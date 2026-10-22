@@ -51,7 +51,7 @@
  */
 #ifdef HAVE_XM_JOINSIDET_H
 # include <Xm/JoinSideT.h>
-#else
+#інакше
 # define XmLEFT	    1
 # define XmRIGHT    2
 # define XmTOP	    3

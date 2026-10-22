@@ -13,26 +13,26 @@
 
 #include "vim.h"
 
-#if defined(FEAT_EVAL)
+#якщо defined(FEAT_EVAL)
 
 /*
  * When recursively copying lists and dicts we need to remember which ones we
  * have done to avoid endless recursiveness.  This unique ID is used for that.
  * The last bit is used for previous_funccal, ignored when comparing.
  */
-static int current_copyID = 0;
+static ціле current_copyID = 0;
 
-static int free_unref_items(int copyID);
+static ціле free_unref_items(ціле copyID);
 
 /*
  * Return the next (unique) copy ID.
  * Used for serializing nested structures.
  */
-    int
+    ціле
 get_copyID(void)
 {
     current_copyID += COPYID_INC;
-    return current_copyID;
+    повернути current_copyID;
 }
 
 /*
@@ -60,17 +60,17 @@ get_copyID(void)
  * When "testing" is TRUE this is called from test_garbagecollect_now().
  * Return TRUE if some memory was freed.
  */
-    int
-garbage_collect(int testing)
+    ціле
+garbage_collect(ціле testing)
 {
-    int		copyID;
-    int		abort = FALSE;
+    ціле		copyID;
+    ціле		abort = FALSE;
     buf_T	*buf;
     win_T	*wp;
-    int		did_free = FALSE;
+    ціле		did_free = FALSE;
     tabpage_T	*tp;
 
-    if (!testing)
+    якщо (!testing)
     {
 	// Only do this once.
 	want_garbage_collect = FALSE;
@@ -79,24 +79,24 @@ garbage_collect(int testing)
     }
 
     // The execution stack can grow big, limit the size.
-    if (exestack.ga_maxlen - exestack.ga_len > 500)
+    якщо (exestack.ga_maxlen - exestack.ga_len > 500)
     {
 	size_t	new_len;
 	char_u	*pp;
-	int	n;
+	ціле	n;
 
 	// Keep 150% of the current size, with a minimum of the growth size.
 	n = exestack.ga_len / 2;
-	if (n < exestack.ga_growsize)
+	якщо (n < exestack.ga_growsize)
 	    n = exestack.ga_growsize;
 
 	// Don't make it bigger though.
-	if (exestack.ga_len + n < exestack.ga_maxlen)
+	якщо (exestack.ga_len + n < exestack.ga_maxlen)
 	{
 	    new_len = (size_t)exestack.ga_itemsize * (exestack.ga_len + n);
 	    pp = vim_realloc(exestack.ga_data, new_len);
-	    if (pp == NULL)
-		return FAIL;
+	    якщо (pp == NULL)
+		повернути FAIL;
 	    exestack.ga_maxlen = exestack.ga_len + n;
 	    exestack.ga_data = pp;
 	}
@@ -132,8 +132,8 @@ garbage_collect(int testing)
 	abort = abort || set_ref_in_item(&wp->w_winvar.di_tv, copyID,
 							NULL, NULL, NULL);
     // window-local variables in autocmd windows
-    for (int i = 0; i < AUCMD_WIN_COUNT; ++i)
-	if (aucmd_win[i].auc_win != NULL)
+    для (ціле i = 0; i < AUCMD_WIN_COUNT; ++i)
+	якщо (aucmd_win[i].auc_win != NULL)
 	    abort = abort || set_ref_in_item(
 		    &aucmd_win[i].auc_win->w_winvar.di_tv, copyID, NULL, NULL, NULL);
 #ifdef FEAT_PROP_POPUP
@@ -230,7 +230,7 @@ garbage_collect(int testing)
 
     abort = abort || set_ref_in_classes(copyID);
 
-    if (!abort)
+    якщо (!abort)
     {
 	/*
 	 * 2. Free lists and dictionaries that are not referenced.
@@ -243,21 +243,21 @@ garbage_collect(int testing)
 	 */
 	free_unref_funccal(copyID, testing);
     }
-    else if (p_verbose > 0)
+    інакше якщо (p_verbose > 0)
     {
 	verb_msg(_("Not enough memory to set references, garbage collection aborted!"));
     }
 
-    return did_free;
+    повернути did_free;
 }
 
 /*
  * Free lists, dictionaries, channels and jobs that are no longer referenced.
  */
-    static int
-free_unref_items(int copyID)
+    static ціле
+free_unref_items(ціле copyID)
 {
-    int		did_free = FALSE;
+    ціле		did_free = FALSE;
 
     // Let all "free" functions know that we are here.  This means no
     // dictionaries, lists, channels or jobs are to be freed, because we will
@@ -314,7 +314,7 @@ free_unref_items(int copyID)
 
     in_free_unref_items = FALSE;
 
-    return did_free;
+    повернути did_free;
 }
 
 /*
@@ -323,31 +323,31 @@ free_unref_items(int copyID)
  *
  * Returns TRUE if setting references failed somehow.
  */
-    int
+    ціле
 set_ref_in_ht(
     hashtab_T		*ht,
-    int			copyID,
+    ціле			copyID,
     list_stack_T	**list_stack,
     tuple_stack_T	**tuple_stack)
 {
-    int		todo;
-    int		abort = FALSE;
+    ціле		todo;
+    ціле		abort = FALSE;
     hashitem_T	*hi;
     hashtab_T	*cur_ht;
     ht_stack_T	*ht_stack = NULL;
     ht_stack_T	*tempitem;
 
     cur_ht = ht;
-    for (;;)
+    для (;;)
     {
-	if (!abort)
+	якщо (!abort)
 	{
 	    // Mark each item in the hashtab.  If the item contains a hashtab
 	    // it is added to ht_stack, if it contains a list it is added to
 	    // list_stack.
-	    todo = (int)cur_ht->ht_used;
+	    todo = (ціле)cur_ht->ht_used;
 	    FOR_ALL_HASHTAB_ITEMS(cur_ht, hi, todo)
-		if (!HASHITEM_EMPTY(hi))
+		якщо (!HASHITEM_EMPTY(hi))
 		{
 		    --todo;
 		    abort = abort
@@ -356,7 +356,7 @@ set_ref_in_ht(
 		}
 	}
 
-	if (ht_stack == NULL)
+	якщо (ht_stack == NULL)
 	    break;
 
 	// take an item from the stack
@@ -366,23 +366,23 @@ set_ref_in_ht(
 	free(tempitem);
     }
 
-    return abort;
+    повернути abort;
 }
 
-#if defined(FEAT_LUA) || defined(FEAT_PYTHON) || defined(FEAT_PYTHON3)
+#якщо defined(FEAT_LUA) || defined(FEAT_PYTHON) || defined(FEAT_PYTHON3)
 /*
  * Mark a dict and its items with "copyID".
  * Returns TRUE if setting references failed somehow.
  */
-    int
-set_ref_in_dict(dict_T *d, int copyID)
+    ціле
+set_ref_in_dict(dict_T *d, ціле copyID)
 {
-    if (d != NULL && d->dv_copyID != copyID)
+    якщо (d != NULL && d->dv_copyID != copyID)
     {
 	d->dv_copyID = copyID;
-	return set_ref_in_ht(&d->dv_hashtab, copyID, NULL, NULL);
+	повернути set_ref_in_ht(&d->dv_hashtab, copyID, NULL, NULL);
     }
-    return FALSE;
+    повернути FALSE;
 }
 #endif
 
@@ -390,15 +390,15 @@ set_ref_in_dict(dict_T *d, int copyID)
  * Mark a list and its items with "copyID".
  * Returns TRUE if setting references failed somehow.
  */
-    int
-set_ref_in_list(list_T *ll, int copyID)
+    ціле
+set_ref_in_list(list_T *ll, ціле copyID)
 {
-    if (ll != NULL && ll->lv_copyID != copyID)
+    якщо (ll != NULL && ll->lv_copyID != copyID)
     {
 	ll->lv_copyID = copyID;
-	return set_ref_in_list_items(ll, copyID, NULL, NULL);
+	повернути set_ref_in_list_items(ll, copyID, NULL, NULL);
     }
-    return FALSE;
+    повернути FALSE;
 }
 
 /*
@@ -407,30 +407,30 @@ set_ref_in_list(list_T *ll, int copyID)
  *
  * Returns TRUE if setting references failed somehow.
  */
-    int
+    ціле
 set_ref_in_list_items(
     list_T		*l,
-    int			copyID,
+    ціле			copyID,
     ht_stack_T		**ht_stack,
     tuple_stack_T	**tuple_stack)
 {
     listitem_T	 *li;
-    int		 abort = FALSE;
+    ціле		 abort = FALSE;
     list_T	 *cur_l;
     list_stack_T *list_stack = NULL;
     list_stack_T *tempitem;
 
     cur_l = l;
-    for (;;)
+    для (;;)
     {
-	if (!abort && cur_l->lv_first != &range_list_item)
+	якщо (!abort && cur_l->lv_first != &range_list_item)
 	    // Mark each item in the list.  If the item contains a hashtab
 	    // it is added to ht_stack, if it contains a list it is added to
 	    // list_stack.
-	    for (li = cur_l->lv_first; !abort && li != NULL; li = li->li_next)
+	    для (li = cur_l->lv_first; !abort && li != NULL; li = li->li_next)
 		abort = abort || set_ref_in_item(&li->li_tv, copyID,
 				       ht_stack, &list_stack, tuple_stack);
-	if (list_stack == NULL)
+	якщо (list_stack == NULL)
 	    break;
 
 	// take an item from the stack
@@ -440,22 +440,22 @@ set_ref_in_list_items(
 	free(tempitem);
     }
 
-    return abort;
+    повернути abort;
 }
 
 /*
  * Mark a tuple and its items with "copyID".
  * Returns TRUE if setting references failed somehow.
  */
-    int
-set_ref_in_tuple(tuple_T *tuple, int copyID)
+    ціле
+set_ref_in_tuple(tuple_T *tuple, ціле copyID)
 {
-    if (tuple != NULL && tuple->tv_copyID != copyID)
+    якщо (tuple != NULL && tuple->tv_copyID != copyID)
     {
 	tuple->tv_copyID = copyID;
-	return set_ref_in_tuple_items(tuple, copyID, NULL, NULL);
+	повернути set_ref_in_tuple_items(tuple, copyID, NULL, NULL);
     }
-    return FALSE;
+    повернути FALSE;
 }
 
 /*
@@ -464,32 +464,32 @@ set_ref_in_tuple(tuple_T *tuple, int copyID)
  *
  * Returns TRUE if setting references failed somehow.
  */
-    int
+    ціле
 set_ref_in_tuple_items(
     tuple_T		*tuple,
-    int			copyID,
+    ціле			copyID,
     ht_stack_T		**ht_stack,
     list_stack_T	**list_stack)
 {
-    int			abort = FALSE;
+    ціле			abort = FALSE;
     tuple_T		*cur_t;
     tuple_stack_T	*tuple_stack = NULL;
     tuple_stack_T	*tempitem;
 
     cur_t = tuple;
-    for (;;)
+    для (;;)
     {
 	// Mark each item in the tuple.  If the item contains a hashtab
 	// it is added to ht_stack, if it contains a list it is added to
 	// list_stack.
-	for (int i = 0; i < cur_t->tv_items.ga_len; i++)
+	для (ціле i = 0; i < cur_t->tv_items.ga_len; i++)
 	{
 	    typval_T *tv = ((typval_T *)cur_t->tv_items.ga_data) + i;
 	    abort = abort
 		|| set_ref_in_item(tv, copyID,
 			ht_stack, list_stack, &tuple_stack);
 	}
-	if (tuple_stack == NULL)
+	якщо (tuple_stack == NULL)
 	    break;
 
 	// take an item from the stack
@@ -499,139 +499,139 @@ set_ref_in_tuple_items(
 	free(tempitem);
     }
 
-    return abort;
+    повернути abort;
 }
 
 /*
  * Mark the partial in callback 'cb' with "copyID".
  */
-    int
-set_ref_in_callback(callback_T *cb, int copyID)
+    ціле
+set_ref_in_callback(callback_T *cb, ціле copyID)
 {
     typval_T tv;
 
-    if (cb->cb_name == NULL || *cb->cb_name == NUL || cb->cb_partial == NULL)
-	return FALSE;
+    якщо (cb->cb_name == NULL || *cb->cb_name == NUL || cb->cb_partial == NULL)
+	повернути FALSE;
 
     tv.v_type = VAR_PARTIAL;
     tv.vval.v_partial = cb->cb_partial;
-    return set_ref_in_item(&tv, copyID, NULL, NULL, NULL);
+    повернути set_ref_in_item(&tv, copyID, NULL, NULL, NULL);
 }
 
 /*
  * Mark the dict "dd" with "copyID".
  * Also see set_ref_in_item().
  */
-    static int
+    static ціле
 set_ref_in_item_dict(
     dict_T		*dd,
-    int			copyID,
+    ціле			copyID,
     ht_stack_T		**ht_stack,
     list_stack_T	**list_stack,
     tuple_stack_T	**tuple_stack)
 {
-    if (dd == NULL || dd->dv_copyID == copyID)
-	return FALSE;
+    якщо (dd == NULL || dd->dv_copyID == copyID)
+	повернути FALSE;
 
     // Didn't see this dict yet.
     dd->dv_copyID = copyID;
-    if (ht_stack == NULL)
-	return set_ref_in_ht(&dd->dv_hashtab, copyID, list_stack, tuple_stack);
+    якщо (ht_stack == NULL)
+	повернути set_ref_in_ht(&dd->dv_hashtab, copyID, list_stack, tuple_stack);
 
     ht_stack_T *newitem = ALLOC_ONE(ht_stack_T);
-    if (newitem == NULL)
-	return TRUE;
+    якщо (newitem == NULL)
+	повернути TRUE;
 
     newitem->ht = &dd->dv_hashtab;
     newitem->prev = *ht_stack;
     *ht_stack = newitem;
 
-    return FALSE;
+    повернути FALSE;
 }
 
 /*
  * Mark the list "ll" with "copyID".
  * Also see set_ref_in_item().
  */
-    static int
+    static ціле
 set_ref_in_item_list(
     list_T		*ll,
-    int			copyID,
+    ціле			copyID,
     ht_stack_T		**ht_stack,
     list_stack_T	**list_stack,
     tuple_stack_T	**tuple_stack)
 {
-    if (ll == NULL || ll->lv_copyID == copyID)
-	return FALSE;
+    якщо (ll == NULL || ll->lv_copyID == copyID)
+	повернути FALSE;
 
     // Didn't see this list yet.
     ll->lv_copyID = copyID;
-    if (list_stack == NULL)
-	return set_ref_in_list_items(ll, copyID, ht_stack, tuple_stack);
+    якщо (list_stack == NULL)
+	повернути set_ref_in_list_items(ll, copyID, ht_stack, tuple_stack);
 
     list_stack_T *newitem = ALLOC_ONE(list_stack_T);
-    if (newitem == NULL)
-	return TRUE;
+    якщо (newitem == NULL)
+	повернути TRUE;
 
     newitem->list = ll;
     newitem->prev = *list_stack;
     *list_stack = newitem;
 
-    return FALSE;
+    повернути FALSE;
 }
 
 /*
  * Mark the tuple "tt" with "copyID".
  * Also see set_ref_in_item().
  */
-    static int
+    static ціле
 set_ref_in_item_tuple(
     tuple_T		*tt,
-    int			copyID,
+    ціле			copyID,
     ht_stack_T		**ht_stack,
     list_stack_T	**list_stack,
     tuple_stack_T	**tuple_stack)
 {
-    if (tt == NULL || tt->tv_copyID == copyID)
-	return FALSE;
+    якщо (tt == NULL || tt->tv_copyID == copyID)
+	повернути FALSE;
 
     // Didn't see this tuple yet.
     tt->tv_copyID = copyID;
-    if (tuple_stack == NULL)
-	return set_ref_in_tuple_items(tt, copyID, ht_stack, list_stack);
+    якщо (tuple_stack == NULL)
+	повернути set_ref_in_tuple_items(tt, copyID, ht_stack, list_stack);
 
     tuple_stack_T *newitem = ALLOC_ONE(tuple_stack_T);
-    if (newitem == NULL)
-	return TRUE;
+    якщо (newitem == NULL)
+	повернути TRUE;
 
     newitem->tuple = tt;
     newitem->prev = *tuple_stack;
     *tuple_stack = newitem;
 
-    return FALSE;
+    повернути FALSE;
 }
 
 /*
  * Mark the partial "pt" with "copyID".
  * Also see set_ref_in_item().
  */
-    static int
+    static ціле
 set_ref_in_item_partial(
     partial_T		*pt,
-    int			copyID,
+    ціле			copyID,
     ht_stack_T		**ht_stack,
     list_stack_T	**list_stack,
     tuple_stack_T	**tuple_stack)
 {
-    if (pt == NULL || pt->pt_copyID == copyID)
-	return FALSE;
+    якщо (pt == NULL || pt->pt_copyID == copyID)
+	повернути FALSE;
 
     // Didn't see this partial yet.
     pt->pt_copyID = copyID;
 
-    int abort = set_ref_in_func(pt->pt_name, pt->pt_func, copyID);
+    ціле abort = set_ref_in_func(pt->pt_name, pt->pt_func, copyID);
 
-    if (pt->pt_dict != NULL)
+    якщо (pt->pt_dict != NULL)
     {
 	typval_T dtv;
 
@@ -640,7 +640,7 @@ set_ref_in_item_partial(
 	set_ref_in_item(&dtv, copyID, ht_stack, list_stack, tuple_stack);
     }
 
-    if (pt->pt_obj != NULL)
+    якщо (pt->pt_obj != NULL)
     {
 	typval_T objtv;
 
@@ -649,13 +649,13 @@ set_ref_in_item_partial(
 	set_ref_in_item(&objtv, copyID, ht_stack, list_stack, tuple_stack);
     }
 
-    for (int i = 0; i < pt->pt_argc; ++i)
+    для (ціле i = 0; i < pt->pt_argc; ++i)
 	abort = abort || set_ref_in_item(&pt->pt_argv[i], copyID,
 		ht_stack, list_stack, tuple_stack);
     // pt_funcstack is handled in set_ref_in_funcstacks()
     // pt_loopvars is handled in set_ref_in_loopvars()
 
-    return abort;
+    повернути abort;
 }
 
 #ifdef FEAT_JOB_CHANNEL
@@ -663,88 +663,88 @@ set_ref_in_item_partial(
  * Mark the job "pt" with "copyID".
  * Also see set_ref_in_item().
  */
-    static int
+    static ціле
 set_ref_in_item_job(
     job_T		*job,
-    int			copyID,
+    ціле			copyID,
     ht_stack_T		**ht_stack,
     list_stack_T	**list_stack,
     tuple_stack_T	**tuple_stack)
 {
     typval_T    dtv;
 
-    if (job == NULL || job->jv_copyID == copyID)
-	return FALSE;
+    якщо (job == NULL || job->jv_copyID == copyID)
+	повернути FALSE;
 
     job->jv_copyID = copyID;
-    if (job->jv_channel != NULL)
+    якщо (job->jv_channel != NULL)
     {
 	dtv.v_type = VAR_CHANNEL;
 	dtv.vval.v_channel = job->jv_channel;
 	set_ref_in_item(&dtv, copyID, ht_stack, list_stack, tuple_stack);
     }
-    if (job->jv_exit_cb.cb_partial != NULL)
+    якщо (job->jv_exit_cb.cb_partial != NULL)
     {
 	dtv.v_type = VAR_PARTIAL;
 	dtv.vval.v_partial = job->jv_exit_cb.cb_partial;
 	set_ref_in_item(&dtv, copyID, ht_stack, list_stack, tuple_stack);
     }
 
-    return FALSE;
+    повернути FALSE;
 }
 
 /*
  * Mark the channel "ch" with "copyID".
  * Also see set_ref_in_item().
  */
-    static int
+    static ціле
 set_ref_in_item_channel(
     channel_T		*ch,
-    int			copyID,
+    ціле			copyID,
     ht_stack_T		**ht_stack,
     list_stack_T	**list_stack,
     tuple_stack_T	**tuple_stack)
 {
     typval_T    dtv;
 
-    if (ch == NULL || ch->ch_copyID == copyID)
-	return FALSE;
+    якщо (ch == NULL || ch->ch_copyID == copyID)
+	повернути FALSE;
 
     ch->ch_copyID = copyID;
-    for (ch_part_T part = PART_SOCK; part < PART_COUNT; ++part)
+    для (ch_part_T part = PART_SOCK; part < PART_COUNT; ++part)
     {
-	for (jsonq_T *jq = ch->ch_part[part].ch_json_head.jq_next;
+	для (jsonq_T *jq = ch->ch_part[part].ch_json_head.jq_next;
 		jq != NULL; jq = jq->jq_next)
 	    set_ref_in_item(jq->jq_value, copyID, ht_stack, list_stack, tuple_stack);
-	for (cbq_T *cq = ch->ch_part[part].ch_cb_head.cq_next; cq != NULL;
+	для (cbq_T *cq = ch->ch_part[part].ch_cb_head.cq_next; cq != NULL;
 		cq = cq->cq_next)
-	    if (cq->cq_callback.cb_partial != NULL)
+	    якщо (cq->cq_callback.cb_partial != NULL)
 	    {
 		dtv.v_type = VAR_PARTIAL;
 		dtv.vval.v_partial = cq->cq_callback.cb_partial;
 		set_ref_in_item(&dtv, copyID, ht_stack, list_stack, tuple_stack);
 	    }
-	if (ch->ch_part[part].ch_callback.cb_partial != NULL)
+	якщо (ch->ch_part[part].ch_callback.cb_partial != NULL)
 	{
 	    dtv.v_type = VAR_PARTIAL;
 	    dtv.vval.v_partial = ch->ch_part[part].ch_callback.cb_partial;
 	    set_ref_in_item(&dtv, copyID, ht_stack, list_stack, tuple_stack);
 	}
     }
-    if (ch->ch_callback.cb_partial != NULL)
+    якщо (ch->ch_callback.cb_partial != NULL)
     {
 	dtv.v_type = VAR_PARTIAL;
 	dtv.vval.v_partial = ch->ch_callback.cb_partial;
 	set_ref_in_item(&dtv, copyID, ht_stack, list_stack, tuple_stack);
     }
-    if (ch->ch_close_cb.cb_partial != NULL)
+    якщо (ch->ch_close_cb.cb_partial != NULL)
     {
 	dtv.v_type = VAR_PARTIAL;
 	dtv.vval.v_partial = ch->ch_close_cb.cb_partial;
 	set_ref_in_item(&dtv, copyID, ht_stack, list_stack, tuple_stack);
     }
 
-    return FALSE;
+    повернути FALSE;
 }
 #endif
 
@@ -752,68 +752,68 @@ set_ref_in_item_channel(
  * Mark the class "cl" with "copyID".
  * Also see set_ref_in_item().
  */
-    int
+    ціле
 set_ref_in_item_class(
     class_T		*cl,
-    int			copyID,
+    ціле			copyID,
     ht_stack_T		**ht_stack,
     list_stack_T	**list_stack,
     tuple_stack_T	**tuple_stack)
 {
-    int abort = FALSE;
+    ціле abort = FALSE;
 
-    if (cl == NULL || cl->class_copyID == copyID)
-	return FALSE;
+    якщо (cl == NULL || cl->class_copyID == copyID)
+	повернути FALSE;
 
     cl->class_copyID = copyID;
-    if (cl->class_members_tv != NULL)
+    якщо (cl->class_members_tv != NULL)
     {
 	// The "class_members_tv" table is allocated only for regular classes
 	// and not for interfaces.
-	for (int i = 0; !abort && i < cl->class_class_member_count; ++i)
+	для (ціле i = 0; !abort && i < cl->class_class_member_count; ++i)
 	    abort = abort || set_ref_in_item(
 		    &cl->class_members_tv[i],
 		    copyID, ht_stack, list_stack, tuple_stack);
     }
 
-    for (int i = 0; !abort && i < cl->class_class_function_count; ++i)
+    для (ціле i = 0; !abort && i < cl->class_class_function_count; ++i)
 	abort = abort || set_ref_in_func(NULL,
 		cl->class_class_functions[i], copyID);
 
-    for (int i = 0; !abort && i < cl->class_obj_method_count; ++i)
+    для (ціле i = 0; !abort && i < cl->class_obj_method_count; ++i)
 	abort = abort || set_ref_in_func(NULL,
 		cl->class_obj_methods[i], copyID);
 
-    return abort;
+    повернути abort;
 }
 
 /*
  * Mark the object "cl" with "copyID".
  * Also see set_ref_in_item().
  */
-    static int
+    static ціле
 set_ref_in_item_object(
     object_T		*obj,
-    int			copyID,
+    ціле			copyID,
     ht_stack_T		**ht_stack,
     list_stack_T	**list_stack,
     tuple_stack_T	**tuple_stack)
 {
-    int abort = FALSE;
+    ціле abort = FALSE;
 
-    if (obj == NULL || obj->obj_copyID == copyID)
-	return FALSE;
+    якщо (obj == NULL || obj->obj_copyID == copyID)
+	повернути FALSE;
 
     obj->obj_copyID = copyID;
 
     // The typval_T array is right after the object_T.
     typval_T *mtv = (typval_T *)(obj + 1);
-    for (int i = 0; !abort
+    для (ціле i = 0; !abort
 	    && i < obj->obj_class->class_obj_member_count; ++i)
 	abort = abort || set_ref_in_item(mtv + i, copyID,
 		ht_stack, list_stack, tuple_stack);
 
-    return abort;
+    повернути abort;
 }
 
 /*
@@ -824,28 +824,28 @@ set_ref_in_item_object(
  *
  * Returns TRUE if setting references failed somehow.
  */
-    int
+    ціле
 set_ref_in_item(
     typval_T	    *tv,
-    int		    copyID,
+    ціле		    copyID,
     ht_stack_T	    **ht_stack,
     list_stack_T    **list_stack,
     tuple_stack_T   **tuple_stack)
 {
-    int		abort = FALSE;
+    ціле		abort = FALSE;
 
     switch (tv->v_type)
     {
 	case VAR_DICT:
-	    return set_ref_in_item_dict(tv->vval.v_dict, copyID,
+	    повернути set_ref_in_item_dict(tv->vval.v_dict, copyID,
 					 ht_stack, list_stack, tuple_stack);
 
 	case VAR_LIST:
-	    return set_ref_in_item_list(tv->vval.v_list, copyID,
+	    повернути set_ref_in_item_list(tv->vval.v_list, copyID,
 					 ht_stack, list_stack, tuple_stack);
 
 	case VAR_TUPLE:
-	    return set_ref_in_item_tuple(tv->vval.v_tuple, copyID,
+	    повернути set_ref_in_item_tuple(tv->vval.v_tuple, copyID,
 					 ht_stack, list_stack, tuple_stack);
 	case VAR_FUNC:
 	{
@@ -854,31 +854,31 @@ set_ref_in_item(
 	}
 
 	case VAR_PARTIAL:
-	    return set_ref_in_item_partial(tv->vval.v_partial, copyID,
+	    повернути set_ref_in_item_partial(tv->vval.v_partial, copyID,
 					ht_stack, list_stack, tuple_stack);
 
 	case VAR_JOB:
 #ifdef FEAT_JOB_CHANNEL
-	    return set_ref_in_item_job(tv->vval.v_job, copyID,
+	    повернути set_ref_in_item_job(tv->vval.v_job, copyID,
 					ht_stack, list_stack, tuple_stack);
-#else
+#інакше
 	    break;
 #endif
 
 	case VAR_CHANNEL:
 #ifdef FEAT_JOB_CHANNEL
-	    return set_ref_in_item_channel(tv->vval.v_channel, copyID,
+	    повернути set_ref_in_item_channel(tv->vval.v_channel, copyID,
 					ht_stack, list_stack, tuple_stack);
-#else
+#інакше
 	    break;
 #endif
 
 	case VAR_CLASS:
-	    return set_ref_in_item_class(tv->vval.v_class, copyID,
+	    повернути set_ref_in_item_class(tv->vval.v_class, copyID,
 					ht_stack, list_stack, tuple_stack);
 
 	case VAR_OBJECT:
-	    return set_ref_in_item_object(tv->vval.v_object, copyID,
+	    повернути set_ref_in_item_object(tv->vval.v_object, copyID,
 					ht_stack, list_stack, tuple_stack);
 
 	case VAR_UNKNOWN:
@@ -896,7 +896,7 @@ set_ref_in_item(
 	    break;
     }
 
-    return abort;
+    повернути abort;
 }
 
 #endif

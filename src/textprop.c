@@ -13,7 +13,7 @@
 
 #include "vim.h"
 
-#if defined(FEAT_PROP_POPUP)
+#якщо defined(FEAT_PROP_POPUP)
 
 static void um_store_changes(unpacked_memline_T *um);
 
@@ -21,10 +21,10 @@ static void um_store_changes(unpacked_memline_T *um);
  * Free virtual text strings in a detached unpacked memline's props.
  */
     static void
-um_free_vtext(textprop_T *props, int count)
+um_free_vtext(textprop_T *props, ціле count)
 {
-    for (int i = 0; i < count; ++i)
-	if (props[i].tp_flags & TP_FLAG_VTEXT_PTR)
+    для (ціле i = 0; i < count; ++i)
+	якщо (props[i].tp_flags & TP_FLAG_VTEXT_PTR)
 	    VIM_CLEAR(props[i].u.tp_text);
 }
 
@@ -34,7 +34,7 @@ um_free_vtext(textprop_T *props, int count)
     static void
 um_free(unpacked_memline_T *um)
 {
-    if (um->detached)
+    якщо (um->detached)
     {
 	VIM_CLEAR(um->text);
 	um_free_vtext(um->props, um->prop_count);
@@ -57,7 +57,7 @@ um_open(buf_T *buf)
 
     CLEAR_FIELD(um);
     um.buf = buf;
-    return um;
+    повернути um;
 }
 
 /*
@@ -67,23 +67,23 @@ um_open(buf_T *buf)
  * Returns true on success, false on error (um becomes closed).
  */
     bool
-um_goto_line(unpacked_memline_T *um, linenr_T lnum, int extra_props)
+um_goto_line(unpacked_memline_T *um, linenr_T lnum, ціле extra_props)
 {
     char_u	*line;
     size_t	textlen;
     size_t	propdata_len;
-    int		proplen;
+    ціле		proplen;
 
-    if (um->buf == NULL)
-	return false;
+    якщо (um->buf == NULL)
+	повернути false;
 
     // Store changes to the current line if any.
-    if (um->lnum > 0 && um->detached)
+    якщо (um->lnum > 0 && um->detached)
 	um_store_changes(um);
     um_free(um);
 
-    if (lnum == 0)
-	return true;	// just unload
+    якщо (lnum == 0)
+	повернути true;	// just unload
 
     line = ml_get_buf(um->buf, lnum, FALSE);
     textlen = ml_get_buf_len(um->buf, lnum) + 1;
@@ -93,15 +93,15 @@ um_goto_line(unpacked_memline_T *um, linenr_T lnum, int extra_props)
     um->text_size = (colnr_T)textlen;
     um->text = line;
 
-    if (propdata_len == 0)
-	return true;
+    якщо (propdata_len == 0)
+	повернути true;
 
     // New format: [prop_count (uint16)][textprop_T...][vtext...]
-    if (propdata_len < PROP_COUNT_SIZE + sizeof(textprop_T))
+    якщо (propdata_len < PROP_COUNT_SIZE + sizeof(textprop_T))
     {
 	emsg(e_text_property_info_corrupted);
 	um->buf = NULL;
-	return false;
+	повернути false;
     }
 
     uint16_t    prop_count;
@@ -109,27 +109,27 @@ um_goto_line(unpacked_memline_T *um, linenr_T lnum, int extra_props)
     char_u	    *props_start;
 
     mch_memmove(&prop_count, count_ptr, PROP_COUNT_SIZE);
-    if (!text_prop_count_valid(prop_count, propdata_len))
+    якщо (!text_prop_count_valid(prop_count, propdata_len))
     {
 	emsg(e_text_property_info_corrupted);
 	um->buf = NULL;
-	return false;
+	повернути false;
     }
-    proplen = (int)prop_count;
+    proplen = (ціле)prop_count;
     props_start = count_ptr + PROP_COUNT_SIZE;
 
-    if (!text_prop_vtext_valid(props_start, proplen, propdata_len))
+    якщо (!text_prop_vtext_valid(props_start, proplen, propdata_len))
     {
 	emsg(e_text_property_info_corrupted);
 	um->buf = NULL;
-	return false;
+	повернути false;
     }
 
     um->props = ALLOC_MULT(textprop_T, proplen + extra_props);
-    if (um->props == NULL)
+    якщо (um->props == NULL)
     {
 	um->buf = NULL;
-	return false;
+	повернути false;
     }
     um->prop_size = proplen + extra_props;
     um->prop_count = proplen;
@@ -137,18 +137,18 @@ um_goto_line(unpacked_memline_T *um, linenr_T lnum, int extra_props)
 
     // Convert tp_text_offset to tp_text pointer for virtual text
     // props.
-    for (int i = 0; i < proplen; ++i)
+    для (ціле i = 0; i < proplen; ++i)
     {
-	if (um->props[i].tp_id < 0 && um->props[i].u.tp_text_offset > 0)
+	якщо (um->props[i].tp_id < 0 && um->props[i].u.tp_text_offset > 0)
 	{
 	    um->props[i].u.tp_text = count_ptr + um->props[i].u.tp_text_offset;
 	    um->props[i].tp_flags |= TP_FLAG_VTEXT_PTR;
 	}
-	else
+	інакше
 	    um->props[i].u.tp_text = NULL;
     }
 
-    return true;
+    повернути true;
 }
 
 /*
@@ -156,13 +156,13 @@ um_goto_line(unpacked_memline_T *um, linenr_T lnum, int extra_props)
  * Check um.buf != NULL for success.
  */
     unpacked_memline_T
-um_open_at(buf_T *buf, linenr_T lnum, int extra_props)
+um_open_at(buf_T *buf, linenr_T lnum, ціле extra_props)
 {
     unpacked_memline_T um = um_open(buf);
 
-    if (!um_goto_line(&um, lnum, extra_props))
+    якщо (!um_goto_line(&um, lnum, extra_props))
 	um.buf = NULL;
-    return um;
+    повернути um;
 }
 
 /*
@@ -175,38 +175,38 @@ um_detach(unpacked_memline_T *um)
 {
     char_u  *newtext;
 
-    if (um->detached || um->buf == NULL)
-	return um->detached;
+    якщо (um->detached || um->buf == NULL)
+	повернути um->detached;
 
     newtext = vim_strnsave(um->text, um->text_size - 1);
-    if (newtext == NULL)
+    якщо (newtext == NULL)
     {
 	um->buf = NULL;
-	return false;
+	повернути false;
     }
     um->text = newtext;
 
-    for (int i = 0; i < um->prop_count; ++i)
+    для (ціле i = 0; i < um->prop_count; ++i)
     {
-	if (um->props[i].tp_flags & TP_FLAG_VTEXT_PTR)
+	якщо (um->props[i].tp_flags & TP_FLAG_VTEXT_PTR)
 	{
 	    char_u *copy = vim_strsave(um->props[i].u.tp_text);
 
-	    if (copy == NULL)
+	    якщо (copy == NULL)
 	    {
-		for (int j = 0; j < i; ++j)
-		    if (um->props[j].tp_id < 0)
+		для (ціле j = 0; j < i; ++j)
+		    якщо (um->props[j].tp_id < 0)
 			VIM_CLEAR(um->props[j].u.tp_text);
 		VIM_CLEAR(um->text);
 		um->buf = NULL;
-		return false;
+		повернути false;
 	    }
 	    um->props[i].u.tp_text = copy;
 	}
     }
 
     um->detached = true;
-    return true;
+    повернути true;
 }
 
 /*
@@ -216,15 +216,15 @@ um_detach(unpacked_memline_T *um)
     bool
 um_set_text(unpacked_memline_T *um, char_u *text)
 {
-    if (um->buf == NULL)
-	return false;
-    if (um->detached)
+    якщо (um->buf == NULL)
+	повернути false;
+    якщо (um->detached)
 	vim_free(um->text);
     um->text = text;
     um->text_size = (colnr_T)STRLEN(text) + 1;
     um->text_changed = true;
     um->detached = true;
-    return true;
+    повернути true;
 }
 
 /*
@@ -232,20 +232,20 @@ um_set_text(unpacked_memline_T *um, char_u *text)
  * Returns true on success.
  */
     static bool
-um_grow_props(unpacked_memline_T *um, int needed)
+um_grow_props(unpacked_memline_T *um, ціле needed)
 {
-    if (um->prop_count + needed <= um->prop_size)
-	return true;
+    якщо (um->prop_count + needed <= um->prop_size)
+	повернути true;
 
-    int	    new_size = um->prop_count + needed;
+    ціле	    new_size = um->prop_count + needed;
     textprop_T  *newprops = vim_realloc(um->props,
 					    new_size * sizeof(textprop_T));
-    if (newprops == NULL)
-	return false;
+    якщо (newprops == NULL)
+	повернути false;
     um->props = newprops;
     um->prop_size = new_size;
 
-    return true;
+    повернути true;
 }
 
 /*
@@ -255,14 +255,14 @@ um_grow_props(unpacked_memline_T *um, int needed)
     static void
 um_add_prop(unpacked_memline_T *um, textprop_T *prop)
 {
-    if (um->buf == NULL)
-	return;
-    if (!um->detached && !um_detach(um))
-	return;
-    if (!um_grow_props(um, 1))
+    якщо (um->buf == NULL)
+	повернути;
+    якщо (!um->detached && !um_detach(um))
+	повернути;
+    якщо (!um_grow_props(um, 1))
     {
 	um->buf = NULL;
-	return;
+	повернути;
     }
     um->props[um->prop_count++] = *prop;
 }
@@ -273,7 +273,7 @@ um_add_prop(unpacked_memline_T *um, textprop_T *prop)
     void
 um_reverse_props(unpacked_memline_T *um)
 {
-    for (int i = 0, j = um->prop_count - 1; i < j; ++i, --j)
+    для (ціле i = 0, j = um->prop_count - 1; i < j; ++i, --j)
     {
 	textprop_T tmp = um->props[i];
 	um->props[i] = um->props[j];
@@ -287,45 +287,45 @@ um_reverse_props(unpacked_memline_T *um)
  * immediately in the DETACHED state.
  */
     unpacked_memline_T
-um_open_at_no_props(buf_T *buf, linenr_T lnum, int prop_count)
+um_open_at_no_props(buf_T *buf, linenr_T lnum, ціле prop_count)
 {
     unpacked_memline_T um;
 
     CLEAR_FIELD(um);
     um.buf = buf;
 
-    if (lnum < 1 || lnum > buf->b_ml.ml_line_count)
+    якщо (lnum < 1 || lnum > buf->b_ml.ml_line_count)
     {
 	um.buf = NULL;
-	return um;
+	повернути um;
     }
 
     char_u *line = ml_get_buf(buf, lnum, FALSE);
     char_u *text_copy = vim_strsave(line);
 
-    if (text_copy == NULL)
+    якщо (text_copy == NULL)
     {
 	um.buf = NULL;
-	return um;
+	повернути um;
     }
     um.lnum = lnum;
     um.text = text_copy;
     um.text_size = (colnr_T)STRLEN(text_copy) + 1;
     um.detached = true;
 
-    if (prop_count > 0)
+    якщо (prop_count > 0)
     {
 	um.props = ALLOC_MULT(textprop_T, prop_count);
-	if (um.props == NULL)
+	якщо (um.props == NULL)
 	{
 	    vim_free(um.text);
 	    um.buf = NULL;
-	    return um;
+	    повернути um;
 	}
 	um.prop_size = prop_count;
     }
 
-    return um;
+    повернути um;
 }
 
 /*
@@ -335,24 +335,24 @@ um_open_at_no_props(buf_T *buf, linenr_T lnum, int prop_count)
  */
     static void
 clear_cont_flag_on_neighbor(buf_T *buf, linenr_T lnum,
-					int tp_id, int tp_type, int flag)
+					ціле tp_id, ціле tp_type, ціле flag)
 {
     unpacked_memline_T	neighbor;
 
-    if (lnum < 1 || lnum > buf->b_ml.ml_line_count)
-	return;
+    якщо (lnum < 1 || lnum > buf->b_ml.ml_line_count)
+	повернути;
 
     neighbor = um_open_at(buf, lnum, 0);
-    if (neighbor.buf == NULL)
-	return;
+    якщо (neighbor.buf == NULL)
+	повернути;
 
-    for (int i = 0; i < neighbor.prop_count; ++i)
+    для (ціле i = 0; i < neighbor.prop_count; ++i)
     {
 	textprop_T *p = &neighbor.props[i];
 
-	if (p->tp_id == tp_id && p->tp_type == tp_type && (p->tp_flags & flag))
+	якщо (p->tp_id == tp_id && p->tp_type == tp_type && (p->tp_flags & flag))
 	{
-	    if (!neighbor.detached && !um_detach(&neighbor))
+	    якщо (!neighbor.detached && !um_detach(&neighbor))
 		break;
 	    // Re-get pointer after detach.
 	    p = &neighbor.props[i];
@@ -369,26 +369,26 @@ clear_cont_flag_on_neighbor(buf_T *buf, linenr_T lnum,
  * Also adjusts continuation flags on neighboring lines.
  */
     void
-um_delete_prop(unpacked_memline_T *um, int index)
+um_delete_prop(unpacked_memline_T *um, ціле index)
 {
     textprop_T *prop;
 
-    if (um->buf == NULL || index < 0 || index >= um->prop_count)
-	return;
-    if (!um->detached && !um_detach(um))
-	return;
+    якщо (um->buf == NULL || index < 0 || index >= um->prop_count)
+	повернути;
+    якщо (!um->detached && !um_detach(um))
+	повернути;
 
     prop = &um->props[index];
 
     // Adjust continuation flags on neighboring lines before deleting.
-    if (prop->tp_flags & TP_FLAG_CONT_PREV)
+    якщо (prop->tp_flags & TP_FLAG_CONT_PREV)
 	clear_cont_flag_on_neighbor(um->buf, um->lnum - 1,
 			       prop->tp_id, prop->tp_type, TP_FLAG_CONT_NEXT);
-    if (prop->tp_flags & TP_FLAG_CONT_NEXT)
+    якщо (prop->tp_flags & TP_FLAG_CONT_NEXT)
 	clear_cont_flag_on_neighbor(um->buf, um->lnum + 1,
 			       prop->tp_id, prop->tp_type, TP_FLAG_CONT_PREV);
 
-    if (prop->tp_flags & TP_FLAG_VTEXT_PTR)
+    якщо (prop->tp_flags & TP_FLAG_VTEXT_PTR)
 	VIM_CLEAR(prop->u.tp_text);
     prop->tp_flags |= TP_FLAG_DELETED;
 }
@@ -403,45 +403,45 @@ um_delete_prop(unpacked_memline_T *um, int index)
  * the read side has not been converted yet.
  */
     static char_u *
-um_pack(unpacked_memline_T *um, int *packed_len)
+um_pack(unpacked_memline_T *um, ціле *packed_len)
 {
     uint16_t	live_count = 0;
-    int		vtext_size = 0;
-    int		total_len;
+    ціле		vtext_size = 0;
+    ціле		total_len;
     char_u	*buf;
     char_u	*count_dest;
     char_u	*prop_dest;
     char_u	*vtext_dest;
 
-    for (int i = 0; i < um->prop_count; ++i)
+    для (ціле i = 0; i < um->prop_count; ++i)
     {
 	textprop_T *prop = &um->props[i];
 
-	if (prop->tp_flags & TP_FLAG_DELETED)
+	якщо (prop->tp_flags & TP_FLAG_DELETED)
 	    continue;
 	++live_count;
-	if (prop->tp_flags & TP_FLAG_VTEXT_PTR)
+	якщо (prop->tp_flags & TP_FLAG_VTEXT_PTR)
 	    vtext_size += prop->tp_len + 1;
     }
 
-    if (live_count == 0)
+    якщо (live_count == 0)
     {
 	// No properties: just text, no prop_count header.
 	total_len = um->text_size;
 	buf = alloc(total_len);
-	if (buf == NULL)
-	    return NULL;
+	якщо (buf == NULL)
+	    повернути NULL;
 	*packed_len = total_len;
 	mch_memmove(buf, um->text, um->text_size);
-	return buf;
+	повернути buf;
     }
 
     // Format: [text][NUL][prop_count][textprop_T...][vtext...]
-    total_len = um->text_size + (int)PROP_COUNT_SIZE
-		+ live_count * (int)sizeof(textprop_T) + vtext_size;
+    total_len = um->text_size + (ціле)PROP_COUNT_SIZE
+		+ live_count * (ціле)sizeof(textprop_T) + vtext_size;
     buf = alloc(total_len);
-    if (buf == NULL)
-	return NULL;
+    якщо (buf == NULL)
+	повернути NULL;
     *packed_len = total_len;
 
     mch_memmove(buf, um->text, um->text_size);
@@ -452,22 +452,22 @@ um_pack(unpacked_memline_T *um, int *packed_len)
     prop_dest = count_dest + PROP_COUNT_SIZE;
     vtext_dest = prop_dest + live_count * sizeof(textprop_T);
 
-    for (int i = 0; i < um->prop_count; ++i)
+    для (ціле i = 0; i < um->prop_count; ++i)
     {
 	textprop_T prop = um->props[i];
 
-	if (prop.tp_flags & TP_FLAG_DELETED)
+	якщо (prop.tp_flags & TP_FLAG_DELETED)
 	    continue;
 
-	if (prop.tp_id < 0 && (prop.tp_flags & TP_FLAG_VTEXT_PTR))
+	якщо (prop.tp_id < 0 && (prop.tp_flags & TP_FLAG_VTEXT_PTR))
 	{
-	    int copysize = prop.tp_len + 1;
+	    ціле copysize = prop.tp_len + 1;
 
 	    mch_memmove(vtext_dest, prop.u.tp_text, copysize);
 	    prop.u.tp_text_offset = (colnr_T)(vtext_dest - count_dest);
 	    vtext_dest += copysize;
 	}
-	else
+	інакше
 	    prop.u.tp_text_offset = 0;
 	prop.tp_flags &= ~(TP_FLAG_DELETED | TP_FLAG_VTEXT_PTR);
 
@@ -475,7 +475,7 @@ um_pack(unpacked_memline_T *um, int *packed_len)
 	prop_dest += sizeof(textprop_T);
     }
 
-    return buf;
+    повернути buf;
 }
 
 /*
@@ -485,31 +485,31 @@ um_pack(unpacked_memline_T *um, int *packed_len)
 um_store_changes(unpacked_memline_T *um)
 {
     char_u  *packed;
-    int	    packed_len;
+    ціле	    packed_len;
 
-    if (!um->detached || um->buf == NULL || um->lnum == 0)
-	return;
+    якщо (!um->detached || um->buf == NULL || um->lnum == 0)
+	повернути;
 
     packed = um_pack(um, &packed_len);
-    if (packed == NULL)
+    якщо (packed == NULL)
     {
 	um->buf = NULL;
-	return;
+	повернути;
     }
 
     // Flush any other dirty line before setting ours.  ml_get_buf()
     // with will_change=TRUE will flush the current dirty line and set
     // up for our line.
-    if (um->buf->b_ml.ml_line_lnum != um->lnum)
+    якщо (um->buf->b_ml.ml_line_lnum != um->lnum)
 	ml_get_buf(um->buf, um->lnum, TRUE);
-    else if (!(um->buf->b_ml.ml_flags & ML_LINE_DIRTY))
+    інакше якщо (!(um->buf->b_ml.ml_flags & ML_LINE_DIRTY))
 	(void)ml_get_buf(um->buf, um->lnum, TRUE);
 
     // Free the detached text and vtext before switching to packed.
     vim_free(um->text);
     um_free_vtext(um->props, um->prop_count);
 
-    if (um->buf->b_ml.ml_flags & (ML_LINE_DIRTY | ML_ALLOCATED))
+    якщо (um->buf->b_ml.ml_flags & (ML_LINE_DIRTY | ML_ALLOCATED))
 	vim_free(um->buf->b_ml.ml_line_ptr);
     um->buf->b_ml.ml_line_ptr = packed;
     um->buf->b_ml.ml_line_len = packed_len;
@@ -527,9 +527,9 @@ um_store_changes(unpacked_memline_T *um)
     void
 um_close(unpacked_memline_T *um)
 {
-    if (um->buf == NULL)
-	return;
-    if (um->detached && um->lnum > 0)
+    якщо (um->buf == NULL)
+	повернути;
+    якщо (um->detached && um->lnum > 0)
 	um_store_changes(um);
     um_free(um);
     um->buf = NULL;
@@ -561,7 +561,7 @@ static hashtab_T *global_proptypes = NULL;
 static proptype_T **global_proparray = NULL;
 
 // The last used text property type ID.
-static int proptype_id = 0;
+static ціле proptype_id = 0;
 
 /*
  * Find a property type by name, return the hashitem.
@@ -573,19 +573,19 @@ find_prop_type_hi(char_u *name, buf_T *buf)
     hashtab_T	*ht;
     hashitem_T	*hi;
 
-    if (*name == NUL)
-	return NULL;
-    if (buf == NULL)
+    якщо (*name == NUL)
+	повернути NULL;
+    якщо (buf == NULL)
 	ht = global_proptypes;
-    else
+    інакше
 	ht = buf->b_proptypes;
 
-    if (ht == NULL)
-	return NULL;
+    якщо (ht == NULL)
+	повернути NULL;
     hi = hash_find(ht, name);
-    if (HASHITEM_EMPTY(hi))
-	return NULL;
-    return hi;
+    якщо (HASHITEM_EMPTY(hi))
+	повернути NULL;
+    повернути hi;
 }
 
 /*
@@ -596,23 +596,23 @@ find_prop_type(char_u *name, buf_T *buf)
 {
     hashitem_T	*hi = find_prop_type_hi(name, buf);
 
-    if (hi == NULL)
-	return NULL;
-    return HI2PT(hi);
+    якщо (hi == NULL)
+	повернути NULL;
+    повернути HI2PT(hi);
 }
 
 /*
  * Get the prop type ID of "name".
  * When not found return zero.
  */
-    int
+    ціле
 find_prop_type_id(char_u *name, buf_T *buf)
 {
     proptype_T *pt = find_prop_type(name, buf);
 
-    if (pt == NULL)
-	return 0;
-    return pt->pt_id;
+    якщо (pt == NULL)
+	повернути 0;
+    повернути pt->pt_id;
 }
 
 /*
@@ -625,11 +625,11 @@ lookup_prop_type(char_u *name, buf_T *buf)
 {
     proptype_T *type = find_prop_type(name, buf);
 
-    if (type == NULL)
+    якщо (type == NULL)
 	type = find_prop_type(name, NULL);
-    if (type == NULL)
+    якщо (type == NULL)
 	semsg(_(e_property_type_str_does_not_exist), name);
-    return type;
+    повернути type;
 }
 
 /*
@@ -639,27 +639,27 @@ lookup_prop_type(char_u *name, buf_T *buf)
  * If "bufnr" is valid or not present return OK.
  * When "arg" is not a dict or "bufnr" is invalid return FAIL.
  */
-    static int
+    static ціле
 get_bufnr_from_arg(typval_T *arg, buf_T **buf)
 {
     dictitem_T	*di;
 
-    if (arg->v_type != VAR_DICT)
+    якщо (arg->v_type != VAR_DICT)
     {
 	emsg(_(e_dictionary_required));
-	return FAIL;
+	повернути FAIL;
     }
-    if (arg->vval.v_dict == NULL)
-	return OK;  // NULL dict is like an empty dict
+    якщо (arg->vval.v_dict == NULL)
+	повернути OK;  // NULL dict is like an empty dict
     di = dict_find(arg->vval.v_dict, (char_u *)"bufnr", -1);
-    if (di != NULL && (di->di_tv.v_type != VAR_NUMBER
+    якщо (di != NULL && (di->di_tv.v_type != VAR_NUMBER
 					      || di->di_tv.vval.v_number != 0))
     {
 	*buf = get_buf_arg(&di->di_tv);
-	if (*buf == NULL)
-	    return FAIL;
+	якщо (*buf == NULL)
+	    повернути FAIL;
     }
-    return OK;
+    повернути OK;
 }
 
 /*
@@ -671,16 +671,16 @@ f_prop_add(typval_T *argvars, typval_T *rettv)
     linenr_T	start_lnum;
     colnr_T	start_col;
 
-    if (in_vim9script()
+    якщо (in_vim9script()
 	    && (check_for_number_arg(argvars, 0) == FAIL
 		|| check_for_number_arg(argvars, 1) == FAIL
 		|| check_for_dict_arg(argvars, 2) == FAIL))
-	return;
+	повернути;
 
     start_lnum = tv_get_number(&argvars[0]);
     start_col = tv_get_number(&argvars[1]);
-    if (check_for_dict_arg(argvars, 2) == FAIL)
-	return;
+    якщо (check_for_dict_arg(argvars, 2) == FAIL)
+	повернути;
 
     rettv->vval.v_number = prop_add_common(start_lnum, start_col,
 				 argvars[2].vval.v_dict, curbuf, &argvars[2]);
@@ -692,14 +692,14 @@ f_prop_add(typval_T *argvars, typval_T *rettv)
  * the buffer "buf" and assign identifier "id".
  * When "text" is not NULL store it as virtual text in the memline.
  */
-    static int
+    static ціле
 prop_add_one(
 	buf_T		*buf,
 	char_u		*type_name,
-	int		id,
+	ціле		id,
 	char_u		*text_arg,
-	int		text_padding_left,
-	int		text_flags,
+	ціле		text_padding_left,
+	ціле		text_flags,
 	linenr_T	start_lnum,
 	linenr_T	end_lnum,
 	colnr_T		start_col,
@@ -707,49 +707,49 @@ prop_add_one(
 {
     proptype_T	*type;
     linenr_T	lnum;
-    int		proplen;
+    ціле		proplen;
     char_u	*props = NULL;
     char_u	*newprops;
     size_t	textlen;
     char_u	*newtext;
-    int		i;
+    ціле		i;
     textprop_T	tmp_prop;
     char_u	*text = text_arg;
-    int		res = FAIL;
+    ціле		res = FAIL;
 
     type = lookup_prop_type(type_name, buf);
-    if (type == NULL)
+    якщо (type == NULL)
 	goto theend;
 
-    if (start_lnum < 1 || start_lnum > buf->b_ml.ml_line_count)
+    якщо (start_lnum < 1 || start_lnum > buf->b_ml.ml_line_count)
     {
 	semsg(_(e_invalid_line_number_nr), (long)start_lnum);
 	goto theend;
     }
-    if (end_lnum < start_lnum || end_lnum > buf->b_ml.ml_line_count)
+    якщо (end_lnum < start_lnum || end_lnum > buf->b_ml.ml_line_count)
     {
 	semsg(_(e_invalid_line_number_nr), (long)end_lnum);
 	goto theend;
     }
 
-    if (buf->b_ml.ml_mfp == NULL)
+    якщо (buf->b_ml.ml_mfp == NULL)
     {
 	emsg(_(e_cannot_add_text_property_to_unloaded_buffer));
 	goto theend;
     }
 
-    if (text != NULL)
+    якщо (text != NULL)
     {
 	char_u	    *p;
 
 	// change any control character (Tab, Newline, etc.) to a Space to make
 	// it simpler to compute the size
-	for (p = text; *p != NUL; MB_PTR_ADV(p))
-	    if (*p < ' ')
+	для (p = text; *p != NUL; MB_PTR_ADV(p))
+	    якщо (*p < ' ')
 		*p = ' ';
     }
 
-    for (lnum = start_lnum; lnum <= end_lnum; ++lnum)
+    для (lnum = start_lnum; lnum <= end_lnum; ++lnum)
     {
 	colnr_T col;	    // start column use in tp_col
 	colnr_T sort_col;   // column where it appears
@@ -760,39 +760,39 @@ prop_add_one(
 	textlen = ml_get_buf_len(buf, lnum) + 1;
 
 	// prop_count is a uint16_t; stop before proplen + 1 wraps to zero.
-	if (proplen >= 0xffff)
+	якщо (proplen >= 0xffff)
 	{
 	    emsg(_(e_too_many_text_properties_on_a_single_line));
 	    goto theend;
 	}
 
-	if (lnum == start_lnum)
+	якщо (lnum == start_lnum)
 	    col = start_col;
-	else
+	інакше
 	    col = 1;
-	if (col - 1 > (colnr_T)textlen && !(col == 0 && text_arg != NULL))
+	якщо (col - 1 > (colnr_T)textlen && !(col == 0 && text_arg != NULL))
 	{
 	    semsg(_(e_invalid_column_number_nr), (long)start_col);
 	    goto theend;
 	}
 	sort_col = col;
 
-	if (lnum == end_lnum)
+	якщо (lnum == end_lnum)
 	    length = end_col - col;
-	else
-	    length = (int)textlen - col + 1;
-	if (length > (long)textlen)
-	    length = (int)textlen;	// can include the end-of-line
-	if (length < 0)
+	інакше
+	    length = (ціле)textlen - col + 1;
+	якщо (length > (long)textlen)
+	    length = (ціле)textlen;	// can include the end-of-line
+	якщо (length < 0)
 	    length = 0;		// zero-width property
 
-	if (text_arg != NULL)
+	якщо (text_arg != NULL)
 	{
 	    length = (long)STRLEN(text_arg);
-	    if (col == 0)
+	    якщо (col == 0)
 	    {
 		col = MAXCOL;	// before or after the line
-		if ((text_flags & TP_FLAG_ALIGN_ABOVE) == 0)
+		якщо ((text_flags & TP_FLAG_ALIGN_ABOVE) == 0)
 		    sort_col = MAXCOL;
 	    }
 	}
@@ -809,11 +809,11 @@ prop_add_one(
 			    | ((type->pt_flags & PT_FLAG_INS_START_INCL)
 						     ? TP_FLAG_START_INCL : 0);
 	tmp_prop.tp_padleft = text_padding_left;
-	if (text_arg != NULL)
+	якщо (text_arg != NULL)
 	    tmp_prop.u.tp_text = text_arg;
 
 	// Find the index where to insert the new property.
-	for (i = 0; i < proplen; ++i)
+	для (i = 0; i < proplen; ++i)
 	{
 	    textprop_T	existing;
 	    colnr_T	prop_col;
@@ -822,38 +822,38 @@ prop_add_one(
 							   sizeof(textprop_T));
 	    prop_col = (existing.tp_flags & TP_FLAG_ALIGN_ABOVE)
 				? 0 : existing.tp_col;
-	    if (prop_col >= sort_col)
+	    якщо (prop_col >= sort_col)
 		break;
 	}
 
 	// Compute the sizes for the new memline format:
 	//   [text][NUL][prop_count][textprop_T...][vtext...]
 	uint16_t	new_propcount = (uint16_t)(proplen + 1);
-	int		vtext_total = 0;
-	int		new_line_len;
+	ціле		vtext_total = 0;
+	ціле		new_line_len;
 	char_u	*count_dest;
 	char_u	*vtext_dest;
-	int		j;
+	ціле		j;
 
 	// Compute total vtext size from existing props.
-	for (j = 0; j < proplen; ++j)
+	для (j = 0; j < proplen; ++j)
 	{
 	    textprop_T ep;
 
 	    mch_memmove(&ep, props + j * sizeof(textprop_T),
 							sizeof(textprop_T));
-	    if (ep.tp_id < 0 && ep.tp_len > 0)
+	    якщо (ep.tp_id < 0 && ep.tp_len > 0)
 		vtext_total += ep.tp_len + 1;
 	}
 	// Add new vtext if this is a virtual text prop.
-	if (text_arg != NULL)
+	якщо (text_arg != NULL)
 	    vtext_total += length + 1;
 
-	new_line_len = (int)textlen + (int)PROP_COUNT_SIZE
-			+ new_propcount * (int)sizeof(textprop_T)
+	new_line_len = (ціле)textlen + (ціле)PROP_COUNT_SIZE
+			+ new_propcount * (ціле)sizeof(textprop_T)
 			+ vtext_total;
 	newtext = alloc(new_line_len);
-	if (newtext == NULL)
+	якщо (newtext == NULL)
 	    goto theend;
 
 	// Copy line text.
@@ -866,25 +866,25 @@ prop_add_one(
 	// Write properties: [0..i-1] existing, [i] new, [i..proplen-1]
 	// existing.
 	newprops = count_dest + PROP_COUNT_SIZE;
-	if (i > 0)
+	якщо (i > 0)
 	    mch_memmove(newprops, props, sizeof(textprop_T) * i);
 	// new prop is written after vtext offsets are computed
-	if (i < proplen)
+	якщо (i < proplen)
 	    mch_memmove(newprops + (i + 1) * sizeof(textprop_T),
 					props + i * sizeof(textprop_T),
 					sizeof(textprop_T) * (proplen - i));
 
 	// Write vtext strings and set offsets.
 	vtext_dest = newprops + new_propcount * sizeof(textprop_T);
-	for (j = 0; j < new_propcount; ++j)
+	для (j = 0; j < new_propcount; ++j)
 	{
 	    textprop_T ep;
 
-	    if (j == i)
+	    якщо (j == i)
 		continue;  // handle new prop separately below
 	    mch_memmove(&ep, newprops + j * sizeof(textprop_T),
 		    sizeof(textprop_T));
-	    if (ep.tp_id < 0 && ep.tp_len > 0)
+	    якщо (ep.tp_id < 0 && ep.tp_len > 0)
 	    {
 		// Copy existing vtext from old memline data.
 		char_u *old_count = (char_u *)props - PROP_COUNT_SIZE;
@@ -899,22 +899,22 @@ prop_add_one(
 	}
 
 	// Write new prop with vtext.
-	if (text_arg != NULL)
+	якщо (text_arg != NULL)
 	{
-	    int copysize = tmp_prop.tp_len + 1;
+	    ціле copysize = tmp_prop.tp_len + 1;
 
 	    mch_memmove(vtext_dest, text_arg, copysize);
 	    tmp_prop.u.tp_text_offset =
 				    (colnr_T)(vtext_dest - count_dest);
 	    vtext_dest += copysize;
 	}
-	else
+	інакше
 	    tmp_prop.u.tp_text_offset = 0;
 
 	mch_memmove(newprops + i * sizeof(textprop_T), &tmp_prop,
 							sizeof(textprop_T));
 
-	if (buf->b_ml.ml_flags & (ML_LINE_DIRTY | ML_ALLOCATED))
+	якщо (buf->b_ml.ml_flags & (ML_LINE_DIRTY | ML_ALLOCATED))
 	    vim_free(buf->b_ml.ml_line_ptr);
 	buf->b_ml.ml_line_ptr = newtext;
 	buf->b_ml.ml_line_len = new_line_len;
@@ -927,7 +927,7 @@ prop_add_one(
 
 theend:
     vim_free(text);
-    return res;
+    повернути res;
 }
 
 /*
@@ -943,45 +943,45 @@ f_prop_add_list(typval_T *argvars, typval_T *rettv UNUSED)
     dict_T	*dict;
     char_u	*type_name;
     buf_T	*buf = curbuf;
-    int		id = 0;
+    ціле		id = 0;
     listitem_T	*li;
     list_T	*pos_list;
     linenr_T	start_lnum;
     colnr_T	start_col;
     linenr_T	end_lnum;
     colnr_T	end_col;
-    int		error = FALSE;
-    int		prev_did_emsg = did_emsg;
+    ціле		error = FALSE;
+    ціле		prev_did_emsg = did_emsg;
 
-    if (check_for_dict_arg(argvars, 0) == FAIL
+    якщо (check_for_dict_arg(argvars, 0) == FAIL
 	    || check_for_list_arg(argvars, 1) == FAIL)
-	return;
+	повернути;
 
-    if (check_for_nonnull_list_arg(argvars, 1) == FAIL)
-	return;
+    якщо (check_for_nonnull_list_arg(argvars, 1) == FAIL)
+	повернути;
 
     dict = argvars[0].vval.v_dict;
-    if (dict == NULL || !dict_has_key(dict, "type"))
+    якщо (dict == NULL || !dict_has_key(dict, "type"))
     {
 	emsg(_(e_missing_property_type_name));
-	return;
+	повернути;
     }
     type_name = dict_get_string(dict, "type", FALSE);
 
-    if (dict_has_key(dict, "id"))
+    якщо (dict_has_key(dict, "id"))
     {
 	vimlong_T x;
 	x = dict_get_number(dict, "id");
-	if (x > INT_MAX || x  <= INT_MIN)
+	якщо (x > INT_MAX || x  <= INT_MIN)
 	{
 	    semsg(_(e_val_too_large), dict_get_string(dict, "id", FALSE));
-	    return;
+	    повернути;
 	}
-	id = (int)x;
+	id = (ціле)x;
     }
 
-    if (get_bufnr_from_arg(&argvars[0], &buf) == FAIL)
-	return;
+    якщо (get_bufnr_from_arg(&argvars[0], &buf) == FAIL)
+	повернути;
 
     // This must be done _before_ we start adding properties because property
     // changes trigger buffer (memline) reorganisation, which needs this flag
@@ -989,50 +989,50 @@ f_prop_add_list(typval_T *argvars, typval_T *rettv UNUSED)
     buf->b_has_textprop = true;  // this is never reset
     FOR_ALL_LIST_ITEMS(argvars[1].vval.v_list, li)
     {
-	if (li->li_tv.v_type != VAR_LIST || li->li_tv.vval.v_list == NULL)
+	якщо (li->li_tv.v_type != VAR_LIST || li->li_tv.vval.v_list == NULL)
 	{
 	    emsg(_(e_list_required));
-	    return;
+	    повернути;
 	}
 
 	pos_list = li->li_tv.vval.v_list;
 	start_lnum = list_find_nr(pos_list, 0L, &error);
-	if (!error)
+	якщо (!error)
 	    start_col = list_find_nr(pos_list, 1L, &error);
-	if (!error)
+	якщо (!error)
 	    end_lnum = list_find_nr(pos_list, 2L, &error);
-	if (!error)
+	якщо (!error)
 	    end_col = list_find_nr(pos_list, 3L, &error);
-	int this_id = id;
-	if (!error && pos_list->lv_len > 4)
+	ціле this_id = id;
+	якщо (!error && pos_list->lv_len > 4)
 	    this_id = list_find_nr(pos_list, 4L, &error);
-	if (error || start_lnum <= 0 || start_col <= 0
+	якщо (error || start_lnum <= 0 || start_col <= 0
 		  || end_lnum <= 0 || end_col <= 0)
 	{
-	    if (prev_did_emsg == did_emsg)
+	    якщо (prev_did_emsg == did_emsg)
 		emsg(_(e_invalid_argument));
-	    return;
+	    повернути;
 	}
-	if (prop_add_one(buf, type_name, this_id, NULL, 0, 0,
+	якщо (prop_add_one(buf, type_name, this_id, NULL, 0, 0,
 			     start_lnum, end_lnum, start_col, end_col) == FAIL)
-	    return;
+	    повернути;
     }
 
     redraw_buf_later(buf, UPD_VALID);
 }
 
 // Counter for virtual text property IDs (decremented for each new one).
-static int vt_id_counter = 0;
+static ціле vt_id_counter = 0;
 
 /*
  * Get the next ID to use for a textprop.
  */
-    static int
+    static ціле
 get_textprop_id(void)
 {
-    if (vt_id_counter > 0)
+    якщо (vt_id_counter > 0)
 	vt_id_counter = 0;
-    return --vt_id_counter;
+    повернути --vt_id_counter;
 }
 
 /*
@@ -1041,7 +1041,7 @@ get_textprop_id(void)
  * it is NULL for popup_create().
  * Returns the "id" used for "text" or zero.
  */
-    int
+    ціле
 prop_add_common(
 	linenr_T    start_lnum,
 	colnr_T	    start_col,
@@ -1053,70 +1053,70 @@ prop_add_common(
     colnr_T	end_col;
     char_u	*type_name;
     buf_T	*buf = default_buf;
-    int		id = 0;
+    ціле		id = 0;
     char_u	*text = NULL;
-    int		text_padding_left = 0;
-    int		flags = 0;
+    ціле		text_padding_left = 0;
+    ціле		flags = 0;
 
-    if (dict == NULL || !dict_has_key(dict, "type"))
+    якщо (dict == NULL || !dict_has_key(dict, "type"))
     {
 	emsg(_(e_missing_property_type_name));
 	goto theend;
     }
     type_name = dict_get_string(dict, "type", FALSE);
 
-    if (dict_has_key(dict, "end_lnum"))
+    якщо (dict_has_key(dict, "end_lnum"))
     {
 	end_lnum = dict_get_number(dict, "end_lnum");
-	if (end_lnum < start_lnum)
+	якщо (end_lnum < start_lnum)
 	{
 	    semsg(_(e_invalid_value_for_argument_str), "end_lnum");
 	    goto theend;
 	}
     }
-    else
+    інакше
 	end_lnum = start_lnum;
 
-    if (dict_has_key(dict, "length"))
+    якщо (dict_has_key(dict, "length"))
     {
 	long length = dict_get_number(dict, "length");
 
-	if (length < 0 || end_lnum > start_lnum)
+	якщо (length < 0 || end_lnum > start_lnum)
 	{
 	    semsg(_(e_invalid_value_for_argument_str), "length");
 	    goto theend;
 	}
 	end_col = start_col + length;
     }
-    else if (dict_has_key(dict, "end_col"))
+    інакше якщо (dict_has_key(dict, "end_col"))
     {
 	end_col = dict_get_number(dict, "end_col");
-	if (end_col <= 0)
+	якщо (end_col <= 0)
 	{
 	    semsg(_(e_invalid_value_for_argument_str), "end_col");
 	    goto theend;
 	}
     }
-    else if (start_lnum == end_lnum)
+    інакше якщо (start_lnum == end_lnum)
 	end_col = start_col;
-    else
+    інакше
 	end_col = 1;
 
-    if (dict_has_key(dict, "id"))
+    якщо (dict_has_key(dict, "id"))
     {
 	vimlong_T x;
 	x = dict_get_number(dict, "id");
-	if (x > INT_MAX || x  <= INT_MIN)
+	якщо (x > INT_MAX || x  <= INT_MIN)
 	{
 	    semsg(_(e_val_too_large), dict_get_string(dict, "id", FALSE));
 	    goto theend;
 	}
-	id = (int)x;
+	id = (ціле)x;
     }
 
-    if (dict_has_key(dict, "text"))
+    якщо (dict_has_key(dict, "text"))
     {
-	if (dict_has_key(dict, "length")
+	якщо (dict_has_key(dict, "length")
 		|| dict_has_key(dict, "end_col")
 		|| dict_has_key(dict, "end_lnum"))
 	{
@@ -1125,54 +1125,54 @@ prop_add_common(
 	}
 
 	text = dict_get_string(dict, "text", TRUE);
-	if (text == NULL)
+	якщо (text == NULL)
 	    goto theend;
 	// use a default length of 1 to make multiple props show up
 	end_col = start_col + 1;
 
-	if (dict_has_key(dict, "text_align"))
+	якщо (dict_has_key(dict, "text_align"))
 	{
 	    char_u *p = dict_get_string(dict, "text_align", FALSE);
 
-	    if (p == NULL)
+	    якщо (p == NULL)
 		goto theend;
-	    if (start_col != 0)
+	    якщо (start_col != 0)
 	    {
 		emsg(_(e_can_only_use_text_align_when_column_is_zero));
 		goto theend;
 	    }
-	    if (STRCMP(p, "right") == 0)
+	    якщо (STRCMP(p, "right") == 0)
 		flags |= TP_FLAG_ALIGN_RIGHT;
-	    else if (STRCMP(p, "above") == 0)
+	    інакше якщо (STRCMP(p, "above") == 0)
 		flags |= TP_FLAG_ALIGN_ABOVE;
-	    else if (STRCMP(p, "below") == 0)
+	    інакше якщо (STRCMP(p, "below") == 0)
 		flags |= TP_FLAG_ALIGN_BELOW;
-	    else if (STRCMP(p, "after") != 0)
+	    інакше якщо (STRCMP(p, "after") != 0)
 	    {
 		semsg(_(e_invalid_value_for_argument_str_str), "text_align", p);
 		goto theend;
 	    }
 	}
 
-	if (dict_has_key(dict, "text_padding_left"))
+	якщо (dict_has_key(dict, "text_padding_left"))
 	{
 	    text_padding_left = dict_get_number(dict, "text_padding_left");
-	    if (text_padding_left < 0)
+	    якщо (text_padding_left < 0)
 	    {
 		semsg(_(e_argument_must_be_positive_str), "text_padding_left");
 		goto theend;
 	    }
 	}
 
-	if (dict_has_key(dict, "text_wrap"))
+	якщо (dict_has_key(dict, "text_wrap"))
 	{
 	    char_u *p = dict_get_string(dict, "text_wrap", FALSE);
 
-	    if (p == NULL)
+	    якщо (p == NULL)
 		goto theend;
-	    if (STRCMP(p, "wrap") == 0)
+	    якщо (STRCMP(p, "wrap") == 0)
 		flags |= TP_FLAG_WRAP;
-	    else if (STRCMP(p, "truncate") != 0)
+	    інакше якщо (STRCMP(p, "truncate") != 0)
 	    {
 		semsg(_(e_invalid_value_for_argument_str_str), "text_wrap", p);
 		goto theend;
@@ -1182,24 +1182,24 @@ prop_add_common(
 
     // Column must be 1 or more for a normal text property; when "text" is
     // present zero means it goes after the line.
-    if (start_col < (text == NULL ? 1 : 0))
+    якщо (start_col < (text == NULL ? 1 : 0))
     {
 	semsg(_(e_invalid_column_number_nr), (long)start_col);
 	goto theend;
     }
-    if (start_col > 0 && text_padding_left > 0)
+    якщо (start_col > 0 && text_padding_left > 0)
     {
 	emsg(_(e_can_only_use_left_padding_when_column_is_zero));
 	goto theend;
     }
 
-    if (dict_arg != NULL && get_bufnr_from_arg(dict_arg, &buf) == FAIL)
+    якщо (dict_arg != NULL && get_bufnr_from_arg(dict_arg, &buf) == FAIL)
 	goto theend;
 
-    if (text != NULL)
+    якщо (text != NULL)
 	// Always assign an internal negative id; ignore any user-provided id.
 	id = get_textprop_id();
-    else if (id < 0)
+    інакше якщо (id < 0)
     {
 	emsg(_(e_cannot_use_negative_id));
 	goto theend;
@@ -1218,7 +1218,7 @@ prop_add_common(
 
 theend:
     vim_free(text);
-    return id;
+    повернути id;
 }
 
 /*
@@ -1227,8 +1227,8 @@ theend:
  * first one in "props" (note that it is not aligned, therefore the char_u
  * pointer).
  */
-    int
-get_text_props(buf_T *buf, linenr_T lnum, char_u **props, int will_change)
+    ціле
+get_text_props(buf_T *buf, linenr_T lnum, char_u **props, ціле will_change)
 {
     char_u	*text;
     size_t	textlen;
@@ -1237,38 +1237,38 @@ get_text_props(buf_T *buf, linenr_T lnum, char_u **props, int will_change)
 
     // Be quick when no text property types have been defined for the buffer,
     // unless we are adding one.
-    if ((!buf->b_has_textprop && !will_change) || buf->b_ml.ml_mfp == NULL)
-	return 0;
+    якщо ((!buf->b_has_textprop && !will_change) || buf->b_ml.ml_mfp == NULL)
+	повернути 0;
 
     // Fetch the line to get the ml_line_len field updated.
     text = ml_get_buf(buf, lnum, will_change);
     textlen = ml_get_buf_len(buf, lnum) + 1;
     propdata_len = buf->b_ml.ml_line_len - textlen;
-    if (propdata_len == 0)
-	return 0;
+    якщо (propdata_len == 0)
+	повернути 0;
 
     // Format: [prop_count (uint16)][textprop_T...][vtext...]
     // Lines without properties have no prop data at all.
     // prop_count is never zero.
-    if (propdata_len < PROP_COUNT_SIZE + sizeof(textprop_T))
+    якщо (propdata_len < PROP_COUNT_SIZE + sizeof(textprop_T))
     {
 	emsg(e_text_property_info_corrupted);
-	return 0;
+	повернути 0;
     }
     mch_memmove(&prop_count, text + textlen, PROP_COUNT_SIZE);
-    if (!text_prop_count_valid(prop_count, propdata_len))
+    якщо (!text_prop_count_valid(prop_count, propdata_len))
     {
 	emsg(e_text_property_info_corrupted);
-	return 0;
+	повернути 0;
     }
-    if (!text_prop_vtext_valid(text + textlen + PROP_COUNT_SIZE,
-					   (int)prop_count, propdata_len))
+    якщо (!text_prop_vtext_valid(text + textlen + PROP_COUNT_SIZE,
+					   (ціле)prop_count, propdata_len))
     {
 	emsg(e_text_property_info_corrupted);
-	return 0;
+	повернути 0;
     }
     *props = text + textlen + PROP_COUNT_SIZE;
-    return (int)prop_count;
+    повернути (ціле)prop_count;
 }
 
 /*
@@ -1276,34 +1276,34 @@ get_text_props(buf_T *buf, linenr_T lnum, char_u **props, int will_change)
  * line "lnum".  A "right" aligned property also goes below after a "below" or
  * other "right" aligned property.
  */
-    int
+    ціле
 prop_count_above_below(buf_T *buf, linenr_T lnum)
 {
     char_u	*props;
-    int		count = get_text_props(buf, lnum, &props, FALSE);
-    int		result = 0;
+    ціле		count = get_text_props(buf, lnum, &props, FALSE);
+    ціле		result = 0;
     textprop_T	prop;
-    int		i;
-    int		next_right_goes_below = FALSE;
+    ціле		i;
+    ціле		next_right_goes_below = FALSE;
 
-    if (count == 0)
-	return 0;
-    for (i = 0; i < count; ++i)
+    якщо (count == 0)
+	повернути 0;
+    для (i = 0; i < count; ++i)
     {
 	mch_memmove(&prop, props + i * sizeof(prop), sizeof(prop));
-	if (prop.tp_col == MAXCOL && text_prop_type_valid(buf, &prop))
+	якщо (prop.tp_col == MAXCOL && text_prop_type_valid(buf, &prop))
 	{
-	    if ((prop.tp_flags & (TP_FLAG_ALIGN_ABOVE | TP_FLAG_ALIGN_BELOW))
+	    якщо ((prop.tp_flags & (TP_FLAG_ALIGN_ABOVE | TP_FLAG_ALIGN_BELOW))
 		    || (next_right_goes_below
 				     && (prop.tp_flags & TP_FLAG_ALIGN_RIGHT)))
 	    {
 		++result;
 	    }
-	    else if (prop.tp_flags & TP_FLAG_ALIGN_RIGHT)
+	    інакше якщо (prop.tp_flags & TP_FLAG_ALIGN_RIGHT)
 		next_right_goes_below = TRUE;
 	}
     }
-    return result;
+    повернути result;
 }
 
 /**
@@ -1313,25 +1313,25 @@ prop_count_above_below(buf_T *buf, linenr_T lnum)
  * When "last_line" is FALSE then text properties after the line are not
  * counted.
  */
-    int
-count_props(linenr_T lnum, int only_starting, int last_line)
+    ціле
+count_props(linenr_T lnum, ціле only_starting, ціле last_line)
 {
     char_u	*props;
-    int		proplen = get_text_props(curbuf, lnum, &props, 0);
-    int		result = proplen;
+    ціле		proplen = get_text_props(curbuf, lnum, &props, 0);
+    ціле		result = proplen;
     textprop_T	prop;
 
-    for (int i = 0; i < proplen; ++i)
+    для (ціле i = 0; i < proplen; ++i)
     {
 	mch_memmove(&prop, props + i * sizeof(prop), sizeof(prop));
 	// A prop is dropped when in the first line and it continues from the
 	// previous line, or when not in the last line and it is virtual text
 	// after the line.
-	if ((only_starting && (prop.tp_flags & TP_FLAG_CONT_PREV))
+	якщо ((only_starting && (prop.tp_flags & TP_FLAG_CONT_PREV))
 		|| (!last_line && prop.tp_col == MAXCOL))
 	    --result;
     }
-    return result;
+    повернути result;
 }
 
 static textprop_T	*text_prop_compare_props;
@@ -1341,16 +1341,16 @@ static buf_T		*text_prop_compare_buf;
  * Score for sorting on position of the text property: 0: above,
  * 1: after (default), 2: right, 3: below (comes last)
  */
-    static int
-text_prop_order(int flags)
+    static ціле
+text_prop_order(ціле flags)
 {
-    if (flags & TP_FLAG_ALIGN_ABOVE)
-	return 0;
-    if (flags & TP_FLAG_ALIGN_RIGHT)
-	return 2;
-    if (flags & TP_FLAG_ALIGN_BELOW)
-	return 3;
-    return 1;
+    якщо (flags & TP_FLAG_ALIGN_ABOVE)
+	повернути 0;
+    якщо (flags & TP_FLAG_ALIGN_RIGHT)
+	повернути 2;
+    якщо (flags & TP_FLAG_ALIGN_BELOW)
+	повернути 3;
+    повернути 1;
 }
 
 /*
@@ -1358,57 +1358,57 @@ text_prop_order(int flags)
  * Return 1 if "s1" has priority over "s2", -1 if the other way around, zero if
  * both have the same priority.
  */
-    static int
+    static ціле
 text_prop_compare(const void *s1, const void *s2)
 {
-    int  idx1, idx2;
+    ціле  idx1, idx2;
     textprop_T	*tp1, *tp2;
     proptype_T  *pt1, *pt2;
     colnr_T col1, col2;
 
-    idx1 = *(int *)s1;
-    idx2 = *(int *)s2;
+    idx1 = *(ціле *)s1;
+    idx2 = *(ціле *)s2;
     tp1 = &text_prop_compare_props[idx1];
     tp2 = &text_prop_compare_props[idx2];
     col1 = tp1->tp_col;
     col2 = tp2->tp_col;
 
     // property that inserts text has priority over one that doesn't
-    if ((tp1->tp_id < 0) != (tp2->tp_id < 0))
-	return tp1->tp_id < 0 ? 1 : -1;
+    якщо ((tp1->tp_id < 0) != (tp2->tp_id < 0))
+	повернути tp1->tp_id < 0 ? 1 : -1;
 
-    if (col1 == MAXCOL || col2 == MAXCOL)
+    якщо (col1 == MAXCOL || col2 == MAXCOL)
     {
-	int order1 = text_prop_order(tp1->tp_flags);
-	int order2 = text_prop_order(tp2->tp_flags);
+	ціле order1 = text_prop_order(tp1->tp_flags);
+	ціле order2 = text_prop_order(tp2->tp_flags);
 
 	// sort on order where it is added
-	if (order1 != order2)
-	    return order1 < order2 ? 1 : -1;
+	якщо (order1 != order2)
+	    повернути order1 < order2 ? 1 : -1;
     }
 
     // check highest priority, defined by the type
     pt1 = text_prop_type_by_id(text_prop_compare_buf, tp1->tp_type);
     pt2 = text_prop_type_by_id(text_prop_compare_buf, tp2->tp_type);
-    if (pt1 != pt2)
+    якщо (pt1 != pt2)
     {
-	if (pt1 == NULL)
-	    return -1;
-	if (pt2 == NULL)
-	    return 1;
-	if (pt1->pt_priority != pt2->pt_priority)
-	    return pt1->pt_priority > pt2->pt_priority ? 1 : -1;
+	якщо (pt1 == NULL)
+	    повернути -1;
+	якщо (pt2 == NULL)
+	    повернути 1;
+	якщо (pt1->pt_priority != pt2->pt_priority)
+	    повернути pt1->pt_priority > pt2->pt_priority ? 1 : -1;
     }
 
     // same priority, one that starts first wins
-    if (col1 != col2)
-	return col1 < col2 ? 1 : -1;
+    якщо (col1 != col2)
+	повернути col1 < col2 ? 1 : -1;
 
     // for a property with text the id can be used as tie breaker
-    if (tp1->tp_id < 0)
-	return tp1->tp_id > tp2->tp_id ? 1 : -1;
+    якщо (tp1->tp_id < 0)
+	повернути tp1->tp_id > tp2->tp_id ? 1 : -1;
 
-    return 0;
+    повернути 0;
 }
 
 /*
@@ -1419,12 +1419,12 @@ text_prop_compare(const void *s1, const void *s2)
 sort_text_props(
 	buf_T	    *buf,
 	textprop_T  *props,
-	int	    *idxs,
-	int	    count)
+	ціле	    *idxs,
+	ціле	    count)
 {
     text_prop_compare_buf = buf;
     text_prop_compare_props = props;
-    qsort((void *)idxs, (size_t)count, sizeof(int), text_prop_compare);
+    qsort((void *)idxs, (size_t)count, sizeof(ціле), text_prop_compare);
 }
 
 /*
@@ -1434,37 +1434,37 @@ sort_text_props(
     bool
 find_prop_in_lines(
 	win_T	    *wp,
-	int	    type_id,
-	int	    id,
+	ціле	    type_id,
+	ціле	    id,
 	textprop_T  *prop,
 	linenr_T    *found_lnum,
 	linenr_T    first_lnum,
 	linenr_T    last_lnum)
 {
-    if (text_prop_type_by_id(wp->w_buffer, type_id) == NULL)
-	return false;
+    якщо (text_prop_type_by_id(wp->w_buffer, type_id) == NULL)
+	повернути false;
 
-    if (first_lnum < 1)
+    якщо (first_lnum < 1)
 	first_lnum = 1;
-    if (last_lnum > wp->w_buffer->b_ml.ml_line_count)
+    якщо (last_lnum > wp->w_buffer->b_ml.ml_line_count)
 	last_lnum = wp->w_buffer->b_ml.ml_line_count;
 
-    for (linenr_T lnum = first_lnum; lnum <= last_lnum; ++lnum)
+    для (linenr_T lnum = first_lnum; lnum <= last_lnum; ++lnum)
     {
 	char_u	*props;
-	int	count = get_text_props(wp->w_buffer, lnum, &props, FALSE);
-	for (int i = 0; i < count; ++i)
+	ціле	count = get_text_props(wp->w_buffer, lnum, &props, FALSE);
+	для (ціле i = 0; i < count; ++i)
 	{
 	    mch_memmove(prop, props + i * sizeof(textprop_T),
 							   sizeof(textprop_T));
-	    if (prop->tp_type == type_id && (id <= 0 || prop->tp_id == id))
+	    якщо (prop->tp_type == type_id && (id <= 0 || prop->tp_id == id))
 	    {
 		*found_lnum = lnum;
-		return true;
+		повернути true;
 	    }
 	}
     }
-    return false;
+    повернути false;
 }
 
 /*
@@ -1475,14 +1475,14 @@ find_prop_in_lines(
     bool
 find_visible_prop(
 	win_T	    *wp,
-	int	    type_id,
-	int	    id,
+	ціле	    type_id,
+	ціле	    id,
 	textprop_T  *prop,
 	linenr_T    *found_lnum)
 {
     // w_botline may not have been updated yet.
     validate_botline_win(wp);
-    return find_prop_in_lines(wp, type_id, id, prop, found_lnum,
+    повернути find_prop_in_lines(wp, type_id, id, prop, found_lnum,
 					  wp->w_topline, wp->w_botline - 1);
 }
 
@@ -1494,48 +1494,48 @@ find_visible_prop(
  * Only works for the current buffer.
  */
     static void
-set_text_props(linenr_T lnum, textprop_T *tps, int count)
+set_text_props(linenr_T lnum, textprop_T *tps, ціле count)
 {
     char_u  *text;
     char_u  *newtext;
-    int	    textlen;
+    ціле	    textlen;
 
     text = ml_get(lnum);
     textlen = ml_get_len(lnum) + 1;
 
-    if (count == 0)
+    якщо (count == 0)
     {
 	// No properties: just text.
 	newtext = alloc(textlen);
-	if (newtext == NULL)
-	    return;
+	якщо (newtext == NULL)
+	    повернути;
 	mch_memmove(newtext, text, textlen);
-	if (curbuf->b_ml.ml_flags & (ML_LINE_DIRTY | ML_ALLOCATED))
+	якщо (curbuf->b_ml.ml_flags & (ML_LINE_DIRTY | ML_ALLOCATED))
 	    vim_free(curbuf->b_ml.ml_line_ptr);
 	curbuf->b_ml.ml_line_ptr = newtext;
 	curbuf->b_ml.ml_line_len = textlen;
 	curbuf->b_ml.ml_flags |= ML_LINE_DIRTY;
     }
-    else
+    інакше
     {
 	// Build new format: [text][NUL][prop_count][props...][vtext...]
 	uint16_t    prop_count = (uint16_t)count;
-	int	    vtext_size = 0;
-	int	    total_len;
+	ціле	    vtext_size = 0;
+	ціле	    total_len;
 	char_u	    *count_dest;
 	char_u	    *prop_dest;
 	char_u	    *vtext_dest;
-	int	    i;
+	ціле	    i;
 
-	for (i = 0; i < count; ++i)
-	    if (tps[i].tp_flags & TP_FLAG_VTEXT_PTR)
+	для (i = 0; i < count; ++i)
+	    якщо (tps[i].tp_flags & TP_FLAG_VTEXT_PTR)
 		vtext_size += tps[i].tp_len + 1;
 
-	total_len = textlen + (int)PROP_COUNT_SIZE
-		    + count * (int)sizeof(textprop_T) + vtext_size;
+	total_len = textlen + (ціле)PROP_COUNT_SIZE
+		    + count * (ціле)sizeof(textprop_T) + vtext_size;
 	newtext = alloc(total_len);
-	if (newtext == NULL)
-	    return;
+	якщо (newtext == NULL)
+	    повернути;
 	mch_memmove(newtext, text, textlen);
 
 	count_dest = newtext + textlen;
@@ -1544,13 +1544,13 @@ set_text_props(linenr_T lnum, textprop_T *tps, int count)
 	prop_dest = count_dest + PROP_COUNT_SIZE;
 	vtext_dest = prop_dest + count * sizeof(textprop_T);
 
-	for (i = 0; i < count; ++i)
+	для (i = 0; i < count; ++i)
 	{
 	    textprop_T prop = tps[i];
 
-	    if (prop.tp_flags & TP_FLAG_VTEXT_PTR)
+	    якщо (prop.tp_flags & TP_FLAG_VTEXT_PTR)
 	    {
-		int copysize = prop.tp_len + 1;
+		ціле copysize = prop.tp_len + 1;
 
 		mch_memmove(vtext_dest, prop.u.tp_text, copysize);
 		vim_free(tps[i].u.tp_text);
@@ -1558,13 +1558,13 @@ set_text_props(linenr_T lnum, textprop_T *tps, int count)
 		prop.u.tp_text_offset = (colnr_T)(vtext_dest - count_dest);
 		vtext_dest += copysize;
 	    }
-	    else
+	    інакше
 		prop.u.tp_text_offset = 0;
 	    mch_memmove(prop_dest, &prop, sizeof(textprop_T));
 	    prop_dest += sizeof(textprop_T);
 	}
 
-	if (curbuf->b_ml.ml_flags & (ML_LINE_DIRTY | ML_ALLOCATED))
+	якщо (curbuf->b_ml.ml_flags & (ML_LINE_DIRTY | ML_ALLOCATED))
 	    vim_free(curbuf->b_ml.ml_line_ptr);
 	curbuf->b_ml.ml_line_ptr = newtext;
 	curbuf->b_ml.ml_line_len = total_len;
@@ -1583,40 +1583,40 @@ set_text_props(linenr_T lnum, textprop_T *tps, int count)
  * of the text including NUL.  "*new_len" is set to the new total length.
  */
     char_u *
-props_add_count_header(char_u *line, int line_len, int textlen, int *new_len)
+props_add_count_header(char_u *line, ціле line_len, ціле textlen, ціле *new_len)
 {
-    int		prop_bytes = line_len - textlen;
+    ціле		prop_bytes = line_len - textlen;
     uint16_t	prop_count;
-    int		vtext_size = 0;
-    int		total;
+    ціле		vtext_size = 0;
+    ціле		total;
     char_u	*newline;
     char_u	*count_dest;
     char_u	*prop_dest;
     char_u	*vtext_dest;
-    int		i;
+    ціле		i;
 
-    if (prop_bytes <= 0 || prop_bytes % sizeof(textprop_T) != 0)
+    якщо (prop_bytes <= 0 || prop_bytes % sizeof(textprop_T) != 0)
     {
 	*new_len = line_len;
-	return NULL;
+	повернути NULL;
     }
     prop_count = (uint16_t)(prop_bytes / sizeof(textprop_T));
 
     // Calculate total vtext size.
-    for (i = 0; i < (int)prop_count; ++i)
+    для (i = 0; i < (ціле)prop_count; ++i)
     {
 	textprop_T prop;
 
 	mch_memmove(&prop, line + textlen + i * sizeof(textprop_T),
 							sizeof(textprop_T));
-	if (prop.tp_flags & TP_FLAG_VTEXT_PTR)
+	якщо (prop.tp_flags & TP_FLAG_VTEXT_PTR)
 	    vtext_size += prop.tp_len + 1;
     }
 
-    total = textlen + (int)PROP_COUNT_SIZE + prop_bytes + vtext_size;
+    total = textlen + (ціле)PROP_COUNT_SIZE + prop_bytes + vtext_size;
     newline = alloc(total);
-    if (newline == NULL)
-	return NULL;
+    якщо (newline == NULL)
+	повернути NULL;
     *new_len = total;
 
     mch_memmove(newline, line, textlen);
@@ -1625,62 +1625,62 @@ props_add_count_header(char_u *line, int line_len, int textlen, int *new_len)
     prop_dest = count_dest + PROP_COUNT_SIZE;
     vtext_dest = prop_dest + prop_bytes;
 
-    for (i = 0; i < (int)prop_count; ++i)
+    для (i = 0; i < (ціле)prop_count; ++i)
     {
 	textprop_T prop;
 
 	mch_memmove(&prop, line + textlen + i * sizeof(textprop_T),
 							sizeof(textprop_T));
-	if (prop.tp_flags & TP_FLAG_VTEXT_PTR)
+	якщо (prop.tp_flags & TP_FLAG_VTEXT_PTR)
 	{
-	    int copysize = prop.tp_len + 1;
+	    ціле copysize = prop.tp_len + 1;
 
 	    mch_memmove(vtext_dest, prop.u.tp_text, copysize);
 	    vim_free(prop.u.tp_text);
 	    prop.u.tp_text_offset = (colnr_T)(vtext_dest - count_dest);
 	    vtext_dest += copysize;
 	}
-	else
+	інакше
 	    prop.u.tp_text_offset = 0;
 	mch_memmove(prop_dest + i * sizeof(textprop_T), &prop,
 							sizeof(textprop_T));
     }
-    return newline;
+    повернути newline;
 }
 
 /*
  * Add "text_props" with "text_prop_count" text properties to line "lnum".
  */
     void
-add_text_props(linenr_T lnum, textprop_T *text_props, int text_prop_count)
+add_text_props(linenr_T lnum, textprop_T *text_props, ціле text_prop_count)
 {
     unpacked_memline_T	um;
-    int			i;
+    ціле			i;
 
     um = um_open_at(curbuf, lnum, text_prop_count);
-    if (um.buf == NULL)
-	return;
-    if (!um_detach(&um))
+    якщо (um.buf == NULL)
+	повернути;
+    якщо (!um_detach(&um))
     {
 	um_abort(&um);
-	return;
+	повернути;
     }
 
     // Grow props array if needed.
-    if (um.prop_count + text_prop_count > um.prop_size)
+    якщо (um.prop_count + text_prop_count > um.prop_size)
     {
 	textprop_T *newprops = vim_realloc(um.props,
 		(um.prop_count + text_prop_count) * sizeof(textprop_T));
-	if (newprops == NULL)
+	якщо (newprops == NULL)
 	{
 	    um_abort(&um);
-	    return;
+	    повернути;
 	}
 	um.props = newprops;
 	um.prop_size = um.prop_count + text_prop_count;
     }
 
-    for (i = 0; i < text_prop_count; ++i)
+    для (i = 0; i < text_prop_count; ++i)
 	um.props[um.prop_count++] = text_props[i];
 
     um_close(&um);
@@ -1689,39 +1689,39 @@ add_text_props(linenr_T lnum, textprop_T *text_props, int text_prop_count)
 /*
  * Function passed to qsort() for sorting proptype_T on pt_id.
  */
-    static int
+    static ціле
 compare_pt(const void *s1, const void *s2)
 {
     proptype_T	*tp1 = *(proptype_T **)s1;
     proptype_T	*tp2 = *(proptype_T **)s2;
 
-    return tp1->pt_id == tp2->pt_id ? 0 : tp1->pt_id < tp2->pt_id ? -1 : 1;
+    повернути tp1->pt_id == tp2->pt_id ? 0 : tp1->pt_id < tp2->pt_id ? -1 : 1;
 }
 
     static proptype_T *
-find_type_by_id(hashtab_T *ht, proptype_T ***array, int id)
+find_type_by_id(hashtab_T *ht, proptype_T ***array, ціле id)
 {
-    int low = 0;
-    int high;
+    ціле low = 0;
+    ціле high;
 
-    if (ht == NULL || ht->ht_used == 0)
-	return NULL;
+    якщо (ht == NULL || ht->ht_used == 0)
+	повернути NULL;
 
     // Make the lookup faster by creating an array with pointers to
     // hashtable entries, sorted on pt_id.
-    if (*array == NULL)
+    якщо (*array == NULL)
     {
 	long	    todo;
 	hashitem_T  *hi;
-	int	    i = 0;
+	ціле	    i = 0;
 
 	*array = ALLOC_MULT(proptype_T *, ht->ht_used);
-	if (*array == NULL)
-	    return NULL;
+	якщо (*array == NULL)
+	    повернути NULL;
 	todo = (long)ht->ht_used;
 	FOR_ALL_HASHTAB_ITEMS(ht, hi, todo)
 	{
-	    if (!HASHITEM_EMPTY(hi))
+	    якщо (!HASHITEM_EMPTY(hi))
 	    {
 		(*array)[i++] = HI2PT(hi);
 		--todo;
@@ -1732,18 +1732,18 @@ find_type_by_id(hashtab_T *ht, proptype_T ***array, int id)
 
     // binary search in the sorted array
     high = ht->ht_used;
-    while (high > low)
+    поки (high > low)
     {
-	int m = (high + low) / 2;
+	ціле m = (high + low) / 2;
 
-	if ((*array)[m]->pt_id == id)
-	    return (*array)[m];
-	if ((*array)[m]->pt_id > id)
+	якщо ((*array)[m]->pt_id == id)
+	    повернути (*array)[m];
+	якщо ((*array)[m]->pt_id > id)
 	    high = m;
-	else
+	інакше
 	    low = m + 1;
     }
-    return NULL;
+    повернути NULL;
 }
 
 /*
@@ -1753,11 +1753,11 @@ find_type_by_id(hashtab_T *ht, proptype_T ***array, int id)
 prop_fill_dict(dict_T *dict, textprop_T *prop, buf_T *buf)
 {
     proptype_T *pt;
-    int buflocal = TRUE;
-    int virtualtext_prop = prop->tp_id < 0;
+    ціле buflocal = TRUE;
+    ціле virtualtext_prop = prop->tp_id < 0;
 
     dict_add_number(dict, "col", (prop->tp_col == MAXCOL) ? 0 : prop->tp_col);
-    if (!virtualtext_prop)
+    якщо (!virtualtext_prop)
     {
 	dict_add_number(dict, "length", prop->tp_len);
 	dict_add_number(dict, "id", prop->tp_id);
@@ -1766,20 +1766,20 @@ prop_fill_dict(dict_T *dict, textprop_T *prop, buf_T *buf)
     dict_add_number(dict, "end", !(prop->tp_flags & TP_FLAG_CONT_NEXT));
 
     pt = find_type_by_id(buf->b_proptypes, &buf->b_proparray, prop->tp_type);
-    if (pt == NULL)
+    якщо (pt == NULL)
     {
 	pt = find_type_by_id(global_proptypes, &global_proparray,
 								prop->tp_type);
 	buflocal = FALSE;
     }
-    if (pt != NULL)
+    якщо (pt != NULL)
 	dict_add_string(dict, "type", pt->pt_name);
 
-    if (buflocal)
+    якщо (buflocal)
 	dict_add_number(dict, "type_bufnr", buf->b_fnum);
-    else
+    інакше
 	dict_add_number(dict, "type_bufnr", 0);
-    if (virtualtext_prop)
+    якщо (virtualtext_prop)
     {
 	string_T    text_align = {NULL, 0};
 
@@ -1787,21 +1787,21 @@ prop_fill_dict(dict_T *dict, textprop_T *prop, buf_T *buf)
 	dict_add_string(dict, "text", prop->u.tp_text);
 
 	// text_align
-	if (prop->tp_flags & TP_FLAG_ALIGN_RIGHT)
+	якщо (prop->tp_flags & TP_FLAG_ALIGN_RIGHT)
 	    STR_LITERAL_SET(text_align, "right");
-	else if (prop->tp_flags & TP_FLAG_ALIGN_ABOVE)
+	інакше якщо (prop->tp_flags & TP_FLAG_ALIGN_ABOVE)
 	    STR_LITERAL_SET(text_align, "above");
-	else if (prop->tp_flags & TP_FLAG_ALIGN_BELOW)
+	інакше якщо (prop->tp_flags & TP_FLAG_ALIGN_BELOW)
 	    STR_LITERAL_SET(text_align, "below");
-	if (text_align.string != NULL)
+	якщо (text_align.string != NULL)
 	    dict_add_string_len(dict, "text_align",
-		text_align.string, (int)text_align.length);
+		text_align.string, (ціле)text_align.length);
 
 	// text_wrap
-	if (prop->tp_flags & TP_FLAG_WRAP)
+	якщо (prop->tp_flags & TP_FLAG_WRAP)
 	    dict_add_string_len(dict, "text_wrap",
 		(char_u *)"wrap", STRLEN_LITERAL("wrap"));
-	if (prop->tp_padleft != 0)
+	якщо (prop->tp_padleft != 0)
 	    dict_add_number(dict, "text_padding_left", prop->tp_padleft);
     }
 }
@@ -1811,14 +1811,14 @@ prop_fill_dict(dict_T *dict, textprop_T *prop, buf_T *buf)
  * Returns NULL if not found.
  */
     proptype_T *
-text_prop_type_by_id(buf_T *buf, int id)
+text_prop_type_by_id(buf_T *buf, ціле id)
 {
     proptype_T *type;
 
     type = find_type_by_id(buf->b_proptypes, &buf->b_proparray, id);
-    if (type == NULL)
+    якщо (type == NULL)
 	type = find_type_by_id(global_proptypes, &global_proparray, id);
-    return type;
+    повернути type;
 }
 
 /*
@@ -1827,7 +1827,7 @@ text_prop_type_by_id(buf_T *buf, int id)
     bool
 text_prop_type_valid(buf_T *buf, textprop_T *prop)
 {
-    return text_prop_type_by_id(buf, prop->tp_type) != NULL;
+    повернути text_prop_type_by_id(buf, prop->tp_type) != NULL;
 }
 
 /*
@@ -1840,53 +1840,53 @@ f_prop_clear(typval_T *argvars, typval_T *rettv UNUSED)
     linenr_T end;
     linenr_T lnum;
     buf_T    *buf = curbuf;
-    int	    did_clear = FALSE;
+    ціле	    did_clear = FALSE;
 
-    if (in_vim9script()
+    якщо (in_vim9script()
 	    && (check_for_number_arg(argvars, 0) == FAIL
 		|| check_for_opt_number_arg(argvars, 1) == FAIL
 		|| (argvars[1].v_type != VAR_UNKNOWN
 		    && check_for_opt_dict_arg(argvars, 2) == FAIL)))
-	return;
+	повернути;
 
     start = tv_get_number(&argvars[0]);
     end = start;
-    if (argvars[1].v_type != VAR_UNKNOWN)
+    якщо (argvars[1].v_type != VAR_UNKNOWN)
     {
 	end = tv_get_number(&argvars[1]);
-	if (argvars[2].v_type != VAR_UNKNOWN)
+	якщо (argvars[2].v_type != VAR_UNKNOWN)
 	{
-	    if (get_bufnr_from_arg(&argvars[2], &buf) == FAIL)
-		return;
+	    якщо (get_bufnr_from_arg(&argvars[2], &buf) == FAIL)
+		повернути;
 	}
     }
-    if (start < 1 || end < 1)
+    якщо (start < 1 || end < 1)
     {
 	emsg(_(e_invalid_range));
-	return;
+	повернути;
     }
 
     {
 	unpacked_memline_T um = um_open(buf);
 
-	for (lnum = start; lnum <= end; ++lnum)
+	для (lnum = start; lnum <= end; ++lnum)
 	{
-	    int idx;
+	    ціле idx;
 
-	    if (lnum > buf->b_ml.ml_line_count)
+	    якщо (lnum > buf->b_ml.ml_line_count)
 		break;
-	    if (!um_goto_line(&um, lnum, 0))
+	    якщо (!um_goto_line(&um, lnum, 0))
 		break;
-	    if (um.prop_count > 0)
+	    якщо (um.prop_count > 0)
 	    {
 		did_clear = TRUE;
-		for (idx = um.prop_count - 1; idx >= 0; --idx)
+		для (idx = um.prop_count - 1; idx >= 0; --idx)
 		    um_delete_prop(&um, idx);
 	    }
 	}
 	um_close(&um);
     }
-    if (did_clear)
+    якщо (did_clear)
 	redraw_buf_later(buf, UPD_NOT_VALID);
 }
 
@@ -1900,145 +1900,145 @@ f_prop_find(typval_T *argvars, typval_T *rettv)
     dict_T      *dict;
     buf_T       *buf = curbuf;
     dictitem_T  *di;
-    int		lnum_start;
-    int		start_pos_has_prop = 0;
-    int		seen_end = FALSE;
-    int		id = 0;
-    int		id_found = FALSE;
-    int		type_id = -1;
-    int		skipstart = FALSE;
-    int		lnum = -1;
-    int		col = -1;
-    int		dir = FORWARD;    // FORWARD == 1, BACKWARD == -1
-    int		both;
+    ціле		lnum_start;
+    ціле		start_pos_has_prop = 0;
+    ціле		seen_end = FALSE;
+    ціле		id = 0;
+    ціле		id_found = FALSE;
+    ціле		type_id = -1;
+    ціле		skipstart = FALSE;
+    ціле		lnum = -1;
+    ціле		col = -1;
+    ціле		dir = FORWARD;    // FORWARD == 1, BACKWARD == -1
+    ціле		both;
 
-    if (in_vim9script()
+    якщо (in_vim9script()
 	    && (check_for_dict_arg(argvars, 0) == FAIL
 		|| check_for_opt_string_arg(argvars, 1) == FAIL))
-	return;
+	повернути;
 
-    if (check_for_nonnull_dict_arg(argvars, 0) == FAIL)
-	return;
+    якщо (check_for_nonnull_dict_arg(argvars, 0) == FAIL)
+	повернути;
     dict = argvars[0].vval.v_dict;
 
-    if (get_bufnr_from_arg(&argvars[0], &buf) == FAIL)
-	return;
-    if (buf->b_ml.ml_mfp == NULL)
-	return;
+    якщо (get_bufnr_from_arg(&argvars[0], &buf) == FAIL)
+	повернути;
+    якщо (buf->b_ml.ml_mfp == NULL)
+	повернути;
 
-    if (argvars[1].v_type != VAR_UNKNOWN)
+    якщо (argvars[1].v_type != VAR_UNKNOWN)
     {
 	char_u      *dir_s = tv_get_string(&argvars[1]);
 
-	if (*dir_s == 'b')
+	якщо (*dir_s == 'b')
 	    dir = BACKWARD;
-	else if (*dir_s != 'f')
+	інакше якщо (*dir_s != 'f')
 	{
 	    emsg(_(e_invalid_argument));
-	    return;
+	    повернути;
 	}
     }
 
     di = dict_find(dict, (char_u *)"lnum", -1);
-    if (di != NULL)
+    якщо (di != NULL)
 	lnum = tv_get_number(&di->di_tv);
 
     di = dict_find(dict, (char_u *)"col", -1);
-    if (di != NULL)
+    якщо (di != NULL)
 	col = tv_get_number(&di->di_tv);
 
-    if (lnum == -1)
+    якщо (lnum == -1)
     {
 	lnum = cursor->lnum;
 	col = cursor->col + 1;
     }
-    else if (col == -1)
+    інакше якщо (col == -1)
 	col = 1;
 
-    if (lnum < 1 || lnum > buf->b_ml.ml_line_count)
+    якщо (lnum < 1 || lnum > buf->b_ml.ml_line_count)
     {
 	emsg(_(e_invalid_range));
-	return;
+	повернути;
     }
 
     skipstart = dict_get_bool(dict, "skipstart", 0);
 
-    if (dict_has_key(dict, "id"))
+    якщо (dict_has_key(dict, "id"))
     {
 	id = dict_get_number(dict, "id");
 	id_found = TRUE;
     }
-    if (dict_has_key(dict, "type"))
+    якщо (dict_has_key(dict, "type"))
     {
 	char_u	    *name = dict_get_string(dict, "type", FALSE);
 	proptype_T  *type = lookup_prop_type(name, buf);
 
-	if (type == NULL)
-	    return;
+	якщо (type == NULL)
+	    повернути;
 	type_id = type->pt_id;
     }
     both = dict_get_bool(dict, "both", FALSE);
-    if (!id_found && type_id == -1)
+    якщо (!id_found && type_id == -1)
     {
 	emsg(_(e_need_at_least_one_of_id_or_type));
-	return;
+	повернути;
     }
-    if (both && (!id_found || type_id == -1))
+    якщо (both && (!id_found || type_id == -1))
     {
 	emsg(_(e_need_id_and_type_or_types_with_both));
-	return;
+	повернути;
     }
 
     lnum_start = lnum;
 
-    if (rettv_dict_alloc(rettv) == FAIL)
-	return;
+    якщо (rettv_dict_alloc(rettv) == FAIL)
+	повернути;
 
-    while (1)
+    поки (1)
     {
 	char_u	*prop_start_ptr;
-	int	count = get_text_props(buf, lnum, &prop_start_ptr, FALSE);
-	int	    i;
+	ціле	count = get_text_props(buf, lnum, &prop_start_ptr, FALSE);
+	ціле	    i;
 	textprop_T  prop;
-	int	    prop_start;
-	int	    prop_end;
+	ціле	    prop_start;
+	ціле	    prop_end;
 
-	for (i = dir == BACKWARD ? count - 1 : 0; i >= 0 && i < count; i += dir)
+	для (i = dir == BACKWARD ? count - 1 : 0; i >= 0 && i < count; i += dir)
 	{
 	    mch_memmove(&prop, prop_start_ptr + i * sizeof(textprop_T),
 							   sizeof(textprop_T));
 	    // Convert offset to pointer for virtual text props.
-	    if (prop.tp_id < 0 && prop.u.tp_text_offset > 0)
+	    якщо (prop.tp_id < 0 && prop.u.tp_text_offset > 0)
 	    {
 		prop.u.tp_text = (prop_start_ptr - PROP_COUNT_SIZE)
 						    + prop.u.tp_text_offset;
 		prop.tp_flags |= TP_FLAG_VTEXT_PTR;
 	    }
-	    else
+	    інакше
 		prop.u.tp_text = NULL;
 
 	    // For the very first line try to find the first property before or
 	    // after `col`, depending on the search direction.
-	    if (lnum == lnum_start)
+	    якщо (lnum == lnum_start)
 	    {
 		bool is_floating_vtext = prop.tp_id < 0
 		    && prop.tp_col == MAXCOL;
-		if (dir == BACKWARD)
+		якщо (dir == BACKWARD)
 		{
 		    // Virtual text with MAXCOL always matches any column
-		    if (!is_floating_vtext && prop.tp_col > col)
+		    якщо (!is_floating_vtext && prop.tp_col > col)
 			continue;
 		}
-		else if (!is_floating_vtext
+		інакше якщо (!is_floating_vtext
 		    && prop.tp_col + prop.tp_len - (prop.tp_len != 0) < col)
 		    continue;
 	    }
-	    if (both ? prop.tp_id == id && prop.tp_type == type_id
+	    якщо (both ? prop.tp_id == id && prop.tp_type == type_id
 		     : (id_found && prop.tp_id == id)
 						    || prop.tp_type == type_id)
 	    {
 		// Check if the starting position has text props.
-		if (lnum_start == lnum
+		якщо (lnum_start == lnum
 			&& col >= prop.tp_col
 			&& (col <= prop.tp_col + prop.tp_len
 							 - (prop.tp_len != 0)))
@@ -2050,22 +2050,22 @@ f_prop_find(typval_T *argvars, typval_T *rettv)
 		// The property does not continue on the next line, it ends on
 		// this line.
 		prop_end = !(prop.tp_flags & TP_FLAG_CONT_NEXT);
-		if (!prop_start && prop_end && dir == FORWARD)
+		якщо (!prop_start && prop_end && dir == FORWARD)
 		    seen_end = 1;
 
 		// Skip lines without the start flag.
-		if (!prop_start)
+		якщо (!prop_start)
 		{
 		    // Always search backwards for start when search started
 		    // on a prop and we're not skipping.
-		    if (start_pos_has_prop && !skipstart)
+		    якщо (start_pos_has_prop && !skipstart)
 			dir = BACKWARD;
 		    continue;
 		}
 
 		// If skipstart is true, skip the prop at start pos (even if
 		// continued from another line).
-		if (start_pos_has_prop && skipstart && !seen_end)
+		якщо (start_pos_has_prop && skipstart && !seen_end)
 		{
 		    start_pos_has_prop = 0;
 		    continue;
@@ -2074,19 +2074,19 @@ f_prop_find(typval_T *argvars, typval_T *rettv)
 		prop_fill_dict(rettv->vval.v_dict, &prop, buf);
 		dict_add_number(rettv->vval.v_dict, "lnum", lnum);
 
-		return;
+		повернути;
 	    }
 	}
 
-	if (dir > 0)
+	якщо (dir > 0)
 	{
-	    if (lnum >= buf->b_ml.ml_line_count)
+	    якщо (lnum >= buf->b_ml.ml_line_count)
 		break;
 	    lnum++;
 	}
-	else
+	інакше
 	{
-	    if (lnum <= 1)
+	    якщо (lnum <= 1)
 		break;
 	    lnum--;
 	}
@@ -2096,16 +2096,16 @@ f_prop_find(typval_T *argvars, typval_T *rettv)
 /*
  * Returns TRUE if 'type_or_id' is in the 'types_or_ids' list.
  */
-    static int
-prop_type_or_id_in_list(int *types_or_ids, int len, int type_or_id)
+    static ціле
+prop_type_or_id_in_list(ціле *types_or_ids, ціле len, ціле type_or_id)
 {
-    int i;
+    ціле i;
 
-    for (i = 0; i < len; i++)
-	if (types_or_ids[i] == type_or_id)
-	    return TRUE;
+    для (i = 0; i < len; i++)
+	якщо (types_or_ids[i] == type_or_id)
+	    повернути TRUE;
 
-    return FALSE;
+    повернути FALSE;
 }
 
 /*
@@ -2121,33 +2121,33 @@ prop_type_or_id_in_list(int *types_or_ids, int len, int type_or_id)
 get_props_in_line(
 	buf_T		*buf,
 	linenr_T	lnum,
-	int		*prop_types,
-	int		prop_types_len,
-	int		*prop_ids,
-	int		prop_ids_len,
+	ціле		*prop_types,
+	ціле		prop_types_len,
+	ціле		*prop_ids,
+	ціле		prop_ids_len,
 	list_T		*retlist,
-	int		add_lnum)
+	ціле		add_lnum)
 {
     char_u	*props;
-    int		count;
-    int		i;
+    ціле		count;
+    ціле		i;
     textprop_T	prop;
 
     count = get_text_props(buf, lnum, &props, FALSE);
-    for (i = 0; i < count; ++i)
+    для (i = 0; i < count; ++i)
     {
 	mch_memmove(&prop, props + i * sizeof(textprop_T),
 		sizeof(textprop_T));
 	// Convert offset to pointer for virtual text props.
-	if (prop.tp_id < 0 && prop.u.tp_text_offset > 0)
+	якщо (prop.tp_id < 0 && prop.u.tp_text_offset > 0)
 	{
 	    prop.u.tp_text = (props - PROP_COUNT_SIZE)
 						+ prop.u.tp_text_offset;
 	    prop.tp_flags |= TP_FLAG_VTEXT_PTR;
 	}
-	else
+	інакше
 	    prop.u.tp_text = NULL;
-	if ((prop_types == NULL
+	якщо ((prop_types == NULL
 		    || prop_type_or_id_in_list(prop_types, prop_types_len,
 			prop.tp_type))
 		&& (prop_ids == NULL
@@ -2156,12 +2156,12 @@ get_props_in_line(
 	{
 	    dict_T *d = dict_alloc();
 
-	    if (d == NULL)
+	    якщо (d == NULL)
 		break;
 	    prop_fill_dict(d, &prop, buf);
-	    if (add_lnum)
+	    якщо (add_lnum)
 		dict_add_number(d, "lnum", lnum);
-	    if (list_append_dict(retlist, d) == FAIL)
+	    якщо (list_append_dict(retlist, d) == FAIL)
 		dict_unref(d);
 	}
     }
@@ -2172,45 +2172,45 @@ get_props_in_line(
  * identifiers. Returns a pointer to the allocated array. Returns NULL on
  * error. 'num_types' is set to the number of returned property types.
  */
-    static int *
-get_prop_types_from_names(list_T *l, buf_T *buf, int *num_types)
+    static ціле *
+get_prop_types_from_names(list_T *l, buf_T *buf, ціле *num_types)
 {
-    int		*prop_types;
+    ціле		*prop_types;
     listitem_T	*li;
-    int		i;
+    ціле		i;
     char_u	*name;
     proptype_T	*type;
 
     *num_types = 0;
 
-    prop_types = ALLOC_MULT(int, list_len(l));
-    if (prop_types == NULL)
-	return NULL;
+    prop_types = ALLOC_MULT(ціле, list_len(l));
+    якщо (prop_types == NULL)
+	повернути NULL;
 
     i = 0;
     FOR_ALL_LIST_ITEMS(l, li)
     {
-	if (li->li_tv.v_type != VAR_STRING)
+	якщо (li->li_tv.v_type != VAR_STRING)
 	{
 	    emsg(_(e_string_required));
 	    goto errret;
 	}
 	name = li->li_tv.vval.v_string;
-	if (name == NULL)
+	якщо (name == NULL)
 	    goto errret;
 
 	type = lookup_prop_type(name, buf);
-	if (type == NULL)
+	якщо (type == NULL)
 	    goto errret;
 	prop_types[i++] = type->pt_id;
     }
 
     *num_types = i;
-    return prop_types;
+    повернути prop_types;
 
 errret:
     VIM_CLEAR(prop_types);
-    return NULL;
+    повернути NULL;
 }
 
 /*
@@ -2218,38 +2218,38 @@ errret:
  * identifiers.  Returns a pointer to the allocated array. Returns NULL on
  * error. 'num_ids' is set to the number of returned property identifiers.
  */
-    static int *
-get_prop_ids_from_list(list_T *l, int *num_ids)
+    static ціле *
+get_prop_ids_from_list(list_T *l, ціле *num_ids)
 {
-    int		*prop_ids;
+    ціле		*prop_ids;
     listitem_T	*li;
-    int		i = 0;
-    int		id;
-    int		error;
+    ціле		i = 0;
+    ціле		id;
+    ціле		error;
 
     *num_ids = 0;
 
-    prop_ids = ALLOC_MULT(int, list_len(l));
-    if (prop_ids == NULL)
-	return NULL;
+    prop_ids = ALLOC_MULT(ціле, list_len(l));
+    якщо (prop_ids == NULL)
+	повернути NULL;
 
     CHECK_LIST_MATERIALIZE(l);
     FOR_ALL_LIST_ITEMS(l, li)
     {
 	error = FALSE;
 	id = tv_get_number_chk(&li->li_tv, &error);
-	if (error)
+	якщо (error)
 	    goto errret;
 
 	prop_ids[i++] = id;
     }
 
     *num_ids = i;
-    return prop_ids;
+    повернути prop_ids;
 
 errret:
     VIM_CLEAR(prop_ids);
-    return NULL;
+    повернути NULL;
 }
 
 /*
@@ -2262,90 +2262,90 @@ f_prop_list(typval_T *argvars, typval_T *rettv)
     linenr_T	start_lnum;
     linenr_T	end_lnum;
     buf_T	*buf = curbuf;
-    int		add_lnum = FALSE;
-    int		*prop_types = NULL;
-    int		prop_types_len = 0;
-    int		*prop_ids = NULL;
-    int		prop_ids_len = 0;
+    ціле		add_lnum = FALSE;
+    ціле		*prop_types = NULL;
+    ціле		prop_types_len = 0;
+    ціле		*prop_ids = NULL;
+    ціле		prop_ids_len = 0;
     list_T	*l;
     dictitem_T	*di;
 
-    if (in_vim9script()
+    якщо (in_vim9script()
 	    && (check_for_number_arg(argvars, 0) == FAIL
 		|| check_for_opt_dict_arg(argvars, 1) == FAIL))
-	return;
+	повернути;
 
-    if (rettv_list_alloc(rettv) == FAIL)
-	return;
+    якщо (rettv_list_alloc(rettv) == FAIL)
+	повернути;
 
     // default: get text properties on current line
     start_lnum = tv_get_number(&argvars[0]);
     end_lnum = start_lnum;
-    if (argvars[1].v_type != VAR_UNKNOWN)
+    якщо (argvars[1].v_type != VAR_UNKNOWN)
     {
 	dict_T *d;
 
-	if (check_for_dict_arg(argvars, 1) == FAIL)
-	    return;
+	якщо (check_for_dict_arg(argvars, 1) == FAIL)
+	    повернути;
 	d = argvars[1].vval.v_dict;
 
-	if (get_bufnr_from_arg(&argvars[1], &buf) == FAIL)
-	    return;
+	якщо (get_bufnr_from_arg(&argvars[1], &buf) == FAIL)
+	    повернути;
 
-	if (d != NULL && (di = dict_find(d, (char_u *)"end_lnum", -1)) != NULL)
+	якщо (d != NULL && (di = dict_find(d, (char_u *)"end_lnum", -1)) != NULL)
 	{
-	    if (di->di_tv.v_type != VAR_NUMBER)
+	    якщо (di->di_tv.v_type != VAR_NUMBER)
 	    {
 		emsg(_(e_number_required));
-		return;
+		повернути;
 	    }
 	    end_lnum = tv_get_number(&di->di_tv);
-	    if (end_lnum < 0)
+	    якщо (end_lnum < 0)
 		// negative end_lnum is used as an offset from the last buffer
 		// line
 		end_lnum = buf->b_ml.ml_line_count + end_lnum + 1;
-	    else if (end_lnum > buf->b_ml.ml_line_count)
+	    інакше якщо (end_lnum > buf->b_ml.ml_line_count)
 		end_lnum = buf->b_ml.ml_line_count;
 	    add_lnum = TRUE;
 	}
-	if (d != NULL && (di = dict_find(d, (char_u *)"types", -1)) != NULL)
+	якщо (d != NULL && (di = dict_find(d, (char_u *)"types", -1)) != NULL)
 	{
-	    if (di->di_tv.v_type != VAR_LIST)
+	    якщо (di->di_tv.v_type != VAR_LIST)
 	    {
 		emsg(_(e_list_required));
-		return;
+		повернути;
 	    }
 
 	    l = di->di_tv.vval.v_list;
-	    if (l != NULL && list_len(l) > 0)
+	    якщо (l != NULL && list_len(l) > 0)
 	    {
 		prop_types = get_prop_types_from_names(l, buf, &prop_types_len);
-		if (prop_types == NULL)
-		    return;
+		якщо (prop_types == NULL)
+		    повернути;
 	    }
 	}
-	if (d != NULL && (di = dict_find(d, (char_u *)"ids", -1)) != NULL)
+	якщо (d != NULL && (di = dict_find(d, (char_u *)"ids", -1)) != NULL)
 	{
-	    if (di->di_tv.v_type != VAR_LIST)
+	    якщо (di->di_tv.v_type != VAR_LIST)
 	    {
 		emsg(_(e_list_required));
 		goto errret;
 	    }
 
 	    l = di->di_tv.vval.v_list;
-	    if (l != NULL && list_len(l) > 0)
+	    якщо (l != NULL && list_len(l) > 0)
 	    {
 		prop_ids = get_prop_ids_from_list(l, &prop_ids_len);
-		if (prop_ids == NULL)
+		якщо (prop_ids == NULL)
 		    goto errret;
 	    }
 	}
     }
-    if (start_lnum < 1 || start_lnum > buf->b_ml.ml_line_count
+    якщо (start_lnum < 1 || start_lnum > buf->b_ml.ml_line_count
 		|| end_lnum < 1 || end_lnum < start_lnum)
 	emsg(_(e_invalid_range));
-    else
-	for (lnum = start_lnum; lnum <= end_lnum; lnum++)
+    інакше
+	для (lnum = start_lnum; lnum <= end_lnum; lnum++)
 	    get_props_in_line(buf, lnum, prop_types, prop_types_len,
 		    prop_ids, prop_ids_len,
 		    rettv->vval.v_list, add_lnum);
@@ -2368,80 +2368,80 @@ f_prop_remove(typval_T *argvars, typval_T *rettv)
     linenr_T	last_changed = 0;
     dict_T	*dict;
     buf_T	*buf = curbuf;
-    int		do_all;
-    int		id = -MAXCOL;
-    int		type_id = -1;	    // for a single "type"
-    int		*type_ids = NULL;   // array, for a list of "types", allocated
-    int		num_type_ids = 0;   // number of elements in "type_ids"
-    int		both;
+    ціле		do_all;
+    ціле		id = -MAXCOL;
+    ціле		type_id = -1;	    // for a single "type"
+    ціле		*type_ids = NULL;   // array, for a list of "types", allocated
+    ціле		num_type_ids = 0;   // number of elements in "type_ids"
+    ціле		both;
 
     rettv->vval.v_number = 0;
 
-    if (in_vim9script()
+    якщо (in_vim9script()
 	    && (check_for_dict_arg(argvars, 0) == FAIL
 		|| check_for_opt_number_arg(argvars, 1) == FAIL
 		|| (argvars[1].v_type != VAR_UNKNOWN
 		    && check_for_opt_number_arg(argvars, 2) == FAIL)))
-	return;
+	повернути;
 
-    if (check_for_nonnull_dict_arg(argvars, 0) == FAIL)
-	return;
+    якщо (check_for_nonnull_dict_arg(argvars, 0) == FAIL)
+	повернути;
 
-    if (argvars[1].v_type != VAR_UNKNOWN)
+    якщо (argvars[1].v_type != VAR_UNKNOWN)
     {
 	start = tv_get_number(&argvars[1]);
 	end = start;
-	if (argvars[2].v_type != VAR_UNKNOWN)
+	якщо (argvars[2].v_type != VAR_UNKNOWN)
 	    end = tv_get_number(&argvars[2]);
-	if (start < 1 || end < 1)
+	якщо (start < 1 || end < 1)
 	{
 	    emsg(_(e_invalid_range));
-	    return;
+	    повернути;
 	}
     }
 
     dict = argvars[0].vval.v_dict;
-    if (get_bufnr_from_arg(&argvars[0], &buf) == FAIL)
-	return;
-    if (buf->b_ml.ml_mfp == NULL)
-	return;
+    якщо (get_bufnr_from_arg(&argvars[0], &buf) == FAIL)
+	повернути;
+    якщо (buf->b_ml.ml_mfp == NULL)
+	повернути;
 
     do_all = dict_get_bool(dict, "all", FALSE);
 
-    if (dict_has_key(dict, "id"))
+    якщо (dict_has_key(dict, "id"))
 	id = dict_get_number(dict, "id");
 
     // if a specific type was supplied "type": check that (and ignore "types".
     // Otherwise check against the list of "types".
-    if (dict_has_key(dict, "type"))
+    якщо (dict_has_key(dict, "type"))
     {
 	char_u	    *name = dict_get_string(dict, "type", FALSE);
 	proptype_T  *type = lookup_prop_type(name, buf);
 
-	if (type == NULL)
-	    return;
+	якщо (type == NULL)
+	    повернути;
 	type_id = type->pt_id;
     }
-    if (dict_has_key(dict, "types"))
+    якщо (dict_has_key(dict, "types"))
     {
 	typval_T types;
 	listitem_T *li = NULL;
 
 	dict_get_tv(dict, "types", &types);
-	if (types.v_type == VAR_LIST && types.vval.v_list->lv_len > 0)
+	якщо (types.v_type == VAR_LIST && types.vval.v_list->lv_len > 0)
 	{
-	    type_ids = alloc( sizeof(int) * types.vval.v_list->lv_len );
+	    type_ids = alloc( sizeof(ціле) * types.vval.v_list->lv_len );
 
 	    FOR_ALL_LIST_ITEMS(types.vval.v_list, li)
 	    {
 		proptype_T *prop_type;
 
-		if (li->li_tv.v_type != VAR_STRING)
+		якщо (li->li_tv.v_type != VAR_STRING)
 		    continue;
 
 		prop_type = lookup_prop_type(li->li_tv.vval.v_string, buf);
 
-		if (!prop_type)
+		якщо (!prop_type)
 		    goto cleanup_prop_remove;
 
 		type_ids[num_type_ids++] = prop_type->pt_id;
@@ -2450,68 +2450,68 @@ f_prop_remove(typval_T *argvars, typval_T *rettv)
     }
     both = dict_get_bool(dict, "both", FALSE);
 
-    if (id == -MAXCOL && (type_id == -1 && num_type_ids == 0))
+    якщо (id == -MAXCOL && (type_id == -1 && num_type_ids == 0))
     {
 	emsg(_(e_need_at_least_one_of_id_or_type));
 	goto cleanup_prop_remove;
     }
-    if (both && (id == -MAXCOL || (type_id == -1 && num_type_ids == 0)))
+    якщо (both && (id == -MAXCOL || (type_id == -1 && num_type_ids == 0)))
     {
 	emsg(_(e_need_id_and_type_or_types_with_both));
 	goto cleanup_prop_remove;
     }
-    if (type_id != -1 && num_type_ids > 0)
+    якщо (type_id != -1 && num_type_ids > 0)
     {
 	emsg(_(e_cannot_specify_both_type_and_types));
 	goto cleanup_prop_remove;
     }
 
-    if (end == 0)
+    якщо (end == 0)
 	end = buf->b_ml.ml_line_count;
 
     {
 	unpacked_memline_T um = um_open(buf);
 
-	for (lnum = start; lnum <= end; ++lnum)
+	для (lnum = start; lnum <= end; ++lnum)
 	{
-	    int idx;
+	    ціле idx;
 
-	    if (lnum > buf->b_ml.ml_line_count)
+	    якщо (lnum > buf->b_ml.ml_line_count)
 		break;
-	    if (!um_goto_line(&um, lnum, 0))
+	    якщо (!um_goto_line(&um, lnum, 0))
 		break;
 
-	    for (idx = 0; idx < um.prop_count; ++idx)
+	    для (idx = 0; idx < um.prop_count; ++idx)
 	    {
 		textprop_T  *prop = &um.props[idx];
-		int	    matches_id = 0;
-		int	    matches_type = 0;
+		ціле	    matches_id = 0;
+		ціле	    matches_type = 0;
 
-		if (prop->tp_flags & TP_FLAG_DELETED)
+		якщо (prop->tp_flags & TP_FLAG_DELETED)
 		    continue;
 
 		matches_id = prop->tp_id == id;
-		if (num_type_ids > 0)
+		якщо (num_type_ids > 0)
 		{
-		    int idx2;
+		    ціле idx2;
 
-		    for (idx2 = 0; !matches_type && idx2 < num_type_ids;
+		    для (idx2 = 0; !matches_type && idx2 < num_type_ids;
 								      ++idx2)
 			matches_type = prop->tp_type == type_ids[idx2];
 		}
-		else
+		інакше
 		    matches_type = prop->tp_type == type_id;
 
-		if (both ? matches_id && matches_type
+		якщо (both ? matches_id && matches_type
 			 : matches_id || matches_type)
 		{
 		    um_delete_prop(&um, idx);
 
-		    if (first_changed == 0)
+		    якщо (first_changed == 0)
 			first_changed = lnum;
 		    last_changed = lnum;
 		    ++rettv->vval.v_number;
-		    if (!do_all)
+		    якщо (!do_all)
 			break;
 		}
 	    }
@@ -2519,7 +2519,7 @@ f_prop_remove(typval_T *argvars, typval_T *rettv)
 	um_close(&um);
     }
 
-    if (first_changed > 0)
+    якщо (first_changed > 0)
     {
 	changed_line_display_buf(buf);
 	changed_lines_buf(buf, first_changed, last_changed + 1, 0);
@@ -2534,7 +2534,7 @@ cleanup_prop_remove:
  * Common for f_prop_type_add() and f_prop_type_change().
  */
     static void
-prop_type_set(typval_T *argvars, int add)
+prop_type_set(typval_T *argvars, ціле add)
 {
     char_u	*name;
     buf_T	*buf = NULL;
@@ -2542,126 +2542,126 @@ prop_type_set(typval_T *argvars, int add)
     dictitem_T  *di;
     proptype_T	*prop;
 
-    if (in_vim9script()
+    якщо (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_dict_arg(argvars, 1) == FAIL))
-	return;
+	повернути;
 
     name = tv_get_string(&argvars[0]);
-    if (*name == NUL)
+    якщо (*name == NUL)
     {
 	semsg(_(e_invalid_argument_str), "\"\"");
-	return;
+	повернути;
     }
 
-    if (get_bufnr_from_arg(&argvars[1], &buf) == FAIL)
-	return;
+    якщо (get_bufnr_from_arg(&argvars[1], &buf) == FAIL)
+	повернути;
     dict = argvars[1].vval.v_dict;
 
     prop = find_prop_type(name, buf);
-    if (add)
+    якщо (add)
     {
 	hashtab_T **htp;
 
-	if (prop != NULL)
+	якщо (prop != NULL)
 	{
 	    semsg(_(e_property_type_str_already_defined), name);
-	    return;
+	    повернути;
 	}
 	prop = alloc_clear(offsetof(proptype_T, pt_name) + STRLEN(name) + 1);
-	if (prop == NULL)
-	    return;
+	якщо (prop == NULL)
+	    повернути;
 	STRCPY(prop->pt_name, name);
 	prop->pt_id = ++proptype_id;
 	prop->pt_flags = PT_FLAG_COMBINE;
-	if (buf == NULL)
+	якщо (buf == NULL)
 	{
 	    htp = &global_proptypes;
 	    VIM_CLEAR(global_proparray);
 	}
-	else
+	інакше
 	{
 	    htp = &buf->b_proptypes;
 	    VIM_CLEAR(buf->b_proparray);
 	}
-	if (*htp == NULL)
+	якщо (*htp == NULL)
 	{
 	    *htp = ALLOC_ONE(hashtab_T);
-	    if (*htp == NULL)
+	    якщо (*htp == NULL)
 	    {
 		vim_free(prop);
-		return;
+		повернути;
 	    }
 	    hash_init(*htp);
 	}
 	hash_add(*htp, PT2HIKEY(prop), "prop type");
     }
-    else
+    інакше
     {
-	if (prop == NULL)
+	якщо (prop == NULL)
 	{
 	    semsg(_(e_property_type_str_does_not_exist), name);
-	    return;
+	    повернути;
 	}
     }
 
-    if (dict != NULL)
+    якщо (dict != NULL)
     {
 	di = dict_find(dict, (char_u *)"highlight", -1);
-	if (di != NULL)
+	якщо (di != NULL)
 	{
 	    char_u	*highlight;
-	    int		hl_id = 0;
+	    ціле		hl_id = 0;
 
 	    highlight = dict_get_string(dict, "highlight", FALSE);
-	    if (highlight != NULL && *highlight != NUL)
+	    якщо (highlight != NULL && *highlight != NUL)
 		hl_id = syn_name2id(highlight);
-	    if (hl_id <= 0)
+	    якщо (hl_id <= 0)
 	    {
 		semsg(_(e_unknown_highlight_group_name_str),
 			highlight == NULL ? (char_u *)"" : highlight);
-		return;
+		повернути;
 	    }
 	    prop->pt_hl_id = hl_id;
 	}
 
 	di = dict_find(dict, (char_u *)"combine", -1);
-	if (di != NULL)
+	якщо (di != NULL)
 	{
-	    if (tv_get_bool(&di->di_tv))
+	    якщо (tv_get_bool(&di->di_tv))
 		prop->pt_flags |= PT_FLAG_COMBINE;
-	    else
+	    інакше
 		prop->pt_flags &= ~PT_FLAG_COMBINE;
 	}
 
 	di = dict_find(dict, (char_u *)"override", -1);
-	if (di != NULL)
+	якщо (di != NULL)
 	{
-	    if (tv_get_bool(&di->di_tv))
+	    якщо (tv_get_bool(&di->di_tv))
 		prop->pt_flags |= PT_FLAG_OVERRIDE;
-	    else
+	    інакше
 		prop->pt_flags &= ~PT_FLAG_OVERRIDE;
 	}
 
 	di = dict_find(dict, (char_u *)"priority", -1);
-	if (di != NULL)
+	якщо (di != NULL)
 	    prop->pt_priority = tv_get_number(&di->di_tv);
 
 	di = dict_find(dict, (char_u *)"start_incl", -1);
-	if (di != NULL)
+	якщо (di != NULL)
 	{
-	    if (tv_get_bool(&di->di_tv))
+	    якщо (tv_get_bool(&di->di_tv))
 		prop->pt_flags |= PT_FLAG_INS_START_INCL;
-	    else
+	    інакше
 		prop->pt_flags &= ~PT_FLAG_INS_START_INCL;
 	}
 
 	di = dict_find(dict, (char_u *)"end_incl", -1);
-	if (di != NULL)
+	якщо (di != NULL)
 	{
-	    if (tv_get_bool(&di->di_tv))
+	    якщо (tv_get_bool(&di->di_tv))
 		prop->pt_flags |= PT_FLAG_INS_END_INCL;
-	    else
+	    інакше
 		prop->pt_flags &= ~PT_FLAG_INS_END_INCL;
 	}
     }
@@ -2695,37 +2695,37 @@ f_prop_type_delete(typval_T *argvars, typval_T *rettv UNUSED)
     buf_T	*buf = NULL;
     hashitem_T	*hi;
 
-    if (in_vim9script()
+    якщо (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_opt_dict_arg(argvars, 1) == FAIL))
-	return;
+	повернути;
 
     name = tv_get_string(&argvars[0]);
-    if (*name == NUL)
+    якщо (*name == NUL)
     {
 	semsg(_(e_invalid_argument_str), "\"\"");
-	return;
+	повернути;
     }
 
-    if (argvars[1].v_type != VAR_UNKNOWN)
+    якщо (argvars[1].v_type != VAR_UNKNOWN)
     {
-	if (get_bufnr_from_arg(&argvars[1], &buf) == FAIL)
-	    return;
+	якщо (get_bufnr_from_arg(&argvars[1], &buf) == FAIL)
+	    повернути;
     }
 
     hi = find_prop_type_hi(name, buf);
-    if (hi == NULL)
-	return;
+    якщо (hi == NULL)
+	повернути;
 
     hashtab_T	*ht;
     proptype_T	*prop = HI2PT(hi);
 
-    if (buf == NULL)
+    якщо (buf == NULL)
     {
 	ht = global_proptypes;
 	VIM_CLEAR(global_proparray);
     }
-    else
+    інакше
     {
 	ht = buf->b_proptypes;
 	VIM_CLEAR(buf->b_proparray);
@@ -2746,37 +2746,37 @@ f_prop_type_get(typval_T *argvars, typval_T *rettv)
 {
     char_u *name;
 
-    if (in_vim9script()
+    якщо (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_opt_dict_arg(argvars, 1) == FAIL))
-	return;
+	повернути;
 
     name = tv_get_string(&argvars[0]);
-    if (*name == NUL)
+    якщо (*name == NUL)
     {
 	semsg(_(e_invalid_argument_str), "\"\"");
-	return;
+	повернути;
     }
 
-    if (rettv_dict_alloc(rettv) == FAIL)
-	return;
+    якщо (rettv_dict_alloc(rettv) == FAIL)
+	повернути;
 
     proptype_T  *prop = NULL;
     buf_T	    *buf = NULL;
 
-    if (argvars[1].v_type != VAR_UNKNOWN)
+    якщо (argvars[1].v_type != VAR_UNKNOWN)
     {
-	if (get_bufnr_from_arg(&argvars[1], &buf) == FAIL)
-	    return;
+	якщо (get_bufnr_from_arg(&argvars[1], &buf) == FAIL)
+	    повернути;
     }
 
     prop = find_prop_type(name, buf);
-    if (prop == NULL)
-	return;
+    якщо (prop == NULL)
+	повернути;
 
     dict_T *d = rettv->vval.v_dict;
 
-    if (prop->pt_hl_id > 0)
+    якщо (prop->pt_hl_id > 0)
 	dict_add_string(d, "highlight", syn_id2name(prop->pt_hl_id));
     dict_add_number(d, "priority", prop->pt_priority);
     dict_add_number(d, "combine",
@@ -2787,7 +2787,7 @@ f_prop_type_get(typval_T *argvars, typval_T *rettv)
 	    (prop->pt_flags & PT_FLAG_INS_START_INCL) ? 1 : 0);
     dict_add_number(d, "end_incl",
 	    (prop->pt_flags & PT_FLAG_INS_END_INCL) ? 1 : 0);
-    if (buf != NULL)
+    якщо (buf != NULL)
 	dict_add_number(d, "bufnr", buf->b_fnum);
 }
 
@@ -2800,7 +2800,7 @@ list_types(hashtab_T *ht, list_T *l)
     todo = (long)ht->ht_used;
     FOR_ALL_HASHTAB_ITEMS(ht, hi, todo)
     {
-	if (!HASHITEM_EMPTY(hi))
+	якщо (!HASHITEM_EMPTY(hi))
 	{
 	    proptype_T *prop = HI2PT(hi);
 
@@ -2818,23 +2818,23 @@ f_prop_type_list(typval_T *argvars, typval_T *rettv)
 {
     buf_T *buf = NULL;
 
-    if (rettv_list_alloc(rettv) == FAIL)
-	return;
+    якщо (rettv_list_alloc(rettv) == FAIL)
+	повернути;
 
-    if (in_vim9script() && check_for_opt_dict_arg(argvars, 0) == FAIL)
-	return;
+    якщо (in_vim9script() && check_for_opt_dict_arg(argvars, 0) == FAIL)
+	повернути;
 
-    if (argvars[0].v_type != VAR_UNKNOWN)
+    якщо (argvars[0].v_type != VAR_UNKNOWN)
     {
-	if (get_bufnr_from_arg(&argvars[0], &buf) == FAIL)
-	    return;
+	якщо (get_bufnr_from_arg(&argvars[0], &buf) == FAIL)
+	    повернути;
     }
-    if (buf == NULL)
+    якщо (buf == NULL)
     {
-	if (global_proptypes != NULL)
+	якщо (global_proptypes != NULL)
 	    list_types(global_proptypes, rettv->vval.v_list);
     }
-    else if (buf->b_proptypes != NULL)
+    інакше якщо (buf->b_proptypes != NULL)
 	list_types(buf->b_proptypes, rettv->vval.v_list);
 }
 
@@ -2847,13 +2847,13 @@ clear_ht_prop_types(hashtab_T *ht)
     long	todo;
     hashitem_T	*hi;
 
-    if (ht == NULL)
-	return;
+    якщо (ht == NULL)
+	повернути;
 
     todo = (long)ht->ht_used;
     FOR_ALL_HASHTAB_ITEMS(ht, hi, todo)
     {
-	if (!HASHITEM_EMPTY(hi))
+	якщо (!HASHITEM_EMPTY(hi))
 	{
 	    proptype_T *prop = HI2PT(hi);
 
@@ -2866,7 +2866,7 @@ clear_ht_prop_types(hashtab_T *ht)
     vim_free(ht);
 }
 
-#if defined(EXITFREE)
+#якщо defined(EXITFREE)
 /*
  * Free all global property types.
  */
@@ -2893,8 +2893,8 @@ clear_buf_prop_types(buf_T *buf)
 // Struct used to return two values from adjust_prop().
 typedef struct
 {
-    int dirty;	    // if the property was changed
-    int can_drop;   // whether after this change, the prop may be removed
+    ціле dirty;	    // if the property was changed
+    ціле can_drop;   // whether after this change, the prop may be removed
 } adjustres_T;
 
 /*
@@ -2910,27 +2910,27 @@ typedef struct
 adjust_prop(
 	textprop_T  *prop,
 	colnr_T	    col,
-	int	    added,
-	int	    flags)
+	ціле	    added,
+	ціле	    flags)
 {
     proptype_T	*pt;
-    int		start_incl;
-    int		end_incl;
-    int		droppable;
+    ціле		start_incl;
+    ціле		end_incl;
+    ціле		droppable;
     adjustres_T res = {TRUE, FALSE};
 
     // prop after end of the line doesn't move
-    if (prop->tp_col == MAXCOL)
+    якщо (prop->tp_col == MAXCOL)
     {
 	res.dirty = FALSE;
-	return res;
+	повернути res;
     }
 
     pt = text_prop_type_by_id(curbuf, prop->tp_type);
     start_incl = (pt != NULL && (pt->pt_flags & PT_FLAG_INS_START_INCL))
 				|| (flags & APC_SUBSTITUTE)
 				|| (prop->tp_flags & TP_FLAG_CONT_PREV);
-    if (prop->tp_id < 0 && (flags & APC_INDENT))
+    якщо (prop->tp_id < 0 && (flags & APC_INDENT))
 	// when inserting indent just before a character with virtual text
 	// shift the text property
 	start_incl = FALSE;
@@ -2939,31 +2939,31 @@ adjust_prop(
     // do not drop zero-width props if they later can increase in size
     droppable = !(start_incl || end_incl);
 
-    if (added > 0)
+    якщо (added > 0)
     {
-	if (col + 1 <= prop->tp_col
+	якщо (col + 1 <= prop->tp_col
 		- (start_incl || (prop->tp_len == 0 && end_incl)))
 	    // Change is entirely before the text property: Only shift
 	    prop->tp_col += added;
-	else if (col + 1 < prop->tp_col + prop->tp_len + end_incl
+	інакше якщо (col + 1 < prop->tp_col + prop->tp_len + end_incl
 		&& prop->tp_id >= 0)  // don't change length for virtual text
 	    // Insertion was inside text property
 	    prop->tp_len += added;
     }
-    else if (prop->tp_col > col + 1)
+    інакше якщо (prop->tp_col > col + 1)
     {
-	if (prop->tp_col + added < col + 1)
+	якщо (prop->tp_col + added < col + 1)
 	{
-	    if (prop->tp_id < 0)
+	    якщо (prop->tp_id < 0)
 	    {
 		// Inline virtual text swallowed by the deletion.
 		res.can_drop = TRUE;
 	    }
-	    else
+	    інакше
 	    {
 		prop->tp_len += (prop->tp_col - 1 - col) + added;
 		prop->tp_col = col + 1;
-		if (prop->tp_len <= 0)
+		якщо (prop->tp_len <= 0)
 		{
 		    prop->tp_len = 0;
 		    // Multiline properties with no text left should
@@ -2974,33 +2974,33 @@ adjust_prop(
 		}
 	    }
 	}
-	else
+	інакше
 	    prop->tp_col += added;
     }
-    else if (prop->tp_len > 0 && prop->tp_col + prop->tp_len > col
+    інакше якщо (prop->tp_len > 0 && prop->tp_col + prop->tp_len > col
 	    && prop->tp_id >= 0)  // don't change length for virtual text
     {
-	if (added <= -MAXCOL)
+	якщо (added <= -MAXCOL)
 	    // Delete everything from col to end of line.
 	    prop->tp_len = col - (prop->tp_col - 1);
-	else
+	інакше
 	{
-	    int after = col - added - (prop->tp_col - 1 + prop->tp_len);
+	    ціле after = col - added - (prop->tp_col - 1 + prop->tp_len);
 
 	    prop->tp_len += after > 0 ? added + after : added;
 	}
 	// A multiline property with no text left on this line
 	// should also be dropped.  When TP_FLAG_CONT_NEXT is set,
 	// tp_len == 1 means only the newline remains.
-	if (prop->tp_len <= 0 || ((prop->tp_flags & TP_FLAG_CONT_NEXT)
+	якщо (prop->tp_len <= 0 || ((prop->tp_flags & TP_FLAG_CONT_NEXT)
 		    && prop->tp_len <= 1))
 	    res.can_drop = droppable || (prop->tp_flags
 			& (TP_FLAG_CONT_PREV | TP_FLAG_CONT_NEXT));
     }
-    else
+    інакше
 	res.dirty = FALSE;
 
-    return res;
+    повернути res;
 }
 
 /*
@@ -3015,68 +3015,68 @@ adjust_prop(
  * Caller is expected to check b_has_textprop and "bytes_added" being non-zero.
  * Returns TRUE when props were changed.
  */
-    int
+    ціле
 adjust_prop_columns(
 	linenr_T    lnum,
 	colnr_T	    col,
-	int	    bytes_added,
-	int	    flags)
+	ціле	    bytes_added,
+	ціле	    flags)
 {
     unpacked_memline_T um;
-    int		dirty = FALSE;
-    int		ri;
+    ціле		dirty = FALSE;
+    ціле		ri;
 
-    if (text_prop_frozen > 0)
-	return FALSE;
+    якщо (text_prop_frozen > 0)
+	повернути FALSE;
 
     um = um_open_at(curbuf, lnum, 0);
-    if (um.buf == NULL || um.prop_count == 0)
+    якщо (um.buf == NULL || um.prop_count == 0)
     {
 	um_abort(&um);
-	return FALSE;
+	повернути FALSE;
     }
 
-    for (ri = 0; ri < um.prop_count; ++ri)
+    для (ri = 0; ri < um.prop_count; ++ri)
     {
 	textprop_T	*prop = &um.props[ri];
 	adjustres_T	res;
 
 	res = adjust_prop(prop, col, bytes_added, flags);
-	if (res.dirty)
+	якщо (res.dirty)
 	{
-	    if (!dirty)
+	    якщо (!dirty)
 	    {
 		// Detach before u_savesub() so that all text and vtext
 		// pointers are allocated copies, immune to memline
 		// changes caused by u_savesub().
-		if (!um.detached && !um_detach(&um))
+		якщо (!um.detached && !um_detach(&um))
 		{
 		    um_abort(&um);
-		    return FALSE;
+		    повернути FALSE;
 		}
 		// Re-get prop pointer after detach (array may move).
 		prop = &um.props[ri];
 
-		if ((flags & APC_SAVE_FOR_UNDO)
+		якщо ((flags & APC_SAVE_FOR_UNDO)
 					       && u_savesub(lnum) == FAIL)
 		{
 		    um_abort(&um);
-		    return FALSE;
+		    повернути FALSE;
 		}
 	    }
 	    dirty = TRUE;
 	}
-	if (res.can_drop)
+	якщо (res.can_drop)
 	{
 	    um_delete_prop(&um, ri);
 	    continue;
 	}
     }
-    if (dirty)
+    якщо (dirty)
 	um_close(&um);
-    else
+    інакше
 	um_abort(&um);
-    return dirty;
+    повернути dirty;
 }
 
 /*
@@ -3091,18 +3091,18 @@ adjust_prop_columns(
 adjust_props_for_split(
 	linenr_T    lnum_props,
 	linenr_T    lnum_top,
-	int	    kept,
-	int	    deleted,
-	int	    at_eol)
+	ціле	    kept,
+	ціле	    deleted,
+	ціле	    at_eol)
 {
     char_u	*props;
-    int		count;
+    ціле		count;
     garray_T    prevprop;
     garray_T    nextprop;
-    int		skipped = kept + deleted;
+    ціле		skipped = kept + deleted;
 
-    if (!curbuf->b_has_textprop)
-	return;
+    якщо (!curbuf->b_has_textprop)
+	повернути;
 
     // Get the text properties from "lnum_props".
     count = get_text_props(curbuf, lnum_props, &props, FALSE);
@@ -3115,25 +3115,25 @@ adjust_props_for_split(
     // Keep the relevant ones in the first line, reducing the length if needed.
     // Copy the ones that include the split to the second line.
     // Move the ones after the split to the second line.
-    for (int i = 0; i < count; ++i)
+    для (ціле i = 0; i < count; ++i)
     {
 	textprop_T  prop;
 	proptype_T *pt;
-	int	    start_incl, end_incl;
-	int	    cont_prev, cont_next;
-	int	    prop_col;
+	ціле	    start_incl, end_incl;
+	ціле	    cont_prev, cont_next;
+	ціле	    prop_col;
 
 	// copy the prop to an aligned structure
 	mch_memmove(&prop, props + i * sizeof(textprop_T), sizeof(textprop_T));
 
 	// Convert offset to pointer and copy for virtual text props.
 	// Must copy because set_text_props() may invalidate memline data.
-	if (prop.tp_id < 0 && prop.u.tp_text_offset > 0)
+	якщо (prop.tp_id < 0 && prop.u.tp_text_offset > 0)
 	{
 	    prop.u.tp_text = vim_strsave(count_ptr + prop.u.tp_text_offset);
 	    prop.tp_flags |= TP_FLAG_VTEXT_PTR;
 	}
-	else
+	інакше
 	    prop.u.tp_text = NULL;
 
 	pt = text_prop_type_by_id(curbuf, prop.tp_type);
@@ -3143,63 +3143,63 @@ adjust_props_for_split(
 	// a text prop "above" behaves like it is on the first text column
 	prop_col = (prop.tp_flags & TP_FLAG_ALIGN_ABOVE) ? 1 : prop.tp_col;
 
-	if (prop_col == MAXCOL)
+	якщо (prop_col == MAXCOL)
 	{
 	    cont_prev = at_eol;
 	    cont_next = !at_eol;
 	}
-	else
+	інакше
 	{
 	    // Floating virtual text (tp_col == MAXCOL) should not use
 	    // tp_len for continuation since tp_len holds the vtext
 	    // string length.
-	    int is_floating_vtext = (prop.tp_id < 0
+	    ціле is_floating_vtext = (prop.tp_id < 0
 						&& prop.tp_col == MAXCOL);
 
 	    cont_prev = prop_col + !start_incl <= kept;
-	    if (is_floating_vtext)
+	    якщо (is_floating_vtext)
 		cont_next = FALSE;
-	    else
+	    інакше
 		cont_next = skipped <= prop_col + prop.tp_len - !end_incl;
 	}
 	// when a prop has text it is never copied
-	if (prop.tp_id < 0 && cont_next)
+	якщо (prop.tp_id < 0 && cont_next)
 	    cont_prev = FALSE;
 
-	if (cont_prev && ga_grow(&prevprop, 1) == OK)
+	якщо (cont_prev && ga_grow(&prevprop, 1) == OK)
 	{
 	    textprop_T *p = ((textprop_T *)prevprop.ga_data) + prevprop.ga_len;
-	    int is_vtext = (prop.tp_id < 0);
+	    ціле is_vtext = (prop.tp_id < 0);
 
 	    *p = prop;
 	    ++prevprop.ga_len;
-	    if (!is_vtext && p->tp_col + p->tp_len >= kept)
+	    якщо (!is_vtext && p->tp_col + p->tp_len >= kept)
 		p->tp_len = kept - p->tp_col;
-	    if (cont_next)
+	    якщо (cont_next)
 		p->tp_flags |= TP_FLAG_CONT_NEXT;
 	}
 
 	// Only add the property to the next line if the length is bigger than
 	// zero.
-	if (cont_next && ga_grow(&nextprop, 1) == OK)
+	якщо (cont_next && ga_grow(&nextprop, 1) == OK)
 	{
 	    textprop_T *p = ((textprop_T *)nextprop.ga_data) + nextprop.ga_len;
-	    int is_vtext = (prop.tp_id < 0);
+	    ціле is_vtext = (prop.tp_id < 0);
 
 	    *p = prop;
 	    ++nextprop.ga_len;
-	    if (p->tp_col != MAXCOL)
+	    якщо (p->tp_col != MAXCOL)
 	    {
-		if (p->tp_col > skipped)
+		якщо (p->tp_col > skipped)
 		    p->tp_col -= skipped - 1;
-		else
+		інакше
 		{
-		    if (!is_vtext)
+		    якщо (!is_vtext)
 			p->tp_len -= skipped - p->tp_col;
 		    p->tp_col = 1;
 		}
 	    }
-	    if (cont_prev)
+	    якщо (cont_prev)
 		p->tp_flags |= TP_FLAG_CONT_PREV;
 	}
     }
@@ -3221,51 +3221,51 @@ adjust_props_for_split(
 prepend_joined_props(
 	unpacked_memline_T  *um,
 	linenr_T	    lnum,
-	int		    last_line,
+	ціле		    last_line,
 	long		    col,
-	int		    removed)
+	ціле		    removed)
 {
     unpacked_memline_T	r_um;
 
-    if (um->buf == NULL)
-	return;
+    якщо (um->buf == NULL)
+	повернути;
 
     r_um = um_open_at(um->buf, lnum, 0);
-    if (r_um.buf == NULL)
-	return;
-    if (!um_detach(&r_um))
+    якщо (r_um.buf == NULL)
+	повернути;
+    якщо (!um_detach(&r_um))
     {
 	um_abort(&r_um);
-	return;
+	повернути;
     }
 
-    for (int i = r_um.prop_count - 1; i >= 0; --i)
+    для (ціле i = r_um.prop_count - 1; i >= 0; --i)
     {
 	textprop_T  *prop = &r_um.props[i];
-	int	    end;
+	ціле	    end;
 
-	if (prop->tp_col == MAXCOL && !last_line)
+	якщо (prop->tp_col == MAXCOL && !last_line)
 	    continue;  // drop floating text for non-last lines
 	end = !(prop->tp_flags & TP_FLAG_CONT_NEXT);
 
 	adjust_prop(prop, 0, -removed, 0);
 	adjust_prop(prop, -1, col, 0);
 
-	if (last_line || end)
+	якщо (last_line || end)
 	{
 	    um_add_prop(um, prop);
 	    prop->u.tp_text = NULL;  // ownership transferred
 	}
-	else
+	інакше
 	{
 	    // Search for continuing prop in um.
 	    bool    found = false;
 
-	    for (int j = 0; j < um->prop_count; ++j)
+	    для (ціле j = 0; j < um->prop_count; ++j)
 	    {
 		textprop_T *op = &um->props[j];
 
-		if ((op->tp_flags & TP_FLAG_CONT_PREV)
+		якщо ((op->tp_flags & TP_FLAG_CONT_PREV)
 			&& op->tp_id == prop->tp_id
 			&& op->tp_type == prop->tp_type)
 		{
@@ -3276,7 +3276,7 @@ prepend_joined_props(
 		    break;
 		}
 	    }
-	    if (!found)
+	    якщо (!found)
 		internal_error("text property above joined line not found");
 	}
     }
@@ -3287,16 +3287,16 @@ prepend_joined_props(
  * Remember in "gap" that "flag" was cleared on "prop", on the line "which".
  */
     static void
-remember_cleared_prop(garray_T *gap, int which, textprop_T *prop, int flag)
+remember_cleared_prop(garray_T *gap, ціле which, textprop_T *prop, ціле flag)
 {
     undoprop_T	*up;
 
-    if (which == UNDOPROP_NONE)
-	return;
-    if (gap->ga_itemsize == 0)
+    якщо (which == UNDOPROP_NONE)
+	повернути;
+    якщо (gap->ga_itemsize == 0)
 	ga_init2(gap, sizeof(undoprop_T), 4);
-    if (ga_grow(gap, 1) == FAIL)
-	return;
+    якщо (ga_grow(gap, 1) == FAIL)
+	повернути;
     up = (undoprop_T *)gap->ga_data + gap->ga_len++;
     up->up_which = which;
     up->up_type = prop->tp_type;
@@ -3316,8 +3316,8 @@ adjust_props_for_undo(
 	buf_T	    *buf,
 	linenr_T    lnum,
 	garray_T    *gap,
-	int	    above_which,
-	int	    below_which)
+	ціле	    above_which,
+	ціле	    below_which)
 {
     unpacked_memline_T	above;
     unpacked_memline_T	below;
@@ -3326,48 +3326,48 @@ adjust_props_for_undo(
     bool		below_changed = false;
     bool		cont_next = false;
 
-    if (!buf->b_has_textprop || lnum < 1 || lnum >= buf->b_ml.ml_line_count)
-	return;
+    якщо (!buf->b_has_textprop || lnum < 1 || lnum >= buf->b_ml.ml_line_count)
+	повернути;
 
     above = um_open_at(buf, lnum, 0);
-    if (above.buf == NULL)
-	return;
-    for (int i = 0; i < above.prop_count; ++i)
-	if (above.props[i].tp_flags & TP_FLAG_CONT_NEXT)
+    якщо (above.buf == NULL)
+	повернути;
+    для (ціле i = 0; i < above.prop_count; ++i)
+	якщо (above.props[i].tp_flags & TP_FLAG_CONT_NEXT)
 	    cont_next = true;
     // Loading the line below may invalidate the text of "above", copy it when
     // it may have to be stored.
-    if (cont_next && !um_detach(&above))
+    якщо (cont_next && !um_detach(&above))
     {
 	um_abort(&above);
-	return;
+	повернути;
     }
 
     below = um_open_at(buf, lnum + 1, 0);
-    if (below.buf == NULL)
+    якщо (below.buf == NULL)
     {
 	um_abort(&above);
-	return;
+	повернути;
     }
-    if (below.prop_count > 0)
+    якщо (below.prop_count > 0)
     {
 	paired = ALLOC_CLEAR_MULT(bool, below.prop_count);
-	if (paired == NULL)
+	якщо (paired == NULL)
 	    goto theend;
     }
 
-    for (int i = 0; i < above.prop_count; ++i)
+    для (ціле i = 0; i < above.prop_count; ++i)
     {
 	textprop_T  *prop = &above.props[i];
 	bool	    found = false;
 
-	if (!(prop->tp_flags & TP_FLAG_CONT_NEXT))
+	якщо (!(prop->tp_flags & TP_FLAG_CONT_NEXT))
 	    continue;
-	for (int j = 0; j < below.prop_count; ++j)
+	для (ціле j = 0; j < below.prop_count; ++j)
 	{
 	    textprop_T *next = &below.props[j];
 
-	    if (!paired[j] && (next->tp_flags & TP_FLAG_CONT_PREV)
+	    якщо (!paired[j] && (next->tp_flags & TP_FLAG_CONT_PREV)
 		    && next->tp_id == prop->tp_id
 		    && next->tp_type == prop->tp_type)
 	    {
@@ -3376,7 +3376,7 @@ adjust_props_for_undo(
 		break;
 	    }
 	}
-	if (!found)
+	якщо (!found)
 	{
 	    prop->tp_flags &= ~TP_FLAG_CONT_NEXT;
 	    above_changed = true;
@@ -3384,11 +3384,11 @@ adjust_props_for_undo(
 	}
     }
 
-    for (int j = 0; j < below.prop_count; ++j)
+    для (ціле j = 0; j < below.prop_count; ++j)
     {
-	if (!(below.props[j].tp_flags & TP_FLAG_CONT_PREV) || paired[j])
+	якщо (!(below.props[j].tp_flags & TP_FLAG_CONT_PREV) || paired[j])
 	    continue;
-	if (!below.detached && !um_detach(&below))
+	якщо (!below.detached && !um_detach(&below))
 	    break;
 	below.props[j].tp_flags &= ~TP_FLAG_CONT_PREV;
 	below_changed = true;
@@ -3397,13 +3397,13 @@ adjust_props_for_undo(
     }
 
 theend:
-    if (below_changed)
+    якщо (below_changed)
 	um_close(&below);
-    else
+    інакше
 	um_abort(&below);
-    if (above_changed)
+    якщо (above_changed)
 	um_close(&above);
-    else
+    інакше
 	um_abort(&above);
     vim_free(paired);
 }
@@ -3418,32 +3418,32 @@ restore_props_for_undo(
 	buf_T	    *buf,
 	linenr_T    lnum,
 	garray_T    *gap,
-	int	    which)
+	ціле	    which)
 {
     unpacked_memline_T	um;
     bool		changed = false;
 
-    if (!buf->b_has_textprop || gap->ga_len == 0 || lnum < 1
+    якщо (!buf->b_has_textprop || gap->ga_len == 0 || lnum < 1
 					  || lnum > buf->b_ml.ml_line_count)
-	return;
+	повернути;
     um = um_open_at(buf, lnum, 0);
-    if (um.buf == NULL)
-	return;
-    for (int r = 0; r < gap->ga_len; ++r)
+    якщо (um.buf == NULL)
+	повернути;
+    для (ціле r = 0; r < gap->ga_len; ++r)
     {
 	undoprop_T  *up = (undoprop_T *)gap->ga_data + r;
 
-	if (up->up_which != which)
+	якщо (up->up_which != which)
 	    continue;
-	for (int i = 0; i < um.prop_count; ++i)
+	для (ціле i = 0; i < um.prop_count; ++i)
 	{
 	    textprop_T *prop = &um.props[i];
 
-	    if (prop->tp_type != up->up_type || prop->tp_id != up->up_id
+	    якщо (prop->tp_type != up->up_type || prop->tp_id != up->up_id
 		    || prop->tp_col != up->up_col
 		    || (prop->tp_flags & up->up_flag))
 		continue;
-	    if (!um.detached && !um_detach(&um))
+	    якщо (!um.detached && !um_detach(&um))
 		goto theend;
 	    um.props[i].tp_flags |= up->up_flag;
 	    changed = true;
@@ -3452,18 +3452,18 @@ restore_props_for_undo(
     }
 
 theend:
-    if (changed)
+    якщо (changed)
 	um_close(&um);
-    else
+    інакше
 	um_abort(&um);
 }
 
     bool
-text_prop_count_valid(int prop_count, size_t propdata_len)
+text_prop_count_valid(ціле prop_count, size_t propdata_len)
 {
-    if (propdata_len < PROP_COUNT_SIZE)
-	return false;
-    return (size_t)prop_count * sizeof(textprop_T)
+    якщо (propdata_len < PROP_COUNT_SIZE)
+	повернути false;
+    повернути (size_t)prop_count * sizeof(textprop_T)
 		    <= propdata_len - PROP_COUNT_SIZE;
 }
 
@@ -3473,21 +3473,21 @@ text_prop_count_valid(int prop_count, size_t propdata_len)
  * "props" may be unaligned.
  */
     bool
-text_prop_vtext_valid(char_u *props, int prop_count, size_t propdata_len)
+text_prop_vtext_valid(char_u *props, ціле prop_count, size_t propdata_len)
 {
-    for (int i = 0; i < prop_count; ++i)
+    для (ціле i = 0; i < prop_count; ++i)
     {
 	textprop_T  prop;
 
 	mch_memmove(&prop, props + (size_t)i * sizeof(textprop_T),
 							  sizeof(textprop_T));
-	if (prop.tp_id >= 0 || prop.u.tp_text_offset <= 0)
+	якщо (prop.tp_id >= 0 || prop.u.tp_text_offset <= 0)
 	    continue;
-	if (prop.tp_len < 0 || (size_t)prop.u.tp_text_offset
+	якщо (prop.tp_len < 0 || (size_t)prop.u.tp_text_offset
 				+ (size_t)prop.tp_len + 1 > propdata_len)
-	    return false;
+	    повернути false;
     }
-    return true;
+    повернути true;
 }
 
 #endif // FEAT_PROP_POPUP

@@ -14,7 +14,7 @@
 
 #include "vim.h"
 
-#if defined(FEAT_EVAL)
+#якщо defined(FEAT_EVAL)
 
 #ifdef VMS
 # include <float.h>
@@ -24,7 +24,7 @@ static void f_and(typval_T *argvars, typval_T *rettv);
 #ifdef FEAT_BEVAL
 static void f_balloon_gettext(typval_T *argvars, typval_T *rettv);
 static void f_balloon_show(typval_T *argvars, typval_T *rettv);
-# if defined(FEAT_BEVAL_TERM)
+# якщо defined(FEAT_BEVAL_TERM)
 static void f_balloon_split(typval_T *argvars, typval_T *rettv);
 # endif
 #endif
@@ -138,7 +138,7 @@ static void f_py3eval(typval_T *argvars, typval_T *rettv);
 #ifdef FEAT_PYTHON
 static void f_pyeval(typval_T *argvars, typval_T *rettv);
 #endif
-#if defined(FEAT_PYTHON) || defined(FEAT_PYTHON3)
+#якщо defined(FEAT_PYTHON) || defined(FEAT_PYTHON3)
 static void f_pyxeval(typval_T *argvars, typval_T *rettv);
 #endif
 static void f_test_srand_seed(typval_T *argvars, typval_T *rettv);
@@ -209,9 +209,9 @@ static void f_xor(typval_T *argvars, typval_T *rettv);
 
 // Context passed to an arg_ function.
 typedef struct {
-    int		arg_count;	// actual argument count
+    ціле		arg_count;	// actual argument count
     type2_T	*arg_types;	// list of argument types
-    int		arg_idx;	// current argument index (first arg is zero)
+    ціле		arg_idx;	// current argument index (first arg is zero)
     cctx_T	*arg_cctx;
 } argcontext_T;
 
@@ -220,18 +220,18 @@ typedef struct {
 // E.g. if "arg_idx" is 1, then (type - 1) is the first argument type.
 // NOTE:    Use "arg_any", not NULL, in funcentry_T.f_argcheck array
 //	    to accept an argument of any type.
-typedef int (*argcheck_T)(type_T *, type_T *, argcontext_T *);
+typedef ціле (*argcheck_T)(type_T *, type_T *, argcontext_T *);
 
 /*
  * Call need_type() to check an argument type.
  */
-    static int
+    static ціле
 check_arg_type(
 	type_T		*expected,
 	type_T		*actual,
 	argcontext_T	*context)
 {
-    return need_type(actual, expected, 0,
+    повернути need_type(actual, expected, 0,
 	    context->arg_idx - context->arg_count, context->arg_idx + 1,
 	    context->arg_cctx, FALSE, FALSE);
 }
@@ -239,506 +239,506 @@ check_arg_type(
 /*
  * Call need_type() to check an argument type and that it is modifiable
  */
-    static int
+    static ціле
 check_arg_type_mod(
 	type_T		*expected,
 	type_T		*actual,
 	argcontext_T	*context)
 {
-    if (need_type(actual, expected, 0,
+    якщо (need_type(actual, expected, 0,
 	    context->arg_idx - context->arg_count, context->arg_idx + 1,
 	    context->arg_cctx, FALSE, FALSE) == FAIL)
-	return FAIL;
-    return arg_type_modifiable(actual, context->arg_idx + 1);
+	повернути FAIL;
+    повернути arg_type_modifiable(actual, context->arg_idx + 1);
 }
 
 /*
  * Give an error if "type" is a constant.
  */
-    int
-arg_type_modifiable(type_T *type, int arg_idx)
+    ціле
+arg_type_modifiable(type_T *type, ціле arg_idx)
 {
     char *tofree;
 
-    if ((type->tt_flags & TTFLAG_CONST) == 0)
-	return OK;
+    якщо ((type->tt_flags & TTFLAG_CONST) == 0)
+	повернути OK;
     semsg(_(e_argument_nr_trying_to_modify_const_str),
 	    arg_idx, type_name(type, &tofree));
     vim_free(tofree);
-    return FAIL;
+    повернути FAIL;
 }
 
 /*
  *  Return OK for any type unconditionally.
  */
-    static int
+    static ціле
 arg_any(type_T *type UNUSED,
 	type_T *decl_type UNUSED,
 	argcontext_T *context UNUSED)
 {
-    return OK;
+    повернути OK;
 }
 
 /*
  * Check "type" is a float or a number.
  */
-    static int
+    static ціле
 arg_float_or_nr(type_T *type, type_T *decl_type UNUSED, argcontext_T *context)
 {
-    if (type->tt_type == VAR_FLOAT
+    якщо (type->tt_type == VAR_FLOAT
 	    || type->tt_type == VAR_NUMBER
 	    || type_any_or_unknown(type))
-	return OK;
+	повернути OK;
     arg_type_mismatch(&t_number, type, context->arg_idx + 1);
-    return FAIL;
+    повернути FAIL;
 }
 
 /*
  * Check "type" is a number.
  */
-    static int
+    static ціле
 arg_number(type_T *type, type_T *decl_type UNUSED, argcontext_T *context)
 {
-    return check_arg_type(&t_number, type, context);
+    повернути check_arg_type(&t_number, type, context);
 }
 
 /*
  * Check "type" is an object.
  */
-    static int
+    static ціле
 arg_object(type_T *type, type_T *decl_type UNUSED, argcontext_T *context)
 {
-    if (type->tt_type == VAR_OBJECT
+    якщо (type->tt_type == VAR_OBJECT
 	    || type_any_or_unknown(type))
-	return OK;
+	повернути OK;
     arg_type_mismatch(&t_object_any, type, context->arg_idx + 1);
-    return FAIL;
+    повернути FAIL;
 }
 
 /*
  * Check "type" is a dict of 'any'.
  */
-    static int
+    static ціле
 arg_dict_any(type_T *type, type_T *decl_type UNUSED, argcontext_T *context)
 {
-    return check_arg_type(&t_dict_any, type, context);
+    повернути check_arg_type(&t_dict_any, type, context);
 }
 
 /*
  * Check "type" is a list of 'any'.
  */
-    static int
+    static ціле
 arg_list_any(type_T *type, type_T *decl_type UNUSED, argcontext_T *context)
 {
-    return check_arg_type(&t_list_any, type, context);
+    повернути check_arg_type(&t_list_any, type, context);
 }
 
 /*
  * Check "type" is a list of 'any' and modifiable
  */
-    static int
+    static ціле
 arg_list_any_mod(
 	type_T	     *type,
 	type_T	     *decl_type UNUSED,
 	argcontext_T *context)
 {
-    return check_arg_type_mod(&t_list_any, type, context);
+    повернути check_arg_type_mod(&t_list_any, type, context);
 }
 
 /*
  * Check "type" is a list of numbers.
  */
-    static int
+    static ціле
 arg_list_number(type_T *type, type_T *decl_type UNUSED, argcontext_T *context)
 {
-    return check_arg_type(&t_list_number, type, context);
+    повернути check_arg_type(&t_list_number, type, context);
 }
 
 /*
  * Check "type" is a list of strings.
  */
-    static int
+    static ціле
 arg_list_string(type_T *type, type_T *decl_type UNUSED, argcontext_T *context)
 {
-    return check_arg_type(&t_list_string, type, context);
+    повернути check_arg_type(&t_list_string, type, context);
 }
 
 /*
  * Check "type" is a tuple of 'any'.
  */
-    static int
+    static ціле
 arg_tuple_any(type_T *type, type_T *decl_type UNUSED, argcontext_T *context)
 {
-    return check_arg_type(&t_tuple_any, type, context);
+    повернути check_arg_type(&t_tuple_any, type, context);
 }
 
 /*
  * Check "type" is a string.
  */
-    static int
+    static ціле
 arg_string(type_T *type, type_T *decl_type UNUSED, argcontext_T *context)
 {
-    return check_arg_type(&t_string, type, context);
+    повернути check_arg_type(&t_string, type, context);
 }
 
 /*
  * Check "type" is a blob
  */
-    static int
+    static ціле
 arg_blob(type_T *type, type_T *decl_type UNUSED, argcontext_T *context)
 {
-    return check_arg_type(&t_blob, type, context);
+    повернути check_arg_type(&t_blob, type, context);
 }
 
 /*
  * Check "type" is a bool or number 0 or 1.
  */
-    static int
+    static ціле
 arg_bool(type_T *type, type_T *decl_type UNUSED, argcontext_T *context)
 {
-    return check_arg_type(&t_bool, type, context);
+    повернути check_arg_type(&t_bool, type, context);
 }
 
 /*
  * Check "type" is a bool or a number.
  */
-    static int
+    static ціле
 arg_bool_or_nr(type_T *type, type_T *decl_type UNUSED, argcontext_T *context)
 {
-    if (type->tt_type == VAR_BOOL
+    якщо (type->tt_type == VAR_BOOL
 	    || type->tt_type == VAR_NUMBER
 	    || type_any_or_unknown(type))
-	return OK;
+	повернути OK;
     arg_type_mismatch(&t_number, type, context->arg_idx + 1);
-    return FAIL;
+    повернути FAIL;
 }
 
 /*
  * Check "type" is a bool or a dict of 'any'.
  */
-    static int
+    static ціле
 arg_bool_or_dict_any(
     type_T		*type,
     type_T		*decl_type UNUSED,
     argcontext_T	*context)
 {
-    if (type->tt_type == VAR_DICT || type_any_or_unknown(type))
-	return OK;
-    return check_arg_type(&t_bool, type, context);
+    якщо (type->tt_type == VAR_DICT || type_any_or_unknown(type))
+	повернути OK;
+    повернути check_arg_type(&t_bool, type, context);
 }
 
 /*
  * Check "type" is a list of 'any' or a blob.
  */
-    static int
+    static ціле
 arg_list_or_blob(type_T *type, type_T *decl_type UNUSED, argcontext_T *context)
 {
-    if (type->tt_type == VAR_LIST
+    якщо (type->tt_type == VAR_LIST
 	    || type->tt_type == VAR_BLOB
 	    || type_any_or_unknown(type))
-	return OK;
+	повернути OK;
     arg_type_mismatch(&t_list_any, type, context->arg_idx + 1);
-    return FAIL;
+    повернути FAIL;
 }
 
 /*
  * Check "type" is a modifiable list of 'any' or a blob.
  */
-    static int
+    static ціле
 arg_list_or_blob_mod(
 	type_T	     *type,
 	type_T	     *decl_type,
 	argcontext_T *context)
 {
-    if (arg_list_or_blob(type, decl_type, context) == FAIL)
-	return FAIL;
-    return arg_type_modifiable(type, context->arg_idx + 1);
+    якщо (arg_list_or_blob(type, decl_type, context) == FAIL)
+	повернути FAIL;
+    повернути arg_type_modifiable(type, context->arg_idx + 1);
 }
 
 /*
  * Check "type" is a list of 'any' or a tuple.
  */
-    static int
+    static ціле
 arg_list_or_tuple(
     type_T		*type,
     type_T		*decl_type UNUSED,
     argcontext_T	*context)
 {
-    if (type->tt_type == VAR_LIST
+    якщо (type->tt_type == VAR_LIST
 	    || type->tt_type == VAR_TUPLE
 	    || type_any_or_unknown(type))
-	return OK;
+	повернути OK;
     arg_type_mismatch(&t_list_any, type, context->arg_idx + 1);
-    return FAIL;
+    повернути FAIL;
 }
 
 
 /*
  * Check "type" is a list of 'any', a tuple or a blob.
  */
-    static int
+    static ціле
 arg_list_or_tuple_or_blob(
     type_T		*type,
     type_T		*decl_type UNUSED,
     argcontext_T	*context)
 {
-    if (type->tt_type == VAR_LIST
+    якщо (type->tt_type == VAR_LIST
 	    || type->tt_type == VAR_TUPLE
 	    || type->tt_type == VAR_BLOB
 	    || type_any_or_unknown(type))
-	return OK;
+	повернути OK;
     arg_type_mismatch(&t_list_any, type, context->arg_idx + 1);
-    return FAIL;
+    повернути FAIL;
 }
 
 /*
  * Check "type" is a string or a number
  */
-    static int
+    static ціле
 arg_string_or_nr(type_T *type, type_T *decl_type UNUSED, argcontext_T *context)
 {
-    if (type->tt_type == VAR_STRING
+    якщо (type->tt_type == VAR_STRING
 	    || type->tt_type == VAR_NUMBER
 	    || type_any_or_unknown(type))
-	return OK;
+	повернути OK;
     arg_type_mismatch(&t_string, type, context->arg_idx + 1);
-    return FAIL;
+    повернути FAIL;
 }
 
 /*
  * Check "type" is a buffer (string or a number)
  */
-    static int
+    static ціле
 arg_buffer(type_T *type, type_T *decl_type UNUSED, argcontext_T *context)
 {
-    if (type->tt_type == VAR_STRING
+    якщо (type->tt_type == VAR_STRING
 	    || type->tt_type == VAR_NUMBER
 	    || type_any_or_unknown(type))
-	return OK;
+	повернути OK;
     arg_type_mismatch(&t_string, type, context->arg_idx + 1);
-    return FAIL;
+    повернути FAIL;
 }
 
 /*
  * Check "type" is a buffer or a dict of any
  */
-    static int
+    static ціле
 arg_buffer_or_dict_any(
     type_T		*type,
     type_T		*decl_type UNUSED,
     argcontext_T	*context)
 {
-    if (type->tt_type == VAR_STRING
+    якщо (type->tt_type == VAR_STRING
 	    || type->tt_type == VAR_NUMBER
 	    || type->tt_type == VAR_DICT
 	    || type_any_or_unknown(type))
-	return OK;
+	повернути OK;
     arg_type_mismatch(&t_string, type, context->arg_idx + 1);
-    return FAIL;
+    повернути FAIL;
 }
 
 /*
  * Check "type" is a line (string or a number)
  */
-    static int
+    static ціле
 arg_lnum(type_T *type, type_T *decl_type UNUSED, argcontext_T *context)
 {
-    if (type->tt_type == VAR_STRING
+    якщо (type->tt_type == VAR_STRING
 	    || type->tt_type == VAR_NUMBER
 	    || type_any_or_unknown(type))
-	return OK;
+	повернути OK;
     arg_type_mismatch(&t_string, type, context->arg_idx + 1);
-    return FAIL;
+    повернути FAIL;
 }
 
 /*
  * Check "type" is a string or a list of strings.
  */
-    static int
+    static ціле
 arg_string_or_list_string(
     type_T		*type,
     type_T		*decl_type UNUSED,
     argcontext_T	*context)
 {
-    if (type->tt_type == VAR_STRING
+    якщо (type->tt_type == VAR_STRING
 	    || type_any_or_unknown(type))
-	return OK;
-    if (type->tt_type != VAR_LIST)
+	повернути OK;
+    якщо (type->tt_type != VAR_LIST)
     {
 	arg_type_mismatch(&t_string, type, context->arg_idx + 1);
-	return FAIL;
+	повернути FAIL;
     }
-    if (type->tt_member->tt_type == VAR_ANY
+    якщо (type->tt_member->tt_type == VAR_ANY
 		    || type->tt_member->tt_type == VAR_STRING)
-	return OK;
+	повернути OK;
 
     arg_type_mismatch(&t_list_string, type, context->arg_idx + 1);
-    return FAIL;
+    повернути FAIL;
 }
 
 /*
  * Check "type" is a string or a list of 'any'
  */
-    static int
+    static ціле
 arg_string_or_list_any(
     type_T		*type,
     type_T		*decl_type UNUSED,
     argcontext_T	*context)
 {
-    if (type->tt_type == VAR_STRING
+    якщо (type->tt_type == VAR_STRING
 	    || type->tt_type == VAR_LIST
 	    || type_any_or_unknown(type))
-	return OK;
+	повернути OK;
     arg_type_mismatch(&t_string, type, context->arg_idx + 1);
-    return FAIL;
+    повернути FAIL;
 }
 
 /*
  * Check "type" is a string or a dict of 'any'
  */
-    static int
+    static ціле
 arg_string_or_dict_any(
     type_T		*type,
     type_T		*decl_type UNUSED,
     argcontext_T	*context)
 {
-    if (type->tt_type == VAR_STRING
+    якщо (type->tt_type == VAR_STRING
 	    || type->tt_type == VAR_DICT
 	    || type_any_or_unknown(type))
-	return OK;
+	повернути OK;
     arg_type_mismatch(&t_string, type, context->arg_idx + 1);
-    return FAIL;
+    повернути FAIL;
 }
 
 /*
  * Check "type" is a string or a blob
  */
-    static int
+    static ціле
 arg_string_or_blob(
     type_T		*type,
     type_T		*decl_type UNUSED,
     argcontext_T	*context)
 {
-    if (type->tt_type == VAR_STRING
+    якщо (type->tt_type == VAR_STRING
 	    || type->tt_type == VAR_BLOB
 	    || type_any_or_unknown(type))
-	return OK;
+	повернути OK;
     arg_type_mismatch(&t_string, type, context->arg_idx + 1);
-    return FAIL;
+    повернути FAIL;
 }
 
 /*
  * Check "type" is a list of 'any', a tuple of 'any' or dict of 'any'.
  */
-    static int
+    static ціле
 arg_list_or_tuple_or_dict(
     type_T		*type,
     type_T		*decl_type UNUSED,
     argcontext_T	*context)
 {
-    if (type->tt_type == VAR_LIST
+    якщо (type->tt_type == VAR_LIST
 	    || type->tt_type == VAR_TUPLE
 	    || type->tt_type == VAR_DICT
 	    || type_any_or_unknown(type))
-	return OK;
+	повернути OK;
     arg_type_mismatch(&t_list_any, type, context->arg_idx + 1);
-    return FAIL;
+    повернути FAIL;
 }
 
 /*
  * Check "type" is a list of 'any', a dict of 'any' or a blob.
  */
-    static int
+    static ціле
 arg_list_or_dict_or_blob(
 	type_T	     *type,
 	type_T	     *decl_type UNUSED,
 	argcontext_T *context)
 {
-    if (type->tt_type == VAR_LIST
+    якщо (type->tt_type == VAR_LIST
 	    || type->tt_type == VAR_DICT
 	    || type->tt_type == VAR_BLOB
 	    || type_any_or_unknown(type))
-	return OK;
+	повернути OK;
     arg_type_mismatch(&t_list_any, type, context->arg_idx + 1);
-    return FAIL;
+    повернути FAIL;
 }
 
 /*
  * Check "type" is a list of 'any', a dict of 'any' or a blob.
  * Also check if "type" is modifiable.
  */
-    static int
+    static ціле
 arg_list_or_dict_or_blob_mod(
 	type_T	     *type,
 	type_T	     *decl_type,
 	argcontext_T *context)
 {
-    if (arg_list_or_dict_or_blob(type, decl_type, context) == FAIL)
-	return FAIL;
-    return arg_type_modifiable(type, context->arg_idx + 1);
+    якщо (arg_list_or_dict_or_blob(type, decl_type, context) == FAIL)
+	повернути FAIL;
+    повернути arg_type_modifiable(type, context->arg_idx + 1);
 }
 
 /*
  * Check "type" is a list of 'any' or a dict of 'any' or a blob or a string.
  */
-    static int
+    static ціле
 arg_list_or_dict_or_blob_or_string(
     type_T		*type,
     type_T		*decl_type UNUSED,
     argcontext_T	*context)
 {
-    if (type->tt_type == VAR_LIST
+    якщо (type->tt_type == VAR_LIST
 	    || type->tt_type == VAR_DICT
 	    || type->tt_type == VAR_BLOB
 	    || type->tt_type == VAR_STRING
 	    || type_any_or_unknown(type))
-	return OK;
+	повернути OK;
     arg_type_mismatch(&t_list_any, type, context->arg_idx + 1);
-    return FAIL;
+    повернути FAIL;
 }
 
 /*
  * Check "type" is a list of 'any' or a dict of 'any' or a blob or a string.
  * Also check the value is modifiable.
  */
-    static int
+    static ціле
 arg_list_or_dict_or_blob_or_string_mod(
 	type_T	     *type,
 	type_T	     *decl_type,
 	argcontext_T *context)
 {
-    if (arg_list_or_dict_or_blob_or_string(type, decl_type, context) == FAIL)
-	return FAIL;
-    return arg_type_modifiable(type, context->arg_idx + 1);
+    якщо (arg_list_or_dict_or_blob_or_string(type, decl_type, context) == FAIL)
+	повернути FAIL;
+    повернути arg_type_modifiable(type, context->arg_idx + 1);
 }
 
 /*
  * Check "type" is a list of 'any', a tuple of 'any', a dict of 'any', a blob
  * or a string.
  */
-    static int
+    static ціле
 arg_list_tuple_dict_blob_or_string(
     type_T		*type,
     type_T		*decl_type UNUSED,
     argcontext_T	*context)
 {
-    if (type->tt_type == VAR_LIST
+    якщо (type->tt_type == VAR_LIST
 	    || type->tt_type == VAR_TUPLE
 	    || type->tt_type == VAR_DICT
 	    || type->tt_type == VAR_BLOB
 	    || type->tt_type == VAR_STRING
 	    || type_any_or_unknown(type))
-	return OK;
+	повернути OK;
 
     semsg(_(e_list_tuple_dict_blob_or_string_required_for_argument_nr),
 						 context->arg_idx + 1);
-    return FAIL;
+    повернути FAIL;
 }
 
 /*
  * Check second argument of map(), filter(), foreach().
  */
-    static int
+    static ціле
 check_map_filter_arg2(
     type_T		*type,
     argcontext_T	*context,
@@ -748,160 +748,160 @@ check_map_filter_arg2(
     type_T *(args[2]);
     type_T t_func_exp = {VAR_FUNC, 2, 0, 0, NULL, NULL, args};
 
-    if (context->arg_types[0].type_curr->tt_type == VAR_LIST
+    якщо (context->arg_types[0].type_curr->tt_type == VAR_LIST
 	    || context->arg_types[0].type_curr->tt_type == VAR_DICT)
     {
 	// Use the declared type if possible, so that an error is given if
 	// a declared list changes type, but not if a constant list changes
 	// type.
-	if (context->arg_types[0].type_decl->tt_type == VAR_LIST
+	якщо (context->arg_types[0].type_decl->tt_type == VAR_LIST
 		|| context->arg_types[0].type_decl->tt_type == VAR_DICT)
 	    expected_member = context->arg_types[0].type_decl->tt_member;
-	else
+	інакше
 	    expected_member = context->arg_types[0].type_curr->tt_member;
     }
-    else if (context->arg_types[0].type_curr->tt_type == VAR_STRING)
+    інакше якщо (context->arg_types[0].type_curr->tt_type == VAR_STRING)
 	expected_member = &t_string;
-    else if (context->arg_types[0].type_curr->tt_type == VAR_BLOB)
+    інакше якщо (context->arg_types[0].type_curr->tt_type == VAR_BLOB)
 	expected_member = &t_number;
 
     args[0] = NULL;
     args[1] = &t_unknown;
-    if (type->tt_argcount != -1)
+    якщо (type->tt_argcount != -1)
     {
-	if (!(type->tt_argcount == 2 || (type->tt_argcount == 1
+	якщо (!(type->tt_argcount == 2 || (type->tt_argcount == 1
 				    && (type->tt_flags & TTFLAG_VARARGS))))
 	{
 	    emsg(_(e_invalid_number_of_arguments));
-	    return FAIL;
+	    повернути FAIL;
 	}
-	if (type->tt_flags & TTFLAG_VARARGS)
+	якщо (type->tt_flags & TTFLAG_VARARGS)
 	    // check the argument types at runtime
 	    t_func_exp.tt_argcount = -1;
-	else
+	інакше
 	{
-	    if (context->arg_types[0].type_curr->tt_type == VAR_STRING
+	    якщо (context->arg_types[0].type_curr->tt_type == VAR_STRING
 		    || context->arg_types[0].type_curr->tt_type == VAR_BLOB
 		    || context->arg_types[0].type_curr->tt_type == VAR_LIST)
 		args[0] = &t_number;
-	    else if (context->arg_types[0].type_decl->tt_type == VAR_DICT)
+	    інакше якщо (context->arg_types[0].type_decl->tt_type == VAR_DICT)
 		args[0] = &t_string;
-	    if (args[0] != NULL)
+	    якщо (args[0] != NULL)
 		args[1] = expected_member;
 	}
     }
 
-    if (!type_any_or_unknown(type->tt_member) || args[0] != NULL)
+    якщо (!type_any_or_unknown(type->tt_member) || args[0] != NULL)
     {
 	where_T where = WHERE_INIT;
 
-	if (filtermap == FILTERMAP_MAP)
+	якщо (filtermap == FILTERMAP_MAP)
 	    t_func_exp.tt_member = expected_member == NULL
 					|| type_any_or_unknown(type->tt_member)
 				? &t_any : expected_member;
-	else if (filtermap == FILTERMAP_FILTER)
+	інакше якщо (filtermap == FILTERMAP_FILTER)
 	    t_func_exp.tt_member = &t_bool;
-	else // filtermap == FILTERMAP_FOREACH
+	інакше // filtermap == FILTERMAP_FOREACH
 	    t_func_exp.tt_member = &t_unknown;
-	if (args[0] == NULL)
+	якщо (args[0] == NULL)
 	    args[0] = &t_unknown;
-	if (type->tt_argcount == -1)
+	якщо (type->tt_argcount == -1)
 	    t_func_exp.tt_argcount = -1;
 
 	where.wt_index = 2;
 	where.wt_kind = WT_ARGUMENT;
-	return check_type(&t_func_exp, type, TRUE, where);
+	повернути check_type(&t_func_exp, type, TRUE, where);
     }
-    return OK;
+    повернути OK;
 }
 
 /*
  * Check second argument of filter(): func must return a bool.
  */
-    static int
+    static ціле
 arg_filter_func(type_T *type, type_T *decl_type UNUSED, argcontext_T *context)
 {
-    if (type->tt_type == VAR_STRING
+    якщо (type->tt_type == VAR_STRING
 	    || type->tt_type == VAR_PARTIAL
 	    || type_any_or_unknown(type))
-	return OK;
+	повернути OK;
 
-    if (type->tt_type == VAR_FUNC)
-	return check_map_filter_arg2(type, context, FILTERMAP_FILTER);
+    якщо (type->tt_type == VAR_FUNC)
+	повернути check_map_filter_arg2(type, context, FILTERMAP_FILTER);
     semsg(_(e_string_or_function_required_for_argument_nr), 2);
-    return FAIL;
+    повернути FAIL;
 }
 
 /*
  * Check second argument of map(), the function.
  */
-    static int
+    static ціле
 arg_map_func(type_T *type, type_T *decl_type UNUSED, argcontext_T *context)
 {
-    if (type->tt_type == VAR_STRING
+    якщо (type->tt_type == VAR_STRING
 	    || type->tt_type == VAR_PARTIAL
 	    || type_any_or_unknown(type))
-	return OK;
+	повернути OK;
 
-    if (type->tt_type == VAR_FUNC)
-	return check_map_filter_arg2(type, context, FILTERMAP_MAP);
+    якщо (type->tt_type == VAR_FUNC)
+	повернути check_map_filter_arg2(type, context, FILTERMAP_MAP);
     semsg(_(e_string_or_function_required_for_argument_nr), 2);
-    return FAIL;
+    повернути FAIL;
 }
 
 /*
  * Check second argument of foreach(), the function.
  */
-    static int
+    static ціле
 arg_foreach_func(type_T *type, type_T *decl_type UNUSED, argcontext_T *context)
 {
-    if (type->tt_type == VAR_STRING
+    якщо (type->tt_type == VAR_STRING
 	    || type->tt_type == VAR_PARTIAL
 	    || type_any_or_unknown(type))
-	return OK;
+	повернути OK;
 
-    if (type->tt_type == VAR_FUNC)
-	return check_map_filter_arg2(type, context, FILTERMAP_FOREACH);
+    якщо (type->tt_type == VAR_FUNC)
+	повернути check_map_filter_arg2(type, context, FILTERMAP_FOREACH);
     semsg(_(e_string_or_function_required_for_argument_nr), 2);
-    return FAIL;
+    повернути FAIL;
 }
 
 /*
  * Check second argument of sort() and uniq(), the "how" argument.
  */
-    static int
+    static ціле
 arg_sort_how(type_T *type, type_T *decl_type UNUSED, argcontext_T *context)
 {
-    if (type->tt_type == VAR_STRING
+    якщо (type->tt_type == VAR_STRING
 	    || type->tt_type == VAR_PARTIAL
 	    || type_any_or_unknown(type))
-	return OK;
+	повернути OK;
 
-    if (type->tt_type == VAR_FUNC)
+    якщо (type->tt_type == VAR_FUNC)
     {
 	type_T *(args[2]);
 	type_T t_func_exp = {VAR_FUNC, 2, 0, 0, &t_number, NULL, args};
 
-	if (context->arg_types[0].type_curr->tt_type == VAR_LIST)
+	якщо (context->arg_types[0].type_curr->tt_type == VAR_LIST)
 	    args[0] = context->arg_types[0].type_curr->tt_member;
-	else
+	інакше
 	    args[0] = &t_unknown;
-	if (!type_any_or_unknown(type->tt_member) || args[0] != &t_unknown)
+	якщо (!type_any_or_unknown(type->tt_member) || args[0] != &t_unknown)
 	{
 	    where_T where = WHERE_INIT;
 
 	    args[1] = args[0];
-	    if (type->tt_argcount == -1)
+	    якщо (type->tt_argcount == -1)
 		t_func_exp.tt_argcount = -1;
 	    where.wt_index = 2;
 	    where.wt_kind = WT_ARGUMENT;
-	    return check_type(&t_func_exp, type, TRUE, where);
+	    повернути check_type(&t_func_exp, type, TRUE, where);
 	}
 
-	return OK;
+	повернути OK;
     }
     semsg(_(e_string_or_function_required_for_argument_nr), 2);
-    return FAIL;
+    повернути FAIL;
 }
 
 /*
@@ -909,106 +909,106 @@ arg_sort_how(type_T *type, type_T *decl_type UNUSED, argcontext_T *context)
  * Also accept a bool, a constant resulting from compiling a string argument.
  * Also accept a number, one and zero are accepted.
  */
-    static int
+    static ціле
 arg_string_or_func(
     type_T		*type,
     type_T		*decl_type UNUSED,
     argcontext_T	*context)
 {
-    if (type->tt_type == VAR_STRING
+    якщо (type->tt_type == VAR_STRING
 	    || type->tt_type == VAR_PARTIAL
 	    || type->tt_type == VAR_FUNC
 	    || type->tt_type == VAR_BOOL
 	    || type->tt_type == VAR_NUMBER
 	    || type_any_or_unknown(type))
-	return OK;
+	повернути OK;
     arg_type_mismatch(&t_func_any, type, context->arg_idx + 1);
-    return FAIL;
+    повернути FAIL;
 }
 
 /*
  * Check varargs' "type" are class.
  */
-    static int
+    static ціле
 varargs_class(type_T *type UNUSED,
 	      type_T *decl_type UNUSED,
 	      argcontext_T *context)
 {
-    for (int i = context->arg_idx; i < context->arg_count; ++i)
+    для (ціле i = context->arg_idx; i < context->arg_count; ++i)
     {
 	type2_T *types = &context->arg_types[i];
-	if (types->type_curr->tt_type != VAR_CLASS)
+	якщо (types->type_curr->tt_type != VAR_CLASS)
 	{
 	    semsg(_(e_class_or_typealias_required_for_argument_nr), i + 1);
-	    return FAIL;
+	    повернути FAIL;
 	}
     }
-    return OK;
+    повернути OK;
 }
 
 /*
  * Check "type" is a list of 'any', a tuple, a blob or a string.
  */
-    static int
+    static ціле
 arg_string_list_tuple_or_blob(
     type_T		*type,
     type_T		*decl_type UNUSED,
     argcontext_T	*context)
 {
-    if (type->tt_type == VAR_LIST
+    якщо (type->tt_type == VAR_LIST
 	    || type->tt_type == VAR_TUPLE
 	    || type->tt_type == VAR_BLOB
 	    || type->tt_type == VAR_STRING
 	    || type_any_or_unknown(type))
-	return OK;
+	повернути OK;
     arg_type_mismatch(&t_list_any, type, context->arg_idx + 1);
-    return FAIL;
+    повернути FAIL;
 }
 
 /*
  * Check "type" is a tuple or a modifiable list of 'any' or a blob or a string.
  */
-    static int
+    static ціле
 arg_reverse(type_T *type, type_T *decl_type, argcontext_T *context)
 {
-    if (arg_string_list_tuple_or_blob(type, decl_type, context) == FAIL)
-	return FAIL;
-    return arg_type_modifiable(type, context->arg_idx + 1);
+    якщо (arg_string_list_tuple_or_blob(type, decl_type, context) == FAIL)
+	повернути FAIL;
+    повернути arg_type_modifiable(type, context->arg_idx + 1);
 }
 
 /*
  * Check "type" is a job.
  */
-    static int
+    static ціле
 arg_job(type_T *type, type_T *decl_type UNUSED, argcontext_T *context)
 {
-    return check_arg_type(&t_job, type, context);
+    повернути check_arg_type(&t_job, type, context);
 }
 
 /*
  * Check "type" is a channel or a job.
  */
-    static int
+    static ціле
 arg_chan_or_job(type_T *type, type_T *decl_type UNUSED, argcontext_T *context)
 {
-    if (type->tt_type == VAR_CHANNEL
+    якщо (type->tt_type == VAR_CHANNEL
 	    || type->tt_type == VAR_JOB
 	    || type_any_or_unknown(type))
-	return OK;
+	повернути OK;
     arg_type_mismatch(&t_channel, type, context->arg_idx + 1);
-    return FAIL;
+    повернути FAIL;
 }
 
 /*
  * Check "type" can be used as the type_decl of the previous argument.
  * Must not be used for the first argcheck_T entry.
  */
-    static int
+    static ціле
 arg_same_as_prev(type_T *type, type_T *decl_type UNUSED, argcontext_T *context)
 {
     type_T *prev_type = context->arg_types[context->arg_idx - 1].type_decl;
 
-    return check_arg_type(prev_type, type, context);
+    повернути check_arg_type(prev_type, type, context);
 }
 
 /*
@@ -1016,7 +1016,7 @@ arg_same_as_prev(type_T *type, type_T *decl_type UNUSED, argcontext_T *context)
  * dict vs other type, but not member type.
  * Must not be used for the first argcheck_T entry.
  */
-    static int
+    static ціле
 arg_same_struct_as_prev(
     type_T		*type,
     type_T		*decl_type UNUSED,
@@ -1024,111 +1024,111 @@ arg_same_struct_as_prev(
 {
     type_T *prev_type = context->arg_types[context->arg_idx - 1].type_curr;
 
-    if (prev_type->tt_type != context->arg_types[context->arg_idx].type_curr->tt_type)
-	return check_arg_type(prev_type, type, context);
-    return OK;
+    якщо (prev_type->tt_type != context->arg_types[context->arg_idx].type_curr->tt_type)
+	повернути check_arg_type(prev_type, type, context);
+    повернути OK;
 }
 
 /*
  * Check "type" is an item of the list or blob of the previous arg.
  * Must not be used for the first argcheck_T entry.
  */
-    static int
+    static ціле
 arg_item_of_prev(type_T *type, type_T *decl_type UNUSED, argcontext_T *context)
 {
     type_T *prev_type = context->arg_types[context->arg_idx - 1].type_curr;
     type_T *expected;
 
-    if (prev_type->tt_type == VAR_LIST)
+    якщо (prev_type->tt_type == VAR_LIST)
 	expected = prev_type->tt_member;
-    else if (prev_type->tt_type == VAR_BLOB)
+    інакше якщо (prev_type->tt_type == VAR_BLOB)
 	expected = &t_number;
-    else
+    інакше
 	// probably VAR_ANY, can't check
-	return OK;
+	повернути OK;
 
-    return check_arg_type(expected, type, context);
+    повернути check_arg_type(expected, type, context);
 }
 
 /*
  * Check "type" is a string or a number or a list
  */
-    static int
+    static ціле
 arg_str_or_nr_or_list(
     type_T		*type,
     type_T		*decl_type UNUSED,
     argcontext_T	*context)
 {
-    if (type->tt_type == VAR_STRING
+    якщо (type->tt_type == VAR_STRING
 	    || type->tt_type == VAR_NUMBER
 	    || type->tt_type == VAR_LIST
 	    || type_any_or_unknown(type))
-	return OK;
+	повернути OK;
     arg_type_mismatch(&t_string, type, context->arg_idx + 1);
-    return FAIL;
+    повернути FAIL;
 }
 
 /*
  * Check "type" is a dict of 'any' or a string
  */
-    static int
+    static ціле
 arg_dict_any_or_string(
     type_T		*type,
     type_T		*decl_type UNUSED,
     argcontext_T	*context)
 {
-    if (type->tt_type == VAR_DICT
+    якщо (type->tt_type == VAR_DICT
 	    || type->tt_type == VAR_STRING
 	    || type_any_or_unknown(type))
-	return OK;
+	повернути OK;
     arg_type_mismatch(&t_string, type, context->arg_idx + 1);
-    return FAIL;
+    повернути FAIL;
 }
 
 /*
  * Check "type" which is the third argument of extend() (number or string or
  * any)
  */
-    static int
+    static ціле
 arg_extend3(type_T *type, type_T *decl_type, argcontext_T *context)
 {
     type_T *first_type = context->arg_types[context->arg_idx - 2].type_curr;
 
-    if (first_type->tt_type == VAR_LIST || first_type->tt_type == VAR_BLOB)
-	return arg_number(type, decl_type, context);
-    if (first_type->tt_type == VAR_DICT)
-	return arg_string(type, decl_type, context);
-    return OK;
+    якщо (first_type->tt_type == VAR_LIST || first_type->tt_type == VAR_BLOB)
+	повернути arg_number(type, decl_type, context);
+    якщо (first_type->tt_type == VAR_DICT)
+	повернути arg_string(type, decl_type, context);
+    повернути OK;
 }
 
 /*
  * Check "type" which is the first argument of get() (a blob, a list, a tuple,
  * a dict or a funcref)
  */
-    static int
+    static ціле
 arg_get1(type_T *type, type_T *decl_type UNUSED, argcontext_T *context)
 {
-    if (type->tt_type == VAR_BLOB
+    якщо (type->tt_type == VAR_BLOB
 	    || type->tt_type == VAR_LIST
 	    || type->tt_type == VAR_TUPLE
 	    || type->tt_type == VAR_DICT
 	    || type->tt_type == VAR_FUNC
 	    || type->tt_type == VAR_PARTIAL
 	    || type_any_or_unknown(type))
-	return OK;
+	повернути OK;
 
     arg_type_mismatch(&t_list_any, type, context->arg_idx + 1);
-    return FAIL;
+    повернути FAIL;
 }
 
 /*
  * Check "type" which is the first argument of len() (a string, a number, a
  * blob, a list, a tuple, a dict or an object)
  */
-    static int
+    static ціле
 arg_len1(type_T *type, type_T *decl_type UNUSED, argcontext_T *context)
 {
-    if (type->tt_type == VAR_STRING
+    якщо (type->tt_type == VAR_STRING
 	    || type->tt_type == VAR_NUMBER
 	    || type->tt_type == VAR_BLOB
 	    || type->tt_type == VAR_LIST
@@ -1136,102 +1136,102 @@ arg_len1(type_T *type, type_T *decl_type UNUSED, argcontext_T *context)
 	    || type->tt_type == VAR_DICT
 	    || type->tt_type == VAR_OBJECT
 	    || type_any_or_unknown(type))
-	return OK;
+	повернути OK;
 
     arg_type_mismatch(&t_list_any, type, context->arg_idx + 1);
-    return FAIL;
+    повернути FAIL;
 }
 
 /*
  * Check "type" which is the second argument of remove() (number or string or
  * any)
  */
-    static int
+    static ціле
 arg_remove2(type_T *type, type_T *decl_type, argcontext_T *context)
 {
     type_T *first_type = context->arg_types[context->arg_idx - 1].type_curr;
 
-    if (first_type->tt_type == VAR_LIST || first_type->tt_type == VAR_BLOB)
-	return arg_number(type, decl_type, context);
-    if (first_type->tt_type == VAR_DICT)
-	return arg_string_or_nr(type, decl_type, context);
-    return OK;
+    якщо (first_type->tt_type == VAR_LIST || first_type->tt_type == VAR_BLOB)
+	повернути arg_number(type, decl_type, context);
+    якщо (first_type->tt_type == VAR_DICT)
+	повернути arg_string_or_nr(type, decl_type, context);
+    повернути OK;
 }
 
 /*
  * Check "type" which is the first argument of repeat() (a string, a number, a
  * blob, a list, a tuple or any)
  */
-    static int
+    static ціле
 arg_repeat1(type_T *type, type_T *decl_type UNUSED, argcontext_T *context)
 {
-    if (type->tt_type == VAR_STRING
+    якщо (type->tt_type == VAR_STRING
 	    || type->tt_type == VAR_NUMBER
 	    || type->tt_type == VAR_BLOB
 	    || type->tt_type == VAR_LIST
 	    || type->tt_type == VAR_TUPLE
 	    || type_any_or_unknown(type))
-	return OK;
+	повернути OK;
 
     arg_type_mismatch(&t_string, type, context->arg_idx + 1);
-    return FAIL;
+    повернути FAIL;
 }
 
 /*
  * Check "type" which is the first argument of slice() (a list, a tuple, a
  * blob, a string or any)
  */
-    static int
+    static ціле
 arg_slice1(type_T *type, type_T *decl_type UNUSED, argcontext_T *context)
 {
-    if (type->tt_type == VAR_LIST
+    якщо (type->tt_type == VAR_LIST
 	    || type->tt_type == VAR_TUPLE
 	    || type->tt_type == VAR_BLOB
 	    || type->tt_type == VAR_STRING
 	    || type_any_or_unknown(type))
-	return OK;
+	повернути OK;
 
     arg_type_mismatch(&t_list_any, type, context->arg_idx + 1);
-    return FAIL;
+    повернути FAIL;
 }
 
 /*
  * Check "type" which is the first argument of count() (a string, a list, a
  * tuple, a dict or any)
  */
-    static int
+    static ціле
 arg_string_list_tuple_or_dict(
     type_T		*type,
     type_T		*decl_type UNUSED,
     argcontext_T	*context)
 {
-    if (type->tt_type == VAR_STRING
+    якщо (type->tt_type == VAR_STRING
 	    || type->tt_type == VAR_LIST
 	    || type->tt_type == VAR_TUPLE
 	    || type->tt_type == VAR_DICT
 	    || type_any_or_unknown(type))
-	return OK;
+	повернути OK;
 
     semsg(_(e_string_list_tuple_or_dict_required_for_argument_nr),
 							 context->arg_idx + 1);
-    return FAIL;
+    повернути FAIL;
 }
 
 /*
  * Check "type" which is the first argument of cursor() (number or string or
  * list or any)
  */
-    static int
+    static ціле
 arg_cursor1(type_T *type, type_T *decl_type UNUSED, argcontext_T *context)
 {
-    if (type->tt_type == VAR_NUMBER
+    якщо (type->tt_type == VAR_NUMBER
 	    || type->tt_type == VAR_STRING
 	    || type->tt_type == VAR_LIST
 	    || type_any_or_unknown(type))
-	return OK;
+	повернути OK;
 
     arg_type_mismatch(&t_number, type, context->arg_idx + 1);
-    return FAIL;
+    повернути FAIL;
 }
 
 /*
@@ -1396,212 +1396,212 @@ static garray_T *current_type_gap = NULL;
  * Note that "argtypes" is NULL if "argcount" is zero.
  */
     static type_T *
-ret_void(int argcount UNUSED,
+ret_void(ціле argcount UNUSED,
 	type2_T *argtypes UNUSED,
 	type_T	**decl_type UNUSED)
 {
-    return &t_void;
+    повернути &t_void;
 }
     static type_T *
-ret_any(int	argcount UNUSED,
+ret_any(ціле	argcount UNUSED,
 	type2_T *argtypes UNUSED,
 	type_T	**decl_type UNUSED)
 {
-    return &t_any;
+    повернути &t_any;
 }
     static type_T *
-ret_bool(int argcount UNUSED,
+ret_bool(ціле argcount UNUSED,
 	type2_T *argtypes UNUSED,
 	type_T	**decl_type UNUSED)
 {
-    return &t_bool;
+    повернути &t_bool;
 }
     static type_T *
-ret_number_bool(int argcount UNUSED,
+ret_number_bool(ціле argcount UNUSED,
 	type2_T *argtypes UNUSED,
 	type_T	**decl_type UNUSED)
 {
-    return &t_number_bool;
+    повернути &t_number_bool;
 }
     static type_T *
-ret_number(int argcount UNUSED,
+ret_number(ціле argcount UNUSED,
 	type2_T *argtypes UNUSED,
 	type_T	**decl_type UNUSED)
 {
-    return &t_number;
+    повернути &t_number;
 }
     static type_T *
-ret_float(int argcount UNUSED,
+ret_float(ціле argcount UNUSED,
 	type2_T *argtypes UNUSED,
 	type_T	**decl_type UNUSED)
 {
-    return &t_float;
+    повернути &t_float;
 }
     static type_T *
-ret_string(int argcount UNUSED,
+ret_string(ціле argcount UNUSED,
 	type2_T *argtypes UNUSED,
 	type_T	**decl_type UNUSED)
 {
-    return &t_string;
+    повернути &t_string;
 }
     static type_T *
-ret_list_any(int argcount UNUSED,
+ret_list_any(ціле argcount UNUSED,
 	type2_T *argtypes UNUSED,
 	type_T	**decl_type UNUSED)
 {
-    return &t_list_any;
+    повернути &t_list_any;
 }
     static type_T *
-ret_list_number(int argcount UNUSED,
+ret_list_number(ціле argcount UNUSED,
 	type2_T *argtypes UNUSED,
 	type_T	**decl_type)
 {
     *decl_type = &t_list_any;
-    return &t_list_number;
+    повернути &t_list_number;
 }
     static type_T *
-ret_list_string(int argcount UNUSED,
+ret_list_string(ціле argcount UNUSED,
 	type2_T *argtypes UNUSED,
 	type_T	**decl_type)
 {
     *decl_type = &t_list_any;
-    return &t_list_string;
+    повернути &t_list_string;
 }
     static type_T *
-ret_list_dict_any(int argcount UNUSED,
+ret_list_dict_any(ціле argcount UNUSED,
 	type2_T *argtypes UNUSED,
 	type_T	**decl_type)
 {
     *decl_type = &t_list_any;
-    return &t_list_dict_any;
+    повернути &t_list_dict_any;
 }
     static type_T *
-ret_list_items(int argcount UNUSED,
+ret_list_items(ціле argcount UNUSED,
 	type2_T *argtypes UNUSED,
 	type_T	**decl_type)
 {
     *decl_type = &t_list_any;
-    return &t_list_list_any;
+    повернути &t_list_list_any;
 }
     static type_T *
-ret_list_list_any(int argcount UNUSED,
+ret_list_list_any(ціле argcount UNUSED,
 	type2_T *argtypes UNUSED,
 	type_T	**decl_type)
 {
     *decl_type = &t_list_any;
-    return &t_list_list_any;
+    повернути &t_list_list_any;
 }
     static type_T *
-ret_list_string_items(int argcount UNUSED,
+ret_list_string_items(ціле argcount UNUSED,
 	type2_T *argtypes UNUSED,
 	type_T	**decl_type)
 {
     *decl_type = &t_list_any;
-    return &t_list_list_string;
+    повернути &t_list_list_string;
 }
     static type_T *
-ret_list_regionpos(int argcount UNUSED,
+ret_list_regionpos(ціле argcount UNUSED,
 	type2_T *argtypes UNUSED,
 	type_T	**decl_type)
 {
     *decl_type = &t_list_any;
-    return &t_list_list_list_number;
+    повернути &t_list_list_list_number;
 }
     static type_T *
-ret_tuple_any(int argcount UNUSED,
+ret_tuple_any(ціле argcount UNUSED,
 	type2_T *argtypes UNUSED,
 	type_T	**decl_type UNUSED)
 {
-    return &t_tuple_any;
+    повернути &t_tuple_any;
 }
     static type_T *
-ret_dict_any(int argcount UNUSED,
+ret_dict_any(ціле argcount UNUSED,
 	type2_T *argtypes UNUSED,
 	type_T	**decl_type UNUSED)
 {
-    return &t_dict_any;
+    повернути &t_dict_any;
 }
     static type_T *
-ret_job_info(int argcount,
+ret_job_info(ціле argcount,
 	type2_T *argtypes UNUSED,
 	type_T	**decl_type)
 {
-    if (argcount == 0)
+    якщо (argcount == 0)
     {
 	*decl_type = &t_list_any;
-	return &t_list_job;
+	повернути &t_list_job;
     }
-    return &t_dict_any;
+    повернути &t_dict_any;
 }
     static type_T *
-ret_dict_number(int argcount UNUSED,
+ret_dict_number(ціле argcount UNUSED,
 	type2_T *argtypes UNUSED,
 	type_T	**decl_type UNUSED)
 {
-    return &t_dict_number;
+    повернути &t_dict_number;
 }
     static type_T *
-ret_dict_string(int argcount UNUSED,
+ret_dict_string(ціле argcount UNUSED,
 	type2_T *argtypes UNUSED,
 	type_T	**decl_type UNUSED)
 {
-    return &t_dict_string;
+    повернути &t_dict_string;
 }
     static type_T *
-ret_blob(int argcount UNUSED,
+ret_blob(ціле argcount UNUSED,
 	type2_T *argtypes UNUSED,
 	type_T	**decl_type UNUSED)
 {
-    return &t_blob;
+    повернути &t_blob;
 }
     static type_T *
-ret_func_any(int argcount UNUSED,
+ret_func_any(ціле argcount UNUSED,
 	type2_T *argtypes UNUSED,
 	type_T	**decl_type UNUSED)
 {
-    return &t_func_any;
+    повернути &t_func_any;
 }
     static type_T *
-ret_func_unknown(int argcount UNUSED,
+ret_func_unknown(ціле argcount UNUSED,
 	type2_T *argtypes UNUSED,
 	type_T	**decl_type UNUSED)
 {
-    return &t_func_unknown;
+    повернути &t_func_unknown;
 }
     static type_T *
-ret_channel(int argcount UNUSED,
+ret_channel(ціле argcount UNUSED,
 	type2_T *argtypes UNUSED,
 	type_T	**decl_type UNUSED)
 {
-    return &t_channel;
+    повернути &t_channel;
 }
     static type_T *
-ret_job(int argcount UNUSED,
+ret_job(ціле argcount UNUSED,
 	type2_T *argtypes UNUSED,
 	type_T	**decl_type UNUSED)
 {
-    return &t_job;
+    повернути &t_job;
 }
     static type_T *
-ret_first_arg(int argcount,
+ret_first_arg(ціле argcount,
 	type2_T *argtypes,
 	type_T	**decl_type)
 {
-    if (argcount > 0)
+    якщо (argcount > 0)
     {
 	*decl_type = argtypes[0].type_decl;
-	return argtypes[0].type_curr;
+	повернути argtypes[0].type_curr;
     }
-    return &t_void;
+    повернути &t_void;
 }
     static type_T *
-ret_slice(int argcount,
+ret_slice(ціле argcount,
 	type2_T *argtypes,
 	type_T	**decl_type)
 {
-    if (argcount > 0)
+    якщо (argcount > 0)
     {
-	if (argtypes[0].type_decl != NULL)
+	якщо (argtypes[0].type_decl != NULL)
 	{
 	    switch (argtypes[0].type_decl->tt_type)
 	    {
@@ -1612,208 +1612,208 @@ ret_slice(int argcount,
 		default: break;
 	    }
 	}
-	return argtypes[0].type_curr;
+	повернути argtypes[0].type_curr;
     }
-    return &t_void;
+    повернути &t_void;
 }
     static type_T *
-ret_copy(int argcount,
+ret_copy(ціле argcount,
 	type2_T *argtypes,
 	type_T	**decl_type)
 {
-    if (argcount > 0)
+    якщо (argcount > 0)
     {
-	if (argtypes[0].type_decl != NULL)
+	якщо (argtypes[0].type_decl != NULL)
 	{
-	    if (argtypes[0].type_decl->tt_type == VAR_LIST)
+	    якщо (argtypes[0].type_decl->tt_type == VAR_LIST)
 		*decl_type = &t_list_any;
-	    else if (argtypes[0].type_decl->tt_type == VAR_DICT)
+	    інакше якщо (argtypes[0].type_decl->tt_type == VAR_DICT)
 		*decl_type = &t_dict_any;
-	    else
+	    інакше
 		*decl_type = argtypes[0].type_decl;
 	}
-	if (argtypes[0].type_curr != NULL)
+	якщо (argtypes[0].type_curr != NULL)
 	{
-	    if (argtypes[0].type_curr->tt_type == VAR_LIST)
-		return &t_list_any;
-	    else if (argtypes[0].type_curr->tt_type == VAR_DICT)
-		return &t_dict_any;
+	    якщо (argtypes[0].type_curr->tt_type == VAR_LIST)
+		повернути &t_list_any;
+	    інакше якщо (argtypes[0].type_curr->tt_type == VAR_DICT)
+		повернути &t_dict_any;
 	}
-	return argtypes[0].type_curr;
+	повернути argtypes[0].type_curr;
     }
-    return &t_void;
+    повернути &t_void;
 }
     static type_T *
-ret_extend(int argcount,
+ret_extend(ціле argcount,
 	type2_T *argtypes,
 	type_T	**decl_type)
 {
-    if (argcount > 0)
+    якщо (argcount > 0)
     {
 	*decl_type = argtypes[0].type_decl;
 	// if the second argument has a different current type then the current
 	// type is "any"
-	if (argcount > 1 && !equal_type(argtypes[0].type_curr,
+	якщо (argcount > 1 && !equal_type(argtypes[0].type_curr,
 						     argtypes[1].type_curr, 0))
 	{
-	    if (argtypes[0].type_curr->tt_type == VAR_LIST)
-		return &t_list_any;
-	    if (argtypes[0].type_curr->tt_type == VAR_DICT)
-		return &t_dict_any;
-	    if (argtypes[0].type_curr->tt_type == VAR_BLOB)
-		return &t_blob;
+	    якщо (argtypes[0].type_curr->tt_type == VAR_LIST)
+		повернути &t_list_any;
+	    якщо (argtypes[0].type_curr->tt_type == VAR_DICT)
+		повернути &t_dict_any;
+	    якщо (argtypes[0].type_curr->tt_type == VAR_BLOB)
+		повернути &t_blob;
 	}
-	return argtypes[0].type_curr;
+	повернути argtypes[0].type_curr;
     }
-    return &t_void;
+    повернути &t_void;
 }
     static type_T *
-ret_repeat(int argcount,
+ret_repeat(ціле argcount,
 	type2_T *argtypes,
 	type_T	**decl_type UNUSED)
 {
-    if (argcount == 0)
-	return &t_any;
-    if (argtypes[0].type_curr == &t_number)
-	return &t_string;
-    return argtypes[0].type_curr;
+    якщо (argcount == 0)
+	повернути &t_any;
+    якщо (argtypes[0].type_curr == &t_number)
+	повернути &t_string;
+    повернути argtypes[0].type_curr;
 }
 // for map(): returns first argument but item type may differ
     static type_T *
-ret_first_cont(int argcount,
+ret_first_cont(ціле argcount,
 	type2_T *argtypes,
 	type_T	**decl_type UNUSED)
 {
-    if (argcount > 0)
+    якщо (argcount > 0)
     {
-	if (argtypes[0].type_curr->tt_type == VAR_LIST)
-	    return &t_list_any;
-	if (argtypes[0].type_curr->tt_type == VAR_DICT)
-	    return &t_dict_any;
-	if (argtypes[0].type_curr->tt_type == VAR_BLOB)
-	    return argtypes[0].type_curr;
+	якщо (argtypes[0].type_curr->tt_type == VAR_LIST)
+	    повернути &t_list_any;
+	якщо (argtypes[0].type_curr->tt_type == VAR_DICT)
+	    повернути &t_dict_any;
+	якщо (argtypes[0].type_curr->tt_type == VAR_BLOB)
+	    повернути argtypes[0].type_curr;
     }
-    return &t_any;
+    повернути &t_any;
 }
 // for get(): the type of the item when a missing item has the same type
     static type_T *
-ret_get(int argcount,
+ret_get(ціле argcount,
 	type2_T *argtypes,
 	type_T	**decl_type)
 {
-    if (argcount > 0)
+    якщо (argcount > 0)
     {
 	type_T	*t = argtypes[0].type_curr;
 	type_T	*item = NULL;
 
-	if (t->tt_type == VAR_BLOB)
+	якщо (t->tt_type == VAR_BLOB)
 	    item = &t_number;
-	else if (t->tt_type == VAR_LIST || t->tt_type == VAR_DICT)
+	інакше якщо (t->tt_type == VAR_LIST || t->tt_type == VAR_DICT)
 	    item = t->tt_member;
 	// A missing item gives {default} when present, otherwise zero.
-	if (item != NULL && (argcount == 3
+	якщо (item != NULL && (argcount == 3
 			? equal_type(item, argtypes[2].type_curr, 0)
 			: item->tt_type == VAR_NUMBER))
 	{
-	    if (t->tt_type != VAR_BLOB
+	    якщо (t->tt_type != VAR_BLOB
 			    && argtypes[0].type_decl->tt_type == t->tt_type)
 		*decl_type = argtypes[0].type_decl->tt_member;
-	    return item;
+	    повернути item;
 	}
     }
-    return &t_any;
+    повернути &t_any;
 }
 // for getline()
     static type_T *
-ret_getline(int argcount,
+ret_getline(ціле argcount,
 	type2_T *argtypes UNUSED,
 	type_T	**decl_type UNUSED)
 {
-    if (argcount == 1)
-	return &t_string;
+    якщо (argcount == 1)
+	повернути &t_string;
     *decl_type = &t_list_any;
-    return &t_list_string;
+    повернути &t_list_string;
 }
 // A string with fewer than N arguments, otherwise it depends on the value of
 // the last one: a string or a list of strings.
     static type_T *
-ret_string_or_any_1(int argcount,
+ret_string_or_any_1(ціле argcount,
 	type2_T *argtypes UNUSED,
 	type_T	**decl_type UNUSED)
 {
-    if (argcount < 1)
-	return &t_string;
-    return &t_any;
+    якщо (argcount < 1)
+	повернути &t_string;
+    повернути &t_any;
 }
     static type_T *
-ret_string_or_any_2(int argcount,
+ret_string_or_any_2(ціле argcount,
 	type2_T *argtypes UNUSED,
 	type_T	**decl_type UNUSED)
 {
-    if (argcount < 2)
-	return &t_string;
-    return &t_any;
+    якщо (argcount < 2)
+	повернути &t_string;
+    повернути &t_any;
 }
     static type_T *
-ret_string_or_any_3(int argcount,
+ret_string_or_any_3(ціле argcount,
 	type2_T *argtypes UNUSED,
 	type_T	**decl_type UNUSED)
 {
-    if (argcount < 3)
-	return &t_string;
-    return &t_any;
+    якщо (argcount < 3)
+	повернути &t_string;
+    повернути &t_any;
 }
     static type_T *
-ret_string_or_any_4(int argcount,
+ret_string_or_any_4(ціле argcount,
 	type2_T *argtypes UNUSED,
 	type_T	**decl_type UNUSED)
 {
-    if (argcount < 4)
-	return &t_string;
-    return &t_any;
+    якщо (argcount < 4)
+	повернути &t_string;
+    повернути &t_any;
 }
 // for abs()
     static type_T *
-ret_abs(int argcount,
+ret_abs(ціле argcount,
 	type2_T *argtypes,
 	type_T	**decl_type UNUSED)
 {
-    if (argcount > 0 && argtypes[0].type_curr->tt_type == VAR_FLOAT)
-	return &t_float;
-    return &t_number;
+    якщо (argcount > 0 && argtypes[0].type_curr->tt_type == VAR_FLOAT)
+	повернути &t_float;
+    повернути &t_number;
 }
 // for sign_define()
     static type_T *
-ret_sign_define(int argcount,
+ret_sign_define(ціле argcount,
 	type2_T *argtypes,
 	type_T	**decl_type UNUSED)
 {
-    if (argcount > 0 && argtypes[0].type_curr->tt_type == VAR_LIST)
-	return &t_list_number;
-    return &t_number;
+    якщо (argcount > 0 && argtypes[0].type_curr->tt_type == VAR_LIST)
+	повернути &t_list_number;
+    повернути &t_number;
 }
 // for values(): list of member of first argument
     static type_T *
-ret_list_member(int argcount,
+ret_list_member(ціле argcount,
 	type2_T *argtypes,
 	type_T	**decl_type)
 {
-    if (argcount > 0)
+    якщо (argcount > 0)
     {
 	type_T *t = argtypes[0].type_decl;
-	if (current_type_gap != NULL
+	якщо (current_type_gap != NULL
 		&& (t->tt_type == VAR_DICT || t->tt_type == VAR_LIST))
 	    t = get_list_type(t->tt_member, current_type_gap);
-	else
+	інакше
 	    t = &t_list_any;
 	*decl_type = t;
 
 	t = argtypes[0].type_curr;
-	if (current_type_gap != NULL
+	якщо (current_type_gap != NULL
 		&& (t->tt_type == VAR_DICT || t->tt_type == VAR_LIST))
-	    return get_list_type(t->tt_member, current_type_gap);
+	    повернути get_list_type(t->tt_member, current_type_gap);
     }
-    return &t_list_any;
+    повернути &t_list_any;
 }
 
 /*
@@ -1821,14 +1821,14 @@ ret_list_member(int argcount,
  * one.
  */
     static type_T *
-ret_list_or_dict_0(int argcount,
+ret_list_or_dict_0(ціле argcount,
 	type2_T *argtypes UNUSED,
 	type_T	**decl_type)
 {
-    if (argcount > 0)
-	return &t_dict_any;
+    якщо (argcount > 0)
+	повернути &t_dict_any;
     *decl_type = &t_list_any;
-    return &t_list_dict_any;
+    повернути &t_list_dict_any;
 }
 
 /*
@@ -1836,119 +1836,119 @@ ret_list_or_dict_0(int argcount,
  * are two.
  */
     static type_T *
-ret_list_or_dict_1(int argcount,
+ret_list_or_dict_1(ціле argcount,
 	type2_T *argtypes UNUSED,
 	type_T	**decl_type)
 {
-    if (argcount > 1)
-	return &t_dict_any;
+    якщо (argcount > 1)
+	повернути &t_dict_any;
     *decl_type = &t_list_any;
-    return &t_list_dict_any;
+    повернути &t_list_dict_any;
 }
 
     static type_T *
-ret_argv(int argcount,
+ret_argv(ціле argcount,
 	type2_T *argtypes UNUSED,
 	type_T	**decl_type)
 {
     // argv() returns list of strings
-    if (argcount == 0)
+    якщо (argcount == 0)
     {
 	*decl_type = &t_list_any;
-	return &t_list_string;
+	повернути &t_list_string;
     }
 
     // argv(0) returns a string, but argv(-1] returns a list
-    return &t_any;
+    повернути &t_any;
 }
 
     static type_T *
-ret_remove(int argcount,
+ret_remove(ціле argcount,
 	type2_T *argtypes,
 	type_T	**decl_type)
 {
-    if (argcount > 0)
+    якщо (argcount > 0)
     {
-	if (argtypes[0].type_curr->tt_type == VAR_LIST
+	якщо (argtypes[0].type_curr->tt_type == VAR_LIST
 		|| argtypes[0].type_curr->tt_type == VAR_DICT)
 	{
-	    if (argcount == 3)
+	    якщо (argcount == 3)
 	    {
 		*decl_type = argtypes[0].type_decl;
-		return argtypes[0].type_curr;
+		повернути argtypes[0].type_curr;
 	    }
-	    if (argtypes[0].type_curr->tt_type
+	    якщо (argtypes[0].type_curr->tt_type
 					     == argtypes[0].type_decl->tt_type)
 		*decl_type = argtypes[0].type_decl->tt_member;
-	    return argtypes[0].type_curr->tt_member;
+	    повернути argtypes[0].type_curr->tt_member;
 	}
-	if (argtypes[0].type_curr->tt_type == VAR_BLOB)
-	    return &t_number;
+	якщо (argtypes[0].type_curr->tt_type == VAR_BLOB)
+	    повернути &t_number;
     }
-    return &t_any;
+    повернути &t_any;
 }
 
     static type_T *
-ret_max_min(int argcount,
+ret_max_min(ціле argcount,
 	type2_T *argtypes,
 	type_T	**decl_type)
 {
-    if (argcount > 0)
+    якщо (argcount > 0)
     {
 	type_T *t = argtypes[0].type_decl;
-	if (t->tt_type == VAR_LIST || t->tt_type == VAR_DICT)
+	якщо (t->tt_type == VAR_LIST || t->tt_type == VAR_DICT)
 	    t = t->tt_member;
-	else
+	інакше
 	    t = &t_any;
 	*decl_type = t;
 
 	t = argtypes[0].type_curr;
-	if (t->tt_type == VAR_LIST || t->tt_type == VAR_DICT)
+	якщо (t->tt_type == VAR_LIST || t->tt_type == VAR_DICT)
 	    t = t->tt_member;
-	else
+	інакше
 	    t = &t_any;
-	return t;
+	повернути t;
     }
-    return &t_any;
+    повернути &t_any;
 }
 
     static type_T *
-ret_getreg(int argcount,
+ret_getreg(ціле argcount,
 	type2_T *argtypes UNUSED,
 	type_T	**decl_type)
 {
     // Assume that if the third argument is passed it's non-zero
-    if (argcount == 3)
+    якщо (argcount == 3)
     {
 	*decl_type = &t_list_any;
-	return &t_list_string;
+	повернути &t_list_string;
     }
-    return &t_string;
+    повернути &t_string;
 }
 
     static type_T *
-ret_virtcol(int argcount,
+ret_virtcol(ціле argcount,
 	type2_T *argtypes UNUSED,
 	type_T	**decl_type)
 {
     // Assume that if the second argument is passed it's non-zero
-    if (argcount > 1)
+    якщо (argcount > 1)
     {
 	*decl_type = &t_list_any;
-	return &t_list_number;
+	повернути &t_list_number;
     }
-    return &t_number;
+    повернути &t_number;
 }
 
     static type_T *
-ret_maparg(int argcount,
+ret_maparg(ціле argcount,
 	type2_T *argtypes UNUSED,
 	type_T	**decl_type UNUSED)
 {
     // Assume that if the fourth argument is passed it's non-zero
-    if (argcount == 4)
-	return &t_dict_any;
-    return &t_string;
+    якщо (argcount == 4)
+	повернути &t_dict_any;
+    повернути &t_string;
 }
 
 /*
@@ -1972,7 +1972,7 @@ typedef struct
     char	*f_argnames;	// names of the arguments as in the help,
 				// separated by ", "; an argument without a
 				// name is empty, NULL when there is none
-    type_T	*(*f_retfunc)(int argcount, type2_T *argtypes,
+    type_T	*(*f_retfunc)(ціле argcount, type2_T *argtypes,
 							   type_T **decl_type);
 				// return type function
     void	(*f_func)(typval_T *args, typval_T *rvar);
@@ -1990,49 +1990,49 @@ typedef struct
 #define FEARG_MASK  0x0F    // bits in f_argtype used as argument index
 #define FE_X	    0x10    // builtin accepts a non-value (class, typealias)
 
-#if defined(HAVE_MATH_H)
+#якщо defined(HAVE_MATH_H)
 # define MATH_FUNC(name) name
-#else
+#інакше
 # define MATH_FUNC(name) NULL
 #endif
 #ifdef FEAT_TIMERS
 # define TIMER_FUNC(name) name
-#else
+#інакше
 # define TIMER_FUNC(name) NULL
 #endif
 #ifdef FEAT_JOB_CHANNEL
 # define JOB_FUNC(name) name
-#else
+#інакше
 # define JOB_FUNC(name) NULL
 #endif
 #ifdef FEAT_PROP_POPUP
 # define PROP_FUNC(name) name
-#else
+#інакше
 # define PROP_FUNC(name) NULL
 #endif
 #ifdef FEAT_SIGNS
 # define SIGN_FUNC(name) name
-#else
+#інакше
 # define SIGN_FUNC(name) NULL
 #endif
 #ifdef FEAT_SOUND
 # define SOUND_FUNC(name) name
-#else
+#інакше
 # define SOUND_FUNC(name) NULL
 #endif
 #ifdef FEAT_TERMINAL
 # define TERM_FUNC(name) name
-#else
+#інакше
 # define TERM_FUNC(name) NULL
 #endif
 #ifdef FEAT_TABPANEL
 # define TABPANEL_FUNC(name) name
-#else
+#інакше
 # define TABPANEL_FUNC(name) NULL
 #endif
 #ifdef FEAT_IMAGE
 # define IMAGE_FUNC(name) name
-#else
+#інакше
 # define IMAGE_FUNC(name) NULL
 #endif
 
@@ -2130,7 +2130,7 @@ static const funcentry_T global_functions[] =
 			ret_string,
 #ifdef FEAT_BEVAL
 	    f_balloon_gettext
-#else
+#інакше
 	    NULL
 #endif
 			},
@@ -2139,16 +2139,16 @@ static const funcentry_T global_functions[] =
 			ret_void,
 #ifdef FEAT_BEVAL
 	    f_balloon_show
-#else
+#інакше
 	    NULL
 #endif
 			},
     {"balloon_split",	1, 1, FEARG_1,	    arg1_string,
 			"msg",
 			ret_list_string,
-#if defined(FEAT_BEVAL_TERM)
+#якщо defined(FEAT_BEVAL_TERM)
 	    f_balloon_split
-#else
+#інакше
 	    NULL
 #endif
 			},
@@ -2349,7 +2349,7 @@ static const funcentry_T global_functions[] =
 			ret_number,
 #ifdef MSWIN
 	    f_debugbreak
-#else
+#інакше
 	    NULL
 #endif
 			},
@@ -2919,7 +2919,7 @@ static const funcentry_T global_functions[] =
 			ret_any,
 #ifdef FEAT_LUA
 		f_luaeval
-#else
+#інакше
 		NULL
 #endif
 			},
@@ -2988,7 +2988,7 @@ static const funcentry_T global_functions[] =
 			ret_dict_any,
 #ifdef FEAT_MENU
 	    f_menu_info
-#else
+#інакше
 	    NULL
 #endif
 			},
@@ -3006,7 +3006,7 @@ static const funcentry_T global_functions[] =
 			ret_any,
 #ifdef FEAT_MZSCHEME
 	    f_mzeval
-#else
+#інакше
 	    NULL
 #endif
 			},
@@ -3030,7 +3030,7 @@ static const funcentry_T global_functions[] =
 			ret_any,
 #ifdef FEAT_PERL
 	    f_perleval
-#else
+#інакше
 	    NULL
 #endif
 			},
@@ -3171,7 +3171,7 @@ static const funcentry_T global_functions[] =
 			ret_any,
 #ifdef FEAT_PYTHON3
 	    f_py3eval
-#else
+#інакше
 	    NULL
 #endif
 	    },
@@ -3180,16 +3180,16 @@ static const funcentry_T global_functions[] =
 			ret_any,
 #ifdef FEAT_PYTHON
 	    f_pyeval
-#else
+#інакше
 	    NULL
 #endif
 			},
     {"pyxeval",		1, 2, FEARG_1,	    arg2_string_dict,
 			"expr, locals",
 			ret_any,
-#if defined(FEAT_PYTHON) || defined(FEAT_PYTHON3)
+#якщо defined(FEAT_PYTHON) || defined(FEAT_PYTHON3)
 	    f_pyxeval
-#else
+#інакше
 	    NULL
 #endif
 			},
@@ -3276,7 +3276,7 @@ static const funcentry_T global_functions[] =
 			ret_any,
 #ifdef FEAT_RUBY
 	    f_rubyeval
-#else
+#інакше
 	    NULL
 #endif
 			},
@@ -3390,7 +3390,7 @@ static const funcentry_T global_functions[] =
 			ret_string,
 #ifdef FEAT_CRYPT
 	    f_sha256
-#else
+#інакше
 	    NULL
 #endif
 			},
@@ -3504,7 +3504,7 @@ static const funcentry_T global_functions[] =
 			ret_string,
 #ifdef HAVE_STRFTIME
 	    f_strftime
-#else
+#інакше
 	    NULL
 #endif
 			},
@@ -3528,7 +3528,7 @@ static const funcentry_T global_functions[] =
 			ret_number,
 #ifdef HAVE_STRPTIME
 	    f_strptime
-#else
+#інакше
 	    NULL
 #endif
 			},
@@ -3625,9 +3625,9 @@ static const funcentry_T global_functions[] =
     {"term_getansicolors", 1, 1, FEARG_1,   arg1_buffer,
 			"buf",
 			ret_list_string,
-#if defined(FEAT_TERMINAL) && (defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS))
+#якщо defined(FEAT_TERMINAL) && (defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS))
 	    f_term_getansicolors
-#else
+#інакше
 	    NULL
 #endif
 			},
@@ -3670,9 +3670,9 @@ static const funcentry_T global_functions[] =
     {"term_setansicolors", 2, 2, FEARG_1,   arg2_buffer_list_any,
 			"buf, colors",
 			ret_void,
-#if defined(FEAT_TERMINAL) && (defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS))
+#якщо defined(FEAT_TERMINAL) && (defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS))
 	    f_term_setansicolors
-#else
+#інакше
 	    NULL
 #endif
 			},
@@ -3930,10 +3930,10 @@ static const funcentry_T global_functions[] =
 /*
  * Return true if specified function allows a type as an argument.
  */
-    static int
-func_allows_type(int idx)
+    static ціле
+func_allows_type(ціле idx)
 {
-    return (global_functions[idx].f_argtype & FE_X) != 0;
+    повернути (global_functions[idx].f_argtype & FE_X) != 0;
 }
 
 /*
@@ -3941,38 +3941,38 @@ func_allows_type(int idx)
  * or user defined function names.
  */
     char_u *
-get_function_name(expand_T *xp, int idx)
+get_function_name(expand_T *xp, ціле idx)
 {
-    static int	intidx = -1;
+    static ціле	intidx = -1;
     char_u	*name;
 
-    if (idx == 0)
+    якщо (idx == 0)
 	intidx = -1;
-    if (intidx < 0)
+    якщо (intidx < 0)
     {
 	name = get_user_func_name(xp, idx);
-	if (name != NULL)
+	якщо (name != NULL)
 	{
-	    if (*name != NUL && *name != '<'
+	    якщо (*name != NUL && *name != '<'
 				      && STRNCMP("g:", xp->xp_pattern, 2) == 0)
-		return cat_prefix_varname('g', name);
-	    return name;
+		повернути cat_prefix_varname('g', name);
+	    повернути name;
 	}
     }
-    if (++intidx < (int)ARRAY_LENGTH(global_functions))
+    якщо (++intidx < (ціле)ARRAY_LENGTH(global_functions))
     {
 	// Skip if the function doesn't have an implementation (feature not
 	// implemented).
-	if (global_functions[intidx].f_func == NULL)
-	    return (char_u *)"";
+	якщо (global_functions[intidx].f_func == NULL)
+	    повернути (char_u *)"";
 	STRCPY(IObuff, global_functions[intidx].f_name);
 	STRCAT(IObuff, "(");
-	if (global_functions[intidx].f_max_argc == 0)
+	якщо (global_functions[intidx].f_max_argc == 0)
 	    STRCAT(IObuff, ")");
-	return IObuff;
+	повернути IObuff;
     }
 
-    return NULL;
+    повернути NULL;
 }
 
 /*
@@ -3980,20 +3980,20 @@ get_function_name(expand_T *xp, int idx)
  * user defined variable or function names.
  */
     char_u *
-get_expr_name(expand_T *xp, int idx)
+get_expr_name(expand_T *xp, ціле idx)
 {
-    static int	intidx = -1;
+    static ціле	intidx = -1;
     char_u	*name;
 
-    if (idx == 0)
+    якщо (idx == 0)
 	intidx = -1;
-    if (intidx < 0)
+    якщо (intidx < 0)
     {
 	name = get_function_name(xp, idx);
-	if (name != NULL)
-	    return name;
+	якщо (name != NULL)
+	    повернути name;
     }
-    return get_user_var_name(xp, ++intidx);
+    повернути get_user_var_name(xp, ++intidx);
 }
 
 /*
@@ -4001,59 +4001,59 @@ get_expr_name(expand_T *xp, int idx)
  * Return index, or -1 if not found or "implemented" is TRUE and the function
  * is not implemented.
  */
-    static int
-find_internal_func_opt(char_u *name, int implemented)
+    static ціле
+find_internal_func_opt(char_u *name, ціле implemented)
 {
-    int		first = 0;
-    int		last;
-    int		cmp;
-    int		x;
+    ціле		first = 0;
+    ціле		last;
+    ціле		cmp;
+    ціле		x;
 
-    last = (int)ARRAY_LENGTH(global_functions) - 1;
+    last = (ціле)ARRAY_LENGTH(global_functions) - 1;
 
     // Find the function name in the table. Binary search.
-    while (first <= last)
+    поки (first <= last)
     {
 	x = first + ((unsigned)(last - first) >> 1);
 	cmp = STRCMP(name, global_functions[x].f_name);
-	if (cmp < 0)
+	якщо (cmp < 0)
 	    last = x - 1;
-	else if (cmp > 0)
+	інакше якщо (cmp > 0)
 	    first = x + 1;
-	else if (implemented && global_functions[x].f_func == NULL)
+	інакше якщо (implemented && global_functions[x].f_func == NULL)
 	    break;
-	else
-	    return x;
+	інакше
+	    повернути x;
     }
-    return -1;
+    повернути -1;
 }
 
 /*
  * Find internal function "name" in table "global_functions".
  * Return index, or -1 if not found or the function is not implemented.
  */
-    int
+    ціле
 find_internal_func(char_u *name)
 {
-    return find_internal_func_opt(name, TRUE);
+    повернути find_internal_func_opt(name, TRUE);
 }
 
-    int
+    ціле
 has_internal_func(char_u *name)
 {
-    return find_internal_func_opt(name, TRUE) >= 0;
+    повернути find_internal_func_opt(name, TRUE) >= 0;
 }
 
-    static int
+    static ціле
 has_internal_func_name(char_u *name)
 {
-    return find_internal_func_opt(name, FALSE) >= 0;
+    повернути find_internal_func_opt(name, FALSE) >= 0;
 }
 
     char *
-internal_func_name(int idx)
+internal_func_name(ціле idx)
 {
-    return global_functions[idx].f_name;
+    повернути global_functions[idx].f_name;
 }
 
 /*
@@ -4061,40 +4061,40 @@ internal_func_name(int idx)
  * Uses the list of types on the type stack: "types".
  * Return FAIL and gives an error message when a type is wrong.
  */
-    int
+    ціле
 internal_func_check_arg_types(
 	type2_T	*types,
-	int	idx,
-	int	argcount,
+	ціле	idx,
+	ціле	argcount,
 	cctx_T	*cctx)
 {
     // Some internal functions accept types like Class as arguments. For other
     // functions, check the arguments are not types.
-    if (!(func_allows_type(idx)))
+    якщо (!(func_allows_type(idx)))
     {
-	for (int i = 0; i < argcount; ++i)
-	    if (check_type_is_value(types[i].type_curr) == FAIL)
-		return FAIL;
+	для (ціле i = 0; i < argcount; ++i)
+	    якщо (check_type_is_value(types[i].type_curr) == FAIL)
+		повернути FAIL;
     }
 
     const argcheck_T	*argchecks = global_functions[idx].f_argcheck;
 
-    if (argchecks == NULL)
-	return OK;
+    якщо (argchecks == NULL)
+	повернути OK;
 
     argcontext_T context;
 
     context.arg_count = argcount;
     context.arg_types = types;
     context.arg_cctx = cctx;
-    for (int i = 0; i < argcount && argchecks[i] != NULL; ++i)
+    для (ціле i = 0; i < argcount && argchecks[i] != NULL; ++i)
     {
 	context.arg_idx = i;
-	if (argchecks[i](types[i].type_curr, types[i].type_decl,
+	якщо (argchecks[i](types[i].type_curr, types[i].type_decl,
 							    &context) == FAIL)
-	    return FAIL;
+	    повернути FAIL;
     }
-    return OK;
+    повернути OK;
 }
 
 /*
@@ -4103,7 +4103,7 @@ internal_func_check_arg_types(
  * argument count.
  */
     void
-internal_func_get_argcount(int idx, int *argcount, int *min_argcount)
+internal_func_get_argcount(ціле idx, ціле *argcount, ціле *min_argcount)
 {
     *argcount = global_functions[idx].f_max_argc;
     *min_argcount = global_functions[idx].f_min_argc;
@@ -4118,8 +4118,8 @@ internal_func_get_argcount(int idx, int *argcount, int *min_argcount)
  */
     type_T *
 internal_func_ret_type(
-	int	    idx,
-	int	    argcount,
+	ціле	    idx,
+	ціле	    argcount,
 	type2_T	    *argtypes,
 	type_T	    **decl_type,
 	garray_T    *type_gap)
@@ -4129,19 +4129,19 @@ internal_func_ret_type(
     current_type_gap = type_gap;
     *decl_type = NULL;
     ret = global_functions[idx].f_retfunc(argcount, argtypes, decl_type);
-    if (*decl_type == NULL)
+    якщо (*decl_type == NULL)
 	*decl_type = ret;
     current_type_gap = NULL;
-    return ret;
+    повернути ret;
 }
 
 /*
  * Return TRUE if "idx" is for the map() function.
  */
-    int
-internal_func_is_map(int idx)
+    ціле
+internal_func_is_map(ціле idx)
 {
-    return global_functions[idx].f_func == f_map;
+    повернути global_functions[idx].f_func == f_map;
 }
 
 /*
@@ -4150,25 +4150,25 @@ internal_func_is_map(int idx)
  * first argument, 2 if method base is second argument, etc.  9 if method base
  * is last argument.
  */
-    int
-check_internal_func(int idx, int argcount)
+    ціле
+check_internal_func(ціле idx, ціле argcount)
 {
     funcerror_T	    res;
     char	    *name;
 
-    if (argcount < global_functions[idx].f_min_argc)
+    якщо (argcount < global_functions[idx].f_min_argc)
 	res = FCERR_TOOFEW;
-    else if (argcount > global_functions[idx].f_max_argc)
+    інакше якщо (argcount > global_functions[idx].f_max_argc)
 	res = FCERR_TOOMANY;
-    else
-	return global_functions[idx].f_argtype & FEARG_MASK;
+    інакше
+	повернути global_functions[idx].f_argtype & FEARG_MASK;
 
     name = internal_func_name(idx);
-    if (res == FCERR_TOOMANY)
+    якщо (res == FCERR_TOOMANY)
 	semsg(_(e_too_many_arguments_for_function_str), name);
-    else
+    інакше
 	semsg(_(e_not_enough_arguments_for_function_str), name);
-    return -1;
+    повернути -1;
 }
 
 /*
@@ -4177,51 +4177,51 @@ check_internal_func(int idx, int argcount)
  *
  * Return OK/FAIL.
  */
-    static int
-check_args_for_type(int idx, int argcount, typval_T *argvars)
+    static ціле
+check_args_for_type(ціле idx, ціле argcount, typval_T *argvars)
 {
-    if (!func_allows_type(idx))
+    якщо (!func_allows_type(idx))
     {
-	for (int i = 0; i < argcount; ++i)
-	    if (check_typval_is_value(&argvars[i]) == FAIL)
-		return FAIL;
+	для (ціле i = 0; i < argcount; ++i)
+	    якщо (check_typval_is_value(&argvars[i]) == FAIL)
+		повернути FAIL;
     }
-    return OK;
+    повернути OK;
 }
 
     funcerror_T
 call_internal_func(
 	char_u	    *name,
-	int	    argcount,
+	ціле	    argcount,
 	typval_T    *argvars,
 	typval_T    *rettv)
 {
-    int i;
+    ціле i;
 
     i = find_internal_func(name);
-    if (i < 0)
-	return FCERR_UNKNOWN;
-    if (argcount < global_functions[i].f_min_argc)
-	return FCERR_TOOFEW;
-    if (argcount > global_functions[i].f_max_argc)
-	return FCERR_TOOMANY;
-    if (check_args_for_type(i, argcount, argvars) == FAIL)
-	return FCERR_OTHER;
+    якщо (i < 0)
+	повернути FCERR_UNKNOWN;
+    якщо (argcount < global_functions[i].f_min_argc)
+	повернути FCERR_TOOFEW;
+    якщо (argcount > global_functions[i].f_max_argc)
+	повернути FCERR_TOOMANY;
+    якщо (check_args_for_type(i, argcount, argvars) == FAIL)
+	повернути FCERR_OTHER;
     argvars[argcount].v_type = VAR_UNKNOWN;
     global_functions[i].f_func(argvars, rettv);
-    if (in_vim9script() && global_functions[i].f_retfunc == ret_void)
+    якщо (in_vim9script() && global_functions[i].f_retfunc == ret_void)
 	rettv->v_type = VAR_VOID;
-    return FCERR_NONE;
+    повернути FCERR_NONE;
 }
 
     void
 call_internal_func_by_idx(
-	int	    idx,
+	ціле	    idx,
 	typval_T    *argvars,
 	typval_T    *rettv)
 {
     global_functions[idx].f_func(argvars, rettv);
-    if (in_vim9script() && global_functions[idx].f_retfunc == ret_void)
+    якщо (in_vim9script() && global_functions[idx].f_retfunc == ret_void)
 	rettv->v_type = VAR_VOID;
 }
 
@@ -4231,85 +4231,85 @@ call_internal_func_by_idx(
     funcerror_T
 call_internal_method(
 	char_u	    *name,
-	int	    argcount,
+	ціле	    argcount,
 	typval_T    *argvars,
 	typval_T    *rettv,
 	typval_T    *basetv)
 {
-    int		fi;
+    ціле		fi;
     typval_T	argv[MAX_FUNC_ARGS + 1];
 
     fi = find_internal_func(name);
-    if (fi < 0)
-	return FCERR_UNKNOWN;
-    if ((global_functions[fi].f_argtype & FEARG_MASK) == 0)
-	return FCERR_NOTMETHOD;
-    if (argcount + 1 < global_functions[fi].f_min_argc)
-	return FCERR_TOOFEW;
-    if (argcount + 1 > global_functions[fi].f_max_argc)
-	return FCERR_TOOMANY;
-    if (check_args_for_type(fi, argcount, argvars) == FAIL)
-	return FCERR_OTHER;
+    якщо (fi < 0)
+	повернути FCERR_UNKNOWN;
+    якщо ((global_functions[fi].f_argtype & FEARG_MASK) == 0)
+	повернути FCERR_NOTMETHOD;
+    якщо (argcount + 1 < global_functions[fi].f_min_argc)
+	повернути FCERR_TOOFEW;
+    якщо (argcount + 1 > global_functions[fi].f_max_argc)
+	повернути FCERR_TOOMANY;
+    якщо (check_args_for_type(fi, argcount, argvars) == FAIL)
+	повернути FCERR_OTHER;
 
-    if ((global_functions[fi].f_argtype & FEARG_MASK) == FEARG_2)
+    якщо ((global_functions[fi].f_argtype & FEARG_MASK) == FEARG_2)
     {
-	if (argcount < 1)
-	    return FCERR_TOOFEW;
+	якщо (argcount < 1)
+	    повернути FCERR_TOOFEW;
 
 	// base value goes second
 	argv[0] = argvars[0];
 	argv[1] = *basetv;
-	for (int i = 1; i < argcount; ++i)
+	для (ціле i = 1; i < argcount; ++i)
 	    argv[i + 1] = argvars[i];
     }
-    else if ((global_functions[fi].f_argtype & FEARG_MASK) == FEARG_3)
+    інакше якщо ((global_functions[fi].f_argtype & FEARG_MASK) == FEARG_3)
     {
-	if (argcount < 2)
-	    return FCERR_TOOFEW;
+	якщо (argcount < 2)
+	    повернути FCERR_TOOFEW;
 
 	// base value goes third
 	argv[0] = argvars[0];
 	argv[1] = argvars[1];
 	argv[2] = *basetv;
-	for (int i = 2; i < argcount; ++i)
+	для (ціле i = 2; i < argcount; ++i)
 	    argv[i + 1] = argvars[i];
     }
-    else if ((global_functions[fi].f_argtype & FEARG_MASK) == FEARG_4)
+    інакше якщо ((global_functions[fi].f_argtype & FEARG_MASK) == FEARG_4)
     {
-	if (argcount < 3)
-	    return FCERR_TOOFEW;
+	якщо (argcount < 3)
+	    повернути FCERR_TOOFEW;
 
 	// base value goes fourth
 	argv[0] = argvars[0];
 	argv[1] = argvars[1];
 	argv[2] = argvars[2];
 	argv[3] = *basetv;
-	for (int i = 3; i < argcount; ++i)
+	для (ціле i = 3; i < argcount; ++i)
 	    argv[i + 1] = argvars[i];
     }
-    else
+    інакше
     {
 	// FEARG_1: base value goes first
 	argv[0] = *basetv;
-	for (int i = 0; i < argcount; ++i)
+	для (ціле i = 0; i < argcount; ++i)
 	    argv[i + 1] = argvars[i];
     }
     argv[argcount + 1].v_type = VAR_UNKNOWN;
 
-    if (check_args_for_type(fi, argcount + 1, argv) == FAIL)
-	return FCERR_OTHER;
+    якщо (check_args_for_type(fi, argcount + 1, argv) == FAIL)
+	повернути FCERR_OTHER;
 
     global_functions[fi].f_func(argv, rettv);
-    return FCERR_NONE;
+    повернути FCERR_NONE;
 }
 
 /*
  * Return TRUE for a non-zero Number and a non-empty String.
  */
-    int
+    ціле
 non_zero_arg(typval_T *argvars)
 {
-    return ((argvars[0].v_type == VAR_NUMBER
+    повернути ((argvars[0].v_type == VAR_NUMBER
 		&& argvars[0].vval.v_number != 0)
 	    || (argvars[0].v_type == VAR_BOOL
 		&& argvars[0].vval.v_number == VVAL_TRUE)
@@ -4324,10 +4324,10 @@ non_zero_arg(typval_T *argvars)
     static void
 f_and(typval_T *argvars, typval_T *rettv)
 {
-    if (in_vim9script()
+    якщо (in_vim9script()
 	    && (check_for_number_arg(argvars, 0) == FAIL
 		|| check_for_number_arg(argvars, 1) == FAIL))
-	return;
+	повернути;
 
     rettv->vval.v_number = tv_get_number_chk(&argvars[0], NULL)
 					& tv_get_number_chk(&argvars[1], NULL);
@@ -4341,26 +4341,26 @@ f_and(typval_T *argvars, typval_T *rettv)
 f_balloon_gettext(typval_T *argvars UNUSED, typval_T *rettv)
 {
     rettv->v_type = VAR_STRING;
-    if (balloonEval == NULL)
-	return;
+    якщо (balloonEval == NULL)
+	повернути;
 
-    if (balloonEval->msg == NULL)
+    якщо (balloonEval->msg == NULL)
 	rettv->vval.v_string = NULL;
-    else
+    інакше
 	rettv->vval.v_string = vim_strsave(balloonEval->msg);
 }
 
     static void
 f_balloon_show(typval_T *argvars, typval_T *rettv UNUSED)
 {
-    if (balloonEval == NULL)
-	return;
+    якщо (balloonEval == NULL)
+	повернути;
 
-    if (in_vim9script()
+    якщо (in_vim9script()
 	    && check_for_string_or_list_arg(argvars, 0) == FAIL)
-	return;
+	повернути;
 
-    if (argvars[0].v_type == VAR_LIST
+    якщо (argvars[0].v_type == VAR_LIST
 # ifdef FEAT_GUI
 	    && !gui.in_use
 # endif
@@ -4372,41 +4372,41 @@ f_balloon_show(typval_T *argvars, typval_T *rettv UNUSED)
 	post_balloon(balloonEval, NULL,
 		l == NULL || l->lv_len == 0 ? NULL : l);
     }
-    else
+    інакше
     {
 	char_u *mesg;
 
-	if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-	    return;
+	якщо (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+	    повернути;
 
 	mesg = tv_get_string_chk(&argvars[0]);
-	if (mesg != NULL)
+	якщо (mesg != NULL)
 	    // empty string removes the balloon
 	    post_balloon(balloonEval, *mesg == NUL ? NULL : mesg, NULL);
     }
 }
 
-# if defined(FEAT_BEVAL_TERM)
+# якщо defined(FEAT_BEVAL_TERM)
     static void
 f_balloon_split(typval_T *argvars, typval_T *rettv UNUSED)
 {
-    if (rettv_list_alloc(rettv) != OK)
-	return;
+    якщо (rettv_list_alloc(rettv) != OK)
+	повернути;
 
     char_u *msg;
 
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    якщо (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+	повернути;
     msg = tv_get_string_chk(&argvars[0]);
-    if (msg != NULL)
+    якщо (msg != NULL)
     {
 	pumitem_T	*array;
-	int		size = split_message(msg, &array);
+	ціле		size = split_message(msg, &array);
 
 	// Skip the first and last item, they are always empty.
-	for (int i = 1; i < size - 1; ++i)
+	для (ціле i = 1; i < size - 1; ++i)
 	    list_append_string(rettv->vval.v_list, array[i].pum_text, -1);
-	while (size > 0)
+	поки (size > 0)
 	    vim_free(array[--size].pum_text);
 	vim_free(array);
     }
@@ -4420,14 +4420,14 @@ f_balloon_split(typval_T *argvars, typval_T *rettv UNUSED)
     static void
 f_base64_decode(typval_T *argvars, typval_T *rettv)
 {
-    if (check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    якщо (check_for_string_arg(argvars, 0) == FAIL)
+	повернути;
 
-    if (rettv_blob_alloc(rettv) == FAIL)
-	return;
+    якщо (rettv_blob_alloc(rettv) == FAIL)
+	повернути;
 
     char_u *str = tv_get_string_chk(&argvars[0]);
-    if (str != NULL)
+    якщо (str != NULL)
 	base64_decode(str, STRLEN(str), &rettv->vval.v_blob->bv_ga);
 }
 
@@ -4437,14 +4437,14 @@ f_base64_decode(typval_T *argvars, typval_T *rettv)
     static void
 f_base64_encode(typval_T *argvars, typval_T *rettv)
 {
-    if (check_for_blob_arg(argvars, 0) == FAIL)
-	return;
+    якщо (check_for_blob_arg(argvars, 0) == FAIL)
+	повернути;
 
     rettv->v_type = VAR_STRING;
     rettv->vval.v_string = NULL;
 
     blob_T *blob = argvars->vval.v_blob;
-    if (blob != NULL)
+    якщо (blob != NULL)
 	rettv->vval.v_string =
 	    base64_encode(blob->bv_ga.ga_data, blob->bv_ga.ga_len);
 }
@@ -4461,9 +4461,9 @@ get_buf_arg(typval_T *arg)
     ++emsg_off;
     buf = tv_get_buf(arg, FALSE);
     --emsg_off;
-    if (buf == NULL)
+    якщо (buf == NULL)
 	semsg(_(e_invalid_buffer_name_str), tv_get_string(arg));
-    return buf;
+    повернути buf;
 }
 
 /*
@@ -4475,22 +4475,22 @@ f_bindtextdomain(typval_T *argvars, typval_T *rettv)
     rettv->v_type = VAR_BOOL;
     rettv->vval.v_number = VVAL_TRUE;
 
-    if (check_for_nonempty_string_arg(argvars, 0) == FAIL
+    якщо (check_for_nonempty_string_arg(argvars, 0) == FAIL
 	    || check_for_nonempty_string_arg(argvars, 1) == FAIL)
-	return;
+	повернути;
 
-    if (strcmp((const char *)argvars[0].vval.v_string, VIMPACKAGE) == 0)
+    якщо (strcmp((const char *)argvars[0].vval.v_string, VIMPACKAGE) == 0)
 	semsg(_(e_invalid_argument_str), tv_get_string(&argvars[0]));
-    else
+    інакше
     {
-	if (bindtextdomain((const char *)argvars[0].vval.v_string, (const char *)argvars[1].vval.v_string) == NULL)
+	якщо (bindtextdomain((const char *)argvars[0].vval.v_string, (const char *)argvars[1].vval.v_string) == NULL)
 	{
 	    do_outofmem_msg((long)0);
 	    rettv->vval.v_number = VVAL_FALSE;
 	}
     }
 
-    return;
+    повернути;
 }
 
 /*
@@ -4501,16 +4501,16 @@ f_byte2line(typval_T *argvars UNUSED, typval_T *rettv)
 {
 #ifndef FEAT_BYTEOFF
     rettv->vval.v_number = -1;
-#else
+#інакше
     long	boff = 0;
 
-    if (in_vim9script() && check_for_number_arg(argvars, 0) == FAIL)
-	return;
+    якщо (in_vim9script() && check_for_number_arg(argvars, 0) == FAIL)
+	повернути;
 
     boff = tv_get_number(&argvars[0]) - 1;  // boff gets -1 on type error
-    if (boff < 0)
+    якщо (boff < 0)
 	rettv->vval.v_number = -1;
-    else
+    інакше
 	rettv->vval.v_number = ml_find_line_or_offset(curbuf,
 							  (linenr_T)0, &boff);
 #endif
@@ -4527,44 +4527,44 @@ f_call(typval_T *argvars, typval_T *rettv)
     dict_T	*selfdict = NULL;
     char_u	*tofree = NULL;
 
-    if (in_vim9script()
+    якщо (in_vim9script()
 	    && (check_for_string_or_func_arg(argvars, 0) == FAIL
 		|| check_for_list_arg(argvars, 1) == FAIL
 		|| check_for_opt_dict_arg(argvars, 2) == FAIL))
-	return;
+	повернути;
 
-    if (check_for_list_arg(argvars, 1) == FAIL)
-	return;
-    if (argvars[1].vval.v_list == NULL)
-	return;
+    якщо (check_for_list_arg(argvars, 1) == FAIL)
+	повернути;
+    якщо (argvars[1].vval.v_list == NULL)
+	повернути;
 
-    if (argvars[0].v_type == VAR_FUNC)
+    якщо (argvars[0].v_type == VAR_FUNC)
 	func = argvars[0].vval.v_string;
-    else if (argvars[0].v_type == VAR_PARTIAL)
+    інакше якщо (argvars[0].v_type == VAR_PARTIAL)
     {
 	partial = argvars[0].vval.v_partial;
 	func = partial_name(partial);
     }
-    else
+    інакше
 	func = tv_get_string(&argvars[0]);
-    if (func == NULL || *func == NUL)
-	return;		// type error, empty name or null function
+    якщо (func == NULL || *func == NUL)
+	повернути;		// type error, empty name or null function
 
-    if (argvars[0].v_type == VAR_STRING)
+    якщо (argvars[0].v_type == VAR_STRING)
     {
 	char_u	*p = func;
 	tofree = trans_function_name(&p, NULL, FALSE, TFN_INT|TFN_QUIET);
-	if (tofree == NULL)
+	якщо (tofree == NULL)
 	{
 	    emsg_funcname(e_unknown_function_str, func);
-	    return;
+	    повернути;
 	}
-	if (*p == '<')
+	якщо (*p == '<')
 	{
 	    // generic function
 	    char_u *s = append_generic_func_type_args(tofree, STRLEN(tofree),
 									&p);
-	    if (s != NULL)
+	    якщо (s != NULL)
 	    {
 		vim_free(tofree);
 		tofree = s;
@@ -4573,9 +4573,9 @@ f_call(typval_T *argvars, typval_T *rettv)
 	func = tofree;
     }
 
-    if (argvars[2].v_type != VAR_UNKNOWN)
+    якщо (argvars[2].v_type != VAR_UNKNOWN)
     {
-	if (check_for_dict_arg(argvars, 2) == FAIL)
+	якщо (check_for_dict_arg(argvars, 2) == FAIL)
 	    goto done;
 
 	selfdict = argvars[2].vval.v_dict;
@@ -4602,24 +4602,24 @@ f_changenr(typval_T *argvars UNUSED, typval_T *rettv)
     static void
 f_char2nr(typval_T *argvars, typval_T *rettv)
 {
-    if (in_vim9script()
+    якщо (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_opt_bool_arg(argvars, 1) == FAIL))
-	return;
+	повернути;
 
-    if (has_mbyte)
+    якщо (has_mbyte)
     {
-	int	utf8 = 0;
+	ціле	utf8 = 0;
 
-	if (argvars[1].v_type != VAR_UNKNOWN)
-	    utf8 = (int)tv_get_bool_chk(&argvars[1], NULL);
+	якщо (argvars[1].v_type != VAR_UNKNOWN)
+	    utf8 = (ціле)tv_get_bool_chk(&argvars[1], NULL);
 
-	if (utf8)
+	якщо (utf8)
 	    rettv->vval.v_number = utf_ptr2char(tv_get_string(&argvars[0]));
-	else
+	інакше
 	    rettv->vval.v_number = (*mb_ptr2char)(tv_get_string(&argvars[0]));
     }
-    else
+    інакше
 	rettv->vval.v_number = tv_get_string(&argvars[0])[0];
 }
 
@@ -4629,61 +4629,61 @@ f_char2nr(typval_T *argvars, typval_T *rettv)
  * of the column.
  */
     static void
-get_col(typval_T *argvars, typval_T *rettv, int charcol)
+get_col(typval_T *argvars, typval_T *rettv, ціле charcol)
 {
     colnr_T	col = 0;
     pos_T	*fp;
     switchwin_T	switchwin;
-    int		winchanged = FALSE;
+    ціле		winchanged = FALSE;
 
-    if (check_for_string_or_list_arg(argvars, 0) == FAIL
+    якщо (check_for_string_or_list_arg(argvars, 0) == FAIL
 	    || check_for_opt_number_arg(argvars, 1) == FAIL)
-	return;
+	повернути;
 
-    if (argvars[1].v_type != VAR_UNKNOWN)
+    якщо (argvars[1].v_type != VAR_UNKNOWN)
     {
 	tabpage_T	*tp;
 	win_T		*wp;
 
 	// use the window specified in the second argument
-	wp = win_id2wp_tp((int)tv_get_number(&argvars[1]), &tp);
-	if (wp == NULL || tp == NULL)
-	    return;
+	wp = win_id2wp_tp((ціле)tv_get_number(&argvars[1]), &tp);
+	якщо (wp == NULL || tp == NULL)
+	    повернути;
 
-	if (switch_win_noblock(&switchwin, wp, tp, TRUE) != OK)
-	    return;
+	якщо (switch_win_noblock(&switchwin, wp, tp, TRUE) != OK)
+	    повернути;
 
 	check_cursor();
 	winchanged = TRUE;
     }
 
-    int fnum = curbuf->b_fnum;
+    ціле fnum = curbuf->b_fnum;
     fp = var2fpos(&argvars[0], FALSE, &fnum, charcol);
-    if (fp != NULL && fnum == curbuf->b_fnum)
+    якщо (fp != NULL && fnum == curbuf->b_fnum)
     {
-	if (fp->col == MAXCOL)
+	якщо (fp->col == MAXCOL)
 	{
 	    // '> can be MAXCOL, get the length of the line then
-	    if (fp->lnum <= curbuf->b_ml.ml_line_count)
+	    якщо (fp->lnum <= curbuf->b_ml.ml_line_count)
 		col = ml_get_len(fp->lnum) + 1;
-	    else
+	    інакше
 		col = MAXCOL;
 	}
-	else
+	інакше
 	{
 	    col = fp->col + 1;
 	    // col(".") when the cursor is on the NUL at the end of the line
 	    // because of "coladd" can be seen as an extra column.
-	    if (virtual_active() && fp == &curwin->w_cursor)
+	    якщо (virtual_active() && fp == &curwin->w_cursor)
 	    {
 		char_u	*p = ml_get_cursor();
 
-		if (curwin->w_cursor.coladd >= (colnr_T)chartabsize(p,
+		якщо (curwin->w_cursor.coladd >= (colnr_T)chartabsize(p,
 				 curwin->w_virtcol - curwin->w_cursor.coladd))
 		{
-		    int		l;
+		    ціле		l;
 
-		    if (*p != NUL && p[(l = (*mb_ptr2len)(p))] == NUL)
+		    якщо (*p != NUL && p[(l = (*mb_ptr2len)(p))] == NUL)
 			col += l;
 		}
 	    }
@@ -4691,7 +4691,7 @@ get_col(typval_T *argvars, typval_T *rettv, int charcol)
     }
     rettv->vval.v_number = col;
 
-    if (winchanged)
+    якщо (winchanged)
 	restore_win_noblock(&switchwin, TRUE);
 }
 
@@ -4705,20 +4705,20 @@ f_charcol(typval_T *argvars, typval_T *rettv)
 }
 
     win_T *
-get_optional_window(typval_T *argvars, int idx)
+get_optional_window(typval_T *argvars, ціле idx)
 {
     win_T   *win = curwin;
 
-    if (argvars[idx].v_type == VAR_UNKNOWN)
-	return curwin;
+    якщо (argvars[idx].v_type == VAR_UNKNOWN)
+	повернути curwin;
 
     win = find_win_by_nr_or_id(&argvars[idx]);
-    if (win == NULL)
+    якщо (win == NULL)
     {
 	emsg(_(e_invalid_window_number));
-	return NULL;
+	повернути NULL;
     }
-    return win;
+    повернути win;
 }
 
 /*
@@ -4736,42 +4736,42 @@ f_col(typval_T *argvars, typval_T *rettv)
     static void
 f_confirm(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
 {
-#if defined(FEAT_GUI_DIALOG) || defined(FEAT_CON_DIALOG)
+#якщо defined(FEAT_GUI_DIALOG) || defined(FEAT_CON_DIALOG)
     char_u	*message;
     char_u	*buttons = NULL;
     char_u	buf[NUMBUFLEN];
     char_u	buf2[NUMBUFLEN];
-    int		def = 1;
-    int		type = VIM_GENERIC;
+    ціле		def = 1;
+    ціле		type = VIM_GENERIC;
     char_u	*typestr;
-    int		error = FALSE;
+    ціле		error = FALSE;
 
-    if (in_vim9script()
+    якщо (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| (check_for_opt_string_arg(argvars, 1) == FAIL
 		    || (argvars[1].v_type != VAR_UNKNOWN
 			&& (check_for_opt_number_arg(argvars, 2) == FAIL
 			    || (argvars[2].v_type != VAR_UNKNOWN
 				&& check_for_opt_string_arg(argvars, 3) == FAIL))))))
-	return;
+	повернути;
 
     message = tv_get_string_chk(&argvars[0]);
-    if (message == NULL)
+    якщо (message == NULL)
 	error = TRUE;
-    if (argvars[1].v_type != VAR_UNKNOWN)
+    якщо (argvars[1].v_type != VAR_UNKNOWN)
     {
 	buttons = tv_get_string_buf_chk(&argvars[1], buf);
-	if (buttons == NULL)
+	якщо (buttons == NULL)
 	    error = TRUE;
-	if (argvars[2].v_type != VAR_UNKNOWN)
+	якщо (argvars[2].v_type != VAR_UNKNOWN)
 	{
-	    def = (int)tv_get_number_chk(&argvars[2], &error);
-	    if (argvars[3].v_type != VAR_UNKNOWN)
+	    def = (ціле)tv_get_number_chk(&argvars[2], &error);
+	    якщо (argvars[3].v_type != VAR_UNKNOWN)
 	    {
 		typestr = tv_get_string_buf_chk(&argvars[3], buf2);
-		if (typestr == NULL)
+		якщо (typestr == NULL)
 		    error = TRUE;
-		else
+		інакше
 		{
 		    switch (TOUPPER_ASC(*typestr))
 		    {
@@ -4786,10 +4786,10 @@ f_confirm(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
 	}
     }
 
-    if (buttons == NULL || *buttons == NUL)
+    якщо (buttons == NULL || *buttons == NUL)
 	buttons = (char_u *)_("&Ok");
 
-    if (!error)
+    якщо (!error)
 	rettv->vval.v_number = do_dialog(type, NULL, message, buttons,
 							    def, NULL, FALSE);
 #endif
@@ -4810,65 +4810,65 @@ f_copy(typval_T *argvars, typval_T *rettv)
  * Otherwise use the column number as a byte offset.
  */
     static void
-set_cursorpos(typval_T *argvars, typval_T *rettv, int charcol)
+set_cursorpos(typval_T *argvars, typval_T *rettv, ціле charcol)
 {
     long	lnum, col;
     long	coladd = 0;
-    int		set_curswant = TRUE;
+    ціле		set_curswant = TRUE;
 
-    if (in_vim9script()
+    якщо (in_vim9script()
 	    && (check_for_string_or_number_or_list_arg(argvars, 0) == FAIL
 		|| check_for_opt_number_arg(argvars, 1) == FAIL
 		|| (argvars[1].v_type != VAR_UNKNOWN
 		    && check_for_opt_number_arg(argvars, 2) == FAIL)))
-	return;
+	повернути;
 
     rettv->vval.v_number = -1;
-    if (argvars[0].v_type == VAR_LIST)
+    якщо (argvars[0].v_type == VAR_LIST)
     {
 	pos_T	    pos;
 	colnr_T	    curswant = -1;
 
-	if (list2fpos(argvars, &pos, NULL, &curswant, charcol) == FAIL)
+	якщо (list2fpos(argvars, &pos, NULL, &curswant, charcol) == FAIL)
 	{
 	    emsg(_(e_invalid_argument));
-	    return;
+	    повернути;
 	}
 	lnum = pos.lnum;
 	col = pos.col;
 	coladd = pos.coladd;
-	if (curswant >= 0)
+	якщо (curswant >= 0)
 	{
 	    curwin->w_curswant = curswant - 1;
 	    set_curswant = FALSE;
 	}
     }
-    else if ((argvars[0].v_type == VAR_NUMBER
+    інакше якщо ((argvars[0].v_type == VAR_NUMBER
 					    || argvars[0].v_type == VAR_STRING)
 	    && (argvars[1].v_type == VAR_NUMBER
 					   || argvars[1].v_type == VAR_STRING))
     {
 	lnum = tv_get_lnum(argvars);
-	if (lnum < 0)
+	якщо (lnum < 0)
 	    semsg(_(e_invalid_argument_str), tv_get_string(&argvars[0]));
-	else if (lnum == 0)
+	інакше якщо (lnum == 0)
 	    lnum = curwin->w_cursor.lnum;
 	col = (long)tv_get_number_chk(&argvars[1], NULL);
-	if (charcol)
+	якщо (charcol)
 	    col = buf_charidx_to_byteidx(curbuf, lnum, col) + 1;
-	if (argvars[2].v_type != VAR_UNKNOWN)
+	якщо (argvars[2].v_type != VAR_UNKNOWN)
 	    coladd = (long)tv_get_number_chk(&argvars[2], NULL);
     }
-    else
+    інакше
     {
 	emsg(_(e_invalid_argument));
-	return;
+	повернути;
     }
-    if (lnum < 0 || col < 0 || coladd < 0)
-	return;		// type error; errmsg already given
-    if (lnum > 0)
+    якщо (lnum < 0 || col < 0 || coladd < 0)
+	повернути;		// type error; errmsg already given
+    якщо (lnum > 0)
 	curwin->w_cursor.lnum = lnum;
-    if (col != MAXCOL && --col < 0)
+    якщо (col != MAXCOL && --col < 0)
 	col = 0;
     curwin->w_cursor.col = col;
     curwin->w_cursor.coladd = coladd;
@@ -4876,7 +4876,7 @@ set_cursorpos(typval_T *argvars, typval_T *rettv, int charcol)
     // Make sure the cursor is in a valid position.
     check_cursor();
     // Correct cursor for multi-byte character.
-    if (has_mbyte)
+    якщо (has_mbyte)
 	mb_adjust_cursor();
 
     curwin->w_set_curswant = set_curswant;
@@ -4903,22 +4903,22 @@ f_cursor(typval_T *argvars, typval_T *rettv)
     static void
 f_debugbreak(typval_T *argvars, typval_T *rettv)
 {
-    int		pid;
+    ціле		pid;
 
     rettv->vval.v_number = FAIL;
-    if (in_vim9script() && check_for_number_arg(argvars, 0) == FAIL)
-	return;
+    якщо (in_vim9script() && check_for_number_arg(argvars, 0) == FAIL)
+	повернути;
 
-    pid = (int)tv_get_number(&argvars[0]);
-    if (pid == 0)
+    pid = (ціле)tv_get_number(&argvars[0]);
+    якщо (pid == 0)
     {
 	emsg(_(e_invalid_argument));
-	return;
+	повернути;
     }
 
     HANDLE hProcess = OpenProcess(PROCESS_ALL_ACCESS, 0, pid);
-    if (hProcess == NULL)
-	return;
+    якщо (hProcess == NULL)
+	повернути;
 
     DebugBreakProcess(hProcess);
     CloseHandle(hProcess);
@@ -4934,10 +4934,10 @@ f_deepcopy(typval_T *argvars, typval_T *rettv)
 {
     varnumber_T	noref = 0;
 
-    if (check_for_opt_bool_arg(argvars, 1) == FAIL)
-	return;
+    якщо (check_for_opt_bool_arg(argvars, 1) == FAIL)
+	повернути;
 
-    if (argvars[1].v_type != VAR_UNKNOWN)
+    якщо (argvars[1].v_type != VAR_UNKNOWN)
 	noref = tv_get_bool_chk(&argvars[1], NULL);
 
     item_copy(&argvars[0], rettv, TRUE, TRUE, noref == 0 ? get_copyID() : 0);
@@ -4960,14 +4960,14 @@ f_echoraw(typval_T *argvars, typval_T *rettv UNUSED)
 {
     char_u *str;
 
-    if (check_secure())
-	return;
+    якщо (check_secure())
+	повернути;
 
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    якщо (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+	повернути;
 
     str = tv_get_string_chk(&argvars[0]);
-    if (str != NULL && *str != NUL)
+    якщо (str != NULL && *str != NUL)
     {
 	out_str(str);
 	out_flush();
@@ -4980,7 +4980,7 @@ f_echoraw(typval_T *argvars, typval_T *rettv UNUSED)
     static void
 f_empty(typval_T *argvars, typval_T *rettv)
 {
-    int		n = FALSE;
+    ціле		n = FALSE;
 
     switch (argvars[0].v_type)
     {
@@ -5061,44 +5061,44 @@ f_empty(typval_T *argvars, typval_T *rettv)
     static void
 f_environ(typval_T *argvars UNUSED, typval_T *rettv)
 {
-#if !defined(AMIGA)
-    int			i = 0;
+#якщо !defined(AMIGA)
+    ціле			i = 0;
     char_u		*entry, *value;
-# if defined (MSWIN)
-#  if !defined(_UCRT)
+# якщо defined (MSWIN)
+#  якщо !defined(_UCRT)
     extern wchar_t	**_wenviron;
 #  endif
-# else
+# інакше
     extern char		**environ;
 # endif
 
-    if (rettv_dict_alloc(rettv) == FAIL)
-	return;
+    якщо (rettv_dict_alloc(rettv) == FAIL)
+	повернути;
 
 # ifdef MSWIN
-    if (*_wenviron == NULL)
-	return;
-# else
-    if (*environ == NULL)
-	return;
+    якщо (*_wenviron == NULL)
+	повернути;
+# інакше
+    якщо (*environ == NULL)
+	повернути;
 # endif
 
-    for (i = 0; ; ++i)
+    для (i = 0; ; ++i)
     {
 # ifdef MSWIN
 	short_u		*p;
 
-	if ((p = (short_u *)_wenviron[i]) == NULL)
-	    return;
+	якщо ((p = (short_u *)_wenviron[i]) == NULL)
+	    повернути;
 	entry = utf16_to_enc(p, NULL);
-# else
-	if ((entry = (char_u *)environ[i]) == NULL)
-	    return;
+# інакше
+	якщо ((entry = (char_u *)environ[i]) == NULL)
+	    повернути;
 	entry = vim_strsave(entry);
 # endif
-	if (entry == NULL) // out of memory
-	    return;
-	if ((value = vim_strchr(entry, '=')) == NULL)
+	якщо (entry == NULL) // out of memory
+	    повернути;
+	якщо ((value = vim_strchr(entry, '=')) == NULL)
 	{
 	    vim_free(entry);
 	    continue;
@@ -5116,21 +5116,21 @@ f_environ(typval_T *argvars UNUSED, typval_T *rettv)
     static void
 f_err_teapot(typval_T *argvars, typval_T *rettv UNUSED)
 {
-    if (argvars[0].v_type != VAR_UNKNOWN)
+    якщо (argvars[0].v_type != VAR_UNKNOWN)
     {
-	if (argvars[0].v_type == VAR_STRING)
+	якщо (argvars[0].v_type == VAR_STRING)
 	{
 	    char_u *s = tv_get_string_strict(&argvars[0]);
-	    if (*skipwhite(s) == NUL)
-		return;
+	    якщо (*skipwhite(s) == NUL)
+		повернути;
 	}
 
-	int err = FALSE;
-	int do_503 = eval_expr_to_bool(&argvars[0], &err);
-	if (!err && do_503)
+	ціле err = FALSE;
+	ціле do_503 = eval_expr_to_bool(&argvars[0], &err);
+	якщо (!err && do_503)
 	{
 	    emsg(_(e_coffee_currently_not_available));
-	    return;
+	    повернути;
 	}
     }
 
@@ -5145,10 +5145,10 @@ f_escape(typval_T *argvars, typval_T *rettv)
 {
     char_u	buf[NUMBUFLEN];
 
-    if (in_vim9script()
+    якщо (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_string_arg(argvars, 1) == FAIL))
-	return;
+	повернути;
 
     rettv->vval.v_string = vim_strsave_escaped(tv_get_string(&argvars[0]),
 					 tv_get_string_buf(&argvars[1], buf));
@@ -5163,23 +5163,23 @@ f_eval(typval_T *argvars, typval_T *rettv)
 {
     char_u	*s, *p;
 
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    якщо (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+	повернути;
 
     s = tv_get_string_chk(&argvars[0]);
-    if (s != NULL)
+    якщо (s != NULL)
 	s = skipwhite(s);
 
     p = s;
-    if (s == NULL || eval1(&s, rettv, &EVALARG_EVALUATE) == FAIL)
+    якщо (s == NULL || eval1(&s, rettv, &EVALARG_EVALUATE) == FAIL)
     {
-	if (p != NULL && !aborting())
+	якщо (p != NULL && !aborting())
 	    semsg(_(e_invalid_expression_str), p);
 	need_clr_eos = FALSE;
 	rettv->v_type = VAR_NUMBER;
 	rettv->vval.v_number = 0;
     }
-    else if (*s != NUL)
+    інакше якщо (*s != NUL)
 	semsg(_(e_trailing_characters_str), s);
 }
 
@@ -5198,23 +5198,23 @@ static garray_T	redir_execute_ga;
  * Append "value[value_len]" to the execute() output.
  */
     void
-execute_redir_str(char_u *value, int value_len)
+execute_redir_str(char_u *value, ціле value_len)
 {
-    int		len;
+    ціле		len;
 
-    if (value_len == -1)
-	len = (int)STRLEN(value);	// Append the entire string
-    else
+    якщо (value_len == -1)
+	len = (ціле)STRLEN(value);	// Append the entire string
+    інакше
 	len = value_len;		// Append only "value_len" characters
-    if (ga_grow(&redir_execute_ga, len) == FAIL)
-	return;
+    якщо (ga_grow(&redir_execute_ga, len) == FAIL)
+	повернути;
 
     mch_memmove((char *)redir_execute_ga.ga_data
 	    + redir_execute_ga.ga_len, value, len);
     redir_execute_ga.ga_len += len;
 }
 
-#if defined(FEAT_LUA)
+#якщо defined(FEAT_LUA)
 /*
  * Get next line from a string containing NL separated lines.
  * Called by do_cmdline() to get the next line.
@@ -5222,9 +5222,9 @@ execute_redir_str(char_u *value, int value_len)
  */
     static char_u *
 get_str_line(
-    int	    c UNUSED,
+    ціле	    c UNUSED,
     void    *cookie,
-    int	    indent UNUSED,
+    ціле	    indent UNUSED,
     getline_opt_T options UNUSED)
 {
     char_u	*start = *(char_u **)cookie;
@@ -5232,19 +5232,19 @@ get_str_line(
     char_u	*p;
 
     p = start;
-    if (p == NULL || *p == NUL)
-	return NULL;
+    якщо (p == NULL || *p == NUL)
+	повернути NULL;
     p = vim_strchr(p, '\n');
-    if (p == NULL)
+    якщо (p == NULL)
 	line = vim_strsave(start);
-    else
+    інакше
     {
 	line = vim_strnsave(start, p - start);
 	p++;
     }
 
     *(char_u **)cookie = p;
-    return line;
+    повернути line;
 }
 
 /*
@@ -5265,9 +5265,9 @@ execute_cmds_from_string(char_u *str)
  */
     char_u *
 get_list_line(
-    int	    c UNUSED,
+    ціле	    c UNUSED,
     void    *cookie,
-    int	    indent UNUSED,
+    ціле	    indent UNUSED,
     getline_opt_T options UNUSED)
 {
     listitem_T **p = (listitem_T **)cookie;
@@ -5275,91 +5275,91 @@ get_list_line(
     char_u	buf[NUMBUFLEN];
     char_u	*s;
 
-    if (item == NULL)
-	return NULL;
+    якщо (item == NULL)
+	повернути NULL;
     s = tv_get_string_buf_chk(&item->li_tv, buf);
     *p = item->li_next;
-    return s == NULL ? NULL : vim_strsave(s);
+    повернути s == NULL ? NULL : vim_strsave(s);
 }
 
 /*
  * "execute()" function
  */
     void
-execute_common(typval_T *argvars, typval_T *rettv, int arg_off)
+execute_common(typval_T *argvars, typval_T *rettv, ціле arg_off)
 {
     char_u	*cmd = NULL;
     list_T	*list = NULL;
-    int		save_msg_silent = msg_silent;
-    int		save_emsg_silent = emsg_silent;
-    int		save_emsg_noredir = emsg_noredir;
-    int		save_redir_execute = redir_execute;
-    int		save_redir_off = redir_off;
+    ціле		save_msg_silent = msg_silent;
+    ціле		save_emsg_silent = emsg_silent;
+    ціле		save_emsg_noredir = emsg_noredir;
+    ціле		save_redir_execute = redir_execute;
+    ціле		save_redir_off = redir_off;
     garray_T	save_ga;
-    int		save_msg_col = msg_col;
-    int		save_sticky_cmdmod_flags = sticky_cmdmod_flags;
-    int		echo_output = FALSE;
+    ціле		save_msg_col = msg_col;
+    ціле		save_sticky_cmdmod_flags = sticky_cmdmod_flags;
+    ціле		echo_output = FALSE;
 
     rettv->vval.v_string = NULL;
     rettv->v_type = VAR_STRING;
 
-    if (argvars[arg_off].v_type == VAR_LIST)
+    якщо (argvars[arg_off].v_type == VAR_LIST)
     {
 	list = argvars[arg_off].vval.v_list;
-	if (list == NULL || list->lv_len == 0)
+	якщо (list == NULL || list->lv_len == 0)
 	    // empty list, no commands, empty output
-	    return;
+	    повернути;
 	++list->lv_refcount;
     }
-    else if (argvars[arg_off].v_type == VAR_JOB
+    інакше якщо (argvars[arg_off].v_type == VAR_JOB
 	    || argvars[arg_off].v_type == VAR_CHANNEL)
     {
 	semsg(_(e_using_invalid_value_as_string_str),
 				       vartype_name(argvars[arg_off].v_type));
-	return;
+	повернути;
     }
-    else
+    інакше
     {
 	cmd = tv_get_string_chk(&argvars[arg_off]);
-	if (cmd == NULL)
-	    return;
+	якщо (cmd == NULL)
+	    повернути;
     }
 
-    if (argvars[arg_off + 1].v_type != VAR_UNKNOWN)
+    якщо (argvars[arg_off + 1].v_type != VAR_UNKNOWN)
     {
 	char_u	buf[NUMBUFLEN];
 	char_u  *s = tv_get_string_buf_chk_strict(&argvars[arg_off + 1], buf,
 							      in_vim9script());
 
-	if (s == NULL)
-	    return;
-	if (*s == NUL)
+	якщо (s == NULL)
+	    повернути;
+	якщо (*s == NUL)
 	    echo_output = TRUE;
-	if (STRNCMP(s, "silent", 6) == 0)
+	якщо (STRNCMP(s, "silent", 6) == 0)
 	    ++msg_silent;
-	if (STRCMP(s, "silent!") == 0)
+	якщо (STRCMP(s, "silent!") == 0)
 	{
 	    emsg_silent = TRUE;
 	    emsg_noredir = TRUE;
 	}
     }
-    else
+    інакше
 	++msg_silent;
 
-    if (redir_execute)
+    якщо (redir_execute)
 	save_ga = redir_execute_ga;
     ga_init2(&redir_execute_ga, sizeof(char), 500);
     redir_execute = TRUE;
     redir_off = FALSE;
-    if (!echo_output)
+    якщо (!echo_output)
 	msg_col = 0;  // prevent leading spaces
 
     // For "legacy call execute('cmd')" and "vim9cmd execute('cmd')" apply the
     // command modifiers to "cmd".
     sticky_cmdmod_flags = cmdmod.cmod_flags & (CMOD_LEGACY | CMOD_VIM9CMD);
-    if (cmd != NULL)
+    якщо (cmd != NULL)
 	do_cmdline_cmd(cmd);
-    else
+    інакше
     {
 	listitem_T	*item;
 
@@ -5372,12 +5372,12 @@ execute_common(typval_T *argvars, typval_T *rettv, int arg_off)
     sticky_cmdmod_flags = save_sticky_cmdmod_flags;
 
     // Need to append a NUL to the result.
-    if (ga_grow(&redir_execute_ga, 1) == OK)
+    якщо (ga_grow(&redir_execute_ga, 1) == OK)
     {
 	((char *)redir_execute_ga.ga_data)[redir_execute_ga.ga_len] = NUL;
 	rettv->vval.v_string = redir_execute_ga.ga_data;
     }
-    else
+    інакше
     {
 	ga_clear(&redir_execute_ga);
 	rettv->vval.v_string = NULL;
@@ -5387,16 +5387,16 @@ execute_common(typval_T *argvars, typval_T *rettv, int arg_off)
     emsg_noredir = save_emsg_noredir;
 
     redir_execute = save_redir_execute;
-    if (redir_execute)
+    якщо (redir_execute)
 	redir_execute_ga = save_ga;
     redir_off = save_redir_off;
 
     // "silent reg" or "silent echo x" leaves msg_col somewhere in the line.
-    if (echo_output)
+    якщо (echo_output)
 	// When not working silently: put it in column zero.  A following
 	// "echon" will overwrite the message, unavoidably.
 	msg_col = 0;
-    else
+    інакше
 	// When working silently: Put it back where it was, since nothing
 	// should have been written.
 	msg_col = save_msg_col;
@@ -5408,10 +5408,10 @@ execute_common(typval_T *argvars, typval_T *rettv, int arg_off)
     static void
 f_execute(typval_T *argvars, typval_T *rettv)
 {
-    if (in_vim9script()
+    якщо (in_vim9script()
 	    && (check_for_string_or_list_arg(argvars, 0) == FAIL
 		|| check_for_opt_string_arg(argvars, 1) == FAIL))
-	return;
+	повернути;
 
     execute_common(argvars, rettv, 0);
 }
@@ -5423,52 +5423,52 @@ f_execute(typval_T *argvars, typval_T *rettv)
 f_exists(typval_T *argvars, typval_T *rettv)
 {
     char_u	*p;
-    int		n = FALSE;
+    ціле		n = FALSE;
 
-    if (in_vim9script() && check_for_nonempty_string_arg(argvars, 0) == FAIL)
-	return;
+    якщо (in_vim9script() && check_for_nonempty_string_arg(argvars, 0) == FAIL)
+	повернути;
 
     p = tv_get_string(&argvars[0]);
-    if (*p == '$')			// environment variable
+    якщо (*p == '$')			// environment variable
     {
 	// first try "normal" environment variables (fast)
-	if (mch_getenv(p + 1) != NULL)
+	якщо (mch_getenv(p + 1) != NULL)
 	    n = TRUE;
-	else
+	інакше
 	{
 	    // try expanding things like $VIM and ${HOME}
 	    p = expand_env_save(p);
-	    if (p != NULL && *p != '$')
+	    якщо (p != NULL && *p != '$')
 		n = TRUE;
 	    vim_free(p);
 	}
     }
-    else if (*p == '&' || *p == '+')			// option
+    інакше якщо (*p == '&' || *p == '+')			// option
     {
 	n = (eval_option(&p, NULL, TRUE) == OK);
-	if (*skipwhite(p) != NUL)
+	якщо (*skipwhite(p) != NUL)
 	    n = FALSE;			// trailing garbage
     }
-    else if (*p == '*')			// internal or user defined function
+    інакше якщо (*p == '*')			// internal or user defined function
     {
 	n = function_exists(p + 1, FALSE);
     }
-    else if (*p == '?')			// internal function only
+    інакше якщо (*p == '?')			// internal function only
     {
 	n = has_internal_func_name(p + 1);
     }
-    else if (*p == ':')
+    інакше якщо (*p == ':')
     {
 	n = cmd_exists(p + 1);
     }
-    else if (*p == '#')
+    інакше якщо (*p == '#')
     {
-	if (p[1] == '#')
+	якщо (p[1] == '#')
 	    n = autocmd_supported(p + 2);
-	else
+	інакше
 	    n = au_exists(p + 1);
     }
-    else				// internal variable
+    інакше				// internal variable
     {
 	n = var_exists(p);
     }
@@ -5490,20 +5490,20 @@ f_expand(typval_T *argvars, typval_T *rettv)
 {
     char_u	*s;
     size_t	len;
-    int		options = WILD_SILENT|WILD_USE_NL|WILD_LIST_NOTFOUND;
+    ціле		options = WILD_SILENT|WILD_USE_NL|WILD_LIST_NOTFOUND;
     expand_T	xpc;
-    int		error = FALSE;
+    ціле		error = FALSE;
     char_u	*result;
 #ifdef BACKSLASH_IN_FILENAME
     char_u	*p_csl_save = p_csl;
 #endif
 
-    if (in_vim9script()
+    якщо (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_opt_bool_arg(argvars, 1) == FAIL
 		|| (argvars[1].v_type != VAR_UNKNOWN
 		    && check_for_opt_bool_arg(argvars, 2) == FAIL)))
-	return;
+	повернути;
 
 #ifdef BACKSLASH_IN_FILENAME
     // avoid using 'completeslash' here
@@ -5511,58 +5511,58 @@ f_expand(typval_T *argvars, typval_T *rettv)
 #endif
 
     rettv->v_type = VAR_STRING;
-    if (argvars[1].v_type != VAR_UNKNOWN
+    якщо (argvars[1].v_type != VAR_UNKNOWN
 	    && argvars[2].v_type != VAR_UNKNOWN
 	    && tv_get_bool_chk(&argvars[2], &error)
 	    && !error)
 	rettv_list_set(rettv, NULL);
 
     s = tv_get_string(&argvars[0]);
-    if (*s == '%' || *s == '#' || *s == '<')
+    якщо (*s == '%' || *s == '#' || *s == '<')
     {
 	char	*errormsg = NULL;
 
-	if (p_verbose == 0)
+	якщо (p_verbose == 0)
 	    ++emsg_off;
 	result = eval_vars(s, s, &len, NULL, &errormsg, NULL, FALSE);
-	if (p_verbose == 0)
+	якщо (p_verbose == 0)
 	    --emsg_off;
-	else if (errormsg != NULL)
+	інакше якщо (errormsg != NULL)
 	    emsg(errormsg);
-	if (rettv->v_type == VAR_LIST)
+	якщо (rettv->v_type == VAR_LIST)
 	{
-	    if (rettv_list_alloc(rettv) == OK && result != NULL)
+	    якщо (rettv_list_alloc(rettv) == OK && result != NULL)
 		list_append_string(rettv->vval.v_list, result, -1);
 	    vim_free(result);
 	}
-	else
+	інакше
 	    rettv->vval.v_string = result;
     }
-    else
+    інакше
     {
 	// When the optional second argument is non-zero, don't remove matches
 	// for 'wildignore' and don't put matches for 'suffixes' at the end.
-	if (argvars[1].v_type != VAR_UNKNOWN
+	якщо (argvars[1].v_type != VAR_UNKNOWN
 				    && tv_get_bool_chk(&argvars[1], &error))
 	    options |= WILD_KEEP_ALL;
-	if (!error)
+	якщо (!error)
 	{
 	    ExpandInit(&xpc);
 	    xpc.xp_context = EXPAND_FILES;
-	    if (p_wic)
+	    якщо (p_wic)
 		options += WILD_ICASE;
-	    if (rettv->v_type == VAR_STRING)
+	    якщо (rettv->v_type == VAR_STRING)
 		rettv->vval.v_string = ExpandOne(&xpc, s, NULL,
 							   options, WILD_ALL);
-	    else if (rettv_list_alloc(rettv) == OK)
+	    інакше якщо (rettv_list_alloc(rettv) == OK)
 	    {
 		ExpandOne(&xpc, s, NULL, options, WILD_ALL_KEEP);
-		for (int i = 0; i < xpc.xp_numfiles; i++)
+		для (ціле i = 0; i < xpc.xp_numfiles; i++)
 		    list_append_string(rettv->vval.v_list, xpc.xp_files[i], -1);
 		ExpandCleanup(&xpc);
 	    }
 	}
-	else
+	інакше
 	    rettv->vval.v_string = NULL;
     }
 #ifdef BACKSLASH_IN_FILENAME
@@ -5580,14 +5580,14 @@ f_expandcmd(typval_T *argvars, typval_T *rettv)
     exarg_T	eap;
     char_u	*cmdstr;
     char	*errormsg = NULL;
-    int		emsgoff = TRUE;
+    ціле		emsgoff = TRUE;
 
-    if (in_vim9script()
+    якщо (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_opt_dict_arg(argvars, 1) == FAIL))
-	return;
+	повернути;
 
-    if (argvars[1].v_type == VAR_DICT
+    якщо (argvars[1].v_type == VAR_DICT
 		&& dict_get_bool(argvars[1].vval.v_dict, "errmsg", VVAL_FALSE))
 	emsgoff = FALSE;
 
@@ -5602,12 +5602,12 @@ f_expandcmd(typval_T *argvars, typval_T *rettv)
     eap.nextcmd = NULL;
     eap.cmdidx = CMD_USER;
 
-    if (emsgoff)
+    якщо (emsgoff)
 	++emsg_off;
-    if (expand_filename(&eap, &cmdstr, &errormsg) == FAIL)
-	if (!emsgoff && errormsg != NULL && *errormsg != NUL)
+    якщо (expand_filename(&eap, &cmdstr, &errormsg) == FAIL)
+	якщо (!emsgoff && errormsg != NULL && *errormsg != NUL)
 	    emsg(errormsg);
-    if (emsgoff)
+    якщо (emsgoff)
 	--emsg_off;
 
     rettv->vval.v_string = cmdstr;
@@ -5619,33 +5619,33 @@ f_expandcmd(typval_T *argvars, typval_T *rettv)
     static void
 f_feedkeys(typval_T *argvars, typval_T *rettv UNUSED)
 {
-    int		remap = TRUE;
-    int		insert = FALSE;
+    ціле		remap = TRUE;
+    ціле		insert = FALSE;
     char_u	*keys, *flags;
     char_u	nbuf[NUMBUFLEN];
-    int		typed = FALSE;
-    int		execute = FALSE;
-    int		context = FALSE;
-    int		dangerous = FALSE;
-    int		lowlevel = FALSE;
+    ціле		typed = FALSE;
+    ціле		execute = FALSE;
+    ціле		context = FALSE;
+    ціле		dangerous = FALSE;
+    ціле		lowlevel = FALSE;
 
     // This is not allowed in the sandbox.  If the commands would still be
     // executed in the sandbox it would be OK, but it probably happens later,
     // when "sandbox" is no longer set.
-    if (check_secure())
-	return;
+    якщо (check_secure())
+	повернути;
 
-    if (in_vim9script()
+    якщо (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_opt_string_arg(argvars, 1) == FAIL))
-	return;
+	повернути;
 
     keys = tv_get_string(&argvars[0]);
 
-    if (argvars[1].v_type != VAR_UNKNOWN)
+    якщо (argvars[1].v_type != VAR_UNKNOWN)
     {
 	flags = tv_get_string_buf(&argvars[1], nbuf);
-	for ( ; *flags != NUL; ++flags)
+	для ( ; *flags != NUL; ++flags)
 	{
 	    switch (*flags)
 	    {
@@ -5661,9 +5661,9 @@ f_feedkeys(typval_T *argvars, typval_T *rettv UNUSED)
 	}
     }
 
-    if (*keys != NUL || execute)
+    якщо (*keys != NUL || execute)
     {
-	if (lowlevel
+	якщо (lowlevel
 #ifdef FEAT_VTP
 		&& (!is_term_win32()
 		    || (keys[0] == 3 && ctrl_c_interrupts && typed))
@@ -5673,32 +5673,32 @@ f_feedkeys(typval_T *argvars, typval_T *rettv UNUSED)
 #ifdef USE_INPUT_BUF
 	    ch_log(NULL, "feedkeys() lowlevel: %s", keys);
 
-	    int len = (int)STRLEN(keys);
-	    for (int idx = 0; idx < len; ++idx)
+	    ціле len = (ціле)STRLEN(keys);
+	    для (ціле idx = 0; idx < len; ++idx)
 	    {
 		// if a CTRL-C was typed, set got_int, similar to what
 		// happens in fill_input_buf()
-		if (keys[idx] == 3 && ctrl_c_interrupts && typed)
+		якщо (keys[idx] == 3 && ctrl_c_interrupts && typed)
 		    got_int = TRUE;
 		add_to_input_buf(keys + idx, 1);
 	    }
-#else
+#інакше
 	    emsg(_(e_lowlevel_input_not_supported));
 #endif
 	}
-	else
+	інакше
 	{
 	    // Need to escape K_SPECIAL and CSI before putting the string in
 	    // the typeahead buffer.
 	    char_u *keys_esc = vim_strsave_escape_csi(keys);
-	    if (keys_esc == NULL)
-		return;
+	    якщо (keys_esc == NULL)
+		повернути;
 
 	    ch_log(NULL, "feedkeys(%s): %s", typed ? "typed" : "", keys);
 
 	    ins_typebuf(keys_esc, (remap ? REMAP_YES : REMAP_NONE),
 				   insert ? 0 : typebuf.tb_len, !typed, FALSE);
-	    if (vgetc_busy
+	    якщо (vgetc_busy
 #ifdef FEAT_TIMERS
 		    || timer_busy
 #endif
@@ -5708,9 +5708,9 @@ f_feedkeys(typval_T *argvars, typval_T *rettv UNUSED)
 	    vim_free(keys_esc);
 	}
 
-	if (execute)
+	якщо (execute)
 	{
-	    int		save_msg_scroll = msg_scroll;
+	    ціле		save_msg_scroll = msg_scroll;
 	    sctx_T	save_sctx;
 
 	    // Avoid a 1 second delay when the keys start Insert mode.
@@ -5718,14 +5718,14 @@ f_feedkeys(typval_T *argvars, typval_T *rettv UNUSED)
 
 	    ch_log(NULL, "feedkeys() executing");
 
-	    if (context)
+	    якщо (context)
 	    {
 		save_sctx = current_sctx;
 		current_sctx.sc_sid = 0;
 		current_sctx.sc_version = 0;
 	    }
 
-	    if (!dangerous)
+	    якщо (!dangerous)
 	    {
 		++ex_normal_busy;
 		++in_feedkeys;
@@ -5733,7 +5733,7 @@ f_feedkeys(typval_T *argvars, typval_T *rettv UNUSED)
 	    ++allow_osc_key;
 	    exec_normal(TRUE, lowlevel, TRUE);
 	    --allow_osc_key;
-	    if (!dangerous)
+	    якщо (!dangerous)
 	    {
 		--ex_normal_busy;
 		--in_feedkeys;
@@ -5741,7 +5741,7 @@ f_feedkeys(typval_T *argvars, typval_T *rettv UNUSED)
 
 	    msg_scroll |= save_msg_scroll;
 
-	    if (context)
+	    якщо (context)
 		current_sctx = save_sctx;
 	}
     }
@@ -5753,8 +5753,8 @@ f_feedkeys(typval_T *argvars, typval_T *rettv UNUSED)
     static void
 f_fnameescape(typval_T *argvars, typval_T *rettv)
 {
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    якщо (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+	повернути;
 
     rettv->vval.v_string = vim_strsave_fnameescape(
 					 tv_get_string(&argvars[0]), VSE_NONE);
@@ -5768,13 +5768,13 @@ f_fnameescape(typval_T *argvars, typval_T *rettv)
 f_foreground(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
 {
 #ifdef FEAT_GUI
-    if (gui.in_use)
+    якщо (gui.in_use)
     {
 	gui_mch_set_foreground();
-	return;
+	повернути;
     }
 #endif
-#if defined(MSWIN) && (!defined(FEAT_GUI) || defined(VIMDLL))
+#якщо defined(MSWIN) && (!defined(FEAT_GUI) || defined(VIMDLL))
     win32_set_foreground();
 #endif
 }
@@ -5784,125 +5784,125 @@ f_foreground(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
  * "funcref()" function
  */
     static void
-common_function(typval_T *argvars, typval_T *rettv, int is_funcref)
+common_function(typval_T *argvars, typval_T *rettv, ціле is_funcref)
 {
     char_u	*s;
     char_u	*name;
-    int		use_string = FALSE;
+    ціле		use_string = FALSE;
     partial_T   *arg_pt = NULL;
     char_u	*trans_name = NULL;
-    int		is_global = FALSE;
+    ціле		is_global = FALSE;
     char_u	*start_bracket = NULL;
 
-    if (in_vim9script()
+    якщо (in_vim9script()
 	    && (check_for_string_or_func_arg(argvars, 0) == FAIL
 		|| check_for_opt_list_arg(argvars, 1) == FAIL
 		|| (argvars[1].v_type != VAR_UNKNOWN
 		    && check_for_opt_dict_arg(argvars, 2) == FAIL)))
-	return;
+	повернути;
 
-    if (argvars[0].v_type == VAR_FUNC)
+    якщо (argvars[0].v_type == VAR_FUNC)
     {
 	// function(MyFunc, [arg], dict)
 	s = argvars[0].vval.v_string;
     }
-    else if (argvars[0].v_type == VAR_PARTIAL
+    інакше якщо (argvars[0].v_type == VAR_PARTIAL
 					 && argvars[0].vval.v_partial != NULL)
     {
 	// function(dict.MyFunc, [arg])
 	arg_pt = argvars[0].vval.v_partial;
 	s = partial_name(arg_pt);
     }
-    else
+    інакше
     {
 	// function('MyFunc', [arg], dict)
 	s = tv_get_string(&argvars[0]);
 	use_string = TRUE;
     }
-    if (s == NULL)
+    якщо (s == NULL)
     {
 	semsg(_(e_invalid_argument_str), "NULL");
-	return;
+	повернути;
     }
 
-    if ((use_string && vim_strchr(s, AUTOLOAD_CHAR) == NULL) || is_funcref)
+    якщо ((use_string && vim_strchr(s, AUTOLOAD_CHAR) == NULL) || is_funcref)
     {
 	name = s;
 	trans_name = save_function_name(&name, &is_global, FALSE,
 		   TFN_INT | TFN_QUIET | TFN_NO_AUTOLOAD | TFN_NO_DEREF, NULL);
-	if (*name == '<')
+	якщо (*name == '<')
 	{
 	    // generic function
 	    start_bracket = name;
-	    if (skip_generic_func_type_args(&name) == FAIL)
+	    якщо (skip_generic_func_type_args(&name) == FAIL)
 		goto theend;
 	}
-	if (*name != NUL)
+	якщо (*name != NUL)
 	    s = NULL;
     }
 
-    if (s == NULL || *s == NUL || (use_string && VIM_ISDIGIT(*s))
+    якщо (s == NULL || *s == NUL || (use_string && VIM_ISDIGIT(*s))
 					 || (is_funcref && trans_name == NULL))
 	semsg(_(e_invalid_argument_str),
 				  use_string ? tv_get_string(&argvars[0]) : s);
     // Don't check an autoload name for existence here.
-    else if (trans_name != NULL && (is_funcref
+    інакше якщо (trans_name != NULL && (is_funcref
 			 ? find_func(trans_name, is_global) == NULL
 			 : !translated_function_exists(trans_name, is_global)))
 	semsg(_(e_unknown_function_str_2), s);
-    else
+    інакше
     {
-	int	dict_idx = 0;
-	int	arg_idx = 0;
+	ціле	dict_idx = 0;
+	ціле	arg_idx = 0;
 	list_T	*list = NULL;
 
-	if (STRNCMP(s, "s:", 2) == 0 || STRNCMP(s, "<SID>", 5) == 0)
+	якщо (STRNCMP(s, "s:", 2) == 0 || STRNCMP(s, "<SID>", 5) == 0)
 	    // Expand s: and <SID> into <SNR>nr_, so that the function can
 	    // also be called from another script. Using trans_function_name()
 	    // would also work, but some plugins depend on the name being
 	    // printable text.
 	    name = get_scriptlocal_funcname(s);
-	else if (trans_name != NULL && *trans_name == K_SPECIAL)
+	інакше якщо (trans_name != NULL && *trans_name == K_SPECIAL)
 	    name = alloc_printable_func_name(trans_name);
-	else
+	інакше
 	    name = vim_strsave(s);
 
-	if (argvars[1].v_type != VAR_UNKNOWN)
+	якщо (argvars[1].v_type != VAR_UNKNOWN)
 	{
-	    if (argvars[2].v_type != VAR_UNKNOWN)
+	    якщо (argvars[2].v_type != VAR_UNKNOWN)
 	    {
 		// function(name, [args], dict)
 		arg_idx = 1;
 		dict_idx = 2;
 	    }
-	    else if (argvars[1].v_type == VAR_DICT)
+	    інакше якщо (argvars[1].v_type == VAR_DICT)
 		// function(name, dict)
 		dict_idx = 1;
-	    else
+	    інакше
 		// function(name, [args])
 		arg_idx = 1;
-	    if (dict_idx > 0)
+	    якщо (dict_idx > 0)
 	    {
-		if (check_for_dict_arg(argvars, dict_idx) == FAIL)
+		якщо (check_for_dict_arg(argvars, dict_idx) == FAIL)
 		{
 		    vim_free(name);
 		    goto theend;
 		}
-		if (argvars[dict_idx].vval.v_dict == NULL)
+		якщо (argvars[dict_idx].vval.v_dict == NULL)
 		    dict_idx = 0;
 	    }
-	    if (arg_idx > 0)
+	    якщо (arg_idx > 0)
 	    {
-		if (argvars[arg_idx].v_type != VAR_LIST)
+		якщо (argvars[arg_idx].v_type != VAR_LIST)
 		{
 		    emsg(_(e_second_argument_of_function_must_be_list_or_dict));
 		    vim_free(name);
 		    goto theend;
 		}
 		list = argvars[arg_idx].vval.v_list;
-		if (list == NULL || list->lv_len == 0)
+		якщо (list == NULL || list->lv_len == 0)
 		    arg_idx = 0;
-		else if (list->lv_len > MAX_FUNC_ARGS)
+		інакше якщо (list->lv_len > MAX_FUNC_ARGS)
 		{
 		    emsg_funcname(e_too_many_arguments_for_function_str, s);
 		    vim_free(name);
@@ -5910,37 +5910,37 @@ common_function(typval_T *argvars, typval_T *rettv, int is_funcref)
 		}
 	    }
 	}
-	if (dict_idx > 0 || arg_idx > 0 || arg_pt != NULL || is_funcref)
+	якщо (dict_idx > 0 || arg_idx > 0 || arg_pt != NULL || is_funcref)
 	{
 	    partial_T	*pt = ALLOC_CLEAR_ONE(partial_T);
 
 	    // result is a VAR_PARTIAL
-	    if (pt == NULL)
+	    якщо (pt == NULL)
 		vim_free(name);
-	    else
+	    інакше
 	    {
-		if (arg_idx > 0 || (arg_pt != NULL && arg_pt->pt_argc > 0))
+		якщо (arg_idx > 0 || (arg_pt != NULL && arg_pt->pt_argc > 0))
 		{
 		    listitem_T	*li;
-		    int		i = 0;
-		    int		arg_len = 0;
-		    int		lv_len = 0;
+		    ціле		i = 0;
+		    ціле		arg_len = 0;
+		    ціле		lv_len = 0;
 
-		    if (arg_pt != NULL)
+		    якщо (arg_pt != NULL)
 			arg_len = arg_pt->pt_argc;
-		    if (list != NULL)
+		    якщо (list != NULL)
 			lv_len = list->lv_len;
 		    pt->pt_argc = arg_len + lv_len;
 		    pt->pt_argv = ALLOC_MULT(typval_T, pt->pt_argc);
-		    if (pt->pt_argv == NULL)
+		    якщо (pt->pt_argv == NULL)
 		    {
 			vim_free(pt);
 			vim_free(name);
 			goto theend;
 		    }
-		    for (i = 0; i < arg_len; i++)
+		    для (i = 0; i < arg_len; i++)
 			copy_tv(&arg_pt->pt_argv[i], &pt->pt_argv[i]);
-		    if (lv_len > 0)
+		    якщо (lv_len > 0)
 		    {
 			CHECK_LIST_MATERIALIZE(list);
 			FOR_ALL_LIST_ITEMS(list, li)
@@ -5950,48 +5950,48 @@ common_function(typval_T *argvars, typval_T *rettv, int is_funcref)
 
 		// For "function(dict.func, [], dict)" and "func" is a partial
 		// use "dict".  That is backwards compatible.
-		if (dict_idx > 0)
+		якщо (dict_idx > 0)
 		{
 		    // The dict is bound explicitly, pt_auto is FALSE.
 		    pt->pt_dict = argvars[dict_idx].vval.v_dict;
 		    ++pt->pt_dict->dv_refcount;
 		}
-		else if (arg_pt != NULL)
+		інакше якщо (arg_pt != NULL)
 		{
 		    // If the dict was bound automatically the result is also
 		    // bound automatically.
 		    pt->pt_dict = arg_pt->pt_dict;
 		    pt->pt_auto = arg_pt->pt_auto;
-		    if (pt->pt_dict != NULL)
+		    якщо (pt->pt_dict != NULL)
 			++pt->pt_dict->dv_refcount;
 		    pt->pt_obj = arg_pt->pt_obj;
-		    if (pt->pt_obj != NULL)
+		    якщо (pt->pt_obj != NULL)
 			++pt->pt_obj->obj_refcount;
 		}
 
 		pt->pt_refcount = 1;
-		if (arg_pt != NULL && arg_pt->pt_func != NULL)
+		якщо (arg_pt != NULL && arg_pt->pt_func != NULL)
 		{
 		    pt->pt_func = arg_pt->pt_func;
 		    func_ptr_ref(pt->pt_func);
 		    vim_free(name);
 		}
-		else if (is_funcref)
+		інакше якщо (is_funcref)
 		{
 		    pt->pt_func = find_func(trans_name, is_global);
-		    if (IS_GENERIC_FUNC(pt->pt_func) && start_bracket != NULL)
+		    якщо (IS_GENERIC_FUNC(pt->pt_func) && start_bracket != NULL)
 			pt->pt_func = eval_generic_func(pt->pt_func, s,
 							&start_bracket);
 		    func_ptr_ref(pt->pt_func);
 		    vim_free(name);
 		}
-		else
+		інакше
 		{
 		    pt->pt_name = name;
 		    func_ref(name);
 		}
 
-		if (arg_pt != NULL)
+		якщо (arg_pt != NULL)
 		{
 		    pt->pt_outer_partial = arg_pt;
 		    ++arg_pt->pt_refcount;
@@ -6000,21 +6000,21 @@ common_function(typval_T *argvars, typval_T *rettv, int is_funcref)
 	    rettv->v_type = VAR_PARTIAL;
 	    rettv->vval.v_partial = pt;
 	}
-	else
+	інакше
 	{
 	    // result is a VAR_FUNC
 	    rettv->v_type = VAR_FUNC;
-	    if (start_bracket == NULL)
+	    якщо (start_bracket == NULL)
 	    {
 		rettv->vval.v_string = name;
 		func_ref(name);
 	    }
-	    else
+	    інакше
 	    {
 		// generic function
 		size_t len = STRLEN(name) + STRLEN(start_bracket);
 		rettv->vval.v_string = alloc(len + 1);
-		if (rettv->vval.v_string != NULL)
+		якщо (rettv->vval.v_string != NULL)
 		{
 		    STRCPY(rettv->vval.v_string, name);
 		    STRCAT(rettv->vval.v_string, start_bracket);
@@ -6051,14 +6051,14 @@ f_function(typval_T *argvars, typval_T *rettv)
     static void
 f_garbagecollect(typval_T *argvars, typval_T *rettv UNUSED)
 {
-    if (in_vim9script() && check_for_opt_bool_arg(argvars, 0) == FAIL)
-	return;
+    якщо (in_vim9script() && check_for_opt_bool_arg(argvars, 0) == FAIL)
+	повернути;
 
     // This is postponed until we are back at the toplevel, because we may be
     // using Lists and Dicts internally.  E.g.: ":echo [garbagecollect()]".
     want_garbage_collect = TRUE;
 
-    if (argvars[0].v_type != VAR_UNKNOWN && tv_get_bool(&argvars[0]) == 1)
+    якщо (argvars[0].v_type != VAR_UNKNOWN && tv_get_bool(&argvars[0]) == 1)
 	garbage_collect_at_exit = TRUE;
 }
 
@@ -6074,135 +6074,135 @@ f_get(typval_T *argvars, typval_T *rettv)
     dictitem_T	*di;
     dict_T	*d;
     typval_T	*tv = NULL;
-    int		what_is_dict = FALSE;
+    ціле		what_is_dict = FALSE;
 
-    if (argvars[0].v_type == VAR_BLOB)
+    якщо (argvars[0].v_type == VAR_BLOB)
     {
-	int error = FALSE;
-	int idx = tv_get_number_chk(&argvars[1], &error);
+	ціле error = FALSE;
+	ціле idx = tv_get_number_chk(&argvars[1], &error);
 
-	if (!error)
+	якщо (!error)
 	{
 	    rettv->v_type = VAR_NUMBER;
-	    if (idx < 0)
+	    якщо (idx < 0)
 		idx = blob_len(argvars[0].vval.v_blob) + idx;
-	    if (idx < 0 || idx >= blob_len(argvars[0].vval.v_blob))
+	    якщо (idx < 0 || idx >= blob_len(argvars[0].vval.v_blob))
 		rettv->vval.v_number = -1;
-	    else
+	    інакше
 	    {
 		rettv->vval.v_number = blob_get(argvars[0].vval.v_blob, idx);
 		tv = rettv;
 	    }
 	}
     }
-    else if (argvars[0].v_type == VAR_LIST)
+    інакше якщо (argvars[0].v_type == VAR_LIST)
     {
-	if ((l = argvars[0].vval.v_list) != NULL)
+	якщо ((l = argvars[0].vval.v_list) != NULL)
 	{
-	    int		error = FALSE;
+	    ціле		error = FALSE;
 
 	    li = list_find(l, (long)tv_get_number_chk(&argvars[1], &error));
-	    if (!error && li != NULL)
+	    якщо (!error && li != NULL)
 		tv = &li->li_tv;
 	}
     }
-    else if (argvars[0].v_type == VAR_TUPLE)
+    інакше якщо (argvars[0].v_type == VAR_TUPLE)
     {
-	if ((tuple = argvars[0].vval.v_tuple) != NULL)
+	якщо ((tuple = argvars[0].vval.v_tuple) != NULL)
 	{
-	    int		error = FALSE;
+	    ціле		error = FALSE;
 	    long	idx;
 
 	    idx = (long)tv_get_number_chk(&argvars[1], &error);
-	    if (!error)
+	    якщо (!error)
 		tv = tuple_find(tuple, idx);
 	}
     }
-    else if (argvars[0].v_type == VAR_DICT)
+    інакше якщо (argvars[0].v_type == VAR_DICT)
     {
-	if ((d = argvars[0].vval.v_dict) != NULL)
+	якщо ((d = argvars[0].vval.v_dict) != NULL)
 	{
 	    di = dict_find(d, tv_get_string(&argvars[1]), -1);
-	    if (di != NULL)
+	    якщо (di != NULL)
 		tv = &di->di_tv;
 	}
     }
-    else if (argvars[0].v_type == VAR_PARTIAL || argvars[0].v_type == VAR_FUNC)
+    інакше якщо (argvars[0].v_type == VAR_PARTIAL || argvars[0].v_type == VAR_FUNC)
     {
 	partial_T	*pt;
 	partial_T	fref_pt;
 
-	if (argvars[0].v_type == VAR_PARTIAL)
+	якщо (argvars[0].v_type == VAR_PARTIAL)
 	    pt = argvars[0].vval.v_partial;
-	else
+	інакше
 	{
 	    CLEAR_FIELD(fref_pt);
 	    fref_pt.pt_name = argvars[0].vval.v_string;
 	    pt = &fref_pt;
 	}
 
-	if (pt != NULL)
+	якщо (pt != NULL)
 	{
 	    char_u *what = tv_get_string(&argvars[1]);
 
-	    if (STRCMP(what, "func") == 0 || STRCMP(what, "name") == 0)
+	    якщо (STRCMP(what, "func") == 0 || STRCMP(what, "name") == 0)
 	    {
 		char_u *name = partial_name(pt);
 
 		rettv->v_type = (*what == 'f' ? VAR_FUNC : VAR_STRING);
-		if (name == NULL)
+		якщо (name == NULL)
 		    rettv->vval.v_string = NULL;
-		else
+		інакше
 		{
-		    if (rettv->v_type == VAR_FUNC)
+		    якщо (rettv->v_type == VAR_FUNC)
 			func_ref(name);
-		    if (*what == 'n' && pt->pt_name == NULL
+		    якщо (*what == 'n' && pt->pt_name == NULL
 							&& pt->pt_func != NULL)
 			// use <SNR> instead of the byte code
 			name = printable_func_name(pt->pt_func);
 		    rettv->vval.v_string = vim_strsave(name);
 		}
 	    }
-	    else if (STRCMP(what, "dict") == 0)
+	    інакше якщо (STRCMP(what, "dict") == 0)
 	    {
 		what_is_dict = TRUE;
-		if (pt->pt_dict != NULL)
+		якщо (pt->pt_dict != NULL)
 		    rettv_dict_set(rettv, pt->pt_dict);
 	    }
-	    else if (STRCMP(what, "args") == 0)
+	    інакше якщо (STRCMP(what, "args") == 0)
 	    {
 		rettv->v_type = VAR_LIST;
-		if (rettv_list_alloc(rettv) == OK)
+		якщо (rettv_list_alloc(rettv) == OK)
 		{
-		    int i;
+		    ціле i;
 
-		    for (i = 0; i < pt->pt_argc; ++i)
+		    для (i = 0; i < pt->pt_argc; ++i)
 			list_append_tv(rettv->vval.v_list, &pt->pt_argv[i]);
 		}
 	    }
-	    else if (STRCMP(what, "arity") == 0)
+	    інакше якщо (STRCMP(what, "arity") == 0)
 	    {
-		int required = 0, optional = 0, varargs = FALSE;
+		ціле required = 0, optional = 0, varargs = FALSE;
 		char_u *name = partial_name(pt);
 
 		get_func_arity(name, &required, &optional, &varargs);
 
 		rettv->v_type = VAR_DICT;
-		if (rettv_dict_alloc(rettv) == OK)
+		якщо (rettv_dict_alloc(rettv) == OK)
 		{
 		    dict_T *dict = rettv->vval.v_dict;
 
 		    // Take into account the arguments of the partial, if any.
 		    // Note that it is possible to supply more arguments than the function
 		    // accepts.
-		    if (pt->pt_argc >= required + optional)
+		    якщо (pt->pt_argc >= required + optional)
 			required = optional = 0;
-		    else if (pt->pt_argc > required)
+		    інакше якщо (pt->pt_argc > required)
 		    {
 			optional -= pt->pt_argc - required;
 			required = 0;
 		    }
-		    else
+		    інакше
 			required -= pt->pt_argc;
 
 		    dict_add_number(dict, "required", required);
@@ -6210,24 +6210,24 @@ f_get(typval_T *argvars, typval_T *rettv)
 		    dict_add_bool(dict, "varargs", varargs);
 		}
 	    }
-	    else
+	    інакше
 		semsg(_(e_invalid_argument_str), what);
 
 	    // When {what} == "dict" and pt->pt_dict == NULL, evaluate the
 	    // third argument
-	    if (!what_is_dict)
-		return;
+	    якщо (!what_is_dict)
+		повернути;
 	}
     }
-    else
+    інакше
 	semsg(_(e_argument_of_str_must_be_list_tuple_dictionary_or_blob), "get()");
 
-    if (tv == NULL)
+    якщо (tv == NULL)
     {
-	if (argvars[2].v_type != VAR_UNKNOWN)
+	якщо (argvars[2].v_type != VAR_UNKNOWN)
 	    copy_tv(&argvars[2], rettv);
     }
-    else
+    інакше
 	copy_tv(tv, rettv);
 }
 
@@ -6243,30 +6243,30 @@ f_get(typval_T *argvars, typval_T *rettv)
     static void
 f_getbgcolor(typval_T *argvars UNUSED, typval_T *rettv)
 {
-    if (rettv_list_alloc(rettv) == FAIL)
-	return;
+    якщо (rettv_list_alloc(rettv) == FAIL)
+	повернути;
 
-#if defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
+#якщо defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
     {
 	bool try_hl = false;
 
 # ifdef FEAT_GUI
-	if (gui.in_use)
+	якщо (gui.in_use)
 	    try_hl = true;
 # endif
 # ifdef FEAT_TERMGUICOLORS
-	if (p_tgc)
+	якщо (p_tgc)
 	    try_hl = true;
 # endif
-	if (try_hl)
+	якщо (try_hl)
 	{
 	    guicolor_T	fg, bg;
-	    int		hl_id = syn_name2id((char_u *)"Normal");
+	    ціле		hl_id = syn_name2id((char_u *)"Normal");
 
-	    if (hl_id > 0)
+	    якщо (hl_id > 0)
 	    {
 		(void)syn_id2colors(hl_id, &fg, &bg);
-		if (bg != INVALCOLOR)
+		якщо (bg != INVALCOLOR)
 		{
 		    long_u  rgb = GUI_MCH_GET_RGB(bg);
 
@@ -6276,7 +6276,7 @@ f_getbgcolor(typval_T *argvars UNUSED, typval_T *rettv)
 					    (varnumber_T)((rgb >> 8) & 0xff));
 		    list_append_number(rettv->vval.v_list,
 					    (varnumber_T)(rgb & 0xff));
-		    return;
+		    повернути;
 		}
 	    }
 	}
@@ -6286,7 +6286,7 @@ f_getbgcolor(typval_T *argvars UNUSED, typval_T *rettv)
     {
 	char_u	r = 0, g = 0, b = 0;
 
-	if (term_get_bg_color(&r, &g, &b) == OK)
+	якщо (term_get_bg_color(&r, &g, &b) == OK)
 	{
 	    list_append_number(rettv->vval.v_list, (varnumber_T)r);
 	    list_append_number(rettv->vval.v_list, (varnumber_T)g);
@@ -6302,23 +6302,23 @@ f_getbgcolor(typval_T *argvars UNUSED, typval_T *rettv)
     static void
 f_getcellpixels(typval_T *argvars UNUSED, typval_T *rettv)
 {
-    if (rettv_list_alloc(rettv) == FAIL)
-	return;
+    якщо (rettv_list_alloc(rettv) == FAIL)
+	повернути;
 
-#if defined(FEAT_GUI)
-    if (gui.in_use)
+#якщо defined(FEAT_GUI)
+    якщо (gui.in_use)
     {
 	// success pixel size and no gui.
 	list_append_number(rettv->vval.v_list, (varnumber_T)gui.char_width);
 	list_append_number(rettv->vval.v_list, (varnumber_T)gui.char_height);
     }
-    else
+    інакше
 #endif
     {
-#if defined(UNIX) || defined(MSWIN)
+#якщо defined(UNIX) || defined(MSWIN)
 	list_append_number(rettv->vval.v_list, (varnumber_T)cell_width);
 	list_append_number(rettv->vval.v_list, (varnumber_T)cell_height);
-#else
+#інакше
 	// Non-Unix CUIs are not supported, so set this to -1x-1.
 	list_append_number(rettv->vval.v_list, (varnumber_T)-1);
 	list_append_number(rettv->vval.v_list, (varnumber_T)-1);
@@ -6334,31 +6334,31 @@ f_getcellpixels(typval_T *argvars UNUSED, typval_T *rettv)
 f_getchangelist(typval_T *argvars, typval_T *rettv)
 {
     buf_T	*buf;
-    int		i;
+    ціле		i;
     list_T	*l;
     dict_T	*d;
-    int		changelistindex;
+    ціле		changelistindex;
 
-    if (rettv_list_alloc(rettv) == FAIL)
-	return;
+    якщо (rettv_list_alloc(rettv) == FAIL)
+	повернути;
 
-    if (in_vim9script() && check_for_opt_buffer_arg(argvars, 0) == FAIL)
-	return;
+    якщо (in_vim9script() && check_for_opt_buffer_arg(argvars, 0) == FAIL)
+	повернути;
 
-    if (argvars[0].v_type == VAR_UNKNOWN)
+    якщо (argvars[0].v_type == VAR_UNKNOWN)
 	buf = curbuf;
-    else
+    інакше
 	buf = tv_get_buf_from_arg(&argvars[0]);
-    if (buf == NULL)
-	return;
+    якщо (buf == NULL)
+	повернути;
 
     l = list_alloc();
-    if (l == NULL)
-	return;
-    if (list_append_list(rettv->vval.v_list, l) == FAIL)
+    якщо (l == NULL)
+	повернути;
+    якщо (list_append_list(rettv->vval.v_list, l) == FAIL)
     {
 	list_free(l);
-	return;
+	повернути;
     }
 
     /*
@@ -6366,32 +6366,32 @@ f_getchangelist(typval_T *argvars, typval_T *rettv)
      * current buffer. For other buffers use the stored index for the current
      * window, or, if that's not available, the change list length.
      */
-    if (buf == curwin->w_buffer)
+    якщо (buf == curwin->w_buffer)
     {
 	changelistindex = curwin->w_changelistidx;
     }
-    else
+    інакше
     {
 	wininfo_T	*wip;
 
 	FOR_ALL_BUF_WININFO(buf, wip)
-	    if (wip->wi_win == curwin)
+	    якщо (wip->wi_win == curwin)
 		break;
 	changelistindex = wip != NULL ? wip->wi_changelistidx
 							: buf->b_changelistlen;
     }
     list_append_number(rettv->vval.v_list, (varnumber_T)changelistindex);
 
-    for (i = 0; i < buf->b_changelistlen; ++i)
+    для (i = 0; i < buf->b_changelistlen; ++i)
     {
-	if (buf->b_changelist[i].lnum == 0)
+	якщо (buf->b_changelist[i].lnum == 0)
 	    continue;
-	if ((d = dict_alloc()) == NULL)
-	    return;
-	if (list_append_dict(l, d) == FAIL)
+	якщо ((d = dict_alloc()) == NULL)
+	    повернути;
+	якщо (list_append_dict(l, d) == FAIL)
 	{
 	    dict_unref(d);
-	    return;
+	    повернути;
 	}
 	dict_add_number(d, "lnum", (long)buf->b_changelist[i].lnum);
 	dict_add_number(d, "col", (long)buf->b_changelist[i].col);
@@ -6403,29 +6403,29 @@ f_getchangelist(typval_T *argvars, typval_T *rettv)
 getpos_both(
     typval_T	*argvars,
     typval_T	*rettv,
-    int		getcurpos,
-    int		charcol)
+    ціле		getcurpos,
+    ціле		charcol)
 {
     pos_T	*fp = NULL;
     pos_T	pos;
     win_T	*wp = curwin;
     list_T	*l;
-    int		fnum = -1;
+    ціле		fnum = -1;
 
-    if (rettv_list_alloc(rettv) == OK)
+    якщо (rettv_list_alloc(rettv) == OK)
     {
 	l = rettv->vval.v_list;
-	if (getcurpos)
+	якщо (getcurpos)
 	{
-	    if (argvars[0].v_type != VAR_UNKNOWN)
+	    якщо (argvars[0].v_type != VAR_UNKNOWN)
 	    {
 		wp = find_win_by_nr_or_id(&argvars[0]);
-		if (wp != NULL)
+		якщо (wp != NULL)
 		    fp = &wp->w_cursor;
 	    }
-	    else
+	    інакше
 		fp = &curwin->w_cursor;
-	    if (fp != NULL && charcol)
+	    якщо (fp != NULL && charcol)
 	    {
 		pos = *fp;
 		pos.col =
@@ -6433,11 +6433,11 @@ getpos_both(
 		fp = &pos;
 	    }
 	}
-	else
+	інакше
 	    fp = var2fpos(&argvars[0], TRUE, &fnum, charcol);
-	if (fnum != -1)
+	якщо (fnum != -1)
 	    list_append_number(l, (varnumber_T)fnum);
-	else
+	інакше
 	    list_append_number(l, (varnumber_T)0);
 	list_append_number(l, (fp != NULL) ? (varnumber_T)fp->lnum
 							    : (varnumber_T)0);
@@ -6446,20 +6446,20 @@ getpos_both(
 							    : (varnumber_T)0);
 	list_append_number(l, (fp != NULL) ? (varnumber_T)fp->coladd :
 							      (varnumber_T)0);
-	if (getcurpos)
+	якщо (getcurpos)
 	{
-	    int	    save_set_curswant = curwin->w_set_curswant;
+	    ціле	    save_set_curswant = curwin->w_set_curswant;
 	    colnr_T save_curswant = curwin->w_curswant;
 	    colnr_T save_virtcol = curwin->w_virtcol;
 
-	    if (wp == curwin)
+	    якщо (wp == curwin)
 		update_curswant();
 	    list_append_number(l, wp == NULL ? 0 : wp->w_curswant == MAXCOL
 		    ?  (varnumber_T)MAXCOL : (varnumber_T)wp->w_curswant + 1);
 
 	    // Do not change "curswant", as it is unexpected that a get
 	    // function has a side effect.
-	    if (wp == curwin && save_set_curswant)
+	    якщо (wp == curwin && save_set_curswant)
 	    {
 		curwin->w_set_curswant = save_set_curswant;
 		curwin->w_curswant = save_curswant;
@@ -6468,7 +6468,7 @@ getpos_both(
 	    }
 	}
     }
-    else
+    інакше
 	rettv->vval.v_number = FALSE;
 }
 
@@ -6478,8 +6478,8 @@ getpos_both(
     static void
 f_getcharpos(typval_T *argvars UNUSED, typval_T *rettv)
 {
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    якщо (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+	повернути;
 
     getpos_both(argvars, rettv, FALSE, TRUE);
 }
@@ -6490,8 +6490,8 @@ f_getcharpos(typval_T *argvars UNUSED, typval_T *rettv)
     static void
 f_getcharsearch(typval_T *argvars UNUSED, typval_T *rettv)
 {
-    if (rettv_dict_alloc(rettv) != OK)
-	return;
+    якщо (rettv_dict_alloc(rettv) != OK)
+	повернути;
 
     dict_T *dict = rettv->vval.v_dict;
 
@@ -6506,20 +6506,20 @@ f_getcharsearch(typval_T *argvars UNUSED, typval_T *rettv)
     static void
 f_getenv(typval_T *argvars, typval_T *rettv)
 {
-    int	    mustfree = FALSE;
+    ціле	    mustfree = FALSE;
     char_u  *p;
 
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    якщо (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+	повернути;
 
     p = vim_getenv(tv_get_string(&argvars[0]), &mustfree);
-    if (p == NULL)
+    якщо (p == NULL)
     {
 	rettv->v_type = VAR_SPECIAL;
 	rettv->vval.v_number = VVAL_NULL;
-	return;
+	повернути;
     }
-    if (!mustfree)
+    якщо (!mustfree)
 	p = vim_strsave(p);
     rettv->vval.v_string = p;
     rettv->v_type = VAR_STRING;
@@ -6534,33 +6534,33 @@ f_getfontname(typval_T *argvars UNUSED, typval_T *rettv)
     rettv->v_type = VAR_STRING;
     rettv->vval.v_string = NULL;
 
-    if (in_vim9script() && check_for_opt_string_arg(argvars, 0) == FAIL)
-	return;
+    якщо (in_vim9script() && check_for_opt_string_arg(argvars, 0) == FAIL)
+	повернути;
 
 #ifdef FEAT_GUI
-    if (gui.in_use)
+    якщо (gui.in_use)
     {
 	GuiFont font;
 	char_u	*name = NULL;
 
-	if (argvars[0].v_type == VAR_UNKNOWN)
+	якщо (argvars[0].v_type == VAR_UNKNOWN)
 	{
 	    // Get the "Normal" font.  Either the name saved by
 	    // hl_set_font_name() or from the font ID.
 	    font = gui.norm_font;
 	    name = hl_get_font_name();
 	}
-	else
+	інакше
 	{
 	    name = tv_get_string(&argvars[0]);
-	    if (STRCMP(name, "*") == 0)	    // don't use font dialog
-		return;
+	    якщо (STRCMP(name, "*") == 0)	    // don't use font dialog
+		повернути;
 	    font = gui_mch_get_font(name, FALSE);
-	    if (font == NOFONT)
-		return;	    // Invalid font name, return empty string.
+	    якщо (font == NOFONT)
+		повернути;	    // Invalid font name, return empty string.
 	}
 	rettv->vval.v_string = gui_mch_get_fontname(font, name);
-	if (argvars[0].v_type != VAR_UNKNOWN)
+	якщо (argvars[0].v_type != VAR_UNKNOWN)
 	    gui_mch_free_font(font);
     }
 #endif
@@ -6647,29 +6647,29 @@ argcheck_type_list(argcheck_T check)
     list_T	*l = list_alloc();
     char	*types = "any";
 
-    if (l == NULL)
-	return NULL;
-    for (int i = 0; i < (int)ARRAY_LENGTH(argcheck_types); ++i)
-	if (argcheck_types[i].func == check)
+    якщо (l == NULL)
+	повернути NULL;
+    для (ціле i = 0; i < (ціле)ARRAY_LENGTH(argcheck_types); ++i)
+	якщо (argcheck_types[i].func == check)
 	{
 	    types = argcheck_types[i].types;
 	    break;
 	}
-    for (char *p = types; ; )
+    для (char *p = types; ; )
     {
 	char	*end = (char *)vim_strchr((char_u *)p, ',');
-	int	len = end == NULL ? (int)STRLEN(p) : (int)(end - p);
+	ціле	len = end == NULL ? (ціле)STRLEN(p) : (ціле)(end - p);
 
-	if (list_append_string(l, (char_u *)p, len) == FAIL)
+	якщо (list_append_string(l, (char_u *)p, len) == FAIL)
 	{
 	    list_free(l);
-	    return NULL;
+	    повернути NULL;
 	}
-	if (end == NULL)
+	якщо (end == NULL)
 	    break;
 	p = end + 1;
     }
-    return l;
+    повернути l;
 }
 
 /*
@@ -6678,7 +6678,7 @@ argcheck_type_list(argcheck_T check)
  * required but not in "l" get type "any".
  * Returns the number of arguments, -1 for an error.
  */
-    static int
+    static ціле
 getinfo_argtypes(
 	list_T			*l,
 	const funcentry_T	*fe,
@@ -6686,40 +6686,40 @@ getinfo_argtypes(
 	garray_T		*type_gap)
 {
     listitem_T	*li;
-    int		argcount = 0;
+    ціле		argcount = 0;
 
-    if (l != NULL)
+    якщо (l != NULL)
 	FOR_ALL_LIST_ITEMS(l, li)
 	{
 	    char_u  *s = tv_get_string_chk(&li->li_tv);
 	    char_u  *p = s;
 	    type_T  *type;
 
-	    if (s == NULL)
-		return -1;
-	    if (argcount >= fe->f_max_argc || argcount >= MAX_FUNC_ARGS)
+	    якщо (s == NULL)
+		повернути -1;
+	    якщо (argcount >= fe->f_max_argc || argcount >= MAX_FUNC_ARGS)
 	    {
 		semsg(_(e_too_many_arguments_for_function_str), fe->f_name);
-		return -1;
+		повернути -1;
 	    }
 	    type = parse_type(&p, type_gap, NULL, NULL, TRUE);
-	    if (type == NULL)
-		return -1;
-	    if (*skipwhite(p) != NUL)
+	    якщо (type == NULL)
+		повернути -1;
+	    якщо (*skipwhite(p) != NUL)
 	    {
 		semsg(_(e_type_not_recognized_str), s);
-		return -1;
+		повернути -1;
 	    }
 	    argtypes[argcount].type_curr = type;
 	    argtypes[argcount].type_decl = type;
 	    ++argcount;
 	}
-    for ( ; argcount < fe->f_min_argc && argcount < MAX_FUNC_ARGS; ++argcount)
+    для ( ; argcount < fe->f_min_argc && argcount < MAX_FUNC_ARGS; ++argcount)
     {
 	argtypes[argcount].type_curr = &t_any;
 	argtypes[argcount].type_decl = &t_any;
     }
-    return argcount;
+    повернути argcount;
 }
 
 /*
@@ -6729,8 +6729,8 @@ getinfo_argtypes(
  */
     static char *
 builtin_ret_type_name(
-	int	    idx,
-	int	    argcount,
+	ціле	    idx,
+	ціле	    argcount,
 	type2_T	    *argtypes,
 	garray_T    *type_gap,
 	char	    **tofree)
@@ -6739,7 +6739,7 @@ builtin_ret_type_name(
     type_T	*ret = internal_func_ret_type(idx, argcount, argtypes,
 							&decl_type, type_gap);
 
-    return type_name(ret, tofree);
+    повернути type_name(ret, tofree);
 }
 
 /*
@@ -6774,8 +6774,8 @@ f_getinfo(typval_T *argvars, typval_T *rettv)
     char_u		*name;
     char_u		namebuf[NUMBUFLEN];
     getinfo_kind_T	kind;
-    int			ki;
-    int			idx;
+    ціле			ki;
+    ціле			idx;
     const funcentry_T	*fe;
     dict_T		*d;
     list_T		*args;
@@ -6783,89 +6783,89 @@ f_getinfo(typval_T *argvars, typval_T *rettv)
     garray_T		type_gap;
     type2_T		argtypes[MAX_FUNC_ARGS];
     list_T		*argtypes_list = NULL;
-    int			argcount;
-    int			vim9 = -1;	// -1: the context of the caller
+    ціле			argcount;
+    ціле			vim9 = -1;	// -1: the context of the caller
     char		*ret_name;
     char		*tofree;
 
-    if (rettv_dict_alloc(rettv) == FAIL)
-	return;
-    if (in_vim9script() && (check_for_string_arg(argvars, 0) == FAIL
+    якщо (rettv_dict_alloc(rettv) == FAIL)
+	повернути;
+    якщо (in_vim9script() && (check_for_string_arg(argvars, 0) == FAIL
 				|| check_for_string_arg(argvars, 1) == FAIL))
-	return;
-    if (check_for_opt_dict_arg(argvars, 2) == FAIL)
-	return;
+	повернути;
+    якщо (check_for_opt_dict_arg(argvars, 2) == FAIL)
+	повернути;
 
     kindname = tv_get_string(&argvars[0]);
-    for (ki = 0; ki < (int)ARRAY_LENGTH(getinfo_kinds); ++ki)
-	if (STRCMP(kindname, getinfo_kinds[ki].name) == 0)
+    для (ki = 0; ki < (ціле)ARRAY_LENGTH(getinfo_kinds); ++ki)
+	якщо (STRCMP(kindname, getinfo_kinds[ki].name) == 0)
 	    break;
-    if (ki == (int)ARRAY_LENGTH(getinfo_kinds))
+    якщо (ki == (ціле)ARRAY_LENGTH(getinfo_kinds))
     {
 	semsg(_(e_invalid_argument_str), kindname);
-	return;
+	повернути;
     }
     kind = getinfo_kinds[ki].kind;
     name = tv_get_string_buf(&argvars[1], namebuf);
 
-    if (argvars[2].v_type != VAR_UNKNOWN && argvars[2].vval.v_dict != NULL)
+    якщо (argvars[2].v_type != VAR_UNKNOWN && argvars[2].vval.v_dict != NULL)
     {
 	// Each item of {opts} is for one kind.
 	dict_T	    *opts = argvars[2].vval.v_dict;
 	hashitem_T  *hi;
-	int	    todo = (int)opts->dv_hashtab.ht_used;
+	ціле	    todo = (ціле)opts->dv_hashtab.ht_used;
 
 	FOR_ALL_HASHTAB_ITEMS(&opts->dv_hashtab, hi, todo)
 	{
-	    if (HASHITEM_EMPTY(hi))
+	    якщо (HASHITEM_EMPTY(hi))
 		continue;
 	    --todo;
 	    dictitem_T *di = HI2DI(hi);
 
-	    if (STRCMP(di->di_key, "argtypes") == 0 && kind == GI_FUNCTION
+	    якщо (STRCMP(di->di_key, "argtypes") == 0 && kind == GI_FUNCTION
 		    && di->di_tv.v_type == VAR_LIST)
 		argtypes_list = di->di_tv.vval.v_list;
-	    else if (STRCMP(di->di_key, "vim9") == 0 && kind == GI_COMMAND)
+	    інакше якщо (STRCMP(di->di_key, "vim9") == 0 && kind == GI_COMMAND)
 		vim9 = tv_get_bool(&di->di_tv);
-	    else
+	    інакше
 	    {
 		semsg(_(e_invalid_argument_str), di->di_key);
-		return;
+		повернути;
 	    }
 	}
     }
-    if (kind == GI_VIMVAR)
+    якщо (kind == GI_VIMVAR)
     {
-	if (STRNCMP(name, "v:", 2) == 0)
+	якщо (STRNCMP(name, "v:", 2) == 0)
 	    (void)vim_var_info(name + 2, rettv->vval.v_dict);
-	return;
+	повернути;
     }
-    if (kind == GI_COMMAND)
+    якщо (kind == GI_COMMAND)
     {
 	(void)ex_command_info(name, vim9, rettv->vval.v_dict);
-	return;
+	повернути;
     }
-    if (kind == GI_OPTION)
+    якщо (kind == GI_OPTION)
     {
 	(void)option_info(name, rettv->vval.v_dict);
-	return;
+	повернути;
     }
     // A builtin function, also one that is not implemented in this Vim, or a
     // user defined function when there is no builtin one with that name.
     idx = find_internal_func_opt(name, FALSE);
-    if (idx < 0)
+    якщо (idx < 0)
     {
 	(void)user_func_info(name, rettv->vval.v_dict);
-	return;
+	повернути;
     }
 
     fe = &global_functions[idx];
     ga_init2(&type_gap, sizeof(type_T *), 10);
     argcount = getinfo_argtypes(argtypes_list, fe, argtypes, &type_gap);
-    if (argcount < 0)
+    якщо (argcount < 0)
     {
 	clear_type_list(&type_gap);
-	return;
+	повернути;
     }
     d = rettv->vval.v_dict;
     dict_add_string(d, "name", (char_u *)fe->f_name);
@@ -6877,66 +6877,66 @@ f_getinfo(typval_T *argvars, typval_T *rettv)
     dict_add_number(d, "method", fe->f_argtype & FEARG_MASK);
 
     args = list_alloc();
-    if (args == NULL || dict_add_list(d, "args", args) == FAIL)
+    якщо (args == NULL || dict_add_list(d, "args", args) == FAIL)
     {
 	list_unref(args);
 	clear_type_list(&type_gap);
-	return;
+	повернути;
     }
     argnames = (char_u *)fe->f_argnames;
-    for (int i = 0; ; ++i)
+    для (ціле i = 0; ; ++i)
     {
 	argcheck_T  check;
 	dict_T	    *arg;
 	list_T	    *types;
 	char_u	    *argname = NULL;
-	int	    argnamelen = 0;
+	ціле	    argnamelen = 0;
 
-	if (fe->f_argcheck == NULL)
+	якщо (fe->f_argcheck == NULL)
 	{
 	    // Every argument is "any"; one item stands for all of them when
 	    // there is no maximum.
-	    if (i >= (fe->f_max_argc == VARGS ? 1 : fe->f_max_argc))
+	    якщо (i >= (fe->f_max_argc == VARGS ? 1 : fe->f_max_argc))
 		break;
 	    check = arg_any;
 	}
-	else
+	інакше
 	{
 	    // One check per argument up to the maximum; without a maximum the
 	    // checks end with NULL.
-	    if ((fe->f_max_argc != VARGS && i >= fe->f_max_argc)
+	    якщо ((fe->f_max_argc != VARGS && i >= fe->f_max_argc)
 						|| fe->f_argcheck[i] == NULL)
 		break;
 	    check = fe->f_argcheck[i];
 	}
 	// The name of the argument, when the help gives one.
-	if (argnames != NULL)
+	якщо (argnames != NULL)
 	{
 	    char_u  *end = vim_strchr(argnames, ',');
 
 	    argname = argnames;
-	    argnamelen = end == NULL ? (int)STRLEN(argnames)
-						     : (int)(end - argnames);
+	    argnamelen = end == NULL ? (ціле)STRLEN(argnames)
+						     : (ціле)(end - argnames);
 	    argnames = end == NULL ? NULL : skipwhite(end + 1);
 	}
 	arg = dict_alloc();
 	types = argcheck_type_list(check);
-	if (arg == NULL || types == NULL
+	якщо (arg == NULL || types == NULL
 		|| dict_add_list(arg, "types", types) == FAIL)
 	{
 	    list_unref(types);
 	    dict_unref(arg);
 	    clear_type_list(&type_gap);
-	    return;
+	    повернути;
 	}
-	if ((argnamelen > 0
+	якщо ((argnamelen > 0
 		    && dict_add_string_len(arg, "name", argname, argnamelen)
 								       == FAIL)
 		|| list_append_dict(args, arg) == FAIL)
 	{
 	    dict_unref(arg);
 	    clear_type_list(&type_gap);
-	    return;
+	    повернути;
 	}
     }
 
@@ -6944,13 +6944,13 @@ f_getinfo(typval_T *argvars, typval_T *rettv)
     // when it differs with the number of arguments.
     ret_name = builtin_ret_type_name(idx, argcount, argtypes, &type_gap,
 								    &tofree);
-    if (argtypes_list == NULL
+    якщо (argtypes_list == NULL
 	    && fe->f_max_argc != VARGS && fe->f_max_argc != fe->f_min_argc)
     {
 	char	*tofree_max;
 	char	*max_name;
 
-	for (int i = argcount; i < fe->f_max_argc && i < MAX_FUNC_ARGS; ++i)
+	для (ціле i = argcount; i < fe->f_max_argc && i < MAX_FUNC_ARGS; ++i)
 	{
 	    argtypes[i].type_curr = &t_any;
 	    argtypes[i].type_decl = &t_any;
@@ -6958,7 +6958,7 @@ f_getinfo(typval_T *argvars, typval_T *rettv)
 	max_name = builtin_ret_type_name(idx, fe->f_max_argc, argtypes,
 						    &type_gap, &tofree_max);
 
-	if (STRCMP(ret_name, max_name) != 0)
+	якщо (STRCMP(ret_name, max_name) != 0)
 	{
 	    vim_free(tofree);
 	    tofree = NULL;
@@ -6978,52 +6978,52 @@ f_getinfo(typval_T *argvars, typval_T *rettv)
 f_getjumplist(typval_T *argvars, typval_T *rettv)
 {
     win_T	*wp;
-    int		i;
+    ціле		i;
     list_T	*l;
     dict_T	*d;
 
-    if (rettv_list_alloc(rettv) == FAIL)
-	return;
+    якщо (rettv_list_alloc(rettv) == FAIL)
+	повернути;
 
-    if (in_vim9script()
+    якщо (in_vim9script()
 	    && (check_for_opt_number_arg(argvars, 0) == FAIL
 		|| (argvars[0].v_type != VAR_UNKNOWN
 		    && check_for_opt_number_arg(argvars, 1) == FAIL)))
-	return;
+	повернути;
 
     wp = find_tabwin(&argvars[0], &argvars[1], NULL);
-    if (wp == NULL)
-	return;
+    якщо (wp == NULL)
+	повернути;
 
     cleanup_jumplist(wp, TRUE);
 
     l = list_alloc();
-    if (l == NULL)
-	return;
-    if (list_append_list(rettv->vval.v_list, l) == FAIL)
+    якщо (l == NULL)
+	повернути;
+    якщо (list_append_list(rettv->vval.v_list, l) == FAIL)
     {
 	list_free(l);
-	return;
+	повернути;
     }
 
     list_append_number(rettv->vval.v_list, (varnumber_T)wp->w_jumplistidx);
 
-    for (i = 0; i < wp->w_jumplistlen; ++i)
+    для (i = 0; i < wp->w_jumplistlen; ++i)
     {
-	if (wp->w_jumplist[i].fmark.mark.lnum == 0)
+	якщо (wp->w_jumplist[i].fmark.mark.lnum == 0)
 	    continue;
-	if ((d = dict_alloc()) == NULL)
-	    return;
-	if (list_append_dict(l, d) == FAIL)
+	якщо ((d = dict_alloc()) == NULL)
+	    повернути;
+	якщо (list_append_dict(l, d) == FAIL)
 	{
 	    dict_unref(d);
-	    return;
+	    повернути;
 	}
 	dict_add_number(d, "lnum", (long)wp->w_jumplist[i].fmark.mark.lnum);
 	dict_add_number(d, "col", (long)wp->w_jumplist[i].fmark.mark.col);
 	dict_add_number(d, "coladd", (long)wp->w_jumplist[i].fmark.mark.coladd);
 	dict_add_number(d, "bufnr", (long)wp->w_jumplist[i].fmark.fnum);
-	if (wp->w_jumplist[i].fname != NULL)
+	якщо (wp->w_jumplist[i].fname != NULL)
 	    dict_add_string(d, "filename", wp->w_jumplist[i].fname);
     }
 }
@@ -7043,8 +7043,8 @@ f_getpid(typval_T *argvars UNUSED, typval_T *rettv)
     static void
 f_getcurpos(typval_T *argvars, typval_T *rettv)
 {
-    if (in_vim9script() && check_for_opt_number_arg(argvars, 0) == FAIL)
-	return;
+    якщо (in_vim9script() && check_for_opt_number_arg(argvars, 0) == FAIL)
+	повернути;
 
     getpos_both(argvars, rettv, TRUE, FALSE);
 }
@@ -7052,8 +7052,8 @@ f_getcurpos(typval_T *argvars, typval_T *rettv)
     static void
 f_getcursorcharpos(typval_T *argvars, typval_T *rettv)
 {
-    if (in_vim9script() && check_for_opt_number_arg(argvars, 0) == FAIL)
-	return;
+    якщо (in_vim9script() && check_for_opt_number_arg(argvars, 0) == FAIL)
+	повернути;
 
     getpos_both(argvars, rettv, TRUE, TRUE);
 }
@@ -7064,8 +7064,8 @@ f_getcursorcharpos(typval_T *argvars, typval_T *rettv)
     static void
 f_getpos(typval_T *argvars, typval_T *rettv)
 {
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    якщо (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+	повернути;
 
     getpos_both(argvars, rettv, FALSE, FALSE);
 }
@@ -7073,14 +7073,14 @@ f_getpos(typval_T *argvars, typval_T *rettv)
 /*
  * Convert from block_def to string
  */
-    static int
+    static ціле
 block_def2str(struct block_def *bd, string_T *ret)
 {
     ret->string = alloc(bd->startspaces + bd->endspaces + bd->textlen + 1);
-    if (ret->string == NULL)
+    якщо (ret->string == NULL)
     {
 	ret->length = 0;
-	return FAIL;
+	повернути FAIL;
     }
 
     vim_memset(ret->string, ' ', bd->startspaces);
@@ -7091,107 +7091,107 @@ block_def2str(struct block_def *bd, string_T *ret)
     ret->length += bd->endspaces;
     ret->string[ret->length] = NUL;
 
-    return OK;
+    повернути OK;
 }
 
-    static int
+    static ціле
 getregionpos(
     typval_T	*argvars,
     typval_T	*rettv,
     pos_T	*p1,
     pos_T	*p2,
-    int		*inclusive,
-    int		*region_type,
+    ціле		*inclusive,
+    ціле		*region_type,
     oparg_T	*oap)
 {
-    int		fnum1 = -1, fnum2 = -1;
+    ціле		fnum1 = -1, fnum2 = -1;
     char_u	*type;
     buf_T	*findbuf;
     char_u	default_type[] = "v";
-    int		block_width = 0;
-    int		is_select_exclusive;
-    int		l;
+    ціле		block_width = 0;
+    ціле		is_select_exclusive;
+    ціле		l;
 
-    if (rettv_list_alloc(rettv) == FAIL)
-	return FAIL;
+    якщо (rettv_list_alloc(rettv) == FAIL)
+	повернути FAIL;
 
-    if (check_for_list_arg(argvars, 0) == FAIL
+    якщо (check_for_list_arg(argvars, 0) == FAIL
 	    || check_for_list_arg(argvars, 1) == FAIL
 	    || check_for_opt_dict_arg(argvars, 2) == FAIL)
-	return FAIL;
+	повернути FAIL;
 
-    if (list2fpos(&argvars[0], p1, &fnum1, NULL, FALSE) != OK
+    якщо (list2fpos(&argvars[0], p1, &fnum1, NULL, FALSE) != OK
 	    || list2fpos(&argvars[1], p2, &fnum2, NULL, FALSE) != OK
 	    || fnum1 != fnum2)
-	return FAIL;
+	повернути FAIL;
 
-    if (argvars[2].v_type == VAR_DICT)
+    якщо (argvars[2].v_type == VAR_DICT)
     {
 	is_select_exclusive = dict_get_bool(
 		argvars[2].vval.v_dict, "exclusive", *p_sel == 'e');
 	type = dict_get_string(
 		argvars[2].vval.v_dict, "type", FALSE);
-	if (type == NULL)
+	якщо (type == NULL)
 	    type = default_type;
     }
-    else
+    інакше
     {
 	is_select_exclusive = *p_sel == 'e';
 	type = default_type;
     }
 
-    if (type[0] == 'v' && type[1] == NUL)
+    якщо (type[0] == 'v' && type[1] == NUL)
 	*region_type = MCHAR;
-    else if (type[0] == 'V' && type[1] == NUL)
+    інакше якщо (type[0] == 'V' && type[1] == NUL)
 	*region_type = MLINE;
-    else if (type[0] == Ctrl_V)
+    інакше якщо (type[0] == Ctrl_V)
     {
 	char_u *p = type + 1;
 
-	if (*p != NUL && ((block_width = getdigits(&p)) <= 0 || *p != NUL))
+	якщо (*p != NUL && ((block_width = getdigits(&p)) <= 0 || *p != NUL))
 	{
 	    semsg(_(e_invalid_value_for_argument_str_str), "type", type);
-	    return FAIL;
+	    повернути FAIL;
 	}
 	*region_type = MBLOCK;
     }
-    else
+    інакше
     {
 	semsg(_(e_invalid_value_for_argument_str_str), "type", type);
-	return FAIL;
+	повернути FAIL;
     }
 
     findbuf = fnum1 != 0 ? buflist_findnr(fnum1) : curbuf;
-    if (findbuf == NULL || findbuf->b_ml.ml_mfp == NULL)
+    якщо (findbuf == NULL || findbuf->b_ml.ml_mfp == NULL)
     {
 	emsg(_(e_buffer_is_not_loaded));
-	return FAIL;
+	повернути FAIL;
     }
 
-    if (p1->lnum < 1 || p1->lnum > findbuf->b_ml.ml_line_count)
+    якщо (p1->lnum < 1 || p1->lnum > findbuf->b_ml.ml_line_count)
     {
 	semsg(_(e_invalid_line_number_nr), p1->lnum);
-	return FAIL;
+	повернути FAIL;
     }
-    if (p1->col == MAXCOL)
+    якщо (p1->col == MAXCOL)
 	p1->col = ml_get_buf_len(findbuf, p1->lnum) + 1;
-    else if (p1->col < 1 || p1->col > ml_get_buf_len(findbuf, p1->lnum) + 1)
+    інакше якщо (p1->col < 1 || p1->col > ml_get_buf_len(findbuf, p1->lnum) + 1)
     {
 	semsg(_(e_invalid_column_number_nr), p1->col);
-	return FAIL;
+	повернути FAIL;
     }
 
-    if (p2->lnum < 1 || p2->lnum > findbuf->b_ml.ml_line_count)
+    якщо (p2->lnum < 1 || p2->lnum > findbuf->b_ml.ml_line_count)
     {
 	semsg(_(e_invalid_line_number_nr), p2->lnum);
-	return FAIL;
+	повернути FAIL;
     }
-    if (p2->col == MAXCOL)
+    якщо (p2->col == MAXCOL)
 	p2->col = ml_get_buf_len(findbuf, p2->lnum) + 1;
-    else if (p2->col < 1 || p2->col > ml_get_buf_len(findbuf, p2->lnum) + 1)
+    інакше якщо (p2->col < 1 || p2->col > ml_get_buf_len(findbuf, p2->lnum) + 1)
     {
 	semsg(_(e_invalid_column_number_nr), p2->col);
-	return FAIL;
+	повернути FAIL;
     }
 
     curbuf = findbuf;
@@ -7202,7 +7202,7 @@ getregionpos(
     p1->col--;
     p2->col--;
 
-    if (!LT_POS(*p1, *p2))
+    якщо (!LT_POS(*p1, *p2))
     {
 	// swap position
 	pos_T p;
@@ -7212,22 +7212,22 @@ getregionpos(
 	*p2 = p;
     }
 
-    if (*region_type == MCHAR)
+    якщо (*region_type == MCHAR)
     {
 	// Handle 'selection' == "exclusive".
-	if (is_select_exclusive && !EQUAL_POS(*p1, *p2))
+	якщо (is_select_exclusive && !EQUAL_POS(*p1, *p2))
 	    // When backing up to previous line, inclusive becomes false.
 	    *inclusive = !unadjust_for_sel_inner(p2);
 	// If p2 is on NUL (end of line), inclusive becomes false.
-	if (*inclusive && !virtual_op && *ml_get_pos(p2) == NUL)
+	якщо (*inclusive && !virtual_op && *ml_get_pos(p2) == NUL)
 	    *inclusive = FALSE;
     }
-    else if (*region_type == MBLOCK)
+    інакше якщо (*region_type == MBLOCK)
     {
 	colnr_T sc1, ec1, sc2, ec2;
 
 #ifdef FEAT_LINEBREAK
-	int	lbr_saved = reset_lbr();
+	ціле	lbr_saved = reset_lbr();
 #endif
 
 	getvvcol(curwin, p1, &sc1, NULL, &ec1, 0);
@@ -7243,20 +7243,20 @@ getregionpos(
 	oap->start = *p1;
 	oap->end = *p2;
 	oap->start_vcol = MIN(sc1, sc2);
-	if (block_width > 0)
+	якщо (block_width > 0)
 	    oap->end_vcol = oap->start_vcol + block_width - 1;
-	else if (is_select_exclusive && ec1 < sc2 && 0 < sc2 && ec2 > ec1)
+	інакше якщо (is_select_exclusive && ec1 < sc2 && 0 < sc2 && ec2 > ec1)
 	    oap->end_vcol = sc2 - 1;
-	else
+	інакше
 	    oap->end_vcol = MAX(ec1, ec2);
     }
 
     // Include the trailing byte of a multi-byte char.
     l = mb_ptr2len((char_u *)ml_get_pos(p2));
-    if (l > 1)
+    якщо (l > 1)
 	p2->col += l - 1;
 
-    return OK;
+    повернути OK;
 }
 
 /*
@@ -7266,34 +7266,34 @@ getregionpos(
 f_getregion(typval_T *argvars, typval_T *rettv)
 {
     pos_T		p1, p2;
-    int			inclusive = TRUE;
-    int			region_type = -1;
+    ціле			inclusive = TRUE;
+    ціле			region_type = -1;
     oparg_T		oa;
 
     buf_T		*save_curbuf;
-    int			save_virtual;
+    ціле			save_virtual;
     string_T		akt = {NULL, 0};
     linenr_T		lnum;
 
     save_curbuf = curbuf;
     save_virtual = virtual_op;
 
-    if (getregionpos(argvars, rettv,
+    якщо (getregionpos(argvars, rettv,
 		&p1, &p2, &inclusive, &region_type, &oa) == FAIL)
-	return;
+	повернути;
 
-    for (lnum = p1.lnum; lnum <= p2.lnum; lnum++)
+    для (lnum = p1.lnum; lnum <= p2.lnum; lnum++)
     {
-	int ret = OK;
+	ціле ret = OK;
 
-	if (region_type == MBLOCK)
+	якщо (region_type == MBLOCK)
 	{
 	    struct block_def	bd;
 
 	    block_prep(&oa, &bd, lnum, FALSE);
 	    block_def2str(&bd, &akt);
 	}
-	else if (region_type == MLINE
+	інакше якщо (region_type == MLINE
 	    || (p1.lnum < lnum && lnum < p2.lnum))
 	{
 	    string_T	s;
@@ -7301,12 +7301,12 @@ f_getregion(typval_T *argvars, typval_T *rettv)
 	    s.string = ml_get(lnum);
 	    s.length = ml_get_len(lnum);
 	    akt.string = vim_strnsave(s.string, s.length);
-	    if (akt.string == NULL)
+	    якщо (akt.string == NULL)
 		akt.length = 0;
-	    else
+	    інакше
 		akt.length = s.length;
 	}
-	else
+	інакше
 	{
 	    struct block_def	bd;
 
@@ -7314,17 +7314,17 @@ f_getregion(typval_T *argvars, typval_T *rettv)
 	    block_def2str(&bd, &akt);
 	}
 
-	if (akt.string == NULL)
+	якщо (akt.string == NULL)
 	{
 	    clear_tv(rettv);
 	    (void)rettv_list_alloc(rettv);
 	    break;
 	}
 
-	ret = list_append_string(rettv->vval.v_list, akt.string, (int)akt.length);
+	ret = list_append_string(rettv->vval.v_list, akt.string, (ціле)akt.length);
 	vim_free(akt.string);
 
-	if (ret == FAIL)
+	якщо (ret == FAIL)
 	{
 	    clear_tv(rettv);
 	    (void)rettv_list_alloc(rettv);
@@ -7344,33 +7344,33 @@ add_regionpos_range(typval_T *rettv, pos_T p1, pos_T p2)
     list_T	*l1, *l2, *l3;
 
     l1 = list_alloc();
-    if (l1 == NULL)
-	return;
+    якщо (l1 == NULL)
+	повернути;
 
-    if (list_append_list(rettv->vval.v_list, l1) == FAIL)
+    якщо (list_append_list(rettv->vval.v_list, l1) == FAIL)
     {
 	list_free(l1);
-	return;
+	повернути;
     }
 
     l2 = list_alloc();
-    if (l2 == NULL)
-	return;
+    якщо (l2 == NULL)
+	повернути;
 
-    if (list_append_list(l1, l2) == FAIL)
+    якщо (list_append_list(l1, l2) == FAIL)
     {
 	list_free(l2);
-	return;
+	повернути;
     }
 
     l3 = list_alloc();
-    if (l3 == NULL)
-	return;
+    якщо (l3 == NULL)
+	повернути;
 
-    if (list_append_list(l1, l3) == FAIL)
+    якщо (list_append_list(l1, l3) == FAIL)
     {
 	list_free(l3);
-	return;
+	повернути;
     }
 
     list_append_number(l2, curbuf->b_fnum);
@@ -7394,95 +7394,95 @@ getregionpos_line(
     linenr_T	lnum,
     pos_T	p1,
     pos_T	p2,
-    int		inclusive,
-    int		region_type,
+    ціле		inclusive,
+    ціле		region_type,
     oparg_T	*oap,
-    int		allow_eol,
+    ціле		allow_eol,
     pos_T	*ret_p1,
     pos_T	*ret_p2)
 {
     char_u	*line = ml_get(lnum);
     colnr_T	line_len = ml_get_len(lnum);
 
-    if (region_type == MLINE)
+    якщо (region_type == MLINE)
     {
 	ret_p1->col = 1;
 	ret_p1->coladd = 0;
 	ret_p2->col = MAXCOL;
 	ret_p2->coladd = 0;
     }
-    else
+    інакше
     {
 	struct block_def	bd;
 
-	if (region_type == MBLOCK)
+	якщо (region_type == MBLOCK)
 	    block_prep(oap, &bd, lnum, FALSE);
-	else
+	інакше
 	    charwise_block_prep(p1, p2, &bd, lnum, inclusive);
 
-	if (bd.is_oneChar)  // selection entirely inside one char
+	якщо (bd.is_oneChar)  // selection entirely inside one char
 	{
-	    if (region_type == MBLOCK)
+	    якщо (region_type == MBLOCK)
 	    {
 		ret_p1->col = mb_prevptr(line, bd.textstart) - line + 1;
 		ret_p1->coladd = bd.start_char_vcols
 					   - (bd.start_vcol - oap->start_vcol);
 	    }
-	    else
+	    інакше
 	    {
 		ret_p1->col = p1.col + 1;
 		ret_p1->coladd = p1.coladd;
 	    }
 	}
-	else if (region_type == MBLOCK && oap->start_vcol > bd.start_vcol)
+	інакше якщо (region_type == MBLOCK && oap->start_vcol > bd.start_vcol)
 	{
 	    // blockwise selection entirely beyond end of line
 	    ret_p1->col = MAXCOL;
 	    ret_p1->coladd = oap->start_vcol - bd.start_vcol;
 	    bd.is_oneChar = TRUE;
 	}
-	else if (bd.startspaces > 0)
+	інакше якщо (bd.startspaces > 0)
 	{
 	    ret_p1->col = mb_prevptr(line, bd.textstart) - line + 1;
 	    ret_p1->coladd = bd.start_char_vcols - bd.startspaces;
 	}
-	else
+	інакше
 	{
 	    ret_p1->col = bd.textcol + 1;
 	    ret_p1->coladd = 0;
 	}
 
-	if (bd.is_oneChar)  // selection entirely inside one char
+	якщо (bd.is_oneChar)  // selection entirely inside one char
 	{
 	    ret_p2->col = ret_p1->col;
 	    ret_p2->coladd = ret_p1->coladd + bd.startspaces + bd.endspaces;
 	}
-	else if (bd.endspaces > 0)
+	інакше якщо (bd.endspaces > 0)
 	{
 	    ret_p2->col = bd.textcol + bd.textlen + 1;
 	    ret_p2->coladd = bd.endspaces;
 	}
-	else
+	інакше
 	{
 	    ret_p2->col = bd.textcol + bd.textlen;
 	    ret_p2->coladd = 0;
 	}
     }
 
-    if (!allow_eol && ret_p1->col > line_len)
+    якщо (!allow_eol && ret_p1->col > line_len)
     {
 	ret_p1->col = 0;
 	ret_p1->coladd = 0;
     }
-    else if (ret_p1->col > line_len + 1)
+    інакше якщо (ret_p1->col > line_len + 1)
 	ret_p1->col = line_len + 1;
 
-    if (!allow_eol && ret_p2->col > line_len)
+    якщо (!allow_eol && ret_p2->col > line_len)
     {
 	ret_p2->col = ret_p1->col == 0 ? 0 : line_len;
 	ret_p2->coladd = 0;
     }
-    else if (ret_p2->col > line_len + 1)
+    інакше якщо (ret_p2->col > line_len + 1)
 	ret_p2->col = line_len + 1;
 
     ret_p1->lnum = lnum;
@@ -7496,30 +7496,30 @@ getregionpos_line(
 f_getregionpos(typval_T *argvars, typval_T *rettv)
 {
     pos_T	p1, p2;
-    int		inclusive = TRUE;
-    int		region_type = -1;
-    int		allow_eol = FALSE;
-    int		bounds_only = FALSE;
+    ціле		inclusive = TRUE;
+    ціле		region_type = -1;
+    ціле		allow_eol = FALSE;
+    ціле		bounds_only = FALSE;
     oparg_T	oa;
-    int		lnum;
+    ціле		lnum;
 
     buf_T	*save_curbuf;
-    int		save_virtual;
+    ціле		save_virtual;
 
     save_curbuf = curbuf;
     save_virtual = virtual_op;
 
-    if (getregionpos(argvars, rettv,
+    якщо (getregionpos(argvars, rettv,
 		&p1, &p2, &inclusive, &region_type, &oa) == FAIL)
-	return;
+	повернути;
 
-    if (argvars[2].v_type == VAR_DICT)
+    якщо (argvars[2].v_type == VAR_DICT)
     {
 	allow_eol = dict_get_bool(argvars[2].vval.v_dict, "eol", FALSE);
 	bounds_only = dict_get_bool(argvars[2].vval.v_dict, "bounds", FALSE);
     }
 
-    if (bounds_only)
+    якщо (bounds_only)
     {
 	// Only the outer bounds of the region are wanted, so the lines in
 	// between do not have to be visited.
@@ -7527,7 +7527,7 @@ f_getregionpos(typval_T *argvars, typval_T *rettv)
 
 	getregionpos_line(p1.lnum, p1, p2, inclusive, region_type, &oa,
 					   allow_eol, &start_pos, &end_pos);
-	if (p2.lnum != p1.lnum)
+	якщо (p2.lnum != p1.lnum)
 	{
 	    pos_T	unused;
 
@@ -7536,9 +7536,9 @@ f_getregionpos(typval_T *argvars, typval_T *rettv)
 	}
 	add_regionpos_range(rettv, start_pos, end_pos);
     }
-    else
+    інакше
     {
-	for (lnum = p1.lnum; lnum <= p2.lnum; lnum++)
+	для (lnum = p1.lnum; lnum <= p2.lnum; lnum++)
 	{
 	    pos_T	ret_p1, ret_p2;
 
@@ -7559,27 +7559,27 @@ f_getregionpos(typval_T *argvars, typval_T *rettv)
  * name from the first argument.
  * Returns zero on error.
  */
-    static int
+    static ціле
 getreg_get_regname(typval_T *argvars)
 {
     char_u  *strregname;
 
-    if (argvars[0].v_type != VAR_UNKNOWN)
+    якщо (argvars[0].v_type != VAR_UNKNOWN)
     {
 	strregname = tv_get_string_chk(&argvars[0]);
-	if (strregname != NULL && in_vim9script() && STRLEN(strregname) > 1)
+	якщо (strregname != NULL && in_vim9script() && STRLEN(strregname) > 1)
 	{
 	    semsg(_(e_register_name_must_be_one_char_str), strregname);
 	    strregname = NULL;
 	}
-	if (strregname == NULL)	    // type error; errmsg already given
-	    return 0;
+	якщо (strregname == NULL)	    // type error; errmsg already given
+	    повернути 0;
     }
-    else
+    інакше
 	// Default to v:register
 	strregname = get_vim_var_str(VV_REG);
 
-    return *strregname == 0 ? '"' : *strregname;
+    повернути *strregname == 0 ? '"' : *strregname;
 }
 
 /*
@@ -7588,45 +7588,45 @@ getreg_get_regname(typval_T *argvars)
     static void
 f_getreg(typval_T *argvars, typval_T *rettv)
 {
-    int		regname;
-    int		arg2 = FALSE;
-    int		return_list = FALSE;
+    ціле		regname;
+    ціле		arg2 = FALSE;
+    ціле		return_list = FALSE;
 
-    if (in_vim9script()
+    якщо (in_vim9script()
 	    && (check_for_opt_string_arg(argvars, 0) == FAIL
 		|| (argvars[0].v_type != VAR_UNKNOWN
 		    && (check_for_opt_bool_arg(argvars, 1) == FAIL
 			|| (argvars[1].v_type != VAR_UNKNOWN
 			    && check_for_opt_bool_arg(argvars, 2) == FAIL)))))
-	return;
+	повернути;
 
     regname = getreg_get_regname(argvars);
-    if (regname == 0)
-	return;
+    якщо (regname == 0)
+	повернути;
 
-    if (argvars[0].v_type != VAR_UNKNOWN && argvars[1].v_type != VAR_UNKNOWN)
+    якщо (argvars[0].v_type != VAR_UNKNOWN && argvars[1].v_type != VAR_UNKNOWN)
     {
-	int		error = FALSE;
+	ціле		error = FALSE;
 
-	arg2 = (int)tv_get_bool_chk(&argvars[1], &error);
+	arg2 = (ціле)tv_get_bool_chk(&argvars[1], &error);
 
-	if (!error && argvars[2].v_type != VAR_UNKNOWN)
-	    return_list = (int)tv_get_bool_chk(&argvars[2], &error);
-	if (error)
-	    return;
+	якщо (!error && argvars[2].v_type != VAR_UNKNOWN)
+	    return_list = (ціле)tv_get_bool_chk(&argvars[2], &error);
+	якщо (error)
+	    повернути;
     }
 
-    if (return_list)
+    якщо (return_list)
     {
 	rettv->v_type = VAR_LIST;
 	rettv->vval.v_list = (list_T *)get_reg_contents(regname,
 				      (arg2 ? GREG_EXPR_SRC : 0) | GREG_LIST);
-	if (rettv->vval.v_list == NULL)
+	якщо (rettv->vval.v_list == NULL)
 	    (void)rettv_list_alloc(rettv);
-	else
+	інакше
 	    ++rettv->vval.v_list->lv_refcount;
     }
-    else
+    інакше
     {
 	rettv->v_type = VAR_STRING;
 	rettv->vval.v_string = get_reg_contents(regname,
@@ -7640,7 +7640,7 @@ f_getreg(typval_T *argvars, typval_T *rettv)
     static void
 f_getregtype(typval_T *argvars, typval_T *rettv)
 {
-    int		regname;
+    ціле		regname;
     char_u	buf[NUMBUFLEN + 2];
     long	reglen = 0;
 
@@ -7648,12 +7648,12 @@ f_getregtype(typval_T *argvars, typval_T *rettv)
     rettv->v_type = VAR_STRING;
     rettv->vval.v_string = NULL;
 
-    if (in_vim9script() && check_for_opt_string_arg(argvars, 0) == FAIL)
-	return;
+    якщо (in_vim9script() && check_for_opt_string_arg(argvars, 0) == FAIL)
+	повернути;
 
     regname = getreg_get_regname(argvars);
-    if (regname == 0)
-	return;
+    якщо (regname == 0)
+	повернути;
 
     buf[0] = NUL;
     buf[1] = NUL;
@@ -7677,17 +7677,17 @@ f_gettagstack(typval_T *argvars, typval_T *rettv)
 {
     win_T	*wp = curwin;			// default is current window
 
-    if (rettv_dict_alloc(rettv) == FAIL)
-	return;
+    якщо (rettv_dict_alloc(rettv) == FAIL)
+	повернути;
 
-    if (in_vim9script() && check_for_opt_number_arg(argvars, 0) == FAIL)
-	return;
+    якщо (in_vim9script() && check_for_opt_number_arg(argvars, 0) == FAIL)
+	повернути;
 
-    if (argvars[0].v_type != VAR_UNKNOWN)
+    якщо (argvars[0].v_type != VAR_UNKNOWN)
     {
 	wp = find_win_by_nr_or_id(&argvars[0]);
-	if (wp == NULL)
-	    return;
+	якщо (wp == NULL)
+	    повернути;
     }
 
     get_tagstack(wp, rettv->vval.v_dict);
@@ -7699,38 +7699,38 @@ f_gettagstack(typval_T *argvars, typval_T *rettv)
     static void
 f_gettext(typval_T *argvars, typval_T *rettv)
 {
-#if defined(HAVE_BIND_TEXTDOMAIN_CODESET)
+#якщо defined(HAVE_BIND_TEXTDOMAIN_CODESET)
     char *prev = NULL;
 #endif
 
-    if (check_for_nonempty_string_arg(argvars, 0) == FAIL
+    якщо (check_for_nonempty_string_arg(argvars, 0) == FAIL
 	|| check_for_opt_string_arg(argvars, 1) == FAIL)
-	return;
+	повернути;
 
     rettv->v_type = VAR_STRING;
 
-    if (argvars[1].v_type == VAR_STRING &&
+    якщо (argvars[1].v_type == VAR_STRING &&
 	    argvars[1].vval.v_string != NULL &&
 	    *(argvars[1].vval.v_string) != NUL)
     {
-#if defined(HAVE_BIND_TEXTDOMAIN_CODESET)
+#якщо defined(HAVE_BIND_TEXTDOMAIN_CODESET)
 	prev = bind_textdomain_codeset((const char *)argvars[1].vval.v_string, (char *)p_enc);
 #endif
 
-#if defined(HAVE_DGETTEXT)
+#якщо defined(HAVE_DGETTEXT)
 	rettv->vval.v_string = vim_strsave((char_u *)dgettext((const char *)argvars[1].vval.v_string, (const char *)argvars[0].vval.v_string));
-#else
+#інакше
 	textdomain((const char *)argvars[1].vval.v_string);
 	rettv->vval.v_string = vim_strsave((char_u *)_(argvars[0].vval.v_string));
 	textdomain(VIMPACKAGE);
 #endif
 
-#if defined(HAVE_BIND_TEXTDOMAIN_CODESET)
-	if (prev != NULL)
+#якщо defined(HAVE_BIND_TEXTDOMAIN_CODESET)
+	якщо (prev != NULL)
 	    bind_textdomain_codeset((const char *)argvars[1].vval.v_string, prev);
 #endif
     }
-    else
+    інакше
 	rettv->vval.v_string = vim_strsave((char_u *)_(argvars[0].vval.v_string));
 }
 
@@ -7743,10 +7743,10 @@ f_gettext(typval_T *argvars, typval_T *rettv)
     void
 f_has(typval_T *argvars, typval_T *rettv)
 {
-    int		i;
+    ціле		i;
     char_u	*name;
-    int		x = FALSE;
-    int		n = FALSE;
+    ціле		x = FALSE;
+    ціле		n = FALSE;
     typedef struct {
 	char *name;
 	short present;
@@ -7756,140 +7756,140 @@ f_has(typval_T *argvars, typval_T *rettv)
 	{"amiga",
 #ifdef AMIGA
 		1
-#else
+#інакше
 		0
 #endif
 		},
 	{"android",
 #ifdef __ANDROID__
 		1
-#else
+#інакше
 		0
 #endif
 		},
 	{"arp",
-#if defined(AMIGA) && defined(FEAT_ARP)
+#якщо defined(AMIGA) && defined(FEAT_ARP)
 		1
-#else
+#інакше
 		0
 #endif
 		},
 	{"haiku",
 #ifdef __HAIKU__
 		1
-#else
+#інакше
 		0
 #endif
 		},
 	{"bsd",
-#if defined(BSD) && !defined(MACOS_X) && !defined(__GNU__)
+#якщо defined(BSD) && !defined(MACOS_X) && !defined(__GNU__)
 		1
-#else
+#інакше
 		0
 #endif
 		},
 	{"hpux",
 #ifdef hpux
 		1
-#else
+#інакше
 		0
 #endif
 		},
 	{"hurd",
 #ifdef __GNU__
 		1
-#else
+#інакше
 		0
 #endif
 		},
 	{"linux",
 #ifdef __linux__
 		1
-#else
+#інакше
 		0
 #endif
 		},
 	{"mac",		// Mac OS X (and, once, Mac OS Classic)
 #ifdef MACOS_X
 		1
-#else
+#інакше
 		0
 #endif
 		},
 	{"osx",		// Mac OS X
 #ifdef MACOS_X
 		1
-#else
+#інакше
 		0
 #endif
 		},
 	{"macunix",	// Mac OS X, with the darwin feature
-#if defined(MACOS_X) && defined(MACOS_X_DARWIN)
+#якщо defined(MACOS_X) && defined(MACOS_X_DARWIN)
 		1
-#else
+#інакше
 		0
 #endif
 		},
 	{"osxdarwin",	// synonym for macunix
-#if defined(MACOS_X) && defined(MACOS_X_DARWIN)
+#якщо defined(MACOS_X) && defined(MACOS_X_DARWIN)
 		1
-#else
+#інакше
 		0
 #endif
 		},
 	{"qnx",
 #ifdef __QNX__
 		1
-#else
+#інакше
 		0
 #endif
 		},
 	{"sun",
 #ifdef SUN_SYSTEM
 		1
-#else
+#інакше
 		0
 #endif
 		},
 	{"termux",
 #ifdef __TERMUX__
 		1
-#else
+#інакше
 		0
 #endif
 		},
 	{"unix",
 #ifdef UNIX
 		1
-#else
+#інакше
 		0
 #endif
 		},
 	{"vms",
 #ifdef VMS
 		1
-#else
+#інакше
 		0
 #endif
 		},
 	{"win32",
 #ifdef MSWIN
 		1
-#else
+#інакше
 		0
 #endif
 		},
 	{"win32unix",
 #ifdef WIN32UNIX
 		1
-#else
+#інакше
 		0
 #endif
 		},
 	{"win64",
 #ifdef _WIN64
 		1
-#else
+#інакше
 		0
 #endif
 		},
@@ -7897,21 +7897,21 @@ f_has(typval_T *argvars, typval_T *rettv)
 	{"fname_case",
 #ifndef CASE_INSENSITIVE_FILENAME
 		1
-#else
+#інакше
 		0
 #endif
 		},
 	{"acl",
 #ifdef HAVE_ACL
 		1
-#else
+#інакше
 		0
 #endif
 		},
 	{"arabic",
 #ifdef FEAT_ARABIC
 		1
-#else
+#інакше
 		0
 #endif
 		},
@@ -7919,67 +7919,67 @@ f_has(typval_T *argvars, typval_T *rettv)
 	{"autochdir",
 #ifdef FEAT_AUTOCHDIR
 		1
-#else
+#інакше
 		0
 #endif
 		},
 	{"autoservername",
 #ifdef FEAT_AUTOSERVERNAME
 		1
-#else
+#інакше
 		0
 #endif
 		},
 	{"socketserver",
 #ifdef FEAT_SOCKETSERVER
 		1
-#else
+#інакше
 		0
 #endif
 		},
 	{"balloon_eval",
 #ifdef FEAT_BEVAL_GUI
 		1
-#else
+#інакше
 		0
 #endif
 		},
 	{"balloon_multiline",
 #ifdef FEAT_BEVAL_GUI
 		1
-#else
+#інакше
 		0
 #endif
 		},
 	{"balloon_eval_term",
 #ifdef FEAT_BEVAL_TERM
 		1
-#else
+#інакше
 		0
 #endif
 		},
 	{"builtin_terms", 1},
 	{"all_builtin_terms", 1},
 	{"browsefilter",
-#if defined(FEAT_BROWSE) && (defined(FEAT_GUI_GTK) \
+#якщо defined(FEAT_BROWSE) && (defined(FEAT_GUI_GTK) \
 	|| defined(FEAT_GUI_MSWIN) \
 	|| defined(FEAT_GUI_MOTIF))
 		1
-#else
+#інакше
 		0
 #endif
 		},
 	{"byte_offset",
 #ifdef FEAT_BYTEOFF
 		1
-#else
+#інакше
 		0
 #endif
 		},
 	{"channel",
 #ifdef FEAT_JOB_CHANNEL
 		1
-#else
+#інакше
 		0
 #endif
 		},
@@ -7987,21 +7987,21 @@ f_has(typval_T *argvars, typval_T *rettv)
 	{"clientserver",
 #ifdef FEAT_CLIENTSERVER
 		1
-#else
+#інакше
 		0
 #endif
 		},
 	{"clipboard",
 #ifdef FEAT_CLIPBOARD
 		1
-#else
+#інакше
 		0
 #endif
 		},
 	{"clipboard_provider",
 #ifdef FEAT_CLIPBOARD_PROVIDER
 		1
-#else
+#інакше
 		0
 #endif
 		},
@@ -8012,35 +8012,35 @@ f_has(typval_T *argvars, typval_T *rettv)
 	{"conceal",
 #ifdef FEAT_CONCEAL
 		1
-#else
+#інакше
 		0
 #endif
 		},
 	{"cryptv",
 #ifdef FEAT_CRYPT
 		1
-#else
+#інакше
 		0
 #endif
 		},
 	{"crypt-blowfish",
 #ifdef FEAT_CRYPT
 		1
-#else
+#інакше
 		0
 #endif
 		},
 	{"crypt-blowfish2",
 #ifdef FEAT_CRYPT
 		1
-#else
+#інакше
 		0
 #endif
 		},
 	{"cscope",
 #ifdef FEAT_CSCOPE
 		1
-#else
+#інакше
 		0
 #endif
 		},
@@ -8048,77 +8048,77 @@ f_has(typval_T *argvars, typval_T *rettv)
 	{"cursorshape",
 #ifdef CURSOR_SHAPE
 		1
-#else
+#інакше
 		0
 #endif
 		},
 	{"debug",
 #ifdef DEBUG
 		1
-#else
+#інакше
 		0
 #endif
 		},
 	{"dialog_con",
 #ifdef FEAT_CON_DIALOG
 		1
-#else
+#інакше
 		0
 #endif
 		},
 	{"dialog_con_gui",
-#if defined(FEAT_CON_DIALOG) && defined(FEAT_GUI_DIALOG)
+#якщо defined(FEAT_CON_DIALOG) && defined(FEAT_GUI_DIALOG)
 		1
-#else
+#інакше
 		0
 #endif
 		},
 	{"dialog_gui",
 #ifdef FEAT_GUI_DIALOG
 		1
-#else
+#інакше
 		0
 #endif
 		},
 	{"diff",
 #ifdef FEAT_DIFF
 		1
-#else
+#інакше
 		0
 #endif
 		},
 	{"digraphs",
 #ifdef FEAT_DIGRAPHS
 		1
-#else
+#інакше
 		0
 #endif
 		},
 	{"directx",
 #ifdef FEAT_DIRECTX
 		1
-#else
+#інакше
 		0
 #endif
 		},
 	{"dnd",
 #ifdef FEAT_DND
 		1
-#else
+#інакше
 		0
 #endif
 		},
 	{"drop_file",
 #ifdef HAVE_DROP_FILE
 		1
-#else
+#інакше
 		0
 #endif
 		},
 	{"emacs_tags",
 #ifdef FEAT_EMACS_TAGS
 		1
-#else
+#інакше
 		0
 #endif
 		},
@@ -8127,22 +8127,22 @@ f_has(typval_T *argvars, typval_T *rettv)
 	{"extra_search",
 #ifdef FEAT_SEARCH_EXTRA
 		1
-#else
+#інакше
 		0
 #endif
 		},
 	{"file_in_path", 1},
 	{"filterpipe",
-#if defined(FEAT_FILTERPIPE) && !defined(VIMDLL)
+#якщо defined(FEAT_FILTERPIPE) && !defined(VIMDLL)
 		1
-#else
+#інакше
 		0
 #endif
 		},
 	{"find_in_path",
 #ifdef FEAT_FIND_ID
 		1
-#else
+#інакше
 		0
 #endif
 		},
@@ -8150,29 +8150,29 @@ f_has(typval_T *argvars, typval_T *rettv)
 	{"folding",
 #ifdef FEAT_FOLDING
 		1
-#else
+#інакше
 		0
 #endif
 		},
 	{"footer", 0},
 	{"fork",
-#if !defined(USE_SYSTEM) && defined(UNIX)
+#якщо !defined(USE_SYSTEM) && defined(UNIX)
 		1
-#else
+#інакше
 		0
 #endif
 		},
 	{"gettext",
 #ifdef FEAT_GETTEXT
 		1
-#else
+#інакше
 		0
 #endif
 		},
 	{"gui",
 #ifdef FEAT_GUI
 		1
-#else
+#інакше
 		0
 #endif
 		},
@@ -8181,42 +8181,42 @@ f_has(typval_T *argvars, typval_T *rettv)
 	{"gui_gtk",
 #ifdef FEAT_GUI_GTK
 		1
-#else
+#інакше
 		0
 #endif
 		},
 	{"gui_gtk2",
-#if defined(FEAT_GUI_GTK) && !defined(USE_GTK3) && !defined(USE_GTK4)
+#якщо defined(FEAT_GUI_GTK) && !defined(USE_GTK3) && !defined(USE_GTK4)
 		1
-#else
+#інакше
 		0
 #endif
 		},
 	{"gui_gtk3",
-#if defined(FEAT_GUI_GTK) && defined(USE_GTK3)
+#якщо defined(FEAT_GUI_GTK) && defined(USE_GTK3)
 		1
-#else
+#інакше
 		0
 #endif
 		},
 	{"gui_gtk4",
-#if defined(FEAT_GUI_GTK) && defined(USE_GTK4)
+#якщо defined(FEAT_GUI_GTK) && defined(USE_GTK4)
 		1
-#else
+#інакше
 		0
 #endif
 		},
 	{"gui_gnome",
 #ifdef FEAT_GUI_GNOME
 		1
-#else
+#інакше
 		0
 #endif
 		},
 	{"gui_haiku",
 #ifdef FEAT_GUI_HAIKU
 		1
-#else
+#інакше
 		0
 #endif
 		},
@@ -8224,42 +8224,42 @@ f_has(typval_T *argvars, typval_T *rettv)
 	{"gui_motif",
 #ifdef FEAT_GUI_MOTIF
 		1
-#else
+#інакше
 		0
 #endif
 		},
 	{"gui_photon",
 #ifdef FEAT_GUI_PHOTON
 		1
-#else
+#інакше
 		0
 #endif
 		},
 	{"gui_win32",
 #ifdef FEAT_GUI_MSWIN
 		1
-#else
+#інакше
 		0
 #endif
 		},
 	{"iconv",
-#if defined(HAVE_ICONV_H) && defined(USE_ICONV)
+#якщо defined(HAVE_ICONV_H) && defined(USE_ICONV)
 		1
-#else
+#інакше
 		0
 #endif
 		},
 	{"image",
 #ifdef FEAT_IMAGE
 		1
-#else
+#інакше
 		0
 #endif
 		},
 	{"image_popup",
 #ifdef FEAT_IMAGE_POPUP
 		1
-#else
+#інакше
 		0
 #endif
 		},
@@ -8267,14 +8267,14 @@ f_has(typval_T *argvars, typval_T *rettv)
 	{"ipv6",
 #ifdef FEAT_IPV6
 		1
-#else
+#інакше
 		0
 #endif
 	},
 	{"job",
 #ifdef FEAT_JOB_CHANNEL
 		1
-#else
+#інакше
 		0
 #endif
 		},
@@ -8282,7 +8282,7 @@ f_has(typval_T *argvars, typval_T *rettv)
 	{"keymap",
 #ifdef FEAT_KEYMAP
 		1
-#else
+#інакше
 		0
 #endif
 		},
@@ -8290,21 +8290,21 @@ f_has(typval_T *argvars, typval_T *rettv)
 	{"langmap",
 #ifdef FEAT_LANGMAP
 		1
-#else
+#інакше
 		0
 #endif
 		},
 	{"libcall",
 #ifdef FEAT_LIBCALL
 		1
-#else
+#інакше
 		0
 #endif
 		},
 	{"linebreak",
 #ifdef FEAT_LINEBREAK
 		1
-#else
+#інакше
 		0
 #endif
 		},
@@ -8312,23 +8312,23 @@ f_has(typval_T *argvars, typval_T *rettv)
 	{"listcmds", 1},
 	{"localmap", 1},
 	{"lua",
-#if defined(FEAT_LUA) && !defined(DYNAMIC_LUA)
+#якщо defined(FEAT_LUA) && !defined(DYNAMIC_LUA)
 		1
-#else
+#інакше
 		0
 #endif
 		},
 	{"menu",
 #ifdef FEAT_MENU
 		1
-#else
+#інакше
 		0
 #endif
 		},
 	{"mksession",
 #ifdef FEAT_SESSION
 		1
-#else
+#інакше
 		0
 #endif
 		},
@@ -8337,70 +8337,70 @@ f_has(typval_T *argvars, typval_T *rettv)
 	{"mouseshape",
 #ifdef FEAT_MOUSESHAPE
 		1
-#else
+#інакше
 		0
 #endif
 		},
 	{"mouse_dec",
-#if (defined(UNIX) || defined(VMS)) && defined(FEAT_MOUSE_DEC)
+#якщо (defined(UNIX) || defined(VMS)) && defined(FEAT_MOUSE_DEC)
 		1
-#else
+#інакше
 		0
 #endif
 		},
 	{"mouse_gpm",
-#if (defined(UNIX) || defined(VMS)) && defined(FEAT_MOUSE_GPM) && !defined(DYNAMIC_GPM)
+#якщо (defined(UNIX) || defined(VMS)) && defined(FEAT_MOUSE_GPM) && !defined(DYNAMIC_GPM)
 		1
-#else
+#інакше
 		0
 #endif
 		},
 	{"mouse_jsbterm",
-#if (defined(UNIX) || defined(VMS)) && defined(FEAT_MOUSE_JSB)
+#якщо (defined(UNIX) || defined(VMS)) && defined(FEAT_MOUSE_JSB)
 		1
-#else
+#інакше
 		0
 #endif
 		},
 	{"mouse_netterm",
-#if (defined(UNIX) || defined(VMS)) && defined(FEAT_MOUSE_NET)
+#якщо (defined(UNIX) || defined(VMS)) && defined(FEAT_MOUSE_NET)
 		1
-#else
+#інакше
 		0
 #endif
 		},
 	{"mouse_pterm",
-#if (defined(UNIX) || defined(VMS)) && defined(FEAT_MOUSE_PTERM)
+#якщо (defined(UNIX) || defined(VMS)) && defined(FEAT_MOUSE_PTERM)
 		1
-#else
+#інакше
 		0
 #endif
 		},
 	{"mouse_sgr",
-#if (defined(UNIX) || defined(VMS)) && defined(FEAT_MOUSE_XTERM)
+#якщо (defined(UNIX) || defined(VMS)) && defined(FEAT_MOUSE_XTERM)
 		1
-#else
+#інакше
 		0
 #endif
 		},
 	{"mouse_sysmouse",
-#if (defined(UNIX) || defined(VMS)) && defined(FEAT_SYSMOUSE)
+#якщо (defined(UNIX) || defined(VMS)) && defined(FEAT_SYSMOUSE)
 		1
-#else
+#інакше
 		0
 #endif
 		},
 	{"mouse_urxvt",
-#if (defined(UNIX) || defined(VMS)) && defined(FEAT_MOUSE_URXVT)
+#якщо (defined(UNIX) || defined(VMS)) && defined(FEAT_MOUSE_URXVT)
 		1
-#else
+#інакше
 		0
 #endif
 		},
 	{"mouse_xterm",
-#if (defined(UNIX) || defined(VMS)) && defined(FEAT_MOUSE_XTERM)
+#якщо (defined(UNIX) || defined(VMS)) && defined(FEAT_MOUSE_XTERM)
 		1
-#else
+#інакше
 		0
 #endif
 		},
@@ -8408,28 +8408,28 @@ f_has(typval_T *argvars, typval_T *rettv)
 	{"multi_byte_ime",
 #ifdef FEAT_MBYTE_IME
 		1
-#else
+#інакше
 		0
 #endif
 		},
 	{"multi_lang",
 #ifdef FEAT_MULTI_LANG
 		1
-#else
+#інакше
 		0
 #endif
 		},
 	{"mzscheme",
-#if defined(FEAT_MZSCHEME) && !defined(DYNAMIC_MZSCHEME)
+#якщо defined(FEAT_MZSCHEME) && !defined(DYNAMIC_MZSCHEME)
 		1
-#else
+#інакше
 		0
 #endif
 		},
 	{"nanotime",
 #ifdef ST_MTIM_NSEC
 		1
-#else
+#інакше
 		0
 #endif
 	},
@@ -8437,156 +8437,156 @@ f_has(typval_T *argvars, typval_T *rettv)
 	{"ole",
 #ifdef FEAT_OLE
 		1
-#else
+#інакше
 		0
 #endif
 		},
 	{"packages",
 #ifdef FEAT_EVAL
 		1
-#else
+#інакше
 		0
 #endif
 		},
 	{"path_extra", 1},
 	{"perl",
-#if defined(FEAT_PERL) && !defined(DYNAMIC_PERL)
+#якщо defined(FEAT_PERL) && !defined(DYNAMIC_PERL)
 		1
-#else
+#інакше
 		0
 #endif
 		},
 	{"persistent_undo",
 #ifdef FEAT_PERSISTENT_UNDO
 		1
-#else
+#інакше
 		0
 #endif
 		},
 	{"python_compiled",
-#if defined(FEAT_PYTHON)
+#якщо defined(FEAT_PYTHON)
 		1
-#else
+#інакше
 		0
 #endif
 		},
 	{"python_dynamic",
-#if defined(FEAT_PYTHON) && defined(DYNAMIC_PYTHON)
+#якщо defined(FEAT_PYTHON) && defined(DYNAMIC_PYTHON)
 		1
-#else
+#інакше
 		0
 #endif
 		},
 	{"python",
-#if defined(FEAT_PYTHON) && !defined(DYNAMIC_PYTHON)
+#якщо defined(FEAT_PYTHON) && !defined(DYNAMIC_PYTHON)
 		1
-#else
+#інакше
 		0
 #endif
 		},
 	{"pythonx",
-#if (defined(FEAT_PYTHON) && !defined(DYNAMIC_PYTHON)) \
+#якщо (defined(FEAT_PYTHON) && !defined(DYNAMIC_PYTHON)) \
 	|| (defined(FEAT_PYTHON3) && !defined(DYNAMIC_PYTHON3))
 		1
-#else
+#інакше
 		0
 #endif
 		},
 	{"python3_compiled",
-#if defined(FEAT_PYTHON3)
+#якщо defined(FEAT_PYTHON3)
 		1
-#else
+#інакше
 		0
 #endif
 		},
 	{"python3_dynamic",
-#if defined(FEAT_PYTHON3) && defined(DYNAMIC_PYTHON3)
+#якщо defined(FEAT_PYTHON3) && defined(DYNAMIC_PYTHON3)
 		1
-#else
+#інакше
 		0
 #endif
 		},
 	{"python3_stable",
-#if defined(FEAT_PYTHON3) && defined(DYNAMIC_PYTHON3_STABLE_ABI)
+#якщо defined(FEAT_PYTHON3) && defined(DYNAMIC_PYTHON3_STABLE_ABI)
 		1
-#else
+#інакше
 		0
 #endif
 		},
 	{"python3",
-#if defined(FEAT_PYTHON3) && !defined(DYNAMIC_PYTHON3)
+#якщо defined(FEAT_PYTHON3) && !defined(DYNAMIC_PYTHON3)
 		1
-#else
+#інакше
 		0
 #endif
 		},
 	{"popupwin",
 #ifdef FEAT_PROP_POPUP
 		1
-#else
+#інакше
 		0
 #endif
 		},
 	{"postscript",
 #ifdef FEAT_POSTSCRIPT
 		1
-#else
+#інакше
 		0
 #endif
 		},
 	{"pango",
 #ifdef FEAT_PRINT_PANGO
 		1
-#else
+#інакше
 		0
 #endif
 		},
 	{"printer",
 #ifdef FEAT_PRINTER
 		1
-#else
+#інакше
 		0
 #endif
 		},
 	{"profile",
 #ifdef FEAT_PROFILE
 		1
-#else
+#інакше
 		0
 #endif
 		},
 	{"prof_nsec",
 #ifdef PROF_NSEC
 		1
-#else
+#інакше
 		0
 #endif
 		},
 	{"reltime",
 #ifdef FEAT_RELTIME
 		1
-#else
+#інакше
 		0
 #endif
 		},
 	{"quickfix",
 #ifdef FEAT_QUICKFIX
 		1
-#else
+#інакше
 		0
 #endif
 		},
 	{"rightleft",
 #ifdef FEAT_RIGHTLEFT
 		1
-#else
+#інакше
 		0
 #endif
 		},
 	{"ruby",
-#if defined(FEAT_RUBY) && !defined(DYNAMIC_RUBY)
+#якщо defined(FEAT_RUBY) && !defined(DYNAMIC_RUBY)
 		1
-#else
+#інакше
 		0
 #endif
 		},
@@ -8596,7 +8596,7 @@ f_has(typval_T *argvars, typval_T *rettv)
 	{"signs",
 #ifdef FEAT_SIGNS
 		1
-#else
+#інакше
 		0
 #endif
 		},
@@ -8604,106 +8604,106 @@ f_has(typval_T *argvars, typval_T *rettv)
 	{"startuptime",
 #ifdef STARTUPTIME
 		1
-#else
+#інакше
 		0
 #endif
 		},
 	{"statusline",
 #ifdef FEAT_STL_OPT
 		1
-#else
+#інакше
 		0
 #endif
 		},
 	{"statusline_click",
 #ifdef FEAT_STL_OPT
 		1
-#else
+#інакше
 		0
 #endif
 		},
 	{"netbeans_intg",
 #ifdef FEAT_NETBEANS_INTG
 		1
-#else
+#інакше
 		0
 #endif
 		},
 	{"sodium",
-#if defined(FEAT_SODIUM) && !defined(DYNAMIC_SODIUM)
+#якщо defined(FEAT_SODIUM) && !defined(DYNAMIC_SODIUM)
 		1
-#else
+#інакше
 		0
 #endif
 		},
 	{"sound",
 #ifdef FEAT_SOUND
 		1
-#else
+#інакше
 		0
 #endif
 		},
 	{"spell",
 #ifdef FEAT_SPELL
 		1
-#else
+#інакше
 		0
 #endif
 		},
 	{"syntax",
 #ifdef FEAT_SYN_HL
 		1
-#else
+#інакше
 		0
 #endif
 		},
 	{"system",
-#if defined(USE_SYSTEM) || !defined(UNIX)
+#якщо defined(USE_SYSTEM) || !defined(UNIX)
 		1
-#else
+#інакше
 		0
 #endif
 		},
 	{"tabpanel",
-#if defined(FEAT_TABPANEL)
+#якщо defined(FEAT_TABPANEL)
 		1,
-#else
+#інакше
 		0,
 #endif
 	},
 	{"tag_binary", 1},	// graduated feature
 	{"tcl",
-#if defined(FEAT_TCL) && !defined(DYNAMIC_TCL)
+#якщо defined(FEAT_TCL) && !defined(DYNAMIC_TCL)
 		1
-#else
+#інакше
 		0
 #endif
 		},
 	{"termguicolors",
 #ifdef FEAT_TERMGUICOLORS
 		1
-#else
+#інакше
 		0
 #endif
 		},
 	{"terminal",
-#if defined(FEAT_TERMINAL) && !defined(MSWIN)
+#якщо defined(FEAT_TERMINAL) && !defined(MSWIN)
 		1
-#else
+#інакше
 		0
 #endif
 		},
 	{"terminfo",
 #ifdef TERMINFO
 		1
-#else
+#інакше
 		0
 #endif
 		},
 	{"termresponse",
 #ifdef FEAT_TERMRESPONSE
 		1
-#else
+#інакше
 		0
 #endif
 		},
@@ -8711,21 +8711,21 @@ f_has(typval_T *argvars, typval_T *rettv)
 	{"textprop",
 #ifdef FEAT_PROP_POPUP
 		1
-#else
+#інакше
 		0
 #endif
 		},
 	{"tgetent",
 #ifdef HAVE_TGETENT
 		1
-#else
+#інакше
 		0
 #endif
 		},
 	{"timers",
 #ifdef FEAT_TIMERS
 		1
-#else
+#інакше
 		0
 #endif
 		},
@@ -8733,7 +8733,7 @@ f_has(typval_T *argvars, typval_T *rettv)
 	{"toolbar",
 #ifdef FEAT_TOOLBAR
 		1
-#else
+#інакше
 		0
 #endif
 		},
@@ -8742,7 +8742,7 @@ f_has(typval_T *argvars, typval_T *rettv)
 	{"vartabs",
 #ifdef FEAT_VARTABS
 		1
-#else
+#інакше
 		0
 #endif
 		},
@@ -8750,7 +8750,7 @@ f_has(typval_T *argvars, typval_T *rettv)
 	{"viminfo",
 #ifdef FEAT_VIMINFO
 		1
-#else
+#інакше
 		0
 #endif
 		},
@@ -8766,21 +8766,21 @@ f_has(typval_T *argvars, typval_T *rettv)
 	{"vtp",
 #ifdef FEAT_VTP
 		1
-#else
+#інакше
 		0
 #endif
 		},
 	{"wayland",
 #ifdef FEAT_WAYLAND
 		1
-#else
+#інакше
 		0
 #endif
 		},
 	{"wayland_clipboard",
 #ifdef FEAT_WAYLAND_CLIPBOARD
 		1
-#else
+#інакше
 		0
 #endif
 		},
@@ -8790,121 +8790,121 @@ f_has(typval_T *argvars, typval_T *rettv)
 	{"winaltkeys",
 #ifdef FEAT_WAK
 		1
-#else
+#інакше
 		0
 #endif
 		},
 	{"writebackup",
 #ifdef FEAT_WRITEBACKUP
 		1
-#else
+#інакше
 		0
 #endif
 		},
 	{"xattr",
 #ifdef FEAT_XATTR
 		1
-#else
+#інакше
 		0
 #endif
 		},
 	{"xim",
 #ifdef FEAT_XIM
 		1
-#else
+#інакше
 		0
 #endif
 		},
 	{"xfontset",
 #ifdef FEAT_XFONTSET
 		1
-#else
+#інакше
 		0
 #endif
 		},
 	{"xpm",
-#if defined(FEAT_XPM_W32) || defined(HAVE_XPM)
+#якщо defined(FEAT_XPM_W32) || defined(HAVE_XPM)
 		1
-#else
+#інакше
 		0
 #endif
 		},
 	{"xpm_w32",	// for backward compatibility
 #ifdef FEAT_XPM_W32
 		1
-#else
+#інакше
 		0
 #endif
 		},
 	{"xsmp",
 #ifdef USE_XSMP
 		1
-#else
+#інакше
 		0
 #endif
 		},
 	{"xsmp_interact",
 #ifdef USE_XSMP_INTERACT
 		1
-#else
+#інакше
 		0
 #endif
 		},
 	{"xterm_clipboard",
 #ifdef FEAT_XCLIPBOARD
 		1
-#else
+#інакше
 		0
 #endif
 		},
 	{"xterm_save",
 #ifdef FEAT_XTERM_SAVE
 		1
-#else
+#інакше
 		0
 #endif
 		},
 	{"X11",
-#if defined(UNIX) && defined(FEAT_X11)
+#якщо defined(UNIX) && defined(FEAT_X11)
 		1
-#else
+#інакше
 		0
 #endif
 		},
 	{":tearoff",
 // same #ifdef as used for ex_tearoff().
-#if defined(FEAT_GUI_MSWIN) && defined(FEAT_MENU) && defined(FEAT_TEAROFF)
+#якщо defined(FEAT_GUI_MSWIN) && defined(FEAT_MENU) && defined(FEAT_TEAROFF)
 		1
-#else
+#інакше
 		0
 #endif
 		},
 	{NULL, 0}
     };
 
-    if (in_vim9script()
+    якщо (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_opt_bool_arg(argvars, 1) == FAIL))
-	return;
+	повернути;
 
     name = tv_get_string(&argvars[0]);
 
     // Fast-path: check features not in has_list[] first to avoid the full
     // linear scan for very common queries like has('patch-...').
-    if (STRNICMP(name, "patch", 5) == 0)
+    якщо (STRNICMP(name, "patch", 5) == 0)
     {
 	x = TRUE;
-	if (name[5] == '-'
+	якщо (name[5] == '-'
 		&& STRLEN(name) >= 11
 		&& (name[6] >= '1' && name[6] <= '9'))
 	{
 	    char	*end;
-	    int	major, minor;
+	    ціле	major, minor;
 
 	    // This works for patch-8.1.2, patch-9.0.3, patch-10.0.4, etc.
 	    // Not for patch-9.10.5.
-	    major = (int)strtoul((char *)name + 6, &end, 10);
-	    if (*end == '.' && vim_isdigit(end[1])
+	    major = (ціле)strtoul((char *)name + 6, &end, 10);
+	    якщо (*end == '.' && vim_isdigit(end[1])
 		    && end[2] == '.' && vim_isdigit(end[3]))
 	    {
 		minor = atoi(end + 1);
@@ -8917,86 +8917,86 @@ f_has(typval_T *argvars, typval_T *rettv)
 				 && has_patch(atoi(end + 3))))));
 	    }
 	}
-	else if (SAFE_isdigit(name[5]))
+	інакше якщо (SAFE_isdigit(name[5]))
 	    n = has_patch(atoi((char *)name + 5));
     }
-    else if (STRICMP(name, "vim_starting") == 0)
+    інакше якщо (STRICMP(name, "vim_starting") == 0)
     {
 	x = TRUE;
 	n = (starting != 0);
     }
-    else if (STRICMP(name, "ttyin") == 0)
+    інакше якщо (STRICMP(name, "ttyin") == 0)
     {
 	x = TRUE;
 	n = mch_input_isatty();
     }
-    else if (STRICMP(name, "ttyout") == 0)
+    інакше якщо (STRICMP(name, "ttyout") == 0)
     {
 	x = TRUE;
 	n = stdout_isatty;
     }
-    else if (STRICMP(name, "multi_byte_encoding") == 0)
+    інакше якщо (STRICMP(name, "multi_byte_encoding") == 0)
     {
 	x = TRUE;
 	n = has_mbyte;
     }
-    else if (STRICMP(name, "gui_running") == 0)
+    інакше якщо (STRICMP(name, "gui_running") == 0)
     {
 	x = TRUE;
 #ifdef FEAT_GUI
 	n = (gui.in_use || gui.starting);
 #endif
     }
-    else if (STRICMP(name, "browse") == 0)
+    інакше якщо (STRICMP(name, "browse") == 0)
     {
 	x = TRUE;
-#if defined(FEAT_GUI) && defined(FEAT_BROWSE)
+#якщо defined(FEAT_GUI) && defined(FEAT_BROWSE)
 	n = gui.in_use;	// gui_mch_browse() works when GUI is running
 #endif
     }
-    else if (STRICMP(name, "syntax_items") == 0)
+    інакше якщо (STRICMP(name, "syntax_items") == 0)
     {
 	x = TRUE;
 #ifdef FEAT_SYN_HL
 	n = syntax_present(curwin);
 #endif
     }
-    else if (STRICMP(name, "vcon") == 0)
+    інакше якщо (STRICMP(name, "vcon") == 0)
     {
 	x = TRUE;
 #ifdef FEAT_VTP
 	n = is_term_win32() && has_vtp_working();
 #endif
     }
-    else if (STRICMP(name, "netbeans_enabled") == 0)
+    інакше якщо (STRICMP(name, "netbeans_enabled") == 0)
     {
 	x = TRUE;
 #ifdef FEAT_NETBEANS_INTG
 	n = netbeans_active();
 #endif
     }
-    else if (STRICMP(name, "mouse_gpm_enabled") == 0)
+    інакше якщо (STRICMP(name, "mouse_gpm_enabled") == 0)
     {
 	x = TRUE;
 #ifdef FEAT_MOUSE_GPM
 	n = gpm_enabled();
 #endif
     }
-    else if (STRICMP(name, "conpty") == 0)
+    інакше якщо (STRICMP(name, "conpty") == 0)
     {
 	x = TRUE;
-#if defined(FEAT_TERMINAL) && defined(MSWIN)
+#якщо defined(FEAT_TERMINAL) && defined(MSWIN)
 	n = use_conpty();
 #endif
     }
-    else if (STRICMP(name, "clipboard_working") == 0)
+    інакше якщо (STRICMP(name, "clipboard_working") == 0)
     {
 	x = TRUE;
 #ifdef FEAT_CLIPBOARD
 	n = clipmethod == CLIPMETHOD_PROVIDER ? TRUE : clip_star.available;
 #endif
     }
-    else if (STRICMP(name, "unnamedplus") == 0)
+    інакше якщо (STRICMP(name, "unnamedplus") == 0)
     {
 	x = TRUE;
 #ifdef FEAT_CLIPBOARD
@@ -9004,24 +9004,24 @@ f_has(typval_T *argvars, typval_T *rettv)
 	// but becomes unavailable if on a platform that doesn't support it
 	// and clipmethod is "none".
 	// (Windows, MacOS).
-# if defined(FEAT_X11) || defined(FEAT_WAYLAND_CLIPBOARD)
+# якщо defined(FEAT_X11) || defined(FEAT_WAYLAND_CLIPBOARD)
 	n = TRUE;
 # elif defined(FEAT_EVAL)
-	if (clipmethod == CLIPMETHOD_PROVIDER)
+	якщо (clipmethod == CLIPMETHOD_PROVIDER)
 	    n = TRUE;
-	else
+	інакше
 	    n = FALSE;
-# else
+# інакше
 	n = FALSE;
 # endif
 #endif
     }
 
     // Look up in has_list[] only if not already handled above.
-    if (x == FALSE)
+    якщо (x == FALSE)
     {
-	for (i = 0; has_list[i].name != NULL; ++i)
-	    if (STRICMP(name, has_list[i].name) == 0)
+	для (i = 0; has_list[i].name != NULL; ++i)
+	    якщо (STRICMP(name, has_list[i].name) == 0)
 	    {
 		x = TRUE;
 		n = has_list[i].present;
@@ -9029,49 +9029,49 @@ f_has(typval_T *argvars, typval_T *rettv)
 	    }
 
 	// features also in has_list[] but sometimes enabled at runtime
-	if (x == TRUE && n == FALSE)
+	якщо (x == TRUE && n == FALSE)
 	{
-	    if (0)
+	    якщо (0)
 	    {
 		// intentionally empty
 	    }
 #ifdef VIMDLL
-	    else if (STRICMP(name, "filterpipe") == 0)
+	    інакше якщо (STRICMP(name, "filterpipe") == 0)
 		n = gui.in_use || gui.starting;
 #endif
-#if defined(USE_ICONV) && defined(DYNAMIC_ICONV)
-	    else if (STRICMP(name, "iconv") == 0)
+#якщо defined(USE_ICONV) && defined(DYNAMIC_ICONV)
+	    інакше якщо (STRICMP(name, "iconv") == 0)
 		n = iconv_enabled(FALSE);
 #endif
 #ifdef DYNAMIC_LUA
-	    else if (STRICMP(name, "lua") == 0)
+	    інакше якщо (STRICMP(name, "lua") == 0)
 		n = lua_enabled(FALSE);
 #endif
 #ifdef DYNAMIC_MZSCHEME
-	    else if (STRICMP(name, "mzscheme") == 0)
+	    інакше якщо (STRICMP(name, "mzscheme") == 0)
 		n = mzscheme_enabled(FALSE);
 #endif
 #ifdef DYNAMIC_PERL
-	    else if (STRICMP(name, "perl") == 0)
+	    інакше якщо (STRICMP(name, "perl") == 0)
 		n = perl_enabled(FALSE);
 #endif
 #ifdef DYNAMIC_PYTHON
-	    else if (STRICMP(name, "python") == 0)
+	    інакше якщо (STRICMP(name, "python") == 0)
 		n = python_enabled(FALSE);
 #endif
 #ifdef DYNAMIC_PYTHON3
-	    else if (STRICMP(name, "python3") == 0)
+	    інакше якщо (STRICMP(name, "python3") == 0)
 		n = python3_enabled(FALSE);
 #endif
-#if defined(DYNAMIC_PYTHON) || defined(DYNAMIC_PYTHON3)
-	    else if (STRICMP(name, "pythonx") == 0)
+#якщо defined(DYNAMIC_PYTHON) || defined(DYNAMIC_PYTHON3)
+	    інакше якщо (STRICMP(name, "pythonx") == 0)
 	    {
-# if defined(DYNAMIC_PYTHON) && defined(DYNAMIC_PYTHON3)
-		if (p_pyx == 0)
+# якщо defined(DYNAMIC_PYTHON) && defined(DYNAMIC_PYTHON3)
+		якщо (p_pyx == 0)
 		    n = python3_enabled(FALSE) || python_enabled(FALSE);
-		else if (p_pyx == 3)
+		інакше якщо (p_pyx == 3)
 		    n = python3_enabled(FALSE);
-		else if (p_pyx == 2)
+		інакше якщо (p_pyx == 2)
 		    n = python_enabled(FALSE);
 # elif defined(DYNAMIC_PYTHON)
 		n = python_enabled(FALSE);
@@ -9081,32 +9081,32 @@ f_has(typval_T *argvars, typval_T *rettv)
 	    }
 #endif
 #ifdef DYNAMIC_RUBY
-	    else if (STRICMP(name, "ruby") == 0)
+	    інакше якщо (STRICMP(name, "ruby") == 0)
 		n = ruby_enabled(FALSE);
 #endif
 #ifdef DYNAMIC_TCL
-	    else if (STRICMP(name, "tcl") == 0)
+	    інакше якщо (STRICMP(name, "tcl") == 0)
 		n = tcl_enabled(FALSE);
 #endif
 #ifdef DYNAMIC_SODIUM
-	    else if (STRICMP(name, "sodium") == 0)
+	    інакше якщо (STRICMP(name, "sodium") == 0)
 		n = sodium_enabled(FALSE);
 #endif
-#if defined(FEAT_TERMINAL) && defined(MSWIN)
-	    else if (STRICMP(name, "terminal") == 0)
+#якщо defined(FEAT_TERMINAL) && defined(MSWIN)
+	    інакше якщо (STRICMP(name, "terminal") == 0)
 		n = terminal_enabled();
 #endif
 #ifdef DYNAMIC_GPM
-	    else if (STRICMP(name, "mouse_gpm") == 0)
+	    інакше якщо (STRICMP(name, "mouse_gpm") == 0)
 		n = gpm_available();
 #endif
 	}
     }
 
-    if (argvars[1].v_type != VAR_UNKNOWN && tv_get_bool(&argvars[1]))
+    якщо (argvars[1].v_type != VAR_UNKNOWN && tv_get_bool(&argvars[1]))
 	// return whether feature could ever be enabled
 	rettv->vval.v_number = x;
-    else
+    інакше
 	// return whether feature is enabled
 	rettv->vval.v_number = n;
 }
@@ -9115,22 +9115,22 @@ f_has(typval_T *argvars, typval_T *rettv)
  * Return TRUE if "feature" can change later.
  * Also when checking for the feature has side effects, such as loading a DLL.
  */
-    int
+    ціле
 dynamic_feature(char_u *feature)
 {
-    return (feature == NULL
-#if defined(FEAT_GUI) && defined(FEAT_BROWSE)
+    повернути (feature == NULL
+#якщо defined(FEAT_GUI) && defined(FEAT_BROWSE)
 	    || (STRICMP(feature, "browse") == 0 && !gui.in_use)
 #endif
 #ifdef VIMDLL
 	    || STRICMP(feature, "filterpipe") == 0
 #endif
-#if defined(FEAT_GUI) && !defined(ALWAYS_USE_GUI) && !defined(VIMDLL)
+#якщо defined(FEAT_GUI) && !defined(ALWAYS_USE_GUI) && !defined(VIMDLL)
 	    // this can only change on Unix where the ":gui" command could be
 	    // used.
 	    || (STRICMP(feature, "gui_running") == 0 && !gui.in_use)
 #endif
-#if defined(USE_ICONV) && defined(DYNAMIC_ICONV)
+#якщо defined(USE_ICONV) && defined(DYNAMIC_ICONV)
 	    || STRICMP(feature, "iconv") == 0
 #endif
 #ifdef DYNAMIC_LUA
@@ -9154,7 +9154,7 @@ dynamic_feature(char_u *feature)
 #ifdef DYNAMIC_PYTHON3
 	    || STRICMP(feature, "python3") == 0
 #endif
-#if defined(DYNAMIC_PYTHON) || defined(DYNAMIC_PYTHON3)
+#якщо defined(DYNAMIC_PYTHON) || defined(DYNAMIC_PYTHON3)
 	    || STRICMP(feature, "pythonx") == 0
 #endif
 #ifdef DYNAMIC_RUBY
@@ -9169,7 +9169,7 @@ dynamic_feature(char_u *feature)
 	    // once "starting" is zero it will stay that way
 	    || (STRICMP(feature, "vim_starting") == 0 && starting != 0)
 	    || STRICMP(feature, "multi_byte_encoding") == 0
-#if defined(FEAT_TERMINAL) && defined(MSWIN)
+#якщо defined(FEAT_TERMINAL) && defined(MSWIN)
 	    || STRICMP(feature, "conpty") == 0
 #endif
 	    );
@@ -9184,20 +9184,20 @@ f_haslocaldir(typval_T *argvars, typval_T *rettv)
     tabpage_T	*tp = NULL;
     win_T	*wp = NULL;
 
-    if (in_vim9script()
+    якщо (in_vim9script()
 	    && (check_for_opt_number_arg(argvars, 0) == FAIL
 		|| (argvars[0].v_type != VAR_UNKNOWN
 		    && check_for_opt_number_arg(argvars, 1) == FAIL)))
-	return;
+	повернути;
 
     wp = find_tabwin(&argvars[0], &argvars[1], &tp);
 
     // Check for window-local and tab-local directories
-    if (wp != NULL && wp->w_localdir != NULL)
+    якщо (wp != NULL && wp->w_localdir != NULL)
 	rettv->vval.v_number = 1;
-    else if (tp != NULL && tp->tp_localdir != NULL)
+    інакше якщо (tp != NULL && tp->tp_localdir != NULL)
 	rettv->vval.v_number = 2;
-    else
+    інакше
 	rettv->vval.v_number = 0;
 }
 
@@ -9207,8 +9207,8 @@ f_haslocaldir(typval_T *argvars, typval_T *rettv)
     static void
 f_hlID(typval_T *argvars, typval_T *rettv)
 {
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    якщо (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+	повернути;
 
     rettv->vval.v_number = syn_name2id(tv_get_string(&argvars[0]));
 }
@@ -9219,8 +9219,8 @@ f_hlID(typval_T *argvars, typval_T *rettv)
     static void
 f_hlexists(typval_T *argvars, typval_T *rettv)
 {
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    якщо (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+	повернути;
 
     rettv->vval.v_number = highlight_exists(tv_get_string(&argvars[0]));
 }
@@ -9245,9 +9245,9 @@ f_hostname(typval_T *argvars UNUSED, typval_T *rettv)
  * Return empty string if not an object.
  */
 #ifdef VMS // VMS does not have defined uintptr_t
-# if defined(HAVE_NO_LONG_LONG)
-typedef unsigned int uintptr_t;
-# else
+# якщо defined(HAVE_NO_LONG_LONG)
+typedef unsigned ціле uintptr_t;
+# інакше
 typedef unsigned long long uintptr_t;
 # endif
 #endif // VMS
@@ -9268,13 +9268,13 @@ f_id(typval_T *argvars, typval_T *rettv)
 	case VAR_CHANNEL:
 	case VAR_BLOB:
 	    // Assume pointer value in typval_T vval union at common location.
-	    if (argvars[0].vval.v_object != NULL)
+	    якщо (argvars[0].vval.v_object != NULL)
 	    {
 		// "v" gets the address as an integer
 		uintptr_t v = (uintptr_t)(void *)argvars[0].vval.v_object;
 		// Build a hex string from the item's address; it is in
 		// reverse order. Ignore trailing zeros.
-		for (; p < numbuf + sizeof(uintptr_t) * 2 && v != 0;
+		для (; p < numbuf + sizeof(uintptr_t) * 2 && v != 0;
 								++p, v >>= 4)
 		    *p = "0123456789abcdef"[v & 0xf];
 	    }
@@ -9295,36 +9295,36 @@ index_func_blob(typval_T *argvars, typval_T *rettv)
 {
     typval_T	tv;
     blob_T	*b;
-    int		start = 0;
-    int		error = FALSE;
-    int		ic = FALSE;
+    ціле		start = 0;
+    ціле		error = FALSE;
+    ціле		ic = FALSE;
 
     b = argvars[0].vval.v_blob;
-    if (b == NULL)
-	return;
+    якщо (b == NULL)
+	повернути;
 
-    if (argvars[2].v_type != VAR_UNKNOWN)
+    якщо (argvars[2].v_type != VAR_UNKNOWN)
     {
 	start = tv_get_number_chk(&argvars[2], &error);
-	if (error)
-	    return;
+	якщо (error)
+	    повернути;
     }
 
-    if (start < 0)
+    якщо (start < 0)
     {
 	start = blob_len(b) + start;
-	if (start < 0)
+	якщо (start < 0)
 	    start = 0;
     }
 
-    for (int idx = start; idx < blob_len(b); ++idx)
+    для (ціле idx = start; idx < blob_len(b); ++idx)
     {
 	tv.v_type = VAR_NUMBER;
 	tv.vval.v_number = blob_get(b, idx);
-	if (tv_equal(&tv, &argvars[1], ic))
+	якщо (tv_equal(&tv, &argvars[1], ic))
 	{
 	    rettv->vval.v_number = idx;
-	    return;
+	    повернути;
 	}
     }
 }
@@ -9336,20 +9336,20 @@ index_func_blob(typval_T *argvars, typval_T *rettv)
 index_func_tuple(typval_T *argvars, typval_T *rettv)
 {
     tuple_T	*tuple = argvars[0].vval.v_tuple;
-    int		ic = FALSE;
-    int		error = FALSE;
+    ціле		ic = FALSE;
+    ціле		error = FALSE;
 
-    if (tuple == NULL)
-	return;
+    якщо (tuple == NULL)
+	повернути;
 
-    int	start_idx = 0;
-    if (argvars[2].v_type != VAR_UNKNOWN)
+    ціле	start_idx = 0;
+    якщо (argvars[2].v_type != VAR_UNKNOWN)
     {
 	start_idx = tv_get_number_chk(&argvars[2], &error);
-	if (!error && argvars[3].v_type != VAR_UNKNOWN)
-	    ic = (int)tv_get_bool_chk(&argvars[3], &error);
-	if (error)
-	    return;
+	якщо (!error && argvars[3].v_type != VAR_UNKNOWN)
+	    ic = (ціле)tv_get_bool_chk(&argvars[3], &error);
+	якщо (error)
+	    повернути;
     }
 
     rettv->vval.v_number = index_tuple(tuple, &argvars[1], start_idx, ic);
@@ -9364,29 +9364,29 @@ index_func_list(typval_T *argvars, typval_T *rettv)
     list_T	*l;
     listitem_T	*item;
     long	idx = 0;
-    int		ic = FALSE;
-    int		error = FALSE;
+    ціле		ic = FALSE;
+    ціле		error = FALSE;
 
     l = argvars[0].vval.v_list;
-    if (l == NULL)
-	return;
+    якщо (l == NULL)
+	повернути;
 
     CHECK_LIST_MATERIALIZE(l);
     item = l->lv_first;
-    if (argvars[2].v_type != VAR_UNKNOWN)
+    якщо (argvars[2].v_type != VAR_UNKNOWN)
     {
 	// Start at specified item.  Use the cached index that list_find()
 	// sets, so that a negative number also works.
 	item = list_find(l, (long)tv_get_number_chk(&argvars[2], &error));
 	idx = l->lv_u.mat.lv_idx;
-	if (argvars[3].v_type != VAR_UNKNOWN)
-	    ic = (int)tv_get_bool_chk(&argvars[3], &error);
-	if (error)
+	якщо (argvars[3].v_type != VAR_UNKNOWN)
+	    ic = (ціле)tv_get_bool_chk(&argvars[3], &error);
+	якщо (error)
 	    item = NULL;
     }
 
-    for ( ; item != NULL; item = item->li_next, ++idx)
-	if (tv_equal(&item->li_tv, &argvars[1], ic))
+    для ( ; item != NULL; item = item->li_next, ++idx)
+	якщо (tv_equal(&item->li_tv, &argvars[1], ic))
 	{
 	    rettv->vval.v_number = idx;
 	    break;
@@ -9401,22 +9401,22 @@ f_index(typval_T *argvars, typval_T *rettv)
 {
     rettv->vval.v_number = -1;
 
-    if (in_vim9script()
+    якщо (in_vim9script()
 	    && (check_for_list_or_tuple_or_blob_arg(argvars, 0) == FAIL
 		|| (argvars[0].v_type == VAR_BLOB
 		    && check_for_number_arg(argvars, 1) == FAIL)
 		|| check_for_opt_number_arg(argvars, 2) == FAIL
 		|| (argvars[2].v_type != VAR_UNKNOWN
 		    && check_for_opt_bool_arg(argvars, 3) == FAIL)))
-	return;
+	повернути;
 
-    if (argvars[0].v_type == VAR_BLOB)
+    якщо (argvars[0].v_type == VAR_BLOB)
 	index_func_blob(argvars, rettv);
-    else if (argvars[0].v_type == VAR_TUPLE)
+    інакше якщо (argvars[0].v_type == VAR_TUPLE)
 	index_func_tuple(argvars, rettv);
-    else if (argvars[0].v_type == VAR_LIST)
+    інакше якщо (argvars[0].v_type == VAR_LIST)
 	index_func_list(argvars, rettv);
-    else
+    інакше
 	emsg(_(e_list_or_blob_required));
 }
 
@@ -9425,25 +9425,25 @@ f_index(typval_T *argvars, typval_T *rettv)
  * The expression is expected to return a boolean value.  The caller should set
  * the VV_KEY and VV_VAL vim variables before calling this function.
  */
-    int
+    ціле
 indexof_eval_expr(typval_T *expr)
 {
     typval_T	argv[3];
     typval_T	newtv;
     varnumber_T	found;
-    int		error = FALSE;
+    ціле		error = FALSE;
 
     argv[0] = *get_vim_var_tv(VV_KEY);
     argv[1] = *get_vim_var_tv(VV_VAL);
     newtv.v_type = VAR_UNKNOWN;
 
-    if (eval_expr_typval(expr, FALSE, argv, 2, NULL, &newtv) == FAIL)
-	return FALSE;
+    якщо (eval_expr_typval(expr, FALSE, argv, 2, NULL, &newtv) == FAIL)
+	повернути FALSE;
 
     found = tv_get_bool_chk(&newtv, &error);
     clear_tv(&newtv);
 
-    return error ? FALSE : found;
+    повернути error ? FALSE : found;
 }
 
 /*
@@ -9451,39 +9451,39 @@ indexof_eval_expr(typval_T *expr)
  * 'startidx' and return the index of the byte where 'expr' is TRUE.  Returns
  * -1 if 'expr' doesn't evaluate to TRUE for any of the bytes.
  */
-    static int
+    static ціле
 indexof_blob(blob_T *b, long startidx, typval_T *expr)
 {
     long	idx = 0;
 
-    if (b == NULL)
-	return -1;
+    якщо (b == NULL)
+	повернути -1;
 
-    if (startidx < 0)
+    якщо (startidx < 0)
     {
 	// negative index: index from the last byte
 	startidx = blob_len(b) + startidx;
-	if (startidx < 0)
+	якщо (startidx < 0)
 	    startidx = 0;
     }
 
     set_vim_var_type(VV_KEY, VAR_NUMBER);
     set_vim_var_type(VV_VAL, VAR_NUMBER);
 
-    int		called_emsg_start = called_emsg;
-    for (idx = startidx; idx < blob_len(b); ++idx)
+    ціле		called_emsg_start = called_emsg;
+    для (idx = startidx; idx < blob_len(b); ++idx)
     {
 	set_vim_var_nr(VV_KEY, idx);
 	set_vim_var_nr(VV_VAL, blob_get(b, idx));
 
-	if (indexof_eval_expr(expr))
-	    return idx;
+	якщо (indexof_eval_expr(expr))
+	    повернути idx;
 
-	if (called_emsg != called_emsg_start)
-	    return -1;
+	якщо (called_emsg != called_emsg_start)
+	    повернути -1;
     }
 
-    return -1;
+    повернути -1;
 }
 
 /*
@@ -9491,33 +9491,33 @@ indexof_blob(blob_T *b, long startidx, typval_T *expr)
  * 'startidx' and return the index of the item where 'expr' is TRUE.  Returns
  * -1 if 'expr' doesn't evaluate to TRUE for any of the items.
  */
-    static int
+    static ціле
 indexof_list(list_T *l, long startidx, typval_T *expr)
 {
     listitem_T	*item;
     long	idx = 0;
-    int		found;
+    ціле		found;
 
-    if (l == NULL)
-	return -1;
+    якщо (l == NULL)
+	повернути -1;
 
     CHECK_LIST_MATERIALIZE(l);
 
-    if (startidx == 0)
+    якщо (startidx == 0)
 	item = l->lv_first;
-    else
+    інакше
     {
 	// Start at specified item.  Use the cached index that list_find()
 	// sets, so that a negative number also works.
 	item = list_find(l, startidx);
-	if (item != NULL)
+	якщо (item != NULL)
 	    idx = l->lv_u.mat.lv_idx;
     }
 
     set_vim_var_type(VV_KEY, VAR_NUMBER);
 
-    int		called_emsg_start = called_emsg;
-    for ( ; item != NULL; item = item->li_next, ++idx)
+    ціле		called_emsg_start = called_emsg;
+    для ( ; item != NULL; item = item->li_next, ++idx)
     {
 	set_vim_var_nr(VV_KEY, idx);
 	copy_tv(&item->li_tv, get_vim_var_tv(VV_VAL));
@@ -9525,14 +9525,14 @@ indexof_list(list_T *l, long startidx, typval_T *expr)
 	found = indexof_eval_expr(expr);
 	clear_tv(get_vim_var_tv(VV_VAL));
 
-	if (found)
-	    return idx;
+	якщо (found)
+	    повернути idx;
 
-	if (called_emsg != called_emsg_start)
-	    return -1;
+	якщо (called_emsg != called_emsg_start)
+	    повернути -1;
     }
 
-    return -1;
+    повернути -1;
 }
 
 /*
@@ -9544,23 +9544,23 @@ f_indexof(typval_T *argvars, typval_T *rettv)
     long	startidx = 0;
     typval_T	save_val;
     typval_T	save_key;
-    int		save_did_emsg;
+    ціле		save_did_emsg;
 
     rettv->vval.v_number = -1;
 
-    if (check_for_list_or_tuple_or_blob_arg(argvars, 0) == FAIL
+    якщо (check_for_list_or_tuple_or_blob_arg(argvars, 0) == FAIL
 	    || check_for_string_or_func_arg(argvars, 1) == FAIL
 	    || check_for_opt_dict_arg(argvars, 2) == FAIL)
-	return;
+	повернути;
 
-    if ((argvars[1].v_type == VAR_STRING &&
+    якщо ((argvars[1].v_type == VAR_STRING &&
 		(argvars[1].vval.v_string == NULL
 		 || *argvars[1].vval.v_string == NUL))
 	    || (argvars[1].v_type == VAR_FUNC
 		&& argvars[1].vval.v_partial == NULL))
-	return;
+	повернути;
 
-    if (argvars[2].v_type == VAR_DICT)
+    якщо (argvars[2].v_type == VAR_DICT)
 	startidx = dict_get_number_def(argvars[2].vval.v_dict, "startidx", 0);
 
     prepare_vimvar(VV_VAL, &save_val);
@@ -9571,13 +9571,13 @@ f_indexof(typval_T *argvars, typval_T *rettv)
     save_did_emsg = did_emsg;
     did_emsg = FALSE;
 
-    if (argvars[0].v_type == VAR_BLOB)
+    якщо (argvars[0].v_type == VAR_BLOB)
 	rettv->vval.v_number = indexof_blob(argvars[0].vval.v_blob, startidx,
 								&argvars[1]);
-    else if (argvars[0].v_type == VAR_TUPLE)
+    інакше якщо (argvars[0].v_type == VAR_TUPLE)
 	rettv->vval.v_number = indexof_tuple(argvars[0].vval.v_tuple, startidx,
 								&argvars[1]);
-    else
+    інакше
 	rettv->vval.v_number = indexof_list(argvars[0].vval.v_list, startidx,
 								&argvars[1]);
 
@@ -9586,7 +9586,7 @@ f_indexof(typval_T *argvars, typval_T *rettv)
     did_emsg |= save_did_emsg;
 }
 
-static int inputsecret_flag = 0;
+static ціле inputsecret_flag = 0;
 
 /*
  * "input()" function
@@ -9604,44 +9604,44 @@ f_input(typval_T *argvars, typval_T *rettv)
     static void
 f_inputdialog(typval_T *argvars, typval_T *rettv)
 {
-#if defined(FEAT_GUI_TEXTDIALOG)
+#якщо defined(FEAT_GUI_TEXTDIALOG)
     // Use a GUI dialog if the GUI is running and 'c' is not in 'guioptions'
-    if (gui.in_use && vim_strchr(p_go, GO_CONDIALOG) == NULL)
+    якщо (gui.in_use && vim_strchr(p_go, GO_CONDIALOG) == NULL)
     {
 	char_u	*message;
 	char_u	buf[NUMBUFLEN];
 	char_u	*defstr = (char_u *)"";
 
-	if (in_vim9script()
+	якщо (in_vim9script()
 		&& (check_for_string_arg(argvars, 0) == FAIL
 		    || check_for_opt_string_arg(argvars, 1) == FAIL
 		    || (argvars[1].v_type != VAR_UNKNOWN
 			&& check_for_opt_string_arg(argvars, 2) == FAIL)))
-	    return;
+	    повернути;
 
 	message = tv_get_string_chk(&argvars[0]);
-	if (argvars[1].v_type != VAR_UNKNOWN
+	якщо (argvars[1].v_type != VAR_UNKNOWN
 		&& (defstr = tv_get_string_buf_chk(&argvars[1], buf)) != NULL)
 	    vim_strncpy(IObuff, defstr, IOSIZE - 1);
-	else
+	інакше
 	    IObuff[0] = NUL;
-	if (message != NULL && defstr != NULL
+	якщо (message != NULL && defstr != NULL
 		&& do_dialog(VIM_QUESTION, NULL, message,
 			  (char_u *)_("&OK\n&Cancel"), 1, IObuff, FALSE) == 1)
 	    rettv->vval.v_string = vim_strsave(IObuff);
-	else
+	інакше
 	{
-	    if (message != NULL && defstr != NULL
+	    якщо (message != NULL && defstr != NULL
 					&& argvars[1].v_type != VAR_UNKNOWN
 					&& argvars[2].v_type != VAR_UNKNOWN)
 		rettv->vval.v_string = vim_strsave(
 				      tv_get_string_buf(&argvars[2], buf));
-	    else
+	    інакше
 		rettv->vval.v_string = NULL;
 	}
 	rettv->v_type = VAR_STRING;
     }
-    else
+    інакше
 #endif
 	get_user_input(argvars, rettv, TRUE, inputsecret_flag);
 }
@@ -9654,22 +9654,22 @@ f_inputlist(typval_T *argvars, typval_T *rettv)
 {
     list_T	*l;
     listitem_T	*li;
-    int		selected;
-    int		mouse_used;
+    ціле		selected;
+    ціле		mouse_used;
 
 #ifdef NO_CONSOLE_INPUT
     // While starting up, there is no place to enter text. When running tests
     // with --not-a-term we assume feedkeys() will be used.
-    if (no_console_input() && !is_not_a_term())
-	return;
+    якщо (no_console_input() && !is_not_a_term())
+	повернути;
 #endif
-    if (in_vim9script() && check_for_list_arg(argvars, 0) == FAIL)
-	return;
+    якщо (in_vim9script() && check_for_list_arg(argvars, 0) == FAIL)
+	повернути;
 
-    if (argvars[0].v_type != VAR_LIST || argvars[0].vval.v_list == NULL)
+    якщо (argvars[0].v_type != VAR_LIST || argvars[0].vval.v_list == NULL)
     {
 	semsg(_(e_argument_of_str_must_be_list), "inputlist()");
-	return;
+	повернути;
     }
 
     msg_start();
@@ -9688,7 +9688,7 @@ f_inputlist(typval_T *argvars, typval_T *rettv)
 
     // Ask for choice.
     selected = prompt_for_number(&mouse_used);
-    if (mouse_used)
+    якщо (mouse_used)
 	selected -= lines_left;
 
     rettv->vval.v_number = selected;
@@ -9702,14 +9702,14 @@ static garray_T	    ga_userinput = {0, 0, sizeof(tasave_T), 4, NULL};
     static void
 f_inputrestore(typval_T *argvars UNUSED, typval_T *rettv)
 {
-    if (ga_userinput.ga_len > 0)
+    якщо (ga_userinput.ga_len > 0)
     {
 	--ga_userinput.ga_len;
 	restore_typeahead((tasave_T *)(ga_userinput.ga_data)
 						  + ga_userinput.ga_len, TRUE);
 	// default return is zero == OK
     }
-    else if (p_verbose > 1)
+    інакше якщо (p_verbose > 1)
     {
 	verb_msg(_("called inputrestore() more often than inputsave()"));
 	rettv->vval.v_number = 1; // Failed
@@ -9723,14 +9723,14 @@ f_inputrestore(typval_T *argvars UNUSED, typval_T *rettv)
 f_inputsave(typval_T *argvars UNUSED, typval_T *rettv)
 {
     // Add an entry to the stack of typeahead storage.
-    if (ga_grow(&ga_userinput, 1) == OK)
+    якщо (ga_grow(&ga_userinput, 1) == OK)
     {
 	save_typeahead((tasave_T *)(ga_userinput.ga_data)
 						       + ga_userinput.ga_len);
 	++ga_userinput.ga_len;
 	// default return is zero == OK
     }
-    else
+    інакше
 	rettv->vval.v_number = 1; // Failed
 }
 
@@ -9740,10 +9740,10 @@ f_inputsave(typval_T *argvars UNUSED, typval_T *rettv)
     static void
 f_inputsecret(typval_T *argvars, typval_T *rettv)
 {
-    if (in_vim9script()
+    якщо (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_opt_string_arg(argvars, 1) == FAIL))
-	return;
+	повернути;
 
     ++cmdline_star;
     ++inputsecret_flag;
@@ -9767,8 +9767,8 @@ f_interrupt(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
     static void
 f_invert(typval_T *argvars, typval_T *rettv)
 {
-    if (in_vim9script() && check_for_number_arg(argvars, 0) == FAIL)
-	return;
+    якщо (in_vim9script() && check_for_number_arg(argvars, 0) == FAIL)
+	повернути;
 
     rettv->vval.v_number = ~tv_get_number_chk(&argvars[0], NULL);
 }
@@ -9779,7 +9779,7 @@ f_invert(typval_T *argvars, typval_T *rettv)
     static void
 free_lval_root(lval_root_T *root)
 {
-    if (root->lr_tv != NULL)
+    якщо (root->lr_tv != NULL)
 	free_tv(root->lr_tv);
     class_unref(root->lr_cl_exec);
     root->lr_tv = NULL;
@@ -9797,27 +9797,27 @@ free_lval_root(lval_root_T *root)
  * Free resources and return FAIL if the root should not be used. Otherwise OK.
  */
 
-    static int
+    static ціле
 fix_variable_reference_lval_root(lval_root_T *root, char_u *name)
 {
 
     // Check if lr_tv is the name of an object/class reference: name start with
     // "this" or name is class variable. Clear lr_tv if neither.
-    int found_member = FALSE;
-    if (root->lr_tv->v_type == VAR_OBJECT)
+    ціле found_member = FALSE;
+    якщо (root->lr_tv->v_type == VAR_OBJECT)
     {
-	if (STRNCMP("this.", name, 5) == 0 ||STRCMP("this", name) == 0)
+	якщо (STRNCMP("this.", name, 5) == 0 ||STRCMP("this", name) == 0)
 	    found_member = TRUE;
     }
-    if (!found_member)	// not object member, try class member
+    якщо (!found_member)	// not object member, try class member
     {
 	// Explicitly check if the name is a class member.
 	// If it's not then do nothing.
 	char_u	*end;
-	for (end = name; ASCII_ISALNUM(*end) || *end == '_'; ++end)
+	для (end = name; ASCII_ISALNUM(*end) || *end == '_'; ++end)
 	    ;
-	int idx = class_member_idx(root->lr_cl_exec, name, end - name);
-	if (idx >= 0)
+	ціле idx = class_member_idx(root->lr_cl_exec, name, end - name);
+	якщо (idx >= 0)
 	{
 	    // A class variable, replace lr_tv with it
 	    clear_tv(root->lr_tv);
@@ -9825,13 +9825,13 @@ fix_variable_reference_lval_root(lval_root_T *root, char_u *name)
 	    found_member = TRUE;
 	}
     }
-    if (!found_member)
+    якщо (!found_member)
     {
 	free_tv(root->lr_tv);
 	root->lr_tv = NULL;	    // Not a member variable
     }
     // If FAIL, then must free_lval_root(root);
-    return OK;
+    повернути OK;
 }
 
 /*
@@ -9846,8 +9846,8 @@ f_islocked(typval_T *argvars, typval_T *rettv)
 
     rettv->vval.v_number = -1;
 
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    якщо (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+	повернути;
 
     char_u *name = tv_get_string(&argvars[0]);
 #ifdef LOG_LOCKVAR
@@ -9858,11 +9858,11 @@ f_islocked(typval_T *argvars, typval_T *rettv)
     lval_root_T *root = NULL;
 
     // Set up lval_root if executing in a method.
-    if (fill_exec_lval_root(&aroot) == OK)
+    якщо (fill_exec_lval_root(&aroot) == OK)
     {
 	// Almost always produces a valid lval_root since lr_cl_exec is used
 	// for access verification, lr_tv may be set to NULL.
-	if (fix_variable_reference_lval_root(&aroot, name) == OK)
+	якщо (fix_variable_reference_lval_root(&aroot, name) == OK)
 	    root = &aroot;
     }
 
@@ -9873,19 +9873,19 @@ f_islocked(typval_T *argvars, typval_T *rettv)
 			     FNE_CHECK_START);
     lval_root = lval_root_save;
 
-    if (end != NULL && lv.ll_name != NULL)
+    якщо (end != NULL && lv.ll_name != NULL)
     {
-	if (*end != NUL)
+	якщо (*end != NUL)
 	{
 	    semsg(_(lv.ll_name == lv.ll_name_end
 		   ? e_invalid_argument_str : e_trailing_characters_str), end);
 	}
-	else
+	інакше
 	{
-	    if (lv.ll_tv == NULL)
+	    якщо (lv.ll_tv == NULL)
 	    {
 		di = find_var(lv.ll_name, NULL, TRUE);
-		if (di != NULL)
+		якщо (di != NULL)
 		{
 		    // Consider a variable locked when:
 		    // 1. the variable itself is locked
@@ -9895,11 +9895,11 @@ f_islocked(typval_T *argvars, typval_T *rettv)
 						   || tv_islocked(&di->di_tv));
 		}
 	    }
-	    else if (lv.ll_is_root)
+	    інакше якщо (lv.ll_is_root)
 	    {
 		rettv->vval.v_number = tv_islocked(lv.ll_tv);
 	    }
-	    else if (lv.ll_object != NULL)
+	    інакше якщо (lv.ll_object != NULL)
 	    {
 		typval_T *tv = ((typval_T *)(lv.ll_object + 1)) + lv.ll_oi;
 		rettv->vval.v_number = tv_islocked(tv);
@@ -9907,7 +9907,7 @@ f_islocked(typval_T *argvars, typval_T *rettv)
 		ch_log(NULL, "LKVAR: f_islocked(): name %s (obj)", lv.ll_name);
 #endif
 	    }
-	    else if (lv.ll_class != NULL)
+	    інакше якщо (lv.ll_class != NULL)
 	    {
 		typval_T *tv = &lv.ll_class->class_members_tv[lv.ll_oi];
 		rettv->vval.v_number = tv_islocked(tv);
@@ -9915,23 +9915,23 @@ f_islocked(typval_T *argvars, typval_T *rettv)
 		ch_log(NULL, "LKVAR: f_islocked(): name %s (cl)", lv.ll_name);
 #endif
 	    }
-	    else if (lv.ll_range)
+	    інакше якщо (lv.ll_range)
 		emsg(_(e_range_not_allowed));
-	    else if (lv.ll_newkey != NULL)
+	    інакше якщо (lv.ll_newkey != NULL)
 		semsg(_(e_key_not_present_in_dictionary_str), lv.ll_newkey);
-	    else if (lv.ll_list != NULL)
+	    інакше якщо (lv.ll_list != NULL)
 		// List item.
 		rettv->vval.v_number = tv_islocked(&lv.ll_li->li_tv);
-	    else if (lv.ll_tuple != NULL)
+	    інакше якщо (lv.ll_tuple != NULL)
 		// Tuple item.
 		rettv->vval.v_number = tv_islocked(lv.ll_tv);
-	    else
+	    інакше
 		// Dictionary item.
 		rettv->vval.v_number = tv_islocked(&lv.ll_di->di_tv);
 	}
     }
 
-    if (root != NULL)
+    якщо (root != NULL)
 	free_lval_root(root);
     clear_lval(&lv);
 }
@@ -9942,17 +9942,17 @@ f_islocked(typval_T *argvars, typval_T *rettv)
     static void
 f_items(typval_T *argvars, typval_T *rettv)
 {
-    if (argvars[0].v_type == VAR_STRING)
+    якщо (argvars[0].v_type == VAR_STRING)
 	string2items(argvars, rettv);
-    else if (argvars[0].v_type == VAR_LIST)
+    інакше якщо (argvars[0].v_type == VAR_LIST)
 	list2items(argvars, rettv);
-    else if (argvars[0].v_type == VAR_TUPLE)
+    інакше якщо (argvars[0].v_type == VAR_TUPLE)
 	tuple2items(argvars, rettv);
-    else if (argvars[0].v_type == VAR_BLOB)
+    інакше якщо (argvars[0].v_type == VAR_BLOB)
 	blob2items(argvars, rettv);
-    else if (argvars[0].v_type == VAR_DICT)
+    інакше якщо (argvars[0].v_type == VAR_DICT)
 	dict2items(argvars, rettv);
-    else
+    інакше
 	semsg(_(e_list_tuple_dict_blob_or_string_required_for_argument_nr), 1);
 }
 
@@ -9965,9 +9965,9 @@ f_keytrans(typval_T *argvars, typval_T *rettv)
     char_u *escaped;
 
     rettv->v_type = VAR_STRING;
-    if (check_for_string_arg(argvars, 0) == FAIL
+    якщо (check_for_string_arg(argvars, 0) == FAIL
 	    || argvars[0].vval.v_string == NULL)
-	return;
+	повернути;
     // Need to escape K_SPECIAL and CSI for mb_unescape().
     escaped = vim_strsave_escape_csi(argvars[0].vval.v_string);
     rettv->vval.v_string = str2special_save(escaped, TRUE, TRUE);
@@ -9980,11 +9980,11 @@ f_keytrans(typval_T *argvars, typval_T *rettv)
     static void
 f_last_buffer_nr(typval_T *argvars UNUSED, typval_T *rettv)
 {
-    int		n = 0;
+    ціле		n = 0;
     buf_T	*buf;
 
     FOR_ALL_BUFFERS(buf)
-	if (n < buf->b_fnum)
+	якщо (n < buf->b_fnum)
 	    n = buf->b_fnum;
 
     rettv->vval.v_number = n;
@@ -10037,44 +10037,44 @@ f_len(typval_T *argvars, typval_T *rettv)
 }
 
     static void
-libcall_common(typval_T *argvars UNUSED, typval_T *rettv, int type)
+libcall_common(typval_T *argvars UNUSED, typval_T *rettv, ціле type)
 {
 #ifdef FEAT_LIBCALL
     char_u		*string_in;
     char_u		**string_result;
-    int			nr_result;
+    ціле			nr_result;
 #endif
 
     rettv->v_type = type;
-    if (type != VAR_NUMBER)
+    якщо (type != VAR_NUMBER)
 	rettv->vval.v_string = NULL;
 
-    if (check_restricted() || check_secure())
-	return;
+    якщо (check_restricted() || check_secure())
+	повернути;
 
-    if (in_vim9script()
+    якщо (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_string_arg(argvars, 1) == FAIL
 		|| check_for_string_or_number_arg(argvars, 2) == FAIL))
-	return;
+	повернути;
 
 #ifdef FEAT_LIBCALL
     // The first two args must be strings, otherwise it's meaningless
-    if (argvars[0].v_type == VAR_STRING && argvars[1].v_type == VAR_STRING)
+    якщо (argvars[0].v_type == VAR_STRING && argvars[1].v_type == VAR_STRING)
     {
 	string_in = NULL;
-	if (argvars[2].v_type == VAR_STRING)
+	якщо (argvars[2].v_type == VAR_STRING)
 	    string_in = argvars[2].vval.v_string;
-	if (type == VAR_NUMBER)
+	якщо (type == VAR_NUMBER)
 	{
 	    string_result = NULL;
 	}
-	else
+	інакше
 	{
 	    rettv->vval.v_string = NULL;
 	    string_result = &rettv->vval.v_string;
 	}
-	if (mch_libcall(argvars[0].vval.v_string,
+	якщо (mch_libcall(argvars[0].vval.v_string,
 			     argvars[1].vval.v_string,
 			     string_in,
 			     argvars[2].vval.v_number,
@@ -10112,29 +10112,29 @@ f_line(typval_T *argvars, typval_T *rettv)
 {
     linenr_T	lnum = 0;
     pos_T	*fp = NULL;
-    int		fnum;
-    int		id;
+    ціле		fnum;
+    ціле		id;
     tabpage_T	*tp;
     win_T	*wp;
     switchwin_T	switchwin;
 
-    if (in_vim9script()
+    якщо (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_opt_number_arg(argvars, 1) == FAIL))
-	return;
+	повернути;
 
-    if (argvars[1].v_type != VAR_UNKNOWN)
+    якщо (argvars[1].v_type != VAR_UNKNOWN)
     {
 	// use window specified in the second argument
-	id = (int)tv_get_number(&argvars[1]);
+	id = (ціле)tv_get_number(&argvars[1]);
 	wp = win_id2wp_tp(id, &tp);
-	if (wp != NULL && tp != NULL)
+	якщо (wp != NULL && tp != NULL)
 	{
-	    if (switch_win_noblock(&switchwin, wp, tp, TRUE) == OK)
+	    якщо (switch_win_noblock(&switchwin, wp, tp, TRUE) == OK)
 	    {
 		// With 'splitkeep' != cursor and in diff mode, prevent that the
 		// window scrolls and keep the topline.
-		if (*p_spk != 'c'
+		якщо (*p_spk != 'c'
 #ifdef FEAT_DIFF
 		|| (curwin->w_p_diff && switchwin.sw_curwin->w_p_diff)
 #endif
@@ -10147,11 +10147,11 @@ f_line(typval_T *argvars, typval_T *rettv)
 	    restore_win_noblock(&switchwin, TRUE);
 	}
     }
-    else
+    інакше
 	// use current window
 	fp = var2fpos(&argvars[0], TRUE, &fnum, FALSE);
 
-    if (fp != NULL)
+    якщо (fp != NULL)
 	lnum = fp->lnum;
     rettv->vval.v_number = lnum;
 }
@@ -10164,18 +10164,18 @@ f_line2byte(typval_T *argvars UNUSED, typval_T *rettv)
 {
 #ifndef FEAT_BYTEOFF
     rettv->vval.v_number = -1;
-#else
+#інакше
     linenr_T	lnum;
 
-    if (in_vim9script() && check_for_lnum_arg(argvars, 0) == FAIL)
-	return;
+    якщо (in_vim9script() && check_for_lnum_arg(argvars, 0) == FAIL)
+	повернути;
 
     lnum = tv_get_lnum(argvars);
-    if (lnum < 1 || lnum > curbuf->b_ml.ml_line_count + 1)
+    якщо (lnum < 1 || lnum > curbuf->b_ml.ml_line_count + 1)
 	rettv->vval.v_number = -1;
-    else
+    інакше
 	rettv->vval.v_number = ml_find_line_or_offset(curbuf, lnum, NULL);
-    if (rettv->vval.v_number >= 0)
+    якщо (rettv->vval.v_number >= 0)
 	++rettv->vval.v_number;
 #endif
 }
@@ -10190,11 +10190,11 @@ f_luaeval(typval_T *argvars, typval_T *rettv)
     char_u	*str;
     char_u	buf[NUMBUFLEN];
 
-    if (check_restricted() || check_secure())
-	return;
+    якщо (check_restricted() || check_secure())
+	повернути;
 
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    якщо (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+	повернути;
 
     str = tv_get_string_buf(&argvars[0], buf);
     do_luaeval(str, argvars + 1, rettv);
@@ -10224,11 +10224,11 @@ find_some_match(typval_T *argvars, typval_T *rettv, matchtype_T type)
     long	start = 0;
     long	nth = 1;
     colnr_T	startcol = 0;
-    int		match = 0;
+    ціле		match = 0;
     list_T	*l = NULL;
     listitem_T	*li = NULL;
     long	idx = 0;
-    int		prev_lock = 0;
+    ціле		prev_lock = 0;
     char_u	*tofree = NULL;
 
     // Make 'cpoptions' empty, the 'l' flag should not be used here.
@@ -10236,13 +10236,13 @@ find_some_match(typval_T *argvars, typval_T *rettv, matchtype_T type)
     p_cpo = empty_option;
 
     rettv->vval.v_number = -1;
-    if (type == MATCH_LIST || type == MATCH_POS)
+    якщо (type == MATCH_LIST || type == MATCH_POS)
     {
 	// type MATCH_LIST: return empty list when there are no matches.
 	// type MATCH_POS: return ["", -1, -1, -1]
-	if (rettv_list_alloc(rettv) == FAIL)
+	якщо (rettv_list_alloc(rettv) == FAIL)
 	    goto theend;
-	if (type == MATCH_POS
+	якщо (type == MATCH_POS
 		&& (list_append_string(rettv->vval.v_list,
 					    (char_u *)"", 0) == FAIL
 		    || list_append_number(rettv->vval.v_list,
@@ -10257,13 +10257,13 @@ find_some_match(typval_T *argvars, typval_T *rettv, matchtype_T type)
 		goto theend;
 	}
     }
-    else if (type == MATCH_STR)
+    інакше якщо (type == MATCH_STR)
     {
 	rettv->v_type = VAR_STRING;
 	rettv->vval.v_string = NULL;
     }
 
-    if (in_vim9script()
+    якщо (in_vim9script()
 	    && (check_for_string_or_list_arg(argvars, 0) == FAIL
 		|| check_for_string_arg(argvars, 1) == FAIL
 		|| check_for_opt_number_arg(argvars, 2) == FAIL
@@ -10271,108 +10271,108 @@ find_some_match(typval_T *argvars, typval_T *rettv, matchtype_T type)
 		    && check_for_opt_number_arg(argvars, 3) == FAIL)))
 	goto theend;
 
-    if (argvars[0].v_type == VAR_LIST)
+    якщо (argvars[0].v_type == VAR_LIST)
     {
-	if ((l = argvars[0].vval.v_list) == NULL)
+	якщо ((l = argvars[0].vval.v_list) == NULL)
 	    goto theend;
 	CHECK_LIST_MATERIALIZE(l);
 	li = l->lv_first;
     }
-    else
+    інакше
     {
 	expr = str = tv_get_string(&argvars[0]);
 	len = (long)STRLEN(str);
     }
 
     pat = tv_get_string_buf_chk(&argvars[1], patbuf);
-    if (pat == NULL)
+    якщо (pat == NULL)
 	goto theend;
 
-    if (argvars[2].v_type != VAR_UNKNOWN)
+    якщо (argvars[2].v_type != VAR_UNKNOWN)
     {
-	int	    error = FALSE;
+	ціле	    error = FALSE;
 
 	start = (long)tv_get_number_chk(&argvars[2], &error);
-	if (error)
+	якщо (error)
 	    goto theend;
-	if (l != NULL)
+	якщо (l != NULL)
 	{
 	    li = list_find(l, start);
-	    if (li == NULL)
+	    якщо (li == NULL)
 		goto theend;
 	    idx = l->lv_u.mat.lv_idx;	// use the cached index
 	}
-	else
+	інакше
 	{
-	    if (start < 0)
+	    якщо (start < 0)
 		start = 0;
-	    if (start > len)
+	    якщо (start > len)
 		goto theend;
 	    // When "count" argument is there ignore matches before "start",
 	    // otherwise skip part of the string.  Differs when pattern is "^"
 	    // or "\<".
-	    if (argvars[3].v_type != VAR_UNKNOWN)
+	    якщо (argvars[3].v_type != VAR_UNKNOWN)
 		startcol = start;
-	    else
+	    інакше
 	    {
 		str += start;
 		len -= start;
 	    }
 	}
 
-	if (argvars[3].v_type != VAR_UNKNOWN)
+	якщо (argvars[3].v_type != VAR_UNKNOWN)
 	    nth = (long)tv_get_number_chk(&argvars[3], &error);
-	if (error)
+	якщо (error)
 	    goto theend;
     }
 
     regmatch.regprog = eval_regcomp(pat);
-    if (regmatch.regprog != NULL)
+    якщо (regmatch.regprog != NULL)
     {
 	regmatch.rm_ic = p_ic;
 
 	// Lock the list, the string() method of an object item could remove
 	// the item the loop is standing on.
-	if (l != NULL)
+	якщо (l != NULL)
 	{
 	    prev_lock = l->lv_lock;
-	    if (l->lv_lock == 0)
+	    якщо (l->lv_lock == 0)
 		l->lv_lock = VAR_LOCKED;
 	}
 
-	for (;;)
+	для (;;)
 	{
-	    if (l != NULL)
+	    якщо (l != NULL)
 	    {
-		if (li == NULL)
+		якщо (li == NULL)
 		{
 		    match = FALSE;
 		    break;
 		}
 		vim_free(tofree);
 		expr = str = echo_string(&li->li_tv, &tofree, strbuf, 0);
-		if (str == NULL)
+		якщо (str == NULL)
 		    break;
 	    }
 
 	    match = vim_regexec_nl(&regmatch, str, startcol);
 
-	    if (match && --nth <= 0)
+	    якщо (match && --nth <= 0)
 		break;
-	    if (l == NULL && !match)
+	    якщо (l == NULL && !match)
 		break;
 
 	    // Advance to just after the match.
-	    if (l != NULL)
+	    якщо (l != NULL)
 	    {
 		li = li->li_next;
 		++idx;
 	    }
-	    else
+	    інакше
 	    {
 		startcol = (colnr_T)(regmatch.startp[0]
 				    + (*mb_ptr2len)(regmatch.startp[0]) - str);
-		if (startcol > (colnr_T)len
+		якщо (startcol > (colnr_T)len
 				      || str + startcol <= regmatch.startp[0])
 		{
 		    match = FALSE;
@@ -10381,9 +10381,9 @@ find_some_match(typval_T *argvars, typval_T *rettv, matchtype_T type)
 	    }
 	}
 
-	if (match)
+	якщо (match)
 	{
-	    if (type == MATCH_POS)
+	    якщо (type == MATCH_POS)
 	    {
 		listitem_T *li1 = rettv->vval.v_list->lv_first;
 		listitem_T *li2 = li1->li_next;
@@ -10397,58 +10397,58 @@ find_some_match(typval_T *argvars, typval_T *rettv, matchtype_T type)
 				      (varnumber_T)(regmatch.startp[0] - expr);
 		li4->li_tv.vval.v_number =
 					(varnumber_T)(regmatch.endp[0] - expr);
-		if (l != NULL)
+		якщо (l != NULL)
 		    li2->li_tv.vval.v_number = (varnumber_T)idx;
 	    }
-	    else if (type == MATCH_LIST)
+	    інакше якщо (type == MATCH_LIST)
 	    {
-		int i;
+		ціле i;
 
 		// return list with matched string and submatches
-		for (i = 0; i < NSUBEXP; ++i)
+		для (i = 0; i < NSUBEXP; ++i)
 		{
-		    if (regmatch.endp[i] == NULL)
+		    якщо (regmatch.endp[i] == NULL)
 		    {
-			if (list_append_string(rettv->vval.v_list,
+			якщо (list_append_string(rettv->vval.v_list,
 							    NULL, 0) == FAIL)
 			    break;
 		    }
-		    else if (list_append_string(rettv->vval.v_list,
+		    інакше якщо (list_append_string(rettv->vval.v_list,
 				regmatch.startp[i],
-				(int)(regmatch.endp[i] - regmatch.startp[i]))
+				(ціле)(regmatch.endp[i] - regmatch.startp[i]))
 			    == FAIL)
 			break;
 		}
 	    }
-	    else if (type == MATCH_STR)
+	    інакше якщо (type == MATCH_STR)
 	    {
 		// return matched string
-		if (l != NULL)
+		якщо (l != NULL)
 		    copy_tv(&li->li_tv, rettv);
-		else
+		інакше
 		    rettv->vval.v_string = vim_strnsave(regmatch.startp[0],
 					regmatch.endp[0] - regmatch.startp[0]);
 	    }
-	    else if (l != NULL)
+	    інакше якщо (l != NULL)
 		rettv->vval.v_number = idx;
-	    else
+	    інакше
 	    {
-		if (type != MATCH_END)
+		якщо (type != MATCH_END)
 		    rettv->vval.v_number =
 				      (varnumber_T)(regmatch.startp[0] - str);
-		else
+		інакше
 		    rettv->vval.v_number =
 					(varnumber_T)(regmatch.endp[0] - str);
 		rettv->vval.v_number += (varnumber_T)(str - expr);
 	    }
 	}
-	if (l != NULL)
+	якщо (l != NULL)
 	    l->lv_lock = prev_lock;
 	eval_regfree(pat, regmatch.regprog);
     }
 
 theend:
-    if (type == MATCH_POS && l == NULL && rettv->vval.v_list != NULL)
+    якщо (type == MATCH_POS && l == NULL && rettv->vval.v_list != NULL)
 	// matchstrpos() without a list: drop the second item.
 	listitem_remove(rettv->vval.v_list,
 				       rettv->vval.v_list->lv_first->li_next);
@@ -10462,76 +10462,76 @@ theend:
  * If "submatches" is TRUE, then submatch information is also returned.
  * "matchbuf" is TRUE when called for matchbufline().
  */
-    static int
+    static ціле
 get_matches_in_str(
     char_u	*str,
     regmatch_T	*rmp,
     list_T	*mlist,
-    int		idx,
-    int		submatches,
-    int		matchbuf)
+    ціле		idx,
+    ціле		submatches,
+    ціле		matchbuf)
 {
     long	len = (long)STRLEN(str);
-    int		match = 0;
+    ціле		match = 0;
     colnr_T	startidx = 0;
 
-    for (;;)
+    для (;;)
     {
 	match = vim_regexec_nl(rmp, str, startidx);
-	if (!match)
+	якщо (!match)
 	    break;
 
 	dict_T *d = dict_alloc();
-	if (d == NULL)
-	    return FAIL;
-	if (list_append_dict(mlist, d) == FAIL)
+	якщо (d == NULL)
+	    повернути FAIL;
+	якщо (list_append_dict(mlist, d) == FAIL)
 	{
 	    dict_unref(d);
-	    return FAIL;
+	    повернути FAIL;
 	}
 
-	if (dict_add_number(d, matchbuf ? "lnum" : "idx", idx) == FAIL)
-	    return FAIL;
+	якщо (dict_add_number(d, matchbuf ? "lnum" : "idx", idx) == FAIL)
+	    повернути FAIL;
 
-	if (dict_add_number(d, "byteidx",
+	якщо (dict_add_number(d, "byteidx",
 		    (colnr_T)(rmp->startp[0] - str)) == FAIL)
-	    return FAIL;
+	    повернути FAIL;
 
-	if (dict_add_string_len(d, "text", rmp->startp[0],
-		    (int)(rmp->endp[0] - rmp->startp[0])) == FAIL)
-	    return FAIL;
+	якщо (dict_add_string_len(d, "text", rmp->startp[0],
+		    (ціле)(rmp->endp[0] - rmp->startp[0])) == FAIL)
+	    повернути FAIL;
 
-	if (submatches)
+	якщо (submatches)
 	{
 	    list_T *sml = list_alloc();
-	    if (sml == NULL)
-		return FAIL;
+	    якщо (sml == NULL)
+		повернути FAIL;
 
-	    if (dict_add_list(d, "submatches", sml) == FAIL)
+	    якщо (dict_add_list(d, "submatches", sml) == FAIL)
 	    {
 		list_unref(sml);
-		return FAIL;
+		повернути FAIL;
 	    }
 
 	    // return a list with the submatches
-	    for (int i = 1; i < NSUBEXP; ++i)
+	    для (ціле i = 1; i < NSUBEXP; ++i)
 	    {
-		if (rmp->endp[i] == NULL)
+		якщо (rmp->endp[i] == NULL)
 		{
-		    if (list_append_string(sml, (char_u *)"", 0) == FAIL)
-			return FAIL;
+		    якщо (list_append_string(sml, (char_u *)"", 0) == FAIL)
+			повернути FAIL;
 		}
-		else if (list_append_string(sml, rmp->startp[i],
-			    (int)(rmp->endp[i] - rmp->startp[i])) == FAIL)
-		    return FAIL;
+		інакше якщо (list_append_string(sml, rmp->startp[i],
+			    (ціле)(rmp->endp[i] - rmp->startp[i])) == FAIL)
+		    повернути FAIL;
 	    }
 	}
 	startidx = (colnr_T)(rmp->endp[0] - str);
-	if (startidx >= (colnr_T)len || str + startidx <= rmp->startp[0])
+	якщо (startidx >= (colnr_T)len || str + startidx <= rmp->startp[0])
 	    break;
     }
 
-    return OK;
+    повернути OK;
 }
 
 /*
@@ -10546,68 +10546,68 @@ f_matchbufline(typval_T *argvars, typval_T *rettv)
     regmatch_T	regmatch;
 
     rettv->vval.v_number = -1;
-    if (rettv_list_alloc(rettv) != OK)
-	return;
+    якщо (rettv_list_alloc(rettv) != OK)
+	повернути;
     retlist = rettv->vval.v_list;
 
-    if (check_for_buffer_arg(argvars, 0) == FAIL
+    якщо (check_for_buffer_arg(argvars, 0) == FAIL
 	    || check_for_string_arg(argvars, 1) == FAIL
 	    || check_for_lnum_arg(argvars, 2) == FAIL
 	    || check_for_lnum_arg(argvars, 3) == FAIL
 	    || check_for_opt_dict_arg(argvars, 4) == FAIL)
-	return;
+	повернути;
 
-    int prev_did_emsg = did_emsg;
+    ціле prev_did_emsg = did_emsg;
     buf_T *buf = tv_get_buf(&argvars[0], FALSE);
-    if (buf == NULL)
+    якщо (buf == NULL)
     {
-	if (did_emsg == prev_did_emsg)
+	якщо (did_emsg == prev_did_emsg)
 	    semsg(_(e_invalid_buffer_name_str), tv_get_string(&argvars[0]));
-	return;
+	повернути;
     }
-    if (buf->b_ml.ml_mfp == NULL)
+    якщо (buf->b_ml.ml_mfp == NULL)
     {
 	emsg(_(e_buffer_is_not_loaded));
-	return;
+	повернути;
     }
 
     char_u *pat = tv_get_string_buf(&argvars[1], patbuf);
 
-    int		did_emsg_before = did_emsg;
+    ціле		did_emsg_before = did_emsg;
     linenr_T slnum = tv_get_lnum_buf(&argvars[2], buf);
-    if (did_emsg > did_emsg_before)
-	return;
-    if (slnum < 1)
+    якщо (did_emsg > did_emsg_before)
+	повернути;
+    якщо (slnum < 1)
     {
 	semsg(_(e_invalid_value_for_argument_str), "lnum");
-	return;
+	повернути;
     }
 
     linenr_T elnum = tv_get_lnum_buf(&argvars[3], buf);
-    if (did_emsg > did_emsg_before)
-	return;
-    if (elnum < 1 || elnum < slnum)
+    якщо (did_emsg > did_emsg_before)
+	повернути;
+    якщо (elnum < 1 || elnum < slnum)
     {
 	semsg(_(e_invalid_value_for_argument_str), "end_lnum");
-	return;
+	повернути;
     }
 
-    if (elnum > buf->b_ml.ml_line_count)
+    якщо (elnum > buf->b_ml.ml_line_count)
 	elnum = buf->b_ml.ml_line_count;
 
-    int		submatches = FALSE;
-    if (argvars[4].v_type != VAR_UNKNOWN)
+    ціле		submatches = FALSE;
+    якщо (argvars[4].v_type != VAR_UNKNOWN)
     {
 	dict_T *d = argvars[4].vval.v_dict;
-	if (d != NULL)
+	якщо (d != NULL)
 	{
 	    dictitem_T *di = dict_find(d, (char_u *)"submatches", -1);
-	    if (di != NULL)
+	    якщо (di != NULL)
 	    {
-		if (di->di_tv.v_type != VAR_BOOL)
+		якщо (di->di_tv.v_type != VAR_BOOL)
 		{
 		    semsg(_(e_invalid_value_for_argument_str), "submatches");
-		    return;
+		    повернути;
 		}
 		submatches = tv_get_bool(&di->di_tv);
 	    }
@@ -10619,14 +10619,14 @@ f_matchbufline(typval_T *argvars, typval_T *rettv)
     p_cpo = empty_option;
 
     regmatch.regprog = eval_regcomp(pat);
-    if (regmatch.regprog == NULL)
+    якщо (regmatch.regprog == NULL)
 	goto theend;
     regmatch.rm_ic = p_ic;
 
-    while (slnum <= elnum)
+    поки (slnum <= elnum)
     {
 	char_u *str = ml_get_buf(buf, slnum, FALSE);
-	if (get_matches_in_str(str, &regmatch, retlist, slnum, submatches,
+	якщо (get_matches_in_str(str, &regmatch, retlist, slnum, submatches,
 								TRUE) == FAIL)
 	    goto cleanup;
 	slnum++;
@@ -10689,41 +10689,41 @@ f_matchstrlist(typval_T *argvars, typval_T *rettv)
     regmatch_T	regmatch;
 
     rettv->vval.v_number = -1;
-    if (rettv_list_alloc(rettv) != OK)
-	return;
+    якщо (rettv_list_alloc(rettv) != OK)
+	повернути;
     retlist = rettv->vval.v_list;
 
-    if (check_for_list_arg(argvars, 0) == FAIL
+    якщо (check_for_list_arg(argvars, 0) == FAIL
 	    || check_for_string_arg(argvars, 1) == FAIL
 	    || check_for_opt_dict_arg(argvars, 2) == FAIL)
-	return;
+	повернути;
 
-    if ((l = argvars[0].vval.v_list) == NULL)
-	return;
+    якщо ((l = argvars[0].vval.v_list) == NULL)
+	повернути;
 
     char_u *pat = tv_get_string_buf_chk(&argvars[1], patbuf);
-    if (pat == NULL)
-	return;
+    якщо (pat == NULL)
+	повернути;
 
     // Make 'cpoptions' empty, the 'l' flag should not be used here.
     save_cpo = p_cpo;
     p_cpo = empty_option;
 
     regmatch.regprog = eval_regcomp(pat);
-    if (regmatch.regprog == NULL)
+    якщо (regmatch.regprog == NULL)
 	goto theend;
     regmatch.rm_ic = p_ic;
 
-    int		submatches = FALSE;
-    if (argvars[2].v_type != VAR_UNKNOWN)
+    ціле		submatches = FALSE;
+    якщо (argvars[2].v_type != VAR_UNKNOWN)
     {
 	dict_T *d = argvars[2].vval.v_dict;
-	if (d != NULL)
+	якщо (d != NULL)
 	{
 	    dictitem_T *di = dict_find(d, (char_u *)"submatches", -1);
-	    if (di != NULL)
+	    якщо (di != NULL)
 	    {
-		if (di->di_tv.v_type != VAR_BOOL)
+		якщо (di->di_tv.v_type != VAR_BOOL)
 		{
 		    semsg(_(e_invalid_value_for_argument_str), "submatches");
 		    goto cleanup;
@@ -10733,14 +10733,14 @@ f_matchstrlist(typval_T *argvars, typval_T *rettv)
 	}
     }
 
-    int idx = 0;
+    ціле idx = 0;
     CHECK_LIST_MATERIALIZE(l);
     FOR_ALL_LIST_ITEMS(l, li)
     {
-	if (li->li_tv.v_type == VAR_STRING && li->li_tv.vval.v_string != NULL)
+	якщо (li->li_tv.v_type == VAR_STRING && li->li_tv.vval.v_string != NULL)
 	{
 	    char_u *str = li->li_tv.vval.v_string;
-	    if (get_matches_in_str(str, &regmatch, retlist, idx, submatches,
+	    якщо (get_matches_in_str(str, &regmatch, retlist, idx, submatches,
 								FALSE) == FAIL)
 		goto cleanup;
 	}
@@ -10764,99 +10764,99 @@ f_matchstrpos(typval_T *argvars, typval_T *rettv)
 }
 
     static void
-max_min(typval_T *argvars, typval_T *rettv, int domax)
+max_min(typval_T *argvars, typval_T *rettv, ціле domax)
 {
     varnumber_T	n = 0;
 
-    if (in_vim9script() &&
+    якщо (in_vim9script() &&
 	    check_for_list_or_tuple_or_dict_arg(argvars, 0) == FAIL)
-	return;
+	повернути;
 
     rettv->vval.v_number = 0;
 
-    if (argvars[0].v_type == VAR_LIST)
+    якщо (argvars[0].v_type == VAR_LIST)
     {
 	list_T		*l;
 	listitem_T	*li;
 	typval_T	*tv = NULL;
 
 	l = argvars[0].vval.v_list;
-	if (l != NULL && l->lv_len > 0)
+	якщо (l != NULL && l->lv_len > 0)
 	{
-	    if (l->lv_first == &range_list_item)
+	    якщо (l->lv_first == &range_list_item)
 	    {
-		if ((l->lv_u.nonmat.lv_stride > 0) ^ domax)
+		якщо ((l->lv_u.nonmat.lv_stride > 0) ^ domax)
 		    n = l->lv_u.nonmat.lv_start;
-		else
+		інакше
 		    n = l->lv_u.nonmat.lv_start + ((varnumber_T)l->lv_len - 1)
 						    * l->lv_u.nonmat.lv_stride;
 		rettv->vval.v_number = n;
 	    }
-	    else
+	    інакше
 	    {
 		FOR_ALL_LIST_ITEMS(l, li)
 		{
-		    if (tv == NULL)
+		    якщо (tv == NULL)
 			tv = &li->li_tv;
-		    else
+		    інакше
 		    {
-			int res;
-			if (typval_compare2(&li->li_tv, tv,
+			ціле res;
+			якщо (typval_compare2(&li->li_tv, tv,
 				domax ? EXPR_GREATER : EXPR_SMALLER, FALSE, &res) == FAIL)
-			    return;
-			if (res == OK)
+			    повернути;
+			якщо (res == OK)
 			    tv = &li->li_tv;
 		    }
 		}
 
-		if (tv != NULL)
+		якщо (tv != NULL)
 		    copy_tv(tv, rettv);
 	    }
 	}
     }
-    else if (argvars[0].v_type == VAR_TUPLE)
+    інакше якщо (argvars[0].v_type == VAR_TUPLE)
     {
 	typval_T *tv;
 
 	tv = tuple_max_min(argvars[0].vval.v_tuple, domax);
-	if (tv != NULL)
+	якщо (tv != NULL)
 	    copy_tv(tv, rettv);
     }
-    else if (argvars[0].v_type == VAR_DICT)
+    інакше якщо (argvars[0].v_type == VAR_DICT)
     {
 	dict_T		*d;
 	hashitem_T	*hi;
-	int		todo;
+	ціле		todo;
 	typval_T	*tv = NULL;
 
 	d = argvars[0].vval.v_dict;
-	if (d != NULL)
+	якщо (d != NULL)
 	{
-	    todo = (int)d->dv_hashtab.ht_used;
+	    todo = (ціле)d->dv_hashtab.ht_used;
 	    FOR_ALL_HASHTAB_ITEMS(&d->dv_hashtab, hi, todo)
 	    {
-		if (!HASHITEM_EMPTY(hi))
+		якщо (!HASHITEM_EMPTY(hi))
 		{
 		    --todo;
-		    if (tv == NULL)
+		    якщо (tv == NULL)
 			tv = &HI2DI(hi)->di_tv;
-		    else
+		    інакше
 		    {
-			int res;
-			if (typval_compare2(&HI2DI(hi)->di_tv, tv,
+			ціле res;
+			якщо (typval_compare2(&HI2DI(hi)->di_tv, tv,
 				domax ? EXPR_GREATER : EXPR_SMALLER, FALSE, &res) == FAIL)
-			    return;
-			if (res == OK)
+			    повернути;
+			якщо (res == OK)
 			    tv = &HI2DI(hi)->di_tv;
 		    }
 		}
 	    }
 	}
 
-	if (tv != NULL)
+	якщо (tv != NULL)
 	    copy_tv(tv, rettv);
     }
-    else
+    інакше
 	semsg(_(e_argument_of_str_must_be_list_or_dictionary), domax ? "max()" : "min()");
 }
 
@@ -10878,7 +10878,7 @@ f_min(typval_T *argvars, typval_T *rettv)
     max_min(argvars, rettv, FALSE);
 }
 
-#if defined(FEAT_MZSCHEME)
+#якщо defined(FEAT_MZSCHEME)
 /*
  * "mzeval()" function
  */
@@ -10888,11 +10888,11 @@ f_mzeval(typval_T *argvars, typval_T *rettv)
     char_u	*str;
     char_u	buf[NUMBUFLEN];
 
-    if (check_restricted() || check_secure())
-	return;
+    якщо (check_restricted() || check_secure())
+	повернути;
 
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    якщо (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+	повернути;
 
     str = tv_get_string_buf(&argvars[0], buf);
     do_mzeval(str, rettv);
@@ -10920,17 +10920,17 @@ f_nextnonblank(typval_T *argvars, typval_T *rettv)
 {
     linenr_T	lnum;
 
-    if (in_vim9script() && check_for_lnum_arg(argvars, 0) == FAIL)
-	return;
+    якщо (in_vim9script() && check_for_lnum_arg(argvars, 0) == FAIL)
+	повернути;
 
-    for (lnum = tv_get_lnum(argvars); ; ++lnum)
+    для (lnum = tv_get_lnum(argvars); ; ++lnum)
     {
-	if (lnum < 0 || lnum > curbuf->b_ml.ml_line_count)
+	якщо (lnum < 0 || lnum > curbuf->b_ml.ml_line_count)
 	{
 	    lnum = 0;
 	    break;
 	}
-	if (*skipwhite(ml_get(lnum)) != NUL)
+	якщо (*skipwhite(ml_get(lnum)) != NUL)
 	    break;
     }
     rettv->vval.v_number = lnum;
@@ -10943,40 +10943,40 @@ f_nextnonblank(typval_T *argvars, typval_T *rettv)
     static void
 f_ngettext(typval_T *argvars, typval_T *rettv)
 {
-#if defined(HAVE_BIND_TEXTDOMAIN_CODESET)
+#якщо defined(HAVE_BIND_TEXTDOMAIN_CODESET)
     char *prev = NULL;
 #endif
 
-    if (check_for_nonempty_string_arg(argvars, 0) == FAIL
+    якщо (check_for_nonempty_string_arg(argvars, 0) == FAIL
 	|| check_for_nonempty_string_arg(argvars, 1) == FAIL
 	|| check_for_number_arg(argvars, 2) == FAIL
 	|| check_for_opt_string_arg(argvars, 3) == FAIL)
-	return;
+	повернути;
 
     rettv->v_type = VAR_STRING;
 
-    if (argvars[3].v_type == VAR_STRING &&
+    якщо (argvars[3].v_type == VAR_STRING &&
 	    argvars[3].vval.v_string != NULL &&
 	    *(argvars[3].vval.v_string) != NUL)
     {
-#if defined(HAVE_BIND_TEXTDOMAIN_CODESET)
+#якщо defined(HAVE_BIND_TEXTDOMAIN_CODESET)
 	prev = bind_textdomain_codeset((const char *)argvars[3].vval.v_string, (char *)p_enc);
 #endif
 
-#if defined(HAVE_DNGETTEXT)
-	rettv->vval.v_string = vim_strsave((char_u *)dngettext((const char *)argvars[3].vval.v_string, (const char *)argvars[0].vval.v_string, (const char *)argvars[1].vval.v_string, (int)argvars[2].vval.v_number));
-#else
+#якщо defined(HAVE_DNGETTEXT)
+	rettv->vval.v_string = vim_strsave((char_u *)dngettext((const char *)argvars[3].vval.v_string, (const char *)argvars[0].vval.v_string, (const char *)argvars[1].vval.v_string, (ціле)argvars[2].vval.v_number));
+#інакше
 	textdomain((const char *)argvars[3].vval.v_string);
 	rettv->vval.v_string = vim_strsave((char_u *)NGETTEXT((const char *)argvars[0].vval.v_string, (const char *)argvars[1].vval.v_string, argvars[2].vval.v_number));
 	textdomain(VIMPACKAGE);
 #endif
 
-#if defined(HAVE_BIND_TEXTDOMAIN_CODESET)
-	if (prev != NULL)
+#якщо defined(HAVE_BIND_TEXTDOMAIN_CODESET)
+	якщо (prev != NULL)
 	    bind_textdomain_codeset((const char *)argvars[3].vval.v_string, prev);
 #endif
     }
-    else
+    інакше
 	rettv->vval.v_string = vim_strsave((char_u *)NGETTEXT((const char *)argvars[0].vval.v_string, (const char *)argvars[1].vval.v_string, argvars[2].vval.v_number));
 }
 
@@ -10989,23 +10989,23 @@ f_nr2char(typval_T *argvars, typval_T *rettv)
 {
     char_u	buf[NUMBUFLEN];
 
-    if (in_vim9script()
+    якщо (in_vim9script()
 	    && (check_for_number_arg(argvars, 0) == FAIL
 		|| check_for_opt_bool_arg(argvars, 1) == FAIL))
-	return;
+	повернути;
 
-    if (has_mbyte)
+    якщо (has_mbyte)
     {
-	int	utf8 = 0;
+	ціле	utf8 = 0;
 
-	if (argvars[1].v_type != VAR_UNKNOWN)
-	    utf8 = (int)tv_get_bool_chk(&argvars[1], NULL);
-	if (utf8)
-	    buf[utf_char2bytes((int)tv_get_number(&argvars[0]), buf)] = NUL;
-	else
-	    buf[(*mb_char2bytes)((int)tv_get_number(&argvars[0]), buf)] = NUL;
+	якщо (argvars[1].v_type != VAR_UNKNOWN)
+	    utf8 = (ціле)tv_get_bool_chk(&argvars[1], NULL);
+	якщо (utf8)
+	    buf[utf_char2bytes((ціле)tv_get_number(&argvars[0]), buf)] = NUL;
+	інакше
+	    buf[(*mb_char2bytes)((ціле)tv_get_number(&argvars[0]), buf)] = NUL;
     }
-    else
+    інакше
     {
 	buf[0] = (char_u)tv_get_number(&argvars[0]);
 	buf[1] = NUL;
@@ -11020,10 +11020,10 @@ f_nr2char(typval_T *argvars, typval_T *rettv)
     static void
 f_or(typval_T *argvars, typval_T *rettv)
 {
-    if (in_vim9script()
+    якщо (in_vim9script()
 	    && (check_for_number_arg(argvars, 0) == FAIL
 		|| check_for_number_arg(argvars, 1) == FAIL))
-	return;
+	повернути;
 
     rettv->vval.v_number = tv_get_number_chk(&argvars[0], NULL)
 					| tv_get_number_chk(&argvars[1], NULL);
@@ -11039,11 +11039,11 @@ f_perleval(typval_T *argvars, typval_T *rettv)
     char_u	*str;
     char_u	buf[NUMBUFLEN];
 
-    if (check_restricted() || check_secure())
-	return;
+    якщо (check_restricted() || check_secure())
+	повернути;
 
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    якщо (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+	повернути;
 
     str = tv_get_string_buf(&argvars[0], buf);
     do_perleval(str, rettv);
@@ -11058,14 +11058,14 @@ f_prevnonblank(typval_T *argvars, typval_T *rettv)
 {
     linenr_T	lnum;
 
-    if (in_vim9script() && check_for_lnum_arg(argvars, 0) == FAIL)
-	return;
+    якщо (in_vim9script() && check_for_lnum_arg(argvars, 0) == FAIL)
+	повернути;
 
     lnum = tv_get_lnum(argvars);
-    if (lnum < 1 || lnum > curbuf->b_ml.ml_line_count)
+    якщо (lnum < 1 || lnum > curbuf->b_ml.ml_line_count)
 	lnum = 0;
-    else
-	while (lnum >= 1 && *skipwhite(ml_get(lnum)) == NUL)
+    інакше
+	поки (lnum >= 1 && *skipwhite(ml_get(lnum)) == NUL)
 	    --lnum;
     rettv->vval.v_number = lnum;
 }
@@ -11083,25 +11083,25 @@ static va_list	ap;
 f_printf(typval_T *argvars, typval_T *rettv)
 {
     char_u	buf[NUMBUFLEN];
-    int		len;
+    ціле		len;
     char_u	*s;
-    int		saved_did_emsg = did_emsg;
+    ціле		saved_did_emsg = did_emsg;
     char	*fmt;
 
     rettv->v_type = VAR_STRING;
     rettv->vval.v_string = NULL;
 
-    if (in_vim9script() && check_for_string_or_number_arg(argvars, 0) == FAIL)
-	return;
+    якщо (in_vim9script() && check_for_string_or_number_arg(argvars, 0) == FAIL)
+	повернути;
 
     // Get the required length, allocate the buffer and do it for real.
     did_emsg = FALSE;
     fmt = (char *)tv_get_string_buf(&argvars[0], buf);
     len = vim_vsnprintf_typval(NULL, 0, fmt, ap, argvars + 1);
-    if (!did_emsg)
+    якщо (!did_emsg)
     {
 	s = alloc(len + 1);
-	if (s != NULL)
+	якщо (s != NULL)
 	{
 	    rettv->vval.v_string = s;
 	    (void)vim_vsnprintf_typval((char *)s, len + 1, fmt,
@@ -11117,8 +11117,8 @@ f_printf(typval_T *argvars, typval_T *rettv)
     static void
 f_pum_getpos(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
 {
-    if (rettv_dict_alloc(rettv) == FAIL)
-	return;
+    якщо (rettv_dict_alloc(rettv) == FAIL)
+	повернути;
     pum_set_event_info(rettv->vval.v_dict);
 }
 
@@ -11128,7 +11128,7 @@ f_pum_getpos(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
     static void
 f_pumvisible(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
 {
-    if (pum_visible())
+    якщо (pum_visible())
 	rettv->vval.v_number = 1;
 }
 
@@ -11143,27 +11143,27 @@ f_py3eval(typval_T *argvars, typval_T *rettv)
     char_u	buf[NUMBUFLEN];
     dict_T	*locals;
 
-    if (check_restricted() || check_secure())
-	return;
+    якщо (check_restricted() || check_secure())
+	повернути;
 
-    if (in_vim9script()
+    якщо (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_opt_dict_arg(argvars, 1) == FAIL))
-	return;
+	повернути;
 
-    if (p_pyx == 0)
+    якщо (p_pyx == 0)
 	p_pyx = 3;
 
-    if (argvars[1].v_type == VAR_DICT)
+    якщо (argvars[1].v_type == VAR_DICT)
     {
 	locals = argvars[1].vval.v_dict;
     }
-    else if (argvars[1].v_type != VAR_UNKNOWN)
+    інакше якщо (argvars[1].v_type != VAR_UNKNOWN)
     {
 	emsg(_(e_dictionary_required));
-	return;
+	повернути;
     }
-    else
+    інакше
     {
 	locals = NULL;
     }
@@ -11184,27 +11184,27 @@ f_pyeval(typval_T *argvars, typval_T *rettv)
     char_u	buf[NUMBUFLEN];
     dict_T	*locals;
 
-    if (check_restricted() || check_secure())
-	return;
+    якщо (check_restricted() || check_secure())
+	повернути;
 
-    if (in_vim9script() && (
+    якщо (in_vim9script() && (
 	    check_for_string_arg(argvars, 0) == FAIL ||
 	    check_for_opt_dict_arg(argvars, 1) == FAIL ) )
-	return;
+	повернути;
 
-    if (p_pyx == 0)
+    якщо (p_pyx == 0)
 	p_pyx = 2;
 
-    if (argvars[1].v_type == VAR_DICT)
+    якщо (argvars[1].v_type == VAR_DICT)
     {
 	locals = argvars[1].vval.v_dict;
     }
-    else if (argvars[1].v_type != VAR_UNKNOWN)
+    інакше якщо (argvars[1].v_type != VAR_UNKNOWN)
     {
 	emsg( "Invalid argument: must be dict" );
-	return;
+	повернути;
     }
-    else
+    інакше
     {
 	locals = NULL;
     }
@@ -11214,26 +11214,26 @@ f_pyeval(typval_T *argvars, typval_T *rettv)
 }
 #endif
 
-#if defined(FEAT_PYTHON) || defined(FEAT_PYTHON3)
+#якщо defined(FEAT_PYTHON) || defined(FEAT_PYTHON3)
 /*
  * "pyxeval()" function
  */
     static void
 f_pyxeval(typval_T *argvars, typval_T *rettv)
 {
-    if (check_restricted() || check_secure())
-	return;
+    якщо (check_restricted() || check_secure())
+	повернути;
 
-    if (in_vim9script()
+    якщо (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_opt_dict_arg(argvars, 1) == FAIL))
-	return;
+	повернути;
 
-# if defined(FEAT_PYTHON) && defined(FEAT_PYTHON3)
+# якщо defined(FEAT_PYTHON) && defined(FEAT_PYTHON3)
     init_pyxversion();
-    if (p_pyx == 2)
+    якщо (p_pyx == 2)
 	f_pyeval(argvars, rettv);
-    else
+    інакше
 	f_py3eval(argvars, rettv);
 # elif defined(FEAT_PYTHON)
     f_pyeval(argvars, rettv);
@@ -11244,17 +11244,17 @@ f_pyxeval(typval_T *argvars, typval_T *rettv)
 #endif
 
 static UINT32_T srand_seed_for_testing = 0;
-static int	srand_seed_for_testing_is_used = FALSE;
+static ціле	srand_seed_for_testing_is_used = FALSE;
 
     static void
 f_test_srand_seed(typval_T *argvars, typval_T *rettv UNUSED)
 {
-    if (in_vim9script() && check_for_opt_number_arg(argvars, 0) == FAIL)
-	return;
+    якщо (in_vim9script() && check_for_opt_number_arg(argvars, 0) == FAIL)
+	повернути;
 
-    if (argvars[0].v_type == VAR_UNKNOWN)
+    якщо (argvars[0].v_type == VAR_UNKNOWN)
 	srand_seed_for_testing_is_used = FALSE;
-    else
+    інакше
     {
 	srand_seed_for_testing = (UINT32_T)tv_get_number(&argvars[0]);
 	srand_seed_for_testing_is_used = TRUE;
@@ -11271,37 +11271,37 @@ init_srand(UINT32_T *x)
 	} contents;
     } buf;
 
-    if (srand_seed_for_testing_is_used)
+    якщо (srand_seed_for_testing_is_used)
     {
 	*x = srand_seed_for_testing;
-	return;
+	повернути;
     }
 
-    if (mch_get_random(buf.contents.bytes, sizeof(buf.contents.bytes)) == OK)
+    якщо (mch_get_random(buf.contents.bytes, sizeof(buf.contents.bytes)) == OK)
     {
 	*x = buf.contents.number;
-	return;
+	повернути;
     }
 
     // The system's random number generator doesn't work, fall back to:
     // - randombytes_random()
     // - reltime() or time()
     // - XOR with process ID
-#if defined(FEAT_SODIUM)
-    if (crypt_sodium_init() >= 0)
+#якщо defined(FEAT_SODIUM)
+    якщо (crypt_sodium_init() >= 0)
 	*x = crypt_sodium_randombytes_random();
-    else
+    інакше
 #endif
     {
-#if defined(FEAT_RELTIME)
+#якщо defined(FEAT_RELTIME)
 	proftime_T res;
 	profile_start(&res);
-# if defined(MSWIN)
+# якщо defined(MSWIN)
 	*x = (UINT32_T)res.LowPart;
-# else
+# інакше
 	*x = (UINT32_T)res.tv_fsec;
 # endif
-#else
+#інакше
 	*x = vim_time();
 #endif
 	*x ^= mch_get_pid();
@@ -11332,17 +11332,17 @@ f_rand(typval_T *argvars, typval_T *rettv)
 {
     list_T	*l = NULL;
     static UINT32_T	gx, gy, gz, gw;
-    static int	initialized = FALSE;
+    static ціле	initialized = FALSE;
     listitem_T	*lx, *ly, *lz, *lw;
     UINT32_T	x = 0, y, z, w, t, result;
 
-    if (in_vim9script() && check_for_opt_list_arg(argvars, 0) == FAIL)
-	return;
+    якщо (in_vim9script() && check_for_opt_list_arg(argvars, 0) == FAIL)
+	повернути;
 
-    if (argvars[0].v_type == VAR_UNKNOWN)
+    якщо (argvars[0].v_type == VAR_UNKNOWN)
     {
 	// When no argument is given use the global seed list.
-	if (initialized == FALSE)
+	якщо (initialized == FALSE)
 	{
 	    // Initialize the global seed list.
 	    init_srand(&x);
@@ -11356,19 +11356,19 @@ f_rand(typval_T *argvars, typval_T *rettv)
 
 	SHUFFLE_XOSHIRO128STARSTAR(gx, gy, gz, gw);
     }
-    else if (argvars[0].v_type == VAR_LIST)
+    інакше якщо (argvars[0].v_type == VAR_LIST)
     {
 	l = argvars[0].vval.v_list;
-	if (l == NULL || list_len(l) != 4)
+	якщо (l == NULL || list_len(l) != 4)
 	    goto theend;
 
 	lx = list_find(l, 0L);
 	ly = list_find(l, 1L);
 	lz = list_find(l, 2L);
 	lw = list_find(l, 3L);
-	if (lx == NULL || ly == NULL || lz == NULL || lw == NULL)
+	якщо (lx == NULL || ly == NULL || lz == NULL || lw == NULL)
 	    goto theend;
-	if (lx->li_tv.v_type != VAR_NUMBER
+	якщо (lx->li_tv.v_type != VAR_NUMBER
 		|| ly->li_tv.v_type != VAR_NUMBER
 		|| lz->li_tv.v_type != VAR_NUMBER
 		|| lw->li_tv.v_type != VAR_NUMBER)
@@ -11385,12 +11385,12 @@ f_rand(typval_T *argvars, typval_T *rettv)
 	lz->li_tv.vval.v_number = (varnumber_T)z;
 	lw->li_tv.vval.v_number = (varnumber_T)w;
     }
-    else
+    інакше
 	goto theend;
 
     rettv->v_type = VAR_NUMBER;
     rettv->vval.v_number = (varnumber_T)result;
-    return;
+    повернути;
 
 theend:
     semsg(_(e_invalid_argument_str), tv_get_string(&argvars[0]));
@@ -11406,23 +11406,23 @@ f_srand(typval_T *argvars, typval_T *rettv)
 {
     UINT32_T x = 0, z;
 
-    if (rettv_list_alloc(rettv) == FAIL)
-	return;
+    якщо (rettv_list_alloc(rettv) == FAIL)
+	повернути;
 
-    if (in_vim9script() && check_for_opt_number_arg(argvars, 0) == FAIL)
-	return;
+    якщо (in_vim9script() && check_for_opt_number_arg(argvars, 0) == FAIL)
+	повернути;
 
-    if (argvars[0].v_type == VAR_UNKNOWN)
+    якщо (argvars[0].v_type == VAR_UNKNOWN)
     {
 	init_srand(&x);
     }
-    else
+    інакше
     {
-	int	    error = FALSE;
+	ціле	    error = FALSE;
 
 	x = (UINT32_T)tv_get_number_chk(&argvars[0], &error);
-	if (error)
-	    return;
+	якщо (error)
+	    повернути;
     }
 
     list_append_number(rettv->vval.v_list, (varnumber_T)SPLITMIX32(x, z));
@@ -11444,52 +11444,52 @@ f_range(typval_T *argvars, typval_T *rettv)
     varnumber_T	start;
     varnumber_T	end;
     varnumber_T	stride = 1;
-    int		error = FALSE;
+    ціле		error = FALSE;
 
-    if (rettv_list_alloc(rettv) == FAIL)
-	return;
+    якщо (rettv_list_alloc(rettv) == FAIL)
+	повернути;
 
-    if (in_vim9script()
+    якщо (in_vim9script()
 	    && (check_for_number_arg(argvars, 0) == FAIL
 		|| check_for_opt_number_arg(argvars, 1) == FAIL
 		|| (argvars[1].v_type != VAR_UNKNOWN
 		    && check_for_opt_number_arg(argvars, 2) == FAIL)))
-	return;
+	повернути;
 
     start = tv_get_number_chk(&argvars[0], &error);
-    if (argvars[1].v_type == VAR_UNKNOWN)
+    якщо (argvars[1].v_type == VAR_UNKNOWN)
     {
 	end = start - 1;
 	start = 0;
     }
-    else
+    інакше
     {
 	end = tv_get_number_chk(&argvars[1], &error);
-	if (argvars[2].v_type != VAR_UNKNOWN)
+	якщо (argvars[2].v_type != VAR_UNKNOWN)
 	    stride = tv_get_number_chk(&argvars[2], &error);
     }
 
-    if (error)
-	return;		// type error; errmsg already given
-    if (stride == 0)
+    якщо (error)
+	повернути;		// type error; errmsg already given
+    якщо (stride == 0)
     {
 	emsg(_(e_stride_is_zero));
-	return;
+	повернути;
     }
 
     // The stride is stored in "lv_stride", which is an int.
-    if (stride < INT_MIN || stride > INT_MAX)
+    якщо (stride < INT_MIN || stride > INT_MAX)
     {
 	char	buf[NUMBUFLEN];
 
 	vim_snprintf(buf, sizeof(buf), "%lld", stride);
 	semsg(_(e_val_too_large), buf);
-	return;
+	повернути;
     }
 
     uvarnumber_T	len;
 
-    if (stride > 0 ? end < start : end > start)
+    якщо (stride > 0 ? end < start : end > start)
     {
 	// One step before the start gives an empty list, further away is
 	// an error.  Subtract unsigned to avoid an overflow.
@@ -11497,14 +11497,14 @@ f_range(typval_T *argvars, typval_T *rettv)
 				  ? (uvarnumber_T)start - (uvarnumber_T)end
 				  : (uvarnumber_T)end - (uvarnumber_T)start;
 
-	if (back > 1)
+	якщо (back > 1)
 	{
 	    emsg(_(e_start_past_end));
-	    return;
+	    повернути;
 	}
 	len = 0;
     }
-    else
+    інакше
     {
 	varnumber_T	astride = stride > 0 ? stride : -stride;
 	uvarnumber_T	span = stride > 0
@@ -11513,7 +11513,7 @@ f_range(typval_T *argvars, typval_T *rettv)
 	uvarnumber_T	count = span / (uvarnumber_T)astride;
 
 	// The number of items is "count" + 1 and must fit in "lv_len".
-	if (count >= (uvarnumber_T)INT_MAX)
+	якщо (count >= (uvarnumber_T)INT_MAX)
 	{
 	    char	buf[NUMBUFLEN];
 
@@ -11521,7 +11521,7 @@ f_range(typval_T *argvars, typval_T *rettv)
 	    vim_snprintf(buf, sizeof(buf), "%llu",
 			      count < UVARNUM_MAX ? count + 1 : UVARNUM_MAX);
 	    semsg(_(e_val_too_large), buf);
-	    return;
+	    повернути;
 	}
 	len = count + 1;
     }
@@ -11534,8 +11534,8 @@ f_range(typval_T *argvars, typval_T *rettv)
     list->lv_first = &range_list_item;
     list->lv_u.nonmat.lv_start = start;
     list->lv_u.nonmat.lv_end = end;
-    list->lv_u.nonmat.lv_stride = (int)stride;
-    list->lv_len = (int)len;
+    list->lv_u.nonmat.lv_stride = (ціле)stride;
+    list->lv_len = (ціле)len;
 }
 
 /*
@@ -11547,18 +11547,18 @@ range_list_materialize(list_T *list)
 {
     varnumber_T start = list->lv_u.nonmat.lv_start;
     varnumber_T end = list->lv_u.nonmat.lv_end;
-    int		stride = list->lv_u.nonmat.lv_stride;
+    ціле		stride = list->lv_u.nonmat.lv_stride;
     varnumber_T i;
 
     list->lv_first = NULL;
     list->lv_u.mat.lv_last = NULL;
     list->lv_len = 0;
     list->lv_u.mat.lv_idx_item = NULL;
-    for (i = start; stride > 0 ? i <= end : i >= end; i += stride)
+    для (i = start; stride > 0 ? i <= end : i >= end; i += stride)
     {
-	if (list_append_number(list, i) == FAIL)
+	якщо (list_append_number(list, i) == FAIL)
 	    break;
-	if (list->lv_lock & VAR_ITEMS_LOCKED)
+	якщо (list->lv_lock & VAR_ITEMS_LOCKED)
 	    list->lv_u.mat.lv_last->li_tv.v_lock = VAR_LOCKED;
     }
     list->lv_lock &= ~VAR_ITEMS_LOCKED;
@@ -11570,31 +11570,31 @@ range_list_materialize(list_T *list)
     static void
 f_getreginfo(typval_T *argvars, typval_T *rettv)
 {
-    int		regname;
+    ціле		regname;
     char_u	buf[NUMBUFLEN + 2];
     size_t	buflen;
     long	reglen = 0;
     dict_T	*dict;
     list_T	*list;
 
-    if (in_vim9script() && check_for_opt_string_arg(argvars, 0) == FAIL)
-	return;
+    якщо (in_vim9script() && check_for_opt_string_arg(argvars, 0) == FAIL)
+	повернути;
 
     regname = getreg_get_regname(argvars);
-    if (regname == 0)
-	return;
+    якщо (regname == 0)
+	повернути;
 
-    if (regname == '@')
+    якщо (regname == '@')
 	regname = '"';
 
-    if (rettv_dict_alloc(rettv) == FAIL)
-	return;
+    якщо (rettv_dict_alloc(rettv) == FAIL)
+	повернути;
     dict = rettv->vval.v_dict;
 
     list = (list_T *)get_reg_contents(regname, GREG_EXPR_SRC | GREG_LIST);
-    if (list == NULL)
-	return;
-    if (dict_add_list(dict, "regcontents", list) == FAIL)
+    якщо (list == NULL)
+	повернути;
+    якщо (dict_add_list(dict, "regcontents", list) == FAIL)
 	list_unref(list);
 
     switch (get_reg_type(regname, &reglen))
@@ -11618,18 +11618,18 @@ f_getreginfo(typval_T *argvars, typval_T *rettv)
 	    buflen = 0;
 	    break;
     }
-    (void)dict_add_string_len(dict, (char *)"regtype", buf, (int)buflen);
+    (void)dict_add_string_len(dict, (char *)"regtype", buf, (ціле)buflen);
 
     buf[0] = get_register_name(get_unname_register());
     buf[1] = NUL;
     buflen = (buf[0] == NUL) ? 0 : 1;
-    if (regname == '"')
-	(void)dict_add_string_len(dict, (char *)"points_to", buf, (int)buflen);
-    else
+    якщо (regname == '"')
+	(void)dict_add_string_len(dict, (char *)"points_to", buf, (ціле)buflen);
+    інакше
     {
 	dictitem_T	*item = dictitem_alloc((char_u *)"isunnamed");
 
-	if (item != NULL)
+	якщо (item != NULL)
 	{
 	    item->di_tv.v_type = VAR_BOOL;
 	    item->di_tv.vval.v_number = regname == buf[0]
@@ -11640,7 +11640,7 @@ f_getreginfo(typval_T *argvars, typval_T *rettv)
 }
 
     static void
-return_register(int regname, typval_T *rettv)
+return_register(ціле regname, typval_T *rettv)
 {
     char_u buf[2] = {NUL, NUL};
 
@@ -11676,13 +11676,13 @@ f_rename(typval_T *argvars, typval_T *rettv)
     char_u	buf[NUMBUFLEN];
 
     rettv->vval.v_number = -1;
-    if (check_restricted() || check_secure())
-	return;
+    якщо (check_restricted() || check_secure())
+	повернути;
 
-    if (in_vim9script()
+    якщо (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_string_arg(argvars, 1) == FAIL))
-	return;
+	повернути;
 
     rettv->vval.v_number = vim_rename(tv_get_string(&argvars[0]),
 				      tv_get_string_buf(&argvars[1], buf));
@@ -11694,19 +11694,19 @@ f_rename(typval_T *argvars, typval_T *rettv)
     static void
 repeat_list(list_T *l, varnumber_T n, typval_T *rettv)
 {
-    int slen = list_len(l);
+    ціле slen = list_len(l);
 
-    if (rettv_list_alloc(rettv) == FAIL
+    якщо (rettv_list_alloc(rettv) == FAIL
 	    || l == NULL
 	    || n <= 0
 	    || slen == 0)
-	return;
+	повернути;
 
-    if (check_repeat_count(slen, n) == FAIL)
-	return;
+    якщо (check_repeat_count(slen, n) == FAIL)
+	повернути;
 
-    while (n-- > 0)
-	if (list_extend(rettv->vval.v_list, l, NULL) == FAIL)
+    поки (n-- > 0)
+	якщо (list_extend(rettv->vval.v_list, l, NULL) == FAIL)
 	    break;
 }
 
@@ -11716,37 +11716,37 @@ repeat_list(list_T *l, varnumber_T n, typval_T *rettv)
     static void
 repeat_blob(typval_T *blob_tv, varnumber_T n, typval_T *rettv)
 {
-    int		slen;
-    int		len;
-    int		i;
+    ціле		slen;
+    ціле		len;
+    ціле		i;
     blob_T	*blob = blob_tv->vval.v_blob;
 
-    if (rettv_blob_alloc(rettv) == FAIL
+    якщо (rettv_blob_alloc(rettv) == FAIL
 	    || blob == NULL
 	    || n <= 0)
-	return;
+	повернути;
 
     slen = blob->bv_ga.ga_len;
-    if (slen <= 0)
-	return;
-    if (check_repeat_count(slen, n) == FAIL)
-	return;
-    len = slen * (int)n;
+    якщо (slen <= 0)
+	повернути;
+    якщо (check_repeat_count(slen, n) == FAIL)
+	повернути;
+    len = slen * (ціле)n;
 
-    if (ga_grow(&rettv->vval.v_blob->bv_ga, len) == FAIL)
-	return;
+    якщо (ga_grow(&rettv->vval.v_blob->bv_ga, len) == FAIL)
+	повернути;
 
     rettv->vval.v_blob->bv_ga.ga_len = len;
 
-    for (i = 0; i < slen; ++i)
-	if (blob_get(blob, i) != 0)
+    для (i = 0; i < slen; ++i)
+	якщо (blob_get(blob, i) != 0)
 	    break;
 
-    if (i == slen)
+    якщо (i == slen)
 	// No need to copy since all bytes are already zero
-	return;
+	повернути;
 
-    for (i = 0; i < (int)n; ++i)
+    для (i = 0; i < (ціле)n; ++i)
 	blob_set_range(rettv->vval.v_blob,
 		(long)i * slen, ((long)i + 1) * slen - 1, blob_tv);
 }
@@ -11759,32 +11759,32 @@ repeat_string(typval_T *str_tv, varnumber_T n, typval_T *rettv)
 {
     char_u	*p;
     size_t	slen;
-    int		len;
+    ціле		len;
     char_u	*r;
-    int		done;
+    ціле		done;
 
     p = tv_get_string(str_tv);
     rettv->v_type = VAR_STRING;
     rettv->vval.v_string = NULL;
 
     slen = STRLEN(p);
-    if (slen == 0 || n <= 0)
-	return;
-    if (check_repeat_count((varnumber_T)slen, n) == FAIL)
-	return;
-    len = (int)slen * (int)n;
+    якщо (slen == 0 || n <= 0)
+	повернути;
+    якщо (check_repeat_count((varnumber_T)slen, n) == FAIL)
+	повернути;
+    len = (ціле)slen * (ціле)n;
 
     r = alloc((size_t)len + 1);
-    if (r == NULL)
-	return;
+    якщо (r == NULL)
+	повернути;
 
     mch_memmove(r, p, slen);
-    done = (int)slen;
-    while (done < len)
+    done = (ціле)slen;
+    поки (done < len)
     {
-	int copy_len = done;
+	ціле copy_len = done;
 
-	if (copy_len > len - done)
+	якщо (copy_len > len - done)
 	    copy_len = len - done;
 	mch_memmove(r + done, r, (size_t)copy_len);
 	done += copy_len;
@@ -11802,19 +11802,19 @@ f_repeat(typval_T *argvars, typval_T *rettv)
 {
     varnumber_T	n;
 
-    if (in_vim9script()
+    якщо (in_vim9script()
 	    && (check_for_repeat_func_arg(argvars, 0) == FAIL
 		|| check_for_number_arg(argvars, 1) == FAIL))
-	return;
+	повернути;
 
     n = tv_get_number(&argvars[1]);
-    if (argvars[0].v_type == VAR_LIST)
+    якщо (argvars[0].v_type == VAR_LIST)
 	repeat_list(argvars[0].vval.v_list, n, rettv);
-    else if (argvars[0].v_type == VAR_TUPLE)
+    інакше якщо (argvars[0].v_type == VAR_TUPLE)
 	tuple_repeat(argvars[0].vval.v_tuple, n, rettv);
-    else if (argvars[0].v_type == VAR_BLOB)
+    інакше якщо (argvars[0].v_type == VAR_BLOB)
 	repeat_blob(&argvars[0], n, rettv);
-    else
+    інакше
 	repeat_string(&argvars[0], n, rettv);
 }
 
@@ -11832,21 +11832,21 @@ f_repeat(typval_T *argvars, typval_T *rettv)
  * Possibly sets "p_ws".
  * Returns BACKWARD, FORWARD or zero (for an error).
  */
-    static int
-get_search_arg(typval_T *varp, int *flagsp)
+    static ціле
+get_search_arg(typval_T *varp, ціле *flagsp)
 {
-    int		dir = FORWARD;
+    ціле		dir = FORWARD;
     char_u	*flags;
     char_u	nbuf[NUMBUFLEN];
-    int		mask;
+    ціле		mask;
 
-    if (varp->v_type == VAR_UNKNOWN)
-	return FORWARD;
+    якщо (varp->v_type == VAR_UNKNOWN)
+	повернути FORWARD;
 
     flags = tv_get_string_buf_chk(varp, nbuf);
-    if (flags == NULL)
-	return 0;		// type error; errmsg already given
-    while (*flags != NUL)
+    якщо (flags == NULL)
+	повернути 0;		// type error; errmsg already given
+    поки (*flags != NUL)
     {
 	switch (*flags)
 	{
@@ -11854,7 +11854,7 @@ get_search_arg(typval_T *varp, int *flagsp)
 	    case 'w': p_ws = TRUE; break;
 	    case 'W': p_ws = FALSE; break;
 	    default:  mask = 0;
-		      if (flagsp != NULL)
+		      якщо (flagsp != NULL)
 			  switch (*flags)
 			  {
 			      case 'c': mask = SP_START; break;
@@ -11866,46 +11866,46 @@ get_search_arg(typval_T *varp, int *flagsp)
 			      case 's': mask = SP_SETPCMARK; break;
 			      case 'z': mask = SP_COLUMN; break;
 			  }
-		      if (mask == 0)
+		      якщо (mask == 0)
 		      {
 			  semsg(_(e_invalid_argument_str), flags);
 			  dir = 0;
 		      }
-		      else
+		      інакше
 			  *flagsp |= mask;
 	}
-	if (dir == 0)
+	якщо (dir == 0)
 	    break;
 	++flags;
     }
-    return dir;
+    повернути dir;
 }
 
 /*
  * Shared by search() and searchpos() functions.
  */
-    static int
-search_cmn(typval_T *argvars, pos_T *match_pos, int *flagsp)
+    static ціле
+search_cmn(typval_T *argvars, pos_T *match_pos, ціле *flagsp)
 {
-    int		flags;
+    ціле		flags;
     char_u	*pat;
     size_t	patlen;
     pos_T	pos;
     pos_T	save_cursor;
-    int		save_p_ws = p_ws;
-    int		dir;
-    int		retval = 0;	// default: FAIL
+    ціле		save_p_ws = p_ws;
+    ціле		dir;
+    ціле		retval = 0;	// default: FAIL
     long	lnum_stop = 0;
 #ifdef FEAT_RELTIME
     long	time_limit = 0;
 #endif
-    int		options = SEARCH_KEEP;
-    int		subpatnum;
+    ціле		options = SEARCH_KEEP;
+    ціле		subpatnum;
     searchit_arg_T sia;
-    int		use_skip = FALSE;
+    ціле		use_skip = FALSE;
     pos_T	firstpos;
 
-    if (in_vim9script()
+    якщо (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_opt_string_arg(argvars, 1) == FAIL
 		|| (argvars[1].v_type != VAR_UNKNOWN
@@ -11916,27 +11916,27 @@ search_cmn(typval_T *argvars, pos_T *match_pos, int *flagsp)
 
     pat = tv_get_string(&argvars[0]);
     dir = get_search_arg(&argvars[1], flagsp);	// may set p_ws
-    if (dir == 0)
+    якщо (dir == 0)
 	goto theend;
     flags = *flagsp;
-    if (flags & SP_START)
+    якщо (flags & SP_START)
 	options |= SEARCH_START;
-    if (flags & SP_END)
+    якщо (flags & SP_END)
 	options |= SEARCH_END;
-    if (flags & SP_COLUMN)
+    якщо (flags & SP_COLUMN)
 	options |= SEARCH_COL;
 
     // Optional arguments: line number to stop searching, timeout and skip.
-    if (argvars[1].v_type != VAR_UNKNOWN && argvars[2].v_type != VAR_UNKNOWN)
+    якщо (argvars[1].v_type != VAR_UNKNOWN && argvars[2].v_type != VAR_UNKNOWN)
     {
 	lnum_stop = (long)tv_get_number_chk(&argvars[2], NULL);
-	if (lnum_stop < 0)
+	якщо (lnum_stop < 0)
 	    goto theend;
-	if (argvars[3].v_type != VAR_UNKNOWN)
+	якщо (argvars[3].v_type != VAR_UNKNOWN)
 	{
 #ifdef FEAT_RELTIME
 	    time_limit = (long)tv_get_number_chk(&argvars[3], NULL);
-	    if (time_limit < 0)
+	    якщо (time_limit < 0)
 		goto theend;
 #endif
 	    use_skip = eval_expr_valid_arg(&argvars[4]);
@@ -11949,7 +11949,7 @@ search_cmn(typval_T *argvars, pos_T *match_pos, int *flagsp)
      * Also, Only the SP_NOMOVE or the SP_SETPCMARK flag can be set. Both
      * flags cannot be set. Check for that condition also.
      */
-    if (((flags & (SP_REPEAT | SP_RETCOUNT)) != 0)
+    якщо (((flags & (SP_REPEAT | SP_RETCOUNT)) != 0)
 	    || ((flags & SP_NOMOVE) && (flags & SP_SETPCMARK)))
     {
 	semsg(_(e_invalid_argument_str), tv_get_string(&argvars[1]));
@@ -11967,38 +11967,38 @@ search_cmn(typval_T *argvars, pos_T *match_pos, int *flagsp)
     patlen = STRLEN(pat);
 
     // Repeat until {skip} returns FALSE.
-    for (;;)
+    для (;;)
     {
 	subpatnum = searchit(curwin, curbuf, &pos, NULL, dir, pat, patlen, 1L,
 						     options, RE_SEARCH, &sia);
 	// finding the first match again means there is no match where {skip}
 	// evaluates to zero.
-	if (firstpos.lnum != 0 && EQUAL_POS(pos, firstpos))
+	якщо (firstpos.lnum != 0 && EQUAL_POS(pos, firstpos))
 	    subpatnum = FAIL;
 
-	if (subpatnum == FAIL || !use_skip)
+	якщо (subpatnum == FAIL || !use_skip)
 	    // didn't find it or no skip argument
 	    break;
-	if (firstpos.lnum == 0)
+	якщо (firstpos.lnum == 0)
 	    firstpos = pos;
 
 	// If the skip expression matches, ignore this match.
 	{
-	    int	    do_skip;
-	    int	    err;
+	    ціле	    do_skip;
+	    ціле	    err;
 	    pos_T   save_pos = curwin->w_cursor;
 
 	    curwin->w_cursor = pos;
 	    err = FALSE;
 	    do_skip = eval_expr_to_bool(&argvars[4], &err);
 	    curwin->w_cursor = save_pos;
-	    if (err)
+	    якщо (err)
 	    {
 		// Evaluating {skip} caused an error, break here.
 		subpatnum = FAIL;
 		break;
 	    }
-	    if (!do_skip)
+	    якщо (!do_skip)
 		break;
 	}
 
@@ -12006,16 +12006,16 @@ search_cmn(typval_T *argvars, pos_T *match_pos, int *flagsp)
 	options &= ~SEARCH_START;
     }
 
-    if (subpatnum != FAIL)
+    якщо (subpatnum != FAIL)
     {
-	if (flags & SP_SUBPAT)
+	якщо (flags & SP_SUBPAT)
 	    retval = subpatnum;
-	else
+	інакше
 	    retval = pos.lnum;
-	if (flags & SP_SETPCMARK)
+	якщо (flags & SP_SETPCMARK)
 	    setpcmark();
 	curwin->w_cursor = pos;
-	if (match_pos != NULL)
+	якщо (match_pos != NULL)
 	{
 	    // Store the match cursor position
 	    match_pos->lnum = pos.lnum;
@@ -12027,14 +12027,14 @@ search_cmn(typval_T *argvars, pos_T *match_pos, int *flagsp)
     }
 
     // If 'n' flag is used: restore cursor position.
-    if (flags & SP_NOMOVE)
+    якщо (flags & SP_NOMOVE)
 	curwin->w_cursor = save_cursor;
-    else
+    інакше
 	curwin->w_set_curswant = true;
 theend:
     p_ws = save_p_ws;
 
-    return retval;
+    повернути retval;
 }
 
 #ifdef FEAT_RUBY
@@ -12047,11 +12047,11 @@ f_rubyeval(typval_T *argvars, typval_T *rettv)
     char_u	*str;
     char_u	buf[NUMBUFLEN];
 
-    if (check_restricted() || check_secure())
-	return;
+    якщо (check_restricted() || check_secure())
+	повернути;
 
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    якщо (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+	повернути;
 
     str = tv_get_string_buf(&argvars[0], buf);
     do_rubyeval(str, rettv);
@@ -12064,21 +12064,21 @@ f_rubyeval(typval_T *argvars, typval_T *rettv)
     static void
 f_screenattr(typval_T *argvars, typval_T *rettv)
 {
-    int		row;
-    int		col;
-    int		c;
+    ціле		row;
+    ціле		col;
+    ціле		c;
 
-    if (in_vim9script()
+    якщо (in_vim9script()
 	    && (check_for_number_arg(argvars, 0) == FAIL
 		|| check_for_number_arg(argvars, 1) == FAIL))
-	return;
+	повернути;
 
-    row = (int)tv_get_number_chk(&argvars[0], NULL) - 1;
-    col = (int)tv_get_number_chk(&argvars[1], NULL) - 1;
-    if (row < 0 || row >= screen_Rows
+    row = (ціле)tv_get_number_chk(&argvars[0], NULL) - 1;
+    col = (ціле)tv_get_number_chk(&argvars[1], NULL) - 1;
+    якщо (row < 0 || row >= screen_Rows
 	    || col < 0 || col >= screen_Columns)
 	c = -1;
-    else
+    інакше
 	c = ScreenAttrs[LineOffset[row] + col];
     rettv->vval.v_number = c;
 }
@@ -12089,20 +12089,20 @@ f_screenattr(typval_T *argvars, typval_T *rettv)
     static void
 f_screenchar(typval_T *argvars, typval_T *rettv)
 {
-    int		row;
-    int		col;
-    int		c;
+    ціле		row;
+    ціле		col;
+    ціле		c;
 
-    if (in_vim9script()
+    якщо (in_vim9script()
 	    && (check_for_number_arg(argvars, 0) == FAIL
 		|| check_for_number_arg(argvars, 1) == FAIL))
-	return;
+	повернути;
 
-    row = (int)tv_get_number_chk(&argvars[0], NULL) - 1;
-    col = (int)tv_get_number_chk(&argvars[1], NULL) - 1;
-    if (row < 0 || row >= screen_Rows || col < 0 || col >= screen_Columns)
+    row = (ціле)tv_get_number_chk(&argvars[0], NULL) - 1;
+    col = (ціле)tv_get_number_chk(&argvars[1], NULL) - 1;
+    якщо (row < 0 || row >= screen_Rows || col < 0 || col >= screen_Columns)
 	c = -1;
-    else
+    інакше
     {
 	char_u buf[MB_MAXBYTES + 1];
 	screen_getbytes(row, col, buf, NULL);
@@ -12117,35 +12117,35 @@ f_screenchar(typval_T *argvars, typval_T *rettv)
     static void
 f_screenchars(typval_T *argvars, typval_T *rettv)
 {
-    int		row;
-    int		col;
-    int		c;
-    int		i;
+    ціле		row;
+    ціле		col;
+    ціле		c;
+    ціле		i;
 
-    if (rettv_list_alloc(rettv) == FAIL)
-	return;
+    якщо (rettv_list_alloc(rettv) == FAIL)
+	повернути;
 
-    if (in_vim9script()
+    якщо (in_vim9script()
 	    && (check_for_number_arg(argvars, 0) == FAIL
 		|| check_for_number_arg(argvars, 1) == FAIL))
-	return;
+	повернути;
 
-    row = (int)tv_get_number_chk(&argvars[0], NULL) - 1;
-    col = (int)tv_get_number_chk(&argvars[1], NULL) - 1;
-    if (row < 0 || row >= screen_Rows || col < 0 || col >= screen_Columns)
-	return;
+    row = (ціле)tv_get_number_chk(&argvars[0], NULL) - 1;
+    col = (ціле)tv_get_number_chk(&argvars[1], NULL) - 1;
+    якщо (row < 0 || row >= screen_Rows || col < 0 || col >= screen_Columns)
+	повернути;
 
     char_u buf[MB_MAXBYTES + 1];
     screen_getbytes(row, col, buf, NULL);
-    int pcc[MAX_MCO];
-    if (enc_utf8)
+    ціле pcc[MAX_MCO];
+    якщо (enc_utf8)
 	c = utfc_ptr2char(buf, pcc);
-    else
+    інакше
 	c = (*mb_ptr2char)(buf);
     list_append_number(rettv->vval.v_list, (varnumber_T)c);
 
-    if (enc_utf8)
-	for (i = 0; i < Screen_mco && pcc[i] != 0; ++i)
+    якщо (enc_utf8)
+	для (i = 0; i < Screen_mco && pcc[i] != 0; ++i)
 	    list_append_number(rettv->vval.v_list, (varnumber_T)pcc[i]);
 }
 
@@ -12175,22 +12175,22 @@ f_screenrow(typval_T *argvars UNUSED, typval_T *rettv)
     static void
 f_screenstring(typval_T *argvars, typval_T *rettv)
 {
-    int		row;
-    int		col;
+    ціле		row;
+    ціле		col;
     char_u	buf[MB_MAXBYTES + 1];
 
     rettv->vval.v_string = NULL;
     rettv->v_type = VAR_STRING;
 
-    if (in_vim9script()
+    якщо (in_vim9script()
 	    && (check_for_number_arg(argvars, 0) == FAIL
 		|| check_for_number_arg(argvars, 1) == FAIL))
-	return;
+	повернути;
 
-    row = (int)tv_get_number_chk(&argvars[0], NULL) - 1;
-    col = (int)tv_get_number_chk(&argvars[1], NULL) - 1;
-    if (row < 0 || row >= screen_Rows || col < 0 || col >= screen_Columns)
-	return;
+    row = (ціле)tv_get_number_chk(&argvars[0], NULL) - 1;
+    col = (ціле)tv_get_number_chk(&argvars[1], NULL) - 1;
+    якщо (row < 0 || row >= screen_Rows || col < 0 || col >= screen_Columns)
+	повернути;
 
     screen_getbytes(row, col, buf, NULL);
     rettv->vval.v_string = vim_strsave(buf);
@@ -12202,7 +12202,7 @@ f_screenstring(typval_T *argvars, typval_T *rettv)
     static void
 f_search(typval_T *argvars, typval_T *rettv)
 {
-    int		flags = 0;
+    ціле		flags = 0;
 
     rettv->vval.v_number = search_cmn(argvars, NULL, &flags);
 }
@@ -12213,50 +12213,50 @@ f_search(typval_T *argvars, typval_T *rettv)
     static void
 f_searchdecl(typval_T *argvars, typval_T *rettv)
 {
-    int		locally = TRUE;
-    int		thisblock = FALSE;
-    int		error = FALSE;
+    ціле		locally = TRUE;
+    ціле		thisblock = FALSE;
+    ціле		error = FALSE;
     char_u	*name;
 
     rettv->vval.v_number = 1;	// default: FAIL
 
-    if (in_vim9script()
+    якщо (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_opt_bool_arg(argvars, 1) == FAIL
 		|| (argvars[1].v_type != VAR_UNKNOWN
 		    && check_for_opt_bool_arg(argvars, 2) == FAIL)))
-	return;
+	повернути;
 
     name = tv_get_string_chk(&argvars[0]);
-    if (argvars[1].v_type != VAR_UNKNOWN)
+    якщо (argvars[1].v_type != VAR_UNKNOWN)
     {
-	locally = !(int)tv_get_bool_chk(&argvars[1], &error);
-	if (!error && argvars[2].v_type != VAR_UNKNOWN)
-	    thisblock = (int)tv_get_bool_chk(&argvars[2], &error);
+	locally = !(ціле)tv_get_bool_chk(&argvars[1], &error);
+	якщо (!error && argvars[2].v_type != VAR_UNKNOWN)
+	    thisblock = (ціле)tv_get_bool_chk(&argvars[2], &error);
     }
-    if (!error && name != NULL)
-	rettv->vval.v_number = find_decl(name, (int)STRLEN(name),
+    якщо (!error && name != NULL)
+	rettv->vval.v_number = find_decl(name, (ціле)STRLEN(name),
 				     locally, thisblock, SEARCH_KEEP) == FAIL;
 }
 
 /*
  * Used by searchpair() and searchpairpos()
  */
-    static int
+    static ціле
 searchpair_cmn(typval_T *argvars, pos_T *match_pos)
 {
     char_u	*spat, *mpat, *epat;
     typval_T	*skip;
-    int		save_p_ws = p_ws;
-    int		dir;
-    int		flags = 0;
+    ціле		save_p_ws = p_ws;
+    ціле		dir;
+    ціле		flags = 0;
     char_u	nbuf1[NUMBUFLEN];
     char_u	nbuf2[NUMBUFLEN];
-    int		retval = 0;		// default: FAIL
+    ціле		retval = 0;		// default: FAIL
     long	lnum_stop = 0;
     long	time_limit = 0;
 
-    if (in_vim9script()
+    якщо (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_string_arg(argvars, 1) == FAIL
 		|| check_for_string_arg(argvars, 2) == FAIL
@@ -12273,17 +12273,17 @@ searchpair_cmn(typval_T *argvars, pos_T *match_pos)
     spat = tv_get_string_chk(&argvars[0]);
     mpat = tv_get_string_buf_chk(&argvars[1], nbuf1);
     epat = tv_get_string_buf_chk(&argvars[2], nbuf2);
-    if (spat == NULL || mpat == NULL || epat == NULL)
+    якщо (spat == NULL || mpat == NULL || epat == NULL)
 	goto theend;	    // type error
 
     // Handle the optional fourth argument: flags
     dir = get_search_arg(&argvars[3], &flags); // may set p_ws
-    if (dir == 0)
+    якщо (dir == 0)
 	goto theend;
 
     // Don't accept SP_END or SP_SUBPAT.
     // Only one of the SP_NOMOVE or SP_SETPCMARK flags can be set.
-    if ((flags & (SP_END | SP_SUBPAT)) != 0
+    якщо ((flags & (SP_END | SP_SUBPAT)) != 0
 	    || ((flags & SP_NOMOVE) && (flags & SP_SETPCMARK)))
     {
 	semsg(_(e_invalid_argument_str), tv_get_string(&argvars[3]));
@@ -12291,31 +12291,31 @@ searchpair_cmn(typval_T *argvars, pos_T *match_pos)
     }
 
     // Using 'r' implies 'W', otherwise it doesn't work.
-    if (flags & SP_REPEAT)
+    якщо (flags & SP_REPEAT)
 	p_ws = FALSE;
 
     // Optional fifth argument: skip expression
-    if (argvars[3].v_type == VAR_UNKNOWN
+    якщо (argvars[3].v_type == VAR_UNKNOWN
 	    || argvars[4].v_type == VAR_UNKNOWN)
 	skip = NULL;
-    else
+    інакше
     {
 	// Type is checked later.
 	skip = &argvars[4];
 
-	if (argvars[5].v_type != VAR_UNKNOWN)
+	якщо (argvars[5].v_type != VAR_UNKNOWN)
 	{
 	    lnum_stop = (long)tv_get_number_chk(&argvars[5], NULL);
-	    if (lnum_stop < 0)
+	    якщо (lnum_stop < 0)
 	    {
 		semsg(_(e_invalid_argument_str), tv_get_string(&argvars[5]));
 		goto theend;
 	    }
 #ifdef FEAT_RELTIME
-	    if (argvars[6].v_type != VAR_UNKNOWN)
+	    якщо (argvars[6].v_type != VAR_UNKNOWN)
 	    {
 		time_limit = (long)tv_get_number_chk(&argvars[6], NULL);
-		if (time_limit < 0)
+		якщо (time_limit < 0)
 		{
 		    semsg(_(e_invalid_argument_str), tv_get_string(&argvars[6]));
 		    goto theend;
@@ -12331,7 +12331,7 @@ searchpair_cmn(typval_T *argvars, pos_T *match_pos)
 theend:
     p_ws = save_p_ws;
 
-    return retval;
+    повернути retval;
 }
 
 /*
@@ -12350,13 +12350,13 @@ f_searchpair(typval_T *argvars, typval_T *rettv)
 f_searchpairpos(typval_T *argvars, typval_T *rettv)
 {
     pos_T	match_pos;
-    int		lnum = 0;
-    int		col = 0;
+    ціле		lnum = 0;
+    ціле		col = 0;
 
-    if (rettv_list_alloc(rettv) == FAIL)
-	return;
+    якщо (rettv_list_alloc(rettv) == FAIL)
+	повернути;
 
-    if (searchpair_cmn(argvars, &match_pos) > 0)
+    якщо (searchpair_cmn(argvars, &match_pos) > 0)
     {
 	lnum = match_pos.lnum;
 	col = match_pos.col;
@@ -12376,9 +12376,9 @@ do_searchpair(
     char_u	*spat,	    // start pattern
     char_u	*mpat,	    // middle pattern
     char_u	*epat,	    // end pattern
-    int		dir,	    // BACKWARD or FORWARD
+    ціле		dir,	    // BACKWARD or FORWARD
     typval_T	*skip,	    // skip expression
-    int		flags,	    // SP_SETPCMARK and other SP_ values
+    ціле		flags,	    // SP_SETPCMARK and other SP_ values
     pos_T	*match_pos,
     linenr_T	lnum_stop,  // stop at this line if not zero
     long	time_limit UNUSED) // stop after this many msec
@@ -12398,12 +12398,12 @@ do_searchpair(
     pos_T	foundpos;
     pos_T	save_cursor;
     pos_T	save_pos;
-    int		n;
-    int		r;
-    int		nest = 1;
-    int		use_skip = FALSE;
-    int		err;
-    int		options = SEARCH_KEEP;
+    ціле		n;
+    ціле		r;
+    ціле		nest = 1;
+    ціле		use_skip = FALSE;
+    ціле		err;
+    ціле		options = SEARCH_KEEP;
 
     // Make 'cpoptions' empty, the 'l' flag should not be used here.
     save_cpo = p_cpo;
@@ -12415,29 +12415,29 @@ do_searchpair(
     epatlen = STRLEN(epat);
     pat2size = spatlen + epatlen + 17;
     pat2 = alloc(pat2size);
-    if (pat2 == NULL)
+    якщо (pat2 == NULL)
 	goto theend;
     pat3size = spatlen + STRLEN(mpat) + epatlen + 25;
     pat3 = alloc(pat3size);
-    if (pat3 == NULL)
+    якщо (pat3 == NULL)
 	goto theend;
     pat2len = vim_snprintf((char *)pat2, pat2size, "\\m\\(%s\\m\\)\\|\\(%s\\m\\)", spat, epat);
-    if (*mpat == NUL)
+    якщо (*mpat == NUL)
     {
 	STRCPY(pat3, pat2);
 	pat3len = pat2len;
     }
-    else
+    інакше
 	pat3len = vim_snprintf((char *)pat3, pat3size, "\\m\\(%s\\m\\)\\|\\(%s\\m\\)\\|\\(%s\\m\\)",
 							    spat, epat, mpat);
-    if (flags & SP_START)
+    якщо (flags & SP_START)
 	options |= SEARCH_START;
 
-    if (skip != NULL)
+    якщо (skip != NULL)
 	use_skip = eval_expr_valid_arg(skip);
 
 #ifdef FEAT_RELTIME
-    if (time_limit > 0)
+    якщо (time_limit > 0)
 	init_regexp_timeout(time_limit);
 #endif
     save_cursor = curwin->w_cursor;
@@ -12446,7 +12446,7 @@ do_searchpair(
     CLEAR_POS(&foundpos);
     pat = pat3;
     patlen = pat3len;
-    for (;;)
+    для (;;)
     {
 	searchit_arg_T sia;
 
@@ -12454,20 +12454,20 @@ do_searchpair(
 	sia.sa_stop_lnum = lnum_stop;
 	n = searchit(curwin, curbuf, &pos, NULL, dir, pat, patlen, 1L,
 						     options, RE_SEARCH, &sia);
-	if (n == FAIL || (firstpos.lnum != 0 && EQUAL_POS(pos, firstpos)))
+	якщо (n == FAIL || (firstpos.lnum != 0 && EQUAL_POS(pos, firstpos)))
 	    // didn't find it or found the first match again: FAIL
 	    break;
 
-	if (firstpos.lnum == 0)
+	якщо (firstpos.lnum == 0)
 	    firstpos = pos;
-	if (EQUAL_POS(pos, foundpos))
+	якщо (EQUAL_POS(pos, foundpos))
 	{
 	    // Found the same position again.  Can happen with a pattern that
 	    // has "\zs" at the end and searching backwards.  Advance one
 	    // character and try again.
-	    if (dir == BACKWARD)
+	    якщо (dir == BACKWARD)
 		decl(&pos);
-	    else
+	    інакше
 		incl(&pos);
 	}
 	foundpos = pos;
@@ -12476,56 +12476,56 @@ do_searchpair(
 	options &= ~SEARCH_START;
 
 	// If the skip pattern matches, ignore this match.
-	if (use_skip)
+	якщо (use_skip)
 	{
 	    save_pos = curwin->w_cursor;
 	    curwin->w_cursor = pos;
 	    err = FALSE;
 	    r = eval_expr_to_bool(skip, &err);
 	    curwin->w_cursor = save_pos;
-	    if (err)
+	    якщо (err)
 	    {
 		// Evaluating {skip} caused an error, break here.
 		curwin->w_cursor = save_cursor;
 		retval = -1;
 		break;
 	    }
-	    if (r)
+	    якщо (r)
 		continue;
 	}
 
-	if ((dir == BACKWARD && n == 3) || (dir == FORWARD && n == 2))
+	якщо ((dir == BACKWARD && n == 3) || (dir == FORWARD && n == 2))
 	{
 	    // Found end when searching backwards or start when searching
 	    // forward: nested pair.
 	    ++nest;
 	    pat = pat2;		// nested, don't search for middle
 	}
-	else
+	інакше
 	{
 	    // Found end when searching forward or start when searching
 	    // backward: end of (nested) pair; or found middle in outer pair.
-	    if (--nest == 1)
+	    якщо (--nest == 1)
 		pat = pat3;	// outer level, search for middle
 	}
 
-	if (nest == 0)
+	якщо (nest == 0)
 	{
 	    // Found the match: return matchcount or line number.
-	    if (flags & SP_RETCOUNT)
+	    якщо (flags & SP_RETCOUNT)
 		++retval;
-	    else
+	    інакше
 		retval = pos.lnum;
-	    if (flags & SP_SETPCMARK)
+	    якщо (flags & SP_SETPCMARK)
 		setpcmark();
 	    curwin->w_cursor = pos;
-	    if (!(flags & SP_REPEAT))
+	    якщо (!(flags & SP_REPEAT))
 		break;
 	    nest = 1;	    // search for next unmatched
 	}
     }
 
-    if (match_pos != NULL)
+    якщо (match_pos != NULL)
     {
 	// Store the match cursor position
 	match_pos->lnum = curwin->w_cursor.lnum;
@@ -12533,29 +12533,29 @@ do_searchpair(
     }
 
     // If 'n' flag is used or search failed: restore cursor position.
-    if ((flags & SP_NOMOVE) || retval == 0)
+    якщо ((flags & SP_NOMOVE) || retval == 0)
 	curwin->w_cursor = save_cursor;
 
 theend:
 #ifdef FEAT_RELTIME
-    if (time_limit > 0)
+    якщо (time_limit > 0)
 	disable_regexp_timeout();
 #endif
     vim_free(pat2);
     vim_free(pat3);
-    if (p_cpo == empty_option)
+    якщо (p_cpo == empty_option)
 	p_cpo = save_cpo;
-    else
+    інакше
     {
 	// Darn, evaluating the {skip} expression changed the value.
 	// If it's still empty it was changed and restored, need to restore in
 	// the complicated way.
-	if (*p_cpo == NUL)
+	якщо (*p_cpo == NUL)
 	    set_option_value_give_err((char_u *)"cpo", 0L, save_cpo, 0);
 	free_string_option(save_cpo);
     }
 
-    return retval;
+    повернути retval;
 }
 
 /*
@@ -12565,16 +12565,16 @@ theend:
 f_searchpos(typval_T *argvars, typval_T *rettv)
 {
     pos_T	match_pos;
-    int		lnum = 0;
-    int		col = 0;
-    int		n;
-    int		flags = 0;
+    ціле		lnum = 0;
+    ціле		col = 0;
+    ціле		n;
+    ціле		flags = 0;
 
-    if (rettv_list_alloc(rettv) == FAIL)
-	return;
+    якщо (rettv_list_alloc(rettv) == FAIL)
+	повернути;
 
     n = search_cmn(argvars, &match_pos, &flags);
-    if (n > 0)
+    якщо (n > 0)
     {
 	lnum = match_pos.lnum;
 	col = match_pos.col;
@@ -12582,7 +12582,7 @@ f_searchpos(typval_T *argvars, typval_T *rettv)
 
     list_append_number(rettv->vval.v_list, (varnumber_T)lnum);
     list_append_number(rettv->vval.v_list, (varnumber_T)col);
-    if (flags & SP_SUBPAT)
+    якщо (flags & SP_SUBPAT)
 	list_append_number(rettv->vval.v_list, (varnumber_T)n);
 }
 
@@ -12592,34 +12592,34 @@ f_searchpos(typval_T *argvars, typval_T *rettv)
  * Otherwise use the column number as a byte offset.
  */
     static void
-set_position(typval_T *argvars, typval_T *rettv, int charpos)
+set_position(typval_T *argvars, typval_T *rettv, ціле charpos)
 {
     pos_T	pos;
-    int		fnum;
+    ціле		fnum;
     char_u	*name;
     colnr_T	curswant = -1;
 
     rettv->vval.v_number = -1;
 
-    if (in_vim9script()
+    якщо (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_list_arg(argvars, 1) == FAIL))
-	return;
+	повернути;
 
     name = tv_get_string_chk(argvars);
-    if (name == NULL)
-	return;
+    якщо (name == NULL)
+	повернути;
 
-    if (list2fpos(&argvars[1], &pos, &fnum, &curswant, charpos) != OK)
-	return;
+    якщо (list2fpos(&argvars[1], &pos, &fnum, &curswant, charpos) != OK)
+	повернути;
 
-    if (pos.col != MAXCOL && --pos.col < 0)
+    якщо (pos.col != MAXCOL && --pos.col < 0)
 	pos.col = 0;
-    if ((name[0] == '.' && name[1] == NUL))
+    якщо ((name[0] == '.' && name[1] == NUL))
     {
 	// set cursor; "fnum" is ignored
 	curwin->w_cursor = pos;
-	if (curswant >= 0)
+	якщо (curswant >= 0)
 	{
 	    curwin->w_curswant = curswant - 1;
 	    curwin->w_set_curswant = false;
@@ -12627,13 +12627,13 @@ set_position(typval_T *argvars, typval_T *rettv, int charpos)
 	check_cursor();
 	rettv->vval.v_number = 0;
     }
-    else if (name[0] == '\'' && name[1] != NUL && name[2] == NUL)
+    інакше якщо (name[0] == '\'' && name[1] != NUL && name[2] == NUL)
     {
 	// set mark
-	if (setmark_pos(name[1], &pos, fnum) == OK)
+	якщо (setmark_pos(name[1], &pos, fnum) == OK)
 	    rettv->vval.v_number = 0;
     }
-    else
+    інакше
 	emsg(_(e_invalid_argument));
 }
 /*
@@ -12652,34 +12652,34 @@ f_setcharsearch(typval_T *argvars, typval_T *rettv UNUSED)
     dictitem_T	*di;
     char_u	*csearch;
 
-    if (check_for_dict_arg(argvars, 0) == FAIL)
-	return;
+    якщо (check_for_dict_arg(argvars, 0) == FAIL)
+	повернути;
 
-    if ((d = argvars[0].vval.v_dict) == NULL)
-	return;
+    якщо ((d = argvars[0].vval.v_dict) == NULL)
+	повернути;
 
     csearch = dict_get_string(d, "char", FALSE);
-    if (csearch != NULL)
+    якщо (csearch != NULL)
     {
-	if (enc_utf8)
+	якщо (enc_utf8)
 	{
-	    int pcc[MAX_MCO];
-	    int c = utfc_ptr2char(csearch, pcc);
+	    ціле pcc[MAX_MCO];
+	    ціле c = utfc_ptr2char(csearch, pcc);
 
 	    set_last_csearch(c, csearch, utfc_ptr2len(csearch));
 	}
-	else
+	інакше
 	    set_last_csearch(PTR2CHAR(csearch),
 		    csearch, mb_ptr2len(csearch));
     }
 
     di = dict_find(d, (char_u *)"forward", -1);
-    if (di != NULL)
-	set_csearch_direction((int)tv_get_number(&di->di_tv)
+    якщо (di != NULL)
+	set_csearch_direction((ціле)tv_get_number(&di->di_tv)
 		? FORWARD : BACKWARD);
 
     di = dict_find(d, (char_u *)"until", -1);
-    if (di != NULL)
+    якщо (di != NULL)
 	set_csearch_until(!!tv_get_number(&di->di_tv));
 }
 
@@ -12702,20 +12702,20 @@ f_setenv(typval_T *argvars, typval_T *rettv UNUSED)
     char_u   valbuf[NUMBUFLEN];
     char_u  *name;
 
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    якщо (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+	повернути;
 
     // setting an environment variable may be dangerous, e.g. you could
     // setenv GCONV_PATH=/tmp and then have iconv() unexpectedly call
     // a shell command using some shared library:
-    if (check_restricted() || check_secure())
-	return;
+    якщо (check_restricted() || check_secure())
+	повернути;
 
     name = tv_get_string_buf(&argvars[0], namebuf);
-    if (argvars[1].v_type == VAR_SPECIAL
+    якщо (argvars[1].v_type == VAR_SPECIAL
 				      && argvars[1].vval.v_number == VVAL_NULL)
 	vim_unsetenv_ext(name);
-    else
+    інакше
 	vim_setenv_ext(name, tv_get_string_buf(&argvars[1], valbuf));
 }
 
@@ -12728,33 +12728,33 @@ f_setfperm(typval_T *argvars, typval_T *rettv)
     char_u	*fname;
     char_u	modebuf[NUMBUFLEN];
     char_u	*mode_str;
-    int		i;
-    int		mask;
-    int		mode = 0;
+    ціле		i;
+    ціле		mask;
+    ціле		mode = 0;
 
     rettv->vval.v_number = 0;
 
-    if (in_vim9script()
+    якщо (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_string_arg(argvars, 1) == FAIL))
-	return;
+	повернути;
 
     fname = tv_get_string_chk(&argvars[0]);
-    if (fname == NULL)
-	return;
+    якщо (fname == NULL)
+	повернути;
     mode_str = tv_get_string_buf_chk(&argvars[1], modebuf);
-    if (mode_str == NULL)
-	return;
-    if (STRLEN(mode_str) != 9)
+    якщо (mode_str == NULL)
+	повернути;
+    якщо (STRLEN(mode_str) != 9)
     {
 	semsg(_(e_invalid_argument_str), mode_str);
-	return;
+	повернути;
     }
 
     mask = 1;
-    for (i = 8; i >= 0; --i)
+    для (i = 8; i >= 0; --i)
     {
-	if (mode_str[i] != '-')
+	якщо (mode_str[i] != '-')
 	    mode |= mask;
 	mask = mask << 1;
     }
@@ -12773,7 +12773,7 @@ f_setpos(typval_T *argvars, typval_T *rettv)
 /*
  * Translate a register type string to the yank type and block length
  */
-    int
+    ціле
 get_yank_type(char_u **pp, char_u *yank_type, long *block_len)
 {
     char_u *stropt = *pp;
@@ -12787,7 +12787,7 @@ get_yank_type(char_u **pp, char_u *yank_type, long *block_len)
 	    break;
 	case 'b': case Ctrl_V:	// block-wise selection
 	    *yank_type = MBLOCK;
-	    if (VIM_ISDIGIT(stropt[1]))
+	    якщо (VIM_ISDIGIT(stropt[1]))
 	    {
 		++stropt;
 		*block_len = getdigits(&stropt) - 1;
@@ -12795,10 +12795,10 @@ get_yank_type(char_u **pp, char_u *yank_type, long *block_len)
 	    }
 	    break;
 	default:
-	    return FAIL;
+	    повернути FAIL;
     }
     *pp = stropt;
-    return OK;
+    повернути OK;
 }
 
 /*
@@ -12807,20 +12807,20 @@ get_yank_type(char_u **pp, char_u *yank_type, long *block_len)
     static void
 f_setreg(typval_T *argvars, typval_T *rettv)
 {
-    int		regname;
+    ціле		regname;
     char_u	*strregname;
     char_u	*stropt;
     char_u	*strval;
-    int		append;
+    ціле		append;
     char_u	yank_type;
     long	block_len;
     typval_T	*regcontents;
-    int		pointreg;
+    ціле		pointreg;
 
-    if (in_vim9script()
+    якщо (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_opt_string_arg(argvars, 2) == FAIL))
-	return;
+	повернути;
 
     pointreg = 0;
     regcontents = NULL;
@@ -12831,73 +12831,73 @@ f_setreg(typval_T *argvars, typval_T *rettv)
     strregname = tv_get_string_chk(argvars);
     rettv->vval.v_number = 1;		// FAIL is default
 
-    if (strregname == NULL)
-	return;		// type error; errmsg already given
-    if (in_vim9script() && STRLEN(strregname) > 1)
+    якщо (strregname == NULL)
+	повернути;		// type error; errmsg already given
+    якщо (in_vim9script() && STRLEN(strregname) > 1)
     {
 	semsg(_(e_register_name_must_be_one_char_str), strregname);
-	return;
+	повернути;
     }
     regname = *strregname;
-    if (regname == 0 || regname == '@')
+    якщо (regname == 0 || regname == '@')
 	regname = '"';
 
-    if (argvars[1].v_type == VAR_DICT)
+    якщо (argvars[1].v_type == VAR_DICT)
     {
 	dict_T	    *d = argvars[1].vval.v_dict;
 	dictitem_T  *di;
 
-	if (d == NULL || d->dv_hashtab.ht_used == 0)
+	якщо (d == NULL || d->dv_hashtab.ht_used == 0)
 	{
 	    // Empty dict, clear the register (like setreg(0, []))
 	    char_u *lstval[2] = {NULL, NULL};
 	    write_reg_contents_lst(regname, lstval, 0, FALSE, MAUTO, -1);
-	    return;
+	    повернути;
 	}
 
 	di = dict_find(d, (char_u *)"regcontents", -1);
-	if (di != NULL)
+	якщо (di != NULL)
 	    regcontents = &di->di_tv;
 
 	stropt = dict_get_string(d, "regtype", FALSE);
-	if (stropt != NULL)
+	якщо (stropt != NULL)
 	{
-	    int ret = get_yank_type(&stropt, &yank_type, &block_len);
+	    ціле ret = get_yank_type(&stropt, &yank_type, &block_len);
 
-	    if (ret == FAIL || *++stropt != NUL)
+	    якщо (ret == FAIL || *++stropt != NUL)
 	    {
 		semsg(_(e_invalid_value_for_argument_str), "value");
-		return;
+		повернути;
 	    }
 	}
 
-	if (regname == '"')
+	якщо (regname == '"')
 	{
 	    stropt = dict_get_string(d, "points_to", FALSE);
-	    if (stropt != NULL)
+	    якщо (stropt != NULL)
 	    {
 		pointreg = *stropt;
 		regname = pointreg;
 	    }
 	}
-	else if (dict_get_bool(d, "isunnamed", -1) > 0)
+	інакше якщо (dict_get_bool(d, "isunnamed", -1) > 0)
 	    pointreg = regname;
     }
-    else
+    інакше
 	regcontents = &argvars[1];
 
-    if (argvars[2].v_type != VAR_UNKNOWN)
+    якщо (argvars[2].v_type != VAR_UNKNOWN)
     {
-	if (yank_type != MAUTO)
+	якщо (yank_type != MAUTO)
 	{
 	    semsg(_(e_too_many_arguments_for_function_str), "setreg");
-	    return;
+	    повернути;
 	}
 
 	stropt = tv_get_string_chk(&argvars[2]);
-	if (stropt == NULL)
-	    return;		// type error
-	for (; *stropt != NUL; ++stropt)
+	якщо (stropt == NULL)
+	    повернути;		// type error
+	для (; *stropt != NUL; ++stropt)
 	    switch (*stropt)
 	    {
 		case 'a': case 'A':	// append
@@ -12908,7 +12908,7 @@ f_setreg(typval_T *argvars, typval_T *rettv)
 	    }
     }
 
-    if (regcontents && regcontents->v_type == VAR_LIST)
+    якщо (regcontents && regcontents->v_type == VAR_LIST)
     {
 	char_u		**lstval;
 	char_u		**allocval;
@@ -12917,7 +12917,7 @@ f_setreg(typval_T *argvars, typval_T *rettv)
 	char_u		**curallocval;
 	list_T		*ll = regcontents->vval.v_list;
 	listitem_T	*li;
-	int		len;
+	ціле		len;
 
 	// If the list is NULL handle like an empty list.
 	len = ll == NULL ? 0 : ll->lv_len;
@@ -12925,26 +12925,26 @@ f_setreg(typval_T *argvars, typval_T *rettv)
 	// First half: use for pointers to result lines; second half: use for
 	// pointers to allocated copies.
 	lstval = ALLOC_MULT(char_u *, (len + 1) * 2);
-	if (lstval == NULL)
-	    return;
+	якщо (lstval == NULL)
+	    повернути;
 	curval = lstval;
 	allocval = lstval + len + 2;
 	curallocval = allocval;
 
-	if (ll != NULL)
+	якщо (ll != NULL)
 	{
 	    CHECK_LIST_MATERIALIZE(ll);
 	    FOR_ALL_LIST_ITEMS(ll, li)
 	    {
 		strval = tv_get_string_buf_chk(&li->li_tv, buf);
-		if (strval == NULL)
+		якщо (strval == NULL)
 		    goto free_lstval;
-		if (strval == buf)
+		якщо (strval == buf)
 		{
 		    // Need to make a copy, next tv_get_string_buf_chk() will
 		    // overwrite the string.
 		    strval = vim_strsave(buf);
-		    if (strval == NULL)
+		    якщо (strval == NULL)
 			goto free_lstval;
 		    *curallocval++ = strval;
 		}
@@ -12956,19 +12956,19 @@ f_setreg(typval_T *argvars, typval_T *rettv)
 	write_reg_contents_lst(regname, lstval, -1,
 						append, yank_type, block_len);
 free_lstval:
-	while (curallocval > allocval)
+	поки (curallocval > allocval)
 	    vim_free(*--curallocval);
 	vim_free(lstval);
     }
-    else if (regcontents)
+    інакше якщо (regcontents)
     {
 	strval = tv_get_string_chk(regcontents);
-	if (strval == NULL)
-	    return;
+	якщо (strval == NULL)
+	    повернути;
 	write_reg_contents_ex(regname, strval, -1,
 						append, yank_type, block_len);
     }
-    if (pointreg != 0)
+    якщо (pointreg != 0)
 	get_yank_register(pointreg, TRUE);
 
     rettv->vval.v_number = 0;
@@ -12982,51 +12982,51 @@ f_settagstack(typval_T *argvars, typval_T *rettv)
 {
     win_T	*wp;
     dict_T	*d;
-    int		action = 'r';
+    ціле		action = 'r';
 
     rettv->vval.v_number = -1;
 
-    if (in_vim9script()
+    якщо (in_vim9script()
 	    && (check_for_number_arg(argvars, 0) == FAIL
 		|| check_for_dict_arg(argvars, 1) == FAIL
 		|| check_for_opt_string_arg(argvars, 2) == FAIL))
-	return;
+	повернути;
 
     // first argument: window number or id
     wp = find_win_by_nr_or_id(&argvars[0]);
-    if (wp == NULL)
-	return;
+    якщо (wp == NULL)
+	повернути;
 
     // second argument: dict with items to set in the tag stack
-    if (check_for_dict_arg(argvars, 1) == FAIL)
-	return;
+    якщо (check_for_dict_arg(argvars, 1) == FAIL)
+	повернути;
     d = argvars[1].vval.v_dict;
-    if (d == NULL)
-	return;
+    якщо (d == NULL)
+	повернути;
 
     // third argument: action - 'a' for append and 'r' for replace.
     // default is to replace the stack.
-    if (argvars[2].v_type == VAR_UNKNOWN)
+    якщо (argvars[2].v_type == VAR_UNKNOWN)
 	action = 'r';
-    else if (check_for_string_arg(argvars, 2) == FAIL)
-	return;
-    else
+    інакше якщо (check_for_string_arg(argvars, 2) == FAIL)
+	повернути;
+    інакше
     {
 	char_u	*actstr;
 	actstr = tv_get_string_chk(&argvars[2]);
-	if (actstr == NULL)
-	    return;
-	if ((*actstr == 'r' || *actstr == 'a' || *actstr == 't')
+	якщо (actstr == NULL)
+	    повернути;
+	якщо ((*actstr == 'r' || *actstr == 'a' || *actstr == 't')
 		&& actstr[1] == NUL)
 	    action = *actstr;
-	else
+	інакше
 	{
 	    semsg(_(e_invalid_action_str_2), actstr);
-	    return;
+	    повернути;
 	}
     }
 
-    if (set_tagstack(wp, d, action) == OK)
+    якщо (set_tagstack(wp, d, action) == OK)
 	rettv->vval.v_number = 0;
 }
 
@@ -13038,26 +13038,26 @@ f_settagstack(typval_T *argvars, typval_T *rettv)
 f_sha256(typval_T *argvars, typval_T *rettv)
 {
     char_u	*p;
-    int		len;
+    ціле		len;
 
-    if (in_vim9script() && check_for_string_or_blob_arg(argvars, 0) == FAIL)
-	return;
+    якщо (in_vim9script() && check_for_string_or_blob_arg(argvars, 0) == FAIL)
+	повернути;
 
     rettv->v_type = VAR_STRING;
     rettv->vval.v_string = NULL;
 
-    if (argvars[0].v_type == VAR_BLOB)
+    якщо (argvars[0].v_type == VAR_BLOB)
     {
 	blob_T *blob = argvars[0].vval.v_blob;
 	p = blob != NULL ? (char_u *)blob->bv_ga.ga_data : (char_u *)"";
 	len = blob != NULL ? blob->bv_ga.ga_len : 0;
 	rettv->vval.v_string = vim_strsave(sha256_bytes(p, len, NULL, 0));
     }
-    else
+    інакше
     {
 	p = tv_get_string(&argvars[0]);
 	rettv->vval.v_string = vim_strsave(
-				    sha256_bytes(p, (int)STRLEN(p), NULL, 0));
+				    sha256_bytes(p, (ціле)STRLEN(p), NULL, 0));
     }
 }
 #endif // FEAT_CRYPT
@@ -13068,12 +13068,12 @@ f_sha256(typval_T *argvars, typval_T *rettv)
     static void
 f_shellescape(typval_T *argvars, typval_T *rettv)
 {
-    int do_special;
+    ціле do_special;
 
-    if (in_vim9script()
+    якщо (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_opt_bool_arg(argvars, 1) == FAIL))
-	return;
+	повернути;
 
     do_special = non_zero_arg(&argvars[1]);
     rettv->vval.v_string = vim_strsave_shellescape(
@@ -13089,19 +13089,19 @@ f_shiftwidth(typval_T *argvars UNUSED, typval_T *rettv)
 {
     rettv->vval.v_number = 0;
 
-    if (in_vim9script() && check_for_opt_number_arg(argvars, 0) == FAIL)
-	return;
+    якщо (in_vim9script() && check_for_opt_number_arg(argvars, 0) == FAIL)
+	повернути;
 
-    if (argvars[0].v_type != VAR_UNKNOWN)
+    якщо (argvars[0].v_type != VAR_UNKNOWN)
     {
 	long	col;
 
 	col = (long)tv_get_number_chk(argvars, NULL);
-	if (col < 0)
-	    return;	// type error; errmsg already given
+	якщо (col < 0)
+	    повернути;	// type error; errmsg already given
 #ifdef FEAT_VARTABS
 	rettv->vval.v_number = get_sw_value_col(curbuf, col, FALSE);
-	return;
+	повернути;
 #endif
     }
 
@@ -13116,14 +13116,14 @@ f_soundfold(typval_T *argvars, typval_T *rettv)
 {
     char_u	*s;
 
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    якщо (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+	повернути;
 
     rettv->v_type = VAR_STRING;
     s = tv_get_string(&argvars[0]);
 #ifdef FEAT_SPELL
     rettv->vval.v_string = eval_soundfold(s);
-#else
+#інакше
     rettv->vval.v_string = vim_strsave(s);
 #endif
 }
@@ -13136,58 +13136,58 @@ f_spellbadword(typval_T *argvars UNUSED, typval_T *rettv)
 {
     char_u	*word = (char_u *)"";
     hlf_T	attr = HLF_COUNT;
-    int		len = 0;
+    ціле		len = 0;
 #ifdef FEAT_SPELL
-    int		wo_spell_save = curwin->w_p_spell;
+    ціле		wo_spell_save = curwin->w_p_spell;
 
-    if (in_vim9script() && check_for_opt_string_arg(argvars, 0) == FAIL)
-	return;
+    якщо (in_vim9script() && check_for_opt_string_arg(argvars, 0) == FAIL)
+	повернути;
 
-    if (!curwin->w_p_spell)
+    якщо (!curwin->w_p_spell)
     {
 	parse_spelllang(curwin);
 	curwin->w_p_spell = TRUE;
     }
 
-    if (*curwin->w_s->b_p_spl == NUL)
+    якщо (*curwin->w_s->b_p_spl == NUL)
     {
 	emsg(_(e_spell_checking_is_not_possible));
 	curwin->w_p_spell = wo_spell_save;
-	return;
+	повернути;
     }
 #endif
 
-    if (rettv_list_alloc(rettv) == FAIL)
+    якщо (rettv_list_alloc(rettv) == FAIL)
     {
 #ifdef FEAT_SPELL
 	curwin->w_p_spell = wo_spell_save;
 #endif
-	return;
+	повернути;
     }
 
 #ifdef FEAT_SPELL
-    if (argvars[0].v_type == VAR_UNKNOWN)
+    якщо (argvars[0].v_type == VAR_UNKNOWN)
     {
 	// Find the start and length of the badly spelled word.
 	len = spell_move_to(curwin, FORWARD, SMT_ALL, TRUE, &attr);
-	if (len != 0)
+	якщо (len != 0)
 	{
 	    word = ml_get_cursor();
 	    curwin->w_set_curswant = true;
 	}
     }
-    else if (*curbuf->b_s.b_p_spl != NUL)
+    інакше якщо (*curbuf->b_s.b_p_spl != NUL)
     {
 	char_u	*str = tv_get_string_chk(&argvars[0]);
-	int	capcol = -1;
+	ціле	capcol = -1;
 
-	if (str != NULL)
+	якщо (str != NULL)
 	{
 	    // Check the argument for spelling.
-	    while (*str != NUL)
+	    поки (*str != NUL)
 	    {
 		len = spell_check(curwin, str, &attr, &capcol, FALSE);
-		if (attr != HLF_COUNT)
+		якщо (attr != HLF_COUNT)
 		{
 		    word = str;
 		    break;
@@ -13234,70 +13234,70 @@ f_spellsuggest(typval_T *argvars UNUSED, typval_T *rettv)
 {
 #ifdef FEAT_SPELL
     char_u	*str;
-    int		typeerr = FALSE;
-    int		maxcount;
+    ціле		typeerr = FALSE;
+    ціле		maxcount;
     garray_T	ga;
-    int		i;
+    ціле		i;
     listitem_T	*li;
-    int		need_capital = FALSE;
-    int		wo_spell_save = curwin->w_p_spell;
+    ціле		need_capital = FALSE;
+    ціле		wo_spell_save = curwin->w_p_spell;
 
-    if (in_vim9script()
+    якщо (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_opt_number_arg(argvars, 1) == FAIL
 		|| (argvars[1].v_type != VAR_UNKNOWN
 		    && check_for_opt_bool_arg(argvars, 2) == FAIL)))
-	return;
+	повернути;
 
-    if (!curwin->w_p_spell)
+    якщо (!curwin->w_p_spell)
     {
 	parse_spelllang(curwin);
 	curwin->w_p_spell = TRUE;
     }
 
-    if (*curwin->w_s->b_p_spl == NUL)
+    якщо (*curwin->w_s->b_p_spl == NUL)
     {
 	emsg(_(e_spell_checking_is_not_possible));
 	curwin->w_p_spell = wo_spell_save;
-	return;
+	повернути;
     }
 #endif
 
-    if (rettv_list_alloc(rettv) == FAIL)
+    якщо (rettv_list_alloc(rettv) == FAIL)
     {
 #ifdef FEAT_SPELL
 	curwin->w_p_spell = wo_spell_save;
 #endif
-	return;
+	повернути;
     }
 
 #ifdef FEAT_SPELL
     str = tv_get_string(&argvars[0]);
-    if (argvars[1].v_type != VAR_UNKNOWN)
+    якщо (argvars[1].v_type != VAR_UNKNOWN)
     {
-	maxcount = (int)tv_get_number_chk(&argvars[1], &typeerr);
-	if (maxcount <= 0)
-	    return;
-	if (argvars[2].v_type != VAR_UNKNOWN)
+	maxcount = (ціле)tv_get_number_chk(&argvars[1], &typeerr);
+	якщо (maxcount <= 0)
+	    повернути;
+	якщо (argvars[2].v_type != VAR_UNKNOWN)
 	{
-	    need_capital = (int)tv_get_bool_chk(&argvars[2], &typeerr);
-	    if (typeerr)
-		return;
+	    need_capital = (ціле)tv_get_bool_chk(&argvars[2], &typeerr);
+	    якщо (typeerr)
+		повернути;
 	}
     }
-    else
+    інакше
 	maxcount = 25;
 
     spell_suggest_list(&ga, str, maxcount, need_capital, FALSE);
 
-    for (i = 0; i < ga.ga_len; ++i)
+    для (i = 0; i < ga.ga_len; ++i)
     {
 	str = ((char_u **)ga.ga_data)[i];
 
 	li = listitem_alloc();
-	if (li == NULL)
+	якщо (li == NULL)
 	    vim_free(str);
-	else
+	інакше
 	{
 	    li->li_tv.v_type = VAR_STRING;
 	    li->li_tv.v_lock = 0;
@@ -13319,66 +13319,66 @@ f_split(typval_T *argvars, typval_T *rettv)
     regmatch_T	regmatch;
     char_u	patbuf[NUMBUFLEN];
     char_u	*save_cpo;
-    int		match;
+    ціле		match;
     colnr_T	col = 0;
-    int		keepempty = FALSE;
-    int		typeerr = FALSE;
+    ціле		keepempty = FALSE;
+    ціле		typeerr = FALSE;
 
-    if (in_vim9script()
+    якщо (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_opt_string_arg(argvars, 1) == FAIL
 		|| (argvars[1].v_type != VAR_UNKNOWN
 		    && check_for_opt_bool_arg(argvars, 2) == FAIL)))
-	return;
+	повернути;
 
     // Make 'cpoptions' empty, the 'l' flag should not be used here.
     save_cpo = p_cpo;
     p_cpo = empty_option;
 
     str = tv_get_string(&argvars[0]);
-    if (argvars[1].v_type != VAR_UNKNOWN)
+    якщо (argvars[1].v_type != VAR_UNKNOWN)
     {
 	pat = tv_get_string_buf_chk(&argvars[1], patbuf);
-	if (pat == NULL)
+	якщо (pat == NULL)
 	    typeerr = TRUE;
-	if (argvars[2].v_type != VAR_UNKNOWN)
-	    keepempty = (int)tv_get_bool_chk(&argvars[2], &typeerr);
+	якщо (argvars[2].v_type != VAR_UNKNOWN)
+	    keepempty = (ціле)tv_get_bool_chk(&argvars[2], &typeerr);
     }
-    if (pat == NULL || *pat == NUL)
+    якщо (pat == NULL || *pat == NUL)
 	pat = (char_u *)"[\\x01- ]\\+";
 
-    if (rettv_list_alloc(rettv) == FAIL)
+    якщо (rettv_list_alloc(rettv) == FAIL)
 	goto theend;
-    if (typeerr)
+    якщо (typeerr)
 	goto theend;
 
     regmatch.regprog = eval_regcomp(pat);
-    if (regmatch.regprog != NULL)
+    якщо (regmatch.regprog != NULL)
     {
 	regmatch.rm_ic = FALSE;
-	while (*str != NUL || keepempty)
+	поки (*str != NUL || keepempty)
 	{
-	    if (*str == NUL)
+	    якщо (*str == NUL)
 		match = FALSE;	// empty item at the end
-	    else
+	    інакше
 		match = vim_regexec_nl(&regmatch, str, col);
-	    if (match)
+	    якщо (match)
 		end = regmatch.startp[0];
-	    else
+	    інакше
 		end = str + STRLEN(str);
-	    if (keepempty || end > str || (rettv->vval.v_list->lv_len > 0
+	    якщо (keepempty || end > str || (rettv->vval.v_list->lv_len > 0
 			   && *str != NUL && match && end < regmatch.endp[0]))
 	    {
-		if (list_append_string(rettv->vval.v_list, str,
-						    (int)(end - str)) == FAIL)
+		якщо (list_append_string(rettv->vval.v_list, str,
+						    (ціле)(end - str)) == FAIL)
 		    break;
 	    }
-	    if (!match)
+	    якщо (!match)
 		break;
 	    // Advance to just after the match.
-	    if (regmatch.endp[0] > str)
+	    якщо (regmatch.endp[0] > str)
 		col = 0;
-	    else
+	    інакше
 		// Don't get stuck at the same match.
 		col = (*mb_ptr2len)(regmatch.endp[0]);
 	    str = regmatch.endp[0];
@@ -13397,34 +13397,34 @@ theend:
     static void
 f_submatch(typval_T *argvars, typval_T *rettv)
 {
-    int		error = FALSE;
-    int		no;
-    int		retList = 0;
+    ціле		error = FALSE;
+    ціле		no;
+    ціле		retList = 0;
 
-    if (in_vim9script()
+    якщо (in_vim9script()
 	    && (check_for_number_arg(argvars, 0) == FAIL
 		|| check_for_opt_bool_arg(argvars, 1) == FAIL))
-	return;
+	повернути;
 
-    no = (int)tv_get_number_chk(&argvars[0], &error);
-    if (error)
-	return;
-    if (no < 0 || no >= NSUBEXP)
+    no = (ціле)tv_get_number_chk(&argvars[0], &error);
+    якщо (error)
+	повернути;
+    якщо (no < 0 || no >= NSUBEXP)
     {
 	semsg(_(e_invalid_submatch_number_nr), no);
-	return;
+	повернути;
     }
-    if (argvars[1].v_type != VAR_UNKNOWN)
-	retList = (int)tv_get_bool_chk(&argvars[1], &error);
-    if (error)
-	return;
+    якщо (argvars[1].v_type != VAR_UNKNOWN)
+	retList = (ціле)tv_get_bool_chk(&argvars[1], &error);
+    якщо (error)
+	повернути;
 
-    if (retList == 0)
+    якщо (retList == 0)
     {
 	rettv->v_type = VAR_STRING;
 	rettv->vval.v_string = reg_submatch(no);
     }
-    else
+    інакше
     {
 	rettv->v_type = VAR_LIST;
 	rettv->vval.v_list = reg_submatch_list(no);
@@ -13446,30 +13446,30 @@ f_substitute(typval_T *argvars, typval_T *rettv)
     typval_T	*expr = NULL;
     char_u	*flg;
 
-    if (in_vim9script()
+    якщо (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_string_arg(argvars, 1) == FAIL
 		|| check_for_string_arg(argvars, 3) == FAIL))
-	return;
+	повернути;
 
     str = tv_get_string_chk(&argvars[0]);
     pat = tv_get_string_buf_chk(&argvars[1], patbuf);
     flg = tv_get_string_buf_chk(&argvars[3], flagsbuf);
 
-    if (argvars[2].v_type == VAR_FUNC
+    якщо (argvars[2].v_type == VAR_FUNC
 	    || argvars[2].v_type == VAR_PARTIAL
 	    || argvars[2].v_type == VAR_INSTR
 	    || argvars[2].v_type == VAR_CLASS
 	    || argvars[2].v_type == VAR_OBJECT)
 	expr = &argvars[2];
-    else
+    інакше
 	sub = tv_get_string_buf_chk(&argvars[2], subbuf);
 
     rettv->v_type = VAR_STRING;
-    if (str == NULL || pat == NULL || (sub == NULL && expr == NULL)
+    якщо (str == NULL || pat == NULL || (sub == NULL && expr == NULL)
 								|| flg == NULL)
 	rettv->vval.v_string = NULL;
-    else
+    інакше
 	rettv->vval.v_string = do_string_sub(str, STRLEN(str), pat, sub, expr, flg, NULL);
 }
 
@@ -13479,8 +13479,8 @@ f_substitute(typval_T *argvars, typval_T *rettv)
     static void
 f_swapfilelist(typval_T *argvars UNUSED, typval_T *rettv)
 {
-    if (rettv_list_alloc(rettv) == FAIL)
-	return;
+    якщо (rettv_list_alloc(rettv) == FAIL)
+	повернути;
     recover_names(NULL, FALSE, rettv->vval.v_list, 0, NULL);
 }
 
@@ -13490,10 +13490,10 @@ f_swapfilelist(typval_T *argvars UNUSED, typval_T *rettv)
     static void
 f_swapinfo(typval_T *argvars, typval_T *rettv)
 {
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    якщо (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+	повернути;
 
-    if (rettv_dict_alloc(rettv) == OK)
+    якщо (rettv_dict_alloc(rettv) == OK)
 	get_b0_dict(tv_get_string(argvars), rettv->vval.v_dict);
 }
 
@@ -13507,14 +13507,14 @@ f_swapname(typval_T *argvars, typval_T *rettv)
 
     rettv->v_type = VAR_STRING;
 
-    if (in_vim9script() && check_for_buffer_arg(argvars, 0) == FAIL)
-	return;
+    якщо (in_vim9script() && check_for_buffer_arg(argvars, 0) == FAIL)
+	повернути;
 
     buf = tv_get_buf(&argvars[0], FALSE);
-    if (buf == NULL || buf->b_ml.ml_mfp == NULL
+    якщо (buf == NULL || buf->b_ml.ml_mfp == NULL
 					|| buf->b_ml.ml_mfp->mf_fname == NULL)
 	rettv->vval.v_string = NULL;
-    else
+    інакше
 	rettv->vval.v_string = vim_strsave(buf->b_ml.ml_mfp->mf_fname);
 }
 
@@ -13524,24 +13524,24 @@ f_swapname(typval_T *argvars, typval_T *rettv)
     static void
 f_synID(typval_T *argvars UNUSED, typval_T *rettv)
 {
-    int		id = 0;
+    ціле		id = 0;
 #ifdef FEAT_SYN_HL
     linenr_T	lnum;
     colnr_T	col;
-    int		trans;
-    int		transerr = FALSE;
+    ціле		trans;
+    ціле		transerr = FALSE;
 
-    if (in_vim9script()
+    якщо (in_vim9script()
 	    && (check_for_lnum_arg(argvars, 0) == FAIL
 		|| check_for_number_arg(argvars, 1) == FAIL
 		|| check_for_bool_arg(argvars, 2) == FAIL))
-	return;
+	повернути;
 
     lnum = tv_get_lnum(argvars);		// -1 on type error
     col = (linenr_T)tv_get_number(&argvars[1]) - 1;	// -1 on type error
-    trans = (int)tv_get_bool_chk(&argvars[2], &transerr);
+    trans = (ціле)tv_get_bool_chk(&argvars[2], &transerr);
 
-    if (!transerr && lnum >= 1 && lnum <= curbuf->b_ml.ml_line_count
+    якщо (!transerr && lnum >= 1 && lnum <= curbuf->b_ml.ml_line_count
 	    && col >= 0 && col < (long)ml_get_len(lnum))
 	id = syn_get_id(curwin, lnum, col, trans, NULL, FALSE);
 #endif
@@ -13557,46 +13557,46 @@ f_synIDattr(typval_T *argvars UNUSED, typval_T *rettv)
 {
     char_u	*p = NULL;
 #ifdef FEAT_SYN_HL
-    int		id;
+    ціле		id;
     char_u	*what;
     char_u	*mode;
     char_u	modebuf[NUMBUFLEN];
-    int		modec;
+    ціле		modec;
 
-    if (in_vim9script()
+    якщо (in_vim9script()
 	    && (check_for_number_arg(argvars, 0) == FAIL
 		|| check_for_string_arg(argvars, 1) == FAIL
 		|| check_for_opt_string_arg(argvars, 2) == FAIL))
-	return;
+	повернути;
 
-    id = (int)tv_get_number(&argvars[0]);
+    id = (ціле)tv_get_number(&argvars[0]);
     what = tv_get_string(&argvars[1]);
-    if (argvars[2].v_type != VAR_UNKNOWN)
+    якщо (argvars[2].v_type != VAR_UNKNOWN)
     {
 	mode = tv_get_string_buf(&argvars[2], modebuf);
 	modec = TOLOWER_ASC(mode[0]);
-	if (modec != 't' && modec != 'c' && modec != 'g')
+	якщо (modec != 't' && modec != 'c' && modec != 'g')
 	    modec = 0;	// replace invalid with current
     }
-    else
+    інакше
     {
-# if defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
-	if (USE_24BIT)
+# якщо defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
+	якщо (USE_24BIT)
 	    modec = 'g';
-	else
+	інакше
 # endif
-	    if (t_colors > 1)
+	    якщо (t_colors > 1)
 		modec = 'c';
-	    else
+	    інакше
 		modec = 't';
     }
 
     switch (TOLOWER_ASC(what[0]))
     {
 	case 'b':
-		if (TOLOWER_ASC(what[1]) == 'g')	// bg[#]
+		якщо (TOLOWER_ASC(what[1]) == 'g')	// bg[#]
 		    p = highlight_color(id, what, modec);
-		else					// bold
+		інакше					// bold
 		    p = highlight_has_attr(id, HL_BOLD, modec);
 		break;
 
@@ -13605,16 +13605,16 @@ f_synIDattr(typval_T *argvars UNUSED, typval_T *rettv)
 		break;
 
 	case 'i':
-		if (TOLOWER_ASC(what[1]) == 'n')	// inverse
+		якщо (TOLOWER_ASC(what[1]) == 'n')	// inverse
 		    p = highlight_has_attr(id, HL_INVERSE, modec);
-		else					// italic
+		інакше					// italic
 		    p = highlight_has_attr(id, HL_ITALIC, modec);
 		break;
 
 	case 'n':
-		if (TOLOWER_ASC(what[1]) == 'o')	// nocombine
+		якщо (TOLOWER_ASC(what[1]) == 'o')	// nocombine
 		    p = highlight_has_attr(id, HL_NOCOMBINE, modec);
-		else					// name
+		інакше					// name
 		    p = get_highlight_name_ext(NULL, id - 1, FALSE);
 		break;
 
@@ -13623,42 +13623,42 @@ f_synIDattr(typval_T *argvars UNUSED, typval_T *rettv)
 		break;
 
 	case 's':
-		if (TOLOWER_ASC(what[1]) == 'p')	// sp[#]
+		якщо (TOLOWER_ASC(what[1]) == 'p')	// sp[#]
 		    p = highlight_color(id, what, modec);
 							// strikeout
-		else if (TOLOWER_ASC(what[1]) == 't' &&
+		інакше якщо (TOLOWER_ASC(what[1]) == 't' &&
 			TOLOWER_ASC(what[2]) == 'r')
 		    p = highlight_has_attr(id, HL_STRIKETHROUGH, modec);
-		else					// standout
+		інакше					// standout
 		    p = highlight_has_attr(id, HL_STANDOUT, modec);
 		break;
 
 	case 'u':
-		if (STRLEN(what) >= 9)
+		якщо (STRLEN(what) >= 9)
 		{
-		    if (TOLOWER_ASC(what[5]) == 'l')
+		    якщо (TOLOWER_ASC(what[5]) == 'l')
 							// underline
 			p = highlight_has_attr(id, HL_UNDERLINE, modec);
-		    else if (TOLOWER_ASC(what[5]) != 'd')
+		    інакше якщо (TOLOWER_ASC(what[5]) != 'd')
 							// undercurl
 			p = highlight_has_attr(id, HL_UNDERCURL, modec);
-		    else if (TOLOWER_ASC(what[6]) != 'o')
+		    інакше якщо (TOLOWER_ASC(what[6]) != 'o')
 							// underdashed
 			p = highlight_has_attr(id, HL_UNDERDASHED, modec);
-		    else if (TOLOWER_ASC(what[7]) == 'u')
+		    інакше якщо (TOLOWER_ASC(what[7]) == 'u')
 							// underdouble
 			p = highlight_has_attr(id, HL_UNDERDOUBLE, modec);
-		    else
+		    інакше
 							// underdotted
 			p = highlight_has_attr(id, HL_UNDERDOTTED, modec);
 		}
-		else
+		інакше
 							// ul
 		    p = highlight_color(id, what, modec);
 		break;
     }
 
-    if (p != NULL)
+    якщо (p != NULL)
 	p = vim_strsave(p);
 #endif
     rettv->v_type = VAR_STRING;
@@ -13671,17 +13671,17 @@ f_synIDattr(typval_T *argvars UNUSED, typval_T *rettv)
     static void
 f_synIDtrans(typval_T *argvars UNUSED, typval_T *rettv)
 {
-    int		id;
+    ціле		id;
 
 #ifdef FEAT_SYN_HL
-    if (in_vim9script() && check_for_number_arg(argvars, 0) == FAIL)
-	return;
+    якщо (in_vim9script() && check_for_number_arg(argvars, 0) == FAIL)
+	повернути;
 
-    id = (int)tv_get_number(&argvars[0]);
+    id = (ціле)tv_get_number(&argvars[0]);
 
-    if (id > 0)
+    якщо (id > 0)
 	id = syn_get_final_id(id);
-    else
+    інакше
 #endif
 	id = 0;
 
@@ -13694,31 +13694,31 @@ f_synIDtrans(typval_T *argvars UNUSED, typval_T *rettv)
     static void
 f_synconcealed(typval_T *argvars UNUSED, typval_T *rettv)
 {
-#if defined(FEAT_SYN_HL) && defined(FEAT_CONCEAL)
+#якщо defined(FEAT_SYN_HL) && defined(FEAT_CONCEAL)
     linenr_T	lnum;
     colnr_T	col;
-    int		syntax_flags = 0;
-    int		cchar;
-    int		matchid = 0;
+    ціле		syntax_flags = 0;
+    ціле		cchar;
+    ціле		matchid = 0;
     char_u	str[NUMBUFLEN];
 #endif
 
     rettv_list_set(rettv, NULL);
 
-    if (in_vim9script()
+    якщо (in_vim9script()
 	    && (check_for_lnum_arg(argvars, 0) == FAIL
 		|| check_for_number_arg(argvars, 1) == FAIL))
-	return;
+	повернути;
 
-#if defined(FEAT_SYN_HL) && defined(FEAT_CONCEAL)
+#якщо defined(FEAT_SYN_HL) && defined(FEAT_CONCEAL)
     lnum = tv_get_lnum(argvars);		// -1 on type error
     col = (colnr_T)tv_get_number(&argvars[1]) - 1;	// -1 on type error
 
     CLEAR_FIELD(str);
 
-    if (rettv_list_alloc(rettv) == OK)
+    якщо (rettv_list_alloc(rettv) == OK)
     {
-	if (lnum >= 1 && lnum <= curbuf->b_ml.ml_line_count
+	якщо (lnum >= 1 && lnum <= curbuf->b_ml.ml_line_count
 	    && col >= 0 && col <= (long)ml_get_len(lnum)
 	    && curwin->w_p_cole > 0)
 	{
@@ -13726,17 +13726,17 @@ f_synconcealed(typval_T *argvars UNUSED, typval_T *rettv)
 	    syntax_flags = get_syntax_info(&matchid);
 
 	    // get the conceal character
-	    if ((syntax_flags & HL_CONCEAL) && curwin->w_p_cole < 3)
+	    якщо ((syntax_flags & HL_CONCEAL) && curwin->w_p_cole < 3)
 	    {
 		cchar = syn_get_sub_char();
-		if (cchar == NUL && curwin->w_p_cole == 1)
+		якщо (cchar == NUL && curwin->w_p_cole == 1)
 		    cchar = (curwin->w_lcs_chars.conceal == NUL) ? ' '
 					: curwin->w_lcs_chars.conceal;
-		if (cchar != NUL)
+		якщо (cchar != NUL)
 		{
-		    if (has_mbyte)
+		    якщо (has_mbyte)
 			(*mb_char2bytes)(cchar, str);
-		    else
+		    інакше
 			str[0] = cchar;
 		}
 	    }
@@ -13760,32 +13760,32 @@ f_synstack(typval_T *argvars UNUSED, typval_T *rettv)
 #ifdef FEAT_SYN_HL
     linenr_T	lnum;
     colnr_T	col;
-    int		i;
-    int		id;
+    ціле		i;
+    ціле		id;
 #endif
 
     rettv_list_set(rettv, NULL);
 
-    if (in_vim9script()
+    якщо (in_vim9script()
 	    && (check_for_lnum_arg(argvars, 0) == FAIL
 		|| check_for_number_arg(argvars, 1) == FAIL))
-	return;
+	повернути;
 
 #ifdef FEAT_SYN_HL
     lnum = tv_get_lnum(argvars);		// -1 on type error
     col = (colnr_T)tv_get_number(&argvars[1]) - 1;	// -1 on type error
 
-    if (lnum >= 1 && lnum <= curbuf->b_ml.ml_line_count
+    якщо (lnum >= 1 && lnum <= curbuf->b_ml.ml_line_count
 	    && col >= 0 && col <= (long)ml_get_len(lnum)
 	    && rettv_list_alloc(rettv) == OK)
     {
 	(void)syn_get_id(curwin, lnum, col, FALSE, NULL, TRUE);
-	for (i = 0; ; ++i)
+	для (i = 0; ; ++i)
 	{
 	    id = syn_get_stack_item(i);
-	    if (id < 0)
+	    якщо (id < 0)
 		break;
-	    if (list_append_number(rettv->vval.v_list, id) == FAIL)
+	    якщо (list_append_number(rettv->vval.v_list, id) == FAIL)
 		break;
 	}
     }
@@ -13801,21 +13801,21 @@ f_tabpagebuflist(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
     tabpage_T	*tp;
     win_T	*wp = NULL;
 
-    if (in_vim9script() && check_for_opt_number_arg(argvars, 0) == FAIL)
-	return;
+    якщо (in_vim9script() && check_for_opt_number_arg(argvars, 0) == FAIL)
+	повернути;
 
-    if (argvars[0].v_type == VAR_UNKNOWN)
+    якщо (argvars[0].v_type == VAR_UNKNOWN)
 	wp = firstwin;
-    else
+    інакше
     {
-	tp = find_tabpage((int)tv_get_number(&argvars[0]));
-	if (tp != NULL)
+	tp = find_tabpage((ціле)tv_get_number(&argvars[0]));
+	якщо (tp != NULL)
 	    wp = (tp == curtab) ? firstwin : tp->tp_firstwin;
     }
-    if (wp != NULL && rettv_list_alloc(rettv) == OK)
+    якщо (wp != NULL && rettv_list_alloc(rettv) == OK)
     {
-	for (; wp != NULL; wp = wp->w_next)
-	    if (list_append_number(rettv->vval.v_list,
+	для (; wp != NULL; wp = wp->w_next)
+	    якщо (list_append_number(rettv->vval.v_list,
 						wp->w_buffer->b_fnum) == FAIL)
 		break;
     }
@@ -13829,16 +13829,16 @@ f_tagfiles(typval_T *argvars UNUSED, typval_T *rettv)
 {
     char_u	*fname;
     tagname_T	tn;
-    int		first;
+    ціле		first;
 
-    if (rettv_list_alloc(rettv) == FAIL)
-	return;
+    якщо (rettv_list_alloc(rettv) == FAIL)
+	повернути;
     fname = alloc(MAXPATHL);
-    if (fname == NULL)
-	return;
+    якщо (fname == NULL)
+	повернути;
 
-    for (first = TRUE; ; first = FALSE)
-	if (get_tagfname(&tn, first, fname) == FAIL
+    для (first = TRUE; ; first = FALSE)
+	якщо (get_tagfname(&tn, first, fname) == FAIL
 		|| list_append_string(rettv->vval.v_list, fname, -1) == FAIL)
 	    break;
     tagname_free(&tn);
@@ -13854,20 +13854,20 @@ f_taglist(typval_T *argvars, typval_T *rettv)
     char_u  *fname = NULL;
     char_u  *tag_pattern;
 
-    if (in_vim9script()
+    якщо (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_opt_string_arg(argvars, 1) == FAIL))
-	return;
+	повернути;
 
     tag_pattern = tv_get_string(&argvars[0]);
 
     rettv->vval.v_number = FALSE;
-    if (*tag_pattern == NUL)
-	return;
+    якщо (*tag_pattern == NUL)
+	повернути;
 
-    if (argvars[1].v_type != VAR_UNKNOWN)
+    якщо (argvars[1].v_type != VAR_UNKNOWN)
 	fname = tv_get_string(&argvars[1]);
-    if (rettv_list_alloc(rettv) == OK)
+    якщо (rettv_list_alloc(rettv) == OK)
 	(void)get_tags(rettv->vval.v_list, tag_pattern, fname);
 }
 
@@ -13877,7 +13877,7 @@ f_taglist(typval_T *argvars, typval_T *rettv)
     static void
 f_type(typval_T *argvars, typval_T *rettv)
 {
-    int n = -1;
+    ціле n = -1;
 
     switch (argvars[0].v_type)
     {
@@ -13899,9 +13899,9 @@ f_type(typval_T *argvars, typval_T *rettv)
 	case VAR_CLASS:
 	    {
 		class_T *cl = argvars[0].vval.v_class;
-		if (cl != NULL && IS_ENUM(cl))
+		якщо (cl != NULL && IS_ENUM(cl))
 		    n = VAR_TYPE_ENUM;
-		else
+		інакше
 		    n = VAR_TYPE_CLASS;
 		break;
 	    }
@@ -13909,14 +13909,14 @@ f_type(typval_T *argvars, typval_T *rettv)
 	    {
 		object_T *obj = argvars[0].vval.v_object;
 
-		if (obj == NULL)
+		якщо (obj == NULL)
 		    n = VAR_TYPE_OBJECT;
-		else
+		інакше
 		{
 		    class_T *cl = argvars[0].vval.v_object->obj_class;
-		    if (IS_ENUM(cl))
+		    якщо (IS_ENUM(cl))
 			n = VAR_TYPE_ENUMVALUE;
-		    else
+		    інакше
 			n = VAR_TYPE_OBJECT;
 		}
 		break;
@@ -13943,45 +13943,45 @@ f_virtcol(typval_T *argvars, typval_T *rettv)
     colnr_T	vcol_end = 0;
     pos_T	*fp;
     switchwin_T	switchwin;
-    int		winchanged = FALSE;
-    int		len;
+    ціле		winchanged = FALSE;
+    ціле		len;
 
-    if (in_vim9script()
+    якщо (in_vim9script()
 	    && (check_for_string_or_list_arg(argvars, 0) == FAIL
 		|| (argvars[1].v_type != VAR_UNKNOWN
 		    && (check_for_bool_arg(argvars, 1) == FAIL
 			|| check_for_opt_number_arg(argvars, 2) == FAIL))))
-	return;
+	повернути;
 
-    if (argvars[1].v_type != VAR_UNKNOWN && argvars[2].v_type != VAR_UNKNOWN)
+    якщо (argvars[1].v_type != VAR_UNKNOWN && argvars[2].v_type != VAR_UNKNOWN)
     {
 	tabpage_T	*tp;
 	win_T		*wp;
 
 	// use the window specified in the third argument
-	wp = win_id2wp_tp((int)tv_get_number(&argvars[2]), &tp);
-	if (wp == NULL || tp == NULL)
+	wp = win_id2wp_tp((ціле)tv_get_number(&argvars[2]), &tp);
+	якщо (wp == NULL || tp == NULL)
 	    goto theend;
 
-	if (switch_win_noblock(&switchwin, wp, tp, TRUE) != OK)
+	якщо (switch_win_noblock(&switchwin, wp, tp, TRUE) != OK)
 	    goto theend;
 
 	check_cursor();
 	winchanged = TRUE;
     }
 
-    int fnum = curbuf->b_fnum;
+    ціле fnum = curbuf->b_fnum;
     fp = var2fpos(&argvars[0], FALSE, &fnum, FALSE);
-    if (fp != NULL && fp->lnum <= curbuf->b_ml.ml_line_count
+    якщо (fp != NULL && fp->lnum <= curbuf->b_ml.ml_line_count
 	    && fnum == curbuf->b_fnum)
     {
 	// Limit the column to a valid value, getvvcol() doesn't check.
-	if (fp->col < 0)
+	якщо (fp->col < 0)
 	    fp->col = 0;
-	else
+	інакше
 	{
-	    len = (int)ml_get_len(fp->lnum);
-	    if (fp->col > len)
+	    len = (ціле)ml_get_len(fp->lnum);
+	    якщо (fp->col > len)
 		fp->col = len;
 	}
 	getvvcol(curwin, fp, &vcol_start, NULL, &vcol_end, 0);
@@ -13990,20 +13990,20 @@ f_virtcol(typval_T *argvars, typval_T *rettv)
     }
 
 theend:
-    if (argvars[1].v_type != VAR_UNKNOWN && tv_get_bool(&argvars[1]))
+    якщо (argvars[1].v_type != VAR_UNKNOWN && tv_get_bool(&argvars[1]))
     {
-	if (rettv_list_alloc(rettv) == OK)
+	якщо (rettv_list_alloc(rettv) == OK)
 	{
 	    list_append_number(rettv->vval.v_list, vcol_start);
 	    list_append_number(rettv->vval.v_list, vcol_end);
 	}
-	else
+	інакше
 	    rettv->vval.v_number = 0;
     }
-    else
+    інакше
 	rettv->vval.v_number = vcol_end;
 
-    if (winchanged)
+    якщо (winchanged)
 	restore_win_noblock(&switchwin, TRUE);
 }
 
@@ -14015,8 +14015,8 @@ f_visualmode(typval_T *argvars, typval_T *rettv)
 {
     char_u	str[2];
 
-    if (in_vim9script() && check_for_opt_bool_arg(argvars, 0) == FAIL)
-	return;
+    якщо (in_vim9script() && check_for_opt_bool_arg(argvars, 0) == FAIL)
+	повернути;
 
     rettv->v_type = VAR_STRING;
     str[0] = curbuf->b_visual_mode_eval;
@@ -14024,7 +14024,7 @@ f_visualmode(typval_T *argvars, typval_T *rettv)
     rettv->vval.v_string = vim_strsave(str);
 
     // A non-zero number or non-empty string argument: reset mode.
-    if (non_zero_arg(&argvars[0]))
+    якщо (non_zero_arg(&argvars[0]))
 	curbuf->b_visual_mode_eval = NUL;
 }
 
@@ -14034,7 +14034,7 @@ f_visualmode(typval_T *argvars, typval_T *rettv)
     static void
 f_wildmenumode(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
 {
-    if (wild_menu_showing || ((State & MODE_CMDLINE) && cmdline_pum_active()))
+    якщо (wild_menu_showing || ((State & MODE_CMDLINE) && cmdline_pum_active()))
 	rettv->vval.v_number = 1;
 }
 
@@ -14054,8 +14054,8 @@ f_windowsversion(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
     static void
 f_wordcount(typval_T *argvars UNUSED, typval_T *rettv)
 {
-    if (rettv_dict_alloc(rettv) == FAIL)
-	return;
+    якщо (rettv_dict_alloc(rettv) == FAIL)
+	повернути;
     cursor_pos_info(rettv->vval.v_dict);
 }
 
@@ -14065,10 +14065,10 @@ f_wordcount(typval_T *argvars UNUSED, typval_T *rettv)
     static void
 f_xor(typval_T *argvars, typval_T *rettv)
 {
-    if (in_vim9script()
+    якщо (in_vim9script()
 	    && (check_for_number_arg(argvars, 0) == FAIL
 		|| check_for_number_arg(argvars, 1) == FAIL))
-	return;
+	повернути;
 
     rettv->vval.v_number = tv_get_number_chk(&argvars[0], NULL)
 					^ tv_get_number_chk(&argvars[1], NULL);

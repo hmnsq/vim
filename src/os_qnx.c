@@ -15,13 +15,13 @@
 #include "vim.h"
 
 
-#if defined(FEAT_GUI_PHOTON)
-int is_photon_available;
+#якщо defined(FEAT_GUI_PHOTON)
+ціле is_photon_available;
 #endif
 
 void qnx_init(void)
 {
-#if defined(FEAT_GUI_PHOTON)
+#якщо defined(FEAT_GUI_PHOTON)
     PhChannelParms_t parms;
 
     CLEAR_FIELD(parms);
@@ -31,7 +31,7 @@ void qnx_init(void)
 #endif
 }
 
-#if defined(FEAT_GUI_PHOTON) && defined(FEAT_CLIPBOARD)
+#якщо defined(FEAT_GUI_PHOTON) && defined(FEAT_CLIPBOARD)
 
 # define CLIP_TYPE_VIM "VIMTYPE"
 # define CLIP_TYPE_TEXT "TEXT"
@@ -39,7 +39,7 @@ void qnx_init(void)
 // Turn on the clipboard for a console vim when photon is running
 void qnx_clip_init(void)
 {
-    if (is_photon_available == TRUE && !gui.in_use)
+    якщо (is_photon_available == TRUE && !gui.in_use)
 	clip_init(TRUE);
 }
 
@@ -47,10 +47,10 @@ void qnx_clip_init(void)
 // Clipboard
 
 // No support for owning the clipboard
-int
+ціле
 clip_mch_own_selection(Clipboard_T *cbd)
 {
-    return FALSE;
+    повернути FALSE;
 }
 
 void
@@ -61,18 +61,18 @@ clip_mch_lose_selection(Clipboard_T *cbd)
 void
 clip_mch_request_selection(Clipboard_T *cbd)
 {
-    int		    type = MLINE, clip_length = 0, is_type_set = FALSE;
+    ціле		    type = MLINE, clip_length = 0, is_type_set = FALSE;
     void	    *cbdata;
     PhClipHeader    *clip_header;
     char_u	    *clip_text = NULL;
 
     cbdata = PhClipboardPasteStart(PhInputGroup(NULL));
-    if (cbdata == NULL)
-	return;
+    якщо (cbdata == NULL)
+	повернути;
 
     // Look for the vim specific clip first
     clip_header = PhClipboardPasteType(cbdata, CLIP_TYPE_VIM);
-    if (clip_header != NULL && clip_header->data != NULL)
+    якщо (clip_header != NULL && clip_header->data != NULL)
     {
 	switch(*(char *) clip_header->data)
 	{
@@ -86,16 +86,16 @@ clip_mch_request_selection(Clipboard_T *cbd)
 
     // Try for just normal text
     clip_header = PhClipboardPasteType(cbdata, CLIP_TYPE_TEXT);
-    if (clip_header != NULL)
+    якщо (clip_header != NULL)
     {
 	clip_text = clip_header->data;
 	clip_length  = clip_header->length - 1;
 
-	if (clip_text != NULL && is_type_set == FALSE)
+	якщо (clip_text != NULL && is_type_set == FALSE)
 	    type = MAUTO;
     }
 
-    if ((clip_text != NULL) && (clip_length > 0))
+    якщо ((clip_text != NULL) && (clip_length > 0))
 	clip_yank_selection(type, clip_text, clip_length, cbd);
 
     PhClipboardPasteFinish(cbdata);
@@ -104,25 +104,25 @@ clip_mch_request_selection(Clipboard_T *cbd)
 void
 clip_mch_set_selection(Clipboard_T *cbd)
 {
-    int type;
+    ціле type;
     long_u  len;
     char_u *text_clip, vim_clip[2], *str = NULL;
     PhClipHeader clip_header[2];
 
     // Prevent recursion from clip_get_selection()
-    if (cbd->owned == TRUE)
-	return;
+    якщо (cbd->owned == TRUE)
+	повернути;
 
     cbd->owned = TRUE;
     clip_get_selection(cbd);
     cbd->owned = FALSE;
 
     type = clip_convert_selection(&str, &len, cbd);
-    if (type >= 0)
+    якщо (type >= 0)
     {
 	text_clip = alloc(len + 1); // Normal text
 
-	if (text_clip && vim_clip)
+	якщо (text_clip && vim_clip)
 	{
 	    CLEAR_FIELD(clip_header);
 

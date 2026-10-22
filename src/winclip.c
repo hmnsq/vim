@@ -33,46 +33,46 @@
  * Otherwise "outstr" must be a buffer of sufficient size.
  * Returns the number of UTF-16 words produced.
  */
-    int
-utf8_to_utf16(char_u *instr, int inlen, short_u *outstr, int *unconvlenp)
+    ціле
+utf8_to_utf16(char_u *instr, ціле inlen, short_u *outstr, ціле *unconvlenp)
 {
-    int		outlen = 0;
+    ціле		outlen = 0;
     char_u	*p = instr;
-    int		todo = inlen;
-    int		l;
-    int		ch;
+    ціле		todo = inlen;
+    ціле		l;
+    ціле		ch;
 
-    while (todo > 0)
+    поки (todo > 0)
     {
 	// Only convert if we have a complete sequence.
 	l = utf_ptr2len_len(p, todo);
-	if (l > todo)
+	якщо (l > todo)
 	{
 	    // Return length of incomplete sequence.
-	    if (unconvlenp != NULL)
+	    якщо (unconvlenp != NULL)
 		*unconvlenp = todo;
 	    break;
 	}
 
 	ch = utf_ptr2char(p);
-	if (ch >= 0x10000)
+	якщо (ch >= 0x10000)
 	{
 	    // non-BMP character, encoding with surrogate pairs
 	    ++outlen;
-	    if (outstr != NULL)
+	    якщо (outstr != NULL)
 	    {
 		*outstr++ = (0xD800 - (0x10000 >> 10)) + (ch >> 10);
 		*outstr++ = 0xDC00 | (ch & 0x3FF);
 	    }
 	}
-	else if (outstr != NULL)
+	інакше якщо (outstr != NULL)
 	    *outstr++ = ch;
 	++outlen;
 	p += l;
 	todo -= l;
     }
 
-    return outlen;
+    повернути outlen;
 }
 
 /*
@@ -82,42 +82,42 @@ utf8_to_utf16(char_u *instr, int inlen, short_u *outstr, int *unconvlenp)
  * Otherwise "outstr" must be a buffer of sufficient size.
  * Return the number of bytes produced.
  */
-    int
-utf16_to_utf8(short_u *instr, int inlen, char_u *outstr)
+    ціле
+utf16_to_utf8(short_u *instr, ціле inlen, char_u *outstr)
 {
-    int		outlen = 0;
-    int		todo = inlen;
+    ціле		outlen = 0;
+    ціле		todo = inlen;
     short_u	*p = instr;
-    int		l;
-    int		ch, ch2;
+    ціле		l;
+    ціле		ch, ch2;
 
-    while (todo > 0)
+    поки (todo > 0)
     {
 	ch = *p;
-	if (ch >= 0xD800 && ch <= 0xDBFF && todo > 1)
+	якщо (ch >= 0xD800 && ch <= 0xDBFF && todo > 1)
 	{
 	    // surrogate pairs handling
 	    ch2 = p[1];
-	    if (ch2 >= 0xDC00 && ch2 <= 0xDFFF)
+	    якщо (ch2 >= 0xDC00 && ch2 <= 0xDFFF)
 	    {
 		ch = ((ch - 0xD800) << 10) + (ch2 & 0x3FF) + 0x10000;
 		++p;
 		--todo;
 	    }
 	}
-	if (outstr != NULL)
+	якщо (outstr != NULL)
 	{
 	    l = utf_char2bytes(ch, outstr);
 	    outstr += l;
 	}
-	else
+	інакше
 	    l = utf_char2len(ch);
 	++p;
 	outlen += l;
 	--todo;
     }
 
-    return outlen;
+    повернути outlen;
 }
 
 /*
@@ -127,14 +127,14 @@ utf16_to_utf8(short_u *instr, int inlen, char_u *outstr)
  */
     void
 MultiByteToWideChar_alloc(UINT cp, DWORD flags,
-	LPCSTR in, int inlen,
-	LPWSTR *out, int *outlen)
+	LPCSTR in, ціле inlen,
+	LPWSTR *out, ціле *outlen)
 {
     *outlen = MultiByteToWideChar(cp, flags, in, inlen, 0, 0);
     // Add one word to avoid a zero-length alloc().
     *out = ALLOC_MULT(WCHAR, *outlen + 1);
-    if (*out == NULL)
-	return;
+    якщо (*out == NULL)
+	повернути;
 
     MultiByteToWideChar(cp, flags, in, inlen, *out, *outlen);
     (*out)[*outlen] = 0;
@@ -146,15 +146,15 @@ MultiByteToWideChar_alloc(UINT cp, DWORD flags,
  */
     void
 WideCharToMultiByte_alloc(UINT cp, DWORD flags,
-	LPCWSTR in, int inlen,
-	LPSTR *out, int *outlen,
+	LPCWSTR in, ціле inlen,
+	LPSTR *out, ціле *outlen,
 	LPCSTR def, LPBOOL useddef)
 {
     *outlen = WideCharToMultiByte(cp, flags, in, inlen, NULL, 0, def, useddef);
     // Add one byte to avoid a zero-length alloc().
     *out = alloc(*outlen + 1);
-    if (*out == NULL)
-	return;
+    якщо (*out == NULL)
+	повернути;
     WideCharToMultiByte(cp, flags, in, inlen, *out, *outlen, def, useddef);
     (*out)[*outlen] = 0;
 }
@@ -183,24 +183,24 @@ win_clip_init(void)
 // Type used for the clipboard type of Vim's data.
 typedef struct
 {
-    int type;		// MCHAR, MBLOCK or MLINE
-    int txtlen;		// length of CF_TEXT in bytes
-    int ucslen;		// length of CF_UNICODETEXT in words
-    int rawlen;		// length of clip_star.format_raw, including encoding,
+    ціле type;		// MCHAR, MBLOCK or MLINE
+    ціле txtlen;		// length of CF_TEXT in bytes
+    ціле ucslen;		// length of CF_UNICODETEXT in words
+    ціле rawlen;		// length of clip_star.format_raw, including encoding,
 			// excluding terminating NUL
 } VimClipType_t;
 
 /*
  * Make vim the owner of the current selection.  Return OK upon success.
  */
-    int
+    ціле
 clip_mch_own_selection(Clipboard_T *cbd UNUSED)
 {
     /*
      * Never actually own the clipboard.  If another application sets the
      * clipboard, we don't want to think that we still own it.
      */
-    return FAIL;
+    повернути FAIL;
 }
 
 /*
@@ -218,21 +218,21 @@ clip_mch_lose_selection(Clipboard_T *cbd UNUSED)
  * Returns NULL when out of memory.
  */
     static char_u *
-crnl_to_nl(const char_u *str, int *size)
+crnl_to_nl(const char_u *str, ціле *size)
 {
-    int		pos = 0;
-    int		str_len = *size;
+    ціле		pos = 0;
+    ціле		str_len = *size;
     char_u	*ret;
     char_u	*retp;
 
     // Avoid allocating zero bytes, it generates an error message.
     ret = alloc(str_len == 0 ? 1 : str_len);
-    if (ret != NULL)
+    якщо (ret != NULL)
     {
 	retp = ret;
-	for (pos = 0; pos < str_len; ++pos)
+	для (pos = 0; pos < str_len; ++pos)
 	{
-	    if (str[pos] == '\r' && str[pos + 1] == '\n')
+	    якщо (str[pos] == '\r' && str[pos + 1] == '\n')
 	    {
 		++pos;
 		--(*size);
@@ -241,26 +241,26 @@ crnl_to_nl(const char_u *str, int *size)
 	}
     }
 
-    return ret;
+    повернути ret;
 }
 
 /*
  * Wait for another process to Close the Clipboard.
  * Returns TRUE for success.
  */
-    static int
+    static ціле
 vim_open_clipboard(void)
 {
-    int delay = 10;
+    ціле delay = 10;
 
-    while (!OpenClipboard(NULL))
+    поки (!OpenClipboard(NULL))
     {
-	if (delay > 500)
-	    return FALSE;  // waited too long, give up
+	якщо (delay > 500)
+	    повернути FALSE;  // waited too long, give up
 	Sleep(delay);
 	delay *= 2;	// wait for 10, 20, 40, 80, etc. msec
     }
-    return TRUE;
+    повернути TRUE;
 }
 
 /*
@@ -282,32 +282,32 @@ clip_mch_request_selection(Clipboard_T *cbd)
     char_u		*str = NULL;
     char_u		*to_free = NULL;
     HGLOBAL		rawh = NULL;
-    int			str_size = 0;
-    int			maxlen;
+    ціле			str_size = 0;
+    ціле			maxlen;
     size_t		n;
 
     /*
      * Don't pass GetActiveWindow() as an argument to OpenClipboard() because
      * then we can't paste back into the same window for some reason - webb.
      */
-    if (!vim_open_clipboard())
-	return;
+    якщо (!vim_open_clipboard())
+	повернути;
 
     // Check for vim's own clipboard format first.  This only gets the type of
     // the data, still need to use CF_UNICODETEXT or CF_TEXT for the text.
-    if (IsClipboardFormatAvailable(cbd->format))
+    якщо (IsClipboardFormatAvailable(cbd->format))
     {
 	VimClipType_t	*meta_p;
 	HGLOBAL		meta_h;
 
 	// We have metadata on the clipboard; try to get it.
-	if ((meta_h = GetClipboardData(cbd->format)) != NULL
+	якщо ((meta_h = GetClipboardData(cbd->format)) != NULL
 		&& (meta_p = (VimClipType_t *)GlobalLock(meta_h)) != NULL)
 	{
 	    // The size of "VimClipType_t" changed, "rawlen" was added later.
 	    // Only copy what is available for backwards compatibility.
 	    n = sizeof(VimClipType_t);
-	    if (GlobalSize(meta_h) < n)
+	    якщо (GlobalSize(meta_h) < n)
 		n = GlobalSize(meta_h);
 	    memcpy(&metadata, meta_p, n);
 	    GlobalUnlock(meta_h);
@@ -316,53 +316,53 @@ clip_mch_request_selection(Clipboard_T *cbd)
 
     // Check for Vim's raw clipboard format first.  This is used without
     // conversion, but only if 'encoding' matches.
-    if (IsClipboardFormatAvailable(cbd->format_raw)
-				      && metadata.rawlen > (int)STRLEN(p_enc))
+    якщо (IsClipboardFormatAvailable(cbd->format_raw)
+				      && metadata.rawlen > (ціле)STRLEN(p_enc))
     {
 	// We have raw data on the clipboard; try to get it.
-	if ((rawh = GetClipboardData(cbd->format_raw)) != NULL)
+	якщо ((rawh = GetClipboardData(cbd->format_raw)) != NULL)
 	{
 	    char_u	*rawp;
 
 	    rawp = (char_u *)GlobalLock(rawh);
-	    if (rawp != NULL && STRCMP(p_enc, rawp) == 0)
+	    якщо (rawp != NULL && STRCMP(p_enc, rawp) == 0)
 	    {
 		n = STRLEN(p_enc) + 1;
 		str = rawp + n;
-		str_size = (int)(metadata.rawlen - n);
+		str_size = (ціле)(metadata.rawlen - n);
 	    }
-	    else
+	    інакше
 	    {
 		GlobalUnlock(rawh);
 		rawh = NULL;
 	    }
 	}
     }
-    if (str == NULL)
+    якщо (str == NULL)
     {
 	// Try to get the clipboard in Unicode if it's not an empty string.
-	if (IsClipboardFormatAvailable(CF_UNICODETEXT) && metadata.ucslen != 0)
+	якщо (IsClipboardFormatAvailable(CF_UNICODETEXT) && metadata.ucslen != 0)
 	{
 	    HGLOBAL hMemW;
 
-	    if ((hMemW = GetClipboardData(CF_UNICODETEXT)) != NULL)
+	    якщо ((hMemW = GetClipboardData(CF_UNICODETEXT)) != NULL)
 	    {
 		WCHAR *hMemWstr = (WCHAR *)GlobalLock(hMemW);
 
 		// Use the length of our metadata if possible, but limit it to
 		// the GlobalSize() for safety.
-		maxlen = (int)(GlobalSize(hMemW) / sizeof(WCHAR));
-		if (metadata.ucslen >= 0)
+		maxlen = (ціле)(GlobalSize(hMemW) / sizeof(WCHAR));
+		якщо (metadata.ucslen >= 0)
 		{
-		    if (metadata.ucslen > maxlen)
+		    якщо (metadata.ucslen > maxlen)
 			str_size = maxlen;
-		    else
+		    інакше
 			str_size = metadata.ucslen;
 		}
-		else
+		інакше
 		{
-		    for (str_size = 0; str_size < maxlen; ++str_size)
-			if (hMemWstr[str_size] == NUL)
+		    для (str_size = 0; str_size < maxlen; ++str_size)
+			якщо (hMemWstr[str_size] == NUL)
 			    break;
 		}
 		to_free = str = utf16_to_enc((short_u *)hMemWstr, &str_size);
@@ -370,33 +370,33 @@ clip_mch_request_selection(Clipboard_T *cbd)
 	    }
 	}
 	// Get the clipboard in the Active codepage.
-	else if (IsClipboardFormatAvailable(CF_TEXT))
+	інакше якщо (IsClipboardFormatAvailable(CF_TEXT))
 	{
-	    if ((hMem = GetClipboardData(CF_TEXT)) != NULL)
+	    якщо ((hMem = GetClipboardData(CF_TEXT)) != NULL)
 	    {
 		str = (char_u *)GlobalLock(hMem);
 
 		// The length is either what our metadata says or the strlen().
 		// But limit it to the GlobalSize() for safety.
-		maxlen = (int)GlobalSize(hMem);
-		if (metadata.txtlen >= 0)
+		maxlen = (ціле)GlobalSize(hMem);
+		якщо (metadata.txtlen >= 0)
 		{
-		    if (metadata.txtlen > maxlen)
+		    якщо (metadata.txtlen > maxlen)
 			str_size = maxlen;
-		    else
+		    інакше
 			str_size = metadata.txtlen;
 		}
-		else
+		інакше
 		{
-		    for (str_size = 0; str_size < maxlen; ++str_size)
-			if (str[str_size] == NUL)
+		    для (str_size = 0; str_size < maxlen; ++str_size)
+			якщо (str[str_size] == NUL)
 			    break;
 		}
 
 		// The text is in the active codepage.  Convert to
 		// 'encoding', going through UTF-16.
 		acp_to_enc(str, str_size, &to_free, &maxlen);
-		if (to_free != NULL)
+		якщо (to_free != NULL)
 		{
 		    str_size = maxlen;
 		    str = to_free;
@@ -405,17 +405,17 @@ clip_mch_request_selection(Clipboard_T *cbd)
 	}
     }
 
-    if (str != NULL && metadata.txtlen != 0)
+    якщо (str != NULL && metadata.txtlen != 0)
     {
 	char_u *temp_clipboard;
 
 	// If the type is not known detect it.
-	if (metadata.type == -1)
+	якщо (metadata.type == -1)
 	    metadata.type = MAUTO;
 
 	// Translate <CR><NL> into <NL>.
 	temp_clipboard = crnl_to_nl(str, &str_size);
-	if (temp_clipboard != NULL)
+	якщо (temp_clipboard != NULL)
 	{
 	    clip_yank_selection(metadata.type, temp_clipboard, str_size, cbd);
 	    vim_free(temp_clipboard);
@@ -423,9 +423,9 @@ clip_mch_request_selection(Clipboard_T *cbd)
     }
 
     // unlock the global object
-    if (hMem != NULL)
+    якщо (hMem != NULL)
 	GlobalUnlock(hMem);
-    if (rawh != NULL)
+    якщо (rawh != NULL)
 	GlobalUnlock(rawh);
     CloseClipboard();
     vim_free(to_free);
@@ -452,9 +452,9 @@ clip_mch_set_selection(Clipboard_T *cbd)
 
     // Get the text to be put on the clipboard, with CR-LF.
     metadata.type = clip_convert_selection(&str, &txtlen, cbd);
-    if (metadata.type < 0)
-	return;
-    metadata.txtlen = (int)txtlen;
+    якщо (metadata.type < 0)
+	повернути;
+    metadata.txtlen = (ціле)txtlen;
     metadata.ucslen = 0;
     metadata.rawlen = 0;
 
@@ -464,28 +464,28 @@ clip_mch_set_selection(Clipboard_T *cbd)
     {
 	LPSTR lpszMemRaw;
 
-	metadata.rawlen = (int)(txtlen + STRLEN(p_enc) + 1);
+	metadata.rawlen = (ціле)(txtlen + STRLEN(p_enc) + 1);
 	hMemRaw = (LPSTR)GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE,
 							 metadata.rawlen + 1);
 	lpszMemRaw = (LPSTR)GlobalLock(hMemRaw);
-	if (lpszMemRaw != NULL)
+	якщо (lpszMemRaw != NULL)
 	{
 	    STRCPY(lpszMemRaw, p_enc);
 	    memcpy(lpszMemRaw + STRLEN(p_enc) + 1, str, txtlen + 1);
 	    GlobalUnlock(hMemRaw);
 	}
-	else
+	інакше
 	    metadata.rawlen = 0;
     }
 
     {
 	WCHAR		*out;
-	int		len = metadata.txtlen;
+	ціле		len = metadata.txtlen;
 
 	// Convert the text to UTF-16. This is put on the clipboard as
 	// CF_UNICODETEXT.
 	out = (WCHAR *)enc_to_utf16(str, &len);
-	if (out != NULL)
+	якщо (out != NULL)
 	{
 	    WCHAR *lpszMemW;
 
@@ -495,10 +495,10 @@ clip_mch_set_selection(Clipboard_T *cbd)
 							       NULL, 0, 0, 0);
 	    vim_free(str);
 	    str = alloc(metadata.txtlen == 0 ? 1 : metadata.txtlen);
-	    if (str == NULL)
+	    якщо (str == NULL)
 	    {
 		vim_free(out);
-		return;		// out of memory
+		повернути;		// out of memory
 	    }
 	    WideCharToMultiByte(GetACP(), 0, out, len,
 					   (LPSTR)str, metadata.txtlen, 0, 0);
@@ -508,7 +508,7 @@ clip_mch_set_selection(Clipboard_T *cbd)
 	    hMemW = (LPSTR)GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE,
 						   (len + 1) * sizeof(WCHAR));
 	    lpszMemW = (WCHAR *)GlobalLock(hMemW);
-	    if (lpszMemW != NULL)
+	    якщо (lpszMemW != NULL)
 	    {
 		memcpy(lpszMemW, out, len * sizeof(WCHAR));
 		lpszMemW[len] = NUL;
@@ -524,7 +524,7 @@ clip_mch_set_selection(Clipboard_T *cbd)
     {
 	LPSTR lpszMem = (LPSTR)GlobalLock(hMem);
 
-	if (lpszMem)
+	якщо (lpszMem)
 	{
 	    mch_memmove((char_u *)lpszMem, str, metadata.txtlen);
 	    GlobalUnlock(hMem);
@@ -550,15 +550,15 @@ clip_mch_set_selection(Clipboard_T *cbd)
      * because then we can't paste back into the same window for some
      * reason - webb.
      */
-    if (vim_open_clipboard())
+    якщо (vim_open_clipboard())
     {
-	if (EmptyClipboard())
+	якщо (EmptyClipboard())
 	{
 	    SetClipboardData(cbd->format, hMemVim);
 	    hMemVim = 0;
-	    if (hMemW != NULL)
+	    якщо (hMemW != NULL)
 	    {
-		if (SetClipboardData(CF_UNICODETEXT, hMemW) != NULL)
+		якщо (SetClipboardData(CF_UNICODETEXT, hMemW) != NULL)
 		    hMemW = NULL;
 	    }
 	    // Always use CF_TEXT.  On Win98 Notepad won't obtain the
@@ -571,13 +571,13 @@ clip_mch_set_selection(Clipboard_T *cbd)
 
     vim_free(str);
     // Free any allocations we didn't give to the clipboard:
-    if (hMemRaw)
+    якщо (hMemRaw)
 	GlobalFree(hMemRaw);
-    if (hMem)
+    якщо (hMem)
 	GlobalFree(hMem);
-    if (hMemW)
+    якщо (hMemW)
 	GlobalFree(hMemW);
-    if (hMemVim)
+    якщо (hMemVim)
 	GlobalFree(hMemVim);
 }
 
@@ -596,47 +596,47 @@ clip_mch_set_selection(Clipboard_T *cbd)
  * Returns NULL when out of memory.
  */
     short_u *
-enc_to_utf16(char_u *str, int *lenp)
+enc_to_utf16(char_u *str, ціле *lenp)
 {
     vimconv_T	conv;
     WCHAR	*ret;
     char_u	*allocbuf = NULL;
-    int		len_loc;
-    int		length;
+    ціле		len_loc;
+    ціле		length;
 
-    if (lenp == NULL)
+    якщо (lenp == NULL)
     {
-	len_loc = (int)STRLEN(str) + 1;
+	len_loc = (ціле)STRLEN(str) + 1;
 	lenp = &len_loc;
     }
 
-    if (enc_codepage > 0)
+    якщо (enc_codepage > 0)
     {
 	// We can do any CP### -> UTF-16 in one pass, and we can do it
 	// without iconv() (convert_* may need iconv).
 	MultiByteToWideChar_alloc(enc_codepage, 0, (LPCSTR)str, *lenp,
 							       &ret, &length);
     }
-    else
+    інакше
     {
 	// Use "latin1" by default, we might be called before we have p_enc
 	// set up.  Convert to utf-8 first, works better with iconv().  Does
 	// nothing if 'encoding' is "utf-8".
 	conv.vc_type = CONV_NONE;
-	if (convert_setup(&conv, p_enc ? p_enc : (char_u *)"latin1",
+	якщо (convert_setup(&conv, p_enc ? p_enc : (char_u *)"latin1",
 						   (char_u *)"utf-8") == FAIL)
-	    return NULL;
-	if (conv.vc_type != CONV_NONE)
+	    повернути NULL;
+	якщо (conv.vc_type != CONV_NONE)
 	{
 	    str = allocbuf = string_convert(&conv, str, lenp);
-	    if (str == NULL)
-		return NULL;
+	    якщо (str == NULL)
+		повернути NULL;
 	}
 	convert_setup(&conv, NULL, NULL);
 
 	length = utf8_to_utf16(str, *lenp, NULL, NULL);
 	ret = ALLOC_MULT(WCHAR, length + 1);
-	if (ret != NULL)
+	якщо (ret != NULL)
 	{
 	    utf8_to_utf16(str, *lenp, (short_u *)ret, NULL);
 	    ret[length] = 0;
@@ -646,7 +646,7 @@ enc_to_utf16(char_u *str, int *lenp)
     }
 
     *lenp = length;
-    return (short_u *)ret;
+    повернути (short_u *)ret;
 }
 
 /*
@@ -658,32 +658,32 @@ enc_to_utf16(char_u *str, int *lenp)
  * Returns NULL when out of memory.
  */
     char_u *
-utf16_to_enc(short_u *str, int *lenp)
+utf16_to_enc(short_u *str, ціле *lenp)
 {
     vimconv_T	conv;
     char_u	*utf8_str = NULL, *enc_str = NULL;
-    int		len_loc;
+    ціле		len_loc;
 
-    if (lenp == NULL)
+    якщо (lenp == NULL)
     {
-	len_loc = (int)wcslen(str) + 1;
+	len_loc = (ціле)wcslen(str) + 1;
 	lenp = &len_loc;
     }
 
-    if (enc_codepage > 0)
+    якщо (enc_codepage > 0)
     {
 	// We can do any UTF-16 -> CP### in one pass.
-	int length;
+	ціле length;
 
 	WideCharToMultiByte_alloc(enc_codepage, 0, str, *lenp,
 					    (LPSTR *)&enc_str, &length, 0, 0);
 	*lenp = length;
-	return enc_str;
+	повернути enc_str;
     }
 
     // Avoid allocating zero bytes, it generates an error message.
     utf8_str = alloc(utf16_to_utf8(str, *lenp == 0 ? 1 : *lenp, NULL));
-    if (utf8_str != NULL)
+    якщо (utf8_str != NULL)
     {
 	*lenp = utf16_to_utf8(str, *lenp, utf8_str);
 
@@ -691,12 +691,12 @@ utf16_to_enc(short_u *str, int *lenp)
 	conv.vc_type = CONV_NONE;
 	convert_setup(&conv, (char_u *)"utf-8",
 					    p_enc? p_enc: (char_u *)"latin1");
-	if (conv.vc_type == CONV_NONE)
+	якщо (conv.vc_type == CONV_NONE)
 	{
 	    // p_enc is utf-8, so we're done.
 	    enc_str = utf8_str;
 	}
-	else
+	інакше
 	{
 	    enc_str = string_convert(&conv, utf8_str, lenp);
 	    vim_free(utf8_str);
@@ -705,7 +705,7 @@ utf16_to_enc(short_u *str, int *lenp)
 	convert_setup(&conv, NULL, NULL);
     }
 
-    return enc_str;
+    повернути enc_str;
 }
 
 /*
@@ -717,17 +717,17 @@ utf16_to_enc(short_u *str, int *lenp)
     void
 acp_to_enc(
     char_u	*str,
-    int		str_size,
+    ціле		str_size,
     char_u	**out,
-    int		*outlen)
+    ціле		*outlen)
 
 {
     LPWSTR	widestr;
 
     MultiByteToWideChar_alloc(GetACP(), 0, (LPCSTR)str, str_size,
 							    &widestr, outlen);
-    if (widestr == NULL)
-	return;
+    якщо (widestr == NULL)
+	повернути;
     ++*outlen;	// Include the 0 after the string
     *out = utf16_to_enc((short_u *)widestr, outlen);
     vim_free(widestr);
@@ -741,17 +741,17 @@ acp_to_enc(
     void
 enc_to_acp(
     char_u	*str,
-    int		str_size,
+    ціле		str_size,
     char_u	**out,
-    int		*outlen)
+    ціле		*outlen)
 
 {
     LPWSTR	widestr;
-    int		len = str_size;
+    ціле		len = str_size;
 
     widestr = (WCHAR *)enc_to_utf16(str, &len);
-    if (widestr == NULL)
-	return;
+    якщо (widestr == NULL)
+	повернути;
     WideCharToMultiByte_alloc(GetACP(), 0, widestr, len,
 	    (LPSTR *)out, outlen, 0, 0);
     vim_free(widestr);

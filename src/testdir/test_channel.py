@@ -22,7 +22,7 @@ except ImportError:
 class TestingRequestHandler(socketserver.BaseRequestHandler):
     def handle(self):
         print("=== socket opened ===")
-        while True:
+        поки True:
             try:
                 received = self.request.recv(4096).decode('utf-8')
             except socket.error:
@@ -31,7 +31,7 @@ class TestingRequestHandler(socketserver.BaseRequestHandler):
             except IOError:
                 print("=== socket closed ===")
                 break
-            if received == '':
+            якщо received == '':
                 print("=== socket closed ===")
                 break
             print("received: {0}".format(received))
@@ -39,15 +39,15 @@ class TestingRequestHandler(socketserver.BaseRequestHandler):
             # We may receive two messages at once. Take the part up to the
             # newline, which should be after the matching "]".
             todo = received
-            while todo != '':
+            поки todo != '':
                 splitidx = todo.find('\n')
-                if splitidx < 0:
+                якщо splitidx < 0:
                      used = todo
                      todo = ''
-                else:
+                інакше:
                      used = todo[:splitidx]
                      todo = todo[splitidx + 1:]
-                if used != received:
+                якщо used != received:
                     print("using: {0}".format(used))
 
                 try:
@@ -57,8 +57,8 @@ class TestingRequestHandler(socketserver.BaseRequestHandler):
                     decoded = [-1, '']
 
                 # Send a response if the sequence number is positive.
-                if decoded[0] >= 0:
-                    if decoded[1] == 'hello!':
+                якщо decoded[0] >= 0:
+                    якщо decoded[1] == 'hello!':
                         # simply send back a string
                         response = "got it"
                     elif decoded[1] == 'malformed1':
@@ -217,16 +217,16 @@ class TestingRequestHandler(socketserver.BaseRequestHandler):
                     elif decoded[1] == '!quit!':
                         # we're done
                         self.server.shutdown()
-                        return
+                        повернути
                     elif decoded[1] == '!crash!':
                         # Crash!
                         42 / 0
-                    else:
+                    інакше:
                         response = "what?"
 
-                    if response == "":
+                    якщо response == "":
                         print("no response")
-                    else:
+                    інакше:
                         encoded = json.dumps([decoded[0], response])
                         print("sending: {0}".format(encoded))
                         self.request.sendall(encoded.encode('utf-8'))
@@ -252,7 +252,7 @@ def main(host, port, server_class=ThreadedTCPServer):
     # Wait half a second before opening the port to test waittime in ch_open().
     # We do want to get the port number, get that first.  We cannot open the
     # socket, guess a port is free.
-    if len(sys.argv) >= 2 and sys.argv[1] == 'delay':
+    якщо len(sys.argv) >= 2 and sys.argv[1] == 'delay':
         port = 13684
         writePortInFile(port)
 
@@ -279,10 +279,10 @@ def main(host, port, server_class=ThreadedTCPServer):
     # Main thread terminates, but the server continues running
     # until server.shutdown() is called.
     try:
-        while server_thread.is_alive():
+        поки server_thread.is_alive():
             server_thread.join(1)
     except (KeyboardInterrupt, SystemExit):
         server.shutdown()
 
-if __name__ == "__main__":
+якщо __name__ == "__main__":
     main("127.0.0.1", 0)

@@ -25,7 +25,7 @@
 
 #include "vim.h"
 
-#if defined(FEAT_NETBEANS_INTG)
+#якщо defined(FEAT_NETBEANS_INTG)
 
 #ifndef MSWIN
 # include <netdb.h>
@@ -53,24 +53,24 @@ static long pos2off(buf_T *, pos_T *);
 static pos_T *off2pos(buf_T *, long);
 static pos_T *get_off_or_lnum(buf_T *buf, char_u **argp);
 static long get_buf_size(buf_T *);
-static int netbeans_keystring(char_u *keystr);
+static ціле netbeans_keystring(char_u *keystr);
 static void special_keys(char_u *args);
 
-static int getConnInfo(char *file, char **host, char **port, char **password);
+static ціле getConnInfo(char *file, char **host, char **port, char **password);
 
 static void nb_init_graphics(void);
 static void coloncmd(char *cmd, ...) ATTRIBUTE_FORMAT_PRINTF(1, 2);
 static void nb_set_curbuf(buf_T *buf);
 static void nb_parse_cmd(char_u *);
-static int  nb_do_cmd(int, char_u *, int, int, char_u *);
+static ціле  nb_do_cmd(ціле, char_u *, ціле, ціле, char_u *);
 static void nb_send(char *buf, char *fun);
 static void nb_free(void);
 
 #define NETBEANS_OPEN (channel_can_write_to(nb_channel))
 static channel_T *nb_channel = NULL;
 
-static int r_cmdno;			// current command number for reply
-static int dosetvisible = FALSE;
+static ціле r_cmdno;			// current command number for reply
+static ціле dosetvisible = FALSE;
 
 /*
  * Include the debugging code if wanted.
@@ -79,23 +79,23 @@ static int dosetvisible = FALSE;
 # include "nbdebug.c"
 #endif
 
-static int needupdate = 0;
-static int inAtomic = 0;
+static ціле needupdate = 0;
+static ціле inAtomic = 0;
 
 /*
  * Return TRUE if "str" contains only characters from "allowed".
  * Used to validate NetBeans-supplied strings before interpolating them
  * into Ex commands via coloncmd().
  */
-    static int
+    static ціле
 nb_is_safe_string(char_u *str, char_u *allowed)
 {
-    if (str == NULL)
-	return FALSE;
-    for (char_u *p = str; *p != NUL; p++)
-	if (vim_strchr(allowed, *p) == NULL)
-	    return FALSE;
-    return TRUE;
+    якщо (str == NULL)
+	повернути FALSE;
+    для (char_u *p = str; *p != NUL; p++)
+	якщо (vim_strchr(allowed, *p) == NULL)
+	    повернути FALSE;
+    повернути TRUE;
 }
 
 /*
@@ -114,10 +114,10 @@ nb_channel_closed(void)
     static void
 netbeans_close(void)
 {
-    if (NETBEANS_OPEN)
+    якщо (NETBEANS_OPEN)
     {
 	netbeans_send_disconnect();
-	if (nb_channel != NULL)
+	якщо (nb_channel != NULL)
 	{
 	    // Close the socket and remove the input handlers.
 	    channel_close(nb_channel, TRUE);
@@ -147,10 +147,10 @@ netbeans_close(void)
 #define NB_DEF_ADDR "3219"
 #define NB_DEF_PASS "changeme"
 
-    static int
-netbeans_connect(char *params, int doabort)
+    static ціле
+netbeans_connect(char *params, ціле doabort)
 {
-    int		port;
+    ціле		port;
     char	buf[32];
     char	*hostname = NULL;
     char	*address = NULL;
@@ -158,78 +158,78 @@ netbeans_connect(char *params, int doabort)
     char	*fname;
     char	*arg = NULL;
 
-    if (*params == '=')
+    якщо (*params == '=')
     {
 	// "=fname": Read info from specified file.
-	if (getConnInfo(params + 1, &hostname, &address, &password) == FAIL)
-	    return FAIL;
+	якщо (getConnInfo(params + 1, &hostname, &address, &password) == FAIL)
+	    повернути FAIL;
     }
-    else
+    інакше
     {
-	if (*params == ':')
+	якщо (*params == ':')
 	    // ":<host>:<addr>:<password>": get info from argument
 	    arg = params + 1;
-	if (arg == NULL && (fname = getenv("__NETBEANS_CONINFO")) != NULL)
+	якщо (arg == NULL && (fname = getenv("__NETBEANS_CONINFO")) != NULL)
 	{
 	    // "": get info from file specified in environment
-	    if (getConnInfo(fname, &hostname, &address, &password) == FAIL)
-		return FAIL;
+	    якщо (getConnInfo(fname, &hostname, &address, &password) == FAIL)
+		повернути FAIL;
 	}
-	else
+	інакше
 	{
-	    if (arg != NULL)
+	    якщо (arg != NULL)
 	    {
 		// ":<host>:<addr>:<password>": get info from argument
 		hostname = arg;
 		address = strchr(hostname, ':');
-		if (address != NULL)
+		якщо (address != NULL)
 		{
 		    *address++ = '\0';
 		    password = strchr(address, ':');
-		    if (password != NULL)
+		    якщо (password != NULL)
 			*password++ = '\0';
 		}
 	    }
 
 	    // Get the missing values from the environment.
-	    if (hostname == NULL || *hostname == '\0')
+	    якщо (hostname == NULL || *hostname == '\0')
 		hostname = getenv("__NETBEANS_HOST");
-	    if (address == NULL)
+	    якщо (address == NULL)
 		address = getenv("__NETBEANS_SOCKET");
-	    if (password == NULL)
+	    якщо (password == NULL)
 		password = getenv("__NETBEANS_VIM_PASSWORD");
 
 	    // Move values to allocated memory.
-	    if (hostname != NULL)
+	    якщо (hostname != NULL)
 		hostname = (char *)vim_strsave((char_u *)hostname);
-	    if (address != NULL)
+	    якщо (address != NULL)
 		address = (char *)vim_strsave((char_u *)address);
-	    if (password != NULL)
+	    якщо (password != NULL)
 		password = (char *)vim_strsave((char_u *)password);
 	}
     }
 
     // Use the default when a value is missing.
-    if (hostname == NULL || *hostname == '\0')
+    якщо (hostname == NULL || *hostname == '\0')
     {
 	vim_free(hostname);
 	hostname = (char *)vim_strsave((char_u *)NB_DEF_HOST);
     }
-    if (address == NULL || *address == '\0')
+    якщо (address == NULL || *address == '\0')
     {
 	vim_free(address);
 	address = (char *)vim_strsave((char_u *)NB_DEF_ADDR);
     }
-    if (password == NULL || *password == '\0')
+    якщо (password == NULL || *password == '\0')
     {
 	vim_free(password);
 	password = (char *)vim_strsave((char_u *)NB_DEF_PASS);
     }
-    if (hostname != NULL && address != NULL && password != NULL)
+    якщо (hostname != NULL && address != NULL && password != NULL)
     {
 	port = atoi(address);
 	nb_channel = channel_open(hostname, port, 3000, nb_channel_closed);
-	if (nb_channel != NULL)
+	якщо (nb_channel != NULL)
 	{
 	    // success
 #ifdef FEAT_BEVAL_GUI
@@ -245,13 +245,13 @@ netbeans_connect(char *params, int doabort)
 	}
     }
 
-    if (nb_channel == NULL && doabort)
+    якщо (nb_channel == NULL && doabort)
 	getout(1);
 
     vim_free(hostname);
     vim_free(address);
     vim_free(password);
-    return NETBEANS_OPEN ? OK : FAIL;
+    повернути NETBEANS_OPEN ? OK : FAIL;
 }
 
 /*
@@ -260,7 +260,7 @@ netbeans_connect(char *params, int doabort)
  * Return FAIL if the file could not be read, OK otherwise (no matter what it
  * contains).
  */
-    static int
+    static ціле
 getConnInfo(char *file, char **host, char **port, char **auth)
 {
     FILE *fp;
@@ -274,41 +274,41 @@ getConnInfo(char *file, char **host, char **port, char **auth)
      * For Unix only accept the file when it's not accessible by others.
      * The open will then fail if we don't own the file.
      */
-    if (mch_stat(file, &st) == 0 && (st.st_mode & 0077) != 0)
+    якщо (mch_stat(file, &st) == 0 && (st.st_mode & 0077) != 0)
     {
 	nbdebug(("Wrong access mode for NetBeans connection info file: \"%s\"\n",
 								       file));
 	semsg(_(e_wrong_access_mode_for_netbeans_connection_info_file_str),
 									file);
-	return FAIL;
+	повернути FAIL;
     }
 #endif
 
     fp = mch_fopen(file, "r");
-    if (fp == NULL)
+    якщо (fp == NULL)
     {
 	nbdebug(("Cannot open NetBeans connection info file\n"));
 	PERROR(e_cannot_open_netbeans_connection_info_file);
-	return FAIL;
+	повернути FAIL;
     }
 
     // Read the file. There should be one of each parameter
-    while ((lp = (char_u *)fgets((char *)buf, BUFSIZ, fp)) != NULL)
+    поки ((lp = (char_u *)fgets((char *)buf, BUFSIZ, fp)) != NULL)
     {
-	if ((nlp = vim_strchr(lp, '\n')) != NULL)
+	якщо ((nlp = vim_strchr(lp, '\n')) != NULL)
 	    *nlp = 0;	    // strip off the trailing newline
 
-	if (STRNCMP(lp, "host=", 5) == 0)
+	якщо (STRNCMP(lp, "host=", 5) == 0)
 	{
 	    vim_free(*host);
 	    *host = (char *)vim_strsave(&buf[5]);
 	}
-	else if (STRNCMP(lp, "port=", 5) == 0)
+	інакше якщо (STRNCMP(lp, "port=", 5) == 0)
 	{
 	    vim_free(*port);
 	    *port = (char *)vim_strsave(&buf[5]);
 	}
-	else if (STRNCMP(lp, "auth=", 5) == 0)
+	інакше якщо (STRNCMP(lp, "auth=", 5) == 0)
 	{
 	    vim_free(*auth);
 	    *auth = (char *)vim_strsave(&buf[5]);
@@ -316,7 +316,7 @@ getConnInfo(char *file, char **host, char **port, char **auth)
     }
     fclose(fp);
 
-    return OK;
+    повернути OK;
 }
 
 
@@ -343,10 +343,10 @@ postpone_keycommand(char_u *keystr)
     keyQ_T *node;
 
     node = ALLOC_ONE(keyQ_T);
-    if (node == NULL)
-	return;  // out of memory, drop the key
+    якщо (node == NULL)
+	повернути;  // out of memory, drop the key
 
-    if (keyHead.next == NULL) // initialize circular queue
+    якщо (keyHead.next == NULL) // initialize circular queue
     {
 	keyHead.next = &keyHead;
 	keyHead.prev = &keyHead;
@@ -367,9 +367,9 @@ postpone_keycommand(char_u *keystr)
     static void
 handle_key_queue(void)
 {
-    int postponed = FALSE;
+    ціле postponed = FALSE;
 
-    while (!postponed && keyHead.next && keyHead.next != &keyHead)
+    поки (!postponed && keyHead.next && keyHead.next != &keyHead)
     {
 	// first, unlink the node
 	keyQ_T *node = keyHead.next;
@@ -378,7 +378,7 @@ handle_key_queue(void)
 
 	// Now, send the keycommand.  This may cause it to be postponed again
 	// and change keyHead.
-	if (node->keystr != NULL)
+	якщо (node->keystr != NULL)
 	    postponed = !netbeans_keystring(node->keystr);
 	vim_free(node->keystr);
 
@@ -397,23 +397,23 @@ netbeans_parse_messages(void)
     readq_T	*node;
     char_u	*buffer;
     char_u	*p;
-    int		own_node;
+    ціле		own_node;
 
-    while (nb_channel != NULL)
+    поки (nb_channel != NULL)
     {
 	node = channel_peek(nb_channel, PART_SOCK);
-	if (node == NULL)
+	якщо (node == NULL)
 	    break;	// nothing to read
 
 	// Locate the end of the first line in the first buffer.
 	p = channel_first_nl(node);
-	if (p == NULL)
+	якщо (p == NULL)
 	{
 	    // Command isn't complete.  If there is no following buffer,
 	    // return (wait for more). If there is another buffer following,
 	    // prepend the text to that buffer and delete this one.
-	    if (channel_collapse(nb_channel, PART_SOCK, TRUE) == FAIL)
-		return;
+	    якщо (channel_collapse(nb_channel, PART_SOCK, TRUE) == FAIL)
+		повернути;
 	    continue;
 	}
 
@@ -422,13 +422,13 @@ netbeans_parse_messages(void)
 	// the buffer.  Do this before executing, because new buffers can
 	// be added while busy handling the command.
 	*p++ = NUL;
-	if (*p == NUL)
+	якщо (*p == NUL)
 	{
 	    own_node = TRUE;
 	    buffer = channel_get(nb_channel, PART_SOCK, NULL);
 	    // "node" is now invalid!
 	}
-	else
+	інакше
 	{
 	    own_node = FALSE;
 	    buffer = node->rq_buffer;
@@ -438,12 +438,12 @@ netbeans_parse_messages(void)
 	// NULL if the channel is closed.
 	nb_parse_cmd(buffer);
 
-	if (own_node)
+	якщо (own_node)
 	    // buffer finished, dispose of it
 	    vim_free(buffer);
-	else if (nb_channel != NULL)
+	інакше якщо (nb_channel != NULL)
 	    // more follows, move it to the start
-	    channel_consume(nb_channel, PART_SOCK, (int)(p - buffer));
+	    channel_consume(nb_channel, PART_SOCK, (ціле)(p - buffer));
     }
 }
 
@@ -468,10 +468,10 @@ nb_parse_cmd(char_u *cmd)
 {
     char	*verb;
     char	*q;
-    int		bufno;
-    int		isfunc = -1;
+    ціле		bufno;
+    ціле		isfunc = -1;
 
-    if (STRCMP(cmd, "DISCONNECT") == 0)
+    якщо (STRCMP(cmd, "DISCONNECT") == 0)
     {
 	// We assume the server knows that we can safely exit!
 	// Disconnect before exiting, Motif hangs in a Select error
@@ -481,7 +481,7 @@ nb_parse_cmd(char_u *cmd)
 	// NOTREACHED
     }
 
-    if (STRCMP(cmd, "DETACH") == 0)
+    якщо (STRCMP(cmd, "DETACH") == 0)
     {
 	buf_T	*buf;
 
@@ -490,28 +490,28 @@ nb_parse_cmd(char_u *cmd)
 
 	// The IDE is breaking the connection.
 	netbeans_close();
-	return;
+	повернути;
     }
 
     bufno = strtol((char *)cmd, &verb, 10);
 
-    if (*verb != ':')
+    якщо (*verb != ':')
     {
 	nbdebug(("    missing colon: %s\n", cmd));
 	semsg(_(e_missing_colon_str), cmd);
-	return;
+	повернути;
     }
     ++verb; // skip colon
 
-    for (q = verb; *q; q++)
+    для (q = verb; *q; q++)
     {
-	if (*q == '!')
+	якщо (*q == '!')
 	{
 	    *q++ = NUL;
 	    isfunc = 0;
 	    break;
 	}
-	else if (*q == '/')
+	інакше якщо (*q == '/')
 	{
 	    *q++ = NUL;
 	    isfunc = 1;
@@ -519,18 +519,18 @@ nb_parse_cmd(char_u *cmd)
 	}
     }
 
-    if (isfunc < 0)
+    якщо (isfunc < 0)
     {
 	nbdebug(("    missing ! or / in: %s\n", cmd));
 	semsg(_(e_missing_bang_or_slash_in_str), cmd);
-	return;
+	повернути;
     }
 
     r_cmdno = strtol(q, &q, 10);
 
     q = (char *)skipwhite((char_u *)q);
 
-    if (nb_do_cmd(bufno, (char_u *)verb, isfunc, r_cmdno, (char_u *)q) == FAIL)
+    якщо (nb_do_cmd(bufno, (char_u *)verb, isfunc, r_cmdno, (char_u *)q) == FAIL)
     {
 #ifdef NBDEBUG
 	/*
@@ -547,13 +547,13 @@ nb_parse_cmd(char_u *cmd)
 struct nbbuf_struct
 {
     buf_T		*bufp;
-    unsigned int	 fireChanges:1;
-    unsigned int	 initDone:1;
-    unsigned int	 insertDone:1;
-    unsigned int	 modified:1;
-    int			 nbbuf_number;
+    unsigned ціле	 fireChanges:1;
+    unsigned ціле	 initDone:1;
+    unsigned ціле	 insertDone:1;
+    unsigned ціле	 modified:1;
+    ціле			 nbbuf_number;
     char		*displayname;
-    int			*signmap;
+    ціле			*signmap;
     short_u		 signmaplen;
     short_u		 signmapused;
 };
@@ -561,21 +561,21 @@ struct nbbuf_struct
 typedef struct nbbuf_struct nbbuf_T;
 
 static nbbuf_T *buf_list = NULL;
-static int buf_list_size = 0;	// size of buf_list
-static int buf_list_used = 0;	// nr of entries in buf_list actually in use
+static ціле buf_list_size = 0;	// size of buf_list
+static ціле buf_list_used = 0;	// nr of entries in buf_list actually in use
 
 static char **globalsignmap = NULL;
-static int globalsignmaplen = 0;
-static int globalsignmapused = 0;
+static ціле globalsignmaplen = 0;
+static ціле globalsignmapused = 0;
 
-static int  mapsigntype(nbbuf_T *, int localsigntype);
-static void addsigntype(nbbuf_T *, int localsigntype, char_u *typeName,
+static ціле  mapsigntype(nbbuf_T *, ціле localsigntype);
+static void addsigntype(nbbuf_T *, ціле localsigntype, char_u *typeName,
 			char_u *tooltip, char_u *glyphfile,
 			char_u *fg, char_u *bg);
 static void print_read_msg(nbbuf_T *buf);
 static void print_save_msg(nbbuf_T *buf, off_T nchars);
 
-static int curPCtype = -1;
+static ціле curPCtype = -1;
 
 /*
  * Free netbeans resources.
@@ -585,15 +585,15 @@ nb_free(void)
 {
     keyQ_T *key_node = keyHead.next;
     nbbuf_T buf;
-    int i;
+    ціле i;
 
     // free the netbeans buffer list
-    for (i = 0; i < buf_list_used; i++)
+    для (i = 0; i < buf_list_used; i++)
     {
 	buf = buf_list[i];
 	vim_free(buf.displayname);
 	vim_free(buf.signmap);
-	if (buf.bufp != NULL && buf_valid(buf.bufp))
+	якщо (buf.bufp != NULL && buf_valid(buf.bufp))
 	{
 	    buf.bufp->b_netbeans_file = false;
 	    buf.bufp->b_was_netbeans_file = false;
@@ -604,12 +604,12 @@ nb_free(void)
     buf_list_used = 0;
 
     // free the queued key commands
-    while (key_node != NULL && key_node != &keyHead)
+    поки (key_node != NULL && key_node != &keyHead)
     {
 	keyQ_T *next = key_node->next;
 	vim_free(key_node->keystr);
 	vim_free(key_node);
-	if (next == &keyHead)
+	якщо (next == &keyHead)
 	{
 	    keyHead.next = &keyHead;
 	    keyHead.prev = &keyHead;
@@ -619,31 +619,31 @@ nb_free(void)
     }
 
     // free the queued netbeans commands
-    if (nb_channel != NULL)
+    якщо (nb_channel != NULL)
 	channel_clear(nb_channel);
 }
 
 /*
  * Get the Netbeans buffer number for the specified buffer.
  */
-    static int
+    static ціле
 nb_getbufno(buf_T *bufp)
 {
-    int i;
+    ціле i;
 
-    for (i = 0; i < buf_list_used; i++)
-	if (buf_list[i].bufp == bufp)
-	    return i;
-    return -1;
+    для (i = 0; i < buf_list_used; i++)
+	якщо (buf_list[i].bufp == bufp)
+	    повернути i;
+    повернути -1;
 }
 
 /*
  * Is this a NetBeans-owned buffer?
  */
-    int
+    ціле
 isNetbeansBuffer(buf_T *bufp)
 {
-    return NETBEANS_OPEN && bufp->b_netbeans_file;
+    повернути NETBEANS_OPEN && bufp->b_netbeans_file;
 }
 
 /*
@@ -655,20 +655,20 @@ isNetbeansBuffer(buf_T *bufp)
  * So this function is for the corner case where Vim thinks a buffer is
  * unmodified but NetBeans thinks it IS modified.
  */
-    int
+    ціле
 isNetbeansModified(buf_T *bufp)
 {
-    if (isNetbeansBuffer(bufp))
+    якщо (isNetbeansBuffer(bufp))
     {
-	int bufno = nb_getbufno(bufp);
+	ціле bufno = nb_getbufno(bufp);
 
-	if (bufno > 0)
-	    return buf_list[bufno].modified;
-	else
-	    return FALSE;
+	якщо (bufno > 0)
+	    повернути buf_list[bufno].modified;
+	інакше
+	    повернути FALSE;
     }
-    else
-	return FALSE;
+    інакше
+	повернути FALSE;
 }
 
 /*
@@ -677,23 +677,23 @@ isNetbeansModified(buf_T *bufp)
  * non-buffer related command has been sent.
  */
     static nbbuf_T *
-nb_get_buf(int bufno)
+nb_get_buf(ціле bufno)
 {
     // find or create a buffer with the given number
-    int incr;
+    ціле incr;
 
-    if (bufno <= 0)
-	return NULL;
+    якщо (bufno <= 0)
+	повернути NULL;
 
-    if (!buf_list)
+    якщо (!buf_list)
     {
 	// initialize
 	buf_list = alloc_clear(100 * sizeof(nbbuf_T));
 	buf_list_size = 100;
     }
-    if (bufno >= buf_list_used) // new
+    якщо (bufno >= buf_list_used) // new
     {
-	if (bufno >= buf_list_size) // grow list
+	якщо (bufno >= buf_list_size) // grow list
 	{
 	    nbbuf_T	*t_buf_list = buf_list;
 	    size_t	bufsize;
@@ -701,24 +701,24 @@ nb_get_buf(int bufno)
 	    incr = bufno - buf_list_size + 90;
 	    buf_list_size += incr;
 	    bufsize = buf_list_size * sizeof(nbbuf_T);
-	    if (bufsize == 0 || bufsize / sizeof(nbbuf_T)
+	    якщо (bufsize == 0 || bufsize / sizeof(nbbuf_T)
 						      != (size_t)buf_list_size)
 	    {
 		// list size overflow, bail out
-		return NULL;
+		повернути NULL;
 	    }
 	    buf_list = vim_realloc(buf_list, bufsize);
-	    if (buf_list == NULL)
+	    якщо (buf_list == NULL)
 	    {
 		vim_free(t_buf_list);
 		buf_list_size = 0;
-		return NULL;
+		повернути NULL;
 	    }
 	    vim_memset(buf_list + buf_list_size - incr, 0,
 						      incr * sizeof(nbbuf_T));
 	}
 
-	while (buf_list_used <= bufno)
+	поки (buf_list_used <= bufno)
 	{
 	    // Default is to fire text changes.
 	    buf_list[buf_list_used].fireChanges = 1;
@@ -726,23 +726,23 @@ nb_get_buf(int bufno)
 	}
     }
 
-    return buf_list + bufno;
+    повернути buf_list + bufno;
 }
 
 /*
  * Return the number of buffers that are modified.
  */
-    static int
+    static ціле
 count_changed_buffers(void)
 {
     buf_T	*bufp;
-    int		n;
+    ціле		n;
 
     n = 0;
     FOR_ALL_BUFFERS(bufp)
-	if (bufp->b_changed)
+	якщо (bufp->b_changed)
 	    ++n;
-    return n;
+    повернути n;
 }
 
 /*
@@ -751,17 +751,17 @@ count_changed_buffers(void)
     void
 netbeans_end(void)
 {
-    int i;
+    ціле i;
     static char buf[128];
 
-    if (!NETBEANS_OPEN)
-	return;
+    якщо (!NETBEANS_OPEN)
+	повернути;
 
-    for (i = 0; i < buf_list_used; i++)
+    для (i = 0; i < buf_list_used; i++)
     {
-	if (!buf_list[i].bufp)
+	якщо (!buf_list[i].bufp)
 	    continue;
-	if (netbeansForcedQuit)
+	якщо (netbeansForcedQuit)
 	{
 	    // mark as unmodified so NetBeans won't put up dialog on "killed"
 	    sprintf(buf, "%d:unmodified=%d\n", i, r_cmdno);
@@ -783,9 +783,9 @@ netbeans_end(void)
     static void
 nb_send(char *buf, char *fun)
 {
-    if (nb_channel != NULL)
+    якщо (nb_channel != NULL)
 	channel_send(nb_channel, PART_SOCK, (char_u *)buf,
-						       (int)STRLEN(buf), fun);
+						       (ціле)STRLEN(buf), fun);
 }
 
 /*
@@ -793,15 +793,15 @@ nb_send(char *buf, char *fun)
  * handles a response with no information (except the command number).
  */
     static void
-nb_reply_nil(int cmdno)
+nb_reply_nil(ціле cmdno)
 {
     char reply[32];
 
     nbdebug(("REP %d: <none>\n", cmdno));
 
     // Avoid printing an annoying error message.
-    if (!NETBEANS_OPEN)
-	return;
+    якщо (!NETBEANS_OPEN)
+	повернути;
 
     sprintf(reply, "%d\n", cmdno);
     nb_send(reply, "nb_reply_nil");
@@ -813,7 +813,7 @@ nb_reply_nil(int cmdno)
  * "result" must have been quoted already (using nb_quote()).
  */
     static void
-nb_reply_text(int cmdno, char_u *result)
+nb_reply_text(ціле cmdno, char_u *result)
 {
     char_u *reply;
 
@@ -831,7 +831,7 @@ nb_reply_text(int cmdno, char_u *result)
  * Send a response with a number result code.
  */
     static void
-nb_reply_nr(int cmdno, long result)
+nb_reply_nr(ціле cmdno, long result)
 {
     char reply[32];
 
@@ -852,9 +852,9 @@ nb_quote(char_u *txt)
     char_u *p = txt;
     char_u *q = buf;
 
-    if (buf == NULL)
-	return NULL;
-    for (; *p; p++)
+    якщо (buf == NULL)
+	повернути NULL;
+    для (; *p; p++)
     {
 	switch (*p)
 	{
@@ -874,7 +874,7 @@ nb_quote(char_u *txt)
     }
     *q = '\0';
 
-    return buf;
+    повернути buf;
 }
 
 
@@ -889,22 +889,22 @@ nb_unquote(char_u *p, char_u **endp)
 {
     char *result = 0;
     char *q;
-    int done = 0;
+    ціле done = 0;
 
     // result is never longer than input
     result = alloc_clear(STRLEN(p) + 1);
-    if (result == NULL)
-	return NULL;
+    якщо (result == NULL)
+	повернути NULL;
 
-    if (*p++ != '"')
+    якщо (*p++ != '"')
     {
 	nbdebug(("nb_unquote called with string that doesn't start with a quote!: %s\n",
 			p));
 	result[0] = NUL;
-	return result;
+	повернути result;
     }
 
-    for (q = result; !done && *p != NUL;)
+    для (q = result; !done && *p != NUL;)
     {
 	switch (*p)
 	{
@@ -935,10 +935,10 @@ nb_unquote(char_u *p, char_u **endp)
 	}
     }
 
-    if (endp != NULL)
+    якщо (endp != NULL)
 	*endp = p;
 
-    return result;
+    повернути result;
 }
 
 /*
@@ -949,18 +949,18 @@ nb_unquote(char_u *p, char_u **endp)
 nb_partialremove(linenr_T lnum, colnr_T first, colnr_T last)
 {
     char_u *oldtext, *newtext;
-    int oldlen;
-    int lastbyte = last;
+    ціле oldlen;
+    ціле lastbyte = last;
 
     oldtext = ml_get(lnum);
     oldlen = ml_get_len(lnum);
-    if (first >= (colnr_T)oldlen || oldlen == 0)  // just in case
-	return;
-    if (lastbyte >= oldlen)
+    якщо (first >= (colnr_T)oldlen || oldlen == 0)  // just in case
+	повернути;
+    якщо (lastbyte >= oldlen)
 	lastbyte = oldlen - 1;
     newtext = alloc(oldlen - (lastbyte - first));
-    if (newtext == NULL)
-	return;
+    якщо (newtext == NULL)
+	повернути;
 
     mch_memmove(newtext, oldtext, first);
     STRMOVE(newtext + first, oldtext + lastbyte + 1);
@@ -975,14 +975,14 @@ nb_partialremove(linenr_T lnum, colnr_T first, colnr_T last)
     static void
 nb_joinlines(linenr_T first, linenr_T other)
 {
-    int len_first, len_other;
+    ціле len_first, len_other;
     char_u *p;
 
     len_first = ml_get_len(first);
     len_other = ml_get_len(other);
     p = alloc(len_first + len_other + 1);
-    if (p == NULL)
-	return;
+    якщо (p == NULL)
+	повернути;
 
     mch_memmove(p, ml_get(first), len_first);
     mch_memmove(p + len_first, ml_get(other), len_other + 1);
@@ -998,39 +998,39 @@ nb_joinlines(linenr_T first, linenr_T other)
  * gets a response (it's required) but a command does not.
  * For arguments see comment for nb_parse_cmd().
  */
-    static int
+    static ціле
 nb_do_cmd(
-    int		bufno,
+    ціле		bufno,
     char_u	*cmd,
-    int		func,
-    int		cmdno,
+    ціле		func,
+    ціле		cmdno,
     char_u	*args)	    // points to space before arguments or NUL
 {
-    int		do_update = 0;
+    ціле		do_update = 0;
     long	off = 0;
     nbbuf_T	*buf = nb_get_buf(bufno);
-    static int	skip = 0;
-    int		retval = OK;
+    static ціле	skip = 0;
+    ціле		retval = OK;
     char	*cp;	    // for when a char pointer is needed
 
     nbdebug(("%s %d: (%d) %s %s\n", (func) ? "FUN" : "CMD", cmdno, bufno, cmd,
 	STRCMP(cmd, "insert") == 0 ? "<text>" : (char *)args));
 
-    if (func)
+    якщо (func)
     {
 // =====================================================================
-	if (streq((char *)cmd, "getModified"))
+	якщо (streq((char *)cmd, "getModified"))
 	{
-	    if (buf == NULL || buf->bufp == NULL)
+	    якщо (buf == NULL || buf->bufp == NULL)
 		// Return the number of buffers that are modified.
 		nb_reply_nr(cmdno, (long)count_changed_buffers());
-	    else
+	    інакше
 		// Return whether the buffer is modified.
 		nb_reply_nr(cmdno, (long)(buf->bufp->b_changed
 					   || isNetbeansModified(buf->bufp)));
 // =====================================================================
 	}
-	else if (streq((char *)cmd, "saveAndExit"))
+	інакше якщо (streq((char *)cmd, "saveAndExit"))
 	{
 	    // Note: this will exit Vim if successful.
 	    coloncmd(":confirm qall");
@@ -1039,7 +1039,7 @@ nb_do_cmd(
 	    nb_reply_nr(cmdno, (long)count_changed_buffers());
 // =====================================================================
 	}
-	else if (streq((char *)cmd, "getCursor"))
+	інакше якщо (streq((char *)cmd, "getCursor"))
 	{
 	    char_u text[200];
 
@@ -1049,24 +1049,24 @@ nb_do_cmd(
 	    sprintf((char *)text, "%d %ld %d %ld",
 		    nb_getbufno(curbuf),
 		    (long)curwin->w_cursor.lnum,
-		    (int)curwin->w_cursor.col,
+		    (ціле)curwin->w_cursor.col,
 		    pos2off(curbuf, &curwin->w_cursor));
 	    nb_reply_text(cmdno, text);
 // =====================================================================
 	}
-	else if (streq((char *)cmd, "getAnno"))
+	інакше якщо (streq((char *)cmd, "getAnno"))
 	{
 	    long linenum = 0;
 #ifdef FEAT_SIGNS
-	    if (buf == NULL || buf->bufp == NULL)
+	    якщо (buf == NULL || buf->bufp == NULL)
 	    {
 		nbdebug(("    Invalid buffer identifier in getAnno\n"));
 		emsg(_(e_invalid_buffer_identifier_in_getanno));
 		retval = FAIL;
 	    }
-	    else
+	    інакше
 	    {
-		int serNum;
+		ціле serNum;
 
 		cp = (char *)args;
 		serNum = strtol(cp, &cp, 10);
@@ -1077,24 +1077,24 @@ nb_do_cmd(
 	    nb_reply_nr(cmdno, linenum);
 // =====================================================================
 	}
-	else if (streq((char *)cmd, "getLength"))
+	інакше якщо (streq((char *)cmd, "getLength"))
 	{
 	    long len = 0;
 
-	    if (buf == NULL || buf->bufp == NULL)
+	    якщо (buf == NULL || buf->bufp == NULL)
 	    {
 		nbdebug(("    invalid buffer identifier in getLength\n"));
 		emsg(_(e_invalid_buffer_identifier_in_getlength));
 		retval = FAIL;
 	    }
-	    else
+	    інакше
 	    {
 		len = get_buf_size(buf->bufp);
 	    }
 	    nb_reply_nr(cmdno, len);
 // =====================================================================
 	}
-	else if (streq((char *)cmd, "getText"))
+	інакше якщо (streq((char *)cmd, "getText"))
 	{
 	    long	len;
 	    linenr_T	nlines;
@@ -1103,30 +1103,30 @@ nb_do_cmd(
 	    char_u	*p;
 	    char_u	*line;
 
-	    if (buf == NULL || buf->bufp == NULL)
+	    якщо (buf == NULL || buf->bufp == NULL)
 	    {
 		nbdebug(("    invalid buffer identifier in getText\n"));
 		emsg(_(e_invalid_buffer_identifier_in_gettext));
 		retval = FAIL;
 	    }
-	    else
+	    інакше
 	    {
 		len = get_buf_size(buf->bufp);
 		nlines = buf->bufp->b_ml.ml_line_count;
 		text = alloc((len > 0) ? ((len + nlines) * 2) : 4);
-		if (text == NULL)
+		якщо (text == NULL)
 		{
 		    nbdebug(("    nb_do_cmd: getText has null text field\n"));
 		    retval = FAIL;
 		}
-		else
+		інакше
 		{
 		    p = text;
 		    *p++ = '\"';
-		    for (; lno <= nlines ; lno++)
+		    для (; lno <= nlines ; lno++)
 		    {
 			line = nb_quote(ml_get_buf(buf->bufp, lno, FALSE));
-			if (line != NULL)
+			якщо (line != NULL)
 			{
 			    STRCPY(p, line);
 			    p += STRLEN(line);
@@ -1139,40 +1139,40 @@ nb_do_cmd(
 		    *p = '\0';
 		}
 	    }
-	    if (text == NULL)
+	    якщо (text == NULL)
 		nb_reply_text(cmdno, (char_u *)"");
-	    else
+	    інакше
 	    {
 		nb_reply_text(cmdno, text);
 		vim_free(text);
 	    }
 // =====================================================================
 	}
-	else if (streq((char *)cmd, "remove"))
+	інакше якщо (streq((char *)cmd, "remove"))
 	{
 	    long count;
 	    pos_T first, last;
 	    pos_T *pos;
 	    pos_T *next;
 	    linenr_T del_from_lnum, del_to_lnum;  // lines to be deleted as a whole
-	    int oldFire = netbeansFireChanges;
-	    int oldSuppress = netbeansSuppressNoLines;
-	    int wasChanged;
+	    ціле oldFire = netbeansFireChanges;
+	    ціле oldSuppress = netbeansSuppressNoLines;
+	    ціле wasChanged;
 
-	    if (skip >= SKIP_STOP)
+	    якщо (skip >= SKIP_STOP)
 	    {
 		nbdebug(("    Skipping %s command\n", (char *) cmd));
 		nb_reply_nil(cmdno);
-		return OK;
+		повернути OK;
 	    }
 
-	    if (buf == NULL || buf->bufp == NULL)
+	    якщо (buf == NULL || buf->bufp == NULL)
 	    {
 		nbdebug(("    invalid buffer identifier in remove\n"));
 		emsg(_(e_invalid_buffer_identifier_in_remove));
 		retval = FAIL;
 	    }
-	    else
+	    інакше
 	    {
 		netbeansFireChanges = FALSE;
 		netbeansSuppressNoLines = TRUE;
@@ -1185,25 +1185,25 @@ nb_do_cmd(
 		args = (char_u *)cp;
 		// delete "count" chars, starting at "off"
 		pos = off2pos(buf->bufp, off);
-		if (!pos)
+		якщо (!pos)
 		{
 		    nbdebug(("    !bad position\n"));
 		    nb_reply_text(cmdno, (char_u *)"!bad position");
 		    netbeansFireChanges = oldFire;
 		    netbeansSuppressNoLines = oldSuppress;
-		    return FAIL;
+		    повернути FAIL;
 		}
 		first = *pos;
 		nbdebug(("    FIRST POS: line %ld, col %d\n",
 						      first.lnum, first.col));
 		pos = off2pos(buf->bufp, off+count-1);
-		if (!pos)
+		якщо (!pos)
 		{
 		    nbdebug(("    !bad count\n"));
 		    nb_reply_text(cmdno, (char_u *)"!bad count");
 		    netbeansFireChanges = oldFire;
 		    netbeansSuppressNoLines = oldSuppress;
-		    return FAIL;
+		    повернути FAIL;
 		}
 		last = *pos;
 		nbdebug(("    LAST POS: line %ld, col %d\n",
@@ -1218,16 +1218,16 @@ nb_do_cmd(
 		next = off2pos(buf->bufp, off + count);
 
 		// Remove part of the first line.
-		if (first.col != 0
+		якщо (first.col != 0
 				|| (next != NULL && first.lnum == next->lnum))
 		{
-		    if (first.lnum != last.lnum
+		    якщо (first.lnum != last.lnum
 			    || (next != NULL && first.lnum != next->lnum))
 		    {
 			// remove to the end of the first line
 			nb_partialremove(first.lnum, first.col,
 							     (colnr_T)MAXCOL);
-			if (first.lnum == last.lnum)
+			якщо (first.lnum == last.lnum)
 			{
 			    // Partial line to remove includes the end of
 			    // line.  Join the line with the next one, have
@@ -1236,7 +1236,7 @@ nb_do_cmd(
 			    del_to_lnum = next->lnum;
 			}
 		    }
-		    else
+		    інакше
 		    {
 			// remove within one line
 			nb_partialremove(first.lnum, first.col, last.col);
@@ -1245,17 +1245,17 @@ nb_do_cmd(
 		}
 
 		// Remove part of the last line.
-		if (first.lnum != last.lnum && next != NULL
+		якщо (first.lnum != last.lnum && next != NULL
 			&& next->col != 0 && last.lnum == next->lnum)
 		{
 		    nb_partialremove(last.lnum, 0, last.col);
-		    if (del_from_lnum > first.lnum)
+		    якщо (del_from_lnum > first.lnum)
 		    {
 			// Join end of last line to start of first line; last
 			// line is deleted below.
 			nb_joinlines(first.lnum, last.lnum);
 		    }
-		    else
+		    інакше
 			// First line is deleted as a whole, keep the last
 			// line.
 			--del_to_lnum;
@@ -1264,7 +1264,7 @@ nb_do_cmd(
 		// First is partial line; last line to remove includes
 		// the end of line; join first line to line following last
 		// line; line following last line is deleted below.
-		if (first.lnum != last.lnum && del_from_lnum > first.lnum
+		якщо (first.lnum != last.lnum && del_from_lnum > first.lnum
 			&& next != NULL && last.lnum != next->lnum)
 		{
 		    nb_joinlines(first.lnum, next->lnum);
@@ -1272,21 +1272,21 @@ nb_do_cmd(
 		}
 
 		// Delete whole lines if there are any.
-		if (del_to_lnum >= del_from_lnum)
+		якщо (del_to_lnum >= del_from_lnum)
 		{
-		    int i;
+		    ціле i;
 
 		    // delete signs from the lines being deleted
-		    for (i = del_from_lnum; i <= del_to_lnum; i++)
+		    для (i = del_from_lnum; i <= del_to_lnum; i++)
 		    {
-			int id = buf_findsign_id(buf->bufp, (linenr_T)i, NULL);
-			if (id > 0)
+			ціле id = buf_findsign_id(buf->bufp, (linenr_T)i, NULL);
+			якщо (id > 0)
 			{
 			    nbdebug(("    Deleting sign %d on line %d\n",
 								      id, i));
 			    buf_delsign(buf->bufp, 0, id, NULL);
 			}
-			else
+			інакше
 			{
 			    nbdebug(("    No sign on line %d\n", i));
 			}
@@ -1311,15 +1311,15 @@ nb_do_cmd(
 	    nb_reply_nil(cmdno);
 // =====================================================================
 	}
-	else if (streq((char *)cmd, "insert"))
+	інакше якщо (streq((char *)cmd, "insert"))
 	{
 	    char_u	*to_free;
 
-	    if (skip >= SKIP_STOP)
+	    якщо (skip >= SKIP_STOP)
 	    {
 		nbdebug(("    Skipping %s command\n", (char *) cmd));
 		nb_reply_nil(cmdno);
-		return OK;
+		повернути OK;
 	    }
 
 	    // get offset
@@ -1335,20 +1335,20 @@ nb_do_cmd(
 		    buf->bufp->b_ml.ml_line_count, STRLEN(args), off));
 	    */
 
-	    if (buf == NULL || buf->bufp == NULL)
+	    якщо (buf == NULL || buf->bufp == NULL)
 	    {
 		nbdebug(("    invalid buffer identifier in insert\n"));
 		emsg(_(e_invalid_buffer_identifier_in_insert));
 		retval = FAIL;
 	    }
-	    else if (args != NULL)
+	    інакше якщо (args != NULL)
 	    {
-		int	ff_detected = EOL_UNKNOWN;
-		int	buf_was_empty = (buf->bufp->b_ml.ml_flags & ML_EMPTY);
+		ціле	ff_detected = EOL_UNKNOWN;
+		ціле	buf_was_empty = (buf->bufp->b_ml.ml_flags & ML_EMPTY);
 		size_t	len = 0;
-		int	added = 0;
-		int	oldFire = netbeansFireChanges;
-		int	old_b_changed;
+		ціле	added = 0;
+		ціле	oldFire = netbeansFireChanges;
+		ціле	old_b_changed;
 		char_u	*nlp;
 		linenr_T lnum;
 		linenr_T lnum_start;
@@ -1364,20 +1364,20 @@ nb_do_cmd(
 		// Convert the specified character offset into a lnum/col
 		// position.
 		pos = off2pos(curbuf, off);
-		if (pos != NULL)
+		якщо (pos != NULL)
 		{
-		    if (pos->lnum <= 0)
+		    якщо (pos->lnum <= 0)
 			lnum_start = 1;
-		    else
+		    інакше
 			lnum_start = pos->lnum;
 		}
-		else
+		інакше
 		{
 		    // If the given position is not found, assume we want
 		    // the end of the file.  See setLocAndSize HACK.
-		    if (buf_was_empty)
+		    якщо (buf_was_empty)
 			lnum_start = 1;	    // above empty line
-		    else
+		    інакше
 			lnum_start = curbuf->b_ml.ml_line_count + 1;
 		}
 
@@ -1387,16 +1387,16 @@ nb_do_cmd(
 
 		// Loop over the "\n" separated lines of the argument.
 		do_update = 1;
-		while (*args != NUL)
+		поки (*args != NUL)
 		{
 		    nlp = vim_strchr(args, '\n');
-		    if (nlp == NULL)
+		    якщо (nlp == NULL)
 		    {
 			// Incomplete line, probably truncated.  Next "insert"
 			// command should append to this one.
 			len = STRLEN(args);
 		    }
-		    else
+		    інакше
 		    {
 			len = nlp - args;
 
@@ -1404,27 +1404,27 @@ nb_do_cmd(
 			 * We need to detect EOL style, because the commands
 			 * use a character offset.
 			 */
-			if (nlp > args && nlp[-1] == '\r')
+			якщо (nlp > args && nlp[-1] == '\r')
 			{
 			    ff_detected = EOL_DOS;
 			    --len;
 			}
-			else
+			інакше
 			    ff_detected = EOL_UNIX;
 		    }
 		    args[len] = NUL;
 
-		    if (lnum == lnum_start
+		    якщо (lnum == lnum_start
 			    && ((pos != NULL && pos->col > 0)
 				|| (lnum == 1 && buf_was_empty)))
 		    {
 			char_u	*oldline = ml_get(lnum);
 			char_u	*newline;
-			int	col = pos == NULL ? 0 : pos->col;
+			ціле	col = pos == NULL ? 0 : pos->col;
 
 			// Insert halfway a line.
 			newline = alloc(ml_get_len(lnum) + len + 1);
-			if (newline != NULL)
+			якщо (newline != NULL)
 			{
 			    mch_memmove(newline, oldline, (size_t)col);
 			    newline[col] = NUL;
@@ -1433,7 +1433,7 @@ nb_do_cmd(
 			    ml_replace(lnum, newline, FALSE);
 			}
 		    }
-		    else
+		    інакше
 		    {
 			// Append a new line.  Not that we always do this,
 			// also when the text doesn't end in a "\n".
@@ -1442,7 +1442,7 @@ nb_do_cmd(
 			++added;
 		    }
 
-		    if (nlp == NULL)
+		    якщо (nlp == NULL)
 			break;
 		    ++lnum;
 		    args = nlp + 1;
@@ -1455,12 +1455,12 @@ nb_do_cmd(
 		 * When starting with an empty buffer set the fileformat.
 		 * This is just guessing...
 		 */
-		if (buf_was_empty)
+		якщо (buf_was_empty)
 		{
-		    if (ff_detected == EOL_UNKNOWN)
-#if defined(MSWIN)
+		    якщо (ff_detected == EOL_UNKNOWN)
+#якщо defined(MSWIN)
 			ff_detected = EOL_DOS;
-#else
+#інакше
 			ff_detected = EOL_UNIX;
 #endif
 		    set_fileformat(ff_detected, OPT_LOCAL);
@@ -1481,24 +1481,24 @@ nb_do_cmd(
 	    vim_free(to_free);
 	    nb_reply_nil(cmdno); // or !error
 	}
-	else
+	інакше
 	{
 	    nbdebug(("UNIMPLEMENTED FUNCTION: %s\n", cmd));
 	    nb_reply_nil(cmdno);
 	    retval = FAIL;
 	}
     }
-    else // Not a function; no reply required.
+    інакше // Not a function; no reply required.
     {
 // =====================================================================
-	if (streq((char *)cmd, "create"))
+	якщо (streq((char *)cmd, "create"))
 	{
 	    // Create a buffer without a name.
-	    if (buf == NULL)
+	    якщо (buf == NULL)
 	    {
 		nbdebug(("    invalid buffer identifier in create\n"));
 		emsg(_(e_invalid_buffer_identifier_in_create));
-		return FAIL;
+		повернути FAIL;
 	    }
 	    VIM_CLEAR(buf->displayname);
 
@@ -1508,19 +1508,19 @@ nb_do_cmd(
 	    buf->bufp = curbuf;
 	    maketitle();
 	    buf->insertDone = FALSE;
-#if defined(FEAT_MENU) && defined(FEAT_GUI)
-	    if (gui.in_use)
+#якщо defined(FEAT_MENU) && defined(FEAT_GUI)
+	    якщо (gui.in_use)
 		gui_update_menus(0);
 #endif
 // =====================================================================
 	}
-	else if (streq((char *)cmd, "insertDone"))
+	інакше якщо (streq((char *)cmd, "insertDone"))
 	{
-	    if (buf == NULL || buf->bufp == NULL)
+	    якщо (buf == NULL || buf->bufp == NULL)
 	    {
 		nbdebug(("    invalid buffer identifier in insertDone\n"));
 	    }
-	    else
+	    інакше
 	    {
 		buf->bufp->b_start_eol = *args == 'T';
 		buf->insertDone = TRUE;
@@ -1530,46 +1530,46 @@ nb_do_cmd(
 	    }
 // =====================================================================
 	}
-	else if (streq((char *)cmd, "saveDone"))
+	інакше якщо (streq((char *)cmd, "saveDone"))
 	{
 	    long savedChars = atol((char *)args);
 
-	    if (buf == NULL || buf->bufp == NULL)
+	    якщо (buf == NULL || buf->bufp == NULL)
 		nbdebug(("    invalid buffer identifier in saveDone\n"));
-	    else
+	    інакше
 		print_save_msg(buf, savedChars);
 // =====================================================================
 	}
-	else if (streq((char *)cmd, "startDocumentListen"))
+	інакше якщо (streq((char *)cmd, "startDocumentListen"))
 	{
-	    if (buf == NULL)
+	    якщо (buf == NULL)
 	    {
 		nbdebug(("    invalid buffer identifier in startDocumentListen\n"));
 		emsg(_(e_invalid_buffer_identifier_in_startdocumentlisten));
-		return FAIL;
+		повернути FAIL;
 	    }
 	    buf->fireChanges = 1;
 // =====================================================================
 	}
-	else if (streq((char *)cmd, "stopDocumentListen"))
+	інакше якщо (streq((char *)cmd, "stopDocumentListen"))
 	{
-	    if (buf == NULL)
+	    якщо (buf == NULL)
 	    {
 		nbdebug(("    invalid buffer identifier in stopDocumentListen\n"));
 		emsg(_(e_invalid_buffer_identifier_in_stopdocumentlisten));
-		return FAIL;
+		повернути FAIL;
 	    }
 	    buf->fireChanges = 0;
-	    if (buf->bufp != NULL && buf->bufp->b_was_netbeans_file)
+	    якщо (buf->bufp != NULL && buf->bufp->b_was_netbeans_file)
 	    {
-		if (!buf->bufp->b_netbeans_file)
+		якщо (!buf->bufp->b_netbeans_file)
 		{
 		    nbdebug((e_netbeans_connection_lost_for_buffer_nr,
 							   buf->bufp->b_fnum));
 		    semsg(_(e_netbeans_connection_lost_for_buffer_nr),
 							   buf->bufp->b_fnum);
 		}
-		else
+		інакше
 		{
 		    // NetBeans uses stopDocumentListen when it stops editing
 		    // a file.  It then expects the buffer in Vim to
@@ -1581,25 +1581,25 @@ nb_do_cmd(
 	    }
 // =====================================================================
 	}
-	else if (streq((char *)cmd, "setTitle"))
+	інакше якщо (streq((char *)cmd, "setTitle"))
 	{
-	    if (buf == NULL)
+	    якщо (buf == NULL)
 	    {
 		nbdebug(("    invalid buffer identifier in setTitle\n"));
 		emsg(_(e_invalid_buffer_identifier_in_settitle));
-		return FAIL;
+		повернути FAIL;
 	    }
 	    vim_free(buf->displayname);
 	    buf->displayname = nb_unquote(args, NULL);
 // =====================================================================
 	}
-	else if (streq((char *)cmd, "initDone"))
+	інакше якщо (streq((char *)cmd, "initDone"))
 	{
-	    if (buf == NULL || buf->bufp == NULL)
+	    якщо (buf == NULL || buf->bufp == NULL)
 	    {
 		nbdebug(("    invalid buffer identifier in initDone\n"));
 		emsg(_(e_invalid_buffer_identifier_in_initdone));
-		return FAIL;
+		повернути FAIL;
 	    }
 	    do_update = 1;
 	    buf->initDone = TRUE;
@@ -1610,37 +1610,37 @@ nb_do_cmd(
 	    handle_key_queue();
 // =====================================================================
 	}
-	else if (streq((char *)cmd, "setBufferNumber")
+	інакше якщо (streq((char *)cmd, "setBufferNumber")
 		|| streq((char *)cmd, "putBufferNumber"))
 	{
 	    char_u	*path;
 	    buf_T	*bufp;
 
-	    if (buf == NULL)
+	    якщо (buf == NULL)
 	    {
 		nbdebug(("    invalid buffer identifier in setBufferNumber\n"));
 		emsg(_(e_invalid_buffer_identifier_in_setbuffernumber));
-		return FAIL;
+		повернути FAIL;
 	    }
 	    path = (char_u *)nb_unquote(args, NULL);
-	    if (path == NULL)
-		return FAIL;
+	    якщо (path == NULL)
+		повернути FAIL;
 	    bufp = buflist_findname(path);
 	    vim_free(path);
-	    if (bufp == NULL)
+	    якщо (bufp == NULL)
 	    {
 		nbdebug(("    File %s not found in setBufferNumber\n", args));
 		semsg(_(e_file_str_not_found_in_setbuffernumber), args);
-		return FAIL;
+		повернути FAIL;
 	    }
 	    buf->bufp = bufp;
 	    buf->nbbuf_number = bufp->b_fnum;
 
 	    // "setBufferNumber" has the side effect of jumping to the buffer
 	    // (don't know why!).  Don't do that for "putBufferNumber".
-	    if (*cmd != 'p')
+	    якщо (*cmd != 'p')
 		coloncmd(":buffer %d", bufp->b_fnum);
-	    else
+	    інакше
 	    {
 		buf->initDone = TRUE;
 
@@ -1650,13 +1650,13 @@ nb_do_cmd(
 
 // =====================================================================
 	}
-	else if (streq((char *)cmd, "setFullName"))
+	інакше якщо (streq((char *)cmd, "setFullName"))
 	{
-	    if (buf == NULL)
+	    якщо (buf == NULL)
 	    {
 		nbdebug(("    invalid buffer identifier in setFullName\n"));
 		emsg(_(e_invalid_buffer_identifier_in_setfullname));
-		return FAIL;
+		повернути FAIL;
 	    }
 	    vim_free(buf->displayname);
 	    buf->displayname = nb_unquote(args, NULL);
@@ -1667,19 +1667,19 @@ nb_do_cmd(
 	    netbeansReadFile = 1;
 	    buf->bufp = curbuf;
 	    maketitle();
-#if defined(FEAT_MENU) && defined(FEAT_GUI)
-	    if (gui.in_use)
+#якщо defined(FEAT_MENU) && defined(FEAT_GUI)
+	    якщо (gui.in_use)
 		gui_update_menus(0);
 #endif
 // =====================================================================
 	}
-	else if (streq((char *)cmd, "editFile"))
+	інакше якщо (streq((char *)cmd, "editFile"))
 	{
-	    if (buf == NULL)
+	    якщо (buf == NULL)
 	    {
 		nbdebug(("    invalid buffer identifier in editFile\n"));
 		emsg(_(e_invalid_buffer_identifier_in_editfile));
-		return FAIL;
+		повернути FAIL;
 	    }
 	    // Edit a file: like create + setFullName + read the file.
 	    vim_free(buf->displayname);
@@ -1690,24 +1690,24 @@ nb_do_cmd(
 	    buf->initDone = TRUE;
 	    do_update = 1;
 	    maketitle();
-#if defined(FEAT_MENU) && defined(FEAT_GUI)
-	    if (gui.in_use)
+#якщо defined(FEAT_MENU) && defined(FEAT_GUI)
+	    якщо (gui.in_use)
 		gui_update_menus(0);
 #endif
 // =====================================================================
 	}
-	else if (streq((char *)cmd, "setVisible"))
+	інакше якщо (streq((char *)cmd, "setVisible"))
 	{
-	    if (buf == NULL || buf->bufp == NULL)
+	    якщо (buf == NULL || buf->bufp == NULL)
 	    {
 		nbdebug(("    invalid buffer identifier in setVisible\n"));
 		// This message was commented out, probably because it can
 		// happen when shutting down.
-		if (p_verbose > 0)
+		якщо (p_verbose > 0)
 		    emsg(_(e_invalid_buffer_identifier_in_setvisible));
-		return FAIL;
+		повернути FAIL;
 	    }
-	    if (streq((char *)args, "T") && buf->bufp != curbuf)
+	    якщо (streq((char *)args, "T") && buf->bufp != curbuf)
 	    {
 		exarg_T exarg;
 		CLEAR_FIELD(exarg);
@@ -1721,54 +1721,54 @@ nb_do_cmd(
 
 #ifdef FEAT_GUI
 		// Side effect!!!.
-		if (gui.in_use)
+		якщо (gui.in_use)
 		    gui_mch_set_foreground();
 #endif
 	    }
 // =====================================================================
 	}
-	else if (streq((char *)cmd, "raise"))
+	інакше якщо (streq((char *)cmd, "raise"))
 	{
 #ifdef FEAT_GUI
 	    // Bring gvim to the foreground.
-	    if (gui.in_use)
+	    якщо (gui.in_use)
 		gui_mch_set_foreground();
 #endif
 // =====================================================================
 	}
-	else if (streq((char *)cmd, "setModified"))
+	інакше якщо (streq((char *)cmd, "setModified"))
 	{
-	    int prev_b_changed;
+	    ціле prev_b_changed;
 
-	    if (buf == NULL || buf->bufp == NULL)
+	    якщо (buf == NULL || buf->bufp == NULL)
 	    {
 		nbdebug(("    invalid buffer identifier in setModified\n"));
 		// This message was commented out, probably because it can
 		// happen when shutting down.
-		if (p_verbose > 0)
+		якщо (p_verbose > 0)
 		    emsg(_(e_invalid_buffer_identifier_in_setmodified));
-		return FAIL;
+		повернути FAIL;
 	    }
 	    prev_b_changed = buf->bufp->b_changed;
-	    if (streq((char *)args, "T"))
+	    якщо (streq((char *)args, "T"))
 		buf->bufp->b_changed = TRUE;
-	    else
+	    інакше
 	    {
 		stat_T	st;
 
 		// Assume NetBeans stored the file.  Reset the timestamp to
 		// avoid "file changed" warnings.
-		if (buf->bufp->b_ffname != NULL
+		якщо (buf->bufp->b_ffname != NULL
 			&& mch_stat((char *)buf->bufp->b_ffname, &st) >= 0)
 		    buf_store_time(buf->bufp, &st, buf->bufp->b_ffname);
 		buf->bufp->b_changed = FALSE;
 	    }
 	    buf->modified = buf->bufp->b_changed;
-	    if (prev_b_changed != buf->bufp->b_changed)
+	    якщо (prev_b_changed != buf->bufp->b_changed)
 	    {
 		check_status(buf->bufp);
 		redraw_tabline = TRUE;
-#if defined(FEAT_TABPANEL)
+#якщо defined(FEAT_TABPANEL)
 		redraw_tabpanel = TRUE;
 #endif
 		maketitle();
@@ -1776,35 +1776,35 @@ nb_do_cmd(
 	    }
 // =====================================================================
 	}
-	else if (streq((char *)cmd, "setModtime"))
+	інакше якщо (streq((char *)cmd, "setModtime"))
 	{
-	    if (buf == NULL || buf->bufp == NULL)
+	    якщо (buf == NULL || buf->bufp == NULL)
 		nbdebug(("    invalid buffer identifier in setModtime\n"));
-	    else
+	    інакше
 	    {
 		buf->bufp->b_mtime = atoi((char *)args);
 		buf->bufp->b_mtime_ns = 0;
 	    }
 // =====================================================================
 	}
-	else if (streq((char *)cmd, "setReadOnly"))
+	інакше якщо (streq((char *)cmd, "setReadOnly"))
 	{
-	    if (buf == NULL || buf->bufp == NULL)
+	    якщо (buf == NULL || buf->bufp == NULL)
 		nbdebug(("    invalid buffer identifier in setReadOnly\n"));
-	    else if (streq((char *)args, "T"))
+	    інакше якщо (streq((char *)args, "T"))
 		buf->bufp->b_p_ro = TRUE;
-	    else
+	    інакше
 		buf->bufp->b_p_ro = FALSE;
 // =====================================================================
 	}
-	else if (streq((char *)cmd, "setMark"))
+	інакше якщо (streq((char *)cmd, "setMark"))
 	{
 	    // not yet
 // =====================================================================
 	}
-	else if (streq((char *)cmd, "showBalloon"))
+	інакше якщо (streq((char *)cmd, "showBalloon"))
 	{
-#if defined(FEAT_BEVAL_GUI)
+#якщо defined(FEAT_BEVAL_GUI)
 	    static char	*text = NULL;
 
 	    /*
@@ -1812,40 +1812,40 @@ nb_do_cmd(
 	     * Ignore 'ballooneval' here.
 	     * The text pointer must remain valid for a while.
 	     */
-	    if (balloonEval != NULL)
+	    якщо (balloonEval != NULL)
 	    {
 		vim_free(text);
 		text = nb_unquote(args, NULL);
-		if (text != NULL)
+		якщо (text != NULL)
 		    gui_mch_post_balloon(balloonEval, (char_u *)text);
 	    }
 #endif
 // =====================================================================
 	}
-	else if (streq((char *)cmd, "setDot"))
+	інакше якщо (streq((char *)cmd, "setDot"))
 	{
 	    pos_T *pos;
 #ifdef NBDEBUG
 	    char_u *s;
 #endif
 
-	    if (buf == NULL || buf->bufp == NULL)
+	    якщо (buf == NULL || buf->bufp == NULL)
 	    {
 		nbdebug(("    invalid buffer identifier in setDot\n"));
 		emsg(_(e_invalid_buffer_identifier_in_setdot));
-		return FAIL;
+		повернути FAIL;
 	    }
 
 	    nb_set_curbuf(buf->bufp);
 
 	    // Don't want Visual mode now.
-	    if (VIsual_active)
+	    якщо (VIsual_active)
 		end_visual_mode();
 #ifdef NBDEBUG
 	    s = args;
 #endif
 	    pos = get_off_or_lnum(buf->bufp, &args);
-	    if (pos)
+	    якщо (pos)
 	    {
 		curwin->w_cursor = *pos;
 		check_cursor();
@@ -1853,7 +1853,7 @@ nb_do_cmd(
 		foldOpenCursor();
 #endif
 	    }
-	    else
+	    інакше
 	    {
 		nbdebug(("    BAD POSITION in setDot: %s\n", s));
 	    }
@@ -1867,45 +1867,45 @@ nb_do_cmd(
 	    out_flush_cursor(TRUE, FALSE);
 
 	    // Quit a hit-return or more prompt.
-	    if (State == MODE_HITRETURN || State == MODE_ASKMORE)
+	    якщо (State == MODE_HITRETURN || State == MODE_ASKMORE)
 	    {
 #ifdef FEAT_GUI_GTK
-		if (gui.in_use && gtk_main_level() > 0)
+		якщо (gui.in_use && gtk_main_level() > 0)
 		    gtk_main_quit();
 #endif
 	    }
 // =====================================================================
 	}
-	else if (streq((char *)cmd, "close"))
+	інакше якщо (streq((char *)cmd, "close"))
 	{
 #ifdef NBDEBUG
 	    char *name = "<NONE>";
 #endif
 
-	    if (buf == NULL)
+	    якщо (buf == NULL)
 	    {
 		nbdebug(("    invalid buffer identifier in close\n"));
 		emsg(_(e_invalid_buffer_identifier_in_close));
-		return FAIL;
+		повернути FAIL;
 	    }
 
 #ifdef NBDEBUG
-	    if (buf->displayname != NULL)
+	    якщо (buf->displayname != NULL)
 		name = buf->displayname;
 #endif
-	    if (buf->bufp == NULL)
+	    якщо (buf->bufp == NULL)
 	    {
 		nbdebug(("    invalid buffer identifier in close\n"));
 		// This message was commented out, probably because it can
 		// happen when shutting down.
-		if (p_verbose > 0)
+		якщо (p_verbose > 0)
 		    emsg(_(e_invalid_buffer_identifier_in_close));
 	    }
 	    nbdebug(("    CLOSE %d: %s\n", bufno, name));
 #ifdef FEAT_GUI
 	    need_mouse_correct = TRUE;
 #endif
-	    if (buf->bufp != NULL)
+	    якщо (buf->bufp != NULL)
 		do_buffer(DOBUF_WIPE, DOBUF_FIRST, FORWARD,
 						     buf->bufp->b_fnum, TRUE);
 	    buf->bufp = NULL;
@@ -1913,33 +1913,33 @@ nb_do_cmd(
 	    do_update = 1;
 // =====================================================================
 	}
-	else if (streq((char *)cmd, "setStyle")) // obsolete...
+	інакше якщо (streq((char *)cmd, "setStyle")) // obsolete...
 	{
 	    nbdebug(("    setStyle is obsolete!\n"));
 // =====================================================================
 	}
-	else if (streq((char *)cmd, "setExitDelay"))
+	інакше якщо (streq((char *)cmd, "setExitDelay"))
 	{
 	    // Only used in version 2.1.
 // =====================================================================
 	}
-	else if (streq((char *)cmd, "defineAnnoType"))
+	інакше якщо (streq((char *)cmd, "defineAnnoType"))
 	{
 #ifdef FEAT_SIGNS
-	    int typeNum;
+	    ціле typeNum;
 	    char_u *typeName;
 	    char_u *tooltip;
 	    char_u *p;
 	    char_u *glyphFile;
-	    int parse_error = FALSE;
+	    ціле parse_error = FALSE;
 	    char_u *fg;
 	    char_u *bg;
 
-	    if (buf == NULL)
+	    якщо (buf == NULL)
 	    {
 		nbdebug(("    invalid buffer identifier in defineAnnoType\n"));
 		emsg(_(e_invalid_buffer_identifier_in_defineannotype));
-		return FAIL;
+		повернути FAIL;
 	    }
 
 	    cp = (char *)args;
@@ -1957,20 +1957,20 @@ nb_do_cmd(
 
 	    args = skipwhite(args + 1);
 	    p = skiptowhite(args);
-	    if (*p != NUL)
+	    якщо (*p != NUL)
 	    {
 		*p = NUL;
 		p = skipwhite(p + 1);
 	    }
 	    fg = vim_strsave(args);
 	    bg = vim_strsave(p);
-	    if (STRLEN(fg) > MAX_COLOR_LENGTH || STRLEN(bg) > MAX_COLOR_LENGTH)
+	    якщо (STRLEN(fg) > MAX_COLOR_LENGTH || STRLEN(bg) > MAX_COLOR_LENGTH)
 	    {
 		emsg(_(e_highlighting_color_name_too_long_in_defineAnnoType));
 		VIM_CLEAR(typeName);
 		parse_error = TRUE;
 	    }
-	    else if (!nb_is_safe_string(typeName, VALID_SIGNNAME_CHARS) ||
+	    інакше якщо (!nb_is_safe_string(typeName, VALID_SIGNNAME_CHARS) ||
 		    (*fg != NUL && !nb_is_safe_string(fg, VALID_COLOR_CHARS)) ||
 		    (*bg != NUL && !nb_is_safe_string(bg, VALID_COLOR_CHARS)))
 	    {
@@ -1979,7 +1979,7 @@ nb_do_cmd(
 		VIM_CLEAR(typeName);
 		parse_error = TRUE;
 	    }
-	    else if (typeName != NULL && tooltip != NULL && glyphFile != NULL)
+	    інакше якщо (typeName != NULL && tooltip != NULL && glyphFile != NULL)
 		addsigntype(buf, typeNum, typeName, tooltip, glyphFile, fg, bg);
 
 	    vim_free(typeName);
@@ -1987,25 +1987,25 @@ nb_do_cmd(
 	    vim_free(bg);
 	    vim_free(tooltip);
 	    vim_free(glyphFile);
-	    if (parse_error)
-		return FAIL;
+	    якщо (parse_error)
+		повернути FAIL;
 
 #endif
 // =====================================================================
 	}
-	else if (streq((char *)cmd, "addAnno"))
+	інакше якщо (streq((char *)cmd, "addAnno"))
 	{
 #ifdef FEAT_SIGNS
-	    int serNum;
-	    int localTypeNum;
-	    int typeNum;
+	    ціле serNum;
+	    ціле localTypeNum;
+	    ціле typeNum;
 	    pos_T *pos;
 
-	    if (buf == NULL || buf->bufp == NULL)
+	    якщо (buf == NULL || buf->bufp == NULL)
 	    {
 		nbdebug(("    invalid buffer identifier in addAnno\n"));
 		emsg(_(e_invalid_buffer_identifier_in_addanno));
-		return FAIL;
+		повернути FAIL;
 	    }
 
 	    do_update = 1;
@@ -2022,37 +2022,37 @@ nb_do_cmd(
 	    pos = get_off_or_lnum(buf->bufp, &args);
 
 	    cp = (char *)args;
-	    vim_ignored = (int)strtol(cp, &cp, 10);
+	    vim_ignored = (ціле)strtol(cp, &cp, 10);
 	    args = (char_u *)cp;
 # ifdef NBDEBUG
-	    if (vim_ignored != -1)
+	    якщо (vim_ignored != -1)
 		nbdebug(("    partial line annotation -- Not Yet Implemented!\n"));
 # endif
-	    if (serNum >= GUARDEDOFFSET)
+	    якщо (serNum >= GUARDEDOFFSET)
 	    {
 		nbdebug(("    too many annotations! ignoring...\n"));
-		return FAIL;
+		повернути FAIL;
 	    }
-	    if (pos)
+	    якщо (pos)
 	    {
 		coloncmd(":sign place %d line=%ld name=%d buffer=%d",
 			   serNum, pos->lnum, typeNum, buf->bufp->b_fnum);
-		if (typeNum == curPCtype)
+		якщо (typeNum == curPCtype)
 		    coloncmd(":sign jump %d buffer=%d", serNum,
 						       buf->bufp->b_fnum);
 	    }
 #endif
 // =====================================================================
 	}
-	else if (streq((char *)cmd, "removeAnno"))
+	інакше якщо (streq((char *)cmd, "removeAnno"))
 	{
 #ifdef FEAT_SIGNS
-	    int serNum;
+	    ціле serNum;
 
-	    if (buf == NULL || buf->bufp == NULL)
+	    якщо (buf == NULL || buf->bufp == NULL)
 	    {
 		nbdebug(("    invalid buffer identifier in removeAnno\n"));
-		return FAIL;
+		повернути FAIL;
 	    }
 	    do_update = 1;
 	    cp = (char *)args;
@@ -2064,34 +2064,34 @@ nb_do_cmd(
 #endif
 // =====================================================================
 	}
-	else if (streq((char *)cmd, "moveAnnoToFront"))
+	інакше якщо (streq((char *)cmd, "moveAnnoToFront"))
 	{
 #ifdef FEAT_SIGNS
 	    nbdebug(("    moveAnnoToFront: Not Yet Implemented!\n"));
 #endif
 // =====================================================================
 	}
-	else if (streq((char *)cmd, "guard") || streq((char *)cmd, "unguard"))
+	інакше якщо (streq((char *)cmd, "guard") || streq((char *)cmd, "unguard"))
 	{
-	    int len;
+	    ціле len;
 	    pos_T first;
 	    pos_T last;
 	    pos_T *pos;
-	    int un = (cmd[0] == 'u');
-	    static int guardId = GUARDEDOFFSET;
+	    ціле un = (cmd[0] == 'u');
+	    static ціле guardId = GUARDEDOFFSET;
 
-	    if (skip >= SKIP_STOP)
+	    якщо (skip >= SKIP_STOP)
 	    {
 		nbdebug(("    Skipping %s command\n", (char *) cmd));
-		return OK;
+		повернути OK;
 	    }
 
 	    nb_init_graphics();
 
-	    if (buf == NULL || buf->bufp == NULL)
+	    якщо (buf == NULL || buf->bufp == NULL)
 	    {
 		nbdebug(("    invalid buffer identifier in %s command\n", cmd));
-		return FAIL;
+		повернути FAIL;
 	    }
 	    nb_set_curbuf(buf->bufp);
 	    cp = (char *)args;
@@ -2100,13 +2100,13 @@ nb_do_cmd(
 	    args = (char_u *)cp;
 	    pos = off2pos(buf->bufp, off);
 	    do_update = 1;
-	    if (!pos)
+	    якщо (!pos)
 		nbdebug(("    no such start pos in %s, %ld\n", cmd, off));
-	    else
+	    інакше
 	    {
 		first = *pos;
 		pos = off2pos(buf->bufp, off + len - 1);
-		if (pos != NULL && pos->col == 0)
+		якщо (pos != NULL && pos->col == 0)
 		{
 			/*
 			 * In Java Swing the offset is a position between 2
@@ -2115,10 +2115,10 @@ nb_do_cmd(
 			 */
 			pos = off2pos(buf->bufp, off + len - 2);
 		}
-		if (!pos)
+		якщо (!pos)
 		    nbdebug(("    no such end pos in %s, %ld\n",
 			    cmd, off + len - 1));
-		else
+		інакше
 		{
 		    long lnum;
 		    last = *pos;
@@ -2127,15 +2127,15 @@ nb_do_cmd(
 			     first.lnum, first.col,
 			     last.lnum, last.col));
 #ifdef FEAT_SIGNS
-		    for (lnum = first.lnum; lnum <= last.lnum; lnum++)
+		    для (lnum = first.lnum; lnum <= last.lnum; lnum++)
 		    {
-			if (un)
+			якщо (un)
 			{
 			    // never used
 			}
-			else
+			інакше
 			{
-			    if (buf_findsigntype_id(buf->bufp, lnum,
+			    якщо (buf_findsigntype_id(buf->bufp, lnum,
 				GUARDED) == 0)
 			    {
 				coloncmd(
@@ -2151,38 +2151,38 @@ nb_do_cmd(
 	    }
 // =====================================================================
 	}
-	else if (streq((char *)cmd, "startAtomic"))
+	інакше якщо (streq((char *)cmd, "startAtomic"))
 	{
 	    inAtomic = 1;
 // =====================================================================
 	}
-	else if (streq((char *)cmd, "endAtomic"))
+	інакше якщо (streq((char *)cmd, "endAtomic"))
 	{
 	    inAtomic = 0;
-	    if (needupdate)
+	    якщо (needupdate)
 	    {
 		do_update = 1;
 		needupdate = 0;
 	    }
 // =====================================================================
 	}
-	else if (streq((char *)cmd, "save"))
+	інакше якщо (streq((char *)cmd, "save"))
 	{
 	    /*
 	     * NOTE - This command is obsolete wrt NetBeans. It's left in
 	     * only for historical reasons.
 	     */
-	    if (buf == NULL || buf->bufp == NULL)
+	    якщо (buf == NULL || buf->bufp == NULL)
 	    {
 		nbdebug(("    invalid buffer identifier in %s command\n", cmd));
-		return FAIL;
+		повернути FAIL;
 	    }
 
 	    // the following is taken from ex_cmds.c (do_wqall function)
-	    if (bufIsChanged(buf->bufp))
+	    якщо (bufIsChanged(buf->bufp))
 	    {
 		// Only write if the buffer can be written.
-		if (p_write
+		якщо (p_write
 			&& !buf->bufp->b_p_ro
 			&& buf->bufp->b_ffname != NULL
 			&& !bt_dontwrite(buf->bufp))
@@ -2192,47 +2192,47 @@ nb_do_cmd(
 		    set_bufref(&bufref, buf->bufp);
 		    buf_write_all(buf->bufp, FALSE);
 		    // an autocommand may have deleted the buffer
-		    if (!bufref_valid(&bufref))
+		    якщо (!bufref_valid(&bufref))
 			buf->bufp = NULL;
 		}
 	    }
-	    else
+	    інакше
 	    {
 		nbdebug(("    Buffer has no changes!\n"));
 	    }
 // =====================================================================
 	}
-	else if (streq((char *)cmd, "netbeansBuffer"))
+	інакше якщо (streq((char *)cmd, "netbeansBuffer"))
 	{
-	    if (buf == NULL || buf->bufp == NULL)
+	    якщо (buf == NULL || buf->bufp == NULL)
 	    {
 		nbdebug(("    invalid buffer identifier in %s command\n", cmd));
-		return FAIL;
+		повернути FAIL;
 	    }
-	    if (*args == 'T')
+	    якщо (*args == 'T')
 	    {
 		buf->bufp->b_netbeans_file = true;
 		buf->bufp->b_was_netbeans_file = true;
 	    }
-	    else
+	    інакше
 		buf->bufp->b_netbeans_file = false;
 // =====================================================================
 	}
-	else if (streq((char *)cmd, "specialKeys"))
+	інакше якщо (streq((char *)cmd, "specialKeys"))
 	{
 	    special_keys(args);
 // =====================================================================
 	}
-	else if (streq((char *)cmd, "actionMenuItem"))
+	інакше якщо (streq((char *)cmd, "actionMenuItem"))
 	{
 	    // not used yet
 // =====================================================================
 	}
-	else if (streq((char *)cmd, "version"))
+	інакше якщо (streq((char *)cmd, "version"))
 	{
 	    // not used yet
 	}
-	else
+	інакше
 	{
 	    nbdebug(("Unrecognised command: %s\n", cmd));
 	}
@@ -2240,7 +2240,7 @@ nb_do_cmd(
 	 * Unrecognized command is ignored.
 	 */
     }
-    if (inAtomic && do_update)
+    якщо (inAtomic && do_update)
     {
 	needupdate = 1;
 	do_update = 0;
@@ -2251,7 +2251,7 @@ nb_do_cmd(
      * and it may no longer be necessary. If it's not needed then needupdate
      * and do_update can also be removed.
      */
-    if (buf != NULL && buf->initDone && do_update)
+    якщо (buf != NULL && buf->initDone && do_update)
     {
 	update_screen(UPD_NOT_VALID);
 	setcursor();
@@ -2259,16 +2259,16 @@ nb_do_cmd(
 	out_flush_cursor(TRUE, FALSE);
 
 	// Quit a hit-return or more prompt.
-	if (State == MODE_HITRETURN || State == MODE_ASKMORE)
+	якщо (State == MODE_HITRETURN || State == MODE_ASKMORE)
 	{
 #ifdef FEAT_GUI_GTK
-	    if (gui.in_use && gtk_main_level() > 0)
+	    якщо (gui.in_use && gtk_main_level() > 0)
 		gtk_main_quit();
 #endif
 	}
     }
 
-    return retval;
+    повернути retval;
 }
 
 
@@ -2280,13 +2280,13 @@ nb_do_cmd(
     static void
 nb_set_curbuf(buf_T *buf)
 {
-    if (curbuf == buf)
-	return;
+    якщо (curbuf == buf)
+	повернути;
 
-    if (buf_jump_open_win(buf) != NULL)
-	return;
-    if ((swb_flags & SWB_USETAB) && buf_jump_open_tab(buf) != NULL)
-	return;
+    якщо (buf_jump_open_win(buf) != NULL)
+	повернути;
+    якщо ((swb_flags & SWB_USETAB) && buf_jump_open_tab(buf) != NULL)
+	повернути;
     set_curbuf(buf, DOBUF_GOTO);
 }
 
@@ -2325,14 +2325,14 @@ special_keys(char_u *args)
     char keybuf[KEYBUFLEN];
     char cmdbuf[256];
 
-    while (tok != NULL)
+    поки (tok != NULL)
     {
-	int i = 0;
+	ціле i = 0;
 
-	if ((sep = strchr(tok, '-')) != NULL)
+	якщо ((sep = strchr(tok, '-')) != NULL)
 	{
 	    *sep = NUL;
-	    while (*tok && i + 2 < KEYBUFLEN)
+	    поки (*tok && i + 2 < KEYBUFLEN)
 	    {
 		switch (*tok)
 		{
@@ -2349,20 +2349,20 @@ special_keys(char_u *args)
 	    tok++;
 	}
 
-	if (strlen(tok) + i < KEYBUFLEN)
+	якщо (strlen(tok) + i < KEYBUFLEN)
 	{
 	    // Only allow alphanumeric and function-key name characters.
 	    // Reject anything else to prevent map command injection.
-	    int safe = TRUE;
-	    for (char_u *tp = (char_u *)tok; *tp != NUL; tp++)
+	    ціле safe = TRUE;
+	    для (char_u *tp = (char_u *)tok; *tp != NUL; tp++)
 	    {
-		if (!ASCII_ISALNUM(*tp) && *tp != '-')
+		якщо (!ASCII_ISALNUM(*tp) && *tp != '-')
 		{
 		    safe = FALSE;
 		    break;
 		}
 	    }
-	    if (safe)
+	    якщо (safe)
 	    {
 		vim_strncpy((char_u *)&keybuf[i], (char_u *)tok, KEYBUFLEN - i - 1);
 		vim_snprintf(cmdbuf, sizeof(cmdbuf),
@@ -2392,12 +2392,12 @@ ex_nbstart(
     exarg_T	*eap)
 {
 #ifdef FEAT_GUI
-# if !defined(FEAT_GUI_X11) && !defined(FEAT_GUI_GTK)  \
+# якщо !defined(FEAT_GUI_X11) && !defined(FEAT_GUI_GTK)  \
 		&& !defined(FEAT_GUI_MSWIN)
-    if (gui.in_use)
+    якщо (gui.in_use)
     {
 	emsg(_(e_netbeans_is_not_supported_with_this_GUI));
-	return;
+	повернути;
     }
 # endif
 #endif
@@ -2410,10 +2410,10 @@ ex_nbstart(
     static void
 nb_init_graphics(void)
 {
-    static int did_init = FALSE;
+    static ціле did_init = FALSE;
 
-    if (did_init)
-	return;
+    якщо (did_init)
+	повернути;
 
     coloncmd(":highlight NBGuarded guibg=Cyan guifg=Black"
 	    " ctermbg=LightCyan ctermfg=Black");
@@ -2426,19 +2426,19 @@ nb_init_graphics(void)
  * Convert key to netbeans name.  This uses the global "mod_mask".
  */
     static void
-netbeans_keyname(int key, char *buf)
+netbeans_keyname(ціле key, char *buf)
 {
     char *name = 0;
     char namebuf[2];
-    int ctrl  = 0;
-    int shift = 0;
-    int alt   = 0;
+    ціле ctrl  = 0;
+    ціле shift = 0;
+    ціле alt   = 0;
 
-    if (mod_mask & MOD_MASK_CTRL)
+    якщо (mod_mask & MOD_MASK_CTRL)
 	ctrl = 1;
-    if (mod_mask & MOD_MASK_SHIFT)
+    якщо (mod_mask & MOD_MASK_SHIFT)
 	shift = 1;
-    if (mod_mask & MOD_MASK_ALT)
+    якщо (mod_mask & MOD_MASK_ALT)
 	alt = 1;
 
 
@@ -2469,31 +2469,31 @@ netbeans_keyname(int key, char *buf)
 	case K_F12:		name = "F12";		break;
 	case K_S_F12:	name = "F12";	shift = 1;	break;
 	default:
-			if (key >= ' ' && key <= '~')
+			якщо (key >= ' ' && key <= '~')
 			{
 			    // Allow ASCII characters.
 			    name = namebuf;
 			    namebuf[0] = key;
 			    namebuf[1] = NUL;
 			}
-			else
+			інакше
 			    name = "X";
 			break;
     }
 
     buf[0] = '\0';
-    if (ctrl)
+    якщо (ctrl)
 	strcat(buf, "C");
-    if (shift)
+    якщо (shift)
 	strcat(buf, "S");
-    if (alt)
+    якщо (alt)
 	strcat(buf, "M"); // META
-    if (ctrl || shift || alt)
+    якщо (ctrl || shift || alt)
 	strcat(buf, "-");
     strcat(buf, name);
 }
 
-#if defined(FEAT_BEVAL)
+#якщо defined(FEAT_BEVAL)
 /*
  * Function to be called for balloon evaluation.  Grabs the text under the
  * cursor and sends it to the debugger for evaluation.  The debugger should
@@ -2502,32 +2502,32 @@ netbeans_keyname(int key, char *buf)
     void
 netbeans_beval_cb(
 	BalloonEval	*beval,
-	int		 state UNUSED)
+	ціле		 state UNUSED)
 {
     win_T	*wp;
     char_u	*text;
     linenr_T	lnum;
-    int		col;
+    ціле		col;
     char	*buf;
     char_u	*p;
 
     // Don't do anything when 'ballooneval' is off, messages scrolled the
     // windows up or we have no connection.
-    if (!can_use_beval() || !NETBEANS_OPEN)
-	return;
+    якщо (!can_use_beval() || !NETBEANS_OPEN)
+	повернути;
 
-    if (get_beval_info(beval, TRUE, &wp, &lnum, &text, &col) != OK)
-	return;
+    якщо (get_beval_info(beval, TRUE, &wp, &lnum, &text, &col) != OK)
+	повернути;
 
     // Send debugger request.  Only when the text is of reasonable
     // length.
-    if (text != NULL && text[0] != NUL && STRLEN(text) < MAXPATHL)
+    якщо (text != NULL && text[0] != NUL && STRLEN(text) < MAXPATHL)
     {
 	buf = alloc(MAXPATHL * 2 + 25);
-	if (buf != NULL)
+	якщо (buf != NULL)
 	{
 	    p = nb_quote(text);
-	    if (p != NULL)
+	    якщо (p != NULL)
 	    {
 		vim_snprintf(buf, MAXPATHL * 2 + 25,
 			"0:balloonText=%d \"%s\"\n", r_cmdno, p);
@@ -2545,28 +2545,28 @@ netbeans_beval_cb(
 /*
  * Return TRUE when the netbeans connection is active.
  */
-    int
+    ціле
 netbeans_active(void)
 {
-    return NETBEANS_OPEN;
+    повернути NETBEANS_OPEN;
 }
 
 /*
  * Tell netbeans that the window was opened, ready for commands.
  */
     void
-netbeans_open(char *params, int doabort)
+netbeans_open(char *params, ціле doabort)
 {
     char *cmd = "0:startupDone=0\n";
 
-    if (NETBEANS_OPEN)
+    якщо (NETBEANS_OPEN)
     {
 	emsg(_(e_netbeans_already_connected));
-	return;
+	повернути;
     }
 
-    if (netbeans_connect(params, doabort) != OK)
-	return;
+    якщо (netbeans_connect(params, doabort) != OK)
+	повернути;
 
     nbdebug(("EVT: %s", cmd));
     nb_send(cmd, "netbeans_startup_done");
@@ -2588,7 +2588,7 @@ netbeans_send_disconnect(void)
 {
     char buf[128];
 
-    if (NETBEANS_OPEN)
+    якщо (NETBEANS_OPEN)
     {
 	sprintf(buf, "0:disconnect=%d\n", r_cmdno);
 	nbdebug(("EVT: %s", buf));
@@ -2596,37 +2596,37 @@ netbeans_send_disconnect(void)
     }
 }
 
-#if defined(FEAT_EVAL)
-    int
-set_ref_in_nb_channel(int copyID)
+#якщо defined(FEAT_EVAL)
+    ціле
+set_ref_in_nb_channel(ціле copyID)
 {
-    int abort = FALSE;
+    ціле abort = FALSE;
     typval_T tv;
 
-    if (nb_channel == NULL)
-	return FALSE;
+    якщо (nb_channel == NULL)
+	повернути FALSE;
 
     tv.v_type = VAR_CHANNEL;
     tv.vval.v_channel = nb_channel;
     abort = set_ref_in_item(&tv, copyID, NULL, NULL, NULL);
-    return abort;
+    повернути abort;
 }
 #endif
 
-#if defined(FEAT_GUI_X11) || defined(FEAT_GUI_MSWIN)
+#якщо defined(FEAT_GUI_X11) || defined(FEAT_GUI_MSWIN)
 /*
  * Tell netbeans that the window was moved or resized.
  */
     void
-netbeans_frame_moved(int new_x, int new_y)
+netbeans_frame_moved(ціле new_x, ціле new_y)
 {
     char buf[128];
 
-    if (!NETBEANS_OPEN)
-	return;
+    якщо (!NETBEANS_OPEN)
+	повернути;
 
     sprintf(buf, "0:geometry=%d %d %d %d %d\n",
-		    r_cmdno, (int)Columns, (int)Rows, new_x, new_y);
+		    r_cmdno, (ціле)Columns, (ціле)Rows, new_x, new_y);
     // nbdebug(("EVT: %s", buf)); happens too many times during a move
     nb_send(buf, "netbeans_frame_moved");
 }
@@ -2638,21 +2638,21 @@ netbeans_frame_moved(int new_x, int new_y)
     void
 netbeans_file_activated(buf_T *bufp)
 {
-    int bufno = nb_getbufno(bufp);
+    ціле bufno = nb_getbufno(bufp);
     nbbuf_T *bp = nb_get_buf(bufno);
     char    buffer[2*MAXPATHL];
     char_u  *q;
 
-    if (!NETBEANS_OPEN || !bufp->b_netbeans_file || dosetvisible)
-	return;
+    якщо (!NETBEANS_OPEN || !bufp->b_netbeans_file || dosetvisible)
+	повернути;
 
     q = nb_quote(bufp->b_ffname);
-    if (q == NULL)
-	return;
-    if (bp == NULL)
+    якщо (q == NULL)
+	повернути;
+    якщо (bp == NULL)
     {
 	vim_free(q);
-	return;
+	повернути;
     }
 
     vim_snprintf(buffer, sizeof(buffer),  "%d:fileOpened=%d \"%s\" %s %s\n",
@@ -2674,21 +2674,21 @@ netbeans_file_activated(buf_T *bufp)
     void
 netbeans_file_opened(buf_T *bufp)
 {
-    int bufno = nb_getbufno(bufp);
+    ціле bufno = nb_getbufno(bufp);
     char    buffer[2*MAXPATHL];
     char_u  *q;
     nbbuf_T *bp = nb_get_buf(nb_getbufno(bufp));
-    int	    bnum;
+    ціле	    bnum;
 
-    if (!NETBEANS_OPEN)
-	return;
+    якщо (!NETBEANS_OPEN)
+	повернути;
 
     q = nb_quote(bufp->b_ffname);
-    if (q == NULL)
-	return;
-    if (bp != NULL)
+    якщо (q == NULL)
+	повернути;
+    якщо (bp != NULL)
 	bnum = bufno;
-    else
+    інакше
 	bnum = 0;
 
     vim_snprintf(buffer, sizeof(buffer), "%d:fileOpened=%d \"%s\" %s %s\n",
@@ -2702,7 +2702,7 @@ netbeans_file_opened(buf_T *bufp)
     nbdebug(("EVT: %s", buffer));
 
     nb_send(buffer, "netbeans_file_opened");
-    if (p_acd && vim_chdirfile(bufp->b_ffname, "auto") == OK)
+    якщо (p_acd && vim_chdirfile(bufp->b_ffname, "auto") == OK)
     {
 	last_chdir_reason = "netbeans";
 	shorten_fnames(TRUE);
@@ -2715,12 +2715,12 @@ netbeans_file_opened(buf_T *bufp)
     void
 netbeans_file_killed(buf_T *bufp)
 {
-    int		bufno = nb_getbufno(bufp);
+    ціле		bufno = nb_getbufno(bufp);
     nbbuf_T	*nbbuf = nb_get_buf(bufno);
     char	buffer[2*MAXPATHL];
 
-    if (!NETBEANS_OPEN || bufno == -1)
-	return;
+    якщо (!NETBEANS_OPEN || bufno == -1)
+	повернути;
 
     nbdebug(("netbeans_file_killed:\n"));
     nbdebug(("    Killing bufno: %d", bufno));
@@ -2731,7 +2731,7 @@ netbeans_file_killed(buf_T *bufp)
 
     nb_send(buffer, "netbeans_file_killed");
 
-    if (nbbuf != NULL)
+    якщо (nbbuf != NULL)
 	nbbuf->bufp = NULL;
 }
 
@@ -2741,24 +2741,24 @@ netbeans_file_killed(buf_T *bufp)
  * Otherwise store the buffer number in "*bufnop".
  */
     static nbbuf_T *
-nb_bufp2nbbuf_fire(buf_T *bufp, int *bufnop)
+nb_bufp2nbbuf_fire(buf_T *bufp, ціле *bufnop)
 {
-    int		bufno;
+    ціле		bufno;
     nbbuf_T	*nbbuf;
 
-    if (!NETBEANS_OPEN || !netbeansFireChanges)
-	return NULL;		// changes are not reported at all
+    якщо (!NETBEANS_OPEN || !netbeansFireChanges)
+	повернути NULL;		// changes are not reported at all
 
     bufno = nb_getbufno(bufp);
-    if (bufno <= 0)
-	return NULL;		// file is not known to NetBeans
+    якщо (bufno <= 0)
+	повернути NULL;		// file is not known to NetBeans
 
     nbbuf = nb_get_buf(bufno);
-    if (nbbuf != NULL && !nbbuf->fireChanges)
-	return NULL;		// changes in this buffer are not reported
+    якщо (nbbuf != NULL && !nbbuf->fireChanges)
+	повернути NULL;		// changes in this buffer are not reported
 
     *bufnop = bufno;
-    return nbbuf;
+    повернути nbbuf;
 }
 
 /*
@@ -2770,25 +2770,25 @@ netbeans_inserted(
     linenr_T	linenr,
     colnr_T	col,
     char_u	*txt,
-    int		newlen)
+    ціле		newlen)
 {
     char_u	*buf;
-    int		bufno;
+    ціле		bufno;
     nbbuf_T	*nbbuf;
     pos_T	pos;
     long	off;
     char_u	*p;
     char_u	*newtxt;
 
-    if (!NETBEANS_OPEN)
-	return;
+    якщо (!NETBEANS_OPEN)
+	повернути;
 
     nbbuf = nb_bufp2nbbuf_fire(bufp, &bufno);
-    if (nbbuf == NULL)
-	return;
+    якщо (nbbuf == NULL)
+	повернути;
 
     // Don't mark as modified for initial read
-    if (nbbuf->insertDone)
+    якщо (nbbuf->insertDone)
 	nbbuf->modified = 1;
 
     // send the "insert" EVT
@@ -2801,7 +2801,7 @@ netbeans_inserted(
     off = pos2off(bufp, &pos);
 
     p = nb_quote(newtxt);
-    if (p != NULL)
+    якщо (p != NULL)
     {
 	buf = alloc(128 + 2*newlen);
 	sprintf((char *)buf, "%d:insert=%d %ld \"%s\"\n",
@@ -2825,22 +2825,22 @@ netbeans_removed(
     long	len)
 {
     char_u	buf[128];
-    int		bufno;
+    ціле		bufno;
     nbbuf_T	*nbbuf;
     pos_T	pos;
     long	off;
 
-    if (!NETBEANS_OPEN)
-	return;
+    якщо (!NETBEANS_OPEN)
+	повернути;
 
     nbbuf = nb_bufp2nbbuf_fire(bufp, &bufno);
-    if (nbbuf == NULL)
-	return;
+    якщо (nbbuf == NULL)
+	повернути;
 
-    if (len < 0)
+    якщо (len < 0)
     {
 	nbdebug(("Negative len %ld in netbeans_removed()!\n", len));
-	return;
+	повернути;
     }
 
     nbbuf->modified = 1;
@@ -2870,20 +2870,20 @@ netbeans_unmodified(buf_T *bufp UNUSED)
  * to decide what to do (if anything) with this event.
  */
     void
-netbeans_button_release(int button)
+netbeans_button_release(ціле button)
 {
     char	buf[128];
-    int		bufno;
+    ціле		bufno;
 
-    if (!NETBEANS_OPEN)
-	return;
+    якщо (!NETBEANS_OPEN)
+	повернути;
 
     bufno = nb_getbufno(curbuf);
 
-    if (bufno < 0 || curwin == NULL || curwin->w_buffer != curbuf)
-	return;
+    якщо (bufno < 0 || curwin == NULL || curwin->w_buffer != curbuf)
+	повернути;
 
-    int col = mouse_col - curwin->w_wincol
+    ціле col = mouse_col - curwin->w_wincol
 	- ((curwin->w_p_nu || curwin->w_p_rnu) ? 9 : 1);
     long off = pos2off(curbuf, &curwin->w_cursor);
 
@@ -2905,13 +2905,13 @@ netbeans_button_release(int button)
  * Return TRUE when the key was sent, FALSE when the command has been
  * postponed.
  */
-    int
-netbeans_keycommand(int key)
+    ціле
+netbeans_keycommand(ціле key)
 {
     char	keyName[60];
 
     netbeans_keyname(key, keyName);
-    return netbeans_keystring((char_u *)keyName);
+    повернути netbeans_keystring((char_u *)keyName);
 }
 
 
@@ -2921,35 +2921,35 @@ netbeans_keycommand(int key)
  * Return TRUE when the key was sent, FALSE when the command has been
  * postponed.
  */
-    static int
+    static ціле
 netbeans_keystring(char_u *keyName)
 {
     char	buf[2*MAXPATHL];
-    int		bufno = nb_getbufno(curbuf);
+    ціле		bufno = nb_getbufno(curbuf);
     long	off;
     char_u	*q;
 
-    if (!NETBEANS_OPEN)
-	return TRUE;
+    якщо (!NETBEANS_OPEN)
+	повернути TRUE;
 
-    if (bufno == -1)
+    якщо (bufno == -1)
     {
 	nbdebug(("got keycommand for non-NetBeans buffer, opening...\n"));
 	q = curbuf->b_ffname == NULL ? (char_u *)""
 						 : nb_quote(curbuf->b_ffname);
-	if (q == NULL)
-	    return TRUE;
+	якщо (q == NULL)
+	    повернути TRUE;
 	vim_snprintf(buf, sizeof(buf), "0:fileOpened=%d \"%s\" %s %s\n", 0,
 		q,
 		"T",  // open in NetBeans
 		"F"); // modified
-	if (curbuf->b_ffname != NULL)
+	якщо (curbuf->b_ffname != NULL)
 	    vim_free(q);
 	nbdebug(("EVT: %s", buf));
 	nb_send(buf, "netbeans_keycommand");
 
 	postpone_keycommand(keyName);
-	return FALSE;
+	повернути FALSE;
     }
 
     // sync the cursor position
@@ -2974,7 +2974,7 @@ netbeans_keystring(char_u *keyName)
 		off, (long)curwin->w_cursor.lnum, (long)curwin->w_cursor.col);
     nbdebug(("EVT: %s", buf));
     nb_send(buf, "netbeans_keycommand");
-    return TRUE;
+    повернути TRUE;
 }
 
 
@@ -2985,15 +2985,15 @@ netbeans_keystring(char_u *keyName)
 netbeans_save_buffer(buf_T *bufp)
 {
     char_u	buf[64];
-    int		bufno;
+    ціле		bufno;
     nbbuf_T	*nbbuf;
 
-    if (!NETBEANS_OPEN)
-	return;
+    якщо (!NETBEANS_OPEN)
+	повернути;
 
     nbbuf = nb_bufp2nbbuf_fire(bufp, &bufno);
-    if (nbbuf == NULL)
-	return;
+    якщо (nbbuf == NULL)
+	повернути;
 
     nbbuf->modified = 0;
 
@@ -3010,18 +3010,18 @@ netbeans_save_buffer(buf_T *bufp)
 netbeans_deleted_all_lines(buf_T *bufp)
 {
     char_u	buf[64];
-    int		bufno;
+    ціле		bufno;
     nbbuf_T	*nbbuf;
 
-    if (!NETBEANS_OPEN)
-	return;
+    якщо (!NETBEANS_OPEN)
+	повернути;
 
     nbbuf = nb_bufp2nbbuf_fire(bufp, &bufno);
-    if (nbbuf == NULL)
-	return;
+    якщо (nbbuf == NULL)
+	повернути;
 
     // Don't mark as modified for initial read
-    if (nbbuf->insertDone)
+    якщо (nbbuf->insertDone)
 	nbbuf->modified = 1;
 
     sprintf((char *)buf, "%d:remove=%d 0 -1\n", bufno, r_cmdno);
@@ -3035,43 +3035,43 @@ netbeans_deleted_all_lines(buf_T *bufp)
  * u_savecommon(), these are the line above the change and the line below the
  * change.
  */
-    int
+    ціле
 netbeans_is_guarded(linenr_T top, linenr_T bot)
 {
     sign_entry_T	*p;
-    int			lnum;
+    ціле			lnum;
 
-    if (!NETBEANS_OPEN)
-	return FALSE;
+    якщо (!NETBEANS_OPEN)
+	повернути FALSE;
 
     FOR_ALL_SIGNS_IN_BUF(curbuf, p)
-	if (p->se_id >= GUARDEDOFFSET)
-	    for (lnum = top + 1; lnum < bot; lnum++)
-		if (lnum == p->se_lnum)
-		    return TRUE;
+	якщо (p->se_id >= GUARDEDOFFSET)
+	    для (lnum = top + 1; lnum < bot; lnum++)
+		якщо (lnum == p->se_lnum)
+		    повернути TRUE;
 
-    return FALSE;
+    повернути FALSE;
 }
 
-#if defined(FEAT_GUI_X11)
+#якщо defined(FEAT_GUI_X11)
 /*
  * We have multiple signs to draw at the same location. Draw the
  * multi-sign indicator instead. This is the Motif version.
  */
     void
-netbeans_draw_multisign_indicator(int row)
+netbeans_draw_multisign_indicator(ціле row)
 {
-    int i;
-    int y;
-    int x;
+    ціле i;
+    ціле y;
+    ціле x;
 
-    if (!NETBEANS_OPEN)
-	return;
+    якщо (!NETBEANS_OPEN)
+	повернути;
 
     x = 0;
     y = row * gui.char_height + 2;
 
-    for (i = 0; i < gui.char_height - 3; i++)
+    для (i = 0; i < gui.char_height - 3; i++)
 	XDrawPoint(gui.dpy, gui.wid, gui.text_gc, x+2, y++);
 
     XDrawPoint(gui.dpy, gui.wid, gui.text_gc, x+0, y);
@@ -3084,42 +3084,42 @@ netbeans_draw_multisign_indicator(int row)
 }
 #endif // FEAT_GUI_X11
 
-#if defined(FEAT_GUI_GTK) && !defined(PROTO)
+#якщо defined(FEAT_GUI_GTK) && !defined(PROTO)
 /*
  * We have multiple signs to draw at the same location. Draw the
  * multi-sign indicator instead. This is the GTK/Gnome version.
  */
     void
-netbeans_draw_multisign_indicator(int row)
+netbeans_draw_multisign_indicator(ціле row)
 {
-    int i;
-    int y;
-    int x;
-# if GTK_CHECK_VERSION(3,0,0)
+    ціле i;
+    ціле y;
+    ціле x;
+# якщо GTK_CHECK_VERSION(3,0,0)
     cairo_t *cr = NULL;
-# else
+# інакше
     GdkDrawable *drawable = gui.drawarea->window;
 # endif
 # ifdef USE_GTK4
     cairo_surface_t *surf;
 # endif
 
-    if (!NETBEANS_OPEN)
-	return;
+    якщо (!NETBEANS_OPEN)
+	повернути;
 
     x = 0;
 # ifdef USE_GTK4
     y = 2;
-# else
+# інакше
     y = row * gui.char_height + 2;
 # endif
 
-# if GTK_CHECK_VERSION(3,0,0)
+# якщо GTK_CHECK_VERSION(3,0,0)
 #  ifdef USE_GTK4
     surf = cairo_image_surface_create(
 	    CAIRO_FORMAT_ARGB32, 5, gui.char_height);
     cr = cairo_create(surf);
-#  else
+#  інакше
     cr = cairo_create(gui.surface);
 #  endif
     cairo_set_source_rgba(cr,
@@ -3127,14 +3127,14 @@ netbeans_draw_multisign_indicator(int row)
 	    gui.fgcolor->alpha);
 # endif
 
-    for (i = 0; i < gui.char_height - 3; i++)
-# if GTK_CHECK_VERSION(3,0,0)
+    для (i = 0; i < gui.char_height - 3; i++)
+# якщо GTK_CHECK_VERSION(3,0,0)
 	cairo_rectangle(cr, x+2, y++, 1, 1);
-# else
+# інакше
     gdk_draw_point(drawable, gui.text_gc, x+2, y++);
 # endif
 
-# if GTK_CHECK_VERSION(3,0,0)
+# якщо GTK_CHECK_VERSION(3,0,0)
     cairo_rectangle(cr, x+0, y, 1, 1);
     cairo_rectangle(cr, x+2, y, 1, 1);
     cairo_rectangle(cr, x+4, y++, 1, 1);
@@ -3142,7 +3142,7 @@ netbeans_draw_multisign_indicator(int row)
     cairo_rectangle(cr, x+2, y, 1, 1);
     cairo_rectangle(cr, x+3, y++, 1, 1);
     cairo_rectangle(cr, x+2, y, 1, 1);
-# else
+# інакше
     gdk_draw_point(drawable, gui.text_gc, x+0, y);
     gdk_draw_point(drawable, gui.text_gc, x+2, y);
     gdk_draw_point(drawable, gui.text_gc, x+4, y++);
@@ -3157,7 +3157,7 @@ netbeans_draw_multisign_indicator(int row)
     gui_gtk4_add_multisign(surf, row, 0, 5, gui.char_height);
 # endif
 
-# if GTK_CHECK_VERSION(3,0,0)
+# якщо GTK_CHECK_VERSION(3,0,0)
     cairo_destroy(cr);
 # endif
 # ifdef USE_GTK4
@@ -3175,23 +3175,23 @@ netbeans_gutter_click(linenr_T lnum)
 {
     sign_entry_T	*p;
 
-    if (!NETBEANS_OPEN)
-	return;
+    якщо (!NETBEANS_OPEN)
+	повернути;
 
     FOR_ALL_SIGNS_IN_BUF(curbuf, p)
     {
-	if (p->se_lnum == lnum && p->se_next && p->se_next->se_lnum == lnum)
+	якщо (p->se_lnum == lnum && p->se_next && p->se_next->se_lnum == lnum)
 	{
 	    sign_entry_T *tail;
 
 	    // remove "p" from list, reinsert it at the tail of the sublist
-	    if (p->se_prev)
+	    якщо (p->se_prev)
 		p->se_prev->se_next = p->se_next;
-	    else
+	    інакше
 		curbuf->b_signlist = p->se_next;
 	    p->se_next->se_prev = p->se_prev;
 	    // now find end of sublist and insert p
-	    for (tail = p->se_next;
+	    для (tail = p->se_next;
 		  tail->se_next && tail->se_next->se_lnum == lnum
 				       && tail->se_next->se_id < GUARDEDOFFSET;
 		  tail = tail->se_next)
@@ -3199,7 +3199,7 @@ netbeans_gutter_click(linenr_T lnum)
 	    // tail now points to last entry with same lnum (except
 	    // that "guarded" annotations are always last)
 	    p->se_next = tail->se_next;
-	    if (tail->se_next)
+	    якщо (tail->se_next)
 		tail->se_next->se_prev = p;
 	    p->se_prev = tail;
 	    tail->se_next = p;
@@ -3227,88 +3227,88 @@ netbeans_gutter_click(linenr_T lnum)
     static void
 addsigntype(
     nbbuf_T	*buf,
-    int		typeNum,
+    ціле		typeNum,
     char_u	*typeName,
     char_u	*tooltip UNUSED,
     char_u	*glyphFile,
     char_u	*fg,
     char_u	*bg)
 {
-    int i, j;
-    int use_fg = (*fg && STRCMP(fg, "none") != 0);
-    int use_bg = (*bg && STRCMP(bg, "none") != 0);
+    ціле i, j;
+    ціле use_fg = (*fg && STRCMP(fg, "none") != 0);
+    ціле use_bg = (*bg && STRCMP(bg, "none") != 0);
 
-    for (i = 0; i < globalsignmapused; i++)
-	if (STRCMP(typeName, globalsignmap[i]) == 0)
+    для (i = 0; i < globalsignmapused; i++)
+	якщо (STRCMP(typeName, globalsignmap[i]) == 0)
 	    break;
 
-    if (i == globalsignmapused) // not found; add it to global map
+    якщо (i == globalsignmapused) // not found; add it to global map
     {
 	nbdebug(("DEFINEANNOTYPE(%d,%s,%s,%s,%s,%s)\n",
 			    typeNum, typeName, tooltip, glyphFile, fg, bg));
-	if (use_fg || use_bg)
+	якщо (use_fg || use_bg)
 	{
 	    char fgbuf[2 * (8 + MAX_COLOR_LENGTH) + 1];
 	    char bgbuf[2 * (8 + MAX_COLOR_LENGTH) + 1];
 	    char *ptr;
-	    int value;
+	    ціле value;
 
 	    value = strtol((char *)fg, &ptr, 10);
-	    if (ptr != (char *)fg)
+	    якщо (ptr != (char *)fg)
 		sprintf(fgbuf, "guifg=#%06x", value & 0xFFFFFF);
-	    else
+	    інакше
 		sprintf(fgbuf, "guifg=%s ctermfg=%s", fg, fg);
 
 	    value = strtol((char *)bg, &ptr, 10);
-	    if (ptr != (char *)bg)
+	    якщо (ptr != (char *)bg)
 		sprintf(bgbuf, "guibg=#%06x", value & 0xFFFFFF);
-	    else
+	    інакше
 		sprintf(bgbuf, "guibg=%s ctermbg=%s", bg, bg);
 
 	    coloncmd(":highlight NB_%s %s %s", typeName, (use_fg) ? fgbuf : "",
 		     (use_bg) ? bgbuf : "");
-	    if (*glyphFile == NUL)
+	    якщо (*glyphFile == NUL)
 		// no glyph, line highlighting only
 		coloncmd(":sign define %d linehl=NB_%s", i + 1, typeName);
-	    else if (vim_strsize(glyphFile) <= 2)
+	    інакше якщо (vim_strsize(glyphFile) <= 2)
 		// one- or two-character glyph name, use as text glyph with
 		// texthl
 		coloncmd(":sign define %d text=%s texthl=NB_%s", i + 1,
 							 glyphFile, typeName);
-	    else
+	    інакше
 		// glyph, line highlighting
 		coloncmd(":sign define %d icon=%s linehl=NB_%s", i + 1,
 							 glyphFile, typeName);
 	}
-	else
+	інакше
 	    // glyph, no line highlighting
 	    coloncmd(":sign define %d icon=%s", i + 1, glyphFile);
 
-	if (STRCMP(typeName,"CurrentPC") == 0)
+	якщо (STRCMP(typeName,"CurrentPC") == 0)
 	    curPCtype = typeNum;
 
-	if (globalsignmapused == globalsignmaplen)
+	якщо (globalsignmapused == globalsignmaplen)
 	{
-	    if (globalsignmaplen == 0) // first allocation
+	    якщо (globalsignmaplen == 0) // first allocation
 	    {
 		globalsignmaplen = 20;
 		globalsignmap = ALLOC_CLEAR_MULT(char *, globalsignmaplen);
 	    }
-	    else    // grow it
+	    інакше    // grow it
 	    {
-		int incr;
-		int oldlen = globalsignmaplen;
+		ціле incr;
+		ціле oldlen = globalsignmaplen;
 		char **t_globalsignmap = globalsignmap;
 
 		globalsignmaplen *= 2;
 		incr = globalsignmaplen - oldlen;
 		globalsignmap = vim_realloc(globalsignmap,
 					   globalsignmaplen * sizeof(char *));
-		if (globalsignmap == NULL)
+		якщо (globalsignmap == NULL)
 		{
 		    vim_free(t_globalsignmap);
 		    globalsignmaplen = 0;
-		    return;
+		    повернути;
 		}
 		vim_memset(globalsignmap + oldlen, 0, incr * sizeof(char *));
 	    }
@@ -3319,35 +3319,35 @@ addsigntype(
     }
 
     // check local map; should *not* be found!
-    for (j = 0; j < buf->signmapused; j++)
-	if (buf->signmap[j] == i + 1)
-	    return;
+    для (j = 0; j < buf->signmapused; j++)
+	якщо (buf->signmap[j] == i + 1)
+	    повернути;
 
     // add to local map
-    if (buf->signmapused == buf->signmaplen)
+    якщо (buf->signmapused == buf->signmaplen)
     {
-	if (buf->signmaplen == 0) // first allocation
+	якщо (buf->signmaplen == 0) // first allocation
 	{
 	    buf->signmaplen = 5;
-	    buf->signmap = ALLOC_CLEAR_MULT(int, buf->signmaplen);
+	    buf->signmap = ALLOC_CLEAR_MULT(ціле, buf->signmaplen);
 	}
-	else    // grow it
+	інакше    // grow it
 	{
-	    int incr;
-	    int oldlen = buf->signmaplen;
-	    int *t_signmap = buf->signmap;
+	    ціле incr;
+	    ціле oldlen = buf->signmaplen;
+	    ціле *t_signmap = buf->signmap;
 
 	    buf->signmaplen *= 2;
 	    incr = buf->signmaplen - oldlen;
 	    buf->signmap = vim_realloc(buf->signmap,
-					       buf->signmaplen * sizeof(int));
-	    if (buf->signmap == NULL)
+					       buf->signmaplen * sizeof(ціле));
+	    якщо (buf->signmap == NULL)
 	    {
 		vim_free(t_signmap);
 		buf->signmaplen = 0;
-		return;
+		повернути;
 	    }
-	    vim_memset(buf->signmap + oldlen, 0, incr * sizeof(int));
+	    vim_memset(buf->signmap + oldlen, 0, incr * sizeof(ціле));
 	}
     }
 
@@ -3359,13 +3359,13 @@ addsigntype(
 /*
  * See if we have the requested sign type in the buffer.
  */
-    static int
-mapsigntype(nbbuf_T *buf, int localsigntype)
+    static ціле
+mapsigntype(nbbuf_T *buf, ціле localsigntype)
 {
-    if (--localsigntype >= 0 && localsigntype < buf->signmapused)
-	return buf->signmap[localsigntype];
+    якщо (--localsigntype >= 0 && localsigntype < buf->signmapused)
+	повернути buf->signmap[localsigntype];
 
-    return 0;
+    повернути 0;
 }
 
 
@@ -3377,33 +3377,33 @@ get_buf_size(buf_T *bufp)
 {
     linenr_T	lnum;
     long	char_count = 0;
-    int		eol_size;
+    ціле		eol_size;
     long	last_check = 100000L;
 
-    if (bufp->b_ml.ml_flags & ML_EMPTY)
-	return 0;
+    якщо (bufp->b_ml.ml_flags & ML_EMPTY)
+	повернути 0;
 
-    if (get_fileformat(bufp) == EOL_DOS)
+    якщо (get_fileformat(bufp) == EOL_DOS)
 	eol_size = 2;
-    else
+    інакше
 	eol_size = 1;
-    for (lnum = 1; lnum <= bufp->b_ml.ml_line_count; ++lnum)
+    для (lnum = 1; lnum <= bufp->b_ml.ml_line_count; ++lnum)
     {
 	char_count += ml_get_buf_len(bufp, lnum) + eol_size;
 	// Check for a CTRL-C every 100000 characters
-	if (char_count > last_check)
+	якщо (char_count > last_check)
 	{
 	    ui_breakcheck();
-	    if (got_int)
-		return char_count;
+	    якщо (got_int)
+		повернути char_count;
 	    last_check = char_count + 100000L;
 	}
     }
     // Correction for when last line doesn't have an EOL.
-    if (!bufp->b_p_eol && (bufp->b_p_bin || !bufp->b_p_fixeol))
+    якщо (!bufp->b_p_eol && (bufp->b_p_bin || !bufp->b_p_fixeol))
 	char_count -= eol_size;
 
-    return char_count;
+    повернути char_count;
 }
 
 /*
@@ -3419,15 +3419,15 @@ off2pos(buf_T *buf, long offset)
     pos.col = 0;
     pos.coladd = 0;
 
-    if (!(buf->b_ml.ml_flags & ML_EMPTY))
+    якщо (!(buf->b_ml.ml_flags & ML_EMPTY))
     {
-	if ((lnum = ml_find_line_or_offset(buf, (linenr_T)0, &offset)) < 0)
-	    return NULL;
+	якщо ((lnum = ml_find_line_or_offset(buf, (linenr_T)0, &offset)) < 0)
+	    повернути NULL;
 	pos.lnum = lnum;
 	pos.col = offset;
     }
 
-    return &pos;
+    повернути &pos;
 }
 
 /*
@@ -3444,15 +3444,15 @@ get_off_or_lnum(buf_T *buf, char_u **argp)
     long		off;
 
     off = strtol((char *)*argp, (char **)argp, 10);
-    if (**argp == '/')
+    якщо (**argp == '/')
     {
 	mypos.lnum = (linenr_T)off;
 	++*argp;
 	mypos.col = strtol((char *)*argp, (char **)argp, 10);
 	mypos.coladd = 0;
-	return &mypos;
+	повернути &mypos;
     }
-    return off2pos(buf, off);
+    повернути off2pos(buf, off);
 }
 
 
@@ -3464,14 +3464,14 @@ pos2off(buf_T *buf, pos_T *pos)
 {
     long	 offset = 0;
 
-    if (buf->b_ml.ml_flags & ML_EMPTY)
-	return 0;
+    якщо (buf->b_ml.ml_flags & ML_EMPTY)
+	повернути 0;
 
-    if ((offset = ml_find_line_or_offset(buf, pos->lnum, 0)) < 0)
-	return 0;
+    якщо ((offset = ml_find_line_or_offset(buf, pos->lnum, 0)) < 0)
+	повернути 0;
     offset += pos->col;
 
-    return offset;
+    повернути offset;
 }
 
 
@@ -3483,19 +3483,19 @@ pos2off(buf_T *buf, pos_T *pos)
     static void
 print_read_msg(nbbuf_T *buf)
 {
-    int	    lnum = buf->bufp->b_ml.ml_line_count;
+    ціле	    lnum = buf->bufp->b_ml.ml_line_count;
     off_T   nchars = buf->bufp->b_orig_size;
     char_u  c;
 
     msg_add_fname(buf->bufp, buf->bufp->b_ffname);
     c = FALSE;
 
-    if (buf->bufp->b_p_ro)
+    якщо (buf->bufp->b_p_ro)
     {
 	STRCAT(IObuff, shortmess(SHM_RO) ? _("[RO]") : _("[readonly]"));
 	c = TRUE;
     }
-    if (!buf->bufp->b_start_eol)
+    якщо (!buf->bufp->b_start_eol)
     {
 	STRCAT(IObuff, shortmess(SHM_LAST) ? _("[noeol]")
 					       : _("[Incomplete last line]"));
@@ -3522,7 +3522,7 @@ print_save_msg(nbbuf_T *buf, off_T nchars)
     char_u	c;
     char_u	*p;
 
-    if (nchars >= 0)
+    якщо (nchars >= 0)
     {
 	// put fname in IObuff with quotes
 	msg_add_fname(buf->bufp, buf->bufp->b_ffname);
@@ -3534,7 +3534,7 @@ print_save_msg(nbbuf_T *buf, off_T nchars)
 	VIM_CLEAR(keep_msg);
 	msg_scrolled_ign = TRUE;
 	p = (char_u *)msg_trunc_attr((char *)IObuff, FALSE, 0);
-	if ((msg_scrolled && !need_wait_return) || !buf->initDone)
+	якщо ((msg_scrolled && !need_wait_return) || !buf->initDone)
 	{
 	    // Need to repeat the message after redrawing when:
 	    // - When reading from stdin (the screen will be cleared next).
@@ -3547,7 +3547,7 @@ print_save_msg(nbbuf_T *buf, off_T nchars)
 	msg_scrolled_ign = FALSE;
 	// add_to_input_buf((char_u *)"\f", 1);
     }
-    else
+    інакше
     {
 	char msgbuf[IOSIZE];
 

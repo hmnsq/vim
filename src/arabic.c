@@ -30,7 +30,7 @@
 
 #include "vim.h"
 
-#if defined(FEAT_ARABIC)
+#якщо defined(FEAT_ARABIC)
 
 // Unicode values for Arabic characters.
 #define a_HAMZA				0x0621
@@ -168,33 +168,33 @@ static struct achar {
  * Returns NULL if not found.
  */
     static struct achar *
-find_achar(int c)
+find_achar(ціле c)
 {
-    int h, m, l;
+    ціле h, m, l;
 
     // using binary search to find c
     h = ARRAY_LENGTH(achars);
     l = 0;
-    while (l < h)
+    поки (l < h)
     {
 	m = (h + l) / 2;
-	if (achars[m].c == (unsigned)c)
-	    return &achars[m];
-	if ((unsigned)c < achars[m].c)
+	якщо (achars[m].c == (unsigned)c)
+	    повернути &achars[m];
+	якщо ((unsigned)c < achars[m].c)
 	    h = m;
-	else
+	інакше
 	    l = m + 1;
     }
-    return NULL;
+    повернути NULL;
 }
 
 /*
  * Change shape - from Combination (2 char) to an Isolated
  */
-    static int
-chg_c_laa2i(int hid_c)
+    static ціле
+chg_c_laa2i(ціле hid_c)
 {
-    int tempc;
+    ціле tempc;
 
     switch (hid_c)
     {
@@ -214,16 +214,16 @@ chg_c_laa2i(int hid_c)
 	    tempc = 0;
     }
 
-    return tempc;
+    повернути tempc;
 }
 
 /*
  * Change shape - from Combination-Isolated to Final
  */
-    static int
-chg_c_laa2f(int hid_c)
+    static ціле
+chg_c_laa2f(ціле hid_c)
 {
-    int tempc;
+    ціле tempc;
 
     switch (hid_c)
     {
@@ -243,77 +243,77 @@ chg_c_laa2f(int hid_c)
 	    tempc = 0;
     }
 
-    return tempc;
+    повернути tempc;
 }
 
 /*
  * Returns whether it is possible to join the given letters
  */
-    static int
-can_join(int c1, int c2)
+    static ціле
+can_join(ціле c1, ціле c2)
 {
     struct achar *a1 = find_achar(c1);
     struct achar *a2 = find_achar(c2);
 
-    return a1 && a2 && (a1->initial || a1->medial) && (a2->final || a2->medial);
+    повернути a1 && a2 && (a1->initial || a1->medial) && (a2->final || a2->medial);
 }
 
 /*
  * Check whether we are dealing with a character that could be regarded as an
  * Arabic combining character, need to check the character before this.
  */
-    int
-arabic_maycombine(int two)
+    ціле
+arabic_maycombine(ціле two)
 {
-    if (p_arshape && !p_tbidi)
-	return (two == a_ALEF_MADDA
+    якщо (p_arshape && !p_tbidi)
+	повернути (two == a_ALEF_MADDA
 		    || two == a_ALEF_HAMZA_ABOVE
 		    || two == a_ALEF_HAMZA_BELOW
 		    || two == a_ALEF);
-    return FALSE;
+    повернути FALSE;
 }
 
 /*
  * Check whether we are dealing with Arabic combining characters.
  * Note: these are NOT really composing characters!
  */
-    int
+    ціле
 arabic_combine(
-    int		one,	    // first character
-    int		two)	    // character just after "one"
+    ціле		one,	    // first character
+    ціле		two)	    // character just after "one"
 {
-    if (one == a_LAM)
-	return arabic_maycombine(two);
-    return FALSE;
+    якщо (one == a_LAM)
+	повернути arabic_maycombine(two);
+    повернути FALSE;
 }
 
 /*
  * A_is_iso returns true if 'c' is an Arabic ISO-8859-6 character
  *		(alphabet/number/punctuation)
  */
-    static int
-A_is_iso(int c)
+    static ціле
+A_is_iso(ціле c)
 {
-    return find_achar(c) != NULL;
+    повернути find_achar(c) != NULL;
 }
 
 /*
  * A_is_ok returns true if 'c' is an Arabic 10646 (8859-6 or Form-B)
  */
-    static int
-A_is_ok(int c)
+    static ціле
+A_is_ok(ціле c)
 {
-    return (A_is_iso(c) || c == a_BYTE_ORDER_MARK);
+    повернути (A_is_iso(c) || c == a_BYTE_ORDER_MARK);
 }
 
 /*
  * A_is_valid returns true if 'c' is an Arabic 10646 (8859-6 or Form-B)
  *		with some exceptions/exclusions
  */
-    static int
-A_is_valid(int c)
+    static ціле
+A_is_valid(ціле c)
 {
-    return (A_is_ok(c) && c != a_HAMZA);
+    повернути (A_is_ok(c) && c != a_HAMZA);
 }
 
 /*
@@ -325,63 +325,63 @@ A_is_valid(int c)
  *		     (not shaped)
  * in:     "next_c"  is the next character (not shaped).
  */
-    int
+    ціле
 arabic_shape(
-    int		c,
-    int		*ccp,
-    int		*c1p,
-    int		prev_c,
-    int		prev_c1,
-    int		next_c)
+    ціле		c,
+    ціле		*ccp,
+    ціле		*c1p,
+    ціле		prev_c,
+    ціле		prev_c1,
+    ціле		next_c)
 {
-    int		curr_c;
-    int		curr_laa;
-    int		prev_laa;
+    ціле		curr_c;
+    ціле		curr_laa;
+    ціле		prev_laa;
 
     // Deal only with Arabic characters, pass back all others
-    if (!A_is_ok(c))
-	return c;
+    якщо (!A_is_ok(c))
+	повернути c;
 
     curr_laa = arabic_combine(c, *c1p);
     prev_laa = arabic_combine(prev_c, prev_c1);
 
-    if (curr_laa)
+    якщо (curr_laa)
     {
-	if (A_is_valid(prev_c) && can_join(prev_c, a_LAM) && !prev_laa)
+	якщо (A_is_valid(prev_c) && can_join(prev_c, a_LAM) && !prev_laa)
 	    curr_c = chg_c_laa2f(*c1p);
-	else
+	інакше
 	    curr_c = chg_c_laa2i(*c1p);
 
 	// Remove the composing character
 	*c1p = 0;
     }
-    else
+    інакше
     {
 	struct achar *curr_a = find_achar(c);
-	int backward_combine = !prev_laa && can_join(prev_c, c);
-	int forward_combine = can_join(c, next_c);
+	ціле backward_combine = !prev_laa && can_join(prev_c, c);
+	ціле forward_combine = can_join(c, next_c);
 
-	if (backward_combine)
+	якщо (backward_combine)
 	{
-	    if (forward_combine)
+	    якщо (forward_combine)
 		curr_c = curr_a->medial;
-	    else
+	    інакше
 		curr_c = curr_a->final;
 	}
-	else
+	інакше
 	{
-	    if (forward_combine)
+	    якщо (forward_combine)
 		curr_c = curr_a->initial;
-	    else
+	    інакше
 		curr_c = curr_a->isolated;
 	}
     }
 
     // Character missing from the table means using original character.
-    if (curr_c == NUL)
+    якщо (curr_c == NUL)
 	curr_c = c;
 
-    if (curr_c != c && ccp != NULL)
+    якщо (curr_c != c && ccp != NULL)
     {
 	char_u buf[MB_MAXBYTES + 1];
 
@@ -391,6 +391,6 @@ arabic_shape(
     }
 
     // Return the shaped character
-    return curr_c;
+    повернути curr_c;
 }
 #endif // FEAT_ARABIC

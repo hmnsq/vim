@@ -12,7 +12,7 @@
 # define PLURAL_MSG(var1, msg1, var2, msg2) \
 	char var1[] = msg1; \
 	char var2[] = msg2;
-#else
+#інакше
 # define PLURAL_MSG(var1, msg1, var2, msg2) \
 	extern char var1[]; \
 	extern char var2[];
@@ -40,7 +40,7 @@ EXTERN char e_invalid_expression_str[]
 #endif
 EXTERN char e_invalid_range[]
 	INIT(= N_("E16: Invalid range"));
-#if defined(UNIX) || defined(FEAT_SYN_HL) \
+#якщо defined(UNIX) || defined(FEAT_SYN_HL) \
 	    || defined(FEAT_SPELL) || defined(FEAT_EVAL)
 EXTERN char e_str_is_directory[]
 	INIT(= N_("E17: \"%s\" is a directory"));
@@ -63,7 +63,7 @@ EXTERN char e_no_alternate_file[]
 	INIT(= N_("E23: No alternate file"));
 EXTERN char e_no_such_abbreviation[]
 	INIT(= N_("E24: No such abbreviation"));
-#if !defined(FEAT_GUI) || defined(VIMDLL)
+#якщо !defined(FEAT_GUI) || defined(VIMDLL)
 EXTERN char e_gui_cannot_be_used_not_enabled_at_compile_time[]
 	INIT(= N_("E25: GUI cannot be used: Not enabled at compile time"));
 #endif
@@ -73,7 +73,7 @@ EXTERN char e_hebrew_cannot_be_used_not_enabled_at_compile_time[]
 #endif
 EXTERN char e_farsi_support_has_been_removed[]
 	INIT(= N_("E27: Farsi support has been removed\n"));
-#if defined(FEAT_SEARCH_EXTRA) || defined(FEAT_SYN_HL)
+#якщо defined(FEAT_SEARCH_EXTRA) || defined(FEAT_SYN_HL)
 EXTERN char e_no_such_highlight_group_name_str[]
 	INIT(= N_("E28: No such highlight group name: %s"));
 #endif
@@ -99,7 +99,7 @@ EXTERN char e_no_write_since_last_change_add_bang_to_override[]
 	INIT(= N_("E37: No write since last change (add ! to override)"));
 EXTERN char e_null_argument[]
 	INIT(= "E38: Null argument");
-#if defined(FEAT_DIGRAPHS) || defined(FEAT_TIMERS) || defined(FEAT_EVAL)
+#якщо defined(FEAT_DIGRAPHS) || defined(FEAT_TIMERS) || defined(FEAT_EVAL)
 EXTERN char e_number_expected[]
 	INIT(= N_("E39: Number expected"));
 #endif
@@ -232,7 +232,7 @@ EXTERN char e_no_matching_buffer_for_str[]
 	INIT(= N_("E94: No matching buffer for %s"));
 EXTERN char e_buffer_with_this_name_already_exists[]
 	INIT(= N_("E95: Buffer with this name already exists"));
-#if defined(FEAT_DIFF)
+#якщо defined(FEAT_DIFF)
 EXTERN char e_cannot_diff_more_than_nr_buffers[]
 	INIT(= N_("E96: Cannot diff more than %d buffers"));
 EXTERN char e_cannot_create_diffs[]
@@ -321,7 +321,7 @@ EXTERN char e_cannot_move_range_of_lines_into_itself[]
 	INIT(= N_("E134: Cannot move a range of lines into itself"));
 EXTERN char e_filter_autocommands_must_not_change_current_buffer[]
 	INIT(= N_("E135: *Filter* Autocommands must not change current buffer"));
-#if defined(FEAT_VIMINFO)
+#якщо defined(FEAT_VIMINFO)
 EXTERN char e_viminfo_too_many_errors_skipping_rest_of_file[]
 	INIT(= N_("E136: viminfo: Too many errors, skipping rest of file"));
 EXTERN char e_viminfo_file_is_not_writable_str[]
@@ -369,7 +369,7 @@ EXTERN char e_missing_sign_name[]
 EXTERN char e_invalid_sign_id_nr[]
 	INIT(= N_("E157: Invalid sign ID: %d"));
 #endif
-#if defined(FEAT_SIGNS) || defined(FEAT_EVAL)
+#якщо defined(FEAT_SIGNS) || defined(FEAT_EVAL)
 EXTERN char e_invalid_buffer_name_str[]
 	INIT(= N_("E158: Invalid buffer name: %s"));
 #endif
@@ -551,25 +551,25 @@ EXTERN char e_guifontwide_invalid[]
 EXTERN char e_cannot_create_ballooneval_with_both_message_and_callback[]
 	INIT(= "E232: Cannot create BalloonEval with both message and callback");
 # endif
-# if defined(FEAT_GUI_GTK) || defined(FEAT_GUI_X11)
+# якщо defined(FEAT_GUI_GTK) || defined(FEAT_GUI_X11)
 EXTERN char e_cannot_open_display[]
 	INIT(= N_("E233: Cannot open display"));
 # endif
-# if defined(FEAT_XFONTSET)
+# якщо defined(FEAT_XFONTSET)
 EXTERN char e_unknown_fontset_str[]
 	INIT(= N_("E234: Unknown fontset: %s"));
 # endif
-# if defined(FEAT_GUI_X11) || defined(FEAT_GUI_GTK) \
+# якщо defined(FEAT_GUI_X11) || defined(FEAT_GUI_GTK) \
 	|| defined(FEAT_GUI_PHOTON) || defined(FEAT_GUI_MSWIN) || defined(FEAT_GUI_HAIKU)
 EXTERN char e_unknown_font_str[]
 	INIT(= N_("E235: Unknown font: %s"));
 # endif
-# if defined(FEAT_GUI_X11) && !defined(FEAT_GUI_GTK)
+# якщо defined(FEAT_GUI_X11) && !defined(FEAT_GUI_GTK)
 EXTERN char e_font_str_is_not_fixed_width[]
 	INIT(= N_("E236: Font \"%s\" is not fixed-width"));
 # endif
 #endif
-#if defined(MSWIN) || defined(FEAT_PRINT_PANGO)
+#якщо defined(MSWIN) || defined(FEAT_PRINT_PANGO)
 EXTERN char e_printer_selection_failed[]
 	INIT(= N_("E237: Printer selection failed"));
 EXTERN char e_print_error_str[]
@@ -579,7 +579,7 @@ EXTERN char e_print_error_str[]
 EXTERN char e_invalid_sign_text_str[]
 	INIT(= N_("E239: Invalid sign text: %s"));
 #endif
-#if defined(FEAT_CLIENTSERVER) && defined(FEAT_X11)
+#якщо defined(FEAT_CLIENTSERVER) && defined(FEAT_X11)
 EXTERN char e_no_connection_to_x_server[]
 	INIT(= N_("E240: No connection to the X server"));
 #endif
@@ -589,7 +589,7 @@ EXTERN char e_unable_to_send_to_str[]
 #endif
 EXTERN char e_cant_split_window_while_closing_another[]
 	INIT(= N_("E242: Can't split a window while closing another"));
-#if defined(FEAT_GUI_MSWIN) && !defined(FEAT_OLE)
+#якщо defined(FEAT_GUI_MSWIN) && !defined(FEAT_OLE)
 EXTERN char e_argument_not_supported_str_use_ole_version[]
 	INIT(= N_("E243: Argument not supported: \"-%s\"; Use the OLE version."));
 #endif
@@ -623,11 +623,11 @@ EXTERN char e_fontsent_name_str_font_str_is_not_fixed_width[]
 EXTERN char e_fontset_name_str[]
 	INIT(= N_("E253: Fontset name: %s"));
 #endif
-#if defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
+#якщо defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
 EXTERN char e_cannot_allocate_color_str[]
 	INIT(= N_("E254: Cannot allocate color %s"));
 #endif
-#if defined(FEAT_SIGN_ICONS) && !defined(FEAT_GUI_GTK)
+#якщо defined(FEAT_SIGN_ICONS) && !defined(FEAT_GUI_GTK)
 EXTERN char e_couldnt_read_in_sign_data[]
 	INIT(= N_("E255: Couldn't read in sign data"));
 #endif
@@ -654,11 +654,11 @@ EXTERN char e_cscope_connection_str_not_founc[]
 EXTERN char e_error_reading_cscope_connection_nr[]
 	INIT(= N_("E262: Error reading cscope connection %d"));
 #endif
-#if defined(DYNAMIC_PYTHON) || defined(DYNAMIC_PYTHON3)
+#якщо defined(DYNAMIC_PYTHON) || defined(DYNAMIC_PYTHON3)
 EXTERN char e_sorry_this_command_is_disabled_python_library_could_not_be_found[]
 	INIT(= N_("E263: Sorry, this command is disabled, the Python library could not be loaded."));
 #endif
-#if defined(FEAT_PYTHON) || defined(FEAT_PYTHON3)
+#якщо defined(FEAT_PYTHON) || defined(FEAT_PYTHON3)
 EXTERN char e_python_error_initialising_io_object[]
 	INIT(= N_("E264: Python: Error initialising I/O objects"));
 #endif
@@ -703,7 +703,7 @@ EXTERN char e_unable_to_read_server_reply[]
 	INIT(= N_("E277: Unable to read a server reply"));
 #endif
 // E278 unused
-#if defined(FEAT_TERMINAL) && !defined(UNIX) && !defined(MSWIN)
+#якщо defined(FEAT_TERMINAL) && !defined(UNIX) && !defined(MSWIN)
 EXTERN char e_sorry_plusplusshell_not_supported_on_this_system[]
 	INIT(= N_("E279: Sorry, ++shell is not supported on this system"));
 #endif
@@ -815,7 +815,7 @@ EXTERN char e_line_number_out_of_range_nr_past_the_end[]
 	INIT(= "E322: Line number out of range: %ld past the end");
 EXTERN char e_line_count_wrong_in_block_nr[]
 	INIT(= "E323: Line count wrong in block %ld");
-#if defined(FEAT_POSTSCRIPT) || defined(FEAT_PRINT_PANGO)
+#якщо defined(FEAT_POSTSCRIPT) || defined(FEAT_PRINT_PANGO)
 EXTERN char e_cant_open_postscript_output_file[]
 	INIT(= N_("E324: Can't open PostScript output file"));
 #endif
@@ -895,7 +895,7 @@ EXTERN char e_langmap_matching_character_missing_for_str[]
 EXTERN char e_langmap_extra_characters_after_semicolon_str[]
 	INIT(= N_("E358: 'langmap': Extra characters after semicolon: %s"));
 #endif
-#if defined(AMIGA) || defined(MACOS_X) || defined(MSWIN)  \
+#якщо defined(AMIGA) || defined(MACOS_X) || defined(MSWIN)  \
 	|| defined(UNIX) || defined(VMS)
 EXTERN char e_screen_mode_setting_not_supported[]
 	INIT(= N_("E359: Screen mode setting not supported"));
@@ -905,7 +905,7 @@ EXTERN char e_cannot_execute_shell_with_f_option[]
 	INIT(= N_("E360: Cannot execute shell with -f option"));
 #endif
 // E361 unused
-#if defined(FEAT_EVAL)
+#якщо defined(FEAT_EVAL)
 EXTERN char e_using_boolean_value_as_float[]
 	INIT(= N_("E362: Using a boolean value as a Float"));
 #endif
@@ -915,7 +915,7 @@ EXTERN char e_pattern_uses_more_memory_than_maxmempattern[]
 EXTERN char e_library_call_failed_for_str[]
 	INIT(= N_("E364: Library call failed for \"%s()\""));
 #endif
-#if defined(FEAT_POSTSCRIPT) || defined(FEAT_PRINT_PANGO)
+#якщо defined(FEAT_POSTSCRIPT) || defined(FEAT_PRINT_PANGO)
 EXTERN char e_failed_to_print_postscript_file[]
 	INIT(= N_("E365: Failed to print PostScript file"));
 #endif
@@ -1139,7 +1139,7 @@ EXTERN char e_cant_read_postscript_resource_file_str[]
 	INIT(= N_("E457: Can't read PostScript resource file \"%s\""));
 #endif
 // E458 unused
-#if defined(UNIX) || defined(FEAT_SESSION) || defined(FEAT_SOCKETSERVER)
+#якщо defined(UNIX) || defined(FEAT_SESSION) || defined(FEAT_SOCKETSERVER)
 EXTERN char e_cannot_go_back_to_previous_directory[]
 	INIT(= N_("E459: Cannot go back to previous directory"));
 #endif
@@ -1189,7 +1189,7 @@ EXTERN char e_invalid_argument_str[]
 	INIT(= N_("E475: Invalid argument: %s"));
 EXTERN char e_invalid_value_for_argument_str[]
 	INIT(= N_("E475: Invalid value for argument %s"));
-#if defined(FEAT_JOB_CHANNEL) || defined(FEAT_PROP_POPUP) \
+#якщо defined(FEAT_JOB_CHANNEL) || defined(FEAT_PROP_POPUP) \
 	|| defined(FEAT_EVAL) || defined(FEAT_IMAGE)
 EXTERN char e_invalid_value_for_argument_str_str[]
 	INIT(= N_("E475: Invalid value for argument %s: %s"));
@@ -1422,7 +1422,7 @@ EXTERN char e_cannot_open_termcap_file[]
 	INIT(= N_("E557: Cannot open termcap file"));
 EXTERN char e_terminal_entry_not_found_in_terminfo[]
 	INIT(= N_("E558: Terminal entry not found in terminfo"));
-#if defined(HAVE_TGETENT) && !defined(TERMINFO)
+#якщо defined(HAVE_TGETENT) && !defined(TERMINFO)
 EXTERN char e_terminal_entry_not_found_in_termcap[]
 	INIT(= N_("E559: Terminal entry not found in termcap"));
 #endif
@@ -1531,7 +1531,7 @@ EXTERN char e_invalid_fontset[]
 	INIT(= N_("E598: Invalid fontset"));
 # endif
 #endif
-#if defined(FEAT_XIM) && defined(FEAT_GUI_GTK)
+#якщо defined(FEAT_XIM) && defined(FEAT_GUI_GTK)
 EXTERN char e_value_of_imactivatekey_is_invalid[]
 	INIT(= N_("E599: Value of 'imactivatekey' is invalid"));
 #endif
@@ -1569,7 +1569,7 @@ EXTERN char e_using_special_as_number[]
 EXTERN char e_too_many_signs_defined[]
 	INIT(= N_("E612: Too many signs defined"));
 #endif
-#if defined(FEAT_PRINTER) && (defined(MSWIN) || defined(FEAT_PRINT_PANGO))
+#якщо defined(FEAT_PRINTER) && (defined(MSWIN) || defined(FEAT_PRINT_PANGO))
 EXTERN char e_unknown_printer_font_str[]
 	INIT(= N_("E613: Unknown printer font: %s"));
 #endif
@@ -1601,11 +1601,11 @@ EXTERN char e_could_not_spawn_cscope_process[]
 	INIT(= N_("E623: Could not spawn cscope process"));
 # endif
 #endif
-#if defined(FEAT_PRINTER) && defined(FEAT_POSTSCRIPT)
+#якщо defined(FEAT_PRINTER) && defined(FEAT_POSTSCRIPT)
 EXTERN char e_cant_open_file_str_3[]
 	INIT(= N_("E624: Can't open file \"%s\""));
 #endif
-#if defined(FEAT_CSCOPE) && !defined(UNIX)
+#якщо defined(FEAT_CSCOPE) && !defined(UNIX)
 EXTERN char e_cannot_open_cscope_database_str[]
 	INIT(= N_("E625: Cannot open cscope database: %s"));
 EXTERN char e_cannot_get_cscope_database_information[]
@@ -1732,7 +1732,7 @@ EXTERN char e_cannot_find_window_title_str[]
 EXTERN char e_unable_to_open_window_inside_mdi_application[]
 	INIT(= N_("E672: Unable to open window inside MDI application"));
 #endif
-#if defined(FEAT_PRINTER) && defined(FEAT_POSTSCRIPT)
+#якщо defined(FEAT_PRINTER) && defined(FEAT_POSTSCRIPT)
 EXTERN char e_incompatible_multi_byte_encoding_and_character_set[]
 	INIT(= N_("E673: Incompatible multi-byte encoding and character set"));
 EXTERN char e_printmbcharset_cannot_be_empty_with_multi_byte_encoding[]
@@ -1754,7 +1754,7 @@ EXTERN char e_recursive_loop_loading_syncolor_vim[]
 #endif
 EXTERN char e_buffer_nr_invalid_buffer_number[]
 	INIT(= N_("E680: <buffer=%d>: invalid buffer number"));
-#if defined(FEAT_QUICKFIX) || defined(FEAT_EVAL)
+#якщо defined(FEAT_QUICKFIX) || defined(FEAT_EVAL)
 EXTERN char e_buffer_is_not_loaded[]
 	INIT(= N_("E681: Buffer is not loaded"));
 #endif
@@ -1940,7 +1940,7 @@ EXTERN char e_character_in_fol_low_or_upp_is_out_of_range[]
 EXTERN char e_word_characters_differ_between_spell_files[]
 	INIT(= N_("E763: Word characters differ between spell files"));
 #endif
-#if defined(FEAT_SYN_HL) || defined(FEAT_COMPL_FUNC) || defined(FEAT_SPELL)
+#якщо defined(FEAT_SYN_HL) || defined(FEAT_COMPL_FUNC) || defined(FEAT_SPELL)
 EXTERN char e_option_str_is_not_set[]
 	INIT(= N_("E764: Option '%s' is not set"));
 #endif
@@ -1971,7 +1971,7 @@ EXTERN char e_symlink_loop_for_str[]
 #ifdef FEAT_EVAL
 EXTERN char e_operatorfunc_is_empty[]
 	INIT(= N_("E774: 'operatorfunc' is empty"));
-#else
+#інакше
 EXTERN char e_eval_feature_not_available[]
 	INIT(= N_("E775: Eval feature not available"));
 #endif
@@ -2129,7 +2129,7 @@ EXTERN char e_corrupted_undo_file_str_str[]
 # ifdef FEAT_CRYPT
 EXTERN char e_undo_file_decryption_failed[]
 	INIT(= N_("E826: Undo file decryption failed: %s"));
-# else
+# інакше
 EXTERN char e_undo_file_is_encrypted_str[]
 	INIT(= N_("E827: Undo file is encrypted: %s"));
 # endif
@@ -2147,7 +2147,7 @@ EXTERN char e_bf_key_init_called_with_empty_password[]
 EXTERN char e_non_encrypted_file_has_encrypted_undo_file_str[]
 	INIT(= N_("E832: Non-encrypted file has encrypted undo file: %s"));
 # endif
-#else
+#інакше
 EXTERN char e_str_is_encrypted_and_this_version_of_vim_does_not_support_encryption[]
 	INIT(= N_("E833: %s is encrypted and this version of Vim does not support encryption"));
 #endif
@@ -2161,7 +2161,7 @@ EXTERN char e_this_vim_cannot_execute_python_after_using_py3[]
 EXTERN char e_this_vim_cannot_execute_py3_after_using_python[]
 	INIT(= N_("E837: This Vim cannot execute :py3 after using :python"));
 #endif
-#if defined(FEAT_NETBEANS_INTG) && defined(FEAT_GUI)
+#якщо defined(FEAT_NETBEANS_INTG) && defined(FEAT_GUI)
 EXTERN char e_netbeans_is_not_supported_with_this_GUI[]
 	INIT(= N_("E838: NetBeans is not supported with this GUI"));
 #endif
@@ -2220,7 +2220,7 @@ EXTERN char e_assert_fails_second_arg[]
 EXTERN char e_dictionary_key_str_required[]
 	INIT(= N_("E857: Dictionary key \"%s\" required"));
 #endif
-#if defined(FEAT_PYTHON) || defined(FEAT_PYTHON3)
+#якщо defined(FEAT_PYTHON) || defined(FEAT_PYTHON3)
 EXTERN char e_eval_did_not_return_valid_python_object[]
 	INIT(= N_("E858: Eval did not return a valid python object"));
 EXTERN char e_failed_to_convert_returned_python_object_to_vim_value[]
@@ -2238,7 +2238,7 @@ EXTERN char e_cannot_open_second_popup_with_terminal[]
 EXTERN char e_cannot_use_g_here[]
 	INIT(= N_("E862: Cannot use g: here"));
 #endif
-#if defined(FEAT_PROP_POPUP) && defined(FEAT_TERMINAL)
+#якщо defined(FEAT_PROP_POPUP) && defined(FEAT_TERMINAL)
 EXTERN char e_not_allowed_for_terminal_in_popup_window[]
 	INIT(= N_("E863: Not allowed for a terminal in a popup window"));
 #endif
@@ -2279,7 +2279,7 @@ EXTERN char e_nfa_regexp_could_not_allocate_memory_for_branch_traversal[]
 EXTERN char e_nfa_regexp_too_many_z[]
 	INIT(= N_("E879: (NFA regexp) Too many \\z("));
 #endif
-#if defined(FEAT_PYTHON) || defined(FEAT_PYTHON3)
+#якщо defined(FEAT_PYTHON) || defined(FEAT_PYTHON3)
 EXTERN char e_cant_handle_systemexit_of_python_exception_in_vim[]
 	INIT(= N_("E880: Can't handle SystemExit of python exception in vim"));
 #endif
@@ -2301,7 +2301,7 @@ EXTERN char e_not_possible_to_change_sign_str[]
 EXTERN char e_cant_rename_viminfo_file_to_str[]
 	INIT(= N_("E886: Can't rename viminfo file to %s!"));
 #endif
-#if defined(FEAT_PYTHON) || defined(FEAT_PYTHON3)
+#якщо defined(FEAT_PYTHON) || defined(FEAT_PYTHON3)
 EXTERN char e_sorry_this_command_is_disabled_python_site_module_could_not_be_loaded[]
 	INIT(= N_("E887: Sorry, this command is disabled, the Python's site module could not be loaded."));
 #endif
@@ -2462,7 +2462,7 @@ EXTERN char e_cannot_lock_or_unlock_variable_str[]
 # ifdef FEAT_CLIENTSERVER
 EXTERN char e_already_started_server[]
 	INIT(= N_("E941: Already started a server"));
-# else
+# інакше
 EXTERN char e_clientserver_feature_not_available[]
 	INIT(= N_("E942: +clientserver feature not available"));
 # endif
@@ -2490,7 +2490,7 @@ EXTERN char e_cannot_convert_between_str_and_str[]
 EXTERN char e_percent_value_too_large[]
 	// xgettext:no-c-format
 	INIT(= N_("E951: \\% value too large"));
-#if defined(FEAT_EVAL) && defined(FEAT_QUICKFIX)
+#якщо defined(FEAT_EVAL) && defined(FEAT_QUICKFIX)
 EXTERN char e_autocommand_caused_recursive_behavior[]
 	INIT(= N_("E952: Autocommand caused recursive behavior"));
 #endif
@@ -2498,7 +2498,7 @@ EXTERN char e_autocommand_caused_recursive_behavior[]
 EXTERN char e_file_exists_str[]
 	INIT(= N_("E953: File exists: %s"));
 #endif
-#if defined(FEAT_TERMGUICOLORS) && defined(FEAT_VTP)
+#якщо defined(FEAT_TERMGUICOLORS) && defined(FEAT_VTP)
 EXTERN char e_24_bit_colors_are_not_supported_on_this_environment[]
 	INIT(= N_("E954: 24-bit colors are not supported on this environment"));
 #endif
@@ -2530,7 +2530,7 @@ EXTERN char e_invalid_action_str_2[]
 EXTERN char e_setting_v_str_to_value_with_wrong_type[]
 	INIT(= N_("E963: Setting v:%s to value with wrong type"));
 #endif
-#if defined(FEAT_PROP_POPUP) || defined(FEAT_EVAL)
+#якщо defined(FEAT_PROP_POPUP) || defined(FEAT_EVAL)
 EXTERN char_u e_invalid_column_number_nr[]
 	INIT(= N_("E964: Invalid column number: %ld"));
 #endif
@@ -2578,7 +2578,7 @@ EXTERN char e_lowlevel_input_not_supported[]
 #endif
 EXTERN char e_command_not_allowed_in_rvim[]
 	INIT(= N_("E981: Command not allowed in rvim"));
-#if defined(FEAT_TERMINAL) && defined(MSWIN)
+#якщо defined(FEAT_TERMINAL) && defined(MSWIN)
 EXTERN char e_conpty_is_not_available[]
 	INIT(= N_("E982: ConPTY is not available"));
 #endif
@@ -3042,7 +3042,7 @@ EXTERN char e_expression_does_not_result_in_value_str[]
 #endif
 EXTERN char e_failed_to_source_defaults[]
 	INIT(= N_("E1187: Failed to source defaults.vim"));
-#if defined(FEAT_TERMINAL)
+#якщо defined(FEAT_TERMINAL)
 EXTERN char e_cannot_open_terminal_from_command_line_window[]
 	INIT(= N_("E1188: Cannot open a terminal from the command line window"));
 #endif
@@ -3063,8 +3063,8 @@ EXTERN char e_empty_function_name[]
 # ifndef FEAT_SODIUM
 EXTERN char e_libsodium_not_built_in[]
 	INIT(= N_("E1193: cryptmethod xchacha20 not built into this Vim"));
-# else
-#  if 0
+# інакше
+#  якщо 0
 EXTERN char e_libsodium_cannot_encrypt_header[]
 	INIT(= N_("E1194: Cannot encrypt header, not enough space"));
 EXTERN char e_libsodium_cannot_encrypt_buffer[]
@@ -3076,7 +3076,7 @@ EXTERN char e_libsodium_cannot_allocate_buffer[]
 	INIT(= N_("E1197: Cannot allocate_buffer for encryption"));
 EXTERN char e_libsodium_decryption_failed_header_incomplete[]
 	INIT(= N_("E1198: Decryption failed: Header incomplete!"));
-#  if 0
+#  якщо 0
 EXTERN char e_libsodium_cannot_decrypt_buffer[]
 	INIT(= N_("E1199: Cannot decrypt buffer, not enough space"));
 #  endif
@@ -3116,7 +3116,7 @@ EXTERN char e_bool_required_for_argument_nr[]
 EXTERN char e_redefining_imported_item_str[]
 	INIT(= N_("E1213: Redefining imported item \"%s\""));
 #endif
-#if defined(FEAT_DIGRAPHS)
+#якщо defined(FEAT_DIGRAPHS)
 EXTERN char e_digraph_must_be_just_two_characters_str[]
 	INIT(= N_("E1214: Digraph must be just two characters: %s"));
 EXTERN char e_digraph_argument_must_be_one_character_str[]
@@ -3190,12 +3190,12 @@ EXTERN char e_separator_not_supported_str[]
 EXTERN char e_no_white_space_allowed_before_separator_str[]
 	INIT(= N_("E1242: No white space allowed before separator: %s"));
 #endif
-#if defined(FEAT_GUI_GTK) || defined(FEAT_GUI_MSWIN)
+#якщо defined(FEAT_GUI_GTK) || defined(FEAT_GUI_MSWIN)
 EXTERN char e_ascii_code_not_in_range[]
 	INIT(= N_("E1243: ASCII code not in 32-127 range"));
 #endif
 #ifdef FEAT_EVAL
-# if defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
+# якщо defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
 EXTERN char e_bad_color_string_str[]
 	INIT(= N_("E1244: Bad color string: %s"));
 # endif
@@ -3248,7 +3248,7 @@ EXTERN char e_autoload_import_cannot_use_absolute_or_relative_path[]
 EXTERN char e_cannot_use_partial_here[]
 	INIT(= N_("E1265: Cannot use a partial here"));
 #endif
-#if defined(FEAT_PYTHON3) && defined(MSWIN)
+#якщо defined(FEAT_PYTHON3) && defined(MSWIN)
 EXTERN char e_critical_error_in_python3_initialization_check_your_installation[]
 	INIT(= N_("E1266: Critical error in python3 initialization, check your python3 installation"));
 #endif
@@ -3277,7 +3277,7 @@ EXTERN char e_string_or_function_required_for_arrow_parens_expr[]
 	INIT(= N_("E1275: String or function required for ->(expr)"));
 EXTERN char e_illegal_map_mode_string_str[]
 	INIT(= N_("E1276: Illegal map mode string: '%s'"));
-# if !defined(FEAT_JOB_CHANNEL)
+# якщо !defined(FEAT_JOB_CHANNEL)
 EXTERN char e_channel_job_feature_not_available[]
 	INIT(= N_("E1277: Channel and job feature is not available"));
 # endif
@@ -3298,7 +3298,7 @@ EXTERN char e_bitshift_ops_must_be_number[]
 EXTERN char e_bitshift_ops_must_be_positive[]
 	INIT(= N_("E1283: Bitshift amount must be a positive number"));
 #endif
-#if defined(FEAT_PROP_POPUP)
+#якщо defined(FEAT_PROP_POPUP)
 EXTERN char e_argument_1_list_item_nr_dictionary_required[]
 	INIT(= N_("E1284: Argument 1, list item %d: Dictionary required"));
 #endif
@@ -3372,7 +3372,7 @@ EXTERN char e_cannot_resize_window_in_another_tab_page[]
 #endif
 EXTERN char e_cannot_change_mappings_while_listing[]
 	INIT(= N_("E1309: Cannot change mappings while listing"));
-#if defined(FEAT_MENU)
+#якщо defined(FEAT_MENU)
 EXTERN char e_cannot_change_menus_while_listing[]
 	INIT(= N_("E1310: Cannot change menus while listing"));
 #endif
@@ -3745,7 +3745,7 @@ EXTERN char e_cannot_not_support_redrawtabpanel[]
 EXTERN char e_wayland_connection_unavailable[]
 	INIT(= N_("E1548: Wayland connection is unavailable"));
 #endif
-#if defined(FEAT_DIFF)
+#якщо defined(FEAT_DIFF)
 EXTERN char e_cannot_have_more_than_nr_diff_anchors[]
 	INIT(= N_("E1549: Cannot have more than %d diff anchors"));
 EXTERN char e_failed_to_find_all_diff_anchors[]
@@ -3777,7 +3777,7 @@ EXTERN char e_not_a_generic_function_str[]
 EXTERN char e_duplicate_type_var_name_str[]
 	INIT(= N_("E1561: Duplicate type variable name: %s"));
 #endif
-#if defined(FEAT_DIFF)
+#якщо defined(FEAT_DIFF)
 EXTERN char e_diff_anchors_with_hidden_windows[]
 	INIT(= N_("E1562: Diff anchors cannot be used with hidden diff windows"));
 #endif

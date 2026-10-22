@@ -5,16 +5,16 @@
 
 #undef DEBUG_PARSER
 
-static int is_intermed(unsigned char c)
+static ціле is_intermed(unsigned char c)
 {
-  return c >= 0x20 && c <= 0x2f;
+  повернути c >= 0x20 && c <= 0x2f;
 }
 
 static void do_control(VTerm *vt, unsigned char control)
 {
-  if(vt->parser.callbacks && vt->parser.callbacks->control)
-    if((*vt->parser.callbacks->control)(control, vt->parser.cbdata))
-      return;
+  якщо(vt->parser.callbacks && vt->parser.callbacks->control)
+    якщо((*vt->parser.callbacks->control)(control, vt->parser.cbdata))
+      повернути;
 
   DEBUG_LOG1("libvterm: Unhandled control 0x%02x\n", control);
 }
@@ -24,23 +24,23 @@ static void do_csi(VTerm *vt, char command)
 #ifdef DEBUG_PARSER
   printf("Parsed CSI args as:\n", arglen, args);
   printf(" leader: %s\n", vt->parser.v.csi.leader);
-  for(int argi = 0; argi < vt->parser.v.csi.argi; argi++) {
+  для(ціле argi = 0; argi < vt->parser.v.csi.argi; argi++) {
     printf(" %lu", CSI_ARG(vt->parser.v.csi.args[argi]));
-    if(!CSI_ARG_HAS_MORE(vt->parser.v.csi.args[argi]))
+    якщо(!CSI_ARG_HAS_MORE(vt->parser.v.csi.args[argi]))
       printf("\n");
   printf(" intermed: %s\n", vt->parser.intermed);
   }
 #endif
 
-  if(vt->parser.callbacks && vt->parser.callbacks->csi)
-    if((*vt->parser.callbacks->csi)(
+  якщо(vt->parser.callbacks && vt->parser.callbacks->csi)
+    якщо((*vt->parser.callbacks->csi)(
           vt->parser.v.csi.leaderlen ? vt->parser.v.csi.leader : NULL,
           vt->parser.v.csi.args,
           vt->parser.v.csi.argi,
           vt->parser.intermedlen ? vt->parser.intermed : NULL,
           command,
           vt->parser.cbdata))
-      return;
+      повернути;
 
   DEBUG_LOG1("libvterm: Unhandled CSI %c\n", command);
 }
@@ -54,14 +54,14 @@ static void do_escape(VTerm *vt, char command)
   seq[len++] = command;
   seq[len]   = 0;
 
-  if(vt->parser.callbacks && vt->parser.callbacks->escape)
-    if((*vt->parser.callbacks->escape)(seq, len, vt->parser.cbdata))
-      return;
+  якщо(vt->parser.callbacks && vt->parser.callbacks->escape)
+    якщо((*vt->parser.callbacks->escape)(seq, len, vt->parser.cbdata))
+      повернути;
 
   DEBUG_LOG1("libvterm: Unhandled escape ESC 0x%02x\n", command);
 }
 
-static void string_fragment(VTerm *vt, const char *str, size_t len, int final)
+static void string_fragment(VTerm *vt, const char *str, size_t len, ціле final)
 {
   VTermStringFragment frag;
 
@@ -72,27 +72,27 @@ static void string_fragment(VTerm *vt, const char *str, size_t len, int final)
 
   switch(vt->parser.state) {
     case OSC:
-      if(vt->parser.callbacks && vt->parser.callbacks->osc)
+      якщо(vt->parser.callbacks && vt->parser.callbacks->osc)
         (*vt->parser.callbacks->osc)(vt->parser.v.osc.command, frag, vt->parser.cbdata);
       break;
 
     case DCS:
-      if(vt->parser.callbacks && vt->parser.callbacks->dcs)
+      якщо(vt->parser.callbacks && vt->parser.callbacks->dcs)
         (*vt->parser.callbacks->dcs)(vt->parser.v.dcs.command, vt->parser.v.dcs.commandlen, frag, vt->parser.cbdata);
       break;
 
     case APC:
-      if(vt->parser.callbacks && vt->parser.callbacks->apc)
+      якщо(vt->parser.callbacks && vt->parser.callbacks->apc)
         (*vt->parser.callbacks->apc)(frag, vt->parser.cbdata);
       break;
 
     case PM:
-      if(vt->parser.callbacks && vt->parser.callbacks->pm)
+      якщо(vt->parser.callbacks && vt->parser.callbacks->pm)
         (*vt->parser.callbacks->pm)(frag, vt->parser.cbdata);
       break;
 
     case SOS:
-      if(vt->parser.callbacks && vt->parser.callbacks->sos)
+      якщо(vt->parser.callbacks && vt->parser.callbacks->sos)
         (*vt->parser.callbacks->sos)(frag, vt->parser.cbdata);
       break;
 
@@ -134,57 +134,57 @@ size_t vterm_input_write(VTerm *vt, const char *bytes, size_t len)
     break;
   }
 
-#define ENTER_STATE(st)        do { vt->parser.state = st; string_start = NULL; } while(0)
+#define ENTER_STATE(st)        do { vt->parser.state = st; string_start = NULL; } поки(0)
 #define ENTER_NORMAL_STATE()   ENTER_STATE(NORMAL)
 
 #define IS_STRING_STATE()      (vt->parser.state >= OSC_COMMAND)
 
-  for( ; pos < len; pos++) {
+  для( ; pos < len; pos++) {
     unsigned char c = bytes[pos];
-    int c1_allowed = !vt->mode.utf8;
+    ціле c1_allowed = !vt->mode.utf8;
 
-    if(c == 0x00 || c == 0x7f) { // NUL, DEL
-      if(IS_STRING_STATE()) {
+    якщо(c == 0x00 || c == 0x7f) { // NUL, DEL
+      якщо(IS_STRING_STATE()) {
         string_fragment(vt, string_start, bytes + pos - string_start, FALSE);
         string_start = bytes + pos + 1;
       }
-      if(vt->parser.emit_nul)
+      якщо(vt->parser.emit_nul)
         do_control(vt, c);
       continue;
     }
-    if(c == 0x18 || c == 0x1a) { // CAN, SUB
+    якщо(c == 0x18 || c == 0x1a) { // CAN, SUB
       vt->parser.in_esc = FALSE;
       ENTER_NORMAL_STATE();
-      if(vt->parser.emit_nul)
+      якщо(vt->parser.emit_nul)
         do_control(vt, c);
       continue;
     }
-    else if(c == 0x1b) { // ESC
+    інакше якщо(c == 0x1b) { // ESC
       vt->parser.intermedlen = 0;
-      if(!IS_STRING_STATE())
+      якщо(!IS_STRING_STATE())
         vt->parser.state = NORMAL;
       vt->parser.in_esc = TRUE;
       continue;
     }
-    else if(c == 0x07 &&  // BEL, can stand for ST in OSC or DCS state
+    інакше якщо(c == 0x07 &&  // BEL, can stand for ST in OSC or DCS state
             IS_STRING_STATE()) {
       // fallthrough
     }
-    else if(c < 0x20) { // other C0
-      if(vt->parser.state == SOS)
+    інакше якщо(c < 0x20) { // other C0
+      якщо(vt->parser.state == SOS)
         continue; // All other C0s permitted in SOS
 
-      if(vterm_get_special_pty_type() == 2) {
-        if(c == 0x08) // BS
+      якщо(vterm_get_special_pty_type() == 2) {
+        якщо(c == 0x08) // BS
           // Set the trick for BS output after a sequence, to delay backspace
           // activation
-          if(pos + 2 < len && bytes[pos + 1] == 0x20 && bytes[pos + 2] == 0x08)
+          якщо(pos + 2 < len && bytes[pos + 1] == 0x20 && bytes[pos + 2] == 0x08)
             vt->in_backspace = 2; // Trigger when count down to 1
       }
-      if(IS_STRING_STATE())
+      якщо(IS_STRING_STATE())
         string_fragment(vt, string_start, bytes + pos - string_start, FALSE);
       do_control(vt, c);
-      if(IS_STRING_STATE())
+      якщо(IS_STRING_STATE())
         string_start = bytes + pos + 1;
       continue;
     }
@@ -192,19 +192,19 @@ size_t vterm_input_write(VTerm *vt, const char *bytes, size_t len)
 
     size_t string_len = bytes + pos - string_start;
 
-    if(vt->parser.in_esc) {
+    якщо(vt->parser.in_esc) {
       // Hoist an ESC letter into a C1 if we're not in a string mode
       // Always accept ESC \ == ST even in string mode
-      if(!vt->parser.intermedlen &&
+      якщо(!vt->parser.intermedlen &&
           c >= 0x40 && c < 0x60 &&
           ((!IS_STRING_STATE() || c == 0x5c))) {
         c += 0x40;
         c1_allowed = TRUE;
-        if(string_len)
+        якщо(string_len)
           string_len -= 1;
         vt->parser.in_esc = FALSE;
       }
-      else {
+      інакше {
         string_start = NULL;
         vt->parser.state = NORMAL;
       }
@@ -213,8 +213,8 @@ size_t vterm_input_write(VTerm *vt, const char *bytes, size_t len)
     switch(vt->parser.state) {
     case CSI_LEADER:
       /* Extract leader bytes 0x3c to 0x3f */
-      if(c >= 0x3c && c <= 0x3f) {
-        if(vt->parser.v.csi.leaderlen < CSI_LEADER_MAX-1)
+      якщо(c >= 0x3c && c <= 0x3f) {
+        якщо(vt->parser.v.csi.leaderlen < CSI_LEADER_MAX-1)
           vt->parser.v.csi.leader[vt->parser.v.csi.leaderlen++] = c;
         break;
       }
@@ -229,25 +229,25 @@ size_t vterm_input_write(VTerm *vt, const char *bytes, size_t len)
       /* fallthrough */
     case CSI_ARGS:
       /* Numerical value of argument */
-      if(c >= '0' && c <= '9') {
+      якщо(c >= '0' && c <= '9') {
         long arg_max = CSI_ARG_MISSING - 1;
         long *arg = &vt->parser.v.csi.args[vt->parser.v.csi.argi];
-        int digit = c - '0';
+        ціле digit = c - '0';
 
-        if(*arg == CSI_ARG_MISSING)
+        якщо(*arg == CSI_ARG_MISSING)
           *arg = 0;
-        if(*arg > (arg_max - digit) / 10)
+        якщо(*arg > (arg_max - digit) / 10)
           *arg = arg_max;
-        else
+        інакше
           *arg = *arg * 10 + digit;
         break;
       }
-      if(c == ':') {
+      якщо(c == ':') {
         vt->parser.v.csi.args[vt->parser.v.csi.argi] |= CSI_ARG_FLAG_MORE;
         c = ';';
       }
-      if(c == ';') {
-        if(vt->parser.v.csi.argi >= CSI_ARGS_MAX - 1)
+      якщо(c == ';') {
+        якщо(vt->parser.v.csi.argi >= CSI_ARGS_MAX - 1)
           break; /* drop excess args */
         vt->parser.v.csi.argi++;
         vt->parser.v.csi.args[vt->parser.v.csi.argi] = CSI_ARG_MISSING;
@@ -260,15 +260,15 @@ size_t vterm_input_write(VTerm *vt, const char *bytes, size_t len)
       vt->parser.state = CSI_INTERMED;
       // FALLTHROUGH
     case CSI_INTERMED:
-      if(is_intermed(c)) {
-        if(vt->parser.intermedlen < INTERMED_MAX-1)
+      якщо(is_intermed(c)) {
+        якщо(vt->parser.intermedlen < INTERMED_MAX-1)
           vt->parser.intermed[vt->parser.intermedlen++] = c;
         break;
       }
-      else if(c == 0x1b) {
+      інакше якщо(c == 0x1b) {
         /* ESC in CSI cancels */
       }
-      else if(c >= 0x40 && c <= 0x7e) {
+      інакше якщо(c >= 0x40 && c <= 0x7e) {
         vt->parser.intermed[vt->parser.intermedlen] = 0;
         do_csi(vt, c);
       }
@@ -279,15 +279,15 @@ size_t vterm_input_write(VTerm *vt, const char *bytes, size_t len)
 
     case OSC_COMMAND:
       /* Numerical value of command */
-      if(c >= '0' && c <= '9') {
-        if(vt->parser.v.osc.command == -1)
+      якщо(c >= '0' && c <= '9') {
+        якщо(vt->parser.v.osc.command == -1)
           vt->parser.v.osc.command = 0;
-        else
+        інакше
           vt->parser.v.osc.command *= 10;
         vt->parser.v.osc.command += c - '0';
         break;
       }
-      if(c == ';') {
+      якщо(c == ';') {
         vt->parser.state = OSC;
         string_start = bytes + pos + 1;
         break;
@@ -300,10 +300,10 @@ size_t vterm_input_write(VTerm *vt, const char *bytes, size_t len)
       goto string_state;
 
     case DCS_COMMAND:
-      if(vt->parser.v.dcs.commandlen < CSI_LEADER_MAX)
+      якщо(vt->parser.v.dcs.commandlen < CSI_LEADER_MAX)
         vt->parser.v.dcs.command[vt->parser.v.dcs.commandlen++] = c;
 
-      if(c >= 0x40 && c<= 0x7e) {
+      якщо(c >= 0x40 && c<= 0x7e) {
         string_start = bytes + pos + 1;
         vt->parser.state = DCS;
       }
@@ -315,29 +315,29 @@ string_state:
     case APC:
     case PM:
     case SOS:
-      if(c == 0x07 || (c1_allowed && c == 0x9c)) {
+      якщо(c == 0x07 || (c1_allowed && c == 0x9c)) {
         string_fragment(vt, string_start, string_len, TRUE);
         ENTER_NORMAL_STATE();
       }
       break;
 
     case NORMAL:
-      if(vt->parser.in_esc) {
-        if(is_intermed(c)) {
-          if(vt->parser.intermedlen < INTERMED_MAX-1)
+      якщо(vt->parser.in_esc) {
+        якщо(is_intermed(c)) {
+          якщо(vt->parser.intermedlen < INTERMED_MAX-1)
             vt->parser.intermed[vt->parser.intermedlen++] = c;
         }
-        else if(c >= 0x30 && c < 0x7f) {
+        інакше якщо(c >= 0x30 && c < 0x7f) {
           do_escape(vt, c);
           vt->parser.in_esc = 0;
           ENTER_NORMAL_STATE();
         }
-        else {
+        інакше {
           DEBUG_LOG1("TODO: Unhandled byte %02x in Escape\n", c);
         }
         break;
       }
-      if(c1_allowed && c >= 0x80 && c < 0xa0) {
+      якщо(c1_allowed && c >= 0x80 && c < 0xa0) {
         switch(c) {
         case 0x90: // DCS
           vt->parser.string_initial = TRUE;
@@ -377,12 +377,12 @@ string_state:
           break;
         }
       }
-      else {
+      інакше {
         size_t eaten = 0;
-        if(vt->parser.callbacks && vt->parser.callbacks->text)
+        якщо(vt->parser.callbacks && vt->parser.callbacks->text)
           eaten = (*vt->parser.callbacks->text)(bytes + pos, len - pos, vt->parser.cbdata);
 
-        if(!eaten) {
+        якщо(!eaten) {
           DEBUG_LOG("libvterm: Text callback did not consume any input\n");
           /* force it to make progress */
           eaten = 1;
@@ -394,14 +394,14 @@ string_state:
     }
   }
 
-  if(string_start) {
+  якщо(string_start) {
     size_t string_len = bytes + pos - string_start;
-    if(vt->parser.in_esc)
+    якщо(vt->parser.in_esc)
       string_len -= 1;
     string_fragment(vt, string_start, string_len, FALSE);
   }
 
-  return len;
+  повернути len;
 }
 
 void vterm_parser_set_callbacks(VTerm *vt, const VTermParserCallbacks *callbacks, void *user)
@@ -412,10 +412,10 @@ void vterm_parser_set_callbacks(VTerm *vt, const VTermParserCallbacks *callbacks
 
 void *vterm_parser_get_cbdata(VTerm *vt)
 {
-  return vt->parser.cbdata;
+  повернути vt->parser.cbdata;
 }
 
-void vterm_parser_set_emit_nul(VTerm *vt, int emit)
+void vterm_parser_set_emit_nul(VTerm *vt, ціле emit)
 {
   vt->parser.emit_nul = emit;
 }

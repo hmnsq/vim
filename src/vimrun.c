@@ -23,15 +23,15 @@
 #endif
 #include <windows.h>
 
-    int
+    ціле
 main(void)
 {
     const wchar_t   *p;
     wchar_t	    *cmd;
     size_t	    cmdlen;
-    int		    retval;
-    int		    inquote = 0;
-    int		    silent = 0;
+    ціле		    retval;
+    ціле		    inquote = 0;
+    ціле		    silent = 0;
     HANDLE	    hstdout;
     DWORD	    written;
 
@@ -40,28 +40,28 @@ main(void)
     /*
      * Skip the executable name, which might be in "".
      */
-    while (*p)
+    поки (*p)
     {
-	if (*p == L'"')
+	якщо (*p == L'"')
 	    inquote = !inquote;
-	else if (!inquote && *p == L' ')
+	інакше якщо (!inquote && *p == L' ')
 	{
 	    ++p;
 	    break;
 	}
 	++p;
     }
-    while (*p == L' ')
+    поки (*p == L' ')
 	++p;
 
     /*
      * "-s" argument: don't wait for a key hit.
      */
-    if (p[0] == L'-' && p[1] == L's' && p[2] == L' ')
+    якщо (p[0] == L'-' && p[1] == L's' && p[2] == L' ')
     {
 	silent = 1;
 	p += 3;
-	while (*p == L' ')
+	поки (*p == L' ')
 	    ++p;
     }
 
@@ -74,14 +74,14 @@ main(void)
     // Enclose the command in parentheses.
     cmd = NULL;
     cmdlen = wcslen(p);
-    if (cmdlen >= 2 && p[0] == L'"' && p[cmdlen - 1] == L'"')
+    якщо (cmdlen >= 2 && p[0] == L'"' && p[cmdlen - 1] == L'"')
     {
 	cmdlen += 3;
 	cmd = malloc(cmdlen * sizeof(wchar_t));
-	if (cmd == NULL)
+	якщо (cmd == NULL)
 	{
 	    perror("vimrun malloc(): ");
-	    return -1;
+	    повернути -1;
 	}
 	_snwprintf(cmd, cmdlen, L"(%s)", p);
 	p = cmd;
@@ -92,22 +92,22 @@ main(void)
      */
     retval = _wsystem(p);
 
-    if (cmd)
+    якщо (cmd)
 	free(cmd);
 
-    if (retval == -1)
+    якщо (retval == -1)
 	perror("vimrun system(): ");
-    else if (retval != 0)
+    інакше якщо (retval != 0)
 	printf("shell returned %d\n", retval);
 
-    if (!silent)
+    якщо (!silent)
     {
 	puts("Hit any key to close this window...");
 
-	while (_kbhit())
+	поки (_kbhit())
 	    (void)_getch();
 	(void)_getch();
     }
 
-    return retval;
+    повернути retval;
 }

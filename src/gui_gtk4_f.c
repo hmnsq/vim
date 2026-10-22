@@ -17,8 +17,8 @@
 typedef struct
 {
     GtkWidget	*widget;
-    int		x;
-    int		y;
+    ціле		x;
+    ціле		y;
 } VimFormChild;
 
 /*
@@ -35,15 +35,15 @@ struct _VimForm
 
     // See vim_form_size_allocate()
     guint resize_idle_id;
-    int last_width;
-    int last_height;
+    ціле last_width;
+    ціле last_height;
 };
 
 G_DEFINE_TYPE(VimForm, vim_form, GTK_TYPE_WIDGET)
 
 static void vim_form_snapshot(GtkWidget *widget, GtkSnapshot *snapshot);
-static void vim_form_size_allocate(GtkWidget *widget, int width, int height, int baseline);
-static void vim_form_measure(GtkWidget *widget, GtkOrientation orientation, int for_size, int *minimum, int *natural, int *minimum_baseline, int *natural_baseline);
+static void vim_form_size_allocate(GtkWidget *widget, ціле width, ціле height, ціле baseline);
+static void vim_form_measure(GtkWidget *widget, GtkOrientation orientation, ціле for_size, ціле *minimum, ціле *natural, ціле *minimum_baseline, ціле *natural_baseline);
 static gboolean vim_form_contains(GtkWidget *widget, double x, double y);
 
     static void
@@ -52,7 +52,7 @@ vim_form_dispose(GObject *obj)
     VimForm *self = VIM_FORM(obj);
     GList   *ele = self->children;
 
-    while (ele != NULL)
+    поки (ele != NULL)
     {
 	VimFormChild *child = ele->data;
 
@@ -88,7 +88,7 @@ vim_form_init(VimForm *self UNUSED)
     GtkWidget *
 vim_form_new(void)
 {
-    return g_object_new(VIM_TYPE_FORM, NULL);
+    повернути g_object_new(VIM_TYPE_FORM, NULL);
 }
 
 /*
@@ -99,19 +99,19 @@ vim_form_position_child(VimForm	*self, VimFormChild *child)
 {
     GtkRequisition  requisition;
     GskTransform    *transform;
-    int		    w, h;
+    ціле		    w, h;
 
     gtk_widget_get_preferred_size(child->widget, &requisition, NULL);
     w = requisition.width;
     h = requisition.height;
 
     // If widget has no size request, use parent size
-    if (w <= 0)
+    якщо (w <= 0)
 	w = gtk_widget_get_width(GTK_WIDGET(self));
-    if (h <= 0)
+    якщо (h <= 0)
 	h = gtk_widget_get_height(GTK_WIDGET(self));
-    if (w <= 0) w = 1;
-    if (h <= 0) h = 1;
+    якщо (w <= 0) w = 1;
+    якщо (h <= 0) h = 1;
 
     transform = gsk_transform_translate(NULL,
 	    &GRAPHENE_POINT_INIT((float)child->x, (float)child->y));
@@ -122,7 +122,7 @@ vim_form_position_child(VimForm	*self, VimFormChild *child)
  * Place the given widget at the point (x, y).
  */
     void
-vim_form_put(VimForm *self, GtkWidget *widget, int x, int y)
+vim_form_put(VimForm *self, GtkWidget *widget, ціле x, ціле y)
 {
     VimFormChild *child;
 
@@ -145,17 +145,17 @@ vim_form_put(VimForm *self, GtkWidget *widget, int x, int y)
  * to the given point (x, y).
  */
     void
-vim_form_move(VimForm *self, GtkWidget *widget, int x, int y)
+vim_form_move(VimForm *self, GtkWidget *widget, ціле x, ціле y)
 {
-    for (GList *ele = self->children; ele != NULL; ele = ele->next)
+    для (GList *ele = self->children; ele != NULL; ele = ele->next)
     {
 	VimFormChild *child = ele->data;
-	if (child->widget == widget)
+	якщо (child->widget == widget)
 	{
 	    child->x = x;
 	    child->y = y;
 	    vim_form_position_child(self, child);
-	    return;
+	    повернути;
 	}
     }
 }
@@ -173,7 +173,7 @@ vim_form_move_resize(
 	gint	    h)
 {
     gtk_widget_set_size_request(widget, w, h);
-    if (!gtk_widget_get_visible(widget))
+    якщо (!gtk_widget_get_visible(widget))
 	gtk_widget_queue_resize(widget);
     vim_form_move(self, widget, x, y);
 }
@@ -181,16 +181,16 @@ vim_form_move_resize(
     void
 vim_form_remove(VimForm *self, GtkWidget *widget)
 {
-    for (GList *ele = self->children; ele != NULL; ele = ele->next)
+    для (GList *ele = self->children; ele != NULL; ele = ele->next)
     {
 	VimFormChild *child = ele->data;
-	if (child->widget == widget)
+	якщо (child->widget == widget)
 	{
 	    self->children = g_list_remove_link(self->children, ele);
 	    g_list_free_1(ele);
 	    gtk_widget_unparent(widget);
 	    g_free(child);
-	    return;
+	    повернути;
 	}
     }
 }
@@ -200,7 +200,7 @@ vim_form_snapshot(GtkWidget *widget, GtkSnapshot *snapshot)
 {
     VimForm *self = VIM_FORM(widget);
 
-    for (GList *ele = self->children; ele != NULL; ele = ele->next)
+    для (GList *ele = self->children; ele != NULL; ele = ele->next)
     {
 	VimFormChild *child = ele->data;
 	gtk_widget_snapshot_child(widget, child->widget, snapshot);
@@ -212,30 +212,30 @@ vim_form_resize_idle_cb(VimForm *self)
 {
     self->resize_idle_id = 0;
 
-    if (gui.drawarea == NULL)
+    якщо (gui.drawarea == NULL)
 	goto exit;
 
-    if (self->last_width > 1 && self->last_height > 1)
+    якщо (self->last_width > 1 && self->last_height > 1)
     {
 	// Ignore an allocation that does not answer the size that was last
 	// asked for: it was computed before the request and using it would
 	// compute Rows and Columns from the old size together with the new
 	// base size, losing columns. Give up after one allocation in case
 	// the request is never answered exactly.
-	if (gui.pending_form_w > 0
+	якщо (gui.pending_form_w > 0
 		&& (self->last_width != gui.pending_form_w
 		    || self->last_height != gui.pending_form_h)
 		&& --gui.pending_form_skip >= 0)
 	    goto exit;
 
-	int	req_w, req_h;
+	ціле	req_w, req_h;
 
 	gui.pending_form_w = 0;
 
 	// The size request that Vim made has been answered.  Keep the size and
 	// drop the request, otherwise the window could not be made smaller.
 	gtk_widget_get_size_request(GTK_WIDGET(self), &req_w, &req_h);
-	if (req_w != -1 || req_h != -1)
+	якщо (req_w != -1 || req_h != -1)
 	{
 	    gtk_window_set_default_size(GTK_WINDOW(gui.mainwin),
 		    gtk_widget_get_width(gui.mainwin),
@@ -248,28 +248,28 @@ vim_form_resize_idle_cb(VimForm *self)
 
 exit:
     g_object_unref(self);
-    return G_SOURCE_REMOVE;
+    повернути G_SOURCE_REMOVE;
 }
 
     static void
 vim_form_size_allocate(
 	GtkWidget *widget,
-	int width,
-	int height,
-	int baseline UNUSED)
+	ціле width,
+	ціле height,
+	ціле baseline UNUSED)
 {
     VimForm *self = VIM_FORM(widget);
 
-    for (GList *ele = self->children; ele != NULL; ele = ele->next)
+    для (GList *ele = self->children; ele != NULL; ele = ele->next)
 	vim_form_position_child(self, ele->data);
 
     // Notify Vim about size change via idle callback
-    if (width != self->last_width || height != self->last_height)
+    якщо (width != self->last_width || height != self->last_height)
     {
 	self->last_width = width;
 	self->last_height = height;
 
-	if (self->resize_idle_id == 0)
+	якщо (self->resize_idle_id == 0)
 	    self->resize_idle_id = g_idle_add(
 		    (GSourceFunc)vim_form_resize_idle_cb, g_object_ref(self));
     }
@@ -279,33 +279,33 @@ vim_form_size_allocate(
 vim_form_measure(
 	GtkWidget	*widget UNUSED,
 	GtkOrientation	orientation,
-	int		for_size UNUSED,
-	int		*minimum,
-	int		*natural,
-	int		*minimum_baseline,
-	int		*natural_baseline)
+	ціле		for_size UNUSED,
+	ціле		*minimum,
+	ціле		*natural,
+	ціле		*minimum_baseline,
+	ціле		*natural_baseline)
 {
-    if (orientation == GTK_ORIENTATION_VERTICAL)
+    якщо (orientation == GTK_ORIENTATION_VERTICAL)
     {
 	// Set minimum height of form widget to 4 rows.
-	if (minimum != NULL)
+	якщо (minimum != NULL)
 	    *minimum  = gui.char_height * 4;
-	if (natural != NULL)
+	якщо (natural != NULL)
 	    *natural = gui.char_height * 4;
     }
-    else
+    інакше
     {
 	// Set minimum width of form widget to 20 columns. Any less and the draw
 	// area seems to glitch out...
-	if (minimum != NULL)
+	якщо (minimum != NULL)
 	    *minimum  = gui.char_width * 20;
-	if (natural != NULL)
+	якщо (natural != NULL)
 	    *natural = gui.char_width * 20;
     }
 
-    if (minimum_baseline != NULL)
+    якщо (minimum_baseline != NULL)
 	*minimum_baseline = -1;
-    if (natural_baseline != NULL)
+    якщо (natural_baseline != NULL)
 	*natural_baseline = -1;
 }
 
@@ -317,5 +317,5 @@ vim_form_measure(
     static gboolean
 vim_form_contains(GtkWidget *widget UNUSED, double x UNUSED, double y UNUSED)
 {
-    return FALSE;
+    повернути FALSE;
 }

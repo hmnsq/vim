@@ -31,16 +31,16 @@
 char *searchpath(char *name);
 #endif
 
-#if defined(UNIX_LINT)
+#якщо defined(UNIX_LINT)
 # include <unistd.h>
 # include <errno.h>
 #endif
 
 #include "version.h"
 
-#if defined(UNIX_LINT)
+#якщо defined(UNIX_LINT)
 # define vim_mkdir(x, y) mkdir((char *)(x), y)
-#else
+#інакше
 # define vim_mkdir(x, y) _mkdir((char *)(x))
 #endif
 
@@ -75,46 +75,46 @@ char *searchpath(char *name);
 
 #ifdef __MINGW32__
 # define UNUSED __attribute__((unused))
-#else
+#інакше
 # define UNUSED
 #endif
 
 #define VIM_STARTMENU "Programs\\Vim " VIM_VERSION_SHORT
 
-int	interactive;		// non-zero when running interactively
+ціле	interactive;		// non-zero when running interactively
 
 /*
  * Call malloc() and exit when out of memory.
  */
     static void *
-alloc(int len)
+alloc(ціле len)
 {
     void *p;
 
     p = malloc(len);
-    if (p == NULL)
+    якщо (p == NULL)
     {
 	printf("ERROR: out of memory\n");
 	exit(1);
     }
-    return p;
+    повернути p;
 }
 
 /*
  * The toupper() in Bcc 5.5 doesn't work, use our own implementation.
  */
-    static int
-mytoupper(int c)
+    static ціле
+mytoupper(ціле c)
 {
-    if (c >= 'a' && c <= 'z')
-	return c - 'a' + 'A';
-    return c;
+    якщо (c >= 'a' && c <= 'z')
+	повернути c - 'a' + 'A';
+    повернути c;
 }
 
     static void
-myexit(int n)
+myexit(ціле n)
 {
-    if (!interactive)
+    якщо (!interactive)
     {
 	// Present a prompt, otherwise error messages can't be read.
 	printf("Press Enter to continue\n");
@@ -133,16 +133,16 @@ typedef BOOL (WINAPI *LPFN_ISWOW64PROCESS)(HANDLE, PBOOL);
 is_64bit_os(void)
 {
 #ifdef _WIN64
-    return TRUE;
-#else
+    повернути TRUE;
+#інакше
     BOOL bIsWow64 = FALSE;
     LPFN_ISWOW64PROCESS pIsWow64Process;
 
     pIsWow64Process = (LPFN_ISWOW64PROCESS)GetProcAddress(
 	    GetModuleHandle("kernel32"), "IsWow64Process");
-    if (pIsWow64Process != NULL)
+    якщо (pIsWow64Process != NULL)
 	pIsWow64Process(GetCurrentProcess(), &bIsWow64);
-    return bIsWow64;
+    повернути bIsWow64;
 #endif
 }
 
@@ -156,14 +156,14 @@ searchpath(char *name)
     // Use FindExecutableW() instead...
     MultiByteToWideChar(CP_ACP, 0, (LPCTSTR)name, -1,
 	    (LPWSTR)widename, BUFSIZE);
-    if (FindExecutableW((LPCWSTR)widename, (LPCWSTR)"",
+    якщо (FindExecutableW((LPCWSTR)widename, (LPCWSTR)"",
 		(LPWSTR)location) > (HINSTANCE)32)
     {
 	WideCharToMultiByte(CP_ACP, 0, (LPWSTR)location, -1,
 		(LPSTR)widename, 2 * BUFSIZE, NULL, NULL);
-	return widename;
+	повернути widename;
     }
-    return NULL;
+    повернути NULL;
 }
 
 /*
@@ -176,11 +176,11 @@ searchpath_save(char *name)
     char	*s;
 
     p = searchpath(name);
-    if (p == NULL)
-	return NULL;
+    якщо (p == NULL)
+	повернути NULL;
     s = alloc(strlen(p) + 1);
     strcpy(s, p);
-    return s;
+    повернути s;
 }
 
 
@@ -196,7 +196,7 @@ searchpath_save(char *name)
  *
  * Return FAIL on error, OK on success
  */
-    int
+    ціле
 get_shell_folder_path(
 	char *shell_folder_path,
 	const char *shell_folder_name)
@@ -208,34 +208,34 @@ get_shell_folder_path(
      */
     LPITEMIDLIST    pidl = 0; // Pointer to an Item ID list allocated below
     LPMALLOC	    pMalloc;  // Pointer to an IMalloc interface
-    int		    csidl;
-    int		    alt_csidl = -1;
-    static int	    desktop_csidl = -1;
-    static int	    programs_csidl = -1;
-    int		    *pcsidl;
-    int		    r;
+    ціле		    csidl;
+    ціле		    alt_csidl = -1;
+    static ціле	    desktop_csidl = -1;
+    static ціле	    programs_csidl = -1;
+    ціле		    *pcsidl;
+    ціле		    r;
 
-    if (strcmp(shell_folder_name, "desktop") == 0)
+    якщо (strcmp(shell_folder_name, "desktop") == 0)
     {
 	pcsidl = &desktop_csidl;
 	csidl = CSIDL_COMMON_DESKTOPDIRECTORY;
 	alt_csidl = CSIDL_DESKTOP;
     }
-    else if (strncmp(shell_folder_name, "Programs", 8) == 0)
+    інакше якщо (strncmp(shell_folder_name, "Programs", 8) == 0)
     {
 	pcsidl = &programs_csidl;
 	csidl = CSIDL_COMMON_PROGRAMS;
 	alt_csidl = CSIDL_PROGRAMS;
     }
-    else
+    інакше
     {
 	printf("\nERROR (internal) unrecognised shell_folder_name: \"%s\"\n\n",
 							   shell_folder_name);
-	return FAIL;
+	повернути FAIL;
     }
 
     // Did this stuff before, use the same ID again.
-    if (*pcsidl >= 0)
+    якщо (*pcsidl >= 0)
     {
 	csidl = *pcsidl;
 	alt_csidl = -1;
@@ -243,22 +243,22 @@ get_shell_folder_path(
 
 retry:
     // Initialize pointer to IMalloc interface
-    if (NOERROR != SHGetMalloc(&pMalloc))
+    якщо (NOERROR != SHGetMalloc(&pMalloc))
     {
 	printf("\nERROR getting interface for shell_folder_name: \"%s\"\n\n",
 							   shell_folder_name);
-	return FAIL;
+	повернути FAIL;
     }
 
     // Get an ITEMIDLIST corresponding to the folder code
-    if (NOERROR != SHGetSpecialFolderLocation(0, csidl, &pidl))
+    якщо (NOERROR != SHGetSpecialFolderLocation(0, csidl, &pidl))
     {
-	if (alt_csidl < 0 || NOERROR != SHGetSpecialFolderLocation(0,
+	якщо (alt_csidl < 0 || NOERROR != SHGetSpecialFolderLocation(0,
 							    alt_csidl, &pidl))
 	{
 	    printf("\nERROR getting ITEMIDLIST for shell_folder_name: \"%s\"\n\n",
 							   shell_folder_name);
-	    return FAIL;
+	    повернути FAIL;
 	}
 	csidl = alt_csidl;
 	alt_csidl = -1;
@@ -272,9 +272,9 @@ retry:
     // Release the IMalloc interface
     pMalloc->lpVtbl->Release(pMalloc);
 
-    if (!r)
+    якщо (!r)
     {
-	if (alt_csidl >= 0)
+	якщо (alt_csidl >= 0)
 	{
 	    // We probably get here for Windows 95: the "all users"
 	    // desktop/start menu entry doesn't exist.
@@ -284,13 +284,13 @@ retry:
 	}
 	printf("\nERROR translating ITEMIDLIST for shell_folder_name: \"%s\"\n\n",
 							   shell_folder_name);
-	return FAIL;
+	повернути FAIL;
     }
 
     // If there is an alternative: verify we can write in this directory.
     // This should cause a retry when the "all users" directory exists but we
     // are a normal user and can't write there.
-    if (alt_csidl >= 0)
+    якщо (alt_csidl >= 0)
     {
 	char tbuf[BUFSIZE];
 	FILE *fd;
@@ -298,7 +298,7 @@ retry:
 	strcpy(tbuf, shell_folder_path);
 	strcat(tbuf, "\\vim write test");
 	fd = fopen(tbuf, "w");
-	if (fd == NULL)
+	якщо (fd == NULL)
 	{
 	    csidl = alt_csidl;
 	    alt_csidl = -1;
@@ -312,13 +312,13 @@ retry:
      * Keep the found csidl for next time, so that we don't have to do the
      * write test every time.
      */
-    if (*pcsidl < 0)
+    якщо (*pcsidl < 0)
 	*pcsidl = csidl;
 
-    if (strncmp(shell_folder_name, "Programs\\", 9) == 0)
+    якщо (strncmp(shell_folder_name, "Programs\\", 9) == 0)
 	strcat(shell_folder_path, shell_folder_name + 8);
 
-    return OK;
+    повернути OK;
 }
 
 /*
@@ -374,7 +374,7 @@ char *(icon_link_names[ICON_COUNT]) =
 	 "gVim Read only " VIM_VERSION_SHORT ".lnk"};
 
 /* This is only used for dosinst.c. */
-#if defined(DOSINST)
+#якщо defined(DOSINST)
 /*
  * Run an external command and wait for it to finish.
  */
@@ -388,19 +388,19 @@ run_command(char *cmd)
     // On WinNT, 'start' is a shell built-in for cmd.exe rather than an
     // executable (start.exe) like in Win9x.
     cmd_path = searchpath_save("cmd.exe");
-    if (cmd_path != NULL)
+    якщо (cmd_path != NULL)
     {
 	// There is a cmd.exe, so this might be Windows NT.  If it is,
 	// we need to call cmd.exe explicitly.  If it is a later OS,
 	// calling cmd.exe won't hurt if it is present.
 	// Also, "start" on NT expects a window title argument.
 	// Replace the slashes with backslashes.
-	while ((p = strchr(cmd_path, '/')) != NULL)
+	поки ((p = strchr(cmd_path, '/')) != NULL)
 	    *p = '\\';
 	sprintf(cmd_buf, "%s /c start \"vimcmd\" /wait %s", cmd_path, cmd);
 	free(cmd_path);
     }
-    else
+    інакше
     {
 	// No cmd.exe, just make the call and let the system handle it.
 	sprintf(cmd_buf, "start /w %s", cmd);
@@ -415,54 +415,54 @@ run_command(char *cmd)
     void
 add_pathsep(char *name)
 {
-    int		len = strlen(name);
+    ціле		len = strlen(name);
 
-    if (len > 0 && name[len - 1] != '\\' && name[len - 1] != '/')
+    якщо (len > 0 && name[len - 1] != '\\' && name[len - 1] != '/')
 	strcat(name, "\\");
 }
 
 /*
  * The normal chdir() does not change the default drive.  This one does.
  */
-    int
-change_drive(int drive)
+    ціле
+change_drive(ціле drive)
 {
     char temp[3] = "-:";
     temp[0] = (char)(drive + 'A' - 1);
-    return !SetCurrentDirectory(temp);
+    повернути !SetCurrentDirectory(temp);
 }
 
 /*
  * Change directory to "path".
  * Return 0 for success, -1 for failure.
  */
-    int
+    ціле
 mch_chdir(char *path)
 {
-    if (path[0] == NUL)		// just checking...
-	return 0;
-    if (path[1] == ':')		// has a drive name
+    якщо (path[0] == NUL)		// just checking...
+	повернути 0;
+    якщо (path[1] == ':')		// has a drive name
     {
-	if (change_drive(mytoupper(path[0]) - 'A' + 1))
-	    return -1;		// invalid drive name
+	якщо (change_drive(mytoupper(path[0]) - 'A' + 1))
+	    повернути -1;		// invalid drive name
 	path += 2;
     }
-    if (*path == NUL)		// drive name only
-	return 0;
-    return chdir(path);		// let the normal chdir() do the rest
+    якщо (*path == NUL)		// drive name only
+	повернути 0;
+    повернути chdir(path);		// let the normal chdir() do the rest
 }
 
 /*
  * Expand the executable name into a full path name.
  */
     static char *
-my_fullpath(char *buf, char *fname UNUSED, int len)
+my_fullpath(char *buf, char *fname UNUSED, ціле len)
 {
     // Only GetModuleFileName() will get the long file name path.
     // GetFullPathName() may still use the short (FAT) name.
     DWORD len_read = GetModuleFileName(NULL, buf, (size_t)len);
 
-    return (len_read > 0 && len_read < (DWORD)len) ? buf : NULL;
+    повернути (len_read > 0 && len_read < (DWORD)len) ? buf : NULL;
 }
 
 /*
@@ -472,10 +472,10 @@ my_fullpath(char *buf, char *fname UNUSED, int len)
     static void
 remove_tail(char *path)
 {
-    int		i;
+    ціле		i;
 
-    for (i = strlen(path) - 1; i > 0; --i)
-	if (path[i] == '/' || path[i] == '\\')
+    для (i = strlen(path) - 1; i > 0; --i)
+	якщо (path[i] == '/' || path[i] == '\\')
 	{
 	    path[i] = NUL;
 	    break;
@@ -486,7 +486,7 @@ remove_tail(char *path)
 char	installdir[MAX_PATH-9];	// top of the installation dir, where the
 				// install.exe is located, E.g.:
 				// "c:\vim\vim60"
-int	runtimeidx;		// index in installdir[] where "vim60" starts
+ціле	runtimeidx;		// index in installdir[] where "vim60" starts
 char	*sysdrive;		// system drive or "c:\"
 
 /*
@@ -497,7 +497,7 @@ char	*sysdrive;		// system drive or "c:\"
 do_inits(char **argv)
 {
     // Find out the full path of our executable.
-    if (my_fullpath(installdir, argv[0], sizeof(installdir)) == NULL)
+    якщо (my_fullpath(installdir, argv[0], sizeof(installdir)) == NULL)
     {
 	printf("ERROR: Cannot get name of executable\n");
 	myexit(1);
@@ -511,6 +511,6 @@ do_inits(char **argv)
     // Find the system drive.  Only used for searching the Vim executable, not
     // very important.
     sysdrive = getenv("SYSTEMDRIVE");
-    if (sysdrive == NULL || *sysdrive == NUL)
+    якщо (sysdrive == NULL || *sysdrive == NUL)
 	sysdrive = "C:\\";
 }

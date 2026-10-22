@@ -5,15 +5,15 @@
 
 #define strneq(a,b,n) (strncmp(a,b,n)==0)
 
-#if defined(DEBUG) && DEBUG > 1
+#якщо defined(DEBUG) && DEBUG > 1
 # define DEBUG_GLYPH_COMBINE
 #endif
 
-static int on_resize(int rows, int cols, void *user);
+static ціле on_resize(ціле rows, ціле cols, void *user);
 
 /* Some convenient wrappers to make callback functions easier */
 
-static void putglyph(VTermState *state, const uint32_t chars[], int width, VTermPos pos)
+static void putglyph(VTermState *state, const uint32_t chars[], ціле width, VTermPos pos)
 {
   VTermGlyphInfo info;
 
@@ -23,48 +23,48 @@ static void putglyph(VTermState *state, const uint32_t chars[], int width, VTerm
   info.dwl = state->lineinfo[pos.row].doublewidth;
   info.dhl = state->lineinfo[pos.row].doubleheight;
 
-  if(state->callbacks && state->callbacks->putglyph)
-    if((*state->callbacks->putglyph)(&info, pos, state->cbdata))
-      return;
+  якщо(state->callbacks && state->callbacks->putglyph)
+    якщо((*state->callbacks->putglyph)(&info, pos, state->cbdata))
+      повернути;
 
   DEBUG_LOG3("libvterm: Unhandled putglyph U+%04x at (%d,%d)\n", chars[0], pos.col, pos.row);
 }
 
-static void updatecursor(VTermState *state, VTermPos *oldpos, int cancel_phantom)
+static void updatecursor(VTermState *state, VTermPos *oldpos, ціле cancel_phantom)
 {
-  if(state->pos.col == oldpos->col && state->pos.row == oldpos->row)
-    return;
+  якщо(state->pos.col == oldpos->col && state->pos.row == oldpos->row)
+    повернути;
 
-  if(cancel_phantom)
+  якщо(cancel_phantom)
     state->at_phantom = 0;
 
-  if(state->callbacks && state->callbacks->movecursor)
-    if((*state->callbacks->movecursor)(state->pos, *oldpos, state->mode.cursor_visible, state->cbdata))
-      return;
+  якщо(state->callbacks && state->callbacks->movecursor)
+    якщо((*state->callbacks->movecursor)(state->pos, *oldpos, state->mode.cursor_visible, state->cbdata))
+      повернути;
 }
 
-static void erase(VTermState *state, VTermRect rect, int selective)
+static void erase(VTermState *state, VTermRect rect, ціле selective)
 {
-  if(rect.end_col == state->cols) {
-    int row;
+  якщо(rect.end_col == state->cols) {
+    ціле row;
     /* If we're erasing the final cells of any lines, cancel the continuation
      * marker on the subsequent line
      */
-    for(row = rect.start_row + 1; row < rect.end_row + 1 && row < state->rows; row++)
+    для(row = rect.start_row + 1; row < rect.end_row + 1 && row < state->rows; row++)
       state->lineinfo[row].continuation = 0;
   }
 
-  if(state->callbacks && state->callbacks->erase)
-    if((*state->callbacks->erase)(rect, selective, state->cbdata))
-      return;
+  якщо(state->callbacks && state->callbacks->erase)
+    якщо((*state->callbacks->erase)(rect, selective, state->cbdata))
+      повернути;
 }
 
 static VTermState *vterm_state_new(VTerm *vt)
 {
   VTermState *state = vterm_allocator_malloc(vt, sizeof(VTermState));
 
-  if (state == NULL)
-    return NULL;
+  якщо (state == NULL)
+    повернути NULL;
   state->vt = vt;
 
   state->rows = vt->rows;
@@ -99,69 +99,69 @@ static VTermState *vterm_state_new(VTerm *vt)
   state->lineinfo = state->lineinfos[BUFIDX_PRIMARY];
 
   state->encoding_utf8.enc = vterm_lookup_encoding(ENC_UTF8, 'u');
-  if(state->encoding_utf8.enc->init)
+  якщо(state->encoding_utf8.enc->init)
     (*state->encoding_utf8.enc->init)(state->encoding_utf8.enc, state->encoding_utf8.data);
 
-  return state;
+  повернути state;
 }
 
 INTERNAL void vterm_state_free(VTermState *state)
 {
   vterm_allocator_free(state->vt, state->tabstops);
   vterm_allocator_free(state->vt, state->lineinfos[BUFIDX_PRIMARY]);
-  if(state->lineinfos[BUFIDX_ALTSCREEN])
+  якщо(state->lineinfos[BUFIDX_ALTSCREEN])
     vterm_allocator_free(state->vt, state->lineinfos[BUFIDX_ALTSCREEN]);
   vterm_allocator_free(state->vt, state->combine_chars);
   vterm_allocator_free(state->vt, state);
 }
 
-static void scroll(VTermState *state, VTermRect rect, int downward, int rightward)
+static void scroll(VTermState *state, VTermRect rect, ціле downward, ціле rightward)
 {
-  int rows;
-  int cols;
-  if(!downward && !rightward)
-    return;
+  ціле rows;
+  ціле cols;
+  якщо(!downward && !rightward)
+    повернути;
 
   // A degenerate rectangle makes "rows" or "cols" below negative, which
   // inverts the clamping of "downward" and "rightward" and results in a
   // negative height being passed to memmove().  This happens when a scroll
   // region survives a resize that made the terminal smaller.
-  if(rect.end_row <= rect.start_row || rect.end_col <= rect.start_col)
-    return;
+  якщо(rect.end_row <= rect.start_row || rect.end_col <= rect.start_col)
+    повернути;
 
   rows = rect.end_row - rect.start_row;
-  if(downward > rows)
+  якщо(downward > rows)
     downward = rows;
-  else if(downward < -rows)
+  інакше якщо(downward < -rows)
     downward = -rows;
 
   cols = rect.end_col - rect.start_col;
-  if(rightward > cols)
+  якщо(rightward > cols)
     rightward = cols;
-  else if(rightward < -cols)
+  інакше якщо(rightward < -cols)
     rightward = -cols;
 
-  if(state->callbacks_has_premove && state->callbacks && state->callbacks->premove) {
+  якщо(state->callbacks_has_premove && state->callbacks && state->callbacks->premove) {
     // TODO: technically this logic is wrong if both downward != 0 and rightward != 0
 
     /* Work out what subsection of the destination area is about to be destroyed */
-    if(downward > 0)
+    якщо(downward > 0)
       /* about to destroy the top */
       (*state->callbacks->premove)((VTermRect){
           .start_row = rect.start_row, .end_row = rect.start_row + downward,
           .start_col = rect.start_col, .end_col = rect.end_col}, state->cbdata);
-    else if(downward < 0)
+    інакше якщо(downward < 0)
       /* about to destroy the bottom */
       (*state->callbacks->premove)((VTermRect){
           .start_row = rect.end_row + downward, .end_row = rect.end_row,
           .start_col = rect.start_col,          .end_col = rect.end_col}, state->cbdata);
 
-    if(rightward > 0)
+    якщо(rightward > 0)
       /* about to destroy the left */
       (*state->callbacks->premove)((VTermRect){
           .start_row = rect.start_row, .end_row = rect.end_row,
           .start_col = rect.start_col, .end_col = rect.start_col + rightward}, state->cbdata);
-    else if(rightward < 0)
+    інакше якщо(rightward < 0)
       /* about to destroy the right */
       (*state->callbacks->premove)((VTermRect){
           .start_row = rect.start_row,           .end_row = rect.end_row,
@@ -169,39 +169,39 @@ static void scroll(VTermState *state, VTermRect rect, int downward, int rightwar
   }
 
   // Update lineinfo if full line
-  if(rect.start_col == 0 && rect.end_col == state->cols && rightward == 0) {
-    int height = rect.end_row - rect.start_row - abs(downward);
-    int row;
+  якщо(rect.start_col == 0 && rect.end_col == state->cols && rightward == 0) {
+    ціле height = rect.end_row - rect.start_row - abs(downward);
+    ціле row;
     VTermLineInfo zeroLineInfo = {0x0};
 
-    if(downward > 0) {
+    якщо(downward > 0) {
       memmove(state->lineinfo + rect.start_row,
               state->lineinfo + rect.start_row + downward,
               height * sizeof(state->lineinfo[0]));
-      for(row = rect.end_row - downward; row < rect.end_row; row++)
+      для(row = rect.end_row - downward; row < rect.end_row; row++)
         state->lineinfo[row] = zeroLineInfo;
     }
-    else {
+    інакше {
       memmove(state->lineinfo + rect.start_row - downward,
               state->lineinfo + rect.start_row,
               height * sizeof(state->lineinfo[0]));
-      for(row = rect.start_row; row < rect.start_row - downward; row++)
+      для(row = rect.start_row; row < rect.start_row - downward; row++)
         state->lineinfo[row] = zeroLineInfo;
     }
   }
 
-  if(state->callbacks && state->callbacks->scrollrect)
-    if((*state->callbacks->scrollrect)(rect, downward, rightward, state->cbdata))
-      return;
+  якщо(state->callbacks && state->callbacks->scrollrect)
+    якщо((*state->callbacks->scrollrect)(rect, downward, rightward, state->cbdata))
+      повернути;
 
-  if(state->callbacks)
+  якщо(state->callbacks)
     vterm_scroll_rect(rect, downward, rightward,
         state->callbacks->moverect, state->callbacks->erase, state->cbdata);
 }
 
 static void linefeed(VTermState *state)
 {
-  if(state->pos.row == SCROLLREGION_BOTTOM(state) - 1) {
+  якщо(state->pos.row == SCROLLREGION_BOTTOM(state) - 1) {
     VTermRect rect;
     rect.start_row = state->scrollregion_top;
     rect.end_row   = SCROLLREGION_BOTTOM(state);
@@ -210,7 +210,7 @@ static void linefeed(VTermState *state)
 
     scroll(state, rect, 1, 0);
   }
-  else if(state->pos.row < state->rows-1)
+  інакше якщо(state->pos.row < state->rows-1)
     state->pos.row++;
 }
 
@@ -227,53 +227,53 @@ static void grow_combine_buffer(VTermState *state)
   state->combine_chars_size = new_size;
 }
 
-static void set_col_tabstop(VTermState *state, int col)
+static void set_col_tabstop(VTermState *state, ціле col)
 {
   unsigned char mask = 1 << (col & 7);
   state->tabstops[col >> 3] |= mask;
 }
 
-static void clear_col_tabstop(VTermState *state, int col)
+static void clear_col_tabstop(VTermState *state, ціле col)
 {
   unsigned char mask = 1 << (col & 7);
   state->tabstops[col >> 3] &= ~mask;
 }
 
-static int is_col_tabstop(VTermState *state, int col)
+static ціле is_col_tabstop(VTermState *state, ціле col)
 {
   unsigned char mask = 1 << (col & 7);
-  return state->tabstops[col >> 3] & mask;
+  повернути state->tabstops[col >> 3] & mask;
 }
 
-static int is_cursor_in_scrollregion(const VTermState *state)
+static ціле is_cursor_in_scrollregion(const VTermState *state)
 {
-  if(state->pos.row < state->scrollregion_top ||
+  якщо(state->pos.row < state->scrollregion_top ||
      state->pos.row >= SCROLLREGION_BOTTOM(state))
-    return 0;
-  if(state->pos.col < SCROLLREGION_LEFT(state) ||
+    повернути 0;
+  якщо(state->pos.col < SCROLLREGION_LEFT(state) ||
      state->pos.col >= SCROLLREGION_RIGHT(state))
-    return 0;
+    повернути 0;
 
-  return 1;
+  повернути 1;
 }
 
-static void tab(VTermState *state, int count, int direction)
+static void tab(VTermState *state, ціле count, ціле direction)
 {
-  while(count > 0) {
-    if(direction > 0) {
-      if(state->pos.col >= THISROWWIDTH(state)-1)
-        return;
+  поки(count > 0) {
+    якщо(direction > 0) {
+      якщо(state->pos.col >= THISROWWIDTH(state)-1)
+        повернути;
 
       state->pos.col++;
     }
-    else if(direction < 0) {
-      if(state->pos.col < 1)
-        return;
+    інакше якщо(direction < 0) {
+      якщо(state->pos.col < 1)
+        повернути;
 
       state->pos.col--;
     }
 
-    if(is_col_tabstop(state, state->pos.col))
+    якщо(is_col_tabstop(state, state->pos.col))
       count--;
   }
 }
@@ -288,37 +288,37 @@ static void tab(VTermState *state, int count, int direction)
 #define DHL_TOP    1
 #define DHL_BOTTOM 2
 
-static void set_lineinfo(VTermState *state, int row, int force, int dwl, int dhl)
+static void set_lineinfo(VTermState *state, ціле row, ціле force, ціле dwl, ціле dhl)
 {
   VTermLineInfo info = state->lineinfo[row];
 
-  if(dwl == DWL_OFF)
+  якщо(dwl == DWL_OFF)
     info.doublewidth = DWL_OFF;
-  else if(dwl == DWL_ON)
+  інакше якщо(dwl == DWL_ON)
     info.doublewidth = DWL_ON;
   // else -1 to ignore
 
-  if(dhl == DHL_OFF)
+  якщо(dhl == DHL_OFF)
     info.doubleheight = DHL_OFF;
-  else if(dhl == DHL_TOP)
+  інакше якщо(dhl == DHL_TOP)
     info.doubleheight = DHL_TOP;
-  else if(dhl == DHL_BOTTOM)
+  інакше якщо(dhl == DHL_BOTTOM)
     info.doubleheight = DHL_BOTTOM;
 
-  if((state->callbacks &&
+  якщо((state->callbacks &&
       state->callbacks->setlineinfo &&
       (*state->callbacks->setlineinfo)(row, &info, state->lineinfo + row, state->cbdata))
       || force)
     state->lineinfo[row] = info;
 }
 
-static int on_text(const char bytes[], size_t len, void *user)
+static ціле on_text(const char bytes[], size_t len, void *user)
 {
   VTermState *state = user;
-  int npoints = 0;
+  ціле npoints = 0;
   size_t eaten = 0;
   VTermEncodingInstance *encoding;
-  int i = 0;
+  ціле i = 0;
 
   VTermPos oldpos = state->pos;
 
@@ -332,54 +332,54 @@ static int on_text(const char bytes[], size_t len, void *user)
     !(bytes[eaten] & 0x80) ? &state->encoding[state->gl_set] :
     state->vt->mode.utf8   ? &state->encoding_utf8 :
                              &state->encoding[state->gr_set];
-  if (encoding->enc == state->encoding_utf8.enc)
+  якщо (encoding->enc == state->encoding_utf8.enc)
     encoding = &state->encoding_utf8;  // Only use one UTF-8 encoding state.
 
   (*encoding->enc->decode)(encoding->enc, encoding->data,
-      codepoints, &npoints, state->gsingle_set ? 1 : (int)maxpoints,
+      codepoints, &npoints, state->gsingle_set ? 1 : (ціле)maxpoints,
       bytes, &eaten, len);
 
   /* There's a chance an encoding (e.g. UTF-8) hasn't found enough bytes yet
    * for even a single codepoint
    */
-  if(!npoints)
+  якщо(!npoints)
   {
-    return (int)eaten;
+    повернути (ціле)eaten;
   }
 
-  if(state->gsingle_set && npoints)
+  якщо(state->gsingle_set && npoints)
     state->gsingle_set = 0;
 
   /* This is a combining char. that needs to be merged with the previous
    * glyph output */
-  if(vterm_unicode_is_combining(codepoints[i])) {
+  якщо(vterm_unicode_is_combining(codepoints[i])) {
     /* See if the cursor has moved since */
-    if(state->pos.row == state->combine_pos.row && state->pos.col == state->combine_pos.col + state->combine_width) {
+    якщо(state->pos.row == state->combine_pos.row && state->pos.col == state->combine_pos.col + state->combine_width) {
 #ifdef DEBUG_GLYPH_COMBINE
-      int printpos;
+      ціле printpos;
       printf("DEBUG: COMBINING SPLIT GLYPH of chars {");
-      for(printpos = 0; state->combine_chars[printpos]; printpos++)
+      для(printpos = 0; state->combine_chars[printpos]; printpos++)
         printf("U+%04x ", state->combine_chars[printpos]);
       printf("} + {");
 #endif
 
       /* Find where we need to append these combining chars */
-      int saved_i = 0;
-      while(state->combine_chars[saved_i])
+      ціле saved_i = 0;
+      поки(state->combine_chars[saved_i])
         saved_i++;
 
       /* Add extra ones */
-      while(i < npoints && vterm_unicode_is_combining(codepoints[i])) {
-        if(saved_i >= (int)state->combine_chars_size)
+      поки(i < npoints && vterm_unicode_is_combining(codepoints[i])) {
+        якщо(saved_i >= (ціле)state->combine_chars_size)
           grow_combine_buffer(state);
         state->combine_chars[saved_i++] = codepoints[i++];
       }
-      if(saved_i >= (int)state->combine_chars_size)
+      якщо(saved_i >= (ціле)state->combine_chars_size)
         grow_combine_buffer(state);
       state->combine_chars[saved_i] = 0;
 
 #ifdef DEBUG_GLYPH_COMBINE
-      for(; state->combine_chars[printpos]; printpos++)
+      для(; state->combine_chars[printpos]; printpos++)
         printf("U+%04x ", state->combine_chars[printpos]);
       printf("}\n");
 #endif
@@ -387,71 +387,71 @@ static int on_text(const char bytes[], size_t len, void *user)
       /* Now render it */
       putglyph(state, state->combine_chars, state->combine_width, state->combine_pos);
     }
-    else {
+    інакше {
       DEBUG_LOG("libvterm: TODO: Skip over split char+combining\n");
     }
   }
 
-  for(; i < npoints; i++) {
+  для(; i < npoints; i++) {
     // Try to find combining characters following this
-    int glyph_starts = i;
-    int glyph_ends;
-    int width = 0;
+    ціле glyph_starts = i;
+    ціле glyph_ends;
+    ціле width = 0;
 
-    for(glyph_ends = i + 1;
+    для(glyph_ends = i + 1;
         (glyph_ends < npoints) && (glyph_ends < glyph_starts + VTERM_MAX_CHARS_PER_CELL);
         glyph_ends++)
-      if(!vterm_unicode_is_combining(codepoints[glyph_ends]))
+      якщо(!vterm_unicode_is_combining(codepoints[glyph_ends]))
         break;
 
     uint32_t *chars = vterm_allocator_malloc(state->vt, (VTERM_MAX_CHARS_PER_CELL + 1) * sizeof(uint32_t));
-    if (chars == NULL)
+    якщо (chars == NULL)
       break;
 
-    for( ; i < glyph_ends; i++) {
-      int this_width;
-      if(vterm_get_special_pty_type() == 2) {
+    для( ; i < glyph_ends; i++) {
+      ціле this_width;
+      якщо(vterm_get_special_pty_type() == 2) {
         state->vt->in_backspace -= (state->vt->in_backspace > 0) ? 1 : 0;
-        if(state->vt->in_backspace == 1)
+        якщо(state->vt->in_backspace == 1)
           codepoints[i] = 0; // codepoints under this condition must be 0
       }
       chars[i - glyph_starts] = codepoints[i];
       this_width = vterm_unicode_width(codepoints[i]);
 #ifdef DEBUG
-      if(this_width < 0) {
+      якщо(this_width < 0) {
         fprintf(stderr, "Text with negative-width codepoint U+%04x\n", codepoints[i]);
         abort();
       }
 #endif
-      if (i == glyph_starts || this_width > width)
+      якщо (i == glyph_starts || this_width > width)
 	width = this_width;  // TODO: should be += ?
     }
 
-    if (width < 0)
+    якщо (width < 0)
       width = 0;
 
-    while(i < npoints && vterm_unicode_is_combining(codepoints[i]))
+    поки(i < npoints && vterm_unicode_is_combining(codepoints[i]))
       i++;
 
     chars[glyph_ends - glyph_starts] = 0;
     i--;
 
 #ifdef DEBUG_GLYPH_COMBINE
-    int printpos;
+    ціле printpos;
     printf("DEBUG: COMBINED GLYPH of %d chars {", glyph_ends - glyph_starts);
-    for(printpos = 0; printpos < glyph_ends - glyph_starts; printpos++)
+    для(printpos = 0; printpos < glyph_ends - glyph_starts; printpos++)
       printf("U+%04x ", chars[printpos]);
     printf("}, onscreen width %d\n", width);
 #endif
 
-    if(state->at_phantom || state->pos.col + width > THISROWWIDTH(state)) {
+    якщо(state->at_phantom || state->pos.col + width > THISROWWIDTH(state)) {
       linefeed(state);
       state->pos.col = 0;
       state->at_phantom = 0;
       state->lineinfo[state->pos.row].continuation = 1;
     }
 
-    if(state->mode.insert) {
+    якщо(state->mode.insert) {
       // TODO: This will be a little inefficient for large bodies of text, as
       // it'll have to 'ICH' effectively before every glyph. We should scan
       // ahead and ICH as many times as required
@@ -465,27 +465,27 @@ static int on_text(const char bytes[], size_t len, void *user)
 
     putglyph(state, chars, width, state->pos);
 
-    if(i == npoints - 1) {
+    якщо(i == npoints - 1) {
       /* End of the buffer. Save the chars in case we have to combine with
        * more on the next call */
-      int save_i;
-      for(save_i = 0; chars[save_i]; save_i++) {
-        if(save_i >= (int)state->combine_chars_size)
+      ціле save_i;
+      для(save_i = 0; chars[save_i]; save_i++) {
+        якщо(save_i >= (ціле)state->combine_chars_size)
           grow_combine_buffer(state);
         state->combine_chars[save_i] = chars[save_i];
       }
-      if(save_i >= (int)state->combine_chars_size)
+      якщо(save_i >= (ціле)state->combine_chars_size)
         grow_combine_buffer(state);
       state->combine_chars[save_i] = 0;
       state->combine_width = width;
       state->combine_pos = state->pos;
     }
 
-    if(state->pos.col + width >= THISROWWIDTH(state)) {
-      if(state->mode.autowrap)
+    якщо(state->pos.col + width >= THISROWWIDTH(state)) {
+      якщо(state->mode.autowrap)
         state->at_phantom = 1;
     }
-    else {
+    інакше {
       state->pos.col += width;
     }
     vterm_allocator_free(state->vt, chars);
@@ -494,7 +494,7 @@ static int on_text(const char bytes[], size_t len, void *user)
   updatecursor(state, &oldpos, 0);
 
 #ifdef DEBUG
-  if(state->pos.row < 0 || state->pos.row >= state->rows ||
+  якщо(state->pos.row < 0 || state->pos.row >= state->rows ||
      state->pos.col < 0 || state->pos.col >= state->cols) {
     fprintf(stderr, "Position out of bounds after text: (%d,%d)\n",
         state->pos.row, state->pos.col);
@@ -502,10 +502,10 @@ static int on_text(const char bytes[], size_t len, void *user)
   }
 #endif
 
-  return (int)eaten;
+  повернути (ціле)eaten;
 }
 
-static int on_control(unsigned char control, void *user)
+static ціле on_control(unsigned char control, void *user)
 {
   VTermState *state = user;
 
@@ -519,17 +519,17 @@ static int on_control(unsigned char control, void *user)
 
   switch(control) {
   case 0x07: // BEL - ECMA-48 8.3.3
-    if(state->callbacks && state->callbacks->bell)
+    якщо(state->callbacks && state->callbacks->bell)
       (*state->callbacks->bell)(state->cbdata);
     break;
 
   case 0x08: // BS - ECMA-48 8.3.5
-    if(state->pos.col > 0)
+    якщо(state->pos.col > 0)
       state->pos.col--;
-    if(vterm_get_special_pty_type() == 2) {
+    якщо(vterm_get_special_pty_type() == 2) {
       // In 2 cell letters, go back 2 cells
       vterm_screen_get_cell(state->vt->screen, leadpos, &cell);
-      if(vterm_unicode_width(cell.chars[0]) == 2)
+      якщо(vterm_unicode_width(cell.chars[0]) == 2)
         state->pos.col--;
     }
     break;
@@ -542,7 +542,7 @@ static int on_control(unsigned char control, void *user)
   case 0x0b: // VT
   case 0x0c: // FF
     linefeed(state);
-    if(state->mode.newline)
+    якщо(state->mode.newline)
       state->pos.col = 0;
     break;
 
@@ -572,7 +572,7 @@ static int on_control(unsigned char control, void *user)
     break;
 
   case 0x8d: // RI - ECMA-48 8.3.104
-    if(state->pos.row == state->scrollregion_top) {
+    якщо(state->pos.row == state->scrollregion_top) {
       VTermRect rect;
       rect.start_row = state->scrollregion_top;
       rect.end_row   = SCROLLREGION_BOTTOM(state);
@@ -581,7 +581,7 @@ static int on_control(unsigned char control, void *user)
 
       scroll(state, rect, -1, 0);
     }
-    else if(state->pos.row > 0)
+    інакше якщо(state->pos.row > 0)
         state->pos.row--;
     break;
 
@@ -594,17 +594,17 @@ static int on_control(unsigned char control, void *user)
     break;
 
   default:
-    if(state->fallbacks && state->fallbacks->control)
-      if((*state->fallbacks->control)(control, state->fbdata))
-        return 1;
+    якщо(state->fallbacks && state->fallbacks->control)
+      якщо((*state->fallbacks->control)(control, state->fbdata))
+        повернути 1;
 
-    return 0;
+    повернути 0;
   }
 
   updatecursor(state, &oldpos, 1);
 
 #ifdef DEBUG
-  if(state->pos.row < 0 || state->pos.row >= state->rows ||
+  якщо(state->pos.row < 0 || state->pos.row >= state->rows ||
      state->pos.col < 0 || state->pos.col >= state->cols) {
     fprintf(stderr, "Position out of bounds after Ctrl %02x: (%d,%d)\n",
         control, state->pos.row, state->pos.col);
@@ -612,34 +612,34 @@ static int on_control(unsigned char control, void *user)
   }
 #endif
 
-  return 1;
+  повернути 1;
 }
 
-static int settermprop_bool(VTermState *state, VTermProp prop, int v)
+static ціле settermprop_bool(VTermState *state, VTermProp prop, ціле v)
 {
   VTermValue val;
   val.boolean = v;
-  return vterm_state_set_termprop(state, prop, &val);
+  повернути vterm_state_set_termprop(state, prop, &val);
 }
 
-static int settermprop_int(VTermState *state, VTermProp prop, int v)
+static ціле settermprop_int(VTermState *state, VTermProp prop, ціле v)
 {
   VTermValue val;
   val.number = v;
-  return vterm_state_set_termprop(state, prop, &val);
+  повернути vterm_state_set_termprop(state, prop, &val);
 }
 
-static int settermprop_string(VTermState *state, VTermProp prop, VTermStringFragment frag)
+static ціле settermprop_string(VTermState *state, VTermProp prop, VTermStringFragment frag)
 {
   VTermValue val;
 
   val.string = frag;
-  return vterm_state_set_termprop(state, prop, &val);
+  повернути vterm_state_set_termprop(state, prop, &val);
 }
 
-static void savecursor(VTermState *state, int save)
+static void savecursor(VTermState *state, ціле save)
 {
-  if(save) {
+  якщо(save) {
     state->saved.pos = state->pos;
     state->saved.mode.cursor_visible = state->mode.cursor_visible;
     state->saved.mode.cursor_blink   = state->mode.cursor_blink;
@@ -647,7 +647,7 @@ static void savecursor(VTermState *state, int save)
 
     vterm_state_savepen(state, 1);
   }
-  else {
+  інакше {
     VTermPos oldpos = state->pos;
 
     state->pos = state->saved.pos;
@@ -662,7 +662,7 @@ static void savecursor(VTermState *state, int save)
   }
 }
 
-static int on_escape(const char *bytes, size_t len, void *user)
+static ціле on_escape(const char *bytes, size_t len, void *user)
 {
   VTermState *state = user;
 
@@ -671,8 +671,8 @@ static int on_escape(const char *bytes, size_t len, void *user)
    */
   switch(bytes[0]) {
   case ' ':
-    if(len != 2)
-      return 0;
+    якщо(len != 2)
+      повернути 0;
 
     switch(bytes[1]) {
       case 'F': // S7C1T
@@ -684,35 +684,35 @@ static int on_escape(const char *bytes, size_t len, void *user)
         break;
 
       default:
-        return 0;
+        повернути 0;
     }
-    return 2;
+    повернути 2;
 
   case '#':
-    if(len != 2)
-      return 0;
+    якщо(len != 2)
+      повернути 0;
 
     switch(bytes[1]) {
       case '3': // DECDHL top
-        if(state->mode.leftrightmargin)
+        якщо(state->mode.leftrightmargin)
           break;
         set_lineinfo(state, state->pos.row, NO_FORCE, DWL_ON, DHL_TOP);
         break;
 
       case '4': // DECDHL bottom
-        if(state->mode.leftrightmargin)
+        якщо(state->mode.leftrightmargin)
           break;
         set_lineinfo(state, state->pos.row, NO_FORCE, DWL_ON, DHL_BOTTOM);
         break;
 
       case '5': // DECSWL
-        if(state->mode.leftrightmargin)
+        якщо(state->mode.leftrightmargin)
           break;
         set_lineinfo(state, state->pos.row, NO_FORCE, DWL_OFF, DHL_OFF);
         break;
 
       case '6': // DECDWL
-        if(state->mode.leftrightmargin)
+        якщо(state->mode.leftrightmargin)
           break;
         set_lineinfo(state, state->pos.row, NO_FORCE, DWL_ON, DHL_OFF);
         break;
@@ -721,89 +721,89 @@ static int on_escape(const char *bytes, size_t len, void *user)
       {
         VTermPos pos;
         uint32_t E[] = { 'E', 0 };
-        for(pos.row = 0; pos.row < state->rows; pos.row++)
-          for(pos.col = 0; pos.col < ROWWIDTH(state, pos.row); pos.col++)
+        для(pos.row = 0; pos.row < state->rows; pos.row++)
+          для(pos.col = 0; pos.col < ROWWIDTH(state, pos.row); pos.col++)
             putglyph(state, E, 1, pos);
         break;
       }
 
       default:
-        return 0;
+        повернути 0;
     }
-    return 2;
+    повернути 2;
 
   case '(': case ')': case '*': case '+': // SCS
-    if(len != 2)
-      return 0;
+    якщо(len != 2)
+      повернути 0;
 
     {
-      int setnum = bytes[0] - 0x28;
+      ціле setnum = bytes[0] - 0x28;
       VTermEncoding *newenc = vterm_lookup_encoding(ENC_SINGLE_94, bytes[1]);
 
-      if(newenc) {
+      якщо(newenc) {
         state->encoding[setnum].enc = newenc;
 
-        if(newenc->init)
+        якщо(newenc->init)
           (*newenc->init)(newenc, state->encoding[setnum].data);
       }
     }
 
-    return 2;
+    повернути 2;
 
   case '7': // DECSC
     savecursor(state, 1);
-    return 1;
+    повернути 1;
 
   case '8': // DECRC
     savecursor(state, 0);
-    return 1;
+    повернути 1;
 
   case '<': // Ignored by VT100. Used in VT52 mode to switch up to VT100
-    return 1;
+    повернути 1;
 
   case '=': // DECKPAM
     state->mode.keypad = 1;
-    return 1;
+    повернути 1;
 
   case '>': // DECKPNM
     state->mode.keypad = 0;
-    return 1;
+    повернути 1;
 
   case 'c': // RIS - ECMA-48 8.3.105
   {
     VTermPos oldpos = state->pos;
     vterm_state_reset(state, 1);
-    if(state->callbacks && state->callbacks->movecursor)
+    якщо(state->callbacks && state->callbacks->movecursor)
       (*state->callbacks->movecursor)(state->pos, oldpos, state->mode.cursor_visible, state->cbdata);
-    return 1;
+    повернути 1;
   }
 
   case 'n': // LS2 - ECMA-48 8.3.78
     state->gl_set = 2;
-    return 1;
+    повернути 1;
 
   case 'o': // LS3 - ECMA-48 8.3.80
     state->gl_set = 3;
-    return 1;
+    повернути 1;
 
   case '~': // LS1R - ECMA-48 8.3.77
     state->gr_set = 1;
-    return 1;
+    повернути 1;
 
   case '}': // LS2R - ECMA-48 8.3.79
     state->gr_set = 2;
-    return 1;
+    повернути 1;
 
   case '|': // LS3R - ECMA-48 8.3.81
     state->gr_set = 3;
-    return 1;
+    повернути 1;
 
   default:
-    return 0;
+    повернути 0;
   }
 }
 
-static void set_mode(VTermState *state, int num, int val)
+static void set_mode(VTermState *state, ціле num, ціле val)
 {
   switch(num) {
   case 4: // IRM - ECMA-48 7.2.10
@@ -816,11 +816,11 @@ static void set_mode(VTermState *state, int num, int val)
 
   default:
     DEBUG_LOG1("libvterm: Unknown mode %d\n", num);
-    return;
+    повернути;
   }
 }
 
-static void set_dec_mode(VTermState *state, int num, int val)
+static void set_dec_mode(VTermState *state, ціле num, ціле val)
 {
   switch(num) {
   case 1:
@@ -856,11 +856,11 @@ static void set_dec_mode(VTermState *state, int num, int val)
   case 69: // DECVSSM - vertical split screen mode
            // DECLRMM - left/right margin mode
     state->mode.leftrightmargin = val;
-    if(val) {
-      int row;
+    якщо(val) {
+      ціле row;
 
       // Setting DECVSSM must clear doublewidth/doubleheight state of every line
-      for(row = 0; row < state->rows; row++)
+      для(row = 0; row < state->rows; row++)
         set_lineinfo(state, row, FORCE, DWL_OFF, DHL_OFF);
     }
 
@@ -912,13 +912,13 @@ static void set_dec_mode(VTermState *state, int num, int val)
 
   default:
     DEBUG_LOG1("libvterm: Unknown DEC mode %d\n", num);
-    return;
+    повернути;
   }
 }
 
-static void request_dec_mode(VTermState *state, int num)
+static void request_dec_mode(VTermState *state, ціле num)
 {
-  int reply;
+  ціле reply;
 
   switch(num) {
     case 1:
@@ -987,7 +987,7 @@ static void request_dec_mode(VTermState *state, int num)
 
     default:
       vterm_push_output_sprintf_ctrl(state->vt, C1_CSI, "?%d;%d$y", num, 0);
-      return;
+      повернути;
   }
 
   vterm_push_output_sprintf_ctrl(state->vt, C1_CSI, "?%d;%d$y", num, reply ? 1 : 2);
@@ -999,24 +999,24 @@ static void request_version_string(VTermState *state)
       VTERM_VERSION_MAJOR, VTERM_VERSION_MINOR);
 }
 
-static int on_csi(const char *leader, const long args[], int argcount, const char *intermed, char command, void *user)
+static ціле on_csi(const char *leader, const long args[], ціле argcount, const char *intermed, char command, void *user)
 {
   VTermState *state = user;
-  int leader_byte = 0;
-  int intermed_byte = 0;
-  int cancel_phantom = 1;
+  ціле leader_byte = 0;
+  ціле intermed_byte = 0;
+  ціле cancel_phantom = 1;
   VTermPos oldpos = state->pos;
-  int handled = 1;
+  ціле handled = 1;
 
   // Some temporaries for later code
-  int count, val;
-  int row, col;
+  ціле count, val;
+  ціле row, col;
   VTermRect rect;
-  int selective;
+  ціле selective;
 
-  if(leader && leader[0]) {
-    if(leader[1]) // longer than 1 char
-      return 0;
+  якщо(leader && leader[0]) {
+    якщо(leader[1]) // longer than 1 char
+      повернути 0;
 
     switch(leader[0]) {
     case '?':
@@ -1025,13 +1025,13 @@ static int on_csi(const char *leader, const long args[], int argcount, const cha
       leader_byte = leader[0];
       break;
     default:
-      return 0;
+      повернути 0;
     }
   }
 
-  if(intermed && intermed[0]) {
-    if(intermed[1]) // longer than 1 char
-      return 0;
+  якщо(intermed && intermed[0]) {
+    якщо(intermed[1]) // longer than 1 char
+      повернути 0;
 
     switch(intermed[0]) {
     case ' ':
@@ -1042,14 +1042,14 @@ static int on_csi(const char *leader, const long args[], int argcount, const cha
       intermed_byte = intermed[0];
       break;
     default:
-      return 0;
+      повернути 0;
     }
   }
 
   oldpos = state->pos;
 
-#define LBOUND(v,min) if((v) < (min)) (v) = (min)
-#define UBOUND(v,max) if((v) > (max)) (v) = (max)
+#define LBOUND(v,min) якщо((v) < (min)) (v) = (min)
+#define UBOUND(v,max) якщо((v) > (max)) (v) = (max)
 
 #define LEADER(l,b) ((l << 8) | b)
 #define INTERMED(i,b) ((i << 16) | b)
@@ -1058,15 +1058,15 @@ static int on_csi(const char *leader, const long args[], int argcount, const cha
   case 0x40: // ICH - ECMA-48 8.3.64
     count = CSI_ARG_COUNT(args[0]);
 
-    if(!is_cursor_in_scrollregion(state))
+    якщо(!is_cursor_in_scrollregion(state))
       break;
 
     rect.start_row = state->pos.row;
     rect.end_row   = state->pos.row + 1;
     rect.start_col = state->pos.col;
-    if(state->mode.leftrightmargin)
+    якщо(state->mode.leftrightmargin)
       rect.end_col = SCROLLREGION_RIGHT(state);
-    else
+    інакше
       rect.end_col = THISROWWIDTH(state);
 
     scroll(state, rect, 0, -count);
@@ -1121,11 +1121,11 @@ static int on_csi(const char *leader, const long args[], int argcount, const cha
     row = CSI_ARG_OR(args[0], 1);
     col = argcount < 2 || CSI_ARG_IS_MISSING(args[1]) ? 1 : CSI_ARG(args[1]);
     // zero-based
-    if(vterm_get_special_pty_type() == 2) {
+    якщо(vterm_get_special_pty_type() == 2) {
       // Fix a sequence that is not correct right now
-      if(state->pos.row == row - 1) {
-        int cnt, ptr = 0;
-        for(cnt = 0; cnt < col - 1; ++cnt) {
+      якщо(state->pos.row == row - 1) {
+        ціле cnt, ptr = 0;
+        для(cnt = 0; cnt < col - 1; ++cnt) {
 	  VTermPos p;
 	  VTermScreenCell c0, c1;
 	  p.row = row - 1;
@@ -1143,7 +1143,7 @@ static int on_csi(const char *leader, const long args[], int argcount, const cha
     }
     state->pos.row = row-1;
     state->pos.col = col-1;
-    if(state->mode.origin) {
+    якщо(state->mode.origin) {
       state->pos.row += state->scrollregion_top;
       state->pos.col += SCROLLREGION_LEFT(state);
     }
@@ -1163,43 +1163,43 @@ static int on_csi(const char *leader, const long args[], int argcount, const cha
     case 0:
       rect.start_row = state->pos.row; rect.end_row = state->pos.row + 1;
       rect.start_col = state->pos.col; rect.end_col = state->cols;
-      if(rect.end_col > rect.start_col)
+      якщо(rect.end_col > rect.start_col)
         erase(state, rect, selective);
 
       rect.start_row = state->pos.row + 1; rect.end_row = state->rows;
       rect.start_col = 0;
-      for(row = rect.start_row; row < rect.end_row; row++)
+      для(row = rect.start_row; row < rect.end_row; row++)
 	set_lineinfo(state, row, FORCE, DWL_OFF, DHL_OFF);
-      if(rect.end_row > rect.start_row)
+      якщо(rect.end_row > rect.start_row)
         erase(state, rect, selective);
       break;
 
     case 1:
       rect.start_row = 0; rect.end_row = state->pos.row;
       rect.start_col = 0; rect.end_col = state->cols;
-      for(row = rect.start_row; row < rect.end_row; row++)
+      для(row = rect.start_row; row < rect.end_row; row++)
 	set_lineinfo(state, row, FORCE, DWL_OFF, DHL_OFF);
-      if(rect.end_col > rect.start_col)
+      якщо(rect.end_col > rect.start_col)
         erase(state, rect, selective);
 
       rect.start_row = state->pos.row; rect.end_row = state->pos.row + 1;
                           rect.end_col = state->pos.col + 1;
-      if(rect.end_row > rect.start_row)
+      якщо(rect.end_row > rect.start_row)
         erase(state, rect, selective);
       break;
 
     case 2:
       rect.start_row = 0; rect.end_row = state->rows;
       rect.start_col = 0; rect.end_col = state->cols;
-      for(row = rect.start_row; row < rect.end_row; row++)
+      для(row = rect.start_row; row < rect.end_row; row++)
 	set_lineinfo(state, row, FORCE, DWL_OFF, DHL_OFF);
       erase(state, rect, selective);
       break;
 
     case 3:
-      if(state->callbacks && state->callbacks->sb_clear)
-        if((*state->callbacks->sb_clear)(state->cbdata))
-          return 1;
+      якщо(state->callbacks && state->callbacks->sb_clear)
+        якщо((*state->callbacks->sb_clear)(state->cbdata))
+          повернути 1;
       break;
     }
     break;
@@ -1219,10 +1219,10 @@ static int on_csi(const char *leader, const long args[], int argcount, const cha
     case 2:
       rect.start_col = 0; rect.end_col = THISROWWIDTH(state); break;
     default:
-      return 0;
+      повернути 0;
     }
 
-    if(rect.end_col > rect.start_col)
+    якщо(rect.end_col > rect.start_col)
       erase(state, rect, selective);
 
     break;
@@ -1230,7 +1230,7 @@ static int on_csi(const char *leader, const long args[], int argcount, const cha
   case 0x4c: // IL - ECMA-48 8.3.67
     count = CSI_ARG_COUNT(args[0]);
 
-    if(!is_cursor_in_scrollregion(state))
+    якщо(!is_cursor_in_scrollregion(state))
       break;
 
     rect.start_row = state->pos.row;
@@ -1245,7 +1245,7 @@ static int on_csi(const char *leader, const long args[], int argcount, const cha
   case 0x4d: // DL - ECMA-48 8.3.32
     count = CSI_ARG_COUNT(args[0]);
 
-    if(!is_cursor_in_scrollregion(state))
+    якщо(!is_cursor_in_scrollregion(state))
       break;
 
     rect.start_row = state->pos.row;
@@ -1260,15 +1260,15 @@ static int on_csi(const char *leader, const long args[], int argcount, const cha
   case 0x50: // DCH - ECMA-48 8.3.26
     count = CSI_ARG_COUNT(args[0]);
 
-    if(!is_cursor_in_scrollregion(state))
+    якщо(!is_cursor_in_scrollregion(state))
       break;
 
     rect.start_row = state->pos.row;
     rect.end_row   = state->pos.row + 1;
     rect.start_col = state->pos.col;
-    if(state->mode.leftrightmargin)
+    якщо(state->mode.leftrightmargin)
       rect.end_col = SCROLLREGION_RIGHT(state);
-    else
+    інакше
       rect.end_col = THISROWWIDTH(state);
 
     scroll(state, rect, 0, count);
@@ -1329,23 +1329,23 @@ static int on_csi(const char *leader, const long args[], int argcount, const cha
     break;
 
   case 0x62: { // REP - ECMA-48 8.3.103
-    const int row_width = THISROWWIDTH(state);
+    const ціле row_width = THISROWWIDTH(state);
 
     // ECMA-48 repeats the preceding graphic character; when none was
     // printed yet "combine_width" is zero and the loop below would never
     // advance the cursor.  Ignore the control then, like xterm does.
-    if(state->combine_width < 1)
+    якщо(state->combine_width < 1)
       break;
 
     count = CSI_ARG_COUNT(args[0]);
     col = state->pos.col + count;
     UBOUND(col, row_width);
-    while (state->pos.col < col) {
+    поки (state->pos.col < col) {
       putglyph(state, state->combine_chars, state->combine_width, state->pos);
       state->pos.col += state->combine_width;
     }
-    if (state->pos.col + state->combine_width >= row_width) {
-      if (state->mode.autowrap) {
+    якщо (state->pos.col + state->combine_width >= row_width) {
+      якщо (state->mode.autowrap) {
         state->at_phantom = 1;
         cancel_phantom = 0;
       }
@@ -1355,7 +1355,7 @@ static int on_csi(const char *leader, const long args[], int argcount, const cha
 
   case 0x63: // DA - ECMA-48 8.3.24
     val = CSI_ARG_OR(args[0], 0);
-    if(val == 0)
+    якщо(val == 0)
       // DEC VT100 response
       vterm_push_output_sprintf_ctrl(state->vt, C1_CSI, "?1;2c");
     break;
@@ -1368,7 +1368,7 @@ static int on_csi(const char *leader, const long args[], int argcount, const cha
   case 0x64: // VPA - ECMA-48 8.3.158
     row = CSI_ARG_OR(args[0], 1);
     state->pos.row = row-1;
-    if(state->mode.origin)
+    якщо(state->mode.origin)
       state->pos.row += state->scrollregion_top;
     state->at_phantom = 0;
     break;
@@ -1385,7 +1385,7 @@ static int on_csi(const char *leader, const long args[], int argcount, const cha
     // zero-based
     state->pos.row = row-1;
     state->pos.col = col-1;
-    if(state->mode.origin) {
+    якщо(state->mode.origin) {
       state->pos.row += state->scrollregion_top;
       state->pos.col += SCROLLREGION_LEFT(state);
     }
@@ -1401,7 +1401,7 @@ static int on_csi(const char *leader, const long args[], int argcount, const cha
       break;
     case 3:
     case 5:
-      for(col = 0; col < state->cols; col++)
+      для(col = 0; col < state->cols; col++)
         clear_col_tabstop(state, col);
       break;
     case 1:
@@ -1410,18 +1410,18 @@ static int on_csi(const char *leader, const long args[], int argcount, const cha
       break;
     /* TODO: 1, 2 and 4 aren't meaningful yet without line tab stops */
     default:
-      return 0;
+      повернути 0;
     }
     break;
 
   case 0x68: // SM - ECMA-48 8.3.125
-    if(!CSI_ARG_IS_MISSING(args[0]))
+    якщо(!CSI_ARG_IS_MISSING(args[0]))
       set_mode(state, CSI_ARG(args[0]), 1);
     break;
 
   case LEADER('?', 0x68): // DEC private mode set
-    for(int i = 0; i < argcount; i++) {
-      if(!CSI_ARG_IS_MISSING(args[i]))
+    для(ціле i = 0; i < argcount; i++) {
+      якщо(!CSI_ARG_IS_MISSING(args[i]))
         set_dec_mode(state, CSI_ARG(args[i]), 1);
     }
     break;
@@ -1439,13 +1439,13 @@ static int on_csi(const char *leader, const long args[], int argcount, const cha
     break;
 
   case 0x6c: // RM - ECMA-48 8.3.106
-    if(!CSI_ARG_IS_MISSING(args[0]))
+    якщо(!CSI_ARG_IS_MISSING(args[0]))
       set_mode(state, CSI_ARG(args[0]), 0);
     break;
 
   case LEADER('?', 0x6c): // DEC private mode reset
-    for(int i = 0; i < argcount; i++) {
-      if(!CSI_ARG_IS_MISSING(args[i]))
+    для(ціле i = 0; i < argcount; i++) {
+      якщо(!CSI_ARG_IS_MISSING(args[i]))
         set_dec_mode(state, CSI_ARG(args[i]), 0);
     }
     break;
@@ -1456,7 +1456,7 @@ static int on_csi(const char *leader, const long args[], int argcount, const cha
 
   case LEADER('?', 0x6d): // DECSGR and XTQMODKEYS
     // CSI ? 4 m  XTQMODKEYS: request modifyOtherKeys level
-    if (argcount == 1 && CSI_ARG(args[0]) == 4)
+    якщо (argcount == 1 && CSI_ARG(args[0]) == 4)
     {
       vterm_push_output_sprintf_ctrl(state->vt, C1_CSI, ">4;%dm",
 					state->mode.modify_other_keys ? 2 : 0);
@@ -1466,7 +1466,7 @@ static int on_csi(const char *leader, const long args[], int argcount, const cha
     /* No actual DEC terminal recognised these, but some printers did. These
      * are alternative ways to request subscript/superscript/off
      */
-    for(int argi = 0; argi < argcount; argi++) {
+    для(ціле argi = 0; argi < argcount; argi++) {
       long arg;
       switch(arg = CSI_ARG(args[argi])) {
         case 4: // Superscript on
@@ -1486,7 +1486,7 @@ static int on_csi(const char *leader, const long args[], int argcount, const cha
     break;
 
   case LEADER('>', 0x6d): // CSI > 4 ; Pv m   xterm resource modifyOtherKeys
-    if (argcount == 2 && CSI_ARG(args[0]) == 4)
+    якщо (argcount == 2 && CSI_ARG(args[0]) == 4)
     {
       // can't have both modify_other_keys and kitty_keyboard
       state->mode.kitty_keyboard = 0;
@@ -1496,7 +1496,7 @@ static int on_csi(const char *leader, const long args[], int argcount, const cha
     break;
 
   case LEADER('>', 0x75): // CSI > 1 u  enable kitty keyboard protocol
-    if (argcount == 1 && CSI_ARG(args[0]) == 1)
+    якщо (argcount == 1 && CSI_ARG(args[0]) == 1)
     {
       // can't have both modify_other_keys and kitty_keyboard
       state->mode.modify_other_keys = 0;
@@ -1506,12 +1506,12 @@ static int on_csi(const char *leader, const long args[], int argcount, const cha
     break;
 
   case LEADER('<', 0x75): // CSI < u  disable kitty keyboard protocol
-    if (argcount <= 1)
+    якщо (argcount <= 1)
       state->mode.kitty_keyboard = 0;
     break;
 
   case LEADER('?', 0x75): // CSI ? u  request kitty keyboard protocol state
-    if (argcount <= 1)
+    якщо (argcount <= 1)
       // TODO: this only uses the values zero and one.  The protocol specifies
       // more values, the progressive enhancement flags.
       vterm_push_output_sprintf_ctrl(state->vt, C1_CSI, "?%du",
@@ -1604,12 +1604,12 @@ static int on_csi(const char *leader, const long args[], int argcount, const cha
     LBOUND(state->scrollregion_top, 0);
     UBOUND(state->scrollregion_top, state->rows);
     LBOUND(state->scrollregion_bottom, -1);
-    if(state->scrollregion_top == 0 && state->scrollregion_bottom == state->rows)
+    якщо(state->scrollregion_top == 0 && state->scrollregion_bottom == state->rows)
       state->scrollregion_bottom = -1;
-    else
+    інакше
       UBOUND(state->scrollregion_bottom, state->rows);
 
-    if(SCROLLREGION_BOTTOM(state) <= state->scrollregion_top) {
+    якщо(SCROLLREGION_BOTTOM(state) <= state->scrollregion_top) {
       // Invalid
       state->scrollregion_top    = 0;
       state->scrollregion_bottom = -1;
@@ -1618,7 +1618,7 @@ static int on_csi(const char *leader, const long args[], int argcount, const cha
     // Setting the scrolling region restores the cursor to the home position
     state->pos.row = 0;
     state->pos.col = 0;
-    if(state->mode.origin) {
+    якщо(state->mode.origin) {
       state->pos.row += state->scrollregion_top;
       state->pos.col += SCROLLREGION_LEFT(state);
     }
@@ -1632,12 +1632,12 @@ static int on_csi(const char *leader, const long args[], int argcount, const cha
     LBOUND(state->scrollregion_left, 0);
     UBOUND(state->scrollregion_left, state->cols);
     LBOUND(state->scrollregion_right, -1);
-    if(state->scrollregion_left == 0 && state->scrollregion_right == state->cols)
+    якщо(state->scrollregion_left == 0 && state->scrollregion_right == state->cols)
       state->scrollregion_right = -1;
-    else
+    інакше
       UBOUND(state->scrollregion_right, state->cols);
 
-    if(state->scrollregion_right > -1 &&
+    якщо(state->scrollregion_right > -1 &&
        state->scrollregion_right <= state->scrollregion_left) {
       // Invalid
       state->scrollregion_left  = 0;
@@ -1647,7 +1647,7 @@ static int on_csi(const char *leader, const long args[], int argcount, const cha
     // Setting the scrolling region restores the cursor to the home position
     state->pos.row = 0;
     state->pos.col = 0;
-    if(state->mode.origin) {
+    якщо(state->mode.origin) {
       state->pos.row += state->scrollregion_top;
       state->pos.col += SCROLLREGION_LEFT(state);
     }
@@ -1657,7 +1657,7 @@ static int on_csi(const char *leader, const long args[], int argcount, const cha
   case 0x74:
     switch(CSI_ARG(args[0])) {
       case 8: // CSI 8 ; rows ; cols t  set size
-        if (argcount == 3 &&
+        якщо (argcount == 3 &&
             !CSI_ARG_IS_MISSING(args[1]) && !CSI_ARG_IS_MISSING(args[2]) &&
             CSI_ARG(args[1]) > 0 && CSI_ARG(args[2]) > 0)
 	  on_resize(CSI_ARG(args[1]), CSI_ARG(args[2]), state);
@@ -1671,7 +1671,7 @@ static int on_csi(const char *leader, const long args[], int argcount, const cha
   case INTERMED('\'', 0x7D): // DECIC
     count = CSI_ARG_COUNT(args[0]);
 
-    if(!is_cursor_in_scrollregion(state))
+    якщо(!is_cursor_in_scrollregion(state))
       break;
 
     rect.start_row = state->scrollregion_top;
@@ -1686,7 +1686,7 @@ static int on_csi(const char *leader, const long args[], int argcount, const cha
   case INTERMED('\'', 0x7E): // DECDC
     count = CSI_ARG_COUNT(args[0]);
 
-    if(!is_cursor_in_scrollregion(state))
+    якщо(!is_cursor_in_scrollregion(state))
       break;
 
     rect.start_row = state->scrollregion_top;
@@ -1703,21 +1703,21 @@ static int on_csi(const char *leader, const long args[], int argcount, const cha
     break;
   }
 
-  if (!handled) {
-    if(state->fallbacks && state->fallbacks->csi)
-      if((*state->fallbacks->csi)(leader, args, argcount, intermed, command, state->fbdata))
-        return 1;
+  якщо (!handled) {
+    якщо(state->fallbacks && state->fallbacks->csi)
+      якщо((*state->fallbacks->csi)(leader, args, argcount, intermed, command, state->fbdata))
+        повернути 1;
 
-    return 0;
+    повернути 0;
   }
 
-  if(state->mode.origin) {
+  якщо(state->mode.origin) {
     LBOUND(state->pos.row, state->scrollregion_top);
     UBOUND(state->pos.row, SCROLLREGION_BOTTOM(state)-1);
     LBOUND(state->pos.col, SCROLLREGION_LEFT(state));
     UBOUND(state->pos.col, SCROLLREGION_RIGHT(state)-1);
   }
-  else {
+  інакше {
     LBOUND(state->pos.row, 0);
     UBOUND(state->pos.row, state->rows-1);
     LBOUND(state->pos.col, 0);
@@ -1727,68 +1727,68 @@ static int on_csi(const char *leader, const long args[], int argcount, const cha
   updatecursor(state, &oldpos, cancel_phantom);
 
 #ifdef DEBUG
-  if(state->pos.row < 0 || state->pos.row >= state->rows ||
+  якщо(state->pos.row < 0 || state->pos.row >= state->rows ||
      state->pos.col < 0 || state->pos.col >= state->cols) {
     fprintf(stderr, "Position out of bounds after CSI %c: (%d,%d)\n",
         command, state->pos.row, state->pos.col);
     abort();
   }
 
-  if(SCROLLREGION_BOTTOM(state) <= state->scrollregion_top) {
+  якщо(SCROLLREGION_BOTTOM(state) <= state->scrollregion_top) {
     fprintf(stderr, "Scroll region height out of bounds after CSI %c: %d <= %d\n",
         command, SCROLLREGION_BOTTOM(state), state->scrollregion_top);
     abort();
   }
 
-  if(SCROLLREGION_RIGHT(state) <= SCROLLREGION_LEFT(state)) {
+  якщо(SCROLLREGION_RIGHT(state) <= SCROLLREGION_LEFT(state)) {
     fprintf(stderr, "Scroll region width out of bounds after CSI %c: %d <= %d\n",
         command, SCROLLREGION_RIGHT(state), SCROLLREGION_LEFT(state));
     abort();
   }
 #endif
 
-  return 1;
+  повернути 1;
 }
 
 static char base64_one(uint8_t b)
 {
-  if(b < 26)
-    return 'A' + b;
-  else if(b < 52)
-    return 'a' + b - 26;
-  else if(b < 62)
-    return '0' + b - 52;
-  else if(b == 62)
-    return '+';
-  else if(b == 63)
-    return '/';
-  return 0;
+  якщо(b < 26)
+    повернути 'A' + b;
+  інакше якщо(b < 52)
+    повернути 'a' + b - 26;
+  інакше якщо(b < 62)
+    повернути '0' + b - 52;
+  інакше якщо(b == 62)
+    повернути '+';
+  інакше якщо(b == 63)
+    повернути '/';
+  повернути 0;
 }
 
 static uint8_t unbase64one(char c)
 {
-  if(c >= 'A' && c <= 'Z')
-    return c - 'A';
-  else if(c >= 'a' && c <= 'z')
-    return c - 'a' + 26;
-  else if(c >= '0' && c <= '9')
-    return c - '0' + 52;
-  else if(c == '+')
-    return 62;
-  else if(c == '/')
-    return 63;
+  якщо(c >= 'A' && c <= 'Z')
+    повернути c - 'A';
+  інакше якщо(c >= 'a' && c <= 'z')
+    повернути c - 'a' + 26;
+  інакше якщо(c >= '0' && c <= '9')
+    повернути c - '0' + 52;
+  інакше якщо(c == '+')
+    повернути 62;
+  інакше якщо(c == '/')
+    повернути 63;
 
-  return 0xFF;
+  повернути 0xFF;
 }
 
 static void osc_selection(VTermState *state, VTermStringFragment frag)
 {
-  if(frag.initial) {
+  якщо(frag.initial) {
     state->tmp.selection.mask = 0;
     state->tmp.selection.state = SELECTION_INITIAL;
   }
 
-  while(!state->tmp.selection.state && frag.len) {
+  поки(!state->tmp.selection.state && frag.len) {
     /* Parse selection parameter */
     switch(frag.str[0]) {
       case 'c':
@@ -1816,7 +1816,7 @@ static void osc_selection(VTermState *state, VTermStringFragment frag)
 
       case ';':
         state->tmp.selection.state = SELECTION_SELECTED;
-        if(!state->tmp.selection.mask)
+        якщо(!state->tmp.selection.mask)
           state->tmp.selection.mask = VTERM_SELECTION_SELECT|VTERM_SELECTION_CUT0;
         break;
     }
@@ -1825,9 +1825,9 @@ static void osc_selection(VTermState *state, VTermStringFragment frag)
     frag.len--;
   }
 
-  if(!frag.len) {
+  якщо(!frag.len) {
     /* Clear selection if we're already finished but didn't do anything */
-    if(frag.final && state->selection.callbacks->set) {
+    якщо(frag.final && state->selection.callbacks->set) {
       (*state->selection.callbacks->set)(state->tmp.selection.mask, (VTermStringFragment){
               .str     = NULL,
               .len     = 0,
@@ -1835,66 +1835,66 @@ static void osc_selection(VTermState *state, VTermStringFragment frag)
               .final   = TRUE,
             }, state->selection.user);
     }
-    return;
+    повернути;
   }
 
-  if(state->tmp.selection.state == SELECTION_SELECTED) {
-    if(frag.str[0] == '?') {
+  якщо(state->tmp.selection.state == SELECTION_SELECTED) {
+    якщо(frag.str[0] == '?') {
       state->tmp.selection.state = SELECTION_QUERY;
     }
-    else {
+    інакше {
       state->tmp.selection.state = SELECTION_SET_INITIAL;
       state->tmp.selection.recvpartial = 0;
     }
   }
 
-  if(state->tmp.selection.state == SELECTION_QUERY) {
-    if(state->selection.callbacks->query)
+  якщо(state->tmp.selection.state == SELECTION_QUERY) {
+    якщо(state->selection.callbacks->query)
       (*state->selection.callbacks->query)(state->tmp.selection.mask, state->selection.user);
-    return;
+    повернути;
   }
 
-  if(state->tmp.selection.state == SELECTION_INVALID)
-    return;
+  якщо(state->tmp.selection.state == SELECTION_INVALID)
+    повернути;
 
-  if(state->selection.callbacks->set) {
+  якщо(state->selection.callbacks->set) {
     size_t bufcur = 0;
     char *buffer = state->selection.buffer;
 
     uint32_t x = 0; /* Current decoding value */
-    int n = 0;      /* Number of sextets consumed */
+    ціле n = 0;      /* Number of sextets consumed */
 
-    if(state->tmp.selection.recvpartial) {
+    якщо(state->tmp.selection.recvpartial) {
       n = state->tmp.selection.recvpartial >> 24;
       x = state->tmp.selection.recvpartial & 0x03FFFF; /* could be up to 18 bits of state in here */
 
       state->tmp.selection.recvpartial = 0;
     }
 
-    while((state->selection.buflen - bufcur) >= 3 && frag.len) {
-      if(frag.str[0] == '=') {
-        if(n == 2) {
+    поки((state->selection.buflen - bufcur) >= 3 && frag.len) {
+      якщо(frag.str[0] == '=') {
+        якщо(n == 2) {
           buffer[0] = (x >> 4) & 0xFF;
           buffer += 1, bufcur += 1;
         }
-        if(n == 3) {
+        якщо(n == 3) {
           buffer[0] = (x >> 10) & 0xFF;
           buffer[1] = (x >>  2) & 0xFF;
           buffer += 2, bufcur += 2;
         }
 
-        while(frag.len && frag.str[0] == '=')
+        поки(frag.len && frag.str[0] == '=')
           frag.str++, frag.len--;
 
         n = 0;
       }
-      else {
+      інакше {
         uint8_t b = unbase64one(frag.str[0]);
-        if(b == 0xFF) {
+        якщо(b == 0xFF) {
           DEBUG_LOG1("base64decode bad input %02X\n", (uint8_t)frag.str[0]);
 
           state->tmp.selection.state = SELECTION_INVALID;
-          if(state->selection.callbacks->set) {
+          якщо(state->selection.callbacks->set) {
             (*state->selection.callbacks->set)(state->tmp.selection.mask, (VTermStringFragment){
                 .str     = NULL,
                 .len     = 0,
@@ -1909,7 +1909,7 @@ static void osc_selection(VTermState *state, VTermStringFragment frag)
         n++;
         frag.str++, frag.len--;
 
-        if(n == 4) {
+        якщо(n == 4) {
           buffer[0] = (x >> 16) & 0xFF;
           buffer[1] = (x >>  8) & 0xFF;
           buffer[2] = (x >>  0) & 0xFF;
@@ -1920,8 +1920,8 @@ static void osc_selection(VTermState *state, VTermStringFragment frag)
         }
       }
 
-      if(!frag.len || (state->selection.buflen - bufcur) < 3) {
-        if(bufcur) {
+      якщо(!frag.len || (state->selection.buflen - bufcur) < 3) {
+        якщо(bufcur) {
 	  VTermStringFragment setfrag = {
 	    state->selection.buffer, // str
 	    bufcur, // len
@@ -1938,12 +1938,12 @@ static void osc_selection(VTermState *state, VTermStringFragment frag)
       }
     }
 
-    if(n)
+    якщо(n)
       state->tmp.selection.recvpartial = (n << 24) | x;
   }
 }
 
-static int on_osc(int command, VTermStringFragment frag, void *user)
+static ціле on_osc(ціле command, VTermStringFragment frag, void *user)
 {
   VTermState *state = user;
 
@@ -1951,52 +1951,52 @@ static int on_osc(int command, VTermStringFragment frag, void *user)
     case 0:
       settermprop_string(state, VTERM_PROP_ICONNAME, frag);
       settermprop_string(state, VTERM_PROP_TITLE, frag);
-      return 1;
+      повернути 1;
 
     case 1:
       settermprop_string(state, VTERM_PROP_ICONNAME, frag);
-      return 1;
+      повернути 1;
 
     case 2:
       settermprop_string(state, VTERM_PROP_TITLE, frag);
-      return 1;
+      повернути 1;
 
     case 10:
       {
         // request foreground color: <Esc>]10;?<0x07>
-        int red = state->default_fg.red;
-        int blue = state->default_fg.blue;
-        int green = state->default_fg.green;
+        ціле red = state->default_fg.red;
+        ціле blue = state->default_fg.blue;
+        ціле green = state->default_fg.green;
         vterm_push_output_sprintf_ctrl(state->vt, C1_OSC, "10;rgb:%02x%02x/%02x%02x/%02x%02x\x07", red, red, green, green, blue, blue);
-        return 1;
+        повернути 1;
       }
 
     case 11:
       {
 	// request background color: <Esc>]11;?<0x07>
-	int red = state->default_bg.red;
-	int blue = state->default_bg.blue;
-	int green = state->default_bg.green;
+	ціле red = state->default_bg.red;
+	ціле blue = state->default_bg.blue;
+	ціле green = state->default_bg.green;
 	vterm_push_output_sprintf_ctrl(state->vt, C1_OSC, "11;rgb:%02x%02x/%02x%02x/%02x%02x\x07", red, red, green, green, blue, blue);
-	return 1;
+	повернути 1;
       }
     case 12:
       settermprop_string(state, VTERM_PROP_CURSORCOLOR, frag);
-      return 1;
+      повернути 1;
 
     case 52:
-      if(state->selection.callbacks)
+      якщо(state->selection.callbacks)
         osc_selection(state, frag);
 
-      return 1;
+      повернути 1;
 
     default:
-      if(state->fallbacks && state->fallbacks->osc)
-        if((*state->fallbacks->osc)(command, frag, state->fbdata))
-          return 1;
+      якщо(state->fallbacks && state->fallbacks->osc)
+        якщо((*state->fallbacks->osc)(command, frag, state->fbdata))
+          повернути 1;
   }
 
-  return 0;
+  повернути 0;
 }
 
 static void request_status_string(VTermState *state, VTermStringFragment frag)
@@ -2005,170 +2005,170 @@ static void request_status_string(VTermState *state, VTermStringFragment frag)
 
   char *tmp = state->tmp.decrqss;
 
-  if(frag.initial)
+  якщо(frag.initial)
     tmp[0] = tmp[1] = tmp[2] = tmp[3] = 0;
 
   size_t i = 0;
-  while(i < sizeof(state->tmp.decrqss)-1 && tmp[i])
+  поки(i < sizeof(state->tmp.decrqss)-1 && tmp[i])
     i++;
-  while(i < sizeof(state->tmp.decrqss)-1 && frag.len--)
+  поки(i < sizeof(state->tmp.decrqss)-1 && frag.len--)
     tmp[i++] = (frag.str++)[0];
   tmp[i] = 0;
 
-  if(!frag.final)
-    return;
+  якщо(!frag.final)
+    повернути;
 
   switch(tmp[0] | tmp[1]<<8 | tmp[2]<<16) {
     case 'm': {
       // Query SGR
       long args[20];
-      int argc = vterm_state_getpen(state, args, sizeof(args)/sizeof(args[0]));
+      ціле argc = vterm_state_getpen(state, args, sizeof(args)/sizeof(args[0]));
       size_t cur = 0;
 
       cur += SNPRINTF(vt->tmpbuffer + cur, vt->tmpbuffer_len - cur,
           vt->mode.ctrl8bit ? "\x90" "1$r" : ESC_S "P" "1$r"); // DCS 1$r ...
-      if(cur >= vt->tmpbuffer_len)
-        return;
+      якщо(cur >= vt->tmpbuffer_len)
+        повернути;
 
-      for(int argi = 0; argi < argc; argi++) {
+      для(ціле argi = 0; argi < argc; argi++) {
         cur += SNPRINTF(vt->tmpbuffer + cur, vt->tmpbuffer_len - cur,
             argi == argc - 1             ? "%ld" :
             CSI_ARG_HAS_MORE(args[argi]) ? "%ld:" :
                                            "%ld;",
             CSI_ARG(args[argi]));
-        if(cur >= vt->tmpbuffer_len)
-          return;
+        якщо(cur >= vt->tmpbuffer_len)
+          повернути;
       }
 
       cur += SNPRINTF(vt->tmpbuffer + cur, vt->tmpbuffer_len - cur,
           vt->mode.ctrl8bit ? "m" "\x9C" : "m" ESC_S "\\"); // ... m ST
-      if(cur >= vt->tmpbuffer_len)
-        return;
+      якщо(cur >= vt->tmpbuffer_len)
+        повернути;
 
       vterm_push_output_bytes(vt, vt->tmpbuffer, cur);
-      return;
+      повернути;
     }
 
     case 'r':
       // Query DECSTBM
       vterm_push_output_sprintf_str(vt, C1_DCS, TRUE,
           "1$r%d;%dr", state->scrollregion_top+1, SCROLLREGION_BOTTOM(state));
-      return;
+      повернути;
 
     case 's':
       // Query DECSLRM
       vterm_push_output_sprintf_str(vt, C1_DCS, TRUE,
           "1$r%d;%ds", SCROLLREGION_LEFT(state)+1, SCROLLREGION_RIGHT(state));
-      return;
+      повернути;
 
     case ' '|('q'<<8): {
       // Query DECSCUSR
-      int reply;
+      ціле reply;
       switch(state->mode.cursor_shape) {
         case VTERM_PROP_CURSORSHAPE_BLOCK:     reply = 2; break;
         case VTERM_PROP_CURSORSHAPE_UNDERLINE: reply = 4; break;
 	default: /* VTERM_PROP_CURSORSHAPE_BAR_LEFT */ reply = 6; break;
       }
-      if(state->mode.cursor_blink)
+      якщо(state->mode.cursor_blink)
         reply--;
       vterm_push_output_sprintf_str(vt, C1_DCS, TRUE,
           "1$r%d q", reply);
-      return;
+      повернути;
     }
 
     case '\"'|('q'<<8):
       // Query DECSCA
       vterm_push_output_sprintf_str(vt, C1_DCS, TRUE,
           "1$r%d\"q", state->protected_cell ? 1 : 2);
-      return;
+      повернути;
   }
 
   vterm_push_output_sprintf_str(state->vt, C1_DCS, TRUE, "0$r");
 }
 
-static int on_dcs(const char *command, size_t commandlen, VTermStringFragment frag, void *user)
+static ціле on_dcs(const char *command, size_t commandlen, VTermStringFragment frag, void *user)
 {
   VTermState *state = user;
 
-  if(commandlen == 2 && strneq(command, "$q", 2)) {
+  якщо(commandlen == 2 && strneq(command, "$q", 2)) {
     request_status_string(state, frag);
-    return 1;
+    повернути 1;
   }
-  else if(state->fallbacks && state->fallbacks->dcs)
-    if((*state->fallbacks->dcs)(command, commandlen, frag, state->fbdata))
-      return 1;
+  інакше якщо(state->fallbacks && state->fallbacks->dcs)
+    якщо((*state->fallbacks->dcs)(command, commandlen, frag, state->fbdata))
+      повернути 1;
 
-  DEBUG_LOG2("libvterm: Unhandled DCS %.*s\n", (int)commandlen, command);
-  return 0;
+  DEBUG_LOG2("libvterm: Unhandled DCS %.*s\n", (ціле)commandlen, command);
+  повернути 0;
 }
 
-static int on_apc(VTermStringFragment frag, void *user)
+static ціле on_apc(VTermStringFragment frag, void *user)
 {
   VTermState *state = user;
 
-  if(state->fallbacks && state->fallbacks->apc)
-    if((*state->fallbacks->apc)(frag, state->fbdata))
-      return 1;
+  якщо(state->fallbacks && state->fallbacks->apc)
+    якщо((*state->fallbacks->apc)(frag, state->fbdata))
+      повернути 1;
 
   /* No DEBUG_LOG because all APCs are unhandled */
-  return 0;
+  повернути 0;
 }
 
-static int on_pm(VTermStringFragment frag, void *user)
+static ціле on_pm(VTermStringFragment frag, void *user)
 {
   VTermState *state = user;
 
-  if(state->fallbacks && state->fallbacks->pm)
-    if((*state->fallbacks->pm)(frag, state->fbdata))
-      return 1;
+  якщо(state->fallbacks && state->fallbacks->pm)
+    якщо((*state->fallbacks->pm)(frag, state->fbdata))
+      повернути 1;
 
   /* No DEBUG_LOG because all PMs are unhandled */
-  return 0;
+  повернути 0;
 }
 
-static int on_sos(VTermStringFragment frag, void *user)
+static ціле on_sos(VTermStringFragment frag, void *user)
 {
   VTermState *state = user;
 
-  if(state->fallbacks && state->fallbacks->sos)
-    if((*state->fallbacks->sos)(frag, state->fbdata))
-      return 1;
+  якщо(state->fallbacks && state->fallbacks->sos)
+    якщо((*state->fallbacks->sos)(frag, state->fbdata))
+      повернути 1;
 
   /* No DEBUG_LOG because all SOSs are unhandled */
-  return 0;
+  повернути 0;
 }
 
-static int on_resize(int rows, int cols, void *user)
+static ціле on_resize(ціле rows, ціле cols, void *user)
 {
   VTermState *state = user;
   VTermPos oldpos = state->pos;
 
-  if (cols > VTERM_MAX_COLS)
+  якщо (cols > VTERM_MAX_COLS)
     cols = VTERM_MAX_COLS;
 
-  if (rows > VTERM_MAX_ROWS)
+  якщо (rows > VTERM_MAX_ROWS)
     rows = VTERM_MAX_ROWS;
 
-  if(cols != state->cols) {
+  якщо(cols != state->cols) {
     unsigned char *newtabstops = vterm_allocator_malloc(state->vt, (cols + 7) / 8);
-    if (newtabstops == NULL)
-      return 0;
+    якщо (newtabstops == NULL)
+      повернути 0;
 
     /* TODO: This can all be done much more efficiently bytewise */
-    int col;
-    for(col = 0; col < state->cols && col < cols; col++) {
+    ціле col;
+    для(col = 0; col < state->cols && col < cols; col++) {
       unsigned char mask = 1 << (col & 7);
-      if(state->tabstops[col >> 3] & mask)
+      якщо(state->tabstops[col >> 3] & mask)
         newtabstops[col >> 3] |= mask;
-      else
+      інакше
         newtabstops[col >> 3] &= ~mask;
       }
 
-    for( ; col < cols; col++) {
+    для( ; col < cols; col++) {
       unsigned char mask = 1 << (col & 7);
-      if(col % 8 == 0)
+      якщо(col % 8 == 0)
         newtabstops[col >> 3] |= mask;
-      else
+      інакше
         newtabstops[col >> 3] &= ~mask;
     }
 
@@ -2179,9 +2179,9 @@ static int on_resize(int rows, int cols, void *user)
   state->rows = rows;
   state->cols = cols;
 
-  if(state->scrollregion_bottom > -1)
+  якщо(state->scrollregion_bottom > -1)
     UBOUND(state->scrollregion_bottom, state->rows);
-  if(state->scrollregion_right > -1)
+  якщо(state->scrollregion_right > -1)
     UBOUND(state->scrollregion_right, state->cols);
 
   // The near edges need clamping as well, otherwise a scroll region that
@@ -2190,11 +2190,11 @@ static int on_resize(int rows, int cols, void *user)
   // DECSTBM and DECSLRM do when it is set.
   UBOUND(state->scrollregion_top, state->rows);
   UBOUND(state->scrollregion_left, state->cols);
-  if(SCROLLREGION_BOTTOM(state) <= state->scrollregion_top) {
+  якщо(SCROLLREGION_BOTTOM(state) <= state->scrollregion_top) {
     state->scrollregion_top = 0;
     state->scrollregion_bottom = -1;
   }
-  if(SCROLLREGION_RIGHT(state) <= state->scrollregion_left) {
+  якщо(SCROLLREGION_RIGHT(state) <= state->scrollregion_left) {
     state->scrollregion_left = 0;
     state->scrollregion_right = -1;
   }
@@ -2204,28 +2204,28 @@ static int on_resize(int rows, int cols, void *user)
   fields.lineinfos[0] = state->lineinfos[0];
   fields.lineinfos[1] = state->lineinfos[1];
 
-  if(state->callbacks && state->callbacks->resize) {
+  якщо(state->callbacks && state->callbacks->resize) {
     (*state->callbacks->resize)(rows, cols, &fields, state->cbdata);
     state->pos = fields.pos;
 
     state->lineinfos[0] = fields.lineinfos[0];
     state->lineinfos[1] = fields.lineinfos[1];
   }
-  else {
-    if(rows != state->rows) {
-      for(int bufidx = BUFIDX_PRIMARY; bufidx <= BUFIDX_ALTSCREEN; bufidx++) {
+  інакше {
+    якщо(rows != state->rows) {
+      для(ціле bufidx = BUFIDX_PRIMARY; bufidx <= BUFIDX_ALTSCREEN; bufidx++) {
         VTermLineInfo *oldlineinfo = state->lineinfos[bufidx];
-        if(!oldlineinfo)
+        якщо(!oldlineinfo)
           continue;
 
         VTermLineInfo *newlineinfo = vterm_allocator_malloc(state->vt, rows * sizeof(VTermLineInfo));
 
-        int row;
-        for(row = 0; row < state->rows && row < rows; row++) {
+        ціле row;
+        для(row = 0; row < state->rows && row < rows; row++) {
           newlineinfo[row] = oldlineinfo[row];
         }
 
-        for( ; row < rows; row++) {
+        для( ; row < rows; row++) {
           newlineinfo[row] = (VTermLineInfo){
             .doublewidth = 0,
           };
@@ -2239,23 +2239,23 @@ static int on_resize(int rows, int cols, void *user)
 
   state->lineinfo = state->lineinfos[state->mode.alt_screen ? BUFIDX_ALTSCREEN : BUFIDX_PRIMARY];
 
-  if(state->at_phantom && state->pos.col < cols-1) {
+  якщо(state->at_phantom && state->pos.col < cols-1) {
     state->at_phantom = 0;
     state->pos.col++;
   }
 
-  if(state->pos.row < 0)
+  якщо(state->pos.row < 0)
     state->pos.row = 0;
-  if(state->pos.row >= rows)
+  якщо(state->pos.row >= rows)
     state->pos.row = rows - 1;
-  if(state->pos.col < 0)
+  якщо(state->pos.col < 0)
     state->pos.col = 0;
-  if(state->pos.col >= cols)
+  якщо(state->pos.col >= cols)
     state->pos.col = cols - 1;
 
   updatecursor(state, &oldpos, 1);
 
-  return 1;
+  повернути 1;
 }
 
 static const VTermParserCallbacks parser_callbacks = {
@@ -2277,20 +2277,20 @@ static const VTermParserCallbacks parser_callbacks = {
  */
 VTermState *vterm_obtain_state(VTerm *vt)
 {
-  if(vt->state)
-    return vt->state;
+  якщо(vt->state)
+    повернути vt->state;
 
   VTermState *state = vterm_state_new(vt);
-  if (state == NULL)
-    return NULL;
+  якщо (state == NULL)
+    повернути NULL;
   vt->state = state;
 
   vterm_parser_set_callbacks(vt, &parser_callbacks, state);
 
-  return state;
+  повернути state;
 }
 
-void vterm_state_reset(VTermState *state, int hard)
+void vterm_state_reset(VTermState *state, ціле hard)
 {
   state->scrollregion_top = 0;
   state->scrollregion_bottom = -1;
@@ -2312,16 +2312,16 @@ void vterm_state_reset(VTermState *state, int hard)
 
   state->vt->mode.ctrl8bit   = 0;
 
-  for(int col = 0; col < state->cols; col++)
-    if(col % 8 == 0)
+  для(ціле col = 0; col < state->cols; col++)
+    якщо(col % 8 == 0)
       set_col_tabstop(state, col);
-    else
+    інакше
       clear_col_tabstop(state, col);
 
-  for(int row = 0; row < state->rows; row++)
+  для(ціле row = 0; row < state->rows; row++)
     set_lineinfo(state, row, FORCE, DWL_OFF, DHL_OFF);
 
-  if(state->callbacks && state->callbacks->initpen)
+  якщо(state->callbacks && state->callbacks->initpen)
     (*state->callbacks->initpen)(state->cbdata);
 
   vterm_state_resetpen(state);
@@ -2330,9 +2330,9 @@ void vterm_state_reset(VTermState *state, int hard)
       vterm_lookup_encoding(ENC_UTF8,      'u') :
       vterm_lookup_encoding(ENC_SINGLE_94, 'B');
 
-  for(int i = 0; i < 4; i++) {
+  для(ціле i = 0; i < 4; i++) {
     state->encoding[i].enc = default_enc;
-    if(default_enc->init)
+    якщо(default_enc->init)
       (*default_enc->init)(default_enc, state->encoding[i].data);
   }
 
@@ -2347,7 +2347,7 @@ void vterm_state_reset(VTermState *state, int hard)
   settermprop_bool(state, VTERM_PROP_CURSORBLINK,   1);
   settermprop_int (state, VTERM_PROP_CURSORSHAPE,   VTERM_PROP_CURSORSHAPE_BLOCK);
 
-  if(hard) {
+  якщо(hard) {
     state->pos.row = 0;
     state->pos.col = 0;
     state->at_phantom = 0;
@@ -2374,14 +2374,14 @@ void vterm_state_get_mousestate(const VTermState *state, VTermMouseState *mouses
 
 void vterm_state_set_callbacks(VTermState *state, const VTermStateCallbacks *callbacks, void *user)
 {
-  if(callbacks) {
+  якщо(callbacks) {
     state->callbacks = callbacks;
     state->cbdata = user;
 
-    if(state->callbacks && state->callbacks->initpen)
+    якщо(state->callbacks && state->callbacks->initpen)
       (*state->callbacks->initpen)(state->cbdata);
   }
-  else {
+  інакше {
     state->callbacks = NULL;
     state->cbdata = NULL;
   }
@@ -2394,16 +2394,16 @@ void vterm_state_callbacks_has_premove(VTermState *state)
 
 void *vterm_state_get_cbdata(VTermState *state)
 {
-  return state->cbdata;
+  повернути state->cbdata;
 }
 
 void vterm_state_set_unrecognised_fallbacks(VTermState *state, const VTermStateFallbacks *fallbacks, void *user)
 {
-  if(fallbacks) {
+  якщо(fallbacks) {
     state->fallbacks = fallbacks;
     state->fbdata = user;
   }
-  else {
+  інакше {
     state->fallbacks = NULL;
     state->fbdata = NULL;
   }
@@ -2411,86 +2411,86 @@ void vterm_state_set_unrecognised_fallbacks(VTermState *state, const VTermStateF
 
 void *vterm_state_get_unrecognised_fbdata(VTermState *state)
 {
-  return state->fbdata;
+  повернути state->fbdata;
 }
 
-int vterm_state_set_termprop(VTermState *state, VTermProp prop, VTermValue *val)
+ціле vterm_state_set_termprop(VTermState *state, VTermProp prop, VTermValue *val)
 {
   /* Only store the new value of the property if usercode said it was happy.
    * This is especially important for altscreen switching */
-  if(state->callbacks && state->callbacks->settermprop)
-    if(!(*state->callbacks->settermprop)(prop, val, state->cbdata))
-      return 0;
+  якщо(state->callbacks && state->callbacks->settermprop)
+    якщо(!(*state->callbacks->settermprop)(prop, val, state->cbdata))
+      повернути 0;
 
   switch(prop) {
   case VTERM_PROP_TITLE:
   case VTERM_PROP_ICONNAME:
   case VTERM_PROP_CURSORCOLOR:
     // we don't store these, just transparently pass through
-    return 1;
+    повернути 1;
   case VTERM_PROP_CURSORVISIBLE:
     state->mode.cursor_visible = val->boolean;
-    return 1;
+    повернути 1;
   case VTERM_PROP_CURSORBLINK:
     state->mode.cursor_blink = val->boolean;
-    return 1;
+    повернути 1;
   case VTERM_PROP_CURSORSHAPE:
     state->mode.cursor_shape = val->number;
-    return 1;
+    повернути 1;
   case VTERM_PROP_REVERSE:
     state->mode.screen = val->boolean;
-    return 1;
+    повернути 1;
   case VTERM_PROP_ALTSCREEN:
     state->mode.alt_screen = val->boolean;
     state->lineinfo = state->lineinfos[state->mode.alt_screen ? BUFIDX_ALTSCREEN : BUFIDX_PRIMARY];
-    if(state->mode.alt_screen) {
+    якщо(state->mode.alt_screen) {
       VTermRect rect = {0, 0, 0, 0};
       rect.end_row = state->rows;
       rect.end_col = state->cols;
       erase(state, rect, 0);
     }
-    return 1;
+    повернути 1;
   case VTERM_PROP_MOUSE:
     state->mouse_flags = 0;
-    if(val->number)
+    якщо(val->number)
       state->mouse_flags |= MOUSE_WANT_CLICK;
-    if(val->number == VTERM_PROP_MOUSE_DRAG)
+    якщо(val->number == VTERM_PROP_MOUSE_DRAG)
       state->mouse_flags |= MOUSE_WANT_DRAG;
-    if(val->number == VTERM_PROP_MOUSE_MOVE)
+    якщо(val->number == VTERM_PROP_MOUSE_MOVE)
       state->mouse_flags |= MOUSE_WANT_MOVE;
-    return 1;
+    повернути 1;
   case VTERM_PROP_FOCUSREPORT:
     state->mode.report_focus = val->boolean;
-    return 1;
+    повернути 1;
 
   case VTERM_N_PROPS:
-    return 0;
+    повернути 0;
   }
 
-  return 0;
+  повернути 0;
 }
 
 void vterm_state_focus_in(VTermState *state)
 {
-  if(state->mode.report_focus)
+  якщо(state->mode.report_focus)
     vterm_push_output_sprintf_ctrl(state->vt, C1_CSI, "I");
 }
 
 void vterm_state_focus_out(VTermState *state)
 {
-  if(state->mode.report_focus)
+  якщо(state->mode.report_focus)
     vterm_push_output_sprintf_ctrl(state->vt, C1_CSI, "O");
 }
 
-const VTermLineInfo *vterm_state_get_lineinfo(const VTermState *state, int row)
+const VTermLineInfo *vterm_state_get_lineinfo(const VTermState *state, ціле row)
 {
-  return state->lineinfo + row;
+  повернути state->lineinfo + row;
 }
 
 void vterm_state_set_selection_callbacks(VTermState *state, const VTermSelectionCallbacks *callbacks, void *user,
     char *buffer, size_t buflen)
 {
-  if(buflen && !buffer)
+  якщо(buflen && !buffer)
     buffer = vterm_allocator_malloc(state->vt, buflen);
 
   state->selection.callbacks = callbacks;
@@ -2503,12 +2503,12 @@ void vterm_state_send_selection(VTermState *state, VTermSelectionMask mask, VTer
 {
   VTerm *vt = state->vt;
 
-  if(frag.initial) {
+  якщо(frag.initial) {
     /* TODO: support sending more than one mask bit */
     static char selection_chars[] = "cpqs";
-    int idx;
-    for(idx = 0; idx < 4; idx++)
-      if(mask & (1 << idx))
+    ціле idx;
+    для(idx = 0; idx < 4; idx++)
+      якщо(mask & (1 << idx))
         break;
 
     vterm_push_output_sprintf_str(vt, C1_OSC, FALSE, "52;%c;", selection_chars[idx]);
@@ -2516,26 +2516,26 @@ void vterm_state_send_selection(VTermState *state, VTermSelectionMask mask, VTer
     state->tmp.selection.sendpartial = 0;
   }
 
-  if(frag.len) {
+  якщо(frag.len) {
     size_t bufcur = 0;
     char *buffer = state->selection.buffer;
 
     uint32_t x = 0;
-    int n = 0;
+    ціле n = 0;
 
-    if(state->tmp.selection.sendpartial) {
+    якщо(state->tmp.selection.sendpartial) {
       n = state->tmp.selection.sendpartial >> 24;
       x = state->tmp.selection.sendpartial & 0xFFFFFF;
 
       state->tmp.selection.sendpartial = 0;
     }
 
-    while((state->selection.buflen - bufcur) >= 4 && frag.len) {
+    поки((state->selection.buflen - bufcur) >= 4 && frag.len) {
       x = (x << 8) | frag.str[0];
       n++;
       frag.str++, frag.len--;
 
-      if(n == 3) {
+      якщо(n == 3) {
         buffer[0] = base64_one((x >> 18) & 0x3F);
         buffer[1] = base64_one((x >> 12) & 0x3F);
         buffer[2] = base64_one((x >>  6) & 0x3F);
@@ -2546,8 +2546,8 @@ void vterm_state_send_selection(VTermState *state, VTermSelectionMask mask, VTer
         n = 0;
       }
 
-      if(!frag.len || (state->selection.buflen - bufcur) < 4) {
-        if(bufcur)
+      якщо(!frag.len || (state->selection.buflen - bufcur) < 4) {
+        якщо(bufcur)
           vterm_push_output_bytes(vt, state->selection.buffer, bufcur);
 
         buffer = state->selection.buffer;
@@ -2555,13 +2555,13 @@ void vterm_state_send_selection(VTermState *state, VTermSelectionMask mask, VTer
       }
     }
 
-    if(n)
+    якщо(n)
       state->tmp.selection.sendpartial = (n << 24) | x;
   }
 
-  if(frag.final) {
-    if(state->tmp.selection.sendpartial) {
-      int n      = state->tmp.selection.sendpartial >> 24;
+  якщо(frag.final) {
+    якщо(state->tmp.selection.sendpartial) {
+      ціле n      = state->tmp.selection.sendpartial >> 24;
       uint32_t x = state->tmp.selection.sendpartial & 0xFFFFFF;
       char *buffer = state->selection.buffer;
 
@@ -2575,7 +2575,7 @@ void vterm_state_send_selection(VTermState *state, VTermSelectionMask mask, VTer
 
       vterm_push_output_sprintf_str(vt, 0, TRUE, "%.*s", 4, buffer);
     }
-    else
+    інакше
       vterm_push_output_sprintf_str(vt, 0, TRUE, "");
   }
 }

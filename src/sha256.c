@@ -23,7 +23,7 @@
 
 #include "vim.h"
 
-#if defined(FEAT_CRYPT) || defined(FEAT_PERSISTENT_UNDO)
+#якщо defined(FEAT_CRYPT) || defined(FEAT_PERSISTENT_UNDO)
 
 # define GET_UINT32(n, b, i)		    \
 {					    \
@@ -194,8 +194,8 @@ sha256_update(context_sha256_T *ctx, char_u *input, UINT32_T length)
 {
     UINT32_T left, fill;
 
-    if (length == 0)
-	return;
+    якщо (length == 0)
+	повернути;
 
     left = ctx->total[0] & 0x3F;
     fill = 64 - left;
@@ -203,10 +203,10 @@ sha256_update(context_sha256_T *ctx, char_u *input, UINT32_T length)
     ctx->total[0] += length;
     ctx->total[0] &= 0xFFFFFFFF;
 
-    if (ctx->total[0] < length)
+    якщо (ctx->total[0] < length)
 	ctx->total[1]++;
 
-    if (left && length >= fill)
+    якщо (left && length >= fill)
     {
 	memcpy((void *)(ctx->buffer + left), (void *)input, fill);
 	sha256_process(ctx, ctx->buffer);
@@ -215,14 +215,14 @@ sha256_update(context_sha256_T *ctx, char_u *input, UINT32_T length)
 	left = 0;
     }
 
-    while (length >= 64)
+    поки (length >= 64)
     {
 	sha256_process(ctx, input);
 	length -= 64;
 	input  += 64;
     }
 
-    if (length)
+    якщо (length)
 	memcpy((void *)(ctx->buffer + left), (void *)input, length);
 }
 
@@ -263,7 +263,7 @@ sha256_finish(context_sha256_T *ctx, char_u digest[32])
 }
 #endif // FEAT_CRYPT || FEAT_PERSISTENT_UNDO
 
-#if defined(FEAT_CRYPT)
+#якщо defined(FEAT_CRYPT)
 /*
  * Returns hex digest of "buf[buf_len]" in a static array.
  * if "salt" is not NULL also do "salt[salt_len]".
@@ -271,26 +271,26 @@ sha256_finish(context_sha256_T *ctx, char_u digest[32])
     char_u *
 sha256_bytes(
     char_u *buf,
-    int    buf_len,
+    ціле    buf_len,
     char_u *salt,
-    int    salt_len)
+    ціле    salt_len)
 {
     char_u	     sha256sum[32];
     static char_u    hexit[65];
-    int		     j;
+    ціле		     j;
     context_sha256_T ctx;
 
     sha256_self_test();
 
     sha256_start(&ctx);
     sha256_update(&ctx, buf, buf_len);
-    if (salt != NULL)
+    якщо (salt != NULL)
 	sha256_update(&ctx, salt, salt_len);
     sha256_finish(&ctx, sha256sum);
-    for (j = 0; j < 32; j++)
+    для (j = 0; j < 32; j++)
 	sprintf((char *)hexit + j * 2, "%02x", sha256sum[j]);
     hexit[sizeof(hexit) - 1] = '\0';
-    return hexit;
+    повернути hexit;
 }
 
 /*
@@ -300,13 +300,13 @@ sha256_bytes(
 sha256_key(
     char_u *buf,
     char_u *salt,
-    int    salt_len)
+    ціле    salt_len)
 {
     // No passwd means don't encrypt
-    if (buf == NULL || *buf == NUL)
-	return (char_u *)"";
+    якщо (buf == NULL || *buf == NUL)
+	повернути (char_u *)"";
 
-    return sha256_bytes(buf, (int)STRLEN(buf), salt, salt_len);
+    повернути sha256_bytes(buf, (ціле)STRLEN(buf), salt, salt_len);
 }
 
 /*
@@ -332,52 +332,52 @@ static char *sha_self_test_vector[] = {
  * Perform a test on the SHA256 algorithm.
  * Return FAIL or OK.
  */
-    int
+    ціле
 sha256_self_test(void)
 {
-    int		     i, j;
+    ціле		     i, j;
     char	     output[65];
     context_sha256_T ctx;
     char_u	     buf[1000];
     char_u	     sha256sum[32];
-    static int	     failures = 0;
+    static ціле	     failures = 0;
     char_u	     *hexit;
-    static int	     sha256_self_tested = 0;
+    static ціле	     sha256_self_tested = 0;
 
-    if (sha256_self_tested > 0)
-	return failures > 0 ? FAIL : OK;
+    якщо (sha256_self_tested > 0)
+	повернути failures > 0 ? FAIL : OK;
     sha256_self_tested = 1;
 
-    for (i = 0; i < 3; i++)
+    для (i = 0; i < 3; i++)
     {
-	if (i < 2)
+	якщо (i < 2)
 	{
 	    hexit = sha256_bytes((char_u *)sha_self_test_msg[i],
-		    (int)STRLEN(sha_self_test_msg[i]),
+		    (ціле)STRLEN(sha_self_test_msg[i]),
 		    NULL, 0);
 	    STRCPY(output, hexit);
 	}
-	else
+	інакше
 	{
 	    sha256_start(&ctx);
 	    vim_memset(buf, 'a', 1000);
-	    for (j = 0; j < 1000; j++)
+	    для (j = 0; j < 1000; j++)
 		sha256_update(&ctx, (char_u *)buf, 1000);
 	    sha256_finish(&ctx, sha256sum);
-	    for (j = 0; j < 32; j++)
+	    для (j = 0; j < 32; j++)
 		sprintf(output + j * 2, "%02x", sha256sum[j]);
 	}
-	if (memcmp(output, sha_self_test_vector[i], 64))
+	якщо (memcmp(output, sha_self_test_vector[i], 64))
 	{
 	    failures++;
 	    output[sizeof(output) - 1] = '\0';
 	    // printf("sha256_self_test %d failed %s\n", i, output);
 	}
     }
-    return failures > 0 ? FAIL : OK;
+    повернути failures > 0 ? FAIL : OK;
 }
 
-    static unsigned int
+    static unsigned ціле
 get_some_time(void)
 {
 # ifdef HAVE_GETTIMEOFDAY
@@ -385,9 +385,9 @@ get_some_time(void)
 
     // Using usec makes it less predictable.
     gettimeofday(&tv, NULL);
-    return (unsigned int)(tv.tv_sec + tv.tv_usec);
-# else
-    return (unsigned int)time(NULL);
+    повернути (unsigned ціле)(tv.tv_sec + tv.tv_usec);
+# інакше
+    повернути (unsigned ціле)time(NULL);
 # endif
 }
 
@@ -398,30 +398,30 @@ get_some_time(void)
     void
 sha2_seed(
     char_u *header,
-    int    header_len,
+    ціле    header_len,
     char_u *salt,
-    int    salt_len)
+    ціле    salt_len)
 {
-    int		     i;
+    ціле		     i;
     static char_u    random_data[1000];
     char_u	     sha256sum[32];
     context_sha256_T ctx;
 
     srand(get_some_time());
 
-    for (i = 0; i < (int)sizeof(random_data) - 1; i++)
+    для (i = 0; i < (ціле)sizeof(random_data) - 1; i++)
 	random_data[i] = (char_u)((get_some_time() ^ rand()) & 0xff);
     sha256_start(&ctx);
     sha256_update(&ctx, (char_u *)random_data, sizeof(random_data));
     sha256_finish(&ctx, sha256sum);
 
     // put first block into header.
-    for (i = 0; i < header_len; i++)
+    для (i = 0; i < header_len; i++)
 	header[i] = sha256sum[i % sizeof(sha256sum)];
 
     // put remaining block into salt.
-    if (salt != NULL)
-	for (i = 0; i < salt_len; i++)
+    якщо (salt != NULL)
+	для (i = 0; i < salt_len; i++)
 	    salt[i] = sha256sum[(i + header_len) % sizeof(sha256sum)];
 }
 

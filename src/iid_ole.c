@@ -17,7 +17,7 @@ extern "C"{
 #ifdef __MINGW32__
 # include <w32api.h>
 
-# if __W32API_MAJOR_VERSION == 3 && __W32API_MINOR_VERSION < 10
+# якщо __W32API_MAJOR_VERSION == 3 && __W32API_MINOR_VERSION < 10
    // This define is missing from older MingW versions of w32api, even though
    // IID is defined.
 #  define __IID_DEFINED__

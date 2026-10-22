@@ -13,7 +13,7 @@
 
 #include "vim.h"
 
-#if defined(FEAT_EVAL)
+#якщо defined(FEAT_EVAL)
 
 /*
  * Allocate an empty blob.
@@ -24,25 +24,25 @@ blob_alloc(void)
 {
     blob_T *blob = ALLOC_CLEAR_ONE_ID(blob_T, aid_blob_alloc);
 
-    if (blob != NULL)
+    якщо (blob != NULL)
 	ga_init2(&blob->bv_ga, 1, 100);
-    return blob;
+    повернути blob;
 }
 
 /*
  * Allocate an empty blob for a return value, with reference count set.
  * Returns OK or FAIL.
  */
-    int
+    ціле
 rettv_blob_alloc(typval_T *rettv)
 {
     blob_T	*b = blob_alloc();
 
-    if (b == NULL)
-	return FAIL;
+    якщо (b == NULL)
+	повернути FAIL;
 
     rettv_blob_set(rettv, b);
-    return OK;
+    повернути OK;
 }
 
 /*
@@ -53,7 +53,7 @@ rettv_blob_set(typval_T *rettv, blob_T *b)
 {
     rettv->v_type = VAR_BLOB;
     rettv->vval.v_blob = b;
-    if (b != NULL)
+    якщо (b != NULL)
 	++b->bv_refcount;
 }
 
@@ -65,29 +65,29 @@ rettv_blob_set(typval_T *rettv, blob_T *b)
     blob_T *
 blob_copy(blob_T *orig)
 {
-    int		len;
+    ціле		len;
     blob_T	*copy;
 
-    if (orig == NULL)
-	return NULL;
+    якщо (orig == NULL)
+	повернути NULL;
 
     copy = blob_alloc();
-    if (copy == NULL)
-	return NULL;
+    якщо (copy == NULL)
+	повернути NULL;
     ++copy->bv_refcount;
 
     len = orig->bv_ga.ga_len;
-    if (len > 0)
+    якщо (len > 0)
     {
 	copy->bv_ga.ga_data =
 	    vim_memsave(orig->bv_ga.ga_data, len);
-	if (copy->bv_ga.ga_data == NULL)
+	якщо (copy->bv_ga.ga_data == NULL)
 	    len = 0;
     }
     copy->bv_ga.ga_len = len;
     copy->bv_ga.ga_maxlen = len;
 
-    return copy;
+    повернути copy;
 }
 
     void
@@ -104,7 +104,7 @@ blob_free(blob_T *b)
     void
 blob_unref(blob_T *b)
 {
-    if (b != NULL && --b->bv_refcount <= 0)
+    якщо (b != NULL && --b->bv_refcount <= 0)
 	blob_free(b);
 }
 
@@ -114,19 +114,19 @@ blob_unref(blob_T *b)
     long
 blob_len(blob_T *b)
 {
-    if (b == NULL)
-	return 0L;
-    return b->bv_ga.ga_len;
+    якщо (b == NULL)
+	повернути 0L;
+    повернути b->bv_ga.ga_len;
 }
 
 /*
  * Get byte "idx" in blob "b".
  * Caller must check that "idx" is valid.
  */
-    int
-blob_get(blob_T *b, int idx)
+    ціле
+blob_get(blob_T *b, ціле idx)
 {
-    return ((char_u*)b->bv_ga.ga_data)[idx];
+    повернути ((char_u*)b->bv_ga.ga_data)[idx];
 }
 
 /*
@@ -134,7 +134,7 @@ blob_get(blob_T *b, int idx)
  * Caller must make sure that "idx" is valid.
  */
     void
-blob_set(blob_T *blob, int idx, int byte)
+blob_set(blob_T *blob, ціле idx, ціле byte)
 {
     ((char_u*)blob->bv_ga.ga_data)[idx] = byte;
 }
@@ -144,17 +144,17 @@ blob_set(blob_T *blob, int idx, int byte)
  * Append one byte if needed.
  */
     void
-blob_set_append(blob_T *blob, int idx, int byte)
+blob_set_append(blob_T *blob, ціле idx, ціле byte)
 {
     garray_T *gap = &blob->bv_ga;
 
     // Allow for appending a byte.  Setting a byte beyond
     // the end is an error otherwise.
-    if (idx < gap->ga_len
+    якщо (idx < gap->ga_len
 	    || (idx == gap->ga_len && ga_grow(gap, 1) == OK))
     {
 	blob_set(blob, idx, byte);
-	if (idx == gap->ga_len)
+	якщо (idx == gap->ga_len)
 	    ++gap->ga_len;
     }
 }
@@ -162,26 +162,26 @@ blob_set_append(blob_T *blob, int idx, int byte)
 /*
  * Return TRUE when two blobs have exactly the same values.
  */
-    int
+    ціле
 blob_equal(
     blob_T	*b1,
     blob_T	*b2)
 {
-    int	    i;
+    ціле	    i;
     long    len1 = blob_len(b1);
     long    len2 = blob_len(b2);
 
     // empty and NULL are considered the same
-    if (len1 == 0 && len2 == 0)
-	return TRUE;
-    if (b1 == b2)
-	return TRUE;
-    if (len1 != len2)
-	return FALSE;
+    якщо (len1 == 0 && len2 == 0)
+	повернути TRUE;
+    якщо (b1 == b2)
+	повернути TRUE;
+    якщо (len1 != len2)
+	повернути FALSE;
 
-    for (i = 0; i < b1->bv_ga.ga_len; i++)
-	if (blob_get(b1, i) != blob_get(b2, i)) return FALSE;
-    return TRUE;
+    для (i = 0; i < b1->bv_ga.ga_len; i++)
+	якщо (blob_get(b1, i) != blob_get(b2, i)) повернути FALSE;
+    повернути TRUE;
 }
 
 /*
@@ -189,22 +189,22 @@ blob_equal(
  * Caller has allocated a blob in "rettv".
  * Return OK or FAIL.
  */
-    int
+    ціле
 read_blob(FILE *fd, typval_T *rettv, off_T offset, off_T size_arg)
 {
     blob_T	*blob = rettv->vval.v_blob;
     struct stat	st;
-    int		whence;
+    ціле		whence;
     off_T	size = size_arg;
 
-    if (fstat(fileno(fd), &st) < 0)
-	return FAIL;  // can't read the file, error
+    якщо (fstat(fileno(fd), &st) < 0)
+	повернути FAIL;  // can't read the file, error
 
-    if (offset >= 0)
+    якщо (offset >= 0)
     {
 	// The size defaults to the whole file.  If a size is given it is
 	// limited to not go past the end of the file.
-	if (size == -1 || (size > st.st_size - offset
+	якщо (size == -1 || (size > st.st_size - offset
 #ifdef S_ISCHR
 		    && !S_ISCHR(st.st_mode)
 #endif
@@ -213,53 +213,53 @@ read_blob(FILE *fd, typval_T *rettv, off_T offset, off_T size_arg)
 	    size = st.st_size - offset;
 	whence = SEEK_SET;
     }
-    else
+    інакше
     {
 	// limit the offset to not go before the start of the file
-	if (-offset > st.st_size
+	якщо (-offset > st.st_size
 #ifdef S_ISCHR
 		    && !S_ISCHR(st.st_mode)
 #endif
 		    )
 	    offset = -st.st_size;
 	// Size defaults to reading until the end of the file.
-	if (size == -1 || size > -offset)
+	якщо (size == -1 || size > -offset)
 	    size = -offset;
 	whence = SEEK_END;
     }
-    if (size <= 0)
-	return OK;
-    if (offset != 0 && vim_fseek(fd, offset, whence) != 0)
-	return OK;
+    якщо (size <= 0)
+	повернути OK;
+    якщо (offset != 0 && vim_fseek(fd, offset, whence) != 0)
+	повернути OK;
 
-    if (ga_grow(&blob->bv_ga, (int)size) == FAIL)
-	return FAIL;
-    blob->bv_ga.ga_len = (int)size;
-    if (fread(blob->bv_ga.ga_data, 1, blob->bv_ga.ga_len, fd)
+    якщо (ga_grow(&blob->bv_ga, (ціле)size) == FAIL)
+	повернути FAIL;
+    blob->bv_ga.ga_len = (ціле)size;
+    якщо (fread(blob->bv_ga.ga_data, 1, blob->bv_ga.ga_len, fd)
 						  < (size_t)blob->bv_ga.ga_len)
     {
 	// An empty blob is returned on error.
 	blob_free(rettv->vval.v_blob);
 	rettv->vval.v_blob = NULL;
-	return FAIL;
+	повернути FAIL;
     }
-    return OK;
+    повернути OK;
 }
 
 /*
  * Write "blob" to file "fd".
  * Return OK or FAIL.
  */
-    int
+    ціле
 write_blob(FILE *fd, blob_T *blob)
 {
-    if (fwrite(blob->bv_ga.ga_data, 1, blob->bv_ga.ga_len, fd)
+    якщо (fwrite(blob->bv_ga.ga_data, 1, blob->bv_ga.ga_len, fd)
 						  < (size_t)blob->bv_ga.ga_len)
     {
 	emsg(_(e_error_while_writing));
-	return FAIL;
+	повернути FAIL;
     }
-    return OK;
+    повернути OK;
 }
 
 /*
@@ -269,36 +269,36 @@ write_blob(FILE *fd, blob_T *blob)
 blob2string(blob_T *blob, char_u **tofree, char_u *numbuf UNUSED)
 {
     static const char hex_chars[] = "0123456789ABCDEF";
-    int		blen;
+    ціле		blen;
     size_t	total;
     char_u	*buf;
     char_u	*p;
     char_u	*src;
 
-    if (blob == NULL || (blen = blob_len(blob)) == 0)
+    якщо (blob == NULL || (blen = blob_len(blob)) == 0)
     {
 	*tofree = NULL;
-	return (char_u *)"0z";
+	повернути (char_u *)"0z";
     }
 
     // 2 ("0z") + 2 hex per byte + one '.' every 4 bytes + NUL terminator.
     total = 2 + (size_t)blen * 2 + (size_t)((blen - 1) / 4) + 1;
     buf = alloc(total);
-    if (buf == NULL)
+    якщо (buf == NULL)
     {
 	*tofree = NULL;
-	return (char_u *)"0z";
+	повернути (char_u *)"0z";
     }
 
     p = buf;
     *p++ = '0';
     *p++ = 'z';
     src = (char_u *)blob->bv_ga.ga_data;
-    for (int i = 0; i < blen; i++)
+    для (ціле i = 0; i < blen; i++)
     {
 	unsigned b;
 
-	if (i > 0 && (i & 3) == 0)
+	якщо (i > 0 && (i & 3) == 0)
 	    *p++ = '.';
 	b = src[i];
 	*p++ = hex_chars[b >> 4];
@@ -306,7 +306,7 @@ blob2string(blob_T *blob, char_u **tofree, char_u *numbuf UNUSED)
     }
     *p = NUL;
     *tofree = buf;
-    return buf;
+    повернути buf;
 }
 
 /*
@@ -320,24 +320,24 @@ blob2items(typval_T *argvars, typval_T *rettv)
 {
     blob_T	*blob = argvars[0].vval.v_blob;
 
-    if (rettv_list_alloc(rettv) == FAIL)
-	return;
+    якщо (rettv_list_alloc(rettv) == FAIL)
+	повернути;
 
-    for (int i = 0; i < blob_len(blob); i++)
+    для (ціле i = 0; i < blob_len(blob); i++)
     {
 	list_T	*l2 = list_alloc();
-	if (l2 == NULL)
-	    return;
+	якщо (l2 == NULL)
+	    повернути;
 
-	if (list_append_list(rettv->vval.v_list, l2) == FAIL)
+	якщо (list_append_list(rettv->vval.v_list, l2) == FAIL)
 	{
 	    list_free(l2);
-	    return;
+	    повернути;
 	}
 
-	if (list_append_number(l2, i) == FAIL
+	якщо (list_append_number(l2, i) == FAIL
 		|| list_append_number(l2, blob_get(blob, i)) == FAIL)
-	    return;
+	    повернути;
     }
 }
 
@@ -351,76 +351,76 @@ string2blob(char_u *str)
     blob_T  *blob = blob_alloc();
     char_u  *s = str;
 
-    if (blob == NULL)
-	return NULL;
-    if (s[0] != '0' || (s[1] != 'z' && s[1] != 'Z'))
+    якщо (blob == NULL)
+	повернути NULL;
+    якщо (s[0] != '0' || (s[1] != 'z' && s[1] != 'Z'))
 	goto failed;
     s += 2;
-    while (vim_isxdigit(*s))
+    поки (vim_isxdigit(*s))
     {
-	if (!vim_isxdigit(s[1]))
+	якщо (!vim_isxdigit(s[1]))
 	    goto failed;
 	ga_append(&blob->bv_ga, (hex2nr(s[0]) << 4) + hex2nr(s[1]));
 	s += 2;
-	if (*s == '.' && vim_isxdigit(s[1]))
+	якщо (*s == '.' && vim_isxdigit(s[1]))
 	    ++s;
     }
-    if (*skipwhite(s) != NUL)
+    якщо (*skipwhite(s) != NUL)
 	goto failed;  // text after final digit
 
     ++blob->bv_refcount;
-    return blob;
+    повернути blob;
 
 failed:
     blob_free(blob);
-    return NULL;
+    повернути NULL;
 }
 
 /*
  * Returns a slice of 'blob' from index 'n1' to 'n2' in 'rettv'.  The length of
  * the blob is 'len'.  Returns an empty blob if the indexes are out of range.
  */
-    static int
+    static ціле
 blob_slice(
 	blob_T		*blob,
 	long		len,
 	varnumber_T	n1,
 	varnumber_T	n2,
-	int		exclusive,
+	ціле		exclusive,
 	typval_T	*rettv)
 {
-    if (n1 < 0)
+    якщо (n1 < 0)
     {
 	n1 = len + n1;
-	if (n1 < 0)
+	якщо (n1 < 0)
 	    n1 = 0;
     }
-    if (n2 < 0)
+    якщо (n2 < 0)
 	n2 = len + n2;
-    else if (n2 >= len)
+    інакше якщо (n2 >= len)
 	n2 = len - (exclusive ? 0 : 1);
-    if (exclusive)
+    якщо (exclusive)
 	--n2;
-    if (n1 >= len || n2 < 0 || n1 > n2)
+    якщо (n1 >= len || n2 < 0 || n1 > n2)
     {
 	clear_tv(rettv);
 	rettv->v_type = VAR_BLOB;
 	rettv->vval.v_blob = NULL;
     }
-    else
+    інакше
     {
 	blob_T  *new_blob = blob_alloc();
 	long    i;
 
-	if (new_blob != NULL)
+	якщо (new_blob != NULL)
 	{
-	    if (ga_grow(&new_blob->bv_ga, n2 - n1 + 1) == FAIL)
+	    якщо (ga_grow(&new_blob->bv_ga, n2 - n1 + 1) == FAIL)
 	    {
 		blob_free(new_blob);
-		return FAIL;
+		повернути FAIL;
 	    }
 	    new_blob->bv_ga.ga_len = n2 - n1 + 1;
-	    for (i = n1; i <= n2; i++)
+	    для (i = n1; i <= n2; i++)
 		blob_set(new_blob, i - n1, blob_get(blob, i));
 
 	    clear_tv(rettv);
@@ -428,87 +428,87 @@ blob_slice(
 	}
     }
 
-    return OK;
+    повернути OK;
 }
 
 /*
  * Return the byte value in 'blob' at index 'idx' in 'rettv'.  If the index is
  * too big or negative that is an error.  The length of the blob is 'len'.
  */
-    static int
+    static ціле
 blob_index(
 	blob_T		*blob,
-	int		len,
+	ціле		len,
 	varnumber_T	idx,
 	typval_T	*rettv)
 {
     // The resulting variable is a byte value.
     // If the index is too big or negative that is an error.
-    if (idx < 0)
+    якщо (idx < 0)
 	idx = len + idx;
-    if (idx < len && idx >= 0)
+    якщо (idx < len && idx >= 0)
     {
-	int v = blob_get(blob, idx);
+	ціле v = blob_get(blob, idx);
 
 	clear_tv(rettv);
 	rettv->v_type = VAR_NUMBER;
 	rettv->vval.v_number = v;
     }
-    else
+    інакше
     {
 	semsg(_(e_blob_index_out_of_range_nr), idx);
-	return FAIL;
+	повернути FAIL;
     }
 
-    return OK;
+    повернути OK;
 }
 
-    int
+    ціле
 blob_slice_or_index(
 	blob_T		*blob,
-	int		is_range,
+	ціле		is_range,
 	varnumber_T	n1,
 	varnumber_T	n2,
-	int		exclusive,
+	ціле		exclusive,
 	typval_T	*rettv)
 {
     long	len = blob_len(blob);
 
-    if (is_range)
-	return blob_slice(blob, len, n1, n2, exclusive, rettv);
-    else
-	return blob_index(blob, len, n1, rettv);
-    return OK;
+    якщо (is_range)
+	повернути blob_slice(blob, len, n1, n2, exclusive, rettv);
+    інакше
+	повернути blob_index(blob, len, n1, rettv);
+    повернути OK;
 }
 
 /*
  * Check if "n1"- is a valid index for a blobl with length "bloblen".
  */
-    int
-check_blob_index(long bloblen, varnumber_T n1, int quiet)
+    ціле
+check_blob_index(long bloblen, varnumber_T n1, ціле quiet)
 {
-    if (n1 < 0 || n1 > bloblen)
+    якщо (n1 < 0 || n1 > bloblen)
     {
-	if (!quiet)
+	якщо (!quiet)
 	    semsg(_(e_blob_index_out_of_range_nr), n1);
-	return FAIL;
+	повернути FAIL;
     }
-    return OK;
+    повернути OK;
 }
 
 /*
  * Check if "n1"-"n2" is a valid range for a blob with length "bloblen".
  */
-    int
-check_blob_range(long bloblen, varnumber_T n1, varnumber_T n2, int quiet)
+    ціле
+check_blob_range(long bloblen, varnumber_T n1, varnumber_T n2, ціле quiet)
 {
-    if (n2 < 0 || n2 >= bloblen || n2 < n1)
+    якщо (n2 < 0 || n2 >= bloblen || n2 < n1)
     {
-	if (!quiet)
+	якщо (!quiet)
 	    semsg(_(e_blob_index_out_of_range_nr), n2);
-	return FAIL;
+	повернути FAIL;
     }
-    return OK;
+    повернути OK;
 }
 
 /*
@@ -516,21 +516,21 @@ check_blob_range(long bloblen, varnumber_T n1, varnumber_T n2, int quiet)
  * Caller must make sure "src" is a blob.
  * Returns FAIL if the number of bytes does not match.
  */
-    int
+    ціле
 blob_set_range(blob_T *dest, long n1, long n2, typval_T *src)
 {
-    int	il, ir;
+    ціле	il, ir;
 
-    if (n2 - n1 + 1 != blob_len(src->vval.v_blob))
+    якщо (n2 - n1 + 1 != blob_len(src->vval.v_blob))
     {
 	emsg(_(e_blob_value_does_not_have_right_number_of_bytes));
-	return FAIL;
+	повернути FAIL;
     }
 
     ir = 0;
-    for (il = n1; il <= n2; il++)
+    для (il = n1; il <= n2; il++)
 	blob_set(dest, il, blob_get(src->vval.v_blob, ir++));
-    return OK;
+    повернути OK;
 }
 
 /*
@@ -540,24 +540,24 @@ blob_set_range(blob_T *dest, long n1, long n2, typval_T *src)
 blob_add(typval_T *argvars, typval_T *rettv)
 {
     blob_T	*b = argvars[0].vval.v_blob;
-    int		error = FALSE;
+    ціле		error = FALSE;
     varnumber_T n;
 
-    if (b == NULL)
+    якщо (b == NULL)
     {
-	if (in_vim9script())
+	якщо (in_vim9script())
 	    emsg(_(e_cannot_add_to_null_blob));
-	return;
+	повернути;
     }
 
-    if (value_check_lock(b->bv_lock, (char_u *)N_("add() argument"), TRUE))
-	return;
+    якщо (value_check_lock(b->bv_lock, (char_u *)N_("add() argument"), TRUE))
+	повернути;
 
     n = tv_get_number_chk(&argvars[1], &error);
-    if (error)
-	return;
+    якщо (error)
+	повернути;
 
-    ga_append(&b->bv_ga, (int)n);
+    ga_append(&b->bv_ga, (ціле)n);
     copy_tv(&argvars[0], rettv);
 }
 
@@ -569,59 +569,59 @@ blob_remove(typval_T *argvars, typval_T *rettv, char_u *arg_errmsg)
 {
     blob_T	*b = argvars[0].vval.v_blob;
     blob_T	*newblob;
-    int		error = FALSE;
+    ціле		error = FALSE;
     long	idx;
     long	end;
-    int		len;
+    ціле		len;
     char_u	*p;
 
-    if (b != NULL && value_check_lock(b->bv_lock, arg_errmsg, TRUE))
-	return;
+    якщо (b != NULL && value_check_lock(b->bv_lock, arg_errmsg, TRUE))
+	повернути;
 
     idx = (long)tv_get_number_chk(&argvars[1], &error);
-    if (error)
-	return;
+    якщо (error)
+	повернути;
 
     len = blob_len(b);
 
-    if (idx < 0)
+    якщо (idx < 0)
 	// count from the end
 	idx = len + idx;
-    if (idx < 0 || idx >= len)
+    якщо (idx < 0 || idx >= len)
     {
 	semsg(_(e_blob_index_out_of_range_nr), idx);
-	return;
+	повернути;
     }
-    if (argvars[2].v_type == VAR_UNKNOWN)
+    якщо (argvars[2].v_type == VAR_UNKNOWN)
     {
 	// Remove one item, return its value.
 	p = (char_u *)b->bv_ga.ga_data;
 	rettv->vval.v_number = (varnumber_T) *(p + idx);
 	mch_memmove(p + idx, p + idx + 1, (size_t)len - idx - 1);
 	--b->bv_ga.ga_len;
-	return;
+	повернути;
     }
 
     // Remove range of items, return blob with values.
     end = (long)tv_get_number_chk(&argvars[2], &error);
-    if (error)
-	return;
-    if (end < 0)
+    якщо (error)
+	повернути;
+    якщо (end < 0)
 	// count from the end
 	end = len + end;
-    if (end >= len || idx > end)
+    якщо (end >= len || idx > end)
     {
 	semsg(_(e_blob_index_out_of_range_nr), end);
-	return;
+	повернути;
     }
     newblob = blob_alloc();
-    if (newblob == NULL)
-	return;
+    якщо (newblob == NULL)
+	повернути;
     newblob->bv_ga.ga_len = end - idx + 1;
-    if (ga_grow(&newblob->bv_ga, end - idx + 1) == FAIL)
+    якщо (ga_grow(&newblob->bv_ga, end - idx + 1) == FAIL)
     {
 	vim_free(newblob);
-	return;
+	повернути;
     }
     p = (char_u *)b->bv_ga.ga_data;
     mch_memmove((char_u *)newblob->bv_ga.ga_data, p + idx,
@@ -630,7 +630,7 @@ blob_remove(typval_T *argvars, typval_T *rettv, char_u *arg_errmsg)
     rettv->v_type = VAR_BLOB;
     rettv->vval.v_blob = newblob;
 
-    if (len - end - 1 > 0)
+    якщо (len - end - 1 > 0)
 	mch_memmove(p + idx, p + end + 1, (size_t)(len - end - 1));
     b->bv_ga.ga_len -= end - idx + 1;
 }
@@ -648,67 +648,67 @@ blob_filter_map(
 	typval_T	*rettv)
 {
     blob_T	*b = blob_arg;
-    int		i;
+    ціле		i;
     typval_T	tv;
     varnumber_T	val;
     blob_T	*b_ret;
-    int		idx = 0;
-    int		rem;
+    ціле		idx = 0;
+    ціле		rem;
     typval_T	newtv;
     funccall_T	*fc;
 
-    if (filtermap == FILTERMAP_MAPNEW)
+    якщо (filtermap == FILTERMAP_MAPNEW)
     {
 	rettv->v_type = VAR_BLOB;
 	rettv->vval.v_blob = NULL;
     }
-    if (b == NULL || (filtermap == FILTERMAP_FILTER
+    якщо (b == NULL || (filtermap == FILTERMAP_FILTER
 			    && value_check_lock(b->bv_lock, arg_errmsg, TRUE)))
-	return;
+	повернути;
 
     b_ret = b;
-    if (filtermap == FILTERMAP_MAPNEW)
+    якщо (filtermap == FILTERMAP_MAPNEW)
     {
 	rettv->v_lock = 0;
 	rettv->vval.v_blob = blob_copy(b);
-	if (rettv->vval.v_blob == NULL)
-	    return;
+	якщо (rettv->vval.v_blob == NULL)
+	    повернути;
 	b_ret = rettv->vval.v_blob;
     }
 
     // set_vim_var_nr() doesn't set the type
     set_vim_var_type(VV_KEY, VAR_NUMBER);
 
-    int prev_lock = b->bv_lock;
-    if (b->bv_lock == 0)
+    ціле prev_lock = b->bv_lock;
+    якщо (b->bv_lock == 0)
 	b->bv_lock = VAR_LOCKED;
 
     // Create one funccall_T for all eval_expr_typval() calls.
     fc = eval_expr_get_funccal(expr, &newtv);
 
-    for (i = 0; i < b->bv_ga.ga_len; i++)
+    для (i = 0; i < b->bv_ga.ga_len; i++)
     {
 	tv.v_type = VAR_NUMBER;
 	val = blob_get(b, i);
 	tv.vval.v_number = val;
 	set_vim_var_nr(VV_KEY, idx);
-	if (filter_map_one(&tv, expr, filtermap, fc, &newtv, &rem) == FAIL
+	якщо (filter_map_one(&tv, expr, filtermap, fc, &newtv, &rem) == FAIL
 		|| did_emsg)
 	    break;
-	if (filtermap != FILTERMAP_FOREACH)
+	якщо (filtermap != FILTERMAP_FOREACH)
 	{
-	    if (newtv.v_type != VAR_NUMBER && newtv.v_type != VAR_BOOL)
+	    якщо (newtv.v_type != VAR_NUMBER && newtv.v_type != VAR_BOOL)
 	    {
 		clear_tv(&newtv);
 		emsg(_(e_invalid_operation_for_blob));
 		break;
 	    }
-	    if (filtermap != FILTERMAP_FILTER)
+	    якщо (filtermap != FILTERMAP_FILTER)
 	    {
-		if (newtv.vval.v_number != val)
+		якщо (newtv.vval.v_number != val)
 		    blob_set(b_ret, i, newtv.vval.v_number);
 	    }
-	    else if (rem)
+	    інакше якщо (rem)
 	    {
 		char_u *p = (char_u *)blob_arg->bv_ga.ga_data;
 
@@ -722,7 +722,7 @@ blob_filter_map(
     }
 
     b->bv_lock = prev_lock;
-    if (fc != NULL)
+    якщо (fc != NULL)
 	remove_funccal();
 }
 
@@ -734,43 +734,43 @@ blob_insert_func(typval_T *argvars, typval_T *rettv)
 {
     blob_T	*b = argvars[0].vval.v_blob;
     long	before = 0;
-    int		error = FALSE;
-    int		val, len;
+    ціле		error = FALSE;
+    ціле		val, len;
     char_u	*p;
 
-    if (b == NULL)
+    якщо (b == NULL)
     {
-	if (in_vim9script())
+	якщо (in_vim9script())
 	    emsg(_(e_cannot_add_to_null_blob));
-	return;
+	повернути;
     }
 
-    if (value_check_lock(b->bv_lock, (char_u *)N_("insert() argument"), TRUE))
-	return;
+    якщо (value_check_lock(b->bv_lock, (char_u *)N_("insert() argument"), TRUE))
+	повернути;
 
     len = blob_len(b);
-    if (argvars[2].v_type != VAR_UNKNOWN)
+    якщо (argvars[2].v_type != VAR_UNKNOWN)
     {
 	before = (long)tv_get_number_chk(&argvars[2], &error);
-	if (error)
-	    return;		// type error; errmsg already given
-	if (before < 0 || before > len)
+	якщо (error)
+	    повернути;		// type error; errmsg already given
+	якщо (before < 0 || before > len)
 	{
 	    semsg(_(e_invalid_argument_str), tv_get_string(&argvars[2]));
-	    return;
+	    повернути;
 	}
     }
     val = tv_get_number_chk(&argvars[1], &error);
-    if (error)
-	return;
-    if (val < 0 || val > 255)
+    якщо (error)
+	повернути;
+    якщо (val < 0 || val > 255)
     {
 	semsg(_(e_invalid_argument_str), tv_get_string(&argvars[1]));
-	return;
+	повернути;
     }
 
-    if (ga_grow(&b->bv_ga, 1) == FAIL)
-	return;
+    якщо (ga_grow(&b->bv_ga, 1) == FAIL)
+	повернути;
     p = (char_u *)b->bv_ga.ga_data;
     mch_memmove(p + before + 1, p + before, (size_t)len - before);
     *(p + before) = val;
@@ -786,34 +786,34 @@ blob_insert_func(typval_T *argvars, typval_T *rettv)
  * Caller must check that "bef" is valid.
  * Returns FAIL when out of memory.
  */
-    static int
+    static ціле
 blob_extend(blob_T *b1, blob_T *b2, long bef)
 {
-    int		len1, len2;
+    ціле		len1, len2;
     char_u	*p1;
 
     // NULL blob is equivalent to an empty blob: nothing to do.
-    if (b2 == NULL || b2->bv_ga.ga_len == 0)
-	return OK;
+    якщо (b2 == NULL || b2->bv_ga.ga_len == 0)
+	повернути OK;
 
     len1 = b1->bv_ga.ga_len;
     len2 = b2->bv_ga.ga_len;
 
-    if (ga_grow(&b1->bv_ga, len2) == FAIL)
-	return FAIL;
+    якщо (ga_grow(&b1->bv_ga, len2) == FAIL)
+	повернути FAIL;
 
     p1 = (char_u *)b1->bv_ga.ga_data;
 
-    if (b1 == b2)
+    якщо (b1 == b2)
     {
 	// Inserting a blob into itself
 	mch_memmove(p1 + bef, p1, (size_t)len1);
-	if (bef < len1)
+	якщо (bef < len1)
 	    memcpy(p1 + bef + len1, p1 + bef * 2, (size_t)(len1 - bef));
     }
-    else
+    інакше
     {
-	if (bef < len1)
+	якщо (bef < len1)
 	    mch_memmove(p1 + bef + len2, p1 + bef, (size_t)(len1 - bef));
 
 	memcpy(p1 + bef, b2->bv_ga.ga_data, (size_t)len2);
@@ -821,7 +821,7 @@ blob_extend(blob_T *b1, blob_T *b2, long bef)
 
     b1->bv_ga.ga_len += len2;
 
-    return OK;
+    повернути OK;
 }
 
 /*
@@ -833,63 +833,63 @@ blob_extend(blob_T *b1, blob_T *b2, long bef)
 blob_extend_func(
 	typval_T	*argvars,
 	char_u		*arg_errmsg,
-	int		is_new,
+	ціле		is_new,
 	typval_T	*rettv)
 {
     blob_T	*b1, *b2;
     long	before;
-    int		error = FALSE;
+    ціле		error = FALSE;
 
     b1 = argvars[0].vval.v_blob;
-    if (b1 == NULL)
+    якщо (b1 == NULL)
     {
 	emsg(_(e_cannot_extend_null_blob));
-	return;
+	повернути;
     }
-    if (is_new || !value_check_lock(b1->bv_lock, arg_errmsg, TRUE))
+    якщо (is_new || !value_check_lock(b1->bv_lock, arg_errmsg, TRUE))
     {
-	if (is_new)
+	якщо (is_new)
 	{
 	    b1 = blob_copy(b1);
-	    if (b1 == NULL)
-		return;
+	    якщо (b1 == NULL)
+		повернути;
 	}
 
 	b2 = argvars[1].vval.v_blob;
-	if (b2 == NULL)
+	якщо (b2 == NULL)
 	    goto theend;
 
-	if (argvars[2].v_type != VAR_UNKNOWN)
+	якщо (argvars[2].v_type != VAR_UNKNOWN)
 	{
 	    before = (long)tv_get_number_chk(&argvars[2], &error);
-	    if (error)
+	    якщо (error)
 		goto cleanup;		// type error; errmsg already given
-	    if (before < 0)
+	    якщо (before < 0)
 		before = b1->bv_ga.ga_len + before;
-	    if (before < 0 || before > b1->bv_ga.ga_len)
+	    якщо (before < 0 || before > b1->bv_ga.ga_len)
 	    {
 		semsg(_(e_blob_index_out_of_range_nr), before);
 		goto cleanup;
 	    }
 	}
-	else
+	інакше
 	    before = b1->bv_ga.ga_len;
-	if (blob_extend(b1, b2, before) == FAIL)
+	якщо (blob_extend(b1, b2, before) == FAIL)
 	    goto cleanup;
 
 theend:
-	if (is_new)
+	якщо (is_new)
 	{
 	    rettv->v_type = VAR_BLOB;
 	    rettv->v_lock = 0;
 	    rettv->vval.v_blob = b1;
 	}
-	else
+	інакше
 	    copy_tv(&argvars[0], rettv);
-	return;
+	повернути;
 
 cleanup:
-	if (is_new)
+	якщо (is_new)
 	    blob_unref(b1);
     }
 }
@@ -906,36 +906,36 @@ blob_reduce(
 	typval_T	*rettv)
 {
     blob_T	*b = argvars[0].vval.v_blob;
-    int		called_emsg_start = called_emsg;
-    int		r;
+    ціле		called_emsg_start = called_emsg;
+    ціле		r;
     typval_T	initial;
     typval_T	argv[3];
-    int	i;
+    ціле	i;
 
-    if (argvars[2].v_type == VAR_UNKNOWN)
+    якщо (argvars[2].v_type == VAR_UNKNOWN)
     {
-	if (b == NULL || b->bv_ga.ga_len == 0)
+	якщо (b == NULL || b->bv_ga.ga_len == 0)
 	{
 	    semsg(_(e_reduce_of_an_empty_str_with_no_initial_value), "Blob");
-	    return;
+	    повернути;
 	}
 	initial.v_type = VAR_NUMBER;
 	initial.vval.v_number = blob_get(b, 0);
 	i = 1;
     }
-    else if (check_for_number_arg(argvars, 2) == FAIL)
-	return;
-    else
+    інакше якщо (check_for_number_arg(argvars, 2) == FAIL)
+	повернути;
+    інакше
     {
 	initial = argvars[2];
 	i = 0;
     }
 
     copy_tv(&initial, rettv);
-    if (b == NULL)
-	return;
+    якщо (b == NULL)
+	повернути;
 
-    for ( ; i < b->bv_ga.ga_len; i++)
+    для ( ; i < b->bv_ga.ga_len; i++)
     {
 	argv[0] = *rettv;
 	argv[1].v_type = VAR_NUMBER;
@@ -944,8 +944,8 @@ blob_reduce(
 	r = eval_expr_typval(expr, TRUE, argv, 2, NULL, rettv);
 
 	clear_tv(&argv[0]);
-	if (r == FAIL || called_emsg != called_emsg_start)
-	    return;
+	якщо (r == FAIL || called_emsg != called_emsg_start)
+	    повернути;
     }
 }
 
@@ -957,12 +957,12 @@ blob_reverse(blob_T *b, typval_T *rettv)
 {
     long    i, len = blob_len(b);
 
-    for (i = 0; i < len / 2; i++)
+    для (i = 0; i < len / 2; i++)
     {
-	int tmp = blob_get(b, (int)i);
+	ціле tmp = blob_get(b, (ціле)i);
 
-	blob_set(b, (int)i, blob_get(b, (int)(len - i - 1)));
-	blob_set(b, (int)(len - i - 1), tmp);
+	blob_set(b, (ціле)i, blob_get(b, (ціле)(len - i - 1)));
+	blob_set(b, (ціле)(len - i - 1), tmp);
     }
     rettv_blob_set(rettv, b);
 }
@@ -975,25 +975,25 @@ f_blob2list(typval_T *argvars, typval_T *rettv)
 {
     blob_T	*blob;
     list_T	*l;
-    int		i, len;
+    ціле		i, len;
     typval_T	tv;
 
-    if (check_for_blob_arg(argvars, 0) == FAIL)
+    якщо (check_for_blob_arg(argvars, 0) == FAIL)
     {
 	(void)rettv_list_alloc(rettv);
-	return;
+	повернути;
     }
 
     blob = argvars->vval.v_blob;
     len = blob_len(blob);
     l = list_alloc_with_items(len);
-    if (l == NULL)
-	return;
+    якщо (l == NULL)
+	повернути;
     rettv_list_set(rettv, l);
 
     tv.v_type = VAR_NUMBER;
     tv.v_lock = 0;
-    for (i = 0; i < len; i++)
+    для (i = 0; i < len; i++)
     {
 	tv.vval.v_number = blob_get(blob, i);
 	list_set_item(l, i, &tv);
@@ -1010,35 +1010,35 @@ f_list2blob(typval_T *argvars, typval_T *rettv)
     listitem_T	*li;
     blob_T	*blob;
 
-    if (rettv_blob_alloc(rettv) == FAIL)
-	return;
+    якщо (rettv_blob_alloc(rettv) == FAIL)
+	повернути;
     blob = rettv->vval.v_blob;
 
-    if (check_for_list_arg(argvars, 0) == FAIL)
-	return;
+    якщо (check_for_list_arg(argvars, 0) == FAIL)
+	повернути;
 
     l = argvars->vval.v_list;
-    if (l == NULL)
-	return;
+    якщо (l == NULL)
+	повернути;
 
     // The result has one byte per list item; reserve all space at once.
-    if (ga_grow(&blob->bv_ga, list_len(l)) == FAIL)
-	return;
+    якщо (ga_grow(&blob->bv_ga, list_len(l)) == FAIL)
+	повернути;
 
     CHECK_LIST_MATERIALIZE(l);
     FOR_ALL_LIST_ITEMS(l, li)
     {
-	int		error;
+	ціле		error;
 	varnumber_T	n;
 
 	error = FALSE;
 	n = tv_get_number_chk(&li->li_tv, &error);
-	if (error == TRUE || n < 0 || n > 255)
+	якщо (error == TRUE || n < 0 || n > 255)
 	{
-	    if (!error)
+	    якщо (!error)
 		semsg(_(e_invalid_value_for_blob_nr), n);
 	    ga_clear(&blob->bv_ga);
-	    return;
+	    повернути;
 	}
 	((char_u *)blob->bv_ga.ga_data)[blob->bv_ga.ga_len++] = (char_u)n;
     }

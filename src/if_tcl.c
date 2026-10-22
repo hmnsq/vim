@@ -79,9 +79,9 @@ TODO:
 typedef struct
 {
     Tcl_Interp *interp;
-    int exitvalue;
-    int range_start, range_end;
-    int lbase;
+    ціле exitvalue;
+    ціле range_start, range_end;
+    ціле lbase;
     char *curbuf, *curwin;
 } tcl_info;
 
@@ -129,15 +129,15 @@ struct ref
 };
 static char * tclgetbuffer _ANSI_ARGS_((Tcl_Interp *interp, buf_T *buf));
 static char * tclgetwindow _ANSI_ARGS_((Tcl_Interp *interp, win_T *win));
-static int tclsetdelcmd _ANSI_ARGS_((Tcl_Interp *interp, struct ref *reflist, void *vimobj, Tcl_Obj *delcmd));
-static int tclgetlinenum _ANSI_ARGS_ ((Tcl_Interp *interp, Tcl_Obj *obj, int *valueP, buf_T *buf));
+static ціле tclsetdelcmd _ANSI_ARGS_((Tcl_Interp *interp, struct ref *reflist, void *vimobj, Tcl_Obj *delcmd));
+static ціле tclgetlinenum _ANSI_ARGS_ ((Tcl_Interp *interp, Tcl_Obj *obj, ціле *valueP, buf_T *buf));
 static win_T *tclfindwin _ANSI_ARGS_ ((buf_T *buf));
-static int tcldoexcommand _ANSI_ARGS_ ((Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[], int objn));
-static int tclsetoption _ANSI_ARGS_ ((Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[], int objn));
-static int tclvimexpr _ANSI_ARGS_ ((Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[], int objn));
+static ціле tcldoexcommand _ANSI_ARGS_ ((Tcl_Interp *interp, ціле objc, Tcl_Obj *CONST objv[], ціле objn));
+static ціле tclsetoption _ANSI_ARGS_ ((Tcl_Interp *interp, ціле objc, Tcl_Obj *CONST objv[], ціле objn));
+static ціле tclvimexpr _ANSI_ARGS_ ((Tcl_Interp *interp, ціле objc, Tcl_Obj *CONST objv[], ціле objn));
 static void tcldelthisinterp _ANSI_ARGS_ ((void));
 
-static int vimerror _ANSI_ARGS_((Tcl_Interp *interp));
+static ціле vimerror _ANSI_ARGS_((Tcl_Interp *interp));
 static void tclmsg _ANSI_ARGS_((char *text));
 static void tclerrmsg _ANSI_ARGS_((char *text));
 static void tclupdatevars _ANSI_ARGS_((void));
@@ -148,7 +148,7 @@ static struct ref refsdeleted;	// dummy object for deleted ref list
 // TCL interface manager
 ////////////////////////////////////////////////////////////////////////////
 
-#if defined(DYNAMIC_TCL)
+#якщо defined(DYNAMIC_TCL)
 # ifndef DYNAMIC_TCL_DLL
 #  define DYNAMIC_TCL_DLL "tcl83.dll"
 # endif
@@ -157,7 +157,7 @@ static struct ref refsdeleted;	// dummy object for deleted ref list
 # endif
 
 # ifndef  DYNAMIC_TCL // Just generating prototypes
-typedef int HANDLE;
+typedef ціле HANDLE;
 # endif
 
 # ifdef MSWIN
@@ -166,7 +166,7 @@ typedef int HANDLE;
 #  define symbol_from_dll GetProcAddress
 #  define close_dll FreeLibrary
 #  define load_dll_error GetWin32Error
-# else
+# інакше
 #  include <dlfcn.h>
 #  define HANDLE void*
 #  define TCL_PROC void*
@@ -205,33 +205,33 @@ static struct {
  * Parameter 'libname' provides name of DLL.
  * Return OK or FAIL.
  */
-    static int
-tcl_runtime_link_init(char *libname, int verbose)
+    static ціле
+tcl_runtime_link_init(char *libname, ціле verbose)
 {
-    int i;
+    ціле i;
 
-    if (hTclLib)
-	return OK;
-    if (!(hTclLib = load_dll(libname)))
+    якщо (hTclLib)
+	повернути OK;
+    якщо (!(hTclLib = load_dll(libname)))
     {
-	if (verbose)
+	якщо (verbose)
 	    semsg(_(e_could_not_load_library_str_str), libname, load_dll_error());
-	return FAIL;
+	повернути FAIL;
     }
-    for (i = 0; tcl_funcname_table[i].ptr; ++i)
+    для (i = 0; tcl_funcname_table[i].ptr; ++i)
     {
-	if (!(*tcl_funcname_table[i].ptr = symbol_from_dll(hTclLib,
+	якщо (!(*tcl_funcname_table[i].ptr = symbol_from_dll(hTclLib,
 						  tcl_funcname_table[i].name)))
 	{
 	    close_dll(hTclLib);
 	    hTclLib = NULL;
-	    if (verbose)
+	    якщо (verbose)
 		semsg(_(e_could_not_load_library_function_str),
 						   tcl_funcname_table[i].name);
-	    return FAIL;
+	    повернути FAIL;
 	}
     }
-    return OK;
+    повернути OK;
 }
 #endif // defined(DYNAMIC_TCL)
 
@@ -244,22 +244,22 @@ vim_tcl_init(char *arg)
 {
 #ifdef DYNAMIC_TCL
     find_executable_arg = arg;
-#else
+#інакше
     Tcl_FindExecutable(arg);
 #endif
 }
 
-#if defined(DYNAMIC_TCL)
+#якщо defined(DYNAMIC_TCL)
 
-static int stubs_initialized = FALSE;
+static ціле stubs_initialized = FALSE;
 
 /*
  * Return TRUE if the TCL interface can be used.
  */
-    int
-tcl_enabled(int verbose)
+    ціле
+tcl_enabled(ціле verbose)
 {
-    if (!stubs_initialized && find_executable_arg != NULL
+    якщо (!stubs_initialized && find_executable_arg != NULL
 	    && tcl_runtime_link_init((char *)p_tcldll, verbose) == OK)
     {
 	Tcl_Interp *interp;
@@ -268,9 +268,9 @@ tcl_enabled(int verbose)
 	// which will be reported as possibly leaked by valgrind.
 	dll_Tcl_FindExecutable(find_executable_arg);
 
-	if ((interp = dll_Tcl_CreateInterp()) != NULL)
+	якщо ((interp = dll_Tcl_CreateInterp()) != NULL)
 	{
-	    if (Tcl_InitStubs(interp, DYNAMIC_TCL_VER, 0) != NULL)
+	    якщо (Tcl_InitStubs(interp, DYNAMIC_TCL_VER, 0) != NULL)
 	    {
 		Tcl_DeleteInterp(interp);
 		stubs_initialized = TRUE;
@@ -278,11 +278,11 @@ tcl_enabled(int verbose)
 	    // FIXME: When Tcl_InitStubs() was failed, how delete interp?
 	}
     }
-    return stubs_initialized;
+    повернути stubs_initialized;
 }
 #endif
 
-#if defined(EXITFREE)
+#якщо defined(EXITFREE)
 /*
  * Called once when exiting.
  */
@@ -290,7 +290,7 @@ tcl_enabled(int verbose)
 vim_tcl_finalize(void)
 {
 # ifdef DYNAMIC_TCL
-    if (stubs_initialized)
+    якщо (stubs_initialized)
 # endif
 	Tcl_Finalize();
 }
@@ -319,19 +319,19 @@ tcl_end(void)
  * string in the interpreter's result value. Therefore it would be
  * useless for this routine to return the exit code via Tcl_SetResult().
  */
-    static int
+    static ціле
 exitcmd(
     ClientData dummy UNUSED,
     Tcl_Interp *interp,
-    int objc,
+    ціле objc,
     Tcl_Obj *CONST objv[])
 {
-    int value = 0;
+    ціле value = 0;
 
     switch (objc)
     {
 	case 2:
-	    if (Tcl_GetIntFromObj(interp, objv[1], &value) != TCL_OK)
+	    якщо (Tcl_GetIntFromObj(interp, objv[1], &value) != TCL_OK)
 		break;
 	    // FALLTHROUGH
 	case 1:
@@ -342,26 +342,26 @@ exitcmd(
 	default:
 	    Tcl_WrongNumArgs(interp, 1, objv, "?returnCode?");
     }
-    return TCL_ERROR;
+    повернути TCL_ERROR;
 }
 
 /*
  *  "::vim::beep" - what Vi[m] does best :-)
  */
-    static int
+    static ціле
 beepcmd(
     ClientData dummy UNUSED,
     Tcl_Interp *interp,
-    int objc,
+    ціле objc,
     Tcl_Obj *CONST objv[])
 {
-    if (objc != 1)
+    якщо (objc != 1)
     {
 	Tcl_WrongNumArgs(interp, 1, objv, NULL);
-	return TCL_ERROR;
+	повернути TCL_ERROR;
     }
     vim_beep(BO_LANG);
-    return TCL_OK;
+    повернути TCL_OK;
 }
 
 /*
@@ -370,59 +370,59 @@ beepcmd(
  *  "::vim::buffer exists {N}" - test if buffer N exists.
  *  "::vim::buffer new" - create a new buffer (not implemented)
  */
-    static int
+    static ціле
 buffercmd(
     ClientData dummy UNUSED,
     Tcl_Interp *interp,
-    int objc,
+    ціле objc,
     Tcl_Obj *CONST objv[])
 {
     char	*name;
     buf_T	*buf;
     Tcl_Obj	*resobj;
-    int		err, n, idx;
+    ціле		err, n, idx;
     enum {BCMD_EXISTS, BCMD_LIST};
     static CONST84 char *bcmdoptions[] =
     {
 	"exists", "list", (char *)0
     };
 
-    if (objc < 2)
+    якщо (objc < 2)
     {
 	Tcl_WrongNumArgs(interp, 1, objv, "option");
-	return TCL_ERROR;
+	повернути TCL_ERROR;
     }
     err = Tcl_GetIntFromObj(interp, objv[1], &n);
-    if (err == TCL_OK)
+    якщо (err == TCL_OK)
     {
-	if (objc != 2)
+	якщо (objc != 2)
 	{
 	    Tcl_WrongNumArgs(interp, 1, objv, "bufNumber");
-	    return TCL_ERROR;
+	    повернути TCL_ERROR;
 	}
 	FOR_ALL_BUFFERS(buf)
 	{
-	    if (buf->b_fnum == n)
+	    якщо (buf->b_fnum == n)
 	    {
 		name = tclgetbuffer(interp, buf);
-		if (name == NULL)
-		    return TCL_ERROR;
+		якщо (name == NULL)
+		    повернути TCL_ERROR;
 		Tcl_SetResult(interp, name, TCL_VOLATILE);
-		return TCL_OK;
+		повернути TCL_OK;
 	    }
 	}
 	Tcl_SetResult(interp, _("invalid buffer number"), TCL_STATIC);
-	return TCL_ERROR;
+	повернути TCL_ERROR;
     }
     Tcl_ResetResult(interp); // clear error from Tcl_GetIntFromObj
 
     err = Tcl_GetIndexFromObj(interp, objv[1], bcmdoptions, "option", 0, &idx);
-    if (err != TCL_OK)
-	return err;
+    якщо (err != TCL_OK)
+	повернути err;
     switch (idx)
     {
 	case BCMD_LIST:
-	    if (objc != 2)
+	    якщо (objc != 2)
 	    {
 		Tcl_WrongNumArgs(interp, 2, objv, "");
 		err = TCL_ERROR;
@@ -431,7 +431,7 @@ buffercmd(
 	    FOR_ALL_BUFFERS(buf)
 	    {
 		name = tclgetbuffer(interp, buf);
-		if (name == NULL)
+		якщо (name == NULL)
 		{
 		    err = TCL_ERROR;
 		    break;
@@ -441,14 +441,14 @@ buffercmd(
 	    break;
 
 	case BCMD_EXISTS:
-	    if (objc != 3)
+	    якщо (objc != 3)
 	    {
 		Tcl_WrongNumArgs(interp, 2, objv, "bufNumber");
 		err = TCL_ERROR;
 		break;
 	    }
 	    err = Tcl_GetIntFromObj(interp, objv[2], &n);
-	    if (err == TCL_OK)
+	    якщо (err == TCL_OK)
 	    {
 		buf = buflist_findnr(n);
 		resobj = Tcl_NewIntObj(buf != NULL);
@@ -460,41 +460,41 @@ buffercmd(
 	    Tcl_SetResult(interp, _("not implemented yet"), TCL_STATIC);
 	    err = TCL_ERROR;
     }
-    return err;
+    повернути err;
 }
 
 /*
  * "::vim::window list" - create list of window commands.
  */
-    static int
+    static ціле
 windowcmd(
     ClientData	dummy UNUSED,
     Tcl_Interp	*interp,
-    int		objc,
+    ціле		objc,
     Tcl_Obj	*CONST objv[])
 {
     char	*what, *string;
     win_T	*win;
 
-    if (objc != 2)
+    якщо (objc != 2)
     {
 	Tcl_WrongNumArgs(interp, 1, objv, "option");
-	return TCL_ERROR;
+	повернути TCL_ERROR;
     }
     what = Tcl_GetStringFromObj(objv[1], NULL);
-    if (strcmp(what, "list") == 0)
+    якщо (strcmp(what, "list") == 0)
     {
 	FOR_ALL_WINDOWS(win)
 	{
 	    string = tclgetwindow(interp, win);
-	    if (string == NULL)
-		return TCL_ERROR;
+	    якщо (string == NULL)
+		повернути TCL_ERROR;
 	    Tcl_AppendElement(interp, string);
 	}
-	return TCL_OK;
+	повернути TCL_OK;
     }
     Tcl_SetResult(interp, _("unknown option"), TCL_STATIC);
-    return TCL_ERROR;
+    повернути TCL_ERROR;
 }
 
 /*
@@ -507,15 +507,15 @@ windowcmd(
 /*
  * This function implements the buffer commands.
  */
-    static int
+    static ціле
 bufselfcmd(
     ClientData	ref,
     Tcl_Interp	*interp,
-    int		objc,
+    ціле		objc,
     Tcl_Obj	*CONST objv[])
 {
-    int		opt, err, idx, flags;
-    int		val1, val2, n, i;
+    ціле		opt, err, idx, flags;
+    ціле		val1, val2, n, i;
     buf_T	*buf, *savebuf;
     win_T	*win, *savewin;
     Tcl_Obj	*resobj;
@@ -535,15 +535,15 @@ bufselfcmd(
 	"option", "set", "windows", (char *)0
     };
 
-    if (objc < 2)
+    якщо (objc < 2)
     {
 	Tcl_WrongNumArgs(interp, 1, objv, "option ?arg ...?");
-	return TCL_ERROR;
+	повернути TCL_ERROR;
     }
 
     err = Tcl_GetIndexFromObj(interp, objv[1], bufoptions, "option", 0, &idx);
-    if (err != TCL_OK)
-	return err;
+    якщо (err != TCL_OK)
+	повернути err;
 
     buf = (buf_T *)((struct ref *)ref)->vimobj;
     savebuf = curbuf;  curbuf = buf;
@@ -571,15 +571,15 @@ bufselfcmd(
 	    /*
 	     *	Get filename of buffer.
 	     */
-	    if (objc != 2)
+	    якщо (objc != 2)
 	    {
 		Tcl_WrongNumArgs(interp, 2, objv, NULL);
 		err = TCL_ERROR;
 		break;
 	    }
-	    if (buf->b_ffname)
+	    якщо (buf->b_ffname)
 		Tcl_SetResult(interp, (char *)buf->b_ffname, TCL_VOLATILE);
-	    else
+	    інакше
 		Tcl_SetResult(interp, "", TCL_STATIC);
 	    break;
 
@@ -593,14 +593,14 @@ bufselfcmd(
 	    /*
 	     * Get number of lines in buffer.
 	     */
-	    if (objc != 2)
+	    якщо (objc != 2)
 	    {
 		Tcl_WrongNumArgs(interp, 2, objv, NULL);
 		err = TCL_ERROR;
 		break;
 	    }
-	    val1 = (int)buf->b_ml.ml_line_count;
-	    if (opt)
+	    val1 = (ціле)buf->b_ml.ml_line_count;
+	    якщо (opt)
 		val1 = row2tcl(val1);
 
 	    resobj = Tcl_NewIntObj(val1);
@@ -611,47 +611,47 @@ bufselfcmd(
 	    /*
 	     * Get buffer's number.
 	     */
-	    if (objc != 2)
+	    якщо (objc != 2)
 	    {
 		Tcl_WrongNumArgs(interp, 2, objv, NULL);
 		err = TCL_ERROR;
 		break;
 	    }
-	    resobj = Tcl_NewIntObj((int)buf->b_fnum);
+	    resobj = Tcl_NewIntObj((ціле)buf->b_fnum);
 	    Tcl_SetObjResult(interp, resobj);
 	    break;
 
 	case BUF_GET:
-	    if (objc != 3 && objc != 4)
+	    якщо (objc != 3 && objc != 4)
 	    {
 		Tcl_WrongNumArgs(interp, 2, objv, "lineNumber ?lineNumber?");
 		err = TCL_ERROR;
 		break;
 	    }
 	    err = tclgetlinenum(interp, objv[2], &val1, buf);
-	    if (err != TCL_OK)
+	    якщо (err != TCL_OK)
 		break;
-	    if (objc == 4)
+	    якщо (objc == 4)
 	    {
 		err = tclgetlinenum(interp, objv[3], &val2, buf);
-		if (err != TCL_OK)
+		якщо (err != TCL_OK)
 		    break;
-		if (val1 > val2)
+		якщо (val1 > val2)
 		{
 		    n = val1; val1 = val2; val2 = n;
 		}
 		Tcl_ResetResult(interp);
 
-		for (n = val1; n <= val2 && err == TCL_OK; n++)
+		для (n = val1; n <= val2 && err == TCL_OK; n++)
 		{
 		    line = (char *)ml_get_buf(buf, (linenr_T)n, FALSE);
-		    if (line)
+		    якщо (line)
 			Tcl_AppendElement(interp, line);
-		    else
+		    інакше
 			err = TCL_ERROR;
 		}
 	    }
-	    else
+	    інакше
 	    {  // objc == 3
 		line = (char *)ml_get_buf(buf, (linenr_T)val1, FALSE);
 		Tcl_SetResult(interp, line, TCL_VOLATILE);
@@ -659,41 +659,41 @@ bufselfcmd(
 	    break;
 
 	case BUF_SET:
-	    if (objc != 4 && objc != 5)
+	    якщо (objc != 4 && objc != 5)
 	    {
 		Tcl_WrongNumArgs(interp, 3, objv, "lineNumber ?lineNumber? stringOrList");
 		err = TCL_ERROR;
 		break;
 	    }
 	    err = tclgetlinenum(interp, objv[2], &val1, buf);
-	    if (err != TCL_OK)
-		return TCL_ERROR;
-	    if (objc == 4)
+	    якщо (err != TCL_OK)
+		повернути TCL_ERROR;
+	    якщо (objc == 4)
 	    {
 		/*
 		 *  Replace one line with a string.
 		 *	$buf set {n} {string}
 		 */
 		line = Tcl_GetStringFromObj(objv[3], NULL);
-		if (u_savesub((linenr_T)val1) != OK)
+		якщо (u_savesub((linenr_T)val1) != OK)
 		{
 		    Tcl_SetResult(interp, _("cannot save undo information"), TCL_STATIC);
 		    err = TCL_ERROR;
 		}
-		else
-		if (ml_replace((linenr_T)val1, (char_u *)line, TRUE) != OK)
+		інакше
+		якщо (ml_replace((linenr_T)val1, (char_u *)line, TRUE) != OK)
 		{
 		    Tcl_SetResult(interp, _("cannot replace line"), TCL_STATIC);
 		    err = TCL_ERROR;
 		}
-		else
+		інакше
 		{
 		    changed_bytes((linenr_T)val1, 0);
 		    flags |= FL_UPDATE_CURBUF;
 		}
 		break;
 	    }
-	    else
+	    інакше
 	    {
 		/*
 		 * Replace several lines with the elements of a Tcl list.
@@ -703,16 +703,16 @@ bufselfcmd(
 		 * elements, * the lines from {n}+length({list}) through {m}
 		 * are deleted.
 		 */
-		int	    lc;
+		ціле	    lc;
 		Tcl_Obj	    **lv;
 
 		err = tclgetlinenum(interp, objv[3], &val2, buf);
-		if (err != TCL_OK)
+		якщо (err != TCL_OK)
 		    break;
 		err = Tcl_ListObjGetElements(interp, objv[4], &lc, &lv);
-		if (err != TCL_OK)
+		якщо (err != TCL_OK)
 		    break;
-		if (val1 > val2)
+		якщо (val1 > val2)
 		{
 		    n = val1;
 		    val1 = val2;
@@ -720,7 +720,7 @@ bufselfcmd(
 		}
 
 		n = val1;
-		if (u_save((linenr_T)(val1 - 1), (linenr_T)(val2 + 1)) != OK)
+		якщо (u_save((linenr_T)(val1 - 1), (linenr_T)(val2 + 1)) != OK)
 		{
 		    Tcl_SetResult(interp, _("cannot save undo information"),
 								  TCL_STATIC);
@@ -729,36 +729,36 @@ bufselfcmd(
 		}
 		flags |= FL_UPDATE_CURBUF;
 
-		for (i = 0; i < lc && n <= val2; i++)
+		для (i = 0; i < lc && n <= val2; i++)
 		{
 		    line = Tcl_GetStringFromObj(lv[i], NULL);
-		    if (ml_replace((linenr_T)n, (char_u *)line, TRUE) != OK)
+		    якщо (ml_replace((linenr_T)n, (char_u *)line, TRUE) != OK)
 			goto setListError;
 		    ++n;
 		}
-		if (i < lc)
+		якщо (i < lc)
 		{
 		    // append lines
 		    do
 		    {
 			line = Tcl_GetStringFromObj(lv[i], NULL);
-			if (ml_append((linenr_T)(n - 1),
+			якщо (ml_append((linenr_T)(n - 1),
 					      (char_u *)line, 0, FALSE) != OK)
 			    goto setListError;
 			++n;
 			++i;
-		    } while (i < lc);
+		    } поки (i < lc);
 		}
-		else if (n <= val2)
+		інакше якщо (n <= val2)
 		{
 		    // did not replace all lines, delete
 		    i = n;
 		    do
 		    {
-			if (ml_delete((linenr_T)i) != OK)
+			якщо (ml_delete((linenr_T)i) != OK)
 			    goto setListError;
 			++n;
-		    } while (n <= val2);
+		    } поки (n <= val2);
 		}
 		lc -= val2 - val1 + 1;	// number of lines to be replaced
 		mark_adjust((linenr_T)val1, (linenr_T)val2, (long)MAXLNUM,
@@ -773,48 +773,48 @@ bufselfcmd(
 	    break;
 
 	case BUF_DELETE:
-	    if (objc != 3  &&  objc != 4)
+	    якщо (objc != 3  &&  objc != 4)
 	    {
 		Tcl_WrongNumArgs(interp, 3, objv, "lineNumber ?lineNumber?");
 		err = TCL_ERROR;
 		break;
 	    }
 	    err = tclgetlinenum(interp, objv[2], &val1, buf);
-	    if (err != TCL_OK)
+	    якщо (err != TCL_OK)
 		break;
 	    val2 = val1;
-	    if (objc == 4)
+	    якщо (objc == 4)
 	    {
 		err = tclgetlinenum(interp, objv[3], &val2, buf);
-		if (err != TCL_OK)
-		    return err;
-		if (val1 > val2)
+		якщо (err != TCL_OK)
+		    повернути err;
+		якщо (val1 > val2)
 		{
 		    i = val1; val1 = val2; val2 = i;
 		}
 	    }
 	    n = val2 - val1 + 1;
-	    if (u_savedel((linenr_T)val1, (long)n) != OK)
+	    якщо (u_savedel((linenr_T)val1, (long)n) != OK)
 	    {
 		Tcl_SetResult(interp, _("cannot save undo information"),
 								  TCL_STATIC);
 		err = TCL_ERROR;
 		break;
 	    }
-	    for (i = 0; i < n; i++)
+	    для (i = 0; i < n; i++)
 	    {
 		ml_delete((linenr_T)val1);
 		err = vimerror(interp);
-		if (err != TCL_OK)
+		якщо (err != TCL_OK)
 		    break;
 	    }
-	    if (i > 0)
+	    якщо (i > 0)
 		deleted_lines_mark((linenr_T)val1, (long)i);
 	    flags |= FL_ADJUST_CURSOR|FL_UPDATE_SCREEN;
 	    break;
 
 	case BUF_MARK:
-	    if (objc != 3)
+	    якщо (objc != 3)
 	    {
 		Tcl_WrongNumArgs(interp, 2, objv, "markName");
 		err = TCL_ERROR;
@@ -823,28 +823,28 @@ bufselfcmd(
 	    line = Tcl_GetStringFromObj(objv[2], NULL);
 
 	    pos = NULL;
-	    if (line[0] != '\0'  &&  line[1] == '\0')
+	    якщо (line[0] != '\0'  &&  line[1] == '\0')
 		pos = getmark(line[0], FALSE);
-	    if (pos == NULL)
+	    якщо (pos == NULL)
 	    {
 		Tcl_SetResult(interp, _("invalid mark name"), TCL_STATIC);
 		err = TCL_ERROR;
 		break;
 	    }
 	    err = vimerror(interp);
-	    if (err != TCL_OK)
+	    якщо (err != TCL_OK)
 		break;
-	    if (pos->lnum <= 0)
+	    якщо (pos->lnum <= 0)
 	    {
 		Tcl_SetResult(interp, _("mark not set"), TCL_STATIC);
 		err = TCL_ERROR;
 	    }
-	    else
+	    інакше
 	    {
 		char rbuf[64];
 
 		sprintf(rbuf, _("row %d column %d"),
-			     (int)row2tcl(pos->lnum), (int)col2tcl(pos->col));
+			     (ціле)row2tcl(pos->lnum), (ціле)col2tcl(pos->col));
 		Tcl_SetResult(interp, rbuf, TCL_VOLATILE);
 	    }
 	    break;
@@ -853,18 +853,18 @@ bufselfcmd(
 	    opt = 1;
 	    // fallthrough
 	case BUF_APPEND:
-	    if (objc != 4)
+	    якщо (objc != 4)
 	    {
 		Tcl_WrongNumArgs(interp, 2, objv, "lineNum text");
 		err = TCL_ERROR;
 		break;
 	    }
 	    err = tclgetlinenum(interp, objv[2], &val1, buf);
-	    if (err != TCL_OK)
+	    якщо (err != TCL_OK)
 		break;
-	    if (opt)
+	    якщо (opt)
 		--val1;
-	    if (u_save((linenr_T)val1, (linenr_T)(val1+1)) != OK)
+	    якщо (u_save((linenr_T)val1, (linenr_T)(val1+1)) != OK)
 	    {
 		Tcl_SetResult(interp, _("cannot save undo information"),
 								  TCL_STATIC);
@@ -873,7 +873,7 @@ bufselfcmd(
 	    }
 
 	    line = Tcl_GetStringFromObj(objv[3], NULL);
-	    if (ml_append((linenr_T)val1, (char_u *)line, 0, FALSE) != OK)
+	    якщо (ml_append((linenr_T)val1, (char_u *)line, 0, FALSE) != OK)
 	    {
 		Tcl_SetResult(interp, _("cannot insert/append line"),
 								  TCL_STATIC);
@@ -888,7 +888,7 @@ bufselfcmd(
 	    /*
 	     * Return list of window commands.
 	     */
-	    if (objc != 2)
+	    якщо (objc != 2)
 	    {
 		Tcl_WrongNumArgs(interp, 2, objv, NULL);
 		err = TCL_ERROR;
@@ -897,12 +897,12 @@ bufselfcmd(
 	    Tcl_ResetResult(interp);
 	    FOR_ALL_WINDOWS(win)
 	    {
-		if (win->w_buffer == buf)
+		якщо (win->w_buffer == buf)
 		{
 		    line = tclgetwindow(interp, win);
-		    if (line != NULL)
+		    якщо (line != NULL)
 			Tcl_AppendElement(interp, line);
-		    else
+		    інакше
 		    {
 			err = TCL_ERROR;
 			break;
@@ -916,7 +916,7 @@ bufselfcmd(
 	     * Register deletion callback.
 	     * TODO: Should be able to register multiple callbacks
 	     */
-	    if (objc != 3)
+	    якщо (objc != 3)
 	    {
 		Tcl_WrongNumArgs(interp, 2, objv, "command");
 		err = TCL_ERROR;
@@ -930,30 +930,30 @@ bufselfcmd(
 	    err = TCL_ERROR;
     }
 
-    if (flags & FL_UPDATE_CURBUF)
+    якщо (flags & FL_UPDATE_CURBUF)
 	redraw_curbuf_later(UPD_NOT_VALID);
     curbuf = savebuf;
     curwin = savewin;
-    if (flags & FL_ADJUST_CURSOR)
+    якщо (flags & FL_ADJUST_CURSOR)
 	check_cursor();
-    if (flags & (FL_UPDATE_SCREEN | FL_UPDATE_CURBUF))
+    якщо (flags & (FL_UPDATE_SCREEN | FL_UPDATE_CURBUF))
 	update_screen(UPD_NOT_VALID);
 
-    return err;
+    повернути err;
 }
 
 /*
  * This function implements the window commands.
  */
-    static int
+    static ціле
 winselfcmd(
     ClientData	ref,
     Tcl_Interp	*interp,
-    int		objc,
+    ціле		objc,
     Tcl_Obj	*CONST objv[])
 {
-    int		err, idx, flags;
-    int		val1, val2;
+    ціле		err, idx, flags;
+    ціле		val1, val2;
     Tcl_Obj	*resobj;
     win_T	*savewin, *win;
     buf_T	*savebuf;
@@ -970,15 +970,15 @@ winselfcmd(
 	"height", "option", (char *)0
     };
 
-    if (objc < 2)
+    якщо (objc < 2)
     {
 	Tcl_WrongNumArgs(interp, 1, objv, "option ?arg ...?");
-	return TCL_ERROR;
+	повернути TCL_ERROR;
     }
 
     err = Tcl_GetIndexFromObj(interp, objv[1], winoptions, "option", 0,  &idx);
-    if (err != TCL_OK)
-	return TCL_ERROR;
+    якщо (err != TCL_OK)
+	повернути TCL_ERROR;
 
     win = (win_T *)((struct ref *)ref)->vimobj;
     savewin = curwin;  curwin = win;
@@ -1002,47 +1002,47 @@ winselfcmd(
 	    break;
 
 	case WIN_HEIGHT:
-	    if (objc == 3)
+	    якщо (objc == 3)
 	    {
 		err = Tcl_GetIntFromObj(interp, objv[2], &val1);
-		if (err != TCL_OK)
+		якщо (err != TCL_OK)
 		    break;
 #ifdef FEAT_GUI
 		need_mouse_correct = TRUE;
 #endif
 		win_setheight(val1);
 		err = vimerror(interp);
-		if (err != TCL_OK)
+		якщо (err != TCL_OK)
 		    break;
 	    }
-	    else
-	    if (objc != 2)
+	    інакше
+	    якщо (objc != 2)
 	    {
 		Tcl_WrongNumArgs(interp, 2, objv, "?value?");
 		err = TCL_ERROR;
 		break;
 	    }
 
-	    resobj = Tcl_NewIntObj((int)(win->w_height));
+	    resobj = Tcl_NewIntObj((ціле)(win->w_height));
 	    Tcl_SetObjResult(interp, resobj);
 	    break;
 
 	case WIN_BUFFER:
-	    if (objc != 2)
+	    якщо (objc != 2)
 	    {
 		Tcl_WrongNumArgs(interp, 2, objv, NULL);
 		err = TCL_ERROR;
 		break;
 	    }
 	    str = tclgetbuffer(interp, win->w_buffer);
-	    if (str)
+	    якщо (str)
 		Tcl_SetResult(interp, str, TCL_VOLATILE);
-	    else
+	    інакше
 		err = TCL_ERROR;
 	    break;
 
 	case WIN_DELCMD:
-	    if (objc != 3)
+	    якщо (objc != 3)
 	    {
 		Tcl_WrongNumArgs(interp, 2, objv, "command");
 		err = TCL_ERROR;
@@ -1052,52 +1052,52 @@ winselfcmd(
 	    break;
 
 	case WIN_CURSOR:
-	    if (objc > 4)
+	    якщо (objc > 4)
 	    {
 		Tcl_WrongNumArgs(interp, 2, objv, "?arg1 ?arg2??");
 		err = TCL_ERROR;
 		break;
 	    }
-	    if (objc == 2)
+	    якщо (objc == 2)
 	    {
 		char buf[64];
 
-		sprintf(buf, _("row %d column %d"), (int)row2tcl(win->w_cursor.lnum), (int)col2tcl(win->w_cursor.col));
+		sprintf(buf, _("row %d column %d"), (ціле)row2tcl(win->w_cursor.lnum), (ціле)col2tcl(win->w_cursor.col));
 		Tcl_SetResult(interp, buf, TCL_VOLATILE);
 		break;
 	    }
-	    else if (objc == 3)
+	    інакше якщо (objc == 3)
 	    {
 		Tcl_Obj *part, *var;
 
 		part = Tcl_NewStringObj("row", -1);
 		var = Tcl_ObjGetVar2(interp, objv[2], part, TCL_LEAVE_ERR_MSG);
-		if (var == NULL)
+		якщо (var == NULL)
 		{
 		    err = TCL_ERROR;
 		    break;
 		}
 		err = tclgetlinenum(interp, var, &val1, win->w_buffer);
-		if (err != TCL_OK)
+		якщо (err != TCL_OK)
 		    break;
 		part = Tcl_NewStringObj("column", -1);
 		var = Tcl_ObjGetVar2(interp, objv[2], part, TCL_LEAVE_ERR_MSG);
-		if (var == NULL)
+		якщо (var == NULL)
 		{
 		    err = TCL_ERROR;
 		    break;
 		}
 		err = Tcl_GetIntFromObj(interp, var, &val2);
-		if (err != TCL_OK)
+		якщо (err != TCL_OK)
 		    break;
 	    }
-	    else
+	    інакше
 	    {  // objc == 4
 		err = tclgetlinenum(interp, objv[2], &val1, win->w_buffer);
-		if (err != TCL_OK)
+		якщо (err != TCL_OK)
 		    break;
 		err = Tcl_GetIntFromObj(interp, objv[3], &val2);
-		if (err != TCL_OK)
+		якщо (err != TCL_OK)
 		    break;
 	    }
 	    // TODO: should check column
@@ -1114,49 +1114,49 @@ winselfcmd(
 
     curwin = savewin;
     curbuf = savebuf;
-    if (flags & FL_UPDATE_SCREEN)
+    якщо (flags & FL_UPDATE_SCREEN)
 	update_screen(UPD_NOT_VALID);
 
-    return err;
+    повернути err;
 }
 
 
-    static int
+    static ціле
 commandcmd(
     ClientData	dummy UNUSED,
     Tcl_Interp	*interp,
-    int		objc,
+    ціле		objc,
     Tcl_Obj	*CONST objv[])
 {
-    int		err;
+    ціле		err;
 
     err = tcldoexcommand(interp, objc, objv, 1);
     update_screen(UPD_VALID);
-    return err;
+    повернути err;
 }
 
-    static int
+    static ціле
 optioncmd(
     ClientData	dummy UNUSED,
     Tcl_Interp	*interp,
-    int		objc,
+    ціле		objc,
     Tcl_Obj	*CONST objv[])
 {
-    int		err;
+    ціле		err;
 
     err = tclsetoption(interp, objc, objv, 1);
     update_screen(UPD_VALID);
-    return err;
+    повернути err;
 }
 
-    static int
+    static ціле
 exprcmd(
     ClientData	dummy UNUSED,
     Tcl_Interp	*interp,
-    int		objc,
+    ціле		objc,
     Tcl_Obj	*CONST objv[])
 {
-    return tclvimexpr(interp, objc, objv, 1);
+    повернути tclvimexpr(interp, objc, objv, 1);
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -1166,14 +1166,14 @@ exprcmd(
 /*
  * Get a line number from 'obj' and convert it to vim's range.
  */
-    static int
+    static ціле
 tclgetlinenum(
     Tcl_Interp	*interp,
     Tcl_Obj	*obj,
-    int		*valueP,
+    ціле		*valueP,
     buf_T	*buf)
 {
-    int err, i;
+    ціле err, i;
 
     enum { LN_BEGIN, LN_BOTTOM, LN_END, LN_FIRST, LN_LAST, LN_START, LN_TOP };
 
@@ -1183,7 +1183,7 @@ tclgetlinenum(
     };
 
     err = Tcl_GetIndexFromObj(interp, obj, keyw, "", 0, &i);
-    if (err == TCL_OK)
+    якщо (err == TCL_OK)
     {
 	switch (i)
 	{
@@ -1199,21 +1199,21 @@ tclgetlinenum(
 		*valueP = buf->b_ml.ml_line_count;
 		break;
 	}
-	return TCL_OK;
+	повернути TCL_OK;
     }
     Tcl_ResetResult(interp);
 
     err = Tcl_GetIntFromObj(interp, obj, &i);
-    if (err != TCL_OK)
-	return err;
+    якщо (err != TCL_OK)
+	повернути err;
     i = row2vim(i);
-    if (i < 1  ||  i > buf->b_ml.ml_line_count)
+    якщо (i < 1  ||  i > buf->b_ml.ml_line_count)
     {
 	Tcl_SetResult(interp, _("line number out of range"), TCL_STATIC);
-	return TCL_ERROR;
+	повернути TCL_ERROR;
     }
     *valueP = i;
-    return TCL_OK;
+    повернути TCL_OK;
 }
 
 /*
@@ -1226,44 +1226,44 @@ tclfindwin(buf_T *buf)
 
     FOR_ALL_WINDOWS(win)
     {
-	if (win->w_buffer == buf)
-	    return win;
+	якщо (win->w_buffer == buf)
+	    повернути win;
     }
-    return curwin;  // keep current window context
+    повернути curwin;  // keep current window context
 }
 
 /*
  * Do-it-all function for "::vim::command", "$buf command" and "$win command".
  */
-    static int
+    static ціле
 tcldoexcommand(
     Tcl_Interp	*interp,
-    int		objc,
+    ціле		objc,
     Tcl_Obj	*CONST objv[],
-    int		objn)
+    ціле		objn)
 {
     tcl_info	saveinfo;
-    int		err, flag, nobjs;
+    ціле		err, flag, nobjs;
     char	*arg;
 
     nobjs = objc - objn;
-    if (nobjs < 1 || nobjs > 2)
+    якщо (nobjs < 1 || nobjs > 2)
     {
 	Tcl_WrongNumArgs(interp, objn, objv, "?-quiet? exCommand");
-	return TCL_ERROR;
+	повернути TCL_ERROR;
     }
 
     flag = 0;
-    if (nobjs == 2)
+    якщо (nobjs == 2)
     {
 	arg = Tcl_GetStringFromObj(objv[objn], NULL);
-	if (strcmp(arg, "-quiet") == 0)
+	якщо (strcmp(arg, "-quiet") == 0)
 	    flag = 1;
-	else
+	інакше
 	{
 	    Tcl_ResetResult(interp);
 	    Tcl_AppendResult(interp, _("unknown flag: "), arg, (char *)0);
-	    return TCL_ERROR;
+	    повернути TCL_ERROR;
 	}
 	++objn;
     }
@@ -1274,33 +1274,33 @@ tcldoexcommand(
     tclinfo.curbuf = NULL;
 
     arg = Tcl_GetStringFromObj(objv[objn], NULL);
-    if (flag)
+    якщо (flag)
 	++emsg_off;
     do_cmdline_cmd((char_u *)arg);
-    if (flag)
+    якщо (flag)
 	--emsg_off;
     err = vimerror(interp);
 
     // If the ex command created a new Tcl interpreter, remove it
-    if (tclinfo.interp)
+    якщо (tclinfo.interp)
 	tcldelthisinterp();
     memcpy(&tclinfo, &saveinfo, sizeof(tcl_info));
     tclupdatevars();
 
-    return err;
+    повернути err;
 }
 
 /*
  * Do-it-all function for "::vim::option", "$buf option" and "$win option".
  */
-    static int
+    static ціле
 tclsetoption(
     Tcl_Interp	*interp,
-    int		objc,
+    ціле		objc,
     Tcl_Obj	*CONST objv[],
-    int		objn)
+    ціле		objn)
 {
-    int		err, nobjs, idx;
+    ціле		err, nobjs, idx;
     char_u	*option;
     getoption_T	gov;
     long	lval;
@@ -1311,10 +1311,10 @@ tclsetoption(
     static CONST84 char *optkw[] = { "off", "on", "toggle", (char *)0 };
 
     nobjs = objc - objn;
-    if (nobjs != 1 && nobjs != 2)
+    якщо (nobjs != 1 && nobjs != 2)
     {
 	Tcl_WrongNumArgs(interp, objn, objv, "vimOption ?value?");
-	return TCL_ERROR;
+	повернути TCL_ERROR;
     }
 
     option = (char_u *)Tcl_GetStringFromObj(objv[objn], NULL);
@@ -1334,20 +1334,20 @@ tclsetoption(
 	    break;
 	default:
 	    Tcl_SetResult(interp, _("unknown vimOption"), TCL_STATIC);
-	    return TCL_ERROR;
+	    повернути TCL_ERROR;
     }
-    if (nobjs == 2)
+    якщо (nobjs == 2)
     {
-	if (gov != gov_string)
+	якщо (gov != gov_string)
 	{
 	    sval = NULL;    // avoid compiler warning
 	    err = Tcl_GetIndexFromObj(interp, objv[objn], optkw, "", 0, &idx);
-	    if (err != TCL_OK)
+	    якщо (err != TCL_OK)
 	    {
 		Tcl_ResetResult(interp);
 		err = Tcl_GetLongFromObj(interp, objv[objn], &lval);
 	    }
-	    else
+	    інакше
 	    {
 		switch (idx)
 		{
@@ -1363,74 +1363,74 @@ tclsetoption(
 		}
 	    }
 	}
-	else
+	інакше
 	    sval = (char_u *)Tcl_GetStringFromObj(objv[objn], NULL);
-	if (err == TCL_OK)
+	якщо (err == TCL_OK)
 	{
 	    set_option_value_give_err(option, lval, sval, OPT_LOCAL);
 	    err = vimerror(interp);
 	}
     }
-    return err;
+    повернути err;
 }
 
 /*
  * Do-it-all function for "::vim::expr", "$buf expr" and "$win expr".
  */
-    static int
+    static ціле
 tclvimexpr(
     Tcl_Interp	*interp,
-    int		objc,
+    ціле		objc,
     Tcl_Obj	*CONST objv[],
-    int		objn)
+    ціле		objn)
 {
 #ifdef FEAT_EVAL
     char	*expr, *str;
 #endif
-    int		err;
+    ціле		err;
 
-    if (objc - objn != 1)
+    якщо (objc - objn != 1)
     {
 	Tcl_WrongNumArgs(interp, objn, objv, "vimExpr");
-	return TCL_ERROR;
+	повернути TCL_ERROR;
     }
 
 #ifdef FEAT_EVAL
     expr = Tcl_GetStringFromObj(objv[objn], NULL);
     str = (char *)eval_to_string((char_u *)expr, TRUE, FALSE);
-    if (str == NULL)
+    якщо (str == NULL)
 	Tcl_SetResult(interp, _("invalid expression"), TCL_STATIC);
-    else
+    інакше
     {
 	Tcl_SetResult(interp, str, TCL_VOLATILE);
 	vim_free(str);
     }
     err = vimerror(interp);
-#else
+#інакше
     Tcl_SetResult(interp, _("expressions disabled at compile time"), TCL_STATIC);
     err = TCL_ERROR;
 #endif
 
-    return err;
+    повернути err;
 }
 
 /*
  * Check for internal vim errors.
  */
-    static int
+    static ціле
 vimerror(Tcl_Interp *interp)
 {
-    if (got_int)
+    якщо (got_int)
     {
 	Tcl_SetResult(interp, _("keyboard interrupt"), TCL_STATIC);
-	return TCL_ERROR;
+	повернути TCL_ERROR;
     }
-    else if (did_emsg)
+    інакше якщо (did_emsg)
     {
 	Tcl_SetResult(interp, _("Vim error"), TCL_STATIC);
-	return TCL_ERROR;
+	повернути TCL_ERROR;
     }
-    return TCL_OK;
+    повернути TCL_OK;
 }
 
 /*
@@ -1446,7 +1446,7 @@ delref(ClientData cref)
 {
     struct ref *ref = (struct ref *)cref;
 
-    if (ref->delcmd)
+    якщо (ref->delcmd)
     {
 	Tcl_DecrRefCount(ref->delcmd);
 	ref->delcmd = NULL;
@@ -1468,29 +1468,29 @@ tclgetref(
     Tcl_Command cmd;
 
     ref = (struct ref *)(*refstartP);
-    if (ref == &refsdeleted)
+    якщо (ref == &refsdeleted)
     {
 	Tcl_SetResult(interp, _("cannot create buffer/window command: object is being deleted"), TCL_STATIC);
-	return NULL;
+	повернути NULL;
     }
 
-    while (ref != NULL)
+    поки (ref != NULL)
     {
-	if (ref->interp == interp)
+	якщо (ref->interp == interp)
 	    break;
-	if (ref->interp == NULL)
+	якщо (ref->interp == NULL)
 	    unused = ref;
 	ref = ref->next;
     }
 
-    if (ref)
+    якщо (ref)
 	vim_snprintf(name, sizeof(name), "::vim::%s",
 					Tcl_GetCommandName(interp, ref->cmd));
-    else
+    інакше
     {
-	if (unused)
+	якщо (unused)
 	    ref = unused;
-	else
+	інакше
 	{
 	    ref = (struct ref *)Tcl_Alloc(sizeof(struct ref));
 	    ref->interp = NULL;
@@ -1503,58 +1503,58 @@ tclgetref(
 					       prefix, (unsigned long)vimobj);
 	cmd = Tcl_CreateObjCommand(interp, name, proc,
 	    (ClientData)ref, (Tcl_CmdDeleteProc *)delref);
-	if (!cmd)
-	    return NULL;
+	якщо (!cmd)
+	    повернути NULL;
 
 	ref->interp = interp;
 	ref->cmd = cmd;
 	ref->delcmd = NULL;
 	ref->vimobj = vimobj;
     }
-    return name;
+    повернути name;
 }
 
     static char *
 tclgetwindow(Tcl_Interp *interp, win_T *win)
 {
-    return tclgetref(interp, &(win->w_tcl_ref), "win", (void *)win, winselfcmd);
+    повернути tclgetref(interp, &(win->w_tcl_ref), "win", (void *)win, winselfcmd);
 }
 
     static char *
 tclgetbuffer(Tcl_Interp *interp, buf_T *buf)
 {
-    return tclgetref(interp, &(buf->b_tcl_ref), "buf", (void *)buf, bufselfcmd);
+    повернути tclgetref(interp, &(buf->b_tcl_ref), "buf", (void *)buf, bufselfcmd);
 }
 
-    static int
+    static ціле
 tclsetdelcmd(
     Tcl_Interp	*interp,
     struct ref	*reflist,
     void	*vimobj,
     Tcl_Obj	*delcmd)
 {
-    if (reflist == &refsdeleted)
+    якщо (reflist == &refsdeleted)
     {
 	Tcl_SetResult(interp, _("cannot register callback command: buffer/window is already being deleted"), TCL_STATIC);
-	return TCL_ERROR;
+	повернути TCL_ERROR;
     }
 
-    while (reflist != NULL)
+    поки (reflist != NULL)
     {
-	if (reflist->interp == interp && reflist->vimobj == vimobj)
+	якщо (reflist->interp == interp && reflist->vimobj == vimobj)
 	{
-	    if (reflist->delcmd)
+	    якщо (reflist->delcmd)
 		Tcl_DecrRefCount(reflist->delcmd);
 	    Tcl_IncrRefCount(delcmd);
 	    reflist->delcmd = delcmd;
-	    return TCL_OK;
+	    повернути TCL_OK;
 	}
 	reflist = reflist->next;
     }
     // This should never happen.  Famous last word?
     iemsg(e_tcl_fatal_error_reflist_corrupt_please_report_this);
     Tcl_SetResult(interp, _("cannot register callback command: buffer/window reference not found"), TCL_STATIC);
-    return TCL_ERROR;
+    повернути TCL_ERROR;
 }
 
 
@@ -1562,90 +1562,90 @@ tclsetdelcmd(
 //    I/O Channel
 ////////////////////////////////////////////
 
-    static int
+    static ціле
 tcl_channel_close(ClientData instance, Tcl_Interp *interp UNUSED)
 {
-    int		err = 0;
+    ціле		err = 0;
 
     // currently does nothing
 
-    if (instance != VIMOUT && instance != VIMERR)
+    якщо (instance != VIMOUT && instance != VIMERR)
     {
 	Tcl_SetErrno(EBADF);
 	err = EBADF;
     }
-    return err;
+    повернути err;
 }
 
-    static int
+    static ціле
 tcl_channel_input(
     ClientData	instance UNUSED,
     char	*buf UNUSED,
-    int		bufsiz UNUSED,
-    int		*errptr)
+    ціле		bufsiz UNUSED,
+    ціле		*errptr)
 {
 
     // input is currently not supported
 
     Tcl_SetErrno(EINVAL);
-    if (errptr)
+    якщо (errptr)
 	*errptr = EINVAL;
-    return -1;
+    повернути -1;
 }
 
-    static int
+    static ціле
 tcl_channel_output(
     ClientData	instance,
     const char	*buf,
-    int		bufsiz,
-    int		*errptr)
+    ціле		bufsiz,
+    ціле		*errptr)
 {
     char_u	*str;
-    int		result;
+    ціле		result;
 
     // The buffer is not guaranteed to be 0-terminated, and we don't if
     // there is enough room to add a '\0'.  So we have to create a copy
     // of the buffer...
     str = vim_strnsave((char_u *)buf, bufsiz);
-    if (!str)
+    якщо (!str)
     {
 	Tcl_SetErrno(ENOMEM);
-	if (errptr)
+	якщо (errptr)
 	    *errptr = ENOMEM;
-	return -1;
+	повернути -1;
     }
 
     result = bufsiz;
-    if (instance == VIMOUT)
+    якщо (instance == VIMOUT)
 	tclmsg((char *)str);
-    else
-    if (instance == VIMERR)
+    інакше
+    якщо (instance == VIMERR)
 	tclerrmsg((char *)str);
-    else
+    інакше
     {
 	Tcl_SetErrno(EBADF);
-	if (errptr)
+	якщо (errptr)
 	    *errptr = EBADF;
 	result = -1;
     }
     vim_free(str);
-    return result;
+    повернути result;
 }
 
     static void
-tcl_channel_watch(ClientData instance UNUSED, int mask UNUSED)
+tcl_channel_watch(ClientData instance UNUSED, ціле mask UNUSED)
 {
     Tcl_SetErrno(EINVAL);
 }
 
-    static int
+    static ціле
 tcl_channel_gethandle(
     ClientData	instance UNUSED,
-    int		direction UNUSED,
+    ціле		direction UNUSED,
     ClientData	*handleptr UNUSED)
 {
     Tcl_SetErrno(EINVAL);
-    return EINVAL;
+    повернути EINVAL;
 }
 
 
@@ -1712,21 +1712,21 @@ tclupdatevars(void)
 }
 
 
-    static int
+    static ціле
 tclinit(exarg_T *eap)
 {
     char varname[VARNAME_SIZE];	// Tcl_LinkVar requires writeable varname
     char *name;
 
 #ifdef DYNAMIC_TCL
-    if (!tcl_enabled(TRUE))
+    якщо (!tcl_enabled(TRUE))
     {
 	emsg(_(e_sorry_this_command_is_disabled_tcl_library_could_not_be_loaded));
-	return FAIL;
+	повернути FAIL;
     }
 #endif
 
-    if (!tclinfo.interp)
+    якщо (!tclinfo.interp)
     {
 	Tcl_Interp *interp;
 	static Tcl_Channel ch1, ch2;
@@ -1741,13 +1741,13 @@ tclinit(exarg_T *eap)
 
 	interp = Tcl_CreateInterp();
 	Tcl_Preserve(interp);
-	if (Tcl_Init(interp) == TCL_ERROR)
+	якщо (Tcl_Init(interp) == TCL_ERROR)
 	{
 	    Tcl_Release(interp);
 	    Tcl_DeleteInterp(interp);
-	    return FAIL;
+	    повернути FAIL;
 	}
-#if 0
+#якщо 0
 	// VIM sure is interactive
 	Tcl_SetVar(interp, "tcl_interactive", "1", TCL_GLOBAL_ONLY);
 #endif
@@ -1809,7 +1809,7 @@ tclinit(exarg_T *eap)
 
 	tclinfo.interp = interp;
     }
-    else
+    інакше
     {
 	// Interpreter already exists, just update variables
 	tclinfo.range_start = row2tcl(eap->line1);
@@ -1818,7 +1818,7 @@ tclinit(exarg_T *eap)
     }
 
     tclinfo.exitvalue = 0;
-    return OK;
+    повернути OK;
 }
 
     static void
@@ -1826,13 +1826,13 @@ tclerrmsg(char *text)
 {
     char *next;
 
-    while ((next=strchr(text, '\n')))
+    поки ((next=strchr(text, '\n')))
     {
 	*next++ = '\0';
 	emsg(text);
 	text = next;
     }
-    if (*text)
+    якщо (*text)
 	emsg(text);
 }
 
@@ -1841,20 +1841,20 @@ tclmsg(char *text)
 {
     char *next;
 
-    while ((next=strchr(text, '\n')))
+    поки ((next=strchr(text, '\n')))
     {
 	*next++ = '\0';
 	msg(text);
 	text = next;
     }
-    if (*text)
+    якщо (*text)
 	msg(text);
 }
 
     static void
 tcldelthisinterp(void)
 {
-    if (!Tcl_InterpDeleted(tclinfo.interp))
+    якщо (!Tcl_InterpDeleted(tclinfo.interp))
 	Tcl_DeleteInterp(tclinfo.interp);
     Tcl_Release(tclinfo.interp);
     // The interpreter is now gets deleted.  All registered commands (esp.
@@ -1872,13 +1872,13 @@ tcldelthisinterp(void)
     tclinfo.curbuf = tclinfo.curwin = NULL;
 }
 
-    static int
-tclexit(int error)
+    static ціле
+tclexit(ціле error)
 {
-    int newerr = OK;
+    ціле newerr = OK;
 
-    if (Tcl_InterpDeleted(tclinfo.interp)     // True if we intercepted Tcl's exit command
-#if (TCL_MAJOR_VERSION == 8 && TCL_MINOR_VERSION >= 5) || TCL_MAJOR_VERSION > 8
+    якщо (Tcl_InterpDeleted(tclinfo.interp)     // True if we intercepted Tcl's exit command
+#якщо (TCL_MAJOR_VERSION == 8 && TCL_MINOR_VERSION >= 5) || TCL_MAJOR_VERSION > 8
 	|| Tcl_LimitExceeded(tclinfo.interp)  // True if the interpreter cannot continue
 #endif
 	)
@@ -1887,34 +1887,34 @@ tclexit(int error)
 
 	sprintf(buf, _(e_exit_code_nr), tclinfo.exitvalue);
 	tclerrmsg(buf);
-	if (tclinfo.exitvalue == 0)
+	якщо (tclinfo.exitvalue == 0)
 	{
 	    did_emsg = 0;
 	    newerr = OK;
 	}
-	else
+	інакше
 	    newerr = FAIL;
 
 	tcldelthisinterp();
     }
-    else
+    інакше
     {
 	char *result;
 
 	result = (char *)Tcl_GetStringResult(tclinfo.interp);
-	if (error == TCL_OK)
+	якщо (error == TCL_OK)
 	{
 	    tclmsg(result);
 	    newerr = OK;
 	}
-	else
+	інакше
 	{
 	    tclerrmsg(result);
 	    newerr = FAIL;
 	}
     }
 
-    return newerr;
+    повернути newerr;
 }
 
 /*
@@ -1924,18 +1924,18 @@ tclexit(int error)
 ex_tcl(exarg_T *eap)
 {
     char_u	*script;
-    int		err;
+    ціле		err;
 
     script = script_get(eap, eap->arg);
-    if (!eap->skip)
+    якщо (!eap->skip)
     {
 	err = tclinit(eap);
-	if (err == OK)
+	якщо (err == OK)
 	{
 	    Tcl_AllowExceptions(tclinfo.interp);
-	    if (script == NULL)
+	    якщо (script == NULL)
 		err = Tcl_Eval(tclinfo.interp, (char *)eap->arg);
-	    else
+	    інакше
 		err = Tcl_Eval(tclinfo.interp, (char *)script);
 	    err = tclexit(err);
 	}
@@ -1950,10 +1950,10 @@ ex_tcl(exarg_T *eap)
 ex_tclfile(exarg_T *eap)
 {
     char *file = (char *)eap->arg;
-    int err;
+    ціле err;
 
     err = tclinit(eap);
-    if (err == OK)
+    якщо (err == OK)
     {
 	Tcl_AllowExceptions(tclinfo.interp);
 	err = Tcl_EvalFile(tclinfo.interp, file);
@@ -1968,7 +1968,7 @@ ex_tclfile(exarg_T *eap)
 ex_tcldo(exarg_T *eap)
 {
     char	*script, *line;
-    int		err, rs, re, lnum;
+    ціле		err, rs, re, lnum;
     char	var_lnum[VARNAME_SIZE]; // must be writeable memory
     char	var_line[VARNAME_SIZE];
     linenr_T	first_line = 0;
@@ -1982,23 +1982,23 @@ ex_tcldo(exarg_T *eap)
     strcpy(var_line, VAR_CURLINE);
 
     err = tclinit(eap);
-    if (err != OK)
-	return;
+    якщо (err != OK)
+	повернути;
 
     lnum = row2tcl(rs);
     Tcl_LinkVar(tclinfo.interp, var_lnum, (char *)&lnum, TCL_LINK_INT|TCL_LINK_READ_ONLY);
     err = TCL_OK;
-    if (u_save((linenr_T)(rs-1), (linenr_T)(re+1)) != OK)
+    якщо (u_save((linenr_T)(rs-1), (linenr_T)(re+1)) != OK)
     {
 	Tcl_SetResult(tclinfo.interp, _("cannot save undo information"), TCL_STATIC);
 	err = TCL_ERROR;
     }
-    while (err == TCL_OK  &&  rs <= re)
+    поки (err == TCL_OK  &&  rs <= re)
     {
-	if ((linenr_T)rs > curbuf->b_ml.ml_line_count)
+	якщо ((linenr_T)rs > curbuf->b_ml.ml_line_count)
 	    break;
 	line = (char *)ml_get_buf(curbuf, (linenr_T)rs, FALSE);
-	if (!line)
+	якщо (!line)
 	{
 	    Tcl_SetResult(tclinfo.interp, _("cannot get line"), TCL_STATIC);
 	    err = TCL_ERROR;
@@ -2007,24 +2007,24 @@ ex_tcldo(exarg_T *eap)
 	Tcl_SetVar(tclinfo.interp, var_line, line, 0);
 	Tcl_AllowExceptions(tclinfo.interp);
 	err = Tcl_Eval(tclinfo.interp, script);
-	if (err != TCL_OK
+	якщо (err != TCL_OK
 	    || Tcl_InterpDeleted(tclinfo.interp)
-#if (TCL_MAJOR_VERSION == 8 && TCL_MINOR_VERSION >= 5) || TCL_MAJOR_VERSION > 8
+#якщо (TCL_MAJOR_VERSION == 8 && TCL_MINOR_VERSION >= 5) || TCL_MAJOR_VERSION > 8
 	    || Tcl_LimitExceeded(tclinfo.interp)
 #endif
 	    || curbuf != was_curbuf
 	    || (linenr_T)rs > curbuf->b_ml.ml_line_count)
 	    break;
 	line = (char *)Tcl_GetVar(tclinfo.interp, var_line, 0);
-	if (line)
+	якщо (line)
 	{
-	    if (ml_replace((linenr_T)rs, (char_u *)line, TRUE) != OK)
+	    якщо (ml_replace((linenr_T)rs, (char_u *)line, TRUE) != OK)
 	    {
 		Tcl_SetResult(tclinfo.interp, _("cannot replace line"), TCL_STATIC);
 		err = TCL_ERROR;
 		break;
 	    }
-	    if (first_line == 0)
+	    якщо (first_line == 0)
 		first_line = rs;
 	    last_line = rs;
 	}
@@ -2032,12 +2032,12 @@ ex_tcldo(exarg_T *eap)
 	++lnum;
 	Tcl_UpdateLinkedVar(tclinfo.interp, var_lnum);
     }
-    if (first_line)
+    якщо (first_line)
 	changed_lines(first_line, 0, last_line + 1, (long)0);
 
     Tcl_UnsetVar(tclinfo.interp, var_line, 0);
     Tcl_UnlinkVar(tclinfo.interp, var_lnum);
-    if (err == TCL_OK)
+    якщо (err == TCL_OK)
 	Tcl_ResetResult(tclinfo.interp);
 
     (void)tclexit(err);
@@ -2047,27 +2047,27 @@ ex_tcldo(exarg_T *eap)
 tcldelallrefs(struct ref *ref)
 {
     struct ref	*next;
-    int		err;
+    ціле		err;
     char	*result;
 
 #ifdef DYNAMIC_TCL
     // TODO: this code currently crashes Vim on exit
-    if (exiting)
-	return;
+    якщо (exiting)
+	повернути;
 #endif
 
-    while (ref != NULL)
+    поки (ref != NULL)
     {
 	next = ref->next;
-	if (ref->interp)
+	якщо (ref->interp)
 	{
-	    if (ref->delcmd)
+	    якщо (ref->delcmd)
 	    {
 		err = Tcl_GlobalEvalObj(ref->interp, ref->delcmd);
-		if (err != TCL_OK)
+		якщо (err != TCL_OK)
 		{
 		    result = (char *)Tcl_GetStringResult(ref->interp);
-		    if (result)
+		    якщо (result)
 			tclerrmsg(result);
 		}
 		Tcl_DecrRefCount(ref->delcmd);
@@ -2086,12 +2086,12 @@ tcl_buffer_free(buf_T *buf)
     struct ref *reflist;
 
 #ifdef DYNAMIC_TCL
-    if (!stubs_initialized)	// Not using Tcl, nothing to do.
-	return;
+    якщо (!stubs_initialized)	// Not using Tcl, nothing to do.
+	повернути;
 #endif
 
     reflist = (struct ref *)(buf->b_tcl_ref);
-    if (reflist != &refsdeleted)
+    якщо (reflist != &refsdeleted)
     {
 	buf->b_tcl_ref = (void *)&refsdeleted;
 	tcldelallrefs(reflist);
@@ -2105,12 +2105,12 @@ tcl_window_free(win_T *win)
     struct ref *reflist;
 
 #ifdef DYNAMIC_TCL
-    if (!stubs_initialized)	// Not using Tcl, nothing to do.
-	return;
+    якщо (!stubs_initialized)	// Not using Tcl, nothing to do.
+	повернути;
 #endif
 
     reflist = (struct ref*)(win->w_tcl_ref);
-    if (reflist != &refsdeleted)
+    якщо (reflist != &refsdeleted)
     {
 	win->w_tcl_ref = (void *)&refsdeleted;
 	tcldelallrefs(reflist);

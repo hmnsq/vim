@@ -14,13 +14,13 @@
 
 #include "vim.h"
 
-static int	VIsual_mode_orig = NUL;		// saved Visual mode
+static ціле	VIsual_mode_orig = NUL;		// saved Visual mode
 
 #ifdef FEAT_EVAL
-static void	set_vcount_ca(cmdarg_T *cap, int *set_prevcount);
+static void	set_vcount_ca(cmdarg_T *cap, ціле *set_prevcount);
 #endif
 static void	unshift_special(cmdarg_T *cap);
-static void	del_from_showcmd(int);
+static void	del_from_showcmd(ціле);
 
 /*
  * nv_*(): functions called to handle Normal and Visual mode commands.
@@ -61,7 +61,7 @@ static void	nv_end(cmdarg_T *cap);
 static void	nv_dollar(cmdarg_T *cap);
 static void	nv_search(cmdarg_T *cap);
 static void	nv_next(cmdarg_T *cap);
-static int	normal_search(cmdarg_T *cap, int dir, char_u *pat, size_t patlen, int opt, int *wrapped);
+static ціле	normal_search(cmdarg_T *cap, ціле dir, char_u *pat, size_t patlen, ціле opt, ціле *wrapped);
 static void	nv_csearch(cmdarg_T *cap);
 static void	nv_brackets(cmdarg_T *cap);
 static void	nv_percent(cmdarg_T *cap);
@@ -72,7 +72,7 @@ static void	nv_undo(cmdarg_T *cap);
 static void	nv_kundo(cmdarg_T *cap);
 static void	nv_Replace(cmdarg_T *cap);
 static void	nv_replace(cmdarg_T *cap);
-static void	nv_cursormark(cmdarg_T *cap, int flag, pos_T *pos);
+static void	nv_cursormark(cmdarg_T *cap, ціле flag, pos_T *pos);
 static void	v_visop(cmdarg_T *cap);
 static void	nv_subst(cmdarg_T *cap);
 static void	nv_abbrev(cmdarg_T *cap);
@@ -81,7 +81,7 @@ static void	nv_gomark(cmdarg_T *cap);
 static void	nv_pcmark(cmdarg_T *cap);
 static void	nv_regname(cmdarg_T *cap);
 static void	nv_visual(cmdarg_T *cap);
-static void	n_start_visual_mode(int c);
+static void	n_start_visual_mode(ціле c);
 static void	nv_window(cmdarg_T *cap);
 static void	nv_suspend(cmdarg_T *cap);
 static void	nv_g_cmd(cmdarg_T *cap);
@@ -91,7 +91,7 @@ static void	nv_Undo(cmdarg_T *cap);
 static void	nv_tilde(cmdarg_T *cap);
 static void	nv_operator(cmdarg_T *cap);
 #ifdef FEAT_EVAL
-static void	set_op_var(int optype);
+static void	set_op_var(ціле optype);
 #endif
 static void	nv_lineop(cmdarg_T *cap);
 static void	nv_home(cmdarg_T *cap);
@@ -106,14 +106,14 @@ static void	nv_goto(cmdarg_T *cap);
 static void	nv_normal(cmdarg_T *cap);
 static void	nv_esc(cmdarg_T *oap);
 static void	nv_edit(cmdarg_T *cap);
-static void	invoke_edit(cmdarg_T *cap, int repl, int cmd, int startln);
+static void	invoke_edit(cmdarg_T *cap, ціле repl, ціле cmd, ціле startln);
 static void	nv_object(cmdarg_T *cap);
 static void	nv_record(cmdarg_T *cap);
 static void	nv_at(cmdarg_T *cap);
 static void	nv_halfpage(cmdarg_T *cap);
 static void	nv_join(cmdarg_T *cap);
 static void	nv_put(cmdarg_T *cap);
-static void	nv_put_opt(cmdarg_T *cap, int fix_indent);
+static void	nv_put_opt(cmdarg_T *cap, ціле fix_indent);
 static void	nv_open(cmdarg_T *cap);
 #ifdef FEAT_NETBEANS_INTG
 static void	nv_nbcmd(cmdarg_T *cap);
@@ -134,65 +134,65 @@ static void	nv_cursorhold(cmdarg_T *cap);
  * Search for a command in the commands table.
  * Returns -1 for invalid command.
  */
-    static int
-find_command(int cmdchar)
+    static ціле
+find_command(ціле cmdchar)
 {
-    int		i;
-    int		idx;
-    int		top, bot;
-    int		c;
+    ціле		i;
+    ціле		idx;
+    ціле		top, bot;
+    ціле		c;
 
     // A multi-byte character is never a command.
-    if (cmdchar >= 0x100)
-	return -1;
+    якщо (cmdchar >= 0x100)
+	повернути -1;
 
     // We use the absolute value of the character.  Special keys have a
     // negative value, but are sorted on their absolute value.
-    if (cmdchar < 0)
+    якщо (cmdchar < 0)
 	cmdchar = -cmdchar;
 
     // If the character is in the first part: The character is the index into
     // nv_cmd_idx[].
-    if (cmdchar <= nv_max_linear)
-	return nv_cmd_idx[cmdchar];
+    якщо (cmdchar <= nv_max_linear)
+	повернути nv_cmd_idx[cmdchar];
 
     // Perform a binary search.
     bot = nv_max_linear + 1;
     top = NV_CMDS_SIZE - 1;
     idx = -1;
-    while (bot <= top)
+    поки (bot <= top)
     {
 	i = (top + bot) / 2;
 	c = nv_cmds[nv_cmd_idx[i]].cmd_char;
-	if (c < 0)
+	якщо (c < 0)
 	    c = -c;
-	if (cmdchar == c)
+	якщо (cmdchar == c)
 	{
 	    idx = nv_cmd_idx[i];
 	    break;
 	}
-	if (cmdchar > c)
+	якщо (cmdchar > c)
 	    bot = i + 1;
-	else
+	інакше
 	    top = i - 1;
     }
-    return idx;
+    повернути idx;
 }
 
 /*
  * If currently editing a cmdline or text is locked: beep and give an error
  * message, return TRUE.
  */
-    static int
+    static ціле
 check_text_locked(oparg_T *oap)
 {
-    if (!text_locked())
-	return FALSE;
+    якщо (!text_locked())
+	повернути FALSE;
 
-    if (oap != NULL)
+    якщо (oap != NULL)
 	clearopbeep(oap);
     text_locked_msg();
-    return TRUE;
+    повернути TRUE;
 }
 
 /*
@@ -200,52 +200,52 @@ check_text_locked(oparg_T *oap)
  * Give an error message, possibly beep and return TRUE.
  * "oap" may be NULL.
  */
-    int
+    ціле
 check_text_or_curbuf_locked(oparg_T *oap)
 {
-    if (check_text_locked(oap))
-	return TRUE;
+    якщо (check_text_locked(oap))
+	повернути TRUE;
 
-    if (!curbuf_locked())
-	return FALSE;
+    якщо (!curbuf_locked())
+	повернути FALSE;
 
-    if (oap != NULL)
+    якщо (oap != NULL)
 	clearop(oap);
-    return TRUE;
+    повернути TRUE;
 }
 
 /*
  * Handle the count before a normal command and set cap->count0.
  */
-    static int
+    static ціле
 normal_cmd_get_count(
 	cmdarg_T	*cap,
-	int		c,
-	int		toplevel UNUSED,
-	int		set_prevcount UNUSED,
-	int		*ctrl_w,
-	int		*need_flushbuf UNUSED)
+	ціле		c,
+	ціле		toplevel UNUSED,
+	ціле		set_prevcount UNUSED,
+	ціле		*ctrl_w,
+	ціле		*need_flushbuf UNUSED)
 {
 getcount:
-    if (!(VIsual_active && VIsual_select))
+    якщо (!(VIsual_active && VIsual_select))
     {
 	// Handle a count before a command and compute ca.count0.
 	// Note that '0' is a command and not the start of a count, but it's
 	// part of a count after other digits.
-	while ((c >= '1' && c <= '9')
+	поки ((c >= '1' && c <= '9')
 		|| (cap->count0 != 0 && (c == K_DEL || c == K_KDEL
 			|| c == '0')))
 	{
-	    if (c == K_DEL || c == K_KDEL)
+	    якщо (c == K_DEL || c == K_KDEL)
 	    {
 		cap->count0 /= 10;
 		del_from_showcmd(4);	// delete the digit and ~@%
 	    }
-	    else if (cap->count0 > 99999999L)
+	    інакше якщо (cap->count0 > 99999999L)
 	    {
 		cap->count0 = 999999999L;
 	    }
-	    else
+	    інакше
 	    {
 		cap->count0 = cap->count0 * 10 + (c - '0');
 	    }
@@ -253,10 +253,10 @@ getcount:
 	    // Set v:count here, when called from main() and not a stuffed
 	    // command, so that v:count can be used in an expression mapping
 	    // right after the count. Do set it for redo.
-	    if (toplevel && readbuf1_empty())
+	    якщо (toplevel && readbuf1_empty())
 		set_vcount_ca(cap, &set_prevcount);
 #endif
-	    if (*ctrl_w)
+	    якщо (*ctrl_w)
 	    {
 		++no_mapping;
 		++allow_keys;		// no mapping for nchar, but keys
@@ -265,7 +265,7 @@ getcount:
 	    c = plain_vgetc();
 	    LANGMAP_ADJUST(c, TRUE);
 	    --no_zero_mapping;
-	    if (*ctrl_w)
+	    якщо (*ctrl_w)
 	    {
 		--no_mapping;
 		--allow_keys;
@@ -274,7 +274,7 @@ getcount:
 	}
 
 	// If we got CTRL-W there may be a/another count
-	if (c == Ctrl_W && !*ctrl_w && cap->oap->op_type == OP_NOP)
+	якщо (c == Ctrl_W && !*ctrl_w && cap->oap->op_type == OP_NOP)
 	{
 	    *ctrl_w = TRUE;
 	    cap->opcount = cap->count0;	// remember first count
@@ -291,14 +291,14 @@ getcount:
 	}
     }
 
-    if (c == K_CURSORHOLD)
+    якщо (c == K_CURSORHOLD)
     {
 	// Save the count values so that ca.opcount and ca.count0 are exactly
 	// the same when coming back here after handling K_CURSORHOLD.
 	cap->oap->prev_opcount = cap->opcount;
 	cap->oap->prev_count0 = cap->count0;
     }
-    else if (cap->opcount != 0)
+    інакше якщо (cap->opcount != 0)
     {
 	// If we're in the middle of an operator (including after entering a
 	// yank buffer with '"') AND we had a count before the operator, then
@@ -307,14 +307,14 @@ getcount:
 	// into "d3w" which makes things fall into place pretty neatly.
 	// If you give a count before AND after the operator, they are
 	// multiplied.
-	if (cap->count0)
+	якщо (cap->count0)
 	{
-	    if (cap->opcount >= 999999999L / cap->count0)
+	    якщо (cap->opcount >= 999999999L / cap->count0)
 		cap->count0 = 999999999L;
-	    else
+	    інакше
 		cap->count0 *= cap->opcount;
 	}
-	else
+	інакше
 	    cap->count0 = cap->opcount;
     }
 
@@ -328,20 +328,20 @@ getcount:
 #ifdef FEAT_EVAL
     // Only set v:count when called from main() and not a stuffed command.
     // Do set it for redo.
-    if (toplevel && readbuf1_empty())
+    якщо (toplevel && readbuf1_empty())
 	set_vcount(cap->count0, cap->count1, set_prevcount);
 #endif
 
-    return c;
+    повернути c;
 }
 
 /*
  * Returns TRUE if the normal command (cap) needs a second character.
  */
-    static int
+    static ціле
 normal_cmd_needs_more_chars(cmdarg_T *cap, short_u cmd_flags)
 {
-    return ((cmd_flags & NV_NCH)
+    повернути ((cmd_flags & NV_NCH)
 	    && (((cmd_flags & NV_NCH_NOP) == NV_NCH_NOP
 		    && cap->oap->op_type == OP_NOP)
 		|| (cmd_flags & NV_NCH_ALW) == NV_NCH_ALW
@@ -357,21 +357,21 @@ normal_cmd_needs_more_chars(cmdarg_T *cap, short_u cmd_flags)
  * Get one or more additional characters for a normal command.
  * Return the updated command index (if changed).
  */
-    static int
+    static ціле
 normal_cmd_get_more_chars(
-	int	    idx_arg,
+	ціле	    idx_arg,
 	cmdarg_T    *cap,
-	int	    *need_flushbuf UNUSED)
+	ціле	    *need_flushbuf UNUSED)
 {
-    int		idx = idx_arg;
-    int		c;
-    int		*cp;
-    int		repl = FALSE;	// get character for replace mode
-    int		lit = FALSE;	// get extra character literally
-    int		langmap_active = FALSE;    // using :lmap mappings
-    int		lang;		// getting a text character
+    ціле		idx = idx_arg;
+    ціле		c;
+    ціле		*cp;
+    ціле		repl = FALSE;	// get character for replace mode
+    ціле		lit = FALSE;	// get extra character literally
+    ціле		langmap_active = FALSE;    // using :lmap mappings
+    ціле		lang;		// getting a text character
 #ifdef HAVE_INPUT_METHOD
-    int		save_smd;	// saved value of p_smd
+    ціле		save_smd;	// saved value of p_smd
 #endif
 
     ++no_mapping;
@@ -379,7 +379,7 @@ normal_cmd_get_more_chars(
     // Don't generate a CursorHold event here, most commands can't handle
     // it, e.g., nv_replace(), nv_csearch().
     did_cursorhold = TRUE;
-    if (cap->cmdchar == 'g')
+    якщо (cap->cmdchar == 'g')
     {
 	/*
 	 * For 'g' get the next character now, so that we can check for
@@ -388,21 +388,21 @@ normal_cmd_get_more_chars(
 	cap->nchar = plain_vgetc();
 	LANGMAP_ADJUST(cap->nchar, TRUE);
 	*need_flushbuf |= add_to_showcmd(cap->nchar);
-	if (cap->nchar == 'r' || cap->nchar == '\'' || cap->nchar == '`'
+	якщо (cap->nchar == 'r' || cap->nchar == '\'' || cap->nchar == '`'
 		|| cap->nchar == Ctrl_BSL)
 	{
 	    cp = &cap->extra_char;	// need to get a third character
-	    if (cap->nchar != 'r')
+	    якщо (cap->nchar != 'r')
 		lit = TRUE;			// get it literally
-	    else
+	    інакше
 		repl = TRUE;		// get it in replace mode
 	}
-	else
+	інакше
 	    cp = NULL;		// no third character needed
     }
-    else
+    інакше
     {
-	if (cap->cmdchar == 'r')		// get it in replace mode
+	якщо (cap->cmdchar == 'r')		// get it in replace mode
 	    repl = TRUE;
 	cp = &cap->nchar;
     }
@@ -411,9 +411,9 @@ normal_cmd_get_more_chars(
     /*
      * Get a second or third character.
      */
-    if (cp != NULL)
+    якщо (cp != NULL)
     {
-	if (repl)
+	якщо (repl)
 	{
 	    State = MODE_REPLACE;	// pretend Replace mode
 #ifdef CURSOR_SHAPE
@@ -423,24 +423,24 @@ normal_cmd_get_more_chars(
 	    update_mouseshape(-1);
 #endif
 	}
-	if (lang && curbuf->b_p_iminsert == B_IMODE_LMAP)
+	якщо (lang && curbuf->b_p_iminsert == B_IMODE_LMAP)
 	{
 	    // Allow mappings defined with ":lmap".
 	    --no_mapping;
 	    --allow_keys;
-	    if (repl)
+	    якщо (repl)
 		State = MODE_LREPLACE;
-	    else
+	    інакше
 		State = MODE_LANGMAP;
 	    langmap_active = TRUE;
 	}
 #ifdef HAVE_INPUT_METHOD
 	save_smd = p_smd;
 	p_smd = FALSE;	// Don't let the IM code show the mode here
-	if (lang && curbuf->b_p_iminsert == B_IMODE_IM)
+	якщо (lang && curbuf->b_p_iminsert == B_IMODE_IM)
 	    im_set_active(TRUE);
 #endif
-	if ((State & MODE_INSERT) && !p_ek)
+	якщо ((State & MODE_INSERT) && !p_ek)
 	{
 	    MAY_WANT_TO_LOG_THIS;
 
@@ -452,7 +452,7 @@ normal_cmd_get_more_chars(
 
 	*cp = plain_vgetc();
 
-	if ((State & MODE_INSERT) && !p_ek)
+	якщо ((State & MODE_INSERT) && !p_ek)
 	{
 	    MAY_WANT_TO_LOG_THIS;
 
@@ -461,7 +461,7 @@ normal_cmd_get_more_chars(
 	    out_str_t_TI();
 	}
 
-	if (langmap_active)
+	якщо (langmap_active)
 	{
 	    // Undo the decrement done above
 	    ++no_mapping;
@@ -469,9 +469,9 @@ normal_cmd_get_more_chars(
 	    State = MODE_NORMAL_BUSY;
 	}
 #ifdef HAVE_INPUT_METHOD
-	if (lang)
+	якщо (lang)
 	{
-	    if (curbuf->b_p_iminsert != B_IMODE_LMAP)
+	    якщо (curbuf->b_p_iminsert != B_IMODE_LMAP)
 		im_save_status(&curbuf->b_p_iminsert);
 	    im_set_active(FALSE);
 	}
@@ -480,17 +480,17 @@ normal_cmd_get_more_chars(
 	State = MODE_NORMAL_BUSY;
 	*need_flushbuf |= add_to_showcmd(*cp);
 
-	if (!lit)
+	якщо (!lit)
 	{
 #ifdef FEAT_DIGRAPHS
 	    // Typing CTRL-K gets a digraph.
-	    if (*cp == Ctrl_K
+	    якщо (*cp == Ctrl_K
 		    && ((nv_cmds[idx].cmd_flags & NV_LANG)
 			|| cp == &cap->extra_char)
 		    && vim_strchr(p_cpo, CPO_DIGRAPH) == NULL)
 	    {
 		c = get_digraph(FALSE);
-		if (c > 0)
+		якщо (c > 0)
 		{
 		    *cp = c;
 		    // Guessing how to update showcmd here...
@@ -504,14 +504,14 @@ normal_cmd_get_more_chars(
 	    LANGMAP_ADJUST(*cp, !lang);
 #ifdef FEAT_RIGHTLEFT
 	    // adjust Hebrew mapped char
-	    if (p_hkmap && lang && KeyTyped)
+	    якщо (p_hkmap && lang && KeyTyped)
 		*cp = hkmap(*cp);
 #endif
 	}
 
 	// When the next character is CTRL-\ a following CTRL-N means the
 	// command is aborted and we go to Normal mode.
-	if (cp == &cap->extra_char
+	якщо (cp == &cap->extra_char
 		&& cap->nchar == Ctrl_BSL
 		&& (cap->extra_char == Ctrl_N || cap->extra_char == Ctrl_G))
 	{
@@ -519,26 +519,26 @@ normal_cmd_get_more_chars(
 	    cap->nchar = cap->extra_char;
 	    idx = find_command(cap->cmdchar);
 	}
-	else if ((cap->nchar == 'n' || cap->nchar == 'N')
+	інакше якщо ((cap->nchar == 'n' || cap->nchar == 'N')
 							&& cap->cmdchar == 'g')
 	    cap->oap->op_type = get_op_type(*cp, NUL);
-	else if (*cp == Ctrl_BSL)
+	інакше якщо (*cp == Ctrl_BSL)
 	{
 	    long towait = (p_ttm >= 0 ? p_ttm : p_tm);
 
 	    // There is a busy wait here when typing "f<C-\>" and then
 	    // something different from CTRL-N.  Can't be avoided.
-	    while ((c = vpeekc()) <= 0 && towait > 0L)
+	    поки ((c = vpeekc()) <= 0 && towait > 0L)
 	    {
 		do_sleep(towait > 50L ? 50L : towait, FALSE);
 		towait -= 50L;
 	    }
-	    if (c > 0)
+	    якщо (c > 0)
 	    {
 		c = plain_vgetc();
-		if (c != Ctrl_N && c != Ctrl_G)
+		якщо (c != Ctrl_N && c != Ctrl_G)
 		    vungetc(c);
-		else
+		інакше
 		{
 		    cap->cmdchar = Ctrl_BSL;
 		    cap->nchar = c;
@@ -547,7 +547,7 @@ normal_cmd_get_more_chars(
 	    }
 	}
 
-	if (enc_utf8 && lang)
+	якщо (enc_utf8 && lang)
 	{
 	    // When getting a text character and the next character is a
 	    // multi-byte character, it could be a composing character.
@@ -555,18 +555,18 @@ normal_cmd_get_more_chars(
 	    // because if it's put back with vungetc() it's too late to apply
 	    // mapping.
 	    --no_mapping;
-	    while ((c = vpeekc()) > 0
+	    поки ((c = vpeekc()) > 0
 		    && (c >= 0x100 || MB_BYTE2LEN(vpeekc()) > 1))
 	    {
 		c = plain_vgetc();
-		if (!utf_iscomposing(c))
+		якщо (!utf_iscomposing(c))
 		{
 		    vungetc(c);		// it wasn't, put it back
 		    break;
 		}
-		else if (cap->ncharC1 == 0)
+		інакше якщо (cap->ncharC1 == 0)
 		    cap->ncharC1 = c;
-		else
+		інакше
 		    cap->ncharC2 = c;
 	    }
 	    ++no_mapping;
@@ -582,7 +582,7 @@ normal_cmd_get_more_chars(
     --no_mapping;
     --allow_keys;
 
-    return idx;
+    повернути idx;
 }
 
 /*
@@ -590,7 +590,7 @@ normal_cmd_get_more_chars(
  * moment when a message is displayed that will be overwritten by the mode
  * message.
  */
-    static int
+    static ціле
 normal_cmd_need_to_wait_for_msg(cmdarg_T *cap, pos_T *old_pos)
 {
     // In Visual mode and with "^O" in Insert mode, a short message will be
@@ -601,7 +601,7 @@ normal_cmd_need_to_wait_for_msg(cmdarg_T *cap, pos_T *old_pos)
     // Don't wait when emsg_silent is non-zero.
     // Also wait a bit after an error message, e.g. for "^O:".
     // Don't redraw the screen, it would remove the message.
-    return (       ((p_smd
+    повернути (       ((p_smd
 		    && msg_silent == 0
 		    && (restart_edit != 0
 			|| (VIsual_active
@@ -634,15 +634,15 @@ normal_cmd_need_to_wait_for_msg(cmdarg_T *cap, pos_T *old_pos)
     static void
 normal_cmd_wait_for_msg(void)
 {
-    int	save_State = State;
+    ціле	save_State = State;
 
     // Draw the cursor with the right shape here
-    if (restart_edit != 0)
+    якщо (restart_edit != 0)
 	State = MODE_INSERT;
 
     // If need to redraw, and there is a "keep_msg", redraw before the
     // delay
-    if (must_redraw && keep_msg != NULL && !emsg_on_display)
+    якщо (must_redraw && keep_msg != NULL && !emsg_on_display)
     {
 	char_u	*kmsg;
 
@@ -656,7 +656,7 @@ normal_cmd_wait_for_msg(void)
 	keep_msg = kmsg;
 
 	kmsg = vim_strsave(keep_msg);
-	if (kmsg != NULL)
+	якщо (kmsg != NULL)
 	{
 	    msg_attr((char *)kmsg, keep_msg_attr);
 	    vim_free(kmsg);
@@ -668,7 +668,7 @@ normal_cmd_wait_for_msg(void)
 #endif
     cursor_on();
     out_flush();
-    if (msg_scroll || emsg_on_display)
+    якщо (msg_scroll || emsg_on_display)
 	ui_delay(1003L, TRUE);	// wait at least one second
     ui_delay(3003L, FALSE);		// wait up to three seconds
     State = save_State;
@@ -683,21 +683,21 @@ normal_cmd_wait_for_msg(void)
     void
 normal_cmd(
     oparg_T	*oap,
-    int		toplevel UNUSED)	// TRUE when called from main()
+    ціле		toplevel UNUSED)	// TRUE when called from main()
 {
     cmdarg_T	ca;			// command arguments
-    int		c;
-    int		ctrl_w = FALSE;		// got CTRL-W command
-    int		old_col = curwin->w_curswant;
-    int		need_flushbuf = FALSE;	// need to call out_flush()
+    ціле		c;
+    ціле		ctrl_w = FALSE;		// got CTRL-W command
+    ціле		old_col = curwin->w_curswant;
+    ціле		need_flushbuf = FALSE;	// need to call out_flush()
     pos_T	old_pos;		// cursor position before command
-    int		mapped_len;
-    static int	old_mapped_len = 0;
-    int		idx;
-    int		set_prevcount = FALSE;
-    int		save_did_cursorhold = did_cursorhold;
+    ціле		mapped_len;
+    static ціле	old_mapped_len = 0;
+    ціле		idx;
+    ціле		set_prevcount = FALSE;
+    ціле		save_did_cursorhold = did_cursorhold;
 #ifdef FEAT_EVAL
-    int		did_visual_op = FALSE;
+    ціле		did_visual_op = FALSE;
 #endif
 
     CLEAR_FIELD(ca);	// also resets ca.retval
@@ -716,7 +716,7 @@ normal_cmd(
 #endif
     finish_op = (oap->op_type != OP_NOP);
 #ifdef CURSOR_SHAPE
-    if (finish_op != c)
+    якщо (finish_op != c)
     {
 	ui_cursor_shape();		// may show different cursor shape
 # ifdef FEAT_MOUSESHAPE
@@ -728,7 +728,7 @@ normal_cmd(
 
     // When not finishing an operator and no register name typed, reset the
     // count.
-    if (!finish_op && !oap->regname)
+    якщо (!finish_op && !oap->regname)
     {
 	ca.opcount = 0;
 #ifdef FEAT_EVAL
@@ -739,7 +739,7 @@ normal_cmd(
     // Restore counts from before receiving K_CURSORHOLD.  This means after
     // typing "3", handling K_CURSORHOLD and then typing "2" we get "32", not
     // "3 * 2".
-    if (oap->prev_opcount > 0 || oap->prev_count0 > 0)
+    якщо (oap->prev_opcount > 0 || oap->prev_count0 > 0)
     {
 	ca.opcount = oap->prev_opcount;
 	ca.count0 = oap->prev_count0;
@@ -758,7 +758,7 @@ normal_cmd(
     // Set v:count here, when called from main() and not a stuffed
     // command, so that v:count can be used in an expression mapping
     // when there is no count. Do set it for redo.
-    if (toplevel && readbuf1_empty())
+    якщо (toplevel && readbuf1_empty())
 	set_vcount_ca(&ca, &set_prevcount);
 #endif
 
@@ -771,21 +771,21 @@ normal_cmd(
     // If a mapping was started in Visual or Select mode, remember the length
     // of the mapping.  This is used below to not return to Insert mode for as
     // long as the mapping is being executed.
-    if (restart_edit == 0)
+    якщо (restart_edit == 0)
 	old_mapped_len = 0;
-    else if (old_mapped_len
+    інакше якщо (old_mapped_len
 		|| (VIsual_active && mapped_len == 0 && typebuf_maplen() > 0))
 	old_mapped_len = typebuf_maplen();
 
-    if (c == NUL)
+    якщо (c == NUL)
 	c = K_ZERO;
 
     // In Select mode, typed text replaces the selection.
-    if (VIsual_active
+    якщо (VIsual_active
 	    && VIsual_select
 	    && (vim_isprintc(c) || c == NL || c == CAR || c == K_KENTER))
     {
-	int len;
+	ціле len;
 
 	// Fake a "c"hange command.  When "restart_edit" is set (e.g., because
 	// 'insertmode' is set) fake a "d"elete command, Insert mode will
@@ -796,12 +796,12 @@ normal_cmd(
 
 	// When recording and gotchars() was called the character will be
 	// recorded again, remove the previous recording.
-	if (KeyTyped)
+	якщо (KeyTyped)
 	    ungetchars(len);
 
-	if (restart_edit != 0)
+	якщо (restart_edit != 0)
 	    c = 'd';
-	else
+	інакше
 	    c = 'c';
 	msg_nowait = TRUE;	// don't delay going to insert mode
 	old_mapped_len = 0;	// do go to Insert mode
@@ -809,7 +809,7 @@ normal_cmd(
 
     // If the window was made so small that nothing shows, make it at least one
     // line and one column when typing a command.
-    if (KeyTyped && !KeyStuffed)
+    якщо (KeyTyped && !KeyStuffed)
 	win_ensure_size();
 
     need_flushbuf = add_to_showcmd(c);
@@ -820,30 +820,30 @@ normal_cmd(
 
     // Find the command character in the table of commands.
     // For CTRL-W we already got nchar when looking for a count.
-    if (ctrl_w)
+    якщо (ctrl_w)
     {
 	ca.nchar = c;
 	ca.cmdchar = Ctrl_W;
     }
-    else
+    інакше
 	ca.cmdchar = c;
     idx = find_command(ca.cmdchar);
-    if (idx < 0)
+    якщо (idx < 0)
     {
 	// Not a known command: beep.
 	clearopbeep(oap);
 	goto normal_end;
     }
 
-    if ((nv_cmds[idx].cmd_flags & NV_NCW) && check_text_or_curbuf_locked(oap))
+    якщо ((nv_cmds[idx].cmd_flags & NV_NCW) && check_text_or_curbuf_locked(oap))
 	// this command is not allowed now
 	goto normal_end;
 
     // In Visual/Select mode, a few keys are handled in a special way.
-    if (VIsual_active)
+    якщо (VIsual_active)
     {
 	// when 'keymodel' contains "stopsel" may stop Select/Visual mode
-	if (km_stopsel
+	якщо (km_stopsel
 		&& (nv_cmds[idx].cmd_flags & NV_STS)
 		&& !(mod_mask & MOD_MASK_SHIFT))
 	{
@@ -852,27 +852,27 @@ normal_cmd(
 	}
 
 	// Keys that work different when 'keymodel' contains "startsel"
-	if (km_startsel)
+	якщо (km_startsel)
 	{
-	    if (nv_cmds[idx].cmd_flags & NV_SS)
+	    якщо (nv_cmds[idx].cmd_flags & NV_SS)
 	    {
 		unshift_special(&ca);
 		idx = find_command(ca.cmdchar);
-		if (idx < 0)
+		якщо (idx < 0)
 		{
 		    // Just in case
 		    clearopbeep(oap);
 		    goto normal_end;
 		}
 	    }
-	    else if ((nv_cmds[idx].cmd_flags & NV_SSS)
+	    інакше якщо ((nv_cmds[idx].cmd_flags & NV_SSS)
 					       && (mod_mask & MOD_MASK_SHIFT))
 		mod_mask &= ~MOD_MASK_SHIFT;
 	}
     }
 
 #ifdef FEAT_RIGHTLEFT
-    if (curwin->w_p_rl && KeyTyped && !KeyStuffed
+    якщо (curwin->w_p_rl && KeyTyped && !KeyStuffed
 					  && (nv_cmds[idx].cmd_flags & NV_RL))
     {
 	// Invert horizontal movements and operations.  Only when typed by the
@@ -896,35 +896,35 @@ normal_cmd(
 #endif
 
     // Get additional characters if we need them.
-    if (normal_cmd_needs_more_chars(&ca, nv_cmds[idx].cmd_flags))
+    якщо (normal_cmd_needs_more_chars(&ca, nv_cmds[idx].cmd_flags))
 	idx = normal_cmd_get_more_chars(idx, &ca, &need_flushbuf);
 
     // Flush the showcmd characters onto the screen so we can see them while
     // the command is being executed.  Only do this when the shown command was
     // actually displayed, otherwise this will slow down a lot when executing
     // mappings.
-    if (need_flushbuf)
+    якщо (need_flushbuf)
 	out_flush();
 
-    if (ca.cmdchar != K_IGNORE)
+    якщо (ca.cmdchar != K_IGNORE)
     {
-	if (ex_normal_busy)
+	якщо (ex_normal_busy)
 	    did_cursorhold = save_did_cursorhold;
-	else
+	інакше
 	    did_cursorhold = FALSE;
     }
 
     State = MODE_NORMAL;
 
-    if (ca.nchar == ESC || ca.extra_char == ESC)
+    якщо (ca.nchar == ESC || ca.extra_char == ESC)
     {
 	clearop(oap);
-	if (restart_edit == 0 && goto_im())
+	якщо (restart_edit == 0 && goto_im())
 	    restart_edit = 'a';
 	goto normal_end;
     }
 
-    if (ca.cmdchar != K_IGNORE)
+    якщо (ca.cmdchar != K_IGNORE)
     {
 	msg_didout = FALSE;    // don't scroll screen up for normal command
 	msg_col = 0;
@@ -934,15 +934,15 @@ normal_cmd(
 
     // When 'keymodel' contains "startsel" some keys start Select/Visual
     // mode.
-    if (!VIsual_active && km_startsel)
+    якщо (!VIsual_active && km_startsel)
     {
-	if (nv_cmds[idx].cmd_flags & NV_SS)
+	якщо (nv_cmds[idx].cmd_flags & NV_SS)
 	{
 	    start_selection();
 	    unshift_special(&ca);
 	    idx = find_command(ca.cmdchar);
 	}
-	else if ((nv_cmds[idx].cmd_flags & NV_SSS)
+	інакше якщо ((nv_cmds[idx].cmd_flags & NV_SSS)
 					   && (mod_mask & MOD_MASK_SHIFT))
 	{
 	    start_selection();
@@ -957,7 +957,7 @@ normal_cmd(
 
     // If we didn't start or finish an operator, reset oap->regname, unless we
     // need it later.
-    if (!finish_op
+    якщо (!finish_op
 	    && !oap->op_type
 	    && (idx < 0 || !(nv_cmds[idx].cmd_flags & NV_KEEPREG)))
     {
@@ -969,12 +969,12 @@ normal_cmd(
 
     // Get the length of mapped chars again after typing a count, second
     // character or "z333<cr>".
-    if (old_mapped_len > 0)
+    якщо (old_mapped_len > 0)
 	old_mapped_len = typebuf_maplen();
 
     // If an operation is pending, handle it.  But not for K_IGNORE or
     // K_MOUSEMOVE.
-    if (ca.cmdchar != K_IGNORE && ca.cmdchar != K_MOUSEMOVE)
+    якщо (ca.cmdchar != K_IGNORE && ca.cmdchar != K_MOUSEMOVE)
     {
 #ifdef FEAT_EVAL
 	did_visual_op = VIsual_active && oap->op_type != OP_NOP
@@ -987,7 +987,7 @@ normal_cmd(
 
     // Wait for a moment when a message is displayed that will be overwritten
     // by the mode message.
-    if (normal_cmd_need_to_wait_for_msg(&ca, &old_pos))
+    якщо (normal_cmd_need_to_wait_for_msg(&ca, &old_pos))
 	normal_cmd_wait_for_msg();
 
     // Finish up after executing a Normal mode command.
@@ -996,14 +996,14 @@ normal_end:
     msg_nowait = FALSE;
 
 #ifdef FEAT_EVAL
-    if (finish_op || did_visual_op)
+    якщо (finish_op || did_visual_op)
 	reset_reg_var();
 #endif
 
 #ifdef CURSOR_SHAPE
-    int prev_finish_op = finish_op;
+    ціле prev_finish_op = finish_op;
 #endif
-    if (oap->op_type == OP_NOP)
+    якщо (oap->op_type == OP_NOP)
     {
 	// Reset finish_op, in case it was set
 	finish_op = FALSE;
@@ -1012,7 +1012,7 @@ normal_end:
 #ifdef CURSOR_SHAPE
     // Redraw the cursor with another shape, if we were in Operator-pending
     // mode or did a replace command.
-    if (prev_finish_op || ca.cmdchar == 'r'
+    якщо (prev_finish_op || ca.cmdchar == 'r'
 				     || (ca.cmdchar == 'g' && ca.nchar == 'r'))
     {
 	ui_cursor_shape();		// may show different cursor shape
@@ -1022,23 +1022,23 @@ normal_end:
     }
 #endif
 
-    if (oap->op_type == OP_NOP && oap->regname == 0
+    якщо (oap->op_type == OP_NOP && oap->regname == 0
 						 && ca.cmdchar != K_CURSORHOLD)
 	clear_showcmd();
 
     checkpcmark();		// check if we moved since setting pcmark
     vim_free(ca.searchbuf);
 
-    if (has_mbyte)
+    якщо (has_mbyte)
 	mb_adjust_cursor();
 
-    if (curwin->w_p_scb && toplevel)
+    якщо (curwin->w_p_scb && toplevel)
     {
 	validate_cursor();	// may need to update w_leftcol
 	do_check_scrollbind(TRUE);
     }
 
-    if (curwin->w_p_crb && toplevel)
+    якщо (curwin->w_p_crb && toplevel)
     {
 	validate_cursor();	// may need to update w_leftcol
 	do_check_cursorbind();
@@ -1046,21 +1046,21 @@ normal_end:
 
 #ifdef FEAT_TERMINAL
     // don't go to Insert mode if a terminal has a running job
-    if (term_job_running(curbuf->b_term))
+    якщо (term_job_running(curbuf->b_term))
 	restart_edit = 0;
 #endif
 
     // May restart edit(), if we got here with CTRL-O in Insert mode (but not
     // if still inside a mapping that started in Visual mode).
     // May switch from Visual to Select mode after CTRL-O command.
-    if (       oap->op_type == OP_NOP
+    якщо (       oap->op_type == OP_NOP
 	    && ((restart_edit != 0 && !VIsual_active && old_mapped_len == 0)
 		|| restart_VIsual_select == 1)
 	    && !(ca.retval & CA_COMMAND_BUSY)
 	    && stuff_empty()
 	    && oap->regname == 0)
     {
-	if (restart_VIsual_select == 1)
+	якщо (restart_VIsual_select == 1)
 	{
 	    VIsual_select = TRUE;
 	    may_trigger_modechanged();
@@ -1068,11 +1068,11 @@ normal_end:
 	    restart_VIsual_select = 0;
 	    VIsual_select_reg = 0;
 	}
-	if (restart_edit != 0 && !VIsual_active && old_mapped_len == 0)
+	якщо (restart_edit != 0 && !VIsual_active && old_mapped_len == 0)
 	    (void)edit(restart_edit, FALSE, 1L);
     }
 
-    if (restart_VIsual_select == 2)
+    якщо (restart_VIsual_select == 2)
 	restart_VIsual_select = 1;
 
     // Save count before an operator for next time.
@@ -1085,12 +1085,12 @@ normal_end:
  * Set v:prevcount only when "set_prevcount" is TRUE.
  */
     static void
-set_vcount_ca(cmdarg_T *cap, int *set_prevcount)
+set_vcount_ca(cmdarg_T *cap, ціле *set_prevcount)
 {
     long count = cap->count0;
 
     // multiply with cap->opcount the same way as above
-    if (cap->opcount != 0)
+    якщо (cap->opcount != 0)
 	count = cap->opcount * (count == 0 ? 1 : count);
     set_vcount(count, count == 0 ? 1 : count, *set_prevcount);
     *set_prevcount = FALSE;  // only set v:prevcount once
@@ -1104,22 +1104,22 @@ set_vcount_ca(cmdarg_T *cap, int *set_prevcount)
     void
 check_visual_highlight(void)
 {
-    static int	    did_check = FALSE;
+    static ціле	    did_check = FALSE;
 
-    if (full_screen)
+    якщо (full_screen)
     {
-	if (!did_check && HL_ATTR(HLF_V) == 0)
+	якщо (!did_check && HL_ATTR(HLF_V) == 0)
 	    msg(_("Warning: terminal cannot highlight"));
 	did_check = TRUE;
     }
 }
 
-#if defined(FEAT_CLIPBOARD) && defined(FEAT_EVAL)
+#якщо defined(FEAT_CLIPBOARD) && defined(FEAT_EVAL)
 /*
  * Call yank_do_autocmd() for "regname".
  */
     static void
-call_yank_do_autocmd(int regname)
+call_yank_do_autocmd(ціле regname)
 {
     oparg_T	oa;
     yankreg_T	*reg;
@@ -1155,18 +1155,18 @@ end_visual_mode_keep_button(void)
     // we need to paste it somewhere while we still own the selection.
     // Only do this when the clipboard is already owned.  Don't want to grab
     // the selection when hitting ESC.
-    if ((clip_star.available && clip_star.owned)
+    якщо ((clip_star.available && clip_star.owned)
 	    || (clip_plus.available && clip_plus.owned))
 	clip_auto_select();
 
-# if defined(FEAT_EVAL)
+# якщо defined(FEAT_EVAL)
     // Emit a TextYankPost for the automatic copy of the selection into the
     // star and/or plus register.
-    if (has_textyankpost())
+    якщо (has_textyankpost())
     {
-	if (clip_isautosel_star())
+	якщо (clip_isautosel_star())
 	    call_yank_do_autocmd('*');
-	if (clip_isautosel_plus())
+	якщо (clip_isautosel_plus())
 	    call_yank_do_autocmd('+');
     }
 # endif
@@ -1184,7 +1184,7 @@ end_visual_mode_keep_button(void)
 #ifdef FEAT_EVAL
     curbuf->b_visual_mode_eval = VIsual_mode;
 #endif
-    if (!virtual_active())
+    якщо (!virtual_active())
 	curwin->w_cursor.coladd = 0;
     may_clear_cmdline();
 
@@ -1198,7 +1198,7 @@ end_visual_mode_keep_button(void)
     void
 reset_VIsual_and_resel(void)
 {
-    if (VIsual_active)
+    якщо (VIsual_active)
     {
 	end_visual_mode();
 	redraw_curbuf_later(UPD_INVERTED);	// delete the inversion later
@@ -1212,7 +1212,7 @@ reset_VIsual_and_resel(void)
     void
 reset_VIsual(void)
 {
-    if (VIsual_active)
+    якщо (VIsual_active)
     {
 	end_visual_mode();
 	redraw_curbuf_later(UPD_INVERTED);	// delete the inversion later
@@ -1223,7 +1223,7 @@ reset_VIsual(void)
     void
 restore_visual_mode(void)
 {
-    if (VIsual_mode_orig != NUL)
+    якщо (VIsual_mode_orig != NUL)
     {
 	curbuf->b_visual.vi_mode = VIsual_mode_orig;
 	VIsual_mode_orig = NUL;
@@ -1238,35 +1238,35 @@ restore_visual_mode(void)
  * "*colp" is in/decremented if "ptr[-dir]" should also be included.
  * "bnp" points to a counter for square brackets.
  */
-    static int
+    static ціле
 find_is_eval_item(
     char_u	*ptr,
-    int		*colp,
-    int		*bnp,
-    int		dir)
+    ціле		*colp,
+    ціле		*bnp,
+    ціле		dir)
 {
     // Accept everything inside [].
-    if ((*ptr == ']' && dir == BACKWARD) || (*ptr == '[' && dir == FORWARD))
+    якщо ((*ptr == ']' && dir == BACKWARD) || (*ptr == '[' && dir == FORWARD))
 	++*bnp;
-    if (*bnp > 0)
+    якщо (*bnp > 0)
     {
-	if ((*ptr == '[' && dir == BACKWARD) || (*ptr == ']' && dir == FORWARD))
+	якщо ((*ptr == '[' && dir == BACKWARD) || (*ptr == ']' && dir == FORWARD))
 	    --*bnp;
-	return TRUE;
+	повернути TRUE;
     }
 
     // skip over "s.var"
-    if (*ptr == '.')
-	return TRUE;
+    якщо (*ptr == '.')
+	повернути TRUE;
 
     // two-character item: s->var
-    if (ptr[dir == BACKWARD ? 0 : 1] == '>'
+    якщо (ptr[dir == BACKWARD ? 0 : 1] == '>'
 	    && ptr[dir == BACKWARD ? -1 : 0] == '-')
     {
 	*colp += dir;
-	return TRUE;
+	повернути TRUE;
     }
-    return FALSE;
+    повернути FALSE;
 }
 
 /*
@@ -1290,10 +1290,10 @@ find_is_eval_item(
  * If text is found, a pointer to the text is put in "*text".  This
  * points into the current buffer line and is not always NUL terminated.
  */
-    int
-find_ident_under_cursor(char_u **text, int find_type)
+    ціле
+find_ident_under_cursor(char_u **text, ціле find_type)
 {
-    return find_ident_at_pos(curwin, curwin->w_cursor.lnum,
+    повернути find_ident_at_pos(curwin, curwin->w_cursor.lnum,
 				curwin->w_cursor.col, text, NULL, find_type);
 }
 
@@ -1301,47 +1301,47 @@ find_ident_under_cursor(char_u **text, int find_type)
  * Like find_ident_under_cursor(), but for any window and any position.
  * However: Uses 'iskeyword' from the current window!.
  */
-    int
+    ціле
 find_ident_at_pos(
     win_T	*wp,
     linenr_T	lnum,
     colnr_T	startcol,
     char_u	**text,
-    int		*textcol,	// column where "text" starts, can be NULL
-    int		find_type)
+    ціле		*textcol,	// column where "text" starts, can be NULL
+    ціле		find_type)
 {
     char_u	*ptr;
-    int		col = 0;	// init to shut up GCC
-    int		i;
-    int		this_class = 0;
-    int		prev_class;
-    int		prevcol;
-    int		bn = 0;		// bracket nesting
+    ціле		col = 0;	// init to shut up GCC
+    ціле		i;
+    ціле		this_class = 0;
+    ціле		prev_class;
+    ціле		prevcol;
+    ціле		bn = 0;		// bracket nesting
 
     // if i == 0: try to find an identifier
     // if i == 1: try to find any non-white text
     ptr = ml_get_buf(wp->w_buffer, lnum, FALSE);
-    for (i = (find_type & FIND_IDENT) ? 0 : 1;	i < 2; ++i)
+    для (i = (find_type & FIND_IDENT) ? 0 : 1;	i < 2; ++i)
     {
 	/*
 	 * 1. skip to start of identifier/text
 	 */
 	col = startcol;
-	if (has_mbyte)
+	якщо (has_mbyte)
 	{
-	    while (ptr[col] != NUL)
+	    поки (ptr[col] != NUL)
 	    {
 		// Stop at a ']' to evaluate "a[x]".
-		if ((find_type & FIND_EVAL) && ptr[col] == ']')
+		якщо ((find_type & FIND_EVAL) && ptr[col] == ']')
 		    break;
 		this_class = mb_get_class(ptr + col);
-		if (this_class != 0 && (i == 1 || this_class != 1))
+		якщо (this_class != 0 && (i == 1 || this_class != 1))
 		    break;
 		col += (*mb_ptr2len)(ptr + col);
 	    }
 	}
-	else
-	    while (ptr[col] != NUL
+	інакше
+	    поки (ptr[col] != NUL
 		    && (i == 0 ? !vim_iswordc(ptr[col]) : VIM_ISWHITE(ptr[col]))
 		    && (!(find_type & FIND_EVAL) || ptr[col] != ']')
 		    )
@@ -1353,18 +1353,18 @@ find_ident_at_pos(
 	/*
 	 * 2. Back up to start of identifier/text.
 	 */
-	if (has_mbyte)
+	якщо (has_mbyte)
 	{
 	    // Remember class of character under cursor.
-	    if ((find_type & FIND_EVAL) && ptr[col] == ']')
+	    якщо ((find_type & FIND_EVAL) && ptr[col] == ']')
 		this_class = mb_get_class((char_u *)"a");
-	    else
+	    інакше
 		this_class = mb_get_class(ptr + col);
-	    while (col > 0 && this_class != 0)
+	    поки (col > 0 && this_class != 0)
 	    {
 		prevcol = col - 1 - (*mb_head_off)(ptr, ptr + col - 1);
 		prev_class = mb_get_class(ptr + prevcol);
-		if (this_class != prev_class
+		якщо (this_class != prev_class
 			&& (i == 0
 			    || prev_class == 0
 			    || (find_type & FIND_IDENT))
@@ -1379,14 +1379,14 @@ find_ident_at_pos(
 
 	    // If we don't want just any old text, or we've found an
 	    // identifier, stop searching.
-	    if (this_class > 2)
+	    якщо (this_class > 2)
 		this_class = 2;
-	    if (!(find_type & FIND_STRING) || this_class == 2)
+	    якщо (!(find_type & FIND_STRING) || this_class == 2)
 		break;
 	}
-	else
+	інакше
 	{
-	    while (col > 0
+	    поки (col > 0
 		    && ((i == 0
 			    ? vim_iswordc(ptr[col - 1])
 			    : (!VIM_ISWHITE(ptr[col - 1])
@@ -1401,27 +1401,27 @@ find_ident_at_pos(
 
 	    // If we don't want just any old text, or we've found an
 	    // identifier, stop searching.
-	    if (!(find_type & FIND_STRING) || vim_iswordc(ptr[col]))
+	    якщо (!(find_type & FIND_STRING) || vim_iswordc(ptr[col]))
 		break;
 	}
     }
 
-    if (ptr[col] == NUL || (i == 0
+    якщо (ptr[col] == NUL || (i == 0
 		&& (has_mbyte ? this_class != 2 : !vim_iswordc(ptr[col]))))
     {
 	// didn't find an identifier or text
-	if ((find_type & FIND_NOERROR) == 0)
+	якщо ((find_type & FIND_NOERROR) == 0)
 	{
-	    if (find_type & FIND_STRING)
+	    якщо (find_type & FIND_STRING)
 		emsg(_(e_no_string_under_cursor));
-	    else
+	    інакше
 		emsg(_(e_no_identifier_under_cursor));
 	}
-	return 0;
+	повернути 0;
     }
     ptr += col;
     *text = ptr;
-    if (textcol != NULL)
+    якщо (textcol != NULL)
 	*textcol = col;
 
     /*
@@ -1430,29 +1430,29 @@ find_ident_at_pos(
     bn = 0;
     startcol -= col;
     col = 0;
-    if (has_mbyte)
+    якщо (has_mbyte)
     {
 	// Search for point of changing multibyte character class.
 	this_class = mb_get_class(ptr);
-	while (ptr[col] != NUL
+	поки (ptr[col] != NUL
 		&& ((i == 0 ? mb_get_class(ptr + col) == this_class
 			    : mb_get_class(ptr + col) != 0)
 		    || ((find_type & FIND_EVAL)
-			&& col <= (int)startcol
+			&& col <= (ціле)startcol
 			&& find_is_eval_item(ptr + col, &col, &bn, FORWARD))
 		))
 	    col += (*mb_ptr2len)(ptr + col);
     }
-    else
-	while ((i == 0 ? vim_iswordc(ptr[col])
+    інакше
+	поки ((i == 0 ? vim_iswordc(ptr[col])
 		       : (ptr[col] != NUL && !VIM_ISWHITE(ptr[col])))
 		    || ((find_type & FIND_EVAL)
-			&& col <= (int)startcol
+			&& col <= (ціле)startcol
 			&& find_is_eval_item(ptr + col, &col, &bn, FORWARD))
 		)
 	    ++col;
 
-    return col;
+    повернути col;
 }
 
 /*
@@ -1471,13 +1471,13 @@ prep_redo_cmd(cmdarg_T *cap)
  */
     void
 prep_redo(
-    int	    regname,
+    ціле	    regname,
     long    num,
-    int	    cmd1,
-    int	    cmd2,
-    int	    cmd3,
-    int	    cmd4,
-    int	    cmd5)
+    ціле	    cmd1,
+    ціле	    cmd2,
+    ціле	    cmd3,
+    ціле	    cmd4,
+    ціле	    cmd5)
 {
     prep_redo_num2(regname, num, cmd1, cmd2, 0L, cmd3, cmd4, cmd5);
 }
@@ -1487,14 +1487,14 @@ prep_redo(
  */
     void
 prep_redo_num2(
-    int	    regname,
+    ціле	    regname,
     long    num1,
-    int	    cmd1,
-    int	    cmd2,
+    ціле	    cmd1,
+    ціле	    cmd2,
     long    num2,
-    int	    cmd3,
-    int	    cmd4,
-    int	    cmd5)
+    ціле	    cmd3,
+    ціле	    cmd4,
+    ціле	    cmd5)
 {
     ResetRedobuff();
 
@@ -1504,24 +1504,24 @@ prep_redo_num2(
     may_add_last_used_map_to_redobuff();
 #endif
 
-    if (regname != 0)	// yank from specified buffer
+    якщо (regname != 0)	// yank from specified buffer
     {
 	AppendCharToRedobuff('"');
 	AppendCharToRedobuff(regname);
     }
-    if (num1 != 0)
+    якщо (num1 != 0)
 	AppendNumberToRedobuff(num1);
-    if (cmd1 != NUL)
+    якщо (cmd1 != NUL)
 	AppendCharToRedobuff(cmd1);
-    if (cmd2 != NUL)
+    якщо (cmd2 != NUL)
 	AppendCharToRedobuff(cmd2);
-    if (num2 != 0)
+    якщо (num2 != 0)
 	AppendNumberToRedobuff(num2);
-    if (cmd3 != NUL)
+    якщо (cmd3 != NUL)
 	AppendCharToRedobuff(cmd3);
-    if (cmd4 != NUL)
+    якщо (cmd4 != NUL)
 	AppendCharToRedobuff(cmd4);
-    if (cmd5 != NUL)
+    якщо (cmd5 != NUL)
 	AppendCharToRedobuff(cmd5);
 }
 
@@ -1530,13 +1530,13 @@ prep_redo_num2(
  *
  * Beep and return TRUE if an operator was active.
  */
-    static int
+    static ціле
 checkclearop(oparg_T *oap)
 {
-    if (oap->op_type == OP_NOP)
-	return FALSE;
+    якщо (oap->op_type == OP_NOP)
+	повернути FALSE;
     clearopbeep(oap);
-    return TRUE;
+    повернути TRUE;
 }
 
 /*
@@ -1544,13 +1544,13 @@ checkclearop(oparg_T *oap)
  *
  * Beep and return TRUE if an operator or Visual was active.
  */
-    static int
+    static ціле
 checkclearopq(oparg_T *oap)
 {
-    if (oap->op_type == OP_NOP && !VIsual_active)
-	return FALSE;
+    якщо (oap->op_type == OP_NOP && !VIsual_active)
+	повернути FALSE;
     clearopbeep(oap);
-    return TRUE;
+    повернути TRUE;
 }
 
     void
@@ -1595,9 +1595,9 @@ unshift_special(cmdarg_T *cap)
     void
 may_clear_cmdline(void)
 {
-    if (mode_displayed)
+    якщо (mode_displayed)
 	clear_cmdline = TRUE;   // unshow visual mode later
-    else
+    інакше
 	clear_showcmd();
 }
 
@@ -1606,32 +1606,32 @@ may_clear_cmdline(void)
  */
 
 static char_u	old_showcmd_buf[SHOWCMD_BUFLEN];  // For push_showcmd()
-static int	showcmd_is_clear = TRUE;
-static int	showcmd_visual = FALSE;
+static ціле	showcmd_is_clear = TRUE;
+static ціле	showcmd_visual = FALSE;
 
 static void display_showcmd(void);
 
     void
 clear_showcmd(void)
 {
-    if (!p_sc)
-	return;
+    якщо (!p_sc)
+	повернути;
 
-    if (VIsual_active
+    якщо (VIsual_active
 	&& stuff_empty() && typebuf.tb_len == 0 && !using_script())
     {
-	int		cursor_bot = LT_POS(VIsual, curwin->w_cursor);
+	ціле		cursor_bot = LT_POS(VIsual, curwin->w_cursor);
 	long		lines;
 	colnr_T		leftcol, rightcol;
 	linenr_T	top, bot;
 
 	// Show the size of the Visual area.
-	if (cursor_bot)
+	якщо (cursor_bot)
 	{
 	    top = VIsual.lnum;
 	    bot = curwin->w_cursor.lnum;
 	}
-	else
+	інакше
 	{
 	    top = curwin->w_cursor.lnum;
 	    bot = VIsual.lnum;
@@ -1643,7 +1643,7 @@ clear_showcmd(void)
 #endif
 	lines = bot - top + 1;
 
-	if (VIsual_mode == Ctrl_V)
+	якщо (VIsual_mode == Ctrl_V)
 	{
 #ifdef FEAT_LINEBREAK
 	    char_u *saved_sbr = p_sbr;
@@ -1662,29 +1662,29 @@ clear_showcmd(void)
 	    vim_snprintf((char *)showcmd_buf, SHOWCMD_BUFLEN, "%ldx%ld", lines,
 					      (long)(rightcol - leftcol + 1));
 	}
-	else if (VIsual_mode == 'V' || VIsual.lnum != curwin->w_cursor.lnum)
+	інакше якщо (VIsual_mode == 'V' || VIsual.lnum != curwin->w_cursor.lnum)
 	    vim_snprintf((char *)showcmd_buf, SHOWCMD_BUFLEN, "%ld", lines);
-	else
+	інакше
 	{
 	    char_u  *s, *e;
-	    int	    l;
-	    int	    bytes = 0;
-	    int	    chars = 0;
+	    ціле	    l;
+	    ціле	    bytes = 0;
+	    ціле	    chars = 0;
 
-	    if (cursor_bot)
+	    якщо (cursor_bot)
 	    {
 		s = ml_get_pos(&VIsual);
 		e = ml_get_cursor();
 	    }
-	    else
+	    інакше
 	    {
 		s = ml_get_cursor();
 		e = ml_get_pos(&VIsual);
 	    }
-	    while ((*p_sel != 'e') ? s <= e : s < e)
+	    поки ((*p_sel != 'e') ? s <= e : s < e)
 	    {
 		l = (*mb_ptr2len)(s);
-		if (l == 0)
+		якщо (l == 0)
 		{
 		    ++bytes;
 		    ++chars;
@@ -1694,22 +1694,22 @@ clear_showcmd(void)
 		++chars;
 		s += l;
 	    }
-	    if (bytes == chars)
+	    якщо (bytes == chars)
 		vim_snprintf((char *)showcmd_buf, SHOWCMD_BUFLEN, "%d", chars);
-	    else
+	    інакше
 		vim_snprintf((char *)showcmd_buf, SHOWCMD_BUFLEN, "%d-%d", chars, bytes);
 	}
 	showcmd_buf[SHOWCMD_COLS] = NUL;	// truncate
 	showcmd_visual = TRUE;
     }
-    else
+    інакше
     {
 	showcmd_buf[0] = NUL;
 	showcmd_visual = FALSE;
 
 	// Don't actually display something if there is nothing to clear.
-	if (showcmd_is_clear)
-	    return;
+	якщо (showcmd_is_clear)
+	    повернути;
     }
 
     display_showcmd();
@@ -1719,16 +1719,16 @@ clear_showcmd(void)
  * Add 'c' to string of shown command chars.
  * Return TRUE if output has been written (and setcursor() has been called).
  */
-    int
-add_to_showcmd(int c)
+    ціле
+add_to_showcmd(ціле c)
 {
     char_u	*p;
-    int		old_len;
-    int		extra_len;
-    int		overflow;
-    int		i;
+    ціле		old_len;
+    ціле		extra_len;
+    ціле		overflow;
+    ціле		i;
     char_u	mbyte_buf[MB_MAXBYTES];
-    static int	ignore[] =
+    static ціле	ignore[] =
     {
 #ifdef FEAT_GUI
 	K_VER_SCROLLBAR, K_HOR_SCROLLBAR,
@@ -1744,52 +1744,52 @@ add_to_showcmd(int c)
 	0
     };
 
-    if (!p_sc || msg_silent != 0)
-	return FALSE;
+    якщо (!p_sc || msg_silent != 0)
+	повернути FALSE;
 
-    if (showcmd_visual)
+    якщо (showcmd_visual)
     {
 	showcmd_buf[0] = NUL;
 	showcmd_visual = FALSE;
     }
 
     // Ignore keys that are scrollbar updates and mouse clicks
-    if (IS_SPECIAL(c))
-	for (i = 0; ignore[i] != 0; ++i)
-	    if (ignore[i] == c)
-		return FALSE;
+    якщо (IS_SPECIAL(c))
+	для (i = 0; ignore[i] != 0; ++i)
+	    якщо (ignore[i] == c)
+		повернути FALSE;
 
-    if (c <= 0x7f || !vim_isprintc(c))
+    якщо (c <= 0x7f || !vim_isprintc(c))
     {
 	p = transchar(c);
-	if (*p == ' ')
+	якщо (*p == ' ')
 	    STRCPY(p, "<20>");
     }
-    else
+    інакше
     {
 	mbyte_buf[(*mb_char2bytes)(c, mbyte_buf)] = NUL;
 	p = mbyte_buf;
     }
-    old_len = (int)STRLEN(showcmd_buf);
-    extra_len = (int)STRLEN(p);
+    old_len = (ціле)STRLEN(showcmd_buf);
+    extra_len = (ціле)STRLEN(p);
     overflow = old_len + extra_len - SHOWCMD_COLS;
-    if (overflow > 0)
+    якщо (overflow > 0)
 	mch_memmove(showcmd_buf, showcmd_buf + overflow,
 						      old_len - overflow + 1);
     STRCAT(showcmd_buf, p);
 
-    if (char_avail())
-	return FALSE;
+    якщо (char_avail())
+	повернути FALSE;
 
     display_showcmd();
 
-    return TRUE;
+    повернути TRUE;
 }
 
     void
-add_to_showcmd_c(int c)
+add_to_showcmd_c(ціле c)
 {
-    if (!add_to_showcmd(c))
+    якщо (!add_to_showcmd(c))
 	setcursor();
 }
 
@@ -1797,19 +1797,19 @@ add_to_showcmd_c(int c)
  * Delete 'len' characters from the end of the shown command.
  */
     static void
-del_from_showcmd(int len)
+del_from_showcmd(ціле len)
 {
-    int	    old_len;
+    ціле	    old_len;
 
-    if (!p_sc)
-	return;
+    якщо (!p_sc)
+	повернути;
 
-    old_len = (int)STRLEN(showcmd_buf);
-    if (len > old_len)
+    old_len = (ціле)STRLEN(showcmd_buf);
+    якщо (len > old_len)
 	len = old_len;
     showcmd_buf[old_len - len] = NUL;
 
-    if (!char_avail())
+    якщо (!char_avail())
 	display_showcmd();
 }
 
@@ -1820,15 +1820,15 @@ del_from_showcmd(int len)
     void
 push_showcmd(void)
 {
-    if (p_sc)
+    якщо (p_sc)
 	STRCPY(old_showcmd_buf, showcmd_buf);
 }
 
     void
 pop_showcmd(void)
 {
-    if (!p_sc)
-	return;
+    якщо (!p_sc)
+	повернути;
 
     STRCPY(showcmd_buf, old_showcmd_buf);
 
@@ -1844,35 +1844,35 @@ showcmd_update_clear_state(void)
     static void
 display_showcmd(void)
 {
-    int	    len = vim_strsize(showcmd_buf);
+    ціле	    len = vim_strsize(showcmd_buf);
 
     showcmd_update_clear_state();
     cursor_off();
 
-    if (*p_sloc == 's')
+    якщо (*p_sloc == 's')
     {
-	if (showcmd_is_clear && !vgetc_busy)
+	якщо (showcmd_is_clear && !vgetc_busy)
 	    curwin->w_redr_status = true;
-	else
+	інакше
 	    win_redr_status(curwin, FALSE);
     }
-    else if (*p_sloc == 't')
+    інакше якщо (*p_sloc == 't')
     {
-	if (showcmd_is_clear && !vgetc_busy)
+	якщо (showcmd_is_clear && !vgetc_busy)
 	    redraw_tabline = TRUE;
-	else
+	інакше
 	    draw_tabline();
     }
-    else // 'showcmdloc' is "last" or empty
+    інакше // 'showcmdloc' is "last" or empty
     {
-	if (!showcmd_is_clear)
-	    screen_puts(showcmd_buf, (int)Rows - 1,
+	якщо (!showcmd_is_clear)
+	    screen_puts(showcmd_buf, (ціле)Rows - 1,
 		    cmdline_col_off + sc_col, 0);
 
 	// clear the rest of an old message by outputting up to SHOWCMD_COLS
 	// spaces
 	screen_puts((char_u *)"          " + len,
-		(int)Rows - 1, cmdline_col_off + sc_col + len, 0);
+		(ціле)Rows - 1, cmdline_col_off + sc_col + len, 0);
     }
 
     setcursor();	    // put cursor back where it belongs
@@ -1884,28 +1884,28 @@ display_showcmd(void)
  * scrolled.  Called from normal_cmd() and edit().
  */
     void
-do_check_scrollbind(int check)
+do_check_scrollbind(ціле check)
 {
     static win_T	*old_curwin = NULL;
     static linenr_T	old_topline = 0;
 #ifdef FEAT_DIFF
-    static int		old_topfill = 0;
+    static ціле		old_topfill = 0;
 #endif
     static buf_T	*old_buf = NULL;
     static colnr_T	old_leftcol = 0;
 
-    if (check && curwin->w_p_scb)
+    якщо (check && curwin->w_p_scb)
     {
 	// If a ":syncbind" command was just used, don't scroll, only reset
 	// the values.
-	if (did_syncbind)
+	якщо (did_syncbind)
 	    did_syncbind = FALSE;
-	else if (curwin == old_curwin)
+	інакше якщо (curwin == old_curwin)
 	{
 	    // Synchronize other windows, as necessary according to
 	    // 'scrollbind'.  Don't do this after an ":edit" command, except
 	    // when 'diff' is set.
-	    if ((curwin->w_buffer == old_buf
+	    якщо ((curwin->w_buffer == old_buf
 #ifdef FEAT_DIFF
 			|| curwin->w_p_diff
 #endif
@@ -1920,7 +1920,7 @@ do_check_scrollbind(int check)
 			(long)(curwin->w_leftcol - old_leftcol));
 	    }
 	}
-	else if (vim_strchr(p_sbo, 'j')) // jump flag set in 'scrollopt'
+	інакше якщо (vim_strchr(p_sbo, 'j')) // jump flag set in 'scrollopt'
 	{
 	    // When switching between windows, make sure that the relative
 	    // vertical offset is valid for the new window.  The relative
@@ -1952,12 +1952,12 @@ do_check_scrollbind(int check)
     void
 check_scrollbind(linenr_T topline_diff, long leftcol_diff)
 {
-    int		want_ver;
-    int		want_hor;
+    ціле		want_ver;
+    ціле		want_hor;
     win_T	*old_curwin = curwin;
     buf_T	*old_curbuf = curbuf;
-    int		old_VIsual_select = VIsual_select;
-    int		old_VIsual_active = VIsual_active;
+    ціле		old_VIsual_select = VIsual_select;
+    ціле		old_VIsual_active = VIsual_active;
     colnr_T	tgt_leftcol = curwin->w_leftcol;
     long	topline;
     long	y;
@@ -1975,31 +1975,31 @@ check_scrollbind(linenr_T topline_diff, long leftcol_diff)
     {
 	curbuf = curwin->w_buffer;
 	// skip original window and windows with 'noscrollbind'
-	if (curwin == old_curwin || !curwin->w_p_scb)
+	якщо (curwin == old_curwin || !curwin->w_p_scb)
 	    continue;
 
 	// do the vertical scroll
-	if (want_ver)
+	якщо (want_ver)
 	{
 #ifdef FEAT_DIFF
-	    if (old_curwin->w_p_diff && curwin->w_p_diff)
+	    якщо (old_curwin->w_p_diff && curwin->w_p_diff)
 	    {
 		diff_set_topline(old_curwin, curwin);
 	    }
-	    else
+	    інакше
 #endif
 	    {
 		curwin->w_scbind_pos += topline_diff;
 		topline = curwin->w_scbind_pos;
-		if (topline > curbuf->b_ml.ml_line_count)
+		якщо (topline > curbuf->b_ml.ml_line_count)
 		    topline = curbuf->b_ml.ml_line_count;
-		if (topline < 1)
+		якщо (topline < 1)
 		    topline = 1;
 
 		y = topline - curwin->w_topline;
-		if (y > 0)
+		якщо (y > 0)
 		    scrollup(y, FALSE);
-		else
+		інакше
 		    scrolldown(-y, FALSE);
 	    }
 
@@ -2009,7 +2009,7 @@ check_scrollbind(linenr_T topline_diff, long leftcol_diff)
 	}
 
 	// do the horizontal scroll
-	if (want_hor)
+	якщо (want_hor)
 	    (void)set_leftcol(tgt_leftcol);
     }
 
@@ -2055,7 +2055,7 @@ nv_error(cmdarg_T *cap)
     static void
 nv_help(cmdarg_T *cap)
 {
-    if (!checkclearopq(cap->oap))
+    якщо (!checkclearopq(cap->oap))
 	ex_help(NULL);
 }
 
@@ -2066,20 +2066,20 @@ nv_help(cmdarg_T *cap)
 nv_addsub(cmdarg_T *cap)
 {
 #ifdef FEAT_JOB_CHANNEL
-    if (bt_prompt(curbuf) && !prompt_curpos_editable())
+    якщо (bt_prompt(curbuf) && !prompt_curpos_editable())
 	clearopbeep(cap->oap);
-    else
+    інакше
 #endif
-    if (!VIsual_active && cap->oap->op_type == OP_NOP)
+    якщо (!VIsual_active && cap->oap->op_type == OP_NOP)
     {
 	prep_redo_cmd(cap);
 	cap->oap->op_type = cap->cmdchar == Ctrl_A ?  OP_NR_ADD : OP_NR_SUB;
 	op_addsub(cap->oap, cap->count1, cap->arg);
 	cap->oap->op_type = OP_NOP;
     }
-    else if (VIsual_active)
+    інакше якщо (VIsual_active)
 	nv_operator(cap);
-    else
+    інакше
 	clearop(cap->oap);
 }
 
@@ -2089,18 +2089,18 @@ nv_addsub(cmdarg_T *cap)
     static void
 nv_page(cmdarg_T *cap)
 {
-    if (checkclearop(cap->oap))
-	return;
+    якщо (checkclearop(cap->oap))
+	повернути;
 
-    if (mod_mask & MOD_MASK_CTRL)
+    якщо (mod_mask & MOD_MASK_CTRL)
     {
 	// <C-PageUp>: tab page back; <C-PageDown>: tab page forward
-	if (cap->arg == BACKWARD)
-	    goto_tabpage(-(int)cap->count1);
-	else
-	    goto_tabpage((int)cap->count0);
+	якщо (cap->arg == BACKWARD)
+	    goto_tabpage(-(ціле)cap->count1);
+	інакше
+	    goto_tabpage((ціле)cap->count0);
     }
-    else
+    інакше
 	(void)pagescroll(cap->arg, cap->count1, FALSE);
 }
 
@@ -2110,26 +2110,26 @@ nv_page(cmdarg_T *cap)
     static void
 nv_gd(
     oparg_T	*oap,
-    int		nchar,
-    int		thisblock)	// 1 for "1gd" and "1gD"
+    ціле		nchar,
+    ціле		thisblock)	// 1 for "1gd" and "1gD"
 {
-    int		len;
+    ціле		len;
     char_u	*ptr;
 
-    if ((len = find_ident_under_cursor(&ptr, FIND_IDENT)) == 0
+    якщо ((len = find_ident_under_cursor(&ptr, FIND_IDENT)) == 0
 	    || find_decl(ptr, len, nchar == 'd', thisblock, SEARCH_START)
 								       == FAIL)
     {
 	clearopbeep(oap);
-	return;
+	повернути;
     }
 
 #ifdef FEAT_FOLDING
-    if ((fdo_flags & FDO_SEARCH) && KeyTyped && oap->op_type == OP_NOP)
+    якщо ((fdo_flags & FDO_SEARCH) && KeyTyped && oap->op_type == OP_NOP)
 	foldOpenCursor();
 #endif
     // clear any search statistics
-    if (messaging() && !msg_silent && !shortmess(SHM_SEARCHCOUNT))
+    якщо (messaging() && !msg_silent && !shortmess(SHM_SEARCHCOUNT))
 	clear_cmdline = TRUE;
 }
 
@@ -2137,46 +2137,46 @@ nv_gd(
  * Return TRUE if line[offset] is not inside a C-style comment or string, FALSE
  * otherwise.
  */
-    static int
-is_ident(char_u *line, int offset)
+    static ціле
+is_ident(char_u *line, ціле offset)
 {
-    int	i;
-    int	incomment = FALSE;
-    int	instring = 0;
-    int	prev = 0;
+    ціле	i;
+    ціле	incomment = FALSE;
+    ціле	instring = 0;
+    ціле	prev = 0;
 
-    for (i = 0; i < offset && line[i] != NUL; i++)
+    для (i = 0; i < offset && line[i] != NUL; i++)
     {
-	if (instring != 0)
+	якщо (instring != 0)
 	{
-	    if (prev != '\\' && line[i] == instring)
+	    якщо (prev != '\\' && line[i] == instring)
 		instring = 0;
 	}
-	else if ((line[i] == '"' || line[i] == '\'') && !incomment)
+	інакше якщо ((line[i] == '"' || line[i] == '\'') && !incomment)
 	{
 	    instring = line[i];
 	}
-	else
+	інакше
 	{
-	    if (incomment)
+	    якщо (incomment)
 	    {
-		if (prev == '*' && line[i] == '/')
+		якщо (prev == '*' && line[i] == '/')
 		    incomment = FALSE;
 	    }
-	    else if (prev == '/' && line[i] == '*')
+	    інакше якщо (prev == '/' && line[i] == '*')
 	    {
 		incomment = TRUE;
 	    }
-	    else if (prev == '/' && line[i] == '/')
+	    інакше якщо (prev == '/' && line[i] == '/')
 	    {
-		return FALSE;
+		повернути FALSE;
 	    }
 	}
 
 	prev = line[i];
     }
 
-    return incomment == FALSE && instring == 0;
+    повернути incomment == FALSE && instring == 0;
 }
 
 /*
@@ -2186,29 +2186,29 @@ is_ident(char_u *line, int offset)
  * When "thisblock" is TRUE check the {} block scope.
  * Return FAIL when not found.
  */
-    int
+    ціле
 find_decl(
     char_u	*ptr,
-    int		len,
-    int		locally,
-    int		thisblock,
-    int		flags_arg)	// flags passed to searchit()
+    ціле		len,
+    ціле		locally,
+    ціле		thisblock,
+    ціле		flags_arg)	// flags passed to searchit()
 {
     char_u	*pat;
     size_t	patlen;
     pos_T	old_pos;
     pos_T	par_pos;
     pos_T	found_pos;
-    int		t;
-    int		save_p_ws;
-    int		save_p_scs;
-    int		retval = OK;
-    int		incll;
-    int		searchflags = flags_arg;
-    int		valid;
+    ціле		t;
+    ціле		save_p_ws;
+    ціле		save_p_scs;
+    ціле		retval = OK;
+    ціле		incll;
+    ціле		searchflags = flags_arg;
+    ціле		valid;
 
-    if ((pat = alloc(len + 7)) == NULL)
-	return FAIL;
+    якщо ((pat = alloc(len + 7)) == NULL)
+	повернути FAIL;
 
     // Put "\V" before the pattern to avoid that the special meaning of "."
     // and "~" causes trouble.
@@ -2224,37 +2224,37 @@ find_decl(
     // With "gD" go to line 1.
     // With "gd" Search back for the start of the current function, then go
     // back until a blank line.  If this fails go to line 1.
-    if (!locally || !findpar(&incll, BACKWARD, 1L, '{', FALSE))
+    якщо (!locally || !findpar(&incll, BACKWARD, 1L, '{', FALSE))
     {
 	setpcmark();			// Set in findpar() otherwise
 	curwin->w_cursor.lnum = 1;
 	par_pos = curwin->w_cursor;
     }
-    else
+    інакше
     {
 	par_pos = curwin->w_cursor;
-	while (curwin->w_cursor.lnum > 1 && *skipwhite(ml_get_curline()) != NUL)
+	поки (curwin->w_cursor.lnum > 1 && *skipwhite(ml_get_curline()) != NUL)
 	    --curwin->w_cursor.lnum;
     }
     curwin->w_cursor.col = 0;
 
     // Search forward for the identifier, ignore comment lines.
     CLEAR_POS(&found_pos);
-    for (;;)
+    для (;;)
     {
 	t = searchit(curwin, curbuf, &curwin->w_cursor, NULL, FORWARD,
 					  pat, patlen, 1L, searchflags, RE_LAST, NULL);
-	if (curwin->w_cursor.lnum >= old_pos.lnum)
+	якщо (curwin->w_cursor.lnum >= old_pos.lnum)
 	    t = FAIL;	// match after start is failure too
 
-	if (thisblock && t != FAIL)
+	якщо (thisblock && t != FAIL)
 	{
 	    pos_T	*pos;
 
 	    // Check that the block the match is in doesn't end before the
 	    // position where we started the search from.
-	    if ((pos = findmatchlimit(NULL, '}', FM_FORWARD,
-		     (int)(old_pos.lnum - curwin->w_cursor.lnum + 1))) != NULL
+	    якщо ((pos = findmatchlimit(NULL, '}', FM_FORWARD,
+		     (ціле)(old_pos.lnum - curwin->w_cursor.lnum + 1))) != NULL
 		    && pos->lnum < old_pos.lnum)
 	    {
 		// There can't be a useful match before the end of this block.
@@ -2264,17 +2264,17 @@ find_decl(
 	    }
 	}
 
-	if (t == FAIL)
+	якщо (t == FAIL)
 	{
 	    // If we previously found a valid position, use it.
-	    if (found_pos.lnum != 0)
+	    якщо (found_pos.lnum != 0)
 	    {
 		curwin->w_cursor = found_pos;
 		t = OK;
 	    }
 	    break;
 	}
-	if (get_leader_len(ml_get_curline(), NULL, FALSE, TRUE) > 0)
+	якщо (get_leader_len(ml_get_curline(), NULL, FALSE, TRUE) > 0)
 	{
 	    // Ignore this line, continue at start of next line.
 	    ++curwin->w_cursor.lnum;
@@ -2285,19 +2285,19 @@ find_decl(
 
 	// If the current position is not a valid identifier and a previous
 	// match is present, favor that one instead.
-	if (!valid && found_pos.lnum != 0)
+	якщо (!valid && found_pos.lnum != 0)
 	{
 	    curwin->w_cursor = found_pos;
 	    break;
 	}
 
 	// Global search: use first valid match found
-	if (valid && !locally)
+	якщо (valid && !locally)
 	    break;
-	if (valid && curwin->w_cursor.lnum >= par_pos.lnum)
+	якщо (valid && curwin->w_cursor.lnum >= par_pos.lnum)
 	{
 	    // If we previously found a valid position, use it.
-	    if (found_pos.lnum != 0)
+	    якщо (found_pos.lnum != 0)
 		curwin->w_cursor = found_pos;
 	    break;
 	}
@@ -2305,21 +2305,21 @@ find_decl(
 	// For finding a local variable and the match is before the "{" or
 	// inside a comment, continue searching.  For K&R style function
 	// declarations this skips the function header without types.
-	if (!valid)
+	якщо (!valid)
 	    CLEAR_POS(&found_pos);
-	else
+	інакше
 	    found_pos = curwin->w_cursor;
 	// Remove SEARCH_START from flags to avoid getting stuck at one
 	// position.
 	searchflags &= ~SEARCH_START;
     }
 
-    if (t == FAIL)
+    якщо (t == FAIL)
     {
 	retval = FAIL;
 	curwin->w_cursor = old_pos;
     }
-    else
+    інакше
     {
 	curwin->w_set_curswant = true;
 	// "n" searches forward now
@@ -2330,7 +2330,7 @@ find_decl(
     p_ws = save_p_ws;
     p_scs = save_p_scs;
 
-    return retval;
+    повернути retval;
 }
 
 /*
@@ -2340,19 +2340,19 @@ find_decl(
  *
  * Return OK if able to move cursor, FAIL otherwise.
  */
-    int
-nv_screengo(oparg_T *oap, int dir, long dist)
+    ціле
+nv_screengo(oparg_T *oap, ціле dir, long dist)
 {
 
-    int		linelen = linetabsize_no_outer(curwin, curwin->w_cursor.lnum);
+    ціле		linelen = linetabsize_no_outer(curwin, curwin->w_cursor.lnum);
 
-    int		retval = OK;
-    int		atend = FALSE;
-    int		n;
-    int		col_off1;	// margin offset for first screen line
-    int		col_off2;	// margin offset for wrapped screen line
-    int		width1;		// text width for first screen line
-    int		width2;		// text width for wrapped screen line
+    ціле		retval = OK;
+    ціле		atend = FALSE;
+    ціле		n;
+    ціле		col_off1;	// margin offset for first screen line
+    ціле		col_off2;	// margin offset for wrapped screen line
+    ціле		width1;		// text width for first screen line
+    ціле		width2;		// text width for wrapped screen line
 
     oap->motion_type = MCHAR;
     oap->inclusive = (curwin->w_curswant == MAXCOL);
@@ -2361,20 +2361,20 @@ nv_screengo(oparg_T *oap, int dir, long dist)
     col_off2 = col_off1 - curwin_col_off2();
     width1 = curwin->w_width - col_off1;
     width2 = curwin->w_width - col_off2;
-    if (width2 == 0)
+    якщо (width2 == 0)
 	width2 = 1; // avoid divide by zero
 
-    if (curwin->w_width != 0)
+    якщо (curwin->w_width != 0)
     {
       // Instead of sticking at the last character of the buffer line we
       // try to stick in the last column of the screen.
-      if (curwin->w_curswant == MAXCOL)
+      якщо (curwin->w_curswant == MAXCOL)
       {
 	atend = TRUE;
 	validate_virtcol();
-	if (width1 <= 0)
+	якщо (width1 <= 0)
 	    curwin->w_curswant = 0;
-	else
+	інакше
 	{
 	    colnr_T virtcol = curwin->w_virtcol
 #ifdef FEAT_PROP_POPUP
@@ -2383,26 +2383,26 @@ nv_screengo(oparg_T *oap, int dir, long dist)
 		;
 
 	    curwin->w_curswant = width1 - 1;
-	    if (virtcol > curwin->w_curswant)
+	    якщо (virtcol > curwin->w_curswant)
 		curwin->w_curswant += ((virtcol
 			     - curwin->w_curswant - 1) / width2 + 1) * width2;
 	}
       }
-      else
+      інакше
       {
-	if (linelen > width1)
+	якщо (linelen > width1)
 	    n = ((linelen - width1 - 1) / width2 + 1) * width2 + width1;
-	else
+	інакше
 	    n = width1;
-	if (curwin->w_curswant >= (colnr_T)n)
+	якщо (curwin->w_curswant >= (colnr_T)n)
 	    curwin->w_curswant = n - 1;
       }
 
-      while (dist--)
+      поки (dist--)
       {
-	if (dir == BACKWARD)
+	якщо (dir == BACKWARD)
 	{
-	    if ((long)curwin->w_curswant >= width1
+	    якщо ((long)curwin->w_curswant >= width1
 #ifdef FEAT_FOLDING
 		    && !hasFolding(curwin->w_cursor.lnum, NULL, NULL)
 #endif
@@ -2411,10 +2411,10 @@ nv_screengo(oparg_T *oap, int dir, long dist)
 		// for w_curswant if width1 < width2 (with cpoptions+=n),
 		// which will get clipped to column 0.
 		curwin->w_curswant -= width2;
-	    else
+	    інакше
 	    {
 		// to previous line
-		if (curwin->w_cursor.lnum <= 1)
+		якщо (curwin->w_cursor.lnum <= 1)
 		{
 		    retval = FAIL;
 		    break;
@@ -2422,28 +2422,28 @@ nv_screengo(oparg_T *oap, int dir, long dist)
 		cursor_up_inner(curwin, 1);
 
 		linelen = linetabsize_no_outer(curwin, curwin->w_cursor.lnum);
-		if (linelen > width1)
+		якщо (linelen > width1)
 		    curwin->w_curswant += (((linelen - width1 - 1) / width2)
 								+ 1) * width2;
 	    }
 	}
-	else // dir == FORWARD
+	інакше // dir == FORWARD
 	{
-	    if (linelen > width1)
+	    якщо (linelen > width1)
 		n = ((linelen - width1 - 1) / width2 + 1) * width2 + width1;
-	    else
+	    інакше
 		n = width1;
-	    if (curwin->w_curswant + width2 < (colnr_T)n
+	    якщо (curwin->w_curswant + width2 < (colnr_T)n
 #ifdef FEAT_FOLDING
 		    && !hasFolding(curwin->w_cursor.lnum, NULL, NULL)
 #endif
 		    )
 		// move forward within line
 		curwin->w_curswant += width2;
-	    else
+	    інакше
 	    {
 		// to next line
-		if (curwin->w_cursor.lnum
+		якщо (curwin->w_cursor.lnum
 				       >= curwin->w_buffer->b_ml.ml_line_count)
 		{
 		    retval = FAIL;
@@ -2456,7 +2456,7 @@ nv_screengo(oparg_T *oap, int dir, long dist)
 		// when width1 < width2 (with cpoptions+=n). Subtract width2
 		// to get a negative value for w_curswant, which will get
 		// clipped to column 0.
-		if (curwin->w_curswant >= width1)
+		якщо (curwin->w_curswant >= width1)
 		    curwin->w_curswant -= width2;
 		linelen = linetabsize_no_outer(curwin, curwin->w_cursor.lnum);
 	    }
@@ -2464,15 +2464,15 @@ nv_screengo(oparg_T *oap, int dir, long dist)
       }
     }
 
-    if (virtual_active() && atend)
+    якщо (virtual_active() && atend)
 	coladvance(MAXCOL);
-    else
+    інакше
 	coladvance(curwin->w_curswant);
 
-    if (curwin->w_cursor.col > 0 && curwin->w_p_wrap)
+    якщо (curwin->w_cursor.col > 0 && curwin->w_p_wrap)
     {
 	colnr_T virtcol;
-	int	c;
+	ціле	c;
 
 	// Check for landing on a character that got split at the end of the
 	// last line.  We want to advance a screenline, not end up in the same
@@ -2483,18 +2483,18 @@ nv_screengo(oparg_T *oap, int dir, long dist)
 	    - curwin->w_virtcol_first_char
 #endif
 	    ;
-#if defined(FEAT_LINEBREAK)
-	if (virtcol > (colnr_T)width1 && *get_showbreak_value(curwin) != NUL)
+#якщо defined(FEAT_LINEBREAK)
+	якщо (virtcol > (colnr_T)width1 && *get_showbreak_value(curwin) != NUL)
 	    virtcol -= vim_strsize(get_showbreak_value(curwin));
 #endif
 
 	c = (*mb_ptr2char)(ml_get_cursor());
-	if (dir == FORWARD && virtcol < curwin->w_curswant
+	якщо (dir == FORWARD && virtcol < curwin->w_curswant
 		&& (curwin->w_curswant <= (colnr_T)width1)
 		&& !vim_isprintc(c) && c > 255)
 	    oneright();
 
-	if (virtcol > curwin->w_curswant
+	якщо (virtcol > curwin->w_curswant
 		&& (curwin->w_curswant < (colnr_T)width1
 		    ? (curwin->w_curswant > (colnr_T)width1 / 2)
 		    : ((curwin->w_curswant - width1) % width2
@@ -2502,11 +2502,11 @@ nv_screengo(oparg_T *oap, int dir, long dist)
 	    --curwin->w_cursor.col;
     }
 
-    if (atend)
+    якщо (atend)
 	curwin->w_curswant = MAXCOL;	    // stick in the last column
     adjust_skipcol();
 
-    return retval;
+    повернути retval;
 }
 
 /*
@@ -2516,7 +2516,7 @@ nv_screengo(oparg_T *oap, int dir, long dist)
     void
 nv_scroll_line(cmdarg_T *cap)
 {
-    if (!checkclearop(cap->oap))
+    якщо (!checkclearop(cap->oap))
 	scroll_redraw(cap->arg, cap->count1);
 }
 
@@ -2525,18 +2525,18 @@ nv_scroll_line(cmdarg_T *cap)
  * 'z<Left>', and 'z<Right>' commands accept a count after 'z'.
  * Returns TRUE to process the 'z' command and FALSE to skip it.
  */
-    static int
-nv_z_get_count(cmdarg_T *cap, int *nchar_arg)
+    static ціле
+nv_z_get_count(cmdarg_T *cap, ціле *nchar_arg)
 {
-    int		nchar = *nchar_arg;
+    ціле		nchar = *nchar_arg;
     long	n;
 
     // "z123{nchar}": edit the count before obtaining {nchar}
-    if (checkclearop(cap->oap))
-	return FALSE;
+    якщо (checkclearop(cap->oap))
+	повернути FALSE;
     n = nchar - '0';
 
-    for (;;)
+    для (;;)
     {
 #ifdef USE_ON_FLY_SCROLL
 	dont_scroll = TRUE;		// disallow scrolling here
@@ -2549,41 +2549,41 @@ nv_z_get_count(cmdarg_T *cap, int *nchar_arg)
 	--allow_keys;
 	(void)add_to_showcmd(nchar);
 
-	if (nchar == K_DEL || nchar == K_KDEL)
+	якщо (nchar == K_DEL || nchar == K_KDEL)
 	    n /= 10;
-	else if (VIM_ISDIGIT(nchar))
+	інакше якщо (VIM_ISDIGIT(nchar))
 	{
-	    if (vim_append_digit_long(&n, nchar - '0') == FAIL)
+	    якщо (vim_append_digit_long(&n, nchar - '0') == FAIL)
 	    {
 		clearopbeep(cap->oap);
 		break;
 	    }
 	}
-	else if (nchar == CAR)
+	інакше якщо (nchar == CAR)
 	{
 #ifdef FEAT_GUI
 	    need_mouse_correct = TRUE;
 #endif
-	    win_setheight((int)n);
+	    win_setheight((ціле)n);
 	    break;
 	}
-	else if (nchar == 'l'
+	інакше якщо (nchar == 'l'
 		|| nchar == 'h'
 		|| nchar == K_LEFT
 		|| nchar == K_RIGHT)
 	{
 	    cap->count1 = n ? n * cap->count1 : cap->count1;
 	    *nchar_arg = nchar;
-	    return TRUE;
+	    повернути TRUE;
 	}
-	else
+	інакше
 	{
 	    clearopbeep(cap->oap);
 	    break;
 	}
     }
     cap->oap->op_type = OP_NOP;
-    return FALSE;
+    повернути FALSE;
 }
 
 #ifdef FEAT_SPELL
@@ -2594,14 +2594,14 @@ nv_z_get_count(cmdarg_T *cap, int *nchar_arg)
  * "zG": add good word to temp word list
  * "zW": add wrong word to temp word list
  */
-    static int
-nv_zg_zw(cmdarg_T *cap, int nchar)
+    static ціле
+nv_zg_zw(cmdarg_T *cap, ціле nchar)
 {
     char_u	*ptr = NULL;
-    int		len;
-    int		undo = FALSE;
+    ціле		len;
+    ціле		undo = FALSE;
 
-    if (nchar == 'u')
+    якщо (nchar == 'u')
     {
 	++no_mapping;
 	++allow_keys;   // no mapping for nchar, but allow key codes
@@ -2611,19 +2611,19 @@ nv_zg_zw(cmdarg_T *cap, int nchar)
 	--allow_keys;
 	(void)add_to_showcmd(nchar);
 
-	if (vim_strchr((char_u *)"gGwW", nchar) == NULL)
+	якщо (vim_strchr((char_u *)"gGwW", nchar) == NULL)
 	{
 	    clearopbeep(cap->oap);
-	    return OK;
+	    повернути OK;
 	}
 	undo = TRUE;
     }
 
-    if (checkclearop(cap->oap))
-	return OK;
-    if (VIsual_active && get_visual_text(cap, &ptr, &len) == FAIL)
-	return FAIL;
-    if (ptr == NULL)
+    якщо (checkclearop(cap->oap))
+	повернути OK;
+    якщо (VIsual_active && get_visual_text(cap, &ptr, &len) == FAIL)
+	повернути FAIL;
+    якщо (ptr == NULL)
     {
 	pos_T	pos = curwin->w_cursor;
 
@@ -2633,19 +2633,19 @@ nv_zg_zw(cmdarg_T *cap, int nchar)
 	emsg_off++;
 	len = spell_move_to(curwin, FORWARD, SMT_ALL, TRUE, NULL);
 	emsg_off--;
-	if (len != 0 && curwin->w_cursor.col <= pos.col)
+	якщо (len != 0 && curwin->w_cursor.col <= pos.col)
 	    ptr = ml_get_pos(&curwin->w_cursor);
 	curwin->w_cursor = pos;
     }
 
-    if (ptr == NULL
+    якщо (ptr == NULL
 		&& (len = find_ident_under_cursor(&ptr, FIND_IDENT)) == 0)
-	return FAIL;
+	повернути FAIL;
     spell_add_word(ptr, len, nchar == 'w' || nchar == 'W'
 	    ? SPELL_ADD_BAD : SPELL_ADD_GOOD,
-	    (nchar == 'G' || nchar == 'W') ? 0 : (int)cap->count1, undo);
+	    (nchar == 'G' || nchar == 'W') ? 0 : (ціле)cap->count1, undo);
 
-    return OK;
+    повернути OK;
 }
 #endif
 
@@ -2657,17 +2657,17 @@ nv_zet(cmdarg_T *cap)
 {
     long	n;
     colnr_T	col;
-    int		nchar = cap->nchar;
+    ціле		nchar = cap->nchar;
 #ifdef FEAT_FOLDING
     long	old_fdl = curwin->w_p_fdl;
-    int		old_fen = curwin->w_p_fen;
+    ціле		old_fen = curwin->w_p_fen;
 #endif
     long	siso = get_sidescrolloff_value();
 
-    if (VIM_ISDIGIT(nchar) && !nv_z_get_count(cap, &nchar))
-	    return;
+    якщо (VIM_ISDIGIT(nchar) && !nv_z_get_count(cap, &nchar))
+	    повернути;
 
-    if (
+    якщо (
 #ifdef FEAT_FOLDING
 	    // "zf" and "zF" are always an operator, "zd", "zo", "zO", "zc"
 	    // and "zC" only in Visual mode.  "zj" and "zk" are motion
@@ -2678,18 +2678,18 @@ nv_zet(cmdarg_T *cap)
 	    &&
 #endif
 	    checkclearop(cap->oap))
-	return;
+	повернути;
 
     // For "z+", "z<CR>", "zt", "z.", "zz", "z^", "z-", "zb":
     // If line number given, set cursor.
-    if ((vim_strchr((char_u *)"+\r\nt.z^-b", nchar) != NULL)
+    якщо ((vim_strchr((char_u *)"+\r\nt.z^-b", nchar) != NULL)
 	    && cap->count0
 	    && cap->count0 != curwin->w_cursor.lnum)
     {
 	setpcmark();
-	if (cap->count0 > curbuf->b_ml.ml_line_count)
+	якщо (cap->count0 > curbuf->b_ml.ml_line_count)
 	    curwin->w_cursor.lnum = curbuf->b_ml.ml_line_count;
-	else
+	інакше
 	    curwin->w_cursor.lnum = cap->count0;
 	check_cursor_col();
     }
@@ -2698,13 +2698,13 @@ nv_zet(cmdarg_T *cap)
     {
 		// "z+", "z<CR>" and "zt": put cursor at top of screen
     case '+':
-		if (cap->count0 == 0)
+		якщо (cap->count0 == 0)
 		{
 		    // No count given: put cursor at the line below screen
 		    validate_botline();	// make sure w_botline is valid
-		    if (curwin->w_botline > curbuf->b_ml.ml_line_count)
+		    якщо (curwin->w_botline > curbuf->b_ml.ml_line_count)
 			curwin->w_cursor.lnum = curbuf->b_ml.ml_line_count;
-		    else
+		    інакше
 			curwin->w_cursor.lnum = curwin->w_botline;
 		}
 		// FALLTHROUGH
@@ -2732,14 +2732,14 @@ nv_zet(cmdarg_T *cap)
     case '^':	// Strange Vi behavior: <count>z^ finds line at top of window
 		// when <count> is at bottom of window, and puts that one at
 		// bottom of window.
-		if (cap->count0 != 0)
+		якщо (cap->count0 != 0)
 		{
 		    scroll_cursor_bot(0, TRUE);
 		    curwin->w_cursor.lnum = curwin->w_topline;
 		}
-		else if (curwin->w_topline == 1)
+		інакше якщо (curwin->w_topline == 1)
 		    curwin->w_cursor.lnum = 1;
-		else
+		інакше
 		    curwin->w_cursor.lnum = curwin->w_topline - 1;
 		// FALLTHROUGH
     case '-':
@@ -2759,7 +2759,7 @@ nv_zet(cmdarg_T *cap)
 		// "zh" - scroll screen to the right
     case 'h':
     case K_LEFT:
-		if (!curwin->w_p_wrap)
+		якщо (!curwin->w_p_wrap)
 		    (void)set_leftcol((colnr_T)cap->count1 > curwin->w_leftcol
 			       ? 0 : curwin->w_leftcol - (colnr_T)cap->count1);
 		break;
@@ -2771,24 +2771,24 @@ nv_zet(cmdarg_T *cap)
 		// "zl" - scroll window to the left if not wrapping
     case 'l':
     case K_RIGHT:
-		if (!curwin->w_p_wrap)
+		якщо (!curwin->w_p_wrap)
 		    (void)set_leftcol(curwin->w_leftcol + (colnr_T)cap->count1);
 		break;
 
 		// "zs" - scroll screen, cursor at the start
-    case 's':	if (!curwin->w_p_wrap)
+    case 's':	якщо (!curwin->w_p_wrap)
 		{
 #ifdef FEAT_FOLDING
-		    if (hasFolding(curwin->w_cursor.lnum, NULL, NULL))
+		    якщо (hasFolding(curwin->w_cursor.lnum, NULL, NULL))
 			col = 0;	// like the cursor is in col 0
-		    else
+		    інакше
 #endif
 		    getvcol(curwin, &curwin->w_cursor, &col, NULL, NULL, 0);
-		    if ((long)col > siso)
+		    якщо ((long)col > siso)
 			col -= siso;
-		    else
+		    інакше
 			col = 0;
-		    if (curwin->w_leftcol != col)
+		    якщо (curwin->w_leftcol != col)
 		    {
 			curwin->w_leftcol = col;
 			redraw_later(UPD_NOT_VALID);
@@ -2797,22 +2797,22 @@ nv_zet(cmdarg_T *cap)
 		break;
 
 		// "ze" - scroll screen, cursor at the end
-    case 'e':	if (!curwin->w_p_wrap)
+    case 'e':	якщо (!curwin->w_p_wrap)
 		{
 #ifdef FEAT_FOLDING
-		    if (hasFolding(curwin->w_cursor.lnum, NULL, NULL))
+		    якщо (hasFolding(curwin->w_cursor.lnum, NULL, NULL))
 			col = 0;	// like the cursor is in col 0
-		    else
+		    інакше
 #endif
 		    getvcol(curwin, &curwin->w_cursor, NULL, NULL, &col, 0);
 		    n = curwin->w_width - curwin_col_off();
-		    if ((long)col + siso < n)
+		    якщо ((long)col + siso < n)
 			col = 0;
-		    else if (siso - n < INT_MAX - col)
-			col = (int)(col + siso - n + 1);
-		    else
+		    інакше якщо (siso - n < INT_MAX - col)
+			col = (ціле)(col + siso - n + 1);
+		    інакше
 			col = INT_MAX;
-		    if (curwin->w_leftcol != col)
+		    якщо (curwin->w_leftcol != col)
 		    {
 			curwin->w_leftcol = col;
 			redraw_later(UPD_NOT_VALID);
@@ -2831,46 +2831,46 @@ nv_zet(cmdarg_T *cap)
 		// "zF": create fold command
 		// "zf": create fold operator
     case 'F':
-    case 'f':   if (foldManualAllowed(TRUE))
+    case 'f':   якщо (foldManualAllowed(TRUE))
 		{
 		    cap->nchar = 'f';
 		    nv_operator(cap);
 		    curwin->w_p_fen = TRUE;
 
 		    // "zF" is like "zfzf"
-		    if (nchar == 'F' && cap->oap->op_type == OP_FOLD)
+		    якщо (nchar == 'F' && cap->oap->op_type == OP_FOLD)
 		    {
 			nv_operator(cap);
 			finish_op = TRUE;
 		    }
 		}
-		else
+		інакше
 		    clearopbeep(cap->oap);
 		break;
 
 		// "zd": delete fold at cursor
 		// "zD": delete fold at cursor recursively
     case 'd':
-    case 'D':	if (foldManualAllowed(FALSE))
+    case 'D':	якщо (foldManualAllowed(FALSE))
 		{
-		    if (VIsual_active)
+		    якщо (VIsual_active)
 			nv_operator(cap);
-		    else
+		    інакше
 			deleteFold(curwin->w_cursor.lnum,
 				  curwin->w_cursor.lnum, nchar == 'D', FALSE);
 		}
 		break;
 
 		// "zE": erase all folds
-    case 'E':	if (foldmethodIsManual(curwin))
+    case 'E':	якщо (foldmethodIsManual(curwin))
 		{
 		    clearFolding(curwin);
 		    changed_window_setting();
 		}
-		else if (foldmethodIsMarker(curwin))
+		інакше якщо (foldmethodIsMarker(curwin))
 		    deleteFold((linenr_T)1, curbuf->b_ml.ml_line_count,
 								 TRUE, FALSE);
-		else
+		інакше
 		    emsg(_(e_cannot_erase_folds_with_current_foldmethod));
 		break;
 
@@ -2887,9 +2887,9 @@ nv_zet(cmdarg_T *cap)
 		break;
 
 		// "za": open closed fold or close open fold at cursor
-    case 'a':	if (hasFolding(curwin->w_cursor.lnum, NULL, NULL))
+    case 'a':	якщо (hasFolding(curwin->w_cursor.lnum, NULL, NULL))
 		    openFold(curwin->w_cursor.lnum, cap->count1);
-		else
+		інакше
 		{
 		    closeFold(curwin->w_cursor.lnum, cap->count1);
 		    curwin->w_p_fen = TRUE;
@@ -2897,9 +2897,9 @@ nv_zet(cmdarg_T *cap)
 		break;
 
 		// "zA": open fold at cursor recursively
-    case 'A':	if (hasFolding(curwin->w_cursor.lnum, NULL, NULL))
+    case 'A':	якщо (hasFolding(curwin->w_cursor.lnum, NULL, NULL))
 		    openFoldRecurse(curwin->w_cursor.lnum);
-		else
+		інакше
 		{
 		    closeFoldRecurse(curwin->w_cursor.lnum);
 		    curwin->w_p_fen = TRUE;
@@ -2907,31 +2907,31 @@ nv_zet(cmdarg_T *cap)
 		break;
 
 		// "zo": open fold at cursor or Visual area
-    case 'o':	if (VIsual_active)
+    case 'o':	якщо (VIsual_active)
 		    nv_operator(cap);
-		else
+		інакше
 		    openFold(curwin->w_cursor.lnum, cap->count1);
 		break;
 
 		// "zO": open fold recursively
-    case 'O':	if (VIsual_active)
+    case 'O':	якщо (VIsual_active)
 		    nv_operator(cap);
-		else
+		інакше
 		    openFoldRecurse(curwin->w_cursor.lnum);
 		break;
 
 		// "zc": close fold at cursor or Visual area
-    case 'c':	if (VIsual_active)
+    case 'c':	якщо (VIsual_active)
 		    nv_operator(cap);
-		else
+		інакше
 		    closeFold(curwin->w_cursor.lnum, cap->count1);
 		curwin->w_p_fen = TRUE;
 		break;
 
 		// "zC": close fold recursively
-    case 'C':	if (VIsual_active)
+    case 'C':	якщо (VIsual_active)
 		    nv_operator(cap);
-		else
+		інакше
 		    closeFoldRecurse(curwin->w_cursor.lnum);
 		curwin->w_p_fen = TRUE;
 		break;
@@ -2954,10 +2954,10 @@ nv_zet(cmdarg_T *cap)
 		break;
 
 		// "zm": fold more
-    case 'm':	if (curwin->w_p_fdl > 0)
+    case 'm':	якщо (curwin->w_p_fdl > 0)
 		{
 		    curwin->w_p_fdl -= cap->count1;
-		    if (curwin->w_p_fdl < 0)
+		    якщо (curwin->w_p_fdl < 0)
 			curwin->w_p_fdl = 0;
 		}
 		old_fdl = -1;		// force an update
@@ -2973,9 +2973,9 @@ nv_zet(cmdarg_T *cap)
 		// "zr": reduce folding
     case 'r':	curwin->w_p_fdl += cap->count1;
 		{
-		    int d = getDeepestNesting();
+		    ціле d = getDeepestNesting();
 
-		    if (curwin->w_p_fdl >= d)
+		    якщо (curwin->w_p_fdl >= d)
 			curwin->w_p_fdl = d;
 		}
 		break;
@@ -2987,7 +2987,7 @@ nv_zet(cmdarg_T *cap)
 
     case 'j':	// "zj" move to next fold downwards
     case 'k':	// "zk" move to next fold upwards
-		if (foldMoveTo(TRUE, nchar == 'j' ? FORWARD : BACKWARD,
+		якщо (foldMoveTo(TRUE, nchar == 'j' ? FORWARD : BACKWARD,
 							  cap->count1) == FAIL)
 		    clearopbeep(cap->oap);
 		break;
@@ -3000,13 +3000,13 @@ nv_zet(cmdarg_T *cap)
     case 'w':	// "zw": add wrong word to word list
     case 'G':	// "zG": add good word to temp word list
     case 'W':	// "zW": add wrong word to temp word list
-		if (nv_zg_zw(cap, nchar) == FAIL)
-		    return;
+		якщо (nv_zg_zw(cap, nchar) == FAIL)
+		    повернути;
 		break;
 
     case '=':	// "z=": suggestions for a badly spelled word
-		if (!checkclearop(cap->oap))
-		    spell_suggest((int)cap->count0);
+		якщо (!checkclearop(cap->oap))
+		    spell_suggest((ціле)cap->count0);
 		break;
 #endif
 
@@ -3015,17 +3015,17 @@ nv_zet(cmdarg_T *cap)
 
 #ifdef FEAT_FOLDING
     // Redraw when 'foldenable' changed
-    if (old_fen != curwin->w_p_fen)
+    якщо (old_fen != curwin->w_p_fen)
     {
 # ifdef FEAT_DIFF
 	win_T	    *wp;
 
-	if (foldmethodIsDiff(curwin) && curwin->w_p_scb)
+	якщо (foldmethodIsDiff(curwin) && curwin->w_p_scb)
 	{
 	    // Adjust 'foldenable' in diff-synced windows.
 	    FOR_ALL_WINDOWS(wp)
 	    {
-		if (wp != curwin && foldmethodIsDiff(wp) && wp->w_p_scb)
+		якщо (wp != curwin && foldmethodIsDiff(wp) && wp->w_p_scb)
 		{
 		    wp->w_p_fen = curwin->w_p_fen;
 		    changed_window_setting_win(wp);
@@ -3037,7 +3037,7 @@ nv_zet(cmdarg_T *cap)
     }
 
     // Redraw when 'foldlevel' changed.
-    if (old_fdl != curwin->w_p_fdl)
+    якщо (old_fdl != curwin->w_p_fdl)
 	newFoldLevel();
 #endif
 }
@@ -3049,7 +3049,7 @@ nv_zet(cmdarg_T *cap)
     static void
 nv_ver_scrollbar(cmdarg_T *cap)
 {
-    if (cap->oap->op_type != OP_NOP)
+    якщо (cap->oap->op_type != OP_NOP)
 	clearopbeep(cap->oap);
 
     // Even if an operator was pending, we still want to scroll
@@ -3062,7 +3062,7 @@ nv_ver_scrollbar(cmdarg_T *cap)
     static void
 nv_hor_scrollbar(cmdarg_T *cap)
 {
-    if (cap->oap->op_type != OP_NOP)
+    якщо (cap->oap->op_type != OP_NOP)
 	clearopbeep(cap->oap);
 
     // Even if an operator was pending, we still want to scroll
@@ -3070,14 +3070,14 @@ nv_hor_scrollbar(cmdarg_T *cap)
 }
 #endif
 
-#if defined(FEAT_GUI_TABLINE)
+#якщо defined(FEAT_GUI_TABLINE)
 /*
  * Click in GUI tab.
  */
     static void
 nv_tabline(cmdarg_T *cap)
 {
-    if (cap->oap->op_type != OP_NOP)
+    якщо (cap->oap->op_type != OP_NOP)
 	clearopbeep(cap->oap);
 
     // Even if an operator was pending, we still want to jump tabs.
@@ -3090,7 +3090,7 @@ nv_tabline(cmdarg_T *cap)
     static void
 nv_tabmenu(cmdarg_T *cap)
 {
-    if (cap->oap->op_type != OP_NOP)
+    якщо (cap->oap->op_type != OP_NOP)
 	clearopbeep(cap->oap);
 
     // Even if an operator was pending, we still want to jump tabs.
@@ -3107,9 +3107,9 @@ handle_tabmenu(void)
     switch (current_tabmenu)
     {
 	case TABLINE_MENU_CLOSE:
-	    if (current_tab == 0)
+	    якщо (current_tab == 0)
 		do_cmdline_cmd((char_u *)"confirm tabclose");
-	    else
+	    інакше
 	    {
 		vim_snprintf((char *)IObuff, IOSIZE, "confirm tabclose %d",
 								 current_tab);
@@ -3118,9 +3118,9 @@ handle_tabmenu(void)
 	    break;
 
 	case TABLINE_MENU_NEW:
-	    if (current_tab == 0)
+	    якщо (current_tab == 0)
 		do_cmdline_cmd((char_u *)"$tabnew");
-	    else
+	    інакше
 	    {
 		vim_snprintf((char *)IObuff, IOSIZE, "%dtabnew",
 							     current_tab - 1);
@@ -3129,9 +3129,9 @@ handle_tabmenu(void)
 	    break;
 
 	case TABLINE_MENU_OPEN:
-	    if (current_tab == 0)
+	    якщо (current_tab == 0)
 		do_cmdline_cmd((char_u *)"browse $tabnew");
-	    else
+	    інакше
 	    {
 		vim_snprintf((char *)IObuff, IOSIZE, "browse %dtabnew",
 							     current_tab - 1);
@@ -3149,9 +3149,9 @@ handle_tabmenu(void)
 nv_exmode(cmdarg_T *cap)
 {
     // Ignore 'Q' in Visual mode, just give a beep.
-    if (VIsual_active)
+    якщо (VIsual_active)
 	vim_beep(BO_EX);
-    else if (!checkclearop(cap->oap))
+    інакше якщо (!checkclearop(cap->oap))
 	do_exmode(FALSE);
 }
 
@@ -3161,29 +3161,29 @@ nv_exmode(cmdarg_T *cap)
     static void
 nv_colon(cmdarg_T *cap)
 {
-    int	old_p_im;
-    int	cmd_result;
-    int	is_cmdkey = cap->cmdchar == K_COMMAND
+    ціле	old_p_im;
+    ціле	cmd_result;
+    ціле	is_cmdkey = cap->cmdchar == K_COMMAND
 					   || cap->cmdchar == K_SCRIPT_COMMAND;
-    int	flags;
+    ціле	flags;
 
-    if (VIsual_active && !is_cmdkey)
+    якщо (VIsual_active && !is_cmdkey)
     {
 	nv_operator(cap);
-	return;
+	повернути;
     }
 
-    if (cap->oap->op_type != OP_NOP)
+    якщо (cap->oap->op_type != OP_NOP)
     {
 	// Using ":" as a movement is characterwise exclusive.
 	cap->oap->motion_type = MCHAR;
 	cap->oap->inclusive = FALSE;
     }
-    else if (cap->count0 && !is_cmdkey)
+    інакше якщо (cap->count0 && !is_cmdkey)
     {
 	// translate "count:" into ":.,.+(count - 1)"
 	stuffcharReadbuff('.');
-	if (cap->count0 > 1)
+	якщо (cap->count0 > 1)
 	{
 	    stuffReadbuff((char_u *)",.+");
 	    stuffnumReadbuff((long)cap->count0 - 1L);
@@ -3191,31 +3191,31 @@ nv_colon(cmdarg_T *cap)
     }
 
     // When typing, don't type below an old message
-    if (KeyTyped)
+    якщо (KeyTyped)
 	compute_cmdrow();
 
     old_p_im = p_im;
 
     // get a command line and execute it
     flags = cap->oap->op_type != OP_NOP ? DOCMD_KEEPLINE : 0;
-    if (is_cmdkey)
+    якщо (is_cmdkey)
 	cmd_result = do_cmdkey_command(cap->cmdchar, flags);
-    else
+    інакше
 	cmd_result = do_cmdline(NULL, getexline, NULL, flags);
 
     // If 'insertmode' changed, enter or exit Insert mode
-    if (p_im != old_p_im)
+    якщо (p_im != old_p_im)
     {
-	if (p_im)
+	якщо (p_im)
 	    restart_edit = 'i';
-	else
+	інакше
 	    restart_edit = 0;
     }
 
-    if (cmd_result == FAIL)
+    якщо (cmd_result == FAIL)
 	// The Ex command failed, do not execute the operator.
 	clearop(cap->oap);
-    else if (cap->oap->op_type != OP_NOP
+    інакше якщо (cap->oap->op_type != OP_NOP
 	    && (cap->oap->start.lnum > curbuf->b_ml.ml_line_count
 		|| cap->oap->start.col > ml_get_len(cap->oap->start.lnum)
 		|| did_emsg
@@ -3230,15 +3230,15 @@ nv_colon(cmdarg_T *cap)
     static void
 nv_ctrlg(cmdarg_T *cap)
 {
-    if (VIsual_active)	// toggle Selection/Visual mode
+    якщо (VIsual_active)	// toggle Selection/Visual mode
     {
 	VIsual_select = !VIsual_select;
 	may_trigger_modechanged();
 	showmode();
     }
-    else if (!checkclearop(cap->oap))
+    інакше якщо (!checkclearop(cap->oap))
 	// print full name if count given or :cd used
-	fileinfo((int)cap->count0, FALSE, TRUE);
+	fileinfo((ціле)cap->count0, FALSE, TRUE);
 }
 
 /*
@@ -3247,12 +3247,12 @@ nv_ctrlg(cmdarg_T *cap)
     static void
 nv_ctrlh(cmdarg_T *cap)
 {
-    if (VIsual_active && VIsual_select)
+    якщо (VIsual_active && VIsual_select)
     {
 	cap->cmdchar = 'x';	// BS key behaves like 'x' in Select mode
 	v_visop(cap);
     }
-    else
+    інакше
 	nv_left(cap);
 }
 
@@ -3262,8 +3262,8 @@ nv_ctrlh(cmdarg_T *cap)
     static void
 nv_clear(cmdarg_T *cap)
 {
-    if (checkclearop(cap->oap))
-	return;
+    якщо (checkclearop(cap->oap))
+	повернути;
 
 #ifdef FEAT_SYN_HL
     // Clear all syntax states to force resyncing.
@@ -3278,9 +3278,9 @@ nv_clear(cmdarg_T *cap)
 # endif
 #endif
     redraw_later(UPD_CLEAR);
-#if defined(MSWIN) && (!defined(FEAT_GUI_MSWIN) || defined(VIMDLL))
+#якщо defined(MSWIN) && (!defined(FEAT_GUI_MSWIN) || defined(VIMDLL))
 # ifdef VIMDLL
-    if (!gui.in_use)
+    якщо (!gui.in_use)
 # endif
 	resize_console_buf();
 #endif
@@ -3293,14 +3293,14 @@ nv_clear(cmdarg_T *cap)
     static void
 nv_ctrlo(cmdarg_T *cap)
 {
-    if (VIsual_active && VIsual_select)
+    якщо (VIsual_active && VIsual_select)
     {
 	VIsual_select = FALSE;
 	may_trigger_modechanged();
 	showmode();
 	restart_VIsual_select = 2;	// restart Select mode later
     }
-    else
+    інакше
     {
 	cap->count1 = -cap->count1;
 	nv_pcmark(cap);
@@ -3314,8 +3314,8 @@ nv_ctrlo(cmdarg_T *cap)
     static void
 nv_hat(cmdarg_T *cap)
 {
-    if (!checkclearopq(cap->oap))
-	(void)buflist_getfile((int)cap->count0, (linenr_T)0,
+    якщо (!checkclearopq(cap->oap))
+	(void)buflist_getfile((ціле)cap->count0, (linenr_T)0,
 						GETF_SETMARK|GETF_ALT, FALSE);
 }
 
@@ -3325,8 +3325,8 @@ nv_hat(cmdarg_T *cap)
     static void
 nv_Zet(cmdarg_T *cap)
 {
-    if (checkclearopq(cap->oap))
-	return;
+    якщо (checkclearopq(cap->oap))
+	повернути;
 
     switch (cap->nchar)
     {
@@ -3346,7 +3346,7 @@ nv_Zet(cmdarg_T *cap)
  * Call nv_ident() as if "c1" was used, with "c2" as next character.
  */
     void
-do_nv_ident(int c1, int c2)
+do_nv_ident(ціле c1, ціле c2)
 {
     oparg_T	oa;
     cmdarg_T	ca;
@@ -3363,74 +3363,74 @@ do_nv_ident(int c1, int c2)
  * 'K' normal-mode command. Get the command to lookup the keyword under the
  * cursor.
  */
-    static int
+    static ціле
 nv_K_getcmd(
 	cmdarg_T	*cap,
 	char_u		*kp,
-	int		kp_help,
-	int		kp_ex,
+	ціле		kp_help,
+	ціле		kp_ex,
 	char_u		**ptr_arg,
-	int		n,
+	ціле		n,
 	char_u		*buf,
 	size_t		bufsize,
 	size_t		*buflen)
 {
     char_u	*ptr = *ptr_arg;
-    int		isman;
-    int		isman_s;
+    ціле		isman;
+    ціле		isman_s;
 
-    if (kp_help)
+    якщо (kp_help)
     {
 	// in the help buffer
 	STRCPY(buf, "he! ");
 	*buflen = STRLEN_LITERAL("he! ");
-	return n;
+	повернути n;
     }
 
-    if (kp_ex)
+    якщо (kp_ex)
     {
 	// 'keywordprog' is an ex command
-	if (cap->count0 != 0)
+	якщо (cap->count0 != 0)
 	    *buflen = vim_snprintf((char *)buf, bufsize, "%s %ld ", kp, cap->count0);
-	else
+	інакше
 	    *buflen = vim_snprintf((char *)buf, bufsize, "%s ", kp);
-	return n;
+	повернути n;
     }
 
     // An external command will probably use an argument starting
     // with "-" as an option.  To avoid trouble we skip the "-".
-    while (*ptr == '-' && n > 0)
+    поки (*ptr == '-' && n > 0)
     {
 	++ptr;
 	--n;
     }
-    if (n == 0)
+    якщо (n == 0)
     {
 	// found dashes only
 	emsg(_(e_no_identifier_under_cursor));
 	vim_free(buf);
 	*ptr_arg = ptr;
-	return 0;
+	повернути 0;
     }
 
     // When a count is given, turn it into a range.  Is this
     // really what we want?
     isman = (STRCMP(kp, "man") == 0);
     isman_s = (STRCMP(kp, "man -s") == 0);
-    if (cap->count0 != 0 && !(isman || isman_s))
+    якщо (cap->count0 != 0 && !(isman || isman_s))
 	*buflen = vim_snprintf((char *)buf, bufsize, ".,.+%ld! ", cap->count0 - 1);
-    else
+    інакше
 	*buflen = vim_snprintf((char *)buf, bufsize, "! ");
 
-    if (cap->count0 == 0 && isman_s)
+    якщо (cap->count0 == 0 && isman_s)
 	*buflen += vim_snprintf((char *)buf + *buflen, bufsize - *buflen, "man ");
-    else
+    інакше
 	*buflen += vim_snprintf((char *)buf + *buflen, bufsize - *buflen, "%s ", kp);
-    if (cap->count0 != 0 && (isman || isman_s))
+    якщо (cap->count0 != 0 && (isman || isman_s))
 	*buflen += vim_snprintf((char *)buf + *buflen, bufsize - *buflen, "%ld ", cap->count0);
 
     *ptr_arg = ptr;
-    return n;
+    повернути n;
 }
 
 /*
@@ -3451,43 +3451,43 @@ nv_ident(cmdarg_T *cap)
     char_u	*newbuf;
     char_u	*p;
     char_u	*kp;		// value of 'keywordprg'
-    int		kp_help;	// 'keywordprg' is ":he"
-    int		kp_ex;		// 'keywordprg' starts with ":"
-    int		n = 0;		// init for GCC
-    int		cmdchar;
-    int		g_cmd;		// "g" command
-    int		tag_cmd = FALSE;
+    ціле		kp_help;	// 'keywordprg' is ":he"
+    ціле		kp_ex;		// 'keywordprg' starts with ":"
+    ціле		n = 0;		// init for GCC
+    ціле		cmdchar;
+    ціле		g_cmd;		// "g" command
+    ціле		tag_cmd = FALSE;
     char_u	*aux_ptr;
 
-    if (cap->cmdchar == 'g')	// "g*", "g#", "g]" and "gCTRL-]"
+    якщо (cap->cmdchar == 'g')	// "g*", "g#", "g]" and "gCTRL-]"
     {
 	cmdchar = cap->nchar;
 	g_cmd = TRUE;
     }
-    else
+    інакше
     {
 	cmdchar = cap->cmdchar;
 	g_cmd = FALSE;
     }
 
-    if (cmdchar == POUND)	// the pound sign, '#' for English keyboards
+    якщо (cmdchar == POUND)	// the pound sign, '#' for English keyboards
 	cmdchar = '#';
 
     // The "]", "CTRL-]" and "K" commands accept an argument in Visual mode.
-    if (cmdchar == ']' || cmdchar == Ctrl_RSB || cmdchar == 'K')
+    якщо (cmdchar == ']' || cmdchar == Ctrl_RSB || cmdchar == 'K')
     {
-	if (VIsual_active && get_visual_text(cap, &ptr, &n) == FAIL)
-	    return;
-	if (checkclearopq(cap->oap))
-	    return;
+	якщо (VIsual_active && get_visual_text(cap, &ptr, &n) == FAIL)
+	    повернути;
+	якщо (checkclearopq(cap->oap))
+	    повернути;
     }
 
-    if (ptr == NULL && (n = find_ident_under_cursor(&ptr,
+    якщо (ptr == NULL && (n = find_ident_under_cursor(&ptr,
 		    (cmdchar == '*' || cmdchar == '#')
 				 ? FIND_IDENT|FIND_STRING : FIND_IDENT)) == 0)
     {
 	clearop(cap->oap);
-	return;
+	повернути;
     }
 
     // Allocate buffer to put the command in.  Inserting backslashes can
@@ -3496,16 +3496,16 @@ nv_ident(cmdarg_T *cap)
     kp = (*curbuf->b_p_kp == NUL ? p_kp : curbuf->b_p_kp);
     kp_help = (*kp == NUL || STRCMP(kp, ":he") == 0
 						 || STRCMP(kp, ":help") == 0);
-    if (kp_help && *skipwhite(ptr) == NUL)
+    якщо (kp_help && *skipwhite(ptr) == NUL)
     {
 	emsg(_(e_no_identifier_under_cursor));	 // found white space only
-	return;
+	повернути;
     }
     kp_ex = (*kp == ':');
     bufsize = (size_t)(n * 2 + 30 + STRLEN(kp));
     buf = alloc(bufsize);
-    if (buf == NULL)
-	return;
+    якщо (buf == NULL)
+	повернути;
     buf[0] = NUL;
     buflen = 0;
 
@@ -3520,7 +3520,7 @@ nv_ident(cmdarg_T *cap)
 	    setpcmark();
 	    curwin->w_cursor.col = (colnr_T) (ptr - ml_get_curline());
 
-	    if (!g_cmd && vim_iswordp(ptr))
+	    якщо (!g_cmd && vim_iswordp(ptr))
 	    {
 		STRCPY(buf, "\\<");
 		buflen = STRLEN_LITERAL("\\<");
@@ -3530,19 +3530,19 @@ nv_ident(cmdarg_T *cap)
 
 	case 'K':
 	    n = nv_K_getcmd(cap, kp, kp_help, kp_ex, &ptr, n, buf, bufsize, &buflen);
-	    if (n == 0)
-		return;
+	    якщо (n == 0)
+		повернути;
 	    break;
 
 	case ']':
 	    tag_cmd = TRUE;
 #ifdef FEAT_CSCOPE
-	    if (p_cst)
+	    якщо (p_cst)
 	    {
 		STRCPY(buf, "cstag ");
 		buflen = STRLEN_LITERAL("cstag ");
 	    }
-	    else
+	    інакше
 #endif
 	    {
 		STRCPY(buf, "ts ");
@@ -3552,91 +3552,91 @@ nv_ident(cmdarg_T *cap)
 
 	default:
 	    tag_cmd = TRUE;
-	    if (curbuf->b_help)
+	    якщо (curbuf->b_help)
 	    {
 		STRCPY(buf, "he! ");
 		buflen = STRLEN_LITERAL("he! ");
 	    }
-	    else
+	    інакше
 	    {
-		if (g_cmd)
+		якщо (g_cmd)
 		{
 		    STRCPY(buf, "tj ");
 		    buflen = STRLEN_LITERAL("tj ");
 		}
-		else if (cap->count0 == 0)
+		інакше якщо (cap->count0 == 0)
 		{
 		    STRCPY(buf, "ta ");
 		    buflen = STRLEN_LITERAL("ta ");
 		}
-		else
+		інакше
 		    buflen = vim_snprintf((char *)buf, bufsize, ":%ldta ", cap->count0);
 	    }
     }
 
     // Now grab the chars in the identifier
-    if (cmdchar == 'K' && !kp_help)
+    якщо (cmdchar == 'K' && !kp_help)
     {
 	size_t plen;
 
 	ptr = vim_strnsave(ptr, n);
-	if (kp_ex)
+	якщо (kp_ex)
 	    // Escape the argument properly for an Ex command
 	    p = vim_strsave_fnameescape(ptr, VSE_NONE);
-	else
+	інакше
 	    // Escape the argument properly for a shell command
 	    p = vim_strsave_shellescape(ptr, TRUE, TRUE);
 	vim_free(ptr);
-	if (p == NULL)
+	якщо (p == NULL)
 	{
 	    vim_free(buf);
-	    return;
+	    повернути;
 	}
 	plen = STRLEN(p);
 	newbuf = vim_realloc(buf, buflen + plen + 1);
-	if (newbuf == NULL)
+	якщо (newbuf == NULL)
 	{
 	    vim_free(buf);
 	    vim_free(p);
-	    return;
+	    повернути;
 	}
 	buf = newbuf;
 	STRCPY(buf + buflen, p);
 	buflen += plen;
 	vim_free(p);
     }
-    else
+    інакше
     {
-	if (cmdchar == '*')
+	якщо (cmdchar == '*')
 	    aux_ptr = (char_u *)(magic_isset() ? "/.*~[^$\\" : "/^$\\");
-	else if (cmdchar == '#')
+	інакше якщо (cmdchar == '#')
 	    aux_ptr = (char_u *)(magic_isset() ? "/?.*~[^$\\" : "/?^$\\");
-	else if (tag_cmd)
+	інакше якщо (tag_cmd)
 	{
-	    if (STRCMP(curbuf->b_p_ft, "help") == 0)
+	    якщо (STRCMP(curbuf->b_p_ft, "help") == 0)
 		// ":help" handles unescaped argument
 		aux_ptr = (char_u *)"";
-	    else
+	    інакше
 		aux_ptr = (char_u *)"\\|\"\n[";
 	}
-	else
+	інакше
 	    aux_ptr = (char_u *)"\\|\"\n*?[";
 
 	p = buf + buflen;
-	while (n-- > 0)
+	поки (n-- > 0)
 	{
 	    // put a backslash before \ and some others
-	    if (vim_strchr(aux_ptr, *ptr) != NULL)
+	    якщо (vim_strchr(aux_ptr, *ptr) != NULL)
 		*p++ = '\\';
 
 	    // When current byte is a part of multibyte character, copy all
 	    // bytes of that character.
-	    if (has_mbyte)
+	    якщо (has_mbyte)
 	    {
-		int i;
-		int len = (*mb_ptr2len)(ptr) - 1;
+		ціле i;
+		ціле len = (*mb_ptr2len)(ptr) - 1;
 
-		for (i = 0; i < len && n >= 1; ++i, --n)
+		для (i = 0; i < len && n >= 1; ++i, --n)
 		    *p++ = *ptr++;
 	    }
 	    *p++ = *ptr++;
@@ -3646,9 +3646,9 @@ nv_ident(cmdarg_T *cap)
     }
 
     // Execute the command.
-    if (cmdchar == '*' || cmdchar == '#')
+    якщо (cmdchar == '*' || cmdchar == '#')
     {
-	if (!g_cmd && (has_mbyte
+	якщо (!g_cmd && (has_mbyte
 		    ? vim_iswordp(mb_prevptr(ml_get_curline(), ptr))
 		    : vim_iswordc(ptr[-1])))
 	{
@@ -3662,7 +3662,7 @@ nv_ident(cmdarg_T *cap)
 
 	(void)normal_search(cap, cmdchar == '*' ? '/' : '?', buf, buflen, 0, NULL);
     }
-    else
+    інакше
     {
 	g_tag_at_cursor = TRUE;
 	do_cmdline_cmd(buf);
@@ -3676,52 +3676,52 @@ nv_ident(cmdarg_T *cap)
  * Get visually selected text, within one line only.
  * Returns FAIL if more than one line selected.
  */
-    int
+    ціле
 get_visual_text(
     cmdarg_T	*cap,
     char_u	**pp,	    // return: start of selected text
-    int		*lenp)	    // return: length of selected text
+    ціле		*lenp)	    // return: length of selected text
 {
-    if (VIsual_mode != 'V')
+    якщо (VIsual_mode != 'V')
 	unadjust_for_sel();
-    if (VIsual.lnum != curwin->w_cursor.lnum)
+    якщо (VIsual.lnum != curwin->w_cursor.lnum)
     {
-	if (cap != NULL)
+	якщо (cap != NULL)
 	    clearopbeep(cap->oap);
-	return FAIL;
+	повернути FAIL;
     }
-    if (VIsual_mode == 'V')
+    якщо (VIsual_mode == 'V')
     {
 	*pp = ml_get_curline();
-	*lenp = (int)ml_get_curline_len();
+	*lenp = (ціле)ml_get_curline_len();
     }
-    else
+    інакше
     {
-	if (LT_POS(curwin->w_cursor, VIsual))
+	якщо (LT_POS(curwin->w_cursor, VIsual))
 	{
 	    *pp = ml_get_pos(&curwin->w_cursor);
 	    *lenp = VIsual.col - curwin->w_cursor.col + 1;
 	}
-	else
+	інакше
 	{
 	    *pp = ml_get_pos(&VIsual);
 	    *lenp = curwin->w_cursor.col - VIsual.col + 1;
 	}
-	if (**pp == NUL)
+	якщо (**pp == NUL)
 	    *lenp = 0;
-	if (*lenp > 0)
+	якщо (*lenp > 0)
 	{
-	    if (has_mbyte)
+	    якщо (has_mbyte)
 		// Correct the length to include all bytes of the last
 		// character.
 		*lenp += (*mb_ptr2len)(*pp + (*lenp - 1)) - 1;
-	    else if ((*pp)[*lenp - 1] == NUL)
+	    інакше якщо ((*pp)[*lenp - 1] == NUL)
 		// Do not include a trailing NUL.
 		*lenp -= 1;
 	}
     }
     reset_VIsual_and_resel();
-    return OK;
+    повернути OK;
 }
 
 /*
@@ -3730,8 +3730,8 @@ get_visual_text(
     static void
 nv_tagpop(cmdarg_T *cap)
 {
-    if (!checkclearopq(cap->oap))
-	do_tag((char_u *)"", DT_POP, (int)cap->count1, FALSE, TRUE);
+    якщо (!checkclearopq(cap->oap))
+	do_tag((char_u *)"", DT_POP, (ціле)cap->count1, FALSE, TRUE);
 }
 
 /*
@@ -3740,45 +3740,45 @@ nv_tagpop(cmdarg_T *cap)
     static void
 nv_scroll(cmdarg_T *cap)
 {
-    int		used = 0;
+    ціле		used = 0;
     long	n;
 #ifdef FEAT_FOLDING
     linenr_T	lnum;
 #endif
-    int		half;
+    ціле		half;
 
     cap->oap->motion_type = MLINE;
     setpcmark();
 
-    if (cap->cmdchar == 'L')
+    якщо (cap->cmdchar == 'L')
     {
 	validate_botline();	    // make sure curwin->w_botline is valid
 	curwin->w_cursor.lnum = curwin->w_botline - 1;
-	if (cap->count1 - 1 >= curwin->w_cursor.lnum)
+	якщо (cap->count1 - 1 >= curwin->w_cursor.lnum)
 	    curwin->w_cursor.lnum = 1;
-	else
+	інакше
 	{
 #ifdef FEAT_FOLDING
-	    if (hasAnyFolding(curwin))
+	    якщо (hasAnyFolding(curwin))
 	    {
 		// Count a fold for one screen line.
-		for (n = cap->count1 - 1; n > 0
+		для (n = cap->count1 - 1; n > 0
 			    && curwin->w_cursor.lnum > curwin->w_topline; --n)
 		{
 		    (void)hasFolding(curwin->w_cursor.lnum,
 						&curwin->w_cursor.lnum, NULL);
-		    if (curwin->w_cursor.lnum > curwin->w_topline)
+		    якщо (curwin->w_cursor.lnum > curwin->w_topline)
 			--curwin->w_cursor.lnum;
 		}
 	    }
-	    else
+	    інакше
 #endif
 		curwin->w_cursor.lnum -= cap->count1 - 1;
 	}
     }
-    else
+    інакше
     {
-	if (cap->cmdchar == 'M')
+	якщо (cap->cmdchar == 'M')
 	{
 #ifdef FEAT_DIFF
 	    // Don't count filler lines above the window.
@@ -3787,12 +3787,12 @@ nv_scroll(cmdarg_T *cap)
 #endif
 	    validate_botline();	    // make sure w_empty_rows is valid
 	    half = (curwin->w_height - curwin->w_empty_rows + 1) / 2;
-	    for (n = 0; curwin->w_topline + n < curbuf->b_ml.ml_line_count; ++n)
+	    для (n = 0; curwin->w_topline + n < curbuf->b_ml.ml_line_count; ++n)
 	    {
 #ifdef FEAT_DIFF
 		// Count half he number of filler lines to be "below this
 		// line" and half to be "above the next line".
-		if (n > 0 && used + diff_check_fill(curwin, curwin->w_topline
+		якщо (n > 0 && used + diff_check_fill(curwin, curwin->w_topline
 							     + n) / 2 >= half)
 		{
 		    --n;
@@ -3800,25 +3800,25 @@ nv_scroll(cmdarg_T *cap)
 		}
 #endif
 		used += plines(curwin->w_topline + n);
-		if (used >= half)
+		якщо (used >= half)
 		    break;
 #ifdef FEAT_FOLDING
-		if (hasFolding(curwin->w_topline + n, NULL, &lnum))
+		якщо (hasFolding(curwin->w_topline + n, NULL, &lnum))
 		    n = lnum - curwin->w_topline;
 #endif
 	    }
-	    if (n > 0 && used > curwin->w_height)
+	    якщо (n > 0 && used > curwin->w_height)
 		--n;
 	}
-	else // (cap->cmdchar == 'H')
+	інакше // (cap->cmdchar == 'H')
 	{
 	    n = cap->count1 - 1;
 #ifdef FEAT_FOLDING
-	    if (hasAnyFolding(curwin))
+	    якщо (hasAnyFolding(curwin))
 	    {
 		// Count a fold for one screen line.
 		lnum = curwin->w_topline;
-		while (n-- > 0 && lnum < curwin->w_botline - 1)
+		поки (n-- > 0 && lnum < curwin->w_botline - 1)
 		{
 		    (void)hasFolding(lnum, NULL, &lnum);
 		    ++lnum;
@@ -3828,12 +3828,12 @@ nv_scroll(cmdarg_T *cap)
 #endif
 	}
 	curwin->w_cursor.lnum = curwin->w_topline + n;
-	if (curwin->w_cursor.lnum > curbuf->b_ml.ml_line_count)
+	якщо (curwin->w_cursor.lnum > curbuf->b_ml.ml_line_count)
 	    curwin->w_cursor.lnum = curbuf->b_ml.ml_line_count;
     }
 
     // Correct for 'so', except when an operator is pending.
-    if (cap->oap->op_type == OP_NOP)
+    якщо (cap->oap->op_type == OP_NOP)
 	cursor_correct();
     beginline(BL_SOL | BL_FIX);
 }
@@ -3845,15 +3845,15 @@ nv_scroll(cmdarg_T *cap)
 nv_right(cmdarg_T *cap)
 {
     long	n;
-    int		past_line;
+    ціле		past_line;
 
-    if (mod_mask & (MOD_MASK_SHIFT | MOD_MASK_CTRL))
+    якщо (mod_mask & (MOD_MASK_SHIFT | MOD_MASK_CTRL))
     {
 	// <C-Right> and <S-Right> move a word or WORD right
-	if (mod_mask & MOD_MASK_CTRL)
+	якщо (mod_mask & MOD_MASK_CTRL)
 	    cap->arg = TRUE;
 	nv_wordcmd(cap);
-	return;
+	повернути;
     }
 
     cap->oap->motion_type = MCHAR;
@@ -3862,19 +3862,19 @@ nv_right(cmdarg_T *cap)
 
     // In virtual edit mode, there's no such thing as "past_line", as lines
     // are (theoretically) infinitely long.
-    if (virtual_active())
+    якщо (virtual_active())
 	past_line = 0;
 
-    for (n = cap->count1; n > 0; --n)
+    для (n = cap->count1; n > 0; --n)
     {
-	if ((!past_line && oneright() == FAIL)
+	якщо ((!past_line && oneright() == FAIL)
 		|| (past_line && *ml_get_cursor() == NUL)
 		)
 	{
 	    //	  <Space> wraps to next line if 'whichwrap' has 's'.
 	    //	      'l' wraps to next line if 'whichwrap' has 'l'.
 	    // CURS_RIGHT wraps to next line if 'whichwrap' has '>'.
-	    if (       ((cap->cmdchar == ' '
+	    якщо (       ((cap->cmdchar == ' '
 			    && vim_strchr(p_ww, 's') != NULL)
 			|| (cap->cmdchar == 'l'
 			    && vim_strchr(p_ww, 'l') != NULL)
@@ -3885,11 +3885,11 @@ nv_right(cmdarg_T *cap)
 		// When deleting we also count the NL as a character.
 		// Set cap->oap->inclusive when last char in the line is
 		// included, move to next line after that
-		if (	   cap->oap->op_type != OP_NOP
+		якщо (	   cap->oap->op_type != OP_NOP
 			&& !cap->oap->inclusive
 			&& !LINEEMPTY(curwin->w_cursor.lnum))
 		    cap->oap->inclusive = TRUE;
-		else
+		інакше
 		{
 		    ++curwin->w_cursor.lnum;
 		    curwin->w_cursor.col = 0;
@@ -3899,35 +3899,35 @@ nv_right(cmdarg_T *cap)
 		}
 		continue;
 	    }
-	    if (cap->oap->op_type == OP_NOP)
+	    якщо (cap->oap->op_type == OP_NOP)
 	    {
 		// Only beep and flush if not moved at all
-		if (n == cap->count1)
+		якщо (n == cap->count1)
 		    beep_flush();
 	    }
-	    else
+	    інакше
 	    {
-		if (!LINEEMPTY(curwin->w_cursor.lnum))
+		якщо (!LINEEMPTY(curwin->w_cursor.lnum))
 		    cap->oap->inclusive = TRUE;
 	    }
 	    break;
 	}
-	else if (past_line)
+	інакше якщо (past_line)
 	{
 	    curwin->w_set_curswant = true;
-	    if (virtual_active())
+	    якщо (virtual_active())
 		oneright();
-	    else
+	    інакше
 	    {
-		if (has_mbyte)
+		якщо (has_mbyte)
 		    curwin->w_cursor.col += (*mb_ptr2len)(ml_get_cursor());
-		else
+		інакше
 		    ++curwin->w_cursor.col;
 	    }
 	}
     }
 #ifdef FEAT_FOLDING
-    if (n != cap->count1 && (fdo_flags & FDO_HOR) && KeyTyped
+    якщо (n != cap->count1 && (fdo_flags & FDO_HOR) && KeyTyped
 					       && cap->oap->op_type == OP_NOP)
 	foldOpenCursor();
 #endif
@@ -3943,25 +3943,25 @@ nv_left(cmdarg_T *cap)
 {
     long	n;
 
-    if (mod_mask & (MOD_MASK_SHIFT | MOD_MASK_CTRL))
+    якщо (mod_mask & (MOD_MASK_SHIFT | MOD_MASK_CTRL))
     {
 	// <C-Left> and <S-Left> move a word or WORD left
-	if (mod_mask & MOD_MASK_CTRL)
+	якщо (mod_mask & MOD_MASK_CTRL)
 	    cap->arg = 1;
 	nv_bck_word(cap);
-	return;
+	повернути;
     }
 
     cap->oap->motion_type = MCHAR;
     cap->oap->inclusive = FALSE;
-    for (n = cap->count1; n > 0; --n)
+    для (n = cap->count1; n > 0; --n)
     {
-	if (oneleft() == FAIL)
+	якщо (oneleft() == FAIL)
 	{
 	    // <BS> and <Del> wrap to previous line if 'whichwrap' has 'b'.
 	    //		 'h' wraps to previous line if 'whichwrap' has 'h'.
 	    //	   CURS_LEFT wraps to previous line if 'whichwrap' has '<'.
-	    if (       (((cap->cmdchar == K_BS
+	    якщо (       (((cap->cmdchar == K_BS
 				|| cap->cmdchar == Ctrl_H)
 			    && vim_strchr(p_ww, 'b') != NULL)
 			|| (cap->cmdchar == 'h'
@@ -3978,17 +3978,17 @@ nv_left(cmdarg_T *cap)
 		// put the cursor on the NUL after the previous line.
 		// This is a very special case, be careful!
 		// Don't adjust op_end now, otherwise it won't work.
-		if (	   (cap->oap->op_type == OP_DELETE
+		якщо (	   (cap->oap->op_type == OP_DELETE
 			    || cap->oap->op_type == OP_CHANGE)
 			&& !LINEEMPTY(curwin->w_cursor.lnum))
 		{
 		    char_u *cp = ml_get_cursor();
 
-		    if (*cp != NUL)
+		    якщо (*cp != NUL)
 		    {
-			if (has_mbyte)
+			якщо (has_mbyte)
 			    curwin->w_cursor.col += (*mb_ptr2len)(cp);
-			else
+			інакше
 			    ++curwin->w_cursor.col;
 		    }
 		    cap->retval |= CA_NO_ADJ_OP_END;
@@ -3996,13 +3996,13 @@ nv_left(cmdarg_T *cap)
 		continue;
 	    }
 	    // Only beep and flush if not moved at all
-	    else if (cap->oap->op_type == OP_NOP && n == cap->count1)
+	    інакше якщо (cap->oap->op_type == OP_NOP && n == cap->count1)
 		beep_flush();
 	    break;
 	}
     }
 #ifdef FEAT_FOLDING
-    if (n != cap->count1 && (fdo_flags & FDO_HOR) && KeyTyped
+    якщо (n != cap->count1 && (fdo_flags & FDO_HOR) && KeyTyped
 					       && cap->oap->op_type == OP_NOP)
 	foldOpenCursor();
 #endif
@@ -4015,18 +4015,18 @@ nv_left(cmdarg_T *cap)
     static void
 nv_up(cmdarg_T *cap)
 {
-    if (mod_mask & MOD_MASK_SHIFT)
+    якщо (mod_mask & MOD_MASK_SHIFT)
     {
 	// <S-Up> is page up
 	cap->arg = BACKWARD;
 	nv_page(cap);
-	return;
+	повернути;
     }
 
     cap->oap->motion_type = MLINE;
-    if (cursor_up(cap->count1, cap->oap->op_type == OP_NOP) == FAIL)
+    якщо (cursor_up(cap->count1, cap->oap->op_type == OP_NOP) == FAIL)
 	clearopbeep(cap->oap);
-    else if (cap->arg)
+    інакше якщо (cap->arg)
 	beginline(BL_WHITE | BL_FIX);
 }
 
@@ -4037,39 +4037,39 @@ nv_up(cmdarg_T *cap)
     static void
 nv_down(cmdarg_T *cap)
 {
-    if (mod_mask & MOD_MASK_SHIFT)
+    якщо (mod_mask & MOD_MASK_SHIFT)
     {
 	// <S-Down> is page down
 	cap->arg = FORWARD;
 	nv_page(cap);
     }
-#if defined(FEAT_QUICKFIX)
+#якщо defined(FEAT_QUICKFIX)
     // Quickfix window only: view the result under the cursor.
-    else if (bt_quickfix(curbuf) && cap->cmdchar == CAR)
+    інакше якщо (bt_quickfix(curbuf) && cap->cmdchar == CAR)
 	qf_view_result(FALSE);
 #endif
-    else
+    інакше
     {
 	// In the cmdline window a <CR> executes the command.
-	if (cmdwin_type != 0 && cap->cmdchar == CAR)
+	якщо (cmdwin_type != 0 && cap->cmdchar == CAR)
 	    cmdwin_result = CAR;
-	else
+	інакше
 #ifdef FEAT_JOB_CHANNEL
 	// In a prompt buffer a <CR> in the last line invokes the callback.
-	if (bt_prompt(curbuf) && cap->cmdchar == CAR
+	якщо (bt_prompt(curbuf) && cap->cmdchar == CAR
 		       && curwin->w_cursor.lnum == curbuf->b_ml.ml_line_count)
 	{
 	    invoke_prompt_callback();
-	    if (restart_edit == 0)
+	    якщо (restart_edit == 0)
 		restart_edit = 'a';
 	}
-	else
+	інакше
 #endif
 	{
 	    cap->oap->motion_type = MLINE;
-	    if (cursor_down(cap->count1, cap->oap->op_type == OP_NOP) == FAIL)
+	    якщо (cursor_down(cap->count1, cap->oap->op_type == OP_NOP) == FAIL)
 		clearopbeep(cap->oap);
-	    else if (cap->arg)
+	    інакше якщо (cap->arg)
 		beginline(BL_WHITE | BL_FIX);
 	}
     }
@@ -4084,26 +4084,26 @@ nv_gotofile(cmdarg_T *cap)
     char_u	*ptr;
     linenr_T	lnum = -1;
 
-    if (check_text_or_curbuf_locked(cap->oap))
-	return;
+    якщо (check_text_or_curbuf_locked(cap->oap))
+	повернути;
 
 #ifdef FEAT_PROP_POPUP
-    if (ERROR_IF_TERM_POPUP_WINDOW)
-	return;
+    якщо (ERROR_IF_TERM_POPUP_WINDOW)
+	повернути;
 #endif
 
-    if (!check_can_set_curbuf_disabled())
-	return;
+    якщо (!check_can_set_curbuf_disabled())
+	повернути;
 
     ptr = grab_file_name(cap->count1, &lnum);
 
-    if (ptr != NULL)
+    якщо (ptr != NULL)
     {
 	// do autowrite if necessary
-	if (curbufIsChanged() && curbuf->b_nwindows <= 1 && !buf_hide(curbuf))
+	якщо (curbufIsChanged() && curbuf->b_nwindows <= 1 && !buf_hide(curbuf))
 	    (void)autowrite(curbuf, FALSE);
 	setpcmark();
-	if (do_ecmd(0, ptr, NULL, NULL, ECMD_LAST,
+	якщо (do_ecmd(0, ptr, NULL, NULL, ECMD_LAST,
 				buf_hide(curbuf) ? ECMD_HIDE : 0, curwin) == OK
 		&& cap->nchar == 'F' && lnum >= 0)
 	{
@@ -4113,7 +4113,7 @@ nv_gotofile(cmdarg_T *cap)
 	}
 	vim_free(ptr);
     }
-    else
+    інакше
 	clearop(cap->oap);
 }
 
@@ -4123,7 +4123,7 @@ nv_gotofile(cmdarg_T *cap)
     static void
 nv_end(cmdarg_T *cap)
 {
-    if (cap->arg || (mod_mask & MOD_MASK_CTRL))	// CTRL-END = goto last line
+    якщо (cap->arg || (mod_mask & MOD_MASK_CTRL))	// CTRL-END = goto last line
     {
 	cap->arg = TRUE;
 	nv_goto(cap);
@@ -4143,14 +4143,14 @@ nv_dollar(cmdarg_T *cap)
     // In virtual mode when off the edge of a line and an operator
     // is pending (whew!) keep the cursor where it is.
     // Otherwise, send it to the end of the line.
-    if (!virtual_active() || gchar_cursor() != NUL
+    якщо (!virtual_active() || gchar_cursor() != NUL
 					       || cap->oap->op_type == OP_NOP)
 	curwin->w_curswant = MAXCOL;	// so we stay at the end
-    if (cursor_down((long)(cap->count1 - 1),
+    якщо (cursor_down((long)(cap->count1 - 1),
 					 cap->oap->op_type == OP_NOP) == FAIL)
 	clearopbeep(cap->oap);
 #ifdef FEAT_FOLDING
-    else if ((fdo_flags & FDO_HOR) && KeyTyped && cap->oap->op_type == OP_NOP)
+    інакше якщо ((fdo_flags & FDO_HOR) && KeyTyped && cap->oap->op_type == OP_NOP)
 	foldOpenCursor();
 #endif
 }
@@ -4165,23 +4165,23 @@ nv_search(cmdarg_T *cap)
     oparg_T	*oap = cap->oap;
     pos_T	save_cursor = curwin->w_cursor;
 
-    if (cap->cmdchar == '?' && cap->oap->op_type == OP_ROT13)
+    якщо (cap->cmdchar == '?' && cap->oap->op_type == OP_ROT13)
     {
 	// Translate "g??" to "g?g?"
 	cap->cmdchar = 'g';
 	cap->nchar = '?';
 	nv_operator(cap);
-	return;
+	повернути;
     }
 
     // When using 'incsearch' the cursor may be moved to set a different search
     // start position.
     cap->searchbuf = getcmdline(cap->cmdchar, cap->count1, 0, 0);
 
-    if (cap->searchbuf == NULL)
+    якщо (cap->searchbuf == NULL)
     {
 	clearop(oap);
-	return;
+	повернути;
     }
 
     (void)normal_search(cap, cap->cmdchar, cap->searchbuf, STRLEN(cap->searchbuf),
@@ -4198,10 +4198,10 @@ nv_search(cmdarg_T *cap)
 nv_next(cmdarg_T *cap)
 {
     pos_T   old = curwin->w_cursor;
-    int	    wrapped = FALSE;
-    int	    i = normal_search(cap, 0, NULL, 0, SEARCH_MARK | cap->arg, &wrapped);
+    ціле	    wrapped = FALSE;
+    ціле	    i = normal_search(cap, 0, NULL, 0, SEARCH_MARK | cap->arg, &wrapped);
 
-    if (i == 1 && !wrapped && EQUAL_POS(old, curwin->w_cursor))
+    якщо (i == 1 && !wrapped && EQUAL_POS(old, curwin->w_cursor))
     {
 	// Avoid getting stuck on the current cursor position, which can
 	// happen when an offset is given and the cursor is on the last char
@@ -4213,7 +4213,7 @@ nv_next(cmdarg_T *cap)
 
 #ifdef FEAT_SEARCH_EXTRA
     // Redraw the window to refresh the highlighted matches.
-    if (i > 0 && p_hls && !no_hlsearch)
+    якщо (i > 0 && p_hls && !no_hlsearch)
 	redraw_later(UPD_SOME_VALID);
 #endif
 }
@@ -4223,16 +4223,16 @@ nv_next(cmdarg_T *cap)
  * Uses only cap->count1 and cap->oap from "cap".
  * Return 0 for failure, 1 for found, 2 for found and line offset added.
  */
-    static int
+    static ціле
 normal_search(
     cmdarg_T	*cap,
-    int		dir,
+    ціле		dir,
     char_u	*pat,
     size_t	patlen,
-    int		opt,		// extra flags for do_search()
-    int		*wrapped)
+    ціле		opt,		// extra flags for do_search()
+    ціле		*wrapped)
 {
-    int		i;
+    ціле		i;
     searchit_arg_T sia;
 #ifdef FEAT_SEARCH_EXTRA
     pos_T	prev_cursor = curwin->w_cursor;
@@ -4246,23 +4246,23 @@ normal_search(
     CLEAR_FIELD(sia);
     i = do_search(cap->oap, dir, dir, pat, patlen, cap->count1,
 			    opt | SEARCH_OPT | SEARCH_ECHO | SEARCH_MSG, &sia);
-    if (wrapped != NULL)
+    якщо (wrapped != NULL)
 	*wrapped = sia.sa_wrapped;
-    if (i == 0)
+    якщо (i == 0)
 	clearop(cap->oap);
-    else
+    інакше
     {
-	if (i == 2)
+	якщо (i == 2)
 	    cap->oap->motion_type = MLINE;
 	curwin->w_cursor.coladd = 0;
 #ifdef FEAT_FOLDING
-	if (cap->oap->op_type == OP_NOP && (fdo_flags & FDO_SEARCH) && KeyTyped)
+	якщо (cap->oap->op_type == OP_NOP && (fdo_flags & FDO_SEARCH) && KeyTyped)
 	    foldOpenCursor();
 #endif
     }
 #ifdef FEAT_SEARCH_EXTRA
     // Redraw the window to refresh the highlighted matches.
-    if (!EQUAL_POS(curwin->w_cursor, prev_cursor) && p_hls && !no_hlsearch)
+    якщо (!EQUAL_POS(curwin->w_cursor, prev_cursor) && p_hls && !no_hlsearch)
 	redraw_later(UPD_SOME_VALID);
 #endif
 
@@ -4270,7 +4270,7 @@ normal_search(
     // correct that here
     check_cursor();
 
-    return i;
+    повернути i;
 }
 
 /*
@@ -4282,35 +4282,35 @@ normal_search(
     static void
 nv_csearch(cmdarg_T *cap)
 {
-    int		t_cmd;
-    int		cursor_dec = FALSE;
+    ціле		t_cmd;
+    ціле		cursor_dec = FALSE;
 
     // If adjusted cursor position previously, unadjust it.
-    if (*p_sel == 'e' && VIsual_active && VIsual_mode == 'v'
+    якщо (*p_sel == 'e' && VIsual_active && VIsual_mode == 'v'
 		&& VIsual_select_exclu_adj)
     {
 	unadjust_for_sel();
 	cursor_dec = TRUE;
     }
 
-    if (cap->cmdchar == 't' || cap->cmdchar == 'T')
+    якщо (cap->cmdchar == 't' || cap->cmdchar == 'T')
 	t_cmd = TRUE;
-    else
+    інакше
 	t_cmd = FALSE;
 
     cap->oap->motion_type = MCHAR;
-    if (IS_SPECIAL(cap->nchar) || searchc(cap, t_cmd) == FAIL)
+    якщо (IS_SPECIAL(cap->nchar) || searchc(cap, t_cmd) == FAIL)
     {
 	clearopbeep(cap->oap);
 	// Revert unadjust when failed.
-	if (cursor_dec)
+	якщо (cursor_dec)
 	    adjust_for_sel(cap);
-	return;
+	повернути;
     }
 
     curwin->w_set_curswant = true;
     // Include a Tab for "tx" and for "dfx".
-    if (gchar_cursor() == TAB && virtual_active() && cap->arg == FORWARD
+    якщо (gchar_cursor() == TAB && virtual_active() && cap->arg == FORWARD
 	    && (t_cmd || cap->oap->op_type != OP_NOP))
     {
 	colnr_T	scol, ecol;
@@ -4318,11 +4318,11 @@ nv_csearch(cmdarg_T *cap)
 	getvcol(curwin, &curwin->w_cursor, &scol, NULL, &ecol, 0);
 	curwin->w_cursor.coladd = ecol - scol;
     }
-    else
+    інакше
 	curwin->w_cursor.coladd = 0;
     adjust_for_sel(cap);
 #ifdef FEAT_FOLDING
-    if ((fdo_flags & FDO_HOR) && KeyTyped && cap->oap->op_type == OP_NOP)
+    якщо ((fdo_flags & FDO_HOR) && KeyTyped && cap->oap->op_type == OP_NOP)
 	foldOpenCursor();
 #endif
 }
@@ -4341,36 +4341,36 @@ nv_bracket_block(cmdarg_T *cap, pos_T *old_pos)
     pos_T	*pos = NULL;	    // init for GCC
     pos_T	prev_pos;
     long	n;
-    int		findc;
-    int		c;
+    ціле		findc;
+    ціле		c;
 
-    if (cap->nchar == '*')
+    якщо (cap->nchar == '*')
 	cap->nchar = '/';
     prev_pos.lnum = 0;
-    if (cap->nchar == 'm' || cap->nchar == 'M')
+    якщо (cap->nchar == 'm' || cap->nchar == 'M')
     {
-	if (cap->cmdchar == '[')
+	якщо (cap->cmdchar == '[')
 	    findc = '{';
-	else
+	інакше
 	    findc = '}';
 	n = 9999;
     }
-    else
+    інакше
     {
 	findc = cap->nchar;
 	n = cap->count1;
     }
-    for ( ; n > 0; --n)
+    для ( ; n > 0; --n)
     {
-	if ((pos = findmatchlimit(cap->oap, findc,
+	якщо ((pos = findmatchlimit(cap->oap, findc,
 			(cap->cmdchar == '[') ? FM_BACKWARD : FM_FORWARD, 0)) == NULL)
 	{
-	    if (new_pos.lnum == 0)	// nothing found
+	    якщо (new_pos.lnum == 0)	// nothing found
 	    {
-		if (cap->nchar != 'm' && cap->nchar != 'M')
+		якщо (cap->nchar != 'm' && cap->nchar != 'M')
 		    clearopbeep(cap->oap);
 	    }
-	    else
+	    інакше
 		pos = &new_pos;	// use last one found
 	    break;
 	}
@@ -4384,40 +4384,40 @@ nv_bracket_block(cmdarg_T *cap, pos_T *old_pos)
     // brought us to the match for "[m" and "]M" when inside a method.
     // Try finding the '{' or '}' we want to be at.
     // Also repeat for the given count.
-    if (cap->nchar == 'm' || cap->nchar == 'M')
+    якщо (cap->nchar == 'm' || cap->nchar == 'M')
     {
 	// norm is TRUE for "]M" and "[m"
-	int	    norm = ((findc == '{') == (cap->nchar == 'm'));
+	ціле	    norm = ((findc == '{') == (cap->nchar == 'm'));
 
 	n = cap->count1;
 	// found a match: we were inside a method
-	if (prev_pos.lnum != 0)
+	якщо (prev_pos.lnum != 0)
 	{
 	    pos = &prev_pos;
 	    curwin->w_cursor = prev_pos;
-	    if (norm)
+	    якщо (norm)
 		--n;
 	}
-	else
+	інакше
 	    pos = NULL;
-	while (n > 0)
+	поки (n > 0)
 	{
-	    for (;;)
+	    для (;;)
 	    {
-		if ((findc == '{' ? dec_cursor() : inc_cursor()) < 0)
+		якщо ((findc == '{' ? dec_cursor() : inc_cursor()) < 0)
 		{
 		    // if not found anything, that's an error
-		    if (pos == NULL)
+		    якщо (pos == NULL)
 			clearopbeep(cap->oap);
 		    n = 0;
 		    break;
 		}
 		c = gchar_cursor();
-		if (c == '{' || c == '}')
+		якщо (c == '{' || c == '}')
 		{
 		    // Must have found end/start of class: use it.
 		    // Or found the place to be at.
-		    if ((c == findc && norm) || (n == 1 && !norm))
+		    якщо ((c == findc && norm) || (n == 1 && !norm))
 		    {
 			new_pos = curwin->w_cursor;
 			pos = &new_pos;
@@ -4425,17 +4425,17 @@ nv_bracket_block(cmdarg_T *cap, pos_T *old_pos)
 		    }
 		    // if no match found at all, we started outside of the
 		    // class and we're inside now.  Just go on.
-		    else if (new_pos.lnum == 0)
+		    інакше якщо (new_pos.lnum == 0)
 		    {
 			new_pos = curwin->w_cursor;
 			pos = &new_pos;
 		    }
 		    // found start/end of other method: go to match
-		    else if ((pos = findmatchlimit(cap->oap, findc,
+		    інакше якщо ((pos = findmatchlimit(cap->oap, findc,
 			      (cap->cmdchar == '[') ? FM_BACKWARD : FM_FORWARD,
 								   0)) == NULL)
 			n = 0;
-		    else
+		    інакше
 			curwin->w_cursor = *pos;
 		    break;
 		}
@@ -4443,16 +4443,16 @@ nv_bracket_block(cmdarg_T *cap, pos_T *old_pos)
 	    --n;
 	}
 	curwin->w_cursor = *old_pos;
-	if (pos == NULL && new_pos.lnum != 0)
+	якщо (pos == NULL && new_pos.lnum != 0)
 	    clearopbeep(cap->oap);
     }
-    if (pos != NULL)
+    якщо (pos != NULL)
     {
 	setpcmark();
 	curwin->w_cursor = *pos;
 	curwin->w_set_curswant = true;
 #ifdef FEAT_FOLDING
-	if ((fdo_flags & FDO_BLOCK) && KeyTyped
+	якщо ((fdo_flags & FDO_BLOCK) && KeyTyped
 		&& cap->oap->op_type == OP_NOP)
 	    foldOpenCursor();
 #endif
@@ -4469,7 +4469,7 @@ nv_brackets(cmdarg_T *cap)
     pos_T	prev_pos;
     pos_T	*pos = NULL;	    // init for GCC
     pos_T	old_pos;	    // cursor position before command
-    int		flag;
+    ціле		flag;
     long	n;
 
     cap->oap->motion_type = MCHAR;
@@ -4478,9 +4478,9 @@ nv_brackets(cmdarg_T *cap)
     curwin->w_cursor.coladd = 0;    // TODO: don't do this for an error.
 
     // "[f" or "]f" : Edit file under the cursor (same as "gf")
-    if (cap->nchar == 'f')
+    якщо (cap->nchar == 'f')
 	nv_gotofile(cap);
-    else
+    інакше
 
 #ifdef FEAT_FIND_ID
     // Find the occurrence(s) of the identifier or define under cursor
@@ -4490,19 +4490,19 @@ nv_brackets(cmdarg_T *cap)
     //		      fwd   bwd    fwd	 bwd	 fwd	bwd
     // identifier     "]i"  "[i"   "]I"  "[I"	"]^I"  "[^I"
     // define	      "]d"  "[d"   "]D"  "[D"	"]^D"  "[^D"
-    if (vim_strchr((char_u *)"iI\011dD\004", cap->nchar) != NULL)
+    якщо (vim_strchr((char_u *)"iI\011dD\004", cap->nchar) != NULL)
     {
 	char_u	*ptr;
-	int	len;
+	ціле	len;
 
-	if ((len = find_ident_under_cursor(&ptr, FIND_IDENT)) == 0)
+	якщо ((len = find_ident_under_cursor(&ptr, FIND_IDENT)) == 0)
 	    clearop(cap->oap);
-	else
+	інакше
 	{
 	    // Make a copy, if the line was changed it will be freed.
 	    ptr = vim_strnsave(ptr, len);
-	    if (ptr == NULL)
-		return;
+	    якщо (ptr == NULL)
+		повернути;
 
 	    find_pattern_in_path(ptr, 0, len, TRUE,
 		cap->count0 == 0 ? !SAFE_isupper(cap->nchar) : FALSE,
@@ -4517,7 +4517,7 @@ nv_brackets(cmdarg_T *cap)
 	    curwin->w_set_curswant = true;
 	}
     }
-    else
+    інакше
 #endif
 
     // "[{", "[(", "]}" or "])": go to Nth unclosed '{', '(', '}' or ')'
@@ -4525,64 +4525,64 @@ nv_brackets(cmdarg_T *cap)
     // "[/", "[*", "]/", "]*": go to Nth comment start/end.
     // "[m" or "]m" search for prev/next start of (Java) method.
     // "[M" or "]M" search for prev/next end of (Java) method.
-    if (  (cap->cmdchar == '['
+    якщо (  (cap->cmdchar == '['
 		&& vim_strchr((char_u *)"{(*/#mM", cap->nchar) != NULL)
 	    || (cap->cmdchar == ']'
 		&& vim_strchr((char_u *)"})*/#mM", cap->nchar) != NULL))
 	nv_bracket_block(cap, &old_pos);
 
     // "[[", "[]", "]]" and "][": move to start or end of function
-    else if (cap->nchar == '[' || cap->nchar == ']')
+    інакше якщо (cap->nchar == '[' || cap->nchar == ']')
     {
-	if (cap->nchar == cap->cmdchar)		    // "]]" or "[["
+	якщо (cap->nchar == cap->cmdchar)		    // "]]" or "[["
 	    flag = '{';
-	else
+	інакше
 	    flag = '}';		    // "][" or "[]"
 
 	curwin->w_set_curswant = true;
 	// Imitate strange Vi behaviour: When using "]]" with an operator
 	// we also stop at '}'.
-	if (!findpar(&cap->oap->inclusive, cap->arg, cap->count1, flag,
+	якщо (!findpar(&cap->oap->inclusive, cap->arg, cap->count1, flag,
 	      (cap->oap->op_type != OP_NOP
 				      && cap->arg == FORWARD && flag == '{')))
 	    clearopbeep(cap->oap);
-	else
+	інакше
 	{
-	    if (cap->oap->op_type == OP_NOP)
+	    якщо (cap->oap->op_type == OP_NOP)
 		beginline(BL_WHITE | BL_FIX);
 #ifdef FEAT_FOLDING
-	    if ((fdo_flags & FDO_BLOCK) && KeyTyped && cap->oap->op_type == OP_NOP)
+	    якщо ((fdo_flags & FDO_BLOCK) && KeyTyped && cap->oap->op_type == OP_NOP)
 		foldOpenCursor();
 #endif
 	}
     }
 
     // "[p", "[P", "]P" and "]p": put with indent adjustment
-    else if (cap->nchar == 'p' || cap->nchar == 'P')
+    інакше якщо (cap->nchar == 'p' || cap->nchar == 'P')
     {
 	nv_put_opt(cap, TRUE);
     }
 
     // "['", "[`", "]'" and "]`": jump to next mark
-    else if (cap->nchar == '\'' || cap->nchar == '`')
+    інакше якщо (cap->nchar == '\'' || cap->nchar == '`')
     {
 	pos = &curwin->w_cursor;
-	for (n = cap->count1; n > 0; --n)
+	для (n = cap->count1; n > 0; --n)
 	{
 	    prev_pos = *pos;
 	    pos = getnextmark(pos, cap->cmdchar == '[' ? BACKWARD : FORWARD,
 							  cap->nchar == '\'');
-	    if (pos == NULL)
+	    якщо (pos == NULL)
 		break;
 	}
-	if (pos == NULL)
+	якщо (pos == NULL)
 	    pos = &prev_pos;
 	nv_cursormark(cap, cap->nchar == '\'', pos);
     }
 
     // [ or ] followed by a middle mouse click: put selected text with
     // indent adjustment.  Any other button just does as usual.
-    else if (cap->nchar >= K_RIGHTRELEASE && cap->nchar <= K_LEFTMOUSE)
+    інакше якщо (cap->nchar >= K_RIGHTRELEASE && cap->nchar <= K_LEFTMOUSE)
     {
 	(void)do_mouse(cap->oap, cap->nchar,
 		       (cap->cmdchar == ']') ? FORWARD : BACKWARD,
@@ -4591,9 +4591,9 @@ nv_brackets(cmdarg_T *cap)
 
 #ifdef FEAT_FOLDING
     // "[z" and "]z": move to start or end of open fold.
-    else if (cap->nchar == 'z')
+    інакше якщо (cap->nchar == 'z')
     {
-	if (foldMoveTo(FALSE, cap->cmdchar == ']' ? FORWARD : BACKWARD,
+	якщо (foldMoveTo(FALSE, cap->cmdchar == ']' ? FORWARD : BACKWARD,
 							 cap->count1) == FAIL)
 	    clearopbeep(cap->oap);
     }
@@ -4601,9 +4601,9 @@ nv_brackets(cmdarg_T *cap)
 
 #ifdef FEAT_DIFF
     // "[c" and "]c": move to next or previous diff-change.
-    else if (cap->nchar == 'c')
+    інакше якщо (cap->nchar == 'c')
     {
-	if (diff_move_to(cap->cmdchar == ']' ? FORWARD : BACKWARD,
+	якщо (diff_move_to(cap->cmdchar == ']' ? FORWARD : BACKWARD,
 							 cap->count1) == FAIL)
 	    clearopbeep(cap->oap);
     }
@@ -4611,11 +4611,11 @@ nv_brackets(cmdarg_T *cap)
 
 #ifdef FEAT_SPELL
     // "[r", "[s", "[S", "]r", "]s" and "]S": move to next spell error.
-    else if (cap->nchar == 'r' || cap->nchar == 's' || cap->nchar == 'S')
+    інакше якщо (cap->nchar == 'r' || cap->nchar == 's' || cap->nchar == 'S')
     {
 	setpcmark();
-	for (n = 0; n < cap->count1; ++n)
-	    if (spell_move_to(curwin, cap->cmdchar == ']' ? FORWARD : BACKWARD,
+	для (n = 0; n < cap->count1; ++n)
+	    якщо (spell_move_to(curwin, cap->cmdchar == ']' ? FORWARD : BACKWARD,
 			  cap->nchar == 's' ? SMT_ALL :
 			  cap->nchar == 'r' ? SMT_RARE :
 			  SMT_BAD, FALSE, NULL) == 0)
@@ -4623,17 +4623,17 @@ nv_brackets(cmdarg_T *cap)
 		clearopbeep(cap->oap);
 		break;
 	    }
-	    else
+	    інакше
 		curwin->w_set_curswant = true;
 # ifdef FEAT_FOLDING
-	if (cap->oap->op_type == OP_NOP && (fdo_flags & FDO_SEARCH) && KeyTyped)
+	якщо (cap->oap->op_type == OP_NOP && (fdo_flags & FDO_SEARCH) && KeyTyped)
 	    foldOpenCursor();
 # endif
     }
 #endif
 
     // Not a valid cap->nchar.
-    else
+    інакше
 	clearopbeep(cap->oap);
 }
 
@@ -4648,17 +4648,17 @@ buf_has_cstyle_comments(void)
     char_u	*list;
     char_u	part_buf[COM_MAX_LEN];	// buffer for one 'comments' part
 
-    for (list = curbuf->b_p_com; *list; )
+    для (list = curbuf->b_p_com; *list; )
     {
 	char_u	*string;
 
 	(void)copy_option_part(&list, part_buf, COM_MAX_LEN, ",");
 	string = vim_strchr(part_buf, ':');	// flags and comment leader
-	if (string != NULL && string[1] == '/'
+	якщо (string != NULL && string[1] == '/'
 				    && (string[2] == '/' || string[2] == '*'))
-	    return true;
+	    повернути true;
     }
-    return false;
+    повернути false;
 }
 
 /*
@@ -4668,16 +4668,16 @@ buf_has_cstyle_comments(void)
 nv_percent(cmdarg_T *cap)
 {
     pos_T	*pos;
-#if defined(FEAT_FOLDING)
+#якщо defined(FEAT_FOLDING)
     linenr_T	lnum = curwin->w_cursor.lnum;
 #endif
 
     cap->oap->inclusive = TRUE;
-    if (cap->count0)	    // {cnt}% : goto {cnt} percentage in file
+    якщо (cap->count0)	    // {cnt}% : goto {cnt} percentage in file
     {
-	if (cap->count0 > 100)
+	якщо (cap->count0 > 100)
 	    clearopbeep(cap->oap);
-	else
+	інакше
 	{
 	    cap->oap->motion_type = MLINE;
 	    setpcmark();
@@ -4685,40 +4685,40 @@ nv_percent(cmdarg_T *cap)
 	    // Beyond 21474836 lines, (ml_line_count * 100 + 99) would
 	    // overflow on 32-bits, so use a formula with less accuracy
 	    // to avoid overflows.
-	    if (curbuf->b_ml.ml_line_count >= 21474836)
+	    якщо (curbuf->b_ml.ml_line_count >= 21474836)
 		curwin->w_cursor.lnum = (curbuf->b_ml.ml_line_count + 99L)
 							 / 100L * cap->count0;
-	    else
+	    інакше
 		curwin->w_cursor.lnum = (curbuf->b_ml.ml_line_count *
 						    cap->count0 + 99L) / 100L;
-	    if (curwin->w_cursor.lnum < 1)
+	    якщо (curwin->w_cursor.lnum < 1)
 		curwin->w_cursor.lnum = 1;
-	    if (curwin->w_cursor.lnum > curbuf->b_ml.ml_line_count)
+	    якщо (curwin->w_cursor.lnum > curbuf->b_ml.ml_line_count)
 		curwin->w_cursor.lnum = curbuf->b_ml.ml_line_count;
 	    beginline(BL_SOL | BL_FIX);
 	}
     }
-    else		    // "%" : go to matching paren
+    інакше		    // "%" : go to matching paren
     {
-	int	flags = 0;
+	ціле	flags = 0;
 
 	// Skip matching parens inside C-style comments, like the "=" operator
 	// does, but not when "%" is in 'cpoptions' (Vi-compatible) or the
 	// cursor sits in a line comment (so a match there can still be found).
-	if (vim_strchr(p_cpo, CPO_MATCH) == NULL && buf_has_cstyle_comments())
+	якщо (vim_strchr(p_cpo, CPO_MATCH) == NULL && buf_has_cstyle_comments())
 	{
-	    int	comment_col = check_linecomment(ml_get_curline());
+	    ціле	comment_col = check_linecomment(ml_get_curline());
 
-	    if (comment_col == MAXCOL
+	    якщо (comment_col == MAXCOL
 			   || curwin->w_cursor.col < (colnr_T)comment_col)
 		flags = FM_SKIPCOMM;
 	}
 
 	cap->oap->motion_type = MCHAR;
 	cap->oap->use_reg_one = TRUE;
-	if ((pos = findmatchlimit(cap->oap, NUL, flags, 0)) == NULL)
+	якщо ((pos = findmatchlimit(cap->oap, NUL, flags, 0)) == NULL)
 	    clearopbeep(cap->oap);
-	else
+	інакше
 	{
 	    setpcmark();
 	    curwin->w_cursor = *pos;
@@ -4728,7 +4728,7 @@ nv_percent(cmdarg_T *cap)
 	}
     }
 #ifdef FEAT_FOLDING
-    if (cap->oap->op_type == OP_NOP
+    якщо (cap->oap->op_type == OP_NOP
 	    && lnum != curwin->w_cursor.lnum
 	    && (fdo_flags & FDO_PERCENT)
 	    && KeyTyped)
@@ -4749,17 +4749,17 @@ nv_brace(cmdarg_T *cap)
     cap->oap->inclusive = FALSE;
     curwin->w_set_curswant = true;
 
-    if (findsent(cap->arg, cap->count1) == FAIL)
+    якщо (findsent(cap->arg, cap->count1) == FAIL)
     {
 	clearopbeep(cap->oap);
-	return;
+	повернути;
     }
 
     // Don't leave the cursor on the NUL past end of line.
     adjust_cursor(cap->oap);
     curwin->w_cursor.coladd = 0;
 #ifdef FEAT_FOLDING
-    if ((fdo_flags & FDO_BLOCK) && KeyTyped && cap->oap->op_type == OP_NOP)
+    якщо ((fdo_flags & FDO_BLOCK) && KeyTyped && cap->oap->op_type == OP_NOP)
 	foldOpenCursor();
 #endif
 }
@@ -4770,10 +4770,10 @@ nv_brace(cmdarg_T *cap)
     static void
 nv_mark(cmdarg_T *cap)
 {
-    if (checkclearop(cap->oap))
-	return;
+    якщо (checkclearop(cap->oap))
+	повернути;
 
-    if (setmark(cap->nchar) == FAIL)
+    якщо (setmark(cap->nchar) == FAIL)
 	clearopbeep(cap->oap);
 }
 
@@ -4788,15 +4788,15 @@ nv_findpar(cmdarg_T *cap)
     cap->oap->inclusive = FALSE;
     cap->oap->use_reg_one = TRUE;
     curwin->w_set_curswant = true;
-    if (!findpar(&cap->oap->inclusive, cap->arg, cap->count1, NUL, FALSE))
+    якщо (!findpar(&cap->oap->inclusive, cap->arg, cap->count1, NUL, FALSE))
     {
 	clearopbeep(cap->oap);
-	return;
+	повернути;
     }
 
     curwin->w_cursor.coladd = 0;
 #ifdef FEAT_FOLDING
-    if ((fdo_flags & FDO_BLOCK) && KeyTyped && cap->oap->op_type == OP_NOP)
+    якщо ((fdo_flags & FDO_BLOCK) && KeyTyped && cap->oap->op_type == OP_NOP)
 	foldOpenCursor();
 #endif
 }
@@ -4807,14 +4807,14 @@ nv_findpar(cmdarg_T *cap)
     static void
 nv_undo(cmdarg_T *cap)
 {
-    if (cap->oap->op_type == OP_LOWER || VIsual_active)
+    якщо (cap->oap->op_type == OP_LOWER || VIsual_active)
     {
 	// translate "<Visual>u" to "<Visual>gu" and "guu" to "gugu"
 	cap->cmdchar = 'g';
 	cap->nchar = 'u';
 	nv_operator(cap);
     }
-    else
+    інакше
 	nv_kundo(cap);
 }
 
@@ -4824,17 +4824,17 @@ nv_undo(cmdarg_T *cap)
     static void
 nv_kundo(cmdarg_T *cap)
 {
-    if (checkclearopq(cap->oap))
-	return;
+    якщо (checkclearopq(cap->oap))
+	повернути;
 
 #ifdef FEAT_JOB_CHANNEL
-    if (bt_prompt(curbuf))
+    якщо (bt_prompt(curbuf))
     {
 	clearopbeep(cap->oap);
-	return;
+	повернути;
     }
 #endif
-    u_undo((int)cap->count1);
+    u_undo((ціле)cap->count1);
     curwin->w_set_curswant = true;
 }
 
@@ -4844,97 +4844,97 @@ nv_kundo(cmdarg_T *cap)
     static void
 nv_replace(cmdarg_T *cap)
 {
-    int		had_ctrl_v;
+    ціле		had_ctrl_v;
     long	n;
 
-    if (checkclearop(cap->oap))
-	return;
+    якщо (checkclearop(cap->oap))
+	повернути;
 #ifdef FEAT_JOB_CHANNEL
-    if (bt_prompt(curbuf) && !prompt_curpos_editable())
+    якщо (bt_prompt(curbuf) && !prompt_curpos_editable())
     {
 	clearopbeep(cap->oap);
-	return;
+	повернути;
     }
 #endif
 
     // get another character
-    if (cap->nchar == Ctrl_V || cap->nchar == Ctrl_Q)
+    якщо (cap->nchar == Ctrl_V || cap->nchar == Ctrl_Q)
     {
 	had_ctrl_v = Ctrl_V;
 	cap->nchar = get_literal(FALSE);
 	// Don't redo a multibyte character with CTRL-V.
-	if (cap->nchar > DEL)
+	якщо (cap->nchar > DEL)
 	    had_ctrl_v = NUL;
     }
-    else
+    інакше
 	had_ctrl_v = NUL;
 
     // Abort if the character is a special key.
-    if (IS_SPECIAL(cap->nchar))
+    якщо (IS_SPECIAL(cap->nchar))
     {
 	clearopbeep(cap->oap);
-	return;
+	повернути;
     }
 
     // Visual mode "r"
-    if (VIsual_active)
+    якщо (VIsual_active)
     {
-	if (got_int)
+	якщо (got_int)
 	    got_int = FALSE;
-	if (had_ctrl_v)
+	якщо (had_ctrl_v)
 	{
 	    // Use a special (negative) number to make a difference between a
 	    // literal CR or NL and a line break.
-	    if (cap->nchar == CAR)
+	    якщо (cap->nchar == CAR)
 		cap->nchar = REPLACE_CR_NCHAR;
-	    else if (cap->nchar == NL)
+	    інакше якщо (cap->nchar == NL)
 		cap->nchar = REPLACE_NL_NCHAR;
 	}
 	nv_operator(cap);
-	return;
+	повернути;
     }
 
     // Break tabs, etc.
-    if (virtual_active())
+    якщо (virtual_active())
     {
-	if (u_save_cursor() == FAIL)
-	    return;
-	if (gchar_cursor() == NUL)
+	якщо (u_save_cursor() == FAIL)
+	    повернути;
+	якщо (gchar_cursor() == NUL)
 	{
 	    // Add extra space and put the cursor on the first one.
 	    coladvance_force((colnr_T)(getviscol() + cap->count1));
 	    curwin->w_cursor.col -= cap->count1;
 	}
-	else if (gchar_cursor() == TAB)
+	інакше якщо (gchar_cursor() == TAB)
 	    coladvance_force(getviscol());
     }
 
     // Abort if not enough characters to replace.
-    if ((size_t)ml_get_cursor_len() < (unsigned)cap->count1
+    якщо ((size_t)ml_get_cursor_len() < (unsigned)cap->count1
 	    || (has_mbyte && mb_charlen(ml_get_cursor()) < cap->count1))
     {
 	clearopbeep(cap->oap);
-	return;
+	повернути;
     }
 
     // Replacing with a TAB is done by edit() when it is complicated because
     // 'expandtab' or 'smarttab' is set.  CTRL-V TAB inserts a literal TAB.
     // Other characters are done below to avoid problems with things like
     // CTRL-V 048 (for edit() this would be R CTRL-V 0 ESC).
-    if (had_ctrl_v != Ctrl_V && cap->nchar == '\t' && (curbuf->b_p_et || p_sta))
+    якщо (had_ctrl_v != Ctrl_V && cap->nchar == '\t' && (curbuf->b_p_et || p_sta))
     {
 	stuffnumReadbuff(cap->count1);
 	stuffcharReadbuff('R');
 	stuffcharReadbuff('\t');
 	stuffcharReadbuff(ESC);
-	return;
+	повернути;
     }
 
     // save line for undo
-    if (u_save_cursor() == FAIL)
-	return;
+    якщо (u_save_cursor() == FAIL)
+	повернути;
 
-    if (had_ctrl_v != Ctrl_V && (cap->nchar == '\r' || cap->nchar == '\n'))
+    якщо (had_ctrl_v != Ctrl_V && (cap->nchar == '\r' || cap->nchar == '\n'))
     {
 	// Replace character(s) by a single newline.
 	// Strange vi behaviour: Only one newline is inserted.
@@ -4949,76 +4949,76 @@ nv_replace(cmdarg_T *cap)
 	// Give 'r' to edit(), to get the redo command right.
 	invoke_edit(cap, TRUE, 'r', FALSE);
     }
-    else
+    інакше
     {
 	prep_redo(cap->oap->regname, cap->count1,
 				       NUL, 'r', NUL, had_ctrl_v, cap->nchar);
 
 	curbuf->b_op_start = curwin->w_cursor;
-	if (has_mbyte)
+	якщо (has_mbyte)
 	{
-	    int		old_State = State;
+	    ціле		old_State = State;
 
-	    if (cap->ncharC1 != 0)
+	    якщо (cap->ncharC1 != 0)
 		AppendCharToRedobuff(cap->ncharC1);
-	    if (cap->ncharC2 != 0)
+	    якщо (cap->ncharC2 != 0)
 		AppendCharToRedobuff(cap->ncharC2);
 
 	    // This is slow, but it handles replacing a single-byte with a
 	    // multi-byte and the other way around.  Also handles adding
 	    // composing characters for utf-8.
-	    for (n = cap->count1; n > 0; --n)
+	    для (n = cap->count1; n > 0; --n)
 	    {
 		State = MODE_REPLACE;
-		if (cap->nchar == Ctrl_E || cap->nchar == Ctrl_Y)
+		якщо (cap->nchar == Ctrl_E || cap->nchar == Ctrl_Y)
 		{
-		    int c = ins_copychar(curwin->w_cursor.lnum
+		    ціле c = ins_copychar(curwin->w_cursor.lnum
 					   + (cap->nchar == Ctrl_Y ? -1 : 1));
-		    if (c != NUL)
+		    якщо (c != NUL)
 			ins_char(c);
-		    else
+		    інакше
 			// will be decremented further down
 			++curwin->w_cursor.col;
 		}
-		else
+		інакше
 		    ins_char(cap->nchar);
 		State = old_State;
-		if (cap->ncharC1 != 0)
+		якщо (cap->ncharC1 != 0)
 		    ins_char(cap->ncharC1);
-		if (cap->ncharC2 != 0)
+		якщо (cap->ncharC2 != 0)
 		    ins_char(cap->ncharC2);
 	    }
 	}
-	else
+	інакше
 	{
 	    char_u *ptr;
 
 	    // Replace the characters within one line.
-	    for (n = cap->count1; n > 0; --n)
+	    для (n = cap->count1; n > 0; --n)
 	    {
 		// Get ptr again, because ins_copychar() and showmatch()
 		// will have released the line.
 		// At the same time we let know that the line will be changed.
-		if (cap->nchar == Ctrl_E || cap->nchar == Ctrl_Y)
+		якщо (cap->nchar == Ctrl_E || cap->nchar == Ctrl_Y)
 		{
-		  int c = ins_copychar(curwin->w_cursor.lnum
+		  ціле c = ins_copychar(curwin->w_cursor.lnum
 					   + (cap->nchar == Ctrl_Y ? -1 : 1));
 
 		  ptr = ml_get_buf(curbuf, curwin->w_cursor.lnum, TRUE);
-		  if (c != NUL)
+		  якщо (c != NUL)
 		    ptr[curwin->w_cursor.col] = c;
 		}
-		else
+		інакше
 		{
 		    ptr = ml_get_buf(curbuf, curwin->w_cursor.lnum, TRUE);
 		    ptr[curwin->w_cursor.col] = cap->nchar;
 		}
-		if (p_sm && msg_silent == 0)
+		якщо (p_sm && msg_silent == 0)
 		    showmatch(cap->nchar);
 		++curwin->w_cursor.col;
 	    }
 #ifdef FEAT_NETBEANS_INTG
-	    if (netbeans_active())
+	    якщо (netbeans_active())
 	    {
 		colnr_T  start = (colnr_T)(curwin->w_cursor.col - cap->count1);
 		ptr = ml_get_curline();
@@ -5026,7 +5026,7 @@ nv_replace(cmdarg_T *cap)
 		netbeans_removed(curbuf, curwin->w_cursor.lnum, start,
 							   cap->count1);
 		netbeans_inserted(curbuf, curwin->w_cursor.lnum, start,
-					       &ptr[start], (int)cap->count1);
+					       &ptr[start], (ціле)cap->count1);
 	    }
 #endif
 
@@ -5037,7 +5037,7 @@ nv_replace(cmdarg_T *cap)
 	--curwin->w_cursor.col;	    // cursor on the last replaced char
 	// if the character on the left of the current cursor is a multi-byte
 	// character, move two characters left
-	if (has_mbyte)
+	якщо (has_mbyte)
 	    mb_adjust_cursor();
 	curbuf->b_op_end = curwin->w_cursor;
 	curwin->w_set_curswant = true;
@@ -5050,12 +5050,12 @@ nv_replace(cmdarg_T *cap)
  * 'O': same, but in block mode exchange left and right corners.
  */
     static void
-v_swap_corners(int cmdchar)
+v_swap_corners(ціле cmdchar)
 {
     pos_T	old_cursor;
     colnr_T	left, right;
 
-    if (cmdchar == 'O' && VIsual_mode == Ctrl_V)
+    якщо (cmdchar == 'O' && VIsual_mode == Ctrl_V)
     {
 	old_cursor = curwin->w_cursor;
 	getvcols(curwin, &old_cursor, &VIsual, &left, &right, 0);
@@ -5067,15 +5067,15 @@ v_swap_corners(int cmdchar)
 	curwin->w_curswant = right;
 	// 'selection "exclusive" and cursor at right-bottom corner: move it
 	// right one column
-	if (old_cursor.lnum >= VIsual.lnum && *p_sel == 'e')
+	якщо (old_cursor.lnum >= VIsual.lnum && *p_sel == 'e')
 	    ++curwin->w_curswant;
 	coladvance(curwin->w_curswant);
-	if (curwin->w_cursor.col == old_cursor.col
+	якщо (curwin->w_cursor.col == old_cursor.col
 		&& (!virtual_active()
 		    || curwin->w_cursor.coladd == old_cursor.coladd))
 	{
 	    curwin->w_cursor.lnum = VIsual.lnum;
-	    if (old_cursor.lnum <= VIsual.lnum && *p_sel == 'e')
+	    якщо (old_cursor.lnum <= VIsual.lnum && *p_sel == 'e')
 		++right;
 	    coladvance(right);
 	    VIsual = curwin->w_cursor;
@@ -5085,7 +5085,7 @@ v_swap_corners(int cmdchar)
 	    curwin->w_curswant = left;
 	}
     }
-    else
+    інакше
     {
 	old_cursor = curwin->w_cursor;
 	curwin->w_cursor = VIsual;
@@ -5100,24 +5100,24 @@ v_swap_corners(int cmdchar)
     static void
 nv_Replace(cmdarg_T *cap)
 {
-    if (VIsual_active)		// "R" is replace lines
+    якщо (VIsual_active)		// "R" is replace lines
     {
 	cap->cmdchar = 'c';
 	cap->nchar = NUL;
 	VIsual_mode_orig = VIsual_mode; // remember original area for gv
 	VIsual_mode = 'V';
 	nv_operator(cap);
-	return;
+	повернути;
     }
 
-    if (checkclearopq(cap->oap))
-	return;
+    якщо (checkclearopq(cap->oap))
+	повернути;
 
-    if (!curbuf->b_p_ma)
+    якщо (!curbuf->b_p_ma)
 	emsg(_(e_cannot_make_changes_modifiable_is_off));
-    else
+    інакше
     {
-	if (virtual_active())
+	якщо (virtual_active())
 	    coladvance(getviscol());
 	invoke_edit(cap, FALSE, cap->arg ? 'V' : 'R', FALSE);
     }
@@ -5129,31 +5129,31 @@ nv_Replace(cmdarg_T *cap)
     static void
 nv_vreplace(cmdarg_T *cap)
 {
-    if (VIsual_active)
+    якщо (VIsual_active)
     {
 	cap->cmdchar = 'r';
 	cap->nchar = cap->extra_char;
 	nv_replace(cap);	// Do same as "r" in Visual mode for now
-	return;
+	повернути;
     }
 
-    if (checkclearopq(cap->oap))
-	return;
+    якщо (checkclearopq(cap->oap))
+	повернути;
 
-    if (!curbuf->b_p_ma)
+    якщо (!curbuf->b_p_ma)
 	emsg(_(e_cannot_make_changes_modifiable_is_off));
-    else
+    інакше
     {
-	if (cap->extra_char == Ctrl_V || cap->extra_char == Ctrl_Q)
+	якщо (cap->extra_char == Ctrl_V || cap->extra_char == Ctrl_Q)
 	    // get another character
 	    cap->extra_char = get_literal(FALSE);
-	if (cap->extra_char < ' ')
+	якщо (cap->extra_char < ' ')
 	    // Prefix a control character with CTRL-V to avoid it being used as
 	    // a command.
 	    stuffcharReadbuff(Ctrl_V);
 	stuffcharReadbuff(cap->extra_char);
 	stuffcharReadbuff(ESC);
-	if (virtual_active())
+	якщо (virtual_active())
 	    coladvance(getviscol());
 	invoke_edit(cap, TRUE, 'v', FALSE);
     }
@@ -5167,47 +5167,47 @@ n_swapchar(cmdarg_T *cap)
 {
     long	n;
     pos_T	startpos;
-    int		did_change = 0;
+    ціле		did_change = 0;
 #ifdef FEAT_NETBEANS_INTG
     pos_T	pos;
     char_u	*ptr;
-    int		count;
+    ціле		count;
 #endif
 
-    if (checkclearopq(cap->oap))
-	return;
+    якщо (checkclearopq(cap->oap))
+	повернути;
 
-    if (LINEEMPTY(curwin->w_cursor.lnum) && vim_strchr(p_ww, '~') == NULL)
+    якщо (LINEEMPTY(curwin->w_cursor.lnum) && vim_strchr(p_ww, '~') == NULL)
     {
 	clearopbeep(cap->oap);
-	return;
+	повернути;
     }
 
     prep_redo_cmd(cap);
 
-    if (u_save_cursor() == FAIL)
-	return;
+    якщо (u_save_cursor() == FAIL)
+	повернути;
 
     startpos = curwin->w_cursor;
 #ifdef FEAT_NETBEANS_INTG
     pos = startpos;
 #endif
-    for (n = cap->count1; n > 0; --n)
+    для (n = cap->count1; n > 0; --n)
     {
 	did_change |= swapchar(cap->oap->op_type, &curwin->w_cursor);
 	inc_cursor();
-	if (gchar_cursor() == NUL)
+	якщо (gchar_cursor() == NUL)
 	{
-	    if (vim_strchr(p_ww, '~') != NULL
+	    якщо (vim_strchr(p_ww, '~') != NULL
 		    && curwin->w_cursor.lnum < curbuf->b_ml.ml_line_count)
 	    {
 #ifdef FEAT_NETBEANS_INTG
-		if (netbeans_active())
+		якщо (netbeans_active())
 		{
-		    if (did_change)
+		    якщо (did_change)
 		    {
 			ptr = ml_get(pos.lnum);
-			count = (int)ml_get_len(pos.lnum) - pos.col;
+			count = (ціле)ml_get_len(pos.lnum) - pos.col;
 			netbeans_removed(curbuf, pos.lnum, pos.col,
 								 (long)count);
 			// line may have been flushed, get it again
@@ -5221,19 +5221,19 @@ n_swapchar(cmdarg_T *cap)
 #endif
 		++curwin->w_cursor.lnum;
 		curwin->w_cursor.col = 0;
-		if (n > 1)
+		якщо (n > 1)
 		{
-		    if (u_savesub(curwin->w_cursor.lnum) == FAIL)
+		    якщо (u_savesub(curwin->w_cursor.lnum) == FAIL)
 			break;
 		    u_clearline();
 		}
 	    }
-	    else
+	    інакше
 		break;
 	}
     }
 #ifdef FEAT_NETBEANS_INTG
-    if (did_change && netbeans_active())
+    якщо (did_change && netbeans_active())
     {
 	ptr = ml_get(pos.lnum);
 	count = curwin->w_cursor.col - pos.col;
@@ -5245,13 +5245,13 @@ n_swapchar(cmdarg_T *cap)
 
     check_cursor();
     curwin->w_set_curswant = true;
-    if (did_change)
+    якщо (did_change)
     {
 	changed_lines(startpos.lnum, startpos.col, curwin->w_cursor.lnum + 1,
 									  0L);
 	curbuf->b_op_start = startpos;
 	curbuf->b_op_end = curwin->w_cursor;
-	if (curbuf->b_op_end.col > 0)
+	якщо (curbuf->b_op_end.col > 0)
 	    --curbuf->b_op_end.col;
     }
 }
@@ -5260,25 +5260,25 @@ n_swapchar(cmdarg_T *cap)
  * Move cursor to mark.
  */
     static void
-nv_cursormark(cmdarg_T *cap, int flag, pos_T *pos)
+nv_cursormark(cmdarg_T *cap, ціле flag, pos_T *pos)
 {
-    if (check_mark(pos) == FAIL)
+    якщо (check_mark(pos) == FAIL)
 	clearop(cap->oap);
-    else
+    інакше
     {
-	if (cap->cmdchar == '\''
+	якщо (cap->cmdchar == '\''
 		|| cap->cmdchar == '`'
 		|| cap->cmdchar == '['
 		|| cap->cmdchar == ']')
 	    setpcmark();
 	curwin->w_cursor = *pos;
-	if (flag)
+	якщо (flag)
 	    beginline(BL_WHITE | BL_FIX);
-	else
+	інакше
 	    check_cursor();
     }
     cap->oap->motion_type = flag ? MLINE : MCHAR;
-    if (cap->cmdchar == '`')
+    якщо (cap->cmdchar == '`')
 	cap->oap->use_reg_one = TRUE;
     cap->oap->inclusive = FALSE;		// ignored if not MCHAR
     curwin->w_set_curswant = true;
@@ -5294,14 +5294,14 @@ v_visop(cmdarg_T *cap)
 
     // Uppercase means linewise, except in block mode, then "D" deletes till
     // the end of the line, and "C" replaces till EOL
-    if (SAFE_isupper(cap->cmdchar))
+    якщо (SAFE_isupper(cap->cmdchar))
     {
-	if (VIsual_mode != Ctrl_V)
+	якщо (VIsual_mode != Ctrl_V)
 	{
 	    VIsual_mode_orig = VIsual_mode;
 	    VIsual_mode = 'V';
 	}
-	else if (cap->cmdchar == 'C' || cap->cmdchar == 'D')
+	інакше якщо (cap->cmdchar == 'C' || cap->cmdchar == 'D')
 	    curwin->w_curswant = MAXCOL;
     }
     cap->cmdchar = *(vim_strchr(trans, cap->cmdchar) + 1);
@@ -5316,19 +5316,19 @@ nv_subst(cmdarg_T *cap)
 {
 #ifdef FEAT_TERMINAL
     // When showing output of term_dumpdiff() swap the top and bottom.
-    if (term_swap_diff() == OK)
-	return;
+    якщо (term_swap_diff() == OK)
+	повернути;
 #endif
 #ifdef FEAT_JOB_CHANNEL
-    if (bt_prompt(curbuf) && !prompt_curpos_editable())
+    якщо (bt_prompt(curbuf) && !prompt_curpos_editable())
     {
 	clearopbeep(cap->oap);
-	return;
+	повернути;
     }
 #endif
-    if (VIsual_active)	// "vs" and "vS" are the same as "vc"
+    якщо (VIsual_active)	// "vs" and "vS" are the same as "vc"
     {
-	if (cap->cmdchar == 'S')
+	якщо (cap->cmdchar == 'S')
 	{
 	    VIsual_mode_orig = VIsual_mode;
 	    VIsual_mode = 'V';
@@ -5336,7 +5336,7 @@ nv_subst(cmdarg_T *cap)
 	cap->cmdchar = 'c';
 	nv_operator(cap);
     }
-    else
+    інакше
 	nv_optrans(cap);
 }
 
@@ -5346,13 +5346,13 @@ nv_subst(cmdarg_T *cap)
     static void
 nv_abbrev(cmdarg_T *cap)
 {
-    if (cap->cmdchar == K_DEL || cap->cmdchar == K_KDEL)
+    якщо (cap->cmdchar == K_DEL || cap->cmdchar == K_KDEL)
 	cap->cmdchar = 'x';		// DEL key behaves like 'x'
 
     // in Visual mode these commands are operators
-    if (VIsual_active)
+    якщо (VIsual_active)
 	v_visop(cap);
-    else
+    інакше
 	nv_optrans(cap);
 }
 
@@ -5368,11 +5368,11 @@ nv_optrans(cmdarg_T *cap)
 			      (char_u *)"yy", (char_u *)":s\r"};
     static char_u *str = (char_u *)"xXDCsSY&";
 
-    if (!checkclearopq(cap->oap))
+    якщо (!checkclearopq(cap->oap))
     {
 	// In Vi "2D" doesn't delete the next line.  Can't translate it
 	// either, because "2." should also not use the count.
-	if (cap->cmdchar == 'D' && vim_strchr(p_cpo, CPO_HASH) != NULL)
+	якщо (cap->cmdchar == 'D' && vim_strchr(p_cpo, CPO_HASH) != NULL)
 	{
 	    cap->oap->start = curwin->w_cursor;
 	    cap->oap->op_type = OP_DELETE;
@@ -5385,11 +5385,11 @@ nv_optrans(cmdarg_T *cap)
 	    ResetRedobuff();
 	    AppendCharToRedobuff('D');
 	}
-	else
+	інакше
 	{
-	    if (cap->count0)
+	    якщо (cap->count0)
 		stuffnumReadbuff(cap->count0);
-	    stuffReadbuff(ar[(int)(vim_strchr(str, cap->cmdchar) - str)]);
+	    stuffReadbuff(ar[(ціле)(vim_strchr(str, cap->cmdchar) - str)]);
 	}
     }
     cap->opcount = 0;
@@ -5403,36 +5403,36 @@ nv_optrans(cmdarg_T *cap)
 nv_gomark(cmdarg_T *cap)
 {
     pos_T	*pos;
-    int		c;
+    ціле		c;
 #ifdef FEAT_FOLDING
     pos_T	old_cursor = curwin->w_cursor;
-    int		old_KeyTyped = KeyTyped;    // getting file may reset it
+    ціле		old_KeyTyped = KeyTyped;    // getting file may reset it
 #endif
 
-    if (cap->cmdchar == 'g')
+    якщо (cap->cmdchar == 'g')
 	c = cap->extra_char;
-    else
+    інакше
 	c = cap->nchar;
     pos = getmark(c, (cap->oap->op_type == OP_NOP));
-    if (pos == (pos_T *)-1)	    // jumped to other file
+    якщо (pos == (pos_T *)-1)	    // jumped to other file
     {
-	if (cap->arg)
+	якщо (cap->arg)
 	{
 	    check_cursor_lnum();
 	    beginline(BL_WHITE | BL_FIX);
 	}
-	else
+	інакше
 	    check_cursor();
     }
-    else
+    інакше
 	nv_cursormark(cap, cap->arg, pos);
 
     // May need to clear the coladd that a mark includes.
-    if (!virtual_active())
+    якщо (!virtual_active())
 	curwin->w_cursor.coladd = 0;
     check_cursor_col();
 #ifdef FEAT_FOLDING
-    if (cap->oap->op_type == OP_NOP
+    якщо (cap->oap->op_type == OP_NOP
 	    && pos != NULL
 	    && (pos == (pos_T *)-1 || !EQUAL_POS(old_cursor, *pos))
 	    && (fdo_flags & FDO_MARK)
@@ -5450,42 +5450,42 @@ nv_pcmark(cmdarg_T *cap)
     pos_T	*pos;
 #ifdef FEAT_FOLDING
     linenr_T	lnum = curwin->w_cursor.lnum;
-    int		old_KeyTyped = KeyTyped;    // getting file may reset it
+    ціле		old_KeyTyped = KeyTyped;    // getting file may reset it
 #endif
 
-    if (checkclearopq(cap->oap))
-	return;
+    якщо (checkclearopq(cap->oap))
+	повернути;
 
-    if (cap->cmdchar == TAB && mod_mask == MOD_MASK_CTRL)
+    якщо (cap->cmdchar == TAB && mod_mask == MOD_MASK_CTRL)
     {
-	if (goto_tabpage_lastused() == FAIL)
+	якщо (goto_tabpage_lastused() == FAIL)
 	    clearopbeep(cap->oap);
-	return;
+	повернути;
     }
-    if (cap->cmdchar == 'g')
-	pos = movechangelist((int)cap->count1);
-    else
-	pos = movemark((int)cap->count1);
-    if (pos == (pos_T *)-1)		// jump to other file
+    якщо (cap->cmdchar == 'g')
+	pos = movechangelist((ціле)cap->count1);
+    інакше
+	pos = movemark((ціле)cap->count1);
+    якщо (pos == (pos_T *)-1)		// jump to other file
     {
 	curwin->w_set_curswant = true;
 	check_cursor();
     }
-    else if (pos != NULL)		    // can jump
+    інакше якщо (pos != NULL)		    // can jump
 	nv_cursormark(cap, FALSE, pos);
-    else if (cap->cmdchar == 'g')
+    інакше якщо (cap->cmdchar == 'g')
     {
-	if (curbuf->b_changelistlen == 0)
+	якщо (curbuf->b_changelistlen == 0)
 	    emsg(_(e_changelist_is_empty));
-	else if (cap->count1 < 0)
+	інакше якщо (cap->count1 < 0)
 	    emsg(_(e_at_start_of_changelist));
-	else
+	інакше
 	    emsg(_(e_at_end_of_changelist));
     }
-    else
+    інакше
 	clearopbeep(cap->oap);
 #ifdef FEAT_FOLDING
-    if (cap->oap->op_type == OP_NOP
+    якщо (cap->oap->op_type == OP_NOP
 	    && (pos == (pos_T *)-1 || lnum != curwin->w_cursor.lnum)
 	    && (fdo_flags & FDO_MARK)
 	    && old_KeyTyped)
@@ -5499,13 +5499,13 @@ nv_pcmark(cmdarg_T *cap)
     static void
 nv_regname(cmdarg_T *cap)
 {
-    if (checkclearop(cap->oap))
-	return;
+    якщо (checkclearop(cap->oap))
+	повернути;
 #ifdef FEAT_EVAL
-    if (cap->nchar == '=')
+    якщо (cap->nchar == '=')
 	cap->nchar = get_expr_register();
 #endif
-    if (cap->nchar != NUL && valid_yank_reg(cap->nchar, FALSE))
+    якщо (cap->nchar != NUL && valid_yank_reg(cap->nchar, FALSE))
     {
 	cap->oap->regname = cap->nchar;
 	cap->opcount = cap->count0;	// remember count before '"'
@@ -5513,7 +5513,7 @@ nv_regname(cmdarg_T *cap)
 	set_reg_var(cap->oap->regname);
 #endif
     }
-    else
+    інакше
 	clearopbeep(cap->oap);
 }
 
@@ -5526,24 +5526,24 @@ nv_regname(cmdarg_T *cap)
     static void
 nv_visual(cmdarg_T *cap)
 {
-    if (cap->cmdchar == Ctrl_Q)
+    якщо (cap->cmdchar == Ctrl_Q)
 	cap->cmdchar = Ctrl_V;
 
     // 'v', 'V' and CTRL-V can be used while an operator is pending to make it
     // characterwise, linewise, or blockwise.
-    if (cap->oap->op_type != OP_NOP)
+    якщо (cap->oap->op_type != OP_NOP)
     {
 	motion_force = cap->oap->motion_force = cap->cmdchar;
 	finish_op = FALSE;	// operator doesn't finish now but later
-	return;
+	повернути;
     }
 
     VIsual_select = cap->arg;
-    if (VIsual_active)	    // change Visual mode
+    якщо (VIsual_active)	    // change Visual mode
     {
-	if (VIsual_mode == cap->cmdchar)    // stop visual mode
+	якщо (VIsual_mode == cap->cmdchar)    // stop visual mode
 	    end_visual_mode();
-	else				    // toggle char/block mode
+	інакше				    // toggle char/block mode
 	{				    //	   or char/line mode
 	    VIsual_mode = cap->cmdchar;
 	    showmode();
@@ -5551,50 +5551,50 @@ nv_visual(cmdarg_T *cap)
 	}
 	redraw_curbuf_later(UPD_INVERTED);	    // update the inversion
     }
-    else		    // start Visual mode
+    інакше		    // start Visual mode
     {
 	check_visual_highlight();
-	if (cap->count0 > 0 && resel_VIsual_mode != NUL)
+	якщо (cap->count0 > 0 && resel_VIsual_mode != NUL)
 	{
 	    // use previously selected part
 	    VIsual = curwin->w_cursor;
 
 	    VIsual_active = TRUE;
 	    VIsual_reselect = TRUE;
-	    if (!cap->arg)
+	    якщо (!cap->arg)
 		// start Select mode when 'selectmode' contains "cmd"
 		may_start_select('c');
 	    setmouse();
-	    if (p_smd && msg_silent == 0)
+	    якщо (p_smd && msg_silent == 0)
 		redraw_cmdline = TRUE;	    // show visual mode later
 	    // For V and ^V, we multiply the number of lines even if there
 	    // was only one -- webb
-	    if (resel_VIsual_mode != 'v' || resel_VIsual_line_count > 1)
+	    якщо (resel_VIsual_mode != 'v' || resel_VIsual_line_count > 1)
 	    {
 		curwin->w_cursor.lnum +=
 				    resel_VIsual_line_count * cap->count0 - 1;
 		check_cursor();
 	    }
 	    VIsual_mode = resel_VIsual_mode;
-	    if (VIsual_mode == 'v')
+	    якщо (VIsual_mode == 'v')
 	    {
-		if (resel_VIsual_line_count <= 1)
+		якщо (resel_VIsual_line_count <= 1)
 		{
 		    update_curswant_force();
 		    curwin->w_curswant += resel_VIsual_vcol * cap->count0;
-		    if (*p_sel != 'e')
+		    якщо (*p_sel != 'e')
 			--curwin->w_curswant;
 		}
-		else
+		інакше
 		    curwin->w_curswant = resel_VIsual_vcol;
 		coladvance(curwin->w_curswant);
 	    }
-	    if (resel_VIsual_vcol == MAXCOL)
+	    якщо (resel_VIsual_vcol == MAXCOL)
 	    {
 		curwin->w_curswant = MAXCOL;
 		coladvance((colnr_T)MAXCOL);
 	    }
-	    else if (VIsual_mode == Ctrl_V)
+	    інакше якщо (VIsual_mode == Ctrl_V)
 	    {
 		// Update curswant at the original cursor position.
 		pos_T tmp_cursor = curwin->w_cursor;
@@ -5602,30 +5602,30 @@ nv_visual(cmdarg_T *cap)
 		update_curswant_force();
 		curwin->w_curswant += resel_VIsual_vcol * cap->count0 - 1;
 		curwin->w_cursor = tmp_cursor;
-		if (*p_sel == 'e')
+		якщо (*p_sel == 'e')
 		    ++curwin->w_curswant;
 		coladvance(curwin->w_curswant);
 	    }
-	    else
+	    інакше
 		curwin->w_set_curswant = true;
 	    redraw_curbuf_later(UPD_INVERTED);	// show the inversion
 	}
-	else
+	інакше
 	{
-	    if (!cap->arg)
+	    якщо (!cap->arg)
 		// start Select mode when 'selectmode' contains "cmd"
 		may_start_select('c');
 	    n_start_visual_mode(cap->cmdchar);
-	    if (VIsual_mode != 'V' && *p_sel == 'e')
+	    якщо (VIsual_mode != 'V' && *p_sel == 'e')
 		++cap->count1;  // include one more char
-	    else
+	    інакше
 		VIsual_select_exclu_adj = FALSE;
-	    if (cap->count0 > 0 && --cap->count1 > 0)
+	    якщо (cap->count0 > 0 && --cap->count1 > 0)
 	    {
 		// With a count select that many characters or lines.
-		if (VIsual_mode == 'v' || VIsual_mode == Ctrl_V)
+		якщо (VIsual_mode == 'v' || VIsual_mode == Ctrl_V)
 		    nv_right(cap);
-		else if (VIsual_mode == 'V')
+		інакше якщо (VIsual_mode == 'V')
 		    nv_down(cap);
 	    }
 	}
@@ -5648,7 +5648,7 @@ start_selection(void)
  * When "c" is 'o' (checking for "mouse") then also when mapped.
  */
     void
-may_start_select(int c)
+may_start_select(ціле c)
 {
     VIsual_select = (c == 'o' || (stuff_empty() && typebuf_typed()))
 		    && vim_strchr(p_slm, c) != NULL;
@@ -5659,10 +5659,10 @@ may_start_select(int c)
  * Should set VIsual_select before calling this.
  */
     static void
-n_start_visual_mode(int c)
+n_start_visual_mode(ціле c)
 {
 #ifdef FEAT_CONCEAL
-    int cursor_line_was_concealed = curwin->w_p_cole > 0
+    ціле cursor_line_was_concealed = curwin->w_p_cole > 0
 						&& conceal_cursor_line(curwin);
 #endif
 
@@ -5672,7 +5672,7 @@ n_start_visual_mode(int c)
 
     // Corner case: the 0 position in a tab may change when going into
     // virtualedit.  Recalculate curwin->w_cursor to avoid bad highlighting.
-    if (c == Ctrl_V && (get_ve_flags() & VE_BLOCK) && gchar_cursor() == TAB)
+    якщо (c == Ctrl_V && (get_ve_flags() & VE_BLOCK) && gchar_cursor() == TAB)
     {
 	validate_virtcol();
 	coladvance(curwin->w_virtcol);
@@ -5690,7 +5690,7 @@ n_start_visual_mode(int c)
     conceal_check_cursor_line(cursor_line_was_concealed);
 #endif
 
-    if (p_smd && msg_silent == 0)
+    якщо (p_smd && msg_silent == 0)
 	redraw_cmdline = TRUE;	// show visual mode later
 #ifdef FEAT_CLIPBOARD
     // Make sure the clipboard gets updated.  Needed because start and
@@ -5700,7 +5700,7 @@ n_start_visual_mode(int c)
 
     // Only need to redraw this line, unless still need to redraw an old
     // Visual area (when 'lazyredraw' is set).
-    if (curwin->w_redr_type < UPD_INVERTED)
+    якщо (curwin->w_redr_type < UPD_INVERTED)
     {
 	curwin->w_old_cursor_lnum = curwin->w_cursor.lnum;
 	curwin->w_old_visual_lnum = curwin->w_cursor.lnum;
@@ -5714,14 +5714,14 @@ n_start_visual_mode(int c)
     static void
 nv_window(cmdarg_T *cap)
 {
-    if (cap->nchar == ':')
+    якщо (cap->nchar == ':')
     {
 	// "CTRL-W :" is the same as typing ":"; useful in a terminal window
 	cap->cmdchar = ':';
 	cap->nchar = NUL;
 	nv_colon(cap);
     }
-    else if (!checkclearop(cap->oap))
+    інакше якщо (!checkclearop(cap->oap))
 	do_window(cap->nchar, cap->count0, NUL); // everything is in window.c
 }
 
@@ -5732,7 +5732,7 @@ nv_window(cmdarg_T *cap)
 nv_suspend(cmdarg_T *cap)
 {
     clearop(cap->oap);
-    if (VIsual_active)
+    якщо (VIsual_active)
 	end_visual_mode();		// stop Visual mode
     do_cmdline_cmd((char_u *)"stop");
 }
@@ -5745,18 +5745,18 @@ nv_suspend(cmdarg_T *cap)
 nv_gv_cmd(cmdarg_T *cap)
 {
     pos_T	tpos;
-    int		i;
+    ціле		i;
 
-    if (curbuf->b_visual.vi_start.lnum == 0
+    якщо (curbuf->b_visual.vi_start.lnum == 0
 	    || curbuf->b_visual.vi_start.lnum > curbuf->b_ml.ml_line_count
 	    || curbuf->b_visual.vi_end.lnum == 0)
     {
 	beep_flush();
-	return;
+	повернути;
     }
 
     // set w_cursor to the start of the Visual area, tpos to the end
-    if (VIsual_active)
+    якщо (VIsual_active)
     {
 	i = VIsual_mode;
 	VIsual_mode = curbuf->b_visual.vi_mode;
@@ -5773,7 +5773,7 @@ nv_gv_cmd(cmdarg_T *cap)
 	curwin->w_cursor = curbuf->b_visual.vi_start;
 	curbuf->b_visual.vi_start = VIsual;
     }
-    else
+    інакше
     {
 	VIsual_mode = curbuf->b_visual.vi_mode;
 	curwin->w_curswant = curbuf->b_visual.vi_curswant;
@@ -5795,12 +5795,12 @@ nv_gv_cmd(cmdarg_T *cap)
     // When called from normal "g" command: start Select mode when
     // 'selectmode' contains "cmd".  When called for K_SELECT, always
     // start Select mode.
-    if (cap->arg)
+    якщо (cap->arg)
     {
 	VIsual_select = TRUE;
 	VIsual_select_reg = 0;
     }
-    else
+    інакше
 	may_start_select('c');
     setmouse();
 #ifdef FEAT_CLIPBOARD
@@ -5819,19 +5819,19 @@ nv_gv_cmd(cmdarg_T *cap)
     void
 nv_g_home_m_cmd(cmdarg_T *cap)
 {
-    int		i;
-    int		flag = FALSE;
+    ціле		i;
+    ціле		flag = FALSE;
 
-    if (cap->nchar == '^')
+    якщо (cap->nchar == '^')
 	flag = TRUE;
 
     cap->oap->motion_type = MCHAR;
     cap->oap->inclusive = FALSE;
-    if (curwin->w_p_wrap && curwin->w_width != 0)
+    якщо (curwin->w_p_wrap && curwin->w_width != 0)
     {
-	int	width1 = curwin->w_width - curwin_col_off();
-	int	width2 = width1 + curwin_col_off2();
-	int	virtcol;
+	ціле	width1 = curwin->w_width - curwin_col_off();
+	ціле	width2 = width1 + curwin_col_off2();
+	ціле	virtcol;
 
 	validate_virtcol();
 	virtcol = curwin->w_virtcol
@@ -5840,41 +5840,41 @@ nv_g_home_m_cmd(cmdarg_T *cap)
 #endif
 	    ;
 	i = 0;
-	if (virtcol >= (colnr_T)width1 && width2 > 0)
+	якщо (virtcol >= (colnr_T)width1 && width2 > 0)
 	    i = (virtcol - width1) / width2 * width2 + width1;
 
 	// When ending up below 'smoothscroll' marker, move just beyond it so
 	// that skipcol is not adjusted later.
-	if (curwin->w_skipcol > 0 && curwin->w_cursor.lnum == curwin->w_topline)
+	якщо (curwin->w_skipcol > 0 && curwin->w_cursor.lnum == curwin->w_topline)
 	{
-	    int overlap = sms_marker_overlap(curwin, curwin->w_width - width2);
-	    if (overlap > 0 && i == curwin->w_skipcol)
+	    ціле overlap = sms_marker_overlap(curwin, curwin->w_width - width2);
+	    якщо (overlap > 0 && i == curwin->w_skipcol)
 		i += overlap;
 	}
     }
-    else
+    інакше
 	i = curwin->w_leftcol;
     // Go to the middle of the screen line.  When 'number' or
     // 'relativenumber' is on and lines are wrapping the middle can be more
     // to the left.
-    if (cap->nchar == 'm')
+    якщо (cap->nchar == 'm')
 	i += (curwin->w_width - curwin_col_off()
 		+ ((curwin->w_p_wrap && i > 0)
 		    ? curwin_col_off2() : 0)) / 2;
     coladvance((colnr_T)i);
-    if (flag)
+    якщо (flag)
     {
 	do
 	    i = gchar_cursor();
-	while (VIM_ISWHITE(i) && oneright() == OK);
+	поки (VIM_ISWHITE(i) && oneright() == OK);
 	curwin->w_valid &= ~VALID_WCOL;
     }
     curwin->w_set_curswant = true;
 #ifdef FEAT_FOLDING
-    if (hasAnyFolding(curwin))
+    якщо (hasAnyFolding(curwin))
     {
 	validate_cheight();
-	if (curwin->w_cline_folded)
+	якщо (curwin->w_cline_folded)
 	    update_curswant_force();
     }
 #endif
@@ -5893,21 +5893,21 @@ nv_g_underscore_cmd(cmdarg_T *cap)
     cap->oap->motion_type = MCHAR;
     cap->oap->inclusive = TRUE;
     curwin->w_curswant = MAXCOL;
-    if (cursor_down((long)(cap->count1 - 1),
+    якщо (cursor_down((long)(cap->count1 - 1),
 					cap->oap->op_type == OP_NOP) == FAIL)
     {
 	clearopbeep(cap->oap);
-	return;
+	повернути;
     }
 
     ptr = ml_get_curline();
 
     // In Visual mode we may end up after the line.
-    if (curwin->w_cursor.col > 0 && ptr[curwin->w_cursor.col] == NUL)
+    якщо (curwin->w_cursor.col > 0 && ptr[curwin->w_cursor.col] == NUL)
 	--curwin->w_cursor.col;
 
     // Decrease the cursor column until it's on a non-blank.
-    while (curwin->w_cursor.col > 0
+    поки (curwin->w_cursor.col > 0
 	    && VIM_ISWHITE(ptr[curwin->w_cursor.col]))
 	--curwin->w_cursor.col;
     curwin->w_set_curswant = true;
@@ -5921,23 +5921,23 @@ nv_g_underscore_cmd(cmdarg_T *cap)
 nv_g_dollar_cmd(cmdarg_T *cap)
 {
     oparg_T	*oap = cap->oap;
-    int		i;
-    int		col_off = curwin_col_off();
-    int		flag = FALSE;
+    ціле		i;
+    ціле		col_off = curwin_col_off();
+    ціле		flag = FALSE;
 
-    if (cap->nchar == K_END || cap->nchar == K_KEND)
+    якщо (cap->nchar == K_END || cap->nchar == K_KEND)
 	flag = TRUE;
 
     oap->motion_type = MCHAR;
     oap->inclusive = TRUE;
-    if (curwin->w_p_wrap && curwin->w_width != 0)
+    якщо (curwin->w_p_wrap && curwin->w_width != 0)
     {
 	curwin->w_curswant = MAXCOL;    // so we stay at the end
-	if (cap->count1 == 1)
+	якщо (cap->count1 == 1)
 	{
-	    int		width1 = curwin->w_width - col_off;
-	    int		width2 = width1 + curwin_col_off2();
-	    int		virtcol;
+	    ціле		width1 = curwin->w_width - col_off;
+	    ціле		width2 = width1 + curwin_col_off2();
+	    ціле		virtcol;
 
 	    validate_virtcol();
 	    virtcol = curwin->w_virtcol
@@ -5946,19 +5946,19 @@ nv_g_dollar_cmd(cmdarg_T *cap)
 #endif
 		;
 	    i = width1 - 1;
-	    if (virtcol >= (colnr_T)width1)
+	    якщо (virtcol >= (colnr_T)width1)
 		i += ((virtcol - width1) / width2 + 1)
 		    * width2;
 	    coladvance((colnr_T)i);
 
 	    // Make sure we stick in this column.
 	    update_curswant_force();
-	    if (curwin->w_cursor.col > 0 && curwin->w_p_wrap)
+	    якщо (curwin->w_cursor.col > 0 && curwin->w_p_wrap)
 	    {
 		// Check for landing on a character that got split at
 		// the end of the line.  We do not want to advance to
 		// the next screen line.
-		if (curwin->w_virtcol
+		якщо (curwin->w_virtcol
 #ifdef FEAT_PROP_POPUP
 			- curwin->w_virtcol_first_char
 #endif
@@ -5966,12 +5966,12 @@ nv_g_dollar_cmd(cmdarg_T *cap)
 		    --curwin->w_cursor.col;
 	    }
 	}
-	else if (nv_screengo(oap, FORWARD, cap->count1 - 1) == FAIL)
+	інакше якщо (nv_screengo(oap, FORWARD, cap->count1 - 1) == FAIL)
 	    clearopbeep(oap);
     }
-    else
+    інакше
     {
-	if (cap->count1 > 1)
+	якщо (cap->count1 > 1)
 	    // if it fails, let the cursor still move to the last char
 	    (void)cursor_down(cap->count1 - 1, FALSE);
 
@@ -5979,24 +5979,24 @@ nv_g_dollar_cmd(cmdarg_T *cap)
 	coladvance((colnr_T)i);
 
 	// if the character doesn't fit move one back
-	if (curwin->w_cursor.col > 0
+	якщо (curwin->w_cursor.col > 0
 		&& (*mb_ptr2cells)(ml_get_cursor()) > 1)
 	{
 	    colnr_T vcol;
 
 	    getvvcol(curwin, &curwin->w_cursor, NULL, NULL, &vcol, 0);
-	    if (vcol >= curwin->w_leftcol + curwin->w_width - col_off)
+	    якщо (vcol >= curwin->w_leftcol + curwin->w_width - col_off)
 		--curwin->w_cursor.col;
 	}
 
 	// Make sure we stick in this column.
 	update_curswant_force();
     }
-    if (flag)
+    якщо (flag)
     {
 	do
 	    i = gchar_cursor();
-	while (IS_WHITE_OR_NUL(i) && oneleft() == OK);
+	поки (IS_WHITE_OR_NUL(i) && oneleft() == OK);
 	curwin->w_valid &= ~VALID_WCOL;
     }
 }
@@ -6007,16 +6007,16 @@ nv_g_dollar_cmd(cmdarg_T *cap)
     static void
 nv_gi_cmd(cmdarg_T *cap)
 {
-    int		i;
+    ціле		i;
 
-    if (curbuf->b_last_insert.lnum != 0)
+    якщо (curbuf->b_last_insert.lnum != 0)
     {
 	curwin->w_cursor = curbuf->b_last_insert;
 	check_cursor_lnum();
-	i = (int)ml_get_curline_len();
-	if (curwin->w_cursor.col > (colnr_T)i)
+	i = (ціле)ml_get_curline_len();
+	якщо (curwin->w_cursor.col > (colnr_T)i)
 	{
-	    if (virtual_active())
+	    якщо (virtual_active())
 		curwin->w_cursor.coladd += curwin->w_cursor.col - i;
 	    curwin->w_cursor.col = i;
 	}
@@ -6032,7 +6032,7 @@ nv_gi_cmd(cmdarg_T *cap)
 nv_g_cmd(cmdarg_T *cap)
 {
     oparg_T	*oap = cap->oap;
-    int		i;
+    ціле		i;
 
     switch (cap->nchar)
     {
@@ -6040,19 +6040,19 @@ nv_g_cmd(cmdarg_T *cap)
     case Ctrl_X:
 #ifdef MEM_PROFILE
     // "g^A": dump log of used memory.
-	if (!VIsual_active && cap->nchar == Ctrl_A)
+	якщо (!VIsual_active && cap->nchar == Ctrl_A)
 	    vim_mem_profile_dump();
-	else
+	інакше
 #endif
     // "g^A/g^X": sequentially increment visually selected region
-	if (VIsual_active)
+	якщо (VIsual_active)
 	{
 	    cap->arg = TRUE;
 	    cap->cmdchar = cap->nchar;
 	    cap->nchar = NUL;
 	    nv_addsub(cap);
 	}
-	else
+	інакше
 	    clearopbeep(oap);
 	break;
 
@@ -6101,7 +6101,7 @@ nv_g_cmd(cmdarg_T *cap)
     // "gN" selects previous match
     case 'N':
     case 'n':
-	if (!current_search(cap->count1, cap->nchar == 'n'))
+	якщо (!current_search(cap->count1, cap->nchar == 'n'))
 	    clearopbeep(oap);
 	break;
 
@@ -6110,28 +6110,28 @@ nv_g_cmd(cmdarg_T *cap)
     case 'j':
     case K_DOWN:
 	// with 'nowrap' it works just like the normal "j" command.
-	if (!curwin->w_p_wrap)
+	якщо (!curwin->w_p_wrap)
 	{
 	    oap->motion_type = MLINE;
 	    i = cursor_down(cap->count1, oap->op_type == OP_NOP);
 	}
-	else
+	інакше
 	    i = nv_screengo(oap, FORWARD, cap->count1);
-	if (i == FAIL)
+	якщо (i == FAIL)
 	    clearopbeep(oap);
 	break;
 
     case 'k':
     case K_UP:
 	// with 'nowrap' it works just like the normal "k" command.
-	if (!curwin->w_p_wrap)
+	якщо (!curwin->w_p_wrap)
 	{
 	    oap->motion_type = MLINE;
 	    i = cursor_up(cap->count1, oap->op_type == OP_NOP);
 	}
-	else
+	інакше
 	    i = nv_screengo(oap, BACKWARD, cap->count1);
-	if (i == FAIL)
+	якщо (i == FAIL)
 	    clearopbeep(oap);
 	break;
 
@@ -6155,9 +6155,9 @@ nv_g_cmd(cmdarg_T *cap)
 	    oap->motion_type = MCHAR;
 	    oap->inclusive = FALSE;
 	    i = linetabsize_no_outer(curwin, curwin->w_cursor.lnum);
-	    if (cap->count0 > 0 && cap->count0 <= 100)
+	    якщо (cap->count0 > 0 && cap->count0 <= 100)
 		coladvance((colnr_T)(i * cap->count0 / 100));
-	    else
+	    інакше
 		coladvance((colnr_T)(i / 2));
 	    curwin->w_set_curswant = true;
 	}
@@ -6179,7 +6179,7 @@ nv_g_cmd(cmdarg_T *cap)
     // "g*" and "g#", like "*" and "#" but without using "\<" and "\>"
     case '*':
     case '#':
-#if POUND != '#'
+#якщо POUND != '#'
     case POUND:		// pound sign (sometimes equal to '#')
 #endif
     case Ctrl_RSB:		// :tag or :tselect for current identifier
@@ -6193,7 +6193,7 @@ nv_g_cmd(cmdarg_T *cap)
 	oap->motion_type = MCHAR;
 	curwin->w_set_curswant = true;
 	oap->inclusive = TRUE;
-	if (bckend_word(cap->count1, cap->nchar == 'E', FALSE) == FAIL)
+	якщо (bckend_word(cap->count1, cap->nchar == 'E', FALSE) == FAIL)
 	    clearopbeep(oap);
 	break;
 
@@ -6210,7 +6210,7 @@ nv_g_cmd(cmdarg_T *cap)
     // "gI": Start insert in column 1.
     case 'I':
 	beginline(0);
-	if (!checkclearopq(oap))
+	якщо (!checkclearopq(oap))
 	    invoke_edit(cap, FALSE, 'g', FALSE);
 	break;
 
@@ -6244,9 +6244,9 @@ nv_g_cmd(cmdarg_T *cap)
     // cursor.	It is displayed in hex.
     // "8g8" finds illegal byte sequence.
     case '8':
-	if (cap->count0 == 8)
+	якщо (cap->count0 == 8)
 	    utf_find_illegal();
-	else
+	інакше
 	    show_utf8();
 	break;
 
@@ -6287,7 +6287,7 @@ nv_g_cmd(cmdarg_T *cap)
     // "gD": idem, but in the current file.
     case 'd':
     case 'D':
-	nv_gd(oap, cap->nchar, (int)cap->count0);
+	nv_gd(oap, cap->nchar, (ціле)cap->count0);
 	break;
 
     // g<*Mouse> : <C-*mouse>
@@ -6330,7 +6330,7 @@ nv_g_cmd(cmdarg_T *cap)
 
     // "gQ": improved Ex mode
     case 'Q':
-	if (!check_text_locked(cap->oap) && !checkclearopq(oap))
+	якщо (!check_text_locked(cap->oap) && !checkclearopq(oap))
 	    do_exmode(TRUE);
 	break;
 
@@ -6344,22 +6344,22 @@ nv_g_cmd(cmdarg_T *cap)
 	break;
 
     case 't':
-	if (!checkclearop(oap))
-	    goto_tabpage((int)cap->count0);
+	якщо (!checkclearop(oap))
+	    goto_tabpage((ціле)cap->count0);
 	break;
     case 'T':
-	if (!checkclearop(oap))
-	    goto_tabpage(-(int)cap->count1);
+	якщо (!checkclearop(oap))
+	    goto_tabpage(-(ціле)cap->count1);
 	break;
 
     case TAB:
-	if (!checkclearop(oap) && goto_tabpage_lastused() == FAIL)
+	якщо (!checkclearop(oap) && goto_tabpage_lastused() == FAIL)
 	    clearopbeep(oap);
 	break;
 
     case '+':
     case '-': // "g+" and "g-": undo or redo along the timeline
-	if (!checkclearopq(oap))
+	якщо (!checkclearopq(oap))
 	    undo_time(cap->nchar == '-' ? -cap->count1 : cap->count1,
 							 FALSE, FALSE, FALSE);
 	break;
@@ -6380,22 +6380,22 @@ n_opencmd(cmdarg_T *cap)
     linenr_T	oldline = curwin->w_cursor.lnum;
 #endif
 
-    if (checkclearopq(cap->oap))
-	return;
+    якщо (checkclearopq(cap->oap))
+	повернути;
 
 #ifdef FEAT_FOLDING
-    if (cap->cmdchar == 'O')
+    якщо (cap->cmdchar == 'O')
 	// Open above the first line of a folded sequence of lines
 	(void)hasFolding(curwin->w_cursor.lnum,
 		&curwin->w_cursor.lnum, NULL);
-    else
+    інакше
 	// Open below the last line of a folded sequence of lines
 	(void)hasFolding(curwin->w_cursor.lnum,
 		NULL, &curwin->w_cursor.lnum);
 #endif
     // trigger TextChangedI for the 'o/O' command
     curbuf->b_last_changedtick_i = CHANGEDTICK(curbuf);
-    if (u_save((linenr_T)(curwin->w_cursor.lnum -
+    якщо (u_save((linenr_T)(curwin->w_cursor.lnum -
 		    (cap->cmdchar == 'O' ? 1 : 0)),
 		(linenr_T)(curwin->w_cursor.lnum +
 		    (cap->cmdchar == 'o' ? 1 : 0))
@@ -6405,16 +6405,16 @@ n_opencmd(cmdarg_T *cap)
 		0, NULL) == OK)
     {
 #ifdef FEAT_CONCEAL
-	if (curwin->w_p_cole > 0 && oldline != curwin->w_cursor.lnum)
+	якщо (curwin->w_p_cole > 0 && oldline != curwin->w_cursor.lnum)
 	    redrawWinline(curwin, oldline);
 #endif
 #ifdef FEAT_SYN_HL
-	if (curwin->w_p_cul)
+	якщо (curwin->w_p_cul)
 	    // force redraw of cursorline
 	    curwin->w_valid &= ~VALID_CROW;
 #endif
 	// When '#' is in 'cpoptions' ignore the count.
-	if (vim_strchr(p_cpo, CPO_HASH) != NULL)
+	якщо (vim_strchr(p_cpo, CPO_HASH) != NULL)
 	    cap->count1 = 1;
 	invoke_edit(cap, FALSE, cap->cmdchar, TRUE);
     }
@@ -6426,13 +6426,13 @@ n_opencmd(cmdarg_T *cap)
     static void
 nv_dot(cmdarg_T *cap)
 {
-    if (checkclearopq(cap->oap))
-	return;
+    якщо (checkclearopq(cap->oap))
+	повернути;
 
     // If "restart_edit" is TRUE, the last but one command is repeated
     // instead of the last command (inserting text). This is used for
     // CTRL-O <.> in insert mode.
-    if (start_redo(cap->count0, restart_edit != 0 && !arrow_used) == FAIL)
+    якщо (start_redo(cap->count0, restart_edit != 0 && !arrow_used) == FAIL)
 	clearopbeep(cap->oap);
 }
 
@@ -6442,9 +6442,9 @@ nv_dot(cmdarg_T *cap)
     static void
 nv_redo_or_register(cmdarg_T *cap)
 {
-    if (VIsual_select && VIsual_active)
+    якщо (VIsual_select && VIsual_active)
     {
-	int reg;
+	ціле reg;
 	// Get register name
 	++no_mapping;
 	++allow_keys;
@@ -6453,18 +6453,18 @@ nv_redo_or_register(cmdarg_T *cap)
 	--no_mapping;
 	--allow_keys;
 
-	if (reg == '"')
+	якщо (reg == '"')
 	    // the unnamed register is 0
 	    reg = 0;
 
 	VIsual_select_reg = valid_yank_reg(reg, TRUE) ? reg : 0;
-	return;
+	повернути;
     }
 
-    if (checkclearopq(cap->oap))
-	return;
+    якщо (checkclearopq(cap->oap))
+	повернути;
 
-    u_redo((int)cap->count1);
+    u_redo((ціле)cap->count1);
     curwin->w_set_curswant = true;
 }
 
@@ -6475,17 +6475,17 @@ nv_redo_or_register(cmdarg_T *cap)
 nv_Undo(cmdarg_T *cap)
 {
     // In Visual mode and typing "gUU" triggers an operator
-    if (cap->oap->op_type == OP_UPPER || VIsual_active)
+    якщо (cap->oap->op_type == OP_UPPER || VIsual_active)
     {
 	// translate "gUU" to "gUgU"
 	cap->cmdchar = 'g';
 	cap->nchar = 'U';
 	nv_operator(cap);
-	return;
+	повернути;
     }
 
-    if (checkclearopq(cap->oap))
-	return;
+    якщо (checkclearopq(cap->oap))
+	повернути;
 
     u_undoline();
     curwin->w_set_curswant = true;
@@ -6498,18 +6498,18 @@ nv_Undo(cmdarg_T *cap)
     static void
 nv_tilde(cmdarg_T *cap)
 {
-    if (!p_to && !VIsual_active && cap->oap->op_type != OP_TILDE)
+    якщо (!p_to && !VIsual_active && cap->oap->op_type != OP_TILDE)
     {
 #ifdef FEAT_JOB_CHANNEL
-	if (bt_prompt(curbuf) && !prompt_curpos_editable())
+	якщо (bt_prompt(curbuf) && !prompt_curpos_editable())
 	{
 	    clearopbeep(cap->oap);
-	    return;
+	    повернути;
 	}
 #endif
 	n_swapchar(cap);
     }
-    else
+    інакше
 	nv_operator(cap);
 }
 
@@ -6520,20 +6520,20 @@ nv_tilde(cmdarg_T *cap)
     static void
 nv_operator(cmdarg_T *cap)
 {
-    int	    op_type;
+    ціле	    op_type;
 
     op_type = get_op_type(cap->cmdchar, cap->nchar);
 #ifdef FEAT_JOB_CHANNEL
-    if (bt_prompt(curbuf) && op_is_change(op_type) && !prompt_curpos_editable())
+    якщо (bt_prompt(curbuf) && op_is_change(op_type) && !prompt_curpos_editable())
     {
 	clearopbeep(cap->oap);
-	return;
+	повернути;
     }
 #endif
 
-    if (op_type == cap->oap->op_type)	    // double operator works on lines
+    якщо (op_type == cap->oap->op_type)	    // double operator works on lines
 	nv_lineop(cap);
-    else if (!checkclearop(cap->oap))
+    інакше якщо (!checkclearop(cap->oap))
     {
 	cap->oap->start = curwin->w_cursor;
 	cap->oap->op_type = op_type;
@@ -6548,11 +6548,11 @@ nv_operator(cmdarg_T *cap)
  * Set v:operator to the characters for "optype".
  */
     static void
-set_op_var(int optype)
+set_op_var(ціле optype)
 {
-    if (optype == OP_NOP)
+    якщо (optype == OP_NOP)
 	set_vim_var_string(VV_OP, NULL, 0);
-    else
+    інакше
     {
 	char_u	opchars[3];
 
@@ -6577,15 +6577,15 @@ set_op_var(int optype)
 nv_lineop(cmdarg_T *cap)
 {
     cap->oap->motion_type = MLINE;
-    if (cursor_down(cap->count1 - 1L, cap->oap->op_type == OP_NOP) == FAIL)
+    якщо (cursor_down(cap->count1 - 1L, cap->oap->op_type == OP_NOP) == FAIL)
 	clearopbeep(cap->oap);
-    else if (  (cap->oap->op_type == OP_DELETE // only with linewise motions
+    інакше якщо (  (cap->oap->op_type == OP_DELETE // only with linewise motions
 		&& cap->oap->motion_force != 'v'
 		&& cap->oap->motion_force != Ctrl_V)
 	    || cap->oap->op_type == OP_LSHIFT
 	    || cap->oap->op_type == OP_RSHIFT)
 	beginline(BL_SOL | BL_FIX);
-    else if (cap->oap->op_type != OP_YANK)	// 'Y' does not move cursor
+    інакше якщо (cap->oap->op_type != OP_YANK)	// 'Y' does not move cursor
 	beginline(BL_WHITE | BL_FIX);
 }
 
@@ -6596,9 +6596,9 @@ nv_lineop(cmdarg_T *cap)
 nv_home(cmdarg_T *cap)
 {
     // CTRL-HOME is like "gg"
-    if (mod_mask & MOD_MASK_CTRL)
+    якщо (mod_mask & MOD_MASK_CTRL)
 	nv_goto(cap);
-    else
+    інакше
     {
 	cap->count0 = 1;
 	nv_pipe(cap);
@@ -6619,12 +6619,12 @@ nv_pipe(cmdarg_T *cap)
     // adjusted for the column we end up in, not for column zero.
     curwin->w_cursor.col = 0;
     curwin->w_cursor.coladd = 0;
-    if (cap->count0 > 0)
+    якщо (cap->count0 > 0)
     {
 	coladvance((colnr_T)(cap->count0 - 1));
 	curwin->w_curswant = (colnr_T)(cap->count0 - 1);
     }
-    else
+    інакше
 	curwin->w_curswant = 0;
     // keep curswant at the column where we wanted to go, not where
     // we ended; differs if line is too short
@@ -6642,10 +6642,10 @@ nv_bck_word(cmdarg_T *cap)
     cap->oap->motion_type = MCHAR;
     cap->oap->inclusive = FALSE;
     curwin->w_set_curswant = true;
-    if (bck_word(cap->count1, cap->arg, FALSE) == FAIL)
+    якщо (bck_word(cap->count1, cap->arg, FALSE) == FAIL)
 	clearopbeep(cap->oap);
 #ifdef FEAT_FOLDING
-    else if ((fdo_flags & FDO_HOR) && KeyTyped && cap->oap->op_type == OP_NOP)
+    інакше якщо ((fdo_flags & FDO_HOR) && KeyTyped && cap->oap->op_type == OP_NOP)
 	foldOpenCursor();
 #endif
 }
@@ -6657,38 +6657,38 @@ nv_bck_word(cmdarg_T *cap)
     static void
 nv_wordcmd(cmdarg_T *cap)
 {
-    int		n;
-    int		word_end;
-    int		flag = FALSE;
+    ціле		n;
+    ціле		word_end;
+    ціле		flag = FALSE;
     pos_T	startpos = curwin->w_cursor;
 
     // Set inclusive for the "E" and "e" command.
-    if (cap->cmdchar == 'e' || cap->cmdchar == 'E')
+    якщо (cap->cmdchar == 'e' || cap->cmdchar == 'E')
 	word_end = TRUE;
-    else
+    інакше
 	word_end = FALSE;
     cap->oap->inclusive = word_end;
 
     // "cw" and "cW" are a special case.
-    if (!word_end && cap->oap->op_type == OP_CHANGE)
+    якщо (!word_end && cap->oap->op_type == OP_CHANGE)
     {
 	n = gchar_cursor();
-	if (n != NUL)			// not an empty line
+	якщо (n != NUL)			// not an empty line
 	{
-	    if (VIM_ISWHITE(n))
+	    якщо (VIM_ISWHITE(n))
 	    {
 		// Reproduce a funny Vi behaviour: "cw" on a blank only
 		// changes one character, not all blanks until the start of
 		// the next word.  Only do this when the 'w' flag is included
 		// in 'cpoptions'.
-		if (cap->count1 == 1 && vim_strchr(p_cpo, CPO_CW) != NULL)
+		якщо (cap->count1 == 1 && vim_strchr(p_cpo, CPO_CW) != NULL)
 		{
 		    cap->oap->inclusive = TRUE;
 		    cap->oap->motion_type = MCHAR;
-		    return;
+		    повернути;
 		}
 	    }
-	    else
+	    інакше
 	    {
 		// This is a little strange. To match what the real Vi does,
 		// we effectively map 'cw' to 'ce', and 'cW' to 'cE', provided
@@ -6700,7 +6700,7 @@ nv_wordcmd(cmdarg_T *cap)
 		// will change only one character! This is done by setting
 		// flag.
 		// This can be configured using :set cpo-z
-		if (vim_strchr(p_cpo, CPO_WORD) != NULL)
+		якщо (vim_strchr(p_cpo, CPO_WORD) != NULL)
 		{
 		    cap->oap->inclusive = TRUE;
 		    word_end = TRUE;
@@ -6712,23 +6712,23 @@ nv_wordcmd(cmdarg_T *cap)
 
     cap->oap->motion_type = MCHAR;
     curwin->w_set_curswant = true;
-    if (word_end)
+    якщо (word_end)
 	n = end_word(cap->count1, cap->arg, flag, FALSE);
-    else
+    інакше
 	n = fwd_word(cap->count1, cap->arg, cap->oap->op_type != OP_NOP);
 
     // Don't leave the cursor on the NUL past the end of line. Unless we
     // didn't move it forward.
-    if (LT_POS(startpos, curwin->w_cursor))
+    якщо (LT_POS(startpos, curwin->w_cursor))
 	adjust_cursor(cap->oap);
 
-    if (n == FAIL && cap->oap->op_type == OP_NOP)
+    якщо (n == FAIL && cap->oap->op_type == OP_NOP)
 	clearopbeep(cap->oap);
-    else
+    інакше
     {
 	adjust_for_sel(cap);
 #ifdef FEAT_FOLDING
-	if ((fdo_flags & FDO_HOR) && KeyTyped && cap->oap->op_type == OP_NOP)
+	якщо ((fdo_flags & FDO_HOR) && KeyTyped && cap->oap->op_type == OP_NOP)
 	    foldOpenCursor();
 #endif
     }
@@ -6746,13 +6746,13 @@ adjust_cursor(oparg_T *oap)
     // - the column is > 0
     // - not in Visual mode or 'selection' is "o"
     // - 'virtualedit' is not "all" and not "onemore".
-    if (curwin->w_cursor.col > 0 && gchar_cursor() == NUL
+    якщо (curwin->w_cursor.col > 0 && gchar_cursor() == NUL
 		&& (!VIsual_active || *p_sel == 'o')
 		&& !virtual_active() && (get_ve_flags() & VE_ONEMORE) == 0)
     {
 	--curwin->w_cursor.col;
 	// prevent cursor from moving on the trail byte
-	if (has_mbyte)
+	якщо (has_mbyte)
 	    mb_adjust_cursor();
 	oap->inclusive = TRUE;
     }
@@ -6769,7 +6769,7 @@ nv_beginline(cmdarg_T *cap)
     cap->oap->inclusive = FALSE;
     beginline(cap->arg);
 #ifdef FEAT_FOLDING
-    if ((fdo_flags & FDO_HOR) && KeyTyped && cap->oap->op_type == OP_NOP)
+    якщо ((fdo_flags & FDO_HOR) && KeyTyped && cap->oap->op_type == OP_NOP)
 	foldOpenCursor();
 #endif
     ins_at_eol = FALSE;	    // Don't move cursor past eol (only necessary in a
@@ -6782,12 +6782,12 @@ nv_beginline(cmdarg_T *cap)
     static void
 adjust_for_sel(cmdarg_T *cap)
 {
-    if (VIsual_active && cap->oap->inclusive && *p_sel == 'e'
+    якщо (VIsual_active && cap->oap->inclusive && *p_sel == 'e'
 	    && gchar_cursor() != NUL && LT_POS(VIsual, curwin->w_cursor))
     {
-	if (has_mbyte)
+	якщо (has_mbyte)
 	    inc_cursor();
-	else
+	інакше
 	    ++curwin->w_cursor.col;
 	cap->oap->inclusive = FALSE;
 	VIsual_select_exclu_adj = TRUE;
@@ -6799,45 +6799,45 @@ adjust_for_sel(cmdarg_T *cap)
  * Should check VIsual_mode before calling this.
  * Returns TRUE when backed up to the previous line.
  */
-    int
+    ціле
 unadjust_for_sel(void)
 {
-    if (*p_sel == 'e' && !EQUAL_POS(VIsual, curwin->w_cursor))
-	return unadjust_for_sel_inner(LT_POS(VIsual, curwin->w_cursor)
+    якщо (*p_sel == 'e' && !EQUAL_POS(VIsual, curwin->w_cursor))
+	повернути unadjust_for_sel_inner(LT_POS(VIsual, curwin->w_cursor)
 					? &curwin->w_cursor : &VIsual);
-    return FALSE;
+    повернути FALSE;
 }
 
 /*
  * Move position "*pp" back one character for 'selection' == "exclusive".
  * Returns TRUE when backed up to the previous line.
  */
-    int
+    ціле
 unadjust_for_sel_inner(pos_T *pp)
 {
     colnr_T	cs, ce;
     VIsual_select_exclu_adj = FALSE;
 
-    if (pp->coladd > 0)
+    якщо (pp->coladd > 0)
 	--pp->coladd;
-    else if (pp->col > 0)
+    інакше якщо (pp->col > 0)
     {
 	--pp->col;
 	mb_adjustpos(curbuf, pp);
-	if (virtual_active())
+	якщо (virtual_active())
 	{
 	    getvcol(curwin, pp, &cs, NULL, &ce, 0);
 	    pp->coladd = ce - cs;
 	}
     }
-    else if (pp->lnum > 1)
+    інакше якщо (pp->lnum > 1)
     {
 	--pp->lnum;
 	pp->col = ml_get_len(pp->lnum);
-	return TRUE;
+	повернути TRUE;
     }
 
-    return FALSE;
+    повернути FALSE;
 }
 
 /*
@@ -6846,12 +6846,12 @@ unadjust_for_sel_inner(pos_T *pp)
     static void
 nv_select(cmdarg_T *cap)
 {
-    if (VIsual_active)
+    якщо (VIsual_active)
     {
 	VIsual_select = TRUE;
 	VIsual_select_reg = 0;
     }
-    else if (VIsual_reselect)
+    інакше якщо (VIsual_reselect)
     {
 	cap->nchar = 'v';	    // fake "gv" command
 	cap->arg = TRUE;
@@ -6869,24 +6869,24 @@ nv_goto(cmdarg_T *cap)
 {
     linenr_T	lnum;
 
-    if (cap->arg)
+    якщо (cap->arg)
 	lnum = curbuf->b_ml.ml_line_count;
-    else
+    інакше
 	lnum = 1L;
     cap->oap->motion_type = MLINE;
     setpcmark();
 
     // When a count is given, use it instead of the default lnum
-    if (cap->count0 != 0)
+    якщо (cap->count0 != 0)
 	lnum = cap->count0;
-    if (lnum < 1L)
+    якщо (lnum < 1L)
 	lnum = 1L;
-    else if (lnum > curbuf->b_ml.ml_line_count)
+    інакше якщо (lnum > curbuf->b_ml.ml_line_count)
 	lnum = curbuf->b_ml.ml_line_count;
     curwin->w_cursor.lnum = lnum;
     beginline(BL_SOL | BL_FIX);
 #ifdef FEAT_FOLDING
-    if ((fdo_flags & FDO_JUMP) && KeyTyped && cap->oap->op_type == OP_NOP)
+    якщо ((fdo_flags & FDO_JUMP) && KeyTyped && cap->oap->op_type == OP_NOP)
 	foldOpenCursor();
 #endif
 }
@@ -6897,24 +6897,24 @@ nv_goto(cmdarg_T *cap)
     static void
 nv_normal(cmdarg_T *cap)
 {
-    if (cap->nchar == Ctrl_N || cap->nchar == Ctrl_G)
+    якщо (cap->nchar == Ctrl_N || cap->nchar == Ctrl_G)
     {
 	clearop(cap->oap);
-	if (restart_edit != 0 && mode_displayed)
+	якщо (restart_edit != 0 && mode_displayed)
 	    clear_cmdline = TRUE;		// unshow mode later
 	restart_edit = 0;
-	if (cmdwin_type != 0)
+	якщо (cmdwin_type != 0)
 	    cmdwin_result = Ctrl_C;
-	if (VIsual_active)
+	якщо (VIsual_active)
 	{
 	    end_visual_mode();		// stop Visual
 	    redraw_curbuf_later(UPD_INVERTED);
 	}
 	// CTRL-\ CTRL-G restarts Insert mode when 'insertmode' is set.
-	if (cap->nchar == Ctrl_G && p_im)
+	якщо (cap->nchar == Ctrl_G && p_im)
 	    restart_edit = 'a';
     }
-    else
+    інакше
 	clearopbeep(cap->oap);
 }
 
@@ -6925,7 +6925,7 @@ nv_normal(cmdarg_T *cap)
     static void
 nv_esc(cmdarg_T *cap)
 {
-    int		no_reason;
+    ціле		no_reason;
 
     no_reason = (cap->oap->op_type == OP_NOP
 		&& cap->opcount == 0
@@ -6933,73 +6933,73 @@ nv_esc(cmdarg_T *cap)
 		&& cap->oap->regname == 0
 		&& !p_im);
 
-    if (cap->arg)		// TRUE for CTRL-C
+    якщо (cap->arg)		// TRUE for CTRL-C
     {
-	if (restart_edit == 0 && cmdwin_type == 0
+	якщо (restart_edit == 0 && cmdwin_type == 0
 						&& !VIsual_active && no_reason)
 	{
-	    int	out_redir = !stdout_isatty && !is_not_a_term_or_gui();
+	    ціле	out_redir = !stdout_isatty && !is_not_a_term_or_gui();
 
 	    // The user may accidentally do "vim file | grep word" and then
 	    // CTRL-C doesn't show anything.  With a changed buffer give the
 	    // message on stderr.  Without any changes might as well exit.
-	    if (anyBufIsChanged())
+	    якщо (anyBufIsChanged())
 	    {
 		char *ms = _("Type  :qa!  and press <Enter> to abandon all changes and exit Vim");
 
-		if (out_redir)
+		якщо (out_redir)
 		    mch_errmsg(ms);
-		else
+		інакше
 		    msg(ms);
 	    }
-	    else
+	    інакше
 	    {
-		if (out_redir)
+		якщо (out_redir)
 		{
 		    got_int = FALSE;
 		    do_cmdline_cmd((char_u *)"qa");
 		}
-		else
+		інакше
 		    msg(_("Type  :qa  and press <Enter> to exit Vim"));
 	    }
 	}
 
-	if (restart_edit != 0)
+	якщо (restart_edit != 0)
 	    redraw_mode = TRUE;  // remove "-- (insert) --"
 
 	// Don't reset "restart_edit" when 'insertmode' is set, it won't be
 	// set again below when halfway a mapping.
-	if (!p_im)
+	якщо (!p_im)
 	    restart_edit = 0;
-	if (cmdwin_type != 0)
+	якщо (cmdwin_type != 0)
 	{
 	    cmdwin_result = K_IGNORE;
 	    got_int = FALSE;	// don't stop executing autocommands et al.
-	    return;
+	    повернути;
 	}
     }
-    else if (cmdwin_type != 0 && ex_normal_busy && typebuf_was_empty)
+    інакше якщо (cmdwin_type != 0 && ex_normal_busy && typebuf_was_empty)
     {
 	// When :normal runs out of characters while in the command line window
 	// vgetorpeek() will repeatedly return ESC.  Exit the cmdline window to
 	// break the loop.
 	cmdwin_result = K_IGNORE;
-	return;
+	повернути;
     }
 
-    if (VIsual_active)
+    якщо (VIsual_active)
     {
 	end_visual_mode();	// stop Visual
 	check_cursor_col();	// make sure cursor is not beyond EOL
 	curwin->w_set_curswant = true;
 	redraw_curbuf_later(UPD_INVERTED);
     }
-    else if (no_reason)
+    інакше якщо (no_reason)
     {
 #ifdef HAS_MESSAGE_WINDOW
-	if (!cap->arg && popup_message_win_visible())
+	якщо (!cap->arg && popup_message_win_visible())
 	    popup_hide_message_win();
-	else
+	інакше
 #endif
 	    vim_beep(BO_ESC);
     }
@@ -7007,7 +7007,7 @@ nv_esc(cmdarg_T *cap)
 
     // A CTRL-C is often used at the start of a menu.  When 'insertmode' is
     // set return to Insert mode afterwards.
-    if (restart_edit == 0 && goto_im() && ex_normal_busy == 0)
+    якщо (restart_edit == 0 && goto_im() && ex_normal_busy == 0)
 	restart_edit = 'a';
 }
 
@@ -7018,9 +7018,9 @@ nv_esc(cmdarg_T *cap)
 set_cursor_for_append_to_line(void)
 {
     curwin->w_set_curswant = true;
-    if (get_ve_flags() == VE_ALL)
+    якщо (get_ve_flags() == VE_ALL)
     {
-	int save_State = State;
+	ціле save_State = State;
 
 	// Pretend Insert mode here to allow the cursor on the
 	// character past the end of the line
@@ -7028,7 +7028,7 @@ set_cursor_for_append_to_line(void)
 	coladvance((colnr_T)MAXCOL);
 	State = save_State;
     }
-    else
+    інакше
 	curwin->w_cursor.col += (colnr_T)STRLEN(ml_get_cursor());
 }
 
@@ -7040,60 +7040,60 @@ set_cursor_for_append_to_line(void)
 nv_edit(cmdarg_T *cap)
 {
     // <Insert> is equal to "i"
-    if (cap->cmdchar == K_INS || cap->cmdchar == K_KINS)
+    якщо (cap->cmdchar == K_INS || cap->cmdchar == K_KINS)
 	cap->cmdchar = 'i';
 
     // in Visual mode "A" and "I" are an operator
-    if (VIsual_active && (cap->cmdchar == 'A' || cap->cmdchar == 'I'))
+    якщо (VIsual_active && (cap->cmdchar == 'A' || cap->cmdchar == 'I'))
     {
 #ifdef FEAT_TERMINAL
-	if (term_in_normal_mode(curbuf))
+	якщо (term_in_normal_mode(curbuf))
 	{
 	    end_visual_mode();
 	    clearop(cap->oap);
 	    term_enter_job_mode();
-	    return;
+	    повернути;
 	}
 #endif
 	v_visop(cap);
     }
 
     // in Visual mode and after an operator "a" and "i" are for text objects
-    else if ((cap->cmdchar == 'a' || cap->cmdchar == 'i')
+    інакше якщо ((cap->cmdchar == 'a' || cap->cmdchar == 'i')
 	    && (cap->oap->op_type != OP_NOP || VIsual_active))
     {
 	nv_object(cap);
     }
 #ifdef FEAT_TERMINAL
-    else if (term_in_normal_mode(curbuf))
+    інакше якщо (term_in_normal_mode(curbuf))
     {
 	clearop(cap->oap);
 	term_enter_job_mode();
-	return;
+	повернути;
     }
 #endif
-    else if (!curbuf->b_p_ma && !p_im)
+    інакше якщо (!curbuf->b_p_ma && !p_im)
     {
 	// Only give this error when 'insertmode' is off.
 	emsg(_(e_cannot_make_changes_modifiable_is_off));
 	clearop(cap->oap);
-	if (cap->cmdchar == K_PS)
+	якщо (cap->cmdchar == K_PS)
 	    // drop the pasted text
 	    bracketed_paste(PASTE_INSERT, TRUE, NULL);
     }
-    else if (cap->cmdchar == K_PS && VIsual_active)
+    інакше якщо (cap->cmdchar == K_PS && VIsual_active)
     {
 	pos_T old_pos = curwin->w_cursor;
 	pos_T old_visual = VIsual;
-	int old_visual_mode = VIsual_mode;
+	ціле old_visual_mode = VIsual_mode;
 
 	// In Visual mode the selected text is deleted.
-	if (VIsual_mode == 'V' || curwin->w_cursor.lnum != VIsual.lnum)
+	якщо (VIsual_mode == 'V' || curwin->w_cursor.lnum != VIsual.lnum)
 	{
 	    shift_delete_registers();
 	    cap->oap->regname = '1';
 	}
-	else
+	інакше
 	    cap->oap->regname = '-';
 	cap->cmdchar = 'd';
 	cap->nchar = NUL;
@@ -7101,19 +7101,19 @@ nv_edit(cmdarg_T *cap)
 	do_pending_operator(cap, 0, FALSE);
 	cap->cmdchar = K_PS;
 
-	if (*ml_get_cursor() != NUL)
+	якщо (*ml_get_cursor() != NUL)
 	{
-	    if (old_visual_mode == 'V')
+	    якщо (old_visual_mode == 'V')
 	    {
 		// In linewise Visual mode insert before the beginning of the
 		// next line.
 		// When the last line in the buffer was deleted then create a
 		// new line, otherwise there is not need to move cursor.
 		// Detect this by checking if cursor moved above Visual area.
-		if (curwin->w_cursor.lnum < old_pos.lnum
+		якщо (curwin->w_cursor.lnum < old_pos.lnum
 				&& curwin->w_cursor.lnum < old_visual.lnum)
 		{
-		    if (u_save_cursor() == OK)
+		    якщо (u_save_cursor() == OK)
 		    {
 			ml_append(curwin->w_cursor.lnum, (char_u *)"", 0,
 									FALSE);
@@ -7123,7 +7123,7 @@ nv_edit(cmdarg_T *cap)
 	    }
 	    // When the last char in the line was deleted then append.
 	    // Detect this by checking if cursor moved before Visual area.
-	    else if (curwin->w_cursor.col < old_pos.col
+	    інакше якщо (curwin->w_cursor.col < old_pos.col
 				&& curwin->w_cursor.col < old_visual.col)
 		inc_cursor();
 	}
@@ -7131,7 +7131,7 @@ nv_edit(cmdarg_T *cap)
 	// Insert to replace the deleted text with the pasted text.
 	invoke_edit(cap, FALSE, cap->cmdchar, FALSE);
     }
-    else if (!checkclearopq(cap->oap))
+    інакше якщо (!checkclearopq(cap->oap))
     {
 	switch (cap->cmdchar)
 	{
@@ -7140,35 +7140,35 @@ nv_edit(cmdarg_T *cap)
 		break;
 
 	    case 'I':	// "I"nsert before the first non-blank
-		if (vim_strchr(p_cpo, CPO_INSEND) == NULL)
+		якщо (vim_strchr(p_cpo, CPO_INSEND) == NULL)
 		    beginline(BL_WHITE);
-		else
+		інакше
 		    beginline(BL_WHITE|BL_FIX);
 		break;
 
 	    case K_PS:
 		// Bracketed paste works like "a"ppend, unless the cursor is in
 		// the first column, then it inserts.
-		if (curwin->w_cursor.col == 0)
+		якщо (curwin->w_cursor.col == 0)
 		    break;
 		// FALLTHROUGH
 
 	    case 'a':	// "a"ppend is like "i"nsert on the next character.
 		// increment coladd when in virtual space, increment the
 		// column otherwise, also to append after an unprintable char
-		if (virtual_active()
+		якщо (virtual_active()
 			&& (curwin->w_cursor.coladd > 0
 			    || *ml_get_cursor() == NUL
 			    || *ml_get_cursor() == TAB))
 		    curwin->w_cursor.coladd++;
-		else if (*ml_get_cursor() != NUL)
+		інакше якщо (*ml_get_cursor() != NUL)
 		    inc_cursor();
 		break;
 	}
 
-	if (curwin->w_cursor.coladd && cap->cmdchar != 'A')
+	якщо (curwin->w_cursor.coladd && cap->cmdchar != 'A')
 	{
-	    int save_State = State;
+	    ціле save_State = State;
 
 	    // Pretend Insert mode here to allow the cursor on the
 	    // character past the end of the line
@@ -7179,7 +7179,7 @@ nv_edit(cmdarg_T *cap)
 
 	invoke_edit(cap, FALSE, cap->cmdchar, FALSE);
     }
-    else if (cap->cmdchar == K_PS)
+    інакше якщо (cap->cmdchar == K_PS)
 	// drop the pasted text
 	bracketed_paste(PASTE_INSERT, TRUE, NULL);
 }
@@ -7190,18 +7190,18 @@ nv_edit(cmdarg_T *cap)
     static void
 invoke_edit(
     cmdarg_T	*cap,
-    int		repl,		// "r" or "gr" command
-    int		cmd,
-    int		startln)
+    ціле		repl,		// "r" or "gr" command
+    ціле		cmd,
+    ціле		startln)
 {
-    int		restart_edit_save = 0;
+    ціле		restart_edit_save = 0;
 
     // Complicated: When the user types "a<C-O>a" we don't want to do Insert
     // mode recursively.  But when doing "a<C-O>." or "a<C-O>rx" we do allow
     // it.
-    if (repl || !stuff_empty())
+    якщо (repl || !stuff_empty())
 	restart_edit_save = restart_edit;
-    else
+    інакше
 	restart_edit_save = 0;
 
     // Always reset "restart_edit", this is not a restarted edit.
@@ -7209,12 +7209,12 @@ invoke_edit(
 
     // Reset Changedtick_i, so that TextChangedI will only be triggered for stuff
     // from insert mode, for 'o/O' this has already been done in n_opencmd
-    if (cap->cmdchar != 'O' && cap->cmdchar != 'o')
+    якщо (cap->cmdchar != 'O' && cap->cmdchar != 'o')
 	curbuf->b_last_changedtick_i = CHANGEDTICK(curbuf);
-    if (edit(cmd, startln, cap->count1))
+    якщо (edit(cmd, startln, cap->count1))
 	cap->retval |= CA_COMMAND_BUSY;
 
-    if (restart_edit == 0)
+    якщо (restart_edit == 0)
 	restart_edit = restart_edit_save;
 }
 
@@ -7225,13 +7225,13 @@ invoke_edit(
 nv_object(
     cmdarg_T	*cap)
 {
-    int		flag;
-    int		include;
+    ціле		flag;
+    ціле		include;
     char_u	*mps_save;
 
-    if (cap->cmdchar == 'i')
+    якщо (cap->cmdchar == 'i')
 	include = FALSE;    // "ix" = inner object: exclude white space
-    else
+    інакше
 	include = TRUE;	    // "ax" = an object: include white space
 
     // Make sure (), [], {} and <> are in 'matchpairs'
@@ -7288,7 +7288,7 @@ nv_object(
 		flag = current_quote(cap->oap, cap->count1, include,
 								  cap->nchar);
 		break;
-#if 0	// TODO
+#якщо 0	// TODO
 	case 'S': // "aS" = a section
 	case 'f': // "af" = a filename
 	case 'u': // "au" = a URL
@@ -7299,7 +7299,7 @@ nv_object(
     }
 
     curbuf->b_p_mps = mps_save;
-    if (flag == FAIL)
+    якщо (flag == FAIL)
 	clearopbeep(cap->oap);
     adjust_cursor_col();
     curwin->w_set_curswant = true;
@@ -7312,32 +7312,32 @@ nv_object(
     static void
 nv_record(cmdarg_T *cap)
 {
-    if (cap->oap->op_type == OP_FORMAT)
+    якщо (cap->oap->op_type == OP_FORMAT)
     {
 	// "gqq" is the same as "gqgq": format line
 	cap->cmdchar = 'g';
 	cap->nchar = 'q';
 	nv_operator(cap);
-	return;
+	повернути;
     }
 
-    if (checkclearop(cap->oap))
-	return;
+    якщо (checkclearop(cap->oap))
+	повернути;
 
-    if (cap->nchar == ':' || cap->nchar == '/' || cap->nchar == '?')
+    якщо (cap->nchar == ':' || cap->nchar == '/' || cap->nchar == '?')
     {
-	if (cmdwin_type != 0)
+	якщо (cmdwin_type != 0)
 	{
 	    emsg(_(e_cmdline_window_already_open));
-	    return;
+	    повернути;
 	}
 	stuffcharReadbuff(cap->nchar);
 	stuffcharReadbuff(K_CMDWIN);
     }
-    else
+    інакше
 	// (stop) recording into a named register, unless executing a
 	// register
-	if (reg_executing == 0 && do_record(cap->nchar) == FAIL)
+	якщо (reg_executing == 0 && do_record(cap->nchar) == FAIL)
 	    clearopbeep(cap->oap);
 }
 
@@ -7347,18 +7347,18 @@ nv_record(cmdarg_T *cap)
     static void
 nv_at(cmdarg_T *cap)
 {
-    if (checkclearop(cap->oap))
-	return;
+    якщо (checkclearop(cap->oap))
+	повернути;
 #ifdef FEAT_EVAL
-    if (cap->nchar == '=')
+    якщо (cap->nchar == '=')
     {
-	if (get_expr_register() == NUL)
-	    return;
+	якщо (get_expr_register() == NUL)
+	    повернути;
     }
 #endif
-    while (cap->count1-- && !got_int)
+    поки (cap->count1-- && !got_int)
     {
-	if (do_execreg(cap->nchar, FALSE, FALSE, FALSE) == FAIL)
+	якщо (do_execreg(cap->nchar, FALSE, FALSE, FALSE) == FAIL)
 	{
 	    clearopbeep(cap->oap);
 	    break;
@@ -7373,8 +7373,8 @@ nv_at(cmdarg_T *cap)
     static void
 nv_halfpage(cmdarg_T *cap)
 {
-    int	dir = cap->cmdchar == Ctrl_D ? FORWARD : BACKWARD;
-    if (!checkclearop(cap->oap))
+    ціле	dir = cap->cmdchar == Ctrl_D ? FORWARD : BACKWARD;
+    якщо (!checkclearop(cap->oap))
 	pagescroll(dir, cap->count0, TRUE);
 }
 
@@ -7384,25 +7384,25 @@ nv_halfpage(cmdarg_T *cap)
     static void
 nv_join(cmdarg_T *cap)
 {
-    if (VIsual_active)	// join the visual lines
+    якщо (VIsual_active)	// join the visual lines
     {
 	nv_operator(cap);
-	return;
+	повернути;
     }
 
-    if (checkclearop(cap->oap))
-	return;
+    якщо (checkclearop(cap->oap))
+	повернути;
 
-    if (cap->count0 <= 1)
+    якщо (cap->count0 <= 1)
 	cap->count0 = 2;	    // default for join is two lines!
-    if (curwin->w_cursor.lnum + cap->count0 - 1 >
+    якщо (curwin->w_cursor.lnum + cap->count0 - 1 >
 	    curbuf->b_ml.ml_line_count)
     {
 	// can't join when on the last line
-	if (cap->count0 <= 2)
+	якщо (cap->count0 <= 2)
 	{
 	    clearopbeep(cap->oap);
-	    return;
+	    повернути;
 	}
 	cap->count0 = curbuf->b_ml.ml_line_count
 	    - curwin->w_cursor.lnum + 1;
@@ -7427,59 +7427,59 @@ nv_put(cmdarg_T *cap)
  * "fix_indent" is TRUE for "[p", "[P", "]p" and "]P".
  */
     static void
-nv_put_opt(cmdarg_T *cap, int fix_indent)
+nv_put_opt(cmdarg_T *cap, ціле fix_indent)
 {
-    int		regname = 0;
+    ціле		regname = 0;
     void	*reg1 = NULL, *reg2 = NULL;
-    int		empty = FALSE;
-    int		was_visual = FALSE;
-    int		dir;
-    int		flags = 0;
-    int		keep_registers = FALSE;
+    ціле		empty = FALSE;
+    ціле		was_visual = FALSE;
+    ціле		dir;
+    ціле		flags = 0;
+    ціле		keep_registers = FALSE;
 #ifdef FEAT_FOLDING
-    int		save_fen = curwin->w_p_fen;
+    ціле		save_fen = curwin->w_p_fen;
 #endif
 
-    if (cap->oap->op_type != OP_NOP)
+    якщо (cap->oap->op_type != OP_NOP)
     {
 #ifdef FEAT_DIFF
 	// "dp" is ":diffput"
-	if (cap->oap->op_type == OP_DELETE && cap->cmdchar == 'p')
+	якщо (cap->oap->op_type == OP_DELETE && cap->cmdchar == 'p')
 	{
 	    clearop(cap->oap);
 	    nv_diffgetput(TRUE, cap->opcount);
 	}
-	else
+	інакше
 #endif
 	    clearopbeep(cap->oap);
-	return;
+	повернути;
     }
 
 #ifdef FEAT_JOB_CHANNEL
-    if (bt_prompt(curbuf) && !prompt_curpos_editable())
+    якщо (bt_prompt(curbuf) && !prompt_curpos_editable())
     {
 	clearopbeep(cap->oap);
-	return;
+	повернути;
     }
 #endif
 
-    if (fix_indent)
+    якщо (fix_indent)
     {
 	dir = (cap->cmdchar == ']' && cap->nchar == 'p')
 	    ? FORWARD : BACKWARD;
 	flags |= PUT_FIXINDENT;
     }
-    else
+    інакше
 	dir = (cap->cmdchar == 'P'
 		|| ((cap->cmdchar == 'g' || cap->cmdchar == 'z')
 		    && cap->nchar == 'P')) ? BACKWARD : FORWARD;
     prep_redo_cmd(cap);
-    if (cap->cmdchar == 'g')
+    якщо (cap->cmdchar == 'g')
 	flags |= PUT_CURSEND;
-    else if (cap->cmdchar == 'z')
+    інакше якщо (cap->cmdchar == 'z')
 	flags |= PUT_BLOCK_INNER;
 
-    if (VIsual_active)
+    якщо (VIsual_active)
     {
 	// Putting in Visual mode: The put text replaces the selected
 	// text.  First delete the selected text, then put the new text.
@@ -7491,7 +7491,7 @@ nv_put_opt(cmdarg_T *cap, int fix_indent)
 #ifdef HAVE_CLIPMETHOD
 	adjust_clip_reg(&regname);
 #endif
-	if (regname == 0 || regname == '"'
+	якщо (regname == 0 || regname == '"'
 		|| VIM_ISDIGIT(regname) || regname == '-'
 #ifdef FEAT_CLIPBOARD
 		|| (clip_unnamed && (regname == '*' || regname == '+'))
@@ -7523,7 +7523,7 @@ nv_put_opt(cmdarg_T *cap, int fix_indent)
 	// delete PUT_LINE_BACKWARD;
 	cap->oap->regname = regname;
 
-	if (reg1 != NULL)
+	якщо (reg1 != NULL)
 	{
 	    // Delete probably changed the register we want to put, save
 	    // it first. Then put back what was there before the delete.
@@ -7534,14 +7534,14 @@ nv_put_opt(cmdarg_T *cap, int fix_indent)
 	// When deleted a linewise Visual area, put the register as
 	// lines to avoid it joined with the next line.  When deletion was
 	// characterwise, split a line when putting lines.
-	if (VIsual_mode == 'V')
+	якщо (VIsual_mode == 'V')
 	    flags |= PUT_LINE;
-	else if (VIsual_mode == 'v')
+	інакше якщо (VIsual_mode == 'v')
 	    flags |= PUT_LINE_SPLIT;
-	if (VIsual_mode == Ctrl_V && dir == FORWARD)
+	якщо (VIsual_mode == Ctrl_V && dir == FORWARD)
 	    flags |= PUT_LINE_FORWARD;
 	dir = BACKWARD;
-	if ((VIsual_mode != 'V'
+	якщо ((VIsual_mode != 'V'
 		    && curwin->w_cursor.col < curbuf->b_op_start.col)
 		|| (VIsual_mode == 'V'
 		    && curwin->w_cursor.lnum < curbuf->b_op_start.lnum))
@@ -7554,13 +7554,13 @@ nv_put_opt(cmdarg_T *cap, int fix_indent)
     do_put(cap->oap->regname, NULL, dir, cap->count1, flags);
 
     // If a register was saved, put it back now.
-    if (reg2 != NULL)
+    якщо (reg2 != NULL)
 	put_register(regname, reg2);
 
-    if (was_visual)
+    якщо (was_visual)
     {
 #ifdef FEAT_FOLDING
-	if (save_fen)
+	якщо (save_fen)
 	    curwin->w_p_fen = TRUE;
 #endif
 	// What to reselect with "gv"?  Selecting the just put text seems to
@@ -7568,20 +7568,20 @@ nv_put_opt(cmdarg_T *cap, int fix_indent)
 	curbuf->b_visual.vi_start = curbuf->b_op_start;
 	curbuf->b_visual.vi_end = curbuf->b_op_end;
 	// need to adjust cursor position
-	if (*p_sel == 'e')
+	якщо (*p_sel == 'e')
 	    inc(&curbuf->b_visual.vi_end);
     }
 
     // When all lines were selected and deleted do_put() leaves an empty
     // line that needs to be deleted now.
-    if (empty && *ml_get(curbuf->b_ml.ml_line_count) == NUL)
+    якщо (empty && *ml_get(curbuf->b_ml.ml_line_count) == NUL)
     {
 	ml_delete_flags(curbuf->b_ml.ml_line_count, ML_DEL_MESSAGE);
 	deleted_lines(curbuf->b_ml.ml_line_count + 1, 1);
 
 	// If the cursor was in that line, move it to the end of the last
 	// line.
-	if (curwin->w_cursor.lnum > curbuf->b_ml.ml_line_count)
+	якщо (curwin->w_cursor.lnum > curbuf->b_ml.ml_line_count)
 	{
 	    curwin->w_cursor.lnum = curbuf->b_ml.ml_line_count;
 	    coladvance((colnr_T)MAXCOL);
@@ -7598,20 +7598,20 @@ nv_open(cmdarg_T *cap)
 {
 #ifdef FEAT_DIFF
     // "do" is ":diffget"
-    if (cap->oap->op_type == OP_DELETE && cap->cmdchar == 'o')
+    якщо (cap->oap->op_type == OP_DELETE && cap->cmdchar == 'o')
     {
 	clearop(cap->oap);
 	nv_diffgetput(FALSE, cap->opcount);
     }
-    else
+    інакше
 #endif
-    if (VIsual_active)  // switch start and end of visual
+    якщо (VIsual_active)  // switch start and end of visual
 	v_swap_corners(cap->cmdchar);
 #ifdef FEAT_JOB_CHANNEL
-    else if (bt_prompt(curbuf))
+    інакше якщо (bt_prompt(curbuf))
 	clearopbeep(cap->oap);
 #endif
-    else
+    інакше
 	n_opencmd(cap);
 }
 

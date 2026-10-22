@@ -33,7 +33,7 @@
 
 #include <limits.h>
 
-#if defined(MSWIN) && defined(HAVE_FCNTL_H)
+#якщо defined(MSWIN) && defined(HAVE_FCNTL_H)
 # undef HAVE_FCNTL_H
 #endif
 
@@ -76,9 +76,9 @@
 #undef HAVE_FCNTL_H // Clash with os_win32.h
 
 // The "surrogateescape" error handler is new in Python 3.1
-#if PY_VERSION_HEX >= 0x030100f0
+#якщо PY_VERSION_HEX >= 0x030100f0
 # define CODEC_ERROR_HANDLER "surrogateescape"
-#else
+#інакше
 # define CODEC_ERROR_HANDLER NULL
 #endif
 
@@ -119,32 +119,32 @@
  * PySlice_GetIndicesEx(): first argument type changed from PySliceObject
  * to PyObject in Python 3.2 or later.
  */
-#if PY_VERSION_HEX >= 0x030200f0
+#якщо PY_VERSION_HEX >= 0x030200f0
 typedef PyObject PySliceObject_T;
-#else
+#інакше
 typedef PySliceObject PySliceObject_T;
 #endif
 
 #ifndef MSWIN
 # define HINSTANCE void *
 #endif
-#if defined(DYNAMIC_PYTHON3) || defined(MSWIN)
+#якщо defined(DYNAMIC_PYTHON3) || defined(MSWIN)
 static HINSTANCE hinstPy3 = 0; // Instance of python.dll
 #endif
 
-#if defined(DYNAMIC_PYTHON3)
+#якщо defined(DYNAMIC_PYTHON3)
 
 # ifdef MSWIN
 #  define load_dll vimLoadLib
 #  define close_dll FreeLibrary
 #  define symbol_from_dll GetProcAddress
 #  define load_dll_error GetWin32Error
-# else
+# інакше
 #  include <dlfcn.h>
 #  define FARPROC void*
-#  if defined(PY_NO_RTLD_GLOBAL) && defined(PY3_NO_RTLD_GLOBAL)
+#  якщо defined(PY_NO_RTLD_GLOBAL) && defined(PY3_NO_RTLD_GLOBAL)
 #   define load_dll(n) dlopen((n), RTLD_LAZY)
-#  else
+#  інакше
 #   define load_dll(n) dlopen((n), RTLD_LAZY|RTLD_GLOBAL)
 #  endif
 #  define close_dll dlclose
@@ -192,7 +192,7 @@ static HINSTANCE hinstPy3 = 0; // Instance of python.dll
 # define PySequence_Size py3_PySequence_Size
 # define PySequence_GetItem py3_PySequence_GetItem
 # define PySequence_Fast py3_PySequence_Fast
-# if PY_VERSION_HEX >= 0x030601f0
+# якщо PY_VERSION_HEX >= 0x030601f0
 #  define PySlice_AdjustIndices py3_PySlice_AdjustIndices
 #  define PySlice_Unpack py3_PySlice_Unpack
 # endif
@@ -207,7 +207,7 @@ static HINSTANCE hinstPy3 = 0; // Instance of python.dll
 # ifndef PyMapping_Keys
 #  define PyMapping_Keys py3_PyMapping_Keys
 # endif
-# if (defined(USE_LIMITED_API) && Py_LIMITED_API >= 0x03080000) || \
+# якщо (defined(USE_LIMITED_API) && Py_LIMITED_API >= 0x03080000) || \
        (!defined(USE_LIMITED_API) && PY_VERSION_HEX >= 0x03080000)
 #  undef PyIter_Check
 #  define PyIter_Check py3_PyIter_Check
@@ -218,14 +218,14 @@ static HINSTANCE hinstPy3 = 0; // Instance of python.dll
 # define PyObject_GetItem py3_PyObject_GetItem
 # define PyObject_IsTrue py3_PyObject_IsTrue
 # define PyModule_GetDict py3_PyModule_GetDict
-# if defined(USE_LIMITED_API) || PY_VERSION_HEX >= 0x03080000
+# якщо defined(USE_LIMITED_API) || PY_VERSION_HEX >= 0x03080000
 #  define Py_IncRef py3_Py_IncRef
 #  define Py_DecRef py3_Py_DecRef
 # endif
 # ifdef USE_LIMITED_API
 #  define Py_CompileString py3_Py_CompileString
 #  define PyEval_EvalCode py3_PyEval_EvalCode
-# else
+# інакше
 #  undef PyRun_SimpleString
 #  define PyRun_SimpleString py3_PyRun_SimpleString
 #  undef PyRun_String
@@ -235,9 +235,9 @@ static HINSTANCE hinstPy3 = 0; // Instance of python.dll
 # define PyObject_HasAttrString py3_PyObject_HasAttrString
 # define PyObject_SetAttrString py3_PyObject_SetAttrString
 # define PyObject_CallFunctionObjArgs py3_PyObject_CallFunctionObjArgs
-# if PY_VERSION_HEX >= 0x030d0000
+# якщо PY_VERSION_HEX >= 0x030d0000
 #  define PyObject_CallFunction py3_PyObject_CallFunction
-# else
+# інакше
 #  define _PyObject_CallFunction_SizeT py3__PyObject_CallFunction_SizeT
 # endif
 # define PyObject_Call py3_PyObject_Call
@@ -247,7 +247,7 @@ static HINSTANCE hinstPy3 = 0; // Instance of python.dll
 # define PySys_GetObject py3_PySys_GetObject
 # define PySys_SetArgv py3_PySys_SetArgv
 # define PyType_Ready py3_PyType_Ready
-# if PY_VERSION_HEX >= 0x03040000
+# якщо PY_VERSION_HEX >= 0x03040000
 #  define PyType_GetFlags py3_PyType_GetFlags
 # endif
 # undef Py_BuildValue
@@ -259,7 +259,7 @@ static HINSTANCE hinstPy3 = 0; // Instance of python.dll
 # define _Py_NoneStruct (*py3__Py_NoneStruct)
 # define _Py_FalseStruct (*py3__Py_FalseStruct)
 # define _Py_TrueStruct (*py3__Py_TrueStruct)
-# if !defined(USE_LIMITED_API) && PY_VERSION_HEX < 0x030D0000
+# якщо !defined(USE_LIMITED_API) && PY_VERSION_HEX < 0x030D0000
 // Private symbol that used to be required as part of PyIter_Check.
 #  define _PyObject_NextNotImplemented (*py3__PyObject_NextNotImplemented)
 # endif
@@ -267,13 +267,13 @@ static HINSTANCE hinstPy3 = 0; // Instance of python.dll
 # define PyImport_AppendInittab py3_PyImport_AppendInittab
 # define PyImport_AddModule py3_PyImport_AddModule
 # ifdef USE_LIMITED_API
-#  if Py_LIMITED_API >= 0x030a0000
+#  якщо Py_LIMITED_API >= 0x030a0000
 #   define PyUnicode_AsUTF8AndSize py3_PyUnicode_AsUTF8AndSize
 #  endif
-# else
-#  if PY_VERSION_HEX >= 0x030300f0
+# інакше
+#  якщо PY_VERSION_HEX >= 0x030300f0
 #   define PyUnicode_AsUTF8AndSize py3_PyUnicode_AsUTF8AndSize
-#  else
+#  інакше
 #   define _PyUnicode_AsString py3__PyUnicode_AsString
 #  endif
 # endif
@@ -309,13 +309,13 @@ static HINSTANCE hinstPy3 = 0; // Instance of python.dll
 #  define _Py_NegativeRefcount py3__Py_NegativeRefcount
 #  define _Py_RefTotal (*py3__Py_RefTotal)
 #  define PyModule_Create2TraceRefs py3_PyModule_Create2TraceRefs
-# else
+# інакше
 #  define PyModule_Create2 py3_PyModule_Create2
 # endif
-# if defined(Py_DEBUG) && !defined(Py_DEBUG_NO_PYMALLOC)
+# якщо defined(Py_DEBUG) && !defined(Py_DEBUG_NO_PYMALLOC)
 #  define _PyObject_DebugMalloc py3__PyObject_DebugMalloc
 #  define _PyObject_DebugFree py3__PyObject_DebugFree
-# else
+# інакше
 #  define PyObject_Malloc py3_PyObject_Malloc
 #  define PyObject_Free py3_PyObject_Free
 # endif
@@ -329,10 +329,10 @@ static HINSTANCE hinstPy3 = 0; // Instance of python.dll
 # ifdef Py_UNICODE_USE_UCS_FUNCTIONS
 #  ifdef Py_UNICODE_WIDE
 #   define PyUnicodeUCS4_FromFormat py3_PyUnicodeUCS4_FromFormat
-#  else
+#  інакше
 #   define PyUnicodeUCS2_FromFormat py3_PyUnicodeUCS2_FromFormat
 #  endif
-# else
+# інакше
 #  define PyUnicode_FromFormat py3_PyUnicode_FromFormat
 # endif
 # undef PyUnicode_Decode
@@ -345,7 +345,7 @@ static HINSTANCE hinstPy3 = 0; // Instance of python.dll
 #  define PyType_FromSpec py3_PyType_FromSpec
 # endif
 
-# if defined(Py_DEBUG) && !defined(Py_DEBUG_NO_PYMALLOC)
+# якщо defined(Py_DEBUG) && !defined(Py_DEBUG_NO_PYMALLOC)
 #  undef PyObject_NEW
 #  define PyObject_NEW(type, typeobj) \
 ( (type *) PyObject_Init( \
@@ -359,59 +359,59 @@ static HINSTANCE hinstPy3 = 0; // Instance of python.dll
 /*
  * Pointers for dynamic link
  */
-static int (*py3_PySys_SetArgv)(int, wchar_t **);
+static ціле (*py3_PySys_SetArgv)(ціле, wchar_t **);
 static void (*py3_Py_SetPythonHome)(wchar_t *home);
 static void (*py3_Py_Initialize)(void);
 static PyObject* (*py3_PyList_New)(Py_ssize_t size);
 static PyGILState_STATE (*py3_PyGILState_Ensure)(void);
 static void (*py3_PyGILState_Release)(PyGILState_STATE);
-static int (*py3_PySys_SetObject)(char *, PyObject *);
+static ціле (*py3_PySys_SetObject)(char *, PyObject *);
 static PyObject* (*py3_PySys_GetObject)(char *);
-static int (*py3_PyList_Append)(PyObject *, PyObject *);
-static int (*py3_PyList_Insert)(PyObject *, int, PyObject *);
+static ціле (*py3_PyList_Append)(PyObject *, PyObject *);
+static ціле (*py3_PyList_Insert)(PyObject *, ціле, PyObject *);
 static Py_ssize_t (*py3_PyList_Size)(PyObject *);
 static PyObject* (*py3_PyTuple_New)(Py_ssize_t size);
-static int (*py3_PyTuple_SetItem)(PyObject *, Py_ssize_t, PyObject *);
+static ціле (*py3_PyTuple_SetItem)(PyObject *, Py_ssize_t, PyObject *);
 static Py_ssize_t (*py3_PyTuple_Size)(PyObject *);
-static int (*py3_PySequence_Check)(PyObject *);
+static ціле (*py3_PySequence_Check)(PyObject *);
 static Py_ssize_t (*py3_PySequence_Size)(PyObject *);
 static PyObject* (*py3_PySequence_GetItem)(PyObject *, Py_ssize_t);
 static PyObject* (*py3_PySequence_Fast)(PyObject *, const char *);
 static PyObject* (*py3_PyTuple_GetItem)(PyObject *, Py_ssize_t);
-static int (*py3_PyMapping_Check)(PyObject *);
+static ціле (*py3_PyMapping_Check)(PyObject *);
 static PyObject* (*py3_PyMapping_Keys)(PyObject *);
-# if PY_VERSION_HEX >= 0x030601f0
-static int (*py3_PySlice_AdjustIndices)(Py_ssize_t length,
+# якщо PY_VERSION_HEX >= 0x030601f0
+static ціле (*py3_PySlice_AdjustIndices)(Py_ssize_t length,
 		     Py_ssize_t *start, Py_ssize_t *stop, Py_ssize_t step);
-static int (*py3_PySlice_Unpack)(PyObject *slice,
+static ціле (*py3_PySlice_Unpack)(PyObject *slice,
 		     Py_ssize_t *start, Py_ssize_t *stop, Py_ssize_t *step);
 # endif
-static int (*py3_PySlice_GetIndicesEx)(PySliceObject_T *r, Py_ssize_t length,
+static ціле (*py3_PySlice_GetIndicesEx)(PySliceObject_T *r, Py_ssize_t length,
 		     Py_ssize_t *start, Py_ssize_t *stop, Py_ssize_t *step,
 		     Py_ssize_t *slicelen);
 static PyObject* (*py3_PyErr_NoMemory)(void);
 static void (*py3_Py_Finalize)(void);
 static void (*py3_PyErr_SetString)(PyObject *, const char *);
 static void (*py3_PyErr_SetObject)(PyObject *, PyObject *);
-static int (*py3_PyErr_ExceptionMatches)(PyObject *);
-# if defined(USE_LIMITED_API) || PY_VERSION_HEX >= 0x03080000
+static ціле (*py3_PyErr_ExceptionMatches)(PyObject *);
+# якщо defined(USE_LIMITED_API) || PY_VERSION_HEX >= 0x03080000
 static void (*py3_Py_IncRef)(PyObject *);
 static void (*py3_Py_DecRef)(PyObject *);
 # endif
 # ifdef USE_LIMITED_API
-static PyObject* (*py3_Py_CompileString)(const char *, const char *, int);
+static PyObject* (*py3_Py_CompileString)(const char *, const char *, ціле);
 static PyObject* (*py3_PyEval_EvalCode)(PyObject *co, PyObject *globals, PyObject *locals);
-# else
-static int (*py3_PyRun_SimpleString)(char *);
-static PyObject* (*py3_PyRun_String)(char *, int, PyObject *, PyObject *);
+# інакше
+static ціле (*py3_PyRun_SimpleString)(char *);
+static PyObject* (*py3_PyRun_String)(char *, ціле, PyObject *, PyObject *);
 # endif
 static PyObject* (*py3_PyObject_GetAttrString)(PyObject *, const char *);
-static int (*py3_PyObject_HasAttrString)(PyObject *, const char *);
-static int (*py3_PyObject_SetAttrString)(PyObject *, const char *, PyObject *);
+static ціле (*py3_PyObject_HasAttrString)(PyObject *, const char *);
+static ціле (*py3_PyObject_SetAttrString)(PyObject *, const char *, PyObject *);
 static PyObject* (*py3_PyObject_CallFunctionObjArgs)(PyObject *, ...);
-# if PY_VERSION_HEX >= 0x030d0000
+# якщо PY_VERSION_HEX >= 0x030d0000
 static PyObject* (*py3_PyObject_CallFunction)(PyObject *, char *, ...);
-# else
+# інакше
 static PyObject* (*py3__PyObject_CallFunction_SizeT)(PyObject *, char *, ...);
 # endif
 static PyObject* (*py3_PyObject_Call)(PyObject *, PyObject *, PyObject *);
@@ -420,37 +420,37 @@ static PyObject* (*py3_PyEval_GetLocals)(void);
 static PyObject* (*py3_PyList_GetItem)(PyObject *, Py_ssize_t);
 static PyObject* (*py3_PyImport_ImportModule)(const char *);
 static PyObject* (*py3_PyImport_AddModule)(const char *);
-static int (*py3_PyErr_BadArgument)(void);
+static ціле (*py3_PyErr_BadArgument)(void);
 static PyObject* (*py3_PyErr_Occurred)(void);
 static PyObject* (*py3_PyModule_GetDict)(PyObject *);
-static int (*py3_PyList_SetItem)(PyObject *, Py_ssize_t, PyObject *);
+static ціле (*py3_PyList_SetItem)(PyObject *, Py_ssize_t, PyObject *);
 static PyObject* (*py3_PyDict_GetItemString)(PyObject *, const char *);
-static int (*py3_PyDict_Next)(PyObject *, Py_ssize_t *, PyObject **, PyObject **);
+static ціле (*py3_PyDict_Next)(PyObject *, Py_ssize_t *, PyObject **, PyObject **);
 static PyObject* (*py3_PyLong_FromLong)(long);
 static PyObject* (*py3_PyDict_New)(void);
-# if (defined(USE_LIMITED_API) && Py_LIMITED_API >= 0x03080000) || \
+# якщо (defined(USE_LIMITED_API) && Py_LIMITED_API >= 0x03080000) || \
        (!defined(USE_LIMITED_API) && PY_VERSION_HEX >= 0x03080000)
-static int (*py3_PyIter_Check)(PyObject *o);
+static ціле (*py3_PyIter_Check)(PyObject *o);
 # endif
 static PyObject* (*py3_PyIter_Next)(PyObject *);
 static PyObject* (*py3_PyObject_GetIter)(PyObject *);
 static PyObject* (*py3_PyObject_Repr)(PyObject *);
 static PyObject* (*py3_PyObject_GetItem)(PyObject *, PyObject *);
-static int (*py3_PyObject_IsTrue)(PyObject *);
+static ціле (*py3_PyObject_IsTrue)(PyObject *);
 static PyObject* (*py3_Py_BuildValue)(char *, ...);
-# if PY_VERSION_HEX >= 0x03040000
-static int (*py3_PyType_GetFlags)(PyTypeObject *o);
+# якщо PY_VERSION_HEX >= 0x03040000
+static ціле (*py3_PyType_GetFlags)(PyTypeObject *o);
 # endif
-static int (*py3_PyType_Ready)(PyTypeObject *type);
-static int (*py3_PyDict_SetItemString)(PyObject *dp, char *key, PyObject *item);
+static ціле (*py3_PyType_Ready)(PyTypeObject *type);
+static ціле (*py3_PyDict_SetItemString)(PyObject *dp, char *key, PyObject *item);
 static PyObject* (*py3_PyUnicode_FromString)(const char *u);
 # ifdef Py_UNICODE_USE_UCS_FUNCTIONS
 #  ifdef Py_UNICODE_WIDE
 static PyObject* (*py3_PyUnicodeUCS4_FromFormat)(const char *u, ...);
-#  else
+#  інакше
 static PyObject* (*py3_PyUnicodeUCS2_FromFormat)(const char *u, ...);
 #  endif
-# else
+# інакше
 static PyObject* (*py3_PyUnicode_FromFormat)(const char *u, ...);
 # endif
 static PyObject* (*py3_PyUnicode_Decode)(const char *u, Py_ssize_t size,
@@ -460,42 +460,42 @@ static void (*py3_PyErr_SetNone)(PyObject *);
 static void (*py3_PyEval_InitThreads)(void);
 static void(*py3_PyEval_RestoreThread)(PyThreadState *);
 static PyThreadState*(*py3_PyEval_SaveThread)(void);
-static int (*py3_PyArg_Parse)(PyObject *, char *, ...);
-static int (*py3_PyArg_ParseTuple)(PyObject *, char *, ...);
+static ціле (*py3_PyArg_Parse)(PyObject *, char *, ...);
+static ціле (*py3_PyArg_ParseTuple)(PyObject *, char *, ...);
 static void (*py3_PyMem_Free)(void *);
 static void* (*py3_PyMem_Malloc)(size_t);
-static int (*py3_Py_IsInitialized)(void);
+static ціле (*py3_Py_IsInitialized)(void);
 static void (*py3_PyErr_Clear)(void);
 static PyObject* (*py3_PyErr_Format)(PyObject *, const char *, ...);
-static void (*py3_PyErr_PrintEx)(int);
+static void (*py3_PyErr_PrintEx)(ціле);
 static PyObject*(*py3__PyObject_Init)(PyObject *, PyTypeObject *);
-# if !defined(USE_LIMITED_API) && PY_VERSION_HEX < 0x030D0000
+# якщо !defined(USE_LIMITED_API) && PY_VERSION_HEX < 0x030D0000
 static iternextfunc py3__PyObject_NextNotImplemented;
 # endif
 static PyObject* py3__Py_NoneStruct;
 static PyObject* py3__Py_FalseStruct;
 static PyObject* py3__Py_TrueStruct;
-static int (*py3_PyModule_AddObject)(PyObject *m, const char *name, PyObject *o);
-static int (*py3_PyImport_AppendInittab)(const char *name, PyObject* (*initfunc)(void));
+static ціле (*py3_PyModule_AddObject)(PyObject *m, const char *name, PyObject *o);
+static ціле (*py3_PyImport_AppendInittab)(const char *name, PyObject* (*initfunc)(void));
 # ifdef USE_LIMITED_API
-#  if Py_LIMITED_API >= 0x030a0000
+#  якщо Py_LIMITED_API >= 0x030a0000
 static char* (*py3_PyUnicode_AsUTF8AndSize)(PyObject *unicode, Py_ssize_t *size);
 #  endif
-# else
-#  if PY_VERSION_HEX >= 0x030300f0
+# інакше
+#  якщо PY_VERSION_HEX >= 0x030300f0
 static char* (*py3_PyUnicode_AsUTF8AndSize)(PyObject *unicode, Py_ssize_t *size);
-#  else
+#  інакше
 static char* (*py3__PyUnicode_AsString)(PyObject *unicode);
 #  endif
 # endif
-static int (*py3_PyUnicode_CompareWithASCIIString)(PyObject *unicode, const char* string);
+static ціле (*py3_PyUnicode_CompareWithASCIIString)(PyObject *unicode, const char* string);
 static PyObject* (*py3_PyUnicode_AsEncodedString)(PyObject *unicode, const char* encoding, const char* errors);
 static PyObject* (*py3_PyUnicode_AsUTF8String)(PyObject *unicode);
 static char* (*py3_PyBytes_AsString)(PyObject *bytes);
-static int (*py3_PyBytes_AsStringAndSize)(PyObject *bytes, char **buffer, Py_ssize_t *length);
+static ціле (*py3_PyBytes_AsStringAndSize)(PyObject *bytes, char **buffer, Py_ssize_t *length);
 static PyObject* (*py3_PyBytes_FromString)(char *str);
 static PyObject* (*py3_PyBytes_FromStringAndSize)(char *str, Py_ssize_t length);
-# if PY_VERSION_HEX >= 0x030900b0
+# якщо PY_VERSION_HEX >= 0x030900b0
 static PyObject* (*py3__PyObject_New)(PyTypeObject *);
 # endif
 static PyObject* (*py3_PyFloat_FromDouble)(double num);
@@ -510,31 +510,31 @@ static PyTypeObject* py3_PyStdPrinter_Type;
 static PyTypeObject* py3_PySlice_Type;
 static PyTypeObject* py3_PyFloat_Type;
 static PyTypeObject* py3_PyBool_Type;
-static int (*py3_PyNumber_Check)(PyObject *);
+static ціле (*py3_PyNumber_Check)(PyObject *);
 static PyObject* (*py3_PyNumber_Long)(PyObject *);
 static PyObject* (*py3_PyErr_NewException)(char *name, PyObject *base, PyObject *dict);
 static PyObject* (*py3_PyCapsule_New)(void *, char *, PyCapsule_Destructor);
 static void* (*py3_PyCapsule_GetPointer)(PyObject *, char *);
 # ifdef Py_DEBUG
-static void (*py3__Py_NegativeRefcount)(const char *fname, int lineno, PyObject *op);
+static void (*py3__Py_NegativeRefcount)(const char *fname, ціле lineno, PyObject *op);
 static Py_ssize_t* py3__Py_RefTotal;
-static PyObject* (*py3_PyModule_Create2TraceRefs)(struct PyModuleDef* module, int module_api_version);
-# else
-static PyObject* (*py3_PyModule_Create2)(struct PyModuleDef* module, int module_api_version);
+static PyObject* (*py3_PyModule_Create2TraceRefs)(struct PyModuleDef* module, ціле module_api_version);
+# інакше
+static PyObject* (*py3_PyModule_Create2)(struct PyModuleDef* module, ціле module_api_version);
 # endif
-# if defined(Py_DEBUG) && !defined(Py_DEBUG_NO_PYMALLOC)
+# якщо defined(Py_DEBUG) && !defined(Py_DEBUG_NO_PYMALLOC)
 static void (*py3__PyObject_DebugFree)(void*);
 static void* (*py3__PyObject_DebugMalloc)(size_t);
-# else
+# інакше
 static void (*py3_PyObject_Free)(void*);
 static void* (*py3_PyObject_Malloc)(size_t);
 # endif
 static PyObject*(*py3__PyObject_GC_New)(PyTypeObject *);
 static void(*py3_PyObject_GC_Del)(void *);
 static void(*py3_PyObject_GC_UnTrack)(void *);
-static int (*py3_PyType_IsSubtype)(PyTypeObject *, PyTypeObject *);
+static ціле (*py3_PyType_IsSubtype)(PyTypeObject *, PyTypeObject *);
 # ifdef USE_LIMITED_API
-static void* (*py3_PyType_GetSlot)(PyTypeObject *, int);
+static void* (*py3_PyType_GetSlot)(PyTypeObject *, ціле);
 static PyObject* (*py3_PyType_FromSpec)(PyType_Spec *);
 # endif
 
@@ -594,7 +594,7 @@ static struct
     {"PySequence_Size", (PYTHON_PROC*)&py3_PySequence_Size},
     {"PySequence_GetItem", (PYTHON_PROC*)&py3_PySequence_GetItem},
     {"PySequence_Fast", (PYTHON_PROC*)&py3_PySequence_Fast},
-# if PY_VERSION_HEX >= 0x030601f0
+# якщо PY_VERSION_HEX >= 0x030601f0
     {"PySlice_AdjustIndices", (PYTHON_PROC*)&py3_PySlice_AdjustIndices},
     {"PySlice_Unpack", (PYTHON_PROC*)&py3_PySlice_Unpack},
 # endif
@@ -604,14 +604,14 @@ static struct
     {"PyErr_SetString", (PYTHON_PROC*)&py3_PyErr_SetString},
     {"PyErr_SetObject", (PYTHON_PROC*)&py3_PyErr_SetObject},
     {"PyErr_ExceptionMatches", (PYTHON_PROC*)&py3_PyErr_ExceptionMatches},
-# if defined(USE_LIMITED_API) || PY_VERSION_HEX >= 0x03080000
+# якщо defined(USE_LIMITED_API) || PY_VERSION_HEX >= 0x03080000
     {"Py_IncRef", (PYTHON_PROC*)&py3_Py_IncRef},
     {"Py_DecRef", (PYTHON_PROC*)&py3_Py_DecRef},
 # endif
 # ifdef USE_LIMITED_API
     {"Py_CompileString", (PYTHON_PROC*)&py3_Py_CompileString},
     {"PyEval_EvalCode", (PYTHON_PROC*)&PyEval_EvalCode},
-# else
+# інакше
     {"PyRun_SimpleString", (PYTHON_PROC*)&py3_PyRun_SimpleString},
     {"PyRun_String", (PYTHON_PROC*)&py3_PyRun_String},
 # endif
@@ -619,9 +619,9 @@ static struct
     {"PyObject_HasAttrString", (PYTHON_PROC*)&py3_PyObject_HasAttrString},
     {"PyObject_SetAttrString", (PYTHON_PROC*)&py3_PyObject_SetAttrString},
     {"PyObject_CallFunctionObjArgs", (PYTHON_PROC*)&py3_PyObject_CallFunctionObjArgs},
-# if PY_VERSION_HEX >= 0x030d0000
+# якщо PY_VERSION_HEX >= 0x030d0000
     {"PyObject_CallFunction", (PYTHON_PROC*)&py3_PyObject_CallFunction},
-# else
+# інакше
     {"_PyObject_CallFunction_SizeT", (PYTHON_PROC*)&py3__PyObject_CallFunction_SizeT},
 # endif
     {"PyObject_Call", (PYTHON_PROC*)&py3_PyObject_Call},
@@ -638,7 +638,7 @@ static struct
     {"PyDict_Next", (PYTHON_PROC*)&py3_PyDict_Next},
     {"PyMapping_Check", (PYTHON_PROC*)&py3_PyMapping_Check},
     {"PyMapping_Keys", (PYTHON_PROC*)&py3_PyMapping_Keys},
-# if (defined(USE_LIMITED_API) && Py_LIMITED_API >= 0x03080000) || \
+# якщо (defined(USE_LIMITED_API) && Py_LIMITED_API >= 0x03080000) || \
        (!defined(USE_LIMITED_API) && PY_VERSION_HEX >= 0x03080000)
     {"PyIter_Check", (PYTHON_PROC*)&py3_PyIter_Check},
 # endif
@@ -649,7 +649,7 @@ static struct
     {"PyObject_IsTrue", (PYTHON_PROC*)&py3_PyObject_IsTrue},
     {"PyLong_FromLong", (PYTHON_PROC*)&py3_PyLong_FromLong},
     {"PyDict_New", (PYTHON_PROC*)&py3_PyDict_New},
-# if PY_VERSION_HEX >= 0x03040000
+# якщо PY_VERSION_HEX >= 0x03040000
     {"PyType_GetFlags", (PYTHON_PROC*)&py3_PyType_GetFlags},
 # endif
     {"PyType_Ready", (PYTHON_PROC*)&py3_PyType_Ready},
@@ -661,7 +661,7 @@ static struct
     {"PyEval_SaveThread", (PYTHON_PROC*)&py3_PyEval_SaveThread},
     {"_PyArg_Parse_SizeT", (PYTHON_PROC*)&py3_PyArg_Parse},
     {"Py_IsInitialized", (PYTHON_PROC*)&py3_Py_IsInitialized},
-# if !defined(USE_LIMITED_API) && PY_VERSION_HEX < 0x030D0000
+# якщо !defined(USE_LIMITED_API) && PY_VERSION_HEX < 0x030D0000
     {"_PyObject_NextNotImplemented", (PYTHON_PROC*)&py3__PyObject_NextNotImplemented},
 # endif
     {"_Py_NoneStruct", (PYTHON_PROC*)&py3__Py_NoneStruct},
@@ -674,13 +674,13 @@ static struct
     {"PyModule_AddObject", (PYTHON_PROC*)&py3_PyModule_AddObject},
     {"PyImport_AppendInittab", (PYTHON_PROC*)&py3_PyImport_AppendInittab},
 # ifdef USE_LIMITED_API
-#  if Py_LIMITED_API >= 0x030a0000
+#  якщо Py_LIMITED_API >= 0x030a0000
     {"PyUnicode_AsUTF8AndSize", (PYTHON_PROC*)&py3_PyUnicode_AsUTF8AndSize},
 #  endif
-# else
-#  if PY_VERSION_HEX >= 0x030300f0
+# інакше
+#  якщо PY_VERSION_HEX >= 0x030300f0
     {"PyUnicode_AsUTF8AndSize", (PYTHON_PROC*)&py3_PyUnicode_AsUTF8AndSize},
-#  else
+#  інакше
     {"_PyUnicode_AsString", (PYTHON_PROC*)&py3__PyUnicode_AsString},
 #  endif
 # endif
@@ -689,17 +689,17 @@ static struct
 # ifdef Py_UNICODE_USE_UCS_FUNCTIONS
 #  ifdef Py_UNICODE_WIDE
     {"PyUnicodeUCS4_FromFormat", (PYTHON_PROC*)&py3_PyUnicodeUCS4_FromFormat},
-#  else
+#  інакше
     {"PyUnicodeUCS2_FromFormat", (PYTHON_PROC*)&py3_PyUnicodeUCS2_FromFormat},
 #  endif
-# else
+# інакше
     {"PyUnicode_FromFormat", (PYTHON_PROC*)&py3_PyUnicode_FromFormat},
 # endif
     {"PyBytes_AsString", (PYTHON_PROC*)&py3_PyBytes_AsString},
     {"PyBytes_AsStringAndSize", (PYTHON_PROC*)&py3_PyBytes_AsStringAndSize},
     {"PyBytes_FromString", (PYTHON_PROC*)&py3_PyBytes_FromString},
     {"PyBytes_FromStringAndSize", (PYTHON_PROC*)&py3_PyBytes_FromStringAndSize},
-# if PY_VERSION_HEX >= 0x030900b0
+# якщо PY_VERSION_HEX >= 0x030900b0
     {"_PyObject_New", (PYTHON_PROC*)&py3__PyObject_New},
 # endif
     {"PyFloat_FromDouble", (PYTHON_PROC*)&py3_PyFloat_FromDouble},
@@ -721,13 +721,13 @@ static struct
     {"_Py_NegativeRefcount", (PYTHON_PROC*)&py3__Py_NegativeRefcount},
     {"_Py_RefTotal", (PYTHON_PROC*)&py3__Py_RefTotal},
     {"PyModule_Create2TraceRefs", (PYTHON_PROC*)&py3_PyModule_Create2TraceRefs},
-# else
+# інакше
     {"PyModule_Create2", (PYTHON_PROC*)&py3_PyModule_Create2},
 # endif
-# if defined(Py_DEBUG) && !defined(Py_DEBUG_NO_PYMALLOC)
+# якщо defined(Py_DEBUG) && !defined(Py_DEBUG_NO_PYMALLOC)
     {"_PyObject_DebugFree", (PYTHON_PROC*)&py3__PyObject_DebugFree},
     {"_PyObject_DebugMalloc", (PYTHON_PROC*)&py3__PyObject_DebugMalloc},
-# else
+# інакше
     {"PyObject_Malloc", (PYTHON_PROC*)&py3_PyObject_Malloc},
     {"PyObject_Free", (PYTHON_PROC*)&py3_PyObject_Free},
 # endif
@@ -738,7 +738,7 @@ static struct
     {"PyCapsule_New", (PYTHON_PROC*)&py3_PyCapsule_New},
     {"PyCapsule_GetPointer", (PYTHON_PROC*)&py3_PyCapsule_GetPointer},
 # ifdef USE_LIMITED_API
-#  if PY_VERSION_HEX >= 0x03040000
+#  якщо PY_VERSION_HEX >= 0x03040000
     {"PyType_GetSlot", (PYTHON_PROC*)&py3_PyType_GetSlot},
 #  endif
     {"PyType_FromSpec", (PYTHON_PROC*)&py3_PyType_FromSpec},
@@ -746,7 +746,7 @@ static struct
     {"", NULL},
 };
 
-# if defined(USE_LIMITED_API) || PY_VERSION_HEX >= 0x03080000
+# якщо defined(USE_LIMITED_API) || PY_VERSION_HEX >= 0x03080000
 // Use stable versions of inc/dec ref. Note that these always null-check and
 // therefore there's no difference between XINCREF and INCREF.
 //
@@ -766,30 +766,30 @@ static struct
 #  define Py_XDECREF(obj) Py_DecRef((PyObject *)obj)
 # endif
 
-# if PY_VERSION_HEX >= 0x030900b0
-    static inline int
+# якщо PY_VERSION_HEX >= 0x030900b0
+    static inline ціле
 py3_PyType_HasFeature(PyTypeObject *type, unsigned long feature)
 {
-    return ((PyType_GetFlags(type) & feature) != 0);
+    повернути ((PyType_GetFlags(type) & feature) != 0);
 }
 #  define PyType_HasFeature(t,f) py3_PyType_HasFeature(t,f)
 # endif
 
-# if PY_VERSION_HEX >= 0x030a00b2
-    static inline int
+# якщо PY_VERSION_HEX >= 0x030a00b2
+    static inline ціле
 py3__PyObject_TypeCheck(PyObject *ob, PyTypeObject *type)
 {
-    return Py_IS_TYPE(ob, type) || PyType_IsSubtype(Py_TYPE(ob), type);
+    повернути Py_IS_TYPE(ob, type) || PyType_IsSubtype(Py_TYPE(ob), type);
 }
-#  if PY_VERSION_HEX >= 0x030b00b3
+#  якщо PY_VERSION_HEX >= 0x030b00b3
 #   undef PyObject_TypeCheck
 #   define PyObject_TypeCheck(o,t) py3__PyObject_TypeCheck(o,t)
-#  else
+#  інакше
 #   define _PyObject_TypeCheck(o,t) py3__PyObject_TypeCheck(o,t)
 #  endif
 # endif
 
-# if !defined(USE_LIMITED_API) && PY_VERSION_HEX >= 0x030c00b0
+# якщо !defined(USE_LIMITED_API) && PY_VERSION_HEX >= 0x030c00b0
 // PyTuple_GET_SIZE/PyList_GET_SIZE are inlined functions that use Py_SIZE(),
 // which started to introduce linkage dependency from Python 3.12. When we
 // build Python in dynamic mode, we don't link against it in build time, and
@@ -812,17 +812,17 @@ py3_get_system_libname(const char *libname)
     const char	*cp = libname;
     WCHAR	subkey[128];
     HKEY	hKey;
-    int		i;
+    ціле		i;
     DWORD	j, len;
     LSTATUS	ret;
 
-    while (*cp != '\0')
+    поки (*cp != '\0')
     {
-	if (*cp == ':' || *cp == '\\' || *cp == '/')
+	якщо (*cp == ':' || *cp == '\\' || *cp == '/')
 	{
 	    // Bail out if "libname" contains path separator, assume it is
 	    // an absolute path.
-	    return NULL;
+	    повернути NULL;
 	}
 	++cp;
     }
@@ -833,14 +833,14 @@ py3_get_system_libname(const char *libname)
 #  ifdef USE_LIMITED_API
     long    maxminor = -1;
 #  endif
-    for (i = 0; i < ARRAY_LENGTH(hKeyTop); i++)
+    для (i = 0; i < ARRAY_LENGTH(hKeyTop); i++)
     {
 	long	major, minor;
 
 	ret = RegOpenKeyExW(hKeyTop[i], pythoncore, 0, KEY_READ, &hKey);
-	if (ret != ERROR_SUCCESS)
+	якщо (ret != ERROR_SUCCESS)
 	    continue;
-	for (j = 0;; j++)
+	для (j = 0;; j++)
 	{
 	    WCHAR   keyname[32];
 	    WCHAR   *wp;
@@ -848,35 +848,35 @@ py3_get_system_libname(const char *libname)
 	    len = ARRAY_LENGTH(keyname);
 	    ret = RegEnumKeyExW(hKey, j, keyname, &len,
 						    NULL, NULL, NULL, NULL);
-	    if (ret == ERROR_NO_MORE_ITEMS)
+	    якщо (ret == ERROR_NO_MORE_ITEMS)
 		break;
 
 	    major = wcstol(keyname, &wp, 10);
-	    if (*wp != L'.')
+	    якщо (*wp != L'.')
 		continue;
 	    minor = wcstol(wp + 1, &wp, 10);
 #  ifdef _WIN64
-	    if (*wp != L'\0')
+	    якщо (*wp != L'\0')
 		continue;
-#  else
-	    if (wcscmp(wp, L"-32") != 0)
+#  інакше
+	    якщо (wcscmp(wp, L"-32") != 0)
 		continue;
 #  endif
 
-	    if (major != PY_MAJOR_VERSION)
+	    якщо (major != PY_MAJOR_VERSION)
 		continue;
 #  ifdef USE_LIMITED_API
 	    // Search the latest version.
-	    if ((minor > maxminor)
+	    якщо ((minor > maxminor)
 		    && (minor >= ((Py_LIMITED_API >> 16) & 0xff)))
 	    {
 		maxminor = minor;
 		wcscpy(keyfound, keyname);
 		hKeyFound = hKeyTop[i];
 	    }
-#  else
+#  інакше
 	    // Check if it matches with the compiled version.
-	    if (minor == PY_MINOR_VERSION)
+	    якщо (minor == PY_MINOR_VERSION)
 	    {
 		wcscpy(keyfound, keyname);
 		hKeyFound = hKeyTop[i];
@@ -886,36 +886,36 @@ py3_get_system_libname(const char *libname)
 	}
 	RegCloseKey(hKey);
 #  ifdef USE_LIMITED_API
-	if (hKeyFound != NULL)
+	якщо (hKeyFound != NULL)
 	    break;
 #  endif
     }
-    if (hKeyFound == NULL)
-	return NULL;
+    якщо (hKeyFound == NULL)
+	повернути NULL;
 
     swprintf(subkey, ARRAY_LENGTH(subkey), L"%ls\\%ls\\InstallPath",
 							pythoncore, keyfound);
     ret = RegGetValueW(hKeyFound, subkey, NULL, RRF_RT_REG_SZ,
 							    NULL, NULL, &len);
-    if (ret != ERROR_MORE_DATA && ret != ERROR_SUCCESS)
-	return NULL;
+    якщо (ret != ERROR_MORE_DATA && ret != ERROR_SUCCESS)
+	повернути NULL;
     size_t len2 = len / sizeof(WCHAR) + 1 + strlen(libname);
     WCHAR *path = alloc(len2 * sizeof(WCHAR));
-    if (path == NULL)
-	return NULL;
+    якщо (path == NULL)
+	повернути NULL;
     ret = RegGetValueW(hKeyFound, subkey, NULL, RRF_RT_REG_SZ,
 							    NULL, path, &len);
-    if (ret != ERROR_SUCCESS)
+    якщо (ret != ERROR_SUCCESS)
     {
 	vim_free(path);
-	return NULL;
+	повернути NULL;
     }
     // Remove trailing path separators.
     size_t len3 = wcslen(path);
-    if ((len3 > 0) && (path[len3 - 1] == L'/' || path[len3 - 1] == L'\\'))
+    якщо ((len3 > 0) && (path[len3 - 1] == L'/' || path[len3 - 1] == L'\\'))
 	--len3;
     swprintf(path + len3, len2 - len3, L"\\%hs", libname);
-    return path;
+    повернути path;
 }
 # endif
 
@@ -924,38 +924,38 @@ py3_get_system_libname(const char *libname)
  * Parameter 'libname' provides name of DLL.
  * Return OK or FAIL.
  */
-    static int
-py3_runtime_link_init(char *libname, int verbose)
+    static ціле
+py3_runtime_link_init(char *libname, ціле verbose)
 {
-    int i;
+    ціле i;
     PYTHON_PROC *ucs_from_string = (PYTHON_PROC *)&py3_PyUnicode_FromString;
     PYTHON_PROC *ucs_decode = (PYTHON_PROC *)&py3_PyUnicode_Decode;
     PYTHON_PROC *ucs_as_encoded_string =
 				 (PYTHON_PROC *)&py3_PyUnicode_AsEncodedString;
 
-# if !(defined(PY_NO_RTLD_GLOBAL) && defined(PY3_NO_RTLD_GLOBAL)) && defined(UNIX) && defined(FEAT_PYTHON)
+# якщо !(defined(PY_NO_RTLD_GLOBAL) && defined(PY3_NO_RTLD_GLOBAL)) && defined(UNIX) && defined(FEAT_PYTHON)
     // Can't have Python and Python3 loaded at the same time.
     // It causes a crash, because RTLD_GLOBAL is needed for
     // standard C extension libraries of one or both python versions.
-    if (python_loaded())
+    якщо (python_loaded())
     {
-	if (verbose)
+	якщо (verbose)
 	    emsg(_(e_this_vim_cannot_execute_py3_after_using_python));
-	return FAIL;
+	повернути FAIL;
     }
 # endif
 
-    if (hinstPy3 != 0)
-	return OK;
+    якщо (hinstPy3 != 0)
+	повернути OK;
     hinstPy3 = load_dll(libname);
 
 # ifdef MSWIN
-    if (!hinstPy3)
+    якщо (!hinstPy3)
     {
 	// Attempt to use the path from InstallPath as stored in the registry.
 	WCHAR *syslibname = py3_get_system_libname(libname);
 
-	if (syslibname != NULL)
+	якщо (syslibname != NULL)
 	{
 	    hinstPy3 = LoadLibraryExW(syslibname, NULL,
 		    LOAD_LIBRARY_SEARCH_DLL_LOAD_DIR |
@@ -965,40 +965,40 @@ py3_runtime_link_init(char *libname, int verbose)
     }
 # endif
 
-    if (!hinstPy3)
+    якщо (!hinstPy3)
     {
-	if (verbose)
+	якщо (verbose)
 	    semsg(_(e_could_not_load_library_str_str), libname, load_dll_error());
-	return FAIL;
+	повернути FAIL;
     }
 
-    for (i = 0; py3_funcname_table[i].ptr; ++i)
+    для (i = 0; py3_funcname_table[i].ptr; ++i)
     {
-	if ((*py3_funcname_table[i].ptr = symbol_from_dll(hinstPy3,
+	якщо ((*py3_funcname_table[i].ptr = symbol_from_dll(hinstPy3,
 			py3_funcname_table[i].name)) == NULL)
 	{
 	    close_dll(hinstPy3);
 	    hinstPy3 = 0;
-	    if (verbose)
+	    якщо (verbose)
 		semsg(_(e_could_not_load_library_function_str), py3_funcname_table[i].name);
-	    return FAIL;
+	    повернути FAIL;
 	}
     }
 
     // Load unicode functions separately as only the ucs2 or the ucs4 functions
     // will be present in the library.
-# if PY_VERSION_HEX >= 0x030300f0
+# якщо PY_VERSION_HEX >= 0x030300f0
     *ucs_from_string = symbol_from_dll(hinstPy3, "PyUnicode_FromString");
     *ucs_decode = symbol_from_dll(hinstPy3, "PyUnicode_Decode");
     *ucs_as_encoded_string = symbol_from_dll(hinstPy3,
 	    "PyUnicode_AsEncodedString");
-# else
+# інакше
     *ucs_from_string = symbol_from_dll(hinstPy3, "PyUnicodeUCS2_FromString");
     *ucs_decode = symbol_from_dll(hinstPy3,
 	    "PyUnicodeUCS2_Decode");
     *ucs_as_encoded_string = symbol_from_dll(hinstPy3,
 	    "PyUnicodeUCS2_AsEncodedString");
-    if (*ucs_from_string == NULL || *ucs_decode == NULL
+    якщо (*ucs_from_string == NULL || *ucs_decode == NULL
 					     || *ucs_as_encoded_string == NULL)
     {
 	*ucs_from_string = symbol_from_dll(hinstPy3,
@@ -1009,27 +1009,27 @@ py3_runtime_link_init(char *libname, int verbose)
 		"PyUnicodeUCS4_AsEncodedString");
     }
 # endif
-    if (*ucs_from_string == NULL || *ucs_decode == NULL
+    якщо (*ucs_from_string == NULL || *ucs_decode == NULL
 					     || *ucs_as_encoded_string == NULL)
     {
 	close_dll(hinstPy3);
 	hinstPy3 = 0;
-	if (verbose)
+	якщо (verbose)
 	    semsg(_(e_could_not_load_library_function_str), "PyUnicode_UCSX_*");
-	return FAIL;
+	повернути FAIL;
     }
 
-    return OK;
+    повернути OK;
 }
 
 /*
  * If python is enabled (there is installed python on Windows system) return
  * TRUE, else FALSE.
  */
-    int
-python3_enabled(int verbose)
+    ціле
+python3_enabled(ціле verbose)
 {
-    return py3_runtime_link_init((char *)p_py3dll, verbose) == OK;
+    повернути py3_runtime_link_init((char *)p_py3dll, verbose) == OK;
 }
 
 /*
@@ -1065,14 +1065,14 @@ get_py3_exceptions(void)
 }
 #endif // DYNAMIC_PYTHON3
 
-static int py3initialised = 0;
+static ціле py3initialised = 0;
 #define PYINITIALISED py3initialised
-static int python_end_called = FALSE;
+static ціле python_end_called = FALSE;
 
 #ifdef USE_LIMITED_API
 # define DESTRUCTOR_FINISH(self) \
     ((freefunc)PyType_GetSlot(Py_TYPE((PyObject*)self), Py_tp_free))((PyObject*)self)
-#else
+#інакше
 # define DESTRUCTOR_FINISH(self) Py_TYPE(self)->tp_free((PyObject*)self)
 #endif
 
@@ -1083,9 +1083,9 @@ static int python_end_called = FALSE;
     static void
 call_PyObject_Free(void *p)
 {
-#if defined(Py_DEBUG) && !defined(Py_DEBUG_NO_PYMALLOC)
+#якщо defined(Py_DEBUG) && !defined(Py_DEBUG_NO_PYMALLOC)
     _PyObject_DebugFree(p);
-#else
+#інакше
     PyObject_Free(p);
 #endif
 }
@@ -1093,31 +1093,31 @@ call_PyObject_Free(void *p)
     static PyObject *
 call_PyType_GenericNew(PyTypeObject *type, PyObject *args, PyObject *kwds)
 {
-    return PyType_GenericNew(type,args,kwds);
+    повернути PyType_GenericNew(type,args,kwds);
 }
 
     static PyObject *
 call_PyType_GenericAlloc(PyTypeObject *type, Py_ssize_t nitems)
 {
-    return PyType_GenericAlloc(type,nitems);
+    повернути PyType_GenericAlloc(type,nitems);
 }
 
 static PyObject *OutputGetattro(PyObject *, PyObject *);
-static int OutputSetattro(PyObject *, PyObject *, PyObject *);
+static ціле OutputSetattro(PyObject *, PyObject *, PyObject *);
 static PyObject *BufferGetattro(PyObject *, PyObject *);
-static int BufferSetattro(PyObject *, PyObject *, PyObject *);
+static ціле BufferSetattro(PyObject *, PyObject *, PyObject *);
 static PyObject *TabPageGetattro(PyObject *, PyObject *);
 static PyObject *WindowGetattro(PyObject *, PyObject *);
-static int WindowSetattro(PyObject *, PyObject *, PyObject *);
+static ціле WindowSetattro(PyObject *, PyObject *, PyObject *);
 static PyObject *RangeGetattro(PyObject *, PyObject *);
 static PyObject *CurrentGetattro(PyObject *, PyObject *);
-static int CurrentSetattro(PyObject *, PyObject *, PyObject *);
+static ціле CurrentSetattro(PyObject *, PyObject *, PyObject *);
 static PyObject *DictionaryGetattro(PyObject *, PyObject *);
-static int DictionarySetattro(PyObject *, PyObject *, PyObject *);
+static ціле DictionarySetattro(PyObject *, PyObject *, PyObject *);
 static PyObject *ListGetattro(PyObject *, PyObject *);
-static int ListSetattro(PyObject *, PyObject *, PyObject *);
+static ціле ListSetattro(PyObject *, PyObject *, PyObject *);
 static PyObject *TupleGetattro(PyObject *, PyObject *);
-static int TupleSetattro(PyObject *, PyObject *, PyObject *);
+static ціле TupleSetattro(PyObject *, PyObject *, PyObject *);
 static PyObject *FunctionGetattro(PyObject *, PyObject *);
 
 static struct PyModuleDef vimmodule;
@@ -1130,9 +1130,9 @@ static struct PyModuleDef vimmodule;
 #include "if_py_both.h"
 
 #ifdef USE_LIMITED_API
-# if Py_LIMITED_API >= 0x030A0000
+# якщо Py_LIMITED_API >= 0x030A0000
 #  define PY_UNICODE_GET_UTF8_CHARS(obj) PyUnicode_AsUTF8AndSize(obj, NULL)
-# else
+# інакше
 // Python limited API before 3.10 lack easy ways to query the raw UTF-8 chars.
 // We need to first convert the string to bytes, and then extract the chars.
 // This function is only used for attribute string comparisons, which have
@@ -1146,25 +1146,25 @@ static char* PY_UNICODE_GET_UTF8_CHARS(PyObject* str)
 {
     py3_unicode_utf8_chars[0] = '\0';
     PyObject* bytes = PyUnicode_AsUTF8String(str);
-    if (bytes)
+    якщо (bytes)
     {
 	char *chars;
 	Py_ssize_t len;
-	if (PyBytes_AsStringAndSize(bytes, &chars, &len) != -1)
+	якщо (PyBytes_AsStringAndSize(bytes, &chars, &len) != -1)
 	{
-	    if (len < (Py_ssize_t)sizeof(py3_unicode_utf8_chars))
+	    якщо (len < (Py_ssize_t)sizeof(py3_unicode_utf8_chars))
 		// PyBytes_AsStringAndSize guarantees null-termination
 		memcpy(py3_unicode_utf8_chars, chars, len + 1);
 	}
 	Py_DECREF(bytes);
     }
-    return py3_unicode_utf8_chars;
+    повернути py3_unicode_utf8_chars;
 }
 # endif
-#else	// !USE_LIMITED_API
-# if PY_VERSION_HEX >= 0x030300f0
+#інакше	// !USE_LIMITED_API
+# якщо PY_VERSION_HEX >= 0x030300f0
 #  define PY_UNICODE_GET_UTF8_CHARS(obj) PyUnicode_AsUTF8AndSize(obj, NULL)
-# else
+# інакше
 #  define PY_UNICODE_GET_UTF8_CHARS _PyUnicode_AsString
 # endif
 #endif
@@ -1172,7 +1172,7 @@ static char* PY_UNICODE_GET_UTF8_CHARS(PyObject* str)
 // NOTE: Must always be used at the start of a block, since it declares "name".
 #define GET_ATTR_STRING(name, nameobj) \
     char	*name = ""; \
-    if (PyUnicode_Check(nameobj)) \
+    якщо (PyUnicode_Check(nameobj)) \
 	name = (char *)PY_UNICODE_GET_UTF8_CHARS(nameobj)
 
 #define PY3OBJ_DELETED(obj) (obj->ob_base.ob_refcnt<=0)
@@ -1188,19 +1188,19 @@ static PyObject *Py3Init_vim(void);
     void
 python3_end(void)
 {
-    static int recurse = 0;
+    static ціле recurse = 0;
 
     // If a crash occurs while doing this, don't try again.
-    if (recurse != 0)
-	return;
+    якщо (recurse != 0)
+	повернути;
 
     python_end_called = TRUE;
     ++recurse;
 
 #ifdef DYNAMIC_PYTHON3
-    if (hinstPy3)
+    якщо (hinstPy3)
 #endif
-    if (Py_IsInitialized())
+    якщо (Py_IsInitialized())
     {
 #ifdef USE_LIMITED_API
 	shutdown_types();
@@ -1215,17 +1215,17 @@ python3_end(void)
     --recurse;
 }
 
-#if defined(DYNAMIC_PYTHON3) && defined(DYNAMIC_PYTHON) && defined(FEAT_PYTHON) && defined(UNIX)
-    int
+#якщо defined(DYNAMIC_PYTHON3) && defined(DYNAMIC_PYTHON) && defined(FEAT_PYTHON) && defined(UNIX)
+    ціле
 python3_loaded(void)
 {
-    return (hinstPy3 != 0);
+    повернути (hinstPy3 != 0);
 }
 #endif
 
 static wchar_t *py_home_buf = NULL;
 
-#if defined(MSWIN) && (PY_VERSION_HEX >= 0x030500f0)
+#якщо defined(MSWIN) && (PY_VERSION_HEX >= 0x030500f0)
 /*
  * Return TRUE if stdin is readable from Python 3.
  */
@@ -1234,15 +1234,15 @@ is_stdin_readable(void)
 {
     DWORD	    mode, eventnum;
     struct _stat    st;
-    int		    fd = fileno(stdin);
+    ціле		    fd = fileno(stdin);
     HANDLE	    hstdin = (HANDLE)_get_osfhandle(fd);
 
     // Check if stdin is connected to the console.
-    if (GetConsoleMode(hstdin, &mode))
+    якщо (GetConsoleMode(hstdin, &mode))
 	// Check if it is opened as input.
-	return GetNumberOfConsoleInputEvents(hstdin, &eventnum);
+	повернути GetNumberOfConsoleInputEvents(hstdin, &eventnum);
 
-    return _fstat(fd, &st) == 0;
+    повернути _fstat(fd, &st) == 0;
 }
 
 // Python 3.5 or later will abort inside Py_Initialize() when stdin has
@@ -1256,34 +1256,34 @@ reset_stdin(void)
     FILE *(*pyfreopen)(const char *, const char *, FILE *) = NULL;
     HINSTANCE hinst = get_forwarded_dll(hinstPy3);
 
-    if (hinst == NULL || is_stdin_readable())
-	return;
+    якщо (hinst == NULL || is_stdin_readable())
+	повернути;
 
     // Get "freopen" and "stdin" which are used in the python DLL.
     // "stdin" is defined as "__acrt_iob_func(0)" in VC++ 2015 or later.
     py__acrt_iob_func = get_dll_import_func(hinst, "__acrt_iob_func");
-    if (py__acrt_iob_func)
+    якщо (py__acrt_iob_func)
     {
 	HINSTANCE hpystdiodll = find_imported_module_by_funcname(hinst,
 							    "__acrt_iob_func");
-	if (hpystdiodll)
+	якщо (hpystdiodll)
 	    pyfreopen = (void *)GetProcAddress(hpystdiodll, "freopen");
     }
 
     // Reconnect stdin to CONIN$.
-    if (pyfreopen != NULL)
+    якщо (pyfreopen != NULL)
 	pyfreopen("CONIN$", "r", py__acrt_iob_func(0));
-    else
+    інакше
 	freopen("CONIN$", "r", stdin);
 }
-#else
+#інакше
 # define reset_stdin()
 #endif
 
 // Python 3.2 or later will abort inside Py_Initialize() when mandatory
 // modules cannot be loaded (e.g. 'pythonthreehome' is wrongly set.).
 // Install a hook to python dll's exit() and recover from it.
-#if defined(MSWIN) && (PY_VERSION_HEX >= 0x030200f0)
+#якщо defined(MSWIN) && (PY_VERSION_HEX >= 0x030200f0)
 # define HOOK_EXIT
 # include <setjmp.h>
 
@@ -1294,7 +1294,7 @@ static void *orig_exit = NULL;
  * Function that replaces exit() while calling Py_Initialize().
  */
     static void
-hooked_exit(int ret)
+hooked_exit(ціле ret)
 {
     // Recover from exit.
     longjmp(exit_hook_jump_buf, 1);
@@ -1308,8 +1308,8 @@ hook_py_exit(void)
 {
     HINSTANCE hinst = get_forwarded_dll(hinstPy3);
 
-    if (hinst == NULL || orig_exit != NULL)
-	return;
+    якщо (hinst == NULL || orig_exit != NULL)
+	повернути;
 
     orig_exit = hook_dll_import_func(hinst, "exit", (void *)hooked_exit);
 }
@@ -1322,22 +1322,22 @@ restore_py_exit(void)
 {
     HINSTANCE hinst = hinstPy3;
 
-    if (hinst == NULL)
-	return;
+    якщо (hinst == NULL)
+	повернути;
 
-    if (orig_exit != NULL)
+    якщо (orig_exit != NULL)
 	hook_dll_import_func(hinst, "exit", orig_exit);
     orig_exit = NULL;
 }
 #endif
 
-    static int
+    static ціле
 Python3_Init(void)
 {
-    if (!py3initialised)
+    якщо (!py3initialised)
     {
 #ifdef DYNAMIC_PYTHON3
-	if (!python3_enabled(TRUE))
+	якщо (!python3_enabled(TRUE))
 	{
 	    emsg(_(e_sorry_this_command_is_disabled_python_library_could_not_be_found));
 	    goto fail;
@@ -1351,24 +1351,24 @@ Python3_Init(void)
 
 	init_structs();
 
-	if (*p_py3home != NUL)
+	якщо (*p_py3home != NUL)
 	{
 	    size_t len = mbstowcs(NULL, (char *)p_py3home, 0) + 1;
 
 	    // The string must not change later, make a copy in static memory.
 	    py_home_buf = ALLOC_MULT(wchar_t, len);
-	    if (py_home_buf != NULL && mbstowcs(
+	    якщо (py_home_buf != NULL && mbstowcs(
 			    py_home_buf, (char *)p_py3home, len) != (size_t)-1)
 		Py_SetPythonHome(py_home_buf);
 	}
 #ifdef PYTHON3_HOME
-	else if (mch_getenv((char_u *)"PYTHONHOME") == NULL)
+	інакше якщо (mch_getenv((char_u *)"PYTHONHOME") == NULL)
 	    Py_SetPythonHome(PYTHON3_HOME);
 #endif
 
 	PyImport_AppendInittab("vim", Py3Init_vim);
 
-#if !defined(DYNAMIC_PYTHON3) && defined(MSWIN)
+#якщо !defined(DYNAMIC_PYTHON3) && defined(MSWIN)
 	hinstPy3 = GetModuleHandle(PYTHON3_DLL);
 #endif
 	reset_stdin();
@@ -1376,23 +1376,23 @@ Python3_Init(void)
 #ifdef HOOK_EXIT
 	// Catch exit() called in Py_Initialize().
 	hook_py_exit();
-	if (setjmp(exit_hook_jump_buf) == 0)
+	якщо (setjmp(exit_hook_jump_buf) == 0)
 	{
 	    Py_Initialize();
 	    restore_py_exit();
 	}
-	else
+	інакше
 	{
 	    // exit() was called in Py_Initialize().
 	    restore_py_exit();
 	    emsg(_(e_critical_error_in_python3_initialization_check_your_installation));
 	    goto fail;
 	}
-#else
+#інакше
 	Py_Initialize();
 #endif
 
-#if PY_VERSION_HEX < 0x03090000
+#якщо PY_VERSION_HEX < 0x03090000
 	// Initialise threads.  This is deprecated since Python 3.9.
 	PyEval_InitThreads();
 #endif
@@ -1400,7 +1400,7 @@ Python3_Init(void)
 	get_py3_exceptions();
 #endif
 
-	if (PythonIO_Init_io())
+	якщо (PythonIO_Init_io())
 	    goto fail;
 
 	globals = PyModule_GetDict(PyImport_AddModule("__main__"));
@@ -1426,7 +1426,7 @@ Python3_Init(void)
 	py3initialised = 1;
     }
 
-    return 0;
+    повернути 0;
 
 fail:
     // We call PythonIO_Flush() here to print any Python errors.
@@ -1434,7 +1434,7 @@ fail:
     // if PythonIO_Init_io() has not completed successfully (it will
     // not do anything in this case).
     PythonIO_Flush();
-    return -1;
+    повернути -1;
 }
 
 /*
@@ -1447,29 +1447,29 @@ DoPyCommand(const char *cmd,
 	    runner run,
 	    void *arg)
 {
-#if defined(HAVE_LOCALE_H) || defined(X_LOCALE)
+#якщо defined(HAVE_LOCALE_H) || defined(X_LOCALE)
     char		*saved_locale;
 #endif
     PyObject		*cmdstr;
     PyObject		*cmdbytes;
     PyGILState_STATE	pygilstate;
 
-    if (python_end_called)
+    якщо (python_end_called)
 	goto theend;
 
-    if (Python3_Init())
+    якщо (Python3_Init())
 	goto theend;
 
     init_range(arg);
 
     Python_Release_Vim();	    // leave Vim
 
-#if defined(HAVE_LOCALE_H) || defined(X_LOCALE)
+#якщо defined(HAVE_LOCALE_H) || defined(X_LOCALE)
     // Python only works properly when the LC_NUMERIC locale is "C".
     saved_locale = setlocale(LC_NUMERIC, NULL);
-    if (saved_locale == NULL || STRCMP(saved_locale, "C") == 0)
+    якщо (saved_locale == NULL || STRCMP(saved_locale, "C") == 0)
 	saved_locale = NULL;
-    else
+    інакше
     {
 	// Need to make a copy, value may change when setting new locale.
 	saved_locale = (char *)vim_strsave((char_u *)saved_locale);
@@ -1491,8 +1491,8 @@ DoPyCommand(const char *cmd,
 
     PyGILState_Release(pygilstate);
 
-#if defined(HAVE_LOCALE_H) || defined(X_LOCALE)
-    if (saved_locale != NULL)
+#якщо defined(HAVE_LOCALE_H) || defined(X_LOCALE)
+    якщо (saved_locale != NULL)
     {
 	(void)setlocale(LC_NUMERIC, saved_locale);
 	vim_free(saved_locale);
@@ -1503,7 +1503,7 @@ DoPyCommand(const char *cmd,
     PythonIO_Flush();
 
 theend:
-    return;	    // keeps lint happy
+    повернути;	    // keeps lint happy
 }
 
 /*
@@ -1515,9 +1515,9 @@ ex_py3(exarg_T *eap)
     char_u *script;
 
     script = script_get(eap, eap->arg);
-    if (!eap->skip)
+    якщо (!eap->skip)
     {
-	if (p_pyx == 0)
+	якщо (p_pyx == 0)
 	    p_pyx = 3;
 
 	DoPyCommand(script == NULL ? (char *) eap->arg : (char *) script,
@@ -1540,9 +1540,9 @@ ex_py3file(exarg_T *eap)
     static char buffer[BUFFER_SIZE];
     const char *file;
     char *p;
-    int i;
+    ціле i;
 
-    if (p_pyx == 0)
+    якщо (p_pyx == 0)
 	p_pyx = 3;
 
     // Have to do it like this. PyRun_SimpleFile requires you to pass a
@@ -1561,24 +1561,24 @@ ex_py3file(exarg_T *eap)
     strcpy(buffer, "exec(compile(open('");
     p = buffer + 19; // size of "exec(compile(open('"
 
-    for (i=0; i<2; ++i)
+    для (i=0; i<2; ++i)
     {
 	file = (char *)eap->arg;
-	while (*file && p < buffer + (BUFFER_SIZE - 3))
+	поки (*file && p < buffer + (BUFFER_SIZE - 3))
 	{
-	    if (*file == '\\' || *file == '\'')
+	    якщо (*file == '\\' || *file == '\'')
 		*p++ = '\\';
 	    *p++ = *file++;
 	}
 	// If we didn't finish the file name, we hit a buffer overflow
-	if (*file != '\0')
-	    return;
-	if (i==0)
+	якщо (*file != '\0')
+	    повернути;
+	якщо (i==0)
 	{
 	    strcpy(p,"','rb').read(),'");
 	    p += 16;
 	}
-	else
+	інакше
 	{
 	    strcpy(p,"','exec'))");
 	    p += 10;
@@ -1597,7 +1597,7 @@ ex_py3file(exarg_T *eap)
     void
 ex_py3do(exarg_T *eap)
 {
-    if (p_pyx == 0)
+    якщо (p_pyx == 0)
 	p_pyx = 3;
 
     DoPyCommand((char *)eap->arg,
@@ -1617,22 +1617,22 @@ OutputGetattro(PyObject *self, PyObject *nameobj)
 {
     GET_ATTR_STRING(name, nameobj);
 
-    if (strcmp(name, "softspace") == 0)
-	return PyLong_FromLong(((OutputObject *)(self))->softspace);
-    else if (strcmp(name, "errors") == 0)
-	return PyString_FromString("strict");
-    else if (strcmp(name, "encoding") == 0)
-	return PyString_FromString(ENC_OPT);
+    якщо (strcmp(name, "softspace") == 0)
+	повернути PyLong_FromLong(((OutputObject *)(self))->softspace);
+    інакше якщо (strcmp(name, "errors") == 0)
+	повернути PyString_FromString("strict");
+    інакше якщо (strcmp(name, "encoding") == 0)
+	повернути PyString_FromString(ENC_OPT);
 
-    return PyObject_GenericGetAttr(self, nameobj);
+    повернути PyObject_GenericGetAttr(self, nameobj);
 }
 
-    static int
+    static ціле
 OutputSetattro(PyObject *self, PyObject *nameobj, PyObject *val)
 {
     GET_ATTR_STRING(name, nameobj);
 
-    return OutputSetattr(self, name, val);
+    повернути OutputSetattr(self, name, val);
 }
 
 ///////////////////////////////////////////////////////
@@ -1649,7 +1649,7 @@ OutputSetattro(PyObject *self, PyObject *nameobj, PyObject *val)
 #define BufferType_Check(obj) ((obj)->ob_base.ob_type == &BufferType)
 
 static PyObject* BufferSubscript(PyObject *self, PyObject *idx);
-static int BufferAsSubscript(PyObject *self, PyObject *idx, PyObject *val);
+static ціле BufferAsSubscript(PyObject *self, PyObject *idx, PyObject *val);
 
 // Line range type - Implementation functions
 // --------------------------------------
@@ -1657,8 +1657,8 @@ static int BufferAsSubscript(PyObject *self, PyObject *idx, PyObject *val);
 #define RangeType_Check(obj) ((obj)->ob_base.ob_type == &RangeType)
 
 static PyObject* RangeSubscript(PyObject *self, PyObject *idx);
-static int RangeAsItem(PyObject *, Py_ssize_t, PyObject *);
-static int RangeAsSubscript(PyObject *self, PyObject *idx, PyObject *val);
+static ціле RangeAsItem(PyObject *, Py_ssize_t, PyObject *);
+static ціле RangeAsSubscript(PyObject *self, PyObject *idx, PyObject *val);
 
 // Current objects type - Implementation functions
 // -----------------------------------------------
@@ -1692,25 +1692,25 @@ BufferGetattro(PyObject *self, PyObject *nameobj)
 
     GET_ATTR_STRING(name, nameobj);
 
-    if ((r = BufferAttrValid((BufferObject *)(self), name)))
-	return r;
+    якщо ((r = BufferAttrValid((BufferObject *)(self), name)))
+	повернути r;
 
-    if (CheckBuffer((BufferObject *)(self)))
-	return NULL;
+    якщо (CheckBuffer((BufferObject *)(self)))
+	повернути NULL;
 
     r = BufferAttr((BufferObject *)(self), name);
-    if (r || PyErr_Occurred())
-	return r;
-    else
-	return PyObject_GenericGetAttr(self, nameobj);
+    якщо (r || PyErr_Occurred())
+	повернути r;
+    інакше
+	повернути PyObject_GenericGetAttr(self, nameobj);
 }
 
-    static int
+    static ціле
 BufferSetattro(PyObject *self, PyObject *nameobj, PyObject *val)
 {
     GET_ATTR_STRING(name, nameobj);
 
-    return BufferSetattr(self, name, val);
+    повернути BufferSetattr(self, name, val);
 }
 
 //////////////////
@@ -1718,66 +1718,66 @@ BufferSetattro(PyObject *self, PyObject *nameobj, PyObject *val)
     static PyObject *
 BufferSubscript(PyObject *self, PyObject* idx)
 {
-    if (PyLong_Check(idx))
+    якщо (PyLong_Check(idx))
     {
 	long _idx = PyLong_AsLong(idx);
-	return BufferItem((BufferObject *)(self), _idx);
+	повернути BufferItem((BufferObject *)(self), _idx);
     }
-    else if (PySlice_Check(idx))
+    інакше якщо (PySlice_Check(idx))
     {
 	Py_ssize_t start, stop, step, slicelen;
 
-	if (CheckBuffer((BufferObject *) self))
-	    return NULL;
+	якщо (CheckBuffer((BufferObject *) self))
+	    повернути NULL;
 
-	if (PySlice_GetIndicesEx((PySliceObject_T *)idx,
+	якщо (PySlice_GetIndicesEx((PySliceObject_T *)idx,
 	      (Py_ssize_t)((BufferObject *)(self))->buf->b_ml.ml_line_count,
 	      &start, &stop,
 	      &step, &slicelen) < 0)
-	    return NULL;
-	return BufferSlice((BufferObject *)(self), start, stop);
+	    повернути NULL;
+	повернути BufferSlice((BufferObject *)(self), start, stop);
     }
-    else
+    інакше
     {
 	RAISE_INVALID_INDEX_TYPE(idx);
-	return NULL;
+	повернути NULL;
     }
 }
 
-    static int
+    static ціле
 BufferAsSubscript(PyObject *self, PyObject* idx, PyObject* val)
 {
-    if (PyLong_Check(idx))
+    якщо (PyLong_Check(idx))
     {
 	long n = PyLong_AsLong(idx);
 
-	if (CheckBuffer((BufferObject *) self))
-	    return -1;
+	якщо (CheckBuffer((BufferObject *) self))
+	    повернути -1;
 
-	return RBAsItem((BufferObject *)(self), n, val, 1,
+	повернути RBAsItem((BufferObject *)(self), n, val, 1,
 		    (Py_ssize_t)((BufferObject *)(self))->buf->b_ml.ml_line_count,
 		    NULL);
     }
-    else if (PySlice_Check(idx))
+    інакше якщо (PySlice_Check(idx))
     {
 	Py_ssize_t start, stop, step, slicelen;
 
-	if (CheckBuffer((BufferObject *) self))
-	    return -1;
+	якщо (CheckBuffer((BufferObject *) self))
+	    повернути -1;
 
-	if (PySlice_GetIndicesEx((PySliceObject_T *)idx,
+	якщо (PySlice_GetIndicesEx((PySliceObject_T *)idx,
 	      (Py_ssize_t)((BufferObject *)(self))->buf->b_ml.ml_line_count,
 	      &start, &stop,
 	      &step, &slicelen) < 0)
-	    return -1;
-	return RBAsSlice((BufferObject *)(self), start, stop, val, 1,
+	    повернути -1;
+	повернути RBAsSlice((BufferObject *)(self), start, stop, val, 1,
 			  (PyInt)((BufferObject *)(self))->buf->b_ml.ml_line_count,
 			  NULL);
     }
-    else
+    інакше
     {
 	RAISE_INVALID_INDEX_TYPE(idx);
-	return -1;
+	повернути -1;
     }
 }
 
@@ -1807,20 +1807,20 @@ RangeGetattro(PyObject *self, PyObject *nameobj)
 {
     GET_ATTR_STRING(name, nameobj);
 
-    if (strcmp(name, "start") == 0)
-	return Py_BuildValue("n", ((RangeObject *)(self))->start - 1);
-    else if (strcmp(name, "end") == 0)
-	return Py_BuildValue("n", ((RangeObject *)(self))->end - 1);
-    else
-	return PyObject_GenericGetAttr(self, nameobj);
+    якщо (strcmp(name, "start") == 0)
+	повернути Py_BuildValue("n", ((RangeObject *)(self))->start - 1);
+    інакше якщо (strcmp(name, "end") == 0)
+	повернути Py_BuildValue("n", ((RangeObject *)(self))->end - 1);
+    інакше
+	повернути PyObject_GenericGetAttr(self, nameobj);
 }
 
 ////////////////
 
-    static int
+    static ціле
 RangeAsItem(PyObject *self, Py_ssize_t n, PyObject *val)
 {
-    return RBAsItem(((RangeObject *)(self))->buf, n, val,
+    повернути RBAsItem(((RangeObject *)(self))->buf, n, val,
 		    ((RangeObject *)(self))->start,
 		    ((RangeObject *)(self))->end,
 		    &((RangeObject *)(self))->end);
@@ -1829,7 +1829,7 @@ RangeAsItem(PyObject *self, Py_ssize_t n, PyObject *val)
     static Py_ssize_t
 RangeAsSlice(PyObject *self, Py_ssize_t lo, Py_ssize_t hi, PyObject *val)
 {
-    return RBAsSlice(((RangeObject *)(self))->buf, lo, hi, val,
+    повернути RBAsSlice(((RangeObject *)(self))->buf, lo, hi, val,
 		    ((RangeObject *)(self))->start,
 		    ((RangeObject *)(self))->end,
 		    &((RangeObject *)(self))->end);
@@ -1838,52 +1838,52 @@ RangeAsSlice(PyObject *self, Py_ssize_t lo, Py_ssize_t hi, PyObject *val)
     static PyObject *
 RangeSubscript(PyObject *self, PyObject* idx)
 {
-    if (PyLong_Check(idx))
+    якщо (PyLong_Check(idx))
     {
 	long _idx = PyLong_AsLong(idx);
-	return RangeItem((RangeObject *)(self), _idx);
+	повернути RangeItem((RangeObject *)(self), _idx);
     }
-    else if (PySlice_Check(idx))
+    інакше якщо (PySlice_Check(idx))
     {
 	Py_ssize_t start, stop, step, slicelen;
 
-	if (PySlice_GetIndicesEx((PySliceObject_T *)idx,
+	якщо (PySlice_GetIndicesEx((PySliceObject_T *)idx,
 		((RangeObject *)(self))->end-((RangeObject *)(self))->start+1,
 		&start, &stop,
 		&step, &slicelen) < 0)
-	    return NULL;
-	return RangeSlice((RangeObject *)(self), start, stop);
+	    повернути NULL;
+	повернути RangeSlice((RangeObject *)(self), start, stop);
     }
-    else
+    інакше
     {
 	RAISE_INVALID_INDEX_TYPE(idx);
-	return NULL;
+	повернути NULL;
     }
 }
 
-    static int
+    static ціле
 RangeAsSubscript(PyObject *self, PyObject *idx, PyObject *val)
 {
-    if (PyLong_Check(idx))
+    якщо (PyLong_Check(idx))
     {
 	long n = PyLong_AsLong(idx);
-	return RangeAsItem(self, n, val);
+	повернути RangeAsItem(self, n, val);
     }
-    else if (PySlice_Check(idx))
+    інакше якщо (PySlice_Check(idx))
     {
 	Py_ssize_t start, stop, step, slicelen;
 
-	if (PySlice_GetIndicesEx((PySliceObject_T *)idx,
+	якщо (PySlice_GetIndicesEx((PySliceObject_T *)idx,
 		((RangeObject *)(self))->end-((RangeObject *)(self))->start+1,
 		&start, &stop,
 		&step, &slicelen) < 0)
-	    return -1;
-	return RangeAsSlice(self, start, stop, val);
+	    повернути -1;
+	повернути RangeAsSlice(self, start, stop, val);
     }
-    else
+    інакше
     {
 	RAISE_INVALID_INDEX_TYPE(idx);
-	return -1;
+	повернути -1;
     }
 }
 
@@ -1896,17 +1896,17 @@ TabPageGetattro(PyObject *self, PyObject *nameobj)
 
     GET_ATTR_STRING(name, nameobj);
 
-    if ((r = TabPageAttrValid((TabPageObject *)(self), name)))
-	return r;
+    якщо ((r = TabPageAttrValid((TabPageObject *)(self), name)))
+	повернути r;
 
-    if (CheckTabPage((TabPageObject *)(self)))
-	return NULL;
+    якщо (CheckTabPage((TabPageObject *)(self)))
+	повернути NULL;
 
     r = TabPageAttr((TabPageObject *)(self), name);
-    if (r || PyErr_Occurred())
-	return r;
-    else
-	return PyObject_GenericGetAttr(self, nameobj);
+    якщо (r || PyErr_Occurred())
+	повернути r;
+    інакше
+	повернути PyObject_GenericGetAttr(self, nameobj);
 }
 
 // Window object - Implementation
@@ -1918,25 +1918,25 @@ WindowGetattro(PyObject *self, PyObject *nameobj)
 
     GET_ATTR_STRING(name, nameobj);
 
-    if ((r = WindowAttrValid((WindowObject *)(self), name)))
-	return r;
+    якщо ((r = WindowAttrValid((WindowObject *)(self), name)))
+	повернути r;
 
-    if (CheckWindow((WindowObject *)(self)))
-	return NULL;
+    якщо (CheckWindow((WindowObject *)(self)))
+	повернути NULL;
 
     r = WindowAttr((WindowObject *)(self), name);
-    if (r || PyErr_Occurred())
-	return r;
-    else
-	return PyObject_GenericGetAttr(self, nameobj);
+    якщо (r || PyErr_Occurred())
+	повернути r;
+    інакше
+	повернути PyObject_GenericGetAttr(self, nameobj);
 }
 
-    static int
+    static ціле
 WindowSetattro(PyObject *self, PyObject *nameobj, PyObject *val)
 {
     GET_ATTR_STRING(name, nameobj);
 
-    return WindowSetattr(self, name, val);
+    повернути WindowSetattr(self, name, val);
 }
 
 // Tab page list object - Definitions
@@ -1977,16 +1977,16 @@ CurrentGetattro(PyObject *self, PyObject *nameobj)
 {
     PyObject	*r;
     GET_ATTR_STRING(name, nameobj);
-    if (!(r = CurrentGetattr(self, name)))
-	return PyObject_GenericGetAttr(self, nameobj);
-    return r;
+    якщо (!(r = CurrentGetattr(self, name)))
+	повернути PyObject_GenericGetAttr(self, nameobj);
+    повернути r;
 }
 
-    static int
+    static ціле
 CurrentSetattro(PyObject *self, PyObject *nameobj, PyObject *value)
 {
     GET_ATTR_STRING(name, nameobj);
-    return CurrentSetattr(self, name, value);
+    повернути CurrentSetattr(self, name, value);
 }
 
 // Dictionary object - Definitions
@@ -1998,19 +1998,19 @@ DictionaryGetattro(PyObject *self, PyObject *nameobj)
 
     GET_ATTR_STRING(name, nameobj);
 
-    if (strcmp(name, "locked") == 0)
-	return PyLong_FromLong(this->dict->dv_lock);
-    else if (strcmp(name, "scope") == 0)
-	return PyLong_FromLong(this->dict->dv_scope);
+    якщо (strcmp(name, "locked") == 0)
+	повернути PyLong_FromLong(this->dict->dv_lock);
+    інакше якщо (strcmp(name, "scope") == 0)
+	повернути PyLong_FromLong(this->dict->dv_scope);
 
-    return PyObject_GenericGetAttr(self, nameobj);
+    повернути PyObject_GenericGetAttr(self, nameobj);
 }
 
-    static int
+    static ціле
 DictionarySetattro(PyObject *self, PyObject *nameobj, PyObject *val)
 {
     GET_ATTR_STRING(name, nameobj);
-    return DictionarySetattr(self, name, val);
+    повернути DictionarySetattr(self, name, val);
 }
 
 // List object - Definitions
@@ -2020,17 +2020,17 @@ ListGetattro(PyObject *self, PyObject *nameobj)
 {
     GET_ATTR_STRING(name, nameobj);
 
-    if (strcmp(name, "locked") == 0)
-	return PyLong_FromLong(((ListObject *) (self))->list->lv_lock);
+    якщо (strcmp(name, "locked") == 0)
+	повернути PyLong_FromLong(((ListObject *) (self))->list->lv_lock);
 
-    return PyObject_GenericGetAttr(self, nameobj);
+    повернути PyObject_GenericGetAttr(self, nameobj);
 }
 
-    static int
+    static ціле
 ListSetattro(PyObject *self, PyObject *nameobj, PyObject *val)
 {
     GET_ATTR_STRING(name, nameobj);
-    return ListSetattr(self, name, val);
+    повернути ListSetattr(self, name, val);
 }
 
 // Tuple object - Definitions
@@ -2040,17 +2040,17 @@ TupleGetattro(PyObject *self, PyObject *nameobj)
 {
     GET_ATTR_STRING(name, nameobj);
 
-    if (strcmp(name, "locked") == 0)
-	return PyLong_FromLong(((TupleObject *) (self))->tuple->tv_lock);
+    якщо (strcmp(name, "locked") == 0)
+	повернути PyLong_FromLong(((TupleObject *) (self))->tuple->tv_lock);
 
-    return PyObject_GenericGetAttr(self, nameobj);
+    повернути PyObject_GenericGetAttr(self, nameobj);
 }
 
-    static int
+    static ціле
 TupleSetattro(PyObject *self, PyObject *nameobj, PyObject *val)
 {
     GET_ATTR_STRING(name, nameobj);
-    return TupleSetattr(self, name, val);
+    повернути TupleSetattr(self, name, val);
 }
 
 // Function object - Definitions
@@ -2064,10 +2064,10 @@ FunctionGetattro(PyObject *self, PyObject *nameobj)
     GET_ATTR_STRING(name, nameobj);
 
     r = FunctionAttr(this, name);
-    if (r || PyErr_Occurred())
-	return r;
-    else
-	return PyObject_GenericGetAttr(self, nameobj);
+    якщо (r || PyErr_Occurred())
+	повернути r;
+    інакше
+	повернути PyObject_GenericGetAttr(self, nameobj);
 }
 
 // External interface
@@ -2076,8 +2076,8 @@ FunctionGetattro(PyObject *self, PyObject *nameobj)
 python3_buffer_free(buf_T *buf)
 {
     BufferObject *bp = BUF_PYTHON_REF(buf);
-    if (bp == NULL)
-	return;
+    якщо (bp == NULL)
+	повернути;
     bp->buf = INVALID_BUFFER_VALUE;
     BUF_PYTHON_REF(buf) = NULL;
 }
@@ -2086,8 +2086,8 @@ python3_buffer_free(buf_T *buf)
 python3_window_free(win_T *win)
 {
     WindowObject *wp = WIN_PYTHON_REF(win);
-    if (wp == NULL)
-	return;
+    якщо (wp == NULL)
+	повернути;
     wp->win = INVALID_WINDOW_VALUE;
     WIN_PYTHON_REF(win) = NULL;
 }
@@ -2096,8 +2096,8 @@ python3_window_free(win_T *win)
 python3_tabpage_free(tabpage_T *tab)
 {
     TabPageObject *tp = TAB_PYTHON_REF(tab);
-    if (tp == NULL)
-	return;
+    якщо (tp == NULL)
+	повернути;
     tp->tab = INVALID_TABPAGE_VALUE;
     TAB_PYTHON_REF(tab) = NULL;
 }
@@ -2108,22 +2108,22 @@ Py3Init_vim(void)
     // The special value is removed from sys.path in Python3_Init().
     static wchar_t *(argv[2]) = {L"/must>not&exist/foo", NULL};
 
-    if (init_types())
-	return NULL;
+    якщо (init_types())
+	повернути NULL;
 
     // Set sys.argv[] to avoid a crash in warn().
     PySys_SetArgv(1, argv);
 
-    if ((vim_module = PyModule_Create(&vimmodule)) == NULL)
-	return NULL;
+    якщо ((vim_module = PyModule_Create(&vimmodule)) == NULL)
+	повернути NULL;
 
-    if (populate_module(vim_module))
-	return NULL;
+    якщо (populate_module(vim_module))
+	повернути NULL;
 
-    if (init_sys_path())
-	return NULL;
+    якщо (init_sys_path())
+	повернути NULL;
 
-    return vim_module;
+    повернути vim_module;
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -2144,17 +2144,17 @@ LineToString(const char *str)
 
     tmp = alloc(len + 1);
     p = tmp;
-    if (p == NULL)
+    якщо (p == NULL)
     {
 	PyErr_NoMemory();
-	return NULL;
+	повернути NULL;
     }
 
-    while (*str)
+    поки (*str)
     {
-	if (*str == '\n')
+	якщо (*str == '\n')
 	    *p = '\0';
-	else
+	інакше
 	    *p = *str;
 
 	++p;
@@ -2165,7 +2165,7 @@ LineToString(const char *str)
     result = PyUnicode_Decode(tmp, len, (char *)ENC_OPT, ERRORS_DECODE_ARG);
 
     vim_free(tmp);
-    return result;
+    повернути result;
 }
 
     void
@@ -2176,25 +2176,25 @@ do_py3eval(char_u *str, dict_T *locals, typval_T *rettv)
 	    init_range_eval,
 	    (runner) run_eval,
 	    (void *) rettv);
-    if (rettv->v_type == VAR_UNKNOWN)
+    якщо (rettv->v_type == VAR_UNKNOWN)
     {
 	rettv->v_type = VAR_NUMBER;
 	rettv->vval.v_number = 0;
     }
 }
 
-    int
-set_ref_in_python3(int copyID)
+    ціле
+set_ref_in_python3(ціле copyID)
 {
-    return set_ref_in_py(copyID);
+    повернути set_ref_in_py(copyID);
 }
 
-    int
+    ціле
 python3_version(void)
 {
 #ifdef USE_LIMITED_API
-    return Py_LIMITED_API;
-#else
-    return PY_VERSION_HEX;
+    повернути Py_LIMITED_API;
+#інакше
+    повернути PY_VERSION_HEX;
 #endif
 }

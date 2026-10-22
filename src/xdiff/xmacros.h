@@ -20,7 +20,7 @@
  *
  */
 
-#if !defined(XMACROS_H)
+#якщо !defined(XMACROS_H)
 #define XMACROS_H
 
 
@@ -44,13 +44,13 @@ do { \
 	*__p++ = (unsigned char) ((v) >> 8); \
 	*__p++ = (unsigned char) ((v) >> 16); \
 	*__p = (unsigned char) ((v) >> 24); \
-} while (0)
+} поки (0)
 #define XDL_LE32_GET(p, v) \
 do { \
 	unsigned char const *__p = (unsigned char const *) (p); \
 	(v) = (unsigned long) __p[0] | ((unsigned long) __p[1]) << 8 | \
 		((unsigned long) __p[2]) << 16 | ((unsigned long) __p[3]) << 24; \
-} while (0)
+} поки (0)
 
 /* Allocate an array of nr elements, returns NULL on failure */
 #define XDL_ALLOC_ARRAY(p, nr)				\

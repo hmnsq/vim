@@ -34,7 +34,7 @@ struct VimScrollBar;
 
 // Locking functions
 
-extern int vim_lock_screen();
+extern ціле vim_lock_screen();
 extern void vim_unlock_screen();
 
 #ifndef __cplusplus

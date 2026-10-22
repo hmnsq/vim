@@ -20,7 +20,7 @@
  *
  */
 
-#if !defined(XDIFFI_H)
+#якщо !defined(XDIFFI_H)
 #define XDIFFI_H
 
 
@@ -34,22 +34,22 @@ typedef struct s_xdchange {
 	struct s_xdchange *next;
 	long i1, i2;
 	long chg1, chg2;
-	int ignore;
+	ціле ignore;
 } xdchange_t;
 
 
 
-int xdl_recs_cmp(xdfile_t *xdf1, long off1, long lim1,
+ціле xdl_recs_cmp(xdfile_t *xdf1, long off1, long lim1,
 		 xdfile_t *xdf2, long off2, long lim2,
-		 long *kvdf, long *kvdb, int need_min, xdalgoenv_t *xenv);
-int xdl_do_diff(mmfile_t *mf1, mmfile_t *mf2, xpparam_t const *xpp,
+		 long *kvdf, long *kvdb, ціле need_min, xdalgoenv_t *xenv);
+ціле xdl_do_diff(mmfile_t *mf1, mmfile_t *mf2, xpparam_t const *xpp,
 		xdfenv_t *xe);
-int xdl_change_compact(xdfile_t *xdf, xdfile_t *xdfo, long flags);
-int xdl_build_script(xdfenv_t *xe, xdchange_t **xscr);
+ціле xdl_change_compact(xdfile_t *xdf, xdfile_t *xdfo, long flags);
+ціле xdl_build_script(xdfenv_t *xe, xdchange_t **xscr);
 void xdl_free_script(xdchange_t *xscr);
-int xdl_emit_diff(xdfenv_t *xe, xdchange_t *xscr, xdemitcb_t *ecb,
+ціле xdl_emit_diff(xdfenv_t *xe, xdchange_t *xscr, xdemitcb_t *ecb,
 		  xdemitconf_t const *xecfg);
-int xdl_do_patience_diff(xpparam_t const *xpp, xdfenv_t *env);
-int xdl_do_histogram_diff(xpparam_t const *xpp, xdfenv_t *env);
+ціле xdl_do_patience_diff(xpparam_t const *xpp, xdfenv_t *env);
+ціле xdl_do_histogram_diff(xpparam_t const *xpp, xdfenv_t *env);
 
 #endif /* #if !defined(XDIFFI_H) */

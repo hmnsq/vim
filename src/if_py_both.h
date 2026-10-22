@@ -13,8 +13,8 @@
  * Common code for if_python.c and if_python3.c.
  */
 
-#if PY_VERSION_HEX < 0x02050000
-typedef int Py_ssize_t;  // Python 2.4 and earlier don't have this type.
+#якщо PY_VERSION_HEX < 0x02050000
+typedef ціле Py_ssize_t;  // Python 2.4 and earlier don't have this type.
 #endif
 
 // Use values that are known to work, others may make Vim crash.
@@ -108,9 +108,9 @@ struct typeobject_wrapper {
 static PyObject* Vim_PyObject_New(PyTypeObject *type, size_t objsize)
 {
     PyObject *obj = (PyObject *)PyObject_Malloc(objsize);
-    if (obj == NULL)
-	return PyErr_NoMemory();
-    return PyObject_Init(obj, type);
+    якщо (obj == NULL)
+	повернути PyErr_NoMemory();
+    повернути PyObject_Init(obj, type);
 }
 # undef PyObject_NEW
 # define PyObject_NEW(type, typeobj) ((type *)Vim_PyObject_New(typeobj, sizeof(type)))
@@ -125,20 +125,20 @@ static PyObject* Vim_PyObject_New(PyTypeObject *type, size_t objsize)
 # define PyErr_FORMAT_TYPE(msg, obj) \
     do { \
 	PyObject* qualname = PyObject_GetAttrString((PyObject*)(obj)->ob_type, "__qualname__"); \
-	if (qualname == NULL) \
+	якщо (qualname == NULL) \
 	{ \
 	    PyErr_FORMAT(PyExc_TypeError, msg, "(NULL)"); \
 	    break; \
 	} \
 	PyObject* module = PyObject_GetAttrString((PyObject*)(obj)->ob_type, "__module__"); \
 	PyObject* full; \
-	if (module == NULL || PyUnicode_CompareWithASCIIString(module, "builtins") == 0 \
+	якщо (module == NULL || PyUnicode_CompareWithASCIIString(module, "builtins") == 0 \
 		|| PyUnicode_CompareWithASCIIString(module, "__main__") == 0) \
 	{ \
 	    full = qualname; \
 	    Py_INCREF(full); \
 	} \
-	else \
+	інакше \
 	    full = PyUnicode_FromFormat("%U.%U", module, qualname); \
 	PyObject* full_bytes = PyUnicode_AsUTF8String(full); \
 	const char* full_str = PyBytes_AsString(full_bytes); \
@@ -148,7 +148,7 @@ static PyObject* Vim_PyObject_New(PyTypeObject *type, size_t objsize)
 	Py_XDECREF(module); \
 	Py_XDECREF(full); \
 	Py_XDECREF(full_bytes); \
-    } while (0)
+    } поки (0)
 
 # define PyList_GET_ITEM(list, i) PyList_GetItem(list, i)
 # define PyList_GET_SIZE(o) PyList_Size(o)
@@ -161,7 +161,7 @@ static PyObject* Vim_PyObject_New(PyTypeObject *type, size_t objsize)
 # define PyTuple_GET_ITEM(o, pos) PyTuple_GetItem(o, pos)
 # define PyTuple_GET_SIZE(o) PyTuple_Size(o)
 
-# if Py_LIMITED_API < 0x03080000
+# якщо Py_LIMITED_API < 0x03080000
 // PyIter_check only became part of stable ABI in 3.8, and there is no easy way
 // to check for it in the API. We simply return false as a compromise. This
 // does mean we should avoid compiling with stable ABI < 3.8.
@@ -183,16 +183,16 @@ static PyTypeObject* AddHeapType(struct typeobject_wrapper* type_object)
     size_t slot_i = 0;
 
 # define ADD_TP_SLOT(slot_name) \
-    if (slot_i >= 40) return NULL; /* this should never happen */ \
-    if (type_object->slot_name != NULL) \
+    якщо (slot_i >= 40) повернути NULL; /* this should never happen */ \
+    якщо (type_object->slot_name != NULL) \
     { \
 	slots[slot_i].slot = Py_##slot_name; \
 	slots[slot_i].pfunc = (void*)type_object->slot_name; \
 	++slot_i; \
     }
 # define ADD_TP_SUB_SLOT(sub_slot, slot_name) \
-    if (slot_i >= 40) return NULL; /* this should never happen */ \
-    if (type_object->sub_slot != NULL && type_object->sub_slot->slot_name != NULL) \
+    якщо (slot_i >= 40) повернути NULL; /* this should never happen */ \
+    якщо (type_object->sub_slot != NULL && type_object->sub_slot->slot_name != NULL) \
     { \
 	slots[slot_i].slot = Py_##slot_name; \
 	slots[slot_i].pfunc = (void*)type_object->sub_slot->slot_name; \
@@ -233,7 +233,7 @@ static PyTypeObject* AddHeapType(struct typeobject_wrapper* type_object)
     type_spec.slots = slots;
 
     PyObject* newtype = PyType_FromSpec(&type_spec);
-    return (PyTypeObject*)newtype;
+    повернути (PyTypeObject*)newtype;
 }
 
 // Add a heap type, since static types do not work in limited API
@@ -248,44 +248,44 @@ static PyTypeObject* AddHeapType(struct typeobject_wrapper* type_object)
 // will be no long-term leak.
 # define PYTYPE_READY(type) \
     type##Ptr = AddHeapType(&(type)); \
-    if (type##Ptr == NULL) \
-	return -1;
+    якщо (type##Ptr == NULL) \
+	повернути -1;
 # define PYTYPE_CLEANUP(type) \
     type##Ptr = NULL;
 
 // Limited API does not provide PyRun_* functions. Need to implement manually
 // using PyCompile and PyEval.
-static PyObject* Vim_PyRun_String(const char *str, int start, PyObject *globals, PyObject *locals)
+static PyObject* Vim_PyRun_String(const char *str, ціле start, PyObject *globals, PyObject *locals)
 {
     // Just pass "" for filename for now.
     PyObject* compiled = Py_CompileString(str, "", start);
-    if (compiled == NULL)
-	return NULL;
+    якщо (compiled == NULL)
+	повернути NULL;
 
     PyObject* eval_result = PyEval_EvalCode(compiled, globals, locals);
     Py_DECREF(compiled);
-    return eval_result;
+    повернути eval_result;
 }
-static int Vim_PyRun_SimpleString(const char *str)
+static ціле Vim_PyRun_SimpleString(const char *str)
 {
     // This function emulates CPython's implementation.
     PyObject* m = PyImport_AddModule("__main__");
-    if (m == NULL)
-	return -1;
+    якщо (m == NULL)
+	повернути -1;
     PyObject* d = PyModule_GetDict(m);
     PyObject* output = Vim_PyRun_String(str, Py_file_input, d, d);
-    if (output == NULL)
+    якщо (output == NULL)
     {
 	PyErr_PrintEx(TRUE);
-	return -1;
+	повернути -1;
     }
     Py_DECREF(output);
-    return 0;
+    повернути 0;
 }
 # define PyRun_String Vim_PyRun_String
 # define PyRun_SimpleString Vim_PyRun_SimpleString
 
-#else // !defined(USE_LIMITED_API)
+#інакше // !defined(USE_LIMITED_API)
 
 // Full Python API. Can make use of structs and macros directly.
 # define DEFINE_PY_TYPE_OBJECT(type) \
@@ -305,8 +305,8 @@ static int Vim_PyRun_SimpleString(const char *str)
 
 // Add a static type
 # define PYTYPE_READY(type) \
-    if (PyType_Ready(type##Ptr)) \
-	return -1;
+    якщо (PyType_Ready(type##Ptr)) \
+	повернути -1;
 
 #endif
 
@@ -335,10 +335,10 @@ typedef void (*runner)(const char *, dict_T *, void *
 #endif
 	);
 
-static int ConvertFromPyObject(PyObject *, typval_T *);
-static int _ConvertFromPyObject(PyObject *, typval_T *, PyObject *);
-static int ConvertFromPyMapping(PyObject *, typval_T *);
-static int ConvertFromPySequence(PyObject *, typval_T *);
+static ціле ConvertFromPyObject(PyObject *, typval_T *);
+static ціле _ConvertFromPyObject(PyObject *, typval_T *, PyObject *);
+static ціле ConvertFromPyMapping(PyObject *, typval_T *);
+static ціле ConvertFromPySequence(PyObject *, typval_T *);
 static PyObject *WindowNew(win_T *, tabpage_T *);
 static PyObject *BufferNew (buf_T *);
 static PyObject *LineToString(const char *);
@@ -354,12 +354,12 @@ static PyObject *py_getcwd;
 static PyObject *vim_module;
 static PyObject *vim_special_path_object;
 
-#if PY_VERSION_HEX >= 0x030700f0
+#якщо PY_VERSION_HEX >= 0x030700f0
 static PyObject *py_find_spec;
-#else
+#інакше
 static PyObject *py_load_module;
 #endif
-#if PY_VERSION_HEX < 0x30c00a7
+#якщо PY_VERSION_HEX < 0x30c00a7
 static PyObject *py_find_module;
 #endif
 
@@ -393,45 +393,45 @@ StringToChars(PyObject *obj, PyObject **todecref)
 {
     char_u	*str;
 
-    if (PyBytes_Check(obj))
+    якщо (PyBytes_Check(obj))
     {
 
-	if (PyBytes_AsStringAndSize(obj, (char **) &str, NULL) == -1
+	якщо (PyBytes_AsStringAndSize(obj, (char **) &str, NULL) == -1
 		|| str == NULL)
-	    return NULL;
+	    повернути NULL;
 
 	*todecref = NULL;
     }
-    else if (PyUnicode_Check(obj))
+    інакше якщо (PyUnicode_Check(obj))
     {
 	PyObject	*bytes;
 
-	if (!(bytes = PyUnicode_AsEncodedString(obj, ENC_OPT,
+	якщо (!(bytes = PyUnicode_AsEncodedString(obj, ENC_OPT,
 							   ERRORS_ENCODE_ARG)))
-	    return NULL;
+	    повернути NULL;
 
-	if (PyBytes_AsStringAndSize(bytes, (char **) &str, NULL) == -1
+	якщо (PyBytes_AsStringAndSize(bytes, (char **) &str, NULL) == -1
 		|| str == NULL)
 	{
 	    Py_DECREF(bytes);
-	    return NULL;
+	    повернути NULL;
 	}
 
 	*todecref = bytes;
     }
-    else
+    інакше
     {
-#if PY_MAJOR_VERSION < 3
+#якщо PY_MAJOR_VERSION < 3
 	PyErr_FORMAT_TYPE(N_("expected str() or unicode() instance, but got %s"),
 		obj);
-#else
+#інакше
 	PyErr_FORMAT_TYPE(N_("expected bytes() or str() instance, but got %s"),
 		obj);
 #endif
-	return NULL;
+	повернути NULL;
     }
 
-    return (char_u *) str;
+    повернути (char_u *) str;
 }
 
 #define NUMBER_LONG     1
@@ -439,108 +439,108 @@ StringToChars(PyObject *obj, PyObject **todecref)
 #define NUMBER_NATURAL  4
 #define NUMBER_UNSIGNED 8
 
-    static int
-NumberToLong(PyObject *obj, long *result, int flags)
+    static ціле
+NumberToLong(PyObject *obj, long *result, ціле flags)
 {
-#if PY_MAJOR_VERSION < 3
-    if (PyInt_Check(obj))
+#якщо PY_MAJOR_VERSION < 3
+    якщо (PyInt_Check(obj))
     {
 	*result = PyInt_AsLong(obj);
-	if (PyErr_Occurred())
-	    return -1;
+	якщо (PyErr_Occurred())
+	    повернути -1;
     }
-    else
+    інакше
 #endif
-    if (PyLong_Check(obj))
+    якщо (PyLong_Check(obj))
     {
 	*result = PyLong_AsLong(obj);
-	if (PyErr_Occurred())
-	    return -1;
+	якщо (PyErr_Occurred())
+	    повернути -1;
     }
-    else if (PyNumber_Check(obj))
+    інакше якщо (PyNumber_Check(obj))
     {
 	PyObject	*num;
 
-	if (!(num = PyNumber_Long(obj)))
-	    return -1;
+	якщо (!(num = PyNumber_Long(obj)))
+	    повернути -1;
 
 	*result = PyLong_AsLong(num);
 
 	Py_DECREF(num);
 
-	if (PyErr_Occurred())
-	    return -1;
+	якщо (PyErr_Occurred())
+	    повернути -1;
     }
-    else
+    інакше
     {
-#if PY_MAJOR_VERSION < 3
+#якщо PY_MAJOR_VERSION < 3
 	PyErr_FORMAT_TYPE(
 		N_("expected int(), long() or something supporting "
 		   "coercing to long(), but got %s"),
 		obj);
-#else
+#інакше
 	PyErr_FORMAT_TYPE(
 		N_("expected int() or something supporting coercing to int(), "
 		   "but got %s"),
 		obj);
 #endif
-	return -1;
+	повернути -1;
     }
 
-    if (flags & NUMBER_INT)
+    якщо (flags & NUMBER_INT)
     {
-	if (*result > INT_MAX)
+	якщо (*result > INT_MAX)
 	{
 	    PyErr_SET_STRING(PyExc_OverflowError,
 		    N_("value is too large to fit into C int type"));
-	    return -1;
+	    повернути -1;
 	}
-	else if (*result < INT_MIN)
+	інакше якщо (*result < INT_MIN)
 	{
 	    PyErr_SET_STRING(PyExc_OverflowError,
 		    N_("value is too small to fit into C int type"));
-	    return -1;
+	    повернути -1;
 	}
     }
 
-    if (flags & NUMBER_NATURAL)
+    якщо (flags & NUMBER_NATURAL)
     {
-	if (*result <= 0)
+	якщо (*result <= 0)
 	{
 	    PyErr_SET_STRING(PyExc_ValueError,
 		    N_("number must be greater than zero"));
-	    return -1;
+	    повернути -1;
 	}
     }
-    else if (flags & NUMBER_UNSIGNED)
+    інакше якщо (flags & NUMBER_UNSIGNED)
     {
-	if (*result < 0)
+	якщо (*result < 0)
 	{
 	    PyErr_SET_STRING(PyExc_ValueError,
 		    N_("number must be greater or equal to zero"));
-	    return -1;
+	    повернути -1;
 	}
     }
 
-    return 0;
+    повернути 0;
 }
 
-    static int
+    static ціле
 add_string(PyObject *list, char *s)
 {
     PyObject	*string;
 
-    if (!(string = PyString_FromString(s)))
-	return -1;
+    якщо (!(string = PyString_FromString(s)))
+	повернути -1;
 
-    if (PyList_Append(list, string))
+    якщо (PyList_Append(list, string))
     {
 	Py_DECREF(string);
-	return -1;
+	повернути -1;
     }
 
     Py_DECREF(string);
-    return 0;
+    повернути 0;
 }
 
     static PyObject *
@@ -550,39 +550,39 @@ ObjectDir(PyObject *self, char **attributes)
     char	**attr;
     PyObject	*ret;
 
-    if (!(ret = PyList_New(0)))
-	return NULL;
+    якщо (!(ret = PyList_New(0)))
+	повернути NULL;
 
-    if (self)
-	for (method = Py_TYPE_GET_TP_METHODS(self->ob_type) ; method->ml_name != NULL ; ++method)
-	    if (add_string(ret, (char *)method->ml_name))
+    якщо (self)
+	для (method = Py_TYPE_GET_TP_METHODS(self->ob_type) ; method->ml_name != NULL ; ++method)
+	    якщо (add_string(ret, (char *)method->ml_name))
 	    {
 		Py_DECREF(ret);
-		return NULL;
+		повернути NULL;
 	    }
 
-    for (attr = attributes ; *attr ; ++attr)
-	if (add_string(ret, *attr))
+    для (attr = attributes ; *attr ; ++attr)
+	якщо (add_string(ret, *attr))
 	{
 	    Py_DECREF(ret);
-	    return NULL;
+	    повернути NULL;
 	}
 
-#if PY_MAJOR_VERSION < 3
-    if (add_string(ret, "__members__"))
+#якщо PY_MAJOR_VERSION < 3
+    якщо (add_string(ret, "__members__"))
     {
 	Py_DECREF(ret);
-	return NULL;
+	повернути NULL;
     }
 #endif
 
-    return ret;
+    повернути ret;
 }
 
 // Output buffer management
 
 // Function to write a line, points to either msg() or emsg().
-typedef int (*writefn)(char *);
+typedef ціле (*writefn)(char *);
 
 DEFINE_PY_TYPE_OBJECT(OutputType);
 
@@ -601,29 +601,29 @@ static char *OutputAttrs[] = {
     static PyObject *
 OutputDir(PyObject *self, PyObject *args UNUSED)
 {
-    return ObjectDir(self, OutputAttrs);
+    повернути ObjectDir(self, OutputAttrs);
 }
 
-    static int
+    static ціле
 OutputSetattr(PyObject *self_obj, char *name, PyObject *valObject)
 {
     OutputObject *self = (OutputObject*)self_obj;
-    if (valObject == NULL)
+    якщо (valObject == NULL)
     {
 	PyErr_SET_STRING(PyExc_AttributeError,
 		N_("can't delete OutputObject attributes"));
-	return -1;
+	повернути -1;
     }
 
-    if (strcmp(name, "softspace") == 0)
+    якщо (strcmp(name, "softspace") == 0)
     {
-	if (NumberToLong(valObject, &(self->softspace), NUMBER_UNSIGNED))
-	    return -1;
-	return 0;
+	якщо (NumberToLong(valObject, &(self->softspace), NUMBER_UNSIGNED))
+	    повернути -1;
+	повернути 0;
     }
 
     PyErr_FORMAT(PyExc_AttributeError, N_("invalid attribute: %s"), name);
-    return -1;
+    повернути -1;
 }
 
 // Buffer IO, we write one whole line at a time.
@@ -633,7 +633,7 @@ static writefn old_fn = NULL;
     static void
 PythonIO_Flush(void)
 {
-    if (old_fn != NULL && io_ga.ga_len > 0)
+    якщо (old_fn != NULL && io_ga.ga_len > 0)
     {
 	((char *)io_ga.ga_data)[io_ga.ga_len] = NUL;
 	// We don't know what emsg_severe should be here, so ... hope?
@@ -643,12 +643,12 @@ PythonIO_Flush(void)
 }
 
     static void
-writer(writefn fn, char_u *str, PyInt n, int severe)
+writer(writefn fn, char_u *str, PyInt n, ціле severe)
 {
     char_u *ptr;
 
     // Flush when switching output function.
-    if (fn != old_fn)
+    якщо (fn != old_fn)
 	PythonIO_Flush();
     old_fn = fn;
 
@@ -657,12 +657,12 @@ writer(writefn fn, char_u *str, PyInt n, int severe)
     // For normal messages: Do not output when "got_int" was set.  This avoids
     // a loop gone crazy flooding the terminal with messages.  Also for when
     // "q" is pressed at the more-prompt.
-    while (n > 0 && (ptr = memchr(str, '\n', n)) != NULL
+    поки (n > 0 && (ptr = memchr(str, '\n', n)) != NULL
 					  && (fn == (writefn)emsg || !got_int))
     {
 	PyInt len = ptr - str;
 
-	if (ga_grow(&io_ga, (int)(len + 1)) == FAIL)
+	якщо (ga_grow(&io_ga, (ціле)(len + 1)) == FAIL)
 	    break;
 
 	mch_memmove(((char *)io_ga.ga_data) + io_ga.ga_len, str, (size_t)len);
@@ -675,23 +675,23 @@ writer(writefn fn, char_u *str, PyInt n, int severe)
     }
 
     // Put the remaining text into io_ga for later printing.
-    if (n > 0 && (fn == (writefn)emsg || !got_int)
-					&& ga_grow(&io_ga, (int)(n + 1)) == OK)
+    якщо (n > 0 && (fn == (writefn)emsg || !got_int)
+					&& ga_grow(&io_ga, (ціле)(n + 1)) == OK)
     {
 	mch_memmove(((char *)io_ga.ga_data) + io_ga.ga_len, str, (size_t)n);
-	io_ga.ga_len += (int)n;
+	io_ga.ga_len += (ціле)n;
     }
 }
 
-    static int
+    static ціле
 write_output(OutputObject *self, PyObject *string)
 {
     Py_ssize_t	len = 0;
     char	*str = NULL;
-    int		error = self->error;
+    ціле		error = self->error;
 
-    if (!PyArg_Parse(string, "et#", ENC_OPT, &str, &len))
-	return -1;
+    якщо (!PyArg_Parse(string, "et#", ENC_OPT, &str, &len))
+	повернути -1;
 
     Py_BEGIN_ALLOW_THREADS
     Python_Lock_Vim();
@@ -700,17 +700,17 @@ write_output(OutputObject *self, PyObject *string)
     Py_END_ALLOW_THREADS
     PyMem_Free(str);
 
-    return 0;
+    повернути 0;
 }
 
     static PyObject *
 OutputWrite(OutputObject *self, PyObject *string)
 {
-    if (write_output(self, string))
-	return NULL;
+    якщо (write_output(self, string))
+	повернути NULL;
 
     Py_INCREF(Py_None);
-    return Py_None;
+    повернути Py_None;
 }
 
     static PyObject *
@@ -719,16 +719,16 @@ OutputWritelines(OutputObject *self, PyObject *seq)
     PyObject	*iterator;
     PyObject	*item;
 
-    if (!(iterator = PyObject_GetIter(seq)))
-	return NULL;
+    якщо (!(iterator = PyObject_GetIter(seq)))
+	повернути NULL;
 
-    while ((item = PyIter_Next(iterator)))
+    поки ((item = PyIter_Next(iterator)))
     {
-	if (write_output(self, item))
+	якщо (write_output(self, item))
 	{
 	    Py_DECREF(iterator);
 	    Py_DECREF(item);
-	    return NULL;
+	    повернути NULL;
 	}
 	Py_DECREF(item);
     }
@@ -736,11 +736,11 @@ OutputWritelines(OutputObject *self, PyObject *seq)
     Py_DECREF(iterator);
 
     // Iterator may have finished due to an exception
-    if (PyErr_Occurred())
-	return NULL;
+    якщо (PyErr_Occurred())
+	повернути NULL;
 
     Py_INCREF(Py_None);
-    return Py_None;
+    повернути Py_None;
 }
 
     static PyObject *
@@ -748,7 +748,7 @@ AlwaysNone(PyObject *self UNUSED, PyObject *args UNUSED)
 {
     // do nothing
     Py_INCREF(Py_None);
-    return Py_None;
+    повернути Py_None;
 }
 #define ALWAYS_NONE AlwaysNone(NULL, NULL)
 
@@ -758,7 +758,7 @@ AlwaysFalse(PyObject *self UNUSED, PyObject *args UNUSED)
     // do nothing
     PyObject	*ret = Py_False;
     Py_INCREF(ret);
-    return ret;
+    повернути ret;
 }
 #define ALWAYS_FALSE AlwaysFalse(NULL, NULL)
 
@@ -768,7 +768,7 @@ AlwaysTrue(PyObject *self UNUSED, PyObject *args UNUSED)
     // do nothing
     PyObject	*ret = Py_True;
     Py_INCREF(ret);
-    return ret;
+    повернути ret;
 }
 #define ALWAYS_TRUE AlwaysTrue(NULL, NULL)
 
@@ -803,25 +803,25 @@ static OutputObject Error =
     1
 };
 
-    static int
+    static ціле
 PythonIO_Init_io(void)
 {
-    if (PySys_SetObject("stdout", (PyObject *)(void *)&Output))
-	return -1;
-    if (PySys_SetObject("stderr", (PyObject *)(void *)&Error))
-	return -1;
+    якщо (PySys_SetObject("stdout", (PyObject *)(void *)&Output))
+	повернути -1;
+    якщо (PySys_SetObject("stderr", (PyObject *)(void *)&Error))
+	повернути -1;
 
-    if (PyErr_Occurred())
+    якщо (PyErr_Occurred())
     {
 	emsg(_(e_python_error_initialising_io_object));
-	return -1;
+	повернути -1;
     }
 
-    return 0;
+    повернути 0;
 }
 
-#if PY_VERSION_HEX < 0x030700f0
-static PyObject *call_load_module(char *name, int len, PyObject *find_module_result);
+#якщо PY_VERSION_HEX < 0x030700f0
+static PyObject *call_load_module(char *name, ціле len, PyObject *find_module_result);
 
 typedef struct
 {
@@ -847,14 +847,14 @@ LoaderLoadModule(LoaderObject *self, PyObject *args UNUSED)
     PyObject	*result = self->result;
     PyObject	*module;
 
-    if (!fullname)
+    якщо (!fullname)
     {
 	module = result ? result : Py_None;
 	Py_INCREF(module);
-	return module;
+	повернути module;
     }
 
-    module = call_load_module(fullname, (int)STRLEN(fullname), result);
+    module = call_load_module(fullname, (ціле)STRLEN(fullname), result);
 
     self->fullname = NULL;
     self->result = module;
@@ -862,17 +862,17 @@ LoaderLoadModule(LoaderObject *self, PyObject *args UNUSED)
     vim_free(fullname);
     Py_DECREF(result);
 
-    if (!module)
+    якщо (!module)
     {
-	if (PyErr_Occurred())
-	    return NULL;
+	якщо (PyErr_Occurred())
+	    повернути NULL;
 
 	Py_INCREF(Py_None);
-	return Py_None;
+	повернути Py_None;
     }
 
     Py_INCREF(module);
-    return module;
+    повернути module;
 }
 
 static struct PyMethodDef LoaderMethods[] = {
@@ -892,7 +892,7 @@ VimTryStart(void)
     ++trylevel;
 }
 
-    static int
+    static ціле
 VimTryEnd(void)
 {
     --trylevel;
@@ -900,62 +900,62 @@ VimTryEnd(void)
     // generates strange error messages if I e.g. try calling Test() in a cycle
     did_emsg = FALSE;
     // Keyboard interrupt should be preferred over anything else
-    if (got_int)
+    якщо (got_int)
     {
-	if (did_throw)
+	якщо (did_throw)
 	    discard_current_exception();
 	got_int = FALSE;
 	PyErr_SetNone(PyExc_KeyboardInterrupt);
-	return -1;
+	повернути -1;
     }
-    else if (msg_list != NULL && *msg_list != NULL)
+    інакше якщо (msg_list != NULL && *msg_list != NULL)
     {
-	int	should_free;
+	ціле	should_free;
 	char	*msg;
 
 	msg = get_exception_string(*msg_list, ET_ERROR, NULL, &should_free);
 
-	if (msg == NULL)
+	якщо (msg == NULL)
 	{
 	    PyErr_NoMemory();
-	    return -1;
+	    повернути -1;
 	}
 
 	PyErr_SetVim(msg);
 
 	free_global_msglist();
 
-	if (should_free)
+	якщо (should_free)
 	    vim_free(msg);
 
-	return -1;
+	повернути -1;
     }
-    else if (!did_throw)
-	return (PyErr_Occurred() ? -1 : 0);
+    інакше якщо (!did_throw)
+	повернути (PyErr_Occurred() ? -1 : 0);
     // Python exception is preferred over Vim one; unlikely to occur though
-    else if (PyErr_Occurred())
+    інакше якщо (PyErr_Occurred())
     {
 	discard_current_exception();
-	return -1;
+	повернути -1;
     }
     // Finally transform Vim script exception to python one
-    else
+    інакше
     {
 	PyErr_SetVim((char *)current_exception->value);
 	discard_current_exception();
-	return -1;
+	повернути -1;
     }
 }
 
-    static int
+    static ціле
 VimCheckInterrupt(void)
 {
-    if (got_int)
+    якщо (got_int)
     {
 	PyErr_SetNone(PyExc_KeyboardInterrupt);
-	return 1;
+	повернути 1;
     }
-    return 0;
+    повернути 0;
 }
 
 // Vim module - Implementation
@@ -967,8 +967,8 @@ VimCommand(PyObject *self UNUSED, PyObject *string)
     PyObject	*ret;
     PyObject	*todecref;
 
-    if (!(cmd = StringToChars(string, &todecref)))
-	return NULL;
+    якщо (!(cmd = StringToChars(string, &todecref)))
+	повернути NULL;
 
     Py_BEGIN_ALLOW_THREADS
     Python_Lock_Vim();
@@ -980,14 +980,14 @@ VimCommand(PyObject *self UNUSED, PyObject *string)
     Python_Release_Vim();
     Py_END_ALLOW_THREADS
 
-    if (VimTryEnd())
+    якщо (VimTryEnd())
 	ret = NULL;
-    else
+    інакше
 	ret = Py_None;
 
     Py_XINCREF(ret);
     Py_XDECREF(todecref);
-    return ret;
+    повернути ret;
 }
 
 /*
@@ -998,23 +998,23 @@ VimCommand(PyObject *self UNUSED, PyObject *string)
  * you call VimToPython.
  */
     static PyObject *
-VimToPython(typval_T *our_tv, int depth, PyObject *lookup_dict)
+VimToPython(typval_T *our_tv, ціле depth, PyObject *lookup_dict)
 {
     PyObject	*ret;
     PyObject	*newObj;
     char	ptrBuf[sizeof(void *) * 2 + 3];
 
     // Avoid infinite recursion
-    if (depth > 100)
+    якщо (depth > 100)
     {
 	Py_INCREF(Py_None);
 	ret = Py_None;
-	return ret;
+	повернути ret;
     }
 
     // Check if we run into a recursive loop.  The item must be in lookup_dict
     // then and we can use it again.
-    if ((our_tv->v_type == VAR_LIST && our_tv->vval.v_list != NULL)
+    якщо ((our_tv->v_type == VAR_LIST && our_tv->vval.v_list != NULL)
 	    || (our_tv->v_type == VAR_TUPLE && our_tv->vval.v_tuple != NULL)
 	    || (our_tv->v_type == VAR_DICT && our_tv->vval.v_dict != NULL))
     {
@@ -1024,17 +1024,17 @@ VimToPython(typval_T *our_tv, int depth, PyObject *lookup_dict)
 			(void *)our_tv->vval.v_tuple
 			: (void *)our_tv->vval.v_dict);
 
-	if ((ret = PyDict_GetItemString(lookup_dict, ptrBuf)))
+	якщо ((ret = PyDict_GetItemString(lookup_dict, ptrBuf)))
 	{
 	    Py_INCREF(ret);
-	    return ret;
+	    повернути ret;
 	}
     }
 
-    if (our_tv->v_type == VAR_STRING)
+    якщо (our_tv->v_type == VAR_STRING)
 	ret = PyString_FromString(our_tv->vval.v_string == NULL
 					? "" : (char *)our_tv->vval.v_string);
-    else if (our_tv->v_type == VAR_NUMBER)
+    інакше якщо (our_tv->v_type == VAR_NUMBER)
     {
 	char buf[NUMBUFLEN];
 
@@ -1042,81 +1042,81 @@ VimToPython(typval_T *our_tv, int depth, PyObject *lookup_dict)
 	sprintf(buf, "%lld", (long long)our_tv->vval.v_number);
 	ret = PyString_FromString((char *)buf);
     }
-    else if (our_tv->v_type == VAR_FLOAT)
+    інакше якщо (our_tv->v_type == VAR_FLOAT)
     {
 	char buf[NUMBUFLEN];
 
 	sprintf(buf, "%f", our_tv->vval.v_float);
 	ret = PyString_FromString((char *)buf);
     }
-    else if (our_tv->v_type == VAR_LIST)
+    інакше якщо (our_tv->v_type == VAR_LIST)
     {
 	list_T		*list = our_tv->vval.v_list;
 	listitem_T	*curr;
 
-	if (list == NULL)
-	    return NULL;
+	якщо (list == NULL)
+	    повернути NULL;
 
-	if (!(ret = PyList_New(0)))
-	    return NULL;
+	якщо (!(ret = PyList_New(0)))
+	    повернути NULL;
 
-	if (PyDict_SetItemString(lookup_dict, ptrBuf, ret))
+	якщо (PyDict_SetItemString(lookup_dict, ptrBuf, ret))
 	{
 	    Py_DECREF(ret);
-	    return NULL;
+	    повернути NULL;
 	}
 
 	CHECK_LIST_MATERIALIZE(list);
 	FOR_ALL_LIST_ITEMS(list, curr)
 	{
-	    if (!(newObj = VimToPython(&curr->li_tv, depth + 1, lookup_dict)))
+	    якщо (!(newObj = VimToPython(&curr->li_tv, depth + 1, lookup_dict)))
 	    {
 		Py_DECREF(ret);
-		return NULL;
+		повернути NULL;
 	    }
-	    if (PyList_Append(ret, newObj))
+	    якщо (PyList_Append(ret, newObj))
 	    {
 		Py_DECREF(newObj);
 		Py_DECREF(ret);
-		return NULL;
+		повернути NULL;
 	    }
 	    Py_DECREF(newObj);
 	}
     }
-    else if (our_tv->v_type == VAR_TUPLE)
+    інакше якщо (our_tv->v_type == VAR_TUPLE)
     {
 	tuple_T	*tuple = our_tv->vval.v_tuple;
-	int	len;
+	ціле	len;
 
-	if (tuple == NULL)
-	    return NULL;
+	якщо (tuple == NULL)
+	    повернути NULL;
 
 	len = TUPLE_LEN(tuple);
 
 	ret = PyTuple_New(len);
-	if (ret == NULL)
-	    return NULL;
+	якщо (ret == NULL)
+	    повернути NULL;
 
-	for (int idx = 0; idx < len; idx++)
+	для (ціле idx = 0; idx < len; idx++)
 	{
 	    typval_T	*item_tv = TUPLE_ITEM(tuple, idx);
 
 	    newObj = VimToPython(item_tv, depth + 1, lookup_dict);
-	    if (!newObj)
+	    якщо (!newObj)
 	    {
 		Py_DECREF(ret);
-		return NULL;
+		повернути NULL;
 	    }
 	    PyTuple_SetItem(ret, idx, newObj);
 	}
 
-	if (PyDict_SetItemString(lookup_dict, ptrBuf, ret))
+	якщо (PyDict_SetItemString(lookup_dict, ptrBuf, ret))
 	{
 	    Py_DECREF(ret);
-	    return NULL;
+	    повернути NULL;
 	}
     }
-    else if (our_tv->v_type == VAR_DICT)
+    інакше якщо (our_tv->v_type == VAR_DICT)
     {
 
 	hashtab_T	*ht;
@@ -1124,72 +1124,72 @@ VimToPython(typval_T *our_tv, int depth, PyObject *lookup_dict)
 	hashitem_T	*hi;
 	dictitem_T	*di;
 
-	if (our_tv->vval.v_dict == NULL)
-	    return NULL;
+	якщо (our_tv->vval.v_dict == NULL)
+	    повернути NULL;
 	ht = &our_tv->vval.v_dict->dv_hashtab;
 
-	if (!(ret = PyDict_New()))
-	    return NULL;
+	якщо (!(ret = PyDict_New()))
+	    повернути NULL;
 
-	if (PyDict_SetItemString(lookup_dict, ptrBuf, ret))
+	якщо (PyDict_SetItemString(lookup_dict, ptrBuf, ret))
 	{
 	    Py_DECREF(ret);
-	    return NULL;
+	    повернути NULL;
 	}
 
 	todo = ht->ht_used;
-	for (hi = ht->ht_array; todo > 0; ++hi)
+	для (hi = ht->ht_array; todo > 0; ++hi)
 	{
-	    if (!HASHITEM_EMPTY(hi))
+	    якщо (!HASHITEM_EMPTY(hi))
 	    {
 		--todo;
 
 		di = dict_lookup(hi);
-		if (!(newObj = VimToPython(&di->di_tv, depth + 1, lookup_dict)))
+		якщо (!(newObj = VimToPython(&di->di_tv, depth + 1, lookup_dict)))
 		{
 		    Py_DECREF(ret);
-		    return NULL;
+		    повернути NULL;
 		}
-		if (PyDict_SetItemString(ret, (char *)hi->hi_key, newObj))
+		якщо (PyDict_SetItemString(ret, (char *)hi->hi_key, newObj))
 		{
 		    Py_DECREF(ret);
 		    Py_DECREF(newObj);
-		    return NULL;
+		    повернути NULL;
 		}
 	    }
 	}
     }
-    else if (our_tv->v_type == VAR_BOOL)
+    інакше якщо (our_tv->v_type == VAR_BOOL)
     {
-	if (our_tv->vval.v_number == VVAL_FALSE)
+	якщо (our_tv->vval.v_number == VVAL_FALSE)
 	{
 	    ret = Py_False;
 	    Py_INCREF(ret);
 	}
-	else
+	інакше
 	{
 	    ret = Py_True;
 	    Py_INCREF(ret);
 	}
-	return ret;
+	повернути ret;
     }
-    else if (our_tv->v_type == VAR_SPECIAL)
+    інакше якщо (our_tv->v_type == VAR_SPECIAL)
     {
 	Py_INCREF(Py_None);
 	ret = Py_None;
-	return ret;
+	повернути ret;
     }
-    else if (our_tv->v_type == VAR_BLOB)
+    інакше якщо (our_tv->v_type == VAR_BLOB)
 	ret = PyBytes_FromStringAndSize(
 		(char*) our_tv->vval.v_blob->bv_ga.ga_data,
 		(Py_ssize_t) our_tv->vval.v_blob->bv_ga.ga_len);
-    else
+    інакше
     {
 	Py_INCREF(Py_None);
 	ret = Py_None;
     }
 
-    return ret;
+    повернути ret;
 }
 
     static PyObject *
@@ -1202,11 +1202,11 @@ VimEval(PyObject *self UNUSED, PyObject *args)
     PyObject	*ret;
     PyObject	*lookup_dict;
 
-    if (!PyArg_ParseTuple(args, "O", &string))
-	return NULL;
+    якщо (!PyArg_ParseTuple(args, "O", &string))
+	повернути NULL;
 
-    if (!(expr = StringToChars(string, &todecref)))
-	return NULL;
+    якщо (!(expr = StringToChars(string, &todecref)))
+	повернути NULL;
 
     Py_BEGIN_ALLOW_THREADS
     Python_Lock_Vim();
@@ -1217,20 +1217,20 @@ VimEval(PyObject *self UNUSED, PyObject *args)
 
     Py_XDECREF(todecref);
 
-    if (VimTryEnd())
-	return NULL;
+    якщо (VimTryEnd())
+	повернути NULL;
 
-    if (our_tv == NULL)
+    якщо (our_tv == NULL)
     {
 	PyErr_SET_VIM(N_("invalid expression"));
-	return NULL;
+	повернути NULL;
     }
 
     // Convert the Vim type into a Python type.  Create a dictionary that's
     // used to check for recursive loops.
-    if (!(lookup_dict = PyDict_New()))
+    якщо (!(lookup_dict = PyDict_New()))
 	ret = NULL;
-    else
+    інакше
     {
 	ret = VimToPython(our_tv, 1, lookup_dict);
 	Py_DECREF(lookup_dict);
@@ -1243,7 +1243,7 @@ VimEval(PyObject *self UNUSED, PyObject *args)
     Python_Release_Vim();
     Py_END_ALLOW_THREADS
 
-    return ret;
+    повернути ret;
 }
 
 static PyObject *ConvertToPyObject(typval_T *);
@@ -1256,8 +1256,8 @@ VimEvalPy(PyObject *self UNUSED, PyObject *string)
     char_u	*expr;
     PyObject	*todecref;
 
-    if (!(expr = StringToChars(string, &todecref)))
-	return NULL;
+    якщо (!(expr = StringToChars(string, &todecref)))
+	повернути NULL;
 
     Py_BEGIN_ALLOW_THREADS
     Python_Lock_Vim();
@@ -1268,13 +1268,13 @@ VimEvalPy(PyObject *self UNUSED, PyObject *string)
 
     Py_XDECREF(todecref);
 
-    if (VimTryEnd())
-	return NULL;
+    якщо (VimTryEnd())
+	повернути NULL;
 
-    if (our_tv == NULL)
+    якщо (our_tv == NULL)
     {
 	PyErr_SET_VIM(N_("invalid expression"));
-	return NULL;
+	повернути NULL;
     }
 
     ret = ConvertToPyObject(our_tv);
@@ -1284,7 +1284,7 @@ VimEvalPy(PyObject *self UNUSED, PyObject *string)
     Python_Release_Vim();
     Py_END_ALLOW_THREADS
 
-    return ret;
+    повернути ret;
 }
 
     static PyObject *
@@ -1292,16 +1292,16 @@ VimStrwidth(PyObject *self UNUSED, PyObject *string)
 {
     char_u	*str;
     PyObject	*todecref;
-    int		len;
+    ціле		len;
 
-    if (!(str = StringToChars(string, &todecref)))
-	return NULL;
+    якщо (!(str = StringToChars(string, &todecref)))
+	повернути NULL;
 
-    len = mb_string2cells(str, (int)STRLEN(str));
+    len = mb_string2cells(str, (ціле)STRLEN(str));
 
     Py_XDECREF(todecref);
 
-    return PyLong_FromLong(len);
+    повернути PyLong_FromLong(len);
 }
 
     static PyObject *
@@ -1312,37 +1312,37 @@ _VimChdir(PyObject *_chdir, PyObject *args, PyObject *kwargs)
     PyObject	*todecref;
     char_u	*new_dir;
 
-    if (_chdir == NULL)
-	return NULL;
-    if (!(ret = PyObject_Call(_chdir, args, kwargs)))
-	return NULL;
+    якщо (_chdir == NULL)
+	повернути NULL;
+    якщо (!(ret = PyObject_Call(_chdir, args, kwargs)))
+	повернути NULL;
 
-    if (!(newwd = PyObject_CallFunctionObjArgs(py_getcwd, NULL)))
+    якщо (!(newwd = PyObject_CallFunctionObjArgs(py_getcwd, NULL)))
     {
 	Py_DECREF(ret);
-	return NULL;
+	повернути NULL;
     }
 
-    if (!(new_dir = StringToChars(newwd, &todecref)))
+    якщо (!(new_dir = StringToChars(newwd, &todecref)))
     {
 	Py_DECREF(ret);
 	Py_DECREF(newwd);
-	return NULL;
+	повернути NULL;
     }
 
     VimTryStart();
 
-    if (vim_chdir(new_dir))
+    якщо (vim_chdir(new_dir))
     {
 	Py_DECREF(ret);
 	Py_DECREF(newwd);
 	Py_XDECREF(todecref);
 
-	if (VimTryEnd())
-	    return NULL;
+	якщо (VimTryEnd())
+	    повернути NULL;
 
 	PyErr_SET_VIM(N_("failed to change directory"));
-	return NULL;
+	повернути NULL;
     }
 
     Py_DECREF(newwd);
@@ -1350,25 +1350,25 @@ _VimChdir(PyObject *_chdir, PyObject *args, PyObject *kwargs)
 
     post_chdir(CDSCOPE_GLOBAL);
 
-    if (VimTryEnd())
+    якщо (VimTryEnd())
     {
 	Py_DECREF(ret);
-	return NULL;
+	повернути NULL;
     }
 
-    return ret;
+    повернути ret;
 }
 
     static PyObject *
 VimChdir(PyObject *self UNUSED, PyObject *args, PyObject *kwargs)
 {
-    return _VimChdir(py_chdir, args, kwargs);
+    повернути _VimChdir(py_chdir, args, kwargs);
 }
 
     static PyObject *
 VimFchdir(PyObject *self UNUSED, PyObject *args, PyObject *kwargs)
 {
-    return _VimChdir(py_fchdir, args, kwargs);
+    повернути _VimChdir(py_fchdir, args, kwargs);
 }
 
 typedef struct {
@@ -1383,10 +1383,10 @@ map_rtp_callback(char_u *path, void *_data)
     PyObject	*pathObject;
     map_rtp_data	*mr_data = *((map_rtp_data **) data);
 
-    if (!(pathObject = PyString_FromString((char *)path)))
+    якщо (!(pathObject = PyString_FromString((char *)path)))
     {
 	*data = NULL;
-	return;
+	повернути;
     }
 
     mr_data->result = PyObject_CallFunctionObjArgs(mr_data->callable,
@@ -1394,9 +1394,9 @@ map_rtp_callback(char_u *path, void *_data)
 
     Py_DECREF(pathObject);
 
-    if (!mr_data->result || mr_data->result != Py_None)
+    якщо (!mr_data->result || mr_data->result != Py_None)
 	*data = NULL;
-    else
+    інакше
     {
 	Py_DECREF(mr_data->result);
 	mr_data->result = NULL;
@@ -1413,17 +1413,17 @@ VimForeachRTP(PyObject *self UNUSED, PyObject *callable)
 
     do_in_runtimepath(NULL, 0, &map_rtp_callback, &data);
 
-    if (data.result == NULL)
+    якщо (data.result == NULL)
     {
-	if (PyErr_Occurred())
-	    return NULL;
-	else
+	якщо (PyErr_Occurred())
+	    повернути NULL;
+	інакше
 	{
 	    Py_INCREF(Py_None);
-	    return Py_None;
+	    повернути Py_None;
 	}
     }
-    return data.result;
+    повернути data.result;
 }
 
 /*
@@ -1441,20 +1441,20 @@ map_finder_callback(char_u *path, void *_data)
 
     pathlen = STRLEN(path);
 
-#if PY_MAJOR_VERSION < 3
+#якщо PY_MAJOR_VERSION < 3
 # define PY_MAIN_DIR_STRING "python2"
-#else
+#інакше
 # define PY_MAIN_DIR_STRING "python3"
 #endif
 #define PY_ALTERNATE_DIR_STRING "pythonx"
 
 #define PYTHONX_STRING_LENGTH 7 // STRLEN("pythonx")
-    if (!(pathbuf = PyMem_New(char,
+    якщо (!(pathbuf = PyMem_New(char,
 		    pathlen + STRLEN(PATHSEPSTR) + PYTHONX_STRING_LENGTH + 1)))
     {
 	PyErr_NoMemory();
 	*data = NULL;
-	return;
+	повернути;
     }
 
     mch_memmove(pathbuf, path, pathlen + 1);
@@ -1464,27 +1464,27 @@ map_finder_callback(char_u *path, void *_data)
     mch_memmove(pathbuf + pathlen, PY_MAIN_DIR_STRING,
 	    PYTHONX_STRING_LENGTH + 1);
 
-    if (!(pathObject1 = PyString_FromString(pathbuf)))
+    якщо (!(pathObject1 = PyString_FromString(pathbuf)))
     {
 	*data = NULL;
 	PyMem_Free(pathbuf);
-	return;
+	повернути;
     }
 
     mch_memmove(pathbuf + pathlen, PY_ALTERNATE_DIR_STRING,
 	    PYTHONX_STRING_LENGTH + 1);
 
-    if (!(pathObject2 = PyString_FromString(pathbuf)))
+    якщо (!(pathObject2 = PyString_FromString(pathbuf)))
     {
 	Py_DECREF(pathObject1);
 	PyMem_Free(pathbuf);
 	*data = NULL;
-	return;
+	повернути;
     }
 
     PyMem_Free(pathbuf);
 
-    if (PyList_Append(list, pathObject1)
+    якщо (PyList_Append(list, pathObject1)
 	    || PyList_Append(list, pathObject2))
 	*data = NULL;
 
@@ -1497,21 +1497,21 @@ Vim_GetPaths(PyObject *self UNUSED, PyObject *args UNUSED)
 {
     PyObject	*ret;
 
-    if (!(ret = PyList_New(0)))
-	return NULL;
+    якщо (!(ret = PyList_New(0)))
+	повернути NULL;
 
     do_in_runtimepath(NULL, 0, &map_finder_callback, ret);
 
-    if (PyErr_Occurred())
+    якщо (PyErr_Occurred())
     {
 	Py_DECREF(ret);
-	return NULL;
+	повернути NULL;
     }
 
-    return ret;
+    повернути ret;
 }
 
-#if PY_VERSION_HEX >= 0x030700f0
+#якщо PY_VERSION_HEX >= 0x030700f0
     static PyObject *
 FinderFindSpec(PyObject *self, PyObject *args)
 {
@@ -1520,26 +1520,26 @@ FinderFindSpec(PyObject *self, PyObject *args)
     PyObject	*target = Py_None;
     PyObject	*spec;
 
-    if (!PyArg_ParseTuple(args, "s|O", &fullname, &target))
-	return NULL;
+    якщо (!PyArg_ParseTuple(args, "s|O", &fullname, &target))
+	повернути NULL;
 
-    if (!(paths = Vim_GetPaths(self, NULL)))
-	return NULL;
+    якщо (!(paths = Vim_GetPaths(self, NULL)))
+	повернути NULL;
 
     spec = PyObject_CallFunction(py_find_spec, "sOO", fullname, paths, target);
 
     Py_DECREF(paths);
 
-    if (!spec)
+    якщо (!spec)
     {
-	if (PyErr_Occurred())
-	    return NULL;
+	якщо (PyErr_Occurred())
+	    повернути NULL;
 
 	Py_INCREF(Py_None);
-	return Py_None;
+	повернути Py_None;
     }
 
-    return spec;
+    повернути spec;
 }
 
     static PyObject *
@@ -1547,40 +1547,40 @@ FinderFindModule(PyObject* self UNUSED, PyObject* args UNUSED)
 {
     // Apparently returning None works.
     Py_INCREF(Py_None);
-    return Py_None;
+    повернути Py_None;
 }
-#else
+#інакше
     static PyObject *
-call_load_module(char *name, int len, PyObject *find_module_result)
+call_load_module(char *name, ціле len, PyObject *find_module_result)
 {
     PyObject	*fd, *pathname, *description;
 
-    if (!PyTuple_Check(find_module_result))
+    якщо (!PyTuple_Check(find_module_result))
     {
 	PyErr_FORMAT_TYPE(
 		N_("expected 3-tuple as imp.find_module() result, but got %s"),
 		find_module_result);
-	return NULL;
+	повернути NULL;
     }
-    if (PyTuple_GET_SIZE(find_module_result) != 3)
+    якщо (PyTuple_GET_SIZE(find_module_result) != 3)
     {
 	PyErr_FORMAT(PyExc_TypeError,
 		N_("expected 3-tuple as imp.find_module() result, but got "
 		   "tuple of size %d"),
-		(int) PyTuple_GET_SIZE(find_module_result));
-	return NULL;
+		(ціле) PyTuple_GET_SIZE(find_module_result));
+	повернути NULL;
     }
 
-    if (!(fd = PyTuple_GET_ITEM(find_module_result, 0))
+    якщо (!(fd = PyTuple_GET_ITEM(find_module_result, 0))
 	    || !(pathname = PyTuple_GET_ITEM(find_module_result, 1))
 	    || !(description = PyTuple_GET_ITEM(find_module_result, 2)))
     {
 	PyErr_SET_STRING(PyExc_RuntimeError,
 		N_("internal error: imp.find_module returned tuple with NULL"));
-	return NULL;
+	повернути NULL;
     }
 
-    return PyObject_CallFunction(py_load_module,
+    повернути PyObject_CallFunction(py_load_module,
 	    "s#OOO", name, len, fd, pathname, description);
 }
 
@@ -1591,38 +1591,38 @@ find_module(char *fullname, char *tail, PyObject *new_path)
     PyObject	*module;
     char	*dot;
 
-    if ((dot = (char *)vim_strchr((char_u *) tail, '.')))
+    якщо ((dot = (char *)vim_strchr((char_u *) tail, '.')))
     {
 	/*
 	 * There is a dot in the name: call find_module recursively without the
 	 * first component
 	 */
 	PyObject	*newest_path;
-	int		partlen = (int) (dot - 1 - tail);
+	ціле		partlen = (ціле) (dot - 1 - tail);
 
-	if (!(find_module_result = PyObject_CallFunction(py_find_module,
+	якщо (!(find_module_result = PyObject_CallFunction(py_find_module,
 			"s#O", tail, partlen, new_path)))
 	{
-	    if (PyErr_Occurred() && PyErr_ExceptionMatches(PyExc_ImportError))
+	    якщо (PyErr_Occurred() && PyErr_ExceptionMatches(PyExc_ImportError))
 		PyErr_Clear();
-	    return NULL;
+	    повернути NULL;
 	}
 
-	if (!(module = call_load_module(
+	якщо (!(module = call_load_module(
 			fullname,
-			((int) (tail - fullname)) + partlen,
+			((ціле) (tail - fullname)) + partlen,
 			find_module_result)))
 	{
 	    Py_DECREF(find_module_result);
-	    return NULL;
+	    повернути NULL;
 	}
 
 	Py_DECREF(find_module_result);
 
-	if (!(newest_path = PyObject_GetAttrString(module, "__path__")))
+	якщо (!(newest_path = PyObject_GetAttrString(module, "__path__")))
 	{
 	    Py_DECREF(module);
-	    return NULL;
+	    повернути NULL;
 	}
 
 	Py_DECREF(module);
@@ -1631,19 +1631,19 @@ find_module(char *fullname, char *tail, PyObject *new_path)
 
 	Py_DECREF(newest_path);
 
-	return find_module_result;
+	повернути find_module_result;
     }
-    else
+    інакше
     {
-	if (!(find_module_result = PyObject_CallFunction(py_find_module,
+	якщо (!(find_module_result = PyObject_CallFunction(py_find_module,
 			"sO", tail, new_path)))
 	{
-	    if (PyErr_Occurred() && PyErr_ExceptionMatches(PyExc_ImportError))
+	    якщо (PyErr_Occurred() && PyErr_ExceptionMatches(PyExc_ImportError))
 		PyErr_Clear();
-	    return NULL;
+	    повернути NULL;
 	}
 
-	return find_module_result;
+	повернути find_module_result;
     }
 }
 
@@ -1655,43 +1655,43 @@ FinderFindModule(PyObject *self, PyObject *args)
     PyObject	*new_path;
     LoaderObject	*loader;
 
-    if (!PyArg_ParseTuple(args, "s", &fullname))
-	return NULL;
+    якщо (!PyArg_ParseTuple(args, "s", &fullname))
+	повернути NULL;
 
-    if (!(new_path = Vim_GetPaths(self, NULL)))
-	return NULL;
+    якщо (!(new_path = Vim_GetPaths(self, NULL)))
+	повернути NULL;
 
     result = find_module(fullname, fullname, new_path);
 
     Py_DECREF(new_path);
 
-    if (!result)
+    якщо (!result)
     {
-	if (PyErr_Occurred())
-	    return NULL;
+	якщо (PyErr_Occurred())
+	    повернути NULL;
 
 	Py_INCREF(Py_None);
-	return Py_None;
+	повернути Py_None;
     }
 
-    if (!(fullname = (char *)vim_strsave((char_u *)fullname)))
+    якщо (!(fullname = (char *)vim_strsave((char_u *)fullname)))
     {
 	Py_DECREF(result);
 	PyErr_NoMemory();
-	return NULL;
+	повернути NULL;
     }
 
-    if (!(loader = PyObject_NEW(LoaderObject, LoaderTypePtr)))
+    якщо (!(loader = PyObject_NEW(LoaderObject, LoaderTypePtr)))
     {
 	vim_free(fullname);
 	Py_DECREF(result);
-	return NULL;
+	повернути NULL;
     }
 
     loader->fullname = fullname;
     loader->result = result;
 
-    return (PyObject *) loader;
+    повернути (PyObject *) loader;
 }
 #endif
 
@@ -1700,16 +1700,16 @@ VimPathHook(PyObject *self UNUSED, PyObject *args)
 {
     char	*path;
 
-    if (PyArg_ParseTuple(args, "s", &path)
+    якщо (PyArg_ParseTuple(args, "s", &path)
 	    && STRCMP(path, vim_special_path) == 0)
     {
 	Py_INCREF(vim_module);
-	return vim_module;
+	повернути vim_module;
     }
 
     PyErr_Clear();
     PyErr_SetNone(PyExc_ImportError);
-    return NULL;
+    повернути NULL;
 }
 
 /*
@@ -1725,7 +1725,7 @@ static struct PyMethodDef VimMethods[] = {
     {"chdir",	    (PyCFunction)(void *)VimChdir,	METH_VARARGS|METH_KEYWORDS,	"Change directory"},
     {"fchdir",	    (PyCFunction)(void *)VimFchdir,	METH_VARARGS|METH_KEYWORDS,	"Change directory"},
     {"foreach_rtp", VimForeachRTP,		METH_O,				"Call given callable for each path in &rtp"},
-#if PY_VERSION_HEX >= 0x030700f0
+#якщо PY_VERSION_HEX >= 0x030700f0
     {"find_spec",   FinderFindSpec,		METH_VARARGS,			"Internal use only, returns spec object for any input it receives"},
 #endif
     {"find_module", FinderFindModule,		METH_VARARGS,			"Internal use only, returns loader object for any input it receives"},
@@ -1742,8 +1742,8 @@ DEFINE_PY_TYPE_OBJECT(IterType);
 
 typedef PyObject *(*nextfun)(void **);
 typedef void (*destructorfun)(void *);
-typedef int (*traversefun)(void *, visitproc, void *);
-typedef int (*clearfun)(void **);
+typedef ціле (*traversefun)(void *, visitproc, void *);
+typedef ціле (*clearfun)(void **);
 
 // Main purpose of this object is removing the need for do python
 // initialization (i.e. PyType_Ready and setting type attributes) for a big
@@ -1773,31 +1773,31 @@ IterNew(void *start, destructorfun destruct, nextfun next, traversefun traverse,
     self->clear = clear;
     self->iter_object = iter_object;
 
-    if (iter_object)
+    якщо (iter_object)
 	Py_INCREF(iter_object);
 
-    return (PyObject *)(self);
+    повернути (PyObject *)(self);
 }
 
     static void
 IterDestructor(PyObject *self_obj)
 {
     IterObject *self = (IterObject*)self_obj;
-    if (self->iter_object)
+    якщо (self->iter_object)
 	Py_DECREF(self->iter_object);
     PyObject_GC_UnTrack((void *)(self));
     self->destruct(self->cur);
     PyObject_GC_Del((void *)(self));
 }
 
-    static int
+    static ціле
 IterTraverse(PyObject *self_obj, visitproc visit, void *arg)
 {
     IterObject *self = (IterObject*)self_obj;
-    if (self->traverse != NULL)
-	return self->traverse(self->cur, visit, arg);
-    else
-	return 0;
+    якщо (self->traverse != NULL)
+	повернути self->traverse(self->cur, visit, arg);
+    інакше
+	повернути 0;
 }
 
 // Mac OSX defines clear() somewhere.
@@ -1805,28 +1805,28 @@ IterTraverse(PyObject *self_obj, visitproc visit, void *arg)
 # undef clear
 #endif
 
-    static int
+    static ціле
 IterClear(PyObject *self_obj)
 {
     IterObject *self = (IterObject*)self_obj;
-    if (self->clear != NULL)
-	return self->clear(&self->cur);
-    else
-	return 0;
+    якщо (self->clear != NULL)
+	повернути self->clear(&self->cur);
+    інакше
+	повернути 0;
 }
 
     static PyObject *
 IterNext(PyObject *self_obj)
 {
     IterObject *self = (IterObject*)self_obj;
-    return self->next(&self->cur);
+    повернути self->next(&self->cur);
 }
 
     static PyObject *
 IterIter(PyObject *self)
 {
     Py_INCREF(self);
-    return self;
+    повернути self;
 }
 
 typedef struct pylinkedlist_S {
@@ -1843,29 +1843,29 @@ static pylinkedlist_T *lastfunc = NULL;
     static void
 pyll_remove(pylinkedlist_T *ref, pylinkedlist_T **last)
 {
-    if (ref->pll_prev == NULL)
+    якщо (ref->pll_prev == NULL)
     {
-	if (ref->pll_next == NULL)
+	якщо (ref->pll_next == NULL)
 	{
 	    *last = NULL;
-	    return;
+	    повернути;
 	}
     }
-    else
+    інакше
 	ref->pll_prev->pll_next = ref->pll_next;
 
-    if (ref->pll_next == NULL)
+    якщо (ref->pll_next == NULL)
 	*last = ref->pll_prev;
-    else
+    інакше
 	ref->pll_next->pll_prev = ref->pll_prev;
 }
 
     static void
 pyll_add(PyObject *self, pylinkedlist_T *ref, pylinkedlist_T **last)
 {
-    if (*last == NULL)
+    якщо (*last == NULL)
 	ref->pll_prev = NULL;
-    else
+    інакше
     {
 	(*last)->pll_next = ref;
 	ref->pll_prev = *last;
@@ -1894,14 +1894,14 @@ DictionaryNew(PyTypeObject *subtype, dict_T *dict)
     DictionaryObject	*self;
 
     self = (DictionaryObject *) Py_TYPE_GET_TP_ALLOC(subtype)(subtype, 0);
-    if (self == NULL)
-	return NULL;
+    якщо (self == NULL)
+	повернути NULL;
     self->dict = dict;
     ++dict->dv_refcount;
 
     pyll_add((PyObject *)(self), &self->ref, &lastdict);
 
-    return (PyObject *)(self);
+    повернути (PyObject *)(self);
 }
 
     static dict_T *
@@ -1909,14 +1909,14 @@ py_dict_alloc(void)
 {
     dict_T	*ret;
 
-    if (!(ret = dict_alloc()))
+    якщо (!(ret = dict_alloc()))
     {
 	PyErr_NoMemory();
-	return NULL;
+	повернути NULL;
     }
     ++ret->dv_refcount;
 
-    return ret;
+    повернути ret;
 }
 
     static PyObject *
@@ -1925,26 +1925,26 @@ DictionaryConstructor(PyTypeObject *subtype, PyObject *args, PyObject *kwargs)
     DictionaryObject	*self;
     dict_T	*dict;
 
-    if (!(dict = py_dict_alloc()))
-	return NULL;
+    якщо (!(dict = py_dict_alloc()))
+	повернути NULL;
 
     self = (DictionaryObject *) DictionaryNew(subtype, dict);
 
     --dict->dv_refcount;
 
-    if (kwargs || PyTuple_Size(args))
+    якщо (kwargs || PyTuple_Size(args))
     {
 	PyObject	*tmp;
-	if (!(tmp = DictionaryUpdate(self, args, kwargs)))
+	якщо (!(tmp = DictionaryUpdate(self, args, kwargs)))
 	{
 	    Py_DECREF(self);
-	    return NULL;
+	    повернути NULL;
 	}
 
 	Py_DECREF(tmp);
     }
 
-    return (PyObject *)(self);
+    повернути (PyObject *)(self);
 }
 
     static void
@@ -1965,51 +1965,51 @@ static char *DictionaryAttrs[] = {
     static PyObject *
 DictionaryDir(PyObject *self, PyObject *args UNUSED)
 {
-    return ObjectDir(self, DictionaryAttrs);
+    повернути ObjectDir(self, DictionaryAttrs);
 }
 
-    static int
+    static ціле
 DictionarySetattr(PyObject *self_obj, char *name, PyObject *valObject)
 {
     DictionaryObject *self = (DictionaryObject*)self_obj;
-    if (valObject == NULL)
+    якщо (valObject == NULL)
     {
 	PyErr_SET_STRING(PyExc_AttributeError,
 		N_("cannot delete vim.Dictionary attributes"));
-	return -1;
+	повернути -1;
     }
 
-    if (strcmp(name, "locked") == 0)
+    якщо (strcmp(name, "locked") == 0)
     {
-	if (self->dict->dv_lock == VAR_FIXED)
+	якщо (self->dict->dv_lock == VAR_FIXED)
 	{
 	    PyErr_SET_STRING(PyExc_TypeError,
 		    N_("cannot modify fixed dictionary"));
-	    return -1;
+	    повернути -1;
 	}
-	else
+	інакше
 	{
-	    int		istrue = PyObject_IsTrue(valObject);
-	    if (istrue == -1)
-		return -1;
-	    else if (istrue)
+	    ціле		istrue = PyObject_IsTrue(valObject);
+	    якщо (istrue == -1)
+		повернути -1;
+	    інакше якщо (istrue)
 		self->dict->dv_lock = VAR_LOCKED;
-	    else
+	    інакше
 		self->dict->dv_lock = 0;
 	}
-	return 0;
+	повернути 0;
     }
-    else
+    інакше
     {
 	PyErr_FORMAT(PyExc_AttributeError, N_("cannot set attribute %s"), name);
-	return -1;
+	повернути -1;
     }
 }
 
     static PyInt
 DictionaryLength(DictionaryObject *self)
 {
-    return ((PyInt) (self->dict->dv_hashtab.ht_used));
+    повернути ((PyInt) (self->dict->dv_hashtab.ht_used));
 }
 
 #define DICT_FLAG_HAS_DEFAULT	0x01
@@ -2019,7 +2019,7 @@ DictionaryLength(DictionaryObject *self)
 #define DICT_FLAG_RETURN_PAIR	0x10
 
     static PyObject *
-_DictionaryItem(DictionaryObject *self, PyObject *args, int flags)
+_DictionaryItem(DictionaryObject *self, PyObject *args, ціле flags)
 {
     PyObject	*keyObject;
     PyObject	*defObject = ((flags & DICT_FLAG_NONE_DEFAULT)? Py_None : NULL);
@@ -2030,97 +2030,97 @@ _DictionaryItem(DictionaryObject *self, PyObject *args, int flags)
     hashitem_T	*hi;
     PyObject	*todecref;
 
-    if (flags & DICT_FLAG_HAS_DEFAULT)
+    якщо (flags & DICT_FLAG_HAS_DEFAULT)
     {
-	if (!PyArg_ParseTuple(args, "O|O", &keyObject, &defObject))
-	    return NULL;
+	якщо (!PyArg_ParseTuple(args, "O|O", &keyObject, &defObject))
+	    повернути NULL;
     }
-    else
+    інакше
 	keyObject = args;
 
-    if (flags & DICT_FLAG_RETURN_BOOL)
+    якщо (flags & DICT_FLAG_RETURN_BOOL)
 	defObject = Py_False;
 
-    if (!(key = StringToChars(keyObject, &todecref)))
-	return NULL;
+    якщо (!(key = StringToChars(keyObject, &todecref)))
+	повернути NULL;
 
-    if (*key == NUL)
+    якщо (*key == NUL)
     {
 	RAISE_NO_EMPTY_KEYS;
 	Py_XDECREF(todecref);
-	return NULL;
+	повернути NULL;
     }
 
     hi = hash_find(&dict->dv_hashtab, key);
 
     Py_XDECREF(todecref);
 
-    if (HASHITEM_EMPTY(hi))
+    якщо (HASHITEM_EMPTY(hi))
     {
-	if (defObject)
+	якщо (defObject)
 	{
 	    Py_INCREF(defObject);
-	    return defObject;
+	    повернути defObject;
 	}
-	else
+	інакше
 	{
 	    PyErr_SetObject(PyExc_KeyError, keyObject);
-	    return NULL;
+	    повернути NULL;
 	}
     }
-    else if (flags & DICT_FLAG_RETURN_BOOL)
+    інакше якщо (flags & DICT_FLAG_RETURN_BOOL)
     {
 	ret = Py_True;
 	Py_INCREF(ret);
-	return ret;
+	повернути ret;
     }
 
     di = dict_lookup(hi);
 
-    if (!(ret = ConvertToPyObject(&di->di_tv)))
-	return NULL;
+    якщо (!(ret = ConvertToPyObject(&di->di_tv)))
+	повернути NULL;
 
-    if (flags & DICT_FLAG_POP)
+    якщо (flags & DICT_FLAG_POP)
     {
-	if (dict->dv_lock)
+	якщо (dict->dv_lock)
 	{
 	    RAISE_LOCKED_DICTIONARY;
 	    Py_DECREF(ret);
-	    return NULL;
+	    повернути NULL;
 	}
 
 	hash_remove(&dict->dv_hashtab, hi, "Python remove variable");
 	dictitem_free(di);
     }
 
-    return ret;
+    повернути ret;
 }
 
     static PyObject *
 DictionaryItem(DictionaryObject *self, PyObject *keyObject)
 {
-    return _DictionaryItem(self, keyObject, 0);
+    повернути _DictionaryItem(self, keyObject, 0);
 }
 
-    static int
+    static ціле
 DictionaryContains(DictionaryObject *self, PyObject *keyObject)
 {
     PyObject	*rObj = _DictionaryItem(self, keyObject, DICT_FLAG_RETURN_BOOL);
-    int		ret;
+    ціле		ret;
 
-    if (rObj == NULL)
-	return -1;
+    якщо (rObj == NULL)
+	повернути -1;
 
     ret = (rObj == Py_True);
 
     Py_DECREF(rObj);
 
-    return ret;
+    повернути ret;
 }
 
 typedef struct
 {
-    int		dii_changed;
+    ціле		dii_changed;
     hashtab_T	*dii_ht;
     hashitem_T	*dii_hi;
     long_u	dii_todo;
@@ -2132,25 +2132,25 @@ DictionaryIterNext(void **arg)
     PyObject	*ret;
     dictiterinfo_T **dii = (dictiterinfo_T**)arg;
 
-    if (!(*dii)->dii_todo)
-	return NULL;
+    якщо (!(*dii)->dii_todo)
+	повернути NULL;
 
-    if ((*dii)->dii_ht->ht_changed != (*dii)->dii_changed)
+    якщо ((*dii)->dii_ht->ht_changed != (*dii)->dii_changed)
     {
 	PyErr_SET_STRING(PyExc_RuntimeError,
 		N_("hashtab changed during iteration"));
-	return NULL;
+	повернути NULL;
     }
 
-    while (((*dii)->dii_todo) && HASHITEM_EMPTY((*dii)->dii_hi))
+    поки (((*dii)->dii_todo) && HASHITEM_EMPTY((*dii)->dii_hi))
 	++((*dii)->dii_hi);
 
     --((*dii)->dii_todo);
 
-    if (!(ret = PyBytes_FromString((char *)(*dii)->dii_hi->hi_key)))
-	return NULL;
+    якщо (!(ret = PyBytes_FromString((char *)(*dii)->dii_hi->hi_key)))
+	повернути NULL;
 
-    return ret;
+    повернути ret;
 }
 
     static PyObject *
@@ -2160,10 +2160,10 @@ DictionaryIter(PyObject *self_obj)
     dictiterinfo_T	*dii;
     hashtab_T		*ht;
 
-    if (!(dii = PyMem_New(dictiterinfo_T, 1)))
+    якщо (!(dii = PyMem_New(dictiterinfo_T, 1)))
     {
 	PyErr_NoMemory();
-	return NULL;
+	повернути NULL;
     }
 
     ht = &self->dict->dv_hashtab;
@@ -2172,12 +2172,12 @@ DictionaryIter(PyObject *self_obj)
     dii->dii_hi = ht->ht_array;
     dii->dii_todo = ht->ht_used;
 
-    return IterNew(dii,
+    повернути IterNew(dii,
 	    PyMem_Free, DictionaryIterNext,
 	    NULL, NULL, (PyObject *)self);
 }
 
-    static int
+    static ціле
 DictionaryAssItem(
 	DictionaryObject *self, PyObject *keyObject, PyObject *valObject)
 {
@@ -2187,73 +2187,73 @@ DictionaryAssItem(
     dictitem_T	*di;
     PyObject	*todecref;
 
-    if (dict->dv_lock)
+    якщо (dict->dv_lock)
     {
 	RAISE_LOCKED_DICTIONARY;
-	return -1;
+	повернути -1;
     }
 
-    if (!(key = StringToChars(keyObject, &todecref)))
-	return -1;
+    якщо (!(key = StringToChars(keyObject, &todecref)))
+	повернути -1;
 
-    if (*key == NUL)
+    якщо (*key == NUL)
     {
 	RAISE_NO_EMPTY_KEYS;
 	Py_XDECREF(todecref);
-	return -1;
+	повернути -1;
     }
 
     di = dict_find(dict, key, -1);
 
-    if (valObject == NULL)
+    якщо (valObject == NULL)
     {
 	hashitem_T	*hi;
 
-	if (di == NULL)
+	якщо (di == NULL)
 	{
 	    Py_XDECREF(todecref);
 	    PyErr_SetObject(PyExc_KeyError, keyObject);
-	    return -1;
+	    повернути -1;
 	}
 	hi = hash_find(&dict->dv_hashtab, di->di_key);
 	hash_remove(&dict->dv_hashtab, hi, "Python remove item");
 	dictitem_free(di);
 	Py_XDECREF(todecref);
-	return 0;
+	повернути 0;
     }
 
-    if (ConvertFromPyObject(valObject, &tv) == -1)
+    якщо (ConvertFromPyObject(valObject, &tv) == -1)
     {
 	Py_XDECREF(todecref);
-	return -1;
+	повернути -1;
     }
 
-    if (di == NULL)
+    якщо (di == NULL)
     {
-	if (!(di = dictitem_alloc(key)))
+	якщо (!(di = dictitem_alloc(key)))
 	{
 	    Py_XDECREF(todecref);
 	    PyErr_NoMemory();
-	    return -1;
+	    повернути -1;
 	}
 	di->di_tv.v_type = VAR_UNKNOWN;
 
-	if (dict_add(dict, di) == FAIL)
+	якщо (dict_add(dict, di) == FAIL)
 	{
 	    dictitem_free(di);
 	    RAISE_KEY_ADD_FAIL(key);
 	    Py_XDECREF(todecref);
-	    return -1;
+	    повернути -1;
 	}
     }
-    else
+    інакше
 	clear_tv(&di->di_tv);
 
     Py_XDECREF(todecref);
 
     copy_tv(&tv, &di->di_tv);
     clear_tv(&tv);
-    return 0;
+    повернути 0;
 }
 
 typedef PyObject *(*hi_to_py)(hashitem_T *);
@@ -2269,33 +2269,33 @@ DictionaryListObjects(DictionaryObject *self, hi_to_py hiconvert)
     PyObject	*newObj;
 
     ret = PyList_New(todo);
-    for (hi = dict->dv_hashtab.ht_array; todo > 0; ++hi)
+    для (hi = dict->dv_hashtab.ht_array; todo > 0; ++hi)
     {
-	if (!HASHITEM_EMPTY(hi))
+	якщо (!HASHITEM_EMPTY(hi))
 	{
-	    if (!(newObj = hiconvert(hi)))
+	    якщо (!(newObj = hiconvert(hi)))
 	    {
 		Py_DECREF(ret);
-		return NULL;
+		повернути NULL;
 	    }
 	    PyList_SET_ITEM(ret, i, newObj);
 	    --todo;
 	    ++i;
 	}
     }
-    return ret;
+    повернути ret;
 }
 
     static PyObject *
 dict_key(hashitem_T *hi)
 {
-    return PyBytes_FromString((char *)(hi->hi_key));
+    повернути PyBytes_FromString((char *)(hi->hi_key));
 }
 
     static PyObject *
 DictionaryListKeys(DictionaryObject *self, PyObject *args UNUSED)
 {
-    return DictionaryListObjects(self, dict_key);
+    повернути DictionaryListObjects(self, dict_key);
 }
 
     static PyObject *
@@ -2304,13 +2304,13 @@ dict_val(hashitem_T *hi)
     dictitem_T	*di;
 
     di = dict_lookup(hi);
-    return ConvertToPyObject(&di->di_tv);
+    повернути ConvertToPyObject(&di->di_tv);
 }
 
     static PyObject *
 DictionaryListValues(DictionaryObject *self, PyObject *args UNUSED)
 {
-    return DictionaryListObjects(self, dict_val);
+    повернути DictionaryListObjects(self, dict_val);
 }
 
     static PyObject *
@@ -2320,13 +2320,13 @@ dict_item(hashitem_T *hi)
     PyObject	*valObject;
     PyObject	*ret;
 
-    if (!(keyObject = dict_key(hi)))
-	return NULL;
+    якщо (!(keyObject = dict_key(hi)))
+	повернути NULL;
 
-    if (!(valObject = dict_val(hi)))
+    якщо (!(valObject = dict_val(hi)))
     {
 	Py_DECREF(keyObject);
-	return NULL;
+	повернути NULL;
     }
 
     ret = Py_BuildValue("(OO)", keyObject, valObject);
@@ -2334,13 +2334,13 @@ dict_item(hashitem_T *hi)
     Py_DECREF(keyObject);
     Py_DECREF(valObject);
 
-    return ret;
+    повернути ret;
 }
 
     static PyObject *
 DictionaryListItems(DictionaryObject *self, PyObject *args UNUSED)
 {
-    return DictionaryListObjects(self, dict_item);
+    повернути DictionaryListObjects(self, dict_item);
 }
 
     static PyObject *
@@ -2348,49 +2348,49 @@ DictionaryUpdate(DictionaryObject *self, PyObject *args, PyObject *kwargs)
 {
     dict_T	*dict = self->dict;
 
-    if (dict->dv_lock)
+    якщо (dict->dv_lock)
     {
 	RAISE_LOCKED_DICTIONARY;
-	return NULL;
+	повернути NULL;
     }
 
-    if (kwargs)
+    якщо (kwargs)
     {
 	typval_T	tv;
 
-	if (ConvertFromPyMapping(kwargs, &tv) == -1)
-	    return NULL;
+	якщо (ConvertFromPyMapping(kwargs, &tv) == -1)
+	    повернути NULL;
 
 	VimTryStart();
 	dict_extend(self->dict, tv.vval.v_dict, (char_u *) "force", NULL);
 	clear_tv(&tv);
-	if (VimTryEnd())
-	    return NULL;
+	якщо (VimTryEnd())
+	    повернути NULL;
     }
-    else
+    інакше
     {
 	PyObject	*obj = NULL;
 
-	if (!PyArg_ParseTuple(args, "|O", &obj))
-	    return NULL;
+	якщо (!PyArg_ParseTuple(args, "|O", &obj))
+	    повернути NULL;
 
-	if (obj == NULL)
+	якщо (obj == NULL)
 	{
 	    Py_INCREF(Py_None);
-	    return Py_None;
+	    повернути Py_None;
 	}
 
-	if (PyObject_HasAttrString(obj, "keys"))
-	    return DictionaryUpdate(self, NULL, obj);
-	else
+	якщо (PyObject_HasAttrString(obj, "keys"))
+	    повернути DictionaryUpdate(self, NULL, obj);
+	інакше
 	{
 	    PyObject	*iterator;
 	    PyObject	*item;
 
-	    if (!(iterator = PyObject_GetIter(obj)))
-		return NULL;
+	    якщо (!(iterator = PyObject_GetIter(obj)))
+		повернути NULL;
 
-	    while ((item = PyIter_Next(iterator)))
+	    поки ((item = PyIter_Next(iterator)))
 	    {
 		PyObject	*fast;
 		PyObject	*keyObject;
@@ -2400,92 +2400,92 @@ DictionaryUpdate(DictionaryObject *self, PyObject *args, PyObject *kwargs)
 		dictitem_T	*di;
 		hashitem_T	*hi;
 
-		if (!(fast = PySequence_Fast(item, "")))
+		якщо (!(fast = PySequence_Fast(item, "")))
 		{
 		    Py_DECREF(iterator);
 		    Py_DECREF(item);
-		    return NULL;
+		    повернути NULL;
 		}
 
 		Py_DECREF(item);
 
-		if (PySequence_Size(fast) != 2)
+		якщо (PySequence_Size(fast) != 2)
 		{
 		    Py_DECREF(iterator);
 		    Py_DECREF(fast);
 		    PyErr_FORMAT(PyExc_ValueError,
 			    N_("expected sequence element of size 2, "
 			    "but got sequence of size %d"),
-			    (int) PySequence_Size(fast));
-		    return NULL;
+			    (ціле) PySequence_Size(fast));
+		    повернути NULL;
 		}
 
 		keyObject = PySequence_GetItem(fast, 0);
 
-		if (!(key = StringToChars(keyObject, &todecref)))
+		якщо (!(key = StringToChars(keyObject, &todecref)))
 		{
 		    Py_DECREF(iterator);
 		    Py_DECREF(fast);
-		    return NULL;
+		    повернути NULL;
 		}
 
 		di = dictitem_alloc(key);
 
 		Py_XDECREF(todecref);
 
-		if (di == NULL)
+		якщо (di == NULL)
 		{
 		    Py_DECREF(fast);
 		    Py_DECREF(iterator);
 		    PyErr_NoMemory();
-		    return NULL;
+		    повернути NULL;
 		}
 		di->di_tv.v_type = VAR_UNKNOWN;
 
 		valObject = PySequence_GetItem(fast, 1);
 
-		if (ConvertFromPyObject(valObject, &di->di_tv) == -1)
+		якщо (ConvertFromPyObject(valObject, &di->di_tv) == -1)
 		{
 		    Py_DECREF(iterator);
 		    Py_DECREF(fast);
 		    dictitem_free(di);
-		    return NULL;
+		    повернути NULL;
 		}
 
 		Py_DECREF(fast);
 
 		hi = hash_find(&dict->dv_hashtab, di->di_key);
-		if (!HASHITEM_EMPTY(hi) || dict_add(dict, di) == FAIL)
+		якщо (!HASHITEM_EMPTY(hi) || dict_add(dict, di) == FAIL)
 		{
 		    RAISE_KEY_ADD_FAIL(di->di_key);
 		    Py_DECREF(iterator);
 		    dictitem_free(di);
-		    return NULL;
+		    повернути NULL;
 		}
 	    }
 
 	    Py_DECREF(iterator);
 
 	    // Iterator may have finished due to an exception
-	    if (PyErr_Occurred())
-		return NULL;
+	    якщо (PyErr_Occurred())
+		повернути NULL;
 	}
     }
     Py_INCREF(Py_None);
-    return Py_None;
+    повернути Py_None;
 }
 
     static PyObject *
 DictionaryGet(DictionaryObject *self, PyObject *args)
 {
-    return _DictionaryItem(self, args,
+    повернути _DictionaryItem(self, args,
 			    DICT_FLAG_HAS_DEFAULT|DICT_FLAG_NONE_DEFAULT);
 }
 
     static PyObject *
 DictionaryPop(DictionaryObject *self, PyObject *args)
 {
-    return _DictionaryItem(self, args, DICT_FLAG_HAS_DEFAULT|DICT_FLAG_POP);
+    повернути _DictionaryItem(self, args, DICT_FLAG_HAS_DEFAULT|DICT_FLAG_POP);
 }
 
     static PyObject *
@@ -2496,37 +2496,37 @@ DictionaryPopItem(DictionaryObject *self, PyObject *args UNUSED)
     PyObject	*valObject;
     dictitem_T	*di;
 
-    if (self->dict->dv_hashtab.ht_used == 0)
+    якщо (self->dict->dv_hashtab.ht_used == 0)
     {
 	PyErr_SetNone(PyExc_KeyError);
-	return NULL;
+	повернути NULL;
     }
 
     hi = self->dict->dv_hashtab.ht_array;
-    while (HASHITEM_EMPTY(hi))
+    поки (HASHITEM_EMPTY(hi))
 	++hi;
 
     di = dict_lookup(hi);
 
-    if (!(valObject = ConvertToPyObject(&di->di_tv)))
-	return NULL;
+    якщо (!(valObject = ConvertToPyObject(&di->di_tv)))
+	повернути NULL;
 
-    if (!(ret = Py_BuildValue("(" Py_bytes_fmt "O)", hi->hi_key, valObject)))
+    якщо (!(ret = Py_BuildValue("(" Py_bytes_fmt "O)", hi->hi_key, valObject)))
     {
 	Py_DECREF(valObject);
-	return NULL;
+	повернути NULL;
     }
 
     hash_remove(&self->dict->dv_hashtab, hi, "Python pop item");
     dictitem_free(di);
 
-    return ret;
+    повернути ret;
 }
 
     static PyObject *
 DictionaryHasKey(DictionaryObject *self, PyObject *keyObject)
 {
-    return _DictionaryItem(self, keyObject, DICT_FLAG_RETURN_BOOL);
+    повернути _DictionaryItem(self, keyObject, DICT_FLAG_RETURN_BOOL);
 }
 
 static PySequenceMethods DictionaryAsSeq = {
@@ -2577,19 +2577,19 @@ ListNew(PyTypeObject *subtype, list_T *list)
 {
     ListObject	*self;
 
-    if (list == NULL)
-	return NULL;
+    якщо (list == NULL)
+	повернути NULL;
 
     self = (ListObject *) Py_TYPE_GET_TP_ALLOC(subtype)(subtype, 0);
-    if (self == NULL)
-	return NULL;
+    якщо (self == NULL)
+	повернути NULL;
     self->list = list;
     ++list->lv_refcount;
     CHECK_LIST_MATERIALIZE(list);
 
     pyll_add((PyObject *)(self), &self->ref, &lastlist);
 
-    return (PyObject *)(self);
+    повернути (PyObject *)(self);
 }
 
     static list_T *
@@ -2597,44 +2597,44 @@ py_list_alloc(void)
 {
     list_T	*ret;
 
-    if (!(ret = list_alloc()))
+    якщо (!(ret = list_alloc()))
     {
 	PyErr_NoMemory();
-	return NULL;
+	повернути NULL;
     }
     ++ret->lv_refcount;
 
-    return ret;
+    повернути ret;
 }
 
-    static int
+    static ціле
 list_py_concat(list_T *l, PyObject *obj, PyObject *lookup_dict)
 {
     PyObject	*iterator;
     PyObject	*item;
     listitem_T	*li;
 
-    if (!(iterator = PyObject_GetIter(obj)))
-	return -1;
+    якщо (!(iterator = PyObject_GetIter(obj)))
+	повернути -1;
 
-    while ((item = PyIter_Next(iterator)))
+    поки ((item = PyIter_Next(iterator)))
     {
-	if (!(li = listitem_alloc()))
+	якщо (!(li = listitem_alloc()))
 	{
 	    PyErr_NoMemory();
 	    Py_DECREF(item);
 	    Py_DECREF(iterator);
-	    return -1;
+	    повернути -1;
 	}
 	li->li_tv.v_lock = 0;
 	li->li_tv.v_type = VAR_UNKNOWN;
 
-	if (_ConvertFromPyObject(item, &li->li_tv, lookup_dict) == -1)
+	якщо (_ConvertFromPyObject(item, &li->li_tv, lookup_dict) == -1)
 	{
 	    Py_DECREF(item);
 	    Py_DECREF(iterator);
 	    listitem_free(l, li);
-	    return -1;
+	    повернути -1;
 	}
 
 	Py_DECREF(item);
@@ -2645,10 +2645,10 @@ list_py_concat(list_T *l, PyObject *obj, PyObject *lookup_dict)
     Py_DECREF(iterator);
 
     // Iterator may have finished due to an exception
-    if (PyErr_Occurred())
-	return -1;
+    якщо (PyErr_Occurred())
+	повернути -1;
 
-    return 0;
+    повернути 0;
 }
 
     static PyObject *
@@ -2657,40 +2657,40 @@ ListConstructor(PyTypeObject *subtype, PyObject *args, PyObject *kwargs)
     list_T	*list;
     PyObject	*obj = NULL;
 
-    if (kwargs)
+    якщо (kwargs)
     {
 	PyErr_SET_STRING(PyExc_TypeError,
 		N_("list constructor does not accept keyword arguments"));
-	return NULL;
+	повернути NULL;
     }
 
-    if (!PyArg_ParseTuple(args, "|O", &obj))
-	return NULL;
+    якщо (!PyArg_ParseTuple(args, "|O", &obj))
+	повернути NULL;
 
-    if (!(list = py_list_alloc()))
-	return NULL;
+    якщо (!(list = py_list_alloc()))
+	повернути NULL;
 
-    if (obj)
+    якщо (obj)
     {
 	PyObject	*lookup_dict;
 
-	if (!(lookup_dict = PyDict_New()))
+	якщо (!(lookup_dict = PyDict_New()))
 	{
 	    list_unref(list);
-	    return NULL;
+	    повернути NULL;
 	}
 
-	if (list_py_concat(list, obj, lookup_dict) == -1)
+	якщо (list_py_concat(list, obj, lookup_dict) == -1)
 	{
 	    Py_DECREF(lookup_dict);
 	    list_unref(list);
-	    return NULL;
+	    повернути NULL;
 	}
 
 	Py_DECREF(lookup_dict);
     }
 
-    return ListNew(subtype, list);
+    повернути ListNew(subtype, list);
 }
 
     static void
@@ -2706,7 +2706,7 @@ ListDestructor(PyObject *self_obj)
     static PyInt
 ListLength(ListObject *self)
 {
-    return ((PyInt) (self->list->lv_len));
+    повернути ((PyInt) (self->list->lv_len));
 }
 
     static PyObject *
@@ -2714,20 +2714,20 @@ ListIndex(ListObject *self, Py_ssize_t index)
 {
     listitem_T	*li;
 
-    if (index >= ListLength(self))
+    якщо (index >= ListLength(self))
     {
 	PyErr_SET_STRING(PyExc_IndexError, N_("list index out of range"));
-	return NULL;
+	повернути NULL;
     }
     li = list_find(self->list, (long) index);
-    if (li == NULL)
+    якщо (li == NULL)
     {
 	// No more suitable format specifications in python-2.3
 	PyErr_VIM_FORMAT(N_("internal error: failed to get Vim list item %d"),
-		(int) index);
-	return NULL;
+		(ціле) index);
+	повернути NULL;
     }
-    return ConvertToPyObject(&li->li_tv);
+    повернути ConvertToPyObject(&li->li_tv);
 }
 
     static PyObject *
@@ -2737,62 +2737,62 @@ ListSlice(ListObject *self, Py_ssize_t first, Py_ssize_t step,
     PyInt	i;
     PyObject	*list;
 
-    if (step == 0)
+    якщо (step == 0)
     {
 	PyErr_SET_STRING(PyExc_ValueError, N_("slice step cannot be zero"));
-	return NULL;
+	повернути NULL;
     }
 
     list = PyList_New(slicelen);
-    if (list == NULL)
-	return NULL;
+    якщо (list == NULL)
+	повернути NULL;
 
-    for (i = 0; i < slicelen; ++i)
+    для (i = 0; i < slicelen; ++i)
     {
 	PyObject	*item;
 
 	item = ListIndex(self, first + i*step);
-	if (item == NULL)
+	якщо (item == NULL)
 	{
 	    Py_DECREF(list);
-	    return NULL;
+	    повернути NULL;
 	}
 
 	PyList_SET_ITEM(list, i, item);
     }
 
-    return list;
+    повернути list;
 }
 
     static PyObject *
 ListItem(ListObject *self, PyObject* idx)
 {
-#if PY_MAJOR_VERSION < 3
-    if (PyInt_Check(idx))
+#якщо PY_MAJOR_VERSION < 3
+    якщо (PyInt_Check(idx))
     {
 	long _idx = PyInt_AsLong(idx);
-	return ListIndex(self, _idx);
+	повернути ListIndex(self, _idx);
     }
-    else
+    інакше
 #endif
-    if (PyLong_Check(idx))
+    якщо (PyLong_Check(idx))
     {
 	long _idx = PyLong_AsLong(idx);
-	return ListIndex(self, _idx);
+	повернути ListIndex(self, _idx);
     }
-    else if (PySlice_Check(idx))
+    інакше якщо (PySlice_Check(idx))
     {
 	Py_ssize_t start, stop, step, slicelen;
 
-	if (PySlice_GetIndicesEx((PySliceObject_T *)idx, ListLength(self),
+	якщо (PySlice_GetIndicesEx((PySliceObject_T *)idx, ListLength(self),
 				 &start, &stop, &step, &slicelen) < 0)
-	    return NULL;
-	return ListSlice(self, start, step, slicelen);
+	    повернути NULL;
+	повернути ListSlice(self, start, step, slicelen);
     }
-    else
+    інакше
     {
 	RAISE_INVALID_INDEX_TYPE(idx);
-	return NULL;
+	повернути NULL;
     }
 }
 
@@ -2800,12 +2800,12 @@ ListItem(ListObject *self, PyObject* idx)
 list_restore(Py_ssize_t numadded, Py_ssize_t numreplaced, Py_ssize_t slicelen,
 	list_T *l, listitem_T **lis, listitem_T *lastaddedli)
 {
-    while (numreplaced--)
+    поки (numreplaced--)
     {
 	list_insert(l, lis[numreplaced], lis[slicelen + numreplaced]);
 	listitem_remove(l, lis[slicelen + numreplaced]);
     }
-    while (numadded--)
+    поки (numadded--)
     {
 	listitem_T	*next;
 
@@ -2815,7 +2815,7 @@ list_restore(Py_ssize_t numadded, Py_ssize_t numreplaced, Py_ssize_t slicelen,
     }
 }
 
-    static int
+    static ціле
 ListAssSlice(ListObject *self, Py_ssize_t first,
 	     Py_ssize_t step, Py_ssize_t slicelen, PyObject *obj)
 {
@@ -2835,30 +2835,30 @@ ListAssSlice(ListObject *self, Py_ssize_t first,
 
     size = ListLength(self);
 
-    if (l->lv_lock)
+    якщо (l->lv_lock)
     {
 	RAISE_LOCKED_LIST;
-	return -1;
+	повернути -1;
     }
 
-    if (step == 0)
+    якщо (step == 0)
     {
 	PyErr_SET_STRING(PyExc_ValueError, N_("slice step cannot be zero"));
-	return -1;
+	повернути -1;
     }
 
-    if (step != 1 && slicelen == 0)
+    якщо (step != 1 && slicelen == 0)
     {
 	// Nothing to do. Only error out if obj has some items.
-	int		ret = 0;
+	ціле		ret = 0;
 
-	if (obj == NULL)
-	    return 0;
+	якщо (obj == NULL)
+	    повернути 0;
 
-	if (!(iterator = PyObject_GetIter(obj)))
-	    return -1;
+	якщо (!(iterator = PyObject_GetIter(obj)))
+	    повернути -1;
 
-	if ((item = PyIter_Next(iterator)))
+	якщо ((item = PyIter_Next(iterator)))
 	{
 	    PyErr_FORMAT(PyExc_ValueError,
 		    N_("attempt to assign sequence of size greater than %d "
@@ -2867,77 +2867,77 @@ ListAssSlice(ListObject *self, Py_ssize_t first,
 	    ret = -1;
 	}
 	Py_DECREF(iterator);
-	return ret;
+	повернути ret;
     }
 
-    if (obj != NULL)
+    якщо (obj != NULL)
 	// XXX May allocate zero bytes.
-	if (!(lis = PyMem_New(listitem_T *, slicelen * 2)))
+	якщо (!(lis = PyMem_New(listitem_T *, slicelen * 2)))
 	{
 	    PyErr_NoMemory();
-	    return -1;
+	    повернути -1;
 	}
 
-    if (first == size)
+    якщо (first == size)
 	li = NULL;
-    else
+    інакше
     {
 	li = list_find(l, (long) first);
-	if (li == NULL)
+	якщо (li == NULL)
 	{
 	    PyErr_VIM_FORMAT(N_("internal error: no Vim list item %d"),
-		    (int)first);
-	    if (obj != NULL)
+		    (ціле)first);
+	    якщо (obj != NULL)
 		PyMem_Free(lis);
-	    return -1;
+	    повернути -1;
 	}
 	i = slicelen;
-	while (i-- && li != NULL)
+	поки (i-- && li != NULL)
 	{
 	    j = step;
 	    next = li;
-	    if (step > 0)
-		while (next != NULL && ((next = next->li_next) != NULL) && --j);
-	    else
-		while (next != NULL && ((next = next->li_prev) != NULL) && ++j);
+	    якщо (step > 0)
+		поки (next != NULL && ((next = next->li_next) != NULL) && --j);
+	    інакше
+		поки (next != NULL && ((next = next->li_prev) != NULL) && ++j);
 
-	    if (obj == NULL)
+	    якщо (obj == NULL)
 		listitem_remove(l, li);
-	    else
+	    інакше
 		lis[slicelen - i - 1] = li;
 
 	    li = next;
 	}
-	if (li == NULL && i != -1)
+	якщо (li == NULL && i != -1)
 	{
 	    PyErr_SET_VIM(N_("internal error: not enough list items"));
-	    if (obj != NULL)
+	    якщо (obj != NULL)
 		PyMem_Free(lis);
-	    return -1;
+	    повернути -1;
 	}
     }
 
-    if (obj == NULL)
-	return 0;
+    якщо (obj == NULL)
+	повернути 0;
 
-    if (!(iterator = PyObject_GetIter(obj)))
+    якщо (!(iterator = PyObject_GetIter(obj)))
     {
 	PyMem_Free(lis);
-	return -1;
+	повернути -1;
     }
 
     i = 0;
-    while ((item = PyIter_Next(iterator)))
+    поки ((item = PyIter_Next(iterator)))
     {
-	if (ConvertFromPyObject(item, &v) == -1)
+	якщо (ConvertFromPyObject(item, &v) == -1)
 	{
 	    Py_DECREF(iterator);
 	    Py_DECREF(item);
 	    PyMem_Free(lis);
-	    return -1;
+	    повернути -1;
 	}
 	Py_DECREF(item);
-	if (list_insert_tv(l, &v, numreplaced < slicelen
+	якщо (list_insert_tv(l, &v, numreplaced < slicelen
 				    ? lis[numreplaced]
 				    : li) == FAIL)
 	{
@@ -2945,66 +2945,66 @@ ListAssSlice(ListObject *self, Py_ssize_t first,
 	    PyErr_SET_VIM(N_("internal error: failed to add item to list"));
 	    list_restore(numadded, numreplaced, slicelen, l, lis, lastaddedli);
 	    PyMem_Free(lis);
-	    return -1;
+	    повернути -1;
 	}
-	if (numreplaced < slicelen)
+	якщо (numreplaced < slicelen)
 	{
 	    lis[slicelen + numreplaced] = lis[numreplaced]->li_prev;
 	    vimlist_remove(l, lis[numreplaced], lis[numreplaced]);
 	    numreplaced++;
 	}
-	else
+	інакше
 	{
-	    if (li)
+	    якщо (li)
 		lastaddedli = li->li_prev;
-	    else
+	    інакше
 		lastaddedli = l->lv_u.mat.lv_last;
 	    numadded++;
 	}
 	clear_tv(&v);
-	if (step != 1 && i >= slicelen)
+	якщо (step != 1 && i >= slicelen)
 	{
 	    Py_DECREF(iterator);
 	    PyErr_FORMAT(PyExc_ValueError,
 		    N_("attempt to assign sequence of size greater than %d "
-			"to extended slice"), (int) slicelen);
+			"to extended slice"), (ціле) slicelen);
 	    list_restore(numadded, numreplaced, slicelen, l, lis, lastaddedli);
 	    PyMem_Free(lis);
-	    return -1;
+	    повернути -1;
 	}
 	++i;
     }
     Py_DECREF(iterator);
 
-    if (step != 1 && i != slicelen)
+    якщо (step != 1 && i != slicelen)
     {
 	PyErr_FORMAT2(PyExc_ValueError,
 		N_("attempt to assign sequence of size %d to extended slice "
-		    "of size %d"), (int) i, (int) slicelen);
+		    "of size %d"), (ціле) i, (ціле) slicelen);
 	list_restore(numadded, numreplaced, slicelen, l, lis, lastaddedli);
 	PyMem_Free(lis);
-	return -1;
+	повернути -1;
     }
 
-    if (PyErr_Occurred())
+    якщо (PyErr_Occurred())
     {
 	list_restore(numadded, numreplaced, slicelen, l, lis, lastaddedli);
 	PyMem_Free(lis);
-	return -1;
+	повернути -1;
     }
 
-    for (i = 0; i < numreplaced; i++)
+    для (i = 0; i < numreplaced; i++)
 	listitem_free(l, lis[i]);
-    if (step == 1)
-	for (i = numreplaced; i < slicelen; i++)
+    якщо (step == 1)
+	для (i = numreplaced; i < slicelen; i++)
 	    listitem_remove(l, lis[i]);
 
     PyMem_Free(lis);
 
-    return 0;
+    повернути 0;
 }
 
-    static int
+    static ціле
 ListAssIndex(ListObject *self, Py_ssize_t index, PyObject *obj)
 {
     typval_T	tv;
@@ -3012,90 +3012,90 @@ ListAssIndex(ListObject *self, Py_ssize_t index, PyObject *obj)
     listitem_T	*li;
     Py_ssize_t	length = ListLength(self);
 
-    if (l->lv_lock)
+    якщо (l->lv_lock)
     {
 	RAISE_LOCKED_LIST;
-	return -1;
+	повернути -1;
     }
-    if (index > length || (index == length && obj == NULL))
+    якщо (index > length || (index == length && obj == NULL))
     {
 	PyErr_SET_STRING(PyExc_IndexError, N_("list index out of range"));
-	return -1;
+	повернути -1;
     }
 
-    if (obj == NULL)
+    якщо (obj == NULL)
     {
 	li = list_find(l, (long) index);
-	if (li == NULL)
+	якщо (li == NULL)
 	{
 	    PyErr_VIM_FORMAT(N_("internal error: failed to get Vim "
-			"list item %d"), (int) index);
-	    return -1;
+			"list item %d"), (ціле) index);
+	    повернути -1;
 	}
 	vimlist_remove(l, li, li);
 	clear_tv(&li->li_tv);
 	vim_free(li);
-	return 0;
+	повернути 0;
     }
 
-    if (ConvertFromPyObject(obj, &tv) == -1)
-	return -1;
+    якщо (ConvertFromPyObject(obj, &tv) == -1)
+	повернути -1;
 
-    if (index == length)
+    якщо (index == length)
     {
-	if (list_append_tv(l, &tv) == FAIL)
+	якщо (list_append_tv(l, &tv) == FAIL)
 	{
 	    clear_tv(&tv);
 	    PyErr_SET_VIM(N_("failed to add item to list"));
-	    return -1;
+	    повернути -1;
 	}
     }
-    else
+    інакше
     {
 	li = list_find(l, (long) index);
-	if (li == NULL)
+	якщо (li == NULL)
 	{
 	    PyErr_VIM_FORMAT(N_("internal error: failed to get Vim "
-			"list item %d"), (int) index);
-	    return -1;
+			"list item %d"), (ціле) index);
+	    повернути -1;
 	}
 	clear_tv(&li->li_tv);
 	copy_tv(&tv, &li->li_tv);
 	clear_tv(&tv);
     }
-    return 0;
+    повернути 0;
 }
 
-    static int
+    static ціле
 ListAssItem(ListObject *self, PyObject *idx, PyObject *obj)
 {
-#if PY_MAJOR_VERSION < 3
-    if (PyInt_Check(idx))
+#якщо PY_MAJOR_VERSION < 3
+    якщо (PyInt_Check(idx))
     {
 	long _idx = PyInt_AsLong(idx);
-	return (int)ListAssIndex(self, _idx, obj);
+	повернути (ціле)ListAssIndex(self, _idx, obj);
     }
-    else
+    інакше
 #endif
-    if (PyLong_Check(idx))
+    якщо (PyLong_Check(idx))
     {
 	long _idx = PyLong_AsLong(idx);
-	return (int)ListAssIndex(self, _idx, obj);
+	повернути (ціле)ListAssIndex(self, _idx, obj);
     }
-    else if (PySlice_Check(idx))
+    інакше якщо (PySlice_Check(idx))
     {
 	Py_ssize_t start, stop, step, slicelen;
 
-	if (PySlice_GetIndicesEx((PySliceObject_T *)idx, ListLength(self),
+	якщо (PySlice_GetIndicesEx((PySliceObject_T *)idx, ListLength(self),
 				 &start, &stop, &step, &slicelen) < 0)
-	    return -1;
-	return (int)ListAssSlice(self, start, step, slicelen,
+	    повернути -1;
+	повернути (ціле)ListAssSlice(self, start, step, slicelen,
 		obj);
     }
-    else
+    інакше
     {
 	RAISE_INVALID_INDEX_TYPE(idx);
-	return -1;
+	повернути -1;
     }
 }
 
@@ -3105,24 +3105,24 @@ ListConcatInPlace(ListObject *self, PyObject *obj)
     list_T	*l = self->list;
     PyObject	*lookup_dict;
 
-    if (l->lv_lock)
+    якщо (l->lv_lock)
     {
 	RAISE_LOCKED_LIST;
-	return NULL;
+	повернути NULL;
     }
 
-    if (!(lookup_dict = PyDict_New()))
-	return NULL;
+    якщо (!(lookup_dict = PyDict_New()))
+	повернути NULL;
 
-    if (list_py_concat(l, obj, lookup_dict) == -1)
+    якщо (list_py_concat(l, obj, lookup_dict) == -1)
     {
 	Py_DECREF(lookup_dict);
-	return NULL;
+	повернути NULL;
     }
     Py_DECREF(lookup_dict);
 
     Py_INCREF((PyObject *)self);
-    return (PyObject *)(self);
+    повернути (PyObject *)(self);
 }
 
 typedef struct
@@ -3146,15 +3146,15 @@ ListIterNext(void **arg)
     PyObject	*ret;
     listiterinfo_T **lii = (listiterinfo_T**)arg;
 
-    if (!((*lii)->lw.lw_item))
-	return NULL;
+    якщо (!((*lii)->lw.lw_item))
+	повернути NULL;
 
-    if (!(ret = ConvertToPyObject(&((*lii)->lw.lw_item->li_tv))))
-	return NULL;
+    якщо (!(ret = ConvertToPyObject(&((*lii)->lw.lw_item->li_tv))))
+	повернути NULL;
 
     (*lii)->lw.lw_item = (*lii)->lw.lw_item->li_next;
 
-    return ret;
+    повернути ret;
 }
 
     static PyObject *
@@ -3164,10 +3164,10 @@ ListIter(PyObject *self_obj)
     listiterinfo_T	*lii;
     list_T	*l = self->list;
 
-    if (!(lii = PyMem_New(listiterinfo_T, 1)))
+    якщо (!(lii = PyMem_New(listiterinfo_T, 1)))
     {
 	PyErr_NoMemory();
-	return NULL;
+	повернути NULL;
     }
 
     CHECK_LIST_MATERIALIZE(l);
@@ -3176,7 +3176,7 @@ ListIter(PyObject *self_obj)
     lii->list = l;
     ++l->lv_refcount;
 
-    return IterNew(lii,
+    повернути IterNew(lii,
 	    ListIterDestruct, ListIterNext,
 	    NULL, NULL, (PyObject *)self);
 }
@@ -3189,43 +3189,43 @@ static char *ListAttrs[] = {
     static PyObject *
 ListDir(PyObject *self, PyObject *args UNUSED)
 {
-    return ObjectDir(self, ListAttrs);
+    повернути ObjectDir(self, ListAttrs);
 }
 
-    static int
+    static ціле
 ListSetattr(PyObject *self_obj, char *name, PyObject *valObject)
 {
     ListObject *self = (ListObject*)self_obj;
-    if (valObject == NULL)
+    якщо (valObject == NULL)
     {
 	PyErr_SET_STRING(PyExc_AttributeError,
 		N_("cannot delete vim.List attributes"));
-	return -1;
+	повернути -1;
     }
 
-    if (strcmp(name, "locked") == 0)
+    якщо (strcmp(name, "locked") == 0)
     {
-	if (self->list->lv_lock == VAR_FIXED)
+	якщо (self->list->lv_lock == VAR_FIXED)
 	{
 	    PyErr_SET_STRING(PyExc_TypeError, N_("cannot modify fixed list"));
-	    return -1;
+	    повернути -1;
 	}
-	else
+	інакше
 	{
-	    int		istrue = PyObject_IsTrue(valObject);
-	    if (istrue == -1)
-		return -1;
-	    else if (istrue)
+	    ціле		istrue = PyObject_IsTrue(valObject);
+	    якщо (istrue == -1)
+		повернути -1;
+	    інакше якщо (istrue)
 		self->list->lv_lock = VAR_LOCKED;
-	    else
+	    інакше
 		self->list->lv_lock = 0;
 	}
-	return 0;
+	повернути 0;
     }
-    else
+    інакше
     {
 	PyErr_FORMAT(PyExc_AttributeError, N_("cannot set attribute %s"), name);
-	return -1;
+	повернути -1;
     }
 }
 
@@ -3270,18 +3270,18 @@ TupleNew(PyTypeObject *subtype, tuple_T *tuple)
 {
     TupleObject	*self;
 
-    if (tuple == NULL)
-	return NULL;
+    якщо (tuple == NULL)
+	повернути NULL;
 
     self = (TupleObject *) Py_TYPE_GET_TP_ALLOC(subtype)(subtype, 0);
-    if (self == NULL)
-	return NULL;
+    якщо (self == NULL)
+	повернути NULL;
     self->tuple = tuple;
     ++tuple->tv_refcount;
 
     pyll_add((PyObject *)(self), &self->ref, &lasttuple);
 
-    return (PyObject *)(self);
+    повернути (PyObject *)(self);
 }
 
     static tuple_T *
@@ -3289,52 +3289,52 @@ py_tuple_alloc(void)
 {
     tuple_T	*ret;
 
-    if (!(ret = tuple_alloc()))
+    якщо (!(ret = tuple_alloc()))
     {
 	PyErr_NoMemory();
-	return NULL;
+	повернути NULL;
     }
     ++ret->tv_refcount;
 
-    return ret;
+    повернути ret;
 }
 
-    static int
+    static ціле
 tuple_py_concat(tuple_T *t, PyObject *obj, PyObject *lookup_dict)
 {
     PyObject	*iterator;
     PyObject	*item;
 
-    if (!(iterator = PyObject_GetIter(obj)))
-	return -1;
+    якщо (!(iterator = PyObject_GetIter(obj)))
+	повернути -1;
 
-    while ((item = PyIter_Next(iterator)))
+    поки ((item = PyIter_Next(iterator)))
     {
 	typval_T    new_tv;
 
-	if (_ConvertFromPyObject(item, &new_tv, lookup_dict) == -1)
+	якщо (_ConvertFromPyObject(item, &new_tv, lookup_dict) == -1)
 	{
 	    Py_DECREF(item);
 	    Py_DECREF(iterator);
-	    return -1;
+	    повернути -1;
 	}
 
 	Py_DECREF(item);
 
-	if (tuple_append_tv(t, &new_tv) == FAIL)
+	якщо (tuple_append_tv(t, &new_tv) == FAIL)
 	{
 	    Py_DECREF(iterator);
-	    return -1;
+	    повернути -1;
 	}
     }
 
     Py_DECREF(iterator);
 
     // Iterator may have finished due to an exception
-    if (PyErr_Occurred())
-	return -1;
+    якщо (PyErr_Occurred())
+	повернути -1;
 
-    return 0;
+    повернути 0;
 }
 
     static PyObject *
@@ -3343,40 +3343,40 @@ TupleConstructor(PyTypeObject *subtype, PyObject *args, PyObject *kwargs)
     tuple_T	*tuple;
     PyObject	*obj = NULL;
 
-    if (kwargs)
+    якщо (kwargs)
     {
 	PyErr_SET_STRING(PyExc_TypeError,
 		N_("tuple constructor does not accept keyword arguments"));
-	return NULL;
+	повернути NULL;
     }
 
-    if (!PyArg_ParseTuple(args, "|O", &obj))
-	return NULL;
+    якщо (!PyArg_ParseTuple(args, "|O", &obj))
+	повернути NULL;
 
-    if (!(tuple = py_tuple_alloc()))
-	return NULL;
+    якщо (!(tuple = py_tuple_alloc()))
+	повернути NULL;
 
-    if (obj)
+    якщо (obj)
     {
 	PyObject	*lookup_dict;
 
-	if (!(lookup_dict = PyDict_New()))
+	якщо (!(lookup_dict = PyDict_New()))
 	{
 	    tuple_unref(tuple);
-	    return NULL;
+	    повернути NULL;
 	}
 
-	if (tuple_py_concat(tuple, obj, lookup_dict) == -1)
+	якщо (tuple_py_concat(tuple, obj, lookup_dict) == -1)
 	{
 	    Py_DECREF(lookup_dict);
 	    tuple_unref(tuple);
-	    return NULL;
+	    повернути NULL;
 	}
 
 	Py_DECREF(lookup_dict);
     }
 
-    return TupleNew(subtype, tuple);
+    повернути TupleNew(subtype, tuple);
 }
 
     static void
@@ -3392,7 +3392,7 @@ TupleDestructor(PyObject *self_obj)
     static PyInt
 TupleLength(TupleObject *self)
 {
-    return ((PyInt)(tuple_len(self->tuple)));
+    повернути ((PyInt)(tuple_len(self->tuple)));
 }
 
     static PyObject *
@@ -3400,15 +3400,15 @@ TupleIndex(TupleObject *self, Py_ssize_t index)
 {
     PyInt	len = TupleLength(self);
 
-    if (index < 0)
+    якщо (index < 0)
 	index = len + index;
 
-    if (index < 0 || index >= len)
+    якщо (index < 0 || index >= len)
     {
 	PyErr_SET_STRING(PyExc_IndexError, N_("tuple index out of range"));
-	return NULL;
+	повернути NULL;
     }
-    return ConvertToPyObject(TUPLE_ITEM(self->tuple, index));
+    повернути ConvertToPyObject(TUPLE_ITEM(self->tuple, index));
 }
 
 /*
@@ -3426,62 +3426,62 @@ TupleSlice(
     PyObject	*tuple;
 
     tuple = PyTuple_New(slicelen);
-    if (tuple == NULL)
-	return NULL;
+    якщо (tuple == NULL)
+	повернути NULL;
 
-    for (i = 0; i < slicelen; ++i)
+    для (i = 0; i < slicelen; ++i)
     {
 	PyObject	*item;
 
 	item = TupleIndex(self, first + i * step);
-	if (item == NULL)
+	якщо (item == NULL)
 	{
 	    Py_DECREF(tuple);
-	    return NULL;
+	    повернути NULL;
 	}
 
 	PyTuple_SetItem(tuple, i, item);
     }
 
-    return tuple;
+    повернути tuple;
 }
 
     static PyObject *
 TupleItem(TupleObject *self, PyObject* idx)
 {
-#if PY_MAJOR_VERSION < 3
-    if (PyInt_Check(idx))
+#якщо PY_MAJOR_VERSION < 3
+    якщо (PyInt_Check(idx))
     {
 	long _idx = PyInt_AsLong(idx);
-	return TupleIndex(self, _idx);
+	повернути TupleIndex(self, _idx);
     }
-    else
+    інакше
 #endif
-    if (PyLong_Check(idx))
+    якщо (PyLong_Check(idx))
     {
 	long _idx = PyLong_AsLong(idx);
-	return TupleIndex(self, _idx);
+	повернути TupleIndex(self, _idx);
     }
-    else if (PySlice_Check(idx))
+    інакше якщо (PySlice_Check(idx))
     {
 	Py_ssize_t start, stop, step, slicelen;
 
-	if (PySlice_GetIndicesEx((PySliceObject_T *)idx, TupleLength(self),
+	якщо (PySlice_GetIndicesEx((PySliceObject_T *)idx, TupleLength(self),
 				 &start, &stop, &step, &slicelen) < 0)
-	    return NULL;
-	return TupleSlice(self, start, step, slicelen);
+	    повернути NULL;
+	повернути TupleSlice(self, start, step, slicelen);
     }
-    else
+    інакше
     {
 	RAISE_INVALID_INDEX_TYPE(idx);
-	return NULL;
+	повернути NULL;
     }
 }
 
 typedef struct
 {
     tuple_T	*tuple;
-    int		index;
+    ціле		index;
 } tupleiterinfo_T;
 
     static void
@@ -3498,15 +3498,15 @@ TupleIterNext(void **arg)
     PyObject	*ret;
     tupleiterinfo_T **tii = (tupleiterinfo_T**)arg;
 
-    if ((*tii)->index >= TUPLE_LEN((*tii)->tuple))
-	return NULL;
+    якщо ((*tii)->index >= TUPLE_LEN((*tii)->tuple))
+	повернути NULL;
 
-    if (!(ret = ConvertToPyObject(TUPLE_ITEM((*tii)->tuple, (*tii)->index))))
-	return NULL;
+    якщо (!(ret = ConvertToPyObject(TUPLE_ITEM((*tii)->tuple, (*tii)->index))))
+	повернути NULL;
 
     (*tii)->index++;
 
-    return ret;
+    повернути ret;
 }
 
     static PyObject *
@@ -3516,17 +3516,17 @@ TupleIter(PyObject *self_obj)
     tupleiterinfo_T	*tii;
     tuple_T	*t = self->tuple;
 
-    if (!(tii = PyMem_New(tupleiterinfo_T, 1)))
+    якщо (!(tii = PyMem_New(tupleiterinfo_T, 1)))
     {
 	PyErr_NoMemory();
-	return NULL;
+	повернути NULL;
     }
 
     tii->tuple = t;
     tii->index = 0;
     ++t->tv_refcount;
 
-    return IterNew(tii,
+    повернути IterNew(tii,
 	    TupleIterDestruct, TupleIterNext,
 	    NULL, NULL, (PyObject *)self);
 }
@@ -3539,43 +3539,43 @@ static char *TupleAttrs[] = {
     static PyObject *
 TupleDir(PyObject *self, PyObject *args UNUSED)
 {
-    return ObjectDir(self, TupleAttrs);
+    повернути ObjectDir(self, TupleAttrs);
 }
 
-    static int
+    static ціле
 TupleSetattr(PyObject *self_obj, char *name, PyObject *valObject)
 {
     TupleObject *self = (TupleObject*)self_obj;
-    if (valObject == NULL)
+    якщо (valObject == NULL)
     {
 	PyErr_SET_STRING(PyExc_AttributeError,
 		N_("cannot delete vim.Tuple attributes"));
-	return -1;
+	повернути -1;
     }
 
-    if (strcmp(name, "locked") == 0)
+    якщо (strcmp(name, "locked") == 0)
     {
-	if (self->tuple->tv_lock == VAR_FIXED)
+	якщо (self->tuple->tv_lock == VAR_FIXED)
 	{
 	    PyErr_SET_STRING(PyExc_TypeError, N_("cannot modify fixed tuple"));
-	    return -1;
+	    повернути -1;
 	}
-	else
+	інакше
 	{
-	    int		istrue = PyObject_IsTrue(valObject);
-	    if (istrue == -1)
-		return -1;
-	    else if (istrue)
+	    ціле		istrue = PyObject_IsTrue(valObject);
+	    якщо (istrue == -1)
+		повернути -1;
+	    інакше якщо (istrue)
 		self->tuple->tv_lock = VAR_LOCKED;
-	    else
+	    інакше
 		self->tuple->tv_lock = 0;
 	}
-	return 0;
+	повернути 0;
     }
-    else
+    інакше
     {
 	PyErr_FORMAT(PyExc_AttributeError, N_("cannot set attribute %s"), name);
-	return -1;
+	повернути -1;
     }
 }
 
@@ -3607,11 +3607,11 @@ typedef struct
 {
     PyObject_HEAD
     char_u	*name;
-    int		argc;
+    ціле		argc;
     typval_T	*argv;
     dict_T	*self;
     pylinkedlist_T	ref;
-    int		auto_rebind;
+    ціле		auto_rebind;
 } FunctionObject;
 
 DEFINE_PY_TYPE_OBJECT(FunctionType);
@@ -3620,53 +3620,53 @@ DEFINE_PY_TYPE_OBJECT(FunctionType);
     FunctionNew(FunctionTypePtr, (name), (argc), (argv), (self), (pt_auto))
 
     static PyObject *
-FunctionNew(PyTypeObject *subtype, char_u *name, int argc, typval_T *argv,
-	dict_T *selfdict, int auto_rebind)
+FunctionNew(PyTypeObject *subtype, char_u *name, ціле argc, typval_T *argv,
+	dict_T *selfdict, ціле auto_rebind)
 {
     FunctionObject	*self;
 
     self = (FunctionObject *) Py_TYPE_GET_TP_ALLOC(subtype)(subtype, 0);
-    if (self == NULL)
-	return NULL;
+    якщо (self == NULL)
+	повернути NULL;
 
-    if (isdigit((unsigned char)*name))
+    якщо (isdigit((unsigned char)*name))
     {
-	if (!translated_function_exists(name, FALSE))
+	якщо (!translated_function_exists(name, FALSE))
 	{
 	    PyErr_FORMAT(PyExc_ValueError,
 		    N_("unnamed function %s does not exist"), name);
-	    return NULL;
+	    повернути NULL;
 	}
 	self->name = vim_strsave(name);
     }
-    else
+    інакше
     {
 	char_u *p;
 
-	if ((p = get_expanded_name(name,
+	якщо ((p = get_expanded_name(name,
 			    vim_strchr(name, AUTOLOAD_CHAR) == NULL)) == NULL)
 	{
 	    PyErr_FORMAT(PyExc_ValueError,
 		    N_("function %s does not exist"), name);
-	    return NULL;
+	    повернути NULL;
 	}
 
-	if (p[0] == K_SPECIAL && p[1] == KS_EXTRA && p[2] == (int)KE_SNR)
+	якщо (p[0] == K_SPECIAL && p[1] == KS_EXTRA && p[2] == (ціле)KE_SNR)
 	{
 	    char_u *np;
 	    size_t len = STRLEN(p) + 1;
 
-	    if ((np = alloc(len + 2)) == NULL)
+	    якщо ((np = alloc(len + 2)) == NULL)
 	    {
 		vim_free(p);
-		return NULL;
+		повернути NULL;
 	    }
 	    mch_memmove(np, "<SNR>", 5);
 	    mch_memmove(np + 5, p + 3, len - 3);
 	    vim_free(p);
 	    self->name = np;
 	}
-	else
+	інакше
 	    self->name = p;
     }
 
@@ -3676,10 +3676,10 @@ FunctionNew(PyTypeObject *subtype, char_u *name, int argc, typval_T *argv,
     self->self = selfdict;
     self->auto_rebind = selfdict == NULL ? TRUE : auto_rebind;
 
-    if (self->argv || self->self)
+    якщо (self->argv || self->self)
 	pyll_add((PyObject *)(self), &self->ref, &lastfunc);
 
-    return (PyObject *)(self);
+    повернути (PyObject *)(self);
 }
 
     static PyObject *
@@ -3694,42 +3694,42 @@ FunctionConstructor(PyTypeObject *subtype, PyObject *args, PyObject *kwargs)
     typval_T	argstv;
     list_T	*argslist = NULL;
     dict_T	*selfdict = NULL;
-    int		argc = 0;
-    int		auto_rebind = TRUE;
+    ціле		argc = 0;
+    ціле		auto_rebind = TRUE;
     typval_T	*argv = NULL;
     typval_T	*curtv;
     listitem_T	*li;
 
-    if (kwargs != NULL)
+    якщо (kwargs != NULL)
     {
 	selfdictObject = PyDict_GetItemString(kwargs, "self");
-	if (selfdictObject != NULL)
+	якщо (selfdictObject != NULL)
 	{
-	    if (ConvertFromPyMapping(selfdictObject, &selfdicttv) == -1)
-		return NULL;
+	    якщо (ConvertFromPyMapping(selfdictObject, &selfdicttv) == -1)
+		повернути NULL;
 	    selfdict = selfdicttv.vval.v_dict;
 	}
 	argsObject = PyDict_GetItemString(kwargs, "args");
-	if (argsObject != NULL)
+	якщо (argsObject != NULL)
 	{
-	    if (ConvertFromPySequence(argsObject, &argstv) == -1)
+	    якщо (ConvertFromPySequence(argsObject, &argstv) == -1)
 	    {
 		dict_unref(selfdict);
-		return NULL;
+		повернути NULL;
 	    }
 	    argslist = argstv.vval.v_list;
 	    CHECK_LIST_MATERIALIZE(argslist);
 
 	    argc = argslist->lv_len;
-	    if (argc != 0)
+	    якщо (argc != 0)
 	    {
 		argv = PyMem_New(typval_T, (size_t) argc);
-		if (argv == NULL)
+		якщо (argv == NULL)
 		{
 		    PyErr_NoMemory();
 		    dict_unref(selfdict);
 		    list_unref(argslist);
-		    return NULL;
+		    повернути NULL;
 		}
 		curtv = argv;
 		FOR_ALL_LIST_ITEMS(argslist, li)
@@ -3737,51 +3737,51 @@ FunctionConstructor(PyTypeObject *subtype, PyObject *args, PyObject *kwargs)
 	    }
 	    list_unref(argslist);
 	}
-	if (selfdict != NULL)
+	якщо (selfdict != NULL)
 	{
 	    auto_rebind = FALSE;
 	    autoRebindObject = PyDict_GetItemString(kwargs, "auto_rebind");
-	    if (autoRebindObject != NULL)
+	    якщо (autoRebindObject != NULL)
 	    {
 		auto_rebind = PyObject_IsTrue(autoRebindObject);
-		if (auto_rebind == -1)
+		якщо (auto_rebind == -1)
 		{
 		    dict_unref(selfdict);
 		    list_unref(argslist);
-		    return NULL;
+		    повернути NULL;
 		}
 	    }
 	}
     }
 
-    if (!PyArg_ParseTuple(args, "et", "ascii", &name))
+    якщо (!PyArg_ParseTuple(args, "et", "ascii", &name))
     {
 	dict_unref(selfdict);
-	while (argc--)
+	поки (argc--)
 	    clear_tv(&argv[argc]);
 	PyMem_Free(argv);
-	return NULL;
+	повернути NULL;
     }
 
     self = FunctionNew(subtype, name, argc, argv, selfdict, auto_rebind);
 
     PyMem_Free(name);
 
-    return self;
+    повернути self;
 }
 
     static void
 FunctionDestructor(PyObject *self_obj)
 {
     FunctionObject *self = (FunctionObject*)self_obj;
-    int i;
+    ціле i;
     func_unref(self->name);
     vim_free(self->name);
-    for (i = 0; i < self->argc; ++i)
+    для (i = 0; i < self->argc; ++i)
 	clear_tv(&self->argv[i]);
     PyMem_Free(self->argv);
     dict_unref(self->self);
-    if (self->argv || self->self)
+    якщо (self->argv || self->self)
 	pyll_remove(&self->ref, &lastfunc);
 
     DESTRUCTOR_FINISH(self);
@@ -3795,36 +3795,36 @@ static char *FunctionAttrs[] = {
     static PyObject *
 FunctionDir(PyObject *self, PyObject *args UNUSED)
 {
-    return ObjectDir(self, FunctionAttrs);
+    повернути ObjectDir(self, FunctionAttrs);
 }
 
     static PyObject *
 FunctionAttr(FunctionObject *self, char *name)
 {
     list_T *list;
-    int i;
-    if (strcmp(name, "name") == 0)
-	return PyString_FromString((char *)(self->name));
-    else if (strcmp(name, "args") == 0)
+    ціле i;
+    якщо (strcmp(name, "name") == 0)
+	повернути PyString_FromString((char *)(self->name));
+    інакше якщо (strcmp(name, "args") == 0)
     {
-	if (self->argv == NULL || (list = list_alloc()) == NULL)
-	    return ALWAYS_NONE;
+	якщо (self->argv == NULL || (list = list_alloc()) == NULL)
+	    повернути ALWAYS_NONE;
 
-	for (i = 0; i < self->argc; ++i)
+	для (i = 0; i < self->argc; ++i)
 	    list_append_tv(list, &self->argv[i]);
-	return NEW_LIST(list);
+	повернути NEW_LIST(list);
     }
-    else if (strcmp(name, "self") == 0)
-	return self->self == NULL
+    інакше якщо (strcmp(name, "self") == 0)
+	повернути self->self == NULL
 	    ? ALWAYS_NONE
 	    : NEW_DICTIONARY(self->self);
-    else if (strcmp(name, "auto_rebind") == 0)
-	return self->auto_rebind
+    інакше якщо (strcmp(name, "auto_rebind") == 0)
+	повернути self->auto_rebind
 	    ? ALWAYS_TRUE
 	    : ALWAYS_FALSE;
-    else if (strcmp(name, "__members__") == 0)
-	return ObjectDir(NULL, FunctionAttrs);
-    return NULL;
+    інакше якщо (strcmp(name, "__members__") == 0)
+	повернути ObjectDir(NULL, FunctionAttrs);
+    повернути NULL;
 }
 
 /*
@@ -3834,33 +3834,33 @@ FunctionAttr(FunctionObject *self, char *name)
  * that may be stored in a variable (i.e. may be freed by Vim).
  */
     static void
-set_partial(FunctionObject *self, partial_T *pt, int exported)
+set_partial(FunctionObject *self, partial_T *pt, ціле exported)
 {
-    int i;
+    ціле i;
 
     pt->pt_name = self->name;
-    if (self->argv)
+    якщо (self->argv)
     {
 	pt->pt_argc = self->argc;
-	if (exported)
+	якщо (exported)
 	{
 	    pt->pt_argv = ALLOC_CLEAR_MULT(typval_T, self->argc);
-	    for (i = 0; i < pt->pt_argc; ++i)
+	    для (i = 0; i < pt->pt_argc; ++i)
 		copy_tv(&self->argv[i], &pt->pt_argv[i]);
 	}
-	else
+	інакше
 	    pt->pt_argv = self->argv;
     }
-    else
+    інакше
     {
 	pt->pt_argc = 0;
 	pt->pt_argv = NULL;
     }
     pt->pt_auto = self->auto_rebind || !exported;
     pt->pt_dict = self->self;
-    if (exported && self->self)
+    якщо (exported && self->self)
 	++pt->pt_dict->dv_refcount;
-    if (exported)
+    якщо (exported)
 	pt->pt_name = vim_strsave(pt->pt_name);
     pt->pt_refcount = 1;
 }
@@ -3876,28 +3876,28 @@ FunctionCall(PyObject *self_obj, PyObject *argsObject, PyObject *kwargs)
     dict_T	*selfdict = NULL;
     PyObject	*selfdictObject;
     PyObject	*ret;
-    int		error;
+    ціле		error;
     partial_T	pt;
     partial_T	*pt_ptr = NULL;
 
-    if (ConvertFromPySequence(argsObject, &args) == -1)
-	return NULL;
+    якщо (ConvertFromPySequence(argsObject, &args) == -1)
+	повернути NULL;
 
-    if (kwargs != NULL)
+    якщо (kwargs != NULL)
     {
 	selfdictObject = PyDict_GetItemString(kwargs, "self");
-	if (selfdictObject != NULL)
+	якщо (selfdictObject != NULL)
 	{
-	    if (ConvertFromPyMapping(selfdictObject, &selfdicttv) == -1)
+	    якщо (ConvertFromPyMapping(selfdictObject, &selfdicttv) == -1)
 	    {
 		clear_tv(&args);
-		return NULL;
+		повернути NULL;
 	    }
 	    selfdict = selfdicttv.vval.v_dict;
 	}
     }
 
-    if (self->argv || self->self)
+    якщо (self->argv || self->self)
     {
 	CLEAR_FIELD(pt);
 	set_partial(self, &pt, FALSE);
@@ -3913,22 +3913,22 @@ FunctionCall(PyObject *self_obj, PyObject *argsObject, PyObject *kwargs)
     Python_Release_Vim();
     Py_END_ALLOW_THREADS
 
-    if (VimTryEnd())
+    якщо (VimTryEnd())
 	ret = NULL;
-    else if (error != OK)
+    інакше якщо (error != OK)
     {
 	ret = NULL;
 	PyErr_VIM_FORMAT(N_("failed to run function %s"), (char *)name);
     }
-    else
+    інакше
 	ret = ConvertToPyObject(&rettv);
 
     clear_tv(&args);
     clear_tv(&rettv);
-    if (selfdict != NULL)
+    якщо (selfdict != NULL)
 	clear_tv(&selfdicttv);
 
-    return ret;
+    повернути ret;
 }
 
     static PyObject *
@@ -3937,25 +3937,25 @@ FunctionRepr(PyObject *self_obj)
     FunctionObject *self = (FunctionObject*)self_obj;
     PyObject *ret;
     garray_T repr_ga;
-    int i;
+    ціле i;
     char_u *tofree = NULL;
     typval_T tv;
     char_u numbuf[NUMBUFLEN];
 
     ga_init2(&repr_ga, sizeof(char), 70);
     ga_concat(&repr_ga, (char_u *)"<vim.Function '");
-    if (self->name)
+    якщо (self->name)
 	ga_concat(&repr_ga, self->name);
-    else
+    інакше
 	ga_concat(&repr_ga, (char_u *)"<NULL>");
     ga_append(&repr_ga, '\'');
-    if (self->argv)
+    якщо (self->argv)
     {
 	ga_concat(&repr_ga, (char_u *)", args=[");
 	++emsg_silent;
-	for (i = 0; i < self->argc; i++)
+	для (i = 0; i < self->argc; i++)
 	{
-	    if (i != 0)
+	    якщо (i != 0)
 		ga_concat(&repr_ga, (char_u *)", ");
 	    ga_concat(&repr_ga, tv2string(&self->argv[i], &tofree, numbuf,
 			get_copyID()));
@@ -3964,7 +3964,7 @@ FunctionRepr(PyObject *self_obj)
 	--emsg_silent;
 	ga_append(&repr_ga, ']');
     }
-    if (self->self)
+    якщо (self->self)
     {
 	ga_concat(&repr_ga, (char_u *)", self=");
 	tv.v_type = VAR_DICT;
@@ -3973,13 +3973,13 @@ FunctionRepr(PyObject *self_obj)
 	ga_concat(&repr_ga, tv2string(&tv, &tofree, numbuf, get_copyID()));
 	--emsg_silent;
 	vim_free(tofree);
-	if (self->auto_rebind)
+	якщо (self->auto_rebind)
 	    ga_concat(&repr_ga, (char_u *)", auto_rebind=True");
     }
     ga_append(&repr_ga, '>');
     ret = PyString_FromString((char *)repr_ga.ga_data);
     ga_clear(&repr_ga);
-    return ret;
+    повернути ret;
 }
 
 static struct PyMethodDef FunctionMethods[] = {
@@ -3993,40 +3993,40 @@ static struct PyMethodDef FunctionMethods[] = {
 
 DEFINE_PY_TYPE_OBJECT(OptionsType);
 
-typedef int (*checkfun)(void *);
+typedef ціле (*checkfun)(void *);
 
 typedef struct
 {
     PyObject_HEAD
-    int		opt_type;
+    ціле		opt_type;
     void	*from;
     checkfun	Check;
     PyObject	*fromObj;
 } OptionsObject;
 
-    static int
+    static ціле
 dummy_check(void *arg UNUSED)
 {
-    return 0;
+    повернути 0;
 }
 
     static PyObject *
-OptionsNew(int opt_type, void *from, checkfun Check, PyObject *fromObj)
+OptionsNew(ціле opt_type, void *from, checkfun Check, PyObject *fromObj)
 {
     OptionsObject	*self;
 
     self = PyObject_GC_New(OptionsObject, OptionsTypePtr);
-    if (self == NULL)
-	return NULL;
+    якщо (self == NULL)
+	повернути NULL;
 
     self->opt_type = opt_type;
     self->from = from;
     self->Check = Check;
     self->fromObj = fromObj;
-    if (fromObj)
+    якщо (fromObj)
 	Py_INCREF(fromObj);
 
-    return (PyObject *)(self);
+    повернути (PyObject *)(self);
 }
 
     static void
@@ -4038,42 +4038,42 @@ OptionsDestructor(PyObject *self_obj)
     PyObject_GC_Del((void *)(self));
 }
 
-    static int
+    static ціле
 OptionsTraverse(PyObject *self_obj, visitproc visit, void *arg)
 {
     OptionsObject *self = (OptionsObject*)self_obj;
     Py_VISIT(self->fromObj);
-    return 0;
+    повернути 0;
 }
 
-    static int
+    static ціле
 OptionsClear(PyObject *self_obj)
 {
     OptionsObject *self = (OptionsObject*)self_obj;
     Py_CLEAR(self->fromObj);
-    return 0;
+    повернути 0;
 }
 
     static PyObject *
 OptionsItem(OptionsObject *self, PyObject *keyObject)
 {
     char_u	*key;
-    int		flags;
+    ціле		flags;
     long	numval;
     char_u	*stringval;
     PyObject	*todecref;
 
-    if (self->Check(self->fromObj))
-	return NULL;
+    якщо (self->Check(self->fromObj))
+	повернути NULL;
 
-    if (!(key = StringToChars(keyObject, &todecref)))
-	return NULL;
+    якщо (!(key = StringToChars(keyObject, &todecref)))
+	повернути NULL;
 
-    if (*key == NUL)
+    якщо (*key == NUL)
     {
 	RAISE_NO_EMPTY_KEYS;
 	Py_XDECREF(todecref);
-	return NULL;
+	повернути NULL;
     }
 
     flags = get_option_value_strict(key, &numval, &stringval,
@@ -4081,79 +4081,79 @@ OptionsItem(OptionsObject *self, PyObject *keyObject)
 
     Py_XDECREF(todecref);
 
-    if (flags == 0)
+    якщо (flags == 0)
     {
 	PyErr_SetObject(PyExc_KeyError, keyObject);
-	return NULL;
+	повернути NULL;
     }
 
-    if (flags & SOPT_UNSET)
+    якщо (flags & SOPT_UNSET)
     {
 	Py_INCREF(Py_None);
-	return Py_None;
+	повернути Py_None;
     }
-    else if (flags & SOPT_BOOL)
+    інакше якщо (flags & SOPT_BOOL)
     {
 	PyObject	*ret;
 	ret = numval ? Py_True : Py_False;
 	Py_INCREF(ret);
-	return ret;
+	повернути ret;
     }
-    else if (flags & SOPT_NUM)
-	return PyInt_FromLong(numval);
-    else if (flags & SOPT_STRING)
+    інакше якщо (flags & SOPT_NUM)
+	повернути PyInt_FromLong(numval);
+    інакше якщо (flags & SOPT_STRING)
     {
-	if (stringval)
+	якщо (stringval)
 	{
 	    PyObject	*ret = PyBytes_FromString((char *)stringval);
 	    vim_free(stringval);
-	    return ret;
+	    повернути ret;
 	}
-	else
+	інакше
 	{
 	    PyErr_SET_STRING(PyExc_RuntimeError,
 		    N_("unable to get option value"));
-	    return NULL;
+	    повернути NULL;
 	}
     }
-    else
+    інакше
     {
 	PyErr_SET_VIM(N_("internal error: unknown option type"));
-	return NULL;
+	повернути NULL;
     }
 }
 
-    static int
+    static ціле
 OptionsContains(OptionsObject *self, PyObject *keyObject)
 {
     char_u	*key;
     PyObject	*todecref;
 
-    if (!(key = StringToChars(keyObject, &todecref)))
-	return -1;
+    якщо (!(key = StringToChars(keyObject, &todecref)))
+	повернути -1;
 
-    if (*key == NUL)
+    якщо (*key == NUL)
     {
 	Py_XDECREF(todecref);
-	return 0;
+	повернути 0;
     }
 
-    if (get_option_value_strict(key, NULL, NULL, self->opt_type, NULL))
+    якщо (get_option_value_strict(key, NULL, NULL, self->opt_type, NULL))
     {
 	Py_XDECREF(todecref);
-	return 1;
+	повернути 1;
     }
-    else
+    інакше
     {
 	Py_XDECREF(todecref);
-	return 0;
+	повернути 0;
     }
 }
 
 typedef struct
 {
     void	*lastoption;
-    int		opt_type;
+    ціле		opt_type;
 } optiterinfo_T;
 
     static PyObject *
@@ -4162,10 +4162,10 @@ OptionsIterNext(void **arg)
     char_u	*name;
     optiterinfo_T **oii = (optiterinfo_T**)arg;
 
-    if ((name = option_iter_next(&((*oii)->lastoption), (*oii)->opt_type)))
-	return PyString_FromString((char *)name);
+    якщо ((name = option_iter_next(&((*oii)->lastoption), (*oii)->opt_type)))
+	повернути PyString_FromString((char *)name);
 
-    return NULL;
+    повернути NULL;
 }
 
     static PyObject *
@@ -4174,60 +4174,60 @@ OptionsIter(PyObject *self_obj)
     OptionsObject	*self = (OptionsObject*)self_obj;
     optiterinfo_T	*oii;
 
-    if (!(oii = PyMem_New(optiterinfo_T, 1)))
+    якщо (!(oii = PyMem_New(optiterinfo_T, 1)))
     {
 	PyErr_NoMemory();
-	return NULL;
+	повернути NULL;
     }
 
     oii->opt_type = self->opt_type;
     oii->lastoption = NULL;
 
-    return IterNew(oii,
+    повернути IterNew(oii,
 	    PyMem_Free, OptionsIterNext,
 	    NULL, NULL, (PyObject *)self);
 }
 
-    static int
-set_option_value_err(char_u *key, int numval, char_u *stringval, int opt_flags)
+    static ціле
+set_option_value_err(char_u *key, ціле numval, char_u *stringval, ціле opt_flags)
 {
     char	*errmsg;
 
-    if ((errmsg = set_option_value(key, numval, stringval, opt_flags)))
+    якщо ((errmsg = set_option_value(key, numval, stringval, opt_flags)))
     {
-	if (VimTryEnd())
-	    return FAIL;
+	якщо (VimTryEnd())
+	    повернути FAIL;
 	PyErr_SetVim(errmsg);
-	return FAIL;
+	повернути FAIL;
     }
-    return OK;
+    повернути OK;
 }
 
-    static int
+    static ціле
 set_option_value_for(
 	char_u *key,
-	int numval,
+	ціле numval,
 	char_u *stringval,
-	int opt_flags,
-	int opt_type,
+	ціле opt_flags,
+	ціле opt_type,
 	void *from)
 {
     switchwin_T	switchwin;
     bufref_T	save_curbuf;
-    int		set_ret = 0;
+    ціле		set_ret = 0;
 
     VimTryStart();
     switch (opt_type)
     {
 	case SREQ_WIN:
-	    if (switch_win(&switchwin, (win_T *)from,
+	    якщо (switch_win(&switchwin, (win_T *)from,
 			      win_find_tabpage((win_T *)from), FALSE) == FAIL)
 	    {
 		restore_win(&switchwin, TRUE);
-		if (VimTryEnd())
-		    return -1;
+		якщо (VimTryEnd())
+		    повернути -1;
 		PyErr_SET_VIM(N_("problem while switching windows"));
-		return -1;
+		повернути -1;
 	    }
 	    set_ret = set_option_value_err(key, numval, stringval, opt_flags);
 	    restore_win(&switchwin, TRUE);
@@ -4241,111 +4241,111 @@ set_option_value_for(
 	    set_ret = set_option_value_err(key, numval, stringval, opt_flags);
 	    break;
     }
-    if (set_ret == FAIL)
-	return -1;
-    return VimTryEnd();
+    якщо (set_ret == FAIL)
+	повернути -1;
+    повернути VimTryEnd();
 }
 
-    static int
+    static ціле
 OptionsAssItem(OptionsObject *self, PyObject *keyObject, PyObject *valObject)
 {
     char_u	*key;
-    int		flags;
-    int		opt_flags;
-    int		ret = 0;
+    ціле		flags;
+    ціле		opt_flags;
+    ціле		ret = 0;
     PyObject	*todecref;
 
-    if (self->Check(self->fromObj))
-	return -1;
+    якщо (self->Check(self->fromObj))
+	повернути -1;
 
-    if (!(key = StringToChars(keyObject, &todecref)))
-	return -1;
+    якщо (!(key = StringToChars(keyObject, &todecref)))
+	повернути -1;
 
-    if (*key == NUL)
+    якщо (*key == NUL)
     {
 	RAISE_NO_EMPTY_KEYS;
 	Py_XDECREF(todecref);
-	return -1;
+	повернути -1;
     }
 
     flags = get_option_value_strict(key, NULL, NULL,
 				    self->opt_type, self->from);
 
-    if (flags == 0)
+    якщо (flags == 0)
     {
 	PyErr_SetObject(PyExc_KeyError, keyObject);
 	Py_XDECREF(todecref);
-	return -1;
+	повернути -1;
     }
 
-    if (valObject == NULL)
+    якщо (valObject == NULL)
     {
-	if (self->opt_type == SREQ_GLOBAL)
+	якщо (self->opt_type == SREQ_GLOBAL)
 	{
 	    PyErr_FORMAT(PyExc_ValueError,
 		    N_("unable to unset global option %s"), key);
 	    Py_XDECREF(todecref);
-	    return -1;
+	    повернути -1;
 	}
-	else if (!(flags & SOPT_GLOBAL))
+	інакше якщо (!(flags & SOPT_GLOBAL))
 	{
 	    PyErr_FORMAT(PyExc_ValueError,
 		    N_("unable to unset option %s "
 		       "which does not have global value"), key);
 	    Py_XDECREF(todecref);
-	    return -1;
+	    повернути -1;
 	}
-	else
+	інакше
 	{
 	    unset_global_local_option(key, self->from);
 	    Py_XDECREF(todecref);
-	    return 0;
+	    повернути 0;
 	}
     }
 
     opt_flags = (self->opt_type ? OPT_LOCAL : OPT_GLOBAL);
 
-    if (flags & SOPT_BOOL)
+    якщо (flags & SOPT_BOOL)
     {
-	int	istrue = PyObject_IsTrue(valObject);
+	ціле	istrue = PyObject_IsTrue(valObject);
 
-	if (istrue == -1)
+	якщо (istrue == -1)
 	    ret = -1;
-	else
+	інакше
 	    ret = set_option_value_for(key, istrue, NULL,
 				    opt_flags, self->opt_type, self->from);
     }
-    else if (flags & SOPT_NUM)
+    інакше якщо (flags & SOPT_NUM)
     {
 	long	val;
 
-	if (NumberToLong(valObject, &val, NUMBER_INT))
+	якщо (NumberToLong(valObject, &val, NUMBER_INT))
 	{
 	    Py_XDECREF(todecref);
-	    return -1;
+	    повернути -1;
 	}
 
-	ret = set_option_value_for(key, (int) val, NULL, opt_flags,
+	ret = set_option_value_for(key, (ціле) val, NULL, opt_flags,
 				self->opt_type, self->from);
     }
-    else
+    інакше
     {
 	char_u		*val;
 	PyObject	*todecref2;
 
-	if ((val = StringToChars(valObject, &todecref2)))
+	якщо ((val = StringToChars(valObject, &todecref2)))
 	{
 	    ret = set_option_value_for(key, 0, val, opt_flags,
 				    self->opt_type, self->from);
 	    Py_XDECREF(todecref2);
 	}
-	else
+	інакше
 	    ret = -1;
     }
 
     Py_XDECREF(todecref);
 
-    return ret;
+    повернути ret;
 }
 
 static PySequenceMethods OptionsAsSeq = {
@@ -4379,16 +4379,16 @@ static PyObject *WinListNew(TabPageObject *tabObject);
 
 DEFINE_PY_TYPE_OBJECT(TabPageType);
 
-    static int
+    static ціле
 CheckTabPage(TabPageObject *self)
 {
-    if (self->tab == INVALID_TABPAGE_VALUE)
+    якщо (self->tab == INVALID_TABPAGE_VALUE)
     {
 	PyErr_SET_VIM(N_("attempt to refer to deleted tab page"));
-	return -1;
+	повернути -1;
     }
 
-    return 0;
+    повернути 0;
 }
 
     static PyObject *
@@ -4396,28 +4396,28 @@ TabPageNew(tabpage_T *tab)
 {
     TabPageObject *self;
 
-    if (TAB_PYTHON_REF(tab))
+    якщо (TAB_PYTHON_REF(tab))
     {
 	self = TAB_PYTHON_REF(tab);
 	Py_INCREF((PyObject *)self);
     }
-    else
+    інакше
     {
 	self = PyObject_NEW(TabPageObject, TabPageTypePtr);
-	if (self == NULL)
-	    return NULL;
+	якщо (self == NULL)
+	    повернути NULL;
 	self->tab = tab;
 	TAB_PYTHON_REF(tab) = self;
     }
 
-    return (PyObject *)(self);
+    повернути (PyObject *)(self);
 }
 
     static void
 TabPageDestructor(PyObject *self_obj)
 {
     TabPageObject *self = (TabPageObject*)self_obj;
-    if (self->tab && self->tab != INVALID_TABPAGE_VALUE)
+    якщо (self->tab && self->tab != INVALID_TABPAGE_VALUE)
 	TAB_PYTHON_REF(self->tab) = NULL;
 
     DESTRUCTOR_FINISH(self);
@@ -4431,7 +4431,7 @@ static char *TabPageAttrs[] = {
     static PyObject *
 TabPageDir(PyObject *self, PyObject *args UNUSED)
 {
-    return ObjectDir(self, TabPageAttrs);
+    повернути ObjectDir(self, TabPageAttrs);
 }
 
     static PyObject *
@@ -4439,51 +4439,51 @@ TabPageAttrValid(TabPageObject *self, char *name)
 {
     PyObject	*ret;
 
-    if (strcmp(name, "valid") != 0)
-	return NULL;
+    якщо (strcmp(name, "valid") != 0)
+	повернути NULL;
 
     ret = ((self->tab == INVALID_TABPAGE_VALUE) ? Py_False : Py_True);
     Py_INCREF(ret);
-    return ret;
+    повернути ret;
 }
 
     static PyObject *
 TabPageAttr(TabPageObject *self, char *name)
 {
-    if (strcmp(name, "windows") == 0)
-	return WinListNew(self);
-    else if (strcmp(name, "number") == 0)
-	return PyLong_FromLong((long) get_tab_number(self->tab));
-    else if (strcmp(name, "vars") == 0)
-	return NEW_DICTIONARY(self->tab->tp_vars);
-    else if (strcmp(name, "window") == 0)
+    якщо (strcmp(name, "windows") == 0)
+	повернути WinListNew(self);
+    інакше якщо (strcmp(name, "number") == 0)
+	повернути PyLong_FromLong((long) get_tab_number(self->tab));
+    інакше якщо (strcmp(name, "vars") == 0)
+	повернути NEW_DICTIONARY(self->tab->tp_vars);
+    інакше якщо (strcmp(name, "window") == 0)
     {
 	// For current tab window.c does not bother to set or update tp_curwin
-	if (self->tab == curtab)
-	    return WindowNew(curwin, curtab);
-	else
-	    return WindowNew(self->tab->tp_curwin, self->tab);
+	якщо (self->tab == curtab)
+	    повернути WindowNew(curwin, curtab);
+	інакше
+	    повернути WindowNew(self->tab->tp_curwin, self->tab);
     }
-    else if (strcmp(name, "__members__") == 0)
-	return ObjectDir(NULL, TabPageAttrs);
-    return NULL;
+    інакше якщо (strcmp(name, "__members__") == 0)
+	повернути ObjectDir(NULL, TabPageAttrs);
+    повернути NULL;
 }
 
     static PyObject *
 TabPageRepr(PyObject *self_obj)
 {
     TabPageObject *self = (TabPageObject*)self_obj;
-    if (self->tab == INVALID_TABPAGE_VALUE)
-	return PyString_FromFormat("<tabpage object (deleted) at %p>", (void *)self);
-    else
+    якщо (self->tab == INVALID_TABPAGE_VALUE)
+	повернути PyString_FromFormat("<tabpage object (deleted) at %p>", (void *)self);
+    інакше
     {
-	int	t = get_tab_number(self->tab);
+	ціле	t = get_tab_number(self->tab);
 
-	if (t == 0)
-	    return PyString_FromFormat("<tabpage object (unknown) at %p>",
+	якщо (t == 0)
+	    повернути PyString_FromFormat("<tabpage object (unknown) at %p>",
 					(void *)self);
-	else
-	    return PyString_FromFormat("<tabpage %d>", t - 1);
+	інакше
+	    повернути PyString_FromFormat("<tabpage %d>", t - 1);
     }
 }
 
@@ -4516,13 +4516,13 @@ TabListLength(PyObject *self UNUSED)
     tabpage_T	*tp = first_tabpage;
     PyInt	n = 0;
 
-    while (tp != NULL)
+    поки (tp != NULL)
     {
 	++n;
 	tp = tp->tp_next;
     }
 
-    return n;
+    повернути n;
 }
 
     static PyObject *
@@ -4530,12 +4530,12 @@ TabListItem(PyObject *self UNUSED, PyInt n)
 {
     tabpage_T	*tp;
 
-    for (tp = first_tabpage; tp != NULL; tp = tp->tp_next, --n)
-	if (n == 0)
-	    return TabPageNew(tp);
+    для (tp = first_tabpage; tp != NULL; tp = tp->tp_next, --n)
+	якщо (n == 0)
+	    повернути TabPageNew(tp);
 
     PyErr_SET_STRING(PyExc_IndexError, N_("no such tab page"));
-    return NULL;
+    повернути NULL;
 }
 
 /*
@@ -4551,22 +4551,22 @@ typedef struct
 
 DEFINE_PY_TYPE_OBJECT(WindowType);
 
-    static int
+    static ціле
 CheckWindow(WindowObject *self)
 {
-    if (self->win == INVALID_WINDOW_VALUE)
+    якщо (self->win == INVALID_WINDOW_VALUE)
     {
 	PyErr_SET_VIM(N_("attempt to refer to deleted window"));
-	return -1;
+	повернути -1;
     }
 
-    return 0;
+    повернути 0;
 }
 
-    static int
+    static ціле
 CheckWindowCb(void *self)
 {
-    return CheckWindow((WindowObject*)self);
+    повернути CheckWindow((WindowObject*)self);
 }
 
     static PyObject *
@@ -4590,23 +4590,23 @@ WindowNew(win_T *win, tabpage_T *tab)
 
     WindowObject *self;
 
-    if (WIN_PYTHON_REF(win))
+    якщо (WIN_PYTHON_REF(win))
     {
 	self = WIN_PYTHON_REF(win);
 	Py_INCREF((PyObject *)self);
     }
-    else
+    інакше
     {
 	self = PyObject_GC_New(WindowObject, WindowTypePtr);
-	if (self == NULL)
-	    return NULL;
+	якщо (self == NULL)
+	    повернути NULL;
 	self->win = win;
 	WIN_PYTHON_REF(win) = self;
     }
 
     self->tabObject = ((TabPageObject *)(TabPageNew(tab)));
 
-    return (PyObject *)(self);
+    повернути (PyObject *)(self);
 }
 
     static void
@@ -4614,43 +4614,43 @@ WindowDestructor(PyObject *self_obj)
 {
     WindowObject *self = (WindowObject*)self_obj;
     PyObject_GC_UnTrack((void *)(self));
-    if (self->win && self->win != INVALID_WINDOW_VALUE)
+    якщо (self->win && self->win != INVALID_WINDOW_VALUE)
 	WIN_PYTHON_REF(self->win) = NULL;
     Py_XDECREF(((PyObject *)(self->tabObject)));
     PyObject_GC_Del((void *)(self));
 }
 
-    static int
+    static ціле
 WindowTraverse(PyObject *self_obj, visitproc visit, void *arg)
 {
     WindowObject *self = (WindowObject*)self_obj;
     Py_VISIT(((PyObject *)(self->tabObject)));
-    return 0;
+    повернути 0;
 }
 
-    static int
+    static ціле
 WindowClear(PyObject *self_obj)
 {
     WindowObject *self = (WindowObject*)self_obj;
     Py_CLEAR(self->tabObject);
-    return 0;
+    повернути 0;
 }
 
     static win_T *
 get_firstwin(TabPageObject *tabObject)
 {
-    if (tabObject)
+    якщо (tabObject)
     {
-	if (CheckTabPage(tabObject))
-	    return NULL;
+	якщо (CheckTabPage(tabObject))
+	    повернути NULL;
 	// For current tab window.c does not bother to set or update tp_firstwin
-	else if (tabObject->tab == curtab)
-	    return firstwin;
-	else
-	    return tabObject->tab->tp_firstwin;
+	інакше якщо (tabObject->tab == curtab)
+	    повернути firstwin;
+	інакше
+	    повернути tabObject->tab->tp_firstwin;
     }
-    else
-	return firstwin;
+    інакше
+	повернути firstwin;
 }
 
 // Use the same order as in the WindowAttr() function.
@@ -4672,7 +4672,7 @@ static char *WindowAttrs[] = {
     static PyObject *
 WindowDir(PyObject *self, PyObject *args UNUSED)
 {
-    return ObjectDir(self, WindowAttrs);
+    повернути ObjectDir(self, WindowAttrs);
 }
 
     static PyObject *
@@ -4680,85 +4680,85 @@ WindowAttrValid(WindowObject *self, char *name)
 {
     PyObject	*ret;
 
-    if (strcmp(name, "valid") != 0)
-	return NULL;
+    якщо (strcmp(name, "valid") != 0)
+	повернути NULL;
 
     ret = ((self->win == INVALID_WINDOW_VALUE) ? Py_False : Py_True);
     Py_INCREF(ret);
-    return ret;
+    повернути ret;
 }
 
     static PyObject *
 WindowAttr(WindowObject *self, char *name)
 {
-    if (strcmp(name, "buffer") == 0)
-	return (PyObject *)BufferNew(self->win->w_buffer);
-    else if (strcmp(name, "cursor") == 0)
+    якщо (strcmp(name, "buffer") == 0)
+	повернути (PyObject *)BufferNew(self->win->w_buffer);
+    інакше якщо (strcmp(name, "cursor") == 0)
     {
 	pos_T *pos = &self->win->w_cursor;
 
-	return Py_BuildValue("(ll)", (long)(pos->lnum), (long)(pos->col));
+	повернути Py_BuildValue("(ll)", (long)(pos->lnum), (long)(pos->col));
     }
-    else if (strcmp(name, "height") == 0)
-	return PyLong_FromLong((long)(self->win->w_height));
-    else if (strcmp(name, "row") == 0)
-	return PyLong_FromLong((long)(self->win->w_winrow));
-    else if (strcmp(name, "width") == 0)
-	return PyLong_FromLong((long)(self->win->w_width));
-    else if (strcmp(name, "col") == 0)
-	return PyLong_FromLong((long)(self->win->w_wincol));
-    else if (strcmp(name, "vars") == 0)
-	return NEW_DICTIONARY(self->win->w_vars);
-    else if (strcmp(name, "options") == 0)
-	return OptionsNew(SREQ_WIN, self->win, CheckWindowCb,
+    інакше якщо (strcmp(name, "height") == 0)
+	повернути PyLong_FromLong((long)(self->win->w_height));
+    інакше якщо (strcmp(name, "row") == 0)
+	повернути PyLong_FromLong((long)(self->win->w_winrow));
+    інакше якщо (strcmp(name, "width") == 0)
+	повернути PyLong_FromLong((long)(self->win->w_width));
+    інакше якщо (strcmp(name, "col") == 0)
+	повернути PyLong_FromLong((long)(self->win->w_wincol));
+    інакше якщо (strcmp(name, "vars") == 0)
+	повернути NEW_DICTIONARY(self->win->w_vars);
+    інакше якщо (strcmp(name, "options") == 0)
+	повернути OptionsNew(SREQ_WIN, self->win, CheckWindowCb,
 			(PyObject *) self);
-    else if (strcmp(name, "number") == 0)
+    інакше якщо (strcmp(name, "number") == 0)
     {
-	if (CheckTabPage(self->tabObject))
-	    return NULL;
-	return PyLong_FromLong((long)
+	якщо (CheckTabPage(self->tabObject))
+	    повернути NULL;
+	повернути PyLong_FromLong((long)
 		get_win_number(self->win, get_firstwin(self->tabObject)));
     }
-    else if (strcmp(name, "tabpage") == 0)
+    інакше якщо (strcmp(name, "tabpage") == 0)
     {
 	Py_INCREF((PyObject *)self->tabObject);
-	return (PyObject *)(self->tabObject);
+	повернути (PyObject *)(self->tabObject);
     }
-    else if (strcmp(name, "__members__") == 0)
-	return ObjectDir(NULL, WindowAttrs);
-    else
-	return NULL;
+    інакше якщо (strcmp(name, "__members__") == 0)
+	повернути ObjectDir(NULL, WindowAttrs);
+    інакше
+	повернути NULL;
 }
 
-    static int
+    static ціле
 WindowSetattr(PyObject *self_obj, char *name, PyObject *valObject)
 {
     WindowObject *self = (WindowObject*)self_obj;
-    if (CheckWindow(self))
-	return -1;
+    якщо (CheckWindow(self))
+	повернути -1;
 
-    if (strcmp(name, "buffer") == 0)
+    якщо (strcmp(name, "buffer") == 0)
     {
 	PyErr_SET_STRING(PyExc_TypeError, N_("readonly attribute: buffer"));
-	return -1;
+	повернути -1;
     }
-    else if (strcmp(name, "cursor") == 0)
+    інакше якщо (strcmp(name, "cursor") == 0)
     {
 	long lnum;
 	long col;
 
-	if (!PyArg_Parse(valObject, "(ll)", &lnum, &col))
-	    return -1;
+	якщо (!PyArg_Parse(valObject, "(ll)", &lnum, &col))
+	    повернути -1;
 
-	if (lnum <= 0 || lnum > self->win->w_buffer->b_ml.ml_line_count)
+	якщо (lnum <= 0 || lnum > self->win->w_buffer->b_ml.ml_line_count)
 	{
 	    PyErr_SET_VIM(N_("cursor position outside buffer"));
-	    return -1;
+	    повернути -1;
 	}
 
 	// Check for keyboard interrupts
-	if (VimCheckInterrupt())
-	    return -1;
+	якщо (VimCheckInterrupt())
+	    повернути -1;
 
 	self->win->w_cursor.lnum = lnum;
 	self->win->w_cursor.col = col;
@@ -4768,15 +4768,15 @@ WindowSetattr(PyObject *self_obj, char *name, PyObject *valObject)
 	check_cursor_col_win(self->win);
 
 	update_screen(UPD_VALID);
-	return 0;
+	повернути 0;
     }
-    else if (strcmp(name, "height") == 0)
+    інакше якщо (strcmp(name, "height") == 0)
     {
 	long	height;
 	win_T	*savewin;
 
-	if (NumberToLong(valObject, &height, NUMBER_INT|NUMBER_UNSIGNED))
-	    return -1;
+	якщо (NumberToLong(valObject, &height, NUMBER_INT|NUMBER_UNSIGNED))
+	    повернути -1;
 
 #ifdef FEAT_GUI
 	need_mouse_correct = TRUE;
@@ -4786,21 +4786,21 @@ WindowSetattr(PyObject *self_obj, char *name, PyObject *valObject)
 	curbuf = curwin->w_buffer;
 
 	VimTryStart();
-	win_setheight((int) height);
+	win_setheight((ціле) height);
 	curwin = savewin;
 	curbuf = curwin->w_buffer;
-	if (VimTryEnd())
-	    return -1;
+	якщо (VimTryEnd())
+	    повернути -1;
 
-	return 0;
+	повернути 0;
     }
-    else if (strcmp(name, "width") == 0)
+    інакше якщо (strcmp(name, "width") == 0)
     {
 	long	width;
 	win_T	*savewin;
 
-	if (NumberToLong(valObject, &width, NUMBER_INT|NUMBER_UNSIGNED))
-	    return -1;
+	якщо (NumberToLong(valObject, &width, NUMBER_INT|NUMBER_UNSIGNED))
+	    повернути -1;
 
 #ifdef FEAT_GUI
 	need_mouse_correct = TRUE;
@@ -4810,18 +4810,18 @@ WindowSetattr(PyObject *self_obj, char *name, PyObject *valObject)
 	curbuf = curwin->w_buffer;
 
 	VimTryStart();
-	win_setwidth((int) width);
+	win_setwidth((ціле) width);
 	curwin = savewin;
 	curbuf = curwin->w_buffer;
-	if (VimTryEnd())
-	    return -1;
+	якщо (VimTryEnd())
+	    повернути -1;
 
-	return 0;
+	повернути 0;
     }
-    else
+    інакше
     {
 	PyErr_SetString(PyExc_AttributeError, name);
-	return -1;
+	повернути -1;
     }
 }
 
@@ -4829,17 +4829,17 @@ WindowSetattr(PyObject *self_obj, char *name, PyObject *valObject)
 WindowRepr(PyObject *self_obj)
 {
     WindowObject *self = (WindowObject*)self_obj;
-    if (self->win == INVALID_WINDOW_VALUE)
-	return PyString_FromFormat("<window object (deleted) at %p>", (void *)self);
-    else
+    якщо (self->win == INVALID_WINDOW_VALUE)
+	повернути PyString_FromFormat("<window object (deleted) at %p>", (void *)self);
+    інакше
     {
-	int	w = get_win_number(self->win, firstwin);
+	ціле	w = get_win_number(self->win, firstwin);
 
-	if (w == 0)
-	    return PyString_FromFormat("<window object (unknown) at %p>",
+	якщо (w == 0)
+	    повернути PyString_FromFormat("<window object (unknown) at %p>",
 								      (void *)self);
-	else
-	    return PyString_FromFormat("<window %d>", w - 1);
+	інакше
+	    повернути PyString_FromFormat("<window %d>", w - 1);
     }
 }
 
@@ -4877,7 +4877,7 @@ WinListNew(TabPageObject *tabObject)
     self->tabObject = tabObject;
     Py_INCREF((PyObject *)tabObject);
 
-    return (PyObject *)(self);
+    повернути (PyObject *)(self);
 }
 
     static void
@@ -4885,7 +4885,7 @@ WinListDestructor(WinListObject *self)
 {
     TabPageObject	*tabObject = self->tabObject;
 
-    if (tabObject)
+    якщо (tabObject)
     {
 	Py_DECREF((PyObject *)(tabObject));
     }
@@ -4899,16 +4899,16 @@ WinListLength(WinListObject *self)
     win_T	*w;
     PyInt	n = 0;
 
-    if (!(w = get_firstwin(self->tabObject)))
-	return -1;
+    якщо (!(w = get_firstwin(self->tabObject)))
+	повернути -1;
 
-    while (w != NULL)
+    поки (w != NULL)
     {
 	++n;
 	w = W_NEXT(w);
     }
 
-    return n;
+    повернути n;
 }
 
     static PyObject *
@@ -4916,15 +4916,15 @@ WinListItem(WinListObject *self, PyInt n)
 {
     win_T *w;
 
-    if (!(w = get_firstwin(self->tabObject)))
-	return NULL;
+    якщо (!(w = get_firstwin(self->tabObject)))
+	повернути NULL;
 
-    for (; w != NULL; w = W_NEXT(w), --n)
-	if (n == 0)
-	    return WindowNew(w, self->tabObject? self->tabObject->tab: curtab);
+    для (; w != NULL; w = W_NEXT(w), --n)
+	якщо (n == 0)
+	    повернути WindowNew(w, self->tabObject? self->tabObject->tab: curtab);
 
     PyErr_SET_STRING(PyExc_IndexError, N_("no such window"));
-    return NULL;
+    повернути NULL;
 }
 
 /*
@@ -4946,37 +4946,37 @@ StringToLine(PyObject *obj)
     PyInt	i;
     char	*p;
 
-    if (PyBytes_Check(obj))
+    якщо (PyBytes_Check(obj))
     {
-	if (PyBytes_AsStringAndSize(obj, &str, &len) == -1
+	якщо (PyBytes_AsStringAndSize(obj, &str, &len) == -1
 		|| str == NULL)
-	    return NULL;
+	    повернути NULL;
     }
-    else if (PyUnicode_Check(obj))
+    інакше якщо (PyUnicode_Check(obj))
     {
-	if (!(bytes = PyUnicode_AsEncodedString(obj, ENC_OPT,
+	якщо (!(bytes = PyUnicode_AsEncodedString(obj, ENC_OPT,
 							   ERRORS_ENCODE_ARG)))
-	    return NULL;
+	    повернути NULL;
 
-	if (PyBytes_AsStringAndSize(bytes, &str, &len) == -1
+	якщо (PyBytes_AsStringAndSize(bytes, &str, &len) == -1
 		|| str == NULL)
 	{
 	    Py_DECREF(bytes);
-	    return NULL;
+	    повернути NULL;
 	}
     }
-    else
+    інакше
     {
-#if PY_MAJOR_VERSION < 3
+#якщо PY_MAJOR_VERSION < 3
 	PyErr_FORMAT_TYPE(
 		N_("expected str() or unicode() instance, but got %s"),
 		obj);
-#else
+#інакше
 	PyErr_FORMAT_TYPE(
 		N_("expected bytes() or str() instance, but got %s"),
 		obj);
 #endif
-	return NULL;
+	повернути NULL;
     }
 
     /*
@@ -4986,15 +4986,15 @@ StringToLine(PyObject *obj)
      * A trailing newline is removed, so that append(f.readlines()) works.
      */
     p = memchr(str, '\n', len);
-    if (p != NULL)
+    якщо (p != NULL)
     {
-	if (p == str + len - 1)
+	якщо (p == str + len - 1)
 	    --len;
-	else
+	інакше
 	{
 	    PyErr_SET_VIM(N_("string cannot contain newlines"));
 	    Py_XDECREF(bytes);
-	    return NULL;
+	    повернути NULL;
 	}
     }
 
@@ -5003,25 +5003,25 @@ StringToLine(PyObject *obj)
      * newline characters, as is the Vim convention.
      */
     save = alloc(len+1);
-    if (save == NULL)
+    якщо (save == NULL)
     {
 	PyErr_NoMemory();
 	Py_XDECREF(bytes);
-	return NULL;
+	повернути NULL;
     }
 
-    for (i = 0; i < len; ++i)
+    для (i = 0; i < len; ++i)
     {
-	if (str[i] == '\0')
+	якщо (str[i] == '\0')
 	    save[i] = '\n';
-	else
+	інакше
 	    save[i] = str[i];
     }
 
     save[i] = '\0';
     Py_XDECREF(bytes);  // Python 2 does nothing here
 
-    return save;
+    повернути save;
 }
 
 /*
@@ -5032,7 +5032,7 @@ StringToLine(PyObject *obj)
     static PyObject *
 GetBufferLine(buf_T *buf, PyInt n)
 {
-    return LineToString((char *)ml_get_buf(buf, (linenr_T)n, FALSE));
+    повернути LineToString((char *)ml_get_buf(buf, (linenr_T)n, FALSE));
 }
 
 
@@ -5048,24 +5048,24 @@ GetBufferLineList(buf_T *buf, PyInt lo, PyInt hi)
     PyInt	n = hi - lo;
     PyObject	*list = PyList_New(n);
 
-    if (list == NULL)
-	return NULL;
+    якщо (list == NULL)
+	повернути NULL;
 
-    for (i = 0; i < n; ++i)
+    для (i = 0; i < n; ++i)
     {
 	linenr_T	lnum = (linenr_T)(lo + i);
 	char		*text;
 	PyObject	*string;
 
-	if (lnum > buf->b_ml.ml_line_count)
+	якщо (lnum > buf->b_ml.ml_line_count)
 	    text = "";
-	else
+	інакше
 	    text = (char *)ml_get_buf(buf, lnum, FALSE);
 	string = LineToString(text);
-	if (string == NULL)
+	якщо (string == NULL)
 	{
 	    Py_DECREF(list);
-	    return NULL;
+	    повернути NULL;
 	}
 
 	PyList_SET_ITEM(list, i, string);
@@ -5075,7 +5075,7 @@ GetBufferLineList(buf_T *buf, PyInt lo, PyInt hi)
     // the caller should Py_DECREF() the object when it is finished
     // with it).
 
-    return list;
+    повернути list;
 }
 
 /*
@@ -5086,21 +5086,21 @@ GetBufferLineList(buf_T *buf, PyInt lo, PyInt hi)
     static void
 py_fix_cursor(linenr_T lo, linenr_T hi, linenr_T extra)
 {
-    if (curwin->w_cursor.lnum >= lo)
+    якщо (curwin->w_cursor.lnum >= lo)
     {
 	// Adjust the cursor position if it's in/after the changed
 	// lines.
-	if (curwin->w_cursor.lnum >= hi)
+	якщо (curwin->w_cursor.lnum >= hi)
 	{
 	    curwin->w_cursor.lnum += extra;
 	    check_cursor_col();
 	}
-	else if (extra < 0)
+	інакше якщо (extra < 0)
 	{
 	    curwin->w_cursor.lnum = lo;
 	    check_cursor();
 	}
-	else
+	інакше
 	    check_cursor_col();
 	changed_cline_bef_curs();
     }
@@ -5116,7 +5116,7 @@ py_fix_cursor(linenr_T lo, linenr_T hi, linenr_T extra)
  * If OK is returned and len_change is not NULL, *len_change
  * is set to the change in the buffer length.
  */
-    static int
+    static ціле
 SetBufferLine(buf_T *buf, PyInt n, PyObject *line, PyInt *len_change)
 {
     bufref_T	save_curbuf = {NULL, 0, 0};
@@ -5127,7 +5127,7 @@ SetBufferLine(buf_T *buf, PyInt n, PyObject *line, PyInt *len_change)
     //	  1. NULL, or None - this is a deletion.
     //	  2. A string	   - this is a replacement.
     //	  3. Anything else - this is an error.
-    if (line == Py_None || line == NULL)
+    якщо (line == Py_None || line == NULL)
     {
 	PyErr_Clear();
 	switchwin.sw_curwin = NULL;
@@ -5135,18 +5135,18 @@ SetBufferLine(buf_T *buf, PyInt n, PyObject *line, PyInt *len_change)
 
 	VimTryStart();
 
-	if (u_savedel((linenr_T)n, 1L) == FAIL)
+	якщо (u_savedel((linenr_T)n, 1L) == FAIL)
 	    RAISE_UNDO_FAIL;
-	else if (ml_delete((linenr_T)n) == FAIL)
+	інакше якщо (ml_delete((linenr_T)n) == FAIL)
 	    RAISE_DELETE_LINE_FAIL;
-	else
+	інакше
 	{
-	    if (buf == curbuf && (switchwin.sw_curwin != NULL
+	    якщо (buf == curbuf && (switchwin.sw_curwin != NULL
 					   || save_curbuf.br_buf == NULL))
 		// Using an existing window for the buffer, adjust the cursor
 		// position.
 		py_fix_cursor((linenr_T)n, (linenr_T)n + 1, (linenr_T)-1);
-	    if (save_curbuf.br_buf == NULL)
+	    якщо (save_curbuf.br_buf == NULL)
 		// Only adjust marks if we managed to switch to a window that
 		// holds the buffer, otherwise line numbers will be invalid.
 		deleted_lines_mark((linenr_T)n, 1L);
@@ -5154,20 +5154,20 @@ SetBufferLine(buf_T *buf, PyInt n, PyObject *line, PyInt *len_change)
 
 	restore_win_for_buf(&switchwin, &save_curbuf);
 
-	if (VimTryEnd())
-	    return FAIL;
+	якщо (VimTryEnd())
+	    повернути FAIL;
 
-	if (len_change)
+	якщо (len_change)
 	    *len_change = -1;
 
-	return OK;
+	повернути OK;
     }
-    else if (PyBytes_Check(line) || PyUnicode_Check(line))
+    інакше якщо (PyBytes_Check(line) || PyUnicode_Check(line))
     {
 	char	*save = StringToLine(line);
 
-	if (save == NULL)
-	    return FAIL;
+	якщо (save == NULL)
+	    повернути FAIL;
 
 	VimTryStart();
 
@@ -5175,37 +5175,37 @@ SetBufferLine(buf_T *buf, PyInt n, PyObject *line, PyInt *len_change)
 	PyErr_Clear();
 	switch_to_win_for_buf(buf, &switchwin, &save_curbuf);
 
-	if (u_savesub((linenr_T)n) == FAIL)
+	якщо (u_savesub((linenr_T)n) == FAIL)
 	{
 	    RAISE_UNDO_FAIL;
 	    vim_free(save);
 	}
-	else if (ml_replace((linenr_T)n, (char_u *)save, FALSE) == FAIL)
+	інакше якщо (ml_replace((linenr_T)n, (char_u *)save, FALSE) == FAIL)
 	{
 	    RAISE_REPLACE_LINE_FAIL;
 	    vim_free(save);
 	}
-	else
+	інакше
 	    changed_bytes((linenr_T)n, 0);
 
 	restore_win_for_buf(&switchwin, &save_curbuf);
 
 	// Check that the cursor is not beyond the end of the line now.
-	if (buf == curbuf)
+	якщо (buf == curbuf)
 	    check_cursor_col();
 
-	if (VimTryEnd())
-	    return FAIL;
+	якщо (VimTryEnd())
+	    повернути FAIL;
 
-	if (len_change)
+	якщо (len_change)
 	    *len_change = 0;
 
-	return OK;
+	повернути OK;
     }
-    else
+    інакше
     {
 	PyErr_BadArgument();
-	return FAIL;
+	повернути FAIL;
     }
 }
 
@@ -5218,7 +5218,7 @@ SetBufferLine(buf_T *buf, PyInt n, PyObject *line, PyInt *len_change)
  * If OK is returned and len_change is not NULL, *len_change
  * is set to the change in the buffer length.
  */
-    static int
+    static ціле
 SetBufferLineList(
 	buf_T *buf,
 	PyInt lo,
@@ -5234,34 +5234,34 @@ SetBufferLineList(
     //	  1. NULL, or None - this is a deletion.
     //	  2. A list	   - this is a replacement.
     //	  3. Anything else - this is an error.
-    if (list == Py_None || list == NULL)
+    якщо (list == Py_None || list == NULL)
     {
 	PyInt	i;
-	PyInt	n = (int)(hi - lo);
+	PyInt	n = (ціле)(hi - lo);
 
 	PyErr_Clear();
 	VimTryStart();
 	switchwin.sw_curwin = NULL;
 	switch_to_win_for_buf(buf, &switchwin, &save_curbuf);
 
-	if (u_savedel((linenr_T)lo, (long)n) == FAIL)
+	якщо (u_savedel((linenr_T)lo, (long)n) == FAIL)
 	    RAISE_UNDO_FAIL;
-	else
+	інакше
 	{
-	    for (i = 0; i < n; ++i)
+	    для (i = 0; i < n; ++i)
 	    {
-		if (ml_delete((linenr_T)lo) == FAIL)
+		якщо (ml_delete((linenr_T)lo) == FAIL)
 		{
 		    RAISE_DELETE_LINE_FAIL;
 		    break;
 		}
 	    }
-	    if (buf == curbuf && (switchwin.sw_curwin != NULL
+	    якщо (buf == curbuf && (switchwin.sw_curwin != NULL
 					       || save_curbuf.br_buf == NULL))
 		// Using an existing window for the buffer, adjust the cursor
 		// position.
 		py_fix_cursor((linenr_T)lo, (linenr_T)hi, (linenr_T)-n);
-	    if (save_curbuf.br_buf == NULL)
+	    якщо (save_curbuf.br_buf == NULL)
 		// Only adjust marks if we managed to switch to a window that
 		// holds the buffer, otherwise line numbers will be invalid.
 		deleted_lines_mark((linenr_T)lo, (long)i);
@@ -5269,15 +5269,15 @@ SetBufferLineList(
 
 	restore_win_for_buf(&switchwin, &save_curbuf);
 
-	if (VimTryEnd())
-	    return FAIL;
+	якщо (VimTryEnd())
+	    повернути FAIL;
 
-	if (len_change)
+	якщо (len_change)
 	    *len_change = -n;
 
-	return OK;
+	повернути OK;
     }
-    else if (PyList_Check(list))
+    інакше якщо (PyList_Check(list))
     {
 	PyInt	i;
 	PyInt	new_len = PyList_Size(list);
@@ -5285,29 +5285,29 @@ SetBufferLineList(
 	PyInt	extra = 0;	// lines added to text, can be negative
 	char	**array;
 
-	if (new_len == 0)	// avoid allocating zero bytes
+	якщо (new_len == 0)	// avoid allocating zero bytes
 	    array = NULL;
-	else
+	інакше
 	{
 	    array = PyMem_New(char *, new_len);
-	    if (array == NULL)
+	    якщо (array == NULL)
 	    {
 		PyErr_NoMemory();
-		return FAIL;
+		повернути FAIL;
 	    }
 	}
 
-	for (i = 0; i < new_len; ++i)
+	для (i = 0; i < new_len; ++i)
 	{
 	    PyObject *line;
 
-	    if (!(line = PyList_GetItem(list, i)) ||
+	    якщо (!(line = PyList_GetItem(list, i)) ||
 		!(array[i] = StringToLine(line)))
 	    {
-		while (i)
+		поки (i)
 		    vim_free(array[--i]);
 		PyMem_Free(array);
-		return FAIL;
+		повернути FAIL;
 	    }
 	}
 
@@ -5318,16 +5318,16 @@ SetBufferLineList(
 	switchwin.sw_curwin = NULL;
 	switch_to_win_for_buf(buf, &switchwin, &save_curbuf);
 
-	if (u_save((linenr_T)(lo-1), (linenr_T)hi) == FAIL)
+	якщо (u_save((linenr_T)(lo-1), (linenr_T)hi) == FAIL)
 	    RAISE_UNDO_FAIL;
 
 	// If the size of the range is reducing (ie, new_len < old_len) we
 	// need to delete some old_len. We do this at the start, by
 	// repeatedly deleting line "lo".
-	if (!PyErr_Occurred())
+	якщо (!PyErr_Occurred())
 	{
-	    for (i = 0; i < old_len - new_len; ++i)
-		if (ml_delete((linenr_T)lo) == FAIL)
+	    для (i = 0; i < old_len - new_len; ++i)
+		якщо (ml_delete((linenr_T)lo) == FAIL)
 		{
 		    RAISE_DELETE_LINE_FAIL;
 		    break;
@@ -5338,27 +5338,27 @@ SetBufferLineList(
 	// For as long as possible, replace the existing old_len with the
 	// new old_len. This is a more efficient operation, as it requires
 	// less memory allocation and freeing.
-	if (!PyErr_Occurred())
+	якщо (!PyErr_Occurred())
 	{
-	    for (i = 0; i < old_len && i < new_len; ++i)
-		if (ml_replace((linenr_T)(lo+i), (char_u *)array[i], FALSE)
+	    для (i = 0; i < old_len && i < new_len; ++i)
+		якщо (ml_replace((linenr_T)(lo+i), (char_u *)array[i], FALSE)
 								      == FAIL)
 		{
 		    RAISE_REPLACE_LINE_FAIL;
 		    break;
 		}
 	}
-	else
+	інакше
 	    i = 0;
 
 	// Now we may need to insert the remaining new old_len. If we do, we
 	// must free the strings as we finish with them (we can't pass the
 	// responsibility to Vim in this case).
-	if (!PyErr_Occurred())
+	якщо (!PyErr_Occurred())
 	{
-	    while (i < new_len)
+	    поки (i < new_len)
 	    {
-		if (ml_append((linenr_T)(lo + i - 1),
+		якщо (ml_append((linenr_T)(lo + i - 1),
 					(char_u *)array[i], 0, FALSE) == FAIL)
 		{
 		    RAISE_INSERT_LINE_FAIL;
@@ -5371,7 +5371,7 @@ SetBufferLineList(
 	}
 
 	// Free any left-over old_len, as a result of an error
-	while (i < new_len)
+	поки (i < new_len)
 	{
 	    vim_free(array[i]);
 	    ++i;
@@ -5386,14 +5386,14 @@ SetBufferLineList(
 	// changed range, and move any in the remainder of the buffer.
 	// Only adjust marks if we managed to switch to a window that holds
 	// the buffer, otherwise line numbers will be invalid.
-	if (save_curbuf.br_buf == NULL)
+	якщо (save_curbuf.br_buf == NULL)
 	{
 	    mark_adjust((linenr_T)lo, (linenr_T)(hi - 1),
 						  (long)MAXLNUM, (long)extra);
 	    changed_lines((linenr_T)lo, 0, (linenr_T)hi, (long)extra);
 	}
 
-	if (buf == curbuf && (switchwin.sw_curwin != NULL
+	якщо (buf == curbuf && (switchwin.sw_curwin != NULL
 					   || save_curbuf.br_buf == NULL))
 	    // Using an existing window for the buffer, adjust the cursor
 	    // position.
@@ -5402,18 +5402,18 @@ SetBufferLineList(
 	// END of region without "return".
 	restore_win_for_buf(&switchwin, &save_curbuf);
 
-	if (VimTryEnd())
-	    return FAIL;
+	якщо (VimTryEnd())
+	    повернути FAIL;
 
-	if (len_change)
+	якщо (len_change)
 	    *len_change = new_len - old_len;
 
-	return OK;
+	повернути OK;
     }
-    else
+    інакше
     {
 	PyErr_BadArgument();
-	return FAIL;
+	повернути FAIL;
     }
 }
 
@@ -5426,7 +5426,7 @@ SetBufferLineList(
  * If OK is returned and len_change is not NULL, *len_change
  * is set to the change in the buffer length.
  */
-    static int
+    static ціле
 InsertBufferLines(buf_T *buf, PyInt n, PyObject *lines, PyInt *len_change)
 {
     bufref_T	save_curbuf = {NULL, 0, 0};
@@ -5434,22 +5434,22 @@ InsertBufferLines(buf_T *buf, PyInt n, PyObject *lines, PyInt *len_change)
 
     // First of all, we check the type of the supplied Python object.
     // It must be a string or a list, or the call is in error.
-    if (PyBytes_Check(lines) || PyUnicode_Check(lines))
+    якщо (PyBytes_Check(lines) || PyUnicode_Check(lines))
     {
 	char		*str = StringToLine(lines);
 
-	if (str == NULL)
-	    return FAIL;
+	якщо (str == NULL)
+	    повернути FAIL;
 
 	PyErr_Clear();
 	VimTryStart();
 	switch_to_win_for_buf(buf, &switchwin, &save_curbuf);
 
-	if (u_save((linenr_T)n, (linenr_T)(n + 1)) == FAIL)
+	якщо (u_save((linenr_T)n, (linenr_T)(n + 1)) == FAIL)
 	    RAISE_UNDO_FAIL;
-	else if (ml_append((linenr_T)n, (char_u *)str, 0, FALSE) == FAIL)
+	інакше якщо (ml_append((linenr_T)n, (char_u *)str, 0, FALSE) == FAIL)
 	    RAISE_INSERT_LINE_FAIL;
-	else if (save_curbuf.br_buf == NULL)
+	інакше якщо (save_curbuf.br_buf == NULL)
 	    // Only adjust marks if we managed to switch to a window that
 	    // holds the buffer, otherwise line numbers will be invalid.
 	    appended_lines_mark((linenr_T)n, 1L);
@@ -5458,38 +5458,38 @@ InsertBufferLines(buf_T *buf, PyInt n, PyObject *lines, PyInt *len_change)
 	restore_win_for_buf(&switchwin, &save_curbuf);
 	update_screen(UPD_VALID);
 
-	if (VimTryEnd())
-	    return FAIL;
+	якщо (VimTryEnd())
+	    повернути FAIL;
 
-	if (len_change)
+	якщо (len_change)
 	    *len_change = 1;
 
-	return OK;
+	повернути OK;
     }
-    else if (PyList_Check(lines))
+    інакше якщо (PyList_Check(lines))
     {
 	PyInt	i;
 	PyInt	size = PyList_Size(lines);
 	char	**array;
 
 	array = PyMem_New(char *, size);
-	if (array == NULL)
+	якщо (array == NULL)
 	{
 	    PyErr_NoMemory();
-	    return FAIL;
+	    повернути FAIL;
 	}
 
-	for (i = 0; i < size; ++i)
+	для (i = 0; i < size; ++i)
 	{
 	    PyObject *line;
 
-	    if (!(line = PyList_GetItem(lines, i)) ||
+	    якщо (!(line = PyList_GetItem(lines, i)) ||
 		!(array[i] = StringToLine(line)))
 	    {
-		while (i)
+		поки (i)
 		    vim_free(array[--i]);
 		PyMem_Free(array);
-		return FAIL;
+		повернути FAIL;
 	    }
 	}
 
@@ -5497,26 +5497,26 @@ InsertBufferLines(buf_T *buf, PyInt n, PyObject *lines, PyInt *len_change)
 	VimTryStart();
 	switch_to_win_for_buf(buf, &switchwin, &save_curbuf);
 
-	if (u_save((linenr_T)n, (linenr_T)(n + 1)) == FAIL)
+	якщо (u_save((linenr_T)n, (linenr_T)(n + 1)) == FAIL)
 	    RAISE_UNDO_FAIL;
-	else
+	інакше
 	{
-	    for (i = 0; i < size; ++i)
+	    для (i = 0; i < size; ++i)
 	    {
-		if (ml_append((linenr_T)(n + i),
+		якщо (ml_append((linenr_T)(n + i),
 					(char_u *)array[i], 0, FALSE) == FAIL)
 		{
 		    RAISE_INSERT_LINE_FAIL;
 
 		    // Free the rest of the lines
-		    while (i < size)
+		    поки (i < size)
 			vim_free(array[i++]);
 
 		    break;
 		}
 		vim_free(array[i]);
 	    }
-	    if (i > 0 && save_curbuf.br_buf == NULL)
+	    якщо (i > 0 && save_curbuf.br_buf == NULL)
 		// Only adjust marks if we managed to switch to a window that
 		// holds the buffer, otherwise line numbers will be invalid.
 		appended_lines_mark((linenr_T)n, (long)i);
@@ -5529,18 +5529,18 @@ InsertBufferLines(buf_T *buf, PyInt n, PyObject *lines, PyInt *len_change)
 
 	update_screen(UPD_VALID);
 
-	if (VimTryEnd())
-	    return FAIL;
+	якщо (VimTryEnd())
+	    повернути FAIL;
 
-	if (len_change)
+	якщо (len_change)
 	    *len_change = size;
 
-	return OK;
+	повернути OK;
     }
-    else
+    інакше
     {
 	PyErr_BadArgument();
-	return FAIL;
+	повернути FAIL;
     }
 }
 
@@ -5555,43 +5555,43 @@ typedef struct
     buf_T *buf;
 } BufferObject;
 
-    static int
+    static ціле
 CheckBuffer(BufferObject *self)
 {
-    if (self->buf == INVALID_BUFFER_VALUE)
+    якщо (self->buf == INVALID_BUFFER_VALUE)
     {
 	PyErr_SET_VIM(N_("attempt to refer to deleted buffer"));
-	return -1;
+	повернути -1;
     }
 
-    return 0;
+    повернути 0;
 }
 
-    static int
+    static ціле
 CheckBufferCb(void *self)
 {
-    return CheckBuffer((BufferObject*)self);
+    повернути CheckBuffer((BufferObject*)self);
 }
 
     static PyObject *
 RBItem(BufferObject *self, PyInt n, PyInt start, PyInt end)
 {
-    if (CheckBuffer(self))
-	return NULL;
+    якщо (CheckBuffer(self))
+	повернути NULL;
 
-    if (end == -1)
+    якщо (end == -1)
 	end = self->buf->b_ml.ml_line_count;
 
-    if (n < 0)
+    якщо (n < 0)
 	n += end - start + 1;
 
-    if (n < 0 || n > end - start)
+    якщо (n < 0 || n > end - start)
     {
 	PyErr_SET_STRING(PyExc_IndexError, N_("line number out of range"));
-	return NULL;
+	повернути NULL;
     }
 
-    return GetBufferLine(self->buf, n+start);
+    повернути GetBufferLine(self->buf, n+start);
 }
 
     static PyObject *
@@ -5599,26 +5599,26 @@ RBSlice(BufferObject *self, PyInt lo, PyInt hi, PyInt start, PyInt end)
 {
     PyInt size;
 
-    if (CheckBuffer(self))
-	return NULL;
+    якщо (CheckBuffer(self))
+	повернути NULL;
 
-    if (end == -1)
+    якщо (end == -1)
 	end = self->buf->b_ml.ml_line_count;
 
     size = end - start + 1;
 
-    if (lo < 0)
+    якщо (lo < 0)
 	lo = 0;
-    else if (lo > size)
+    інакше якщо (lo > size)
 	lo = size;
-    if (hi < 0)
+    якщо (hi < 0)
 	hi = 0;
-    if (hi < lo)
+    якщо (hi < lo)
 	hi = lo;
-    else if (hi > size)
+    інакше якщо (hi > size)
 	hi = size;
 
-    return GetBufferLineList(self->buf, lo+start, hi+start);
+    повернути GetBufferLineList(self->buf, lo+start, hi+start);
 }
 
     static PyInt
@@ -5632,28 +5632,28 @@ RBAsItem(
 {
     PyInt len_change;
 
-    if (CheckBuffer(self))
-	return -1;
+    якщо (CheckBuffer(self))
+	повернути -1;
 
-    if (end == -1)
+    якщо (end == -1)
 	end = self->buf->b_ml.ml_line_count;
 
-    if (n < 0)
+    якщо (n < 0)
 	n += end - start + 1;
 
-    if (n < 0 || n > end - start)
+    якщо (n < 0 || n > end - start)
     {
 	PyErr_SET_STRING(PyExc_IndexError, N_("line number out of range"));
-	return -1;
+	повернути -1;
     }
 
-    if (SetBufferLine(self->buf, n+start, valObject, &len_change) == FAIL)
-	return -1;
+    якщо (SetBufferLine(self->buf, n+start, valObject, &len_change) == FAIL)
+	повернути -1;
 
-    if (new_end)
+    якщо (new_end)
 	*new_end = end + len_change;
 
-    return 0;
+    повернути 0;
 }
 
     static PyInt
@@ -5670,34 +5670,34 @@ RBAsSlice(
     PyInt len_change;
 
     // Self must be a valid buffer
-    if (CheckBuffer(self))
-	return -1;
+    якщо (CheckBuffer(self))
+	повернути -1;
 
-    if (end == -1)
+    якщо (end == -1)
 	end = self->buf->b_ml.ml_line_count;
 
     // Sort out the slice range
     size = end - start + 1;
 
-    if (lo < 0)
+    якщо (lo < 0)
 	lo = 0;
-    else if (lo > size)
+    інакше якщо (lo > size)
 	lo = size;
-    if (hi < 0)
+    якщо (hi < 0)
 	hi = 0;
-    if (hi < lo)
+    якщо (hi < lo)
 	hi = lo;
-    else if (hi > size)
+    інакше якщо (hi > size)
 	hi = size;
 
-    if (SetBufferLineList(self->buf, lo + start, hi + start,
+    якщо (SetBufferLineList(self->buf, lo + start, hi + start,
 						valObject, &len_change) == FAIL)
-	return -1;
+	повернути -1;
 
-    if (new_end)
+    якщо (new_end)
 	*new_end = end + len_change;
 
-    return 0;
+    повернути 0;
 }
 
 
@@ -5714,31 +5714,31 @@ RBAppend(
     PyInt max;
     PyInt n;
 
-    if (CheckBuffer(self))
-	return NULL;
+    якщо (CheckBuffer(self))
+	повернути NULL;
 
-    if (end == -1)
+    якщо (end == -1)
 	end = self->buf->b_ml.ml_line_count;
 
     max = n = end - start + 1;
 
-    if (!PyArg_ParseTuple(args, "O|n", &lines, &n))
-	return NULL;
+    якщо (!PyArg_ParseTuple(args, "O|n", &lines, &n))
+	повернути NULL;
 
-    if (n < 0 || n > max)
+    якщо (n < 0 || n > max)
     {
 	PyErr_SET_STRING(PyExc_IndexError, N_("line number out of range"));
-	return NULL;
+	повернути NULL;
     }
 
-    if (InsertBufferLines(self->buf, n + start - 1, lines, &len_change) == FAIL)
-	return NULL;
+    якщо (InsertBufferLines(self->buf, n + start - 1, lines, &len_change) == FAIL)
+	повернути NULL;
 
-    if (new_end)
+    якщо (new_end)
 	*new_end = end + len_change;
 
     Py_INCREF(Py_None);
-    return Py_None;
+    повернути Py_None;
 }
 
 // Range object
@@ -5761,14 +5761,14 @@ RangeNew(buf_T *buf, PyInt start, PyInt end)
     BufferObject *bufr;
     RangeObject *self;
     self = PyObject_GC_New(RangeObject, RangeTypePtr);
-    if (self == NULL)
-	return NULL;
+    якщо (self == NULL)
+	повернути NULL;
 
     bufr = (BufferObject *)BufferNew(buf);
-    if (bufr == NULL)
+    якщо (bufr == NULL)
     {
 	Py_DECREF(self);
-	return NULL;
+	повернути NULL;
     }
     Py_INCREF((PyObject *)bufr);
 
@@ -5776,7 +5776,7 @@ RangeNew(buf_T *buf, PyInt start, PyInt end)
     self->start = start;
     self->end = end;
 
-    return (PyObject *)(self);
+    повернути (PyObject *)(self);
 }
 
     static void
@@ -5788,42 +5788,42 @@ RangeDestructor(PyObject *self_obj)
     PyObject_GC_Del((void *)(self));
 }
 
-    static int
+    static ціле
 RangeTraverse(PyObject *self_obj, visitproc visit, void *arg)
 {
     RangeObject *self = (RangeObject*)self_obj;
     Py_VISIT(((PyObject *)(self->buf)));
-    return 0;
+    повернути 0;
 }
 
-    static int
+    static ціле
 RangeClear(PyObject *self_obj)
 {
     RangeObject *self = (RangeObject*)self_obj;
     Py_CLEAR(self->buf);
-    return 0;
+    повернути 0;
 }
 
     static PyInt
 RangeLength(RangeObject *self)
 {
     // HOW DO WE SIGNAL AN ERROR FROM THIS FUNCTION?
-    if (CheckBuffer(self->buf))
-	return -1; // ???
+    якщо (CheckBuffer(self->buf))
+	повернути -1; // ???
 
-    return (self->end - self->start + 1);
+    повернути (self->end - self->start + 1);
 }
 
     static PyObject *
 RangeItem(RangeObject *self, PyInt n)
 {
-    return RBItem(self->buf, n, self->start, self->end);
+    повернути RBItem(self->buf, n, self->start, self->end);
 }
 
     static PyObject *
 RangeSlice(RangeObject *self, PyInt lo, PyInt hi)
 {
-    return RBSlice(self->buf, lo, hi, self->start, self->end);
+    повернути RBSlice(self->buf, lo, hi, self->start, self->end);
 }
 
 static char *RangeAttrs[] = {
@@ -5834,31 +5834,31 @@ static char *RangeAttrs[] = {
     static PyObject *
 RangeDir(PyObject *self, PyObject *args UNUSED)
 {
-    return ObjectDir(self, RangeAttrs);
+    повернути ObjectDir(self, RangeAttrs);
 }
 
     static PyObject *
 RangeAppend(RangeObject *self, PyObject *args)
 {
-    return RBAppend(self->buf, args, self->start, self->end, &self->end);
+    повернути RBAppend(self->buf, args, self->start, self->end, &self->end);
 }
 
     static PyObject *
 RangeRepr(PyObject *self_obj)
 {
     RangeObject *self = (RangeObject*)self_obj;
-    if (self->buf->buf == INVALID_BUFFER_VALUE)
-	return PyString_FromFormat("<range object (for deleted buffer) at %p>",
+    якщо (self->buf->buf == INVALID_BUFFER_VALUE)
+	повернути PyString_FromFormat("<range object (for deleted buffer) at %p>",
 				    (void *)self);
-    else
+    інакше
     {
 	char *name = (char *)self->buf->buf->b_fname;
 
-	if (name == NULL)
+	якщо (name == NULL)
 	    name = "";
 
-	return PyString_FromFormat("<range %s (%d:%d)>",
-				    name, (int)self->start, (int)self->end);
+	повернути PyString_FromFormat("<range %s (%d:%d)>",
+				    name, (ціле)self->start, (ціле)self->end);
     }
 }
 
@@ -5896,28 +5896,28 @@ BufferNew(buf_T *buf)
 
     BufferObject *self;
 
-    if (BUF_PYTHON_REF(buf) != NULL)
+    якщо (BUF_PYTHON_REF(buf) != NULL)
     {
 	self = BUF_PYTHON_REF(buf);
 	Py_INCREF((PyObject *)self);
     }
-    else
+    інакше
     {
 	self = PyObject_NEW(BufferObject, BufferTypePtr);
-	if (self == NULL)
-	    return NULL;
+	якщо (self == NULL)
+	    повернути NULL;
 	self->buf = buf;
 	BUF_PYTHON_REF(buf) = self;
     }
 
-    return (PyObject *)(self);
+    повернути (PyObject *)(self);
 }
 
     static void
 BufferDestructor(PyObject *self_obj)
 {
     BufferObject *self = (BufferObject*)self_obj;
-    if (self->buf && self->buf != INVALID_BUFFER_VALUE)
+    якщо (self->buf && self->buf != INVALID_BUFFER_VALUE)
 	BUF_PYTHON_REF(self->buf) = NULL;
 
     DESTRUCTOR_FINISH(self);
@@ -5927,22 +5927,22 @@ BufferDestructor(PyObject *self_obj)
 BufferLength(BufferObject *self)
 {
     // HOW DO WE SIGNAL AN ERROR FROM THIS FUNCTION?
-    if (CheckBuffer(self))
-	return -1; // ???
+    якщо (CheckBuffer(self))
+	повернути -1; // ???
 
-    return (PyInt)(self->buf->b_ml.ml_line_count);
+    повернути (PyInt)(self->buf->b_ml.ml_line_count);
 }
 
     static PyObject *
 BufferItem(BufferObject *self, PyInt n)
 {
-    return RBItem(self, n, 1, -1);
+    повернути RBItem(self, n, 1, -1);
 }
 
     static PyObject *
 BufferSlice(BufferObject *self, PyInt lo, PyInt hi)
 {
-    return RBSlice(self, lo, hi, 1, -1);
+    повернути RBSlice(self, lo, hi, 1, -1);
 }
 
 static char *BufferAttrs[] = {
@@ -5953,7 +5953,7 @@ static char *BufferAttrs[] = {
     static PyObject *
 BufferDir(PyObject *self, PyObject *args UNUSED)
 {
-    return ObjectDir(self, BufferAttrs);
+    повернути ObjectDir(self, BufferAttrs);
 }
 
     static PyObject *
@@ -5961,80 +5961,80 @@ BufferAttrValid(BufferObject *self, char *name)
 {
     PyObject	*ret;
 
-    if (strcmp(name, "valid") != 0)
-	return NULL;
+    якщо (strcmp(name, "valid") != 0)
+	повернути NULL;
 
     ret = ((self->buf == INVALID_BUFFER_VALUE) ? Py_False : Py_True);
     Py_INCREF(ret);
-    return ret;
+    повернути ret;
 }
 
     static PyObject *
 BufferAttr(BufferObject *self, char *name)
 {
-    if (strcmp(name, "name") == 0)
-	return PyString_FromString((self->buf->b_ffname == NULL
+    якщо (strcmp(name, "name") == 0)
+	повернути PyString_FromString((self->buf->b_ffname == NULL
 				    ? "" : (char *)self->buf->b_ffname));
-    else if (strcmp(name, "number") == 0)
-	return Py_BuildValue(Py_ssize_t_fmt, self->buf->b_fnum);
-    else if (strcmp(name, "vars") == 0)
-	return NEW_DICTIONARY(self->buf->b_vars);
-    else if (strcmp(name, "options") == 0)
-	return OptionsNew(SREQ_BUF, self->buf, CheckBufferCb,
+    інакше якщо (strcmp(name, "number") == 0)
+	повернути Py_BuildValue(Py_ssize_t_fmt, self->buf->b_fnum);
+    інакше якщо (strcmp(name, "vars") == 0)
+	повернути NEW_DICTIONARY(self->buf->b_vars);
+    інакше якщо (strcmp(name, "options") == 0)
+	повернути OptionsNew(SREQ_BUF, self->buf, CheckBufferCb,
 			(PyObject *) self);
-    else if (strcmp(name, "__members__") == 0)
-	return ObjectDir(NULL, BufferAttrs);
-    else
-	return NULL;
+    інакше якщо (strcmp(name, "__members__") == 0)
+	повернути ObjectDir(NULL, BufferAttrs);
+    інакше
+	повернути NULL;
 }
 
-    static int
+    static ціле
 BufferSetattr(PyObject *self_obj, char *name, PyObject *valObject)
 {
     BufferObject *self = (BufferObject*)self_obj;
-    if (CheckBuffer(self))
-	return -1;
+    якщо (CheckBuffer(self))
+	повернути -1;
 
-    if (strcmp(name, "name") == 0)
+    якщо (strcmp(name, "name") == 0)
     {
 	char_u		*val;
 	aco_save_T	aco;
-	int		ren_ret = OK;
+	ціле		ren_ret = OK;
 	PyObject	*todecref;
 
-	if (!(val = StringToChars(valObject, &todecref)))
-	    return -1;
+	якщо (!(val = StringToChars(valObject, &todecref)))
+	    повернути -1;
 
 	VimTryStart();
 	// Using aucmd_*: autocommands will be executed by rename_buffer
 	aucmd_prepbuf(&aco, self->buf);
-	if (curbuf == self->buf)
+	якщо (curbuf == self->buf)
 	{
 	    ren_ret = rename_buffer(val);
 	    aucmd_restbuf(&aco);
 	}
 	Py_XDECREF(todecref);
-	if (VimTryEnd())
-	    return -1;
+	якщо (VimTryEnd())
+	    повернути -1;
 
-	if (ren_ret == FAIL)
+	якщо (ren_ret == FAIL)
 	{
 	    PyErr_SET_VIM(N_("failed to rename buffer"));
-	    return -1;
+	    повернути -1;
 	}
-	return 0;
+	повернути 0;
     }
-    else
+    інакше
     {
 	PyErr_SetString(PyExc_AttributeError, name);
-	return -1;
+	повернути -1;
     }
 }
 
     static PyObject *
 BufferAppend(BufferObject *self, PyObject *args)
 {
-    return RBAppend(self, args, 1, -1, NULL);
+    повернути RBAppend(self, args, 1, -1, NULL);
 }
 
     static PyObject *
@@ -6046,18 +6046,18 @@ BufferMark(BufferObject *self, PyObject *pmarkObject)
     bufref_T	savebuf;
     PyObject	*todecref;
 
-    if (CheckBuffer(self))
-	return NULL;
+    якщо (CheckBuffer(self))
+	повернути NULL;
 
-    if (!(pmark = StringToChars(pmarkObject, &todecref)))
-	return NULL;
+    якщо (!(pmark = StringToChars(pmarkObject, &todecref)))
+	повернути NULL;
 
-    if (pmark[0] == '\0' || pmark[1] != '\0')
+    якщо (pmark[0] == '\0' || pmark[1] != '\0')
     {
 	PyErr_SET_STRING(PyExc_ValueError,
 		N_("mark name must be a single character"));
 	Py_XDECREF(todecref);
-	return NULL;
+	повернути NULL;
     }
 
     mark = *pmark;
@@ -6068,23 +6068,23 @@ BufferMark(BufferObject *self, PyObject *pmarkObject)
     switch_buffer(&savebuf, self->buf);
     posp = getmark(mark, FALSE);
     restore_buffer(&savebuf);
-    if (VimTryEnd())
-	return NULL;
+    якщо (VimTryEnd())
+	повернути NULL;
 
-    if (posp == NULL)
+    якщо (posp == NULL)
     {
 	PyErr_SET_VIM(N_("invalid mark name"));
-	return NULL;
+	повернути NULL;
     }
 
-    if (posp->lnum <= 0)
+    якщо (posp->lnum <= 0)
     {
 	// Or raise an error?
 	Py_INCREF(Py_None);
-	return Py_None;
+	повернути Py_None;
     }
 
-    return Py_BuildValue("(ll)", (long)(posp->lnum), (long)(posp->col));
+    повернути Py_BuildValue("(ll)", (long)(posp->lnum), (long)(posp->col));
 }
 
     static PyObject *
@@ -6093,29 +6093,29 @@ BufferRange(BufferObject *self, PyObject *args)
     PyInt start;
     PyInt end;
 
-    if (CheckBuffer(self))
-	return NULL;
+    якщо (CheckBuffer(self))
+	повернути NULL;
 
-    if (!PyArg_ParseTuple(args, "nn", &start, &end))
-	return NULL;
+    якщо (!PyArg_ParseTuple(args, "nn", &start, &end))
+	повернути NULL;
 
-    return RangeNew(self->buf, start, end);
+    повернути RangeNew(self->buf, start, end);
 }
 
     static PyObject *
 BufferRepr(PyObject *self_obj)
 {
     BufferObject *self = (BufferObject*)self_obj;
-    if (self->buf == INVALID_BUFFER_VALUE)
-	return PyString_FromFormat("<buffer object (deleted) at %p>", (void *)self);
-    else
+    якщо (self->buf == INVALID_BUFFER_VALUE)
+	повернути PyString_FromFormat("<buffer object (deleted) at %p>", (void *)self);
+    інакше
     {
 	char	*name = (char *)self->buf->b_fname;
 
-	if (name == NULL)
+	якщо (name == NULL)
 	    name = "";
 
-	return PyString_FromFormat("<buffer %s>", name);
+	повернути PyString_FromFormat("<buffer %s>", name);
     }
 }
 
@@ -6150,13 +6150,13 @@ BufMapLength(PyObject *self UNUSED)
     buf_T	*b = firstbuf;
     PyInt	n = 0;
 
-    while (b)
+    поки (b)
     {
 	++n;
 	b = b->b_next;
     }
 
-    return n;
+    повернути n;
 }
 
     static PyObject *
@@ -6165,17 +6165,17 @@ BufMapItem(PyObject *self UNUSED, PyObject *keyObject)
     buf_T	*b;
     long	bnr;
 
-    if (NumberToLong(keyObject, &bnr, NUMBER_INT|NUMBER_NATURAL))
-	return NULL;
+    якщо (NumberToLong(keyObject, &bnr, NUMBER_INT|NUMBER_NATURAL))
+	повернути NULL;
 
-    b = buflist_findnr((int) bnr);
+    b = buflist_findnr((ціле) bnr);
 
-    if (b)
-	return BufferNew(b);
-    else
+    якщо (b)
+	повернути BufferNew(b);
+    інакше
     {
 	PyErr_SetObject(PyExc_KeyError, keyObject);
-	return NULL;
+	повернути NULL;
     }
 }
 
@@ -6184,28 +6184,28 @@ BufMapIterDestruct(void* arg)
 {
     PyObject *buffer = (PyObject*)arg;
     // Iteration was stopped before all buffers were processed
-    if (buffer)
+    якщо (buffer)
     {
 	Py_DECREF(buffer);
     }
 }
 
-    static int
+    static ціле
 BufMapIterTraverse(void *iter, visitproc visit, void *arg)
 {
     PyObject *buffer = (PyObject*)iter;
-    if (buffer)
+    якщо (buffer)
 	Py_VISIT(buffer);
-    return 0;
+    повернути 0;
 }
 
-    static int
+    static ціле
 BufMapIterClear(void **iter)
 {
     PyObject **buffer = (PyObject**)iter;
-    if (*buffer)
+    якщо (*buffer)
 	Py_CLEAR(*buffer);
-    return 0;
+    повернути 0;
 }
 
     static PyObject *
@@ -6215,25 +6215,25 @@ BufMapIterNext(void **arg)
     PyObject	*ret;
     PyObject	**buffer = (PyObject**)arg;
 
-    if (!*buffer)
-	return NULL;
+    якщо (!*buffer)
+	повернути NULL;
 
     ret = *buffer;
 
-    if (CheckBuffer((BufferObject *)(ret)))
+    якщо (CheckBuffer((BufferObject *)(ret)))
     {
 	*buffer = NULL;
-	return NULL;
+	повернути NULL;
     }
 
-    if (!((BufferObject *)(ret))->buf->b_next)
+    якщо (!((BufferObject *)(ret))->buf->b_next)
 	next = NULL;
-    else if (!(next = BufferNew(((BufferObject *)(ret))->buf->b_next)))
-	return NULL;
+    інакше якщо (!(next = BufferNew(((BufferObject *)(ret))->buf->b_next)))
+	повернути NULL;
     *buffer = next;
     // Do not increment reference: we no longer hold it (decref), but whoever
     // on other side will hold (incref). Decref+incref = nothing.
-    return ret;
+    повернути ret;
 }
 
     static PyObject *
@@ -6242,7 +6242,7 @@ BufMapIter(PyObject *self)
     PyObject *buffer;
 
     buffer = BufferNew(firstbuf);
-    return IterNew(buffer,
+    повернути IterNew(buffer,
 	    BufMapIterDestruct, BufMapIterNext,
 	    BufMapIterTraverse, BufMapIterClear,
 	    self);
@@ -6264,136 +6264,136 @@ static char *CurrentAttrs[] = {
     static PyObject *
 CurrentDir(PyObject *self, PyObject *args UNUSED)
 {
-    return ObjectDir(self, CurrentAttrs);
+    повернути ObjectDir(self, CurrentAttrs);
 }
 
     static PyObject *
 CurrentGetattr(PyObject *self UNUSED, char *name)
 {
-    if (strcmp(name, "buffer") == 0)
-	return (PyObject *)BufferNew(curbuf);
-    else if (strcmp(name, "window") == 0)
-	return (PyObject *)WindowNew(curwin, curtab);
-    else if (strcmp(name, "tabpage") == 0)
-	return (PyObject *)TabPageNew(curtab);
-    else if (strcmp(name, "line") == 0)
-	return GetBufferLine(curbuf, (PyInt)curwin->w_cursor.lnum);
-    else if (strcmp(name, "range") == 0)
-	return RangeNew(curbuf, RangeStart, RangeEnd);
-    else if (strcmp(name, "__members__") == 0)
-	return ObjectDir(NULL, CurrentAttrs);
-    else
-#if PY_MAJOR_VERSION < 3
-	return Py_FindMethod(WindowMethods, self, name);
-#else
-	return NULL;
+    якщо (strcmp(name, "buffer") == 0)
+	повернути (PyObject *)BufferNew(curbuf);
+    інакше якщо (strcmp(name, "window") == 0)
+	повернути (PyObject *)WindowNew(curwin, curtab);
+    інакше якщо (strcmp(name, "tabpage") == 0)
+	повернути (PyObject *)TabPageNew(curtab);
+    інакше якщо (strcmp(name, "line") == 0)
+	повернути GetBufferLine(curbuf, (PyInt)curwin->w_cursor.lnum);
+    інакше якщо (strcmp(name, "range") == 0)
+	повернути RangeNew(curbuf, RangeStart, RangeEnd);
+    інакше якщо (strcmp(name, "__members__") == 0)
+	повернути ObjectDir(NULL, CurrentAttrs);
+    інакше
+#якщо PY_MAJOR_VERSION < 3
+	повернути Py_FindMethod(WindowMethods, self, name);
+#інакше
+	повернути NULL;
 #endif
 }
 
-    static int
+    static ціле
 CurrentSetattr(PyObject *self UNUSED, char *name, PyObject *valObject)
 {
-    if (strcmp(name, "line") == 0)
+    якщо (strcmp(name, "line") == 0)
     {
-	if (SetBufferLine(curbuf, (PyInt)curwin->w_cursor.lnum, valObject,
+	якщо (SetBufferLine(curbuf, (PyInt)curwin->w_cursor.lnum, valObject,
 			  NULL) == FAIL)
-	    return -1;
+	    повернути -1;
 
-	return 0;
+	повернути 0;
     }
-    else if (strcmp(name, "buffer") == 0)
+    інакше якщо (strcmp(name, "buffer") == 0)
     {
-	int count;
+	ціле count;
 
-	if (valObject->ob_type != BufferTypePtr)
+	якщо (valObject->ob_type != BufferTypePtr)
 	{
 	    PyErr_FORMAT_TYPE(
 		    N_("expected vim.Buffer object, but got %s"),
 		    valObject);
-	    return -1;
+	    повернути -1;
 	}
 
-	if (CheckBuffer((BufferObject *)(valObject)))
-	    return -1;
+	якщо (CheckBuffer((BufferObject *)(valObject)))
+	    повернути -1;
 	count = ((BufferObject *)(valObject))->buf->b_fnum;
 
 	VimTryStart();
-	if (do_buffer(DOBUF_GOTO, DOBUF_FIRST, FORWARD, count, 0) == FAIL)
+	якщо (do_buffer(DOBUF_GOTO, DOBUF_FIRST, FORWARD, count, 0) == FAIL)
 	{
-	    if (VimTryEnd())
-		return -1;
+	    якщо (VimTryEnd())
+		повернути -1;
 	    PyErr_VIM_FORMAT(N_("failed to switch to buffer %d"), count);
-	    return -1;
+	    повернути -1;
 	}
 
-	return VimTryEnd();
+	повернути VimTryEnd();
     }
-    else if (strcmp(name, "window") == 0)
+    інакше якщо (strcmp(name, "window") == 0)
     {
-	int count;
+	ціле count;
 
-	if (valObject->ob_type != WindowTypePtr)
+	якщо (valObject->ob_type != WindowTypePtr)
 	{
 	    PyErr_FORMAT_TYPE(
 		    N_("expected vim.Window object, but got %s"),
 		    valObject);
-	    return -1;
+	    повернути -1;
 	}
 
-	if (CheckWindow((WindowObject *)(valObject)))
-	    return -1;
+	якщо (CheckWindow((WindowObject *)(valObject)))
+	    повернути -1;
 	count = get_win_number(((WindowObject *)(valObject))->win, firstwin);
 
-	if (!count)
+	якщо (!count)
 	{
 	    PyErr_SET_STRING(PyExc_ValueError,
 		    N_("failed to find window in the current tab page"));
-	    return -1;
+	    повернути -1;
 	}
 
 	VimTryStart();
 	win_goto(((WindowObject *)(valObject))->win);
-	if (((WindowObject *)(valObject))->win != curwin)
+	якщо (((WindowObject *)(valObject))->win != curwin)
 	{
-	    if (VimTryEnd())
-		return -1;
+	    якщо (VimTryEnd())
+		повернути -1;
 	    PyErr_SET_STRING(PyExc_RuntimeError,
 		    N_("did not switch to the specified window"));
-	    return -1;
+	    повернути -1;
 	}
 
-	return VimTryEnd();
+	повернути VimTryEnd();
     }
-    else if (strcmp(name, "tabpage") == 0)
+    інакше якщо (strcmp(name, "tabpage") == 0)
     {
-	if (valObject->ob_type != TabPageTypePtr)
+	якщо (valObject->ob_type != TabPageTypePtr)
 	{
 	    PyErr_FORMAT_TYPE(
 		    N_("expected vim.TabPage object, but got %s"),
 		    valObject);
-	    return -1;
+	    повернути -1;
 	}
 
-	if (CheckTabPage((TabPageObject *)(valObject)))
-	    return -1;
+	якщо (CheckTabPage((TabPageObject *)(valObject)))
+	    повернути -1;
 
 	VimTryStart();
 	goto_tabpage_tp(((TabPageObject *)(valObject))->tab, TRUE, TRUE);
-	if (((TabPageObject *)(valObject))->tab != curtab)
+	якщо (((TabPageObject *)(valObject))->tab != curtab)
 	{
-	    if (VimTryEnd())
-		return -1;
+	    якщо (VimTryEnd())
+		повернути -1;
 	    PyErr_SET_STRING(PyExc_RuntimeError,
 		    N_("did not switch to the specified tab page"));
-	    return -1;
+	    повернути -1;
 	}
 
-	return VimTryEnd();
+	повернути VimTryEnd();
     }
-    else
+    інакше
     {
 	PyErr_SetString(PyExc_AttributeError, name);
-	return -1;
+	повернути -1;
     }
 }
 
@@ -6427,21 +6427,21 @@ run_cmd(const char *cmd, dict_T* locals UNUSED, void *arg UNUSED
 {
     PyObject	*run_ret;
     run_ret = PyRun_String((char *)cmd, Py_file_input, globals, globals);
-    if (run_ret != NULL)
+    якщо (run_ret != NULL)
     {
 	Py_DECREF(run_ret);
     }
-    else if (PyErr_Occurred() && PyErr_ExceptionMatches(PyExc_SystemExit))
+    інакше якщо (PyErr_Occurred() && PyErr_ExceptionMatches(PyExc_SystemExit))
     {
 	emsg(_(e_cant_handle_systemexit_of_python_exception_in_vim));
 	PyErr_Clear();
     }
-    else
+    інакше
 	PyErr_PrintEx(1);
 }
 
 static const char	*code_hdr = "def " DOPY_FUNC "(line, linenr):\n ";
-static int		code_hdr_len = 30;
+static ціле		code_hdr_len = 30;
 
     static void
 run_do(const char *cmd, dict_T* locals UNUSED, void *arg UNUSED
@@ -6453,15 +6453,15 @@ run_do(const char *cmd, dict_T* locals UNUSED, void *arg UNUSED
     PyInt	lnum;
     size_t	len;
     char	*code;
-    int		status;
+    ціле		status;
     PyObject	*pyfunc, *pymain;
     PyObject	*run_ret;
     buf_T	*was_curbuf = curbuf;
 
-    if (u_save((linenr_T)RangeStart - 1, (linenr_T)RangeEnd + 1) != OK)
+    якщо (u_save((linenr_T)RangeStart - 1, (linenr_T)RangeEnd + 1) != OK)
     {
 	emsg(_("cannot save undo information"));
-	return;
+	повернути;
     }
 
     len = code_hdr_len + STRLEN(cmd);
@@ -6470,27 +6470,27 @@ run_do(const char *cmd, dict_T* locals UNUSED, void *arg UNUSED
     STRCPY(code + code_hdr_len, cmd);
     run_ret = PyRun_String(code, Py_file_input, globals, globals);
     status = -1;
-    if (run_ret != NULL)
+    якщо (run_ret != NULL)
     {
 	status = 0;
 	Py_DECREF(run_ret);
     }
-    else if (PyErr_Occurred() && PyErr_ExceptionMatches(PyExc_SystemExit))
+    інакше якщо (PyErr_Occurred() && PyErr_ExceptionMatches(PyExc_SystemExit))
     {
 	PyMem_Free(code);
 	emsg(_(e_cant_handle_systemexit_of_python_exception_in_vim));
 	PyErr_Clear();
-	return;
+	повернути;
     }
-    else
+    інакше
 	PyErr_PrintEx(1);
 
     PyMem_Free(code);
 
-    if (status)
+    якщо (status)
     {
 	emsg(_("failed to run the code"));
-	return;
+	повернути;
     }
 
     status = 0;
@@ -6500,7 +6500,7 @@ run_do(const char *cmd, dict_T* locals UNUSED, void *arg UNUSED
     PyGILState_Release(*pygilstate);
 #endif
 
-    for (lnum = RangeStart; lnum <= RangeEnd; ++lnum)
+    для (lnum = RangeStart; lnum <= RangeEnd; ++lnum)
     {
 	PyObject	*line;
 	PyObject	*linenr;
@@ -6510,10 +6510,10 @@ run_do(const char *cmd, dict_T* locals UNUSED, void *arg UNUSED
 	*pygilstate = PyGILState_Ensure();
 #endif
 	// Check the line number, the command my have deleted lines.
-	if (lnum > curbuf->b_ml.ml_line_count
+	якщо (lnum > curbuf->b_ml.ml_line_count
 		|| !(line = GetBufferLine(curbuf, lnum)))
 	    goto err;
-	if (!(linenr = PyInt_FromLong((long) lnum)))
+	якщо (!(linenr = PyInt_FromLong((long) lnum)))
 	{
 	    Py_DECREF(line);
 	    goto err;
@@ -6521,19 +6521,19 @@ run_do(const char *cmd, dict_T* locals UNUSED, void *arg UNUSED
 	ret = PyObject_CallFunctionObjArgs(pyfunc, line, linenr, NULL);
 	Py_DECREF(line);
 	Py_DECREF(linenr);
-	if (!ret)
+	якщо (!ret)
 	    goto err;
 
 	// Check that the command didn't switch to another buffer.
 	// Check the line number, the command my have deleted lines.
-	if (curbuf != was_curbuf || lnum > curbuf->b_ml.ml_line_count)
+	якщо (curbuf != was_curbuf || lnum > curbuf->b_ml.ml_line_count)
 	{
 	    Py_XDECREF(ret);
 	    goto err;
 	}
 
-	if (ret != Py_None)
-	    if (SetBufferLine(curbuf, lnum, ret, NULL) == FAIL)
+	якщо (ret != Py_None)
+	    якщо (SetBufferLine(curbuf, lnum, ret, NULL) == FAIL)
 	    {
 		Py_XDECREF(ret);
 		goto err;
@@ -6555,13 +6555,13 @@ err:
     status = 1;
 out:
 #ifdef PY_CAN_RECURSE
-    if (!status)
+    якщо (!status)
 	*pygilstate = PyGILState_Ensure();
 #endif
     Py_DECREF(pyfunc);
     PyObject_SetAttrString(pymain, DOPY_FUNC, NULL);
-    if (status)
-	return;
+    якщо (status)
+	повернути;
     check_cursor();
     update_curbuf(UPD_NOT_VALID);
 }
@@ -6578,93 +6578,93 @@ run_eval(const char *cmd, dict_T *locals, void *arg
     PyObject	*pylocals = locals ? NEW_DICTIONARY(locals) : globals;
 
     run_ret = PyRun_String((char *)cmd, Py_eval_input, globals, pylocals);
-    if (run_ret == NULL)
+    якщо (run_ret == NULL)
     {
-	if (PyErr_Occurred() && PyErr_ExceptionMatches(PyExc_SystemExit))
+	якщо (PyErr_Occurred() && PyErr_ExceptionMatches(PyExc_SystemExit))
 	{
 	    emsg(_(e_cant_handle_systemexit_of_python_exception_in_vim));
 	    PyErr_Clear();
 	}
-	else
+	інакше
 	{
-	    if (PyErr_Occurred() && !msg_silent)
+	    якщо (PyErr_Occurred() && !msg_silent)
 		PyErr_PrintEx(0);
 	    emsg(_(e_eval_did_not_return_valid_python_object));
 	}
     }
-    else
+    інакше
     {
-	if (ConvertFromPyObject(run_ret, rettv) == -1)
+	якщо (ConvertFromPyObject(run_ret, rettv) == -1)
 	    emsg(_(e_failed_to_convert_returned_python_object_to_vim_value));
 	Py_DECREF(run_ret);
     }
     PyErr_Clear();
 }
 
-    static int
-set_ref_in_py(const int copyID)
+    static ціле
+set_ref_in_py(const ціле copyID)
 {
     pylinkedlist_T	*cur;
     list_T		*ll;
     tuple_T		*tt;
-    int			i;
-    int			abort = FALSE;
+    ціле			i;
+    ціле			abort = FALSE;
     FunctionObject	*func;
 
-    if (lastdict != NULL)
+    якщо (lastdict != NULL)
     {
-	for (cur = lastdict ; !abort && cur != NULL ; cur = cur->pll_prev)
+	для (cur = lastdict ; !abort && cur != NULL ; cur = cur->pll_prev)
 	    abort = set_ref_in_dict(((DictionaryObject *)(cur->pll_obj))->dict,
 								       copyID);
     }
 
-    if (lastlist != NULL)
+    якщо (lastlist != NULL)
     {
-	for (cur = lastlist ; !abort && cur != NULL ; cur = cur->pll_prev)
+	для (cur = lastlist ; !abort && cur != NULL ; cur = cur->pll_prev)
 	{
 	    ll = ((ListObject *) (cur->pll_obj))->list;
 	    abort = set_ref_in_list(ll, copyID);
 	}
     }
 
-    if (lasttuple != NULL)
+    якщо (lasttuple != NULL)
     {
-	for (cur = lasttuple ; !abort && cur != NULL ; cur = cur->pll_prev)
+	для (cur = lasttuple ; !abort && cur != NULL ; cur = cur->pll_prev)
 	{
 	    tt = ((TupleObject *) (cur->pll_obj))->tuple;
 	    abort = set_ref_in_tuple(tt, copyID);
 	}
     }
 
-    if (lastfunc != NULL)
+    якщо (lastfunc != NULL)
     {
-	for (cur = lastfunc ; !abort && cur != NULL ; cur = cur->pll_prev)
+	для (cur = lastfunc ; !abort && cur != NULL ; cur = cur->pll_prev)
 	{
 	    func = (FunctionObject *) cur->pll_obj;
 	    abort = set_ref_in_dict(func->self, copyID);
-	    if (func->argc)
-		for (i = 0; !abort && i < func->argc; ++i)
+	    якщо (func->argc)
+		для (i = 0; !abort && i < func->argc; ++i)
 		    abort = abort
 			|| set_ref_in_item(&func->argv[i], copyID, NULL, NULL, NULL);
 	}
     }
 
-    return abort;
+    повернути abort;
 }
 
-    static int
+    static ціле
 set_string_copy(char_u *str, typval_T *tv)
 {
     tv->vval.v_string = vim_strsave(str);
-    if (tv->vval.v_string == NULL)
+    якщо (tv->vval.v_string == NULL)
     {
 	PyErr_NoMemory();
-	return -1;
+	повернути -1;
     }
-    return 0;
+    повернути 0;
 }
 
-    static int
+    static ціле
 pydict_to_tv(PyObject *obj, typval_T *tv, PyObject *lookup_dict)
 {
     dict_T	*dict;
@@ -6674,69 +6674,69 @@ pydict_to_tv(PyObject *obj, typval_T *tv, PyObject *lookup_dict)
     PyObject	*valObject;
     Py_ssize_t	iter = 0;
 
-    if (!(dict = py_dict_alloc()))
-	return -1;
+    якщо (!(dict = py_dict_alloc()))
+	повернути -1;
 
     tv->v_type = VAR_DICT;
     tv->vval.v_dict = dict;
 
-    while (PyDict_Next(obj, &iter, &keyObject, &valObject))
+    поки (PyDict_Next(obj, &iter, &keyObject, &valObject))
     {
 	PyObject	*todecref = NULL;
 
-	if (keyObject == NULL || valObject == NULL)
+	якщо (keyObject == NULL || valObject == NULL)
 	{
 	    dict_unref(dict);
-	    return -1;
+	    повернути -1;
 	}
 
-	if (!(key = StringToChars(keyObject, &todecref)))
+	якщо (!(key = StringToChars(keyObject, &todecref)))
 	{
 	    dict_unref(dict);
-	    return -1;
+	    повернути -1;
 	}
 
-	if (*key == NUL)
+	якщо (*key == NUL)
 	{
 	    dict_unref(dict);
 	    Py_XDECREF(todecref);
 	    RAISE_NO_EMPTY_KEYS;
-	    return -1;
+	    повернути -1;
 	}
 
 	di = dictitem_alloc(key);
 
 	Py_XDECREF(todecref);
 
-	if (di == NULL)
+	якщо (di == NULL)
 	{
 	    PyErr_NoMemory();
 	    dict_unref(dict);
-	    return -1;
+	    повернути -1;
 	}
 
-	if (_ConvertFromPyObject(valObject, &di->di_tv, lookup_dict) == -1)
+	якщо (_ConvertFromPyObject(valObject, &di->di_tv, lookup_dict) == -1)
 	{
 	    vim_free(di);
 	    dict_unref(dict);
-	    return -1;
+	    повернути -1;
 	}
 
-	if (dict_add(dict, di) == FAIL)
+	якщо (dict_add(dict, di) == FAIL)
 	{
 	    RAISE_KEY_ADD_FAIL(di->di_key);
 	    clear_tv(&di->di_tv);
 	    vim_free(di);
 	    dict_unref(dict);
-	    return -1;
+	    повернути -1;
 	}
     }
 
     --dict->dv_refcount;
-    return 0;
+    повернути 0;
 }
 
-    static int
+    static ціле
 pymap_to_tv(PyObject *obj, typval_T *tv, PyObject *lookup_dict)
 {
     dict_T	*dict;
@@ -6747,55 +6747,55 @@ pymap_to_tv(PyObject *obj, typval_T *tv, PyObject *lookup_dict)
     PyObject	*keyObject;
     PyObject	*valObject;
 
-    if (!(dict = py_dict_alloc()))
-	return -1;
+    якщо (!(dict = py_dict_alloc()))
+	повернути -1;
 
     tv->v_type = VAR_DICT;
     tv->vval.v_dict = dict;
 
-    if (!(list = PyMapping_Keys(obj)))
+    якщо (!(list = PyMapping_Keys(obj)))
     {
 	dict_unref(dict);
-	return -1;
+	повернути -1;
     }
 
-    if (!(iterator = PyObject_GetIter(list)))
+    якщо (!(iterator = PyObject_GetIter(list)))
     {
 	dict_unref(dict);
 	Py_DECREF(list);
-	return -1;
+	повернути -1;
     }
     Py_DECREF(list);
 
-    while ((keyObject = PyIter_Next(iterator)))
+    поки ((keyObject = PyIter_Next(iterator)))
     {
 	PyObject	*todecref;
 
-	if (!(key = StringToChars(keyObject, &todecref)))
+	якщо (!(key = StringToChars(keyObject, &todecref)))
 	{
 	    Py_DECREF(keyObject);
 	    Py_DECREF(iterator);
 	    dict_unref(dict);
-	    return -1;
+	    повернути -1;
 	}
 
-	if (*key == NUL)
+	якщо (*key == NUL)
 	{
 	    Py_DECREF(keyObject);
 	    Py_DECREF(iterator);
 	    Py_XDECREF(todecref);
 	    dict_unref(dict);
 	    RAISE_NO_EMPTY_KEYS;
-	    return -1;
+	    повернути -1;
 	}
 
-	if (!(valObject = PyObject_GetItem(obj, keyObject)))
+	якщо (!(valObject = PyObject_GetItem(obj, keyObject)))
 	{
 	    Py_DECREF(keyObject);
 	    Py_DECREF(iterator);
 	    Py_XDECREF(todecref);
 	    dict_unref(dict);
-	    return -1;
+	    повернути -1;
 	}
 
 	di = dictitem_alloc(key);
@@ -6803,85 +6803,85 @@ pymap_to_tv(PyObject *obj, typval_T *tv, PyObject *lookup_dict)
 	Py_DECREF(keyObject);
 	Py_XDECREF(todecref);
 
-	if (di == NULL)
+	якщо (di == NULL)
 	{
 	    Py_DECREF(iterator);
 	    Py_DECREF(valObject);
 	    dict_unref(dict);
 	    PyErr_NoMemory();
-	    return -1;
+	    повернути -1;
 	}
 
-	if (_ConvertFromPyObject(valObject, &di->di_tv, lookup_dict) == -1)
+	якщо (_ConvertFromPyObject(valObject, &di->di_tv, lookup_dict) == -1)
 	{
 	    Py_DECREF(iterator);
 	    Py_DECREF(valObject);
 	    vim_free(di);
 	    dict_unref(dict);
-	    return -1;
+	    повернути -1;
 	}
 
 	Py_DECREF(valObject);
 
-	if (dict_add(dict, di) == FAIL)
+	якщо (dict_add(dict, di) == FAIL)
 	{
 	    RAISE_KEY_ADD_FAIL(di->di_key);
 	    Py_DECREF(iterator);
 	    dictitem_free(di);
 	    dict_unref(dict);
-	    return -1;
+	    повернути -1;
 	}
     }
     Py_DECREF(iterator);
     --dict->dv_refcount;
-    return 0;
+    повернути 0;
 }
 
-    static int
+    static ціле
 pyseq_to_tv(PyObject *obj, typval_T *tv, PyObject *lookup_dict)
 {
     list_T	*l;
 
-    if (!(l = py_list_alloc()))
-	return -1;
+    якщо (!(l = py_list_alloc()))
+	повернути -1;
 
     tv->v_type = VAR_LIST;
     tv->vval.v_list = l;
 
-    if (list_py_concat(l, obj, lookup_dict) == -1)
+    якщо (list_py_concat(l, obj, lookup_dict) == -1)
     {
 	list_unref(l);
-	return -1;
+	повернути -1;
     }
 
     --l->lv_refcount;
-    return 0;
+    повернути 0;
 }
 
-    static int
+    static ціле
 pytuple_to_tv(PyObject *obj, typval_T *tv, PyObject *lookup_dict)
 {
     tuple_T	*t;
 
-    if (!(t = py_tuple_alloc()))
-	return -1;
+    якщо (!(t = py_tuple_alloc()))
+	повернути -1;
 
     tv->v_type = VAR_TUPLE;
     tv->vval.v_tuple = t;
 
-    if (tuple_py_concat(t, obj, lookup_dict) == -1)
+    якщо (tuple_py_concat(t, obj, lookup_dict) == -1)
     {
 	tuple_unref(t);
-	return -1;
+	повернути -1;
     }
 
     --t->tv_refcount;
-    return 0;
+    повернути 0;
 }
 
-typedef int (*pytotvfunc)(PyObject *, typval_T *, PyObject *);
+typedef ціле (*pytotvfunc)(PyObject *, typval_T *, PyObject *);
 
-    static int
+    static ціле
 convert_dl(PyObject *obj, typval_T *tv,
 				    pytotvfunc py_to_tv, PyObject *lookup_dict)
 {
@@ -6892,74 +6892,74 @@ convert_dl(PyObject *obj, typval_T *tv,
 
 #ifdef PY_USE_CAPSULE
     capsule = PyDict_GetItemString(lookup_dict, hexBuf);
-#else
+#інакше
     capsule = (PyObject *)PyDict_GetItemString(lookup_dict, hexBuf);
 #endif
-    if (capsule == NULL)
+    якщо (capsule == NULL)
     {
 #ifdef PY_USE_CAPSULE
 	capsule = PyCapsule_New(tv, NULL, NULL);
-#else
+#інакше
 	capsule = PyCObject_FromVoidPtr(tv, NULL);
 #endif
-	if (PyDict_SetItemString(lookup_dict, hexBuf, capsule))
+	якщо (PyDict_SetItemString(lookup_dict, hexBuf, capsule))
 	{
 	    Py_DECREF(capsule);
 	    tv->v_type = VAR_UNKNOWN;
-	    return -1;
+	    повернути -1;
 	}
 
 	Py_DECREF(capsule);
 
-	if (py_to_tv(obj, tv, lookup_dict) == -1)
+	якщо (py_to_tv(obj, tv, lookup_dict) == -1)
 	{
 	    tv->v_type = VAR_UNKNOWN;
-	    return -1;
+	    повернути -1;
 	}
 	// As we are not using copy_tv which increments reference count we must
 	// do it ourself.
-	if (tv->v_type == VAR_DICT)
+	якщо (tv->v_type == VAR_DICT)
 	    ++tv->vval.v_dict->dv_refcount;
-	else if (tv->v_type == VAR_LIST)
+	інакше якщо (tv->v_type == VAR_LIST)
 	    ++tv->vval.v_list->lv_refcount;
-	else if (tv->v_type == VAR_TUPLE)
+	інакше якщо (tv->v_type == VAR_TUPLE)
 	    ++tv->vval.v_tuple->tv_refcount;
     }
-    else
+    інакше
     {
 	typval_T	*v;
 
 #ifdef PY_USE_CAPSULE
 	v = PyCapsule_GetPointer(capsule, NULL);
-#else
+#інакше
 	v = PyCObject_AsVoidPtr(capsule);
 #endif
 	copy_tv(v, tv);
     }
-    return 0;
+    повернути 0;
 }
 
-    static int
+    static ціле
 ConvertFromPyMapping(PyObject *obj, typval_T *tv)
 {
     PyObject	*lookup_dict;
-    int		ret;
+    ціле		ret;
 
-    if (!(lookup_dict = PyDict_New()))
-	return -1;
+    якщо (!(lookup_dict = PyDict_New()))
+	повернути -1;
 
-    if (PyType_IsSubtype(obj->ob_type, DictionaryTypePtr))
+    якщо (PyType_IsSubtype(obj->ob_type, DictionaryTypePtr))
     {
 	tv->v_type = VAR_DICT;
 	tv->vval.v_dict = (((DictionaryObject *)(obj))->dict);
 	++tv->vval.v_dict->dv_refcount;
 	ret = 0;
     }
-    else if (PyDict_Check(obj))
+    інакше якщо (PyDict_Check(obj))
 	ret = convert_dl(obj, tv, pydict_to_tv, lookup_dict);
-    else if (PyMapping_Check(obj))
+    інакше якщо (PyMapping_Check(obj))
 	ret = convert_dl(obj, tv, pymap_to_tv, lookup_dict);
-    else
+    інакше
     {
 	PyErr_FORMAT_TYPE(
 		N_("unable to convert %s to a Vim dictionary"),
@@ -6967,28 +6967,28 @@ ConvertFromPyMapping(PyObject *obj, typval_T *tv)
 	ret = -1;
     }
     Py_DECREF(lookup_dict);
-    return ret;
+    повернути ret;
 }
 
-    static int
+    static ціле
 ConvertFromPySequence(PyObject *obj, typval_T *tv)
 {
     PyObject	*lookup_dict;
-    int		ret;
+    ціле		ret;
 
-    if (!(lookup_dict = PyDict_New()))
-	return -1;
+    якщо (!(lookup_dict = PyDict_New()))
+	повернути -1;
 
-    if (PyType_IsSubtype(obj->ob_type, ListTypePtr))
+    якщо (PyType_IsSubtype(obj->ob_type, ListTypePtr))
     {
 	tv->v_type = VAR_LIST;
 	tv->vval.v_list = (((ListObject *)(obj))->list);
 	++tv->vval.v_list->lv_refcount;
 	ret = 0;
     }
-    else if (PyIter_Check(obj) || PySequence_Check(obj))
+    інакше якщо (PyIter_Check(obj) || PySequence_Check(obj))
 	ret = convert_dl(obj, tv, pyseq_to_tv, lookup_dict);
-    else
+    інакше
     {
 	PyErr_FORMAT_TYPE(
 		N_("unable to convert %s to a Vim list"),
@@ -6996,47 +6996,47 @@ ConvertFromPySequence(PyObject *obj, typval_T *tv)
 	ret = -1;
     }
     Py_DECREF(lookup_dict);
-    return ret;
+    повернути ret;
 }
 
-    static int
+    static ціле
 ConvertFromPyObject(PyObject *obj, typval_T *tv)
 {
     PyObject	*lookup_dict;
-    int		ret;
+    ціле		ret;
 
-    if (!(lookup_dict = PyDict_New()))
-	return -1;
+    якщо (!(lookup_dict = PyDict_New()))
+	повернути -1;
     ret = _ConvertFromPyObject(obj, tv, lookup_dict);
     Py_DECREF(lookup_dict);
-    return ret;
+    повернути ret;
 }
 
-    static int
+    static ціле
 _ConvertFromPyObject(PyObject *obj, typval_T *tv, PyObject *lookup_dict)
 {
-    if (PyType_IsSubtype(obj->ob_type, DictionaryTypePtr))
+    якщо (PyType_IsSubtype(obj->ob_type, DictionaryTypePtr))
     {
 	tv->v_type = VAR_DICT;
 	tv->vval.v_dict = (((DictionaryObject *)(obj))->dict);
 	++tv->vval.v_dict->dv_refcount;
     }
-    else if (PyType_IsSubtype(obj->ob_type, ListTypePtr))
+    інакше якщо (PyType_IsSubtype(obj->ob_type, ListTypePtr))
     {
 	tv->v_type = VAR_LIST;
 	tv->vval.v_list = (((ListObject *)(obj))->list);
 	++tv->vval.v_list->lv_refcount;
     }
-    else if (PyType_IsSubtype(obj->ob_type, TupleTypePtr))
+    інакше якщо (PyType_IsSubtype(obj->ob_type, TupleTypePtr))
     {
 	tv->v_type = VAR_TUPLE;
 	tv->vval.v_tuple = (((TupleObject *)(obj))->tuple);
 	++tv->vval.v_tuple->tv_refcount;
     }
-    else if (PyType_IsSubtype(obj->ob_type, FunctionTypePtr))
+    інакше якщо (PyType_IsSubtype(obj->ob_type, FunctionTypePtr))
     {
 	FunctionObject *func = (FunctionObject *) obj;
-	if (func->self != NULL || func->argv != NULL)
+	якщо (func->self != NULL || func->argv != NULL)
 	{
 	    partial_T *pt = ALLOC_CLEAR_ONE(partial_T);
 
@@ -7044,158 +7044,158 @@ _ConvertFromPyObject(PyObject *obj, typval_T *tv, PyObject *lookup_dict)
 	    tv->vval.v_partial = pt;
 	    tv->v_type = VAR_PARTIAL;
 	}
-	else
+	інакше
 	{
-	    if (set_string_copy(func->name, tv) == -1)
-		return -1;
+	    якщо (set_string_copy(func->name, tv) == -1)
+		повернути -1;
 
 	    tv->v_type = VAR_FUNC;
 	}
 	func_ref(func->name);
     }
-    else if (PyBytes_Check(obj))
+    інакше якщо (PyBytes_Check(obj))
     {
 	char_u	*str;
 
-	if (PyBytes_AsStringAndSize(obj, (char **) &str, NULL) == -1)
-	    return -1;
-	if (str == NULL)
-	    return -1;
+	якщо (PyBytes_AsStringAndSize(obj, (char **) &str, NULL) == -1)
+	    повернути -1;
+	якщо (str == NULL)
+	    повернути -1;
 
-	if (set_string_copy(str, tv) == -1)
-	    return -1;
+	якщо (set_string_copy(str, tv) == -1)
+	    повернути -1;
 
 	tv->v_type = VAR_STRING;
     }
-    else if (PyUnicode_Check(obj))
+    інакше якщо (PyUnicode_Check(obj))
     {
 	PyObject	*bytes;
 	char_u	*str;
 
 	bytes = PyUnicode_AsEncodedString(obj, ENC_OPT, ERRORS_ENCODE_ARG);
-	if (bytes == NULL)
-	    return -1;
+	якщо (bytes == NULL)
+	    повернути -1;
 
-	if (PyBytes_AsStringAndSize(bytes, (char **) &str, NULL) == -1)
-	    return -1;
-	if (str == NULL)
-	    return -1;
+	якщо (PyBytes_AsStringAndSize(bytes, (char **) &str, NULL) == -1)
+	    повернути -1;
+	якщо (str == NULL)
+	    повернути -1;
 
-	if (set_string_copy(str, tv))
+	якщо (set_string_copy(str, tv))
 	{
 	    Py_XDECREF(bytes);
-	    return -1;
+	    повернути -1;
 	}
 	Py_XDECREF(bytes);
 
 	tv->v_type = VAR_STRING;
     }
-#if PY_MAJOR_VERSION < 3
-    else if (PyInt_Check(obj))
+#якщо PY_MAJOR_VERSION < 3
+    інакше якщо (PyInt_Check(obj))
     {
 	tv->v_type = VAR_NUMBER;
 	tv->vval.v_number = (varnumber_T) PyInt_AsLong(obj);
-	if (PyErr_Occurred())
-	    return -1;
+	якщо (PyErr_Occurred())
+	    повернути -1;
     }
 #endif
-    else if (PyLong_Check(obj))
+    інакше якщо (PyLong_Check(obj))
     {
 	tv->v_type = VAR_NUMBER;
 	tv->vval.v_number = (varnumber_T) PyLong_AsLong(obj);
-	if (PyErr_Occurred())
-	    return -1;
+	якщо (PyErr_Occurred())
+	    повернути -1;
     }
-    else if (PyTuple_Check(obj))
-	return convert_dl(obj, tv, pytuple_to_tv, lookup_dict);
-    else if (PyDict_Check(obj))
-	return convert_dl(obj, tv, pydict_to_tv, lookup_dict);
-    else if (PyFloat_Check(obj))
+    інакше якщо (PyTuple_Check(obj))
+	повернути convert_dl(obj, tv, pytuple_to_tv, lookup_dict);
+    інакше якщо (PyDict_Check(obj))
+	повернути convert_dl(obj, tv, pydict_to_tv, lookup_dict);
+    інакше якщо (PyFloat_Check(obj))
     {
 	tv->v_type = VAR_FLOAT;
 	tv->vval.v_float = (float_T) PyFloat_AsDouble(obj);
     }
-    else if (PyObject_HasAttrString(obj, "keys"))
-	return convert_dl(obj, tv, pymap_to_tv, lookup_dict);
+    інакше якщо (PyObject_HasAttrString(obj, "keys"))
+	повернути convert_dl(obj, tv, pymap_to_tv, lookup_dict);
     // PyObject_GetIter can create built-in iterator for any sequence object
-    else if (PyIter_Check(obj) || PySequence_Check(obj))
-	return convert_dl(obj, tv, pyseq_to_tv, lookup_dict);
-    else if (PyMapping_Check(obj))
-	return convert_dl(obj, tv, pymap_to_tv, lookup_dict);
-    else if (PyNumber_Check(obj))
+    інакше якщо (PyIter_Check(obj) || PySequence_Check(obj))
+	повернути convert_dl(obj, tv, pyseq_to_tv, lookup_dict);
+    інакше якщо (PyMapping_Check(obj))
+	повернути convert_dl(obj, tv, pymap_to_tv, lookup_dict);
+    інакше якщо (PyNumber_Check(obj))
     {
 	PyObject	*num;
 
-	if (!(num = PyNumber_Long(obj)))
-	    return -1;
+	якщо (!(num = PyNumber_Long(obj)))
+	    повернути -1;
 
 	tv->v_type = VAR_NUMBER;
 	tv->vval.v_number = (varnumber_T) PyLong_AsLong(num);
 
 	Py_DECREF(num);
     }
-    else if (obj == Py_None)
+    інакше якщо (obj == Py_None)
     {
 	tv->v_type = VAR_SPECIAL;
 	tv->vval.v_number = VVAL_NONE;
     }
-    else
+    інакше
     {
 	PyErr_FORMAT_TYPE(
 		N_("unable to convert %s to a Vim structure"),
 		obj);
-	return -1;
+	повернути -1;
     }
-    return 0;
+    повернути 0;
 }
 
     static PyObject *
 ConvertToPyObject(typval_T *tv)
 {
     typval_T *argv;
-    int i;
-    if (tv == NULL)
+    ціле i;
+    якщо (tv == NULL)
     {
 	PyErr_SET_VIM(N_("internal error: NULL reference passed"));
-	return NULL;
+	повернути NULL;
     }
     switch (tv->v_type)
     {
 	case VAR_STRING:
-	    return PyBytes_FromString(tv->vval.v_string == NULL
+	    повернути PyBytes_FromString(tv->vval.v_string == NULL
 					    ? "" : (char *)tv->vval.v_string);
 	case VAR_NUMBER:
-	    return PyLong_FromLong((long) tv->vval.v_number);
+	    повернути PyLong_FromLong((long) tv->vval.v_number);
 	case VAR_FLOAT:
-	    return PyFloat_FromDouble((double) tv->vval.v_float);
+	    повернути PyFloat_FromDouble((double) tv->vval.v_float);
 	case VAR_LIST:
-	    return NEW_LIST(tv->vval.v_list);
+	    повернути NEW_LIST(tv->vval.v_list);
 	case VAR_TUPLE:
-	    return NEW_TUPLE(tv->vval.v_tuple);
+	    повернути NEW_TUPLE(tv->vval.v_tuple);
 	case VAR_DICT:
-	    return NEW_DICTIONARY(tv->vval.v_dict);
+	    повернути NEW_DICTIONARY(tv->vval.v_dict);
 	case VAR_FUNC:
-	    return NEW_FUNCTION(tv->vval.v_string == NULL
+	    повернути NEW_FUNCTION(tv->vval.v_string == NULL
 					  ? (char_u *)"" : tv->vval.v_string,
 					  0, NULL, NULL, TRUE);
 	case VAR_PARTIAL:
-	    if (tv->vval.v_partial->pt_argc)
+	    якщо (tv->vval.v_partial->pt_argc)
 	    {
 		argv = PyMem_New(typval_T, (size_t)tv->vval.v_partial->pt_argc);
-		for (i = 0; i < tv->vval.v_partial->pt_argc; i++)
+		для (i = 0; i < tv->vval.v_partial->pt_argc; i++)
 		    copy_tv(&tv->vval.v_partial->pt_argv[i], &argv[i]);
 	    }
-	    else
+	    інакше
 		argv = NULL;
-	    if (tv->vval.v_partial->pt_dict != NULL)
+	    якщо (tv->vval.v_partial->pt_dict != NULL)
 		tv->vval.v_partial->pt_dict->dv_refcount++;
-	    return NEW_FUNCTION(tv->vval.v_partial == NULL
+	    повернути NEW_FUNCTION(tv->vval.v_partial == NULL
 			     ? (char_u *)"" : partial_name(tv->vval.v_partial),
 				tv->vval.v_partial->pt_argc, argv,
 				tv->vval.v_partial->pt_dict,
 				tv->vval.v_partial->pt_auto);
 	case VAR_BLOB:
-	    return PyBytes_FromStringAndSize(
+	    повернути PyBytes_FromStringAndSize(
 		(char*) tv->vval.v_blob->bv_ga.ga_data,
 		(Py_ssize_t) tv->vval.v_blob->bv_ga.ga_len);
 	case VAR_UNKNOWN:
@@ -7208,20 +7208,20 @@ ConvertToPyObject(typval_T *tv)
 	case VAR_OBJECT:
 	case VAR_TYPEALIAS:
 	    Py_INCREF(Py_None);
-	    return Py_None;
+	    повернути Py_None;
 	case VAR_BOOL:
 	case VAR_SPECIAL:
 	    switch (tv->vval.v_number)
 	    {
-		case VVAL_FALSE: return ALWAYS_FALSE;
-		case VVAL_TRUE:  return ALWAYS_TRUE;
+		case VVAL_FALSE: повернути ALWAYS_FALSE;
+		case VVAL_TRUE:  повернути ALWAYS_TRUE;
 		case VVAL_NONE:
-		case VVAL_NULL:  return ALWAYS_NONE;
+		case VVAL_NULL:  повернути ALWAYS_NONE;
 	    }
 	    PyErr_SET_VIM(N_("internal error: invalid value type"));
-	    return NULL;
+	    повернути NULL;
     }
-    return NULL;
+    повернути NULL;
 }
 
 DEFINE_PY_TYPE_OBJECT(CurrentType);
@@ -7245,7 +7245,7 @@ init_structs(void)
     OutputType.tp_flags = Py_TPFLAGS_DEFAULT;
     OutputType.tp_doc = "vim message object";
     OutputType.tp_methods = OutputMethods;
-#if PY_MAJOR_VERSION >= 3
+#якщо PY_MAJOR_VERSION >= 3
     OutputType.tp_getattro = OutputGetattro;
     OutputType.tp_setattro = OutputSetattro;
     OutputType.tp_alloc = call_PyType_GenericAlloc;
@@ -7256,7 +7256,7 @@ init_structs(void)
     // anyway and so in limited API we don't set it.
     OutputType.tp_base = &PyStdPrinter_Type;
 # endif
-#else
+#інакше
     OutputType.tp_getattr = OutputGetattr;
     OutputType.tp_setattr = OutputSetattr;
     // Disabled, because this causes a crash in test86
@@ -7284,13 +7284,13 @@ init_structs(void)
     BufferType.tp_flags = Py_TPFLAGS_DEFAULT;
     BufferType.tp_doc = "vim buffer object";
     BufferType.tp_methods = BufferMethods;
-#if PY_MAJOR_VERSION >= 3
+#якщо PY_MAJOR_VERSION >= 3
     BufferType.tp_getattro = BufferGetattro;
     BufferType.tp_setattro = BufferSetattro;
     BufferType.tp_alloc = call_PyType_GenericAlloc;
     BufferType.tp_new = call_PyType_GenericNew;
     BufferType.tp_free = call_PyObject_Free;
-#else
+#інакше
     BufferType.tp_getattr = BufferGetattr;
     BufferType.tp_setattr = BufferSetattr;
 #endif
@@ -7305,13 +7305,13 @@ init_structs(void)
     WindowType.tp_methods = WindowMethods;
     WindowType.tp_traverse = WindowTraverse;
     WindowType.tp_clear = WindowClear;
-#if PY_MAJOR_VERSION >= 3
+#якщо PY_MAJOR_VERSION >= 3
     WindowType.tp_getattro = WindowGetattro;
     WindowType.tp_setattro = WindowSetattro;
     WindowType.tp_alloc = call_PyType_GenericAlloc;
     WindowType.tp_new = call_PyType_GenericNew;
     WindowType.tp_free = call_PyObject_Free;
-#else
+#інакше
     WindowType.tp_getattr = WindowGetattr;
     WindowType.tp_setattr = WindowSetattr;
 #endif
@@ -7324,12 +7324,12 @@ init_structs(void)
     TabPageType.tp_flags = Py_TPFLAGS_DEFAULT;
     TabPageType.tp_doc = "vim tab page object";
     TabPageType.tp_methods = TabPageMethods;
-#if PY_MAJOR_VERSION >= 3
+#якщо PY_MAJOR_VERSION >= 3
     TabPageType.tp_getattro = TabPageGetattro;
     TabPageType.tp_alloc = call_PyType_GenericAlloc;
     TabPageType.tp_new = call_PyType_GenericNew;
     TabPageType.tp_free = call_PyObject_Free;
-#else
+#інакше
     TabPageType.tp_getattr = TabPageGetattr;
 #endif
 
@@ -7368,12 +7368,12 @@ init_structs(void)
     RangeType.tp_methods = RangeMethods;
     RangeType.tp_traverse = RangeTraverse;
     RangeType.tp_clear = RangeClear;
-#if PY_MAJOR_VERSION >= 3
+#якщо PY_MAJOR_VERSION >= 3
     RangeType.tp_getattro = RangeGetattro;
     RangeType.tp_alloc = call_PyType_GenericAlloc;
     RangeType.tp_new = call_PyType_GenericNew;
     RangeType.tp_free = call_PyObject_Free;
-#else
+#інакше
     RangeType.tp_getattr = RangeGetattr;
 #endif
 
@@ -7383,10 +7383,10 @@ init_structs(void)
     CurrentType.tp_flags = Py_TPFLAGS_DEFAULT;
     CurrentType.tp_doc = "vim current object";
     CurrentType.tp_methods = CurrentMethods;
-#if PY_MAJOR_VERSION >= 3
+#якщо PY_MAJOR_VERSION >= 3
     CurrentType.tp_getattro = CurrentGetattro;
     CurrentType.tp_setattro = CurrentSetattro;
-#else
+#інакше
     CurrentType.tp_getattr = CurrentGetattr;
     CurrentType.tp_setattr = CurrentSetattr;
 #endif
@@ -7403,10 +7403,10 @@ init_structs(void)
     DictionaryType.tp_iter = DictionaryIter;
     DictionaryType.tp_new = DictionaryConstructor;
     DictionaryType.tp_alloc = PyType_GenericAlloc;
-#if PY_MAJOR_VERSION >= 3
+#якщо PY_MAJOR_VERSION >= 3
     DictionaryType.tp_getattro = DictionaryGetattro;
     DictionaryType.tp_setattro = DictionarySetattro;
-#else
+#інакше
     DictionaryType.tp_getattr = DictionaryGetattr;
     DictionaryType.tp_setattr = DictionarySetattr;
 #endif
@@ -7423,10 +7423,10 @@ init_structs(void)
     ListType.tp_iter = ListIter;
     ListType.tp_new = ListConstructor;
     ListType.tp_alloc = PyType_GenericAlloc;
-#if PY_MAJOR_VERSION >= 3
+#якщо PY_MAJOR_VERSION >= 3
     ListType.tp_getattro = ListGetattro;
     ListType.tp_setattro = ListSetattro;
-#else
+#інакше
     ListType.tp_getattr = ListGetattr;
     ListType.tp_setattr = ListSetattr;
 #endif
@@ -7444,10 +7444,10 @@ init_structs(void)
     TupleType.tp_iter = TupleIter;
     TupleType.tp_new = TupleConstructor;
     TupleType.tp_alloc = PyType_GenericAlloc;
-#if PY_MAJOR_VERSION >= 3
+#якщо PY_MAJOR_VERSION >= 3
     TupleType.tp_getattro = TupleGetattro;
     TupleType.tp_setattro = TupleSetattro;
-#else
+#інакше
     TupleType.tp_getattr = TupleGetattr;
     TupleType.tp_setattr = TupleSetattr;
 #endif
@@ -7463,9 +7463,9 @@ init_structs(void)
     FunctionType.tp_repr = FunctionRepr;
     FunctionType.tp_new = FunctionConstructor;
     FunctionType.tp_alloc = PyType_GenericAlloc;
-#if PY_MAJOR_VERSION >= 3
+#якщо PY_MAJOR_VERSION >= 3
     FunctionType.tp_getattro = FunctionGetattro;
-#else
+#інакше
     FunctionType.tp_getattr = FunctionGetattr;
 #endif
 
@@ -7481,7 +7481,7 @@ init_structs(void)
     OptionsType.tp_traverse = OptionsTraverse;
     OptionsType.tp_clear = OptionsClear;
 
-#if PY_VERSION_HEX < 0x030700f0
+#якщо PY_VERSION_HEX < 0x030700f0
     CLEAR_FIELD(LoaderType);
     LoaderType.tp_name = "vim.Loader";
     LoaderType.tp_basicsize = sizeof(LoaderObject);
@@ -7491,7 +7491,7 @@ init_structs(void)
     LoaderType.tp_dealloc = LoaderDestructor;
 #endif
 
-#if PY_MAJOR_VERSION >= 3
+#якщо PY_MAJOR_VERSION >= 3
     CLEAR_FIELD(vimmodule);
     vimmodule.m_name = "vim";
     vimmodule.m_doc = "Vim Python interface\n";
@@ -7500,7 +7500,7 @@ init_structs(void)
 #endif
 }
 
-    static int
+    static ціле
 init_types(void)
 {
     PYTYPE_READY(IterType);
@@ -7518,7 +7518,7 @@ init_types(void)
     PYTYPE_READY(FunctionType);
     PYTYPE_READY(OptionsType);
     PYTYPE_READY(OutputType);
-#if PY_VERSION_HEX < 0x030700f0
+#якщо PY_VERSION_HEX < 0x030700f0
     PYTYPE_READY(LoaderType);
 #endif
 
@@ -7534,7 +7534,7 @@ init_types(void)
     PyObject_FINISH_INIT_TYPE(TheCurrent, CurrentType);
     PyObject_FINISH_INIT_TYPE(TheTabPageList, TabListType);
 #endif
-    return 0;
+    повернути 0;
 }
 
 #ifdef USE_LIMITED_API
@@ -7556,44 +7556,44 @@ shutdown_types(void)
     PYTYPE_CLEANUP(FunctionType);
     PYTYPE_CLEANUP(OptionsType);
     PYTYPE_CLEANUP(OutputType);
-# if PY_VERSION_HEX < 0x030700f0
+# якщо PY_VERSION_HEX < 0x030700f0
     PYTYPE_CLEANUP(LoaderType);
 # endif
 }
 #endif
 
-    static int
+    static ціле
 init_sys_path(void)
 {
     PyObject	*path;
     PyObject	*path_hook;
     PyObject	*path_hooks;
 
-    if (!(path_hook = PyObject_GetAttrString(vim_module, "path_hook")))
-	return -1;
+    якщо (!(path_hook = PyObject_GetAttrString(vim_module, "path_hook")))
+	повернути -1;
 
-    if (!(path_hooks = PySys_GetObject("path_hooks")))
+    якщо (!(path_hooks = PySys_GetObject("path_hooks")))
     {
 	PyErr_Clear();
 	path_hooks = PyList_New(1);
 	PyList_SET_ITEM(path_hooks, 0, path_hook);
-	if (PySys_SetObject("path_hooks", path_hooks))
+	якщо (PySys_SetObject("path_hooks", path_hooks))
 	{
 	    Py_DECREF(path_hooks);
-	    return -1;
+	    повернути -1;
 	}
 	Py_DECREF(path_hooks);
     }
-    else if (PyList_Check(path_hooks))
+    інакше якщо (PyList_Check(path_hooks))
     {
-	if (PyList_Append(path_hooks, path_hook))
+	якщо (PyList_Append(path_hooks, path_hook))
 	{
 	    Py_DECREF(path_hook);
-	    return -1;
+	    повернути -1;
 	}
 	Py_DECREF(path_hook);
     }
-    else
+    інакше
     {
 	VimTryStart();
 	emsg(_("Failed to set path hook: sys.path_hooks is not a list\n"
@@ -7602,28 +7602,28 @@ init_sys_path(void)
 	       "- append vim.VIM_SPECIAL_PATH to sys.path\n"));
 	VimTryEnd(); // Discard the error
 	Py_DECREF(path_hook);
-	return 0;
+	повернути 0;
     }
 
-    if (!(path = PySys_GetObject("path")))
+    якщо (!(path = PySys_GetObject("path")))
     {
 	PyErr_Clear();
 	path = PyList_New(1);
 	Py_INCREF(vim_special_path_object);
 	PyList_SET_ITEM(path, 0, vim_special_path_object);
-	if (PySys_SetObject("path", path))
+	якщо (PySys_SetObject("path", path))
 	{
 	    Py_DECREF(path);
-	    return -1;
+	    повернути -1;
 	}
 	Py_DECREF(path);
     }
-    else if (PyList_Check(path))
+    інакше якщо (PyList_Check(path))
     {
-	if (PyList_Append(path, vim_special_path_object))
-	    return -1;
+	якщо (PyList_Append(path, vim_special_path_object))
+	    повернути -1;
     }
-    else
+    інакше
     {
 	VimTryStart();
 	emsg(_("Failed to set path: sys.path is not a list\n"
@@ -7631,12 +7631,12 @@ init_sys_path(void)
 	VimTryEnd(); // Discard the error
     }
 
-    return 0;
+    повернути 0;
 }
 
 static struct numeric_constant {
     char	*name;
-    int		val;
+    ціле		val;
 } numeric_constants[] = {
     {"VAR_LOCKED",	VAR_LOCKED},
     {"VAR_FIXED",	VAR_FIXED},
@@ -7650,30 +7650,30 @@ struct object_constant {
 };
 
 #define ADD_OBJECT(m, name, obj) \
-    if (PyModule_AddObject(m, name, obj)) \
-	return -1;
+    якщо (PyModule_AddObject(m, name, obj)) \
+	повернути -1;
 
 #define ADD_CHECKED_OBJECT(m, name, obj) \
     { \
 	PyObject	*valObject = obj; \
-	if (!valObject) \
-	    return -1; \
+	якщо (!valObject) \
+	    повернути -1; \
 	ADD_OBJECT(m, name, valObject); \
     }
 
-    static int
+    static ціле
 populate_module(PyObject *m)
 {
-    int		i;
+    ціле		i;
     PyObject	*other_module;
     PyObject	*attr;
     PyObject	*imp;
-#if PY_VERSION_HEX >= 0x030700f0
+#якщо PY_VERSION_HEX >= 0x030700f0
     PyObject	*dict;
     PyObject	*cls;
 #endif
 
-    for (i = 0; i < (int)(sizeof(numeric_constants)
+    для (i = 0; i < (ціле)(sizeof(numeric_constants)
 					   / sizeof(struct numeric_constant));
 	    ++i)
 	ADD_CHECKED_OBJECT(m, numeric_constants[i].name,
@@ -7694,12 +7694,12 @@ populate_module(PyObject *m)
 	{"Tuple",      (PyObject *)TupleTypePtr},
 	{"Function",   (PyObject *)FunctionTypePtr},
 	{"Options",    (PyObject *)OptionsTypePtr},
-#if PY_VERSION_HEX < 0x030700f0
+#якщо PY_VERSION_HEX < 0x030700f0
 	{"_Loader",    (PyObject *)LoaderTypePtr},
 #endif
     };
 
-    for (i = 0; i < (int)(sizeof(object_constants)
+    для (i = 0; i < (ціле)(sizeof(object_constants)
 					    / sizeof(struct object_constant));
 	    ++i)
     {
@@ -7710,8 +7710,8 @@ populate_module(PyObject *m)
 	ADD_OBJECT(m, object_constants[i].name, valObject);
     }
 
-    if (!(VimError = PyErr_NewException("vim.error", NULL, NULL)))
-	return -1;
+    якщо (!(VimError = PyErr_NewException("vim.error", NULL, NULL)))
+	повернути -1;
     ADD_OBJECT(m, "error", VimError);
 
     ADD_CHECKED_OBJECT(m, "vars",  NEW_DICTIONARY(get_globvar_dict()));
@@ -7719,93 +7719,93 @@ populate_module(PyObject *m)
     ADD_CHECKED_OBJECT(m, "options",
 	    OptionsNew(SREQ_GLOBAL, NULL, dummy_check, NULL));
 
-    if (!(other_module = PyImport_ImportModule("os")))
-	return -1;
+    якщо (!(other_module = PyImport_ImportModule("os")))
+	повернути -1;
     ADD_OBJECT(m, "os", other_module);
 
-#if PY_MAJOR_VERSION >= 3
-    if (!(py_getcwd = PyObject_GetAttrString(other_module, "getcwd")))
-	return -1;
-#else
-    if (!(py_getcwd = PyObject_GetAttrString(other_module, "getcwdu")))
-	return -1;
+#якщо PY_MAJOR_VERSION >= 3
+    якщо (!(py_getcwd = PyObject_GetAttrString(other_module, "getcwd")))
+	повернути -1;
+#інакше
+    якщо (!(py_getcwd = PyObject_GetAttrString(other_module, "getcwdu")))
+	повернути -1;
 #endif
     ADD_OBJECT(m, "_getcwd", py_getcwd)
 
-    if (!(py_chdir = PyObject_GetAttrString(other_module, "chdir")))
-	return -1;
+    якщо (!(py_chdir = PyObject_GetAttrString(other_module, "chdir")))
+	повернути -1;
     ADD_OBJECT(m, "_chdir", py_chdir);
-    if (!(attr = PyObject_GetAttrString(m, "chdir")))
-	return -1;
-    if (PyObject_SetAttrString(other_module, "chdir", attr))
+    якщо (!(attr = PyObject_GetAttrString(m, "chdir")))
+	повернути -1;
+    якщо (PyObject_SetAttrString(other_module, "chdir", attr))
     {
 	Py_DECREF(attr);
-	return -1;
+	повернути -1;
     }
     Py_DECREF(attr);
 
-    if ((py_fchdir = PyObject_GetAttrString(other_module, "fchdir")))
+    якщо ((py_fchdir = PyObject_GetAttrString(other_module, "fchdir")))
     {
 	ADD_OBJECT(m, "_fchdir", py_fchdir);
-	if (!(attr = PyObject_GetAttrString(m, "fchdir")))
-	    return -1;
-	if (PyObject_SetAttrString(other_module, "fchdir", attr))
+	якщо (!(attr = PyObject_GetAttrString(m, "fchdir")))
+	    повернути -1;
+	якщо (PyObject_SetAttrString(other_module, "fchdir", attr))
 	{
 	    Py_DECREF(attr);
-	    return -1;
+	    повернути -1;
 	}
 	Py_DECREF(attr);
     }
-    else
+    інакше
 	PyErr_Clear();
 
-    if (!(vim_special_path_object = PyString_FromString(vim_special_path)))
-	return -1;
+    якщо (!(vim_special_path_object = PyString_FromString(vim_special_path)))
+	повернути -1;
 
     ADD_OBJECT(m, "VIM_SPECIAL_PATH", vim_special_path_object);
 
-#if PY_VERSION_HEX >= 0x030700f0
-    if (!(imp = PyImport_ImportModule("importlib.machinery")))
-	return -1;
+#якщо PY_VERSION_HEX >= 0x030700f0
+    якщо (!(imp = PyImport_ImportModule("importlib.machinery")))
+	повернути -1;
 
     dict = PyModule_GetDict(imp);
 
-    if (!(cls = PyDict_GetItemString(dict, "PathFinder")))
+    якщо (!(cls = PyDict_GetItemString(dict, "PathFinder")))
     {
 	Py_DECREF(imp);
-	return -1;
+	повернути -1;
     }
 
-    if (!(py_find_spec = PyObject_GetAttrString(cls, "find_spec")))
+    якщо (!(py_find_spec = PyObject_GetAttrString(cls, "find_spec")))
     {
 	Py_DECREF(imp);
-	return -1;
+	повернути -1;
     }
 
-# if PY_VERSION_HEX < 0x30c00a7
+# якщо PY_VERSION_HEX < 0x30c00a7
     // find_module has been removed as of Python 3.12.0a7
-    if ((py_find_module = PyObject_GetAttrString(cls, "find_module")))
+    якщо ((py_find_module = PyObject_GetAttrString(cls, "find_module")))
 	ADD_OBJECT(m, "_find_module", py_find_module);
 # endif
 
     Py_DECREF(imp);
 
     ADD_OBJECT(m, "_find_spec", py_find_spec);
-#else
-    if (!(imp = PyImport_ImportModule("imp")))
-	return -1;
+#інакше
+    якщо (!(imp = PyImport_ImportModule("imp")))
+	повернути -1;
 
-    if (!(py_find_module = PyObject_GetAttrString(imp, "find_module")))
+    якщо (!(py_find_module = PyObject_GetAttrString(imp, "find_module")))
     {
 	Py_DECREF(imp);
-	return -1;
+	повернути -1;
     }
 
-    if (!(py_load_module = PyObject_GetAttrString(imp, "load_module")))
+    якщо (!(py_load_module = PyObject_GetAttrString(imp, "load_module")))
     {
 	Py_DECREF(py_find_module);
 	Py_DECREF(imp);
-	return -1;
+	повернути -1;
     }
 
     Py_DECREF(imp);
@@ -7814,5 +7814,5 @@ populate_module(PyObject *m)
     ADD_OBJECT(m, "_load_module", py_load_module);
 #endif
 
-    return 0;
+    повернути 0;
 }

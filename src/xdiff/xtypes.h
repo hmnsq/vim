@@ -20,7 +20,7 @@
  *
  */
 
-#if !defined(XTYPES_H)
+#якщо !defined(XTYPES_H)
 #define XTYPES_H
 
 
