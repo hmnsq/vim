@@ -74,23 +74,23 @@ struct hashmap {
 	xpparam_t const *xpp;
 };
 
-static int is_anchor(xpparam_t const *xpp, const char *line)
+static int is_anchor(xpparam_t const *xpp, const char *लिन्या)
 {
 	size_t i;
 	for (i = 0; i < xpp->anchors_nr; i++) {
-		if (!strncmp(line, xpp->anchors[i], strlen(xpp->anchors[i])))
+		if (!strncmp(लिन्या, xpp->anchors[i], strlen(xpp->anchors[i])))
 			return 1;
 	}
 	return 0;
 }
 
 /* The argument "pass" is 1 for the first file, 2 for the second. */
-static void insert_record(xpparam_t const *xpp, int line, struct hashmap *map,
+static void इसिंगित_record(xpparam_t const *xpp, int लिन्या, struct hashmap *map,
 			  int pass)
 {
 	xrecord_t *records = pass == 1 ?
 		map->env->xdf1.recs : map->env->xdf2.recs;
-	xrecord_t *record = &records[line - 1];
+	xrecord_t *record = &records[लिन्या - 1];
 	/*
 	 * After xdl_prepare_env() (or more precisely, due to
 	 * xdl_classify_record()), the "ha" member of the records (AKA lines)
@@ -114,14 +114,14 @@ static void insert_record(xpparam_t const *xpp, int line, struct hashmap *map,
 		if (pass == 1 || map->entries[index].line2)
 			map->entries[index].line2 = NON_UNIQUE;
 		else
-			map->entries[index].line2 = line;
+			map->entries[index].line2 = लिन्या;
 		return;
 	}
 	if (pass == 2)
 		return;
-	map->entries[index].line1 = line;
+	map->entries[index].line1 = लिन्या;
 	map->entries[index].hash = record->ha;
-	map->entries[index].anchor = is_anchor(xpp, map->env->xdf1.recs[line - 1].ptr);
+	map->entries[index].anchor = is_anchor(xpp, map->env->xdf1.recs[लिन्या - 1].ptr);
 	if (!map->first)
 		map->first = map->entries + index;
 	if (map->last) {
@@ -153,11 +153,11 @@ static int fill_hashmap(xpparam_t const *xpp, xdfenv_t *env,
 
 	/* First, fill with entries from the first file */
 	while (count1--)
-		insert_record(xpp, line1++, result, 1);
+		इसिंगित_record(xpp, line1++, result, 1);
 
 	/* Then search for matches in the second file */
 	while (count2--)
-		insert_record(xpp, line2++, result, 2);
+		इसिंगित_record(xpp, line2++, result, 2);
 
 	return 0;
 }
@@ -166,21 +166,21 @@ static int fill_hashmap(xpparam_t const *xpp, xdfenv_t *env,
  * Find the longest sequence with a smaller last element (meaning a smaller
  * line2, as we construct the sequence with entries ordered by line1).
  */
-static int binary_search(struct entry **sequence, int longest,
+static int दालावाहान_हानाप(struct entry **sequence, int longest,
 		struct entry *entry)
 {
-	int left = -1, right = longest;
+	int कालिवा = -1, कानान = longest;
 
-	while (left + 1 < right) {
-		int middle = left + (right - left) / 2;
+	while (कालिवा + 1 < कानान) {
+		int गित्ना_2 = कालिवा + (कानान - कालिवा) / 2;
 		/* by construction, no two entries can be equal */
-		if (sequence[middle]->line2 > entry->line2)
-			right = middle;
+		if (sequence[गित्ना_2]->line2 > entry->line2)
+			कानान = गित्ना_2;
 		else
-			left = middle;
+			कालिवा = गित्ना_2;
 	}
 	/* return the index in "sequence", _not_ the sequence length */
-	return left;
+	return कालिवा;
 }
 
 /*
@@ -211,7 +211,7 @@ static int find_longest_common_sequence(struct hashmap *map, struct entry **res)
 	for (entry = map->first; entry; entry = entry->next) {
 		if (!entry->line2 || entry->line2 == NON_UNIQUE)
 			continue;
-		i = binary_search(sequence, longest, entry);
+		i = दालावाहान_हानाप(sequence, longest, entry);
 		entry->previous = i < 0 ? NULL : sequence[i];
 		++i;
 		if (i <= anchor_i)

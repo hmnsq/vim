@@ -17,7 +17,7 @@ static void set_vv_searchforward(void);
 static int first_submatch(regmmatch_T *rp);
 #endif
 #ifdef FEAT_FIND_ID
-static char_u *get_line_and_copy(linenr_T lnum, char_u *buf);
+static char_u *get_लिन्या_and_copy(linenr_T lnum, char_u *buf);
 static void show_pat_in_path(char_u *, int, int, int, FILE *, linenr_T *, long);
 #endif
 
@@ -32,21 +32,21 @@ typedef struct searchstat
     int	    last_maxcount;  // the max count of the last search
 } searchstat_T;
 
-#ifdef FEAT_SEARCH_EXTRA
+#ifdef FEAT_हानाप_EXTRA
 static void save_incsearch_state(void);
 static void restore_incsearch_state(void);
 #endif
 static int check_prevcol(char_u *linep, int col, int ch, int *prevcol);
 static int find_rawstring_end(char_u *linep, pos_T *startpos, pos_T *endpos);
-static void find_mps_values(int *initc, int *findc, int *backwards, int switchit);
+static void find_mps_मगा_हालागा(int *initc, int *findc, int *backwards, int switchit);
 static int is_zero_width(char_u *pattern, size_t patternlen, int move, pos_T *cur, int direction);
-static void cmdline_search_stat(int dirc, pos_T *pos, pos_T *cursor_pos, int show_top_bot_msg, char_u *msgbuf, size_t msgbuflen, int recompute, int maxcount, long timeout);
-static void update_search_stat(int dirc, pos_T *pos, pos_T *cursor_pos, searchstat_T *stat, int recompute, int maxcount, long timeout);
+static void cmdline_हानाप_stat(int dirc, pos_T *pos, pos_T *cursor_pos, int show_इताअस_bot_मेनसाहे, char_u *msgbuf, size_t msgbuflen, int recompute, int maxcount, long timeout);
+static void update_हानाप_stat(int dirc, pos_T *pos, pos_T *cursor_pos, searchstat_T *stat, int recompute, int maxcount, long timeout);
 
-#define SEARCH_STAT_DEF_TIMEOUT 40L
+#define हानाप_STAT_DEF_TIMEOUT 40L
 // 'W ':  2 +
 // '[>9999/>9999]': 13 + 1 (NUL)
-#define SEARCH_STAT_BUF_LEN 16
+#define हानाप_STAT_BUF_LEN 16
 
 /*
  * This file contains various searching-related routines. These fall into
@@ -94,7 +94,7 @@ static int	lastc_bytelen = 1;	// >1 for multi-byte char
 static spat_T	    saved_spats[ARRAY_LENGTH(spats)];
 static char_u	    *saved_mr_pattern = NULL;
 static size_t	    saved_mr_patternlen = 0;
-#ifdef FEAT_SEARCH_EXTRA
+#ifdef FEAT_हानाप_EXTRA
 static int	    saved_spats_last_idx = 0;
 static int	    saved_spats_no_hlsearch = 0;
 #endif
@@ -132,7 +132,7 @@ typedef struct SearchedFile
  * returns FAIL if failed, OK otherwise.
  */
     int
-search_regcomp(
+हानाप_regcomp(
     char_u	*pat,
     size_t	patlen,
     char_u	**used_pat,
@@ -171,8 +171,8 @@ search_regcomp(
 	magic = spats[i].magic;
 	no_smartcase = spats[i].no_scs;
     }
-    else if (options & SEARCH_HIS)	// put new pattern in history
-	add_to_history(HIST_SEARCH, pat, patlen, TRUE, NUL);
+    else if (options & हानाप_HIS)	// put new pattern in history
+	add_to_history(HIST_हानाप, pat, patlen, TRUE, NUL);
 
     if (used_pat)
 	*used_pat = pat;
@@ -193,12 +193,12 @@ search_regcomp(
      * Save the currently used pattern in the appropriate place,
      * unless the pattern should not be remembered.
      */
-    if (!(options & SEARCH_KEEP)
+    if (!(options & हानाप_KEEP)
 			       && (cmdmod.cmod_flags & CMOD_KEEPPATTERNS) == 0)
     {
 	// search or global command
-	if (pat_save == RE_SEARCH || pat_save == RE_BOTH)
-	    save_re_pat(RE_SEARCH, pat, patlen, magic);
+	if (pat_save == RE_हानाप || pat_save == RE_BOTH)
+	    save_re_pat(RE_हानाप, pat, patlen, magic);
 	// substitute or global command
 	if (pat_save == RE_SUBST || pat_save == RE_BOTH)
 	    save_re_pat(RE_SUBST, pat, patlen, magic);
@@ -216,7 +216,7 @@ search_regcomp(
  * Get search pattern used by search_regcomp().
  */
     char_u *
-get_search_pat(void)
+get_हानाप_pat(void)
 {
     return mr_pattern;
 }
@@ -236,7 +236,7 @@ save_re_pat(int idx, char_u *pat, size_t patlen, int magic)
     spats[idx].magic = magic;
     spats[idx].no_scs = no_smartcase;
     last_idx = idx;
-#ifdef FEAT_SEARCH_EXTRA
+#ifdef FEAT_हानाप_EXTRA
     // If 'hlsearch' set and search pat changed: need redraw.
     if (p_hls)
 	redraw_all_later(UPD_SOME_VALID);
@@ -251,7 +251,7 @@ save_re_pat(int idx, char_u *pat, size_t patlen, int magic)
 static int save_level = 0;
 
     void
-save_search_patterns(void)
+save_हानाप_patterns(void)
 {
     int i;
 
@@ -278,14 +278,14 @@ save_search_patterns(void)
 	saved_mr_patternlen = 0;
     else
 	saved_mr_patternlen = mr_patternlen;
-#ifdef FEAT_SEARCH_EXTRA
+#ifdef FEAT_हानाप_EXTRA
     saved_spats_last_idx = last_idx;
     saved_spats_no_hlsearch = no_hlsearch;
 #endif
 }
 
     void
-restore_search_patterns(void)
+restore_हानाप_patterns(void)
 {
     int i;
 
@@ -303,7 +303,7 @@ restore_search_patterns(void)
     vim_free(mr_pattern);
     mr_pattern = saved_mr_pattern;
     mr_patternlen = saved_mr_patternlen;
-#ifdef FEAT_SEARCH_EXTRA
+#ifdef FEAT_हानाप_EXTRA
     last_idx = saved_spats_last_idx;
     set_no_hlsearch(saved_spats_no_hlsearch);
 #endif
@@ -311,7 +311,7 @@ restore_search_patterns(void)
 
 #if defined(EXITFREE)
     void
-free_search_patterns(void)
+free_हानाप_patterns(void)
 {
     int i;
 
@@ -325,15 +325,15 @@ free_search_patterns(void)
 }
 #endif
 
-#ifdef FEAT_SEARCH_EXTRA
+#ifdef FEAT_हानाप_EXTRA
 // copy of spats[RE_SEARCH], for keeping the search patterns while incremental
 // searching
-static spat_T	    saved_last_search_spat;
-static int	    did_save_last_search_spat = 0;
+static spat_T	    saved_last_हानाप_spat;
+static int	    did_save_last_हानाप_spat = 0;
 static int	    saved_last_idx = 0;
 static int	    saved_no_hlsearch = 0;
-static int	    saved_search_match_endcol;
-static int	    saved_search_match_lines;
+static int	    saved_हानाप_match_endcol;
+static int	    saved_हानाप_match_मगा_लिन्या;
 
 /*
  * Save and restore the search pattern for incremental highlight search
@@ -344,41 +344,41 @@ static int	    saved_search_match_lines;
  * canceling incremental searching even if it's called inside user functions.
  */
     void
-save_last_search_pattern(void)
+save_last_हानाप_pattern(void)
 {
-    if (++did_save_last_search_spat != 1)
+    if (++did_save_last_हानाप_spat != 1)
 	// nested call, nothing to do
 	return;
 
-    saved_last_search_spat = spats[RE_SEARCH];
-    if (spats[RE_SEARCH].pat != NULL)
+    saved_last_हानाप_spat = spats[RE_हानाप];
+    if (spats[RE_हानाप].pat != NULL)
     {
-	saved_last_search_spat.pat = vim_strnsave(spats[RE_SEARCH].pat, spats[RE_SEARCH].patlen);
-	if (saved_last_search_spat.pat == NULL)
-	    saved_last_search_spat.patlen = 0;
+	saved_last_हानाप_spat.pat = vim_strnsave(spats[RE_हानाप].pat, spats[RE_हानाप].patlen);
+	if (saved_last_हानाप_spat.pat == NULL)
+	    saved_last_हानाप_spat.patlen = 0;
 	else
-	    saved_last_search_spat.patlen = spats[RE_SEARCH].patlen;
+	    saved_last_हानाप_spat.patlen = spats[RE_हानाप].patlen;
     }
     saved_last_idx = last_idx;
     saved_no_hlsearch = no_hlsearch;
 }
 
     void
-restore_last_search_pattern(void)
+restore_last_हानाप_pattern(void)
 {
-    if (--did_save_last_search_spat > 0)
+    if (--did_save_last_हानाप_spat > 0)
 	// nested call, nothing to do
 	return;
-    if (did_save_last_search_spat != 0)
+    if (did_save_last_हानाप_spat != 0)
     {
 	iemsg("restore_last_search_pattern() called more often than save_last_search_pattern()");
 	return;
     }
 
-    vim_free(spats[RE_SEARCH].pat);
-    spats[RE_SEARCH] = saved_last_search_spat;
-    saved_last_search_spat.pat = NULL;
-    saved_last_search_spat.patlen = 0;
+    vim_free(spats[RE_हानाप].pat);
+    spats[RE_हानाप] = saved_last_हानाप_spat;
+    saved_last_हानाप_spat.pat = NULL;
+    saved_last_हानाप_spat.patlen = 0;
 # if defined(FEAT_EVAL)
     set_vv_searchforward();
 # endif
@@ -394,27 +394,27 @@ restore_last_search_pattern(void)
     static void
 save_incsearch_state(void)
 {
-    saved_search_match_endcol = search_match_endcol;
-    saved_search_match_lines  = search_match_lines;
+    saved_हानाप_match_endcol = हानाप_match_endcol;
+    saved_हानाप_match_मगा_लिन्या  = हानाप_match_मगा_लिन्या;
 }
 
     static void
 restore_incsearch_state(void)
 {
-    search_match_endcol = saved_search_match_endcol;
-    search_match_lines  = saved_search_match_lines;
+    हानाप_match_endcol = saved_हानाप_match_endcol;
+    हानाप_match_मगा_लिन्या  = saved_हानाप_match_मगा_लिन्या;
 }
 
     char_u *
-last_search_pattern(void)
+last_हानाप_pattern(void)
 {
-    return spats[RE_SEARCH].pat;
+    return spats[RE_हानाप].pat;
 }
 
     size_t
-last_search_pattern_len(void)
+last_हानाप_pattern_len(void)
 {
-    return spats[RE_SEARCH].patlen;
+    return spats[RE_हानाप].patlen;
 }
 #endif
 
@@ -536,7 +536,7 @@ set_csearch_until(int t_cmd)
 }
 
     char_u *
-last_search_pat(void)
+last_हानाप_pat(void)
 {
     return spats[last_idx].pat;
 }
@@ -545,7 +545,7 @@ last_search_pat(void)
  * Reset search direction to forward.  For "gd" and "gD" commands.
  */
     void
-reset_search_dir(void)
+reset_हानाप_dir(void)
 {
     spats[0].off.dir = '/';
 #if defined(FEAT_EVAL)
@@ -559,7 +559,7 @@ reset_search_dir(void)
  * Also set the saved search pattern, so that this works in an autocommand.
  */
     void
-set_last_search_pat(
+set_last_हानाप_pat(
     char_u	*s,
     int		idx,
     int		magic,
@@ -582,7 +582,7 @@ set_last_search_pat(
 # if defined(FEAT_EVAL)
     set_vv_searchforward();
 # endif
-    spats[idx].off.line = FALSE;
+    spats[idx].off.लिन्या = FALSE;
     spats[idx].off.end = FALSE;
     spats[idx].off.off = 0;
     if (setlast)
@@ -599,11 +599,11 @@ set_last_search_pat(
 	    saved_spats[idx].patlen = 0;
 	else
 	    saved_spats[idx].patlen = spats[idx].patlen;
-# ifdef FEAT_SEARCH_EXTRA
+# ifdef FEAT_हानाप_EXTRA
 	saved_spats_last_idx = last_idx;
 # endif
     }
-# ifdef FEAT_SEARCH_EXTRA
+# ifdef FEAT_हानाप_EXTRA
     // If 'hlsearch' set and search pat changed: need redraw.
     if (p_hls && idx == last_idx && !no_hlsearch)
 	redraw_all_later(UPD_SOME_VALID);
@@ -611,7 +611,7 @@ set_last_search_pat(
 }
 #endif
 
-#ifdef FEAT_SEARCH_EXTRA
+#ifdef FEAT_हानाप_EXTRA
 /*
  * Get a regexp program for the last used search pattern.
  * This is used for highlighting all matches in a window.
@@ -626,7 +626,7 @@ last_pat_prog(regmmatch_T *regmatch)
 	return;
     }
     ++emsg_off;		// So it doesn't beep if bad expr
-    (void)search_regcomp((char_u *)"", 0, NULL, 0, last_idx, SEARCH_KEEP, regmatch);
+    (void)हानाप_regcomp((char_u *)"", 0, NULL, 0, last_idx, हानाप_KEEP, regmatch);
     --emsg_off;
 }
 #endif
@@ -661,7 +661,7 @@ searchit(
     int		dir,
     char_u	*pat,
     size_t	patlen,
-    long	count,
+    long	बिलांग,
     int		options,
     int		pat_use,	// which pattern to use when "pat" is empty
     searchit_arg_T *extra_arg)	// optional extra arguments, can be NULL
@@ -676,7 +676,7 @@ searchit(
     lpos_T	matchpos;
     int		loop;
     pos_T	start_pos;
-    int		at_first_line;
+    int		at_first_लिन्या;
     int		extra_col;
     int		start_char_len;
     int		match_ok;
@@ -684,23 +684,23 @@ searchit(
     int		submatch = 0;
     int		first_match = TRUE;
     int		called_emsg_before = called_emsg;
-#ifdef FEAT_SEARCH_EXTRA
+#ifdef FEAT_हानाप_EXTRA
     int		break_loop = FALSE;
 #endif
     linenr_T	stop_lnum = 0;	// stop after this line number when != 0
     int		unused_timeout_flag = FALSE;
     int		*timed_out = &unused_timeout_flag;  // set when timed out.
-    int		search_from_match_end;		    // vi-compatible search?
+    int		हानाप_from_match_end;		    // vi-compatible search?
 
-    if (search_regcomp(pat, patlen, NULL, RE_SEARCH, pat_use,
-		   (options & (SEARCH_HIS + SEARCH_KEEP)), &regmatch) == FAIL)
+    if (हानाप_regcomp(pat, patlen, NULL, RE_हानाप, pat_use,
+		   (options & (हानाप_HIS + हानाप_KEEP)), &regmatch) == FAIL)
     {
-	if ((options & SEARCH_MSG) && !rc_did_emsg)
-	    semsg(_(e_invalid_search_string_str), mr_pattern);
+	if ((options & हानाप_मेनसाहे) && !rc_did_emsg)
+	    semsg(_(e_invalid_हानाप_string_str), mr_pattern);
 	return FAIL;
     }
 
-    search_from_match_end = vim_strchr(p_cpo, CPO_SEARCH) != NULL;
+    हानाप_from_match_end = vim_strchr(p_cpo, CPO_हानाप) != NULL;
 
     if (extra_arg != NULL)
     {
@@ -726,7 +726,7 @@ searchit(
 	    start_char_len = 0;
 	// Watch out for the "col" being MAXCOL - 2, used in a closed fold.
 	else if (has_mbyte
-		    && pos->lnum >= 1 && pos->lnum <= buf->b_ml.ml_line_count
+		    && pos->lnum >= 1 && pos->lnum <= buf->b_ml.ml_लिन्या_बिलांग
 						    && pos->col < MAXCOL - 2)
 	{
 	    ptr = ml_get_buf(buf, pos->lnum, FALSE);
@@ -739,14 +739,14 @@ searchit(
 	    start_char_len = 1;
 	if (dir == FORWARD)
 	{
-	    if (options & SEARCH_START)
+	    if (options & हानाप_START)
 		extra_col = 0;
 	    else
 		extra_col = start_char_len;
 	}
 	else
 	{
-	    if (options & SEARCH_START)
+	    if (options & हानाप_START)
 		extra_col = start_char_len;
 	    else
 		extra_col = 0;
@@ -754,12 +754,12 @@ searchit(
 
 	start_pos = *pos;	// remember start pos for detecting no match
 	found = 0;		// default: not found
-	at_first_line = TRUE;	// default: start in first line
+	at_first_लिन्या = TRUE;	// default: start in first line
 	if (pos->lnum == 0)	// correct lnum for when starting in line 0
 	{
 	    pos->lnum = 1;
 	    pos->col = 0;
-	    at_first_line = FALSE;  // not in first line now
+	    at_first_लिन्या = FALSE;  // not in first line now
 	}
 
 	/*
@@ -770,18 +770,18 @@ searchit(
 	 * Otherwise begin the search in the current line.
 	 */
 	if (dir == BACKWARD && start_pos.col == 0
-					     && (options & SEARCH_START) == 0)
+					     && (options & हानाप_START) == 0)
 	{
 	    lnum = pos->lnum - 1;
-	    at_first_line = FALSE;
+	    at_first_लिन्या = FALSE;
 	}
 	else
 	    lnum = pos->lnum;
 
 	for (loop = 0; loop <= 1; ++loop)   // loop twice if 'wrapscan' set
 	{
-	    for ( ; lnum > 0 && lnum <= buf->b_ml.ml_line_count;
-					   lnum += dir, at_first_line = FALSE)
+	    for ( ; lnum > 0 && lnum <= buf->b_ml.ml_लिन्या_बिलांग;
+					   lnum += dir, at_first_लिन्या = FALSE)
 	    {
 		// Stop after checking "stop_lnum", if it's set.
 		if (stop_lnum != 0 && (dir == FORWARD
@@ -794,7 +794,7 @@ searchit(
 		/*
 		 * Look for a match somewhere in line "lnum".
 		 */
-		col = at_first_line && (options & SEARCH_COL) ? pos->col
+		col = at_first_लिन्या && (options & हानाप_COL) ? pos->col
 								 : (colnr_T)0;
 		nmatched = vim_regexec_multi(&regmatch, win, buf,
 							 lnum, col, timed_out);
@@ -813,7 +813,7 @@ searchit(
 		    submatch = first_submatch(&regmatch);
 #endif
 		    // "lnum" may be past end of buffer for "\n\zs".
-		    if (lnum + matchpos.lnum > buf->b_ml.ml_line_count)
+		    if (lnum + matchpos.lnum > buf->b_ml.ml_लिन्या_बिलांग)
 			ptr = (char_u *)"";
 		    else
 			ptr = ml_get_buf(buf, lnum + matchpos.lnum, FALSE);
@@ -823,7 +823,7 @@ searchit(
 		     * the start position. If not, continue at the end of the
 		     * match (this is vi compatible) or on the next char.
 		     */
-		    if (dir == FORWARD && at_first_line)
+		    if (dir == FORWARD && at_first_लिन्या)
 		    {
 			match_ok = TRUE;
 
@@ -835,7 +835,7 @@ searchit(
 			 * otherwise "/$" will get stuck on end of line.
 			 */
 			while (matchpos.lnum == 0
-				&& ((options & SEARCH_END) && first_match
+				&& ((options & हानाप_END) && first_match
 				    ?  (nmatched == 1
 					&& (int)endpos.col - 1
 					     < (int)start_pos.col + extra_col)
@@ -848,7 +848,7 @@ searchit(
 			     * of the match, otherwise continue one position
 			     * forward.
 			     */
-			    if (search_from_match_end)
+			    if (हानाप_from_match_end)
 			    {
 				if (nmatched > 1)
 				{
@@ -884,7 +884,7 @@ searchit(
 					++matchcol;
 				}
 			    }
-			    if (matchcol == 0 && (options & SEARCH_START))
+			    if (matchcol == 0 && (options & हानाप_START))
 				break;
 			    if (ptr[matchcol] == NUL
 				    || (nmatched = vim_regexec_multi(&regmatch,
@@ -927,7 +927,7 @@ searchit(
 			    // the line.  Always accept a position after
 			    // wrapping around.
 			    if (loop
-				|| ((options & SEARCH_END)
+				|| ((options & हानाप_END)
 				    ? (lnum + regmatch.endpos[0].lnum
 							      < start_pos.lnum
 					|| (lnum + regmatch.endpos[0].lnum
@@ -960,7 +960,7 @@ searchit(
 			     * of the match, otherwise continue one position
 			     * forward.
 			     */
-			    if (search_from_match_end)
+			    if (हानाप_from_match_end)
 			    {
 				if (nmatched > 1)
 				    break;
@@ -1023,7 +1023,7 @@ searchit(
 		    // With the SEARCH_END option move to the last character
 		    // of the match.  Don't do it for an empty match, end
 		    // should be same as start then.
-		    if ((options & SEARCH_END) && !(options & SEARCH_NOOF)
+		    if ((options & हानाप_END) && !(options & हानाप_NOOF)
 			    && !(matchpos.lnum == endpos.lnum
 				&& matchpos.col == endpos.col))
 		    {
@@ -1043,7 +1043,7 @@ searchit(
 			{
 			    --pos->col;
 			    if (has_mbyte
-				    && pos->lnum <= buf->b_ml.ml_line_count)
+				    && pos->lnum <= buf->b_ml.ml_लिन्या_बिलांग)
 			    {
 				ptr = ml_get_buf(buf, pos->lnum, FALSE);
 				pos->col -= (*mb_head_off)(ptr, ptr + pos->col);
@@ -1072,19 +1072,19 @@ searchit(
 		    first_match = FALSE;
 
 		    // Set variables used for 'incsearch' highlighting.
-		    search_match_lines = endpos.lnum - matchpos.lnum;
-		    search_match_endcol = endpos.col;
+		    हानाप_match_मगा_लिन्या = endpos.lnum - matchpos.lnum;
+		    हानाप_match_endcol = endpos.col;
 		    break;
 		}
-		line_breakcheck();	// stop if ctrl-C typed
+		लिन्या_breakcheck();	// stop if ctrl-C typed
 		if (got_int)
 		    break;
 
-#ifdef FEAT_SEARCH_EXTRA
+#ifdef FEAT_हानाप_EXTRA
 		// Cancel searching if a character was typed.  Used for
 		// 'incsearch'.  Don't check too often, that would slowdown
 		// searching too much.
-		if ((options & SEARCH_PEEK)
+		if ((options & हानाप_PEEK)
 			&& ((lnum - pos->lnum) & 0x3f) == 0
 			&& char_avail())
 		{
@@ -1096,7 +1096,7 @@ searchit(
 		if (loop && lnum == start_pos.lnum)
 		    break;	    // if second loop, stop where started
 	    }
-	    at_first_line = FALSE;
+	    at_first_लिन्या = FALSE;
 
 	    // vim_regexec_multi() may clear "regprog"
 	    if (regmatch.regprog == NULL)
@@ -1109,7 +1109,7 @@ searchit(
 	     */
 	    if (!p_ws || stop_lnum != 0 || got_int
 			      || called_emsg > called_emsg_before || *timed_out
-#ifdef FEAT_SEARCH_EXTRA
+#ifdef FEAT_हानाप_EXTRA
 			      || break_loop
 #endif
 			      || found || loop)
@@ -1125,25 +1125,25 @@ searchit(
 	     * written.
 	     */
 	    if (dir == BACKWARD)    // start second loop at the other end
-		lnum = buf->b_ml.ml_line_count;
+		lnum = buf->b_ml.ml_लिन्या_बिलांग;
 	    else
 		lnum = 1;
-	    if (!shortmess(SHM_SEARCH)
+	    if (!shortmess(SHM_हानाप)
 		    && shortmess(SHM_SEARCHCOUNT)
-		    && (options & SEARCH_MSG))
+		    && (options & हानाप_मेनसाहे))
 		give_warning((char_u *)_(dir == BACKWARD
-					  ? top_bot_msg : bot_top_msg), TRUE);
+					  ? इताअस_bot_मेनसाहे : bot_इताअस_मेनसाहे), TRUE);
 	    if (extra_arg != NULL)
 		extra_arg->sa_wrapped = TRUE;
 	}
 	if (got_int || called_emsg > called_emsg_before || *timed_out
-#ifdef FEAT_SEARCH_EXTRA
+#ifdef FEAT_हानाप_EXTRA
 		|| break_loop
 #endif
 		)
 	    break;
     }
-    while (--count > 0 && found);   // stop after count matches or no match
+    while (--बिलांग > 0 && found);   // stop after count matches or no match
 
 #ifdef FEAT_RELTIME
     if (extra_arg != NULL && extra_arg->sa_tm > 0)
@@ -1155,22 +1155,22 @@ searchit(
     {
 	if (got_int)
 	    emsg(_(e_interrupted));
-	else if ((options & SEARCH_MSG) == SEARCH_MSG)
+	else if ((options & हानाप_मेनसाहे) == हानाप_मेनसाहे)
 	{
 	    if (p_ws)
 		semsg(_(e_pattern_not_found_str), mr_pattern);
 	    else if (lnum == 0)
-		semsg(_(e_search_hit_top_without_match_for_str), mr_pattern);
+		semsg(_(e_हानाप_hit_इताअस_without_match_for_str), mr_pattern);
 	    else
-		semsg(_(e_search_hit_bottom_without_match_for_str), mr_pattern);
+		semsg(_(e_हानाप_hit_bottom_without_match_for_str), mr_pattern);
 	}
 	return FAIL;
     }
 
     // A pattern like "\n\zs" may go past the last line.
-    if (pos->lnum > buf->b_ml.ml_line_count)
+    if (pos->lnum > buf->b_ml.ml_लिन्या_बिलांग)
     {
-	pos->lnum = buf->b_ml.ml_line_count;
+	pos->lnum = buf->b_ml.ml_लिन्या_बिलांग;
 	pos->col = ml_get_buf_len(buf, pos->lnum);
 	if (pos->col > 0)
 	    --pos->col;
@@ -1181,7 +1181,7 @@ searchit(
 
 #if defined(FEAT_EVAL) || defined(FEAT_PROTO)
     void
-set_search_direction(int cdir)
+set_हानाप_direction(int cdir)
 {
     spats[0].off.dir = cdir;
 }
@@ -1232,10 +1232,10 @@ first_submatch(regmmatch_T *rp)
  * to know how much of the command line was consumed).
  */
     int
-parse_search_pattern_offset(
+parse_हानाप_pattern_offset(
     char_u	**pat,
     size_t	*patlen,
-    int		search_delim,
+    int		हानाप_delim,
     int		options,
     char_u	**strcopy,
     char_u	**searchstr,
@@ -1259,7 +1259,7 @@ parse_search_pattern_offset(
      * Find end of regular expression.
      * If there is a matching '/' or '?', toss it.
      */
-    p = skip_regexp_ex(*pat, search_delim, magic_isset(),
+    p = skip_regexp_ex(*pat, हानाप_delim, magic_isset(),
 						    strcopy, NULL, NULL);
     if (*strcopy != ps)
     {
@@ -1271,14 +1271,14 @@ parse_search_pattern_offset(
 	*searchstr = *strcopy;
 	*searchstrlen = len;
     }
-    if (*p == search_delim)
+    if (*p == हानाप_delim)
     {
 	*searchstrlen = p - *pat;
 	*dircp = p;	// remember where we put the NUL
 	*p++ = NUL;
     }
 
-    offset->line = FALSE;
+    offset->लिन्या = FALSE;
     offset->end = FALSE;
     offset->off = 0;
     /*
@@ -1288,12 +1288,12 @@ parse_search_pattern_offset(
      * substitute command.
      */
     if (*p == '+' || *p == '-' || VIM_ISDIGIT(*p))
-	offset->line = TRUE;
-    else if ((options & SEARCH_OPT)
+	offset->लिन्या = TRUE;
+    else if ((options & हानाप_OPT)
 				  && (*p == 'e' || *p == 's' || *p == 'b'))
     {
 	if (*p == 'e')		// end
-	    offset->end = SEARCH_END;
+	    offset->end = हानाप_END;
 	++p;
     }
     if (VIM_ISDIGIT(*p) || *p == '+' || *p == '-')  // got an offset
@@ -1340,14 +1340,14 @@ parse_search_pattern_offset(
  * Return 0 for failure, 1 for found, 2 for found and line offset added.
  */
     int
-do_search(
+do_हानाप(
     oparg_T	    *oap,	// can be NULL
     int		    dirc,	// '/' or '?'
-    int		    search_delim, // the delimiter for the search, e.g. '%' in
+    int		    हानाप_delim, // the delimiter for the search, e.g. '%' in
 				  // s%regex%replacement%
     char_u	    *pat,
     size_t	    patlen,
-    long	    count,
+    long	    बिलांग,
     int		    options,
     searchit_arg_T  *sia)	// optional arguments or NULL
 {
@@ -1360,7 +1360,7 @@ do_search(
     long	    c;
     char_u	    *dircp;
     char_u	    *strcopy = NULL;
-    int		    show_search_stats;
+    int		    show_हानाप_stats;
     char_u	    *msgbuf = NULL;
     size_t	    msgbuflen = 0;
     int		    has_offset = FALSE;
@@ -1370,9 +1370,9 @@ do_search(
     /*
      * A line offset is not remembered, this is vi compatible.
      */
-    if (spats[0].off.line && vim_strchr(p_cpo, CPO_LINEOFF) != NULL)
+    if (spats[0].off.लिन्या && vim_strchr(p_cpo, CPO_LINEOFF) != NULL)
     {
-	spats[0].off.line = FALSE;
+	spats[0].off.लिन्या = FALSE;
 	spats[0].off.off = 0;
     }
 
@@ -1396,7 +1396,7 @@ do_search(
 	set_vv_searchforward();
 #endif
     }
-    if (options & SEARCH_REV)
+    if (options & हानाप_REV)
     {
 #ifdef MSWIN
 	// There is a bug in the Visual C++ 2.2 compiler which means that
@@ -1425,11 +1425,11 @@ do_search(
     }
 #endif
 
-#ifdef FEAT_SEARCH_EXTRA
+#ifdef FEAT_हानाप_EXTRA
     /*
      * Turn 'hlsearch' highlighting back on.
      */
-    if (no_hlsearch && !(options & SEARCH_KEEP))
+    if (no_hlsearch && !(options & हानाप_KEEP))
     {
 	redraw_all_later(UPD_SOME_VALID);
 	set_no_hlsearch(FALSE);
@@ -1441,22 +1441,22 @@ do_search(
      */
     for (;;)
     {
-	int		show_top_bot_msg = FALSE;
+	int		show_इताअस_bot_मेनसाहे = FALSE;
 
 	searchstr = pat;
 	searchstrlen = patlen;
 
 	dircp = NULL;
 					    // use previous pattern
-	if (pat == NULL || *pat == NUL || *pat == search_delim)
+	if (pat == NULL || *pat == NUL || *pat == हानाप_delim)
 	{
-	    if (spats[RE_SEARCH].pat == NULL)	    // no previous pattern
+	    if (spats[RE_हानाप].pat == NULL)	    // no previous pattern
 	    {
 		if (spats[RE_SUBST].pat == NULL)
 		{
 		    emsg(_(e_no_previous_regular_expression));
 		    retval = 0;
-		    goto end_do_search;
+		    goto end_do_हानाप;
 		}
 		searchstr = spats[RE_SUBST].pat;
 		searchstrlen = spats[RE_SUBST].patlen;
@@ -1474,8 +1474,8 @@ do_search(
 	    char_u	*prev_searchstr = searchstr;
 	    size_t	prev_searchstrlen = searchstrlen;
 
-	    searchcmdlen += parse_search_pattern_offset(&pat, &patlen,
-				search_delim, options, &strcopy, &searchstr,
+	    searchcmdlen += parse_हानाप_pattern_offset(&pat, &patlen,
+				हानाप_delim, options, &strcopy, &searchstr,
 				&searchstrlen, &dircp, &spats[0].off);
 	    // An empty pattern (e.g. "//e") uses the previous pattern selected
 	    // above.
@@ -1486,9 +1486,9 @@ do_search(
 	    }
 	}
 
-	show_search_stats = FALSE;
-	if ((options & SEARCH_ECHO) && messaging()
-		&& !msg_silent
+	show_हानाप_stats = FALSE;
+	if ((options & हानाप_ECHO) && messaging()
+		&& !मेनसाहे_silent
 		&& (!cmd_silent || !shortmess(SHM_SEARCHCOUNT)))
 	{
 	    char_u	off_buf[40];
@@ -1497,19 +1497,19 @@ do_search(
 	    size_t	msgbufsize;
 
 	    // Compute msg_row early.
-	    msg_start();
+	    मेनसाहे_start();
 
 	    // Get the offset, so we know how long it is.
 	    if (!cmd_silent &&
-		    (spats[0].off.line || spats[0].off.end || spats[0].off.off))
+		    (spats[0].off.लिन्या || spats[0].off.end || spats[0].off.off))
 	    {
 		off_buf[off_len++] = dirc;
 		if (spats[0].off.end)
 		    off_buf[off_len++] = 'e';
-		else if (!spats[0].off.line)
+		else if (!spats[0].off.लिन्या)
 		    off_buf[off_len++] = 's';
 		off_buf[off_len] = NUL;
-		if (spats[0].off.off != 0 || spats[0].off.line)
+		if (spats[0].off.off != 0 || spats[0].off.लिन्या)
 		    off_len += vim_snprintf((char *)off_buf + off_len,
 			   sizeof(off_buf) - off_len, "%+ld", spats[0].off.off);
 	    }
@@ -1531,15 +1531,15 @@ do_search(
 		// search stat.  Use all the space available, so that the
 		// search state is right aligned.  If there is not enough space
 		// msg_strtrunc() will shorten in the middle.
-		if (msg_scrolled != 0 && !cmd_silent)
+		if (मेनसाहे_scrolled != 0 && !cmd_silent)
 		    // Use all the columns.
-		    msgbufsize = (int)(Rows - msg_row) * cmdline_width - 1;
+		    msgbufsize = (int)(Rows - मेनसाहे_row) * cmdline_width - 1;
 		else
 		    // Use up to 'showcmd' column.
-		    msgbufsize = (int)(Rows - msg_row - 1) * cmdline_width
+		    msgbufsize = (int)(Rows - मेनसाहे_row - 1) * cmdline_width
 			+ sc_col - 1;
-		if (msgbufsize < plen + off_len + SEARCH_STAT_BUF_LEN + 3)
-		    msgbufsize = plen + off_len + SEARCH_STAT_BUF_LEN + 3;
+		if (msgbufsize < plen + off_len + हानाप_STAT_BUF_LEN + 3)
+		    msgbufsize = plen + off_len + हानाप_STAT_BUF_LEN + 3;
 	    }
 	    else
 		// Reserve enough space for the search pattern + offset.
@@ -1575,7 +1575,7 @@ do_search(
 		    if (off_len > 0)
 			mch_memmove(msgbuf + plen + 1, off_buf, off_len);
 
-		    trunc = msg_strtrunc(msgbuf, TRUE);
+		    trunc = मेनसाहे_strtrunc(msgbuf, TRUE);
 		    if (trunc != NULL)
 		    {
 			vim_free(msgbuf);
@@ -1612,17 +1612,17 @@ do_search(
 			}
 		    }
 #endif
-		    msg_outtrans(msgbuf);
-		    msg_clr_eos();
-		    msg_check();
+		    मेनसाहे_outtrans(msgbuf);
+		    मेनसाहे_clr_eos();
+		    मेनसाहे_check();
 
 		    gotocmdline(FALSE);
 		    out_flush();
-		    msg_nowait = TRUE;	    // don't wait for this message
+		    मेनसाहे_nowait = TRUE;	    // don't wait for this message
 		}
 
 		if (!shortmess(SHM_SEARCHCOUNT))
-		    show_search_stats = TRUE;
+		    show_हानाप_stats = TRUE;
 	    }	// msgbuf != NULL
 	}
 
@@ -1633,7 +1633,7 @@ do_search(
 	 * This is not done for a line offset, because then we would not be vi
 	 * compatible.
 	 */
-	if (!spats[0].off.line && spats[0].off.off && pos.col < MAXCOL - 2)
+	if (!spats[0].off.लिन्या && spats[0].off.off && pos.col < MAXCOL - 2)
 	{
 	    if (spats[0].off.off > 0)
 	    {
@@ -1653,7 +1653,7 @@ do_search(
 			break;
 		if (c)			// at end of buffer
 		{
-		    pos.lnum = curbuf->b_ml.ml_line_count + 1;
+		    pos.lnum = curbuf->b_ml.ml_लिन्या_बिलांग + 1;
 		    pos.col = 0;
 		}
 	    }
@@ -1664,22 +1664,22 @@ do_search(
 	 */
 	c = searchit(curwin, curbuf, &pos, NULL,
 					      dirc == '/' ? FORWARD : BACKWARD,
-		searchstr, searchstrlen, count, spats[0].off.end + (options &
-		       (SEARCH_KEEP + SEARCH_PEEK + SEARCH_HIS
-			+ SEARCH_MSG + SEARCH_START
-			+ ((pat != NULL && *pat == ';') ? 0 : SEARCH_NOOF))),
+		searchstr, searchstrlen, बिलांग, spats[0].off.end + (options &
+		       (हानाप_KEEP + हानाप_PEEK + हानाप_HIS
+			+ हानाप_मेनसाहे + हानाप_START
+			+ ((pat != NULL && *pat == ';') ? 0 : हानाप_NOOF))),
 		RE_LAST, sia);
 
 	if (dircp != NULL)
-	    *dircp = search_delim; // restore second '/' or '?' for normal_cmd()
+	    *dircp = हानाप_delim; // restore second '/' or '?' for normal_cmd()
 
-	if (!shortmess(SHM_SEARCH) && sia && sia->sa_wrapped)
-	    show_top_bot_msg = TRUE;
+	if (!shortmess(SHM_हानाप) && sia && sia->sa_wrapped)
+	    show_इताअस_bot_मेनसाहे = TRUE;
 
 	if (c == FAIL)
 	{
 	    retval = 0;
-	    goto end_do_search;
+	    goto end_do_हानाप;
 	}
 	if (spats[0].off.end && oap != NULL)
 	    oap->inclusive = TRUE;  // 'e' includes last character
@@ -1689,17 +1689,17 @@ do_search(
 	/*
 	 * Add character and/or line offset
 	 */
-	if (!(options & SEARCH_NOOF) || (pat != NULL && *pat == ';'))
+	if (!(options & हानाप_NOOF) || (pat != NULL && *pat == ';'))
 	{
 	    pos_T org_pos = pos;
 
-	    if (spats[0].off.line)	// Add the offset to the line number.
+	    if (spats[0].off.लिन्या)	// Add the offset to the line number.
 	    {
 		c = pos.lnum + spats[0].off.off;
 		if (c < 1)
 		    pos.lnum = 1;
-		else if (c > curbuf->b_ml.ml_line_count)
-		    pos.lnum = curbuf->b_ml.ml_line_count;
+		else if (c > curbuf->b_ml.ml_लिन्या_बिलांग)
+		    pos.lnum = curbuf->b_ml.ml_लिन्या_बिलांग;
 		else
 		    pos.lnum = c;
 		pos.col = 0;
@@ -1729,18 +1729,18 @@ do_search(
 	}
 
 	// Show [1/15] if 'S' is not in 'shortmess'.
-	if (show_search_stats)
-	     cmdline_search_stat(dirc, &pos, &curwin->w_cursor,
-				show_top_bot_msg, msgbuf, msgbuflen,
-				(count != 1 || has_offset
+	if (show_हानाप_stats)
+	     cmdline_हानाप_stat(dirc, &pos, &curwin->w_cursor,
+				show_इताअस_bot_मेनसाहे, msgbuf, msgbuflen,
+				(बिलांग != 1 || has_offset
 #ifdef FEAT_FOLDING
-				 || (!(fdo_flags & FDO_SEARCH)
+				 || (!(fdo_flags & FDO_हानाप)
 				     && hasFolding(curwin->w_cursor.lnum,
 								   NULL, NULL))
 #endif
 				),
 				p_msc,
-				SEARCH_STAT_DEF_TIMEOUT);
+				हानाप_STAT_DEF_TIMEOUT);
 
 	/*
 	 * The search command can be followed by a ';' to do another search.
@@ -1750,29 +1750,29 @@ do_search(
 	 * - When an error happens the cursor isn't moved at all.
 	 * Don't do this when called by get_address() (it handles ';' itself).
 	 */
-	if (!(options & SEARCH_OPT) || pat == NULL || *pat != ';')
+	if (!(options & हानाप_OPT) || pat == NULL || *pat != ';')
 	    break;
 
 	dirc = *++pat;
 	--patlen;
-	search_delim = dirc;
+	हानाप_delim = dirc;
 	if (dirc != '?' && dirc != '/')
 	{
 	    retval = 0;
 	    emsg(_(e_expected_question_or_slash_after_semicolon));
-	    goto end_do_search;
+	    goto end_do_हानाप;
 	}
 	++pat;
 	--patlen;
     }
 
-    if (options & SEARCH_MARK)
+    if (options & हानाप_MARK)
 	setpcmark();
     curwin->w_cursor = pos;
     curwin->w_set_curswant = true;
 
-end_do_search:
-    if ((options & SEARCH_KEEP) || (cmdmod.cmod_flags & CMOD_KEEPPATTERNS))
+end_do_हानाप:
+    if ((options & हानाप_KEEP) || (cmdmod.cmod_flags & CMOD_KEEPPATTERNS))
 	spats[0].off = old_off;
     vim_free(strcopy);
     vim_free(msgbuf);
@@ -1790,7 +1790,7 @@ end_do_search:
  * Return OK for success, or FAIL if no line found.
  */
     int
-search_for_exact_line(
+हानाप_for_exact_लिन्या(
     buf_T	*buf,
     pos_T	*pos,
     int		dir,
@@ -1801,7 +1801,7 @@ search_for_exact_line(
     char_u	*p;
     int		compl_len = ins_compl_len();
 
-    if (buf->b_ml.ml_line_count == 0)
+    if (buf->b_ml.ml_लिन्या_बिलांग == 0)
 	return FAIL;
     for (;;)
     {
@@ -1810,9 +1810,9 @@ search_for_exact_line(
 	{
 	    if (p_ws)
 	    {
-		pos->lnum = buf->b_ml.ml_line_count;
-		if (!shortmess(SHM_SEARCH))
-		    give_warning((char_u *)_(top_bot_msg), TRUE);
+		pos->lnum = buf->b_ml.ml_लिन्या_बिलांग;
+		if (!shortmess(SHM_हानाप))
+		    give_warning((char_u *)_(इताअस_bot_मेनसाहे), TRUE);
 	    }
 	    else
 	    {
@@ -1820,13 +1820,13 @@ search_for_exact_line(
 		break;
 	    }
 	}
-	else if (pos->lnum > buf->b_ml.ml_line_count)
+	else if (pos->lnum > buf->b_ml.ml_लिन्या_बिलांग)
 	{
 	    if (p_ws)
 	    {
 		pos->lnum = 1;
-		if (!shortmess(SHM_SEARCH))
-		    give_warning((char_u *)_(bot_top_msg), TRUE);
+		if (!shortmess(SHM_हानाप))
+		    give_warning((char_u *)_(bot_इताअस_मेनसाहे), TRUE);
 	    }
 	    else
 	    {
@@ -1874,7 +1874,7 @@ searchc(cmdarg_T *cap, int t_cmd)
 {
     int			c = cap->nchar;	// char to search for
     int			dir = cap->arg;	// TRUE for searching forward
-    long		count = cap->count1;	// repeat count
+    long		बिलांग = cap->count1;	// repeat count
     int			col;
     char_u		*p;
     int			len;
@@ -1882,7 +1882,7 @@ searchc(cmdarg_T *cap, int t_cmd)
 
     if (c != NUL)	// normal search: remember args for repeat
     {
-	if (!KeyStuffed)    // don't remember when redoing
+	if (!सुसि_Stuffed)    // don't remember when redoing
 	{
 	    *lastc = c;
 	    set_csearch_direction(dir);
@@ -1913,7 +1913,7 @@ searchc(cmdarg_T *cap, int t_cmd)
 	// Force a move of at least one char, so ";" and "," will move the
 	// cursor, even if the cursor is right in front of char we are looking
 	// at.
-	if (vim_strchr(p_cpo, CPO_SCOLON) == NULL && count == 1 && t_cmd)
+	if (vim_strchr(p_cpo, CPO_SCOLON) == NULL && बिलांग == 1 && t_cmd)
 	    stop = FALSE;
     }
 
@@ -1926,7 +1926,7 @@ searchc(cmdarg_T *cap, int t_cmd)
     col = curwin->w_cursor.col;
     len = ml_get_curline_len();
 
-    while (count--)
+    while (बिलांग--)
     {
 	if (has_mbyte)
 	{
@@ -2045,12 +2045,12 @@ find_rawstring_end(char_u *linep, pos_T *startpos, pos_T *endpos)
 	return FALSE;
     for (lnum = startpos->lnum; lnum <= endpos->lnum; ++lnum)
     {
-	char_u *line = ml_get(lnum);
+	char_u *लिन्या = ml_get(lnum);
 
-	for (p = line + (lnum == startpos->lnum
+	for (p = लिन्या + (lnum == startpos->lnum
 					    ? startpos->col + 1 : 0); *p; ++p)
 	{
-	    if (lnum == endpos->lnum && (colnr_T)(p - line) >= endpos->col)
+	    if (lnum == endpos->lnum && (colnr_T)(p - लिन्या) >= endpos->col)
 		break;
 	    if (*p == ')' && STRNCMP(delim_copy, p + 1, delim_len) == 0
 			  && p[delim_len + 1] == '"')
@@ -2073,7 +2073,7 @@ find_rawstring_end(char_u *linep, pos_T *startpos, pos_T *endpos)
  * When "switchit" is TRUE swap the direction.
  */
     static void
-find_mps_values(
+find_mps_मगा_हालागा(
     int	    *initc,
     int	    *findc,
     int	    *backwards,
@@ -2192,7 +2192,7 @@ findmatchlimit(
     static pos_T pos;			// current search position
     int		findc = 0;		// matching brace
     int		c;
-    int		count = 0;		// cumulative number of braces
+    int		बिलांग = 0;		// cumulative number of braces
     int		backwards = FALSE;	// init for gcc
     int		raw_string = FALSE;	// search for raw string
     int		inquote = FALSE;	// TRUE when inside quotes
@@ -2248,7 +2248,7 @@ findmatchlimit(
     }
     else if (initc != '#' && initc != NUL)
     {
-	find_mps_values(&initc, &findc, &backwards, TRUE);
+	find_mps_मगा_हालागा(&initc, &findc, &backwards, TRUE);
 	if (dir)
 	    backwards = (dir == FORWARD) ? FALSE : TRUE;
 	if (findc == NUL)
@@ -2334,7 +2334,7 @@ findmatchlimit(
 		    if (initc == NUL)
 			break;
 
-		    find_mps_values(&initc, &findc, &backwards, FALSE);
+		    find_mps_मगा_हालागा(&initc, &findc, &backwards, FALSE);
 		    if (findc)
 			break;
 		    pos.col += mb_ptr2len(linep + pos.col);
@@ -2381,14 +2381,14 @@ findmatchlimit(
 	    {
 		if (hash_dir > 0)
 		{
-		    if (pos.lnum == curbuf->b_ml.ml_line_count)
+		    if (pos.lnum == curbuf->b_ml.ml_लिन्या_बिलांग)
 			break;
 		}
 		else if (pos.lnum == 1)
 		    break;
 		pos.lnum += hash_dir;
 		linep = ml_get(pos.lnum);
-		line_breakcheck();	// check for CTRL-C typed
+		लिन्या_breakcheck();	// check for CTRL-C typed
 		ptr = skipwhite(linep);
 		if (*ptr != '#')
 		    continue;
@@ -2397,34 +2397,34 @@ findmatchlimit(
 		if (hash_dir > 0)
 		{
 		    if (STRNCMP(ptr, "if", 2) == 0)
-			count++;
+			बिलांग++;
 		    else if (STRNCMP(ptr, "el", 2) == 0)
 		    {
-			if (count == 0)
+			if (बिलांग == 0)
 			    return &pos;
 		    }
 		    else if (STRNCMP(ptr, "endif", 5) == 0)
 		    {
-			if (count == 0)
+			if (बिलांग == 0)
 			    return &pos;
-			count--;
+			बिलांग--;
 		    }
 		}
 		else
 		{
 		    if (STRNCMP(ptr, "if", 2) == 0)
 		    {
-			if (count == 0)
+			if (बिलांग == 0)
 			    return &pos;
-			count--;
+			बिलांग--;
 		    }
 		    else if (initc == '#' && STRNCMP(ptr, "el", 2) == 0)
 		    {
-			if (count == 0)
+			if (बिलांग == 0)
 			    return &pos;
 		    }
 		    else if (STRNCMP(ptr, "endif", 5) == 0)
-			count++;
+			बिलांग++;
 		}
 	    }
 	    return NULL;
@@ -2475,7 +2475,7 @@ findmatchlimit(
 		linep = ml_get(pos.lnum);
 		pos.col = ml_get_len(pos.lnum); // pos.col on trailing NUL
 		do_quotes = -1;
-		line_breakcheck();
+		लिन्या_breakcheck();
 
 		// Check if this line contains a single-line comment
 		if (comment_dir || lisp || skip_comments)
@@ -2503,7 +2503,7 @@ findmatchlimit(
 		    || (lisp && comment_col != MAXCOL
 					   && pos.col == (colnr_T)comment_col))
 	    {
-		if (pos.lnum == curbuf->b_ml.ml_line_count  // end of file
+		if (pos.lnum == curbuf->b_ml.ml_लिन्या_बिलांग  // end of file
 			// line is exhausted and comment with it,
 			// don't search for match in code
 			 || lispcomm)
@@ -2516,7 +2516,7 @@ findmatchlimit(
 		linep = ml_get(pos.lnum);
 		pos.col = 0;
 		do_quotes = -1;
-		line_breakcheck();
+		लिन्या_breakcheck();
 		if (lisp || skip_comments)   // find comment pos in new line
 		    comment_col = check_linecomment(linep);
 	    }
@@ -2567,7 +2567,7 @@ findmatchlimit(
 	if (pos.col == 0 && (flags & FM_BLOCKSTOP)
 				       && (linep[0] == '{' || linep[0] == '}'))
 	{
-	    if (linep[0] == findc && count == 0)	// match!
+	    if (linep[0] == findc && बिलांग == 0)	// match!
 		return &pos;
 	    break;					// out of scope
 	}
@@ -2603,9 +2603,9 @@ findmatchlimit(
 			// started searching, or before the previously found
 			// raw string start.
 			if (!find_rawstring_end(linep, &pos,
-				  count > 0 ? &match_pos : &curwin->w_cursor))
+				  बिलांग > 0 ? &match_pos : &curwin->w_cursor))
 			{
-			    count++;
+			    बिलांग++;
 			    match_pos = pos;
 			    match_pos.col--;
 			}
@@ -2617,13 +2617,13 @@ findmatchlimit(
 			&& (pos.col == 1 || linep[pos.col - 2] != '*')
 			&& (int)pos.col < comment_col)
 		{
-		    count++;
+		    बिलांग++;
 		    match_pos = pos;
 		    match_pos.col--;
 		}
 		else if (linep[pos.col - 1] == '*' && linep[pos.col] == '/')
 		{
-		    if (count > 0)
+		    if (बिलांग > 0)
 			pos = match_pos;
 		    else if (pos.col > 1 && linep[pos.col - 2] == '/'
 					       && (int)pos.col <= comment_col)
@@ -2826,19 +2826,19 @@ findmatchlimit(
 		if (cpo_bsl || (bslcnt & 1) == match_escaped)
 		{
 		    if (c == initc)
-			count++;
+			बिलांग++;
 		    else
 		    {
-			if (count == 0)
+			if (बिलांग == 0)
 			    return &pos;
-			count--;
+			बिलांग--;
 		    }
 		}
 	    }
 	}
     }
 
-    if (comment_dir == BACKWARD && count > 0)
+    if (comment_dir == BACKWARD && बिलांग > 0)
     {
 	pos = match_pos;
 	return &pos;
@@ -2986,8 +2986,8 @@ is_zero_width(
 	patternlen = spats[last_idx].patlen;
     }
 
-    if (search_regcomp(pattern, patternlen, NULL, RE_SEARCH, RE_SEARCH,
-					      SEARCH_KEEP, &regmatch) == FAIL)
+    if (हानाप_regcomp(pattern, patternlen, NULL, RE_हानाप, RE_हानाप,
+					      हानाप_KEEP, &regmatch) == FAIL)
 	return -1;
 
     // init startcol correctly
@@ -3001,11 +3001,11 @@ is_zero_width(
     {
 	pos = *cur;
 	// accept a match at the cursor position
-	flag = SEARCH_START;
+	flag = हानाप_START;
     }
 
     if (searchit(curwin, curbuf, &pos, NULL, direction, pattern, patternlen, 1,
-				  SEARCH_KEEP + flag, RE_SEARCH, NULL) != FAIL)
+				  हानाप_KEEP + flag, RE_हानाप, NULL) != FAIL)
     {
 	// Zero-width pattern should match somewhere, then we can check if
 	// start and end are in the same position.
@@ -3038,8 +3038,8 @@ is_zero_width(
  * Used while an operator is pending, and in Visual mode.
  */
     int
-current_search(
-    long	count,
+current_हानाप(
+    long	बिलांग,
     int		forward)	// TRUE for forward, FALSE for backward
 {
     pos_T	start_pos;	// start position of the pattern match
@@ -3097,7 +3097,7 @@ current_search(
 
 	flags = 0;
 	if (!dir && !zero_width)
-	    flags = SEARCH_END;
+	    flags = हानाप_END;
 	end_pos = pos;
 
 	// wrapping should not occur in the first round
@@ -3106,8 +3106,8 @@ current_search(
 
 	result = searchit(curwin, curbuf, &pos, &end_pos,
 		(dir ? FORWARD : BACKWARD),
-		spats[last_idx].pat, spats[last_idx].patlen, (long) (i ? count : 1),
-		SEARCH_KEEP | flags, RE_SEARCH, NULL);
+		spats[last_idx].pat, spats[last_idx].patlen, (long) (i ? बिलांग : 1),
+		हानाप_KEEP | flags, RE_हानाप, NULL);
 
 	p_ws = old_p_ws;
 
@@ -3133,8 +3133,8 @@ current_search(
 	    {
 		// try again from end of buffer
 		// searching backwards, so set pos to last line and col
-		pos.lnum = curwin->w_buffer->b_ml.ml_line_count;
-		pos.col  = ml_get_len(curwin->w_buffer->b_ml.ml_line_count);
+		pos.lnum = curwin->w_buffer->b_ml.ml_लिन्या_बिलांग;
+		pos.col  = ml_get_len(curwin->w_buffer->b_ml.ml_लिन्या_बिलांग);
 	    }
 	}
     }
@@ -3170,7 +3170,7 @@ current_search(
     }
 
 #ifdef FEAT_FOLDING
-    if (fdo_flags & FDO_SEARCH && KeyTyped)
+    if (fdo_flags & FDO_हानाप && सुसि_Typed)
 	foldOpenCursor();
 #endif
 
@@ -3204,11 +3204,11 @@ linewhite(linenr_T lnum)
  * See update_search_stat() for other arguments.
  */
     static void
-cmdline_search_stat(
+cmdline_हानाप_stat(
     int		dirc,
     pos_T	*pos,
     pos_T	*cursor_pos,
-    int		show_top_bot_msg,
+    int		show_इताअस_bot_मेनसाहे,
     char_u	*msgbuf,
     size_t	msgbuflen,
     int		recompute,
@@ -3217,46 +3217,46 @@ cmdline_search_stat(
 {
     searchstat_T stat;
 
-    update_search_stat(dirc, pos, cursor_pos, &stat, recompute, maxcount,
+    update_हानाप_stat(dirc, pos, cursor_pos, &stat, recompute, maxcount,
 								      timeout);
     if (stat.cur <= 0)
 	return;
 
-    char	t[SEARCH_STAT_BUF_LEN];
+    char	t[हानाप_STAT_BUF_LEN];
     size_t	len;
 
 #ifdef FEAT_RIGHTLEFT
     if (curwin->w_p_rl && *curwin->w_p_rlc == 's')
     {
 	if (stat.incomplete == 1)
-	    len = vim_snprintf(t, SEARCH_STAT_BUF_LEN, "[?/??]");
+	    len = vim_snprintf(t, हानाप_STAT_BUF_LEN, "[?/??]");
 	else if (stat.cnt > maxcount && stat.cur > maxcount)
-	    len = vim_snprintf(t, SEARCH_STAT_BUF_LEN, "[>%d/>%d]",
+	    len = vim_snprintf(t, हानाप_STAT_BUF_LEN, "[>%d/>%d]",
 		    maxcount, maxcount);
 	else if (stat.cnt > maxcount)
-	    len = vim_snprintf(t, SEARCH_STAT_BUF_LEN, "[>%d/%d]",
+	    len = vim_snprintf(t, हानाप_STAT_BUF_LEN, "[>%d/%d]",
 		    maxcount, stat.cur);
 	else
-	    len = vim_snprintf(t, SEARCH_STAT_BUF_LEN, "[%d/%d]",
+	    len = vim_snprintf(t, हानाप_STAT_BUF_LEN, "[%d/%d]",
 		    stat.cnt, stat.cur);
     }
     else
 #endif
     {
 	if (stat.incomplete == 1)
-	    len = vim_snprintf(t, SEARCH_STAT_BUF_LEN, "[?/??]");
+	    len = vim_snprintf(t, हानाप_STAT_BUF_LEN, "[?/??]");
 	else if (stat.cnt > maxcount && stat.cur > maxcount)
-	    len = vim_snprintf(t, SEARCH_STAT_BUF_LEN, "[>%d/>%d]",
+	    len = vim_snprintf(t, हानाप_STAT_BUF_LEN, "[>%d/>%d]",
 		    maxcount, maxcount);
 	else if (stat.cnt > maxcount)
-	    len = vim_snprintf(t, SEARCH_STAT_BUF_LEN, "[%d/>%d]",
+	    len = vim_snprintf(t, हानाप_STAT_BUF_LEN, "[%d/>%d]",
 		    stat.cur, maxcount);
 	else
-	    len = vim_snprintf(t, SEARCH_STAT_BUF_LEN, "[%d/%d]",
+	    len = vim_snprintf(t, हानाप_STAT_BUF_LEN, "[%d/%d]",
 		    stat.cur, stat.cnt);
     }
 
-    if (show_top_bot_msg && len + 2 < SEARCH_STAT_BUF_LEN)
+    if (show_इताअस_bot_मेनसाहे && len + 2 < हानाप_STAT_BUF_LEN)
     {
 	mch_memmove(t + 2, t, len);
 	t[0] = 'W';
@@ -3272,9 +3272,9 @@ cmdline_search_stat(
 	stat.cur = -1;
 
     // keep the message even after redraw, but don't put in history
-    msg_hist_off = TRUE;
+    मेनसाहे_hist_off = TRUE;
     give_warning(msgbuf, FALSE);
-    msg_hist_off = FALSE;
+    मेनसाहे_hist_off = FALSE;
 }
 
 /*
@@ -3286,7 +3286,7 @@ cmdline_search_stat(
  * dirc == '?': find the previous match
  */
     static void
-update_search_stat(
+update_हानाप_stat(
     int			dirc,
     pos_T		*pos,
     pos_T		*cursor_pos,
@@ -3353,7 +3353,7 @@ update_search_stat(
 	cur += dirc == 0 ? 0 : dirc == '/' ? 1 : -1;
     else
     {
-	int	done_search = FALSE;
+	int	done_हानाप = FALSE;
 	pos_T	endpos = {0, 0, 0};
 
 	p_ws = FALSE;
@@ -3362,9 +3362,9 @@ update_search_stat(
 	    profile_setlimit(timeout, &start);
 #endif
 	while (!got_int && searchit(curwin, curbuf, &lastpos, &endpos,
-			 FORWARD, NULL, 0, 1, SEARCH_KEEP, RE_LAST, NULL) != FAIL)
+			 FORWARD, NULL, 0, 1, हानाप_KEEP, RE_LAST, NULL) != FAIL)
 	{
-	    done_search = TRUE;
+	    done_हानाप = TRUE;
 #ifdef FEAT_RELTIME
 	    // Stop after passing the time limit.
 	    if (timeout > 0 && profile_passed_limit(&start))
@@ -3389,7 +3389,7 @@ update_search_stat(
 	}
 	if (got_int)
 	    cur = -1; // abort
-	if (done_search)
+	if (done_हानाप)
 	{
 	    vim_free(lastpat);
 	    lastpat = vim_strnsave(spats[last_idx].pat, spats[last_idx].patlen);
@@ -3418,11 +3418,11 @@ update_search_stat(
  * mark.
  */
     static char_u *
-get_line_and_copy(linenr_T lnum, char_u *buf)
+get_लिन्या_and_copy(linenr_T lnum, char_u *buf)
 {
-    char_u *line = ml_get(lnum);
+    char_u *लिन्या = ml_get(lnum);
 
-    vim_strncpy(buf, line, LSIZE - 1);
+    vim_strncpy(buf, लिन्या, LSIZE - 1);
     return buf;
 }
 
@@ -3439,7 +3439,7 @@ find_pattern_in_path(
     int		skip_comments,	// don't match inside comments
     int		type,		// Type of search; are we looking for a type?
 				// a macro?
-    long	count,
+    long	बिलांग,
     int		action,		// What to do when we find it
     linenr_T	start_lnum,	// first line to start searching
     linenr_T	end_lnum,	// last line for searching
@@ -3449,7 +3449,7 @@ find_pattern_in_path(
     SearchedFile *files;		// Stack of included files
     SearchedFile *bigger;		// When we need more space
     int		max_path_depth = 50;
-    long	match_count = 1;
+    long	match_बिलांग = 1;
 
     char_u	*pat;
     char_u	*new_fname;
@@ -3460,8 +3460,8 @@ find_pattern_in_path(
     int		depth_displayed;	// For type==CHECK_PATH
     int		old_files;
     int		already_searched;
-    char_u	*file_line;
-    char_u	*line;
+    char_u	*file_लिन्या;
+    char_u	*लिन्या;
     char_u	*p;
     char_u	save_char;
     int		define_matched;
@@ -3483,8 +3483,8 @@ find_pattern_in_path(
     incl_regmatch.regprog = NULL;
     def_regmatch.regprog = NULL;
 
-    file_line = alloc(LSIZE);
-    if (file_line == NULL)
+    file_लिन्या = alloc(LSIZE);
+    if (file_लिन्या == NULL)
 	return;
 
     if (type != CHECK_PATH && type != FIND_DEFINE
@@ -3527,16 +3527,16 @@ find_pattern_in_path(
     depth = depth_displayed = -1;
 
     lnum = start_lnum;
-    if (end_lnum > curbuf->b_ml.ml_line_count)
-	end_lnum = curbuf->b_ml.ml_line_count;
+    if (end_lnum > curbuf->b_ml.ml_लिन्या_बिलांग)
+	end_lnum = curbuf->b_ml.ml_लिन्या_बिलांग;
     if (lnum > end_lnum)		// do at least one line
 	lnum = end_lnum;
-    line = get_line_and_copy(lnum, file_line);
+    लिन्या = get_लिन्या_and_copy(lnum, file_लिन्या);
 
     for (;;)
     {
 	if (incl_regmatch.regprog != NULL
-		&& vim_regexec(&incl_regmatch, line, (colnr_T)0))
+		&& vim_regexec(&incl_regmatch, लिन्या, (colnr_T)0))
 	{
 	    char_u *p_fname = (curr_fname == curbuf->b_fname)
 					      ? curbuf->b_ffname : curr_fname;
@@ -3548,7 +3548,7 @@ find_pattern_in_path(
 				 FNAME_EXP|FNAME_INCL|FNAME_REL, 1L, p_fname);
 	    else
 		// Use text after match with 'include'.
-		new_fname = file_name_in_line(incl_regmatch.endp[0], 0,
+		new_fname = file_name_in_लिन्या(incl_regmatch.endp[0], 0,
 			     FNAME_EXP|FNAME_INCL|FNAME_REL, 1L, p_fname, NULL);
 	    already_searched = FALSE;
 	    if (new_fname != NULL)
@@ -3567,13 +3567,13 @@ find_pattern_in_path(
 				&& action == ACTION_SHOW_ALL
 				&& files[i].matched)
 			{
-			    msg_putchar('\n');	    // cursor below last one
+			    मेनसाहे_putchar('\n');	    // cursor below last one
 			    if (!got_int)	    // don't display if 'q'
 						    // typed at "--more--"
 						    // message
 			    {
-				msg_home_replace_hl(new_fname);
-				msg_puts(_(" (includes previously listed match)"));
+				मेनसाहे_home_replace_hl(new_fname);
+				मेनसाहे_puts(_(" (includes previously listed match)"));
 				prev_fname = NULL;
 			    }
 			}
@@ -3588,34 +3588,34 @@ find_pattern_in_path(
 				 || (new_fname == NULL && !already_searched)))
 	    {
 		if (did_show)
-		    msg_putchar('\n');	    // cursor below last one
+		    मेनसाहे_putchar('\n');	    // cursor below last one
 		else
 		{
 		    gotocmdline(TRUE);	    // cursor at status line
-		    msg_puts_title(_("--- Included files "));
+		    मेनसाहे_puts_title(_("--- Included files "));
 		    if (action != ACTION_SHOW_ALL)
-			msg_puts_title(_("not found "));
-		    msg_puts_title(_("in path ---\n"));
+			मेनसाहे_puts_title(_("not found "));
+		    मेनसाहे_puts_title(_("in path ---\n"));
 		}
 		did_show = TRUE;
 		while (depth_displayed < depth && !got_int)
 		{
 		    ++depth_displayed;
 		    for (i = 0; i < depth_displayed; i++)
-			msg_puts("  ");
-		    msg_home_replace(files[depth_displayed].name);
-		    msg_puts(" -->\n");
+			मेनसाहे_puts("  ");
+		    मेनसाहे_home_replace(files[depth_displayed].name);
+		    मेनसाहे_puts(" -->\n");
 		}
 		if (!got_int)		    // don't display if 'q' typed
 					    // for "--more--" message
 		{
 		    for (i = 0; i <= depth_displayed; i++)
-			msg_puts("  ");
+			मेनसाहे_puts("  ");
 		    if (new_fname != NULL)
 		    {
 			// using "new_fname" is more reliable, e.g., when
 			// 'includeexpr' is set.
-			msg_outtrans_attr(new_fname, HL_ATTR(HLF_D));
+			मेनसाहे_outtrans_attr(new_fname, HL_ATTR(HLF_D));
 		    }
 		    else
 		    {
@@ -3648,7 +3648,7 @@ find_pattern_in_path(
 			}
 			// Avoid checking before the start of the line, can
 			// happen if \zs appears in the regexp.
-			else if (p > line)
+			else if (p > लिन्या)
 			{
 			    if (p[-1] == '"' || p[-1] == '<')
 			    {
@@ -3660,16 +3660,16 @@ find_pattern_in_path(
 			}
 			save_char = p[i];
 			p[i] = NUL;
-			msg_outtrans_attr(p, HL_ATTR(HLF_D));
+			मेनसाहे_outtrans_attr(p, HL_ATTR(HLF_D));
 			p[i] = save_char;
 		    }
 
 		    if (new_fname == NULL && action == ACTION_SHOW_ALL)
 		    {
 			if (already_searched)
-			    msg_puts(_("  (Already listed)"));
+			    मेनसाहे_puts(_("  (Already listed)"));
 			else
-			    msg_puts(_("  NOT FOUND"));
+			    मेनसाहे_puts(_("  NOT FOUND"));
 		    }
 		}
 		out_flush();	    // output each line directly
@@ -3720,11 +3720,11 @@ find_pattern_in_path(
 		    if (action == ACTION_EXPAND
 			    && !shortmess(SHM_COMPLETIONSCAN) && !silent)
 		    {
-			msg_hist_off = TRUE;	// reset in msg_trunc_attr()
+			मेनसाहे_hist_off = TRUE;	// reset in msg_trunc_attr()
 			vim_snprintf((char*)IObuff, IOSIZE,
 				_("Scanning included file: %s"),
 				(char *)new_fname);
-			msg_trunc_attr((char *)IObuff, TRUE, HL_ATTR(HLF_R));
+			मेनसाहे_trunc_attr((char *)IObuff, TRUE, HL_ATTR(HLF_R));
 		    }
 		    else if (p_verbose >= 5)
 		    {
@@ -3742,11 +3742,11 @@ find_pattern_in_path(
 	    /*
 	     * Check if the line is a define (type == FIND_DEFINE)
 	     */
-	    p = line;
-search_line:
+	    p = लिन्या;
+हानाप_लिन्या:
 	    define_matched = FALSE;
 	    if (def_regmatch.regprog != NULL
-			      && vim_regexec(&def_regmatch, line, (colnr_T)0))
+			      && vim_regexec(&def_regmatch, लिन्या, (colnr_T)0))
 	    {
 		/*
 		 * Pattern must be first identifier after 'define', so skip
@@ -3778,7 +3778,7 @@ search_line:
 			matched = FALSE;
 		}
 		else if (regmatch.regprog != NULL
-			 && vim_regexec(&regmatch, line, (colnr_T)(p - line)))
+			 && vim_regexec(&regmatch, लिन्या, (colnr_T)(p - लिन्या)))
 		{
 		    matched = TRUE;
 		    startp = regmatch.startp[0];
@@ -3789,9 +3789,9 @@ search_line:
 		     */
 		    if (!define_matched && skip_comments)
 		    {
-			if ((*line != '#' ||
-				STRNCMP(skipwhite(line + 1), "define", 6) != 0)
-				&& get_leader_len(line, NULL, FALSE, TRUE))
+			if ((*लिन्या != '#' ||
+				STRNCMP(skipwhite(लिन्या + 1), "define", 6) != 0)
+				&& get_leader_len(लिन्या, NULL, FALSE, TRUE))
 			    matched = FALSE;
 
 			/*
@@ -3800,10 +3800,10 @@ search_line:
 			 * * /" when looking for "normal".
 			 * Note: Doesn't skip "/ *" in comments.
 			 */
-			p = skipwhite(line);
+			p = skipwhite(लिन्या);
 			if (matched
 				|| (p[0] == '/' && p[1] == '*') || p[0] == '*')
-			    for (p = line; *p && p < startp; ++p)
+			    for (p = लिन्या; *p && p < startp; ++p)
 			    {
 				if (matched
 					&& p[0] == '/'
@@ -3860,16 +3860,16 @@ search_line:
 		    {
 			if (lnum >= end_lnum)
 			    goto exit_matched;
-			line = get_line_and_copy(++lnum, file_line);
+			लिन्या = get_लिन्या_and_copy(++lnum, file_लिन्या);
 		    }
-		    else if (vim_fgets(line = file_line,
+		    else if (vim_fgets(लिन्या = file_लिन्या,
 						      LSIZE, files[depth].fp))
 			goto exit_matched;
 
 		    // we read a line, set "already" to check this "line" later
 		    // if depth >= 0 we'll increase files[depth].lnum far
 		    // below  -- Acevedo
-		    already = aux = p = skipwhite(line);
+		    already = aux = p = skipwhite(लिन्या);
 		    p = find_word_start(p);
 		    p = find_word_end(p);
 		    if (p > aux)
@@ -3918,25 +3918,25 @@ search_line:
 		if (curr_fname != prev_fname)
 		{
 		    if (did_show)
-			msg_putchar('\n');	// cursor below last one
+			मेनसाहे_putchar('\n');	// cursor below last one
 		    if (!got_int)		// don't display if 'q' typed
 						// at "--more--" message
-			msg_home_replace_hl(curr_fname);
+			मेनसाहे_home_replace_hl(curr_fname);
 		    prev_fname = curr_fname;
 		}
 		did_show = TRUE;
 		if (!got_int)
-		    show_pat_in_path(line, type, TRUE, action,
+		    show_pat_in_path(लिन्या, type, TRUE, action,
 			    (depth == -1) ? NULL : files[depth].fp,
 			    (depth == -1) ? &lnum : &files[depth].lnum,
-			    match_count++);
+			    match_बिलांग++);
 
 		// Set matched flag for this file and all the ones that
 		// include it
 		for (i = 0; i <= depth; ++i)
 		    files[i].matched = TRUE;
 	    }
-	    else if (--count <= 0)
+	    else if (--बिलांग <= 0)
 	    {
 		found = TRUE;
 		if (depth == -1 && lnum == curwin->w_cursor.lnum
@@ -3944,10 +3944,10 @@ search_line:
 						      && g_do_tagpreview == 0
 # endif
 						      )
-		    emsg(_(e_match_is_on_current_line));
+		    emsg(_(e_match_is_on_current_लिन्या));
 		else if (action == ACTION_SHOW)
 		{
-		    show_pat_in_path(line, type, did_show, action,
+		    show_pat_in_path(लिन्या, type, did_show, action,
 			    (depth == -1) ? NULL : files[depth].fp,
 			    (depth == -1) ? &lnum : &files[depth].lnum, 1L);
 		    did_show = TRUE;
@@ -4003,7 +4003,7 @@ search_line:
 		}
 		if (action != ACTION_SHOW)
 		{
-		    curwin->w_cursor.col = (colnr_T)(startp - line);
+		    curwin->w_cursor.col = (colnr_T)(startp - लिन्या);
 		    curwin->w_set_curswant = true;
 		}
 
@@ -4033,11 +4033,11 @@ exit_matched:
 		    && !compl_status_sol()
 		    && *startp != NUL
 		    && *(startp + mb_ptr2len(startp)) != NUL)
-		goto search_line;
+		goto हानाप_लिन्या;
 	}
-	line_breakcheck();
+	लिन्या_breakcheck();
 	if (action == ACTION_EXPAND)
-	    ins_compl_check_keys(30, FALSE);
+	    ins_compl_check_मगा_सुसि(30, FALSE);
 	if (got_int || ins_compl_interrupted())
 	    break;
 
@@ -4047,7 +4047,7 @@ exit_matched:
 	 * it.
 	 */
 	while (depth >= 0 && !already
-		&& vim_fgets(line = file_line, LSIZE, files[depth].fp))
+		&& vim_fgets(लिन्या = file_लिन्या, LSIZE, files[depth].fp))
 	{
 	    fclose(files[depth].fp);
 	    --old_files;
@@ -4063,17 +4063,17 @@ exit_matched:
 	{
 	    files[depth].lnum++;
 	    // Remove any CR and LF from the line.
-	    i = (int)STRLEN(line);
-	    if (i > 0 && line[i - 1] == '\n')
-		line[--i] = NUL;
-	    if (i > 0 && line[i - 1] == '\r')
-		line[--i] = NUL;
+	    i = (int)STRLEN(लिन्या);
+	    if (i > 0 && लिन्या[i - 1] == '\n')
+		लिन्या[--i] = NUL;
+	    if (i > 0 && लिन्या[i - 1] == '\r')
+		लिन्या[--i] = NUL;
 	}
 	else if (!already)
 	{
 	    if (++lnum > end_lnum)
 		break;
-	    line = get_line_and_copy(lnum, file_line);
+	    लिन्या = get_लिन्या_and_copy(lnum, file_लिन्या);
 	}
 	already = NULL;
     }
@@ -4094,9 +4094,9 @@ exit_matched:
 	if (!did_show)
 	{
 	    if (action != ACTION_SHOW_ALL)
-		msg(_("All included files were found"));
+		मेनसाहे(_("All included files were found"));
 	    else
-		msg(_("No included files"));
+		मेनसाहे(_("No included files"));
 	}
     }
     else if (!found && action != ACTION_EXPAND && !silent)
@@ -4109,10 +4109,10 @@ exit_matched:
 	    emsg(_(e_couldnt_find_pattern));
     }
     if (action == ACTION_SHOW || action == ACTION_SHOW_ALL)
-	msg_end();
+	मेनसाहे_end();
 
 fpip_end:
-    vim_free(file_line);
+    vim_free(file_लिन्या);
     vim_regfree(regmatch.regprog);
     vim_regfree(incl_regmatch.regprog);
     vim_regfree(def_regmatch.regprog);
@@ -4120,67 +4120,67 @@ fpip_end:
 
     static void
 show_pat_in_path(
-    char_u  *line,
+    char_u  *लिन्या,
     int	    type,
     int	    did_show,
     int	    action,
     FILE    *fp,
     linenr_T *lnum,
-    long    count)
+    long    बिलांग)
 {
     char_u  *p;
     size_t  linelen;
 
     if (did_show)
-	msg_putchar('\n');	// cursor below last one
-    else if (!msg_silent)
+	मेनसाहे_putchar('\n');	// cursor below last one
+    else if (!मेनसाहे_silent)
 	gotocmdline(TRUE);	// cursor at status line
     if (got_int)		// 'q' typed at "--more--" message
 	return;
-    linelen = STRLEN(line);
+    linelen = STRLEN(लिन्या);
     for (;;)
     {
-	p = line + linelen - 1;
+	p = लिन्या + linelen - 1;
 	if (fp != NULL)
 	{
 	    // We used fgets(), so get rid of newline at end
-	    if (p >= line && *p == '\n')
+	    if (p >= लिन्या && *p == '\n')
 		--p;
-	    if (p >= line && *p == '\r')
+	    if (p >= लिन्या && *p == '\r')
 		--p;
 	    *(p + 1) = NUL;
 	}
 	if (action == ACTION_SHOW_ALL)
 	{
-	    sprintf((char *)IObuff, "%3ld: ", count);	// show match nr
-	    msg_puts((char *)IObuff);
+	    sprintf((char *)IObuff, "%3ld: ", बिलांग);	// show match nr
+	    मेनसाहे_puts((char *)IObuff);
 	    sprintf((char *)IObuff, "%4ld", *lnum);	// show line nr
 						// Highlight line numbers
-	    msg_puts_attr((char *)IObuff, HL_ATTR(HLF_N));
-	    msg_puts(" ");
+	    मेनसाहे_puts_attr((char *)IObuff, HL_ATTR(HLF_N));
+	    मेनसाहे_puts(" ");
 	}
-	msg_prt_line(line, FALSE);
+	मेनसाहे_prt_लिन्या(लिन्या, FALSE);
 	out_flush();			// show one line at a time
 
 	// Definition continues until line that doesn't end with '\'
-	if (got_int || type != FIND_DEFINE || p < line || *p != '\\')
+	if (got_int || type != FIND_DEFINE || p < लिन्या || *p != '\\')
 	    break;
 
 	if (fp != NULL)
 	{
-	    if (vim_fgets(line, LSIZE, fp)) // end of file
+	    if (vim_fgets(लिन्या, LSIZE, fp)) // end of file
 		break;
-	    linelen = STRLEN(line);
+	    linelen = STRLEN(लिन्या);
 	    ++*lnum;
 	}
 	else
 	{
-	    if (++*lnum > curbuf->b_ml.ml_line_count)
+	    if (++*lnum > curbuf->b_ml.ml_लिन्या_बिलांग)
 		break;
-	    line = ml_get(*lnum);
+	    लिन्या = ml_get(*lnum);
 	    linelen = ml_get_len(*lnum);
 	}
-	msg_putchar('\n');
+	मेनसाहे_putchar('\n');
     }
 }
 #endif
@@ -4215,7 +4215,7 @@ f_searchcount(typval_T *argvars, typval_T *rettv)
     pos_T		pos = curwin->w_cursor;
     char_u		*pattern = NULL;
     int			maxcount = p_msc;
-    long		timeout = SEARCH_STAT_DEF_TIMEOUT;
+    long		timeout = हानाप_STAT_DEF_TIMEOUT;
     int			recompute = TRUE;
     searchstat_T	stat;
 
@@ -4241,14 +4241,14 @@ f_searchcount(typval_T *argvars, typval_T *rettv)
 	di = dict_find(dict, (char_u *)"timeout", -1);
 	if (di != NULL)
 	{
-	    timeout = (long)tv_get_number_chk(&di->di_tv, &error);
+	    timeout = (long)tv_get_नुमेरो_chk(&di->di_tv, &error);
 	    if (error)
 		return;
 	}
 	di = dict_find(dict, (char_u *)"maxcount", -1);
 	if (di != NULL)
 	{
-	    maxcount = (int)tv_get_number_chk(&di->di_tv, &error);
+	    maxcount = (int)tv_get_नुमेरो_chk(&di->di_tv, &error);
 	    if (error)
 		return;
 	}
@@ -4276,29 +4276,29 @@ f_searchcount(typval_T *argvars, typval_T *rettv)
 	    li = list_find(di->di_tv.vval.v_list, 0L);
 	    if (li != NULL)
 	    {
-		pos.lnum = tv_get_number_chk(&li->li_tv, &error);
+		pos.lnum = tv_get_नुमेरो_chk(&li->li_tv, &error);
 		if (error)
 		    return;
 	    }
 	    li = list_find(di->di_tv.vval.v_list, 1L);
 	    if (li != NULL)
 	    {
-		pos.col = tv_get_number_chk(&li->li_tv, &error) - 1;
+		pos.col = tv_get_नुमेरो_chk(&li->li_tv, &error) - 1;
 		if (error)
 		    return;
 	    }
 	    li = list_find(di->di_tv.vval.v_list, 2L);
 	    if (li != NULL)
 	    {
-		pos.coladd = tv_get_number_chk(&li->li_tv, &error);
+		pos.coladd = tv_get_नुमेरो_chk(&li->li_tv, &error);
 		if (error)
 		    return;
 	    }
 	}
     }
 
-    save_last_search_pattern();
-# ifdef FEAT_SEARCH_EXTRA
+    save_last_हानाप_pattern();
+# ifdef FEAT_हानाप_EXTRA
     save_incsearch_state();
 # endif
     if (pattern != NULL)
@@ -4314,17 +4314,17 @@ f_searchcount(typval_T *argvars, typval_T *rettv)
     if (spats[last_idx].pat == NULL || *spats[last_idx].pat == NUL)
 	goto the_end;	// the previous pattern was never defined
 
-    update_search_stat(0, &pos, &pos, &stat, recompute, maxcount, timeout);
+    update_हानाप_stat(0, &pos, &pos, &stat, recompute, maxcount, timeout);
 
-    dict_add_number(rettv->vval.v_dict, "current", stat.cur);
-    dict_add_number(rettv->vval.v_dict, "total", stat.cnt);
-    dict_add_number(rettv->vval.v_dict, "exact_match", stat.exact_match);
-    dict_add_number(rettv->vval.v_dict, "incomplete", stat.incomplete);
-    dict_add_number(rettv->vval.v_dict, "maxcount", stat.last_maxcount);
+    dict_add_नुमेरो(rettv->vval.v_dict, "current", stat.cur);
+    dict_add_नुमेरो(rettv->vval.v_dict, "total", stat.cnt);
+    dict_add_नुमेरो(rettv->vval.v_dict, "exact_match", stat.exact_match);
+    dict_add_नुमेरो(rettv->vval.v_dict, "incomplete", stat.incomplete);
+    dict_add_नुमेरो(rettv->vval.v_dict, "maxcount", stat.last_maxcount);
 
 the_end:
-    restore_last_search_pattern();
-# ifdef FEAT_SEARCH_EXTRA
+    restore_last_हानाप_pattern();
+# ifdef FEAT_हानाप_EXTRA
     restore_incsearch_state();
 # endif
 }

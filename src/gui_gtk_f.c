@@ -180,7 +180,7 @@ gui_gtk_form_freeze(GtkForm *form)
 {
     g_return_if_fail(GTK_IS_FORM(form));
 
-    ++form->freeze_count;
+    ++form->freeze_बिलांग;
 }
 
     void
@@ -188,10 +188,10 @@ gui_gtk_form_thaw(GtkForm *form)
 {
     g_return_if_fail(GTK_IS_FORM(form));
 
-    if (!form->freeze_count)
+    if (!form->freeze_बिलांग)
 	return;
 
-    if (!(--form->freeze_count))
+    if (!(--form->freeze_बिलांग))
     {
 	form_position_children(form);
 	gtk_widget_queue_draw(GTK_WIDGET(form));
@@ -270,7 +270,7 @@ gui_gtk_form_init(GtkForm *form
 #endif
     form->children = NULL;
     form->bin_window = NULL;
-    form->freeze_count = 0;
+    form->freeze_बिलांग = 0;
 }
 
 /*
@@ -297,7 +297,7 @@ form_realize(GtkWidget *widget)
     attributes.y = allocation.y;
     attributes.width = allocation.width;
     attributes.height = allocation.height;
-    attributes.wclass = GDK_INPUT_OUTPUT;
+    attributes.wclass = GDK_पासोक_OUTPUT;
     attributes.visual = gtk_widget_get_visual(widget);
 #if GTK_CHECK_VERSION(3,0,0)
     attributes.event_mask = GDK_EXPOSURE_MASK;
@@ -690,7 +690,7 @@ form_attach_child_window(GtkForm *form, GtkFormChild *child)
 	attributes.y = child->y;
 	attributes.width = requisition.width;
 	attributes.height = requisition.height;
-	attributes.wclass = GDK_INPUT_OUTPUT;
+	attributes.wclass = GDK_पासोक_OUTPUT;
 	attributes.visual = gtk_widget_get_visual(widget);
 #if !GTK_CHECK_VERSION(3,0,0)
 	attributes.colormap = gtk_widget_get_colormap(widget);

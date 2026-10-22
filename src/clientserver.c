@@ -22,7 +22,7 @@ static char_u *serverMakeName(char_u *arg, char *cmd);
  * Replace termcodes such as <CR> and insert as key presses if there is room.
  */
     void
-server_to_input_buf(char_u *str)
+server_to_पासोक_buf(char_u *str)
 {
     char_u      *ptr = NULL;
     char_u      *cpo_save = p_cpo;
@@ -62,7 +62,7 @@ server_to_input_buf(char_u *str)
  * Evaluate an expression that the client sent to a string.
  */
     char_u *
-eval_client_expr_to_string(char_u *expr)
+eval_client_पाहायाग_to_string(char_u *पाहायाग)
 {
     char_u	*res;
     int		save_dbl = debug_break_level;
@@ -71,7 +71,7 @@ eval_client_expr_to_string(char_u *expr)
     int		did_save_funccal = FALSE;
 
 # if defined(FEAT_EVAL)
-    ch_log(NULL, "eval_client_expr_to_string(\"%s\")", expr);
+    ch_log(NULL, "eval_client_expr_to_string(\"%s\")", पाहायाग);
 # endif
 
     // Evaluate the expression at the toplevel, don't use variables local to
@@ -90,7 +90,7 @@ eval_client_expr_to_string(char_u *expr)
     // to be typed.  Do generate errors so that try/catch works.
     ++emsg_silent;
 
-    res = eval_to_string(expr, TRUE, FALSE);
+    res = eval_to_string(पाहायाग, TRUE, FALSE);
 
     debug_break_level = save_dbl;
     redir_off = save_ro;
@@ -112,25 +112,25 @@ eval_client_expr_to_string(char_u *expr)
  * Evaluate a command or expression sent to ourselves.
  */
     int
-sendToLocalVim(char_u *cmd, int asExpr, char_u **result)
+sendToLocalVim(char_u *cmd, int as_पाहायाग, char_u **result)
 {
-    if (asExpr)
+    if (as_पाहायाग)
     {
 	char_u *ret;
 
-	ret = eval_client_expr_to_string(cmd);
+	ret = eval_client_पाहायाग_to_string(cmd);
 	if (result != NULL)
 	{
 	    if (ret == NULL)
 	    {
 		char	*err = _(e_invalid_expression_received);
 		size_t	len = STRLEN(cmd) + STRLEN(err) + 5;
-		char_u	*msg;
+		char_u	*मेनसाहे;
 
-		msg = alloc(len);
-		if (msg != NULL)
-		    vim_snprintf((char *)msg, len, "%s: \"%s\"", err, cmd);
-		*result = msg;
+		मेनसाहे = alloc(len);
+		if (मेनसाहे != NULL)
+		    vim_snprintf((char *)मेनसाहे, len, "%s: \"%s\"", err, cmd);
+		*result = मेनसाहे;
 	    }
 	    else
 		*result = ret;
@@ -139,7 +139,7 @@ sendToLocalVim(char_u *cmd, int asExpr, char_u **result)
 	    vim_free(ret);
 	return ret == NULL ? -1 : 0;
     }
-    server_to_input_buf(cmd);
+    server_to_पासोक_buf(cmd);
     return 0;
 }
 
@@ -273,7 +273,7 @@ prepare_server(mparm_T *parmp)
 		    gui.in_use
 #   endif
 #   ifdef UNIX
-		 && getuid() != ROOT_UID
+		 && getuid() != उगात_UID
 #   endif
 		) ||
 #  endif
@@ -288,7 +288,7 @@ prepare_server(mparm_T *parmp)
 	if (clientserver_method == CLIENTSERVER_METHOD_X11)
 	{
 	    (void)serverRegisterName(X_DISPLAY, parmp->servername);
-	    TIME_MSG("register x11 server name");
+	    TIME_मेनसाहे("register x11 server name");
 	}
 #  endif
 	vim_free(parmp->servername);
@@ -312,7 +312,7 @@ prepare_server(mparm_T *parmp)
     {
 	char_u *p;
 
-	server_to_input_buf(serverConvert(parmp->serverStrEnc,
+	server_to_पासोक_buf(serverConvert(parmp->serverStrEnc,
 						       parmp->serverStr, &p));
 	vim_free(p);
     }
@@ -483,17 +483,17 @@ cmdsrv_main(
 	     */
 	    if (argtype == ARGTYPE_EDIT_WAIT)
 	    {
-		int	numFiles = *argc - i - 1;
-		char_u  *done = alloc(numFiles);
+		int	नुमेरो_Files = *argc - i - 1;
+		char_u  *done = alloc(नुमेरो_Files);
 # ifdef FEAT_GUI_MSWIN
 		NOTIFYICONDATA ni;
-		int	count = 0;
+		int	बिलांग = 0;
 		extern HWND message_window;
 # endif
 
-		if (numFiles > 0 && argv[i + 1][0] == '+')
+		if (नुमेरो_Files > 0 && argv[i + 1][0] == '+')
 		    // Skip "+cmd" argument, don't wait for it to be edited.
-		    --numFiles;
+		    --नुमेरो_Files;
 
 # ifdef FEAT_GUI_MSWIN
 		ni.cbSize = sizeof(ni);
@@ -501,13 +501,13 @@ cmdsrv_main(
 		ni.uID = 0;
 		ni.uFlags = NIF_ICON|NIF_TIP;
 		ni.hIcon = LoadIcon((HINSTANCE)GetModuleHandle(0), "IDR_VIM");
-		sprintf(ni.szTip, _("%d of %d edited"), count, numFiles);
+		sprintf(ni.szTip, _("%d of %d edited"), बिलांग, नुमेरो_Files);
 		Shell_NotifyIcon(NIM_ADD, &ni);
 # endif
 
 		// Wait for all files to unload in remote
-		vim_memset(done, 0, numFiles);
-		while (memchr(done, 0, numFiles) != NULL)
+		vim_memset(done, 0, नुमेरो_Files);
+		while (memchr(done, 0, नुमेरो_Files) != NULL)
 		{
 		    char_u  *p = NULL;
 		    int	    j;
@@ -531,12 +531,12 @@ cmdsrv_main(
 			break;
 		    j = atoi((char *)p);
 		    vim_free(p);
-		    if (j >= 0 && j < numFiles)
+		    if (j >= 0 && j < नुमेरो_Files)
 		    {
 # ifdef FEAT_GUI_MSWIN
-			++count;
+			++बिलांग;
 			sprintf(ni.szTip, _("%d of %d edited"),
-							     count, numFiles);
+							     बिलांग, नुमेरो_Files);
 			Shell_NotifyIcon(NIM_MODIFY, &ni);
 # endif
 			done[j] = 1;
@@ -643,9 +643,9 @@ cmdsrv_main(
 	didone = TRUE;
 	if (res != NULL && *res != NUL)
 	{
-	    mch_msg((char *)res);
+	    mch_मेनसाहे((char *)res);
 	    if (res[STRLEN(res) - 1] != '\n')
-		mch_msg("\n");
+		mch_मेनसाहे("\n");
 	}
 	vim_free(res);
     }
@@ -868,10 +868,10 @@ check_connection(void)
 
 #ifdef FEAT_CLIENTSERVER
     static void
-remote_common(typval_T *argvars, typval_T *rettv, int expr)
+remote_common(typval_T *argvars, typval_T *rettv, int पाहायाग)
 {
     char_u	*server_name;
-    char_u	*keys;
+    char_u	*मगा_सुसि;
     char_u	*r = NULL;
     char_u	buf[NUMBUFLEN];
     int		timeout = 0;
@@ -893,27 +893,27 @@ remote_common(typval_T *argvars, typval_T *rettv, int expr)
 # endif
     if (argvars[2].v_type != VAR_UNKNOWN
 	    && argvars[3].v_type != VAR_UNKNOWN)
-	timeout = tv_get_number(&argvars[3]);
+	timeout = tv_get_नुमेरो(&argvars[3]);
 
     server_name = tv_get_string_chk(&argvars[0]);
     if (server_name == NULL)
 	return;		// type error; errmsg already given
-    keys = tv_get_string_buf(&argvars[1], buf);
+    मगा_सुसि = tv_get_string_buf(&argvars[1], buf);
 # ifdef MSWIN
     if (clientserver_method == CLIENTSERVER_METHOD_MSWIN
-	    && serverSendToVim(server_name, keys, &r, &w, expr,
+	    && serverSendToVim(server_name, मगा_सुसि, &r, &w, पाहायाग,
 		timeout, TRUE) < 0)
 	ret = FAIL;
 # endif
 # ifdef FEAT_SOCKETSERVER
     if (clientserver_method == CLIENTSERVER_METHOD_SOCKET
-	&& socketserver_send(server_name, keys, &r, expr,
+	&& socketserver_send(server_name, मगा_सुसि, &r, पाहायाग,
 	    timeout * 1000, true, NULL) < 0)
 	ret = FAIL;
 # endif
 # ifdef FEAT_X11
     if (clientserver_method == CLIENTSERVER_METHOD_X11)
-	if (serverSendToVim(X_DISPLAY, server_name, keys, &r, &w, expr, timeout,
+	if (serverSendToVim(X_DISPLAY, server_name, मगा_सुसि, &r, &w, पाहायाग, timeout,
 		    0, TRUE) < 0)
 	ret = FAIL;
 # endif
@@ -978,7 +978,7 @@ remote_common(typval_T *argvars, typval_T *rettv, int expr)
  * "remote_expr()" function
  */
     void
-f_remote_expr(typval_T *argvars UNUSED, typval_T *rettv)
+f_remote_पाहायाग(typval_T *argvars UNUSED, typval_T *rettv)
 {
     rettv->v_type = VAR_STRING;
     rettv->vval.v_string = NULL;
@@ -989,7 +989,7 @@ f_remote_expr(typval_T *argvars UNUSED, typval_T *rettv)
 		|| check_for_string_arg(argvars, 1) == FAIL
 		|| check_for_opt_string_arg(argvars, 2) == FAIL
 		|| (argvars[2].v_type != VAR_UNKNOWN
-		    && check_for_opt_number_arg(argvars, 3) == FAIL)))
+		    && check_for_opt_नुमेरो_arg(argvars, 3) == FAIL)))
 	return;
 
     remote_common(argvars, rettv, TRUE);
@@ -1038,7 +1038,7 @@ f_remote_peek(typval_T *argvars UNUSED, typval_T *rettv)
 #  endif
     char_u	*serverid;
 
-    rettv->vval.v_number = -1;
+    rettv->vval.v_नुमेरो = -1;
     if (check_restricted() || check_secure())
 	return;
 
@@ -1055,17 +1055,17 @@ f_remote_peek(typval_T *argvars UNUSED, typval_T *rettv)
     {
 	sscanf((const char *)serverid, SCANF_HEX_LONG_U, &n);
 	if (n == 0)
-	    rettv->vval.v_number = -1;
+	    rettv->vval.v_नुमेरो = -1;
 	else
 	{
 	    s = serverGetReply((HWND)n, FALSE, FALSE, FALSE, 0);
-	    rettv->vval.v_number = (s != NULL);
+	    rettv->vval.v_नुमेरो = (s != NULL);
 	}
     }
 #  endif
 #  ifdef FEAT_SOCKETSERVER
     if (clientserver_method == CLIENTSERVER_METHOD_SOCKET)
-	rettv->vval.v_number = socketserver_peek_reply(serverid, &s);
+	rettv->vval.v_नुमेरो = socketserver_peek_reply(serverid, &s);
 #  endif
 #  ifdef FEAT_X11
     if (clientserver_method == CLIENTSERVER_METHOD_X11)
@@ -1073,12 +1073,12 @@ f_remote_peek(typval_T *argvars UNUSED, typval_T *rettv)
 	if (check_connection() == FAIL)
 	    return;
 
-	rettv->vval.v_number = serverPeekReply(X_DISPLAY,
+	rettv->vval.v_नुमेरो = serverPeekReply(X_DISPLAY,
 		serverStrToWin(serverid), &s);
     }
 #  endif
 
-    if (argvars[1].v_type != VAR_UNKNOWN && rettv->vval.v_number > 0)
+    if (argvars[1].v_type != VAR_UNKNOWN && rettv->vval.v_नुमेरो > 0)
     {
 	char_u		*retvar;
 
@@ -1090,7 +1090,7 @@ f_remote_peek(typval_T *argvars UNUSED, typval_T *rettv)
 	vim_free(v.di_tv.vval.v_string);
     }
 # else
-    rettv->vval.v_number = -1;
+    rettv->vval.v_नुमेरो = -1;
 # endif
 }
 
@@ -1104,7 +1104,7 @@ f_remote_read(typval_T *argvars UNUSED, typval_T *rettv)
 
     if (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
-		|| check_for_opt_number_arg(argvars, 1) == FAIL))
+		|| check_for_opt_नुमेरो_arg(argvars, 1) == FAIL))
 	return;
 
     serverid = tv_get_string_chk(&argvars[0]);
@@ -1117,7 +1117,7 @@ f_remote_read(typval_T *argvars UNUSED, typval_T *rettv)
 #  endif
 
 	if (argvars[1].v_type != VAR_UNKNOWN)
-	    timeout = tv_get_number(&argvars[1]);
+	    timeout = tv_get_नुमेरो(&argvars[1]);
 
 #  ifdef MSWIN
 	if (clientserver_method == CLIENTSERVER_METHOD_MSWIN)
@@ -1215,7 +1215,7 @@ f_server2client(typval_T *argvars UNUSED, typval_T *rettv)
     char_u	*reply;
     int		ret = OK;
 
-    rettv->vval.v_number = -1;
+    rettv->vval.v_नुमेरो = -1;
     if (check_restricted() || check_secure())
 	return;
 
@@ -1250,9 +1250,9 @@ f_server2client(typval_T *argvars UNUSED, typval_T *rettv)
 	emsg(_(e_unable_to_send_to_client));
 	return;
     }
-    rettv->vval.v_number = 0;
+    rettv->vval.v_नुमेरो = 0;
 # else
-    rettv->vval.v_number = -1;
+    rettv->vval.v_नुमेरो = -1;
 # endif
 }
 

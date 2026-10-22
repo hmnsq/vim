@@ -217,7 +217,7 @@ vwl_connection_roundtrip(vwl_connection_T *self)
  * Redirect libwayland logging to use ch_log + emsg instead.
  */
     static void
-vwl_log_handler(const char *fmt, va_list args)
+vwl_log_handler(const char *fmt, va_list मगा_कातविरान)
 {
     // 512 bytes should be big enough
     char	*buf	= alloc(512);
@@ -228,7 +228,7 @@ vwl_log_handler(const char *fmt, va_list args)
 	return;
 
     vim_strncpy((char_u*)buf, (char_u*)prefix, len);
-    vim_vsnprintf(buf + len, 512 - len, fmt, args);
+    vim_vsnprintf(buf + len, 512 - len, fmt, मगा_कातविरान);
 
     // Remove newline that libwayland puts
     buf[STRLEN(buf) - 1] = NUL;
@@ -568,7 +568,7 @@ wayland_uninit_connection(void)
     wayland_set_display("");
 }
 
-static int wayland_ct_restore_count = 0;
+static int wayland_ct_restore_बिलांग = 0;
 
 /*
  * Attempts to restore the Wayland display connection.
@@ -577,10 +577,10 @@ static int wayland_ct_restore_count = 0;
 wayland_restore_connection(void)
 {
     // No point in restoring the connection if we are exiting or dying.
-    if (exiting || v_dying || wayland_ct_restore_count <= 0)
+    if (exiting || v_dying || wayland_ct_restore_बिलांग <= 0)
 	wayland_set_display("");
 
-    --wayland_ct_restore_count;
+    --wayland_ct_restore_बिलांग;
     wayland_uninit_connection();
 
     if (wayland_init_connection(wayland_display_name) == OK)
@@ -728,7 +728,7 @@ ex_wlrestore(exarg_T *eap)
     wayland_uninit_connection();
 
     // Reset amount of available tries to reconnect the display to 5
-    wayland_ct_restore_count = 5;
+    wayland_ct_restore_बिलांग = 5;
 
     if (wayland_init_connection(display) == OK)
     {
@@ -739,7 +739,7 @@ ex_wlrestore(exarg_T *eap)
 #endif
     }
     else
-	msg(_("failed restoring, lost connection to Wayland display"));
+	मेनसाहे(_("failed restoring, lost connection to Wayland display"));
 
     vim_free(display);
 

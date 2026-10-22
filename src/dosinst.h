@@ -66,11 +66,11 @@ char *searchpath(char *name);
  * Modern way of creating registry entries, also works on 64 bit windows when
  * compiled as a 32 bit program.
  */
-#ifndef KEY_WOW64_64KEY
-# define KEY_WOW64_64KEY 0x0100
+#ifndef सुसि_WOW64_64_सुसि
+# define सुसि_WOW64_64_सुसि 0x0100
 #endif
-#ifndef KEY_WOW64_32KEY
-# define KEY_WOW64_32KEY 0x0200
+#ifndef सुसि_WOW64_32_सुसि
+# define सुसि_WOW64_32_सुसि 0x0200
 #endif
 
 #ifdef __MINGW32__
@@ -325,7 +325,7 @@ retry:
  * List of targets.  The first one (index zero) is used for the default path
  * for the batch files.
  */
-#define TARGET_COUNT  9
+#define TARGET_बिलांग  9
 
 struct
 {
@@ -339,7 +339,7 @@ struct
     char	*oldexe;	// path to existing xxx.exe or NULL
     char	batpath[BUFSIZE];  // path of batch file to create; not
 				   // created when it's empty
-} targets[TARGET_COUNT] =
+} targets[TARGET_बिलांग] =
 {
     {"all",	"batch files", NULL, NULL, NULL, NULL, NULL, NULL, ""},
     {"vim",	"vim.bat",	"Vim.lnk",
@@ -363,12 +363,12 @@ struct
 /* Uninstall key for vim.bat, etc. */
 #define VIMBAT_UNINSTKEY    "rem # uninstall key: " VIM_VERSION_NODOT " #"
 
-#define ICON_COUNT 3
-char *(icon_names[ICON_COUNT]) =
+#define ICON_बिलांग 3
+char *(icon_names[ICON_बिलांग]) =
 	{"gVim " VIM_VERSION_SHORT,
 	 "gVim Easy " VIM_VERSION_SHORT,
 	 "gVim Read only " VIM_VERSION_SHORT};
-char *(icon_link_names[ICON_COUNT]) =
+char *(icon_link_names[ICON_बिलांग]) =
 	{"gVim " VIM_VERSION_SHORT ".lnk",
 	 "gVim Easy " VIM_VERSION_SHORT ".lnk",
 	 "gVim Read only " VIM_VERSION_SHORT ".lnk"};

@@ -329,7 +329,7 @@ clip_copy_selection(Clipboard_T *clip)
  * prevents accessing the clipboard very often which might slow down Vim
  * considerably.
  */
-static int global_change_count = 0; // if set, inside a start_global_changes
+static int global_change_बिलांग = 0; // if set, inside a start_global_changes
 static int clipboard_needs_update = FALSE; // clipboard needs to be updated
 static int clip_did_set_selection = TRUE;
 
@@ -339,7 +339,7 @@ static int clip_did_set_selection = TRUE;
     void
 start_global_changes(void)
 {
-    if (++global_change_count > 1)
+    if (++global_change_बिलांग > 1)
 	return;
     clip_unnamed_saved = clip_unnamed;
     clipboard_needs_update = FALSE;
@@ -367,7 +367,7 @@ is_clipboard_needs_update(void)
     void
 end_global_changes(void)
 {
-    if (--global_change_count > 0)
+    if (--global_change_बिलांग > 0)
 	// recursive
 	return;
     if (!clip_did_set_selection)
@@ -601,11 +601,11 @@ clip_modeless(int button, int is_click, int is_drag)
     int		repeat;
 
     repeat = ((clip_star.mode == SELECT_MODE_CHAR
-		|| clip_star.mode == SELECT_MODE_LINE)
+		|| clip_star.mode == SELECT_MODE_लिन्या)
 					      && (mod_mask & MOD_MASK_2CLICK))
 	    || (clip_star.mode == SELECT_MODE_WORD
 					     && (mod_mask & MOD_MASK_3CLICK));
-    if (is_click && button == MOUSE_RIGHT)
+    if (is_click && button == MOUSE_कानान)
     {
 	// Right mouse button: If there was no selection, start one.
 	// Otherwise extend the existing selection.
@@ -671,10 +671,10 @@ clip_get_word_boundaries(Clipboard_T *cb, int row, int col)
     char_u	*p;
     int		mboff;
 
-    if (row >= screen_Rows || col >= screen_Columns || ScreenLines == NULL)
+    if (row >= screen_Rows || col >= screen_Columns || Screen_मगा_लिन्या == NULL)
 	return;
 
-    p = ScreenLines + LineOffset[row];
+    p = Screen_मगा_लिन्या + लिन्या_Offset[row];
     // Correct for starting in the right half of a double-wide char
     if (enc_dbcs != 0)
 	col -= dbcs_screen_head_off(p, p + col);
@@ -707,11 +707,11 @@ clip_get_word_boundaries(Clipboard_T *cb, int row, int col)
  * line at or before start_col.
  */
     static int
-clip_get_line_end(Clipboard_T *cbd UNUSED, int row)
+clip_get_लिन्या_end(Clipboard_T *cbd UNUSED, int row)
 {
     int	    i;
 
-    if (row >= screen_Rows || ScreenLines == NULL)
+    if (row >= screen_Rows || Screen_मगा_लिन्या == NULL)
 	return 0;
     for (i =
 # ifdef FEAT_PROP_POPUP
@@ -720,7 +720,7 @@ clip_get_line_end(Clipboard_T *cbd UNUSED, int row)
 	    screen_Columns;
 # endif
 			    i > 0; i--)
-	if (ScreenLines[LineOffset[row] + i - 1] != ' ')
+	if (Screen_मगा_लिन्या[लिन्या_Offset[row] + i - 1] != ' ')
 	    break;
     return i;
 }
@@ -781,7 +781,7 @@ clip_start_selection(int col, int row, int repeated_click)
 
     if (repeated_click)
     {
-	if (++cb->mode > SELECT_MODE_LINE)
+	if (++cb->mode > SELECT_MODE_लिन्या)
 	    cb->mode = SELECT_MODE_CHAR;
     }
     else
@@ -797,7 +797,7 @@ clip_start_selection(int col, int row, int repeated_click)
     {
 	case SELECT_MODE_CHAR:
 	    cb->origin_start_col = cb->start.col;
-	    cb->word_end_col = clip_get_line_end(cb, (int)cb->start.lnum);
+	    cb->word_end_col = clip_get_लिन्या_end(cb, (int)cb->start.lnum);
 	    break;
 
 	case SELECT_MODE_WORD:
@@ -811,7 +811,7 @@ clip_start_selection(int col, int row, int repeated_click)
 	    cb->end.col   = cb->word_end_col;
 	    break;
 
-	case SELECT_MODE_LINE:
+	case SELECT_MODE_लिन्या:
 	    clip_invert_area(cb, (int)cb->start.lnum, 0, (int)cb->start.lnum,
 			    (int)Columns, CLIP_SET);
 	    cb->start.col = 0;
@@ -887,7 +887,7 @@ clip_process_selection(
      * When extending the selection with the right mouse button, swap the
      * start and end if the position is before half the selection
      */
-    if (cb->state == SELECT_DONE && button == MOUSE_RIGHT)
+    if (cb->state == SELECT_DONE && button == MOUSE_कानान)
     {
 	/*
 	 * If the click is before the start, or the click is inside the
@@ -925,7 +925,7 @@ clip_process_selection(
     printf("Selection extending to (%d,%d)\n", row, col);
 # endif
 
-    if (repeated_click && ++cb->mode > SELECT_MODE_LINE)
+    if (repeated_click && ++cb->mode > SELECT_MODE_लिन्या)
 	cb->mode = SELECT_MODE_CHAR;
 
     switch (cb->mode)
@@ -933,7 +933,7 @@ clip_process_selection(
 	case SELECT_MODE_CHAR:
 	    // If we're on a different line, find where the line ends
 	    if (row != cb->prev.lnum)
-		cb->word_end_col = clip_get_line_end(cb, row);
+		cb->word_end_col = clip_get_लिन्या_end(cb, row);
 
 	    // See if we are before or after the origin of the selection
 	    if (clip_compare_pos(row, col, cb->origin_row,
@@ -983,7 +983,7 @@ clip_process_selection(
 			cb->origin_row, cb->origin_end_col);
 	    break;
 
-	case SELECT_MODE_LINE:
+	case SELECT_MODE_लिन्या:
 	    if (row == cb->prev.lnum && !repeated_click)
 		return;
 
@@ -1105,7 +1105,7 @@ clip_copy_modeless_selection(int both UNUSED)
     int		row;
     int		start_col;
     int		end_col;
-    int		line_end_col;
+    int		लिन्या_end_col;
     int		add_newline_flag = FALSE;
     int		len;
     char_u	*p;
@@ -1115,7 +1115,7 @@ clip_copy_modeless_selection(int both UNUSED)
     int		col2 = clip_star.end.col;
 
     // Can't use ScreenLines unless initialized
-    if (ScreenLines == NULL)
+    if (Screen_मगा_लिन्या == NULL)
 	return;
 
     /*
@@ -1143,7 +1143,7 @@ clip_copy_modeless_selection(int both UNUSED)
 	row2 = clip_star.max_row;
 # endif
     // correct starting point for being on right half of double-wide char
-    p = ScreenLines + LineOffset[row1];
+    p = Screen_मगा_लिन्या + लिन्या_Offset[row1];
     if (enc_dbcs != 0)
 	col1 -= (*mb_head_off)(p, p + col1);
     else if (enc_utf8 && p[col1] == 0)
@@ -1182,7 +1182,7 @@ clip_copy_modeless_selection(int both UNUSED)
 	    end_col = Columns;
 # endif
 
-	line_end_col = clip_get_line_end(&clip_star, row);
+	लिन्या_end_col = clip_get_लिन्या_end(&clip_star, row);
 
 	// See if we need to nuke some trailing whitespace
 	if (end_col >=
@@ -1191,10 +1191,10 @@ clip_copy_modeless_selection(int both UNUSED)
 # else
 		Columns
 # endif
-		    && (row < row2 || end_col > line_end_col))
+		    && (row < row2 || end_col > लिन्या_end_col))
 	{
 	    // Get rid of trailing whitespace
-	    end_col = line_end_col;
+	    end_col = लिन्या_end_col;
 	    if (end_col < start_col)
 		end_col = start_col;
 
@@ -1204,7 +1204,7 @@ clip_copy_modeless_selection(int both UNUSED)
 	}
 
 	// If after the first row, we need to always add a newline
-	if (row > row1 && !LineWraps[row - 1])
+	if (row > row1 && !लिन्या_Wraps[row - 1])
 	    *bufp++ = NL;
 
 	// Safetey check for in case resizing went wrong
@@ -1214,13 +1214,13 @@ clip_copy_modeless_selection(int both UNUSED)
 	    {
 		int	i;
 
-		p = ScreenLines + LineOffset[row];
+		p = Screen_मगा_लिन्या + लिन्या_Offset[row];
 		for (i = start_col; i < end_col; ++i)
 		    if (enc_dbcs == DBCS_JPNU && p[i] == 0x8e)
 		    {
 			// single-width double-byte char
 			*bufp++ = 0x8e;
-			*bufp++ = ScreenLines2[LineOffset[row] + i];
+			*bufp++ = ScreenLines2[लिन्या_Offset[row] + i];
 		    }
 		    else
 		    {
@@ -1234,24 +1234,24 @@ clip_copy_modeless_selection(int both UNUSED)
 		int	off;
 		int	i;
 
-		off = LineOffset[row];
+		off = लिन्या_Offset[row];
 		for (i = start_col; i < end_col; ++i)
 		{
 		    // The base character is either in ScreenLinesUC[] or
 		    // ScreenLines[].
-		    if (ScreenLinesUC[off + i] == 0)
-			*bufp++ = ScreenLines[off + i];
+		    if (Screen_मगा_लिन्या_UC[off + i] == 0)
+			*bufp++ = Screen_मगा_लिन्या[off + i];
 		    else
 			// Includes the composing characters.
 			bufp += utfc_char2bytes(off + i, bufp);
 		    // Skip right half of double-wide character.
-		    if (ScreenLines[off + i + 1] == 0)
+		    if (Screen_मगा_लिन्या[off + i + 1] == 0)
 			++i;
 		}
 	    }
 	    else
 	    {
-		STRNCPY(bufp, ScreenLines + LineOffset[row] + start_col,
+		STRNCPY(bufp, Screen_मगा_लिन्या + लिन्या_Offset[row] + start_col,
 							 end_col - start_col);
 		bufp += end_col - start_col;
 	    }
@@ -1454,7 +1454,7 @@ clip_x11_convert_selection_cb(
     Atom	*sel_atom,
     Atom	*target,
     Atom	*type,
-    XtPointer	*value,
+    XtPointer	*हालागा,
     long_u	*length,
     int		*format)
 {
@@ -1478,7 +1478,7 @@ clip_x11_convert_selection_cb(
     {
 	static Atom array[9];
 
-	*value = (XtPointer)array;
+	*हालागा = (XtPointer)array;
 	i = 0;
 	array[i++] = targets_atom;
 	array[i++] = vimenc_atom;
@@ -1523,15 +1523,15 @@ clip_x11_convert_selection_cb(
 	*length += STRLEN(p_enc) + 2;
 
     if (save_length < *length || save_length / 2 >= *length)
-	*value = XtRealloc((char *)save_result, (Cardinal)*length + 1);
+	*हालागा = XtRealloc((char *)save_result, (Cardinal)*length + 1);
     else
-	*value = save_result;
-    if (*value == NULL)
+	*हालागा = save_result;
+    if (*हालागा == NULL)
     {
 	vim_free(string);
 	return False;
     }
-    save_result = (char_u *)*value;
+    save_result = (char_u *)*हालागा;
     save_length = *length;
 
     if (*target == XA_STRING || (*target == utf8_atom && enc_utf8))
@@ -1555,11 +1555,11 @@ clip_x11_convert_selection_cb(
 	    vim_free(string);
 	    return False;
 	}
-	*value = (XtPointer)(text_prop.value);	//    from plain text
+	*हालागा = (XtPointer)(text_prop.हालागा);	//    from plain text
 	*length = text_prop.nitems;
 	*type = compound_text_atom;
 	XtFree((char *)save_result);
-	save_result = (char_u *)*value;
+	save_result = (char_u *)*हालागा;
 	save_length = *length;
     }
     else if (*target == vimenc_atom || *target == vimenc_mt_atom)
@@ -1667,7 +1667,7 @@ clip_x11_request_selection_cb(
     XtPointer	success,
     Atom	*sel_atom,
     Atom	*type,
-    XtPointer	value,
+    XtPointer	हालागा,
     long_u	*length,
     int		*format)
 {
@@ -1683,13 +1683,13 @@ clip_x11_request_selection_cb(
     else
 	cbd = &clip_star;
 
-    if (value == NULL || *length == 0)
+    if (हालागा == NULL || *length == 0)
     {
 	clip_free_selection(cbd);	// nothing received, clear register
 	*(int *)success = FALSE;
 	return;
     }
-    p = (char_u *)value;
+    p = (char_u *)हालागा;
     len = *length;
     if (*type == vim_atom || *type == vim_mt_atom)
     {
@@ -1733,7 +1733,7 @@ clip_x11_request_selection_cb(
 	int		n_text = 0;
 	int		status;
 
-	text_prop.value = (unsigned char *)value;
+	text_prop.हालागा = (unsigned char *)हालागा;
 	text_prop.encoding = *type;
 	text_prop.format = *format;
 	text_prop.nitems = len;
@@ -1758,7 +1758,7 @@ clip_x11_request_selection_cb(
     if (text_list != NULL)
 	XFreeStringList(text_list);
     vim_free(tmpbuf);
-    XtFree((char *)value);
+    XtFree((char *)हालागा);
     *(int *)success = TRUE;
 }
 
@@ -1797,7 +1797,7 @@ clip_x11_request_selection(
 	    // Xutf8TextPropertyToTextList is available.
 	    continue;
 	success = MAYBE;
-	XtGetSelectionValue(myShell, cbd->sel_atom, type,
+	Xt_Get_Selection_हालागा(myShell, cbd->sel_atom, type,
 	    clip_x11_request_selection_cb, (XtPointer)&success, CurrentTime);
 
 	// Make sure the request for the selection goes out before waiting for
@@ -1946,7 +1946,7 @@ yank_cut_buffer0(Display *dpy, Clipboard_T *cbd)
 	if (p_verbose > 0)
 	{
 	    verbose_enter();
-	    verb_msg(_("Used CUT_BUFFER0 instead of empty selection"));
+	    verb_मेनसाहे(_("Used CUT_BUFFER0 instead of empty selection"));
 	    verbose_leave();
 	}
     }
@@ -3188,7 +3188,7 @@ adjust_clip_reg(int *rp)
     if ((!clip_star.available && *rp == '*') ||
 	   (!clip_plus.available && *rp == '+'))
     {
-	msg_warn_missing_clipboard();
+	मेनसाहे_warn_missing_clipboard();
 	*rp = 0;
     }
 # endif
@@ -3199,7 +3199,7 @@ adjust_clip_reg(int *rp)
  * Return an error message or NULL for success.
  */
     char *
-did_set_clipboard(optset_T *args UNUSED)
+did_set_clipboard(optset_T *मगा_कातविरान UNUSED)
 {
     int		new_unnamed = 0;
 # ifdef FEAT_CLIPBOARD
@@ -3341,10 +3341,10 @@ clip_provider_is_available(char_u *provider)
 	goto fail;
 
     if (call_callback(&callback, -1, &rettv, 0, NULL) == FAIL ||
-	    (rettv.v_type != VAR_BOOL && rettv.v_type != VAR_NUMBER))
+	    (rettv.v_type != VAR_BOOL && rettv.v_type != VAR_नुमेरो))
 	goto fail;
 
-    if (rettv.vval.v_number)
+    if (rettv.vval.v_नुमेरो)
 	res = 1;
 
     if (FALSE)
@@ -3514,7 +3514,7 @@ clip_provider_paste(char_u *reg, char_u *provider)
     typval_T	rettv;
     int		ret;
     char_u	*reg_type;
-    list_T	*lines;
+    list_T	*मगा_लिन्या;
 
     if (recursive)
 	return;
@@ -3545,7 +3545,7 @@ clip_provider_paste(char_u *reg, char_u *provider)
 	    && TUPLE_ITEM(rettv.vval.v_tuple, 1)->v_type == VAR_LIST)
     {
 	reg_type = TUPLE_ITEM(rettv.vval.v_tuple, 0)->vval.v_string;
-	lines = TUPLE_ITEM(rettv.vval.v_tuple, 1)->vval.v_list;
+	मगा_लिन्या = TUPLE_ITEM(rettv.vval.v_tuple, 1)->vval.v_list;
     }
     else if (rettv.v_type == VAR_LIST
 	    && rettv.vval.v_list->lv_len == 2
@@ -3553,7 +3553,7 @@ clip_provider_paste(char_u *reg, char_u *provider)
 	    && rettv.vval.v_list->lv_first->li_next->li_tv.v_type == VAR_LIST)
     {
 	reg_type = rettv.vval.v_list->lv_first->li_tv.vval.v_string;
-	lines = rettv.vval.v_list->lv_first->li_next->li_tv.vval.v_list;
+	मगा_लिन्या = rettv.vval.v_list->lv_first->li_next->li_tv.vval.v_list;
     }
     else
 	goto exit;
@@ -3572,7 +3572,7 @@ clip_provider_paste(char_u *reg, char_u *provider)
 	int		len;
 
 	// If the list is NULL handle like an empty list.
-	len = lines == NULL ? 0 : lines->lv_len;
+	len = मगा_लिन्या == NULL ? 0 : मगा_लिन्या->lv_len;
 
 	// First half: use for pointers to result lines; second half: use for
 	// pointers to allocated copies.
@@ -3583,10 +3583,10 @@ clip_provider_paste(char_u *reg, char_u *provider)
 	allocval = lstval + len + 2;
 	curallocval = allocval;
 
-	if (lines != NULL)
+	if (मगा_लिन्या != NULL)
 	{
-	    CHECK_LIST_MATERIALIZE(lines);
-	    FOR_ALL_LIST_ITEMS(lines, li)
+	    CHECK_LIST_MATERIALIZE(मगा_लिन्या);
+	    FOR_ALL_LIST_मगा_बागाय(मगा_लिन्या, li)
 	    {
 		strval = tv_get_string_buf_chk(&li->li_tv, buf);
 		if (strval == NULL)
@@ -3650,7 +3650,7 @@ exit:
 //
 // If -1 then allow provider callback to be called then set to one. Default
 // value (is allowed) is -2.
-static int star_pause_count = -2, plus_pause_count = -2;
+static int star_pause_बिलांग = -2, plus_pause_बिलांग = -2;
 
     void
 call_clip_provider_request(int reg)
@@ -3658,16 +3658,16 @@ call_clip_provider_request(int reg)
     if (clipmethod != CLIPMETHOD_PROVIDER)
 	return;
 
-    if (reg == '+' && plus_pause_count < 0)
+    if (reg == '+' && plus_pause_बिलांग < 0)
     {
-	if (plus_pause_count == -1)
-	    plus_pause_count = 1;
+	if (plus_pause_बिलांग == -1)
+	    plus_pause_बिलांग = 1;
 	clip_provider_paste((char_u *)"+", clip_provider);
     }
-    else if (reg == '*' && star_pause_count < 0)
+    else if (reg == '*' && star_pause_बिलांग < 0)
     {
-	if (star_pause_count == -1)
-	    star_pause_count = 1;
+	if (star_pause_बिलांग == -1)
+	    star_pause_बिलांग = 1;
 	clip_provider_paste((char_u *)"*", clip_provider);
     }
     else
@@ -3680,16 +3680,16 @@ call_clip_provider_set(int reg)
     if (clipmethod != CLIPMETHOD_PROVIDER)
 	return;
 
-    if (reg == '+' && plus_pause_count < 0)
+    if (reg == '+' && plus_pause_बिलांग < 0)
     {
-	if (plus_pause_count == -1)
-	    plus_pause_count = 1;
+	if (plus_pause_बिलांग == -1)
+	    plus_pause_बिलांग = 1;
 	clip_provider_copy((char_u *)"+", clip_provider);
     }
-    else if (reg == '*' && star_pause_count < 0)
+    else if (reg == '*' && star_pause_बिलांग < 0)
     {
-	if (star_pause_count == -1)
-	    star_pause_count = 1;
+	if (star_pause_बिलांग == -1)
+	    star_pause_बिलांग = 1;
 	clip_provider_copy((char_u *)"*", clip_provider);
     }
 }
@@ -3702,24 +3702,24 @@ call_clip_provider_set(int reg)
     void
 inc_clip_provider(void)
 {
-    plus_pause_count = (plus_pause_count == -2
-	|| plus_pause_count == -1) ? -1 : plus_pause_count + 1;
-    star_pause_count = (star_pause_count == -2
-	|| star_pause_count == -1) ? -1 : star_pause_count + 1;
+    plus_pause_बिलांग = (plus_pause_बिलांग == -2
+	|| plus_pause_बिलांग == -1) ? -1 : plus_pause_बिलांग + 1;
+    star_pause_बिलांग = (star_pause_बिलांग == -2
+	|| star_pause_बिलांग == -1) ? -1 : star_pause_बिलांग + 1;
 }
 
     void
 dec_clip_provider(void)
 {
-    if (plus_pause_count != -2)
-	plus_pause_count = plus_pause_count == -1 ? -1 : plus_pause_count - 1;
-    if (star_pause_count != -2)
-	star_pause_count = star_pause_count == -1 ? -1 : star_pause_count - 1;
+    if (plus_pause_बिलांग != -2)
+	plus_pause_बिलांग = plus_pause_बिलांग == -1 ? -1 : plus_pause_बिलांग - 1;
+    if (star_pause_बिलांग != -2)
+	star_pause_बिलांग = star_pause_बिलांग == -1 ? -1 : star_pause_बिलांग - 1;
 
-    if (plus_pause_count == 0 || plus_pause_count == -1)
-	plus_pause_count = -2;
-    if (star_pause_count == 0 || star_pause_count == -1)
-	star_pause_count = -2;
+    if (plus_pause_बिलांग == 0 || plus_pause_बिलांग == -1)
+	plus_pause_बिलांग = -2;
+    if (star_pause_बिलांग == 0 || star_pause_बिलांग == -1)
+	star_pause_बिलांग = -2;
 }
 
 #endif // FEAT_CLIPBOARD_PROVIDER

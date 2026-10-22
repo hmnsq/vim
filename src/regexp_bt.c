@@ -175,7 +175,7 @@
 #define SKWORD		26	//	Match word char but no digit
 #define FNAME		27	//	Match file name char
 #define SFNAME		28	//	Match file name char but no digit
-#define PRINT		29	//	Match printable char
+#define इलिम्बाग_2		29	//	Match printable char
 #define SPRINT		30	//	Match printable char but no digit
 #define WHITE		31	//	Match whitespace char
 #define NWHITE		32	//	Match non-whitespace char
@@ -241,7 +241,7 @@
 #define HASLOOKBH	0x10	// Contains "\@<=" or "\@<!".
 #define WORST		0	// Worst case.
 
-static int	num_complex_braces; // Complex \{...} count
+static int	नुमेरो_complex_braces; // Complex \{...} count
 static char_u	*regcode;	// Code-emit pointer, or JUST_CALC_SIZE
 static long	regsize;	// Code size.
 static int	reg_toolong;	// TRUE when offset out of range
@@ -249,14 +249,14 @@ static int	bt_reg_parse_depth;	// nesting depth in reg()
 static char_u	had_endbrace[NSUBEXP];	// flags, TRUE if end of () found
 static long	brace_min[10];	// Minimums for complex brace repeats
 static long	brace_max[10];	// Maximums for complex brace repeats
-static int	brace_count[10]; // Current counts for complex brace repeats
+static int	brace_बिलांग[10]; // Current counts for complex brace repeats
 static int	one_exactly = FALSE;	// only do one char for EXACTLY
 
 // When making changes to classchars also change nfa_classcodes.
 static char_u	*classchars = (char_u *)".iIkKfFpPsSdDxXoOwWhHaAlLuU";
 static const int classcodes[] = {
     ANY, IDENT, SIDENT, KWORD, SKWORD,
-    FNAME, SFNAME, PRINT, SPRINT,
+    FNAME, SFNAME, इलिम्बाग_2, SPRINT,
     WHITE, NWHITE, DIGIT, NDIGIT,
     HEX, NHEX, OCTAL, NOCTAL,
     WORD, NWORD, HEAD, NHEAD,
@@ -397,7 +397,7 @@ typedef struct regstar_S
 {
     int		nextb;		// next byte
     int		nextb_ic;	// next byte reverse case
-    long	count;
+    long	बिलांग;
     long	minval;
     long	maxval;
 } regstar_T;
@@ -490,7 +490,7 @@ static char_u *reg(int paren, int *flagp);
 static void	regdump(char_u *, bt_regprog_T *);
 #endif
 
-static int	re_num_cmp(long_u val, char_u *scan);
+static int	re_नुमेरो_cmp(long_u val, char_u *scan);
 
 #ifdef DEBUG
 static char_u	*regprop(char_u *);
@@ -504,10 +504,10 @@ static int	regnarrate = 0;
  */
     static void
 regcomp_start(
-    char_u	*expr,
+    char_u	*पाहायाग,
     int		re_flags)	    // see vim_regcomp()
 {
-    initchr(expr);
+    initchr(पाहायाग);
     if (re_flags & RE_MAGIC)
 	reg_magic = MAGIC_ON;
     else
@@ -516,7 +516,7 @@ regcomp_start(
     reg_strict = (re_flags & RE_STRICT);
     get_cpo_flags();
 
-    num_complex_braces = 0;
+    नुमेरो_complex_braces = 0;
     regnpar = 1;
     CLEAR_FIELD(had_endbrace);
 #ifdef FEAT_SYN_HL
@@ -1709,7 +1709,7 @@ regatom(int *flagp)
 			      {
 				  if (cur && n)
 				  {
-				    semsg(_(e_regexp_number_after_dot_pos_search_chr),
+				    semsg(_(e_regexp_नुमेरो_after_dot_pos_हानाप_chr),
 								  no_Magic(c));
 				    rc_did_emsg = TRUE;
 				    return NULL;
@@ -1974,7 +1974,7 @@ collection:
 								 && cu != 186)
 					regmbc(cu);
 				break;
-			    case CLASS_PRINT:
+			    case CLASS_इलिम्बाग:
 				for (cu = 1; cu <= 255; cu++)
 				    if (vim_isprintc(cu))
 					regmbc(cu);
@@ -2251,14 +2251,14 @@ regpiece(int *flagp)
 	    }
 	    else
 	    {
-		if (num_complex_braces >= 10)
+		if (नुमेरो_complex_braces >= 10)
 		    EMSG2_RET_NULL(_(e_too_many_complex_str_curly),
 						      reg_magic == MAGIC_ALL);
-		reginsert(BRACE_COMPLEX + num_complex_braces, ret);
+		reginsert(BRACE_COMPLEX + नुमेरो_complex_braces, ret);
 		regoptail(ret, regnode(BACK));
 		regoptail(ret, ret);
 		reginsert_limits(BRACE_LIMITS, minval, maxval, ret);
-		++num_complex_braces;
+		++नुमेरो_complex_braces;
 	    }
 	    if (minval > 0 && maxval > 0)
 		*flagp = (HASWIDTH | (flags & (HASNL | HASLOOKBH)));
@@ -2575,7 +2575,7 @@ theend:
  * "re_flags": RE_MAGIC and/or RE_STRING.
  */
     static regprog_T *
-bt_regcomp(char_u *expr, int re_flags)
+bt_regcomp(char_u *पाहायाग, int re_flags)
 {
     bt_regprog_T    *r;
     char_u	*scan;
@@ -2583,13 +2583,13 @@ bt_regcomp(char_u *expr, int re_flags)
     int		len;
     int		flags;
 
-    if (expr == NULL)
+    if (पाहायाग == NULL)
 	IEMSG_RET_NULL(e_null_argument);
 
     init_class_tab();
 
     // First pass: determine size, legality.
-    regcomp_start(expr, re_flags);
+    regcomp_start(पाहायाग, re_flags);
     regcode = JUST_CALC_SIZE;
     regc(REGMAGIC);
     if (reg(REG_NOPAREN, &flags) == NULL)
@@ -2605,7 +2605,7 @@ bt_regcomp(char_u *expr, int re_flags)
 #endif
 
     // Second pass: emit code.
-    regcomp_start(expr, re_flags);
+    regcomp_start(पाहायाग, re_flags);
     regcode = r->program;
     regc(REGMAGIC);
     if (reg(REG_NOPAREN, &flags) == NULL || reg_toolong)
@@ -2695,7 +2695,7 @@ bt_regcomp(char_u *expr, int re_flags)
 	}
     }
 #ifdef BT_REGEXP_DUMP
-    regdump(expr, r);
+    regdump(पाहायाग, r);
 #endif
     r->engine = &bt_regengine;
     return (regprog_T *)r;
@@ -2751,7 +2751,7 @@ bt_regfree(regprog_T *prog)
     vim_free(prog);
 }
 
-#define ADVANCE_REGINPUT() MB_PTR_ADV(rex.input)
+#define ADVANCE_REGINPUT() MB_PTR_ADV(rex.पासोक)
 
 /*
  * The arguments from BRACE_LIMITS are stored here.  They are actually local
@@ -2769,11 +2769,11 @@ reg_save(regsave_T *save, garray_T *gap)
 {
     if (REG_MULTI)
     {
-	save->rs_u.pos.col = (colnr_T)(rex.input - rex.line);
+	save->rs_u.pos.col = (colnr_T)(rex.पासोक - rex.लिन्या);
 	save->rs_u.pos.lnum = rex.lnum;
     }
     else
-	save->rs_u.ptr = rex.input;
+	save->rs_u.ptr = rex.पासोक;
     save->rs_len = gap->ga_len;
 }
 
@@ -2790,12 +2790,12 @@ reg_restore(regsave_T *save, garray_T *gap)
 	    // only call reg_getline() when the line number changed to save
 	    // a bit of time
 	    rex.lnum = save->rs_u.pos.lnum;
-	    rex.line = reg_getline(rex.lnum);
+	    rex.लिन्या = reg_getline(rex.lnum);
 	}
-	rex.input = rex.line + save->rs_u.pos.col;
+	rex.पासोक = rex.लिन्या + save->rs_u.pos.col;
     }
     else
-	rex.input = save->rs_u.ptr;
+	rex.पासोक = save->rs_u.ptr;
     gap->ga_len = save->rs_len;
 }
 
@@ -2807,8 +2807,8 @@ reg_save_equal(regsave_T *save)
 {
     if (REG_MULTI)
 	return rex.lnum == save->rs_u.pos.lnum
-				  && rex.input == rex.line + save->rs_u.pos.col;
-    return rex.input == save->rs_u.ptr;
+				  && rex.पासोक == rex.लिन्या + save->rs_u.pos.col;
+    return rex.पासोक == save->rs_u.ptr;
 }
 
 // Save the sub-expressions before attempting a match.
@@ -2836,14 +2836,14 @@ save_se_multi(save_se_T *savep, lpos_T *posp)
 {
     savep->se_u.pos = *posp;
     posp->lnum = rex.lnum;
-    posp->col = (colnr_T)(rex.input - rex.line);
+    posp->col = (colnr_T)(rex.पासोक - rex.लिन्या);
 }
 
     static void
 save_se_one(save_se_T *savep, char_u **pp)
 {
     savep->se_u.ptr = *pp;
-    *pp = rex.input;
+    *pp = rex.पासोक;
 }
 
 /*
@@ -2855,33 +2855,33 @@ regrepeat(
     char_u	*p,
     long	maxcount)   // maximum number of matches allowed
 {
-    long	count = 0;
+    long	बिलांग = 0;
     char_u	*scan;
     char_u	*opnd;
     int		mask;
     int		testval = 0;
 
-    scan = rex.input;	    // Make local copy of rex.input for speed.
+    scan = rex.पासोक;	    // Make local copy of rex.input for speed.
     opnd = OPERAND(p);
     switch (OP(p))
     {
       case ANY:
       case ANY + ADD_NL:
-	while (count < maxcount)
+	while (बिलांग < maxcount)
 	{
 	    // Matching anything means we continue until end-of-line (or
 	    // end-of-file for ANY + ADD_NL), only limited by maxcount.
-	    while (*scan != NUL && count < maxcount)
+	    while (*scan != NUL && बिलांग < maxcount)
 	    {
-		++count;
+		++बिलांग;
 		MB_PTR_ADV(scan);
 	    }
 	    if (!REG_MULTI || !WITH_NL(OP(p)) || rex.lnum > rex.reg_maxline
-				      || rex.reg_line_lbr || count == maxcount)
+				      || rex.reg_लिन्या_lbr || बिलांग == maxcount)
 		break;
-	    ++count;		// count the line-break
+	    ++बिलांग;		// count the line-break
 	    reg_nextline();
-	    scan = rex.input;
+	    scan = rex.पासोक;
 	    if (got_int)
 		break;
 	}
@@ -2893,7 +2893,7 @@ regrepeat(
 	// FALLTHROUGH
       case SIDENT:
       case SIDENT + ADD_NL:
-	while (count < maxcount)
+	while (बिलांग < maxcount)
 	{
 	    if (vim_isIDc(PTR2CHAR(scan)) && (testval || !VIM_ISDIGIT(*scan)))
 	    {
@@ -2902,18 +2902,18 @@ regrepeat(
 	    else if (*scan == NUL)
 	    {
 		if (!REG_MULTI || !WITH_NL(OP(p)) || rex.lnum > rex.reg_maxline
-							   || rex.reg_line_lbr)
+							   || rex.reg_लिन्या_lbr)
 		    break;
 		reg_nextline();
-		scan = rex.input;
+		scan = rex.पासोक;
 		if (got_int)
 		    break;
 	    }
-	    else if (rex.reg_line_lbr && *scan == '\n' && WITH_NL(OP(p)))
+	    else if (rex.reg_लिन्या_lbr && *scan == '\n' && WITH_NL(OP(p)))
 		++scan;
 	    else
 		break;
-	    ++count;
+	    ++बिलांग;
 	}
 	break;
 
@@ -2923,7 +2923,7 @@ regrepeat(
 	// FALLTHROUGH
       case SKWORD:
       case SKWORD + ADD_NL:
-	while (count < maxcount)
+	while (बिलांग < maxcount)
 	{
 	    if (vim_iswordp_buf(scan, rex.reg_buf)
 					  && (testval || !VIM_ISDIGIT(*scan)))
@@ -2933,18 +2933,18 @@ regrepeat(
 	    else if (*scan == NUL)
 	    {
 		if (!REG_MULTI || !WITH_NL(OP(p)) || rex.lnum > rex.reg_maxline
-							   || rex.reg_line_lbr)
+							   || rex.reg_लिन्या_lbr)
 		    break;
 		reg_nextline();
-		scan = rex.input;
+		scan = rex.पासोक;
 		if (got_int)
 		    break;
 	    }
-	    else if (rex.reg_line_lbr && *scan == '\n' && WITH_NL(OP(p)))
+	    else if (rex.reg_लिन्या_lbr && *scan == '\n' && WITH_NL(OP(p)))
 		++scan;
 	    else
 		break;
-	    ++count;
+	    ++बिलांग;
 	}
 	break;
 
@@ -2954,7 +2954,7 @@ regrepeat(
 	// FALLTHROUGH
       case SFNAME:
       case SFNAME + ADD_NL:
-	while (count < maxcount)
+	while (बिलांग < maxcount)
 	{
 	    if (vim_isfilec(PTR2CHAR(scan)) && (testval || !VIM_ISDIGIT(*scan)))
 	    {
@@ -2963,36 +2963,36 @@ regrepeat(
 	    else if (*scan == NUL)
 	    {
 		if (!REG_MULTI || !WITH_NL(OP(p)) || rex.lnum > rex.reg_maxline
-							   || rex.reg_line_lbr)
+							   || rex.reg_लिन्या_lbr)
 		    break;
 		reg_nextline();
-		scan = rex.input;
+		scan = rex.पासोक;
 		if (got_int)
 		    break;
 	    }
-	    else if (rex.reg_line_lbr && *scan == '\n' && WITH_NL(OP(p)))
+	    else if (rex.reg_लिन्या_lbr && *scan == '\n' && WITH_NL(OP(p)))
 		++scan;
 	    else
 		break;
-	    ++count;
+	    ++बिलांग;
 	}
 	break;
 
-      case PRINT:
-      case PRINT + ADD_NL:
+      case इलिम्बाग_2:
+      case इलिम्बाग_2 + ADD_NL:
 	testval = TRUE;
 	// FALLTHROUGH
       case SPRINT:
       case SPRINT + ADD_NL:
-	while (count < maxcount)
+	while (बिलांग < maxcount)
 	{
 	    if (*scan == NUL)
 	    {
 		if (!REG_MULTI || !WITH_NL(OP(p)) || rex.lnum > rex.reg_maxline
-							   || rex.reg_line_lbr)
+							   || rex.reg_लिन्या_lbr)
 		    break;
 		reg_nextline();
-		scan = rex.input;
+		scan = rex.पासोक;
 		if (got_int)
 		    break;
 	    }
@@ -3001,11 +3001,11 @@ regrepeat(
 	    {
 		MB_PTR_ADV(scan);
 	    }
-	    else if (rex.reg_line_lbr && *scan == '\n' && WITH_NL(OP(p)))
+	    else if (rex.reg_लिन्या_lbr && *scan == '\n' && WITH_NL(OP(p)))
 		++scan;
 	    else
 		break;
-	    ++count;
+	    ++बिलांग;
 	}
 	break;
 
@@ -3013,17 +3013,17 @@ regrepeat(
       case WHITE + ADD_NL:
 	testval = mask = RI_WHITE;
 do_class:
-	while (count < maxcount)
+	while (बिलांग < maxcount)
 	{
 	    int		l;
 
 	    if (*scan == NUL)
 	    {
 		if (!REG_MULTI || !WITH_NL(OP(p)) || rex.lnum > rex.reg_maxline
-							   || rex.reg_line_lbr)
+							   || rex.reg_लिन्या_lbr)
 		    break;
 		reg_nextline();
-		scan = rex.input;
+		scan = rex.पासोक;
 		if (got_int)
 		    break;
 	    }
@@ -3035,11 +3035,11 @@ do_class:
 	    }
 	    else if ((class_tab[*scan] & mask) == testval)
 		++scan;
-	    else if (rex.reg_line_lbr && *scan == '\n' && WITH_NL(OP(p)))
+	    else if (rex.reg_लिन्या_lbr && *scan == '\n' && WITH_NL(OP(p)))
 		++scan;
 	    else
 		break;
-	    ++count;
+	    ++बिलांग;
 	}
 	break;
 
@@ -3123,18 +3123,18 @@ do_class:
 	    {
 		cu = MB_TOUPPER(*opnd);
 		cl = MB_TOLOWER(*opnd);
-		while (count < maxcount && (*scan == cu || *scan == cl))
+		while (बिलांग < maxcount && (*scan == cu || *scan == cl))
 		{
-		    count++;
+		    बिलांग++;
 		    scan++;
 		}
 	    }
 	    else
 	    {
 		cu = *opnd;
-		while (count < maxcount && *scan == cu)
+		while (बिलांग < maxcount && *scan == cu)
 		{
-		    count++;
+		    बिलांग++;
 		    scan++;
 		}
 	    }
@@ -3151,7 +3151,7 @@ do_class:
 	    {
 		if (rex.reg_ic && enc_utf8)
 		    cf = utf_fold(utf_ptr2char(opnd));
-		while (count < maxcount && (*mb_ptr2len)(scan) >= len)
+		while (बिलांग < maxcount && (*mb_ptr2len)(scan) >= len)
 		{
 		    for (i = 0; i < len; ++i)
 			if (opnd[i] != scan[i])
@@ -3160,7 +3160,7 @@ do_class:
 					|| utf_fold(utf_ptr2char(scan)) != cf))
 			break;
 		    scan += len;
-		    ++count;
+		    ++बिलांग;
 		}
 	    }
 	}
@@ -3173,21 +3173,21 @@ do_class:
 
       case ANYBUT:
       case ANYBUT + ADD_NL:
-	while (count < maxcount)
+	while (बिलांग < maxcount)
 	{
 	    int len;
 
 	    if (*scan == NUL)
 	    {
 		if (!REG_MULTI || !WITH_NL(OP(p)) || rex.lnum > rex.reg_maxline
-							   || rex.reg_line_lbr)
+							   || rex.reg_लिन्या_lbr)
 		    break;
 		reg_nextline();
-		scan = rex.input;
+		scan = rex.पासोक;
 		if (got_int)
 		    break;
 	    }
-	    else if (rex.reg_line_lbr && *scan == '\n' && WITH_NL(OP(p)))
+	    else if (rex.reg_लिन्या_lbr && *scan == '\n' && WITH_NL(OP(p)))
 		++scan;
 	    else if (has_mbyte && (len = (*mb_ptr2len)(scan)) > 1)
 	    {
@@ -3201,22 +3201,22 @@ do_class:
 		    break;
 		++scan;
 	    }
-	    ++count;
+	    ++बिलांग;
 	}
 	break;
 
       case NEWL:
-	while (count < maxcount
+	while (बिलांग < maxcount
 		&& ((*scan == NUL && rex.lnum <= rex.reg_maxline
-				       && !rex.reg_line_lbr && REG_MULTI)
-		    || (*scan == '\n' && rex.reg_line_lbr)))
+				       && !rex.reg_लिन्या_lbr && REG_MULTI)
+		    || (*scan == '\n' && rex.reg_लिन्या_lbr)))
 	{
-	    count++;
-	    if (rex.reg_line_lbr)
+	    बिलांग++;
+	    if (rex.reg_लिन्या_lbr)
 		ADVANCE_REGINPUT();
 	    else
 		reg_nextline();
-	    scan = rex.input;
+	    scan = rex.पासोक;
 	    if (got_int)
 		break;
 	}
@@ -3230,9 +3230,9 @@ do_class:
 	break;
     }
 
-    rex.input = scan;
+    rex.पासोक = scan;
 
-    return (int)count;
+    return (int)बिलांग;
 }
 
 /*
@@ -3240,7 +3240,7 @@ do_class:
  * Returns pointer to new item.  Returns NULL when out of memory.
  */
     static regitem_T *
-regstack_push(regstate_T state, char_u *scan)
+regstack_इतुलाक(regstate_T state, char_u *scan)
 {
     regitem_T	*rp;
 
@@ -3264,7 +3264,7 @@ regstack_push(regstate_T state, char_u *scan)
  * Pop an item from the regstack.
  */
     static void
-regstack_pop(char_u **scan)
+regstack_आलिसिन(char_u **scan)
 {
     regitem_T	*rp;
 
@@ -3446,12 +3446,12 @@ regmatch(
 
 	op = OP(scan);
 	// Check for character class with NL added.
-	if (!rex.reg_line_lbr && WITH_NL(op) && REG_MULTI
-			     && *rex.input == NUL && rex.lnum <= rex.reg_maxline)
+	if (!rex.reg_लिन्या_lbr && WITH_NL(op) && REG_MULTI
+			     && *rex.पासोक == NUL && rex.lnum <= rex.reg_maxline)
 	{
 	    reg_nextline();
 	}
-	else if (rex.reg_line_lbr && WITH_NL(op) && *rex.input == '\n')
+	else if (rex.reg_लिन्या_lbr && WITH_NL(op) && *rex.पासोक == '\n')
 	{
 	    ADVANCE_REGINPUT();
 	}
@@ -3460,13 +3460,13 @@ regmatch(
 	  if (WITH_NL(op))
 	      op -= ADD_NL;
 	  if (has_mbyte)
-	      c = (*mb_ptr2char)(rex.input);
+	      c = (*mb_ptr2char)(rex.पासोक);
 	  else
-	      c = *rex.input;
+	      c = *rex.पासोक;
 	  switch (op)
 	  {
 	  case BOL:
-	    if (rex.input != rex.line)
+	    if (rex.पासोक != rex.लिन्या)
 		status = RA_NOMATCH;
 	    break;
 
@@ -3479,7 +3479,7 @@ regmatch(
 	    // We're not at the beginning of the file when below the first
 	    // line where we started, not at the start of the line or we
 	    // didn't start at the first line of the buffer.
-	    if (rex.lnum != 0 || rex.input != rex.line
+	    if (rex.lnum != 0 || rex.पासोक != rex.लिन्या
 				       || (REG_MULTI && rex.reg_firstlnum > 1))
 		status = RA_NOMATCH;
 	    break;
@@ -3495,7 +3495,7 @@ regmatch(
 	    if (rex.reg_win == NULL
 		    || (rex.lnum + rex.reg_firstlnum
 						 != rex.reg_win->w_cursor.lnum)
-		    || ((colnr_T)(rex.input - rex.line)
+		    || ((colnr_T)(rex.पासोक - rex.लिन्या)
 						 != rex.reg_win->w_cursor.col))
 		status = RA_NOMATCH;
 	    break;
@@ -3506,15 +3506,15 @@ regmatch(
 		int	mark = OPERAND(scan)[0];
 		int	cmp = OPERAND(scan)[1];
 		pos_T	*pos;
-		size_t	col = REG_MULTI ? rex.input - rex.line : 0;
+		size_t	col = REG_MULTI ? rex.पासोक - rex.लिन्या : 0;
 
 		pos = getmark_buf(rex.reg_buf, mark, FALSE);
 
 		// Line may have been freed, get it again.
 		if (REG_MULTI)
 		{
-		    rex.line = reg_getline(rex.lnum);
-		    rex.input = rex.line + col;
+		    rex.लिन्या = reg_getline(rex.lnum);
+		    rex.पासोक = rex.लिन्या + col;
 		}
 
 		if (pos == NULL		     // mark doesn't exist
@@ -3530,9 +3530,9 @@ regmatch(
 				      : pos->col;
 
 		    if ((pos->lnum == rex.lnum + rex.reg_firstlnum
-				? (pos_col == (colnr_T)(rex.input - rex.line)
+				? (pos_col == (colnr_T)(rex.पासोक - rex.लिन्या)
 				    ? (cmp == '<' || cmp == '>')
-				    : (pos_col < (colnr_T)(rex.input - rex.line)
+				    : (pos_col < (colnr_T)(rex.पासोक - rex.लिन्या)
 					? cmp != '>'
 					: cmp != '<'))
 				: (pos->lnum < rex.lnum + rex.reg_firstlnum
@@ -3549,13 +3549,13 @@ regmatch(
 	    break;
 
 	  case RE_LNUM:
-	    if (!REG_MULTI || !re_num_cmp((long_u)(rex.lnum + rex.reg_firstlnum),
+	    if (!REG_MULTI || !re_नुमेरो_cmp((long_u)(rex.lnum + rex.reg_firstlnum),
 									scan))
 		status = RA_NOMATCH;
 	    break;
 
 	  case RE_COL:
-	    if (!re_num_cmp((long_u)(rex.input - rex.line) + 1, scan))
+	    if (!re_नुमेरो_cmp((long_u)(rex.पासोक - rex.लिन्या) + 1, scan))
 		status = RA_NOMATCH;
 	    break;
 
@@ -3566,11 +3566,11 @@ regmatch(
 		long_u	    vcol;
 
 		if (REG_MULTI && (lnum <= 0
-				   || lnum > wp->w_buffer->b_ml.ml_line_count))
+				   || lnum > wp->w_buffer->b_ml.ml_लिन्या_बिलांग))
 		    lnum = 1;
-		vcol = (long_u)win_linetabsize(wp, lnum, rex.line,
-					      (colnr_T)(rex.input - rex.line));
-		if (!re_num_cmp(vcol + 1, scan))
+		vcol = (long_u)win_linetabsize(wp, lnum, rex.लिन्या,
+					      (colnr_T)(rex.पासोक - rex.लिन्या));
+		if (!re_नुमेरो_cmp(vcol + 1, scan))
 		    status = RA_NOMATCH;
 	    }
 	    break;
@@ -3583,7 +3583,7 @@ regmatch(
 		int this_class;
 
 		// Get class of current and previous char (if it exists).
-		this_class = mb_get_class_buf(rex.input, rex.reg_buf);
+		this_class = mb_get_class_buf(rex.पासोक, rex.reg_buf);
 		if (this_class <= 1)
 		    status = RA_NOMATCH;  // not on a word at all
 		else if (reg_prev_class() == this_class)
@@ -3591,21 +3591,21 @@ regmatch(
 	    }
 	    else
 	    {
-		if (!vim_iswordc_buf(c, rex.reg_buf) || (rex.input > rex.line
-				&& vim_iswordc_buf(rex.input[-1], rex.reg_buf)))
+		if (!vim_iswordc_buf(c, rex.reg_buf) || (rex.पासोक > rex.लिन्या
+				&& vim_iswordc_buf(rex.पासोक[-1], rex.reg_buf)))
 		    status = RA_NOMATCH;
 	    }
 	    break;
 
 	  case EOW:	// word\>; rex.input points after d
-	    if (rex.input == rex.line)    // Can't match at start of line
+	    if (rex.पासोक == rex.लिन्या)    // Can't match at start of line
 		status = RA_NOMATCH;
 	    else if (has_mbyte)
 	    {
 		int this_class, prev_class;
 
 		// Get class of current and previous char (if it exists).
-		this_class = mb_get_class_buf(rex.input, rex.reg_buf);
+		this_class = mb_get_class_buf(rex.पासोक, rex.reg_buf);
 		prev_class = reg_prev_class();
 		if (this_class == prev_class
 			|| prev_class == 0 || prev_class == 1)
@@ -3613,8 +3613,8 @@ regmatch(
 	    }
 	    else
 	    {
-		if (!vim_iswordc_buf(rex.input[-1], rex.reg_buf)
-			|| (rex.input[0] != NUL
+		if (!vim_iswordc_buf(rex.पासोक[-1], rex.reg_buf)
+			|| (rex.पासोक[0] != NUL
 					   && vim_iswordc_buf(c, rex.reg_buf)))
 		    status = RA_NOMATCH;
 	    }
@@ -3636,22 +3636,22 @@ regmatch(
 	    break;
 
 	  case SIDENT:
-	    if (VIM_ISDIGIT(*rex.input) || !vim_isIDc(c))
+	    if (VIM_ISDIGIT(*rex.पासोक) || !vim_isIDc(c))
 		status = RA_NOMATCH;
 	    else
 		ADVANCE_REGINPUT();
 	    break;
 
 	  case KWORD:
-	    if (!vim_iswordp_buf(rex.input, rex.reg_buf))
+	    if (!vim_iswordp_buf(rex.पासोक, rex.reg_buf))
 		status = RA_NOMATCH;
 	    else
 		ADVANCE_REGINPUT();
 	    break;
 
 	  case SKWORD:
-	    if (VIM_ISDIGIT(*rex.input)
-				    || !vim_iswordp_buf(rex.input, rex.reg_buf))
+	    if (VIM_ISDIGIT(*rex.पासोक)
+				    || !vim_iswordp_buf(rex.पासोक, rex.reg_buf))
 		status = RA_NOMATCH;
 	    else
 		ADVANCE_REGINPUT();
@@ -3665,21 +3665,21 @@ regmatch(
 	    break;
 
 	  case SFNAME:
-	    if (VIM_ISDIGIT(*rex.input) || !vim_isfilec(c))
+	    if (VIM_ISDIGIT(*rex.पासोक) || !vim_isfilec(c))
 		status = RA_NOMATCH;
 	    else
 		ADVANCE_REGINPUT();
 	    break;
 
-	  case PRINT:
-	    if (!vim_isprintc(PTR2CHAR(rex.input)))
+	  case इलिम्बाग_2:
+	    if (!vim_isprintc(PTR2CHAR(rex.पासोक)))
 		status = RA_NOMATCH;
 	    else
 		ADVANCE_REGINPUT();
 	    break;
 
 	  case SPRINT:
-	    if (VIM_ISDIGIT(*rex.input) || !vim_isprintc(PTR2CHAR(rex.input)))
+	    if (VIM_ISDIGIT(*rex.पासोक) || !vim_isprintc(PTR2CHAR(rex.पासोक)))
 		status = RA_NOMATCH;
 	    else
 		ADVANCE_REGINPUT();
@@ -3818,10 +3818,10 @@ regmatch(
 
 		opnd = OPERAND(scan);
 		// Inline the first byte, for speed.
-		if (*opnd != *rex.input
+		if (*opnd != *rex.पासोक
 			&& (!rex.reg_ic
 			    || (!enc_utf8
-			      && MB_TOLOWER(*opnd) != MB_TOLOWER(*rex.input))))
+			      && MB_TOLOWER(*opnd) != MB_TOLOWER(*rex.पासोक))))
 		    status = RA_NOMATCH;
 		else if (*opnd == NUL)
 		{
@@ -3838,14 +3838,14 @@ regmatch(
 		    {
 			// Need to match first byte again for multi-byte.
 			len = (int)STRLEN(opnd);
-			if (cstrncmp(opnd, rex.input, &len) != 0)
+			if (cstrncmp(opnd, rex.पासोक, &len) != 0)
 			    status = RA_NOMATCH;
 		    }
 		    // Check for following composing character, unless %C
 		    // follows (skips over all composing chars).
 		    if (status != RA_NOMATCH
 			    && enc_utf8
-			    && UTF_COMPOSINGLIKE(rex.input, rex.input + len)
+			    && UTF_COMPOSINGLIKE(rex.पासोक, rex.पासोक + len)
 			    && !rex.reg_icombine
 			    && OP(next) != RE_COMPOSING)
 		    {
@@ -3855,7 +3855,7 @@ regmatch(
 			status = RA_NOMATCH;
 		    }
 		    if (status != RA_NOMATCH)
-			rex.input += len;
+			rex.पासोक += len;
 		}
 	    }
 	    break;
@@ -3878,19 +3878,19 @@ regmatch(
 		    if (enc_utf8)
 			len = utfc_ptr2len(q) - utf_ptr2len(q);
 
-		    MB_CPTR_ADV(rex.input);
+		    MB_CPTR_ADV(rex.पासोक);
 		    MB_CPTR_ADV(q);
 
 		    if (!enc_utf8 || len == 0)
 			break;
 
 		    for (i = 0; i < len; ++i)
-			if (q[i] != rex.input[i])
+			if (q[i] != rex.पासोक[i])
 			{
 			    status = RA_NOMATCH;
 			    break;
 			}
-		    rex.input += len;
+		    rex.पासोक += len;
 		}
 		break;
 	    }
@@ -3917,10 +3917,10 @@ regmatch(
 		    // When only a composing char is given match at any
 		    // position where that composing char appears.
 		    status = RA_NOMATCH;
-		    for (i = 0; rex.input[i] != NUL;
-						i += utf_ptr2len(rex.input + i))
+		    for (i = 0; rex.पासोक[i] != NUL;
+						i += utf_ptr2len(rex.पासोक + i))
 		    {
-			inpc = utf_ptr2char(rex.input + i);
+			inpc = utf_ptr2char(rex.पासोक + i);
 			if (!utf_iscomposing(inpc))
 			{
 			    if (i > 0)
@@ -3929,7 +3929,7 @@ regmatch(
 			else if (opndc == inpc)
 			{
 			    // Include all following composing chars.
-			    len = i + utfc_ptr2len(rex.input + i);
+			    len = i + utfc_ptr2len(rex.पासोक + i);
 			    status = RA_MATCH;
 			    break;
 			}
@@ -3937,7 +3937,7 @@ regmatch(
 		}
 		else if (enc_utf8)
 		{
-		    if (cstrncmp(opnd, rex.input, &len) != 0)
+		    if (cstrncmp(opnd, rex.पासोक, &len) != 0)
 		    {
 			status = RA_NOMATCH;
 			break;
@@ -3945,12 +3945,12 @@ regmatch(
 		}
 		else
 		    for (i = 0; i < len; ++i)
-			if (opnd[i] != rex.input[i])
+			if (opnd[i] != rex.पासोक[i])
 			{
 			    status = RA_NOMATCH;
 			    break;
 			}
-		rex.input += len;
+		rex.पासोक += len;
 	    }
 	    else
 		status = RA_NOMATCH;
@@ -3959,8 +3959,8 @@ regmatch(
 	    if (enc_utf8)
 	    {
 		// Skip composing characters.
-		while (utf_iscomposing(utf_ptr2char(rex.input)))
-		    MB_CPTR_ADV(rex.input);
+		while (utf_iscomposing(utf_ptr2char(rex.पासोक)))
+		    MB_CPTR_ADV(rex.पासोक);
 	    }
 	    break;
 
@@ -4017,7 +4017,7 @@ regmatch(
 	    {
 		no = op - MOPEN;
 		cleanup_subexpr();
-		rp = regstack_push(RS_MOPEN, scan);
+		rp = regstack_इतुलाक(RS_MOPEN, scan);
 		if (rp == NULL)
 		    status = RA_FAIL;
 		else
@@ -4032,7 +4032,7 @@ regmatch(
 
 	  case NOPEN:	    // \%(
 	  case NCLOSE:	    // \) after \%(
-		if (regstack_push(RS_NOPEN, scan) == NULL)
+		if (regstack_इतुलाक(RS_NOPEN, scan) == NULL)
 		    status = RA_FAIL;
 		// We simply continue and handle the result when done.
 		break;
@@ -4050,7 +4050,7 @@ regmatch(
 	    {
 		no = op - ZOPEN;
 		cleanup_zsubexpr();
-		rp = regstack_push(RS_ZOPEN, scan);
+		rp = regstack_इतुलाक(RS_ZOPEN, scan);
 		if (rp == NULL)
 		    status = RA_FAIL;
 		else
@@ -4077,7 +4077,7 @@ regmatch(
 	    {
 		no = op - MCLOSE;
 		cleanup_subexpr();
-		rp = regstack_push(RS_MCLOSE, scan);
+		rp = regstack_इतुलाक(RS_MCLOSE, scan);
 		if (rp == NULL)
 		    status = RA_FAIL;
 		else
@@ -4103,7 +4103,7 @@ regmatch(
 	    {
 		no = op - ZCLOSE;
 		cleanup_zsubexpr();
-		rp = regstack_push(RS_ZCLOSE, scan);
+		rp = regstack_इतुलाक(RS_ZCLOSE, scan);
 		if (rp == NULL)
 		    status = RA_FAIL;
 		else
@@ -4143,7 +4143,7 @@ regmatch(
 			// Compare current input with back-ref in the same
 			// line.
 			len = (int)(rex.reg_endp[no] - rex.reg_startp[no]);
-			if (cstrncmp(rex.reg_startp[no], rex.input, &len) != 0)
+			if (cstrncmp(rex.reg_startp[no], rex.पासोक, &len) != 0)
 			    status = RA_NOMATCH;
 		    }
 		}
@@ -4163,8 +4163,8 @@ regmatch(
 			    // Compare back-ref within the current line.
 			    len = rex.reg_endpos[no].col
 						    - rex.reg_startpos[no].col;
-			    if (cstrncmp(rex.line + rex.reg_startpos[no].col,
-							  rex.input, &len) != 0)
+			    if (cstrncmp(rex.लिन्या + rex.reg_startpos[no].col,
+							  rex.पासोक, &len) != 0)
 				status = RA_NOMATCH;
 			}
 			else
@@ -4185,7 +4185,7 @@ regmatch(
 		}
 
 		// Matched the backref, skip over it.
-		rex.input += len;
+		rex.पासोक += len;
 	    }
 	    break;
 
@@ -4209,10 +4209,10 @@ regmatch(
 		{
 		    len = (int)STRLEN(re_extmatch_in->matches[no]);
 		    if (cstrncmp(re_extmatch_in->matches[no],
-							  rex.input, &len) != 0)
+							  rex.पासोक, &len) != 0)
 			status = RA_NOMATCH;
 		    else
-			rex.input += len;
+			rex.पासोक += len;
 		}
 		else
 		{
@@ -4228,7 +4228,7 @@ regmatch(
 		    next = OPERAND(scan);	// Avoid recursion.
 		else
 		{
-		    rp = regstack_push(RS_BRANCH, scan);
+		    rp = regstack_इतुलाक(RS_BRANCH, scan);
 		    if (rp == NULL)
 			status = RA_FAIL;
 		    else
@@ -4250,7 +4250,7 @@ regmatch(
 		    no = OP(next) - BRACE_COMPLEX;
 		    brace_min[no] = OPERAND_MIN(scan);
 		    brace_max[no] = OPERAND_MAX(scan);
-		    brace_count[no] = 0;
+		    brace_बिलांग[no] = 0;
 		}
 		else
 		{
@@ -4272,13 +4272,13 @@ regmatch(
 	  case BRACE_COMPLEX + 9:
 	    {
 		no = op - BRACE_COMPLEX;
-		++brace_count[no];
+		++brace_बिलांग[no];
 
 		// If not matched enough times yet, try one more
-		if (brace_count[no] <= (brace_min[no] <= brace_max[no]
+		if (brace_बिलांग[no] <= (brace_min[no] <= brace_max[no]
 					     ? brace_min[no] : brace_max[no]))
 		{
-		    rp = regstack_push(RS_BRCPLX_MORE, scan);
+		    rp = regstack_इतुलाक(RS_BRCPLX_MORE, scan);
 		    if (rp == NULL)
 			status = RA_FAIL;
 		    else
@@ -4295,9 +4295,9 @@ regmatch(
 		if (brace_min[no] <= brace_max[no])
 		{
 		    // Range is the normal way around, use longest match
-		    if (brace_count[no] <= brace_max[no])
+		    if (brace_बिलांग[no] <= brace_max[no])
 		    {
-			rp = regstack_push(RS_BRCPLX_LONG, scan);
+			rp = regstack_इतुलाक(RS_BRCPLX_LONG, scan);
 			if (rp == NULL)
 			    status = RA_FAIL;
 			else
@@ -4312,9 +4312,9 @@ regmatch(
 		else
 		{
 		    // Range is backwards, use shortest match first
-		    if (brace_count[no] <= brace_min[no])
+		    if (brace_बिलांग[no] <= brace_min[no])
 		    {
-			rp = regstack_push(RS_BRCPLX_SHORT, scan);
+			rp = regstack_इतुलाक(RS_BRCPLX_SHORT, scan);
 			if (rp == NULL)
 			    status = RA_FAIL;
 			else
@@ -4368,14 +4368,14 @@ regmatch(
 		// to maxval.  When maxval < minval, try matching at least the
 		// minimal number (since the range is backwards, that's also
 		// maxval!).
-		rst.count = regrepeat(OPERAND(scan), rst.maxval);
+		rst.बिलांग = regrepeat(OPERAND(scan), rst.maxval);
 		if (got_int)
 		{
 		    status = RA_FAIL;
 		    break;
 		}
 		if (rst.minval <= rst.maxval
-			  ? rst.count >= rst.minval : rst.count >= rst.maxval)
+			  ? rst.बिलांग >= rst.minval : rst.बिलांग >= rst.maxval)
 		{
 		    // It could match.  Prepare for trying to match what
 		    // follows.  The code is below.  Parameters are stored in
@@ -4390,7 +4390,7 @@ regmatch(
 		    else
 		    {
 			regstack.ga_len += sizeof(regstar_T);
-			rp = regstack_push(rst.minval <= rst.maxval
+			rp = regstack_इतुलाक(rst.minval <= rst.maxval
 					? RS_STAR_LONG : RS_STAR_SHORT, scan);
 			if (rp == NULL)
 			    status = RA_FAIL;
@@ -4410,7 +4410,7 @@ regmatch(
 	  case NOMATCH:
 	  case MATCH:
 	  case SUBPAT:
-	    rp = regstack_push(RS_NOMATCH, scan);
+	    rp = regstack_इतुलाक(RS_NOMATCH, scan);
 	    if (rp == NULL)
 		status = RA_FAIL;
 	    else
@@ -4435,7 +4435,7 @@ regmatch(
 	    else
 	    {
 		regstack.ga_len += sizeof(regbehind_T);
-		rp = regstack_push(RS_BEHIND1, scan);
+		rp = regstack_इतुलाक(RS_BEHIND1, scan);
 		if (rp == NULL)
 		    status = RA_FAIL;
 		else
@@ -4455,20 +4455,20 @@ regmatch(
 	  case BHPOS:
 	    if (REG_MULTI)
 	    {
-		if (behind_pos.rs_u.pos.col != (colnr_T)(rex.input - rex.line)
+		if (behind_pos.rs_u.pos.col != (colnr_T)(rex.पासोक - rex.लिन्या)
 			|| behind_pos.rs_u.pos.lnum != rex.lnum)
 		    status = RA_NOMATCH;
 	    }
-	    else if (behind_pos.rs_u.ptr != rex.input)
+	    else if (behind_pos.rs_u.ptr != rex.पासोक)
 		status = RA_NOMATCH;
 	    break;
 
 	  case NEWL:
 	    if ((c != NUL || !REG_MULTI || rex.lnum > rex.reg_maxline
-			     || rex.reg_line_lbr)
-					   && (c != '\n' || !rex.reg_line_lbr))
+			     || rex.reg_लिन्या_lbr)
+					   && (c != '\n' || !rex.reg_लिन्या_lbr))
 		status = RA_NOMATCH;
-	    else if (rex.reg_line_lbr)
+	    else if (rex.reg_लिन्या_lbr)
 		ADVANCE_REGINPUT();
 	    else
 		reg_nextline();
@@ -4506,7 +4506,7 @@ regmatch(
 	{
 	  case RS_NOPEN:
 	    // Result is passed on as-is, simply pop the state.
-	    regstack_pop(&scan);
+	    regstack_आलिसिन(&scan);
 	    break;
 
 	  case RS_MOPEN:
@@ -4514,7 +4514,7 @@ regmatch(
 	    if (status == RA_NOMATCH)
 		restore_se(&rp->rs_un.sesave, &rex.reg_startpos[rp->rs_no],
 						  &rex.reg_startp[rp->rs_no]);
-	    regstack_pop(&scan);
+	    regstack_आलिसिन(&scan);
 	    break;
 
 #ifdef FEAT_SYN_HL
@@ -4523,7 +4523,7 @@ regmatch(
 	    if (status == RA_NOMATCH)
 		restore_se(&rp->rs_un.sesave, &reg_startzpos[rp->rs_no],
 						 &reg_startzp[rp->rs_no]);
-	    regstack_pop(&scan);
+	    regstack_आलिसिन(&scan);
 	    break;
 #endif
 
@@ -4532,7 +4532,7 @@ regmatch(
 	    if (status == RA_NOMATCH)
 		restore_se(&rp->rs_un.sesave, &rex.reg_endpos[rp->rs_no],
 						    &rex.reg_endp[rp->rs_no]);
-	    regstack_pop(&scan);
+	    regstack_आलिसिन(&scan);
 	    break;
 
 #ifdef FEAT_SYN_HL
@@ -4541,14 +4541,14 @@ regmatch(
 	    if (status == RA_NOMATCH)
 		restore_se(&rp->rs_un.sesave, &reg_endzpos[rp->rs_no],
 						   &reg_endzp[rp->rs_no]);
-	    regstack_pop(&scan);
+	    regstack_आलिसिन(&scan);
 	    break;
 #endif
 
 	  case RS_BRANCH:
 	    if (status == RA_MATCH)
 		// this branch matched, use it
-		regstack_pop(&scan);
+		regstack_आलिसिन(&scan);
 	    else
 	    {
 		if (status != RA_BREAK)
@@ -4561,7 +4561,7 @@ regmatch(
 		{
 		    // no more branches, didn't find a match
 		    status = RA_NOMATCH;
-		    regstack_pop(&scan);
+		    regstack_आलिसिन(&scan);
 		}
 		else
 		{
@@ -4578,9 +4578,9 @@ regmatch(
 	    if (status == RA_NOMATCH)
 	    {
 		reg_restore(&rp->rs_un.regsave, &backpos);
-		--brace_count[rp->rs_no];	// decrement match count
+		--brace_बिलांग[rp->rs_no];	// decrement match count
 	    }
-	    regstack_pop(&scan);
+	    regstack_आलिसिन(&scan);
 	    break;
 
 	  case RS_BRCPLX_LONG:
@@ -4589,11 +4589,11 @@ regmatch(
 	    {
 		// There was no match, but we did find enough matches.
 		reg_restore(&rp->rs_un.regsave, &backpos);
-		--brace_count[rp->rs_no];
+		--brace_बिलांग[rp->rs_no];
 		// continue with the items after "\{}"
 		status = RA_CONT;
 	    }
-	    regstack_pop(&scan);
+	    regstack_आलिसिन(&scan);
 	    if (status == RA_CONT)
 		scan = regnext(scan);
 	    break;
@@ -4603,7 +4603,7 @@ regmatch(
 	    if (status == RA_NOMATCH)
 		// There was no match, try to match one more item.
 		reg_restore(&rp->rs_un.regsave, &backpos);
-	    regstack_pop(&scan);
+	    regstack_आलिसिन(&scan);
 	    if (status == RA_NOMATCH)
 	    {
 		scan = OPERAND(scan);
@@ -4623,7 +4623,7 @@ regmatch(
 		if (rp->rs_no != SUBPAT)	// zero-width
 		    reg_restore(&rp->rs_un.regsave, &backpos);
 	    }
-	    regstack_pop(&scan);
+	    regstack_आलिसिन(&scan);
 	    if (status == RA_CONT)
 		scan = regnext(scan);
 	    break;
@@ -4631,7 +4631,7 @@ regmatch(
 	  case RS_BEHIND1:
 	    if (status == RA_NOMATCH)
 	    {
-		regstack_pop(&scan);
+		regstack_आलिसिन(&scan);
 		regstack.ga_len -= sizeof(regbehind_T);
 	    }
 	    else
@@ -4678,7 +4678,7 @@ regmatch(
 		    status = RA_NOMATCH;
 		    restore_subexpr(((regbehind_T *)rp) - 1);
 		}
-		regstack_pop(&scan);
+		regstack_आलिसिन(&scan);
 		regstack.ga_len -= sizeof(regbehind_T);
 	    }
 	    else
@@ -4694,7 +4694,7 @@ regmatch(
 		    if (limit > 0
 			    && ((rp->rs_un.regsave.rs_u.pos.lnum
 						    < behind_pos.rs_u.pos.lnum
-				    ? (colnr_T)STRLEN(rex.line)
+				    ? (colnr_T)STRLEN(rex.लिन्या)
 				    : behind_pos.rs_u.pos.col)
 				- rp->rs_un.regsave.rs_u.pos.col >= limit))
 			no = FAIL;
@@ -4710,18 +4710,18 @@ regmatch(
 			{
 			    reg_restore(&rp->rs_un.regsave, &backpos);
 			    rp->rs_un.regsave.rs_u.pos.col =
-						 (colnr_T)STRLEN(rex.line);
+						 (colnr_T)STRLEN(rex.लिन्या);
 			}
 		    }
 		    else
 		    {
 			if (has_mbyte)
 			{
-			    char_u *line =
+			    char_u *लिन्या =
 				  reg_getline(rp->rs_un.regsave.rs_u.pos.lnum);
 
 			    rp->rs_un.regsave.rs_u.pos.col -=
-				(*mb_head_off)(line, line
+				(*mb_head_off)(लिन्या, लिन्या
 				    + rp->rs_un.regsave.rs_u.pos.col - 1) + 1;
 			}
 			else
@@ -4730,11 +4730,11 @@ regmatch(
 		}
 		else
 		{
-		    if (rp->rs_un.regsave.rs_u.ptr == rex.line)
+		    if (rp->rs_un.regsave.rs_u.ptr == rex.लिन्या)
 			no = FAIL;
 		    else
 		    {
-			MB_PTR_BACK(rex.line, rp->rs_un.regsave.rs_u.ptr);
+			MB_PTR_BACK(rex.लिन्या, rp->rs_un.regsave.rs_u.ptr);
 			if (limit > 0 && (long)(behind_pos.rs_u.ptr
 				     - rp->rs_un.regsave.rs_u.ptr) > limit)
 			    no = FAIL;
@@ -4774,7 +4774,7 @@ regmatch(
 			    restore_subexpr(((regbehind_T *)rp) - 1);
 			}
 		    }
-		    regstack_pop(&scan);
+		    regstack_आलिसिन(&scan);
 		    regstack.ga_len -= sizeof(regbehind_T);
 		}
 	    }
@@ -4787,7 +4787,7 @@ regmatch(
 
 		if (status == RA_MATCH)
 		{
-		    regstack_pop(&scan);
+		    regstack_आलिसिन(&scan);
 		    regstack.ga_len -= sizeof(regstar_T);
 		    break;
 		}
@@ -4806,9 +4806,9 @@ regmatch(
 			{
 			    // Trying for longest match, but couldn't or
 			    // didn't match -- back up one char.
-			    if (--rst->count < rst->minval)
+			    if (--rst->बिलांग < rst->minval)
 				break;
-			    if (rex.input == rex.line)
+			    if (rex.पासोक == rex.लिन्या)
 			    {
 				// backup to last char of previous line
 				if (rex.lnum == 0)
@@ -4817,16 +4817,16 @@ regmatch(
 				    break;
 				}
 				--rex.lnum;
-				rex.line = reg_getline(rex.lnum);
+				rex.लिन्या = reg_getline(rex.lnum);
 				// Just in case regrepeat() didn't count
 				// right.
-				if (rex.line == NULL)
+				if (rex.लिन्या == NULL)
 				    break;
-				rex.input = rex.line + reg_getline_len(rex.lnum);
+				rex.पासोक = rex.लिन्या + reg_getline_len(rex.lnum);
 				fast_breakcheck();
 			    }
 			    else
-				MB_PTR_BACK(rex.line, rex.input);
+				MB_PTR_BACK(rex.लिन्या, rex.पासोक);
 			}
 			else
 			{
@@ -4834,10 +4834,10 @@ regmatch(
 			    // Careful: maxval and minval are exchanged!
 			    // Couldn't or didn't match: try advancing one
 			    // char.
-			    if (rst->count == rst->minval
+			    if (rst->बिलांग == rst->minval
 				  || regrepeat(OPERAND(rp->rs_scan), 1L) == 0)
 				break;
-			    ++rst->count;
+			    ++rst->बिलांग;
 			}
 			if (got_int)
 			    break;
@@ -4846,8 +4846,8 @@ regmatch(
 			status = RA_NOMATCH;
 
 		    // If it could match, try it.
-		    if (rst->nextb == NUL || *rex.input == rst->nextb
-					     || *rex.input == rst->nextb_ic)
+		    if (rst->nextb == NUL || *rex.पासोक == rst->nextb
+					     || *rex.पासोक == rst->nextb_ic)
 		    {
 			reg_save(&rp->rs_un.regsave, &backpos);
 			scan = regnext(rp->rs_scan);
@@ -4858,7 +4858,7 @@ regmatch(
 		if (status != RA_CONT)
 		{
 		    // Failed.
-		    regstack_pop(&scan);
+		    regstack_आलिसिन(&scan);
 		    regstack.ga_len -= sizeof(regstar_T);
 		    status = RA_NOMATCH;
 		}
@@ -4915,7 +4915,7 @@ regtry(
     colnr_T		col,
     int			*timed_out)	// flag set on timeout or NULL
 {
-    rex.input = rex.line + col;
+    rex.पासोक = rex.लिन्या + col;
     rex.need_clear_subexpr = TRUE;
 #ifdef FEAT_SYN_HL
     // Clear the external match subpointers if necessary.
@@ -4936,7 +4936,7 @@ regtry(
 	if (rex.reg_endpos[0].lnum < 0)
 	{
 	    rex.reg_endpos[0].lnum = rex.lnum;
-	    rex.reg_endpos[0].col = (int)(rex.input - rex.line);
+	    rex.reg_endpos[0].col = (int)(rex.पासोक - rex.लिन्या);
 	}
 	else
 	    // Use line number of "\ze".
@@ -4945,9 +4945,9 @@ regtry(
     else
     {
 	if (rex.reg_startp[0] == NULL)
-	    rex.reg_startp[0] = rex.line + col;
+	    rex.reg_startp[0] = rex.लिन्या + col;
 	if (rex.reg_endp[0] == NULL)
-	    rex.reg_endp[0] = rex.input;
+	    rex.reg_endp[0] = rex.पासोक;
     }
 #ifdef FEAT_SYN_HL
     // Package any found \z(...\) matches for export. Default is none.
@@ -4995,7 +4995,7 @@ regtry(
  */
     static long
 bt_regexec_both(
-    char_u	*line,
+    char_u	*लिन्या,
     colnr_T	startcol,	// column to start looking for match
     int		*timed_out)	// flag set on timeout or NULL
 {
@@ -5027,7 +5027,7 @@ bt_regexec_both(
     if (REG_MULTI)
     {
 	prog = (bt_regprog_T *)rex.reg_mmatch->regprog;
-	line = reg_getline((linenr_T)0);
+	लिन्या = reg_getline((linenr_T)0);
 	rex.reg_startpos = rex.reg_mmatch->startpos;
 	rex.reg_endpos = rex.reg_mmatch->endpos;
     }
@@ -5039,7 +5039,7 @@ bt_regexec_both(
     }
 
     // Be paranoid...
-    if (prog == NULL || line == NULL)
+    if (prog == NULL || लिन्या == NULL)
     {
 	iemsg(e_null_argument);
 	goto theend;
@@ -5072,7 +5072,7 @@ bt_regexec_both(
 	    c = (*mb_ptr2char)(prog->regmust);
 	else
 	    c = *prog->regmust;
-	s = line + col;
+	s = लिन्या + col;
 
 	// This is used very often, esp. for ":global".  Use three versions of
 	// the loop to avoid overhead of conditions.
@@ -5104,7 +5104,7 @@ bt_regexec_both(
 	    goto theend;
     }
 
-    rex.line = line;
+    rex.लिन्या = लिन्या;
     rex.lnum = 0;
     reg_toolong = FALSE;
 
@@ -5114,9 +5114,9 @@ bt_regexec_both(
 	int	c;
 
 	if (has_mbyte)
-	    c = (*mb_ptr2char)(rex.line + col);
+	    c = (*mb_ptr2char)(rex.लिन्या + col);
 	else
-	    c = rex.line[col];
+	    c = rex.लिन्या[col];
 	if (prog->regstart == NUL
 		|| prog->regstart == c
 		|| (rex.reg_ic
@@ -5137,15 +5137,15 @@ bt_regexec_both(
 		// Skip until the char we know it must start with.
 		// Used often, do some work to avoid call overhead.
 		if (!rex.reg_ic && !has_mbyte)
-		    s = vim_strbyte(rex.line + col, prog->regstart);
+		    s = vim_strbyte(rex.लिन्या + col, prog->regstart);
 		else
-		    s = cstrchr(rex.line + col, prog->regstart);
+		    s = cstrchr(rex.लिन्या + col, prog->regstart);
 		if (s == NULL)
 		{
 		    retval = 0;
 		    break;
 		}
-		col = (int)(s - rex.line);
+		col = (int)(s - rex.लिन्या);
 	    }
 
 	    // Check for maximum column to try.
@@ -5163,12 +5163,12 @@ bt_regexec_both(
 	    if (rex.lnum != 0)
 	    {
 		rex.lnum = 0;
-		rex.line = reg_getline((linenr_T)0);
+		rex.लिन्या = reg_getline((linenr_T)0);
 	    }
-	    if (rex.line[col] == NUL)
+	    if (rex.लिन्या[col] == NUL)
 		break;
 	    if (has_mbyte)
-		col += (*mb_ptr2len)(rex.line + col);
+		col += (*mb_ptr2len)(rex.लिन्या + col);
 	    else
 		++col;
 #ifdef FEAT_RELTIME
@@ -5230,21 +5230,21 @@ theend:
     static int
 bt_regexec_nl(
     regmatch_T	*rmp,
-    char_u	*line,	// string to match against
+    char_u	*लिन्या,	// string to match against
     colnr_T	col,	// column to start looking for match
-    int		line_lbr)
+    int		लिन्या_lbr)
 {
     rex.reg_match = rmp;
     rex.reg_mmatch = NULL;
     rex.reg_maxline = 0;
-    rex.reg_line_lbr = line_lbr;
+    rex.reg_लिन्या_lbr = लिन्या_lbr;
     rex.reg_buf = curbuf;
     rex.reg_win = NULL;
     rex.reg_ic = rmp->rm_ic;
     rex.reg_icombine = FALSE;
     rex.reg_maxcol = 0;
 
-    return bt_regexec_both(line, col, NULL);
+    return bt_regexec_both(लिन्या, col, NULL);
 }
 
 /*
@@ -5272,7 +5272,7 @@ bt_regexec_multi(
  * Compare a number with the operand of RE_LNUM, RE_COL or RE_VCOL.
  */
     static int
-re_num_cmp(long_u val, char_u *scan)
+re_नुमेरो_cmp(long_u val, char_u *scan)
 {
     long_u  n = OPERAND_MIN(scan);
 
@@ -5484,10 +5484,10 @@ regprop(char_u *op)
       case SFNAME + ADD_NL:
 	p = "SFNAME+NL";
 	break;
-      case PRINT:
+      case इलिम्बाग_2:
 	p = "PRINT";
 	break;
-      case PRINT + ADD_NL:
+      case इलिम्बाग_2 + ADD_NL:
 	p = "PRINT+NL";
 	break;
       case SPRINT:

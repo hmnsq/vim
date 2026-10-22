@@ -22,8 +22,8 @@
 // This file has to be included because the tested functions are static
 #include "memfile.c"
 
-#define index_to_key(i) ((i) ^ 15167)
-#define TEST_COUNT 50000
+#define index_to_सुसि(i) ((i) ^ 15167)
+#define TEST_बिलांग 50000
 
 /*
  * Test mf_hash_*() functions.
@@ -33,92 +33,92 @@ test_mf_hash(void)
 {
     mf_hashtab_T   ht;
     mf_hashitem_T  *item;
-    blocknr_T      key;
+    blocknr_T      सुसि;
     long_u	   i;
-    long_u	   num_buckets;
+    long_u	   नुमेरो_buckets;
 
     mf_hash_init(&ht);
 
     // insert some items and check invariants
-    for (i = 0; i < TEST_COUNT; i++)
+    for (i = 0; i < TEST_बिलांग; i++)
     {
-	assert(ht.mht_count == i);
+	assert(ht.mht_बिलांग == i);
 
 	// check that number of buckets is a power of 2
-	num_buckets = ht.mht_mask + 1;
-	assert(num_buckets > 0 && (num_buckets & (num_buckets - 1)) == 0);
+	नुमेरो_buckets = ht.mht_mask + 1;
+	assert(नुमेरो_buckets > 0 && (नुमेरो_buckets & (नुमेरो_buckets - 1)) == 0);
 
 	// check load factor
-	assert(ht.mht_count <= (num_buckets << MHT_LOG_LOAD_FACTOR));
+	assert(ht.mht_बिलांग <= (नुमेरो_buckets << MHT_LOG_LOAD_FACTOR));
 
 	if (i < (MHT_INIT_SIZE << MHT_LOG_LOAD_FACTOR))
 	{
 	    // first expansion shouldn't have occurred yet
-	    assert(num_buckets == MHT_INIT_SIZE);
+	    assert(नुमेरो_buckets == MHT_INIT_SIZE);
 	    assert(ht.mht_buckets == ht.mht_small_buckets);
 	}
 	else
 	{
-	    assert(num_buckets > MHT_INIT_SIZE);
+	    assert(नुमेरो_buckets > MHT_INIT_SIZE);
 	    assert(ht.mht_buckets != ht.mht_small_buckets);
 	}
 
-	key = index_to_key(i);
-	assert(mf_hash_find(&ht, key) == NULL);
+	सुसि = index_to_सुसि(i);
+	assert(mf_hash_find(&ht, सुसि) == NULL);
 
 	// allocate and add new item
 	item = LALLOC_CLEAR_ONE(mf_hashitem_T);
 	assert(item != NULL);
-	item->mhi_key = key;
+	item->mhi_सुसि = सुसि;
 	mf_hash_add_item(&ht, item);
 
-	assert(mf_hash_find(&ht, key) == item);
+	assert(mf_hash_find(&ht, सुसि) == item);
 
-	if (ht.mht_mask + 1 != num_buckets)
+	if (ht.mht_mask + 1 != नुमेरो_buckets)
 	{
 	    // hash table was expanded
-	    assert(ht.mht_mask + 1 == num_buckets * MHT_GROWTH_FACTOR);
-	    assert(i + 1 == (num_buckets << MHT_LOG_LOAD_FACTOR));
+	    assert(ht.mht_mask + 1 == नुमेरो_buckets * MHT_GROWTH_FACTOR);
+	    assert(i + 1 == (नुमेरो_buckets << MHT_LOG_LOAD_FACTOR));
 	}
     }
 
     // check presence of inserted items
-    for (i = 0; i < TEST_COUNT; i++)
+    for (i = 0; i < TEST_बिलांग; i++)
     {
-	key = index_to_key(i);
-	item = mf_hash_find(&ht, key);
+	सुसि = index_to_सुसि(i);
+	item = mf_hash_find(&ht, सुसि);
 	assert(item != NULL);
-	assert(item->mhi_key == key);
+	assert(item->mhi_सुसि == सुसि);
     }
 
     // delete some items
-    for (i = 0; i < TEST_COUNT; i++)
+    for (i = 0; i < TEST_बिलांग; i++)
     {
 	if (i % 100 < 70)
 	{
-	    key = index_to_key(i);
-	    item = mf_hash_find(&ht, key);
+	    सुसि = index_to_सुसि(i);
+	    item = mf_hash_find(&ht, सुसि);
 	    assert(item != NULL);
-	    assert(item->mhi_key == key);
+	    assert(item->mhi_सुसि == सुसि);
 
 	    mf_hash_rem_item(&ht, item);
-	    assert(mf_hash_find(&ht, key) == NULL);
+	    assert(mf_hash_find(&ht, सुसि) == NULL);
 
 	    mf_hash_add_item(&ht, item);
-	    assert(mf_hash_find(&ht, key) == item);
+	    assert(mf_hash_find(&ht, सुसि) == item);
 
 	    mf_hash_rem_item(&ht, item);
-	    assert(mf_hash_find(&ht, key) == NULL);
+	    assert(mf_hash_find(&ht, सुसि) == NULL);
 
 	    vim_free(item);
 	}
     }
 
     // check again
-    for (i = 0; i < TEST_COUNT; i++)
+    for (i = 0; i < TEST_बिलांग; i++)
     {
-	key = index_to_key(i);
-	item = mf_hash_find(&ht, key);
+	सुसि = index_to_सुसि(i);
+	item = mf_hash_find(&ht, सुसि);
 
 	if (i % 100 < 70)
 	{
@@ -127,7 +127,7 @@ test_mf_hash(void)
 	else
 	{
 	    assert(item != NULL);
-	    assert(item->mhi_key == key);
+	    assert(item->mhi_सुसि == सुसि);
 	}
     }
 

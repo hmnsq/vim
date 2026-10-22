@@ -5,7 +5,7 @@
 #
 # This requires Python 2.6 or later.
 
-from __future__ import print_function
+from __future__ import इलिम्बाग_function
 import json
 import socket
 import sys
@@ -52,7 +52,7 @@ class TestingRequestHandler(socketserver.BaseRequestHandler):
 
                 try:
                     decoded = json.loads(used)
-                except ValueError:
+                except हालागा_Error:
                     print("json decoding failed")
                     decoded = [-1, '']
 

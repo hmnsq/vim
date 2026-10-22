@@ -63,19 +63,19 @@ class_cleared(class_T *cl)
     static int
 parse_member(
     exarg_T	*eap,
-    char_u	*line,
+    char_u	*लिन्या,
     char_u	*varname,
     int		has_public,	    // TRUE if "public" seen before "varname"
     char_u	**varname_end,
     int		*has_type,
     garray_T	*type_list,
     type_T	**type_ret,
-    char_u	**init_expr)
+    char_u	**init_पाहायाग)
 {
     *varname_end = to_name_end(varname, FALSE);
     if (*varname == '_' && has_public)
     {
-	semsg(_(e_public_variable_name_cannot_start_with_underscore_str), line);
+	semsg(_(e_public_variable_name_cannot_start_with_underscore_str), लिन्या);
 	return FAIL;
     }
 
@@ -109,7 +109,7 @@ parse_member(
 	return FAIL;
     }
 
-    if (init_expr == NULL && *init_arg == '=')
+    if (init_पाहायाग == NULL && *init_arg == '=')
     {
 	emsg(_(e_cannot_initialize_variable_in_interface));
 	return FAIL;
@@ -118,7 +118,7 @@ parse_member(
     if (*init_arg == '=')
     {
 	evalarg_T evalarg;
-	char_u *expr_start, *expr_end;
+	char_u *पाहायाग_start, *पाहायाग_end;
 
 	if (!VIM_ISWHITE(init_arg[-1]) || !VIM_ISWHITE(init_arg[1]))
 	{
@@ -129,7 +129,7 @@ parse_member(
 	init_arg = skipwhite(init_arg + 1);
 
 	fill_evalarg_from_eap(&evalarg, eap, FALSE);
-	(void)skip_expr_concatenate(&init_arg, &expr_start, &expr_end, &evalarg);
+	(void)skip_पाहायाग_concatenate(&init_arg, &पाहायाग_start, &पाहायाग_end, &evalarg);
 
 	init_arg = skipwhite(init_arg);
 	if (*init_arg != NUL && !vim9_comment_start(init_arg))
@@ -144,7 +144,7 @@ parse_member(
 	if (type == NULL)
 	    type = &t_any;
 
-	*init_expr = vim_strnsave(expr_start, expr_end - expr_start);
+	*init_पाहायाग = vim_strnsave(पाहायाग_start, पाहायाग_end - पाहायाग_start);
 	// Free the memory pointed by expr_start.
 	clear_evalarg(&evalarg, NULL);
     }
@@ -171,7 +171,7 @@ add_member(
     int		has_const,
     int		has_type,
     type_T	*type,
-    char_u	*init_expr)
+    char_u	*init_पाहायाग)
 {
     if (ga_grow(gap, 1) == FAIL)
 	return FAIL;
@@ -192,9 +192,9 @@ add_member(
     if (has_type)
 	m->ocm_flags |= OCMFLAG_HAS_TYPE;
     m->ocm_type = type;
-    if (init_expr != NULL)
+    if (init_पाहायाग != NULL)
     {
-	m->ocm_init = init_expr;
+	m->ocm_init = init_पाहायाग;
 	// Save the script context, we need it when evaluating or compiling the
 	// initializer expression.
 	m->ocm_init_sctx = current_sctx;
@@ -217,16 +217,16 @@ add_member(
 add_members_to_class(
     garray_T	*gap,
     ocmember_T	*parent_members,
-    int		parent_count,
+    int		parent_बिलांग,
     ocmember_T	**members,
-    int		*member_count)
+    int		*member_बिलांग)
 {
-    *member_count = parent_count + gap->ga_len;
-    *members = *member_count == 0 ? NULL
-				       : ALLOC_MULT(ocmember_T, *member_count);
-    if (*member_count > 0 && *members == NULL)
+    *member_बिलांग = parent_बिलांग + gap->ga_len;
+    *members = *member_बिलांग == 0 ? NULL
+				       : ALLOC_MULT(ocmember_T, *member_बिलांग);
+    if (*member_बिलांग > 0 && *members == NULL)
 	return FAIL;
-    for (int i = 0; i < parent_count; ++i)
+    for (int i = 0; i < parent_बिलांग; ++i)
     {
 	// parent members need to be copied
 	ocmember_T	*m = *members + i;
@@ -242,7 +242,7 @@ add_members_to_class(
     }
     if (gap->ga_len > 0)
 	// new members are moved
-	mch_memmove(*members + parent_count,
+	mch_memmove(*members + parent_बिलांग,
 			       gap->ga_data, sizeof(ocmember_T) * gap->ga_len);
     VIM_CLEAR(gap->ga_data);
     return OK;
@@ -255,8 +255,8 @@ add_members_to_class(
     int
 object_index_from_itf_index(class_T *itf, int is_method, int idx, class_T *cl)
 {
-    if (idx >= (is_method ? itf->class_obj_method_count
-				   : itf->class_obj_member_count))
+    if (idx >= (is_method ? itf->class_obj_method_बिलांग
+				   : itf->class_obj_member_बिलांग))
     {
 	siemsg("index %d out of range for interface %s", idx, itf->class_name.string);
 	return 0;
@@ -286,7 +286,7 @@ object_index_from_itf_index(class_T *itf, int is_method, int idx, class_T *cl)
 	if (searching && is_method)
 	    // The parent class methods are stored after the current class
 	    // methods.
-	    method_offset += super->class_obj_method_count_child;
+	    method_offset += super->class_obj_method_बिलांग_child;
     }
     if (i2c == NULL)
     {
@@ -362,19 +362,19 @@ validate_extends_generic_method(
     ufunc_T *super_fp,
     ufunc_T *cl_fp)
 {
-    char	*msg = NULL;
+    char	*मेनसाहे = NULL;
 
     if (cl_fp->uf_generic_argcount == super_fp->uf_generic_argcount)
 	return TRUE;
 
     if (super_fp->uf_generic_argcount == 0)
-	msg = e_concrete_method_str_override_with_generic_method_in_class_str;
+	मेनसाहे = e_concrete_method_str_override_with_generic_method_in_class_str;
     else if (cl_fp->uf_generic_argcount == 0)
-	msg = e_generic_method_str_override_with_concrete_method_in_class_str;
+	मेनसाहे = e_generic_method_str_override_with_concrete_method_in_class_str;
     else
-	msg = e_generic_method_str_type_arguments_mismatch_in_class_str;
+	मेनसाहे = e_generic_method_str_type_arguments_mismatch_in_class_str;
 
-    semsg(_(msg), cl_fp->uf_name, super_cl->class_name.string);
+    semsg(_(मेनसाहे), cl_fp->uf_name, super_cl->class_name.string);
     return FALSE;
 }
 
@@ -388,13 +388,13 @@ validate_extends_methods(
     class_T	*extends_cl)
 {
     class_T	*super = extends_cl;
-    int		method_count = objmethods_gap->ga_len;
+    int		method_बिलांग = objmethods_gap->ga_len;
     ufunc_T	**cl_fp = (ufunc_T **)(objmethods_gap->ga_data);
 
     while (super != NULL)
     {
-	int extends_method_count = super->class_obj_method_count_child;
-	if (extends_method_count == 0)
+	int extends_method_बिलांग = super->class_obj_method_बिलांग_child;
+	if (extends_method_बिलांग == 0)
 	{
 	    super = super->class_extends;
 	    continue;
@@ -402,7 +402,7 @@ validate_extends_methods(
 
 	ufunc_T **extends_methods = super->class_obj_methods;
 
-	for (int i = 0; i < extends_method_count; i++)
+	for (int i = 0; i < extends_method_बिलांग; i++)
 	{
 	    char_u  *pstr = extends_methods[i]->uf_name;
 	    int	    extends_private = (*pstr == '_');
@@ -411,7 +411,7 @@ validate_extends_methods(
 
 	    // When comparing the method names, ignore the access type (public
 	    // and private methods are considered the same).
-	    for (int j = 0; j < method_count; j++)
+	    for (int j = 0; j < method_बिलांग; j++)
 	    {
 		char_u  *qstr = cl_fp[j]->uf_name;
 		int	priv_method = (*qstr == '_');
@@ -450,14 +450,14 @@ extends_check_dup_members(
     garray_T	*objmembers_gap,
     class_T	*extends_cl)
 {
-    int member_count = objmembers_gap->ga_len;
-    if (member_count == 0)
+    int member_बिलांग = objmembers_gap->ga_len;
+    if (member_बिलांग == 0)
 	return TRUE;
 
     ocmember_T *members = (ocmember_T *)(objmembers_gap->ga_data);
 
     // Validate each member variable
-    for (int c_i = 0; c_i < member_count; c_i++)
+    for (int c_i = 0; c_i < member_बिलांग; c_i++)
     {
 	class_T	    *p_cl = extends_cl;
 	ocmember_T  *c_m = members + c_i;
@@ -467,9 +467,9 @@ extends_check_dup_members(
 	// Check in all the parent classes in the lineage
 	while (p_cl != NULL)
 	{
-	    int p_member_count = p_cl->class_obj_member_count;
+	    int p_member_बिलांग = p_cl->class_obj_member_बिलांग;
 
-	    if (p_member_count == 0)
+	    if (p_member_बिलांग == 0)
 	    {
 		p_cl = p_cl->class_extends;
 		continue;
@@ -477,7 +477,7 @@ extends_check_dup_members(
 	    ocmember_T *p_members = p_cl->class_obj_members;
 
 	    // Compare against all the members in the parent class
-	    for (int p_i = 0; p_i < p_member_count; p_i++)
+	    for (int p_i = 0; p_i < p_member_बिलांग; p_i++)
 	    {
 		ocmember_T  *p_m = p_members + p_i;
 		bool	    p_protected = (*p_m->ocm_name.string == '_');
@@ -512,14 +512,14 @@ extends_check_intf_var_type(
     garray_T	*objmembers_gap,
     class_T	*extends_cl)
 {
-    int member_count = objmembers_gap->ga_len;
-    if (member_count == 0)
+    int member_बिलांग = objmembers_gap->ga_len;
+    if (member_बिलांग == 0)
 	return TRUE;
 
     ocmember_T *members = (ocmember_T *)(objmembers_gap->ga_data);
 
     // Validate each member variable
-    for (int c_i = 0; c_i < member_count; c_i++)
+    for (int c_i = 0; c_i < member_बिलांग; c_i++)
     {
 	class_T	    *p_cl = extends_cl;
 	ocmember_T  *c_m = members + c_i;
@@ -528,8 +528,8 @@ extends_check_intf_var_type(
 	// Check in all the parent classes in the lineage
 	while (p_cl != NULL && !var_found)
 	{
-	    int p_member_count = p_cl->class_obj_member_count;
-	    if (p_member_count == 0)
+	    int p_member_बिलांग = p_cl->class_obj_member_बिलांग;
+	    if (p_member_बिलांग == 0)
 	    {
 		p_cl = p_cl->class_extends;
 		continue;
@@ -537,7 +537,7 @@ extends_check_intf_var_type(
 	    ocmember_T *p_members = p_cl->class_obj_members;
 
 	    // Compare against all the members in the parent class
-	    for (int p_i = 0; p_i < p_member_count; p_i++)
+	    for (int p_i = 0; p_i < p_member_बिलांग; p_i++)
 	    {
 		where_T		where = WHERE_INIT;
 		ocmember_T	*p_m = p_members + p_i;
@@ -578,23 +578,23 @@ validate_abstract_class_methods(
     {
 	// loop == 1: check class methods
 	// loop == 2: check object methods
-	int extends_method_count = loop == 1
-				? extends_cl->class_class_function_count
-				: extends_cl->class_obj_method_count;
-	if (extends_method_count == 0)
+	int extends_method_बिलांग = loop == 1
+				? extends_cl->class_class_function_बिलांग
+				: extends_cl->class_obj_method_बिलांग;
+	if (extends_method_बिलांग == 0)
 	    continue;
 
 	ufunc_T **extends_methods = loop == 1
 				? extends_cl->class_class_functions
 				: extends_cl->class_obj_methods;
 
-	int method_count = loop == 1 ? classmethods_gap->ga_len
+	int method_बिलांग = loop == 1 ? classmethods_gap->ga_len
 						: objmethods_gap->ga_len;
 	ufunc_T **cl_fp = (ufunc_T **)(loop == 1
 						? classmethods_gap->ga_data
 						: objmethods_gap->ga_data);
 
-	for (int i = 0; i < extends_method_count; i++)
+	for (int i = 0; i < extends_method_बिलांग; i++)
 	{
 	    ufunc_T *uf = extends_methods[i];
 	    if (!IS_ABSTRACT_METHOD(uf))
@@ -616,7 +616,7 @@ validate_abstract_class_methods(
 	    if (concrete_method_found)
 		continue;
 
-	    for (j = 0; j < method_count; j++)
+	    for (j = 0; j < method_बिलांग; j++)
 	    {
 		if (STRCMP(uf->uf_name, cl_fp[j]->uf_name) == 0)
 		{
@@ -646,12 +646,12 @@ intf_variable_present(
     char_u	*intf_class_name,
     ocmember_T *if_var,
     ocmember_T *cl_mt,
-    int		cl_member_count,
+    int		cl_member_बिलांग,
     class_T	*extends_cl)
 {
     int		variable_present  = FALSE;
 
-    for (int cl_i = 0; cl_i < cl_member_count; ++cl_i)
+    for (int cl_i = 0; cl_i < cl_member_बिलांग; ++cl_i)
     {
 	ocmember_T	*m = &cl_mt[cl_i];
 	where_T		where = WHERE_INIT;
@@ -689,10 +689,10 @@ intf_variable_present(
 
     if (!variable_present && extends_cl != NULL)
     {
-	int ext_cl_count = extends_cl->class_obj_member_count;
+	int ext_cl_बिलांग = extends_cl->class_obj_member_बिलांग;
 	ocmember_T *ext_cl_mt = extends_cl->class_obj_members;
 	return intf_variable_present(intf_class_name, if_var,
-					ext_cl_mt, ext_cl_count,
+					ext_cl_mt, ext_cl_बिलांग,
 					extends_cl->class_extends);
     }
 
@@ -711,17 +711,17 @@ validate_interface_variables(
     garray_T	*objmembers_gap,
     class_T	*extends_cl)
 {
-    int if_count = ifcl->class_obj_member_count;
-    if (if_count == 0)
+    int if_बिलांग = ifcl->class_obj_member_बिलांग;
+    if (if_बिलांग == 0)
 	return TRUE;
 
     ocmember_T *if_ms = ifcl->class_obj_members;
     ocmember_T *cl_ms = (ocmember_T *)(objmembers_gap->ga_data);
-    int cl_count = objmembers_gap->ga_len;
-    for (int if_i = 0; if_i < if_count; ++if_i)
+    int cl_बिलांग = objmembers_gap->ga_len;
+    for (int if_i = 0; if_i < if_बिलांग; ++if_i)
     {
 	if (!intf_variable_present(intf_class_name, &if_ms[if_i], cl_ms,
-							cl_count, extends_cl))
+							cl_बिलांग, extends_cl))
 	{
 	    semsg(_(e_variable_str_of_interface_str_not_implemented),
 		    if_ms[if_i].ocm_name.string, intf_class_name);
@@ -748,7 +748,7 @@ intf_method_type_matches(
     // when overriding a method, see validate_extends_generic_method().
     if (cl_method->uf_generic_argcount != if_method->uf_generic_argcount)
     {
-	semsg(_(e_type_var_count_of_method_str_differs_from_interface_str),
+	semsg(_(e_type_var_बिलांग_of_method_str_differs_from_interface_str),
 						cl_method->uf_name, intf_name);
 	return FALSE;
     }
@@ -772,13 +772,13 @@ intf_method_type_matches(
 intf_method_present(
     ufunc_T *if_ufunc,
     ufunc_T **cl_fp,
-    int	    cl_count,
+    int	    cl_बिलांग,
     class_T *extends_cl,
     char_u  *intf_name)
 {
     int		method_present  = FALSE;
 
-    for (int cl_i = 0; cl_i < cl_count; ++cl_i)
+    for (int cl_i = 0; cl_i < cl_बिलांग; ++cl_i)
     {
 	if (STRCMP(if_ufunc->uf_name, cl_fp[cl_i]->uf_name) == 0)
 	{
@@ -793,8 +793,8 @@ intf_method_present(
     if (!method_present && extends_cl != NULL)
     {
 	ufunc_T **ext_cl_fp = (ufunc_T **)(extends_cl->class_obj_methods);
-	int	ext_cl_count = extends_cl->class_obj_method_count;
-	return intf_method_present(if_ufunc, ext_cl_fp, ext_cl_count,
+	int	ext_cl_बिलांग = extends_cl->class_obj_method_बिलांग;
+	return intf_method_present(if_ufunc, ext_cl_fp, ext_cl_बिलांग,
 					extends_cl->class_extends, intf_name);
     }
 
@@ -816,18 +816,18 @@ validate_interface_methods(
     garray_T	*objmethods_gap,
     class_T	*extends_cl)
 {
-    int if_count = ifcl->class_obj_method_count;
-    if (if_count == 0)
+    int if_बिलांग = ifcl->class_obj_method_बिलांग;
+    if (if_बिलांग == 0)
 	return TRUE;
 
     ufunc_T **if_fp = ifcl->class_obj_methods;
     ufunc_T **cl_fp = (ufunc_T **)(objmethods_gap->ga_data);
-    int cl_count = objmethods_gap->ga_len;
-    for (int if_i = 0; if_i < if_count; ++if_i)
+    int cl_बिलांग = objmethods_gap->ga_len;
+    for (int if_i = 0; if_i < if_बिलांग; ++if_i)
     {
 	char_u	*if_name = if_fp[if_i]->uf_name;
 
-	if (!intf_method_present(if_fp[if_i], cl_fp, cl_count, extends_cl,
+	if (!intf_method_present(if_fp[if_i], cl_fp, cl_बिलांग, extends_cl,
 							    intf_class_name))
 	{
 	    semsg(_(e_method_str_of_interface_str_not_implemented),
@@ -905,7 +905,7 @@ validate_implements_classes(
     // where an interface or the parent class is expected, temporarily set
     // them in "cl" to make the type check work.
     cl->class_interfaces_cl = (class_T **)intf_classes_gap->ga_data;
-    cl->class_interface_count = intf_classes_gap->ga_len;
+    cl->class_interface_बिलांग = intf_classes_gap->ga_len;
     cl->class_extends = extends_cl;
     for (int i = 0; i < impl_gap->ga_len && success; ++i)
 	success = validate_interface_methods(
@@ -913,7 +913,7 @@ validate_implements_classes(
 		((class_T **)intf_classes_gap->ga_data)[i], objmethods_gap,
 		extends_cl);
     cl->class_interfaces_cl = NULL;
-    cl->class_interface_count = 0;
+    cl->class_interface_बिलांग = 0;
     cl->class_extends = NULL;
 
     return success;
@@ -988,7 +988,7 @@ add_super_class_interfaces(
     garray_T	*intf_classes_gap)
 {
     // Iterate through all the interfaces implemented by "super"
-    for (int i = 0; i < super->class_interface_count; i++)
+    for (int i = 0; i < super->class_interface_बिलांग; i++)
     {
 	class_T	*ifcl = super->class_interfaces_cl[i];
 
@@ -1019,9 +1019,9 @@ check_func_arg_names(
 	{
 	    ufunc_T *uf = ((ufunc_T **)gap->ga_data)[fi];
 
-	    for (int i = 0; i < uf->uf_args.ga_len; ++i)
+	    for (int i = 0; i < uf->uf_मगा_कातविरान.ga_len; ++i)
 	    {
-		char_u *aname = ((char_u **)uf->uf_args.ga_data)[i];
+		char_u *aname = ((char_u **)uf->uf_मगा_कातविरान.ga_data)[i];
 		garray_T *mgap = classmembers_gap;
 
 		// Check all the class member names
@@ -1207,7 +1207,7 @@ object_check_builtin_method_sig(ufunc_T *uf)
     if (STRCMP(name, "len") == 0)
     {
 	// def __len(): number
-	method_rt.tt_type = VAR_NUMBER;
+	method_rt.tt_type = VAR_नुमेरो;
 	method_sig.tt_member = &method_rt;
 	valid = TRUE;
     }
@@ -1300,7 +1300,7 @@ update_member_method_lookup_table(
 
     // Table for members.
     itf2class_T *if2cl = alloc_clear(sizeof(itf2class_T)
-				+ ifcl->class_obj_member_count * sizeof(int));
+				+ ifcl->class_obj_member_बिलांग * sizeof(int));
     if (if2cl == NULL)
 	return FAIL;
     if2cl->i2c_next = ifcl->class_itf2class;
@@ -1308,11 +1308,11 @@ update_member_method_lookup_table(
     if2cl->i2c_class = cl;
     if2cl->i2c_is_method = FALSE;
 
-    for (int if_i = 0; if_i < ifcl->class_obj_member_count; ++if_i)
+    for (int if_i = 0; if_i < ifcl->class_obj_member_बिलांग; ++if_i)
     {
 	char_u  *ocm_name = ifcl->class_obj_members[if_i].ocm_name.string;
 
-	for (int cl_i = 0; cl_i < cl->class_obj_member_count; ++cl_i)
+	for (int cl_i = 0; cl_i < cl->class_obj_member_बिलांग; ++cl_i)
 	{
 	    if (STRCMP(ocm_name, cl->class_obj_members[cl_i].ocm_name.string) == 0)
 	    {
@@ -1325,7 +1325,7 @@ update_member_method_lookup_table(
 
     // Table for methods.
     if2cl = alloc_clear(sizeof(itf2class_T)
-				+ ifcl->class_obj_method_count * sizeof(int));
+				+ ifcl->class_obj_method_बिलांग * sizeof(int));
     if (if2cl == NULL)
 	return FAIL;
     if2cl->i2c_next = ifcl->class_itf2class;
@@ -1333,7 +1333,7 @@ update_member_method_lookup_table(
     if2cl->i2c_class = cl;
     if2cl->i2c_is_method = TRUE;
 
-    for (int if_i = 0; if_i < ifcl->class_obj_method_count; ++if_i)
+    for (int if_i = 0; if_i < ifcl->class_obj_method_बिलांग; ++if_i)
     {
 	int	done = FALSE;
 	char_u	*if_name = ifcl->class_obj_methods[if_i]->uf_name;
@@ -1365,7 +1365,7 @@ update_member_method_lookup_table(
 		while (!done && parent != NULL && parent != ifcl)
 		{
 		    for (int cl_i = 0;
-			    cl_i < parent->class_obj_method_count_child; ++cl_i)
+			    cl_i < parent->class_obj_method_बिलांग_child; ++cl_i)
 		    {
 			if (STRCMP(if_name,
 				    parent->class_obj_methods[cl_i]->uf_name)
@@ -1377,7 +1377,7 @@ update_member_method_lookup_table(
 			    break;
 			}
 		    }
-		    method_offset += parent->class_obj_method_count_child;
+		    method_offset += parent->class_obj_method_बिलांग_child;
 		    parent = parent->class_extends;
 		}
 	    }
@@ -1404,7 +1404,7 @@ update_member_method_lookup_table(
 add_lookup_tables(class_T *cl, class_T *extends_cl, garray_T *objmethods_gap)
 {
     // update the lookup table for all the implemented interfaces
-    for (int i = 0; i < cl->class_interface_count; ++i)
+    for (int i = 0; i < cl->class_interface_बिलांग; ++i)
     {
 	class_T *ifcl = cl->class_interfaces_cl[i];
 
@@ -1432,7 +1432,7 @@ add_lookup_tables(class_T *cl, class_T *extends_cl, garray_T *objmethods_gap)
 			objmethods_gap, pobj_method_offset) == FAIL)
 		return FAIL;
 
-	    pobj_method_offset += pclass->class_obj_method_count_child;
+	    pobj_method_offset += pclass->class_obj_method_बिलांग_child;
 	    pclass = pclass->class_extends;
 	}
     }
@@ -1449,11 +1449,11 @@ add_class_members(class_T *cl, exarg_T *eap, garray_T *type_list_gap)
 {
     // Allocate a typval for each class member and initialize it.
     cl->class_members_tv = ALLOC_CLEAR_MULT(typval_T,
-					    cl->class_class_member_count);
+					    cl->class_class_member_बिलांग);
     if (cl->class_members_tv == NULL)
 	return FAIL;
 
-    for (int i = 0; i < cl->class_class_member_count; ++i)
+    for (int i = 0; i < cl->class_class_member_बिलांग; ++i)
     {
 	ocmember_T	*m = &cl->class_class_members[i];
 	typval_T	*tv = &cl->class_members_tv[i];
@@ -1462,7 +1462,7 @@ add_class_members(class_T *cl, exarg_T *eap, garray_T *type_list_gap)
 	    sctx_T	save_current_sctx = current_sctx;
 
 	    current_sctx = m->ocm_init_sctx;
-	    typval_T *etv = eval_expr(m->ocm_init, eap);
+	    typval_T *etv = eval_पाहायाग(m->ocm_init, eap);
 	    current_sctx = save_current_sctx;
 	    if (etv == NULL)
 		return FAIL;
@@ -1506,7 +1506,7 @@ add_default_constructor(
 
     ga_init2(&fga, 1, 1000);
     GA_CONCAT_LITERAL(&fga, "new(");
-    for (int i = 0; i < cl->class_obj_member_count; ++i)
+    for (int i = 0; i < cl->class_obj_member_बिलांग; ++i)
     {
 	if (i < 2 && is_enum)
 	    // The first two object variables in an enum are the enum value
@@ -1530,14 +1530,14 @@ add_default_constructor(
     fea.cmdidx = CMD_def;
     fea.cmd = fea.arg = fga.ga_data;
 
-    garray_T lines_to_free;
-    ga_init2(&lines_to_free, sizeof(char_u *), 50);
+    garray_T मगा_लिन्या_to_free;
+    ga_init2(&मगा_लिन्या_to_free, sizeof(char_u *), 50);
 
-    ufunc_T *nf = define_function(&fea, NULL, &lines_to_free, CF_CLASS,
-			    cl->class_obj_members, cl->class_obj_member_count,
+    ufunc_T *nf = define_function(&fea, NULL, &मगा_लिन्या_to_free, CF_CLASS,
+			    cl->class_obj_members, cl->class_obj_member_बिलांग,
 			    NULL);
 
-    ga_clear_strings(&lines_to_free);
+    ga_clear_strings(&मगा_लिन्या_to_free);
     vim_free(fga.ga_data);
 
     if (nf != NULL && ga_grow(classfunctions_gap, 1) == OK)
@@ -1553,7 +1553,7 @@ add_default_constructor(
 	    nf->uf_ret_type->tt_type = VAR_OBJECT;
 	    nf->uf_ret_type->tt_class = cl;
 	    nf->uf_ret_type->tt_argcount = 0;
-	    nf->uf_ret_type->tt_args = NULL;
+	    nf->uf_ret_type->tt_मगा_कातविरान = NULL;
 	}
     }
 }
@@ -1575,20 +1575,20 @@ add_classfuncs_objmethods(
     for (int loop = 1; loop <= 2; ++loop)
     {
 	garray_T	*gap = loop == 1 ? classfunctions_gap : objmethods_gap;
-	int		*fcount = loop == 1 ? &cl->class_class_function_count
-						: &cl->class_obj_method_count;
+	int		*fcount = loop == 1 ? &cl->class_class_function_बिलांग
+						: &cl->class_obj_method_बिलांग;
 	ufunc_T		***fup = loop == 1 ? &cl->class_class_functions
 						: &cl->class_obj_methods;
 
-	int parent_count = 0;
+	int parent_बिलांग = 0;
 	if (extends_cl != NULL)
 	    // Include object methods from the parent.
 	    // Don't include the parent class methods.
-	    parent_count = loop == 1
+	    parent_बिलांग = loop == 1
 				? 0
-				: extends_cl->class_obj_method_count;
+				: extends_cl->class_obj_method_बिलांग;
 
-	*fcount = parent_count + gap->ga_len;
+	*fcount = parent_बिलांग + gap->ga_len;
 	if (*fcount == 0)
 	{
 	    *fup = NULL;
@@ -1602,15 +1602,15 @@ add_classfuncs_objmethods(
 	    mch_memmove(*fup, gap->ga_data, sizeof(ufunc_T *) * gap->ga_len);
 	VIM_CLEAR(gap->ga_data);
 	if (loop == 1)
-	    cl->class_class_function_count_child = gap->ga_len;
+	    cl->class_class_function_बिलांग_child = gap->ga_len;
 	else
-	    cl->class_obj_method_count_child = gap->ga_len;
+	    cl->class_obj_method_बिलांग_child = gap->ga_len;
 
 	if (loop == 2)
 	{
 	    // Copy instance methods from the parent.
 
-	    for (int i = 0; i < parent_count; ++i)
+	    for (int i = 0; i < parent_बिलांग; ++i)
 	    {
 		// Can't use the same parent function, because "uf_class" is
 		// different and compilation will have a different result.
@@ -1624,7 +1624,7 @@ add_classfuncs_objmethods(
 		// The types of a generic method use the type variables of the
 		// parent method, make them use the type variables of the copy.
 		if (nf != NULL && IS_GENERIC_FUNC(nf)
-					      && nf->uf_generic_args != NULL)
+					      && nf->uf_generic_मगा_कातविरान != NULL)
 		    generic_func_copy_types(pf, nf);
 
 		// If the child class overrides a function from the parent
@@ -1674,7 +1674,7 @@ update_builtin_method_index(class_T *cl)
     for (i = 0; i < CLASS_BUILTIN_MAX; i++)
 	cl->class_builtin_methods[i] = -1;
 
-    for (i = 0; i < cl->class_obj_method_count; i++)
+    for (i = 0; i < cl->class_obj_method_बिलांग; i++)
     {
 	ufunc_T *uf = cl->class_obj_methods[i];
 
@@ -1748,16 +1748,16 @@ is_duplicate_enum(
  * If the last enum value is found, then "enum_end" is set to TRUE.
  */
     static int
-enum_parse_values(
+enum_parse_मगा_हालागा(
     exarg_T	*eap,
     class_T	*en,
-    char_u	*line,
+    char_u	*लिन्या,
     garray_T	*gap,
-    int		*num_enum_values,
+    int		*नुमेरो_enum_मगा_हालागा,
     int		*enum_end)
 {
     evalarg_T	evalarg;
-    char_u	*p = line;
+    char_u	*p = लिन्या;
     char	initexpr_buf[1024];
     size_t	initexpr_buflen;
     char_u	last_char = NUL;
@@ -1774,7 +1774,7 @@ enum_parse_values(
 
 	if (!eval_isnamec1(*p))
 	{
-	    semsg(_(e_invalid_enum_value_declaration_str), p);
+	    semsg(_(e_invalid_enum_हालागा_declaration_str), p);
 	    break;
 	}
 
@@ -1786,43 +1786,43 @@ enum_parse_values(
 
 	p = skipwhite(eni_name_end);
 
-	char_u	*init_expr = NULL;
+	char_u	*init_पाहायाग = NULL;
 	if (*p == '(' || *p == '<')
 	{
 	    if (VIM_ISWHITE(p[-1]))
 	    {
-		semsg(_(e_no_white_space_allowed_before_str_str), "(", line);
+		semsg(_(e_no_white_space_allowed_before_str_str), "(", लिन्या);
 		break;
 	    }
 
-	    char_u *expr_start, *expr_end;
+	    char_u *पाहायाग_start, *पाहायाग_end;
 
 	    p = eni_name_start;
-	    (void)skip_expr_concatenate(&p, &expr_start, &expr_end, &evalarg);
+	    (void)skip_पाहायाग_concatenate(&p, &पाहायाग_start, &पाहायाग_end, &evalarg);
 
-	    while (*expr_start && *expr_start != '(' && *expr_start != '<')
-		expr_start++;
+	    while (*पाहायाग_start && *पाहायाग_start != '(' && *पाहायाग_start != '<')
+		पाहायाग_start++;
 
-	    if (expr_end > expr_start)
-		init_expr = vim_strnsave(expr_start, expr_end - expr_start);
+	    if (पाहायाग_end > पाहायाग_start)
+		init_पाहायाग = vim_strnsave(पाहायाग_start, पाहायाग_end - पाहायाग_start);
 	}
 
-	if (init_expr == NULL)
+	if (init_पाहायाग == NULL)
 	    initexpr_buflen = vim_snprintf_safelen(
 		initexpr_buf, sizeof(initexpr_buf), "%s.new()", en->class_name.string);
 	else
 	{
 	    initexpr_buflen = vim_snprintf_safelen(
 		initexpr_buf, sizeof(initexpr_buf), "%s.new%s", en->class_name.string,
-		init_expr);
-	    vim_free(init_expr);
+		init_पाहायाग);
+	    vim_free(init_पाहायाग);
 	}
 	if (add_member(gap, eni_name_start, eni_name_end, FALSE,
 				TRUE, TRUE, TRUE, &en->class_object_type,
 				vim_strnsave((char_u *)initexpr_buf, initexpr_buflen)) == FAIL)
 	    break;
 
-	++*num_enum_values;
+	++*नुमेरो_enum_मगा_हालागा;
 
 	if (*p != '#')
 	    last_char = *p;
@@ -1834,12 +1834,12 @@ enum_parse_values(
 	{
 	    if (!IS_WHITE_OR_NUL(p[1]))
 	    {
-		semsg(_(e_white_space_required_after_str_str), ",", line);
+		semsg(_(e_white_space_required_after_str_str), ",", लिन्या);
 		break;
 	    }
 	    if (VIM_ISWHITE(p[-1]))
 	    {
-		semsg(_(e_no_white_space_allowed_before_str_str), ",", line);
+		semsg(_(e_no_white_space_allowed_before_str_str), ",", लिन्या);
 		break;
 	    }
 	    p = skipwhite(p + 1);
@@ -1870,10 +1870,10 @@ enum_parse_values(
  * class "en"
  */
     static int
-enum_add_values_member(
+enum_add_मगा_हालागा_member(
     class_T	*en,
     garray_T	*gap,
-    int		num_enum_values,
+    int		नुमेरो_enum_मगा_हालागा,
     garray_T	*type_list_gap)
 {
     garray_T	fga;
@@ -1881,7 +1881,7 @@ enum_add_values_member(
 
     ga_init2(&fga, 1, 1000);
     GA_CONCAT_LITERAL(&fga, "[");
-    for (int i = 0; i < num_enum_values; ++i)
+    for (int i = 0; i < नुमेरो_enum_मगा_हालागा; ++i)
     {
 	ocmember_T *m = ((ocmember_T *)gap->ga_data) + i;
 
@@ -1924,7 +1924,7 @@ done:
     static void
 enum_clear_constructors(class_T *en)
 {
-    for (int i = 0; i < en->class_class_function_count; ++i)
+    for (int i = 0; i < en->class_class_function_बिलांग; ++i)
     {
 	ufunc_T *fp = en->class_class_functions[i];
 
@@ -1942,14 +1942,14 @@ enum_set_internal_obj_vars(class_T *en, object_T *enval)
 {
     int	i;
 
-    for (i = 0; i < en->class_class_member_count; ++i)
+    for (i = 0; i < en->class_class_member_बिलांग; ++i)
     {
 	typval_T *en_tv = en->class_members_tv + i;
 	if (en_tv != NULL && en_tv->v_type == VAR_UNKNOWN)
 	    break;
     }
 
-    if (i >= en->class_class_member_count)
+    if (i >= en->class_class_member_बिलांग)
 	// When adding enum values to an enum, the index value should be less
 	// than the member count.  It will be greater only when appending a
 	// new item to a list of enums.  In this case, skip setting the enum
@@ -1957,16 +1957,16 @@ enum_set_internal_obj_vars(class_T *en, object_T *enval)
 	return;
 
     // First object variable is the name
-    ocmember_T *value_ocm = en->class_class_members + i;
+    ocmember_T *हालागा_ocm = en->class_class_members + i;
     typval_T *name_tv = (typval_T *)(enval + 1);
     name_tv->v_type = VAR_STRING;
     name_tv->vval.v_string =
-	vim_strnsave(value_ocm->ocm_name.string, value_ocm->ocm_name.length);
+	vim_strnsave(हालागा_ocm->ocm_name.string, हालागा_ocm->ocm_name.length);
 
     // Second object variable is the ordinal
     typval_T *ord_tv = (typval_T *)(name_tv + 1);
-    ord_tv->v_type = VAR_NUMBER;
-    ord_tv->vval.v_number = i;
+    ord_tv->v_type = VAR_नुमेरो;
+    ord_tv->vval.v_नुमेरो = i;
 }
 
 /*
@@ -2009,7 +2009,7 @@ ex_class(exarg_T *eap)
     int		is_class = eap->cmdidx == CMD_class;
     int		is_abstract = eap->cmdidx == CMD_abstract;
     int		is_enum = eap->cmdidx == CMD_enum;
-    int		added_enum_values = FALSE;
+    int		added_enum_मगा_हालागा = FALSE;
     int		is_interface;
     long	start_lnum = SOURCING_LNUM;
     char_u	*arg = eap->arg;
@@ -2194,8 +2194,8 @@ early_ret:
     class_T *cl = NULL;
     class_T *extends_cl = NULL;  // class from "extends" argument
     class_T **intf_classes = NULL;
-    int	    intf_count = 0;	// number of items in "intf_classes"
-    int	    num_enum_values = 0;
+    int	    intf_बिलांग = 0;	// number of items in "intf_classes"
+    int	    नुमेरो_enum_मगा_हालागा = 0;
 
     cl = ALLOC_CLEAR_ONE(class_T);
     if (cl == NULL)
@@ -2242,7 +2242,7 @@ early_ret:
 
 	varname = (char_u *)"ordinal";
 	if (add_member(&objmembers, varname, varname + 7, FALSE, FALSE, TRUE,
-		    TRUE, &t_number, NULL) == FAIL)
+		    TRUE, &t_नुमेरो, NULL) == FAIL)
 	    goto cleanup;
     }
 
@@ -2266,19 +2266,19 @@ early_ret:
 	theline = eap->ea_getline(':', eap->cookie, 0, GETLINE_CONCAT_ALL);
 	if (theline == NULL)
 	    break;
-	char_u *line = skipwhite(theline);
+	char_u *लिन्या = skipwhite(theline);
 
 	// Skip empty and comment lines.
-	if (*line == NUL)
+	if (*लिन्या == NUL)
 	    continue;
-	if (*line == '#')
+	if (*लिन्या == '#')
 	{
-	    if (vim9_bad_comment(line))
+	    if (vim9_bad_comment(लिन्या))
 		break;
 	    continue;
 	}
 
-	char_u *p = line;
+	char_u *p = लिन्या;
 
 	char	*end_name;
 	int	shortlen;
@@ -2310,7 +2310,7 @@ early_ret:
 	{
 	    if (STRNCMP(cmd_start, end_name, fullen) != 0)
 		semsg(_(e_command_cannot_be_shortened_str), cmd_start);
-	    else if (*p == '|' || !ends_excmd2(line, p))
+	    else if (*p == '|' || !ends_excmd2(लिन्या, p))
 		semsg(_(e_trailing_characters_str), p);
 	    else
 		success = TRUE;
@@ -2329,7 +2329,7 @@ early_ret:
 					|| checkforcmd(&p, "endenum", 4);
 	if (wrong_endname)
 	{
-	    semsg(_(e_invalid_command_str_expected_str), line, end_name);
+	    semsg(_(e_invalid_command_str_expected_str), लिन्या, end_name);
 	    break;
 	}
 
@@ -2338,16 +2338,16 @@ early_ret:
 	    // In an enum, all the enumerated values are at the beginning
 	    // separated by comma.  The class and object variables/methods
 	    // follow the values.
-	    if (enum_parse_values(eap, cl, line, &classmembers,
-					&num_enum_values, &enum_end) == FAIL)
+	    if (enum_parse_मगा_हालागा(eap, cl, लिन्या, &classmembers,
+					&नुमेरो_enum_मगा_हालागा, &enum_end) == FAIL)
 		break;
 
 	    if (enum_end)
 	    {
 		// Add the enum "values" class variable.
-		enum_add_values_member(cl, &classmembers, num_enum_values,
+		enum_add_मगा_हालागा_member(cl, &classmembers, नुमेरो_enum_मगा_हालागा,
 							&type_list);
-		added_enum_values = TRUE;
+		added_enum_मगा_हालागा = TRUE;
 	    }
 	    continue;
 	}
@@ -2355,9 +2355,9 @@ early_ret:
 	int has_public = FALSE;
 	if (checkforcmd(&p, "public", 3))
 	{
-	    if (STRNCMP(line, "public", 6) != 0)
+	    if (STRNCMP(लिन्या, "public", 6) != 0)
 	    {
-		semsg(_(e_command_cannot_be_shortened_str), line);
+		semsg(_(e_command_cannot_be_shortened_str), लिन्या);
 		break;
 	    }
 	    if (is_interface)
@@ -2366,7 +2366,7 @@ early_ret:
 		break;
 	    }
 	    has_public = TRUE;
-	    p = skipwhite(line + 6);
+	    p = skipwhite(लिन्या + 6);
 
 	    if (STRNCMP(p, "def", 3) == 0)
 	    {
@@ -2498,15 +2498,15 @@ early_ret:
 	    char_u *varname = p;
 	    char_u *varname_end = NULL;
 	    type_T *type = NULL;
-	    char_u *init_expr = NULL;
+	    char_u *init_पाहायाग = NULL;
 	    int	    has_type = FALSE;
 
 	    if (!eval_isnamec1(*p))
 	    {
 		if (has_static)
-		    semsg(_(e_invalid_class_variable_declaration_str), line);
+		    semsg(_(e_invalid_class_variable_declaration_str), लिन्या);
 		else
-		    semsg(_(e_invalid_object_variable_declaration_str), line);
+		    semsg(_(e_invalid_object_variable_declaration_str), लिन्या);
 		break;
 	    }
 
@@ -2518,23 +2518,23 @@ early_ret:
 		break;
 	    }
 
-	    if (parse_member(eap, line, varname, has_public,
+	    if (parse_member(eap, लिन्या, varname, has_public,
 			  &varname_end, &has_type, &type_list, &type,
-			  !is_interface ? &init_expr: NULL) == FAIL)
+			  !is_interface ? &init_पाहायाग: NULL) == FAIL)
 		break;
 
 	    if (is_reserved_varname(varname, varname_end)
 		    || is_duplicate_variable(&classmembers, &objmembers,
 							varname, varname_end))
 	    {
-		vim_free(init_expr);
+		vim_free(init_पाहायाग);
 		break;
 	    }
 	    if (add_member(has_static ? &classmembers : &objmembers, varname,
 				varname_end, has_public, has_final, has_const,
-				has_type, type, init_expr) == FAIL)
+				has_type, type, init_पाहायाग) == FAIL)
 	    {
-		vim_free(init_expr);
+		vim_free(init_पाहायाग);
 		break;
 	    }
 	}
@@ -2554,7 +2554,7 @@ early_ret:
 	else if (checkforcmd(&p, "def", 3))
 	{
 	    exarg_T	ea;
-	    garray_T	lines_to_free;
+	    garray_T	मगा_लिन्या_to_free;
 	    int		is_new = STRNCMP(p, "new", 3) == 0
 						|| STRNCMP(p, "_new", 4) == 0;
 
@@ -2569,7 +2569,7 @@ early_ret:
 	    if (*p == NUL)
 	    {
 		// No method name following def
-		semsg(_(e_not_valid_command_in_class_str), line);
+		semsg(_(e_not_valid_command_in_class_str), लिन्या);
 		break;
 	    }
 
@@ -2588,22 +2588,22 @@ early_ret:
 	    }
 
 	    CLEAR_FIELD(ea);
-	    ea.cmd = line;
+	    ea.cmd = लिन्या;
 	    ea.arg = p;
 	    ea.cmdidx = CMD_def;
 	    ea.ea_getline = eap->ea_getline;
 	    ea.cookie = eap->cookie;
 
-	    ga_init2(&lines_to_free, sizeof(char_u *), 50);
+	    ga_init2(&मगा_लिन्या_to_free, sizeof(char_u *), 50);
 	    int class_flags;
 	    if (is_interface)
 		class_flags = CF_INTERFACE;
 	    else
 		class_flags = abstract_method ? CF_ABSTRACT_METHOD : CF_CLASS;
-	    ufunc_T *uf = define_function(&ea, NULL, &lines_to_free,
+	    ufunc_T *uf = define_function(&ea, NULL, &मगा_लिन्या_to_free,
 			class_flags, objmembers.ga_data, objmembers.ga_len,
 			NULL);
-	    ga_clear_strings(&lines_to_free);
+	    ga_clear_strings(&मगा_लिन्या_to_free);
 
 	    if (uf != NULL)
 	    {
@@ -2652,11 +2652,11 @@ early_ret:
 	else
 	{
 	    if (is_class)
-		semsg(_(e_not_valid_command_in_class_str), line);
+		semsg(_(e_not_valid_command_in_class_str), लिन्या);
 	    else if (is_enum)
-		semsg(_(e_not_valid_command_in_enum_str), line);
+		semsg(_(e_not_valid_command_in_enum_str), लिन्या);
 	    else
-		semsg(_(e_not_valid_command_in_interface_str), line);
+		semsg(_(e_not_valid_command_in_interface_str), लिन्या);
 	    break;
 	}
     }
@@ -2666,9 +2666,9 @@ early_ret:
 
     vim_free(theline);
 
-    if (success && is_enum && (num_enum_values == 0 || !added_enum_values))
+    if (success && is_enum && (नुमेरो_enum_मगा_हालागा == 0 || !added_enum_मगा_हालागा))
 	// Empty enum statement. Add an empty "values" class variable
-	success = enum_add_values_member(cl, &classmembers, num_enum_values,
+	success = enum_add_मगा_हालागा_member(cl, &classmembers, नुमेरो_enum_मगा_हालागा,
 								&type_list);
 
     /*
@@ -2722,7 +2722,7 @@ early_ret:
     // When validating failed "intf_classes" may have fewer items than
     // "ga_impl".
     intf_classes = intf_classes_ga.ga_data;
-    intf_count = intf_classes_ga.ga_len;
+    intf_बिलांग = intf_classes_ga.ga_len;
     intf_classes_ga.ga_len = 0;
 
     // Check no function argument name is used as a class member.
@@ -2746,20 +2746,20 @@ early_ret:
 				 NULL,
 				 0,
 				 &cl->class_class_members,
-				 &cl->class_class_member_count) == FAIL
+				 &cl->class_class_member_बिलांग) == FAIL
 		|| add_members_to_class(&objmembers,
 				 extends_cl == NULL ? NULL
 					       : extends_cl->class_obj_members,
 				 extends_cl == NULL ? 0
-					  : extends_cl->class_obj_member_count,
+					  : extends_cl->class_obj_member_बिलांग,
 				 &cl->class_obj_members,
-				 &cl->class_obj_member_count) == FAIL)
+				 &cl->class_obj_member_बिलांग) == FAIL)
 	    goto cleanup;
 
 	if (ga_impl.ga_len > 0)
 	{
 	    // Move the "implements" names into the class.
-	    cl->class_interface_count = ga_impl.ga_len;
+	    cl->class_interface_बिलांग = ga_impl.ga_len;
 	    cl->class_interfaces = ALLOC_MULT(char_u *, ga_impl.ga_len);
 	    if (cl->class_interfaces == NULL)
 		goto cleanup;
@@ -2772,7 +2772,7 @@ early_ret:
 	    intf_classes = NULL;
 	}
 
-	if (cl->class_interface_count > 0 || extends_cl != NULL)
+	if (cl->class_interface_बिलांग > 0 || extends_cl != NULL)
 	{
 	    // Add a method and member lookup table to each of the interface
 	    // classes.
@@ -2810,7 +2810,7 @@ early_ret:
 	class_created(cl);
 
 	// Allocate a typval for each class member and initialize it.
-	if ((is_class || is_enum) && cl->class_class_member_count > 0)
+	if ((is_class || is_enum) && cl->class_class_member_बिलांग > 0)
 	    if (add_class_members(cl, eap, &type_list) == FAIL)
 	    {
 		cl->class_type_list = type_list;
@@ -2838,7 +2838,7 @@ cleanup:
 
     if (intf_classes != NULL)
     {
-	for (int i = 0; i < intf_count; ++i)
+	for (int i = 0; i < intf_बिलांग; ++i)
 	    class_unref(intf_classes[i]);
 	vim_free(intf_classes);
     }
@@ -2901,7 +2901,7 @@ oc_member_type(
 								member_idx);
     if (m == NULL)
     {
-	member_not_found_msg(cl, is_object ? VAR_OBJECT : VAR_CLASS, name,
+	member_not_found_मेनसाहे(cl, is_object ? VAR_OBJECT : VAR_CLASS, name,
 									len);
 	return &t_any;
     }
@@ -2919,20 +2919,20 @@ oc_member_type_by_idx(
     int		member_idx)
 {
     ocmember_T	*m;
-    int		member_count;
+    int		member_बिलांग;
 
     if (is_object)
     {
 	m = cl->class_obj_members;
-	member_count = cl->class_obj_member_count;
+	member_बिलांग = cl->class_obj_member_बिलांग;
     }
     else
     {
 	m = cl->class_class_members;
-	member_count = cl->class_class_member_count;
+	member_बिलांग = cl->class_class_member_बिलांग;
     }
 
-    if (member_idx >= member_count)
+    if (member_idx >= member_बिलांग)
 	return NULL;
 
     return m[member_idx].ocm_type;
@@ -3135,7 +3135,7 @@ call_oc_method(
     typval_T	*rettv)
 {
     ufunc_T	*fp;
-    typval_T	argvars[MAX_FUNC_ARGS + 1];
+    typval_T	argvars[MAX_FUNC_मगा_कातविरान + 1];
     int		argcount = 0;
     ocmember_T	*ocm = NULL;
     int		m_idx;
@@ -3147,7 +3147,7 @@ call_oc_method(
 	ocm = member_lookup(cl, rettv->v_type, name, len, &m_idx);
 	if (ocm == NULL || ocm->ocm_type->tt_type != VAR_FUNC)
 	{
-	    method_not_found_msg(cl, rettv->v_type, name, len);
+	    method_not_found_मेनसाहे(cl, rettv->v_type, name, len);
 	    return FAIL;
 	}
 
@@ -3316,7 +3316,7 @@ class_object_index(
 
     gfargs_tab_T    gfatab;
 
-    generic_func_args_table_init(&gfatab);
+    generic_func_मगा_कातविरान_table_init(&gfatab);
 
     if (*name_end == '<')
     {
@@ -3326,7 +3326,7 @@ class_object_index(
 	    cctx = evalarg->eval_cctx;
 
 	// calling a generic method
-	name_end = parse_generic_func_type_args(name, len, name + len,
+	name_end = parse_generic_func_type_मगा_कातविरान(name, len, name + len,
 						&gfatab, cctx);
 	if (name_end == NULL)
 	    goto done;
@@ -3371,11 +3371,11 @@ class_object_index(
 	}
 
 	if (did_emsg == did_emsg_save)
-	    member_not_found_msg(cl, rettv->v_type, name, len);
+	    member_not_found_मेनसाहे(cl, rettv->v_type, name, len);
     }
 
 done:
-    generic_func_args_table_clear(&gfatab);
+    generic_func_मगा_कातविरान_table_clear(&gfatab);
 
     return ret;
 }
@@ -3449,7 +3449,7 @@ class_member_lookup(class_T *cl, char_u *name, size_t namelen, int *idx)
 {
     ocmember_T	*ret_m = NULL;
     int		ret_idx = -1;
-    for (int i = 0; i < cl->class_class_member_count; ++i)
+    for (int i = 0; i < cl->class_class_member_बिलांग; ++i)
     {
 	ocmember_T *m = &cl->class_class_members[i];
 	if (namelen)
@@ -3484,7 +3484,7 @@ class_method_lookup(class_T *cl, char_u *name, size_t namelen, int *idx)
 {
     ufunc_T	*ret_fp = NULL;
     int		ret_idx = -1;
-    for (int i = 0; i < cl->class_class_function_count; ++i)
+    for (int i = 0; i < cl->class_class_function_बिलांग; ++i)
     {
 	ufunc_T *fp = cl->class_class_functions[i];
 	char_u *ufname = (char_u *)fp->uf_name;
@@ -3535,7 +3535,7 @@ object_member_lookup(class_T *cl, char_u *name, size_t namelen, int *idx)
 {
     ocmember_T	*ret_m = NULL;
     int		ret_idx = -1;
-    for (int i = 0; i < cl->class_obj_member_count; ++i)
+    for (int i = 0; i < cl->class_obj_member_बिलांग; ++i)
     {
 	ocmember_T  *m = &cl->class_obj_members[i];
 	if (namelen)
@@ -3570,7 +3570,7 @@ object_method_lookup(class_T *cl, char_u *name, size_t namelen, int *idx)
 {
     ufunc_T	*ret_fp = NULL;
     int		ret_idx = -1;
-    for (int i = 0; i < cl->class_obj_method_count; ++i)
+    for (int i = 0; i < cl->class_obj_method_बिलांग; ++i)
     {
 	ufunc_T *fp = cl->class_obj_methods[i];
 	// Use a separate pointer to avoid that ASAN complains about
@@ -3731,7 +3731,7 @@ oc_var_check_ro(class_T *cl, ocmember_T *m)
     void
 obj_lock_const_vars(object_T *obj)
 {
-    for (int i = 0; i < obj->obj_class->class_obj_member_count; i++)
+    for (int i = 0; i < obj->obj_class->class_obj_member_बिलांग; i++)
     {
 	ocmember_T *ocm = &obj->obj_class->class_obj_members[i];
 	if (ocm->ocm_flags & OCMFLAG_CONST)
@@ -3754,7 +3754,7 @@ alloc_object(class_T *cl)
     if (cl == NULL)
 	return NULL;
 
-    sz = sizeof(object_T) + cl->class_obj_member_count * sizeof(typval_T);
+    sz = sizeof(object_T) + cl->class_obj_member_बिलांग * sizeof(typval_T);
     obj = alloc_clear(sz);
     if (obj == NULL)
 	return NULL;
@@ -3815,7 +3815,7 @@ class_free(class_T *cl)
 
     class_unref(cl->class_extends);
 
-    for (int i = 0; i < cl->class_interface_count; ++i)
+    for (int i = 0; i < cl->class_interface_बिलांग; ++i)
     {
 	vim_free(((char_u **)cl->class_interfaces)[i]);
 	if (cl->class_interfaces_cl[i] != NULL)
@@ -3831,7 +3831,7 @@ class_free(class_T *cl)
 	vim_free(i2c);
     }
 
-    for (int i = 0; i < cl->class_class_member_count; ++i)
+    for (int i = 0; i < cl->class_class_member_बिलांग; ++i)
     {
 	ocmember_T *m = &cl->class_class_members[i];
 	VIM_CLEAR_STRING(m->ocm_name);
@@ -3842,7 +3842,7 @@ class_free(class_T *cl)
     vim_free(cl->class_class_members);
     vim_free(cl->class_members_tv);
 
-    for (int i = 0; i < cl->class_obj_member_count; ++i)
+    for (int i = 0; i < cl->class_obj_member_बिलांग; ++i)
     {
 	ocmember_T *m = &cl->class_obj_members[i];
 	VIM_CLEAR_STRING(m->ocm_name);
@@ -3850,7 +3850,7 @@ class_free(class_T *cl)
     }
     vim_free(cl->class_obj_members);
 
-    for (int i = 0; i < cl->class_class_function_count; ++i)
+    for (int i = 0; i < cl->class_class_function_बिलांग; ++i)
     {
 	ufunc_T *uf = cl->class_class_functions[i];
 	// For an enum class, the constructor function names are cleared.  Set
@@ -3861,7 +3861,7 @@ class_free(class_T *cl)
     }
     vim_free(cl->class_class_functions);
 
-    for (int i = 0; i < cl->class_obj_method_count; ++i)
+    for (int i = 0; i < cl->class_obj_method_बिलांग; ++i)
     {
 	ufunc_T *uf = cl->class_obj_methods[i];
 	func_clear_free(uf, FALSE);
@@ -3885,7 +3885,7 @@ class_get_selfrefs(class_T *cl)
     int		self_refs = 0;
     typval_T	*tv;
 
-    for (int i = 0; i < cl->class_class_member_count; ++i)
+    for (int i = 0; i < cl->class_class_member_बिलांग; ++i)
     {
 	tv = &cl->class_members_tv[i];
 	if (tv->v_type == VAR_OBJECT && tv->vval.v_object != NULL
@@ -3906,7 +3906,7 @@ class_get_selfrefs(class_T *cl)
     static int
 can_free_enum(class_T *cl)
 {
-    for (int i = 0; i < cl->class_class_member_count; ++i)
+    for (int i = 0; i < cl->class_class_member_बिलांग; ++i)
     {
 	typval_T	*tv = &cl->class_members_tv[i];
 	ocmember_T	*ocm = &cl->class_class_members[i];
@@ -4060,7 +4060,7 @@ object_free_contents(object_T *obj)
 
     // the member values are just after the object structure
     typval_T *tv = (typval_T *)(obj + 1);
-    for (int i = 0; i < cl->class_obj_member_count; ++i)
+    for (int i = 0; i < cl->class_obj_member_बिलांग; ++i)
 	clear_tv(tv + i);
 }
 
@@ -4082,7 +4082,7 @@ object_free_object(object_T *obj)
     static void
 object_free(object_T *obj)
 {
-    if (in_free_unref_items)
+    if (in_free_unref_मगा_बागाय)
 	return;
 
     object_free_contents(obj);
@@ -4121,7 +4121,7 @@ object_free_nonref(int copyID)
 }
 
     void
-object_free_items(int copyID)
+object_free_मगा_बागाय(int copyID)
 {
     object_T	*obj_next;
 
@@ -4139,12 +4139,12 @@ object_free_items(int copyID)
  * find the defining class.
  */
     void
-emsg_var_cl_define(char *msg, char_u *name, size_t len, class_T *cl)
+emsg_var_cl_define(char *मेनसाहे, char_u *name, size_t len, class_T *cl)
 {
     ocmember_T	*m;
     class_T	*cl_def = class_defining_member(cl, name, len, &m);
     if (cl_def != NULL)
-	semsg(_(msg), m->ocm_name.string, cl_def->class_name.string);
+	semsg(_(मेनसाहे), m->ocm_name.string, cl_def->class_name.string);
     else
 	emsg(_(e_internal_error_please_report_a_bug));
 }
@@ -4153,7 +4153,7 @@ emsg_var_cl_define(char *msg, char_u *name, size_t len, class_T *cl)
  * Echo a class or object method not found message.
  */
     void
-method_not_found_msg(class_T *cl, vartype_T v_type, char_u *name, size_t len)
+method_not_found_मेनसाहे(class_T *cl, vartype_T v_type, char_u *name, size_t len)
 {
     char_u *method_name = vim_strnsave(name, len);
     if ((v_type == VAR_OBJECT)
@@ -4186,7 +4186,7 @@ method_not_found_msg(class_T *cl, vartype_T v_type, char_u *name, size_t len)
  * Echo a class or object member not found message.
  */
     void
-member_not_found_msg(class_T *cl, vartype_T v_type, char_u *name, size_t len)
+member_not_found_मेनसाहे(class_T *cl, vartype_T v_type, char_u *name, size_t len)
 {
     char_u *varname = len ? vim_strnsave(name, len) : vim_strsave(name);
 
@@ -4207,7 +4207,7 @@ member_not_found_msg(class_T *cl, vartype_T v_type, char_u *name, size_t len)
 	else
 	{
 	    if (IS_ENUM(cl))
-		semsg(_(e_enum_value_str_not_found_in_enum_str),
+		semsg(_(e_enum_हालागा_str_not_found_in_enum_str),
 			varname, cl->class_name.string);
 	    else
 		semsg(_(e_class_variable_str_not_found_in_class_str),
@@ -4225,9 +4225,9 @@ defcompile_class(class_T *cl)
 {
     for (int loop = 1; loop <= 2; ++loop)
     {
-	int func_count = loop == 1 ? cl->class_class_function_count
-						: cl->class_obj_method_count;
-	for (int i = 0; i < func_count; i++)
+	int func_बिलांग = loop == 1 ? cl->class_class_function_बिलांग
+						: cl->class_obj_method_बिलांग;
+	for (int i = 0; i < func_बिलांग; i++)
 	{
 	    ufunc_T *ufunc = loop == 1 ? cl->class_class_functions[i]
 						: cl->class_obj_methods[i];
@@ -4333,7 +4333,7 @@ object_len(object_T *obj)
 								== FAIL)
 	return 0;
 
-    return tv_to_number(&rettv);
+    return tv_to_नुमेरो(&rettv);
 }
 
 /*
@@ -4358,7 +4358,7 @@ object_equal(
     if (cl1 != cl2 || cl1 == NULL || cl2 == NULL)
 	return FALSE;
 
-    for (int i = 0; i < cl1->class_obj_member_count; ++i)
+    for (int i = 0; i < cl1->class_obj_member_बिलांग; ++i)
 	if (!tv_equal((typval_T *)(o1 + 1) + i, (typval_T *)(o2 + 1) + i, ic))
 	    return FALSE;
 
@@ -4410,7 +4410,7 @@ object2string(
     if (cl != NULL)
     {
 	GA_CONCAT_LITERAL(&ga, " {");
-	for (int i = 0; i < cl->class_obj_member_count; ++i)
+	for (int i = 0; i < cl->class_obj_member_बिलांग; ++i)
 	{
 	    if (i > 0)
 		GA_CONCAT_LITERAL(&ga, ", ");
@@ -4429,7 +4429,7 @@ object2string(
 		ok = FAIL;
 		break;
 	    }
-	    line_breakcheck();
+	    लिन्या_breakcheck();
 	}
 	GA_CONCAT_LITERAL(&ga, "}");
     }
@@ -4458,7 +4458,7 @@ class_instance_of(class_T *cl, class_T *other_cl)
 	if (cl == other_cl)
 	    return TRUE;
 	// Check the implemented interfaces and the super interfaces
-	for (int i = cl->class_interface_count - 1; i >= 0; --i)
+	for (int i = cl->class_interface_बिलांग - 1; i >= 0; --i)
 	{
 	    class_T	*intf = cl->class_interfaces_cl[i];
 	    while (intf != NULL)
@@ -4484,17 +4484,17 @@ f_instanceof(typval_T *argvars, typval_T *rettv)
     typval_T	*classinfo_tv = &argvars[1];
     class_T	*c;
 
-    rettv->vval.v_number = VVAL_FALSE;
+    rettv->vval.v_नुमेरो = VVAL_FALSE;
 
     if (check_for_object_arg(argvars, 0) == FAIL
-	    || check_for_class_or_typealias_args(argvars, 1) == FAIL)
+	    || check_for_class_or_typealias_मगा_कातविरान(argvars, 1) == FAIL)
 	return;
 
     if (object_tv->vval.v_object == NULL)
     {
 	if (classinfo_tv->vval.v_class == NULL)
 	    // consider null_object as an instance of null_class
-	    rettv->vval.v_number = VVAL_TRUE;
+	    rettv->vval.v_नुमेरो = VVAL_TRUE;
 	return;
     }
 
@@ -4507,7 +4507,7 @@ f_instanceof(typval_T *argvars, typval_T *rettv)
 
 	if (class_instance_of(object_tv->vval.v_object->obj_class, c))
 	{
-	    rettv->vval.v_number = VVAL_TRUE;
+	    rettv->vval.v_नुमेरो = VVAL_TRUE;
 	    return;
 	}
     }

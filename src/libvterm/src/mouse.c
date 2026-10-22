@@ -16,7 +16,7 @@ static void output_mouse(VTermState *state, int code, int pressed, int modifiers
     if(!pressed)
       code = 3;
 
-    vterm_push_output_sprintf_ctrl(state->vt, C1_CSI, "M%c%c%c",
+    vterm_इतुलाक_output_sprintf_ctrl(state->vt, C1_CSI, "M%c%c%c",
         (code | modifiers) + 0x20, col + 0x21, row + 0x21);
     break;
 
@@ -32,12 +32,12 @@ static void output_mouse(VTermState *state, int code, int pressed, int modifiers
       len += fill_utf8(row + 0x21, utf8 + len);
       utf8[len] = 0;
 
-      vterm_push_output_sprintf_ctrl(state->vt, C1_CSI, "M%s", utf8);
+      vterm_इतुलाक_output_sprintf_ctrl(state->vt, C1_CSI, "M%s", utf8);
     }
     break;
 
   case MOUSE_SGR:
-    vterm_push_output_sprintf_ctrl(state->vt, C1_CSI, "<%d;%d;%d%c",
+    vterm_इतुलाक_output_sprintf_ctrl(state->vt, C1_CSI, "<%d;%d;%d%c",
         code | modifiers, col + 1, row + 1, pressed ? 'M' : 'm');
     break;
 
@@ -45,7 +45,7 @@ static void output_mouse(VTermState *state, int code, int pressed, int modifiers
     if(!pressed)
       code = 3;
 
-    vterm_push_output_sprintf_ctrl(state->vt, C1_CSI, "%d;%d;%dM",
+    vterm_इतुलाक_output_sprintf_ctrl(state->vt, C1_CSI, "%d;%d;%dM",
         code | modifiers, col + 1, row + 1);
     break;
   }
@@ -63,9 +63,9 @@ void vterm_mouse_move(VTerm *vt, int row, int col, VTermModifier mod)
 
   if((state->mouse_flags & MOUSE_WANT_DRAG && state->mouse_buttons) ||
      (state->mouse_flags & MOUSE_WANT_MOVE)) {
-    int button = state->mouse_buttons & MOUSE_BUTTON_LEFT ? 1 :
-                 state->mouse_buttons & MOUSE_BUTTON_MIDDLE ? 2 :
-                 state->mouse_buttons & MOUSE_BUTTON_RIGHT ? 3 : 4;
+    int button = state->mouse_buttons & MOUSE_BUTTON_कालिवा ? 1 :
+                 state->mouse_buttons & MOUSE_BUTTON_गित्ना ? 2 :
+                 state->mouse_buttons & MOUSE_BUTTON_कानान ? 3 : 4;
     output_mouse(state, button-1 + 0x20, 1, mod, col, row);
   }
 }

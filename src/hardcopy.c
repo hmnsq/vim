@@ -103,7 +103,7 @@ int	prt_curr_bold;
 int	prt_curr_underline;
 long_u	prt_curr_bg;
 long_u	prt_curr_fg;
-int	prt_page_count;
+int	prt_page_बिलांग;
 
 /*
  * These values determine the print position on a page.
@@ -111,14 +111,14 @@ int	prt_page_count;
 typedef struct
 {
     int		lead_spaces;	    // remaining spaces for a TAB
-    int		print_pos;	    // virtual column for computing TABs
+    int		इलिम्बाग_pos;	    // virtual column for computing TABs
     colnr_T	column;		    // byte column
-    linenr_T	file_line;	    // line nr in the buffer
+    linenr_T	file_लिन्या;	    // line nr in the buffer
     long_u	bytes_printed;	    // bytes printed so far
     int		ff;		    // seen form feed character
 } prt_pos_T;
 
-#if defined(FEAT_POSTSCRIPT) || defined(FEAT_PRINT_PANGO)
+#if defined(FEAT_POSTSCRIPT) || defined(FEAT_इलिम्बाग_PANGO)
 prt_mediasize_T prt_mediasize[PRT_MEDIASIZE_LEN] = {
     {"A4",		595.0,  842.0},
     {"letter",	612.0,  792.0},
@@ -139,16 +139,16 @@ prt_mediasize_T prt_mediasize[PRT_MEDIASIZE_LEN] = {
 
 static char *parse_list_options(char_u *option_str, option_table_T *table, int table_size);
 
-static colnr_T hardcopy_line(prt_settings_T *psettings, int page_line, prt_pos_T *ppos);
+static colnr_T hardcopy_लिन्या(prt_settings_T *psettings, int page_लिन्या, prt_pos_T *ppos);
 
 /*
  * Parse 'printoptions' and set the flags in "printer_opts".
  * Returns an error message or NULL;
  */
     char *
-parse_printoptions(optset_T *args UNUSED)
+parse_printoptions(optset_T *मगा_कातविरान UNUSED)
 {
-    return parse_list_options(p_popt, printer_opts, OPT_PRINT_NUM_OPTIONS);
+    return parse_list_options(p_popt, printer_opts, OPT_इलिम्बाग_नुमेरो_OPTIONS);
 }
 
 #if defined(FEAT_POSTSCRIPT)
@@ -157,9 +157,9 @@ parse_printoptions(optset_T *args UNUSED)
  * Returns an error message or NULL;
  */
     char *
-parse_printmbfont(optset_T *args UNUSED)
+parse_printmbfont(optset_T *मगा_कातविरान UNUSED)
 {
-    return parse_list_options(p_pmfn, mbfont_opts, OPT_MBFONT_NUM_OPTIONS);
+    return parse_list_options(p_pmfn, mbfont_opts, OPT_MBFONT_नुमेरो_OPTIONS);
 }
 #endif
 
@@ -236,7 +236,7 @@ parse_list_options(
 		break;
 	    }
 
-	    table[idx].number = getdigits(&p); // advances p
+	    table[idx].नुमेरो_2 = getdigits(&p); // advances p
 	}
 
 	table[idx].string = p;
@@ -340,7 +340,7 @@ prt_set_fg(long_u fg)
 	return;
 
     prt_curr_fg = fg;
-    mch_print_set_fg(fg);
+    mch_इलिम्बाग_set_fg(fg);
 }
 
     static void
@@ -350,7 +350,7 @@ prt_set_bg(long_u bg)
 	return;
 
     prt_curr_bg = bg;
-    mch_print_set_bg(bg);
+    mch_इलिम्बाग_set_bg(bg);
 }
 
     static void
@@ -364,31 +364,31 @@ prt_set_font(int bold, int italic, int underline)
     prt_curr_underline = underline;
     prt_curr_italic = italic;
     prt_curr_bold = bold;
-    mch_print_set_font(bold, italic, underline);
+    mch_इलिम्बाग_set_font(bold, italic, underline);
 }
 
 /*
  * Print the line number in the left margin.
  */
     static void
-prt_line_number(
+prt_लिन्या_नुमेरो(
     prt_settings_T *psettings,
-    int		page_line,
+    int		page_लिन्या,
     linenr_T	lnum)
 {
     int		i;
     char_u	tbuf[20];
 
-    prt_set_fg(psettings->number.fg_color);
-    prt_set_bg(psettings->number.bg_color);
-    prt_set_font(psettings->number.bold, psettings->number.italic, psettings->number.underline);
-    mch_print_start_line(TRUE, page_line);
+    prt_set_fg(psettings->नुमेरो_2.fg_color);
+    prt_set_bg(psettings->नुमेरो_2.bg_color);
+    prt_set_font(psettings->नुमेरो_2.bold, psettings->नुमेरो_2.italic, psettings->नुमेरो_2.underline);
+    mch_इलिम्बाग_start_लिन्या(TRUE, page_लिन्या);
 
     // Leave two spaces between the number and the text; depends on
     // PRINT_NUMBER_WIDTH.
     sprintf((char *)tbuf, "%6ld", (long)lnum);
     for (i = 0; i < 6; i++)
-	(void)mch_print_text_out(&tbuf[i], 1);
+	(void)mch_इलिम्बाग_text_out(&tbuf[i], 1);
 
 #ifdef FEAT_SYN_HL
     if (psettings->do_syntax)
@@ -410,8 +410,8 @@ prt_line_number(
     int
 prt_header_height(void)
 {
-    if (printer_opts[OPT_PRINT_HEADERHEIGHT].present)
-	return printer_opts[OPT_PRINT_HEADERHEIGHT].number;
+    if (printer_opts[OPT_इलिम्बाग_HEADERHEIGHT].present)
+	return printer_opts[OPT_इलिम्बाग_HEADERHEIGHT].नुमेरो_2;
     return 2;
 }
 
@@ -419,10 +419,10 @@ prt_header_height(void)
  * Return TRUE if using a line number for printing.
  */
     int
-prt_use_number(void)
+prt_use_नुमेरो(void)
 {
-    return (printer_opts[OPT_PRINT_NUMBER].present
-	    && TOLOWER_ASC(printer_opts[OPT_PRINT_NUMBER].string[0]) == 'y');
+    return (printer_opts[OPT_इलिम्बाग_नुमेरो].present
+	    && TOLOWER_ASC(printer_opts[OPT_इलिम्बाग_नुमेरो].string[0]) == 'y');
 }
 
 /*
@@ -457,15 +457,15 @@ prt_header(
     int		pagenum,
     linenr_T	lnum UNUSED)
 {
-    int		width = psettings->chars_per_line;
-    int		page_line;
+    int		width = psettings->chars_per_लिन्या;
+    int		page_लिन्या;
     char_u	*tbuf;
     char_u	*p;
     int		l;
 
     // Also use the space for the line number.
-    if (prt_use_number())
-	width += PRINT_NUMBER_WIDTH;
+    if (prt_use_नुमेरो())
+	width += इलिम्बाग_नुमेरो_WIDTH;
 
     tbuf = alloc(width + IOSIZE);
     if (tbuf == NULL)
@@ -488,7 +488,7 @@ prt_header(
 	curwin->w_cursor.lnum = lnum;
 	curwin->w_topline = lnum;
 	curwin->w_botline = lnum + 63;
-	printer_page_num = pagenum;
+	printer_page_नुमेरो = pagenum;
 
 	build_stl_str_hl(curwin, tbuf, (size_t)(width + IOSIZE), p_header,
 			 (char_u *)"printheader", 0, ' ', width, NULL, NULL,
@@ -508,16 +508,16 @@ prt_header(
     prt_set_font(TRUE, FALSE, FALSE);
 
     // Use a negative line number to indicate printing in the top margin.
-    page_line = 0 - prt_header_height();
-    mch_print_start_line(TRUE, page_line);
+    page_लिन्या = 0 - prt_header_height();
+    mch_इलिम्बाग_start_लिन्या(TRUE, page_लिन्या);
     for (p = tbuf; *p != NUL; )
     {
-	if (mch_print_text_out(p, (l = (*mb_ptr2len)(p))))
+	if (mch_इलिम्बाग_text_out(p, (l = (*mb_ptr2len)(p))))
 	{
-	    ++page_line;
-	    if (page_line >= 0) // out of room in header
+	    ++page_लिन्या;
+	    if (page_लिन्या >= 0) // out of room in header
 		break;
-	    mch_print_start_line(TRUE, page_line);
+	    mch_इलिम्बाग_start_लिन्या(TRUE, page_लिन्या);
 	}
 	p += l;
     }
@@ -555,17 +555,17 @@ ex_hardcopy(exarg_T *eap)
     linenr_T		lnum;
     int			collated_copies, uncollated_copies;
     prt_settings_T	settings;
-    long_u		bytes_to_print = 0;
-    int			page_line;
+    long_u		bytes_to_इलिम्बाग = 0;
+    int			page_लिन्या;
     int			jobsplit;
 
     CLEAR_FIELD(settings);
     settings.has_color = TRUE;
-#ifdef FEAT_PRINT_PANGO
-    settings.user_abort_msg = TRUE;
+#ifdef FEAT_इलिम्बाग_PANGO
+    settings.user_abort_मेनसाहे = TRUE;
 #endif
 
-#if defined(FEAT_POSTSCRIPT) || defined(FEAT_PRINT_PANGO)
+#if defined(FEAT_POSTSCRIPT) || defined(FEAT_इलिम्बाग_PANGO)
     if (*eap->arg == '>')
     {
 	char	*errormsg = NULL;
@@ -590,7 +590,7 @@ ex_hardcopy(exarg_T *eap)
      * not be a real printer - for example the engine might generate HTML or
      * PS.)
      */
-    if (mch_print_init(&settings,
+    if (mch_इलिम्बाग_init(&settings,
 			curbuf->b_fname == NULL
 			    ? buf_spname(curbuf)
 			    : curbuf->b_sfname == NULL
@@ -612,25 +612,25 @@ ex_hardcopy(exarg_T *eap)
 
     if (!syntax_present(curwin))
 	settings.do_syntax = FALSE;
-    else if (printer_opts[OPT_PRINT_SYNTAX].present
-	    && TOLOWER_ASC(printer_opts[OPT_PRINT_SYNTAX].string[0]) != 'a')
+    else if (printer_opts[OPT_इलिम्बाग_SYNTAX].present
+	    && TOLOWER_ASC(printer_opts[OPT_इलिम्बाग_SYNTAX].string[0]) != 'a')
 	settings.do_syntax =
-	       (TOLOWER_ASC(printer_opts[OPT_PRINT_SYNTAX].string[0]) == 'y');
+	       (TOLOWER_ASC(printer_opts[OPT_इलिम्बाग_SYNTAX].string[0]) == 'y');
     else
 	settings.do_syntax = settings.has_color;
 #endif
 
     // Set up printing attributes for line numbers
-    settings.number.fg_color = PRCOLOR_BLACK;
-    settings.number.bg_color = PRCOLOR_WHITE;
-    settings.number.bold = FALSE;
-    settings.number.italic = TRUE;
-    settings.number.underline = FALSE;
+    settings.नुमेरो_2.fg_color = PRCOLOR_BLACK;
+    settings.नुमेरो_2.bg_color = PRCOLOR_WHITE;
+    settings.नुमेरो_2.bold = FALSE;
+    settings.नुमेरो_2.italic = TRUE;
+    settings.नुमेरो_2.underline = FALSE;
 #ifdef FEAT_SYN_HL
     /*
      * Syntax highlighting of line numbers.
      */
-    if (prt_use_number() && settings.do_syntax)
+    if (prt_use_नुमेरो() && settings.do_syntax)
     {
 	int		id;
 
@@ -638,7 +638,7 @@ ex_hardcopy(exarg_T *eap)
 	if (id > 0)
 	    id = syn_get_final_id(id);
 
-	prt_get_attr(id, &settings.number, settings.modec);
+	prt_get_attr(id, &settings.नुमेरो_2, settings.modec);
     }
 #endif
 
@@ -646,11 +646,11 @@ ex_hardcopy(exarg_T *eap)
      * Estimate the total lines to be printed
      */
     for (lnum = eap->line1; lnum <= eap->line2; lnum++)
-	bytes_to_print += (long_u)STRLEN(skipwhite(ml_get(lnum)));
-    if (bytes_to_print == 0)
+	bytes_to_इलिम्बाग += (long_u)STRLEN(skipwhite(ml_get(lnum)));
+    if (bytes_to_इलिम्बाग == 0)
     {
-	msg(_("No text to be printed"));
-	goto print_fail_no_begin;
+	मेनसाहे(_("No text to be printed"));
+	goto इलिम्बाग_fail_no_begin;
     }
 
     // Set colors and font to normal.
@@ -667,16 +667,16 @@ ex_hardcopy(exarg_T *eap)
     current_syn_id = -1;
 #endif
 
-    jobsplit = (printer_opts[OPT_PRINT_JOBSPLIT].present
-	   && TOLOWER_ASC(printer_opts[OPT_PRINT_JOBSPLIT].string[0]) == 'y');
+    jobsplit = (printer_opts[OPT_इलिम्बाग_JOBSPLIT].present
+	   && TOLOWER_ASC(printer_opts[OPT_इलिम्बाग_JOBSPLIT].string[0]) == 'y');
 
-    if (!mch_print_begin(&settings))
-	goto print_fail_no_begin;
+    if (!mch_इलिम्बाग_begin(&settings))
+	goto इलिम्बाग_fail_no_begin;
 
     /*
      * Loop over collated copies: 1 2 3, 1 2 3, ...
      */
-    prt_page_count = 0;
+    prt_page_बिलांग = 0;
     for (collated_copies = 0;
 	    collated_copies < settings.n_collated_copies;
 	    collated_copies++)
@@ -686,21 +686,21 @@ ex_hardcopy(exarg_T *eap)
 	int		side;
 
 	CLEAR_FIELD(page_prtpos);
-	page_prtpos.file_line = eap->line1;
+	page_prtpos.file_लिन्या = eap->line1;
 	prtpos = page_prtpos;
 
 	if (jobsplit && collated_copies > 0)
 	{
 	    // Splitting jobs: Stop a previous job and start a new one.
-	    mch_print_end(&settings);
-	    if (!mch_print_begin(&settings))
-		goto print_fail_no_begin;
+	    mch_इलिम्बाग_end(&settings);
+	    if (!mch_इलिम्बाग_begin(&settings))
+		goto इलिम्बाग_fail_no_begin;
 	}
 
 	/*
 	 * Loop over all pages in the print job: 1 2 3 ...
 	 */
-	for (prt_page_count = 0; prtpos.file_line <= eap->line2; ++prt_page_count)
+	for (prt_page_बिलांग = 0; prtpos.file_लिन्या <= eap->line2; ++prt_page_बिलांग)
 	{
 	    /*
 	     * Loop over uncollated copies: 1 1 1, 2 2 2, 3 3 3, ...
@@ -725,17 +725,17 @@ ex_hardcopy(exarg_T *eap)
 		    // Check for interrupt character every page.
 		    ui_breakcheck();
 		    if (got_int || settings.user_abort)
-			goto print_fail;
+			goto इलिम्बाग_fail;
 
 		    sprintf((char *)IObuff, _("Printing page %d (%d%%)"),
-			    prt_page_count + 1 + side,
+			    prt_page_बिलांग + 1 + side,
 			    prtpos.bytes_printed > 1000000
 				? (int)(prtpos.bytes_printed /
-						       (bytes_to_print / 100))
+						       (bytes_to_इलिम्बाग / 100))
 				: (int)((prtpos.bytes_printed * 100)
-							   / bytes_to_print));
-		    if (!mch_print_begin_page(IObuff))
-			goto print_fail;
+							   / bytes_to_इलिम्बाग));
+		    if (!mch_इलिम्बाग_begin_page(IObuff))
+			goto इलिम्बाग_fail;
 
 		    if (settings.n_collated_copies > 1)
 			sprintf((char *)IObuff + STRLEN(IObuff),
@@ -748,20 +748,20 @@ ex_hardcopy(exarg_T *eap)
 		     * Output header if required
 		     */
 		    if (prt_header_height() > 0)
-			prt_header(&settings, prt_page_count + 1 + side,
-							prtpos.file_line);
+			prt_header(&settings, prt_page_बिलांग + 1 + side,
+							prtpos.file_लिन्या);
 
-		    for (page_line = 0; page_line < settings.lines_per_page;
-								  ++page_line)
+		    for (page_लिन्या = 0; page_लिन्या < settings.मगा_लिन्या_per_page;
+								  ++page_लिन्या)
 		    {
-			prtpos.column = hardcopy_line(&settings,
-							   page_line, &prtpos);
+			prtpos.column = hardcopy_लिन्या(&settings,
+							   page_लिन्या, &prtpos);
 			if (prtpos.column == 0)
 			{
 			    // finished a file line
 			    prtpos.bytes_printed +=
-				  STRLEN(skipwhite(ml_get(prtpos.file_line)));
-			    if (++prtpos.file_line > eap->line2)
+				  STRLEN(skipwhite(ml_get(prtpos.file_लिन्या)));
+			    if (++prtpos.file_लिन्या > eap->line2)
 				break; // reached the end
 			}
 			else if (prtpos.ff)
@@ -772,9 +772,9 @@ ex_hardcopy(exarg_T *eap)
 			}
 		    }
 
-		    if (!mch_print_end_page())
-			goto print_fail;
-		    if (prtpos.file_line > eap->line2)
+		    if (!mch_इलिम्बाग_end_page())
+			goto इलिम्बाग_fail;
+		    if (prtpos.file_लिन्या > eap->line2)
 			break; // reached the end
 		}
 
@@ -782,16 +782,16 @@ ex_hardcopy(exarg_T *eap)
 		 * Extra blank page for duplexing with odd number of pages and
 		 * more copies to come.
 		 */
-		if (prtpos.file_line > eap->line2 && settings.duplex
+		if (prtpos.file_लिन्या > eap->line2 && settings.duplex
 								 && side == 0
 		    && uncollated_copies + 1 < settings.n_uncollated_copies)
 		{
-		    if (!mch_print_blank_page())
-			goto print_fail;
+		    if (!mch_इलिम्बाग_blank_page())
+			goto इलिम्बाग_fail;
 		}
 	    }
-	    if (settings.duplex && prtpos.file_line <= eap->line2)
-		++prt_page_count;
+	    if (settings.duplex && prtpos.file_लिन्या <= eap->line2)
+		++prt_page_बिलांग;
 
 	    // Remember the position where the next page starts.
 	    page_prtpos = prtpos;
@@ -802,20 +802,20 @@ ex_hardcopy(exarg_T *eap)
 	prt_message(IObuff);
     }
 
-print_fail:
+इलिम्बाग_fail:
     if (got_int || (settings.user_abort
-#ifdef FEAT_PRINT_PANGO
-		&& settings.user_abort_msg
+#ifdef FEAT_इलिम्बाग_PANGO
+		&& settings.user_abort_मेनसाहे
 #endif
 		))
     {
 	sprintf((char *)IObuff, "%s", _("Printing aborted"));
 	prt_message(IObuff);
     }
-    mch_print_end(&settings);
+    mch_इलिम्बाग_end(&settings);
 
-print_fail_no_begin:
-    mch_print_cleanup();
+इलिम्बाग_fail_no_begin:
+    mch_इलिम्बाग_cleanup();
 }
 
 /*
@@ -823,17 +823,17 @@ print_fail_no_begin:
  * Return the next column to print, or zero if the line is finished.
  */
     static colnr_T
-hardcopy_line(
+hardcopy_लिन्या(
     prt_settings_T	*psettings,
-    int			page_line,
+    int			page_लिन्या,
     prt_pos_T		*ppos)
 {
     colnr_T	col;
-    char_u	*line;
+    char_u	*लिन्या;
     int		need_break = FALSE;
     int		outputlen;
     int		tab_spaces;
-    long_u	print_pos;
+    long_u	इलिम्बाग_pos;
 #ifdef FEAT_SYN_HL
     prt_text_attr_T attr;
     int		id;
@@ -841,29 +841,29 @@ hardcopy_line(
 
     if (ppos->column == 0 || ppos->ff)
     {
-	print_pos = 0;
+	इलिम्बाग_pos = 0;
 	tab_spaces = 0;
-	if (!ppos->ff && prt_use_number())
-	    prt_line_number(psettings, page_line, ppos->file_line);
+	if (!ppos->ff && prt_use_नुमेरो())
+	    prt_लिन्या_नुमेरो(psettings, page_लिन्या, ppos->file_लिन्या);
 	ppos->ff = FALSE;
     }
     else
     {
 	// left over from wrap halfway a tab
-	print_pos = ppos->print_pos;
+	इलिम्बाग_pos = ppos->इलिम्बाग_pos;
 	tab_spaces = ppos->lead_spaces;
     }
 
-    mch_print_start_line(0, page_line);
-    line = ml_get(ppos->file_line);
+    mch_इलिम्बाग_start_लिन्या(0, page_लिन्या);
+    लिन्या = ml_get(ppos->file_लिन्या);
 
     /*
      * Loop over the columns until the end of the file line or right margin.
      */
-    for (col = ppos->column; line[col] != NUL && !need_break; col += outputlen)
+    for (col = ppos->column; लिन्या[col] != NUL && !need_break; col += outputlen)
     {
 	outputlen = 1;
-	if (has_mbyte && (outputlen = (*mb_ptr2len)(line + col)) < 1)
+	if (has_mbyte && (outputlen = (*mb_ptr2len)(लिन्या + col)) < 1)
 	    outputlen = 1;
 #ifdef FEAT_SYN_HL
 	/*
@@ -871,13 +871,13 @@ hardcopy_line(
 	 */
 	if (psettings->do_syntax)
 	{
-	    id = syn_get_id(curwin, ppos->file_line, col, 1, NULL, FALSE);
+	    id = syn_get_id(curwin, ppos->file_लिन्या, col, 1, NULL, FALSE);
 	    if (id > 0)
 		id = syn_get_final_id(id);
 	    else
 		id = 0;
 	    // Get the line again, a multi-line regexp may invalidate it.
-	    line = ml_get(ppos->file_line);
+	    लिन्या = ml_get(ppos->file_लिन्या);
 
 	    if (id != current_syn_id)
 	    {
@@ -893,20 +893,20 @@ hardcopy_line(
 	/*
 	 * Appropriately expand any tabs to spaces.
 	 */
-	if (line[col] == TAB || tab_spaces != 0)
+	if (लिन्या[col] == TAB || tab_spaces != 0)
 	{
 	    if (tab_spaces == 0)
 #ifdef FEAT_VARTABS
-		tab_spaces = tabstop_padding(print_pos, curbuf->b_p_ts,
+		tab_spaces = tabstop_padding(इलिम्बाग_pos, curbuf->b_p_ts,
 							curbuf->b_p_vts_array);
 #else
-		tab_spaces = (int)(curbuf->b_p_ts - (print_pos % curbuf->b_p_ts));
+		tab_spaces = (int)(curbuf->b_p_ts - (इलिम्बाग_pos % curbuf->b_p_ts));
 #endif
 
 	    while (tab_spaces > 0)
 	    {
-		need_break = mch_print_text_out((char_u *)" ", 1);
-		print_pos++;
+		need_break = mch_इलिम्बाग_text_out((char_u *)" ", 1);
+		इलिम्बाग_pos++;
 		tab_spaces--;
 		if (need_break)
 		    break;
@@ -915,9 +915,9 @@ hardcopy_line(
 	    if (need_break && tab_spaces > 0)
 		break;
 	}
-	else if (line[col] == FF
-		&& printer_opts[OPT_PRINT_FORMFEED].present
-		&& TOLOWER_ASC(printer_opts[OPT_PRINT_FORMFEED].string[0])
+	else if (लिन्या[col] == FF
+		&& printer_opts[OPT_इलिम्बाग_FORMFEED].present
+		&& TOLOWER_ASC(printer_opts[OPT_इलिम्बाग_FORMFEED].string[0])
 								       == 'y')
 	{
 	    ppos->ff = TRUE;
@@ -925,25 +925,25 @@ hardcopy_line(
 	}
 	else
 	{
-	    need_break = mch_print_text_out(line + col, outputlen);
+	    need_break = mch_इलिम्बाग_text_out(लिन्या + col, outputlen);
 	    if (has_mbyte)
-		print_pos += (*mb_ptr2cells)(line + col);
+		इलिम्बाग_pos += (*mb_ptr2cells)(लिन्या + col);
 	    else
-		print_pos++;
+		इलिम्बाग_pos++;
 	}
     }
 
     ppos->lead_spaces = tab_spaces;
-    ppos->print_pos = (int)print_pos;
+    ppos->इलिम्बाग_pos = (int)इलिम्बाग_pos;
 
     /*
      * Start next line of file if we clip lines, or have reached end of the
      * line, unless we are doing a formfeed.
      */
     if (!ppos->ff
-	    && (line[col] == NUL
-		|| (printer_opts[OPT_PRINT_WRAP].present
-		    && TOLOWER_ASC(printer_opts[OPT_PRINT_WRAP].string[0])
+	    && (लिन्या[col] == NUL
+		|| (printer_opts[OPT_इलिम्बाग_WRAP].present
+		    && TOLOWER_ASC(printer_opts[OPT_इलिम्बाग_WRAP].string[0])
 								     == 'n')))
 	return 0;
     return col;

@@ -57,13 +57,13 @@ filemess(
     char_u	*s,
     int		attr)
 {
-    int		msg_scroll_save;
-    int		prev_msg_col = msg_col;
+    int		मेनसाहे_scroll_save;
+    int		prev_मेनसाहे_col = मेनसाहे_col;
     size_t	len;
 
-    if (msg_silent != 0)
+    if (मेनसाहे_silent != 0)
 	return;
-    msg_add_fname(buf, name);	    // put file name in IObuff with quotes
+    मेनसाहे_add_fname(buf, name);	    // put file name in IObuff with quotes
 
     // If it's extremely long, truncate it.
     len = STRLEN(IObuff);
@@ -82,21 +82,21 @@ filemess(
      * For further ones overwrite the previous one, reset msg_scroll before
      * calling filemess().
      */
-    msg_scroll_save = msg_scroll;
+    मेनसाहे_scroll_save = मेनसाहे_scroll;
     if (shortmess(SHM_OVERALL) && !exiting && p_verbose == 0)
-	msg_scroll = FALSE;
-    if (!msg_scroll)	// wait a bit when overwriting an error msg
+	मेनसाहे_scroll = FALSE;
+    if (!मेनसाहे_scroll)	// wait a bit when overwriting an error msg
 	check_for_delay(FALSE);
-    msg_start();
-    if (prev_msg_col != 0 && msg_col == 0)
-	msg_putchar('\r');  // overwrite any previous message.
-    msg_scroll = msg_scroll_save;
-    msg_scrolled_ign = TRUE;
+    मेनसाहे_start();
+    if (prev_मेनसाहे_col != 0 && मेनसाहे_col == 0)
+	मेनसाहे_putchar('\r');  // overwrite any previous message.
+    मेनसाहे_scroll = मेनसाहे_scroll_save;
+    मेनसाहे_scrolled_ign = TRUE;
     // may truncate the message to avoid a hit-return prompt
-    msg_outtrans_attr(msg_may_trunc(FALSE, IObuff), attr);
-    msg_clr_eos();
+    मेनसाहे_outtrans_attr(मेनसाहे_may_trunc(FALSE, IObuff), attr);
+    मेनसाहे_clr_eos();
     out_flush();
-    msg_scrolled_ign = FALSE;
+    मेनसाहे_scrolled_ign = FALSE;
 }
 
 /*
@@ -130,8 +130,8 @@ readfile(
     char_u	*fname,
     char_u	*sfname,
     linenr_T	from,
-    linenr_T	lines_to_skip,
-    linenr_T	lines_to_read,
+    linenr_T	मगा_लिन्या_to_skip,
+    linenr_T	मगा_लिन्या_to_read,
     exarg_T	*eap,			// can be NULL!
     int		flags)
 {
@@ -152,7 +152,7 @@ readfile(
     char_u	*ptr = NULL;		// pointer into read buffer
     char_u	*buffer = NULL;		// read buffer
     char_u	*new_buffer = NULL;	// init to shut up gcc
-    char_u	*line_start = NULL;	// init to shut up gcc
+    char_u	*लिन्या_start = NULL;	// init to shut up gcc
     int		wasempty;		// buffer was empty before reading
     colnr_T	len;
     long	size = 0;
@@ -161,9 +161,9 @@ readfile(
     int		skip_read = FALSE;
 #ifdef FEAT_CRYPT
     off_T       filesize_disk = 0;      // file size read from disk
-    off_T       filesize_count = 0;     // counter
+    off_T       filesize_बिलांग = 0;     // counter
     char_u	*cryptkey = NULL;
-    int		did_ask_for_key = FALSE;
+    int		did_ask_for_सुसि = FALSE;
 #endif
 #ifdef FEAT_PERSISTENT_UNDO
     context_sha256_T sha_ctx;
@@ -185,9 +185,9 @@ readfile(
     int		keep_fileformat = FALSE;
     stat_T	st;
     int		file_readonly;
-    linenr_T	skip_count = 0;
-    linenr_T	read_count = 0;
-    int		msg_save = msg_scroll;
+    linenr_T	skip_बिलांग = 0;
+    linenr_T	read_बिलांग = 0;
+    int		मेनसाहे_save = मेनसाहे_scroll;
     linenr_T	read_no_eol_lnum = 0;   // non-zero lnum when last line of
 					// last read was missing the eol
     int		try_mac;
@@ -227,7 +227,7 @@ readfile(
     char_u	*old_b_fname;
     int		using_b_ffname;
     int		using_b_fname;
-    static char *msg_is_a_directory = N_("is a directory");
+    static char *मेनसाहे_is_a_directory = N_("is a directory");
 #ifdef FEAT_CRYPT
     int		eof = FALSE;
 #endif
@@ -341,9 +341,9 @@ readfile(
     }
 
     if ((shortmess(SHM_OVER) || curbuf->b_help) && p_verbose == 0)
-	msg_scroll = FALSE;	// overwrite previous file message
+	मेनसाहे_scroll = FALSE;	// overwrite previous file message
     else
-	msg_scroll = TRUE;	// don't overwrite previous file message
+	मेनसाहे_scroll = TRUE;	// don't overwrite previous file message
 
     if (fname != NULL && *fname != NUL)
     {
@@ -353,8 +353,8 @@ readfile(
 	if (fnamelen >= MAXPATHL)
 	{
 	    filemess(curbuf, fname, (char_u *)_("Illegal file name"), 0);
-	    msg_end();
-	    msg_scroll = msg_save;
+	    मेनसाहे_end();
+	    मेनसाहे_scroll = मेनसाहे_save;
 	    goto theend;
 	}
 
@@ -363,9 +363,9 @@ readfile(
 	// swap file may destroy it!  Reported on MS-DOS and Win 95.
 	if (after_pathsep(fname, fname + fnamelen))
 	{
-	    filemess(curbuf, fname, (char_u *)_(msg_is_a_directory), 0);
-	    msg_end();
-	    msg_scroll = msg_save;
+	    filemess(curbuf, fname, (char_u *)_(मेनसाहे_is_a_directory), 0);
+	    मेनसाहे_end();
+	    मेनसाहे_scroll = मेनसाहे_save;
 	    retval = NOTDONE;
 	    goto theend;
 	}
@@ -393,13 +393,13 @@ readfile(
 	     */
 	    if (S_ISDIR(perm))
 	    {
-		filemess(curbuf, fname, (char_u *)_(msg_is_a_directory), 0);
+		filemess(curbuf, fname, (char_u *)_(मेनसाहे_is_a_directory), 0);
 		retval = NOTDONE;
 	    }
 	    else
 		filemess(curbuf, fname, (char_u *)_("is not a file"), 0);
-	    msg_end();
-	    msg_scroll = msg_save;
+	    मेनसाहे_end();
+	    मेनसाहे_scroll = मेनसाहे_save;
 	    goto theend;
 	}
 #endif
@@ -408,11 +408,11 @@ readfile(
 	 * MS-Windows allows opening a device, but we will probably get stuck
 	 * trying to read it.
 	 */
-	if (!p_odev && mch_nodetype(fname) == NODE_WRITABLE)
+	if (!p_odev && mch_nodetype(fname) == बुहोल_WRITABLE)
 	{
 	    filemess(curbuf, fname, (char_u *)_("is a device (disabled with 'opendevice' option)"), 0);
-	    msg_end();
-	    msg_scroll = msg_save;
+	    मेनसाहे_end();
+	    मेनसाहे_scroll = मेनसाहे_save;
 	    goto theend;
 	}
 #endif
@@ -486,7 +486,7 @@ readfile(
     {
 #if defined(MSWIN)
 	// Force binary I/O on stdin to avoid CR-LF -> LF conversion.
-	setmode(0, O_BINARY);
+	setmode(0, O_दालावाहान);
 #endif
     }
     else if (!read_buffer)
@@ -516,7 +516,7 @@ readfile(
 #ifndef UNIX
 	int	isdir_f;
 #endif
-	msg_scroll = msg_save;
+	मेनसाहे_scroll = मेनसाहे_save;
 #ifndef UNIX
 	/*
 	 * On Amiga we can't open a directory, check here.
@@ -525,7 +525,7 @@ readfile(
 	perm = mch_getperm(fname);  // check if the file exists
 	if (isdir_f)
 	{
-	    filemess(curbuf, sfname, (char_u *)_(msg_is_a_directory), 0);
+	    filemess(curbuf, sfname, (char_u *)_(मेनसाहे_is_a_directory), 0);
 	    curbuf->b_p_ro = TRUE;	// must use "w!" now
 	}
 	else
@@ -696,8 +696,8 @@ readfile(
 
     if (!read_buffer)
     {
-	int	m = msg_scroll;
-	int	n = msg_scrolled;
+	int	m = मेनसाहे_scroll;
+	int	n = मेनसाहे_scrolled;
 
 	/*
 	 * The file must be closed again, the autocommands may want to change
@@ -711,7 +711,7 @@ readfile(
 	 * should not be overwritten: Set msg_scroll, restore its value if no
 	 * output was done.
 	 */
-	msg_scroll = TRUE;
+	मेनसाहे_scroll = TRUE;
 	if (filtering)
 	    apply_autocmds_exarg(EVENT_FILTERREADPRE, NULL, sfname,
 							  FALSE, curbuf, eap);
@@ -730,14 +730,14 @@ readfile(
 	try_unix = (vim_strchr(p_ffs, 'x') != NULL);
 	curbuf->b_op_start = orig_start;
 
-	if (msg_scrolled == n)
-	    msg_scroll = m;
+	if (मेनसाहे_scrolled == n)
+	    मेनसाहे_scroll = m;
 
 #ifdef FEAT_EVAL
 	if (aborting())	    // autocmds may abort script processing
 	{
 	    --no_wait_return;
-	    msg_scroll = msg_save;
+	    मेनसाहे_scroll = मेनसाहे_save;
 	    curbuf->b_p_ro = TRUE;	// must use "w!" now
 	    goto theend;
 	}
@@ -755,7 +755,7 @@ readfile(
 		|| (fd = mch_open((char *)fname, O_RDONLY | O_EXTRA, 0)) < 0))
 	{
 	    --no_wait_return;
-	    msg_scroll = msg_save;
+	    मेनसाहे_scroll = मेनसाहे_save;
 	    if (fd < 0)
 		emsg(_(e_readpre_autocommands_made_file_unreadable));
 	    else
@@ -784,7 +784,7 @@ readfile(
 # ifdef VIMDLL
 		if (!gui.in_use)
 # endif
-		    mch_msg(_("Vim: Reading from stdin...\n"));
+		    mch_मेनसाहे(_("Vim: Reading from stdin...\n"));
 #endif
 #ifdef FEAT_GUI
 		// Also write a message in the GUI window, if there is one.
@@ -807,13 +807,13 @@ readfile(
 	    filemess(curbuf, sfname, (char_u *)"", 0);
     }
 
-    msg_scroll = FALSE;			// overwrite the file message
+    मेनसाहे_scroll = FALSE;			// overwrite the file message
 
     /*
      * Set linecnt now, before the "retry" caused by a wrong guess for
      * fileformat, and after the autocommands, which may change them.
      */
-    linecnt = curbuf->b_ml.ml_line_count;
+    linecnt = curbuf->b_ml.ml_लिन्या_बिलांग;
 
     // "++bad=" argument.
     if (eap != NULL && eap->bad_char != 0)
@@ -1124,10 +1124,10 @@ retry:
 	linerest = 0;
 	filesize = 0;
 #ifdef FEAT_CRYPT
-	filesize_count = 0;
+	filesize_बिलांग = 0;
 #endif
-	skip_count = lines_to_skip;
-	read_count = lines_to_read;
+	skip_बिलांग = मगा_लिन्या_to_skip;
+	read_बिलांग = मगा_लिन्या_to_read;
 	conv_restlen = 0;
 #ifdef FEAT_PERSISTENT_UNDO
 	read_undo_file = (newfile && (flags & READ_KEEP_UNDO) == 0
@@ -1197,7 +1197,7 @@ retry:
 		}
 		if (new_buffer == NULL)
 		{
-		    do_outofmem_msg((long_u)(size * 2 + linerest + 1));
+		    do_outofmem_मेनसाहे((long_u)(size * 2 + linerest + 1));
 		    error = TRUE;
 		    break;
 		}
@@ -1206,7 +1206,7 @@ retry:
 		vim_free(buffer);
 		buffer = new_buffer;
 		ptr = buffer + linerest;
-		line_start = buffer;
+		लिन्या_start = buffer;
 
 		// May need room to translate into.
 		// For iconv() we don't really know the required space, use a
@@ -1359,8 +1359,8 @@ retry:
 		    size = read_eintr(fd, ptr, read_size);
 #ifdef FEAT_CRYPT
 		    // Did we reach end of file?
-		    filesize_count += size;
-		    eof = (size < read_size || filesize_count == filesize_disk);
+		    filesize_बिलांग += size;
+		    eof = (size < read_size || filesize_बिलांग == filesize_disk);
 #endif
 		}
 
@@ -1372,7 +1372,7 @@ retry:
 		{
 		    cryptkey = check_for_cryptkey(cryptkey, ptr, &size,
 						  &filesize, newfile, sfname,
-						  &did_ask_for_key);
+						  &did_ask_for_सुसि);
 # if defined(CRYPT_NOT_INPLACE) && defined(FEAT_PERSISTENT_UNDO)
 		    if (curbuf->b_cryptstate != NULL
 				 && !crypt_works_inplace(curbuf->b_cryptstate))
@@ -1431,7 +1431,7 @@ retry:
 			    new_buffer = lalloc(new_size, FALSE);
 			    if (new_buffer == NULL)
 			    {
-				do_outofmem_msg(new_size);
+				do_outofmem_मेनसाहे(new_size);
 				error = TRUE;
 				break;
 			    }
@@ -1448,7 +1448,7 @@ retry:
 			    vim_free(buffer);
 			    buffer = new_buffer;
 			    new_buffer = NULL;
-			    line_start = buffer;
+			    लिन्या_start = buffer;
 			    ptr = buffer + linerest + conv_restlen;
 			    real_size = size;
 			}
@@ -1479,12 +1479,12 @@ retry:
 			    if (can_retry)
 				goto rewind_retry;
 			    if (conv_error == 0)
-				conv_error = curbuf->b_ml.ml_line_count
+				conv_error = curbuf->b_ml.ml_लिन्या_बिलांग
 								- linecnt + 1;
 			}
 			// Remember the first linenr with an illegal byte
 			else if (illegal_byte == 0)
-			    illegal_byte = curbuf->b_ml.ml_line_count
+			    illegal_byte = curbuf->b_ml.ml_लिन्या_बिलांग
 								- linecnt + 1;
 			if (bad_char_behavior == BAD_DROP)
 			{
@@ -1603,14 +1603,14 @@ retry:
 		 * iconv().
 		 */
 		const char	*fromp;
-		char		*top;
+		char		*इताअस;
 		size_t		from_size;
 		size_t		to_size;
 
 		fromp = (char *)ptr;
 		from_size = size;
 		ptr += size;
-		top = (char *)ptr;
+		इताअस = (char *)ptr;
 		to_size = real_size - size;
 
 		/*
@@ -1619,7 +1619,7 @@ retry:
 		 * alternative (help files).
 		 */
 		while ((iconv(iconv_fd, (void *)&fromp, &from_size,
-							       &top, &to_size)
+							       &इताअस, &to_size)
 			    == (size_t)-1 && ICONV_ERRNO != ICONV_EINVAL)
 						  || from_size > CONV_RESTLEN)
 		{
@@ -1627,19 +1627,19 @@ retry:
 			goto rewind_retry;
 		    if (conv_error == 0)
 			conv_error = readfile_linenr(linecnt,
-							  ptr, (char_u *)top);
+							  ptr, (char_u *)इताअस);
 
 		    // Deal with a bad byte and continue with the next.
 		    ++fromp;
 		    --from_size;
 		    if (bad_char_behavior == BAD_KEEP)
 		    {
-			*top++ = *(fromp - 1);
+			*इताअस++ = *(fromp - 1);
 			--to_size;
 		    }
 		    else if (bad_char_behavior != BAD_DROP)
 		    {
-			*top++ = bad_char_behavior;
+			*इताअस++ = bad_char_behavior;
 			--to_size;
 		    }
 		}
@@ -1653,9 +1653,9 @@ retry:
 		}
 
 		// move the linerest to before the converted characters
-		line_start = ptr - linerest;
-		mch_memmove(line_start, buffer, (size_t)linerest);
-		size = (long)((char_u *)top - ptr);
+		लिन्या_start = ptr - linerest;
+		mch_memmove(लिन्या_start, buffer, (size_t)linerest);
+		size = (long)((char_u *)इताअस - ptr);
 	    }
 #endif
 
@@ -2050,8 +2050,8 @@ retry:
 		}
 
 		// move the linerest to before the converted characters
-		line_start = dest - linerest;
-		mch_memmove(line_start, buffer, (size_t)linerest);
+		लिन्या_start = dest - linerest;
+		mch_memmove(लिन्या_start, buffer, (size_t)linerest);
 		size = (long)((ptr + real_size) - dest);
 		ptr = dest;
 	    }
@@ -2249,30 +2249,30 @@ rewind_retry:
 		    *ptr = CAR;	// NLs are replaced by CRs!
 		else
 		{
-		    if (skip_count == 0)
+		    if (skip_बिलांग == 0)
 		    {
 			*ptr = NUL;	    // end of line
-			len = (colnr_T) (ptr - line_start + 1);
-			if (ml_append(lnum, line_start, len, newfile) == FAIL)
+			len = (colnr_T) (ptr - लिन्या_start + 1);
+			if (ml_append(lnum, लिन्या_start, len, newfile) == FAIL)
 			{
 			    error = TRUE;
 			    break;
 			}
 #ifdef FEAT_PERSISTENT_UNDO
 			if (read_undo_file)
-			    sha256_update(&sha_ctx, line_start, len);
+			    sha256_update(&sha_ctx, लिन्या_start, len);
 #endif
 			++lnum;
-			if (--read_count == 0)
+			if (--read_बिलांग == 0)
 			{
 			    error = TRUE;	// break loop
-			    line_start = ptr;	// nothing left to write
+			    लिन्या_start = ptr;	// nothing left to write
 			    break;
 			}
 		    }
 		    else
-			--skip_count;
-		    line_start = ptr + 1;
+			--skip_बिलांग;
+		    लिन्या_start = ptr + 1;
 		}
 	    }
 	}
@@ -2314,13 +2314,13 @@ rewind_retry:
 
 		// Process the newline.
 		ptr = nl;
-		if (skip_count == 0)
+		if (skip_बिलांग == 0)
 		{
 		    *ptr = NUL;		// end of line
-		    len = (colnr_T)(ptr - line_start + 1);
+		    len = (colnr_T)(ptr - लिन्या_start + 1);
 		    if (fileformat == EOL_DOS)
 		    {
-			if (ptr > line_start && ptr[-1] == CAR)
+			if (ptr > लिन्या_start && ptr[-1] == CAR)
 			{
 			    // remove CR before NL
 			    ptr[-1] = NUL;
@@ -2350,37 +2350,37 @@ rewind_retry:
 			    ff_error = EOL_DOS;
 			}
 		    }
-		    if (ml_append(lnum, line_start, len, newfile) == FAIL)
+		    if (ml_append(lnum, लिन्या_start, len, newfile) == FAIL)
 		    {
 			error = TRUE;
 			break;
 		    }
 #ifdef FEAT_PERSISTENT_UNDO
 		    if (read_undo_file)
-			sha256_update(&sha_ctx, line_start, len);
+			sha256_update(&sha_ctx, लिन्या_start, len);
 #endif
 		    ++lnum;
-		    if (--read_count == 0)
+		    if (--read_बिलांग == 0)
 		    {
 			error = TRUE;	    // break loop
-			line_start = ptr;   // nothing left to write
+			लिन्या_start = ptr;   // nothing left to write
 			break;
 		    }
 		}
 		else
-		    --skip_count;
-		line_start = ptr + 1;
+		    --skip_बिलांग;
+		लिन्या_start = ptr + 1;
 		++ptr;
 	    }
 	    size = -1;
 	}
-	linerest = (long)(ptr - line_start);
+	linerest = (long)(ptr - लिन्या_start);
 	ui_breakcheck();
     }
 
 failed:
     // not an error, max. number of lines reached
-    if (error && read_count == 0)
+    if (error && read_बिलांग == 0)
 	error = FALSE;
 
     // In Dos format ignore a trailing CTRL-Z, unless 'binary' is set.
@@ -2410,14 +2410,14 @@ failed:
 	if (set_options)
 	    curbuf->b_p_eol = FALSE;
 	*ptr = NUL;
-	len = (colnr_T)(ptr - line_start + 1);
-	if (ml_append(lnum, line_start, len, newfile) == FAIL)
+	len = (colnr_T)(ptr - लिन्या_start + 1);
+	if (ml_append(lnum, लिन्या_start, len, newfile) == FAIL)
 	    error = TRUE;
 	else
 	{
 #ifdef FEAT_PERSISTENT_UNDO
 	    if (read_undo_file)
-		sha256_update(&sha_ctx, line_start, len);
+		sha256_update(&sha_ctx, लिन्या_start, len);
 #endif
 	    read_no_eol_lnum = ++lnum;
 	}
@@ -2432,8 +2432,8 @@ failed:
 	crypt_free_state(curbuf->b_cryptstate);
 	curbuf->b_cryptstate = NULL;
     }
-    if (cryptkey != NULL && cryptkey != curbuf->b_p_key)
-	crypt_free_key(cryptkey);
+    if (cryptkey != NULL && cryptkey != curbuf->b_p_सुसि)
+	crypt_free_सुसि(cryptkey);
     // Don't set cryptkey to NULL, it's used below as a flag that
     // encryption was used.
 #endif
@@ -2490,13 +2490,13 @@ failed:
 #ifdef FEAT_NETBEANS_INTG
 	    netbeansFireChanges = 0;
 #endif
-	    ml_delete(curbuf->b_ml.ml_line_count);
+	    ml_delete(curbuf->b_ml.ml_लिन्या_बिलांग);
 #ifdef FEAT_NETBEANS_INTG
 	    netbeansFireChanges = 1;
 #endif
 	    --linecnt;
 	}
-	linecnt = curbuf->b_ml.ml_line_count - linecnt;
+	linecnt = curbuf->b_ml.ml_लिन्या_बिलांग - linecnt;
 	if (filesize == 0)
 	    linecnt = 0;
 	if (newfile || read_buffer)
@@ -2514,7 +2514,7 @@ failed:
 #endif
 	}
 	else if (linecnt)		// appended at least one line
-	    appended_lines_mark(from, linecnt);
+	    appended_मगा_लिन्या_mark(from, linecnt);
 
 #ifndef ALWAYS_USE_GUI
 	/*
@@ -2538,7 +2538,7 @@ failed:
 		if (newfile)
 		    curbuf->b_p_ro = TRUE;	// must use "w!" now
 	    }
-	    msg_scroll = msg_save;
+	    मेनसाहे_scroll = मेनसाहे_save;
 #ifdef FEAT_VIMINFO
 	    check_marks_read();
 #endif
@@ -2550,7 +2550,7 @@ failed:
 	{
 	    int	buflen;
 
-	    msg_add_fname(curbuf, sfname);   // fname in IObuff with quotes
+	    मेनसाहे_add_fname(curbuf, sfname);   // fname in IObuff with quotes
 	    c = FALSE;
 
 	    buflen = (int)STRLEN(IObuff);
@@ -2584,7 +2584,7 @@ failed:
 	    }
 	    if (read_no_eol_lnum)
 	    {
-		msg_add_eol();
+		मेनसाहे_add_eol();
 		c = TRUE;
 	    }
 	    if (ff_error == EOL_DOS)
@@ -2614,7 +2614,7 @@ failed:
 #ifdef FEAT_CRYPT
 	    if (cryptkey != NULL)
 	    {
-		crypt_append_msg(curbuf);
+		crypt_append_मेनसाहे(curbuf);
 		c = TRUE;
 	    }
 #endif
@@ -2636,40 +2636,40 @@ failed:
 			_("[READ ERRORS]"));
 		c = TRUE;
 	    }
-	    if (msg_add_fileformat(fileformat))
+	    if (मेनसाहे_add_fileformat(fileformat))
 		c = TRUE;
 #ifdef FEAT_CRYPT
 	    if (cryptkey != NULL)
-		msg_add_lines(c, (long)linecnt, filesize
+		मेनसाहे_add_मगा_लिन्या(c, (long)linecnt, filesize
 			 - crypt_get_header_len(crypt_get_method_nr(curbuf)));
 	    else
 #endif
-		msg_add_lines(c, (long)linecnt, filesize);
+		मेनसाहे_add_मगा_लिन्या(c, (long)linecnt, filesize);
 
-	    VIM_CLEAR(keep_msg);
-	    msg_scrolled_ign = TRUE;
+	    VIM_CLEAR(keep_मेनसाहे);
+	    मेनसाहे_scrolled_ign = TRUE;
 #ifdef ALWAYS_USE_GUI
 	    // Don't show the message when reading stdin, it would end up in a
 	    // message box (which might be shown when exiting!)
 	    if (read_stdin || read_buffer)
-		p = msg_may_trunc(FALSE, IObuff);
+		p = मेनसाहे_may_trunc(FALSE, IObuff);
 	    else
 #endif
 	    {
-		if (msg_col > 0)
-		    msg_putchar('\r');  // overwrite previous message
-		p = (char_u *)msg_trunc_attr((char *)IObuff, FALSE, 0);
+		if (मेनसाहे_col > 0)
+		    मेनसाहे_putchar('\r');  // overwrite previous message
+		p = (char_u *)मेनसाहे_trunc_attr((char *)IObuff, FALSE, 0);
 	    }
 	    if (read_stdin || read_buffer || restart_edit != 0
-		    || (msg_scrolled != 0 && !need_wait_return))
+		    || (मेनसाहे_scrolled != 0 && !need_wait_return))
 		// Need to repeat the message after redrawing when:
 		// - When reading from stdin (the screen will be cleared next).
 		// - When restart_edit is set (otherwise there will be a delay
 		//   before redrawing).
 		// - When the screen was scrolled but there is no wait-return
 		//   prompt.
-		set_keep_msg(p, 0);
-	    msg_scrolled_ign = FALSE;
+		set_keep_मेनसाहे(p, 0);
+	    मेनसाहे_scrolled_ign = FALSE;
 	}
 
 	// with errors writing the file requires ":w!"
@@ -2717,7 +2717,7 @@ failed:
 	}
 #endif
     }
-    msg_scroll = msg_save;
+    मेनसाहे_scroll = मेनसाहे_save;
 
 #ifdef FEAT_VIMINFO
     /*
@@ -2754,8 +2754,8 @@ failed:
 
     if (!read_stdin && !read_fifo && (!read_buffer || sfname != NULL))
     {
-	int m = msg_scroll;
-	int n = msg_scrolled;
+	int m = मेनसाहे_scroll;
+	int n = मेनसाहे_scrolled;
 
 	// Save the fileformat now, otherwise the buffer will be considered
 	// modified if the format/encoding was automatically detected.
@@ -2767,7 +2767,7 @@ failed:
 	 * should not be overwritten: Set msg_scroll, restore its value if no
 	 * output was done.
 	 */
-	msg_scroll = TRUE;
+	मेनसाहे_scroll = TRUE;
 	if (filtering)
 	    apply_autocmds_exarg(EVENT_FILTERREADPOST, NULL, sfname,
 							  FALSE, curbuf, eap);
@@ -2786,8 +2786,8 @@ failed:
 	else
 	    apply_autocmds_exarg(EVENT_FILEREADPOST, sfname, sfname,
 							    FALSE, NULL, eap);
-	if (msg_scrolled == n)
-	    msg_scroll = m;
+	if (मेनसाहे_scrolled == n)
+	    मेनसाहे_scroll = m;
 #ifdef FEAT_EVAL
 	if (aborting())	    // autocmds may abort script processing
 	    goto theend;
@@ -2838,7 +2838,7 @@ readfile_linenr(
     char_u	*s;
     linenr_T	lnum;
 
-    lnum = curbuf->b_ml.ml_line_count - linecnt + 1;
+    lnum = curbuf->b_ml.ml_लिन्या_बिलांग - linecnt + 1;
     for (s = p; s < endp; ++s)
 	if (*s == '\n')
 	    ++lnum;
@@ -2995,7 +2995,7 @@ readfile_charconvert(
     {
 	// Don't use emsg(), it breaks mappings, the retry with
 	// another type of conversion might still work.
-	msg(errmsg);
+	मेनसाहे(errmsg);
 	if (tmpname != NULL)
 	{
 	    mch_remove(tmpname);	// delete converted file
@@ -3041,9 +3041,9 @@ check_for_cryptkey(
 	crypt_set_cm_option(curbuf, method);
 	if (cryptkey == NULL && !*did_ask)
 	{
-	    if (*curbuf->b_p_key)
+	    if (*curbuf->b_p_सुसि)
 	    {
-		cryptkey = curbuf->b_p_key;
+		cryptkey = curbuf->b_p_सुसि;
 		crypt_check_swapfile_curbuf();
 	    }
 	    else
@@ -3052,16 +3052,16 @@ check_for_cryptkey(
 		// option and don't free it.  bf needs hash of the key saved.
 		// Don't ask for the key again when first time Enter was hit.
 		// Happens when retrying to detect encoding.
-		smsg(_(need_key_msg), fname);
-		msg_scroll = TRUE;
+		smsg(_(need_सुसि_मेनसाहे), fname);
+		मेनसाहे_scroll = TRUE;
 		crypt_check_method(method);
-		cryptkey = crypt_get_key(newfile, FALSE);
+		cryptkey = crypt_get_सुसि(newfile, FALSE);
 		*did_ask = TRUE;
 
 		// check if empty key entered
 		if (cryptkey != NULL && *cryptkey == NUL)
 		{
-		    if (cryptkey != curbuf->b_p_key)
+		    if (cryptkey != curbuf->b_p_सुसि)
 			vim_free(cryptkey);
 		    cryptkey = NULL;
 		}
@@ -3076,7 +3076,7 @@ check_for_cryptkey(
 	    if (*sizep < header_len)
 	    {
 		// invalid header, buffer can't be encrypted
-		if (cryptkey != curbuf->b_p_key)
+		if (cryptkey != curbuf->b_p_सुसि)
 		    vim_free(cryptkey);
 		return NULL;
 	    }
@@ -3096,8 +3096,8 @@ check_for_cryptkey(
     }
     // When starting to edit a new file which does not have encryption, clear
     // the 'key' option, except when starting up (called with -x argument)
-    else if (newfile && *curbuf->b_p_key != NUL && !starting)
-	set_option_value_give_err((char_u *)"key", 0L, (char_u *)"", OPT_LOCAL);
+    else if (newfile && *curbuf->b_p_सुसि != NUL && !starting)
+	set_option_हालागा_give_err((char_u *)"key", 0L, (char_u *)"", OPT_LOCAL);
 
     return cryptkey;
 }
@@ -3198,7 +3198,7 @@ set_rw_fname(char_u *fname, char_u *sfname)
  * Put file name into IObuff with quotes.
  */
     void
-msg_add_fname(buf_T *buf, char_u *fname)
+मेनसाहे_add_fname(buf_T *buf, char_u *fname)
 {
     size_t  IObufflen = 0;
 
@@ -3214,7 +3214,7 @@ msg_add_fname(buf_T *buf, char_u *fname)
  * Return TRUE if something appended.
  */
     int
-msg_add_fileformat(int eol_type)
+मेनसाहे_add_fileformat(int eol_type)
 {
 #ifndef USE_CRNL
     if (eol_type == EOL_DOS)
@@ -3242,21 +3242,21 @@ msg_add_fileformat(int eol_type)
  * Append line and character count to IObuff.
  */
     void
-msg_add_lines(
-    int	    insert_space,
+मेनसाहे_add_मगा_लिन्या(
+    int	    इसिंगित_space,
     long    lnum,
     off_T   nchars)
 {
     int  len = (int)STRLEN(IObuff);
 
-    if (shortmess(SHM_LINES))
+    if (shortmess(SHM_मगा_लिन्या))
 	vim_snprintf((char *)IObuff + len, IOSIZE - (size_t)len,
 		// l10n: L as in line, B as in byte
-		_("%s%ldL, %lldB"), insert_space ? " " : "", lnum, (varnumber_T)nchars);
+		_("%s%ldL, %lldB"), इसिंगित_space ? " " : "", lnum, (varnumber_T)nchars);
     else
     {
 	len += vim_snprintf((char *)IObuff + len, IOSIZE - (size_t)len,
-		NGETTEXT("%s%ld line, ", "%s%ld lines, ", lnum), insert_space ? " " : "", lnum);
+		NGETTEXT("%s%ld line, ", "%s%ld lines, ", lnum), इसिंगित_space ? " " : "", lnum);
 	vim_snprintf((char *)IObuff + len, IOSIZE - (size_t)len,
 		NGETTEXT("%lld byte", "%lld bytes", nchars), (varnumber_T)nchars);
     }
@@ -3266,7 +3266,7 @@ msg_add_lines(
  * Append message for missing line separator to IObuff.
  */
     void
-msg_add_eol(void)
+मेनसाहे_add_eol(void)
 {
     STRCAT(IObuff, shortmess(SHM_LAST) ? _("[noeol]") : _("[Incomplete last line]"));
 }
@@ -3614,16 +3614,16 @@ shorten_fnames(int force)
  * Shorten all filenames in "fnames[count]" by current directory.
  */
     void
-shorten_filenames(char_u **fnames, int count)
+shorten_filenames(char_u **fnames, int बिलांग)
 {
     int		i;
     char_u	dirname[MAXPATHL];
     char_u	*p;
 
-    if (fnames == NULL || count < 1)
+    if (fnames == NULL || बिलांग < 1)
 	return;
     mch_dirname(dirname, sizeof(dirname));
-    for (i = 0; i < count; ++i)
+    for (i = 0; i < बिलांग; ++i)
     {
 	if ((p = shorten_fname(fnames[i], dirname)) != NULL)
 	{
@@ -3916,9 +3916,9 @@ vim_rename(char_u *from, char_u *to)
 	// "./foo") a no-op (in a complicated way).
 	if (win32_fileinfo(from, &info1) == FILEINFO_OK
 		&& win32_fileinfo(to, &info2) == FILEINFO_OK
-		&& info1.dwVolumeSerialNumber == info2.dwVolumeSerialNumber
-		&& info1.nFileIndexHigh == info2.nFileIndexHigh
-		&& info1.nFileIndexLow == info2.nFileIndexLow)
+		&& info1.dw_Volume_Serial_नुमेरो == info2.dw_Volume_Serial_नुमेरो
+		&& info1.n_File_Index_माताअस == info2.n_File_Index_माताअस
+		&& info1.n_File_Index_माबाबा == info2.n_File_Index_माबाबा)
 	    use_tmp_file = TRUE;
     }
 #endif
@@ -4184,7 +4184,7 @@ check_timestamps(
 	if (need_wait_return && didit == 2)
 	{
 	    // make sure msg isn't overwritten
-	    msg_puts("\n");
+	    मेनसाहे_puts("\n");
 	    out_flush();
 	}
     }
@@ -4197,7 +4197,7 @@ check_timestamps(
  * empty.
  */
     static int
-move_lines(buf_T *frombuf, buf_T *tobuf)
+move_मगा_लिन्या(buf_T *frombuf, buf_T *tobuf)
 {
     buf_T	*tbuf = curbuf;
     int		retval = OK;
@@ -4206,7 +4206,7 @@ move_lines(buf_T *frombuf, buf_T *tobuf)
 
     // Copy the lines in "frombuf" to "tobuf".
     curbuf = tobuf;
-    for (lnum = 1; lnum <= frombuf->b_ml.ml_line_count; ++lnum)
+    for (lnum = 1; lnum <= frombuf->b_ml.ml_लिन्या_बिलांग; ++lnum)
     {
 	p = vim_strnsave(ml_get_buf(frombuf, lnum, FALSE), ml_get_buf_len(frombuf, lnum));
 	if (p == NULL || ml_append(lnum - 1, p, 0, FALSE) == FAIL)
@@ -4222,7 +4222,7 @@ move_lines(buf_T *frombuf, buf_T *tobuf)
     if (retval != FAIL)
     {
 	curbuf = frombuf;
-	for (lnum = curbuf->b_ml.ml_line_count; lnum > 0; --lnum)
+	for (lnum = curbuf->b_ml.ml_लिन्या_बिलांग; lnum > 0; --lnum)
 	    if (ml_delete(lnum) == FAIL)
 	    {
 		// Oops!  We could try putting back the saved lines, but that
@@ -4519,12 +4519,12 @@ buf_check_timestamp(
 		{
 		    if (!autocmd_busy)
 		    {
-			msg_start();
-			msg_puts_attr(tbuf, HL_ATTR(HLF_E) + MSG_HIST);
+			मेनसाहे_start();
+			मेनसाहे_puts_attr(tbuf, HL_ATTR(HLF_E) + मेनसाहे_HIST);
 			if (*mesg2 != NUL)
-			    msg_puts_attr(mesg2, HL_ATTR(HLF_W) + MSG_HIST);
-			msg_clr_eos();
-			(void)msg_end();
+			    मेनसाहे_puts_attr(mesg2, HL_ATTR(HLF_W) + मेनसाहे_HIST);
+			मेनसाहे_clr_eos();
+			(void)मेनसाहे_end();
 			if (emsg_silent == 0 && !in_assert_fails)
 			{
 			    out_flush();
@@ -4621,12 +4621,12 @@ buf_reload(buf_T *buf, int orig_mode, int reload_options)
 	old_cursor = curwin->w_cursor;
 	old_topline = curwin->w_topline;
 
-	if (p_ur < 0 || curbuf->b_ml.ml_line_count <= p_ur)
+	if (p_ur < 0 || curbuf->b_ml.ml_लिन्या_बिलांग <= p_ur)
 	{
 	    // Save all the text, so that the reload can be undone.
 	    // Sync first so that this is a separate undo-able action.
 	    u_sync(FALSE);
-	    saved = u_savecommon(0, curbuf->b_ml.ml_line_count + 1, 0, TRUE);
+	    saved = u_savecommon(0, curbuf->b_ml.ml_लिन्या_बिलांग + 1, 0, TRUE);
 	    flags |= READ_KEEP_UNDO;
 	}
 
@@ -4654,7 +4654,7 @@ buf_reload(buf_T *buf, int orig_mode, int reload_options)
 		curwin->w_buffer = buf;
 	    }
 	    if (savebuf == NULL || saved == FAIL || buf != curbuf
-				      || move_lines(buf, savebuf) == FAIL)
+				      || move_मगा_लिन्या(buf, savebuf) == FAIL)
 	    {
 		semsg(_(e_could_not_prepare_for_reloading_str), buf->b_fname);
 		saved = FAIL;
@@ -4663,13 +4663,13 @@ buf_reload(buf_T *buf, int orig_mode, int reload_options)
 
 	if (saved == OK)
 	{
-	    int old_msg_silent = msg_silent;
+	    int old_मेनसाहे_silent = मेनसाहे_silent;
 
 	    curbuf->b_flags |= BF_CHECK_RO;	// check for RO again
 	    curbuf->b_keep_filetype = true;	// don't detect 'filetype'
 
 	    if (shortmess(SHM_FILEINFO))
-		msg_silent = 1;
+		मेनसाहे_silent = 1;
 
 	    if (readfile(buf->b_ffname, buf->b_fname, (linenr_T)0,
 			(linenr_T)0,
@@ -4684,9 +4684,9 @@ buf_reload(buf_T *buf, int orig_mode, int reload_options)
 		    // Put the text back from the save buffer.  First
 		    // delete any lines that readfile() added.
 		    while (!BUFEMPTY())
-			if (ml_delete(buf->b_ml.ml_line_count) == FAIL)
+			if (ml_delete(buf->b_ml.ml_लिन्या_बिलांग) == FAIL)
 			    break;
-		    (void)move_lines(savebuf, buf);
+		    (void)move_मगा_लिन्या(savebuf, buf);
 		}
 	    }
 	    else if (buf == curbuf)  // "buf" still valid
@@ -4702,7 +4702,7 @@ buf_reload(buf_T *buf, int orig_mode, int reload_options)
 		}
 	    }
 
-	    msg_silent = old_msg_silent;
+	    मेनसाहे_silent = old_मेनसाहे_silent;
 	}
 	vim_free(ea.cmd);
 
@@ -4716,8 +4716,8 @@ buf_reload(buf_T *buf, int orig_mode, int reload_options)
 
 	// Restore the topline and cursor position and check it (lines may
 	// have been removed).
-	if (old_topline > curbuf->b_ml.ml_line_count)
-	    curwin->w_topline = curbuf->b_ml.ml_line_count;
+	if (old_topline > curbuf->b_ml.ml_लिन्या_बिलांग)
+	    curwin->w_topline = curbuf->b_ml.ml_लिन्या_बिलांग;
 	else
 	    curwin->w_topline = old_topline;
 	curwin->w_cursor = old_cursor;
@@ -4882,15 +4882,15 @@ create_readdirex_item(WIN32_FIND_DATAW *wfd)
     }
     vim_free(p);
 
-    size = (((varnumber_T)wfd->nFileSizeHigh) << 32) | wfd->nFileSizeLow;
-    if (dict_add_number(item, "size", size) == FAIL)
+    size = (((varnumber_T)wfd->n_File_Size_माताअस) << 32) | wfd->n_File_Size_माबाबा;
+    if (dict_add_नुमेरो(item, "size", size) == FAIL)
 	goto theend;
 
     // Convert FILETIME to unix time.
-    time = (((((varnumber_T)wfd->ftLastWriteTime.dwHighDateTime) << 32) |
-		wfd->ftLastWriteTime.dwLowDateTime)
+    time = (((((varnumber_T)wfd->ftLastWriteTime.dw_माताअस_Date_Time) << 32) |
+		wfd->ftLastWriteTime.dw_माबाबा_Date_Time)
 	    - 116444736000000000) / 10000000;
-    if (dict_add_number(item, "time", time) == FAIL)
+    if (dict_add_नुमेरो(item, "time", time) == FAIL)
 	goto theend;
 
     getftypewfd(wfd, &s);
@@ -4962,9 +4962,9 @@ create_readdirex_item(char_u *path, char_u *name)
 	// non-perfect check for overflow
 	else if ((off_T)size != (off_T)st.st_size)
 	    size = -2;
-	if (dict_add_number(item, "size", size) == FAIL)
+	if (dict_add_नुमेरो(item, "size", size) == FAIL)
 	    goto theend;
-	if (dict_add_number(item, "time", (varnumber_T)st.st_mtime) == FAIL)
+	if (dict_add_नुमेरो(item, "time", (varnumber_T)st.st_mtime) == FAIL)
 	    goto theend;
 
 	if (link)
@@ -5009,9 +5009,9 @@ create_readdirex_item(char_u *path, char_u *name)
     }
     else
     {
-	if (dict_add_number(item, "size", -1) == FAIL)
+	if (dict_add_नुमेरो(item, "size", -1) == FAIL)
 	    goto theend;
-	if (dict_add_number(item, "time", -1) == FAIL)
+	if (dict_add_नुमेरो(item, "time", -1) == FAIL)
 	    goto theend;
 	if (q.string == NULL)
 	{
@@ -5087,7 +5087,7 @@ readdir_core(
 # ifdef MSWIN
     char_u		*buf;
     int			ok;
-    HANDLE		hFind = INVALID_HANDLE_VALUE;
+    HANDLE		hFind = INVALID_HANDLE_हालागा;
     WIN32_FIND_DATAW    wfd;
     WCHAR		*wn = NULL;	// UTF-16 name, NULL when not used.
     char_u		*p_end;
@@ -5125,7 +5125,7 @@ readdir_core(
     wn = enc_to_utf16(buf, NULL);
     if (wn != NULL)
 	hFind = FindFirstFileW(wn, &wfd);
-    ok = (hFind != INVALID_HANDLE_VALUE);
+    ok = (hFind != INVALID_HANDLE_हालागा);
     if (!ok)
     {
 	failed = TRUE;
@@ -5335,7 +5335,7 @@ delete_recursive(char_u *name)
 #endif
 
 #if defined(TEMPDIRNAMES)
-static long	temp_count = 0;		// Temp filename counter.
+static long	temp_बिलांग = 0;		// Temp filename counter.
 
 # if defined(UNIX) && defined(HAVE_FLOCK) && defined(HAVE_DIRFD)
 /*
@@ -5577,7 +5577,7 @@ vim_tempname(
     {
 	// There is no need to check if the file exists, because we own the
 	// directory and nobody else creates a file in it.
-	int itmplen = vim_snprintf((char *)itmp, sizeof(itmp), "%s%ld", vim_tempdir, temp_count++);
+	int itmplen = vim_snprintf((char *)itmp, sizeof(itmp), "%s%ld", vim_tempdir, temp_बिलांग++);
 	return vim_strnsave(itmp, (size_t)itmplen);
     }
 

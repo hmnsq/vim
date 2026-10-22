@@ -132,7 +132,7 @@ static void find_word(matchinf_T *mip, int mode);
 static void find_prefix(matchinf_T *mip, int mode);
 static int fold_more(matchinf_T *mip);
 static void spell_load_cb(char_u *fname, void *cookie);
-static int count_syllables(slang_T *slang, char_u *word);
+static int बिलांग_syllables(slang_T *slang, char_u *word);
 static void clear_midword(win_T *buf);
 static void use_midword(slang_T *lp, win_T *buf);
 static int find_region(char_u *rp, char_u *region);
@@ -172,7 +172,7 @@ spell_check(
     int		c;
     int		wrongcaplen = 0;
     int		lpi;
-    int		count_word = docount;
+    int		बिलांग_word = docount;
     int		use_camel_case = *wp->w_s->b_p_spo != NUL;
     int		is_camel_case = FALSE;
 
@@ -286,11 +286,11 @@ spell_check(
 	}
 
 	// Count the word in the first language where it's found to be OK.
-	if (count_word && mi.mi_result == SP_OK)
+	if (बिलांग_word && mi.mi_result == SP_OK)
 	{
-	    count_common_word(mi.mi_lp->lp_slang, ptr,
+	    बिलांग_common_word(mi.mi_lp->lp_slang, ptr,
 						   (int)(mi.mi_end - ptr), 1);
-	    count_word = FALSE;
+	    बिलांग_word = FALSE;
 	}
     }
 
@@ -1023,7 +1023,7 @@ can_compound(slang_T *slang, char_u *word, char_u *flags)
     // are too many syllables AND the number of compound words is above
     // COMPOUNDWORDMAX then compounding is not allowed.
     if (slang->sl_compsylmax < MAXWLEN
-		       && count_syllables(slang, word) > slang->sl_compsylmax)
+		       && बिलांग_syllables(slang, word) > slang->sl_compsylmax)
 	return (int)STRLEN(flags) < slang->sl_compmax;
     return TRUE;
 }
@@ -1342,7 +1342,7 @@ spell_move_to(
     linenr_T	lnum;
     pos_T	found_pos;
     int		found_len = 0;
-    char_u	*line;
+    char_u	*लिन्या;
     char_u	*p;
     char_u	*endp;
     hlf_T	attr = 0;
@@ -1378,9 +1378,9 @@ spell_move_to(
 
     while (!got_int)
     {
-	int empty_line;
+	int empty_लिन्या;
 
-	line = ml_get_buf(wp->w_buffer, lnum, FALSE);
+	लिन्या = ml_get_buf(wp->w_buffer, lnum, FALSE);
 
 	len = ml_get_buf_len(wp->w_buffer, lnum);
 	if (buflen < len + MAXWLEN + 2)
@@ -1398,26 +1398,26 @@ spell_move_to(
 
 	// For checking first word with a capital skip white space.
 	if (capcol == 0)
-	    capcol = getwhitecols(line);
+	    capcol = getwhitecols(लिन्या);
 	else if (curline && wp == curwin)
 	{
 	    // For spellbadword(): check if first word needs a capital.
-	    col = getwhitecols(line);
+	    col = getwhitecols(लिन्या);
 	    if (check_need_cap(curwin, lnum, col))
 		capcol = col;
 
 	    // Need to get the line again, may have looked at the previous
 	    // one.
-	    line = ml_get_buf(wp->w_buffer, lnum, FALSE);
+	    लिन्या = ml_get_buf(wp->w_buffer, lnum, FALSE);
 	}
 
 	// Copy the line into "buf" and append the start of the next line if
 	// possible.  Note: this ml_get_buf() may make "line" invalid, check
 	// for empty line first.
-	empty_line = *skipwhite(line) == NUL;
-	STRCPY(buf, line);
-	if (lnum < wp->w_buffer->b_ml.ml_line_count)
-	    spell_cat_line(buf + STRLEN(buf),
+	empty_लिन्या = *skipwhite(लिन्या) == NUL;
+	STRCPY(buf, लिन्या);
+	if (lnum < wp->w_buffer->b_ml.ml_लिन्या_बिलांग)
+	    spell_cat_लिन्या(buf + STRLEN(buf),
 			  ml_get_buf(wp->w_buffer, lnum + 1, FALSE), MAXWLEN);
 
 	p = buf + skip;
@@ -1433,10 +1433,10 @@ spell_move_to(
 		break;
 
 	    // start of word
-	    attr = HLF_COUNT;
+	    attr = HLF_बिलांग;
 	    len = spell_check(wp, p, &attr, &capcol, FALSE);
 
-	    if (attr != HLF_COUNT)
+	    if (attr != HLF_बिलांग)
 	    {
 		// We found a bad word.  Check the attribute.
 		if (behaviour == SMT_ALL
@@ -1459,7 +1459,7 @@ spell_move_to(
 			    (void)syn_get_id(wp, lnum, (colnr_T)col,
 						    FALSE, &can_spell, FALSE);
 			    if (!can_spell)
-				attr = HLF_COUNT;
+				attr = HLF_बिलांग;
 			}
 			else
 #endif
@@ -1524,16 +1524,16 @@ spell_move_to(
 	    {
 		// Wrap around to the end of the buffer.  May search the
 		// starting line again and accept the last match.
-		lnum = wp->w_buffer->b_ml.ml_line_count;
+		lnum = wp->w_buffer->b_ml.ml_लिन्या_बिलांग;
 		wrapped = TRUE;
-		if (!shortmess(SHM_SEARCH))
-		    give_warning((char_u *)_(top_bot_msg), TRUE);
+		if (!shortmess(SHM_हानाप))
+		    give_warning((char_u *)_(इताअस_bot_मेनसाहे), TRUE);
 	    }
 	    capcol = -1;
 	}
 	else
 	{
-	    if (lnum < wp->w_buffer->b_ml.ml_line_count)
+	    if (lnum < wp->w_buffer->b_ml.ml_लिन्या_बिलांग)
 		++lnum;
 	    else if (!p_ws)
 		break;	    // at first line and 'nowrapscan'
@@ -1543,8 +1543,8 @@ spell_move_to(
 		// starting line again and accept the first match.
 		lnum = 1;
 		wrapped = TRUE;
-		if (!shortmess(SHM_SEARCH))
-		    give_warning((char_u *)_(bot_top_msg), TRUE);
+		if (!shortmess(SHM_हानाप))
+		    give_warning((char_u *)_(bot_इताअस_मेनसाहे), TRUE);
 	    }
 
 	    // If we are back at the starting line and there is no match then
@@ -1554,7 +1554,7 @@ spell_move_to(
 
 	    // Skip the characters at the start of the next line that were
 	    // included in a match crossing line boundaries.
-	    if (attr == HLF_COUNT)
+	    if (attr == HLF_बिलांग)
 		skip = (int)(p - endp);
 	    else
 		skip = 0;
@@ -1563,11 +1563,11 @@ spell_move_to(
 	    --capcol;
 
 	    // But after empty line check first word in next line
-	    if (empty_line)
+	    if (empty_लिन्या)
 		capcol = 0;
 	}
 
-	line_breakcheck();
+	लिन्या_breakcheck();
     }
 
     vim_free(buf);
@@ -1581,12 +1581,12 @@ spell_move_to(
  * to skip those bytes if the word was OK.
  */
     void
-spell_cat_line(char_u *buf, char_u *line, int maxlen)
+spell_cat_लिन्या(char_u *buf, char_u *लिन्या, int maxlen)
 {
     char_u	*p;
     int		n;
 
-    p = skipwhite(line);
+    p = skipwhite(लिन्या);
     while (vim_strchr((char_u *)"*#/\"\t", *p) != NULL)
 	p = skipwhite(p + 1);
 
@@ -1595,7 +1595,7 @@ spell_cat_line(char_u *buf, char_u *line, int maxlen)
 
     // Only worth concatenating if there is something else than spaces to
     // concatenate.
-    n = (int)(p - line) + 1;
+    n = (int)(p - लिन्या) + 1;
     if (n < maxlen - 1)
     {
 	vim_memset(buf, ' ', n);
@@ -1759,7 +1759,7 @@ slang_free(slang_T *lp)
  * sl_sal for the SN_SOFO form.
  */
     void
-free_sal_items(garray_T *gap)
+free_sal_मगा_बागाय(garray_T *gap)
 {
     salitem_T	*smp;
 
@@ -1818,7 +1818,7 @@ slang_clear(slang_T *lp)
 	ga_clear(gap);
     }
     else
-	free_sal_items(gap);
+	free_sal_मगा_बागाय(gap);
 
     for (i = 0; i < lp->sl_prefixcnt; ++i)
 	vim_regfree(lp->sl_prefprog[i]);
@@ -1836,11 +1836,11 @@ slang_clear(slang_T *lp)
     VIM_CLEAR(lp->sl_compallflags);
 
     VIM_CLEAR(lp->sl_syllable);
-    ga_clear(&lp->sl_syl_items);
+    ga_clear(&lp->sl_syl_मगा_बागाय);
 
     ga_clear_strings(&lp->sl_comppat);
 
-    hash_clear_all(&lp->sl_wordcount, WC_KEY_OFF);
+    hash_clear_all(&lp->sl_wordcount, WC_सुसि_OFF);
     hash_init(&lp->sl_wordcount);
 
     hash_clear_all(&lp->sl_map_hash, 0);
@@ -1898,11 +1898,11 @@ spell_load_cb(char_u *fname, void *cookie)
  * If it's already there then the counter is increased.
  */
     void
-count_common_word(
+बिलांग_common_word(
     slang_T	*lp,
     char_u	*word,
     int		len,	    // word length, -1 for up to NUL
-    int		count)	    // 1 to count once, 10 to init
+    int		बिलांग)	    // 1 to count once, 10 to init
 {
     hash_T	hash;
     hashitem_T	*hi;
@@ -1928,14 +1928,14 @@ count_common_word(
 	if (wc == NULL)
 	    return;
 	STRCPY(wc->wc_word, p);
-	wc->wc_count = count;
+	wc->wc_बिलांग = बिलांग;
 	hash_add_item(&lp->sl_wordcount, hi, wc->wc_word, hash);
     }
     else
     {
 	wc = HI2WC(hi);
-	if ((wc->wc_count += count) < (unsigned)count)	// check for overflow
-	    wc->wc_count = MAXWORDCOUNT;
+	if ((wc->wc_बिलांग += बिलांग) < (unsigned)बिलांग)	// check for overflow
+	    wc->wc_बिलांग = MAXWORDCOUNT;
     }
 }
 
@@ -1973,7 +1973,7 @@ init_syl_tab(slang_T *slang)
     int		l;
     syl_item_T	*syl;
 
-    ga_init2(&slang->sl_syl_items, sizeof(syl_item_T), 4);
+    ga_init2(&slang->sl_syl_मगा_बागाय, sizeof(syl_item_T), 4);
     p = vim_strchr(slang->sl_syllable, '/');
     while (p != NULL)
     {
@@ -1988,10 +1988,10 @@ init_syl_tab(slang_T *slang)
 	    l = (int)(p - s);
 	if (l >= SY_MAXLEN)
 	    return SP_FORMERROR;
-	if (ga_grow(&slang->sl_syl_items, 1) == FAIL)
+	if (ga_grow(&slang->sl_syl_मगा_बागाय, 1) == FAIL)
 	    return SP_OTHERERROR;
-	syl = ((syl_item_T *)slang->sl_syl_items.ga_data)
-					       + slang->sl_syl_items.ga_len++;
+	syl = ((syl_item_T *)slang->sl_syl_मगा_बागाय.ga_data)
+					       + slang->sl_syl_मगा_बागाय.ga_len++;
 	vim_strncpy(syl->sy_chars, s, l);
 	syl->sy_len = l;
     }
@@ -2004,7 +2004,7 @@ init_syl_tab(slang_T *slang)
  * Returns zero if syllables are not defines.
  */
     static int
-count_syllables(slang_T *slang, char_u *word)
+बिलांग_syllables(slang_T *slang, char_u *word)
 {
     int		cnt = 0;
     int		skip = FALSE;
@@ -2029,9 +2029,9 @@ count_syllables(slang_T *slang, char_u *word)
 
 	// Find longest match of syllable items.
 	len = 0;
-	for (i = 0; i < slang->sl_syl_items.ga_len; ++i)
+	for (i = 0; i < slang->sl_syl_मगा_बागाय.ga_len; ++i)
 	{
-	    syl = ((syl_item_T *)slang->sl_syl_items.ga_data) + i;
+	    syl = ((syl_item_T *)slang->sl_syl_मगा_बागाय.ga_data) + i;
 	    if (syl->sy_len > len
 			       && STRNCMP(p, syl->sy_chars, syl->sy_len) == 0)
 		len = syl->sy_len;
@@ -2085,7 +2085,7 @@ parse_spelllang(win_T *wp)
     int		i, j;
     langp_T	*lp, *lp2;
     static int	recursive = FALSE;
-    char	*ret_msg = NULL;
+    char	*ret_मेनसाहे = NULL;
     char_u	*spl_copy;
     bufref_T	bufref;
 
@@ -2188,7 +2188,7 @@ parse_spelllang(win_T *wp)
 		// destroying the buffer we are using or closing the window.
 		if (!bufref_valid(&bufref) || !win_valid_any_tab(wp))
 		{
-		    ret_msg = N_(e_spellfilemising_autocommand_deleted_buffer);
+		    ret_मेनसाहे = N_(e_spellfilemising_autocommand_deleted_buffer);
 		    goto theend;
 		}
 	    }
@@ -2230,7 +2230,7 @@ parse_spelllang(win_T *wp)
 		    if (ga_grow(&ga, 1) == FAIL)
 		    {
 			ga_clear(&ga);
-			ret_msg = e_out_of_memory;
+			ret_मेनसाहे = e_out_of_memory;
 			goto theend;
 		    }
 		    LANGP_ENTRY(ga, ga.ga_len)->lp_slang = slang;
@@ -2379,7 +2379,7 @@ parse_spelllang(win_T *wp)
 theend:
     vim_free(spl_copy);
     recursive = FALSE;
-    return ret_msg;
+    return ret_मेनसाहे;
 }
 
 /*
@@ -2605,7 +2605,7 @@ open_spellbuf(void)
     buf->b_spell = true;
     buf->b_p_swf = TRUE;	// may create a swap file
 #ifdef FEAT_CRYPT
-    buf->b_p_key = empty_option;
+    buf->b_p_सुसि = empty_option;
 #endif
     ml_open(buf);
     ml_open_file(buf);	// create swap file now
@@ -2899,11 +2899,11 @@ check_need_cap(win_T *wp, linenr_T lnum, colnr_T col)
 	return FALSE;
 
     int		need_cap = FALSE;
-    char_u	*line = col ? ml_get_buf(wp->w_buffer, lnum, FALSE) : NULL;
-    char_u	*line_copy = NULL;
+    char_u	*लिन्या = col ? ml_get_buf(wp->w_buffer, lnum, FALSE) : NULL;
+    char_u	*लिन्या_copy = NULL;
     colnr_T	endcol = 0;
 
-    if (col == 0 || getwhitecols(line) >= col)
+    if (col == 0 || getwhitecols(लिन्या) >= col)
     {
 	// At start of line, check if previous line is empty or sentence
 	// ends there.
@@ -2911,18 +2911,18 @@ check_need_cap(win_T *wp, linenr_T lnum, colnr_T col)
 	    need_cap = TRUE;
 	else
 	{
-	    line = ml_get_buf(wp->w_buffer, lnum - 1, FALSE);
-	    if (*skipwhite(line) == NUL)
+	    लिन्या = ml_get_buf(wp->w_buffer, lnum - 1, FALSE);
+	    if (*skipwhite(लिन्या) == NUL)
 		need_cap = TRUE;
 	    else
 	    {
 		// Append a space in place of the line break.
-		line_copy = concat_str(line, (char_u *)" ");
-		if (line_copy == NULL)
+		लिन्या_copy = concat_str(लिन्या, (char_u *)" ");
+		if (लिन्या_copy == NULL)
 		    return FALSE;
 
-		line = line_copy;
-		endcol = (colnr_T)STRLEN(line);
+		लिन्या = लिन्या_copy;
+		endcol = (colnr_T)STRLEN(लिन्या);
 	    }
 	}
     }
@@ -2935,14 +2935,14 @@ check_need_cap(win_T *wp, linenr_T lnum, colnr_T col)
 	regmatch_T	regmatch;
 	regmatch.regprog = wp->w_s->b_cap_prog;
 	regmatch.rm_ic = FALSE;
-	char_u *p = line + endcol;
+	char_u *p = लिन्या + endcol;
 	for (;;)
 	{
-	    MB_PTR_BACK(line, p);
-	    if (p == line || spell_iswordp_nmw(p, wp))
+	    MB_PTR_BACK(लिन्या, p);
+	    if (p == लिन्या || spell_iswordp_nmw(p, wp))
 		break;
 	    if (vim_regexec(&regmatch, p, 0)
-					 && regmatch.endp[0] == line + endcol)
+					 && regmatch.endp[0] == लिन्या + endcol)
 	    {
 		need_cap = TRUE;
 		break;
@@ -2951,7 +2951,7 @@ check_need_cap(win_T *wp, linenr_T lnum, colnr_T col)
 	wp->w_s->b_cap_prog = regmatch.regprog;
     }
 
-    vim_free(line_copy);
+    vim_free(लिन्या_copy);
 
     return need_cap;
 }
@@ -2966,7 +2966,7 @@ ex_spellrepall(exarg_T *eap UNUSED)
     pos_T	pos = curwin->w_cursor;
     char_u	*frompat;
     size_t	frompatlen;
-    char_u	*line;
+    char_u	*लिन्या;
     char_u	*p;
     int		save_ws = p_ws;
     linenr_T	prev_lnum = 0;
@@ -2991,22 +2991,22 @@ ex_spellrepall(exarg_T *eap UNUSED)
     curwin->w_cursor.lnum = 0;
     while (!got_int)
     {
-	if (do_search(NULL, '/', '/', frompat, frompatlen, 1L, SEARCH_KEEP, NULL) == 0
+	if (do_हानाप(NULL, '/', '/', frompat, frompatlen, 1L, हानाप_KEEP, NULL) == 0
 						   || u_save_cursor() == FAIL)
 	    break;
 
 	// Only replace when the right word isn't there yet.  This happens
 	// when changing "etc" to "etc.".
-	line = ml_get_curline();
-	if (addlen <= 0 || STRNCMP(line + curwin->w_cursor.col,
+	लिन्या = ml_get_curline();
+	if (addlen <= 0 || STRNCMP(लिन्या + curwin->w_cursor.col,
 						   repl_to, repl_to_len) != 0)
 	{
 	    p = alloc(ml_get_curline_len() + addlen + 1);
 	    if (p == NULL)
 		break;
-	    mch_memmove(p, line, curwin->w_cursor.col);
+	    mch_memmove(p, लिन्या, curwin->w_cursor.col);
 	    STRCPY(p + curwin->w_cursor.col, repl_to);
-	    STRCAT(p, line + curwin->w_cursor.col + repl_from_len);
+	    STRCAT(p, लिन्या + curwin->w_cursor.col + repl_from_len);
 	    ml_replace(curwin->w_cursor.lnum, p, FALSE);
 	    changed_bytes(curwin->w_cursor.lnum, curwin->w_cursor.col);
 #if defined(FEAT_PROP_POPUP)
@@ -3032,7 +3032,7 @@ ex_spellrepall(exarg_T *eap UNUSED)
     if (sub_nsubs == 0)
 	semsg(_(e_not_found_str), repl_from);
     else
-	do_sub_msg(FALSE);
+	do_sub_मेनसाहे(FALSE);
 }
 
 /*
@@ -3896,25 +3896,25 @@ ex_spellinfo(exarg_T *eap UNUSED)
     if (no_spell_checking(curwin))
 	return;
 
-    msg_start();
+    मेनसाहे_start();
     for (lpi = 0; lpi < curwin->w_s->b_langp.ga_len && !got_int; ++lpi)
     {
 	lp = LANGP_ENTRY(curwin->w_s->b_langp, lpi);
-	msg_puts("file: ");
-	msg_puts((char *)lp->lp_slang->sl_fname);
-	msg_putchar('\n');
+	मेनसाहे_puts("file: ");
+	मेनसाहे_puts((char *)lp->lp_slang->sl_fname);
+	मेनसाहे_putchar('\n');
 	p = lp->lp_slang->sl_info;
 	if (p != NULL)
 	{
-	    msg_puts((char *)p);
-	    msg_putchar('\n');
+	    मेनसाहे_puts((char *)p);
+	    मेनसाहे_putchar('\n');
 	}
     }
-    msg_end();
+    मेनसाहे_end();
 }
 
 #define DUMPFLAG_KEEPCASE   1	// round 2: keep-case tree
-#define DUMPFLAG_COUNT	    2	// include word count
+#define DUMPFLAG_बिलांग	    2	// include word count
 #define DUMPFLAG_ICASE	    4	// ignore case when finding matches
 #define DUMPFLAG_ONECAP	    8	// pattern starts with capital
 #define DUMPFLAG_ALLCAP	    16	// pattern is all capitals
@@ -3930,24 +3930,24 @@ ex_spelldump(exarg_T *eap)
 
     if (no_spell_checking(curwin))
 	return;
-    (void)get_option_value((char_u*)"spl", &dummy, &spl, NULL, OPT_LOCAL);
+    (void)get_option_हालागा((char_u*)"spl", &dummy, &spl, NULL, OPT_LOCAL);
 
     // Create a new empty buffer in a new window.
     do_cmdline_cmd((char_u *)"new");
 
     // enable spelling locally in the new window
-    set_option_value_give_err((char_u*)"spell", TRUE, (char_u*)"", OPT_LOCAL);
-    set_option_value_give_err((char_u*)"spl",  dummy, spl, OPT_LOCAL);
+    set_option_हालागा_give_err((char_u*)"spell", TRUE, (char_u*)"", OPT_LOCAL);
+    set_option_हालागा_give_err((char_u*)"spl",  dummy, spl, OPT_LOCAL);
     vim_free(spl);
 
     if (!BUFEMPTY())
 	return;
 
-    spell_dump_compl(NULL, 0, NULL, eap->forceit ? DUMPFLAG_COUNT : 0);
+    spell_dump_compl(NULL, 0, NULL, eap->forceit ? DUMPFLAG_बिलांग : 0);
 
     // Delete the empty line that we started with.
-    if (curbuf->b_ml.ml_line_count > 1)
-	ml_delete(curbuf->b_ml.ml_line_count);
+    if (curbuf->b_ml.ml_लिन्या_बिलांग > 1)
+	ml_delete(curbuf->b_ml.ml_लिन्या_बिलांग);
 
     redraw_later(UPD_NOT_VALID);
 }
@@ -4079,8 +4079,8 @@ spell_dump_compl(
 		{
 		    // Done all bytes at this node, go up one level.
 		    --depth;
-		    line_breakcheck();
-		    ins_compl_check_keys(50, FALSE);
+		    लिन्या_breakcheck();
+		    ins_compl_check_मगा_सुसि(50, FALSE);
 		}
 		else
 		{
@@ -4210,7 +4210,7 @@ dump_word(
 	    p = badword;
 	}
 
-	if (dumpflags & DUMPFLAG_COUNT)
+	if (dumpflags & DUMPFLAG_बिलांग)
 	{
 	    hashitem_T  *hi;
 
@@ -4219,7 +4219,7 @@ dump_word(
 	    if (!HASHITEM_EMPTY(hi))
 	    {
 		vim_snprintf((char *)IObuff, IOSIZE, "%s\t%d",
-						     tw, HI2WC(hi)->wc_count);
+						     tw, HI2WC(hi)->wc_बिलांग);
 		p = IObuff;
 	    }
 	}
@@ -4293,7 +4293,7 @@ dump_prefixes(
 	    {
 		// Done all bytes at this node, go up one level.
 		--depth;
-		line_breakcheck();
+		लिन्या_breakcheck();
 	    }
 	    else
 	    {
@@ -4377,7 +4377,7 @@ spell_to_word_end(char_u *start, win_T *win)
     int
 spell_word_start(int startcol)
 {
-    char_u	*line;
+    char_u	*लिन्या;
     char_u	*p;
     int		col = 0;
 
@@ -4385,19 +4385,19 @@ spell_word_start(int startcol)
 	return startcol;
 
     // Find a word character before "startcol".
-    line = ml_get_curline();
-    for (p = line + startcol; p > line; )
+    लिन्या = ml_get_curline();
+    for (p = लिन्या + startcol; p > लिन्या; )
     {
-	MB_PTR_BACK(line, p);
+	MB_PTR_BACK(लिन्या, p);
 	if (spell_iswordp_nmw(p, curwin))
 	    break;
     }
 
     // Go back to start of the word.
-    while (p > line)
+    while (p > लिन्या)
     {
-	col = (int)(p - line);
-	MB_PTR_BACK(line, p);
+	col = (int)(p - लिन्या);
+	MB_PTR_BACK(लिन्या, p);
 	if (!spell_iswordp(p, curwin))
 	    break;
 	col = 0;

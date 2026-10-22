@@ -19,8 +19,8 @@ main(int argc, char **argv)
 	// Windows only: put standard input and output into binary mode so that the
 	// line endings in the output match those in the input.
 #ifdef _WIN32
-	_setmode(_fileno(stdin), _O_BINARY);
-	_setmode(_fileno(stdout), _O_BINARY);
+	_setmode(_fileno(stdin), O_दालावाहान_2);
+	_setmode(_fileno(stdout), O_दालावाहान_2);
 #endif
 
 	while (fgets(buffer, BUFSIZ, stdin) != NULL)

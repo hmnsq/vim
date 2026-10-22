@@ -36,7 +36,7 @@ static void early_arg_scan(mparm_T *parmp);
 #ifndef NO_VIM_MAIN
 static void usage(void);
 static void parse_command_name(mparm_T *parmp);
-static void command_line_scan(mparm_T *parmp);
+static void command_लिन्या_scan(mparm_T *parmp);
 static void check_tty(mparm_T *parmp);
 static void read_stdin(void);
 static void create_windows(mparm_T *parmp);
@@ -60,7 +60,7 @@ static char *(main_errors[]) =
     N_("Unknown option argument"),
 #define ME_UNKNOWN_OPTION	0
     N_("Too many edit arguments"),
-#define ME_TOO_MANY_ARGS	1
+#define ME_TOO_MANY_मगा_कातविरान	1
     N_("Argument missing after"),
 #define ME_ARG_MISSING		2
     N_("Garbage after option argument"),
@@ -112,7 +112,7 @@ main
      * MinGW expands command line arguments, which confuses our code to
      * convert when 'encoding' changes.  Get the unexpanded arguments.
      */
-    argc = get_cmd_argsW(&argv);
+    argc = get_cmd_मगा_कातविरान_W(&argv);
 #  endif
 
     // Many variables are in "params" so that we can pass them to invoked
@@ -125,14 +125,14 @@ main
 #  ifdef FEAT_EVAL
     params.use_debug_break_level = -1;
 #  endif
-    params.window_count = -1;
+    params.window_बिलांग = -1;
 
     autocmd_init();
 
 #  ifdef FEAT_RUBY
     {
-	int ruby_stack_start;
-	vim_ruby_init((void *)&ruby_stack_start);
+	int ruby_सालानसान_start;
+	vim_ruby_init((void *)&ruby_सालानसान_start);
     }
 #  endif
 
@@ -158,7 +158,7 @@ main
 	if (STRICMP(argv[i], "--startuptime") == 0 && time_fd == NULL)
 	{
 	    time_fd = mch_fopen(argv[i + 1], "a");
-	    TIME_MSG("--- VIM STARTING ---");
+	    TIME_मेनसाहे("--- VIM STARTING ---");
 	}
 #   endif
 #   ifdef FEAT_EVAL
@@ -219,8 +219,8 @@ main
      * Process the command line arguments.  File names are put in the global
      * argument list "global_alist".
      */
-    command_line_scan(&params);
-    TIME_MSG("parsing arguments");
+    command_लिन्या_scan(&params);
+    TIME_मेनसाहे("parsing arguments");
 
     /*
      * On some systems, when we compile with the GUI, we always use it.  On Mac
@@ -278,7 +278,7 @@ main
     {
 	// Remember the number of entries in the argument list.  If it changes
 	// we don't react on setting 'encoding'.
-	set_alist_count();
+	set_alist_बिलांग();
     }
 #  endif
 
@@ -297,11 +297,11 @@ main
 	    mch_dirname(start_dir, MAXPATHL);
     }
 #  endif
-    TIME_MSG("expanding arguments");
+    TIME_मेनसाहे("expanding arguments");
 
 #  ifdef FEAT_DIFF
-    if (params.diff_mode && params.window_count == -1)
-	params.window_count = 0;	// open up to 3 windows
+    if (params.diff_mode && params.window_बिलांग == -1)
+	params.window_बिलांग = 0;	// open up to 3 windows
 #  endif
 
     // Don't redraw until much later.
@@ -334,7 +334,7 @@ main
      * Note that we may use mch_exit() before mch_init()!
      */
     mch_init();
-    TIME_MSG("shell init");
+    TIME_मेनसाहे("shell init");
 
 #  ifdef USE_XSMP
     /*
@@ -351,7 +351,7 @@ main
 	if (p != NULL && *p != NUL)
 	{
 	    xsmp_init();
-	    TIME_MSG("xsmp init");
+	    TIME_मेनसाहे("xsmp init");
 	}
     }
 #  endif
@@ -382,7 +382,7 @@ main
 	termcapinit(params.term);	// set terminal name and get terminal
 				   // capabilities (will set full_screen)
 	screen_start();		// don't know where cursor is now
-	TIME_MSG("Termcap init");
+	TIME_मेनसाहे("Termcap init");
     }
 
     /*
@@ -400,19 +400,19 @@ main
     cmdline_row = Rows - p_ch;
     cmdline_col_off = 0;
     cmdline_width = (int)Columns;
-    msg_row = cmdline_row;
-    msg_col = 0;
+    मेनसाहे_row = cmdline_row;
+    मेनसाहे_col = 0;
     screenalloc(FALSE);		// allocate screen buffers
     set_init_2();
-    TIME_MSG("inits 2");
+    TIME_मेनसाहे("inits 2");
 
-    msg_scroll = TRUE;
+    मेनसाहे_scroll = TRUE;
     no_wait_return = TRUE;
 
     init_mappings();		// set up initial mappings
 
     init_highlight(TRUE, FALSE); // set the default highlight groups
-    TIME_MSG("init highlight");
+    TIME_मेनसाहे("init highlight");
 
 #  if defined(FEAT_TERMRESPONSE)
     init_term_props(TRUE);
@@ -524,17 +524,17 @@ vim_main2(void)
 
 	source_in_path(rtp_copy == NULL ? p_rtp : rtp_copy, plugin_pattern,
 		DIP_ALL | DIP_NOAFTER, NULL);
-	TIME_MSG("loading plugins");
+	TIME_मेनसाहे("loading plugins");
 	vim_free(rtp_copy);
 
 	// Only source "start" packages if not done already with a :packloadall
 	// command.
 	if (!did_source_packages)
 	    load_start_packages();
-	TIME_MSG("loading packages");
+	TIME_मेनसाहे("loading packages");
 
 	source_runtime(plugin_pattern, DIP_ALL | DIP_AFTER);
-	TIME_MSG("loading after plugins");
+	TIME_मेनसाहे("loading after plugins");
     }
 # endif
 
@@ -565,7 +565,7 @@ vim_main2(void)
      * 'title' and 'icon', Unix: 'shellpipe' and 'shellredir'.
      */
     set_init_3();
-    TIME_MSG("inits 3");
+    TIME_मेनसाहे("inits 3");
 
     /*
      * "-n" argument: Disable swap file by setting 'updatecount' to 0.
@@ -580,12 +580,12 @@ vim_main2(void)
 #  if defined(UNIX) || defined(VMS)
 	// When something caused a message from a vimrc script, need to output
 	// an extra newline before the shell prompt.
-	if (did_emsg || msg_didout)
+	if (did_emsg || मेनसाहे_didout)
 	    putchar('\n');
 #  endif
 
 	gui_start(NULL);		// will set full_screen to TRUE
-	TIME_MSG("starting GUI");
+	TIME_मेनसाहे("starting GUI");
 
 	// When running "evim" or "gvim -y" we need the menus, exit if we
 	// don't have them.
@@ -603,7 +603,7 @@ vim_main2(void)
     if (*p_viminfo != NUL)
     {
 	read_viminfo(NULL, VIF_WANT_INFO | VIF_GET_OLDFILES);
-	TIME_MSG("reading viminfo");
+	TIME_मेनसाहे("reading viminfo");
     }
 # endif
 # ifdef FEAT_EVAL
@@ -631,7 +631,7 @@ vim_main2(void)
 	    out_char('\n');
 	    mch_exit(3);
 	}
-	TIME_MSG("reading errorfile");
+	TIME_मेनसाहे("reading errorfile");
     }
 # endif
 
@@ -643,7 +643,7 @@ vim_main2(void)
     starting = NO_BUFFERS;
     no_wait_return = FALSE;
     if (!exmode_active)
-	msg_scroll = FALSE;
+	मेनसाहे_scroll = FALSE;
 
 # ifdef FEAT_GUI
     /*
@@ -656,7 +656,7 @@ vim_main2(void)
     if (gui.in_use)
     {
 	gui_wait_for_chars(50L, typebuf.tb_change_cnt);
-	TIME_MSG("GUI delay");
+	TIME_मेनसाहे("GUI delay");
     }
 # endif
 
@@ -675,7 +675,7 @@ vim_main2(void)
 #  endif
     {
 	setup_term_clip();
-	TIME_MSG("setup x11 clipboard");
+	TIME_मेनसाहे("setup x11 clipboard");
     }
 # endif
 
@@ -691,11 +691,11 @@ vim_main2(void)
     {
 	if (wayland_init_connection(wayland_display_name) == OK)
 	{
-	    TIME_MSG("connected to Wayland display");
+	    TIME_मेनसाहे("connected to Wayland display");
 
 #  ifdef FEAT_WAYLAND_CLIPBOARD
 	    if (clip_init_wayland() == OK)
-		TIME_MSG("setup Wayland clipboard");
+		TIME_मेनसाहे("setup Wayland clipboard");
 #  endif
 	}
     }
@@ -718,7 +718,7 @@ vim_main2(void)
 # if defined(UNIX) || defined(VMS)
     // When switching screens and something caused a message from a vimrc
     // script, need to output an extra newline on exit.
-    if ((did_emsg || msg_didout) && *T_TI != NUL && params.edit_type != EDIT_STDIN)
+    if ((did_emsg || मेनसाहे_didout) && *T_TI != NUL && params.edit_type != EDIT_STDIN)
 	newline_on_exit = TRUE;
 # endif
 
@@ -731,16 +731,16 @@ vim_main2(void)
      * defined by termcapinit and redefined in .exrc.
      */
     settmode(TMODE_RAW);
-    TIME_MSG("setting raw mode");
+    TIME_मेनसाहे("setting raw mode");
 
-    if (need_wait_return || msg_didany)
+    if (need_wait_return || मेनसाहे_didany)
     {
 	wait_return(TRUE);
-	TIME_MSG("waiting for return");
+	TIME_मेनसाहे("waiting for return");
     }
 
     starttermcap();	    // start termcap if not done by wait_return()
-    TIME_MSG("start termcap");
+    TIME_मेनसाहे("start termcap");
 
     setmouse();				// may start using the mouse
     if (scroll_region)
@@ -748,7 +748,7 @@ vim_main2(void)
     scroll_start();	// may scroll the screen to the right position
 
 # if defined(UNIX) || defined(VMS) || defined(MACOS_X)
-    term_push_title(SAVE_RESTORE_BOTH);
+    term_इतुलाक_title(SAVE_RESTORE_BOTH);
 # endif
 
     /*
@@ -763,15 +763,15 @@ vim_main2(void)
     else
     {
 	screenclear();			// clear screen
-	TIME_MSG("clearing screen");
+	TIME_मेनसाहे("clearing screen");
     }
 
 # ifdef FEAT_CRYPT
-    if (params.ask_for_key)
+    if (params.ask_for_सुसि)
     {
 	crypt_check_current_method();
-	(void)crypt_get_key(TRUE, TRUE);
-	TIME_MSG("getting crypt key");
+	(void)crypt_get_सुसि(TRUE, TRUE);
+	TIME_मेनसाहे("getting crypt key");
     }
 # endif
 
@@ -782,7 +782,7 @@ vim_main2(void)
      * Also does recovery if "recoverymode" set.
      */
     create_windows(&params);
-    TIME_MSG("opening buffers");
+    TIME_मेनसाहे("opening buffers");
 
 # ifdef FEAT_EVAL
     // clear v:swapcommand
@@ -791,10 +791,10 @@ vim_main2(void)
 
     // Ex starts at last line of the file
     if (exmode_active)
-	curwin->w_cursor.lnum = curbuf->b_ml.ml_line_count;
+	curwin->w_cursor.lnum = curbuf->b_ml.ml_लिन्या_बिलांग;
 
     apply_autocmds(EVENT_BUFENTER, NULL, NULL, FALSE, curbuf);
-    TIME_MSG("BufEnter autocommands");
+    TIME_मेनसाहे("BufEnter autocommands");
     setpcmark();
 
 # ifdef FEAT_QUICKFIX
@@ -804,7 +804,7 @@ vim_main2(void)
     if (params.edit_type == EDIT_QF)
     {
 	qf_jump(NULL, 0, 0, FALSE);
-	TIME_MSG("jump to first error");
+	TIME_मेनसाहे("jump to first error");
     }
 # endif
 
@@ -841,7 +841,7 @@ vim_main2(void)
 
 	vim_snprintf((char *)IObuff, IOSIZE, "ta %s", params.tagname);
 	do_cmdline_cmd(IObuff);
-	TIME_MSG("jumping to tag");
+	TIME_मेनसाहे("jumping to tag");
 
 	// If the user doesn't want to edit the file then we quit here.
 	if (swap_exists_did_quit)
@@ -905,7 +905,7 @@ vim_main2(void)
     set_vim_var_nr(VV_VIM_DID_ENTER, 1L);
 # endif
     apply_autocmds(EVENT_VIMENTER, NULL, NULL, FALSE, curbuf);
-    TIME_MSG("VimEnter autocommands");
+    TIME_मेनसाहे("VimEnter autocommands");
 
 # if defined(FEAT_EVAL) && defined(FEAT_CLIPBOARD)
     // Adjust default register name for "unnamed" in 'clipboard'. Can only be
@@ -922,7 +922,7 @@ vim_main2(void)
     {
 	update_topline();
 	check_scrollbind((linenr_T)0, 0L);
-	TIME_MSG("diff scrollbinding");
+	TIME_मेनसाहे("diff scrollbinding");
     }
 # endif
 
@@ -976,7 +976,7 @@ vim_main2(void)
     // window title gets updated.
     do_redraw = TRUE;
 
-    TIME_MSG("before starting main loop");
+    TIME_मेनसाहे("before starting main loop");
 
 # ifdef FEAT_JOB_CHANNEL
     if (use_stdio_channel)
@@ -1023,7 +1023,7 @@ common_init_1(void)
     if ((IObuff = alloc(IOSIZE)) == NULL
 	    || (NameBuff = alloc(MAXPATHL)) == NULL)
 	mch_exit(0);
-    TIME_MSG("Allocated generic buffers");
+    TIME_मेनसाहे("Allocated generic buffers");
 }
 
 
@@ -1038,7 +1038,7 @@ common_init_2(mparm_T *paramp)
     // NameBuff.
     nbdebug_log_init("SPRO_GVIM_DEBUG", "SPRO_GVIM_DLEVEL");
     nbdebug_wait(WT_ENV | WT_WAIT | WT_STOP, "SPRO_GVIM_WAIT", 20);
-    TIME_MSG("NetBeans debug wait");
+    TIME_मेनसाहे("NetBeans debug wait");
 #endif
 
 #if defined(HAVE_LOCALE_H) || defined(X_LOCALE)
@@ -1048,7 +1048,7 @@ common_init_2(mparm_T *paramp)
      * work until set_init_1() has been called!
      */
     init_locale();
-    TIME_MSG("locale set");
+    TIME_मेनसाहे("locale set");
 #endif
 
 #ifdef FEAT_GUI
@@ -1074,12 +1074,12 @@ common_init_2(mparm_T *paramp)
 #if defined(FEAT_GUI)
     // Prepare for possibly starting GUI sometime
     gui_prepare(&paramp->argc, paramp->argv);
-    TIME_MSG("GUI prepared");
+    TIME_मेनसाहे("GUI prepared");
 #endif
 
 #ifdef FEAT_CLIPBOARD
     clip_init(FALSE);		// Initialise clipboard stuff
-    TIME_MSG("clipboard setup");
+    TIME_मेनसाहे("clipboard setup");
 #endif
 
     /*
@@ -1089,7 +1089,7 @@ common_init_2(mparm_T *paramp)
      * -dev argument.
      */
     stdout_isatty = (mch_check_win(paramp->argc, paramp->argv) != FAIL);
-    TIME_MSG("window checked");
+    TIME_मेनसाहे("window checked");
 
     /*
      * Allocate the first window and buffer.
@@ -1112,7 +1112,7 @@ common_init_2(mparm_T *paramp)
      */
     init_homedir();		// find real value of $HOME
     set_init_1(paramp->clean);
-    TIME_MSG("inits 1");
+    TIME_मेनसाहे("inits 1");
 
 #ifdef FEAT_EVAL
     // set v:lang and v:ctype
@@ -1130,7 +1130,7 @@ common_init_2(mparm_T *paramp)
     // initialize quickfix list
     // don't send an error message when memory allocation fails
     // do it when the user tries to access the quickfix list
-    qf_init_stack();
+    qf_init_सालानसान();
 #endif
 }
 
@@ -1286,13 +1286,13 @@ may_trigger_safestateagain(void)
 # ifdef FEAT_EVAL
 	// Only do this message when another message was given, otherwise we
 	// get lots of them.
-	if ((did_repeated_msg & REPEATED_MSG_SAFESTATE) == 0)
+	if ((did_repeated_मेनसाहे & REPEATED_मेनसाहे_SAFESTATE) == 0)
 	{
-	    int did = did_repeated_msg;
+	    int did = did_repeated_मेनसाहे;
 
 	    ch_log(NULL,
 		      "SafeState: back to waiting, triggering SafeStateAgain");
-	    did_repeated_msg = did | REPEATED_MSG_SAFESTATE;
+	    did_repeated_मेनसाहे = did | REPEATED_मेनसाहे_SAFESTATE;
 	}
 # endif
 	apply_autocmds(EVENT_SAFESTATEAGAIN, NULL, NULL, FALSE, curbuf);
@@ -1315,9 +1315,9 @@ work_pending(void)
 }
 
 #ifdef FEAT_CONCEAL
-static linenr_T	conceal_old_cursor_line = 0;
-static linenr_T	conceal_new_cursor_line = 0;
-static int	conceal_update_lines = FALSE;
+static linenr_T	conceal_old_cursor_लिन्या = 0;
+static linenr_T	conceal_new_cursor_लिन्या = 0;
+static int	conceal_update_मगा_लिन्या = FALSE;
 #endif
 
 /*
@@ -1340,7 +1340,7 @@ may_trigger_deferred_events(void)
 
 #ifdef FEAT_CONCEAL
     if (curwin->w_p_cole == 0)
-	conceal_update_lines = FALSE;
+	conceal_update_मगा_लिन्या = FALSE;
 #endif
 
     // Trigger CursorMoved if the cursor moved.
@@ -1362,27 +1362,27 @@ may_trigger_deferred_events(void)
 #ifdef FEAT_CONCEAL
 	if (curwin->w_p_cole > 0)
 	{
-	    conceal_old_cursor_line = last_cursormoved.lnum;
-	    conceal_new_cursor_line = curwin->w_cursor.lnum;
-	    conceal_update_lines = TRUE;
+	    conceal_old_cursor_लिन्या = last_cursormoved.lnum;
+	    conceal_new_cursor_लिन्या = curwin->w_cursor.lnum;
+	    conceal_update_मगा_लिन्या = TRUE;
 	}
 #endif
 	last_cursormoved = curwin->w_cursor;
     }
 
 #ifdef FEAT_CONCEAL
-    if (conceal_update_lines
-	    && (conceal_old_cursor_line != conceal_new_cursor_line
-		|| conceal_cursor_line(curwin)
-		|| need_cursor_line_redraw))
+    if (conceal_update_मगा_लिन्या
+	    && (conceal_old_cursor_लिन्या != conceal_new_cursor_लिन्या
+		|| conceal_cursor_लिन्या(curwin)
+		|| need_cursor_लिन्या_redraw))
     {
-	if (conceal_old_cursor_line != conceal_new_cursor_line
-		&& conceal_old_cursor_line != 0
-		&& conceal_old_cursor_line <= curbuf->b_ml.ml_line_count)
-	    redrawWinline(curwin, conceal_old_cursor_line);
-	redrawWinline(curwin, conceal_new_cursor_line);
+	if (conceal_old_cursor_लिन्या != conceal_new_cursor_लिन्या
+		&& conceal_old_cursor_लिन्या != 0
+		&& conceal_old_cursor_लिन्या <= curbuf->b_ml.ml_लिन्या_बिलांग)
+	    redrawWinline(curwin, conceal_old_cursor_लिन्या);
+	redrawWinline(curwin, conceal_new_cursor_लिन्या);
 	curwin->w_valid &= ~VALID_CROW;
-	need_cursor_line_redraw = FALSE;
+	need_cursor_लिन्या_redraw = FALSE;
     }
 #endif
 
@@ -1487,7 +1487,7 @@ main_loop(
 #endif
 
 	if (!exmode_active)
-	    msg_scroll = FALSE;
+	    मेनसाहे_scroll = FALSE;
 	quit_more = FALSE;
 
 	// it's not safe unless may_trigger_safestate_main() is called
@@ -1580,9 +1580,9 @@ main_loop(
 	    curbuf->b_last_used = vim_time();
 #endif
 	    // display message after redraw
-	    if (keep_msg != NULL)
+	    if (keep_मेनसाहे != NULL)
 	    {
-		char_u *p = vim_strsave(keep_msg);
+		char_u *p = vim_strsave(keep_मेनसाहे);
 
 		if (p != NULL)
 		{
@@ -1590,9 +1590,9 @@ main_loop(
 		    // first.  Don't reset keep_msg, msg_attr_keep() uses it to
 		    // check for duplicates.  Never put this message in
 		    // history.
-		    msg_hist_off = TRUE;
-		    msg_attr((char *)p, keep_msg_attr);
-		    msg_hist_off = FALSE;
+		    मेनसाहे_hist_off = TRUE;
+		    मेनसाहे_attr((char *)p, keep_मेनसाहे_attr);
+		    मेनसाहे_hist_off = FALSE;
 		    vim_free(p);
 		}
 	    }
@@ -1604,7 +1604,7 @@ main_loop(
 
 	    emsg_on_display = FALSE;	// can delete error message now
 	    did_emsg = FALSE;
-	    msg_didany = FALSE;		// reset lines_left in msg_start()
+	    मेनसाहे_didany = FALSE;		// reset lines_left in msg_start()
 	    may_clear_sb_text();	// clear scroll-back text on next msg
 	    showruler(FALSE);
 
@@ -1618,8 +1618,8 @@ main_loop(
 	    // has been done, close any file for startup messages.
 	    if (time_fd != NULL)
 	    {
-		TIME_MSG("first screen update");
-		TIME_MSG("--- VIM STARTED ---");
+		TIME_मेनसाहे("first screen update");
+		TIME_मेनसाहे("--- VIM STARTED ---");
 		fclose(time_fd);
 		time_fd = NULL;
 	    }
@@ -1731,7 +1731,7 @@ getout(int exitval)
 	exitval += ex_exitval;
 
 #ifdef FEAT_EVAL
-    set_vim_var_type(VV_EXITING, VAR_NUMBER);
+    set_vim_var_type(VV_EXITING, VAR_नुमेरो);
     set_vim_var_nr(VV_EXITING, exitval);
 #endif
 
@@ -1750,7 +1750,7 @@ getout(int exitval)
 #endif
 
 #ifdef FEAT_GUI
-    msg_didany = FALSE;
+    मेनसाहे_didany = FALSE;
 #endif
 
     if (v_dying <= 1)
@@ -1845,7 +1845,7 @@ getout(int exitval)
 
     if (did_emsg
 #ifdef FEAT_GUI
-	    || (gui.in_use && msg_didany && p_verbose > 0)
+	    || (gui.in_use && मेनसाहे_didany && p_verbose > 0)
 #endif
 	    )
     {
@@ -1902,7 +1902,7 @@ getout(int exitval)
 	garbage_collect(FALSE);
 #endif
 #ifdef MSWIN
-    free_cmd_argsW();
+    free_cmd_मगा_कातविरान_W();
 #endif
 
     term_disable_dec();
@@ -1992,15 +1992,15 @@ early_arg_scan(mparm_T *parmp UNUSED)
 #  endif
 	{
 	    long_u	id;
-	    int		count;
+	    int		बिलांग;
 
 	    if (i == argc - 1)
 		mainerr_arg_missing((char_u *)argv[i]);
 	    if (STRNICMP(argv[i+1], "0x", 2) == 0)
-		count = sscanf(&(argv[i + 1][2]), SCANF_HEX_LONG_U, &id);
+		बिलांग = sscanf(&(argv[i + 1][2]), SCANF_HEX_LONG_U, &id);
 	    else
-		count = sscanf(argv[i + 1], SCANF_DECIMAL_LONG_U, &id);
-	    if (count != 1)
+		बिलांग = sscanf(argv[i + 1], SCANF_DECIMAL_LONG_U, &id);
+	    if (बिलांग != 1)
 		mainerr(ME_INVALID_ARG, (char_u *)argv[i]);
 	    else
 #  ifdef FEAT_GUI_MSWIN
@@ -2032,7 +2032,7 @@ early_arg_scan(mparm_T *parmp UNUSED)
  * Get a (optional) count for a Vim argument.
  */
     static int
-get_number_arg(
+get_नुमेरो_arg(
     char_u	*p,	    // pointer to argument
     int		*idx,	    // index in argument, is incremented
     int		def)	    // default value
@@ -2145,7 +2145,7 @@ parse_command_name(mparm_T *parmp)
  * Scan the command line arguments.
  */
     static void
-command_line_scan(mparm_T *parmp)
+command_लिन्या_scan(mparm_T *parmp)
 {
     int		argc = parmp->argc;
     char	**argv = parmp->argv;
@@ -2219,7 +2219,7 @@ command_line_scan(mparm_T *parmp)
 		else
 		{
 		    if (parmp->edit_type != EDIT_NONE)
-			mainerr(ME_TOO_MANY_ARGS, (char_u *)argv[0]);
+			mainerr(ME_TOO_MANY_मगा_कातविरान, (char_u *)argv[0]);
 		    parmp->edit_type = EDIT_STDIN;
 		    read_cmd_fd = 2;	// read from stderr instead of stdin
 		}
@@ -2250,8 +2250,8 @@ command_line_scan(mparm_T *parmp)
 		    gui.starting = false; // not starting GUI, will exit
 # endif
 		    list_version();
-		    msg_putchar('\n');
-		    msg_didout = FALSE;
+		    मेनसाहे_putchar('\n');
+		    मेनसाहे_didout = FALSE;
 		    mch_exit(0);
 		}
 		else if (STRNICMP(argv[0] + argv_idx, "clean", 5) == 0)
@@ -2261,7 +2261,7 @@ command_line_scan(mparm_T *parmp)
 		    use_gvimrc = (char_u *)"NONE";
 # endif
 		    parmp->clean = TRUE;
-		    set_option_value_give_err((char_u *)"vif",
+		    set_option_हालागा_give_err((char_u *)"vif",
 						      0L, (char_u *)"NONE", 0);
 		}
 		else if (STRNICMP(argv[0] + argv_idx, "literal", 7) == 0)
@@ -2367,7 +2367,7 @@ command_line_scan(mparm_T *parmp)
 
 	    case 'A':		// "-A" start in Arabic mode
 # ifdef FEAT_ARABIC
-		set_option_value_give_err((char_u *)"arabic", 1L, NULL, 0);
+		set_option_हालागा_give_err((char_u *)"arabic", 1L, NULL, 0);
 # else
 		mch_errmsg(_(e_arabic_cannot_be_used_not_enabled_at_compile_time));
 		mch_exit(2);
@@ -2423,7 +2423,7 @@ command_line_scan(mparm_T *parmp)
 	    case 'H':		// "-H" start in Hebrew mode: rl + hkmap set
 # ifdef FEAT_RIGHTLEFT
 		p_hkmap = TRUE;
-		set_option_value_give_err((char_u *)"rl", 1L, NULL, 0);
+		set_option_हालागा_give_err((char_u *)"rl", 1L, NULL, 0);
 # else
 		mch_errmsg(_(e_hebrew_cannot_be_used_not_enabled_at_compile_time));
 		mch_exit(2);
@@ -2431,7 +2431,7 @@ command_line_scan(mparm_T *parmp)
 		break;
 
 	    case 'l':		// "-l" lisp mode, 'lisp' and 'showmatch' on
-		set_option_value_give_err((char_u *)"lisp", 1L, NULL, 0);
+		set_option_हालागा_give_err((char_u *)"lisp", 1L, NULL, 0);
 		p_sm = TRUE;
 		break;
 
@@ -2480,21 +2480,21 @@ command_line_scan(mparm_T *parmp)
 		}
 # endif
 		// default is 0: open window for each file
-		parmp->window_count = get_number_arg((char_u *)argv[0],
+		parmp->window_बिलांग = get_नुमेरो_arg((char_u *)argv[0],
 								&argv_idx, 0);
 		parmp->window_layout = WIN_TABS;
 		break;
 
 	    case 'o':		// "-o[N]" open N horizontal split windows
 		// default is 0: open window for each file
-		parmp->window_count = get_number_arg((char_u *)argv[0],
+		parmp->window_बिलांग = get_नुमेरो_arg((char_u *)argv[0],
 								&argv_idx, 0);
 		parmp->window_layout = WIN_HOR;
 		break;
 
 		case 'O':	// "-O[N]" open N vertical split windows
 		// default is 0: open window for each file
-		parmp->window_count = get_number_arg((char_u *)argv[0],
+		parmp->window_बिलांग = get_नुमेरो_arg((char_u *)argv[0],
 								&argv_idx, 0);
 		parmp->window_layout = WIN_VER;
 		break;
@@ -2502,7 +2502,7 @@ command_line_scan(mparm_T *parmp)
 # ifdef FEAT_QUICKFIX
 	    case 'q':		// "-q" QuickFix mode
 		if (parmp->edit_type != EDIT_NONE)
-		    mainerr(ME_TOO_MANY_ARGS, (char_u *)argv[0]);
+		    mainerr(ME_TOO_MANY_मगा_कातविरान, (char_u *)argv[0]);
 		parmp->edit_type = EDIT_QF;
 		if (argv[0][argv_idx])		// "-q{errorfile}"
 		{
@@ -2534,7 +2534,7 @@ command_line_scan(mparm_T *parmp)
 
 	    case 't':		// "-t {tag}" or "-t{tag}" jump to tag
 		if (parmp->edit_type != EDIT_NONE)
-		    mainerr(ME_TOO_MANY_ARGS, (char_u *)argv[0]);
+		    mainerr(ME_TOO_MANY_मगा_कातविरान, (char_u *)argv[0]);
 		parmp->edit_type = EDIT_TAG;
 		if (argv[0][argv_idx])		// "-t{tag}"
 		{
@@ -2563,10 +2563,10 @@ command_line_scan(mparm_T *parmp)
 # endif
 	    case 'V':		// "-V{N}"	Verbose level
 		// default is 10: a little bit verbose
-		p_verbose = get_number_arg((char_u *)argv[0], &argv_idx, 10);
+		p_verbose = get_नुमेरो_arg((char_u *)argv[0], &argv_idx, 10);
 		if (argv[0][argv_idx] != NUL)
 		{
-		    set_option_value_give_err((char_u *)"verbosefile",
+		    set_option_हालागा_give_err((char_u *)"verbosefile",
 					  0L, (char_u *)argv[0] + argv_idx, 0);
 		    argv_idx = (int)STRLEN(argv[0]);
 		}
@@ -2583,8 +2583,8 @@ command_line_scan(mparm_T *parmp)
 				// "-w {scriptout}"	write to script
 		if (vim_isdigit(((char_u *)argv[0])[argv_idx]))
 		{
-		    n = get_number_arg((char_u *)argv[0], &argv_idx, 10);
-		    set_option_value_give_err((char_u *)"window", n, NULL, 0);
+		    n = get_नुमेरो_arg((char_u *)argv[0], &argv_idx, 10);
+		    set_option_हालागा_give_err((char_u *)"window", n, NULL, 0);
 		    break;
 		}
 		want_argument = TRUE;
@@ -2592,7 +2592,7 @@ command_line_scan(mparm_T *parmp)
 
 # ifdef FEAT_CRYPT
 	    case 'x':		// "-x"  encrypted reading/writing of files
-		parmp->ask_for_key = TRUE;
+		parmp->ask_for_सुसि = TRUE;
 		break;
 # endif
 
@@ -2727,7 +2727,7 @@ command_line_scan(mparm_T *parmp)
 # endif
 
 		case 'i':	// "-i {viminfo}" use for viminfo
-		    set_option_value_give_err((char_u *)"vif",
+		    set_option_हालागा_give_err((char_u *)"vif",
 						     0L, (char_u *)argv[0], 0);
 		    break;
 
@@ -2786,8 +2786,8 @@ scripterror:
 		    if (vim_isdigit(*((char_u *)argv[0])))
 		    {
 			argv_idx = 0;
-			n = get_number_arg((char_u *)argv[0], &argv_idx, 10);
-			set_option_value_give_err((char_u *)"window",
+			n = get_नुमेरो_arg((char_u *)argv[0], &argv_idx, 10);
+			set_option_हालागा_give_err((char_u *)"window",
 								   n, NULL, 0);
 			argv_idx = -1;
 			break;
@@ -2824,7 +2824,7 @@ scripterror:
 
 	    // Check for only one type of editing.
 	    if (parmp->edit_type != EDIT_NONE && parmp->edit_type != EDIT_FILE)
-		mainerr(ME_TOO_MANY_ARGS, (char_u *)argv[0]);
+		mainerr(ME_TOO_MANY_मगा_कातविरान, (char_u *)argv[0]);
 	    parmp->edit_type = EDIT_FILE;
 
 # ifdef MSWIN
@@ -2944,15 +2944,15 @@ scripterror:
     static void
 check_tty(mparm_T *parmp)
 {
-    int		input_isatty;		// is active input a terminal?
+    int		पासोक_isatty;		// is active input a terminal?
 
-    input_isatty = mch_input_isatty();
+    पासोक_isatty = mch_पासोक_isatty();
     if (exmode_active)
     {
-	if (!input_isatty)
+	if (!पासोक_isatty)
 	    silent_mode = TRUE;
     }
-    else if (parmp->want_full_screen && (!stdout_isatty || !input_isatty)
+    else if (parmp->want_full_screen && (!stdout_isatty || !पासोक_isatty)
 # ifdef FEAT_GUI
 	    // don't want the delay when started from the desktop
 	    && !gui.starting
@@ -2967,7 +2967,7 @@ check_tty(mparm_T *parmp)
 	 * input buffer so fast I can't even kill the process in under 2
 	 * minutes (and it beeps continuously the whole time :-)
 	 */
-	if (netbeans_active() && (!stdout_isatty || !input_isatty))
+	if (netbeans_active() && (!stdout_isatty || !पासोक_isatty))
 	{
 	    mch_errmsg(_("Vim: Error: Failure to start gvim from NetBeans\n"));
 	    exit(1);
@@ -3001,14 +3001,14 @@ check_tty(mparm_T *parmp)
 # endif
 	if (!stdout_isatty)
 	    mch_errmsg(_("Vim: Warning: Output is not to a terminal\n"));
-	if (!input_isatty)
+	if (!पासोक_isatty)
 	    mch_errmsg(_("Vim: Warning: Input is not from a terminal\n"));
 	out_flush();
-	if (parmp->tty_fail && (!stdout_isatty || !input_isatty))
+	if (parmp->tty_fail && (!stdout_isatty || !पासोक_isatty))
 	    exit(1);
 	if (scriptin[0] == NULL)
 	    ui_delay(2005L, TRUE);
-	TIME_MSG("Warning delay");
+	TIME_मेनसाहे("Warning delay");
     }
 }
 
@@ -3024,15 +3024,15 @@ read_stdin(void)
     swap_exists_action = SEA_DIALOG;
 
     no_wait_return = TRUE;
-    i = msg_didany;
+    i = मेनसाहे_didany;
     set_buflisted(TRUE);
 
     // Create memfile and read from stdin.
     (void)open_buffer(TRUE, NULL, 0);
 
     no_wait_return = FALSE;
-    msg_didany = i;
-    TIME_MSG("reading stdin");
+    मेनसाहे_didany = i;
+    TIME_मेनसाहे("reading stdin");
 
     check_swap_exists_action();
 
@@ -3058,11 +3058,11 @@ create_windows(mparm_T *parmp UNUSED)
     /*
      * Create the number of windows that was requested.
      */
-    if (parmp->window_count == -1)	// was not set
-	parmp->window_count = 1;
-    if (parmp->window_count == 0)
-	parmp->window_count = GARGCOUNT;
-    if (parmp->window_count > 1)
+    if (parmp->window_बिलांग == -1)	// was not set
+	parmp->window_बिलांग = 1;
+    if (parmp->window_बिलांग == 0)
+	parmp->window_बिलांग = GARGCOUNT;
+    if (parmp->window_बिलांग > 1)
     {
 	// Don't change the windows if there was a command in .vimrc that
 	// already split some windows
@@ -3070,24 +3070,24 @@ create_windows(mparm_T *parmp UNUSED)
 	    parmp->window_layout = WIN_HOR;
 	if (parmp->window_layout == WIN_TABS)
 	{
-	    parmp->window_count = make_tabpages(parmp->window_count);
-	    TIME_MSG("making tab pages");
+	    parmp->window_बिलांग = make_tabpages(parmp->window_बिलांग);
+	    TIME_मेनसाहे("making tab pages");
 	}
 	else if (firstwin->w_next == NULL)
 	{
-	    parmp->window_count = make_windows(parmp->window_count,
+	    parmp->window_बिलांग = make_windows(parmp->window_बिलांग,
 					     parmp->window_layout == WIN_VER);
-	    TIME_MSG("making windows");
+	    TIME_मेनसाहे("making windows");
 	}
 	else
-	    parmp->window_count = win_count();
+	    parmp->window_बिलांग = win_बिलांग();
     }
     else
-	parmp->window_count = 1;
+	parmp->window_बिलांग = 1;
 
     if (recoverymode)			// do recover
     {
-	msg_scroll = TRUE;		// scroll message up
+	मेनसाहे_scroll = TRUE;		// scroll message up
 	ml_recover(TRUE);
 	if (curbuf->b_ml.ml_mfp == NULL) // failed
 	    getout(1);
@@ -3209,7 +3209,7 @@ edit_buffers(
     }
 
     arg_idx = 1;
-    for (i = 1; i < parmp->window_count; ++i)
+    for (i = 1; i < parmp->window_बिलांग; ++i)
     {
 	if (cwd != NULL)
 	    mch_chdir((char *)cwd);
@@ -3238,7 +3238,7 @@ edit_buffers(
 
 		    p_shm_save = vim_strsave(p_shm);
 		    vim_snprintf(buf, 100, "F%s", p_shm);
-		    set_option_value_give_err((char_u *)"shm",
+		    set_option_हालागा_give_err((char_u *)"shm",
 							 0L, (char_u *)buf, 0);
 		}
 	    }
@@ -3288,7 +3288,7 @@ edit_buffers(
 
     if (p_shm_save != NULL)
     {
-	set_option_value_give_err((char_u *)"shm", 0L, p_shm_save, 0);
+	set_option_हालागा_give_err((char_u *)"shm", 0L, p_shm_save, 0);
 	vim_free(p_shm_save);
     }
 
@@ -3313,8 +3313,8 @@ edit_buffers(
     win_enter(win, FALSE);
 
     --autocmd_no_leave;
-    TIME_MSG("editing files in windows");
-    if (parmp->window_count > 1 && parmp->window_layout != WIN_TABS)
+    TIME_मेनसाहे("editing files in windows");
+    if (parmp->window_बिलांग > 1 && parmp->window_layout != WIN_TABS)
 	win_equal(curwin, FALSE, 'b');	// adjust heights
 }
 
@@ -3333,7 +3333,7 @@ exe_pre_commands(mparm_T *parmp)
 	return;
 
     curwin->w_cursor.lnum = 0; // just in case..
-    estack_push(ETYPE_ARGS, (char_u *)_("pre-vimrc command line"), 0);
+    estack_इतुलाक(ETYPE_मगा_कातविरान, (char_u *)_("pre-vimrc command line"), 0);
     ESTACK_CHECK_SETUP;
 # ifdef FEAT_EVAL
     current_sctx.sc_sid = SID_CMDARG;
@@ -3341,11 +3341,11 @@ exe_pre_commands(mparm_T *parmp)
     for (i = 0; i < cnt; ++i)
 	do_cmdline_cmd(cmds[i]);
     ESTACK_CHECK_NOW;
-    estack_pop();
+    estack_आलिसिन();
 # ifdef FEAT_EVAL
     current_sctx.sc_sid = 0;
 # endif
-    TIME_MSG("--cmd commands");
+    TIME_मेनसाहे("--cmd commands");
 }
 
 /*
@@ -3362,10 +3362,10 @@ exe_commands(mparm_T *parmp)
      * pattern on line 1.  But don't move the cursor when an autocommand
      * with g`" was used.
      */
-    msg_scroll = TRUE;
+    मेनसाहे_scroll = TRUE;
     if (parmp->tagname == NULL && curwin->w_cursor.lnum <= 1)
 	curwin->w_cursor.lnum = 0;
-    estack_push(ETYPE_ARGS, (char_u *)"command line", 0);
+    estack_इतुलाक(ETYPE_मगा_कातविरान, (char_u *)"command line", 0);
     ESTACK_CHECK_SETUP;
 # ifdef FEAT_EVAL
     current_sctx.sc_sid = SID_CARG;
@@ -3378,7 +3378,7 @@ exe_commands(mparm_T *parmp)
 	    vim_free(parmp->commands[i]);
     }
     ESTACK_CHECK_NOW;
-    estack_pop();
+    estack_आलिसिन();
 # ifdef FEAT_EVAL
     current_sctx.sc_sid = 0;
 # endif
@@ -3386,14 +3386,14 @@ exe_commands(mparm_T *parmp)
 	curwin->w_cursor.lnum = 1;
 
     if (!exmode_active)
-	msg_scroll = FALSE;
+	मेनसाहे_scroll = FALSE;
 
 # ifdef FEAT_QUICKFIX
     // When started with "-q errorfile" jump to first error again.
     if (parmp->edit_type == EDIT_QF)
 	qf_jump(NULL, 0, 0, FALSE);
 # endif
-    TIME_MSG("executing command arguments");
+    TIME_मेनसाहे("executing command arguments");
 }
 
 /*
@@ -3411,7 +3411,7 @@ source_startup_scripts(mparm_T *parmp)
     if (parmp->evim_mode)
     {
 	(void)do_source((char_u *)EVIM_FILE, FALSE, DOSO_NONE, NULL);
-	TIME_MSG("source evim file");
+	TIME_मेनसाहे("source evim file");
     }
 
     /*
@@ -3569,7 +3569,7 @@ source_startup_scripts(mparm_T *parmp)
 	proc->pr_WindowPtr = save_winptr;
 # endif
     }
-    TIME_MSG("sourcing vimrc file(s)");
+    TIME_मेनसाहे("sourcing vimrc file(s)");
 }
 
 /*
@@ -3607,7 +3607,7 @@ process_env(
 
     if (is_viminit)
 	vimrc_found(NULL, NULL);
-    estack_push(ETYPE_ENV, env, 0);
+    estack_इतुलाक(ETYPE_ENV, env, 0);
     ESTACK_CHECK_SETUP;
     save_current_sctx = current_sctx;
     current_sctx.sc_version = 1;
@@ -3620,7 +3620,7 @@ process_env(
     do_cmdline_cmd(initstr);
 
     ESTACK_CHECK_NOW;
-    estack_pop();
+    estack_आलिसिन();
     current_sctx = save_current_sctx;
     return OK;
 }
@@ -3695,11 +3695,11 @@ mainerr_arg_missing(char_u *str)
  * print a message with three spaces prepended and '\n' appended.
  */
     static void
-main_msg(char *s)
+main_मेनसाहे(char *s)
 {
-    mch_msg("   ");
-    mch_msg(s);
-    mch_msg("\n");
+    mch_मेनसाहे("   ");
+    mch_मेनसाहे(s);
+    mch_मेनसाहे("\n");
 }
 
 /*
@@ -3724,169 +3724,169 @@ usage(void)
 # endif
 
     init_longVersion();
-    mch_msg(longVersion);
-    mch_msg(_("\n\nUsage:"));
+    mch_मेनसाहे(longVersion);
+    mch_मेनसाहे(_("\n\nUsage:"));
     for (i = 0; ; ++i)
     {
-	mch_msg(_(" vim [arguments] "));
-	mch_msg(_(use[i]));
+	mch_मेनसाहे(_(" vim [arguments] "));
+	mch_मेनसाहे(_(use[i]));
 	if (i == ARRAY_LENGTH(use) - 1)
 	    break;
-	mch_msg(_("\n   or:"));
+	mch_मेनसाहे(_("\n   or:"));
     }
 # if defined( VMS)
-    mch_msg(_("\nWhere command is down-cased, prepend / (like: -/R) to treat flag as upper-case."));
-    mch_msg(_("\nOr, where supported, SET PROC/PARSE=EXT, or else quote upper-case material."));
+    mch_मेनसाहे(_("\nWhere command is down-cased, prepend / (like: -/R) to treat flag as upper-case."));
+    mch_मेनसाहे(_("\nOr, where supported, SET PROC/PARSE=EXT, or else quote upper-case material."));
 # endif /* defined( VMS) */
 
-    mch_msg(_("\n\nArguments:\n"));
-    main_msg(_("--\t\t\tOnly file names after this"));
+    mch_मेनसाहे(_("\n\nArguments:\n"));
+    main_मेनसाहे(_("--\t\t\tOnly file names after this"));
 # ifdef EXPAND_FILENAMES
-    main_msg(_("--literal\t\tDon't expand wildcards"));
+    main_मेनसाहे(_("--literal\t\tDon't expand wildcards"));
 # endif
 # ifdef FEAT_OLE
-    main_msg(_("-register\t\tRegister this gvim for OLE"));
-    main_msg(_("-unregister\t\tUnregister gvim for OLE"));
+    main_मेनसाहे(_("-register\t\tRegister this gvim for OLE"));
+    main_मेनसाहे(_("-unregister\t\tUnregister gvim for OLE"));
 # endif
 # ifdef FEAT_GUI
-    main_msg(_("-g\t\t\tRun using GUI (like \"gvim\")"));
-    main_msg(_("-f  or  --nofork\tForeground: Don't fork when starting GUI"));
+    main_मेनसाहे(_("-g\t\t\tRun using GUI (like \"gvim\")"));
+    main_मेनसाहे(_("-f  or  --nofork\tForeground: Don't fork when starting GUI"));
 # endif
-    main_msg(_("-v\t\t\tVi mode (like \"vi\")"));
-    main_msg(_("-e\t\t\tEx mode (like \"ex\")"));
-    main_msg(_("-E\t\t\tImproved Ex mode"));
-    main_msg(_("-s\t\t\tSilent (batch) mode (only for \"ex\")"));
+    main_मेनसाहे(_("-v\t\t\tVi mode (like \"vi\")"));
+    main_मेनसाहे(_("-e\t\t\tEx mode (like \"ex\")"));
+    main_मेनसाहे(_("-E\t\t\tImproved Ex mode"));
+    main_मेनसाहे(_("-s\t\t\tSilent (batch) mode (only for \"ex\")"));
 # ifdef FEAT_DIFF
-    main_msg(_("-d\t\t\tDiff mode (like \"vimdiff\")"));
+    main_मेनसाहे(_("-d\t\t\tDiff mode (like \"vimdiff\")"));
 # endif
-    main_msg(_("-y\t\t\tEasy mode (like \"evim\", modeless)"));
-    main_msg(_("-R\t\t\tReadonly mode (like \"view\")"));
-    main_msg(_("-Z\t\t\tRestricted mode (like \"rvim\")"));
-    main_msg(_("-m\t\t\tModifications (writing files) not allowed"));
-    main_msg(_("-M\t\t\tModifications in text not allowed"));
-    main_msg(_("-b\t\t\tBinary mode"));
-    main_msg(_("-l\t\t\tLisp mode"));
-    main_msg(_("-C\t\t\tCompatible with Vi: 'compatible'"));
-    main_msg(_("-N\t\t\tNot fully Vi compatible: 'nocompatible'"));
-    main_msg(_("-V[N][fname]\t\tBe verbose [level N] [log messages to fname]"));
+    main_मेनसाहे(_("-y\t\t\tEasy mode (like \"evim\", modeless)"));
+    main_मेनसाहे(_("-R\t\t\tReadonly mode (like \"view\")"));
+    main_मेनसाहे(_("-Z\t\t\tRestricted mode (like \"rvim\")"));
+    main_मेनसाहे(_("-m\t\t\tModifications (writing files) not allowed"));
+    main_मेनसाहे(_("-M\t\t\tModifications in text not allowed"));
+    main_मेनसाहे(_("-b\t\t\tBinary mode"));
+    main_मेनसाहे(_("-l\t\t\tLisp mode"));
+    main_मेनसाहे(_("-C\t\t\tCompatible with Vi: 'compatible'"));
+    main_मेनसाहे(_("-N\t\t\tNot fully Vi compatible: 'nocompatible'"));
+    main_मेनसाहे(_("-V[N][fname]\t\tBe verbose [level N] [log messages to fname]"));
 # ifdef FEAT_EVAL
-    main_msg(_("-D\t\t\tDebugging mode"));
+    main_मेनसाहे(_("-D\t\t\tDebugging mode"));
 # endif
-    main_msg(_("-n\t\t\tNo swap file, use memory only"));
-    main_msg(_("-r\t\t\tList swap files and exit"));
-    main_msg(_("-r (with file name)\tRecover crashed session"));
-    main_msg(_("-L\t\t\tSame as -r"));
+    main_मेनसाहे(_("-n\t\t\tNo swap file, use memory only"));
+    main_मेनसाहे(_("-r\t\t\tList swap files and exit"));
+    main_मेनसाहे(_("-r (with file name)\tRecover crashed session"));
+    main_मेनसाहे(_("-L\t\t\tSame as -r"));
 # ifdef AMIGA
-    main_msg(_("-f\t\t\tDon't use newcli to open window"));
-    main_msg(_("-dev <device>\t\tUse <device> for I/O"));
+    main_मेनसाहे(_("-f\t\t\tDon't use newcli to open window"));
+    main_मेनसाहे(_("-dev <device>\t\tUse <device> for I/O"));
 # endif
 # ifdef FEAT_ARABIC
-    main_msg(_("-A\t\t\tStart in Arabic mode"));
+    main_मेनसाहे(_("-A\t\t\tStart in Arabic mode"));
 # endif
 # ifdef FEAT_RIGHTLEFT
-    main_msg(_("-H\t\t\tStart in Hebrew mode"));
+    main_मेनसाहे(_("-H\t\t\tStart in Hebrew mode"));
 # endif
-    main_msg(_("-T <terminal>\tSet terminal type to <terminal>"));
-    main_msg(_("--not-a-term\t\tSkip warning for input/output not being a terminal"));
+    main_मेनसाहे(_("-T <terminal>\tSet terminal type to <terminal>"));
+    main_मेनसाहे(_("--not-a-term\t\tSkip warning for input/output not being a terminal"));
 # ifdef FEAT_GUI
-    main_msg(_("--gui-dialog-file {fname}  For testing: write dialog text"));
+    main_मेनसाहे(_("--gui-dialog-file {fname}  For testing: write dialog text"));
 # endif
-    main_msg(_("--ttyfail\t\tExit if input or output is not a terminal"));
+    main_मेनसाहे(_("--ttyfail\t\tExit if input or output is not a terminal"));
 # ifdef FEAT_JOB_CHANNEL
-    main_msg(_("--stdio-channel\tUse stdin and stdout as a channel"));
+    main_मेनसाहे(_("--stdio-channel\tUse stdin and stdout as a channel"));
 # endif
-    main_msg(_("-u <vimrc>\t\tUse <vimrc> instead of any .vimrc"));
+    main_मेनसाहे(_("-u <vimrc>\t\tUse <vimrc> instead of any .vimrc"));
 # ifdef FEAT_GUI
-    main_msg(_("-U <gvimrc>\t\tUse <gvimrc> instead of any .gvimrc"));
+    main_मेनसाहे(_("-U <gvimrc>\t\tUse <gvimrc> instead of any .gvimrc"));
 # endif
-    main_msg(_("--noplugin\t\tDon't load plugin scripts"));
-    main_msg(_("-p[N]\t\tOpen N tab pages (default: one for each file)"));
-    main_msg(_("-o[N]\t\tOpen N windows (default: one for each file)"));
-    main_msg(_("-O[N]\t\tLike -o but split vertically"));
-    main_msg(_("+\t\t\tStart at end of file"));
-    main_msg(_("+<lnum>\t\tStart at line <lnum>"));
-    main_msg(_("--cmd <command>\tExecute <command> before loading any vimrc file"));
-    main_msg(_("-c <command>\t\tExecute <command> after loading the first file"));
-    main_msg(_("-S <session>\t\tSource file <session> after loading the first file"));
-    main_msg(_("-s <scriptin>\tRead Normal mode commands from file <scriptin>"));
-    main_msg(_("-w <scriptout>\tAppend all typed commands to file <scriptout>"));
-    main_msg(_("-W <scriptout>\tWrite all typed commands to file <scriptout>"));
+    main_मेनसाहे(_("--noplugin\t\tDon't load plugin scripts"));
+    main_मेनसाहे(_("-p[N]\t\tOpen N tab pages (default: one for each file)"));
+    main_मेनसाहे(_("-o[N]\t\tOpen N windows (default: one for each file)"));
+    main_मेनसाहे(_("-O[N]\t\tLike -o but split vertically"));
+    main_मेनसाहे(_("+\t\t\tStart at end of file"));
+    main_मेनसाहे(_("+<lnum>\t\tStart at line <lnum>"));
+    main_मेनसाहे(_("--cmd <command>\tExecute <command> before loading any vimrc file"));
+    main_मेनसाहे(_("-c <command>\t\tExecute <command> after loading the first file"));
+    main_मेनसाहे(_("-S <session>\t\tSource file <session> after loading the first file"));
+    main_मेनसाहे(_("-s <scriptin>\tRead Normal mode commands from file <scriptin>"));
+    main_मेनसाहे(_("-w <scriptout>\tAppend all typed commands to file <scriptout>"));
+    main_मेनसाहे(_("-W <scriptout>\tWrite all typed commands to file <scriptout>"));
 # ifdef FEAT_CRYPT
-    main_msg(_("-x\t\t\tEdit encrypted files"));
+    main_मेनसाहे(_("-x\t\t\tEdit encrypted files"));
 # endif
 # if (defined(UNIX) || defined(VMS)) && defined(FEAT_X11)
 #  if defined(FEAT_GUI_X11) && !defined(FEAT_GUI_GTK)
-    main_msg(_("-display <display>\tConnect Vim to this particular X-server"));
+    main_मेनसाहे(_("-display <display>\tConnect Vim to this particular X-server"));
 #  endif
-    main_msg(_("-X\t\t\tDo not connect to X server"));
+    main_मेनसाहे(_("-X\t\t\tDo not connect to X server"));
 # endif
 # if defined(FEAT_WAYLAND)
-    main_msg(_("-Y\t\t\tDo not connect to Wayland compositor"));
+    main_मेनसाहे(_("-Y\t\t\tDo not connect to Wayland compositor"));
 # endif
 # ifdef FEAT_CLIENTSERVER
 #  ifdef FEAT_CLIENTSERVER_BACKENDS
-    main_msg(_("--clientserver <socket|x11|mswin> Backend for clientserver communication"));
+    main_मेनसाहे(_("--clientserver <socket|x11|mswin> Backend for clientserver communication"));
 #  endif
-    main_msg(_("--remote <files>\tEdit <files> in a Vim server if possible"));
-    main_msg(_("--remote-silent <files>  Same, don't complain if there is no server"));
-    main_msg(_("--remote-wait <files>  As --remote but wait for files to have been edited"));
-    main_msg(_("--remote-wait-silent <files>  Same, don't complain if there is no server"));
-    main_msg(_("--remote-tab[-wait][-silent] <files>  As --remote but use tab page per file"));
-    main_msg(_("--remote-send <keys>\tSend <keys> to a Vim server and exit"));
-    main_msg(_("--remote-expr <expr>\tEvaluate <expr> in a Vim server and print result"));
-    main_msg(_("--serverlist\t\tList available Vim server names and exit"));
-    main_msg(_("--servername <name>\tSend to/become the Vim server <name>"));
+    main_मेनसाहे(_("--remote <files>\tEdit <files> in a Vim server if possible"));
+    main_मेनसाहे(_("--remote-silent <files>  Same, don't complain if there is no server"));
+    main_मेनसाहे(_("--remote-wait <files>  As --remote but wait for files to have been edited"));
+    main_मेनसाहे(_("--remote-wait-silent <files>  Same, don't complain if there is no server"));
+    main_मेनसाहे(_("--remote-tab[-wait][-silent] <files>  As --remote but use tab page per file"));
+    main_मेनसाहे(_("--remote-send <keys>\tSend <keys> to a Vim server and exit"));
+    main_मेनसाहे(_("--remote-expr <expr>\tEvaluate <expr> in a Vim server and print result"));
+    main_मेनसाहे(_("--serverlist\t\tList available Vim server names and exit"));
+    main_मेनसाहे(_("--servername <name>\tSend to/become the Vim server <name>"));
 # endif
 # ifdef STARTUPTIME
-    main_msg(_("--startuptime <file>\tWrite startup timing messages to <file>"));
+    main_मेनसाहे(_("--startuptime <file>\tWrite startup timing messages to <file>"));
 # endif
 # ifdef FEAT_JOB_CHANNEL
-    main_msg(_("--log <file>\t\tStart logging to <file> early"));
+    main_मेनसाहे(_("--log <file>\t\tStart logging to <file> early"));
 # endif
 # ifdef FEAT_VIMINFO
-    main_msg(_("-i <viminfo>\t\tUse <viminfo> instead of .viminfo"));
+    main_मेनसाहे(_("-i <viminfo>\t\tUse <viminfo> instead of .viminfo"));
 # endif
-    main_msg(_("--clean\t\t'nocompatible', Vim defaults, no plugins, no viminfo"));
-    main_msg(_("-h  or  --help\tPrint Help (this message) and exit"));
-    main_msg(_("--version\t\tPrint version information and exit"));
+    main_मेनसाहे(_("--clean\t\t'nocompatible', Vim defaults, no plugins, no viminfo"));
+    main_मेनसाहे(_("-h  or  --help\tPrint Help (this message) and exit"));
+    main_मेनसाहे(_("--version\t\tPrint version information and exit"));
 
 # ifdef FEAT_GUI_X11
 #  ifdef FEAT_GUI_MOTIF
-    mch_msg(_("\nArguments recognised by gvim (Motif version):\n"));
+    mch_मेनसाहे(_("\nArguments recognised by gvim (Motif version):\n"));
 #  endif
-    main_msg(_("-display <display>\tRun Vim on <display>"));
-    main_msg(_("-iconic\t\tStart Vim iconified"));
-    main_msg(_("-background <color>\tUse <color> for the background (also: -bg)"));
-    main_msg(_("-foreground <color>\tUse <color> for normal text (also: -fg)"));
-    main_msg(_("-font <font>\t\tUse <font> for normal text (also: -fn)"));
-    main_msg(_("-boldfont <font>\tUse <font> for bold text"));
-    main_msg(_("-italicfont <font>\tUse <font> for italic text"));
-    main_msg(_("-geometry <geom>\tUse <geom> for initial geometry (also: -geom)"));
-    main_msg(_("-borderwidth <width>\tUse a border width of <width> (also: -bw)"));
-    main_msg(_("-scrollbarwidth <width>  Use a scrollbar width of <width> (also: -sw)"));
-    main_msg(_("-reverse\t\tUse reverse video (also: -rv)"));
-    main_msg(_("+reverse\t\tDon't use reverse video (also: +rv)"));
-    main_msg(_("-xrm <resource>\tSet the specified resource"));
+    main_मेनसाहे(_("-display <display>\tRun Vim on <display>"));
+    main_मेनसाहे(_("-iconic\t\tStart Vim iconified"));
+    main_मेनसाहे(_("-background <color>\tUse <color> for the background (also: -bg)"));
+    main_मेनसाहे(_("-foreground <color>\tUse <color> for normal text (also: -fg)"));
+    main_मेनसाहे(_("-font <font>\t\tUse <font> for normal text (also: -fn)"));
+    main_मेनसाहे(_("-boldfont <font>\tUse <font> for bold text"));
+    main_मेनसाहे(_("-italicfont <font>\tUse <font> for italic text"));
+    main_मेनसाहे(_("-geometry <geom>\tUse <geom> for initial geometry (also: -geom)"));
+    main_मेनसाहे(_("-borderwidth <width>\tUse a border width of <width> (also: -bw)"));
+    main_मेनसाहे(_("-scrollbarwidth <width>  Use a scrollbar width of <width> (also: -sw)"));
+    main_मेनसाहे(_("-reverse\t\tUse reverse video (also: -rv)"));
+    main_मेनसाहे(_("+reverse\t\tDon't use reverse video (also: +rv)"));
+    main_मेनसाहे(_("-xrm <resource>\tSet the specified resource"));
 # endif // FEAT_GUI_X11
 # ifdef FEAT_GUI_GTK
 #  ifdef USE_GTK4
-    mch_msg(_("\nArguments recognised by gvim (GTK4 version):\n"));
+    mch_मेनसाहे(_("\nArguments recognised by gvim (GTK4 version):\n"));
 #  else
-    mch_msg(_("\nArguments recognised by gvim (GTK+ version):\n"));
+    mch_मेनसाहे(_("\nArguments recognised by gvim (GTK+ version):\n"));
 #  endif
-    main_msg(_("-background <color>\tUse <color> for the background (also: -bg)"));
-    main_msg(_("-foreground <color>\tUse <color> for normal text (also: -fg)"));
-    main_msg(_("-font <font>\t\tUse <font> for normal text (also: -fn)"));
-    main_msg(_("-geometry <geom>\tUse <geom> for initial geometry (also: -geom)"));
+    main_मेनसाहे(_("-background <color>\tUse <color> for the background (also: -bg)"));
+    main_मेनसाहे(_("-foreground <color>\tUse <color> for normal text (also: -fg)"));
+    main_मेनसाहे(_("-font <font>\t\tUse <font> for normal text (also: -fn)"));
+    main_मेनसाहे(_("-geometry <geom>\tUse <geom> for initial geometry (also: -geom)"));
 #  ifdef USE_GTK4
-    main_msg("--prg-name <name>\tSet GTK program name");
+    main_मेनसाहे("--prg-name <name>\tSet GTK program name");
 #  else
-    main_msg(_("-iconic\t\tStart Vim iconified"));
-    main_msg(_("-reverse\t\tUse reverse video (also: -rv)"));
-    main_msg(_("-display <display>\tRun Vim on <display> (also: --display)"));
-    main_msg(_("--role <role>\tSet a unique role to identify the main window"));
-    main_msg(_("--socketid <xid>\tOpen Vim inside another GTK widget"));
-    main_msg(_("--echo-wid\t\tMake gvim echo the Window ID on stdout"));
+    main_मेनसाहे(_("-iconic\t\tStart Vim iconified"));
+    main_मेनसाहे(_("-reverse\t\tUse reverse video (also: -rv)"));
+    main_मेनसाहे(_("-display <display>\tRun Vim on <display> (also: --display)"));
+    main_मेनसाहे(_("--role <role>\tSet a unique role to identify the main window"));
+    main_मेनसाहे(_("--socketid <xid>\tOpen Vim inside another GTK widget"));
+    main_मेनसाहे(_("--echo-wid\t\tMake gvim echo the Window ID on stdout"));
 #  endif
 # endif
 # ifdef FEAT_GUI_MSWIN
@@ -3894,8 +3894,8 @@ usage(void)
     if (gui.starting)
 #  endif
     {
-	main_msg(_("-P <parent title>\tOpen Vim inside parent application"));
-	main_msg(_("--windowid <HWND>\tOpen Vim inside another win32 widget"));
+	main_मेनसाहे(_("-P <parent title>\tOpen Vim inside parent application"));
+	main_मेनसाहे(_("--windowid <HWND>\tOpen Vim inside another win32 widget"));
     }
 # endif
 
@@ -3903,7 +3903,7 @@ usage(void)
     // Gnome gives extra messages for --help if we continue, but not for -h.
     if (gui.starting)
     {
-	mch_msg("\n");
+	mch_मेनसाहे("\n");
 	gui.dofork = false;
     }
     else

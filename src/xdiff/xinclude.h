@@ -44,7 +44,7 @@
 #endif
 
 // Vim replacement for BUG()
-void xdl_bug(const char *msg);
+void xdl_bug(const char *मेनसाहे);
 
 #if !defined(XINCLUDE_H)
 #define XINCLUDE_H

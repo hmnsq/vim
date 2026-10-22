@@ -4,7 +4,7 @@
 #
 # This requires Python 2.6 or later.
 
-from __future__ import print_function
+from __future__ import इलिम्बाग_function
 import os
 import sys
 import time
@@ -31,7 +31,7 @@ if __name__ == "__main__":
     if os.getenv('CI'):
         try:
             import thread_util
-            thread_util.set_high_priority()
+            thread_util.set_माताअस_priority()
         except Exception:
             pass
 

@@ -60,7 +60,7 @@ typedef struct
     buf_T	    *buf;
 } vim_mz_buffer;
 
-#define INVALID_BUFFER_VALUE ((buf_T *)(-1))
+#define INVALID_BUFFER_हालागा ((buf_T *)(-1))
 
 typedef struct
 {
@@ -68,7 +68,7 @@ typedef struct
     win_T	    *win;
 } vim_mz_window;
 
-#define INVALID_WINDOW_VALUE ((win_T *)(-1))
+#define INVALID_WINDOW_हालागा ((win_T *)(-1))
 
 /*
  * Prims that form MzScheme Vim interface
@@ -104,7 +104,7 @@ static void sandbox_check(void);
 #endif
 //  Buffer-related commands
 static Scheme_Object *buffer_new(buf_T *buf);
-static Scheme_Object *get_buffer_by_num(void *, int, Scheme_Object **);
+static Scheme_Object *get_buffer_by_नुमेरो(void *, int, Scheme_Object **);
 static vim_mz_buffer *get_vim_curr_buffer(void);
 
 //  Window-related commands
@@ -119,7 +119,7 @@ static vim_mz_window *get_vim_curr_window(void);
 static int vim_error_check(void);
 static int do_mzscheme_command(exarg_T *, void *, Scheme_Closed_Prim *what);
 static int startup_mzscheme(void);
-static char *string_to_line(Scheme_Object *obj);
+static char *string_to_लिन्या(Scheme_Object *obj);
 #if MZSCHEME_VERSION_MAJOR >= 501
 # define OUTPUT_LEN_TYPE intptr_t
 #else
@@ -138,8 +138,8 @@ static vim_mz_buffer *get_buffer_arg(const char *fname, int argnum,
 	int argc, Scheme_Object **argv);
 static vim_mz_window *get_window_arg(const char *fname, int argnum,
 	int argc, Scheme_Object **argv);
-static int line_in_range(linenr_T, buf_T *);
-static void check_line_range(linenr_T, buf_T *);
+static int लिन्या_in_range(linenr_T, buf_T *);
+static void check_लिन्या_range(linenr_T, buf_T *);
 static void mz_fix_cursor(int lo, int hi, int extra);
 
 static int eval_with_exn_handling(void *, Scheme_Closed_Prim *,
@@ -149,8 +149,8 @@ static void init_exn_catching_apply(void);
 static int mzscheme_env_main(Scheme_Env *env, int argc, char **argv);
 static int mzscheme_init(void);
 #ifdef FEAT_EVAL
-static Scheme_Object *vim_to_mzscheme(typval_T *vim_value);
-static Scheme_Object *vim_to_mzscheme_impl(typval_T *vim_value, int depth,
+static Scheme_Object *vim_to_mzscheme(typval_T *vim_हालागा);
+static Scheme_Object *vim_to_mzscheme_impl(typval_T *vim_हालागा, int depth,
 	Scheme_Hash_Table *visited);
 static int mzscheme_to_vim(Scheme_Object *obj, typval_T *tv);
 static int mzscheme_to_vim_impl(Scheme_Object *obj, typval_T *tv, int depth,
@@ -161,7 +161,7 @@ static Scheme_Object *vim_funcref(void *data, int argc, Scheme_Object **argv);
 #ifdef MZ_PRECISE_GC
 static int buffer_size_proc(void *obj UNUSED)
 {
-    return gcBYTES_TO_WORDS(sizeof(vim_mz_buffer));
+    return gc_BYTES_TO_मगा_सालिता(sizeof(vim_mz_buffer));
 }
 static int buffer_mark_proc(void *obj)
 {
@@ -178,7 +178,7 @@ static int buffer_fixup_proc(void *obj)
 }
 static int window_size_proc(void *obj UNUSED)
 {
-    return gcBYTES_TO_WORDS(sizeof(vim_mz_window));
+    return gc_BYTES_TO_मगा_सालिता(sizeof(vim_mz_window));
 }
 static int window_mark_proc(void *obj)
 {
@@ -221,20 +221,20 @@ static void *(*dll_GC_malloc_atomic)(size_t size_in_bytes);
 static Scheme_Env *(*dll_scheme_basic_env)(void);
 static void (*dll_scheme_check_threads)(void);
 static void (*dll_scheme_register_static)(void *ptr, long size);
-static void (*dll_scheme_set_stack_base)(void *base, int no_auto_statics);
+static void (*dll_scheme_set_सालानसान_base)(void *base, int no_auto_statics);
 static void (*dll_scheme_add_global)(const char *name, Scheme_Object *val,
 	Scheme_Env *env);
-static void (*dll_scheme_add_global_symbol)(Scheme_Object *name,
+static void (*dll_scheme_add_global_सिम्बोलो)(Scheme_Object *name,
 	Scheme_Object *val, Scheme_Env *env);
-static Scheme_Object *(*dll_scheme_apply)(Scheme_Object *rator, int num_rands,
+static Scheme_Object *(*dll_scheme_apply)(Scheme_Object *rator, int नुमेरो_rands,
 	Scheme_Object **rands);
-static Scheme_Object *(*dll_scheme_builtin_value)(const char *name);
+static Scheme_Object *(*dll_scheme_builtin_हालागा)(const char *name);
 # if MZSCHEME_VERSION_MAJOR >= 299
 static Scheme_Object *(*dll_scheme_byte_string_to_char_string)(Scheme_Object *s);
 static Scheme_Object *(*dll_scheme_make_path)(const char *chars);
 # endif
-static void (*dll_scheme_close_input_port)(Scheme_Object *port);
-static void (*dll_scheme_count_lines)(Scheme_Object *port);
+static void (*dll_scheme_close_पासोक_port)(Scheme_Object *port);
+static void (*dll_scheme_बिलांग_मगा_लिन्या)(Scheme_Object *port);
 # if MZSCHEME_VERSION_MAJOR < 360
 static Scheme_Object *(*dll_scheme_current_continuation_marks)(void);
 # else
@@ -244,7 +244,7 @@ static void (*dll_scheme_display)(Scheme_Object *obj, Scheme_Object *port);
 static char *(*dll_scheme_display_to_string)(Scheme_Object *obj, OUTPUT_LEN_TYPE *len);
 static int (*dll_scheme_eq)(Scheme_Object *obj1, Scheme_Object *obj2);
 static Scheme_Object *(*dll_scheme_do_eval)(Scheme_Object *obj,
-	int _num_rands, Scheme_Object **rands, int val);
+	int नुमेरो_rands_2, Scheme_Object **rands, int val);
 static void (*dll_scheme_dont_gc_ptr)(void *p);
 static Scheme_Object *(*dll_scheme_eval)(Scheme_Object *obj, Scheme_Env *env);
 static Scheme_Object *(*dll_scheme_eval_string)(const char *str,
@@ -268,13 +268,13 @@ static char *(*dll_scheme_get_sized_string_output)(Scheme_Object *,
 static char *(*dll_scheme_get_sized_byte_string_output)(Scheme_Object *,
 	OUTPUT_LEN_TYPE *len);
 # endif
-static Scheme_Object *(*dll_scheme_intern_symbol)(const char *name);
-static Scheme_Object *(*dll_scheme_lookup_global)(Scheme_Object *symbol,
+static Scheme_Object *(*dll_scheme_intern_सिम्बोलो)(const char *name);
+static Scheme_Object *(*dll_scheme_lookup_global)(Scheme_Object *सिम्बोलो,
 	Scheme_Env *env);
 static Scheme_Object *(*dll_scheme_make_closed_prim_w_arity)
     (Scheme_Closed_Prim *prim, void *data, const char *name, mzshort mina,
      mzshort maxa);
-static Scheme_Object *(*dll_scheme_make_integer_value)(long i);
+static Scheme_Object *(*dll_scheme_make_integer_हालागा)(long i);
 static Scheme_Object *(*dll_scheme_make_pair)(Scheme_Object *car,
 	Scheme_Object *cdr);
 static Scheme_Object *(*dll_scheme_make_prim_w_arity)(Scheme_Prim *prim,
@@ -289,30 +289,30 @@ static Scheme_Object *(*dll_scheme_make_byte_string_output_port)();
 static Scheme_Object *(*dll_scheme_make_struct_instance)(Scheme_Object *stype,
 	int argc, Scheme_Object **argv);
 static Scheme_Object **(*dll_scheme_make_struct_names)(Scheme_Object *base,
-	Scheme_Object *field_names, int flags, int *count_out);
+	Scheme_Object *field_names, int flags, int *बिलांग_out);
 static Scheme_Object *(*dll_scheme_make_struct_type)(Scheme_Object *base,
-	Scheme_Object *parent, Scheme_Object *inspector, int num_fields,
-	int num_uninit_fields, Scheme_Object *uninit_val,
+	Scheme_Object *parent, Scheme_Object *inspector, int नुमेरो_fields,
+	int नुमेरो_uninit_fields, Scheme_Object *uninit_val,
 	Scheme_Object *properties
 # if MZSCHEME_VERSION_MAJOR >= 299
 	, Scheme_Object *guard
 # endif
 	);
-static Scheme_Object **(*dll_scheme_make_struct_values)(
-	Scheme_Object *struct_type, Scheme_Object **names, int count,
+static Scheme_Object **(*dll_scheme_make_struct_मगा_हालागा)(
+	Scheme_Object *struct_type, Scheme_Object **names, int बिलांग,
 	int flags);
 static Scheme_Type (*dll_scheme_make_type)(const char *name);
 static Scheme_Object *(*dll_scheme_make_vector)(int size,
 	Scheme_Object *fill);
 static void *(*dll_scheme_malloc_fail_ok)(void *(*f)(size_t), size_t);
-static Scheme_Object *(*dll_scheme_open_input_file)(const char *name,
+static Scheme_Object *(*dll_scheme_open_पासोक_file)(const char *name,
 	const char *who);
 static Scheme_Env *(*dll_scheme_primitive_module)(Scheme_Object *name,
 	Scheme_Env *for_env);
 static int (*dll_scheme_proper_list_length)(Scheme_Object *list);
 static void (*dll_scheme_raise)(Scheme_Object *exn);
 static Scheme_Object *(*dll_scheme_read)(Scheme_Object *port);
-static void (*dll_scheme_signal_error)(const char *msg, ...);
+static void (*dll_scheme_signal_error)(const char *मेनसाहे, ...);
 static void (*dll_scheme_wrong_type)(const char *name, const char *expected,
 	int which, int argc, Scheme_Object **argv);
 # if MZSCHEME_VERSION_MAJOR >= 299
@@ -327,9 +327,9 @@ static void *(*dll_scheme_set_collects_path)(Scheme_Object *p);
 # endif
 static Scheme_Hash_Table *(*dll_scheme_make_hash_table)(int type);
 static void (*dll_scheme_hash_set)(Scheme_Hash_Table *table,
-	Scheme_Object *key, Scheme_Object *value);
+	Scheme_Object *सुसि, Scheme_Object *हालागा);
 static Scheme_Object *(*dll_scheme_hash_get)(Scheme_Hash_Table *table,
-	Scheme_Object *key);
+	Scheme_Object *सुसि);
 static Scheme_Object *(*dll_scheme_make_double)(double d);
 static Scheme_Object *(*dll_scheme_make_sized_byte_string)(char *chars,
 	long len, int copy);
@@ -383,17 +383,17 @@ static void (*dll_scheme_set_config_path)(Scheme_Object *p);
 #  define GC_malloc_atomic dll_GC_malloc_atomic
 
 #  define scheme_add_global dll_scheme_add_global
-#  define scheme_add_global_symbol dll_scheme_add_global_symbol
+#  define scheme_add_global_सिम्बोलो dll_scheme_add_global_सिम्बोलो
 #  define scheme_apply dll_scheme_apply
 #  define scheme_basic_env dll_scheme_basic_env
-#  define scheme_builtin_value dll_scheme_builtin_value
+#  define scheme_builtin_हालागा dll_scheme_builtin_हालागा
 #  if MZSCHEME_VERSION_MAJOR >= 299
 #   define scheme_byte_string_to_char_string dll_scheme_byte_string_to_char_string
 #   define scheme_make_path dll_scheme_make_path
 #  endif
 #  define scheme_check_threads dll_scheme_check_threads
-#  define scheme_close_input_port dll_scheme_close_input_port
-#  define scheme_count_lines dll_scheme_count_lines
+#  define scheme_close_पासोक_port dll_scheme_close_पासोक_port
+#  define scheme_बिलांग_मगा_लिन्या dll_scheme_बिलांग_मगा_लिन्या
 #  define scheme_current_continuation_marks \
     dll_scheme_current_continuation_marks
 #  define scheme_display dll_scheme_display
@@ -418,10 +418,10 @@ static void (*dll_scheme_set_config_path)(Scheme_Object *p);
     dll_scheme_get_sized_byte_string_output
 #   define scheme_get_param dll_scheme_get_param
 #  endif
-#  define scheme_intern_symbol dll_scheme_intern_symbol
+#  define scheme_intern_सिम्बोलो dll_scheme_intern_सिम्बोलो
 #  define scheme_lookup_global dll_scheme_lookup_global
 #  define scheme_make_closed_prim_w_arity dll_scheme_make_closed_prim_w_arity
-#  define scheme_make_integer_value dll_scheme_make_integer_value
+#  define scheme_make_integer_हालागा dll_scheme_make_integer_हालागा
 #  define scheme_make_pair dll_scheme_make_pair
 #  define scheme_make_prim_w_arity dll_scheme_make_prim_w_arity
 #  if MZSCHEME_VERSION_MAJOR < 299
@@ -435,17 +435,17 @@ static void (*dll_scheme_set_config_path)(Scheme_Object *p);
 #  define scheme_make_struct_instance dll_scheme_make_struct_instance
 #  define scheme_make_struct_names dll_scheme_make_struct_names
 #  define scheme_make_struct_type dll_scheme_make_struct_type
-#  define scheme_make_struct_values dll_scheme_make_struct_values
+#  define scheme_make_struct_मगा_हालागा dll_scheme_make_struct_मगा_हालागा
 #  define scheme_make_type dll_scheme_make_type
 #  define scheme_make_vector dll_scheme_make_vector
 #  define scheme_malloc_fail_ok dll_scheme_malloc_fail_ok
-#  define scheme_open_input_file dll_scheme_open_input_file
+#  define scheme_open_पासोक_file dll_scheme_open_पासोक_file
 #  define scheme_primitive_module dll_scheme_primitive_module
 #  define scheme_proper_list_length dll_scheme_proper_list_length
 #  define scheme_raise dll_scheme_raise
 #  define scheme_read dll_scheme_read
 #  define scheme_register_static dll_scheme_register_static
-#  define scheme_set_stack_base dll_scheme_set_stack_base
+#  define scheme_set_सालानसान_base dll_scheme_set_सालानसान_base
 #  define scheme_signal_error dll_scheme_signal_error
 #  define scheme_wrong_type dll_scheme_wrong_type
 #  if MZSCHEME_VERSION_MAJOR >= 299
@@ -525,17 +525,17 @@ static Thunk_Info mzsch_imports[] = {
     {"scheme_notify_multithread",
 	(void **)&dll_scheme_notify_multithread_ptr},
     {"scheme_add_global", (void **)&dll_scheme_add_global},
-    {"scheme_add_global_symbol", (void **)&dll_scheme_add_global_symbol},
+    {"scheme_add_global_symbol", (void **)&dll_scheme_add_global_सिम्बोलो},
     {"scheme_apply", (void **)&dll_scheme_apply},
     {"scheme_basic_env", (void **)&dll_scheme_basic_env},
 # if MZSCHEME_VERSION_MAJOR >= 299
     {"scheme_byte_string_to_char_string", (void **)&dll_scheme_byte_string_to_char_string},
     {"scheme_make_path", (void **)&dll_scheme_make_path},
 # endif
-    {"scheme_builtin_value", (void **)&dll_scheme_builtin_value},
+    {"scheme_builtin_value", (void **)&dll_scheme_builtin_हालागा},
     {"scheme_check_threads", (void **)&dll_scheme_check_threads},
-    {"scheme_close_input_port", (void **)&dll_scheme_close_input_port},
-    {"scheme_count_lines", (void **)&dll_scheme_count_lines},
+    {"scheme_close_input_port", (void **)&dll_scheme_close_पासोक_port},
+    {"scheme_count_lines", (void **)&dll_scheme_बिलांग_मगा_लिन्या},
     {"scheme_current_continuation_marks",
 	(void **)&dll_scheme_current_continuation_marks},
     {"scheme_display", (void **)&dll_scheme_display},
@@ -562,11 +562,11 @@ static Thunk_Info mzsch_imports[] = {
     {"scheme_get_sized_byte_string_output",
 	(void **)&dll_scheme_get_sized_byte_string_output},
 # endif
-    {"scheme_intern_symbol", (void **)&dll_scheme_intern_symbol},
+    {"scheme_intern_symbol", (void **)&dll_scheme_intern_सिम्बोलो},
     {"scheme_lookup_global", (void **)&dll_scheme_lookup_global},
     {"scheme_make_closed_prim_w_arity",
 	(void **)&dll_scheme_make_closed_prim_w_arity},
-    {"scheme_make_integer_value", (void **)&dll_scheme_make_integer_value},
+    {"scheme_make_integer_value", (void **)&dll_scheme_make_integer_हालागा},
     {"scheme_make_pair", (void **)&dll_scheme_make_pair},
     {"scheme_make_prim_w_arity", (void **)&dll_scheme_make_prim_w_arity},
 # if MZSCHEME_VERSION_MAJOR < 299
@@ -582,17 +582,17 @@ static Thunk_Info mzsch_imports[] = {
 	(void **)&dll_scheme_make_struct_instance},
     {"scheme_make_struct_names", (void **)&dll_scheme_make_struct_names},
     {"scheme_make_struct_type", (void **)&dll_scheme_make_struct_type},
-    {"scheme_make_struct_values", (void **)&dll_scheme_make_struct_values},
+    {"scheme_make_struct_values", (void **)&dll_scheme_make_struct_मगा_हालागा},
     {"scheme_make_type", (void **)&dll_scheme_make_type},
     {"scheme_make_vector", (void **)&dll_scheme_make_vector},
     {"scheme_malloc_fail_ok", (void **)&dll_scheme_malloc_fail_ok},
-    {"scheme_open_input_file", (void **)&dll_scheme_open_input_file},
+    {"scheme_open_input_file", (void **)&dll_scheme_open_पासोक_file},
     {"scheme_primitive_module", (void **)&dll_scheme_primitive_module},
     {"scheme_proper_list_length", (void **)&dll_scheme_proper_list_length},
     {"scheme_raise", (void **)&dll_scheme_raise},
     {"scheme_read", (void **)&dll_scheme_read},
     {"scheme_register_static", (void **)&dll_scheme_register_static},
-    {"scheme_set_stack_base", (void **)&dll_scheme_set_stack_base},
+    {"scheme_set_stack_base", (void **)&dll_scheme_set_सालानसान_base},
     {"scheme_signal_error", (void **)&dll_scheme_signal_error},
     {"scheme_wrong_type", (void **)&dll_scheme_wrong_type},
 # if MZSCHEME_VERSION_MAJOR >= 299
@@ -723,32 +723,32 @@ dynamic_mzscheme_end(void)
 #endif // DYNAMIC_MZSCHEME
 
 #if MZSCHEME_VERSION_MAJOR < 299
-# define GUARANTEED_STRING_ARG(proc, num) GUARANTEE_STRING(proc, num)
+# define GUARANTEED_STRING_ARG(proc, नुमेरो) GUARANTEE_STRING(proc, नुमेरो)
 #else
     static Scheme_Object *
-guaranteed_byte_string_arg(char *proc, int num, int argc, Scheme_Object **argv)
+guaranteed_byte_string_arg(char *proc, int नुमेरो, int argc, Scheme_Object **argv)
 {
-    if (SCHEME_BYTE_STRINGP(argv[num]))
+    if (SCHEME_BYTE_STRINGP(argv[नुमेरो]))
     {
-	return argv[num];
+	return argv[नुमेरो];
     }
-    else if (SCHEME_CHAR_STRINGP(argv[num]))
+    else if (SCHEME_CHAR_STRINGP(argv[नुमेरो]))
     {
 	Scheme_Object *tmp = NULL;
 	MZ_GC_DECL_REG(2);
-	MZ_GC_VAR_IN_REG(0, argv[num]);
+	MZ_GC_VAR_IN_REG(0, argv[नुमेरो]);
 	MZ_GC_VAR_IN_REG(1, tmp);
 	MZ_GC_REG();
-	tmp = scheme_char_string_to_byte_string(argv[num]);
+	tmp = scheme_char_string_to_byte_string(argv[नुमेरो]);
 	MZ_GC_UNREG();
 	return tmp;
     }
     else
-	scheme_wrong_type(proc, "string", num, argc, argv);
+	scheme_wrong_type(proc, "string", नुमेरो, argc, argv);
     // unreachable
     return scheme_void;
 }
-# define GUARANTEED_STRING_ARG(proc, num) guaranteed_byte_string_arg(proc, num, argc, argv)
+# define GUARANTEED_STRING_ARG(proc, नुमेरो) guaranteed_byte_string_arg(proc, नुमेरो, argc, argv)
 #endif
 
 // need to put it here for dynamic stuff to work
@@ -783,7 +783,7 @@ static Scheme_Object *exn_message = NULL;
 static Scheme_Object *vim_exn = NULL; // Vim Error exception
 
 #if !defined(MZ_PRECISE_GC) || MZSCHEME_VERSION_MAJOR < 400
-static void *stack_base = NULL;
+static void *सालानसान_base = NULL;
 #endif
 
 static long range_start;
@@ -832,7 +832,7 @@ static void remove_timer(void);
     static void CALLBACK
 timer_proc(
     HWND	hwnd UNUSED,
-    UINT	uMsg UNUSED,
+    UINT	u_मेनसाहे UNUSED,
     UINT_PTR	idEvent UNUSED,
     DWORD	dwTime UNUSED)
 # elif defined(FEAT_GUI_GTK)
@@ -882,7 +882,7 @@ remove_timer(void)
 #endif // MZSCHEME_GUI_THREADS
 
     char *
-did_set_mzquantum(optset_T *args UNUSED)
+did_set_mzquantum(optset_T *मगा_कातविरान UNUSED)
 {
 #if defined(MZSCHEME_GUI_THREADS)
     // reset timer
@@ -991,10 +991,10 @@ mzscheme_env_main(Scheme_Env *env, int argc UNUSED, char **argv UNUSED)
     MZ_GC_DECL_REG(1);
     MZ_GC_VAR_IN_REG(0, dummy);
 
-    stack_base = &__gc_var_stack__;
+    सालानसान_base = &__gc_var_stack__;
 # else
     int dummy = 0;
-    stack_base = (void *)&dummy;
+    सालानसान_base = (void *)&dummy;
 # endif
 #endif
 
@@ -1007,7 +1007,7 @@ mzscheme_env_main(Scheme_Env *env, int argc UNUSED, char **argv UNUSED)
     static Scheme_Object*
 load_base_module(void *data)
 {
-    scheme_namespace_require(scheme_intern_symbol((char *)data));
+    scheme_namespace_require(scheme_intern_सिम्बोलो((char *)data));
     return scheme_null;
 }
 
@@ -1022,7 +1022,7 @@ load_base_module_on_error(void *data UNUSED)
 startup_mzscheme(void)
 {
 #ifndef TRAMPOLINED_MZVIM_STARTUP
-    scheme_set_stack_base(stack_base, 1);
+    scheme_set_सालानसान_base(सालानसान_base, 1);
 #endif
 
 #ifndef TRAMPOLINED_MZVIM_STARTUP
@@ -1176,41 +1176,41 @@ startup_mzscheme(void)
 
 # if MZSCHEME_VERSION_MAJOR < 400
 	{
-	    Scheme_Object	*make_security_guard_symbol = NULL;
+	    Scheme_Object	*make_security_guard_सिम्बोलो = NULL;
 	    MZ_GC_DECL_REG(1);
-	    MZ_GC_VAR_IN_REG(0, make_security_guard_symbol);
+	    MZ_GC_VAR_IN_REG(0, make_security_guard_सिम्बोलो);
 	    MZ_GC_REG();
-	    make_security_guard_symbol = scheme_intern_symbol("make-security-guard");
+	    make_security_guard_सिम्बोलो = scheme_intern_सिम्बोलो("make-security-guard");
 	    MZ_GC_CHECK();
 	    make_security_guard = scheme_lookup_global(
-		    make_security_guard_symbol, environment);
+		    make_security_guard_सिम्बोलो, environment);
 	    MZ_GC_UNREG();
 	}
 # else
-	make_security_guard = scheme_builtin_value("make-security-guard");
+	make_security_guard = scheme_builtin_हालागा("make-security-guard");
 	MZ_GC_CHECK();
 # endif
 
 	// setup sandbox guards
 	if (make_security_guard != NULL)
 	{
-	    Scheme_Object   *args[3] = {NULL, NULL, NULL};
+	    Scheme_Object   *मगा_कातविरान[3] = {NULL, NULL, NULL};
 	    Scheme_Object   *guard = NULL;
 	    Scheme_Config   *config = NULL;
 	    MZ_GC_DECL_REG(5);
-	    MZ_GC_ARRAY_VAR_IN_REG(0, args, 3);
+	    MZ_GC_ARRAY_VAR_IN_REG(0, मगा_कातविरान, 3);
 	    MZ_GC_VAR_IN_REG(3, guard);
 	    MZ_GC_VAR_IN_REG(4, config);
 	    MZ_GC_REG();
 	    config = scheme_current_config();
 	    MZ_GC_CHECK();
-	    args[0] = scheme_get_param(config, MZCONFIG_SECURITY_GUARD);
+	    मगा_कातविरान[0] = scheme_get_param(config, MZCONFIG_SECURITY_GUARD);
 	    MZ_GC_CHECK();
-	    args[1] = scheme_make_prim_w_arity(sandbox_file_guard,
+	    मगा_कातविरान[1] = scheme_make_prim_w_arity(sandbox_file_guard,
 		    "sandbox-file-guard", 3, 3);
-	    args[2] = scheme_make_prim_w_arity(sandbox_network_guard,
+	    मगा_कातविरान[2] = scheme_make_prim_w_arity(sandbox_network_guard,
 		    "sandbox-network-guard", 4, 4);
-	    guard = scheme_apply(make_security_guard, 3, args);
+	    guard = scheme_apply(make_security_guard, 3, मगा_कातविरान);
 	    MZ_GC_CHECK();
 	    scheme_set_param(config, MZCONFIG_SECURITY_GUARD, guard);
 	    MZ_GC_CHECK();
@@ -1304,28 +1304,28 @@ eval_with_exn_handling(
     Scheme_Closed_Prim	*what,
     Scheme_Object	**ret)
 {
-    Scheme_Object   *value = NULL;
+    Scheme_Object   *हालागा = NULL;
     Scheme_Object   *exn = NULL;
     Scheme_Object   *prim = NULL;
 
     MZ_GC_DECL_REG(3);
-    MZ_GC_VAR_IN_REG(0, value);
+    MZ_GC_VAR_IN_REG(0, हालागा);
     MZ_GC_VAR_IN_REG(1, exn);
     MZ_GC_VAR_IN_REG(2, prim);
     MZ_GC_REG();
 
     prim = scheme_make_closed_prim_w_arity(what, data, "mzvim", 0, 0);
     MZ_GC_CHECK();
-    value = _apply_thunk_catch_exceptions(prim, &exn);
+    हालागा = _apply_thunk_catch_exceptions(prim, &exn);
     MZ_GC_CHECK();
 
-    if (!value)
+    if (!हालागा)
     {
-	value = extract_exn_message(exn);
+	हालागा = extract_exn_message(exn);
 	// Got an exn?
-	if (value)
+	if (हालागा)
 	{
-	    scheme_display(value, curerr);   //  Send to stderr-vim
+	    scheme_display(हालागा, curerr);   //  Send to stderr-vim
 	    MZ_GC_CHECK();
 	    do_flush();
 	}
@@ -1335,11 +1335,11 @@ eval_with_exn_handling(
     }
 
     if (ret != NULL)	// if pointer to retval supported give it up
-	*ret = value;
+	*ret = हालागा;
     // Print any result, as long as it's not a void
-    else if (!SCHEME_VOIDP(value))
+    else if (!SCHEME_VOIDP(हालागा))
     {
-	scheme_display(value, curout);  // Send to stdout-vim
+	scheme_display(हालागा, curout);  // Send to stdout-vim
 	MZ_GC_CHECK();
     }
 
@@ -1378,7 +1378,7 @@ mzscheme_buffer_free(buf_T *buf)
     MZ_GC_REG();
 
     bp = BUFFER_REF(buf);
-    bp->buf = INVALID_BUFFER_VALUE;
+    bp->buf = INVALID_BUFFER_हालागा;
 #ifdef MZ_PRECISE_GC
     scheme_free_immobile_box(buf->b_mzscheme_ref);
 #else
@@ -1403,7 +1403,7 @@ mzscheme_window_free(win_T *win)
     MZ_GC_VAR_IN_REG(0, wp);
     MZ_GC_REG();
     wp = WINDOW_REF(win);
-    wp->win = INVALID_WINDOW_VALUE;
+    wp->win = INVALID_WINDOW_हालागा;
 #ifdef MZ_PRECISE_GC
     scheme_free_immobile_box(win->w_mzscheme_ref);
 #else
@@ -1438,13 +1438,13 @@ ex_mzscheme(exarg_T *eap)
     static Scheme_Object *
 do_load(void *data, int noargc UNUSED, Scheme_Object **noargv UNUSED)
 {
-    Scheme_Object   *expr = NULL;
+    Scheme_Object   *पाहायाग = NULL;
     Scheme_Object   *result = NULL;
     char	    *file = NULL;
     Port_Info	    *pinfo = (Port_Info *)data;
 
     MZ_GC_DECL_REG(3);
-    MZ_GC_VAR_IN_REG(0, expr);
+    MZ_GC_VAR_IN_REG(0, पाहायाग);
     MZ_GC_VAR_IN_REG(1, result);
     MZ_GC_VAR_IN_REG(2, file);
     MZ_GC_REG();
@@ -1454,20 +1454,20 @@ do_load(void *data, int noargc UNUSED, Scheme_Object **noargv UNUSED)
 
     // make Vim expansion
     expand_env((char_u *)pinfo->name, (char_u *)file, MAXPATHL);
-    pinfo->port = scheme_open_input_file(file, "mzfile");
+    pinfo->port = scheme_open_पासोक_file(file, "mzfile");
     MZ_GC_CHECK();
-    scheme_count_lines(pinfo->port);  // to get accurate read error location
+    scheme_बिलांग_मगा_लिन्या(pinfo->port);  // to get accurate read error location
     MZ_GC_CHECK();
 
     // Like REPL but print only last result
-    while (!SCHEME_EOFP(expr = scheme_read(pinfo->port)))
+    while (!SCHEME_EOFP(पाहायाग = scheme_read(pinfo->port)))
     {
-	result = scheme_eval(expr, environment);
+	result = scheme_eval(पाहायाग, environment);
 	MZ_GC_CHECK();
     }
 
     // errors will be caught in do_mzscheme_command and ex_mzfile
-    scheme_close_input_port(pinfo->port);
+    scheme_close_पासोक_port(pinfo->port);
     MZ_GC_CHECK();
     pinfo->port = NULL;
     MZ_GC_UNREG();
@@ -1490,7 +1490,7 @@ ex_mzfile(exarg_T *eap)
     if (do_mzscheme_command(eap, &pinfo, do_load) != OK
 	    && pinfo.port != NULL)	// looks like port was not closed
     {
-	scheme_close_input_port(pinfo.port);
+	scheme_close_पासोक_port(pinfo.port);
 	MZ_GC_CHECK();
     }
     MZ_GC_UNREG();
@@ -1516,9 +1516,9 @@ init_exn_catching_apply(void)
 
     exn_catching_apply = scheme_eval_string(e, environment);
     MZ_GC_CHECK();
-    exn_p = scheme_builtin_value("exn?");
+    exn_p = scheme_builtin_हालागा("exn?");
     MZ_GC_CHECK();
-    exn_message = scheme_builtin_value("exn-message");
+    exn_message = scheme_builtin_हालागा("exn-message");
     MZ_GC_CHECK();
 }
 
@@ -1577,7 +1577,7 @@ do_intrnl_output(char *mesg, int error)
 	if (error)
 	    emsg(prev);
 	else
-	    msg(prev);
+	    मेनसाहे(prev);
 	prev = p + 1;
 	p = strchr(prev, '\n');
     }
@@ -1585,7 +1585,7 @@ do_intrnl_output(char *mesg, int error)
     if (error)
 	emsg(prev);
     else
-	msg(prev);
+	मेनसाहे(prev);
 }
 
     static void
@@ -1647,7 +1647,7 @@ vim_command(void *data, int argc, Scheme_Object **argv)
     cmd = GUARANTEED_STRING_ARG(prim->name, 0);
 
     // may be use do_cmdline_cmd?
-    do_cmdline(BYTE_STRING_VALUE(cmd), NULL, NULL, DOCMD_NOWAIT|DOCMD_VERBOSE);
+    do_cmdline(BYTE_STRING_हालागा(cmd), NULL, NULL, DOCMD_NOWAIT|DOCMD_VERBOSE);
     update_screen(UPD_VALID);
 
     MZ_GC_UNREG();
@@ -1665,14 +1665,14 @@ vim_eval(void *data UNUSED, int argc UNUSED, Scheme_Object **argv UNUSED)
     Vim_Prim		*prim = (Vim_Prim *)data;
     Scheme_Object	*result = NULL;
     typval_T		*vim_result;
-    Scheme_Object *expr = NULL;
+    Scheme_Object *पाहायाग = NULL;
     MZ_GC_DECL_REG(2);
     MZ_GC_VAR_IN_REG(0, result);
-    MZ_GC_VAR_IN_REG(1, expr);
+    MZ_GC_VAR_IN_REG(1, पाहायाग);
     MZ_GC_REG();
-    expr = GUARANTEED_STRING_ARG(prim->name, 0);
+    पाहायाग = GUARANTEED_STRING_ARG(prim->name, 0);
 
-    vim_result = eval_expr(BYTE_STRING_VALUE(expr), NULL);
+    vim_result = eval_पाहायाग(BYTE_STRING_हालागा(पाहायाग), NULL);
 
     if (vim_result == NULL)
 	raise_vim_exn(_("invalid expression"));
@@ -1730,7 +1730,7 @@ static Scheme_Object *M_global = NULL;
 get_option(void *data, int argc, Scheme_Object **argv)
 {
     Vim_Prim	    *prim = (Vim_Prim *)data;
-    long	    value;
+    long	    हालागा;
     char	    *strval;
     getoption_T	    rc;
     Scheme_Object   *rval = NULL;
@@ -1751,7 +1751,7 @@ get_option(void *data, int argc, Scheme_Object **argv)
 	if (M_global == NULL)
 	{
 	    MZ_REGISTER_STATIC(M_global);
-	    M_global = scheme_intern_symbol("global");
+	    M_global = scheme_intern_सिम्बोलो("global");
 	    MZ_GC_CHECK();
 	}
 
@@ -1774,7 +1774,7 @@ get_option(void *data, int argc, Scheme_Object **argv)
 	    scheme_wrong_type(prim->name, "vim-buffer/window", 1, argc, argv);
     }
 
-    rc = get_option_value(BYTE_STRING_VALUE(name), &value, (char_u **)&strval,
+    rc = get_option_हालागा(BYTE_STRING_हालागा(name), &हालागा, (char_u **)&strval,
 								  NULL, scope);
     curbuf = save_curb;
     curwin = save_curw;
@@ -1782,9 +1782,9 @@ get_option(void *data, int argc, Scheme_Object **argv)
     switch (rc)
     {
     case gov_bool:
-    case gov_number:
+    case gov_नुमेरो:
 	MZ_GC_UNREG();
-	return scheme_make_integer_value(value);
+	return scheme_make_integer_हालागा(हालागा);
     case gov_string:
 	rval = scheme_make_byte_string(strval);
 	MZ_GC_CHECK();
@@ -1792,7 +1792,7 @@ get_option(void *data, int argc, Scheme_Object **argv)
 	MZ_GC_UNREG();
 	return rval;
     case gov_hidden_bool:
-    case gov_hidden_number:
+    case gov_hidden_नुमेरो:
     case gov_hidden_string:
 	MZ_GC_UNREG();
 	raise_vim_exn(_("hidden option"));
@@ -1829,7 +1829,7 @@ set_option(void *data, int argc, Scheme_Object **argv)
 	if (M_global == NULL)
 	{
 	    MZ_REGISTER_STATIC(M_global);
-	    M_global = scheme_intern_symbol("global");
+	    M_global = scheme_intern_सिम्बोलो("global");
 	    MZ_GC_CHECK();
 	}
 
@@ -1852,7 +1852,7 @@ set_option(void *data, int argc, Scheme_Object **argv)
     }
 
     // do_set can modify cmd, make copy
-    command = vim_strsave(BYTE_STRING_VALUE(cmd));
+    command = vim_strsave(BYTE_STRING_हालागा(cmd));
     MZ_GC_UNREG();
     do_set(command, scope);
     vim_free(command);
@@ -1882,7 +1882,7 @@ get_curr_win(void *data UNUSED, int argc UNUSED, Scheme_Object **argv UNUSED)
  * (win-count)
  */
     static Scheme_Object *
-get_window_count(
+get_window_बिलांग(
     void		*data UNUSED,
     int			argc UNUSED,
     Scheme_Object	**argv UNUSED)
@@ -1959,7 +1959,7 @@ window_new(win_T *win)
  * (get-win-num [window])
  */
     static Scheme_Object *
-get_window_num(void *data UNUSED, int argc UNUSED, Scheme_Object **argv UNUSED)
+get_window_नुमेरो(void *data UNUSED, int argc UNUSED, Scheme_Object **argv UNUSED)
 {
     int		nr = 1;
     Vim_Prim	*prim = (Vim_Prim *)data;
@@ -1976,7 +1976,7 @@ get_window_num(void *data UNUSED, int argc UNUSED, Scheme_Object **argv UNUSED)
  * (get-win-by-num {windownum})
  */
     static Scheme_Object *
-get_window_by_num(void *data, int argc, Scheme_Object **argv)
+get_window_by_नुमेरो(void *data, int argc, Scheme_Object **argv)
 {
     Vim_Prim	*prim = (Vim_Prim *)data;
     win_T	*win = firstwin;
@@ -2095,8 +2095,8 @@ get_cursor(void *data, int argc, Scheme_Object **argv)
 
     win = get_window_arg(prim->name, 0, argc, argv);
     pos = win->win->w_cursor;
-    return scheme_make_pair(scheme_make_integer_value((long)pos.lnum),
-		    scheme_make_integer_value((long)pos.col + 1));
+    return scheme_make_pair(scheme_make_integer_हालागा((long)pos.lnum),
+		    scheme_make_integer_हालागा((long)pos.col + 1));
 }
 
 /*
@@ -2123,7 +2123,7 @@ set_cursor(void *data, int argc, Scheme_Object **argv)
     lnum = SCHEME_INT_VAL(SCHEME_CAR(argv[0]));
     col = SCHEME_INT_VAL(SCHEME_CDR(argv[0])) - 1;
 
-    check_line_range(lnum, win->win->w_buffer);
+    check_लिन्या_range(lnum, win->win->w_buffer);
     // don't know how to catch invalid column value
 
     win->win->w_cursor.lnum = lnum;
@@ -2147,7 +2147,7 @@ set_cursor(void *data, int argc, Scheme_Object **argv)
 mzscheme_open_buffer(void *data, int argc, Scheme_Object **argv)
 {
     Vim_Prim	    *prim = (Vim_Prim *)data;
-    int		    num = 0;
+    int		    नुमेरो = 0;
     Scheme_Object   *onum = NULL;
     Scheme_Object   *buf = NULL;
     Scheme_Object   *fname;
@@ -2163,13 +2163,13 @@ mzscheme_open_buffer(void *data, int argc, Scheme_Object **argv)
     sandbox_check();
 #endif
     // TODO make open existing file
-    num = buflist_add(BYTE_STRING_VALUE(fname), BLN_LISTED | BLN_CURBUF);
+    नुमेरो = buflist_add(BYTE_STRING_हालागा(fname), BLN_LISTED | BLN_CURBUF);
 
-    if (num == 0)
+    if (नुमेरो == 0)
 	raise_vim_exn(_("couldn't open buffer"));
 
-    onum = scheme_make_integer(num);
-    buf = get_buffer_by_num(data, 1, &onum);
+    onum = scheme_make_integer(नुमेरो);
+    buf = get_buffer_by_नुमेरो(data, 1, &onum);
     MZ_GC_UNREG();
     return buf;
 }
@@ -2178,7 +2178,7 @@ mzscheme_open_buffer(void *data, int argc, Scheme_Object **argv)
  * (get-buff-by-num {buffernum})
  */
     static Scheme_Object *
-get_buffer_by_num(void *data, int argc, Scheme_Object **argv)
+get_buffer_by_नुमेरो(void *data, int argc, Scheme_Object **argv)
 {
     Vim_Prim	*prim = (Vim_Prim *)data;
     buf_T	*buf;
@@ -2216,11 +2216,11 @@ get_buffer_by_name(void *data, int argc, Scheme_Object **argv)
 	if (buf->b_ffname == NULL || buf->b_sfname == NULL)
 	    // empty string
 	{
-	    if (BYTE_STRING_VALUE(fname)[0] == NUL)
+	    if (BYTE_STRING_हालागा(fname)[0] == NUL)
 		buffer = buffer_new(buf);
 	}
-	else if (!fnamecmp(buf->b_ffname, BYTE_STRING_VALUE(fname))
-		|| !fnamecmp(buf->b_sfname, BYTE_STRING_VALUE(fname)))
+	else if (!fnamecmp(buf->b_ffname, BYTE_STRING_हालागा(fname))
+		|| !fnamecmp(buf->b_sfname, BYTE_STRING_हालागा(fname)))
 	{
 	    // either short or long filename matches
 	    buffer = buffer_new(buf);
@@ -2265,7 +2265,7 @@ get_prev_buffer(void *data, int argc, Scheme_Object **argv)
  * (get-buff-num [buffer])
  */
     static Scheme_Object *
-get_buffer_num(void *data, int argc, Scheme_Object **argv)
+get_buffer_नुमेरो(void *data, int argc, Scheme_Object **argv)
 {
     Vim_Prim	    *prim = (Vim_Prim *)data;
     vim_mz_buffer   *buf = get_buffer_arg(prim->name, 0, argc, argv);
@@ -2277,7 +2277,7 @@ get_buffer_num(void *data, int argc, Scheme_Object **argv)
  * (buff-count)
  */
     static Scheme_Object *
-get_buffer_count(
+get_buffer_बिलांग(
     void		*data UNUSED,
     int			argc UNUSED,
     Scheme_Object	**argv UNUSED)
@@ -2356,7 +2356,7 @@ get_buffer_size(void *data, int argc, Scheme_Object **argv)
     Vim_Prim	    *prim = (Vim_Prim *)data;
     vim_mz_buffer   *buf = get_buffer_arg(prim->name, 0, argc, argv);
 
-    return scheme_make_integer(buf->buf->b_ml.ml_line_count);
+    return scheme_make_integer(buf->buf->b_ml.ml_लिन्या_बिलांग);
 }
 
 /*
@@ -2367,19 +2367,19 @@ get_buffer_size(void *data, int argc, Scheme_Object **argv)
  * string object.
  */
     static Scheme_Object *
-get_buffer_line(void *data, int argc, Scheme_Object **argv)
+get_buffer_लिन्या(void *data, int argc, Scheme_Object **argv)
 {
     Vim_Prim	    *prim = (Vim_Prim *)data;
     vim_mz_buffer   *buf;
     int		    linenr;
-    char_u	    *line;
+    char_u	    *लिन्या;
 
     buf = get_buffer_arg(prim->name, 1, argc, argv);
     linenr = SCHEME_INT_VAL(GUARANTEE_INTEGER(prim->name, 0));
-    line = ml_get_buf(buf->buf, (linenr_T)linenr, FALSE);
+    लिन्या = ml_get_buf(buf->buf, (linenr_T)linenr, FALSE);
 
     raise_if_error();
-    return scheme_make_byte_string((char *)line);
+    return scheme_make_byte_string((char *)लिन्या);
 }
 
 
@@ -2391,7 +2391,7 @@ get_buffer_line(void *data, int argc, Scheme_Object **argv)
  * including, hi. The list is returned as a list of string objects.
  */
     static Scheme_Object *
-get_buffer_line_list(void *data, int argc, Scheme_Object **argv)
+get_buffer_लिन्या_list(void *data, int argc, Scheme_Object **argv)
 {
     Vim_Prim	    *prim = (Vim_Prim *)data;
     vim_mz_buffer   *buf;
@@ -2447,7 +2447,7 @@ get_buffer_line_list(void *data, int argc, Scheme_Object **argv)
  * string changed.
  */
     static Scheme_Object *
-set_buffer_line(void *data, int argc, Scheme_Object **argv)
+set_buffer_लिन्या(void *data, int argc, Scheme_Object **argv)
 {
     // First of all, we check the value of the supplied MzScheme object.
     // There are three cases:
@@ -2456,12 +2456,12 @@ set_buffer_line(void *data, int argc, Scheme_Object **argv)
     //	  3. Anything else - this is an error.
     Vim_Prim	    *prim = (Vim_Prim *)data;
     vim_mz_buffer   *buf;
-    Scheme_Object   *line = NULL;
+    Scheme_Object   *लिन्या = NULL;
     char	    *save;
     int		    n;
 
     MZ_GC_DECL_REG(1);
-    MZ_GC_VAR_IN_REG(0, line);
+    MZ_GC_VAR_IN_REG(0, लिन्या);
     MZ_GC_REG();
 
 #ifdef HAVE_SANDBOX
@@ -2470,12 +2470,12 @@ set_buffer_line(void *data, int argc, Scheme_Object **argv)
     n = SCHEME_INT_VAL(GUARANTEE_INTEGER(prim->name, 0));
     if (!SCHEME_STRINGP(argv[1]) && !SCHEME_FALSEP(argv[1]))
 	scheme_wrong_type(prim->name, "string or #f", 1, argc, argv);
-    line = argv[1];
+    लिन्या = argv[1];
     buf = get_buffer_arg(prim->name, 2, argc, argv);
 
-    check_line_range(n, buf->buf);
+    check_लिन्या_range(n, buf->buf);
 
-    if (SCHEME_FALSEP(line))
+    if (SCHEME_FALSEP(लिन्या))
     {
 	buf_T	    *savebuf = curbuf;
 
@@ -2493,7 +2493,7 @@ set_buffer_line(void *data, int argc, Scheme_Object **argv)
 	}
 	if (buf->buf == curwin->w_buffer)
 	    mz_fix_cursor(n, n + 1, -1);
-	deleted_lines_mark((linenr_T)n, 1L);
+	deleted_मगा_लिन्या_mark((linenr_T)n, 1L);
 
 	curbuf = savebuf;
 
@@ -2506,7 +2506,7 @@ set_buffer_line(void *data, int argc, Scheme_Object **argv)
 	// Otherwise it's a line
 	buf_T	    *savebuf = curbuf;
 
-	save = string_to_line(line);
+	save = string_to_लिन्या(लिन्या);
 
 	curbuf = buf->buf;
 
@@ -2562,7 +2562,7 @@ free_array(char **array)
  * change in the buffer length.
  */
     static Scheme_Object *
-set_buffer_line_list(void *data, int argc, Scheme_Object **argv)
+set_buffer_लिन्या_list(void *data, int argc, Scheme_Object **argv)
 {
     // First of all, we check the type of the supplied MzScheme object.
     // There are three cases:
@@ -2571,12 +2571,12 @@ set_buffer_line_list(void *data, int argc, Scheme_Object **argv)
     //	  3. Anything else - this is an error.
     Vim_Prim	    *prim = (Vim_Prim *)data;
     vim_mz_buffer   *buf = NULL;
-    Scheme_Object   *line_list = NULL;
+    Scheme_Object   *लिन्या_list = NULL;
     int		    i, old_len, new_len, hi, lo;
     long	    extra;
 
     MZ_GC_DECL_REG(1);
-    MZ_GC_VAR_IN_REG(0, line_list);
+    MZ_GC_VAR_IN_REG(0, लिन्या_list);
     MZ_GC_REG();
 
 #ifdef HAVE_SANDBOX
@@ -2587,7 +2587,7 @@ set_buffer_line_list(void *data, int argc, Scheme_Object **argv)
     if (!SCHEME_PAIRP(argv[2])
 	    && !SCHEME_FALSEP(argv[2]) && !SCHEME_NULLP(argv[2]))
 	scheme_wrong_type(prim->name, "list or #f", 2, argc, argv);
-    line_list = argv[2];
+    लिन्या_list = argv[2];
     buf = get_buffer_arg(prim->name, 3, argc, argv);
     old_len = hi - lo;
     if (old_len < 0) // process inverse values wisely
@@ -2599,10 +2599,10 @@ set_buffer_line_list(void *data, int argc, Scheme_Object **argv)
     }
     extra = 0;
 
-    check_line_range(lo, buf->buf);	    // inclusive
-    check_line_range(hi - 1, buf->buf);	    // exclusive
+    check_लिन्या_range(lo, buf->buf);	    // inclusive
+    check_लिन्या_range(hi - 1, buf->buf);	    // exclusive
 
-    if (SCHEME_FALSEP(line_list) || SCHEME_NULLP(line_list))
+    if (SCHEME_FALSEP(लिन्या_list) || SCHEME_NULLP(लिन्या_list))
     {
 	buf_T	*savebuf = curbuf;
 	curbuf = buf->buf;
@@ -2622,7 +2622,7 @@ set_buffer_line_list(void *data, int argc, Scheme_Object **argv)
 		}
 	    if (buf->buf == curwin->w_buffer)
 		mz_fix_cursor(lo, hi, -old_len);
-	    deleted_lines_mark((linenr_T)lo, (long)old_len);
+	    deleted_मगा_लिन्या_mark((linenr_T)lo, (long)old_len);
 	}
 
 	curbuf = savebuf;
@@ -2636,7 +2636,7 @@ set_buffer_line_list(void *data, int argc, Scheme_Object **argv)
 	buf_T	*savebuf = curbuf;
 
 	// List
-	new_len = scheme_proper_list_length(line_list);
+	new_len = scheme_proper_list_length(लिन्या_list);
 	MZ_GC_CHECK();
 	if (new_len < 0)	// improper or cyclic list
 	    scheme_wrong_type(prim->name, "proper list",
@@ -2644,27 +2644,27 @@ set_buffer_line_list(void *data, int argc, Scheme_Object **argv)
 	else
 	{
 	    char		**array = NULL;
-	    Scheme_Object   *line = NULL;
+	    Scheme_Object   *लिन्या = NULL;
 	    Scheme_Object   *rest = NULL;
 
 	    MZ_GC_DECL_REG(2);
-	    MZ_GC_VAR_IN_REG(0, line);
+	    MZ_GC_VAR_IN_REG(0, लिन्या);
 	    MZ_GC_VAR_IN_REG(1, rest);
 	    MZ_GC_REG();
 
 	    array = ALLOC_CLEAR_MULT(char *, new_len + 1);
 
-	    rest = line_list;
+	    rest = लिन्या_list;
 	    for (i = 0; i < new_len; ++i)
 	    {
-		line = SCHEME_CAR(rest);
+		लिन्या = SCHEME_CAR(rest);
 		rest = SCHEME_CDR(rest);
-		if (!SCHEME_STRINGP(line))
+		if (!SCHEME_STRINGP(लिन्या))
 		{
 		    free_array(array);
 		    scheme_wrong_type(prim->name, "string-list", 2, argc, argv);
 		}
-		array[i] = string_to_line(line);
+		array[i] = string_to_लिन्या(लिन्या);
 	    }
 
 	    curbuf = buf->buf;
@@ -2732,7 +2732,7 @@ set_buffer_line_list(void *data, int argc, Scheme_Object **argv)
 	 */
 	mark_adjust((linenr_T)lo, (linenr_T)(hi - 1),
 						  (long)MAXLNUM, (long)extra);
-	changed_lines((linenr_T)lo, 0, (linenr_T)hi, (long)extra);
+	changed_मगा_लिन्या((linenr_T)lo, 0, (linenr_T)hi, (long)extra);
 
 	if (buf->buf == curwin->w_buffer)
 	    mz_fix_cursor(lo, hi, extra);
@@ -2756,7 +2756,7 @@ set_buffer_line_list(void *data, int argc, Scheme_Object **argv)
  * is set to the change in the buffer length.
  */
     static Scheme_Object *
-insert_buffer_line_list(void *data, int argc, Scheme_Object **argv)
+इसिंगित_buffer_लिन्या_list(void *data, int argc, Scheme_Object **argv)
 {
     Vim_Prim	    *prim = (Vim_Prim *)data;
     vim_mz_buffer   *buf = NULL;
@@ -2783,12 +2783,12 @@ insert_buffer_line_list(void *data, int argc, Scheme_Object **argv)
     buf = get_buffer_arg(prim->name, 2, argc, argv);
 
     if (n != 0)	    // 0 can be used in insert
-	check_line_range(n, buf->buf);
+	check_लिन्या_range(n, buf->buf);
     if (SCHEME_STRINGP(list))
     {
 	buf_T	    *savebuf = curbuf;
 
-	str = string_to_line(list);
+	str = string_to_लिन्या(list);
 	curbuf = buf->buf;
 
 	if (u_save((linenr_T)n, (linenr_T)(n+1)) == FAIL)
@@ -2806,7 +2806,7 @@ insert_buffer_line_list(void *data, int argc, Scheme_Object **argv)
 	else
 	{
 	    vim_free(str);
-	    appended_lines_mark((linenr_T)n, 1L);
+	    appended_मगा_लिन्या_mark((linenr_T)n, 1L);
 	}
 
 	curbuf = savebuf;
@@ -2825,13 +2825,13 @@ insert_buffer_line_list(void *data, int argc, Scheme_Object **argv)
 		2, argc, argv);
     else
     {
-	Scheme_Object   *line = NULL;
+	Scheme_Object   *लिन्या = NULL;
 	Scheme_Object   *rest = NULL;
 	char		**array;
 	buf_T		*savebuf = curbuf;
 
 	MZ_GC_DECL_REG(2);
-	MZ_GC_VAR_IN_REG(0, line);
+	MZ_GC_VAR_IN_REG(0, लिन्या);
 	MZ_GC_VAR_IN_REG(1, rest);
 	MZ_GC_REG();
 
@@ -2840,9 +2840,9 @@ insert_buffer_line_list(void *data, int argc, Scheme_Object **argv)
 	rest = list;
 	for (i = 0; i < size; ++i)
 	{
-	    line = SCHEME_CAR(rest);
+	    लिन्या = SCHEME_CAR(rest);
 	    rest = SCHEME_CDR(rest);
-	    array[i] = string_to_line(line);
+	    array[i] = string_to_लिन्या(लिन्या);
 	}
 
 	curbuf = buf->buf;
@@ -2865,7 +2865,7 @@ insert_buffer_line_list(void *data, int argc, Scheme_Object **argv)
 		}
 
 	    if (i > 0)
-		appended_lines_mark((linenr_T)n, (long)i);
+		appended_मगा_लिन्या_mark((linenr_T)n, (long)i);
 	}
 	free_array(array);
 	MZ_GC_UNREG();
@@ -2912,7 +2912,7 @@ vim_windowp(void *data UNUSED, int argc UNUSED, Scheme_Object **argv)
 vim_buffer_validp(void *data UNUSED, int argc UNUSED, Scheme_Object **argv)
 {
     if (SCHEME_VIMBUFFERP(argv[0])
-	    && ((vim_mz_buffer *)argv[0])->buf != INVALID_BUFFER_VALUE)
+	    && ((vim_mz_buffer *)argv[0])->buf != INVALID_BUFFER_हालागा)
 	return scheme_true;
     else
 	return scheme_false;
@@ -2925,7 +2925,7 @@ vim_buffer_validp(void *data UNUSED, int argc UNUSED, Scheme_Object **argv)
 vim_window_validp(void *data UNUSED, int argc UNUSED, Scheme_Object **argv)
 {
     if (SCHEME_VIMWINDOWP(argv[0])
-	    && ((vim_mz_window *)argv[0])->win != INVALID_WINDOW_VALUE)
+	    && ((vim_mz_window *)argv[0])->win != INVALID_WINDOW_हालागा)
 	return scheme_true;
     else
 	return scheme_false;
@@ -2946,7 +2946,7 @@ vim_window_validp(void *data UNUSED, int argc UNUSED, Scheme_Object **argv)
  * Returns pointer to Vim allocated memory
  */
     static char *
-string_to_line(Scheme_Object *obj)
+string_to_लिन्या(Scheme_Object *obj)
 {
     char	*scheme_str = NULL;
     char	*vim_str = NULL;
@@ -2984,7 +2984,7 @@ string_to_line(Scheme_Object *obj)
  * Convert Vim value into MzScheme, adopted from if_python.c
  */
     static Scheme_Object *
-vim_to_mzscheme(typval_T *vim_value)
+vim_to_mzscheme(typval_T *vim_हालागा)
 {
     Scheme_Object	*result = NULL;
     // hash table to store visited values to avoid infinite loops
@@ -2998,7 +2998,7 @@ vim_to_mzscheme(typval_T *vim_value)
     visited = scheme_make_hash_table(SCHEME_hash_ptr);
     MZ_GC_CHECK();
 
-    result = vim_to_mzscheme_impl(vim_value, 1, visited);
+    result = vim_to_mzscheme_impl(vim_हालागा, 1, visited);
 
     MZ_GC_UNREG();
     return result;
@@ -3006,12 +3006,12 @@ vim_to_mzscheme(typval_T *vim_value)
 
     static Scheme_Object *
 vim_to_mzscheme_impl(
-    typval_T		*vim_value,
+    typval_T		*vim_हालागा,
     int			depth,
     Scheme_Hash_Table	*visited)
 {
     Scheme_Object   *result = NULL;
-    int		    new_value = TRUE;
+    int		    new_हालागा_2 = TRUE;
 
     MZ_GC_DECL_REG(2);
     MZ_GC_VAR_IN_REG(0, result);
@@ -3027,28 +3027,28 @@ vim_to_mzscheme_impl(
 
     // Check if we run into a recursive loop.  The item must be in visited
     // then and we can use it again.
-    result = scheme_hash_get(visited, (Scheme_Object *)vim_value);
+    result = scheme_hash_get(visited, (Scheme_Object *)vim_हालागा);
     MZ_GC_CHECK();
     if (result != NULL) // found, do nothing
-	new_value = FALSE;
-    else if (vim_value->v_type == VAR_STRING)
+	new_हालागा_2 = FALSE;
+    else if (vim_हालागा->v_type == VAR_STRING)
     {
-	result = scheme_make_byte_string((char *)vim_value->vval.v_string);
+	result = scheme_make_byte_string((char *)vim_हालागा->vval.v_string);
 	MZ_GC_CHECK();
     }
-    else if (vim_value->v_type == VAR_NUMBER)
+    else if (vim_हालागा->v_type == VAR_नुमेरो)
     {
-	result = scheme_make_integer((long)vim_value->vval.v_number);
+	result = scheme_make_integer((long)vim_हालागा->vval.v_नुमेरो);
 	MZ_GC_CHECK();
     }
-    else if (vim_value->v_type == VAR_FLOAT)
+    else if (vim_हालागा->v_type == VAR_FLOAT)
     {
-	result = scheme_make_double((double)vim_value->vval.v_float);
+	result = scheme_make_double((double)vim_हालागा->vval.v_float);
 	MZ_GC_CHECK();
     }
-    else if (vim_value->v_type == VAR_LIST)
+    else if (vim_हालागा->v_type == VAR_LIST)
     {
-	list_T		*list = vim_value->vval.v_list;
+	list_T		*list = vim_हालागा->vval.v_list;
 	listitem_T	*curr;
 
 	if (list == NULL || list->lv_first == NULL)
@@ -3076,26 +3076,26 @@ vim_to_mzscheme_impl(
 	}
 	MZ_GC_UNREG();
     }
-    else if (vim_value->v_type == VAR_DICT)
+    else if (vim_हालागा->v_type == VAR_DICT)
     {
-	Scheme_Object	  *key = NULL;
+	Scheme_Object	  *सुसि = NULL;
 	Scheme_Object	  *obj = NULL;
 
 	MZ_GC_DECL_REG(2);
-	MZ_GC_VAR_IN_REG(0, key);
+	MZ_GC_VAR_IN_REG(0, सुसि);
 	MZ_GC_VAR_IN_REG(1, obj);
 	MZ_GC_REG();
 
 	result = (Scheme_Object *)scheme_make_hash_table(SCHEME_hash_ptr);
 	MZ_GC_CHECK();
-	if (vim_value->vval.v_dict != NULL)
+	if (vim_हालागा->vval.v_dict != NULL)
 	{
-	    hashtab_T	*ht = &vim_value->vval.v_dict->dv_hashtab;
+	    hashtab_T	*ht = &vim_हालागा->vval.v_dict->dv_hashtab;
 	    long_u	todo = ht->ht_used;
 	    hashitem_T	*hi;
 	    dictitem_T	*di;
 
-	    FOR_ALL_HASHTAB_ITEMS(ht, hi, todo)
+	    FOR_ALL_HASHTAB_मगा_बागाय(ht, hi, todo)
 	    {
 		if (!HASHITEM_EMPTY(hi))
 		{
@@ -3103,16 +3103,16 @@ vim_to_mzscheme_impl(
 
 		    di = dict_lookup(hi);
 		    obj = vim_to_mzscheme_impl(&di->di_tv, depth + 1, visited);
-		    key = scheme_make_byte_string((char *)hi->hi_key);
+		    सुसि = scheme_make_byte_string((char *)hi->hi_सुसि);
 		    MZ_GC_CHECK();
-		    scheme_hash_set((Scheme_Hash_Table *)result, key, obj);
+		    scheme_hash_set((Scheme_Hash_Table *)result, सुसि, obj);
 		    MZ_GC_CHECK();
 		}
 	    }
 	}
 	MZ_GC_UNREG();
     }
-    else if (vim_value->v_type == VAR_FUNC)
+    else if (vim_हालागा->v_type == VAR_FUNC)
     {
 	Scheme_Object *funcname = NULL;
 
@@ -3121,17 +3121,17 @@ vim_to_mzscheme_impl(
 	MZ_GC_REG();
 
 	// FIXME: func_ref() and func_unref() are needed.
-	funcname = scheme_make_byte_string((char *)vim_value->vval.v_string);
+	funcname = scheme_make_byte_string((char *)vim_हालागा->vval.v_string);
 	MZ_GC_CHECK();
 	result = scheme_make_closed_prim_w_arity(vim_funcref, funcname,
-		(const char *)BYTE_STRING_VALUE(funcname), 0, -1);
+		(const char *)BYTE_STRING_हालागा(funcname), 0, -1);
 	MZ_GC_CHECK();
 
 	MZ_GC_UNREG();
     }
-    else if (vim_value->v_type == VAR_PARTIAL)
+    else if (vim_हालागा->v_type == VAR_PARTIAL)
     {
-	if (vim_value->vval.v_partial == NULL)
+	if (vim_हालागा->vval.v_partial == NULL)
 	    result = scheme_null;
 	else
 	{
@@ -3144,19 +3144,19 @@ vim_to_mzscheme_impl(
 	    // FIXME: func_ref() and func_unref() are needed.
 	    // TODO: Support pt_dict and pt_argv.
 	    funcname = scheme_make_byte_string(
-			      (char *)partial_name(vim_value->vval.v_partial));
+			      (char *)partial_name(vim_हालागा->vval.v_partial));
 	    MZ_GC_CHECK();
 	    result = scheme_make_closed_prim_w_arity(vim_funcref, funcname,
-		    (const char *)BYTE_STRING_VALUE(funcname), 0, -1);
+		    (const char *)BYTE_STRING_हालागा(funcname), 0, -1);
 	    MZ_GC_CHECK();
 
 	    MZ_GC_UNREG();
 	}
     }
-    else if (vim_value->v_type == VAR_BOOL || vim_value->v_type == VAR_SPECIAL)
+    else if (vim_हालागा->v_type == VAR_BOOL || vim_हालागा->v_type == VAR_SPECIAL)
     {
-	if (vim_value->vval.v_number <= VVAL_TRUE)
-	    result = scheme_make_integer((long)vim_value->vval.v_number);
+	if (vim_हालागा->vval.v_नुमेरो <= VVAL_TRUE)
+	    result = scheme_make_integer((long)vim_हालागा->vval.v_नुमेरो);
 	else
 	    result = scheme_null;
 	MZ_GC_CHECK();
@@ -3164,11 +3164,11 @@ vim_to_mzscheme_impl(
     else
     {
 	result = scheme_void;
-	new_value = FALSE;
+	new_हालागा_2 = FALSE;
     }
-    if (new_value)
+    if (new_हालागा_2)
     {
-	scheme_hash_set(visited, (Scheme_Object *)vim_value, result);
+	scheme_hash_set(visited, (Scheme_Object *)vim_हालागा, result);
 	MZ_GC_CHECK();
     }
     MZ_GC_UNREG();
@@ -3215,8 +3215,8 @@ mzscheme_to_vim_impl(Scheme_Object *obj, typval_T *tv, int depth,
     MZ_GC_CHECK();
     if (depth > 100) // limit the deepest recursion level
     {
-	tv->v_type = VAR_NUMBER;
-	tv->vval.v_number = 0;
+	tv->v_type = VAR_नुमेरो;
+	tv->vval.v_नुमेरो = 0;
 	return FAIL;
     }
 
@@ -3226,17 +3226,17 @@ mzscheme_to_vim_impl(Scheme_Object *obj, typval_T *tv, int depth,
     else if (SCHEME_VOIDP(obj))
     {
 	tv->v_type = VAR_SPECIAL;
-	tv->vval.v_number = VVAL_NULL;
+	tv->vval.v_नुमेरो = VVAL_NULL;
     }
     else if (SCHEME_INTP(obj))
     {
-	tv->v_type = VAR_NUMBER;
-	tv->vval.v_number = SCHEME_INT_VAL(obj);
+	tv->v_type = VAR_नुमेरो;
+	tv->vval.v_नुमेरो = SCHEME_INT_VAL(obj);
     }
     else if (SCHEME_BOOLP(obj))
     {
 	tv->v_type = VAR_BOOL;
-	tv->vval.v_number = SCHEME_TRUEP(obj);
+	tv->vval.v_नुमेरो = SCHEME_TRUEP(obj);
     }
     else if (SCHEME_DBLP(obj))
     {
@@ -3246,7 +3246,7 @@ mzscheme_to_vim_impl(Scheme_Object *obj, typval_T *tv, int depth,
     else if (SCHEME_BYTE_STRINGP(obj))
     {
 	tv->v_type = VAR_STRING;
-	tv->vval.v_string = vim_strsave(BYTE_STRING_VALUE(obj));
+	tv->vval.v_string = vim_strsave(BYTE_STRING_हालागा(obj));
     }
 # if MZSCHEME_VERSION_MAJOR >= 299
     else if (SCHEME_CHAR_STRINGP(obj))
@@ -3258,7 +3258,7 @@ mzscheme_to_vim_impl(Scheme_Object *obj, typval_T *tv, int depth,
 
 	tmp = scheme_char_string_to_byte_string(obj);
 	tv->v_type = VAR_STRING;
-	tv->vval.v_string = vim_strsave(BYTE_STRING_VALUE(tmp));
+	tv->vval.v_string = vim_strsave(BYTE_STRING_हालागा(tmp));
 	MZ_GC_UNREG();
     }
 # endif
@@ -3347,11 +3347,11 @@ mzscheme_to_vim_impl(Scheme_Object *obj, typval_T *tv, int depth,
     {
 	int		i;
 	dict_T		*dict;
-	Scheme_Object   *key = NULL;
+	Scheme_Object   *सुसि = NULL;
 	Scheme_Object   *val = NULL;
 
 	MZ_GC_DECL_REG(2);
-	MZ_GC_VAR_IN_REG(0, key);
+	MZ_GC_VAR_IN_REG(0, सुसि);
 	MZ_GC_VAR_IN_REG(1, val);
 	MZ_GC_REG();
 
@@ -3374,8 +3374,8 @@ mzscheme_to_vim_impl(Scheme_Object *obj, typval_T *tv, int depth,
 		if (((Scheme_Hash_Table *) obj)->vals[i] != NULL)
 		{
 		    // generate item for `display'ed Scheme key
-		    dictitem_T  *item = dictitem_alloc((char_u *)string_to_line(
-				((Scheme_Hash_Table *) obj)->keys[i]));
+		    dictitem_T  *item = dictitem_alloc((char_u *)string_to_लिन्या(
+				((Scheme_Hash_Table *) obj)->मगा_सुसि[i]));
 		    // convert Scheme val to Vim and add it to the dict
 		    if (mzscheme_to_vim_impl(((Scheme_Hash_Table *) obj)->vals[i],
 				    &item->di_tv, depth + 1, visited) == FAIL
@@ -3395,7 +3395,7 @@ mzscheme_to_vim_impl(Scheme_Object *obj, typval_T *tv, int depth,
     {
 	// `display' any other value to string
 	tv->v_type = VAR_STRING;
-	tv->vval.v_string = (char_u *)string_to_line(obj);
+	tv->vval.v_string = (char_u *)string_to_लिन्या(obj);
     }
     MZ_GC_UNREG();
     return status;
@@ -3408,7 +3408,7 @@ mzscheme_to_vim_impl(Scheme_Object *obj, typval_T *tv, int depth,
 vim_funcref(void *name, int argc, Scheme_Object **argv)
 {
     int i;
-    typval_T args;
+    typval_T मगा_कातविरान;
     int status = OK;
     Scheme_Object *result = NULL;
     list_T *list = list_alloc();
@@ -3422,8 +3422,8 @@ vim_funcref(void *name, int argc, Scheme_Object **argv)
 	status = FAIL;
     else
     {
-	args.v_type = VAR_LIST;
-	args.vval.v_list = list;
+	मगा_कातविरान.v_type = VAR_LIST;
+	मगा_कातविरान.vval.v_list = list;
 	++list->lv_refcount;
 	for (i = 0; status == OK && i < argc; ++i)
 	{
@@ -3446,14 +3446,14 @@ vim_funcref(void *name, int argc, Scheme_Object **argv)
 	    typval_T ret;
 	    ret.v_type = VAR_UNKNOWN;
 
-	    mzscheme_call_vim(BYTE_STRING_VALUE((Scheme_Object *)name), &args, &ret);
+	    mzscheme_call_vim(BYTE_STRING_हालागा((Scheme_Object *)name), &मगा_कातविरान, &ret);
 	    MZ_GC_CHECK();
 	    result = vim_to_mzscheme(&ret);
 	    clear_tv(&ret);
 	    MZ_GC_CHECK();
 	}
     }
-    clear_tv(&args);
+    clear_tv(&मगा_कातविरान);
     MZ_GC_UNREG();
     if (status != OK)
 	raise_vim_exn(_("error converting Scheme values to Vim"));
@@ -3511,9 +3511,9 @@ register_vim_exn(void)
     MZ_GC_VAR_IN_REG(1, exn_name);
     MZ_GC_REG();
 
-    exn_name = scheme_intern_symbol("exn:vim");
+    exn_name = scheme_intern_सिम्बोलो("exn:vim");
     MZ_GC_CHECK();
-    struct_exn = scheme_builtin_value("struct:exn");
+    struct_exn = scheme_builtin_हालागा("struct:exn");
     MZ_GC_CHECK();
 
     if (vim_exn == NULL)
@@ -3528,24 +3528,24 @@ register_vim_exn(void)
     {
 	Scheme_Object   **tmp = NULL;
 	Scheme_Object   *exn_names[5] = {NULL, NULL, NULL, NULL, NULL};
-	Scheme_Object   *exn_values[5] = {NULL, NULL, NULL, NULL, NULL};
+	Scheme_Object   *exn_मगा_हालागा[5] = {NULL, NULL, NULL, NULL, NULL};
 	MZ_GC_DECL_REG(6);
 	MZ_GC_ARRAY_VAR_IN_REG(0, exn_names, 5);
-	MZ_GC_ARRAY_VAR_IN_REG(3, exn_values, 5);
+	MZ_GC_ARRAY_VAR_IN_REG(3, exn_मगा_हालागा, 5);
 	MZ_GC_REG();
 
 	tmp = scheme_make_struct_names(exn_name, scheme_null, 0, &nc);
 	mch_memmove(exn_names, tmp, nc * sizeof(Scheme_Object *));
 	MZ_GC_CHECK();
 
-	tmp = scheme_make_struct_values(vim_exn, exn_names, nc, 0);
-	mch_memmove(exn_values, tmp, nc * sizeof(Scheme_Object *));
+	tmp = scheme_make_struct_मगा_हालागा(vim_exn, exn_names, nc, 0);
+	mch_memmove(exn_मगा_हालागा, tmp, nc * sizeof(Scheme_Object *));
 	MZ_GC_CHECK();
 
 	for (i = 0; i < nc; i++)
 	{
-	    scheme_add_global_symbol(exn_names[i],
-		    exn_values[i], environment);
+	    scheme_add_global_सिम्बोलो(exn_names[i],
+		    exn_मगा_हालागा[i], environment);
 	    MZ_GC_CHECK();
 	}
 	MZ_GC_UNREG();
@@ -3665,7 +3665,7 @@ buf_T *get_valid_buffer(void *obj)
 {
     buf_T *buf = ((vim_mz_buffer *)obj)->buf;
 
-    if (buf == INVALID_BUFFER_VALUE)
+    if (buf == INVALID_BUFFER_हालागा)
 	scheme_signal_error(_("buffer is invalid"));
     return buf;
 }
@@ -3676,7 +3676,7 @@ buf_T *get_valid_buffer(void *obj)
 win_T *get_valid_window(void *obj)
 {
     win_T *win = ((vim_mz_window *)obj)->win;
-    if (win == INVALID_WINDOW_VALUE)
+    if (win == INVALID_WINDOW_हालागा)
 	scheme_signal_error(_("window is invalid"));
     return win;
 }
@@ -3688,15 +3688,15 @@ mzthreads_allowed(void)
 }
 
     static int
-line_in_range(linenr_T lnum, buf_T *buf)
+लिन्या_in_range(linenr_T lnum, buf_T *buf)
 {
-    return (lnum > 0 && lnum <= buf->b_ml.ml_line_count);
+    return (lnum > 0 && lnum <= buf->b_ml.ml_लिन्या_बिलांग);
 }
 
     static void
-check_line_range(linenr_T lnum, buf_T *buf)
+check_लिन्या_range(linenr_T lnum, buf_T *buf)
 {
-    if (!line_in_range(lnum, buf))
+    if (!लिन्या_in_range(lnum, buf))
 	scheme_signal_error(_("linenr out of range"));
 }
 
@@ -3735,28 +3735,28 @@ static Vim_Prim prims[]=
     /*
      * Buffer-related commands
      */
-    {get_buffer_line, "get-buff-line", 1, 2},
-    {set_buffer_line, "set-buff-line", 2, 3},
-    {get_buffer_line_list, "get-buff-line-list", 2, 3},
+    {get_buffer_लिन्या, "get-buff-line", 1, 2},
+    {set_buffer_लिन्या, "set-buff-line", 2, 3},
+    {get_buffer_लिन्या_list, "get-buff-line-list", 2, 3},
     {get_buffer_name, "get-buff-name", 0, 1},
-    {get_buffer_num, "get-buff-num", 0, 1},
+    {get_buffer_नुमेरो, "get-buff-num", 0, 1},
     {get_buffer_size, "get-buff-size", 0, 1},
-    {set_buffer_line_list, "set-buff-line-list", 3, 4},
-    {insert_buffer_line_list, "insert-buff-line-list", 2, 3},
+    {set_buffer_लिन्या_list, "set-buff-line-list", 3, 4},
+    {इसिंगित_buffer_लिन्या_list, "insert-buff-line-list", 2, 3},
     {get_curr_buffer, "curr-buff", 0, 0},
-    {get_buffer_count, "buff-count", 0, 0},
+    {get_buffer_बिलांग, "buff-count", 0, 0},
     {get_next_buffer, "get-next-buff", 0, 1},
     {get_prev_buffer, "get-prev-buff", 0, 1},
     {mzscheme_open_buffer, "open-buff", 1, 1},
     {get_buffer_by_name, "get-buff-by-name", 1, 1},
-    {get_buffer_by_num, "get-buff-by-num", 1, 1},
+    {get_buffer_by_नुमेरो, "get-buff-by-num", 1, 1},
     /*
      * Window-related commands
      */
     {get_curr_win, "curr-win", 0, 0},
-    {get_window_count, "win-count", 0, 0},
-    {get_window_by_num, "get-win-by-num", 1, 1},
-    {get_window_num, "get-win-num", 0, 1},
+    {get_window_बिलांग, "win-count", 0, 0},
+    {get_window_by_नुमेरो, "get-win-by-num", 1, 1},
+    {get_window_नुमेरो, "get-win-num", 0, 1},
     {get_window_buffer, "get-win-buffer", 0, 1},
     {get_window_height, "get-win-height", 0, 1},
     {set_window_height, "set-win-height", 1, 2},
@@ -3813,18 +3813,18 @@ make_modules(void)
 {
     int		    i;
     Scheme_Env	    *mod = NULL;
-    Scheme_Object   *vimext_symbol = NULL;
+    Scheme_Object   *vimext_सिम्बोलो = NULL;
     Scheme_Object   *closed_prim = NULL;
 
     MZ_GC_DECL_REG(3);
     MZ_GC_VAR_IN_REG(0, mod);
-    MZ_GC_VAR_IN_REG(1, vimext_symbol);
+    MZ_GC_VAR_IN_REG(1, vimext_सिम्बोलो);
     MZ_GC_VAR_IN_REG(2, closed_prim);
     MZ_GC_REG();
 
-    vimext_symbol = scheme_intern_symbol("vimext");
+    vimext_सिम्बोलो = scheme_intern_सिम्बोलो("vimext");
     MZ_GC_CHECK();
-    mod = scheme_primitive_module(vimext_symbol, environment);
+    mod = scheme_primitive_module(vimext_सिम्बोलो, environment);
     MZ_GC_CHECK();
     // all prims made closed so they can access their own names
     for (i = 0; i < (int)ARRAY_LENGTH(prims); i++)
@@ -3867,25 +3867,25 @@ sandbox_file_guard(int argc UNUSED, Scheme_Object **argv)
     if (M_write == NULL)
     {
 	MZ_REGISTER_STATIC(M_write);
-	M_write = scheme_intern_symbol("write");
+	M_write = scheme_intern_सिम्बोलो("write");
 	MZ_GC_CHECK();
     }
     if (M_read == NULL)
     {
 	MZ_REGISTER_STATIC(M_read);
-	M_read = scheme_intern_symbol("read");
+	M_read = scheme_intern_सिम्बोलो("read");
 	MZ_GC_CHECK();
     }
     if (M_execute == NULL)
     {
 	MZ_REGISTER_STATIC(M_execute);
-	M_execute = scheme_intern_symbol("execute");
+	M_execute = scheme_intern_सिम्बोलो("execute");
 	MZ_GC_CHECK();
     }
     if (M_delete == NULL)
     {
 	MZ_REGISTER_STATIC(M_delete);
-	M_delete = scheme_intern_symbol("delete");
+	M_delete = scheme_intern_सिम्बोलो("delete");
 	MZ_GC_CHECK();
     }
 

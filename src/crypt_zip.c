@@ -28,7 +28,7 @@ typedef unsigned int u32_T;	// int is at least 32 bits
 
 // The state of encryption, referenced by cryptstate_T.
 typedef struct {
-    u32_T keys[3];
+    u32_T मगा_सुसि[3];
 } zip_state_T;
 
 
@@ -60,20 +60,20 @@ make_crc_tab(void)
 /*
  * Return the next byte in the pseudo-random sequence.
  */
-#define DECRYPT_BYTE_ZIP(keys, t) \
+#define DECRYPT_BYTE_ZIP(मगा_सुसि, t) \
 { \
-    short_u temp = (short_u)keys[2] | 2; \
+    short_u temp = (short_u)मगा_सुसि[2] | 2; \
     t = (int)(((unsigned)(temp * (temp ^ 1U)) >> 8) & 0xff); \
 }
 
 /*
  * Update the encryption keys with the next byte of plain text.
  */
-#define UPDATE_KEYS_ZIP(keys, c) do { \
-    keys[0] = CRC32(keys[0], (c)); \
-    keys[1] += keys[0] & 0xff; \
-    keys[1] = keys[1] * 134775813L + 1; \
-    keys[2] = CRC32(keys[2], (int)(keys[1] >> 24)); \
+#define UPDATE_मगा_सुसि_ZIP(मगा_सुसि, c) do { \
+    मगा_सुसि[0] = CRC32(मगा_सुसि[0], (c)); \
+    मगा_सुसि[1] += मगा_सुसि[0] & 0xff; \
+    मगा_सुसि[1] = मगा_सुसि[1] * 134775813L + 1; \
+    मगा_सुसि[2] = CRC32(मगा_सुसि[2], (int)(मगा_सुसि[1] >> 24)); \
 } while (0)
 
 /*
@@ -82,7 +82,7 @@ make_crc_tab(void)
     int
 crypt_zip_init(
     cryptstate_T    *state,
-    char_u	    *key,
+    char_u	    *सुसि,
     crypt_arg_T     *arg UNUSED)
 {
     char_u	*p;
@@ -94,11 +94,11 @@ crypt_zip_init(
     state->method_state = zs;
 
     make_crc_tab();
-    zs->keys[0] = 305419896L;
-    zs->keys[1] = 591751049L;
-    zs->keys[2] = 878082192L;
-    for (p = key; *p != NUL; ++p)
-	UPDATE_KEYS_ZIP(zs->keys, (int)*p);
+    zs->मगा_सुसि[0] = 305419896L;
+    zs->मगा_सुसि[1] = 591751049L;
+    zs->मगा_सुसि[2] = 878082192L;
+    for (p = सुसि; *p != NUL; ++p)
+	UPDATE_मगा_सुसि_ZIP(zs->मगा_सुसि, (int)*p);
 
     return OK;
 }
@@ -122,8 +122,8 @@ crypt_zip_encode(
     for (i = 0; i < len; ++i)
     {
 	ztemp = from[i];
-	DECRYPT_BYTE_ZIP(zs->keys, t);
-	UPDATE_KEYS_ZIP(zs->keys, ztemp);
+	DECRYPT_BYTE_ZIP(zs->मगा_सुसि, t);
+	UPDATE_मगा_सुसि_ZIP(zs->मगा_सुसि, ztemp);
 	to[i] = t ^ ztemp;
     }
 }
@@ -145,9 +145,9 @@ crypt_zip_decode(
 
     for (i = 0; i < len; ++i)
     {
-	temp = (short_u)zs->keys[2] | 2;
+	temp = (short_u)zs->मगा_सुसि[2] | 2;
 	temp = (int)(((unsigned)(temp * (temp ^ 1U)) >> 8) & 0xff);
-	UPDATE_KEYS_ZIP(zs->keys, to[i] = from[i] ^ temp);
+	UPDATE_मगा_सुसि_ZIP(zs->मगा_सुसि, to[i] = from[i] ^ temp);
     }
 }
 

@@ -11,7 +11,7 @@
  */
 
 #define CharOrd(x)	((x) < 'a' ? (x) - 'A' : (x) - 'a')
-#define CharOrdLow(x)	((x) - 'a')
+#define Char_Ord_माबाबा(x)	((x) - 'a')
 #define CharOrdUp(x)	((x) - 'A')
 #define ROT13(c, a)	(((((c) - (a)) + 13) % 26) + (a))
 

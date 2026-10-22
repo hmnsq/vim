@@ -21,9 +21,9 @@ static void um_store_changes(unpacked_memline_T *um);
  * Free virtual text strings in a detached unpacked memline's props.
  */
     static void
-um_free_vtext(textprop_T *props, int count)
+um_free_vtext(textprop_T *props, int बिलांग)
 {
-    for (int i = 0; i < count; ++i)
+    for (int i = 0; i < बिलांग; ++i)
 	if (props[i].tp_flags & TP_FLAG_VTEXT_PTR)
 	    VIM_CLEAR(props[i].u.tp_text);
 }
@@ -37,11 +37,11 @@ um_free(unpacked_memline_T *um)
     if (um->detached)
     {
 	VIM_CLEAR(um->text);
-	um_free_vtext(um->props, um->prop_count);
+	um_free_vtext(um->props, um->prop_बिलांग);
     }
     VIM_CLEAR(um->props);
     um->prop_size = 0;
-    um->prop_count = 0;
+    um->prop_बिलांग = 0;
     um->lnum = 0;
     um->detached = false;
 }
@@ -67,9 +67,9 @@ um_open(buf_T *buf)
  * Returns true on success, false on error (um becomes closed).
  */
     bool
-um_goto_line(unpacked_memline_T *um, linenr_T lnum, int extra_props)
+um_goto_लिन्या(unpacked_memline_T *um, linenr_T lnum, int extra_props)
 {
-    char_u	*line;
+    char_u	*लिन्या;
     size_t	textlen;
     size_t	propdata_len;
     int		proplen;
@@ -85,38 +85,38 @@ um_goto_line(unpacked_memline_T *um, linenr_T lnum, int extra_props)
     if (lnum == 0)
 	return true;	// just unload
 
-    line = ml_get_buf(um->buf, lnum, FALSE);
+    लिन्या = ml_get_buf(um->buf, lnum, FALSE);
     textlen = ml_get_buf_len(um->buf, lnum) + 1;
-    propdata_len = um->buf->b_ml.ml_line_len - textlen;
+    propdata_len = um->buf->b_ml.ml_लिन्या_len - textlen;
 
     um->lnum = lnum;
     um->text_size = (colnr_T)textlen;
-    um->text = line;
+    um->text = लिन्या;
 
     if (propdata_len == 0)
 	return true;
 
     // New format: [prop_count (uint16)][textprop_T...][vtext...]
-    if (propdata_len < PROP_COUNT_SIZE + sizeof(textprop_T))
+    if (propdata_len < PROP_बिलांग_SIZE + sizeof(textprop_T))
     {
 	emsg(e_text_property_info_corrupted);
 	um->buf = NULL;
 	return false;
     }
 
-    uint16_t    prop_count;
-    char_u	    *count_ptr = line + textlen;
+    uint16_t    prop_बिलांग;
+    char_u	    *बिलांग_ptr = लिन्या + textlen;
     char_u	    *props_start;
 
-    mch_memmove(&prop_count, count_ptr, PROP_COUNT_SIZE);
-    if (!text_prop_count_valid(prop_count, propdata_len))
+    mch_memmove(&prop_बिलांग, बिलांग_ptr, PROP_बिलांग_SIZE);
+    if (!text_prop_बिलांग_valid(prop_बिलांग, propdata_len))
     {
 	emsg(e_text_property_info_corrupted);
 	um->buf = NULL;
 	return false;
     }
-    proplen = (int)prop_count;
-    props_start = count_ptr + PROP_COUNT_SIZE;
+    proplen = (int)prop_बिलांग;
+    props_start = बिलांग_ptr + PROP_बिलांग_SIZE;
 
     if (!text_prop_vtext_valid(props_start, proplen, propdata_len))
     {
@@ -132,7 +132,7 @@ um_goto_line(unpacked_memline_T *um, linenr_T lnum, int extra_props)
 	return false;
     }
     um->prop_size = proplen + extra_props;
-    um->prop_count = proplen;
+    um->prop_बिलांग = proplen;
     mch_memmove(um->props, props_start, proplen * sizeof(textprop_T));
 
     // Convert tp_text_offset to tp_text pointer for virtual text
@@ -141,7 +141,7 @@ um_goto_line(unpacked_memline_T *um, linenr_T lnum, int extra_props)
     {
 	if (um->props[i].tp_id < 0 && um->props[i].u.tp_text_offset > 0)
 	{
-	    um->props[i].u.tp_text = count_ptr + um->props[i].u.tp_text_offset;
+	    um->props[i].u.tp_text = बिलांग_ptr + um->props[i].u.tp_text_offset;
 	    um->props[i].tp_flags |= TP_FLAG_VTEXT_PTR;
 	}
 	else
@@ -160,7 +160,7 @@ um_open_at(buf_T *buf, linenr_T lnum, int extra_props)
 {
     unpacked_memline_T um = um_open(buf);
 
-    if (!um_goto_line(&um, lnum, extra_props))
+    if (!um_goto_लिन्या(&um, lnum, extra_props))
 	um.buf = NULL;
     return um;
 }
@@ -186,7 +186,7 @@ um_detach(unpacked_memline_T *um)
     }
     um->text = newtext;
 
-    for (int i = 0; i < um->prop_count; ++i)
+    for (int i = 0; i < um->prop_बिलांग; ++i)
     {
 	if (um->props[i].tp_flags & TP_FLAG_VTEXT_PTR)
 	{
@@ -234,10 +234,10 @@ um_set_text(unpacked_memline_T *um, char_u *text)
     static bool
 um_grow_props(unpacked_memline_T *um, int needed)
 {
-    if (um->prop_count + needed <= um->prop_size)
+    if (um->prop_बिलांग + needed <= um->prop_size)
 	return true;
 
-    int	    new_size = um->prop_count + needed;
+    int	    new_size = um->prop_बिलांग + needed;
     textprop_T  *newprops = vim_realloc(um->props,
 					    new_size * sizeof(textprop_T));
     if (newprops == NULL)
@@ -264,7 +264,7 @@ um_add_prop(unpacked_memline_T *um, textprop_T *prop)
 	um->buf = NULL;
 	return;
     }
-    um->props[um->prop_count++] = *prop;
+    um->props[um->prop_बिलांग++] = *prop;
 }
 
 /*
@@ -273,7 +273,7 @@ um_add_prop(unpacked_memline_T *um, textprop_T *prop)
     void
 um_reverse_props(unpacked_memline_T *um)
 {
-    for (int i = 0, j = um->prop_count - 1; i < j; ++i, --j)
+    for (int i = 0, j = um->prop_बिलांग - 1; i < j; ++i, --j)
     {
 	textprop_T tmp = um->props[i];
 	um->props[i] = um->props[j];
@@ -287,21 +287,21 @@ um_reverse_props(unpacked_memline_T *um)
  * immediately in the DETACHED state.
  */
     unpacked_memline_T
-um_open_at_no_props(buf_T *buf, linenr_T lnum, int prop_count)
+um_open_at_no_props(buf_T *buf, linenr_T lnum, int prop_बिलांग)
 {
     unpacked_memline_T um;
 
     CLEAR_FIELD(um);
     um.buf = buf;
 
-    if (lnum < 1 || lnum > buf->b_ml.ml_line_count)
+    if (lnum < 1 || lnum > buf->b_ml.ml_लिन्या_बिलांग)
     {
 	um.buf = NULL;
 	return um;
     }
 
-    char_u *line = ml_get_buf(buf, lnum, FALSE);
-    char_u *text_copy = vim_strsave(line);
+    char_u *लिन्या = ml_get_buf(buf, lnum, FALSE);
+    char_u *text_copy = vim_strsave(लिन्या);
 
     if (text_copy == NULL)
     {
@@ -313,16 +313,16 @@ um_open_at_no_props(buf_T *buf, linenr_T lnum, int prop_count)
     um.text_size = (colnr_T)STRLEN(text_copy) + 1;
     um.detached = true;
 
-    if (prop_count > 0)
+    if (prop_बिलांग > 0)
     {
-	um.props = ALLOC_MULT(textprop_T, prop_count);
+	um.props = ALLOC_MULT(textprop_T, prop_बिलांग);
 	if (um.props == NULL)
 	{
 	    vim_free(um.text);
 	    um.buf = NULL;
 	    return um;
 	}
-	um.prop_size = prop_count;
+	um.prop_size = prop_बिलांग;
     }
 
     return um;
@@ -339,14 +339,14 @@ clear_cont_flag_on_neighbor(buf_T *buf, linenr_T lnum,
 {
     unpacked_memline_T	neighbor;
 
-    if (lnum < 1 || lnum > buf->b_ml.ml_line_count)
+    if (lnum < 1 || lnum > buf->b_ml.ml_लिन्या_बिलांग)
 	return;
 
     neighbor = um_open_at(buf, lnum, 0);
     if (neighbor.buf == NULL)
 	return;
 
-    for (int i = 0; i < neighbor.prop_count; ++i)
+    for (int i = 0; i < neighbor.prop_बिलांग; ++i)
     {
 	textprop_T *p = &neighbor.props[i];
 
@@ -373,7 +373,7 @@ um_delete_prop(unpacked_memline_T *um, int index)
 {
     textprop_T *prop;
 
-    if (um->buf == NULL || index < 0 || index >= um->prop_count)
+    if (um->buf == NULL || index < 0 || index >= um->prop_बिलांग)
 	return;
     if (!um->detached && !um_detach(um))
 	return;
@@ -405,26 +405,26 @@ um_delete_prop(unpacked_memline_T *um, int index)
     static char_u *
 um_pack(unpacked_memline_T *um, int *packed_len)
 {
-    uint16_t	live_count = 0;
+    uint16_t	live_बिलांग = 0;
     int		vtext_size = 0;
     int		total_len;
     char_u	*buf;
-    char_u	*count_dest;
+    char_u	*बिलांग_dest;
     char_u	*prop_dest;
     char_u	*vtext_dest;
 
-    for (int i = 0; i < um->prop_count; ++i)
+    for (int i = 0; i < um->prop_बिलांग; ++i)
     {
 	textprop_T *prop = &um->props[i];
 
 	if (prop->tp_flags & TP_FLAG_DELETED)
 	    continue;
-	++live_count;
+	++live_बिलांग;
 	if (prop->tp_flags & TP_FLAG_VTEXT_PTR)
 	    vtext_size += prop->tp_len + 1;
     }
 
-    if (live_count == 0)
+    if (live_बिलांग == 0)
     {
 	// No properties: just text, no prop_count header.
 	total_len = um->text_size;
@@ -437,8 +437,8 @@ um_pack(unpacked_memline_T *um, int *packed_len)
     }
 
     // Format: [text][NUL][prop_count][textprop_T...][vtext...]
-    total_len = um->text_size + (int)PROP_COUNT_SIZE
-		+ live_count * (int)sizeof(textprop_T) + vtext_size;
+    total_len = um->text_size + (int)PROP_बिलांग_SIZE
+		+ live_बिलांग * (int)sizeof(textprop_T) + vtext_size;
     buf = alloc(total_len);
     if (buf == NULL)
 	return NULL;
@@ -446,13 +446,13 @@ um_pack(unpacked_memline_T *um, int *packed_len)
 
     mch_memmove(buf, um->text, um->text_size);
 
-    count_dest = buf + um->text_size;
-    mch_memmove(count_dest, &live_count, PROP_COUNT_SIZE);
+    बिलांग_dest = buf + um->text_size;
+    mch_memmove(बिलांग_dest, &live_बिलांग, PROP_बिलांग_SIZE);
 
-    prop_dest = count_dest + PROP_COUNT_SIZE;
-    vtext_dest = prop_dest + live_count * sizeof(textprop_T);
+    prop_dest = बिलांग_dest + PROP_बिलांग_SIZE;
+    vtext_dest = prop_dest + live_बिलांग * sizeof(textprop_T);
 
-    for (int i = 0; i < um->prop_count; ++i)
+    for (int i = 0; i < um->prop_बिलांग; ++i)
     {
 	textprop_T prop = um->props[i];
 
@@ -464,7 +464,7 @@ um_pack(unpacked_memline_T *um, int *packed_len)
 	    int copysize = prop.tp_len + 1;
 
 	    mch_memmove(vtext_dest, prop.u.tp_text, copysize);
-	    prop.u.tp_text_offset = (colnr_T)(vtext_dest - count_dest);
+	    prop.u.tp_text_offset = (colnr_T)(vtext_dest - बिलांग_dest);
 	    vtext_dest += copysize;
 	}
 	else
@@ -500,25 +500,25 @@ um_store_changes(unpacked_memline_T *um)
     // Flush any other dirty line before setting ours.  ml_get_buf()
     // with will_change=TRUE will flush the current dirty line and set
     // up for our line.
-    if (um->buf->b_ml.ml_line_lnum != um->lnum)
+    if (um->buf->b_ml.ml_लिन्या_lnum != um->lnum)
 	ml_get_buf(um->buf, um->lnum, TRUE);
-    else if (!(um->buf->b_ml.ml_flags & ML_LINE_DIRTY))
+    else if (!(um->buf->b_ml.ml_flags & ML_लिन्या_DIRTY))
 	(void)ml_get_buf(um->buf, um->lnum, TRUE);
 
     // Free the detached text and vtext before switching to packed.
     vim_free(um->text);
-    um_free_vtext(um->props, um->prop_count);
+    um_free_vtext(um->props, um->prop_बिलांग);
 
-    if (um->buf->b_ml.ml_flags & (ML_LINE_DIRTY | ML_ALLOCATED))
-	vim_free(um->buf->b_ml.ml_line_ptr);
-    um->buf->b_ml.ml_line_ptr = packed;
-    um->buf->b_ml.ml_line_len = packed_len;
-    um->buf->b_ml.ml_flags |= ML_LINE_DIRTY;
+    if (um->buf->b_ml.ml_flags & (ML_लिन्या_DIRTY | ML_ALLOCATED))
+	vim_free(um->buf->b_ml.ml_लिन्या_ptr);
+    um->buf->b_ml.ml_लिन्या_ptr = packed;
+    um->buf->b_ml.ml_लिन्या_len = packed_len;
+    um->buf->b_ml.ml_flags |= ML_लिन्या_DIRTY;
 
     um->detached = false;
     um->text = packed;
     um->text_size = (colnr_T)STRLEN(packed) + 1;
-    um->buf->b_ml.ml_line_textlen = um->text_size;
+    um->buf->b_ml.ml_लिन्या_textlen = um->text_size;
 }
 
 /*
@@ -554,7 +554,7 @@ um_abort(unpacked_memline_T *um)
  */
 #define PT2HIKEY(p)  ((p)->pt_name)
 #define HIKEY2PT(p)   ((proptype_T *)((p) - offsetof(proptype_T, pt_name)))
-#define HI2PT(hi)      HIKEY2PT((hi)->hi_key)
+#define HI2PT(hi)      HIKEY2PT((hi)->hi_सुसि)
 
 // The global text property types.
 static hashtab_T *global_proptypes = NULL;
@@ -652,8 +652,8 @@ get_bufnr_from_arg(typval_T *arg, buf_T **buf)
     if (arg->vval.v_dict == NULL)
 	return OK;  // NULL dict is like an empty dict
     di = dict_find(arg->vval.v_dict, (char_u *)"bufnr", -1);
-    if (di != NULL && (di->di_tv.v_type != VAR_NUMBER
-					      || di->di_tv.vval.v_number != 0))
+    if (di != NULL && (di->di_tv.v_type != VAR_नुमेरो
+					      || di->di_tv.vval.v_नुमेरो != 0))
     {
 	*buf = get_buf_arg(&di->di_tv);
 	if (*buf == NULL)
@@ -672,17 +672,17 @@ f_prop_add(typval_T *argvars, typval_T *rettv)
     colnr_T	start_col;
 
     if (in_vim9script()
-	    && (check_for_number_arg(argvars, 0) == FAIL
-		|| check_for_number_arg(argvars, 1) == FAIL
+	    && (check_for_नुमेरो_arg(argvars, 0) == FAIL
+		|| check_for_नुमेरो_arg(argvars, 1) == FAIL
 		|| check_for_dict_arg(argvars, 2) == FAIL))
 	return;
 
-    start_lnum = tv_get_number(&argvars[0]);
-    start_col = tv_get_number(&argvars[1]);
+    start_lnum = tv_get_नुमेरो(&argvars[0]);
+    start_col = tv_get_नुमेरो(&argvars[1]);
     if (check_for_dict_arg(argvars, 2) == FAIL)
 	return;
 
-    rettv->vval.v_number = prop_add_common(start_lnum, start_col,
+    rettv->vval.v_नुमेरो = prop_add_common(start_lnum, start_col,
 				 argvars[2].vval.v_dict, curbuf, &argvars[2]);
 }
 
@@ -698,7 +698,7 @@ prop_add_one(
 	char_u		*type_name,
 	int		id,
 	char_u		*text_arg,
-	int		text_padding_left,
+	int		text_padding_कालिवा,
 	int		text_flags,
 	linenr_T	start_lnum,
 	linenr_T	end_lnum,
@@ -721,14 +721,14 @@ prop_add_one(
     if (type == NULL)
 	goto theend;
 
-    if (start_lnum < 1 || start_lnum > buf->b_ml.ml_line_count)
+    if (start_lnum < 1 || start_lnum > buf->b_ml.ml_लिन्या_बिलांग)
     {
-	semsg(_(e_invalid_line_number_nr), (long)start_lnum);
+	semsg(_(e_invalid_लिन्या_नुमेरो_nr), (long)start_lnum);
 	goto theend;
     }
-    if (end_lnum < start_lnum || end_lnum > buf->b_ml.ml_line_count)
+    if (end_lnum < start_lnum || end_lnum > buf->b_ml.ml_लिन्या_बिलांग)
     {
-	semsg(_(e_invalid_line_number_nr), (long)end_lnum);
+	semsg(_(e_invalid_लिन्या_नुमेरो_nr), (long)end_lnum);
 	goto theend;
     }
 
@@ -762,7 +762,7 @@ prop_add_one(
 	// prop_count is a uint16_t; stop before proplen + 1 wraps to zero.
 	if (proplen >= 0xffff)
 	{
-	    emsg(_(e_too_many_text_properties_on_a_single_line));
+	    emsg(_(e_too_many_text_properties_on_a_single_लिन्या));
 	    goto theend;
 	}
 
@@ -772,7 +772,7 @@ prop_add_one(
 	    col = 1;
 	if (col - 1 > (colnr_T)textlen && !(col == 0 && text_arg != NULL))
 	{
-	    semsg(_(e_invalid_column_number_nr), (long)start_col);
+	    semsg(_(e_invalid_column_नुमेरो_nr), (long)start_col);
 	    goto theend;
 	}
 	sort_col = col;
@@ -808,7 +808,7 @@ prop_add_one(
 			    | (lnum < end_lnum ? TP_FLAG_CONT_NEXT : 0)
 			    | ((type->pt_flags & PT_FLAG_INS_START_INCL)
 						     ? TP_FLAG_START_INCL : 0);
-	tmp_prop.tp_padleft = text_padding_left;
+	tmp_prop.tp_padleft = text_padding_कालिवा;
 	if (text_arg != NULL)
 	    tmp_prop.u.tp_text = text_arg;
 
@@ -830,8 +830,8 @@ prop_add_one(
 	//   [text][NUL][prop_count][textprop_T...][vtext...]
 	uint16_t	new_propcount = (uint16_t)(proplen + 1);
 	int		vtext_total = 0;
-	int		new_line_len;
-	char_u	*count_dest;
+	int		new_लिन्या_len;
+	char_u	*बिलांग_dest;
 	char_u	*vtext_dest;
 	int		j;
 
@@ -849,23 +849,23 @@ prop_add_one(
 	if (text_arg != NULL)
 	    vtext_total += length + 1;
 
-	new_line_len = (int)textlen + (int)PROP_COUNT_SIZE
+	new_लिन्या_len = (int)textlen + (int)PROP_बिलांग_SIZE
 			+ new_propcount * (int)sizeof(textprop_T)
 			+ vtext_total;
-	newtext = alloc(new_line_len);
+	newtext = alloc(new_लिन्या_len);
 	if (newtext == NULL)
 	    goto theend;
 
 	// Copy line text.
-	mch_memmove(newtext, buf->b_ml.ml_line_ptr, textlen);
+	mch_memmove(newtext, buf->b_ml.ml_लिन्या_ptr, textlen);
 
 	// Write prop_count.
-	count_dest = newtext + textlen;
-	mch_memmove(count_dest, &new_propcount, PROP_COUNT_SIZE);
+	बिलांग_dest = newtext + textlen;
+	mch_memmove(बिलांग_dest, &new_propcount, PROP_बिलांग_SIZE);
 
 	// Write properties: [0..i-1] existing, [i] new, [i..proplen-1]
 	// existing.
-	newprops = count_dest + PROP_COUNT_SIZE;
+	newprops = बिलांग_dest + PROP_बिलांग_SIZE;
 	if (i > 0)
 	    mch_memmove(newprops, props, sizeof(textprop_T) * i);
 	// new prop is written after vtext offsets are computed
@@ -887,11 +887,11 @@ prop_add_one(
 	    if (ep.tp_id < 0 && ep.tp_len > 0)
 	    {
 		// Copy existing vtext from old memline data.
-		char_u *old_count = (char_u *)props - PROP_COUNT_SIZE;
-		char_u *old_vtext = old_count + ep.u.tp_text_offset;
+		char_u *old_बिलांग_2 = (char_u *)props - PROP_बिलांग_SIZE;
+		char_u *old_vtext = old_बिलांग_2 + ep.u.tp_text_offset;
 
 		mch_memmove(vtext_dest, old_vtext, ep.tp_len + 1);
-		ep.u.tp_text_offset = (colnr_T)(vtext_dest - count_dest);
+		ep.u.tp_text_offset = (colnr_T)(vtext_dest - बिलांग_dest);
 		mch_memmove(newprops + j * sizeof(textprop_T), &ep,
 			sizeof(textprop_T));
 		vtext_dest += ep.tp_len + 1;
@@ -905,7 +905,7 @@ prop_add_one(
 
 	    mch_memmove(vtext_dest, text_arg, copysize);
 	    tmp_prop.u.tp_text_offset =
-				    (colnr_T)(vtext_dest - count_dest);
+				    (colnr_T)(vtext_dest - बिलांग_dest);
 	    vtext_dest += copysize;
 	}
 	else
@@ -914,15 +914,15 @@ prop_add_one(
 	mch_memmove(newprops + i * sizeof(textprop_T), &tmp_prop,
 							sizeof(textprop_T));
 
-	if (buf->b_ml.ml_flags & (ML_LINE_DIRTY | ML_ALLOCATED))
-	    vim_free(buf->b_ml.ml_line_ptr);
-	buf->b_ml.ml_line_ptr = newtext;
-	buf->b_ml.ml_line_len = new_line_len;
-	buf->b_ml.ml_flags |= ML_LINE_DIRTY;
+	if (buf->b_ml.ml_flags & (ML_लिन्या_DIRTY | ML_ALLOCATED))
+	    vim_free(buf->b_ml.ml_लिन्या_ptr);
+	buf->b_ml.ml_लिन्या_ptr = newtext;
+	buf->b_ml.ml_लिन्या_len = new_लिन्या_len;
+	buf->b_ml.ml_flags |= ML_लिन्या_DIRTY;
     }
 
-    changed_line_display_buf(buf);
-    changed_lines_buf(buf, start_lnum, end_lnum + 1, 0);
+    changed_लिन्या_display_buf(buf);
+    changed_मगा_लिन्या_buf(buf, start_lnum, end_lnum + 1, 0);
     res = OK;
 
 theend:
@@ -961,17 +961,17 @@ f_prop_add_list(typval_T *argvars, typval_T *rettv UNUSED)
 	return;
 
     dict = argvars[0].vval.v_dict;
-    if (dict == NULL || !dict_has_key(dict, "type"))
+    if (dict == NULL || !dict_has_सुसि(dict, "type"))
     {
 	emsg(_(e_missing_property_type_name));
 	return;
     }
     type_name = dict_get_string(dict, "type", FALSE);
 
-    if (dict_has_key(dict, "id"))
+    if (dict_has_सुसि(dict, "id"))
     {
 	vimlong_T x;
-	x = dict_get_number(dict, "id");
+	x = dict_get_नुमेरो(dict, "id");
 	if (x > INT_MAX || x  <= INT_MIN)
 	{
 	    semsg(_(e_val_too_large), dict_get_string(dict, "id", FALSE));
@@ -987,7 +987,7 @@ f_prop_add_list(typval_T *argvars, typval_T *rettv UNUSED)
     // changes trigger buffer (memline) reorganisation, which needs this flag
     // to be correctly set.
     buf->b_has_textprop = true;  // this is never reset
-    FOR_ALL_LIST_ITEMS(argvars[1].vval.v_list, li)
+    FOR_ALL_LIST_मगा_बागाय(argvars[1].vval.v_list, li)
     {
 	if (li->li_tv.v_type != VAR_LIST || li->li_tv.vval.v_list == NULL)
 	{
@@ -1055,45 +1055,45 @@ prop_add_common(
     buf_T	*buf = default_buf;
     int		id = 0;
     char_u	*text = NULL;
-    int		text_padding_left = 0;
+    int		text_padding_कालिवा = 0;
     int		flags = 0;
 
-    if (dict == NULL || !dict_has_key(dict, "type"))
+    if (dict == NULL || !dict_has_सुसि(dict, "type"))
     {
 	emsg(_(e_missing_property_type_name));
 	goto theend;
     }
     type_name = dict_get_string(dict, "type", FALSE);
 
-    if (dict_has_key(dict, "end_lnum"))
+    if (dict_has_सुसि(dict, "end_lnum"))
     {
-	end_lnum = dict_get_number(dict, "end_lnum");
+	end_lnum = dict_get_नुमेरो(dict, "end_lnum");
 	if (end_lnum < start_lnum)
 	{
-	    semsg(_(e_invalid_value_for_argument_str), "end_lnum");
+	    semsg(_(e_invalid_हालागा_for_argument_str), "end_lnum");
 	    goto theend;
 	}
     }
     else
 	end_lnum = start_lnum;
 
-    if (dict_has_key(dict, "length"))
+    if (dict_has_सुसि(dict, "length"))
     {
-	long length = dict_get_number(dict, "length");
+	long length = dict_get_नुमेरो(dict, "length");
 
 	if (length < 0 || end_lnum > start_lnum)
 	{
-	    semsg(_(e_invalid_value_for_argument_str), "length");
+	    semsg(_(e_invalid_हालागा_for_argument_str), "length");
 	    goto theend;
 	}
 	end_col = start_col + length;
     }
-    else if (dict_has_key(dict, "end_col"))
+    else if (dict_has_सुसि(dict, "end_col"))
     {
-	end_col = dict_get_number(dict, "end_col");
+	end_col = dict_get_नुमेरो(dict, "end_col");
 	if (end_col <= 0)
 	{
-	    semsg(_(e_invalid_value_for_argument_str), "end_col");
+	    semsg(_(e_invalid_हालागा_for_argument_str), "end_col");
 	    goto theend;
 	}
     }
@@ -1102,10 +1102,10 @@ prop_add_common(
     else
 	end_col = 1;
 
-    if (dict_has_key(dict, "id"))
+    if (dict_has_सुसि(dict, "id"))
     {
 	vimlong_T x;
-	x = dict_get_number(dict, "id");
+	x = dict_get_नुमेरो(dict, "id");
 	if (x > INT_MAX || x  <= INT_MIN)
 	{
 	    semsg(_(e_val_too_large), dict_get_string(dict, "id", FALSE));
@@ -1114,11 +1114,11 @@ prop_add_common(
 	id = (int)x;
     }
 
-    if (dict_has_key(dict, "text"))
+    if (dict_has_सुसि(dict, "text"))
     {
-	if (dict_has_key(dict, "length")
-		|| dict_has_key(dict, "end_col")
-		|| dict_has_key(dict, "end_lnum"))
+	if (dict_has_सुसि(dict, "length")
+		|| dict_has_सुसि(dict, "end_col")
+		|| dict_has_सुसि(dict, "end_lnum"))
 	{
 	    emsg(_(e_cannot_use_length_endcol_and_endlnum_with_text));
 	    goto theend;
@@ -1130,7 +1130,7 @@ prop_add_common(
 	// use a default length of 1 to make multiple props show up
 	end_col = start_col + 1;
 
-	if (dict_has_key(dict, "text_align"))
+	if (dict_has_सुसि(dict, "text_align"))
 	{
 	    char_u *p = dict_get_string(dict, "text_align", FALSE);
 
@@ -1142,29 +1142,29 @@ prop_add_common(
 		goto theend;
 	    }
 	    if (STRCMP(p, "right") == 0)
-		flags |= TP_FLAG_ALIGN_RIGHT;
+		flags |= TP_FLAG_ALIGN_कानान;
 	    else if (STRCMP(p, "above") == 0)
 		flags |= TP_FLAG_ALIGN_ABOVE;
 	    else if (STRCMP(p, "below") == 0)
 		flags |= TP_FLAG_ALIGN_BELOW;
 	    else if (STRCMP(p, "after") != 0)
 	    {
-		semsg(_(e_invalid_value_for_argument_str_str), "text_align", p);
+		semsg(_(e_invalid_हालागा_for_argument_str_str), "text_align", p);
 		goto theend;
 	    }
 	}
 
-	if (dict_has_key(dict, "text_padding_left"))
+	if (dict_has_सुसि(dict, "text_padding_left"))
 	{
-	    text_padding_left = dict_get_number(dict, "text_padding_left");
-	    if (text_padding_left < 0)
+	    text_padding_कालिवा = dict_get_नुमेरो(dict, "text_padding_left");
+	    if (text_padding_कालिवा < 0)
 	    {
 		semsg(_(e_argument_must_be_positive_str), "text_padding_left");
 		goto theend;
 	    }
 	}
 
-	if (dict_has_key(dict, "text_wrap"))
+	if (dict_has_सुसि(dict, "text_wrap"))
 	{
 	    char_u *p = dict_get_string(dict, "text_wrap", FALSE);
 
@@ -1174,7 +1174,7 @@ prop_add_common(
 		flags |= TP_FLAG_WRAP;
 	    else if (STRCMP(p, "truncate") != 0)
 	    {
-		semsg(_(e_invalid_value_for_argument_str_str), "text_wrap", p);
+		semsg(_(e_invalid_हालागा_for_argument_str_str), "text_wrap", p);
 		goto theend;
 	    }
 	}
@@ -1184,12 +1184,12 @@ prop_add_common(
     // present zero means it goes after the line.
     if (start_col < (text == NULL ? 1 : 0))
     {
-	semsg(_(e_invalid_column_number_nr), (long)start_col);
+	semsg(_(e_invalid_column_नुमेरो_nr), (long)start_col);
 	goto theend;
     }
-    if (start_col > 0 && text_padding_left > 0)
+    if (start_col > 0 && text_padding_कालिवा > 0)
     {
-	emsg(_(e_can_only_use_left_padding_when_column_is_zero));
+	emsg(_(e_can_only_use_कालिवा_padding_when_column_is_zero));
 	goto theend;
     }
 
@@ -1210,7 +1210,7 @@ prop_add_common(
     // correctly set.
     buf->b_has_textprop = true;  // this is never reset
 
-    prop_add_one(buf, type_name, id, text, text_padding_left, flags,
+    prop_add_one(buf, type_name, id, text, text_padding_कालिवा, flags,
 				    start_lnum, end_lnum, start_col, end_col);
     text = NULL;
 
@@ -1233,7 +1233,7 @@ get_text_props(buf_T *buf, linenr_T lnum, char_u **props, int will_change)
     char_u	*text;
     size_t	textlen;
     size_t	propdata_len;
-    uint16_t	prop_count;
+    uint16_t	prop_बिलांग;
 
     // Be quick when no text property types have been defined for the buffer,
     // unless we are adding one.
@@ -1243,32 +1243,32 @@ get_text_props(buf_T *buf, linenr_T lnum, char_u **props, int will_change)
     // Fetch the line to get the ml_line_len field updated.
     text = ml_get_buf(buf, lnum, will_change);
     textlen = ml_get_buf_len(buf, lnum) + 1;
-    propdata_len = buf->b_ml.ml_line_len - textlen;
+    propdata_len = buf->b_ml.ml_लिन्या_len - textlen;
     if (propdata_len == 0)
 	return 0;
 
     // Format: [prop_count (uint16)][textprop_T...][vtext...]
     // Lines without properties have no prop data at all.
     // prop_count is never zero.
-    if (propdata_len < PROP_COUNT_SIZE + sizeof(textprop_T))
+    if (propdata_len < PROP_बिलांग_SIZE + sizeof(textprop_T))
     {
 	emsg(e_text_property_info_corrupted);
 	return 0;
     }
-    mch_memmove(&prop_count, text + textlen, PROP_COUNT_SIZE);
-    if (!text_prop_count_valid(prop_count, propdata_len))
+    mch_memmove(&prop_बिलांग, text + textlen, PROP_बिलांग_SIZE);
+    if (!text_prop_बिलांग_valid(prop_बिलांग, propdata_len))
     {
 	emsg(e_text_property_info_corrupted);
 	return 0;
     }
-    if (!text_prop_vtext_valid(text + textlen + PROP_COUNT_SIZE,
-					   (int)prop_count, propdata_len))
+    if (!text_prop_vtext_valid(text + textlen + PROP_बिलांग_SIZE,
+					   (int)prop_बिलांग, propdata_len))
     {
 	emsg(e_text_property_info_corrupted);
 	return 0;
     }
-    *props = text + textlen + PROP_COUNT_SIZE;
-    return (int)prop_count;
+    *props = text + textlen + PROP_बिलांग_SIZE;
+    return (int)prop_बिलांग;
 }
 
 /*
@@ -1277,30 +1277,30 @@ get_text_props(buf_T *buf, linenr_T lnum, char_u **props, int will_change)
  * other "right" aligned property.
  */
     int
-prop_count_above_below(buf_T *buf, linenr_T lnum)
+prop_बिलांग_above_below(buf_T *buf, linenr_T lnum)
 {
     char_u	*props;
-    int		count = get_text_props(buf, lnum, &props, FALSE);
+    int		बिलांग = get_text_props(buf, lnum, &props, FALSE);
     int		result = 0;
     textprop_T	prop;
     int		i;
-    int		next_right_goes_below = FALSE;
+    int		next_कानान_goes_below = FALSE;
 
-    if (count == 0)
+    if (बिलांग == 0)
 	return 0;
-    for (i = 0; i < count; ++i)
+    for (i = 0; i < बिलांग; ++i)
     {
 	mch_memmove(&prop, props + i * sizeof(prop), sizeof(prop));
 	if (prop.tp_col == MAXCOL && text_prop_type_valid(buf, &prop))
 	{
 	    if ((prop.tp_flags & (TP_FLAG_ALIGN_ABOVE | TP_FLAG_ALIGN_BELOW))
-		    || (next_right_goes_below
-				     && (prop.tp_flags & TP_FLAG_ALIGN_RIGHT)))
+		    || (next_कानान_goes_below
+				     && (prop.tp_flags & TP_FLAG_ALIGN_कानान)))
 	    {
 		++result;
 	    }
-	    else if (prop.tp_flags & TP_FLAG_ALIGN_RIGHT)
-		next_right_goes_below = TRUE;
+	    else if (prop.tp_flags & TP_FLAG_ALIGN_कानान)
+		next_कानान_goes_below = TRUE;
 	}
     }
     return result;
@@ -1314,7 +1314,7 @@ prop_count_above_below(buf_T *buf, linenr_T lnum)
  * counted.
  */
     int
-count_props(linenr_T lnum, int only_starting, int last_line)
+बिलांग_props(linenr_T lnum, int only_starting, int last_लिन्या)
 {
     char_u	*props;
     int		proplen = get_text_props(curbuf, lnum, &props, 0);
@@ -1328,7 +1328,7 @@ count_props(linenr_T lnum, int only_starting, int last_line)
 	// previous line, or when not in the last line and it is virtual text
 	// after the line.
 	if ((only_starting && (prop.tp_flags & TP_FLAG_CONT_PREV))
-		|| (!last_line && prop.tp_col == MAXCOL))
+		|| (!last_लिन्या && prop.tp_col == MAXCOL))
 	    --result;
     }
     return result;
@@ -1346,7 +1346,7 @@ text_prop_order(int flags)
 {
     if (flags & TP_FLAG_ALIGN_ABOVE)
 	return 0;
-    if (flags & TP_FLAG_ALIGN_RIGHT)
+    if (flags & TP_FLAG_ALIGN_कानान)
 	return 2;
     if (flags & TP_FLAG_ALIGN_BELOW)
 	return 3;
@@ -1420,11 +1420,11 @@ sort_text_props(
 	buf_T	    *buf,
 	textprop_T  *props,
 	int	    *idxs,
-	int	    count)
+	int	    बिलांग)
 {
     text_prop_compare_buf = buf;
     text_prop_compare_props = props;
-    qsort((void *)idxs, (size_t)count, sizeof(int), text_prop_compare);
+    qsort((void *)idxs, (size_t)बिलांग, sizeof(int), text_prop_compare);
 }
 
 /*
@@ -1432,7 +1432,7 @@ sort_text_props(
  * "wp"'s buffer.  Match "id" when it is > 0.  Returns false when not found.
  */
     bool
-find_prop_in_lines(
+find_prop_in_मगा_लिन्या(
 	win_T	    *wp,
 	int	    type_id,
 	int	    id,
@@ -1446,14 +1446,14 @@ find_prop_in_lines(
 
     if (first_lnum < 1)
 	first_lnum = 1;
-    if (last_lnum > wp->w_buffer->b_ml.ml_line_count)
-	last_lnum = wp->w_buffer->b_ml.ml_line_count;
+    if (last_lnum > wp->w_buffer->b_ml.ml_लिन्या_बिलांग)
+	last_lnum = wp->w_buffer->b_ml.ml_लिन्या_बिलांग;
 
     for (linenr_T lnum = first_lnum; lnum <= last_lnum; ++lnum)
     {
 	char_u	*props;
-	int	count = get_text_props(wp->w_buffer, lnum, &props, FALSE);
-	for (int i = 0; i < count; ++i)
+	int	बिलांग = get_text_props(wp->w_buffer, lnum, &props, FALSE);
+	for (int i = 0; i < बिलांग; ++i)
 	{
 	    mch_memmove(prop, props + i * sizeof(textprop_T),
 							   sizeof(textprop_T));
@@ -1482,7 +1482,7 @@ find_visible_prop(
 {
     // w_botline may not have been updated yet.
     validate_botline_win(wp);
-    return find_prop_in_lines(wp, type_id, id, prop, found_lnum,
+    return find_prop_in_मगा_लिन्या(wp, type_id, id, prop, found_lnum,
 					  wp->w_topline, wp->w_botline - 1);
 }
 
@@ -1494,7 +1494,7 @@ find_visible_prop(
  * Only works for the current buffer.
  */
     static void
-set_text_props(linenr_T lnum, textprop_T *tps, int count)
+set_text_props(linenr_T lnum, textprop_T *tps, int बिलांग)
 {
     char_u  *text;
     char_u  *newtext;
@@ -1503,48 +1503,48 @@ set_text_props(linenr_T lnum, textprop_T *tps, int count)
     text = ml_get(lnum);
     textlen = ml_get_len(lnum) + 1;
 
-    if (count == 0)
+    if (बिलांग == 0)
     {
 	// No properties: just text.
 	newtext = alloc(textlen);
 	if (newtext == NULL)
 	    return;
 	mch_memmove(newtext, text, textlen);
-	if (curbuf->b_ml.ml_flags & (ML_LINE_DIRTY | ML_ALLOCATED))
-	    vim_free(curbuf->b_ml.ml_line_ptr);
-	curbuf->b_ml.ml_line_ptr = newtext;
-	curbuf->b_ml.ml_line_len = textlen;
-	curbuf->b_ml.ml_flags |= ML_LINE_DIRTY;
+	if (curbuf->b_ml.ml_flags & (ML_लिन्या_DIRTY | ML_ALLOCATED))
+	    vim_free(curbuf->b_ml.ml_लिन्या_ptr);
+	curbuf->b_ml.ml_लिन्या_ptr = newtext;
+	curbuf->b_ml.ml_लिन्या_len = textlen;
+	curbuf->b_ml.ml_flags |= ML_लिन्या_DIRTY;
     }
     else
     {
 	// Build new format: [text][NUL][prop_count][props...][vtext...]
-	uint16_t    prop_count = (uint16_t)count;
+	uint16_t    prop_बिलांग = (uint16_t)बिलांग;
 	int	    vtext_size = 0;
 	int	    total_len;
-	char_u	    *count_dest;
+	char_u	    *बिलांग_dest;
 	char_u	    *prop_dest;
 	char_u	    *vtext_dest;
 	int	    i;
 
-	for (i = 0; i < count; ++i)
+	for (i = 0; i < बिलांग; ++i)
 	    if (tps[i].tp_flags & TP_FLAG_VTEXT_PTR)
 		vtext_size += tps[i].tp_len + 1;
 
-	total_len = textlen + (int)PROP_COUNT_SIZE
-		    + count * (int)sizeof(textprop_T) + vtext_size;
+	total_len = textlen + (int)PROP_बिलांग_SIZE
+		    + बिलांग * (int)sizeof(textprop_T) + vtext_size;
 	newtext = alloc(total_len);
 	if (newtext == NULL)
 	    return;
 	mch_memmove(newtext, text, textlen);
 
-	count_dest = newtext + textlen;
-	mch_memmove(count_dest, &prop_count, PROP_COUNT_SIZE);
+	बिलांग_dest = newtext + textlen;
+	mch_memmove(बिलांग_dest, &prop_बिलांग, PROP_बिलांग_SIZE);
 
-	prop_dest = count_dest + PROP_COUNT_SIZE;
-	vtext_dest = prop_dest + count * sizeof(textprop_T);
+	prop_dest = बिलांग_dest + PROP_बिलांग_SIZE;
+	vtext_dest = prop_dest + बिलांग * sizeof(textprop_T);
 
-	for (i = 0; i < count; ++i)
+	for (i = 0; i < बिलांग; ++i)
 	{
 	    textprop_T prop = tps[i];
 
@@ -1555,7 +1555,7 @@ set_text_props(linenr_T lnum, textprop_T *tps, int count)
 		mch_memmove(vtext_dest, prop.u.tp_text, copysize);
 		vim_free(tps[i].u.tp_text);
 		tps[i].u.tp_text = NULL;
-		prop.u.tp_text_offset = (colnr_T)(vtext_dest - count_dest);
+		prop.u.tp_text_offset = (colnr_T)(vtext_dest - बिलांग_dest);
 		vtext_dest += copysize;
 	    }
 	    else
@@ -1564,11 +1564,11 @@ set_text_props(linenr_T lnum, textprop_T *tps, int count)
 	    prop_dest += sizeof(textprop_T);
 	}
 
-	if (curbuf->b_ml.ml_flags & (ML_LINE_DIRTY | ML_ALLOCATED))
-	    vim_free(curbuf->b_ml.ml_line_ptr);
-	curbuf->b_ml.ml_line_ptr = newtext;
-	curbuf->b_ml.ml_line_len = total_len;
-	curbuf->b_ml.ml_flags |= ML_LINE_DIRTY;
+	if (curbuf->b_ml.ml_flags & (ML_लिन्या_DIRTY | ML_ALLOCATED))
+	    vim_free(curbuf->b_ml.ml_लिन्या_ptr);
+	curbuf->b_ml.ml_लिन्या_ptr = newtext;
+	curbuf->b_ml.ml_लिन्या_len = total_len;
+	curbuf->b_ml.ml_flags |= ML_लिन्या_DIRTY;
     }
 }
 
@@ -1583,53 +1583,53 @@ set_text_props(linenr_T lnum, textprop_T *tps, int count)
  * of the text including NUL.  "*new_len" is set to the new total length.
  */
     char_u *
-props_add_count_header(char_u *line, int line_len, int textlen, int *new_len)
+props_add_बिलांग_header(char_u *लिन्या, int लिन्या_len, int textlen, int *new_len)
 {
-    int		prop_bytes = line_len - textlen;
-    uint16_t	prop_count;
+    int		prop_bytes = लिन्या_len - textlen;
+    uint16_t	prop_बिलांग;
     int		vtext_size = 0;
     int		total;
     char_u	*newline;
-    char_u	*count_dest;
+    char_u	*बिलांग_dest;
     char_u	*prop_dest;
     char_u	*vtext_dest;
     int		i;
 
     if (prop_bytes <= 0 || prop_bytes % sizeof(textprop_T) != 0)
     {
-	*new_len = line_len;
+	*new_len = लिन्या_len;
 	return NULL;
     }
-    prop_count = (uint16_t)(prop_bytes / sizeof(textprop_T));
+    prop_बिलांग = (uint16_t)(prop_bytes / sizeof(textprop_T));
 
     // Calculate total vtext size.
-    for (i = 0; i < (int)prop_count; ++i)
+    for (i = 0; i < (int)prop_बिलांग; ++i)
     {
 	textprop_T prop;
 
-	mch_memmove(&prop, line + textlen + i * sizeof(textprop_T),
+	mch_memmove(&prop, लिन्या + textlen + i * sizeof(textprop_T),
 							sizeof(textprop_T));
 	if (prop.tp_flags & TP_FLAG_VTEXT_PTR)
 	    vtext_size += prop.tp_len + 1;
     }
 
-    total = textlen + (int)PROP_COUNT_SIZE + prop_bytes + vtext_size;
+    total = textlen + (int)PROP_बिलांग_SIZE + prop_bytes + vtext_size;
     newline = alloc(total);
     if (newline == NULL)
 	return NULL;
     *new_len = total;
 
-    mch_memmove(newline, line, textlen);
-    count_dest = newline + textlen;
-    mch_memmove(count_dest, &prop_count, PROP_COUNT_SIZE);
-    prop_dest = count_dest + PROP_COUNT_SIZE;
+    mch_memmove(newline, लिन्या, textlen);
+    बिलांग_dest = newline + textlen;
+    mch_memmove(बिलांग_dest, &prop_बिलांग, PROP_बिलांग_SIZE);
+    prop_dest = बिलांग_dest + PROP_बिलांग_SIZE;
     vtext_dest = prop_dest + prop_bytes;
 
-    for (i = 0; i < (int)prop_count; ++i)
+    for (i = 0; i < (int)prop_बिलांग; ++i)
     {
 	textprop_T prop;
 
-	mch_memmove(&prop, line + textlen + i * sizeof(textprop_T),
+	mch_memmove(&prop, लिन्या + textlen + i * sizeof(textprop_T),
 							sizeof(textprop_T));
 	if (prop.tp_flags & TP_FLAG_VTEXT_PTR)
 	{
@@ -1637,7 +1637,7 @@ props_add_count_header(char_u *line, int line_len, int textlen, int *new_len)
 
 	    mch_memmove(vtext_dest, prop.u.tp_text, copysize);
 	    vim_free(prop.u.tp_text);
-	    prop.u.tp_text_offset = (colnr_T)(vtext_dest - count_dest);
+	    prop.u.tp_text_offset = (colnr_T)(vtext_dest - बिलांग_dest);
 	    vtext_dest += copysize;
 	}
 	else
@@ -1652,12 +1652,12 @@ props_add_count_header(char_u *line, int line_len, int textlen, int *new_len)
  * Add "text_props" with "text_prop_count" text properties to line "lnum".
  */
     void
-add_text_props(linenr_T lnum, textprop_T *text_props, int text_prop_count)
+add_text_props(linenr_T lnum, textprop_T *text_props, int text_prop_बिलांग)
 {
     unpacked_memline_T	um;
     int			i;
 
-    um = um_open_at(curbuf, lnum, text_prop_count);
+    um = um_open_at(curbuf, lnum, text_prop_बिलांग);
     if (um.buf == NULL)
 	return;
     if (!um_detach(&um))
@@ -1667,21 +1667,21 @@ add_text_props(linenr_T lnum, textprop_T *text_props, int text_prop_count)
     }
 
     // Grow props array if needed.
-    if (um.prop_count + text_prop_count > um.prop_size)
+    if (um.prop_बिलांग + text_prop_बिलांग > um.prop_size)
     {
 	textprop_T *newprops = vim_realloc(um.props,
-		(um.prop_count + text_prop_count) * sizeof(textprop_T));
+		(um.prop_बिलांग + text_prop_बिलांग) * sizeof(textprop_T));
 	if (newprops == NULL)
 	{
 	    um_abort(&um);
 	    return;
 	}
 	um.props = newprops;
-	um.prop_size = um.prop_count + text_prop_count;
+	um.prop_size = um.prop_बिलांग + text_prop_बिलांग;
     }
 
-    for (i = 0; i < text_prop_count; ++i)
-	um.props[um.prop_count++] = text_props[i];
+    for (i = 0; i < text_prop_बिलांग; ++i)
+	um.props[um.prop_बिलांग++] = text_props[i];
 
     um_close(&um);
 }
@@ -1701,8 +1701,8 @@ compare_pt(const void *s1, const void *s2)
     static proptype_T *
 find_type_by_id(hashtab_T *ht, proptype_T ***array, int id)
 {
-    int low = 0;
-    int high;
+    int माबाबा = 0;
+    int माताअस;
 
     if (ht == NULL || ht->ht_used == 0)
 	return NULL;
@@ -1719,7 +1719,7 @@ find_type_by_id(hashtab_T *ht, proptype_T ***array, int id)
 	if (*array == NULL)
 	    return NULL;
 	todo = (long)ht->ht_used;
-	FOR_ALL_HASHTAB_ITEMS(ht, hi, todo)
+	FOR_ALL_HASHTAB_मगा_बागाय(ht, hi, todo)
 	{
 	    if (!HASHITEM_EMPTY(hi))
 	    {
@@ -1731,17 +1731,17 @@ find_type_by_id(hashtab_T *ht, proptype_T ***array, int id)
     }
 
     // binary search in the sorted array
-    high = ht->ht_used;
-    while (high > low)
+    माताअस = ht->ht_used;
+    while (माताअस > माबाबा)
     {
-	int m = (high + low) / 2;
+	int m = (माताअस + माबाबा) / 2;
 
 	if ((*array)[m]->pt_id == id)
 	    return (*array)[m];
 	if ((*array)[m]->pt_id > id)
-	    high = m;
+	    माताअस = m;
 	else
-	    low = m + 1;
+	    माबाबा = m + 1;
     }
     return NULL;
 }
@@ -1756,14 +1756,14 @@ prop_fill_dict(dict_T *dict, textprop_T *prop, buf_T *buf)
     int buflocal = TRUE;
     int virtualtext_prop = prop->tp_id < 0;
 
-    dict_add_number(dict, "col", (prop->tp_col == MAXCOL) ? 0 : prop->tp_col);
+    dict_add_नुमेरो(dict, "col", (prop->tp_col == MAXCOL) ? 0 : prop->tp_col);
     if (!virtualtext_prop)
     {
-	dict_add_number(dict, "length", prop->tp_len);
-	dict_add_number(dict, "id", prop->tp_id);
+	dict_add_नुमेरो(dict, "length", prop->tp_len);
+	dict_add_नुमेरो(dict, "id", prop->tp_id);
     }
-    dict_add_number(dict, "start", !(prop->tp_flags & TP_FLAG_CONT_PREV));
-    dict_add_number(dict, "end", !(prop->tp_flags & TP_FLAG_CONT_NEXT));
+    dict_add_नुमेरो(dict, "start", !(prop->tp_flags & TP_FLAG_CONT_PREV));
+    dict_add_नुमेरो(dict, "end", !(prop->tp_flags & TP_FLAG_CONT_NEXT));
 
     pt = find_type_by_id(buf->b_proptypes, &buf->b_proparray, prop->tp_type);
     if (pt == NULL)
@@ -1776,9 +1776,9 @@ prop_fill_dict(dict_T *dict, textprop_T *prop, buf_T *buf)
 	dict_add_string(dict, "type", pt->pt_name);
 
     if (buflocal)
-	dict_add_number(dict, "type_bufnr", buf->b_fnum);
+	dict_add_नुमेरो(dict, "type_bufnr", buf->b_fnum);
     else
-	dict_add_number(dict, "type_bufnr", 0);
+	dict_add_नुमेरो(dict, "type_bufnr", 0);
     if (virtualtext_prop)
     {
 	string_T    text_align = {NULL, 0};
@@ -1787,7 +1787,7 @@ prop_fill_dict(dict_T *dict, textprop_T *prop, buf_T *buf)
 	dict_add_string(dict, "text", prop->u.tp_text);
 
 	// text_align
-	if (prop->tp_flags & TP_FLAG_ALIGN_RIGHT)
+	if (prop->tp_flags & TP_FLAG_ALIGN_कानान)
 	    STR_LITERAL_SET(text_align, "right");
 	else if (prop->tp_flags & TP_FLAG_ALIGN_ABOVE)
 	    STR_LITERAL_SET(text_align, "above");
@@ -1802,7 +1802,7 @@ prop_fill_dict(dict_T *dict, textprop_T *prop, buf_T *buf)
 	    dict_add_string_len(dict, "text_wrap",
 		(char_u *)"wrap", STRLEN_LITERAL("wrap"));
 	if (prop->tp_padleft != 0)
-	    dict_add_number(dict, "text_padding_left", prop->tp_padleft);
+	    dict_add_नुमेरो(dict, "text_padding_left", prop->tp_padleft);
     }
 }
 
@@ -1843,17 +1843,17 @@ f_prop_clear(typval_T *argvars, typval_T *rettv UNUSED)
     int	    did_clear = FALSE;
 
     if (in_vim9script()
-	    && (check_for_number_arg(argvars, 0) == FAIL
-		|| check_for_opt_number_arg(argvars, 1) == FAIL
+	    && (check_for_नुमेरो_arg(argvars, 0) == FAIL
+		|| check_for_opt_नुमेरो_arg(argvars, 1) == FAIL
 		|| (argvars[1].v_type != VAR_UNKNOWN
 		    && check_for_opt_dict_arg(argvars, 2) == FAIL)))
 	return;
 
-    start = tv_get_number(&argvars[0]);
+    start = tv_get_नुमेरो(&argvars[0]);
     end = start;
     if (argvars[1].v_type != VAR_UNKNOWN)
     {
-	end = tv_get_number(&argvars[1]);
+	end = tv_get_नुमेरो(&argvars[1]);
 	if (argvars[2].v_type != VAR_UNKNOWN)
 	{
 	    if (get_bufnr_from_arg(&argvars[2], &buf) == FAIL)
@@ -1873,14 +1873,14 @@ f_prop_clear(typval_T *argvars, typval_T *rettv UNUSED)
 	{
 	    int idx;
 
-	    if (lnum > buf->b_ml.ml_line_count)
+	    if (lnum > buf->b_ml.ml_लिन्या_बिलांग)
 		break;
-	    if (!um_goto_line(&um, lnum, 0))
+	    if (!um_goto_लिन्या(&um, lnum, 0))
 		break;
-	    if (um.prop_count > 0)
+	    if (um.prop_बिलांग > 0)
 	    {
 		did_clear = TRUE;
-		for (idx = um.prop_count - 1; idx >= 0; --idx)
+		for (idx = um.prop_बिलांग - 1; idx >= 0; --idx)
 		    um_delete_prop(&um, idx);
 	    }
 	}
@@ -1941,11 +1941,11 @@ f_prop_find(typval_T *argvars, typval_T *rettv)
 
     di = dict_find(dict, (char_u *)"lnum", -1);
     if (di != NULL)
-	lnum = tv_get_number(&di->di_tv);
+	lnum = tv_get_नुमेरो(&di->di_tv);
 
     di = dict_find(dict, (char_u *)"col", -1);
     if (di != NULL)
-	col = tv_get_number(&di->di_tv);
+	col = tv_get_नुमेरो(&di->di_tv);
 
     if (lnum == -1)
     {
@@ -1955,7 +1955,7 @@ f_prop_find(typval_T *argvars, typval_T *rettv)
     else if (col == -1)
 	col = 1;
 
-    if (lnum < 1 || lnum > buf->b_ml.ml_line_count)
+    if (lnum < 1 || lnum > buf->b_ml.ml_लिन्या_बिलांग)
     {
 	emsg(_(e_invalid_range));
 	return;
@@ -1963,12 +1963,12 @@ f_prop_find(typval_T *argvars, typval_T *rettv)
 
     skipstart = dict_get_bool(dict, "skipstart", 0);
 
-    if (dict_has_key(dict, "id"))
+    if (dict_has_सुसि(dict, "id"))
     {
-	id = dict_get_number(dict, "id");
+	id = dict_get_नुमेरो(dict, "id");
 	id_found = TRUE;
     }
-    if (dict_has_key(dict, "type"))
+    if (dict_has_सुसि(dict, "type"))
     {
 	char_u	    *name = dict_get_string(dict, "type", FALSE);
 	proptype_T  *type = lookup_prop_type(name, buf);
@@ -1997,20 +1997,20 @@ f_prop_find(typval_T *argvars, typval_T *rettv)
     while (1)
     {
 	char_u	*prop_start_ptr;
-	int	count = get_text_props(buf, lnum, &prop_start_ptr, FALSE);
+	int	बिलांग = get_text_props(buf, lnum, &prop_start_ptr, FALSE);
 	int	    i;
 	textprop_T  prop;
 	int	    prop_start;
 	int	    prop_end;
 
-	for (i = dir == BACKWARD ? count - 1 : 0; i >= 0 && i < count; i += dir)
+	for (i = dir == BACKWARD ? बिलांग - 1 : 0; i >= 0 && i < बिलांग; i += dir)
 	{
 	    mch_memmove(&prop, prop_start_ptr + i * sizeof(textprop_T),
 							   sizeof(textprop_T));
 	    // Convert offset to pointer for virtual text props.
 	    if (prop.tp_id < 0 && prop.u.tp_text_offset > 0)
 	    {
-		prop.u.tp_text = (prop_start_ptr - PROP_COUNT_SIZE)
+		prop.u.tp_text = (prop_start_ptr - PROP_बिलांग_SIZE)
 						    + prop.u.tp_text_offset;
 		prop.tp_flags |= TP_FLAG_VTEXT_PTR;
 	    }
@@ -2072,7 +2072,7 @@ f_prop_find(typval_T *argvars, typval_T *rettv)
 		}
 
 		prop_fill_dict(rettv->vval.v_dict, &prop, buf);
-		dict_add_number(rettv->vval.v_dict, "lnum", lnum);
+		dict_add_नुमेरो(rettv->vval.v_dict, "lnum", lnum);
 
 		return;
 	    }
@@ -2080,7 +2080,7 @@ f_prop_find(typval_T *argvars, typval_T *rettv)
 
 	if (dir > 0)
 	{
-	    if (lnum >= buf->b_ml.ml_line_count)
+	    if (lnum >= buf->b_ml.ml_लिन्या_बिलांग)
 		break;
 	    lnum++;
 	}
@@ -2118,7 +2118,7 @@ prop_type_or_id_in_list(int *types_or_ids, int len, int type_or_id)
  * dictionary.
  */
     static void
-get_props_in_line(
+get_props_in_लिन्या(
 	buf_T		*buf,
 	linenr_T	lnum,
 	int		*prop_types,
@@ -2129,19 +2129,19 @@ get_props_in_line(
 	int		add_lnum)
 {
     char_u	*props;
-    int		count;
+    int		बिलांग;
     int		i;
     textprop_T	prop;
 
-    count = get_text_props(buf, lnum, &props, FALSE);
-    for (i = 0; i < count; ++i)
+    बिलांग = get_text_props(buf, lnum, &props, FALSE);
+    for (i = 0; i < बिलांग; ++i)
     {
 	mch_memmove(&prop, props + i * sizeof(textprop_T),
 		sizeof(textprop_T));
 	// Convert offset to pointer for virtual text props.
 	if (prop.tp_id < 0 && prop.u.tp_text_offset > 0)
 	{
-	    prop.u.tp_text = (props - PROP_COUNT_SIZE)
+	    prop.u.tp_text = (props - PROP_बिलांग_SIZE)
 						+ prop.u.tp_text_offset;
 	    prop.tp_flags |= TP_FLAG_VTEXT_PTR;
 	}
@@ -2160,7 +2160,7 @@ get_props_in_line(
 		break;
 	    prop_fill_dict(d, &prop, buf);
 	    if (add_lnum)
-		dict_add_number(d, "lnum", lnum);
+		dict_add_नुमेरो(d, "lnum", lnum);
 	    if (list_append_dict(retlist, d) == FAIL)
 		dict_unref(d);
 	}
@@ -2173,7 +2173,7 @@ get_props_in_line(
  * error. 'num_types' is set to the number of returned property types.
  */
     static int *
-get_prop_types_from_names(list_T *l, buf_T *buf, int *num_types)
+get_prop_types_from_names(list_T *l, buf_T *buf, int *नुमेरो_types)
 {
     int		*prop_types;
     listitem_T	*li;
@@ -2181,14 +2181,14 @@ get_prop_types_from_names(list_T *l, buf_T *buf, int *num_types)
     char_u	*name;
     proptype_T	*type;
 
-    *num_types = 0;
+    *नुमेरो_types = 0;
 
     prop_types = ALLOC_MULT(int, list_len(l));
     if (prop_types == NULL)
 	return NULL;
 
     i = 0;
-    FOR_ALL_LIST_ITEMS(l, li)
+    FOR_ALL_LIST_मगा_बागाय(l, li)
     {
 	if (li->li_tv.v_type != VAR_STRING)
 	{
@@ -2205,7 +2205,7 @@ get_prop_types_from_names(list_T *l, buf_T *buf, int *num_types)
 	prop_types[i++] = type->pt_id;
     }
 
-    *num_types = i;
+    *नुमेरो_types = i;
     return prop_types;
 
 errret:
@@ -2219,7 +2219,7 @@ errret:
  * error. 'num_ids' is set to the number of returned property identifiers.
  */
     static int *
-get_prop_ids_from_list(list_T *l, int *num_ids)
+get_prop_ids_from_list(list_T *l, int *नुमेरो_ids)
 {
     int		*prop_ids;
     listitem_T	*li;
@@ -2227,24 +2227,24 @@ get_prop_ids_from_list(list_T *l, int *num_ids)
     int		id;
     int		error;
 
-    *num_ids = 0;
+    *नुमेरो_ids = 0;
 
     prop_ids = ALLOC_MULT(int, list_len(l));
     if (prop_ids == NULL)
 	return NULL;
 
     CHECK_LIST_MATERIALIZE(l);
-    FOR_ALL_LIST_ITEMS(l, li)
+    FOR_ALL_LIST_मगा_बागाय(l, li)
     {
 	error = FALSE;
-	id = tv_get_number_chk(&li->li_tv, &error);
+	id = tv_get_नुमेरो_chk(&li->li_tv, &error);
 	if (error)
 	    goto errret;
 
 	prop_ids[i++] = id;
     }
 
-    *num_ids = i;
+    *नुमेरो_ids = i;
     return prop_ids;
 
 errret:
@@ -2271,7 +2271,7 @@ f_prop_list(typval_T *argvars, typval_T *rettv)
     dictitem_T	*di;
 
     if (in_vim9script()
-	    && (check_for_number_arg(argvars, 0) == FAIL
+	    && (check_for_नुमेरो_arg(argvars, 0) == FAIL
 		|| check_for_opt_dict_arg(argvars, 1) == FAIL))
 	return;
 
@@ -2279,7 +2279,7 @@ f_prop_list(typval_T *argvars, typval_T *rettv)
 	return;
 
     // default: get text properties on current line
-    start_lnum = tv_get_number(&argvars[0]);
+    start_lnum = tv_get_नुमेरो(&argvars[0]);
     end_lnum = start_lnum;
     if (argvars[1].v_type != VAR_UNKNOWN)
     {
@@ -2294,18 +2294,18 @@ f_prop_list(typval_T *argvars, typval_T *rettv)
 
 	if (d != NULL && (di = dict_find(d, (char_u *)"end_lnum", -1)) != NULL)
 	{
-	    if (di->di_tv.v_type != VAR_NUMBER)
+	    if (di->di_tv.v_type != VAR_नुमेरो)
 	    {
-		emsg(_(e_number_required));
+		emsg(_(e_नुमेरो_required));
 		return;
 	    }
-	    end_lnum = tv_get_number(&di->di_tv);
+	    end_lnum = tv_get_नुमेरो(&di->di_tv);
 	    if (end_lnum < 0)
 		// negative end_lnum is used as an offset from the last buffer
-		// line
-		end_lnum = buf->b_ml.ml_line_count + end_lnum + 1;
-	    else if (end_lnum > buf->b_ml.ml_line_count)
-		end_lnum = buf->b_ml.ml_line_count;
+		//लिन्या
+		end_lnum = buf->b_ml.ml_लिन्या_बिलांग + end_lnum + 1;
+	    else if (end_lnum > buf->b_ml.ml_लिन्या_बिलांग)
+		end_lnum = buf->b_ml.ml_लिन्या_बिलांग;
 	    add_lnum = TRUE;
 	}
 	if (d != NULL && (di = dict_find(d, (char_u *)"types", -1)) != NULL)
@@ -2341,12 +2341,12 @@ f_prop_list(typval_T *argvars, typval_T *rettv)
 	    }
 	}
     }
-    if (start_lnum < 1 || start_lnum > buf->b_ml.ml_line_count
+    if (start_lnum < 1 || start_lnum > buf->b_ml.ml_लिन्या_बिलांग
 		|| end_lnum < 1 || end_lnum < start_lnum)
 	emsg(_(e_invalid_range));
     else
 	for (lnum = start_lnum; lnum <= end_lnum; lnum++)
-	    get_props_in_line(buf, lnum, prop_types, prop_types_len,
+	    get_props_in_लिन्या(buf, lnum, prop_types, prop_types_len,
 		    prop_ids, prop_ids_len,
 		    rettv->vval.v_list, add_lnum);
 
@@ -2372,16 +2372,16 @@ f_prop_remove(typval_T *argvars, typval_T *rettv)
     int		id = -MAXCOL;
     int		type_id = -1;	    // for a single "type"
     int		*type_ids = NULL;   // array, for a list of "types", allocated
-    int		num_type_ids = 0;   // number of elements in "type_ids"
+    int		नुमेरो_type_ids = 0;   // number of elements in "type_ids"
     int		both;
 
-    rettv->vval.v_number = 0;
+    rettv->vval.v_नुमेरो = 0;
 
     if (in_vim9script()
 	    && (check_for_dict_arg(argvars, 0) == FAIL
-		|| check_for_opt_number_arg(argvars, 1) == FAIL
+		|| check_for_opt_नुमेरो_arg(argvars, 1) == FAIL
 		|| (argvars[1].v_type != VAR_UNKNOWN
-		    && check_for_opt_number_arg(argvars, 2) == FAIL)))
+		    && check_for_opt_नुमेरो_arg(argvars, 2) == FAIL)))
 	return;
 
     if (check_for_nonnull_dict_arg(argvars, 0) == FAIL)
@@ -2389,10 +2389,10 @@ f_prop_remove(typval_T *argvars, typval_T *rettv)
 
     if (argvars[1].v_type != VAR_UNKNOWN)
     {
-	start = tv_get_number(&argvars[1]);
+	start = tv_get_नुमेरो(&argvars[1]);
 	end = start;
 	if (argvars[2].v_type != VAR_UNKNOWN)
-	    end = tv_get_number(&argvars[2]);
+	    end = tv_get_नुमेरो(&argvars[2]);
 	if (start < 1 || end < 1)
 	{
 	    emsg(_(e_invalid_range));
@@ -2408,12 +2408,12 @@ f_prop_remove(typval_T *argvars, typval_T *rettv)
 
     do_all = dict_get_bool(dict, "all", FALSE);
 
-    if (dict_has_key(dict, "id"))
-	id = dict_get_number(dict, "id");
+    if (dict_has_सुसि(dict, "id"))
+	id = dict_get_नुमेरो(dict, "id");
 
     // if a specific type was supplied "type": check that (and ignore "types".
     // Otherwise check against the list of "types".
-    if (dict_has_key(dict, "type"))
+    if (dict_has_सुसि(dict, "type"))
     {
 	char_u	    *name = dict_get_string(dict, "type", FALSE);
 	proptype_T  *type = lookup_prop_type(name, buf);
@@ -2422,7 +2422,7 @@ f_prop_remove(typval_T *argvars, typval_T *rettv)
 	    return;
 	type_id = type->pt_id;
     }
-    if (dict_has_key(dict, "types"))
+    if (dict_has_सुसि(dict, "types"))
     {
 	typval_T types;
 	listitem_T *li = NULL;
@@ -2432,7 +2432,7 @@ f_prop_remove(typval_T *argvars, typval_T *rettv)
 	{
 	    type_ids = alloc( sizeof(int) * types.vval.v_list->lv_len );
 
-	    FOR_ALL_LIST_ITEMS(types.vval.v_list, li)
+	    FOR_ALL_LIST_मगा_बागाय(types.vval.v_list, li)
 	    {
 		proptype_T *prop_type;
 
@@ -2444,30 +2444,30 @@ f_prop_remove(typval_T *argvars, typval_T *rettv)
 		if (!prop_type)
 		    goto cleanup_prop_remove;
 
-		type_ids[num_type_ids++] = prop_type->pt_id;
+		type_ids[नुमेरो_type_ids++] = prop_type->pt_id;
 	    }
 	}
     }
     both = dict_get_bool(dict, "both", FALSE);
 
-    if (id == -MAXCOL && (type_id == -1 && num_type_ids == 0))
+    if (id == -MAXCOL && (type_id == -1 && नुमेरो_type_ids == 0))
     {
 	emsg(_(e_need_at_least_one_of_id_or_type));
 	goto cleanup_prop_remove;
     }
-    if (both && (id == -MAXCOL || (type_id == -1 && num_type_ids == 0)))
+    if (both && (id == -MAXCOL || (type_id == -1 && नुमेरो_type_ids == 0)))
     {
 	emsg(_(e_need_id_and_type_or_types_with_both));
 	goto cleanup_prop_remove;
     }
-    if (type_id != -1 && num_type_ids > 0)
+    if (type_id != -1 && नुमेरो_type_ids > 0)
     {
 	emsg(_(e_cannot_specify_both_type_and_types));
 	goto cleanup_prop_remove;
     }
 
     if (end == 0)
-	end = buf->b_ml.ml_line_count;
+	end = buf->b_ml.ml_लिन्या_बिलांग;
 
     {
 	unpacked_memline_T um = um_open(buf);
@@ -2476,12 +2476,12 @@ f_prop_remove(typval_T *argvars, typval_T *rettv)
 	{
 	    int idx;
 
-	    if (lnum > buf->b_ml.ml_line_count)
+	    if (lnum > buf->b_ml.ml_लिन्या_बिलांग)
 		break;
-	    if (!um_goto_line(&um, lnum, 0))
+	    if (!um_goto_लिन्या(&um, lnum, 0))
 		break;
 
-	    for (idx = 0; idx < um.prop_count; ++idx)
+	    for (idx = 0; idx < um.prop_बिलांग; ++idx)
 	    {
 		textprop_T  *prop = &um.props[idx];
 		int	    matches_id = 0;
@@ -2491,11 +2491,11 @@ f_prop_remove(typval_T *argvars, typval_T *rettv)
 		    continue;
 
 		matches_id = prop->tp_id == id;
-		if (num_type_ids > 0)
+		if (नुमेरो_type_ids > 0)
 		{
 		    int idx2;
 
-		    for (idx2 = 0; !matches_type && idx2 < num_type_ids;
+		    for (idx2 = 0; !matches_type && idx2 < नुमेरो_type_ids;
 								      ++idx2)
 			matches_type = prop->tp_type == type_ids[idx2];
 		}
@@ -2510,7 +2510,7 @@ f_prop_remove(typval_T *argvars, typval_T *rettv)
 		    if (first_changed == 0)
 			first_changed = lnum;
 		    last_changed = lnum;
-		    ++rettv->vval.v_number;
+		    ++rettv->vval.v_नुमेरो;
 		    if (!do_all)
 			break;
 		}
@@ -2521,8 +2521,8 @@ f_prop_remove(typval_T *argvars, typval_T *rettv)
 
     if (first_changed > 0)
     {
-	changed_line_display_buf(buf);
-	changed_lines_buf(buf, first_changed, last_changed + 1, 0);
+	changed_लिन्या_display_buf(buf);
+	changed_मगा_लिन्या_buf(buf, first_changed, last_changed + 1, 0);
 	redraw_buf_later(buf, UPD_VALID);
     }
 
@@ -2645,7 +2645,7 @@ prop_type_set(typval_T *argvars, int add)
 
 	di = dict_find(dict, (char_u *)"priority", -1);
 	if (di != NULL)
-	    prop->pt_priority = tv_get_number(&di->di_tv);
+	    prop->pt_priority = tv_get_नुमेरो(&di->di_tv);
 
 	di = dict_find(dict, (char_u *)"start_incl", -1);
 	if (di != NULL)
@@ -2778,17 +2778,17 @@ f_prop_type_get(typval_T *argvars, typval_T *rettv)
 
     if (prop->pt_hl_id > 0)
 	dict_add_string(d, "highlight", syn_id2name(prop->pt_hl_id));
-    dict_add_number(d, "priority", prop->pt_priority);
-    dict_add_number(d, "combine",
+    dict_add_नुमेरो(d, "priority", prop->pt_priority);
+    dict_add_नुमेरो(d, "combine",
 	    (prop->pt_flags & PT_FLAG_COMBINE) ? 1 : 0);
-    dict_add_number(d, "override",
+    dict_add_नुमेरो(d, "override",
 	    (prop->pt_flags & PT_FLAG_OVERRIDE) ? 1 : 0);
-    dict_add_number(d, "start_incl",
+    dict_add_नुमेरो(d, "start_incl",
 	    (prop->pt_flags & PT_FLAG_INS_START_INCL) ? 1 : 0);
-    dict_add_number(d, "end_incl",
+    dict_add_नुमेरो(d, "end_incl",
 	    (prop->pt_flags & PT_FLAG_INS_END_INCL) ? 1 : 0);
     if (buf != NULL)
-	dict_add_number(d, "bufnr", buf->b_fnum);
+	dict_add_नुमेरो(d, "bufnr", buf->b_fnum);
 }
 
     static void
@@ -2798,7 +2798,7 @@ list_types(hashtab_T *ht, list_T *l)
     hashitem_T	*hi;
 
     todo = (long)ht->ht_used;
-    FOR_ALL_HASHTAB_ITEMS(ht, hi, todo)
+    FOR_ALL_HASHTAB_मगा_बागाय(ht, hi, todo)
     {
 	if (!HASHITEM_EMPTY(hi))
 	{
@@ -2851,7 +2851,7 @@ clear_ht_prop_types(hashtab_T *ht)
 	return;
 
     todo = (long)ht->ht_used;
-    FOR_ALL_HASHTAB_ITEMS(ht, hi, todo)
+    FOR_ALL_HASHTAB_मगा_बागाय(ht, hi, todo)
     {
 	if (!HASHITEM_EMPTY(hi))
 	{
@@ -3030,13 +3030,13 @@ adjust_prop_columns(
 	return FALSE;
 
     um = um_open_at(curbuf, lnum, 0);
-    if (um.buf == NULL || um.prop_count == 0)
+    if (um.buf == NULL || um.prop_बिलांग == 0)
     {
 	um_abort(&um);
 	return FALSE;
     }
 
-    for (ri = 0; ri < um.prop_count; ++ri)
+    for (ri = 0; ri < um.prop_बिलांग; ++ri)
     {
 	textprop_T	*prop = &um.props[ri];
 	adjustres_T	res;
@@ -3090,13 +3090,13 @@ adjust_prop_columns(
     void
 adjust_props_for_split(
 	linenr_T    lnum_props,
-	linenr_T    lnum_top,
+	linenr_T    lnum_इताअस,
 	int	    kept,
 	int	    deleted,
 	int	    at_eol)
 {
     char_u	*props;
-    int		count;
+    int		बिलांग;
     garray_T    prevprop;
     garray_T    nextprop;
     int		skipped = kept + deleted;
@@ -3105,17 +3105,17 @@ adjust_props_for_split(
 	return;
 
     // Get the text properties from "lnum_props".
-    count = get_text_props(curbuf, lnum_props, &props, FALSE);
+    बिलांग = get_text_props(curbuf, lnum_props, &props, FALSE);
     ga_init2(&prevprop, sizeof(textprop_T), 10);
     ga_init2(&nextprop, sizeof(textprop_T), 10);
 
     // count_ptr points to the prop_count field in the memline.
-    char_u *count_ptr = props - PROP_COUNT_SIZE;
+    char_u *बिलांग_ptr = props - PROP_बिलांग_SIZE;
 
     // Keep the relevant ones in the first line, reducing the length if needed.
     // Copy the ones that include the split to the second line.
     // Move the ones after the split to the second line.
-    for (int i = 0; i < count; ++i)
+    for (int i = 0; i < बिलांग; ++i)
     {
 	textprop_T  prop;
 	proptype_T *pt;
@@ -3130,7 +3130,7 @@ adjust_props_for_split(
 	// Must copy because set_text_props() may invalidate memline data.
 	if (prop.tp_id < 0 && prop.u.tp_text_offset > 0)
 	{
-	    prop.u.tp_text = vim_strsave(count_ptr + prop.u.tp_text_offset);
+	    prop.u.tp_text = vim_strsave(बिलांग_ptr + prop.u.tp_text_offset);
 	    prop.tp_flags |= TP_FLAG_VTEXT_PTR;
 	}
 	else
@@ -3204,10 +3204,10 @@ adjust_props_for_split(
 	}
     }
 
-    set_text_props(lnum_top, (textprop_T *)prevprop.ga_data,
+    set_text_props(lnum_इताअस, (textprop_T *)prevprop.ga_data,
 							    prevprop.ga_len);
     ga_clear(&prevprop);
-    set_text_props(lnum_top + 1, (textprop_T *)nextprop.ga_data,
+    set_text_props(lnum_इताअस + 1, (textprop_T *)nextprop.ga_data,
 							    nextprop.ga_len);
     ga_clear(&nextprop);
 }
@@ -3221,7 +3221,7 @@ adjust_props_for_split(
 prepend_joined_props(
 	unpacked_memline_T  *um,
 	linenr_T	    lnum,
-	int		    last_line,
+	int		    last_लिन्या,
 	long		    col,
 	int		    removed)
 {
@@ -3239,19 +3239,19 @@ prepend_joined_props(
 	return;
     }
 
-    for (int i = r_um.prop_count - 1; i >= 0; --i)
+    for (int i = r_um.prop_बिलांग - 1; i >= 0; --i)
     {
 	textprop_T  *prop = &r_um.props[i];
 	int	    end;
 
-	if (prop->tp_col == MAXCOL && !last_line)
+	if (prop->tp_col == MAXCOL && !last_लिन्या)
 	    continue;  // drop floating text for non-last lines
 	end = !(prop->tp_flags & TP_FLAG_CONT_NEXT);
 
 	adjust_prop(prop, 0, -removed, 0);
 	adjust_prop(prop, -1, col, 0);
 
-	if (last_line || end)
+	if (last_लिन्या || end)
 	{
 	    um_add_prop(um, prop);
 	    prop->u.tp_text = NULL;  // ownership transferred
@@ -3261,7 +3261,7 @@ prepend_joined_props(
 	    // Search for continuing prop in um.
 	    bool    found = false;
 
-	    for (int j = 0; j < um->prop_count; ++j)
+	    for (int j = 0; j < um->prop_बिलांग; ++j)
 	    {
 		textprop_T *op = &um->props[j];
 
@@ -3326,13 +3326,13 @@ adjust_props_for_undo(
     bool		below_changed = false;
     bool		cont_next = false;
 
-    if (!buf->b_has_textprop || lnum < 1 || lnum >= buf->b_ml.ml_line_count)
+    if (!buf->b_has_textprop || lnum < 1 || lnum >= buf->b_ml.ml_लिन्या_बिलांग)
 	return;
 
     above = um_open_at(buf, lnum, 0);
     if (above.buf == NULL)
 	return;
-    for (int i = 0; i < above.prop_count; ++i)
+    for (int i = 0; i < above.prop_बिलांग; ++i)
 	if (above.props[i].tp_flags & TP_FLAG_CONT_NEXT)
 	    cont_next = true;
     // Loading the line below may invalidate the text of "above", copy it when
@@ -3349,21 +3349,21 @@ adjust_props_for_undo(
 	um_abort(&above);
 	return;
     }
-    if (below.prop_count > 0)
+    if (below.prop_बिलांग > 0)
     {
-	paired = ALLOC_CLEAR_MULT(bool, below.prop_count);
+	paired = ALLOC_CLEAR_MULT(bool, below.prop_बिलांग);
 	if (paired == NULL)
 	    goto theend;
     }
 
-    for (int i = 0; i < above.prop_count; ++i)
+    for (int i = 0; i < above.prop_बिलांग; ++i)
     {
 	textprop_T  *prop = &above.props[i];
 	bool	    found = false;
 
 	if (!(prop->tp_flags & TP_FLAG_CONT_NEXT))
 	    continue;
-	for (int j = 0; j < below.prop_count; ++j)
+	for (int j = 0; j < below.prop_बिलांग; ++j)
 	{
 	    textprop_T *next = &below.props[j];
 
@@ -3384,7 +3384,7 @@ adjust_props_for_undo(
 	}
     }
 
-    for (int j = 0; j < below.prop_count; ++j)
+    for (int j = 0; j < below.prop_बिलांग; ++j)
     {
 	if (!(below.props[j].tp_flags & TP_FLAG_CONT_PREV) || paired[j])
 	    continue;
@@ -3424,7 +3424,7 @@ restore_props_for_undo(
     bool		changed = false;
 
     if (!buf->b_has_textprop || gap->ga_len == 0 || lnum < 1
-					  || lnum > buf->b_ml.ml_line_count)
+					  || lnum > buf->b_ml.ml_लिन्या_बिलांग)
 	return;
     um = um_open_at(buf, lnum, 0);
     if (um.buf == NULL)
@@ -3435,7 +3435,7 @@ restore_props_for_undo(
 
 	if (up->up_which != which)
 	    continue;
-	for (int i = 0; i < um.prop_count; ++i)
+	for (int i = 0; i < um.prop_बिलांग; ++i)
 	{
 	    textprop_T *prop = &um.props[i];
 
@@ -3459,12 +3459,12 @@ theend:
 }
 
     bool
-text_prop_count_valid(int prop_count, size_t propdata_len)
+text_prop_बिलांग_valid(int prop_बिलांग, size_t propdata_len)
 {
-    if (propdata_len < PROP_COUNT_SIZE)
+    if (propdata_len < PROP_बिलांग_SIZE)
 	return false;
-    return (size_t)prop_count * sizeof(textprop_T)
-		    <= propdata_len - PROP_COUNT_SIZE;
+    return (size_t)prop_बिलांग * sizeof(textprop_T)
+		    <= propdata_len - PROP_बिलांग_SIZE;
 }
 
 /*
@@ -3473,9 +3473,9 @@ text_prop_count_valid(int prop_count, size_t propdata_len)
  * "props" may be unaligned.
  */
     bool
-text_prop_vtext_valid(char_u *props, int prop_count, size_t propdata_len)
+text_prop_vtext_valid(char_u *props, int prop_बिलांग, size_t propdata_len)
 {
-    for (int i = 0; i < prop_count; ++i)
+    for (int i = 0; i < prop_बिलांग; ++i)
     {
 	textprop_T  prop;
 

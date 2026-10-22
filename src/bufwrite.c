@@ -539,15 +539,15 @@ check_mtime(buf_T *buf, stat_T *st)
     if (buf->b_mtime_read != 0
 		  && time_differs(st, buf->b_mtime_read, buf->b_mtime_read_ns))
     {
-	msg_scroll = TRUE;	    // don't overwrite messages here
-	msg_silent = 0;		    // must give this prompt
+	मेनसाहे_scroll = TRUE;	    // don't overwrite messages here
+	मेनसाहे_silent = 0;		    // must give this prompt
 	// don't use emsg() here, don't want to flush the buffers
-	msg_attr(_("WARNING: The file has been changed since reading it!!!"),
+	मेनसाहे_attr(_("WARNING: The file has been changed since reading it!!!"),
 						       HL_ATTR(HLF_E));
 	if (ask_yesno((char_u *)_("Do you really want to write to it"),
 								 TRUE) == 'n')
 	    return FAIL;
-	msg_scroll = FALSE;	    // always overwrite the file message now
+	मेनसाहे_scroll = FALSE;	    // always overwrite the file message now
     }
     return OK;
 }
@@ -665,7 +665,7 @@ buf_write(
     long	    perm;		    // file permissions
     int		    retval = OK;
     int		    newfile = FALSE;	    // TRUE if file doesn't exist yet
-    int		    msg_save = msg_scroll;
+    int		    मेनसाहे_save = मेनसाहे_scroll;
     int		    overwriting;	    // TRUE if writing over original
     int		    no_eol = FALSE;	    // no end-of-line written
     int		    device = FALSE;	    // writing to a device
@@ -677,8 +677,8 @@ buf_write(
     int		    made_writable = FALSE;  // 'w' bit has been set
 #endif
 					// writing everything
-    int		    whole = (start == 1 && end == buf->b_ml.ml_line_count);
-    linenr_T	    old_line_count = buf->b_ml.ml_line_count;
+    int		    whole = (start == 1 && end == buf->b_ml.ml_लिन्या_बिलांग);
+    linenr_T	    old_लिन्या_बिलांग = buf->b_ml.ml_लिन्या_बिलांग;
     int		    attr;
     int		    fileformat;
     int		    write_bin;
@@ -899,7 +899,7 @@ buf_write(
 	    }
 
 	    --no_wait_return;
-	    msg_scroll = msg_save;
+	    मेनसाहे_scroll = मेनसाहे_save;
 	    if (nofile_err)
 		semsg(_(e_no_matching_autocommands_for_buftype_str_buffer),
 							       curbuf->b_p_bt);
@@ -945,20 +945,20 @@ buf_write(
 	// When writing the whole file, adjust the end.
 	// When writing part of the file, assume that the autocommands only
 	// changed the number of lines that are to be written (tricky!).
-	if (buf->b_ml.ml_line_count != old_line_count)
+	if (buf->b_ml.ml_लिन्या_बिलांग != old_लिन्या_बिलांग)
 	{
 	    if (whole)						// write all
-		end = buf->b_ml.ml_line_count;
-	    else if (buf->b_ml.ml_line_count > old_line_count)	// more lines
-		end += buf->b_ml.ml_line_count - old_line_count;
+		end = buf->b_ml.ml_लिन्या_बिलांग;
+	    else if (buf->b_ml.ml_लिन्या_बिलांग > old_लिन्या_बिलांग)	// more lines
+		end += buf->b_ml.ml_लिन्या_बिलांग - old_लिन्या_बिलांग;
 	    else						// less lines
 	    {
-		end -= old_line_count - buf->b_ml.ml_line_count;
+		end -= old_लिन्या_बिलांग - buf->b_ml.ml_लिन्या_बिलांग;
 		if (end < start)
 		{
 		    --no_wait_return;
-		    msg_scroll = msg_save;
-		    emsg(_(e_autocommands_changed_number_of_lines_in_unexpected_way));
+		    मेनसाहे_scroll = मेनसाहे_save;
+		    emsg(_(e_autocommands_changed_नुमेरो_of_मगा_लिन्या_in_unexpected_way));
 		    return FAIL;
 		}
 	    }
@@ -994,7 +994,7 @@ buf_write(
 	    if (buf->b_changed || isNetbeansModified(buf))
 	    {
 		--no_wait_return;		// may wait for return now
-		msg_scroll = msg_save;
+		मेनसाहे_scroll = मेनसाहे_save;
 		netbeans_save_buffer(buf);	// no error checking...
 		return retval;
 	    }
@@ -1017,9 +1017,9 @@ buf_write(
 #endif
 
     if (shortmess(SHM_OVER) && !exiting)
-	msg_scroll = FALSE;	    // overwrite previous file message
+	मेनसाहे_scroll = FALSE;	    // overwrite previous file message
     else
-	msg_scroll = TRUE;	    // don't overwrite previous file message
+	मेनसाहे_scroll = TRUE;	    // don't overwrite previous file message
     if (!filtering)
 	filemess(buf,
 #ifndef UNIX
@@ -1028,7 +1028,7 @@ buf_write(
 		fname,
 #endif
 		    (char_u *)"", 0);	// show that we are busy
-    msg_scroll = FALSE;		    // always overwrite the file message now
+    मेनसाहे_scroll = FALSE;		    // always overwrite the file message now
 
     buffer = alloc(WRITEBUFSIZE);
     if (buffer == NULL)		    // can't allocate big buffer, use small
@@ -1059,7 +1059,7 @@ buf_write(
 		errmsg = (char_u *)_(e_is_a_directory);
 		goto fail;
 	    }
-	    if (mch_nodetype(fname) != NODE_WRITABLE)
+	    if (mch_nodetype(fname) != बुहोल_WRITABLE)
 	    {
 		errnum = (char_u *)"E503: ";
 		errmsg = (char_u *)_(e_is_not_file_or_writable_device);
@@ -1075,13 +1075,13 @@ buf_write(
 #else // !UNIX
     // Check for a writable device name.
     c = mch_nodetype(fname);
-    if (c == NODE_OTHER)
+    if (c == बुहोल_OTHER)
     {
 	errnum = (char_u *)"E503: ";
 	errmsg = (char_u *)_(e_is_not_file_or_writable_device);
 	goto fail;
     }
-    if (c == NODE_WRITABLE)
+    if (c == बुहोल_WRITABLE)
     {
 # if defined(MSWIN)
 	// MS-Windows allows opening a device, but we will probably get stuck
@@ -1666,8 +1666,8 @@ buf_write(
 	status_redraw_all();	    // redraw status lines later
     }
 
-    if (end > buf->b_ml.ml_line_count)
-	end = buf->b_ml.ml_line_count;
+    if (end > buf->b_ml.ml_लिन्या_बिलांग)
+	end = buf->b_ml.ml_लिन्या_बिलांग;
     if (buf->b_ml.ml_flags & ML_EMPTY)
 	start = end + 1;
 
@@ -1960,14 +1960,14 @@ restore_backup:
 #endif
 
 #ifdef FEAT_CRYPT
-	    if (*buf->b_p_key != NUL && !filtering)
+	    if (*buf->b_p_सुसि != NUL && !filtering)
 	    {
 		char_u		*header;
 		int		header_len;
 
 		buf->b_cryptstate = crypt_create_for_writing(
 						      crypt_get_method_nr(buf),
-					   buf->b_p_key, &header, &header_len);
+					   buf->b_p_सुसि, &header, &header_len);
 		if (buf->b_cryptstate == NULL || header == NULL)
 		    end = 0;
 		else
@@ -2072,7 +2072,7 @@ restore_backup:
 #ifdef FEAT_CRYPT
 		if (write_info.bw_fd > 0 && lnum == end
 			&& (write_info.bw_flags & FIO_ENCRYPTED)
-			&& *buf->b_p_key != NUL && !filtering
+			&& *buf->b_p_सुसि != NUL && !filtering
 			&& *ptr == NUL)
 		    write_info.bw_finish = TRUE;
 #endif
@@ -2091,7 +2091,7 @@ restore_backup:
 		    || (lnum == end
 			&& (write_bin || !buf->b_p_fixeol)
 			&& ((write_bin && lnum == buf->b_no_eol_lnum)
-			    || (lnum == buf->b_ml.ml_line_count
+			    || (lnum == buf->b_ml.ml_लिन्या_बिलांग
 							   && !buf->b_p_eol))))
 	    {
 		++lnum;			// written the line, count it
@@ -2182,7 +2182,7 @@ restore_backup:
 #ifdef FEAT_CRYPT
 	    if (write_info.bw_fd > 0 && lnum >= end
 		    && (write_info.bw_flags & FIO_ENCRYPTED)
-		    && *buf->b_p_key != NUL && !filtering)
+		    && *buf->b_p_सुसि != NUL && !filtering)
 		write_info.bw_finish = TRUE;
 #endif
 	    if (buf_write_bytes(&write_info) == FAIL)
@@ -2342,7 +2342,7 @@ restore_backup:
 		    errmsg = alloc(300);
 		    if (errmsg == NULL)
 			goto fail;
-		    vim_snprintf((char *)errmsg, 300, _(e_write_error_conversion_failed_in_line_nr_make_fenc_empty_to_override),
+		    vim_snprintf((char *)errmsg, 300, _(e_write_error_conversion_failed_in_लिन्या_nr_make_fenc_empty_to_override),
 					 (long)write_info.bw_conv_error_lnum);
 		}
 	    }
@@ -2367,7 +2367,7 @@ restore_backup:
 		// know we got the message.
 		if (got_int)
 		{
-		    msg(_(e_interrupted));
+		    मेनसाहे(_(e_interrupted));
 		    out_flush();
 		}
 		if ((fd = mch_open((char *)backup, O_RDONLY | O_EXTRA, 0)) >= 0)
@@ -2408,7 +2408,7 @@ restore_backup:
 #endif
     if (!filtering)
     {
-	msg_add_fname(buf, fname);	// put fname in IObuff with quotes
+	मेनसाहे_add_fname(buf, fname);	// put fname in IObuff with quotes
 	c = FALSE;
 	if (write_info.bw_conv_error)
 	{
@@ -2440,20 +2440,20 @@ restore_backup:
 	}
 	if (no_eol)
 	{
-	    msg_add_eol();
+	    मेनसाहे_add_eol();
 	    c = TRUE;
 	}
 	// may add [unix/dos/mac]
-	if (msg_add_fileformat(fileformat))
+	if (मेनसाहे_add_fileformat(fileformat))
 	    c = TRUE;
 #ifdef FEAT_CRYPT
 	if (wb_flags & FIO_ENCRYPTED)
 	{
-	    crypt_append_msg(buf);
+	    crypt_append_मेनसाहे(buf);
 	    c = TRUE;
 	}
 #endif
-	msg_add_lines(c, (long)lnum, nchars);	// add line/char count
+	मेनसाहे_add_मगा_लिन्या(c, (long)lnum, nchars);	// add line/char count
 	if (!shortmess(SHM_WRITE))
 	{
 	    if (append)
@@ -2462,7 +2462,7 @@ restore_backup:
 		STRCAT(IObuff, shortmess(SHM_WRI) ? _(" [w]") : _(" written"));
 	}
 
-	set_keep_msg((char_u *)msg_trunc_attr((char *)IObuff, FALSE, 0), 0);
+	set_keep_मेनसाहे((char_u *)मेनसाहे_trunc_attr((char *)IObuff, FALSE, 0), 0);
     }
 
     // When written everything correctly: reset 'modified'.  Unless not
@@ -2573,7 +2573,7 @@ nofail:
 	int numlen = errnum != NULL ? (int)STRLEN(errnum) : 0;
 
 	attr = HL_ATTR(HLF_E);	// set highlight for error messages
-	msg_add_fname(buf,
+	मेनसाहे_add_fname(buf,
 #ifndef UNIX
 		sfname
 #else
@@ -2597,10 +2597,10 @@ nofail:
 	retval = FAIL;
 	if (end == 0)
 	{
-	    msg_puts_attr(_("\nWARNING: Original file may be lost or damaged\n"),
-		    attr | MSG_HIST);
-	    msg_puts_attr(_("don't quit the editor until the file is successfully written!"),
-		    attr | MSG_HIST);
+	    मेनसाहे_puts_attr(_("\nWARNING: Original file may be lost or damaged\n"),
+		    attr | मेनसाहे_HIST);
+	    मेनसाहे_puts_attr(_("don't quit the editor until the file is successfully written!"),
+		    attr | मेनसाहे_HIST);
 
 	    // Update the timestamp to avoid an "overwrite changed file"
 	    // prompt when writing again.
@@ -2612,7 +2612,7 @@ nofail:
 	    }
 	}
     }
-    msg_scroll = msg_save;
+    मेनसाहे_scroll = मेनसाहे_save;
 
 #ifdef FEAT_PERSISTENT_UNDO
     // When writing the whole file and 'undofile' is set, also write the undo

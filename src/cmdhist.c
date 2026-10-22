@@ -13,9 +13,9 @@
 
 #include "vim.h"
 
-static histentry_T *(history[HIST_COUNT]) = {NULL, NULL, NULL, NULL, NULL};
-static int	hisidx[HIST_COUNT] = {-1, -1, -1, -1, -1};  // lastused entry
-static int	hisnum[HIST_COUNT] = {0, 0, 0, 0, 0};
+static histentry_T *(history[HIST_बिलांग]) = {NULL, NULL, NULL, NULL, NULL};
+static int	hisidx[HIST_बिलांग] = {-1, -1, -1, -1, -1};  // lastused entry
+static int	hisnum[HIST_बिलांग] = {0, 0, 0, 0, 0};
 		    // identifying (unique) number of newest history entry
 static int	hislen = 0;		// actual length of history tables
 
@@ -68,12 +68,12 @@ hist_char2type(int c)
     if (c == ':')
 	return HIST_CMD;
     if (c == '=')
-	return HIST_EXPR;
+	return HIST_पाहायाग;
     if (c == '@')
-	return HIST_INPUT;
+	return HIST_पासोक;
     if (c == '>')
 	return HIST_DEBUG;
-    return HIST_SEARCH;	    // must be '?' or '/'
+    return HIST_हानाप;	    // must be '?' or '/'
 }
 
 /*
@@ -100,18 +100,18 @@ static char *(history_names[]) =
 get_history_arg(expand_T *xp UNUSED, int idx)
 {
     char    *short_names = ":=@>?/";
-    int	    short_names_count = (int)STRLEN(short_names);
-    int	    history_name_count = ARRAY_LENGTH(history_names) - 1;
+    int	    short_names_बिलांग = (int)STRLEN(short_names);
+    int	    history_name_बिलांग = ARRAY_LENGTH(history_names) - 1;
 
-    if (idx < short_names_count)
+    if (idx < short_names_बिलांग)
     {
 	xp->xp_buf[0] = (char_u)short_names[idx];
 	xp->xp_buf[1] = NUL;
 	return xp->xp_buf;
     }
-    if (idx < short_names_count + history_name_count)
-	return (char_u *)history_names[idx - short_names_count];
-    if (idx == short_names_count + history_name_count)
+    if (idx < short_names_बिलांग + history_name_बिलांग)
+	return (char_u *)history_names[idx - short_names_बिलांग];
+    if (idx == short_names_बिलांग + history_name_बिलांग)
 	return (char_u *)"all";
     return NULL;
 }
@@ -133,7 +133,7 @@ init_history(void)
 	return;
 
     // history length changed
-    for (type = 0; type < HIST_COUNT; ++type)   // adjust the tables
+    for (type = 0; type < HIST_बिलांग; ++type)   // adjust the tables
     {
 	if (newlen > 0)
 	{
@@ -243,7 +243,7 @@ in_history(
 	p = history[type][i].hisstr;
 	if (STRCMP(str, p) == 0
 		&& !(writing && history[type][i].viminfo)
-		&& (type != HIST_SEARCH || sep == p[history[type][i].hisstrlen + 1]))
+		&& (type != HIST_हानाप || sep == p[history[type][i].hisstrlen + 1]))
 	{
 	    if (!move_to_front)
 		return TRUE;
@@ -319,23 +319,23 @@ add_to_history(
     if (hislen == 0)		// no history
 	return;
 
-    if ((cmdmod.cmod_flags & CMOD_KEEPPATTERNS) && histype == HIST_SEARCH)
+    if ((cmdmod.cmod_flags & CMOD_KEEPPATTERNS) && histype == HIST_हानाप)
 	return;
 
     // Searches inside the same mapping overwrite each other, so that only
     // the last line is kept.  Be careful not to remove a line that was moved
     // down, only lines that were added.
-    if (histype == HIST_SEARCH && in_map)
+    if (histype == HIST_हानाप && in_map)
     {
-	if (maptick == last_maptick && hisidx[HIST_SEARCH] >= 0)
+	if (maptick == last_maptick && hisidx[HIST_हानाप] >= 0)
 	{
 	    // Current line is from the same mapping, remove it
-	    hisptr = &history[HIST_SEARCH][hisidx[HIST_SEARCH]];
+	    hisptr = &history[HIST_हानाप][hisidx[HIST_हानाप]];
 	    vim_free(hisptr->hisstr);
 	    clear_hist_entry(hisptr);
 	    --hisnum[histype];
-	    if (--hisidx[HIST_SEARCH] < 0)
-		hisidx[HIST_SEARCH] = hislen - 1;
+	    if (--hisidx[HIST_हानाप] < 0)
+		hisidx[HIST_हानाप] = hislen - 1;
 	}
 	last_maptick = -1;
     }
@@ -361,7 +361,7 @@ add_to_history(
     hisptr->hisnum = ++hisnum[histype];
     hisptr->viminfo = FALSE;
     hisptr->time_set = vim_time();
-    if (histype == HIST_SEARCH && in_map)
+    if (histype == HIST_हानाप && in_map)
 	last_maptick = maptick;
 }
 
@@ -374,7 +374,7 @@ add_to_history(
     static int
 get_history_idx(int histype)
 {
-    if (hislen == 0 || histype < 0 || histype >= HIST_COUNT
+    if (hislen == 0 || histype < 0 || histype >= HIST_बिलांग
 		    || hisidx[histype] < 0)
 	return -1;
 
@@ -388,20 +388,20 @@ get_history_idx(int histype)
  * "histype" may be one of the HIST_ values.
  */
     static int
-calc_hist_idx(int histype, int num)
+calc_hist_idx(int histype, int नुमेरो)
 {
     int		i;
     histentry_T	*hist;
     int		wrapped = FALSE;
 
-    if (hislen == 0 || histype < 0 || histype >= HIST_COUNT
-		    || (i = hisidx[histype]) < 0 || num == 0)
+    if (hislen == 0 || histype < 0 || histype >= HIST_बिलांग
+		    || (i = hisidx[histype]) < 0 || नुमेरो == 0)
 	return -1;
 
     hist = history[histype];
-    if (num > 0)
+    if (नुमेरो > 0)
     {
-	while (hist[i].hisnum > num)
+	while (hist[i].hisnum > नुमेरो)
 	    if (--i < 0)
 	    {
 		if (wrapped)
@@ -409,12 +409,12 @@ calc_hist_idx(int histype, int num)
 		i += hislen;
 		wrapped = TRUE;
 	    }
-	if (i >= 0 && hist[i].hisnum == num && hist[i].hisstr != NULL)
+	if (i >= 0 && hist[i].hisnum == नुमेरो && hist[i].hisstr != NULL)
 	    return i;
     }
-    else if (-num <= hislen)
+    else if (-नुमेरो <= hislen)
     {
-	i += num + 1;
+	i += नुमेरो + 1;
 	if (i < 0)
 	    i += hislen;
 	if (hist[i].hisstr != NULL)
@@ -433,7 +433,7 @@ clr_history(int histype)
     int		i;
     histentry_T	*hisptr;
 
-    if (hislen != 0 && histype >= 0 && histype < HIST_COUNT)
+    if (hislen != 0 && histype >= 0 && histype < HIST_बिलांग)
     {
 	hisptr = history[histype];
 	for (i = hislen; i--;)
@@ -463,7 +463,7 @@ del_history_entry(int histype, char_u *str)
     int		last;
     int		found = FALSE;
 
-    if (hislen == 0 || histype < 0 || histype >= HIST_COUNT || *str == NUL
+    if (hislen == 0 || histype < 0 || histype >= HIST_बिलांग || *str == NUL
 		|| hisidx[histype] < 0)
 	return FALSE;
 
@@ -525,7 +525,7 @@ del_history_idx(int histype, int idx)
 
     // When deleting the last added search string in a mapping, reset
     // last_maptick, so that the last added search string isn't deleted again.
-    if (histype == HIST_SEARCH && maptick == last_maptick && i == idx)
+    if (histype == HIST_हानाप && maptick == last_maptick && i == idx)
 	last_maptick = -1;
 
     while (i != idx)
@@ -551,7 +551,7 @@ f_histadd(typval_T *argvars UNUSED, typval_T *rettv)
     char_u	*str;
     char_u	buf[NUMBUFLEN];
 
-    rettv->vval.v_number = FALSE;
+    rettv->vval.v_नुमेरो = FALSE;
     if (check_secure())
 	return;
 
@@ -571,7 +571,7 @@ f_histadd(typval_T *argvars UNUSED, typval_T *rettv)
 
     init_history();
     add_to_history(histype, str, STRLEN(str), FALSE, NUL);
-    rettv->vval.v_number = TRUE;
+    rettv->vval.v_नुमेरो = TRUE;
 }
 
 /*
@@ -585,7 +585,7 @@ f_histdel(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
 
     if (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
-		|| check_for_opt_string_or_number_arg(argvars, 1) == FAIL))
+		|| check_for_opt_string_or_नुमेरो_arg(argvars, 1) == FAIL))
 	return;
 
     str = tv_get_string_chk(&argvars[0]);	// NULL on type error
@@ -594,10 +594,10 @@ f_histdel(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
     else if (argvars[1].v_type == VAR_UNKNOWN)
 	// only one argument: clear entire history
 	n = clr_history(get_histtype(str));
-    else if (argvars[1].v_type == VAR_NUMBER)
+    else if (argvars[1].v_type == VAR_नुमेरो)
 	// index given: remove that entry
 	n = del_history_idx(get_histtype(str),
-					  (int)tv_get_number(&argvars[1]));
+					  (int)tv_get_नुमेरो(&argvars[1]));
     else
     {
 	char_u	buf[NUMBUFLEN];
@@ -607,7 +607,7 @@ f_histdel(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
 				      tv_get_string_buf(&argvars[1], buf));
     }
 
-    rettv->vval.v_number = n;
+    rettv->vval.v_नुमेरो = n;
 }
 
 /*
@@ -620,7 +620,7 @@ f_histget(typval_T *argvars UNUSED, typval_T *rettv)
 
     if (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
-		|| check_for_opt_number_arg(argvars, 1) == FAIL))
+		|| check_for_opt_नुमेरो_arg(argvars, 1) == FAIL))
 	return;
 
     str = tv_get_string_chk(&argvars[0]);	// NULL on type error
@@ -635,7 +635,7 @@ f_histget(typval_T *argvars UNUSED, typval_T *rettv)
 	if (argvars[1].v_type == VAR_UNKNOWN)
 	    idx = get_history_idx(type);
 	else
-	    idx = (int)tv_get_number_chk(&argvars[1], NULL);
+	    idx = (int)tv_get_नुमेरो_chk(&argvars[1], NULL);
 						    // -1 on type error
 
 	idx = calc_hist_idx(type, idx);
@@ -661,10 +661,10 @@ f_histnr(typval_T *argvars UNUSED, typval_T *rettv)
 
     histname = tv_get_string_chk(&argvars[0]);
     i = histname == NULL ? HIST_CMD - 1 : get_histtype(histname);
-    if (i >= HIST_CMD && i < HIST_COUNT)
-	rettv->vval.v_number = get_history_idx(i);
+    if (i >= HIST_CMD && i < HIST_बिलांग)
+	rettv->vval.v_नुमेरो = get_history_idx(i);
     else
-	rettv->vval.v_number = -1;
+	rettv->vval.v_नुमेरो = -1;
 }
 #endif // FEAT_EVAL
 
@@ -674,7 +674,7 @@ f_histnr(typval_T *argvars UNUSED, typval_T *rettv)
  * history.
  */
     void
-remove_key_from_history(void)
+remove_सुसि_from_history(void)
 {
     char_u	*p_start;
     char_u	*p_end;
@@ -729,7 +729,7 @@ ex_history(exarg_T *eap)
 
     if (hislen == 0)
     {
-	msg(_("'history' option is zero"));
+	मेनसाहे(_("'history' option is zero"));
 	return;
     }
 
@@ -747,7 +747,7 @@ ex_history(exarg_T *eap)
 	    if (STRNICMP(arg, "all", STRLEN(arg)) == 0)
 	    {
 		histype1 = 0;
-		histype2 = HIST_COUNT-1;
+		histype2 = HIST_बिलांग-1;
 	    }
 	    else
 	    {
@@ -774,7 +774,7 @@ ex_history(exarg_T *eap)
     for (; !got_int && histype1 <= histype2; ++histype1)
     {
 	vim_snprintf((char *)IObuff, IOSIZE, "\n      #  %s history", history_names[histype1]);
-	msg_puts_title((char *)IObuff);
+	मेनसाहे_puts_title((char *)IObuff);
 	idx = hisidx[histype1];
 	hist = history[histype1];
 	j = hisidx1;
@@ -794,7 +794,7 @@ ex_history(exarg_T *eap)
 		{
 		    int  len;
 
-		    msg_putchar('\n');
+		    मेनसाहे_putchar('\n');
 		    len = vim_snprintf((char *)IObuff, IOSIZE,
 				"%c%6d  ", i == idx ? '>' : ' ', hist[i].hisnum);
 		    if (vim_strsize(hist[i].hisstr) > (int)Columns - 10)
@@ -802,7 +802,7 @@ ex_history(exarg_T *eap)
 			     (int)Columns - 10, IOSIZE - (int)len);
 		    else
 			STRCPY(IObuff + len, hist[i].hisstr);
-		    msg_outtrans(IObuff);
+		    मेनसाहे_outtrans(IObuff);
 		    out_flush();
 		}
 		if (i == idx)

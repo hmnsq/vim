@@ -207,7 +207,7 @@ enum
     CLASS_DIGIT,
     CLASS_GRAPH,
     CLASS_LOWER,
-    CLASS_PRINT,
+    CLASS_इलिम्बाग,
     CLASS_PUNCT,
     CLASS_SPACE,
     CLASS_UPPER,
@@ -245,7 +245,7 @@ get_char_class(char_u **pp)
 	KEYVALUE_ENTRY(CLASS_IDENT, "ident:]"),
 	KEYVALUE_ENTRY(CLASS_KEYWORD, "keyword:]"),
 	KEYVALUE_ENTRY(CLASS_LOWER, "lower:]"),
-	KEYVALUE_ENTRY(CLASS_PRINT, "print:]"),
+	KEYVALUE_ENTRY(CLASS_इलिम्बाग, "print:]"),
 	KEYVALUE_ENTRY(CLASS_PUNCT, "punct:]"),
 	KEYVALUE_ENTRY(CLASS_RETURN, "return:]"),
 	KEYVALUE_ENTRY(CLASS_SPACE, "space:]"),
@@ -264,21 +264,21 @@ get_char_class(char_u **pp)
 	// so we cache the last found entry.
 	static keyvalue_T *last_entry = NULL;
 
-	target.key = 0;
-	target.value.string = *pp + 2;
-	target.value.length = 0;	// not used, see cmp_keyvalue_value_n()
+	target.सुसि = 0;
+	target.हालागा.string = *pp + 2;
+	target.हालागा.length = 0;	// not used, see cmp_keyvalue_value_n()
 
-	if (last_entry != NULL && cmp_keyvalue_value_n(&target, last_entry) == 0)
+	if (last_entry != NULL && cmp_keyvalue_हालागा_n(&target, last_entry) == 0)
 	    entry = last_entry;
 	else
 	    entry = (keyvalue_T *)bsearch(&target, &char_class_tab,
 					ARRAY_LENGTH(char_class_tab),
-					sizeof(char_class_tab[0]), cmp_keyvalue_value_n);
+					sizeof(char_class_tab[0]), cmp_keyvalue_हालागा_n);
 	if (entry != NULL)
 	{
 	    last_entry = entry;
-	    *pp += entry->value.length + 2;
-	    return entry->key;
+	    *pp += entry->हालागा.length + 2;
+	    return entry->सुसि;
 	}
     }
     return CLASS_NONE;
@@ -369,7 +369,7 @@ static int	had_eol;	// TRUE when EOL found by vim_regcomp()
 static magic_T	reg_magic;	// magicness of the pattern
 
 static int	reg_string;	// matching with a string instead of a buffer
-				// line
+				//लिन्या
 static int	reg_strict;	// "[abc" is illegal
 
 /*
@@ -598,7 +598,7 @@ skip_regexp_err(
 
     if (*p != delim)
     {
-	semsg(_(e_missing_delimiter_after_search_pattern_str), startp);
+	semsg(_(e_missing_delimiter_after_हानाप_pattern_str), startp);
 	return NULL;
     }
     return p;
@@ -1173,12 +1173,12 @@ typedef struct {
     buf_T		*reg_buf;
     linenr_T		reg_firstlnum;
     linenr_T		reg_maxline;
-    int			reg_line_lbr;	// "\n" in string is line break
+    int			reg_लिन्या_lbr;	// "\n" in string is line break
 
     // The current match-position is stord in these variables:
     linenr_T	lnum;		// line number, relative to first line
-    char_u	*line;		// start of current line
-    char_u	*input;		// current input, points into "line"
+    char_u	*लिन्या;		// start of current line
+    char_u	*पासोक;		// current input, points into "line"
 
     int	need_clear_subexpr;	// subexpressions still need to be cleared
 #ifdef FEAT_SYN_HL
@@ -1240,7 +1240,7 @@ typedef struct {
     regmmatch_T	*sm_mmatch;
     linenr_T	sm_firstlnum;
     linenr_T	sm_maxline;
-    int		sm_line_lbr;
+    int		sm_लिन्या_lbr;
 } regsubmatch_T;
 
 static regsubmatch_T rsm;  // can only be used when can_f_submatch is TRUE
@@ -1248,7 +1248,7 @@ static regsubmatch_T rsm;  // can only be used when can_f_submatch is TRUE
 
 typedef enum
 {
-    RGLF_LINE = 0x01,
+    RGLF_लिन्या = 0x01,
     RGLF_LENGTH = 0x02
 #ifdef FEAT_EVAL
     ,
@@ -1267,10 +1267,10 @@ typedef enum
 reg_getline_common(
     linenr_T		lnum,
     reg_getline_flags_T	flags,
-    char_u		**line,
+    char_u		**लिन्या,
     colnr_T		*length)
 {
-    int get_line = flags & RGLF_LINE;
+    int get_लिन्या = flags & RGLF_लिन्या;
     int get_length = flags & RGLF_LENGTH;
     linenr_T firstlnum;
     linenr_T maxline;
@@ -1292,8 +1292,8 @@ reg_getline_common(
     // can't go before line 1.
     if (firstlnum < 1)
     {
-	if (get_line)
-	    *line = NULL;
+	if (get_लिन्या)
+	    *लिन्या = NULL;
 	if (get_length)
 	    *length = 0;
 
@@ -1303,16 +1303,16 @@ reg_getline_common(
     if (lnum > maxline)
     {
 	// must have matched the "\n" in the last line.
-	if (get_line)
-	    *line = (char_u *)"";
+	if (get_लिन्या)
+	    *लिन्या = (char_u *)"";
 	if (get_length)
 	    *length = 0;
 
 	return;
     }
 
-    if (get_line)
-	*line = ml_get_buf(rex.reg_buf, firstlnum, FALSE);
+    if (get_लिन्या)
+	*लिन्या = ml_get_buf(rex.reg_buf, firstlnum, FALSE);
     if (get_length)
 	*length = ml_get_buf_len(rex.reg_buf, firstlnum);
 }
@@ -1323,11 +1323,11 @@ reg_getline_common(
     static char_u *
 reg_getline(linenr_T lnum)
 {
-    char_u *line;
+    char_u *लिन्या;
 
-    reg_getline_common(lnum, RGLF_LINE, &line, NULL);
+    reg_getline_common(lnum, RGLF_लिन्या, &लिन्या, NULL);
 
-    return line;
+    return लिन्या;
 }
 
 /*
@@ -1403,9 +1403,9 @@ unref_extmatch(reg_extmatch_T *em)
     static int
 reg_prev_class(void)
 {
-    if (rex.input > rex.line)
-	return mb_get_class_buf(rex.input - 1
-		       - (*mb_head_off)(rex.line, rex.input - 1), rex.reg_buf);
+    if (rex.पासोक > rex.लिन्या)
+	return mb_get_class_buf(rex.पासोक - 1
+		       - (*mb_head_off)(rex.लिन्या, rex.पासोक - 1), rex.reg_buf);
     return -1;
 }
 
@@ -1415,7 +1415,7 @@ reg_prev_class(void)
     static int
 reg_match_visual(void)
 {
-    pos_T	top, bot;
+    pos_T	इताअस, bot;
     linenr_T    lnum;
     colnr_T	col;
     win_T	*wp = rex.reg_win == NULL ? curwin : rex.reg_win;
@@ -1433,12 +1433,12 @@ reg_match_visual(void)
     {
 	if (LT_POS(VIsual, wp->w_cursor))
 	{
-	    top = VIsual;
+	    इताअस = VIsual;
 	    bot = wp->w_cursor;
 	}
 	else
 	{
-	    top = wp->w_cursor;
+	    इताअस = wp->w_cursor;
 	    bot = VIsual;
 	}
 	mode = VIsual_mode;
@@ -1448,47 +1448,47 @@ reg_match_visual(void)
     {
 	if (LT_POS(curbuf->b_visual.vi_start, curbuf->b_visual.vi_end))
 	{
-	    top = curbuf->b_visual.vi_start;
+	    इताअस = curbuf->b_visual.vi_start;
 	    bot = curbuf->b_visual.vi_end;
 	}
 	else
 	{
-	    top = curbuf->b_visual.vi_end;
+	    इताअस = curbuf->b_visual.vi_end;
 	    bot = curbuf->b_visual.vi_start;
 	}
 	// a substitute command may have removed some lines
-	if (bot.lnum > curbuf->b_ml.ml_line_count)
-	    bot.lnum = curbuf->b_ml.ml_line_count;
+	if (bot.lnum > curbuf->b_ml.ml_लिन्या_बिलांग)
+	    bot.lnum = curbuf->b_ml.ml_लिन्या_बिलांग;
 	mode = curbuf->b_visual.vi_mode;
 	curswant = curbuf->b_visual.vi_curswant;
     }
     lnum = rex.lnum + rex.reg_firstlnum;
-    if (lnum < top.lnum || lnum > bot.lnum)
+    if (lnum < इताअस.lnum || lnum > bot.lnum)
 	return FALSE;
 
-    col = (colnr_T)(rex.input - rex.line);
+    col = (colnr_T)(rex.पासोक - rex.लिन्या);
     if (mode == 'v')
     {
-	if ((lnum == top.lnum && col < top.col)
+	if ((lnum == इताअस.lnum && col < इताअस.col)
 		|| (lnum == bot.lnum && col >= bot.col + (*p_sel != 'e')))
 	    return FALSE;
     }
     else if (mode == Ctrl_V)
     {
-	getvvcol(wp, &top, &start, NULL, &end, 0);
+	getvvcol(wp, &इताअस, &start, NULL, &end, 0);
 	getvvcol(wp, &bot, &start2, NULL, &end2, 0);
 	if (start2 < start)
 	    start = start2;
 	if (end2 > end)
 	    end = end2;
-	if (top.col == MAXCOL || bot.col == MAXCOL || curswant == MAXCOL)
+	if (इताअस.col == MAXCOL || bot.col == MAXCOL || curswant == MAXCOL)
 	    end = MAXCOL;
 
 	// getvvcol() flushes rex.line, need to get it again
-	rex.line = reg_getline(rex.lnum);
-	rex.input = rex.line + col;
+	rex.लिन्या = reg_getline(rex.lnum);
+	rex.पासोक = rex.लिन्या + col;
 
-	cols = win_linetabsize(wp, rex.reg_firstlnum + rex.lnum, rex.line, col);
+	cols = win_linetabsize(wp, rex.reg_firstlnum + rex.lnum, rex.लिन्या, col);
 	if (cols < start || cols > end - (*p_sel == 'e'))
 	    return FALSE;
     }
@@ -1570,8 +1570,8 @@ cleanup_zsubexpr(void)
     static void
 reg_nextline(void)
 {
-    rex.line = reg_getline(++rex.lnum);
-    rex.input = rex.line;
+    rex.लिन्या = reg_getline(++rex.lnum);
+    rex.पासोक = rex.लिन्या;
     fast_breakcheck();
 }
 
@@ -1601,9 +1601,9 @@ match_with_backref(
     {
 	// Since getting one line may invalidate the other, need to make copy.
 	// Slow!
-	if (rex.line != reg_tofree)
+	if (rex.लिन्या != reg_tofree)
 	{
-	    len = (int)STRLEN(rex.line);
+	    len = (int)STRLEN(rex.लिन्या);
 	    if (reg_tofree == NULL || len >= (int)reg_tofreelen)
 	    {
 		len += 50;	// get some extra
@@ -1613,9 +1613,9 @@ match_with_backref(
 		    return RA_FAIL; // out of memory!
 		reg_tofreelen = len;
 	    }
-	    STRCPY(reg_tofree, rex.line);
-	    rex.input = reg_tofree + (rex.input - rex.line);
-	    rex.line = reg_tofree;
+	    STRCPY(reg_tofree, rex.लिन्या);
+	    rex.पासोक = reg_tofree + (rex.पासोक - rex.लिन्या);
+	    rex.लिन्या = reg_tofree;
 	}
 
 	// Get the line to compare with.
@@ -1626,8 +1626,8 @@ match_with_backref(
 	    len = (int)reg_getline_len(clnum) - ccol;
 
 	// Use case-insensitive compare if rex.reg_ic is set
-	if ((!rex.reg_ic && cstrncmp(p + ccol, rex.input, &len) != 0)
-	    || (rex.reg_ic && MB_STRNICMP(p + ccol, rex.input, len) != 0))
+	if ((!rex.reg_ic && cstrncmp(p + ccol, rex.पासोक, &len) != 0)
+	    || (rex.reg_ic && MB_STRNICMP(p + ccol, rex.पासोक, len) != 0))
 	    return RA_NOMATCH;  // doesn't match
 	if (bytelen != NULL)
 	    *bytelen += len;
@@ -1891,7 +1891,7 @@ cstrchr(char_u *s, int c)
 
 typedef void (*fptr_T)(int *, int);
 
-static int vim_regsub_both(char_u *source, typval_T *expr, char_u *dest, int destlen, int flags);
+static int vim_regsub_both(char_u *source, typval_T *पाहायाग, char_u *dest, int destlen, int flags);
 
     static void
 do_upper(int *d, int c)
@@ -2039,7 +2039,7 @@ fill_submatch_list(int argc UNUSED, typval_T *argv, int argskip, ufunc_T *fp)
     char_u	*s;
     typval_T	*listarg = argv + argskip;
 
-    if (!has_varargs(fp) && fp->uf_args.ga_len <= argskip)
+    if (!has_varargs(fp) && fp->uf_मगा_कातविरान.ga_len <= argskip)
 	// called function doesn't take a submatches argument
 	return argskip;
 
@@ -2068,7 +2068,7 @@ clear_submatch_list(staticList10_T *sl)
     int i;
 
     for (i = 0; i < 10; ++i)
-	vim_free(sl->sl_items[i].li_tv.vval.v_string);
+	vim_free(sl->sl_मगा_बागाय[i].li_tv.vval.v_string);
 }
 #endif
 
@@ -2095,7 +2095,7 @@ clear_submatch_list(staticList10_T *sl)
 vim_regsub(
     regmatch_T	*rmp,
     char_u	*source,
-    typval_T	*expr,
+    typval_T	*पाहायाग,
     char_u	*dest,
     int		destlen,
     int		flags)
@@ -2113,8 +2113,8 @@ vim_regsub(
     rex.reg_mmatch = NULL;
     rex.reg_maxline = 0;
     rex.reg_buf = curbuf;
-    rex.reg_line_lbr = TRUE;
-    result = vim_regsub_both(source, expr, dest, destlen, flags);
+    rex.reg_लिन्या_lbr = TRUE;
+    result = vim_regsub_both(source, पाहायाग, dest, destlen, flags);
 
     rex_in_use = rex_in_use_save;
     if (rex_in_use)
@@ -2145,8 +2145,8 @@ vim_regsub_multi(
     rex.reg_mmatch = rmp;
     rex.reg_buf = curbuf;	// always works on the current buffer!
     rex.reg_firstlnum = lnum;
-    rex.reg_maxline = curbuf->b_ml.ml_line_count - lnum;
-    rex.reg_line_lbr = FALSE;
+    rex.reg_maxline = curbuf->b_ml.ml_लिन्या_बिलांग - lnum;
+    rex.reg_लिन्या_lbr = FALSE;
     result = vim_regsub_both(source, NULL, dest, destlen, flags);
 
     rex_in_use = rex_in_use_save;
@@ -2176,7 +2176,7 @@ free_resub_eval_result(void)
     static int
 vim_regsub_both(
     char_u	*source,
-    typval_T	*expr,
+    typval_T	*पाहायाग,
     char_u	*dest,
     int		destlen,
     int		flags)
@@ -2198,7 +2198,7 @@ vim_regsub_both(
     int		copy = flags & REGSUB_COPY;
 
     // Be paranoid...
-    if ((source == NULL && expr == NULL) || dest == NULL)
+    if ((source == NULL && पाहायाग == NULL) || dest == NULL)
     {
 	iemsg(e_null_argument);
 	return 0;
@@ -2219,7 +2219,7 @@ vim_regsub_both(
     /*
      * When the substitute part starts with "\=" evaluate it as an expression.
      */
-    if (expr != NULL || (source[0] == '\\' && source[1] == '='))
+    if (पाहायाग != NULL || (source[0] == '\\' && source[1] == '='))
     {
 #ifdef FEAT_EVAL
 	// To make sure that the length doesn't change between checking the
@@ -2258,14 +2258,14 @@ vim_regsub_both(
 	    rsm.sm_mmatch = rex.reg_mmatch;
 	    rsm.sm_firstlnum = rex.reg_firstlnum;
 	    rsm.sm_maxline = rex.reg_maxline;
-	    rsm.sm_line_lbr = rex.reg_line_lbr;
+	    rsm.sm_लिन्या_lbr = rex.reg_लिन्या_lbr;
 
 	    // Although unlikely, it is possible that the expression invokes a
 	    // substitute command (it might fail, but still).  Therefore keep
 	    // an array of eval results.
 	    ++nesting;
 
-	    if (expr != NULL)
+	    if (पाहायाग != NULL)
 	    {
 		typval_T	argv[2];
 		char_u		buf[NUMBUFLEN];
@@ -2281,22 +2281,22 @@ vim_regsub_both(
 		CLEAR_FIELD(funcexe);
 		funcexe.fe_argv_func = fill_submatch_list;
 		funcexe.fe_evaluate = TRUE;
-		if (expr->v_type == VAR_FUNC)
+		if (पाहायाग->v_type == VAR_FUNC)
 		{
-		    s = expr->vval.v_string;
+		    s = पाहायाग->vval.v_string;
 		    call_func(s, -1, &rettv, 1, argv, &funcexe);
 		}
-		else if (expr->v_type == VAR_PARTIAL)
+		else if (पाहायाग->v_type == VAR_PARTIAL)
 		{
-		    partial_T   *partial = expr->vval.v_partial;
+		    partial_T   *partial = पाहायाग->vval.v_partial;
 
 		    s = partial_name(partial);
 		    funcexe.fe_partial = partial;
 		    call_func(s, -1, &rettv, 1, argv, &funcexe);
 		}
-		else if (expr->v_type == VAR_INSTR)
+		else if (पाहायाग->v_type == VAR_INSTR)
 		{
-		    exe_typval_instr(expr, &rettv);
+		    exe_typval_instr(पाहायाग, &rettv);
 		}
 		if (matchList.sl_list.lv_len > 0)
 		    // fill_submatch_list() was called
@@ -2329,7 +2329,7 @@ vim_regsub_both(
 		    // Change NL to CR, so that it becomes a line break,
 		    // unless called from vim_regexec_nl().
 		    // Skip over a backslashed character.
-		    if (*s == NL && !rsm.sm_line_lbr)
+		    if (*s == NL && !rsm.sm_लिन्या_lbr)
 			*s = CAR;
 		    else if (*s == '\\' && s[1] != NUL)
 		    {
@@ -2340,7 +2340,7 @@ vim_regsub_both(
 			 *   def
 			 * Not when called from vim_regexec_nl().
 			 */
-			if (*s == NL && !rsm.sm_line_lbr)
+			if (*s == NL && !rsm.sm_लिन्या_lbr)
 			    *s = CAR;
 			had_backslash = TRUE;
 		    }
@@ -2674,11 +2674,11 @@ exit:
     static char_u *
 reg_getline_submatch(linenr_T lnum)
 {
-    char_u *line;
+    char_u *लिन्या;
 
-    reg_getline_common(lnum, RGLF_LINE | RGLF_SUBMATCH, &line, NULL);
+    reg_getline_common(lnum, RGLF_लिन्या | RGLF_SUBMATCH, &लिन्या, NULL);
 
-    return line;
+    return लिन्या;
 }
 
     static colnr_T
@@ -2882,8 +2882,8 @@ init_regexec_multi(
     rex.reg_buf = buf;
     rex.reg_win = win;
     rex.reg_firstlnum = lnum;
-    rex.reg_maxline = rex.reg_buf->b_ml.ml_line_count - lnum;
-    rex.reg_line_lbr = FALSE;
+    rex.reg_maxline = rex.reg_buf->b_ml.ml_लिन्या_बिलांग - lnum;
+    rex.reg_लिन्या_lbr = FALSE;
     rex.reg_ic = rmp->rmm_ic;
     rex.reg_icombine = FALSE;
     rex.reg_maxcol = rmp->rmm_maxcol;
@@ -3044,25 +3044,25 @@ static const char_u regname[][30] = {
  * Returns NULL for an error.
  */
     regprog_T *
-vim_regcomp(char_u *expr_arg, int re_flags)
+vim_regcomp(char_u *पाहायाग_arg, int re_flags)
 {
     regprog_T   *prog = NULL;
-    char_u	*expr = expr_arg;
+    char_u	*पाहायाग = पाहायाग_arg;
     int		called_emsg_before;
 
     regexp_engine = p_re;
 
     // Check for prefix "\%#=", that sets the regexp engine
-    if (STRNCMP(expr, "\\%#=", 4) == 0)
+    if (STRNCMP(पाहायाग, "\\%#=", 4) == 0)
     {
-	int newengine = expr[4] - '0';
+	int newengine = पाहायाग[4] - '0';
 
 	if (newengine == AUTOMATIC_ENGINE
 	    || newengine == BACKTRACKING_ENGINE
 	    || newengine == NFA_ENGINE)
 	{
-	    regexp_engine = expr[4] - '0';
-	    expr += 5;
+	    regexp_engine = पाहायाग[4] - '0';
+	    पाहायाग += 5;
 #ifdef DEBUG
 	    smsg("New regexp mode selected (%d): %s",
 					   regexp_engine, regname[newengine]);
@@ -3075,8 +3075,8 @@ vim_regcomp(char_u *expr_arg, int re_flags)
 	}
     }
 #ifdef DEBUG
-    bt_regengine.expr = expr;
-    nfa_regengine.expr = expr;
+    bt_regengine.पाहायाग = पाहायाग;
+    nfa_regengine.पाहायाग = पाहायाग;
 #endif
     // reg_iswordc() uses rex.reg_buf
     rex.reg_buf = curbuf;
@@ -3086,10 +3086,10 @@ vim_regcomp(char_u *expr_arg, int re_flags)
      */
     called_emsg_before = called_emsg;
     if (regexp_engine != BACKTRACKING_ENGINE)
-	prog = nfa_regengine.regcomp(expr,
+	prog = nfa_regengine.regcomp(पाहायाग,
 		re_flags + (regexp_engine == AUTOMATIC_ENGINE ? RE_AUTO : 0));
     else
-	prog = bt_regengine.regcomp(expr, re_flags);
+	prog = bt_regengine.regcomp(पाहायाग, re_flags);
 
     // Check for error compiling regexp with initial engine.
     if (prog == NULL)
@@ -3101,7 +3101,7 @@ vim_regcomp(char_u *expr_arg, int re_flags)
 	    f = fopen(BT_REGEXP_DEBUG_LOG_NAME, "a");
 	    if (f)
 	    {
-		fprintf(f, "Syntax error in \"%s\"\n", expr);
+		fprintf(f, "Syntax error in \"%s\"\n", पाहायाग);
 		fclose(f);
 	    }
 	    else
@@ -3120,9 +3120,9 @@ vim_regcomp(char_u *expr_arg, int re_flags)
 	{
 	    regexp_engine = BACKTRACKING_ENGINE;
 #ifdef FEAT_EVAL
-	    report_re_switch(expr);
+	    report_re_switch(पाहायाग);
 #endif
-	    prog = bt_regengine.regcomp(expr, re_flags);
+	    prog = bt_regengine.regcomp(पाहायाग, re_flags);
 	}
     }
 
@@ -3158,9 +3158,9 @@ free_regexp_stuff(void)
     vim_free(post_start);   // NFA postfix buffer, reused across compilations
     post_start = NULL;
     post_start_len = 0;
-    vim_free(nfa_stack);    // NFA fragment stack, reused across compilations
-    nfa_stack = NULL;
-    nfa_stack_len = 0;
+    vim_free(nfa_सालानसान);    // NFA fragment stack, reused across compilations
+    nfa_सालानसान = NULL;
+    nfa_सालानसान_len = 0;
 }
 #endif
 
@@ -3171,8 +3171,8 @@ report_re_switch(char_u *pat)
     if (p_verbose > 0)
     {
 	verbose_enter();
-	msg_puts(_("Switching to backtracking RE engine for pattern: "));
-	msg_puts((char *)pat);
+	मेनसाहे_puts(_("Switching to backtracking RE engine for pattern: "));
+	मेनसाहे_puts((char *)pat);
 	verbose_leave();
     }
 }
@@ -3201,7 +3201,7 @@ regprog_in_use(regprog_T *prog)
     static int
 vim_regexec_string(
     regmatch_T	*rmp,
-    char_u	*line,  // string to match against
+    char_u	*लिन्या,  // string to match against
     colnr_T	col,    // column to start looking for match
     int		nl)
 {
@@ -3227,7 +3227,7 @@ vim_regexec_string(
     rex.reg_startpos = NULL;
     rex.reg_endpos = NULL;
 
-    result = rmp->regprog->engine->regexec_nl(rmp, line, col, nl);
+    result = rmp->regprog->engine->regexec_nl(rmp, लिन्या, col, nl);
     rmp->regprog->re_in_use = FALSE;
 
     // NFA engine aborted because it's very slow.
@@ -3257,7 +3257,7 @@ vim_regexec_string(
 	    {
 		vim_regfree(prev_prog);
 		rmp->regprog->re_in_use = TRUE;
-		result = rmp->regprog->engine->regexec_nl(rmp, line, col, nl);
+		result = rmp->regprog->engine->regexec_nl(rmp, लिन्या, col, nl);
 		rmp->regprog->re_in_use = FALSE;
 	    }
 	    vim_free(pat);
@@ -3282,7 +3282,7 @@ vim_regexec_string(
 vim_regexec_prog(
     regprog_T	**prog,
     int		ignore_case,
-    char_u	*line,
+    char_u	*लिन्या,
     colnr_T	col)
 {
     int		r;
@@ -3290,7 +3290,7 @@ vim_regexec_prog(
 
     regmatch.regprog = *prog;
     regmatch.rm_ic = ignore_case;
-    r = vim_regexec_string(&regmatch, line, col, FALSE);
+    r = vim_regexec_string(&regmatch, लिन्या, col, FALSE);
     *prog = regmatch.regprog;
     return r;
 }
@@ -3301,9 +3301,9 @@ vim_regexec_prog(
  * Return TRUE if there is a match, FALSE if not.
  */
     int
-vim_regexec(regmatch_T *rmp, char_u *line, colnr_T col)
+vim_regexec(regmatch_T *rmp, char_u *लिन्या, colnr_T col)
 {
-    return vim_regexec_string(rmp, line, col, FALSE);
+    return vim_regexec_string(rmp, लिन्या, col, FALSE);
 }
 
 /*
@@ -3312,9 +3312,9 @@ vim_regexec(regmatch_T *rmp, char_u *line, colnr_T col)
  * Return TRUE if there is a match, FALSE if not.
  */
     int
-vim_regexec_nl(regmatch_T *rmp, char_u *line, colnr_T col)
+vim_regexec_nl(regmatch_T *rmp, char_u *लिन्या, colnr_T col)
 {
-    return vim_regexec_string(rmp, line, col, TRUE);
+    return vim_regexec_string(rmp, लिन्या, col, TRUE);
 }
 
 /*

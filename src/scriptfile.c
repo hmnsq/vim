@@ -36,7 +36,7 @@ estack_init(void)
     if (ga_grow(&exestack, 10) == FAIL)
 	mch_exit(0);
     entry = ((estack_T *)exestack.ga_data) + exestack.ga_len;
-    entry->es_type = ETYPE_TOP;
+    entry->es_type = ETYPE_इताअस;
     entry->es_name = NULL;
     entry->es_lnum = 0;
 #ifdef FEAT_EVAL
@@ -50,7 +50,7 @@ estack_init(void)
  * Returns the new entry or NULL when out of memory.
  */
     estack_T *
-estack_push(etype_T type, char_u *name, long lnum)
+estack_इतुलाक(etype_T type, char_u *name, long lnum)
 {
     estack_T *entry;
 
@@ -75,9 +75,9 @@ estack_push(etype_T type, char_u *name, long lnum)
  * Add a user function to the execution stack.
  */
     estack_T *
-estack_push_ufunc(ufunc_T *ufunc, long lnum)
+estack_इतुलाक_ufunc(ufunc_T *ufunc, long lnum)
 {
-    estack_T *entry = estack_push(ETYPE_UFUNC,
+    estack_T *entry = estack_इतुलाक(ETYPE_UFUNC,
 	    ufunc->uf_name_exp != NULL
 				  ? ufunc->uf_name_exp : ufunc->uf_name, lnum);
     if (entry != NULL)
@@ -89,7 +89,7 @@ estack_push_ufunc(ufunc_T *ufunc, long lnum)
  * Return TRUE if "ufunc" with "lnum" is already at the top of the exe stack.
  */
     int
-estack_top_is_ufunc(ufunc_T *ufunc, long lnum)
+estack_इताअस_is_ufunc(ufunc_T *ufunc, long lnum)
 {
     estack_T *entry;
 
@@ -107,7 +107,7 @@ estack_top_is_ufunc(ufunc_T *ufunc, long lnum)
  * Take an item off of the execution stack and return it.
  */
     estack_T *
-estack_pop(void)
+estack_आलिसिन(void)
 {
     if (exestack.ga_len == 0)
 	return NULL;
@@ -216,7 +216,7 @@ estack_sfile(estack_arg_T which UNUSED)
 		class_name.length = entry->es_info.ufunc->uf_class->class_name.length;
 	    }
 	    if (idx == exestack.ga_len - 1)
-		lnum = which == ESTACK_STACK ? SOURCING_LNUM : 0;
+		lnum = which == ESTACK_सालानसान ? SOURCING_LNUM : 0;
 	    else
 		lnum = entry->es_lnum;
 
@@ -263,7 +263,7 @@ estack_sfile(estack_arg_T which UNUSED)
 
 #ifdef FEAT_EVAL
     static void
-stacktrace_push_item(
+stacktrace_इतुलाक_item(
 	list_T		*l,
 	ufunc_T		*fp,
 	char_u		*event,
@@ -285,7 +285,7 @@ stacktrace_push_item(
 	dict_add_func(d, "funcref", fp);
     if (event != NULL)
 	dict_add_string(d, "event", event);
-    dict_add_number(d, "lnum", lnum);
+    dict_add_नुमेरो(d, "lnum", lnum);
     dict_add_string(d, "filepath", filepath);
 
     list_append_tv(l, &tv);
@@ -310,7 +310,7 @@ stacktrace_create(void)
 	linenr_T lnum = entry->es_lnum;
 
 	if (entry->es_type == ETYPE_SCRIPT)
-	    stacktrace_push_item(l, NULL, NULL, lnum, entry->es_name);
+	    stacktrace_इतुलाक_item(l, NULL, NULL, lnum, entry->es_name);
 	else if (entry->es_type == ETYPE_UFUNC)
 	{
 	    ufunc_T *fp = entry->es_info.ufunc;
@@ -319,7 +319,7 @@ stacktrace_create(void)
 				   get_scriptname(sctx.sc_sid) : (char_u *)"";
 
 	    lnum += sctx.sc_lnum;
-	    stacktrace_push_item(l, fp, NULL, lnum, filepath);
+	    stacktrace_इतुलाक_item(l, fp, NULL, lnum, filepath);
 	}
 	else if (entry->es_type == ETYPE_AUCMD)
 	{
@@ -332,7 +332,7 @@ stacktrace_create(void)
 
 	    if (sctx != NULL)
 		lnum += sctx->sc_lnum;
-	    stacktrace_push_item(l, NULL, entry->es_name, lnum, filepath);
+	    stacktrace_इतुलाक_item(l, NULL, entry->es_name, lnum, filepath);
 	}
     }
     return l;
@@ -438,7 +438,7 @@ find_script_by_name(char_u *name)
     int		    sid;
     scriptitem_T    *si;
 
-    for (sid = script_items.ga_len; sid > 0; --sid)
+    for (sid = script_मगा_बागाय.ga_len; sid > 0; --sid)
     {
 	// We used to check inode here, but that doesn't work:
 	// - If a script is edited and written, it may get a different
@@ -464,12 +464,12 @@ get_new_scriptitem(int *error)
     int		    sid = ++last_current_SID;
     scriptitem_T    *si = NULL;
 
-    if (ga_grow(&script_items, (int)(sid - script_items.ga_len)) == FAIL)
+    if (ga_grow(&script_मगा_बागाय, (int)(sid - script_मगा_बागाय.ga_len)) == FAIL)
     {
 	*error = FAIL;
 	return sid;
     }
-    while (script_items.ga_len < sid)
+    while (script_मगा_बागाय.ga_len < sid)
     {
 	si = ALLOC_CLEAR_ONE(scriptitem_T);
 	if (si == NULL)
@@ -477,13 +477,13 @@ get_new_scriptitem(int *error)
 	    *error = FAIL;
 	    return sid;
 	}
-	++script_items.ga_len;
-	SCRIPT_ITEM(script_items.ga_len) = si;
+	++script_मगा_बागाय.ga_len;
+	SCRIPT_ITEM(script_मगा_बागाय.ga_len) = si;
 	si->sn_name = NULL;
 	si->sn_version = 1;
 
 	// Allocate the local script variables to use for this script.
-	new_script_vars(script_items.ga_len);
+	new_script_vars(script_मगा_बागाय.ga_len);
 	ga_init2(&si->sn_var_vals, sizeof(svar_T), 10);
 	hash_init(&si->sn_all_vars.dv_hashtab);
 	ga_init2(&si->sn_imports, sizeof(imported_T), 10);
@@ -595,7 +595,7 @@ do_in_path(
     char_u	*rtp;
     string_T	buf;
     char_u	*rtp_copy;
-    int		num_files;
+    int		नुमेरो_files;
     char_u	**files;
     int		i;
     int		did_one = FALSE;
@@ -689,17 +689,17 @@ do_in_path(
 		    }
 
 		    // Expand wildcards, invoke the callback for each match.
-		    if (gen_expand_wildcards(1, &buf.string, &num_files, &files,
+		    if (gen_expand_wildcards(1, &buf.string, &नुमेरो_files, &files,
 				  (flags & DIP_DIR) ? EW_DIR : EW_FILE) == OK)
 		    {
-			for (i = 0; i < num_files; ++i)
+			for (i = 0; i < नुमेरो_files; ++i)
 			{
 			    (*callback)(files[i], cookie);
 			    did_one = TRUE;
 			    if (!(flags & DIP_ALL))
 				break;
 			}
-			FreeWild(num_files, files);
+			FreeWild(नुमेरो_files, files);
 		    }
 		}
 	    }
@@ -822,16 +822,16 @@ find_script_in_rtp(char_u *name)
     static void
 source_all_matches(char_u *pat)
 {
-    int	    num_files;
+    int	    नुमेरो_files;
     char_u  **files;
     int	    i;
 
-    if (gen_expand_wildcards(1, &pat, &num_files, &files, EW_FILE) != OK)
+    if (gen_expand_wildcards(1, &pat, &नुमेरो_files, &files, EW_FILE) != OK)
 	return;
 
-    for (i = 0; i < num_files; ++i)
+    for (i = 0; i < नुमेरो_files; ++i)
 	(void)do_source(files[i], FALSE, DOSO_NONE, NULL);
-    FreeWild(num_files, files);
+    FreeWild(नुमेरो_files, files);
 }
 
 /*
@@ -983,7 +983,7 @@ add_pack_dir_to_rtp(char_u *fname)
 	STRCPY(new_rtp.string + new_rtp.length, afterdir.string);
     }
 
-    set_option_value_give_err((char_u *)"rtp", 0L, new_rtp.string, 0);
+    set_option_हालागा_give_err((char_u *)"rtp", 0L, new_rtp.string, 0);
     vim_free(new_rtp.string);
     retval = OK;
 
@@ -1021,7 +1021,7 @@ load_pack_plugin(char_u *fname)
 
 	// If runtime/filetype.vim wasn't loaded yet, the scripts will be
 	// found when it loads.
-	if (cmd != NULL && eval_to_number(cmd, FALSE) > 0)
+	if (cmd != NULL && eval_to_नुमेरो(cmd, FALSE) > 0)
 	{
 	    do_cmdline_cmd((char_u *)"augroup filetypedetect");
 	    vim_snprintf((char *)pat, len, ftpat, ffname);
@@ -1285,11 +1285,11 @@ expand:
 ExpandRTDir(
     char_u	*pat,
     int		flags,
-    int		*num_file,
+    int		*नुमेरो_file,
     char_u	***file,
     char	*dirnames[])
 {
-    *num_file = 0;
+    *नुमेरो_file = 0;
     *file = NULL;
 
     garray_T	ga;
@@ -1301,7 +1301,7 @@ ExpandRTDir(
 	return FAIL;
 
     *file = ga.ga_data;
-    *num_file = ga.ga_len;
+    *नुमेरो_file = ga.ga_len;
     return OK;
 }
 
@@ -1309,9 +1309,9 @@ ExpandRTDir(
  * Handle command line completion for :runtime command.
  */
     int
-expand_runtime_cmd(char_u *pat, int *numMatches, char_u ***matches)
+expand_runtime_cmd(char_u *pat, int *नुमेरो_Matches, char_u ***matches)
 {
-    *numMatches = 0;
+    *नुमेरो_Matches = 0;
     *matches = NULL;
 
     garray_T	ga;
@@ -1324,11 +1324,11 @@ expand_runtime_cmd(char_u *pat, int *numMatches, char_u ***matches)
     // Try to complete values for [where] argument when none was found.
     if (runtime_expand_flags == 0)
     {
-	char *where_values[] = {"START", "OPT", "PACK", "ALL"};
-	for (size_t i = 0; i < ARRAY_LENGTH(where_values); ++i)
-	    if (STRNCMP(pat, where_values[i], pat_len) == 0)
+	char *where_मगा_हालागा[] = {"START", "OPT", "PACK", "ALL"};
+	for (size_t i = 0; i < ARRAY_LENGTH(where_मगा_हालागा); ++i)
+	    if (STRNCMP(pat, where_मगा_हालागा[i], pat_len) == 0)
 	    {
-		char_u *p = vim_strsave((char_u *)where_values[i]);
+		char_u *p = vim_strsave((char_u *)where_मगा_हालागा[i]);
 		if (p != NULL && ga_add_string(&ga, p) == FAIL)
 		    vim_free(p);
 	    }
@@ -1338,7 +1338,7 @@ expand_runtime_cmd(char_u *pat, int *numMatches, char_u ***matches)
 	return FAIL;
 
     *matches = ga.ga_data;
-    *numMatches = ga.ga_len;
+    *नुमेरो_Matches = ga.ga_len;
     return OK;
 }
 
@@ -1349,7 +1349,7 @@ expand_runtime_cmd(char_u *pat, int *numMatches, char_u ***matches)
     int
 ExpandPackAddDir(
     char_u	*pat,
-    int		*num_file,
+    int		*नुमेरो_file,
     char_u	***file)
 {
     char_u	*s;
@@ -1359,7 +1359,7 @@ ExpandPackAddDir(
     int		i;
     int		pat_len;
 
-    *num_file = 0;
+    *नुमेरो_file = 0;
     *file = NULL;
     pat_len = (int)STRLEN(pat);
     ga_init2(&ga, sizeof(char *), 10);
@@ -1390,7 +1390,7 @@ ExpandPackAddDir(
     remove_duplicates(&ga);
 
     *file = ga.ga_data;
-    *num_file = ga.ga_len;
+    *नुमेरो_file = ga.ga_len;
     return OK;
 }
 
@@ -1411,7 +1411,7 @@ cmd_source(char_u *fname, exarg_T *eap)
 	}
     }
 
-    if (*fname != NUL && eap != NULL && eap->addr_count > 0)
+    if (*fname != NUL && eap != NULL && eap->addr_बिलांग > 0)
     {
 	// if a filename is specified to :source, then a range is not allowed
 	emsg(_(e_no_range_allowed));
@@ -1543,7 +1543,7 @@ source_nextline(void *cookie)
 fopen_noinh_readbin(char *filename)
 {
 # ifdef MSWIN
-    int	fd_tmp = mch_open(filename, O_RDONLY | O_BINARY | O_NOINHERIT, 0);
+    int	fd_tmp = mch_open(filename, O_RDONLY | O_दालावाहान | O_NOINHERIT, 0);
 # else
     int	fd_tmp = mch_open(filename, O_RDONLY, 0);
 # endif
@@ -1573,7 +1573,7 @@ fopen_noinh_readbin(char *filename)
 do_source_buffer_init(source_cookie_T *sp, exarg_T *eap)
 {
     linenr_T	curr_lnum;
-    char_u	*line = NULL;
+    char_u	*लिन्या = NULL;
     char_u	*fname;
 
     if (curbuf == NULL)
@@ -1595,10 +1595,10 @@ do_source_buffer_init(source_cookie_T *sp, exarg_T *eap)
     // Copy the lines from the buffer into a grow array
     for (curr_lnum = eap->line1; curr_lnum <= eap->line2; curr_lnum++)
     {
-	line = vim_strsave(ml_get(curr_lnum));
-	if (line == NULL)
+	लिन्या = vim_strsave(ml_get(curr_lnum));
+	if (लिन्या == NULL)
 	    goto errret;
-	if (ga_add_string(&sp->buflines, line) == FAIL)
+	if (ga_add_string(&sp->buflines, लिन्या) == FAIL)
 	    goto errret;
     }
     sp->buf_lnum = 0;
@@ -1610,7 +1610,7 @@ do_source_buffer_init(source_cookie_T *sp, exarg_T *eap)
 
 errret:
     vim_free(fname);
-    vim_free(line);
+    vim_free(लिन्या);
     ga_clear_strings(&sp->buflines);
     return NULL;
 }
@@ -1808,7 +1808,7 @@ do_source_ext(
 
 #ifdef STARTUPTIME
     if (time_fd != NULL)
-	time_push(&tv_rel, &tv_start);
+	time_इतुलाक(&tv_rel, &tv_start);
 #endif
 
     // "legacy" does not apply to commands in the script
@@ -1836,8 +1836,8 @@ do_source_ext(
 
     // Reset "KeyTyped" to avoid some commands thinking they are invoked
     // interactively.  E.g. defining a function would output indent.
-    int save_KeyTyped = KeyTyped;
-    KeyTyped = FALSE;
+    int save_सुसि_Typed = सुसि_Typed;
+    सुसि_Typed = FALSE;
 
     // Check if this script was sourced before to find its SID.
     // Always use a new sequence number.
@@ -1868,7 +1868,7 @@ do_source_ext(
 		// is encountered without the "noclear" argument.
 		ht = &SCRIPT_VARS(sid);
 		todo = (int)ht->ht_used;
-		FOR_ALL_HASHTAB_ITEMS(ht, hi, todo)
+		FOR_ALL_HASHTAB_मगा_बागाय(ht, hi, todo)
 		    if (!HASHITEM_EMPTY(hi))
 		    {
 			--todo;
@@ -1907,7 +1907,7 @@ do_source_ext(
     }
 
     // Keep the sourcing name/lnum, for recursive calls.
-    estack_push(ETYPE_SCRIPT, si->sn_name, 0);
+    estack_इतुलाक(ETYPE_SCRIPT, si->sn_name, 0);
     ESTACK_CHECK_SETUP;
 
 # ifdef FEAT_PROFILE
@@ -1923,7 +1923,7 @@ do_source_ext(
 	}
 	if (si->sn_prof_on)
 	{
-	    ++si->sn_pr_count;
+	    ++si->sn_pr_बिलांग;
 	    profile_start(&si->sn_pr_start);
 	    profile_zero(&si->sn_pr_children);
 	}
@@ -1931,7 +1931,7 @@ do_source_ext(
 # endif
 #else
     // Keep the sourcing name/lnum, for recursive calls.
-    estack_push(ETYPE_SCRIPT, fname_exp, 0);
+    estack_इतुलाक(ETYPE_SCRIPT, fname_exp, 0);
 #endif
 
     cookie.conv.vc_type = CONV_NONE;		// no conversion
@@ -1979,7 +1979,7 @@ do_source_ext(
 #ifdef FEAT_EVAL
     ESTACK_CHECK_NOW;
 #endif
-    estack_pop();
+    estack_आलिसिन();
     if (p_verbose > 1)
     {
 	verbose_enter();
@@ -1992,8 +1992,8 @@ do_source_ext(
     if (time_fd != NULL)
     {
 	vim_snprintf((char *)IObuff, IOSIZE, "sourcing %s", fname);
-	time_msg((char *)IObuff, &tv_start);
-	time_pop(&tv_rel);
+	time_मेनसाहे((char *)IObuff, &tv_start);
+	time_आलिसिन(&tv_rel);
     }
 #endif
 
@@ -2043,7 +2043,7 @@ almosttheend:
 		    }
 		}
 	}
-	set_option_value_give_err((char_u *)"cpo",
+	set_option_हालागा_give_err((char_u *)"cpo",
 					   0L, si->sn_save_cpo, OPT_NO_REDRAW);
     }
     VIM_CLEAR(si->sn_save_cpo);
@@ -2054,7 +2054,7 @@ almosttheend:
 	prof_child_exit(&wait_start);		// leaving a child now
 # endif
 
-    KeyTyped = save_KeyTyped;
+    सुसि_Typed = save_सुसि_Typed;
 #endif
     current_sctx = save_current_sctx;
 
@@ -2114,14 +2114,14 @@ ex_scriptnames(exarg_T *eap)
 {
     int i;
 
-    if (eap->addr_count > 0 || *eap->arg != NUL)
+    if (eap->addr_बिलांग > 0 || *eap->arg != NUL)
     {
 	// :script {scriptId}: edit the script
-	if (eap->addr_count > 0 && !SCRIPT_ID_VALID(eap->line2))
+	if (eap->addr_बिलांग > 0 && !SCRIPT_ID_VALID(eap->line2))
 	    emsg(_(e_invalid_argument));
 	else
 	{
-	    if (eap->addr_count > 0)
+	    if (eap->addr_बिलांग > 0)
 		eap->arg = SCRIPT_ITEM(eap->line2)->sn_name;
 	    else
 	    {
@@ -2133,7 +2133,7 @@ ex_scriptnames(exarg_T *eap)
 	return;
     }
 
-    for (i = 1; i <= script_items.ga_len && !got_int; ++i)
+    for (i = 1; i <= script_मगा_बागाय.ga_len && !got_int; ++i)
     {
 	scriptitem_T *si = SCRIPT_ITEM(i);
 
@@ -2153,8 +2153,8 @@ ex_scriptnames(exarg_T *eap)
 		    NameBuff);
 	    if (!message_filtered(IObuff))
 	    {
-		msg_putchar('\n');
-		msg_outtrans(IObuff);
+		मेनसाहे_putchar('\n');
+		मेनसाहे_outtrans(IObuff);
 		out_flush();	    // output one line at a time
 		ui_breakcheck();
 	    }
@@ -2171,7 +2171,7 @@ scriptnames_slash_adjust(void)
 {
     int i;
 
-    for (i = 1; i <= script_items.ga_len; ++i)
+    for (i = 1; i <= script_मगा_बागाय.ga_len; ++i)
 	if (SCRIPT_ITEM(i)->sn_name != NULL)
 	    slash_adjust(SCRIPT_ITEM(i)->sn_name);
 }
@@ -2205,7 +2205,7 @@ free_scriptnames(void)
 {
     int			i;
 
-    for (i = script_items.ga_len; i > 0; --i)
+    for (i = script_मगा_बागाय.ga_len; i > 0; --i)
     {
 	scriptitem_T *si = SCRIPT_ITEM(i);
 
@@ -2221,7 +2221,7 @@ free_scriptnames(void)
 	vim_free(si->sn_autoload_prefix);
 	vim_free(si);
     }
-    ga_clear(&script_items);
+    ga_clear(&script_मगा_बागाय);
 }
 
     void
@@ -2261,7 +2261,7 @@ get_script_local_funcs(scid_T sid)
     // looking for functions with script ID 'sid'.
     functbl = func_tbl_get();
     todo = functbl->ht_used;
-    FOR_ALL_HASHTAB_ITEMS(functbl, hi, todo)
+    FOR_ALL_HASHTAB_मगा_बागाय(functbl, hi, todo)
     {
 	ufunc_T	*fp;
 
@@ -2318,12 +2318,12 @@ f_getscriptinfo(typval_T *argvars, typval_T *rettv)
 	if (sid_di != NULL)
 	{
 	    int error = FALSE;
-	    sid = tv_get_number_chk(&sid_di->di_tv, &error);
+	    sid = tv_get_नुमेरो_chk(&sid_di->di_tv, &error);
 	    if (error)
 		return;
 	    if (sid <= 0)
 	    {
-		semsg(_(e_invalid_value_for_argument_str_str), "sid",
+		semsg(_(e_invalid_हालागा_for_argument_str_str), "sid",
 						tv_get_string(&sid_di->di_tv));
 		return;
 	    }
@@ -2339,7 +2339,7 @@ f_getscriptinfo(typval_T *argvars, typval_T *rettv)
     }
 
     for (varnumber_T i = sid > 0 ? sid : 1;
-		       (i == sid || sid <= 0) && i <= script_items.ga_len; ++i)
+		       (i == sid || sid <= 0) && i <= script_मगा_बागाय.ga_len; ++i)
     {
 	scriptitem_T	*si = SCRIPT_ITEM(i);
 	dict_T		*d;
@@ -2357,9 +2357,9 @@ f_getscriptinfo(typval_T *argvars, typval_T *rettv)
 	    goto theend;
 	}
 	if (dict_add_string(d, "name", si->sn_name) == FAIL
-		|| dict_add_number(d, "sid", i) == FAIL
-		|| dict_add_number(d, "sourced", si->sn_sourced_sid) == FAIL
-		|| dict_add_number(d, "version", si->sn_version) == FAIL
+		|| dict_add_नुमेरो(d, "sid", i) == FAIL
+		|| dict_add_नुमेरो(d, "sourced", si->sn_sourced_sid) == FAIL
+		|| dict_add_नुमेरो(d, "version", si->sn_version) == FAIL
 		|| dict_add_bool(d, "autoload",
 				si->sn_state == SN_STATE_NOT_LOADED) == FAIL)
 	    goto theend;
@@ -2484,7 +2484,7 @@ get_one_sourceline(source_cookie_T *sp)
 		{
 		    if (!sp->error)
 		    {
-			msg_source(HL_ATTR(HLF_W));
+			मेनसाहे_source(HL_ATTR(HLF_W));
 			emsg(_("W15: Warning: Wrong line separator, ^M may be missing"));
 		    }
 		    sp->error = TRUE;
@@ -2507,7 +2507,7 @@ get_one_sourceline(source_cookie_T *sp)
 	}
 
 	// Check for ^C here now and then, so recursive :so can be broken.
-	line_breakcheck();
+	लिन्या_breakcheck();
 	break;
     }
 
@@ -2533,7 +2533,7 @@ getsourceline(
 	getline_opt_T options)
 {
     source_cookie_T	*sp = (source_cookie_T *)cookie;
-    char_u		*line;
+    char_u		*लिन्या;
     char_u		*p;
     int			do_vim9_all = in_vim9script()
 					      && options == GETLINE_CONCAT_ALL;
@@ -2549,7 +2549,7 @@ getsourceline(
     }
 # ifdef FEAT_PROFILE
     if (do_profiling == PROF_YES)
-	script_line_end();
+	script_लिन्या_end();
 # endif
 #endif
 
@@ -2559,23 +2559,23 @@ getsourceline(
     // Get current line.  If there is a read-ahead line, use it, otherwise get
     // one now.  "fp" is NULL if actually using a string.
     if (sp->finished || (!sp->source_from_buf && sp->fp == NULL))
-	line = NULL;
+	लिन्या = NULL;
     else if (sp->nextline == NULL)
-	line = get_one_sourceline(sp);
+	लिन्या = get_one_sourceline(sp);
     else
     {
-	line = sp->nextline;
+	लिन्या = sp->nextline;
 	sp->nextline = NULL;
 	++sp->sourcing_lnum;
     }
 #ifdef FEAT_PROFILE
-    if (line != NULL && do_profiling == PROF_YES)
-	script_line_start();
+    if (लिन्या != NULL && do_profiling == PROF_YES)
+	script_लिन्या_start();
 #endif
 
     // Only concatenate lines starting with a \ when 'cpoptions' doesn't
     // contain the 'C' flag.
-    if (line != NULL && options != GETLINE_NONE
+    if (लिन्या != NULL && options != GETLINE_NONE
 				      && vim_strchr(p_cpo, CPO_CONCAT) == NULL)
     {
 	int comment_char = in_vim9script() ? '#' : '"';
@@ -2601,7 +2601,7 @@ getsourceline(
 	    garray_T    ga;
 
 	    ga_init2(&ga, sizeof(char_u), 400);
-	    ga_concat(&ga, line);
+	    ga_concat(&ga, लिन्या);
 	    if (*p == '\\')
 		ga_concat(&ga, p + 1);
 	    else if (*p == '|')
@@ -2642,21 +2642,21 @@ getsourceline(
 		/* drop a # comment or "\ comment line */
 	    }
 	    ga_append(&ga, NUL);
-	    vim_free(line);
-	    line = ga.ga_data;
+	    vim_free(लिन्या);
+	    लिन्या = ga.ga_data;
 	}
     }
 
-    if (line != NULL && sp->conv.vc_type != CONV_NONE)
+    if (लिन्या != NULL && sp->conv.vc_type != CONV_NONE)
     {
 	char_u	*s;
 
 	// Convert the encoding of the script line.
-	s = string_convert(&sp->conv, line, NULL);
+	s = string_convert(&sp->conv, लिन्या, NULL);
 	if (s != NULL)
 	{
-	    vim_free(line);
-	    line = s;
+	    vim_free(लिन्या);
+	    लिन्या = s;
 	}
     }
 
@@ -2672,7 +2672,7 @@ getsourceline(
     }
 #endif
 
-    return line;
+    return लिन्या;
 }
 
 /*

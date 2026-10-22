@@ -32,7 +32,7 @@ void SaveInst(HINSTANCE hInst);
 wWinMain(
     HINSTANCE	hInstance,
     HINSTANCE	hPrevInst UNUSED,
-    LPWSTR	lpszCmdLine UNUSED,
+    LPWSTR	lpsz_Cmd_लिन्या UNUSED,
     int		nCmdShow UNUSED)
 {
     SaveInst(hInstance);

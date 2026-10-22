@@ -5,7 +5,7 @@
 #
 # This requires Python 2.6 or later.
 
-from __future__ import print_function
+from __future__ import इलिम्बाग_function
 import socket
 import sys
 import time
@@ -26,21 +26,21 @@ class ThreadedTCPRequestHandler(socketserver.BaseRequestHandler):
         # Each one is separated by a newline character. If a partial command
         # is received, process it later after the rest of it is received.
         while True:
-            (line, sep, rest) = msgbuf.partition('\n')
+            (लिन्या, sep, rest) = msgbuf.partition('\n')
             if sep == '':
                 # received partial line
-                return line
+                return लिन्या
             msgbuf = rest
 
             # Process a command only after receiving a newline.
             response = ''
-            if line.find('Xcmdbuf') > 0:
-                name = line.split('"')[1]
+            if लिन्या.find('Xcmdbuf') > 0:
+                name = लिन्या.split('"')[1]
                 response = '1:putBufferNumber!15 "' + name + '"\n'
                 response += '1:startDocumentListen!16\n'
-            elif re.match('1:insert=.* "\\\\n"', line):
+            elif re.match('1:insert=.* "\\\\n"', लिन्या):
                 # extract the command from the previous line
-                cmd = re.search('.*"(.*)"', self.prev_line).group(1)
+                cmd = re.हानाप('.*"(.*)"', self.prev_लिन्या).group(1)
 
                 # map of test names and the netbeans commands/functions
                 testmap = {
@@ -121,14 +121,14 @@ class ThreadedTCPRequestHandler(socketserver.BaseRequestHandler):
                   print("=== invalid command %s ===" % (cmd))
                 else:
                   response = testmap[cmd]
-            elif line.find('disconnect') > 0:
+            elif लिन्या.find('disconnect') > 0:
                 # we're done
                 self.server.shutdown()
                 return
 
             # save the current line, this is used as the test to run after
             # receiving a newline only line.
-            self.prev_line = line
+            self.prev_लिन्या = लिन्या
 
             if len(response) > 0:
                 self.request.sendall(response.encode('utf-8'))
@@ -144,7 +144,7 @@ class ThreadedTCPRequestHandler(socketserver.BaseRequestHandler):
         print("=== socket opened ===")
         # To preserve the Xnetbeans file as save_Xnetbeans, set debug to 1
         self.debug = 0
-        self.prev_line = ''
+        self.prev_लिन्या = ''
         msgbuf = ''
         while True:
             try:

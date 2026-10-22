@@ -52,7 +52,7 @@ typedef struct
 
 typedef struct
 {
-    unsigned int    *keys;	// hash keys for dynamic palette lookup
+    unsigned int    *मगा_सुसि;	// hash keys for dynamic palette lookup
     char_u	    *vals;	// hash values for dynamic palette lookup
     int		     hash_cap;	// allocated slots in keys/vals
     char_u	    *idx;	// width * height paletted image
@@ -124,7 +124,7 @@ sixel_uninit(void)
 {
     sixel_band_T *band = &sixel_state.band;
 
-    VIM_CLEAR(sixel_state.keys);
+    VIM_CLEAR(sixel_state.मगा_सुसि);
     VIM_CLEAR(sixel_state.vals);
     VIM_CLEAR(sixel_state.idx);
     VIM_CLEAR(sixel_state.pal);
@@ -190,31 +190,31 @@ sixel_ensure_hash_capacity(int max_colors, int *cap_out)
 	cap <<= 1;
     if (cap > sixel_state.hash_cap)
     {
-	unsigned int	*keys;
+	unsigned int	*मगा_सुसि;
 	char_u		*vals;
 
-	keys = ALLOC_MULT(unsigned int, cap);
+	मगा_सुसि = ALLOC_MULT(unsigned int, cap);
 	vals = ALLOC_MULT(char_u, cap);
-	if (keys == NULL || vals == NULL)
+	if (मगा_सुसि == NULL || vals == NULL)
 	{
-	    vim_free(keys);
+	    vim_free(मगा_सुसि);
 	    vim_free(vals);
 	    return FAIL;
 	}
 	if (sixel_state.hash_cap > 0)
 	{
-	    mch_memmove(keys, sixel_state.keys,
-		    (size_t)sixel_state.hash_cap * sizeof(*keys));
+	    mch_memmove(मगा_सुसि, sixel_state.मगा_सुसि,
+		    (size_t)sixel_state.hash_cap * sizeof(*मगा_सुसि));
 	    mch_memmove(vals, sixel_state.vals,
 		    (size_t)sixel_state.hash_cap * sizeof(*vals));
 	}
-	vim_free(sixel_state.keys);
+	vim_free(sixel_state.मगा_सुसि);
 	vim_free(sixel_state.vals);
-	sixel_state.keys = keys;
+	sixel_state.मगा_सुसि = मगा_सुसि;
 	sixel_state.vals = vals;
 	sixel_state.hash_cap = cap;
     }
-    vim_memset(sixel_state.keys, 0, (size_t)cap * sizeof(*sixel_state.keys));
+    vim_memset(sixel_state.मगा_सुसि, 0, (size_t)cap * sizeof(*sixel_state.मगा_सुसि));
     *cap_out = cap;
     return OK;
 }
@@ -352,7 +352,7 @@ rgb_to_paletted_fast(
     int		     cap;
     int		     mask;
     int		     used = 0;
-    unsigned int    *keys;
+    unsigned int    *मगा_सुसि;
     char_u	    *vals;
     char_u	    *idx;
     char_u	    *pal;
@@ -363,7 +363,7 @@ rgb_to_paletted_fast(
 	    || sixel_ensure_idx_capacity((size_t)width * height) == FAIL
 	    || sixel_ensure_pal_capacity(max_colors) == FAIL)
 	return FAIL;
-    keys = sixel_state.keys;
+    मगा_सुसि = sixel_state.मगा_सुसि;
     vals = sixel_state.vals;
     idx = sixel_state.idx;
     pal = sixel_state.pal;
@@ -373,7 +373,7 @@ rgb_to_paletted_fast(
     for (i = 0; i < n; i++)
     {
 	char_u		*p = pixels + (size_t)i * bpp;
-	unsigned int	 key;
+	unsigned int	 सुसि;
 	unsigned int	 h;
 	int		 slot;
 
@@ -382,20 +382,20 @@ rgb_to_paletted_fast(
 	    idx[i] = 0;	    // transparent -- terminal leaves cell as-is
 	    continue;
 	}
-	key = ((unsigned int)p[0] << 16)
+	सुसि = ((unsigned int)p[0] << 16)
 	    | ((unsigned int)p[1] << 8)
 	    | (unsigned int)p[2];
-	h = key * 2654435761u;
+	h = सुसि * 2654435761u;
 	slot = (int)(h & mask);
 
 	for (;;)
 	{
-	    if (keys[slot] == 0)
+	    if (मगा_सुसि[slot] == 0)
 	    {
 		// new color
 		if (used >= max_colors)
 		    goto too_many;
-		keys[slot] = key + 1;
+		मगा_सुसि[slot] = सुसि + 1;
 		vals[slot] = (char_u)(used + 1);    // 1-based palette index
 		pal[used * 3]	  = p[0];
 		pal[used * 3 + 1] = p[1];
@@ -404,7 +404,7 @@ rgb_to_paletted_fast(
 		idx[i] = vals[slot];
 		break;
 	    }
-	    if (keys[slot] == key + 1)
+	    if (मगा_सुसि[slot] == सुसि + 1)
 	    {
 		idx[i] = vals[slot];
 		break;
@@ -655,7 +655,7 @@ sixel_encode_view(sixel_view_T *view, char_u *seq[2])
     {
 	int gen;
 	int last_was_cr = 0;
-	int used_count = 0;
+	int used_बिलांग = 0;
 
 	if (++band_state->seen_gen <= 0)
 	{
@@ -689,7 +689,7 @@ sixel_encode_view(sixel_view_T *view, char_u *seq[2])
 		if (band_state->seen[pix] != gen)
 		{
 		    band_state->seen[pix] = gen;
-		    band_state->used[used_count++] = pix;
+		    band_state->used[used_बिलांग++] = pix;
 		    band_state->xmin[pix] = x;
 		    band_state->xmax[pix] = x;
 		    vim_memset(band_state->bits + (size_t)pix * width, 0, width);
@@ -705,7 +705,7 @@ sixel_encode_view(sixel_view_T *view, char_u *seq[2])
 	    }
 	}
 
-	for (n = 0; n < used_count; n++)
+	for (n = 0; n < used_बिलांग; n++)
 	{
 	    int	     pix = band_state->used[n];
 	    char_u  *row;

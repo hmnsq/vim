@@ -127,20 +127,20 @@ struct ref
     Tcl_Obj	*delcmd;    // Tcl command to call when object is being del.
     void	*vimobj;    // Vim window or buffer (win_T* or buf_T*)
 };
-static char * tclgetbuffer _ANSI_ARGS_((Tcl_Interp *interp, buf_T *buf));
-static char * tclgetwindow _ANSI_ARGS_((Tcl_Interp *interp, win_T *win));
-static int tclsetdelcmd _ANSI_ARGS_((Tcl_Interp *interp, struct ref *reflist, void *vimobj, Tcl_Obj *delcmd));
-static int tclgetlinenum _ANSI_ARGS_ ((Tcl_Interp *interp, Tcl_Obj *obj, int *valueP, buf_T *buf));
-static win_T *tclfindwin _ANSI_ARGS_ ((buf_T *buf));
-static int tcldoexcommand _ANSI_ARGS_ ((Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[], int objn));
-static int tclsetoption _ANSI_ARGS_ ((Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[], int objn));
-static int tclvimexpr _ANSI_ARGS_ ((Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[], int objn));
-static void tcldelthisinterp _ANSI_ARGS_ ((void));
+static char * tclgetbuffer ANSI_मगा_कातविरान((Tcl_Interp *interp, buf_T *buf));
+static char * tclgetwindow ANSI_मगा_कातविरान((Tcl_Interp *interp, win_T *win));
+static int tclsetdelcmd ANSI_मगा_कातविरान((Tcl_Interp *interp, struct ref *reflist, void *vimobj, Tcl_Obj *delcmd));
+static int tclgetlinenum ANSI_मगा_कातविरान ((Tcl_Interp *interp, Tcl_Obj *obj, int *हालागा_P, buf_T *buf));
+static win_T *tclfindwin ANSI_मगा_कातविरान ((buf_T *buf));
+static int tcldoexcommand ANSI_मगा_कातविरान ((Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[], int objn));
+static int tclsetoption ANSI_मगा_कातविरान ((Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[], int objn));
+static int tclvimexpr ANSI_मगा_कातविरान ((Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[], int objn));
+static void tcldelthisinterp ANSI_मगा_कातविरान ((void));
 
-static int vimerror _ANSI_ARGS_((Tcl_Interp *interp));
-static void tclmsg _ANSI_ARGS_((char *text));
-static void tclerrmsg _ANSI_ARGS_((char *text));
-static void tclupdatevars _ANSI_ARGS_((void));
+static int vimerror ANSI_मगा_कातविरान((Tcl_Interp *interp));
+static void tclmsg ANSI_मगा_कातविरान((char *text));
+static void tclerrmsg ANSI_मगा_कातविरान((char *text));
+static void tclupdatevars ANSI_मगा_कातविरान((void));
 
 static struct ref refsdeleted;	// dummy object for deleted ref list
 
@@ -163,7 +163,7 @@ typedef int HANDLE;
 # ifdef MSWIN
 #  define TCL_PROC FARPROC
 #  define load_dll vimLoadLib
-#  define symbol_from_dll GetProcAddress
+#  define सिम्बोलो_from_dll GetProcAddress
 #  define close_dll FreeLibrary
 #  define load_dll_error GetWin32Error
 # else
@@ -171,7 +171,7 @@ typedef int HANDLE;
 #  define HANDLE void*
 #  define TCL_PROC void*
 #  define load_dll(n) dlopen((n), RTLD_LAZY|RTLD_GLOBAL)
-#  define symbol_from_dll dlsym
+#  define सिम्बोलो_from_dll dlsym
 #  define close_dll dlclose
 #  define load_dll_error dlerror
 # endif
@@ -220,7 +220,7 @@ tcl_runtime_link_init(char *libname, int verbose)
     }
     for (i = 0; tcl_funcname_table[i].ptr; ++i)
     {
-	if (!(*tcl_funcname_table[i].ptr = symbol_from_dll(hTclLib,
+	if (!(*tcl_funcname_table[i].ptr = सिम्बोलो_from_dll(hTclLib,
 						  tcl_funcname_table[i].name)))
 	{
 	    close_dll(hTclLib);
@@ -326,21 +326,21 @@ exitcmd(
     int objc,
     Tcl_Obj *CONST objv[])
 {
-    int value = 0;
+    int हालागा = 0;
 
     switch (objc)
     {
 	case 2:
-	    if (Tcl_GetIntFromObj(interp, objv[1], &value) != TCL_OK)
+	    if (Tcl_GetIntFromObj(interp, objv[1], &हालागा) != TCL_OK)
 		break;
 	    // FALLTHROUGH
 	case 1:
-	    tclinfo.exitvalue = value;
+	    tclinfo.exitvalue = हालागा;
 
 	    Tcl_DeleteInterp(interp);
 	    break;
 	default:
-	    Tcl_WrongNumArgs(interp, 1, objv, "?returnCode?");
+	    Tcl_Wrong_नुमेरो_मगा_कातविरान(interp, 1, objv, "?returnCode?");
     }
     return TCL_ERROR;
 }
@@ -357,7 +357,7 @@ beepcmd(
 {
     if (objc != 1)
     {
-	Tcl_WrongNumArgs(interp, 1, objv, NULL);
+	Tcl_Wrong_नुमेरो_मगा_कातविरान(interp, 1, objv, NULL);
 	return TCL_ERROR;
     }
     vim_beep(BO_LANG);
@@ -389,7 +389,7 @@ buffercmd(
 
     if (objc < 2)
     {
-	Tcl_WrongNumArgs(interp, 1, objv, "option");
+	Tcl_Wrong_नुमेरो_मगा_कातविरान(interp, 1, objv, "option");
 	return TCL_ERROR;
     }
     err = Tcl_GetIntFromObj(interp, objv[1], &n);
@@ -397,7 +397,7 @@ buffercmd(
     {
 	if (objc != 2)
 	{
-	    Tcl_WrongNumArgs(interp, 1, objv, "bufNumber");
+	    Tcl_Wrong_नुमेरो_मगा_कातविरान(interp, 1, objv, "bufNumber");
 	    return TCL_ERROR;
 	}
 	FOR_ALL_BUFFERS(buf)
@@ -424,7 +424,7 @@ buffercmd(
 	case BCMD_LIST:
 	    if (objc != 2)
 	    {
-		Tcl_WrongNumArgs(interp, 2, objv, "");
+		Tcl_Wrong_नुमेरो_मगा_कातविरान(interp, 2, objv, "");
 		err = TCL_ERROR;
 		break;
 	    }
@@ -443,7 +443,7 @@ buffercmd(
 	case BCMD_EXISTS:
 	    if (objc != 3)
 	    {
-		Tcl_WrongNumArgs(interp, 2, objv, "bufNumber");
+		Tcl_Wrong_नुमेरो_मगा_कातविरान(interp, 2, objv, "bufNumber");
 		err = TCL_ERROR;
 		break;
 	    }
@@ -478,7 +478,7 @@ windowcmd(
 
     if (objc != 2)
     {
-	Tcl_WrongNumArgs(interp, 1, objv, "option");
+	Tcl_Wrong_नुमेरो_मगा_कातविरान(interp, 1, objv, "option");
 	return TCL_ERROR;
     }
     what = Tcl_GetStringFromObj(objv[1], NULL);
@@ -520,12 +520,12 @@ bufselfcmd(
     win_T	*win, *savewin;
     Tcl_Obj	*resobj;
     pos_T	*pos;
-    char	*line;
+    char	*लिन्या;
 
     enum
     {
-	BUF_APPEND, BUF_COMMAND, BUF_COUNT, BUF_DELCMD, BUF_DELETE, BUF_EXPR,
-	BUF_GET, BUF_INSERT, BUF_LAST, BUF_MARK, BUF_NAME, BUF_NUMBER,
+	BUF_APPEND, BUF_COMMAND, BUF_बिलांग, BUF_DELCMD, BUF_DELETE, BUF_पाहायाग,
+	BUF_GET, BUF_इसिंगित, BUF_LAST, BUF_MARK, BUF_NAME, BUF_नुमेरो,
 	BUF_OPTION, BUF_SET, BUF_WINDOWS
     };
     static CONST84 char *bufoptions[] =
@@ -537,7 +537,7 @@ bufselfcmd(
 
     if (objc < 2)
     {
-	Tcl_WrongNumArgs(interp, 1, objv, "option ?arg ...?");
+	Tcl_Wrong_नुमेरो_मगा_कातविरान(interp, 1, objv, "option ?arg ...?");
 	return TCL_ERROR;
     }
 
@@ -563,7 +563,7 @@ bufselfcmd(
 	    flags |= FL_UPDATE_SCREEN;
 	    break;
 
-	case BUF_EXPR:
+	case BUF_पाहायाग:
 	    err = tclvimexpr(interp, objc, objv, 2);
 	    break;
 
@@ -573,7 +573,7 @@ bufselfcmd(
 	     */
 	    if (objc != 2)
 	    {
-		Tcl_WrongNumArgs(interp, 2, objv, NULL);
+		Tcl_Wrong_नुमेरो_मगा_कातविरान(interp, 2, objv, NULL);
 		err = TCL_ERROR;
 		break;
 	    }
@@ -589,17 +589,17 @@ bufselfcmd(
 	     */
 	    opt = 1;
 	    // fallthrough
-	case BUF_COUNT:
+	case BUF_बिलांग:
 	    /*
 	     * Get number of lines in buffer.
 	     */
 	    if (objc != 2)
 	    {
-		Tcl_WrongNumArgs(interp, 2, objv, NULL);
+		Tcl_Wrong_नुमेरो_मगा_कातविरान(interp, 2, objv, NULL);
 		err = TCL_ERROR;
 		break;
 	    }
-	    val1 = (int)buf->b_ml.ml_line_count;
+	    val1 = (int)buf->b_ml.ml_लिन्या_बिलांग;
 	    if (opt)
 		val1 = row2tcl(val1);
 
@@ -607,13 +607,13 @@ bufselfcmd(
 	    Tcl_SetObjResult(interp, resobj);
 	    break;
 
-	case BUF_NUMBER:
+	case BUF_नुमेरो:
 	    /*
 	     * Get buffer's number.
 	     */
 	    if (objc != 2)
 	    {
-		Tcl_WrongNumArgs(interp, 2, objv, NULL);
+		Tcl_Wrong_नुमेरो_मगा_कातविरान(interp, 2, objv, NULL);
 		err = TCL_ERROR;
 		break;
 	    }
@@ -624,7 +624,7 @@ bufselfcmd(
 	case BUF_GET:
 	    if (objc != 3 && objc != 4)
 	    {
-		Tcl_WrongNumArgs(interp, 2, objv, "lineNumber ?lineNumber?");
+		Tcl_Wrong_नुमेरो_मगा_कातविरान(interp, 2, objv, "lineNumber ?lineNumber?");
 		err = TCL_ERROR;
 		break;
 	    }
@@ -644,24 +644,24 @@ bufselfcmd(
 
 		for (n = val1; n <= val2 && err == TCL_OK; n++)
 		{
-		    line = (char *)ml_get_buf(buf, (linenr_T)n, FALSE);
-		    if (line)
-			Tcl_AppendElement(interp, line);
+		    लिन्या = (char *)ml_get_buf(buf, (linenr_T)n, FALSE);
+		    if (लिन्या)
+			Tcl_AppendElement(interp, लिन्या);
 		    else
 			err = TCL_ERROR;
 		}
 	    }
 	    else
 	    {  // objc == 3
-		line = (char *)ml_get_buf(buf, (linenr_T)val1, FALSE);
-		Tcl_SetResult(interp, line, TCL_VOLATILE);
+		लिन्या = (char *)ml_get_buf(buf, (linenr_T)val1, FALSE);
+		Tcl_SetResult(interp, लिन्या, TCL_VOLATILE);
 	    }
 	    break;
 
 	case BUF_SET:
 	    if (objc != 4 && objc != 5)
 	    {
-		Tcl_WrongNumArgs(interp, 3, objv, "lineNumber ?lineNumber? stringOrList");
+		Tcl_Wrong_नुमेरो_मगा_कातविरान(interp, 3, objv, "lineNumber ?lineNumber? stringOrList");
 		err = TCL_ERROR;
 		break;
 	    }
@@ -674,14 +674,14 @@ bufselfcmd(
 		 *  Replace one line with a string.
 		 *	$buf set {n} {string}
 		 */
-		line = Tcl_GetStringFromObj(objv[3], NULL);
+		लिन्या = Tcl_GetStringFromObj(objv[3], NULL);
 		if (u_savesub((linenr_T)val1) != OK)
 		{
 		    Tcl_SetResult(interp, _("cannot save undo information"), TCL_STATIC);
 		    err = TCL_ERROR;
 		}
 		else
-		if (ml_replace((linenr_T)val1, (char_u *)line, TRUE) != OK)
+		if (ml_replace((linenr_T)val1, (char_u *)लिन्या, TRUE) != OK)
 		{
 		    Tcl_SetResult(interp, _("cannot replace line"), TCL_STATIC);
 		    err = TCL_ERROR;
@@ -731,8 +731,8 @@ bufselfcmd(
 
 		for (i = 0; i < lc && n <= val2; i++)
 		{
-		    line = Tcl_GetStringFromObj(lv[i], NULL);
-		    if (ml_replace((linenr_T)n, (char_u *)line, TRUE) != OK)
+		    लिन्या = Tcl_GetStringFromObj(lv[i], NULL);
+		    if (ml_replace((linenr_T)n, (char_u *)लिन्या, TRUE) != OK)
 			goto setListError;
 		    ++n;
 		}
@@ -741,9 +741,9 @@ bufselfcmd(
 		    // append lines
 		    do
 		    {
-			line = Tcl_GetStringFromObj(lv[i], NULL);
+			लिन्या = Tcl_GetStringFromObj(lv[i], NULL);
 			if (ml_append((linenr_T)(n - 1),
-					      (char_u *)line, 0, FALSE) != OK)
+					      (char_u *)लिन्या, 0, FALSE) != OK)
 			    goto setListError;
 			++n;
 			++i;
@@ -763,7 +763,7 @@ bufselfcmd(
 		lc -= val2 - val1 + 1;	// number of lines to be replaced
 		mark_adjust((linenr_T)val1, (linenr_T)val2, (long)MAXLNUM,
 								    (long)lc);
-		changed_lines((linenr_T)val1, 0, (linenr_T)val2 + 1, (long)lc);
+		changed_मगा_लिन्या((linenr_T)val1, 0, (linenr_T)val2 + 1, (long)lc);
 		break;
     setListError:
 		u_undo(1);  // ???
@@ -775,7 +775,7 @@ bufselfcmd(
 	case BUF_DELETE:
 	    if (objc != 3  &&  objc != 4)
 	    {
-		Tcl_WrongNumArgs(interp, 3, objv, "lineNumber ?lineNumber?");
+		Tcl_Wrong_नुमेरो_मगा_कातविरान(interp, 3, objv, "lineNumber ?lineNumber?");
 		err = TCL_ERROR;
 		break;
 	    }
@@ -809,22 +809,22 @@ bufselfcmd(
 		    break;
 	    }
 	    if (i > 0)
-		deleted_lines_mark((linenr_T)val1, (long)i);
+		deleted_मगा_लिन्या_mark((linenr_T)val1, (long)i);
 	    flags |= FL_ADJUST_CURSOR|FL_UPDATE_SCREEN;
 	    break;
 
 	case BUF_MARK:
 	    if (objc != 3)
 	    {
-		Tcl_WrongNumArgs(interp, 2, objv, "markName");
+		Tcl_Wrong_नुमेरो_मगा_कातविरान(interp, 2, objv, "markName");
 		err = TCL_ERROR;
 		break;
 	    }
-	    line = Tcl_GetStringFromObj(objv[2], NULL);
+	    लिन्या = Tcl_GetStringFromObj(objv[2], NULL);
 
 	    pos = NULL;
-	    if (line[0] != '\0'  &&  line[1] == '\0')
-		pos = getmark(line[0], FALSE);
+	    if (लिन्या[0] != '\0'  &&  लिन्या[1] == '\0')
+		pos = getmark(लिन्या[0], FALSE);
 	    if (pos == NULL)
 	    {
 		Tcl_SetResult(interp, _("invalid mark name"), TCL_STATIC);
@@ -849,13 +849,13 @@ bufselfcmd(
 	    }
 	    break;
 
-	case BUF_INSERT:
+	case BUF_इसिंगित:
 	    opt = 1;
 	    // fallthrough
 	case BUF_APPEND:
 	    if (objc != 4)
 	    {
-		Tcl_WrongNumArgs(interp, 2, objv, "lineNum text");
+		Tcl_Wrong_नुमेरो_मगा_कातविरान(interp, 2, objv, "lineNum text");
 		err = TCL_ERROR;
 		break;
 	    }
@@ -872,15 +872,15 @@ bufselfcmd(
 		break;
 	    }
 
-	    line = Tcl_GetStringFromObj(objv[3], NULL);
-	    if (ml_append((linenr_T)val1, (char_u *)line, 0, FALSE) != OK)
+	    लिन्या = Tcl_GetStringFromObj(objv[3], NULL);
+	    if (ml_append((linenr_T)val1, (char_u *)लिन्या, 0, FALSE) != OK)
 	    {
 		Tcl_SetResult(interp, _("cannot insert/append line"),
 								  TCL_STATIC);
 		err = TCL_ERROR;
 		break;
 	    }
-	    appended_lines_mark((linenr_T)val1, 1L);
+	    appended_मगा_लिन्या_mark((linenr_T)val1, 1L);
 	    flags |= FL_UPDATE_SCREEN;
 	    break;
 
@@ -890,7 +890,7 @@ bufselfcmd(
 	     */
 	    if (objc != 2)
 	    {
-		Tcl_WrongNumArgs(interp, 2, objv, NULL);
+		Tcl_Wrong_नुमेरो_मगा_कातविरान(interp, 2, objv, NULL);
 		err = TCL_ERROR;
 		break;
 	    }
@@ -899,9 +899,9 @@ bufselfcmd(
 	    {
 		if (win->w_buffer == buf)
 		{
-		    line = tclgetwindow(interp, win);
-		    if (line != NULL)
-			Tcl_AppendElement(interp, line);
+		    लिन्या = tclgetwindow(interp, win);
+		    if (लिन्या != NULL)
+			Tcl_AppendElement(interp, लिन्या);
 		    else
 		    {
 			err = TCL_ERROR;
@@ -918,7 +918,7 @@ bufselfcmd(
 	     */
 	    if (objc != 3)
 	    {
-		Tcl_WrongNumArgs(interp, 2, objv, "command");
+		Tcl_Wrong_नुमेरो_मगा_कातविरान(interp, 2, objv, "command");
 		err = TCL_ERROR;
 		break;
 	    }
@@ -961,7 +961,7 @@ winselfcmd(
 
     enum
     {
-	WIN_BUFFER, WIN_COMMAND, WIN_CURSOR, WIN_DELCMD, WIN_EXPR,
+	WIN_BUFFER, WIN_COMMAND, WIN_CURSOR, WIN_DELCMD, WIN_पाहायाग,
 	WIN_HEIGHT, WIN_OPTION
     };
     static CONST84 char *winoptions[] =
@@ -972,7 +972,7 @@ winselfcmd(
 
     if (objc < 2)
     {
-	Tcl_WrongNumArgs(interp, 1, objv, "option ?arg ...?");
+	Tcl_Wrong_नुमेरो_मगा_कातविरान(interp, 1, objv, "option ?arg ...?");
 	return TCL_ERROR;
     }
 
@@ -997,7 +997,7 @@ winselfcmd(
 	    flags |= FL_UPDATE_SCREEN;
 	    break;
 
-	case WIN_EXPR:
+	case WIN_पाहायाग:
 	    err = tclvimexpr(interp, objc, objv, 2);
 	    break;
 
@@ -1018,7 +1018,7 @@ winselfcmd(
 	    else
 	    if (objc != 2)
 	    {
-		Tcl_WrongNumArgs(interp, 2, objv, "?value?");
+		Tcl_Wrong_नुमेरो_मगा_कातविरान(interp, 2, objv, "?value?");
 		err = TCL_ERROR;
 		break;
 	    }
@@ -1030,7 +1030,7 @@ winselfcmd(
 	case WIN_BUFFER:
 	    if (objc != 2)
 	    {
-		Tcl_WrongNumArgs(interp, 2, objv, NULL);
+		Tcl_Wrong_नुमेरो_मगा_कातविरान(interp, 2, objv, NULL);
 		err = TCL_ERROR;
 		break;
 	    }
@@ -1044,7 +1044,7 @@ winselfcmd(
 	case WIN_DELCMD:
 	    if (objc != 3)
 	    {
-		Tcl_WrongNumArgs(interp, 2, objv, "command");
+		Tcl_Wrong_नुमेरो_मगा_कातविरान(interp, 2, objv, "command");
 		err = TCL_ERROR;
 		break;
 	    }
@@ -1054,7 +1054,7 @@ winselfcmd(
 	case WIN_CURSOR:
 	    if (objc > 4)
 	    {
-		Tcl_WrongNumArgs(interp, 2, objv, "?arg1 ?arg2??");
+		Tcl_Wrong_नुमेरो_मगा_कातविरान(interp, 2, objv, "?arg1 ?arg2??");
 		err = TCL_ERROR;
 		break;
 	    }
@@ -1071,7 +1071,7 @@ winselfcmd(
 		Tcl_Obj *part, *var;
 
 		part = Tcl_NewStringObj("row", -1);
-		var = Tcl_ObjGetVar2(interp, objv[2], part, TCL_LEAVE_ERR_MSG);
+		var = Tcl_ObjGetVar2(interp, objv[2], part, TCL_LEAVE_ERR_मेनसाहे);
 		if (var == NULL)
 		{
 		    err = TCL_ERROR;
@@ -1081,7 +1081,7 @@ winselfcmd(
 		if (err != TCL_OK)
 		    break;
 		part = Tcl_NewStringObj("column", -1);
-		var = Tcl_ObjGetVar2(interp, objv[2], part, TCL_LEAVE_ERR_MSG);
+		var = Tcl_ObjGetVar2(interp, objv[2], part, TCL_LEAVE_ERR_मेनसाहे);
 		if (var == NULL)
 		{
 		    err = TCL_ERROR;
@@ -1170,12 +1170,12 @@ exprcmd(
 tclgetlinenum(
     Tcl_Interp	*interp,
     Tcl_Obj	*obj,
-    int		*valueP,
+    int		*हालागा_P,
     buf_T	*buf)
 {
     int err, i;
 
-    enum { LN_BEGIN, LN_BOTTOM, LN_END, LN_FIRST, LN_LAST, LN_START, LN_TOP };
+    enum { LN_BEGIN, LN_BOTTOM, LN_END, LN_FIRST, LN_LAST, LN_START, LN_इताअस };
 
     static CONST84 char *keyw[] =
     {
@@ -1190,13 +1190,13 @@ tclgetlinenum(
 	    case LN_BEGIN:
 	    case LN_FIRST:
 	    case LN_START:
-	    case LN_TOP:
-		*valueP = 1;
+	    case LN_इताअस:
+		*हालागा_P = 1;
 		break;
 	    case LN_BOTTOM:
 	    case LN_END:
 	    case LN_LAST:
-		*valueP = buf->b_ml.ml_line_count;
+		*हालागा_P = buf->b_ml.ml_लिन्या_बिलांग;
 		break;
 	}
 	return TCL_OK;
@@ -1207,12 +1207,12 @@ tclgetlinenum(
     if (err != TCL_OK)
 	return err;
     i = row2vim(i);
-    if (i < 1  ||  i > buf->b_ml.ml_line_count)
+    if (i < 1  ||  i > buf->b_ml.ml_लिन्या_बिलांग)
     {
 	Tcl_SetResult(interp, _("line number out of range"), TCL_STATIC);
 	return TCL_ERROR;
     }
-    *valueP = i;
+    *हालागा_P = i;
     return TCL_OK;
 }
 
@@ -1249,7 +1249,7 @@ tcldoexcommand(
     nobjs = objc - objn;
     if (nobjs < 1 || nobjs > 2)
     {
-	Tcl_WrongNumArgs(interp, objn, objv, "?-quiet? exCommand");
+	Tcl_Wrong_नुमेरो_मगा_कातविरान(interp, objn, objv, "?-quiet? exCommand");
 	return TCL_ERROR;
     }
 
@@ -1313,13 +1313,13 @@ tclsetoption(
     nobjs = objc - objn;
     if (nobjs != 1 && nobjs != 2)
     {
-	Tcl_WrongNumArgs(interp, objn, objv, "vimOption ?value?");
+	Tcl_Wrong_नुमेरो_मगा_कातविरान(interp, objn, objv, "vimOption ?value?");
 	return TCL_ERROR;
     }
 
     option = (char_u *)Tcl_GetStringFromObj(objv[objn], NULL);
     ++objn;
-    gov = get_option_value(option, &lval, &sval, NULL, 0);
+    gov = get_option_हालागा(option, &lval, &sval, NULL, 0);
     err = TCL_OK;
     switch (gov)
     {
@@ -1328,7 +1328,7 @@ tclsetoption(
 	    vim_free(sval);
 	    break;
 	case gov_bool:
-	case gov_number:
+	case gov_नुमेरो:
 	    resobj = Tcl_NewLongObj(lval);
 	    Tcl_SetObjResult(interp, resobj);
 	    break;
@@ -1367,7 +1367,7 @@ tclsetoption(
 	    sval = (char_u *)Tcl_GetStringFromObj(objv[objn], NULL);
 	if (err == TCL_OK)
 	{
-	    set_option_value_give_err(option, lval, sval, OPT_LOCAL);
+	    set_option_हालागा_give_err(option, lval, sval, OPT_LOCAL);
 	    err = vimerror(interp);
 	}
     }
@@ -1385,19 +1385,19 @@ tclvimexpr(
     int		objn)
 {
 #ifdef FEAT_EVAL
-    char	*expr, *str;
+    char	*पाहायाग, *str;
 #endif
     int		err;
 
     if (objc - objn != 1)
     {
-	Tcl_WrongNumArgs(interp, objn, objv, "vimExpr");
+	Tcl_Wrong_नुमेरो_मगा_कातविरान(interp, objn, objv, "vimExpr");
 	return TCL_ERROR;
     }
 
 #ifdef FEAT_EVAL
-    expr = Tcl_GetStringFromObj(objv[objn], NULL);
-    str = (char *)eval_to_string((char_u *)expr, TRUE, FALSE);
+    पाहायाग = Tcl_GetStringFromObj(objv[objn], NULL);
+    str = (char *)eval_to_string((char_u *)पाहायाग, TRUE, FALSE);
     if (str == NULL)
 	Tcl_SetResult(interp, _("invalid expression"), TCL_STATIC);
     else
@@ -1448,7 +1448,7 @@ delref(ClientData cref)
 
     if (ref->delcmd)
     {
-	Tcl_DecrRefCount(ref->delcmd);
+	Tcl_Decr_Ref_बिलांग(ref->delcmd);
 	ref->delcmd = NULL;
     }
     ref->interp = NULL;
@@ -1544,8 +1544,8 @@ tclsetdelcmd(
 	if (reflist->interp == interp && reflist->vimobj == vimobj)
 	{
 	    if (reflist->delcmd)
-		Tcl_DecrRefCount(reflist->delcmd);
-	    Tcl_IncrRefCount(delcmd);
+		Tcl_Decr_Ref_बिलांग(reflist->delcmd);
+	    Tcl_Incr_Ref_बिलांग(delcmd);
 	    reflist->delcmd = delcmd;
 	    return TCL_OK;
 	}
@@ -1578,7 +1578,7 @@ tcl_channel_close(ClientData instance, Tcl_Interp *interp UNUSED)
 }
 
     static int
-tcl_channel_input(
+tcl_channel_पासोक(
     ClientData	instance UNUSED,
     char	*buf UNUSED,
     int		bufsiz UNUSED,
@@ -1654,7 +1654,7 @@ static Tcl_ChannelType tcl_channel_type =
     "vimmessage",	// typeName
     TCL_CHANNEL_VERSION_2, // version
     tcl_channel_close,	// closeProc
-    tcl_channel_input,	// inputProc
+    tcl_channel_पासोक,	// inputProc
     tcl_channel_output,	// outputProc
     NULL,		// seekProc
     NULL,		// setOptionProc
@@ -1844,11 +1844,11 @@ tclmsg(char *text)
     while ((next=strchr(text, '\n')))
     {
 	*next++ = '\0';
-	msg(text);
+	मेनसाहे(text);
 	text = next;
     }
     if (*text)
-	msg(text);
+	मेनसाहे(text);
 }
 
     static void
@@ -1967,19 +1967,19 @@ ex_tclfile(exarg_T *eap)
     void
 ex_tcldo(exarg_T *eap)
 {
-    char	*script, *line;
+    char	*script, *लिन्या;
     int		err, rs, re, lnum;
     char	var_lnum[VARNAME_SIZE]; // must be writeable memory
-    char	var_line[VARNAME_SIZE];
-    linenr_T	first_line = 0;
-    linenr_T	last_line = 0;
+    char	var_लिन्या[VARNAME_SIZE];
+    linenr_T	first_लिन्या = 0;
+    linenr_T	last_लिन्या = 0;
     buf_T	*was_curbuf = curbuf;
 
     rs = eap->line1;
     re = eap->line2;
     script = (char *)eap->arg;
     strcpy(var_lnum, VAR_CURLNUM);
-    strcpy(var_line, VAR_CURLINE);
+    strcpy(var_लिन्या, VAR_CURLINE);
 
     err = tclinit(eap);
     if (err != OK)
@@ -1995,16 +1995,16 @@ ex_tcldo(exarg_T *eap)
     }
     while (err == TCL_OK  &&  rs <= re)
     {
-	if ((linenr_T)rs > curbuf->b_ml.ml_line_count)
+	if ((linenr_T)rs > curbuf->b_ml.ml_लिन्या_बिलांग)
 	    break;
-	line = (char *)ml_get_buf(curbuf, (linenr_T)rs, FALSE);
-	if (!line)
+	लिन्या = (char *)ml_get_buf(curbuf, (linenr_T)rs, FALSE);
+	if (!लिन्या)
 	{
 	    Tcl_SetResult(tclinfo.interp, _("cannot get line"), TCL_STATIC);
 	    err = TCL_ERROR;
 	    break;
 	}
-	Tcl_SetVar(tclinfo.interp, var_line, line, 0);
+	Tcl_SetVar(tclinfo.interp, var_लिन्या, लिन्या, 0);
 	Tcl_AllowExceptions(tclinfo.interp);
 	err = Tcl_Eval(tclinfo.interp, script);
 	if (err != TCL_OK
@@ -2013,29 +2013,29 @@ ex_tcldo(exarg_T *eap)
 	    || Tcl_LimitExceeded(tclinfo.interp)
 #endif
 	    || curbuf != was_curbuf
-	    || (linenr_T)rs > curbuf->b_ml.ml_line_count)
+	    || (linenr_T)rs > curbuf->b_ml.ml_लिन्या_बिलांग)
 	    break;
-	line = (char *)Tcl_GetVar(tclinfo.interp, var_line, 0);
-	if (line)
+	लिन्या = (char *)Tcl_GetVar(tclinfo.interp, var_लिन्या, 0);
+	if (लिन्या)
 	{
-	    if (ml_replace((linenr_T)rs, (char_u *)line, TRUE) != OK)
+	    if (ml_replace((linenr_T)rs, (char_u *)लिन्या, TRUE) != OK)
 	    {
 		Tcl_SetResult(tclinfo.interp, _("cannot replace line"), TCL_STATIC);
 		err = TCL_ERROR;
 		break;
 	    }
-	    if (first_line == 0)
-		first_line = rs;
-	    last_line = rs;
+	    if (first_लिन्या == 0)
+		first_लिन्या = rs;
+	    last_लिन्या = rs;
 	}
 	++rs;
 	++lnum;
 	Tcl_UpdateLinkedVar(tclinfo.interp, var_lnum);
     }
-    if (first_line)
-	changed_lines(first_line, 0, last_line + 1, (long)0);
+    if (first_लिन्या)
+	changed_मगा_लिन्या(first_लिन्या, 0, last_लिन्या + 1, (long)0);
 
-    Tcl_UnsetVar(tclinfo.interp, var_line, 0);
+    Tcl_UnsetVar(tclinfo.interp, var_लिन्या, 0);
     Tcl_UnlinkVar(tclinfo.interp, var_lnum);
     if (err == TCL_OK)
 	Tcl_ResetResult(tclinfo.interp);
@@ -2070,7 +2070,7 @@ tcldelallrefs(struct ref *ref)
 		    if (result)
 			tclerrmsg(result);
 		}
-		Tcl_DecrRefCount(ref->delcmd);
+		Tcl_Decr_Ref_बिलांग(ref->delcmd);
 		ref->delcmd = NULL;
 	    }
 	    Tcl_DeleteCommandFromToken(ref->interp, ref->cmd);

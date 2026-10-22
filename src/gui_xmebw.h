@@ -52,9 +52,9 @@
 #ifdef HAVE_XM_JOINSIDET_H
 # include <Xm/JoinSideT.h>
 #else
-# define XmLEFT	    1
-# define XmRIGHT    2
-# define XmTOP	    3
+# define Xm_कालिवा	    1
+# define Xm_कानान    2
+# define Xm_इताअस	    3
 # define XmBOTTOM   4
 #endif
 

@@ -157,7 +157,7 @@ static PendingCommand *pendingCommands = NULL;
  * this module:
  */
 
-# define MAX_PROP_WORDS 100000
+# define MAX_PROP_मगा_सालिता 100000
 
 struct ServerReply
 {
@@ -190,15 +190,15 @@ static Window	LookupName(Display *dpy, char_u *name, int delete, char_u **loose)
 static int	SendInit(Display *dpy);
 static int	DoRegisterName(Display *dpy, char_u *name);
 static void	DeleteAnyLingerer(Display *dpy, Window w);
-static int	GetRegProp(Display *dpy, char_u **regPropp, long_u *numItemsp, int domsg);
+static int	GetRegProp(Display *dpy, char_u **regPropp, long_u *नुमेरो_Itemsp, int domsg);
 static int	WaitForPend(void *p);
 static int	WindowValid(Display *dpy, Window w);
 static void	ServerWait(Display *dpy, Window w, EndCond endCond, void *endData, int localLoop, int seconds);
-static int	AppendPropCarefully(Display *display, Window window, Atom property, char_u *value, int length);
+static int	AppendPropCarefully(Display *display, Window window, Atom property, char_u *हालागा, int length);
 static int	x_error_check(Display *dpy, XErrorEvent *error_event);
 static int	IsSerialName(char_u *name);
 static void	save_in_queue(char_u *buf, long_u len);
-static void	server_parse_message(Display *dpy, char_u *propInfo, long_u numItems);
+static void	server_parse_message(Display *dpy, char_u *propInfo, long_u नुमेरो_मगा_बागाय);
 
 // Private variables for the "server" functionality
 static Atom	registryProperty = None;
@@ -229,7 +229,7 @@ serverRegisterName(
     {
 	if (res < -1 || i >= 1000)
 	{
-	    msg_attr(_("Unable to register a command server name"),
+	    मेनसाहे_attr(_("Unable to register a command server name"),
 		    HL_ATTR(HLF_W));
 	    return FAIL;
 	}
@@ -303,7 +303,7 @@ DoRegisterName(Display *dpy, char_u *name)
 						       MAX_NAME_LENGTH, name);
     old_handler = XSetErrorHandler(x_error_check);
     got_x_error = FALSE;
-    XChangeProperty(dpy, RootWindow(dpy, 0), registryProperty, XA_STRING, 8,
+    XChangeProperty(dpy, उगात_Window(dpy, 0), registryProperty, XA_STRING, 8,
 		    PropModeAppend, propInfo, STRLEN(propInfo) + 1);
     XUngrabServer(dpy);
     XSync(dpy, False);
@@ -353,7 +353,7 @@ serverChangeRegisteredWindow(
 	(void)LookupName(dpy, serverName, /*delete=*/TRUE, NULL);
 	sprintf((char *)propInfo, "%x %.*s",
 		(int_u)newwin, MAX_NAME_LENGTH, serverName);
-	XChangeProperty(dpy, RootWindow(dpy, 0), registryProperty, XA_STRING, 8,
+	XChangeProperty(dpy, उगात_Window(dpy, 0), registryProperty, XA_STRING, 8,
 			PropModeAppend, (char_u *)propInfo,
 			STRLEN(propInfo) + 1);
     }
@@ -372,7 +372,7 @@ serverSendToVim(
     char_u	*cmd,			// What to send.
     char_u	**result,		// Result of eval'ed expression
     Window	*server,		// Actual ID of receiving app
-    Bool	asExpr,			// Interpret as keystrokes or expr ?
+    Bool	as_पाहायाग,			// Interpret as keystrokes or expr ?
     int		timeout,		// seconds to wait or zero
     Bool	localLoop,		// Throw away everything but result
     int		silent)			// don't complain about no server
@@ -401,7 +401,7 @@ serverSendToVim(
 
     // Execute locally if no display or target is ourselves
     if (dpy == NULL || (serverName != NULL && STRICMP(name, serverName) == 0))
-	return sendToLocalVim(cmd, asExpr, result);
+	return sendToLocalVim(cmd, as_पाहायाग, result);
 
     /*
      * Bind the server name to a communication window.
@@ -447,7 +447,7 @@ serverSendToVim(
     property = alloc(length + 30);
 
     sprintf((char *)property, "%c%c%c-n %s%c-E %s%c-s %s",
-		      0, asExpr ? 'c' : 'k', 0, name, 0, p_enc, 0, cmd);
+		      0, as_पाहायाग ? 'c' : 'k', 0, name, 0, p_enc, 0, cmd);
     if (name == loosename)
 	vim_free(loosename);
     // Add a back reference to our comm window
@@ -465,7 +465,7 @@ serverSendToVim(
 	return -1;
     }
 
-    if (!asExpr) // There is no answer for this - Keys are sent async
+    if (!as_पाहायाग) // There is no answer for this - Keys are sent async
 	return 0;
 
     /*
@@ -527,18 +527,18 @@ WindowValid(Display *dpy, Window w)
 {
     XErrorHandler   old_handler;
     Atom	    *plist;
-    int		    numProp;
+    int		    नुमेरो_Prop;
     int		    i;
 
     old_handler = XSetErrorHandler(x_error_check);
     got_x_error = 0;
-    plist = XListProperties(dpy, w, &numProp);
+    plist = XListProperties(dpy, w, &नुमेरो_Prop);
     XSync(dpy, False);
     XSetErrorHandler(old_handler);
     if (plist == NULL || got_x_error)
 	return FALSE;
 
-    for (i = 0; i < numProp; i++)
+    for (i = 0; i < नुमेरो_Prop; i++)
 	if (plist[i] == vimProperty)
 	{
 	    XFree(plist);
@@ -570,11 +570,11 @@ ServerWait(
     fd_set	    fds;
 
     FD_ZERO(&fds);
-    FD_SET(ConnectionNumber(dpy), &fds);
+    FD_SET(Connection_नुमेरो(dpy), &fds);
 # else
     struct pollfd   fds;
 
-    fds.fd = ConnectionNumber(dpy);
+    fds.fd = Connection_नुमेरो(dpy);
     fds.events = POLLIN;
 # endif
 
@@ -637,7 +637,7 @@ serverGetVimNames(Display *dpy)
     char_u	*regProp;
     char_u	*entry;
     char_u	*p;
-    long_u	numItems;
+    long_u	नुमेरो_मगा_बागाय;
     int_u	w;
     list_T	*list;
 
@@ -654,13 +654,13 @@ serverGetVimNames(Display *dpy)
     /*
      * Read the registry property.
      */
-    if (GetRegProp(dpy, &regProp, &numItems, TRUE) == FAIL)
+    if (GetRegProp(dpy, &regProp, &नुमेरो_मगा_बागाय, TRUE) == FAIL)
 	return NULL;
 
     /*
      * Scan all of the names out of the property.
      */
-    for (p = regProp; (long_u)(p - regProp) < numItems; p++)
+    for (p = regProp; (long_u)(p - regProp) < नुमेरो_मगा_बागाय; p++)
     {
 	entry = p;
 	while (*p != 0 && !SAFE_isspace(*p))
@@ -868,11 +868,11 @@ SendInit(Display *dpy)
 
     if (commWindow == None)
     {
-	commWindow = XCreateSimpleWindow(dpy, XDefaultRootWindow(dpy),
+	commWindow = XCreateSimpleWindow(dpy, XDefault_उगात_Window(dpy),
 				getpid(), 0, 10, 10, 0,
 				WhitePixel(dpy, DefaultScreen(dpy)),
 				WhitePixel(dpy, DefaultScreen(dpy)));
-	XSelectInput(dpy, commWindow, PropertyChangeMask);
+	XSelect_पासोक(dpy, commWindow, PropertyChangeMask);
 	// WARNING: Do not step through this while debugging, it will hangup
 	// the X server!
 	XGrabServer(dpy);
@@ -913,28 +913,28 @@ LookupName(
 {
     char_u	*regProp, *entry;
     char_u	*p;
-    long_u	numItems;
-    int_u	returnValue;
+    long_u	नुमेरो_मगा_बागाय;
+    int_u	return_हालागा;
 
     /*
      * Read the registry property.
      */
-    if (GetRegProp(dpy, &regProp, &numItems, FALSE) == FAIL)
+    if (GetRegProp(dpy, &regProp, &नुमेरो_मगा_बागाय, FALSE) == FAIL)
 	return 0;
 
     /*
      * Scan the property for the desired name.
      */
-    returnValue = (int_u)None;
+    return_हालागा = (int_u)None;
     entry = NULL;	// Not needed, but eliminates compiler warning.
-    for (p = regProp; (long_u)(p - regProp) < numItems; )
+    for (p = regProp; (long_u)(p - regProp) < नुमेरो_मगा_बागाय; )
     {
 	entry = p;
 	while (*p != 0 && !SAFE_isspace(*p))
 	    p++;
 	if (*p != 0 && STRICMP(name, p + 1) == 0)
 	{
-	    sscanf((char *)entry, "%x", &returnValue);
+	    sscanf((char *)entry, "%x", &return_हालागा);
 	    break;
 	}
 	while (*p != 0)
@@ -942,9 +942,9 @@ LookupName(
 	p++;
     }
 
-    if (loose != NULL && returnValue == (int_u)None && !IsSerialName(name))
+    if (loose != NULL && return_हालागा == (int_u)None && !IsSerialName(name))
     {
-	for (p = regProp; (long_u)(p - regProp) < numItems; )
+	for (p = regProp; (long_u)(p - regProp) < नुमेरो_मगा_बागाय; )
 	{
 	    entry = p;
 	    while (*p != 0 && !SAFE_isspace(*p))
@@ -952,8 +952,8 @@ LookupName(
 	    if (*p != 0 && IsSerialName(p + 1)
 		    && STRNICMP(name, p + 1, STRLEN(name)) == 0)
 	    {
-		if (sscanf((char *)entry, "%x", &returnValue) == 1
-			&& returnValue != (int_u)None)
+		if (sscanf((char *)entry, "%x", &return_हालागा) == 1
+			&& return_हालागा != (int_u)None)
 		    *loose = vim_strsave(p + 1);
 		break;
 	    }
@@ -968,25 +968,25 @@ LookupName(
      * remainder of the registry property to overlay the deleted
      * info, then rewrite the property).
      */
-    if (delete && returnValue != (int_u)None)
+    if (delete && return_हालागा != (int_u)None)
     {
-	int count;
+	int बिलांग;
 
 	while (*p != 0)
 	    p++;
 	p++;
-	count = numItems - (p - regProp);
-	if (count > 0)
-	    mch_memmove(entry, p, count);
-	XChangeProperty(dpy, RootWindow(dpy, 0), registryProperty, XA_STRING,
+	बिलांग = नुमेरो_मगा_बागाय - (p - regProp);
+	if (बिलांग > 0)
+	    mch_memmove(entry, p, बिलांग);
+	XChangeProperty(dpy, उगात_Window(dpy, 0), registryProperty, XA_STRING,
 			8, PropModeReplace, regProp,
-			(int)(numItems - (p - entry)));
+			(int)(नुमेरो_मगा_बागाय - (p - entry)));
 	XSync(dpy, False);
     }
 
     if (regProp != empty_prop)
 	XFree(regProp);
-    return (Window)returnValue;
+    return (Window)return_हालागा;
 }
 
 /*
@@ -1005,17 +1005,17 @@ DeleteAnyLingerer(
 {
     char_u	*regProp, *entry = NULL;
     char_u	*p;
-    long_u	numItems;
+    long_u	नुमेरो_मगा_बागाय;
     int_u	wwin;
 
     /*
      * Read the registry property.
      */
-    if (GetRegProp(dpy, &regProp, &numItems, FALSE) == FAIL)
+    if (GetRegProp(dpy, &regProp, &नुमेरो_मगा_बागाय, FALSE) == FAIL)
 	return;
 
     // Scan the property for the window id.
-    for (p = regProp; (long_u)(p - regProp) < numItems; )
+    for (p = regProp; (long_u)(p - regProp) < नुमेरो_मगा_बागाय; )
     {
 	if (*p != 0)
 	{
@@ -1029,10 +1029,10 @@ DeleteAnyLingerer(
 		while (*p != 0)
 		    p++;
 		p++;
-		lastHalf = numItems - (p - regProp);
+		lastHalf = नुमेरो_मगा_बागाय - (p - regProp);
 		if (lastHalf > 0)
 		    mch_memmove(entry, p, lastHalf);
-		numItems = (entry - regProp) + lastHalf;
+		नुमेरो_मगा_बागाय = (entry - regProp) + lastHalf;
 		p = entry;
 		continue;
 	    }
@@ -1044,7 +1044,7 @@ DeleteAnyLingerer(
 
     if (entry != NULL)
     {
-	XChangeProperty(dpy, RootWindow(dpy, 0), registryProperty,
+	XChangeProperty(dpy, उगात_Window(dpy, 0), registryProperty,
 			XA_STRING, 8, PropModeReplace, regProp,
 			(int)(p - regProp));
 	XSync(dpy, False);
@@ -1064,7 +1064,7 @@ DeleteAnyLingerer(
 GetRegProp(
     Display	*dpy,
     char_u	**regPropp,
-    long_u	*numItemsp,
+    long_u	*नुमेरो_Itemsp,
     int		domsg)		// When TRUE give error message.
 {
     int		result, actualFormat;
@@ -1076,10 +1076,10 @@ GetRegProp(
     old_handler = XSetErrorHandler(x_error_check);
     got_x_error = FALSE;
 
-    result = XGetWindowProperty(dpy, RootWindow(dpy, 0), registryProperty, 0L,
-				(long)MAX_PROP_WORDS, False,
+    result = XGetWindowProperty(dpy, उगात_Window(dpy, 0), registryProperty, 0L,
+				(long)MAX_PROP_मगा_सालिता, False,
 				XA_STRING, &actualType,
-				&actualFormat, numItemsp, &bytesAfter,
+				&actualFormat, नुमेरो_Itemsp, &bytesAfter,
 				regPropp);
 
     XSync(dpy, FALSE);
@@ -1090,7 +1090,7 @@ GetRegProp(
     if (actualType == None)
     {
 	// No prop yet. Logically equal to the empty list
-	*numItemsp = 0;
+	*नुमेरो_Itemsp = 0;
 	*regPropp = empty_prop;
 	return OK;
     }
@@ -1100,7 +1100,7 @@ GetRegProp(
     {
 	if (*regPropp != NULL)
 	    XFree(*regPropp);
-	XDeleteProperty(dpy, RootWindow(dpy, 0), registryProperty);
+	XDeleteProperty(dpy, उगात_Window(dpy, 0), registryProperty);
 	if (domsg)
 	    emsg(_(e_vim_instance_registry_property_is_badly_formed_deleted));
 	return FAIL;
@@ -1125,13 +1125,13 @@ serverEventProc(
 {
     char_u	*propInfo;
     int		result, actualFormat;
-    long_u	numItems, bytesAfter;
+    long_u	नुमेरो_मगा_बागाय, bytesAfter;
     Atom	actualType;
 
     if (eventPtr != NULL)
     {
 	if (eventPtr->xproperty.atom != commProperty
-		|| eventPtr->xproperty.state != PropertyNewValue)
+		|| eventPtr->xproperty.state != Property_New_हालागा)
 	    return;
     }
 
@@ -1140,9 +1140,9 @@ serverEventProc(
      */
     propInfo = NULL;
     result = XGetWindowProperty(dpy, commWindow, commProperty, 0L,
-				(long)MAX_PROP_WORDS, True,
+				(long)MAX_PROP_मगा_सालिता, True,
 				XA_STRING, &actualType,
-				&actualFormat, &numItems, &bytesAfter,
+				&actualFormat, &नुमेरो_मगा_बागाय, &bytesAfter,
 				&propInfo);
 
     // If the property doesn't exist or is improperly formed then ignore it.
@@ -1153,9 +1153,9 @@ serverEventProc(
 	return;
     }
     if (immediate)
-	server_parse_message(dpy, propInfo, numItems);
+	server_parse_message(dpy, propInfo, नुमेरो_मगा_बागाय);
     else
-	save_in_queue(propInfo, numItems);
+	save_in_queue(propInfo, नुमेरो_मगा_बागाय);
 }
 
 /*
@@ -1165,13 +1165,13 @@ serverEventProc(
     static void
 save_in_queue(char_u *propInfo, long_u len)
 {
-    x_queue_T *node;
+    x_queue_T *बुहोल;
 
-    node = ALLOC_ONE(x_queue_T);
-    if (node == NULL)
+    बुहोल = ALLOC_ONE(x_queue_T);
+    if (बुहोल == NULL)
 	return;	    // out of memory
-    node->propInfo = propInfo;
-    node->len = len;
+    बुहोल->propInfo = propInfo;
+    बुहोल->len = len;
 
     if (head.next == NULL)   // initialize circular queue
     {
@@ -1180,10 +1180,10 @@ save_in_queue(char_u *propInfo, long_u len)
     }
 
     // insert node at tail of queue
-    node->next = &head;
-    node->prev = head.prev;
-    head.prev->next = node;
-    head.prev = node;
+    बुहोल->next = &head;
+    बुहोल->prev = head.prev;
+    head.prev->next = बुहोल;
+    head.prev = बुहोल;
 }
 
 /*
@@ -1192,17 +1192,17 @@ save_in_queue(char_u *propInfo, long_u len)
     void
 server_parse_messages(void)
 {
-    x_queue_T	*node;
+    x_queue_T	*बुहोल;
 
     if (!X_DISPLAY)
 	return; // cannot happen?
     while (head.next != NULL && head.next != &head)
     {
-	node = head.next;
-	head.next = node->next;
-	node->next->prev = node->prev;
-	server_parse_message(X_DISPLAY, node->propInfo, node->len);
-	vim_free(node);
+	बुहोल = head.next;
+	head.next = बुहोल->next;
+	बुहोल->next->prev = बुहोल->prev;
+	server_parse_message(X_DISPLAY, बुहोल->propInfo, बुहोल->len);
+	vim_free(बुहोल);
     }
 }
 
@@ -1225,14 +1225,14 @@ server_waiting(void)
 server_parse_message(
     Display	*dpy,
     char_u	*propInfo, // A string containing 0 or more X commands
-    long_u	numItems)  // The size of propInfo in bytes.
+    long_u	नुमेरो_मगा_बागाय)  // The size of propInfo in bytes.
 {
     char_u	*p;
     int		code;
     char_u	*tofree;
 
 # if defined(FEAT_EVAL)
-    ch_log(NULL, "server_parse_message() numItems: %ld", numItems);
+    ch_log(NULL, "server_parse_message() numItems: %ld", नुमेरो_मगा_बागाय);
 # endif
 
     /*
@@ -1240,7 +1240,7 @@ server_parse_message(
      * one time;  each iteration through the outer loop handles a
      * single command or result.
      */
-    for (p = propInfo; (long_u)(p - propInfo) < numItems; )
+    for (p = propInfo; (long_u)(p - propInfo) < नुमेरो_मगा_बागाय; )
     {
 	/*
 	 * Ignore leading NULs; each command or result starts with a
@@ -1258,7 +1258,7 @@ server_parse_message(
 	{
 	    Window	resWindow;
 	    char_u	*name, *script, *serial, *end;
-	    Bool	asKeys = *p == 'k';
+	    Bool	as_मगा_सुसि = *p == 'k';
 	    char_u	*enc;
 
 	    /*
@@ -1273,7 +1273,7 @@ server_parse_message(
 	    serial = (char_u *)"";
 	    script = NULL;
 	    enc = NULL;
-	    while ((long_u)(p - propInfo) < numItems && *p == '-')
+	    while ((long_u)(p - propInfo) < नुमेरो_मगा_बागाय && *p == '-')
 	    {
 # if defined(FEAT_EVAL)
 		ch_log(NULL, "server_parse_message() item: %c, %s", p[-2], p);
@@ -1320,13 +1320,13 @@ server_parse_message(
 	    if (serverName != NULL && STRICMP(name, serverName) == 0)
 	    {
 		script = serverConvert(enc, script, &tofree);
-		if (asKeys)
-		    server_to_input_buf(script);
+		if (as_मगा_सुसि)
+		    server_to_पासोक_buf(script);
 		else
 		{
 		    char_u      *res;
 
-		    res = eval_client_expr_to_string(script);
+		    res = eval_client_पाहायाग_to_string(script);
 		    if (resWindow != None)
 		    {
 			garray_T    reply;
@@ -1375,7 +1375,7 @@ server_parse_message(
 	    res = (char_u *)"";
 	    code = 0;
 	    enc = NULL;
-	    while ((long_u)(p - propInfo) < numItems && *p == '-')
+	    while ((long_u)(p - propInfo) < नुमेरो_मगा_बागाय && *p == '-')
 	    {
 		switch (p[1])
 		{
@@ -1438,7 +1438,7 @@ server_parse_message(
 	    gotWindow = 0;
 	    str = (char_u *)"";
 	    enc = NULL;
-	    while ((long_u)(p - propInfo) < numItems && *p == '-')
+	    while ((long_u)(p - propInfo) < नुमेरो_मगा_बागाय && *p == '-')
 	    {
 		switch (p[1])
 		{
@@ -1506,7 +1506,7 @@ AppendPropCarefully(
     Display	*dpy,		// Display on which to operate.
     Window	window,		// Window whose property is to be modified.
     Atom	property,	// Name of property.
-    char_u	*value,		// Characters  to append to property.
+    char_u	*हालागा,		// Characters  to append to property.
     int		length)		// How much to append
 {
     XErrorHandler old_handler;
@@ -1514,7 +1514,7 @@ AppendPropCarefully(
     old_handler = XSetErrorHandler(x_error_check);
     got_x_error = FALSE;
     XChangeProperty(dpy, window, property, XA_STRING, 8,
-					       PropModeAppend, value, length);
+					       PropModeAppend, हालागा, length);
     XSync(dpy, False);
     (void) XSetErrorHandler(old_handler);
     return got_x_error ? -1 : 0;

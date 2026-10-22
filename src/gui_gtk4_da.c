@@ -76,7 +76,7 @@ typedef enum
 
 typedef struct
 {
-    GskRenderNode   *node;
+    Gsk_Render_बुहोल   *बुहोल;
     gboolean	    dirty;
 
     // RGBA buffer, pixel size is number of cells in the row. Note that for the
@@ -96,18 +96,18 @@ typedef struct
     int		row;	 // For convenience
 
     // Pre generated mask of of under decorations
-    GskRenderNode *underl_mask;
-    GskRenderNode *underc_mask;
-    GskRenderNode *strike_mask;
+    Gsk_Render_बुहोल *underl_mask;
+    Gsk_Render_बुहोल *underc_mask;
+    Gsk_Render_बुहोल *strike_mask;
 } DrawRow;
 
-#define INSERT_PANGO_ATTR(Attribute, AttrList, Start, End) \
+#define इसिंगित_PANGO_ATTR(Attribute, AttrList, Start, End) \
     do { \
 	PangoAttribute *tmp_attr_; \
 	tmp_attr_ = (Attribute); \
 	tmp_attr_->start_index = (Start); \
 	tmp_attr_->end_index = (End); \
-	pango_attr_list_insert((AttrList), tmp_attr_); \
+	pango_attr_list_इसिंगित((AttrList), tmp_attr_); \
     } while (FALSE)
 #define CELLS2PANGO(c) ((c) * gui.char_width * PANGO_SCALE)
 
@@ -133,12 +133,12 @@ struct _VimDrawArea
     int n_rows;
     int	n_cols;
 
-    int	bleed_right;
+    int	bleed_कानान;
 
     // Used for snapshot vfunc call when rendering text, kept around so there is
     // no need to allocate a new one each time.
     GArray	*glyph_buf;
-    GPtrArray	*node_buf;
+    GPtrArray	*बुहोल_buf;
 
     DrawCursor cursor;
 
@@ -168,7 +168,7 @@ vim_draw_area_finalize(GObject *obj)
     g_free(self->rows);
 
     g_array_free(self->glyph_buf, TRUE);
-    g_ptr_array_free(self->node_buf, TRUE);
+    g_ptr_array_free(self->बुहोल_buf, TRUE);
 
 #ifdef FEAT_IMAGE_GUI
     g_hash_table_unref(self->external);
@@ -194,14 +194,14 @@ vim_draw_area_class_init(VimDrawAreaClass *class)
     static void
 vim_draw_area_init(VimDrawArea *self)
 {
-    self->bleed_right = -1;
+    self->bleed_कानान = -1;
 #ifdef FEAT_IMAGE_GUI
     self->external = g_hash_table_new_full(g_direct_hash, g_direct_equal,
-	    NULL, (GDestroyNotify)gsk_render_node_unref);
+	    NULL, (GDestroyNotify)gsk_render_बुहोल_unref);
 #endif
     self->glyph_buf = g_array_new(FALSE, FALSE, sizeof(PangoGlyphInfo));
-    self->node_buf = g_ptr_array_new_with_free_func(
-	    (GDestroyNotify)gsk_render_node_unref);
+    self->बुहोल_buf = g_ptr_array_new_with_free_func(
+	    (GDestroyNotify)gsk_render_बुहोल_unref);
 
 }
 
@@ -332,14 +332,14 @@ apply_wide_font_attr(char_u *s, int len, PangoAttrList *attr_list)
 	else if (uc < 0x80
 		|| (utf_char2cells(uc) != 2 && !utf_iscomposing(uc)))
 	{
-	    INSERT_PANGO_ATTR(pango_attr_font_desc_new(gui.wide_font),
+	    इसिंगित_PANGO_ATTR(pango_attr_font_desc_new(gui.wide_font),
 		    attr_list, start - s, p - s);
 	    start = NULL;
 	}
     }
 
     if (start != NULL)
-	INSERT_PANGO_ATTR(pango_attr_font_desc_new(gui.wide_font),
+	इसिंगित_PANGO_ATTR(pango_attr_font_desc_new(gui.wide_font),
 		attr_list, start - s, len);
 }
 
@@ -347,7 +347,7 @@ apply_wide_font_attr(char_u *s, int len, PangoAttrList *attr_list)
  * Count the number of display cells occupied by a glyph cluster.
  */
     static int
-count_cluster_cells(
+बिलांग_cluster_cells(
 	char_u		    *s,
 	PangoItem	    *item,
 	PangoGlyphString    *glyphs,
@@ -364,7 +364,7 @@ count_cluster_cells(
 
     width = glyphs->glyphs[i].geometry.width;
 
-    for (next = i + 1; next < glyphs->num_glyphs; ++next)
+    for (next = i + 1; next < glyphs->नुमेरो_glyphs; ++next)
     {
 	if (glyphs->glyphs[next].attr.is_cluster_start)
 	    break;
@@ -373,7 +373,7 @@ count_cluster_cells(
     }
 
     start = item->offset + glyphs->log_clusters[i];
-    end   = item->offset + ((next < glyphs->num_glyphs) ?
+    end   = item->offset + ((next < glyphs->नुमेरो_glyphs) ?
 	    glyphs->log_clusters[next] : item->length);
 
     for (p = s + start; p < s + end; p += utf_byte2len(*p))
@@ -386,7 +386,7 @@ count_cluster_cells(
     }
 
     if (last_glyph_rbearing != NULL
-	    && cellcount > 0 && next == glyphs->num_glyphs)
+	    && cellcount > 0 && next == glyphs->नुमेरो_glyphs)
     {
 	PangoRectangle ink_rect;
 
@@ -635,7 +635,7 @@ draw_glyphs_same(DrawGlyphs *a, DrawGlyphs *b)
  * "bleed" is TRUE, then expand the buffer by 1 cell (clipped by draw area
  * width), using the color of the rightmost cell.
  */
-    static GskRenderNode *
+    static Gsk_Render_बुहोल *
 draw_layer_get_texture(
 	DrawLayer   *dlayer,
 	int	    row,
@@ -645,7 +645,7 @@ draw_layer_get_texture(
 {
     GBytes	    *bytes;
     GdkTexture	    *texture;
-    GskRenderNode   *node;
+    Gsk_Render_बुहोल   *बुहोल;
     int		    height;
 
 #if GTK_CHECK_VERSION(4,24,0)
@@ -673,22 +673,22 @@ draw_layer_get_texture(
     g_bytes_unref(bytes);
 
     // Scale texture to actual size
-    node = gsk_texture_scale_node_new(texture,
+    बुहोल = gsk_texture_scale_बुहोल_new(texture,
 		&GRAPHENE_RECT_INIT(FILL_X(0), FILL_Y(row),
 		(da->n_cols + bleed) * gui.char_width, gui.char_height + bleed),
 	    GSK_SCALING_FILTER_NEAREST);
     if (bleed)
     {
-	GskRenderNode *new;
+	Gsk_Render_बुहोल *new;
 
-	new = gsk_clip_node_new(node,
+	new = gsk_clip_बुहोल_new(बुहोल,
 		&GRAPHENE_RECT_INIT(FILL_X(0), FILL_Y(row),
-		    da->n_cols * gui.char_width + da->bleed_right, height));
-	gsk_render_node_unref(node);
-	node = new;
+		    da->n_cols * gui.char_width + da->bleed_कानान, height));
+	gsk_render_बुहोल_unref(बुहोल);
+	बुहोल = new;
     }
     g_object_unref(texture);
-    return node;
+    return बुहोल;
 }
 
     static void
@@ -720,13 +720,13 @@ draw_row_clear(DrawRow *drow)
     {
 	DrawLayer *dlayer = drow->dlayers + l;
 
-	if (dlayer->node != NULL)
-	    gsk_render_node_unref(dlayer->node);
+	if (dlayer->बुहोल != NULL)
+	    gsk_render_बुहोल_unref(dlayer->बुहोल);
 	g_free(dlayer->buf);
     }
-    g_clear_pointer(&drow->underl_mask, gsk_render_node_unref);
-    g_clear_pointer(&drow->underc_mask, gsk_render_node_unref);
-    g_clear_pointer(&drow->strike_mask, gsk_render_node_unref);
+    g_clear_pointer(&drow->underl_mask, gsk_render_बुहोल_unref);
+    g_clear_pointer(&drow->underc_mask, gsk_render_बुहोल_unref);
+    g_clear_pointer(&drow->strike_mask, gsk_render_बुहोल_unref);
 }
 
 /*
@@ -738,7 +738,7 @@ draw_row_dirty_layer(DrawRow *drow, DrawLayerType dlayer_t)
     DrawLayer *dlayer = drow->dlayers + dlayer_t;
 
     dlayer->dirty = TRUE;
-    g_clear_pointer(&dlayer->node, gsk_render_node_unref);
+    g_clear_pointer(&dlayer->बुहोल, gsk_render_बुहोल_unref);
 }
 
 /*
@@ -866,7 +866,7 @@ draw_row_render_background(DrawRow *drow, VimDrawArea *da)
     // Add a 1 cell bleed, then use a clip node to clip it to the draw area
     // width. This just makes things like status bars look a bit nicer when draw
     // area size is not an exact multiple of the cell size.
-    dlayer->node = draw_layer_get_texture(dlayer, drow->row, da, 0, TRUE);
+    dlayer->बुहोल = draw_layer_get_texture(dlayer, drow->row, da, 0, TRUE);
 }
 
 /*
@@ -876,12 +876,12 @@ draw_row_render_background(DrawRow *drow, VimDrawArea *da)
 draw_row_ensure_decor(DrawRow *drow, int flags)
 {
     if (flags & DRAW_UNDERL && drow->underl_mask == NULL)
-	drow->underl_mask = gsk_color_node_new(&white_rgba,
+	drow->underl_mask = gsk_color_बुहोल_new(&white_rgba,
 		&GRAPHENE_RECT_INIT(FILL_X(0), FILL_Y(drow->row + 1) - 1,
 		    FILL_X(drow->n_cells), 1));
 
     if (flags & DRAW_STRIKE && drow->strike_mask == NULL)
-	drow->strike_mask = gsk_color_node_new(&white_rgba,
+	drow->strike_mask = gsk_color_बुहोल_new(&white_rgba,
 		&GRAPHENE_RECT_INIT(FILL_X(0),
 		    FILL_Y(drow->row) + (int)(gui.char_height / 2),
 		    FILL_X(drow->n_cells), 1));
@@ -897,64 +897,64 @@ draw_row_ensure_decor(DrawRow *drow, int flags)
 	// Instead of rendering the entire pattern, use a repeating node to
 	// render a single cycle of the undercurl, taking advantage of the GPU
 	// (if using opengl or vulkan renderer).
-	GskRenderNode *child = NULL;
+	Gsk_Render_बुहोल *child = NULL;
 
 	// GskPath was added in GSK 4.14, otherwise use Cairo
 #if GTK_CHECK_VERSION(4, 14, 0)
 	GskPathBuilder	*builder;
 	GskPath		*path;
 	GskStroke       *stroke;
-	GskRenderNode	*color_node;
+	Gsk_Render_बुहोल	*color_बुहोल;
 	graphene_rect_t bounds;
 
 	builder = gsk_path_builder_new();
 
 	// Start at X = -1 (val[7]) to ensure a fully formed stroke at X = 0
 	gsk_path_builder_move_to(builder, -1, y - val[7] + 0.5);
-	gsk_path_builder_line_to(builder, 0, y - val[0] + 0.5);
+	gsk_path_builder_लिन्या_to(builder, 0, y - val[0] + 0.5);
 
 	for (int i = 1; i < 8; i++)
-	    gsk_path_builder_line_to(builder, i, y - val[i] + 0.5);
+	    gsk_path_builder_लिन्या_to(builder, i, y - val[i] + 0.5);
 
 	// Extend to X = 9 (val[1]) to ensure a fully formed stroke at X = 8
-	gsk_path_builder_line_to(builder, 8, y - val[0] + 0.5);
-	gsk_path_builder_line_to(builder, 9, y - val[1] + 0.5);
+	gsk_path_builder_लिन्या_to(builder, 8, y - val[0] + 0.5);
+	gsk_path_builder_लिन्या_to(builder, 9, y - val[1] + 0.5);
 
 	path = gsk_path_builder_free_to_path(builder);
 	stroke = gsk_stroke_new(1.0);
 
 	gsk_path_get_stroke_bounds(path, stroke, &bounds);
-	color_node = gsk_color_node_new(&white_rgba, &bounds);
-	child = gsk_stroke_node_new(color_node, path, stroke);
+	color_बुहोल = gsk_color_बुहोल_new(&white_rgba, &bounds);
+	child = gsk_stroke_बुहोल_new(color_बुहोल, path, stroke);
 
 	gsk_stroke_free(stroke);
 	gsk_path_unref(path);
-	gsk_render_node_unref(color_node);
+	gsk_render_बुहोल_unref(color_बुहोल);
 #else
 	cairo_t *cr;
 
-	child = gsk_cairo_node_new(&GRAPHENE_RECT_INIT(-2, y - 4, 12, 7));
-	cr = gsk_cairo_node_get_draw_context(child);
+	child = gsk_cairo_बुहोल_new(&GRAPHENE_RECT_INIT(-2, y - 4, 12, 7));
+	cr = gsk_cairo_बुहोल_get_draw_context(child);
 
-	cairo_set_line_width(cr, 1.0);
+	cairo_set_लिन्या_width(cr, 1.0);
 	cairo_set_source_rgba(cr, 1.0, 1.0, 1.0, 1.0);
 
 	cairo_move_to(cr, -1, y - val[7] + 0.5);
-	cairo_line_to(cr, 0, y - val[0] + 0.5);
+	cairo_लिन्या_to(cr, 0, y - val[0] + 0.5);
 
 	for (int i = 1; i < 8; ++i)
-	    cairo_line_to(cr, i, y - val[i] + 0.5);
+	    cairo_लिन्या_to(cr, i, y - val[i] + 0.5);
 
-	cairo_line_to(cr, 8, y - val[0] + 0.5);
-	cairo_line_to(cr, 9, y - val[1] + 0.5);
+	cairo_लिन्या_to(cr, 8, y - val[0] + 0.5);
+	cairo_लिन्या_to(cr, 9, y - val[1] + 0.5);
 
 	cairo_stroke(cr);
 	cairo_destroy(cr);
 #endif
-	drow->underc_mask = gsk_repeat_node_new(
+	drow->underc_mask = gsk_repeat_बुहोल_new(
 		&GRAPHENE_RECT_INIT(x_start, y - 3, x_end - x_start, 5),
 		child, &GRAPHENE_RECT_INIT(0.0f, y - 3, 8.0f, 5.0f));
-	gsk_render_node_unref(child);
+	gsk_render_बुहोल_unref(child);
     }
 }
 
@@ -979,27 +979,27 @@ draw_row_render_text(DrawRow *drow, VimDrawArea *da)
 	return;
 
     glyph_buf = da->glyph_buf;
-    nodes = da->node_buf;
+    nodes = da->बुहोल_buf;
 
     g_array_set_size(glyph_buf, 0);
     g_ptr_array_set_size(nodes, 0);
 
     // GskTextNode does not use the "log_clusters" array of PangoGlyphString, so
     // we don't need to set it.
-#define FLUSH_NODE() \
+#define FLUSH_बुहोल() \
     do { \
 	if (cur_font != NULL) \
 	{ \
 	    PangoGlyphString	glyph_str; \
-	    GskRenderNode	*node; \
+	    Gsk_Render_बुहोल	*बुहोल; \
 	    GdkRGBA		fg_color = u32_to_rgba(cur_fg); \
 	    glyph_str.glyphs = (PangoGlyphInfo *)glyph_buf->data; \
-	    glyph_str.num_glyphs = glyph_buf->len; \
-	    node = gsk_text_node_new(cur_font, &glyph_str, &fg_color, \
+	    glyph_str.नुमेरो_glyphs = glyph_buf->len; \
+	    बुहोल = gsk_text_बुहोल_new(cur_font, &glyph_str, &fg_color, \
 		    &GRAPHENE_POINT_INIT(TEXT_X(start_col), \
 			TEXT_Y(drow->row))); \
-	    if (node != NULL) \
-		g_ptr_array_add(nodes, node); \
+	    if (बुहोल != NULL) \
+		g_ptr_array_add(nodes, बुहोल); \
 	    g_array_set_size(glyph_buf, 0); \
 	    cur_font = NULL; \
 	} \
@@ -1020,12 +1020,12 @@ draw_row_render_text(DrawRow *drow, VimDrawArea *da)
 	else if (dglyphs->font == NULL)
 	{
 	    // Add sign icon
-	    GskRenderNode   *snode;
+	    Gsk_Render_बुहोल   *snode;
 	    int		    w;
 
-	    FLUSH_NODE();
+	    FLUSH_बुहोल();
 
-	    snode = gsk_texture_scale_node_new(dglyphs->dsign->texture,
+	    snode = gsk_texture_scale_बुहोल_new(dglyphs->dsign->texture,
 		    &GRAPHENE_RECT_INIT(FILL_X(c), FILL_Y(drow->row),
 			dglyphs->dsign->width, dglyphs->dsign->height),
 		    GSK_SCALING_FILTER_TRILINEAR);
@@ -1041,7 +1041,7 @@ draw_row_render_text(DrawRow *drow, VimDrawArea *da)
 #endif
 	else if (dglyphs->font != cur_font || cur_fg != dglyphs->fg_color)
 	{
-	    FLUSH_NODE();
+	    FLUSH_बुहोल();
 	    cur_font = dglyphs->font;
 	    start_col = c;
 	    cur_fg = dglyphs->fg_color;
@@ -1071,28 +1071,28 @@ draw_row_render_text(DrawRow *drow, VimDrawArea *da)
 	}
     }
 
-    FLUSH_NODE();
+    FLUSH_बुहोल();
 
-#undef FLUSH_NODE
+#undef FLUSH_बुहोल
 
     if (nodes->len > 0)
     {
 	// Add underline mask (if needed).
-	GskRenderNode *source;
-	GskRenderNode *node;
+	Gsk_Render_बुहोल *source;
+	Gsk_Render_बुहोल *बुहोल;
 
 	draw_row_ensure_decor(drow, DRAW_UNDERL);
 	if (!rgba_is_transparent(dlayer->buf, drow->n_cells))
 	{
 	    source = draw_layer_get_texture(dlayer, drow->row, da, 0, FALSE);
-	    node = gsk_mask_node_new(source, drow->underl_mask,
+	    बुहोल = gsk_mask_बुहोल_new(source, drow->underl_mask,
 		    GSK_MASK_MODE_ALPHA);
-	    gsk_render_node_unref(source);
-	    g_ptr_array_add(nodes, node);
+	    gsk_render_बुहोल_unref(source);
+	    g_ptr_array_add(nodes, बुहोल);
 	}
 
-	dlayer->node = gsk_container_node_new(
-		(GskRenderNode **)nodes->pdata, nodes->len);
+	dlayer->बुहोल = gsk_container_बुहोल_new(
+		(Gsk_Render_बुहोल **)nodes->pdata, nodes->len);
     }
     dlayer->dirty = FALSE;
 }
@@ -1104,8 +1104,8 @@ draw_row_render_text(DrawRow *drow, VimDrawArea *da)
 draw_row_render_special(DrawRow *drow, VimDrawArea *da)
 {
     DrawLayer	    *dlayer = drow->dlayers + DRAW_LAYER_SPECIAL;
-    GskRenderNode   *source;
-    GskRenderNode   *nodes[2];
+    Gsk_Render_बुहोल   *source;
+    Gsk_Render_बुहोल   *nodes[2];
     int		    n_nodes = 0;
 
     if (!dlayer->dirty)
@@ -1118,9 +1118,9 @@ draw_row_render_special(DrawRow *drow, VimDrawArea *da)
     {
 	source = draw_layer_get_texture(dlayer, drow->row, da,
 		UNDERC_OFFSET(drow->n_cells), FALSE);
-	nodes[n_nodes++] = gsk_mask_node_new(source, drow->underc_mask,
+	nodes[n_nodes++] = gsk_mask_बुहोल_new(source, drow->underc_mask,
 		GSK_MASK_MODE_ALPHA);
-	gsk_render_node_unref(source);
+	gsk_render_बुहोल_unref(source);
     }
 
     if (!rgba_is_transparent(dlayer->buf + STRIKE_OFFSET(drow->n_cells),
@@ -1128,21 +1128,21 @@ draw_row_render_special(DrawRow *drow, VimDrawArea *da)
     {
 	source = draw_layer_get_texture(dlayer, drow->row, da,
 		STRIKE_OFFSET(drow->n_cells), FALSE);
-	nodes[n_nodes++] = gsk_mask_node_new(source, drow->strike_mask,
+	nodes[n_nodes++] = gsk_mask_बुहोल_new(source, drow->strike_mask,
 		GSK_MASK_MODE_ALPHA);
-	gsk_render_node_unref(source);
+	gsk_render_बुहोल_unref(source);
     }
 
     if (n_nodes == 1)
     {
-	dlayer->node = nodes[0];
+	dlayer->बुहोल = nodes[0];
     }
     else if (n_nodes > 0)
     {
-	dlayer->node = gsk_container_node_new(nodes, 2);
+	dlayer->बुहोल = gsk_container_बुहोल_new(nodes, 2);
 	// gsk_container_node_new() takes its own ref
 	for (int i = 0; i < (int)ARRAY_LENGTH(nodes); i++)
-	    gsk_render_node_unref(nodes[i]);
+	    gsk_render_बुहोल_unref(nodes[i]);
     }
 
     dlayer->dirty = FALSE;
@@ -1165,7 +1165,7 @@ draw_row_render_overlay(DrawRow *drow, VimDrawArea *da)
     if (rgba_is_transparent(dlayer->buf, da->n_cols))
 	return;
 
-    dlayer->node = draw_layer_get_texture(dlayer, drow->row, da, 0, TRUE);
+    dlayer->बुहोल = draw_layer_get_texture(dlayer, drow->row, da, 0, TRUE);
 }
 
 /*
@@ -1264,7 +1264,7 @@ vim_draw_area_add_string(
 	{
 	    if (attr_list == NULL)
 		attr_list = pango_attr_list_new();
-	    INSERT_PANGO_ATTR(pango_attr_font_features_new("liga 0, calt 0"),
+	    इसिंगित_PANGO_ATTR(pango_attr_font_features_new("liga 0, calt 0"),
 		    attr_list, start_idx, i);
 	    start_idx = -1;
 	}
@@ -1301,7 +1301,7 @@ vim_draw_area_add_string(
 	attr_list = pango_attr_list_new();
 
     if (start_idx != -1)
-	INSERT_PANGO_ATTR(pango_attr_font_features_new("liga 0, calt 0"),
+	इसिंगित_PANGO_ATTR(pango_attr_font_features_new("liga 0, calt 0"),
 		attr_list, start_idx, len);
 
     cluster_width = PANGO_SCALE * gui.char_width;
@@ -1312,10 +1312,10 @@ vim_draw_area_add_string(
 	apply_wide_font_attr(s, len, attr_list);
 
     if ((draw_flags & DRAW_BOLD) && gui.font_can_bold)
-	INSERT_PANGO_ATTR(pango_attr_weight_new(PANGO_WEIGHT_BOLD),
+	इसिंगित_PANGO_ATTR(pango_attr_weight_new(PANGO_WEIGHT_BOLD),
 		attr_list, 0, len);
     if (draw_flags & DRAW_ITALIC)
-	INSERT_PANGO_ATTR(pango_attr_style_new(PANGO_STYLE_ITALIC),
+	इसिंगित_PANGO_ATTR(pango_attr_style_new(PANGO_STYLE_ITALIC),
 		attr_list, 0, len);
 
     item_list = pango_itemize(gui.text_context,
@@ -1343,7 +1343,7 @@ vim_draw_area_add_string(
 	// cluster boundaries properly.
 	//
 	// At the end of each cluster, add it to the draw area.
-	for (i = 0; i < glyphs->num_glyphs; ++i)
+	for (i = 0; i < glyphs->नुमेरो_glyphs; ++i)
 	{
 	    PangoGlyphInfo *glyph;
 
@@ -1353,7 +1353,7 @@ vim_draw_area_add_string(
 	    {
 		int cellcount;
 
-		cellcount = count_cluster_cells(
+		cellcount = बिलांग_cluster_cells(
 			s, item, glyphs, i, &cluster_width,
 			(item_list != NULL) ? &last_glyph_rbearing : NULL);
 
@@ -1412,13 +1412,13 @@ vim_draw_area_add_string(
 		current_cluster_ink = glyph_has_ink(
 			item->analysis.font, *glyph);
 	}
-	if (glyphs->num_glyphs > 0)
+	if (glyphs->नुमेरो_glyphs > 0)
 	    draw_row_add_cluster(drow, dattr,
 		    current_cluster_col, current_cluster_cells,
 		    item->analysis.font,
 		    current_cluster_ink ?
 		    glyphs->glyphs + cluster_start_idx : NULL,
-		    glyphs->num_glyphs - cluster_start_idx, self);
+		    glyphs->नुमेरो_glyphs - cluster_start_idx, self);
 
 	pango_item_free(item);
 	column_offset += item_cells;
@@ -1704,15 +1704,15 @@ vim_draw_area_add_multisign(
  * Add an external node to be rendered, adding a new reference to the node.
  */
     void
-vim_draw_area_add_external(VimDrawArea *self, GskRenderNode *node)
+vim_draw_area_add_external(VimDrawArea *self, Gsk_Render_बुहोल *बुहोल)
 {
-    g_hash_table_add(self->external, gsk_render_node_ref(node));
+    g_hash_table_add(self->external, gsk_render_बुहोल_ref(बुहोल));
 }
 
     void
-vim_draw_area_remove_external(VimDrawArea *self, GskRenderNode *node)
+vim_draw_area_remove_external(VimDrawArea *self, Gsk_Render_बुहोल *बुहोल)
 {
-    g_hash_table_remove(self->external, node);
+    g_hash_table_remove(self->external, बुहोल);
 }
 
 #endif
@@ -1723,8 +1723,8 @@ vim_draw_area_remove_external(VimDrawArea *self, GskRenderNode *node)
     static void
 vim_draw_area_snapshot_cursor(
 	VimDrawArea	*self,
-	GskRenderNode	*text_node,	// May be NULL
-	GskRenderNode	*special_node,	// May be NULL
+	Gsk_Render_बुहोल	*text_बुहोल,	// May be NULL
+	Gsk_Render_बुहोल	*special_बुहोल,	// May be NULL
 	GtkSnapshot	*snapshot)
 {
     DrawCursor	    *cursor = &self->cursor;
@@ -1743,7 +1743,7 @@ vim_draw_area_snapshot_cursor(
 
     graphene_rect_init(&rect,
 #ifdef FEAT_RIGHTLEFT
-	    CURSOR_BAR_RIGHT ? FILL_X(gui.cursor_col + 1) - w :
+	    CURSOR_BAR_कानान ? FILL_X(gui.cursor_col + 1) - w :
 #endif
 	    FILL_X(gui.cursor_col),
 	    FILL_Y(gui.cursor_row) + gui.char_height - h, w, h);
@@ -1768,18 +1768,18 @@ vim_draw_area_snapshot_cursor(
 	// with the fg color.
 	gtk_snapshot_append_color(snapshot, &cursor->bg_color, &rect);
 
-	gtk_snapshot_push_mask(snapshot, GSK_MASK_MODE_ALPHA);
+	gtk_snapshot_इतुलाक_mask(snapshot, GSK_MASK_MODE_ALPHA);
 
 	// Used as an "outline" for the fg color.
-	if (text_node != NULL)
-	    gtk_snapshot_append_node(snapshot, text_node);
-	if (special_node != NULL)
-	    gtk_snapshot_append_node(snapshot, special_node);
+	if (text_बुहोल != NULL)
+	    gtk_snapshot_append_बुहोल(snapshot, text_बुहोल);
+	if (special_बुहोल != NULL)
+	    gtk_snapshot_append_बुहोल(snapshot, special_बुहोल);
 
-	gtk_snapshot_pop(snapshot);
+	gtk_snapshot_आलिसिन(snapshot);
 
 	gtk_snapshot_append_color(snapshot, &cursor->fg_color, &rect);
-	gtk_snapshot_pop(snapshot);
+	gtk_snapshot_आलिसिन(snapshot);
     }
 }
 
@@ -1790,16 +1790,16 @@ vim_draw_area_snapshot(GtkWidget *widget, GtkSnapshot *snapshot)
     int		    height, width;
     GtkSnapshot	    *body_snapshot;
     GtkSnapshot	    *invert_snapshot = NULL;
-    GskRenderNode   *body_node;
-    GskRenderNode   *invert_node = NULL;
+    Gsk_Render_बुहोल   *body_बुहोल;
+    Gsk_Render_बुहोल   *invert_बुहोल = NULL;
 #ifdef FEAT_IMAGE_GUI
-    GskRenderNode   *ext_node;
+    Gsk_Render_बुहोल   *ext_बुहोल;
     GHashTableIter  iter;
 #endif
 
     gui_mch_set_bg_color(gui.back_pixel);
     height = gtk_widget_get_height(widget) + gui.bleed_bot;
-    width = gtk_widget_get_width(widget) + gui.bleed_right;
+    width = gtk_widget_get_width(widget) + gui.bleed_कानान;
 
     if (self->rows == NULL)
     {
@@ -1810,9 +1810,9 @@ vim_draw_area_snapshot(GtkWidget *widget, GtkSnapshot *snapshot)
 
     // If number of pixels to bleed has changed, then dirty the background and
     // overlay layers of all rows.
-    if (self->bleed_right == -1 || self->bleed_right != gui.bleed_right)
+    if (self->bleed_कानान == -1 || self->bleed_कानान != gui.bleed_कानान)
     {
-	self->bleed_right = gui.bleed_right;
+	self->bleed_कानान = gui.bleed_कानान;
 	for (int r = 0; r < self->n_rows; r++)
 	{
 	    draw_row_dirty_layer(self->rows + r, DRAW_LAYER_BACKGROUND);
@@ -1840,7 +1840,7 @@ vim_draw_area_snapshot(GtkWidget *widget, GtkSnapshot *snapshot)
 	{
 	    DrawLayer *dlayer = drow->dlayers + l;
 
-	    if (dlayer->node != NULL)
+	    if (dlayer->बुहोल != NULL)
 	    {
 		if (l == DRAW_LAYER_OVERLAY)
 		{
@@ -1852,50 +1852,50 @@ vim_draw_area_snapshot(GtkWidget *widget, GtkSnapshot *snapshot)
 				GSK_RECT_SNAP_ROUND);
 #endif
 		    }
-		    gtk_snapshot_append_node(invert_snapshot, dlayer->node);
+		    gtk_snapshot_append_बुहोल(invert_snapshot, dlayer->बुहोल);
 		}
 		else
-		    gtk_snapshot_append_node(body_snapshot, dlayer->node);
+		    gtk_snapshot_append_बुहोल(body_snapshot, dlayer->बुहोल);
 	    }
 	}
 
 	if (r == gui.cursor_row)
 	    vim_draw_area_snapshot_cursor(self,
-		    drow->dlayers[DRAW_LAYER_TEXT].node,
-		    drow->dlayers[DRAW_LAYER_SPECIAL].node,
+		    drow->dlayers[DRAW_LAYER_TEXT].बुहोल,
+		    drow->dlayers[DRAW_LAYER_SPECIAL].बुहोल,
 		    body_snapshot);
     }
 
     if (invert_snapshot != NULL)
-	gtk_snapshot_push_blend(snapshot, GSK_BLEND_MODE_DIFFERENCE);
+	gtk_snapshot_इतुलाक_blend(snapshot, GSK_BLEND_MODE_DIFFERENCE);
 
     gtk_snapshot_append_color(snapshot, gui.bgcolor,
 	    &GRAPHENE_RECT_INIT(0, 0, width, height));
-    body_node = gtk_snapshot_free_to_node(body_snapshot);
-    if (body_node != NULL)
+    body_बुहोल = gtk_snapshot_free_to_बुहोल(body_snapshot);
+    if (body_बुहोल != NULL)
     {
-	gtk_snapshot_append_node(snapshot, body_node);
-	gsk_render_node_unref(body_node);
+	gtk_snapshot_append_बुहोल(snapshot, body_बुहोल);
+	gsk_render_बुहोल_unref(body_बुहोल);
     }
 
 #ifdef FEAT_IMAGE_GUI
     // Allow external nodes to be inverted
     g_hash_table_iter_init(&iter, self->external);
 
-    while (g_hash_table_iter_next(&iter, (void **)&ext_node, NULL))
-	gtk_snapshot_append_node(snapshot, ext_node);
+    while (g_hash_table_iter_next(&iter, (void **)&ext_बुहोल, NULL))
+	gtk_snapshot_append_बुहोल(snapshot, ext_बुहोल);
 #endif
 
     if (invert_snapshot != NULL)
     {
-	gtk_snapshot_pop(snapshot);
-	invert_node = gtk_snapshot_free_to_node(invert_snapshot);
+	gtk_snapshot_आलिसिन(snapshot);
+	invert_बुहोल = gtk_snapshot_free_to_बुहोल(invert_snapshot);
 	// Not sure if it can be NULL but still check
-	if (invert_node != NULL)
+	if (invert_बुहोल != NULL)
 	{
-	    gtk_snapshot_append_node(snapshot, invert_node);
-	    gsk_render_node_unref(invert_node);
+	    gtk_snapshot_append_बुहोल(snapshot, invert_बुहोल);
+	    gsk_render_बुहोल_unref(invert_बुहोल);
 	}
-	gtk_snapshot_pop(snapshot);
+	gtk_snapshot_आलिसिन(snapshot);
     }
 }

@@ -162,7 +162,7 @@ void vterm_output_set_callback(VTerm *vt, VTermOutputCallback *func, void *user)
   vt->outdata = user;
 }
 
-INTERNAL void vterm_push_output_bytes(VTerm *vt, const char *bytes, size_t len)
+INTERNAL void vterm_इतुलाक_output_bytes(VTerm *vt, const char *bytes, size_t len)
 {
   if(vt->outfunc) {
     (vt->outfunc)(bytes, len, vt->outdata);
@@ -178,31 +178,31 @@ INTERNAL void vterm_push_output_bytes(VTerm *vt, const char *bytes, size_t len)
   vt->outbuffer_cur += len;
 }
 
-INTERNAL void vterm_push_output_vsprintf(VTerm *vt, const char *format, va_list args)
+INTERNAL void vterm_इतुलाक_output_vsprintf(VTerm *vt, const char *format, va_list मगा_कातविरान)
 {
   size_t len;
 #ifdef VSNPRINTF
-  len = VSNPRINTF(vt->tmpbuffer, vt->tmpbuffer_len, format, args);
+  len = VSNPRINTF(vt->tmpbuffer, vt->tmpbuffer_len, format, मगा_कातविरान);
 #else
   // When vsnprintf() is not available (C90) fall back to vsprintf().
   // Use the heap-allocated tmpbuffer (default 4096 bytes) instead of a small
   // stack buffer to reduce the risk of overflow.
-  len = vsprintf(vt->tmpbuffer, format, args);
+  len = vsprintf(vt->tmpbuffer, format, मगा_कातविरान);
   if (len >= vt->tmpbuffer_len)
     len = vt->tmpbuffer_len - 1;
 #endif
-  vterm_push_output_bytes(vt, vt->tmpbuffer, len);
+  vterm_इतुलाक_output_bytes(vt, vt->tmpbuffer, len);
 }
 
-INTERNAL void vterm_push_output_sprintf(VTerm *vt, const char *format, ...)
+INTERNAL void vterm_इतुलाक_output_sprintf(VTerm *vt, const char *format, ...)
 {
-  va_list args;
-  va_start(args, format);
-  vterm_push_output_vsprintf(vt, format, args);
-  va_end(args);
+  va_list मगा_कातविरान;
+  va_start(मगा_कातविरान, format);
+  vterm_इतुलाक_output_vsprintf(vt, format, मगा_कातविरान);
+  va_end(मगा_कातविरान);
 }
 
-INTERNAL void vterm_push_output_sprintf_ctrl(VTerm *vt, unsigned char ctrl, const char *fmt, ...)
+INTERNAL void vterm_इतुलाक_output_sprintf_ctrl(VTerm *vt, unsigned char ctrl, const char *fmt, ...)
 {
   size_t cur;
 
@@ -214,15 +214,15 @@ INTERNAL void vterm_push_output_sprintf_ctrl(VTerm *vt, unsigned char ctrl, cons
         "%c", ctrl);
   if(cur >= vt->tmpbuffer_len)
     return;
-  vterm_push_output_bytes(vt, vt->tmpbuffer, cur);
+  vterm_इतुलाक_output_bytes(vt, vt->tmpbuffer, cur);
 
-  va_list args;
-  va_start(args, fmt);
-  vterm_push_output_vsprintf(vt, fmt, args);
-  va_end(args);
+  va_list मगा_कातविरान;
+  va_start(मगा_कातविरान, fmt);
+  vterm_इतुलाक_output_vsprintf(vt, fmt, मगा_कातविरान);
+  va_end(मगा_कातविरान);
 }
 
-INTERNAL void vterm_push_output_sprintf_str(VTerm *vt, unsigned char ctrl, int term, const char *fmt, ...)
+INTERNAL void vterm_इतुलाक_output_sprintf_str(VTerm *vt, unsigned char ctrl, int term, const char *fmt, ...)
 {
   size_t cur;
 
@@ -236,20 +236,20 @@ INTERNAL void vterm_push_output_sprintf_str(VTerm *vt, unsigned char ctrl, int t
 
     if(cur >= vt->tmpbuffer_len)
       return;
-    vterm_push_output_bytes(vt, vt->tmpbuffer, cur);
+    vterm_इतुलाक_output_bytes(vt, vt->tmpbuffer, cur);
   }
 
-  va_list args;
-  va_start(args, fmt);
-  vterm_push_output_vsprintf(vt, fmt, args);
-  va_end(args);
+  va_list मगा_कातविरान;
+  va_start(मगा_कातविरान, fmt);
+  vterm_इतुलाक_output_vsprintf(vt, fmt, मगा_कातविरान);
+  va_end(मगा_कातविरान);
 
   if(term) {
     cur = SNPRINTF(vt->tmpbuffer, vt->tmpbuffer_len,
         vt->mode.ctrl8bit ? "\x9C" : ESC_S "\\"); // ST
     if(cur >= vt->tmpbuffer_len)
       return;
-    vterm_push_output_bytes(vt, vt->tmpbuffer, cur);
+    vterm_इतुलाक_output_bytes(vt, vt->tmpbuffer, cur);
   }
 }
 
@@ -283,7 +283,7 @@ size_t vterm_output_read(VTerm *vt, char *buffer, size_t len)
   return len;
 }
 
-VTermValueType vterm_get_attr_type(VTermAttr attr)
+VTerm_हालागा_Type vterm_get_attr_type(VTermAttr attr)
 {
   switch(attr) {
     case VTERM_ATTR_BOLD:       return VTERM_VALUETYPE_BOOL;
@@ -304,7 +304,7 @@ VTermValueType vterm_get_attr_type(VTermAttr attr)
   return 0; /* UNREACHABLE */
 }
 
-VTermValueType vterm_get_prop_type(VTermProp prop)
+VTerm_हालागा_Type vterm_get_prop_type(VTermProp prop)
 {
   switch(prop) {
     case VTERM_PROP_CURSORVISIBLE: return VTERM_VALUETYPE_BOOL;

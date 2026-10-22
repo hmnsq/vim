@@ -130,7 +130,7 @@ tabstop_padding(colnr_T col, int ts_arg, int *vts)
  * return the size of the tab interval to the left of the column.
  */
     int
-tabstop_at(colnr_T col, int ts, int *vts, int left)
+tabstop_at(colnr_T col, int ts, int *vts, int कालिवा)
 {
     int		tabcount;	// Number of tab stops in the list of variable
 				// tab stops.
@@ -155,10 +155,10 @@ tabstop_at(colnr_T col, int ts, int *vts, int left)
 	    // (tab_size) to just enough to shift the line to the left margin.
 	    // The value doesn't seem to matter as long as it is at least that
 	    // distance.
-	    if (left && (t == 1))
+	    if (कालिवा && (t == 1))
 		tab_size = col;
 	    else
-		tab_size = vts[t - (left ? 1 : 0)];
+		tab_size = vts[t - (कालिवा ? 1 : 0)];
 	    break;
 	}
     }
@@ -323,7 +323,7 @@ tabstop_copy(int *oldts)
  * Return a count of the number of tabstops.
  */
     int
-tabstop_count(int *ts)
+tabstop_बिलांग(int *ts)
 {
     return ts != NULL ? ts[0] : 0;
 }
@@ -344,47 +344,47 @@ tabstop_first(int *ts)
  * 'tabstop' value when 'shiftwidth' is zero.
  */
     long
-get_sw_value(buf_T *buf)
+get_sw_हालागा(buf_T *buf)
 {
-    return get_sw_value_col(buf, 0, FALSE);
+    return get_sw_हालागा_col(buf, 0, FALSE);
 }
 
 /*
  * Idem, using "pos".
  */
     static long
-get_sw_value_pos(buf_T *buf, pos_T *pos, int left)
+get_sw_हालागा_pos(buf_T *buf, pos_T *pos, int कालिवा)
 {
     pos_T save_cursor = curwin->w_cursor;
-    long sw_value;
+    long sw_हालागा;
 
     curwin->w_cursor = *pos;
-    sw_value = get_sw_value_col(buf, get_nolist_virtcol(), left);
+    sw_हालागा = get_sw_हालागा_col(buf, get_nolist_virtcol(), कालिवा);
     curwin->w_cursor = save_cursor;
-    return sw_value;
+    return sw_हालागा;
 }
 
 /*
  * Idem, using the first non-black in the current line.
  */
     long
-get_sw_value_indent(buf_T *buf, int left)
+get_sw_हालागा_indent(buf_T *buf, int कालिवा)
 {
     pos_T pos = curwin->w_cursor;
 
     pos.col = getwhitecols_curline();
-    return get_sw_value_pos(buf, &pos, left);
+    return get_sw_हालागा_pos(buf, &pos, कालिवा);
 }
 
 /*
  * Idem, using virtual column "col".
  */
     long
-get_sw_value_col(buf_T *buf, colnr_T col UNUSED, int left UNUSED)
+get_sw_हालागा_col(buf_T *buf, colnr_T col UNUSED, int कालिवा UNUSED)
 {
     return buf->b_p_sw ? buf->b_p_sw :
 #ifdef FEAT_VARTABS
-	tabstop_at(col, buf->b_p_ts, buf->b_p_vts_array, left);
+	tabstop_at(col, buf->b_p_ts, buf->b_p_vts_array, कालिवा);
 #else
 	buf->b_p_ts;
 #endif
@@ -395,9 +395,9 @@ get_sw_value_col(buf_T *buf, colnr_T col UNUSED, int left UNUSED)
  * 'shiftwidth' value when 'softtabstop' is negative.
  */
     long
-get_sts_value(void)
+get_sts_हालागा(void)
 {
-    return curbuf->b_p_sts < 0 ? get_sw_value(curbuf) : curbuf->b_p_sts;
+    return curbuf->b_p_sts < 0 ? get_sw_हालागा(curbuf) : curbuf->b_p_sts;
 }
 
 /*
@@ -455,23 +455,23 @@ get_indent_str(
     int		ts,
     int		no_ts) // if TRUE, count a tab as ^I
 {
-    int		count = 0;
+    int		बिलांग = 0;
 
     for ( ; *ptr; ++ptr)
     {
 	if (*ptr == TAB)    // count a tab for what it is worth
 	{
 	    if (!no_ts)
-		count += ts - (count % ts);
+		बिलांग += ts - (बिलांग % ts);
 	    else
-		count += ptr2cells(ptr);
+		बिलांग += ptr2cells(ptr);
 	}
 	else if (*ptr == ' ')
-	    ++count;		// count a space for one
+	    ++बिलांग;		// count a space for one
 	else
 	    break;
     }
-    return count;
+    return बिलांग;
 }
 
 #if defined(FEAT_VARTABS)
@@ -483,23 +483,23 @@ get_indent_str(
     int
 get_indent_str_vtab(char_u *ptr, int ts, int *vts, int no_ts)
 {
-    int		count = 0;
+    int		बिलांग = 0;
 
     for ( ; *ptr; ++ptr)
     {
 	if (*ptr == TAB)    // count a tab for what it is worth
 	{
 	    if (!no_ts)
-		count += tabstop_padding(count, ts, vts);
+		बिलांग += tabstop_padding(बिलांग, ts, vts);
 	    else
-		count += ptr2cells(ptr);
+		बिलांग += ptr2cells(ptr);
 	}
 	else if (*ptr == ' ')
-	    ++count;		// count a space for one
+	    ++बिलांग;		// count a space for one
 	else
 	    break;
     }
-    return count;
+    return बिलांग;
 }
 #endif
 
@@ -524,7 +524,7 @@ set_indent(
     char_u	*s;
     int		todo;
     int		ind_len;	    // measured in characters
-    int		line_len;	    // size of the line (including the NUL)
+    int		लिन्या_len;	    // size of the line (including the NUL)
     int		doit = FALSE;
     int		ind_done = 0;	    // measured in spaces
 #ifdef FEAT_VARTABS
@@ -540,7 +540,7 @@ set_indent(
     todo = size;
     ind_len = 0;
     p = oldline = ml_get_curline();
-    line_len = ml_get_curline_len() + 1;
+    लिन्या_len = ml_get_curline_len() + 1;
 
     // Calculate the buffer size for the new indent, and check to see if it
     // isn't already set
@@ -548,11 +548,11 @@ set_indent(
     // if 'expandtab' isn't set: use TABs; if both 'expandtab' and
     // 'preserveindent' are set count the number of characters at the
     // beginning of the line to be copied
-    if (!curbuf->b_p_et || (!(flags & SIN_INSERT) && curbuf->b_p_pi))
+    if (!curbuf->b_p_et || (!(flags & SIN_इसिंगित) && curbuf->b_p_pi))
     {
 	// If 'preserveindent' is set then reuse as much as possible of
 	// the existing indent structure for the new indent
-	if (!(flags & SIN_INSERT) && curbuf->b_p_pi)
+	if (!(flags & SIN_इसिंगित) && curbuf->b_p_pi)
 	{
 	    ind_done = 0;
 
@@ -654,16 +654,16 @@ set_indent(
     }
 
     // Return if the indent is OK already.
-    if (!doit && !VIM_ISWHITE(*p) && !(flags & SIN_INSERT))
+    if (!doit && !VIM_ISWHITE(*p) && !(flags & SIN_इसिंगित))
 	return FALSE;
 
     // Allocate memory for the new line.
-    if (flags & SIN_INSERT)
+    if (flags & SIN_इसिंगित)
 	p = oldline;
     else
     {
 	p = skipwhite(p);
-	line_len -= (int)(p - oldline);
+	लिन्या_len -= (int)(p - oldline);
     }
 
     // If 'preserveindent' and 'expandtab' are both set keep the original
@@ -671,7 +671,7 @@ set_indent(
     // after the if (!curbuf->b_p_et) below.
     if (orig_char_len != -1)
     {
-	newline = alloc(orig_char_len + size - ind_done + line_len);
+	newline = alloc(orig_char_len + size - ind_done + लिन्या_len);
 	if (newline == NULL)
 	    return FALSE;
 	todo = size - ind_done;
@@ -695,7 +695,7 @@ set_indent(
     else
     {
 	todo = size;
-	newline = alloc(ind_len + line_len);
+	newline = alloc(ind_len + लिन्या_len);
 	if (newline == NULL)
 	    return FALSE;
 	s = newline;
@@ -707,7 +707,7 @@ set_indent(
     {
 	// If 'preserveindent' is set then reuse as much as possible of
 	// the existing indent structure for the new indent
-	if (!(flags & SIN_INSERT) && curbuf->b_p_pi)
+	if (!(flags & SIN_इसिंगित) && curbuf->b_p_pi)
 	{
 	    p = oldline;
 	    ind_done = 0;
@@ -780,7 +780,7 @@ set_indent(
 	*s++ = ' ';
 	--todo;
     }
-    mch_memmove(s, p, (size_t)line_len);
+    mch_memmove(s, p, (size_t)लिन्या_len);
 
     // Replace the line (unless undo fails).
     if (!(flags & SIN_UNDO) || u_savesub(curwin->w_cursor.lnum) == OK)
@@ -833,7 +833,7 @@ set_indent(
  * Since a pattern is used it can actually handle more than numbers.
  */
     int
-get_number_indent(linenr_T lnum)
+get_नुमेरो_indent(linenr_T lnum)
 {
     colnr_T	col;
     pos_T	pos;
@@ -841,12 +841,12 @@ get_number_indent(linenr_T lnum)
     regmatch_T	regmatch;
     int		lead_len = 0;	// length of comment leader
 
-    if (lnum > curbuf->b_ml.ml_line_count)
+    if (lnum > curbuf->b_ml.ml_लिन्या_बिलांग)
 	return -1;
     pos.lnum = 0;
 
     // In format_lines() (i.e. not insert mode), fo+=q is needed too...
-    if ((State & MODE_INSERT) || has_format_option(FO_Q_COMS))
+    if ((State & MODE_इसिंगित) || has_format_option(FO_Q_COMS))
 	lead_len = get_leader_len(ml_get(lnum), NULL, FALSE, TRUE);
 
     regmatch.regprog = vim_regcomp(curbuf->b_p_flp, RE_MAGIC);
@@ -950,7 +950,7 @@ briopt_check(
     int
 get_breakindent_win(
     win_T	*wp,
-    char_u	*line) // start of the line
+    char_u	*लिन्या) // start of the line
 {
     static int	    prev_indent = 0;	// cached indent value
     static long	    prev_ts     = 0L;	// cached tabstop value
@@ -958,7 +958,7 @@ get_breakindent_win(
     static int      *prev_vts = NULL;   // cached vartabs values
 # endif
     static int	    prev_fnum   = 0;	// cached buffer number
-    static char_u   *prev_line  = NULL;	// cached copy of "line"
+    static char_u   *prev_लिन्या  = NULL;	// cached copy of "line"
     static varnumber_T prev_tick = 0;   // changedtick of cached value
     static int      prev_list = 0;	// cached list indent
     static int      prev_listopt = 0;	// cached w_p_briopt_list value
@@ -994,23 +994,23 @@ get_breakindent_win(
 	    || prev_no_ts != no_ts
 	    || prev_dy_uhex != (dy_flags & DY_UHEX)
 	    || prev_flp == NULL
-	    || STRCMP(prev_flp, get_flp_value(wp->w_buffer)) != 0
-	    || prev_line == NULL || STRCMP(prev_line, line) != 0
+	    || STRCMP(prev_flp, get_flp_हालागा(wp->w_buffer)) != 0
+	    || prev_लिन्या == NULL || STRCMP(prev_लिन्या, लिन्या) != 0
 	)
     {
 	prev_fnum = wp->w_buffer->b_fnum;
-	vim_free(prev_line);
-	prev_line = vim_strsave(line);
+	vim_free(prev_लिन्या);
+	prev_लिन्या = vim_strsave(लिन्या);
 	prev_ts = wp->w_buffer->b_p_ts;
 # ifdef FEAT_VARTABS
 	prev_vts = wp->w_buffer->b_p_vts_array;
 	if (wp->w_briopt_vcol == 0)
-	    prev_indent = get_indent_str_vtab(line,
+	    prev_indent = get_indent_str_vtab(लिन्या,
 				     (int)wp->w_buffer->b_p_ts,
 				      wp->w_buffer->b_p_vts_array, no_ts);
 # else
 	if (wp->w_briopt_vcol == 0)
-	    prev_indent = get_indent_str(line,
+	    prev_indent = get_indent_str(लिन्या,
 					(int)wp->w_buffer->b_p_ts, no_ts);
 # endif
 	prev_tick = CHANGEDTICK(wp->w_buffer);
@@ -1019,7 +1019,7 @@ get_breakindent_win(
 	prev_no_ts = no_ts;
 	prev_dy_uhex = (dy_flags & DY_UHEX);
 	vim_free(prev_flp);
-	prev_flp = vim_strsave(get_flp_value(wp->w_buffer));
+	prev_flp = vim_strsave(get_flp_हालागा(wp->w_buffer));
 	// add additional indent for numbered lists
 	if (wp->w_briopt_list != 0 && wp->w_briopt_vcol == 0)
 	{
@@ -1031,7 +1031,7 @@ get_breakindent_win(
 	    if (regmatch.regprog != NULL)
 	    {
 		regmatch.rm_ic = FALSE;
-		if (vim_regexec(&regmatch, line, 0))
+		if (vim_regexec(&regmatch, लिन्या, 0))
 		{
 		    if (wp->w_briopt_list > 0)
 			prev_list = wp->w_briopt_list;
@@ -1074,7 +1074,7 @@ get_breakindent_win(
 
     // indent minus the length of the showbreak string
     if (wp->w_briopt_sbr)
-	bri -= vim_strsize(get_showbreak_value(wp));
+	bri -= vim_strsize(get_showbreak_हालागा(wp));
 
 
     // never indent past left window margin
@@ -1133,21 +1133,21 @@ op_reindent(oparg_T *oap, int (*how)(void))
 
     // Save for undo.  Do this once for all lines, much faster than doing this
     // for each line separately, especially when undoing.
-    if (u_savecommon(start_lnum - 1, start_lnum + oap->line_count,
-				     start_lnum + oap->line_count, FALSE) == OK)
-	for (i = oap->line_count; --i >= 0 && !got_int; )
+    if (u_savecommon(start_lnum - 1, start_lnum + oap->लिन्या_बिलांग,
+				     start_lnum + oap->लिन्या_बिलांग, FALSE) == OK)
+	for (i = oap->लिन्या_बिलांग; --i >= 0 && !got_int; )
 	{
 	    // it's a slow thing to do, so give feedback so there's no worry
 	    // that the computer's just hung.
 
 	    if (i > 1
-		    && (i % 50 == 0 || i == oap->line_count - 1)
-		    && oap->line_count > p_report)
+		    && (i % 50 == 0 || i == oap->लिन्या_बिलांग - 1)
+		    && oap->लिन्या_बिलांग > p_report)
 		smsg(_("%ld lines to indent... "), i);
 
 	    // Be vi-compatible: For lisp indenting the first line is not
 	    // indented, unless there is only one line.
-	    if (i != oap->line_count - 1 || oap->line_count == 1
+	    if (i != oap->लिन्या_बिलांग - 1 || oap->लिन्या_बिलांग == 1
 						     || how != get_lisp_indent)
 	    {
 		l = skipwhite(ml_get_curline());
@@ -1176,15 +1176,15 @@ op_reindent(oparg_T *oap, int (*how)(void))
     // highlighting was present, need to continue until the last line.  When
     // there is no change still need to remove the Visual highlighting.
     if (last_changed != 0)
-	changed_lines(first_changed, 0,
-		oap->is_VIsual ? start_lnum + oap->line_count :
+	changed_मगा_लिन्या(first_changed, 0,
+		oap->is_VIsual ? start_lnum + oap->लिन्या_बिलांग :
 		last_changed + 1, 0L);
     else if (oap->is_VIsual)
 	redraw_curbuf_later(UPD_INVERTED);
 
-    if (oap->line_count > p_report)
+    if (oap->लिन्या_बिलांग > p_report)
     {
-	i = oap->line_count - (i + 1);
+	i = oap->लिन्या_बिलांग - (i + 1);
 	smsg(NGETTEXT("%ld line indented ",
 						 "%ld lines indented ", i), i);
     }
@@ -1200,7 +1200,7 @@ op_reindent(oparg_T *oap, int (*how)(void))
  * Return TRUE if lines starting with '#' should be left aligned.
  */
     int
-preprocs_left(void)
+preprocs_कालिवा(void)
 {
     return
 	(curbuf->b_p_si && !curbuf->b_p_cin) ||
@@ -1286,7 +1286,7 @@ ins_try_si(int c)
 		curwin->w_cursor = old_pos;
 	    }
 	    if (temp)
-		shift_line(TRUE, FALSE, 1, TRUE);
+		shift_लिन्या(TRUE, FALSE, 1, TRUE);
 	}
     }
 
@@ -1329,12 +1329,12 @@ change_indent(
     int		start_col;
     colnr_T	vc;
     colnr_T	orig_col = 0;		// init for GCC
-    char_u	*new_line, *orig_line = NULL;	// init for GCC
+    char_u	*new_लिन्या, *orig_लिन्या = NULL;	// init for GCC
 
     // MODE_VREPLACE state needs to know what the line was like before changing
     if (State & VREPLACE_FLAG)
     {
-	orig_line = vim_strnsave(ml_get_curline(), ml_get_curline_len());  // Deal with NULL below
+	orig_लिन्या = vim_strnsave(ml_get_curline(), ml_get_curline_len());  // Deal with NULL below
 	orig_col = curwin->w_cursor.col;
     }
 
@@ -1376,8 +1376,8 @@ change_indent(
 
 	// Avoid being called recursively.
 	if (State & VREPLACE_FLAG)
-	    State = MODE_INSERT;
-	shift_line(type == INDENT_DEC, round, 1, call_changed_bytes);
+	    State = MODE_इसिंगित;
+	shift_लिन्या(type == INDENT_DEC, round, 1, call_changed_bytes);
 	State = save_State;
     }
     insstart_less -= curwin->w_cursor.col;
@@ -1397,7 +1397,7 @@ change_indent(
 	    insstart_less = MAXCOL;
 	new_cursor_col += curwin->w_cursor.col;
     }
-    else if (!(State & MODE_INSERT))
+    else if (!(State & MODE_इसिंगित))
 	new_cursor_col = curwin->w_cursor.col;
     else
     {
@@ -1421,7 +1421,7 @@ change_indent(
 	    cts.cts_vcol += lbr_chartabsize(&cts);
 	}
 	vcol = last_vcol;
-	new_cursor_col = cts.cts_ptr - cts.cts_line;
+	new_cursor_col = cts.cts_ptr - cts.cts_लिन्या;
 	clear_chartabsize_arg(&cts);
 
 	// May need to insert spaces to be able to position the cursor on
@@ -1459,7 +1459,7 @@ change_indent(
     changed_cline_bef_curs();
 
     // May have to adjust the start of the insert.
-    if (State & MODE_INSERT)
+    if (State & MODE_इसिंगित)
     {
 	if (curwin->w_cursor.lnum == Insstart.lnum && Insstart.col != 0)
 	{
@@ -1488,10 +1488,10 @@ change_indent(
 	}
 	while (start_col < (int)curwin->w_cursor.col || replaced)
 	{
-	    replace_push(NUL);
+	    replace_इतुलाक(NUL);
 	    if (replaced)
 	    {
-		replace_push(replaced);
+		replace_इतुलाक(replaced);
 		replaced = NUL;
 	    }
 	    ++start_col;
@@ -1508,31 +1508,31 @@ change_indent(
     {
 	// If orig_line didn't allocate, just return.  At least we did the job,
 	// even if you can't backspace.
-	if (orig_line == NULL)
+	if (orig_लिन्या == NULL)
 	    return;
 
 	// Save new line
-	new_line = vim_strnsave(ml_get_curline(), ml_get_curline_len());
-	if (new_line == NULL)
+	new_लिन्या = vim_strnsave(ml_get_curline(), ml_get_curline_len());
+	if (new_लिन्या == NULL)
 	{
-	    vim_free(orig_line);
+	    vim_free(orig_लिन्या);
 	    return;
 	}
 
 	// We only put back the new line up to the cursor
-	new_line[curwin->w_cursor.col] = NUL;
+	new_लिन्या[curwin->w_cursor.col] = NUL;
 
 	// Put back original line
-	ml_replace(curwin->w_cursor.lnum, orig_line, FALSE);
+	ml_replace(curwin->w_cursor.lnum, orig_लिन्या, FALSE);
 	curwin->w_cursor.col = orig_col;
 
 	// Backspace from cursor to start of line
 	backspace_until_column(0);
 
 	// Insert new stuff into line again
-	ins_bytes(new_line);
+	ins_bytes(new_लिन्या);
 
-	vim_free(new_line);
+	vim_free(new_लिन्या);
     }
 }
 
@@ -1545,11 +1545,11 @@ change_indent(
 copy_indent(int size, char_u *src)
 {
     char_u	*p = NULL;
-    char_u	*line = NULL;
+    char_u	*लिन्या = NULL;
     char_u	*s;
     int		todo;
     int		ind_len;
-    int		line_len = 0;
+    int		लिन्या_len = 0;
     int		tab_pad;
     int		ind_done;
     int		round;
@@ -1662,19 +1662,19 @@ copy_indent(int size, char_u *src)
 	{
 	    // Allocate memory for the result: the copied indent, new indent
 	    // and the rest of the line.
-	    line_len = ml_get_curline_len() + 1;
-	    line = alloc(ind_len + line_len);
-	    if (line == NULL)
+	    लिन्या_len = ml_get_curline_len() + 1;
+	    लिन्या = alloc(ind_len + लिन्या_len);
+	    if (लिन्या == NULL)
 		return FALSE;
-	    p = line;
+	    p = लिन्या;
 	}
     }
 
     // Append the original line
-    mch_memmove(p, ml_get_curline(), (size_t)line_len);
+    mch_memmove(p, ml_get_curline(), (size_t)लिन्या_len);
 
     // Replace the line
-    ml_replace(curwin->w_cursor.lnum, line, FALSE);
+    ml_replace(curwin->w_cursor.lnum, लिन्या, FALSE);
 
     // Put the cursor after the indent.
     curwin->w_cursor.col = ind_len;
@@ -1703,8 +1703,8 @@ ex_retab(exarg_T *eap)
 {
     linenr_T	lnum;
     int		got_tab = FALSE;
-    long	num_spaces = 0;
-    long	num_tabs;
+    long	नुमेरो_spaces = 0;
+    long	नुमेरो_tabs;
     long	len;
     long	col;
     long	vcol;
@@ -1713,7 +1713,7 @@ ex_retab(exarg_T *eap)
     long	old_len;
     long	new_len;
     char_u	*ptr;
-    char_u	*new_line = (char_u *)1; // init to non-NULL
+    char_u	*new_लिन्या = (char_u *)1; // init to non-NULL
     int		did_undo;		// called u_save for current line
 #ifdef FEAT_VARTABS
     int		*new_vts_array = NULL;
@@ -1723,8 +1723,8 @@ ex_retab(exarg_T *eap)
     int		new_ts = 0;
 #endif
     int		save_list;
-    linenr_T	first_line = 0;		// first changed line
-    linenr_T	last_line = 0;		// last changed line
+    linenr_T	first_लिन्या = 0;		// first changed line
+    linenr_T	last_लिन्या = 0;		// last changed line
     int		is_indent_only = 0;	// Only process leading whitespace
 
     save_list = curwin->w_p_list;
@@ -1788,26 +1788,26 @@ ex_retab(exarg_T *eap)
 	{
 	    if (VIM_ISWHITE(ptr[col]))
 	    {
-		if (!got_tab && num_spaces == 0)
+		if (!got_tab && नुमेरो_spaces == 0)
 		{
 		    // First consecutive white-space
 		    start_vcol = vcol;
 		    start_col = col;
 		}
 		if (ptr[col] == ' ')
-		    num_spaces++;
+		    नुमेरो_spaces++;
 		else
 		    got_tab = TRUE;
 	    }
 	    else
 	    {
-		if (got_tab || (eap->forceit && num_spaces > 1))
+		if (got_tab || (eap->forceit && नुमेरो_spaces > 1))
 		{
 		    // Retabulate this string of white-space
 
 		    // len is virtual length of white string
-		    len = num_spaces = vcol - start_vcol;
-		    num_tabs = 0;
+		    len = नुमेरो_spaces = vcol - start_vcol;
+		    नुमेरो_tabs = 0;
 		    if (!curbuf->b_p_et)
 		    {
 #ifdef FEAT_VARTABS
@@ -1815,21 +1815,21 @@ ex_retab(exarg_T *eap)
 
 			tabstop_fromto(start_vcol, vcol,
 					curbuf->b_p_ts, new_vts_array, &t, &s);
-			num_tabs = t;
-			num_spaces = s;
+			नुमेरो_tabs = t;
+			नुमेरो_spaces = s;
 #else
 			temp = new_ts - (start_vcol % new_ts);
-			if (num_spaces >= temp)
+			if (नुमेरो_spaces >= temp)
 			{
-			    num_spaces -= temp;
-			    num_tabs++;
+			    नुमेरो_spaces -= temp;
+			    नुमेरो_tabs++;
 			}
-			num_tabs += num_spaces / new_ts;
-			num_spaces -= (num_spaces / new_ts) * new_ts;
+			नुमेरो_tabs += नुमेरो_spaces / new_ts;
+			नुमेरो_spaces -= (नुमेरो_spaces / new_ts) * new_ts;
 #endif
 		    }
 		    if (curbuf->b_p_et || got_tab ||
-					(num_spaces + num_tabs < len))
+					(नुमेरो_spaces + नुमेरो_tabs < len))
 		    {
 			if (did_undo == FALSE)
 			{
@@ -1837,42 +1837,42 @@ ex_retab(exarg_T *eap)
 			    if (u_save((linenr_T)(lnum - 1),
 						(linenr_T)(lnum + 1)) == FAIL)
 			    {
-				new_line = NULL;	// flag out-of-memory
+				new_लिन्या = NULL;	// flag out-of-memory
 				break;
 			    }
 			}
 
 			// len is actual number of white characters used
-			len = num_spaces + num_tabs;
+			len = नुमेरो_spaces + नुमेरो_tabs;
 			new_len = old_len - col + start_col + len + 1;
 			if (new_len <= 0 || new_len >= MAXCOL)
 			{
 			    emsg_text_too_long();
 			    break;
 			}
-			new_line = alloc(new_len);
-			if (new_line == NULL)
+			new_लिन्या = alloc(new_len);
+			if (new_लिन्या == NULL)
 			    break;
 			if (start_col > 0)
-			    mch_memmove(new_line, ptr, (size_t)start_col);
-			mch_memmove(new_line + start_col + len,
+			    mch_memmove(new_लिन्या, ptr, (size_t)start_col);
+			mch_memmove(new_लिन्या + start_col + len,
 				      ptr + col, (size_t)(old_len - col + 1));
-			ptr = new_line + start_col;
+			ptr = new_लिन्या + start_col;
 			for (col = 0; col < len; col++)
-			    ptr[col] = (col < num_tabs) ? '\t' : ' ';
-			if (ml_replace(lnum, new_line, FALSE) == OK)
+			    ptr[col] = (col < नुमेरो_tabs) ? '\t' : ' ';
+			if (ml_replace(lnum, new_लिन्या, FALSE) == OK)
 			    // "new_line" may have been copied
-			    new_line = curbuf->b_ml.ml_line_ptr;
-			if (first_line == 0)
-			    first_line = lnum;
-			last_line = lnum;
-			ptr = new_line;
+			    new_लिन्या = curbuf->b_ml.ml_लिन्या_ptr;
+			if (first_लिन्या == 0)
+			    first_लिन्या = lnum;
+			last_लिन्या = lnum;
+			ptr = new_लिन्या;
 			old_len = new_len - 1;
 			col = start_col + len;
 		    }
 		}
 		got_tab = FALSE;
-		num_spaces = 0;
+		नुमेरो_spaces = 0;
 
 		if (is_indent_only)
 		    break;
@@ -1890,9 +1890,9 @@ ex_retab(exarg_T *eap)
 	    else
 		++col;
 	}
-	if (new_line == NULL)		    // out of memory
+	if (new_लिन्या == NULL)		    // out of memory
 	    break;
-	line_breakcheck();
+	लिन्या_breakcheck();
     }
     if (got_int)
 	emsg(_(e_interrupted));
@@ -1900,11 +1900,11 @@ ex_retab(exarg_T *eap)
 #ifdef FEAT_VARTABS
     // If a single value was given then it can be considered equal to
     // either the value of 'tabstop' or the value of 'vartabstop'.
-    if (tabstop_count(curbuf->b_p_vts_array) == 0
-	&& tabstop_count(new_vts_array) == 1
+    if (tabstop_बिलांग(curbuf->b_p_vts_array) == 0
+	&& tabstop_बिलांग(new_vts_array) == 1
 	&& curbuf->b_p_ts == tabstop_first(new_vts_array))
 	; // not changed
-    else if (tabstop_count(curbuf->b_p_vts_array) > 0
+    else if (tabstop_बिलांग(curbuf->b_p_vts_array) > 0
 	&& tabstop_eq(curbuf->b_p_vts_array, new_vts_array))
 	; // not changed
     else
@@ -1913,8 +1913,8 @@ ex_retab(exarg_T *eap)
     if (curbuf->b_p_ts != new_ts)
 	redraw_curbuf_later(UPD_NOT_VALID);
 #endif
-    if (first_line != 0)
-	changed_lines(first_line, 0, last_line + 1, 0L);
+    if (first_लिन्या != 0)
+	changed_मगा_लिन्या(first_लिन्या, 0, last_लिन्या + 1, 0L);
 
     curwin->w_p_list = save_list;	// restore 'list'
 
@@ -1925,7 +1925,7 @@ ex_retab(exarg_T *eap)
 	// than one tabstop then update 'vartabstop'.
 	int *old_vts_ary = curbuf->b_p_vts_array;
 
-	if (tabstop_count(old_vts_ary) > 0 || tabstop_count(new_vts_array) > 1)
+	if (tabstop_बिलांग(old_vts_ary) > 0 || tabstop_बिलांग(new_vts_array) > 1)
 	{
 	    set_string_option_direct((char_u *)"vts", -1, new_ts_str,
 							OPT_FREE|OPT_LOCAL, 0);
@@ -1954,7 +1954,7 @@ ex_retab(exarg_T *eap)
  * Get indent level from 'indentexpr'.
  */
     int
-get_expr_indent(void)
+get_पाहायाग_indent(void)
 {
     int		indent = -1;
     char_u	*inde_copy;
@@ -1982,7 +1982,7 @@ get_expr_indent(void)
     inde_copy = vim_strsave(curbuf->b_p_inde);
     if (inde_copy != NULL)
     {
-	indent = (int)eval_to_number(inde_copy, TRUE);
+	indent = (int)eval_to_नुमेरो(inde_copy, TRUE);
 	vim_free(inde_copy);
     }
 
@@ -1995,7 +1995,7 @@ get_expr_indent(void)
     // Pretend to be in Insert mode, allow cursor past end of line for "o"
     // command.
     save_State = State;
-    State = MODE_INSERT;
+    State = MODE_इसिंगित;
     curwin->w_cursor = save_pos;
     curwin->w_curswant = save_curswant;
     curwin->w_set_curswant = save_set_curswant;
@@ -2143,10 +2143,10 @@ get_lisp_indent(void)
 		amount = 2;
 	    else
 	    {
-		char_u		*line = that;
+		char_u		*लिन्या = that;
 		chartabsize_T	cts;
 
-		init_chartabsize_arg(&cts, curwin, pos->lnum, 0, line, line);
+		init_chartabsize_arg(&cts, curwin, pos->lnum, 0, लिन्या, लिन्या);
 		while (*cts.cts_ptr != NUL && col > 0)
 		{
 		    cts.cts_vcol += lbr_chartabsize_adv(&cts);
@@ -2174,8 +2174,8 @@ get_lisp_indent(void)
 		    }
 		    firsttry = amount;
 
-		    init_chartabsize_arg(&cts, curwin, (colnr_T)(that - line),
-							   amount, line, that);
+		    init_chartabsize_arg(&cts, curwin, (colnr_T)(that - लिन्या),
+							   amount, लिन्या, that);
 		    while (VIM_ISWHITE(*cts.cts_ptr))
 		    {
 			cts.cts_vcol += lbr_chartabsize(&cts);
@@ -2196,7 +2196,7 @@ get_lisp_indent(void)
 			quotecount = 0;
 
 			init_chartabsize_arg(&cts, curwin,
-				   (colnr_T)(that - line), amount, line, that);
+				   (colnr_T)(that - लिन्या), amount, लिन्या, that);
 			if (vi_lisp
 				|| (*that != '"'
 				    && *that != '\''
@@ -2298,12 +2298,12 @@ fix_indent(void)
     if (curbuf->b_p_lisp && curbuf->b_p_ai)
     {
 	if (use_indentexpr_for_lisp())
-	    do_c_expr_indent();
+	    do_c_पाहायाग_indent();
 	else
 	    fixthisline(get_lisp_indent);
     }
     else if (cindent_on())
-	do_c_expr_indent();
+	do_c_पाहायाग_indent();
 }
 
 #if defined(FEAT_EVAL)
@@ -2319,13 +2319,13 @@ f_indent(typval_T *argvars, typval_T *rettv)
 	return;
 
     lnum = tv_get_lnum(argvars);
-    if (lnum >= 1 && lnum <= curbuf->b_ml.ml_line_count)
-	rettv->vval.v_number = get_indent_lnum(lnum);
+    if (lnum >= 1 && lnum <= curbuf->b_ml.ml_लिन्या_बिलांग)
+	rettv->vval.v_नुमेरो = get_indent_lnum(lnum);
     else
     {
 	if (in_vim9script())
-	    semsg(_(e_invalid_line_number_nr), lnum);
-	rettv->vval.v_number = -1;
+	    semsg(_(e_invalid_लिन्या_नुमेरो_nr), lnum);
+	rettv->vval.v_नुमेरो = -1;
     }
 }
 
@@ -2343,15 +2343,15 @@ f_lispindent(typval_T *argvars UNUSED, typval_T *rettv)
 
     pos = curwin->w_cursor;
     lnum = tv_get_lnum(argvars);
-    if (lnum >= 1 && lnum <= curbuf->b_ml.ml_line_count)
+    if (lnum >= 1 && lnum <= curbuf->b_ml.ml_लिन्या_बिलांग)
     {
 	curwin->w_cursor.lnum = lnum;
-	rettv->vval.v_number = get_lisp_indent();
+	rettv->vval.v_नुमेरो = get_lisp_indent();
 	curwin->w_cursor = pos;
     }
     else if (in_vim9script())
-	semsg(_(e_invalid_line_number_nr), lnum);
+	semsg(_(e_invalid_लिन्या_नुमेरो_nr), lnum);
     else
-	rettv->vval.v_number = -1;
+	rettv->vval.v_नुमेरो = -1;
 }
 #endif

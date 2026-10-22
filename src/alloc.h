@@ -29,7 +29,7 @@ typedef enum {
     aid_qf_multiline_pfx,
     aid_qf_makecmd,
     aid_qf_linebuf,
-    aid_tagstack_items,
+    aid_tagstack_मगा_बागाय,
     aid_tagstack_from,
     aid_tagstack_details,
     aid_sign_getdefined,
@@ -38,7 +38,7 @@ typedef enum {
     aid_sign_getlist,
     aid_sign_getplaced_dict,
     aid_sign_getplaced_list,
-    aid_insert_sign,
+    aid_इसिंगित_sign,
     aid_sign_getinfo,
     aid_newbuf_bvars,
     aid_newwin_wvars,
@@ -47,6 +47,6 @@ typedef enum {
     aid_get_func,
     aid_defer,
     aid_tuple_append,
-    aid_tuple_type_args,
+    aid_tuple_type_मगा_कातविरान,
     aid_last
 } alloc_id_T;

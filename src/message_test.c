@@ -511,14 +511,14 @@ main(int argc, char **argv)
     common_init_1();
     common_init_2(&params);
 
-    set_option_value_give_err((char_u *)"encoding", 0, (char_u *)"utf-8", 0);
+    set_option_हालागा_give_err((char_u *)"encoding", 0, (char_u *)"utf-8", 0);
     init_chartab();
     test_trunc_string();
     test_trunc_string_mbyte();
     test_vim_snprintf();
     test_vim_snprintf_positional();
 
-    set_option_value_give_err((char_u *)"encoding", 0, (char_u *)"latin1", 0);
+    set_option_हालागा_give_err((char_u *)"encoding", 0, (char_u *)"latin1", 0);
     init_chartab();
     test_trunc_string();
     test_vim_snprintf();

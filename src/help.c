@@ -25,7 +25,7 @@ ex_help(exarg_T *eap)
     int		n;
     int		i;
     win_T	*wp;
-    int		num_matches;
+    int		नुमेरो_matches;
     char_u	**matches;
     char_u	*p;
     int		empty_fnum = 0;
@@ -36,7 +36,7 @@ ex_help(exarg_T *eap)
     char_u	*lang;
 #endif
 #ifdef FEAT_FOLDING
-    int		old_KeyTyped = KeyTyped;
+    int		old_सुसि_Typed = सुसि_Typed;
 #endif
 
     if (ERROR_IF_ANY_POPUP_WINDOW)
@@ -85,14 +85,14 @@ ex_help(exarg_T *eap)
 	arg = (char_u *)"help.txt";
 
     // Check if there is a match for the argument.
-    n = find_help_tags(arg, &num_matches, &matches,
+    n = find_help_tags(arg, &नुमेरो_matches, &matches,
 						 eap != NULL && eap->forceit);
 
     i = 0;
 #ifdef FEAT_MULTI_LANG
     if (n != FAIL && lang != NULL)
 	// Find first item with the requested language.
-	for (i = 0; i < num_matches; ++i)
+	for (i = 0; i < नुमेरो_matches; ++i)
 	{
 	    len = (int)STRLEN(matches[i]);
 	    if (len > 3 && matches[i][len - 3] == '@'
@@ -100,7 +100,7 @@ ex_help(exarg_T *eap)
 		break;
 	}
 #endif
-    if (i >= num_matches || n == FAIL)
+    if (i >= नुमेरो_matches || n == FAIL)
     {
 #ifdef FEAT_MULTI_LANG
 	if (lang != NULL)
@@ -109,13 +109,13 @@ ex_help(exarg_T *eap)
 #endif
 	    semsg(_(e_sorry_no_help_for_str), arg);
 	if (n != FAIL)
-	    FreeWild(num_matches, matches);
+	    FreeWild(नुमेरो_matches, matches);
 	return;
     }
 
     // The first match (in the requested language) is the best match.
     tag = vim_strsave(matches[i]);
-    FreeWild(num_matches, matches);
+    FreeWild(नुमेरो_matches, matches);
 
 #ifdef FEAT_GUI
     need_mouse_correct = TRUE;
@@ -150,7 +150,7 @@ ex_help(exarg_T *eap)
 	    n = WSP_HELP;
 	    if (cmdmod.cmod_split == 0 && curwin->w_width != Columns
 						  && curwin->w_width < 80)
-		n |= p_sb ? WSP_BOT : WSP_TOP;
+		n |= p_sb ? WSP_BOT : WSP_इताअस;
 	    if (win_split(0, n) == FAIL)
 		goto erret;
 
@@ -176,7 +176,7 @@ ex_help(exarg_T *eap)
 #ifdef FEAT_FOLDING
     // Restore KeyTyped, setting 'filetype=help' may reset it.
     // It is needed for do_tag top open folds under the cursor.
-    KeyTyped = old_KeyTyped;
+    सुसि_Typed = old_सुसि_Typed;
 #endif
 
     if (tag != NULL)
@@ -257,13 +257,13 @@ help_heuristic(
     int		offset,			// offset for match
     int		wrong_case)		// no matching case
 {
-    int		num_letters;
+    int		नुमेरो_letters;
     char_u	*p;
 
-    num_letters = 0;
+    नुमेरो_letters = 0;
     for (p = matched_string; *p; p++)
 	if (ASCII_ISALNUM(*p))
-	    num_letters++;
+	    नुमेरो_letters++;
 
     // Multiply the number of letters by 100 to give it a much bigger
     // weighting than the number of characters.
@@ -283,7 +283,7 @@ help_heuristic(
     // alone is not a feature.
     if (matched_string[0] == '+' && matched_string[1] != NUL)
 	offset += 100;
-    return (int)(100 * num_letters + STRLEN(matched_string) + offset);
+    return (int)(100 * नुमेरो_letters + STRLEN(matched_string) + offset);
 }
 
 /*
@@ -318,7 +318,7 @@ help_compare(const void *s1, const void *s2)
     int
 find_help_tags(
     char_u	*arg,
-    int		*num_matches,
+    int		*नुमेरो_matches,
     char_u	***matches,
     int		keep_lang)
 {
@@ -369,7 +369,7 @@ find_help_tags(
 	{"s/\\9",	"s/\\\\9"},
 	{NULL, NULL}
     };
-    static char *(expr_table[]) = {"!=?", "!~?", "<=?", "<?", "==?", "=~?",
+    static char *(पाहायाग_table[]) = {"!=?", "!~?", "<=?", "<?", "==?", "=~?",
 				   ">=?", ">?", "is?", "isnot?"};
     int flags;
 
@@ -381,8 +381,8 @@ find_help_tags(
 	// When the string starting with "expr-" and containing '?' and matches
 	// the table, it is taken literally (but ~ is escaped).  Otherwise '?'
 	// is recognized as a wildcard.
-	for (i = (int)ARRAY_LENGTH(expr_table); --i >= 0; )
-	    if (STRCMP(arg + 5, expr_table[i]) == 0)
+	for (i = (int)ARRAY_LENGTH(पाहायाग_table); --i >= 0; )
+	    if (STRCMP(arg + 5, पाहायाग_table[i]) == 0)
 	    {
 		int si = 0, di = 0;
 
@@ -552,20 +552,20 @@ find_help_tags(
     }
 
     *matches = (char_u **)"";
-    *num_matches = 0;
+    *नुमेरो_matches = 0;
     flags = TAG_HELP | TAG_REGEXP | TAG_NAMES | TAG_VERBOSE | TAG_NO_TAGFUNC;
     if (keep_lang)
 	flags |= TAG_KEEP_LANG;
-    if (find_tags(IObuff, num_matches, matches, flags, (int)MAXCOL, NULL) == OK
-	    && *num_matches > 0)
+    if (find_tags(IObuff, नुमेरो_matches, matches, flags, (int)MAXCOL, NULL) == OK
+	    && *नुमेरो_matches > 0)
     {
 	// Sort the matches found on the heuristic number that is after the
 	// tag name.
-	qsort((void *)*matches, (size_t)*num_matches,
+	qsort((void *)*matches, (size_t)*नुमेरो_matches,
 					      sizeof(char_u *), help_compare);
 	// Delete more than TAG_MANY to reduce the size of the listing.
-	while (*num_matches > TAG_MANY)
-	    vim_free((*matches)[--*num_matches]);
+	while (*नुमेरो_matches > TAG_MANY)
+	    vim_free((*matches)[--*नुमेरो_matches]);
     }
     return OK;
 }
@@ -577,7 +577,7 @@ find_help_tags(
  * tag matches it.  Otherwise remove "@en" if "en" is the only language.
  */
     void
-cleanup_help_tags(int num_file, char_u **file)
+cleanup_help_tags(int नुमेरो_file, char_u **file)
 {
     int		i, j;
     int		len;
@@ -592,7 +592,7 @@ cleanup_help_tags(int num_file, char_u **file)
     }
     *p = NUL;
 
-    for (i = 0; i < num_file; ++i)
+    for (i = 0; i < नुमेरो_file; ++i)
     {
 	len = (int)STRLEN(file[i]) - 3;
 	if (len <= 0)
@@ -601,18 +601,18 @@ cleanup_help_tags(int num_file, char_u **file)
 	{
 	    // Sorting on priority means the same item in another language may
 	    // be anywhere.  Search all items for a match up to the "@en".
-	    for (j = 0; j < num_file; ++j)
+	    for (j = 0; j < नुमेरो_file; ++j)
 		if (j != i && (int)STRLEN(file[j]) == len + 3
 			   && STRNCMP(file[i], file[j], len + 1) == 0)
 		    break;
-	    if (j == num_file)
+	    if (j == नुमेरो_file)
 		// item only exists with @en, remove it
 		file[i][len] = NUL;
 	}
     }
 
     if (*buf != NUL)
-	for (i = 0; i < num_file; ++i)
+	for (i = 0; i < नुमेरो_file; ++i)
 	{
 	    len = (int)STRLEN(file[i]) - 3;
 	    if (len <= 0)
@@ -696,7 +696,7 @@ prepare_help_buffer(void)
 fix_help_buffer(void)
 {
     linenr_T	lnum;
-    char_u	*line;
+    char_u	*लिन्या;
     int		in_example = FALSE;
     int		len;
     char_u	*fname;
@@ -708,7 +708,7 @@ fix_help_buffer(void)
     if (STRCMP(curbuf->b_p_ft, "help") != 0)
     {
 	++curbuf_lock;
-	set_option_value_give_err((char_u *)"ft",
+	set_option_हालागा_give_err((char_u *)"ft",
 					      0L, (char_u *)"help", OPT_LOCAL);
 	--curbuf_lock;
     }
@@ -717,35 +717,35 @@ fix_help_buffer(void)
     if (!syntax_present(curwin))
 #endif
     {
-	for (lnum = 1; lnum <= curbuf->b_ml.ml_line_count; ++lnum)
+	for (lnum = 1; lnum <= curbuf->b_ml.ml_लिन्या_बिलांग; ++lnum)
 	{
-	    line = ml_get_buf(curbuf, lnum, FALSE);
+	    लिन्या = ml_get_buf(curbuf, lnum, FALSE);
 	    len = ml_get_buf_len(curbuf, lnum);
-	    if (in_example && len > 0 && !VIM_ISWHITE(line[0]))
+	    if (in_example && len > 0 && !VIM_ISWHITE(लिन्या[0]))
 	    {
 		// End of example: non-white or '<' in first column.
-		if (line[0] == '<')
+		if (लिन्या[0] == '<')
 		{
 		    // blank-out a '<' in the first column
-		    line = ml_get_buf(curbuf, lnum, TRUE);
-		    line[0] = ' ';
+		    लिन्या = ml_get_buf(curbuf, lnum, TRUE);
+		    लिन्या[0] = ' ';
 		}
 		in_example = FALSE;
 	    }
 	    if (!in_example && len > 0)
 	    {
-		if (line[len - 1] == '>' && (len == 1 || line[len - 2] == ' '))
+		if (लिन्या[len - 1] == '>' && (len == 1 || लिन्या[len - 2] == ' '))
 		{
 		    // blank-out a '>' in the last column (start of example)
-		    line = ml_get_buf(curbuf, lnum, TRUE);
-		    line[len - 1] = ' ';
+		    लिन्या = ml_get_buf(curbuf, lnum, TRUE);
+		    लिन्या[len - 1] = ' ';
 		    in_example = TRUE;
 		}
-		else if (line[len - 1] == '~')
+		else if (लिन्या[len - 1] == '~')
 		{
 		    // blank-out a '~' at the end of line (header marker)
-		    line = ml_get_buf(curbuf, lnum, TRUE);
-		    line[len - 1] = ' ';
+		    लिन्या = ml_get_buf(curbuf, lnum, TRUE);
+		    लिन्या[len - 1] = ' ';
 		}
 	    }
 	}
@@ -764,10 +764,10 @@ fix_help_buffer(void)
 #endif
 	)
     {
-	for (lnum = 1; lnum < curbuf->b_ml.ml_line_count; ++lnum)
+	for (lnum = 1; lnum < curbuf->b_ml.ml_लिन्या_बिलांग; ++lnum)
 	{
-	    line = ml_get_buf(curbuf, lnum, FALSE);
-	    if (strstr((char *)line, "*local-additions*") == NULL)
+	    लिन्या = ml_get_buf(curbuf, lnum, FALSE);
+	    if (strstr((char *)लिन्या, "*local-additions*") == NULL)
 		continue;
 
 	    // Go through all directories in 'runtimepath', skipping
@@ -1132,7 +1132,7 @@ helptags_one(
 		if (IObuff[off] == '>' && (off == 0 || IObuff[off - 1] == ' '))
 		    in_example = TRUE;
 	    }
-	    line_breakcheck();
+	    लिन्या_breakcheck();
 	}
 
 	fclose(fd);

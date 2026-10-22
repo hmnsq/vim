@@ -123,7 +123,7 @@ int is_cygpty(int fd)
 	setup_fileid_api();
 
 	h = (HANDLE) _get_osfhandle(fd);
-	if (h == INVALID_HANDLE_VALUE) {
+	if (h == INVALID_HANDLE_हालागा) {
 		return 0;
 	}
 	// Cygwin/msys's pty is a pipe.

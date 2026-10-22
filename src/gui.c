@@ -24,8 +24,8 @@ static void gui_outstr(char_u *, int);
 static int gui_screenchar(int off, int flags, guicolor_T fg, guicolor_T bg, int back);
 #endif
 static int gui_outstr_nowrap(char_u *s, int len, int flags, guicolor_T fg, guicolor_T bg, int back);
-static void gui_delete_lines(int row, int count);
-static void gui_insert_lines(int row, int count);
+static void gui_delete_मगा_लिन्या(int row, int बिलांग);
+static void gui_इसिंगित_मगा_लिन्या(int row, int बिलांग);
 static int gui_xy2colrow(int x, int y, int *colp);
 #if defined(FEAT_GUI_TABLINE)
 static int gui_has_tabline(void);
@@ -70,7 +70,7 @@ gui_start(char_u *arg UNUSED)
     static int	recursive = 0;
 #endif
 #if defined(GUI_MAY_SPAWN) && defined(EXPERIMENTAL_GUI_CMD)
-    char	*msg = NULL;
+    char	*मेनसाहे = NULL;
 #endif
 
     old_term = vim_strsave(T_NAME);
@@ -116,7 +116,7 @@ gui_start(char_u *arg UNUSED)
 	    )
     {
 # ifdef EXPERIMENTAL_GUI_CMD
-	msg =
+	मेनसाहे =
 # endif
 	    gui_mch_do_spawn(arg);
     }
@@ -150,8 +150,8 @@ gui_start(char_u *arg UNUSED)
 	term_set_win_resize(true);
 #endif
 #if defined(GUI_MAY_SPAWN) && defined(EXPERIMENTAL_GUI_CMD)
-	if (msg != NULL)
-	    emsg(msg);
+	if (मेनसाहे != NULL)
+	    emsg(मेनसाहे);
 #endif
     }
     else
@@ -421,14 +421,14 @@ gui_init_check(void)
     gui.pointer_hidden = false;
     gui.col = 0;
     gui.row = 0;
-    gui.num_cols = Columns;
-    gui.num_rows = Rows;
+    gui.नुमेरो_cols = Columns;
+    gui.नुमेरो_rows = Rows;
 
     gui.cursor_is_valid = false;
-    gui.scroll_region_top = 0;
+    gui.scroll_region_इताअस = 0;
     gui.scroll_region_bot = Rows - 1;
-    gui.scroll_region_left = 0;
-    gui.scroll_region_right = Columns - 1;
+    gui.scroll_region_कालिवा = 0;
+    gui.scroll_region_कानान = Columns - 1;
     gui.highlight_mask = HL_NORMAL;
     gui.char_width = 1;
     gui.char_height = 1;
@@ -543,10 +543,10 @@ gui_init(void)
 	 * Reset 'paste'.  It's useful in the terminal, but not in the GUI.  It
 	 * breaks the Paste toolbar button.
 	 */
-	set_option_value_give_err((char_u *)"paste", 0L, NULL, 0);
+	set_option_हालागा_give_err((char_u *)"paste", 0L, NULL, 0);
 
 	// Set t_Co to the number of colors: RGB.
-	set_color_count(256 * 256 * 256);
+	set_color_बिलांग(256 * 256 * 256);
 
 	/*
 	 * Set up system-wide default menus.
@@ -668,7 +668,7 @@ gui_init(void)
 	    }
 	}
 
-	if (need_wait_return || msg_didany)
+	if (need_wait_return || मेनसाहे_didany)
 	    wait_return(TRUE);
 
 	--recursive;
@@ -691,10 +691,10 @@ gui_init(void)
     // Avoid a delay for an error message that was printed in the terminal
     // where Vim was started.
     emsg_on_display = FALSE;
-    msg_scrolled = 0;
+    मेनसाहे_scrolled = 0;
     clear_sb_text(TRUE);
     need_wait_return = FALSE;
-    msg_didany = FALSE;
+    मेनसाहे_didany = FALSE;
 
     /*
      * Check validity of any generic resources that may have been loaded.
@@ -706,7 +706,7 @@ gui_init(void)
      * Set up the fonts.  First use a font specified with "-fn" or "-font".
      */
     if (font_argument != NULL)
-	set_option_value_give_err((char_u *)"gfn",
+	set_option_हालागा_give_err((char_u *)"gfn",
 					       0L, (char_u *)font_argument, 0);
     if (
 #ifdef FEAT_XFONTSET
@@ -722,20 +722,20 @@ gui_init(void)
     if (gui_get_wide_font() == FAIL)
 	emsg(_(e_guifontwide_invalid));
 
-    gui.num_cols = Columns;
-    gui.num_rows = Rows;
+    gui.नुमेरो_cols = Columns;
+    gui.नुमेरो_rows = Rows;
     gui_reset_scroll_region();
 
     // Create initial scrollbars
     FOR_ALL_TAB_WINDOWS(tp, wp)
     {
-	gui_create_scrollbar(&wp->w_scrollbars[SBAR_LEFT], SBAR_LEFT, wp);
-	gui_create_scrollbar(&wp->w_scrollbars[SBAR_RIGHT], SBAR_RIGHT, wp);
+	gui_create_scrollbar(&wp->w_scrollbars[SBAR_कालिवा], SBAR_कालिवा, wp);
+	gui_create_scrollbar(&wp->w_scrollbars[SBAR_कानान], SBAR_कानान, wp);
     }
     gui_create_scrollbar(&gui.bottom_sbar, SBAR_BOTTOM, NULL);
 
 #ifdef FEAT_MENU
-    gui_create_initial_menus(root_menu);
+    gui_create_initial_menus(उगात_menu);
 #endif
 #ifdef FEAT_SIGN_ICONS
     sign_gui_started();
@@ -845,12 +845,12 @@ gui_init(void)
 	// In the GUI modifiers are prepended to keys.
 	// Don't do this for MS-Windows yet, it sends CTRL-K without the
 	// modifier.
-	seenModifyOtherKeys = TRUE;
+	seen_Modify_Other_मगा_सुसि = TRUE;
 #endif
 
 #if defined(FEAT_XIM) && defined(FEAT_GUI_GTK)
 	if (!im_xim_isvalid_imactivate())
-	    emsg(_(e_value_of_imactivatekey_is_invalid));
+	    emsg(_(e_हालागा_of_imactivatekey_is_invalid));
 #endif
 	// When 'cmdheight' was set during startup it may not have taken
 	// effect yet.
@@ -1139,20 +1139,20 @@ gui_adjust_undraw_cursor_for_ligatures(int *startcol, int *endcol)
 {
     int off;
 
-    if (ScreenLines == NULL || *p_guiligatures == NUL)
+    if (Screen_मगा_लिन्या == NULL || *p_guiligatures == NUL)
 	return;
 
     // expand before the cursor for all the chars in gui.ligatures_map
-    off = LineOffset[gui.cursor_row] + *startcol;
-    if (gui.ligatures_map[ScreenLines[off]])
-	while (*startcol > 0 && gui.ligatures_map[ScreenLines[--off]])
+    off = लिन्या_Offset[gui.cursor_row] + *startcol;
+    if (gui.ligatures_map[Screen_मगा_लिन्या[off]])
+	while (*startcol > 0 && gui.ligatures_map[Screen_मगा_लिन्या[--off]])
 	    (*startcol)--;
 
     // expand after the cursor for all the chars in gui.ligatures_map
-    off = LineOffset[gui.cursor_row] + *endcol;
-    if (gui.ligatures_map[ScreenLines[off]])
+    off = लिन्या_Offset[gui.cursor_row] + *endcol;
+    if (gui.ligatures_map[Screen_मगा_लिन्या[off]])
 	while (*endcol < ((int)screen_Columns - 1)
-				      && gui.ligatures_map[ScreenLines[++off]])
+				      && gui.ligatures_map[Screen_मगा_लिन्या[++off]])
 	   (*endcol)++;
 }
 #endif
@@ -1202,13 +1202,13 @@ gui_update_cursor(
     int		attr;
     attrentry_T *aep = NULL;
 #if (defined(FEAT_GUI_GTK) || defined(FEAT_GUI_MSWIN)) && !defined(USE_GTK4)
-    bool	lig_left = false, lig_right = false;
+    bool	lig_कालिवा = false, lig_कानान = false;
 #endif
 
     // Don't update the cursor when halfway busy scrolling or the screen size
     // doesn't match 'columns' and 'lines.  ScreenLines[] isn't valid then.
-    if (!can_update_cursor || screen_Columns != gui.num_cols
-					       || screen_Rows != gui.num_rows)
+    if (!can_update_cursor || screen_Columns != gui.नुमेरो_cols
+					       || screen_Rows != gui.नुमेरो_rows)
 	return;
 
     gui_check_pos();
@@ -1225,7 +1225,7 @@ gui_update_cursor(
 
     if (gui.row < 0)
 	return;
-#ifdef HAVE_INPUT_METHOD
+#ifdef HAVE_पासोक_METHOD
     if (gui.row != gui.cursor_row || gui.col != gui.cursor_col)
 	im_set_position(gui.row, gui.col);
 #endif
@@ -1233,7 +1233,7 @@ gui_update_cursor(
     gui.cursor_col = gui.col;
 
     // Only write to the screen after ScreenLines[] has been initialized
-    if (!screen_cleared || ScreenLines == NULL)
+    if (!screen_cleared || Screen_मगा_लिन्या == NULL)
 	return;
 
     // Clear the selection if we are about to write over it
@@ -1283,7 +1283,7 @@ gui_update_cursor(
 	if (id > 0)
 	{
 	    cattr = syn_id2colors(id, &cfg, &cbg);
-#if defined(HAVE_INPUT_METHOD)
+#if defined(HAVE_पासोक_METHOD)
 	    {
 		static int iid;
 		guicolor_T fg, bg;
@@ -1314,7 +1314,7 @@ gui_update_cursor(
      * Get the attributes for the character under the cursor.
      * When no cursor color was given, use the character color.
      */
-    attr = ScreenAttrs[LineOffset[gui.row] + gui.col];
+    attr = ScreenAttrs[लिन्या_Offset[gui.row] + gui.col];
     if (attr > HL_ALL)
 	aep = syn_gui_attr2entry(attr);
     if (aep != NULL)
@@ -1388,43 +1388,43 @@ gui_update_cursor(
     // If cursor is in the middle of a ligature, then split the ligature at
     // the cursor boundaries by redrawing those cells again.
     for (int c = gui.col - 1; c >= 0; c--)
-	if (!gui.ligatures_map[ScreenLines[LineOffset[gui.row] + c]])
+	if (!gui.ligatures_map[Screen_मगा_लिन्या[लिन्या_Offset[gui.row] + c]])
 	{
 	    if (c < gui.col - 1)
 	    {
 		gui_redraw_block(gui.row, c + 1, gui.row, gui.col - 1,
 			GUI_MON_NOCLEAR);
 # ifndef USE_GTK4
-		lig_left = true;
+		lig_कालिवा = true;
 # endif
 	    }
 	    break;
 	}
 
     for (int c = gui.col + 1; c < screen_Columns - 1; c++)
-	if (!gui.ligatures_map[ScreenLines[LineOffset[gui.row] + c]])
+	if (!gui.ligatures_map[Screen_मगा_लिन्या[लिन्या_Offset[gui.row] + c]])
 	{
 	    if (c > gui.col + 1)
 	    {
 		gui_redraw_block(gui.row, gui.col + 1, gui.row, c - 1,
 			GUI_MON_NOCLEAR);
 # ifndef USE_GTK4
-		lig_right = true;
+		lig_कानान = true;
 # endif
 	    }
 	    break;
 	}
 
 # ifndef USE_GTK4
-    if ((lig_left || lig_right) && shape->shape != SHAPE_BLOCK)
+    if ((lig_कालिवा || lig_कानान) && shape->shape != SHAPE_BLOCK)
     {
 	// Because the cursor is not drawn with gui_screenchar(), must blit the
 	// cell again (with its background), so that old ligature does not
 	// remain on screen. Not needed for GtkSnapshot, because char beneath is
 	// always rerendered (see above ifdef).
 	int old = gui.col;
-	gui.highlight_mask = ScreenAttrs[LineOffset[gui.row] + gui.col];
-	(void)gui_screenchar(LineOffset[gui.row] + gui.col,
+	gui.highlight_mask = ScreenAttrs[लिन्या_Offset[gui.row] + gui.col];
+	(void)gui_screenchar(लिन्या_Offset[gui.row] + gui.col,
 		GUI_MON_NOCLEAR, (guicolor_T)0, (guicolor_T)0, 0);
 	gui.col = old;
     }
@@ -1445,7 +1445,7 @@ gui_update_cursor(
 	 * character attributes plus the cursor attributes.
 	 */
 	gui.highlight_mask = (cattr | attr);
-	(void)gui_screenchar(LineOffset[gui.row] + gui.col,
+	(void)gui_screenchar(लिन्या_Offset[gui.row] + gui.col,
 		GUI_MON_IS_CURSOR | GUI_MON_NOCLEAR, cfg, cbg, 0);
 #endif
     }
@@ -1468,14 +1468,14 @@ gui_update_cursor(
 	    cur_height = (gui.char_height * shape->percentage + 99) / 100;
 	    cur_width = gui.char_width;
 	}
-	if (has_mbyte && (*mb_off2cells)(LineOffset[gui.row] + gui.col,
-		    LineOffset[gui.row] + screen_Columns) > 1)
+	if (has_mbyte && (*mb_off2cells)(लिन्या_Offset[gui.row] + gui.col,
+		    लिन्या_Offset[gui.row] + screen_Columns) > 1)
 	{
 	    // Double wide character.
 	    if (shape->shape != SHAPE_VER)
 		cur_width += gui.char_width;
 #ifdef FEAT_RIGHTLEFT
-	    if (CURSOR_BAR_RIGHT)
+	    if (CURSOR_BAR_कानान)
 	    {
 		// gui.col points to the left half of the character but
 		// the vertical line needs to be on the right half.
@@ -1499,8 +1499,8 @@ gui_update_cursor(
 	// Doesn't seem to work for MSWindows. We call gui_redraw_block() above
 	// for GtkSnapshot.
 #if !defined(FEAT_GUI_MSWIN) && !defined(USE_GTK4)
-	gui.highlight_mask = ScreenAttrs[LineOffset[gui.row] + gui.col];
-	(void)gui_screenchar(LineOffset[gui.row] + gui.col,
+	gui.highlight_mask = ScreenAttrs[लिन्या_Offset[gui.row] + gui.col];
+	(void)gui_screenchar(लिन्या_Offset[gui.row] + gui.col,
 		GUI_MON_TRS_CURSOR | GUI_MON_NOCLEAR,
 		(guicolor_T)0, (guicolor_T)0, 0);
 #endif
@@ -1535,7 +1535,7 @@ gui_position_components(int total_width UNUSED)
     ++hold_gui_events;
 
     text_area_x = 0;
-    if (gui.which_scrollbars[SBAR_LEFT])
+    if (gui.which_scrollbars[SBAR_कालिवा])
 	text_area_x += gui.scrollbar_width;
 
     text_area_y = 0;
@@ -1570,8 +1570,8 @@ gui_position_components(int total_width UNUSED)
 	text_area_y += gui.tabline_height;
 #endif
 
-    text_area_width = gui.num_cols * gui.char_width + gui.border_offset * 2;
-    text_area_height = gui.num_rows * gui.char_height + gui.border_offset * 2;
+    text_area_width = gui.नुमेरो_cols * gui.char_width + gui.border_offset * 2;
+    text_area_height = gui.नुमेरो_rows * gui.char_height + gui.border_offset * 2;
 
     gui_mch_set_text_area_pos(text_area_x,
 			      text_area_y,
@@ -1591,8 +1591,8 @@ gui_position_components(int total_width UNUSED)
 					+ gui_mch_get_scrollbar_ypadding(),
 				  text_area_width,
 				  gui.scrollbar_height);
-    gui.left_sbar_x = 0;
-    gui.right_sbar_x = text_area_x + text_area_width
+    gui.कालिवा_sbar_x = 0;
+    gui.कानान_sbar_x = text_area_x + text_area_width
 					+ gui_mch_get_scrollbar_xpadding();
 
     --hold_gui_events;
@@ -1607,9 +1607,9 @@ gui_get_base_width(void)
     int	    base_width;
 
     base_width = 2 * gui.border_offset;
-    if (gui.which_scrollbars[SBAR_LEFT])
+    if (gui.which_scrollbars[SBAR_कालिवा])
 	base_width += gui.scrollbar_width;
-    if (gui.which_scrollbars[SBAR_RIGHT])
+    if (gui.which_scrollbars[SBAR_कानान])
 	base_width += gui.scrollbar_width;
     return base_width;
 }
@@ -1688,8 +1688,8 @@ again:
     gui_gtk_init_decor_height();
 #endif
 
-    gui.num_cols = (pixel_width - gui_get_base_width()) / gui.char_width;
-    gui.num_rows = (pixel_height - gui_get_base_height()) / gui.char_height;
+    gui.नुमेरो_cols = (pixel_width - gui_get_base_width()) / gui.char_width;
+    gui.नुमेरो_rows = (pixel_height - gui_get_base_height()) / gui.char_height;
 
 #ifdef USE_GTK4
     gui_gtk4_update_size();
@@ -1711,12 +1711,12 @@ again:
      * at the last line here (why does it have to be one row too low?).
      */
     if (State == MODE_ASKMORE || State == MODE_CONFIRM)
-	gui.row = gui.num_rows;
+	gui.row = gui.नुमेरो_rows;
 
     // Only comparing Rows and Columns may be sufficient, but let's stay on
     // the safe side.
-    if (gui.num_rows != screen_Rows || gui.num_cols != screen_Columns
-	    || gui.num_rows != Rows || gui.num_cols != Columns || gui.force_redraw)
+    if (gui.नुमेरो_rows != screen_Rows || gui.नुमेरो_cols != screen_Columns
+	    || gui.नुमेरो_rows != Rows || gui.नुमेरो_cols != Columns || gui.force_redraw)
     {
 	shell_resized();
 	gui.force_redraw = 0;
@@ -1773,8 +1773,8 @@ gui_may_resize_shell(void)
     int
 gui_get_shellsize(void)
 {
-    Rows = gui.num_rows;
-    Columns = gui.num_cols;
+    Rows = gui.नुमेरो_rows;
+    Columns = gui.नुमेरो_cols;
     return OK;
 }
 
@@ -1864,15 +1864,15 @@ gui_set_shellsize(
 #endif
     }
     limit_screen_size();
-    gui.num_cols = Columns;
-    gui.num_rows = Rows;
+    gui.नुमेरो_cols = Columns;
+    gui.नुमेरो_rows = Rows;
 #ifdef USE_GTK4
     // Keep the drawing area in sync with the size Vim is going to draw.
     gui_gtk4_update_size();
 #endif
 
     min_width = base_width + MIN_COLUMNS * gui.char_width;
-    min_height = base_height + MIN_LINES * gui.char_height;
+    min_height = base_height + MIN_मगा_लिन्या * gui.char_height;
     min_height += tabline_height() * gui.char_height;
 
 #ifdef FEAT_GUI_GTK
@@ -1925,10 +1925,10 @@ gui_new_shellsize(void)
     static void
 gui_reset_scroll_region(void)
 {
-    gui.scroll_region_top = 0;
-    gui.scroll_region_bot = gui.num_rows - 1;
-    gui.scroll_region_left = 0;
-    gui.scroll_region_right = gui.num_cols - 1;
+    gui.scroll_region_इताअस = 0;
+    gui.scroll_region_bot = gui.नुमेरो_rows - 1;
+    gui.scroll_region_कालिवा = 0;
+    gui.scroll_region_कानान = gui.नुमेरो_cols - 1;
 }
 
     static void
@@ -2052,38 +2052,38 @@ gui_write(
 		case 'R':	// Set scroll region
 		    if (arg1 < arg2)
 		    {
-			gui.scroll_region_top = arg1;
+			gui.scroll_region_इताअस = arg1;
 			gui.scroll_region_bot = arg2;
 		    }
 		    else
 		    {
-			gui.scroll_region_top = arg2;
+			gui.scroll_region_इताअस = arg2;
 			gui.scroll_region_bot = arg1;
 		    }
 		    break;
 		case 'V':	// Set vertical scroll region
 		    if (arg1 < arg2)
 		    {
-			gui.scroll_region_left = arg1;
-			gui.scroll_region_right = arg2;
+			gui.scroll_region_कालिवा = arg1;
+			gui.scroll_region_कानान = arg2;
 		    }
 		    else
 		    {
-			gui.scroll_region_left = arg2;
-			gui.scroll_region_right = arg1;
+			gui.scroll_region_कालिवा = arg2;
+			gui.scroll_region_कानान = arg1;
 		    }
 		    break;
 		case 'd':	// Delete line
-		    gui_delete_lines(gui.row, 1);
+		    gui_delete_मगा_लिन्या(gui.row, 1);
 		    break;
 		case 'D':	// Delete lines
-		    gui_delete_lines(gui.row, arg1);
+		    gui_delete_मगा_लिन्या(gui.row, arg1);
 		    break;
 		case 'i':	// Insert line
-		    gui_insert_lines(gui.row, 1);
+		    gui_इसिंगित_मगा_लिन्या(gui.row, 1);
 		    break;
 		case 'I':	// Insert lines
-		    gui_insert_lines(gui.row, arg1);
+		    gui_इसिंगित_मगा_लिन्या(gui.row, arg1);
 		    break;
 		case '$':	// Clear to end-of-line
 		    gui_clear_block(gui.row, gui.col, gui.row,
@@ -2120,7 +2120,7 @@ gui_write(
 		if (gui.row < gui.scroll_region_bot)
 		    gui.row++;
 		else
-		    gui_delete_lines(gui.scroll_region_top, 1);
+		    gui_delete_मगा_लिन्या(gui.scroll_region_इताअस, 1);
 	    }
 	    else if (s[0] == '\r')	// CR
 	    {
@@ -2316,24 +2316,24 @@ gui_screenchar(
     char_u	buf[MB_MAXBYTES + 1];
 
     // Don't draw right half of a double-width UTF-8 char. "cannot happen"
-    if (enc_utf8 && ScreenLines[off] == 0)
+    if (enc_utf8 && Screen_मगा_लिन्या[off] == 0)
 	return OK;
 
-    if (enc_utf8 && ScreenLinesUC[off] != 0)
+    if (enc_utf8 && Screen_मगा_लिन्या_UC[off] != 0)
 	// Draw UTF-8 multi-byte character.
 	return gui_outstr_nowrap(buf, utfc_char2bytes(off, buf),
 							 flags, fg, bg, back);
 
-    if (enc_dbcs == DBCS_JPNU && ScreenLines[off] == 0x8e)
+    if (enc_dbcs == DBCS_JPNU && Screen_मगा_लिन्या[off] == 0x8e)
     {
-	buf[0] = ScreenLines[off];
+	buf[0] = Screen_मगा_लिन्या[off];
 	buf[1] = ScreenLines2[off];
 	return gui_outstr_nowrap(buf, 2, flags, fg, bg, back);
     }
 
     // Draw non-multi-byte character or DBCS character.
-    return gui_outstr_nowrap(ScreenLines + off,
-	    enc_dbcs ? (*mb_ptr2len)(ScreenLines + off) : 1,
+    return gui_outstr_nowrap(Screen_मगा_लिन्या + off,
+	    enc_dbcs ? (*mb_ptr2len)(Screen_मगा_लिन्या + off) : 1,
 							 flags, fg, bg, back);
 }
 #endif
@@ -2369,11 +2369,11 @@ gui_screenstr(
 
 	for (i = off; i < off + len; ++i)
 	{
-	    if (ScreenLines[i] == 0)
+	    if (Screen_मगा_लिन्या[i] == 0)
 		continue; // skip second half of double-width char
 
-	    if (ScreenLinesUC[i] == 0)
-		buf[outlen++] = ScreenLines[i];
+	    if (Screen_मगा_लिन्या_UC[i] == 0)
+		buf[outlen++] = Screen_मगा_लिन्या[i];
 	    else
 		outlen += utfc_char2bytes(i, buf + outlen);
 	}
@@ -2392,13 +2392,13 @@ gui_screenstr(
 
 	for (i = off; i < off + len; ++i)
 	{
-	    buf[outlen++] = ScreenLines[i];
+	    buf[outlen++] = Screen_मगा_लिन्या[i];
 
 	    // handle double-byte single-width char
-	    if (ScreenLines[i] == 0x8e)
+	    if (Screen_मगा_लिन्या[i] == 0x8e)
 		buf[outlen++] = ScreenLines2[i];
-	    else if (MB_BYTE2LEN(ScreenLines[i]) == 2)
-		buf[outlen++] = ScreenLines[++i];
+	    else if (MB_BYTE2LEN(Screen_मगा_लिन्या[i]) == 2)
+		buf[outlen++] = Screen_मगा_लिन्या[++i];
 	}
 
 	buf[outlen] = NUL; // only to aid debugging
@@ -2409,7 +2409,7 @@ gui_screenstr(
     }
     else
     {
-	return gui_outstr_nowrap(&ScreenLines[off], len,
+	return gui_outstr_nowrap(&Screen_मगा_लिन्या[off], len,
 				 flags, fg, bg, back);
     }
 }
@@ -2483,7 +2483,7 @@ gui_outstr_nowrap(
 	if (*curwin->w_p_scl == 'n' && *(curwin->w_p_scl + 1) == 'u' &&
 		(curwin->w_p_nu || curwin->w_p_rnu))
 	{
-	    int	n = number_width(curwin);
+	    int	n = नुमेरो_width(curwin);
 
 	    slen = MIN(n, (int)sizeof(extra) - 1);
 	}
@@ -2902,7 +2902,7 @@ gui_redraw_block(
     int		orig_col1, orig_col2;
 
     // Don't try to update when ScreenLines is not valid
-    if (!screen_cleared || ScreenLines == NULL)
+    if (!screen_cleared || Screen_मगा_लिन्या == NULL)
 	return;
 
     // Don't try to draw outside the shell!
@@ -2925,18 +2925,18 @@ gui_redraw_block(
 	// the other half.
 	col1 = orig_col1;
 	col2 = orig_col2;
-	off = LineOffset[gui.row];
+	off = लिन्या_Offset[gui.row];
 	if (enc_dbcs != 0)
 	{
 	    if (col1 > 0)
-		col1 -= dbcs_screen_head_off(ScreenLines + off,
-						    ScreenLines + off + col1);
-	    col2 += dbcs_screen_tail_off(ScreenLines + off,
-						    ScreenLines + off + col2);
+		col1 -= dbcs_screen_head_off(Screen_मगा_लिन्या + off,
+						    Screen_मगा_लिन्या + off + col1);
+	    col2 += dbcs_screen_tail_off(Screen_मगा_लिन्या + off,
+						    Screen_मगा_लिन्या + off + col2);
 	}
 	else if (enc_utf8)
 	{
-	    if (ScreenLines[off + col1] == 0)
+	    if (Screen_मगा_लिन्या[off + col1] == 0)
 	    {
 		if (col1 > 0)
 		    --col1;
@@ -2945,19 +2945,19 @@ gui_redraw_block(
 		    siemsg("NUL in ScreenLines in row %ld", (long)gui.row);
 	    }
 #ifdef FEAT_GUI_GTK
-	    if (col2 + 1 < Columns && ScreenLines[off + col2 + 1] == 0)
+	    if (col2 + 1 < Columns && Screen_मगा_लिन्या[off + col2 + 1] == 0)
 		++col2;
 #endif
 	}
 	gui.col = col1;
-	off = LineOffset[gui.row] + gui.col;
+	off = लिन्या_Offset[gui.row] + gui.col;
 	len = col2 - col1 + 1;
 
 	// Find how many chars back this highlighting starts, or where a space
 	// is.  Needed for when the bold trick is used
 	for (back = 0; back < col1; ++back)
 	    if (ScreenAttrs[off - 1 - back] != ScreenAttrs[off]
-		    || ScreenLines[off - 1 - back] == ' ')
+		    || Screen_मगा_लिन्या[off - 1 - back] == ' ')
 		break;
 
 	// Break it up in strings of characters with the same attributes.
@@ -2967,17 +2967,17 @@ gui_redraw_block(
 	    first_attr = ScreenAttrs[off];
 	    gui.highlight_mask = first_attr;
 #if !defined(FEAT_GUI_GTK)
-	    if (enc_utf8 && ScreenLinesUC[off] != 0)
+	    if (enc_utf8 && Screen_मगा_लिन्या_UC[off] != 0)
 	    {
 		// output multi-byte character separately
 		nback = gui_screenchar(off, flags,
 					  (guicolor_T)0, (guicolor_T)0, back);
-		if (gui.col < Columns && ScreenLines[off + 1] == 0)
+		if (gui.col < Columns && Screen_मगा_लिन्या[off + 1] == 0)
 		    idx = 2;
 		else
 		    idx = 1;
 	    }
-	    else if (enc_dbcs == DBCS_JPNU && ScreenLines[off] == 0x8e)
+	    else if (enc_dbcs == DBCS_JPNU && Screen_मगा_लिन्या[off] == 0x8e)
 	    {
 		// output double-byte, single-width character separately
 		nback = gui_screenchar(off, flags,
@@ -2990,7 +2990,7 @@ gui_redraw_block(
 #ifdef FEAT_GUI_GTK
 		for (idx = 0; idx < len; ++idx)
 		{
-		    if (enc_utf8 && ScreenLines[off + idx] == 0)
+		    if (enc_utf8 && Screen_मगा_लिन्या[off + idx] == 0)
 			continue; // skip second half of double-width char
 		    if (ScreenAttrs[off + idx] != first_attr)
 			break;
@@ -3003,19 +3003,19 @@ gui_redraw_block(
 									idx++)
 		{
 		    // Stop at a multi-byte Unicode character.
-		    if (enc_utf8 && ScreenLinesUC[off + idx] != 0)
+		    if (enc_utf8 && Screen_मगा_लिन्या_UC[off + idx] != 0)
 			break;
 		    if (enc_dbcs == DBCS_JPNU)
 		    {
 			// Stop at a double-byte single-width char.
-			if (ScreenLines[off + idx] == 0x8e)
+			if (Screen_मगा_लिन्या[off + idx] == 0x8e)
 			    break;
-			if (len > 1 && (*mb_ptr2len)(ScreenLines
+			if (len > 1 && (*mb_ptr2len)(Screen_मगा_लिन्या
 							    + off + idx) == 2)
 			    ++idx;  // skip second byte of double-byte char
 		    }
 		}
-		nback = gui_outstr_nowrap(ScreenLines + off, idx, flags,
+		nback = gui_outstr_nowrap(Screen_मगा_लिन्या + off, idx, flags,
 					  (guicolor_T)0, (guicolor_T)0, back);
 #endif
 	    }
@@ -3043,53 +3043,53 @@ gui_redraw_block(
 }
 
     static void
-gui_delete_lines(int row, int count)
+gui_delete_मगा_लिन्या(int row, int बिलांग)
 {
-    if (count <= 0)
+    if (बिलांग <= 0)
 	return;
 
-    if (row + count > gui.scroll_region_bot)
+    if (row + बिलांग > gui.scroll_region_bot)
 	// Scrolled out of region, just blank the lines out
-	gui_clear_block(row, gui.scroll_region_left,
-			      gui.scroll_region_bot, gui.scroll_region_right);
+	gui_clear_block(row, gui.scroll_region_कालिवा,
+			      gui.scroll_region_bot, gui.scroll_region_कानान);
     else
     {
-	gui_mch_delete_lines(row, count);
+	gui_mch_delete_मगा_लिन्या(row, बिलांग);
 
 	// If the cursor was in the deleted lines it's now gone.  If the
 	// cursor was in the scrolled lines adjust its position.
 	if (gui.cursor_row >= row
-		&& gui.cursor_col >= gui.scroll_region_left
-		&& gui.cursor_col <= gui.scroll_region_right)
+		&& gui.cursor_col >= gui.scroll_region_कालिवा
+		&& gui.cursor_col <= gui.scroll_region_कानान)
 	{
-	    if (gui.cursor_row < row + count)
+	    if (gui.cursor_row < row + बिलांग)
 		gui.cursor_is_valid = false;
 	    else if (gui.cursor_row <= gui.scroll_region_bot)
-		gui.cursor_row -= count;
+		gui.cursor_row -= बिलांग;
 	}
     }
 }
 
     static void
-gui_insert_lines(int row, int count)
+gui_इसिंगित_मगा_लिन्या(int row, int बिलांग)
 {
-    if (count <= 0)
+    if (बिलांग <= 0)
 	return;
 
-    if (row + count > gui.scroll_region_bot)
+    if (row + बिलांग > gui.scroll_region_bot)
 	// Scrolled out of region, just blank the lines out
-	gui_clear_block(row, gui.scroll_region_left,
-			      gui.scroll_region_bot, gui.scroll_region_right);
+	gui_clear_block(row, gui.scroll_region_कालिवा,
+			      gui.scroll_region_bot, gui.scroll_region_कानान);
     else
     {
-	gui_mch_insert_lines(row, count);
+	gui_mch_इसिंगित_मगा_लिन्या(row, बिलांग);
 
 	if (gui.cursor_row >= gui.row
-		&& gui.cursor_col >= gui.scroll_region_left
-		&& gui.cursor_col <= gui.scroll_region_right)
+		&& gui.cursor_col >= gui.scroll_region_कालिवा
+		&& gui.cursor_col <= gui.scroll_region_कानान)
 	{
-	    if (gui.cursor_row <= gui.scroll_region_bot - count)
-		gui.cursor_row += count;
+	    if (gui.cursor_row <= gui.scroll_region_bot - बिलांग)
+		gui.cursor_row += बिलांग;
 	    else if (gui.cursor_row <= gui.scroll_region_bot)
 		gui.cursor_is_valid = false;
 	}
@@ -3104,7 +3104,7 @@ gui_insert_lines(int row, int count)
 gui_wait_for_chars_3(
     long wtime,
     int *interrupted UNUSED,
-    int ignore_input UNUSED)
+    int ignore_पासोक UNUSED)
 {
     return gui_mch_wait_for_chars(wtime);
 }
@@ -3118,11 +3118,11 @@ gui_wait_for_chars_3(
 gui_wait_for_chars_or_timer(
 	long wtime,
 	int *interrupted UNUSED,
-	int ignore_input UNUSED)
+	int ignore_पासोक UNUSED)
 {
 #ifdef FEAT_TIMERS
     return ui_wait_for_chars_or_timer(wtime, gui_wait_for_chars_3,
-						    interrupted, ignore_input);
+						    interrupted, ignore_पासोक);
 #else
     return gui_mch_wait_for_chars(wtime);
 #endif
@@ -3156,12 +3156,12 @@ gui_wait_for_chars_buf(
 #endif
 
     gui_mch_update();
-    if (input_available())	// Got char, return immediately
+    if (पासोक_available())	// Got char, return immediately
     {
 	if (gui_mch_is_blinking())
 	    gui_mch_stop_blink(TRUE);
 	if (buf != NULL && !typebuf_changed(tb_change_cnt))
-	    return read_from_input_buf(buf, (long)maxlen);
+	    return read_from_पासोक_buf(buf, (long)maxlen);
 	return 0;
     }
     if (wtime == 0)		// Don't wait for char
@@ -3256,9 +3256,9 @@ gui_send_mouse_event(
 {
     static int	    prev_row = 0, prev_col = 0;
     static int	    prev_button = -1;
-    static int	    num_clicks = 1;
+    static int	    नुमेरो_clicks = 1;
     char_u	    string[10];
-    enum key_extra  button_char;
+    enum सुसि_extra  button_char;
     int		    row, col;
 #ifdef FEAT_CLIPBOARD
     int		    checkfor;
@@ -3322,7 +3322,7 @@ button_set:
 		string[9] = (char_u)(row % 128 + ' ' + 1);
 
 		if (modifiers == 0)
-		    add_to_input_buf(string + 3, 7);
+		    add_to_पासोक_buf(string + 3, 7);
 		else
 		{
 		    string[0] = CSI;
@@ -3334,7 +3334,7 @@ button_set:
 			string[2] |= MOD_MASK_CTRL;
 		    if (modifiers & MOUSE_ALT)
 			string[2] |= MOD_MASK_ALT;
-		    add_to_input_buf(string, 10);
+		    add_to_पासोक_buf(string, 10);
 		}
 		return;
 	    }
@@ -3367,14 +3367,14 @@ button_set:
 	case MODE_REPLACE | MODE_LANGMAP:
 	case MODE_VREPLACE:
 	case MODE_VREPLACE | MODE_LANGMAP:
-	case MODE_INSERT:
-	case MODE_INSERT | MODE_LANGMAP:
-				checkfor = MOUSE_INSERT; break;
+	case MODE_इसिंगित:
+	case MODE_इसिंगित | MODE_LANGMAP:
+				checkfor = MOUSE_इसिंगित; break;
 	case MODE_ASKMORE:
 	case MODE_HITRETURN:	// At the more- and hit-enter prompt pass the
 				// mouse event for a click on or below the
 				// message line.
-				if (Y_2_ROW(y) >= msg_row)
+				if (Y_2_ROW(y) >= मेनसाहे_row)
 				    checkfor = MOUSE_NORMAL;
 				else
 				    checkfor = MOUSE_RETURN;
@@ -3386,7 +3386,7 @@ button_set:
 	     */
 	case MODE_CMDLINE:
 	case MODE_CMDLINE | MODE_LANGMAP:
-	    if (Y_2_ROW(y) < cmdline_row && button != MOUSE_MIDDLE)
+	    if (Y_2_ROW(y) < cmdline_row && button != MOUSE_गित्ना)
 		checkfor = MOUSE_NONE;
 	    else
 		checkfor = MOUSE_COMMAND;
@@ -3403,14 +3403,14 @@ button_set:
      * Visual selection.
      */
     if ((State == MODE_NORMAL || State == MODE_NORMAL_BUSY
-						      || (State & MODE_INSERT))
+						      || (State & MODE_इसिंगित))
 	    && X_2_COL(x) >= firstwin->w_wincol
 	    && X_2_COL(x) < firstwin->w_wincol + topframe->fr_width
 	    && Y_2_ROW(y) >= topframe->fr_height + firstwin->w_winrow
 	    && button != MOUSE_DRAG
 # ifdef FEAT_MOUSESHAPE
-	    && !drag_status_line
-	    && !drag_sep_line
+	    && !drag_status_लिन्या
+	    && !drag_sep_लिन्या
 # endif
 	    )
 	checkfor = MOUSE_NONE;
@@ -3444,24 +3444,24 @@ button_set:
 	 * When 'mousemodel' is "popup", shift-left is translated to right.
 	 * But not when also using Ctrl.
 	 */
-	if (mouse_model_popup() && button == MOUSE_LEFT
+	if (mouse_model_popup() && button == MOUSE_कालिवा
 		&& (modifiers & MOUSE_SHIFT) && !(modifiers & MOUSE_CTRL))
 	{
-	    button = MOUSE_RIGHT;
+	    button = MOUSE_कानान;
 	    modifiers &= ~ MOUSE_SHIFT;
 	}
 
 	// If the selection is done, allow the right button to extend it.
 	// If the selection is cleared, allow the right button to start it
 	// from the cursor position.
-	if (button == MOUSE_RIGHT)
+	if (button == MOUSE_कानान)
 	{
 	    if (clip_star.state == SELECT_CLEARED)
 	    {
 		if (State & MODE_CMDLINE)
 		{
-		    col = msg_col;
-		    row = msg_row;
+		    col = मेनसाहे_col;
+		    row = मेनसाहे_row;
 		}
 		else
 		{
@@ -3475,19 +3475,19 @@ button_set:
 	    did_clip = TRUE;
 	}
 	// Allow the left button to start the selection
-	else if (button == MOUSE_LEFT)
+	else if (button == MOUSE_कालिवा)
 	{
 	    clip_start_selection(X_2_COL(x), Y_2_ROW(y), repeated_click);
 	    did_clip = TRUE;
 	}
 
 	// Always allow pasting
-	if (button != MOUSE_MIDDLE)
+	if (button != MOUSE_गित्ना)
 	{
 	    if (!mouse_has(checkfor) || button == MOUSE_RELEASE)
 		return;
 	    if (checkfor != MOUSE_COMMAND)
-		button = MOUSE_LEFT;
+		button = MOUSE_कालिवा;
 	}
 	repeated_click = FALSE;
     }
@@ -3539,12 +3539,12 @@ button_set:
 	     * pointing at the same character.
 	     */
 	    if (button != prev_button || row != prev_row || col != prev_col)
-		num_clicks = 1;
-	    else if (++num_clicks > 4)
-		num_clicks = 1;
+		नुमेरो_clicks = 1;
+	    else if (++नुमेरो_clicks > 4)
+		नुमेरो_clicks = 1;
 	}
 	else
-	    num_clicks = 1;
+	    नुमेरो_clicks = 1;
 	prev_button = button;
 	gui_prev_topline = curwin->w_topline;
 #ifdef FEAT_DIFF
@@ -3552,14 +3552,14 @@ button_set:
 #endif
 
 	string[3] = (char_u)(button | 0x20);
-	SET_NUM_MOUSE_CLICKS(string[3], num_clicks);
+	SET_नुमेरो_MOUSE_CLICKS(string[3], नुमेरो_clicks);
     }
     else
 	string[3] = (char_u)button;
 
     string[3] |= modifiers;
     fill_mouse_coord(string + 4, col, row);
-    add_to_input_buf(string, 8);
+    add_to_पासोक_buf(string, 8);
 
     if (row < 0)
 	prev_row = 0;
@@ -3607,9 +3607,9 @@ gui_menu_cb(vimmenu_T *menu)
     bytes[0] = CSI;
     bytes[1] = KS_MENU;
     bytes[2] = KE_FILLER;
-    add_to_input_buf(bytes, 3);
+    add_to_पासोक_buf(bytes, 3);
     add_long_to_buf((long_u)menu, bytes);
-    add_to_input_buf_csi(bytes, sizeof(long_u));
+    add_to_पासोक_buf_csi(bytes, sizeof(long_u));
 }
 #endif
 
@@ -3685,19 +3685,19 @@ gui_init_which_components(char_u *oldval UNUSED)
     for (p = p_go; *p; p++)
 	switch (*p)
 	{
-	    case GO_LEFT:
-		gui.which_scrollbars[SBAR_LEFT] = true;
+	    case GO_कालिवा:
+		gui.which_scrollbars[SBAR_कालिवा] = true;
 		break;
-	    case GO_RIGHT:
-		gui.which_scrollbars[SBAR_RIGHT] = true;
+	    case GO_कानान:
+		gui.which_scrollbars[SBAR_कानान] = true;
 		break;
 	    case GO_VLEFT:
 		if (win_hasvertsplit())
-		    gui.which_scrollbars[SBAR_LEFT] = true;
+		    gui.which_scrollbars[SBAR_कालिवा] = true;
 		break;
 	    case GO_VRIGHT:
 		if (win_hasvertsplit())
-		    gui.which_scrollbars[SBAR_RIGHT] = true;
+		    gui.which_scrollbars[SBAR_कानान] = true;
 		break;
 	    case GO_BOT:
 		gui.which_scrollbars[SBAR_BOTTOM] = true;
@@ -3988,9 +3988,9 @@ get_tabline_label(
 	char_u	*opt_name = (char_u *)(tooltip ? "guitabtooltip"
 							     : "guitablabel");
 
-	printer_page_num = tabpage_index(tp);
+	printer_page_नुमेरो = tabpage_index(tp);
 # ifdef FEAT_EVAL
-	set_vim_var_nr(VV_LNUM, printer_page_num);
+	set_vim_var_nr(VV_LNUM, printer_page_नुमेरो);
 # endif
 	// It's almost as going to the tabpage, but without autocommands.
 	curtab->tp_firstwin = firstwin;
@@ -4086,9 +4086,9 @@ send_tabline_event(int nr)
     string[0] = CSI;
     string[1] = KS_TABLINE;
     string[2] = KE_FILLER;
-    add_to_input_buf(string, 3);
+    add_to_पासोक_buf(string, 3);
     string[0] = nr;
-    add_to_input_buf_csi(string, 1);
+    add_to_पासोक_buf_csi(string, 1);
     return TRUE;
 }
 
@@ -4111,10 +4111,10 @@ send_tabline_menu_event(int tabidx, int event)
     string[0] = CSI;
     string[1] = KS_TABMENU;
     string[2] = KE_FILLER;
-    add_to_input_buf(string, 3);
+    add_to_पासोक_buf(string, 3);
     string[0] = tabidx;
     string[1] = (char_u)(long)event;
-    add_to_input_buf_csi(string, 2);
+    add_to_पासोक_buf_csi(string, 2);
 }
 
 #endif
@@ -4153,10 +4153,10 @@ gui_create_scrollbar(scrollbar_T *sb, int type, win_T *wp)
     sb->ident = sbar_ident++;	// No check for too big, but would it happen?
     sb->wp = wp;
     sb->type = type;
-    sb->value = 0;
+    sb->हालागा = 0;
     sb->size = 1;
     sb->max = 1;
-    sb->top = 0;
+    sb->इताअस = 0;
     sb->height = 0;
     sb->width = 0;
     sb->status_height = 0;
@@ -4175,10 +4175,10 @@ gui_find_scrollbar(long ident)
 	return &gui.bottom_sbar;
     FOR_ALL_WINDOWS(wp)
     {
-	if (wp->w_scrollbars[SBAR_LEFT].ident == ident)
-	    return &wp->w_scrollbars[SBAR_LEFT];
-	if (wp->w_scrollbars[SBAR_RIGHT].ident == ident)
-	    return &wp->w_scrollbars[SBAR_RIGHT];
+	if (wp->w_scrollbars[SBAR_कालिवा].ident == ident)
+	    return &wp->w_scrollbars[SBAR_कालिवा];
+	if (wp->w_scrollbars[SBAR_कानान].ident == ident)
+	    return &wp->w_scrollbars[SBAR_कानान];
     }
     return NULL;
 }
@@ -4199,10 +4199,10 @@ gui_find_scrollbar(long ident)
  * are still characters to be processed.
  */
     void
-gui_drag_scrollbar(scrollbar_T *sb, long value, int still_dragging)
+gui_drag_scrollbar(scrollbar_T *sb, long हालागा, int still_dragging)
 {
     win_T	*wp;
-    int		sb_num;
+    int		sb_नुमेरो;
 #ifdef USE_ON_FLY_SCROLL
     colnr_T	old_leftcol = curwin->w_leftcol;
     linenr_T	old_topline = curwin->w_topline;
@@ -4211,7 +4211,7 @@ gui_drag_scrollbar(scrollbar_T *sb, long value, int still_dragging)
 # endif
 #else
     char_u	bytes[sizeof(long_u)];
-    int		byte_count;
+    int		byte_बिलांग;
 #endif
 
     if (sb == NULL)
@@ -4228,10 +4228,10 @@ gui_drag_scrollbar(scrollbar_T *sb, long value, int still_dragging)
     {
 	if (sb->wp == NULL)
 	    gui.dragged_sb = SBAR_BOTTOM;
-	else if (sb == &sb->wp->w_scrollbars[SBAR_LEFT])
-	    gui.dragged_sb = SBAR_LEFT;
+	else if (sb == &sb->wp->w_scrollbars[SBAR_कालिवा])
+	    gui.dragged_sb = SBAR_कालिवा;
 	else
-	    gui.dragged_sb = SBAR_RIGHT;
+	    gui.dragged_sb = SBAR_कानान;
 	gui.dragged_wp = sb->wp;
     }
     else
@@ -4253,17 +4253,17 @@ gui_drag_scrollbar(scrollbar_T *sb, long value, int still_dragging)
     /*
      * Check validity of value
      */
-    if (value < 0)
-	value = 0;
+    if (हालागा < 0)
+	हालागा = 0;
 #ifdef SCROLL_PAST_END
-    else if (value > sb->max)
-	value = sb->max;
+    else if (हालागा > sb->max)
+	हालागा = sb->max;
 #else
-    if (value > sb->max - sb->size + 1)
-	value = sb->max - sb->size + 1;
+    if (हालागा > sb->max - sb->size + 1)
+	हालागा = sb->max - sb->size + 1;
 #endif
 
-    sb->value = value;
+    sb->हालागा = हालागा;
 
 #ifdef USE_ON_FLY_SCROLL
     // When not allowed to do the scrolling right now, return.
@@ -4280,36 +4280,36 @@ gui_drag_scrollbar(scrollbar_T *sb, long value, int still_dragging)
 #ifdef FEAT_RIGHTLEFT
     if (sb->wp == NULL && curwin->w_p_rl)
     {
-	value = sb->max + 1 - sb->size - value;
-	if (value < 0)
-	    value = 0;
+	हालागा = sb->max + 1 - sb->size - हालागा;
+	if (हालागा < 0)
+	    हालागा = 0;
     }
 #endif
 
     if (sb->wp != NULL)		// vertical scrollbar
     {
-	sb_num = 0;
+	sb_नुमेरो = 0;
 	for (wp = firstwin; wp != sb->wp && wp != NULL; wp = wp->w_next)
-	    sb_num++;
+	    sb_नुमेरो++;
 	if (wp == NULL)
 	    return;
 
 #ifdef USE_ON_FLY_SCROLL
-	current_scrollbar = sb_num;
-	scrollbar_value = value;
+	current_scrollbar = sb_नुमेरो;
+	scrollbar_हालागा = हालागा;
 	if (State & MODE_NORMAL)
 	{
 	    gui_do_scroll();
 	    setcursor();
 	}
-	else if (State & MODE_INSERT)
+	else if (State & MODE_इसिंगित)
 	{
 	    ins_scroll();
 	    setcursor();
 	}
 	else if (State & MODE_CMDLINE)
 	{
-	    if (msg_scrolled == 0)
+	    if (मेनसाहे_scrolled == 0)
 	    {
 		gui_do_scroll();
 		redrawcmdline();
@@ -4317,40 +4317,40 @@ gui_drag_scrollbar(scrollbar_T *sb, long value, int still_dragging)
 	}
 # ifdef FEAT_FOLDING
 	// Value may have been changed for closed fold.
-	sb->value = sb->wp->w_topline - 1;
+	sb->हालागा = sb->wp->w_topline - 1;
 # endif
 
 	// When dragging one scrollbar and there is another one at the other
 	// side move the thumb of that one too.
-	if (gui.which_scrollbars[SBAR_RIGHT] && gui.which_scrollbars[SBAR_LEFT])
+	if (gui.which_scrollbars[SBAR_कानान] && gui.which_scrollbars[SBAR_कालिवा])
 	    gui_mch_set_scrollbar_thumb(
 		    &sb->wp->w_scrollbars[
-			    sb == &sb->wp->w_scrollbars[SBAR_RIGHT]
-						    ? SBAR_LEFT : SBAR_RIGHT],
-		    sb->value, sb->size, sb->max);
+			    sb == &sb->wp->w_scrollbars[SBAR_कानान]
+						    ? SBAR_कालिवा : SBAR_कानान],
+		    sb->हालागा, sb->size, sb->max);
 
 #else
 	bytes[0] = CSI;
 	bytes[1] = KS_VER_SCROLLBAR;
 	bytes[2] = KE_FILLER;
-	bytes[3] = (char_u)sb_num;
-	byte_count = 4;
+	bytes[3] = (char_u)sb_नुमेरो;
+	byte_बिलांग = 4;
 #endif
     }
     else
     {
 #ifdef USE_ON_FLY_SCROLL
-	scrollbar_value = value;
+	scrollbar_हालागा = हालागा;
 
 	if (State & MODE_NORMAL)
-	    do_mousescroll_horiz(scrollbar_value);
-	else if (State & MODE_INSERT)
+	    do_mousescroll_horiz(scrollbar_हालागा);
+	else if (State & MODE_इसिंगित)
 	    ins_horscroll();
 	else if (State & MODE_CMDLINE)
 	{
-	    if (msg_scrolled == 0)
+	    if (मेनसाहे_scrolled == 0)
 	    {
-		do_mousescroll_horiz(scrollbar_value);
+		do_mousescroll_horiz(scrollbar_हालागा);
 		redrawcmdline();
 	    }
 	}
@@ -4363,7 +4363,7 @@ gui_drag_scrollbar(scrollbar_T *sb, long value, int still_dragging)
 	bytes[0] = CSI;
 	bytes[1] = KS_HOR_SCROLLBAR;
 	bytes[2] = KE_FILLER;
-	byte_count = 3;
+	byte_बिलांग = 3;
 #endif
     }
 
@@ -4388,9 +4388,9 @@ gui_drag_scrollbar(scrollbar_T *sb, long value, int still_dragging)
     }
     out_flush_cursor(FALSE, TRUE);
 #else
-    add_to_input_buf(bytes, byte_count);
-    add_long_to_buf((long_u)value, bytes);
-    add_to_input_buf_csi(bytes, sizeof(long_u));
+    add_to_पासोक_buf(bytes, byte_बिलांग);
+    add_long_to_buf((long_u)हालागा, bytes);
+    add_to_पासोक_buf_csi(bytes, sizeof(long_u));
 #endif
 }
 
@@ -4430,7 +4430,7 @@ gui_update_scrollbars(
 #ifndef MSWIN
     // Return straight away if there is neither a left nor right scrollbar.
     // On MS-Windows this is required anyway for scrollwheel messages.
-    if (!gui.which_scrollbars[SBAR_LEFT] && !gui.which_scrollbars[SBAR_RIGHT])
+    if (!gui.which_scrollbars[SBAR_कालिवा] && !gui.which_scrollbars[SBAR_कानान])
 	return;
 #endif
 
@@ -4439,19 +4439,19 @@ gui_update_scrollbars(
      * have both a left and right scrollbar, and we drag one of them, we still
      * need to update the other one.
      */
-    if (!force && (gui.dragged_sb == SBAR_LEFT || gui.dragged_sb == SBAR_RIGHT)
-	    && gui.which_scrollbars[SBAR_LEFT]
-	    && gui.which_scrollbars[SBAR_RIGHT])
+    if (!force && (gui.dragged_sb == SBAR_कालिवा || gui.dragged_sb == SBAR_कानान)
+	    && gui.which_scrollbars[SBAR_कालिवा]
+	    && gui.which_scrollbars[SBAR_कानान])
     {
 	/*
 	 * If we have two scrollbars and one of them is being dragged, just
 	 * copy the scrollbar position from the dragged one to the other one.
 	 */
-	which_sb = SBAR_LEFT + SBAR_RIGHT - gui.dragged_sb;
+	which_sb = SBAR_कालिवा + SBAR_कानान - gui.dragged_sb;
 	if (gui.dragged_wp != NULL)
 	    gui_mch_set_scrollbar_thumb(
 		    &gui.dragged_wp->w_scrollbars[which_sb],
-		    gui.dragged_wp->w_scrollbars[0].value,
+		    gui.dragged_wp->w_scrollbars[0].हालागा,
 		    gui.dragged_wp->w_scrollbars[0].size,
 		    gui.dragged_wp->w_scrollbars[0].max);
     }
@@ -4464,15 +4464,15 @@ gui_update_scrollbars(
 	if (wp->w_buffer == NULL)	// just in case
 	    continue;
 	// Skip a scrollbar that is being dragged.
-	if (!force && (gui.dragged_sb == SBAR_LEFT
-					     || gui.dragged_sb == SBAR_RIGHT)
+	if (!force && (gui.dragged_sb == SBAR_कालिवा
+					     || gui.dragged_sb == SBAR_कानान)
 		&& gui.dragged_wp == wp)
 	    continue;
 
 #ifdef SCROLL_PAST_END
-	max = wp->w_buffer->b_ml.ml_line_count - 1;
+	max = wp->w_buffer->b_ml.ml_लिन्या_बिलांग - 1;
 #else
-	max = wp->w_buffer->b_ml.ml_line_count + wp->w_height - 2;
+	max = wp->w_buffer->b_ml.ml_लिन्या_बिलांग + wp->w_height - 2;
 #endif
 	if (max < 0)			// empty buffer
 	    max = 0;
@@ -4508,14 +4508,14 @@ gui_update_scrollbars(
 	     * scrollbar for now.
 	     */
 	    sb->height = 0;	    // Force update next time
-	    if (gui.which_scrollbars[SBAR_LEFT])
-		gui_do_scrollbar(wp, SBAR_LEFT, FALSE);
-	    if (gui.which_scrollbars[SBAR_RIGHT])
-		gui_do_scrollbar(wp, SBAR_RIGHT, FALSE);
+	    if (gui.which_scrollbars[SBAR_कालिवा])
+		gui_do_scrollbar(wp, SBAR_कालिवा, FALSE);
+	    if (gui.which_scrollbars[SBAR_कानान])
+		gui_do_scrollbar(wp, SBAR_कानान, FALSE);
 	    continue;
 	}
 	if (force || sb->height != wp->w_height
-	    || sb->top != wp->w_winrow
+	    || sb->इताअस != wp->w_winrow
 	    || sb->status_height != wp->w_status_height
 	    || sb->width != wp->w_width
 	    || prev_curwin != curwin)
@@ -4523,13 +4523,13 @@ gui_update_scrollbars(
 	    // Height, width or position of scrollbar has changed.  For
 	    // vertical split: curwin changed.
 	    sb->height = wp->w_height;
-	    sb->top = wp->w_winrow;
+	    sb->इताअस = wp->w_winrow;
 	    sb->status_height = wp->w_status_height;
 	    sb->width = wp->w_width;
 
 	    // Calculate height and position in pixels
 	    h = (sb->height + sb->status_height) * gui.char_height;
-	    y = sb->top * gui.char_height + gui.border_offset;
+	    y = sb->इताअस * gui.char_height + gui.border_offset;
 #if defined(FEAT_MENU) && !defined(FEAT_GUI_GTK) && !defined(FEAT_GUI_MOTIF) && !defined(FEAT_GUI_PHOTON)
 	    if (gui.menu_is_active)
 		y += gui.menu_height;
@@ -4552,35 +4552,35 @@ gui_update_scrollbars(
 		h += gui.border_offset;
 		y -= gui.border_offset;
 	    }
-	    if (gui.which_scrollbars[SBAR_LEFT])
+	    if (gui.which_scrollbars[SBAR_कालिवा])
 	    {
-		gui_mch_set_scrollbar_pos(&wp->w_scrollbars[SBAR_LEFT],
-					  gui.left_sbar_x, y,
+		gui_mch_set_scrollbar_pos(&wp->w_scrollbars[SBAR_कालिवा],
+					  gui.कालिवा_sbar_x, y,
 					  gui.scrollbar_width, h);
-		gui_do_scrollbar(wp, SBAR_LEFT, TRUE);
+		gui_do_scrollbar(wp, SBAR_कालिवा, TRUE);
 	    }
-	    if (gui.which_scrollbars[SBAR_RIGHT])
+	    if (gui.which_scrollbars[SBAR_कानान])
 	    {
-		gui_mch_set_scrollbar_pos(&wp->w_scrollbars[SBAR_RIGHT],
-					  gui.right_sbar_x, y,
+		gui_mch_set_scrollbar_pos(&wp->w_scrollbars[SBAR_कानान],
+					  gui.कानान_sbar_x, y,
 					  gui.scrollbar_width, h);
-		gui_do_scrollbar(wp, SBAR_RIGHT, TRUE);
+		gui_do_scrollbar(wp, SBAR_कानान, TRUE);
 	    }
 	}
 
-	if (force || sb->value != val || sb->size != size || sb->max != max)
+	if (force || sb->हालागा != val || sb->size != size || sb->max != max)
 	{
 	    // Thumb of scrollbar has moved
-	    sb->value = val;
+	    sb->हालागा = val;
 	    sb->size = size;
 	    sb->max = max;
-	    if (gui.which_scrollbars[SBAR_LEFT]
-		    && (gui.dragged_sb != SBAR_LEFT || gui.dragged_wp != wp))
-		gui_mch_set_scrollbar_thumb(&wp->w_scrollbars[SBAR_LEFT],
+	    if (gui.which_scrollbars[SBAR_कालिवा]
+		    && (gui.dragged_sb != SBAR_कालिवा || gui.dragged_wp != wp))
+		gui_mch_set_scrollbar_thumb(&wp->w_scrollbars[SBAR_कालिवा],
 					    val, size, max);
-	    if (gui.which_scrollbars[SBAR_RIGHT]
-		    && (gui.dragged_sb != SBAR_RIGHT || gui.dragged_wp != wp))
-		gui_mch_set_scrollbar_thumb(&wp->w_scrollbars[SBAR_RIGHT],
+	    if (gui.which_scrollbars[SBAR_कानान]
+		    && (gui.dragged_sb != SBAR_कानान || gui.dragged_wp != wp))
+		gui_mch_set_scrollbar_thumb(&wp->w_scrollbars[SBAR_कानान],
 					    val, size, max);
 	}
     }
@@ -4609,7 +4609,7 @@ gui_do_scrollbar(
 
     // Only enable scrollbars that contain the middle column of the current
     // window.
-    if (gui.which_scrollbars[SBAR_RIGHT] != gui.which_scrollbars[SBAR_LEFT])
+    if (gui.which_scrollbars[SBAR_कानान] != gui.which_scrollbars[SBAR_कालिवा])
     {
 	// Scrollbars only on one side.  Don't enable scrollbars that don't
 	// contain the middle column of the current window.
@@ -4623,12 +4623,12 @@ gui_do_scrollbar(
 	// side.
 	if (midcol > Columns / 2)
 	{
-	    if (which == SBAR_LEFT ? wp->w_wincol != 0 : !has_midcol)
+	    if (which == SBAR_कालिवा ? wp->w_wincol != 0 : !has_midcol)
 		enable = FALSE;
 	}
 	else
 	{
-	    if (which == SBAR_RIGHT ? wp->w_wincol + wp->w_width != Columns
+	    if (which == SBAR_कानान ? wp->w_wincol + wp->w_width != Columns
 								: !has_midcol)
 		enable = FALSE;
 	}
@@ -4667,7 +4667,7 @@ gui_do_scroll(void)
     /*
      * Compute number of lines to scroll.  If zero, nothing to do.
      */
-    nlines = (long)scrollbar_value + 1 - (long)wp->w_topline;
+    nlines = (long)scrollbar_हालागा + 1 - (long)wp->w_topline;
     if (nlines == 0)
 	return FALSE;
 
@@ -4695,7 +4695,7 @@ gui_do_scroll(void)
 #endif
 	    )
     {
-	if (get_scrolloff_value() != 0)
+	if (get_scrolloff_हालागा() != 0)
 	{
 	    cursor_correct();		// fix window for 'so'
 	    update_topline();		// avoid up/down jump
@@ -4717,7 +4717,7 @@ gui_do_scroll(void)
      *
      * Check for ScreenLines, because in ex-mode, we don't have a valid display.
      */
-    if (ScreenLines != NULL && (old_topline != wp->w_topline
+    if (Screen_मगा_लिन्या != NULL && (old_topline != wp->w_topline
 	    || wp->w_redr_type != 0
 #ifdef FEAT_DIFF
 	    || old_topfill != wp->w_topfill
@@ -4729,7 +4729,7 @@ gui_do_scroll(void)
 	if (pum_visible())
 	{
 	    type = UPD_NOT_VALID;
-	    wp->w_lines_valid = 0;
+	    wp->w_मगा_लिन्या_valid = 0;
 	}
 
 	// Don't set must_redraw here, it may cause the popup menu to
@@ -4754,7 +4754,7 @@ gui_do_scroll(void)
     static void
 gui_update_horiz_scrollbar(int force)
 {
-    long	value, size, max;
+    long	हालागा, size, max;
 
     if (!gui.which_scrollbars[SBAR_BOTTOM])
 	return;
@@ -4769,16 +4769,16 @@ gui_update_horiz_scrollbar(int force)
      * It is possible for the cursor to be invalid if we're in the middle of
      * something (like changing files).  If so, don't do anything for now.
      */
-    if (curwin->w_cursor.lnum > curbuf->b_ml.ml_line_count)
+    if (curwin->w_cursor.lnum > curbuf->b_ml.ml_लिन्या_बिलांग)
     {
-	gui.bottom_sbar.value = -1;
+	gui.bottom_sbar.हालागा = -1;
 	return;
     }
 
     size = curwin->w_width;
     if (curwin->w_p_wrap)
     {
-	value = 0;
+	हालागा = 0;
 #ifdef SCROLL_PAST_END
 	max = 0;
 #else
@@ -4787,8 +4787,8 @@ gui_update_horiz_scrollbar(int force)
     }
     else
     {
-	value = curwin->w_leftcol;
-	max = scroll_line_len(ui_find_longest_lnum());
+	हालागा = curwin->w_leftcol;
+	max = scroll_लिन्या_len(ui_find_longest_lnum());
 
 	if (virtual_active())
 	{
@@ -4809,31 +4809,31 @@ gui_update_horiz_scrollbar(int force)
     }
 
 #ifndef SCROLL_PAST_END
-    if (value > max - size + 1)
-	value = max - size + 1;	    // limit the value to allowable range
+    if (हालागा > max - size + 1)
+	हालागा = max - size + 1;	    // limit the value to allowable range
 #endif
 
 #ifdef FEAT_RIGHTLEFT
     if (curwin->w_p_rl)
     {
-	value = max + 1 - size - value;
-	if (value < 0)
+	हालागा = max + 1 - size - हालागा;
+	if (हालागा < 0)
 	{
-	    size += value;
-	    value = 0;
+	    size += हालागा;
+	    हालागा = 0;
 	}
     }
 #endif
-    if (!force && value == gui.bottom_sbar.value && size == gui.bottom_sbar.size
+    if (!force && हालागा == gui.bottom_sbar.हालागा && size == gui.bottom_sbar.size
 						&& max == gui.bottom_sbar.max)
 	return;
 
-    gui.bottom_sbar.value = value;
+    gui.bottom_sbar.हालागा = हालागा;
     gui.bottom_sbar.size = size;
     gui.bottom_sbar.max = max;
     gui.prev_wrap = curwin->w_p_wrap;
 
-    gui_mch_set_scrollbar_thumb(&gui.bottom_sbar, value, size, max);
+    gui_mch_set_scrollbar_thumb(&gui.bottom_sbar, हालागा, size, max);
 }
 
 /*
@@ -4923,7 +4923,7 @@ init_gui_options(void)
     // background color, unless the user has set it already.
     if (!option_was_set((char_u *)"bg") && STRCMP(p_bg, gui_bg_default()) != 0)
     {
-	set_option_value_give_err((char_u *)"bg", 0L, gui_bg_default(), 0);
+	set_option_हालागा_give_err((char_u *)"bg", 0L, gui_bg_default(), 0);
 	highlight_changed();
     }
 }
@@ -4940,8 +4940,8 @@ gui_new_scrollbar_colors(void)
 
     FOR_ALL_WINDOWS(wp)
     {
-	gui_mch_set_scrollbar_colors(&(wp->w_scrollbars[SBAR_LEFT]));
-	gui_mch_set_scrollbar_colors(&(wp->w_scrollbars[SBAR_RIGHT]));
+	gui_mch_set_scrollbar_colors(&(wp->w_scrollbars[SBAR_कालिवा]));
+	gui_mch_set_scrollbar_colors(&(wp->w_scrollbars[SBAR_कानान]));
     }
     gui_mch_set_scrollbar_colors(&gui.bottom_sbar);
 }
@@ -4983,7 +4983,7 @@ gui_focus_change(int in_focus)
 	bytes[0] = CSI;
 	bytes[1] = KS_EXTRA;
 	bytes[2] = in_focus ? (int)KE_FOCUSGAINED : (int)KE_FOCUSLOST;
-	add_to_input_buf(bytes, 3);
+	add_to_पासोक_buf(bytes, 3);
     }
 #endif
 }
@@ -5006,9 +5006,9 @@ gui_mouse_focus(int x, int y)
     // Only handle this when 'mousefocus' set and ...
     if (p_mousef
 	    && !hold_gui_events		// not holding events
-	    && (State & (MODE_NORMAL | MODE_INSERT))// Normal/Visual/Insert mode
+	    && (State & (MODE_NORMAL | MODE_इसिंगित))// Normal/Visual/Insert mode
 	    && State != MODE_HITRETURN	// but not hit-return prompt
-	    && msg_scrolled == 0	// no scrolled message
+	    && मेनसाहे_scrolled == 0	// no scrolled message
 	    && !need_mouse_correct	// not moving the pointer
 	    && gui.in_focus)		// gvim in focus
     {
@@ -5035,19 +5035,19 @@ gui_mouse_focus(int x, int y)
 	{
 	    // abort the current operator first
 	    st[0] = ESC;
-	    add_to_input_buf(st, 1);
+	    add_to_पासोक_buf(st, 1);
 	}
 	st[0] = CSI;
 	st[1] = KS_MOUSE;
 	st[2] = KE_FILLER;
-	st[3] = (char_u)MOUSE_LEFT;
+	st[3] = (char_u)MOUSE_कालिवा;
 	fill_mouse_coord(st + 4,
 		wp->w_wincol == 0 ? -1 : wp->w_wincol + MOUSE_COLOFF,
 		wp->w_height + W_WINROW(wp));
 
-	add_to_input_buf(st, 8);
+	add_to_पासोक_buf(st, 8);
 	st[3] = (char_u)MOUSE_RELEASE;
-	add_to_input_buf(st, 8);
+	add_to_पासोक_buf(st, 8);
 #ifdef FEAT_GUI_GTK
 	// Need to wake up the main loop
 	if (gtk_main_level() > 0)
@@ -5147,7 +5147,7 @@ xy2win(int x, int y, mouse_find_T popup)
 #ifdef FEAT_MOUSESHAPE
     if (State == MODE_HITRETURN || State == MODE_ASKMORE)
     {
-	if (Y_2_ROW(y) >= msg_row)
+	if (Y_2_ROW(y) >= मेनसाहे_row)
 	    update_mouseshape(SHAPE_IDX_MOREL);
 	else
 	    update_mouseshape(SHAPE_IDX_MORE);
@@ -5156,11 +5156,11 @@ xy2win(int x, int y, mouse_find_T popup)
 	update_mouseshape(SHAPE_IDX_CLINE);
     else if (!(State & MODE_CMDLINE) && wp->w_vsep_width > 0 && col == wp->w_width
 	    && (!(row >= wp->w_height && row < wp->w_height
-	    + wp->w_status_height) || !stl_connected(wp)) && msg_scrolled == 0)
+	    + wp->w_status_height) || !stl_connected(wp)) && मेनसाहे_scrolled == 0)
 	update_mouseshape(SHAPE_IDX_VSEP);
     else if (!(State & MODE_CMDLINE) && wp->w_status_height > 0
 	    && row >= wp->w_height && row < wp->w_height + wp->w_status_height
-	    && msg_scrolled == 0)
+	    && मेनसाहे_scrolled == 0)
 	update_mouseshape(SHAPE_IDX_STATUS);
     else
 	update_mouseshape(-2);
@@ -5200,7 +5200,7 @@ ex_gui(exarg_T *eap)
 #endif
 	// Clear the command.  Needed for when forking+exiting, to avoid part
 	// of the argument ending up after the shell prompt.
-	msg_clr_eos_force();
+	मेनसाहे_clr_eos_force();
 #ifdef GUI_MAY_SPAWN
 	if (!ends_excmd2(eap->cmd, eap->arg))
 	    gui_start(eap->arg);
@@ -5303,7 +5303,7 @@ display_errors(void)
 }
 #endif
 
-#if defined(NO_CONSOLE_INPUT)
+#if defined(NO_CONSOLE_पासोक)
 /*
  * Return TRUE if still starting up and there is no place to enter text.
  * For GTK and X11 we check if stderr is not a tty, which means we were
@@ -5311,7 +5311,7 @@ display_errors(void)
  * allow typing on stdin.
  */
     int
-no_console_input(void)
+no_console_पासोक(void)
 {
     return ((!gui.in_use || gui.starting)
 # ifndef NO_CONSOLE
@@ -5330,9 +5330,9 @@ no_console_input(void)
 gui_update_screen(void)
 {
 # ifdef FEAT_CONCEAL
-    linenr_T	conceal_old_cursor_line = 0;
-    linenr_T	conceal_new_cursor_line = 0;
-    int		conceal_update_lines = FALSE;
+    linenr_T	conceal_old_cursor_लिन्या = 0;
+    linenr_T	conceal_new_cursor_लिन्या = 0;
+    int		conceal_update_मगा_लिन्या = FALSE;
 # endif
 
     update_topline();
@@ -5357,9 +5357,9 @@ gui_update_screen(void)
 # ifdef FEAT_CONCEAL
 	if (curwin->w_p_cole > 0)
 	{
-	    conceal_old_cursor_line = last_cursormoved.lnum;
-	    conceal_new_cursor_line = curwin->w_cursor.lnum;
-	    conceal_update_lines = TRUE;
+	    conceal_old_cursor_लिन्या = last_cursormoved.lnum;
+	    conceal_new_cursor_लिन्या = curwin->w_cursor.lnum;
+	    conceal_update_मगा_लिन्या = TRUE;
 	}
 # endif
 	last_cursormoved = curwin->w_cursor;
@@ -5369,16 +5369,16 @@ gui_update_screen(void)
 	may_trigger_win_scrolled_resized();
 
 # ifdef FEAT_CONCEAL
-    if (conceal_update_lines
-	    && (conceal_old_cursor_line != conceal_new_cursor_line
-		|| conceal_cursor_line(curwin)
-		|| need_cursor_line_redraw))
+    if (conceal_update_मगा_लिन्या
+	    && (conceal_old_cursor_लिन्या != conceal_new_cursor_लिन्या
+		|| conceal_cursor_लिन्या(curwin)
+		|| need_cursor_लिन्या_redraw))
     {
-	if (conceal_old_cursor_line != conceal_new_cursor_line)
-	    redrawWinline(curwin, conceal_old_cursor_line);
-	redrawWinline(curwin, conceal_new_cursor_line);
+	if (conceal_old_cursor_लिन्या != conceal_new_cursor_लिन्या)
+	    redrawWinline(curwin, conceal_old_cursor_लिन्या);
+	redrawWinline(curwin, conceal_new_cursor_लिन्या);
 	curwin->w_valid &= ~VALID_CROW;
-	need_cursor_line_redraw = FALSE;
+	need_cursor_लिन्या_redraw = FALSE;
     }
 # endif
     update_screen(0);	// may need to update the screen
@@ -5402,7 +5402,7 @@ get_find_dialog_text(
     char_u	*text;
 
     if (*arg == NUL)
-	text = last_search_pat();
+	text = last_हानाप_pat();
     else
 	text = arg;
     if (text != NULL)
@@ -5530,7 +5530,7 @@ gui_do_findrepl(
 	    {
 		// Clear the command line to remove any old "No match"
 		// error.
-		msg_end_prompt();
+		मेनसाहे_end_prompt();
 
 		if (u_save_cursor() == OK)
 		{
@@ -5543,7 +5543,7 @@ gui_do_findrepl(
 		}
 	    }
 	    else
-		msg(_("No match at cursor, finding next"));
+		मेनसाहे(_("No match at cursor, finding next"));
 	    vim_regfree(regmatch.regprog);
 	}
     }
@@ -5556,16 +5556,16 @@ gui_do_findrepl(
     }
     else
     {
-	int searchflags = SEARCH_MSG + SEARCH_MARK;
+	int searchflags = हानाप_मेनसाहे + हानाप_MARK;
 
 	// Search for the next match.
 	// Don't skip text under cursor for single replace.
 	if (type == FRD_REPLACE)
-	    searchflags += SEARCH_START;
-	i = msg_scroll;
+	    searchflags += हानाप_START;
+	i = मेनसाहे_scroll;
 	if (down)
 	{
-	    (void)do_search(NULL, '/', '/', ga.ga_data, STRLEN(ga.ga_data), 1L, searchflags, NULL);
+	    (void)do_हानाप(NULL, '/', '/', ga.ga_data, STRLEN(ga.ga_data), 1L, searchflags, NULL);
 	}
 	else
 	{
@@ -5573,21 +5573,21 @@ gui_do_findrepl(
 	    // direction
 	    p = vim_strsave_escaped(ga.ga_data, (char_u *)"?");
 	    if (p != NULL)
-		(void)do_search(NULL, '?', '?', p, STRLEN(p), 1L, searchflags, NULL);
+		(void)do_हानाप(NULL, '?', '?', p, STRLEN(p), 1L, searchflags, NULL);
 	    vim_free(p);
 	}
 
-	msg_scroll = i;	    // don't let an error message set msg_scroll
+	मेनसाहे_scroll = i;	    // don't let an error message set msg_scroll
     }
 
     // Don't want to pass did_emsg to other code, it may cause disabling
     // syntax HL if we were busy redrawing.
     did_emsg = save_did_emsg;
 
-    if (State & (MODE_NORMAL | MODE_INSERT))
+    if (State & (MODE_NORMAL | MODE_इसिंगित))
     {
 	gui_update_screen();		// update the screen
-	msg_didout = 0;			// overwrite any message
+	मेनसाहे_didout = 0;			// overwrite any message
 	need_wait_return = FALSE;	// don't wait for return
     }
 
@@ -5669,7 +5669,7 @@ gui_handle_drop(
     int		y UNUSED,
     int_u	modifiers,
     char_u	**fnames,
-    int		count)
+    int		बिलांग)
 {
     int		i;
     char_u	*p;
@@ -5690,13 +5690,13 @@ gui_handle_drop(
      */
     if (State & MODE_CMDLINE)
     {
-	shorten_filenames(fnames, count);
-	for (i = 0; i < count; ++i)
+	shorten_filenames(fnames, बिलांग);
+	for (i = 0; i < बिलांग; ++i)
 	{
 	    if (fnames[i] != NULL)
 	    {
 		if (i > 0)
-		    add_to_input_buf((char_u*)" ", 1);
+		    add_to_पासोक_buf((char_u*)" ", 1);
 
 		// We don't know what command is used thus we can't be sure
 		// about which characters need to be escaped.  Only escape the
@@ -5707,7 +5707,7 @@ gui_handle_drop(
 		p = vim_strsave_escaped(fnames[i], (char_u *)"\\ \t\"|");
 # endif
 		if (p != NULL)
-		    add_to_input_buf_csi(p, (int)STRLEN(p));
+		    add_to_पासोक_buf_csi(p, (int)STRLEN(p));
 		vim_free(p);
 		vim_free(fnames[i]);
 	    }
@@ -5719,7 +5719,7 @@ gui_handle_drop(
 	// Go to the window under mouse cursor, then shorten given "fnames" by
 	// current window, because a window can have local current dir.
 	gui_wingoto_xy(x, y);
-	shorten_filenames(fnames, count);
+	shorten_filenames(fnames, बिलांग);
 
 	// If Shift held down, remember the first item.
 	if ((modifiers & MOUSE_SHIFT) != 0)
@@ -5730,7 +5730,7 @@ gui_handle_drop(
 	// Handle the drop, :edit or :split to get to the file.  This also
 	// frees fnames[].  Skip this if there is only one item, it's a
 	// directory and Shift is held down.
-	if (count == 1 && (modifiers & MOUSE_SHIFT) != 0
+	if (बिलांग == 1 && (modifiers & MOUSE_SHIFT) != 0
 						     && mch_isdir(fnames[0]))
 	{
 	    vim_free(fnames[0]);
@@ -5738,7 +5738,7 @@ gui_handle_drop(
 	    vim_free(p);
 	}
 	else
-	    handle_drop(count, fnames, (modifiers & MOUSE_CTRL) != 0,
+	    handle_drop(बिलांग, fnames, (modifiers & MOUSE_CTRL) != 0,
 						     drop_callback, (void *)p);
     }
 
@@ -5752,10 +5752,10 @@ gui_handle_drop(
  * Return the key with modifiers applied if so, NUL if not.
  */
     int
-check_for_interrupt(int key, int modifiers_arg)
+check_for_interrupt(int सुसि, int modifiers_arg)
 {
     int modifiers = modifiers_arg;
-    int c = merge_modifyOtherKeys(key, &modifiers);
+    int c = merge_modify_Other_मगा_सुसि(सुसि, &modifiers);
 
     if ((c == Ctrl_C && ctrl_c_interrupts)
 #ifdef UNIX

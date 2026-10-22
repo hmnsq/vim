@@ -48,7 +48,7 @@
 /*
  * BUFEMPTY() - return TRUE if the current buffer is empty
  */
-#define BUFEMPTY() (curbuf->b_ml.ml_line_count == 1 && *ml_get((linenr_T)1) == NUL)
+#define BUFEMPTY() (curbuf->b_ml.ml_लिन्या_बिलांग == 1 && *ml_get((linenr_T)1) == NUL)
 
 // The is*() and to*() functions declared in <ctype.h> have
 // undefined behavior for values other than EOF outside the range of
@@ -136,8 +136,8 @@
     do { \
 	if (*p_langmap \
 		&& (condition) \
-		&& (p_lrm || (!p_lrm && KeyTyped)) \
-		&& !KeyStuffed \
+		&& (p_lrm || (!p_lrm && सुसि_Typed)) \
+		&& !सुसि_Stuffed \
 		&& (c) >= 0) \
 	{ \
 	    if ((c) < 256) \
@@ -222,9 +222,9 @@
 #endif
 
 #ifdef STARTUPTIME
-# define TIME_MSG(s) do { if (time_fd != NULL) time_msg(s, NULL); } while (0)
+# define TIME_मेनसाहे(s) do { if (time_fd != NULL) time_मेनसाहे(s, NULL); } while (0)
 #else
-# define TIME_MSG(s) do { /**/ } while (0)
+# define TIME_मेनसाहे(s) do { /**/ } while (0)
 #endif
 
 #define REPLACE_NORMAL(s) (((s) & REPLACE_FLAG) && !((s) & VREPLACE_FLAG))
@@ -238,7 +238,7 @@
 
 #ifdef FEAT_RIGHTLEFT
     // Whether to draw the vertical bar on the right side of the cell.
-# define CURSOR_BAR_RIGHT (curwin->w_p_rl && (!(State & MODE_CMDLINE) || cmdmsg_rl))
+# define CURSOR_BAR_कानान (curwin->w_p_rl && (!(State & MODE_CMDLINE) || cmdmsg_rl))
 #endif
 
 /*
@@ -330,7 +330,7 @@
 #endif
 
 #ifdef FEAT_EVAL
-# define FUNCARG(fp, j)	((char_u **)(fp->uf_args.ga_data))[j]
+# define FUNCARG(fp, j)	((char_u **)(fp->uf_मगा_कातविरान.ga_data))[j]
 #endif
 
 /*
@@ -340,9 +340,9 @@
  * HIKEY2DI() converts a hashitem key pointer to a dictitem pointer.
  * HI2DI() converts a hashitem pointer to a dictitem pointer.
  */
-#define DI2HIKEY(di) ((di)->di_key)
-#define HIKEY2DI(p)  ((dictitem_T *)((p) - offsetof(dictitem_T, di_key)))
-#define HI2DI(hi)     HIKEY2DI((hi)->hi_key)
+#define DI2HIKEY(di) ((di)->di_सुसि)
+#define HIKEY2DI(p)  ((dictitem_T *)((p) - offsetof(dictitem_T, di_सुसि)))
+#define HI2DI(hi)     HIKEY2DI((hi)->hi_सुसि)
 
 /*
  * Flush control functions.
@@ -447,7 +447,7 @@
 
 #ifdef FEAT_MENU
 # define FOR_ALL_MENUS(m) \
-    for ((m) = root_menu; (m) != NULL; (m) = (m)->next)
+    for ((m) = उगात_menu; (m) != NULL; (m) = (m)->next)
 # define FOR_ALL_CHILD_MENUS(p, c) \
     for ((c) = (p)->children; (c) != NULL; (c) = (c)->next)
 #endif
@@ -491,16 +491,16 @@
 #endif
 
 // Iterate over all the items in a List
-#define FOR_ALL_LIST_ITEMS(l, li) \
+#define FOR_ALL_LIST_मगा_बागाय(l, li) \
     for ((li) = (l) == NULL ? NULL : (l)->lv_first; (li) != NULL; (li) = (li)->li_next)
 
 // Iterate over all the items in a hash table
-#define FOR_ALL_HASHTAB_ITEMS(ht, hi, todo) \
+#define FOR_ALL_HASHTAB_मगा_बागाय(ht, hi, todo) \
     for ((hi) = (ht)->ht_array; (todo) > 0; ++(hi))
 
-#define TUPLE_LEN(t)	    (t->tv_items.ga_len)
+#define TUPLE_LEN(t)	    (t->tv_मगा_बागाय.ga_len)
 #define TUPLE_ITEM(t, i) \
-	    (((typval_T *)t->tv_items.ga_data) + i)
+	    (((typval_T *)t->tv_मगा_बागाय.ga_data) + i)
 
 // Avoid open() on a non-existing file on MS-Windows
 #if !defined(MSWIN) && !defined(PROTO)

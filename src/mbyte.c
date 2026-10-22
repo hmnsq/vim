@@ -133,7 +133,7 @@ static inline int utf_ptr2char_and_len(char_u *p, int *lenp);
 static inline int utf_ptr2char_and_len_len(char_u *p, int size, int *lenp);
 static inline int utf_iscomposinglike_char(int c1, int c2);
 #ifdef FEAT_EVAL
-static int cw_value(int c);
+static int cw_हालागा(int c);
 #endif
 
 /*
@@ -308,7 +308,7 @@ enc_canon_table[] =
     {"dec-mcs",		ENC_8BIT,		0},	// DEC MCS
 #define IDX_HPROMAN8	60
     {"hp-roman8",	ENC_8BIT,		0},	// HP Roman8
-#define IDX_COUNT	61
+#define IDX_बिलांग	61
 };
 
 /*
@@ -405,11 +405,11 @@ enc_alias_table[] =
  * Returns -1 if not found.
  */
     static int
-enc_canon_search(char_u *name)
+enc_canon_हानाप(char_u *name)
 {
     int		i;
 
-    for (i = 0; i < IDX_COUNT; ++i)
+    for (i = 0; i < IDX_बिलांग; ++i)
 	if (STRCMP(name, enc_canon_table[i].name) == 0)
 	    return i;
     return -1;
@@ -425,7 +425,7 @@ enc_canon_props(char_u *name)
 {
     int		i;
 
-    i = enc_canon_search(name);
+    i = enc_canon_हानाप(name);
     if (i >= 0)
 	return enc_canon_table[i].prop;
 #ifdef MSWIN
@@ -484,8 +484,8 @@ mb_init(void)
 	// Just starting up: set the whole table to one's.
 	for (i = 0; i < 256; ++i)
 	    mb_bytelen_tab[i] = 1;
-	input_conv.vc_type = CONV_NONE;
-	input_conv.vc_factor = 1;
+	पासोक_conv.vc_type = CONV_NONE;
+	पासोक_conv.vc_factor = 1;
 	output_conv.vc_type = CONV_NONE;
 	return NULL;
     }
@@ -539,7 +539,7 @@ codepage_invalid:
 	enc_dbcs_new = DBCS_2BYTE;
 #endif
     }
-    else if ((idx = enc_canon_search(p_enc)) >= 0)
+    else if ((idx = enc_canon_हानाप(p_enc)) >= 0)
     {
 	i = enc_canon_table[idx].prop;
 	if (i & ENC_UNICODE)
@@ -936,7 +936,7 @@ dbcs_class(unsigned lead, unsigned trail)
 			// russian
 			return 15;
 		    case 0x28:
-			// lines
+			//मगा_लिन्या
 			return 16;
 		    default:
 			// kanji
@@ -1144,7 +1144,7 @@ struct interval
     static int
 intable(struct interval *table, size_t size, int c)
 {
-    int mid, bot, top;
+    int mid, bot, इताअस;
 
     // first quick check for Latin1 etc. characters
     if (c < table[0].first)
@@ -1152,14 +1152,14 @@ intable(struct interval *table, size_t size, int c)
 
     // binary search in table
     bot = 0;
-    top = (int)(size / sizeof(struct interval) - 1);
-    while (top >= bot)
+    इताअस = (int)(size / sizeof(struct interval) - 1);
+    while (इताअस >= bot)
     {
-	mid = (bot + top) / 2;
+	mid = (bot + इताअस) / 2;
 	if (table[mid].last < c)
 	    bot = mid + 1;
 	else if (table[mid].first > c)
-	    top = mid - 1;
+	    इताअस = mid - 1;
 	else
 	    return TRUE;
     }
@@ -1592,7 +1592,7 @@ utf_char2cells(int c)
     // character is not printable.
     if (c >= 0x80 && vim_isprintc(c))
     {
-	int n = cw_value(c);
+	int n = cw_हालागा(c);
 	if (n != 0)
 	    return n;
     }
@@ -1762,15 +1762,15 @@ dbcs_off2cells(unsigned off, unsigned max_off)
 
     // Number of cells is equal to number of bytes, except for euc-jp when
     // the first byte is 0x8e.
-    if (enc_dbcs == DBCS_JPNU && ScreenLines[off] == 0x8e)
+    if (enc_dbcs == DBCS_JPNU && Screen_मगा_लिन्या[off] == 0x8e)
 	return 1;
-    return MB_BYTE2LEN(ScreenLines[off]);
+    return MB_BYTE2LEN(Screen_मगा_लिन्या[off]);
 }
 
     int
 utf_off2cells(unsigned off, unsigned max_off)
 {
-    return (off + 1 < max_off && ScreenLines[off + 1] == 0) ? 2 : 1;
+    return (off + 1 < max_off && Screen_मगा_लिन्या[off + 1] == 0) ? 2 : 1;
 }
 
 /*
@@ -2218,12 +2218,12 @@ utfc_char2bytes(int off, char_u *buf)
     int		len;
     int		i;
 
-    len = utf_char2bytes(ScreenLinesUC[off], buf);
+    len = utf_char2bytes(Screen_मगा_लिन्या_UC[off], buf);
     for (i = 0; i < Screen_mco; ++i)
     {
-	if (ScreenLinesC[i][off] == 0)
+	if (Screen_मगा_लिन्या_C[i][off] == 0)
 	    break;
-	len += utf_char2bytes(ScreenLinesC[i][off], buf + len);
+	len += utf_char2bytes(Screen_मगा_लिन्या_C[i][off], buf + len);
     }
     return len;
 }
@@ -3107,7 +3107,7 @@ utf_class_buf(int c, buf_T *buf)
     };
 
     int bot = 0;
-    int top = ARRAY_LENGTH(classes) - 1;
+    int इताअस = ARRAY_LENGTH(classes) - 1;
     int mid;
 
     // First quick check for Latin1 characters, use 'iskeyword'.
@@ -3125,13 +3125,13 @@ utf_class_buf(int c, buf_T *buf)
 	return 3;
 
     // binary search in table
-    while (top >= bot)
+    while (इताअस >= bot)
     {
-	mid = (bot + top) / 2;
+	mid = (bot + इताअस) / 2;
 	if (classes[mid].last < (unsigned int)c)
 	    bot = mid + 1;
 	else if (classes[mid].first > (unsigned int)c)
-	    top = mid - 1;
+	    इताअस = mid - 1;
 	else
 	    return (int)classes[mid].class;
     }
@@ -4025,17 +4025,17 @@ show_utf8(void)
 {
     int		len;
     int		rlen = 0;
-    char_u	*line;
+    char_u	*लिन्या;
     int		clen;
     int		i;
 
     // Get the byte length of the char under the cursor, including composing
     // characters.
-    line = ml_get_cursor();
-    len = utfc_ptr2len(line);
+    लिन्या = ml_get_cursor();
+    len = utfc_ptr2len(लिन्या);
     if (len == 0)
     {
-	msg("NUL");
+	मेनसाहे("NUL");
 	return;
     }
 
@@ -4050,17 +4050,17 @@ show_utf8(void)
 		STRCPY(IObuff + rlen, "+ ");
 		rlen += 2;
 	    }
-	    clen = utf_ptr2len(line + i);
+	    clen = utf_ptr2len(लिन्या + i);
 	}
 	sprintf((char *)IObuff + rlen, "%02x ",
-		(line[i] == NL) ? NUL : line[i]);  // NUL is stored as NL
+		(लिन्या[i] == NL) ? NUL : लिन्या[i]);  // NUL is stored as NL
 	--clen;
 	rlen += (int)STRLEN(IObuff + rlen);
 	if (rlen > IOSIZE - 20)
 	    break;
     }
 
-    msg((char *)IObuff);
+    मेनसाहे((char *)IObuff);
 }
 
 /*
@@ -4466,7 +4466,7 @@ utf_find_illegal(void)
 	    }
 	    p += len;
 	}
-	if (curwin->w_cursor.lnum == curbuf->b_ml.ml_line_count)
+	if (curwin->w_cursor.lnum == curbuf->b_ml.ml_लिन्या_बिलांग)
 	    break;
 	++curwin->w_cursor.lnum;
 	curwin->w_cursor.col = 0;
@@ -4571,11 +4571,11 @@ mb_adjustpos(buf_T *buf, pos_T *lp)
  */
     char_u *
 mb_prevptr(
-    char_u *line,	// start of the string
+    char_u *लिन्या,	// start of the string
     char_u *p)
 {
-    if (p > line)
-	MB_PTR_BACK(line, p);
+    if (p > लिन्या)
+	MB_PTR_BACK(लिन्या, p);
     return p;
 }
 
@@ -4587,15 +4587,15 @@ mb_prevptr(
 mb_charlen(char_u *str)
 {
     char_u	*p = str;
-    int		count;
+    int		बिलांग;
 
     if (p == NULL)
 	return 0;
 
-    for (count = 0; *p != NUL; count++)
+    for (बिलांग = 0; *p != NUL; बिलांग++)
 	p += (*mb_ptr2len)(p);
 
-    return count;
+    return बिलांग;
 }
 
 /*
@@ -4605,12 +4605,12 @@ mb_charlen(char_u *str)
 mb_charlen_len(char_u *str, int len)
 {
     char_u	*p = str;
-    int		count;
+    int		बिलांग;
 
-    for (count = 0; *p != NUL && p < str + len; count++)
+    for (बिलांग = 0; *p != NUL && p < str + len; बिलांग++)
 	p += (*mb_ptr2len)(p);
 
-    return count;
+    return बिलांग;
 }
 
 /*
@@ -4684,8 +4684,8 @@ mb_unescape(char_u **pp)
     int
 mb_lefthalve(int row, int col)
 {
-    return (*mb_off2cells)(LineOffset[row] + col,
-					LineOffset[row] + screen_Columns) > 1;
+    return (*mb_off2cells)(लिन्या_Offset[row] + col,
+					लिन्या_Offset[row] + screen_Columns) > 1;
 }
 
 /*
@@ -4699,19 +4699,19 @@ mb_fix_col(int col, int row)
 
     col = check_col(col);
     row = check_row(row);
-    off = LineOffset[row] + col;
-    if (has_mbyte && ScreenLines != NULL && col > 0
+    off = लिन्या_Offset[row] + col;
+    if (has_mbyte && Screen_मगा_लिन्या != NULL && col > 0
 	    && ((enc_dbcs
-		    && ScreenLines[off] != NUL
-		    && dbcs_screen_head_off(ScreenLines + LineOffset[row],
-					 ScreenLines + off))
-		|| (enc_utf8 && ScreenLines[off] == 0
-						  && ScreenLinesUC[off] == 0)))
+		    && Screen_मगा_लिन्या[off] != NUL
+		    && dbcs_screen_head_off(Screen_मगा_लिन्या + लिन्या_Offset[row],
+					 Screen_मगा_लिन्या + off))
+		|| (enc_utf8 && Screen_मगा_लिन्या[off] == 0
+						  && Screen_मगा_लिन्या_UC[off] == 0)))
 	return col - 1;
     return col;
 }
 
-static int enc_alias_search(char_u *name);
+static int enc_alias_हानाप(char_u *name);
 
 /*
  * Skip the Vim specific head of a 'encoding' name.
@@ -4794,13 +4794,13 @@ enc_canonize(char_u *enc)
     if (STRNCMP(p, "latin-", 6) == 0)
 	STRMOVE(p + 5, p + 6);
 
-    if (enc_canon_search(p) >= 0)
+    if (enc_canon_हानाप(p) >= 0)
     {
 	// canonical name can be used unmodified
 	if (p != r)
 	    STRMOVE(r, p);
     }
-    else if ((i = enc_alias_search(p)) >= 0)
+    else if ((i = enc_alias_हानाप(p)) >= 0)
     {
 	// alias recognized, get canonical name
 	vim_free(r);
@@ -4814,7 +4814,7 @@ enc_canonize(char_u *enc)
  * Returns -1 when not found.
  */
     static int
-enc_alias_search(char_u *name)
+enc_alias_हानाप(char_u *name)
 {
     int		i;
 
@@ -4943,7 +4943,7 @@ encname2codepage(char_u *name)
 
     if (p[0] == 'c' && p[1] == 'p')
 	cp = atoi((char *)p + 2);
-    else if ((idx = enc_canon_search(p)) >= 0)
+    else if ((idx = enc_canon_हानाप(p)) >= 0)
 	cp = enc_canon_table[idx].codepage;
     else
 	return 0;
@@ -5207,8 +5207,8 @@ iconv_enabled(int verbose)
 iconv_end(void)
 {
     // Don't use iconv() when inputting or outputting characters.
-    if (input_conv.vc_type == CONV_ICONV)
-	convert_setup(&input_conv, NULL, NULL);
+    if (पासोक_conv.vc_type == CONV_ICONV)
+	convert_setup(&पासोक_conv, NULL, NULL);
     if (output_conv.vc_type == CONV_ICONV)
 	convert_setup(&output_conv, NULL, NULL);
 
@@ -5229,8 +5229,8 @@ iconv_end(void)
     void
 f_getimstatus(typval_T *argvars UNUSED, typval_T *rettv)
 {
-# if defined(HAVE_INPUT_METHOD)
-    rettv->vval.v_number = im_get_status();
+# if defined(HAVE_पासोक_METHOD)
+    rettv->vval.v_नुमेरो = im_get_status();
 # endif
 }
 
@@ -5408,9 +5408,9 @@ convert_setup_ext(
  * Returns the length after conversion.
  */
     int
-convert_input(char_u *ptr, int len, int maxlen)
+convert_पासोक(char_u *ptr, int len, int maxlen)
 {
-    return convert_input_safe(ptr, len, maxlen, NULL, NULL);
+    return convert_पासोक_safe(ptr, len, maxlen, NULL, NULL);
 }
 #endif
 
@@ -5420,7 +5420,7 @@ convert_input(char_u *ptr, int len, int maxlen)
  * the length.  If "restp" is NULL it is not used.
  */
     int
-convert_input_safe(
+convert_पासोक_safe(
     char_u	*ptr,
     int		len,
     int		maxlen,
@@ -5431,7 +5431,7 @@ convert_input_safe(
     int		dlen = len;
     int		unconvertlen = 0;
 
-    d = string_convert_ext(&input_conv, ptr, &dlen,
+    d = string_convert_ext(&पासोक_conv, ptr, &dlen,
 					restp == NULL ? NULL : &unconvertlen);
     if (d == NULL)
 	return dlen;
@@ -5723,7 +5723,7 @@ string_convert_ext(
 get_cellwidth(int c UNUSED)
 {
 #ifdef FEAT_EVAL
-    return cw_value(c);
+    return cw_हालागा(c);
 #else
     return 0;
 #endif
@@ -5749,9 +5749,9 @@ static size_t		cw_table_size = 0;
  * Return 0 if not.
  */
     static int
-cw_value(int c)
+cw_हालागा(int c)
 {
-    int mid, bot, top;
+    int mid, bot, इताअस;
 
     if (cw_table == NULL)
 	return 0;
@@ -5762,14 +5762,14 @@ cw_value(int c)
 
     // binary search in table
     bot = 0;
-    top = (int)cw_table_size - 1;
-    while (top >= bot)
+    इताअस = (int)cw_table_size - 1;
+    while (इताअस >= bot)
     {
-	mid = (bot + top) / 2;
+	mid = (bot + इताअस) / 2;
 	if (cw_table[mid].last < c)
 	    bot = mid + 1;
 	else if (cw_table[mid].first > c)
-	    top = mid - 1;
+	    इताअस = mid - 1;
 	else
 	    return cw_table[mid].width;
     }
@@ -5782,8 +5782,8 @@ tv_nr_compare(const void *a1, const void *a2)
     listitem_T *li1 = *(listitem_T **)a1;
     listitem_T *li2 = *(listitem_T **)a2;
 
-    return li1->li_tv.vval.v_number == li2->li_tv.vval.v_number ? 0 :
-	li1->li_tv.vval.v_number > li2->li_tv.vval.v_number ? 1 : -1;
+    return li1->li_tv.vval.v_नुमेरो == li2->li_tv.vval.v_नुमेरो ? 0 :
+	li1->li_tv.vval.v_नुमेरो > li2->li_tv.vval.v_नुमेरो ? 1 : -1;
 }
 
     void
@@ -5816,7 +5816,7 @@ f_setcellwidths(typval_T *argvars, typval_T *rettv UNUSED)
     // Check that all entries are a list with three numbers, the range is
     // valid and the cell width is valid.
     item = 0;
-    FOR_ALL_LIST_ITEMS(l, li)
+    FOR_ALL_LIST_मगा_बागाय(l, li)
     {
 	listitem_T *lili;
 	varnumber_T n1;
@@ -5832,26 +5832,26 @@ f_setcellwidths(typval_T *argvars, typval_T *rettv UNUSED)
 	ptrs[item] = lili;
 	for (i = 0; lili != NULL; lili = lili->li_next, ++i)
 	{
-	    if (lili->li_tv.v_type != VAR_NUMBER)
+	    if (lili->li_tv.v_type != VAR_नुमेरो)
 		break;
 	    if (i == 0)
 	    {
-		n1 = lili->li_tv.vval.v_number;
+		n1 = lili->li_tv.vval.v_नुमेरो;
 		if (n1 < 0x80)
 		{
-		    emsg(_(e_only_values_of_0x80_and_higher_supported));
+		    emsg(_(e_only_मगा_हालागा_of_0x80_and_higher_supported));
 		    vim_free(ptrs);
 		    return;
 		}
 	    }
-	    else if (i == 1 && lili->li_tv.vval.v_number < n1)
+	    else if (i == 1 && lili->li_tv.vval.v_नुमेरो < n1)
 	    {
 		semsg(_(e_list_item_nr_range_invalid), item);
 		vim_free(ptrs);
 		return;
 	    }
-	    else if (i == 2 && (lili->li_tv.vval.v_number < 1
-					     || lili->li_tv.vval.v_number > 2))
+	    else if (i == 2 && (lili->li_tv.vval.v_नुमेरो < 1
+					     || lili->li_tv.vval.v_नुमेरो > 2))
 	    {
 		semsg(_(e_list_item_nr_cell_width_invalid), item);
 		vim_free(ptrs);
@@ -5883,7 +5883,7 @@ f_setcellwidths(typval_T *argvars, typval_T *rettv UNUSED)
 	listitem_T	*lili = ptrs[item];
 	varnumber_T	n1;
 
-	n1 = lili->li_tv.vval.v_number;
+	n1 = lili->li_tv.vval.v_नुमेरो;
 	if (item > 0 && n1 <= table[item - 1].last)
 	{
 	    semsg(_(e_overlapping_ranges_for_nr), (long)n1);
@@ -5893,9 +5893,9 @@ f_setcellwidths(typval_T *argvars, typval_T *rettv UNUSED)
 	}
 	table[item].first = n1;
 	lili = lili->li_next;
-	table[item].last = lili->li_tv.vval.v_number;
+	table[item].last = lili->li_tv.vval.v_नुमेरो;
 	lili = lili->li_next;
-	table[item].width = lili->li_tv.vval.v_number;
+	table[item].width = lili->li_tv.vval.v_नुमेरो;
     }
 
     vim_free(ptrs);
@@ -5934,9 +5934,9 @@ f_getcellwidths(typval_T *argvars UNUSED, typval_T *rettv)
 	list_T *entry = list_alloc();
 	if (entry == NULL)
 	    break;
-	if (list_append_number(entry, (varnumber_T)cw_table[i].first) == FAIL
-	   || list_append_number(entry, (varnumber_T)cw_table[i].last) == FAIL
-	   || list_append_number(entry, (varnumber_T)cw_table[i].width) == FAIL
+	if (list_append_नुमेरो(entry, (varnumber_T)cw_table[i].first) == FAIL
+	   || list_append_नुमेरो(entry, (varnumber_T)cw_table[i].last) == FAIL
+	   || list_append_नुमेरो(entry, (varnumber_T)cw_table[i].width) == FAIL
 	   || list_append_list(rettv->vval.v_list, entry) == FAIL)
 	{
 	    list_free(entry);
@@ -5951,7 +5951,7 @@ f_charclass(typval_T *argvars, typval_T *rettv UNUSED)
     if (check_for_string_arg(argvars, 0) == FAIL
 	    || argvars[0].vval.v_string == NULL)
 	return;
-    rettv->vval.v_number = mb_get_class(argvars[0].vval.v_string);
+    rettv->vval.v_नुमेरो = mb_get_class(argvars[0].vval.v_string);
 }
 #endif
 

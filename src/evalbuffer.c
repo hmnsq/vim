@@ -44,7 +44,7 @@ set_ref_in_buffers(int copyID)
 	    abort = abort || set_ref_in_callback(&bp->b_tsrfu_cb, copyID);
 	if (!abort && bp->b_p_cpt_cb != NULL)
 	    abort = abort || set_ref_in_cpt_callbacks(bp->b_p_cpt_cb,
-		    bp->b_p_cpt_count, copyID);
+		    bp->b_p_cpt_बिलांग, copyID);
 # endif
 	if (!abort)
 	    abort = abort || set_ref_in_callback(&bp->b_tfu_cb, copyID);
@@ -85,8 +85,8 @@ find_buffer(typval_T *avar)
 {
     buf_T	*buf = NULL;
 
-    if (avar->v_type == VAR_NUMBER)
-	buf = buflist_findnr((int)avar->vval.v_number);
+    if (avar->v_type == VAR_नुमेरो)
+	buf = buflist_findnr((int)avar->vval.v_नुमेरो);
     else if (in_vim9script() && check_for_string_arg(avar, 0) == FAIL)
 	return NULL;
     else if (avar->v_type == VAR_STRING && avar->vval.v_string != NULL)
@@ -188,15 +188,15 @@ change_other_buffer_restore(cob_T *cob)
  * Any type is allowed and converted to a string.
  */
     static void
-set_buffer_lines(
+set_buffer_मगा_लिन्या(
 	buf_T	    *buf,
 	linenr_T    lnum_arg,
 	int	    append,
-	typval_T    *lines,
+	typval_T    *मगा_लिन्या,
 	typval_T    *rettv)
 {
     linenr_T    lnum = lnum_arg + (append ? 1 : 0);
-    char_u	*line = NULL;
+    char_u	*लिन्या = NULL;
     list_T	*l = NULL;
     listitem_T	*li = NULL;
     long	added = 0;
@@ -208,9 +208,9 @@ set_buffer_lines(
     int is_curbuf = buf == curbuf;
     if (buf == NULL || (!is_curbuf && buf->b_ml.ml_mfp == NULL) || lnum < 1)
     {
-	rettv->vval.v_number = 1;	// FAIL
+	rettv->vval.v_नुमेरो = 1;	// FAIL
 	if (in_vim9script() && lnum < 1)
-	    semsg(_(e_invalid_line_number_nr), lnum_arg);
+	    semsg(_(e_invalid_लिन्या_नुमेरो_nr), lnum_arg);
 	return;
     }
 
@@ -226,11 +226,11 @@ set_buffer_lines(
     else
 	// setbufline() uses the line number above which we insert, we only
 	// append if it's below the last line
-	append_lnum = curbuf->b_ml.ml_line_count;
+	append_lnum = curbuf->b_ml.ml_लिन्या_बिलांग;
 
-    if (lines->v_type == VAR_LIST)
+    if (मगा_लिन्या->v_type == VAR_LIST)
     {
-	l = lines->vval.v_list;
+	l = मगा_लिन्या->vval.v_list;
 	if (l == NULL || list_len(l) == 0)
 	{
 	    // not appending anything always succeeds
@@ -240,7 +240,7 @@ set_buffer_lines(
 	li = l->lv_first;
     }
     else
-	line = typval_tostring(lines, FALSE);
+	लिन्या = typval_tostring(मगा_लिन्या, FALSE);
 
     // default result is zero == OK
     for (;;)
@@ -250,13 +250,13 @@ set_buffer_lines(
 	    // list argument, get next string
 	    if (li == NULL)
 		break;
-	    vim_free(line);
-	    line = typval_tostring(&li->li_tv, FALSE);
+	    vim_free(लिन्या);
+	    लिन्या = typval_tostring(&li->li_tv, FALSE);
 	    li = li->li_next;
 	}
 
-	rettv->vval.v_number = 1;	// FAIL
-	if (line == NULL || lnum > curbuf->b_ml.ml_line_count + 1)
+	rettv->vval.v_नुमेरो = 1;	// FAIL
+	if (लिन्या == NULL || lnum > curbuf->b_ml.ml_लिन्या_बिलांग + 1)
 	    break;
 
 	// When coming here from Insert mode, sync undo, so that this can be
@@ -267,39 +267,39 @@ set_buffer_lines(
 	    u_sync(TRUE);
 	}
 
-	if (!append && lnum <= curbuf->b_ml.ml_line_count)
+	if (!append && lnum <= curbuf->b_ml.ml_लिन्या_बिलांग)
 	{
 	    // Existing line, replace it.
 	    // Removes any existing text properties.
 	    if (u_savesub(lnum) == OK && ml_replace_len(
-		      lnum, line, (colnr_T)STRLEN(line) + 1, TRUE, TRUE) == OK)
+		      lnum, लिन्या, (colnr_T)STRLEN(लिन्या) + 1, TRUE, TRUE) == OK)
 	    {
 		changed_bytes(lnum, 0);
 		if (is_curbuf && lnum == curwin->w_cursor.lnum)
 		    check_cursor_col();
-		rettv->vval.v_number = 0;	// OK
+		rettv->vval.v_नुमेरो = 0;	// OK
 	    }
 	}
 	else if (added > 0 || u_save(lnum - 1, lnum) == OK)
 	{
 	    // append the line
 	    ++added;
-	    if (ml_append(lnum - 1, line, (colnr_T)0, FALSE) == OK)
-		rettv->vval.v_number = 0;	// OK
+	    if (ml_append(lnum - 1, लिन्या, (colnr_T)0, FALSE) == OK)
+		rettv->vval.v_नुमेरो = 0;	// OK
 	}
 
 	if (l == NULL)			// only one string argument
 	    break;
 	++lnum;
     }
-    vim_free(line);
+    vim_free(लिन्या);
 
     if (added > 0)
     {
 	win_T	    *wp;
 	tabpage_T   *tp;
 
-	appended_lines_mark(append_lnum, added);
+	appended_मगा_लिन्या_mark(append_lnum, added);
 
 	// Only adjust the cursor for buffers other than the current, unless it
 	// is the current window.  For curbuf and other windows it has been
@@ -336,14 +336,14 @@ f_append(typval_T *argvars, typval_T *rettv)
 
     lnum = tv_get_lnum(&argvars[0]);
     if (did_emsg == did_emsg_before)
-	set_buffer_lines(curbuf, lnum, TRUE, &argvars[1], rettv);
+	set_buffer_मगा_लिन्या(curbuf, lnum, TRUE, &argvars[1], rettv);
 }
 
 /*
  * Set or append lines to a buffer.
  */
     static void
-buf_set_append_line(typval_T *argvars, typval_T *rettv, int append)
+buf_set_append_लिन्या(typval_T *argvars, typval_T *rettv, int append)
 {
     linenr_T	lnum;
     buf_T	*buf;
@@ -352,17 +352,17 @@ buf_set_append_line(typval_T *argvars, typval_T *rettv, int append)
     if (in_vim9script()
 	    && (check_for_buffer_arg(argvars, 0) == FAIL
 		|| check_for_lnum_arg(argvars, 1) == FAIL
-		|| check_for_string_or_number_or_list_arg(argvars, 2) == FAIL))
+		|| check_for_string_or_नुमेरो_or_list_arg(argvars, 2) == FAIL))
 	return;
 
     buf = tv_get_buf(&argvars[0], FALSE);
     if (buf == NULL)
-	rettv->vval.v_number = 1; // FAIL
+	rettv->vval.v_नुमेरो = 1; // FAIL
     else
     {
 	lnum = tv_get_lnum_buf(&argvars[1], buf);
 	if (did_emsg == did_emsg_before)
-	    set_buffer_lines(buf, lnum, append, &argvars[2], rettv);
+	    set_buffer_मगा_लिन्या(buf, lnum, append, &argvars[2], rettv);
     }
 }
 
@@ -372,7 +372,7 @@ buf_set_append_line(typval_T *argvars, typval_T *rettv, int append)
     void
 f_appendbufline(typval_T *argvars, typval_T *rettv)
 {
-    buf_set_append_line(argvars, rettv, TRUE);
+    buf_set_append_लिन्या(argvars, rettv, TRUE);
 }
 
 /*
@@ -387,7 +387,7 @@ f_bufadd(typval_T *argvars, typval_T *rettv)
 	return;
 
     name = tv_get_string(&argvars[0]);
-    rettv->vval.v_number = buflist_add(*name == NUL ? NULL : name, 0);
+    rettv->vval.v_नुमेरो = buflist_add(*name == NUL ? NULL : name, 0);
 }
 
 /*
@@ -399,7 +399,7 @@ f_bufexists(typval_T *argvars, typval_T *rettv)
     if (in_vim9script() && check_for_buffer_arg(argvars, 0) == FAIL)
 	return;
 
-    rettv->vval.v_number = (find_buffer(&argvars[0]) != NULL);
+    rettv->vval.v_नुमेरो = (find_buffer(&argvars[0]) != NULL);
 }
 
 /*
@@ -414,7 +414,7 @@ f_buflisted(typval_T *argvars, typval_T *rettv)
 	return;
 
     buf = find_buffer(&argvars[0]);
-    rettv->vval.v_number = (buf != NULL && buf->b_p_bl);
+    rettv->vval.v_नुमेरो = (buf != NULL && buf->b_p_bl);
 }
 
 /*
@@ -445,7 +445,7 @@ f_bufloaded(typval_T *argvars, typval_T *rettv)
 	return;
 
     buf = find_buffer(&argvars[0]);
-    rettv->vval.v_number = (buf != NULL && buf->b_ml.ml_mfp != NULL);
+    rettv->vval.v_नुमेरो = (buf != NULL && buf->b_ml.ml_mfp != NULL);
 }
 
 /*
@@ -503,9 +503,9 @@ f_bufnr(typval_T *argvars, typval_T *rettv)
 	buf = buflist_new(name, NULL, (linenr_T)1, 0);
 
     if (buf != NULL)
-	rettv->vval.v_number = buf->b_fnum;
+	rettv->vval.v_नुमेरो = buf->b_fnum;
     else
-	rettv->vval.v_number = -1;
+	rettv->vval.v_नुमेरो = -1;
 }
 
     static void
@@ -525,7 +525,7 @@ buf_win_common(typval_T *argvars, typval_T *rettv, int get_nr)
 	if (wp->w_buffer == buf)
 	    break;
     }
-    rettv->vval.v_number = (wp != NULL ? (get_nr ? winnr : wp->w_id) : -1);
+    rettv->vval.v_नुमेरो = (wp != NULL ? (get_nr ? winnr : wp->w_id) : -1);
 }
 
 /*
@@ -555,13 +555,13 @@ f_deletebufline(typval_T *argvars, typval_T *rettv)
     buf_T	*buf;
     linenr_T	first, last;
     linenr_T	lnum;
-    long	count;
+    long	बिलांग;
     int		is_curbuf;
     tabpage_T	*tp;
     win_T	*wp;
     int		did_emsg_before = did_emsg;
 
-    rettv->vval.v_number = 1;	// FAIL by default
+    rettv->vval.v_नुमेरो = 1;	// FAIL by default
 
     if (in_vim9script()
 	    && (check_for_buffer_arg(argvars, 0) == FAIL
@@ -582,7 +582,7 @@ f_deletebufline(typval_T *argvars, typval_T *rettv)
 	last = first;
 
     if (buf->b_ml.ml_mfp == NULL || first < 1
-			   || first > buf->b_ml.ml_line_count || last < first)
+			   || first > buf->b_ml.ml_लिन्या_बिलांग || last < first)
 	return;
 
     // After this don't use "return", goto "cleanup"!
@@ -592,9 +592,9 @@ f_deletebufline(typval_T *argvars, typval_T *rettv)
 	// set "curbuf" to "buf" and find a window for this buffer
 	change_other_buffer_prepare(&cob, buf);
 
-    if (last > curbuf->b_ml.ml_line_count)
-	last = curbuf->b_ml.ml_line_count;
-    count = last - first + 1;
+    if (last > curbuf->b_ml.ml_लिन्या_बिलांग)
+	last = curbuf->b_ml.ml_लिन्या_बिलांग;
+    बिलांग = last - first + 1;
 
     // When coming here from Insert mode, sync undo, so that this can be
     // undone separately from what was previously inserted.
@@ -614,18 +614,18 @@ f_deletebufline(typval_T *argvars, typval_T *rettv)
 	if (wp->w_buffer == buf)
 	{
 	    if (wp->w_cursor.lnum > last)
-		wp->w_cursor.lnum -= count;
+		wp->w_cursor.lnum -= बिलांग;
 	    else if (wp->w_cursor.lnum > first)
 		wp->w_cursor.lnum = first;
-	    if (wp->w_cursor.lnum > wp->w_buffer->b_ml.ml_line_count)
-		wp->w_cursor.lnum = wp->w_buffer->b_ml.ml_line_count;
+	    if (wp->w_cursor.lnum > wp->w_buffer->b_ml.ml_लिन्या_बिलांग)
+		wp->w_cursor.lnum = wp->w_buffer->b_ml.ml_लिन्या_बिलांग;
 	    wp->w_valid = 0;
 	    if (wp->w_cursor.lnum <= wp->w_topline)
 		wp->w_topline = 1;
 	}
     check_cursor_col();
-    deleted_lines_mark(first, count);
-    rettv->vval.v_number = 0; // OK
+    deleted_मगा_लिन्या_mark(first, बिलांग);
+    rettv->vval.v_नुमेरो = 0; // OK
 
 cleanup:
     if (!is_curbuf)
@@ -647,18 +647,18 @@ get_buffer_info(buf_T *buf)
     if (dict == NULL)
 	return NULL;
 
-    dict_add_number(dict, "bufnr", buf->b_fnum);
+    dict_add_नुमेरो(dict, "bufnr", buf->b_fnum);
     dict_add_string(dict, "name", buf->b_ffname);
-    dict_add_number(dict, "lnum", buf == curbuf ? curwin->w_cursor.lnum
+    dict_add_नुमेरो(dict, "lnum", buf == curbuf ? curwin->w_cursor.lnum
 						     : buflist_findlnum(buf));
-    dict_add_number(dict, "linecount", buf->b_ml.ml_line_count);
-    dict_add_number(dict, "loaded", buf->b_ml.ml_mfp != NULL);
-    dict_add_number(dict, "listed", buf->b_p_bl);
-    dict_add_number(dict, "changed", bufIsChanged(buf));
-    dict_add_number(dict, "changedtick", CHANGEDTICK(buf));
-    dict_add_number(dict, "hidden",
+    dict_add_नुमेरो(dict, "linecount", buf->b_ml.ml_लिन्या_बिलांग);
+    dict_add_नुमेरो(dict, "loaded", buf->b_ml.ml_mfp != NULL);
+    dict_add_नुमेरो(dict, "listed", buf->b_p_bl);
+    dict_add_नुमेरो(dict, "changed", bufIsChanged(buf));
+    dict_add_नुमेरो(dict, "changedtick", CHANGEDTICK(buf));
+    dict_add_नुमेरो(dict, "hidden",
 			    buf->b_ml.ml_mfp != NULL && buf->b_nwindows == 0);
-    dict_add_number(dict, "command", buf == cmdwin_buf);
+    dict_add_नुमेरो(dict, "command", buf == cmdwin_buf);
 
     // Get a reference to buffer variables
     dict_add_dict(dict, "variables", buf->b_vars);
@@ -669,7 +669,7 @@ get_buffer_info(buf_T *buf)
     {
 	FOR_ALL_TAB_WINDOWS(tp, wp)
 	    if (wp->w_buffer == buf)
-		list_append_number(windows, (varnumber_T)wp->w_id);
+		list_append_नुमेरो(windows, (varnumber_T)wp->w_id);
 	dict_add_list(dict, "windows", windows);
     }
 
@@ -680,11 +680,11 @@ get_buffer_info(buf_T *buf)
     {
 	FOR_ALL_POPUPWINS(wp)
 	    if (wp->w_buffer == buf)
-		list_append_number(windows, (varnumber_T)wp->w_id);
+		list_append_नुमेरो(windows, (varnumber_T)wp->w_id);
 	FOR_ALL_TABPAGES(tp)
 	    FOR_ALL_POPUPWINS_IN_TAB(tp, wp)
 		if (wp->w_buffer == buf)
-		    list_append_number(windows, (varnumber_T)wp->w_id);
+		    list_append_नुमेरो(windows, (varnumber_T)wp->w_id);
 
 	dict_add_list(dict, "popups", windows);
     }
@@ -704,7 +704,7 @@ get_buffer_info(buf_T *buf)
 # endif
 
 # ifdef FEAT_VIMINFO
-    dict_add_number(dict, "lastused", buf->b_last_used);
+    dict_add_नुमेरो(dict, "lastused", buf->b_last_used);
 # endif
 
     return dict;
@@ -778,7 +778,7 @@ f_getbufinfo(typval_T *argvars, typval_T *rettv)
  * If 'retlist' is TRUE, then the lines are returned as a Vim List.
  */
     static void
-get_buffer_lines(
+get_buffer_मगा_लिन्या(
     buf_T	*buf,
     linenr_T	start,
     linenr_T	end,
@@ -800,7 +800,7 @@ get_buffer_lines(
 
     if (!retlist)
     {
-	if (start >= 1 && start <= buf->b_ml.ml_line_count)
+	if (start >= 1 && start <= buf->b_ml.ml_लिन्या_बिलांग)
 	    rettv->vval.v_string =
 		vim_strnsave(ml_get_buf(buf, start, FALSE),
 		    ml_get_buf_len(buf, start));
@@ -813,13 +813,13 @@ get_buffer_lines(
 	listitem_T	*li;
 
 	start = MAX(start, 1);
-	end = MIN(end, buf->b_ml.ml_line_count);
+	end = MIN(end, buf->b_ml.ml_लिन्या_बिलांग);
 	if (end < start)
 	    goto nolist;
 
 	// The number of lines is known, so allocate the list and its items
 	// in one allocation.
-	l = list_alloc_with_items((int)(end - start + 1));
+	l = list_alloc_with_मगा_बागाय((int)(end - start + 1));
 	if (l == NULL)
 	    goto nolist;
 	rettv_list_set(rettv, l);
@@ -869,7 +869,7 @@ getbufline(typval_T *argvars, typval_T *rettv, int retlist)
 	    end = tv_get_lnum_buf(&argvars[2], buf);
     }
 
-    get_buffer_lines(buf, lnum, end, retlist, rettv);
+    get_buffer_मगा_लिन्या(buf, lnum, end, retlist, rettv);
 }
 
 /*
@@ -917,7 +917,7 @@ f_getline(typval_T *argvars, typval_T *rettv)
 	retlist = TRUE;
     }
 
-    get_buffer_lines(curbuf, lnum, end, retlist, rettv);
+    get_buffer_मगा_लिन्या(curbuf, lnum, end, retlist, rettv);
 }
 
 /*
@@ -926,7 +926,7 @@ f_getline(typval_T *argvars, typval_T *rettv)
     void
 f_setbufline(typval_T *argvars, typval_T *rettv)
 {
-    buf_set_append_line(argvars, rettv, FALSE);
+    buf_set_append_लिन्या(argvars, rettv, FALSE);
 }
 
 /*
@@ -943,7 +943,7 @@ f_setline(typval_T *argvars, typval_T *rettv)
 
     lnum = tv_get_lnum(&argvars[0]);
     if (did_emsg == did_emsg_before)
-	set_buffer_lines(curbuf, lnum, FALSE, &argvars[1], rettv);
+	set_buffer_मगा_लिन्या(curbuf, lnum, FALSE, &argvars[1], rettv);
 }
 #endif  // FEAT_EVAL
 

@@ -7,7 +7,7 @@ int main(int argc, char *argv[])
 {
     FILE	*fpi, *fpo;
     char	cmd[132], buf[BUFSIZ], *argp, *error_file, target[132], *mms;
-    int		err = 0, err_line = 0;
+    int		err = 0, err_लिन्या = 0;
 
     mms = "mms";
     argc--;
@@ -49,17 +49,17 @@ int main(int argc, char *argv[])
     {
 	if (!memcmp(buf, "%CC-", 4))
 	{
-	    err_line++;
+	    err_लिन्या++;
 	    buf[strlen(buf)-1] = '\0';
 	    err++;
 	}
 	else
 	{
-	    if (err_line)
+	    if (err_लिन्या)
 	    {
 		if (strstr(buf, _("At line")))
 		{
-		    err_line = 0;
+		    err_लिन्या = 0;
 		    fprintf(fpo, "@");
 		}
 		else

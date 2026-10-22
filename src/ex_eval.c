@@ -52,8 +52,8 @@ static char	*get_end_emsg(cstack_T *cstack);
  */
 #if 0
 // Expressions used for testing during the development phase.
-# define THROW_ON_ERROR		(!eval_to_number("$VIMNOERRTHROW"))
-# define THROW_ON_INTERRUPT	(!eval_to_number("$VIMNOINTTHROW"))
+# define THROW_ON_ERROR		(!eval_to_नुमेरो("$VIMNOERRTHROW"))
+# define THROW_ON_INTERRUPT	(!eval_to_नुमेरो("$VIMNOINTTHROW"))
 # define THROW_TEST
 #else
 // Values used for the Vim release.
@@ -245,9 +245,9 @@ cause_errthrow(
 	 * returned.  -  Throw only the first of several errors in a row, except
 	 * a severe error is following.
 	 */
-	if (msg_list != NULL)
+	if (मेनसाहे_list != NULL)
 	{
-	    plist = msg_list;
+	    plist = मेनसाहे_list;
 	    while (*plist != NULL)
 		plist = &(*plist)->next;
 
@@ -259,8 +259,8 @@ cause_errthrow(
 	    }
 	    else
 	    {
-		elem->msg = (char *)vim_strsave(mesg);
-		if (elem->msg == NULL)
+		elem->मेनसाहे = (char *)vim_strsave(mesg);
+		if (elem->मेनसाहे == NULL)
 		{
 		    vim_free(elem);
 		    suppress_errthrow = TRUE;
@@ -269,30 +269,30 @@ cause_errthrow(
 		else
 		{
 		    elem->next = NULL;
-		    elem->throw_msg = NULL;
+		    elem->throw_मेनसाहे = NULL;
 		    *plist = elem;
-		    if (plist == msg_list || severe)
+		    if (plist == मेनसाहे_list || severe)
 		    {
 			char	    *tmsg;
 
 			// Skip the extra "Vim " prefix for message "E457".
-			tmsg = elem->msg;
+			tmsg = elem->मेनसाहे;
 			if (STRNCMP(tmsg, "Vim E", 5) == 0
 				&& VIM_ISDIGIT(tmsg[5])
 				&& VIM_ISDIGIT(tmsg[6])
 				&& VIM_ISDIGIT(tmsg[7])
 				&& tmsg[8] == ':'
 				&& tmsg[9] == ' ')
-			    (*msg_list)->throw_msg = &tmsg[4];
+			    (*मेनसाहे_list)->throw_मेनसाहे = &tmsg[4];
 			else
-			    (*msg_list)->throw_msg = tmsg;
+			    (*मेनसाहे_list)->throw_मेनसाहे = tmsg;
 		    }
 
 		    // Get the source name and lnum now, it may change before
 		    // reaching do_errthrow().
 		    elem->sfile = estack_sfile(ESTACK_NONE);
 		    elem->slnum = SOURCING_LNUM;
-		    elem->msg_compiling = estack_compiling;
+		    elem->मेनसाहे_compiling = estack_compiling;
 		}
 	    }
 	}
@@ -312,7 +312,7 @@ free_msglist(msglist_T *l)
     while (messages != NULL)
     {
 	next = messages->next;
-	vim_free(messages->msg);
+	vim_free(messages->मेनसाहे);
 	vim_free(messages->sfile);
 	vim_free(messages);
 	messages = next;
@@ -326,8 +326,8 @@ free_msglist(msglist_T *l)
     void
 free_global_msglist(void)
 {
-    free_msglist(*msg_list);
-    *msg_list = NULL;
+    free_msglist(*मेनसाहे_list);
+    *मेनसाहे_list = NULL;
 }
 
 /*
@@ -350,11 +350,11 @@ do_errthrow(cstack_T *cstack, char_u *cmdname)
 
     // If no exception is to be thrown or the conversion should be done after
     // returning to a previous invocation of do_one_cmd(), do nothing.
-    if (msg_list == NULL || *msg_list == NULL)
+    if (मेनसाहे_list == NULL || *मेनसाहे_list == NULL)
 	return;
 
-    if (throw_exception(*msg_list, ET_ERROR, cmdname) == FAIL)
-	free_msglist(*msg_list);
+    if (throw_exception(*मेनसाहे_list, ET_ERROR, cmdname) == FAIL)
+	free_msglist(*मेनसाहे_list);
     else
     {
 	if (cstack != NULL)
@@ -362,7 +362,7 @@ do_errthrow(cstack_T *cstack, char_u *cmdname)
 	else
 	    need_rethrow = TRUE;
     }
-    *msg_list = NULL;
+    *मेनसाहे_list = NULL;
 }
 
 /*
@@ -422,7 +422,7 @@ do_intthrow(cstack_T *cstack)
  */
     char *
 get_exception_string(
-    void	*value,
+    void	*हालागा,
     except_type_T type,
     char_u	*cmdname,
     int		*should_free)
@@ -435,7 +435,7 @@ get_exception_string(
     if (type == ET_ERROR)
     {
 	*should_free = TRUE;
-	mesg = ((msglist_T *)value)->throw_msg;
+	mesg = ((msglist_T *)हालागा)->throw_मेनसाहे;
 	if (cmdname != NULL && *cmdname != NUL)
 	{
 	    cmdlen = (int)STRLEN(cmdname);
@@ -491,7 +491,7 @@ get_exception_string(
     else
     {
 	*should_free = FALSE;
-	ret = value;
+	ret = हालागा;
     }
 
     return ret;
@@ -505,7 +505,7 @@ get_exception_string(
  * error exception.
  */
     int
-throw_exception(void *value, except_type_T type, char_u *cmdname)
+throw_exception(void *हालागा, except_type_T type, char_u *cmdname)
 {
     except_T	*excp;
     int		should_free;
@@ -517,9 +517,9 @@ throw_exception(void *value, except_type_T type, char_u *cmdname)
      */
     if (type == ET_USER)
     {
-	if (STRNCMP((char_u *)value, "Vim", 3) == 0
-		&& (((char_u *)value)[3] == NUL || ((char_u *)value)[3] == ':'
-		    || ((char_u *)value)[3] == '('))
+	if (STRNCMP((char_u *)हालागा, "Vim", 3) == 0
+		&& (((char_u *)हालागा)[3] == NUL || ((char_u *)हालागा)[3] == ':'
+		    || ((char_u *)हालागा)[3] == '('))
 	{
 	    emsg(_(e_cannot_throw_exceptions_with_vim_prefix));
 	    goto fail;
@@ -533,16 +533,16 @@ throw_exception(void *value, except_type_T type, char_u *cmdname)
     if (type == ET_ERROR)
 	// Store the original message and prefix the exception value with
 	// "Vim:" or, if a command name is given, "Vim(cmdname):".
-	excp->messages = (msglist_T *)value;
+	excp->messages = (msglist_T *)हालागा;
 
-    excp->value = get_exception_string(value, type, cmdname, &should_free);
-    if (excp->value == NULL && should_free)
+    excp->हालागा = get_exception_string(हालागा, type, cmdname, &should_free);
+    if (excp->हालागा == NULL && should_free)
 	goto nomem;
 
     excp->type = type;
-    if (type == ET_ERROR && ((msglist_T *)value)->sfile != NULL)
+    if (type == ET_ERROR && ((msglist_T *)हालागा)->sfile != NULL)
     {
-	msglist_T *entry = (msglist_T *)value;
+	msglist_T *entry = (msglist_T *)हालागा;
 
 	excp->throw_name = entry->sfile;
 	entry->sfile = NULL;
@@ -556,7 +556,7 @@ throw_exception(void *value, except_type_T type, char_u *cmdname)
 	if (excp->throw_name == NULL)
 	{
 	    if (should_free)
-		vim_free(excp->value);
+		vim_free(excp->हालागा);
 	    goto nomem;
 	}
 	excp->throw_lnum = SOURCING_LNUM;
@@ -568,24 +568,24 @@ throw_exception(void *value, except_type_T type, char_u *cmdname)
 
     if (p_verbose >= 13 || debug_break_level > 0)
     {
-	int	save_msg_silent = msg_silent;
+	int	save_मेनसाहे_silent = मेनसाहे_silent;
 
 	if (debug_break_level > 0)
-	    msg_silent = FALSE;		// display messages
+	    मेनसाहे_silent = FALSE;		// display messages
 	else
 	    verbose_enter();
 	++no_wait_return;
 	if (debug_break_level > 0 || *p_vfile == NUL)
-	    msg_scroll = TRUE;	    // always scroll up, don't overwrite
+	    मेनसाहे_scroll = TRUE;	    // always scroll up, don't overwrite
 
-	smsg(_("Exception thrown: %s"), excp->value);
-	msg_puts("\n");   // don't overwrite this either
+	smsg(_("Exception thrown: %s"), excp->हालागा);
+	मेनसाहे_puts("\n");   // don't overwrite this either
 
 	if (debug_break_level > 0 || *p_vfile == NUL)
-	    cmdline_row = msg_row;
+	    cmdline_row = मेनसाहे_row;
 	--no_wait_return;
 	if (debug_break_level > 0)
-	    msg_silent = save_msg_silent;
+	    मेनसाहे_silent = save_मेनसाहे_silent;
 	else
 	    verbose_leave();
     }
@@ -621,33 +621,33 @@ discard_exception(except_T *excp, int was_finished)
 
     if (p_verbose >= 13 || debug_break_level > 0)
     {
-	int	save_msg_silent = msg_silent;
+	int	save_मेनसाहे_silent = मेनसाहे_silent;
 
 	saved_IObuff = vim_strsave(IObuff);
 	if (debug_break_level > 0)
-	    msg_silent = FALSE;		// display messages
+	    मेनसाहे_silent = FALSE;		// display messages
 	else
 	    verbose_enter();
 	++no_wait_return;
 	if (debug_break_level > 0 || *p_vfile == NUL)
-	    msg_scroll = TRUE;	    // always scroll up, don't overwrite
+	    मेनसाहे_scroll = TRUE;	    // always scroll up, don't overwrite
 	smsg(was_finished
 		    ? _("Exception finished: %s")
 		    : _("Exception discarded: %s"),
-		excp->value);
-	msg_puts("\n");   // don't overwrite this either
+		excp->हालागा);
+	मेनसाहे_puts("\n");   // don't overwrite this either
 	if (debug_break_level > 0 || *p_vfile == NUL)
-	    cmdline_row = msg_row;
+	    cmdline_row = मेनसाहे_row;
 	--no_wait_return;
 	if (debug_break_level > 0)
-	    msg_silent = save_msg_silent;
+	    मेनसाहे_silent = save_मेनसाहे_silent;
 	else
 	    verbose_leave();
 	STRCPY(IObuff, saved_IObuff);
 	vim_free(saved_IObuff);
     }
     if (excp->type != ET_INTERRUPT)
-	vim_free(excp->value);
+	vim_free(excp->हालागा);
     if (excp->type == ET_ERROR)
 	free_msglist(excp->messages);
     vim_free(excp->throw_name);
@@ -673,9 +673,9 @@ discard_current_exception(void)
     void
 catch_exception(except_T *excp)
 {
-    excp->caught = caught_stack;
-    caught_stack = excp;
-    set_vim_var_string(VV_EXCEPTION, (char_u *)excp->value, -1);
+    excp->caught = caught_सालानसान;
+    caught_सालानसान = excp;
+    set_vim_var_string(VV_EXCEPTION, (char_u *)excp->हालागा, -1);
     set_vim_var_list(VV_STACKTRACE, excp->stacktrace);
     if (*excp->throw_name != NUL)
     {
@@ -694,24 +694,24 @@ catch_exception(except_T *excp)
 
     if (p_verbose >= 13 || debug_break_level > 0)
     {
-	int	save_msg_silent = msg_silent;
+	int	save_मेनसाहे_silent = मेनसाहे_silent;
 
 	if (debug_break_level > 0)
-	    msg_silent = FALSE;		// display messages
+	    मेनसाहे_silent = FALSE;		// display messages
 	else
 	    verbose_enter();
 	++no_wait_return;
 	if (debug_break_level > 0 || *p_vfile == NUL)
-	    msg_scroll = TRUE;	    // always scroll up, don't overwrite
+	    मेनसाहे_scroll = TRUE;	    // always scroll up, don't overwrite
 
-	smsg(_("Exception caught: %s"), excp->value);
-	msg_puts("\n");   // don't overwrite this either
+	smsg(_("Exception caught: %s"), excp->हालागा);
+	मेनसाहे_puts("\n");   // don't overwrite this either
 
 	if (debug_break_level > 0 || *p_vfile == NUL)
-	    cmdline_row = msg_row;
+	    cmdline_row = मेनसाहे_row;
 	--no_wait_return;
 	if (debug_break_level > 0)
-	    msg_silent = save_msg_silent;
+	    मेनसाहे_silent = save_मेनसाहे_silent;
 	else
 	    verbose_leave();
     }
@@ -723,24 +723,24 @@ catch_exception(except_T *excp)
     void
 finish_exception(except_T *excp)
 {
-    if (excp != caught_stack)
+    if (excp != caught_सालानसान)
 	internal_error("finish_exception()");
-    caught_stack = caught_stack->caught;
-    if (caught_stack != NULL)
+    caught_सालानसान = caught_सालानसान->caught;
+    if (caught_सालानसान != NULL)
     {
-	set_vim_var_string(VV_EXCEPTION, (char_u *)caught_stack->value, -1);
-	set_vim_var_list(VV_STACKTRACE, caught_stack->stacktrace);
-	if (*caught_stack->throw_name != NUL)
+	set_vim_var_string(VV_EXCEPTION, (char_u *)caught_सालानसान->हालागा, -1);
+	set_vim_var_list(VV_STACKTRACE, caught_सालानसान->stacktrace);
+	if (*caught_सालानसान->throw_name != NUL)
 	{
 	    size_t  IObufflen;
 
-	    if (caught_stack->throw_lnum != 0)
+	    if (caught_सालानसान->throw_lnum != 0)
 		IObufflen = vim_snprintf_safelen((char *)IObuff, IOSIZE,
-			_("%s, line %ld"), caught_stack->throw_name,
-			(long)caught_stack->throw_lnum);
+			_("%s, line %ld"), caught_सालानसान->throw_name,
+			(long)caught_सालानसान->throw_lnum);
 	    else
 		IObufflen = vim_snprintf_safelen((char *)IObuff, IOSIZE, "%s",
-						    caught_stack->throw_name);
+						    caught_सालानसान->throw_name);
 	    set_vim_var_string(VV_THROWPOINT, IObuff, (int)IObufflen);
 	}
 	else
@@ -816,11 +816,11 @@ exception_state_clear(void)
  * or the exception value for a pending exception.
  */
     static void
-report_pending(int action, int pending, void *value)
+report_pending(int action, int pending, void *हालागा)
 {
     char	*mesg;
     char	*s;
-    int		save_msg_silent;
+    int		save_मेनसाहे_silent;
 
 
     switch (action)
@@ -853,7 +853,7 @@ report_pending(int action, int pending, void *value)
 	    break;
 	case CSTP_RETURN:
 	    // ":return" command producing value, allocated
-	    s = (char *)get_return_cmd(value);
+	    s = (char *)get_return_cmd(हालागा);
 	    break;
 
 	default:
@@ -862,7 +862,7 @@ report_pending(int action, int pending, void *value)
 		vim_snprintf((char *)IObuff, IOSIZE, mesg, _("Exception"));
 		mesg = (char *)vim_strnsave(IObuff, STRLEN(IObuff) + 4);
 		STRCAT(mesg, ": %s");
-		s = (char *)((except_T *)value)->value;
+		s = (char *)((except_T *)हालागा)->हालागा;
 	    }
 	    else if ((pending & CSTP_ERROR) && (pending & CSTP_INTERRUPT))
 		s = _("Error and interrupt");
@@ -872,17 +872,17 @@ report_pending(int action, int pending, void *value)
 		s = _("Interrupt");
     }
 
-    save_msg_silent = msg_silent;
+    save_मेनसाहे_silent = मेनसाहे_silent;
     if (debug_break_level > 0)
-	msg_silent = FALSE;	// display messages
+	मेनसाहे_silent = FALSE;	// display messages
     ++no_wait_return;
-    msg_scroll = TRUE;		// always scroll up, don't overwrite
+    मेनसाहे_scroll = TRUE;		// always scroll up, don't overwrite
     smsg(mesg, s);
-    msg_puts("\n");   // don't overwrite this either
-    cmdline_row = msg_row;
+    मेनसाहे_puts("\n");   // don't overwrite this either
+    cmdline_row = मेनसाहे_row;
     --no_wait_return;
     if (debug_break_level > 0)
-	msg_silent = save_msg_silent;
+	मेनसाहे_silent = save_मेनसाहे_silent;
 
     if (pending == CSTP_RETURN)
 	vim_free(s);
@@ -895,13 +895,13 @@ report_pending(int action, int pending, void *value)
  * the 'verbose' option or when debugging.
  */
     void
-report_make_pending(int pending, void *value)
+report_make_pending(int pending, void *हालागा)
 {
     if (p_verbose >= 14 || debug_break_level > 0)
     {
 	if (debug_break_level <= 0)
 	    verbose_enter();
-	report_pending(RP_MAKE, pending, value);
+	report_pending(RP_MAKE, pending, हालागा);
 	if (debug_break_level <= 0)
 	    verbose_leave();
     }
@@ -912,13 +912,13 @@ report_make_pending(int pending, void *value)
  * it if required by the 'verbose' option or when debugging.
  */
     static void
-report_resume_pending(int pending, void *value)
+report_resume_pending(int pending, void *हालागा)
 {
     if (p_verbose >= 14 || debug_break_level > 0)
     {
 	if (debug_break_level <= 0)
 	    verbose_enter();
-	report_pending(RP_RESUME, pending, value);
+	report_pending(RP_RESUME, pending, हालागा);
 	if (debug_break_level <= 0)
 	    verbose_leave();
     }
@@ -929,13 +929,13 @@ report_resume_pending(int pending, void *value)
  * by the 'verbose' option or when debugging.
  */
     static void
-report_discard_pending(int pending, void *value)
+report_discard_pending(int pending, void *हालागा)
 {
     if (p_verbose >= 14 || debug_break_level > 0)
     {
 	if (debug_break_level <= 0)
 	    verbose_enter();
-	report_pending(RP_DISCARD, pending, value);
+	report_pending(RP_DISCARD, pending, हालागा);
 	if (debug_break_level <= 0)
 	    verbose_leave();
     }
@@ -1278,7 +1278,7 @@ ex_while(exarg_T *eap)
 	{
 	    enter_block(cstack);
 	    ++cstack->cs_looplevel;
-	    cstack->cs_line[cstack->cs_idx] = -1;
+	    cstack->cs_लिन्या[cstack->cs_idx] = -1;
 	}
 	else
 	{
@@ -1357,14 +1357,14 @@ ex_while(exarg_T *eap)
 		error = FALSE;
 
 		// the "in expr" is not used, skip over it
-		skip_for_lines(fi, &evalarg);
+		skip_for_मगा_लिन्या(fi, &evalarg);
 	    }
 	    else
 	    {
 		long save_lnum = SOURCING_LNUM;
 
 		// Evaluate the argument and get the info in a structure.
-		fi = eval_for_line(eap->arg, &error, eap, &evalarg);
+		fi = eval_for_लिन्या(eap->arg, &error, eap, &evalarg);
 		cstack->cs_forinfo[cstack->cs_idx] = fi;
 
 		// Errors should use the first line number.
@@ -1640,22 +1640,22 @@ inside_block(exarg_T *eap)
 ex_throw(exarg_T *eap)
 {
     char_u	*arg = eap->arg;
-    char_u	*value;
+    char_u	*हालागा;
 
     if (*arg != NUL && *arg != '|' && *arg != '\n')
-	value = eval_to_string_skip(arg, eap, eap->skip);
+	हालागा = eval_to_string_skip(arg, eap, eap->skip);
     else
     {
 	emsg(_(e_argument_required));
-	value = NULL;
+	हालागा = NULL;
     }
 
     // On error or when an exception is thrown during argument evaluation, do
     // not throw.
-    if (!eap->skip && value != NULL)
+    if (!eap->skip && हालागा != NULL)
     {
-	if (throw_exception(value, ET_USER, NULL) == FAIL)
-	    vim_free(value);
+	if (throw_exception(हालागा, ET_USER, NULL) == FAIL)
+	    vim_free(हालागा);
 	else
 	    do_throw(eap->cstack);
     }
@@ -1734,9 +1734,9 @@ do_throw(cstack_T *cstack)
 	 * End the current script or function.  The exception will be rethrown
 	 * in the caller.
 	 */
-	if (getline_equal(eap->getline, eap->cookie, get_func_line))
+	if (getline_equal(eap->getline, eap->cookie, get_func_लिन्या))
 	    current_funccal->returned = TRUE;
-	elseif (eap->get_func_line == getsourceline)
+	elseif (eap->get_func_लिन्या == getsourceline)
 	    ((struct source_cookie *)eap->cookie)->finished = TRUE;
     }
 #endif
@@ -1946,7 +1946,7 @@ ex_catch(exarg_T *eap)
 		    prev_got_int = got_int;
 		    got_int = FALSE;
 		    caught = vim_regexec_nl(&regmatch,
-			       (char_u *)current_exception->value, (colnr_T)0);
+			       (char_u *)current_exception->हालागा, (colnr_T)0);
 		    got_int |= prev_got_int;
 		    vim_regfree(regmatch.regprog);
 		}
@@ -2438,7 +2438,7 @@ leave_cleanup(cleanup_T *csp)
 
 	// If an error was about to be converted to an exception when
 	// enter_cleanup() was called, free the message list.
-	if (msg_list != NULL)
+	if (मेनसाहे_list != NULL)
 	    free_global_msglist();
     }
 

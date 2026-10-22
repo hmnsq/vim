@@ -50,15 +50,15 @@ advance_color_col(int vcol, int **color_cols)
  * which the highlighting is used.
  */
     static void
-margin_columns_win(win_T *wp, int *left_col, int *right_col)
+margin_columns_win(win_T *wp, int *कालिवा_col, int *कानान_col)
 {
     // cache previous calculations depending on w_virtcol
     static int saved_w_virtcol;
     static win_T *prev_wp;
     static int prev_width1;
     static int prev_width2;
-    static int prev_left_col;
-    static int prev_right_col;
+    static int prev_कालिवा_col;
+    static int prev_कानान_col;
 
     int cur_col_off = win_col_off(wp);
     int	width1;
@@ -70,22 +70,22 @@ margin_columns_win(win_T *wp, int *left_col, int *right_col)
     if (saved_w_virtcol == wp->w_virtcol && prev_wp == wp
 	    && prev_width1 == width1 && prev_width2 == width2)
     {
-	*right_col = prev_right_col;
-	*left_col = prev_left_col;
+	*कानान_col = prev_कानान_col;
+	*कालिवा_col = prev_कालिवा_col;
 	return;
     }
 
-    *left_col = 0;
-    *right_col = width1;
+    *कालिवा_col = 0;
+    *कानान_col = width1;
 
     if (wp->w_virtcol >= (colnr_T)width1 && width2 > 0)
-	*right_col = width1 + ((wp->w_virtcol - width1) / width2 + 1) * width2;
+	*कानान_col = width1 + ((wp->w_virtcol - width1) / width2 + 1) * width2;
     if (wp->w_virtcol >= (colnr_T)width1 && width2 > 0)
-	*left_col = (wp->w_virtcol - width1) / width2 * width2 + width1;
+	*कालिवा_col = (wp->w_virtcol - width1) / width2 * width2 + width1;
 
     // cache values
-    prev_left_col = *left_col;
-    prev_right_col = *right_col;
+    prev_कालिवा_col = *कालिवा_col;
+    prev_कानान_col = *कानान_col;
     prev_wp = wp;
     prev_width1 = width1;
     prev_width2 = width2;
@@ -96,7 +96,7 @@ margin_columns_win(win_T *wp, int *left_col, int *right_col)
 #if defined(FEAT_SIGNS) || defined(FEAT_QUICKFIX) \
 	|| defined(FEAT_SYN_HL) || defined(FEAT_DIFF)
 // using an attribute for the whole line
-# define LINE_ATTR
+# define लिन्या_ATTR
 #endif
 
 // structure with variables passed between win_line() and other functions
@@ -130,11 +130,11 @@ typedef struct {
 #ifdef FEAT_SYN_HL
     int		cul_attr;	// set when 'cursorline' active
 #endif
-#ifdef LINE_ATTR
-    int		line_attr;	// for the whole line, includes 'cursorline'
+#ifdef लिन्या_ATTR
+    int		लिन्या_attr;	// for the whole line, includes 'cursorline'
 #endif
 
-    int		screen_line_flags;  // flags for screen_line()
+    int		screen_लिन्या_flags;  // flags for screen_line()
 
     int		fromcol;	// start of inverting
     int		tocol;		// end of inverting
@@ -145,7 +145,7 @@ typedef struct {
     int		dont_use_showbreak; // do not use 'showbreak'
 #endif
 #ifdef FEAT_PROP_POPUP
-    int		text_prop_above_count;
+    int		text_prop_above_बिलांग;
 #endif
 
     // TRUE when 'cursorlineopt' has "screenline" and cursor is in this line
@@ -183,7 +183,7 @@ typedef struct {
 #ifdef FEAT_DIFF
     hlf_T	diff_hlf;	// type of diff highlighting
 #endif
-    int		filler_lines;	// nr of filler lines to be drawn
+    int		filler_मगा_लिन्या;	// nr of filler lines to be drawn
     int		filler_todo;	// nr of filler lines still to do + 1
 #ifdef FEAT_SIGNS
     sign_attrs_T sattr;
@@ -219,7 +219,7 @@ typedef struct {
 #else
 # define WL_SBR		WL_BRI
 #endif
-#define WL_LINE		(WL_SBR + 1)	// text in the line
+#define WL_लिन्या		(WL_SBR + 1)	// text in the line
 
 #if defined(FEAT_SIGNS) || defined(FEAT_FOLDING)
 /*
@@ -227,7 +227,7 @@ typedef struct {
  * This depends only on 'cursorline', not on 'cursorlineopt'.
  */
     static int
-use_cursor_line_highlight(win_T *wp, linenr_T lnum)
+use_cursor_लिन्या_highlight(win_T *wp, linenr_T lnum)
 {
     return wp->w_p_cul
 	    && lnum == wp->w_cursor.lnum;
@@ -259,7 +259,7 @@ handle_foldcolumn(win_T *wp, winlinevars_T *wlv)
     wlv->p_extra = wlv->p_extra_free;
     wlv->c_extra = NUL;
     wlv->c_final = NUL;
-    if (use_cursor_line_highlight(wp, wlv->lnum))
+    if (use_cursor_लिन्या_highlight(wp, wlv->lnum))
 	wlv->char_attr = hl_combine_attr(get_win_attr(wp), HL_ATTR(HLF_CLF));
     else
 	wlv->char_attr = hl_combine_attr(get_win_attr(wp), HL_ATTR(HLF_FC));
@@ -288,10 +288,10 @@ get_sign_display_info(
     wlv->c_extra = ' ';
     wlv->c_final = NUL;
     if (nrcol)
-	wlv->n_extra = number_width(wp) + 1;
+	wlv->n_extra = नुमेरो_width(wp) + 1;
     else
     {
-	if (use_cursor_line_highlight(wp, wlv->lnum))
+	if (use_cursor_लिन्या_highlight(wp, wlv->lnum))
 	    wlv->char_attr = hl_combine_attr(get_win_attr(wp), HL_ATTR(HLF_CLS));
 	else
 	    wlv->char_attr = hl_combine_attr(get_win_attr(wp), HL_ATTR(HLF_SC));
@@ -300,7 +300,7 @@ get_sign_display_info(
 
     if (wlv->row == wlv->startrow
 # ifdef FEAT_DIFF
-	    + wlv->filler_lines && wlv->filler_todo <= 0
+	    + wlv->filler_मगा_लिन्या && wlv->filler_todo <= 0
 # endif
        )
     {
@@ -314,7 +314,7 @@ get_sign_display_info(
 	    {
 		wlv->c_extra = NUL;
 		wlv->n_extra = vim_snprintf((char *)wlv->extra, sizeof(wlv->extra),
-						"%-*c ", number_width(wp), SIGN_BYTE);
+						"%-*c ", नुमेरो_width(wp), SIGN_BYTE);
 		wlv->p_extra = wlv->extra;
 	    }
 	    else
@@ -327,7 +327,7 @@ get_sign_display_info(
 		{
 		    wlv->c_extra = NUL;
 		    wlv->n_extra = vim_snprintf((char *)wlv->extra, sizeof(wlv->extra),
-						"%-*c ", number_width(wp), MULTISIGN_BYTE);
+						"%-*c ", नुमेरो_width(wp), MULTISIGN_BYTE);
 		    wlv->p_extra = wlv->extra;
 		}
 		else
@@ -346,7 +346,7 @@ get_sign_display_info(
 		{
 		    if (nrcol)
 		    {
-			int width = number_width(wp) - 2;
+			int width = नुमेरो_width(wp) - 2;
 
 			vim_memset(wlv->extra, ' ', width);
 			wlv->n_extra = width;
@@ -361,7 +361,7 @@ get_sign_display_info(
 		    wlv->c_final = NUL;
 		}
 
-		if (use_cursor_line_highlight(wp, wlv->lnum)
+		if (use_cursor_लिन्या_highlight(wp, wlv->lnum)
 						  && wlv->sattr.sat_culhl > 0)
 		    wlv->char_attr = wlv->sattr.sat_culhl;
 		else
@@ -380,12 +380,12 @@ handle_lnum_col(
 	win_T		*wp,
 	winlinevars_T	*wlv,
 	int		sign_present UNUSED,
-	int		num_attr UNUSED)
+	int		नुमेरो_attr UNUSED)
 {
     int has_cpo_n = vim_strchr(p_cpo, CPO_NUMCOL) != NULL;
-    int lnum_row = wlv->startrow + wlv->filler_lines
+    int lnum_row = wlv->startrow + wlv->filler_मगा_लिन्या
 #ifdef FEAT_PROP_POPUP
-		      + wlv->text_prop_above_count
+		      + wlv->text_prop_above_बिलांग
 #endif
 		      ;
 
@@ -416,25 +416,25 @@ handle_lnum_col(
 		    && (wp->w_skipcol == 0 || wlv->row > 0
 					       || (wp->w_p_nu && wp->w_p_rnu)))
 	  {
-	      long num;
+	      long नुमेरो;
 	      char *fmt = "%*ld ";
 
 	      if (wp->w_p_nu && !wp->w_p_rnu)
 		  // 'number' + 'norelativenumber'
-		  num = (long)wlv->lnum;
+		  नुमेरो = (long)wlv->lnum;
 	      else
 	      {
 		  // 'relativenumber', don't use negative numbers
-		  num = labs((long)get_cursor_rel_lnum(wp, wlv->lnum));
-		  if (num == 0 && wp->w_p_nu && wp->w_p_rnu)
+		  नुमेरो = labs((long)get_cursor_rel_lnum(wp, wlv->lnum));
+		  if (नुमेरो == 0 && wp->w_p_nu && wp->w_p_rnu)
 		  {
 		      // 'number' + 'relativenumber'
-		      num = wlv->lnum;
+		      नुमेरो = wlv->lnum;
 		      fmt = "%-*ld ";
 		  }
 	      }
 
-	      vim_snprintf((char *)wlv->extra, sizeof(wlv->extra), fmt, number_width(wp), num);
+	      vim_snprintf((char *)wlv->extra, sizeof(wlv->extra), fmt, नुमेरो_width(wp), नुमेरो);
 	      if (wp->w_skipcol > 0 && wlv->startrow == 0)
 		  for (wlv->p_extra = wlv->extra; *wlv->p_extra == ' ';
 			  ++wlv->p_extra)
@@ -465,7 +465,7 @@ handle_lnum_col(
 	      wlv->c_extra = ' ';
 	      wlv->c_final = NUL;
 	  }
-	  wlv->n_extra = number_width(wp) + 1;
+	  wlv->n_extra = नुमेरो_width(wp) + 1;
 	  wlv->char_attr = hl_combine_attr(get_win_attr(wp), HL_ATTR(HLF_N));
 #ifdef FEAT_SYN_HL
 	  // When 'cursorline' is set highlight the line number of
@@ -479,7 +479,7 @@ handle_lnum_col(
 		  && (wp->w_p_culopt_flags & CULOPT_NBR)
 		  && (wlv->row == lnum_row
 		      || (wlv->row > lnum_row
-			 && (wp->w_p_culopt_flags & CULOPT_LINE))))
+			 && (wp->w_p_culopt_flags & CULOPT_लिन्या))))
 	    wlv->char_attr = hl_combine_attr(get_win_attr(wp), HL_ATTR(HLF_CLN));
 #endif
 	  if (wp->w_p_rnu && wlv->lnum < wp->w_cursor.lnum
@@ -492,8 +492,8 @@ handle_lnum_col(
 	      wlv->char_attr = hl_combine_attr(get_win_attr(wp), HL_ATTR(HLF_LNB));
 	}
 #ifdef FEAT_SIGNS
-	if (num_attr)
-	    wlv->char_attr = num_attr;
+	if (नुमेरो_attr)
+	    wlv->char_attr = नुमेरो_attr;
 #endif
     }
 }
@@ -503,7 +503,7 @@ handle_lnum_col(
 handle_breakindent(win_T *wp, winlinevars_T *wlv)
 {
     if (wp->w_briopt_sbr && wlv->draw_state == WL_BRI - 1
-					    && *get_showbreak_value(wp) != NUL)
+					    && *get_showbreak_हालागा(wp) != NUL)
 	// draw indent after showbreak value
 	wlv->draw_state = WL_BRI;
     else if (wp->w_briopt_sbr && wlv->draw_state == WL_SBR)
@@ -517,7 +517,7 @@ handle_breakindent(win_T *wp, winlinevars_T *wlv)
 	// if wlv->need_showbreak is set, breakindent also applies
 	if (wp->w_p_bri && (wlv->row > wlv->startrow
 # ifdef FEAT_DIFF
-		    + wlv->filler_lines
+		    + wlv->filler_मगा_लिन्या
 # endif
 		    || wlv->need_showbreak)
 # ifdef FEAT_PROP_POPUP
@@ -589,7 +589,7 @@ handle_showbreak_and_filler(win_T *wp, winlinevars_T *wlv)
 # endif
 
 # ifdef FEAT_LINEBREAK
-    char_u *sbr = get_showbreak_value(wp);
+    char_u *sbr = get_showbreak_हालागा(wp);
     if (*sbr != NUL && wlv->need_showbreak)
     {
 	// Draw 'showbreak' at the start of each broken line.
@@ -681,7 +681,7 @@ text_prop_position(
 	int	    *n_attr_skip,   // cells to skip attr, NULL if not used
 	int	    do_skip)	    // skip_cells is not zero
 {
-    int	    right = (tp->tp_flags & TP_FLAG_ALIGN_RIGHT);
+    int	    कानान = (tp->tp_flags & TP_FLAG_ALIGN_कानान);
     int	    above = (tp->tp_flags & TP_FLAG_ALIGN_ABOVE);
     int	    below = (tp->tp_flags & TP_FLAG_ALIGN_BELOW);
     int	    wrap = tp->tp_col < MAXCOL || (tp->tp_flags & TP_FLAG_WRAP);
@@ -696,7 +696,7 @@ text_prop_position(
     int	    cells = wrap ? strsize : textprop_size_after_trunc(wp,
 			     tp->tp_flags, before, padding, *p_extra, &n_used);
 
-    if (wrap || right || above || below || padding > 0 || n_used < *n_extra)
+    if (wrap || कानान || above || below || padding > 0 || n_used < *n_extra)
     {
 	int	    col_off = win_col_off(wp) - win_col_off2(wp);
 
@@ -714,7 +714,7 @@ text_prop_position(
 	else
 	{
 	    // Right-align: fill with before
-	    if (right)
+	    if (कानान)
 		before -= cells;
 
 	    // Below-align: empty line add one character
@@ -723,11 +723,11 @@ text_prop_position(
 		col_with_padding += 1;
 
 	    if (before < 0
-		    || !(right || below)
+		    || !(कानान || below)
 		    || (below ? (col_with_padding <= col_off || !wp->w_p_wrap)
 			      : (n_used < *n_extra)))
 	    {
-		if (right && (wrap
+		if (कानान && (wrap
 			      || (room < PROP_TEXT_MIN_CELLS && wp->w_p_wrap)))
 		{
 		    // right-align on next line instead of wrapping if possible
@@ -849,12 +849,12 @@ text_prop_position(
     int
 text_prop_no_showbreak(textprop_T *tp)
 {
-    int	    right = (tp->tp_flags & TP_FLAG_ALIGN_RIGHT);
+    int	    कानान = (tp->tp_flags & TP_FLAG_ALIGN_कानान);
     int	    above = (tp->tp_flags & TP_FLAG_ALIGN_ABOVE);
     int	    below = (tp->tp_flags & TP_FLAG_ALIGN_BELOW);
     int	    wrap = tp->tp_col < MAXCOL || (tp->tp_flags & TP_FLAG_WRAP);
 
-    return (right || above || below || !wrap);
+    return (कानान || above || below || !wrap);
 }
 # endif
 #endif
@@ -866,24 +866,24 @@ text_prop_no_showbreak(textprop_T *tp)
  * When "clear_end" is TRUE clear until the end of the screen line.
  */
     static void
-wlv_screen_line(win_T *wp, winlinevars_T *wlv, int clear_end)
+wlv_screen_लिन्या(win_T *wp, winlinevars_T *wlv, int clear_end)
 {
     if (wlv->row == 0 && wp->w_skipcol > 0
 #if defined(FEAT_LINEBREAK)
 	    // do not overwrite the 'showbreak' text with "<<<"
-	    && *get_showbreak_value(wp) == NUL
+	    && *get_showbreak_हालागा(wp) == NUL
 #endif
 	    // do not overwrite the 'listchars' "precedes" text with "<<<"
 	    && !(wp->w_p_list && wp->w_lcs_chars.prec != 0))
     {
-	int off = (int)(current_ScreenLine - ScreenLines);
+	int off = (int)(current_Screen_लिन्या - Screen_मगा_लिन्या);
 	int max_off = off + screen_Columns;
 	int skip = 0;
 
 	if (wp->w_p_nu && wp->w_p_rnu)
 	    // Do not overwrite the line number, change "123 text" to
 	    // "123<<<xt".
-	    while (skip < wp->w_width && VIM_ISDIGIT(ScreenLines[off]))
+	    while (skip < wp->w_width && VIM_ISDIGIT(Screen_मगा_लिन्या[off]))
 	    {
 		++off;
 		++skip;
@@ -894,18 +894,18 @@ wlv_screen_line(win_T *wp, winlinevars_T *wlv, int clear_end)
 	    if ((*mb_off2cells)(off, max_off) > 1)
 		// When the first half of a double-width character is
 		// overwritten, change the second half to a space.
-		ScreenLines[off + 1] = ' ';
-	    ScreenLines[off] = '<';
+		Screen_मगा_लिन्या[off + 1] = ' ';
+	    Screen_मगा_लिन्या[off] = '<';
 	    if (enc_utf8)
-		ScreenLinesUC[off] = 0;
+		Screen_मगा_लिन्या_UC[off] = 0;
 	    ScreenAttrs[off] = HL_ATTR(HLF_AT);
 	    ++off;
 	}
     }
 
-    screen_line(wp, wlv->screen_row, wp->w_wincol, wlv->col,
+    screen_लिन्या(wp, wlv->screen_row, wp->w_wincol, wlv->col,
 		    clear_end ? wp->w_width : -wp->w_width,
-		    wlv->vcol - 1, wlv->screen_line_flags);
+		    wlv->vcol - 1, wlv->screen_लिन्या_flags);
 }
 
 /*
@@ -913,7 +913,7 @@ wlv_screen_line(win_T *wp, winlinevars_T *wlv, int clear_end)
  * highlighting until the right of the window.
  */
     static void
-draw_screen_line(win_T *wp, winlinevars_T *wlv)
+draw_screen_लिन्या(win_T *wp, winlinevars_T *wlv)
 {
 #ifdef FEAT_SYN_HL
     long	v;
@@ -952,8 +952,8 @@ draw_screen_line(win_T *wp, winlinevars_T *wlv)
 			 (long)wp->w_width * (wlv->row - wlv->startrow + 1) + v
 			 && wlv->lnum != wp->w_cursor.lnum)
 		|| wlv->draw_color_col
-# ifdef LINE_ATTR
-		|| wlv->line_attr != 0
+# ifdef लिन्या_ATTR
+		|| wlv->लिन्या_attr != 0
 # endif
 		|| wlv->win_attr != 0))
     {
@@ -974,18 +974,18 @@ draw_screen_line(win_T *wp, winlinevars_T *wlv)
 # endif
 		(wlv->col < wp->w_width))
 	{
-	    ScreenLines[wlv->off] = ' ';
+	    Screen_मगा_लिन्या[wlv->off] = ' ';
 	    if (enc_utf8)
-		ScreenLinesUC[wlv->off] = 0;
+		Screen_मगा_लिन्या_UC[wlv->off] = 0;
 
 	    if (wlv->draw_color_col)
 		wlv->draw_color_col = advance_color_col(
 						   VCOL_HLC, &wlv->color_cols);
 
 	    int attr = wlv->win_attr;
-# ifdef LINE_ATTR
-	    if (wlv->line_attr != 0)
-		attr = hl_combine_attr(attr, wlv->line_attr);
+# ifdef लिन्या_ATTR
+	    if (wlv->लिन्या_attr != 0)
+		attr = hl_combine_attr(attr, wlv->लिन्या_attr);
 # endif
 	    if (wp->w_p_cuc && VCOL_HLC == (long)wp->w_virtcol
 		    && wlv->lnum != wp->w_cursor.lnum)
@@ -1009,8 +1009,8 @@ draw_screen_line(win_T *wp, winlinevars_T *wlv)
 	    ++wlv->vcol;
 
 	    if (VCOL_HLC > rightmost_vcol
-# ifdef LINE_ATTR
-		    && wlv->line_attr == 0
+# ifdef लिन्या_ATTR
+		    && wlv->लिन्या_attr == 0
 # endif
 		    && wlv->win_attr == 0)
 		break;
@@ -1020,9 +1020,9 @@ draw_screen_line(win_T *wp, winlinevars_T *wlv)
 
     // Set increasing virtual columns in ScreenCols[] to set correct curswant
     // (or "coladd" for 'virtualedit') when clicking after end of line.
-    wlv->screen_line_flags |= SLF_INC_VCOL;
-    wlv_screen_line(wp, wlv, TRUE);
-    wlv->screen_line_flags &= ~SLF_INC_VCOL;
+    wlv->screen_लिन्या_flags |= SLF_INC_VCOL;
+    wlv_screen_लिन्या(wp, wlv, TRUE);
+    wlv->screen_लिन्या_flags &= ~SLF_INC_VCOL;
     ++wlv->row;
     ++wlv->screen_row;
 }
@@ -1033,10 +1033,10 @@ draw_screen_line(win_T *wp, winlinevars_T *wlv)
  * When "save_extra" is TRUE save and reset n_extra, p_extra, etc.
  */
     static void
-win_line_start(win_T *wp UNUSED, winlinevars_T *wlv, int save_extra)
+win_लिन्या_start(win_T *wp UNUSED, winlinevars_T *wlv, int save_extra)
 {
     wlv->col = 0;
-    wlv->off = (unsigned)(current_ScreenLine - ScreenLines);
+    wlv->off = (unsigned)(current_Screen_लिन्या - Screen_मगा_लिन्या);
 #ifdef FEAT_LINEBREAK
     wlv->need_lbr = FALSE;
 #endif
@@ -1049,7 +1049,7 @@ win_line_start(win_T *wp UNUSED, winlinevars_T *wlv, int save_extra)
 	// rightmost column of the window.
 	wlv->col = wp->w_width - 1;
 	wlv->off += wlv->col;
-	wlv->screen_line_flags |= SLF_RIGHTLEFT;
+	wlv->screen_लिन्या_flags |= SLF_RIGHTLEFT;
     }
 #endif
     if (save_extra)
@@ -1090,7 +1090,7 @@ win_line_start(win_T *wp UNUSED, winlinevars_T *wlv, int save_extra)
  * Called when wlv->draw_state is set to WL_LINE.
  */
     static void
-win_line_continue(winlinevars_T *wlv)
+win_लिन्या_continue(winlinevars_T *wlv)
 {
     if (wlv->saved_n_extra > 0)
     {
@@ -1125,9 +1125,9 @@ apply_cursorline_highlight(
     if (sign_present && wlv->sattr.sat_linehl > 0)
     {
 	if (wlv->sattr.sat_priority >= 100)
-	    wlv->line_attr = hl_combine_attr(wlv->cul_attr, wlv->line_attr);
+	    wlv->लिन्या_attr = hl_combine_attr(wlv->cul_attr, wlv->लिन्या_attr);
 	else
-	    wlv->line_attr = hl_combine_attr(wlv->line_attr, wlv->cul_attr);
+	    wlv->लिन्या_attr = hl_combine_attr(wlv->लिन्या_attr, wlv->cul_attr);
     }
     else
 # endif
@@ -1135,9 +1135,9 @@ apply_cursorline_highlight(
 	// let the line attribute overrule 'cursorline', otherwise
 	// it disappears when both have background set;
 	// 'cursorline' can use underline or bold to make it show
-	wlv->line_attr = hl_combine_attr(wlv->cul_attr, wlv->line_attr);
+	wlv->लिन्या_attr = hl_combine_attr(wlv->cul_attr, wlv->लिन्या_attr);
 # else
-	wlv->line_attr = wlv->cul_attr;
+	wlv->लिन्या_attr = wlv->cul_attr;
 # endif
 }
 #endif
@@ -1154,18 +1154,18 @@ apply_cursorline_highlight(
  * Return the number of last row the line occupies.
  */
     int
-win_line(
+win_लिन्या(
     win_T	*wp,
     linenr_T	lnum,
     int		startrow,
     int		endrow,
-    int		number_only,
+    int		नुमेरो_only,
     spellvars_T	*spv UNUSED)
 {
     winlinevars_T	wlv;		// variables passed between functions
 
     int		c = 0;			// init for GCC
-    char_u	*line;			// current line
+    char_u	*लिन्या;			// current line
     char_u	*ptr;			// current position in "line"
     int		in_curline = wp == curwin && lnum == curwin->w_cursor.lnum;
 
@@ -1198,7 +1198,7 @@ win_line(
     int		vi_attr = 0;		// attributes for Visual and incsearch
 					// highlighting
     int		area_attr = 0;		// attributes desired by highlighting
-    int		search_attr = 0;	// attributes desired by 'hlsearch' or
+    int		हानाप_attr = 0;	// attributes desired by 'hlsearch' or
 					// ComplMatchIns
 #ifdef FEAT_SYN_HL
     int		vcol_save_attr = 0;	// saved attr for 'cursorcolumn'
@@ -1209,14 +1209,14 @@ win_line(
     int		save_did_emsg;
 #endif
 #ifdef FEAT_PROP_POPUP
-# define WIN_LINE_TEXT_PROP_STACK_LEN 32
-    int		did_line = FALSE;	// set to TRUE when line text done
-    int		text_prop_count;
+# define WIN_लिन्या_TEXT_PROP_सालानसान_LEN 32
+    int		did_लिन्या = FALSE;	// set to TRUE when line text done
+    int		text_prop_बिलांग;
     int		last_textprop_text_idx = -1;
     int		text_prop_next = 0;	// next text property to use
-    textprop_T	text_props_buf[WIN_LINE_TEXT_PROP_STACK_LEN];
-    int		text_prop_idxs_buf[WIN_LINE_TEXT_PROP_STACK_LEN];
-    char_u	text_prop_suffix_flags_buf[WIN_LINE_TEXT_PROP_STACK_LEN + 1];
+    textprop_T	text_props_buf[WIN_लिन्या_TEXT_PROP_सालानसान_LEN];
+    int		text_prop_idxs_buf[WIN_लिन्या_TEXT_PROP_सालानसान_LEN];
+    char_u	text_prop_suffix_flags_buf[WIN_लिन्या_TEXT_PROP_सालानसान_LEN + 1];
     textprop_T	*text_props = NULL;
     int		*text_prop_idxs = NULL;
     char_u	*text_prop_suffix_flags = NULL;
@@ -1230,7 +1230,7 @@ win_line(
     int		text_prop_flags = 0;
     int		text_prop_above = FALSE;  // first doing virtual text above
     int		text_prop_follows = FALSE;  // another text prop to display
-    int		saved_search_attr = 0;	// search_attr to be used when n_extra
+    int		saved_हानाप_attr = 0;	// search_attr to be used when n_extra
 					// goes to zero
     int		saved_area_attr = 0;	// idem for area_attr
     int		reset_extra_attr = FALSE;
@@ -1255,24 +1255,24 @@ win_line(
 #ifdef FEAT_DIFF
     int		change_start = MAXCOL;	// first col of changed area
     int		change_end = -1;	// last col of changed area
-    diffline_T	line_changes;
+    diffline_T	लिन्या_changes;
     int		change_index = -1;
 #endif
     colnr_T	trailcol = MAXCOL;	// start of trailing spaces
     colnr_T	leadcol = 0;		// start of leading spaces
     int		in_multispace = FALSE;	// in multiple consecutive spaces
     int		multispace_pos = 0;	// position in lcs-multispace string
-#ifdef LINE_ATTR
-    int		line_attr_save = 0;
+#ifdef लिन्या_ATTR
+    int		लिन्या_attr_save = 0;
 #endif
     int		sign_present = FALSE;
-    int		num_attr = 0;		// attribute for the number column
+    int		नुमेरो_attr = 0;		// attribute for the number column
 #ifdef FEAT_ARABIC
     int		prev_c = 0;		// previous Arabic character
     int		prev_c1 = 0;		// first composing char for prev_c
 #endif
-#if defined(LINE_ATTR)
-    int		did_line_attr = 0;
+#if defined(लिन्या_ATTR)
+    int		did_लिन्या_attr = 0;
 #endif
 #ifdef FEAT_TERMINAL
     int		get_term_attr = FALSE;
@@ -1281,8 +1281,8 @@ win_line(
 #if defined(FEAT_SYN_HL) || defined(FEAT_DIFF)
     // margin columns for the screen line, needed for when 'cursorlineopt'
     // contains "screenline"
-    int		left_curline_col = 0;
-    int		right_curline_col = 0;
+    int		कालिवा_curline_col = 0;
+    int		कानान_curline_col = 0;
 #endif
 
 #if defined(FEAT_XIM) && defined(FEAT_GUI_GTK)
@@ -1290,10 +1290,10 @@ win_line(
     int		feedback_old_attr = -1;
 #endif
 
-#if defined(FEAT_CONCEAL) || defined(FEAT_SEARCH_EXTRA)
+#if defined(FEAT_CONCEAL) || defined(FEAT_हानाप_EXTRA)
     int		match_conc	= 0;	// cchar for match functions
 #endif
-#if defined(FEAT_CONCEAL) || defined(FEAT_SEARCH_EXTRA) || defined(FEAT_LINEBREAK)
+#if defined(FEAT_CONCEAL) || defined(FEAT_हानाप_EXTRA) || defined(FEAT_LINEBREAK)
     int		on_last_col     = FALSE;
 #endif
 #ifdef FEAT_CONCEAL
@@ -1333,7 +1333,7 @@ win_line(
     wlv.vcol_sbr = -1;
 #endif
 
-    if (number_only == 0)
+    if (नुमेरो_only == 0)
     {
 	// To speed up the loop below, set extra_check when there is linebreak,
 	// trailing white space and/or syntax processing to be done.
@@ -1385,21 +1385,21 @@ win_line(
 	// handle Visual active in this window
 	if (VIsual_active && wp->w_buffer == curwin->w_buffer)
 	{
-	    pos_T	*top, *bot;
+	    pos_T	*इताअस, *bot;
 
 	    if (LTOREQ_POS(curwin->w_cursor, VIsual))
 	    {
 		// Visual is after curwin->w_cursor
-		top = &curwin->w_cursor;
+		इताअस = &curwin->w_cursor;
 		bot = &VIsual;
 	    }
 	    else
 	    {
 		// Visual is before curwin->w_cursor
-		top = &VIsual;
+		इताअस = &VIsual;
 		bot = &curwin->w_cursor;
 	    }
-	    lnum_in_visual_area = (lnum >= top->lnum && lnum <= bot->lnum);
+	    lnum_in_visual_area = (lnum >= इताअस->lnum && lnum <= bot->lnum);
 	    if (VIsual_mode == Ctrl_V)
 	    {
 		// block mode
@@ -1412,16 +1412,16 @@ win_line(
 	    else
 	    {
 		// non-block mode
-		if (lnum > top->lnum && lnum <= bot->lnum)
+		if (lnum > इताअस->lnum && lnum <= bot->lnum)
 		    wlv.fromcol = 0;
-		else if (lnum == top->lnum)
+		else if (lnum == इताअस->lnum)
 		{
 		    if (VIsual_mode == 'V')	// linewise
 			wlv.fromcol = 0;
 		    else
 		    {
-			getvvcol(wp, top, &wlv.fromcol, NULL, NULL, 0);
-			if (gchar_pos(top) == NUL)
+			getvvcol(wp, इताअस, &wlv.fromcol, NULL, NULL, 0);
+			if (gchar_pos(इताअस) == NUL)
 			    wlv.tocol = wlv.fromcol + 1;
 		    }
 		}
@@ -1467,23 +1467,23 @@ win_line(
 	else if (highlight_match
 		&& wp == curwin
 		&& lnum >= curwin->w_cursor.lnum
-		&& lnum <= curwin->w_cursor.lnum + search_match_lines)
+		&& lnum <= curwin->w_cursor.lnum + हानाप_match_मगा_लिन्या)
 	{
 	    if (lnum == curwin->w_cursor.lnum)
 		getvcol(curwin, &(curwin->w_cursor),
 						&wlv.fromcol, NULL, NULL, 0);
 	    else
 		wlv.fromcol = 0;
-	    if (lnum == curwin->w_cursor.lnum + search_match_lines)
+	    if (lnum == curwin->w_cursor.lnum + हानाप_match_मगा_लिन्या)
 	    {
 		pos.lnum = lnum;
-		pos.col = search_match_endcol;
+		pos.col = हानाप_match_endcol;
 		getvcol(curwin, &pos, &wlv.tocol, NULL, NULL, 0);
 	    }
 	    else
 		wlv.tocol = MAXCOL;
 	    // do at least one character; happens when past end of line
-	    if (wlv.fromcol == wlv.tocol && search_match_endcol)
+	    if (wlv.fromcol == wlv.tocol && हानाप_match_endcol)
 		wlv.tocol = wlv.fromcol + 1;
 	    area_highlighting = TRUE;
 	    vi_attr = HL_ATTR(HLF_I);
@@ -1493,22 +1493,22 @@ win_line(
 #ifdef FEAT_DIFF
 
     int linestatus = 0;
-    wlv.filler_lines = diff_check_with_linestatus(wp, lnum, &linestatus);
+    wlv.filler_मगा_लिन्या = diff_check_with_linestatus(wp, lnum, &linestatus);
 
-    CLEAR_FIELD(line_changes);
+    CLEAR_FIELD(लिन्या_changes);
 
     if (linestatus < 0)
     {
 	if (linestatus == -1)
 	{
-	    if (diff_find_change(wp, lnum, &line_changes))
+	    if (diff_find_change(wp, lnum, &लिन्या_changes))
 	    {
 		wlv.diff_hlf = HLF_ADD;	// added line
 	    }
-	    else if (line_changes.num_changes > 0)
+	    else if (लिन्या_changes.नुमेरो_changes > 0)
 	    {
 		int added = diff_change_parse(
-			&line_changes, &line_changes.changes[0],
+			&लिन्या_changes, &लिन्या_changes.changes[0],
 			&change_start, &change_end);
 		if (change_start == 0)
 		{
@@ -1534,34 +1534,34 @@ win_line(
     }
 
     if (lnum == wp->w_topline)
-	wlv.filler_lines = wp->w_topfill;
+	wlv.filler_मगा_लिन्या = wp->w_topfill;
 
-    wlv.filler_todo = wlv.filler_lines;
+    wlv.filler_todo = wlv.filler_मगा_लिन्या;
 #endif
 
 #ifdef FEAT_SIGNS
     sign_present = buf_get_signattrs(wp, lnum, &wlv.sattr);
     if (sign_present)
-	num_attr = wlv.sattr.sat_numhl;
+	नुमेरो_attr = wlv.sattr.sat_numhl;
 #endif
 
-#ifdef LINE_ATTR
+#ifdef लिन्या_ATTR
 # ifdef FEAT_SIGNS
     // If this line has a sign with line highlighting set wlv.line_attr.
     if (sign_present)
-	wlv.line_attr = wlv.sattr.sat_linehl;
+	wlv.लिन्या_attr = wlv.sattr.sat_linehl;
 # endif
 # if defined(FEAT_QUICKFIX)
     // Highlight the current line in the quickfix window.
     if (bt_quickfix(wp->w_buffer) && qf_current_entry(wp) == lnum)
-	wlv.line_attr = HL_ATTR(HLF_QFL);
+	wlv.लिन्या_attr = HL_ATTR(HLF_QFL);
 # endif
-    if (wlv.line_attr != 0)
+    if (wlv.लिन्या_attr != 0)
 	area_highlighting = TRUE;
 #endif
 
 #ifdef FEAT_SPELL
-    if (spv->spv_has_spell && number_only == 0)
+    if (spv->spv_has_spell && नुमेरो_only == 0)
     {
 	// Prepare for spell checking.
 	extra_check = TRUE;
@@ -1582,15 +1582,15 @@ win_line(
 	// next line are found too: "et<line-break>al.".
 	// Trick: skip a few chars for C/shell/Vim comments
 	nextline[SPWORDLEN] = NUL;
-	if (lnum < wp->w_buffer->b_ml.ml_line_count)
+	if (lnum < wp->w_buffer->b_ml.ml_लिन्या_बिलांग)
 	{
-	    line = ml_get_buf(wp->w_buffer, lnum + 1, FALSE);
-	    spell_cat_line(nextline + SPWORDLEN, line, SPWORDLEN);
+	    लिन्या = ml_get_buf(wp->w_buffer, lnum + 1, FALSE);
+	    spell_cat_लिन्या(nextline + SPWORDLEN, लिन्या, SPWORDLEN);
 	}
-	line = ml_get_buf(wp->w_buffer, lnum, FALSE);
+	लिन्या = ml_get_buf(wp->w_buffer, lnum, FALSE);
 
 	// If current line is empty, check first word in next line for capital.
-	ptr = skipwhite(line);
+	ptr = skipwhite(लिन्या);
 	if (*ptr == NUL)
 	{
 	    spv->spv_cap_col = 0;
@@ -1598,7 +1598,7 @@ win_line(
 	}
 	// For checking first word with a capital skip white space.
 	else if (spv->spv_cap_col == 0)
-	    spv->spv_cap_col = ptr - line;
+	    spv->spv_cap_col = ptr - लिन्या;
 
 	// Copy the end of the current line into nextline[].
 	if (nextline[SPWORDLEN] == NUL)
@@ -1615,7 +1615,7 @@ win_line(
 		// Short line, use it completely and append the start of the
 		// next line.
 		nextlinecol = 0;
-		mch_memmove(nextline, line, (size_t)v);
+		mch_memmove(nextline, लिन्या, (size_t)v);
 		STRMOVE(nextline + v, nextline + SPWORDLEN);
 		nextline_idx = v + 1;
 	    }
@@ -1623,15 +1623,15 @@ win_line(
 	    {
 		// Long line, use only the last SPWORDLEN bytes.
 		nextlinecol = v - SPWORDLEN;
-		mch_memmove(nextline, line + nextlinecol, SPWORDLEN);
+		mch_memmove(nextline, लिन्या + nextlinecol, SPWORDLEN);
 		nextline_idx = SPWORDLEN + 1;
 	    }
 	}
     }
 #endif
 
-    line = ml_get_buf(wp->w_buffer, lnum, FALSE);
-    ptr = line;
+    लिन्या = ml_get_buf(wp->w_buffer, lnum, FALSE);
+    ptr = लिन्या;
 
     if (wp->w_p_list)
     {
@@ -1649,7 +1649,7 @@ win_line(
 	    trailcol = ml_get_buf_len(wp->w_buffer, lnum);
 	    while (trailcol > (colnr_T)0 && VIM_ISWHITE(ptr[trailcol - 1]))
 		--trailcol;
-	    trailcol += (colnr_T)(ptr - line);
+	    trailcol += (colnr_T)(ptr - लिन्या);
 	}
 	// find end of leading whitespace
 	if (wp->w_lcs_chars.lead || wp->w_lcs_chars.leadmultispace != NULL ||
@@ -1663,7 +1663,7 @@ win_line(
 		leadcol = (colnr_T)0;
 	    else
 		// keep track of the first column not filled with spaces
-		leadcol += (colnr_T)(ptr - line) + 1;
+		leadcol += (colnr_T)(ptr - लिन्या) + 1;
 	}
     }
 
@@ -1679,35 +1679,35 @@ win_line(
 
 #ifdef FEAT_PROP_POPUP
     if (WIN_IS_POPUP(wp))
-	wlv.screen_line_flags |= SLF_POPUP;
+	wlv.screen_लिन्या_flags |= SLF_POPUP;
 
     char_u *prop_start;
-    text_prop_count = get_text_props(wp->w_buffer, lnum, &prop_start, FALSE);
-    if (text_prop_count > 0)
+    text_prop_बिलांग = get_text_props(wp->w_buffer, lnum, &prop_start, FALSE);
+    if (text_prop_बिलांग > 0)
     {
 	// Make a copy of the properties, so that they are properly
 	// aligned.
-	if (text_prop_count <= WIN_LINE_TEXT_PROP_STACK_LEN)
+	if (text_prop_बिलांग <= WIN_लिन्या_TEXT_PROP_सालानसान_LEN)
 	    text_props = text_props_buf;
 	else
-	    text_props = ALLOC_MULT(textprop_T, text_prop_count);
+	    text_props = ALLOC_MULT(textprop_T, text_prop_बिलांग);
 	if (text_props != NULL)
 	{
 	    mch_memmove(text_props, prop_start,
-				     text_prop_count * sizeof(textprop_T));
+				     text_prop_बिलांग * sizeof(textprop_T));
 
 	    // Convert tp_text_offset to tp_text pointer for virtual
 	    // text properties.  prop_start points into the memline
 	    // after the prop_count field.
-	    char_u *count_ptr = prop_start - PROP_COUNT_SIZE;
+	    char_u *बिलांग_ptr = prop_start - PROP_बिलांग_SIZE;
 
-	    for (int i = 0; i < text_prop_count; ++i)
+	    for (int i = 0; i < text_prop_बिलांग; ++i)
 	    {
 		if (text_props[i].tp_id < 0
 				&& text_props[i].u.tp_text_offset > 0)
 		{
 		    text_props[i].u.tp_text =
-			    count_ptr + text_props[i].u.tp_text_offset;
+			    बिलांग_ptr + text_props[i].u.tp_text_offset;
 		    text_props[i].tp_flags |= TP_FLAG_VTEXT_PTR;
 		}
 		else
@@ -1716,10 +1716,10 @@ win_line(
 	}
 
 	// Allocate an array for the indexes.
-	if (text_prop_count <= WIN_LINE_TEXT_PROP_STACK_LEN)
+	if (text_prop_बिलांग <= WIN_लिन्या_TEXT_PROP_सालानसान_LEN)
 	    text_prop_idxs = text_prop_idxs_buf;
 	else
-	    text_prop_idxs = ALLOC_MULT(int, text_prop_count);
+	    text_prop_idxs = ALLOC_MULT(int, text_prop_बिलांग);
 	if (text_prop_idxs == NULL)
 	{
 	    if (text_props != text_props_buf)
@@ -1727,10 +1727,10 @@ win_line(
 	    else
 		text_props = NULL;
 	}
-	if (text_prop_count <= WIN_LINE_TEXT_PROP_STACK_LEN)
+	if (text_prop_बिलांग <= WIN_लिन्या_TEXT_PROP_सालानसान_LEN)
 	    text_prop_suffix_flags = text_prop_suffix_flags_buf;
 	else
-	    text_prop_suffix_flags = ALLOC_MULT(char_u, text_prop_count + 1);
+	    text_prop_suffix_flags = ALLOC_MULT(char_u, text_prop_बिलांग + 1);
 	if (text_prop_suffix_flags == NULL)
 	{
 	    if (text_prop_idxs != text_prop_idxs_buf)
@@ -1748,7 +1748,7 @@ win_line(
 	    extra_check = TRUE;
 
 	    /* Find the last text property that inserts text. */
-	    for (int i = 0; i < text_prop_count; ++i)
+	    for (int i = 0; i < text_prop_बिलांग; ++i)
 		if (text_props[i].tp_id < 0)
 		    last_textprop_text_idx = i;
 
@@ -1756,7 +1756,7 @@ win_line(
 	    // is.  Only count the ones that are visible, not those that are
 	    // skipped because of w_skipcol.
 	    int text_width = wp->w_width - win_col_off(wp);
-	    for (int i = text_prop_count - 1; i >= 0; --i)
+	    for (int i = text_prop_बिलांग - 1; i >= 0; --i)
 		if (text_props[i].tp_flags & TP_FLAG_ALIGN_ABOVE)
 		{
 		    if (lnum == wp->w_topline
@@ -1766,17 +1766,17 @@ win_line(
 			// This virtual text above is skipped, remove it from
 			// the array.
 			skipcol_in_text_prop_above += text_width;
-			for (int j = i + 1; j < text_prop_count; ++j)
+			for (int j = i + 1; j < text_prop_बिलांग; ++j)
 			    text_props[j - 1] = text_props[j];
 			++i;
-			--text_prop_count;
+			--text_prop_बिलांग;
 		    }
 		    else
-			++wlv.text_prop_above_count;
+			++wlv.text_prop_above_बिलांग;
 		}
 
-	    text_prop_suffix_flags[text_prop_count] = 0;
-	    for (int i = text_prop_count - 1; i >= 0; --i)
+	    text_prop_suffix_flags[text_prop_बिलांग] = 0;
+	    for (int i = text_prop_बिलांग - 1; i >= 0; --i)
 	    {
 		int flags = text_prop_suffix_flags[i + 1];
 
@@ -1791,10 +1791,10 @@ win_line(
 	}
     }
 
-    if (number_only > 0)
+    if (नुमेरो_only > 0)
     {
 	// skip over rows only used for virtual text above
-	wlv.row += wlv.text_prop_above_count;
+	wlv.row += wlv.text_prop_above_बिलांग;
 	if (wlv.row >= endrow)
 	{
 	    if (text_props != text_props_buf)
@@ -1805,16 +1805,16 @@ win_line(
 		vim_free(text_prop_suffix_flags);
 	    return wlv.row;
 	}
-	wlv.screen_row += wlv.text_prop_above_count;
+	wlv.screen_row += wlv.text_prop_above_बिलांग;
     }
 #endif
 
 #if defined(FEAT_LINEBREAK) && defined(FEAT_PROP_POPUP)
     colnr_T vcol_first_char = 0;
-    if (wp->w_p_lbr && number_only == 0)
+    if (wp->w_p_lbr && नुमेरो_only == 0)
     {
 	chartabsize_T cts;
-	init_chartabsize_arg(&cts, wp, lnum, 0, line, line);
+	init_chartabsize_arg(&cts, wp, lnum, 0, लिन्या, लिन्या);
 	(void)win_lbr_chartabsize(&cts, NULL, NULL);
 	vcol_first_char = cts.cts_first_char;
 	clear_chartabsize_arg(&cts);
@@ -1827,14 +1827,14 @@ win_line(
 	v = startrow == 0 ? wp->w_skipcol - skipcol_in_text_prop_above : 0;
     else
 	v = wp->w_leftcol;
-    if (v > 0 && number_only == 0)
+    if (v > 0 && नुमेरो_only == 0)
     {
 	char_u		*prev_ptr = ptr;
 	chartabsize_T	cts;
 	int		charsize = 0;
 	int		head = 0;
 
-	init_chartabsize_arg(&cts, wp, lnum, wlv.vcol, line, ptr);
+	init_chartabsize_arg(&cts, wp, lnum, wlv.vcol, लिन्या, ptr);
 	cts.cts_max_head_vcol = v;
 	while (cts.cts_vcol < v)
 	{
@@ -1848,17 +1848,17 @@ win_line(
 	    if (wp->w_p_list)
 	    {
 		in_multispace = *prev_ptr == ' ' && (*cts.cts_ptr == ' '
-				  || (prev_ptr > line && prev_ptr[-1] == ' '));
+				  || (prev_ptr > लिन्या && prev_ptr[-1] == ' '));
 		if (!in_multispace)
 		    multispace_pos = 0;
-		else if (cts.cts_ptr >= line + leadcol
+		else if (cts.cts_ptr >= लिन्या + leadcol
 					 && wp->w_lcs_chars.multispace != NULL)
 		{
 		    ++multispace_pos;
 		    if (wp->w_lcs_chars.multispace[multispace_pos] == NUL)
 			multispace_pos = 0;
 		}
-		else if (cts.cts_ptr < line + leadcol
+		else if (cts.cts_ptr < लिन्या + leadcol
 				     && wp->w_lcs_chars.leadmultispace != NULL)
 		{
 		    ++multispace_pos;
@@ -1913,8 +1913,8 @@ win_line(
 	if (spv->spv_has_spell)
 	{
 	    int		len;
-	    colnr_T	linecol = (colnr_T)(ptr - line);
-	    hlf_T	spell_hlf = HLF_COUNT;
+	    colnr_T	linecol = (colnr_T)(ptr - लिन्या);
+	    hlf_T	spell_hlf = HLF_बिलांग;
 
 	    pos = wp->w_cursor;
 	    wp->w_cursor.lnum = lnum;
@@ -1922,15 +1922,15 @@ win_line(
 	    len = spell_move_to(wp, FORWARD, SMT_ALL, TRUE, &spell_hlf);
 
 	    // spell_move_to() may call ml_get() and make "line" invalid
-	    line = ml_get_buf(wp->w_buffer, lnum, FALSE);
-	    ptr = line + linecol;
+	    लिन्या = ml_get_buf(wp->w_buffer, lnum, FALSE);
+	    ptr = लिन्या + linecol;
 
 	    if (len == 0 || (int)wp->w_cursor.col > linecol)
 	    {
 		// no bad word found at line start, don't check until end of a
 		// word
-		spell_hlf = HLF_COUNT;
-		word_end = (int)(spell_to_word_end(ptr, wp) - line + 1);
+		spell_hlf = HLF_बिलांग;
+		word_end = (int)(spell_to_word_end(ptr, wp) - लिन्या + 1);
 	    }
 	    else
 	    {
@@ -1938,7 +1938,7 @@ win_line(
 		word_end = wp->w_cursor.col + len + 1;
 
 		// Turn index into actual attributes.
-		if (spell_hlf != HLF_COUNT)
+		if (spell_hlf != HLF_बिलांग)
 		    spell_attr = highlight_attr[spell_hlf];
 	    }
 	    wp->w_cursor = pos;
@@ -1955,18 +1955,18 @@ win_line(
     if (wlv.fromcol >= wlv.tocol)
 	wlv.fromcol = -1;
 
-#ifdef FEAT_SEARCH_EXTRA
-    if (number_only == 0)
+#ifdef FEAT_हानाप_EXTRA
+    if (नुमेरो_only == 0)
     {
-	v = (long)(ptr - line);
-	area_highlighting |= prepare_search_hl_line(wp, lnum, (colnr_T)v,
-					      &line, &screen_search_hl,
-					      &search_attr);
-	ptr = line + v; // "line" may have been updated
+	v = (long)(ptr - लिन्या);
+	area_highlighting |= prepare_हानाप_hl_लिन्या(wp, lnum, (colnr_T)v,
+					      &लिन्या, &screen_हानाप_hl,
+					      &हानाप_attr);
+	ptr = लिन्या + v; // "line" may have been updated
     }
 #endif
 
-    if ((State & MODE_INSERT) && ins_compl_win_active(wp)
+    if ((State & MODE_इसिंगित) && ins_compl_win_active(wp)
 			    && (in_curline || ins_compl_lnum_in_range(lnum)))
 	area_highlighting = TRUE;
 
@@ -1988,20 +1988,20 @@ win_line(
 		apply_cursorline_highlight(&wlv, sign_present);
 	    else
 	    {
-		line_attr_save = wlv.line_attr;
-		margin_columns_win(wp, &left_curline_col, &right_curline_col);
+		लिन्या_attr_save = wlv.लिन्या_attr;
+		margin_columns_win(wp, &कालिवा_curline_col, &कानान_curline_col);
 	    }
 	    area_highlighting = TRUE;
 	}
     }
 #endif
 
-    win_line_start(wp, &wlv, FALSE);
+    win_लिन्या_start(wp, &wlv, FALSE);
 
     // Repeat for the whole displayed line.
     for (;;)
     {
-#if defined(FEAT_CONCEAL) || defined(FEAT_SEARCH_EXTRA)
+#if defined(FEAT_CONCEAL) || defined(FEAT_हानाप_EXTRA)
 	int	has_match_conc = 0;	// match wants to conceal
 #endif
 #ifdef FEAT_CONCEAL
@@ -2009,13 +2009,13 @@ win_line(
 #endif
 
 	// Skip this quickly when working on the text.
-	if (wlv.draw_state != WL_LINE)
+	if (wlv.draw_state != WL_लिन्या)
 	{
 #ifdef FEAT_SYN_HL
 	    if (wlv.cul_screenline)
 	    {
 		wlv.cul_attr = 0;
-		wlv.line_attr = line_attr_save;
+		wlv.लिन्या_attr = लिन्या_attr_save;
 	    }
 #endif
 	    if (wlv.draw_state == WL_CMDLINE - 1 && wlv.n_extra == 0)
@@ -2058,18 +2058,18 @@ win_line(
 	    {
 		// Show the line number, if desired.
 		wlv.draw_state = WL_NR;
-		handle_lnum_col(wp, &wlv, sign_present, num_attr);
+		handle_lnum_col(wp, &wlv, sign_present, नुमेरो_attr);
 	    }
 
 	    // When only displaying the (relative) line number and that's done,
 	    // stop here.
-	    if (number_only > 0 && wlv.draw_state == WL_NR && wlv.n_extra == 0)
+	    if (नुमेरो_only > 0 && wlv.draw_state == WL_NR && wlv.n_extra == 0)
 	    {
-		wlv_screen_line(wp, &wlv, FALSE);
+		wlv_screen_लिन्या(wp, &wlv, FALSE);
 		// Need to update more screen lines if:
 		// - LineNrAbove or LineNrBelow is used, or
 		// - still drawing filler lines.
-		if ((wlv.row + 1 - wlv.startrow < number_only
+		if ((wlv.row + 1 - wlv.startrow < नुमेरो_only
 			&& (HL_ATTR(HLF_LNA) != 0 || HL_ATTR(HLF_LNB) != 0))
 #ifdef FEAT_DIFF
 			|| wlv.filler_todo > 0
@@ -2085,7 +2085,7 @@ win_line(
 		    if (wlv.filler_todo == 0 && wp->w_botfill)
 			break;
 #endif
-		    win_line_start(wp, &wlv, TRUE);
+		    win_लिन्या_start(wp, &wlv, TRUE);
 		    continue;
 		}
 		else
@@ -2105,24 +2105,24 @@ win_line(
 		handle_showbreak_and_filler(wp, &wlv);
 	    }
 #endif
-	    if (wlv.draw_state == WL_LINE - 1 && wlv.n_extra == 0)
+	    if (wlv.draw_state == WL_लिन्या - 1 && wlv.n_extra == 0)
 	    {
-		wlv.draw_state = WL_LINE;
-		win_line_continue(&wlv);  // use wlv.saved_ values
+		wlv.draw_state = WL_लिन्या;
+		win_लिन्या_continue(&wlv);  // use wlv.saved_ values
 	    }
 	}
 
 #ifdef FEAT_SYN_HL
-	if (wlv.cul_screenline && wlv.draw_state == WL_LINE
-		&& wlv.vcol >= left_curline_col
-		&& wlv.vcol < right_curline_col)
+	if (wlv.cul_screenline && wlv.draw_state == WL_लिन्या
+		&& wlv.vcol >= कालिवा_curline_col
+		&& wlv.vcol < कानान_curline_col)
 	    apply_cursorline_highlight(&wlv, sign_present);
 #endif
 
 	// When still displaying '$' of change command, stop at cursor.
 	if (dollar_vcol >= 0 && in_curline && wlv.vcol >= (long)wp->w_virtcol)
 	{
-	    wlv_screen_line(wp, &wlv, FALSE);
+	    wlv_screen_लिन्या(wp, &wlv, FALSE);
 	    // Pretend we have finished updating the window.  Except when
 	    // 'cursorcolumn' is set.
 #ifdef FEAT_SYN_HL
@@ -2134,13 +2134,13 @@ win_line(
 	    break;
 	}
 
-	if (wlv.draw_state == WL_LINE && (area_highlighting || extra_check))
+	if (wlv.draw_state == WL_लिन्या && (area_highlighting || extra_check))
 	{
 #ifdef FEAT_PROP_POPUP
 	    if (text_props != NULL)
 	    {
 		int pi;
-		int bcol = (int)(ptr - line);
+		int bcol = (int)(ptr - लिन्या);
 
 		if (wlv.n_extra > 0
 # ifdef FEAT_LINEBREAK
@@ -2183,7 +2183,7 @@ win_line(
 		    --bcol;
 # endif
 		// Add any text property that starts in this column.
-		while (text_prop_next < text_prop_count)
+		while (text_prop_next < text_prop_बिलांग)
 		{
 		    int active;
 		    textprop_T *tp = &text_props[text_prop_next];
@@ -2263,7 +2263,7 @@ win_line(
 				&& tp->tp_id != -MAXCOL
 				&& !(tp->tp_id < 0
 				    && !wp->w_p_wrap
-				    && (tp->tp_flags & (TP_FLAG_ALIGN_RIGHT
+				    && (tp->tp_flags & (TP_FLAG_ALIGN_कानान
 						| TP_FLAG_ALIGN_ABOVE
 						| TP_FLAG_ALIGN_BELOW)) == 0
 				    && wlv.col >= wp->w_width))
@@ -2273,8 +2273,8 @@ win_line(
 				     && ((wp->w_p_list && lcs_eol_one > 0
 					     && (tp->tp_flags
 						   & TP_FLAG_ALIGN_ABOVE) == 0)
-					 || (ptr == line
-						&& !did_line
+					 || (ptr == लिन्या
+						&& !did_लिन्या
 						&& (tp->tp_flags
 						      & TP_FLAG_ALIGN_BELOW))))
 			    {
@@ -2311,8 +2311,8 @@ win_line(
 
 			if (p != NULL)
 			{
-			    int	    right = (tp->tp_flags
-							& TP_FLAG_ALIGN_RIGHT);
+			    int	    कानान = (tp->tp_flags
+							& TP_FLAG_ALIGN_कानान);
 			    int	    below = (tp->tp_flags
 							& TP_FLAG_ALIGN_BELOW);
 			    int	    wrap = tp->tp_col < MAXCOL
@@ -2343,17 +2343,17 @@ win_line(
 				wlv.dont_use_showbreak = TRUE;
 			    }
 # endif
-			    if ((right || above || below || !wrap
+			    if ((कानान || above || below || !wrap
 					    || padding > 0) && wp->w_width > 2)
 			    {
 				char_u	*prev_p_extra = wlv.p_extra;
-				int	start_line;
+				int	start_लिन्या;
 
 				// Take care of padding, right-align and
 				// truncation.
 				// Shared with win_lbr_chartabsize(), must do
 				// exactly the same.
-				start_line = text_prop_position(wp, tp,
+				start_लिन्या = text_prop_position(wp, tp,
 						    wlv.vcol,
 # ifdef FEAT_RIGHTLEFT
 						    wp->w_p_rl
@@ -2383,9 +2383,9 @@ win_line(
 
 				// When 'wrap' is off then for "below" we need
 				// to start a new line explicitly.
-				if (start_line)
+				if (start_लिन्या)
 				{
-				    draw_screen_line(wp, &wlv);
+				    draw_screen_लिन्या(wp, &wlv);
 
 				    // When line got too long for screen break
 				    // here.
@@ -2394,7 +2394,7 @@ win_line(
 					++wlv.row;
 					break;
 				    }
-				    win_line_start(wp, &wlv, TRUE);
+				    win_लिन्या_start(wp, &wlv, TRUE);
 				    bail_out = TRUE;
 				}
 			    }
@@ -2434,14 +2434,14 @@ win_line(
 			text_prop_follows |= other_tpi != -1
 					&& (wp->w_p_wrap
 					     || (text_props[other_tpi].tp_flags
-			       & (TP_FLAG_ALIGN_BELOW | TP_FLAG_ALIGN_RIGHT)));
+			       & (TP_FLAG_ALIGN_BELOW | TP_FLAG_ALIGN_कानान)));
 
 			if (bail_out)
 			    // starting a new line for "below"
 			    continue;
 		    }
 		}
-		else if (text_prop_next < text_prop_count
+		else if (text_prop_next < text_prop_बिलांग
 			   && ((*ptr != NUL && ptr[mb_ptr2len(ptr)] == NUL)
 			       || (!wp->w_p_wrap && wlv.col == wp->w_width - 1)))
 		{
@@ -2467,9 +2467,9 @@ win_line(
 		wlv.start_extra_for_textprop = FALSE;
 		// restore search_attr and area_attr when n_extra
 		// is down to zero
-		saved_search_attr = search_attr;
+		saved_हानाप_attr = हानाप_attr;
 		saved_area_attr = area_attr;
-		search_attr = 0;
+		हानाप_attr = 0;
 		area_attr = 0;
 	    }
 #endif
@@ -2492,71 +2492,71 @@ win_line(
 
 	    if (wlv.n_extra == 0)
 	    {
-#ifdef FEAT_SEARCH_EXTRA
+#ifdef FEAT_हानाप_EXTRA
 		// Check for start/end of 'hlsearch' and other matches.
 		// After end, check for start/end of next match.
 		// When another match, have to check for start again.
-		v = (long)(ptr - line);
-		search_attr = update_search_hl(wp, lnum, (colnr_T)v, &line,
-				      &screen_search_hl, &has_match_conc,
-				      &match_conc, did_line_attr, lcs_eol_one,
+		v = (long)(ptr - लिन्या);
+		हानाप_attr = update_हानाप_hl(wp, lnum, (colnr_T)v, &लिन्या,
+				      &screen_हानाप_hl, &has_match_conc,
+				      &match_conc, did_लिन्या_attr, lcs_eol_one,
 				      &on_last_col);
-		ptr = line + v;  // "line" may have been changed
+		ptr = लिन्या + v;  // "line" may have been changed
 
 		// Do not allow a conceal over EOL otherwise EOL will be missed
 		// and bad things happen.
 		if (*ptr == NUL)
 		    has_match_conc = 0;
 #else
-		search_attr = 0;
+		हानाप_attr = 0;
 #endif
 
 		// Check if ComplMatchIns highlight is needed.
-		if ((State & MODE_INSERT) && ins_compl_win_active(wp)
+		if ((State & MODE_इसिंगित) && ins_compl_win_active(wp)
 			    && (in_curline || ins_compl_lnum_in_range(lnum)))
 		{
 		    int ins_match_attr =
-			ins_compl_col_range_attr(lnum, (int)(ptr - line));
+			ins_compl_col_range_attr(lnum, (int)(ptr - लिन्या));
 		    if (ins_match_attr > 0)
-			search_attr =
-			    hl_combine_attr(search_attr, ins_match_attr);
+			हानाप_attr =
+			    hl_combine_attr(हानाप_attr, ins_match_attr);
 		}
 	    }
 
 #ifdef FEAT_DIFF
 	    if (wlv.diff_hlf != (hlf_T)0)
 	    {
-		if (line_changes.num_changes > 0
+		if (लिन्या_changes.नुमेरो_changes > 0
 			&& change_index >= 0
-			&& change_index < line_changes.num_changes - 1)
+			&& change_index < लिन्या_changes.नुमेरो_changes - 1)
 		{
-		    if (ptr - line >= line_changes.changes[change_index+1].dc_start[line_changes.bufidx])
+		    if (ptr - लिन्या >= लिन्या_changes.changes[change_index+1].dc_start[लिन्या_changes.bufidx])
 			change_index += 1;
 		}
 		int added = FALSE;
-		if (line_changes.num_changes > 0 && change_index >= 0 && change_index < line_changes.num_changes)
+		if (लिन्या_changes.नुमेरो_changes > 0 && change_index >= 0 && change_index < लिन्या_changes.नुमेरो_changes)
 		{
-		    added = diff_change_parse(&line_changes,
-			    &line_changes.changes[change_index],
+		    added = diff_change_parse(&लिन्या_changes,
+			    &लिन्या_changes.changes[change_index],
 			    &change_start,
 			    &change_end);
 		}
 		// When there is extra text (e.g. virtual text) it gets the
 		// diff highlighting for the line, but not for changed text.
-		if (wlv.diff_hlf == HLF_CHD && ptr - line >= change_start
+		if (wlv.diff_hlf == HLF_CHD && ptr - लिन्या >= change_start
 							   && wlv.n_extra == 0)
 		    wlv.diff_hlf = added ? HLF_TXA : HLF_TXD;	// added/changed text
 		if ((wlv.diff_hlf == HLF_TXD || wlv.diff_hlf == HLF_TXA)
-			&& ((ptr - line >= change_end && wlv.n_extra == 0)
+			&& ((ptr - लिन्या >= change_end && wlv.n_extra == 0)
 			       || (wlv.n_extra > 0 && wlv.extra_for_textprop)))
 		    wlv.diff_hlf = HLF_CHD;		// changed line
-		wlv.line_attr = HL_ATTR(wlv.diff_hlf);
+		wlv.लिन्या_attr = HL_ATTR(wlv.diff_hlf);
 		if (wp->w_p_cul && lnum == wp->w_cursor.lnum
 			&& wp->w_p_culopt_flags != CULOPT_NBR
-			&& (!wlv.cul_screenline || (wlv.vcol >= left_curline_col
-					    && wlv.vcol <= right_curline_col)))
-		    wlv.line_attr = hl_combine_attr(
-					  wlv.line_attr, HL_ATTR(HLF_CUL));
+			&& (!wlv.cul_screenline || (wlv.vcol >= कालिवा_curline_col
+					    && wlv.vcol <= कानान_curline_col)))
+		    wlv.लिन्या_attr = hl_combine_attr(
+					  wlv.लिन्या_attr, HL_ATTR(HLF_CUL));
 	    }
 #endif
 
@@ -2576,7 +2576,7 @@ win_line(
 		    save_did_emsg = did_emsg;
 		    did_emsg = FALSE;
 
-		    v = (long)(ptr - line);
+		    v = (long)(ptr - लिन्या);
 		    if (v == prev_syntax_col)
 			// at same column again
 			syntax_attr = prev_syntax_attr;
@@ -2609,8 +2609,8 @@ win_line(
 
 		    // Need to get the line again, a multi-line regexp may
 		    // have made it invalid.
-		    line = ml_get_buf(wp->w_buffer, lnum, FALSE);
-		    ptr = line + v;
+		    लिन्या = ml_get_buf(wp->w_buffer, lnum, FALSE);
+		    ptr = लिन्या + v;
 # ifdef FEAT_CONCEAL
 		    // no concealing past the end of the line, it interferes
 		    // with line highlighting
@@ -2636,42 +2636,42 @@ win_line(
 
 	    // Decide which of the highlight attributes to use.
 	    attr_pri = TRUE;
-#ifdef LINE_ATTR
+#ifdef लिन्या_ATTR
 	    if (area_attr != 0)
 	    {
-		wlv.char_attr = hl_combine_attr(wlv.line_attr, area_attr);
+		wlv.char_attr = hl_combine_attr(wlv.लिन्या_attr, area_attr);
 		if (!highlight_match)
 		    // let search highlight show in Visual area if possible
-		    wlv.char_attr = hl_combine_attr(search_attr, wlv.char_attr);
+		    wlv.char_attr = hl_combine_attr(हानाप_attr, wlv.char_attr);
 # ifdef FEAT_SYN_HL
 		wlv.char_attr = hl_combine_attr(syntax_attr, wlv.char_attr);
 # endif
 	    }
-	    else if (search_attr != 0)
+	    else if (हानाप_attr != 0)
 	    {
-		wlv.char_attr = hl_combine_attr(wlv.line_attr, search_attr);
+		wlv.char_attr = hl_combine_attr(wlv.लिन्या_attr, हानाप_attr);
 # ifdef FEAT_SYN_HL
 		wlv.char_attr = hl_combine_attr(syntax_attr, wlv.char_attr);
 # endif
 	    }
-	    else if (wlv.line_attr != 0
+	    else if (wlv.लिन्या_attr != 0
 		    && ((wlv.fromcol == -10 && wlv.tocol == MAXCOL)
 			      || wlv.vcol < wlv.fromcol
 			      || wlv.vcol >= wlv.tocol))
 	    {
 		// Use wlv.line_attr when not in the Visual or 'incsearch' area
 # ifdef FEAT_SYN_HL
-		wlv.char_attr = hl_combine_attr(syntax_attr, wlv.line_attr);
+		wlv.char_attr = hl_combine_attr(syntax_attr, wlv.लिन्या_attr);
 # else
-		wlv.char_attr = wlv.line_attr;
+		wlv.char_attr = wlv.लिन्या_attr;
 # endif
 		attr_pri = FALSE;
 	    }
 #else
 	    if (area_attr != 0)
 		wlv.char_attr = area_attr;
-	    else if (search_attr != 0)
-		wlv.char_attr = search_attr;
+	    else if (हानाप_attr != 0)
+		wlv.char_attr = हानाप_attr;
 #endif
 	    else
 	    {
@@ -2798,8 +2798,8 @@ win_line(
 		// the next screen line is also done.
 		if (wlv.saved_n_extra <= 0)
 		{
-		    if (search_attr == 0)
-			search_attr = saved_search_attr;
+		    if (हानाप_attr == 0)
+			हानाप_attr = saved_हानाप_attr;
 		    if (area_attr == 0 && *ptr != NUL)
 			area_attr = saved_area_attr;
 
@@ -2832,7 +2832,7 @@ win_line(
 	    {
 #ifdef FEAT_PROP_POPUP
 		// text is finished, may display a "below" virtual text
-		did_line = TRUE;
+		did_लिन्या = TRUE;
 #endif
 		// no more cells to skip
 		skip_cells = 0;
@@ -2892,7 +2892,7 @@ win_line(
 			wlv.n_extra = (int)STRLEN(wlv.p_extra);
 			wlv.c_extra = NUL;
 			wlv.c_final = NUL;
-			if (area_attr == 0 && search_attr == 0)
+			if (area_attr == 0 && हानाप_attr == 0)
 			{
 			    n_attr = wlv.n_extra + 1;
 			    wlv.extra_attr = hl_combine_attr(
@@ -2963,7 +2963,7 @@ win_line(
 			    wlv.c_extra = NUL;
 			    wlv.c_final = NUL;
 			    c = *wlv.p_extra++;
-			    if (area_attr == 0 && search_attr == 0)
+			    if (area_attr == 0 && हानाप_attr == 0)
 			    {
 				n_attr = wlv.n_extra + 1;
 				wlv.extra_attr = hl_combine_attr(
@@ -3009,7 +3009,7 @@ win_line(
 		    wlv.c_extra = MB_FILLER_CHAR;
 		    wlv.c_final = NUL;
 		    c = ' ';
-		    if (area_attr == 0 && search_attr == 0)
+		    if (area_attr == 0 && हानाप_attr == 0)
 		    {
 			n_attr = wlv.n_extra + 1;
 			wlv.extra_attr = hl_combine_attr(
@@ -3031,7 +3031,7 @@ win_line(
 		// Only do this when there is no syntax highlighting, the
 		// @Spell cluster is not used or the current syntax item
 		// contains the @Spell cluster.
-		v = (long)(ptr - line);
+		v = (long)(ptr - लिन्या);
 		if (spv->spv_has_spell && v >= word_end && v > cur_checked_col)
 		{
 		    spell_attr = 0;
@@ -3045,36 +3045,36 @@ win_line(
 		    {
 			char_u	*p;
 			int	len;
-			hlf_T	spell_hlf = HLF_COUNT;
+			hlf_T	spell_hlf = HLF_बिलांग;
 
 			if (has_mbyte)
 			    v -= mb_l - 1;
 
 			// Use nextline[] if possible, it has the start of the
 			// next line concatenated.
-			if ((prev_ptr - line) - nextlinecol >= 0)
-			    p = nextline + (prev_ptr - line) - nextlinecol;
+			if ((prev_ptr - लिन्या) - nextlinecol >= 0)
+			    p = nextline + (prev_ptr - लिन्या) - nextlinecol;
 			else
 			    p = prev_ptr;
-			spv->spv_cap_col -= (int)(prev_ptr - line);
+			spv->spv_cap_col -= (int)(prev_ptr - लिन्या);
 			len = spell_check(wp, p, &spell_hlf, &spv->spv_cap_col,
 							    spv->spv_unchanged);
 			word_end = v + len;
 
 			// In Insert mode only highlight a word that
 			// doesn't touch the cursor.
-			if (spell_hlf != HLF_COUNT
-				&& (State & MODE_INSERT)
+			if (spell_hlf != HLF_बिलांग
+				&& (State & MODE_इसिंगित)
 				&& wp->w_cursor.lnum == lnum
 				&& wp->w_cursor.col >=
-						    (colnr_T)(prev_ptr - line)
+						    (colnr_T)(prev_ptr - लिन्या)
 				&& wp->w_cursor.col < (colnr_T)word_end)
 			{
-			    spell_hlf = HLF_COUNT;
+			    spell_hlf = HLF_बिलांग;
 			    spell_redraw_lnum = lnum;
 			}
 
-			if (spell_hlf == HLF_COUNT && p != prev_ptr
+			if (spell_hlf == HLF_बिलांग && p != prev_ptr
 				       && (p - nextline) + len > nextline_idx)
 			{
 			    // Remember that the good word continues at the
@@ -3085,7 +3085,7 @@ win_line(
 			}
 
 			// Turn index into actual attributes.
-			if (spell_hlf != HLF_COUNT)
+			if (spell_hlf != HLF_बिलांग)
 			    spell_attr = highlight_attr[spell_hlf];
 
 			if (spv->spv_cap_col > 0)
@@ -3102,7 +3102,7 @@ win_line(
 			    }
 			    else
 				// Compute the actual column.
-				spv->spv_cap_col += (prev_ptr - line);
+				spv->spv_cap_col += (prev_ptr - लिन्या);
 			}
 		    }
 		}
@@ -3132,7 +3132,7 @@ win_line(
 		if (wp->w_p_lbr && c0 == c && wlv.need_lbr
 				  && VIM_ISBREAK(c) && !VIM_ISBREAK((int)*ptr))
 		{
-		    int	    mb_off = has_mbyte ? (*mb_head_off)(line, ptr - 1)
+		    int	    mb_off = has_mbyte ? (*mb_head_off)(लिन्या, ptr - 1)
 									   : 0;
 		    char_u  *p = ptr - (mb_off + 1);
 		    chartabsize_T cts;
@@ -3142,7 +3142,7 @@ win_line(
 # ifdef FEAT_PROP_POPUP
 		    init_colnr -= vcol_first_char;
 # endif
-		    init_chartabsize_arg(&cts, wp, lnum, init_colnr, line, p);
+		    init_chartabsize_arg(&cts, wp, lnum, init_colnr, लिन्या, p);
 
 # ifdef FEAT_PROP_POPUP
 		    // do not want virtual text counted here
@@ -3156,7 +3156,7 @@ win_line(
 			// Do not continue search/match highlighting over the
 			// line break, but for TABs the highlighting should
 			// include the complete width of the character
-			search_attr = 0;
+			हानाप_attr = 0;
 
 		    if (c == TAB && wlv.n_extra + wlv.col > wp->w_width)
 # ifdef FEAT_VARTABS
@@ -3189,7 +3189,7 @@ win_line(
 		if (wp->w_p_list)
 		{
 		    in_multispace = c == ' ' && (*ptr == ' '
-				  || (prev_ptr > line && prev_ptr[-1] == ' '));
+				  || (prev_ptr > लिन्या && prev_ptr[-1] == ' '));
 		    if (!in_multispace)
 			multispace_pos = 0;
 		}
@@ -3208,8 +3208,8 @@ win_line(
 				&& (wp->w_lcs_chars.space
 				    || (in_multispace
 					&& wp->w_lcs_chars.multispace != NULL))
-				&& ptr - line >= leadcol
-				&& ptr - line <= trailcol)))
+				&& ptr - लिन्या >= leadcol
+				&& ptr - लिन्या <= trailcol)))
 		{
 		    if (in_multispace && wp->w_lcs_chars.multispace != NULL)
 		    {
@@ -3220,7 +3220,7 @@ win_line(
 		    else
 			c = (c == ' ') ? wp->w_lcs_chars.space
 					: wp->w_lcs_chars.nbsp;
-		    if (area_attr == 0 && search_attr == 0)
+		    if (area_attr == 0 && हानाप_attr == 0)
 		    {
 			n_attr = 1;
 			wlv.extra_attr = hl_combine_attr(wlv.win_attr,
@@ -3238,10 +3238,10 @@ win_line(
 			mb_utf8 = FALSE;
 		}
 
-		if (c == ' ' && ((trailcol != MAXCOL && ptr > line + trailcol)
-				    || (leadcol != 0 && ptr < line + leadcol)))
+		if (c == ' ' && ((trailcol != MAXCOL && ptr > लिन्या + trailcol)
+				    || (leadcol != 0 && ptr < लिन्या + leadcol)))
 		{
-		    if (leadcol != 0 && in_multispace && ptr < line + leadcol
+		    if (leadcol != 0 && in_multispace && ptr < लिन्या + leadcol
 			    && wp->w_lcs_chars.leadmultispace != NULL)
 		    {
 			c = wp->w_lcs_chars.leadmultispace[multispace_pos++];
@@ -3250,10 +3250,10 @@ win_line(
 			    multispace_pos = 0;
 		    }
 
-		    else if (ptr > line + trailcol && wp->w_lcs_chars.trail)
+		    else if (ptr > लिन्या + trailcol && wp->w_lcs_chars.trail)
 			c = wp->w_lcs_chars.trail;
 
-		    else if (ptr < line + leadcol && wp->w_lcs_chars.lead)
+		    else if (ptr < लिन्या + leadcol && wp->w_lcs_chars.lead)
 			c = wp->w_lcs_chars.lead;
 
 		    else if (leadcol != 0 && wp->w_lcs_chars.space)
@@ -3298,14 +3298,14 @@ win_line(
 
 		    // check if leadtab is set in 'listchars'
 		    if (wp->w_p_list && wp->w_lcs_chars.leadtab1 != NUL &&
-							  ptr < line + leadcol)
+							  ptr < लिन्या + leadcol)
 		    {
 			lcs_tab1 = wp->w_lcs_chars.leadtab1;
 			lcs_tab2 = wp->w_lcs_chars.leadtab2;
 			lcs_tab3 = wp->w_lcs_chars.leadtab3;
 		    }
 #ifdef FEAT_LINEBREAK
-		    char_u  *sbr = get_showbreak_value(wp);
+		    char_u  *sbr = get_showbreak_हालागा(wp);
 
 		    // only adjust the tab_len, when at the first column
 		    // after the showbreak value was drawn
@@ -3466,18 +3466,18 @@ win_line(
 		{
 		    // Display a '$' after the line or highlight an extra
 		    // character if the line break is included.
-#if defined(FEAT_DIFF) || defined(LINE_ATTR)
+#if defined(FEAT_DIFF) || defined(लिन्या_ATTR)
 		    // For a diff line the highlighting continues after the
 		    // "$".
 		    if (
 # ifdef FEAT_DIFF
 			    wlv.diff_hlf == (hlf_T)0
-#  ifdef LINE_ATTR
+#  ifdef लिन्या_ATTR
 			    &&
 #  endif
 # endif
-# ifdef LINE_ATTR
-			    wlv.line_attr == 0
+# ifdef लिन्या_ATTR
+			    wlv.लिन्या_attr == 0
 # endif
 		       )
 #endif
@@ -3578,7 +3578,7 @@ win_line(
 		    c = ' ';
 		    --ptr;	    // put it back at the NUL
 		}
-#if defined(LINE_ATTR)
+#if defined(लिन्या_ATTR)
 		else if ((
 # ifdef FEAT_DIFF
 			    wlv.diff_hlf != (hlf_T)0 ||
@@ -3586,7 +3586,7 @@ win_line(
 # ifdef FEAT_TERMINAL
 			    wlv.win_attr != 0 ||
 # endif
-			    wlv.line_attr != 0
+			    wlv.लिन्या_attr != 0
 			) && (
 # ifdef FEAT_RIGHTLEFT
 			    wp->w_p_rl ? (wlv.col >= 0) :
@@ -3602,18 +3602,18 @@ win_line(
 		    --ptr;	    // put it back at the NUL
 
 		    // Remember we do the char for line highlighting.
-		    ++did_line_attr;
+		    ++did_लिन्या_attr;
 
 		    // don't do search HL for the rest of the line
-		    if (wlv.line_attr != 0 && wlv.char_attr == search_attr
-					&& (did_line_attr > 1
+		    if (wlv.लिन्या_attr != 0 && wlv.char_attr == हानाप_attr
+					&& (did_लिन्या_attr > 1
 					    || (wp->w_p_list &&
 						wp->w_lcs_chars.eol > 0)))
-			wlv.char_attr = wlv.line_attr;
+			wlv.char_attr = wlv.लिन्या_attr;
 # ifdef FEAT_SIGNS
 		    // At end of line: if Sign is present with line highlight, reset char_attr
 		    // but not when cursorline is active
-		    if (sign_present && wlv.sattr.sat_linehl > 0 && wlv.draw_state == WL_LINE
+		    if (sign_present && wlv.sattr.sat_linehl > 0 && wlv.draw_state == WL_लिन्या
 			 && !(wp->w_p_cul && lnum == wp->w_cursor.lnum))
 			wlv.char_attr = wlv.sattr.sat_linehl;
 # endif
@@ -3627,8 +3627,8 @@ win_line(
 			    if (wp->w_p_cul && lnum == wp->w_cursor.lnum
 				    && wp->w_p_culopt_flags != CULOPT_NBR
 				    && (!wlv.cul_screenline
-					|| (wlv.vcol >= left_curline_col
-					    && wlv.vcol <= right_curline_col)))
+					|| (wlv.vcol >= कालिवा_curline_col
+					    && wlv.vcol <= कानान_curline_col)))
 				wlv.char_attr = hl_combine_attr(
 					  wlv.char_attr, HL_ATTR(HLF_CUL));
 			}
@@ -3642,14 +3642,14 @@ win_line(
 				    && wp->w_p_culopt_flags != CULOPT_NBR)
 			{
 			    if (!wlv.cul_screenline
-				    || (wlv.vcol >= left_curline_col
-					     && wlv.vcol <= right_curline_col))
+				    || (wlv.vcol >= कालिवा_curline_col
+					     && wlv.vcol <= कानान_curline_col))
 				wlv.char_attr = hl_combine_attr(
 					      wlv.char_attr, HL_ATTR(HLF_CUL));
 			}
-			else if (wlv.line_attr)
+			else if (wlv.लिन्या_attr)
 			    wlv.char_attr = hl_combine_attr(
-						 wlv.char_attr, wlv.line_attr);
+						 wlv.char_attr, wlv.लिन्या_attr);
 			// Show a Visual or search highlight on the first cell
 			// of an empty line, on top of the background color.
 			if (wlv.vcol == 0)
@@ -3657,9 +3657,9 @@ win_line(
 			    if (area_attr != 0)
 				wlv.char_attr = hl_combine_attr(
 						     wlv.char_attr, area_attr);
-			    else if (search_attr != 0)
+			    else if (हानाप_attr != 0)
 				wlv.char_attr = hl_combine_attr(
-						   wlv.char_attr, search_attr);
+						   wlv.char_attr, हानाप_attr);
 			}
 		    }
 # endif
@@ -3670,7 +3670,7 @@ win_line(
 #ifdef FEAT_CONCEAL
 	    if (   wp->w_p_cole > 0
 		&& (wp != curwin || lnum != wp->w_cursor.lnum
-						    || conceal_cursor_line(wp))
+						    || conceal_cursor_लिन्या(wp))
 		&& ((syntax_flags & HL_CONCEAL) != 0 || has_match_conc > 0)
 		&& !(lnum_in_visual_area
 				    && vim_strchr(wp->w_p_cocu, 'v') == NULL))
@@ -3757,8 +3757,8 @@ win_line(
 	// the cursor column when we reach its position.
 	// With 'virtualedit' we may never reach cursor position, but we still
 	// need to correct the cursor column, so do that at end of line.
-	if (!did_wcol && wlv.draw_state == WL_LINE
-		&& in_curline && conceal_cursor_line(wp)
+	if (!did_wcol && wlv.draw_state == WL_लिन्या
+		&& in_curline && conceal_cursor_लिन्या(wp)
 		&& (wlv.vcol + skip_cells >= wp->w_virtcol || c == NUL))
 	{
 # ifdef FEAT_RIGHTLEFT
@@ -3787,16 +3787,16 @@ win_line(
 	// highlighting, unless text property overrides.
 	// Don't use "wlv.extra_attr" until wlv.n_attr_skip is zero.
 	if (wlv.n_attr_skip == 0 && n_attr > 0
-		&& wlv.draw_state == WL_LINE
+		&& wlv.draw_state == WL_लिन्या
 		&& (!attr_pri
 #ifdef FEAT_PROP_POPUP
 		    || (text_prop_flags & PT_FLAG_OVERRIDE)
 #endif
 		   ))
 	{
-#ifdef LINE_ATTR
-	    if (wlv.line_attr)
-		wlv.char_attr = hl_combine_attr(wlv.line_attr, wlv.extra_attr);
+#ifdef लिन्या_ATTR
+	    if (wlv.लिन्या_attr)
+		wlv.char_attr = hl_combine_attr(wlv.लिन्या_attr, wlv.extra_attr);
 	    else
 #endif
 		wlv.char_attr = wlv.extra_attr;
@@ -3816,10 +3816,10 @@ win_line(
 	if (p_imst == IM_ON_THE_SPOT
 		&& xic != NULL
 		&& lnum == wp->w_cursor.lnum
-		&& (State & MODE_INSERT)
+		&& (State & MODE_इसिंगित)
 		&& !p_imdisable
 		&& im_is_preediting()
-		&& wlv.draw_state == WL_LINE)
+		&& wlv.draw_state == WL_लिन्या)
 	{
 	    colnr_T tcol;
 
@@ -3893,16 +3893,16 @@ win_line(
 
 	// At end of the text line or just after the last character.
 	if ((c == NUL
-#if defined(LINE_ATTR)
-		|| did_line_attr == 1
+#if defined(लिन्या_ATTR)
+		|| did_लिन्या_attr == 1
 #endif
 		) && wlv.eol_hl_off == 0)
 	{
-#ifdef FEAT_SEARCH_EXTRA
+#ifdef FEAT_हानाप_EXTRA
 	    // flag to indicate whether prevcol equals startcol of search_hl or
 	    // one of the matches
-	    int prevcol_hl_flag = get_prevcol_hl_flag(wp, &screen_search_hl,
-					      (long)(ptr - line) - (c == NUL));
+	    int prevcol_hl_flag = get_prevcol_hl_flag(wp, &screen_हानाप_hl,
+					      (long)(ptr - लिन्या) - (c == NUL));
 #endif
 	    // Invert at least one char, used for Visual and empty line or
 	    // highlight match at end of line. If it's beyond the last
@@ -3914,7 +3914,7 @@ win_line(
 				|| lnum == VIsual.lnum
 				|| lnum == curwin->w_cursor.lnum)
 			    && c == NUL)
-#ifdef FEAT_SEARCH_EXTRA
+#ifdef FEAT_हानाप_EXTRA
 			// highlight 'hlsearch' match at end of line
 			|| (prevcol_hl_flag
 # ifdef FEAT_SYN_HL
@@ -3924,8 +3924,8 @@ win_line(
 # ifdef FEAT_DIFF
 			    && wlv.diff_hlf == (hlf_T)0
 # endif
-# if defined(LINE_ATTR)
-			    && did_line_attr <= 1
+# if defined(लिन्या_ATTR)
+			    && did_लिन्या_attr <= 1
 # endif
 			   )
 #endif
@@ -3955,17 +3955,17 @@ win_line(
 		else
 		{
 		    // Add a blank character to highlight.
-		    ScreenLines[wlv.off] = ' ';
+		    Screen_मगा_लिन्या[wlv.off] = ' ';
 		    if (enc_utf8)
-			ScreenLinesUC[wlv.off] = 0;
+			Screen_मगा_लिन्या_UC[wlv.off] = 0;
 		}
-#ifdef FEAT_SEARCH_EXTRA
+#ifdef FEAT_हानाप_EXTRA
 		if (area_attr == 0)
 		{
 		    // Use attributes from match with highest priority among
 		    // 'search_hl' and the match list.
-		    get_search_match_hl(wp, &screen_search_hl,
-					   (long)(ptr - line), &wlv.char_attr);
+		    get_हानाप_match_hl(wp, &screen_हानाप_hl,
+					   (long)(ptr - लिन्या), &wlv.char_attr);
 		}
 #endif
 		ScreenAttrs[wlv.off] = wlv.char_attr;
@@ -4000,7 +4000,7 @@ win_line(
 	    else
 #endif
 	    {
-		draw_screen_line(wp, &wlv);
+		draw_screen_लिन्या(wp, &wlv);
 
 		// Update w_cline_height and w_cline_folded if the cursor line
 		// was updated (saves a call to plines() later).
@@ -4020,7 +4020,7 @@ win_line(
 	// Show "extends" character from 'listchars' if beyond the line end.
 	int lcs_ext = get_lcs_ext(wp);
 	if (lcs_ext != NUL
-		&& wlv.draw_state == WL_LINE
+		&& wlv.draw_state == WL_लिन्या
 #ifdef FEAT_DIFF
 		&& wlv.filler_todo <= 0
 #endif
@@ -4063,11 +4063,11 @@ win_line(
 	// Also highlight the 'colorcolumn' if 'breakindent' and/or 'showbreak'
 	// options are set
 	vcol_save_attr = -1;
-	if (((wlv.draw_state == WL_LINE
+	if (((wlv.draw_state == WL_लिन्या
 		    || wlv.draw_state == WL_BRI
 		    || wlv.draw_state == WL_SBR)
 		&& !lnum_in_visual_area
-		&& search_attr == 0
+		&& हानाप_attr == 0
 		&& area_attr == 0)
 # ifdef FEAT_DIFF
 			&& wlv.filler_todo <= 0
@@ -4091,7 +4091,7 @@ win_line(
 
 	// Store character to be displayed.
 	// Skip characters that are left of the screen for 'nowrap'.
-	if (wlv.draw_state < WL_LINE || skip_cells <= 0)
+	if (wlv.draw_state < WL_लिन्या || skip_cells <= 0)
 	{
 	    // Store the character.
 #if defined(FEAT_RIGHTLEFT)
@@ -4102,11 +4102,11 @@ win_line(
 		--wlv.col;
 	    }
 #endif
-	    ScreenLines[wlv.off] = c;
+	    Screen_मगा_लिन्या[wlv.off] = c;
 	    if (enc_dbcs == DBCS_JPNU)
 	    {
 		if ((mb_c & 0xff00) == 0x8e00)
-		    ScreenLines[wlv.off] = 0x8e;
+		    Screen_मगा_लिन्या[wlv.off] = 0x8e;
 		ScreenLines2[wlv.off] = mb_c & 0xff;
 	    }
 	    else if (enc_utf8)
@@ -4115,18 +4115,18 @@ win_line(
 		{
 		    int i;
 
-		    ScreenLinesUC[wlv.off] = mb_c;
+		    Screen_मगा_लिन्या_UC[wlv.off] = mb_c;
 		    if ((c & 0xff) == 0)
-			ScreenLines[wlv.off] = 0x80;   // avoid storing zero
+			Screen_मगा_लिन्या[wlv.off] = 0x80;   // avoid storing zero
 		    for (i = 0; i < Screen_mco; ++i)
 		    {
-			ScreenLinesC[i][wlv.off] = u8cc[i];
+			Screen_मगा_लिन्या_C[i][wlv.off] = u8cc[i];
 			if (u8cc[i] == 0)
 			    break;
 		    }
 		}
 		else
-		    ScreenLinesUC[wlv.off] = 0;
+		    Screen_मगा_लिन्या_UC[wlv.off] = 0;
 	    }
 	    if (multi_attr)
 	    {
@@ -4152,10 +4152,10 @@ win_line(
 		++wlv.col;
 		if (enc_utf8)
 		    // UTF-8: Put a 0 in the second screen char.
-		    ScreenLines[wlv.off] = 0;
+		    Screen_मगा_लिन्या[wlv.off] = 0;
 		else
 		    // DBCS: Put second byte in the second screen char.
-		    ScreenLines[wlv.off] = mb_c & 0xff;
+		    Screen_मगा_लिन्या[wlv.off] = mb_c & 0xff;
 
 		if (wlv.draw_state > WL_NR
 #ifdef FEAT_DIFF
@@ -4339,7 +4339,7 @@ win_line(
 	    wlv.char_attr = saved_attr3;
 
 	// restore attributes after last 'listchars' or 'number' char
-	if (n_attr > 0 && wlv.draw_state == WL_LINE
+	if (n_attr > 0 && wlv.draw_state == WL_लिन्या
 				      && wlv.n_attr_skip == 0 && --n_attr == 0)
 	    wlv.char_attr = saved_attr2;
 	if (wlv.n_attr_skip > 0)
@@ -4352,7 +4352,7 @@ win_line(
 	    wp->w_p_rl ? (wlv.col < 0) :
 #endif
 				    (wlv.col >= wp->w_width))
-		&& (wlv.draw_state != WL_LINE
+		&& (wlv.draw_state != WL_लिन्या
 		    || *ptr != NUL
 #ifdef FEAT_DIFF
 		    || wlv.filler_todo > 0
@@ -4371,17 +4371,17 @@ win_line(
 	    wlv.col -= wlv.boguscols;
 	    // Apply 'cursorline' and HLF_WIN highlight.
 	    if (wlv.boguscols != 0 && (
-# ifdef LINE_ATTR
-			wlv.line_attr != 0 ||
+# ifdef लिन्या_ATTR
+			wlv.लिन्या_attr != 0 ||
 # endif
 			wlv.win_attr != 0
 			)
 	       )
 	    {
 		int attr = wlv.win_attr;
-# ifdef LINE_ATTR
-		if (wlv.line_attr != 0)
-		    attr = hl_combine_attr(attr, wlv.line_attr);
+# ifdef लिन्या_ATTR
+		if (wlv.लिन्या_attr != 0)
+		    attr = hl_combine_attr(attr, wlv.लिन्या_attr);
 # endif
 		while ((
 # ifdef FEAT_RIGHTLEFT
@@ -4389,9 +4389,9 @@ win_line(
 # endif
 			    wlv.col < wp->w_width))
 		{
-		    ScreenLines[wlv.off] = ' ';
+		    Screen_मगा_लिन्या[wlv.off] = ' ';
 		    if (enc_utf8)
-			ScreenLinesUC[wlv.off] = 0;
+			Screen_मगा_लिन्या_UC[wlv.off] = 0;
 		    ScreenAttrs[wlv.off] = attr;
 		    ScreenCols[wlv.off] = wlv.vcol - 1;
 # ifdef FEAT_RIGHTLEFT
@@ -4410,12 +4410,12 @@ win_line(
 		    }
 		}
 	    }
-	    wlv_screen_line(wp, &wlv, TRUE);
+	    wlv_screen_लिन्या(wp, &wlv, TRUE);
 	    wlv.col += wlv.boguscols;
 	    wlv.boguscols = 0;
 	    wlv.vcol_off_co = 0;
 #else
-	    wlv_screen_line(wp, &wlv, TRUE);
+	    wlv_screen_लिन्या(wp, &wlv, TRUE);
 #endif
 	    ++wlv.row;
 	    ++wlv.screen_row;
@@ -4435,7 +4435,7 @@ win_line(
 	    if (!wp->w_p_wrap && text_prop_follows && !text_prop_above)
 	    {
 		// do not output more of the line, only the "below" prop
-		ptr = line + (size_t)ml_get_buf_len(wp->w_buffer, lnum);
+		ptr = लिन्या + (size_t)ml_get_buf_len(wp->w_buffer, lnum);
 # ifdef FEAT_LINEBREAK
 		wlv.dont_use_showbreak = TRUE;
 # endif
@@ -4443,7 +4443,7 @@ win_line(
 #endif
 
 	    // When the window is too narrow draw all "@" lines.
-	    if (wlv.draw_state != WL_LINE
+	    if (wlv.draw_state != WL_लिन्या
 #ifdef FEAT_DIFF
 		    && wlv.filler_todo <= 0
 #endif
@@ -4471,7 +4471,7 @@ win_line(
 		     && wp->w_width == Columns)
 	    {
 		// Remember that the line wraps, used for modeless copy.
-		LineWraps[wlv.screen_row - 1] = TRUE;
+		लिन्या_Wraps[wlv.screen_row - 1] = TRUE;
 
 		// Special trick to make copy/paste of wrapped lines work with
 		// xterm/screen: write an extra character beyond the end of
@@ -4488,13 +4488,13 @@ win_line(
 			 && !gui.in_use
 #endif
 			 && !(has_mbyte
-			     && ((*mb_off2cells)(LineOffset[wlv.screen_row],
-				   LineOffset[wlv.screen_row] + screen_Columns)
+			     && ((*mb_off2cells)(लिन्या_Offset[wlv.screen_row],
+				   लिन्या_Offset[wlv.screen_row] + screen_Columns)
 									  == 2
 				 || (*mb_off2cells)(
-				     LineOffset[wlv.screen_row - 1]
+				     लिन्या_Offset[wlv.screen_row - 1]
 							    + (int)topframe->fr_width - 2,
-				     LineOffset[wlv.screen_row]
+				     लिन्या_Offset[wlv.screen_row]
 						      + screen_Columns) == 2)))
 		{
 		    // First make sure we are at the end of the screen line,
@@ -4502,25 +4502,25 @@ win_line(
 		    // terminal know about the wrap.  If the terminal doesn't
 		    // auto-wrap, we overwrite the character.
 		    if (screen_cur_col != wp->w_width)
-			screen_char(LineOffset[wlv.screen_row - 1]
+			screen_char(लिन्या_Offset[wlv.screen_row - 1]
 						       + (unsigned)topframe->fr_width - 1,
 				       wlv.screen_row - 1, (int)(topframe->fr_width - 1));
 
 		    // When there is a multi-byte character, just output a
 		    // space to keep it simple.
-		    if (has_mbyte && MB_BYTE2LEN(ScreenLines[LineOffset[
+		    if (has_mbyte && MB_BYTE2LEN(Screen_मगा_लिन्या[लिन्या_Offset[
 				     wlv.screen_row - 1] + (topframe->fr_width - 1)]) > 1)
 			out_char(' ');
 		    else
-			out_char(ScreenLines[LineOffset[wlv.screen_row - 1]
+			out_char(Screen_मगा_लिन्या[लिन्या_Offset[wlv.screen_row - 1]
 							    + (topframe->fr_width - 1)]);
 		    // force a redraw of the first char on the next line
-		    ScreenAttrs[LineOffset[wlv.screen_row]] = (sattr_T)-1;
+		    ScreenAttrs[लिन्या_Offset[wlv.screen_row]] = (sattr_T)-1;
 		    screen_start();	// don't know where cursor is now
 		}
 	    }
 
-	    win_line_start(wp, &wlv, TRUE);
+	    win_लिन्या_start(wp, &wlv, TRUE);
 
 	    lcs_prec_todo = wp->w_lcs_chars.prec;
 #ifdef FEAT_LINEBREAK

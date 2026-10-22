@@ -15,44 +15,44 @@
 
 #include "vim.h"
 
-static void add_msg_hist(char_u *s, int len, int attr);
-static void check_msg_hist(void);
-static void hit_return_msg(void);
-static void msg_home_replace_attr(char_u *fname, int attr);
-static void msg_puts_attr_len(char *str, int maxlen, int attr);
-static void msg_puts_display(char_u *str, int maxlen, int attr, int recurse);
-static void msg_scroll_up(void);
-static void inc_msg_scrolled(void);
+static void add_मेनसाहे_hist(char_u *s, int len, int attr);
+static void check_मेनसाहे_hist(void);
+static void hit_return_मेनसाहे(void);
+static void मेनसाहे_home_replace_attr(char_u *fname, int attr);
+static void मेनसाहे_puts_attr_len(char *str, int maxlen, int attr);
+static void मेनसाहे_puts_display(char_u *str, int maxlen, int attr, int recurse);
+static void मेनसाहे_scroll_up(void);
+static void inc_मेनसाहे_scrolled(void);
 static void store_sb_text(char_u **sb_str, char_u *s, int attr, int *sb_col, int finish);
 static void t_puts(int *t_col, char_u *t_s, char_u *s, int attr);
-static void msg_puts_printf(char_u *str, int maxlen);
+static void मेनसाहे_puts_printf(char_u *str, int maxlen);
 static int do_more_prompt(int typed_char);
-static void msg_screen_putchar(int c, int attr);
-static void msg_moremsg(int full);
-static int  msg_check_screen(void);
+static void मेनसाहे_screen_putchar(int c, int attr);
+static void मेनसाहे_moremsg(int full);
+static int  मेनसाहे_check_screen(void);
 static void redir_write(char_u *s, int maxlen);
 #ifdef FEAT_CON_DIALOG
-static char_u *msg_show_console_dialog(char_u *message, char_u *buttons, int dfltbutton);
-static int	confirm_msg_used = FALSE;	// displaying confirm_msg
-static char_u	*confirm_msg = NULL;		// ":confirm" message
-static char_u	*confirm_msg_tail;		// tail of confirm_msg
-static void display_confirm_msg(void);
+static char_u *मेनसाहे_show_console_dialog(char_u *message, char_u *buttons, int dfltbutton);
+static int	confirm_मेनसाहे_used = FALSE;	// displaying confirm_msg
+static char_u	*confirm_मेनसाहे = NULL;		// ":confirm" message
+static char_u	*confirm_मेनसाहे_tail;		// tail of confirm_msg
+static void display_confirm_मेनसाहे(void);
 #endif
 #ifdef FEAT_EVAL
 static int emsg_to_channel_log = FALSE;
 #endif
 
-struct msg_hist
+struct मेनसाहे_hist
 {
-    struct msg_hist	*next;
-    char_u		*msg;
+    struct मेनसाहे_hist	*next;
+    char_u		*मेनसाहे;
     int			attr;
 };
 
-static struct msg_hist *first_msg_hist = NULL;
-static struct msg_hist *last_msg_hist = NULL;
-static int msg_hist_len = 0;
-static int msg_hist_max = 500;		// The default max value is 500
+static struct मेनसाहे_hist *first_मेनसाहे_hist = NULL;
+static struct मेनसाहे_hist *last_मेनसाहे_hist = NULL;
+static int मेनसाहे_hist_len = 0;
+static int मेनसाहे_hist_max = 500;		// The default max value is 500
 
 // flags obtained from the 'messagesopt' option
 #define MESSAGES_HIT_ENTER	0x001
@@ -65,8 +65,8 @@ static int msg_hist_max = 500;		// The default max value is 500
 #define MESSAGES_OPT_HISTORY "history:"
 
 // The default is "hit-enter,history:500"
-static int msg_flags = MESSAGES_HIT_ENTER | MESSAGES_HISTORY;
-static int msg_wait = 0;
+static int मेनसाहे_flags = MESSAGES_HIT_ENTER | MESSAGES_HISTORY;
+static int मेनसाहे_wait = 0;
 
 static FILE *verbose_fd = NULL;
 static int  verbose_did_open = FALSE;
@@ -113,34 +113,34 @@ static int  verbose_did_open = FALSE;
  * return TRUE if wait_return() not called
  */
     int
-msg(char *s)
+मेनसाहे(char *s)
 {
-    return msg_attr_keep(s, 0, FALSE);
+    return मेनसाहे_attr_keep(s, 0, FALSE);
 }
 
 /*
  * Like msg() but keep it silent when 'verbosefile' is set.
  */
     int
-verb_msg(char *s)
+verb_मेनसाहे(char *s)
 {
     int		n;
 
     verbose_enter();
-    n = msg_attr_keep(s, 0, FALSE);
+    n = मेनसाहे_attr_keep(s, 0, FALSE);
     verbose_leave();
 
     return n;
 }
 
     int
-msg_attr(char *s, int attr)
+मेनसाहे_attr(char *s, int attr)
 {
-    return msg_attr_keep(s, attr, FALSE);
+    return मेनसाहे_attr_keep(s, attr, FALSE);
 }
 
     int
-msg_attr_keep(
+मेनसाहे_attr_keep(
     char	*s,
     int		attr,
     int		keep)	    // TRUE: set keep_msg if it doesn't scroll
@@ -170,12 +170,12 @@ msg_attr_keep(
 
     // Add message to history (unless it's a repeated kept message or a
     // truncated message)
-    if ((char_u *)s != keep_msg
+    if ((char_u *)s != keep_मेनसाहे
 	    || (*s != '<'
-		&& last_msg_hist != NULL
-		&& last_msg_hist->msg != NULL
-		&& STRCMP(s, last_msg_hist->msg) != 0))
-	add_msg_hist((char_u *)s, -1, attr);
+		&& last_मेनसाहे_hist != NULL
+		&& last_मेनसाहे_hist->मेनसाहे != NULL
+		&& STRCMP(s, last_मेनसाहे_hist->मेनसाहे) != 0))
+	add_मेनसाहे_hist((char_u *)s, -1, attr);
 
 #ifdef FEAT_EVAL
     if (emsg_to_channel_log)
@@ -184,18 +184,18 @@ msg_attr_keep(
 #endif
 
     // Truncate the message if needed.
-    msg_start();
-    buf = msg_strtrunc((char_u *)s, FALSE);
+    मेनसाहे_start();
+    buf = मेनसाहे_strtrunc((char_u *)s, FALSE);
     if (buf != NULL)
 	s = (char *)buf;
 
-    msg_outtrans_attr((char_u *)s, attr);
-    msg_clr_eos();
-    retval = msg_end();
+    मेनसाहे_outtrans_attr((char_u *)s, attr);
+    मेनसाहे_clr_eos();
+    retval = मेनसाहे_end();
 
     if (keep && retval && vim_strsize((char_u *)s)
 		    < (int)(Rows - cmdline_row - 1) * cmdline_width + sc_col)
-	set_keep_msg((char_u *)s, 0);
+	set_keep_मेनसाहे((char_u *)s, 0);
 
     need_fileinfo = FALSE;
 
@@ -209,7 +209,7 @@ msg_attr_keep(
  * Returns an allocated string or NULL when no truncating is done.
  */
     char_u *
-msg_strtrunc(
+मेनसाहे_strtrunc(
     char_u	*s,
     int		force)	    // always truncate
 {
@@ -218,20 +218,20 @@ msg_strtrunc(
     int		room;
 
     // May truncate message to avoid a hit-return prompt
-    if ((!msg_scroll && !need_wait_return && shortmess(SHM_TRUNCALL)
-			       && !exmode_active && msg_silent == 0) || force)
+    if ((!मेनसाहे_scroll && !need_wait_return && shortmess(SHM_TRUNCALL)
+			       && !exmode_active && मेनसाहे_silent == 0) || force)
     {
 	len = vim_strsize(s);
-	if (msg_scrolled != 0
+	if (मेनसाहे_scrolled != 0
 #ifdef HAS_MESSAGE_WINDOW
 		|| in_echowindow
 #endif
 		)
 	    // Use all the columns.
-	    room = (int)(Rows - msg_row) * cmdline_width - 1;
+	    room = (int)(Rows - मेनसाहे_row) * cmdline_width - 1;
 	else
 	    // Use up to 'showcmd' column.
-	    room = (int)(Rows - msg_row - 1) * cmdline_width + sc_col - 1;
+	    room = (int)(Rows - मेनसाहे_row - 1) * cmdline_width + sc_col - 1;
 	if (len > room && room > 0)
 	{
 	    if (enc_utf8)
@@ -389,7 +389,7 @@ smsg(const char *s, ...)
     {
 	// Very early in initialisation and already something wrong, just
 	// give the raw message so the user at least gets a hint.
-	return msg((char *)s);
+	return मेनसाहे((char *)s);
     }
 
     va_list arglist;
@@ -397,7 +397,7 @@ smsg(const char *s, ...)
     va_start(arglist, s);
     vim_vsnprintf((char *)IObuff, IOSIZE, s, arglist);
     va_end(arglist);
-    return msg((char *)IObuff);
+    return मेनसाहे((char *)IObuff);
 }
 
     int
@@ -407,7 +407,7 @@ smsg_attr(int attr, const char *s, ...)
     {
 	// Very early in initialisation and already something wrong, just
 	// give the raw message so the user at least gets a hint.
-	return msg_attr((char *)s, attr);
+	return मेनसाहे_attr((char *)s, attr);
     }
 
     va_list arglist;
@@ -415,7 +415,7 @@ smsg_attr(int attr, const char *s, ...)
     va_start(arglist, s);
     vim_vsnprintf((char *)IObuff, IOSIZE, s, arglist);
     va_end(arglist);
-    return msg_attr((char *)IObuff, attr);
+    return मेनसाहे_attr((char *)IObuff, attr);
 }
 
     int
@@ -425,7 +425,7 @@ smsg_attr_keep(int attr, const char *s, ...)
     {
 	// Very early in initialisation and already something wrong, just
 	// give the raw message so the user at least gets a hint.
-	return msg_attr_keep((char *)s, attr, TRUE);
+	return मेनसाहे_attr_keep((char *)s, attr, TRUE);
     }
 
     va_list arglist;
@@ -433,7 +433,7 @@ smsg_attr_keep(int attr, const char *s, ...)
     va_start(arglist, s);
     vim_vsnprintf((char *)IObuff, IOSIZE, s, arglist);
     va_end(arglist);
-    return msg_attr_keep((char *)IObuff, attr, TRUE);
+    return मेनसाहे_attr_keep((char *)IObuff, attr, TRUE);
 }
 
 #endif
@@ -535,7 +535,7 @@ get_emsg_lnum(void)
  * is only displayed if it changed.
  */
     void
-msg_source(int attr)
+मेनसाहे_source(int attr)
 {
     char_u	*p;
     static int	recursive = FALSE;
@@ -549,14 +549,14 @@ msg_source(int attr)
     p = get_emsg_source();
     if (p != NULL)
     {
-	msg_scroll = TRUE;  // this will take more than one line
-	msg_attr((char *)p, attr);
+	मेनसाहे_scroll = TRUE;  // this will take more than one line
+	मेनसाहे_attr((char *)p, attr);
 	vim_free(p);
     }
     p = get_emsg_lnum();
     if (p != NULL)
     {
-	msg_attr((char *)p, HL_ATTR(HLF_N));
+	मेनसाहे_attr((char *)p, HL_ATTR(HLF_N));
 	vim_free(p);
 	last_sourcing_lnum = SOURCING_LNUM;  // only once for each line
     }
@@ -608,12 +608,12 @@ ignore_error_for_testing(char_u *error)
 }
 
     static int
-ignore_error(const char *msg)
+ignore_error(const char *मेनसाहे)
 {
     int i;
 
     for (i = 0; i < ignore_error_list.ga_len; ++i)
-	if (strstr(msg,
+	if (strstr(मेनसाहे,
 		  (char *)((char_u **)(ignore_error_list.ga_data))[i]) != NULL)
 	    return TRUE;
     return FALSE;
@@ -626,11 +626,11 @@ ignore_error(const char *msg)
  * v:errmsg will be set and called_emsg will be incremented.
  */
     void
-do_perror(char *msg)
+do_perror(char *मेनसाहे)
 {
-    perror(msg);
+    perror(मेनसाहे);
     ++emsg_silent;
-    emsg(msg);
+    emsg(मेनसाहे);
     --emsg_silent;
 }
 #endif
@@ -659,7 +659,7 @@ emsg_core(const char *s)
     // When testing some errors are turned into a normal message.
     if (ignore_error(s))
 	// don't call msg() if it results in a dialog
-	return msg_use_printf() ? FALSE : msg((char *)s);
+	return मेनसाहे_use_printf() ? FALSE : मेनसाहे((char *)s);
 #endif
 
     ++called_emsg;
@@ -688,9 +688,9 @@ emsg_core(const char *s)
 	    return TRUE;
 	}
 
-	if (in_assert_fails && emsg_assert_fails_msg == NULL)
+	if (in_assert_fails && emsg_assert_fails_मेनसाहे == NULL)
 	{
-	    emsg_assert_fails_msg = vim_strsave((char_u *)s);
+	    emsg_assert_fails_मेनसाहे = vim_strsave((char_u *)s);
 	    emsg_assert_fails_lnum = SOURCING_LNUM;
 	    vim_free(emsg_assert_fails_context);
 	    emsg_assert_fails_context = vim_strsave(
@@ -712,7 +712,7 @@ emsg_core(const char *s)
 #endif
 	    if (emsg_noredir == 0)
 	    {
-		msg_start();
+		मेनसाहे_start();
 		p = get_emsg_source();
 		if (p != NULL)
 		{
@@ -744,7 +744,7 @@ emsg_core(const char *s)
 	ex_exitval = 1;
 
 	// Reset msg_silent, an error causes messages to be switched back on.
-	msg_silent = 0;
+	मेनसाहे_silent = 0;
 	cmd_silent = FALSE;
 
 	if (global_busy)		// break :global command
@@ -766,7 +766,7 @@ emsg_core(const char *s)
 	emsg_on_display = TRUE;	    // remember there is an error message
 
     attr = HL_ATTR(HLF_E);	    // set highlight mode for error messages
-    if (msg_scrolled != 0)
+    if (मेनसाहे_scrolled != 0)
 	need_wait_return = TRUE;    // needed in case emsg() is called after
 				    // wait_return() has reset need_wait_return
 				    // and a redraw is expected because
@@ -778,14 +778,14 @@ emsg_core(const char *s)
     /*
      * Display name and line number for the source of the error.
      */
-    msg_scroll = TRUE;
-    msg_source(attr);
+    मेनसाहे_scroll = TRUE;
+    मेनसाहे_source(attr);
 
     /*
      * Display the error message itself.
      */
-    msg_nowait = FALSE;			// wait for this msg
-    r = msg_attr((char *)s, attr);
+    मेनसाहे_nowait = FALSE;			// wait for this msg
+    r = मेनसाहे_attr((char *)s, attr);
 
 #ifdef FEAT_JOB_CHANNEL
     emsg_to_channel_log = FALSE;
@@ -853,7 +853,7 @@ iemsg(char *s)
     emsg_core(s);
 #if defined(ABORT_ON_INTERNAL_ERROR) && defined(FEAT_EVAL)
     set_vim_var_string(VV_ERRMSG, (char_u *)s, -1);
-    msg_putchar('\n');  // avoid overwriting the error message
+    मेनसाहे_putchar('\n');  // avoid overwriting the error message
     out_flush();
     abort();
 #endif
@@ -892,7 +892,7 @@ siemsg(const char *s, ...)
 	emsg_core((char *)IObuff);
     }
 # ifdef ABORT_ON_INTERNAL_ERROR
-    msg_putchar('\n');  // avoid overwriting the error message
+    मेनसाहे_putchar('\n');  // avoid overwriting the error message
     out_flush();
     abort();
 # endif
@@ -941,11 +941,11 @@ emsg_invreg(int name)
  * Give an error message which contains %s for "name[len]".
  */
     void
-emsg_namelen(char *msg, char_u *name, int len)
+emsg_namelen(char *मेनसाहे, char_u *name, int len)
 {
     char_u *copy = vim_strnsave(name, len);
 
-    semsg(msg, copy == NULL ? "NULL" : (char *)copy);
+    semsg(मेनसाहे, copy == NULL ? "NULL" : (char *)copy);
     vim_free(copy);
 }
 #endif
@@ -957,19 +957,19 @@ emsg_namelen(char *msg, char_u *name, int len)
  * Returns a pointer to the printed message, if wait_return() not called.
  */
     char *
-msg_trunc_attr(char *s, int force, int attr)
+मेनसाहे_trunc_attr(char *s, int force, int attr)
 {
     int		n;
     char	*ts;
 
     // Add message to history before truncating
-    add_msg_hist((char_u *)s, -1, attr);
+    add_मेनसाहे_hist((char_u *)s, -1, attr);
 
-    ts = (char *)msg_may_trunc(force, (char_u *)s);
+    ts = (char *)मेनसाहे_may_trunc(force, (char_u *)s);
 
-    msg_hist_off = TRUE;
-    n = msg_attr(ts, attr);
-    msg_hist_off = FALSE;
+    मेनसाहे_hist_off = TRUE;
+    n = मेनसाहे_attr(ts, attr);
+    मेनसाहे_hist_off = FALSE;
 
     if (n)
 	return ts;
@@ -982,7 +982,7 @@ msg_trunc_attr(char *s, int force, int attr)
  * Note: May change the message by replacing a character with '<'.
  */
     char_u *
-msg_may_trunc(int force, char_u *s)
+मेनसाहे_may_trunc(int force, char_u *s)
 {
     int		n;
     int		room;
@@ -1015,18 +1015,18 @@ msg_may_trunc(int force, char_u *s)
 }
 
     static void
-add_msg_hist(
+add_मेनसाहे_hist(
     char_u	*s,
     int		len,		// -1 for undetermined length
     int		attr)
 {
-    struct msg_hist *p;
+    struct मेनसाहे_hist *p;
 
-    if (msg_hist_off || msg_silent != 0)
+    if (मेनसाहे_hist_off || मेनसाहे_silent != 0)
 	return;
 
     // allocate an entry and add the message at the end of the history
-    p = ALLOC_ONE(struct msg_hist);
+    p = ALLOC_ONE(struct मेनसाहे_hist);
     if (p == NULL)
 	return;
 
@@ -1040,17 +1040,17 @@ add_msg_hist(
     }
     while (len > 0 && s[len - 1] == '\n')
 	--len;
-    p->msg = vim_strnsave(s, len);
+    p->मेनसाहे = vim_strnsave(s, len);
     p->next = NULL;
     p->attr = attr;
-    if (last_msg_hist != NULL)
-	last_msg_hist->next = p;
-    last_msg_hist = p;
-    if (first_msg_hist == NULL)
-	first_msg_hist = last_msg_hist;
-    ++msg_hist_len;
+    if (last_मेनसाहे_hist != NULL)
+	last_मेनसाहे_hist->next = p;
+    last_मेनसाहे_hist = p;
+    if (first_मेनसाहे_hist == NULL)
+	first_मेनसाहे_hist = last_मेनसाहे_hist;
+    ++मेनसाहे_hist_len;
 
-    check_msg_hist();
+    check_मेनसाहे_hist();
 }
 
 /*
@@ -1058,28 +1058,28 @@ add_msg_hist(
  * Returns FAIL if there are no messages.
  */
     int
-delete_first_msg(void)
+delete_first_मेनसाहे(void)
 {
-    struct msg_hist *p;
+    struct मेनसाहे_hist *p;
 
-    if (msg_hist_len <= 0)
+    if (मेनसाहे_hist_len <= 0)
 	return FAIL;
-    p = first_msg_hist;
-    first_msg_hist = p->next;
-    if (first_msg_hist == NULL)
-	last_msg_hist = NULL;  // history is empty
-    vim_free(p->msg);
+    p = first_मेनसाहे_hist;
+    first_मेनसाहे_hist = p->next;
+    if (first_मेनसाहे_hist == NULL)
+	last_मेनसाहे_hist = NULL;  // history is empty
+    vim_free(p->मेनसाहे);
     vim_free(p);
-    --msg_hist_len;
+    --मेनसाहे_hist_len;
     return OK;
 }
 
     static void
-check_msg_hist(void)
+check_मेनसाहे_hist(void)
 {
     // Don't let the message history get too big
-    while (msg_hist_len > 0 && msg_hist_len > msg_hist_max)
-	(void)delete_first_msg();
+    while (मेनसाहे_hist_len > 0 && मेनसाहे_hist_len > मेनसाहे_hist_max)
+	(void)delete_first_मेनसाहे();
 }
 
 
@@ -1137,11 +1137,11 @@ messagesopt_changed(void)
     if (messages_wait_new < 0 || messages_wait_new > 10000)
 	return FAIL;
 
-    msg_flags = messages_flags_new;
-    msg_wait = messages_wait_new;
+    मेनसाहे_flags = messages_flags_new;
+    मेनसाहे_wait = messages_wait_new;
 
-    msg_hist_max = messages_history_new;
-    check_msg_hist();
+    मेनसाहे_hist_max = messages_history_new;
+    check_मेनसाहे_hist();
 
     return OK;
 }
@@ -1152,16 +1152,16 @@ messagesopt_changed(void)
     void
 ex_messages(exarg_T *eap)
 {
-    struct msg_hist *p;
+    struct मेनसाहे_hist *p;
     char_u	    *s;
     int		    c = 0;
 
     if (STRCMP(eap->arg, "clear") == 0)
     {
-	int keep = eap->addr_count == 0 ? 0 : eap->line2;
+	int keep = eap->addr_बिलांग == 0 ? 0 : eap->line2;
 
-	while (msg_hist_len > keep)
-	    (void)delete_first_msg();
+	while (मेनसाहे_hist_len > keep)
+	    (void)delete_first_मेनसाहे();
 	return;
     }
 
@@ -1171,10 +1171,10 @@ ex_messages(exarg_T *eap)
 	return;
     }
 
-    msg_hist_off = TRUE;
+    मेनसाहे_hist_off = TRUE;
 
-    p = first_msg_hist;
-    if (eap->addr_count != 0)
+    p = first_मेनसाहे_hist;
+    if (eap->addr_बिलांग != 0)
     {
 	// Count total messages
 	for (; p != NULL && !got_int; p = p->next)
@@ -1183,11 +1183,11 @@ ex_messages(exarg_T *eap)
 	c -= eap->line2;
 
 	// Skip without number of messages specified
-	for (p = first_msg_hist; p != NULL && !got_int && c > 0;
+	for (p = first_मेनसाहे_hist; p != NULL && !got_int && c > 0;
 						    p = p->next, c--);
     }
 
-    if (p == first_msg_hist)
+    if (p == first_मेनसाहे_hist)
     {
 #ifdef FEAT_MULTI_LANG
 	s = get_mess_lang();
@@ -1197,7 +1197,7 @@ ex_messages(exarg_T *eap)
 	if (s != NULL && *s != NUL)
 	    // The next comment is extracted by xgettext and put in po file for
 	    // translators to read.
-	    msg_attr(
+	    मेनसाहे_attr(
 		    // Translator: Please replace the name and email address
 		    // with the appropriate text for your translation.
 		    _("Messages maintainer: The Vim Project"),
@@ -1206,10 +1206,10 @@ ex_messages(exarg_T *eap)
 
     // Display what was not skipped.
     for (; p != NULL && !got_int; p = p->next)
-	if (p->msg != NULL)
-	    msg_attr((char *)p->msg, p->attr);
+	if (p->मेनसाहे != NULL)
+	    मेनसाहे_attr((char *)p->मेनसाहे, p->attr);
 
-    msg_hist_off = FALSE;
+    मेनसाहे_hist_off = FALSE;
 }
 
 #if defined(FEAT_CON_DIALOG) || defined(FIND_REPLACE_DIALOG)
@@ -1218,14 +1218,14 @@ ex_messages(exarg_T *eap)
  * and a delay.
  */
     void
-msg_end_prompt(void)
+मेनसाहे_end_prompt(void)
 {
     need_wait_return = FALSE;
     emsg_on_display = FALSE;
-    cmdline_row = msg_row;
-    msg_col = 0;
-    msg_clr_eos();
-    lines_left = -1;
+    cmdline_row = मेनसाहे_row;
+    मेनसाहे_col = 0;
+    मेनसाहे_clr_eos();
+    मगा_लिन्या_कालिवा = -1;
 }
 #endif
 
@@ -1250,7 +1250,7 @@ wait_return(int redraw)
 
     // If using ":silent cmd", don't wait for a return.  Also don't set
     // need_wait_return to do it later.
-    if (msg_silent != 0)
+    if (मेनसाहे_silent != 0)
 	return;
 #ifdef HAS_MESSAGE_WINDOW
     if (in_echowindow)
@@ -1269,7 +1269,7 @@ wait_return(int redraw)
     if (no_wait_return)
     {
 	if (!exmode_active)
-	    cmdline_row = msg_row;
+	    cmdline_row = मेनसाहे_row;
 	return;
     }
 
@@ -1283,7 +1283,7 @@ wait_return(int redraw)
     }
     else if (exmode_active)
     {
-	msg_puts(" ");		// make sure the cursor is on the right line
+	मेनसाहे_puts(" ");		// make sure the cursor is on the right line
 	c = CAR;		// no need for a return in ex mode
 	got_int = FALSE;
     }
@@ -1303,7 +1303,7 @@ wait_return(int redraw)
 #ifdef USE_ON_FLY_SCROLL
 	dont_scroll = TRUE;		// disallow scrolling here
 #endif
-	cmdline_row = msg_row;
+	cmdline_row = मेनसाहे_row;
 
 	// Avoid the sequence that the user types ":" at the hit-return prompt
 	// to start an Ex command, but the file-changed dialog gets in the
@@ -1311,9 +1311,9 @@ wait_return(int redraw)
 	if (need_check_timestamps)
 	    check_timestamps(FALSE);
 
-	if (msg_flags & MESSAGES_HIT_ENTER)
+	if (मेनसाहे_flags & MESSAGES_HIT_ENTER)
 	{
-	    hit_return_msg();
+	    hit_return_मेनसाहे();
 
 	    do
 	    {
@@ -1329,7 +1329,7 @@ wait_return(int redraw)
 		// Don't do mappings here, we put the character back in the
 		// typeahead buffer.
 		++no_mapping;
-		++allow_keys;
+		++allow_मगा_सुसि;
 
 		// Temporarily disable Recording. If Recording is active, the
 		// character will be recorded later, since it will be added to
@@ -1342,7 +1342,7 @@ wait_return(int redraw)
 		if (had_got_int && !global_busy)
 		    got_int = FALSE;
 		--no_mapping;
-		--allow_keys;
+		--allow_मगा_सुसि;
 		reg_recording = save_reg_recording;
 		scriptout = save_scriptout;
 
@@ -1351,7 +1351,7 @@ wait_return(int redraw)
 		// at the hit-enter prompt.  Use CTRL-Y, because the same is
 		// used in Cmdline-mode and it's harmless when there is no
 		// selection.
-		if (KeyTyped && c == Ctrl_Y && clip_star.state == SELECT_DONE)
+		if (सुसि_Typed && c == Ctrl_Y && clip_star.state == SELECT_DONE)
 		{
 		    clip_copy_modeless_selection(TRUE);
 		    c = K_IGNORE;
@@ -1364,19 +1364,19 @@ wait_return(int redraw)
 		* screen, to avoid that typing one 'j' too many makes the
 		* messages disappear.
 		*/
-		if (KeyTyped && p_more && !p_cp)
+		if (सुसि_Typed && p_more && !p_cp)
 		{
 		    if (c == 'b' || c == Ctrl_B || c == 'k' || c == 'u' || c == 'g'
 						|| c == K_UP || c == K_PAGEUP)
 		    {
-			if (msg_scrolled > Rows)
+			if (मेनसाहे_scrolled > Rows)
 			    // scroll back to show older messages
 			    do_more_prompt(c);
 			else
 			{
-			    msg_didout = FALSE;
+			    मेनसाहे_didout = FALSE;
 			    c = K_IGNORE;
-			    msg_col =
+			    मेनसाहे_col =
 #ifdef FEAT_RIGHTLEFT
 				cmdmsg_rl ? cmdline_width - 1 :
 #endif
@@ -1391,10 +1391,10 @@ wait_return(int redraw)
 			else if (c != K_IGNORE)
 			{
 			    c = K_IGNORE;
-			    hit_return_msg();
+			    hit_return_मेनसाहे();
 			}
 		    }
-		    else if (msg_scrolled > Rows - 2
+		    else if (मेनसाहे_scrolled > Rows - 2
 			    && (c == 'j' || c == 'd' || c == 'f' || c == Ctrl_F
 					    || c == K_DOWN || c == K_PAGEDOWN))
 			c = K_IGNORE;
@@ -1411,7 +1411,7 @@ wait_return(int redraw)
 				|| c == K_MOUSEDOWN  || c == K_MOUSEUP
 				|| c == K_MOUSEMOVE
 				|| (!mouse_has(MOUSE_RETURN)
-				    && mouse_row < msg_row
+				    && mouse_row < मेनसाहे_row
 				    && (c == K_LEFTMOUSE
 					|| c == K_MIDDLEMOUSE
 					|| c == K_RIGHTMOUSE
@@ -1424,7 +1424,7 @@ wait_return(int redraw)
 	    if (c == K_LEFTMOUSE || c == K_MIDDLEMOUSE || c == K_RIGHTMOUSE
 					|| c == K_X1MOUSE || c == K_X2MOUSE)
 		(void)jump_to_mouse(MOUSE_SETPOS, NULL, 0);
-	    else if (!KeyTyped || (vim_strchr((char_u *)"\r\n ", c) == NULL
+	    else if (!सुसि_Typed || (vim_strchr((char_u *)"\r\n ", c) == NULL
 						   && c != Ctrl_C && c != 'q'))
 	    {
 		// Put the character back in the typeahead buffer.  Don't use
@@ -1438,7 +1438,7 @@ wait_return(int redraw)
 	{
 	    c = CAR;
 	    // Wait to allow the user to verify the output.
-	    do_sleep(msg_wait, TRUE);
+	    do_sleep(मेनसाहे_wait, TRUE);
 	}
     }
     redir_off = FALSE;
@@ -1450,7 +1450,7 @@ wait_return(int redraw)
     if (c == ':' || c == '?' || c == '/')
     {
 	if (!exmode_active)
-	    cmdline_row = msg_row;
+	    cmdline_row = मेनसाहे_row;
 	skip_redraw = TRUE;	    // skip redraw once
 	do_redraw = FALSE;
 #ifdef FEAT_TERMINAL
@@ -1466,7 +1466,7 @@ wait_return(int redraw)
     tmpState = State;
     State = oldState;		    // restore State before set_shellsize
     setmouse();
-    msg_check();
+    मेनसाहे_check();
 
 #ifndef MSWIN
     /*
@@ -1480,11 +1480,11 @@ wait_return(int redraw)
     need_wait_return = FALSE;
     did_wait_return = TRUE;
     emsg_on_display = FALSE;	// can delete error message now
-    lines_left = -1;		// reset lines_left at next msg_start()
+    मगा_लिन्या_कालिवा = -1;		// reset lines_left at next msg_start()
     reset_last_sourcing();
-    if (keep_msg != NULL && vim_strsize(keep_msg) >=
+    if (keep_मेनसाहे != NULL && vim_strsize(keep_मेनसाहे) >=
 			    (Rows - cmdline_row - 1) * cmdline_width + sc_col)
-	VIM_CLEAR(keep_msg);	    // don't redisplay message, it's too long
+	VIM_CLEAR(keep_मेनसाहे);	    // don't redisplay message, it's too long
 
     if (tmpState == MODE_SETWSIZE)  // got resize event while in vgetc()
     {
@@ -1492,7 +1492,7 @@ wait_return(int redraw)
 	shell_resized();
     }
     else if (!skip_redraw
-	    && (redraw == TRUE || (msg_scrolled != 0 && redraw != -1)))
+	    && (redraw == TRUE || (मेनसाहे_scrolled != 0 && redraw != -1)))
     {
 	starttermcap();		    // start termcap before redrawing
 	redraw_later(UPD_VALID);
@@ -1503,19 +1503,19 @@ wait_return(int redraw)
  * Write the hit-return prompt.
  */
     static void
-hit_return_msg(void)
+hit_return_मेनसाहे(void)
 {
     int		save_p_more = p_more;
 
     p_more = FALSE;	// don't want to see this message when scrolling back
-    if (msg_didout)	// start on a new line
-	msg_putchar('\n');
+    if (मेनसाहे_didout)	// start on a new line
+	मेनसाहे_putchar('\n');
     if (got_int)
-	msg_puts(_("Interrupt: "));
+	मेनसाहे_puts(_("Interrupt: "));
 
-    msg_puts_attr(_("Press ENTER or type command to continue"), HL_ATTR(HLF_R));
-    if (!msg_use_printf())
-	msg_clr_eos();
+    मेनसाहे_puts_attr(_("Press ENTER or type command to continue"), HL_ATTR(HLF_R));
+    if (!मेनसाहे_use_printf())
+	मेनसाहे_clr_eos();
     p_more = save_p_more;
 }
 
@@ -1523,15 +1523,15 @@ hit_return_msg(void)
  * Set "keep_msg" to "s".  Free the old value and check for NULL pointer.
  */
     void
-set_keep_msg(char_u *s, int attr)
+set_keep_मेनसाहे(char_u *s, int attr)
 {
-    vim_free(keep_msg);
-    if (s != NULL && msg_silent == 0)
-	keep_msg = vim_strsave(s);
+    vim_free(keep_मेनसाहे);
+    if (s != NULL && मेनसाहे_silent == 0)
+	keep_मेनसाहे = vim_strsave(s);
     else
-	keep_msg = NULL;
-    keep_msg_more = FALSE;
-    keep_msg_attr = attr;
+	keep_मेनसाहे = NULL;
+    keep_मेनसाहे_more = FALSE;
+    keep_मेनसाहे_attr = attr;
 }
 
 /*
@@ -1539,27 +1539,27 @@ set_keep_msg(char_u *s, int attr)
  * that it will be displayed again after redraw.
  */
     void
-set_keep_msg_from_hist(void)
+set_keep_मेनसाहे_from_hist(void)
 {
-    if (keep_msg == NULL && last_msg_hist != NULL && msg_scrolled == 0
+    if (keep_मेनसाहे == NULL && last_मेनसाहे_hist != NULL && मेनसाहे_scrolled == 0
 						      && (State & MODE_NORMAL))
-	set_keep_msg(last_msg_hist->msg, last_msg_hist->attr);
+	set_keep_मेनसाहे(last_मेनसाहे_hist->मेनसाहे, last_मेनसाहे_hist->attr);
 }
 
 /*
  * Prepare for outputting characters in the command line.
  */
     void
-msg_start(void)
+मेनसाहे_start(void)
 {
     int		did_return = FALSE;
 
-    if (msg_row < cmdline_row)
-	msg_row = cmdline_row;
+    if (मेनसाहे_row < cmdline_row)
+	मेनसाहे_row = cmdline_row;
 
-    if (!msg_silent)
+    if (!मेनसाहे_silent)
     {
-	VIM_CLEAR(keep_msg);
+	VIM_CLEAR(keep_मेनसाहे);
 	need_fileinfo = FALSE;
     }
 
@@ -1569,7 +1569,7 @@ msg_start(void)
 	// Halfway an ":echo" command and getting an (error) message: clear
 	// any text from the command.
 	need_clr_eos = FALSE;
-	msg_clr_eos();
+	मेनसाहे_clr_eos();
     }
 #endif
 
@@ -1577,43 +1577,43 @@ msg_start(void)
     if (in_echowindow)
     {
 	if (popup_message_win_visible()
-		    && ((msg_col > 0 && (msg_scroll || !full_screen))
+		    && ((मेनसाहे_col > 0 && (मेनसाहे_scroll || !full_screen))
 			|| in_echowindow))
 	{
 	    win_T *wp = popup_get_message_win();
 
 	    // start a new line
 	    curbuf = wp->w_buffer;
-	    ml_append(wp->w_buffer->b_ml.ml_line_count,
+	    ml_append(wp->w_buffer->b_ml.ml_लिन्या_बिलांग,
 					      (char_u *)"", (colnr_T)0, FALSE);
 	    curbuf = curwin->w_buffer;
 	}
-	msg_col = 0;
+	मेनसाहे_col = 0;
     }
     else
 #endif
-	if (!msg_scroll && full_screen)	// overwrite last message
+	if (!मेनसाहे_scroll && full_screen)	// overwrite last message
     {
-	msg_row = cmdline_row;
-	msg_col =
+	मेनसाहे_row = cmdline_row;
+	मेनसाहे_col =
 #ifdef FEAT_RIGHTLEFT
 	    cmdmsg_rl ? cmdline_width - 1 :
 #endif
 	    0;
     }
-    else if (msg_didout || in_echowindow)
+    else if (मेनसाहे_didout || in_echowindow)
     {
 	// start message on next line
-	msg_putchar('\n');
+	मेनसाहे_putchar('\n');
 	did_return = TRUE;
 	if (exmode_active != EXMODE_NORMAL)
-	    cmdline_row = msg_row;
+	    cmdline_row = मेनसाहे_row;
     }
-    if (!msg_didany || lines_left < 0)
-	msg_starthere();
-    if (msg_silent == 0)
+    if (!मेनसाहे_didany || मगा_लिन्या_कालिवा < 0)
+	मेनसाहे_starthere();
+    if (मेनसाहे_silent == 0)
     {
-	msg_didout = FALSE;		    // no output on current line yet
+	मेनसाहे_didout = FALSE;		    // no output on current line yet
 	cursor_off();
     }
 
@@ -1626,20 +1626,20 @@ msg_start(void)
  * Note that the current msg position is where messages start.
  */
     void
-msg_starthere(void)
+मेनसाहे_starthere(void)
 {
-    lines_left = cmdline_row;
-    msg_didany = FALSE;
+    मगा_लिन्या_कालिवा = cmdline_row;
+    मेनसाहे_didany = FALSE;
 }
 
     void
-msg_putchar(int c)
+मेनसाहे_putchar(int c)
 {
-    msg_putchar_attr(c, 0);
+    मेनसाहे_putchar_attr(c, 0);
 }
 
     void
-msg_putchar_attr(int c, int attr)
+मेनसाहे_putchar_attr(int c, int attr)
 {
     char_u	buf[MB_MAXBYTES + 1];
 
@@ -1652,40 +1652,40 @@ msg_putchar_attr(int c, int attr)
     }
     else
 	buf[(*mb_char2bytes)(c, buf)] = NUL;
-    msg_puts_attr((char *)buf, attr);
+    मेनसाहे_puts_attr((char *)buf, attr);
 }
 
     void
-msg_outnum(long n)
+मेनसाहे_outnum(long n)
 {
     char	buf[20];
 
     sprintf(buf, "%ld", n);
-    msg_puts(buf);
+    मेनसाहे_puts(buf);
 }
 
     void
-msg_home_replace(char_u *fname)
+मेनसाहे_home_replace(char_u *fname)
 {
-    msg_home_replace_attr(fname, 0);
+    मेनसाहे_home_replace_attr(fname, 0);
 }
 
 #if defined(FEAT_FIND_ID)
     void
-msg_home_replace_hl(char_u *fname)
+मेनसाहे_home_replace_hl(char_u *fname)
 {
-    msg_home_replace_attr(fname, HL_ATTR(HLF_D));
+    मेनसाहे_home_replace_attr(fname, HL_ATTR(HLF_D));
 }
 #endif
 
     static void
-msg_home_replace_attr(char_u *fname, int attr)
+मेनसाहे_home_replace_attr(char_u *fname, int attr)
 {
     char_u	*name;
 
     name = home_replace_save(NULL, fname);
     if (name != NULL)
-	msg_outtrans_attr(name, attr);
+	मेनसाहे_outtrans_attr(name, attr);
     vim_free(name);
 }
 
@@ -1696,21 +1696,21 @@ msg_home_replace_attr(char_u *fname, int attr)
  * Return the number of characters it takes on the screen.
  */
     int
-msg_outtrans(char_u *str)
+मेनसाहे_outtrans(char_u *str)
 {
-    return msg_outtrans_attr(str, 0);
+    return मेनसाहे_outtrans_attr(str, 0);
 }
 
     int
-msg_outtrans_attr(char_u *str, int attr)
+मेनसाहे_outtrans_attr(char_u *str, int attr)
 {
-    return msg_outtrans_len_attr(str, (int)STRLEN(str), attr);
+    return मेनसाहे_outtrans_len_attr(str, (int)STRLEN(str), attr);
 }
 
     int
-msg_outtrans_len(char_u *str, int len)
+मेनसाहे_outtrans_len(char_u *str, int len)
 {
-    return msg_outtrans_len_attr(str, len, 0);
+    return मेनसाहे_outtrans_len_attr(str, len, 0);
 }
 
 /*
@@ -1718,21 +1718,21 @@ msg_outtrans_len(char_u *str, int len)
  * Handles multi-byte characters.
  */
     char_u *
-msg_outtrans_one(char_u *p, int attr)
+मेनसाहे_outtrans_one(char_u *p, int attr)
 {
     int		l;
 
     if (has_mbyte && (l = (*mb_ptr2len)(p)) > 1)
     {
-	msg_outtrans_len_attr(p, l, attr);
+	मेनसाहे_outtrans_len_attr(p, l, attr);
 	return p + l;
     }
-    msg_puts_attr((char *)transchar_byte_buf(NULL, *p), attr);
+    मेनसाहे_puts_attr((char *)transchar_byte_buf(NULL, *p), attr);
     return p + 1;
 }
 
     int
-msg_outtrans_len_attr(char_u *msgstr, int len, int attr)
+मेनसाहे_outtrans_len_attr(char_u *msgstr, int len, int attr)
 {
     int		retval = 0;
     char_u	*str = msgstr;
@@ -1746,18 +1746,18 @@ msg_outtrans_len_attr(char_u *msgstr, int len, int attr)
     got_int = FALSE;
 
     if (attr == 0)
-	attr = HL_ATTR(HLF_MSG);
+	attr = HL_ATTR(HLF_मेनसाहे);
 
     // if MSG_HIST flag set, add message to history
-    if (attr & MSG_HIST)
+    if (attr & मेनसाहे_HIST)
     {
-	add_msg_hist(str, len, attr);
-	attr &= ~MSG_HIST;
+	add_मेनसाहे_hist(str, len, attr);
+	attr &= ~मेनसाहे_HIST;
     }
 
     // When drawing over the command line no need to clear it later or remove
     // the mode message.
-    if (msg_silent == 0 && len > 0 && msg_row >= cmdline_row && msg_col == 0)
+    if (मेनसाहे_silent == 0 && len > 0 && मेनसाहे_row >= cmdline_row && मेनसाहे_col == 0)
     {
 	clear_cmdline = FALSE;
 	mode_displayed = FALSE;
@@ -1766,7 +1766,7 @@ msg_outtrans_len_attr(char_u *msgstr, int len, int attr)
     // If the string starts with a composing character first draw a space on
     // which the composing char can be drawn.
     if (enc_utf8 && utf_iscomposing(utf_ptr2char(msgstr)))
-	msg_puts_attr(" ", attr);
+	मेनसाहे_puts_attr(" ", attr);
 
     /*
      * Go over the string.  Special characters are translated and printed.
@@ -1792,10 +1792,10 @@ msg_outtrans_len_attr(char_u *msgstr, int len, int attr)
 		// unprintable multi-byte char: print the printable chars so
 		// far and the translation of the unprintable char.
 		if (str > plain_start)
-		    msg_puts_attr_len((char *)plain_start,
+		    मेनसाहे_puts_attr_len((char *)plain_start,
 					       (int)(str - plain_start), attr);
 		plain_start = str + mb_l;
-		msg_puts_attr((char *)transchar_buf(NULL, c),
+		मेनसाहे_puts_attr((char *)transchar_buf(NULL, c),
 					    attr == 0 ? HL_ATTR(HLF_8) : attr);
 		retval += char2cells(c);
 	    }
@@ -1810,10 +1810,10 @@ msg_outtrans_len_attr(char_u *msgstr, int len, int attr)
 		// unprintable char: print the printable chars so far and the
 		// translation of the unprintable char.
 		if (str > plain_start)
-		    msg_puts_attr_len((char *)plain_start,
+		    मेनसाहे_puts_attr_len((char *)plain_start,
 					       (int)(str - plain_start), attr);
 		plain_start = str + 1;
-		msg_puts_attr((char *)s, attr == 0 ? HL_ATTR(HLF_8) : attr);
+		मेनसाहे_puts_attr((char *)s, attr == 0 ? HL_ATTR(HLF_8) : attr);
 		retval += (int)STRLEN(s);
 	    }
 	    else
@@ -1824,7 +1824,7 @@ msg_outtrans_len_attr(char_u *msgstr, int len, int attr)
 
     if (str > plain_start && !got_int)
 	// print the printable chars at the end
-	msg_puts_attr_len((char *)plain_start, (int)(str - plain_start), attr);
+	मेनसाहे_puts_attr_len((char *)plain_start, (int)(str - plain_start), attr);
 
     got_int |= save_got_int;
 
@@ -1833,7 +1833,7 @@ msg_outtrans_len_attr(char_u *msgstr, int len, int attr)
 
 #if defined(FEAT_QUICKFIX)
     void
-msg_make(char_u *arg)
+मेनसाहे_make(char_u *arg)
 {
     int	    i;
     static char_u *str = (char_u *)"eeffoc", *rs = (char_u *)"Plon#dqg#vxjduB";
@@ -1844,9 +1844,9 @@ msg_make(char_u *arg)
 	    break;
     if (i < 0)
     {
-	msg_putchar('\n');
+	मेनसाहे_putchar('\n');
 	for (i = 0; rs[i]; ++i)
-	    msg_putchar(rs[i] - 3);
+	    मेनसाहे_putchar(rs[i] - 3);
     }
 }
 #endif
@@ -1866,7 +1866,7 @@ msg_make(char_u *arg)
  * the character/string -- webb
  */
     int
-msg_outtrans_special(
+मेनसाहे_outtrans_special(
     char_u	*strstart,
     int		from,	// TRUE for lhs of a mapping
     int		maxlen) // screen columns, 0 for unlimited
@@ -1895,7 +1895,7 @@ msg_outtrans_special(
 	if (maxlen > 0 && retval + len >= maxlen)
 	    break;
 	// Highlight special keys
-	msg_puts_attr(text, len > 1
+	मेनसाहे_puts_attr(text, len > 1
 		&& (*mb_ptr2len)((char_u *)text) <= 1 ? attr : 0);
 	retval += len;
     }
@@ -2007,7 +2007,7 @@ str2special(
 	|| c < ' '
 	|| (replace_spaces && c == ' ')
 	|| (replace_others && (c == '<' || c == '|' || c == '\\')))
-	return get_special_key_name(c, modifiers);
+	return get_special_सुसि_name(c, modifiers);
     buf[0] = c;
     buf[1] = NUL;
     return buf;
@@ -2042,7 +2042,7 @@ str2specialbuf(char_u *sp, char_u *buf, int len)
  * print line for :print or :list command
  */
     void
-msg_prt_line(char_u *s, int list)
+मेनसाहे_prt_लिन्या(char_u *s, int list)
 {
     int		c;
     int		col = 0;
@@ -2088,7 +2088,7 @@ msg_prt_line(char_u *s, int list)
     // output a space for an empty line, otherwise the line will be
     // overwritten
     if (*s == NUL && !(list && curwin->w_lcs_chars.eol != NUL))
-	msg_putchar(' ');
+	मेनसाहे_putchar(' ');
 
     while (!got_int)
     {
@@ -2122,7 +2122,7 @@ msg_prt_line(char_u *s, int list)
 		mch_memmove(buf, s, (size_t)l);
 		buf[l] = NUL;
 	    }
-	    msg_puts((char *)buf);
+	    मेनसाहे_puts((char *)buf);
 	    s += l;
 	    continue;
 	}
@@ -2240,10 +2240,10 @@ msg_prt_line(char_u *s, int list)
 	if (c == NUL)
 	    break;
 
-	msg_putchar_attr(c, attr);
+	मेनसाहे_putchar_attr(c, attr);
 	col++;
     }
-    msg_clr_eos();
+    मेनसाहे_clr_eos();
 }
 
 /*
@@ -2255,38 +2255,38 @@ screen_puts_mbyte(char_u *s, int l, int attr)
 {
     int		cw;
 
-    msg_didout = TRUE;		// remember that line is not empty
+    मेनसाहे_didout = TRUE;		// remember that line is not empty
     cw = (*mb_ptr2cells)(s);
     if (cw > 1 && (
 #ifdef FEAT_RIGHTLEFT
-		cmdmsg_rl ? msg_col <= 1 :
+		cmdmsg_rl ? मेनसाहे_col <= 1 :
 #endif
-		msg_col == cmdline_width - 1))
+		मेनसाहे_col == cmdline_width - 1))
     {
 	// Doesn't fit, print a highlighted '>' to fill it up.
-	msg_screen_putchar('>', HL_ATTR(HLF_AT));
+	मेनसाहे_screen_putchar('>', HL_ATTR(HLF_AT));
 	return s;
     }
 
-    screen_puts_len(s, l, msg_row, cmdline_col_off + msg_col, attr);
+    screen_puts_len(s, l, मेनसाहे_row, cmdline_col_off + मेनसाहे_col, attr);
 #ifdef FEAT_RIGHTLEFT
     if (cmdmsg_rl)
     {
-	msg_col -= cw;
-	if (msg_col == 0)
+	मेनसाहे_col -= cw;
+	if (मेनसाहे_col == 0)
 	{
-	    msg_col = cmdline_width;
-	    ++msg_row;
+	    मेनसाहे_col = cmdline_width;
+	    ++मेनसाहे_row;
 	}
     }
     else
 #endif
     {
-	msg_col += cw;
-	if (msg_col >= cmdline_width)
+	मेनसाहे_col += cw;
+	if (मेनसाहे_col >= cmdline_width)
 	{
-	    msg_col = 0;
-	    ++msg_row;
+	    मेनसाहे_col = 0;
+	    ++मेनसाहे_row;
 	}
     }
     return s + l;
@@ -2297,15 +2297,15 @@ screen_puts_mbyte(char_u *s, int l, int attr)
  * Update msg_row and msg_col for the next message.
  */
     void
-msg_puts(char *s)
+मेनसाहे_puts(char *s)
 {
-    msg_puts_attr(s, 0);
+    मेनसाहे_puts_attr(s, 0);
 }
 
     void
-msg_puts_title(char *s)
+मेनसाहे_puts_title(char *s)
 {
-    msg_puts_attr(s, HL_ATTR(HLF_T));
+    मेनसाहे_puts_attr(s, HL_ATTR(HLF_T));
 }
 
 /*
@@ -2314,34 +2314,34 @@ msg_puts_title(char *s)
  * Does not handle multi-byte characters!
  */
     static void
-msg_outtrans_long_len_attr(char_u *longstr, int len, int attr)
+मेनसाहे_outtrans_long_len_attr(char_u *longstr, int len, int attr)
 {
     int		slen = len;
     int		room;
 
-    room = cmdline_width - msg_col;
+    room = cmdline_width - मेनसाहे_col;
     if (len > room && room >= 20)
     {
 	slen = (room - 3) / 2;
-	msg_outtrans_len_attr(longstr, slen, attr);
-	msg_puts_attr("...", HL_ATTR(HLF_8));
+	मेनसाहे_outtrans_len_attr(longstr, slen, attr);
+	मेनसाहे_puts_attr("...", HL_ATTR(HLF_8));
     }
-    msg_outtrans_len_attr(longstr + len - slen, slen, attr);
+    मेनसाहे_outtrans_len_attr(longstr + len - slen, slen, attr);
 }
 
     void
-msg_outtrans_long_attr(char_u *longstr, int attr)
+मेनसाहे_outtrans_long_attr(char_u *longstr, int attr)
 {
-    msg_outtrans_long_len_attr(longstr, (int)STRLEN(longstr), attr);
+    मेनसाहे_outtrans_long_len_attr(longstr, (int)STRLEN(longstr), attr);
 }
 
 /*
  * Basic function for writing a message with highlight attributes.
  */
     void
-msg_puts_attr(char *s, int attr)
+मेनसाहे_puts_attr(char *s, int attr)
 {
-    msg_puts_attr_len(s, -1, attr);
+    मेनसाहे_puts_attr_len(s, -1, attr);
 }
 
 /*
@@ -2350,7 +2350,7 @@ msg_puts_attr(char *s, int attr)
  * When "maxlen" is >= 0 the message is not put in the history.
  */
     static void
-msg_puts_attr_len(char *str, int maxlen, int attr)
+मेनसाहे_puts_attr_len(char *str, int maxlen, int attr)
 {
     /*
      * If redirection is on, also write to the redirection file.
@@ -2360,17 +2360,17 @@ msg_puts_attr_len(char *str, int maxlen, int attr)
     /*
      * Don't print anything when using ":silent cmd".
      */
-    if (msg_silent != 0)
+    if (मेनसाहे_silent != 0)
 	return;
 
     if (attr == 0)
-	attr = HL_ATTR(HLF_MSG);
+	attr = HL_ATTR(HLF_मेनसाहे);
 
     // if MSG_HIST flag set, add message to history
-    if ((attr & MSG_HIST) && maxlen < 0)
+    if ((attr & मेनसाहे_HIST) && maxlen < 0)
     {
-	add_msg_hist((char_u *)str, -1, attr);
-	attr &= ~MSG_HIST;
+	add_मेनसाहे_hist((char_u *)str, -1, attr);
+	attr &= ~मेनसाहे_HIST;
     }
 
     // When writing something to the screen after it has scrolled, requires a
@@ -2378,9 +2378,9 @@ msg_puts_attr_len(char *str, int maxlen, int attr)
     // need_wait_return after some prompt, and then outputting something
     // without scrolling
     // Not needed when only using CR to move the cursor.
-    if (msg_scrolled != 0 && !msg_scrolled_ign && STRCMP(str, "\r") != 0)
+    if (मेनसाहे_scrolled != 0 && !मेनसाहे_scrolled_ign && STRCMP(str, "\r") != 0)
 	need_wait_return = TRUE;
-    msg_didany = TRUE;		// remember that something was outputted
+    मेनसाहे_didany = TRUE;		// remember that something was outputted
 
     /*
      * If there is no valid screen, use fprintf so we can see error messages.
@@ -2389,10 +2389,10 @@ msg_puts_attr_len(char *str, int maxlen, int attr)
      * different, e.g. for Win32 console) or we just don't know where the
      * cursor is.
      */
-    if (msg_use_printf())
-	msg_puts_printf((char_u *)str, maxlen);
+    if (मेनसाहे_use_printf())
+	मेनसाहे_puts_printf((char_u *)str, maxlen);
     else
-	msg_puts_display((char_u *)str, maxlen, attr, FALSE);
+	मेनसाहे_puts_display((char_u *)str, maxlen, attr, FALSE);
 
     need_fileinfo = FALSE;
 }
@@ -2408,7 +2408,7 @@ msg_puts_attr_len(char *str, int maxlen, int attr)
  * "where" specifies where to put the text.
  */
     static void
-put_msg_win(win_T *wp, int where, char_u *t_s, char_u *end, linenr_T lnum)
+put_मेनसाहे_win(win_T *wp, int where, char_u *t_s, char_u *end, linenr_T lnum)
 {
     char_u  *p;
 
@@ -2451,7 +2451,7 @@ put_msg_win(win_T *wp, int where, char_u *t_s, char_u *end, linenr_T lnum)
     redraw_win_later(wp, UPD_NOT_VALID);
 
     // set msg_col so that a newline is written if needed
-    msg_col += (int)(end - t_s);
+    मेनसाहे_col += (int)(end - t_s);
 }
 #endif
 
@@ -2460,7 +2460,7 @@ put_msg_win(win_T *wp, int where, char_u *t_s, char_u *end, linenr_T lnum)
  * May be called recursively to display scroll-back text.
  */
     static void
-msg_puts_display(
+मेनसाहे_puts_display(
     char_u	*str,
     int		maxlen,
     int		attr,
@@ -2472,19 +2472,19 @@ msg_puts_display(
     int		l;
     int		cw;
     char_u	*sb_str = str;
-    int		sb_col = msg_col;
+    int		sb_col = मेनसाहे_col;
     int		wrap;
     int		did_last_char;
 #ifdef HAS_MESSAGE_WINDOW
     int		where = PUT_APPEND;
-    win_T	*msg_win = NULL;
+    win_T	*मेनसाहे_win = NULL;
     linenr_T    lnum = 1;
 
     if (in_echowindow)
     {
-	msg_win = popup_get_message_win();
+	मेनसाहे_win = popup_get_message_win();
 
-	if (msg_win != NULL)
+	if (मेनसाहे_win != NULL)
 	{
 	    if (!popup_message_win_visible())
 	    {
@@ -2492,12 +2492,12 @@ msg_puts_display(
 		{
 		    // When not showing the message window and the output
 		    // starts with a NL show the message normally.
-		    msg_win = NULL;
+		    मेनसाहे_win = NULL;
 		}
 		else
 		{
 		    // currently hidden, make it empty
-		    curbuf = msg_win->w_buffer;
+		    curbuf = मेनसाहे_win->w_buffer;
 		    while ((curbuf->b_ml.ml_flags & ML_EMPTY) == 0)
 			ml_delete(1);
 		    curbuf = curwin->w_buffer;
@@ -2505,8 +2505,8 @@ msg_puts_display(
 	    }
 	    else
 	    {
-		lnum = msg_win->w_buffer->b_ml.ml_line_count;
-		if (msg_col == 0)
+		lnum = मेनसाहे_win->w_buffer->b_ml.ml_लिन्या_बिलांग;
+		if (मेनसाहे_col == 0)
 		    where = PUT_TRUNC;
 	    }
 	}
@@ -2518,7 +2518,7 @@ msg_puts_display(
     {
 #ifdef HAS_MESSAGE_WINDOW
 	// For echowindow, use full width; for regular messages, leave last column
-	int wrap_col = msg_win != NULL ? cmdline_width : cmdline_width - 1;
+	int wrap_col = मेनसाहे_win != NULL ? cmdline_width : cmdline_width - 1;
 #else
 	int wrap_col = cmdline_width - 1;
 #endif
@@ -2528,20 +2528,20 @@ msg_puts_display(
 	 * - When outputting a newline.
 	 * - When outputting a character in the last column.
 	 */
-	if (!recurse && msg_row >= Rows - 1 && (*s == '\n' || (
+	if (!recurse && मेनसाहे_row >= Rows - 1 && (*s == '\n' || (
 #ifdef FEAT_RIGHTLEFT
 		    cmdmsg_rl
 		    ? (
-			msg_col <= 1
-		      || (*s == TAB && msg_col <= 7)
-		      || (has_mbyte && (*mb_ptr2cells)(s) > 1 && msg_col <= 2))
+			मेनसाहे_col <= 1
+		      || (*s == TAB && मेनसाहे_col <= 7)
+		      || (has_mbyte && (*mb_ptr2cells)(s) > 1 && मेनसाहे_col <= 2))
 		    :
 #endif
-		      ((*s != '\r' && msg_col + t_col >= wrap_col)
-		       || (*s == TAB && msg_col + t_col
+		      ((*s != '\r' && मेनसाहे_col + t_col >= wrap_col)
+		       || (*s == TAB && मेनसाहे_col + t_col
 			   >= (wrap_col & ~7))
 		       || (has_mbyte && (*mb_ptr2cells)(s) > 1
-			   && msg_col + t_col >= wrap_col - 1)))))
+			   && मेनसाहे_col + t_col >= wrap_col - 1)))))
 	{
 	    /*
 	     * The screen is scrolled up when at the last row (some terminals
@@ -2552,9 +2552,9 @@ msg_puts_display(
 	    {
 		// output postponed text
 #ifdef HAS_MESSAGE_WINDOW
-		if (msg_win != NULL)
+		if (मेनसाहे_win != NULL)
 		{
-		    put_msg_win(msg_win, where, t_s, s, lnum);
+		    put_मेनसाहे_win(मेनसाहे_win, where, t_s, s, lnum);
 		    if (where == PUT_BELOW)
 			++lnum;
 		    t_col = 0;
@@ -2566,22 +2566,22 @@ msg_puts_display(
 	    }
 
 	    // When no more prompt and no more room, truncate here
-	    if (msg_no_more && lines_left == 0)
+	    if (मेनसाहे_no_more && मगा_लिन्या_कालिवा == 0)
 		break;
 
 #ifdef HAS_MESSAGE_WINDOW
-	    if (msg_win == NULL)
+	    if (मेनसाहे_win == NULL)
 #endif
 		// Scroll the screen up one line.
-		msg_scroll_up();
+		मेनसाहे_scroll_up();
 
 #ifdef HAS_MESSAGE_WINDOW
-	    if (msg_win == NULL)
+	    if (मेनसाहे_win == NULL)
 	    {
 #endif
-		msg_row = Rows - 2;
-		if (msg_col >= cmdline_width)  // can happen after screen resize
-		    msg_col = cmdline_width - 1;
+		मेनसाहे_row = Rows - 2;
+		if (मेनसाहे_col >= cmdline_width)  // can happen after screen resize
+		    मेनसाहे_col = cmdline_width - 1;
 #ifdef HAS_MESSAGE_WINDOW
 	    }
 #endif
@@ -2603,7 +2603,7 @@ msg_puts_display(
 		    s = screen_puts_mbyte(s, l, attr);
 		}
 		else
-		    msg_screen_putchar(*s++, attr);
+		    मेनसाहे_screen_putchar(*s++, attr);
 		did_last_char = TRUE;
 	    }
 	    else
@@ -2614,10 +2614,10 @@ msg_puts_display(
 		store_sb_text(&sb_str, s, attr, &sb_col, TRUE);
 
 #ifdef HAS_MESSAGE_WINDOW
-	    if (msg_win == NULL)
+	    if (मेनसाहे_win == NULL)
 	    {
 #endif
-		inc_msg_scrolled();
+		inc_मेनसाहे_scrolled();
 		need_wait_return = TRUE; // may need wait_return() in main()
 		redraw_cmdline = TRUE;
 		if (cmdline_row > 0 && !exmode_active)
@@ -2627,17 +2627,17 @@ msg_puts_display(
 		 * If screen is completely filled and 'more' is set then wait
 		 * for a character.
 		 */
-		if (lines_left > 0)
-		    --lines_left;
+		if (मगा_लिन्या_कालिवा > 0)
+		    --मगा_लिन्या_कालिवा;
 #ifdef HAS_MESSAGE_WINDOW
 	    }
 #endif
-	    if (p_more && lines_left == 0 && State != MODE_HITRETURN
-					    && !msg_no_more && !exmode_active)
+	    if (p_more && मगा_लिन्या_कालिवा == 0 && State != MODE_HITRETURN
+					    && !मेनसाहे_no_more && !exmode_active)
 	    {
 #ifdef FEAT_CON_DIALOG
 		if (do_more_prompt(NUL))
-		    s = confirm_msg_tail;
+		    s = confirm_मेनसाहे_tail;
 #else
 		(void)do_more_prompt(NUL);
 #endif
@@ -2652,24 +2652,24 @@ msg_puts_display(
 	}
 
 	wrap = *s == '\n'
-		    || msg_col + t_col >= wrap_col
+		    || मेनसाहे_col + t_col >= wrap_col
 		    || (has_mbyte && (*mb_ptr2cells)(s) > 1
-			    && msg_col + t_col >= wrap_col - 1);
+			    && मेनसाहे_col + t_col >= wrap_col - 1);
 	if (t_col > 0 && (wrap || *s == '\r' || *s == '\b'
 						 || *s == '\t' || *s == BELL))
 	{
 	    // output any postponed text
 #ifdef HAS_MESSAGE_WINDOW
-	    if (msg_win != NULL)
+	    if (मेनसाहे_win != NULL)
 	    {
-		put_msg_win(msg_win, where, t_s, s, lnum);
+		put_मेनसाहे_win(मेनसाहे_win, where, t_s, s, lnum);
 		if (where == PUT_BELOW)
 		    ++lnum;
 		t_col = 0;
 		where = PUT_BELOW;
 		// Reset msg_col after outputting to new line in echowindow
 		if (wrap)
-		    msg_col = 0;
+		    मेनसाहे_col = 0;
 	    }
 	    else
 #endif
@@ -2683,51 +2683,51 @@ msg_puts_display(
 	if (*s == '\n')		    // go to next line
 	{
 #ifdef HAS_MESSAGE_WINDOW
-	    if (msg_win != NULL)
+	    if (मेनसाहे_win != NULL)
 	    {
 		// Ignore a NL when the buffer is empty, it is used to scroll
 		// up the text.
-		if ((msg_win->w_buffer->b_ml.ml_flags & ML_EMPTY) == 0)
+		if ((मेनसाहे_win->w_buffer->b_ml.ml_flags & ML_EMPTY) == 0)
 		{
-		    put_msg_win(msg_win, PUT_BELOW, t_s, t_s, lnum);
+		    put_मेनसाहे_win(मेनसाहे_win, PUT_BELOW, t_s, t_s, lnum);
 		    ++lnum;
 		}
-		msg_col = 0;  // Reset column for new line
+		मेनसाहे_col = 0;  // Reset column for new line
 	    }
 	    else
 #endif
-		msg_didout = FALSE;	    // remember that line is empty
+		मेनसाहे_didout = FALSE;	    // remember that line is empty
 #ifdef FEAT_RIGHTLEFT
 	    if (cmdmsg_rl)
-		msg_col = cmdline_width - 1;
+		मेनसाहे_col = cmdline_width - 1;
 	    else
 #endif
-		msg_col = 0;
-	    if (++msg_row >= Rows)  // safety check
-		msg_row = Rows - 1;
+		मेनसाहे_col = 0;
+	    if (++मेनसाहे_row >= Rows)  // safety check
+		मेनसाहे_row = Rows - 1;
 	}
 	else if (*s == '\r')	    // go to column 0
 	{
-	    msg_col = 0;
+	    मेनसाहे_col = 0;
 #ifdef HAS_MESSAGE_WINDOW
 	    where = PUT_TRUNC;
 #endif
 	}
 	else if (*s == '\b')	    // go to previous char
 	{
-	    if (msg_col)
-		--msg_col;
+	    if (मेनसाहे_col)
+		--मेनसाहे_col;
 	}
 	else if (*s == TAB)	    // translate Tab into spaces
 	{
 #ifdef HAS_MESSAGE_WINDOW
-	    if (msg_win != NULL)
-		msg_col = (msg_col + 7) % 8;
+	    if (मेनसाहे_win != NULL)
+		मेनसाहे_col = (मेनसाहे_col + 7) % 8;
 	    else
 #endif
 		do
-		    msg_screen_putchar(' ', attr);
-		while (msg_col & 7);
+		    मेनसाहे_screen_putchar(' ', attr);
+		while (मेनसाहे_col & 7);
 	}
 	else if (*s == BELL)		// beep (from ":sh")
 	    vim_beep(BO_SH);
@@ -2755,12 +2755,12 @@ msg_puts_display(
 #ifdef FEAT_RIGHTLEFT
 		    cmdmsg_rl ||
 #endif
-		    (cw > 1 && msg_col + t_col >= wrap_col))
+		    (cw > 1 && मेनसाहे_col + t_col >= wrap_col))
 	    {
 		if (l > 1)
 		    s = screen_puts_mbyte(s, l, attr) - 1;
 		else
-		    msg_screen_putchar(*s, attr);
+		    मेनसाहे_screen_putchar(*s, attr);
 	    }
 	    else
 	    {
@@ -2778,22 +2778,22 @@ msg_puts_display(
     if (t_col > 0)
     {
 #ifdef HAS_MESSAGE_WINDOW
-	if (msg_win != NULL)
-	    put_msg_win(msg_win, where, t_s, s, lnum);
+	if (मेनसाहे_win != NULL)
+	    put_मेनसाहे_win(मेनसाहे_win, where, t_s, s, lnum);
 	else
 #endif
 	    t_puts(&t_col, t_s, s, attr);
     }
 
 #ifdef HAS_MESSAGE_WINDOW
-    if (msg_win != NULL)
+    if (मेनसाहे_win != NULL)
 	popup_show_message_win();
 #endif
     // Store the text for scroll back.
     if (p_more && !recurse)
 	store_sb_text(&sb_str, s, attr, &sb_col, FALSE);
 
-    msg_check();
+    मेनसाहे_check();
 }
 
 /*
@@ -2801,13 +2801,13 @@ msg_puts_display(
  * "pattern".
  */
     int
-message_filtered(char_u *msg)
+message_filtered(char_u *मेनसाहे)
 {
     int match;
 
     if (cmdmod.cmod_filter_regmatch.regprog == NULL)
 	return FALSE;
-    match = vim_regexec(&cmdmod.cmod_filter_regmatch, msg, (colnr_T)0);
+    match = vim_regexec(&cmdmod.cmod_filter_regmatch, मेनसाहे, (colnr_T)0);
     return cmdmod.cmod_filter_force ? match : !match;
 }
 
@@ -2815,7 +2815,7 @@ message_filtered(char_u *msg)
  * Scroll the screen up one line for displaying the next message line.
  */
     static void
-msg_scroll_up(void)
+मेनसाहे_scroll_up(void)
 {
 #ifdef HAS_MESSAGE_WINDOW
     if (in_echowindow)
@@ -2829,7 +2829,7 @@ msg_scroll_up(void)
 #endif
     // scrolling up always works
     mch_disable_flush();
-    screen_del_lines(0, 0, 1, (int)Rows, TRUE, 0, NULL);
+    screen_del_मगा_लिन्या(0, 0, 1, (int)Rows, TRUE, 0, NULL);
     mch_enable_flush();
 
     if (!can_clear((char_u *)" "))
@@ -2838,14 +2838,14 @@ msg_scroll_up(void)
 	// background here.  It's not efficient, but avoids that we have to do
 	// it all over the code.
 	screen_fill((int)Rows - 1, (int)Rows, cmdline_col_off,
-		cmdline_col_off + cmdline_width, ' ', ' ', HL_ATTR(HLF_MSG));
+		cmdline_col_off + cmdline_width, ' ', ' ', HL_ATTR(HLF_मेनसाहे));
 
 	// Also clear the last char of the last but one line if it was not
 	// cleared before to avoid a scroll-up.
-	if (ScreenAttrs[LineOffset[Rows - 2] + Columns - 1] == (sattr_T)-1)
+	if (ScreenAttrs[लिन्या_Offset[Rows - 2] + Columns - 1] == (sattr_T)-1)
 	    screen_fill((int)Rows - 2, (int)Rows - 1,
 				 (int)Columns - 1, (int)Columns,
-				 ' ', ' ', HL_ATTR(HLF_MSG));
+				 ' ', ' ', HL_ATTR(HLF_मेनसाहे));
     }
 }
 
@@ -2853,7 +2853,7 @@ msg_scroll_up(void)
  * Increment "msg_scrolled".
  */
     static void
-inc_msg_scrolled(void)
+inc_मेनसाहे_scrolled(void)
 {
 #ifdef FEAT_EVAL
     if (*get_vim_var_str(VV_SCROLLSTART) == NUL)
@@ -2862,7 +2862,7 @@ inc_msg_scrolled(void)
 	char_u	    *tofree = NULL;
 
 	// v:scrollstart is empty, set it to the script/function name and line
-	// number
+	//नुमेरो
 	if (p.string == NULL)
 	{
 	    p.string = (char_u *)_("Unknown");
@@ -2885,7 +2885,7 @@ inc_msg_scrolled(void)
 	vim_free(tofree);
     }
 #endif
-    ++msg_scrolled;
+    ++मेनसाहे_scrolled;
     set_must_redraw(UPD_VALID);
 }
 
@@ -2899,14 +2899,14 @@ struct msgchunk_S
     msgchunk_T	*sb_next;
     msgchunk_T	*sb_prev;
     char	sb_eol;		// TRUE when line ends after this text
-    int		sb_msg_col;	// column in which text starts
+    int		sb_मेनसाहे_col;	// column in which text starts
     int		sb_attr;	// text attributes
     char_u	sb_text[1];	// text to be displayed, actually longer
 };
 
 static msgchunk_T *last_msgchunk = NULL; // last displayed text
 
-static msgchunk_T *msg_sb_start(msgchunk_T *mps);
+static msgchunk_T *मेनसाहे_sb_start(msgchunk_T *mps);
 
 typedef enum {
     SB_CLEAR_NONE = 0,
@@ -2935,7 +2935,7 @@ store_sb_text(
 	    || do_clear_sb_text == SB_CLEAR_CMDLINE_DONE)
     {
 	clear_sb_text(do_clear_sb_text == SB_CLEAR_ALL);
-	msg_sb_eol();  // prevent messages from overlapping
+	मेनसाहे_sb_eol();  // prevent messages from overlapping
 	do_clear_sb_text = SB_CLEAR_NONE;
     }
 
@@ -2945,7 +2945,7 @@ store_sb_text(
 	if (mp != NULL)
 	{
 	    mp->sb_eol = finish;
-	    mp->sb_msg_col = *sb_col;
+	    mp->sb_मेनसाहे_col = *sb_col;
 	    mp->sb_attr = attr;
 	    vim_strncpy(mp->sb_text, *sb_str, s - *sb_str);
 
@@ -2992,7 +2992,7 @@ sb_text_start_cmdline(void)
 	sb_text_restart_cmdline();
     else
     {
-	msg_sb_eol();
+	मेनसाहे_sb_eol();
 	do_clear_sb_text = SB_CLEAR_CMDLINE_BUSY;
     }
 }
@@ -3012,7 +3012,7 @@ sb_text_restart_cmdline(void)
 	// No unfinished line: don't clear anything.
 	return;
 
-    tofree = msg_sb_start(last_msgchunk);
+    tofree = मेनसाहे_sb_start(last_msgchunk);
     last_msgchunk = tofree->sb_prev;
     if (last_msgchunk != NULL)
 	last_msgchunk->sb_next = NULL;
@@ -3051,7 +3051,7 @@ clear_sb_text(int all)
     {
 	if (last_msgchunk == NULL)
 	    return;
-	lastp = &msg_sb_start(last_msgchunk)->sb_prev;
+	lastp = &मेनसाहे_sb_start(last_msgchunk)->sb_prev;
     }
 
     while (*lastp != NULL)
@@ -3072,7 +3072,7 @@ show_sb_text(void)
 
     // Only show something if there is more than one line, otherwise it looks
     // weird, typing a command without output results in one line.
-    mp = msg_sb_start(last_msgchunk);
+    mp = मेनसाहे_sb_start(last_msgchunk);
     if (mp == NULL || mp->sb_prev == NULL)
 	vim_beep(BO_MESS);
     else
@@ -3086,7 +3086,7 @@ show_sb_text(void)
  * Move to the start of screen line in already displayed text.
  */
     static msgchunk_T *
-msg_sb_start(msgchunk_T *mps)
+मेनसाहे_sb_start(msgchunk_T *mps)
 {
     msgchunk_T *mp = mps;
 
@@ -3099,7 +3099,7 @@ msg_sb_start(msgchunk_T *mps)
  * Mark the last message chunk as finishing the line.
  */
     void
-msg_sb_eol(void)
+मेनसाहे_sb_eol(void)
 {
     // A trailing newline starts an empty line that has not been filled yet.
     // Marking it as finished would introduce an extra empty line.
@@ -3115,26 +3115,26 @@ msg_sb_eol(void)
  * Returns a pointer to the text for the next line (can be NULL).
  */
     static msgchunk_T *
-disp_sb_line(int row, msgchunk_T *smp, int clear_to_eol)
+disp_sb_लिन्या(int row, msgchunk_T *smp, int clear_to_eol)
 {
     msgchunk_T	*mp = smp;
     char_u	*p;
 
     for (;;)
     {
-	msg_row = row;
-	msg_col = mp->sb_msg_col;
+	मेनसाहे_row = row;
+	मेनसाहे_col = mp->sb_मेनसाहे_col;
 	p = mp->sb_text;
 	if (*p == '\n')	    // don't display the line break
 	    ++p;
-	msg_puts_display(p, -1, mp->sb_attr, TRUE);
+	मेनसाहे_puts_display(p, -1, mp->sb_attr, TRUE);
 
 	// If clearing the screen did not work (e.g. because of a background
 	// color and t_ut isn't set) clear until the last column here.
 	if (clear_to_eol)
 	    screen_fill(row, row + 1,
-		    cmdline_col_off + msg_col, cmdline_col_off + cmdline_width,
-		    ' ', ' ', HL_ATTR(HLF_MSG));
+		    cmdline_col_off + मेनसाहे_col, cmdline_col_off + cmdline_width,
+		    ' ', ' ', HL_ATTR(HLF_मेनसाहे));
 
 	if (mp->sb_eol || mp->sb_next == NULL)
 	    break;
@@ -3154,19 +3154,19 @@ t_puts(
     int		attr)
 {
     // output postponed text
-    msg_didout = TRUE;		// remember that line is not empty
-    screen_puts_len(t_s, (int)(s - t_s), msg_row, cmdline_col_off + msg_col,
+    मेनसाहे_didout = TRUE;		// remember that line is not empty
+    screen_puts_len(t_s, (int)(s - t_s), मेनसाहे_row, cmdline_col_off + मेनसाहे_col,
 	    attr);
-    msg_col += *t_col;
+    मेनसाहे_col += *t_col;
     *t_col = 0;
     // If the string starts with a composing character don't increment the
     // column position for it.
     if (enc_utf8 && utf_iscomposing(utf_ptr2char(t_s)))
-	--msg_col;
-    if (msg_col >= cmdline_width)
+	--मेनसाहे_col;
+    if (मेनसाहे_col >= cmdline_width)
     {
-	msg_col = 0;
-	++msg_row;
+	मेनसाहे_col = 0;
+	++मेनसाहे_row;
     }
 }
 
@@ -3179,9 +3179,9 @@ t_puts(
  * cursor is.
  */
     int
-msg_use_printf(void)
+मेनसाहे_use_printf(void)
 {
-    return (!msg_check_screen()
+    return (!मेनसाहे_check_screen()
 #if defined(MSWIN) && (!defined(FEAT_GUI_MSWIN) || defined(VIMDLL))
 # ifdef VIMDLL
 	    || (!gui.in_use && !termcap_active)
@@ -3197,7 +3197,7 @@ msg_use_printf(void)
  * Print a message when there is no valid screen.
  */
     static void
-msg_puts_printf(char_u *str, int maxlen)
+मेनसाहे_puts_printf(char_u *str, int maxlen)
 {
     char_u	*s = str;
     char_u	*buf = NULL;
@@ -3225,7 +3225,7 @@ msg_puts_printf(char_u *str, int maxlen)
 		    buf[n++] = NL;
 		    buf[n++] = NUL;
 		    if (info_message)   // informative message, not an error
-			mch_msg((char *)buf);
+			mch_मेनसाहे((char *)buf);
 		    else
 			mch_errmsg((char *)buf);
 		    vim_free(buf);
@@ -3239,17 +3239,17 @@ msg_puts_printf(char_u *str, int maxlen)
 	if (cmdmsg_rl)
 	{
 	    if (*s == CAR || *s == NL)
-		msg_col = cmdline_width - 1;
+		मेनसाहे_col = cmdline_width - 1;
 	    else
-		--msg_col;
+		--मेनसाहे_col;
 	}
 	else
 #endif
 	{
 	    if (*s == CAR || *s == NL)
-		msg_col = 0;
+		मेनसाहे_col = 0;
 	    else
-		++msg_col;
+		++मेनसाहे_col;
 	}
 	++s;
     }
@@ -3267,14 +3267,14 @@ msg_puts_printf(char_u *str, int maxlen)
 	if (p != NULL)
 	{
 	    if (info_message)
-		mch_msg((char *)p);
+		mch_मेनसाहे((char *)p);
 	    else
 		mch_errmsg((char *)p);
 	    vim_free(tofree);
 	}
     }
 
-    msg_didout = TRUE;	    // assume that line is not empty
+    मेनसाहे_didout = TRUE;	    // assume that line is not empty
 
 #ifdef MSWIN
     if (!(silent_mode && p_verbose == 0))
@@ -3303,9 +3303,9 @@ do_more_prompt(int typed_char)
     msgchunk_T	*mp_last = NULL;
     msgchunk_T	*mp;
     int		i;
-    int		msg_attr;
+    int		मेनसाहे_attr;
 
-    msg_attr = HL_ATTR(HLF_MSG);
+    मेनसाहे_attr = HL_ATTR(HLF_मेनसाहे);
 
     // We get called recursively when a timer callback outputs a message. In
     // that case don't show another prompt. Also when at the hit-Enter prompt
@@ -3317,16 +3317,16 @@ do_more_prompt(int typed_char)
     if (typed_char == 'G')
     {
 	// "g<": Find first line on the last page.
-	mp_last = msg_sb_start(last_msgchunk);
+	mp_last = मेनसाहे_sb_start(last_msgchunk);
 	for (i = 0; i < Rows - 2 && mp_last != NULL
 					     && mp_last->sb_prev != NULL; ++i)
-	    mp_last = msg_sb_start(mp_last->sb_prev);
+	    mp_last = मेनसाहे_sb_start(mp_last->sb_prev);
     }
 
     State = MODE_ASKMORE;
     setmouse();
     if (typed_char == NUL)
-	msg_moremsg(FALSE);
+	मेनसाहे_moremsg(FALSE);
     for (;;)
     {
 	/*
@@ -3403,12 +3403,12 @@ do_more_prompt(int typed_char)
 
 	case 'G':		// all the way to the end
 	    toscroll = 999999;
-	    lines_left = 999999;
+	    मगा_लिन्या_कालिवा = 999999;
 	    break;
 
 	case ':':		// start new command line
 #ifdef FEAT_CON_DIALOG
-	    if (!confirm_msg_used)
+	    if (!confirm_मेनसाहे_used)
 #endif
 	    {
 		// Since got_int is set all typeahead will be flushed, but we
@@ -3426,7 +3426,7 @@ do_more_prompt(int typed_char)
 	case Ctrl_C:
 	case ESC:
 #ifdef FEAT_CON_DIALOG
-	    if (confirm_msg_used)
+	    if (confirm_मेनसाहे_used)
 	    {
 		// Jump to the choices of the dialog.
 		retval = TRUE;
@@ -3439,7 +3439,7 @@ do_more_prompt(int typed_char)
 	    }
 	    // When there is some more output (wrapping line) display that
 	    // without another prompt.
-	    lines_left = Rows - 1;
+	    मगा_लिन्या_कालिवा = Rows - 1;
 	    break;
 
 #ifdef FEAT_CLIPBOARD
@@ -3454,7 +3454,7 @@ do_more_prompt(int typed_char)
 	    continue;
 #endif
 	default:		// no valid response
-	    msg_moremsg(TRUE);
+	    मेनसाहे_moremsg(TRUE);
 	    continue;
 	}
 
@@ -3464,16 +3464,16 @@ do_more_prompt(int typed_char)
 	    {
 		// go to start of last line
 		if (mp_last == NULL)
-		    mp = msg_sb_start(last_msgchunk);
+		    mp = मेनसाहे_sb_start(last_msgchunk);
 		else if (mp_last->sb_prev != NULL)
-		    mp = msg_sb_start(mp_last->sb_prev);
+		    mp = मेनसाहे_sb_start(mp_last->sb_prev);
 		else
 		    mp = NULL;
 
 		// go to start of line at top of the screen
 		for (i = 0; i < Rows - 2 && mp != NULL && mp->sb_prev != NULL;
 									  ++i)
-		    mp = msg_sb_start(mp->sb_prev);
+		    mp = मेनसाहे_sb_start(mp->sb_prev);
 
 		if (mp != NULL && mp->sb_prev != NULL)
 		{
@@ -3482,18 +3482,18 @@ do_more_prompt(int typed_char)
 		    {
 			if (mp == NULL || mp->sb_prev == NULL)
 			    break;
-			mp = msg_sb_start(mp->sb_prev);
+			mp = मेनसाहे_sb_start(mp->sb_prev);
 			if (mp_last == NULL)
-			    mp_last = msg_sb_start(last_msgchunk);
+			    mp_last = मेनसाहे_sb_start(last_msgchunk);
 			else
-			    mp_last = msg_sb_start(mp_last->sb_prev);
+			    mp_last = मेनसाहे_sb_start(mp_last->sb_prev);
 		    }
 
-		    if (toscroll == -1 && screen_ins_lines(0, 0, 1,
+		    if (toscroll == -1 && screen_ins_मगा_लिन्या(0, 0, 1,
 						     (int)Rows, 0, NULL) == OK)
 		    {
 			// display line at top
-			(void)disp_sb_line(0, mp, FALSE);
+			(void)disp_sb_लिन्या(0, mp, FALSE);
 		    }
 		    else
 		    {
@@ -3502,8 +3502,8 @@ do_more_prompt(int typed_char)
 			// redisplay all lines
 			for (i = 0; mp != NULL && i < Rows - 1; ++i)
 			{
-			    mp = disp_sb_line(i, mp, !did_clear);
-			    ++msg_scrolled;
+			    mp = disp_sb_लिन्या(i, mp, !did_clear);
+			    ++मेनसाहे_scrolled;
 			}
 		    }
 		    toscroll = 0;
@@ -3515,12 +3515,12 @@ do_more_prompt(int typed_char)
 		while (toscroll > 0 && mp_last != NULL)
 		{
 		    // scroll up, display line at bottom
-		    msg_scroll_up();
-		    inc_msg_scrolled();
+		    मेनसाहे_scroll_up();
+		    inc_मेनसाहे_scrolled();
 		    screen_fill((int)Rows - 2, (int)Rows - 1,
 			    cmdline_col_off, cmdline_col_off + cmdline_width,
-			    ' ', ' ', msg_attr);
-		    mp_last = disp_sb_line((int)Rows - 2, mp_last, FALSE);
+			    ' ', ' ', मेनसाहे_attr);
+		    mp_last = disp_sb_लिन्या((int)Rows - 2, mp_last, FALSE);
 		    --toscroll;
 		}
 	    }
@@ -3529,13 +3529,13 @@ do_more_prompt(int typed_char)
 	    {
 		// displayed the requested text, more prompt again
 		screen_fill((int)Rows - 1, (int)Rows, cmdline_col_off,
-			cmdline_col_off + cmdline_width, ' ', ' ', msg_attr);
-		msg_moremsg(FALSE);
+			cmdline_col_off + cmdline_width, ' ', ' ', मेनसाहे_attr);
+		मेनसाहे_moremsg(FALSE);
 		continue;
 	    }
 
 	    // display more text, return to caller
-	    lines_left = toscroll;
+	    मगा_लिन्या_कालिवा = toscroll;
 	}
 
 	break;
@@ -3543,17 +3543,17 @@ do_more_prompt(int typed_char)
 
     // clear the --more-- message
     screen_fill((int)Rows - 1, (int)Rows, cmdline_col_off,
-	    cmdline_col_off + cmdline_width, ' ', ' ', msg_attr);
+	    cmdline_col_off + cmdline_width, ' ', ' ', मेनसाहे_attr);
     State = oldState;
     setmouse();
     if (quit_more)
     {
-	msg_row = Rows - 1;
-	msg_col = 0;
+	मेनसाहे_row = Rows - 1;
+	मेनसाहे_col = 0;
     }
 #ifdef FEAT_RIGHTLEFT
     else if (cmdmsg_rl)
-	msg_col = cmdline_width - 1;
+	मेनसाहे_col = cmdline_width - 1;
 #endif
 
     entered = FALSE;
@@ -3569,8 +3569,8 @@ do_more_prompt(int typed_char)
 # ifdef mch_errmsg
 #  undef mch_errmsg
 # endif
-# ifdef mch_msg
-#  undef mch_msg
+# ifdef mch_मेनसाहे
+#  undef mch_मेनसाहे
 # endif
 
 # if defined(MSWIN) && (!defined(FEAT_GUI_MSWIN) || defined(VIMDLL))
@@ -3684,7 +3684,7 @@ mch_errmsg(char *str)
 
 # if defined(MSWIN) && (!defined(FEAT_GUI_MSWIN) || defined(VIMDLL))
     static void
-mch_msg_c(char *str)
+mch_मेनसाहे_c(char *str)
 {
     DWORD   nwrite = 0;
     DWORD   mode;
@@ -3715,7 +3715,7 @@ mch_msg_c(char *str)
  * can be displayed in a message box.
  */
     void
-mch_msg(char *str)
+mch_मेनसाहे(char *str)
 {
 # if (defined(UNIX) || defined(FEAT_GUI)) && !defined(ALWAYS_USE_GUI) && !defined(VIMDLL)
     // On Unix use stdout if we have a tty.  This allows "vim -h | more" and
@@ -3748,7 +3748,7 @@ mch_msg(char *str)
     if (!(gui.in_use || gui.starting))
 #  endif
     {
-	mch_msg_c(str);
+	mch_मेनसाहे_c(str);
 	return;
     }
 # endif
@@ -3763,32 +3763,32 @@ mch_msg(char *str)
  * to the next position.  Only for printable ASCII!
  */
     static void
-msg_screen_putchar(int c, int attr)
+मेनसाहे_screen_putchar(int c, int attr)
 {
-    msg_didout = TRUE;		// remember that line is not empty
-    screen_putchar(c, msg_row, cmdline_col_off + msg_col, attr);
+    मेनसाहे_didout = TRUE;		// remember that line is not empty
+    screen_putchar(c, मेनसाहे_row, cmdline_col_off + मेनसाहे_col, attr);
 #ifdef FEAT_RIGHTLEFT
     if (cmdmsg_rl)
     {
-	if (--msg_col == 0)
+	if (--मेनसाहे_col == 0)
 	{
-	    msg_col = cmdline_width;
-	    ++msg_row;
+	    मेनसाहे_col = cmdline_width;
+	    ++मेनसाहे_row;
 	}
     }
     else
 #endif
     {
-	if (++msg_col >= cmdline_width)
+	if (++मेनसाहे_col >= cmdline_width)
 	{
-	    msg_col = 0;
-	    ++msg_row;
+	    मेनसाहे_col = 0;
+	    ++मेनसाहे_row;
 	}
     }
 }
 
     static void
-msg_moremsg(int full)
+मेनसाहे_moremsg(int full)
 {
     int		attr;
     char_u	*s = (char_u *)_("-- More --");
@@ -3810,33 +3810,33 @@ repeat_message(void)
 {
     if (State == MODE_ASKMORE)
     {
-	msg_moremsg(TRUE);	// display --more-- message again
-	msg_row = Rows - 1;
+	मेनसाहे_moremsg(TRUE);	// display --more-- message again
+	मेनसाहे_row = Rows - 1;
     }
 #ifdef FEAT_CON_DIALOG
     else if (State == MODE_CONFIRM)
     {
-	display_confirm_msg();	// display ":confirm" message again
-	msg_row = Rows - 1;
+	display_confirm_मेनसाहे();	// display ":confirm" message again
+	मेनसाहे_row = Rows - 1;
     }
 #endif
     else if (State == MODE_EXTERNCMD)
     {
-	windgoto(msg_row, cmdline_col_off + msg_col); // put cursor back
+	windgoto(मेनसाहे_row, cmdline_col_off + मेनसाहे_col); // put cursor back
     }
     else if (State == MODE_HITRETURN || State == MODE_SETWSIZE)
     {
-	if (msg_row == Rows - 1)
+	if (मेनसाहे_row == Rows - 1)
 	{
 	    // Avoid drawing the "hit-enter" prompt below the previous one,
 	    // overwrite it.  Esp. useful when regaining focus and a
 	    // FocusGained autocmd exists but didn't draw anything.
-	    msg_didout = FALSE;
-	    msg_col = 0;
-	    msg_clr_eos();
+	    मेनसाहे_didout = FALSE;
+	    मेनसाहे_col = 0;
+	    मेनसाहे_clr_eos();
 	}
-	hit_return_msg();
-	msg_row = Rows - 1;
+	hit_return_मेनसाहे();
+	मेनसाहे_row = Rows - 1;
     }
 }
 
@@ -3847,15 +3847,15 @@ repeat_message(void)
  * output goes to the terminal.  Don't use the terminal codes then.
  */
     static int
-msg_check_screen(void)
+मेनसाहे_check_screen(void)
 {
     if (!full_screen || !screen_valid(FALSE))
 	return FALSE;
 
-    if (msg_row >= Rows)
-	msg_row = Rows - 1;
-    if (msg_col >= cmdline_width)
-	msg_col = cmdline_width - 1;
+    if (मेनसाहे_row >= Rows)
+	मेनसाहे_row = Rows - 1;
+    if (मेनसाहे_col >= cmdline_width)
+	मेनसाहे_col = cmdline_width - 1;
     return TRUE;
 }
 
@@ -3864,10 +3864,10 @@ msg_check_screen(void)
  * Skip this when ":silent" was used, no need to clear for redirection.
  */
     void
-msg_clr_eos(void)
+मेनसाहे_clr_eos(void)
 {
-    if (msg_silent == 0)
-	msg_clr_eos_force();
+    if (मेनसाहे_silent == 0)
+	मेनसाहे_clr_eos_force();
 }
 
 /*
@@ -3876,13 +3876,13 @@ msg_clr_eos(void)
  * for msg_check().
  */
     void
-msg_clr_eos_force(void)
+मेनसाहे_clr_eos_force(void)
 {
 #ifdef HAS_MESSAGE_WINDOW
     if (in_echowindow)
 	return;  // messages go into a popup
 #endif
-    if (msg_use_printf())
+    if (मेनसाहे_use_printf())
     {
 	if (full_screen)	// only when termcap codes are valid
 	{
@@ -3894,29 +3894,29 @@ msg_clr_eos_force(void)
     }
     else
     {
-	int msg_attr;
+	int मेनसाहे_attr;
 
-	msg_attr = HL_ATTR(HLF_MSG);
+	मेनसाहे_attr = HL_ATTR(HLF_मेनसाहे);
 
 #ifdef FEAT_RIGHTLEFT
 	if (cmdmsg_rl)
 	{
-	    screen_fill(msg_row, msg_row + 1,
-		    cmdline_col_off, cmdline_col_off + msg_col + 1,
-		    ' ', ' ', msg_attr);
-	    screen_fill(msg_row + 1, (int)Rows,
+	    screen_fill(मेनसाहे_row, मेनसाहे_row + 1,
+		    cmdline_col_off, cmdline_col_off + मेनसाहे_col + 1,
+		    ' ', ' ', मेनसाहे_attr);
+	    screen_fill(मेनसाहे_row + 1, (int)Rows,
 		    cmdline_col_off, cmdline_col_off + cmdline_width,
-		    ' ', ' ', msg_attr);
+		    ' ', ' ', मेनसाहे_attr);
 	}
 	else
 #endif
 	{
-	    screen_fill(msg_row, msg_row + 1,
-		    cmdline_col_off + msg_col, cmdline_col_off + cmdline_width,
-		    ' ', ' ', msg_attr);
-	    screen_fill(msg_row + 1, (int)Rows,
+	    screen_fill(मेनसाहे_row, मेनसाहे_row + 1,
+		    cmdline_col_off + मेनसाहे_col, cmdline_col_off + cmdline_width,
+		    ' ', ' ', मेनसाहे_attr);
+	    screen_fill(मेनसाहे_row + 1, (int)Rows,
 		    cmdline_col_off, cmdline_col_off + cmdline_width,
-		    ' ', ' ', msg_attr);
+		    ' ', ' ', मेनसाहे_attr);
 	}
     }
 }
@@ -3925,11 +3925,11 @@ msg_clr_eos_force(void)
  * Clear the command line.
  */
     void
-msg_clr_cmdline(void)
+मेनसाहे_clr_cmdline(void)
 {
-    msg_row = cmdline_row;
-    msg_col = 0;
-    msg_clr_eos_force();
+    मेनसाहे_row = cmdline_row;
+    मेनसाहे_col = 0;
+    मेनसाहे_clr_eos_force();
 }
 
 /*
@@ -3938,7 +3938,7 @@ msg_clr_cmdline(void)
  * return TRUE if wait_return() not called.
  */
     int
-msg_end(void)
+मेनसाहे_end(void)
 {
     /*
      * If the string is larger than the window,
@@ -3960,9 +3960,9 @@ msg_end(void)
  * wait for hit-return and redraw the window later.
  */
     void
-msg_check(void)
+मेनसाहे_check(void)
 {
-    if (msg_row == Rows - 1 && msg_col >= sc_col
+    if (मेनसाहे_row == Rows - 1 && मेनसाहे_col >= sc_col
 #ifdef HAS_MESSAGE_WINDOW
 		&& !in_echowindow
 #endif
@@ -3996,7 +3996,7 @@ redir_write(char_u *str, int maxlen)
 	// If the string doesn't start with CR or NL, go to msg_col
 	if (*s != '\n' && *s != '\r')
 	{
-	    while (cur_col < msg_col)
+	    while (cur_col < मेनसाहे_col)
 	    {
 #ifdef FEAT_EVAL
 		if (redir_execute)
@@ -4043,8 +4043,8 @@ redir_write(char_u *str, int maxlen)
 	    ++s;
 	}
 
-	if (msg_silent != 0)	// should update msg_col
-	    msg_col = cur_col;
+	if (मेनसाहे_silent != 0)	// should update msg_col
+	    मेनसाहे_col = cur_col;
     }
 }
 
@@ -4066,7 +4066,7 @@ redirecting(void)
 verbose_enter(void)
 {
     if (*p_vfile != NUL)
-	++msg_silent;
+	++मेनसाहे_silent;
 }
 
 /*
@@ -4077,8 +4077,8 @@ verbose_enter(void)
 verbose_leave(void)
 {
     if (*p_vfile != NUL)
-	if (--msg_silent < 0)
-	    msg_silent = 0;
+	if (--मेनसाहे_silent < 0)
+	    मेनसाहे_silent = 0;
 }
 
 /*
@@ -4088,10 +4088,10 @@ verbose_leave(void)
 verbose_enter_scroll(void)
 {
     if (*p_vfile != NUL)
-	++msg_silent;
+	++मेनसाहे_silent;
     else
 	// always scroll up, don't overwrite
-	msg_scroll = TRUE;
+	मेनसाहे_scroll = TRUE;
 }
 
 /*
@@ -4102,11 +4102,11 @@ verbose_leave_scroll(void)
 {
     if (*p_vfile != NUL)
     {
-	if (--msg_silent < 0)
-	    msg_silent = 0;
+	if (--मेनसाहे_silent < 0)
+	    मेनसाहे_silent = 0;
     }
     else
-	cmdline_row = msg_row;
+	cmdline_row = मेनसाहे_row;
 }
 
 /*
@@ -4159,7 +4159,7 @@ give_warning(char_u *message, int hl)
 give_warning_with_source(char_u *message, int hl, int with_source)
 {
     // Don't do this for ":silent".
-    if (msg_silent != 0)
+    if (मेनसाहे_silent != 0)
 	return;
 
     // Don't want a hit-enter prompt here.
@@ -4168,29 +4168,29 @@ give_warning_with_source(char_u *message, int hl, int with_source)
 #ifdef FEAT_EVAL
     set_vim_var_string(VV_WARNINGMSG, message, -1);
 #endif
-    VIM_CLEAR(keep_msg);
+    VIM_CLEAR(keep_मेनसाहे);
     if (hl)
-	keep_msg_attr = HL_ATTR(HLF_W);
+	keep_मेनसाहे_attr = HL_ATTR(HLF_W);
     else
-	keep_msg_attr = 0;
+	keep_मेनसाहे_attr = 0;
 
     if (with_source)
     {
 	// Do what msg() does, but with a column offset if the warning should
 	// be after the mode message.
-	msg_start();
-	msg_source(HL_ATTR(HLF_W));
-	msg_puts(" ");
-	msg_puts_attr((char *)message, HL_ATTR(HLF_W) | MSG_HIST);
-	msg_clr_eos();
-	(void)msg_end();
+	मेनसाहे_start();
+	मेनसाहे_source(HL_ATTR(HLF_W));
+	मेनसाहे_puts(" ");
+	मेनसाहे_puts_attr((char *)message, HL_ATTR(HLF_W) | मेनसाहे_HIST);
+	मेनसाहे_clr_eos();
+	(void)मेनसाहे_end();
     }
-    else if (msg_attr((char *)message, keep_msg_attr) && msg_scrolled == 0)
-	set_keep_msg(message, keep_msg_attr);
+    else if (मेनसाहे_attr((char *)message, keep_मेनसाहे_attr) && मेनसाहे_scrolled == 0)
+	set_keep_मेनसाहे(message, keep_मेनसाहे_attr);
 
-    msg_didout = FALSE;	    // overwrite this message
-    msg_nowait = TRUE;	    // don't wait for this message
-    msg_col = 0;
+    मेनसाहे_didout = FALSE;	    // overwrite this message
+    मेनसाहे_nowait = TRUE;	    // don't wait for this message
+    मेनसाहे_col = 0;
 
     --no_wait_return;
 }
@@ -4217,37 +4217,37 @@ give_warning2(char_u *message, char_u *a1, int hl)
  * Advance msg cursor to column "col".
  */
     void
-msg_advance(int col)
+मेनसाहे_advance(int col)
 {
-    if (msg_silent != 0)	// nothing to advance to
+    if (मेनसाहे_silent != 0)	// nothing to advance to
     {
-	msg_col = col;		// for redirection, may fill it up later
+	मेनसाहे_col = col;		// for redirection, may fill it up later
 	return;
     }
     if (col >= cmdline_width)	// not enough room
 	col = cmdline_width - 1;
 #ifdef FEAT_RIGHTLEFT
     if (cmdmsg_rl)
-	while (msg_col > cmdline_width - col)
-	    msg_putchar(' ');
+	while (मेनसाहे_col > cmdline_width - col)
+	    मेनसाहे_putchar(' ');
     else
 #endif
-	while (msg_col < col)
-	    msg_putchar(' ');
+	while (मेनसाहे_col < col)
+	    मेनसाहे_putchar(' ');
 }
 
 /*
  * Warn about missing Clipboard Support
  */
     void
-msg_warn_missing_clipboard(void)
+मेनसाहे_warn_missing_clipboard(void)
 {
-    if (!global_busy && !did_warn_clipboard && silence_w23_w24_msg == 0)
+    if (!global_busy && !did_warn_clipboard && silence_w23_w24_मेनसाहे == 0)
     {
 #ifdef FEAT_CLIPBOARD
-	msg(_("W23: Clipboard register not available, using register 0"));
+	मेनसाहे(_("W23: Clipboard register not available, using register 0"));
 #else
-	msg(_("W24: Clipboard register not available. See :h W24"));
+	मेनसाहे(_("W24: Clipboard register not available. See :h W24"));
 #endif
 	did_warn_clipboard = TRUE;
     }
@@ -4312,7 +4312,7 @@ do_dialog(
 	// avoid a hit-enter prompt without clearing the cmdline
 	need_wait_return = FALSE;
 	emsg_on_display = FALSE;
-	cmdline_row = msg_row;
+	cmdline_row = मेनसाहे_row;
 
 	// Flush output to avoid that further messages and redrawing is done
 	// in the wrong order.
@@ -4336,7 +4336,7 @@ do_dialog(
      * user press RETURN as well afterwards.
      */
     ++no_wait_return;
-    hotkeys = msg_show_console_dialog(message, buttons, dfltbutton);
+    hotkeys = मेनसाहे_show_console_dialog(message, buttons, dfltbutton);
 
     if (hotkeys != NULL)
     {
@@ -4395,7 +4395,7 @@ do_dialog(
     State = oldState;
     setmouse();
     --no_wait_return;
-    msg_end_prompt();
+    मेनसाहे_end_prompt();
 
     return retval;
 }
@@ -4447,7 +4447,7 @@ copy_char(
  * Returns an allocated string with hotkeys, or NULL for error.
  */
     static char_u *
-msg_show_console_dialog(
+मेनसाहे_show_console_dialog(
     char_u	*message,
     char_u	*buttons,
     int		dfltbutton)
@@ -4567,19 +4567,19 @@ msg_show_console_dialog(
 	    /*
 	     * Now allocate and load the strings
 	     */
-	    vim_free(confirm_msg);
-	    confirm_msg = alloc(len);
-	    if (confirm_msg == NULL)
+	    vim_free(confirm_मेनसाहे);
+	    confirm_मेनसाहे = alloc(len);
+	    if (confirm_मेनसाहे == NULL)
 		return NULL;
-	    *confirm_msg = NUL;
+	    *confirm_मेनसाहे = NUL;
 	    hotk = alloc(lenhotkey);
 	    if (hotk == NULL)
 		return NULL;
 
-	    *confirm_msg = '\n';
-	    STRCPY(confirm_msg + 1, message);
+	    *confirm_मेनसाहे = '\n';
+	    STRCPY(confirm_मेनसाहे + 1, message);
 
-	    msgp = confirm_msg + 1 + STRLEN(message);
+	    msgp = confirm_मेनसाहे + 1 + STRLEN(message);
 	    hotkp = hotk;
 
 	    // Define first default hotkey.  Keep the hotkey string NUL
@@ -4588,12 +4588,12 @@ msg_show_console_dialog(
 
 	    // Remember where the choices start, displaying starts here when
 	    // "hotkp" typed at the more prompt.
-	    confirm_msg_tail = msgp;
+	    confirm_मेनसाहे_tail = msgp;
 	    *msgp++ = '\n';
 	}
     }
 
-    display_confirm_msg();
+    display_confirm_मेनसाहे();
     return hotk;
 }
 
@@ -4601,13 +4601,13 @@ msg_show_console_dialog(
  * Display the ":confirm" message.  Also called when screen resized.
  */
     static void
-display_confirm_msg(void)
+display_confirm_मेनसाहे(void)
 {
     // avoid that 'q' at the more prompt truncates the message here
-    ++confirm_msg_used;
-    if (confirm_msg != NULL)
-	msg_puts_attr((char *)confirm_msg, HL_ATTR(HLF_M));
-    --confirm_msg_used;
+    ++confirm_मेनसाहे_used;
+    if (confirm_मेनसाहे != NULL)
+	मेनसाहे_puts_attr((char *)confirm_मेनसाहे, HL_ATTR(HLF_M));
+    --confirm_मेनसाहे_used;
 }
 
 #endif // FEAT_CON_DIALOG

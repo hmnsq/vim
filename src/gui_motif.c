@@ -71,8 +71,8 @@ static Widget toolBarFrame;
 static Widget toolBar;
 #endif
 #ifdef FEAT_GUI_TABLINE
-static Widget	tabLine;
-static Widget	tabLine_menu = 0;
+static Widget	tab_लिन्या;
+static Widget	tab_लिन्या_menu = 0;
 static int	showing_tabline = 0;
 #endif
 #ifdef FEAT_MENU
@@ -104,15 +104,15 @@ static void gui_motif_scroll_colors(Widget id);
 scroll_cb(Widget w UNUSED, XtPointer client_data, XtPointer call_data)
 {
     scrollbar_T *sb;
-    long	value;
+    long	हालागा;
     int		dragging;
 
     sb = gui_find_scrollbar((long)client_data);
 
-    value = ((XmScrollBarCallbackStruct *)call_data)->value;
+    हालागा = ((XmScrollBarCallbackStruct *)call_data)->हालागा;
     dragging = (((XmScrollBarCallbackStruct *)call_data)->reason ==
 							      (int)XmCR_DRAG);
-    gui_drag_scrollbar(sb, value, dragging);
+    gui_drag_scrollbar(sb, हालागा, dragging);
 }
 
 #ifdef FEAT_GUI_TABLINE
@@ -126,7 +126,7 @@ tabline_cb(
 
     nptr = (XmNotebookCallbackStruct *)call_data;
     if (nptr->reason != (int)XmCR_NONE)
-	send_tabline_event(nptr->page_number);
+	send_tabline_event(nptr->page_नुमेरो);
 }
 
     static void
@@ -137,8 +137,8 @@ tabline_button_cb(
 {
     XtPointer	cmd, tab_idx;
 
-    XtVaGetValues(w, XmNuserData, &cmd, NULL);
-    XtVaGetValues(tabLine_menu, XmNuserData, &tab_idx, NULL);
+    Xt_Va_Get_मगा_हालागा(w, XmNuserData, &cmd, NULL);
+    Xt_Va_Get_मगा_हालागा(tab_लिन्या_menu, XmNuserData, &tab_idx, NULL);
 
     send_tabline_menu_event((int)(long)tab_idx, (int)(long)cmd);
 }
@@ -166,10 +166,10 @@ tabline_scroller_clicked(
     Position	pos_x, pos_y;
     Dimension	width, height;
 
-    tab_scroll_w = XtNameToWidget(tabLine, scroller_name);
+    tab_scroll_w = XtNameToWidget(tab_लिन्या, scroller_name);
     if (tab_scroll_w != (Widget)0)
     {
-	XtVaGetValues(tab_scroll_w, XmNx, &pos_x, XmNy, &pos_y, XmNwidth,
+	Xt_Va_Get_मगा_हालागा(tab_scroll_w, XmNx, &pos_x, XmNy, &pos_y, XmNwidth,
 		      &width, XmNheight, &height, NULL);
 	if (pos_x >= 0)
 	{
@@ -194,7 +194,7 @@ tabline_menu_cb(
     XButtonPressedEvent		*event;
     int				tab_idx = 0;
     WidgetList			children;
-    Cardinal			numChildren;
+    Cardinal			नुमेरो_Children;
     static XtIntervalId		timer = (XtIntervalId)0;
     static int			timed_out = TRUE;
 
@@ -232,7 +232,7 @@ tabline_menu_cb(
     if (event->button == Button2)
     {
 	// Middle mouse click on tabpage label closes that tab.
-	XtVaGetValues(tabLine_menu, XmNuserData, &tab_idx, NULL);
+	Xt_Va_Get_मगा_हालागा(tab_लिन्या_menu, XmNuserData, &tab_idx, NULL);
 	send_tabline_menu_event(tab_idx, (int)TABLINE_MENU_CLOSE);
 	return;
     }
@@ -248,16 +248,16 @@ tabline_menu_cb(
     {
 	tab_w = XtWindowToWidget(XtDisplay(w), event->subwindow);
 	// LINTED: avoid warning: dubious operation on enum
-	if (tab_w != (Widget)0 && XmIsPushButton(tab_w))
-	    XtVaGetValues(tab_w, XmNpageNumber, &tab_idx, NULL);
+	if (tab_w != (Widget)0 && Xm_Is_इतुलाक_Button(tab_w))
+	    Xt_Va_Get_मगा_हालागा(tab_w, Xm_Npage_नुमेरो, &tab_idx, NULL);
     }
 
-    XtVaSetValues(tabLine_menu, XmNuserData, (XtPointer)(long)tab_idx, NULL);
-    XtVaGetValues(tabLine_menu, XmNchildren, &children, XmNnumChildren,
-		  &numChildren, NULL);
-    XtManageChildren(children, numChildren);
-    XmMenuPosition(tabLine_menu, (XButtonPressedEvent *)e) ;
-    XtManageChild(tabLine_menu);
+    Xt_Va_Set_मगा_हालागा(tab_लिन्या_menu, XmNuserData, (XtPointer)(long)tab_idx, NULL);
+    Xt_Va_Get_मगा_हालागा(tab_लिन्या_menu, XmNchildren, &children, XmNnumChildren,
+		  &नुमेरो_Children, NULL);
+    XtManageChildren(children, नुमेरो_Children);
+    XmMenuPosition(tab_लिन्या_menu, (XButtonPressedEvent *)e) ;
+    XtManageChild(tab_लिन्या_menu);
 }
 
     static void
@@ -269,7 +269,7 @@ tabline_balloon_cb(BalloonEval *beval, int state UNUSED)
     if (beval->target == (Widget)0)
 	return;
 
-    XtVaGetValues(beval->target, XmNpageNumber, &nr, NULL);
+    Xt_Va_Get_मगा_हालागा(beval->target, Xm_Npage_नुमेरो, &nr, NULL);
     tp = find_tabpage(nr);
     if (tp == NULL)
 	return;
@@ -301,13 +301,13 @@ label_expose(Widget _w, XEvent *_event, Region _region)
     XmLabelWidget   lw = (XmLabelWidget)_w;
     unsigned char   label_type = (int)XmSTRING;
 
-    XtVaGetValues(_w, XmNlabelType, &label_type, (XtPointer)0);
+    Xt_Va_Get_मगा_हालागा(_w, XmNlabelType, &label_type, (XtPointer)0);
 
     if (XtIsSensitive(_w) || label_type != (int)XmSTRING)
 	(*old_label_expose)(_w, _event, _region);
     else
     {
-	XGCValues   values;
+	XGCValues   मगा_हालागा;
 	XtGCMask    mask;
 	XtGCMask    dynamic;
 	XFontStruct *fs;
@@ -319,20 +319,20 @@ label_expose(Widget _w, XEvent *_event, Region _region)
 
 	mask = GCForeground | GCBackground | GCGraphicsExposures;
 	dynamic = GCClipMask | GCClipXOrigin | GCClipYOrigin;
-	values.graphics_exposures = False;
+	मगा_हालागा.graphics_exposures = False;
 
 	if (fs != 0)
 	{
 	    mask |= GCFont;
-	    values.font = fs->fid;
+	    मगा_हालागा.font = fs->fid;
 	}
 
-	if (lw->primitive.top_shadow_pixmap != None
-		&& lw->primitive.top_shadow_pixmap != XmUNSPECIFIED_PIXMAP)
+	if (lw->primitive.इताअस_shadow_pixmap != None
+		&& lw->primitive.इताअस_shadow_pixmap != XmUNSPECIFIED_PIXMAP)
 	{
 	    mask |= GCFillStyle | GCTile;
-	    values.fill_style = FillTiled;
-	    values.tile = lw->primitive.top_shadow_pixmap;
+	    मगा_हालागा.fill_style = FillTiled;
+	    मगा_हालागा.tile = lw->primitive.इताअस_shadow_pixmap;
 	}
 
 	lw->label.TextRect.x += 1;
@@ -343,11 +343,11 @@ label_expose(Widget _w, XEvent *_event, Region _region)
 	    lw->label.acc_TextRect.y += 1;
 	}
 
-	values.foreground = lw->primitive.top_shadow_color;
-	values.background = lw->core.background_pixel;
+	मगा_हालागा.foreground = lw->primitive.इताअस_shadow_color;
+	मगा_हालागा.background = lw->core.background_pixel;
 
 	lw->label.insensitive_GC = XtAllocateGC((Widget)lw, 0, mask,
-					       &values, dynamic, (XtGCMask)0);
+					       &मगा_हालागा, dynamic, (XtGCMask)0);
 	(*old_label_expose)(_w, _event, _region);
 	XtReleaseGC(_w, lw->label.insensitive_GC);
 
@@ -359,11 +359,11 @@ label_expose(Widget _w, XEvent *_event, Region _region)
 	    lw->label.acc_TextRect.y -= 1;
 	}
 
-	values.foreground = lw->primitive.bottom_shadow_color;
-	values.background = lw->core.background_pixel;
+	मगा_हालागा.foreground = lw->primitive.bottom_shadow_color;
+	मगा_हालागा.background = lw->core.background_pixel;
 
 	lw->label.insensitive_GC = XtAllocateGC((Widget) lw, 0, mask,
-					       &values, dynamic, (XtGCMask)0);
+					       &मगा_हालागा, dynamic, (XtGCMask)0);
 	(*old_label_expose)(_w, _event, _region);
 	XtReleaseGC(_w, lw->label.insensitive_GC);
 
@@ -379,7 +379,7 @@ gui_x11_create_widgets(void)
 {
 #ifdef FEAT_GUI_TABLINE
     Widget	button, scroller;
-    Arg		args[10];
+    Arg		मगा_कातविरान[10];
     int		n;
     XmString	xms;
 #endif
@@ -406,7 +406,7 @@ gui_x11_create_widgets(void)
 #endif
 
     // Make sure the "Quit" menu entry of the window manager is ignored
-    XtVaSetValues(vimShell, XmNdeleteResponse, XmDO_NOTHING, NULL);
+    Xt_Va_Set_मगा_हालागा(vimShell, XmNdeleteResponse, XmDO_NOTHING, NULL);
 
     vimForm = XtVaCreateManagedWidget("vimForm",
 	xmFormWidgetClass, vimShell,
@@ -478,20 +478,20 @@ gui_x11_create_widgets(void)
 #ifdef FEAT_GUI_TABLINE
     // Create the Vim GUI tabline
     n = 0;
-    XtSetArg(args[n], XmNbindingType, XmNONE); n++;
-    XtSetArg(args[n], XmNorientation, XmVERTICAL); n++;
-    XtSetArg(args[n], XmNbackPageSize, XmNONE); n++;
-    XtSetArg(args[n], XmNbackPageNumber, 0); n++;
-    XtSetArg(args[n], XmNbackPagePlacement, XmTOP_RIGHT); n++;
-    XtSetArg(args[n], XmNmajorTabSpacing, 0); n++;
-    XtSetArg(args[n], XmNshadowThickness, 0); n++;
-    XtSetArg(args[n], XmNleftAttachment, XmATTACH_FORM); n++;
-    XtSetArg(args[n], XmNrightAttachment, XmATTACH_FORM); n++;
-    tabLine = XmCreateNotebook(vimForm, "Vim tabline", args, n);
+    XtSetArg(मगा_कातविरान[n], XmNbindingType, XmNONE); n++;
+    XtSetArg(मगा_कातविरान[n], XmNorientation, XmVERTICAL); n++;
+    XtSetArg(मगा_कातविरान[n], XmNbackPageSize, XmNONE); n++;
+    XtSetArg(मगा_कातविरान[n], Xm_Nback_Page_नुमेरो, 0); n++;
+    XtSetArg(मगा_कातविरान[n], XmNbackPagePlacement, Xm_इताअस_कानान); n++;
+    XtSetArg(मगा_कातविरान[n], XmNmajorTabSpacing, 0); n++;
+    XtSetArg(मगा_कातविरान[n], XmNshadowThickness, 0); n++;
+    XtSetArg(मगा_कातविरान[n], XmNleftAttachment, XmATTACH_FORM); n++;
+    XtSetArg(मगा_कातविरान[n], XmNrightAttachment, XmATTACH_FORM); n++;
+    tab_लिन्या = XmCreateNotebook(vimForm, "Vim tabline", मगा_कातविरान, n);
 
-    XtAddCallback(tabLine, XmNpageChangedCallback, (XtCallbackProc)tabline_cb,
+    XtAddCallback(tab_लिन्या, XmNpageChangedCallback, (XtCallbackProc)tabline_cb,
 			NULL);
-    XtAddEventHandler(tabLine, ButtonPressMask, False,
+    XtAddEventHandler(tab_लिन्या, ButtonPressMask, False,
 			(XtEventHandler)tabline_menu_cb, NULL);
 
     gui.tabline_height = TABLINE_HEIGHT;
@@ -503,40 +503,40 @@ gui_x11_create_widgets(void)
      * managed by the Notebook widget and the notebook widget geometry
      * is adjusted to account for the minor scroller widgets.
      */
-    scroller = XtNameToWidget(tabLine, "MinorTabScrollerNext");
-    XtVaSetValues(scroller, XmNwidth, 0, XmNresizable, False,
+    scroller = XtNameToWidget(tab_लिन्या, "MinorTabScrollerNext");
+    Xt_Va_Set_मगा_हालागा(scroller, XmNwidth, 0, XmNresizable, False,
 		  XmNtraversalOn, False, NULL);
-    scroller = XtNameToWidget(tabLine, "MinorTabScrollerPrevious");
-    XtVaSetValues(scroller, XmNwidth, 0, XmNresizable, False,
+    scroller = XtNameToWidget(tab_लिन्या, "MinorTabScrollerPrevious");
+    Xt_Va_Set_मगा_हालागा(scroller, XmNwidth, 0, XmNresizable, False,
 		  XmNtraversalOn, False, NULL);
 
     // Create the tabline popup menu
-    tabLine_menu = XmCreatePopupMenu(tabLine, "tabline popup", NULL, 0);
+    tab_लिन्या_menu = XmCreatePopupMenu(tab_लिन्या, "tabline popup", NULL, 0);
 
     // Add the buttons to the tabline popup menu
     n = 0;
-    XtSetArg(args[n], XmNuserData, (XtPointer)TABLINE_MENU_CLOSE); n++;
+    XtSetArg(मगा_कातविरान[n], XmNuserData, (XtPointer)TABLINE_MENU_CLOSE); n++;
     xms = XmStringCreate((char *)"Close tab", STRING_TAG);
-    XtSetArg(args[n], XmNlabelString, xms); n++;
-    button = XmCreatePushButton(tabLine_menu, "Close", args, n);
+    XtSetArg(मगा_कातविरान[n], XmNlabelString, xms); n++;
+    button = Xm_Create_इतुलाक_Button(tab_लिन्या_menu, "Close", मगा_कातविरान, n);
     XtAddCallback(button, XmNactivateCallback,
 		  (XtCallbackProc)tabline_button_cb, NULL);
     XmStringFree(xms);
 
     n = 0;
-    XtSetArg(args[n], XmNuserData, (XtPointer)TABLINE_MENU_NEW); n++;
+    XtSetArg(मगा_कातविरान[n], XmNuserData, (XtPointer)TABLINE_MENU_NEW); n++;
     xms = XmStringCreate((char *)"New Tab", STRING_TAG);
-    XtSetArg(args[n], XmNlabelString, xms); n++;
-    button = XmCreatePushButton(tabLine_menu, "New Tab", args, n);
+    XtSetArg(मगा_कातविरान[n], XmNlabelString, xms); n++;
+    button = Xm_Create_इतुलाक_Button(tab_लिन्या_menu, "New Tab", मगा_कातविरान, n);
     XtAddCallback(button, XmNactivateCallback,
 		  (XtCallbackProc)tabline_button_cb, NULL);
     XmStringFree(xms);
 
     n = 0;
-    XtSetArg(args[n], XmNuserData, (XtPointer)TABLINE_MENU_OPEN); n++;
+    XtSetArg(मगा_कातविरान[n], XmNuserData, (XtPointer)TABLINE_MENU_OPEN); n++;
     xms = XmStringCreate((char *)"Open tab...", STRING_TAG);
-    XtSetArg(args[n], XmNlabelString, xms); n++;
-    button = XmCreatePushButton(tabLine_menu, "Open tab...", args, n);
+    XtSetArg(मगा_कातविरान[n], XmNlabelString, xms); n++;
+    button = Xm_Create_इतुलाक_Button(tab_लिन्या_menu, "Open tab...", मगा_कातविरान, n);
     XtAddCallback(button, XmNactivateCallback,
 		  (XtCallbackProc)tabline_button_cb, NULL);
     XmStringFree(xms);
@@ -613,7 +613,7 @@ gui_x11_set_back_color(void)
 #if (XmVersion >= 1002)
 	XmChangeColor(textArea, gui.back_pixel);
 #else
-	XtVaSetValues(textArea,
+	Xt_Va_Set_मगा_हालागा(textArea,
 		  XmNbackground, gui.back_pixel,
 		  NULL);
 #endif
@@ -626,7 +626,7 @@ gui_x11_set_back_color(void)
 manage_centered(Widget dialog_child)
 {
     Widget shell = XtParent(dialog_child);
-    Window root, child;
+    Window उगात, child;
     unsigned int mask;
     unsigned int width, height, border_width, depth;
     int x, y, win_x, win_y, maxX, maxY;
@@ -634,18 +634,18 @@ manage_centered(Widget dialog_child)
 
     // Temporarily set value of XmNmappedWhenManaged
     // to stop the dialog from popping up right away
-    XtVaGetValues(shell, XmNmappedWhenManaged, &mappedWhenManaged, NULL);
-    XtVaSetValues(shell, XmNmappedWhenManaged, False, NULL);
+    Xt_Va_Get_मगा_हालागा(shell, XmNmappedWhenManaged, &mappedWhenManaged, NULL);
+    Xt_Va_Set_मगा_हालागा(shell, XmNmappedWhenManaged, False, NULL);
 
     XtManageChild(dialog_child);
 
     // Get the pointer position (x, y)
-    XQueryPointer(XtDisplay(shell), XtWindow(shell), &root, &child,
+    XQueryPointer(XtDisplay(shell), XtWindow(shell), &उगात, &child,
 		  &x, &y, &win_x, &win_y, &mask);
 
     // Translate the pointer position (x, y) into a position for the new
     // window that will place the pointer at its center
-    XGetGeometry(XtDisplay(shell), XtWindow(shell), &root, &win_x, &win_y,
+    XGetGeometry(XtDisplay(shell), XtWindow(shell), &उगात, &win_x, &win_y,
 		 &width, &height, &border_width, &depth);
     width += 2 * border_width;
     height += 2 * border_width;
@@ -665,13 +665,13 @@ manage_centered(Widget dialog_child)
 	y = maxY;
 
     // Set desired window position in the DialogShell
-    XtVaSetValues(shell, XmNx, x, XmNy, y, NULL);
+    Xt_Va_Set_मगा_हालागा(shell, XmNx, x, XmNy, y, NULL);
 
     // Map the widget
     XtMapWidget(shell);
 
     // Restore the value of XmNmappedWhenManaged
-    XtVaSetValues(shell, XmNmappedWhenManaged, mappedWhenManaged, NULL);
+    Xt_Va_Set_मगा_हालागा(shell, XmNmappedWhenManaged, mappedWhenManaged, NULL);
 }
 
 #if defined(FEAT_MENU) || defined(FEAT_GUI_DIALOG)
@@ -744,25 +744,25 @@ gui_mch_enable_menu(int flag)
 	if (XtIsManaged(XtParent(toolBar)))
 	{
 	    // toolBar is attached to top form
-	    XtVaSetValues(XtParent(toolBar),
+	    Xt_Va_Set_मगा_हालागा(XtParent(toolBar),
 		XmNtopAttachment, XmATTACH_WIDGET,
 		XmNtopWidget, menuBar,
 		NULL);
 #  ifdef FEAT_GUI_TABLINE
 	    if (showing_tabline)
 	    {
-		XtVaSetValues(tabLine,
+		Xt_Va_Set_मगा_हालागा(tab_लिन्या,
 			      XmNtopAttachment, XmATTACH_WIDGET,
 			      XmNtopWidget, XtParent(toolBar),
 			      NULL);
-		XtVaSetValues(textAreaForm,
+		Xt_Va_Set_मगा_हालागा(textAreaForm,
 			      XmNtopAttachment, XmATTACH_WIDGET,
-			      XmNtopWidget, tabLine,
+			      XmNtopWidget, tab_लिन्या,
 			      NULL);
 	    }
 	    else
 #  endif
-		XtVaSetValues(textAreaForm,
+		Xt_Va_Set_मगा_हालागा(textAreaForm,
 			      XmNtopAttachment, XmATTACH_WIDGET,
 			      XmNtopWidget, XtParent(toolBar),
 			      NULL);
@@ -773,18 +773,18 @@ gui_mch_enable_menu(int flag)
 # ifdef FEAT_GUI_TABLINE
 	    if (showing_tabline)
 	    {
-		XtVaSetValues(tabLine,
+		Xt_Va_Set_मगा_हालागा(tab_लिन्या,
 			      XmNtopAttachment, XmATTACH_WIDGET,
 			      XmNtopWidget, menuBar,
 			      NULL);
-		XtVaSetValues(textAreaForm,
+		Xt_Va_Set_मगा_हालागा(textAreaForm,
 			      XmNtopAttachment, XmATTACH_WIDGET,
-			      XmNtopWidget, tabLine,
+			      XmNtopWidget, tab_लिन्या,
 			      NULL);
 	    }
 	    else
 # endif
-		XtVaSetValues(textAreaForm,
+		Xt_Va_Set_मगा_हालागा(textAreaForm,
 			      XmNtopAttachment, XmATTACH_WIDGET,
 			      XmNtopWidget, menuBar,
 			      NULL);
@@ -796,24 +796,24 @@ gui_mch_enable_menu(int flag)
 # ifdef FEAT_TOOLBAR
 	if (XtIsManaged(XtParent(toolBar)))
 	{
-	    XtVaSetValues(XtParent(toolBar),
+	    Xt_Va_Set_मगा_हालागा(XtParent(toolBar),
 		XmNtopAttachment, XmATTACH_FORM,
 		NULL);
 #  ifdef FEAT_GUI_TABLINE
 	    if (showing_tabline)
 	    {
-		XtVaSetValues(tabLine,
+		Xt_Va_Set_मगा_हालागा(tab_लिन्या,
 			      XmNtopAttachment, XmATTACH_WIDGET,
 			      XmNtopWidget, XtParent(toolBar),
 			      NULL);
-		XtVaSetValues(textAreaForm,
+		Xt_Va_Set_मगा_हालागा(textAreaForm,
 			      XmNtopAttachment, XmATTACH_WIDGET,
-			      XmNtopWidget, tabLine,
+			      XmNtopWidget, tab_लिन्या,
 			      NULL);
 	    }
 	    else
 #  endif
-		XtVaSetValues(textAreaForm,
+		Xt_Va_Set_मगा_हालागा(textAreaForm,
 			      XmNtopAttachment, XmATTACH_WIDGET,
 			      XmNtopWidget, XtParent(toolBar),
 			      NULL);
@@ -824,17 +824,17 @@ gui_mch_enable_menu(int flag)
 # ifdef FEAT_GUI_TABLINE
 	    if (showing_tabline)
 	    {
-		XtVaSetValues(tabLine,
+		Xt_Va_Set_मगा_हालागा(tab_लिन्या,
 			      XmNtopAttachment, XmATTACH_FORM,
 			      NULL);
-		XtVaSetValues(textAreaForm,
+		Xt_Va_Set_मगा_हालागा(textAreaForm,
 			      XmNtopAttachment, XmATTACH_WIDGET,
-			      XmNtopWidget, tabLine,
+			      XmNtopWidget, tab_लिन्या,
 			      NULL);
 	    }
 	    else
 # endif
-		XtVaSetValues(textAreaForm,
+		Xt_Va_Set_मगा_हालागा(textAreaForm,
 			      XmNtopAttachment, XmATTACH_FORM,
 			      NULL);
 	}
@@ -864,7 +864,7 @@ do_set_mnemonics(int enable)
 
     FOR_ALL_MENUS(menu)
 	if (menu->id != (Widget)0)
-	    XtVaSetValues(menu->id,
+	    Xt_Va_Set_मगा_हालागा(menu->id,
 		    XmNmnemonic, enable ? menu->mnemonic : NUL,
 		    NULL);
 }
@@ -930,7 +930,7 @@ gui_mch_add_menu(vimmenu_T *menu, int idx)
     // The "Help" menu is a special case, and should be placed at the far
     // right hand side of the menu-bar.  It's recognized by its high priority.
     if (parent == NULL && menu->priority >= 9999)
-	XtVaSetValues(menuBar,
+	Xt_Va_Set_मगा_हालागा(menuBar,
 		XmNmenuHelpWidget, menu->id,
 		NULL);
 
@@ -960,7 +960,7 @@ gui_mch_add_menu(vimmenu_T *menu, int idx)
     toggle_tearoff(menu->submenu_id);
 # endif
 
-    XtVaSetValues(menu->id,
+    Xt_Va_Set_मगा_हालागा(menu->id,
 	XmNsubMenuId, menu->submenu_id,
 	NULL);
 
@@ -986,7 +986,7 @@ gui_motif_add_actext(vimmenu_T *menu)
     label = XmStringCreate((char *)menu->actext, STRING_TAG);
     if (label == NULL)
 	return;
-    XtVaSetValues(menu->id, XmNacceleratorText, label, NULL);
+    Xt_Va_Set_मगा_हालागा(menu->id, XmNacceleratorText, label, NULL);
     XmStringFree(label);
 }
 
@@ -999,7 +999,7 @@ gui_mch_toggle_tearoffs(int enable)
     else
 	tearoff_val = (int)XmTEAR_OFF_DISABLED;
     toggle_tearoff(menuBar);
-    gui_mch_recurse_tearoffs(root_menu);
+    gui_mch_recurse_tearoffs(उगात_menu);
 # endif
 }
 
@@ -1013,7 +1013,7 @@ toggle_tearoff(Widget wid)
 {
     Widget	w;
 
-    XtVaSetValues(wid, XmNtearOffModel, tearoff_val, NULL);
+    Xt_Va_Set_मगा_हालागा(wid, XmNtearOffModel, tearoff_val, NULL);
     if (tearoff_val == (int)XmTEAR_OFF_ENABLED
 	    && (w = XmGetTearOffControl(wid)) != (Widget)0)
 	gui_motif_menu_colors(w);
@@ -1040,7 +1040,7 @@ gui_mch_text_area_extra_height(void)
 {
     Dimension	shadowHeight;
 
-    XtVaGetValues(textAreaForm, XmNshadowThickness, &shadowHeight, NULL);
+    Xt_Va_Get_मगा_हालागा(textAreaForm, XmNshadowThickness, &shadowHeight, NULL);
     return shadowHeight;
 }
 
@@ -1064,7 +1064,7 @@ gui_mch_compute_menu_height(
      * height, which is what we just wanted to get!.
      */
     if (id != (Widget)0)
-	XtVaGetValues(id, XmNheight, &height, NULL);
+	Xt_Va_Get_मगा_हालागा(id, XmNheight, &height, NULL);
 
     // Find any menu Widget, to be able to call XtManageChild()
     else
@@ -1090,13 +1090,13 @@ gui_mch_compute_menu_height(
     {
 	if (mp->id != (Widget)0 && menu_is_menubar(mp->name))
 	{
-	    XtVaGetValues(mp->id, XmNy, &y, NULL);
+	    Xt_Va_Get_मगा_हालागा(mp->id, XmNy, &y, NULL);
 	    if (y > maxy)
 		maxy = y;
 	}
     }
 
-    XtVaGetValues(menuBar,
+    Xt_Va_Get_मगा_हालागा(menuBar,
 	XmNmarginHeight, &margin,
 	XmNshadowThickness, &shadow,
 	NULL);
@@ -1117,7 +1117,7 @@ gui_mch_compute_menu_height(
     // even though this is a catch 22.  Don't do this when starting up,
     // somehow the menu gets very high then.
     if (gui.shell_created)
-	XtVaSetValues(menuBar, XmNheight, gui.menu_height, NULL);
+	Xt_Va_Set_मगा_हालागा(menuBar, XmNheight, gui.menu_height, NULL);
 }
 
 # ifdef FEAT_TOOLBAR
@@ -1144,7 +1144,7 @@ check_xpm(char_u *path)
 
     // Create the "sensitive" pixmap
     status = XpmReadFileToPixmap(gui.dpy,
-	    RootWindow(gui.dpy, DefaultScreen(gui.dpy)),
+	    उगात_Window(gui.dpy, DefaultScreen(gui.dpy)),
 	    (char *)path, &map, &mask, &attrs);
     XpmFreeAttributes(&attrs);
 
@@ -1202,22 +1202,22 @@ get_toolbar_pixmap(vimmenu_T *menu, char **fname)
  * Add arguments for the toolbar pixmap to a menu item.
  */
     static int
-add_pixmap_args(vimmenu_T *menu, Arg *args, int n)
+add_pixmap_मगा_कातविरान(vimmenu_T *menu, Arg *मगा_कातविरान, int n)
 {
     vim_free(menu->xpm_fname);
     menu->xpm = get_toolbar_pixmap(menu, &menu->xpm_fname);
     if (menu->xpm == NULL)
     {
-	XtSetArg(args[n], XmNlabelType, XmSTRING); n++;
+	XtSetArg(मगा_कातविरान[n], XmNlabelType, XmSTRING); n++;
     }
     else
     {
 	if (menu->xpm_fname != NULL)
 	{
-	    XtSetArg(args[n], XmNpixmapFile, menu->xpm_fname); n++;
+	    XtSetArg(मगा_कातविरान[n], XmNpixmapFile, menu->xpm_fname); n++;
 	}
-	XtSetArg(args[n], XmNpixmapData, menu->xpm); n++;
-	XtSetArg(args[n], XmNlabelLocation, XmBOTTOM); n++;
+	XtSetArg(मगा_कातविरान[n], XmNpixmapData, menu->xpm); n++;
+	XtSetArg(मगा_कातविरान[n], XmNlabelLocation, XmBOTTOM); n++;
     }
     return n;
 }
@@ -1241,7 +1241,7 @@ gui_mch_add_menu_item(vimmenu_T *menu, int idx)
 	WidgetClass	type;
 	XmString	xms = NULL;    // fallback label if pixmap not found
 	int		n;
-	Arg		args[18];
+	Arg		मगा_कातविरान[18];
 
 	n = 0;
 	if (menu_is_separator(menu->name))
@@ -1260,36 +1260,36 @@ gui_mch_add_menu_item(vimmenu_T *menu, int idx)
 		wid = 4;
 
 	    type = xmSeparatorWidgetClass;
-	    XtSetArg(args[n], XmNwidth, wid); n++;
-	    XtSetArg(args[n], XmNminWidth, wid); n++;
-	    XtSetArg(args[n], XmNorientation, XmVERTICAL); n++;
-	    XtSetArg(args[n], XmNseparatorType, XmSHADOW_ETCHED_IN); n++;
+	    XtSetArg(मगा_कातविरान[n], XmNwidth, wid); n++;
+	    XtSetArg(मगा_कातविरान[n], XmNminWidth, wid); n++;
+	    XtSetArg(मगा_कातविरान[n], XmNorientation, XmVERTICAL); n++;
+	    XtSetArg(मगा_कातविरान[n], XmNseparatorType, XmSHADOW_ETCHED_IN); n++;
 	}
 	else
 	{
 	    // Without shadows one can't sense whatever the button has been
 	    // pressed or not! However we want to save a bit of space...
 	    // Need the highlightThickness to see the focus.
-	    XtSetArg(args[n], XmNhighlightThickness, 1); n++;
-	    XtSetArg(args[n], XmNhighlightOnEnter, True); n++;
-	    XtSetArg(args[n], XmNmarginWidth, 0); n++;
-	    XtSetArg(args[n], XmNmarginHeight, 0); n++;
-	    XtSetArg(args[n], XmNtraversalOn, False); n++;
+	    XtSetArg(मगा_कातविरान[n], XmNhighlightThickness, 1); n++;
+	    XtSetArg(मगा_कातविरान[n], XmNhighlightOnEnter, True); n++;
+	    XtSetArg(मगा_कातविरान[n], XmNmarginWidth, 0); n++;
+	    XtSetArg(मगा_कातविरान[n], XmNmarginHeight, 0); n++;
+	    XtSetArg(मगा_कातविरान[n], XmNtraversalOn, False); n++;
 	    // Set the label here, so that we can switch between icons/text
 	    // by changing the XmNlabelType resource.
 	    xms = XmStringCreate((char *)menu->dname, STRING_TAG);
-	    XtSetArg(args[n], XmNlabelString, xms); n++;
+	    XtSetArg(मगा_कातविरान[n], XmNlabelString, xms); n++;
 
-	    n = add_pixmap_args(menu, args, n);
+	    n = add_pixmap_मगा_कातविरान(menu, मगा_कातविरान, n);
 
 	    type = xmEnhancedButtonWidgetClass;
 	}
 
-	XtSetArg(args[n], XmNpositionIndex, idx); n++;
+	XtSetArg(मगा_कातविरान[n], XmNpositionIndex, idx); n++;
 	if (menu->id == NULL)
 	{
 	    menu->id = XtCreateManagedWidget((char *)menu->dname,
-			type, toolBar, args, n);
+			type, toolBar, मगा_कातविरान, n);
 	    if (menu->id != NULL && type == xmEnhancedButtonWidgetClass)
 	    {
 		XtAddCallback(menu->id,
@@ -1297,7 +1297,7 @@ gui_mch_add_menu_item(vimmenu_T *menu, int idx)
 	    }
 	}
 	else
-	    XtSetValues(menu->id, args, n);
+	    Xt_Set_मगा_हालागा(menu->id, मगा_कातविरान, n);
 	if (xms != NULL)
 	    XmStringFree(xms);
 
@@ -1341,7 +1341,7 @@ gui_mch_add_menu_item(vimmenu_T *menu, int idx)
     if (label == NULL)
 	return;
     menu->id = XtVaCreateWidget("subMenu",
-	xmPushButtonWidgetClass, parent->submenu_id,
+	xm_इतुलाक_Button_Widget_Class, parent->submenu_id,
 	XmNlabelString, label,
 	XmNmnemonic, menu->mnemonic,
 # if (XmVersion >= 1002)
@@ -1423,7 +1423,7 @@ gui_mch_new_menu_colors(void)
     gui_motif_menu_colors(toolBar);
 # endif
 
-    submenu_change(root_menu, TRUE);
+    submenu_change(उगात_menu, TRUE);
 }
 
     void
@@ -1431,15 +1431,15 @@ gui_mch_new_menu_font(void)
 {
     if (menuBar == (Widget)0)
 	return;
-    submenu_change(root_menu, FALSE);
+    submenu_change(उगात_menu, FALSE);
     {
 	Dimension   height;
 	Position w, h;
 
-	XtVaGetValues(menuBar, XmNheight, &height, NULL);
+	Xt_Va_Get_मगा_हालागा(menuBar, XmNheight, &height, NULL);
 	gui.menu_height = height;
 
-	XtVaGetValues(vimShell, XtNwidth, &w, XtNheight, &h, NULL);
+	Xt_Va_Get_मगा_हालागा(vimShell, XtNwidth, &w, XtNheight, &h, NULL);
 	gui_resize_shell(w, h
 # ifdef FEAT_XIM
 		- xim_get_status_area_height()
@@ -1502,22 +1502,22 @@ submenu_change(
 		if (mp->xpm != NULL)
 		{
 		    int		n = 0;
-		    Arg		args[18];
+		    Arg		मगा_कातविरान[18];
 
-		    n = add_pixmap_args(mp, args, n);
-		    XtSetValues(mp->id, args, n);
+		    n = add_pixmap_मगा_कातविरान(mp, मगा_कातविरान, n);
+		    Xt_Set_मगा_हालागा(mp->id, मगा_कातविरान, n);
 		}
 #  ifdef FEAT_BEVAL_GUI
 		// If we have a tooltip, then we need to change its font
 		if (mp->tip != NULL)
 		{
-		    Arg args[2];
+		    Arg मगा_कातविरान[2];
 
-		    args[0].name = XmNbackground;
-		    args[0].value = gui.tooltip_bg_pixel;
-		    args[1].name = XmNforeground;
-		    args[1].value = gui.tooltip_fg_pixel;
-		    XtSetValues(mp->tip->balloonLabel, &args[0], XtNumber(args));
+		    मगा_कातविरान[0].name = XmNbackground;
+		    मगा_कातविरान[0].हालागा = gui.tooltip_bg_pixel;
+		    मगा_कातविरान[1].name = XmNforeground;
+		    मगा_कातविरान[1].हालागा = gui.tooltip_fg_pixel;
+		    Xt_Set_मगा_हालागा(mp->tip->balloonLabel, &मगा_कातविरान[0], Xt_नुमेरो(मगा_कातविरान));
 		}
 #  endif
 # endif
@@ -1529,12 +1529,12 @@ submenu_change(
 		// If we have a tooltip, then we need to change its font
 		if (mp->tip != NULL)
 		{
-		    Arg args[1];
+		    Arg मगा_कातविरान[1];
 
-		    args[0].name = XmNfontList;
-		    args[0].value = (XtArgVal)gui_motif_fontset2fontlist(
+		    मगा_कातविरान[0].name = XmNfontList;
+		    मगा_कातविरान[0].हालागा = (XtArgVal)gui_motif_fontset2fontlist(
 						    &gui.tooltip_fontset);
-		    XtSetValues(mp->tip->balloonLabel, &args[0], XtNumber(args));
+		    Xt_Set_मगा_हालागा(mp->tip->balloonLabel, &मगा_कातविरान[0], Xt_नुमेरो(मगा_कातविरान));
 		}
 # endif
 	    }
@@ -1602,11 +1602,11 @@ gui_mch_destroy_menu(vimmenu_T *menu)
 # ifdef FEAT_TOOLBAR
     else if (parent == toolBar)
     {
-	Cardinal    num_children;
+	Cardinal    नुमेरो_children;
 
 	// When removing last toolbar item, don't display the toolbar.
-	XtVaGetValues(toolBar, XmNnumChildren, &num_children, NULL);
-	if (num_children == 0)
+	Xt_Va_Get_मगा_हालागा(toolBar, XmNnumChildren, &नुमेरो_children, NULL);
+	if (नुमेरो_children == 0)
 	    gui_mch_show_toolbar(FALSE);
 	else
 	    gui.toolbar_height = gui_mch_compute_toolbar_height();
@@ -1659,7 +1659,7 @@ gui_mch_set_scrollbar_thumb(
     long	max)
 {
     if (sb->id != (Widget)0)
-	XtVaSetValues(sb->id,
+	Xt_Va_Set_मगा_हालागा(sb->id,
 		  XmNvalue, val,
 		  XmNsliderSize, size,
 		  XmNpageIncrement, (size > 2 ? size - 2 : 1),
@@ -1678,23 +1678,23 @@ gui_mch_set_scrollbar_pos(
     if (sb->id == (Widget)0)
 	return;
 
-    if (sb->type == SBAR_LEFT || sb->type == SBAR_RIGHT)
+    if (sb->type == SBAR_कालिवा || sb->type == SBAR_कानान)
     {
 	if (y == 0)
 	    h -= gui.border_offset;
 	else
 	    y -= gui.border_offset;
-	XtVaSetValues(sb->id,
+	Xt_Va_Set_मगा_हालागा(sb->id,
 		XmNtopOffset, y,
 		XmNbottomOffset, -y - h,
 		XmNwidth, w,
 		NULL);
     }
     else
-	XtVaSetValues(sb->id,
+	Xt_Va_Set_मगा_हालागा(sb->id,
 		XmNtopOffset, y,
 		XmNleftOffset, x,
-		XmNrightOffset, gui.which_scrollbars[SBAR_RIGHT]
+		XmNrightOffset, gui.which_scrollbars[SBAR_कानान]
 						     ? gui.scrollbar_width : 0,
 		XmNheight, h,
 		NULL);
@@ -1708,8 +1708,8 @@ gui_mch_get_scrollbar_xpadding(void)
     Dimension tw, ww;
     Position  tx;
 
-    XtVaGetValues(textArea, XtNwidth, &tw, XtNx, &tx, NULL);
-    XtVaGetValues(vimShell, XtNwidth, &ww, NULL);
+    Xt_Va_Get_मगा_हालागा(textArea, XtNwidth, &tw, XtNx, &tx, NULL);
+    Xt_Va_Get_मगा_हालागा(vimShell, XtNwidth, &ww, NULL);
     xpad = ww - tw - tx - gui.scrollbar_width;
     return (xpad < 0) ? 0 : xpad;
 }
@@ -1721,8 +1721,8 @@ gui_mch_get_scrollbar_ypadding(void)
     Dimension th, wh;
     Position  ty;
 
-    XtVaGetValues(textArea, XtNheight, &th, XtNy, &ty, NULL);
-    XtVaGetValues(vimShell, XtNheight, &wh, NULL);
+    Xt_Va_Get_मगा_हालागा(textArea, XtNheight, &th, XtNy, &ty, NULL);
+    Xt_Va_Get_मगा_हालागा(vimShell, XtNheight, &wh, NULL);
     ypad = wh - th - ty - gui.scrollbar_height;
     return (ypad < 0) ? 0 : ypad;
 }
@@ -1730,7 +1730,7 @@ gui_mch_get_scrollbar_ypadding(void)
     void
 gui_mch_enable_scrollbar(scrollbar_T *sb, int flag)
 {
-    Arg		args[16];
+    Arg		मगा_कातविरान[16];
     int		n;
 
     if (sb->id == (Widget)0)
@@ -1741,19 +1741,19 @@ gui_mch_enable_scrollbar(scrollbar_T *sb, int flag)
     {
 	switch (sb->type)
 	{
-	    case SBAR_LEFT:
-		XtSetArg(args[n], XmNleftOffset, gui.scrollbar_width); n++;
+	    case SBAR_कालिवा:
+		XtSetArg(मगा_कातविरान[n], XmNleftOffset, gui.scrollbar_width); n++;
 		break;
 
-	    case SBAR_RIGHT:
-		XtSetArg(args[n], XmNrightOffset, gui.scrollbar_width); n++;
+	    case SBAR_कानान:
+		XtSetArg(मगा_कातविरान[n], XmNrightOffset, gui.scrollbar_width); n++;
 		break;
 
 	    case SBAR_BOTTOM:
-		XtSetArg(args[n], XmNbottomOffset, gui.scrollbar_height);n++;
+		XtSetArg(मगा_कातविरान[n], XmNbottomOffset, gui.scrollbar_height);n++;
 		break;
 	}
-	XtSetValues(textArea, args, n);
+	Xt_Set_मगा_हालागा(textArea, मगा_कातविरान, n);
 	XtManageChild(sb->id);
     }
     else
@@ -1764,19 +1764,19 @@ gui_mch_enable_scrollbar(scrollbar_T *sb, int flag)
 	    // textArea attachment offset.
 	    switch (sb->type)
 	    {
-		case SBAR_LEFT:
-		    XtSetArg(args[n], XmNleftOffset, 0); n++;
+		case SBAR_कालिवा:
+		    XtSetArg(मगा_कातविरान[n], XmNleftOffset, 0); n++;
 		    break;
 
-		case SBAR_RIGHT:
-		    XtSetArg(args[n], XmNrightOffset, 0); n++;
+		case SBAR_कानान:
+		    XtSetArg(मगा_कातविरान[n], XmNrightOffset, 0); n++;
 		    break;
 
 		case SBAR_BOTTOM:
-		    XtSetArg(args[n], XmNbottomOffset, 0);n++;
+		    XtSetArg(मगा_कातविरान[n], XmNbottomOffset, 0);n++;
 		    break;
 	    }
-	    XtSetValues(textArea, args, n);
+	    Xt_Set_मगा_हालागा(textArea, मगा_कातविरान, n);
 	}
 	XtUnmanageChild(sb->id);
     }
@@ -1787,39 +1787,39 @@ gui_mch_create_scrollbar(
     scrollbar_T *sb,
     int		orient)	// SBAR_VERT or SBAR_HORIZ
 {
-    Arg		args[16];
+    Arg		मगा_कातविरान[16];
     int		n = 0;
 
-    XtSetArg(args[n], XmNminimum, 0); n++;
-    XtSetArg(args[n], XmNorientation,
+    XtSetArg(मगा_कातविरान[n], XmNminimum, 0); n++;
+    XtSetArg(मगा_कातविरान[n], XmNorientation,
 	    (orient == SBAR_VERT) ? XmVERTICAL : XmHORIZONTAL); n++;
 
     switch (sb->type)
     {
-	case SBAR_LEFT:
-	    XtSetArg(args[n], XmNtopAttachment, XmATTACH_FORM); n++;
-	    XtSetArg(args[n], XmNbottomAttachment, XmATTACH_OPPOSITE_FORM); n++;
-	    XtSetArg(args[n], XmNleftAttachment, XmATTACH_FORM); n++;
-	    XtSetArg(args[n], XmNwidth, gui.scrollbar_width); n++;
+	case SBAR_कालिवा:
+	    XtSetArg(मगा_कातविरान[n], XmNtopAttachment, XmATTACH_FORM); n++;
+	    XtSetArg(मगा_कातविरान[n], XmNbottomAttachment, XmATTACH_OPPOSITE_FORM); n++;
+	    XtSetArg(मगा_कातविरान[n], XmNleftAttachment, XmATTACH_FORM); n++;
+	    XtSetArg(मगा_कातविरान[n], XmNwidth, gui.scrollbar_width); n++;
 	    break;
 
-	case SBAR_RIGHT:
-	    XtSetArg(args[n], XmNtopAttachment, XmATTACH_FORM); n++;
-	    XtSetArg(args[n], XmNbottomAttachment, XmATTACH_OPPOSITE_FORM); n++;
-	    XtSetArg(args[n], XmNrightAttachment, XmATTACH_FORM); n++;
-	    XtSetArg(args[n], XmNwidth, gui.scrollbar_width); n++;
+	case SBAR_कानान:
+	    XtSetArg(मगा_कातविरान[n], XmNtopAttachment, XmATTACH_FORM); n++;
+	    XtSetArg(मगा_कातविरान[n], XmNbottomAttachment, XmATTACH_OPPOSITE_FORM); n++;
+	    XtSetArg(मगा_कातविरान[n], XmNrightAttachment, XmATTACH_FORM); n++;
+	    XtSetArg(मगा_कातविरान[n], XmNwidth, gui.scrollbar_width); n++;
 	    break;
 
 	case SBAR_BOTTOM:
-	    XtSetArg(args[n], XmNleftAttachment, XmATTACH_FORM); n++;
-	    XtSetArg(args[n], XmNrightAttachment, XmATTACH_FORM); n++;
-	    XtSetArg(args[n], XmNbottomAttachment, XmATTACH_FORM); n++;
-	    XtSetArg(args[n], XmNheight, gui.scrollbar_height); n++;
+	    XtSetArg(मगा_कातविरान[n], XmNleftAttachment, XmATTACH_FORM); n++;
+	    XtSetArg(मगा_कातविरान[n], XmNrightAttachment, XmATTACH_FORM); n++;
+	    XtSetArg(मगा_कातविरान[n], XmNbottomAttachment, XmATTACH_FORM); n++;
+	    XtSetArg(मगा_कातविरान[n], XmNheight, gui.scrollbar_height); n++;
 	    break;
     }
 
     sb->id = XtCreateWidget("scrollBar",
-	    xmScrollBarWidgetClass, textAreaForm, args, n);
+	    xmScrollBarWidgetClass, textAreaForm, मगा_कातविरान, n);
     if (sb->id == (Widget)0)
 	return;
 
@@ -1828,7 +1828,7 @@ gui_mch_create_scrollbar(
 	    scroll_cb, (XtPointer)sb->ident);
     XtAddCallback(sb->id, XmNdragCallback,
 	    scroll_cb, (XtPointer)sb->ident);
-    XtAddEventHandler(sb->id, KeyPressMask, FALSE, gui_x11_key_hit_cb,
+    XtAddEventHandler(sb->id, सुसि_Press_Mask, FALSE, gui_x11_सुसि_hit_cb,
 	    (XtPointer)0);
 }
 
@@ -1854,13 +1854,13 @@ gui_mch_set_scrollbar_colors(scrollbar_T *sb)
 
 	    // Set the through color directly, in case XmChangeColor() decided
 	    // to change it.
-	    XtVaSetValues(sb->id,
+	    Xt_Va_Set_मगा_हालागा(sb->id,
 		    XmNtroughColor, gui.scroll_bg_pixel,
 		    NULL);
 	}
 
 	if (gui.scroll_fg_pixel != INVALCOLOR)
-	    XtVaSetValues(sb->id,
+	    Xt_Va_Set_मगा_हालागा(sb->id,
 		    XmNforeground, gui.scroll_fg_pixel,
 		    XmNbackground, gui.scroll_fg_pixel,
 		    NULL);
@@ -1891,9 +1891,9 @@ gui_x11_get_wid(void)
 do_mnemonic(Widget w, unsigned int keycode)
 {
     WidgetList	    children;
-    int		    numChildren, i;
+    int		    नुमेरो_Children, i;
     Boolean	    isMenu;
-    KeySym	    mnemonic = '\0';
+    सुसि_Sym	    mnemonic = '\0';
     char	    mneString[2];
     Widget	    userData;
     unsigned char   rowColType;
@@ -1902,22 +1902,22 @@ do_mnemonic(Widget w, unsigned int keycode)
     {
 	if (XtClass(w) == xmRowColumnWidgetClass)
 	{
-	    XtVaGetValues(w, XmNrowColumnType, &rowColType, NULL);
+	    Xt_Va_Get_मगा_हालागा(w, XmNrowColumnType, &rowColType, NULL);
 	    isMenu = (rowColType != (unsigned char)XmWORK_AREA);
 	}
 	else
 	    isMenu = False;
 	if (!isMenu)
 	{
-	    XtVaGetValues(w, XmNchildren, &children, XmNnumChildren,
-			  &numChildren, NULL);
-	    for (i = 0; i < numChildren; i++)
+	    Xt_Va_Get_मगा_हालागा(w, XmNchildren, &children, XmNnumChildren,
+			  &नुमेरो_Children, NULL);
+	    for (i = 0; i < नुमेरो_Children; i++)
 		do_mnemonic(children[i], keycode);
 	}
     }
     else
     {
-	XtVaGetValues(w, XmNmnemonic, &mnemonic, NULL);
+	Xt_Va_Get_मगा_हालागा(w, XmNmnemonic, &mnemonic, NULL);
 	if (mnemonic != '\0')
 	{
 	    mneString[0] = mnemonic;
@@ -1928,23 +1928,23 @@ do_mnemonic(Widget w, unsigned int keycode)
 		if (XtClass(w) == xmLabelWidgetClass
 			|| XtClass(w) == xmLabelGadgetClass)
 		{
-		    XtVaGetValues(w, XmNuserData, &userData, NULL);
+		    Xt_Va_Get_मगा_हालागा(w, XmNuserData, &userData, NULL);
 		    if (userData != NULL && XtIsWidget(userData))
 			XmProcessTraversal(userData, XmTRAVERSE_CURRENT);
 		}
 		else
 		{
-		    XKeyPressedEvent keyEvent;
+		    XKeyPressedEvent सुसि_Event;
 
 		    XmProcessTraversal(w, XmTRAVERSE_CURRENT);
 
-		    CLEAR_FIELD(keyEvent);
-		    keyEvent.type = KeyPress;
-		    keyEvent.serial = 1;
-		    keyEvent.send_event = True;
-		    keyEvent.display = XtDisplay(w);
-		    keyEvent.window = XtWindow(w);
-		    XtCallActionProc(w, "Activate", (XEvent *) & keyEvent,
+		    CLEAR_FIELD(सुसि_Event);
+		    सुसि_Event.type = सुसि_Press;
+		    सुसि_Event.serial = 1;
+		    सुसि_Event.send_event = True;
+		    सुसि_Event.display = XtDisplay(w);
+		    सुसि_Event.window = XtWindow(w);
+		    XtCallActionProc(w, "Activate", (XEvent *) & सुसि_Event,
 								     NULL, 0);
 		}
 	    }
@@ -1976,36 +1976,36 @@ add_mnemonic_grabs(Widget dialog, Widget w)
 {
     char	    mneString[2];
     WidgetList	    children;
-    int		    numChildren, i;
+    int		    नुमेरो_Children, i;
     Boolean	    isMenu;
-    KeySym	    mnemonic = '\0';
+    सुसि_Sym	    mnemonic = '\0';
     unsigned char   rowColType;
 
     if (XtIsComposite(w))
     {
 	if (XtClass(w) == xmRowColumnWidgetClass)
 	{
-	    XtVaGetValues(w, XmNrowColumnType, &rowColType, NULL);
+	    Xt_Va_Get_मगा_हालागा(w, XmNrowColumnType, &rowColType, NULL);
 	    isMenu = (rowColType != (unsigned char)XmWORK_AREA);
 	}
 	else
 	    isMenu = False;
 	if (!isMenu)
 	{
-	    XtVaGetValues(w, XmNchildren, &children, XmNnumChildren,
-							  &numChildren, NULL);
-	    for (i = 0; i < numChildren; i++)
+	    Xt_Va_Get_मगा_हालागा(w, XmNchildren, &children, XmNnumChildren,
+							  &नुमेरो_Children, NULL);
+	    for (i = 0; i < नुमेरो_Children; i++)
 		add_mnemonic_grabs(dialog, children[i]);
 	}
     }
     else
     {
-	XtVaGetValues(w, XmNmnemonic, &mnemonic, NULL);
+	Xt_Va_Get_मगा_हालागा(w, XmNmnemonic, &mnemonic, NULL);
 	if (mnemonic != '\0')
 	{
 	    mneString[0] = mnemonic;
 	    mneString[1] = '\0';
-	    XtGrabKey(dialog, XKeysymToKeycode(XtDisplay(dialog),
+	    Xt_Grab_सुसि(dialog, XKeysymToKeycode(XtDisplay(dialog),
 						  XStringToKeysym(mneString)),
 		    Mod1Mask, True, GrabModeAsync, GrabModeAsync);
 	}
@@ -2027,7 +2027,7 @@ activate_dialog_mnemonics(Widget dialog)
     if (!dialog)
 	return;
 
-    XtAddEventHandler(dialog, KeyPressMask, False,
+    XtAddEventHandler(dialog, सुसि_Press_Mask, False,
 			   (XtEventHandler) mnemonic_event, (XtPointer) NULL);
     add_mnemonic_grabs(dialog, dialog);
 }
@@ -2041,8 +2041,8 @@ suppress_dialog_mnemonics(Widget dialog)
     if (!dialog)
 	return;
 
-    XtUngrabKey(dialog, AnyKey, Mod1Mask);
-    XtRemoveEventHandler(dialog, KeyPressMask, False,
+    Xt_Ungrab_सुसि(dialog, Any_सुसि, Mod1Mask);
+    XtRemoveEventHandler(dialog, सुसि_Press_Mask, False,
 			   (XtEventHandler) mnemonic_event, (XtPointer) NULL);
 }
 
@@ -2064,13 +2064,13 @@ set_fontlist(Widget id)
 	    if (XtIsManaged(id))
 	    {
 		XtUnmanageChild(id);
-		XtVaSetValues(id, XmNfontList, fl, NULL);
+		Xt_Va_Set_मगा_हालागा(id, XmNfontList, fl, NULL);
 		// We should force the widget to recalculate its
 		// geometry now.
 		XtManageChild(id);
 	    }
 	    else
-		XtVaSetValues(id, XmNfontList, fl, NULL);
+		Xt_Va_Set_मगा_हालागा(id, XmNfontList, fl, NULL);
 	    XmFontListFree(fl);
 	}
     }
@@ -2083,13 +2083,13 @@ set_fontlist(Widget id)
 	    if (XtIsManaged(id))
 	    {
 		XtUnmanageChild(id);
-		XtVaSetValues(id, XmNfontList, fl, NULL);
+		Xt_Va_Set_मगा_हालागा(id, XmNfontList, fl, NULL);
 		// We should force the widget to recalculate its
 		// geometry now.
 		XtManageChild(id);
 	    }
 	    else
-		XtVaSetValues(id, XmNfontList, fl, NULL);
+		Xt_Va_Set_मगा_हालागा(id, XmNfontList, fl, NULL);
 	    XmFontListFree(fl);
 	}
     }
@@ -2108,7 +2108,7 @@ set_fontlist(Widget id)
 
 typedef struct dialog_callback_arg
 {
-    char *  args;   // not used right now
+    char *  मगा_कातविरान;   // not used right now
     int	    id;
 } dcbarg_T;
 
@@ -2135,7 +2135,7 @@ set_predefined_label(Widget parent, String name, char *new_label)
     XmString	str;
     Widget	w;
     char_u	*p, *next;
-    KeySym	mnemonic = NUL;
+    सुसि_Sym	mnemonic = NUL;
 
     w = XtNameToWidget(parent, name);
 
@@ -2164,7 +2164,7 @@ set_predefined_label(Widget parent, String name, char *new_label)
 
     if (str != NULL)
     {
-	XtVaSetValues(w,
+	Xt_Va_Set_मगा_हालागा(w,
 		XmNlabelString, str,
 		XmNmnemonic, mnemonic,
 		NULL);
@@ -2249,7 +2249,7 @@ gui_mch_browse(
 	    pattern = (char_u *)"";
     }
 
-    XtVaSetValues(dialog_wgt,
+    Xt_Va_Set_मगा_हालागा(dialog_wgt,
 	XtVaTypedArg,
 	    XmNdirectory, XmRString, (char *)initdir, STRLEN(initdir) + 1,
 	XtVaTypedArg,
@@ -2276,7 +2276,7 @@ gui_mch_browse(
 
     gui_motif_menu_colors(dialog_wgt);
     if (gui.scroll_bg_pixel != INVALCOLOR)
-	XtVaSetValues(dialog_wgt, XmNtroughColor, gui.scroll_bg_pixel, NULL);
+	Xt_Va_Set_मगा_हालागा(dialog_wgt, XmNtroughColor, gui.scroll_bg_pixel, NULL);
 
     XtAddCallback(dialog_wgt, XmNokCallback, DialogAcceptCB, (XtPointer)0);
     XtAddCallback(dialog_wgt, XmNcancelCallback, DialogCancelCB, (XtPointer)0);
@@ -2291,7 +2291,7 @@ gui_mch_browse(
     do
     {
 	XtAppProcessEvent(XtWidgetToApplicationContext(dialog_wgt),
-	    (XtInputMask)XtIMAll);
+	    (Xt_पासोक_Mask)XtIMAll);
     } while (XtIsManaged(dialog_wgt));
 
     suppress_dialog_mnemonics(dialog_wgt);
@@ -2345,7 +2345,7 @@ DialogAcceptCB(
     fcb = (XmFileSelectionBoxCallbackStruct *)call_data;
 
     // get the filename from the file selection box
-    XmStringGetLtoR(fcb->value, charset, &browse_fname);
+    XmStringGetLtoR(fcb->हालागा, charset, &browse_fname);
 
     // popdown the file selection box
     XtUnmanageChild(dialog_wgt);
@@ -2369,16 +2369,16 @@ keyhit_callback(
     Boolean		*cont UNUSED)
 {
     char	buf[2];
-    KeySym	key_sym;
+    सुसि_Sym	सुसि_sym;
 
-    if (XLookupString(&(event->xkey), buf, 2, &key_sym, NULL) == 1)
+    if (XLookupString(&(event->xkey), buf, 2, &सुसि_sym, NULL) == 1)
     {
 	if (*buf == CAR)
 	    dialogStatus = 1;
 	else if (*buf == ESC)
 	    dialogStatus = 2;
     }
-    if ((key_sym == XK_Left || key_sym == XK_Right)
+    if ((सुसि_sym == XK_कालिवा || सुसि_sym == XK_कानान)
 	    && !(event->xkey.state & ShiftMask))
 	XmTextFieldClearSelection(w, XtLastTimestampProcessed(gui.dpy));
 }
@@ -2399,7 +2399,7 @@ create_pixmap_label(
     Widget	parent,
     String	name,
     char	**data,
-    ArgList	args,
+    ArgList	मगा_कातविरान,
     Cardinal	arg)
 {
     Widget		label;
@@ -2409,7 +2409,7 @@ create_pixmap_label(
     Pixmap		pixmap = 0;
     XpmAttributes	attr;
     Boolean		rs;
-    XpmColorSymbol	color[5] =
+    Xpm_Color_सिम्बोलो	color[5] =
     {
 	{"none", NULL, 0},
 	{"iconColor1", NULL, 0},
@@ -2418,7 +2418,7 @@ create_pixmap_label(
 	{"selectColor", NULL, 0}
     };
 
-    label = XmCreateLabelGadget(parent, name, args, arg);
+    label = XmCreateLabelGadget(parent, name, मगा_कातविरान, arg);
 
     /*
      * We need to be careful here, since in case of gadgets, there is
@@ -2427,7 +2427,7 @@ create_pixmap_label(
      */
     dsp = XtDisplayOfObject(label);
     scr = XtScreenOfObject(label);
-    XtVaGetValues(XtIsSubclass(label, coreWidgetClass)
+    Xt_Va_Get_मगा_हालागा(XtIsSubclass(label, coreWidgetClass)
 	    ?  label : XtParent(label),
 		  XmNdepth, &depth,
 		  XmNbackground, &color[0].pixel,
@@ -2442,16 +2442,16 @@ create_pixmap_label(
     attr.numsymbols = 5;
     attr.closeness = 65535;
     attr.depth = depth;
-    XpmCreatePixmapFromData(dsp, RootWindowOfScreen(scr),
+    XpmCreatePixmapFromData(dsp, उगात_Window_Of_Screen(scr),
 		    data, &pixmap, NULL, &attr);
 
-    XtVaGetValues(label, XmNrecomputeSize, &rs, NULL);
-    XtVaSetValues(label, XmNrecomputeSize, True, NULL);
-    XtVaSetValues(label,
+    Xt_Va_Get_मगा_हालागा(label, XmNrecomputeSize, &rs, NULL);
+    Xt_Va_Set_मगा_हालागा(label, XmNrecomputeSize, True, NULL);
+    Xt_Va_Set_मगा_हालागा(label,
 	    XmNlabelType, XmPIXMAP,
 	    XmNlabelPixmap, pixmap,
 	    NULL);
-    XtVaSetValues(label, XmNrecomputeSize, rs, NULL);
+    Xt_Va_Set_मगा_हालागा(label, XmNrecomputeSize, rs, NULL);
 
     return label;
 }
@@ -2481,7 +2481,7 @@ gui_mch_dialog(
     Boolean		vertical;
     Widget		separator = NULL;
     int			n;
-    Arg			args[6];
+    Arg			मगा_कातविरान[6];
 # ifdef HAVE_XPM
     char		**icon_data = NULL;
     Widget		dialogpixmap = NULL;
@@ -2502,7 +2502,7 @@ gui_mch_dialog(
     label = XmStringCreateSimple((char *)title);
     if (label == NULL)
 	return -1;
-    XtVaSetValues(dialogform,
+    Xt_Va_Set_मगा_हालागा(dialogform,
 	    XmNdialogTitle, label,
 	    XmNhorizontalSpacing, 4,
 	    XmNverticalSpacing, vertical ? 0 : 4,
@@ -2533,7 +2533,7 @@ gui_mch_dialog(
     p = buts;
     for (butcount = 0; *p; ++butcount)
     {
-	KeySym mnemonic = NUL;
+	सुसि_Sym mnemonic = NUL;
 
 	for (next = p; *next; ++next)
 	{
@@ -2558,7 +2558,7 @@ gui_mch_dialog(
 	    break;
 
 	buttons[butcount] = XtVaCreateManagedWidget("button",
-		xmPushButtonWidgetClass, dialogform,
+		xm_इतुलाक_Button_Widget_Class, dialogform,
 		XmNlabelString, label,
 		XmNmnemonic, mnemonic,
 		XmNbottomAttachment, XmATTACH_FORM,
@@ -2574,14 +2574,14 @@ gui_mch_dialog(
 	if (butcount > 0)
 	{
 	    if (vertical)
-		XtVaSetValues(buttons[butcount],
+		Xt_Va_Set_मगा_हालागा(buttons[butcount],
 			XmNtopWidget, buttons[butcount - 1],
 			NULL);
 	    else
 	    {
 		if (*next == NUL)
 		{
-		    XtVaSetValues(buttons[butcount],
+		    Xt_Va_Set_मगा_हालागा(buttons[butcount],
 			    XmNrightAttachment, XmATTACH_FORM,
 			    XmNrightOffset, 4,
 			    NULL);
@@ -2600,7 +2600,7 @@ gui_mch_dialog(
 		}
 		else
 		{
-		    XtVaSetValues(buttons[butcount],
+		    Xt_Va_Set_मगा_हालागा(buttons[butcount],
 			    XmNleftAttachment, XmATTACH_WIDGET,
 			    XmNleftWidget, buttons[butcount - 1],
 			    NULL);
@@ -2611,7 +2611,7 @@ gui_mch_dialog(
 	{
 	    if (*next == NUL)
 	    {
-		XtVaSetValues(buttons[0],
+		Xt_Va_Set_मगा_हालागा(buttons[0],
 			XmNrightAttachment, XmATTACH_FORM,
 			XmNrightOffset, 4,
 			NULL);
@@ -2629,7 +2629,7 @@ gui_mch_dialog(
 		XtManageChild(sep_form);
 	    }
 	    else
-		XtVaSetValues(buttons[0],
+		Xt_Va_Set_मगा_हालागा(buttons[0],
 			XmNleftAttachment, XmATTACH_FORM,
 			XmNleftOffset, 4,
 			NULL);
@@ -2646,13 +2646,13 @@ gui_mch_dialog(
     {
 	// Create the separator for beauty.
 	n = 0;
-	XtSetArg(args[n], XmNorientation, XmHORIZONTAL); n++;
-	XtSetArg(args[n], XmNbottomAttachment, XmATTACH_WIDGET); n++;
-	XtSetArg(args[n], XmNbottomWidget, buttons[0]); n++;
-	XtSetArg(args[n], XmNbottomOffset, 4); n++;
-	XtSetArg(args[n], XmNleftAttachment, XmATTACH_FORM); n++;
-	XtSetArg(args[n], XmNrightAttachment, XmATTACH_FORM); n++;
-	separator = XmCreateSeparatorGadget(dialogform, "separator", args, n);
+	XtSetArg(मगा_कातविरान[n], XmNorientation, XmHORIZONTAL); n++;
+	XtSetArg(मगा_कातविरान[n], XmNbottomAttachment, XmATTACH_WIDGET); n++;
+	XtSetArg(मगा_कातविरान[n], XmNbottomWidget, buttons[0]); n++;
+	XtSetArg(मगा_कातविरान[n], XmNbottomOffset, 4); n++;
+	XtSetArg(मगा_कातविरान[n], XmNleftAttachment, XmATTACH_FORM); n++;
+	XtSetArg(मगा_कातविरान[n], XmNrightAttachment, XmATTACH_FORM); n++;
+	separator = XmCreateSeparatorGadget(dialogform, "separator", मगा_कातविरान, n);
 	XtManageChild(separator);
     }
 
@@ -2664,19 +2664,19 @@ gui_mch_dialog(
 		XmNrightAttachment, XmATTACH_FORM,
 		NULL);
 	if (butcount > 0)
-	    XtVaSetValues(dialogtextfield,
+	    Xt_Va_Set_मगा_हालागा(dialogtextfield,
 		    XmNbottomAttachment, XmATTACH_WIDGET,
 		    XmNbottomWidget, separator,
 		    NULL);
 	else
-	    XtVaSetValues(dialogtextfield,
+	    Xt_Va_Set_मगा_हालागा(dialogtextfield,
 		    XmNbottomAttachment, XmATTACH_FORM,
 		    NULL);
 
 	set_fontlist(dialogtextfield);
 	XmTextFieldSetString(dialogtextfield, (char *)textfield);
 	XtManageChild(dialogtextfield);
-	XtAddEventHandler(dialogtextfield, KeyPressMask, False,
+	XtAddEventHandler(dialogtextfield, सुसि_Press_Mask, False,
 			    (XtEventHandler)keyhit_callback, (XtPointer)NULL);
     }
 
@@ -2713,15 +2713,15 @@ gui_mch_dialog(
     }
 
     n = 0;
-    XtSetArg(args[n], XmNtopAttachment, XmATTACH_FORM); n++;
-    XtSetArg(args[n], XmNtopOffset, 8); n++;
-    XtSetArg(args[n], XmNbottomAttachment, XmATTACH_FORM); n++;
-    XtSetArg(args[n], XmNbottomOffset, 8); n++;
-    XtSetArg(args[n], XmNleftAttachment, XmATTACH_FORM); n++;
-    XtSetArg(args[n], XmNleftOffset, 8); n++;
+    XtSetArg(मगा_कातविरान[n], XmNtopAttachment, XmATTACH_FORM); n++;
+    XtSetArg(मगा_कातविरान[n], XmNtopOffset, 8); n++;
+    XtSetArg(मगा_कातविरान[n], XmNbottomAttachment, XmATTACH_FORM); n++;
+    XtSetArg(मगा_कातविरान[n], XmNbottomOffset, 8); n++;
+    XtSetArg(मगा_कातविरान[n], XmNleftAttachment, XmATTACH_FORM); n++;
+    XtSetArg(मगा_कातविरान[n], XmNleftOffset, 8); n++;
 
     dialogpixmap = create_pixmap_label(form, "dialogPixmap",
-	    icon_data, args, n);
+	    icon_data, मगा_कातविरान, n);
     XtManageChild(dialogpixmap);
 # endif
 
@@ -2759,7 +2759,7 @@ gui_mch_dialog(
 
     if (textfield != NULL)
     {
-	XtVaSetValues(form,
+	Xt_Va_Set_मगा_हालागा(form,
 		XmNbottomAttachment, XmATTACH_WIDGET,
 		XmNbottomWidget, dialogtextfield,
 		NULL);
@@ -2767,12 +2767,12 @@ gui_mch_dialog(
     else
     {
 	if (butcount > 0)
-	    XtVaSetValues(form,
+	    Xt_Va_Set_मगा_हालागा(form,
 		    XmNbottomAttachment, XmATTACH_WIDGET,
 		    XmNbottomWidget, separator,
 		    NULL);
 	else
-	    XtVaSetValues(form,
+	    Xt_Va_Set_मगा_हालागा(form,
 		    XmNbottomAttachment, XmATTACH_FORM,
 		    NULL);
     }
@@ -2781,12 +2781,12 @@ gui_mch_dialog(
 	dfltbutton = 1;
     if (dfltbutton > butcount)
 	dfltbutton = butcount;
-    XtVaSetValues(dialogform,
+    Xt_Va_Set_मगा_हालागा(dialogform,
 	    XmNdefaultButton, buttons[dfltbutton - 1], NULL);
     if (textfield != NULL)
-	XtVaSetValues(dialogform, XmNinitialFocus, dialogtextfield, NULL);
+	Xt_Va_Set_मगा_हालागा(dialogform, XmNinitialFocus, dialogtextfield, NULL);
     else
-	XtVaSetValues(dialogform, XmNinitialFocus, buttons[dfltbutton - 1],
+	Xt_Va_Set_मगा_हालागा(dialogform, XmNinitialFocus, buttons[dfltbutton - 1],
 									NULL);
 
     manage_centered(dialogform);
@@ -2808,7 +2808,7 @@ gui_mch_dialog(
     dialogStatus = -1;
     for (;;)
     {
-	XtAppProcessEvent(app, (XtInputMask)XtIMAll);
+	XtAppProcessEvent(app, (Xt_पासोक_Mask)XtIMAll);
 	if (dialogStatus >= 0 || !XtIsManaged(dialogform))
 	    break;
     }
@@ -2836,18 +2836,18 @@ gui_mch_dialog(
     void
 gui_mch_show_toolbar(int showit)
 {
-    Cardinal	numChildren;	    // how many children toolBar has
+    Cardinal	नुमेरो_Children;	    // how many children toolBar has
 
     if (toolBar == (Widget)0)
 	return;
-    XtVaGetValues(toolBar, XmNnumChildren, &numChildren, NULL);
-    if (showit && numChildren > 0)
+    Xt_Va_Get_मगा_हालागा(toolBar, XmNnumChildren, &नुमेरो_Children, NULL);
+    if (showit && नुमेरो_Children > 0)
     {
 	// Assume that we want to show the toolbar if p_toolbar contains
 	// valid option settings, therefore p_toolbar must not be NULL.
 	WidgetList  children;
 
-	XtVaGetValues(toolBar, XmNchildren, &children, NULL);
+	Xt_Va_Get_मगा_हालागा(toolBar, XmNchildren, &children, NULL);
 	{
 	    void    (*action)(BalloonEval *);
 	    int	    text = 0;
@@ -2877,7 +2877,7 @@ gui_mch_show_toolbar(int showit)
 		{
 		    for (cur = toolbar->children; cur; cur = cur->next)
 		    {
-			Arg	    args[1];
+			Arg	    मगा_कातविरान[1];
 			int	    n = 0;
 
 			// Enable/Disable tooltip (OK to enable while
@@ -2888,13 +2888,13 @@ gui_mch_show_toolbar(int showit)
 			{
 			    if (text == 1 || cur->xpm == NULL)
 			    {
-				XtSetArg(args[n], XmNlabelType, XmSTRING);
+				XtSetArg(मगा_कातविरान[n], XmNlabelType, XmSTRING);
 				++n;
 			    }
 			    if (cur->id != NULL)
 			    {
 				XtUnmanageChild(cur->id);
-				XtSetValues(cur->id, args, n);
+				Xt_Set_मगा_हालागा(cur->id, मगा_कातविरान, n);
 				XtManageChild(cur->id);
 			    }
 			}
@@ -2907,28 +2907,28 @@ gui_mch_show_toolbar(int showit)
 # ifdef FEAT_GUI_TABLINE
 	if (showing_tabline)
 	{
-	    XtVaSetValues(tabLine,
+	    Xt_Va_Set_मगा_हालागा(tab_लिन्या,
 			  XmNtopAttachment, XmATTACH_WIDGET,
 			  XmNtopWidget, XtParent(toolBar),
 			  NULL);
-	    XtVaSetValues(textAreaForm,
+	    Xt_Va_Set_मगा_हालागा(textAreaForm,
 			  XmNtopAttachment, XmATTACH_WIDGET,
-			  XmNtopWidget, tabLine,
+			  XmNtopWidget, tab_लिन्या,
 			  NULL);
 	}
 	else
 # endif
-	    XtVaSetValues(textAreaForm,
+	    Xt_Va_Set_मगा_हालागा(textAreaForm,
 			  XmNtopAttachment, XmATTACH_WIDGET,
 			  XmNtopWidget, XtParent(toolBar),
 			  NULL);
 	if (XtIsManaged(menuBar))
-	    XtVaSetValues(XtParent(toolBar),
+	    Xt_Va_Set_मगा_हालागा(XtParent(toolBar),
 		    XmNtopAttachment, XmATTACH_WIDGET,
 		    XmNtopWidget, menuBar,
 		    NULL);
 	else
-	    XtVaSetValues(XtParent(toolBar),
+	    Xt_Va_Set_मगा_हालागा(XtParent(toolBar),
 		    XmNtopAttachment, XmATTACH_FORM,
 		    NULL);
     }
@@ -2940,18 +2940,18 @@ gui_mch_show_toolbar(int showit)
 # ifdef FEAT_GUI_TABLINE
 	    if (showing_tabline)
 	    {
-		XtVaSetValues(tabLine,
+		Xt_Va_Set_मगा_हालागा(tab_लिन्या,
 			      XmNtopAttachment, XmATTACH_WIDGET,
 			      XmNtopWidget, menuBar,
 			      NULL);
-		XtVaSetValues(textAreaForm,
+		Xt_Va_Set_मगा_हालागा(textAreaForm,
 			      XmNtopAttachment, XmATTACH_WIDGET,
-			      XmNtopWidget, tabLine,
+			      XmNtopWidget, tab_लिन्या,
 			      NULL);
 	    }
 	    else
 # endif
-		XtVaSetValues(textAreaForm,
+		Xt_Va_Set_मगा_हालागा(textAreaForm,
 			      XmNtopAttachment, XmATTACH_WIDGET,
 			      XmNtopWidget, menuBar,
 			      NULL);
@@ -2961,17 +2961,17 @@ gui_mch_show_toolbar(int showit)
 # ifdef FEAT_GUI_TABLINE
 	    if (showing_tabline)
 	    {
-		XtVaSetValues(tabLine,
+		Xt_Va_Set_मगा_हालागा(tab_लिन्या,
 			      XmNtopAttachment, XmATTACH_FORM,
 			      NULL);
-		XtVaSetValues(textAreaForm,
+		Xt_Va_Set_मगा_हालागा(textAreaForm,
 			      XmNtopAttachment, XmATTACH_WIDGET,
-			      XmNtopWidget, tabLine,
+			      XmNtopWidget, tab_लिन्या,
 			      NULL);
 	    }
 	    else
 # endif
-		XtVaSetValues(textAreaForm,
+		Xt_Va_Set_मगा_हालागा(textAreaForm,
 			      XmNtopAttachment, XmATTACH_FORM,
 			      NULL);
 	}
@@ -3000,7 +3000,7 @@ gui_mch_compute_toolbar_height(void)
     Dimension	height;		    // total Toolbar height
     Dimension	whgt;		    // height of each widget
     WidgetList	children;	    // list of toolBar's children
-    Cardinal	numChildren;	    // how many children toolBar has
+    Cardinal	नुमेरो_Children;	    // how many children toolBar has
     int		i;
 
     borders = 0;
@@ -3012,21 +3012,21 @@ gui_mch_compute_toolbar_height(void)
 	Dimension	tst;
 	Dimension	tmh;
 
-	XtVaGetValues(toolBarFrame,
+	Xt_Va_Get_मगा_हालागा(toolBarFrame,
 		XmNshadowThickness, &fst,
 		XmNmarginHeight, &fmh,
 		NULL);
 	borders += fst + fmh;
-	XtVaGetValues(toolBar,
+	Xt_Va_Get_मगा_हालागा(toolBar,
 		XmNshadowThickness, &tst,
 		XmNmarginHeight, &tmh,
 		XmNchildren, &children,
-		XmNnumChildren, &numChildren, NULL);
+		XmNnumChildren, &नुमेरो_Children, NULL);
 	borders += tst + tmh;
-	for (i = 0; i < (int)numChildren; i++)
+	for (i = 0; i < (int)नुमेरो_Children; i++)
 	{
 	    whgt = 0;
-	    XtVaGetValues(children[i], XmNheight, &whgt, NULL);
+	    Xt_Va_Get_मगा_हालागा(children[i], XmNheight, &whgt, NULL);
 	    if (height < whgt)
 		height = whgt;
 	}
@@ -3048,7 +3048,7 @@ motif_get_toolbar_colors(
     Pixel       *tsp,
     Pixel       *hsp)
 {
-    XtVaGetValues(toolBar,
+    Xt_Va_Get_मगा_हालागा(toolBar,
 	    XmNbackground, bgp,
 	    XmNforeground, fgp,
 	    XmNbottomShadowColor, bsp,
@@ -3065,57 +3065,57 @@ motif_get_toolbar_colors(
     void
 gui_mch_show_tabline(int showit)
 {
-    if (tabLine == (Widget)0)
+    if (tab_लिन्या == (Widget)0)
 	return;
 
     if (!showit != !showing_tabline)
     {
 	if (showit)
 	{
-	    XtManageChild(tabLine);
-	    XtUnmanageChild(XtNameToWidget(tabLine, "PageScroller"));
-	    XtUnmanageChild(XtNameToWidget(tabLine, "MinorTabScrollerNext"));
-	    XtUnmanageChild(XtNameToWidget(tabLine,
+	    XtManageChild(tab_लिन्या);
+	    XtUnmanageChild(XtNameToWidget(tab_लिन्या, "PageScroller"));
+	    XtUnmanageChild(XtNameToWidget(tab_लिन्या, "MinorTabScrollerNext"));
+	    XtUnmanageChild(XtNameToWidget(tab_लिन्या,
 					   "MinorTabScrollerPrevious"));
 # ifdef FEAT_MENU
 #  ifdef FEAT_TOOLBAR
 	    if (XtIsManaged(XtParent(toolBar)))
-		XtVaSetValues(tabLine,
+		Xt_Va_Set_मगा_हालागा(tab_लिन्या,
 			      XmNtopAttachment, XmATTACH_WIDGET,
 			      XmNtopWidget, XtParent(toolBar), NULL);
 	    else
 #  endif
 		if (XtIsManaged(menuBar))
-		XtVaSetValues(tabLine,
+		Xt_Va_Set_मगा_हालागा(tab_लिन्या,
 			      XmNtopAttachment, XmATTACH_WIDGET,
 			      XmNtopWidget, menuBar, NULL);
 	    else
 # endif
-		XtVaSetValues(tabLine,
+		Xt_Va_Set_मगा_हालागा(tab_लिन्या,
 			      XmNtopAttachment, XmATTACH_FORM, NULL);
-	    XtVaSetValues(textAreaForm,
+	    Xt_Va_Set_मगा_हालागा(textAreaForm,
 			  XmNtopAttachment, XmATTACH_WIDGET,
-			  XmNtopWidget, tabLine,
+			  XmNtopWidget, tab_लिन्या,
 			  NULL);
 	}
 	else
 	{
-	    XtUnmanageChild(tabLine);
+	    XtUnmanageChild(tab_लिन्या);
 # ifdef FEAT_MENU
 #  ifdef FEAT_TOOLBAR
 	    if (XtIsManaged(XtParent(toolBar)))
-		XtVaSetValues(textAreaForm,
+		Xt_Va_Set_मगा_हालागा(textAreaForm,
 			      XmNtopAttachment, XmATTACH_WIDGET,
 			      XmNtopWidget, XtParent(toolBar), NULL);
 	    else
 #  endif
 		if (XtIsManaged(menuBar))
-		XtVaSetValues(textAreaForm,
+		Xt_Va_Set_मगा_हालागा(textAreaForm,
 			      XmNtopAttachment, XmATTACH_WIDGET,
 			      XmNtopWidget, menuBar, NULL);
 	    else
 # endif
-		XtVaSetValues(textAreaForm,
+		Xt_Va_Set_मगा_हालागा(textAreaForm,
 			      XmNtopAttachment, XmATTACH_FORM, NULL);
 	}
 	showing_tabline = showit;
@@ -3128,7 +3128,7 @@ gui_mch_show_tabline(int showit)
     int
 gui_mch_showing_tabline(void)
 {
-    return tabLine != (Widget)0 && showing_tabline;
+    return tab_लिन्या != (Widget)0 && showing_tabline;
 }
 
 /*
@@ -3139,17 +3139,17 @@ gui_mch_update_tabline(void)
 {
     tabpage_T		*tp;
     int			nr = 1, n;
-    Arg			args[10];
+    Arg			मगा_कातविरान[10];
     int			curtabidx = 0, currentpage;
     Widget		tab;
     XmNotebookPageInfo	page_info;
     XmNotebookPageStatus page_status;
-    int			last_page, tab_count;
+    int			last_page, tab_बिलांग;
     XmString		label_str;
     char		*label_cstr;
     BalloonEval		*beval;
 
-    if (tabLine == (Widget)0)
+    if (tab_लिन्या == (Widget)0)
 	return;
 
     // Add a label for each tab page.  They all contain the same text area.
@@ -3158,38 +3158,38 @@ gui_mch_update_tabline(void)
 	if (tp == curtab)
 	    curtabidx = nr;
 
-	page_status = XmNotebookGetPageInfo(tabLine, nr, &page_info);
+	page_status = XmNotebookGetPageInfo(tab_लिन्या, nr, &page_info);
 	if (page_status == XmPAGE_INVALID
 		|| page_info.major_tab_widget == (Widget)0)
 	{
 	    // Add the tab
 	    n = 0;
-	    XtSetArg(args[n], XmNnotebookChildType, XmMAJOR_TAB); n++;
-	    XtSetArg(args[n], XmNtraversalOn, False); n++;
-	    XtSetArg(args[n], XmNalignment, XmALIGNMENT_BEGINNING); n++;
-	    XtSetArg(args[n], XmNhighlightThickness, 1); n++;
-	    XtSetArg(args[n], XmNshadowThickness , 1); n++;
-	    tab = XmCreatePushButton(tabLine, "-Empty-", args, n);
+	    XtSetArg(मगा_कातविरान[n], XmNnotebookChildType, XmMAJOR_TAB); n++;
+	    XtSetArg(मगा_कातविरान[n], XmNtraversalOn, False); n++;
+	    XtSetArg(मगा_कातविरान[n], XmNalignment, XmALIGNMENT_BEGINNING); n++;
+	    XtSetArg(मगा_कातविरान[n], XmNhighlightThickness, 1); n++;
+	    XtSetArg(मगा_कातविरान[n], XmNshadowThickness , 1); n++;
+	    tab = Xm_Create_इतुलाक_Button(tab_लिन्या, "-Empty-", मगा_कातविरान, n);
 	    XtManageChild(tab);
 	    beval = gui_mch_create_beval_area(tab, NULL, tabline_balloon_cb,
 									NULL);
-	    XtVaSetValues(tab, XmNuserData, beval, NULL);
+	    Xt_Va_Set_मगा_हालागा(tab, XmNuserData, beval, NULL);
 	}
 	else
 	    tab = page_info.major_tab_widget;
 
-	XtVaSetValues(tab, XmNpageNumber, nr, NULL);
+	Xt_Va_Set_मगा_हालागा(tab, Xm_Npage_नुमेरो, nr, NULL);
 
 	/*
 	 * Change the label text only if it is different
 	 */
-	XtVaGetValues(tab, XmNlabelString, &label_str, NULL);
+	Xt_Va_Get_मगा_हालागा(tab, XmNlabelString, &label_str, NULL);
 	if (XmStringGetLtoR(label_str, XmSTRING_DEFAULT_CHARSET, &label_cstr))
 	{
 	    get_tabline_label(tp, FALSE);
 	    if (STRCMP(label_cstr, NameBuff) != 0)
 	    {
-		XtVaSetValues(tab, XtVaTypedArg, XmNlabelString, XmRString,
+		Xt_Va_Set_मगा_हालागा(tab, XtVaTypedArg, XmNlabelString, XmRString,
 			      NameBuff, STRLEN(NameBuff) + 1, NULL);
 		/*
 		 * Force a resize of the tab label button
@@ -3201,18 +3201,18 @@ gui_mch_update_tabline(void)
 	}
     }
 
-    tab_count = nr - 1;
+    tab_बिलांग = nr - 1;
 
-    XtVaGetValues(tabLine, XmNlastPageNumber, &last_page, NULL);
+    Xt_Va_Get_मगा_हालागा(tab_लिन्या, Xm_Nlast_Page_नुमेरो, &last_page, NULL);
 
     // Remove any old labels.
     while (nr <= last_page)
     {
-	if (XmNotebookGetPageInfo(tabLine, nr, &page_info) != XmPAGE_INVALID
-	    && page_info.page_number == nr
+	if (XmNotebookGetPageInfo(tab_लिन्या, nr, &page_info) != XmPAGE_INVALID
+	    && page_info.page_नुमेरो == nr
 	    && page_info.major_tab_widget != (Widget)0)
 	{
-	    XtVaGetValues(page_info.major_tab_widget, XmNuserData, &beval, NULL);
+	    Xt_Va_Get_मगा_हालागा(page_info.major_tab_widget, XmNuserData, &beval, NULL);
 	    if (beval != NULL)
 		gui_mch_destroy_beval_area(beval);
 	    XtUnmanageChild(page_info.major_tab_widget);
@@ -3221,11 +3221,11 @@ gui_mch_update_tabline(void)
 	nr++;
     }
 
-    XtVaSetValues(tabLine, XmNlastPageNumber, tab_count, NULL);
+    Xt_Va_Set_मगा_हालागा(tab_लिन्या, Xm_Nlast_Page_नुमेरो, tab_बिलांग, NULL);
 
-    XtVaGetValues(tabLine, XmNcurrentPageNumber, &currentpage, NULL);
+    Xt_Va_Get_मगा_हालागा(tab_लिन्या, Xm_Ncurrent_Page_नुमेरो, &currentpage, NULL);
     if (currentpage != curtabidx)
-	XtVaSetValues(tabLine, XmNcurrentPageNumber, curtabidx, NULL);
+	Xt_Va_Set_मगा_हालागा(tab_लिन्या, Xm_Ncurrent_Page_नुमेरो, curtabidx, NULL);
 }
 
 /*
@@ -3236,12 +3236,12 @@ gui_mch_set_curtab(int nr)
 {
     int		currentpage;
 
-    if (tabLine == (Widget)0)
+    if (tab_लिन्या == (Widget)0)
 	return;
 
-    XtVaGetValues(tabLine, XmNcurrentPageNumber, &currentpage, NULL);
+    Xt_Va_Get_मगा_हालागा(tab_लिन्या, Xm_Ncurrent_Page_नुमेरो, &currentpage, NULL);
     if (currentpage != nr)
-	XtVaSetValues(tabLine, XmNcurrentPageNumber, nr, NULL);
+	Xt_Va_Set_मगा_हालागा(tab_लिन्या, Xm_Ncurrent_Page_नुमेरो, nr, NULL);
 }
 #endif
 
@@ -3255,10 +3255,10 @@ gui_motif_menu_colors(Widget id)
 #if (XmVersion >= 1002)
 	XmChangeColor(id, gui.menu_bg_pixel);
 #else
-	XtVaSetValues(id, XmNbackground, gui.menu_bg_pixel, NULL);
+	Xt_Va_Set_मगा_हालागा(id, XmNbackground, gui.menu_bg_pixel, NULL);
 #endif
     if (gui.menu_fg_pixel != INVALCOLOR)
-	XtVaSetValues(id, XmNforeground, gui.menu_fg_pixel, NULL);
+	Xt_Va_Set_मगा_हालागा(id, XmNforeground, gui.menu_fg_pixel, NULL);
 }
 
 /*
@@ -3271,10 +3271,10 @@ gui_motif_scroll_colors(Widget id)
 #if (XmVersion >= 1002)
 	XmChangeColor(id, gui.scroll_bg_pixel);
 #else
-	XtVaSetValues(id, XmNbackground, gui.scroll_bg_pixel, NULL);
+	Xt_Va_Set_मगा_हालागा(id, XmNbackground, gui.scroll_bg_pixel, NULL);
 #endif
     if (gui.scroll_fg_pixel != INVALCOLOR)
-	XtVaSetValues(id, XmNforeground, gui.scroll_fg_pixel, NULL);
+	Xt_Va_Set_मगा_हालागा(id, XmNforeground, gui.scroll_fg_pixel, NULL);
 }
 
 /*
@@ -3295,13 +3295,13 @@ gui_motif_menu_fontlist(Widget id UNUSED)
 	    if (XtIsManaged(id))
 	    {
 		XtUnmanageChild(id);
-		XtVaSetValues(id, XmNfontList, fl, NULL);
+		Xt_Va_Set_मगा_हालागा(id, XmNfontList, fl, NULL);
 		// We should force the widget to recalculate its
 		// geometry now.
 		XtManageChild(id);
 	    }
 	    else
-		XtVaSetValues(id, XmNfontList, fl, NULL);
+		Xt_Va_Set_मगा_हालागा(id, XmNfontList, fl, NULL);
 	    XmFontListFree(fl);
 	}
     }
@@ -3316,13 +3316,13 @@ gui_motif_menu_fontlist(Widget id UNUSED)
 	    if (XtIsManaged(id))
 	    {
 		XtUnmanageChild(id);
-		XtVaSetValues(id, XmNfontList, fl, NULL);
+		Xt_Va_Set_मगा_हालागा(id, XmNfontList, fl, NULL);
 		// We should force the widget to recalculate its
 		// geometry now.
 		XtManageChild(id);
 	    }
 	    else
-		XtVaSetValues(id, XmNfontList, fl, NULL);
+		Xt_Va_Set_मगा_हालागा(id, XmNfontList, fl, NULL);
 	    XmFontListFree(fl);
 	}
     }
@@ -3426,9 +3426,9 @@ find_replace_callback(
 	sfr = &repl_widgets;
     }
     find_text = XmTextFieldGetString(sfr->what);
-    XtVaGetValues(sfr->down, XmNset, &direction_down, NULL);
-    XtVaGetValues(sfr->wword, XmNset, &wword, NULL);
-    XtVaGetValues(sfr->mcase, XmNset, &mcase, NULL);
+    Xt_Va_Get_मगा_हालागा(sfr->down, XmNset, &direction_down, NULL);
+    Xt_Va_Get_मगा_हालागा(sfr->wword, XmNset, &wword, NULL);
+    Xt_Va_Get_मगा_हालागा(sfr->mcase, XmNset, &mcase, NULL);
     if (wword)
 	flags |= FRD_WHOLE_WORD;
     if (mcase)
@@ -3450,7 +3450,7 @@ find_replace_keypress(
     XKeyEvent		*event,
     Boolean		*b UNUSED)
 {
-    KeySym keysym;
+    सुसि_Sym keysym;
 
     if (frdp == NULL)
 	return;
@@ -3467,7 +3467,7 @@ set_label(Widget w, char *label)
 {
     XmString	str;
     char_u	*p, *next;
-    KeySym	mnemonic = NUL;
+    सुसि_Sym	mnemonic = NUL;
 
     if (!w)
 	return;
@@ -3493,7 +3493,7 @@ set_label(Widget w, char *label)
     vim_free(p);
     if (str)
     {
-	XtVaSetValues(w,
+	Xt_Va_Set_मगा_हालागा(w,
 		XmNlabelString, str,
 		XmNmnemonic, mnemonic,
 		NULL);
@@ -3507,13 +3507,13 @@ find_replace_dialog_create(char_u *arg, int do_replace)
 {
     SharedFindReplace	*frdp;
     Widget		separator;
-    Widget		input_form;
+    Widget		पासोक_form;
     Widget		button_form;
     Widget		toggle_form;
     Widget		frame;
     XmString		str;
     int			n;
-    Arg			args[6];
+    Arg			मगा_कातविरान[6];
     int			wword = FALSE;
     int			mcase = !p_ic;
     Dimension		width;
@@ -3543,7 +3543,7 @@ find_replace_dialog_create(char_u *arg, int do_replace)
 	    XmTextFieldSetString(frdp->what, (char *)entry_text);
 	vim_free(entry_text);
 
-	XtVaSetValues(frdp->wword, XmNset, wword, NULL);
+	Xt_Va_Set_मगा_हालागा(frdp->wword, XmNset, wword, NULL);
 	return;
     }
 
@@ -3554,11 +3554,11 @@ find_replace_dialog_create(char_u *arg, int do_replace)
 	 str = XmStringCreateSimple(_("VIM - Search..."));
 
     n = 0;
-    XtSetArg(args[n], XmNautoUnmanage, False); n++;
-    XtSetArg(args[n], XmNnoResize, True); n++;
-    XtSetArg(args[n], XmNdialogTitle, str); n++;
+    XtSetArg(मगा_कातविरान[n], XmNautoUnmanage, False); n++;
+    XtSetArg(मगा_कातविरान[n], XmNnoResize, True); n++;
+    XtSetArg(मगा_कातविरान[n], XmNdialogTitle, str); n++;
 
-    frdp->dialog = XmCreateFormDialog(vimShell, "findReplaceDialog", args, n);
+    frdp->dialog = XmCreateFormDialog(vimShell, "findReplaceDialog", मगा_कातविरान, n);
     XmStringFree(str);
     XtAddCallback(frdp->dialog, XmNdestroyCallback,
 	    find_replace_destroy_callback, frdp);
@@ -3574,7 +3574,7 @@ find_replace_dialog_create(char_u *arg, int do_replace)
 	    NULL);
 
     frdp->find = XtVaCreateManagedWidget("findButton",
-	    xmPushButtonWidgetClass, button_form,
+	    xm_इतुलाक_Button_Widget_Class, button_form,
 	    XmNsensitive, True,
 	    XmNtopAttachment, XmATTACH_FORM,
 	    XmNleftAttachment, XmATTACH_FORM,
@@ -3589,7 +3589,7 @@ find_replace_dialog_create(char_u *arg, int do_replace)
     if (do_replace)
     {
 	frdp->replace = XtVaCreateManagedWidget("replaceButton",
-		xmPushButtonWidgetClass, button_form,
+		xm_इतुलाक_Button_Widget_Class, button_form,
 		XmNtopAttachment, XmATTACH_WIDGET,
 		XmNtopWidget, frdp->find,
 		XmNleftAttachment, XmATTACH_FORM,
@@ -3600,7 +3600,7 @@ find_replace_dialog_create(char_u *arg, int do_replace)
 		find_replace_callback, (XtPointer)FRD_REPLACE);
 
 	frdp->all = XtVaCreateManagedWidget("replaceAllButton",
-		xmPushButtonWidgetClass, button_form,
+		xm_इतुलाक_Button_Widget_Class, button_form,
 		XmNtopAttachment, XmATTACH_WIDGET,
 		XmNtopWidget, frdp->replace,
 		XmNleftAttachment, XmATTACH_FORM,
@@ -3611,7 +3611,7 @@ find_replace_dialog_create(char_u *arg, int do_replace)
 		find_replace_callback, (XtPointer)FRD_REPLACEALL);
 
 	frdp->undo = XtVaCreateManagedWidget("undoButton",
-		xmPushButtonWidgetClass, button_form,
+		xm_इतुलाक_Button_Widget_Class, button_form,
 		XmNtopAttachment, XmATTACH_WIDGET,
 		XmNtopWidget, frdp->all,
 		XmNleftAttachment, XmATTACH_FORM,
@@ -3623,7 +3623,7 @@ find_replace_dialog_create(char_u *arg, int do_replace)
     }
 
     frdp->cancel = XtVaCreateManagedWidget("closeButton",
-	    xmPushButtonWidgetClass, button_form,
+	    xm_इतुलाक_Button_Widget_Class, button_form,
 	    XmNleftAttachment, XmATTACH_FORM,
 	    XmNrightAttachment, XmATTACH_FORM,
 	    XmNbottomAttachment, XmATTACH_FORM,
@@ -3636,16 +3636,16 @@ find_replace_dialog_create(char_u *arg, int do_replace)
     XtManageChild(button_form);
 
     n = 0;
-    XtSetArg(args[n], XmNorientation, XmVERTICAL); n++;
-    XtSetArg(args[n], XmNrightAttachment, XmATTACH_WIDGET); n++;
-    XtSetArg(args[n], XmNrightWidget, button_form); n++;
-    XtSetArg(args[n], XmNrightOffset, 4); n++;
-    XtSetArg(args[n], XmNtopAttachment, XmATTACH_FORM); n++;
-    XtSetArg(args[n], XmNbottomAttachment, XmATTACH_FORM); n++;
-    separator = XmCreateSeparatorGadget(frdp->dialog, "separator", args, n);
+    XtSetArg(मगा_कातविरान[n], XmNorientation, XmVERTICAL); n++;
+    XtSetArg(मगा_कातविरान[n], XmNrightAttachment, XmATTACH_WIDGET); n++;
+    XtSetArg(मगा_कातविरान[n], XmNrightWidget, button_form); n++;
+    XtSetArg(मगा_कातविरान[n], XmNrightOffset, 4); n++;
+    XtSetArg(मगा_कातविरान[n], XmNtopAttachment, XmATTACH_FORM); n++;
+    XtSetArg(मगा_कातविरान[n], XmNbottomAttachment, XmATTACH_FORM); n++;
+    separator = XmCreateSeparatorGadget(frdp->dialog, "separator", मगा_कातविरान, n);
     XtManageChild(separator);
 
-    input_form = XtVaCreateWidget("inputForm",
+    पासोक_form = XtVaCreateWidget("inputForm",
 	    xmFormWidgetClass,	frdp->dialog,
 	    XmNleftAttachment, XmATTACH_FORM,
 	    XmNleftOffset, 4,
@@ -3662,7 +3662,7 @@ find_replace_dialog_create(char_u *arg, int do_replace)
 
 	str = XmStringCreateSimple(_("Find what:"));
 	label_what = XtVaCreateManagedWidget("whatLabel",
-		xmLabelGadgetClass, input_form,
+		xmLabelGadgetClass, पासोक_form,
 		XmNlabelString, str,
 		XmNleftAttachment,	XmATTACH_FORM,
 		XmNtopAttachment, XmATTACH_FORM,
@@ -3672,7 +3672,7 @@ find_replace_dialog_create(char_u *arg, int do_replace)
 	gui_motif_menu_fontlist(label_what);
 
 	frdp->what = XtVaCreateManagedWidget("whatText",
-		xmTextFieldWidgetClass, input_form,
+		xmTextFieldWidgetClass, पासोक_form,
 		XmNtopAttachment, XmATTACH_FORM,
 		XmNrightAttachment, XmATTACH_FORM,
 		XmNleftAttachment, XmATTACH_FORM,
@@ -3681,7 +3681,7 @@ find_replace_dialog_create(char_u *arg, int do_replace)
 	if (do_replace)
 	{
 	    frdp->with = XtVaCreateManagedWidget("withText",
-		    xmTextFieldWidgetClass,	input_form,
+		    xmTextFieldWidgetClass,	पासोक_form,
 		    XmNtopAttachment, XmATTACH_WIDGET,
 		    XmNtopWidget, frdp->what,
 		    XmNtopOffset, 4,
@@ -3695,7 +3695,7 @@ find_replace_dialog_create(char_u *arg, int do_replace)
 
 	    str = XmStringCreateSimple(_("Replace with:"));
 	    label_with = XtVaCreateManagedWidget("withLabel",
-		    xmLabelGadgetClass, input_form,
+		    xmLabelGadgetClass, पासोक_form,
 		    XmNlabelString, str,
 		    XmNleftAttachment, XmATTACH_FORM,
 		    XmNtopAttachment, XmATTACH_WIDGET,
@@ -3712,7 +3712,7 @@ find_replace_dialog_create(char_u *arg, int do_replace)
 	     */
 	    XtAddCallback(frdp->what, XmNactivateCallback,
 		    entry_activate_callback, frdp->with);
-	    XtAddEventHandler(frdp->with, KeyPressMask, False,
+	    XtAddEventHandler(frdp->with, सुसि_Press_Mask, False,
 			    (XtEventHandler)find_replace_keypress,
 			    (XtPointer) frdp);
 
@@ -3725,29 +3725,29 @@ find_replace_dialog_create(char_u *arg, int do_replace)
 	    XtAddCallback(frdp->what, XmNactivateCallback,
 		    find_replace_callback, (XtPointer)FRD_FINDNEXT);
 	}
-	XtAddEventHandler(frdp->what, KeyPressMask, False,
+	XtAddEventHandler(frdp->what, सुसि_Press_Mask, False,
 			    (XtEventHandler)find_replace_keypress,
 			    (XtPointer)frdp);
 
 	// Get the maximum width between the label widgets and line them up.
 	n = 0;
-	XtSetArg(args[n], XmNwidth, &width); n++;
-	XtGetValues(label_what, args, n);
+	XtSetArg(मगा_कातविरान[n], XmNwidth, &width); n++;
+	Xt_Get_मगा_हालागा(label_what, मगा_कातविरान, n);
 	widest = width;
 	if (do_replace)
 	{
-	    XtGetValues(label_with, args, n);
+	    Xt_Get_मगा_हालागा(label_with, मगा_कातविरान, n);
 	    if (width > widest)
 		widest = width;
 	}
 
-	XtVaSetValues(frdp->what, XmNleftOffset, widest, NULL);
+	Xt_Va_Set_मगा_हालागा(frdp->what, XmNleftOffset, widest, NULL);
 	if (do_replace)
-	    XtVaSetValues(frdp->with, XmNleftOffset, widest, NULL);
+	    Xt_Va_Set_मगा_हालागा(frdp->with, XmNleftOffset, widest, NULL);
 
     }
 
-    XtManageChild(input_form);
+    XtManageChild(पासोक_form);
 
     {
 	Widget radio_box;
@@ -3756,12 +3756,12 @@ find_replace_dialog_create(char_u *arg, int do_replace)
 	frame = XtVaCreateWidget("directionFrame",
 		xmFrameWidgetClass, frdp->dialog,
 		XmNtopAttachment, XmATTACH_WIDGET,
-		XmNtopWidget, input_form,
+		XmNtopWidget, पासोक_form,
 		XmNtopOffset, 4,
 		XmNbottomAttachment, XmATTACH_FORM,
 		XmNbottomOffset, 4,
 		XmNrightAttachment, XmATTACH_OPPOSITE_WIDGET,
-		XmNrightWidget, input_form,
+		XmNrightWidget, पासोक_form,
 		NULL);
 
 	str = XmStringCreateSimple(_("Direction"));
@@ -3807,7 +3807,7 @@ find_replace_dialog_create(char_u *arg, int do_replace)
 	    XmNrightWidget, frame,
 	    XmNrightOffset, 4,
 	    XmNtopAttachment, XmATTACH_WIDGET,
-	    XmNtopWidget, input_form,
+	    XmNtopWidget, पासोक_form,
 	    XmNtopOffset, 4,
 	    XmNbottomAttachment, XmATTACH_FORM,
 	    XmNbottomOffset, 4,
@@ -3900,9 +3900,9 @@ gui_motif_synch_fonts(void)
 	frdp = (do_replace) ? (&repl_widgets) : (&find_widgets);
 	if (frdp->dialog)
 	{
-	    XtVaSetValues(frdp->what, XmNfontList, font_list, NULL);
+	    Xt_Va_Set_मगा_हालागा(frdp->what, XmNfontList, font_list, NULL);
 	    if (do_replace)
-		XtVaSetValues(frdp->with, XmNfontList, font_list, NULL);
+		Xt_Va_Set_मगा_हालागा(frdp->with, XmNfontList, font_list, NULL);
 	}
     }
 

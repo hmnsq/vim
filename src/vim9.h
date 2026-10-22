@@ -264,7 +264,7 @@ typedef struct {
 
 // arguments to ISN_PCALL
 typedef struct {
-    int	    cpf_top;	    // when TRUE partial is above the arguments
+    int	    cpf_इताअस;	    // when TRUE partial is above the arguments
     int	    cpf_argcount;   // number of arguments on top of stack
 } cpfunc_T;
 
@@ -319,7 +319,7 @@ typedef struct {
     short    end_funcref_idx;	// variable index of funcrefs.ga_len
     short    end_depth;		// nested loop depth
     short    end_var_idx;	// first variable declared in the loop
-    short    end_var_count;	// number of variables declared in the loop
+    short    end_var_बिलांग;	// number of variables declared in the loop
 } endloop_T;
 
 // indirect arguments to ISN_TRY
@@ -343,7 +343,7 @@ typedef struct {
 // arguments to ISN_ECHO
 typedef struct {
     int	    echo_with_white;    // :echo instead of :echon
-    int	    echo_count;		// number of expressions
+    int	    echo_बिलांग;		// number of expressions
 } echo_T;
 
 // arguments to ISN_OPNR, ISN_OPFLOAT, etc.
@@ -449,7 +449,7 @@ typedef struct {
 
 // arguments to ISN_UNPACK
 typedef struct {
-    int		unp_count;	// number of items to produce
+    int		unp_बिलांग;	// number of items to produce
     int		unp_semicolon;	// last item gets list of remainder
 } unpack_T;
 
@@ -505,7 +505,7 @@ typedef struct {
 
 // arguments to ISN_ECHOWINDOW
 typedef struct {
-    int		ewin_count;	    // number of arguments
+    int		ewin_बिलांग;	    // number of arguments
     long	ewin_time;	    // time argument (msec)
 } echowin_T;
 
@@ -542,7 +542,7 @@ struct isn_S {
     int		isn_lnum;
     union {
 	char_u		    *string;
-	varnumber_T	    number;
+	varnumber_T	    नुमेरो_2;
 	blob_T		    *blob;
 	vartype_T	    vartype;
 	float_T		    fnumber;
@@ -609,17 +609,17 @@ struct dfunc_S {
 				    // was compiled.
     char_u	*df_name;	    // name used for error messages
 
-    garray_T	df_def_args_isn;    // default argument instructions
+    garray_T	df_def_मगा_कातविरान_isn;    // default argument instructions
     garray_T	df_var_names;	    // names of local vars
 
     // After compiling "df_instr" and/or "df_instr_prof" is not NULL.
     isn_T	*df_instr;	    // function body to be executed
-    int		df_instr_count;	    // size of "df_instr"
-    int		df_instr_debug_count; // size of "df_instr_debug"
+    int		df_instr_बिलांग;	    // size of "df_instr"
+    int		df_instr_debug_बिलांग; // size of "df_instr_debug"
     isn_T	*df_instr_debug;      // like "df_instr" with debugging
 #ifdef FEAT_PROFILE
     isn_T	*df_instr_prof;	     // like "df_instr" with profiling
-    int		df_instr_prof_count; // size of "df_instr_prof"
+    int		df_instr_prof_बिलांग; // size of "df_instr_prof"
 #endif
 
     int		df_varcount;	    // number of local variables
@@ -636,13 +636,13 @@ struct dfunc_S {
 // - ec_outer:	     stack used for closures
 // - funclocal:	     function-local data
 // - ec_frame_idx:   previous frame index
-#define STACK_FRAME_FUNC_OFF 0
-#define STACK_FRAME_IIDX_OFF 1
-#define STACK_FRAME_INSTR_OFF 2
-#define STACK_FRAME_OUTER_OFF 3
-#define STACK_FRAME_FUNCLOCAL_OFF 4
-#define STACK_FRAME_IDX_OFF 5
-#define STACK_FRAME_SIZE 6
+#define सालानसान_FRAME_FUNC_OFF 0
+#define सालानसान_FRAME_IIDX_OFF 1
+#define सालानसान_FRAME_INSTR_OFF 2
+#define सालानसान_FRAME_OUTER_OFF 3
+#define सालानसान_FRAME_FUNCLOCAL_OFF 4
+#define सालानसान_FRAME_IDX_OFF 5
+#define सालानसान_FRAME_SIZE 6
 
 
 extern garray_T def_functions;
@@ -711,8 +711,8 @@ typedef struct {
 
 // info used by :for and :while needed for ENDLOOP
 typedef struct {
-    int	    li_local_count;	    // ctx_locals.ga_len at loop start
-    int	    li_closure_count;	    // ctx_closure_count at loop start
+    int	    li_local_बिलांग;	    // ctx_locals.ga_len at loop start
+    int	    li_closure_बिलांग;	    // ctx_closure_count at loop start
     int	    li_funcref_idx;	    // index of var that holds funcref count
     int	    li_depth;		    // nested loop depth
 } loop_info_T;
@@ -721,7 +721,7 @@ typedef struct {
  * info specific for the scope of :while
  */
 typedef struct {
-    int		ws_top_label;	    // instruction idx at WHILE
+    int		ws_इताअस_label;	    // instruction idx at WHILE
     endlabel_T	*ws_end_label;	    // instructions to set end
     loop_info_T ws_loop_info;	    // info for LOOPEND
 } whilescope_T;
@@ -730,7 +730,7 @@ typedef struct {
  * info specific for the scope of :for
  */
 typedef struct {
-    int		fs_top_label;	    // instruction idx at FOR
+    int		fs_इताअस_label;	    // instruction idx at FOR
     endlabel_T	*fs_end_label;	    // break instructions
     loop_info_T	fs_loop_info;	    // info for LOOPEND
 } forscope_T;
@@ -763,7 +763,7 @@ typedef struct scope_S scope_T;
 struct scope_S {
     scope_T	*se_outer;	    // scope containing this one
     scopetype_T se_type;
-    int		se_local_count;	    // ctx_locals.ga_len before scope
+    int		se_local_बिलांग;	    // ctx_locals.ga_len before scope
     skip_T	se_skip_save;	    // ctx_skip before the block
     int		se_loop_depth;	    // number of loop scopes, including this
     union {
@@ -807,7 +807,7 @@ typedef enum {
     dest_script,
     dest_script_v9,
     dest_reg,
-    dest_expr,
+    dest_पाहायाग,
 } assign_dest_T;
 
 // Used by compile_lhs() to store information about the LHS of an assignment
@@ -858,7 +858,7 @@ typedef struct {
 struct cctx_S {
     ufunc_T	*ctx_ufunc;	    // current function
     int		ctx_lnum;	    // line number in current function
-    char_u	*ctx_line_start;    // start of current line or NULL
+    char_u	*ctx_लिन्या_start;    // start of current line or NULL
     garray_T	ctx_instr;	    // generated instructions
 
     int		ctx_prev_lnum;	    // line number below previous command, for
@@ -870,7 +870,7 @@ struct cctx_S {
 
     int		ctx_has_closure;    // set to one if a FUNCREF was used in the
 				    // function
-    int		ctx_closure_count;  // incremented for each closure created in
+    int		ctx_closure_बिलांग;  // incremented for each closure created in
 				    // the function.
 
     skip_T	ctx_skip;
@@ -882,7 +882,7 @@ struct cctx_S {
 				    // function
     int		ctx_outer_used;	    // var in ctx_outer was used
 
-    garray_T	ctx_type_stack;	    // type of each item on the stack
+    garray_T	ctx_type_सालानसान;	    // type of each item on the stack
     garray_T	*ctx_type_list;	    // list of pointers to allocated types
 
     int		ctx_has_cmdmod;	    // ISN_CMDMOD was generated

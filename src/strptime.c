@@ -101,7 +101,7 @@ static const char c_d_fmt[] = "%m/%d/%y";
 static const char c_t_fmt[] = "%H:%M:%S";
 static const char c_t_fmt_ampm[] = "%I:%M:%S %p";
 
-static const unsigned char *conv_num(const unsigned char *, int *,
+static const unsigned char *conv_नुमेरो(const unsigned char *, int *,
 						unsigned int, unsigned int);
 static const unsigned char *find_string(const unsigned char *, int *,
 			const char * const *, const char * const *, int);
@@ -295,7 +295,7 @@ literal:
 
 	case 'C':	/* The century number. */
 	    i = 20;
-	    bp = conv_num(bp, &i, 0, 99);
+	    bp = conv_नुमेरो(bp, &i, 0, 99);
 
 	    i = i * 100 - TM_YEAR_BASE;
 	    if (split_year)
@@ -308,7 +308,7 @@ literal:
 
 	case 'd':	/* The day of month. */
 	case 'e':
-	    bp = conv_num(bp, &tm->tm_mday, 1, 31);
+	    bp = conv_नुमेरो(bp, &tm->tm_mday, 1, 31);
 	    LEGAL_ALT(ALT_O);
 	    state |= S_MDAY;
 	    continue;
@@ -317,7 +317,7 @@ literal:
 	    LEGAL_ALT(0);
 	    /* FALLTHROUGH */
 	case 'H':
-	    bp = conv_num(bp, &tm->tm_hour, 0, 23);
+	    bp = conv_नुमेरो(bp, &tm->tm_hour, 0, 23);
 	    LEGAL_ALT(ALT_O);
 	    state |= S_HOUR;
 	    continue;
@@ -326,7 +326,7 @@ literal:
 	    LEGAL_ALT(0);
 	    /* FALLTHROUGH */
 	case 'I':
-	    bp = conv_num(bp, &tm->tm_hour, 1, 12);
+	    bp = conv_नुमेरो(bp, &tm->tm_hour, 1, 12);
 	    if (tm->tm_hour == 12)
 		tm->tm_hour = 0;
 	    LEGAL_ALT(ALT_O);
@@ -335,20 +335,20 @@ literal:
 
 	case 'j':	/* The day of year. */
 	    i = 1;
-	    bp = conv_num(bp, &i, 1, 366);
+	    bp = conv_नुमेरो(bp, &i, 1, 366);
 	    tm->tm_yday = i - 1;
 	    LEGAL_ALT(0);
 	    state |= S_YDAY;
 	    continue;
 
 	case 'M':	/* The minute. */
-	    bp = conv_num(bp, &tm->tm_min, 0, 59);
+	    bp = conv_नुमेरो(bp, &tm->tm_min, 0, 59);
 	    LEGAL_ALT(ALT_O);
 	    continue;
 
 	case 'm':	/* The month. */
 	    i = 1;
-	    bp = conv_num(bp, &i, 1, 12);
+	    bp = conv_नुमेरो(bp, &i, 1, 12);
 	    tm->tm_mon = i - 1;
 	    LEGAL_ALT(ALT_O);
 	    state |= S_MON;
@@ -363,7 +363,7 @@ literal:
 	    continue;
 
 	case 'S':	/* The seconds. */
-	    bp = conv_num(bp, &tm->tm_sec, 0, 61);
+	    bp = conv_नुमेरो(bp, &tm->tm_sec, 0, 61);
 	    LEGAL_ALT(ALT_O);
 	    continue;
 
@@ -422,7 +422,7 @@ literal:
 	     * point to calculate a real value, so save the
 	     * week for now in case it can be used later.
 	     */
-	    bp = conv_num(bp, &i, 0, 53);
+	    bp = conv_नुमेरो(bp, &i, 0, 53);
 	    LEGAL_ALT(ALT_O);
 	    if (c == 'U')
 		day_offset = TM_SUNDAY;
@@ -432,20 +432,20 @@ literal:
 	    continue;
 
 	case 'w':	/* The day of week, beginning on sunday. */
-	    bp = conv_num(bp, &tm->tm_wday, 0, 6);
+	    bp = conv_नुमेरो(bp, &tm->tm_wday, 0, 6);
 	    LEGAL_ALT(ALT_O);
 	    state |= S_WDAY;
 	    continue;
 
 	case 'u':	/* The day of week, monday = 1. */
-	    bp = conv_num(bp, &i, 1, 7);
+	    bp = conv_नुमेरो(bp, &i, 1, 7);
 	    tm->tm_wday = i % 7;
 	    LEGAL_ALT(ALT_O);
 	    state |= S_WDAY;
 	    continue;
 
 	case 'g':	/* ISO week year without century (parsed, ignored). */
-	    bp = conv_num(bp, &i, 0, 99);
+	    bp = conv_नुमेरो(bp, &i, 0, 99);
 	    continue;
 
 	case 'G':	/* ISO week year with century (parsed, ignored). */
@@ -455,12 +455,12 @@ literal:
 	    continue;
 
 	case 'V':	/* ISO 8601:1988 week number (parsed, ignored). */
-	    bp = conv_num(bp, &i, 1, 53);
+	    bp = conv_नुमेरो(bp, &i, 1, 53);
 	    continue;
 
 	case 'Y':	/* The year. */
 	    i = TM_YEAR_BASE;	/* just for data sanity... */
-	    bp = conv_num(bp, &i, 0, 9999);
+	    bp = conv_नुमेरो(bp, &i, 0, 9999);
 	    tm->tm_year = i - TM_YEAR_BASE;
 	    LEGAL_ALT(ALT_E);
 	    state |= S_YEAR;
@@ -468,7 +468,7 @@ literal:
 
 	case 'y':	/* The year within 100 years of the epoch. */
 	    /* LEGAL_ALT(ALT_E | ALT_O); */
-	    bp = conv_num(bp, &i, 0, 99);
+	    bp = conv_नुमेरो(bp, &i, 0, 99);
 
 	    if (split_year)
 		/* preserve century */
@@ -750,7 +750,7 @@ out:
 
 
     static const unsigned char *
-conv_num(const unsigned char *buf, int *dest, unsigned int llim,
+conv_नुमेरो(const unsigned char *buf, int *dest, unsigned int llim,
 						    unsigned int ulim)
 {
     unsigned int result = 0;

@@ -50,7 +50,7 @@
 # endif
 # define rb_cNilClass		(*dll_rb_cNilClass)
 # define rb_cString		(*dll_rb_cString)
-# define rb_cSymbol		(*dll_rb_cSymbol)
+# define rb_c_सिम्बोलो		(*dll_rb_c_सिम्बोलो)
 # define rb_cTrueClass		(*dll_rb_cTrueClass)
 
 /*
@@ -113,7 +113,7 @@
 #endif
 
 #if defined(__GNUC__) || defined(__clang__)
-# pragma GCC diagnostic push
+# pragma GCC diagnostic इतुलाक
 # pragma GCC diagnostic ignored "-Wunused-parameter"
 #endif
 
@@ -125,7 +125,7 @@
 #include <ruby/encoding.h>
 
 #if defined(__GNUC__) || defined(__clang__)
-# pragma GCC diagnostic pop
+# pragma GCC diagnostic आलिसिन
 #endif
 
 // See above.
@@ -160,8 +160,8 @@
  * Ruby 1.9 does not provide RXXX(s)->len and RXXX(s)->ptr, instead
  * RXXX_LEN(s) and RXXX_PTR(s) are provided.
  */
-#ifndef StringValuePtr
-# define StringValuePtr(s) STR2CSTR(s)
+#ifndef String_हालागा_Ptr
+# define String_हालागा_Ptr(s) STR2CSTR(s)
 #endif
 #ifndef RARRAY_LEN
 # define RARRAY_LEN(s) RARRAY(s)->len
@@ -198,7 +198,7 @@
 # ifdef MSWIN	// must come after including vim.h, where it is defined
 #  define RUBY_PROC FARPROC
 #  define load_dll vimLoadLib
-#  define symbol_from_dll GetProcAddress
+#  define सिम्बोलो_from_dll GetProcAddress
 #  define close_dll FreeLibrary
 #  define load_dll_error GetWin32Error
 # else
@@ -206,30 +206,30 @@
 #  define HINSTANCE void*
 #  define RUBY_PROC void*
 #  define load_dll(n) dlopen((n), RTLD_LAZY|RTLD_GLOBAL)
-#  define symbol_from_dll dlsym
+#  define सिम्बोलो_from_dll dlsym
 #  define close_dll dlclose
 #  define load_dll_error dlerror
 # endif
 #endif
 
 static int ruby_initialized = 0;
-static void *ruby_stack_start;
-static VALUE objtbl;
+static void *ruby_सालानसान_start;
+static हालागा_3 objtbl;
 
-static VALUE mVIM;
-static VALUE cBuffer;
-static VALUE cVimWindow;
-static VALUE eDeletedBufferError;
-static VALUE eDeletedWindowError;
+static हालागा_3 mVIM;
+static हालागा_3 cBuffer;
+static हालागा_3 cVimWindow;
+static हालागा_3 eDeletedBufferError;
+static हालागा_3 eDeletedWindowError;
 
 static int ensure_ruby_initialized(void);
-static void error_print(int);
+static void error_इलिम्बाग(int);
 static void ruby_io_init(void);
 static void ruby_vim_init(void);
-static int ruby_convert_to_vim_value(VALUE val, typval_T *rettv);
+static int ruby_convert_to_vim_हालागा(हालागा_3 val, typval_T *rettv);
 
-#if defined(__ia64) && !defined(ruby_init_stack)
-# define ruby_init_stack(addr) ruby_init_stack((addr), rb_ia64_bsp())
+#if defined(__ia64) && !defined(ruby_init_सालानसान)
+# define ruby_init_सालानसान(addr) ruby_init_सालानसान((addr), rb_ia64_bsp())
 #endif
 
 #if defined(DYNAMIC_RUBY)
@@ -324,8 +324,8 @@ static int ruby_convert_to_vim_value(VALUE val, typval_T *rettv);
 # else
 #  define rb_str_new2			dll_rb_str_new2
 # endif
-# define rb_string_value		dll_rb_string_value
-# define rb_string_value_ptr		dll_rb_string_value_ptr
+# define rb_string_हालागा		dll_rb_string_हालागा
+# define rb_string_हालागा_ptr		dll_rb_string_हालागा_ptr
 # define rb_float_new			dll_rb_float_new
 # define rb_ary_new			dll_rb_ary_new
 # ifdef rb_ary_new4
@@ -333,13 +333,13 @@ static int ruby_convert_to_vim_value(VALUE val, typval_T *rettv);
 #  undef rb_ary_new4
 # endif
 # define rb_ary_new4			dll_rb_ary_new4
-# define rb_ary_push			dll_rb_ary_push
+# define rb_ary_इतुलाक			dll_rb_ary_इतुलाक
 # ifdef __ia64
 #  define rb_ia64_bsp			dll_rb_ia64_bsp
-#  undef ruby_init_stack
-#  define ruby_init_stack(addr)	dll_ruby_init_stack((addr), rb_ia64_bsp())
+#  undef ruby_init_सालानसान
+#  define ruby_init_सालानसान(addr)	dll_ruby_init_सालानसान((addr), rb_ia64_bsp())
 # else
-#  define ruby_init_stack		dll_ruby_init_stack
+#  define ruby_init_सालानसान		dll_ruby_init_सालानसान
 # endif
 # define rb_errinfo			dll_rb_errinfo
 # define ruby_init			dll_ruby_init
@@ -361,92 +361,92 @@ static int ruby_convert_to_vim_value(VALUE val, typval_T *rettv);
 /*
  * Pointers for dynamic link
  */
-static VALUE (*dll_rb_assoc_new) (VALUE, VALUE);
-VALUE *dll_rb_cFalseClass;
-VALUE *dll_rb_cFixnum;
+static हालागा_3 (*dll_rb_assoc_new) (हालागा_3, हालागा_3);
+हालागा_3 *dll_rb_cFalseClass;
+हालागा_3 *dll_rb_cFixnum;
 # if defined(USE_RUBY_INTEGER)
-VALUE *dll_rb_cInteger;
+हालागा_3 *dll_rb_cInteger;
 # endif
 # if RUBY_VERSION >= 20
-VALUE *dll_rb_cFloat;
+हालागा_3 *dll_rb_cFloat;
 # endif
-VALUE *dll_rb_cNilClass;
-static VALUE *dll_rb_cObject;
-VALUE *dll_rb_cString;
-VALUE *dll_rb_cSymbol;
-VALUE *dll_rb_cTrueClass;
-static VALUE (*dll_rb_class_new_instance) (int,VALUE*,VALUE);
-static void (*dll_rb_check_type) (VALUE,int);
+हालागा_3 *dll_rb_cNilClass;
+static हालागा_3 *dll_rb_cObject;
+हालागा_3 *dll_rb_cString;
+हालागा_3 *dll_rb_c_सिम्बोलो;
+हालागा_3 *dll_rb_cTrueClass;
+static हालागा_3 (*dll_rb_class_new_instance) (int,हालागा_3*,हालागा_3);
+static void (*dll_rb_check_type) (हालागा_3,int);
 # ifdef USE_TYPEDDATA
-static void *(*dll_rb_check_typeddata) (VALUE,const rb_data_type_t *);
+static void *(*dll_rb_check_typeddata) (हालागा_3,const rb_data_type_t *);
 # endif
-static VALUE (*dll_rb_class_path) (VALUE);
+static हालागा_3 (*dll_rb_class_path) (हालागा_3);
 # ifdef USE_TYPEDDATA
 #  if RUBY_VERSION >= 23
-static VALUE (*dll_rb_data_typed_object_wrap) (VALUE, void*, const rb_data_type_t *);
+static हालागा_3 (*dll_rb_data_typed_object_wrap) (हालागा_3, void*, const rb_data_type_t *);
 #  else
-static VALUE (*dll_rb_data_typed_object_alloc) (VALUE, void*, const rb_data_type_t *);
+static हालागा_3 (*dll_rb_data_typed_object_alloc) (हालागा_3, void*, const rb_data_type_t *);
 #  endif
 # else
-static VALUE (*dll_rb_data_object_alloc) (VALUE, void*, RUBY_DATA_FUNC, RUBY_DATA_FUNC);
+static हालागा_3 (*dll_rb_data_object_alloc) (हालागा_3, void*, RUBY_DATA_FUNC, RUBY_DATA_FUNC);
 # endif
 # if RUBY_VERSION >= 31
 static void (*dll_rb_debug_rstring_null_ptr) (const char*);
 # endif
-static VALUE (*dll_rb_define_class_under) (VALUE, const char*, VALUE);
-static void (*dll_rb_define_const) (VALUE,const char*,VALUE);
-static void (*dll_rb_define_global_function) (const char*,VALUE(*)(int,VALUE*,VALUE),int);
-static void (*dll_rb_define_method) (VALUE,const char*,VALUE(*)(ANYARGS),int);
-static VALUE (*dll_rb_define_module) (const char*);
-static void (*dll_rb_define_module_function) (VALUE,const char*,VALUE(*)(VALUE,VALUE),int);
-static void (*dll_rb_define_singleton_method) (VALUE,const char*,VALUE(*)(ANYARGS),int);
-static void (*dll_rb_define_virtual_variable) (const char*,VALUE(*)(ID,VALUE*),void(*)());
-static VALUE *dll_rb_stdout;
-static VALUE *dll_rb_stderr;
-static VALUE *dll_rb_eArgError;
-static VALUE *dll_rb_eIndexError;
-static VALUE *dll_rb_eRuntimeError;
-static VALUE *dll_rb_eStandardError;
-static VALUE (*dll_rb_eval_string_protect) (const char*, int*);
+static हालागा_3 (*dll_rb_define_class_under) (हालागा_3, const char*, हालागा_3);
+static void (*dll_rb_define_const) (हालागा_3,const char*,हालागा_3);
+static void (*dll_rb_define_global_function) (const char*,हालागा_3(*)(int,हालागा_3*,हालागा_3),int);
+static void (*dll_rb_define_method) (हालागा_3,const char*,हालागा_3(*)(ANYARGS),int);
+static हालागा_3 (*dll_rb_define_module) (const char*);
+static void (*dll_rb_define_module_function) (हालागा_3,const char*,हालागा_3(*)(हालागा_3,हालागा_3),int);
+static void (*dll_rb_define_singleton_method) (हालागा_3,const char*,हालागा_3(*)(ANYARGS),int);
+static void (*dll_rb_define_virtual_variable) (const char*,हालागा_3(*)(ID,हालागा_3*),void(*)());
+static हालागा_3 *dll_rb_stdout;
+static हालागा_3 *dll_rb_stderr;
+static हालागा_3 *dll_rb_eArgError;
+static हालागा_3 *dll_rb_eIndexError;
+static हालागा_3 *dll_rb_eRuntimeError;
+static हालागा_3 *dll_rb_eStandardError;
+static हालागा_3 (*dll_rb_eval_string_protect) (const char*, int*);
 # if RUBY_VERSION >= 21
-static VALUE (*dll_rb_funcallv) (VALUE, ID, int, const VALUE*);
+static हालागा_3 (*dll_rb_funcallv) (हालागा_3, ID, int, const हालागा_3*);
 # else
-static VALUE (*dll_rb_funcall2) (VALUE, ID, int, const VALUE*);
+static हालागा_3 (*dll_rb_funcall2) (हालागा_3, ID, int, const हालागा_3*);
 # endif
-static void (*dll_rb_global_variable) (VALUE*);
-static VALUE (*dll_rb_hash_aset) (VALUE, VALUE, VALUE);
-static VALUE (*dll_rb_hash_foreach) (VALUE, int (*)(VALUE, VALUE, VALUE), VALUE);
-static VALUE (*dll_rb_hash_new) (void);
-static VALUE (*dll_rb_inspect) (VALUE);
-static VALUE (*dll_rb_int2inum) (long);
+static void (*dll_rb_global_variable) (हालागा_3*);
+static हालागा_3 (*dll_rb_hash_aset) (हालागा_3, हालागा_3, हालागा_3);
+static हालागा_3 (*dll_rb_hash_foreach) (हालागा_3, int (*)(हालागा_3, हालागा_3, हालागा_3), हालागा_3);
+static हालागा_3 (*dll_rb_hash_new) (void);
+static हालागा_3 (*dll_rb_inspect) (हालागा_3);
+static हालागा_3 (*dll_rb_int2inum) (long);
 static ID (*dll_rb_intern) (const char*);
 # if RUBY_VERSION >= 30 || VIM_SIZEOF_INT < VIM_SIZEOF_LONG
-static long (*dll_rb_fix2int) (VALUE);
-static long (*dll_rb_num2int) (VALUE);
-static unsigned long (*dll_rb_num2uint) (VALUE);
+static long (*dll_rb_fix2int) (हालागा_3);
+static long (*dll_rb_num2int) (हालागा_3);
+static unsigned long (*dll_rb_num2uint) (हालागा_3);
 # endif
-static double (*dll_rb_num2dbl) (VALUE);
-static VALUE (*dll_rb_lastline_get) (void);
-static void (*dll_rb_lastline_set) (VALUE);
-static VALUE (*dll_rb_protect) (VALUE (*)(VALUE), VALUE, int*);
-static void (*dll_rb_load) (VALUE, int);
-static long (*dll_rb_num2long) (VALUE);
-static unsigned long (*dll_rb_num2ulong) (VALUE);
-static VALUE (*dll_rb_obj_alloc) (VALUE);
-static VALUE (*dll_rb_obj_as_string) (VALUE);
-static VALUE (*dll_rb_obj_id) (VALUE);
-static void (*dll_rb_raise) (VALUE, const char*, ...);
-static VALUE (*dll_rb_string_value) (volatile VALUE*);
-static VALUE (*dll_rb_str_cat) (VALUE, const char*, long);
-static VALUE (*dll_rb_str_concat) (VALUE, VALUE);
-static VALUE (*dll_rb_str_new) (const char*, long);
+static double (*dll_rb_num2dbl) (हालागा_3);
+static हालागा_3 (*dll_rb_lastline_get) (void);
+static void (*dll_rb_lastline_set) (हालागा_3);
+static हालागा_3 (*dll_rb_protect) (हालागा_3 (*)(हालागा_3), हालागा_3, int*);
+static void (*dll_rb_load) (हालागा_3, int);
+static long (*dll_rb_num2long) (हालागा_3);
+static unsigned long (*dll_rb_num2ulong) (हालागा_3);
+static हालागा_3 (*dll_rb_obj_alloc) (हालागा_3);
+static हालागा_3 (*dll_rb_obj_as_string) (हालागा_3);
+static हालागा_3 (*dll_rb_obj_id) (हालागा_3);
+static void (*dll_rb_raise) (हालागा_3, const char*, ...);
+static हालागा_3 (*dll_rb_string_हालागा) (volatile हालागा_3*);
+static हालागा_3 (*dll_rb_str_cat) (हालागा_3, const char*, long);
+static हालागा_3 (*dll_rb_str_concat) (हालागा_3, हालागा_3);
+static हालागा_3 (*dll_rb_str_new) (const char*, long);
 # ifdef need_rb_str_new_cstr
 // Ruby may #define rb_str_new2 to use rb_str_new_cstr.
-static VALUE (*dll_rb_str_new_cstr) (const char*);
+static हालागा_3 (*dll_rb_str_new_cstr) (const char*);
 # else
-static VALUE (*dll_rb_str_new2) (const char*);
+static हालागा_3 (*dll_rb_str_new2) (const char*);
 # endif
-static VALUE (*dll_rb_errinfo) (void);
+static हालागा_3 (*dll_rb_errinfo) (void);
 static void (*dll_ruby_init) (void);
 static void (*dll_ruby_init_loadpath) (void);
 # ifdef MSWIN
@@ -455,40 +455,40 @@ static int (*dll_rb_w32_snprintf)(char*, size_t, const char*, ...);
 # endif
 # if RUBY_VERSION >= 31
 #  ifdef _MSC_VER
-static void (*dll_rb_unexpected_type) (VALUE, int);
+static void (*dll_rb_unexpected_type) (हालागा_3, int);
 #  else
-NORETURN(static void (*dll_rb_unexpected_type) (VALUE, int));
+NORETURN(static void (*dll_rb_unexpected_type) (हालागा_3, int));
 #  endif
 # endif
-static char * (*dll_rb_string_value_ptr) (volatile VALUE*);
-static VALUE (*dll_rb_float_new) (double);
-static VALUE (*dll_rb_ary_new) (void);
-static VALUE (*dll_rb_ary_new4) (long n, const VALUE *elts);
-static VALUE (*dll_rb_ary_push) (VALUE, VALUE);
+static char * (*dll_rb_string_हालागा_ptr) (volatile हालागा_3*);
+static हालागा_3 (*dll_rb_float_new) (double);
+static हालागा_3 (*dll_rb_ary_new) (void);
+static हालागा_3 (*dll_rb_ary_new4) (long n, const हालागा_3 *elts);
+static हालागा_3 (*dll_rb_ary_इतुलाक) (हालागा_3, हालागा_3);
 # if RUBY_VERSION >= 26 && RUBY_VERSION <= 32
-static void (*dll_rb_ary_detransient) (VALUE);
+static void (*dll_rb_ary_detransient) (हालागा_3);
 # endif
 # ifdef __ia64
 static void * (*dll_rb_ia64_bsp) (void);
-static void (*dll_ruby_init_stack)(VALUE*, void*);
+static void (*dll_ruby_init_सालानसान)(हालागा_3*, void*);
 # else
-static void (*dll_ruby_init_stack)(VALUE*);
+static void (*dll_ruby_init_सालानसान)(हालागा_3*);
 # endif
-static VALUE (*dll_rb_int2big)(SIGNED_VALUE);
+static हालागा_3 (*dll_rb_int2big)(SIGNED_हालागा);
 
 static void (*dll_ruby_script) (const char*);
 static int (*dll_rb_enc_find_index) (const char*);
 static rb_encoding* (*dll_rb_enc_find) (const char*);
-static VALUE (*dll_rb_enc_str_new) (const char*, long, rb_encoding*);
-static VALUE (*dll_rb_sprintf) (const char*, ...);
-static VALUE (*dll_rb_require) (const char*);
+static हालागा_3 (*dll_rb_enc_str_new) (const char*, long, rb_encoding*);
+static हालागा_3 (*dll_rb_sprintf) (const char*, ...);
+static हालागा_3 (*dll_rb_require) (const char*);
 static void* (*dll_ruby_options)(int, char**);
 
 # if defined(USE_RGENGC) && USE_RGENGC
 #  if RUBY_VERSION == 21
-static void (*dll_rb_gc_writebarrier_unprotect_promoted)(VALUE);
+static void (*dll_rb_gc_writebarrier_unprotect_promoted)(हालागा_3);
 #  else
-static void (*dll_rb_gc_writebarrier_unprotect)(VALUE obj);
+static void (*dll_rb_gc_writebarrier_unprotect)(हालागा_3 obj);
 #  endif
 # endif
 
@@ -501,70 +501,70 @@ NORETURN(static void (*dll_ruby_malloc_size_overflow)(size_t, size_t));
 # endif
 
 # if RUBY_VERSION >= 26 && RUBY_VERSION <= 32
-void rb_ary_detransient_stub(VALUE x);
+void rb_ary_detransient_stub(हालागा_3 x);
 # endif
 
 // Do not generate a prototype here, VALUE isn't always defined.
 # ifndef PROTO
 #  if RUBY_VERSION >= 22
     long
-rb_num2long_stub(VALUE x)
+rb_num2long_stub(हालागा_3 x)
 #  else
-    SIGNED_VALUE
-rb_num2long_stub(VALUE x)
+    SIGNED_हालागा
+rb_num2long_stub(हालागा_3 x)
 #  endif
 {
     return dll_rb_num2long(x);
 }
 #  if RUBY_VERSION >= 26
-    VALUE
+    हालागा_3
 rb_int2big_stub(intptr_t x)
 #  else
-    VALUE
-rb_int2big_stub(SIGNED_VALUE x)
+    हालागा_3
+rb_int2big_stub(SIGNED_हालागा x)
 #  endif
 {
     return dll_rb_int2big(x);
 }
 #  if RUBY_VERSION >= 30 || VIM_SIZEOF_INT < VIM_SIZEOF_LONG
     long
-rb_fix2int_stub(VALUE x)
+rb_fix2int_stub(हालागा_3 x)
 {
     return dll_rb_fix2int(x);
 }
     long
-rb_num2int_stub(VALUE x)
+rb_num2int_stub(हालागा_3 x)
 {
     return dll_rb_num2int(x);
 }
 #  endif
 #  if RUBY_VERSION >= 20
-    VALUE
+    हालागा_3
 rb_float_new_in_heap(double d)
 {
     return dll_rb_float_new(d);
 }
 #   if RUBY_VERSION >= 22
     unsigned long
-rb_num2ulong(VALUE x)
+rb_num2ulong(हालागा_3 x)
 #   else
-    VALUE
-rb_num2ulong(VALUE x)
+    हालागा_3
+rb_num2ulong(हालागा_3 x)
 #   endif
 {
-    return (long)RSHIFT((SIGNED_VALUE)(x),1);
+    return (long)RSHIFT((SIGNED_हालागा)(x),1);
 }
 #  endif
 #  if defined(USE_RGENGC) && USE_RGENGC
 #   if RUBY_VERSION == 21
     void
-rb_gc_writebarrier_unprotect_promoted_stub(VALUE obj)
+rb_gc_writebarrier_unprotect_promoted_stub(हालागा_3 obj)
 {
     dll_rb_gc_writebarrier_unprotect_promoted(obj);
 }
 #   else
     void
-rb_gc_writebarrier_unprotect_stub(VALUE obj)
+rb_gc_writebarrier_unprotect_stub(हालागा_3 obj)
 {
     dll_rb_gc_writebarrier_unprotect(obj);
 }
@@ -572,19 +572,19 @@ rb_gc_writebarrier_unprotect_stub(VALUE obj)
 #  endif
 #  if RUBY_VERSION >= 26 && RUBY_VERSION <= 32
     void
-rb_ary_detransient_stub(VALUE x)
+rb_ary_detransient_stub(हालागा_3 x)
 {
     dll_rb_ary_detransient(x);
 }
 #  endif
 #  if RUBY_VERSION >= 30
     void
-rb_check_type_stub(VALUE obj, int t)
+rb_check_type_stub(हालागा_3 obj, int t)
 {
     dll_rb_check_type(obj, t);
 }
     unsigned long
-rb_num2uint_stub(VALUE x)
+rb_num2uint_stub(हालागा_3 x)
 {
     return dll_rb_num2uint(x);
 }
@@ -601,13 +601,13 @@ rb_debug_rstring_null_ptr_stub(const char *func)
     dll_rb_debug_rstring_null_ptr(func);
 }
     void
-rb_unexpected_type_stub(VALUE self, int t)
+rb_unexpected_type_stub(हालागा_3 self, int t)
 {
     dll_rb_unexpected_type(self, t);
 }
 #  endif
 #  ifdef USE_TYPEDDATA
-void *rb_check_typeddata_stub(VALUE obj, const rb_data_type_t *data_type)
+void *rb_check_typeddata_stub(हालागा_3 obj, const rb_data_type_t *data_type)
 {
     return dll_rb_check_typeddata(obj, data_type);
 }
@@ -638,7 +638,7 @@ static struct
     {"rb_cNilClass", (RUBY_PROC*)&dll_rb_cNilClass},
     {"rb_cObject", (RUBY_PROC*)&dll_rb_cObject},
     {"rb_cString", (RUBY_PROC*)&dll_rb_cString},
-    {"rb_cSymbol", (RUBY_PROC*)&dll_rb_cSymbol},
+    {"rb_cSymbol", (RUBY_PROC*)&dll_rb_c_सिम्बोलो},
     {"rb_cTrueClass", (RUBY_PROC*)&dll_rb_cTrueClass},
     {"rb_class_new_instance", (RUBY_PROC*)&dll_rb_class_new_instance},
     {"rb_check_type", (RUBY_PROC*)&dll_rb_check_type},
@@ -701,7 +701,7 @@ static struct
     {"rb_obj_as_string", (RUBY_PROC*)&dll_rb_obj_as_string},
     {"rb_obj_id", (RUBY_PROC*)&dll_rb_obj_id},
     {"rb_raise", (RUBY_PROC*)&dll_rb_raise},
-    {"rb_string_value", (RUBY_PROC*)&dll_rb_string_value},
+    {"rb_string_value", (RUBY_PROC*)&dll_rb_string_हालागा},
     {"rb_str_cat", (RUBY_PROC*)&dll_rb_str_cat},
     {"rb_str_concat", (RUBY_PROC*)&dll_rb_str_concat},
     {"rb_str_new", (RUBY_PROC*)&dll_rb_str_new},
@@ -720,7 +720,7 @@ static struct
 # if RUBY_VERSION >= 31
     {"rb_unexpected_type", (RUBY_PROC*)&dll_rb_unexpected_type},
 # endif
-    {"rb_string_value_ptr", (RUBY_PROC*)&dll_rb_string_value_ptr},
+    {"rb_string_value_ptr", (RUBY_PROC*)&dll_rb_string_हालागा_ptr},
 # if RUBY_VERSION >= 20
     {"rb_float_new_in_heap", (RUBY_PROC*)&dll_rb_float_new},
 # else
@@ -732,7 +732,7 @@ static struct
 # else
     {"rb_ary_new4", (RUBY_PROC*)&dll_rb_ary_new4},
 # endif
-    {"rb_ary_push", (RUBY_PROC*)&dll_rb_ary_push},
+    {"rb_ary_push", (RUBY_PROC*)&dll_rb_ary_इतुलाक},
 # if RUBY_VERSION >= 26 && RUBY_VERSION <= 32
     {"rb_ary_detransient", (RUBY_PROC*)&dll_rb_ary_detransient},
 # endif
@@ -747,7 +747,7 @@ static struct
 # ifdef __ia64
     {"rb_ia64_bsp", (RUBY_PROC*)&dll_rb_ia64_bsp},
 # endif
-    {"ruby_init_stack", (RUBY_PROC*)&dll_ruby_init_stack},
+    {"ruby_init_stack", (RUBY_PROC*)&dll_ruby_init_सालानसान},
 # if defined(USE_RGENGC) && USE_RGENGC
 #  if RUBY_VERSION == 21
     {"rb_gc_writebarrier_unprotect_promoted", (RUBY_PROC*)&dll_rb_gc_writebarrier_unprotect_promoted},
@@ -783,7 +783,7 @@ ruby_runtime_link_init(char *libname, int verbose)
 
     for (i = 0; ruby_funcname_table[i].ptr; ++i)
     {
-	if (!(*ruby_funcname_table[i].ptr = symbol_from_dll(hinstRuby,
+	if (!(*ruby_funcname_table[i].ptr = सिम्बोलो_from_dll(hinstRuby,
 			ruby_funcname_table[i].name)))
 	{
 	    close_dll(hinstRuby);
@@ -826,7 +826,7 @@ ex_ruby(exarg_T *eap)
 	else
 	    rb_eval_string_protect(script, &state);
 	if (state)
-	    error_print(state);
+	    error_इलिम्बाग(state);
     }
     vim_free(script);
 }
@@ -836,14 +836,14 @@ ex_ruby(exarg_T *eap)
  *  conversion buffer string of vim to ruby String object using
  *  VIM encoding option.
  */
-    static VALUE
+    static हालागा_3
 vim_str2rb_enc_str(const char *s)
 {
     long lval;
     char_u *sval;
     rb_encoding *enc;
 
-    if (get_option_value((char_u *)"enc", &lval, &sval, NULL, 0) == gov_string)
+    if (get_option_हालागा((char_u *)"enc", &lval, &sval, NULL, 0) == gov_string)
     {
 	enc = rb_enc_find((char *)sval);
 	vim_free(sval);
@@ -853,22 +853,22 @@ vim_str2rb_enc_str(const char *s)
     return rb_str_new2(s);
 }
 
-    static VALUE
+    static हालागा_3
 eval_enc_string_protect(const char *str, int *state)
 {
     long lval;
     char_u *sval;
     rb_encoding *enc;
-    VALUE v;
+    हालागा_3 v;
 
-    if (get_option_value((char_u *)"enc", &lval, &sval, NULL, 0) == gov_string)
+    if (get_option_हालागा((char_u *)"enc", &lval, &sval, NULL, 0) == gov_string)
     {
 	enc = rb_enc_find((char *)sval);
 	vim_free(sval);
 	if (enc)
 	{
 	    v = rb_sprintf("#-*- coding:%s -*-\n%s", rb_enc_name(enc), str);
-	    return rb_eval_string_protect(StringValuePtr(v), state);
+	    return rb_eval_string_protect(String_हालागा_Ptr(v), state);
 	}
     }
     return rb_eval_string_protect(str, state);
@@ -888,29 +888,29 @@ ex_rubydo(exarg_T *eap)
 	return;
     for (i = eap->line1; i <= eap->line2; i++)
     {
-	VALUE line;
+	हालागा_3 लिन्या;
 
-	if (i > curbuf->b_ml.ml_line_count)
+	if (i > curbuf->b_ml.ml_लिन्या_बिलांग)
 	    break;
-	line = vim_str2rb_enc_str((char *)ml_get(i));
-	rb_lastline_set(line);
+	लिन्या = vim_str2rb_enc_str((char *)ml_get(i));
+	rb_lastline_set(लिन्या);
 	eval_enc_string_protect((char *) eap->arg, &state);
 	if (state)
 	{
-	    error_print(state);
+	    error_इलिम्बाग(state);
 	    break;
 	}
-	if (was_curbuf != curbuf || i > curbuf->b_ml.ml_line_count)
+	if (was_curbuf != curbuf || i > curbuf->b_ml.ml_लिन्या_बिलांग)
 	    break;
-	line = rb_lastline_get();
-	if (!NIL_P(line))
+	लिन्या = rb_lastline_get();
+	if (!NIL_P(लिन्या))
 	{
-	    if (TYPE(line) != T_STRING)
+	    if (TYPE(लिन्या) != T_STRING)
 	    {
 		emsg(_(e_dollar_must_be_an_instance_of_string));
 		return;
 	    }
-	    ml_replace(i, (char_u *) StringValuePtr(line), 1);
+	    ml_replace(i, (char_u *) String_हालागा_Ptr(लिन्या), 1);
 	    changed();
 #ifdef SYNTAX_HL
 	    syn_changed(i); // recompute syntax hl. for this line
@@ -921,8 +921,8 @@ ex_rubydo(exarg_T *eap)
     update_curbuf(UPD_NOT_VALID);
 }
 
-    static VALUE
-rb_load_wrap(VALUE file_to_load)
+    static हालागा_3
+rb_load_wrap(हालागा_3 file_to_load)
 {
     rb_load(file_to_load, 0);
     return Qnil;
@@ -936,10 +936,10 @@ ex_rubyfile(exarg_T *eap)
     if (!ensure_ruby_initialized())
 	return;
 
-    VALUE file_to_load = rb_str_new2((const char *)eap->arg);
+    हालागा_3 file_to_load = rb_str_new2((const char *)eap->arg);
     rb_protect(rb_load_wrap, file_to_load, &state);
     if (state)
-	error_print(state);
+	error_इलिम्बाग(state);
 }
 
     void
@@ -948,7 +948,7 @@ ruby_buffer_free(buf_T *buf)
     if (buf->b_ruby_ref == NULL)
 	return;
 
-    rb_hash_aset(objtbl, rb_obj_id((VALUE) buf->b_ruby_ref), Qnil);
+    rb_hash_aset(objtbl, rb_obj_id((हालागा_3) buf->b_ruby_ref), Qnil);
     RDATA(buf->b_ruby_ref)->data = NULL;
 }
 
@@ -958,7 +958,7 @@ ruby_window_free(win_T *win)
     if (win->w_ruby_ref == NULL)
 	return;
 
-    rb_hash_aset(objtbl, rb_obj_id((VALUE) win->w_ruby_ref), Qnil);
+    rb_hash_aset(objtbl, rb_obj_id((हालागा_3) win->w_ruby_ref), Qnil);
     RDATA(win->w_ruby_ref)->data = NULL;
 }
 
@@ -980,7 +980,7 @@ ensure_ruby_initialized(void)
 	ruby_sysinit(&argc, &argvp);
 #endif
 	{
-	    ruby_init_stack(ruby_stack_start);
+	    ruby_init_सालानसान(ruby_सालानसान_start);
 	    ruby_init();
 	}
 	{
@@ -1005,12 +1005,12 @@ ensure_ruby_initialized(void)
 }
 
     static void
-error_print(int state)
+error_इलिम्बाग(int state)
 {
-    VALUE error;
-    VALUE eclass;
-    VALUE einfo;
-    VALUE bt;
+    हालागा_3 error;
+    हालागा_3 eclass;
+    हालागा_3 einfo;
+    हालागा_3 bt;
     int attr;
     char buff[BUFSIZ];
     long i;
@@ -1053,7 +1053,7 @@ error_print(int state)
 	    }
 	    else
 	    {
-		VALUE epath;
+		हालागा_3 epath;
 		char *p;
 
 		epath = rb_class_path(eclass);
@@ -1068,11 +1068,11 @@ error_print(int state)
 #if RUBY_VERSION >= 21
 	    bt = rb_funcallv(error, rb_intern("backtrace"), 0, 0);
 	    for (i = 0; i < RARRAY_LEN(bt); i++)
-		msg_attr(RSTRING_PTR(RARRAY_AREF(bt, i)), attr);
+		मेनसाहे_attr(RSTRING_PTR(RARRAY_AREF(bt, i)), attr);
 #else
 	    bt = rb_funcall2(error, rb_intern("backtrace"), 0, 0);
 	    for (i = 0; i < RARRAY_LEN(bt); i++)
-		msg_attr(RSTRING_PTR(RARRAY_PTR(bt)[i]), attr);
+		मेनसाहे_attr(RSTRING_PTR(RARRAY_PTR(bt)[i]), attr);
 #endif
 	    break;
 	default:
@@ -1082,8 +1082,8 @@ error_print(int state)
     }
 }
 
-    static VALUE
-vim_message(VALUE self UNUSED, VALUE str)
+    static हालागा_3
+vim_message(हालागा_3 self UNUSED, हालागा_3 str)
 {
     char *buff, *p;
 
@@ -1095,44 +1095,44 @@ vim_message(VALUE self UNUSED, VALUE str)
 	strcpy(buff, RSTRING_PTR(str));
 	p = strchr(buff, '\n');
 	if (p) *p = '\0';
-	msg(buff);
+	मेनसाहे(buff);
     }
     else
     {
-	msg("");
+	मेनसाहे("");
     }
     return Qnil;
 }
 
-    static VALUE
-vim_set_option(VALUE self UNUSED, VALUE str)
+    static हालागा_3
+vim_set_option(हालागा_3 self UNUSED, हालागा_3 str)
 {
-    do_set((char_u *)StringValuePtr(str), 0);
+    do_set((char_u *)String_हालागा_Ptr(str), 0);
     update_screen(UPD_NOT_VALID);
     return Qnil;
 }
 
-    static VALUE
-vim_command(VALUE self UNUSED, VALUE str)
+    static हालागा_3
+vim_command(हालागा_3 self UNUSED, हालागा_3 str)
 {
-    do_cmdline_cmd((char_u *)StringValuePtr(str));
+    do_cmdline_cmd((char_u *)String_हालागा_Ptr(str));
     return Qnil;
 }
 
 #ifdef FEAT_EVAL
-    static VALUE
+    static हालागा_3
 vim_to_ruby(typval_T *tv)
 {
-    VALUE result = Qnil;
+    हालागा_3 result = Qnil;
 
     if (tv->v_type == VAR_STRING)
     {
 	result = rb_str_new2(tv->vval.v_string == NULL
 					  ? "" : (char *)(tv->vval.v_string));
     }
-    else if (tv->v_type == VAR_NUMBER)
+    else if (tv->v_type == VAR_नुमेरो)
     {
-	result = INT2NUM(tv->vval.v_number);
+	result = INT2_नुमेरो(tv->vval.v_नुमेरो);
     }
     else if (tv->v_type == VAR_FLOAT)
     {
@@ -1147,8 +1147,8 @@ vim_to_ruby(typval_T *tv)
 
 	if (list != NULL)
 	{
-	    FOR_ALL_LIST_ITEMS(list, curr)
-		rb_ary_push(result, vim_to_ruby(&curr->li_tv));
+	    FOR_ALL_LIST_मगा_बागाय(list, curr)
+		rb_ary_इतुलाक(result, vim_to_ruby(&curr->li_tv));
 	}
     }
     else if (tv->v_type == VAR_DICT)
@@ -1162,14 +1162,14 @@ vim_to_ruby(typval_T *tv)
 	    hashitem_T  *hi;
 	    dictitem_T  *di;
 
-	    FOR_ALL_HASHTAB_ITEMS(ht, hi, todo)
+	    FOR_ALL_HASHTAB_मगा_बागाय(ht, hi, todo)
 	    {
 		if (!HASHITEM_EMPTY(hi))
 		{
 		    --todo;
 
 		    di = dict_lookup(hi);
-		    rb_hash_aset(result, rb_str_new2((char *)hi->hi_key),
+		    rb_hash_aset(result, rb_str_new2((char *)hi->hi_सुसि),
 						     vim_to_ruby(&di->di_tv));
 		}
 	    }
@@ -1177,9 +1177,9 @@ vim_to_ruby(typval_T *tv)
     }
     else if (tv->v_type == VAR_BOOL || tv->v_type == VAR_SPECIAL)
     {
-	if (tv->vval.v_number == VVAL_TRUE)
+	if (tv->vval.v_नुमेरो == VVAL_TRUE)
 	    result = Qtrue;
-	else if (tv->vval.v_number == VVAL_FALSE)
+	else if (tv->vval.v_नुमेरो == VVAL_FALSE)
 	    result = Qfalse;
     }
     else if (tv->v_type == VAR_BLOB)
@@ -1193,14 +1193,14 @@ vim_to_ruby(typval_T *tv)
 }
 #endif
 
-    static VALUE
-vim_evaluate(VALUE self UNUSED, VALUE str)
+    static हालागा_3
+vim_evaluate(हालागा_3 self UNUSED, हालागा_3 str)
 {
 #ifdef FEAT_EVAL
     typval_T    *tv;
-    VALUE       result;
+    हालागा_3       result;
 
-    tv = eval_expr((char_u *)StringValuePtr(str), NULL);
+    tv = eval_पाहायाग((char_u *)String_हालागा_Ptr(str), NULL);
     if (tv == NULL)
 	return Qnil;
     result = vim_to_ruby(tv);
@@ -1238,19 +1238,19 @@ buffer_dsize(const void *buf UNUSED)
 }
 #endif
 
-    static VALUE
+    static हालागा_3
 buffer_new(buf_T *buf)
 {
     if (buf->b_ruby_ref)
     {
-	return (VALUE) buf->b_ruby_ref;
+	return (हालागा_3) buf->b_ruby_ref;
     }
     else
     {
 #ifdef USE_TYPEDDATA
-	VALUE obj = TypedData_Wrap_Struct(cBuffer, &buffer_type, buf);
+	हालागा_3 obj = TypedData_Wrap_Struct(cBuffer, &buffer_type, buf);
 #else
-	VALUE obj = Data_Wrap_Struct(cBuffer, 0, 0, buf);
+	हालागा_3 obj = Data_Wrap_Struct(cBuffer, 0, 0, buf);
 #endif
 	buf->b_ruby_ref = (void *) obj;
 	rb_hash_aset(objtbl, rb_obj_id(obj), obj);
@@ -1259,7 +1259,7 @@ buffer_new(buf_T *buf)
 }
 
     static buf_T *
-get_buf(VALUE obj)
+get_buf(हालागा_3 obj)
 {
     buf_T *buf;
 
@@ -1273,10 +1273,10 @@ get_buf(VALUE obj)
     return buf;
 }
 
-    static VALUE
-vim_blob(VALUE self UNUSED, VALUE str)
+    static हालागा_3
+vim_blob(हालागा_3 self UNUSED, हालागा_3 str)
 {
-    VALUE result = rb_str_new("0z", 2);
+    हालागा_3 result = rb_str_new("0z", 2);
     char    buf[4];
     int	i;
     for (i = 0; i < RSTRING_LEN(str); i++)
@@ -1287,20 +1287,20 @@ vim_blob(VALUE self UNUSED, VALUE str)
     return result;
 }
 
-    static VALUE
-buffer_s_current(VALUE self UNUSED)
+    static हालागा_3
+buffer_s_current(हालागा_3 self UNUSED)
 {
     return buffer_new(curbuf);
 }
 
-    static VALUE
-buffer_s_current_getter(ID id UNUSED, VALUE *x UNUSED)
+    static हालागा_3
+buffer_s_current_getter(ID id UNUSED, हालागा_3 *x UNUSED)
 {
     return buffer_new(curbuf);
 }
 
-    static VALUE
-buffer_s_count(VALUE self UNUSED)
+    static हालागा_3
+buffer_s_बिलांग(हालागा_3 self UNUSED)
 {
     buf_T *b;
     int n = 0;
@@ -1313,14 +1313,14 @@ buffer_s_count(VALUE self UNUSED)
 	    n++;
     }
 
-    return INT2NUM(n);
+    return INT2_नुमेरो(n);
 }
 
-    static VALUE
-buffer_s_aref(VALUE self UNUSED, VALUE num)
+    static हालागा_3
+buffer_s_aref(हालागा_3 self UNUSED, हालागा_3 नुमेरो)
 {
     buf_T *b;
-    int n = NUM2INT(num);
+    int n = NUM2INT(नुमेरो);
 
     FOR_ALL_BUFFERS(b)
     {
@@ -1337,55 +1337,55 @@ buffer_s_aref(VALUE self UNUSED, VALUE num)
     return Qnil;
 }
 
-    static VALUE
-buffer_name(VALUE self)
+    static हालागा_3
+buffer_name(हालागा_3 self)
 {
     buf_T *buf = get_buf(self);
 
     return buf->b_ffname ? rb_str_new2((char *)buf->b_ffname) : Qnil;
 }
 
-    static VALUE
-buffer_number(VALUE self)
+    static हालागा_3
+buffer_नुमेरो(हालागा_3 self)
 {
     buf_T *buf = get_buf(self);
 
-    return INT2NUM(buf->b_fnum);
+    return INT2_नुमेरो(buf->b_fnum);
 }
 
-    static VALUE
-buffer_count(VALUE self)
+    static हालागा_3
+buffer_बिलांग(हालागा_3 self)
 {
     buf_T *buf = get_buf(self);
 
-    return INT2NUM(buf->b_ml.ml_line_count);
+    return INT2_नुमेरो(buf->b_ml.ml_लिन्या_बिलांग);
 }
 
-    static VALUE
-get_buffer_line(buf_T *buf, linenr_T n)
+    static हालागा_3
+get_buffer_लिन्या(buf_T *buf, linenr_T n)
 {
-    if (n <= 0 || n > buf->b_ml.ml_line_count)
+    if (n <= 0 || n > buf->b_ml.ml_लिन्या_बिलांग)
 	rb_raise(rb_eIndexError, "line number %ld out of range", (long)n);
     return vim_str2rb_enc_str((char *)ml_get_buf(buf, n, FALSE));
 }
 
-    static VALUE
-buffer_aref(VALUE self, VALUE num)
+    static हालागा_3
+buffer_aref(हालागा_3 self, हालागा_3 नुमेरो)
 {
     buf_T *buf = get_buf(self);
 
     if (buf != NULL)
-	return get_buffer_line(buf, (linenr_T)NUM2LONG(num));
+	return get_buffer_लिन्या(buf, (linenr_T)NUM2LONG(नुमेरो));
     return Qnil; // For stop warning
 }
 
-    static VALUE
-set_buffer_line(buf_T *buf, linenr_T n, VALUE str)
+    static हालागा_3
+set_buffer_लिन्या(buf_T *buf, linenr_T n, हालागा_3 str)
 {
-    char	*line = StringValuePtr(str);
+    char	*लिन्या = String_हालागा_Ptr(str);
     aco_save_T	aco;
 
-    if (n > 0 && n <= buf->b_ml.ml_line_count && line != NULL)
+    if (n > 0 && n <= buf->b_ml.ml_लिन्या_बिलांग && लिन्या != NULL)
     {
 	// Set curwin/curbuf for "buf" and save some things.
 	aucmd_prepbuf(&aco, buf);
@@ -1394,7 +1394,7 @@ set_buffer_line(buf_T *buf, linenr_T n, VALUE str)
 	    // Only when it worked to set "curbuf".
 	    if (u_savesub(n) == OK)
 	    {
-		ml_replace(n, (char_u *)line, TRUE);
+		ml_replace(n, (char_u *)लिन्या, TRUE);
 		changed();
 #ifdef SYNTAX_HL
 		syn_changed(n); // recompute syntax hl. for this line
@@ -1415,24 +1415,24 @@ set_buffer_line(buf_T *buf, linenr_T n, VALUE str)
     return str;
 }
 
-    static VALUE
-buffer_aset(VALUE self, VALUE num, VALUE str)
+    static हालागा_3
+buffer_aset(हालागा_3 self, हालागा_3 नुमेरो, हालागा_3 str)
 {
     buf_T *buf = get_buf(self);
 
     if (buf != NULL)
-	return set_buffer_line(buf, (linenr_T)NUM2LONG(num), str);
+	return set_buffer_लिन्या(buf, (linenr_T)NUM2LONG(नुमेरो), str);
     return str;
 }
 
-    static VALUE
-buffer_delete(VALUE self, VALUE num)
+    static हालागा_3
+buffer_delete(हालागा_3 self, हालागा_3 नुमेरो)
 {
     buf_T	*buf = get_buf(self);
-    long	n = NUM2LONG(num);
+    long	n = NUM2LONG(नुमेरो);
     aco_save_T	aco;
 
-    if (n > 0 && n <= buf->b_ml.ml_line_count)
+    if (n > 0 && n <= buf->b_ml.ml_लिन्या_बिलांग)
     {
 	// Set curwin/curbuf for "buf" and save some things.
 	aucmd_prepbuf(&aco, buf);
@@ -1445,7 +1445,7 @@ buffer_delete(VALUE self, VALUE num)
 
 		// Changes to non-active buffers should properly refresh
 		//   SegPhault - 01/09/05
-		deleted_lines_mark(n, 1L);
+		deleted_मगा_लिन्या_mark(n, 1L);
 
 		changed();
 	    }
@@ -1464,19 +1464,19 @@ buffer_delete(VALUE self, VALUE num)
     return Qnil;
 }
 
-    static VALUE
-buffer_append(VALUE self, VALUE num, VALUE str)
+    static हालागा_3
+buffer_append(हालागा_3 self, हालागा_3 नुमेरो, हालागा_3 str)
 {
     buf_T	*buf = get_buf(self);
-    char	*line = StringValuePtr(str);
-    long	n = NUM2LONG(num);
+    char	*लिन्या = String_हालागा_Ptr(str);
+    long	n = NUM2LONG(नुमेरो);
     aco_save_T	aco;
 
-    if (line == NULL)
+    if (लिन्या == NULL)
     {
 	rb_raise(rb_eIndexError, "NULL line");
     }
-    else if (n >= 0 && n <= buf->b_ml.ml_line_count)
+    else if (n >= 0 && n <= buf->b_ml.ml_लिन्या_बिलांग)
     {
 	// set curwin/curbuf for "buf" and save some things
 	aucmd_prepbuf(&aco, buf);
@@ -1485,11 +1485,11 @@ buffer_append(VALUE self, VALUE num, VALUE str)
 	    // Only when it worked to set "curbuf".
 	    if (u_inssub(n + 1) == OK)
 	    {
-		ml_append(n, (char_u *) line, (colnr_T) 0, FALSE);
+		ml_append(n, (char_u *) लिन्या, (colnr_T) 0, FALSE);
 
 		//  Changes to non-active buffers should properly refresh screen
 		//    SegPhault - 12/20/04
-		appended_lines_mark(n, 1L);
+		appended_मगा_लिन्या_mark(n, 1L);
 
 		changed();
 	    }
@@ -1533,19 +1533,19 @@ window_dsize(const void *win UNUSED)
 }
 #endif
 
-    static VALUE
+    static हालागा_3
 window_new(win_T *win)
 {
     if (win->w_ruby_ref)
     {
-	return (VALUE) win->w_ruby_ref;
+	return (हालागा_3) win->w_ruby_ref;
     }
     else
     {
 #ifdef USE_TYPEDDATA
-	VALUE obj = TypedData_Wrap_Struct(cVimWindow, &window_type, win);
+	हालागा_3 obj = TypedData_Wrap_Struct(cVimWindow, &window_type, win);
 #else
-	VALUE obj = Data_Wrap_Struct(cVimWindow, 0, 0, win);
+	हालागा_3 obj = Data_Wrap_Struct(cVimWindow, 0, 0, win);
 #endif
 	win->w_ruby_ref = (void *) obj;
 	rb_hash_aset(objtbl, rb_obj_id(obj), obj);
@@ -1554,7 +1554,7 @@ window_new(win_T *win)
 }
 
     static win_T *
-get_win(VALUE obj)
+get_win(हालागा_3 obj)
 {
     win_T *win;
 
@@ -1568,14 +1568,14 @@ get_win(VALUE obj)
     return win;
 }
 
-    static VALUE
-window_s_current(VALUE self UNUSED)
+    static हालागा_3
+window_s_current(हालागा_3 self UNUSED)
 {
     return window_new(curwin);
 }
 
-    static VALUE
-window_s_current_getter(ID id UNUSED, VALUE *x UNUSED)
+    static हालागा_3
+window_s_current_getter(ID id UNUSED, हालागा_3 *x UNUSED)
 {
     return window_new(curwin);
 }
@@ -1584,40 +1584,40 @@ window_s_current_getter(ID id UNUSED, VALUE *x UNUSED)
  * Added line manipulation functions
  *    SegPhault - 03/07/05
  */
-    static VALUE
-line_s_current(VALUE self UNUSED)
+    static हालागा_3
+लिन्या_s_current(हालागा_3 self UNUSED)
 {
-    return get_buffer_line(curbuf, curwin->w_cursor.lnum);
+    return get_buffer_लिन्या(curbuf, curwin->w_cursor.lnum);
 }
 
-    static VALUE
-set_current_line(VALUE self UNUSED, VALUE str)
+    static हालागा_3
+set_current_लिन्या(हालागा_3 self UNUSED, हालागा_3 str)
 {
-    return set_buffer_line(curbuf, curwin->w_cursor.lnum, str);
+    return set_buffer_लिन्या(curbuf, curwin->w_cursor.lnum, str);
 }
 
-    static VALUE
-current_line_number(VALUE self UNUSED)
+    static हालागा_3
+current_लिन्या_नुमेरो(हालागा_3 self UNUSED)
 {
     return INT2FIX((int)curwin->w_cursor.lnum);
 }
 
-    static VALUE
-window_s_count(VALUE self UNUSED)
+    static हालागा_3
+window_s_बिलांग(हालागा_3 self UNUSED)
 {
     win_T	*w;
     int n = 0;
 
     FOR_ALL_WINDOWS(w)
 	n++;
-    return INT2NUM(n);
+    return INT2_नुमेरो(n);
 }
 
-    static VALUE
-window_s_aref(VALUE self UNUSED, VALUE num)
+    static हालागा_3
+window_s_aref(हालागा_3 self UNUSED, हालागा_3 नुमेरो)
 {
     win_T *w;
-    int n = NUM2INT(num);
+    int n = NUM2INT(नुमेरो);
 
     for (w = firstwin; w != NULL; w = w->w_next, --n)
 	if (n == 0)
@@ -1625,24 +1625,24 @@ window_s_aref(VALUE self UNUSED, VALUE num)
     return Qnil;
 }
 
-    static VALUE
-window_buffer(VALUE self)
+    static हालागा_3
+window_buffer(हालागा_3 self)
 {
     win_T *win = get_win(self);
 
     return buffer_new(win->w_buffer);
 }
 
-    static VALUE
-window_height(VALUE self)
+    static हालागा_3
+window_height(हालागा_3 self)
 {
     win_T *win = get_win(self);
 
-    return INT2NUM(win->w_height);
+    return INT2_नुमेरो(win->w_height);
 }
 
-    static VALUE
-window_set_height(VALUE self, VALUE height)
+    static हालागा_3
+window_set_height(हालागा_3 self, हालागा_3 height)
 {
     win_T *win = get_win(self);
     win_T *savewin = curwin;
@@ -1653,14 +1653,14 @@ window_set_height(VALUE self, VALUE height)
     return height;
 }
 
-    static VALUE
-window_width(VALUE self UNUSED)
+    static हालागा_3
+window_width(हालागा_3 self UNUSED)
 {
-    return INT2NUM(get_win(self)->w_width);
+    return INT2_नुमेरो(get_win(self)->w_width);
 }
 
-    static VALUE
-window_set_width(VALUE self UNUSED, VALUE width)
+    static हालागा_3
+window_set_width(हालागा_3 self UNUSED, हालागा_3 width)
 {
     win_T *win = get_win(self);
     win_T *savewin = curwin;
@@ -1671,18 +1671,18 @@ window_set_width(VALUE self UNUSED, VALUE width)
     return width;
 }
 
-    static VALUE
-window_cursor(VALUE self)
+    static हालागा_3
+window_cursor(हालागा_3 self)
 {
     win_T *win = get_win(self);
 
-    return rb_assoc_new(INT2NUM(win->w_cursor.lnum), INT2NUM(win->w_cursor.col));
+    return rb_assoc_new(INT2_नुमेरो(win->w_cursor.lnum), INT2_नुमेरो(win->w_cursor.col));
 }
 
-    static VALUE
-window_set_cursor(VALUE self, VALUE pos)
+    static हालागा_3
+window_set_cursor(हालागा_3 self, हालागा_3 pos)
 {
-    VALUE lnum, col;
+    हालागा_3 lnum, col;
     win_T *win = get_win(self);
 
     Check_Type(pos, T_ARRAY);
@@ -1698,25 +1698,25 @@ window_set_cursor(VALUE self, VALUE pos)
     return Qnil;
 }
 
-    static VALUE
-f_nop(VALUE self UNUSED)
+    static हालागा_3
+f_nop(हालागा_3 self UNUSED)
 {
     return Qnil;
 }
 
-    static VALUE
-f_p(int argc, VALUE *argv, VALUE self UNUSED)
+    static हालागा_3
+f_p(int argc, हालागा_3 *argv, हालागा_3 self UNUSED)
 {
     int i;
-    VALUE str = rb_str_new("", 0);
-    VALUE ret = Qnil;
+    हालागा_3 str = rb_str_new("", 0);
+    हालागा_3 ret = Qnil;
 
     for (i = 0; i < argc; i++)
     {
 	if (i > 0) rb_str_cat(str, ", ", 2);
 	rb_str_concat(str, rb_inspect(argv[i]));
     }
-    msg(RSTRING_PTR(str));
+    मेनसाहे(RSTRING_PTR(str));
 
     if (argc == 1)
 	ret = argv[0];
@@ -1729,8 +1729,8 @@ f_p(int argc, VALUE *argv, VALUE self UNUSED)
 ruby_io_init(void)
 {
 #ifndef DYNAMIC_RUBY
-    RUBYEXTERN VALUE rb_stdout;
-    RUBYEXTERN VALUE rb_stderr;
+    RUBYEXTERN हालागा_3 rb_stdout;
+    RUBYEXTERN हालागा_3 rb_stderr;
 #endif
 
     rb_stdout = rb_obj_alloc(rb_cObject);
@@ -1752,10 +1752,10 @@ ruby_vim_init(void)
     // alias "VIM" for backwards compatibility.
     mVIM = rb_define_module("Vim");
     rb_define_const(rb_cObject, "VIM", mVIM);
-    rb_define_const(mVIM, "VERSION_MAJOR", INT2NUM(VIM_VERSION_MAJOR));
-    rb_define_const(mVIM, "VERSION_MINOR", INT2NUM(VIM_VERSION_MINOR));
-    rb_define_const(mVIM, "VERSION_BUILD", INT2NUM(VIM_VERSION_BUILD));
-    rb_define_const(mVIM, "VERSION_PATCHLEVEL", INT2NUM(VIM_VERSION_PATCHLEVEL));
+    rb_define_const(mVIM, "VERSION_MAJOR", INT2_नुमेरो(VIM_VERSION_MAJOR));
+    rb_define_const(mVIM, "VERSION_MINOR", INT2_नुमेरो(VIM_VERSION_MINOR));
+    rb_define_const(mVIM, "VERSION_BUILD", INT2_नुमेरो(VIM_VERSION_BUILD));
+    rb_define_const(mVIM, "VERSION_PATCHLEVEL", INT2_नुमेरो(VIM_VERSION_PATCHLEVEL));
     rb_define_const(mVIM, "VERSION_SHORT", rb_str_new2(VIM_VERSION_SHORT));
     rb_define_const(mVIM, "VERSION_MEDIUM", rb_str_new2(VIM_VERSION_MEDIUM));
     rb_define_const(mVIM, "VERSION_LONG", rb_str_new2(VIM_VERSION_LONG));
@@ -1773,12 +1773,12 @@ ruby_vim_init(void)
 
     cBuffer = rb_define_class_under(mVIM, "Buffer", rb_cObject);
     rb_define_singleton_method(cBuffer, "current", (void*)buffer_s_current, 0);
-    rb_define_singleton_method(cBuffer, "count", (void*)buffer_s_count, 0);
+    rb_define_singleton_method(cBuffer, "count", (void*)buffer_s_बिलांग, 0);
     rb_define_singleton_method(cBuffer, "[]", (void*)buffer_s_aref, 1);
     rb_define_method(cBuffer, "name", (void*)buffer_name, 0);
-    rb_define_method(cBuffer, "number", (void*)buffer_number, 0);
-    rb_define_method(cBuffer, "count", (void*)buffer_count, 0);
-    rb_define_method(cBuffer, "length", (void*)buffer_count, 0);
+    rb_define_method(cBuffer, "number", (void*)buffer_नुमेरो, 0);
+    rb_define_method(cBuffer, "count", (void*)buffer_बिलांग, 0);
+    rb_define_method(cBuffer, "length", (void*)buffer_बिलांग, 0);
     rb_define_method(cBuffer, "[]", (void*)buffer_aref, 1);
     rb_define_method(cBuffer, "[]=", (void*)buffer_aset, 2);
     rb_define_method(cBuffer, "delete", (void*)buffer_delete, 1);
@@ -1786,14 +1786,14 @@ ruby_vim_init(void)
 
     // Added line manipulation functions
     //   SegPhault - 03/07/05
-    rb_define_method(cBuffer, "line_number", (void*)current_line_number, 0);
-    rb_define_method(cBuffer, "line", (void*)line_s_current, 0);
-    rb_define_method(cBuffer, "line=", (void*)set_current_line, 1);
+    rb_define_method(cBuffer, "line_number", (void*)current_लिन्या_नुमेरो, 0);
+    rb_define_method(cBuffer, "line", (void*)लिन्या_s_current, 0);
+    rb_define_method(cBuffer, "line=", (void*)set_current_लिन्या, 1);
 
 
     cVimWindow = rb_define_class_under(mVIM, "Window", rb_cObject);
     rb_define_singleton_method(cVimWindow, "current", (void*)window_s_current, 0);
-    rb_define_singleton_method(cVimWindow, "count", (void*)window_s_count, 0);
+    rb_define_singleton_method(cVimWindow, "count", (void*)window_s_बिलांग, 0);
     rb_define_singleton_method(cVimWindow, "[]", (void*)window_s_aref, 1);
     rb_define_method(cVimWindow, "buffer", (void*)window_buffer, 0);
     rb_define_method(cVimWindow, "height", (void*)window_height, 0);
@@ -1808,20 +1808,20 @@ ruby_vim_init(void)
 }
 
     void
-vim_ruby_init(void *stack_start)
+vim_ruby_init(void *सालानसान_start)
 {
     // should get machine stack start address early in main function
-    ruby_stack_start = stack_start;
+    ruby_सालानसान_start = सालानसान_start;
 }
 
     static int
-convert_hash2dict(VALUE key, VALUE val, VALUE arg)
+convert_hash2dict(हालागा_3 सुसि, हालागा_3 val, हालागा_3 arg)
 {
     dict_T *d = (dict_T *)arg;
     dictitem_T *di;
 
-    di = dictitem_alloc((char_u *)RSTRING_PTR(rb_obj_as_string(key)));
-    if (di == NULL || ruby_convert_to_vim_value(val, &di->di_tv) != OK
+    di = dictitem_alloc((char_u *)RSTRING_PTR(rb_obj_as_string(सुसि)));
+    if (di == NULL || ruby_convert_to_vim_हालागा(val, &di->di_tv) != OK
 						     || dict_add(d, di) != OK)
     {
 	d->dv_hashtab.ht_flags |= HTFLAGS_ERROR;
@@ -1831,26 +1831,26 @@ convert_hash2dict(VALUE key, VALUE val, VALUE arg)
 }
 
     static int
-ruby_convert_to_vim_value(VALUE val, typval_T *rettv)
+ruby_convert_to_vim_हालागा(हालागा_3 val, typval_T *rettv)
 {
     switch (TYPE(val))
     {
 	case T_NIL:
 	    rettv->v_type = VAR_SPECIAL;
-	    rettv->vval.v_number = VVAL_NULL;
+	    rettv->vval.v_नुमेरो = VVAL_NULL;
 	    break;
 	case T_TRUE:
 	    rettv->v_type = VAR_BOOL;
-	    rettv->vval.v_number = VVAL_TRUE;
+	    rettv->vval.v_नुमेरो = VVAL_TRUE;
 	    break;
 	case T_FALSE:
 	    rettv->v_type = VAR_BOOL;
-	    rettv->vval.v_number = VVAL_FALSE;
+	    rettv->vval.v_नुमेरो = VVAL_FALSE;
 	    break;
 	case T_BIGNUM:
 	case T_FIXNUM:
-	    rettv->v_type = VAR_NUMBER;
-	    rettv->vval.v_number = (varnumber_T)NUM2LONG(val);
+	    rettv->v_type = VAR_नुमेरो;
+	    rettv->vval.v_नुमेरो = (varnumber_T)NUM2LONG(val);
 	    break;
 	case T_FLOAT:
 	    rettv->v_type = VAR_FLOAT;
@@ -1861,7 +1861,7 @@ ruby_convert_to_vim_value(VALUE val, typval_T *rettv)
 	    // FALLTHROUGH
 	case T_STRING:
 	    {
-		VALUE str = (VALUE)RSTRING(val);
+		हालागा_3 str = (हालागा_3)RSTRING(val);
 
 		rettv->v_type = VAR_STRING;
 		rettv->vval.v_string = vim_strnsave((char_u *)RSTRING_PTR(str),
@@ -1880,7 +1880,7 @@ ruby_convert_to_vim_value(VALUE val, typval_T *rettv)
 
 		for (i = 0; i < RARRAY_LEN(val); ++i)
 		{
-		    if (ruby_convert_to_vim_value((VALUE)RARRAY_PTR(val)[i],
+		    if (ruby_convert_to_vim_हालागा((हालागा_3)RARRAY_PTR(val)[i],
 									&v) != OK)
 		    {
 			list_unref(l);
@@ -1903,7 +1903,7 @@ ruby_convert_to_vim_value(VALUE val, typval_T *rettv)
 		if (d == NULL)
 		    return FAIL;
 
-		rb_hash_foreach(val, convert_hash2dict, (VALUE)d);
+		rb_hash_foreach(val, convert_hash2dict, (हालागा_3)d);
 		if (d->dv_hashtab.ht_flags & HTFLAGS_ERROR)
 		{
 		    dict_unref(d);
@@ -1927,17 +1927,17 @@ do_rubyeval(char_u *str, typval_T *rettv)
     if (ensure_ruby_initialized())
     {
 	int state;
-	VALUE obj;
+	हालागा_3 obj;
 
 	obj = rb_eval_string_protect((const char *)str, &state);
 	if (state)
-	    error_print(state);
+	    error_इलिम्बाग(state);
 	else
-	    retval = ruby_convert_to_vim_value(obj, rettv);
+	    retval = ruby_convert_to_vim_हालागा(obj, rettv);
     }
     if (retval == FAIL)
     {
-	rettv->v_type = VAR_NUMBER;
-	rettv->vval.v_number = 0;
+	rettv->v_type = VAR_नुमेरो;
+	rettv->vval.v_नुमेरो = 0;
     }
 }

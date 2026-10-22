@@ -66,7 +66,7 @@
 # define XmeClearBorder	    _XmClearBorder
 # define XmeDrawShadows	    _XmDrawShadows
 # define XmeDrawHighlight(a, b, c, d, e, f, g, h) \
-    _XmDrawHighlight(a, b, c, d, e, f, g, h, LineSolid)
+    _XmDrawHighlight(a, b, c, d, e, f, g, h, लिन्या_Solid)
 #endif
 
 // Older VMS systems do not have xos_r.h and cannot haldle XtProcessLocking
@@ -95,19 +95,19 @@
 extern Boolean _XmGetInDragMode(Widget widget);
 extern void _XmPrimitiveEnter(Widget wid,
 			      XEvent * event,
-			      String * params, Cardinal * num_params);
+			      String * params, Cardinal * नुमेरो_params);
 extern void _XmPrimitiveLeave(Widget wid,
 			      XEvent * event,
-			      String * params, Cardinal * num_params);
-extern void _XmSetFocusFlag(Widget w, unsigned int mask, Boolean value);
+			      String * params, Cardinal * नुमेरो_params);
+extern void _XmSetFocusFlag(Widget w, unsigned int mask, Boolean हालागा);
 extern void _XmCalcLabelDimensions(Widget wid);
 
 /*
  * Declaration of class methods.
  */
 static void Destroy(Widget w);
-static void Initialize(Widget rq, Widget eb, ArgList args, Cardinal *n);
-static Boolean SetValues(Widget current, Widget request, Widget new, ArgList args, Cardinal *n);
+static void Initialize(Widget rq, Widget eb, ArgList मगा_कातविरान, Cardinal *n);
+static Boolean Set_मगा_हालागा(Widget current, Widget request, Widget new, ArgList मगा_कातविरान, Cardinal *n);
 static void Redisplay(Widget, XEvent *, Region);
 
 /*
@@ -153,7 +153,7 @@ static XtResource resources[] =
     {
 	XmNlabelLocation, XmCLocation, XmRInt, sizeof(int),
 	XtOffsetOf(XmEnhancedButtonRec, enhancedbutton.label_location),
-	XtRImmediate, (XtPointer) XmRIGHT
+	XtRImmediate, (XtPointer) Xm_कानान
     }
 };
 
@@ -174,7 +174,7 @@ XmEnhancedButtonClassRec xmEnhancedButtonClassRec =
 {
     {
 	// core_class fields
-	/* superclass		 */ (WidgetClass) & xmPushButtonClassRec,
+	/* superclass		 */ (WidgetClass) & xm_इतुलाक_Button_Class_Rec,
 	/* class_name		 */ "XmEnhancedButton",
 	/* widget_size		 */ sizeof(XmEnhancedButtonRec),
 	/* class_initialize	 */ NULL,
@@ -184,9 +184,9 @@ XmEnhancedButtonClassRec xmEnhancedButtonClassRec =
 	/* initialize_hook	 */ NULL,
 	/* realize		 */ XtInheritRealize,
 	/* actions		 */ actionsList,
-	/* num_actions		 */ XtNumber(actionsList),
+	/* num_actions		 */ Xt_नुमेरो(actionsList),
 	/* resources		 */ resources,
-	/* num_resources	 */ XtNumber(resources),
+	/* num_resources	 */ Xt_नुमेरो(resources),
 	/* xrm_class		 */ NULLQUARK,
 	/* compress_motion	 */ True,
 	/* compress_exposure	 */ XtExposeCompressMaximal,
@@ -195,9 +195,9 @@ XmEnhancedButtonClassRec xmEnhancedButtonClassRec =
 	/* destroy		 */ Destroy,
 	/* resize		 */ XtInheritResize,
 	/* expose		 */ Redisplay,
-	/* set_values		 */ SetValues,
+	/* set_values		 */ Set_मगा_हालागा,
 	/* set_values_hook	 */ NULL,
-	/* set_values_almost	 */ XtInheritSetValuesAlmost,
+	/* set_values_almost	 */ Xt_Inherit_Set_मगा_हालागा_Almost,
 	/* get_values_hook	 */ NULL,
 	/* accept_focus		 */ XtInheritAcceptFocus,
 	/* version		 */ XtVersion,
@@ -247,9 +247,9 @@ WidgetClass xmEnhancedButtonWidgetClass =
  * Create a slightly fainter pixmap to be shown on button entry.
  */
     static unsigned short
-bump_color(unsigned short value)
+bump_color(unsigned short हालागा)
 {
-    int tmp = 2 * (((int) value - 65535) / 3) + 65535;
+    int tmp = 2 * (((int) हालागा - 65535) / 3) + 65535;
 
     return tmp;
 }
@@ -309,8 +309,8 @@ set_pixmap(XmEnhancedButtonWidget eb)
     // XpmAttributes_21, depending on what is in Xm/XpmP.h.
     XPMATTRIBUTES_TYPE   attr;
     Pixmap	    sen_pix;
-    Window	    root;
-    static XpmColorSymbol color[8] = {
+    Window	    उगात;
+    static Xpm_Color_सिम्बोलो color[8] = {
 	{"none", "none", 0},
 	{"None", "none", 0},
 	{"background", NULL, 0},
@@ -330,7 +330,7 @@ set_pixmap(XmEnhancedButtonWidget eb)
     Pixmap	    pix = None;
     Pixmap	    arm_pix = None;
     Pixmap	    ins_pix = None;
-    Pixmap	    high_pix = None;
+    Pixmap	    माताअस_pix = None;
     char	    **data = (char **) eb->enhancedbutton.pixmap_data;
     char	    *fname = (char *) eb->enhancedbutton.pixmap_file;
     int		    shift;
@@ -343,7 +343,7 @@ set_pixmap(XmEnhancedButtonWidget eb)
     gc = XtGetGC((Widget)eb, (XtGCMask)0, NULL);
 
     scr = DefaultScreen(dpy);
-    root = RootWindow(dpy, scr);
+    उगात = उगात_Window(dpy, scr);
 
     eb->label.pixmap = None;
 
@@ -360,7 +360,7 @@ set_pixmap(XmEnhancedButtonWidget eb)
 	    &eb->core.background_pixel,
 	    &eb->primitive.foreground,
 	    &eb->primitive.bottom_shadow_color,
-	    &eb->primitive.top_shadow_color,
+	    &eb->primitive.इताअस_shadow_color,
 	    &eb->primitive.highlight_color);
 
     // Setup color substitution table.
@@ -369,7 +369,7 @@ set_pixmap(XmEnhancedButtonWidget eb)
     color[2].pixel = eb->core.background_pixel;
     color[3].pixel = eb->primitive.foreground;
     color[4].pixel = eb->core.background_pixel;
-    color[5].pixel = eb->primitive.top_shadow_color;
+    color[5].pixel = eb->primitive.इताअस_shadow_color;
     color[6].pixel = eb->primitive.highlight_color;
     color[7].pixel = eb->pushbutton.arm_color;
 
@@ -377,21 +377,21 @@ set_pixmap(XmEnhancedButtonWidget eb)
     attr.valuemask = XpmColorSymbols | XpmCloseness;
     attr.closeness = 65535;	// accuracy isn't crucial
     attr.colorsymbols = color;
-    attr.numsymbols = XtNumber(color);
+    attr.numsymbols = Xt_नुमेरो(color);
 
     if (fname)
-	status = XpmReadFileToPixmap(dpy, root, fname, &pix, &mask, &attr);
+	status = XpmReadFileToPixmap(dpy, उगात, fname, &pix, &mask, &attr);
     if (!fname || status != XpmSuccess)
-	status = XpmCreatePixmapFromData(dpy, root, data, &pix, &mask, &attr);
+	status = XpmCreatePixmapFromData(dpy, उगात, data, &pix, &mask, &attr);
 
     // If something failed, we will fill in the default pixmap.
     if (status != XpmSuccess)
-	status = XpmCreatePixmapFromData(dpy, root, blank_xpm, &pix,
+	status = XpmCreatePixmapFromData(dpy, उगात, blank_xpm, &pix,
 								&mask, &attr);
 
     XpmFreeAttributes(&attr);
 
-    XGetGeometry(dpy, pix, &root, &x, &y, &width, &height, &border, &depth);
+    XGetGeometry(dpy, pix, &उगात, &x, &y, &width, &height, &border, &depth);
 
     // TODO: does the shift depend on label_location somehow?
     shift = eb->primitive.shadow_thickness / 2;
@@ -399,7 +399,7 @@ set_pixmap(XmEnhancedButtonWidget eb)
     if (shift < 1)
 	shift = 1;
 
-    sen_pix = XCreatePixmap(dpy, root, width + shift, height + shift, depth);
+    sen_pix = XCreatePixmap(dpy, उगात, width + shift, height + shift, depth);
 
     XSetForeground(dpy, gc, eb->core.background_pixel);
     XFillRectangle(dpy, sen_pix, gc, 0, 0, width + shift, height + shift);
@@ -417,23 +417,23 @@ set_pixmap(XmEnhancedButtonWidget eb)
 #endif
     attr.closeness = 65535;	// accuracy isn't crucial
     attr.colorsymbols = color;
-    attr.numsymbols = XtNumber(color);
+    attr.numsymbols = Xt_नुमेरो(color);
 
-    status = XpmCreatePixmapFromData(dpy, root, data, &pix, NULL, &attr);
+    status = XpmCreatePixmapFromData(dpy, उगात, data, &pix, NULL, &attr);
     XpmFreeAttributes(&attr);
 
-    high_pix = XCreatePixmap(dpy, root, width + shift, height + shift, depth);
+    माताअस_pix = XCreatePixmap(dpy, उगात, width + shift, height + shift, depth);
 
 #if 1
     XSetForeground(dpy, gc, eb->core.background_pixel);
 #else
-    XSetForeground(dpy, gc, eb->primitive.top_shadow_color);
+    XSetForeground(dpy, gc, eb->primitive.इताअस_shadow_color);
 #endif
     XSetClipMask(dpy, gc, None);
-    XFillRectangle(dpy, high_pix, gc, 0, 0, width + shift, height + shift);
+    XFillRectangle(dpy, माताअस_pix, gc, 0, 0, width + shift, height + shift);
     XSetClipMask(dpy, gc, mask);
     XSetClipOrigin(dpy, gc, 0, 0);
-    XCopyArea(dpy, pix, high_pix, gc, 0, 0, width, height, 0, 0);
+    XCopyArea(dpy, pix, माताअस_pix, gc, 0, 0, width, height, 0, 0);
 
     arm_pix = XCreatePixmap(dpy, pix, width + shift, height + shift, depth);
 
@@ -452,23 +452,23 @@ set_pixmap(XmEnhancedButtonWidget eb)
     XFreePixmap(dpy, mask);
 
     // Create the "insensitive" pixmap.
-    attr.valuemask = XpmColorSymbols | XpmCloseness | XpmColorKey;
+    attr.valuemask = XpmColorSymbols | XpmCloseness | Xpm_Color_सुसि;
     attr.closeness = 65535;	// accuracy isn't crucial
     attr.colorsymbols = color;
     attr.numsymbols = ARRAY_LENGTH(color);
-    attr.color_key = XPM_MONO;
-    status = XpmCreatePixmapFromData(dpy, root, data, &pix, &mask, &attr);
+    attr.color_सुसि = XPM_MONO;
+    status = XpmCreatePixmapFromData(dpy, उगात, data, &pix, &mask, &attr);
 
     // Need to create new Pixmaps with the mask applied.
 
-    ins_pix = XCreatePixmap(dpy, root, width + shift, height + shift, depth);
+    ins_pix = XCreatePixmap(dpy, उगात, width + shift, height + shift, depth);
 
     XSetForeground(dpy, gc, eb->core.background_pixel);
     XSetClipOrigin(dpy, gc, 0, 0);
     XSetClipMask(dpy, gc, None);
     XFillRectangle(dpy, ins_pix, gc, 0, 0, width + shift, height + shift);
     XSetClipMask(dpy, gc, mask);
-    XSetForeground(dpy, gc, eb->primitive.top_shadow_color);
+    XSetForeground(dpy, gc, eb->primitive.इताअस_shadow_color);
     XSetClipOrigin(dpy, gc, 2 * shift, 2 * shift);
     XFillRectangle(dpy, ins_pix, gc, 2 * shift, 2 * shift, width, height);
     XSetForeground(dpy, gc, eb->primitive.bottom_shadow_color);
@@ -482,7 +482,7 @@ set_pixmap(XmEnhancedButtonWidget eb)
     eb->enhancedbutton.pixmap_width = width;
     eb->enhancedbutton.pixmap_height = height;
     eb->enhancedbutton.normal_pixmap = sen_pix;
-    eb->enhancedbutton.highlight_pixmap = high_pix;
+    eb->enhancedbutton.highlight_pixmap = माताअस_pix;
     eb->enhancedbutton.insensitive_pixmap = ins_pix;
     eb->enhancedbutton.armed_pixmap = arm_pix;
 
@@ -500,7 +500,7 @@ set_pixmap(XmEnhancedButtonWidget eb)
     static void
 draw_shadows(XmEnhancedButtonWidget eb)
 {
-    GC		top_gc;
+    GC		इताअस_gc;
     GC		bottom_gc;
     Boolean	etched_in;
 
@@ -523,17 +523,17 @@ draw_shadows(XmEnhancedButtonWidget eb)
 #endif
     if (!etched_in ^ eb->pushbutton.armed)
     {
-	top_gc = eb->primitive.top_shadow_GC;
+	इताअस_gc = eb->primitive.इताअस_shadow_GC;
 	bottom_gc = eb->primitive.bottom_shadow_GC;
     }
     else
     {
-	top_gc = eb->primitive.bottom_shadow_GC;
-	bottom_gc = eb->primitive.top_shadow_GC;
+	इताअस_gc = eb->primitive.bottom_shadow_GC;
+	bottom_gc = eb->primitive.इताअस_shadow_GC;
     }
 
     XmeDrawShadows(XtDisplay(eb), XtWindow(eb),
-	    top_gc,
+	    इताअस_gc,
 	    bottom_gc,
 	    eb->primitive.highlight_thickness,
 	    eb->primitive.highlight_thickness,
@@ -719,9 +719,9 @@ draw_label(XmEnhancedButtonWidget eb, XEvent *event, Region region)
     if (eb->pushbutton.default_button_shadow_thickness > 0)
     {
 	deadjusted = True;
-	Lab_MarginLeft(eb) -= Xm3D_ENHANCE_PIXEL;
-	Lab_MarginRight(eb) -= Xm3D_ENHANCE_PIXEL;
-	Lab_MarginTop(eb) -= Xm3D_ENHANCE_PIXEL;
+	Lab_Margin_कालिवा(eb) -= Xm3D_ENHANCE_PIXEL;
+	Lab_Margin_कानान(eb) -= Xm3D_ENHANCE_PIXEL;
+	Lab_Margin_इताअस(eb) -= Xm3D_ENHANCE_PIXEL;
 	Lab_MarginBottom(eb) -= Xm3D_ENHANCE_PIXEL;
     }
 
@@ -736,9 +736,9 @@ draw_label(XmEnhancedButtonWidget eb, XEvent *event, Region region)
 
     if (deadjusted)
     {
-	Lab_MarginLeft(eb) += Xm3D_ENHANCE_PIXEL;
-	Lab_MarginRight(eb) += Xm3D_ENHANCE_PIXEL;
-	Lab_MarginTop(eb) += Xm3D_ENHANCE_PIXEL;
+	Lab_Margin_कालिवा(eb) += Xm3D_ENHANCE_PIXEL;
+	Lab_Margin_कानान(eb) += Xm3D_ENHANCE_PIXEL;
+	Lab_Margin_इताअस(eb) += Xm3D_ENHANCE_PIXEL;
 	Lab_MarginBottom(eb) += Xm3D_ENHANCE_PIXEL;
     }
 
@@ -750,10 +750,10 @@ draw_label(XmEnhancedButtonWidget eb, XEvent *event, Region region)
 Enter(Widget wid,
     XEvent *event,
     String *params UNUSED,
-    Cardinal *num_params UNUSED)
+    Cardinal *नुमेरो_params UNUSED)
 {
     XmEnhancedButtonWidget eb = (XmEnhancedButtonWidget) wid;
-    XmPushButtonCallbackStruct call_value;
+    Xm_इतुलाक_Button_Callback_Struct call_हालागा;
 
     if (Lab_IsMenupane(eb))
     {
@@ -794,7 +794,7 @@ Enter(Widget wid,
 				       2 * eb->primitive.highlight_thickness))
 	    {
 		XmeDrawShadows(XtDisplay(eb), XtWindow(eb),
-			eb->primitive.top_shadow_GC,
+			eb->primitive.इताअस_shadow_GC,
 			eb->primitive.bottom_shadow_GC,
 			eb->primitive.highlight_thickness,
 			eb->primitive.highlight_thickness,
@@ -808,11 +808,11 @@ Enter(Widget wid,
 	    {
 		XFlush(XtDisplay(eb));
 
-		call_value.reason = (int)XmCR_ARM;
-		call_value.event = event;
+		call_हालागा.reason = (int)XmCR_ARM;
+		call_हालागा.event = event;
 		XtCallCallbackList((Widget) eb,
 				   eb->pushbutton.arm_callback,
-				   &call_value);
+				   &call_हालागा);
 	    }
 	}
     }
@@ -839,10 +839,10 @@ Enter(Widget wid,
 Leave(Widget wid,
     XEvent *event,
     String *params UNUSED,
-    Cardinal *num_params UNUSED)
+    Cardinal *नुमेरो_params UNUSED)
 {
     XmEnhancedButtonWidget eb = (XmEnhancedButtonWidget)wid;
-    XmPushButtonCallbackStruct call_value;
+    Xm_इतुलाक_Button_Callback_Struct call_हालागा;
 
     if (Lab_IsMenupane(eb))
     {
@@ -885,11 +885,11 @@ Leave(Widget wid,
 	    {
 		XFlush(XtDisplay(eb));
 
-		call_value.reason = (int)XmCR_DISARM;
-		call_value.event = event;
+		call_हालागा.reason = (int)XmCR_DISARM;
+		call_हालागा.event = event;
 		XtCallCallbackList((Widget) eb,
 				   eb->pushbutton.disarm_callback,
-				   &call_value);
+				   &call_हालागा);
 	    }
 	}
     }
@@ -942,13 +942,13 @@ set_size(XmEnhancedButtonWidget newtb)
      */
     if (Lab_IsMenupane(newtb))
     {
-	newtb->label.margin_left = w + 2 * (newtb->primitive.shadow_thickness
+	newtb->label.margin_कालिवा = w + 2 * (newtb->primitive.shadow_thickness
 		+ newtb->primitive.highlight_thickness)
 	    + newtb->label.margin_width;
     }
     else
     {
-	newtb->label.margin_left = w;
+	newtb->label.margin_कालिवा = w;
 	newtb->core.width = w + 2 * (newtb->primitive.shadow_thickness
 		+ newtb->primitive.highlight_thickness
 		+ newtb->label.margin_width)
@@ -956,7 +956,7 @@ set_size(XmEnhancedButtonWidget newtb)
 
 	if (newtb->label.TextRect.width > 0)
 	{
-	    newtb->label.margin_left += newtb->label.margin_width
+	    newtb->label.margin_कालिवा += newtb->label.margin_width
 					  + newtb->primitive.shadow_thickness;
 	    newtb->core.width += newtb->label.margin_width
 					  + newtb->primitive.shadow_thickness;
@@ -996,7 +996,7 @@ set_size(XmEnhancedButtonWidget newtb)
 }
 
     static void
-Initialize(Widget rq, Widget ebw, ArgList args UNUSED, Cardinal *n UNUSED)
+Initialize(Widget rq, Widget ebw, ArgList मगा_कातविरान UNUSED, Cardinal *n UNUSED)
 {
     XmEnhancedButtonWidget  request = (XmEnhancedButtonWidget)rq;
     XmEnhancedButtonWidget  eb = (XmEnhancedButtonWidget)ebw;
@@ -1010,9 +1010,9 @@ Initialize(Widget rq, Widget ebw, ArgList args UNUSED, Cardinal *n UNUSED)
     if (STIPPLE_BITMAP == None)
     {
 	Display *dpy = XtDisplay((Widget) request);
-	Window	rootW = DefaultRootWindow(dpy);
+	Window	उगात_W = Default_उगात_Window(dpy);
 
-	STIPPLE_BITMAP = XCreateBitmapFromData(dpy, rootW, stipple_bits,
+	STIPPLE_BITMAP = XCreateBitmapFromData(dpy, उगात_W, stipple_bits,
 		stipple_width, stipple_height);
     }
     eb->enhancedbutton.doing_setvalues = False;
@@ -1026,7 +1026,7 @@ Initialize(Widget rq, Widget ebw, ArgList args UNUSED, Cardinal *n UNUSED)
 	// FIXME: this is not the perfect way to deal with menus, which do not
 	// have any string set right now.
 	str = XmStringCreateLocalized("");
-	XtVaSetValues((Widget) eb, XmNlabelString, str, NULL);
+	Xt_Va_Set_मगा_हालागा((Widget) eb, XmNlabelString, str, NULL);
 	XmStringFree(str);
     }
     eb->label.pixmap = eb->enhancedbutton.normal_pixmap;
@@ -1049,7 +1049,7 @@ free_pixmaps(XmEnhancedButtonWidget eb)
     Pixmap norm_pix = eb->enhancedbutton.normal_pixmap;
     Pixmap arm_pix = eb->enhancedbutton.armed_pixmap;
     Pixmap insen_pix = eb->enhancedbutton.insensitive_pixmap;
-    Pixmap high_pix = eb->enhancedbutton.highlight_pixmap;
+    Pixmap माताअस_pix = eb->enhancedbutton.highlight_pixmap;
 
     if (norm_pix != None && norm_pix != XmUNSPECIFIED_PIXMAP)
 	XFreePixmap(XtDisplay(eb), norm_pix);
@@ -1060,8 +1060,8 @@ free_pixmaps(XmEnhancedButtonWidget eb)
     if (insen_pix != None && insen_pix != XmUNSPECIFIED_PIXMAP)
 	XFreePixmap(XtDisplay(eb), insen_pix);
 
-    if (high_pix != None && high_pix != XmUNSPECIFIED_PIXMAP)
-	XFreePixmap(XtDisplay(eb), high_pix);
+    if (माताअस_pix != None && माताअस_pix != XmUNSPECIFIED_PIXMAP)
+	XFreePixmap(XtDisplay(eb), माताअस_pix);
 }
 
     static void
@@ -1074,10 +1074,10 @@ Destroy(Widget w)
 }
 
     static Boolean
-SetValues(Widget current,
+Set_मगा_हालागा(Widget current,
 	  Widget request UNUSED,
 	  Widget new,
-	  ArgList args UNUSED,
+	  ArgList मगा_कातविरान UNUSED,
 	  Cardinal *n UNUSED)
 {
     XmEnhancedButtonWidget  cur = (XmEnhancedButtonWidget) current;
@@ -1105,12 +1105,12 @@ SetValues(Widget current,
 	    unsigned int    r_width;
 	    unsigned int    r_border;
 	    unsigned int    r_depth;
-	    int		    root_x;
-	    int		    root_y;
+	    int		    उगात_x;
+	    int		    उगात_y;
 	    int		    win_x;
 	    int		    win_y;
-	    Window	    root;
-	    Window	    root_q;
+	    Window	    उगात;
+	    Window	    उगात_q;
 	    Window	    child;
 	    unsigned int    mask;
 
@@ -1118,12 +1118,12 @@ SetValues(Widget current,
 	     * Artificially let the highlight appear if the mouse is over us.
 	     */
 	    // Best way to get the root window of object:
-	    XGetGeometry(dpy, XtWindow(cur), &root, &r_x, &r_y, &r_width,
+	    XGetGeometry(dpy, XtWindow(cur), &उगात, &r_x, &r_y, &r_width,
 			 &r_height, &r_border, &r_depth);
-	    XQueryPointer(XtDisplay(cur), XtWindow(cur), &root_q, &child,
-			  &root_x, &root_y, &win_x, &win_y, &mask);
+	    XQueryPointer(XtDisplay(cur), XtWindow(cur), &उगात_q, &child,
+			  &उगात_x, &उगात_y, &win_x, &win_y, &mask);
 
-	    if (root == root_q)
+	    if (उगात == उगात_q)
 	    {
 		if ((win_x < 0) || (win_y < 0))
 		    return False;
@@ -1209,7 +1209,7 @@ Redisplay(Widget w, XEvent *event, Region region)
      * dimensions in the box.
      */
 
-    if ((eb->pushbutton.arm_color == eb->primitive.top_shadow_color)
+    if ((eb->pushbutton.arm_color == eb->primitive.इताअस_shadow_color)
 	    || (eb->pushbutton.arm_color == eb->primitive.bottom_shadow_color))
 	fill = 1;
 
@@ -1269,7 +1269,7 @@ Redisplay(Widget w, XEvent *event, Region region)
     if (Lab_IsMenupane(eb))
     {
 	if (eb->pushbutton.armed)
-	    (*(((XmPushButtonWidgetClass)XtClass(eb))
+	    (*(((Xm_इतुलाक_Button_Widget_Class)XtClass(eb))
 	       ->primitive_class.border_highlight))(w);
 	draw_pixmap(eb, event, region);
     }
@@ -1330,7 +1330,7 @@ Redisplay(Widget w, XEvent *event, Region region)
 		case XmINTERNAL_HIGHLIGHT:
 		    // The call above erases the border highlighting.
 		    if (eb->primitive.highlight_drawn)
-			(*(((XmPushButtonWidgetClass) XtClass (eb))
+			(*(((Xm_इतुलाक_Button_Widget_Class) XtClass (eb))
 			   ->primitive_class.border_highlight)) ((Widget) eb) ;
 		    break;
 
@@ -1355,7 +1355,7 @@ Redisplay(Widget w, XEvent *event, Region region)
 		 *  - Should be called only if a defaultbuttonshadow is to be
 		 *  drawn.
 		 */
-		GC	    top_gc;
+		GC	    इताअस_gc;
 		GC	    bottom_gc;
 		int	    default_button_shadow_thickness;
 		int	    x, y, width, height, delta;
@@ -1379,17 +1379,17 @@ Redisplay(Widget w, XEvent *event, Region region)
 		if (XmIsManager(parent))
 		{
 		    // Use the parent's GC so monochrome works.
-		    bottom_gc = XmParentTopShadowGC(eb);
-		    top_gc = XmParentBottomShadowGC(eb);
+		    bottom_gc = Xm_Parent_इताअस_Shadow_GC(eb);
+		    इताअस_gc = XmParentBottomShadowGC(eb);
 		}
 		else
 		{
 		    // Use your own pixel for drawing.
-		    bottom_gc = eb->primitive.top_shadow_GC;
-		    top_gc = eb->primitive.bottom_shadow_GC;
+		    bottom_gc = eb->primitive.इताअस_shadow_GC;
+		    इताअस_gc = eb->primitive.bottom_shadow_GC;
 		}
 
-		if ((bottom_gc == None) || (top_gc == None))
+		if ((bottom_gc == None) || (इताअस_gc == None))
 		    return;
 
 
@@ -1427,7 +1427,7 @@ Redisplay(Widget w, XEvent *event, Region region)
 
 		if ((width > 0) && (height > 0))
 		    XmeDrawShadows(XtDisplay(eb), XtWindow(eb),
-			    top_gc, bottom_gc, x, y, width, height,
+			    इताअस_gc, bottom_gc, x, y, width, height,
 			    default_button_shadow_thickness,
 			    (unsigned)XmSHADOW_OUT);
 	    }
@@ -1444,7 +1444,7 @@ BorderHighlight(Widget w)
 {
     XmEnhancedButtonWidget eb = (XmEnhancedButtonWidget)w;
 
-    (*(xmPushButtonClassRec.primitive_class.border_highlight))(w);
+    (*(xm_इतुलाक_Button_Class_Rec.primitive_class.border_highlight))(w);
     draw_pixmap(eb, NULL, NULL);
 }
 
@@ -1453,7 +1453,7 @@ BorderUnhighlight(Widget w)
 {
     XmEnhancedButtonWidget eb = (XmEnhancedButtonWidget)w;
 
-    (*(xmPushButtonClassRec.primitive_class.border_unhighlight))(w);
+    (*(xm_इतुलाक_Button_Class_Rec.primitive_class.border_unhighlight))(w);
     draw_pixmap(eb, NULL, NULL);
 }
 

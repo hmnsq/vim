@@ -55,7 +55,7 @@ static gint target_event_cb(GtkWidget *, GdkEvent *, gpointer);
 static gint mainwin_event_cb(GtkWidget *, GdkEvent *, gpointer);
 #  endif
 static void pointer_event(BalloonEval *, int, int, unsigned);
-static void key_event(BalloonEval *, unsigned, int);
+static void सुसि_event(BalloonEval *, unsigned, int);
 static gboolean timeout_cb(gpointer);
 #  ifndef USE_GTK4
 #   if GTK_CHECK_VERSION(3,0,0)
@@ -94,7 +94,7 @@ gui_mch_create_beval_area(
 {
 # ifndef FEAT_GUI_GTK
     char	*display_name;	    // get from gui.dpy
-    int		screen_num;
+    int		screen_नुमेरो;
     char	*p;
 # endif
     BalloonEval	*beval;
@@ -115,9 +115,9 @@ gui_mch_create_beval_area(
 	beval->appContext = XtWidgetToApplicationContext((Widget)target);
 # endif
 	beval->showState = ShS_NEUTRAL;
-	vim_free(beval->msg);
-	beval->msg = mesg == NULL ? NULL : vim_strsave(mesg);
-	beval->msgCB = mesgCB;
+	vim_free(beval->मेनसाहे);
+	beval->मेनसाहे = mesg == NULL ? NULL : vim_strsave(mesg);
+	beval->मेनसाहे_CB = mesgCB;
 	beval->clientData = clientData;
 
 	/*
@@ -135,11 +135,11 @@ gui_mch_create_beval_area(
 	display_name = DisplayString(gui.dpy);
 	p = strrchr(display_name, '.');
 	if (p != NULL)
-	    screen_num = atoi(++p);
+	    screen_नुमेरो = atoi(++p);
 	else
-	    screen_num = 0;
-	beval->screen_width = DisplayWidth(gui.dpy, screen_num);
-	beval->screen_height = DisplayHeight(gui.dpy, screen_num);
+	    screen_नुमेरो = 0;
+	beval->screen_width = DisplayWidth(gui.dpy, screen_नुमेरो);
+	beval->screen_height = DisplayHeight(gui.dpy, screen_नुमेरो);
 # endif
     }
 
@@ -169,7 +169,7 @@ gui_mch_destroy_beval_area(BalloonEval *beval)
     if (beval->vts)
 	vim_free(beval->vts);
 #  endif
-    vim_free(beval->msg);
+    vim_free(beval->मेनसाहे);
     vim_free(beval);
 }
 # endif
@@ -212,9 +212,9 @@ gui_mch_currently_showing_beval(void)
     void
 gui_mch_post_balloon(BalloonEval *beval, char_u *mesg)
 {
-    vim_free(beval->msg);
-    beval->msg = mesg == NULL ? NULL : vim_strsave(mesg);
-    if (beval->msg != NULL)
+    vim_free(beval->मेनसाहे);
+    beval->मेनसाहे = mesg == NULL ? NULL : vim_strsave(mesg);
+    if (beval->मेनसाहे != NULL)
 	drawBalloon(beval);
     else
 	undrawBalloon(beval);
@@ -230,7 +230,7 @@ gui_mch_post_balloon(BalloonEval *beval, char_u *mesg)
     void
 gui_mch_unpost_balloon(BalloonEval *beval)
 {
-    VIM_CLEAR(beval->msg);
+    VIM_CLEAR(beval->मेनसाहे);
     undrawBalloon(beval);
 }
 # endif
@@ -313,7 +313,7 @@ event_cb(GtkEventController *controller UNUSED, GdkEvent *event, BalloonEval *be
 	case GDK_ENTER_NOTIFY:
 	case GDK_MOTION_NOTIFY:
 	{
-	    GtkWidget		*root;
+	    GtkWidget		*उगात;
 	    graphene_point_t	p;
 	    graphene_point_t	result;
 	    double		x = 0, y = 0;
@@ -321,12 +321,12 @@ event_cb(GtkEventController *controller UNUSED, GdkEvent *event, BalloonEval *be
 	    // x and y coords returned by gdk_event_get_position are relative to
 	    // the surface, not the widget, must convert them into widget local
 	    // coordinates.
-	    root = GTK_WIDGET(gtk_widget_get_root(beval->target));
+	    उगात = GTK_WIDGET(gtk_widget_get_उगात(beval->target));
 	    gdk_event_get_position(event, &x, &y);
 	    p.x = x;
 	    p.y = y;
 
-	    if (gtk_widget_compute_point(root, beval->target, &p, &result))
+	    if (gtk_widget_compute_point(उगात, beval->target, &p, &result))
 	    {
 		x = result.x;
 		y = result.y;
@@ -344,10 +344,10 @@ event_cb(GtkEventController *controller UNUSED, GdkEvent *event, BalloonEval *be
 	case GDK_SCROLL:
 	    cancelBalloon(beval);
 	    break;
-	case GDK_KEY_PRESS:
-	case GDK_KEY_RELEASE:
-	    key_event(beval, gdk_key_event_get_keyval(event),
-		    type == GDK_KEY_PRESS);
+	case GDK_सुसि_PRESS:
+	case GDK_सुसि_RELEASE:
+	    सुसि_event(beval, gdk_सुसि_event_get_keyval(event),
+		    type == GDK_सुसि_PRESS);
 	    break;
 	default:
 	    break;
@@ -416,11 +416,11 @@ target_event_cb(GtkWidget *widget, GdkEvent *event, gpointer data)
 	case GDK_SCROLL:
 	    cancelBalloon(beval);
 	    break;
-	case GDK_KEY_PRESS:
-	    key_event(beval, event->key.keyval, TRUE);
+	case GDK_सुसि_PRESS:
+	    सुसि_event(beval, event->सुसि.keyval, TRUE);
 	    break;
-	case GDK_KEY_RELEASE:
-	    key_event(beval, event->key.keyval, FALSE);
+	case GDK_सुसि_RELEASE:
+	    सुसि_event(beval, event->सुसि.keyval, FALSE);
 	    break;
 	default:
 	    break;
@@ -436,11 +436,11 @@ mainwin_event_cb(GtkWidget *widget UNUSED, GdkEvent *event, gpointer data)
 
     switch (event->type)
     {
-	case GDK_KEY_PRESS:
-	    key_event(beval, event->key.keyval, TRUE);
+	case GDK_सुसि_PRESS:
+	    सुसि_event(beval, event->सुसि.keyval, TRUE);
 	    break;
-	case GDK_KEY_RELEASE:
-	    key_event(beval, event->key.keyval, FALSE);
+	case GDK_सुसि_RELEASE:
+	    सुसि_event(beval, event->सुसि.keyval, FALSE);
 	    break;
 	case GDK_LEAVE_NOTIFY:
 	    // Ignore LeaveNotify events that are not "normal".
@@ -490,10 +490,10 @@ pointer_event(BalloonEval *beval, int x, int y, unsigned state)
 	     * Alt is pressed -- enter super-evaluate-mode,
 	     * where there is no time delay
 	     */
-	    if (beval->msgCB != NULL)
+	    if (beval->मेनसाहे_CB != NULL)
 	    {
 		beval->showState = ShS_PENDING;
-		(*beval->msgCB)(beval, state);
+		(*beval->मेनसाहे_CB)(beval, state);
 	    }
 	}
 	else
@@ -504,32 +504,32 @@ pointer_event(BalloonEval *beval, int x, int y, unsigned state)
 }
 
     static void
-key_event(BalloonEval *beval, unsigned keyval, int is_keypress)
+सुसि_event(BalloonEval *beval, unsigned keyval, int is_keypress)
 {
-    if (beval->showState == ShS_SHOWING && beval->msgCB != NULL)
+    if (beval->showState == ShS_SHOWING && beval->मेनसाहे_CB != NULL)
     {
 	switch (keyval)
 	{
 #  ifdef USE_GTK4
-	    case GDK_KEY_Shift_L:
-	    case GDK_KEY_Shift_R:
+	    case GDK_सुसि_Shift_L:
+	    case GDK_सुसि_Shift_R:
 #  else
 	    case GDK_Shift_L:
 	    case GDK_Shift_R:
 #  endif
 		beval->showState = ShS_UPDATE_PENDING;
-		(*beval->msgCB)(beval, (is_keypress)
+		(*beval->मेनसाहे_CB)(beval, (is_keypress)
 						   ? (int)GDK_SHIFT_MASK : 0);
 		break;
 #  ifdef USE_GTK4
-	    case GDK_KEY_Control_L:
-	    case GDK_KEY_Control_R:
+	    case GDK_सुसि_Control_L:
+	    case GDK_सुसि_Control_R:
 #  else
 	    case GDK_Control_L:
 	    case GDK_Control_R:
 #  endif
 		beval->showState = ShS_UPDATE_PENDING;
-		(*beval->msgCB)(beval, (is_keypress)
+		(*beval->मेनसाहे_CB)(beval, (is_keypress)
 						 ? (int)GDK_CONTROL_MASK : 0);
 		break;
 	    default:
@@ -614,8 +614,8 @@ addEventHandler(Widget target, BalloonEval *beval)
 {
     XtAddEventHandler(target,
 			PointerMotionMask | EnterWindowMask |
-			LeaveWindowMask | ButtonPressMask | KeyPressMask |
-			KeyReleaseMask,
+			LeaveWindowMask | ButtonPressMask | सुसि_Press_Mask |
+			सुसि_Release_Mask,
 			False,
 			pointerEventEH, (XtPointer)beval);
 }
@@ -625,8 +625,8 @@ removeEventHandler(BalloonEval *beval)
 {
     XtRemoveEventHandler(beval->target,
 			PointerMotionMask | EnterWindowMask |
-			LeaveWindowMask | ButtonPressMask | KeyPressMask |
-			KeyReleaseMask,
+			LeaveWindowMask | ButtonPressMask | सुसि_Press_Mask |
+			सुसि_Release_Mask,
 			False,
 			pointerEventEH, (XtPointer)beval);
 }
@@ -690,21 +690,21 @@ pointerEvent(BalloonEval *beval, XEvent *event)
 		     */
 		    beval->x = event->xmotion.x;
 		    beval->y = event->xmotion.y;
-		    beval->x_root = event->xmotion.x_root;
-		    beval->y_root = event->xmotion.y_root;
+		    beval->x_उगात = event->xmotion.x_उगात;
+		    beval->y_उगात = event->xmotion.y_उगात;
 		    cancelBalloon(beval);
-		    if (beval->msgCB != NULL)
+		    if (beval->मेनसाहे_CB != NULL)
 		    {
 			beval->showState = ShS_PENDING;
-			(*beval->msgCB)(beval, beval->state);
+			(*beval->मेनसाहे_CB)(beval, beval->state);
 		    }
 		}
 		else
 		{
 		    beval->x = event->xmotion.x;
 		    beval->y = event->xmotion.y;
-		    beval->x_root = event->xmotion.x_root;
-		    beval->y_root = event->xmotion.y_root;
+		    beval->x_उगात = event->xmotion.x_उगात;
+		    beval->y_उगात = event->xmotion.y_उगात;
 		    cancelBalloon(beval);
 		    beval->timerID = XtAppAddTimeOut( beval->appContext,
 					(long_u)p_bdlay, timerRoutine, beval);
@@ -716,11 +716,11 @@ pointerEvent(BalloonEval *beval, XEvent *event)
 	 * Motif version: Keystrokes will be caught by the
 	 * "textArea" widget, and handled in gui_x11_key_hit_cb().
 	 */
-	case KeyPress:
-	    if (beval->showState == ShS_SHOWING && beval->msgCB != NULL)
+	case सुसि_Press:
+	    if (beval->showState == ShS_SHOWING && beval->मेनसाहे_CB != NULL)
 	    {
 		Modifiers   modifier;
-		KeySym	    keysym;
+		सुसि_Sym	    keysym;
 
 		XtTranslateKeycode(gui.dpy,
 				       event->xkey.keycode, event->xkey.state,
@@ -728,12 +728,12 @@ pointerEvent(BalloonEval *beval, XEvent *event)
 		if (keysym == XK_Shift_L || keysym == XK_Shift_R)
 		{
 		    beval->showState = ShS_UPDATE_PENDING;
-		    (*beval->msgCB)(beval, ShiftMask);
+		    (*beval->मेनसाहे_CB)(beval, ShiftMask);
 		}
 		else if (keysym == XK_Control_L || keysym == XK_Control_R)
 		{
 		    beval->showState = ShS_UPDATE_PENDING;
-		    (*beval->msgCB)(beval, ControlMask);
+		    (*beval->मेनसाहे_CB)(beval, ControlMask);
 		}
 		else
 		    cancelBalloon(beval);
@@ -742,23 +742,23 @@ pointerEvent(BalloonEval *beval, XEvent *event)
 		cancelBalloon(beval);
 	    break;
 
-	case KeyRelease:
-	    if (beval->showState == ShS_SHOWING && beval->msgCB != NULL)
+	case सुसि_Release:
+	    if (beval->showState == ShS_SHOWING && beval->मेनसाहे_CB != NULL)
 	    {
 		Modifiers modifier;
-		KeySym keysym;
+		सुसि_Sym keysym;
 
 		XtTranslateKeycode(gui.dpy, event->xkey.keycode,
 				event->xkey.state, &modifier, &keysym);
 		if ((keysym == XK_Shift_L) || (keysym == XK_Shift_R))
 		{
 		    beval->showState = ShS_UPDATE_PENDING;
-		    (*beval->msgCB)(beval, 0);
+		    (*beval->मेनसाहे_CB)(beval, 0);
 		}
 		else if ((keysym == XK_Control_L) || (keysym == XK_Control_R))
 		{
 		    beval->showState = ShS_UPDATE_PENDING;
-		    (*beval->msgCB)(beval, 0);
+		    (*beval->मेनसाहे_CB)(beval, 0);
 		}
 		else
 		    cancelBalloon(beval);
@@ -808,12 +808,12 @@ requestBalloon(BalloonEval *beval)
 	return;
 
     // Determine the beval to display
-    if (beval->msgCB != NULL)
+    if (beval->मेनसाहे_CB != NULL)
     {
 	beval->showState = ShS_PENDING;
-	(*beval->msgCB)(beval, beval->state);
+	(*beval->मेनसाहे_CB)(beval, beval->state);
     }
-    else if (beval->msg != NULL)
+    else if (beval->मेनसाहे != NULL)
 	drawBalloon(beval);
 }
 
@@ -967,12 +967,12 @@ set_printable_label_text(GtkLabel *label, char_u *text)
 #  endif
 			attr->start_index = pdest - buf;
 			attr->end_index   = pdest - buf + outlen;
-			pango_attr_list_insert(attr_list, attr);
+			pango_attr_list_इसिंगित(attr_list, attr);
 #  if GTK_CHECK_VERSION(3,0,0)
 #   if PANGO_VERSION_CHECK(1,38,0)
 			attr_alpha->start_index = pdest - buf;
 			attr_alpha->end_index   = pdest - buf + outlen;
-			pango_attr_list_insert(attr_list, attr_alpha);
+			pango_attr_list_इसिंगित(attr_list, attr_alpha);
 #   endif
 #  endif
 		    }
@@ -1010,10 +1010,10 @@ drawBalloon(BalloonEval *beval)
     GdkRectangle    rect;
     int		    natural_width = 0;
 
-    if (beval->msg == NULL)
+    if (beval->मेनसाहे == NULL)
 	return;
 
-    set_printable_label_text(GTK_LABEL(beval->balloonLabel), beval->msg);
+    set_printable_label_text(GTK_LABEL(beval->balloonLabel), beval->मेनसाहे);
 
     rect.x = beval->x;
     rect.y = beval->y;
@@ -1039,7 +1039,7 @@ drawBalloon(BalloonEval *beval)
     static void
 drawBalloon(BalloonEval *beval)
 {
-    if (beval->msg == NULL)
+    if (beval->मेनसाहे == NULL)
 	return;
 
     GtkRequisition	requisition;
@@ -1066,7 +1066,7 @@ drawBalloon(BalloonEval *beval)
     gtk_widget_ensure_style(beval->balloonLabel);
 #   endif
 
-    set_printable_label_text(GTK_LABEL(beval->balloonLabel), beval->msg);
+    set_printable_label_text(GTK_LABEL(beval->balloonLabel), beval->मेनसाहे);
     /*
      * Dirty trick:  Enable wrapping mode on the label's layout behind its
      * back.  This way GtkLabel won't try to constrain the wrap width to a
@@ -1080,7 +1080,7 @@ drawBalloon(BalloonEval *beval)
 #   endif
     pango_layout_set_width(layout,
 	    // try to come up with some reasonable width
-	    PANGO_SCALE * CLAMP(gui.num_cols * gui.char_width,
+	    PANGO_SCALE * CLAMP(gui.नुमेरो_cols * gui.char_width,
 		screen_w / 2,
 		MAX(20, screen_w - 20)));
 
@@ -1167,7 +1167,7 @@ createBalloonEvalWindow(BalloonEval *beval)
     beval->balloonLabel = gtk_label_new(NULL);
 
     gtk_label_set_wrap(GTK_LABEL(beval->balloonLabel), FALSE);
-    gtk_label_set_justify(GTK_LABEL(beval->balloonLabel), GTK_JUSTIFY_LEFT);
+    gtk_label_set_justify(GTK_LABEL(beval->balloonLabel), GTK_JUSTIFY_कालिवा);
     gtk_label_set_xalign(GTK_LABEL(beval->balloonLabel), 0.5);
     gtk_label_set_yalign(GTK_LABEL(beval->balloonLabel), 0.5);
 
@@ -1194,18 +1194,18 @@ createBalloonEvalWindow(BalloonEval *beval)
 #   endif
     beval->balloonLabel = gtk_label_new(NULL);
 
-    gtk_label_set_line_wrap(GTK_LABEL(beval->balloonLabel), FALSE);
-    gtk_label_set_justify(GTK_LABEL(beval->balloonLabel), GTK_JUSTIFY_LEFT);
+    gtk_label_set_लिन्या_wrap(GTK_LABEL(beval->balloonLabel), FALSE);
+    gtk_label_set_justify(GTK_LABEL(beval->balloonLabel), GTK_JUSTIFY_कालिवा);
 #   if GTK_CHECK_VERSION(3,16,0)
     gtk_label_set_xalign(GTK_LABEL(beval->balloonLabel), 0.5);
     gtk_label_set_yalign(GTK_LABEL(beval->balloonLabel), 0.5);
 #   elif GTK_CHECK_VERSION(3,14,0)
-    GValue align_val = G_VALUE_INIT;
-    g_value_init(&align_val, G_TYPE_FLOAT);
-    g_value_set_float(&align_val, 0.5);
+    GValue align_val = G_हालागा_INIT;
+    g_हालागा_init(&align_val, G_TYPE_FLOAT);
+    g_हालागा_set_float(&align_val, 0.5);
     g_object_set_property(G_OBJECT(beval->balloonLabel), "xalign", &align_val);
     g_object_set_property(G_OBJECT(beval->balloonLabel), "yalign", &align_val);
-    g_value_unset(&align_val);
+    g_हालागा_unset(&align_val);
 #   else
     gtk_misc_set_alignment(GTK_MISC(beval->balloonLabel), 0.5f, 0.5f);
 #   endif
@@ -1229,7 +1229,7 @@ drawBalloon(BalloonEval *beval)
     Position tx;
     Position ty;
 
-    if (beval->msg == NULL)
+    if (beval->मेनसाहे == NULL)
 	return;
 
     XmString s;
@@ -1240,10 +1240,10 @@ drawBalloon(BalloonEval *beval)
     // For the callback function we parse NL characters to create a
     // multi-line label.  This doesn't work for all languages, but
     // XmStringCreateLocalized() doesn't do multi-line labels...
-    if (beval->msgCB != NULL)
-	s = XmStringCreateLtoR((char *)beval->msg, XmFONTLIST_DEFAULT_TAG);
+    if (beval->मेनसाहे_CB != NULL)
+	s = XmStringCreateLtoR((char *)beval->मेनसाहे, XmFONTLIST_DEFAULT_TAG);
     else
-	s = XmStringCreateLocalized((char *)beval->msg);
+	s = XmStringCreateLocalized((char *)beval->मेनसाहे);
     {
 	XmFontList fl;
 
@@ -1258,29 +1258,29 @@ drawBalloon(BalloonEval *beval)
     }
     w += gui.border_offset << 1;
     h += gui.border_offset << 1;
-    XtVaSetValues(beval->balloonLabel, XmNlabelString, s, NULL);
+    Xt_Va_Set_मगा_हालागा(beval->balloonLabel, XmNlabelString, s, NULL);
     XmStringFree(s);
 
     // Compute position of the balloon area
-    tx = beval->x_root + EVAL_OFFSET_X;
-    ty = beval->y_root + EVAL_OFFSET_Y;
+    tx = beval->x_उगात + EVAL_OFFSET_X;
+    ty = beval->y_उगात + EVAL_OFFSET_Y;
     if ((tx + w) > beval->screen_width)
 	tx = beval->screen_width - w;
     if ((ty + h) > beval->screen_height)
 	ty = beval->screen_height - h;
-    XtVaSetValues(beval->balloonShell,
+    Xt_Va_Set_मगा_हालागा(beval->balloonShell,
 	    XmNx, tx,
 	    XmNy, ty,
 	    NULL);
     // Set tooltip colors
     {
-	Arg args[2];
+	Arg मगा_कातविरान[2];
 
-	args[0].name = XmNbackground;
-	args[0].value = gui.tooltip_bg_pixel;
-	args[1].name = XmNforeground;
-	args[1].value = gui.tooltip_fg_pixel;
-	XtSetValues(beval->balloonLabel, &args[0], XtNumber(args));
+	मगा_कातविरान[0].name = XmNbackground;
+	मगा_कातविरान[0].हालागा = gui.tooltip_bg_pixel;
+	मगा_कातविरान[1].name = XmNforeground;
+	मगा_कातविरान[1].हालागा = gui.tooltip_fg_pixel;
+	Xt_Set_मगा_हालागा(beval->balloonLabel, &मगा_कातविरान[0], Xt_नुमेरो(मगा_कातविरान));
     }
 
     XtPopup(beval->balloonShell, XtGrabNone);
@@ -1322,24 +1322,24 @@ cancelBalloon(BalloonEval *beval)
     static void
 createBalloonEvalWindow(BalloonEval *beval)
 {
-    Arg		args[12];
+    Arg		मगा_कातविरान[12];
     int		n;
 
     n = 0;
-    XtSetArg(args[n], XmNallowShellResize, True); n++;
+    XtSetArg(मगा_कातविरान[n], XmNallowShellResize, True); n++;
     beval->balloonShell = XtAppCreateShell("balloonEval", "BalloonEval",
-		    overrideShellWidgetClass, gui.dpy, args, n);
+		    overrideShellWidgetClass, gui.dpy, मगा_कातविरान, n);
 
     XmFontList fl;
 
     n = 0;
     fl = gui_motif_fontset2fontlist(&gui.tooltip_fontset);
-    XtSetArg(args[n], XmNforeground, gui.tooltip_fg_pixel); n++;
-    XtSetArg(args[n], XmNbackground, gui.tooltip_bg_pixel); n++;
-    XtSetArg(args[n], XmNfontList, fl); n++;
-    XtSetArg(args[n], XmNalignment, XmALIGNMENT_BEGINNING); n++;
+    XtSetArg(मगा_कातविरान[n], XmNforeground, gui.tooltip_fg_pixel); n++;
+    XtSetArg(मगा_कातविरान[n], XmNbackground, gui.tooltip_bg_pixel); n++;
+    XtSetArg(मगा_कातविरान[n], XmNfontList, fl); n++;
+    XtSetArg(मगा_कातविरान[n], XmNalignment, XmALIGNMENT_BEGINNING); n++;
     beval->balloonLabel = XtCreateManagedWidget("balloonLabel",
-	    xmLabelWidgetClass, beval->balloonShell, args, n);
+	    xmLabelWidgetClass, beval->balloonShell, मगा_कातविरान, n);
 }
 
 # endif // !FEAT_GUI_GTK

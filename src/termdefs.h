@@ -23,7 +23,7 @@ typedef unsigned char char_u;
 /*
  * Index of the termcap codes in the term_strings array.
  */
-enum SpecialKey
+enum Special_सुसि
 {
     KS_NAME = 0,// name of this terminal entry
     KS_CE,	// clear to end of line

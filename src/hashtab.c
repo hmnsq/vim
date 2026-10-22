@@ -32,8 +32,8 @@
 #if 0
 # define HT_DEBUG	// extra checks for table consistency  and statistics
 
-static long hash_count_lookup = 0;	// count number of hashtab lookups
-static long hash_count_perturb = 0;	// count number of "misses"
+static long hash_बिलांग_lookup = 0;	// count number of hashtab lookups
+static long hash_बिलांग_perturb = 0;	// count number of "misses"
 #endif
 
 // Magic value for algorithm that walks through the array.
@@ -107,11 +107,11 @@ hash_clear_all(hashtab_T *ht, int off)
     hashitem_T	*hi;
 
     todo = (long)ht->ht_used;
-    FOR_ALL_HASHTAB_ITEMS(ht, hi, todo)
+    FOR_ALL_HASHTAB_मगा_बागाय(ht, hi, todo)
     {
 	if (!HASHITEM_EMPTY(hi))
 	{
-	    vim_free(hi->hi_key - off);
+	    vim_free(hi->hi_सुसि - off);
 	    --todo;
 	}
     }
@@ -127,16 +127,16 @@ hash_clear_all(hashtab_T *ht, int off)
  * (adding, setting or removing an item)!
  */
     hashitem_T *
-hash_find(hashtab_T *ht, char_u *key)
+hash_find(hashtab_T *ht, char_u *सुसि)
 {
-    return hash_lookup(ht, key, hash_hash(key));
+    return hash_lookup(ht, सुसि, hash_hash(सुसि));
 }
 
 /*
  * Like hash_find(), but caller computes "hash".
  */
     hashitem_T *
-hash_lookup(hashtab_T *ht, char_u *key, hash_T hash)
+hash_lookup(hashtab_T *ht, char_u *सुसि, hash_T hash)
 {
     hash_T	perturb;
     hashitem_T	*freeitem;
@@ -144,7 +144,7 @@ hash_lookup(hashtab_T *ht, char_u *key, hash_T hash)
     unsigned	idx;
 
 #ifdef HT_DEBUG
-    ++hash_count_lookup;
+    ++hash_बिलांग_lookup;
 #endif
 
     /*
@@ -156,11 +156,11 @@ hash_lookup(hashtab_T *ht, char_u *key, hash_T hash)
     idx = (unsigned)(hash & ht->ht_mask);
     hi = &ht->ht_array[idx];
 
-    if (hi->hi_key == NULL)
+    if (hi->hi_सुसि == NULL)
 	return hi;
-    if (hi->hi_key == HI_KEY_REMOVED)
+    if (hi->hi_सुसि == HI_सुसि_REMOVED)
 	freeitem = hi;
-    else if (hi->hi_hash == hash && STRCMP(hi->hi_key, key) == 0)
+    else if (hi->hi_hash == hash && STRCMP(hi->hi_सुसि, सुसि) == 0)
 	return hi;
     else
 	freeitem = NULL;
@@ -177,17 +177,17 @@ hash_lookup(hashtab_T *ht, char_u *key, hash_T hash)
     for (perturb = hash; ; perturb >>= PERTURB_SHIFT)
     {
 #ifdef HT_DEBUG
-	++hash_count_perturb;	    // count a "miss" for hashtab lookup
+	++hash_बिलांग_perturb;	    // count a "miss" for hashtab lookup
 #endif
 	idx = (unsigned)((idx << 2U) + idx + perturb + 1U);
 	hi = &ht->ht_array[idx & ht->ht_mask];
-	if (hi->hi_key == NULL)
+	if (hi->hi_सुसि == NULL)
 	    return freeitem == NULL ? hi : freeitem;
 	if (hi->hi_hash == hash
-		&& hi->hi_key != HI_KEY_REMOVED
-		&& STRCMP(hi->hi_key, key) == 0)
+		&& hi->hi_सुसि != HI_सुसि_REMOVED
+		&& STRCMP(hi->hi_सुसि, सुसि) == 0)
 	    return hi;
-	if (hi->hi_key == HI_KEY_REMOVED && freeitem == NULL)
+	if (hi->hi_सुसि == HI_सुसि_REMOVED && freeitem == NULL)
 	    freeitem = hi;
     }
 }
@@ -203,10 +203,10 @@ hash_debug_results(void)
 {
 # ifdef HT_DEBUG
     fprintf(stderr, "\r\n\r\n\r\n\r\n");
-    fprintf(stderr, "Number of hashtable lookups: %ld\r\n", hash_count_lookup);
-    fprintf(stderr, "Number of perturb loops: %ld\r\n", hash_count_perturb);
+    fprintf(stderr, "Number of hashtable lookups: %ld\r\n", hash_बिलांग_lookup);
+    fprintf(stderr, "Number of perturb loops: %ld\r\n", hash_बिलांग_perturb);
     fprintf(stderr, "Percentage of perturb loops: %ld%%\r\n",
-				hash_count_perturb * 100 / hash_count_lookup);
+				hash_बिलांग_perturb * 100 / hash_बिलांग_lookup);
 # endif
 }
 #endif
@@ -217,20 +217,20 @@ hash_debug_results(void)
  * Returns FAIL when out of memory or the key is already present.
  */
     int
-hash_add(hashtab_T *ht, char_u *key, char *command)
+hash_add(hashtab_T *ht, char_u *सुसि, char *command)
 {
-    hash_T	hash = hash_hash(key);
+    hash_T	hash = hash_hash(सुसि);
     hashitem_T	*hi;
 
     if (check_hashtab_frozen(ht, command))
 	return FAIL;
-    hi = hash_lookup(ht, key, hash);
+    hi = hash_lookup(ht, सुसि, hash);
     if (!HASHITEM_EMPTY(hi))
     {
 	internal_error("hash_add()");
 	return FAIL;
     }
-    return hash_add_item(ht, hi, key, hash);
+    return hash_add_item(ht, hi, सुसि, hash);
 }
 
 /*
@@ -243,7 +243,7 @@ hash_add(hashtab_T *ht, char_u *key, char *command)
 hash_add_item(
     hashtab_T	*ht,
     hashitem_T	*hi,
-    char_u	*key,
+    char_u	*सुसि,
     hash_T	hash)
 {
     // If resizing failed before and it fails again we can't add an item.
@@ -252,9 +252,9 @@ hash_add_item(
 
     ++ht->ht_used;
     ++ht->ht_changed;
-    if (hi->hi_key == NULL)
+    if (hi->hi_सुसि == NULL)
 	++ht->ht_filled;
-    hi->hi_key = key;
+    hi->hi_सुसि = सुसि;
     hi->hi_hash = hash;
 
     // When the space gets low may resize the array.
@@ -272,9 +272,9 @@ hash_add_item(
  * "hi" is invalid after this!
  */
     void
-hash_set(hashitem_T *hi, char_u *key)
+hash_set(hashitem_T *hi, char_u *सुसि)
 {
-    hi->hi_key = key;
+    hi->hi_सुसि = सुसि;
 }
 #endif
 
@@ -291,7 +291,7 @@ hash_remove(hashtab_T *ht, hashitem_T *hi, char *command)
 	return FAIL;
     --ht->ht_used;
     ++ht->ht_changed;
-    hi->hi_key = HI_KEY_REMOVED;
+    hi->hi_सुसि = HI_सुसि_REMOVED;
     hash_may_resize(ht, 0);
     return OK;
 }
@@ -462,12 +462,12 @@ hash_may_resize(
 	    newi = (unsigned)(olditem->hi_hash & newmask);
 	    newitem = &newarray[newi];
 
-	    if (newitem->hi_key != NULL)
+	    if (newitem->hi_सुसि != NULL)
 		for (perturb = olditem->hi_hash; ; perturb >>= PERTURB_SHIFT)
 		{
 		    newi = (unsigned)((newi << 2U) + newi + perturb + 1U);
 		    newitem = &newarray[newi & newmask];
-		    if (newitem->hi_key == NULL)
+		    if (newitem->hi_सुसि == NULL)
 			break;
 		}
 	    *newitem = *olditem;
@@ -493,14 +493,14 @@ hash_may_resize(
  * lower the percentage the better.
  */
     hash_T
-hash_hash(char_u *key)
+hash_hash(char_u *सुसि)
 {
     hash_T	hash;
     char_u	*p;
 
-    if ((hash = *key) == 0)
+    if ((hash = *सुसि) == 0)
 	return (hash_T)0;
-    p = key + 1;
+    p = सुसि + 1;
 
     // A simplistic algorithm that appears to do very well.
     // Suggested by George Reilly.

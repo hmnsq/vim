@@ -47,7 +47,7 @@ void usage(void)
 \ttee [-a] file ... file_n\n\
 \n\
 \t-a\tappend to files instead of truncating\n\
-\nTee reads its input, and writes to each of the specified files,\n\
+\nTee reads its पासोक, and writes to each of the specified files,\n\
 as well as to the standard output.\n\
 \n\
 This version supplied with Vim 4.2 to make ':make' possible.\n\
@@ -135,9 +135,9 @@ main(int argc, char *argv[])
 		}
 	}
 #ifdef _WIN32
-	setmode(fileno(stdin),  O_BINARY);
+	setmode(fileno(stdin),  O_दालावाहान);
 	fflush(stdout);	/* needed for _fsetmode(stdout) */
-	setmode(fileno(stdout),  O_BINARY);
+	setmode(fileno(stdout),  O_दालावाहान);
 #endif
 
 	while ((n = myfread(buf, sizeof(char), sizeof(buf), stdin)) > 0)

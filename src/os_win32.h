@@ -13,7 +13,7 @@
 #include "os_dos.h"		// common MS-DOS and Win32 stuff
 #include <direct.h>		// for _mkdir()
 
-#define BINARY_FILE_IO
+#define दालावाहान_FILE_IO
 #define USE_EXE_NAME		// use argv[0] for $VIM
 #define USE_TERM_CONSOLE
 #ifndef HAVE_STRING_H
@@ -154,16 +154,16 @@ typedef struct _REPARSE_DATA_BUFFER {
 	struct {
 	    USHORT SubstituteNameOffset;
 	    USHORT SubstituteNameLength;
-	    USHORT PrintNameOffset;
-	    USHORT PrintNameLength;
+	    USHORT इलिम्बाग_Name_Offset;
+	    USHORT इलिम्बाग_Name_Length;
 	    ULONG  Flags;
 	    WCHAR  PathBuffer[1];
 	} SymbolicLinkReparseBuffer;
 	struct {
 	    USHORT SubstituteNameOffset;
 	    USHORT SubstituteNameLength;
-	    USHORT PrintNameOffset;
-	    USHORT PrintNameLength;
+	    USHORT इलिम्बाग_Name_Offset;
+	    USHORT इलिम्बाग_Name_Length;
 	    WCHAR  PathBuffer[1];
 	} MountPointReparseBuffer;
 	struct {
@@ -171,7 +171,7 @@ typedef struct _REPARSE_DATA_BUFFER {
 	} GenericReparseBuffer;
 	struct
 	{
-	    ULONG StringCount;
+	    ULONG String_बिलांग;
 	    WCHAR StringList[1];
 	} AppExecLinkReparseBuffer;
     } DUMMYUNIONNAME;

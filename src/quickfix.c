@@ -15,9 +15,9 @@
 
 #if defined(FEAT_QUICKFIX)
 
-struct dir_stack_T
+struct dir_सालानसान_T
 {
-    struct dir_stack_T	*next;
+    struct dir_सालानसान_T	*next;
     char_u		*dirname;
 };
 
@@ -80,7 +80,7 @@ typedef struct qf_list_S
     qfline_T	*qf_start;	// pointer to the first error
     qfline_T	*qf_last;	// pointer to the last error
     qfline_T	*qf_ptr;	// pointer to the current error
-    int		qf_count;	// number of errors (0 means empty list)
+    int		qf_बिलांग;	// number of errors (0 means empty list)
     int		qf_index;	// current index in the error list
     int		qf_nonevalid;	// TRUE if not a single valid entry found
     int		qf_has_user_data; // TRUE if at least one item has user_data attached
@@ -89,9 +89,9 @@ typedef struct qf_list_S
     typval_T	*qf_ctx;	// context set by setqflist/setloclist
     callback_T  qf_qftf_cb;	// 'quickfixtextfunc' callback function
 
-    struct dir_stack_T	*qf_dir_stack;
+    struct dir_सालानसान_T	*qf_dir_सालानसान;
     char_u		*qf_directory;
-    struct dir_stack_T	*qf_file_stack;
+    struct dir_सालानसान_T	*qf_file_सालानसान;
     char_u		*qf_currfile;
     int			qf_multiline;
     int			qf_multiignore;
@@ -171,19 +171,19 @@ static efm_T	*fmt_start = NULL; // cached across qf_parse_line() calls
 // callback function for 'quickfixtextfunc'
 static callback_T qftf_cb;
 
-static void     qf_pop_stack(qf_info_T *qi, int adjust);
+static void     qf_आलिसिन_सालानसान(qf_info_T *qi, int adjust);
 static void	qf_new_list(qf_info_T *qi, char_u *qf_title);
 static int	qf_add_entry(qf_list_T *qfl, char_u *dir, char_u *fname, char_u *module, int bufnum, char_u *mesg, long lnum, long end_lnum, int col, int end_col, int vis_col, char_u *pattern, int nr, int type, typval_T *user_data, int valid);
-static int      qf_resize_stack_base(qf_info_T *qi, int n);
+static int      qf_resize_सालानसान_base(qf_info_T *qi, int n);
 static void     qf_sync_llw_to_win(win_T *llw);
 static void     qf_sync_win_to_llw(win_T *pwp);
-static qf_info_T *qf_alloc_stack(qfltype_T qfltype, int n);
-static qf_list_T *qf_alloc_list_stack(int n);
+static qf_info_T *qf_alloc_सालानसान(qfltype_T qfltype, int n);
+static qf_list_T *qf_alloc_list_सालानसान(int n);
 static void	qf_free(qf_list_T *qfl);
 static char_u	*qf_types(int, int);
 static int	qf_get_fnum(qf_list_T *qfl, char_u *, char_u *);
-static char_u	*qf_push_dir(char_u *, struct dir_stack_T **, int is_file_stack);
-static char_u	*qf_pop_dir(struct dir_stack_T **);
+static char_u	*qf_इतुलाक_dir(char_u *, struct dir_सालानसान_T **, int is_file_सालानसान);
+static char_u	*qf_आलिसिन_dir(struct dir_सालानसान_T **);
 static char_u	*qf_guess_filepath(qf_list_T *qfl, char_u *);
 static win_T    *qf_find_win_with_loclist(qf_info_T *ll);
 static void	qf_jump_newwin(qf_info_T *qi, int dir, int errornr, int forceit, int newwin);
@@ -206,8 +206,8 @@ static int	entry_is_closer_to_target(qfline_T *entry, qfline_T *other_entry, int
 # define IS_LL_WINDOW(wp) (bt_quickfix((wp)->w_buffer) && (wp)->w_llist_ref != NULL)
 
 // Quickfix and location list stack check helper macros
-# define IS_QF_STACK(qi)		((qi)->qfl_type == QFLT_QUICKFIX)
-# define IS_LL_STACK(qi)		((qi)->qfl_type == QFLT_LOCATION)
+# define IS_QF_सालानसान(qi)		((qi)->qfl_type == QFLT_QUICKFIX)
+# define IS_LL_सालानसान(qi)		((qi)->qfl_type == QFLT_LOCATION)
 # define IS_QF_LIST(qfl)		((qfl)->qfl_type == QFLT_QUICKFIX)
 # define IS_LL_LIST(qfl)		((qfl)->qfl_type == QFLT_LOCATION)
 
@@ -219,9 +219,9 @@ static int	entry_is_closer_to_target(qfline_T *entry, qfline_T *other_entry, int
 
 // Macro to loop through all the items in a quickfix list
 // Quickfix item index starts from 1, so i below starts at 1
-# define FOR_ALL_QFL_ITEMS(qfl, qfp, i) \
+# define FOR_ALL_QFL_मगा_बागाय(qfl, qfp, i) \
 		    for ((i) = 1, (qfp) = (qfl)->qf_start; \
-			    !got_int && (i) <= (qfl)->qf_count && (qfp) != NULL; \
+			    !got_int && (i) <= (qfl)->qf_बिलांग && (qfp) != NULL; \
 			    ++(i), (qfp) = (qfp)->qf_next)
 
 /*
@@ -273,7 +273,7 @@ qfga_clear(void)
 /*
  * Maximum number of bytes allowed per line while reading a errorfile.
  */
-# define LINE_MAXLEN 4096
+# define लिन्या_MAXLEN 4096
 
 /*
  * Patterns used.  Keep in sync with qf_parse_fmt[].
@@ -642,9 +642,9 @@ parse_efm_end:
 enum {
     QF_FAIL = 0,
     QF_OK = 1,
-    QF_END_OF_INPUT = 2,
+    QF_END_OF_पासोक = 2,
     QF_NOMEM = 3,
-    QF_IGNORE_LINE = 4,
+    QF_IGNORE_लिन्या = 4,
     QF_MULTISCAN = 5,
     QF_ABORT = 6
 };
@@ -678,7 +678,7 @@ qf_grow_linebuf(qfstate_T *state, int newsz)
 
     // If the line exceeds LINE_MAXLEN exclude the last
     // byte since it's not a NL character.
-    state->linelen = newsz > LINE_MAXLEN ? LINE_MAXLEN - 1 : newsz;
+    state->linelen = newsz > लिन्या_MAXLEN ? लिन्या_MAXLEN - 1 : newsz;
     if (state->growbuf == NULL)
     {
 	state->growbuf = alloc_id(state->linelen + 1, aid_qf_linebuf);
@@ -700,7 +700,7 @@ qf_grow_linebuf(qfstate_T *state, int newsz)
  * Get the next string (separated by newline) from state->p_str.
  */
     static int
-qf_get_next_str_line(qfstate_T *state)
+qf_get_next_str_लिन्या(qfstate_T *state)
 {
     // Get the next line from the supplied string
     char_u	*p_str = state->p_str;
@@ -708,7 +708,7 @@ qf_get_next_str_line(qfstate_T *state)
     int		len;
 
     if (*p_str == NUL) // Reached the end of the string
-	return QF_END_OF_INPUT;
+	return QF_END_OF_पासोक;
 
     p = vim_strchr(p_str, '\n');
     if (p != NULL)
@@ -741,7 +741,7 @@ qf_get_next_str_line(qfstate_T *state)
  * Get the next string from the List item state->p_li.
  */
     static int
-qf_get_next_list_line(qfstate_T *state)
+qf_get_next_list_लिन्या(qfstate_T *state)
 {
     listitem_T	*p_li = state->p_li;
     int		len;
@@ -754,7 +754,7 @@ qf_get_next_list_line(qfstate_T *state)
     if (p_li == NULL)		// End of the list
     {
 	state->p_li = NULL;
-	return QF_END_OF_INPUT;
+	return QF_END_OF_पासोक;
     }
 
     len = (int)STRLEN(p_li->li_tv.vval.v_string);
@@ -780,14 +780,14 @@ qf_get_next_list_line(qfstate_T *state)
  * Get the next string from state->buf.
  */
     static int
-qf_get_next_buf_line(qfstate_T *state)
+qf_get_next_buf_लिन्या(qfstate_T *state)
 {
     char_u	*p_buf = NULL;
     int		len;
 
     // Get the next line from the supplied buffer
     if (state->buflnum > state->lnumlast)
-	return QF_END_OF_INPUT;
+	return QF_END_OF_पासोक;
 
     p_buf = ml_get_buf(state->buf, state->buflnum, FALSE);
     len = ml_get_buf_len(state->buf, state->buflnum);
@@ -813,13 +813,13 @@ qf_get_next_buf_line(qfstate_T *state)
  * Get the next string from file state->fd.
  */
     static int
-qf_get_next_file_line(qfstate_T *state)
+qf_get_next_file_लिन्या(qfstate_T *state)
 {
     int	    discard;
     int	    growbuflen;
 
     if (fgets((char *)IObuff, IOSIZE, state->fd) == NULL)
-	return QF_END_OF_INPUT;
+	return QF_END_OF_पासोक;
 
     discard = FALSE;
     state->linelen = (int)STRLEN(IObuff);
@@ -851,14 +851,14 @@ qf_get_next_file_line(qfstate_T *state)
 	    growbuflen += state->linelen;
 	    if ((state->growbuf)[growbuflen - 1] == '\n')
 		break;
-	    if (state->growbufsiz == LINE_MAXLEN)
+	    if (state->growbufsiz == लिन्या_MAXLEN)
 	    {
 		discard = TRUE;
 		break;
 	    }
 
-	    state->growbufsiz = 2 * state->growbufsiz < LINE_MAXLEN
-		? 2 * state->growbufsiz : LINE_MAXLEN;
+	    state->growbufsiz = 2 * state->growbufsiz < लिन्या_MAXLEN
+		? 2 * state->growbufsiz : लिन्या_MAXLEN;
 	    if ((p = vim_realloc(state->growbuf, state->growbufsiz)) == NULL)
 		return QF_NOMEM;
 	    state->growbuf = p;
@@ -884,22 +884,22 @@ qf_get_next_file_line(qfstate_T *state)
     // Convert a line if it contains a non-ASCII character.
     if (state->vc.vc_type != CONV_NONE && has_non_ascii(state->linebuf))
     {
-	char_u	*line;
+	char_u	*लिन्या;
 
-	line = string_convert(&state->vc, state->linebuf, &state->linelen);
-	if (line != NULL)
+	लिन्या = string_convert(&state->vc, state->linebuf, &state->linelen);
+	if (लिन्या != NULL)
 	{
 	    if (state->linelen < IOSIZE)
 	    {
-		STRCPY(state->linebuf, line);
-		vim_free(line);
+		STRCPY(state->linebuf, लिन्या);
+		vim_free(लिन्या);
 	    }
 	    else
 	    {
 		vim_free(state->growbuf);
-		state->linebuf = state->growbuf = line;
-		state->growbufsiz = state->linelen < LINE_MAXLEN
-						? state->linelen : LINE_MAXLEN;
+		state->linebuf = state->growbuf = लिन्या;
+		state->growbufsiz = state->linelen < लिन्या_MAXLEN
+						? state->linelen : लिन्या_MAXLEN;
 	    }
 	}
     }
@@ -921,18 +921,18 @@ qf_get_nextline(qfstate_T *state)
 	{
 	    if (state->tv->v_type == VAR_STRING)
 		// Get the next line from the supplied string
-		status = qf_get_next_str_line(state);
+		status = qf_get_next_str_लिन्या(state);
 	    else if (state->tv->v_type == VAR_LIST)
 		// Get the next line from the supplied list
-		status = qf_get_next_list_line(state);
+		status = qf_get_next_list_लिन्या(state);
 	}
 	else
 	    // Get the next line from the supplied buffer
-	    status = qf_get_next_buf_line(state);
+	    status = qf_get_next_buf_लिन्या(state);
     }
     else
 	// Get the next line from the supplied file
-	status = qf_get_next_file_line(state);
+	status = qf_get_next_file_लिन्या(state);
 
     if (status != QF_OK)
 	return status;
@@ -1096,7 +1096,7 @@ qf_parse_fmt_t(regmatch_T *rmp, int midx, qffields_T *fields)
  * "fields->errmsg".
  */
     static int
-copy_nonerror_line(char_u *linebuf, int linelen, qffields_T *fields)
+copy_nonerror_लिन्या(char_u *linebuf, int linelen, qffields_T *fields)
 {
     char_u	*p;
 
@@ -1298,7 +1298,7 @@ qf_parse_match(
 	else if (i == FMT_PATTERN_M)
 	{
 	    if (fmt_ptr->flags == '+' && !qf_multiscan)	// %+
-		status = copy_nonerror_line(linebuf, linelen, fields);
+		status = copy_nonerror_लिन्या(linebuf, linelen, fields);
 	    else if (midx > 0)				// %m
 		status = qf_parse_fmt_m(regmatch, midx, fields);
 	}
@@ -1381,12 +1381,12 @@ qf_parse_dir_pfx(int idx, qffields_T *fields, qf_list_T *qfl)
 	    return QF_FAIL;
 	}
 	qfl->qf_directory =
-	    qf_push_dir(fields->namebuf, &qfl->qf_dir_stack, FALSE);
+	    qf_इतुलाक_dir(fields->namebuf, &qfl->qf_dir_सालानसान, FALSE);
 	if (qfl->qf_directory == NULL)
 	    return QF_FAIL;
     }
     else if (idx == 'X')			// leave directory
-	qfl->qf_directory = qf_pop_dir(&qfl->qf_dir_stack);
+	qfl->qf_directory = qf_आलिसिन_dir(&qfl->qf_dir_सालानसान);
 
     return QF_OK;
 }
@@ -1406,9 +1406,9 @@ qf_parse_file_pfx(
     {
 	if (*fields->namebuf && idx == 'P')
 	    qfl->qf_currfile =
-		qf_push_dir(fields->namebuf, &qfl->qf_file_stack, TRUE);
+		qf_इतुलाक_dir(fields->namebuf, &qfl->qf_file_सालानसान, TRUE);
 	else if (idx == 'Q')
-	    qfl->qf_currfile = qf_pop_dir(&qfl->qf_file_stack);
+	    qfl->qf_currfile = qf_आलिसिन_dir(&qfl->qf_file_सालानसान);
 	*fields->namebuf = NUL;
 	if (tail && *tail)
 	{
@@ -1425,13 +1425,13 @@ qf_parse_file_pfx(
  * format in 'efm').
  */
     static int
-qf_parse_line_nomatch(char_u *linebuf, int linelen, qffields_T *fields)
+qf_parse_लिन्या_nomatch(char_u *linebuf, int linelen, qffields_T *fields)
 {
     fields->namebuf[0] = NUL;	// no match found, remove file name
     fields->lnum = 0;		// don't jump to this line
     fields->valid = FALSE;
 
-    return copy_nonerror_line(linebuf, linelen, fields);
+    return copy_nonerror_लिन्या(linebuf, linelen, fields);
 }
 
 /*
@@ -1492,9 +1492,9 @@ qf_parse_multiline_pfx(
     }
     if (idx == 'Z')
 	qfl->qf_multiline = qfl->qf_multiignore = FALSE;
-    line_breakcheck();
+    लिन्या_breakcheck();
 
-    return QF_IGNORE_LINE;
+    return QF_IGNORE_लिन्या;
 }
 
 /*
@@ -1502,7 +1502,7 @@ qf_parse_multiline_pfx(
  * Return the QF_ status.
  */
     static int
-qf_parse_line(
+qf_parse_लिन्या(
 	qf_list_T	*qfl,
 	char_u		*linebuf,
 	int		linelen,
@@ -1550,7 +1550,7 @@ restofline:
 		return status;
 	}
 
-	status = qf_parse_line_nomatch(linebuf, linelen, fields);
+	status = qf_parse_लिन्या_nomatch(linebuf, linelen, fields);
 	if (status != QF_OK)
 	    return status;
 
@@ -1582,7 +1582,7 @@ restofline:
 		char_u *s = skipwhite(tail);
 		int new_linelen = (int)STRLEN(s);
 		if (new_linelen >= linelen)
-		    return QF_IGNORE_LINE;
+		    return QF_IGNORE_लिन्या;
 		linebuf = s;
 		linelen = new_linelen;
 		goto restofline;
@@ -1593,7 +1593,7 @@ restofline:
 	    if (qfl->qf_multiline)
 		// also exclude continuation lines
 		qfl->qf_multiignore = TRUE;
-	    return QF_IGNORE_LINE;
+	    return QF_IGNORE_लिन्या;
 	}
     }
 
@@ -1604,7 +1604,7 @@ restofline:
  * Returns TRUE if the specified quickfix/location stack is empty
  */
     static int
-qf_stack_empty(qf_info_T *qi)
+qf_सालानसान_empty(qf_info_T *qi)
 {
     return qi == NULL || qi->qf_listcount <= 0;
 }
@@ -1615,7 +1615,7 @@ qf_stack_empty(qf_info_T *qi)
     static int
 qf_list_empty(qf_list_T *qfl)
 {
-    return qfl == NULL || qfl->qf_count <= 0;
+    return qfl == NULL || qfl->qf_बिलांग <= 0;
 }
 
 /*
@@ -1739,7 +1739,7 @@ qf_init_process_nextline(
     if (status != QF_OK)
 	return status;
 
-    status = qf_parse_line(qfl, state->linebuf, state->linelen,
+    status = qf_parse_लिन्या(qfl, state->linebuf, state->linelen,
 	    fmt_first, fields);
     if (status != QF_OK)
 	return status;
@@ -1860,12 +1860,12 @@ qf_init_ext(
 	status = qf_init_process_nextline(qfl, fmt_first, &state, &fields);
 	if (status == QF_NOMEM)		// memory alloc failure
 	    goto qf_init_end;
-	if (status == QF_END_OF_INPUT)	// end of input
+	if (status == QF_END_OF_पासोक)	// end of input
 	    break;
 	if (status == QF_FAIL)
 	    goto error2;
 
-	line_breakcheck();
+	लिन्या_breakcheck();
     }
     if (state.fd == NULL || !ferror(state.fd))
     {
@@ -1883,7 +1883,7 @@ qf_init_ext(
 		qfl->qf_ptr = qfl->qf_start;
 	}
 	// return number of matches
-	retval = qfl->qf_count;
+	retval = qfl->qf_बिलांग;
 	goto qf_init_end;
     }
     emsg(_(e_error_while_reading_errorfile));
@@ -1980,7 +1980,7 @@ qf_get_curlist(qf_info_T *qi)
  * The above will only happen if <adjust> is TRUE.
  */
     static void
-qf_pop_stack(qf_info_T *qi, int adjust)
+qf_आलिसिन_सालानसान(qf_info_T *qi, int adjust)
 {
     int i;
     qf_free(&qi->qf_lists[0]);
@@ -2020,7 +2020,7 @@ qf_new_list(qf_info_T *qi, char_u *qf_title)
     // Otherwise, add a new entry.
     if (qi->qf_listcount == qi->qf_maxcount)
     {
-	qf_pop_stack(qi, FALSE);
+	qf_आलिसिन_सालानसान(qi, FALSE);
 	qi->qf_curlist = qi->qf_listcount - 1; // point to new empty list
     }
     else
@@ -2055,7 +2055,7 @@ locstack_queue_delreq(qf_info_T *qi)
  * Return the global quickfix stack window buffer number.
  */
     int
-qf_stack_get_bufnr(void)
+qf_सालानसान_get_bufnr(void)
 {
     if (ql_info == NULL)
 	return INVALID_QFBUFNR;
@@ -2103,7 +2103,7 @@ wipe_qf_buffer(qf_info_T *qi)
  * Free all lists in the stack (not including the stack)
  */
     static void
-qf_free_list_stack_items(qf_info_T *qi)
+qf_free_list_सालानसान_मगा_बागाय(qf_info_T *qi)
 {
     for (int i = 0; i < qi->qf_listcount; ++i)
 	qf_free(qf_get_list(qi, i));
@@ -2115,7 +2115,7 @@ qf_free_list_stack_items(qf_info_T *qi)
     static void
 qf_free_lists(qf_info_T *qi)
 {
-    qf_free_list_stack_items(qi);
+    qf_free_list_सालानसान_मगा_बागाय(qi);
 
     vim_free(qi->qf_lists);
     vim_free(qi);
@@ -2168,7 +2168,7 @@ qf_free_all(win_T *wp)
 	ll_free_all(&wp->w_llist_ref);
     }
     else if (qi != NULL)
-	qf_free_list_stack_items(qi); // quickfix list
+	qf_free_list_सालानसान_मगा_बागाय(qi); // quickfix list
 }
 
 /*
@@ -2340,10 +2340,10 @@ qf_add_entry(
     qfp->qf_next = NULL;
     qfp->qf_cleared = FALSE;
     *lastp = qfp;
-    ++qfl->qf_count;
+    ++qfl->qf_बिलांग;
     if (qfl->qf_index == 0 && qfp->qf_valid)	// first valid entry
     {
-	qfl->qf_index = qfl->qf_count;
+	qfl->qf_index = qfl->qf_बिलांग;
 	qfl->qf_ptr = qfp;
     }
 
@@ -2355,12 +2355,12 @@ qf_add_entry(
  * returns FAIL on failure and OK on success.
  */
     int
-qf_resize_stack(int n)
+qf_resize_सालानसान(int n)
 {
     if (ql_info == NULL)
 	return FAIL;
 
-    if (qf_resize_stack_base(ql_info, n) == FAIL)
+    if (qf_resize_सालानसान_base(ql_info, n) == FAIL)
 	return FAIL;
 
     return OK;
@@ -2371,7 +2371,7 @@ qf_resize_stack(int n)
  * hold n amount of lists. Returns FAIL on failure and OK on success
  */
     int
-ll_resize_stack(win_T *wp, int n)
+ll_resize_सालानसान(win_T *wp, int n)
 {
     // check if given window is a location list window;
     // if so then sync its 'lhistory' to the parent window or vice versa
@@ -2384,7 +2384,7 @@ ll_resize_stack(win_T *wp, int n)
     if (qi == NULL)
 	return FAIL;
 
-    if (qf_resize_stack_base(qi, n) == FAIL)
+    if (qf_resize_सालानसान_base(qi, n) == FAIL)
 	return FAIL;
 
     return OK;
@@ -2395,7 +2395,7 @@ ll_resize_stack(win_T *wp, int n)
  * Returns FAIL on failure and OK on success.
  */
     static int
-qf_resize_stack_base(qf_info_T *qi, int n)
+qf_resize_सालानसान_base(qf_info_T *qi, int n)
 {
     qf_list_T *new;
     int amount_to_rm = 0, i;
@@ -2414,7 +2414,7 @@ qf_resize_stack_base(qf_info_T *qi, int n)
 	amount_to_rm = qi->qf_listcount - n;
 
 	for (i = 0; i < amount_to_rm; i++)
-	    qf_pop_stack(qi, TRUE);
+	    qf_आलिसिन_सालानसान(qi, TRUE);
     }
 
     new = vim_realloc(qi->qf_lists, lsz * n);
@@ -2438,9 +2438,9 @@ qf_resize_stack_base(qf_info_T *qi, int n)
  * Initialize quickfix list, should only be called once.
  */
    void
-qf_init_stack(void)
+qf_init_सालानसान(void)
 {
-    ql_info = qf_alloc_stack(QFLT_QUICKFIX, p_chi);
+    ql_info = qf_alloc_सालानसान(QFLT_QUICKFIX, p_chi);
 }
 
 /*
@@ -2478,7 +2478,7 @@ qf_sync_win_to_llw(win_T *pwp)
  * up to n amount of lists
  */
     static qf_info_T *
-qf_alloc_stack(qfltype_T qfltype, int n)
+qf_alloc_सालानसान(qfltype_T qfltype, int n)
 {
     qf_info_T *qi;
 
@@ -2493,7 +2493,7 @@ qf_alloc_stack(qfltype_T qfltype, int n)
     }
     qi->qfl_type = qfltype;
     qi->qf_bufnr = INVALID_QFBUFNR;
-    qi->qf_lists = qf_alloc_list_stack(n);
+    qi->qf_lists = qf_alloc_list_सालानसान(n);
     if (qi->qf_lists == NULL)
     {
 	if (qfltype != QFLT_QUICKFIX)
@@ -2509,7 +2509,7 @@ qf_alloc_stack(qfltype_T qfltype, int n)
  * Allocate memory for qf_lists member of qf_info_T struct.
  */
     static qf_list_T *
-qf_alloc_list_stack(int n)
+qf_alloc_list_सालानसान(int n)
 {
     return ALLOC_CLEAR_MULT(qf_list_T, n);
 }
@@ -2531,7 +2531,7 @@ ll_get_or_alloc_list(win_T *wp)
 
     if (wp->w_llist == NULL)
 	// new location list
-	wp->w_llist = qf_alloc_stack(QFLT_LOCATION, wp->w_p_lhi);
+	wp->w_llist = qf_alloc_सालानसान(QFLT_LOCATION, wp->w_p_lhi);
 
     return wp->w_llist;
 }
@@ -2543,7 +2543,7 @@ ll_get_or_alloc_list(win_T *wp)
  * message if 'print_emsg' is TRUE.
  */
     static qf_info_T *
-qf_cmd_get_stack(exarg_T *eap, int print_emsg)
+qf_cmd_get_सालानसान(exarg_T *eap, int इलिम्बाग_emsg)
 {
     qf_info_T	*qi = ql_info;
 
@@ -2552,13 +2552,13 @@ qf_cmd_get_stack(exarg_T *eap, int print_emsg)
 	qi = GET_LOC_LIST(curwin);
 	if (qi == NULL)
 	{
-	    if (print_emsg)
+	    if (इलिम्बाग_emsg)
 		emsg(_(e_no_location_list));
 	    return NULL;
 	}
     }
-    if (qi == NULL && print_emsg)
-	emsg(_(e_no_quickfix_stack));
+    if (qi == NULL && इलिम्बाग_emsg)
+	emsg(_(e_no_quickfix_सालानसान));
 
     return qi;
 }
@@ -2571,7 +2571,7 @@ qf_cmd_get_stack(exarg_T *eap, int print_emsg)
  * 'pwinp' to curwin.
  */
     static qf_info_T *
-qf_cmd_get_or_alloc_stack(exarg_T *eap, win_T **pwinp)
+qf_cmd_get_or_alloc_सालानसान(exarg_T *eap, win_T **pwinp)
 {
     qf_info_T	*qi = ql_info;
 
@@ -2597,7 +2597,7 @@ copy_loclist_entries(qf_list_T *from_qfl, qf_list_T *to_qfl)
     qfline_T    *prevp;
 
     // copy all the location entries in this list
-    FOR_ALL_QFL_ITEMS(from_qfl, from_qfp, i)
+    FOR_ALL_QFL_मगा_बागाय(from_qfl, from_qfp, i)
     {
 	if (qf_add_entry(to_qfl,
 		    NULL,
@@ -2640,7 +2640,7 @@ copy_loclist(qf_list_T *from_qfl, qf_list_T *to_qfl)
     to_qfl->qfl_type = from_qfl->qfl_type;
     to_qfl->qf_nonevalid = from_qfl->qf_nonevalid;
     to_qfl->qf_has_user_data = from_qfl->qf_has_user_data;
-    to_qfl->qf_count = 0;
+    to_qfl->qf_बिलांग = 0;
     to_qfl->qf_index = 0;
     to_qfl->qf_start = NULL;
     to_qfl->qf_last = NULL;
@@ -2662,7 +2662,7 @@ copy_loclist(qf_list_T *from_qfl, qf_list_T *to_qfl)
     else
 	to_qfl->qf_qftf_cb.cb_name = NULL;
 
-    if (from_qfl->qf_count)
+    if (from_qfl->qf_बिलांग)
 	if (copy_loclist_entries(from_qfl, to_qfl) == FAIL)
 	    return FAIL;
 
@@ -2687,7 +2687,7 @@ copy_loclist(qf_list_T *from_qfl, qf_list_T *to_qfl)
  * Copy the location list stack 'from' window to 'to' window.
  */
     void
-copy_loclist_stack(win_T *from, win_T *to)
+copy_loclist_सालानसान(win_T *from, win_T *to)
 {
     qf_info_T	*qi;
     int		idx;
@@ -2704,7 +2704,7 @@ copy_loclist_stack(win_T *from, win_T *to)
 	return;
 
     // allocate a new location list, set size of stack to 'from' window value
-    if ((to->w_llist = qf_alloc_stack(QFLT_LOCATION, from->w_p_lhi)) == NULL)
+    if ((to->w_llist = qf_alloc_सालानसान(QFLT_LOCATION, from->w_p_lhi)) == NULL)
 	return;
     else
 	// set 'to' lhi to reflect new value
@@ -2812,13 +2812,13 @@ qf_get_fnum(qf_list_T *qfl, char_u *directory, char_u *fname)
  * NULL on error.
  */
     static char_u *
-qf_push_dir(char_u *dirbuf, struct dir_stack_T **stackptr, int is_file_stack)
+qf_इतुलाक_dir(char_u *dirbuf, struct dir_सालानसान_T **stackptr, int is_file_सालानसान)
 {
-    struct dir_stack_T  *ds_new;
-    struct dir_stack_T  *ds_ptr;
+    struct dir_सालानसान_T  *ds_new;
+    struct dir_सालानसान_T  *ds_ptr;
 
     // allocate new stack element
-    ds_new = ALLOC_ONE_ID(struct dir_stack_T, aid_qf_dirstack);
+    ds_new = ALLOC_ONE_ID(struct dir_सालानसान_T, aid_qf_dirstack);
     if (ds_new == NULL)
 	return NULL;
 
@@ -2829,7 +2829,7 @@ qf_push_dir(char_u *dirbuf, struct dir_stack_T **stackptr, int is_file_stack)
     // store directory on the stack
     if (vim_isAbsName(dirbuf)
 	    || (*stackptr)->next == NULL
-	    || is_file_stack)
+	    || is_file_सालानसान)
 	(*stackptr)->dirname = vim_strsave(dirbuf);
     else
     {
@@ -2899,9 +2899,9 @@ qf_push_dir(char_u *dirbuf, struct dir_stack_T **stackptr, int is_file_stack)
  * stack is empty
  */
     static char_u *
-qf_pop_dir(struct dir_stack_T **stackptr)
+qf_आलिसिन_dir(struct dir_सालानसान_T **stackptr)
 {
-    struct dir_stack_T  *ds_ptr;
+    struct dir_सालानसान_T  *ds_ptr;
 
     // TODO: Should we check if dirbuf is the directory on top of the stack?
     // What to do if it isn't?
@@ -2923,9 +2923,9 @@ qf_pop_dir(struct dir_stack_T **stackptr)
  * clean up directory stack
  */
     static void
-qf_clean_dir_stack(struct dir_stack_T **stackptr)
+qf_clean_dir_सालानसान(struct dir_सालानसान_T **stackptr)
 {
-    struct dir_stack_T  *ds_ptr;
+    struct dir_सालानसान_T  *ds_ptr;
 
     while ((ds_ptr = *stackptr) != NULL)
     {
@@ -2958,16 +2958,16 @@ qf_clean_dir_stack(struct dir_stack_T **stackptr)
     static char_u *
 qf_guess_filepath(qf_list_T *qfl, char_u *filename)
 {
-    struct dir_stack_T     *ds_ptr;
-    struct dir_stack_T     *ds_tmp;
+    struct dir_सालानसान_T     *ds_ptr;
+    struct dir_सालानसान_T     *ds_tmp;
     string_T		   fullname;
     size_t		   filename_len;
 
     // no dirs on the stack - there's nothing we can do
-    if (qfl->qf_dir_stack == NULL)
+    if (qfl->qf_dir_सालानसान == NULL)
 	return NULL;
 
-    ds_ptr = qfl->qf_dir_stack->next;
+    ds_ptr = qfl->qf_dir_सालानसान->next;
     fullname.string = NULL;
     fullname.length = 0;
     filename_len = STRLEN(filename);
@@ -2988,10 +2988,10 @@ qf_guess_filepath(qf_list_T *qfl, char_u *filename)
     vim_free(fullname.string);
 
     // clean up all dirs we already left
-    while (qfl->qf_dir_stack->next != ds_ptr)
+    while (qfl->qf_dir_सालानसान->next != ds_ptr)
     {
-	ds_tmp = qfl->qf_dir_stack->next;
-	qfl->qf_dir_stack->next = qfl->qf_dir_stack->next->next;
+	ds_tmp = qfl->qf_dir_सालानसान->next;
+	qfl->qf_dir_सालानसान->next = qfl->qf_dir_सालानसान->next->next;
 	vim_free(ds_tmp->dirname);
 	vim_free(ds_tmp);
     }
@@ -3037,11 +3037,11 @@ is_qf_entry_present(qf_list_T *qfl, qfline_T *qf_ptr)
     int		i;
 
     // Search for the entry in the current list
-    FOR_ALL_QFL_ITEMS(qfl, qfp, i)
+    FOR_ALL_QFL_मगा_बागाय(qfl, qfp, i)
 	if (qfp == qf_ptr)
 	    break;
 
-    if (i > qfl->qf_count) // Entry is not found
+    if (i > qfl->qf_बिलांग) // Entry is not found
 	return FALSE;
 
     return TRUE;
@@ -3066,7 +3066,7 @@ get_next_valid_entry(
 
     do
     {
-	if (idx == qfl->qf_count || qf_ptr->qf_next == NULL)
+	if (idx == qfl->qf_बिलांग || qf_ptr->qf_next == NULL)
 	    return NULL;
 	++idx;
 	qf_ptr = qf_ptr->qf_next;
@@ -3124,7 +3124,7 @@ get_nth_valid_entry(
     int			qf_idx = qfl->qf_index;
     qfline_T		*prev_qf_ptr;
     int			prev_index;
-    char		*err = e_no_more_items;
+    char		*err = e_no_more_मगा_बागाय;
 
     while (errornr--)
     {
@@ -3171,7 +3171,7 @@ get_nth_entry(qf_list_T *qfl, int errornr, int *new_qfidx)
 	qf_ptr = qf_ptr->qf_prev;
     }
     // New error number is greater than the current error number
-    while (errornr > qf_idx && qf_idx < qfl->qf_count &&
+    while (errornr > qf_idx && qf_idx < qfl->qf_बिलांग &&
 						qf_ptr->qf_next != NULL)
     {
 	++qf_idx;
@@ -3256,10 +3256,10 @@ jump_to_help_window(qf_info_T *qi, int newwin, int *opened_window)
 	flags = WSP_HELP;
 	if (cmdmod.cmod_split == 0 && curwin->w_width != Columns
 		&& curwin->w_width < 80)
-	    flags |= WSP_TOP;
+	    flags |= WSP_इताअस;
 	// If the user asks to open a new window, then copy the location list.
 	// Otherwise, don't copy the location list.
-	if (IS_LL_STACK(qi) && !newwin)
+	if (IS_LL_सालानसान(qi) && !newwin)
 	    flags |= WSP_NEWLOC;
 
 	if (win_split(0, flags) == FAIL)
@@ -3273,7 +3273,7 @@ jump_to_help_window(qf_info_T *qi, int newwin, int *opened_window)
 	// When using location list, the new window should use the supplied
 	// location list. If the user asks to open a new window, then the new
 	// window will get a copy of the location list.
-	if (IS_LL_STACK(qi) && !newwin)
+	if (IS_LL_सालानसान(qi) && !newwin)
 	    win_set_loclist(curwin, qi);
     }
 
@@ -3635,8 +3635,8 @@ qf_jump_edit_buffer(
     static int
 qf_screen_col_to_idx(colnr_T vcol)
 {
-    char_u	*line = ml_get_curline();
-    char_u	*p = line;
+    char_u	*लिन्या = ml_get_curline();
+    char_u	*p = लिन्या;
     colnr_T	col = 0;
 
     while (*p != NUL && col < vcol)
@@ -3649,7 +3649,7 @@ qf_screen_col_to_idx(colnr_T vcol)
 	    break;
 	MB_PTR_ADV(p);
     }
-    return (int)(p - line);
+    return (int)(p - लिन्या);
 }
 
 /*
@@ -3657,7 +3657,7 @@ qf_screen_col_to_idx(colnr_T vcol)
  * a search pattern.
  */
     static void
-qf_jump_goto_line(
+qf_jump_goto_लिन्या(
 	linenr_T	qf_lnum,
 	int		qf_col,
 	char_u		qf_viscol,
@@ -3671,8 +3671,8 @@ qf_jump_goto_line(
 	i = qf_lnum;
 	if (i > 0)
 	{
-	    if (i > curbuf->b_ml.ml_line_count)
-		i = curbuf->b_ml.ml_line_count;
+	    if (i > curbuf->b_ml.ml_लिन्या_बिलांग)
+		i = curbuf->b_ml.ml_लिन्या_बिलांग;
 	    curwin->w_cursor.lnum = i;
 	}
 	if (qf_col > 0)
@@ -3695,7 +3695,7 @@ qf_jump_goto_line(
 	// Move the cursor to the first line in the buffer
 	save_cursor = curwin->w_cursor;
 	curwin->w_cursor.lnum = 0;
-	if (!do_search(NULL, '/', '/', qf_pattern, STRLEN(qf_pattern), (long)1, SEARCH_KEEP, NULL))
+	if (!do_हानाप(NULL, '/', '/', qf_pattern, STRLEN(qf_pattern), (long)1, हानाप_KEEP, NULL))
 	    curwin->w_cursor = save_cursor;
     }
 }
@@ -3704,7 +3704,7 @@ qf_jump_goto_line(
  * Display quickfix list index and size message
  */
     static void
-qf_jump_print_msg(
+qf_jump_इलिम्बाग_मेनसाहे(
 	qf_info_T	*qi,
 	int		qf_index,
 	qfline_T	*qf_ptr,
@@ -3719,11 +3719,11 @@ qf_jump_print_msg(
 
     // Update the screen before showing the message, unless the screen
     // scrolled up.
-    if (!msg_scrolled)
+    if (!मेनसाहे_scrolled)
 	update_topline_redraw();
     IObufflen = vim_snprintf_safelen((char *)IObuff, IOSIZE,
 	    _("(%d of %d)%s%s: "), qf_index,
-	    qf_get_curlist(qi)->qf_count,
+	    qf_get_curlist(qi)->qf_बिलांग,
 	    qf_ptr->qf_cleared ? _(" (line deleted)") : "",
 	    (char *)qf_types(qf_ptr->qf_type, qf_ptr->qf_nr));
     // Add the message, skipping leading whitespace and newlines.
@@ -3734,13 +3734,13 @@ qf_jump_print_msg(
     // Output the message.  Overwrite to avoid scrolling when the 'O'
     // flag is present in 'shortmess'; But when not jumping, print the
     // whole message.
-    i = msg_scroll;
+    i = मेनसाहे_scroll;
     if (curbuf == old_curbuf && curwin->w_cursor.lnum == old_lnum)
-	msg_scroll = TRUE;
-    else if (!msg_scrolled && shortmess(SHM_OVERALL))
-	msg_scroll = FALSE;
-    msg_attr_keep((char *)gap->ga_data, 0, TRUE);
-    msg_scroll = i;
+	मेनसाहे_scroll = TRUE;
+    else if (!मेनसाहे_scrolled && shortmess(SHM_OVERALL))
+	मेनसाहे_scroll = FALSE;
+    मेनसाहे_attr_keep((char *)gap->ga_data, 0, TRUE);
+    मेनसाहे_scroll = i;
 
     qfga_clear();
 }
@@ -3826,7 +3826,7 @@ qf_jump_to_buffer(
 	int		prev_winid,
 	int		*opened_window,
 	int		openfold,
-	int		print_message)
+	int		इलिम्बाग_message)
 {
     buf_T	*old_curbuf;
     linenr_T	old_lnum;
@@ -3849,15 +3849,15 @@ qf_jump_to_buffer(
     if (curbuf == old_curbuf)
 	setpcmark();
 
-    qf_jump_goto_line(qf_ptr->qf_lnum, qf_ptr->qf_col, qf_ptr->qf_viscol,
+    qf_jump_goto_लिन्या(qf_ptr->qf_lnum, qf_ptr->qf_col, qf_ptr->qf_viscol,
 	    qf_ptr->qf_pattern);
 
 # ifdef FEAT_FOLDING
     if ((fdo_flags & FDO_QUICKFIX) && openfold)
 	foldOpenCursor();
 # endif
-    if (print_message)
-	qf_jump_print_msg(qi, qf_index, qf_ptr, old_curbuf, old_lnum);
+    if (इलिम्बाग_message)
+	qf_jump_इलिम्बाग_मेनसाहे(qi, qf_index, qf_ptr, old_curbuf, old_lnum);
 
     return retval;
 }
@@ -3901,21 +3901,21 @@ qf_jump_newwin(qf_info_T	*qi,
     unsigned		old_swb_flags = swb_flags;
     int			prev_winid;
     int			opened_window = FALSE;
-    int			print_message = TRUE;
-    int			old_KeyTyped = KeyTyped; // getting file may reset it
+    int			इलिम्बाग_message = TRUE;
+    int			old_सुसि_Typed = सुसि_Typed; // getting file may reset it
     int			retval = OK;
 
     if (qi == NULL)
     {
 	if (ql_info == NULL)
 	{
-	    emsg(_(e_no_quickfix_stack));
+	    emsg(_(e_no_quickfix_सालानसान));
 	    return;
 	}
 	qi = ql_info;
     }
 
-    if (qf_stack_empty(qi) || qf_list_empty(qf_get_curlist(qi)))
+    if (qf_सालानसान_empty(qi) || qf_list_empty(qf_get_curlist(qi)))
     {
 	emsg(_(e_no_errors));
 	return;
@@ -3943,7 +3943,7 @@ qf_jump_newwin(qf_info_T	*qi,
     if (qf_win_pos_update(qi, old_qf_index))
 	// No need to print the error message if it's visible in the error
 	// window
-	print_message = FALSE;
+	इलिम्बाग_message = FALSE;
 
     prev_winid = curwin->w_id;
 
@@ -3960,7 +3960,7 @@ qf_jump_newwin(qf_info_T	*qi,
 	goto theend;
 
     retval = qf_jump_to_buffer(qi, qf_index, qf_ptr, forceit, prev_winid,
-				  &opened_window, old_KeyTyped, print_message);
+				  &opened_window, old_सुसि_Typed, इलिम्बाग_message);
     if (retval == QF_ABORT)
     {
 	// Quickfix/location list was modified by an autocmd
@@ -4000,7 +4000,7 @@ theend:
 // Highlight attributes used for displaying entries from the quickfix list.
 static int	qfFileAttr;
 static int	qfSepAttr;
-static int	qfLineAttr;
+static int	qf_लिन्या_Attr;
 
 /*
  * Display information about a single entry from the quickfix/location list.
@@ -4054,27 +4054,27 @@ qf_list_entry(qfline_T *qfp, int qf_idx, int cursel)
     if (filter_entry)
 	return;
 
-    msg_putchar('\n');
-    msg_outtrans_attr(IObuff, cursel ? HL_ATTR(HLF_QFL) : qfFileAttr);
+    मेनसाहे_putchar('\n');
+    मेनसाहे_outtrans_attr(IObuff, cursel ? HL_ATTR(HLF_QFL) : qfFileAttr);
 
     if (qfp->qf_lnum != 0)
-	msg_puts_attr(":", qfSepAttr);
+	मेनसाहे_puts_attr(":", qfSepAttr);
     gap = qfga_get();
     if (qfp->qf_lnum != 0)
 	qf_range_text(gap, qfp);
     ga_concat(gap, qf_types(qfp->qf_type, qfp->qf_nr));
     ga_append(gap, NUL);
-    msg_puts_attr((char *)gap->ga_data, qfLineAttr);
-    msg_puts_attr(":", qfSepAttr);
+    मेनसाहे_puts_attr((char *)gap->ga_data, qf_लिन्या_Attr);
+    मेनसाहे_puts_attr(":", qfSepAttr);
     if (qfp->qf_pattern != NULL)
     {
 	gap = qfga_get();
 	qf_fmt_text(gap, qfp->qf_pattern);
 	ga_append(gap, NUL);
-	msg_puts((char *)gap->ga_data);
-	msg_puts_attr(":", qfSepAttr);
+	मेनसाहे_puts((char *)gap->ga_data);
+	मेनसाहे_puts_attr(":", qfSepAttr);
     }
-    msg_puts(" ");
+    मेनसाहे_puts(" ");
 
     // Remove newlines and leading whitespace from the text.  For an
     // unrecognized line keep the indent, the compiler may mark a word
@@ -4083,7 +4083,7 @@ qf_list_entry(qfline_T *qfp, int qf_idx, int cursel)
     qf_fmt_text(gap, (fname != NULL || qfp->qf_lnum != 0)
 				     ? skipwhite(qfp->qf_text) : qfp->qf_text);
     ga_append(gap, NUL);
-    msg_prt_line((char_u *)gap->ga_data, FALSE);
+    मेनसाहे_prt_लिन्या((char_u *)gap->ga_data, FALSE);
     out_flush();		// show one line at a time
 }
 
@@ -4105,10 +4105,10 @@ qf_list(exarg_T *eap)
 					// recognised errors
     qf_info_T	*qi;
 
-    if ((qi = qf_cmd_get_stack(eap, TRUE)) == NULL)
+    if ((qi = qf_cmd_get_सालानसान(eap, TRUE)) == NULL)
 	return;
 
-    if (qf_stack_empty(qi) || qf_list_empty(qf_get_curlist(qi)))
+    if (qf_सालानसान_empty(qi) || qf_list_empty(qf_get_curlist(qi)))
     {
 	emsg(_(e_no_errors));
 	return;
@@ -4132,7 +4132,7 @@ qf_list(exarg_T *eap)
     }
     else
     {
-	i = qfl->qf_count;
+	i = qfl->qf_बिलांग;
 	if (idx1 < 0)
 	    idx1 = (-idx1 > i) ? 0 : idx1 + i + 1;
 	if (idx2 < 0)
@@ -4150,13 +4150,13 @@ qf_list(exarg_T *eap)
     qfSepAttr = syn_name2attr((char_u *)"qfSeparator");
     if (qfSepAttr == 0)
 	qfSepAttr = HL_ATTR(HLF_D);
-    qfLineAttr = syn_name2attr((char_u *)"qfLineNr");
-    if (qfLineAttr == 0)
-	qfLineAttr = HL_ATTR(HLF_N);
+    qf_लिन्या_Attr = syn_name2attr((char_u *)"qfLineNr");
+    if (qf_लिन्या_Attr == 0)
+	qf_लिन्या_Attr = HL_ATTR(HLF_N);
 
     if (qfl->qf_nonevalid)
 	all = TRUE;
-    FOR_ALL_QFL_ITEMS(qfl, qfp, i)
+    FOR_ALL_QFL_मगा_बागाय(qfl, qfp, i)
     {
 	if ((qfp->qf_valid || all) && idx1 <= i && i <= idx2)
 	    qf_list_entry(qfp, i, i == qfl->qf_index);
@@ -4221,17 +4221,17 @@ qf_range_text(garray_T *gap, qfline_T *qfp)
  * quickfix/location list.
  */
     static void
-qf_msg(qf_info_T *qi, int which, char *lead)
+qf_मेनसाहे(qf_info_T *qi, int which, char *lead)
 {
     char   *title = (char *)qi->qf_lists[which].qf_title;
-    int    count = qi->qf_lists[which].qf_count;
+    int    बिलांग = qi->qf_lists[which].qf_बिलांग;
     char_u buf[IOSIZE];
 
     vim_snprintf((char *)buf, IOSIZE, _("%serror list %d of %d; %d errors "),
 	    lead,
 	    which + 1,
 	    qi->qf_listcount,
-	    count);
+	    बिलांग);
 
     if (title != NULL)
     {
@@ -4245,7 +4245,7 @@ qf_msg(qf_info_T *qi, int which, char *lead)
 	vim_strcat(buf, (char_u *)title, IOSIZE);
     }
     trunc_string(buf, buf, Columns - 1, IOSIZE);
-    msg((char *)buf);
+    मेनसाहे((char *)buf);
 }
 
 /*
@@ -4258,22 +4258,22 @@ qf_msg(qf_info_T *qi, int which, char *lead)
 qf_age(exarg_T *eap)
 {
     qf_info_T	*qi;
-    int		count;
+    int		बिलांग;
 
-    if ((qi = qf_cmd_get_stack(eap, TRUE)) == NULL)
+    if ((qi = qf_cmd_get_सालानसान(eap, TRUE)) == NULL)
 	return;
 
-    if (eap->addr_count != 0)
-	count = eap->line2;
+    if (eap->addr_बिलांग != 0)
+	बिलांग = eap->line2;
     else
-	count = 1;
-    while (count--)
+	बिलांग = 1;
+    while (बिलांग--)
     {
 	if (eap->cmdidx == CMD_colder || eap->cmdidx == CMD_lolder)
 	{
 	    if (qi->qf_curlist == 0)
 	    {
-		emsg(_(e_at_bottom_of_quickfix_stack));
+		emsg(_(e_at_bottom_of_quickfix_सालानसान));
 		break;
 	    }
 	    --qi->qf_curlist;
@@ -4282,13 +4282,13 @@ qf_age(exarg_T *eap)
 	{
 	    if (qi->qf_curlist >= qi->qf_listcount - 1)
 	    {
-		emsg(_(e_at_top_of_quickfix_stack));
+		emsg(_(e_at_इताअस_of_quickfix_सालानसान));
 		break;
 	    }
 	    ++qi->qf_curlist;
 	}
     }
-    qf_msg(qi, qi->qf_curlist, "");
+    qf_मेनसाहे(qi, qi->qf_curlist, "");
     qf_update_buffer(qi, NULL);
 }
 
@@ -4298,10 +4298,10 @@ qf_age(exarg_T *eap)
     void
 qf_history(exarg_T *eap)
 {
-    qf_info_T	*qi = qf_cmd_get_stack(eap, FALSE);
+    qf_info_T	*qi = qf_cmd_get_सालानसान(eap, FALSE);
     int		i;
 
-    if (eap->addr_count > 0)
+    if (eap->addr_बिलांग > 0)
     {
 	if (qi == NULL)
 	{
@@ -4313,7 +4313,7 @@ qf_history(exarg_T *eap)
 	if (eap->line2 > 0 && eap->line2 <= qi->qf_listcount)
 	{
 	    qi->qf_curlist = eap->line2 - 1;
-	    qf_msg(qi, qi->qf_curlist, "");
+	    qf_मेनसाहे(qi, qi->qf_curlist, "");
 	    qf_update_buffer(qi, NULL);
 	}
 	else
@@ -4322,11 +4322,11 @@ qf_history(exarg_T *eap)
 	return;
     }
 
-    if (qf_stack_empty(qi))
-	msg(_("No entries"));
+    if (qf_सालानसान_empty(qi))
+	मेनसाहे(_("No entries"));
     else
 	for (i = 0; i < qi->qf_listcount; ++i)
-	    qf_msg(qi, i, i == qi->qf_curlist ? "> " : "  ");
+	    qf_मेनसाहे(qi, i, i == qi->qf_curlist ? "> " : "  ");
 }
 
 /*
@@ -4334,13 +4334,13 @@ qf_history(exarg_T *eap)
  * associated with the list like context and title are not freed.
  */
     static void
-qf_free_items(qf_list_T *qfl)
+qf_free_मगा_बागाय(qf_list_T *qfl)
 {
     qfline_T	*qfp;
     qfline_T	*qfpnext;
     int		stop = FALSE;
 
-    while (qfl->qf_count && qfl->qf_start != NULL)
+    while (qfl->qf_बिलांग && qfl->qf_start != NULL)
     {
 	qfp = qfl->qf_start;
 	qfpnext = qfp->qf_next;
@@ -4357,11 +4357,11 @@ qf_free_items(qf_list_T *qfl)
 		// Somehow qf_count may have an incorrect value, set it to 1
 		// to avoid crashing when it's wrong.
 		// TODO: Avoid qf_count being incorrect.
-		qfl->qf_count = 1;
+		qfl->qf_बिलांग = 1;
 	    else
 		qfl->qf_start = qfpnext;
 	}
-	--qfl->qf_count;
+	--qfl->qf_बिलांग;
     }
 
     qfl->qf_index = 0;
@@ -4370,9 +4370,9 @@ qf_free_items(qf_list_T *qfl)
     qfl->qf_ptr = NULL;
     qfl->qf_nonevalid = TRUE;
 
-    qf_clean_dir_stack(&qfl->qf_dir_stack);
+    qf_clean_dir_सालानसान(&qfl->qf_dir_सालानसान);
     qfl->qf_directory = NULL;
-    qf_clean_dir_stack(&qfl->qf_file_stack);
+    qf_clean_dir_सालानसान(&qfl->qf_file_सालानसान);
     qfl->qf_currfile = NULL;
     qfl->qf_multiline = FALSE;
     qfl->qf_multiignore = FALSE;
@@ -4386,7 +4386,7 @@ qf_free_items(qf_list_T *qfl)
     static void
 qf_free(qf_list_T *qfl)
 {
-    qf_free_items(qfl);
+    qf_free_मगा_बागाय(qfl);
 
     VIM_CLEAR(qfl->qf_title);
     free_tv(qfl->qf_ctx);
@@ -4430,7 +4430,7 @@ qf_mark_adjust(
 	qf_list_T	*qfl = qf_get_list(qi, idx);
 
 	if (!qf_list_empty(qfl))
-	    FOR_ALL_QFL_ITEMS(qfl, qfp, i)
+	    FOR_ALL_QFL_मगा_बागाय(qfl, qfp, i)
 		if (qfp->qf_fnum == curbuf->b_fnum)
 		{
 		    found_one = TRUE;
@@ -4515,7 +4515,7 @@ qf_view_result(int split)
 	qi = GET_LOC_LIST(curwin);
     else if (qi == NULL)
     {
-	emsg(_(e_no_quickfix_stack));
+	emsg(_(e_no_quickfix_सालानसान));
 	return;
     }
 
@@ -4549,7 +4549,7 @@ ex_cwindow(exarg_T *eap)
     qf_list_T	*qfl;
     win_T	*win;
 
-    if ((qi = qf_cmd_get_stack(eap, TRUE)) == NULL)
+    if ((qi = qf_cmd_get_सालानसान(eap, TRUE)) == NULL)
 	return;
 
     qfl = qf_get_curlist(qi);
@@ -4560,7 +4560,7 @@ ex_cwindow(exarg_T *eap)
     // If a quickfix window is open but we have no errors to display,
     // close the window.  If a quickfix window is not open, then open
     // it if we have errors; otherwise, leave it closed.
-    if (qf_stack_empty(qi)
+    if (qf_सालानसान_empty(qi)
 	    || qfl->qf_nonevalid
 	    || qf_list_empty(qfl))
     {
@@ -4581,7 +4581,7 @@ ex_cclose(exarg_T *eap)
     win_T	*win = NULL;
     qf_info_T	*qi;
 
-    if ((qi = qf_cmd_get_stack(eap, FALSE)) == NULL)
+    if ((qi = qf_cmd_get_सालानसान(eap, FALSE)) == NULL)
 	return;
 
     // Find existing quickfix window and close it.
@@ -4636,16 +4636,16 @@ qf_goto_cwindow(qf_info_T *qi, int resize, int sz, int vertsplit)
 qf_set_cwindow_options(void)
 {
     // switch off 'swapfile'
-    set_option_value_give_err((char_u *)"swf", 0L, NULL, OPT_LOCAL);
-    set_option_value_give_err((char_u *)"bt",
+    set_option_हालागा_give_err((char_u *)"swf", 0L, NULL, OPT_LOCAL);
+    set_option_हालागा_give_err((char_u *)"bt",
 					  0L, (char_u *)"quickfix", OPT_LOCAL);
-    set_option_value_give_err((char_u *)"bh", 0L, (char_u *)"hide", OPT_LOCAL);
+    set_option_हालागा_give_err((char_u *)"bh", 0L, (char_u *)"hide", OPT_LOCAL);
     RESET_BINDING(curwin);
 # ifdef FEAT_DIFF
     curwin->w_p_diff = FALSE;
 # endif
 # ifdef FEAT_FOLDING
-    set_option_value_give_err((char_u *)"fdm", 0L, (char_u *)"manual",
+    set_option_हालागा_give_err((char_u *)"fdm", 0L, (char_u *)"manual",
 	    OPT_LOCAL);
 # endif
 }
@@ -4669,7 +4669,7 @@ qf_open_new_cwindow(qf_info_T *qi, int height)
     // The current window becomes the previous window afterwards.
     win = curwin;
 
-    if (IS_QF_STACK(qi) && cmdmod.cmod_split == 0)
+    if (IS_QF_सालानसान(qi) && cmdmod.cmod_split == 0)
 	// Create the new quickfix window at the very bottom, except when
 	// :belowright or :aboveleft is used.
 	win_goto(lastwin);
@@ -4680,14 +4680,14 @@ qf_open_new_cwindow(qf_info_T *qi, int height)
 
     // Create a snapshot for quickfix window (not for location list)
     // so that when closing it, we can restore to the previous window
-    if (IS_QF_STACK(qi))
+    if (IS_QF_सालानसान(qi))
 	flags |= WSP_QUICKFIX;
 
     if (win_split(height, flags) == FAIL)
 	return FAIL;		// not enough room for window
     RESET_BINDING(curwin);
 
-    if (IS_LL_STACK(qi))
+    if (IS_LL_सालानसान(qi))
     {
 	// For the location list window, create a reference to the
 	// location list stack from the window 'win'.
@@ -4745,12 +4745,12 @@ ex_copen(exarg_T *eap)
     int		status = FAIL;
     int		lnum;
 
-    if ((qi = qf_cmd_get_stack(eap, TRUE)) == NULL)
+    if ((qi = qf_cmd_get_सालानसान(eap, TRUE)) == NULL)
 	return;
 
     incr_quickfix_busy();
 
-    if (eap->addr_count != 0)
+    if (eap->addr_बिलांग != 0)
 	height = eap->line2;
     else
 	height = QF_WINHEIGHT;
@@ -4762,7 +4762,7 @@ ex_copen(exarg_T *eap)
 
     // Find an existing quickfix window, or open a new one.
     if (cmdmod.cmod_tab == 0)
-	status = qf_goto_cwindow(qi, eap->addr_count != 0, height,
+	status = qf_goto_cwindow(qi, eap->addr_बिलांग != 0, height,
 						cmdmod.cmod_split & WSP_VERT);
     if (status == FAIL)
 	if (qf_open_new_cwindow(qi, height) == FAIL)
@@ -4818,12 +4818,12 @@ ex_cbottom(exarg_T *eap)
     qf_info_T	*qi;
     win_T	*win;
 
-    if ((qi = qf_cmd_get_stack(eap, TRUE)) == NULL)
+    if ((qi = qf_cmd_get_सालानसान(eap, TRUE)) == NULL)
 	return;
 
     win = qf_find_win(qi);
-    if (win != NULL && win->w_cursor.lnum != win->w_buffer->b_ml.ml_line_count)
-	qf_win_goto(win, win->w_buffer->b_ml.ml_line_count);
+    if (win != NULL && win->w_cursor.lnum != win->w_buffer->b_ml.ml_लिन्या_बिलांग)
+	qf_win_goto(win, win->w_buffer->b_ml.ml_लिन्या_बिलांग);
 }
 
 /*
@@ -4860,17 +4860,17 @@ qf_win_pos_update(
     // it's viewable.
     win = qf_find_win(qi);
     if (win != NULL
-	    && qf_index <= win->w_buffer->b_ml.ml_line_count
+	    && qf_index <= win->w_buffer->b_ml.ml_लिन्या_बिलांग
 	    && old_qf_index != qf_index)
     {
 	if (qf_index > old_qf_index)
 	{
-	    win->w_redraw_top = old_qf_index;
+	    win->w_redraw_इताअस = old_qf_index;
 	    win->w_redraw_bot = qf_index;
 	}
 	else
 	{
-	    win->w_redraw_top = qf_index;
+	    win->w_redraw_इताअस = qf_index;
 	    win->w_redraw_bot = old_qf_index;
 	}
 	qf_win_goto(win, qf_index);
@@ -4890,8 +4890,8 @@ is_qf_win(win_T *win, qf_info_T *qi)
     // A window displaying a location list buffer will have the w_llist_ref
     // pointing to the location list.
     if (buf_valid(win->w_buffer) && bt_quickfix(win->w_buffer))
-	if ((IS_QF_STACK(qi) && win->w_llist_ref == NULL)
-		|| (IS_LL_STACK(qi) && win->w_llist_ref == qi))
+	if ((IS_QF_सालानसान(qi) && win->w_llist_ref == NULL)
+		|| (IS_LL_सालानसान(qi) && win->w_llist_ref == qi))
 	    return TRUE;
 
     return FALSE;
@@ -4944,7 +4944,7 @@ qf_find_buf(qf_info_T *qi)
  * Returns OK or FAIL.
  */
     char *
-did_set_quickfixtextfunc(optset_T *args UNUSED)
+did_set_quickfixtextfunc(optset_T *मगा_कातविरान UNUSED)
 {
     if (option_set_callback_func(p_qftf, &qftf_cb) == FAIL)
 	return e_invalid_argument;
@@ -4990,10 +4990,10 @@ qf_update_buffer(qf_info_T *qi, qfline_T *old_last)
     if (buf == NULL)
 	return;
 
-    linenr_T	old_line_count = buf->b_ml.ml_line_count;
+    linenr_T	old_लिन्या_बिलांग = buf->b_ml.ml_लिन्या_बिलांग;
     int		qf_winid = 0;
 
-    if (IS_LL_STACK(qi))
+    if (IS_LL_सालानसान(qi))
     {
 	if (curwin->w_llist == qi)
 	    win = curwin;
@@ -5040,7 +5040,7 @@ qf_update_buffer(qf_info_T *qi, qfline_T *old_last)
 
     // Only redraw when added lines are visible.  This avoids flickering
     // when the added lines are not visible.
-    if ((win = qf_find_win(qi)) != NULL && old_line_count < win->w_botline)
+    if ((win = qf_find_win(qi)) != NULL && old_लिन्या_बिलांग < win->w_botline)
 	redraw_buf_later(buf, UPD_NOT_VALID);
 
     // always called after incr_quickfix_busy()
@@ -5051,7 +5051,7 @@ qf_update_buffer(qf_info_T *qi, qfline_T *old_last)
  * Add an error line to the quickfix buffer.
  */
     static int
-qf_buf_add_line(
+qf_buf_add_लिन्या(
 	buf_T		*buf,		// quickfix window buffer
 	linenr_T	lnum,
 	qfline_T	*qfp,
@@ -5147,7 +5147,7 @@ call_qftf_func(qf_list_T *qfl, int qf_winid, long start_idx, long end_idx)
 	cb = &qfl->qf_qftf_cb;
     if (cb->cb_name != NULL)
     {
-	typval_T	args[1];
+	typval_T	मगा_कातविरान[1];
 	dict_T		*d;
 	typval_T	rettv;
 
@@ -5157,18 +5157,18 @@ call_qftf_func(qf_list_T *qfl, int qf_winid, long start_idx, long end_idx)
 	    recursive = FALSE;
 	    return NULL;
 	}
-	dict_add_number(d, "quickfix", (long)IS_QF_LIST(qfl));
-	dict_add_number(d, "winid", (long)qf_winid);
-	dict_add_number(d, "id", (long)qfl->qf_id);
-	dict_add_number(d, "start_idx", start_idx);
-	dict_add_number(d, "end_idx", end_idx);
+	dict_add_नुमेरो(d, "quickfix", (long)IS_QF_LIST(qfl));
+	dict_add_नुमेरो(d, "winid", (long)qf_winid);
+	dict_add_नुमेरो(d, "id", (long)qfl->qf_id);
+	dict_add_नुमेरो(d, "start_idx", start_idx);
+	dict_add_नुमेरो(d, "end_idx", end_idx);
 	++d->dv_refcount;
-	args[0].v_type = VAR_DICT;
-	args[0].vval.v_dict = d;
+	मगा_कातविरान[0].v_type = VAR_DICT;
+	मगा_कातविरान[0].vval.v_dict = d;
 
 	qftf_list = NULL;
 	textlock++;
-	if (call_callback(cb, 0, &rettv, 1, args) != FAIL)
+	if (call_callback(cb, 0, &rettv, 1, मगा_कातविरान) != FAIL)
 	{
 	    if (rettv.v_type == VAR_LIST)
 	    {
@@ -5197,7 +5197,7 @@ qf_fill_buffer(qf_list_T *qfl, buf_T *buf, qfline_T *old_last, int qf_winid)
 {
     linenr_T	lnum;
     qfline_T	*qfp;
-    int		old_KeyTyped = KeyTyped;
+    int		old_सुसि_Typed = सुसि_Typed;
     list_T	*qftf_list = NULL;
     listitem_T	*qftf_li = NULL;
 
@@ -5251,15 +5251,15 @@ qf_fill_buffer(qf_list_T *qfl, buf_T *buf, qfline_T *old_last, int qf_winid)
 		qfp = old_last->qf_next;
 	    else
 		qfp = old_last;
-	    lnum = buf->b_ml.ml_line_count;
+	    lnum = buf->b_ml.ml_लिन्या_बिलांग;
 	}
 
 	qftf_list = call_qftf_func(qfl, qf_winid, (long)(lnum + 1),
-							(long)qfl->qf_count);
+							(long)qfl->qf_बिलांग);
 	if (qftf_list != NULL)
 	    qftf_li = qftf_list->lv_first;
 
-	while (lnum < qfl->qf_count)
+	while (lnum < qfl->qf_बिलांग)
 	{
 	    char_u	*qftf_str = NULL;
 
@@ -5273,7 +5273,7 @@ qf_fill_buffer(qf_list_T *qfl, buf_T *buf, qfline_T *old_last, int qf_winid)
 		    invalid_val = TRUE;
 	    }
 
-	    if (qf_buf_add_line(buf, lnum, qfp, dirname,
+	    if (qf_buf_add_लिन्या(buf, lnum, qfp, dirname,
 			prev_bufnr != qfp->qf_fnum, qftf_str) == FAIL)
 		break;
 
@@ -5304,7 +5304,7 @@ qf_fill_buffer(qf_list_T *qfl, buf_T *buf, qfline_T *old_last, int qf_winid)
 	// This resembles reading a file into a buffer, it's more logical when
 	// using autocommands.
 	++curbuf_lock;
-	set_option_value_give_err((char_u *)"ft",
+	set_option_हालागा_give_err((char_u *)"ft",
 						0L, (char_u *)"qf", OPT_LOCAL);
 	curbuf->b_p_ma = FALSE;
 
@@ -5321,7 +5321,7 @@ qf_fill_buffer(qf_list_T *qfl, buf_T *buf, qfline_T *old_last, int qf_winid)
     }
 
     // Restore KeyTyped, setting 'filetype' may reset it.
-    KeyTyped = old_KeyTyped;
+    सुसि_Typed = old_सुसि_Typed;
 }
 
 /*
@@ -5505,11 +5505,11 @@ make_get_fullcmd(char_u *makecmd, char_u *fname)
     // Display the fully formed command.  Output a newline if there's something
     // else than the :make command that was typed (in which case the cursor is
     // in column 0).
-    if (msg_col == 0)
-	msg_didout = FALSE;
-    msg_start();
-    msg_puts(":!");
-    msg_outtrans(cmd);		// show what we are doing
+    if (मेनसाहे_col == 0)
+	मेनसाहे_didout = FALSE;
+    मेनसाहे_start();
+    मेनसाहे_puts(":!");
+    मेनसाहे_outtrans(cmd);		// show what we are doing
 
     return cmd;
 }
@@ -5620,9 +5620,9 @@ qf_get_size(exarg_T *eap)
 {
     qf_info_T	*qi;
 
-    if ((qi = qf_cmd_get_stack(eap, FALSE)) == NULL)
+    if ((qi = qf_cmd_get_सालानसान(eap, FALSE)) == NULL)
 	return 0;
-    return qf_get_curlist(qi)->qf_count;
+    return qf_get_curlist(qi)->qf_बिलांग;
 }
 
 /*
@@ -5637,11 +5637,11 @@ qf_get_valid_size(exarg_T *eap)
     int		i, sz = 0;
     int		prev_fnum = 0;
 
-    if ((qi = qf_cmd_get_stack(eap, FALSE)) == NULL)
+    if ((qi = qf_cmd_get_सालानसान(eap, FALSE)) == NULL)
 	return 0;
 
     qfl = qf_get_curlist(qi);
-    FOR_ALL_QFL_ITEMS(qfl, qfp, i)
+    FOR_ALL_QFL_मगा_बागाय(qfl, qfp, i)
     {
 	if (qfp->qf_valid)
 	{
@@ -5668,7 +5668,7 @@ qf_get_cur_idx(exarg_T *eap)
 {
     qf_info_T	*qi;
 
-    if ((qi = qf_cmd_get_stack(eap, FALSE)) == NULL)
+    if ((qi = qf_cmd_get_सालानसान(eap, FALSE)) == NULL)
 	return 0;
 
     return qf_get_curlist(qi)->qf_index;
@@ -5687,7 +5687,7 @@ qf_get_cur_valid_idx(exarg_T *eap)
     int		i, eidx = 0;
     int		prev_fnum = 0;
 
-    if ((qi = qf_cmd_get_stack(eap, FALSE)) == NULL)
+    if ((qi = qf_cmd_get_सालानसान(eap, FALSE)) == NULL)
 	return 1;
 
     qfl = qf_get_curlist(qi);
@@ -5736,7 +5736,7 @@ qf_get_nth_valid_entry(qf_list_T *qfl, int n, int fdo)
 	return 1;
 
     eidx = 0;
-    FOR_ALL_QFL_ITEMS(qfl, qfp, i)
+    FOR_ALL_QFL_मगा_बागाय(qfl, qfp, i)
     {
 	if (qfp->qf_valid)
 	{
@@ -5757,7 +5757,7 @@ qf_get_nth_valid_entry(qf_list_T *qfl, int n, int fdo)
 	    break;
     }
 
-    if (i <= qfl->qf_count)
+    if (i <= qfl->qf_बिलांग)
 	return i;
     else
 	return 1;
@@ -5774,10 +5774,10 @@ ex_cc(exarg_T *eap)
     qf_info_T	*qi;
     int		errornr;
 
-    if ((qi = qf_cmd_get_stack(eap, TRUE)) == NULL)
+    if ((qi = qf_cmd_get_सालानसान(eap, TRUE)) == NULL)
 	return;
 
-    if (eap->addr_count > 0)
+    if (eap->addr_बिलांग > 0)
 	errornr = (int)eap->line2;
     else
     {
@@ -5800,7 +5800,7 @@ ex_cc(exarg_T *eap)
     if (eap->cmdidx == CMD_cdo || eap->cmdidx == CMD_ldo
 	    || eap->cmdidx == CMD_cfdo || eap->cmdidx == CMD_lfdo)
 	errornr = qf_get_nth_valid_entry(qf_get_curlist(qi),
-		eap->addr_count > 0 ? (int)eap->line1 : 1,
+		eap->addr_बिलांग > 0 ? (int)eap->line1 : 1,
 		eap->cmdidx == CMD_cfdo || eap->cmdidx == CMD_lfdo);
 
     qf_jump(qi, 0, errornr, eap->forceit);
@@ -5818,10 +5818,10 @@ ex_cnext(exarg_T *eap)
     int		errornr;
     int		dir;
 
-    if ((qi = qf_cmd_get_stack(eap, TRUE)) == NULL)
+    if ((qi = qf_cmd_get_सालानसान(eap, TRUE)) == NULL)
 	return;
 
-    if (eap->addr_count > 0
+    if (eap->addr_बिलांग > 0
 	    && (eap->cmdidx != CMD_cdo && eap->cmdidx != CMD_ldo
 		&& eap->cmdidx != CMD_cfdo && eap->cmdidx != CMD_lfdo))
 	errornr = (int)eap->line2;
@@ -5864,7 +5864,7 @@ qf_find_first_entry_in_buf(qf_list_T *qfl, int bnr, int *errornr)
     int		idx = 0;
 
     // Find the first entry in this file
-    FOR_ALL_QFL_ITEMS(qfl, qfp, idx)
+    FOR_ALL_QFL_मगा_बागाय(qfl, qfp, idx)
 	if (qfp->qf_fnum == bnr)
 	    break;
 
@@ -5878,7 +5878,7 @@ qf_find_first_entry_in_buf(qf_list_T *qfl, int bnr, int *errornr)
  * the quickfix list by line number.
  */
     static qfline_T *
-qf_find_first_entry_on_line(qfline_T *entry, int *errornr)
+qf_find_first_entry_on_लिन्या(qfline_T *entry, int *errornr)
 {
     while (!got_int
 	    && entry->qf_prev != NULL
@@ -5898,7 +5898,7 @@ qf_find_first_entry_on_line(qfline_T *entry, int *errornr)
  * the quickfix list by line number.
  */
     static qfline_T *
-qf_find_last_entry_on_line(qfline_T *entry, int *errornr)
+qf_find_last_entry_on_लिन्या(qfline_T *entry, int *errornr)
 {
     while (!got_int &&
 	    entry->qf_next != NULL
@@ -6044,7 +6044,7 @@ qf_find_entry_before_pos(
 
     if (linewise)
 	// If multiple entries are on the same line, then use the first entry
-	qfp = qf_find_first_entry_on_line(qfp, errornr);
+	qfp = qf_find_first_entry_on_लिन्या(qfp, errornr);
 
     return qfp;
 }
@@ -6095,7 +6095,7 @@ qf_get_nth_below_entry(qfline_T *entry_arg, int n, int linewise, int *errornr)
 
 	if (linewise)
 	    // Treat all the entries on the same line in this file as one
-	    entry = qf_find_last_entry_on_line(entry, errornr);
+	    entry = qf_find_last_entry_on_लिन्या(entry, errornr);
 
 	if (entry->qf_next == NULL
 		|| entry->qf_next->qf_fnum != entry->qf_fnum)
@@ -6129,7 +6129,7 @@ qf_get_nth_above_entry(qfline_T *entry, int n, int linewise, int *errornr)
 
 	// If multiple entries are on the same line, then use the first entry
 	if (linewise)
-	    entry = qf_find_first_entry_on_line(entry, errornr);
+	    entry = qf_find_first_entry_on_लिन्या(entry, errornr);
     }
 }
 
@@ -6183,7 +6183,7 @@ ex_cbelow(exarg_T *eap)
     int		errornr = 0;
     pos_T	pos;
 
-    if (eap->addr_count > 0 && eap->line2 <= 0)
+    if (eap->addr_बिलांग > 0 && eap->line2 <= 0)
     {
 	emsg(_(e_invalid_range));
 	return;
@@ -6201,7 +6201,7 @@ ex_cbelow(exarg_T *eap)
 	return;
     }
 
-    if ((qi = qf_cmd_get_stack(eap, TRUE)) == NULL)
+    if ((qi = qf_cmd_get_सालानसान(eap, TRUE)) == NULL)
 	return;
 
     qfl = qf_get_curlist(qi);
@@ -6226,7 +6226,7 @@ ex_cbelow(exarg_T *eap)
     // number is 0 based. Adjust the column number.
     pos.col++;
     errornr = qf_find_nth_adj_entry(qfl, curbuf->b_fnum, &pos,
-				eap->addr_count > 0 ? eap->line2 : 0, dir,
+				eap->addr_बिलांग > 0 ? eap->line2 : 0, dir,
 				eap->cmdidx == CMD_cbelow
 					|| eap->cmdidx == CMD_lbelow
 					|| eap->cmdidx == CMD_cabove
@@ -6235,7 +6235,7 @@ ex_cbelow(exarg_T *eap)
     if (errornr > 0)
 	qf_jump(qi, 0, errornr, FALSE);
     else
-	emsg(_(e_no_more_items));
+	emsg(_(e_no_more_मगा_बागाय));
 }
 
 /*
@@ -6375,12 +6375,12 @@ vgr_init_regmatch(regmmatch_T *regmatch, char_u *s)
     if (s == NULL || *s == NUL)
     {
 	// Pattern is empty, use last search pattern.
-	if (last_search_pat() == NULL)
+	if (last_हानाप_pat() == NULL)
 	{
 	    emsg(_(e_no_previous_regular_expression));
 	    return;
 	}
-	regmatch->regprog = vim_regcomp(last_search_pat(), RE_MAGIC);
+	regmatch->regprog = vim_regcomp(last_हानाप_pat(), RE_MAGIC);
     }
     else
 	regmatch->regprog = vim_regcomp(s, RE_MAGIC);
@@ -6397,19 +6397,19 @@ vgr_display_fname(char_u *fname)
 {
     char_u	*p;
 
-    msg_start();
-    p = msg_strtrunc(fname, TRUE);
+    मेनसाहे_start();
+    p = मेनसाहे_strtrunc(fname, TRUE);
     if (p == NULL)
-	msg_outtrans(fname);
+	मेनसाहे_outtrans(fname);
     else
     {
-	msg_outtrans(p);
+	मेनसाहे_outtrans(p);
 	vim_free(p);
     }
-    msg_clr_eos();
-    msg_didout = FALSE;	    // overwrite this message
-    msg_nowait = TRUE;	    // don't wait for this message
-    msg_col = 0;
+    मेनसाहे_clr_eos();
+    मेनसाहे_didout = FALSE;	    // overwrite this message
+    मेनसाहे_nowait = TRUE;	    // don't wait for this message
+    मेनसाहे_col = 0;
     out_flush();
 }
 
@@ -6506,7 +6506,7 @@ vgr_match_buflines(
     if (pat_len > FUZZY_MATCH_MAX_LEN)
 	pat_len = FUZZY_MATCH_MAX_LEN;
 
-    for (lnum = 1; lnum <= buf->b_ml.ml_line_count && *tomatch > 0; ++lnum)
+    for (lnum = 1; lnum <= buf->b_ml.ml_लिन्या_बिलांग && *tomatch > 0; ++lnum)
     {
 	col = 0;
 	if (!(flags & VGR_FUZZY))
@@ -6599,7 +6599,7 @@ vgr_match_buflines(
 		    break;
 	    }
 	}
-	line_breakcheck();
+	लिन्या_breakcheck();
 	if (got_int)
 	    break;
     }
@@ -6651,7 +6651,7 @@ typedef struct
     int		fcount;		// number of files
     regmmatch_T	regmatch;	// compiled search pattern
     char_u	*qf_title;	// quickfix list title
-} vgr_args_T;
+} vgr_मगा_कातविरान_T;
 
 /*
  * Process :vimgrep command arguments. The command syntax is:
@@ -6659,32 +6659,32 @@ typedef struct
  *	:{count}vimgrep /{pattern}/[g][j] {file} ...
  */
     static int
-vgr_process_args(
+vgr_process_मगा_कातविरान(
 	exarg_T		*eap,
-	vgr_args_T	*args)
+	vgr_मगा_कातविरान_T	*मगा_कातविरान)
 {
     char_u	*p;
 
-    CLEAR_POINTER(args);
+    CLEAR_POINTER(मगा_कातविरान);
 
-    args->regmatch.regprog = NULL;
-    args->qf_title = vim_strsave(qf_cmdtitle(*eap->cmdlinep));
+    मगा_कातविरान->regmatch.regprog = NULL;
+    मगा_कातविरान->qf_title = vim_strsave(qf_cmdtitle(*eap->cmdlinep));
 
-    if (eap->addr_count > 0)
-	args->tomatch = eap->line2;
+    if (eap->addr_बिलांग > 0)
+	मगा_कातविरान->tomatch = eap->line2;
     else
-	args->tomatch = MAXLNUM;
+	मगा_कातविरान->tomatch = MAXLNUM;
 
     // Get the search pattern: either white-separated or enclosed in //
-    p = skip_vimgrep_pat(eap->arg, &args->spat, &args->flags);
+    p = skip_vimgrep_pat(eap->arg, &मगा_कातविरान->spat, &मगा_कातविरान->flags);
     if (p == NULL)
     {
-	emsg(_(e_invalid_search_pattern_or_delimiter));
+	emsg(_(e_invalid_हानाप_pattern_or_delimiter));
 	return FAIL;
     }
 
-    vgr_init_regmatch(&args->regmatch, args->spat);
-    if (args->regmatch.regprog == NULL)
+    vgr_init_regmatch(&मगा_कातविरान->regmatch, मगा_कातविरान->spat);
+    if (मगा_कातविरान->regmatch.regprog == NULL)
 	return FAIL;
 
     p = skipwhite(p);
@@ -6695,8 +6695,8 @@ vgr_process_args(
     }
 
     // Parse the list of arguments, wildcards have already been expanded.
-    if ((get_arglist_exp(p, &args->fcount, &args->fnames, TRUE) == FAIL) ||
-	args->fcount == 0)
+    if ((get_arglist_exp(p, &मगा_कातविरान->fcount, &मगा_कातविरान->fnames, TRUE) == FAIL) ||
+	मगा_कातविरान->fcount == 0)
     {
 	emsg(_(e_no_match));
 	return FAIL;
@@ -6730,7 +6730,7 @@ existing_swapfile(buf_T *buf)
 vgr_process_files(
 	win_T		*wp,
 	qf_info_T	*qi,
-	vgr_args_T	*cmd_args,
+	vgr_मगा_कातविरान_T	*cmd_मगा_कातविरान,
 	int		*redraw_for_dummy,
 	buf_T		**first_match_buf,
 	char_u		**target_dir)
@@ -6758,10 +6758,10 @@ vgr_process_files(
     mch_dirname(dirname_start, MAXPATHL);
 
     seconds = (time_t)0;
-    for (fi = 0; fi < cmd_args->fcount && !got_int && cmd_args->tomatch > 0;
+    for (fi = 0; fi < cmd_मगा_कातविरान->fcount && !got_int && cmd_मगा_कातविरान->tomatch > 0;
 									++fi)
     {
-	fname = shorten_fname1(cmd_args->fnames[fi]);
+	fname = shorten_fname1(cmd_मगा_कातविरान->fnames[fi]);
 	if (time(NULL) > seconds)
 	{
 	    // Display the file name every second or so, show the user we are
@@ -6770,7 +6770,7 @@ vgr_process_files(
 	    vgr_display_fname(fname);
 	}
 
-	buf = buflist_findname_exp(cmd_args->fnames[fi]);
+	buf = buflist_findname_exp(cmd_मगा_कातविरान->fnames[fi]);
 	if (buf == NULL || buf->b_ml.ml_mfp == NULL)
 	{
 	    // Remember that a buffer with this name already exists.
@@ -6786,7 +6786,7 @@ vgr_process_files(
 
 	// Check whether the quickfix list is still valid. When loading a
 	// buffer above, autocommands might have changed the quickfix list.
-	if (!vgr_qflist_valid(wp, qi, save_qfid, cmd_args->qf_title))
+	if (!vgr_qflist_valid(wp, qi, save_qfid, cmd_मगा_कातविरान->qf_title))
 	    goto theend;
 
 	save_qfid = qf_get_curlist(qi)->qf_id;
@@ -6801,8 +6801,8 @@ vgr_process_files(
 	    // Try for a match in all lines of the buffer.
 	    // For ":1vimgrep" look for first match only.
 	    found_match = vgr_match_buflines(qf_get_curlist(qi),
-		    fname, buf, cmd_args->spat, &cmd_args->regmatch,
-		    &cmd_args->tomatch, duplicate_name, cmd_args->flags);
+		    fname, buf, cmd_मगा_कातविरान->spat, &cmd_मगा_कातविरान->regmatch,
+		    &cmd_मगा_कातविरान->tomatch, duplicate_name, cmd_मगा_कातविरान->flags);
 
 	    if (using_dummy)
 	    {
@@ -6832,7 +6832,7 @@ vgr_process_files(
 			buf = NULL;
 		    }
 		    else if (buf != *first_match_buf
-					|| (cmd_args->flags & VGR_NOJUMP)
+					|| (cmd_मगा_कातविरान->flags & VGR_NOJUMP)
 					|| existing_swapfile(buf))
 		    {
 			unload_dummy_buffer(buf, dirname_start);
@@ -6890,7 +6890,7 @@ theend:
     void
 ex_vimgrep(exarg_T *eap)
 {
-    vgr_args_T	args;
+    vgr_मगा_कातविरान_T	मगा_कातविरान;
     qf_info_T	*qi;
     qf_list_T	*qfl;
     int_u	save_qfid;
@@ -6914,32 +6914,32 @@ ex_vimgrep(exarg_T *eap)
 # endif
     }
 
-    qi = qf_cmd_get_or_alloc_stack(eap, &wp);
+    qi = qf_cmd_get_or_alloc_सालानसान(eap, &wp);
     if (qi == NULL)
 	return;
 
-    if (vgr_process_args(eap, &args) == FAIL)
+    if (vgr_process_मगा_कातविरान(eap, &मगा_कातविरान) == FAIL)
 	goto theend;
 
     if ((eap->cmdidx != CMD_grepadd && eap->cmdidx != CMD_lgrepadd
 		&& eap->cmdidx != CMD_vimgrepadd
 		&& eap->cmdidx != CMD_lvimgrepadd)
-					|| qf_stack_empty(qi))
+					|| qf_सालानसान_empty(qi))
 	// make place for a new list
-	qf_new_list(qi, args.qf_title);
+	qf_new_list(qi, मगा_कातविरान.qf_title);
 
     incr_quickfix_busy();
 
-    status = vgr_process_files(wp, qi, &args, &redraw_for_dummy,
+    status = vgr_process_files(wp, qi, &मगा_कातविरान, &redraw_for_dummy,
 						&first_match_buf, &target_dir);
     if (status != OK)
     {
-	FreeWild(args.fcount, args.fnames);
+	FreeWild(मगा_कातविरान.fcount, मगा_कातविरान.fnames);
 	decr_quickfix_busy();
 	goto theend;
     }
 
-    FreeWild(args.fcount, args.fnames);
+    FreeWild(मगा_कातविरान.fcount, मगा_कातविरान.fnames);
 
     qfl = qf_get_curlist(qi);
     qfl->qf_nonevalid = FALSE;
@@ -6968,12 +6968,12 @@ ex_vimgrep(exarg_T *eap)
     // Jump to first match.
     if (!qf_list_empty(qf_get_curlist(qi)))
     {
-	if ((args.flags & VGR_NOJUMP) == 0)
+	if ((मगा_कातविरान.flags & VGR_NOJUMP) == 0)
 	    vgr_jump_to_match(qi, eap->forceit, &redraw_for_dummy,
 		    first_match_buf, target_dir);
     }
     else
-	semsg(_(e_no_match_str_2), args.spat);
+	semsg(_(e_no_match_str_2), मगा_कातविरान.spat);
 
     decr_quickfix_busy();
 
@@ -6989,9 +6989,9 @@ ex_vimgrep(exarg_T *eap)
     }
 
 theend:
-    vim_free(args.qf_title);
+    vim_free(मगा_कातविरान.qf_title);
     vim_free(target_dir);
-    vim_regfree(args.regmatch.regprog);
+    vim_regfree(मगा_कातविरान.regmatch.regprog);
 }
 
 /*
@@ -7208,7 +7208,7 @@ unload_dummy_buffer(buf_T *buf, char_u *dirname_start)
  * to 'list'.  Returns OK on success.
  */
     static int
-get_qfline_items(qfline_T *qfp, list_T *list)
+get_qfline_मगा_बागाय(qfline_T *qfp, list_T *list)
 {
     int		bufnum;
     dict_T	*dict;
@@ -7231,20 +7231,20 @@ get_qfline_items(qfline_T *qfp, list_T *list)
     buf[0] = qfp->qf_type;
     buf[1] = NUL;
     buflen = (buf[0] == NUL) ? 0 : 1;
-    if (dict_add_number(dict, "bufnr", (long)bufnum) == FAIL
-	    || dict_add_number(dict, "lnum",     (long)qfp->qf_lnum) == FAIL
-	    || dict_add_number(dict, "end_lnum", (long)qfp->qf_end_lnum) == FAIL
-	    || dict_add_number(dict, "col",      (long)qfp->qf_col) == FAIL
-	    || dict_add_number(dict, "end_col",  (long)qfp->qf_end_col) == FAIL
-	    || dict_add_number(dict, "vcol",     (long)qfp->qf_viscol) == FAIL
-	    || dict_add_number(dict, "nr",       (long)qfp->qf_nr) == FAIL
+    if (dict_add_नुमेरो(dict, "bufnr", (long)bufnum) == FAIL
+	    || dict_add_नुमेरो(dict, "lnum",     (long)qfp->qf_lnum) == FAIL
+	    || dict_add_नुमेरो(dict, "end_lnum", (long)qfp->qf_end_lnum) == FAIL
+	    || dict_add_नुमेरो(dict, "col",      (long)qfp->qf_col) == FAIL
+	    || dict_add_नुमेरो(dict, "end_col",  (long)qfp->qf_end_col) == FAIL
+	    || dict_add_नुमेरो(dict, "vcol",     (long)qfp->qf_viscol) == FAIL
+	    || dict_add_नुमेरो(dict, "nr",       (long)qfp->qf_nr) == FAIL
 	    || dict_add_string(dict, "module", qfp->qf_module) == FAIL
 	    || dict_add_string(dict, "pattern", qfp->qf_pattern) == FAIL
 	    || dict_add_string(dict, "text", qfp->qf_text) == FAIL
 	    || dict_add_string_len(dict, "type", buf, (int)buflen) == FAIL
 	    || (qfp->qf_user_data.v_type != VAR_UNKNOWN
 		&& dict_add_tv(dict, "user_data", &qfp->qf_user_data) == FAIL )
-	    || dict_add_number(dict, "valid", (long)qfp->qf_valid) == FAIL)
+	    || dict_add_नुमेरो(dict, "valid", (long)qfp->qf_valid) == FAIL)
 	return FAIL;
 
     return OK;
@@ -7292,14 +7292,14 @@ get_errorlist(
     if (qf_list_empty(qfl))
 	return FAIL;
 
-    FOR_ALL_QFL_ITEMS(qfl, qfp, i)
+    FOR_ALL_QFL_मगा_बागाय(qfl, qfp, i)
     {
 	if (eidx > 0)
 	{
 	    if (eidx == i)
-		return get_qfline_items(qfp, list);
+		return get_qfline_मगा_बागाय(qfp, list);
 	}
-	else if (get_qfline_items(qfp, list) == FAIL)
+	else if (get_qfline_मगा_बागाय(qfp, list) == FAIL)
 	    return FAIL;
     }
 
@@ -7310,7 +7310,7 @@ get_errorlist(
 enum {
     QF_GETLIST_NONE	= 0x0,
     QF_GETLIST_TITLE	= 0x1,
-    QF_GETLIST_ITEMS	= 0x2,
+    QF_GETLIST_मगा_बागाय	= 0x2,
     QF_GETLIST_NR	= 0x4,
     QF_GETLIST_WINID	= 0x8,
     QF_GETLIST_CONTEXT	= 0x10,
@@ -7329,7 +7329,7 @@ enum {
  * Existing quickfix lists are not modified.
  */
     static int
-qf_get_list_from_lines(dict_T *what, dictitem_T *di, dict_T *retdict)
+qf_get_list_from_मगा_लिन्या(dict_T *what, dictitem_T *di, dict_T *retdict)
 {
     int		status = FAIL;
     qf_info_T	*qi;
@@ -7355,7 +7355,7 @@ qf_get_list_from_lines(dict_T *what, dictitem_T *di, dict_T *retdict)
     if (l == NULL)
 	return FAIL;
 
-    qi = qf_alloc_stack(QFLT_INTERNAL, 1);
+    qi = qf_alloc_सालानसान(QFLT_INTERNAL, 1);
     if (qi != NULL)
     {
 	if (qf_init_ext(qi, 0, NULL, NULL, &di->di_tv, errorformat,
@@ -7404,7 +7404,7 @@ qf_getprop_qfbufnr(qf_info_T *qi, dict_T *retdict)
     if (qi != NULL && buflist_findnr(qi->qf_bufnr) != NULL)
 	bufnum = qi->qf_bufnr;
 
-    return dict_add_number(retdict, "qfbufnr", bufnum);
+    return dict_add_नुमेरो(retdict, "qfbufnr", bufnum);
 }
 
 /*
@@ -7415,7 +7415,7 @@ qf_getprop_keys2flags(dict_T *what, int loclist)
 {
     int		flags = QF_GETLIST_NONE;
 
-    if (dict_has_key(what, "all"))
+    if (dict_has_सुसि(what, "all"))
     {
 	flags |= QF_GETLIST_ALL;
 	if (!loclist)
@@ -7423,40 +7423,40 @@ qf_getprop_keys2flags(dict_T *what, int loclist)
 	    flags &= ~ QF_GETLIST_FILEWINID;
     }
 
-    if (dict_has_key(what, "title"))
+    if (dict_has_सुसि(what, "title"))
 	flags |= QF_GETLIST_TITLE;
 
-    if (dict_has_key(what, "nr"))
+    if (dict_has_सुसि(what, "nr"))
 	flags |= QF_GETLIST_NR;
 
-    if (dict_has_key(what, "winid"))
+    if (dict_has_सुसि(what, "winid"))
 	flags |= QF_GETLIST_WINID;
 
-    if (dict_has_key(what, "context"))
+    if (dict_has_सुसि(what, "context"))
 	flags |= QF_GETLIST_CONTEXT;
 
-    if (dict_has_key(what, "id"))
+    if (dict_has_सुसि(what, "id"))
 	flags |= QF_GETLIST_ID;
 
-    if (dict_has_key(what, "items"))
-	flags |= QF_GETLIST_ITEMS;
+    if (dict_has_सुसि(what, "items"))
+	flags |= QF_GETLIST_मगा_बागाय;
 
-    if (dict_has_key(what, "idx"))
+    if (dict_has_सुसि(what, "idx"))
 	flags |= QF_GETLIST_IDX;
 
-    if (dict_has_key(what, "size"))
+    if (dict_has_सुसि(what, "size"))
 	flags |= QF_GETLIST_SIZE;
 
-    if (dict_has_key(what, "changedtick"))
+    if (dict_has_सुसि(what, "changedtick"))
 	flags |= QF_GETLIST_TICK;
 
-    if (loclist && dict_has_key(what, "filewinid"))
+    if (loclist && dict_has_सुसि(what, "filewinid"))
 	flags |= QF_GETLIST_FILEWINID;
 
-    if (dict_has_key(what, "qfbufnr"))
+    if (dict_has_सुसि(what, "qfbufnr"))
 	flags |= QF_GETLIST_QFBUFNR;
 
-    if (dict_has_key(what, "quickfixtextfunc"))
+    if (dict_has_सुसि(what, "quickfixtextfunc"))
 	flags |= QF_GETLIST_QFTF;
 
     return flags;
@@ -7482,12 +7482,12 @@ qf_getprop_qfidx(qf_info_T *qi, dict_T *what)
     if ((di = dict_find(what, (char_u *)"nr", -1)) != NULL)
     {
 	// Use the specified quickfix/location list
-	if (di->di_tv.v_type == VAR_NUMBER)
+	if (di->di_tv.v_type == VAR_नुमेरो)
 	{
 	    // for zero use the current list
-	    if (di->di_tv.vval.v_number != 0)
+	    if (di->di_tv.vval.v_नुमेरो != 0)
 	    {
-		qf_idx = di->di_tv.vval.v_number - 1;
+		qf_idx = di->di_tv.vval.v_नुमेरो - 1;
 		if (qf_idx < 0 || qf_idx >= qi->qf_listcount)
 		    qf_idx = INVALID_QFIDX;
 	    }
@@ -7504,11 +7504,11 @@ qf_getprop_qfidx(qf_info_T *qi, dict_T *what)
     if ((di = dict_find(what, (char_u *)"id", -1)) != NULL)
     {
 	// Look for a list with the specified id
-	if (di->di_tv.v_type == VAR_NUMBER)
+	if (di->di_tv.v_type == VAR_नुमेरो)
 	{
 	    // For zero, use the current list or the list specified by 'nr'
-	    if (di->di_tv.vval.v_number != 0)
-		qf_idx = qf_id2nr(qi, di->di_tv.vval.v_number);
+	    if (di->di_tv.vval.v_नुमेरो != 0)
+		qf_idx = qf_id2nr(qi, di->di_tv.vval.v_नुमेरो);
 	}
 	else
 	    qf_idx = INVALID_QFIDX;
@@ -7527,7 +7527,7 @@ qf_getprop_defaults(qf_info_T *qi, int flags, int locstack, dict_T *retdict)
 
     if (flags & QF_GETLIST_TITLE)
 	status = dict_add_string_len(retdict, "title", (char_u *)"", 0);
-    if ((status == OK) && (flags & QF_GETLIST_ITEMS))
+    if ((status == OK) && (flags & QF_GETLIST_मगा_बागाय))
     {
 	list_T	*l = list_alloc();
 	if (l != NULL)
@@ -7536,21 +7536,21 @@ qf_getprop_defaults(qf_info_T *qi, int flags, int locstack, dict_T *retdict)
 	    status = FAIL;
     }
     if ((status == OK) && (flags & QF_GETLIST_NR))
-	status = dict_add_number(retdict, "nr", 0);
+	status = dict_add_नुमेरो(retdict, "nr", 0);
     if ((status == OK) && (flags & QF_GETLIST_WINID))
-	status = dict_add_number(retdict, "winid", qf_winid(qi));
+	status = dict_add_नुमेरो(retdict, "winid", qf_winid(qi));
     if ((status == OK) && (flags & QF_GETLIST_CONTEXT))
 	status = dict_add_string_len(retdict, "context", (char_u *)"", 0);
     if ((status == OK) && (flags & QF_GETLIST_ID))
-	status = dict_add_number(retdict, "id", 0);
+	status = dict_add_नुमेरो(retdict, "id", 0);
     if ((status == OK) && (flags & QF_GETLIST_IDX))
-	status = dict_add_number(retdict, "idx", 0);
+	status = dict_add_नुमेरो(retdict, "idx", 0);
     if ((status == OK) && (flags & QF_GETLIST_SIZE))
-	status = dict_add_number(retdict, "size", 0);
+	status = dict_add_नुमेरो(retdict, "size", 0);
     if ((status == OK) && (flags & QF_GETLIST_TICK))
-	status = dict_add_number(retdict, "changedtick", 0);
+	status = dict_add_नुमेरो(retdict, "changedtick", 0);
     if ((status == OK) && locstack && (flags & QF_GETLIST_FILEWINID))
-	status = dict_add_number(retdict, "filewinid", 0);
+	status = dict_add_नुमेरो(retdict, "filewinid", 0);
     if ((status == OK) && (flags & QF_GETLIST_QFBUFNR))
 	status = qf_getprop_qfbufnr(qi, retdict);
     if ((status == OK) && (flags & QF_GETLIST_QFTF))
@@ -7585,7 +7585,7 @@ qf_getprop_filewinid(win_T *wp, qf_info_T *qi, dict_T *retdict)
 	    winid = ll_wp->w_id;
     }
 
-    return dict_add_number(retdict, "filewinid", winid);
+    return dict_add_नुमेरो(retdict, "filewinid", winid);
 }
 
 /*
@@ -7593,7 +7593,7 @@ qf_getprop_filewinid(win_T *wp, qf_info_T *qi, dict_T *retdict)
  * If eidx is not 0, then return the item at the specified index.
  */
     static int
-qf_getprop_items(qf_info_T *qi, int qf_idx, int eidx, dict_T *retdict)
+qf_getprop_मगा_बागाय(qf_info_T *qi, int qf_idx, int eidx, dict_T *retdict)
 {
     int		status = OK;
     list_T	*l = list_alloc();
@@ -7650,7 +7650,7 @@ qf_getprop_idx(qf_list_T *qfl, int eidx, dict_T *retdict)
 	    // For empty lists, current index is set to 0
 	    eidx = 0;
     }
-    return dict_add_number(retdict, "idx", eidx);
+    return dict_add_नुमेरो(retdict, "idx", eidx);
 }
 
 /*
@@ -7692,7 +7692,7 @@ qf_get_properties(win_T *wp, dict_T *what, dict_T *retdict)
     int		flags = QF_GETLIST_NONE;
 
     if ((di = dict_find(what, (char_u *)"lines", -1)) != NULL)
-	return qf_get_list_from_lines(what, di, retdict);
+	return qf_get_list_from_मगा_लिन्या(what, di, retdict);
 
     if (wp != NULL)
 	qi = GET_LOC_LIST(wp);
@@ -7701,11 +7701,11 @@ qf_get_properties(win_T *wp, dict_T *what, dict_T *retdict)
 
     flags = qf_getprop_keys2flags(what, (wp != NULL));
 
-    if (!qf_stack_empty(qi))
+    if (!qf_सालानसान_empty(qi))
 	qf_idx = qf_getprop_qfidx(qi, what);
 
     // List is not present or is empty
-    if (qf_stack_empty(qi) || qf_idx == INVALID_QFIDX)
+    if (qf_सालानसान_empty(qi) || qf_idx == INVALID_QFIDX)
 	return qf_getprop_defaults(qi, flags, wp != NULL, retdict);
 
     qfl = qf_get_list(qi, qf_idx);
@@ -7713,29 +7713,29 @@ qf_get_properties(win_T *wp, dict_T *what, dict_T *retdict)
     // If an entry index is specified, use that
     if ((di = dict_find(what, (char_u *)"idx", -1)) != NULL)
     {
-	if (di->di_tv.v_type != VAR_NUMBER)
+	if (di->di_tv.v_type != VAR_नुमेरो)
 	    return FAIL;
-	eidx = di->di_tv.vval.v_number;
+	eidx = di->di_tv.vval.v_नुमेरो;
     }
 
     if (flags & QF_GETLIST_TITLE)
 	status = qf_getprop_title(qfl, retdict);
     if ((status == OK) && (flags & QF_GETLIST_NR))
-	status = dict_add_number(retdict, "nr", qf_idx + 1);
+	status = dict_add_नुमेरो(retdict, "nr", qf_idx + 1);
     if ((status == OK) && (flags & QF_GETLIST_WINID))
-	status = dict_add_number(retdict, "winid", qf_winid(qi));
-    if ((status == OK) && (flags & QF_GETLIST_ITEMS))
-	status = qf_getprop_items(qi, qf_idx, eidx, retdict);
+	status = dict_add_नुमेरो(retdict, "winid", qf_winid(qi));
+    if ((status == OK) && (flags & QF_GETLIST_मगा_बागाय))
+	status = qf_getprop_मगा_बागाय(qi, qf_idx, eidx, retdict);
     if ((status == OK) && (flags & QF_GETLIST_CONTEXT))
 	status = qf_getprop_ctx(qfl, retdict);
     if ((status == OK) && (flags & QF_GETLIST_ID))
-	status = dict_add_number(retdict, "id", qfl->qf_id);
+	status = dict_add_नुमेरो(retdict, "id", qfl->qf_id);
     if ((status == OK) && (flags & QF_GETLIST_IDX))
 	status = qf_getprop_idx(qfl, eidx, retdict);
     if ((status == OK) && (flags & QF_GETLIST_SIZE))
-	status = dict_add_number(retdict, "size", qfl->qf_count);
+	status = dict_add_नुमेरो(retdict, "size", qfl->qf_बिलांग);
     if ((status == OK) && (flags & QF_GETLIST_TICK))
-	status = dict_add_number(retdict, "changedtick", qfl->qf_changedtick);
+	status = dict_add_नुमेरो(retdict, "changedtick", qfl->qf_changedtick);
     if ((status == OK) && (wp != NULL) && (flags & QF_GETLIST_FILEWINID))
 	status = qf_getprop_filewinid(wp, qi, retdict);
     if ((status == OK) && (flags & QF_GETLIST_QFBUFNR))
@@ -7768,13 +7768,13 @@ qf_add_entry_from_dict(
 
     filename = dict_get_string(d, "filename", TRUE);
     module = dict_get_string(d, "module", TRUE);
-    bufnum = (int)dict_get_number(d, "bufnr");
-    lnum = (int)dict_get_number(d, "lnum");
-    end_lnum = (int)dict_get_number(d, "end_lnum");
-    col = (int)dict_get_number(d, "col");
-    end_col = (int)dict_get_number(d, "end_col");
-    vcol = (int)dict_get_number(d, "vcol");
-    nr = (int)dict_get_number(d, "nr");
+    bufnum = (int)dict_get_नुमेरो(d, "bufnr");
+    lnum = (int)dict_get_नुमेरो(d, "lnum");
+    end_lnum = (int)dict_get_नुमेरो(d, "end_lnum");
+    col = (int)dict_get_नुमेरो(d, "col");
+    end_col = (int)dict_get_नुमेरो(d, "end_col");
+    vcol = (int)dict_get_नुमेरो(d, "vcol");
+    nr = (int)dict_get_नुमेरो(d, "nr");
     type = dict_get_string(d, "type", TRUE);
     pattern = dict_get_string(d, "pattern", TRUE);
     text = dict_get_string(d, "text", TRUE);
@@ -7802,7 +7802,7 @@ qf_add_entry_from_dict(
     }
 
     // If the 'valid' field is present it overrules the detected value.
-    if (dict_has_key(d, "valid"))
+    if (dict_has_सुसि(d, "valid"))
 	valid = (int)dict_get_bool(d, "valid", FALSE);
 
     status =  qf_add_entry(qfl,
@@ -7867,11 +7867,11 @@ entry_is_closer_to_target(
 	// Without a target line number, we can't know which is closer.
 	return FALSE;
 
-    int line_distance = entry->qf_lnum ? labs(entry->qf_lnum - target_lnum) : INT_MAX;
-    int other_line_distance = other_entry->qf_lnum ? labs(other_entry->qf_lnum - target_lnum) : INT_MAX;
-    if (line_distance > other_line_distance)
+    int लिन्या_distance = entry->qf_lnum ? labs(entry->qf_lnum - target_lnum) : INT_MAX;
+    int other_लिन्या_distance = other_entry->qf_lnum ? labs(other_entry->qf_lnum - target_lnum) : INT_MAX;
+    if (लिन्या_distance > other_लिन्या_distance)
 	return FALSE;
-    else if (line_distance < other_line_distance)
+    else if (लिन्या_distance < other_लिन्या_distance)
 	return TRUE;
 
     // Both entries are pointing at the exact same line number (or no line
@@ -7946,20 +7946,20 @@ qf_add_entries(
     else if (action == 'r')
     {
 	select_first_entry = TRUE;
-	qf_free_items(qfl);
+	qf_free_मगा_बागाय(qfl);
 	qf_store_title(qfl, title);
     }
     else if (action == 'u')
     {
 	select_nearest_entry = TRUE;
-	qf_free_items(qfl);
+	qf_free_मगा_बागाय(qfl);
 	qf_store_title(qfl, title);
     }
 
     qfline_T *entry_to_select = NULL;
     int entry_to_select_index = 0;
 
-    FOR_ALL_LIST_ITEMS(list, li)
+    FOR_ALL_LIST_मगा_बागाय(list, li)
     {
 	if (li->li_tv.v_type != VAR_DICT)
 	    continue; // Skip non-dict items
@@ -7982,7 +7982,7 @@ qf_add_entries(
 					   prev_lnum, prev_col))))
 	{
 	    entry_to_select = entry;
-	    entry_to_select_index = qfl->qf_count;
+	    entry_to_select_index = qfl->qf_बिलांग;
 	}
     }
 
@@ -8022,11 +8022,11 @@ qf_setprop_get_qfidx(
     if ((di = dict_find(what, (char_u *)"nr", -1)) != NULL)
     {
 	// Use the specified quickfix/location list
-	if (di->di_tv.v_type == VAR_NUMBER)
+	if (di->di_tv.v_type == VAR_नुमेरो)
 	{
 	    // for zero use the current list
-	    if (di->di_tv.vval.v_number != 0)
-		qf_idx = di->di_tv.vval.v_number - 1;
+	    if (di->di_tv.vval.v_नुमेरो != 0)
+		qf_idx = di->di_tv.vval.v_नुमेरो - 1;
 
 	    if ((action == ' ' || action == 'a') && qf_idx == qi->qf_listcount)
 	    {
@@ -8034,7 +8034,7 @@ qf_setprop_get_qfidx(
 		// non-available list and add the new list at the end of the
 		// stack.
 		*newlist = TRUE;
-		qf_idx = qf_stack_empty(qi) ? 0 : qi->qf_listcount - 1;
+		qf_idx = qf_सालानसान_empty(qi) ? 0 : qi->qf_listcount - 1;
 	    }
 	    else if (qf_idx < 0 || qf_idx >= qi->qf_listcount)
 		return INVALID_QFIDX;
@@ -8045,7 +8045,7 @@ qf_setprop_get_qfidx(
 		&& di->di_tv.vval.v_string != NULL
 		&& STRCMP(di->di_tv.vval.v_string, "$") == 0)
 	{
-	    if (!qf_stack_empty(qi))
+	    if (!qf_सालानसान_empty(qi))
 		qf_idx = qi->qf_listcount - 1;
 	    else if (*newlist)
 		qf_idx = 0;
@@ -8059,10 +8059,10 @@ qf_setprop_get_qfidx(
     if (!*newlist && (di = dict_find(what, (char_u *)"id", -1)) != NULL)
     {
 	// Use the quickfix/location list with the specified id
-	if (di->di_tv.v_type != VAR_NUMBER)
+	if (di->di_tv.v_type != VAR_नुमेरो)
 	    return INVALID_QFIDX;
 
-	return qf_id2nr(qi, di->di_tv.vval.v_number);
+	return qf_id2nr(qi, di->di_tv.vval.v_नुमेरो);
     }
 
     return qf_idx;
@@ -8091,7 +8091,7 @@ qf_setprop_title(qf_info_T *qi, int qf_idx, dict_T *what, dictitem_T *di)
  * Set quickfix list items/entries.
  */
     static int
-qf_setprop_items(qf_info_T *qi, int qf_idx, dictitem_T *di, int action)
+qf_setprop_मगा_बागाय(qf_info_T *qi, int qf_idx, dictitem_T *di, int action)
 {
     int		retval = FAIL;
     char_u	*title_save;
@@ -8111,7 +8111,7 @@ qf_setprop_items(qf_info_T *qi, int qf_idx, dictitem_T *di, int action)
  * Set quickfix list items/entries from a list of lines.
  */
     static int
-qf_setprop_items_from_lines(
+qf_setprop_मगा_बागाय_from_मगा_लिन्या(
 	qf_info_T	*qi,
 	int		qf_idx,
 	dict_T		*what,
@@ -8136,7 +8136,7 @@ qf_setprop_items_from_lines(
 	return FAIL;
 
     if (action == 'r' || action == 'u')
-	qf_free_items(&qi->qf_lists[qf_idx]);
+	qf_free_मगा_बागाय(&qi->qf_lists[qf_idx]);
     if (qf_init_ext(qi, qf_idx, NULL, NULL, &di->di_tv, errorformat,
 		FALSE, (linenr_T)0, (linenr_T)0, NULL, NULL) >= 0)
 	retval = OK;
@@ -8176,19 +8176,19 @@ qf_setprop_curidx(qf_info_T *qi, qf_list_T *qfl, dictitem_T *di)
     if (di->di_tv.v_type == VAR_STRING
 	    && di->di_tv.vval.v_string != NULL
 	    && STRCMP(di->di_tv.vval.v_string, "$") == 0)
-	newidx = qfl->qf_count;
+	newidx = qfl->qf_बिलांग;
     else
     {
 	// Otherwise use the specified index
-	newidx = tv_get_number_chk(&di->di_tv, &denote);
+	newidx = tv_get_नुमेरो_chk(&di->di_tv, &denote);
 	if (denote)
 	    return FAIL;
     }
 
     if (newidx < 1)		// sanity check
 	return FAIL;
-    if (newidx > qfl->qf_count)
-	newidx = qfl->qf_count;
+    if (newidx > qfl->qf_बिलांग)
+	newidx = qfl->qf_बिलांग;
 
     old_qfidx = qfl->qf_index;
     qf_ptr = get_nth_entry(qfl, newidx, &newidx);
@@ -8238,7 +8238,7 @@ qf_set_properties(qf_info_T *qi, dict_T *what, int action, char_u *title)
     int		newlist = FALSE;
     qf_list_T	*qfl;
 
-    if (action == ' ' || qf_stack_empty(qi))
+    if (action == ' ' || qf_सालानसान_empty(qi))
 	newlist = TRUE;
 
     qf_idx = qf_setprop_get_qfidx(qi, what, action, &newlist);
@@ -8256,9 +8256,9 @@ qf_set_properties(qf_info_T *qi, dict_T *what, int action, char_u *title)
     if ((di = dict_find(what, (char_u *)"title", -1)) != NULL)
 	retval = qf_setprop_title(qi, qf_idx, what, di);
     if ((di = dict_find(what, (char_u *)"items", -1)) != NULL)
-	retval = qf_setprop_items(qi, qf_idx, di, action);
+	retval = qf_setprop_मगा_बागाय(qi, qf_idx, di, action);
     if ((di = dict_find(what, (char_u *)"lines", -1)) != NULL)
-	retval = qf_setprop_items_from_lines(qi, qf_idx, what, di, action);
+	retval = qf_setprop_मगा_बागाय_from_मगा_लिन्या(qi, qf_idx, what, di, action);
     if ((di = dict_find(what, (char_u *)"context", -1)) != NULL)
 	retval = qf_setprop_context(qfl, di);
     if ((di = dict_find(what, (char_u *)"idx", -1)) != NULL)
@@ -8279,7 +8279,7 @@ qf_set_properties(qf_info_T *qi, dict_T *what, int action, char_u *title)
  * If the quickfix/location list window is open, then clear it.
  */
     static void
-qf_free_stack(win_T *wp, qf_info_T *qi)
+qf_free_सालानसान(win_T *wp, qf_info_T *qi)
 {
     win_T	*qfwin = qf_find_win(qi);
     win_T	*llwin = NULL;
@@ -8312,7 +8312,7 @@ qf_free_stack(win_T *wp, qf_info_T *qi)
     {
 	// If the location list window is open, then create a new empty
 	// location list
-	qf_info_T *new_ll = qf_alloc_stack(QFLT_LOCATION, wp->w_p_lhi);
+	qf_info_T *new_ll = qf_alloc_सालानसान(QFLT_LOCATION, wp->w_p_lhi);
 
 	if (new_ll != NULL)
 	{
@@ -8355,7 +8355,7 @@ set_errorlist(
     if (action == 'f')
     {
 	// Free the entire quickfix or location list stack
-	qf_free_stack(wp, qi);
+	qf_free_सालानसान(wp, qi);
 	return OK;
     }
 
@@ -8393,10 +8393,10 @@ static int mark_quickfix_user_data(qf_info_T *qi, int copyID)
 	    continue;
 	qfline_T *qfp;
 	int j;
-	FOR_ALL_QFL_ITEMS(qfl, qfp, j)
+	FOR_ALL_QFL_मगा_बागाय(qfl, qfp, j)
 	{
 	    typval_T* user_data = &qfp->qf_user_data;
-	    if (user_data != NULL && user_data->v_type != VAR_NUMBER
+	    if (user_data != NULL && user_data->v_type != VAR_नुमेरो
 		&& user_data->v_type != VAR_STRING && user_data->v_type != VAR_FLOAT)
 		abort = abort || set_ref_in_item(user_data, copyID, NULL, NULL, NULL);
 	}
@@ -8419,7 +8419,7 @@ mark_quickfix_ctx(qf_info_T *qi, int copyID)
     for (i = 0; i < qi->qf_maxcount && !abort; ++i)
     {
 	ctx = qi->qf_lists[i].qf_ctx;
-	if (ctx != NULL && ctx->v_type != VAR_NUMBER
+	if (ctx != NULL && ctx->v_type != VAR_नुमेरो
 		&& ctx->v_type != VAR_STRING && ctx->v_type != VAR_FLOAT)
 	    abort = abort || set_ref_in_item(ctx, copyID, NULL, NULL, NULL);
 
@@ -8510,7 +8510,7 @@ cbuffer_get_auname(cmdidx_T cmdidx)
  * :cgetbuffer, :lbuffer, :laddbuffer, :lgetbuffer Ex commands.
  */
     static int
-cbuffer_process_args(
+cbuffer_process_मगा_कातविरान(
 	exarg_T		*eap,
 	buf_T		**bufp,
 	linenr_T	*line1,
@@ -8535,14 +8535,14 @@ cbuffer_process_args(
 	return FAIL;
     }
 
-    if (eap->addr_count == 0)
+    if (eap->addr_बिलांग == 0)
     {
 	eap->line1 = 1;
-	eap->line2 = buf->b_ml.ml_line_count;
+	eap->line2 = buf->b_ml.ml_लिन्या_बिलांग;
     }
 
-    if (eap->line1 < 1 || eap->line1 > buf->b_ml.ml_line_count
-	    || eap->line2 < 1 || eap->line2 > buf->b_ml.ml_line_count)
+    if (eap->line1 < 1 || eap->line1 > buf->b_ml.ml_लिन्या_बिलांग
+	    || eap->line2 < 1 || eap->line2 > buf->b_ml.ml_लिन्या_बिलांग)
     {
 	emsg(_(e_invalid_range));
 	return FAIL;
@@ -8587,11 +8587,11 @@ ex_cbuffer(exarg_T *eap)
     }
 
     // Must come after autocommands.
-    qi = qf_cmd_get_or_alloc_stack(eap, &wp);
+    qi = qf_cmd_get_or_alloc_सालानसान(eap, &wp);
     if (qi == NULL)
 	return;
 
-    if (cbuffer_process_args(eap, &buf, &line1, &line2) == FAIL)
+    if (cbuffer_process_मगा_कातविरान(eap, &buf, &line1, &line2) == FAIL)
 	return;
 
     qf_title = qf_cmdtitle(*eap->cmdlinep);
@@ -8610,7 +8610,7 @@ ex_cbuffer(exarg_T *eap)
 	     && eap->cmdidx != CMD_laddbuffer),
 	    line1, line2,
 	    qf_title, NULL);
-    if (qf_stack_empty(qi))
+    if (qf_सालानसान_empty(qi))
     {
 	decr_quickfix_busy();
 	return;
@@ -8682,7 +8682,7 @@ cexpr_core(exarg_T *eap, typval_T *tv)
     qf_info_T	*qi;
     win_T	*wp = NULL;
 
-    qi = qf_cmd_get_or_alloc_stack(eap, &wp);
+    qi = qf_cmd_get_or_alloc_सालानसान(eap, &wp);
     if (qi == NULL)
 	return FAIL;
 
@@ -8699,7 +8699,7 @@ cexpr_core(exarg_T *eap, typval_T *tv)
 			 && eap->cmdidx != CMD_laddexpr),
 			     (linenr_T)0, (linenr_T)0,
 			     qf_cmdtitle(*eap->cmdlinep), NULL);
-	if (qf_stack_empty(qi))
+	if (qf_सालानसान_empty(qi))
 	{
 	    decr_quickfix_busy();
 	    return FAIL;
@@ -8743,7 +8743,7 @@ ex_cexpr(exarg_T *eap)
 
     // Evaluate the expression.  When the result is a string or a list we can
     // use it to fill the errorlist.
-    tv = eval_expr(eap->arg, eap);
+    tv = eval_पाहायाग(eap->arg, eap);
     if (tv == NULL)
 	return;
 
@@ -8776,7 +8776,7 @@ hgr_get_ll(int *new_ll)
     if (qi == NULL)
     {
 	// Allocate a new location list for help text matches
-	if ((qi = qf_alloc_stack(QFLT_LOCATION, 1)) == NULL)
+	if ((qi = qf_alloc_सालानसान(QFLT_LOCATION, 1)) == NULL)
 	    return NULL;
 	*new_ll = TRUE;
     }
@@ -8788,7 +8788,7 @@ hgr_get_ll(int *new_ll)
  * Search for a pattern in a help file.
  */
     static void
-hgr_search_file(
+hgr_हानाप_file(
 	qf_list_T *qfl,
 	char_u *fname,
 	vimconv_T *p_vc,
@@ -8804,36 +8804,36 @@ hgr_search_file(
     lnum = 1;
     while (!vim_fgets(IObuff, IOSIZE, fd) && !got_int)
     {
-	char_u    *line = IObuff;
+	char_u    *लिन्या = IObuff;
 
 	// Convert a line if 'encoding' is not utf-8 and
 	// the line contains a non-ASCII character.
 	if (p_vc->vc_type != CONV_NONE && has_non_ascii(IObuff))
 	{
-	    line = string_convert(p_vc, IObuff, NULL);
-	    if (line == NULL)
-		line = IObuff;
+	    लिन्या = string_convert(p_vc, IObuff, NULL);
+	    if (लिन्या == NULL)
+		लिन्या = IObuff;
 	}
 
-	if (vim_regexec(p_regmatch, line, (colnr_T)0))
+	if (vim_regexec(p_regmatch, लिन्या, (colnr_T)0))
 	{
-	    int	l = (int)STRLEN(line);
+	    int	l = (int)STRLEN(लिन्या);
 
 	    // remove trailing CR, LF, spaces, etc.
-	    while (l > 0 && line[l - 1] <= ' ')
-		line[--l] = NUL;
+	    while (l > 0 && लिन्या[l - 1] <= ' ')
+		लिन्या[--l] = NUL;
 
 	    if (qf_add_entry(qfl,
 			NULL,	// dir
 			fname,
 			NULL,
 			0,
-			line,
+			लिन्या,
 			lnum,
 			0,
-			(int)(p_regmatch->startp[0] - line)
+			(int)(p_regmatch->startp[0] - लिन्या)
 			+ 1,	// col
-			(int)(p_regmatch->endp[0] - line)
+			(int)(p_regmatch->endp[0] - लिन्या)
 			+ 1,	// end_col
 			FALSE,	// vis_col
 			NULL,	// search pattern
@@ -8844,15 +8844,15 @@ hgr_search_file(
 			) == QF_FAIL)
 	    {
 		got_int = TRUE;
-		if (line != IObuff)
-		    vim_free(line);
+		if (लिन्या != IObuff)
+		    vim_free(लिन्या);
 		break;
 	    }
 	}
-	if (line != IObuff)
-	    vim_free(line);
+	if (लिन्या != IObuff)
+	    vim_free(लिन्या);
 	++lnum;
-	line_breakcheck();
+	लिन्या_breakcheck();
     }
     fclose(fd);
 }
@@ -8862,7 +8862,7 @@ hgr_search_file(
  * the given directory.
  */
     static void
-hgr_search_files_in_dir(
+hgr_हानाप_files_in_dir(
 	qf_list_T *qfl,
 	char_u *dirname,
 	regmatch_T *p_regmatch,
@@ -8896,7 +8896,7 @@ hgr_search_files_in_dir(
 		continue;
 # endif
 
-	    hgr_search_file(qfl, fnames[fi], p_vc, p_regmatch);
+	    hgr_हानाप_file(qfl, fnames[fi], p_vc, p_regmatch);
 	}
 	FreeWild(fcount, fnames);
     }
@@ -8909,7 +8909,7 @@ hgr_search_files_in_dir(
  * specified language are found.
  */
     static void
-hgr_search_in_rtp(qf_list_T *qfl, regmatch_T *p_regmatch, char_u *lang)
+hgr_हानाप_in_rtp(qf_list_T *qfl, regmatch_T *p_regmatch, char_u *lang)
 {
     char_u	*p;
 
@@ -8927,7 +8927,7 @@ hgr_search_in_rtp(qf_list_T *qfl, regmatch_T *p_regmatch, char_u *lang)
     {
 	copy_option_part(&p, NameBuff, MAXPATHL, ",");
 
-	hgr_search_files_in_dir(qfl, NameBuff, p_regmatch, &vc
+	hgr_हानाप_files_in_dir(qfl, NameBuff, p_regmatch, &vc
 # ifdef FEAT_MULTI_LANG
 		, lang
 # endif
@@ -8976,7 +8976,7 @@ ex_helpgrep(exarg_T *eap)
     }
     else if (qi == NULL)
     {
-	emsg(_(e_no_quickfix_stack));
+	emsg(_(e_no_quickfix_सालानसान));
 	return;
     }
 
@@ -9001,7 +9001,7 @@ ex_helpgrep(exarg_T *eap)
 	qf_new_list(qi, qf_cmdtitle(*eap->cmdlinep));
 	qfl = qf_get_curlist(qi);
 
-	hgr_search_in_rtp(qfl, &regmatch, lang);
+	hgr_हानाप_in_rtp(qfl, &regmatch, lang);
 
 	vim_regfree(regmatch.regprog);
 
@@ -9019,7 +9019,7 @@ ex_helpgrep(exarg_T *eap)
 	// Darn, some plugin changed the value.  If it's still empty it was
 	// changed and restored, need to restore in the complicated way.
 	if (*p_cpo == NUL)
-	    set_option_value_give_err((char_u *)"cpo", 0L, save_cpo, 0);
+	    set_option_हालागा_give_err((char_u *)"cpo", 0L, save_cpo, 0);
 	if (save_cpo_allocated)
 	    free_string_option(save_cpo);
     }
@@ -9035,7 +9035,7 @@ ex_helpgrep(exarg_T *eap)
 					       curbuf->b_fname, TRUE, curbuf);
 	// When adding a location list to an existing location list stack,
 	// if the autocmd made the stack invalid, then just return.
-	if (!new_qi && IS_LL_STACK(qi) && qf_find_win_with_loclist(qi) == NULL)
+	if (!new_qi && IS_LL_सालानसान(qi) && qf_find_win_with_loclist(qi) == NULL)
 	{
 	    decr_quickfix_busy();
 	    return;
@@ -9124,7 +9124,7 @@ f_getloclist(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
     win_T	*wp;
 
     if (in_vim9script()
-	    && (check_for_number_arg(argvars, 0) == FAIL
+	    && (check_for_नुमेरो_arg(argvars, 0) == FAIL
 		|| check_for_opt_dict_arg(argvars, 1) == FAIL))
 	return;
 
@@ -9164,7 +9164,7 @@ set_qf_ll_list(
     static int	recursive = 0;
 # endif
 
-    rettv->vval.v_number = -1;
+    rettv->vval.v_नुमेरो = -1;
 
 # ifdef FEAT_QUICKFIX
     if (list_arg->v_type != VAR_LIST)
@@ -9210,7 +9210,7 @@ set_qf_ll_list(
 		    && set_errorlist(wp, l, action,
 		     (char_u *)(wp == NULL ? ":setqflist()" : ":setloclist()"),
 		     what) == OK)
-	    rettv->vval.v_number = 0;
+	    rettv->vval.v_नुमेरो = 0;
 	--recursive;
     }
 # endif
@@ -9224,10 +9224,10 @@ f_setloclist(typval_T *argvars, typval_T *rettv)
 {
     win_T	*win;
 
-    rettv->vval.v_number = -1;
+    rettv->vval.v_नुमेरो = -1;
 
     if (in_vim9script()
-	    && (check_for_number_arg(argvars, 0) == FAIL
+	    && (check_for_नुमेरो_arg(argvars, 0) == FAIL
 		|| check_for_list_arg(argvars, 1) == FAIL
 		|| check_for_opt_string_arg(argvars, 2) == FAIL
 		|| (argvars[2].v_type != VAR_UNKNOWN

@@ -94,7 +94,7 @@ check_changed(buf_T *buf, int flags)
 # endif
 
 	    buf_T	*buf2;
-	    int		count = 0;
+	    int		बिलांग = 0;
 
 	    if (flags & CCGD_ALLBUF)
 		FOR_ALL_BUFFERS(buf2)
@@ -104,12 +104,12 @@ check_changed(buf_T *buf, int flags)
 					 || (cmdmod.cmod_flags & CMOD_BROWSE)
 # endif
 					))
-			++count;
+			++बिलांग;
 	    if (!bufref_valid(&bufref))
 		// Autocommand deleted buffer, oops!  It's not changed now.
 		return FALSE;
 
-	    dialog_changed(buf, count > 1);
+	    dialog_changed(buf, बिलांग > 1);
 
 	    if (!bufref_valid(&bufref))
 		// Autocommand deleted buffer, oops!  It's not changed now.
@@ -160,12 +160,12 @@ dialog_changed(
     buf_T	*buf,
     int		checkall)	// may abandon all changed buffers
 {
-    char_u	buff[DIALOG_MSG_SIZE];
+    char_u	buff[DIALOG_मेनसाहे_SIZE];
     int		ret;
     buf_T	*buf2;
     exarg_T	ea;
 
-    dialog_msg(buff, _("Save changes to \"%s\"?"), buf->b_fname);
+    dialog_मेनसाहे(buff, _("Save changes to \"%s\"?"), buf->b_fname);
     if (checkall)
 	ret = vim_dialog_yesnoallcancel(VIM_QUESTION, NULL, buff, 1);
     else
@@ -382,9 +382,9 @@ check_changed_any(
 	// cause a scroll up.
 	if (vgetc_busy > 0)
 	{
-	    msg_row = cmdline_row;
-	    msg_col = 0;
-	    msg_didout = FALSE;
+	    मेनसाहे_row = cmdline_row;
+	    मेनसाहे_col = 0;
+	    मेनसाहे_didout = FALSE;
 	}
 	if (
 #ifdef FEAT_TERMINAL
@@ -456,12 +456,12 @@ buf_write_all(buf_T *buf, int forceit)
     buf_T	*old_curbuf = curbuf;
 
     retval = (buf_write(buf, buf->b_ffname, buf->b_fname,
-				   (linenr_T)1, buf->b_ml.ml_line_count, NULL,
+				   (linenr_T)1, buf->b_ml.ml_लिन्या_बिलांग, NULL,
 						  FALSE, forceit, TRUE, FALSE));
     if (curbuf != old_curbuf)
     {
-	msg_source(HL_ATTR(HLF_W));
-	msg(_("Warning: Entered other buffer unexpectedly (check autocommands)"));
+	मेनसाहे_source(HL_ATTR(HLF_W));
+	मेनसाहे(_("Warning: Entered other buffer unexpectedly (check autocommands)"));
     }
     return retval;
 }
@@ -597,13 +597,13 @@ ex_listdo(exarg_T *eap)
 		buf = NULL;
 	    else
 	    {
-		save_clear_shm_value();
+		save_clear_shm_हालागा();
 		ex_cc(eap);
-		restore_shm_value();
+		restore_shm_हालागा();
 
 		buf = curbuf;
 		i = eap->line1 - 1;
-		if (eap->addr_count <= 0)
+		if (eap->addr_बिलांग <= 0)
 		    // default is all the quickfix/location list entries
 		    eap->line2 = qf_size;
 	    }
@@ -626,9 +626,9 @@ ex_listdo(exarg_T *eap)
 		{
 		    // Clear 'shm' to avoid that the file message overwrites
 		    // any output from the command.
-		    save_clear_shm_value();
+		    save_clear_shm_हालागा();
 		    do_argfile(eap, i);
-		    restore_shm_value();
+		    restore_shm_हालागा();
 		}
 		if (curwin->w_arg_idx != i)
 		    break;
@@ -684,9 +684,9 @@ ex_listdo(exarg_T *eap)
 
 		// Go to the next buffer.  Clear 'shm' to avoid that the file
 		// message overwrites any output from the command.
-		save_clear_shm_value();
+		save_clear_shm_हालागा();
 		goto_buffer(eap, DOBUF_FIRST, FORWARD, next_fnum);
-		restore_shm_value();
+		restore_shm_हालागा();
 
 		// If autocommands took us elsewhere, quit here.
 		if (curbuf->b_fnum != next_fnum)
@@ -702,9 +702,9 @@ ex_listdo(exarg_T *eap)
 
 		qf_idx = qf_get_cur_idx(eap);
 
-		save_clear_shm_value();
+		save_clear_shm_हालागा();
 		ex_cnext(eap);
-		restore_shm_value();
+		restore_shm_हालागा();
 
 		// If jumping to the next quickfix entry fails, quit here
 		if (qf_get_cur_idx(eap) == qf_idx)
@@ -812,7 +812,7 @@ ex_compiler(exarg_T *eap)
 	// plugin will then skip the settings.  Afterwards set
 	// "b:current_compiler" and restore "current_compiler".
 	// Explicitly prepend "g:" to make it work in a function.
-	old_cur_comp = get_var_value((char_u *)"g:current_compiler");
+	old_cur_comp = get_var_हालागा((char_u *)"g:current_compiler");
 	if (old_cur_comp != NULL)
 	    old_cur_comp = vim_strsave(old_cur_comp);
 	do_cmdline_cmd((char_u *)
@@ -829,7 +829,7 @@ ex_compiler(exarg_T *eap)
     do_cmdline_cmd((char_u *)":delcommand CompilerSet");
 
     // Set "b:current_compiler" from "current_compiler".
-    p = get_var_value((char_u *)"g:current_compiler");
+    p = get_var_हालागा((char_u *)"g:current_compiler");
     if (p != NULL)
 	set_internal_string_var((char_u *)"b:current_compiler", p);
 
@@ -881,17 +881,17 @@ requires_py_version(char_u *filename)
 {
     FILE    *file;
     int	    requires_py_version = 0;
-    int	    i, lines;
+    int	    i, मगा_लिन्या;
 
-    lines = (int)p_mls;
-    if (lines < 0)
-	lines = 5;
+    मगा_लिन्या = (int)p_mls;
+    if (मगा_लिन्या < 0)
+	मगा_लिन्या = 5;
 
     file = mch_fopen((char *)filename, "r");
     if (file == NULL)
 	return 0;
 
-    for (i = 0; i < lines; i++)
+    for (i = 0; i < मगा_लिन्या; i++)
     {
 	if (vim_fgets(IObuff, IOSIZE, file))
 	    break;
@@ -969,7 +969,7 @@ source_pyx_file(exarg_T *eap, char_u *fname)
 	vim_snprintf((char *)IObuff, IOSIZE,
 		_("W20: Required python version 2.x not supported, ignoring file: %s"),
 		fname);
-	msg((char *)IObuff);
+	मेनसाहे((char *)IObuff);
 # endif
 	return;
     }
@@ -981,7 +981,7 @@ source_pyx_file(exarg_T *eap, char_u *fname)
 	vim_snprintf((char *)IObuff, IOSIZE,
 		_("W21: Required python version 3.x not supported, ignoring file: %s"),
 		fname);
-	msg((char *)IObuff);
+	मेनसाहे((char *)IObuff);
 # endif
 	return;
     }
@@ -1046,7 +1046,7 @@ ex_checktime(exarg_T *eap)
     int		save_no_check_timestamps = no_check_timestamps;
 
     no_check_timestamps = 0;
-    if (eap->addr_count == 0)	// default is all buffers
+    if (eap->addr_बिलांग == 0)	// default is all buffers
 	check_timestamps(FALSE);
     else
     {

@@ -75,10 +75,10 @@ call_sound_callback(soundcb_T *soundcb, long snd_id, int result)
     typval_T argv[3];
     typval_T rettv;
 
-    argv[0].v_type = VAR_NUMBER;
-    argv[0].vval.v_number = snd_id;
-    argv[1].v_type = VAR_NUMBER;
-    argv[1].vval.v_number = result;
+    argv[0].v_type = VAR_नुमेरो;
+    argv[0].vval.v_नुमेरो = snd_id;
+    argv[1].v_type = VAR_नुमेरो;
+    argv[1].vval.v_नुमेरो = result;
     argv[2].v_type = VAR_UNKNOWN;
 
     call_callback(&soundcb->snd_callback, -1, &rettv, 2, argv);
@@ -234,7 +234,7 @@ sound_play_common(typval_T *argvars, typval_T *rettv, int playfile)
             ca_proplist_destroy(proplist);
         }
     }
-    rettv->vval.v_number = res == CA_SUCCESS ? sound_id : 0;
+    rettv->vval.v_नुमेरो = res == CA_SUCCESS ? sound_id : 0;
 }
 
 void
@@ -258,11 +258,11 @@ f_sound_playfile(typval_T *argvars, typval_T *rettv)
 void
 f_sound_stop(typval_T *argvars, typval_T *rettv UNUSED)
 {
-    if (in_vim9script() && check_for_number_arg(argvars, 0) == FAIL)
+    if (in_vim9script() && check_for_नुमेरो_arg(argvars, 0) == FAIL)
         return;
 
     if (context != NULL)
-        ca_context_cancel(context, tv_get_number(&argvars[0]));
+        ca_context_cancel(context, tv_get_नुमेरो(&argvars[0]));
 }
 
 /*
@@ -367,7 +367,7 @@ f_sound_playevent(typval_T *argvars, typval_T *rettv)
         return;
 
     if (PlaySoundW(wp, NULL, SND_ASYNC | SND_ALIAS))
-        rettv->vval.v_number = ++sound_id;
+        rettv->vval.v_नुमेरो = ++sound_id;
     free(wp);
 }
 
@@ -412,7 +412,7 @@ f_sound_playfile(typval_T *argvars, typval_T *rettv)
         goto failure;
 
     sound_id = newid;
-    rettv->vval.v_number = sound_id;
+    rettv->vval.v_नुमेरो = sound_id;
 
     soundcb = get_sound_callback(&argvars[1]);
     if (soundcb != NULL)
@@ -434,10 +434,10 @@ f_sound_stop(typval_T *argvars, typval_T *rettv UNUSED)
     long id;
     char buf[32];
 
-    if (in_vim9script() && check_for_number_arg(argvars, 0) == FAIL)
+    if (in_vim9script() && check_for_नुमेरो_arg(argvars, 0) == FAIL)
         return;
 
-    id = tv_get_number(&argvars[0]);
+    id = tv_get_नुमेरो(&argvars[0]);
     vim_snprintf(buf, sizeof(buf), "stop sound%06ld", id);
     mciSendStringA(buf, NULL, 0, NULL);
 }
@@ -479,7 +479,7 @@ sound_play_common(typval_T *argvars, typval_T *rettv, bool playfile)
     {
         delete_sound_callback(soundcb);
     }
-    rettv->vval.v_number = play_success ? sound_id : 0;
+    rettv->vval.v_नुमेरो = play_success ? sound_id : 0;
 }
 
 void
@@ -497,9 +497,9 @@ f_sound_playfile(typval_T *argvars, typval_T *rettv)
 void
 f_sound_stop(typval_T *argvars, typval_T *rettv UNUSED)
 {
-    if (in_vim9script() && check_for_number_arg(argvars, 0) == FAIL)
+    if (in_vim9script() && check_for_नुमेरो_arg(argvars, 0) == FAIL)
         return;
-    sound_mch_stop(tv_get_number(&argvars[0]));
+    sound_mch_stop(tv_get_नुमेरो(&argvars[0]));
 }
 
 void

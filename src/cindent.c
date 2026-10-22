@@ -29,14 +29,14 @@
 #define LOOKFOR_NOBREAK		8
 #define LOOKFOR_CPP_BASECLASS	9
 #define LOOKFOR_ENUM_OR_INIT	10
-#define LOOKFOR_JS_KEY		11
+#define LOOKFOR_JS_सुसि		11
 #define LOOKFOR_COMMA		12
 
 /*
  * Return TRUE if the string "line" starts with a word from 'cinwords'.
  */
     int
-cin_is_cinword(char_u *line)
+cin_is_cinword(char_u *लिन्या)
 {
     char_u	*cinw;
     char_u	*cinw_buf;
@@ -49,12 +49,12 @@ cin_is_cinword(char_u *line)
     if (cinw_buf == NULL)
 	return FALSE;
 
-    line = skipwhite(line);
+    लिन्या = skipwhite(लिन्या);
     for (cinw = curbuf->b_p_cinw; *cinw; )
     {
 	len = copy_option_part(&cinw, cinw_buf, cinw_len, ",");
-	if (STRNCMP(line, cinw_buf, len) == 0
-		&& (!vim_iswordc(line[len]) || !vim_iswordc(line[len - 1])))
+	if (STRNCMP(लिन्या, cinw_buf, len) == 0
+		&& (!vim_iswordc(लिन्या[len]) || !vim_iswordc(लिन्या[len - 1])))
 	{
 	    retval = TRUE;
 	    break;
@@ -137,13 +137,13 @@ skip_string(char_u *p)
  * Return TRUE if "line[col]" is inside a C string.
  */
     int
-is_pos_in_string(char_u *line, colnr_T col)
+is_pos_in_string(char_u *लिन्या, colnr_T col)
 {
     char_u *p;
 
-    for (p = line; *p && (colnr_T)(p - line) < col; ++p)
+    for (p = लिन्या; *p && (colnr_T)(p - लिन्या) < col; ++p)
 	p = skip_string(p);
-    return !((colnr_T)(p - line) <= col);
+    return !((colnr_T)(p - लिन्या) <= col);
 }
 
 /*
@@ -153,11 +153,11 @@ is_pos_in_string(char_u *line, colnr_T col)
  * lines with many slashes (e.g. base64 data).
  */
     int
-check_linecomment(char_u *line)
+check_linecomment(char_u *लिन्या)
 {
     char_u  *p;
 
-    p = line;
+    p = लिन्या;
     // skip Lispish one-line comments
     if (curbuf->b_p_lisp)
     {
@@ -165,7 +165,7 @@ check_linecomment(char_u *line)
 	{
 	    int in_str = FALSE;	// inside of string
 
-	    p = line;		// scan from start
+	    p = लिन्या;		// scan from start
 	    while ((p = vim_strpbrk(p, (char_u *)"\";")) != NULL)
 	    {
 		if (*p == '"')
@@ -175,14 +175,14 @@ check_linecomment(char_u *line)
 			if (*(p - 1) != '\\') // skip escaped quote
 			    in_str = FALSE;
 		    }
-		    else if (p == line || ((p - line) >= 2
+		    else if (p == लिन्या || ((p - लिन्या) >= 2
 				      // skip #\" form
 				      && *(p - 1) != '\\' && *(p - 2) != '#'))
 			in_str = TRUE;
 		}
-		else if (!in_str && ((p - line) < 2
+		else if (!in_str && ((p - लिन्या) < 2
 				    || (*(p - 1) != '\\' && *(p - 2) != '#'))
-			       && !is_pos_in_string(line, (colnr_T)(p - line)))
+			       && !is_pos_in_string(लिन्या, (colnr_T)(p - लिन्या)))
 		    break;	// found!
 		++p;
 	    }
@@ -204,7 +204,7 @@ check_linecomment(char_u *line)
 	    // Accept a double /, unless it's preceded with * and followed by
 	    // *, because * / / * is an end and start of a C comment.
 	    if (p[0] == '/' && p[1] == '/'
-				 && (p == line || p[-1] != '*' || p[2] != '*'))
+				 && (p == लिन्या || p[-1] != '*' || p[2] != '*'))
 		break;
 	}
 	if (*p == NUL)
@@ -213,7 +213,7 @@ check_linecomment(char_u *line)
 
     if (p == NULL)
 	return MAXCOL;
-    return (int)(p - line);
+    return (int)(p - लिन्या);
 }
 
 /*
@@ -413,20 +413,20 @@ cin_islinecomment(char_u *p)
  * Check previous lines for a "//" line comment, skipping over blank lines.
  */
     static pos_T *
-find_line_comment(void) // XXX
+find_लिन्या_comment(void) // XXX
 {
     static pos_T pos;
-    char_u	 *line;
+    char_u	 *लिन्या;
     char_u	 *p;
 
     pos = curwin->w_cursor;
     while (--pos.lnum > 0)
     {
-	line = ml_get(pos.lnum);
-	p = skipwhite(line);
+	लिन्या = ml_get(pos.lnum);
+	p = skipwhite(लिन्या);
 	if (cin_islinecomment(p))
 	{
-	    pos.col = (int)(p - line);
+	    pos.col = (int)(p - लिन्या);
 	    return &pos;
 	}
 	if (*p != NUL)
@@ -439,7 +439,7 @@ find_line_comment(void) // XXX
  * Return TRUE if "text" starts with "key:".
  */
     static int
-cin_has_js_key(char_u *text)
+cin_has_js_सुसि(char_u *text)
 {
     char_u *s = skipwhite(text);
     int	    quote = -1;
@@ -545,17 +545,17 @@ cin_ispreproc(char_u *s)
     static int
 cin_ispreproc_cont(char_u **pp, linenr_T *lnump, int *amount)
 {
-    char_u	*line = *pp;
+    char_u	*लिन्या = *pp;
     linenr_T	lnum = *lnump;
     int		retval = FALSE;
     int		candidate_amount = *amount;
 
-    if (*line != NUL && line[STRLEN(line) - 1] == '\\')
+    if (*लिन्या != NUL && लिन्या[STRLEN(लिन्या) - 1] == '\\')
 	candidate_amount = get_indent_lnum(lnum);
 
     for (;;)
     {
-	if (cin_ispreproc(line))
+	if (cin_ispreproc(लिन्या))
 	{
 	    retval = TRUE;
 	    *lnump = lnum;
@@ -563,8 +563,8 @@ cin_ispreproc_cont(char_u **pp, linenr_T *lnump, int *amount)
 	}
 	if (lnum == 1)
 	    break;
-	line = ml_get(--lnum);
-	if (*line == NUL || line[STRLEN(line) - 1] != '\\')
+	लिन्या = ml_get(--lnum);
+	if (*लिन्या == NUL || लिन्या[STRLEN(लिन्या) - 1] != '\\')
 	    break;
     }
 
@@ -729,7 +729,7 @@ cin_islabel(void)		// XXX
     // label.
     pos_T	cursor_save;
     pos_T	*trypos;
-    char_u	*line;
+    char_u	*लिन्या;
 
     cursor_save = curwin->w_cursor;
     while (curwin->w_cursor.lnum > 1)
@@ -742,17 +742,17 @@ cin_islabel(void)		// XXX
 	if ((trypos = ind_find_start_CORS(NULL)) != NULL) // XXX
 	    curwin->w_cursor = *trypos;
 
-	line = ml_get_curline();
-	if (cin_ispreproc(line))	// ignore #defines, #if, etc.
+	लिन्या = ml_get_curline();
+	if (cin_ispreproc(लिन्या))	// ignore #defines, #if, etc.
 	    continue;
-	if (*(line = cin_skipcomment(line)) == NUL)
+	if (*(लिन्या = cin_skipcomment(लिन्या)) == NUL)
 	    continue;
 
 	curwin->w_cursor = cursor_save;
-	if (cin_isterminated(line, TRUE, FALSE)
-		|| cin_isscopedecl(line)
-		|| cin_iscase(line, TRUE)
-		|| (cin_islabel_skip(&line) && cin_nocode(line)))
+	if (cin_isterminated(लिन्या, TRUE, FALSE)
+		|| cin_isscopedecl(लिन्या)
+		|| cin_iscase(लिन्या, TRUE)
+		|| (cin_islabel_skip(&लिन्या) && cin_nocode(लिन्या)))
 	    return TRUE;
 	return FALSE;
     }
@@ -836,14 +836,14 @@ cin_is_compound_init(char_u *s)
 
     if (*p == '(') // skip a typecast
     {
-	int open_count = 1;
+	int open_बिलांग = 1;
 	do
 	{
 	    p = cin_skip_comment_and_string(p + 1);
 	    if (cin_nocode(p))
 		return TRUE;
-	    open_count += (*p == '(') - (*p == ')');
-	} while (open_count);
+	    open_बिलांग += (*p == '(') - (*p == ')');
+	} while (open_बिलांग);
 	p = cin_skipcomment(p + 1);
 	if (cin_nocode(p))
 	    return TRUE;
@@ -1097,13 +1097,13 @@ skip_label(linenr_T lnum, char_u **pp)
     static int
 cin_first_id_amount(void)
 {
-    char_u	*line, *p, *s;
+    char_u	*लिन्या, *p, *s;
     int		len;
     pos_T	fp;
     colnr_T	col;
 
-    line = ml_get_curline();
-    p = skipwhite(line);
+    लिन्या = ml_get_curline();
+    p = skipwhite(लिन्या);
     len = (int)(skiptowhite(p) - p);
     if (len == 6 && STRNCMP(p, "static", 6) == 0)
     {
@@ -1131,7 +1131,7 @@ cin_first_id_amount(void)
 
     p = skipwhite(p + len);
     fp.lnum = curwin->w_cursor.lnum;
-    fp.col = (colnr_T)(p - line);
+    fp.col = (colnr_T)(p - लिन्या);
     getvcol(curwin, &fp, &col, NULL, NULL, 0);
     return (int)col;
 }
@@ -1148,19 +1148,19 @@ cin_first_id_amount(void)
     static int
 cin_get_equal_amount(linenr_T lnum)
 {
-    char_u	*line;
+    char_u	*लिन्या;
     char_u	*s;
     colnr_T	col;
     pos_T	fp;
 
     if (lnum > 1)
     {
-	line = ml_get(lnum - 1);
-	if (*line != NUL && line[STRLEN(line) - 1] == '\\')
+	लिन्या = ml_get(lnum - 1);
+	if (*लिन्या != NUL && लिन्या[STRLEN(लिन्या) - 1] == '\\')
 	    return -1;
     }
 
-    line = s = ml_get(lnum);
+    लिन्या = s = ml_get(lnum);
     while (*s != NUL && vim_strchr((char_u *)"=;{}\"'", *s) == NULL)
     {
 	if (cin_iscomment(s))	// ignore comments
@@ -1179,7 +1179,7 @@ cin_get_equal_amount(linenr_T lnum)
 	++s;
 
     fp.lnum = lnum;
-    fp.col = (colnr_T)(s - line);
+    fp.col = (colnr_T)(s - लिन्या);
     getvcol(curwin, &fp, &col, NULL, NULL, 0);
     return (int)col;
 }
@@ -1191,12 +1191,12 @@ cin_get_equal_amount(linenr_T lnum)
     static int
 cin_skip2pos(pos_T *trypos)
 {
-    char_u	*line;
+    char_u	*लिन्या;
     char_u	*p;
     char_u	*new_p;
 
-    p = line = ml_get(trypos->lnum);
-    while (*p && (colnr_T)(p - line) < trypos->col)
+    p = लिन्या = ml_get(trypos->lnum);
+    while (*p && (colnr_T)(p - लिन्या) < trypos->col)
     {
 	if (cin_iscomment(p))
 	    p = cin_skipcomment(p);
@@ -1209,7 +1209,7 @@ cin_skip2pos(pos_T *trypos)
 		p = new_p;
 	}
     }
-    return (int)(p - line);
+    return (int)(p - लिन्या);
 }
 
     static pos_T *
@@ -1280,7 +1280,7 @@ find_last_paren(char_u *l, int start, int end)
 {
     int		i;
     int		retval = FALSE;
-    int		open_count = 0;
+    int		open_बिलांग = 0;
 
     curwin->w_cursor.col = 0;		    // default is start of line
 
@@ -1291,11 +1291,11 @@ find_last_paren(char_u *l, int start, int end)
 	    break;
 	i = (int)(skip_string(l + i) - l);    // ignore parens in quotes
 	if (l[i] == start)
-	    ++open_count;
+	    ++open_बिलांग;
 	else if (l[i] == end)
 	{
-	    if (open_count > 0)
-		--open_count;
+	    if (open_बिलांग > 0)
+		--open_बिलांग;
 	    else
 	    {
 		curwin->w_cursor.col = i;
@@ -1399,13 +1399,13 @@ cin_isfuncdecl(
 	    //       , arg2)
 	    for (;;)
 	    {
-		if (lnum >= curbuf->b_ml.ml_line_count)
+		if (lnum >= curbuf->b_ml.ml_लिन्या_बिलांग)
 		    break;
 		s = ml_get(++lnum);
 		if (!cin_ispreproc(s))
 		    break;
 	    }
-	    if (lnum >= curbuf->b_ml.ml_line_count)
+	    if (lnum >= curbuf->b_ml.ml_लिन्या_बिलांग)
 		break;
 	    // Require a comma at end of the line or a comma or ')' at the
 	    // start of next line.
@@ -1484,36 +1484,36 @@ cin_iswhileofdo (char_u *p, linenr_T lnum)	// XXX
  * string was found.
  */
     static int
-cin_is_if_for_while_before_offset(char_u *line, int *poffset)
+cin_is_if_for_while_before_offset(char_u *लिन्या, int *poffset)
 {
     int offset = *poffset;
 
     if (offset-- < 2)
 	return 0;
-    while (offset > 2 && VIM_ISWHITE(line[offset]))
+    while (offset > 2 && VIM_ISWHITE(लिन्या[offset]))
 	--offset;
 
     offset -= 1;
-    if (STRNCMP(line + offset, "if", 2) == 0)
+    if (STRNCMP(लिन्या + offset, "if", 2) == 0)
 	goto probablyFound;
 
     if (offset >= 1)
     {
 	offset -= 1;
-	if (STRNCMP(line + offset, "for", 3) == 0)
+	if (STRNCMP(लिन्या + offset, "for", 3) == 0)
 	    goto probablyFound;
 
 	if (offset >= 2)
 	{
 	    offset -= 2;
-	    if (STRNCMP(line + offset, "while", 5) == 0)
+	    if (STRNCMP(लिन्या + offset, "while", 5) == 0)
 		goto probablyFound;
 	}
     }
     return 0;
 
 probablyFound:
-    if (!offset || !vim_isIDc(line[offset - 1]))
+    if (!offset || !vim_isIDc(लिन्या[offset - 1]))
     {
 	*poffset = offset;
 	return 1;
@@ -1532,7 +1532,7 @@ probablyFound:
     static int
 cin_iswhileofdo_end(int terminated)
 {
-    char_u	*line;
+    char_u	*लिन्या;
     char_u	*p;
     char_u	*s;
     pos_T	*trypos;
@@ -1541,7 +1541,7 @@ cin_iswhileofdo_end(int terminated)
     if (terminated != ';')	// there must be a ';' at the end
 	return FALSE;
 
-    p = line = ml_get_curline();
+    p = लिन्या = ml_get_curline();
     while (*p != NUL)
     {
 	p = cin_skipcomment(p);
@@ -1552,7 +1552,7 @@ cin_iswhileofdo_end(int terminated)
 	    {
 		// Found ");" at end of the line, now check there is "while"
 		// before the matching '('.  XXX
-		i = (int)(p - line);
+		i = (int)(p - लिन्या);
 		curwin->w_cursor.col = i;
 		trypos = find_match_paren(curbuf->b_ind_maxparen);
 		if (trypos != NULL)
@@ -1568,8 +1568,8 @@ cin_iswhileofdo_end(int terminated)
 		}
 
 		// Searching may have made "line" invalid, get it again.
-		line = ml_get_curline();
-		p = line + i;
+		लिन्या = ml_get_curline();
+		p = लिन्या + i;
 	    }
 	}
 	if (*p != NUL)
@@ -1605,14 +1605,14 @@ cin_is_cpp_baseclass(
     char_u	*s;
     int		class_or_struct, lookfor_ctor_init, cpp_base_class;
     linenr_T	lnum = curwin->w_cursor.lnum;
-    char_u	*line = ml_get_curline();
+    char_u	*लिन्या = ml_get_curline();
 
     if (pos->lnum <= lnum)
 	return cached->found;	// Use the cached result
 
     pos->col = 0;
 
-    s = skipwhite(line);
+    s = skipwhite(लिन्या);
     if (*s == '#')		// skip #define FOO x ? (x) : x
 	return FALSE;
     s = cin_skipcomment(s);
@@ -1635,8 +1635,8 @@ cin_is_cpp_baseclass(
     //	{}
     while (lnum > 1)
     {
-	line = ml_get(lnum - 1);
-	s = skipwhite(line);
+	लिन्या = ml_get(lnum - 1);
+	s = skipwhite(लिन्या);
 	if (*s == '#' || *s == NUL)
 	    break;
 	while (*s != NUL)
@@ -1654,8 +1654,8 @@ cin_is_cpp_baseclass(
     }
 
     pos->lnum = lnum;
-    line = ml_get(lnum);
-    s = line;
+    लिन्या = ml_get(lnum);
+    s = लिन्या;
     for (;;)
     {
 	if (*s == NUL)
@@ -1663,15 +1663,15 @@ cin_is_cpp_baseclass(
 	    if (lnum == curwin->w_cursor.lnum)
 		break;
 	    // Continue in the cursor line.
-	    line = ml_get(++lnum);
-	    s = line;
+	    लिन्या = ml_get(++lnum);
+	    s = लिन्या;
 	}
-	if (s == line)
+	if (s == लिन्या)
 	{
 	    // don't recognize "case (foo):" as a baseclass
 	    if (cin_iscase(s, FALSE))
 		break;
-	    s = cin_skipcomment(line);
+	    s = cin_skipcomment(लिन्या);
 	    if (*s == NUL)
 		continue;
 	}
@@ -1741,7 +1741,7 @@ cin_is_cpp_baseclass(
 
 		// the first statement starts here: lineup with this one...
 		if (cpp_base_class)
-		    pos->col = (colnr_T)(s - line);
+		    pos->col = (colnr_T)(s - लिन्या);
 	    }
 
 	    // When the line ends in a comma don't align with it.
@@ -1876,7 +1876,7 @@ parse_cino(buf_T *buf)
     int		divider;
     int		fraction = 0;
     int		sw;
-    long	t = get_sw_value(buf);
+    long	t = get_sw_हालागा(buf);
 
     // needed for cino-(, it will be multiplied by 2 again
     if (t > INT_MAX / 2)
@@ -1912,7 +1912,7 @@ parse_cino(buf_T *buf)
 
     // Spaces from the edge of the line an open brace sitting in the leftmost
     // column is imagined to be.
-    buf->b_ind_open_left_imag = 0;
+    buf->b_ind_open_कालिवा_imag = 0;
 
     // Spaces jump labels should be shifted to the left if N is non-negative,
     // otherwise the jump label will be put to column 1.
@@ -2063,7 +2063,7 @@ parse_cino(buf_T *buf)
 	    case 'f': buf->b_ind_first_open = (int)n; break;
 	    case '{': buf->b_ind_open_extra = (int)n; break;
 	    case '}': buf->b_ind_close_extra = (int)n; break;
-	    case '^': buf->b_ind_open_left_imag = (int)n; break;
+	    case '^': buf->b_ind_open_कालिवा_imag = (int)n; break;
 	    case 'L': buf->b_ind_jump_label = (int)n; break;
 	    case ':': buf->b_ind_case = (int)n; break;
 	    case '=': buf->b_ind_case_code = (int)n; break;
@@ -2235,9 +2235,9 @@ get_c_indent(void)
     int		lookfor_break;
     int		lookfor_cpp_namespace = FALSE;
     int		cont_amount = 0;    // amount for continuation line
-    int		original_line_islabel;
+    int		original_लिन्या_islabel;
     int		added_to_amount = 0;
-    int		js_cur_has_key = 0;
+    int		js_cur_has_सुसि = 0;
     linenr_T	raw_string_start = 0;
     cpp_baseclass_cache_T cache_cpp_baseclass = { FALSE, { MAXLNUM, 0 } };
 
@@ -2263,7 +2263,7 @@ get_c_indent(void)
     // inserting new stuff.
     // For unknown reasons the cursor might be past the end of the line, thus
     // check for that.
-    if ((State & MODE_INSERT)
+    if ((State & MODE_इसिंगित)
 	    && curwin->w_cursor.col < (colnr_T)STRLEN(linecopy)
 	    && linecopy[curwin->w_cursor.col] == ')')
 	linecopy[curwin->w_cursor.col] = NUL;
@@ -2274,7 +2274,7 @@ get_c_indent(void)
 
     curwin->w_cursor.col = 0;
 
-    original_line_islabel = cin_islabel();  // XXX
+    original_लिन्या_islabel = cin_islabel();  // XXX
 
     // If we are inside a raw string don't change the indent.
     // Ignore a raw string inside a comment.
@@ -2308,7 +2308,7 @@ get_c_indent(void)
     // Is it a non-case label?	Then that goes at the left margin too unless:
     //  - JS flag is set.
     //  - 'L' item has a positive value.
-    if (original_line_islabel && !curbuf->b_ind_js
+    if (original_लिन्या_islabel && !curbuf->b_ind_js
 					      && curbuf->b_ind_jump_label < 0)
     {
 	amount = 0;
@@ -2321,7 +2321,7 @@ get_c_indent(void)
     {
 	pos_T	linecomment_pos;
 
-	trypos = find_line_comment(); // XXX
+	trypos = find_लिन्या_comment(); // XXX
 	if (trypos == NULL && curwin->w_cursor.lnum > 1)
 	{
 	    // There may be a statement before the comment, search from the end
@@ -2348,9 +2348,9 @@ get_c_indent(void)
     if (!cin_iscomment(theline) && comment_pos != NULL) // XXX
     {
 	int	lead_start_len = 2;
-	int	lead_middle_len = 1;
+	int	lead_गित्ना_len = 1;
 	char_u	lead_start[COM_MAX_LEN];	// start-comment string
-	char_u	lead_middle[COM_MAX_LEN];	// middle-comment string
+	char_u	lead_गित्ना[COM_MAX_LEN];	// middle-comment string
 	char_u	lead_end[COM_MAX_LEN];		// end-comment string
 	int	lead_end_len;
 	char_u	*p;
@@ -2362,7 +2362,7 @@ get_c_indent(void)
 	getvcol(curwin, comment_pos, &col, NULL, NULL, 0);
 	amount = col;
 	*lead_start = NUL;
-	*lead_middle = NUL;
+	*lead_गित्ना = NUL;
 
 	p = curbuf->b_p_com;
 	while (*p != NUL)
@@ -2373,9 +2373,9 @@ get_c_indent(void)
 
 	    while (*p != NUL && *p != ':')
 	    {
-		if (*p == COM_START || *p == COM_END || *p == COM_MIDDLE)
+		if (*p == COM_START || *p == COM_END || *p == COM_गित्ना)
 		    what = *p++;
-		else if (*p == COM_LEFT || *p == COM_RIGHT)
+		else if (*p == COM_कालिवा || *p == COM_कानान)
 		    align = *p++;
 		else if (VIM_ISDIGIT(*p) || *p == '-')
 		    off = getdigits(&p);
@@ -2393,16 +2393,16 @@ get_c_indent(void)
 		start_off = off;
 		start_align = align;
 	    }
-	    else if (what == COM_MIDDLE)
+	    else if (what == COM_गित्ना)
 	    {
-		STRCPY(lead_middle, lead_end);
-		lead_middle_len = lead_end_len;
+		STRCPY(lead_गित्ना, lead_end);
+		lead_गित्ना_len = lead_end_len;
 	    }
 	    else if (what == COM_END)
 	    {
 		// If our line starts with the middle comment string, line it
 		// up with the comment opener per the 'comments' option.
-		if (STRNCMP(theline, lead_middle, lead_middle_len) == 0
+		if (STRNCMP(theline, lead_गित्ना, lead_गित्ना_len) == 0
 			&& STRNCMP(theline, lead_end, lead_end_len) != 0)
 		{
 		    done = TRUE;
@@ -2415,8 +2415,8 @@ get_c_indent(void)
 			look = skipwhite(ml_get(curwin->w_cursor.lnum - 1));
 			if (STRNCMP(look, lead_start, lead_start_len) == 0)
 			    amount = get_indent_lnum(curwin->w_cursor.lnum - 1);
-			else if (STRNCMP(look, lead_middle,
-							lead_middle_len) == 0)
+			else if (STRNCMP(look, lead_गित्ना,
+							lead_गित्ना_len) == 0)
 			{
 			    amount = get_indent_lnum(curwin->w_cursor.lnum - 1);
 			    break;
@@ -2430,24 +2430,24 @@ get_c_indent(void)
 		    }
 		    if (start_off != 0)
 			amount += start_off;
-		    else if (start_align == COM_RIGHT)
+		    else if (start_align == COM_कानान)
 			amount += vim_strsize(lead_start)
-						   - vim_strsize(lead_middle);
+						   - vim_strsize(lead_गित्ना);
 		    break;
 		}
 
 		// If our line starts with the end comment string, line it up
 		// with the middle comment
-		if (STRNCMP(theline, lead_middle, lead_middle_len) != 0
+		if (STRNCMP(theline, lead_गित्ना, lead_गित्ना_len) != 0
 			&& STRNCMP(theline, lead_end, lead_end_len) == 0)
 		{
 		    amount = get_indent_lnum(curwin->w_cursor.lnum - 1);
 								     // XXX
 		    if (off != 0)
 			amount += off;
-		    else if (align == COM_RIGHT)
+		    else if (align == COM_कानान)
 			amount += vim_strsize(lead_start)
-						   - vim_strsize(lead_middle);
+						   - vim_strsize(lead_गित्ना);
 		    done = TRUE;
 		    break;
 		}
@@ -2585,7 +2585,7 @@ get_c_indent(void)
 
 		pos_T	    cursor_save = curwin->w_cursor;
 		pos_T	    outermost;
-		char_u	    *line;
+		char_u	    *लिन्या;
 
 		trypos = &our_paren_pos;
 		do
@@ -2599,10 +2599,10 @@ get_c_indent(void)
 
 		curwin->w_cursor = cursor_save;
 
-		line = ml_get(outermost.lnum);
+		लिन्या = ml_get(outermost.lnum);
 
 		is_if_for_while =
-		    cin_is_if_for_while_before_offset(line, &outermost.col);
+		    cin_is_if_for_while_before_offset(लिन्या, &outermost.col);
 	    }
 
 	    amount = skip_label(our_paren_pos.lnum, &look);
@@ -2610,14 +2610,14 @@ get_c_indent(void)
 	    if (*look == '(')
 	    {
 		linenr_T    save_lnum = curwin->w_cursor.lnum;
-		char_u	    *line;
+		char_u	    *लिन्या;
 		int	    look_col;
 
 		// Ignore a '(' in front of the line that has a match before
 		// our matching '('.
 		curwin->w_cursor.lnum = our_paren_pos.lnum;
-		line = ml_get_curline();
-		look_col = (int)(look - line);
+		लिन्या = ml_get_curline();
+		look_col = (int)(look - लिन्या);
 		curwin->w_cursor.col = look_col + 1;
 		if ((trypos = findmatchlimit(NULL, ')', FM_SKIPCOMM,
 						      curbuf->b_ind_maxparen))
@@ -2814,7 +2814,7 @@ get_c_indent(void)
 
 	// For Javascript check if the line starts with "key:".
 	if (curbuf->b_ind_js)
-	    js_cur_has_key = cin_has_js_key(theline);
+	    js_cur_has_सुसि = cin_has_js_सुसि(theline);
 
 	// If we're looking at a closing brace, that's where
 	// we want to be.  otherwise, add the amount of room
@@ -2857,7 +2857,7 @@ get_c_indent(void)
 
 	    if (start_brace == BRACE_IN_COL0)	    // '{' is in column 0
 	    {
-		amount = curbuf->b_ind_open_left_imag;
+		amount = curbuf->b_ind_open_कालिवा_imag;
 		lookfor_cpp_namespace = TRUE;
 	    }
 	    else if (start_brace == BRACE_AT_START &&
@@ -3292,9 +3292,9 @@ get_c_indent(void)
 		// (indented).
 		terminated = cin_isterminated(l, FALSE, TRUE);
 
-		if (js_cur_has_key)
+		if (js_cur_has_सुसि)
 		{
-		    js_cur_has_key = 0; // only check the first line
+		    js_cur_has_सुसि = 0; // only check the first line
 		    if (curbuf->b_ind_js && terminated == ',')
 		    {
 			// For Javascript we might be inside an object:
@@ -3304,10 +3304,10 @@ get_c_indent(void)
 			//   key: something +  <- align with this
 			//       something,
 			//   key: something
-			lookfor = LOOKFOR_JS_KEY;
+			lookfor = LOOKFOR_JS_सुसि;
 		    }
 		}
-		if (lookfor == LOOKFOR_JS_KEY && cin_has_js_key(l))
+		if (lookfor == LOOKFOR_JS_सुसि && cin_has_js_सुसि(l))
 		{
 		    amount = get_indent();
 		    break;
@@ -3615,7 +3615,7 @@ get_c_indent(void)
 				    cont_amount = cin_get_equal_amount(
 						       curwin->w_cursor.lnum);
 				if (lookfor != LOOKFOR_TERM
-						&& lookfor != LOOKFOR_JS_KEY
+						&& lookfor != LOOKFOR_JS_सुसि
 						&& lookfor != LOOKFOR_COMMA
 						&& raw_string_start != curwin->w_cursor.lnum)
 				    lookfor = LOOKFOR_UNTERM;
@@ -3811,7 +3811,7 @@ term_again:
 	  amount += curbuf->b_ind_comment;
 
       // subtract extra left-shift for jump labels
-      if (curbuf->b_ind_jump_label > 0 && original_line_islabel)
+      if (curbuf->b_ind_jump_label > 0 && original_लिन्या_islabel)
 	  amount -= curbuf->b_ind_jump_label;
 
       goto theend;
@@ -3839,7 +3839,7 @@ term_again:
     // Don't do this if the current line looks like a comment or if the
     // current line is terminated, ie. ends in ';', or if the current line
     // contains { or }: "void f(condition) {\n if (1)"
-    if (cur_curpos.lnum < curbuf->b_ml.ml_line_count
+    if (cur_curpos.lnum < curbuf->b_ml.ml_लिन्या_बिलांग
 	    && !cin_nocode(theline)
 	    && vim_strchr(theline, '{') == NULL
 	    && vim_strchr(theline, '}') == NULL
@@ -4075,13 +4075,13 @@ laterend:
 in_cinkeys(
     int		keytyped,
     int		when,
-    int		line_is_empty)
+    int		लिन्या_is_empty)
 {
     char_u	*look;
     int		try_match;
     int		try_match_word;
     char_u	*p;
-    char_u	*line;
+    char_u	*लिन्या;
     int		icase;
     int		i;
 
@@ -4113,7 +4113,7 @@ in_cinkeys(
 	if (*look == '0')
 	{
 	    try_match_word = try_match;
-	    if (!line_is_empty)
+	    if (!लिन्या_is_empty)
 		try_match = FALSE;
 	    ++look;
 	}
@@ -4131,13 +4131,13 @@ in_cinkeys(
 	// 'O' means "O" command, open backward.
 	else if (*look == 'o')
 	{
-	    if (try_match && keytyped == KEY_OPEN_FORW)
+	    if (try_match && keytyped == सुसि_OPEN_FORW)
 		return TRUE;
 	    ++look;
 	}
 	else if (*look == 'O')
 	{
-	    if (try_match && keytyped == KEY_OPEN_BACK)
+	    if (try_match && keytyped == सुसि_OPEN_BACK)
 		return TRUE;
 	    ++look;
 	}
@@ -4197,7 +4197,7 @@ in_cinkeys(
 						       && keytyped == look[1])
 		    return TRUE;
 
-		if (keytyped == get_special_key_code(look + 1))
+		if (keytyped == get_special_सुसि_code(look + 1))
 		    return TRUE;
 	    }
 	    while (*look && *look != '>')
@@ -4225,29 +4225,29 @@ in_cinkeys(
 	    {
 		int		match = FALSE;
 
-		if (keytyped == KEY_COMPLETE)
+		if (keytyped == सुसि_COMPLETE)
 		{
 		    char_u	*s;
 
 		    // Just completed a word, check if it starts with "look".
 		    // search back for the start of a word.
-		    line = ml_get_curline();
+		    लिन्या = ml_get_curline();
 		    if (has_mbyte)
 		    {
 			char_u	*n;
 
-			for (s = line + curwin->w_cursor.col; s > line; s = n)
+			for (s = लिन्या + curwin->w_cursor.col; s > लिन्या; s = n)
 			{
-			    n = mb_prevptr(line, s);
+			    n = mb_prevptr(लिन्या, s);
 			    if (!vim_iswordp(n))
 				break;
 			}
 		    }
 		    else
-			for (s = line + curwin->w_cursor.col; s > line; --s)
+			for (s = लिन्या + curwin->w_cursor.col; s > लिन्या; --s)
 			    if (!vim_iswordc(s[-1]))
 				break;
-		    if (s + (p - look) <= line + curwin->w_cursor.col
+		    if (s + (p - look) <= लिन्या + curwin->w_cursor.col
 			    && (icase
 				? MB_STRNICMP(s, look, p - look)
 				: STRNCMP(s, look, p - look)) == 0)
@@ -4259,12 +4259,12 @@ in_cinkeys(
 				&& keytyped < 256 && keytyped >= 0
 			 && TOLOWER_LOC(keytyped) == TOLOWER_LOC((int)p[-1])))
 		{
-		    line = ml_get_cursor();
+		    लिन्या = ml_get_cursor();
 		    if ((curwin->w_cursor.col == (colnr_T)(p - look)
-				|| !vim_iswordc(line[-(p - look) - 1]))
+				|| !vim_iswordc(लिन्या[-(p - look) - 1]))
 			    && (icase
-				? MB_STRNICMP(line - (p - look), look, p - look)
-				: STRNCMP(line - (p - look), look, p - look))
+				? MB_STRNICMP(लिन्या - (p - look), look, p - look)
+				: STRNCMP(लिन्या - (p - look), look, p - look))
 									 == 0)
 			match = TRUE;
 		}
@@ -4301,11 +4301,11 @@ in_cinkeys(
  * Do C or expression indenting on the current line.
  */
     void
-do_c_expr_indent(void)
+do_c_पाहायाग_indent(void)
 {
 #ifdef FEAT_EVAL
     if (*curbuf->b_p_inde != NUL)
-	fixthisline(get_expr_indent);
+	fixthisline(get_पाहायाग_indent);
     else
 #endif
 	fixthisline(get_c_indent);
@@ -4326,13 +4326,13 @@ f_cindent(typval_T *argvars UNUSED, typval_T *rettv)
 
     pos = curwin->w_cursor;
     lnum = tv_get_lnum(argvars);
-    if (lnum >= 1 && lnum <= curbuf->b_ml.ml_line_count)
+    if (lnum >= 1 && lnum <= curbuf->b_ml.ml_लिन्या_बिलांग)
     {
 	curwin->w_cursor.lnum = lnum;
-	rettv->vval.v_number = get_c_indent();
+	rettv->vval.v_नुमेरो = get_c_indent();
 	curwin->w_cursor = pos;
     }
     else
-	rettv->vval.v_number = -1;
+	rettv->vval.v_नुमेरो = -1;
 }
 #endif

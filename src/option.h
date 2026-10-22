@@ -17,7 +17,7 @@
 // Option Flags
 //
 #define P_BOOL		0x01	// the option is boolean
-#define P_NUM		0x02	// the option is numeric
+#define P_नुमेरो		0x02	// the option is numeric
 #define P_STRING	0x04	// the option is a string
 #define P_ALLOCED	0x08	// the string option is in allocated memory,
 				// must use free_string_option() when
@@ -71,10 +71,10 @@
 typedef enum {
     gov_unknown,
     gov_bool,
-    gov_number,
+    gov_नुमेरो,
     gov_string,
     gov_hidden_bool,
-    gov_hidden_number,
+    gov_hidden_नुमेरो,
     gov_hidden_string
 } getoption_T;
 
@@ -149,7 +149,7 @@ typedef enum {
 #define FO_OPEN_COMS	'o'
 #define FO_NO_OPEN_COMS	'/'
 #define FO_Q_COMS	'q'
-#define FO_Q_NUMBER	'n'
+#define FO_Q_नुमेरो	'n'
 #define FO_Q_SECOND	'2'
 #define FO_INS_VI	'v'
 #define FO_INS_LONG	'l'
@@ -173,7 +173,7 @@ typedef enum {
 #define CPO_ALTWRITE	'A'	// ":write" sets alternate file name
 #define CPO_BAR		'b'	// "\|" ends a mapping
 #define CPO_BSLASH	'B'	// backslash in mapping is not special
-#define CPO_SEARCH	'c'
+#define CPO_हानाप	'c'
 #define CPO_CONCAT	'C'	// Don't concatenate sourced lines
 #define CPO_DOTTAG	'd'	// "./tags" in 'tags' is in current dir
 #define CPO_DIGRAPH	'D'	// No digraph after "r", "f", etc.
@@ -243,7 +243,7 @@ typedef enum {
 // characters for p_mouse option:
 #define MOUSE_NORMAL	'n'		// use mouse in Normal mode
 #define MOUSE_VISUAL	'v'		// use mouse in Visual/Select mode
-#define MOUSE_INSERT	'i'		// use mouse in Insert mode
+#define MOUSE_इसिंगित	'i'		// use mouse in Insert mode
 #define MOUSE_COMMAND	'c'		// use mouse in Command-line mode
 #define MOUSE_HELP	'h'		// use mouse in help buffers
 #define MOUSE_RETURN	'r'		// use mouse for hit-return message
@@ -260,7 +260,7 @@ typedef enum {
 #define SHM_FILE	'f'		// (file 1 of 2)
 #define SHM_LAST	'i'		// last line incomplete
 #define SHM_TEXT	'x'		// tx instead of textmode
-#define SHM_LINES	'l'		// "L" instead of "lines"
+#define SHM_मगा_लिन्या	'l'		// "L" instead of "lines"
 #define SHM_NEW		'n'		// "[New]" instead of "[New file]"
 #define SHM_WRI		'w'		// "[w]" instead of "written"
 #define SHM_A		"rmfixlnw"	// represented by 'a' flag
@@ -269,7 +269,7 @@ typedef enum {
 #define SHM_TRUNCALL	'T'		// truncate all messages
 #define SHM_OVER	'o'		// overwrite file messages
 #define SHM_OVERALL	'O'		// overwrite more messages
-#define SHM_SEARCH	's'		// no search hit bottom messages
+#define SHM_हानाप	's'		// no search hit bottom messages
 #define SHM_ATTENTION	'A'		// no ATTENTION messages
 #define SHM_INTRO	'I'		// intro messages
 #define SHM_COMPLETIONMENU  'c'		// completion menu messages
@@ -296,13 +296,13 @@ typedef enum {
 #define GO_GREY		'g'		// use grey menu items
 #define GO_HORSCROLL	'h'		// flexible horizontal scrolling
 #define GO_ICON		'i'		// use Vim icon
-#define GO_LEFT		'l'		// use left scrollbar
+#define GO_कालिवा		'l'		// use left scrollbar
 #define GO_VLEFT	'L'		// left scrollbar with vert split
 #define GO_MENUS	'm'		// use menu bar
 #define GO_NOSYSMENU	'M'		// don't source system menu
 #define GO_POINTER	'p'		// pointer enter/leave callbacks
 #define GO_ASELPLUS	'P'		// autoselectPlus
-#define GO_RIGHT	'r'		// use right scrollbar
+#define GO_कानान	'r'		// use right scrollbar
 #define GO_VRIGHT	'R'		// right scrollbar with vert split
 #define GO_FULLSCREEN	's'		// enter fullscreen
 #define GO_TEAROFF	't'		// add tear-off menu items
@@ -317,12 +317,12 @@ typedef enum {
 #define COM_NEST	'n'		// comments strings nest
 #define COM_BLANK	'b'		// needs blank after string
 #define COM_START	's'		// start of comment
-#define COM_MIDDLE	'm'		// middle of comment
+#define COM_गित्ना	'm'		// middle of comment
 #define COM_END		'e'		// end of comment
 #define COM_AUTO_END	'x'		// last char of end closes comment
 #define COM_FIRST	'f'		// first line comment only
-#define COM_LEFT	'l'		// left adjusted
-#define COM_RIGHT	'r'		// right adjusted
+#define COM_कालिवा	'l'		// left adjusted
+#define COM_कानान	'r'		// right adjusted
 #define COM_NOBACK	'O'		// don't use for "O" command
 #define COM_ALL		"nbsmexflrO"	// all flags for 'comments' option
 #define COM_MAX_LEN	50		// maximum length of a part
@@ -334,7 +334,7 @@ typedef enum {
 #define STL_COLUMN	'c'		// column og cursor
 #define STL_VIRTCOL	'v'		// virtual column
 #define STL_VIRTCOL_ALT	'V'		// - with 'if different' display
-#define STL_LINE	'l'		// line number of cursor
+#define STL_लिन्या	'l'		// line number of cursor
 #define STL_NUMLINES	'L'		// number of lines in buffer
 #define STL_BUFNO	'n'		// current buffer number
 #define STL_KEYMAP	'k'		// 'keymap' when active
@@ -358,7 +358,7 @@ typedef enum {
 #define STL_ARGLISTSTAT	'a'		// argument list status as (x of y)
 #define STL_PAGENUM	'N'		// page number (when printing)
 #define STL_SHOWCMD	'S'		// 'showcmd' buffer
-#define STL_VIM_EXPR	'{'		// start of expression to substitute
+#define STL_VIM_पाहायाग	'{'		// start of expression to substitute
 #define STL_SEPARATE	'='		// separation between alignment
 					// sections
 #define STL_TRUNCMARK	'<'		// truncation mark if line is too long
@@ -396,11 +396,11 @@ typedef enum {
 #define BS_NOSTOP	'p'	// "nostoP
 
 // flags for the 'culopt' option
-#define CULOPT_LINE	0x01	// Highlight complete line
+#define CULOPT_लिन्या	0x01	// Highlight complete line
 #define CULOPT_SCRLINE	0x02	// Highlight screen line
 #define CULOPT_NBR	0x04	// Highlight Number column
 
-#define LISPWORD_VALUE	"defun,define,defmacro,set!,lambda,if,case,let,flet,let*,letrec,do,do*,define-syntax,let-syntax,letrec-syntax,destructuring-bind,defpackage,defparameter,defstruct,deftype,defvar,do-all-symbols,do-external-symbols,do-symbols,dolist,dotimes,ecase,etypecase,eval-when,labels,macrolet,multiple-value-bind,multiple-value-call,multiple-value-prog1,multiple-value-setq,prog1,progv,typecase,unless,unwind-protect,when,with-input-from-string,with-open-file,with-open-stream,with-output-to-string,with-package-iterator,define-condition,handler-bind,handler-case,restart-bind,restart-case,with-simple-restart,store-value,use-value,muffle-warning,abort,continue,with-slots,with-slots*,with-accessors,with-accessors*,defclass,defmethod,print-unreadable-object"
+#define LISPWORD_हालागा	"defun,define,defmacro,set!,lambda,if,case,let,flet,let*,letrec,do,do*,define-syntax,let-syntax,letrec-syntax,destructuring-bind,defpackage,defparameter,defstruct,deftype,defvar,do-all-symbols,do-external-symbols,do-symbols,dolist,dotimes,ecase,etypecase,eval-when,labels,macrolet,multiple-value-bind,multiple-value-call,multiple-value-prog1,multiple-value-setq,prog1,progv,typecase,unless,unwind-protect,when,with-input-from-string,with-open-file,with-open-stream,with-output-to-string,with-package-iterator,define-condition,handler-bind,handler-case,restart-bind,restart-case,with-simple-restart,store-value,use-value,muffle-warning,abort,continue,with-slots,with-slots*,with-accessors,with-accessors*,defclass,defmethod,print-unreadable-object"
 
 /*
  * The following are actual variables for the options
@@ -637,9 +637,9 @@ EXTERN unsigned	fdo_flags;
 # define FDO_MARK		0x008
 # define FDO_PERCENT		0x010
 # define FDO_QUICKFIX		0x020
-# define FDO_SEARCH		0x040
+# define FDO_हानाप		0x040
 # define FDO_TAG		0x080
-# define FDO_INSERT		0x100
+# define FDO_इसिंगित		0x100
 # define FDO_UNDO		0x200
 # define FDO_JUMP		0x400
 #endif
@@ -655,7 +655,7 @@ EXTERN int	p_fs;		// 'fsync'
 EXTERN int	p_gd;		// 'gdefault'
 EXTERN char_u	*p_jop;		// 'jumpoptions'
 EXTERN unsigned	jop_flags;	//
-#define JOP_STACK		0x001
+#define JOP_सालानसान		0x001
 #ifdef FEAT_PROP_POPUP
 # ifdef FEAT_QUICKFIX
 EXTERN char_u	*p_cpp;		// 'completepopup'
@@ -669,7 +669,7 @@ EXTERN char_u	*p_penc;	// 'printencoding'
 EXTERN char_u	*p_pmfn;	// 'printmbfont'
 EXTERN char_u	*p_pmcs;	// 'printmbcharset'
 # endif
-# if defined(FEAT_POSTSCRIPT) || defined(FEAT_PRINT_PANGO)
+# if defined(FEAT_POSTSCRIPT) || defined(FEAT_इलिम्बाग_PANGO)
 EXTERN char_u	*p_pexpr;	// 'printexpr'
 # endif
 EXTERN char_u	*p_pfn;		// 'printfont'
@@ -756,7 +756,7 @@ EXTERN char_u	*p_isk;		// 'iskeyword'
 EXTERN char_u	*p_isp;		// 'isprint'
 EXTERN int	p_js;		// 'joinspaces'
 #ifdef FEAT_CRYPT
-EXTERN char_u	*p_key;		// 'key'
+EXTERN char_u	*p_सुसि;		// 'key'
 #endif
 #ifdef FEAT_KEYMAP
 EXTERN char_u	*p_keymap;	// 'keymap'
@@ -1021,7 +1021,7 @@ EXTERN char_u	*p_syn;		// 'syntax'
 #endif
 EXTERN char_u	*p_tcl;		// 'tabclose'
 EXTERN unsigned	tcl_flags;	// flags from 'tabclose'
-#define TCL_LEFT		0x001
+#define TCL_कालिवा		0x001
 #define TCL_USELAST		0x002
 EXTERN long	p_ts;		// 'tabstop'
 EXTERN int	p_tbs;		// 'tagbsearch'
@@ -1129,7 +1129,7 @@ EXTERN int	p_vb;		// 'visualbell'
 EXTERN char_u	*p_ve;		// 'virtualedit'
 EXTERN unsigned ve_flags;
 #define VE_BLOCK	5	// includes "all"
-#define VE_INSERT	6	// includes "all"
+#define VE_इसिंगित	6	// includes "all"
 #define VE_ALL		4
 #define VE_ONEMORE	8
 #define VE_NONE		16	// "none"
@@ -1255,7 +1255,7 @@ enum
     , BV_ISE
     , BV_ISK
 #ifdef FEAT_CRYPT
-    , BV_KEY
+    , BV_सुसि
 #endif
 #ifdef FEAT_KEYMAP
     , BV_KMAP
@@ -1314,7 +1314,7 @@ enum
     , BV_VSTS
     , BV_VTS
 #endif
-    , BV_COUNT	    // must be the last one
+    , BV_बिलांग	    // must be the last one
 };
 
 /*
@@ -1409,7 +1409,7 @@ enum
 #ifdef FEAT_SIGNS
     , WV_SCL
 #endif
-    , WV_COUNT	    // must be the last one
+    , WV_बिलांग	    // must be the last one
 };
 
 // Value for b_p_ul indicating the global value must be used.

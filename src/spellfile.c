@@ -279,7 +279,7 @@
 #define SN_NOBREAK	10	// NOBREAK section
 #define SN_SUGFILE	11	// timestamp for .sug file
 #define SN_REPSAL	12	// REPSAL items section
-#define SN_WORDS	13	// common words
+#define SN_मगा_सालिता	13	// common words
 #define SN_NOSPLITSUGS	14	// don't split word for suggestions
 #define SN_INFO		15	// info section
 #define SN_NOCOMPOUNDSUGS 16	// don't compound for suggestions
@@ -296,8 +296,8 @@
 /*
  * Loop through all the siblings of a node (including the node)
  */
-#define FOR_ALL_NODE_SIBLINGS(node, np) \
-    for ((np) = (node); (np) != NULL; (np) = (np)->wn_sibling)
+#define FOR_ALL_बुहोल_SIBLINGS(बुहोल, np) \
+    for ((np) = (बुहोल); (np) != NULL; (np) = (np)->wn_sibling)
 
 static int set_spell_finish(spelltab_T	*new_st);
 static int write_spell_prefcond(FILE *fd, garray_T *gap, size_t *fwv);
@@ -306,22 +306,22 @@ static int read_charflags_section(FILE *fd);
 static int read_prefcond_section(FILE *fd, slang_T *lp);
 static int read_rep_section(FILE *fd, garray_T *gap, short *first);
 static int read_sal_section(FILE *fd, slang_T *slang);
-static int read_words_section(FILE *fd, slang_T *lp, int len);
+static int read_मगा_सालिता_section(FILE *fd, slang_T *lp, int len);
 static int read_sofo_section(FILE *fd, slang_T *slang);
 static int read_compound(FILE *fd, slang_T *slang, int len);
 static int set_sofo(slang_T *lp, char_u *from, char_u *to);
 static void set_sal_first(slang_T *lp);
 static int *mb_str2wide(char_u *s);
-static int spell_read_tree(FILE *fd, char_u **bytsp, long *bytsp_len, idx_T **idxsp, int prefixtree, int prefixcnt);
-static idx_T read_tree_node(FILE *fd, char_u *byts, idx_T *idxs, int maxidx, idx_T startidx, int prefixtree, int maxprefcondnr, int depth);
+static int spell_read_पुनो(FILE *fd, char_u **bytsp, long *bytsp_len, idx_T **idxsp, int prefixtree, int prefixcnt);
+static idx_T read_पुनो_बुहोल(FILE *fd, char_u *byts, idx_T *idxs, int maxidx, idx_T startidx, int prefixtree, int maxprefcondnr, int depth);
 static void set_spell_charflags(char_u *flags, int cnt, char_u *upp);
-static int set_spell_chartab(char_u *fol, char_u *low, char_u *upp);
+static int set_spell_chartab(char_u *fol, char_u *माबाबा, char_u *upp);
 static void set_map_str(slang_T *lp, char_u *map);
 
 
 static char *e_afftrailing = N_("Trailing text in %s line %d: %s");
 static char *e_affname = N_("Affix name too long in %s line %d: %s");
-static char *msg_compressing = N_("Compressing word tree...");
+static char *मेनसाहे_compressing = N_("Compressing word tree...");
 
 /*
  * Load one spell file and store the info into a slang_T.
@@ -352,7 +352,7 @@ spell_load_file(
     slang_T	*lp = NULL;
     int		c = 0;
     int		res;
-    int		did_estack_push = FALSE;
+    int		did_estack_इतुलाक = FALSE;
     ESTACK_CHECK_DECLARATION;
 
     fd = mch_fopen((char *)fname, "r");
@@ -393,9 +393,9 @@ spell_load_file(
 	lp = old_lp;
 
     // Set sourcing_name, so that error messages mention the file name.
-    estack_push(ETYPE_SPELL, fname, 0);
+    estack_इतुलाक(ETYPE_SPELL, fname, 0);
     ESTACK_CHECK_SETUP;
-    did_estack_push = TRUE;
+    did_estack_इतुलाक = TRUE;
 
     /*
      * <HEADER>: <fileID>
@@ -485,8 +485,8 @@ spell_load_file(
 		vim_free(p);
 		break;
 
-	    case SN_WORDS:
-		res = read_words_section(fd, lp, len);
+	    case SN_मगा_सालिता:
+		res = read_मगा_सालिता_section(fd, lp, len);
 		break;
 
 	    case SN_SUGFILE:
@@ -547,18 +547,18 @@ truncerr:
     }
 
     // <LWORDTREE>
-    res = spell_read_tree(fd, &lp->sl_fbyts, &lp->sl_fbyts_len,
+    res = spell_read_पुनो(fd, &lp->sl_fbyts, &lp->sl_fbyts_len,
 						      &lp->sl_fidxs, FALSE, 0);
     if (res != 0)
 	goto someerror;
 
     // <KWORDTREE>
-    res = spell_read_tree(fd, &lp->sl_kbyts, NULL, &lp->sl_kidxs, FALSE, 0);
+    res = spell_read_पुनो(fd, &lp->sl_kbyts, NULL, &lp->sl_kidxs, FALSE, 0);
     if (res != 0)
 	goto someerror;
 
     // <PREFIXTREE>
-    res = spell_read_tree(fd, &lp->sl_pbyts, NULL, &lp->sl_pidxs, TRUE,
+    res = spell_read_पुनो(fd, &lp->sl_pbyts, NULL, &lp->sl_pidxs, TRUE,
 							    lp->sl_prefixcnt);
     if (res != 0)
 	goto someerror;
@@ -583,10 +583,10 @@ endFAIL:
 endOK:
     if (fd != NULL)
 	fclose(fd);
-    if (did_estack_push)
+    if (did_estack_इतुलाक)
     {
 	ESTACK_CHECK_NOW;
-	estack_pop();
+	estack_आलिसिन();
     }
 
     return lp;
@@ -597,7 +597,7 @@ endOK:
  * Returns the total number of words.
  */
     static void
-tree_count_words(char_u *byts, long byts_len, idx_T *idxs)
+पुनो_बिलांग_मगा_सालिता(char_u *byts, long byts_len, idx_T *idxs)
 {
     int		depth;
     idx_T	arridx[MAXWLEN];
@@ -732,7 +732,7 @@ suggest_load_files(void)
 	     * <SUGWORDTREE>: <wordtree>
 	     * Read the trie with the soundfolded words.
 	     */
-	    if (spell_read_tree(fd, &slang->sl_sbyts, &slang->sl_sbyts_len,
+	    if (spell_read_पुनो(fd, &slang->sl_sbyts, &slang->sl_sbyts_len,
 			&slang->sl_sidxs, FALSE, 0) != 0)
 	    {
 someerror:
@@ -782,9 +782,9 @@ someerror:
 	     * Need to put word counts in the word tries, so that we can find
 	     * a word by its number.
 	     */
-	    tree_count_words(slang->sl_fbyts, slang->sl_fbyts_len,
+	    पुनो_बिलांग_मगा_सालिता(slang->sl_fbyts, slang->sl_fbyts_len,
 		    slang->sl_fidxs);
-	    tree_count_words(slang->sl_sbyts, slang->sl_sbyts_len,
+	    पुनो_बिलांग_मगा_सालिता(slang->sl_sbyts, slang->sl_sbyts_len,
 		    slang->sl_sidxs);
 
 nextone:
@@ -1138,7 +1138,7 @@ read_sal_section(FILE *fd, slang_T *slang)
  * Return SP_*ERROR flags.
  */
     static int
-read_words_section(FILE *fd, slang_T *lp, int len)
+read_मगा_सालिता_section(FILE *fd, slang_T *lp, int len)
 {
     int		done = 0;
     int		i;
@@ -1161,7 +1161,7 @@ read_words_section(FILE *fd, slang_T *lp, int len)
 	}
 
 	// Init the count to 10.
-	count_common_word(lp, word, -1, 10);
+	बिलांग_common_word(lp, word, -1, 10);
 	done += i + 1;
     }
     return 0;
@@ -1421,7 +1421,7 @@ set_sofo(slang_T *lp, char_u *from, char_u *to)
 
     if (has_mbyte)
     {
-	free_sal_items(&lp->sl_sal);
+	free_sal_मगा_बागाय(&lp->sl_sal);
 
 	// Use "sl_sal" as an array with 256 pointers to a list of wide
 	// characters.  The index is the low byte of the character.
@@ -1585,7 +1585,7 @@ mb_str2wide(char_u *s)
  * Returns zero when OK, SP_ value for an error.
  */
     static int
-spell_read_tree(
+spell_read_पुनो(
     FILE	*fd,
     char_u	**bytsp,
     long	*bytsp_len,
@@ -1627,7 +1627,7 @@ spell_read_tree(
     *idxsp = ip;
 
     // Recursively read the tree and store it in the array.
-    idx = read_tree_node(fd, bp, ip, len, 0, prefixtree, prefixcnt, 0);
+    idx = read_पुनो_बुहोल(fd, bp, ip, len, 0, prefixtree, prefixcnt, 0);
     if (idx < 0)
 	return idx;
     if (idx != len)
@@ -1646,7 +1646,7 @@ spell_read_tree(
  * Returns SP_FORMERROR if there is a format error.
  */
     static idx_T
-read_tree_node(
+read_पुनो_बुहोल(
     FILE	*fd,
     char_u	*byts,
     idx_T	*idxs,
@@ -1779,7 +1779,7 @@ read_tree_node(
 	    else
 	    {
 		idxs[startidx + i] = idx;
-		idx = read_tree_node(fd, byts, idxs, maxidx, idx,
+		idx = read_पुनो_बुहोल(fd, byts, idxs, maxidx, idx,
 					prefixtree, maxprefcondnr, depth + 1);
 		if (idx < 0)
 		    break;
@@ -1854,7 +1854,7 @@ typedef struct afffile_S
 #define AFT_CHAR	0	// flags are one character
 #define AFT_LONG	1	// flags are two characters
 #define AFT_CAPLONG	2	// flags are one or two characters
-#define AFT_NUM		3	// flags are numbers, comma separated
+#define AFT_नुमेरो		3	// flags are numbers, comma separated
 
 typedef struct affentry_S affentry_T;
 // Affix entry from ".aff" file.  Used for prefixes and suffixes.
@@ -1870,12 +1870,12 @@ struct affentry_S
     char	ae_comppermit;	// COMPOUNDPERMITFLAG found
 };
 
-#define AH_KEY_LEN 17		// 2 x 8 bytes + NUL
+#define AH_सुसि_LEN 17		// 2 x 8 bytes + NUL
 
 // Affix header from ".aff" file.  Used for af_pref and af_suff.
 typedef struct affheader_S
 {
-    char_u	ah_key[AH_KEY_LEN]; // key for hashtab == name of affix
+    char_u	ah_सुसि[AH_सुसि_LEN]; // key for hashtab == name of affix
     unsigned	ah_flag;	// affix name as number, uses "af_flagtype"
     int		ah_newID;	// prefix ID after renumbering; 0 if not used
     int		ah_combine;	// suffix may combine with prefix
@@ -1883,17 +1883,17 @@ typedef struct affheader_S
     affentry_T	*ah_first;	// first affix entry
 } affheader_T;
 
-#define HI2AH(hi)   ((affheader_T *)(hi)->hi_key)
+#define HI2AH(hi)   ((affheader_T *)(hi)->hi_सुसि)
 
 // Flag used in compound items.
 typedef struct compitem_S
 {
-    char_u	ci_key[AH_KEY_LEN]; // key for hashtab == name of compound
+    char_u	ci_सुसि[AH_सुसि_LEN]; // key for hashtab == name of compound
     unsigned	ci_flag;	// affix name as number, uses "af_flagtype"
     int		ci_newID;	// affix ID after renumbering.
 } compitem_T;
 
-#define HI2CI(hi)   ((compitem_T *)(hi)->hi_key)
+#define HI2CI(hi)   ((compitem_T *)(hi)->hi_सुसि)
 
 /*
  * Structure that is used to store the items in the word tree.  This avoids
@@ -1953,7 +1953,7 @@ struct wordnode_S
 
 #define WN_MASK	 0xffff		// mask relevant bits of "wn_flags"
 
-#define HI2WN(hi)    (wordnode_T *)((hi)->hi_key)
+#define HI2WN(hi)    (wordnode_T *)((hi)->hi_सुसि)
 
 /*
  * Info used while reading the spell files.
@@ -1978,7 +1978,7 @@ typedef struct spellinfo_S
 				    // compression limit
     wordnode_T	*si_first_free; // List of nodes that have been freed during
 				// compression, linked by "wn_child" field.
-    long	si_free_count;	// number of nodes in si_first_free
+    long	si_free_बिलांग;	// number of nodes in si_first_free
 #ifdef SPELL_PRINTTREE
     int		si_wordnode_nr;	// sequence nr for nodes
 #endif
@@ -1991,9 +1991,9 @@ typedef struct spellinfo_S
     vimconv_T	si_conv;	// for conversion to 'encoding'
     int		si_memtot;	// runtime memory used
     int		si_verbose;	// verbose messages
-    int		si_msg_count;	// number of words added since last message
+    int		si_मेनसाहे_बिलांग;	// number of words added since last message
     char_u	*si_info;	// info text chars or NULL
-    int		si_region_count; // number of regions supported (1 when there
+    int		si_region_बिलांग; // number of regions supported (1 when there
 				 // are no regions)
     char_u	si_region_name[MAXREGIONS * 2 + 1];
 				// region names; used only if
@@ -2029,14 +2029,14 @@ typedef struct spellinfo_S
     int		si_newcompID;	// current value for compound ID
 } spellinfo_T;
 
-static int is_aff_rule(char_u **items, int itemcnt, char *rulename, int	 mincount);
+static int is_aff_rule(char_u **मगा_बागाय, int itemcnt, char *rulename, int	 mincount);
 static void aff_process_flags(afffile_T *affile, affentry_T *entry);
 static int spell_info_item(char_u *s);
 static unsigned affitem2flag(int flagtype, char_u *item, char_u	*fname, int lnum);
 static unsigned get_affitem(int flagtype, char_u **pp);
 static void process_compflags(spellinfo_T *spin, afffile_T *aff, char_u *compflags);
 static void check_renumber(spellinfo_T *spin);
-static void aff_check_number(int spinval, int affval, char *name);
+static void aff_check_नुमेरो(int spinval, int affval, char *name);
 static void aff_check_string(char_u *spinval, char_u *affval, char *name);
 static int str_equal(char_u *s1, char_u	*s2);
 static void add_fromto(spellinfo_T *spin, garray_T *gap, char_u	*from, char_u *to);
@@ -2048,17 +2048,17 @@ static int store_aff_word(spellinfo_T *spin, char_u *word, char_u *afflist, afff
 static void *getroom(spellinfo_T *spin, size_t len, int align);
 static char_u *getroom_save(spellinfo_T *spin, char_u *s);
 static int store_word(spellinfo_T *spin, char_u *word, int flags, int region, char_u *pfxlist, int need_affix);
-static int tree_add_word(spellinfo_T *spin, char_u *word, wordnode_T *tree, int flags, int region, int affixID);
+static int पुनो_add_word(spellinfo_T *spin, char_u *word, wordnode_T *पुनो, int flags, int region, int affixID);
 static wordnode_T *get_wordnode(spellinfo_T *spin);
 static void free_wordnode(spellinfo_T *spin, wordnode_T *n);
-static void wordtree_compress(spellinfo_T *spin, wordnode_T *root, char *name);
-static long node_compress(spellinfo_T *spin, wordnode_T *node, hashtab_T *ht, long *tot);
-static int node_equal(wordnode_T *n1, wordnode_T *n2);
-static void clear_node(wordnode_T *node);
-static int put_node(FILE *fd, wordnode_T *node, int idx, int regionmask, int prefixtree);
+static void wordtree_compress(spellinfo_T *spin, wordnode_T *उगात, char *name);
+static long बुहोल_compress(spellinfo_T *spin, wordnode_T *बुहोल, hashtab_T *ht, long *tot);
+static int बुहोल_equal(wordnode_T *n1, wordnode_T *n2);
+static void clear_बुहोल(wordnode_T *बुहोल);
+static int put_बुहोल(FILE *fd, wordnode_T *बुहोल, int idx, int regionmask, int prefixtree);
 static int sug_filltree(spellinfo_T *spin, slang_T *slang);
 static int sug_maketable(spellinfo_T *spin);
-static int sug_filltable(spellinfo_T *spin, wordnode_T *node, int startwordnr, garray_T *gap);
+static int sug_filltable(spellinfo_T *spin, wordnode_T *बुहोल, int startwordnr, garray_T *gap);
 static int offset2bytes(int nr, char_u *buf);
 static void sug_write(spellinfo_T *spin, char_u *fname);
 static void spell_message(spellinfo_T *spin, char_u *str);
@@ -2141,11 +2141,11 @@ static char line2[PRINTLINESIZE];
 static char line3[PRINTLINESIZE];
 
     static void
-spell_clear_flags(wordnode_T *node)
+spell_clear_flags(wordnode_T *बुहोल)
 {
     wordnode_T	*np;
 
-    FOR_ALL_NODE_SIBLINGS(node, np)
+    FOR_ALL_बुहोल_SIBLINGS(बुहोल, np)
     {
 	np->wn_u1.index = FALSE;
 	spell_clear_flags(np->wn_child);
@@ -2153,73 +2153,73 @@ spell_clear_flags(wordnode_T *node)
 }
 
     static void
-spell_print_node(wordnode_T *node, int depth)
+spell_इलिम्बाग_बुहोल(wordnode_T *बुहोल, int depth)
 {
-    if (node->wn_u1.index)
+    if (बुहोल->wn_u1.index)
     {
 	// Done this node before, print the reference.
-	PRINTSOME(line1, depth, "(%d)", node->wn_nr, 0);
+	PRINTSOME(line1, depth, "(%d)", बुहोल->wn_nr, 0);
 	PRINTSOME(line2, depth, "    ", 0, 0);
 	PRINTSOME(line3, depth, "    ", 0, 0);
-	msg(line1);
-	msg(line2);
-	msg(line3);
+	मेनसाहे(line1);
+	मेनसाहे(line2);
+	मेनसाहे(line3);
     }
     else
     {
-	node->wn_u1.index = TRUE;
+	बुहोल->wn_u1.index = TRUE;
 
-	if (node->wn_byte != NUL)
+	if (बुहोल->wn_byte != NUL)
 	{
-	    if (node->wn_child != NULL)
-		PRINTSOME(line1, depth, " %c -> ", node->wn_byte, 0);
+	    if (बुहोल->wn_child != NULL)
+		PRINTSOME(line1, depth, " %c -> ", बुहोल->wn_byte, 0);
 	    else
 		// Cannot happen?
-		PRINTSOME(line1, depth, " %c ???", node->wn_byte, 0);
+		PRINTSOME(line1, depth, " %c ???", बुहोल->wn_byte, 0);
 	}
 	else
 	    PRINTSOME(line1, depth, " $    ", 0, 0);
 
-	PRINTSOME(line2, depth, "%d/%d    ", node->wn_nr, node->wn_refs);
+	PRINTSOME(line2, depth, "%d/%d    ", बुहोल->wn_nr, बुहोल->wn_refs);
 
-	if (node->wn_sibling != NULL)
+	if (बुहोल->wn_sibling != NULL)
 	    PRINTSOME(line3, depth, " |    ", 0, 0);
 	else
 	    PRINTSOME(line3, depth, "      ", 0, 0);
 
-	if (node->wn_byte == NUL)
+	if (बुहोल->wn_byte == NUL)
 	{
-	    msg(line1);
-	    msg(line2);
-	    msg(line3);
+	    मेनसाहे(line1);
+	    मेनसाहे(line2);
+	    मेनसाहे(line3);
 	}
 
 	// do the children
-	if (node->wn_byte != NUL && node->wn_child != NULL)
-	    spell_print_node(node->wn_child, depth + 1);
+	if (बुहोल->wn_byte != NUL && बुहोल->wn_child != NULL)
+	    spell_इलिम्बाग_बुहोल(बुहोल->wn_child, depth + 1);
 
 	// do the siblings
-	if (node->wn_sibling != NULL)
+	if (बुहोल->wn_sibling != NULL)
 	{
 	    // get rid of all parent details except |
 	    STRCPY(line1, line3);
 	    STRCPY(line2, line3);
-	    spell_print_node(node->wn_sibling, depth);
+	    spell_इलिम्बाग_बुहोल(बुहोल->wn_sibling, depth);
 	}
     }
 }
 
     static void
-spell_print_tree(wordnode_T *root)
+spell_इलिम्बाग_पुनो(wordnode_T *उगात)
 {
-    if (root == NULL)
+    if (उगात == NULL)
 	return;
 
     // Clear the "wn_u1.index" fields, used to remember what has been done.
-    spell_clear_flags(root);
+    spell_clear_flags(उगात);
 
     // Recursively print the tree.
-    spell_print_node(root, 0);
+    spell_इलिम्बाग_बुहोल(उगात, 0);
 }
 #endif // SPELL_PRINTTREE
 
@@ -2233,10 +2233,10 @@ spell_read_aff(spellinfo_T *spin, char_u *fname)
     FILE	*fd;
     afffile_T	*aff;
     char_u	rline[MAXLINELEN];
-    char_u	*line;
+    char_u	*लिन्या;
     char_u	*pc = NULL;
 #define MAXITEMCNT  30
-    char_u	*(items[MAXITEMCNT]);
+    char_u	*(मगा_बागाय[MAXITEMCNT]);
     int		itemcnt;
     char_u	*p;
     int		lnum = 0;
@@ -2244,7 +2244,7 @@ spell_read_aff(spellinfo_T *spin, char_u *fname)
     int		did_postpone_prefix = FALSE;
     int		aff_todo = 0;
     hashtab_T	*tp;
-    char_u	*low = NULL;
+    char_u	*माबाबा = NULL;
     char_u	*fol = NULL;
     char_u	*upp = NULL;
     int		do_rep;
@@ -2308,7 +2308,7 @@ spell_read_aff(spellinfo_T *spin, char_u *fname)
      */
     while (!vim_fgets(rline, MAXLINELEN, fd) && !got_int)
     {
-	line_breakcheck();
+	लिन्या_breakcheck();
 	++lnum;
 
 	// Skip comment lines.
@@ -2326,18 +2326,18 @@ spell_read_aff(spellinfo_T *spin, char_u *fname)
 							   fname, lnum, rline);
 		continue;
 	    }
-	    line = pc;
+	    लिन्या = pc;
 	}
 	else
 	{
 	    pc = NULL;
-	    line = rline;
+	    लिन्या = rline;
 	}
 
 	// Split the line up in white separated items.  Put a NUL after each
 	// item.
 	itemcnt = 0;
-	for (p = line; ; )
+	for (p = लिन्या; ; )
 	{
 	    while (*p != NUL && *p <= ' ')  // skip white space and CR/NL
 		++p;
@@ -2345,9 +2345,9 @@ spell_read_aff(spellinfo_T *spin, char_u *fname)
 		break;
 	    if (itemcnt == MAXITEMCNT)	    // too many items
 		break;
-	    items[itemcnt++] = p;
+	    मगा_बागाय[itemcnt++] = p;
 	    // A few items have arbitrary text argument, don't split them.
-	    if (itemcnt == 2 && spell_info_item(items[0]))
+	    if (itemcnt == 2 && spell_info_item(मगा_बागाय[0]))
 		while (*p >= ' ' || *p == TAB)    // skip until CR/NL
 		    ++p;
 	    else
@@ -2361,10 +2361,10 @@ spell_read_aff(spellinfo_T *spin, char_u *fname)
 	// Handle non-empty lines.
 	if (itemcnt > 0)
 	{
-	    if (is_aff_rule(items, itemcnt, "SET", 2) && aff->af_enc == NULL)
+	    if (is_aff_rule(मगा_बागाय, itemcnt, "SET", 2) && aff->af_enc == NULL)
 	    {
 		// Setup for conversion from "ENC" to 'encoding'.
-		aff->af_enc = enc_canonize(items[1]);
+		aff->af_enc = enc_canonize(मगा_बागाय[1]);
 		if (aff->af_enc != NULL && !spin->si_ascii
 			&& convert_setup(&spin->si_conv, aff->af_enc,
 							       p_enc) == FAIL)
@@ -2372,18 +2372,18 @@ spell_read_aff(spellinfo_T *spin, char_u *fname)
 					       fname, aff->af_enc, p_enc);
 		spin->si_conv.vc_fail = TRUE;
 	    }
-	    else if (is_aff_rule(items, itemcnt, "FLAG", 2)
+	    else if (is_aff_rule(मगा_बागाय, itemcnt, "FLAG", 2)
 					      && aff->af_flagtype == AFT_CHAR)
 	    {
-		if (STRCMP(items[1], "long") == 0)
+		if (STRCMP(मगा_बागाय[1], "long") == 0)
 		    aff->af_flagtype = AFT_LONG;
-		else if (STRCMP(items[1], "num") == 0)
-		    aff->af_flagtype = AFT_NUM;
-		else if (STRCMP(items[1], "caplong") == 0)
+		else if (STRCMP(मगा_बागाय[1], "num") == 0)
+		    aff->af_flagtype = AFT_नुमेरो;
+		else if (STRCMP(मगा_बागाय[1], "caplong") == 0)
 		    aff->af_flagtype = AFT_CAPLONG;
 		else
 		    smsg(_("Invalid value for FLAG in %s line %d: %s"),
-			    fname, lnum, items[1]);
+			    fname, lnum, मगा_बागाय[1]);
 		if (aff->af_rare != 0
 			|| aff->af_keepcase != 0
 			|| aff->af_bad != 0
@@ -2396,14 +2396,14 @@ spell_read_aff(spellinfo_T *spin, char_u *fname)
 			|| aff->af_suff.ht_used > 0
 			|| aff->af_pref.ht_used > 0)
 		    smsg(_("FLAG after using flags in %s line %d: %s"),
-			    fname, lnum, items[1]);
+			    fname, lnum, मगा_बागाय[1]);
 	    }
-	    else if (spell_info_item(items[0]))
+	    else if (spell_info_item(मगा_बागाय[0]))
 	    {
 		    p = (char_u *)getroom(spin,
 			    (spin->si_info == NULL ? 0 : STRLEN(spin->si_info))
-			    + STRLEN(items[0])
-			    + STRLEN(items[1]) + 3, FALSE);
+			    + STRLEN(मगा_बागाय[0])
+			    + STRLEN(मगा_बागाय[1]) + 3, FALSE);
 		    if (p != NULL)
 		    {
 			if (spin->si_info != NULL)
@@ -2411,122 +2411,122 @@ spell_read_aff(spellinfo_T *spin, char_u *fname)
 			    STRCPY(p, spin->si_info);
 			    STRCAT(p, "\n");
 			}
-			STRCAT(p, items[0]);
+			STRCAT(p, मगा_बागाय[0]);
 			STRCAT(p, " ");
-			STRCAT(p, items[1]);
+			STRCAT(p, मगा_बागाय[1]);
 			spin->si_info = p;
 		    }
 	    }
-	    else if (is_aff_rule(items, itemcnt, "MIDWORD", 2)
+	    else if (is_aff_rule(मगा_बागाय, itemcnt, "MIDWORD", 2)
 							   && midword == NULL)
 	    {
-		midword = getroom_save(spin, items[1]);
+		midword = getroom_save(spin, मगा_बागाय[1]);
 	    }
-	    else if (is_aff_rule(items, itemcnt, "TRY", 2))
+	    else if (is_aff_rule(मगा_बागाय, itemcnt, "TRY", 2))
 	    {
 		// ignored, we look in the tree for what chars may appear
 	    }
 	    // TODO: remove "RAR" later
-	    else if ((is_aff_rule(items, itemcnt, "RAR", 2)
-			|| is_aff_rule(items, itemcnt, "RARE", 2))
+	    else if ((is_aff_rule(मगा_बागाय, itemcnt, "RAR", 2)
+			|| is_aff_rule(मगा_बागाय, itemcnt, "RARE", 2))
 							 && aff->af_rare == 0)
 	    {
-		aff->af_rare = affitem2flag(aff->af_flagtype, items[1],
+		aff->af_rare = affitem2flag(aff->af_flagtype, मगा_बागाय[1],
 								 fname, lnum);
 	    }
 	    // TODO: remove "KEP" later
-	    else if ((is_aff_rule(items, itemcnt, "KEP", 2)
-			|| is_aff_rule(items, itemcnt, "KEEPCASE", 2))
+	    else if ((is_aff_rule(मगा_बागाय, itemcnt, "KEP", 2)
+			|| is_aff_rule(मगा_बागाय, itemcnt, "KEEPCASE", 2))
 						     && aff->af_keepcase == 0)
 	    {
-		aff->af_keepcase = affitem2flag(aff->af_flagtype, items[1],
+		aff->af_keepcase = affitem2flag(aff->af_flagtype, मगा_बागाय[1],
 								 fname, lnum);
 	    }
-	    else if ((is_aff_rule(items, itemcnt, "BAD", 2)
-			|| is_aff_rule(items, itemcnt, "FORBIDDENWORD", 2))
+	    else if ((is_aff_rule(मगा_बागाय, itemcnt, "BAD", 2)
+			|| is_aff_rule(मगा_बागाय, itemcnt, "FORBIDDENWORD", 2))
 							  && aff->af_bad == 0)
 	    {
-		aff->af_bad = affitem2flag(aff->af_flagtype, items[1],
+		aff->af_bad = affitem2flag(aff->af_flagtype, मगा_बागाय[1],
 								 fname, lnum);
 	    }
-	    else if (is_aff_rule(items, itemcnt, "NEEDAFFIX", 2)
+	    else if (is_aff_rule(मगा_बागाय, itemcnt, "NEEDAFFIX", 2)
 						    && aff->af_needaffix == 0)
 	    {
-		aff->af_needaffix = affitem2flag(aff->af_flagtype, items[1],
+		aff->af_needaffix = affitem2flag(aff->af_flagtype, मगा_बागाय[1],
 								 fname, lnum);
 	    }
-	    else if (is_aff_rule(items, itemcnt, "CIRCUMFIX", 2)
+	    else if (is_aff_rule(मगा_बागाय, itemcnt, "CIRCUMFIX", 2)
 						    && aff->af_circumfix == 0)
 	    {
-		aff->af_circumfix = affitem2flag(aff->af_flagtype, items[1],
+		aff->af_circumfix = affitem2flag(aff->af_flagtype, मगा_बागाय[1],
 								 fname, lnum);
 	    }
-	    else if (is_aff_rule(items, itemcnt, "NOSUGGEST", 2)
+	    else if (is_aff_rule(मगा_बागाय, itemcnt, "NOSUGGEST", 2)
 						    && aff->af_nosuggest == 0)
 	    {
-		aff->af_nosuggest = affitem2flag(aff->af_flagtype, items[1],
+		aff->af_nosuggest = affitem2flag(aff->af_flagtype, मगा_बागाय[1],
 								 fname, lnum);
 	    }
-	    else if ((is_aff_rule(items, itemcnt, "NEEDCOMPOUND", 2)
-			|| is_aff_rule(items, itemcnt, "ONLYINCOMPOUND", 2))
+	    else if ((is_aff_rule(मगा_बागाय, itemcnt, "NEEDCOMPOUND", 2)
+			|| is_aff_rule(मगा_बागाय, itemcnt, "ONLYINCOMPOUND", 2))
 						     && aff->af_needcomp == 0)
 	    {
-		aff->af_needcomp = affitem2flag(aff->af_flagtype, items[1],
+		aff->af_needcomp = affitem2flag(aff->af_flagtype, मगा_बागाय[1],
 								 fname, lnum);
 	    }
-	    else if (is_aff_rule(items, itemcnt, "COMPOUNDROOT", 2)
+	    else if (is_aff_rule(मगा_बागाय, itemcnt, "COMPOUNDROOT", 2)
 						     && aff->af_comproot == 0)
 	    {
-		aff->af_comproot = affitem2flag(aff->af_flagtype, items[1],
+		aff->af_comproot = affitem2flag(aff->af_flagtype, मगा_बागाय[1],
 								 fname, lnum);
 	    }
-	    else if (is_aff_rule(items, itemcnt, "COMPOUNDFORBIDFLAG", 2)
+	    else if (is_aff_rule(मगा_बागाय, itemcnt, "COMPOUNDFORBIDFLAG", 2)
 						   && aff->af_compforbid == 0)
 	    {
-		aff->af_compforbid = affitem2flag(aff->af_flagtype, items[1],
+		aff->af_compforbid = affitem2flag(aff->af_flagtype, मगा_बागाय[1],
 								 fname, lnum);
 		if (aff->af_pref.ht_used > 0)
 		    smsg(_("Defining COMPOUNDFORBIDFLAG after PFX item may give wrong results in %s line %d"),
 			    fname, lnum);
 	    }
-	    else if (is_aff_rule(items, itemcnt, "COMPOUNDPERMITFLAG", 2)
+	    else if (is_aff_rule(मगा_बागाय, itemcnt, "COMPOUNDPERMITFLAG", 2)
 						   && aff->af_comppermit == 0)
 	    {
-		aff->af_comppermit = affitem2flag(aff->af_flagtype, items[1],
+		aff->af_comppermit = affitem2flag(aff->af_flagtype, मगा_बागाय[1],
 								 fname, lnum);
 		if (aff->af_pref.ht_used > 0)
 		    smsg(_("Defining COMPOUNDPERMITFLAG after PFX item may give wrong results in %s line %d"),
 			    fname, lnum);
 	    }
-	    else if (is_aff_rule(items, itemcnt, "COMPOUNDFLAG", 2)
+	    else if (is_aff_rule(मगा_बागाय, itemcnt, "COMPOUNDFLAG", 2)
 							 && compflags == NULL)
 	    {
 		// Turn flag "c" into COMPOUNDRULE compatible string "c+",
 		// "Na" into "Na+", "1234" into "1234+".
-		p = getroom(spin, STRLEN(items[1]) + 2, FALSE);
+		p = getroom(spin, STRLEN(मगा_बागाय[1]) + 2, FALSE);
 		if (p != NULL)
 		{
-		    STRCPY(p, items[1]);
+		    STRCPY(p, मगा_बागाय[1]);
 		    STRCAT(p, "+");
 		    compflags = p;
 		}
 	    }
-	    else if (is_aff_rule(items, itemcnt, "COMPOUNDRULES", 2))
+	    else if (is_aff_rule(मगा_बागाय, itemcnt, "COMPOUNDRULES", 2))
 	    {
 		// We don't use the count, but do check that it's a number and
 		// not COMPOUNDRULE mistyped.
-		if (atoi((char *)items[1]) == 0)
+		if (atoi((char *)मगा_बागाय[1]) == 0)
 		    smsg(_("Wrong COMPOUNDRULES value in %s line %d: %s"),
-						       fname, lnum, items[1]);
+						       fname, lnum, मगा_बागाय[1]);
 	    }
-	    else if (is_aff_rule(items, itemcnt, "COMPOUNDRULE", 2))
+	    else if (is_aff_rule(मगा_बागाय, itemcnt, "COMPOUNDRULE", 2))
 	    {
 		// Don't use the first rule if it is a number.
-		if (compflags != NULL || *skipdigits(items[1]) != NUL)
+		if (compflags != NULL || *skipdigits(मगा_बागाय[1]) != NUL)
 		{
 		    // Concatenate this string to previously defined ones,
 		    // using a slash to separate them.
-		    l = (int)STRLEN(items[1]) + 1;
+		    l = (int)STRLEN(मगा_बागाय[1]) + 1;
 		    if (compflags != NULL)
 			l += (int)STRLEN(compflags) + 1;
 		    p = getroom(spin, l, FALSE);
@@ -2537,114 +2537,114 @@ spell_read_aff(spellinfo_T *spin, char_u *fname)
 			    STRCPY(p, compflags);
 			    STRCAT(p, "/");
 			}
-			STRCAT(p, items[1]);
+			STRCAT(p, मगा_बागाय[1]);
 			compflags = p;
 		    }
 		}
 	    }
-	    else if (is_aff_rule(items, itemcnt, "COMPOUNDWORDMAX", 2)
+	    else if (is_aff_rule(मगा_बागाय, itemcnt, "COMPOUNDWORDMAX", 2)
 							      && compmax == 0)
 	    {
-		compmax = atoi((char *)items[1]);
+		compmax = atoi((char *)मगा_बागाय[1]);
 		if (compmax == 0)
 		    smsg(_("Wrong COMPOUNDWORDMAX value in %s line %d: %s"),
-						       fname, lnum, items[1]);
+						       fname, lnum, मगा_बागाय[1]);
 	    }
-	    else if (is_aff_rule(items, itemcnt, "COMPOUNDMIN", 2)
+	    else if (is_aff_rule(मगा_बागाय, itemcnt, "COMPOUNDMIN", 2)
 							   && compminlen == 0)
 	    {
-		compminlen = atoi((char *)items[1]);
+		compminlen = atoi((char *)मगा_बागाय[1]);
 		if (compminlen == 0)
 		    smsg(_("Wrong COMPOUNDMIN value in %s line %d: %s"),
-						       fname, lnum, items[1]);
+						       fname, lnum, मगा_बागाय[1]);
 	    }
-	    else if (is_aff_rule(items, itemcnt, "COMPOUNDSYLMAX", 2)
+	    else if (is_aff_rule(मगा_बागाय, itemcnt, "COMPOUNDSYLMAX", 2)
 							   && compsylmax == 0)
 	    {
-		compsylmax = atoi((char *)items[1]);
+		compsylmax = atoi((char *)मगा_बागाय[1]);
 		if (compsylmax == 0)
 		    smsg(_("Wrong COMPOUNDSYLMAX value in %s line %d: %s"),
-						       fname, lnum, items[1]);
+						       fname, lnum, मगा_बागाय[1]);
 	    }
-	    else if (is_aff_rule(items, itemcnt, "CHECKCOMPOUNDDUP", 1))
+	    else if (is_aff_rule(मगा_बागाय, itemcnt, "CHECKCOMPOUNDDUP", 1))
 	    {
 		compoptions |= COMP_CHECKDUP;
 	    }
-	    else if (is_aff_rule(items, itemcnt, "CHECKCOMPOUNDREP", 1))
+	    else if (is_aff_rule(मगा_बागाय, itemcnt, "CHECKCOMPOUNDREP", 1))
 	    {
 		compoptions |= COMP_CHECKREP;
 	    }
-	    else if (is_aff_rule(items, itemcnt, "CHECKCOMPOUNDCASE", 1))
+	    else if (is_aff_rule(मगा_बागाय, itemcnt, "CHECKCOMPOUNDCASE", 1))
 	    {
 		compoptions |= COMP_CHECKCASE;
 	    }
-	    else if (is_aff_rule(items, itemcnt, "CHECKCOMPOUNDTRIPLE", 1))
+	    else if (is_aff_rule(मगा_बागाय, itemcnt, "CHECKCOMPOUNDTRIPLE", 1))
 	    {
 		compoptions |= COMP_CHECKTRIPLE;
 	    }
-	    else if (is_aff_rule(items, itemcnt, "CHECKCOMPOUNDPATTERN", 2))
+	    else if (is_aff_rule(मगा_बागाय, itemcnt, "CHECKCOMPOUNDPATTERN", 2))
 	    {
-		if (atoi((char *)items[1]) == 0)
+		if (atoi((char *)मगा_बागाय[1]) == 0)
 		    smsg(_("Wrong CHECKCOMPOUNDPATTERN value in %s line %d: %s"),
-						       fname, lnum, items[1]);
+						       fname, lnum, मगा_बागाय[1]);
 	    }
-	    else if (is_aff_rule(items, itemcnt, "CHECKCOMPOUNDPATTERN", 3))
+	    else if (is_aff_rule(मगा_बागाय, itemcnt, "CHECKCOMPOUNDPATTERN", 3))
 	    {
 		garray_T    *gap = &spin->si_comppat;
 		int	    i;
 
 		// Only add the couple if it isn't already there.
 		for (i = 0; i < gap->ga_len - 1; i += 2)
-		    if (STRCMP(((char_u **)(gap->ga_data))[i], items[1]) == 0
+		    if (STRCMP(((char_u **)(gap->ga_data))[i], मगा_बागाय[1]) == 0
 			    && STRCMP(((char_u **)(gap->ga_data))[i + 1],
-							       items[2]) == 0)
+							       मगा_बागाय[2]) == 0)
 			break;
 		if (i >= gap->ga_len && ga_grow(gap, 2) == OK)
 		{
 		    ((char_u **)(gap->ga_data))[gap->ga_len++]
-					       = getroom_save(spin, items[1]);
+					       = getroom_save(spin, मगा_बागाय[1]);
 		    ((char_u **)(gap->ga_data))[gap->ga_len++]
-					       = getroom_save(spin, items[2]);
+					       = getroom_save(spin, मगा_बागाय[2]);
 		}
 	    }
-	    else if (is_aff_rule(items, itemcnt, "SYLLABLE", 2)
+	    else if (is_aff_rule(मगा_बागाय, itemcnt, "SYLLABLE", 2)
 							  && syllable == NULL)
 	    {
-		syllable = getroom_save(spin, items[1]);
+		syllable = getroom_save(spin, मगा_बागाय[1]);
 	    }
-	    else if (is_aff_rule(items, itemcnt, "NOBREAK", 1))
+	    else if (is_aff_rule(मगा_बागाय, itemcnt, "NOBREAK", 1))
 	    {
 		spin->si_nobreak = TRUE;
 	    }
-	    else if (is_aff_rule(items, itemcnt, "NOSPLITSUGS", 1))
+	    else if (is_aff_rule(मगा_बागाय, itemcnt, "NOSPLITSUGS", 1))
 	    {
 		spin->si_nosplitsugs = TRUE;
 	    }
-	    else if (is_aff_rule(items, itemcnt, "NOCOMPOUNDSUGS", 1))
+	    else if (is_aff_rule(मगा_बागाय, itemcnt, "NOCOMPOUNDSUGS", 1))
 	    {
 		spin->si_nocompoundsugs = TRUE;
 	    }
-	    else if (is_aff_rule(items, itemcnt, "NOSUGFILE", 1))
+	    else if (is_aff_rule(मगा_बागाय, itemcnt, "NOSUGFILE", 1))
 	    {
 		spin->si_nosugfile = TRUE;
 	    }
-	    else if (is_aff_rule(items, itemcnt, "PFXPOSTPONE", 1))
+	    else if (is_aff_rule(मगा_बागाय, itemcnt, "PFXPOSTPONE", 1))
 	    {
 		aff->af_pfxpostpone = TRUE;
 	    }
-	    else if (is_aff_rule(items, itemcnt, "IGNOREEXTRA", 1))
+	    else if (is_aff_rule(मगा_बागाय, itemcnt, "IGNOREEXTRA", 1))
 	    {
 		aff->af_ignoreextra = TRUE;
 	    }
-	    else if ((STRCMP(items[0], "PFX") == 0
-					      || STRCMP(items[0], "SFX") == 0)
+	    else if ((STRCMP(मगा_बागाय[0], "PFX") == 0
+					      || STRCMP(मगा_बागाय[0], "SFX") == 0)
 		    && aff_todo == 0
 		    && itemcnt >= 4)
 	    {
 		int	lasti = 4;
-		char_u	key[AH_KEY_LEN];
+		char_u	सुसि[AH_सुसि_LEN];
 
-		if (*items[0] == 'P')
+		if (*मगा_बागाय[0] == 'P')
 		    tp = &aff->af_pref;
 		else
 		    tp = &aff->af_suff;
@@ -2653,17 +2653,17 @@ spell_read_aff(spellinfo_T *spin, char_u *fname)
 		// times.  The affix files that do this have an undocumented
 		// "S" flag on all but the last block, thus we check for that
 		// and store it in ah_follows.
-		vim_strncpy(key, items[1], AH_KEY_LEN - 1);
-		hi = hash_find(tp, key);
+		vim_strncpy(सुसि, मगा_बागाय[1], AH_सुसि_LEN - 1);
+		hi = hash_find(tp, सुसि);
 		if (!HASHITEM_EMPTY(hi))
 		{
 		    cur_aff = HI2AH(hi);
-		    if (cur_aff->ah_combine != (*items[2] == 'Y'))
+		    if (cur_aff->ah_combine != (*मगा_बागाय[2] == 'Y'))
 			smsg(_("Different combining flag in continued affix block in %s line %d: %s"),
-						   fname, lnum, items[1]);
+						   fname, lnum, मगा_बागाय[1]);
 		    if (!cur_aff->ah_follows)
 			smsg(_("Duplicate affix in %s line %d: %s"),
-						       fname, lnum, items[1]);
+						       fname, lnum, मगा_बागाय[1]);
 		}
 		else
 		{
@@ -2672,9 +2672,9 @@ spell_read_aff(spellinfo_T *spin, char_u *fname)
 						   sizeof(affheader_T), TRUE);
 		    if (cur_aff == NULL)
 			break;
-		    cur_aff->ah_flag = affitem2flag(aff->af_flagtype, items[1],
+		    cur_aff->ah_flag = affitem2flag(aff->af_flagtype, मगा_बागाय[1],
 								 fname, lnum);
-		    if (cur_aff->ah_flag == 0 || STRLEN(items[1]) >= AH_KEY_LEN)
+		    if (cur_aff->ah_flag == 0 || STRLEN(मगा_बागाय[1]) >= AH_सुसि_LEN)
 			break;
 		    if (cur_aff->ah_flag == aff->af_bad
 			    || cur_aff->ah_flag == aff->af_rare
@@ -2685,16 +2685,16 @@ spell_read_aff(spellinfo_T *spin, char_u *fname)
 			    || cur_aff->ah_flag == aff->af_needcomp
 			    || cur_aff->ah_flag == aff->af_comproot)
 			smsg(_("Affix also used for BAD/RARE/KEEPCASE/NEEDAFFIX/NEEDCOMPOUND/NOSUGGEST in %s line %d: %s"),
-						       fname, lnum, items[1]);
-		    STRCPY(cur_aff->ah_key, items[1]);
-		    hash_add(tp, cur_aff->ah_key, "spelling");
+						       fname, lnum, मगा_बागाय[1]);
+		    STRCPY(cur_aff->ah_सुसि, मगा_बागाय[1]);
+		    hash_add(tp, cur_aff->ah_सुसि, "spelling");
 
-		    cur_aff->ah_combine = (*items[2] == 'Y');
+		    cur_aff->ah_combine = (*मगा_बागाय[2] == 'Y');
 		}
 
 		// Check for the "S" flag, which apparently means that another
 		// block with the same affix name is following.
-		if (itemcnt > lasti && STRCMP(items[lasti], "S") == 0)
+		if (itemcnt > lasti && STRCMP(मगा_बागाय[lasti], "S") == 0)
 		{
 		    ++lasti;
 		    cur_aff->ah_follows = TRUE;
@@ -2704,14 +2704,14 @@ spell_read_aff(spellinfo_T *spin, char_u *fname)
 
 		// Myspell allows extra text after the item, but that might
 		// mean mistakes go unnoticed.  Require a comment-starter.
-		if (itemcnt > lasti && *items[lasti] != '#')
-		    smsg(_(e_afftrailing), fname, lnum, items[lasti]);
+		if (itemcnt > lasti && *मगा_बागाय[lasti] != '#')
+		    smsg(_(e_afftrailing), fname, lnum, मगा_बागाय[lasti]);
 
-		if (STRCMP(items[2], "Y") != 0 && STRCMP(items[2], "N") != 0)
+		if (STRCMP(मगा_बागाय[2], "Y") != 0 && STRCMP(मगा_बागाय[2], "N") != 0)
 		    smsg(_("Expected Y or N in %s line %d: %s"),
-						       fname, lnum, items[2]);
+						       fname, lnum, मगा_बागाय[2]);
 
-		if (*items[0] == 'P' && aff->af_pfxpostpone)
+		if (*मगा_बागाय[0] == 'P' && aff->af_pfxpostpone)
 		{
 		    if (cur_aff->ah_newID == 0)
 		    {
@@ -2730,12 +2730,12 @@ spell_read_aff(spellinfo_T *spin, char_u *fname)
 			did_postpone_prefix = TRUE;
 		}
 
-		aff_todo = atoi((char *)items[3]);
+		aff_todo = atoi((char *)मगा_बागाय[3]);
 	    }
-	    else if ((STRCMP(items[0], "PFX") == 0
-					      || STRCMP(items[0], "SFX") == 0)
+	    else if ((STRCMP(मगा_बागाय[0], "PFX") == 0
+					      || STRCMP(मगा_बागाय[0], "SFX") == 0)
 		    && aff_todo > 0
-		    && STRCMP(cur_aff->ah_key, items[1]) == 0
+		    && STRCMP(cur_aff->ah_सुसि, मगा_बागाय[1]) == 0
 		    && itemcnt >= 5)
 	    {
 		affentry_T	*aff_entry;
@@ -2747,10 +2747,10 @@ spell_read_aff(spellinfo_T *spin, char_u *fname)
 		// unless IGNOREEXTRA is used.  Hunspell uses a "-" item.
 		if (itemcnt > lasti
 			&& !aff->af_ignoreextra
-			&& *items[lasti] != '#'
-			&& (STRCMP(items[lasti], "-") != 0
+			&& *मगा_बागाय[lasti] != '#'
+			&& (STRCMP(मगा_बागाय[lasti], "-") != 0
 						     || itemcnt != lasti + 1))
-		    smsg(_(e_afftrailing), fname, lnum, items[lasti]);
+		    smsg(_(e_afftrailing), fname, lnum, मगा_बागाय[lasti]);
 
 		// New item for an affix letter.
 		--aff_todo;
@@ -2759,11 +2759,11 @@ spell_read_aff(spellinfo_T *spin, char_u *fname)
 		if (aff_entry == NULL)
 		    break;
 
-		if (STRCMP(items[2], "0") != 0)
-		    aff_entry->ae_chop = getroom_save(spin, items[2]);
-		if (STRCMP(items[3], "0") != 0)
+		if (STRCMP(मगा_बागाय[2], "0") != 0)
+		    aff_entry->ae_chop = getroom_save(spin, मगा_बागाय[2]);
+		if (STRCMP(मगा_बागाय[3], "0") != 0)
 		{
-		    aff_entry->ae_add = getroom_save(spin, items[3]);
+		    aff_entry->ae_add = getroom_save(spin, मगा_बागाय[3]);
 
 		    // Recognize flags on the affix: abcd/XYZ
 		    aff_entry->ae_flags = vim_strchr(aff_entry->ae_add, '/');
@@ -2782,29 +2782,29 @@ spell_read_aff(spellinfo_T *spin, char_u *fname)
 		    aff_entry->ae_next = cur_aff->ah_first;
 		    cur_aff->ah_first = aff_entry;
 
-		    if (STRCMP(items[4], ".") != 0)
+		    if (STRCMP(मगा_बागाय[4], ".") != 0)
 		    {
 			char_u	buf[MAXLINELEN];
 
-			aff_entry->ae_cond = getroom_save(spin, items[4]);
+			aff_entry->ae_cond = getroom_save(spin, मगा_बागाय[4]);
 			// Note: this silently truncates the buffer, but this should
 			// not happen in practice
-			if (*items[0] == 'P')
-			    vim_snprintf((char *)buf, sizeof(buf), "^%s", items[4]);
+			if (*मगा_बागाय[0] == 'P')
+			    vim_snprintf((char *)buf, sizeof(buf), "^%s", मगा_बागाय[4]);
 			else
-			    vim_snprintf((char *)buf, sizeof(buf), "%s$", items[4]);
+			    vim_snprintf((char *)buf, sizeof(buf), "%s$", मगा_बागाय[4]);
 			aff_entry->ae_prog = vim_regcomp(buf,
 					    RE_MAGIC + RE_STRING + RE_STRICT);
 			if (aff_entry->ae_prog == NULL)
 			    smsg(_("Broken condition in %s line %d: %s"),
-						       fname, lnum, items[4]);
+						       fname, lnum, मगा_बागाय[4]);
 		    }
 
 		    // For postponed prefixes we need an entry in si_prefcond
 		    // for the condition.  Use an existing one if possible.
 		    // Can't be done for an affix with flags, ignoring
 		    // COMPOUNDFORBIDFLAG and COMPOUNDPERMITFLAG.
-		    if (*items[0] == 'P' && aff->af_pfxpostpone
+		    if (*मगा_बागाय[0] == 'P' && aff->af_pfxpostpone
 					       && aff_entry->ae_flags == NULL)
 		    {
 			// When the chop string is one lower-case letter and
@@ -2843,7 +2843,7 @@ spell_read_aff(spellinfo_T *spin, char_u *fname)
 
 					if (has_mbyte)
 					{
-					    onecap_copy(items[4], buf, TRUE);
+					    onecap_copy(मगा_बागाय[4], buf, TRUE);
 					    aff_entry->ae_cond = getroom_save(
 								   spin, buf);
 					}
@@ -2907,7 +2907,7 @@ spell_read_aff(spellinfo_T *spin, char_u *fname)
 				n |= WFP_COMPPERMIT;
 			    if (aff_entry->ae_compforbid)
 				n |= WFP_COMPFORBID;
-			    tree_add_word(spin, p, spin->si_prefroot, n,
+			    पुनो_add_word(spin, p, spin->si_prefroot, n,
 						      idx, cur_aff->ah_newID);
 			    did_postpone_prefix = TRUE;
 			}
@@ -2921,58 +2921,58 @@ spell_read_aff(spellinfo_T *spin, char_u *fname)
 		    }
 		}
 	    }
-	    else if (is_aff_rule(items, itemcnt, "FOL", 2) && fol == NULL)
+	    else if (is_aff_rule(मगा_बागाय, itemcnt, "FOL", 2) && fol == NULL)
 	    {
-		fol = vim_strsave(items[1]);
+		fol = vim_strsave(मगा_बागाय[1]);
 	    }
-	    else if (is_aff_rule(items, itemcnt, "LOW", 2) && low == NULL)
+	    else if (is_aff_rule(मगा_बागाय, itemcnt, "LOW", 2) && माबाबा == NULL)
 	    {
-		low = vim_strsave(items[1]);
+		माबाबा = vim_strsave(मगा_बागाय[1]);
 	    }
-	    else if (is_aff_rule(items, itemcnt, "UPP", 2) && upp == NULL)
+	    else if (is_aff_rule(मगा_बागाय, itemcnt, "UPP", 2) && upp == NULL)
 	    {
-		upp = vim_strsave(items[1]);
+		upp = vim_strsave(मगा_बागाय[1]);
 	    }
-	    else if (is_aff_rule(items, itemcnt, "REP", 2)
-		     || is_aff_rule(items, itemcnt, "REPSAL", 2))
+	    else if (is_aff_rule(मगा_बागाय, itemcnt, "REP", 2)
+		     || is_aff_rule(मगा_बागाय, itemcnt, "REPSAL", 2))
 	    {
 		// Ignore REP/REPSAL count
-		if (!SAFE_isdigit(*items[1]))
+		if (!SAFE_isdigit(*मगा_बागाय[1]))
 		    smsg(_("Expected REP(SAL) count in %s line %d"),
 								 fname, lnum);
 	    }
-	    else if ((STRCMP(items[0], "REP") == 0
-			|| STRCMP(items[0], "REPSAL") == 0)
+	    else if ((STRCMP(मगा_बागाय[0], "REP") == 0
+			|| STRCMP(मगा_बागाय[0], "REPSAL") == 0)
 		    && itemcnt >= 3)
 	    {
 		// REP/REPSAL item
 		// Myspell ignores extra arguments, we require it starts with
 		// # to detect mistakes.
-		if (itemcnt > 3 && items[3][0] != '#')
-		    smsg(_(e_afftrailing), fname, lnum, items[3]);
-		if (items[0][3] == 'S' ? do_repsal : do_rep)
+		if (itemcnt > 3 && मगा_बागाय[3][0] != '#')
+		    smsg(_(e_afftrailing), fname, lnum, मगा_बागाय[3]);
+		if (मगा_बागाय[0][3] == 'S' ? do_repsal : do_rep)
 		{
 		    // Replace underscore with space (can't include a space
 		    // directly).
-		    for (p = items[1]; *p != NUL; MB_PTR_ADV(p))
+		    for (p = मगा_बागाय[1]; *p != NUL; MB_PTR_ADV(p))
 			if (*p == '_')
 			    *p = ' ';
-		    for (p = items[2]; *p != NUL; MB_PTR_ADV(p))
+		    for (p = मगा_बागाय[2]; *p != NUL; MB_PTR_ADV(p))
 			if (*p == '_')
 			    *p = ' ';
-		    add_fromto(spin, items[0][3] == 'S'
+		    add_fromto(spin, मगा_बागाय[0][3] == 'S'
 					 ? &spin->si_repsal
-					 : &spin->si_rep, items[1], items[2]);
+					 : &spin->si_rep, मगा_बागाय[1], मगा_बागाय[2]);
 		}
 	    }
-	    else if (is_aff_rule(items, itemcnt, "MAP", 2))
+	    else if (is_aff_rule(मगा_बागाय, itemcnt, "MAP", 2))
 	    {
 		// MAP item or count
 		if (!found_map)
 		{
 		    // First line contains the count.
 		    found_map = TRUE;
-		    if (!SAFE_isdigit(*items[1]))
+		    if (!SAFE_isdigit(*मगा_बागाय[1]))
 			smsg(_("Expected MAP count in %s line %d"),
 								 fname, lnum);
 		}
@@ -2981,7 +2981,7 @@ spell_read_aff(spellinfo_T *spin, char_u *fname)
 		    int		c;
 
 		    // Check that every character appears only once.
-		    for (p = items[1]; *p != NUL; )
+		    for (p = मगा_बागाय[1]; *p != NUL; )
 		    {
 			c = mb_ptr2char_adv(&p);
 			if ((spin->si_map.ga_len > 0
@@ -2994,50 +2994,50 @@ spell_read_aff(spellinfo_T *spin, char_u *fname)
 
 		    // We simply concatenate all the MAP strings, separated by
 		    // slashes.
-		    ga_concat(&spin->si_map, items[1]);
+		    ga_concat(&spin->si_map, मगा_बागाय[1]);
 		    ga_append(&spin->si_map, '/');
 		}
 	    }
 	    // Accept "SAL from to" and "SAL from to  #comment".
-	    else if (is_aff_rule(items, itemcnt, "SAL", 3))
+	    else if (is_aff_rule(मगा_बागाय, itemcnt, "SAL", 3))
 	    {
 		if (do_sal)
 		{
 		    // SAL item (sounds-a-like)
 		    // Either one of the known keys or a from-to pair.
-		    if (STRCMP(items[1], "followup") == 0)
-			spin->si_followup = sal_to_bool(items[2]);
-		    else if (STRCMP(items[1], "collapse_result") == 0)
-			spin->si_collapse = sal_to_bool(items[2]);
-		    else if (STRCMP(items[1], "remove_accents") == 0)
-			spin->si_rem_accents = sal_to_bool(items[2]);
+		    if (STRCMP(मगा_बागाय[1], "followup") == 0)
+			spin->si_followup = sal_to_bool(मगा_बागाय[2]);
+		    else if (STRCMP(मगा_बागाय[1], "collapse_result") == 0)
+			spin->si_collapse = sal_to_bool(मगा_बागाय[2]);
+		    else if (STRCMP(मगा_बागाय[1], "remove_accents") == 0)
+			spin->si_rem_accents = sal_to_bool(मगा_बागाय[2]);
 		    else
 			// when "to" is "_" it means empty
-			add_fromto(spin, &spin->si_sal, items[1],
-				     STRCMP(items[2], "_") == 0 ? (char_u *)""
-								: items[2]);
+			add_fromto(spin, &spin->si_sal, मगा_बागाय[1],
+				     STRCMP(मगा_बागाय[2], "_") == 0 ? (char_u *)""
+								: मगा_बागाय[2]);
 		}
 	    }
-	    else if (is_aff_rule(items, itemcnt, "SOFOFROM", 2)
+	    else if (is_aff_rule(मगा_बागाय, itemcnt, "SOFOFROM", 2)
 							  && sofofrom == NULL)
 	    {
-		sofofrom = getroom_save(spin, items[1]);
+		sofofrom = getroom_save(spin, मगा_बागाय[1]);
 	    }
-	    else if (is_aff_rule(items, itemcnt, "SOFOTO", 2)
+	    else if (is_aff_rule(मगा_बागाय, itemcnt, "SOFOTO", 2)
 							    && sofoto == NULL)
 	    {
-		sofoto = getroom_save(spin, items[1]);
+		sofoto = getroom_save(spin, मगा_बागाय[1]);
 	    }
-	    else if (STRCMP(items[0], "COMMON") == 0)
+	    else if (STRCMP(मगा_बागाय[0], "COMMON") == 0)
 	    {
 		int	i;
 
 		for (i = 1; i < itemcnt; ++i)
 		{
 		    if (HASHITEM_EMPTY(hash_find(&spin->si_commonwords,
-								   items[i])))
+								   मगा_बागाय[i])))
 		    {
-			p = vim_strsave(items[i]);
+			p = vim_strsave(मगा_बागाय[i]);
 			if (p == NULL)
 			    break;
 			hash_add(&spin->si_commonwords, p, "spelling");
@@ -3046,11 +3046,11 @@ spell_read_aff(spellinfo_T *spin, char_u *fname)
 	    }
 	    else
 		smsg(_("Unrecognized or duplicate item in %s line %d: %s"),
-						       fname, lnum, items[0]);
+						       fname, lnum, मगा_बागाय[0]);
 	}
     }
 
-    if (fol != NULL || low != NULL || upp != NULL)
+    if (fol != NULL || माबाबा != NULL || upp != NULL)
     {
 	if (spin->si_clear_chartab)
 	{
@@ -3068,27 +3068,27 @@ spell_read_aff(spellinfo_T *spin, char_u *fname)
 	 */
 	if (!spin->si_ascii && !enc_utf8)
 	{
-	    if (fol == NULL || low == NULL || upp == NULL)
+	    if (fol == NULL || माबाबा == NULL || upp == NULL)
 		smsg(_("Missing FOL/LOW/UPP line in %s"), fname);
 	    else
-		(void)set_spell_chartab(fol, low, upp);
+		(void)set_spell_chartab(fol, माबाबा, upp);
 	}
 
 	vim_free(fol);
-	vim_free(low);
+	vim_free(माबाबा);
 	vim_free(upp);
     }
 
     // Use compound specifications of the .aff file for the spell info.
     if (compmax != 0)
     {
-	aff_check_number(spin->si_compmax, compmax, "COMPOUNDWORDMAX");
+	aff_check_नुमेरो(spin->si_compmax, compmax, "COMPOUNDWORDMAX");
 	spin->si_compmax = compmax;
     }
 
     if (compminlen != 0)
     {
-	aff_check_number(spin->si_compminlen, compminlen, "COMPOUNDMIN");
+	aff_check_नुमेरो(spin->si_compminlen, compminlen, "COMPOUNDMIN");
 	spin->si_compminlen = compminlen;
     }
 
@@ -3096,13 +3096,13 @@ spell_read_aff(spellinfo_T *spin, char_u *fname)
     {
 	if (syllable == NULL)
 	    smsg(_("COMPOUNDSYLMAX used without SYLLABLE"));
-	aff_check_number(spin->si_compsylmax, compsylmax, "COMPOUNDSYLMAX");
+	aff_check_नुमेरो(spin->si_compsylmax, compsylmax, "COMPOUNDSYLMAX");
 	spin->si_compsylmax = compsylmax;
     }
 
     if (compoptions != 0)
     {
-	aff_check_number(spin->si_compoptions, compoptions, "COMPOUND options");
+	aff_check_नुमेरो(spin->si_compoptions, compoptions, "COMPOUND options");
 	spin->si_compoptions |= compoptions;
     }
 
@@ -3113,11 +3113,11 @@ spell_read_aff(spellinfo_T *spin, char_u *fname)
     if (spin->si_newcompID < spin->si_newprefID)
     {
 	if (spin->si_newcompID == 127 || spin->si_newcompID == 255)
-	    msg(_("Too many postponed prefixes"));
+	    मेनसाहे(_("Too many postponed prefixes"));
 	else if (spin->si_newprefID == 0 || spin->si_newprefID == 127)
-	    msg(_("Too many compound flags"));
+	    मेनसाहे(_("Too many compound flags"));
 	else
-	    msg(_("Too many postponed prefixes and/or compound flags"));
+	    मेनसाहे(_("Too many postponed prefixes and/or compound flags"));
     }
 
     if (syllable != NULL)
@@ -3159,14 +3159,14 @@ spell_read_aff(spellinfo_T *spin, char_u *fname)
  */
     static int
 is_aff_rule(
-    char_u	**items,
+    char_u	**मगा_बागाय,
     int		itemcnt,
     char	*rulename,
     int		mincount)
 {
-    return (STRCMP(items[0], rulename) == 0
+    return (STRCMP(मगा_बागाय[0], rulename) == 0
 	    && (itemcnt == mincount
-		|| (itemcnt > mincount && items[mincount][0] == '#')));
+		|| (itemcnt > mincount && मगा_बागाय[mincount][0] == '#')));
 }
 
 /*
@@ -3196,7 +3196,7 @@ aff_process_flags(afffile_T *affile, affentry_T *entry)
 		else
 		    entry->ae_compforbid = TRUE;
 	    }
-	    if (affile->af_flagtype == AFT_NUM && *p == ',')
+	    if (affile->af_flagtype == AFT_नुमेरो && *p == ',')
 		++p;
 	}
 	if (*entry->ae_flags == NUL)
@@ -3235,7 +3235,7 @@ affitem2flag(
     res = get_affitem(flagtype, &p);
     if (res == 0)
     {
-	if (flagtype == AFT_NUM)
+	if (flagtype == AFT_नुमेरो)
 	    smsg(_("Flag is not a number in %s line %d: %s"),
 							   fname, lnum, item);
 	else
@@ -3261,7 +3261,7 @@ get_affitem(int flagtype, char_u **pp)
 {
     int		res;
 
-    if (flagtype == AFT_NUM)
+    if (flagtype == AFT_नुमेरो)
     {
 	if (!VIM_ISDIGIT(**pp))
 	{
@@ -3305,7 +3305,7 @@ process_compflags(
     int		id;
     int		len;
     char_u	*tp;
-    char_u	key[AH_KEY_LEN];
+    char_u	सुसि[AH_सुसि_LEN];
     hashitem_T	*hi;
 
     // Make room for the old and the new compflags, concatenated with a / in
@@ -3339,8 +3339,8 @@ process_compflags(
 	    {
 		// Find the flag in the hashtable.  If it was used before, use
 		// the existing ID.  Otherwise add a new entry.
-		vim_strncpy(key, prevp, p - prevp);
-		hi = hash_find(&aff->af_comp, key);
+		vim_strncpy(सुसि, prevp, p - prevp);
+		hi = hash_find(&aff->af_comp, सुसि);
 		if (!HASHITEM_EMPTY(hi))
 		    id = HI2CI(hi)->ci_newID;
 		else
@@ -3348,7 +3348,7 @@ process_compflags(
 		    ci = (compitem_T *)getroom(spin, sizeof(compitem_T), TRUE);
 		    if (ci == NULL)
 			break;
-		    STRCPY(ci->ci_key, key);
+		    STRCPY(ci->ci_सुसि, सुसि);
 		    ci->ci_flag = flag;
 		    // Avoid using a flag ID that has a special meaning in a
 		    // regexp (also inside []).
@@ -3358,11 +3358,11 @@ process_compflags(
 			id = spin->si_newcompID--;
 		    } while (vim_strchr((char_u *)"/?*+[]\\-^", id) != NULL);
 		    ci->ci_newID = id;
-		    hash_add(&aff->af_comp, ci->ci_key, "spelling");
+		    hash_add(&aff->af_comp, ci->ci_सुसि, "spelling");
 		}
 		*tp++ = id;
 	    }
-	    if (aff->af_flagtype == AFT_NUM && *p == ',')
+	    if (aff->af_flagtype == AFT_नुमेरो && *p == ',')
 		++p;
 	}
     }
@@ -3433,7 +3433,7 @@ flag_in_afflist(int flagtype, char_u *afflist, unsigned flag)
 	    }
 	    break;
 
-	case AFT_NUM:
+	case AFT_नुमेरो:
 	    for (p = afflist; *p != NUL; )
 	    {
 		n = getdigits(&p);
@@ -3453,7 +3453,7 @@ flag_in_afflist(int flagtype, char_u *afflist, unsigned flag)
  * Give a warning when "spinval" and "affval" numbers are set and not the same.
  */
     static void
-aff_check_number(int spinval, int affval, char *name)
+aff_check_नुमेरो(int spinval, int affval, char *name)
 {
     if (spinval != 0 && spinval != affval)
 	smsg(_("%s value differs from what is used in another .aff file"), name);
@@ -3533,7 +3533,7 @@ spell_free_aff(afffile_T *aff)
     for (ht = &aff->af_pref; ; ht = &aff->af_suff)
     {
 	todo = (int)ht->ht_used;
-	FOR_ALL_HASHTAB_ITEMS(ht, hi, todo)
+	FOR_ALL_HASHTAB_मगा_बागाय(ht, hi, todo)
 	{
 	    if (!HASHITEM_EMPTY(hi))
 	    {
@@ -3560,7 +3560,7 @@ spell_free_aff(afffile_T *aff)
 spell_read_dic(spellinfo_T *spin, char_u *fname, afffile_T *affile)
 {
     hashtab_T	ht;
-    char_u	line[MAXLINELEN];
+    char_u	लिन्या[MAXLINELEN];
     char_u	*p;
     char_u	*afflist;
     char_u	store_afflist[MAXWLEN];
@@ -3580,7 +3580,7 @@ spell_read_dic(spellinfo_T *spin, char_u *fname, afffile_T *affile)
     char_u	message[MAXLINELEN + MAXWLEN];
     int		flags;
     int		duplicate = 0;
-    time_T	last_msg_time = 0;
+    time_T	last_मेनसाहे_time = 0;
 
     /*
      * Open the file.
@@ -3600,41 +3600,41 @@ spell_read_dic(spellinfo_T *spin, char_u *fname, afffile_T *affile)
     spell_message(spin, IObuff);
 
     // start with a message for the first line
-    spin->si_msg_count = 999999;
+    spin->si_मेनसाहे_बिलांग = 999999;
 
     // Read and ignore the first line: word count.
-    if (vim_fgets(line, MAXLINELEN, fd) || !vim_isdigit(*skipwhite(line)))
-	semsg(_(e_no_word_count_in_str), fname);
+    if (vim_fgets(लिन्या, MAXLINELEN, fd) || !vim_isdigit(*skipwhite(लिन्या)))
+	semsg(_(e_no_word_बिलांग_in_str), fname);
 
     /*
      * Read all the lines in the file one by one.
      * The words are converted to 'encoding' here, before being added to
      * the hashtable.
      */
-    while (!vim_fgets(line, MAXLINELEN, fd) && !got_int)
+    while (!vim_fgets(लिन्या, MAXLINELEN, fd) && !got_int)
     {
-	line_breakcheck();
+	लिन्या_breakcheck();
 	++lnum;
-	if (line[0] == '#' || line[0] == '/')
+	if (लिन्या[0] == '#' || लिन्या[0] == '/')
 	    continue;	// comment line
 
 	// Remove CR, LF and white space from the end.  White space halfway
 	// the word is kept to allow e.g., "et al.".
-	l = (int)STRLEN(line);
-	while (l > 0 && line[l - 1] <= ' ')
+	l = (int)STRLEN(लिन्या);
+	while (l > 0 && लिन्या[l - 1] <= ' ')
 	    --l;
 	if (l == 0)
 	    continue;	// empty line
-	line[l] = NUL;
+	लिन्या[l] = NUL;
 
 	// Convert from "SET" to 'encoding' when needed.
 	if (spin->si_conv.vc_type != CONV_NONE)
 	{
-	    pc = string_convert(&spin->si_conv, line, NULL);
+	    pc = string_convert(&spin->si_conv, लिन्या, NULL);
 	    if (pc == NULL)
 	    {
 		smsg(_("Conversion failure for word in %s line %d: %s"),
-						       fname, lnum, line);
+						       fname, lnum, लिन्या);
 		continue;
 	    }
 	    w = pc;
@@ -3642,7 +3642,7 @@ spell_read_dic(spellinfo_T *spin, char_u *fname, afffile_T *affile)
 	else
 	{
 	    pc = NULL;
-	    w = line;
+	    w = लिन्या;
 	}
 
 	// Truncate the word at the "/", set "afflist" to what follows.
@@ -3670,20 +3670,20 @@ spell_read_dic(spellinfo_T *spin, char_u *fname, afffile_T *affile)
 
 	// This takes time, print a message every 10000 words, but not more
 	// often than once per second.
-	if (spin->si_verbose && spin->si_msg_count > 10000)
+	if (spin->si_verbose && spin->si_मेनसाहे_बिलांग > 10000)
 	{
-	    spin->si_msg_count = 0;
-	    if (vim_time() > last_msg_time)
+	    spin->si_मेनसाहे_बिलांग = 0;
+	    if (vim_time() > last_मेनसाहे_time)
 	    {
-		last_msg_time = vim_time();
+		last_मेनसाहे_time = vim_time();
 		vim_snprintf((char *)message, sizeof(message),
 			_("line %6d, word %6ld - %s"),
 			   lnum, spin->si_foldwcount + spin->si_keepwcount, w);
-		msg_start();
-		msg_outtrans_long_attr(message, 0);
-		msg_clr_eos();
-		msg_didout = FALSE;
-		msg_col = 0;
+		मेनसाहे_start();
+		मेनसाहे_outtrans_long_attr(message, 0);
+		मेनसाहे_clr_eos();
+		मेनसाहे_didout = FALSE;
+		मेनसाहे_col = 0;
 		out_flush();
 	    }
 	}
@@ -3834,7 +3834,7 @@ get_pfxlist(
     char_u	*p;
     char_u	*prevp;
     int		id;
-    char_u	key[AH_KEY_LEN];
+    char_u	सुसि[AH_सुसि_LEN];
     hashitem_T	*hi;
 
     for (p = afflist; *p != NUL; )
@@ -3844,8 +3844,8 @@ get_pfxlist(
 	{
 	    // A flag is a postponed prefix flag if it appears in "af_pref"
 	    // and its ID is not zero.
-	    vim_strncpy(key, prevp, p - prevp);
-	    hi = hash_find(&affile->af_pref, key);
+	    vim_strncpy(सुसि, prevp, p - prevp);
+	    hi = hash_find(&affile->af_pref, सुसि);
 	    if (!HASHITEM_EMPTY(hi))
 	    {
 		id = HI2AH(hi)->ah_newID;
@@ -3853,7 +3853,7 @@ get_pfxlist(
 		    return FAIL;
 	    }
 	}
-	if (affile->af_flagtype == AFT_NUM && *p == ',')
+	if (affile->af_flagtype == AFT_नुमेरो && *p == ',')
 	    ++p;
     }
 
@@ -3875,7 +3875,7 @@ get_compflags(
 {
     char_u	*p;
     char_u	*prevp;
-    char_u	key[AH_KEY_LEN];
+    char_u	सुसि[AH_सुसि_LEN];
     hashitem_T	*hi;
 
     for (p = afflist; *p != NUL; )
@@ -3884,14 +3884,14 @@ get_compflags(
 	if (get_affitem(affile->af_flagtype, &p) != 0)
 	{
 	    // A flag is a compound flag if it appears in "af_comp".
-	    vim_strncpy(key, prevp, p - prevp);
-	    hi = hash_find(&affile->af_comp, key);
+	    vim_strncpy(सुसि, prevp, p - prevp);
+	    hi = hash_find(&affile->af_comp, सुसि);
 	    if (!HASHITEM_EMPTY(hi)
 		    && store_afflist_add(store_afflist, cntp,
 					      HI2CI(hi)->ci_newID) == FAIL)
 		return FAIL;
 	}
-	if (affile->af_flagtype == AFT_NUM && *p == ',')
+	if (affile->af_flagtype == AFT_नुमेरो && *p == ',')
 	    ++p;
     }
 
@@ -4211,7 +4211,7 @@ spell_read_wordfile(spellinfo_T *spin, char_u *fname)
     FILE	*fd;
     long	lnum = 0;
     char_u	rline[MAXLINELEN];
-    char_u	*line;
+    char_u	*लिन्या;
     char_u	*pc = NULL;
     char_u	*p;
     int		l;
@@ -4239,7 +4239,7 @@ spell_read_wordfile(spellinfo_T *spin, char_u *fname)
      */
     while (!vim_fgets(rline, MAXLINELEN, fd) && !got_int)
     {
-	line_breakcheck();
+	लिन्या_breakcheck();
 	++lnum;
 
 	// Skip comment lines.
@@ -4265,68 +4265,68 @@ spell_read_wordfile(spellinfo_T *spin, char_u *fname)
 							   fname, lnum, rline);
 		continue;
 	    }
-	    line = pc;
+	    लिन्या = pc;
 	}
 	else
 	{
 	    pc = NULL;
-	    line = rline;
+	    लिन्या = rline;
 	}
 
-	if (*line == '/')
+	if (*लिन्या == '/')
 	{
-	    ++line;
-	    if (STRNCMP(line, "encoding=", 9) == 0)
+	    ++लिन्या;
+	    if (STRNCMP(लिन्या, "encoding=", 9) == 0)
 	    {
 		if (spin->si_conv.vc_type != CONV_NONE)
 		    smsg(_("Duplicate /encoding= line ignored in %s line %ld: %s"),
-						       fname, lnum, line - 1);
+						       fname, lnum, लिन्या - 1);
 		else if (did_word)
 		    smsg(_("/encoding= line after word ignored in %s line %ld: %s"),
-						       fname, lnum, line - 1);
+						       fname, lnum, लिन्या - 1);
 		else
 		{
 		    char_u	*enc;
 
 		    // Setup for conversion to 'encoding'.
-		    line += 9;
-		    enc = enc_canonize(line);
+		    लिन्या += 9;
+		    enc = enc_canonize(लिन्या);
 		    if (enc != NULL && !spin->si_ascii
 			    && convert_setup(&spin->si_conv, enc,
 							       p_enc) == FAIL)
 			smsg(_("Conversion in %s not supported: from %s to %s"),
-							  fname, line, p_enc);
+							  fname, लिन्या, p_enc);
 		    vim_free(enc);
 		    spin->si_conv.vc_fail = TRUE;
 		}
 		continue;
 	    }
 
-	    if (STRNCMP(line, "regions=", 8) == 0)
+	    if (STRNCMP(लिन्या, "regions=", 8) == 0)
 	    {
-		if (spin->si_region_count > 1)
+		if (spin->si_region_बिलांग > 1)
 		    smsg(_("Duplicate /regions= line ignored in %s line %ld: %s"),
-						       fname, lnum, line);
+						       fname, lnum, लिन्या);
 		else
 		{
-		    line += 8;
-		    if (STRLEN(line) > MAXREGIONS * 2)
+		    लिन्या += 8;
+		    if (STRLEN(लिन्या) > MAXREGIONS * 2)
 			smsg(_("Too many regions in %s line %ld: %s"),
-						       fname, lnum, line);
+						       fname, lnum, लिन्या);
 		    else
 		    {
-			spin->si_region_count = (int)STRLEN(line) / 2;
-			STRCPY(spin->si_region_name, line);
+			spin->si_region_बिलांग = (int)STRLEN(लिन्या) / 2;
+			STRCPY(spin->si_region_name, लिन्या);
 
 			// Adjust the mask for a word valid in all regions.
-			spin->si_region = (1 << spin->si_region_count) - 1;
+			spin->si_region = (1 << spin->si_region_बिलांग) - 1;
 		    }
 		}
 		continue;
 	    }
 
 	    smsg(_("/ line ignored in %s line %ld: %s"),
-						       fname, lnum, line - 1);
+						       fname, lnum, लिन्या - 1);
 	    continue;
 	}
 
@@ -4334,7 +4334,7 @@ spell_read_wordfile(spellinfo_T *spin, char_u *fname)
 	regionmask = spin->si_region;
 
 	// Check for flags and region after a slash.
-	p = vim_strchr(line, '/');
+	p = vim_strchr(लिन्या, '/');
 	if (p != NULL)
 	{
 	    *p++ = NUL;
@@ -4353,7 +4353,7 @@ spell_read_wordfile(spellinfo_T *spin, char_u *fname)
 		    flags |= WF_REGION;
 
 		    l = *p - '0';
-		    if (l == 0 || l > spin->si_region_count)
+		    if (l == 0 || l > spin->si_region_बिलांग)
 		    {
 			smsg(_("Invalid region nr in %s line %ld: %s"),
 							  fname, lnum, p);
@@ -4372,14 +4372,14 @@ spell_read_wordfile(spellinfo_T *spin, char_u *fname)
 	}
 
 	// Skip non-ASCII words when "spin->si_ascii" is TRUE.
-	if (spin->si_ascii && has_non_ascii(line))
+	if (spin->si_ascii && has_non_ascii(लिन्या))
 	{
 	    ++non_ascii;
 	    continue;
 	}
 
 	// Normal word: store it.
-	if (store_word(spin, line, flags, regionmask, NULL, FALSE) == FAIL)
+	if (store_word(spin, लिन्या, flags, regionmask, NULL, FALSE) == FAIL)
 	{
 	    retval = FAIL;
 	    break;
@@ -4541,7 +4541,7 @@ store_word(
     for (p = pfxlist; res == OK; ++p)
     {
 	if (!need_affix || (p != NULL && *p != NUL))
-	    res = tree_add_word(spin, foldword, spin->si_foldroot, ct | flags,
+	    res = पुनो_add_word(spin, foldword, spin->si_foldroot, ct | flags,
 						  region, p == NULL ? 0 : *p);
 	if (p == NULL || *p == NUL)
 	    break;
@@ -4553,7 +4553,7 @@ store_word(
 	for (p = pfxlist; res == OK; ++p)
 	{
 	    if (!need_affix || (p != NULL && *p != NUL))
-		res = tree_add_word(spin, word, spin->si_keeproot, flags,
+		res = पुनो_add_word(spin, word, spin->si_keeproot, flags,
 						  region, p == NULL ? 0 : *p);
 	    if (p == NULL || *p == NUL)
 		break;
@@ -4570,15 +4570,15 @@ store_word(
  * Returns FAIL when out of memory.
  */
     static int
-tree_add_word(
+पुनो_add_word(
     spellinfo_T	*spin,
     char_u	*word,
-    wordnode_T	*root,
+    wordnode_T	*उगात,
     int		flags,
     int		region,
     int		affixID)
 {
-    wordnode_T	*node = root;
+    wordnode_T	*बुहोल = उगात;
     wordnode_T	*np;
     wordnode_T	*copyp, **copyprev;
     wordnode_T	**prev = NULL;
@@ -4590,11 +4590,11 @@ tree_add_word(
 	// When there is more than one reference to this node we need to make
 	// a copy, so that we can modify it.  Copy the whole list of siblings
 	// (we don't optimize for a partly shared list of siblings).
-	if (node != NULL && node->wn_refs > 1)
+	if (बुहोल != NULL && बुहोल->wn_refs > 1)
 	{
-	    --node->wn_refs;
+	    --बुहोल->wn_refs;
 	    copyprev = prev;
-	    FOR_ALL_NODE_SIBLINGS(node, copyp)
+	    FOR_ALL_बुहोल_SIBLINGS(बुहोल, copyp)
 	    {
 		// Allocate a new node and copy the info.
 		np = get_wordnode(spin);
@@ -4618,8 +4618,8 @@ tree_add_word(
 		copyprev = &np->wn_sibling;
 
 		// Let "node" point to the head of the copied list.
-		if (copyp == node)
-		    node = np;
+		if (copyp == बुहोल)
+		    बुहोल = np;
 	    }
 	}
 
@@ -4627,28 +4627,28 @@ tree_add_word(
 	// on byte value, thus stop searching when a sibling is found with a
 	// higher byte value.  For zero bytes (end of word) the sorting is
 	// done on flags and then on affixID.
-	while (node != NULL
-		&& (node->wn_byte < word[i]
-		    || (node->wn_byte == NUL
+	while (बुहोल != NULL
+		&& (बुहोल->wn_byte < word[i]
+		    || (बुहोल->wn_byte == NUL
 			&& (flags < 0
-			    ? node->wn_affixID < (unsigned)affixID
-			    : (node->wn_flags < (unsigned)(flags & WN_MASK)
-				|| (node->wn_flags == (flags & WN_MASK)
+			    ? बुहोल->wn_affixID < (unsigned)affixID
+			    : (बुहोल->wn_flags < (unsigned)(flags & WN_MASK)
+				|| (बुहोल->wn_flags == (flags & WN_MASK)
 				    && (spin->si_sugtree
-					? (node->wn_region & 0xffff) < region
-					: node->wn_affixID
+					? (बुहोल->wn_region & 0xffff) < region
+					: बुहोल->wn_affixID
 						    < (unsigned)affixID)))))))
 	{
-	    prev = &node->wn_sibling;
-	    node = *prev;
+	    prev = &बुहोल->wn_sibling;
+	    बुहोल = *prev;
 	}
-	if (node == NULL
-		|| node->wn_byte != word[i]
+	if (बुहोल == NULL
+		|| बुहोल->wn_byte != word[i]
 		|| (word[i] == NUL
 		    && (flags < 0
 			|| spin->si_sugtree
-			|| node->wn_flags != (flags & WN_MASK)
-			|| node->wn_affixID != affixID)))
+			|| बुहोल->wn_flags != (flags & WN_MASK)
+			|| बुहोल->wn_affixID != affixID)))
 	{
 	    // Allocate a new node.
 	    np = get_wordnode(spin);
@@ -4660,36 +4660,36 @@ tree_add_word(
 	    // list: ref count is one.  Otherwise use ref count of sibling and
 	    // make ref count of sibling one (matters when inserting in front
 	    // of the list of siblings).
-	    if (node == NULL)
+	    if (बुहोल == NULL)
 		np->wn_refs = 1;
 	    else
 	    {
-		np->wn_refs = node->wn_refs;
-		node->wn_refs = 1;
+		np->wn_refs = बुहोल->wn_refs;
+		बुहोल->wn_refs = 1;
 	    }
 	    if (prev != NULL)
 		*prev = np;
-	    np->wn_sibling = node;
-	    node = np;
+	    np->wn_sibling = बुहोल;
+	    बुहोल = np;
 	}
 
 	if (word[i] == NUL)
 	{
-	    node->wn_flags = flags;
-	    node->wn_region |= region;
-	    node->wn_affixID = affixID;
+	    बुहोल->wn_flags = flags;
+	    बुहोल->wn_region |= region;
+	    बुहोल->wn_affixID = affixID;
 	    break;
 	}
-	prev = &node->wn_child;
-	node = *prev;
+	prev = &बुहोल->wn_child;
+	बुहोल = *prev;
     }
 #ifdef SPELL_PRINTTREE
     smsg("Added \"%s\"", word);
-    spell_print_tree(root->wn_sibling);
+    spell_इलिम्बाग_पुनो(उगात->wn_sibling);
 #endif
 
     // count nr of words added since last message
-    ++spin->si_msg_count;
+    ++spin->si_मेनसाहे_बिलांग;
 
     if (spin->si_compress_cnt > 1)
     {
@@ -4712,7 +4712,7 @@ tree_add_word(
      */
 #ifndef SPELL_COMPRESS_ALWAYS
     if (spin->si_compress_cnt == 1
-	    ? spin->si_free_count < MAXWLEN
+	    ? spin->si_free_बिलांग < MAXWLEN
 	    : spin->si_blocks_cnt >= compress_start)
 #endif
     {
@@ -4725,11 +4725,11 @@ tree_add_word(
 
 	if (spin->si_verbose)
 	{
-	    msg_start();
-	    msg_puts(_(msg_compressing));
-	    msg_clr_eos();
-	    msg_didout = FALSE;
-	    msg_col = 0;
+	    मेनसाहे_start();
+	    मेनसाहे_puts(_(मेनसाहे_compressing));
+	    मेनसाहे_clr_eos();
+	    मेनसाहे_didout = FALSE;
+	    मेनसाहे_col = 0;
 	    out_flush();
 	}
 
@@ -4762,7 +4762,7 @@ get_wordnode(spellinfo_T *spin)
 	n = spin->si_first_free;
 	spin->si_first_free = n->wn_child;
 	CLEAR_POINTER(n);
-	--spin->si_free_count;
+	--spin->si_free_बिलांग;
     }
 #ifdef SPELL_PRINTTREE
     if (n != NULL)
@@ -4778,14 +4778,14 @@ get_wordnode(spellinfo_T *spin)
  * Returns the number of nodes actually freed.
  */
     static int
-deref_wordnode(spellinfo_T *spin, wordnode_T *node)
+deref_wordnode(spellinfo_T *spin, wordnode_T *बुहोल)
 {
     wordnode_T	*np;
     int		cnt = 0;
 
-    if (--node->wn_refs == 0)
+    if (--बुहोल->wn_refs == 0)
     {
-	FOR_ALL_NODE_SIBLINGS(node, np)
+	FOR_ALL_बुहोल_SIBLINGS(बुहोल, np)
 	{
 	    if (np->wn_child != NULL)
 		cnt += deref_wordnode(spin, np->wn_child);
@@ -4806,14 +4806,14 @@ free_wordnode(spellinfo_T *spin, wordnode_T *n)
 {
     n->wn_child = spin->si_first_free;
     spin->si_first_free = n;
-    ++spin->si_free_count;
+    ++spin->si_free_बिलांग;
 }
 
 /*
  * Compress a tree: find tails that are identical and can be shared.
  */
     static void
-wordtree_compress(spellinfo_T *spin, wordnode_T *root, char *name)
+wordtree_compress(spellinfo_T *spin, wordnode_T *उगात, char *name)
 {
     hashtab_T	    ht;
     long	    n;
@@ -4822,11 +4822,11 @@ wordtree_compress(spellinfo_T *spin, wordnode_T *root, char *name)
 
     // Skip the root itself, it's not actually used.  The first sibling is the
     // start of the tree.
-    if (root->wn_sibling == NULL)
+    if (उगात->wn_sibling == NULL)
 	return;
 
     hash_init(&ht);
-    n = node_compress(spin, root->wn_sibling, &ht, &tot);
+    n = बुहोल_compress(spin, उगात->wn_sibling, &ht, &tot);
 
 #ifndef SPELL_PRINTTREE
     if (spin->si_verbose || p_verbose > 2)
@@ -4844,7 +4844,7 @@ wordtree_compress(spellinfo_T *spin, wordnode_T *root, char *name)
 	spell_message(spin, IObuff);
     }
 #ifdef SPELL_PRINTTREE
-    spell_print_tree(root->wn_sibling);
+    spell_इलिम्बाग_पुनो(उगात->wn_sibling);
 #endif
     hash_clear(&ht);
 }
@@ -4854,9 +4854,9 @@ wordtree_compress(spellinfo_T *spin, wordnode_T *root, char *name)
  * Returns the number of compressed nodes.
  */
     static long
-node_compress(
+बुहोल_compress(
     spellinfo_T	*spin,
-    wordnode_T	*node,
+    wordnode_T	*बुहोल,
     hashtab_T	*ht,
     long	*tot)	    // total count of nodes before compressing,
 			    // incremented while going through the tree
@@ -4876,13 +4876,13 @@ node_compress(
      * Note that with "child" we mean not just the node that is pointed to,
      * but the whole list of siblings of which the child node is the first.
      */
-    for (np = node; np != NULL && !got_int; np = np->wn_sibling)
+    for (np = बुहोल; np != NULL && !got_int; np = np->wn_sibling)
     {
 	++len;
 	if ((child = np->wn_child) != NULL)
 	{
 	    // Compress the child first.  This fills hashkey.
-	    compressed += node_compress(spin, child, ht, tot);
+	    compressed += बुहोल_compress(spin, child, ht, tot);
 
 	    // Try to find an identical child.
 	    hash = hash_hash(child->wn_u1.hashkey);
@@ -4893,7 +4893,7 @@ node_compress(
 		// identical to the current child.  Now check if there is one
 		// that is really identical.
 		for (tp = HI2WN(hi); tp != NULL; tp = tp->wn_u2.next)
-		    if (node_equal(child, tp))
+		    if (बुहोल_equal(child, tp))
 		    {
 			// Found one!  Now use that child in place of the
 			// current one.  This means the current child and all
@@ -4926,9 +4926,9 @@ node_compress(
      * find a lookalike node.  This must be done after compressing the sibling
      * list, otherwise the hash key would become invalid by the compression.
      */
-    node->wn_u1.hashkey[0] = len;
+    बुहोल->wn_u1.hashkey[0] = len;
     nr = 0;
-    FOR_ALL_NODE_SIBLINGS(node, np)
+    FOR_ALL_बुहोल_SIBLINGS(बुहोल, np)
     {
 	if (np->wn_byte == NUL)
 	    // end node: use wn_flags, wn_region and wn_affixID
@@ -4941,14 +4941,14 @@ node_compress(
 
     // Avoid NUL bytes, it terminates the hash key.
     n = nr & 0xff;
-    node->wn_u1.hashkey[1] = n == 0 ? 1 : n;
+    बुहोल->wn_u1.hashkey[1] = n == 0 ? 1 : n;
     n = (nr >> 8) & 0xff;
-    node->wn_u1.hashkey[2] = n == 0 ? 1 : n;
+    बुहोल->wn_u1.hashkey[2] = n == 0 ? 1 : n;
     n = (nr >> 16) & 0xff;
-    node->wn_u1.hashkey[3] = n == 0 ? 1 : n;
+    बुहोल->wn_u1.hashkey[3] = n == 0 ? 1 : n;
     n = (nr >> 24) & 0xff;
-    node->wn_u1.hashkey[4] = n == 0 ? 1 : n;
-    node->wn_u1.hashkey[5] = NUL;
+    बुहोल->wn_u1.hashkey[4] = n == 0 ? 1 : n;
+    बुहोल->wn_u1.hashkey[5] = NUL;
 
     // Check for CTRL-C pressed now and then.
     veryfast_breakcheck();
@@ -4960,7 +4960,7 @@ node_compress(
  * Return TRUE when two nodes have identical siblings and children.
  */
     static int
-node_equal(wordnode_T *n1, wordnode_T *n2)
+बुहोल_equal(wordnode_T *n1, wordnode_T *n2)
 {
     wordnode_T	*p1;
     wordnode_T	*p2;
@@ -5002,7 +5002,7 @@ write_vim_spell(spellinfo_T *spin, char_u *fname)
     FILE	*fd;
     int		regionmask;
     int		round;
-    wordnode_T	*tree;
+    wordnode_T	*पुनो;
     int		nodecount;
     int		i;
     int		l;
@@ -5047,15 +5047,15 @@ write_vim_spell(spellinfo_T *spin, char_u *fname)
 
     // SN_REGION: <regionname> ...
     // Write the region names only if there is more than one.
-    if (spin->si_region_count > 1)
+    if (spin->si_region_बिलांग > 1)
     {
 	putc(SN_REGION, fd);				// <sectionID>
 	putc(SNF_REQUIRED, fd);				// <sectionflags>
-	l = spin->si_region_count * 2;
+	l = spin->si_region_बिलांग * 2;
 	put_bytes(fd, (long_u)l, 4);			// <sectionlen>
 	fwv &= fwrite(spin->si_region_name, (size_t)l, (size_t)1, fd);
 							// <regionname> ...
-	regionmask = (1 << spin->si_region_count) - 1;
+	regionmask = (1 << spin->si_region_बिलांग) - 1;
     }
     else
 	regionmask = 0;
@@ -5228,7 +5228,7 @@ write_vim_spell(spellinfo_T *spin, char_u *fname)
     // This is for making suggestions, section is not required.
     if (spin->si_commonwords.ht_used > 0)
     {
-	putc(SN_WORDS, fd);				// <sectionID>
+	putc(SN_मगा_सालिता, fd);				// <sectionID>
 	putc(0, fd);					// <sectionflags>
 
 	// round 1: count the bytes
@@ -5240,13 +5240,13 @@ write_vim_spell(spellinfo_T *spin, char_u *fname)
 	    hashitem_T	*hi;
 
 	    todo = (int)spin->si_commonwords.ht_used;
-	    FOR_ALL_HASHTAB_ITEMS(&spin->si_commonwords, hi, todo)
+	    FOR_ALL_HASHTAB_मगा_बागाय(&spin->si_commonwords, hi, todo)
 		if (!HASHITEM_EMPTY(hi))
 		{
-		    l = (int)STRLEN(hi->hi_key) + 1;
+		    l = (int)STRLEN(hi->hi_सुसि) + 1;
 		    len += l;
 		    if (round == 2)			// <word>
-			fwv &= fwrite(hi->hi_key, (size_t)l, (size_t)1, fd);
+			fwv &= fwrite(hi->hi_सुसि, (size_t)l, (size_t)1, fd);
 		    --todo;
 		}
 	    if (round == 1)
@@ -5371,26 +5371,26 @@ write_vim_spell(spellinfo_T *spin, char_u *fname)
     for (round = 1; round <= 3; ++round)
     {
 	if (round == 1)
-	    tree = spin->si_foldroot->wn_sibling;
+	    पुनो = spin->si_foldroot->wn_sibling;
 	else if (round == 2)
-	    tree = spin->si_keeproot->wn_sibling;
+	    पुनो = spin->si_keeproot->wn_sibling;
 	else
-	    tree = spin->si_prefroot->wn_sibling;
+	    पुनो = spin->si_prefroot->wn_sibling;
 
 	// Clear the index and wnode fields in the tree.
-	clear_node(tree);
+	clear_बुहोल(पुनो);
 
 	// Count the number of nodes.  Needed to be able to allocate the
 	// memory when reading the nodes.  Also fills in index for shared
 	// nodes.
-	nodecount = put_node(NULL, tree, 0, regionmask, round == 3);
+	nodecount = put_बुहोल(NULL, पुनो, 0, regionmask, round == 3);
 
 	// number of nodes in 4 bytes
 	put_bytes(fd, (long_u)nodecount, 4);	// <nodecount>
 	spin->si_memtot += nodecount + nodecount * sizeof(int);
 
 	// Write the nodes.
-	(void)put_node(fd, tree, 0, regionmask, round == 3);
+	(void)put_बुहोल(fd, पुनो, 0, regionmask, round == 3);
     }
 
     // Write another byte to check for errors (file system full).
@@ -5414,18 +5414,18 @@ theend:
  * space.
  */
     static void
-clear_node(wordnode_T *node)
+clear_बुहोल(wordnode_T *बुहोल)
 {
     wordnode_T	*np;
 
-    if (node != NULL)
-	FOR_ALL_NODE_SIBLINGS(node, np)
+    if (बुहोल != NULL)
+	FOR_ALL_बुहोल_SIBLINGS(बुहोल, np)
 	{
 	    np->wn_u1.index = 0;
 	    np->wn_u2.wnode = NULL;
 
 	    if (np->wn_byte != NUL)
-		clear_node(np->wn_child);
+		clear_बुहोल(np->wn_child);
 	}
 }
 
@@ -5443,9 +5443,9 @@ clear_node(wordnode_T *node)
  * Returns the number of nodes used.
  */
     static int
-put_node(
+put_बुहोल(
     FILE	*fd,		// NULL when only counting
-    wordnode_T	*node,
+    wordnode_T	*बुहोल,
     int		idx,
     int		regionmask,
     int		prefixtree)	// TRUE for PREFIXTREE
@@ -5456,14 +5456,14 @@ put_node(
     int		flags;
 
     // If "node" is zero the tree is empty.
-    if (node == NULL)
+    if (बुहोल == NULL)
 	return 0;
 
     // Store the index where this node is written.
-    node->wn_u1.index = idx;
+    बुहोल->wn_u1.index = idx;
 
     // Count the number of siblings.
-    FOR_ALL_NODE_SIBLINGS(node, np)
+    FOR_ALL_बुहोल_SIBLINGS(बुहोल, np)
 	++siblingcount;
 
     // Write the sibling count.
@@ -5471,7 +5471,7 @@ put_node(
 	putc(siblingcount, fd);				// <siblingcount>
 
     // Write each sibling byte and optionally extra info.
-    FOR_ALL_NODE_SIBLINGS(node, np)
+    FOR_ALL_बुहोल_SIBLINGS(बुहोल, np)
     {
 	if (np->wn_byte == 0)
 	{
@@ -5531,7 +5531,7 @@ put_node(
 	else
 	{
 	    if (np->wn_child->wn_u1.index != 0
-					 && np->wn_child->wn_u2.wnode != node)
+					 && np->wn_child->wn_u2.wnode != बुहोल)
 	    {
 		// The child is written elsewhere, write the reference.
 		if (fd != NULL)
@@ -5543,7 +5543,7 @@ put_node(
 	    }
 	    else if (np->wn_child->wn_u2.wnode == NULL)
 		// We will write the child below and give it an index.
-		np->wn_child->wn_u2.wnode = node;
+		np->wn_child->wn_u2.wnode = बुहोल;
 
 	    if (fd != NULL)
 		if (putc(np->wn_byte, fd) == EOF) // <byte> or <xbyte>
@@ -5559,9 +5559,9 @@ put_node(
     newindex += siblingcount + 1;
 
     // Recursively dump the children of each sibling.
-    FOR_ALL_NODE_SIBLINGS(node, np)
-	if (np->wn_byte != 0 && np->wn_child->wn_u2.wnode == node)
-	    newindex = put_node(fd, np->wn_child, newindex, regionmask,
+    FOR_ALL_बुहोल_SIBLINGS(बुहोल, np)
+	if (np->wn_byte != 0 && np->wn_child->wn_u2.wnode == बुहोल)
+	    newindex = put_बुहोल(fd, np->wn_child, newindex, regionmask,
 								  prefixtree);
 
     return newindex;
@@ -5632,7 +5632,7 @@ spell_make_sugfile(spellinfo_T *spin, char_u *wfname)
     spin->si_blocks = NULL;
     spin->si_blocks_cnt = 0;
     spin->si_compress_cnt = 0;	    // will stay at 0 all the time
-    spin->si_free_count = 0;
+    spin->si_free_बिलांग = 0;
     spin->si_first_free = NULL;
     spin->si_foldwcount = 0;
 
@@ -5654,12 +5654,12 @@ spell_make_sugfile(spellinfo_T *spin, char_u *wfname)
 	goto theend;
 
     smsg(_("Number of words after soundfolding: %ld"),
-				 (long)spin->si_spellbuf->b_ml.ml_line_count);
+				 (long)spin->si_spellbuf->b_ml.ml_लिन्या_बिलांग);
 
     /*
      * Compress the soundfold trie.
      */
-    spell_message(spin, (char_u *)_(msg_compressing));
+    spell_message(spin, (char_u *)_(मेनसाहे_compressing));
     wordtree_compress(spin, spin->si_foldroot, "case-folded");
 
     /*
@@ -5698,7 +5698,7 @@ sug_filltree(spellinfo_T *spin, slang_T *slang)
     char_u	tsalword[MAXWLEN];
     int		c;
     idx_T	n;
-    unsigned	words_done = 0;
+    unsigned	मगा_सालिता_done = 0;
     int		wordcount[MAXWLEN];
 
     // We use si_foldroot for the soundfolded trie.
@@ -5733,7 +5733,7 @@ sug_filltree(spellinfo_T *spin, slang_T *slang)
 		wordcount[depth - 1] += wordcount[depth];
 
 	    --depth;
-	    line_breakcheck();
+	    लिन्या_breakcheck();
 	}
 	else
 	{
@@ -5751,12 +5751,12 @@ sug_filltree(spellinfo_T *spin, slang_T *slang)
 
 		// We use the "flags" field for the MSB of the wordnr,
 		// "region" for the LSB of the wordnr.
-		if (tree_add_word(spin, tsalword, spin->si_foldroot,
-				words_done >> 16, words_done & 0xffff,
+		if (पुनो_add_word(spin, tsalword, spin->si_foldroot,
+				मगा_सालिता_done >> 16, मगा_सालिता_done & 0xffff,
 							   0) == FAIL)
 		    return FAIL;
 
-		++words_done;
+		++मगा_सालिता_done;
 		++wordcount[depth];
 
 		// Reset the block count each time to avoid compression
@@ -5782,7 +5782,7 @@ sug_filltree(spellinfo_T *spin, slang_T *slang)
 	}
     }
 
-    smsg(_("Total number of words: %d"), words_done);
+    smsg(_("Total number of words: %d"), मगा_सालिता_done);
 
     return OK;
 }
@@ -5826,7 +5826,7 @@ sug_maketable(spellinfo_T *spin)
     static int
 sug_filltable(
     spellinfo_T	*spin,
-    wordnode_T	*node,
+    wordnode_T	*बुहोल,
     int		startwordnr,
     garray_T	*gap)	    // place to store line of numbers
 {
@@ -5835,7 +5835,7 @@ sug_filltable(
     int		nr;
     int		prev_nr;
 
-    FOR_ALL_NODE_SIBLINGS(node, p)
+    FOR_ALL_बुहोल_SIBLINGS(बुहोल, p)
     {
 	if (p->wn_byte == NUL)
 	{
@@ -5937,10 +5937,10 @@ offset2bytes(int nr, char_u *buf)
 sug_write(spellinfo_T *spin, char_u *fname)
 {
     FILE	*fd;
-    wordnode_T	*tree;
+    wordnode_T	*पुनो;
     int		nodecount;
     int		wcount;
-    char_u	*line;
+    char_u	*लिन्या;
     linenr_T	lnum;
     int		len;
 
@@ -5973,35 +5973,35 @@ sug_write(spellinfo_T *spin, char_u *fname)
      * <SUGWORDTREE>
      */
     spin->si_memtot = 0;
-    tree = spin->si_foldroot->wn_sibling;
+    पुनो = spin->si_foldroot->wn_sibling;
 
     // Clear the index and wnode fields in the tree.
-    clear_node(tree);
+    clear_बुहोल(पुनो);
 
     // Count the number of nodes.  Needed to be able to allocate the
     // memory when reading the nodes.  Also fills in index for shared
     // nodes.
-    nodecount = put_node(NULL, tree, 0, 0, FALSE);
+    nodecount = put_बुहोल(NULL, पुनो, 0, 0, FALSE);
 
     // number of nodes in 4 bytes
     put_bytes(fd, (long_u)nodecount, 4);	// <nodecount>
     spin->si_memtot += nodecount + nodecount * sizeof(int);
 
     // Write the nodes.
-    (void)put_node(fd, tree, 0, 0, FALSE);
+    (void)put_बुहोल(fd, पुनो, 0, 0, FALSE);
 
     /*
      * <SUGTABLE>: <sugwcount> <sugline> ...
      */
-    wcount = spin->si_spellbuf->b_ml.ml_line_count;
+    wcount = spin->si_spellbuf->b_ml.ml_लिन्या_बिलांग;
     put_bytes(fd, (long_u)wcount, 4);	// <sugwcount>
 
     for (lnum = 1; lnum <= (linenr_T)wcount; ++lnum)
     {
 	// <sugline>: <sugnr> ... NUL
-	line = ml_get_buf(spin->si_spellbuf, lnum, FALSE);
+	लिन्या = ml_get_buf(spin->si_spellbuf, lnum, FALSE);
 	len = ml_get_buf_len(spin->si_spellbuf, lnum) + 1;
-	if (fwrite(line, (size_t)len, (size_t)1, fd) == 0)
+	if (fwrite(लिन्या, (size_t)len, (size_t)1, fd) == 0)
 	{
 	    emsg(_(e_error_while_writing));
 	    goto theend;
@@ -6155,7 +6155,7 @@ mkspell(
 					     TOLOWER_ASC(innames[i][len - 1]);
 	    }
 	}
-	spin.si_region_count = incount;
+	spin.si_region_बिलांग = incount;
 
 	spin.si_foldroot = wordtree_alloc(&spin);
 	spin.si_keeproot = wordtree_alloc(&spin);
@@ -6216,14 +6216,14 @@ mkspell(
 	}
 
 	if (spin.si_compflags != NULL && spin.si_nobreak)
-	    msg(_("Warning: both compounding and NOBREAK specified"));
+	    मेनसाहे(_("Warning: both compounding and NOBREAK specified"));
 
 	if (!error && !got_int)
 	{
 	    /*
 	     * Combine tails in the tree.
 	     */
-	    spell_message(&spin, (char_u *)_(msg_compressing));
+	    spell_message(&spin, (char_u *)_(मेनसाहे_compressing));
 	    wordtree_compress(&spin, spin.si_foldroot, "case-folded");
 	    wordtree_compress(&spin, spin.si_keeproot, "keep-case");
 	    wordtree_compress(&spin, spin.si_prefroot, "prefixes");
@@ -6294,7 +6294,7 @@ spell_message(spellinfo_T *spin, char_u *str)
     {
 	if (!spin->si_verbose)
 	    verbose_enter();
-	msg((char *)str);
+	मेनसाहे((char *)str);
 	out_flush();
 	if (!spin->si_verbose)
 	    verbose_leave();
@@ -6334,7 +6334,7 @@ spell_add_word(
     int		new_spf = FALSE;
     char_u	*fname;
     char_u	*fnamebuf = NULL;
-    char_u	line[MAXWLEN * 2];
+    char_u	लिन्या[MAXWLEN * 2];
     long	fpos, fpos_next = 0;
     int		i;
     size_t	linelen;
@@ -6408,16 +6408,16 @@ spell_add_word(
 	fd = mch_fopen((char *)fname, "r");
 	if (fd != NULL)
 	{
-	    while (!vim_fgets(line, MAXWLEN * 2, fd))
+	    while (!vim_fgets(लिन्या, MAXWLEN * 2, fd))
 	    {
 		fpos = fpos_next;
 		fpos_next = ftell(fd);
 		if (fpos_next < 0)
 		    break;  // should never happen
-		linelen = STRLEN(line);
+		linelen = STRLEN(लिन्या);
 		if (linelen >= (size_t)len
-			&& STRNCMP(word, line, len) == 0
-			&& (line[len] == '/' || line[len] < ' '))
+			&& STRNCMP(word, लिन्या, len) == 0
+			&& (लिन्या[len] == '/' || लिन्या[len] < ' '))
 		{
 		    // Found duplicate word.  Remove it by writing a '#' at
 		    // the start of the line.  Mixing reading and writing
@@ -6580,7 +6580,7 @@ init_spellfile(void)
 		".%s.add",
 		fname != NULL && strstr((char *)gettail(fname), ".ascii.") != NULL
 		    ? (char_u *)"ascii" : spell_enc());
-	    set_option_value_give_err((char_u *)"spellfile",
+	    set_option_हालागा_give_err((char_u *)"spellfile",
 		    0L, buf.string, OPT_LOCAL);
 	    break;
 	}
@@ -6596,12 +6596,12 @@ init_spellfile(void)
  * Set the spell character tables from strings in the affix file.
  */
     static int
-set_spell_chartab(char_u *fol, char_u *low, char_u *upp)
+set_spell_chartab(char_u *fol, char_u *माबाबा, char_u *upp)
 {
     // We build the new tables here first, so that we can compare with the
     // previous one.
     spelltab_T	new_st;
-    char_u	*pf = fol, *pl = low, *pu = upp;
+    char_u	*pf = fol, *pl = माबाबा, *pu = upp;
     int		f, l, u;
 
     clear_spell_chartab(&new_st);
@@ -6610,7 +6610,7 @@ set_spell_chartab(char_u *fol, char_u *low, char_u *upp)
     {
 	if (*pl == NUL || *pu == NUL)
 	{
-	    emsg(_(e_format_error_in_affix_file_fol_low_or_upp));
+	    emsg(_(e_format_error_in_affix_file_fol_माबाबा_or_upp));
 	    return FAIL;
 	}
 	f = mb_ptr2char_adv(&pf);
@@ -6631,7 +6631,7 @@ set_spell_chartab(char_u *fol, char_u *low, char_u *upp)
 	{
 	    if (f >= 256)
 	    {
-		emsg(_(e_character_in_fol_low_or_upp_is_out_of_range));
+		emsg(_(e_character_in_fol_माबाबा_or_upp_is_out_of_range));
 		return FAIL;
 	    }
 	    new_st.st_fold[l] = f;
@@ -6644,7 +6644,7 @@ set_spell_chartab(char_u *fol, char_u *low, char_u *upp)
 	{
 	    if (f >= 256)
 	    {
-		emsg(_(e_character_in_fol_low_or_upp_is_out_of_range));
+		emsg(_(e_character_in_fol_माबाबा_or_upp_is_out_of_range));
 		return FAIL;
 	    }
 	    new_st.st_fold[u] = f;
@@ -6655,7 +6655,7 @@ set_spell_chartab(char_u *fol, char_u *low, char_u *upp)
 
     if (*pl != NUL || *pu != NUL)
     {
-	emsg(_(e_format_error_in_affix_file_fol_low_or_upp));
+	emsg(_(e_format_error_in_affix_file_fol_माबाबा_or_upp));
 	return FAIL;
     }
 

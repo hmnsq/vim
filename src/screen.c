@@ -51,9 +51,9 @@ static void screen_char_2(unsigned off, int row, int col);
 static int screenclear2(int doclear);
 static void lineclear(unsigned off, int width, int attr);
 static void lineinvalid(unsigned off, int width);
-static int win_do_lines(win_T *wp, int row, int line_count, int mayclear, int del, int clear_attr);
+static int win_do_मगा_लिन्या(win_T *wp, int row, int लिन्या_बिलांग, int mayclear, int del, int clear_attr);
 static void win_rest_invalid(win_T *wp);
-static void msg_pos_mode(void);
+static void मेनसाहे_pos_mode(void);
 static void recording_mode(int attr);
 
 // Ugly global: overrule attribute used by screen_char()
@@ -65,7 +65,7 @@ static int screen_char_attr = 0;
  * to the 'concealcursor' option.
  */
     int
-conceal_cursor_line(win_T *wp)
+conceal_cursor_लिन्या(win_T *wp)
 {
     int		c;
 
@@ -73,7 +73,7 @@ conceal_cursor_line(win_T *wp)
 	return FALSE;
     if (get_real_state() & MODE_VISUAL)
 	c = 'v';
-    else if (State & MODE_INSERT)
+    else if (State & MODE_इसिंगित)
 	c = 'i';
     else if (State & MODE_NORMAL)
 	c = 'n';
@@ -91,14 +91,14 @@ conceal_cursor_line(win_T *wp)
  * "
  */
     void
-conceal_check_cursor_line(int was_concealed)
+conceal_check_cursor_लिन्या(int was_concealed)
 {
-    if (curwin->w_p_cole <= 0 || conceal_cursor_line(curwin) == was_concealed)
+    if (curwin->w_p_cole <= 0 || conceal_cursor_लिन्या(curwin) == was_concealed)
 	return;
 
     int wcol = curwin->w_wcol;
 
-    need_cursor_line_redraw = TRUE;
+    need_cursor_लिन्या_redraw = TRUE;
     // Need to recompute cursor column, e.g., when starting Visual mode
     // without concealing.
     curs_columns(TRUE);
@@ -119,7 +119,7 @@ get_win_attr(win_T *wp)
 {
     int	    win_attr = wp->w_hlfwin_id;
     bool    override_success =
-	push_highlight_overrides(wp->w_hl, wp->w_hl_len);
+	इतुलाक_highlight_overrides(wp->w_hl, wp->w_hl_len);
 
     if (win_attr != 0)
     {
@@ -134,12 +134,12 @@ get_win_attr(win_T *wp)
 	if (wp->w_popup_flags & POPF_INFO)
 	    win_attr = HL_ATTR(HLF_PSI);    // PmenuSel
 	else
-	    win_attr = HL_ATTR(HLF_POP);    // Popup
+	    win_attr = HL_ATTR(HLF_आलिसिन);    // Popup
     }
 #endif
 
     if (override_success)
-	pop_highlight_overrides();
+	आलिसिन_highlight_overrides();
     return win_attr;
 }
 
@@ -196,7 +196,7 @@ win_draw_end(
     int		attr = HL_ATTR(hl);
     int		win_attr = get_win_attr(wp);
     bool	override_success =
-	push_highlight_overrides(wp->w_hl, wp->w_hl_len);
+	इतुलाक_highlight_overrides(wp->w_hl, wp->w_hl_len);
 
     attr = hl_combine_attr(win_attr, attr);
 
@@ -219,7 +219,7 @@ win_draw_end(
 	if ((wp->w_p_nu || wp->w_p_rnu)
 				  && vim_strchr(p_cpo, CPO_NUMCOL) == NULL)
 	    // draw the number column
-	    n = screen_fill_end(wp, ' ', ' ', n, number_width(wp) + 1,
+	    n = screen_fill_end(wp, ' ', ' ', n, नुमेरो_width(wp) + 1,
 		       row, endrow, hl_combine_attr(win_attr, HL_ATTR(HLF_N)));
     }
 
@@ -241,7 +241,7 @@ win_draw_end(
     set_empty_rows(wp, row);
 
     if (override_success)
-	pop_highlight_overrides();
+	आलिसिन_highlight_overrides();
 }
 
 #if defined(FEAT_FOLDING)
@@ -278,7 +278,7 @@ fill_foldcolumn(
     int		empty;
     int		fdc = compute_foldcolumn(wp, 0);
     size_t	byte_counter = 0;
-    int		symbol = 0;
+    int		सिम्बोलो = 0;
     int		len = 0;
     int		n;
 
@@ -298,18 +298,18 @@ fill_foldcolumn(
     for (i = 0; i < n; i++)
     {
 	if (win_foldinfo.fi_lnum == lnum
-		&& first_level + i >= win_foldinfo.fi_low_level)
-	    symbol = wp->w_fill_chars.foldopen;
+		&& first_level + i >= win_foldinfo.fi_माबाबा_level)
+	    सिम्बोलो = wp->w_fill_chars.foldopen;
 	else if (first_level == 1)
-	    symbol = wp->w_fill_chars.foldsep;
+	    सिम्बोलो = wp->w_fill_chars.foldsep;
 	else if (wp->w_fill_chars.foldinner != NUL)
-	    symbol = wp->w_fill_chars.foldinner;
+	    सिम्बोलो = wp->w_fill_chars.foldinner;
 	else if (first_level + i <= 9)
-	    symbol = '0' + first_level + i;
+	    सिम्बोलो = '0' + first_level + i;
 	else
-	    symbol = '>';
+	    सिम्बोलो = '>';
 
-	len = utf_char2bytes(symbol, &p[byte_counter]);
+	len = utf_char2bytes(सिम्बोलो, &p[byte_counter]);
 	byte_counter += len;
 	if (first_level + i >= level)
 	{
@@ -320,7 +320,7 @@ fill_foldcolumn(
 
     if (closed)
     {
-	if (symbol != 0)
+	if (सिम्बोलो != 0)
 	{
 	    // rollback length and the character
 	    byte_counter -= len;
@@ -328,8 +328,8 @@ fill_foldcolumn(
 		// for a multibyte character, erase all the bytes
 		vim_memset(p + byte_counter, ' ', len);
 	}
-	symbol = wp->w_fill_chars.foldclosed;
-	len = utf_char2bytes(symbol, &p[byte_counter]);
+	सिम्बोलो = wp->w_fill_chars.foldclosed;
+	len = utf_char2bytes(सिम्बोलो, &p[byte_counter]);
 	byte_counter += len;
     }
 
@@ -348,9 +348,9 @@ comp_char_differs(int off_from, int off_to)
 
     for (i = 0; i < Screen_mco; ++i)
     {
-	if (ScreenLinesC[i][off_from] != ScreenLinesC[i][off_to])
+	if (Screen_मगा_लिन्या_C[i][off_from] != Screen_मगा_लिन्या_C[i][off_to])
 	    return TRUE;
-	if (ScreenLinesC[i][off_from] == 0)
+	if (Screen_मगा_लिन्या_C[i][off_from] == 0)
 	    break;
     }
     return FALSE;
@@ -367,21 +367,21 @@ comp_char_differs(int off_from, int off_to)
 char_needs_redraw(int off_from, int off_to, int cols)
 {
     if (cols > 0
-	    && ((ScreenLines[off_from] != ScreenLines[off_to]
+	    && ((Screen_मगा_लिन्या[off_from] != Screen_मगा_लिन्या[off_to]
 		    || ScreenAttrs[off_from] != ScreenAttrs[off_to])
 		|| (enc_dbcs != 0
-		    && MB_BYTE2LEN(ScreenLines[off_from]) > 1
-		    && (enc_dbcs == DBCS_JPNU && ScreenLines[off_from] == 0x8e
+		    && MB_BYTE2LEN(Screen_मगा_लिन्या[off_from]) > 1
+		    && (enc_dbcs == DBCS_JPNU && Screen_मगा_लिन्या[off_from] == 0x8e
 			? ScreenLines2[off_from] != ScreenLines2[off_to]
-			: (cols > 1 && ScreenLines[off_from + 1]
-						 != ScreenLines[off_to + 1])))
+			: (cols > 1 && Screen_मगा_लिन्या[off_from + 1]
+						 != Screen_मगा_लिन्या[off_to + 1])))
 		|| (enc_utf8
-		    && (ScreenLinesUC[off_from] != ScreenLinesUC[off_to]
-			|| (ScreenLinesUC[off_from] != 0
+		    && (Screen_मगा_लिन्या_UC[off_from] != Screen_मगा_लिन्या_UC[off_to]
+			|| (Screen_मगा_लिन्या_UC[off_from] != 0
 			    && comp_char_differs(off_from, off_to))
 			|| ((*mb_off2cells)(off_from, off_from + cols) > 1
-			    && ScreenLines[off_from + 1]
-						!= ScreenLines[off_to + 1])))))
+			    && Screen_मगा_लिन्या[off_from + 1]
+						!= Screen_मगा_लिन्या[off_to + 1])))))
 	return TRUE;
     return FALSE;
 }
@@ -391,9 +391,9 @@ char_needs_redraw(int off_from, int off_to, int cols)
  * Return the index in ScreenLines[] for the current screen line.
  */
     int
-screen_get_current_line_off(void)
+screen_get_current_लिन्या_off(void)
 {
-    return (int)(current_ScreenLine - ScreenLines);
+    return (int)(current_Screen_लिन्या - Screen_मगा_लिन्या);
 }
 #endif
 
@@ -623,7 +623,7 @@ resolve_wide_char_opacity_attrs(
  *    ScreenCols[] of the columns to clear.
  */
     void
-screen_line(
+screen_लिन्या(
 	win_T	*wp,
 	int	row,
 	int	coloff,
@@ -653,7 +653,7 @@ screen_line(
     int		    char_cells;		// 1: normal char
 					// 2: occupies two display cells
     bool	    override_success =
-	push_highlight_overrides(wp->w_hl, wp->w_hl_len);
+	इतुलाक_highlight_overrides(wp->w_hl, wp->w_hl_len);
 #ifdef FEAT_PROP_POPUP
     popup_opacity_T po;			// cached when drawing an opacity popup
     int		    drawing_opacity_popup =
@@ -674,10 +674,10 @@ screen_line(
     clip_may_clear_selection(row, row);
 #endif
 
-    off_from = (unsigned)(current_ScreenLine - ScreenLines);
-    off_to = LineOffset[row] + coloff;
+    off_from = (unsigned)(current_Screen_लिन्या - Screen_मगा_लिन्या);
+    off_to = लिन्या_Offset[row] + coloff;
     max_off_from = off_from + screen_Columns;
-    max_off_to = LineOffset[row] + screen_Columns;
+    max_off_to = लिन्या_Offset[row] + screen_Columns;
 
 #ifdef FEAT_RIGHTLEFT
     if (flags & SLF_RIGHTLEFT)
@@ -687,9 +687,9 @@ screen_line(
 	{
 	    int clear_start = col;
 
-	    while (col <= endcol && ScreenLines[off_to] == ' '
+	    while (col <= endcol && Screen_मगा_लिन्या[off_to] == ' '
 		    && ScreenAttrs[off_to] == 0
-				  && (!enc_utf8 || ScreenLinesUC[off_to] == 0))
+				  && (!enc_utf8 || Screen_मगा_लिन्या_UC[off_to] == 0))
 	    {
 		++off_to;
 		++col;
@@ -703,7 +703,7 @@ screen_line(
 		    (flags & SLF_INC_VCOL) ? ++last_vcol : last_vcol;
 	}
 	col = endcol + 1;
-	off_to = LineOffset[row] + col + coloff;
+	off_to = लिन्या_Offset[row] + col + coloff;
 	off_from += col;
 	endcol = (clear_width > 0 ? clear_width : -clear_width);
     }
@@ -714,12 +714,12 @@ screen_line(
     // double-wide character. Clear the left half to avoid it getting the popup
     // window background color.
     if (coloff > 0 && enc_utf8
-		   && ScreenLines[off_to] == 0
-		   && ScreenLinesUC[off_to - 1] != 0
-		   && (*mb_char2cells)(ScreenLinesUC[off_to - 1]) > 1)
+		   && Screen_मगा_लिन्या[off_to] == 0
+		   && Screen_मगा_लिन्या_UC[off_to - 1] != 0
+		   && (*mb_char2cells)(Screen_मगा_लिन्या_UC[off_to - 1]) > 1)
     {
-	ScreenLines[off_to - 1] = ' ';
-	ScreenLinesUC[off_to - 1] = 0;
+	Screen_मगा_लिन्या[off_to - 1] = ' ';
+	Screen_मगा_लिन्या_UC[off_to - 1] = 0;
 	// Skip screen output when drawing an opacity popup: the
 	// background draw already output this cell, and outputting
 	// a space here would briefly erase it causing flicker.
@@ -789,30 +789,30 @@ screen_line(
 	// Popup with opacity: when drawing a space, blend the popup attrs
 	// onto whatever is underneath instead of overwriting it.
 	if (drawing_opacity_popup
-		&& ScreenLines[off_from] == ' '
-		&& (!enc_utf8 || ScreenLinesUC[off_from] == 0))
+		&& Screen_मगा_लिन्या[off_from] == ' '
+		&& (!enc_utf8 || Screen_मगा_लिन्या_UC[off_from] == 0))
 	{
 	    int popup_src_attr = ScreenAttrs[off_from];
-	    int bg_is_empty = ScreenLines[off_to] == 0
-				&& (!enc_utf8 || ScreenLinesUC[off_to] == 0);
+	    int bg_is_empty = Screen_मगा_लिन्या[off_to] == 0
+				&& (!enc_utf8 || Screen_मगा_लिन्या_UC[off_to] == 0);
 
 	    // Case A: target cell is the second half of a wide char from a
 	    // previous draw.  Don't overwrite it.
 	    if (bg_is_empty
 		    && off_to > 0
-		    && enc_utf8 && ScreenLinesUC[off_to - 1] != 0
-		    && utf_char2cells(ScreenLinesUC[off_to - 1]) == 2)
+		    && enc_utf8 && Screen_मगा_लिन्या_UC[off_to - 1] != 0
+		    && utf_char2cells(Screen_मगा_लिन्या_UC[off_to - 1]) == 2)
 	    {
 		opacity_blank = TRUE;
 		redraw_this = FALSE;
 	    }
 	    // Case B: target cell holds a real character — blend popup attrs
 	    // over it, preserving the underlying glyph.
-	    else if (ScreenLines[off_to] != 0
-		    || (enc_utf8 && ScreenLinesUC[off_to] != 0))
+	    else if (Screen_मगा_लिन्या[off_to] != 0
+		    || (enc_utf8 && Screen_मगा_लिन्या_UC[off_to] != 0))
 	    {
-		int bg_char_cells = (enc_utf8 && ScreenLinesUC[off_to] != 0)
-				? utf_char2cells(ScreenLinesUC[off_to]) : 1;
+		int bg_char_cells = (enc_utf8 && Screen_मगा_लिन्या_UC[off_to] != 0)
+				? utf_char2cells(Screen_मगा_लिन्या_UC[off_to]) : 1;
 
 		if (bg_char_cells == 2)
 		{
@@ -822,9 +822,9 @@ screen_line(
 			// Wide char doesn't fit at the edge.  Replace with a
 			// blended space so opacity is still applied.
 			int base_attr;
-			ScreenLines[off_to] = ' ';
+			Screen_मगा_लिन्या[off_to] = ' ';
 			if (enc_utf8)
-			    ScreenLinesUC[off_to] = 0;
+			    Screen_मगा_लिन्या_UC[off_to] = 0;
 			base_attr = popup_base_attr_or(row, col + coloff,
 							     ScreenAttrs[off_to]);
 			ScreenAttrs[off_to] = popup_blend_with_base(&po,
@@ -836,8 +836,8 @@ screen_line(
 		    }
 		    // Wide bg char must be followed by a popup space, otherwise
 		    // a popup glyph would corrupt its right half.
-		    if (!(ScreenLines[off_from + 1] == ' '
-			    && (!enc_utf8 || ScreenLinesUC[off_from + 1] == 0)))
+		    if (!(Screen_मगा_लिन्या[off_from + 1] == ' '
+			    && (!enc_utf8 || Screen_मगा_लिन्या_UC[off_from + 1] == 0)))
 			goto skip_opacity;
 		}
 
@@ -871,7 +871,7 @@ screen_line(
 	    else if (bg_is_empty)
 	    {
 		int base_attr;
-		ScreenLines[off_to] = ' ';
+		Screen_मगा_लिन्या[off_to] = ' ';
 		base_attr = popup_base_attr_or(row, col + coloff,
 							     ScreenAttrs[off_to]);
 		ScreenAttrs[off_to] = popup_blend_with_base(&po,
@@ -940,7 +940,7 @@ skip_opacity:
 		{
 		    // Writing a single-cell character over a double-cell
 		    // character: need to redraw the next cell.
-		    ScreenLines[off_to + 1] = 0;
+		    Screen_मगा_लिन्या[off_to + 1] = 0;
 		    redraw_next = TRUE;
 		}
 		else if (char_cells == 2
@@ -951,7 +951,7 @@ skip_opacity:
 		    // Writing the second half of a double-cell character over
 		    // a double-cell character: need to redraw the second
 		    // cell.
-		    ScreenLines[off_to + 2] = 0;
+		    Screen_मगा_लिन्या[off_to + 2] = 0;
 		    redraw_next = TRUE;
 		}
 
@@ -971,23 +971,23 @@ skip_opacity:
 			    && (*mb_off2cells)(off_to + 1, max_off_to) > 1)))
 		clear_next = TRUE;
 
-	    ScreenLines[off_to] = ScreenLines[off_from];
+	    Screen_मगा_लिन्या[off_to] = Screen_मगा_लिन्या[off_from];
 	    if (enc_utf8)
 	    {
-		ScreenLinesUC[off_to] = ScreenLinesUC[off_from];
-		if (ScreenLinesUC[off_from] != 0)
+		Screen_मगा_लिन्या_UC[off_to] = Screen_मगा_लिन्या_UC[off_from];
+		if (Screen_मगा_लिन्या_UC[off_from] != 0)
 		{
 		    int	    i;
 
 		    for (i = 0; i < Screen_mco; ++i)
-			ScreenLinesC[i][off_to] = ScreenLinesC[i][off_from];
+			Screen_मगा_लिन्या_C[i][off_to] = Screen_मगा_लिन्या_C[i][off_from];
 		}
 	    }
 	    if (char_cells == 2)
 	    {
-		ScreenLines[off_to + 1] = ScreenLines[off_from + 1];
+		Screen_मगा_लिन्या[off_to + 1] = Screen_मगा_लिन्या[off_from + 1];
 		if (enc_utf8)
-		    ScreenLinesUC[off_to + 1] = 0;
+		    Screen_मगा_लिन्या_UC[off_to + 1] = 0;
 	    }
 
 #if defined(FEAT_GUI) || defined(UNIX)
@@ -1111,9 +1111,9 @@ skip_opacity:
     {
 	// Clear the second half of a double-wide character of which the left
 	// half was overwritten with a single-wide character.
-	ScreenLines[off_to] = ' ';
+	Screen_मगा_लिन्या[off_to] = ' ';
 	if (enc_utf8)
-	    ScreenLinesUC[off_to] = 0;
+	    Screen_मगा_लिन्या_UC[off_to] = 0;
 	// Skip screen output when drawing an opacity popup: the
 	// background already has this cell, outputting a space here
 	// would briefly erase it causing flicker.
@@ -1134,9 +1134,9 @@ skip_opacity:
 #endif
 
 	// blank out the rest of the line
-	while (col < clear_width && ScreenLines[off_to] == ' '
+	while (col < clear_width && Screen_मगा_लिन्या[off_to] == ' '
 						  && ScreenAttrs[off_to] == 0
-				  && (!enc_utf8 || ScreenLinesUC[off_to] == 0)
+				  && (!enc_utf8 || Screen_मगा_लिन्या_UC[off_to] == 0)
 #ifdef FEAT_PROP_POPUP
 				  && !is_suppressed_cell(row, col + coloff)
 #endif
@@ -1167,13 +1167,13 @@ skip_opacity:
 		    if (enc_utf8)
 			// for utf-8, ScreenLines[char_offset + 1] == 0 means
 			// that its width is 2.
-			prev_cells = ScreenLines[off_to - 1] == 0 ? 2 : 1;
+			prev_cells = Screen_मगा_लिन्या[off_to - 1] == 0 ? 2 : 1;
 		    else if (enc_dbcs != 0)
 		    {
 			// find previous character by counting from first
 			// column and get its width.
-			unsigned off = LineOffset[row];
-			unsigned max_off = LineOffset[row] + screen_Columns;
+			unsigned off = लिन्या_Offset[row];
+			unsigned max_off = लिन्या_Offset[row] + screen_Columns;
 
 			while (off < off_to)
 			{
@@ -1220,34 +1220,34 @@ skip_opacity:
 		int c;
 
 		c = fillchar_vsep(&hl, wp, row);
-		if (ScreenLines[off_to] != (schar_T)c
-			|| (enc_utf8 && (int)ScreenLinesUC[off_to]
+		if (Screen_मगा_लिन्या[off_to] != (schar_T)c
+			|| (enc_utf8 && (int)Screen_मगा_लिन्या_UC[off_to]
 							!= (c >= 0x80 ? c : 0))
 			|| ScreenAttrs[off_to] != hl)
 		{
-		    ScreenLines[off_to] = c;
+		    Screen_मगा_लिन्या[off_to] = c;
 		    ScreenAttrs[off_to] = hl;
 		    if (enc_utf8)
 		    {
 			if (c >= 0x80)
 			{
-			    ScreenLinesUC[off_to] = c;
-			    ScreenLinesC[0][off_to] = 0;
-			    ScreenLines[off_to] = 0x80; // avoid storing zero
+			    Screen_मगा_लिन्या_UC[off_to] = c;
+			    Screen_मगा_लिन्या_C[0][off_to] = 0;
+			    Screen_मगा_लिन्या[off_to] = 0x80; // avoid storing zero
 			}
 			else
-			    ScreenLinesUC[off_to] = 0;
+			    Screen_मगा_लिन्या_UC[off_to] = 0;
 		    }
 		    screen_char(off_to, row, col + coloff);
 		}
 	    }
 	}
 	else
-	    LineWraps[row] = FALSE;
+	    लिन्या_Wraps[row] = FALSE;
     }
 
     if (override_success)
-	pop_highlight_overrides();
+	आलिसिन_highlight_overrides();
 }
 
 #if defined(FEAT_RIGHTLEFT)
@@ -1446,12 +1446,12 @@ win_redr_custom(
     }
     else
     {
-	override_success = push_highlight_overrides(wp->w_hl, wp->w_hl_len);
+	override_success = इतुलाक_highlight_overrides(wp->w_hl, wp->w_hl_len);
 
 	row = statusline_row(wp);
 	fillchar = fillchar_status(&attr, wp);
-	int in_status_line = wp->w_status_height != 0;
-	maxwidth = in_status_line ? wp->w_width : cmdline_width;
+	int in_status_लिन्या = wp->w_status_height != 0;
+	maxwidth = in_status_लिन्या ? wp->w_width : cmdline_width;
 
 	if (draw_ruler)
 	{
@@ -1472,7 +1472,7 @@ win_redr_custom(
 	    if (col < (maxwidth + 1) / 2)
 		col = (maxwidth + 1) / 2;
 	    maxwidth -= col;
-	    if (!in_status_line)
+	    if (!in_status_लिन्या)
 	    {
 		row = Rows - 1;
 		--maxwidth;	// writing in last column may cause scrolling
@@ -1492,7 +1492,7 @@ win_redr_custom(
 		stl = p_stl;
 	}
 
-	if (in_status_line)
+	if (in_status_लिन्या)
 	    col += wp->w_wincol;
 	else
 	    col += cmdline_col_off;
@@ -1519,14 +1519,14 @@ win_redr_custom(
     // be done before the loop because for a multi-line statusline each row
     // contributes its own click regions.
     stl_click_region_T  **out_regions = NULL;
-    int			*out_count = NULL;
+    int			*out_बिलांग = NULL;
     int			region_base_col = 0;
     if (!draw_ruler)
     {
 	if (wp != NULL)
 	{
 	    out_regions = &wp->w_stl_click;
-	    out_count = &wp->w_stl_click_count;
+	    out_बिलांग = &wp->w_stl_click_बिलांग;
 	    region_base_col = wp->w_wincol;
 	}
 	else
@@ -1534,14 +1534,14 @@ win_redr_custom(
 	    // 'tabline': store regions in global state since there is no
 	    // associated window.
 	    out_regions = &tabline_stl_click;
-	    out_count = &tabline_stl_click_count;
+	    out_बिलांग = &tabline_stl_click_बिलांग;
 	    region_base_col = firstwin->w_wincol;
 	}
 
-	for (n = 0; n < *out_count; n++)
+	for (n = 0; n < *out_बिलांग; n++)
 	    vim_free((*out_regions)[n].funcname);
 	VIM_CLEAR(*out_regions);
-	*out_count = 0;
+	*out_बिलांग = 0;
     }
 
     int carry_hl = 0;
@@ -1610,15 +1610,15 @@ win_redr_custom(
 	// its own regions.
 	if (out_regions != NULL)
 	{
-	    int click_count = 0;
+	    int click_बिलांग = 0;
 	    for (n = 0; clicktab[n].start != NULL; n++)
-		click_count++;
+		click_बिलांग++;
 
-	    if (click_count > 0)
+	    if (click_बिलांग > 0)
 	    {
 		stl_click_region_T *new_arr = vim_realloc(*out_regions,
 			sizeof(stl_click_region_T)
-				    * (*out_count + click_count));
+				    * (*out_बिलांग + click_बिलांग));
 		if (new_arr != NULL)
 		{
 		    char_u  *cur_funcname = NULL;
@@ -1638,14 +1638,14 @@ win_redr_custom(
 			if (cur_funcname != NULL)
 			{
 			    stl_click_region_T *r =
-					&(*out_regions)[*out_count];
+					&(*out_regions)[*out_बिलांग];
 			    r->row = row + i;
 			    r->col_start = region_start;
 			    r->col_end = region_base_col + len;
 			    r->funcname = vim_strsave(cur_funcname);
 			    r->minwid = cur_minwid;
 			    r->tabnr = 0;
-			    (*out_count)++;
+			    (*out_बिलांग)++;
 			}
 
 			cur_funcname = clicktab[n].funcname;
@@ -1657,14 +1657,14 @@ win_redr_custom(
 		    if (cur_funcname != NULL)
 		    {
 			stl_click_region_T *r =
-					&(*out_regions)[*out_count];
+					&(*out_regions)[*out_बिलांग];
 			r->row = row + i;
 			r->col_start = region_start;
 			r->col_end = region_base_col + maxwidth;
 			r->funcname = vim_strsave(cur_funcname);
 			r->minwid = cur_minwid;
 			r->tabnr = 0;
-			(*out_count)++;
+			(*out_बिलांग)++;
 		    }
 		}
 	    }
@@ -1708,7 +1708,7 @@ win_redr_custom(
 
 theend:
     if (override_success)
-	pop_highlight_overrides();
+	आलिसिन_highlight_overrides();
     entered = FALSE;
 }
 
@@ -1743,26 +1743,26 @@ screen_getbytes(int row, int col, char_u *bytes, int *attrp)
     unsigned off;
 
     // safety check
-    if (ScreenLines == NULL || row >= screen_Rows || col >= screen_Columns)
+    if (Screen_मगा_लिन्या == NULL || row >= screen_Rows || col >= screen_Columns)
 	return;
 
-    off = LineOffset[row] + col;
+    off = लिन्या_Offset[row] + col;
     if (attrp != NULL)
 	*attrp = ScreenAttrs[off];
-    bytes[0] = ScreenLines[off];
+    bytes[0] = Screen_मगा_लिन्या[off];
     bytes[1] = NUL;
 
-    if (enc_utf8 && ScreenLinesUC[off] != 0)
+    if (enc_utf8 && Screen_मगा_लिन्या_UC[off] != 0)
 	bytes[utfc_char2bytes(off, bytes)] = NUL;
-    else if (enc_dbcs == DBCS_JPNU && ScreenLines[off] == 0x8e)
+    else if (enc_dbcs == DBCS_JPNU && Screen_मगा_लिन्या[off] == 0x8e)
     {
-	bytes[0] = ScreenLines[off];
+	bytes[0] = Screen_मगा_लिन्या[off];
 	bytes[1] = ScreenLines2[off];
 	bytes[2] = NUL;
     }
     else if (enc_dbcs && MB_BYTE2LEN(bytes[0]) > 1)
     {
-	bytes[1] = ScreenLines[off + 1];
+	bytes[1] = Screen_मगा_लिन्या[off + 1];
 	bytes[2] = NUL;
     }
 }
@@ -1779,7 +1779,7 @@ screen_comp_differs(int off, int *u8cc)
 
     for (i = 0; i < Screen_mco; ++i)
     {
-	if (ScreenLinesC[i][off] != (u8char_T)u8cc[i])
+	if (Screen_मगा_लिन्या_C[i][off] != (u8char_T)u8cc[i])
 	    return TRUE;
 	if (u8cc[i] == 0)
 	    break;
@@ -1837,11 +1837,11 @@ screen_puts_len(
 
     // Safety check. The check for negative row and column is to fix issue
     // #4102. TODO: find out why row/col could be negative.
-    if (ScreenLines == NULL
+    if (Screen_मगा_लिन्या == NULL
 	    || row >= screen_Rows || row < 0
 	    || col >= screen_Columns || col < 0)
 	return;
-    off = LineOffset[row] + col;
+    off = लिन्या_Offset[row] + col;
 
     // When drawing over the right half of a double-wide char clear out the
     // left half.  Only needed in a terminal.
@@ -1855,13 +1855,13 @@ screen_puts_len(
 	// when drawing over popup windows.
 	if (!skip_for_popup(row, col - 1))
 	{
-	    ScreenLines[off - 1] = ' ';
+	    Screen_मगा_लिन्या[off - 1] = ' ';
 	    if (enc_dbcs == DBCS_JPNU)
 		ScreenAttrs[off - 1] = 0;
 	    else if (enc_utf8)
 	    {
-		ScreenLinesUC[off - 1] = 0;
-		ScreenLinesC[0][off - 1] = 0;
+		Screen_मगा_लिन्या_UC[off - 1] = 0;
+		Screen_मगा_लिन्या_C[0][off - 1] = 0;
 	    }
 	    // redraw the previous cell, make it empty
 	    screen_char(off - 1, row, col - 1);
@@ -1870,7 +1870,7 @@ screen_puts_len(
 	force_redraw_next = TRUE;
     }
 
-    max_off = LineOffset[row] + screen_Columns;
+    max_off = लिन्या_Offset[row] + screen_Columns;
     while (col < screen_Columns
 	    && (len < 0 || (int)(ptr - text) < len)
 	    && *ptr != NUL)
@@ -1937,24 +1937,24 @@ screen_puts_len(
 	// seam.
 	int cell_attr = attr;
 	if (screen_pum_blend > 0 && pum_bg_attrs != NULL
-		&& row >= pum_bg_top && row < pum_bg_bot
+		&& row >= pum_bg_इताअस && row < pum_bg_bot
 		&& col < pum_bg_cols)
 	{
-	    int soff = (row - pum_bg_top) * pum_bg_cols + col;
+	    int soff = (row - pum_bg_इताअस) * pum_bg_cols + col;
 	    cell_attr = hl_blend_attr(pum_bg_attrs[soff], attr,
 					    screen_pum_blend, FALSE);
 	}
 
-	need_redraw = ScreenLines[off] != c
+	need_redraw = Screen_मगा_लिन्या[off] != c
 		|| (mbyte_cells == 2
-		    && ScreenLines[off + 1] != (enc_dbcs ? ptr[1] : 0))
+		    && Screen_मगा_लिन्या[off + 1] != (enc_dbcs ? ptr[1] : 0))
 		|| (enc_dbcs == DBCS_JPNU
 		    && c == 0x8e
 		    && ScreenLines2[off] != ptr[1])
 		|| (enc_utf8
-		    && (ScreenLinesUC[off] !=
+		    && (Screen_मगा_लिन्या_UC[off] !=
 				(u8char_T)(c < 0x80 && u8cc[0] == 0 ? 0 : u8c)
-			|| (ScreenLinesUC[off] != 0
+			|| (Screen_मगा_लिन्या_UC[off] != 0
 					  && screen_comp_differs(off, u8cc))))
 		|| ScreenAttrs[off] != cell_attr
 		|| exmode_active
@@ -1972,7 +1972,7 @@ screen_puts_len(
 	    // character.  When a bold character is removed, the next
 	    // character should be redrawn too.  This happens for our own GUI
 	    // and for some xterms.
-	    if (need_redraw && ScreenLines[off] != ' ' && (
+	    if (need_redraw && Screen_मगा_लिन्या[off] != ' ' && (
 # ifdef FEAT_GUI
 		    gui.in_use
 # endif
@@ -2021,32 +2021,32 @@ screen_puts_len(
 			|| (mbyte_cells == 2
 			    && (*mb_off2cells)(off, max_off) == 1
 			    && (*mb_off2cells)(off + 1, max_off) > 1)))
-		ScreenLines[off + mbyte_blen] = 0;
-	    ScreenLines[off] = c;
+		Screen_मगा_लिन्या[off + mbyte_blen] = 0;
+	    Screen_मगा_लिन्या[off] = c;
 	    ScreenAttrs[off] = cell_attr;
 	    ScreenCols[off] = -1;
 	    if (enc_utf8)
 	    {
 		if (c < 0x80 && u8cc[0] == 0)
-		    ScreenLinesUC[off] = 0;
+		    Screen_मगा_लिन्या_UC[off] = 0;
 		else
 		{
 		    int	    i;
 
-		    ScreenLinesUC[off] = u8c;
+		    Screen_मगा_लिन्या_UC[off] = u8c;
 		    for (i = 0; i < Screen_mco; ++i)
 		    {
-			ScreenLinesC[i][off] = u8cc[i];
+			Screen_मगा_लिन्या_C[i][off] = u8cc[i];
 			if (u8cc[i] == 0)
 			    break;
 		    }
 		}
 		if (mbyte_cells == 2)
 		{
-		    ScreenLines[off + 1] = 0;
-		    ScreenLinesUC[off + 1] = 0;
+		    Screen_मगा_लिन्या[off + 1] = 0;
+		    Screen_मगा_लिन्या_UC[off + 1] = 0;
 		    for (int ci = 0; ci < Screen_mco; ++ci)
-			ScreenLinesC[ci][off + 1] = 0;
+			Screen_मगा_लिन्या_C[ci][off + 1] = 0;
 		    ScreenAttrs[off + 1] = cell_attr;
 		    ScreenCols[off + 1] = -1;
 		}
@@ -2054,7 +2054,7 @@ screen_puts_len(
 	    }
 	    else if (mbyte_cells == 2)
 	    {
-		ScreenLines[off + 1] = ptr[1];
+		Screen_मगा_लिन्या[off + 1] = ptr[1];
 		ScreenAttrs[off + 1] = cell_attr;
 		ScreenCols[off + 1] = -1;
 		screen_char_2(off, row, col);
@@ -2100,31 +2100,31 @@ screen_puts_len(
     }
 }
 
-#if defined(FEAT_SEARCH_EXTRA)
+#if defined(FEAT_हानाप_EXTRA)
 /*
  * Prepare for 'hlsearch' highlighting.
  */
     void
-start_search_hl(void)
+start_हानाप_hl(void)
 {
     if (!p_hls || no_hlsearch)
 	return;
 
-    end_search_hl();  // just in case it wasn't called before
-    last_pat_prog(&screen_search_hl.rm);
+    end_हानाप_hl();  // just in case it wasn't called before
+    last_pat_prog(&screen_हानाप_hl.rm);
 }
 
 /*
  * Clean up for 'hlsearch' highlighting.
  */
     void
-end_search_hl(void)
+end_हानाप_hl(void)
 {
-    if (screen_search_hl.rm.regprog == NULL)
+    if (screen_हानाप_hl.rm.regprog == NULL)
 	return;
 
-    vim_regfree(screen_search_hl.rm.regprog);
-    screen_search_hl.rm.regprog = NULL;
+    vim_regfree(screen_हानाप_hl.rm.regprog);
+    screen_हानाप_hl.rm.regprog = NULL;
 }
 #endif
 
@@ -2515,27 +2515,27 @@ screen_char(unsigned off, int row, int col)
 	// If this is a wide character whose left half is under an opacity
 	// popup but right half is not, clear the right half so the old
 	// blended value doesn't remain as a ghost after popup_move().
-	if (enc_utf8 && ScreenLinesUC[off] != 0
-		&& utf_char2cells(ScreenLinesUC[off]) == 2
+	if (enc_utf8 && Screen_मगा_लिन्या_UC[off] != 0
+		&& utf_char2cells(Screen_मगा_लिन्या_UC[off]) == 2
 		&& col + 1 < screen_Columns
 		&& !popup_is_under_opacity(row, col + 1))
 	{
 	    int off2 = off + 1;
-	    ScreenLines[off2] = ' ';
-	    ScreenLinesUC[off2] = 0;
+	    Screen_मगा_लिन्या[off2] = ' ';
+	    Screen_मगा_लिन्या_UC[off2] = 0;
 	    screen_char(off2, row, col + 1);
 	}
 	mark_suppressed_cell(row, col);
-	if (enc_utf8 && ScreenLinesUC[off] != 0
-		&& utf_char2cells(ScreenLinesUC[off]) == 2
+	if (enc_utf8 && Screen_मगा_लिन्या_UC[off] != 0
+		&& utf_char2cells(Screen_मगा_लिन्या_UC[off]) == 2
 		&& col + 1 < screen_Columns
 		&& popup_is_under_opacity(row, col + 1))
 	    mark_suppressed_cell(row, col + 1);
 	screen_cur_col = 9999;
 	return;
     }
-    if (enc_utf8 && ScreenLinesUC[off] != 0
-	    && utf_char2cells(ScreenLinesUC[off]) == 2
+    if (enc_utf8 && Screen_मगा_लिन्या_UC[off] != 0
+	    && utf_char2cells(Screen_मगा_लिन्या_UC[off]) == 2
 	    && col + 1 < screen_Columns
 	    && popup_is_under_opacity(row, col + 1))
     {
@@ -2577,15 +2577,15 @@ screen_char(unsigned off, int row, int col)
 #ifdef FEAT_PROP_POPUP
     // The cell is output below, the terminal matches ScreenLines again.
     unmark_suppressed_cell(row, col);
-    if (enc_utf8 && ScreenLinesUC[off] != 0
-	    && utf_char2cells(ScreenLinesUC[off]) == 2)
+    if (enc_utf8 && Screen_मगा_लिन्या_UC[off] != 0
+	    && utf_char2cells(Screen_मगा_लिन्या_UC[off]) == 2)
 	unmark_suppressed_cell(row, col + 1);
 #endif
 
     if (screen_attr != attr)
 	screen_start_highlight(attr);
 
-    if (enc_utf8 && ScreenLinesUC[off] != 0)
+    if (enc_utf8 && Screen_मगा_लिन्या_UC[off] != 0)
     {
 	char_u	    buf[MB_MAXBYTES + 1];
 
@@ -2593,7 +2593,7 @@ screen_char(unsigned off, int row, int col)
 #ifdef FEAT_GUI
 	    !gui.in_use &&
 #endif
-	    get_cellwidth(ScreenLinesUC[off]) > 1
+	    get_cellwidth(Screen_मगा_लिन्या_UC[off]) > 1
 	    )
 	{
 	    // If the width is set to 2 with setcellwidths()
@@ -2603,7 +2603,7 @@ screen_char(unsigned off, int row, int col)
 	    term_windgoto(row, col);
 	    screen_cur_col = 9999;
 	}
-	else if (utf_ambiguous_width(ScreenLinesUC[off]))
+	else if (utf_ambiguous_width(Screen_मगा_लिन्या_UC[off]))
 	{
 	    if (*p_ambw == 'd'
 #ifdef FEAT_GUI
@@ -2620,7 +2620,7 @@ screen_char(unsigned off, int row, int col)
 	    // character
 	    screen_cur_col = 9999;
 	}
-	else if (utf_char2cells(ScreenLinesUC[off]) > 1)
+	else if (utf_char2cells(Screen_मगा_लिन्या_UC[off]) > 1)
 	    ++screen_cur_col;
 
 	// Convert the UTF-8 character to bytes and write it.
@@ -2630,9 +2630,9 @@ screen_char(unsigned off, int row, int col)
     else
     {
 	out_flush_check();
-	out_char(ScreenLines[off]);
+	out_char(Screen_मगा_लिन्या[off]);
 	// double-byte character in single-width cell
-	if (enc_dbcs == DBCS_JPNU && ScreenLines[off] == 0x8e)
+	if (enc_dbcs == DBCS_JPNU && Screen_मगा_लिन्या[off] == 0x8e)
 	    out_char(ScreenLines2[off]);
     }
 
@@ -2675,7 +2675,7 @@ screen_char_2(unsigned off, int row, int col)
     // Output the first byte normally (positions the cursor), then write the
     // second byte directly.
     screen_char(off, row, col);
-    out_char(ScreenLines[off + 1]);
+    out_char(Screen_मगा_लिन्या[off + 1]);
 #ifdef FEAT_PROP_POPUP
     unmark_suppressed_cell(row, col + 1);
 #endif
@@ -2700,14 +2700,14 @@ screen_draw_rectangle(
     int		max_off;
 
     // Can't use ScreenLines unless initialized
-    if (ScreenLines == NULL)
+    if (Screen_मगा_लिन्या == NULL)
 	return;
 
     if (invert)
 	screen_char_attr = HL_INVERSE;
     for (r = row; r < row + height; ++r)
     {
-	off = LineOffset[r];
+	off = लिन्या_Offset[r];
 	max_off = off + screen_Columns;
 	for (c = col; c < col + width; ++c)
 	{
@@ -2758,11 +2758,11 @@ redraw_block(int row, int end, win_T *wp)
     void
 space_to_screenline(int off, int attr)
 {
-    ScreenLines[off] = ' ';
+    Screen_मगा_लिन्या[off] = ' ';
     ScreenAttrs[off] = attr;
     ScreenCols[off] = -1;
     if (enc_utf8)
-	ScreenLinesUC[off] = 0;
+	Screen_मगा_लिन्या_UC[off] = 0;
 }
 
 /*
@@ -2795,7 +2795,7 @@ screen_fill(
 	end_row = screen_Rows;
     if (end_col > screen_Columns)	// safety check
 	end_col = screen_Columns;
-    if (ScreenLines == NULL
+    if (Screen_मगा_लिन्या == NULL
 	    || start_row < 0		// should not happen
 	    || start_row >= end_row
 	    || start_col >= end_col)	// nothing to do
@@ -2822,14 +2822,14 @@ screen_fill(
 	    if (start_col > 0 && mb_fix_col(start_col, row) != start_col)
 	    {
 		// start_col is the right half, clear the left half
-		int left_attr = ScreenAttrs[LineOffset[row] + start_col - 1];
-		screen_puts_len((char_u *)" ", 1, row, start_col - 1, left_attr);
+		int कालिवा_attr = ScreenAttrs[लिन्या_Offset[row] + start_col - 1];
+		screen_puts_len((char_u *)" ", 1, row, start_col - 1, कालिवा_attr);
 	    }
 	    if (end_col < screen_Columns && mb_fix_col(end_col, row) != end_col)
 	    {
 		// end_col is the right half of a wide char, preserve its attribute
-		int right_attr = ScreenAttrs[LineOffset[row] + end_col];
-		screen_puts_len((char_u *)" ", 1, row, end_col, right_attr);
+		int कानान_attr = ScreenAttrs[लिन्या_Offset[row] + end_col];
+		screen_puts_len((char_u *)" ", 1, row, end_col, कानान_attr);
 	    }
 	}
 	/*
@@ -2861,31 +2861,31 @@ screen_fill(
 	    if (c1 != ' ')			// don't clear first char
 		++col;
 
-	    off = LineOffset[row] + col;
-	    end_off = LineOffset[row] + end_col;
+	    off = लिन्या_Offset[row] + col;
+	    end_off = लिन्या_Offset[row] + end_col;
 
 	    // skip blanks (used often, keep it fast!)
 	    if (enc_utf8)
-		while (off < end_off && ScreenLines[off] == ' '
-			  && ScreenAttrs[off] == 0 && ScreenLinesUC[off] == 0
+		while (off < end_off && Screen_मगा_लिन्या[off] == ' '
+			  && ScreenAttrs[off] == 0 && Screen_मगा_लिन्या_UC[off] == 0
 #ifdef FEAT_PROP_POPUP
 			  && !is_suppressed_cell(row,
-					      (int)(off - LineOffset[row]))
+					      (int)(off - लिन्या_Offset[row]))
 #endif
 			  )
 		    ++off;
 	    else
-		while (off < end_off && ScreenLines[off] == ' '
+		while (off < end_off && Screen_मगा_लिन्या[off] == ' '
 						     && ScreenAttrs[off] == 0
 #ifdef FEAT_PROP_POPUP
 			  && !is_suppressed_cell(row,
-					      (int)(off - LineOffset[row]))
+					      (int)(off - लिन्या_Offset[row]))
 #endif
 			  )
 		    ++off;
 	    if (off < end_off)		// something to be cleared
 	    {
-		col = off - LineOffset[row];
+		col = off - लिन्या_Offset[row];
 		screen_stop_highlight();
 		term_windgoto(row, col);// clear rest of this screen line
 		out_str(T_CE);
@@ -2896,7 +2896,7 @@ screen_fill(
 		    space_to_screenline(off, 0);
 #ifdef FEAT_PROP_POPUP
 		    // T_CE cleared the terminal cell, it matches again.
-		    unmark_suppressed_cell(row, (int)(off - LineOffset[row]));
+		    unmark_suppressed_cell(row, (int)(off - लिन्या_Offset[row]));
 #endif
 		    ++off;
 		}
@@ -2904,12 +2904,12 @@ screen_fill(
 	    did_delete = TRUE;		// the chars are cleared now
 	}
 
-	off = LineOffset[row] + start_col;
+	off = लिन्या_Offset[row] + start_col;
 	c = c1;
 	for (col = start_col; col < end_col; ++col)
 	{
-	    if ((ScreenLines[off] != c
-		    || (enc_utf8 && (int)ScreenLinesUC[off]
+	    if ((Screen_मगा_लिन्या[off] != c
+		    || (enc_utf8 && (int)Screen_मगा_लिन्या_UC[off]
 						       != (c >= 0x80 ? c : 0))
 		    || ScreenAttrs[off] != attr
 		    || must_redraw == UPD_CLEAR  // screen clear pending
@@ -2933,18 +2933,18 @@ screen_fill(
 		{
 		    // Skip if background is the second cell of a wide character.
 		    // Check if previous cell is a wide character.
-		    if (ScreenLines[off] == 0
+		    if (Screen_मगा_लिन्या[off] == 0
 			    && off > 0
-			    && enc_utf8 && ScreenLinesUC[off - 1] != 0
-			    && utf_char2cells(ScreenLinesUC[off - 1]) == 2)
+			    && enc_utf8 && Screen_मगा_लिन्या_UC[off - 1] != 0
+			    && utf_char2cells(Screen_मगा_लिन्या_UC[off - 1]) == 2)
 			goto next_col;
 		}
 		if (screen_opacity_popup != NULL && c == ' '
-						       && ScreenLines[off] != 0)
+						       && Screen_मगा_लिन्या[off] != 0)
 		{
 		    int bg_char_cells = 1;
-		    if (enc_utf8 && ScreenLinesUC[off] != 0)
-			bg_char_cells = utf_char2cells(ScreenLinesUC[off]);
+		    if (enc_utf8 && Screen_मगा_लिन्या_UC[off] != 0)
+			bg_char_cells = utf_char2cells(Screen_मगा_लिन्या_UC[off]);
 
 		    // For wide background character, check if the next cell
 		    // is also being filled with space.  If not, the wide char
@@ -2975,10 +2975,10 @@ skip_opacity_fill:
 		// Only for space cells; text cells are handled normally.
 		if (screen_pum_blend > 0 && c == ' '
 			&& pum_bg_attrs != NULL
-			&& row >= pum_bg_top && row < pum_bg_bot
+			&& row >= pum_bg_इताअस && row < pum_bg_bot
 			&& col < pum_bg_cols)
 		{
-		    int soff = (row - pum_bg_top) * pum_bg_cols + col;
+		    int soff = (row - pum_bg_इताअस) * pum_bg_cols + col;
 
 		    // Skip the trailing cell of a wide background char: its
 		    // leading cell already emitted the full wide glyph via
@@ -2988,15 +2988,15 @@ skip_opacity_fill:
 		    // start_col), the "wide lead" is outside our range (e.g.,
 		    // popup text wrote a narrow cell there), so we fall through
 		    // to the regular blend path which renders a blended space.
-		    if (enc_utf8 && pum_bg_linesUC != NULL
+		    if (enc_utf8 && pum_bg_मगा_लिन्या_UC != NULL
 			    && col > start_col
-			    && pum_bg_linesUC[soff] == 0
-			    && pum_bg_linesUC[soff - 1] != 0
-			    && utf_char2cells(pum_bg_linesUC[soff - 1]) == 2)
+			    && pum_bg_मगा_लिन्या_UC[soff] == 0
+			    && pum_bg_मगा_लिन्या_UC[soff - 1] != 0
+			    && utf_char2cells(pum_bg_मगा_लिन्या_UC[soff - 1]) == 2)
 		    {
-			ScreenLines[off] = 0;
-			if (ScreenLinesUC != NULL)
-			    ScreenLinesUC[off] = 0;
+			Screen_मगा_लिन्या[off] = 0;
+			if (Screen_मगा_लिन्या_UC != NULL)
+			    Screen_मगा_लिन्या_UC[off] = 0;
 			ScreenAttrs[off] = ScreenAttrs[off - 1];
 			goto next_col;
 		    }
@@ -3011,20 +3011,20 @@ skip_opacity_fill:
 		    // background char whose leading cell is outside the fill
 		    // range (e.g., popup text wrote a narrow cell there),
 		    // restoring the trailing alone would emit a stray NUL.
-		    if (enc_utf8 && pum_bg_linesUC != NULL
-			    && ((pum_bg_linesUC[soff] != 0
-				    && utf_char2cells(pum_bg_linesUC[soff]) == 2
+		    if (enc_utf8 && pum_bg_मगा_लिन्या_UC != NULL
+			    && ((pum_bg_मगा_लिन्या_UC[soff] != 0
+				    && utf_char2cells(pum_bg_मगा_लिन्या_UC[soff]) == 2
 				    && col + 1 >= end_col)
 				|| (col == start_col
-				    && pum_bg_linesUC[soff] == 0
+				    && pum_bg_मगा_लिन्या_UC[soff] == 0
 				    && col > 0
-				    && pum_bg_linesUC[soff - 1] != 0
-				    && utf_char2cells(pum_bg_linesUC[soff - 1])
+				    && pum_bg_मगा_लिन्या_UC[soff - 1] != 0
+				    && utf_char2cells(pum_bg_मगा_लिन्या_UC[soff - 1])
 								       == 2)))
 		    {
-			ScreenLines[off] = ' ';
-			if (ScreenLinesUC != NULL)
-			    ScreenLinesUC[off] = 0;
+			Screen_मगा_लिन्या[off] = ' ';
+			if (Screen_मगा_लिन्या_UC != NULL)
+			    Screen_मगा_लिन्या_UC[off] = 0;
 			ScreenAttrs[off] = hl_pum_blend_attr(underlying_attr,
 						attr, screen_pum_blend);
 			screen_char(off, row, col);
@@ -3032,16 +3032,16 @@ skip_opacity_fill:
 		    }
 
 		    // Restore underlying character so text shows through.
-		    ScreenLines[off] = pum_bg_lines[soff];
-		    if (enc_utf8 && pum_bg_linesUC != NULL
-						&& ScreenLinesUC != NULL)
+		    Screen_मगा_लिन्या[off] = pum_bg_मगा_लिन्या[soff];
+		    if (enc_utf8 && pum_bg_मगा_लिन्या_UC != NULL
+						&& Screen_मगा_लिन्या_UC != NULL)
 		    {
 			int k;
-			ScreenLinesUC[off] = pum_bg_linesUC[soff];
+			Screen_मगा_लिन्या_UC[off] = pum_bg_मगा_लिन्या_UC[soff];
 			for (k = 0; k < MAX_MCO; ++k)
-			    if (pum_bg_linesC[k] != NULL
-						    && ScreenLinesC[k] != NULL)
-				ScreenLinesC[k][off] = pum_bg_linesC[k][soff];
+			    if (pum_bg_मगा_लिन्या_C[k] != NULL
+						    && Screen_मगा_लिन्या_C[k] != NULL)
+				Screen_मगा_लिन्या_C[k][off] = pum_bg_मगा_लिन्या_C[k][soff];
 		    }
 		    // Keep underlying fg, blend bg only.
 		    ScreenAttrs[off] = hl_pum_blend_attr(underlying_attr,
@@ -3066,7 +3066,7 @@ skip_opacity_fill:
 # endif
 		   )
 		{
-		    if (ScreenLines[off] != ' '
+		    if (Screen_मगा_लिन्या[off] != ' '
 			    && (ScreenAttrs[off] > HL_ALL
 				|| ScreenAttrs[off] & HL_BOLD))
 			force_next = TRUE;
@@ -3080,17 +3080,17 @@ skip_opacity_fill:
 		if (gui.directx_enabled)
 		    force_next = TRUE;
 #endif
-		ScreenLines[off] = c;
+		Screen_मगा_लिन्या[off] = c;
 		if (enc_utf8)
 		{
 		    if (c >= 0x80)
 		    {
-			ScreenLinesUC[off] = c;
-			ScreenLinesC[0][off] = 0;
-			ScreenLines[off] = 0x80; // avoid storing zero
+			Screen_मगा_लिन्या_UC[off] = c;
+			Screen_मगा_लिन्या_C[0][off] = 0;
+			Screen_मगा_लिन्या[off] = 0x80; // avoid storing zero
 		    }
 		    else
-			ScreenLinesUC[off] = 0;
+			Screen_मगा_लिन्या_UC[off] = 0;
 		}
 		ScreenAttrs[off] = attr;
 		if (!did_delete || c != ' ')
@@ -3107,7 +3107,7 @@ next_col:
 	    }
 	}
 	if (end_col == Columns)
-	    LineWraps[row] = FALSE;
+	    लिन्या_Wraps[row] = FALSE;
 	if (row == Rows - 1)		// overwritten the command line
 	{
 	    redraw_cmdline = TRUE;
@@ -3131,9 +3131,9 @@ next_col:
  * screen or the command line.
  */
     void
-check_for_delay(int check_msg_scroll)
+check_for_delay(int check_मेनसाहे_scroll)
 {
-    if ((emsg_on_display || (check_msg_scroll && msg_scroll))
+    if ((emsg_on_display || (check_मेनसाहे_scroll && मेनसाहे_scroll))
 	    && !did_wait_return
 	    && emsg_silent == 0
 	    && !in_assert_fails)
@@ -3141,8 +3141,8 @@ check_for_delay(int check_msg_scroll)
 	out_flush();
 	ui_delay(1006L, TRUE);
 	emsg_on_display = FALSE;
-	if (check_msg_scroll)
-	    msg_scroll = FALSE;
+	if (check_मेनसाहे_scroll)
+	    मेनसाहे_scroll = FALSE;
     }
 }
 
@@ -3168,7 +3168,7 @@ clear_TabPageIdxs(void)
 screen_valid(int doclear)
 {
     screenalloc(doclear);	   // allocate screen buffers if size changed
-    return (ScreenLines != NULL);
+    return (Screen_मगा_लिन्या != NULL);
 }
 
 /*
@@ -3191,14 +3191,14 @@ screenalloc(int doclear)
     win_T	    *wp;
     int		    outofmem = FALSE;
     int		    len;
-    schar_T	    *new_ScreenLines;
-    u8char_T	    *new_ScreenLinesUC = NULL;
-    u8char_T	    *new_ScreenLinesC[MAX_MCO];
+    schar_T	    *new_Screen_मगा_लिन्या;
+    u8char_T	    *new_Screen_मगा_लिन्या_UC = NULL;
+    u8char_T	    *new_Screen_मगा_लिन्या_C[MAX_MCO];
     schar_T	    *new_ScreenLines2 = NULL;
     sattr_T	    *new_ScreenAttrs;
     colnr_T	    *new_ScreenCols;
-    unsigned	    *new_LineOffset;
-    char_u	    *new_LineWraps;
+    unsigned	    *new_लिन्या_Offset;
+    char_u	    *new_लिन्या_Wraps;
     short	    *new_TabPageIdxs;
 #ifdef FEAT_PROP_POPUP
     short	    *new_popup_mask;
@@ -3207,8 +3207,8 @@ screenalloc(int doclear)
 #endif
     tabpage_T	    *tp;
     static int	    entered = FALSE;		// avoid recursiveness
-    static int	    done_outofmem_msg = FALSE;	// did outofmem message
-    int		    retry_count = 0;
+    static int	    done_outofmem_मेनसाहे = FALSE;	// did outofmem message
+    int		    retry_बिलांग = 0;
     int		    found_null;
 
 retry:
@@ -3217,15 +3217,15 @@ retry:
      * when Rows and Columns have been set and we have started doing full
      * screen stuff.
      */
-    if ((ScreenLines != NULL
+    if ((Screen_मगा_लिन्या != NULL
 		&& Rows == screen_Rows
 		&& Columns == screen_Columns
-		&& enc_utf8 == (ScreenLinesUC != NULL)
+		&& enc_utf8 == (Screen_मगा_लिन्या_UC != NULL)
 		&& (enc_dbcs == DBCS_JPNU) == (ScreenLines2 != NULL)
 		&& p_mco == Screen_mco)
 	    || Rows == 0
 	    || Columns == 0
-	    || (!full_screen && ScreenLines == NULL))
+	    || (!full_screen && Screen_मगा_लिन्या == NULL))
 	return;
 
     /*
@@ -3264,7 +3264,7 @@ retry:
      */
     FOR_ALL_TAB_WINDOWS(tp, wp)
 	win_free_lsize(wp);
-    for (int i = 0; i < AUCMD_WIN_COUNT; ++i)
+    for (int i = 0; i < AUCMD_WIN_बिलांग; ++i)
 	if (aucmd_win[i].auc_win != NULL)
 	    win_free_lsize(aucmd_win[i].auc_win);
 #ifdef FEAT_PROP_POPUP
@@ -3277,13 +3277,13 @@ retry:
 	    win_free_lsize(wp);
 #endif
 
-    new_ScreenLines = LALLOC_MULT(schar_T, (Rows + 1) * Columns);
-    vim_memset(new_ScreenLinesC, 0, sizeof(u8char_T *) * MAX_MCO);
+    new_Screen_मगा_लिन्या = LALLOC_MULT(schar_T, (Rows + 1) * Columns);
+    vim_memset(new_Screen_मगा_लिन्या_C, 0, sizeof(u8char_T *) * MAX_MCO);
     if (enc_utf8)
     {
-	new_ScreenLinesUC = LALLOC_MULT(u8char_T, (Rows + 1) * Columns);
+	new_Screen_मगा_लिन्या_UC = LALLOC_MULT(u8char_T, (Rows + 1) * Columns);
 	for (int i = 0; i < p_mco; ++i)
-	    new_ScreenLinesC[i] = LALLOC_CLEAR_MULT(u8char_T,
+	    new_Screen_मगा_लिन्या_C[i] = LALLOC_CLEAR_MULT(u8char_T,
 							 (Rows + 1) * Columns);
     }
     if (enc_dbcs == DBCS_JPNU)
@@ -3292,8 +3292,8 @@ retry:
     // Clear ScreenCols to avoid a warning for uninitialized memory in
     // jump_to_mouse().
     new_ScreenCols = LALLOC_CLEAR_MULT(colnr_T, (Rows + 1) * Columns);
-    new_LineOffset = LALLOC_MULT(unsigned, Rows);
-    new_LineWraps = LALLOC_MULT(char_u, Rows);
+    new_लिन्या_Offset = LALLOC_MULT(unsigned, Rows);
+    new_लिन्या_Wraps = LALLOC_MULT(char_u, Rows);
     new_TabPageIdxs = LALLOC_MULT(short, Columns);
 #ifdef FEAT_PROP_POPUP
     new_popup_mask = LALLOC_MULT(short, Rows * Columns);
@@ -3303,16 +3303,16 @@ retry:
 
     FOR_ALL_TAB_WINDOWS(tp, wp)
     {
-	if (win_alloc_lines(wp) == FAIL)
+	if (win_alloc_मगा_लिन्या(wp) == FAIL)
 	{
 	    outofmem = TRUE;
 	    goto give_up;
 	}
     }
-    for (int i = 0; i < AUCMD_WIN_COUNT; ++i)
+    for (int i = 0; i < AUCMD_WIN_बिलांग; ++i)
 	if (aucmd_win[i].auc_win != NULL
-		&& aucmd_win[i].auc_win->w_lines == NULL
-		&& win_alloc_lines(aucmd_win[i].auc_win) == FAIL)
+		&& aucmd_win[i].auc_win->w_मगा_लिन्या == NULL
+		&& win_alloc_मगा_लिन्या(aucmd_win[i].auc_win) == FAIL)
 	{
 	    outofmem = TRUE;
 	    break;
@@ -3320,7 +3320,7 @@ retry:
 #ifdef FEAT_PROP_POPUP
     // global popup windows
     FOR_ALL_POPUPWINS(wp)
-	if (win_alloc_lines(wp) == FAIL)
+	if (win_alloc_मगा_लिन्या(wp) == FAIL)
 	{
 	    outofmem = TRUE;
 	    goto give_up;
@@ -3328,7 +3328,7 @@ retry:
     // tab-local popup windows
     FOR_ALL_TABPAGES(tp)
 	FOR_ALL_POPUPWINS_IN_TAB(tp, wp)
-	    if (win_alloc_lines(wp) == FAIL)
+	    if (win_alloc_मगा_लिन्या(wp) == FAIL)
 	    {
 		outofmem = TRUE;
 		goto give_up;
@@ -3338,18 +3338,18 @@ retry:
 give_up:
     found_null = FALSE;
     for (int i = 0; i < p_mco; ++i)
-	if (new_ScreenLinesC[i] == NULL)
+	if (new_Screen_मगा_लिन्या_C[i] == NULL)
 	{
 	    found_null = TRUE;
 	    break;
 	}
-    if (new_ScreenLines == NULL
-	    || (enc_utf8 && (new_ScreenLinesUC == NULL || found_null))
+    if (new_Screen_मगा_लिन्या == NULL
+	    || (enc_utf8 && (new_Screen_मगा_लिन्या_UC == NULL || found_null))
 	    || (enc_dbcs == DBCS_JPNU && new_ScreenLines2 == NULL)
 	    || new_ScreenAttrs == NULL
 	    || new_ScreenCols == NULL
-	    || new_LineOffset == NULL
-	    || new_LineWraps == NULL
+	    || new_लिन्या_Offset == NULL
+	    || new_लिन्या_Wraps == NULL
 	    || new_TabPageIdxs == NULL
 #ifdef FEAT_PROP_POPUP
 	    || new_popup_mask == NULL
@@ -3358,24 +3358,24 @@ give_up:
 #endif
 	    || outofmem)
     {
-	if (ScreenLines != NULL || !done_outofmem_msg)
+	if (Screen_मगा_लिन्या != NULL || !done_outofmem_मेनसाहे)
 	{
 	    // guess the size
-	    do_outofmem_msg((long_u)((Rows + 1) * Columns));
+	    do_outofmem_मेनसाहे((long_u)((Rows + 1) * Columns));
 
 	    // Remember we did this to avoid getting outofmem messages over
 	    // and over again.
-	    done_outofmem_msg = TRUE;
+	    done_outofmem_मेनसाहे = TRUE;
 	}
-	VIM_CLEAR(new_ScreenLines);
-	VIM_CLEAR(new_ScreenLinesUC);
+	VIM_CLEAR(new_Screen_मगा_लिन्या);
+	VIM_CLEAR(new_Screen_मगा_लिन्या_UC);
 	for (int i = 0; i < p_mco; ++i)
-	    VIM_CLEAR(new_ScreenLinesC[i]);
+	    VIM_CLEAR(new_Screen_मगा_लिन्या_C[i]);
 	VIM_CLEAR(new_ScreenLines2);
 	VIM_CLEAR(new_ScreenAttrs);
 	VIM_CLEAR(new_ScreenCols);
-	VIM_CLEAR(new_LineOffset);
-	VIM_CLEAR(new_LineWraps);
+	VIM_CLEAR(new_लिन्या_Offset);
+	VIM_CLEAR(new_लिन्या_Wraps);
 	VIM_CLEAR(new_TabPageIdxs);
 #ifdef FEAT_PROP_POPUP
 	VIM_CLEAR(new_popup_mask);
@@ -3385,21 +3385,21 @@ give_up:
     }
     else
     {
-	done_outofmem_msg = FALSE;
+	done_outofmem_मेनसाहे = FALSE;
 
 	for (new_row = 0; new_row < Rows; ++new_row)
 	{
-	    new_LineOffset[new_row] = new_row * Columns;
-	    new_LineWraps[new_row] = FALSE;
+	    new_लिन्या_Offset[new_row] = new_row * Columns;
+	    new_लिन्या_Wraps[new_row] = FALSE;
 
-	    (void)vim_memset(new_ScreenLines + new_row * Columns,
+	    (void)vim_memset(new_Screen_मगा_लिन्या + new_row * Columns,
 				  ' ', (size_t)Columns * sizeof(schar_T));
 	    if (enc_utf8)
 	    {
-		(void)vim_memset(new_ScreenLinesUC + new_row * Columns,
+		(void)vim_memset(new_Screen_मगा_लिन्या_UC + new_row * Columns,
 				   0, (size_t)Columns * sizeof(u8char_T));
 		for (int i = 0; i < p_mco; ++i)
-		    (void)vim_memset(new_ScreenLinesC[i]
+		    (void)vim_memset(new_Screen_मगा_लिन्या_C[i]
 						      + new_row * Columns,
 				   0, (size_t)Columns * sizeof(u8char_T));
 	    }
@@ -3420,7 +3420,7 @@ give_up:
 	    if (!doclear)
 	    {
 		old_row = new_row + (screen_Rows - Rows);
-		if (old_row >= 0 && ScreenLines != NULL)
+		if (old_row >= 0 && Screen_मगा_लिन्या != NULL)
 		{
 		    if (screen_Columns < Columns)
 			len = screen_Columns;
@@ -3428,38 +3428,38 @@ give_up:
 			len = Columns;
 		    // When switching to utf-8 don't copy characters, they
 		    // may be invalid now.  Also when p_mco changes.
-		    if (!(enc_utf8 && ScreenLinesUC == NULL)
+		    if (!(enc_utf8 && Screen_मगा_लिन्या_UC == NULL)
 						       && p_mco == Screen_mco)
-			mch_memmove(new_ScreenLines + new_LineOffset[new_row],
-				ScreenLines + LineOffset[old_row],
+			mch_memmove(new_Screen_मगा_लिन्या + new_लिन्या_Offset[new_row],
+				Screen_मगा_लिन्या + लिन्या_Offset[old_row],
 				(size_t)len * sizeof(schar_T));
-		    if (enc_utf8 && ScreenLinesUC != NULL
+		    if (enc_utf8 && Screen_मगा_लिन्या_UC != NULL
 						       && p_mco == Screen_mco)
 		    {
-			mch_memmove(new_ScreenLinesUC + new_LineOffset[new_row],
-				ScreenLinesUC + LineOffset[old_row],
+			mch_memmove(new_Screen_मगा_लिन्या_UC + new_लिन्या_Offset[new_row],
+				Screen_मगा_लिन्या_UC + लिन्या_Offset[old_row],
 				(size_t)len * sizeof(u8char_T));
 			for (int i = 0; i < p_mco; ++i)
-			    mch_memmove(new_ScreenLinesC[i]
-						    + new_LineOffset[new_row],
-				ScreenLinesC[i] + LineOffset[old_row],
+			    mch_memmove(new_Screen_मगा_लिन्या_C[i]
+						    + new_लिन्या_Offset[new_row],
+				Screen_मगा_लिन्या_C[i] + लिन्या_Offset[old_row],
 				(size_t)len * sizeof(u8char_T));
 		    }
 		    if (enc_dbcs == DBCS_JPNU && ScreenLines2 != NULL)
-			mch_memmove(new_ScreenLines2 + new_LineOffset[new_row],
-				ScreenLines2 + LineOffset[old_row],
+			mch_memmove(new_ScreenLines2 + new_लिन्या_Offset[new_row],
+				ScreenLines2 + लिन्या_Offset[old_row],
 				(size_t)len * sizeof(schar_T));
-		    mch_memmove(new_ScreenAttrs + new_LineOffset[new_row],
-			    ScreenAttrs + LineOffset[old_row],
+		    mch_memmove(new_ScreenAttrs + new_लिन्या_Offset[new_row],
+			    ScreenAttrs + लिन्या_Offset[old_row],
 			    (size_t)len * sizeof(sattr_T));
-		    mch_memmove(new_ScreenCols + new_LineOffset[new_row],
-			    ScreenCols + LineOffset[old_row],
+		    mch_memmove(new_ScreenCols + new_लिन्या_Offset[new_row],
+			    ScreenCols + लिन्या_Offset[old_row],
 			    (size_t)len * sizeof(colnr_T));
 		}
 	    }
 	}
 	// Use the last line of the screen for the current line.
-	current_ScreenLine = new_ScreenLines + Rows * Columns;
+	current_Screen_लिन्या = new_Screen_मगा_लिन्या + Rows * Columns;
 
 #ifdef FEAT_PROP_POPUP
 	vim_memset(new_popup_mask, 0, Rows * Columns * sizeof(short));
@@ -3470,16 +3470,16 @@ give_up:
     free_screenlines();
 
     // NOTE: this may result in all pointers to become NULL.
-    ScreenLines = new_ScreenLines;
-    ScreenLinesUC = new_ScreenLinesUC;
+    Screen_मगा_लिन्या = new_Screen_मगा_लिन्या;
+    Screen_मगा_लिन्या_UC = new_Screen_मगा_लिन्या_UC;
     for (int i = 0; i < p_mco; ++i)
-	ScreenLinesC[i] = new_ScreenLinesC[i];
+	Screen_मगा_लिन्या_C[i] = new_Screen_मगा_लिन्या_C[i];
     Screen_mco = p_mco;
     ScreenLines2 = new_ScreenLines2;
     ScreenAttrs = new_ScreenAttrs;
     ScreenCols = new_ScreenCols;
-    LineOffset = new_LineOffset;
-    LineWraps = new_LineWraps;
+    लिन्या_Offset = new_लिन्या_Offset;
+    लिन्या_Wraps = new_लिन्या_Wraps;
     TabPageIdxs = new_TabPageIdxs;
 #ifdef FEAT_PROP_POPUP
     popup_mask = new_popup_mask;
@@ -3509,19 +3509,19 @@ give_up:
 #ifdef FEAT_GUI
     else if (gui.in_use
 	    && !gui.starting
-	    && ScreenLines != NULL
+	    && Screen_मगा_लिन्या != NULL
 	    && old_Rows != Rows)
     {
 	gui_redraw_block(0, 0, (int)Rows - 1, (int)Columns - 1, 0);
 
 	// Adjust the position of the cursor, for when executing an external
 	// command.
-	if (msg_row >= Rows)		// Rows got smaller
-	    msg_row = Rows - 1;		// put cursor at last row
+	if (मेनसाहे_row >= Rows)		// Rows got smaller
+	    मेनसाहे_row = Rows - 1;		// put cursor at last row
 	else if (Rows > old_Rows)	// Rows got bigger
-	    msg_row += Rows - old_Rows; // put cursor in same place
-	if (msg_col >= cmdline_width)	// cmdline_width got smaller
-	    msg_col = cmdline_width - 1;    // put cursor at last cmdline column
+	    मेनसाहे_row += Rows - old_Rows; // put cursor in same place
+	if (मेनसाहे_col >= cmdline_width)	// cmdline_width got smaller
+	    मेनसाहे_col = cmdline_width - 1;    // put cursor at last cmdline column
     }
 #endif
     clear_TabPageIdxs();
@@ -3538,7 +3538,7 @@ give_up:
      * Do not apply autocommands more than 3 times to avoid an endless loop
      * in case applying autocommands always changes Rows or Columns.
      */
-    if (starting == 0 && ++retry_count <= 3)
+    if (starting == 0 && ++retry_बिलांग <= 3)
     {
 	apply_autocmds(EVENT_VIMRESIZED, NULL, NULL, FALSE, curbuf);
 	// A shell resize also changes window sizes; trigger WinResized (and
@@ -3555,15 +3555,15 @@ free_screenlines(void)
 {
     int		i;
 
-    VIM_CLEAR(ScreenLinesUC);
+    VIM_CLEAR(Screen_मगा_लिन्या_UC);
     for (i = 0; i < Screen_mco; ++i)
-	VIM_CLEAR(ScreenLinesC[i]);
+	VIM_CLEAR(Screen_मगा_लिन्या_C[i]);
     VIM_CLEAR(ScreenLines2);
-    VIM_CLEAR(ScreenLines);
+    VIM_CLEAR(Screen_मगा_लिन्या);
     VIM_CLEAR(ScreenAttrs);
     VIM_CLEAR(ScreenCols);
-    VIM_CLEAR(LineOffset);
-    VIM_CLEAR(LineWraps);
+    VIM_CLEAR(लिन्या_Offset);
+    VIM_CLEAR(लिन्या_Wraps);
     VIM_CLEAR(TabPageIdxs);
 #ifdef FEAT_PROP_POPUP
     VIM_CLEAR(popup_mask);
@@ -3605,7 +3605,7 @@ screenclear2(int doclear)
     int	    i;
     int	    did_clear = FALSE;
 
-    if (starting == NO_SCREEN || ScreenLines == NULL
+    if (starting == NO_SCREEN || Screen_मगा_लिन्या == NULL
 #ifdef FEAT_GUI
 	    || (gui.in_use && gui.starting)
 #endif
@@ -3626,8 +3626,8 @@ screenclear2(int doclear)
     // blank out ScreenLines
     for (i = 0; i < Rows; ++i)
     {
-	lineclear(LineOffset[i], (int)Columns, 0);
-	LineWraps[i] = FALSE;
+	lineclear(लिन्या_Offset[i], (int)Columns, 0);
+	लिन्या_Wraps[i] = FALSE;
     }
 
     if (doclear && can_clear(T_CL))
@@ -3647,7 +3647,7 @@ screenclear2(int doclear)
     {
 	// can't clear the screen, mark all chars with invalid attributes
 	for (i = 0; i < Rows; ++i)
-	    lineinvalid(LineOffset[i], (int)Columns);
+	    lineinvalid(लिन्या_Offset[i], (int)Columns);
 	clear_cmdline = TRUE;
     }
 
@@ -3661,16 +3661,16 @@ screenclear2(int doclear)
 #endif
     if (must_redraw == UPD_CLEAR)	// no need to clear again
 	must_redraw = UPD_NOT_VALID;
-    msg_scrolled = 0;		// compute_cmdrow() uses this
+    मेनसाहे_scrolled = 0;		// compute_cmdrow() uses this
     compute_cmdrow();
 #ifdef FEAT_PROP_POPUP
     popup_redraw_all();		// redraw all popup windows
 #endif
-    msg_row = cmdline_row;	// put cursor on last line for messages
-    msg_col = 0;
+    मेनसाहे_row = cmdline_row;	// put cursor on last line for messages
+    मेनसाहे_col = 0;
     screen_start();		// don't know where cursor is now
-    msg_didany = FALSE;
-    msg_didout = FALSE;
+    मेनसाहे_didany = FALSE;
+    मेनसाहे_didout = FALSE;
 #ifdef FEAT_IMAGE
     shift_reset_image_placements(); // Reset "row_off" for every placement
     clear_all_image_placements();
@@ -3685,9 +3685,9 @@ screenclear2(int doclear)
     static void
 lineclear(unsigned off, int width, int attr)
 {
-    (void)vim_memset(ScreenLines + off, ' ', (size_t)width * sizeof(schar_T));
+    (void)vim_memset(Screen_मगा_लिन्या + off, ' ', (size_t)width * sizeof(schar_T));
     if (enc_utf8)
-	(void)vim_memset(ScreenLinesUC + off, 0,
+	(void)vim_memset(Screen_मगा_लिन्या_UC + off, 0,
 					  (size_t)width * sizeof(u8char_T));
     (void)vim_memset(ScreenAttrs + off, attr, (size_t)width * sizeof(sattr_T));
     (void)vim_memset(ScreenCols + off, -1, (size_t)width * sizeof(colnr_T));
@@ -3709,9 +3709,9 @@ lineinvalid(unsigned off, int width)
  * test on "screen_lnum".
  */
     void
-line_was_clobbered(int screen_lnum)
+लिन्या_was_clobbered(int screen_lnum)
 {
-    lineinvalid(LineOffset[screen_lnum], (int)Columns);
+    lineinvalid(लिन्या_Offset[screen_lnum], (int)Columns);
 }
 
 /*
@@ -3720,19 +3720,19 @@ line_was_clobbered(int screen_lnum)
     static void
 linecopy(int to, int from, win_T *wp)
 {
-    unsigned	off_to = LineOffset[to] + wp->w_wincol;
-    unsigned	off_from = LineOffset[from] + wp->w_wincol;
+    unsigned	off_to = लिन्या_Offset[to] + wp->w_wincol;
+    unsigned	off_from = लिन्या_Offset[from] + wp->w_wincol;
 
-    mch_memmove(ScreenLines + off_to, ScreenLines + off_from,
+    mch_memmove(Screen_मगा_लिन्या + off_to, Screen_मगा_लिन्या + off_from,
 	    wp->w_width * sizeof(schar_T));
     if (enc_utf8)
     {
 	int	i;
 
-	mch_memmove(ScreenLinesUC + off_to, ScreenLinesUC + off_from,
+	mch_memmove(Screen_मगा_लिन्या_UC + off_to, Screen_मगा_लिन्या_UC + off_from,
 		wp->w_width * sizeof(u8char_T));
 	for (i = 0; i < p_mco; ++i)
-	    mch_memmove(ScreenLinesC[i] + off_to, ScreenLinesC[i] + off_from,
+	    mch_memmove(Screen_मगा_लिन्या_C[i] + off_to, Screen_मगा_लिन्या_C[i] + off_from,
 		    wp->w_width * sizeof(u8char_T));
     }
     if (enc_dbcs == DBCS_JPNU)
@@ -3806,7 +3806,7 @@ windgoto(int row, int col)
 #define PLAN_NL	    3
 #define PLAN_WRITE  4
     // Can't use ScreenLines unless initialized
-    if (ScreenLines == NULL)
+    if (Screen_मगा_लिन्या == NULL)
 	return;
     if (col == screen_cur_col && row == screen_cur_row)
 	return;
@@ -3914,7 +3914,7 @@ windgoto(int row, int col)
 	     * Check if the attributes are correct without additionally
 	     * stopping highlighting.
 	     */
-	    p = ScreenAttrs + LineOffset[row] + wouldbe_col;
+	    p = ScreenAttrs + लिन्या_Offset[row] + wouldbe_col;
 	    while (i && *p++ == attr)
 		--i;
 	    if (i != 0)
@@ -3935,7 +3935,7 @@ windgoto(int row, int col)
 	    {
 		// Don't use an UTF-8 char for positioning, it's slow.
 		for (i = wouldbe_col; i < col; ++i)
-		    if (ScreenLinesUC[LineOffset[row] + i] != 0)
+		    if (Screen_मगा_लिन्या_UC[लिन्या_Offset[row] + i] != 0)
 		    {
 			cost = 999;
 			break;
@@ -4005,15 +4005,15 @@ windgoto(int row, int col)
 		{
 		    int	off;
 
-		    off = LineOffset[row] + screen_cur_col;
+		    off = लिन्या_Offset[row] + screen_cur_col;
 		    while (i-- > 0)
 		    {
 			if (ScreenAttrs[off] != screen_attr)
 			    screen_stop_highlight();
 			out_flush_check();
-			out_char(ScreenLines[off]);
+			out_char(Screen_मगा_लिन्या[off]);
 			if (enc_dbcs == DBCS_JPNU
-				&& ScreenLines[off] == 0x8e)
+				&& Screen_मगा_लिन्या[off] == 0x8e)
 			    out_char(ScreenLines2[off]);
 			++off;
 		    }
@@ -4030,7 +4030,7 @@ windgoto(int row, int col)
 	    screen_stop_highlight();
 	if (row == screen_cur_row && (col > screen_cur_col)
 		&& *T_CRI != NUL)
-	    term_cursor_right(col - screen_cur_col);
+	    term_cursor_कानान(col - screen_cur_col);
 	else
 	    term_windgoto(row, col);
     }
@@ -4091,10 +4091,10 @@ setcursor_mayforce(int force)
  * Returns FAIL if the lines are not inserted, OK for success.
  */
     int
-win_ins_lines(
+win_ins_मगा_लिन्या(
     win_T	*wp,
     int		row,
-    int		line_count,
+    int		लिन्या_बिलांग,
     int		invalid,
     int		mayclear)
 {
@@ -4104,7 +4104,7 @@ win_ins_lines(
     int		retval;
 
     if (invalid)
-	wp->w_lines_valid = 0;
+	wp->w_मगा_लिन्या_valid = 0;
 
     // with only a few lines it's not worth the effort
     if (wp->w_height < 5)
@@ -4114,10 +4114,10 @@ win_ins_lines(
     if (pum_visible())
 	return FAIL;
 
-    if (line_count > wp->w_height - row)
-	line_count = wp->w_height - row;
+    if (लिन्या_बिलांग > wp->w_height - row)
+	लिन्या_बिलांग = wp->w_height - row;
 
-    retval = win_do_lines(wp, row, line_count, mayclear, FALSE, 0);
+    retval = win_do_मगा_लिन्या(wp, row, लिन्या_बिलांग, mayclear, FALSE, 0);
     if (retval != MAYBE)
 	return retval;
 
@@ -4130,8 +4130,8 @@ win_ins_lines(
     did_delete = FALSE;
     if (wp->w_next != NULL || wp->w_status_height)
     {
-	if (screen_del_lines(0, W_WINROW(wp) + wp->w_height - line_count,
-				  line_count, (int)Rows, FALSE, 0, NULL) == OK)
+	if (screen_del_मगा_लिन्या(0, W_WINROW(wp) + wp->w_height - लिन्या_बिलांग,
+				  लिन्या_बिलांग, (int)Rows, FALSE, 0, NULL) == OK)
 	    did_delete = TRUE;
 	else if (wp->w_next)
 	    return FAIL;
@@ -4144,14 +4144,14 @@ win_ins_lines(
 	wp->w_redr_status = true;
 	redraw_cmdline = TRUE;
 	nextrow = W_WINROW(wp) + wp->w_height + wp->w_status_height;
-	lastrow = nextrow + line_count;
+	lastrow = nextrow + लिन्या_बिलांग;
 	if (lastrow > Rows)
 	    lastrow = Rows;
-	screen_fill(nextrow - line_count, lastrow - line_count,
+	screen_fill(nextrow - लिन्या_बिलांग, lastrow - लिन्या_बिलांग,
 		  wp->w_wincol, (int)W_ENDCOL(wp), ' ', ' ', 0);
     }
 
-    if (screen_ins_lines(0, W_WINROW(wp) + row, line_count, (int)Rows, 0, NULL)
+    if (screen_ins_मगा_लिन्या(0, W_WINROW(wp) + row, लिन्या_बिलांग, (int)Rows, 0, NULL)
 								      == FAIL)
     {
 	// deletion will have messed up other windows
@@ -4174,10 +4174,10 @@ win_ins_lines(
  * Return OK for success, FAIL if the lines are not deleted.
  */
     int
-win_del_lines(
+win_del_मगा_लिन्या(
     win_T	*wp,
     int		row,
-    int		line_count,
+    int		लिन्या_बिलांग,
     int		invalid,
     int		mayclear,
     int		clear_attr)	    // for clearing lines
@@ -4185,16 +4185,16 @@ win_del_lines(
     int		retval;
 
     if (invalid)
-	wp->w_lines_valid = 0;
+	wp->w_मगा_लिन्या_valid = 0;
 
-    if (line_count > wp->w_height - row)
-	line_count = wp->w_height - row;
+    if (लिन्या_बिलांग > wp->w_height - row)
+	लिन्या_बिलांग = wp->w_height - row;
 
-    retval = win_do_lines(wp, row, line_count, mayclear, TRUE, clear_attr);
+    retval = win_do_मगा_लिन्या(wp, row, लिन्या_बिलांग, mayclear, TRUE, clear_attr);
     if (retval != MAYBE)
 	return retval;
 
-    if (screen_del_lines(0, W_WINROW(wp) + row, line_count,
+    if (screen_del_मगा_लिन्या(0, W_WINROW(wp) + row, लिन्या_बिलांग,
 				   (int)Rows, FALSE, clear_attr, NULL) == FAIL)
 	return FAIL;
 
@@ -4204,8 +4204,8 @@ win_del_lines(
      */
     if (wp->w_next || wp->w_status_height || cmdline_row < Rows - 1)
     {
-	if (screen_ins_lines(0, W_WINROW(wp) + wp->w_height - line_count,
-			      line_count, (int)Rows, clear_attr, NULL) == FAIL)
+	if (screen_ins_मगा_लिन्या(0, W_WINROW(wp) + wp->w_height - लिन्या_बिलांग,
+			      लिन्या_बिलांग, (int)Rows, clear_attr, NULL) == FAIL)
 	{
 	    wp->w_redr_status = true;
 	    win_rest_invalid(wp->w_next);
@@ -4226,29 +4226,29 @@ win_del_lines(
  * Returns MAYBE when not finished yet.
  */
     static int
-win_do_lines(
+win_do_मगा_लिन्या(
     win_T	*wp,
     int		row,
-    int		line_count,
+    int		लिन्या_बिलांग,
     int		mayclear,
     int		del,
     int		clear_attr)
 {
     int		retval;
 
-    if (!redrawing() || line_count <= 0)
+    if (!redrawing() || लिन्या_बिलांग <= 0)
 	return FAIL;
 
     // When inserting lines would result in loss of command output, just redraw
     // the lines.
-    if (no_win_do_lines_ins && !del)
+    if (no_win_do_मगा_लिन्या_ins && !del)
 	return FAIL;
 
     // only a few lines left: redraw is faster
-    if (mayclear && Rows - line_count < 5
+    if (mayclear && Rows - लिन्या_बिलांग < 5
 	    && wp->w_width == topframe->fr_width)
     {
-	if (!no_win_do_lines_ins)
+	if (!no_win_do_मगा_लिन्या_ins)
 	    redraw_as_cleared();    // don't clear the screen to avoid flicker
 	return FAIL;
     }
@@ -4260,7 +4260,7 @@ win_do_lines(
 #endif
 
     // Delete all remaining lines
-    if (row + line_count >= wp->w_height)
+    if (row + लिन्या_बिलांग >= wp->w_height)
     {
 	screen_fill(W_WINROW(wp) + row, W_WINROW(wp) + wp->w_height,
 		wp->w_wincol, (int)W_ENDCOL(wp), ' ', ' ', 0);
@@ -4272,7 +4272,7 @@ win_do_lines(
      * otherwise it will stay there forever.
      * Don't do this when avoiding to insert lines.
      */
-    if (!no_win_do_lines_ins)
+    if (!no_win_do_मगा_लिन्या_ins)
 	clear_cmdline = TRUE;
 
 #if defined(FEAT_TABPANEL)
@@ -4297,10 +4297,10 @@ win_do_lines(
 		    || *T_CSV != NUL))
 	    scroll_region_set(wp, row);
 	if (del)
-	    retval = screen_del_lines(W_WINROW(wp) + row, 0, line_count,
+	    retval = screen_del_मगा_लिन्या(W_WINROW(wp) + row, 0, लिन्या_बिलांग,
 				    wp->w_height - row, FALSE, clear_attr, wp);
 	else
-	    retval = screen_ins_lines(W_WINROW(wp) + row, 0, line_count,
+	    retval = screen_ins_मगा_लिन्या(W_WINROW(wp) + row, 0, लिन्या_बिलांग,
 					   wp->w_height - row, clear_attr, wp);
 	if (scroll_region && (wp->w_width == topframe->fr_width
 		    || *T_CSV != NUL))
@@ -4361,10 +4361,10 @@ win_rest_invalid(win_T *wp)
  * return FAIL for failure, OK for success.
  */
     int
-screen_ins_lines(
+screen_ins_मगा_लिन्या(
     int		off,
     int		row,
-    int		line_count,
+    int		लिन्या_बिलांग,
     int		end,
     int		clear_attr,
     win_T	*wp)	    // NULL or window to use width from
@@ -4388,7 +4388,7 @@ screen_ins_lines(
      * - there is a popup window
      */
     if (!screen_valid(TRUE)
-	     || line_count <= 0 || line_count > p_ttyscroll
+	     || लिन्या_बिलांग <= 0 || लिन्या_बिलांग > p_ttyscroll
 	     || end > Rows
 #ifdef FEAT_CLIPBOARD
 	     || (clip_star.state != SELECT_CLEARED
@@ -4402,7 +4402,7 @@ screen_ins_lines(
     {
 # ifdef FEAT_IMAGE
 	// Always make sure images are correctly shifted
-	shift_image_placements(off + row, off + end, line_count);
+	shift_image_placements(off + row, off + end, लिन्या_बिलांग);
 # endif
 	return FAIL;
     }
@@ -4433,22 +4433,22 @@ screen_ins_lines(
      * the scrollbar for the window. It does have insert line, use that if it
      * exists.
      */
-    result_empty = (row + line_count >= end);
+    result_empty = (row + लिन्या_बिलांग >= end);
     if (wp != NULL && wp->w_width != topframe->fr_width && *T_CSV == NUL)
     {
 	// Avoid that lines are first cleared here and then redrawn, which
 	// results in many characters updated twice.  This happens with CTRL-F
 	// in a vertically split window.  With line-by-line scrolling
 	// USE_REDRAW should be faster.
-	if (line_count > 3)
+	if (लिन्या_बिलांग > 3)
 	    return FAIL;
 	type = USE_REDRAW;
     }
     else if (can_clear(T_CD) && result_empty)
 	type = USE_T_CD;
-    else if (*T_CAL != NUL && (line_count > 1 || *T_AL == NUL))
+    else if (*T_CAL != NUL && (लिन्या_बिलांग > 1 || *T_AL == NUL))
 	type = USE_T_CAL;
-    else if (*T_CDL != NUL && result_empty && (line_count > 1 || !can_ce))
+    else if (*T_CDL != NUL && result_empty && (लिन्या_बिलांग > 1 || !can_ce))
 	type = USE_T_CDL;
     else if (*T_AL != NUL)
 	type = USE_T_AL;
@@ -4467,7 +4467,7 @@ screen_ins_lines(
      */
     if (type == USE_T_CD || type == USE_T_CDL ||
 					 type == USE_T_CE || type == USE_T_DL)
-	return screen_del_lines(off, row, line_count, end, FALSE, 0, wp);
+	return screen_del_मगा_लिन्या(off, row, लिन्या_बिलांग, end, FALSE, 0, wp);
 
     /*
      * If text is retained below the screen, first clear or delete as many
@@ -4475,7 +4475,7 @@ screen_ins_lines(
      * the deleted lines won't later surface during a screen_del_lines.
      */
     if (*T_DB)
-	screen_del_lines(off, end - line_count, line_count, end, FALSE, 0, wp);
+	screen_del_मगा_लिन्या(off, end - लिन्या_बिलांग, लिन्या_बिलांग, end, FALSE, 0, wp);
 
 #ifdef FEAT_CLIPBOARD
     // Remove a modeless selection when inserting lines halfway the screen
@@ -4483,10 +4483,10 @@ screen_ins_lines(
     if (off + row > 0 || (wp != NULL && wp->w_width != topframe->fr_width))
 	clip_clear_selection(&clip_star);
     else
-	clip_scroll_selection(-line_count);
+	clip_scroll_selection(-लिन्या_बिलांग);
 #endif
 #ifdef FEAT_IMAGE
-    shift_image_placements(off + row, off + end, line_count);
+    shift_image_placements(off + row, off + end, लिन्या_बिलांग);
 #endif
 
 #ifdef FEAT_GUI_HAIKU
@@ -4513,33 +4513,33 @@ screen_ins_lines(
      */
     row += off;
     end += off;
-    for (i = 0; i < line_count; ++i)
+    for (i = 0; i < लिन्या_बिलांग; ++i)
     {
 	if (wp != NULL && wp->w_width != topframe->fr_width)
 	{
 	    // need to copy part of a line
 	    j = end - 1 - i;
-	    while ((j -= line_count) >= row)
-		linecopy(j + line_count, j, wp);
-	    j += line_count;
+	    while ((j -= लिन्या_बिलांग) >= row)
+		linecopy(j + लिन्या_बिलांग, j, wp);
+	    j += लिन्या_बिलांग;
 	    if (can_clear((char_u *)" "))
-		lineclear(LineOffset[j] + wp->w_wincol,
+		lineclear(लिन्या_Offset[j] + wp->w_wincol,
 			wp->w_width, clear_attr);
 	    else
-		lineinvalid(LineOffset[j] + wp->w_wincol, wp->w_width);
-	    LineWraps[j] = FALSE;
+		lineinvalid(लिन्या_Offset[j] + wp->w_wincol, wp->w_width);
+	    लिन्या_Wraps[j] = FALSE;
 	}
 	else
 	{
 	    j = end - 1 - i;
-	    temp = LineOffset[j];
-	    while ((j -= line_count) >= row)
+	    temp = लिन्या_Offset[j];
+	    while ((j -= लिन्या_बिलांग) >= row)
 	    {
-		LineOffset[j + line_count] = LineOffset[j];
-		LineWraps[j + line_count] = LineWraps[j];
+		लिन्या_Offset[j + लिन्या_बिलांग] = लिन्या_Offset[j];
+		लिन्या_Wraps[j + लिन्या_बिलांग] = लिन्या_Wraps[j];
 	    }
-	    LineOffset[j + line_count] = temp;
-	    LineWraps[j + line_count] = FALSE;
+	    लिन्या_Offset[j + लिन्या_बिलांग] = temp;
+	    लिन्या_Wraps[j + लिन्या_बिलांग] = FALSE;
 	    if (can_clear((char_u *)" "))
 		lineclear(temp, (int)Columns, clear_attr);
 	    else
@@ -4561,12 +4561,12 @@ screen_ins_lines(
 	redraw_block(row, end, wp);
     else if (type == USE_T_CAL)
     {
-	term_append_lines(line_count);
+	term_append_मगा_लिन्या(लिन्या_बिलांग);
 	screen_start();		// don't know where cursor is now
     }
     else
     {
-	for (i = 0; i < line_count; i++)
+	for (i = 0; i < लिन्या_बिलांग; i++)
 	{
 	    if (type == USE_T_AL)
 	    {
@@ -4586,7 +4586,7 @@ screen_ins_lines(
      */
     if (type == USE_T_SR && *T_DA)
     {
-	for (i = 0; i < line_count; ++i)
+	for (i = 0; i < लिन्या_बिलांग; ++i)
 	{
 	    windgoto(off + i, cursor_col);
 	    out_str(T_CE);
@@ -4615,10 +4615,10 @@ screen_ins_lines(
  * Return OK for success, FAIL if the lines are not deleted.
  */
     int
-screen_del_lines(
+screen_del_मगा_लिन्या(
     int		off,
     int		row,
-    int		line_count,
+    int		लिन्या_बिलांग,
     int		end,
     int		force,		// even when line_count > p_ttyscroll
     int		clear_attr,	// used for clearing lines
@@ -4644,8 +4644,8 @@ screen_del_lines(
      * - redrawing for a callback and there is a modeless selection
      */
     if (!screen_valid(TRUE)
-	    || line_count <= 0
-	    || (!force && line_count > p_ttyscroll)
+	    || लिन्या_बिलांग <= 0
+	    || (!force && लिन्या_बिलांग > p_ttyscroll)
 	    || end > Rows
 #ifdef FEAT_CLIPBOARD
 	    || (clip_star.state != SELECT_CLEARED && redrawing_for_callback > 0)
@@ -4656,7 +4656,7 @@ screen_del_lines(
     /*
      * Check if the rest of the current region will become empty.
      */
-    result_empty = row + line_count >= end;
+    result_empty = row + लिन्या_बिलांग >= end;
 
     /*
      * We can delete lines only when 'db' flag not set or when 'ce' option
@@ -4682,7 +4682,7 @@ screen_del_lines(
 	// results in many characters updated twice.  This happens with CTRL-F
 	// in a vertically split window.  With line-by-line scrolling
 	// USE_REDRAW should be faster.
-	if (line_count > 3)
+	if (लिन्या_बिलांग > 3)
 	    return FAIL;
 	type = USE_REDRAW;
     }
@@ -4692,11 +4692,11 @@ screen_del_lines(
 #ifndef AMIGA
 	// On the Amiga, somehow '\n' on the last line doesn't always scroll
 	// up, so use delete-line command
-			    line_count == 1 ||
+			    लिन्या_बिलांग == 1 ||
 #endif
 						*T_CDL == NUL))
 	type = USE_NL;
-    else if (*T_CDL != NUL && line_count > 1 && can_delete)
+    else if (*T_CDL != NUL && लिन्या_बिलांग > 1 && can_delete)
 	type = USE_T_CDL;
     else if (can_clear(T_CE) && result_empty
 	    && (wp == NULL || wp->w_width == topframe->fr_width))
@@ -4714,10 +4714,10 @@ screen_del_lines(
     if (off + row > 0 || (wp != NULL && wp->w_width != topframe->fr_width))
 	clip_clear_selection(&clip_star);
     else
-	clip_scroll_selection(line_count);
+	clip_scroll_selection(लिन्या_बिलांग);
 #endif
 #ifdef FEAT_IMAGE
-    shift_image_placements(off + row, off + end, -line_count);
+    shift_image_placements(off + row, off + end, -लिन्या_बिलांग);
 #endif
 
 #ifdef FEAT_GUI_HAIKU
@@ -4751,34 +4751,34 @@ screen_del_lines(
      */
     row += off;
     end += off;
-    for (i = 0; i < line_count; ++i)
+    for (i = 0; i < लिन्या_बिलांग; ++i)
     {
 	if (wp != NULL && wp->w_width != topframe->fr_width)
 	{
 	    // need to copy part of a line
 	    j = row + i;
-	    while ((j += line_count) <= end - 1)
-		linecopy(j - line_count, j, wp);
-	    j -= line_count;
+	    while ((j += लिन्या_बिलांग) <= end - 1)
+		linecopy(j - लिन्या_बिलांग, j, wp);
+	    j -= लिन्या_बिलांग;
 	    if (can_clear((char_u *)" "))
-		lineclear(LineOffset[j] + wp->w_wincol,
+		lineclear(लिन्या_Offset[j] + wp->w_wincol,
 			wp->w_width, clear_attr);
 	    else
-		lineinvalid(LineOffset[j] + wp->w_wincol, wp->w_width);
-	    LineWraps[j] = FALSE;
+		lineinvalid(लिन्या_Offset[j] + wp->w_wincol, wp->w_width);
+	    लिन्या_Wraps[j] = FALSE;
 	}
 	else
 	{
 	    // whole width, moving the line pointers is faster
 	    j = row + i;
-	    temp = LineOffset[j];
-	    while ((j += line_count) <= end - 1)
+	    temp = लिन्या_Offset[j];
+	    while ((j += लिन्या_बिलांग) <= end - 1)
 	    {
-		LineOffset[j - line_count] = LineOffset[j];
-		LineWraps[j - line_count] = LineWraps[j];
+		लिन्या_Offset[j - लिन्या_बिलांग] = लिन्या_Offset[j];
+		लिन्या_Wraps[j - लिन्या_बिलांग] = लिन्या_Wraps[j];
 	    }
-	    LineOffset[j - line_count] = temp;
-	    LineWraps[j - line_count] = FALSE;
+	    लिन्या_Offset[j - लिन्या_बिलांग] = temp;
+	    लिन्या_Wraps[j - लिन्या_बिलांग] = FALSE;
 	    if (can_clear((char_u *)" "))
 		lineclear(temp, (int)Columns, clear_attr);
 	    else
@@ -4807,7 +4807,7 @@ screen_del_lines(
     else if (type == USE_T_CDL)
     {
 	windgoto(cursor_row, cursor_col);
-	term_delete_lines(line_count);
+	term_delete_मगा_लिन्या(लिन्या_बिलांग);
 	screen_start();			// don't know where cursor is now
     }
     /*
@@ -4818,12 +4818,12 @@ screen_del_lines(
     else if (type == USE_NL)
     {
 	windgoto(cursor_end - 1, cursor_col);
-	for (i = line_count; --i >= 0; )
+	for (i = लिन्या_बिलांग; --i >= 0; )
 	    out_char('\n');		// cursor will remain on same line
     }
     else
     {
-	for (i = line_count; --i >= 0; )
+	for (i = लिन्या_बिलांग; --i >= 0; )
 	{
 	    if (type == USE_T_DL)
 	    {
@@ -4845,7 +4845,7 @@ screen_del_lines(
      */
     if (*T_DB && (type == USE_T_DL || type == USE_T_CDL))
     {
-	for (i = line_count; i > 0; --i)
+	for (i = लिन्या_बिलांग; i > 0; --i)
 	{
 	    windgoto(cursor_end - i, cursor_col);
 	    out_str(T_CE);		// erase a line
@@ -4878,10 +4878,10 @@ skip_showmode(void)
     // and may pick up terminal response sequences (e.g. t_RV response),
     // falsely preventing the mode from being shown.
     if (global_busy
-	    || msg_silent != 0
+	    || मेनसाहे_silent != 0
 	    || !redrawing()
 	    || ((!stuff_empty() || typebuf.tb_len > 0 || using_script())
-		&& !KeyTyped))
+		&& !सुसि_Typed))
     {
 	redraw_mode = TRUE;		// show mode later
 	return TRUE;
@@ -4909,8 +4909,8 @@ showmode(void)
     int		sub_attr;
     int		show_ruler_with_pum = FALSE;
 
-    do_mode = p_smd && msg_silent == 0
-	    && ((State & MODE_INSERT)
+    do_mode = p_smd && मेनसाहे_silent == 0
+	    && ((State & MODE_इसिंगित)
 		|| restart_edit != NUL
 		|| VIsual_active);
     if (do_mode || reg_recording != 0)
@@ -4926,15 +4926,15 @@ showmode(void)
 	// if the cmdline is more than one line high, erase top lines
 	need_clear = clear_cmdline;
 	if (clear_cmdline && cmdline_row < Rows - 1)
-	    msg_clr_cmdline();			// will reset clear_cmdline
+	    मेनसाहे_clr_cmdline();			// will reset clear_cmdline
 
 	// Position on the last line in the window, column 0
-	msg_pos_mode();
+	मेनसाहे_pos_mode();
 	cursor_off();
 	attr = HL_ATTR(HLF_CM);			// Highlight mode
 	if (do_mode)
 	{
-	    msg_puts_attr("--", attr);
+	    मेनसाहे_puts_attr("--", attr);
 #if defined(FEAT_XIM)
 	    if (
 # ifdef FEAT_GUI_GTK
@@ -4944,9 +4944,9 @@ showmode(void)
 # endif
 	       )
 # ifdef FEAT_GUI_GTK // most of the time, it's not XIM being used
-		msg_puts_attr(" IM", attr);
+		मेनसाहे_puts_attr(" IM", attr);
 # else
-		msg_puts_attr(" XIM", attr);
+		मेनसाहे_puts_attr(" XIM", attr);
 # endif
 #endif
 	    // CTRL-X in Insert mode
@@ -4954,7 +4954,7 @@ showmode(void)
 	    {
 		// These messages can get long, avoid a wrap in a narrow
 		// window.  Prefer showing edit_submode_extra.
-		length = (Rows - msg_row) * cmdline_width - 3;
+		length = (Rows - मेनसाहे_row) * cmdline_width - 3;
 		if (edit_submode_extra != NULL)
 		    length -= vim_strsize(edit_submode_extra);
 		if (length > 0)
@@ -4964,60 +4964,60 @@ showmode(void)
 		    if (length - vim_strsize(edit_submode) > 0)
 		    {
 			if (edit_submode_pre != NULL)
-			    msg_puts_attr((char *)edit_submode_pre, attr);
-			msg_puts_attr((char *)edit_submode, attr);
+			    मेनसाहे_puts_attr((char *)edit_submode_pre, attr);
+			मेनसाहे_puts_attr((char *)edit_submode, attr);
 		    }
 		    if (edit_submode_extra != NULL)
 		    {
-			msg_puts_attr(" ", attr);  // add a space in between
-			if ((int)edit_submode_highl < (int)HLF_COUNT)
+			मेनसाहे_puts_attr(" ", attr);  // add a space in between
+			if ((int)edit_submode_highl < (int)HLF_बिलांग)
 			    sub_attr = HL_ATTR(edit_submode_highl);
 			else
 			    sub_attr = attr;
-			msg_puts_attr((char *)edit_submode_extra, sub_attr);
+			मेनसाहे_puts_attr((char *)edit_submode_extra, sub_attr);
 		    }
 		}
 	    }
 	    else
 	    {
 		if (State & VREPLACE_FLAG)
-		    msg_puts_attr(_(" VREPLACE"), attr);
+		    मेनसाहे_puts_attr(_(" VREPLACE"), attr);
 		else if (State & REPLACE_FLAG)
-		    msg_puts_attr(_(" REPLACE"), attr);
-		else if (State & MODE_INSERT)
+		    मेनसाहे_puts_attr(_(" REPLACE"), attr);
+		else if (State & MODE_इसिंगित)
 		{
 #ifdef FEAT_RIGHTLEFT
 		    if (p_ri)
-			msg_puts_attr(_(" REVERSE"), attr);
+			मेनसाहे_puts_attr(_(" REVERSE"), attr);
 #endif
-		    msg_puts_attr(_(" INSERT"), attr);
+		    मेनसाहे_puts_attr(_(" INSERT"), attr);
 		}
 		else if (restart_edit == 'I' || restart_edit == 'i' ||
 			restart_edit == 'a' || restart_edit == 'A')
-		    msg_puts_attr(_(" (insert)"), attr);
+		    मेनसाहे_puts_attr(_(" (insert)"), attr);
 		else if (restart_edit == 'R')
-		    msg_puts_attr(_(" (replace)"), attr);
+		    मेनसाहे_puts_attr(_(" (replace)"), attr);
 		else if (restart_edit == 'V')
-		    msg_puts_attr(_(" (vreplace)"), attr);
+		    मेनसाहे_puts_attr(_(" (vreplace)"), attr);
 #ifdef FEAT_RIGHTLEFT
 		if (p_hkmap)
-		    msg_puts_attr(_(" Hebrew"), attr);
+		    मेनसाहे_puts_attr(_(" Hebrew"), attr);
 #endif
 #ifdef FEAT_KEYMAP
 		if (State & MODE_LANGMAP)
 		{
 # ifdef FEAT_ARABIC
 		    if (curwin->w_p_arab)
-			msg_puts_attr(_(" Arabic"), attr);
+			मेनसाहे_puts_attr(_(" Arabic"), attr);
 		    else
 # endif
 			if (get_keymap_str(curwin, (char_u *)" (%s)",
 							   NameBuff, MAXPATHL) > 0)
-			    msg_puts_attr((char *)NameBuff, attr);
+			    मेनसाहे_puts_attr((char *)NameBuff, attr);
 		}
 #endif
-		if ((State & MODE_INSERT) && p_paste)
-		    msg_puts_attr(_(" (paste)"), attr);
+		if ((State & MODE_इसिंगित) && p_paste)
+		    मेनसाहे_puts_attr(_(" (paste)"), attr);
 
 		if (VIsual_active)
 		{
@@ -5036,9 +5036,9 @@ showmode(void)
 			case 5: p = N_(" SELECT LINE"); break;
 			default: p = N_(" SELECT BLOCK"); break;
 		    }
-		    msg_puts_attr(_(p), attr);
+		    मेनसाहे_puts_attr(_(p), attr);
 		}
-		msg_puts_attr(" --", attr);
+		मेनसाहे_puts_attr(" --", attr);
 		// Ensure ruler is shown when a popup is visible and only the mode name
 		// is displayed. Without this, the ruler may disappear during insert-mode
 		// completion when 'shortmess' includes 'c'.
@@ -5056,19 +5056,19 @@ showmode(void)
 
 	mode_displayed = TRUE;
 	if (need_clear || clear_cmdline || redraw_mode)
-	    msg_clr_eos();
-	msg_didout = FALSE;		// overwrite this message
-	length = msg_col;
-	msg_col = 0;
+	    मेनसाहे_clr_eos();
+	मेनसाहे_didout = FALSE;		// overwrite this message
+	length = मेनसाहे_col;
+	मेनसाहे_col = 0;
 	need_wait_return = nwr_save;	// never ask for hit-return for this
     }
-    else if (clear_cmdline && msg_silent == 0)
+    else if (clear_cmdline && मेनसाहे_silent == 0)
 	// Clear the whole command line.  Will reset "clear_cmdline".
-	msg_clr_cmdline();
+	मेनसाहे_clr_cmdline();
     else if (redraw_mode)
     {
-	msg_pos_mode();
-	msg_clr_eos();
+	मेनसाहे_pos_mode();
+	मेनसाहे_clr_eos();
     }
 
     // In Visual mode the size of the selected area must be redrawn.
@@ -5091,10 +5091,10 @@ showmode(void)
  * Position for a mode message.
  */
     static void
-msg_pos_mode(void)
+मेनसाहे_pos_mode(void)
 {
-    msg_col = 0;
-    msg_row = Rows - 1;
+    मेनसाहे_col = 0;
+    मेनसाहे_row = Rows - 1;
 }
 
 /*
@@ -5108,7 +5108,7 @@ unshowmode(int force)
     /*
      * Don't delete it right now, when not redrawing or inside a mapping.
      */
-    if (!redrawing() || (!force && char_avail() && !KeyTyped))
+    if (!redrawing() || (!force && char_avail() && !सुसि_Typed))
 	redraw_cmdline = TRUE;		// delete mode later
     else
 	clearmode();
@@ -5120,29 +5120,29 @@ unshowmode(int force)
     void
 clearmode(void)
 {
-    int save_msg_row = msg_row;
-    int save_msg_col = msg_col;
+    int save_मेनसाहे_row = मेनसाहे_row;
+    int save_मेनसाहे_col = मेनसाहे_col;
 
-    msg_pos_mode();
+    मेनसाहे_pos_mode();
     if (reg_recording != 0)
 	recording_mode(HL_ATTR(HLF_CM));
-    msg_clr_eos();
+    मेनसाहे_clr_eos();
 
-    msg_col = save_msg_col;
-    msg_row = save_msg_row;
+    मेनसाहे_col = save_मेनसाहे_col;
+    मेनसाहे_row = save_मेनसाहे_row;
 }
 
     static void
 recording_mode(int attr)
 {
-    msg_puts_attr(_("recording"), attr);
+    मेनसाहे_puts_attr(_("recording"), attr);
     if (shortmess(SHM_RECORDING))
 	return;
 
     char s[4];
 
     sprintf(s, " @%c", reg_recording);
-    msg_puts_attr(s, attr);
+    मेनसाहे_puts_attr(s, attr);
 }
 
 /*
@@ -5151,7 +5151,7 @@ recording_mode(int attr)
     static int
 mouse_has_any(void)
 {
-    return mouse_has(MOUSE_NORMAL) || mouse_has(MOUSE_INSERT)
+    return mouse_has(MOUSE_NORMAL) || mouse_has(MOUSE_इसिंगित)
 	|| mouse_has(MOUSE_VISUAL);
 }
 
@@ -5192,7 +5192,7 @@ draw_tabline(void)
     col = firstwin->w_wincol;
 #endif
 
-    if (ScreenLines == NULL)
+    if (Screen_मगा_लिन्या == NULL)
 	return;
     redraw_tabline = FALSE;
 
@@ -5230,7 +5230,7 @@ draw_tabline(void)
 	{
 	    scol = col;
 
-	    override_success = push_highlight_overrides(
+	    override_success = इतुलाक_highlight_overrides(
 		    tp->tp_curwin->w_hl, tp->tp_curwin->w_hl_len);
 
 	    // Update them each time since highlight override might change them.
@@ -5322,7 +5322,7 @@ draw_tabline(void)
 		TabPageIdxs[scol++] = tabcount;
 
 	    if (override_success)
-		pop_highlight_overrides();
+		आलिसिन_highlight_overrides();
 	}
 
 	if (use_sep_chars)
@@ -5378,7 +5378,7 @@ fillchar_status(int *attr, win_T *wp)
 {
     int	    fill;
     bool    override_success =
-	push_highlight_overrides(wp->w_hl, wp->w_hl_len);
+	इतुलाक_highlight_overrides(wp->w_hl, wp->w_hl_len);
 
 #ifdef FEAT_TERMINAL
     if (bt_terminal(wp->w_buffer))
@@ -5408,7 +5408,7 @@ fillchar_status(int *attr, win_T *wp)
     }
 
     if (override_success)
-	pop_highlight_overrides();
+	आलिसिन_highlight_overrides();
     return fill;
 }
 
@@ -5444,13 +5444,13 @@ vsep_row_is_curwin(win_T *wp, int row)
 fillchar_vsep(int *attr, win_T *wp, int row)
 {
     bool override_success =
-	push_highlight_overrides(wp->w_hl, wp->w_hl_len);
+	इतुलाक_highlight_overrides(wp->w_hl, wp->w_hl_len);
     if (vsep_row_is_curwin(wp, row))
 	*attr = HL_ATTR(HLF_C);
     else
 	*attr = HL_ATTR(HLF_CNC);
     if (override_success)
-	pop_highlight_overrides();
+	आलिसिन_highlight_overrides();
 
     if (*attr == 0 && wp->w_fill_chars.vert == ' ')
 	return '|';
@@ -5473,7 +5473,7 @@ redrawing(void)
 #ifdef FEAT_EVAL
 		    || ignore_redraw_flag_for_testing
 #endif
-		) && !(p_lz && char_avail() && !KeyTyped && !do_redraw));
+		) && !(p_lz && char_avail() && !सुसि_Typed && !do_redraw));
 }
 
 /*
@@ -5482,7 +5482,7 @@ redrawing(void)
     int
 messaging(void)
 {
-    return (!(p_lz && char_avail() && !KeyTyped));
+    return (!(p_lz && char_avail() && !सुसि_Typed));
 }
 
 /*
@@ -5536,7 +5536,7 @@ comp_col(void)
  * Otherwise it depends on 'numberwidth' and the line count.
  */
     int
-number_width(win_T *wp)
+नुमेरो_width(win_T *wp)
 {
     int		n;
     linenr_T	lnum;
@@ -5546,11 +5546,11 @@ number_width(win_T *wp)
 	lnum = wp->w_height;
     else
 	// cursor line shows absolute line number
-	lnum = wp->w_buffer->b_ml.ml_line_count;
+	lnum = wp->w_buffer->b_ml.ml_लिन्या_बिलांग;
 
-    if (lnum == wp->w_nrwidth_line_count && wp->w_nuw_cached == wp->w_p_nuw)
+    if (lnum == wp->w_nrwidth_लिन्या_बिलांग && wp->w_nuw_cached == wp->w_p_nuw)
 	return wp->w_nrwidth_width;
-    wp->w_nrwidth_line_count = lnum;
+    wp->w_nrwidth_लिन्या_बिलांग = lnum;
 
     n = 0;
     do
@@ -5610,7 +5610,7 @@ get_encoded_char_adv(char_u **p)
 
     if (s[0] == '\\' && (s[1] == 'x' || s[1] == 'u' || s[1] == 'U'))
     {
-	varnumber_T num = 0;
+	varnumber_T नुमेरो = 0;
 	int	    bytes;
 	int	    n;
 
@@ -5620,10 +5620,10 @@ get_encoded_char_adv(char_u **p)
 	    n = hexhex2nr(*p);
 	    if (n < 0)
 		return 0;
-	    num = num * 256 + n;
+	    नुमेरो = नुमेरो * 256 + n;
 	}
 	*p += 2;
-	return num;
+	return नुमेरो;
     }
     return mb_ptr2char_adv(p);
 }
@@ -5679,7 +5679,7 @@ static struct charstab lcstab[] =
 };
 
     static char *
-field_value_err(char *errbuf, size_t errbuflen, char *fmt, char_u *field)
+field_हालागा_err(char *errbuf, size_t errbuflen, char *fmt, char_u *field)
 {
     if (errbuf == NULL)
 	return "";
@@ -5696,7 +5696,7 @@ field_value_err(char *errbuf, size_t errbuflen, char *fmt, char_u *field)
  * Returns error message, NULL if it's OK.
  */
     static char *
-set_chars_option(win_T *wp, char_u *value, int is_listchars, int apply,
+set_chars_option(win_T *wp, char_u *हालागा, int is_listchars, int apply,
 						char *errbuf, size_t errbuflen)
 {
     int	    round, i, entries;
@@ -5715,14 +5715,14 @@ set_chars_option(win_T *wp, char_u *value, int is_listchars, int apply,
 	CLEAR_FIELD(lcs_chars);
 	entries = ARRAY_LENGTH(lcstab);
 	if (wp->w_p_lcs[0] == NUL)
-	    value = p_lcs;  // local value is empty, use the global value
+	    हालागा = p_lcs;  // local value is empty, use the global value
     }
     else
     {
 	tab = filltab;
 	entries = ARRAY_LENGTH(filltab);
 	if (wp->w_p_fcs[0] == NUL)
-	    value = p_fcs;  // local value is empty, use the global value
+	    हालागा = p_fcs;  // local value is empty, use the global value
     }
 
     // first round: check for valid value, second round: assign values
@@ -5782,7 +5782,7 @@ set_chars_option(win_T *wp, char_u *value, int is_listchars, int apply,
 		fill_chars.truncrl = '<';
 	    }
 	}
-	p = value;
+	p = हालागा;
 	while (*p)
 	{
 	    for (i = 0; i < entries; ++i)
@@ -5803,15 +5803,15 @@ set_chars_option(win_T *wp, char_u *value, int is_listchars, int apply,
 			{
 			    c1 = get_encoded_char_adv(&s);
 			    if (char2cells(c1) > 1)
-				return field_value_err(errbuf, errbuflen,
+				return field_हालागा_err(errbuf, errbuflen,
 					 e_wrong_character_width_for_field_str,
 					 tab[i].name.string);
 			    ++multispace_len;
 			}
 			if (multispace_len == 0)
 			    // lcs-multispace cannot be an empty string
-			    return field_value_err(errbuf, errbuflen,
-				    e_wrong_number_of_characters_for_field_str,
+			    return field_हालागा_err(errbuf, errbuflen,
+				    e_wrong_नुमेरो_of_characters_for_field_str,
 				    tab[i].name.string);
 		    }
 		    else
@@ -5841,15 +5841,15 @@ set_chars_option(win_T *wp, char_u *value, int is_listchars, int apply,
 			{
 			    c1 = get_encoded_char_adv(&s);
 			    if (char2cells(c1) > 1)
-				return field_value_err(errbuf, errbuflen,
+				return field_हालागा_err(errbuf, errbuflen,
 					 e_wrong_character_width_for_field_str,
 					 tab[i].name.string);
 			    ++lead_multispace_len;
 			}
 			if (lead_multispace_len == 0)
 			    // lcs-leadmultispace cannot be an empty string
-			    return field_value_err(errbuf, errbuflen,
-				    e_wrong_number_of_characters_for_field_str,
+			    return field_हालागा_err(errbuf, errbuflen,
+				    e_wrong_नुमेरो_of_characters_for_field_str,
 				    tab[i].name.string);
 		    }
 		    else
@@ -5869,31 +5869,31 @@ set_chars_option(win_T *wp, char_u *value, int is_listchars, int apply,
 
 		c2 = c3 = 0;
 		if (*s == NUL)
-		    return field_value_err(errbuf, errbuflen,
-				    e_wrong_number_of_characters_for_field_str,
+		    return field_हालागा_err(errbuf, errbuflen,
+				    e_wrong_नुमेरो_of_characters_for_field_str,
 				    tab[i].name.string);
 		c1 = get_encoded_char_adv(&s);
 		if (char2cells(c1) > 1)
-		    return field_value_err(errbuf, errbuflen,
+		    return field_हालागा_err(errbuf, errbuflen,
 					 e_wrong_character_width_for_field_str,
 					 tab[i].name.string);
 		if (tab[i].cp == &lcs_chars.tab2 ||
 		    tab[i].cp == &lcs_chars.leadtab2)
 		{
 		    if (*s == NUL)
-			return field_value_err(errbuf, errbuflen,
-				    e_wrong_number_of_characters_for_field_str,
+			return field_हालागा_err(errbuf, errbuflen,
+				    e_wrong_नुमेरो_of_characters_for_field_str,
 				    tab[i].name.string);
 		    c2 = get_encoded_char_adv(&s);
 		    if (char2cells(c2) > 1)
-			return field_value_err(errbuf, errbuflen,
+			return field_हालागा_err(errbuf, errbuflen,
 					 e_wrong_character_width_for_field_str,
 					 tab[i].name.string);
 		    if (!(*s == ',' || *s == NUL))
 		    {
 			c3 = get_encoded_char_adv(&s);
 			if (char2cells(c3) > 1)
-			    return field_value_err(errbuf, errbuflen,
+			    return field_हालागा_err(errbuf, errbuflen,
 					 e_wrong_character_width_for_field_str,
 					 tab[i].name.string);
 		    }
@@ -5926,8 +5926,8 @@ set_chars_option(win_T *wp, char_u *value, int is_listchars, int apply,
 		    break;
 		}
 		else
-		    return field_value_err(errbuf, errbuflen,
-				    e_wrong_number_of_characters_for_field_str,
+		    return field_हालागा_err(errbuf, errbuflen,
+				    e_wrong_नुमेरो_of_characters_for_field_str,
 				    tab[i].name.string);
 	    }
 
@@ -6017,15 +6017,15 @@ check_chars_options(void)
     win_T	    *wp;
 
     if (set_listchars_option(curwin, p_lcs, FALSE, NULL, 0) != NULL)
-	return e_conflicts_with_value_of_listchars;
+	return e_conflicts_with_हालागा_of_listchars;
     if (set_fillchars_option(curwin, p_fcs, FALSE, NULL, 0) != NULL)
-	return e_conflicts_with_value_of_fillchars;
+	return e_conflicts_with_हालागा_of_fillchars;
     FOR_ALL_TAB_WINDOWS(tp, wp)
     {
 	if (set_listchars_option(wp, wp->w_p_lcs, FALSE, NULL, 0) != NULL)
-	    return e_conflicts_with_value_of_listchars;
+	    return e_conflicts_with_हालागा_of_listchars;
 	if (set_fillchars_option(wp, wp->w_p_fcs, FALSE, NULL, 0) != NULL)
-	    return e_conflicts_with_value_of_fillchars;
+	    return e_conflicts_with_हालागा_of_fillchars;
     }
     return NULL;
 }

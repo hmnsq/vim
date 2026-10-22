@@ -26,9 +26,9 @@ extern int	prt_curr_bold;
 extern int	prt_curr_underline;
 extern long_u	prt_curr_bg;
 extern long_u	prt_curr_fg;
-extern int	prt_page_count;
+extern int	prt_page_बिलांग;
 
-# if defined(FEAT_POSTSCRIPT) || defined(FEAT_PRINT_PANGO)
+# if defined(FEAT_POSTSCRIPT) || defined(FEAT_इलिम्बाग_PANGO)
 typedef struct
 {
     char	*name;

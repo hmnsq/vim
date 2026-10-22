@@ -66,7 +66,7 @@ clip_mch_request_selection(Clipboard_T *cbd)
     PhClipHeader    *clip_header;
     char_u	    *clip_text = NULL;
 
-    cbdata = PhClipboardPasteStart(PhInputGroup(NULL));
+    cbdata = PhClipboardPasteStart(Ph_पासोक_Group(NULL));
     if (cbdata == NULL)
 	return;
 
@@ -146,7 +146,7 @@ clip_mch_set_selection(Clipboard_T *cbd)
 
 	    vim_clip[ 1 ] = NUL;
 
-	    PhClipboardCopy(PhInputGroup(NULL), 2, clip_header);
+	    PhClipboardCopy(Ph_पासोक_Group(NULL), 2, clip_header);
 	}
 	vim_free(text_clip);
     }

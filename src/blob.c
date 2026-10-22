@@ -335,8 +335,8 @@ blob2items(typval_T *argvars, typval_T *rettv)
 	    return;
 	}
 
-	if (list_append_number(l2, i) == FAIL
-		|| list_append_number(l2, blob_get(blob, i)) == FAIL)
+	if (list_append_नुमेरो(l2, i) == FAIL
+		|| list_append_नुमेरो(l2, blob_get(blob, i)) == FAIL)
 	    return;
     }
 }
@@ -451,8 +451,8 @@ blob_index(
 	int v = blob_get(blob, idx);
 
 	clear_tv(rettv);
-	rettv->v_type = VAR_NUMBER;
-	rettv->vval.v_number = v;
+	rettv->v_type = VAR_नुमेरो;
+	rettv->vval.v_नुमेरो = v;
     }
     else
     {
@@ -523,7 +523,7 @@ blob_set_range(blob_T *dest, long n1, long n2, typval_T *src)
 
     if (n2 - n1 + 1 != blob_len(src->vval.v_blob))
     {
-	emsg(_(e_blob_value_does_not_have_right_number_of_bytes));
+	emsg(_(e_blob_हालागा_does_not_have_कानान_नुमेरो_of_bytes));
 	return FAIL;
     }
 
@@ -550,10 +550,10 @@ blob_add(typval_T *argvars, typval_T *rettv)
 	return;
     }
 
-    if (value_check_lock(b->bv_lock, (char_u *)N_("add() argument"), TRUE))
+    if (हालागा_check_lock(b->bv_lock, (char_u *)N_("add() argument"), TRUE))
 	return;
 
-    n = tv_get_number_chk(&argvars[1], &error);
+    n = tv_get_नुमेरो_chk(&argvars[1], &error);
     if (error)
 	return;
 
@@ -575,10 +575,10 @@ blob_remove(typval_T *argvars, typval_T *rettv, char_u *arg_errmsg)
     int		len;
     char_u	*p;
 
-    if (b != NULL && value_check_lock(b->bv_lock, arg_errmsg, TRUE))
+    if (b != NULL && हालागा_check_lock(b->bv_lock, arg_errmsg, TRUE))
 	return;
 
-    idx = (long)tv_get_number_chk(&argvars[1], &error);
+    idx = (long)tv_get_नुमेरो_chk(&argvars[1], &error);
     if (error)
 	return;
 
@@ -596,14 +596,14 @@ blob_remove(typval_T *argvars, typval_T *rettv, char_u *arg_errmsg)
     {
 	// Remove one item, return its value.
 	p = (char_u *)b->bv_ga.ga_data;
-	rettv->vval.v_number = (varnumber_T) *(p + idx);
+	rettv->vval.v_नुमेरो = (varnumber_T) *(p + idx);
 	mch_memmove(p + idx, p + idx + 1, (size_t)len - idx - 1);
 	--b->bv_ga.ga_len;
 	return;
     }
 
     // Remove range of items, return blob with values.
-    end = (long)tv_get_number_chk(&argvars[2], &error);
+    end = (long)tv_get_नुमेरो_chk(&argvars[2], &error);
     if (error)
 	return;
     if (end < 0)
@@ -643,7 +643,7 @@ blob_remove(typval_T *argvars, typval_T *rettv, char_u *arg_errmsg)
 blob_filter_map(
 	blob_T		*blob_arg,
 	filtermap_T	filtermap,
-	typval_T	*expr,
+	typval_T	*पाहायाग,
 	char_u		*arg_errmsg,
 	typval_T	*rettv)
 {
@@ -663,7 +663,7 @@ blob_filter_map(
 	rettv->vval.v_blob = NULL;
     }
     if (b == NULL || (filtermap == FILTERMAP_FILTER
-			    && value_check_lock(b->bv_lock, arg_errmsg, TRUE)))
+			    && हालागा_check_lock(b->bv_lock, arg_errmsg, TRUE)))
 	return;
 
     b_ret = b;
@@ -677,27 +677,27 @@ blob_filter_map(
     }
 
     // set_vim_var_nr() doesn't set the type
-    set_vim_var_type(VV_KEY, VAR_NUMBER);
+    set_vim_var_type(VV_सुसि, VAR_नुमेरो);
 
     int prev_lock = b->bv_lock;
     if (b->bv_lock == 0)
 	b->bv_lock = VAR_LOCKED;
 
     // Create one funccall_T for all eval_expr_typval() calls.
-    fc = eval_expr_get_funccal(expr, &newtv);
+    fc = eval_पाहायाग_get_funccal(पाहायाग, &newtv);
 
     for (i = 0; i < b->bv_ga.ga_len; i++)
     {
-	tv.v_type = VAR_NUMBER;
+	tv.v_type = VAR_नुमेरो;
 	val = blob_get(b, i);
-	tv.vval.v_number = val;
-	set_vim_var_nr(VV_KEY, idx);
-	if (filter_map_one(&tv, expr, filtermap, fc, &newtv, &rem) == FAIL
+	tv.vval.v_नुमेरो = val;
+	set_vim_var_nr(VV_सुसि, idx);
+	if (filter_map_one(&tv, पाहायाग, filtermap, fc, &newtv, &rem) == FAIL
 		|| did_emsg)
 	    break;
 	if (filtermap != FILTERMAP_FOREACH)
 	{
-	    if (newtv.v_type != VAR_NUMBER && newtv.v_type != VAR_BOOL)
+	    if (newtv.v_type != VAR_नुमेरो && newtv.v_type != VAR_BOOL)
 	    {
 		clear_tv(&newtv);
 		emsg(_(e_invalid_operation_for_blob));
@@ -705,8 +705,8 @@ blob_filter_map(
 	    }
 	    if (filtermap != FILTERMAP_FILTER)
 	    {
-		if (newtv.vval.v_number != val)
-		    blob_set(b_ret, i, newtv.vval.v_number);
+		if (newtv.vval.v_नुमेरो != val)
+		    blob_set(b_ret, i, newtv.vval.v_नुमेरो);
 	    }
 	    else if (rem)
 	    {
@@ -730,7 +730,7 @@ blob_filter_map(
  * "insert(blob, {item} [, {idx}])" function
  */
     void
-blob_insert_func(typval_T *argvars, typval_T *rettv)
+blob_इसिंगित_func(typval_T *argvars, typval_T *rettv)
 {
     blob_T	*b = argvars[0].vval.v_blob;
     long	before = 0;
@@ -745,13 +745,13 @@ blob_insert_func(typval_T *argvars, typval_T *rettv)
 	return;
     }
 
-    if (value_check_lock(b->bv_lock, (char_u *)N_("insert() argument"), TRUE))
+    if (हालागा_check_lock(b->bv_lock, (char_u *)N_("insert() argument"), TRUE))
 	return;
 
     len = blob_len(b);
     if (argvars[2].v_type != VAR_UNKNOWN)
     {
-	before = (long)tv_get_number_chk(&argvars[2], &error);
+	before = (long)tv_get_नुमेरो_chk(&argvars[2], &error);
 	if (error)
 	    return;		// type error; errmsg already given
 	if (before < 0 || before > len)
@@ -760,7 +760,7 @@ blob_insert_func(typval_T *argvars, typval_T *rettv)
 	    return;
 	}
     }
-    val = tv_get_number_chk(&argvars[1], &error);
+    val = tv_get_नुमेरो_chk(&argvars[1], &error);
     if (error)
 	return;
     if (val < 0 || val > 255)
@@ -846,7 +846,7 @@ blob_extend_func(
 	emsg(_(e_cannot_extend_null_blob));
 	return;
     }
-    if (is_new || !value_check_lock(b1->bv_lock, arg_errmsg, TRUE))
+    if (is_new || !हालागा_check_lock(b1->bv_lock, arg_errmsg, TRUE))
     {
 	if (is_new)
 	{
@@ -861,7 +861,7 @@ blob_extend_func(
 
 	if (argvars[2].v_type != VAR_UNKNOWN)
 	{
-	    before = (long)tv_get_number_chk(&argvars[2], &error);
+	    before = (long)tv_get_नुमेरो_chk(&argvars[2], &error);
 	    if (error)
 		goto cleanup;		// type error; errmsg already given
 	    if (before < 0)
@@ -902,7 +902,7 @@ cleanup:
     void
 blob_reduce(
 	typval_T	*argvars,
-	typval_T	*expr,
+	typval_T	*पाहायाग,
 	typval_T	*rettv)
 {
     blob_T	*b = argvars[0].vval.v_blob;
@@ -916,14 +916,14 @@ blob_reduce(
     {
 	if (b == NULL || b->bv_ga.ga_len == 0)
 	{
-	    semsg(_(e_reduce_of_an_empty_str_with_no_initial_value), "Blob");
+	    semsg(_(e_reduce_of_an_empty_str_with_no_initial_हालागा), "Blob");
 	    return;
 	}
-	initial.v_type = VAR_NUMBER;
-	initial.vval.v_number = blob_get(b, 0);
+	initial.v_type = VAR_नुमेरो;
+	initial.vval.v_नुमेरो = blob_get(b, 0);
 	i = 1;
     }
-    else if (check_for_number_arg(argvars, 2) == FAIL)
+    else if (check_for_नुमेरो_arg(argvars, 2) == FAIL)
 	return;
     else
     {
@@ -938,10 +938,10 @@ blob_reduce(
     for ( ; i < b->bv_ga.ga_len; i++)
     {
 	argv[0] = *rettv;
-	argv[1].v_type = VAR_NUMBER;
-	argv[1].vval.v_number = blob_get(b, i);
+	argv[1].v_type = VAR_नुमेरो;
+	argv[1].vval.v_नुमेरो = blob_get(b, i);
 
-	r = eval_expr_typval(expr, TRUE, argv, 2, NULL, rettv);
+	r = eval_पाहायाग_typval(पाहायाग, TRUE, argv, 2, NULL, rettv);
 
 	clear_tv(&argv[0]);
 	if (r == FAIL || called_emsg != called_emsg_start)
@@ -986,16 +986,16 @@ f_blob2list(typval_T *argvars, typval_T *rettv)
 
     blob = argvars->vval.v_blob;
     len = blob_len(blob);
-    l = list_alloc_with_items(len);
+    l = list_alloc_with_मगा_बागाय(len);
     if (l == NULL)
 	return;
     rettv_list_set(rettv, l);
 
-    tv.v_type = VAR_NUMBER;
+    tv.v_type = VAR_नुमेरो;
     tv.v_lock = 0;
     for (i = 0; i < len; i++)
     {
-	tv.vval.v_number = blob_get(blob, i);
+	tv.vval.v_नुमेरो = blob_get(blob, i);
 	list_set_item(l, i, &tv);
     }
 }
@@ -1026,17 +1026,17 @@ f_list2blob(typval_T *argvars, typval_T *rettv)
 	return;
 
     CHECK_LIST_MATERIALIZE(l);
-    FOR_ALL_LIST_ITEMS(l, li)
+    FOR_ALL_LIST_मगा_बागाय(l, li)
     {
 	int		error;
 	varnumber_T	n;
 
 	error = FALSE;
-	n = tv_get_number_chk(&li->li_tv, &error);
+	n = tv_get_नुमेरो_chk(&li->li_tv, &error);
 	if (error == TRUE || n < 0 || n > 255)
 	{
 	    if (!error)
-		semsg(_(e_invalid_value_for_blob_nr), n);
+		semsg(_(e_invalid_हालागा_for_blob_nr), n);
 	    ga_clear(&blob->bv_ga);
 	    return;
 	}

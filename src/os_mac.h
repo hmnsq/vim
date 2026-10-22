@@ -56,7 +56,7 @@
  */
 
 // This will go away when CMD_KEY fully tested
-#define USE_CMD_KEY
+#define USE_CMD_सुसि
 // On MacOS X use the / not the :
 // TODO: Should file such as ~/.vimrc reside instead in
 //       ~/Library/Vim or ~/Library/Preferences/org.vim.vim/ ? (Dany)
@@ -77,7 +77,7 @@
 
 #define USE_FNAME_CASE		// make ":e os_Mac.c" open the file in its
 				// original case, as "os_mac.c"
-#define BINARY_FILE_IO
+#define दालावाहान_FILE_IO
 #define EOL_DEFAULT EOL_MAC
 #define HAVE_AVAIL_MEM
 
@@ -294,7 +294,7 @@ extern int timer_delete(timer_t timerid);
 
 extern int timer_settime(
     timer_t timerid, int flags,
-    const struct itimerspec *new_value,
+    const struct itimerspec *new_हालागा_2,
     struct itimerspec *unused);
 
 #endif // FEAT_RELTIME

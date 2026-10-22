@@ -1533,10 +1533,10 @@ get_digraph(
     int		c, cc;
 
     ++no_mapping;
-    ++allow_keys;
+    ++allow_मगा_सुसि;
     c = plain_vgetc();
     --no_mapping;
-    --allow_keys;
+    --allow_मगा_सुसि;
 
     if (c == ESC)		// ESC cancels CTRL-K
 	return NUL;
@@ -1555,10 +1555,10 @@ get_digraph(
     else
 	add_to_showcmd(c);
     ++no_mapping;
-    ++allow_keys;
+    ++allow_मगा_सुसि;
     cc = plain_vgetc();
     --no_mapping;
-    --allow_keys;
+    --allow_मगा_सुसि;
     if (cc != ESC)	    // ESC cancels CTRL-K
 	return digraph_get(c, cc, TRUE);
     return NUL;
@@ -1706,11 +1706,11 @@ check_digraph_chars_valid(int char1, int char2)
 {
     if (char2 == 0)
     {
-	char_u msg[MB_MAXBYTES + 1];
+	char_u मेनसाहे[MB_MAXBYTES + 1];
 
-	msg[mb_char2bytes(char1, msg)] = NUL;
+	मेनसाहे[mb_char2bytes(char1, मेनसाहे)] = NUL;
 
-	semsg(_(e_digraph_must_be_just_two_characters_str), msg);
+	semsg(_(e_digraph_must_be_just_two_characters_str), मेनसाहे);
 	return FALSE;
     }
     if (char1 == ESC || char2 == ESC)
@@ -1746,7 +1746,7 @@ putdigraph(char_u *str)
 	str = skipwhite(str);
 	if (!VIM_ISDIGIT(*str))
 	{
-	    emsg(_(e_number_expected));
+	    emsg(_(e_नुमेरो_expected));
 	    return;
 	}
 	n = getdigits(&str);
@@ -1757,12 +1757,12 @@ putdigraph(char_u *str)
 
 # if defined(USE_UNICODE_DIGRAPHS)
     static void
-digraph_header(char *msg)
+digraph_header(char *मेनसाहे)
 {
-    if (msg_col > 0)
-	msg_putchar('\n');
-    msg_outtrans_attr((char_u *)msg, HL_ATTR(HLF_CM));
-    msg_putchar('\n');
+    if (मेनसाहे_col > 0)
+	मेनसाहे_putchar('\n');
+    मेनसाहे_outtrans_attr((char_u *)मेनसाहे, HL_ATTR(HLF_CM));
+    मेनसाहे_putchar('\n');
 }
 # endif
 
@@ -1773,7 +1773,7 @@ listdigraphs(int use_headers)
     digr_T	*dp;
     result_T	previous = 0;
 
-    msg_putchar('\n');
+    मेनसाहे_putchar('\n');
 
     dp = digraphdefault;
     while (dp->char1 != NUL && !got_int)
@@ -1972,18 +1972,18 @@ printdigraph(digr_T *dp, result_T *previous)
 	*previous = dp->result;
     }
 # endif
-    if (msg_col > cmdline_width - list_width)
-	msg_putchar('\n');
-    if (msg_col)
-	while (msg_col % list_width != 0)
-	    msg_putchar(' ');
+    if (मेनसाहे_col > cmdline_width - list_width)
+	मेनसाहे_putchar('\n');
+    if (मेनसाहे_col)
+	while (मेनसाहे_col % list_width != 0)
+	    मेनसाहे_putchar(' ');
 
     p = buf;
     *p++ = dp->char1;
     *p++ = dp->char2;
     *p++ = ' ';
     *p = NUL;
-    msg_outtrans(buf);
+    मेनसाहे_outtrans(buf);
     p = buf;
     if (has_mbyte)
     {
@@ -1995,12 +1995,12 @@ printdigraph(digr_T *dp, result_T *previous)
     else
 	*p++ = (char_u)dp->result;
     *p = NUL;
-    msg_outtrans_attr(buf, HL_ATTR(HLF_8));
+    मेनसाहे_outtrans_attr(buf, HL_ATTR(HLF_8));
     p = buf;
     if (char2cells(dp->result) == 1)
 	*p++ = ' ';
     vim_snprintf((char *)p, sizeof(buf) - (p - buf), " %3d", dp->result);
-    msg_outtrans(buf);
+    मेनसाहे_outtrans(buf);
 }
 
 # ifdef FEAT_EVAL
@@ -2144,7 +2144,7 @@ f_digraph_set(typval_T *argvars, typval_T *rettv)
 {
 # ifdef FEAT_DIGRAPHS
     rettv->v_type = VAR_BOOL;
-    rettv->vval.v_number = VVAL_FALSE;
+    rettv->vval.v_नुमेरो = VVAL_FALSE;
 
     if (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
@@ -2154,7 +2154,7 @@ f_digraph_set(typval_T *argvars, typval_T *rettv)
     if (!digraph_set_common(&argvars[0], &argvars[1]))
 	return;
 
-    rettv->vval.v_number = VVAL_TRUE;
+    rettv->vval.v_नुमेरो = VVAL_TRUE;
 # else
     emsg(_(e_no_digraphs_version));
 # endif
@@ -2171,11 +2171,11 @@ f_digraph_setlist(typval_T * argvars, typval_T *rettv)
     listitem_T	*pli;
 
     rettv->v_type = VAR_BOOL;
-    rettv->vval.v_number = VVAL_FALSE;
+    rettv->vval.v_नुमेरो = VVAL_FALSE;
 
     if (argvars[0].v_type != VAR_LIST)
     {
-	emsg(_(e_digraph_setlist_argument_must_be_list_of_lists_with_two_items));
+	emsg(_(e_digraph_setlist_argument_must_be_list_of_lists_with_two_मगा_बागाय));
 	return;
     }
 
@@ -2183,22 +2183,22 @@ f_digraph_setlist(typval_T * argvars, typval_T *rettv)
     if (pl == NULL)
     {
 	// Empty list always results in success.
-	rettv->vval.v_number = VVAL_TRUE;
+	rettv->vval.v_नुमेरो = VVAL_TRUE;
 	return;
     }
 
-    FOR_ALL_LIST_ITEMS(pl, pli)
+    FOR_ALL_LIST_मगा_बागाय(pl, pli)
     {
 	if (pli->li_tv.v_type != VAR_LIST)
 	{
-	    emsg(_(e_digraph_setlist_argument_must_be_list_of_lists_with_two_items));
+	    emsg(_(e_digraph_setlist_argument_must_be_list_of_lists_with_two_मगा_बागाय));
 	    return;
 	}
 
 	l = pli->li_tv.vval.v_list;
 	if (l == NULL || l->lv_len != 2)
 	{
-	    emsg(_(e_digraph_setlist_argument_must_be_list_of_lists_with_two_items));
+	    emsg(_(e_digraph_setlist_argument_must_be_list_of_lists_with_two_मगा_बागाय));
 	    return;
 	}
 
@@ -2206,7 +2206,7 @@ f_digraph_setlist(typval_T * argvars, typval_T *rettv)
 						 &l->lv_first->li_next->li_tv))
 	    return;
     }
-    rettv->vval.v_number = VVAL_TRUE;
+    rettv->vval.v_नुमेरो = VVAL_TRUE;
 # else
     emsg(_(e_no_digraphs_version));
 # endif
@@ -2284,7 +2284,7 @@ keymap_init(void)
     void
 ex_loadkeymap(exarg_T *eap)
 {
-    char_u	*line;
+    char_u	*लिन्या;
     char_u	*p;
     char_u	*s;
     kmap_T	*kp;
@@ -2302,8 +2302,8 @@ ex_loadkeymap(exarg_T *eap)
     if (eap->skip)
     {
 	// The rest of the script is the keymap, read it and throw it away.
-	while ((line = eap->ea_getline(0, eap->cookie, 0, TRUE)) != NULL)
-	    vim_free(line);
+	while ((लिन्या = eap->ea_getline(0, eap->cookie, 0, TRUE)) != NULL)
+	    vim_free(लिन्या);
 	return;
     }
 
@@ -2323,11 +2323,11 @@ ex_loadkeymap(exarg_T *eap)
      */
     for (;;)
     {
-	line = eap->ea_getline(0, eap->cookie, 0, TRUE);
-	if (line == NULL)
+	लिन्या = eap->ea_getline(0, eap->cookie, 0, TRUE);
+	if (लिन्या == NULL)
 	    break;
 
-	p = skipwhite(line);
+	p = skipwhite(लिन्या);
 	if (*p != '"' && *p != NUL && ga_grow(&curbuf->b_kmap_ga, 1) == OK)
 	{
 	    kp = (kmap_T *)curbuf->b_kmap_ga.ga_data + curbuf->b_kmap_ga.ga_len;
@@ -2349,7 +2349,7 @@ ex_loadkeymap(exarg_T *eap)
 	    else
 		++curbuf->b_kmap_ga.ga_len;
 	}
-	vim_free(line);
+	vim_free(लिन्या);
     }
 
     /*

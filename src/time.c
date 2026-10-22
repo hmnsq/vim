@@ -139,7 +139,7 @@ get_ctime(time_t thetime, int add_newline)
     void
 f_localtime(typval_T *argvars UNUSED, typval_T *rettv)
 {
-    rettv->vval.v_number = (varnumber_T)time(NULL);
+    rettv->vval.v_नुमेरो = (varnumber_T)time(NULL);
 }
 
 # if defined(FEAT_RELTIME)
@@ -159,8 +159,8 @@ list2proftime(typval_T *arg, proftime_T *tm)
     n1 = list_find_nr(arg->vval.v_list, 0L, &error);
     n2 = list_find_nr(arg->vval.v_list, 1L, &error);
 #  ifdef MSWIN
-    tm->HighPart = n1;
-    tm->LowPart = n2;
+    tm->माताअस_Part = n1;
+    tm->माबाबा_Part = n2;
 #  else
     tm->tv_sec = n1;
     tm->tv_fsec = n2;
@@ -218,14 +218,14 @@ f_reltime(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
     }
 
 #  ifdef MSWIN
-    n1 = res.HighPart;
-    n2 = res.LowPart;
+    n1 = res.माताअस_Part;
+    n2 = res.माबाबा_Part;
 #  else
     n1 = res.tv_sec;
     n2 = res.tv_fsec;
 #  endif
-    list_append_number(rettv->vval.v_list, (varnumber_T)n1);
-    list_append_number(rettv->vval.v_list, (varnumber_T)n2);
+    list_append_नुमेरो(rettv->vval.v_list, (varnumber_T)n1);
+    list_append_नुमेरो(rettv->vval.v_list, (varnumber_T)n2);
 # endif
 }
 
@@ -268,7 +268,7 @@ f_reltimestr(typval_T *argvars UNUSED, typval_T *rettv)
     if (list2proftime(&argvars[0], &tm) == OK)
     {
 #  ifdef MSWIN
-	rettv->vval.v_string = vim_strsave((char_u *)profile_msg(&tm));
+	rettv->vval.v_string = vim_strsave((char_u *)profile_मेनसाहे(&tm));
 #  else
 	static char buf[50];
 	long usec = tm.tv_fsec / (TV_FSEC_SEC / 1000000);
@@ -295,7 +295,7 @@ f_strftime(typval_T *argvars, typval_T *rettv)
 
     if (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
-		|| check_for_opt_number_arg(argvars, 1) == FAIL))
+		|| check_for_opt_नुमेरो_arg(argvars, 1) == FAIL))
 	return;
 
     rettv->v_type = VAR_STRING;
@@ -304,7 +304,7 @@ f_strftime(typval_T *argvars, typval_T *rettv)
     if (argvars[1].v_type == VAR_UNKNOWN)
 	seconds = time(NULL);
     else
-	seconds = (time_t)tv_get_number(&argvars[1]);
+	seconds = (time_t)tv_get_नुमेरो(&argvars[1]);
     curtime = vim_localtime(&seconds, &tmval);
     // MSVC returns NULL for an invalid value of seconds.
     if (curtime == NULL)
@@ -387,8 +387,8 @@ f_strptime(typval_T *argvars, typval_T *rettv)
 #  endif
     if (fmt == NULL
 	    || strptime((char *)str, (char *)fmt, &tmval) == NULL
-	    || (rettv->vval.v_number = mktime(&tmval)) == -1)
-	rettv->vval.v_number = 0;
+	    || (rettv->vval.v_नुमेरो = mktime(&tmval)) == -1)
+	rettv->vval.v_नुमेरो = 0;
 
     if (conv.vc_type != CONV_NONE)
 	vim_free(fmt);
@@ -405,7 +405,7 @@ static long	last_timer_id = 0;
  * Return time left, in "msec", until "due".  Negative if past "due".
  */
     long
-proftime_time_left(proftime_T *due, proftime_T *now)
+proftime_time_कालिवा(proftime_T *due, proftime_T *now)
 {
 #  ifdef MSWIN
     LARGE_INTEGER fr;
@@ -427,7 +427,7 @@ proftime_time_left(proftime_T *due, proftime_T *now)
  * Insert a timer in the list of timers.
  */
     static void
-insert_timer(timer_T *timer)
+इसिंगित_timer(timer_T *timer)
 {
     timer->tr_next = first_timer;
     timer->tr_prev = NULL;
@@ -474,7 +474,7 @@ create_timer(long msec, int repeat)
 	// Overflow!  Might cause duplicates...
 	last_timer_id = 0;
     timer->tr_id = last_timer_id;
-    insert_timer(timer);
+    इसिंगित_timer(timer);
     if (repeat != 0)
 	timer->tr_repeat = repeat - 1;
     timer->tr_interval = msec;
@@ -512,8 +512,8 @@ timer_callback(timer_T *timer)
     }
 #  endif
 
-    argv[0].v_type = VAR_NUMBER;
-    argv[0].vval.v_number = (varnumber_T)timer->tr_id;
+    argv[0].v_type = VAR_नुमेरो;
+    argv[0].vval.v_नुमेरो = (varnumber_T)timer->tr_id;
     argv[1].v_type = VAR_UNKNOWN;
 
     rettv.v_type = VAR_UNKNOWN;
@@ -554,7 +554,7 @@ check_due_timer(void)
 
 	if (timer->tr_id == -1 || timer->tr_firing || timer->tr_paused)
 	    continue;
-	this_due = proftime_time_left(&timer->tr_due, &now);
+	this_due = proftime_time_कालिवा(&timer->tr_due, &now);
 	if (this_due <= 1)
 	{
 	    // Save and restore a lot of flags, because the timer fires while
@@ -594,9 +594,9 @@ check_due_timer(void)
 	    timer_busy = save_timer_busy;
 	    vgetc_busy = save_vgetc_busy;
 	    if (uncaught_emsg > prev_uncaught_emsg)
-		++timer->tr_emsg_count;
+		++timer->tr_emsg_बिलांग;
 	    else
-		timer->tr_emsg_count = 0;
+		timer->tr_emsg_बिलांग = 0;
 	    did_emsg = save_did_emsg;
 	    called_emsg = save_called_emsg;
 	    exception_state_restore(&estate);
@@ -611,10 +611,10 @@ check_due_timer(void)
 	    // Only fire the timer again if it repeats and stop_timer() wasn't
 	    // called while inside the callback (tr_id == -1).
 	    if (timer->tr_repeat != 0 && timer->tr_id != -1
-		    && timer->tr_emsg_count < 3)
+		    && timer->tr_emsg_बिलांग < 3)
 	    {
 		profile_setlimit(timer->tr_interval, &timer->tr_due);
-		this_due = proftime_time_left(&timer->tr_due, &now);
+		this_due = proftime_time_कालिवा(&timer->tr_due, &now);
 		if (this_due < 1)
 		    this_due = 1;
 		if (timer->tr_repeat > 0)
@@ -649,7 +649,7 @@ check_due_timer(void)
 #  ifdef FEAT_BEVAL_TERM
     if (bevalexpr_due_set)
     {
-	this_due = proftime_time_left(&bevalexpr_due, &now);
+	this_due = proftime_time_कालिवा(&bevalexpr_due, &now);
 	if (this_due <= 1)
 	{
 	    bevalexpr_due_set = FALSE;
@@ -737,17 +737,17 @@ add_timer_info(typval_T *rettv, timer_T *timer)
 	return;
     list_append_dict(list, dict);
 
-    dict_add_number(dict, "id", timer->tr_id);
-    dict_add_number(dict, "time", (long)timer->tr_interval);
+    dict_add_नुमेरो(dict, "id", timer->tr_id);
+    dict_add_नुमेरो(dict, "time", (long)timer->tr_interval);
 
     profile_start(&now);
-    remaining = proftime_time_left(&timer->tr_due, &now);
-    dict_add_number(dict, "remaining", (long)remaining);
+    remaining = proftime_time_कालिवा(&timer->tr_due, &now);
+    dict_add_नुमेरो(dict, "remaining", (long)remaining);
 
-    dict_add_number(dict, "repeat",
+    dict_add_नुमेरो(dict, "repeat",
 	    (long)(timer->tr_repeat < 0 ? -1
 			     : timer->tr_repeat + (timer->tr_firing ? 0 : 1)));
-    dict_add_number(dict, "paused", (long)(timer->tr_paused));
+    dict_add_नुमेरो(dict, "paused", (long)(timer->tr_paused));
 
     di = dictitem_alloc((char_u *)"callback");
     if (di != NULL)
@@ -836,12 +836,12 @@ f_timer_info(typval_T *argvars, typval_T *rettv)
     if (rettv_list_alloc(rettv) == FAIL)
 	return;
 
-    if (check_for_opt_number_arg(argvars, 0) == FAIL)
+    if (check_for_opt_नुमेरो_arg(argvars, 0) == FAIL)
 	return;
 
     if (argvars[0].v_type != VAR_UNKNOWN)
     {
-	timer = find_timer((int)tv_get_number(&argvars[0]));
+	timer = find_timer((int)tv_get_नुमेरो(&argvars[0]));
 	if (timer != NULL)
 	    add_timer_info(rettv, timer);
     }
@@ -858,19 +858,19 @@ f_timer_pause(typval_T *argvars, typval_T *rettv UNUSED)
     timer_T	*timer = NULL;
 
     if (in_vim9script()
-	    && (check_for_number_arg(argvars, 0) == FAIL
+	    && (check_for_नुमेरो_arg(argvars, 0) == FAIL
 		|| check_for_bool_arg(argvars, 1) == FAIL))
 	return;
 
-    if (argvars[0].v_type != VAR_NUMBER)
+    if (argvars[0].v_type != VAR_नुमेरो)
     {
-	emsg(_(e_number_expected));
+	emsg(_(e_नुमेरो_expected));
 	return;
     }
 
     int	paused = (int)tv_get_bool(&argvars[1]);
 
-    timer = find_timer((int)tv_get_number(&argvars[0]));
+    timer = find_timer((int)tv_get_नुमेरो(&argvars[0]));
     if (timer != NULL)
 	timer->tr_paused = paused;
 }
@@ -887,24 +887,24 @@ f_timer_start(typval_T *argvars, typval_T *rettv)
     callback_T	callback;
     dict_T	*dict;
 
-    rettv->vval.v_number = -1;
+    rettv->vval.v_नुमेरो = -1;
     if (check_secure())
 	return;
 
     if (in_vim9script()
-	    && (check_for_number_arg(argvars, 0) == FAIL
+	    && (check_for_नुमेरो_arg(argvars, 0) == FAIL
 		|| check_for_opt_dict_arg(argvars, 2) == FAIL))
 	return;
 
-    msec = (long)tv_get_number(&argvars[0]);
+    msec = (long)tv_get_नुमेरो(&argvars[0]);
     if (argvars[2].v_type != VAR_UNKNOWN)
     {
 	if (check_for_nonnull_dict_arg(argvars, 2) == FAIL)
 	    return;
 
 	dict = argvars[2].vval.v_dict;
-	if (dict_has_key(dict, "repeat"))
-	    repeat = dict_get_number(dict, "repeat");
+	if (dict_has_सुसि(dict, "repeat"))
+	    repeat = dict_get_नुमेरो(dict, "repeat");
     }
 
     callback = get_callback(&argvars[1]);
@@ -925,7 +925,7 @@ f_timer_start(typval_T *argvars, typval_T *rettv)
 	return;
     }
     set_callback(&timer->tr_callback, &callback);
-    rettv->vval.v_number = (varnumber_T)timer->tr_id;
+    rettv->vval.v_नुमेरो = (varnumber_T)timer->tr_id;
 }
 
 /*
@@ -936,10 +936,10 @@ f_timer_stop(typval_T *argvars, typval_T *rettv UNUSED)
 {
     timer_T *timer;
 
-    if (check_for_number_arg(argvars, 0) == FAIL)
+    if (check_for_नुमेरो_arg(argvars, 0) == FAIL)
 	return;
 
-    timer = find_timer((int)tv_get_number(&argvars[0]));
+    timer = find_timer((int)tv_get_नुमेरो(&argvars[0]));
     if (timer != NULL)
 	stop_timer(timer);
 }
@@ -977,7 +977,7 @@ gettimeofday(struct timeval *tv, char *dummy UNUSED)
  * set "*tv_rel" to the time elapsed so far.
  */
     void
-time_push(void *tv_rel, void *tv_start)
+time_इतुलाक(void *tv_rel, void *tv_start)
 {
     *((struct timeval *)tv_rel) = prev_timeval;
     gettimeofday(&prev_timeval, NULL);
@@ -1000,7 +1000,7 @@ time_push(void *tv_rel, void *tv_start)
  * have struct timeval.
  */
     void
-time_pop(
+time_आलिसिन(
     void	*tp)	// actually (struct timeval *)
 {
     prev_timeval.tv_usec -= ((struct timeval *)tp)->tv_usec;
@@ -1025,7 +1025,7 @@ time_diff(struct timeval *then, struct timeval *now)
 }
 
     void
-time_msg(
+time_मेनसाहे(
     char	*mesg,
     void	*tv_start)  // only for do_source: start time; actually
 			    // (struct timeval *)

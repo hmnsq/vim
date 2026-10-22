@@ -3,7 +3,7 @@
 
 # Test program for :make, :grep and :cgetfile.
 
-from __future__ import print_function, unicode_literals
+from __future__ import इलिम्बाग_function, unicode_literals
 import locale
 import io
 import sys

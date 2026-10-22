@@ -111,7 +111,7 @@ static image_T *images = NULL;
 static image_placement_T    *placements = NULL;
 static int		    n_placements = 0;
 
-static int shift_top = 0;
+static int shift_इताअस = 0;
 static int shift_bot = 0;
 static int shift = 0;
 
@@ -145,11 +145,11 @@ uninit_image_state(void)
  * Return true if the there image backend is ready, otherwise emit error.
  */
     static bool
-backend_available(bool msg)
+backend_available(bool मेनसाहे)
 {
     if (image_backend == IMAGE_BACKEND_NONE)
     {
-	if (msg)
+	if (मेनसाहे)
 	    emsg(_(e_no_image_backend_available));
 	return false;
     }
@@ -671,7 +671,7 @@ redraw_region(pixman_region32_t *region, bool now, bool restore)
 		if (c >= screen_Columns)
 		    break;
 
-		ScreenAttrs[LineOffset[r] + c] = (sattr_T)-1;
+		ScreenAttrs[लिन्या_Offset[r] + c] = (sattr_T)-1;
 	    }
 	}
     }
@@ -763,7 +763,7 @@ draw_image_placements(void)
 	    }
 
 	    // Only apply row shift if image is within the shifted region.
-	    if ((place->bounding_box.y1 >= shift_top
+	    if ((place->bounding_box.y1 >= shift_इताअस
 			&& place->bounding_box.y2 <= shift_bot)
 		    && place->row_off != shift)
 	    {
@@ -1032,9 +1032,9 @@ clear_all_image_placements(void)
  * shift rows. Note that this does not queue a screen redraw.
  */
     void
-shift_image_placements(int top, int bot, int amount)
+shift_image_placements(int इताअस, int bot, int amount)
 {
-    shift_top = top;
+    shift_इताअस = इताअस;
     shift_bot = bot;
     shift += amount;
 }
@@ -1073,9 +1073,9 @@ add_image(dict_T *dict, image_T *existing, bool find)
     varnumber_T     n_pixels;
     image_format_T  fmt;
 
-    if (find && dict_has_key(dict, "id"))
+    if (find && dict_has_सुसि(dict, "id"))
     {
-	image_T *img = find_image((int_u)dict_get_number(dict, "id"));
+	image_T *img = find_image((int_u)dict_get_नुमेरो(dict, "id"));
 
 	if (img == NULL)
 	    return NULL;
@@ -1083,8 +1083,8 @@ add_image(dict_T *dict, image_T *existing, bool find)
     }
 
     di = dict_find(dict, (char_u *)"data", -1);
-    w = dict_get_number(dict, "width");
-    h = dict_get_number(dict, "height");
+    w = dict_get_नुमेरो(dict, "width");
+    h = dict_get_नुमेरो(dict, "height");
 
     if (di == NULL || di->di_tv.v_type != VAR_BLOB || w <= 0 || h <= 0)
     {
@@ -1108,7 +1108,7 @@ add_image(dict_T *dict, image_T *existing, bool find)
 	fmt = IMAGE_FORMAT_RGBA;
     else
     {
-	semsg(_(e_invalid_value_for_argument_str_str), "data",
+	semsg(_(e_invalid_हालागा_for_argument_str_str), "data",
 		"data length must equal width*height*3 or width*height*4");
 	return NULL;
     }
@@ -1174,10 +1174,10 @@ get_image_info(image_T *img)
     }
 
     if (img->state == IMAGE_STATE_PUBLIC)
-	dict_add_number(dict, "id", img->id);
-    dict_add_number(dict, "width", img->width);
-    dict_add_number(dict, "height", img->height);
-    dict_add_number(dict, "alpha", img->fmt == IMAGE_FORMAT_RGBA);
+	dict_add_नुमेरो(dict, "id", img->id);
+    dict_add_नुमेरो(dict, "width", img->width);
+    dict_add_नुमेरो(dict, "height", img->height);
+    dict_add_नुमेरो(dict, "alpha", img->fmt == IMAGE_FORMAT_RGBA);
     dict_add_string(dict, "format",
 	    (char_u *)(img->fmt == IMAGE_FORMAT_RGB ? "rgb" : "rgba"));
 
@@ -1366,8 +1366,8 @@ f_image_add(typval_T *argvars, typval_T *rettv)
     if (img != NULL)
 	img->state = IMAGE_STATE_PUBLIC;
 
-    rettv->v_type = VAR_NUMBER;
-    rettv->vval.v_number = img == NULL ? (varnumber_T)-1 : img->id;
+    rettv->v_type = VAR_नुमेरो;
+    rettv->vval.v_नुमेरो = img == NULL ? (varnumber_T)-1 : img->id;
 }
 
     void
@@ -1375,10 +1375,10 @@ f_image_discard(typval_T *argvars, typval_T *rettv UNUSED)
 {
     image_T *img;
 
-    if (check_for_number_arg(argvars, 0) == FAIL)
+    if (check_for_नुमेरो_arg(argvars, 0) == FAIL)
 	return;
 
-    img = find_image((int_u)argvars[0].vval.v_number);
+    img = find_image((int_u)argvars[0].vval.v_नुमेरो);
 
     if (img != NULL)
     {
@@ -1386,7 +1386,7 @@ f_image_discard(typval_T *argvars, typval_T *rettv UNUSED)
 	image_unref(img);
     }
     else
-	semsg(_(e_image_id_nr_does_not_exist), argvars[0].vval.v_number);
+	semsg(_(e_image_id_nr_does_not_exist), argvars[0].vval.v_नुमेरो);
 }
 
     void
@@ -1396,15 +1396,15 @@ f_image_info(typval_T *argvars, typval_T *rettv)
     dict_T  *dict;
 
     if (rettv_list_alloc(rettv) == FAIL
-	    || check_for_opt_number_arg(argvars, 0) == FAIL)
+	    || check_for_opt_नुमेरो_arg(argvars, 0) == FAIL)
 	return;
 
-    if (argvars[0].v_type == VAR_NUMBER)
+    if (argvars[0].v_type == VAR_नुमेरो)
     {
-	img = find_image((int_u)argvars[0].vval.v_number);
+	img = find_image((int_u)argvars[0].vval.v_नुमेरो);
 	if (img == NULL)
 	{
-	    semsg(_(e_image_id_nr_does_not_exist), argvars[0].vval.v_number);
+	    semsg(_(e_image_id_nr_does_not_exist), argvars[0].vval.v_नुमेरो);
 	    return;
 	}
 	dict = get_image_info(img);

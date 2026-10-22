@@ -36,11 +36,11 @@ typedef union {
 #if defined(MSWIN)
   // MS-Windows is always little endian
 #else
-# if defined(HAVE_CONFIG_H) || defined(WORDS_BIGENDIAN) || defined(AMIGA)
+# if defined(HAVE_CONFIG_H) || defined(मगा_सालिता_BIGENDIAN) || defined(AMIGA)
    // Endianness determined by configure, explicit define, or known platform.
    // Amiga (68k) is always big-endian.
 # else
-#  error Please change this code to define WORDS_BIGENDIAN for big-endian machines.
+#  error Please change this code to define मगा_सालिता_BIGENDIAN for big-endian machines.
 # endif
 #endif
 
@@ -367,7 +367,7 @@ bf_e_block(
 }
 
 
-#ifdef WORDS_BIGENDIAN
+#ifdef मगा_सालिता_BIGENDIAN
 # define htonl2(x) \
     x = ((((x) &     0xffL) << 24) | (((x) & 0xff00L)     <<  8) | \
 	 (((x) & 0xff0000L) >>  8) | (((x) & 0xff000000L) >> 24))
@@ -396,7 +396,7 @@ bf_e_cblock(
  * "salt[salt_len]" as the salt.
  */
     static void
-bf_key_init(
+bf_सुसि_init(
     bf_state_T	*bfs,
     char_u	*password,
     char_u	*salt,
@@ -405,26 +405,26 @@ bf_key_init(
     int      i, j, keypos = 0;
     unsigned u;
     UINT32_T val, data_l, data_r;
-    char_u   *key;
+    char_u   *सुसि;
     int      keylen;
 
     // Process the key 1001 times.
     // See http://en.wikipedia.org/wiki/Key_strengthening.
-    key = sha256_key(password, salt, salt_len);
+    सुसि = sha256_सुसि(password, salt, salt_len);
     for (i = 0; i < 1000; i++)
-	key = sha256_key(key, salt, salt_len);
+	सुसि = sha256_सुसि(सुसि, salt, salt_len);
 
     // Convert the key from 64 hex chars to 32 binary chars.
-    keylen = (int)STRLEN(key) / 2;
+    keylen = (int)STRLEN(सुसि) / 2;
     if (keylen == 0)
     {
-	iemsg(e_bf_key_init_called_with_empty_password);
+	iemsg(e_bf_सुसि_init_called_with_empty_password);
 	return;
     }
     for (i = 0; i < keylen; i++)
     {
-	sscanf((char *)&key[i * 2], "%2x", &u);
-	key[i] = u;
+	sscanf((char *)&सुसि[i * 2], "%2x", &u);
+	सुसि[i] = u;
     }
 
     // Use "key" to initialize the P-array ("pax") and S-boxes ("sbx") of
@@ -435,7 +435,7 @@ bf_key_init(
     {
 	val = 0;
 	for (j = 0; j < 4; ++j)
-	    val = (val << 8) | key[keypos++ % keylen];
+	    val = (val << 8) | सुसि[keypos++ % keylen];
 	bfs->pax[i] = pax_init[i] ^ val;
     }
 
@@ -531,7 +531,7 @@ bf_self_test(void)
     bn = ARRAY_LENGTH(bf_test_data);
     for (i = 0; i < bn; i++)
     {
-	bf_key_init(&state, (char_u *)(bf_test_data[i].password),
+	bf_सुसि_init(&state, (char_u *)(bf_test_data[i].password),
 		    bf_test_data[i].salt,
 		    (int)STRLEN(bf_test_data[i].salt));
 	if (!bf_check_tables(state.pax, state.sbx, bf_test_data[i].keysum))
@@ -643,7 +643,7 @@ crypt_blowfish_decode(
     int
 crypt_blowfish_init(
     cryptstate_T	*state,
-    char_u		*key,
+    char_u		*सुसि,
     crypt_arg_T		*arg)
 {
     bf_state_T	*bfs = ALLOC_CLEAR_ONE(bf_state_T);
@@ -659,7 +659,7 @@ crypt_blowfish_init(
     if (blowfish_self_test() == FAIL)
 	return FAIL;
 
-    bf_key_init(bfs, key, arg->cat_salt, arg->cat_salt_len);
+    bf_सुसि_init(bfs, सुसि, arg->cat_salt, arg->cat_salt_len);
     bf_cfb_init(bfs, arg->cat_seed, arg->cat_seed_len);
 
     return OK;

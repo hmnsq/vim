@@ -868,7 +868,7 @@ f_chdir(typval_T *argvars, typval_T *rettv)
 	    scope = CDSCOPE_WINDOW;
 	else
 	{
-	    semsg(_(e_invalid_value_for_argument_str_str), "scope", s);
+	    semsg(_(e_invalid_हालागा_for_argument_str_str), "scope", s);
 	    return;
 	}
     }
@@ -892,7 +892,7 @@ f_delete(typval_T *argvars, typval_T *rettv)
     char_u	*name;
     char_u	*flags;
 
-    rettv->vval.v_number = -1;
+    rettv->vval.v_नुमेरो = -1;
     if (check_restricted() || check_secure())
 	return;
 
@@ -915,13 +915,13 @@ f_delete(typval_T *argvars, typval_T *rettv)
 
     if (*flags == NUL)
 	// delete a file
-	rettv->vval.v_number = mch_remove(name) == 0 ? 0 : -1;
+	rettv->vval.v_नुमेरो = mch_remove(name) == 0 ? 0 : -1;
     else if (STRCMP(flags, "d") == 0)
 	// delete an empty directory
-	rettv->vval.v_number = mch_rmdir(name) == 0 ? 0 : -1;
+	rettv->vval.v_नुमेरो = mch_rmdir(name) == 0 ? 0 : -1;
     else if (STRCMP(flags, "rf") == 0)
 	// delete a directory recursively
-	rettv->vval.v_number = delete_recursive(name);
+	rettv->vval.v_नुमेरो = delete_recursive(name);
     else
 	semsg(_(e_invalid_expression_str), flags);
 }
@@ -936,7 +936,7 @@ f_executable(typval_T *argvars, typval_T *rettv)
 	return;
 
     // Check in $PATH and also check directly if there is a directory name.
-    rettv->vval.v_number = mch_can_exe(tv_get_string(&argvars[0]), NULL, TRUE);
+    rettv->vval.v_नुमेरो = mch_can_exe(tv_get_string(&argvars[0]), NULL, TRUE);
 }
 
 /*
@@ -962,7 +962,7 @@ f_filereadable(typval_T *argvars, typval_T *rettv)
 {
     if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
 	return;
-    rettv->vval.v_number = file_is_readable(tv_get_string(&argvars[0]));
+    rettv->vval.v_नुमेरो = file_is_readable(tv_get_string(&argvars[0]));
 }
 
 /*
@@ -974,7 +974,7 @@ f_filewritable(typval_T *argvars, typval_T *rettv)
 {
     if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
 	return;
-    rettv->vval.v_number = filewritable(tv_get_string(&argvars[0]));
+    rettv->vval.v_नुमेरो = filewritable(tv_get_string(&argvars[0]));
 }
 
     static void
@@ -988,7 +988,7 @@ findfilendir(
     char_u	*path = *curbuf->b_p_path == NUL ? p_path : curbuf->b_p_path;
     char_u	*p;
     char_u	pathbuf[NUMBUFLEN];
-    int		count = 1;
+    int		बिलांग = 1;
     int		first = TRUE;
     int		error = FALSE;
 
@@ -998,7 +998,7 @@ findfilendir(
 	    && (check_for_nonempty_string_arg(argvars, 0) == FAIL
 		|| check_for_opt_string_arg(argvars, 1) == FAIL
 		|| (argvars[1].v_type != VAR_UNKNOWN
-		    && check_for_opt_number_arg(argvars, 2) == FAIL)))
+		    && check_for_opt_नुमेरो_arg(argvars, 2) == FAIL)))
 	return;
 
     fname = tv_get_string(&argvars[0]);
@@ -1014,17 +1014,17 @@ findfilendir(
 		path = p;
 
 	    if (argvars[2].v_type != VAR_UNKNOWN)
-		count = (int)tv_get_number_chk(&argvars[2], &error);
+		बिलांग = (int)tv_get_नुमेरो_chk(&argvars[2], &error);
 	}
     }
 
-    if (count < 0 && rettv_list_alloc(rettv) == FAIL)
+    if (बिलांग < 0 && rettv_list_alloc(rettv) == FAIL)
 	error = TRUE;
 
     if (*fname != NUL && !error)
     {
 	char_u	*file_to_find = NULL;
-	char	*search_ctx = NULL;
+	char	*हानाप_ctx = NULL;
 
 	do
 	{
@@ -1037,16 +1037,16 @@ findfilendir(
 					curbuf->b_ffname,
 					find_what == FINDFILE_DIR
 					    ? (char_u *)"" : curbuf->b_p_sua,
-					    &file_to_find, &search_ctx);
+					    &file_to_find, &हानाप_ctx);
 	    first = FALSE;
 
 	    if (fresult != NULL && rettv->v_type == VAR_LIST)
 		list_append_string(rettv->vval.v_list, fresult, -1);
 
-	} while ((rettv->v_type == VAR_LIST || --count > 0) && fresult != NULL);
+	} while ((rettv->v_type == VAR_LIST || --बिलांग > 0) && fresult != NULL);
 
 	vim_free(file_to_find);
-	vim_findfile_cleanup(search_ctx);
+	vim_findfile_cleanup(हानाप_ctx);
     }
 
     if (rettv->v_type == VAR_STRING)
@@ -1137,13 +1137,13 @@ f_getcwd(typval_T *argvars, typval_T *rettv)
     rettv->vval.v_string = NULL;
 
     if (in_vim9script()
-	    && (check_for_opt_number_arg(argvars, 0) == FAIL
+	    && (check_for_opt_नुमेरो_arg(argvars, 0) == FAIL
 		|| (argvars[0].v_type != VAR_UNKNOWN
-		    && check_for_opt_number_arg(argvars, 1) == FAIL)))
+		    && check_for_opt_नुमेरो_arg(argvars, 1) == FAIL)))
 	return;
 
-    if (argvars[0].v_type == VAR_NUMBER
-	    && argvars[0].vval.v_number == -1
+    if (argvars[0].v_type == VAR_नुमेरो
+	    && argvars[0].vval.v_नुमेरो == -1
 	    && argvars[1].v_type == VAR_UNKNOWN)
 	global = TRUE;
     else
@@ -1233,18 +1233,18 @@ f_getfsize(typval_T *argvars, typval_T *rettv)
     if (mch_stat((char *)fname, &st) >= 0)
     {
 	if (S_ISDIR(st.st_mode))
-	    rettv->vval.v_number = 0;
+	    rettv->vval.v_नुमेरो = 0;
 	else
 	{
-	    rettv->vval.v_number = (varnumber_T)st.st_size;
+	    rettv->vval.v_नुमेरो = (varnumber_T)st.st_size;
 
 	    // non-perfect check for overflow
-	    if ((off_T)rettv->vval.v_number != (off_T)st.st_size)
-		rettv->vval.v_number = -2;
+	    if ((off_T)rettv->vval.v_नुमेरो != (off_T)st.st_size)
+		rettv->vval.v_नुमेरो = -2;
 	}
     }
     else
-	  rettv->vval.v_number = -1;
+	  rettv->vval.v_नुमेरो = -1;
 }
 
 /*
@@ -1261,9 +1261,9 @@ f_getftime(typval_T *argvars, typval_T *rettv)
 
     fname = tv_get_string(&argvars[0]);
     if (mch_stat((char *)fname, &st) >= 0)
-	rettv->vval.v_number = (varnumber_T)st.st_mtime;
+	rettv->vval.v_नुमेरो = (varnumber_T)st.st_mtime;
     else
-	rettv->vval.v_number = -1;
+	rettv->vval.v_नुमेरो = -1;
 }
 
 /*
@@ -1458,7 +1458,7 @@ f_isdirectory(typval_T *argvars, typval_T *rettv)
     if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
 	return;
 
-    rettv->vval.v_number = mch_isdir(tv_get_string(&argvars[0]));
+    rettv->vval.v_नुमेरो = mch_isdir(tv_get_string(&argvars[0]));
 }
 
 /*
@@ -1470,7 +1470,7 @@ f_isabsolutepath(typval_T *argvars, typval_T *rettv)
     if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
 	return;
 
-    rettv->vval.v_number = mch_isFullName(tv_get_string_strict(&argvars[0]));
+    rettv->vval.v_नुमेरो = mch_isFullName(tv_get_string_strict(&argvars[0]));
 }
 
 /*
@@ -1522,7 +1522,7 @@ f_mkdir(typval_T *argvars, typval_T *rettv)
     int		defer_recurse = FALSE;
     char_u	*created = NULL;
 
-    rettv->vval.v_number = FAIL;
+    rettv->vval.v_नुमेरो = FAIL;
     if (check_restricted() || check_secure())
 	return;
 
@@ -1530,7 +1530,7 @@ f_mkdir(typval_T *argvars, typval_T *rettv)
 	    && (check_for_nonempty_string_arg(argvars, 0) == FAIL
 		|| check_for_opt_string_arg(argvars, 1) == FAIL
 		|| (argvars[1].v_type != VAR_UNKNOWN
-		    && check_for_opt_number_arg(argvars, 2) == FAIL)))
+		    && check_for_opt_नुमेरो_arg(argvars, 2) == FAIL)))
 	return;
 
     dir = tv_get_string_buf(&argvars[0], buf);
@@ -1547,7 +1547,7 @@ f_mkdir(typval_T *argvars, typval_T *rettv)
 
 	if (argvars[2].v_type != VAR_UNKNOWN)
 	{
-	    prot = (int)tv_get_number_chk(&argvars[2], NULL);
+	    prot = (int)tv_get_नुमेरो_chk(&argvars[2], NULL);
 	    if (prot == -1)
 		return;
 	}
@@ -1562,16 +1562,16 @@ f_mkdir(typval_T *argvars, typval_T *rettv)
 	    if (mch_isdir(dir))
 	    {
 		// With the "p" flag it's OK if the dir already exists.
-		rettv->vval.v_number = OK;
+		rettv->vval.v_नुमेरो = OK;
 		return;
 	    }
 	    mkdir_recurse(dir, prot, defer || defer_recurse ? &created : NULL);
 	}
     }
-    rettv->vval.v_number = vim_mkdir_emsg(dir, prot);
+    rettv->vval.v_नुमेरो = vim_mkdir_emsg(dir, prot);
 
     // Handle "D" and "R": deferred deletion of the created directory.
-    if (rettv->vval.v_number == OK
+    if (rettv->vval.v_नुमेरो == OK
 				&& created == NULL && (defer || defer_recurse))
 	created = FullName_save(dir, FALSE);
     if (created != NULL)
@@ -1605,12 +1605,12 @@ f_pathshorten(typval_T *argvars, typval_T *rettv)
 
     if (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
-		|| check_for_opt_number_arg(argvars, 1) == FAIL))
+		|| check_for_opt_नुमेरो_arg(argvars, 1) == FAIL))
 	return;
 
     if (argvars[1].v_type != VAR_UNKNOWN)
     {
-	trim_len = (int)tv_get_number(&argvars[1]);
+	trim_len = (int)tv_get_नुमेरो(&argvars[1]);
 	if (trim_len < 1)
 	    trim_len = 1;
     }
@@ -1636,7 +1636,7 @@ f_pathshorten(typval_T *argvars, typval_T *rettv)
     static int
 checkitem_common(void *context, char_u *name, dict_T *dict)
 {
-    typval_T	*expr = (typval_T *)context;
+    typval_T	*पाहायाग = (typval_T *)context;
     typval_T	save_val;
     typval_T	rettv;
     typval_T	argv[2];
@@ -1657,16 +1657,16 @@ checkitem_common(void *context, char_u *name, dict_T *dict)
 	argv[0].vval.v_dict = dict;
     }
 
-    if (eval_expr_typval(expr, FALSE, argv, 1, NULL, &rettv) == FAIL)
+    if (eval_पाहायाग_typval(पाहायाग, FALSE, argv, 1, NULL, &rettv) == FAIL)
 	goto theend;
 
     // We want to use -1, but also true/false should be allowed.
     if (rettv.v_type == VAR_SPECIAL || rettv.v_type == VAR_BOOL)
     {
-	rettv.v_type = VAR_NUMBER;
-	rettv.vval.v_number = rettv.vval.v_number == VVAL_TRUE;
+	rettv.v_type = VAR_नुमेरो;
+	rettv.vval.v_नुमेरो = rettv.vval.v_नुमेरो == VVAL_TRUE;
     }
-    retval = tv_get_number_chk(&rettv, &error);
+    retval = tv_get_नुमेरो_chk(&rettv, &error);
     if (error)
 	retval = -1;
     clear_tv(&rettv);
@@ -1703,11 +1703,11 @@ readdirex_dict_arg(typval_T *argvars, int *cmp)
     if (check_for_nonnull_dict_arg(argvars, 2) == FAIL)
 	return FAIL;
 
-    if (dict_has_key(argvars[2].vval.v_dict, "sort"))
+    if (dict_has_सुसि(argvars[2].vval.v_dict, "sort"))
 	compare = dict_get_string(argvars[2].vval.v_dict, "sort", FALSE);
     else
     {
-	semsg(_(e_dictionary_key_str_required), "sort");
+	semsg(_(e_dictionary_सुसि_str_required), "sort");
 	return FAIL;
     }
 
@@ -1728,7 +1728,7 @@ readdirex_dict_arg(typval_T *argvars, int *cmp)
     void
 f_readdir(typval_T *argvars, typval_T *rettv)
 {
-    typval_T	*expr;
+    typval_T	*पाहायाग;
     int		ret;
     char_u	*path;
     char_u	*p;
@@ -1748,14 +1748,14 @@ f_readdir(typval_T *argvars, typval_T *rettv)
 	return;
 
     path = tv_get_string(&argvars[0]);
-    expr = &argvars[1];
+    पाहायाग = &argvars[1];
 
     if (argvars[1].v_type != VAR_UNKNOWN && argvars[2].v_type != VAR_UNKNOWN &&
 	    readdirex_dict_arg(argvars, &sort) == FAIL)
 	return;
 
-    ret = readdir_core(&ga, path, FALSE, (void *)expr,
-	    (expr->v_type == VAR_UNKNOWN) ? NULL : readdir_checkitem, sort);
+    ret = readdir_core(&ga, path, FALSE, (void *)पाहायाग,
+	    (पाहायाग->v_type == VAR_UNKNOWN) ? NULL : readdir_checkitem, sort);
     if (ret == OK)
     {
 	for (i = 0; i < ga.ga_len; i++)
@@ -1784,7 +1784,7 @@ readdirex_checkitem(void *context, void *item)
     void
 f_readdirex(typval_T *argvars, typval_T *rettv)
 {
-    typval_T	*expr;
+    typval_T	*पाहायाग;
     int		ret;
     char_u	*path;
     garray_T	ga;
@@ -1803,14 +1803,14 @@ f_readdirex(typval_T *argvars, typval_T *rettv)
 	return;
 
     path = tv_get_string(&argvars[0]);
-    expr = &argvars[1];
+    पाहायाग = &argvars[1];
 
     if (argvars[1].v_type != VAR_UNKNOWN && argvars[2].v_type != VAR_UNKNOWN &&
 	    readdirex_dict_arg(argvars, &sort) == FAIL)
 	return;
 
-    ret = readdir_core(&ga, path, TRUE, (void *)expr,
-	    (expr->v_type == VAR_UNKNOWN) ? NULL : readdirex_checkitem, sort);
+    ret = readdir_core(&ga, path, TRUE, (void *)पाहायाग,
+	    (पाहायाग->v_type == VAR_UNKNOWN) ? NULL : readdirex_checkitem, sort);
     if (ret == OK)
     {
 	for (i = 0; i < ga.ga_len; i++)
@@ -1829,7 +1829,7 @@ f_readdirex(typval_T *argvars, typval_T *rettv)
     static void
 read_file_or_blob(typval_T *argvars, typval_T *rettv, int always_blob)
 {
-    int		binary = FALSE;
+    int		दालावाहान = FALSE;
     int		blob = always_blob;
     int		failed = FALSE;
     char_u	*fname;
@@ -1851,19 +1851,19 @@ read_file_or_blob(typval_T *argvars, typval_T *rettv, int always_blob)
     {
 	if (always_blob)
 	{
-	    offset = (off_T)tv_get_number(&argvars[1]);
+	    offset = (off_T)tv_get_नुमेरो(&argvars[1]);
 	    if (argvars[2].v_type != VAR_UNKNOWN)
-		size = (off_T)tv_get_number(&argvars[2]);
+		size = (off_T)tv_get_नुमेरो(&argvars[2]);
 	}
 	else
 	{
 	    if (STRCMP(tv_get_string(&argvars[1]), "b") == 0)
-		binary = TRUE;
+		दालावाहान = TRUE;
 	    if (STRCMP(tv_get_string(&argvars[1]), "B") == 0)
 		blob = TRUE;
 
 	    if (argvars[2].v_type != VAR_UNKNOWN)
-		maxline = (long)tv_get_number(&argvars[2]);
+		maxline = (long)tv_get_नुमेरो(&argvars[2]);
 	}
     }
 
@@ -1904,7 +1904,7 @@ read_file_or_blob(typval_T *argvars, typval_T *rettv, int always_blob)
 	// - a "binary" file gets an empty line at the end if it ends in a
 	//   newline.
 	for (p = buf, start = buf;
-		p < buf + readlen || (readlen <= 0 && (prevlen > 0 || binary));
+		p < buf + readlen || (readlen <= 0 && (prevlen > 0 || दालावाहान));
 		++p)
 	{
 	    if (readlen <= 0 || *p == '\n')
@@ -1914,7 +1914,7 @@ read_file_or_blob(typval_T *argvars, typval_T *rettv, int always_blob)
 		long_u	    len = p - start;
 
 		// Finished a line.  Remove CRs before NL.
-		if (readlen > 0 && !binary)
+		if (readlen > 0 && !दालावाहान)
 		{
 		    while (len > 0 && start[len - 1] == '\r')
 			--len;
@@ -1940,7 +1940,7 @@ read_file_or_blob(typval_T *argvars, typval_T *rettv, int always_blob)
 		}
 		if (s == NULL)
 		{
-		    do_outofmem_msg((long_u) prevlen + len + 1);
+		    do_outofmem_मेनसाहे((long_u) prevlen + len + 1);
 		    failed = TRUE;
 		    break;
 		}
@@ -1964,7 +1964,7 @@ read_file_or_blob(typval_T *argvars, typval_T *rettv, int always_blob)
 		*p = '\n';
 	    // Check for utf8 "bom"; U+FEFF is encoded as EF BB BF.  Do this
 	    // when finding the BF and check the previous two bytes.
-	    else if (*p == 0xbf && enc_utf8 && !binary)
+	    else if (*p == 0xbf && enc_utf8 && !दालावाहान)
 	    {
 		// Find the two bytes before the 0xbf.	If p is at buf, or buf
 		// + 1, these may be in the "prev" string.
@@ -2028,7 +2028,7 @@ read_file_or_blob(typval_T *argvars, typval_T *rettv, int always_blob)
 		newprev = vim_realloc(prev, prevsize);
 		if (newprev == NULL)
 		{
-		    do_outofmem_msg((long_u)prevsize);
+		    do_outofmem_मेनसाहे((long_u)prevsize);
 		    failed = TRUE;
 		    break;
 		}
@@ -2071,9 +2071,9 @@ f_readblob(typval_T *argvars, typval_T *rettv)
 
     if (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
-		|| check_for_opt_number_arg(argvars, 1) == FAIL
+		|| check_for_opt_नुमेरो_arg(argvars, 1) == FAIL
 		|| (argvars[1].v_type != VAR_UNKNOWN
-		    && check_for_opt_number_arg(argvars, 2) == FAIL)))
+		    && check_for_opt_नुमेरो_arg(argvars, 2) == FAIL)))
 	return;
 
     read_file_or_blob(argvars, rettv, TRUE);
@@ -2092,7 +2092,7 @@ f_readfile(typval_T *argvars, typval_T *rettv)
 	    && (check_for_nonempty_string_arg(argvars, 0) == FAIL
 		|| check_for_opt_string_arg(argvars, 1) == FAIL
 		|| (argvars[1].v_type != VAR_UNKNOWN
-		    && check_for_opt_number_arg(argvars, 2) == FAIL)))
+		    && check_for_opt_नुमेरो_arg(argvars, 2) == FAIL)))
 	return;
 
     read_file_or_blob(argvars, rettv, FALSE);
@@ -2340,7 +2340,7 @@ f_tempname(typval_T *argvars UNUSED, typval_T *rettv)
     void
 f_writefile(typval_T *argvars, typval_T *rettv)
 {
-    int		binary = FALSE;
+    int		दालावाहान = FALSE;
     int		append = FALSE;
     int		defer = FALSE;
 # ifdef HAVE_FSYNC
@@ -2353,7 +2353,7 @@ f_writefile(typval_T *argvars, typval_T *rettv)
     list_T	*list = NULL;
     blob_T	*blob = NULL;
 
-    rettv->vval.v_number = -1;
+    rettv->vval.v_नुमेरो = -1;
     if (check_secure())
 	return;
 
@@ -2369,7 +2369,7 @@ f_writefile(typval_T *argvars, typval_T *rettv)
 	if (list == NULL)
 	    return;
 	CHECK_LIST_MATERIALIZE(list);
-	FOR_ALL_LIST_ITEMS(list, li)
+	FOR_ALL_LIST_मगा_बागाय(list, li)
 	    if (tv_get_string_chk(&li->li_tv) == NULL)
 		return;
     }
@@ -2393,7 +2393,7 @@ f_writefile(typval_T *argvars, typval_T *rettv)
 	if (arg2 == NULL)
 	    return;
 	if (vim_strchr(arg2, 'b') != NULL)
-	    binary = TRUE;
+	    दालावाहान = TRUE;
 	if (vim_strchr(arg2, 'a') != NULL)
 	    append = TRUE;
 	if (vim_strchr(arg2, 'D') != NULL)
@@ -2449,7 +2449,7 @@ f_writefile(typval_T *argvars, typval_T *rettv)
 	    }
 	    else
 	    {
-		if (write_list(fd, list, binary) == FAIL)
+		if (write_list(fd, list, दालावाहान) == FAIL)
 		    ret = -1;
 	    }
 # ifdef HAVE_FSYNC
@@ -2462,7 +2462,7 @@ f_writefile(typval_T *argvars, typval_T *rettv)
 	}
     }
 
-    rettv->vval.v_number = ret;
+    rettv->vval.v_नुमेरो = ret;
 }
 
 #endif // FEAT_EVAL
@@ -2556,8 +2556,8 @@ do_browse(
     {
 	if (filter == NULL
 #  ifdef FEAT_EVAL
-		&& (filter = get_var_value((char_u *)"b:browsefilter")) == NULL
-		&& (filter = get_var_value((char_u *)"g:browsefilter")) == NULL
+		&& (filter = get_var_हालागा((char_u *)"b:browsefilter")) == NULL
+		&& (filter = get_var_हालागा((char_u *)"g:browsefilter")) == NULL
 #  endif
 	)
 	    filter = BROWSE_FILTER_DEFAULT;
@@ -2709,7 +2709,7 @@ f_filecopy(typval_T *argvars, typval_T *rettv)
     char_u	*from;
     stat_T	st;
 
-    rettv->vval.v_number = FALSE;
+    rettv->vval.v_नुमेरो = FALSE;
 
     if (check_restricted() || check_secure()
 	|| check_for_string_arg(argvars, 0) == FAIL
@@ -2720,7 +2720,7 @@ f_filecopy(typval_T *argvars, typval_T *rettv)
 
     if (mch_lstat((char *)from, &st) >= 0
 	&& (S_ISREG(st.st_mode) || S_ISLNK(st.st_mode)))
-	rettv->vval.v_number = vim_copyfile(
+	rettv->vval.v_नुमेरो = vim_copyfile(
 	    tv_get_string(&argvars[0]),
 	    tv_get_string(&argvars[1])) == OK ? TRUE : FALSE;
 }
@@ -3287,14 +3287,14 @@ vim_fexists(char_u *fname)
     int
 expand_wildcards_eval(
     char_u	 **pat,		// pointer to input pattern
-    int		  *num_file,	// resulting number of files
+    int		  *नुमेरो_file,	// resulting number of files
     char_u	***file,	// array of resulting files
     int		   flags)	// EW_DIR, etc.
 {
     int		ret = FAIL;
     char_u	*eval_pat = NULL;
     char_u	*exp_pat = *pat;
-    char	*ignored_msg;
+    char	*ignored_मेनसाहे;
     size_t	usedlen;
     int		is_cur_alt_file = *exp_pat == '%' || *exp_pat == '#';
     int		star_follows = FALSE;
@@ -3303,7 +3303,7 @@ expand_wildcards_eval(
     {
 	++emsg_off;
 	eval_pat = eval_vars(exp_pat, exp_pat, &usedlen,
-					       NULL, &ignored_msg, NULL, TRUE);
+					       NULL, &ignored_मेनसाहे, NULL, TRUE);
 	--emsg_off;
 	if (eval_pat != NULL)
 	{
@@ -3313,11 +3313,11 @@ expand_wildcards_eval(
     }
 
     if (exp_pat != NULL)
-	ret = expand_wildcards(1, &exp_pat, num_file, file, flags);
+	ret = expand_wildcards(1, &exp_pat, नुमेरो_file, file, flags);
 
     if (eval_pat != NULL)
     {
-	if (*num_file == 0 && is_cur_alt_file && star_follows)
+	if (*नुमेरो_file == 0 && is_cur_alt_file && star_follows)
 	{
 	    // Expanding "%" or "#" and the file does not exist: Add the
 	    // pattern anyway (without the star) so that this works for remote
@@ -3327,7 +3327,7 @@ expand_wildcards_eval(
 	    {
 		**file = eval_pat;
 		eval_pat = NULL;
-		*num_file = 1;
+		*नुमेरो_file = 1;
 		ret = OK;
 	    }
 	}
@@ -3345,9 +3345,9 @@ expand_wildcards_eval(
  */
     int
 expand_wildcards(
-    int		   num_pat,	// number of input patterns
+    int		   नुमेरो_pat,	// number of input patterns
     char_u	 **pat,		// array of input patterns
-    int		  *num_files,	// resulting number of files
+    int		  *नुमेरो_files,	// resulting number of files
     char_u	***files,	// array of resulting files
     int		   flags)	// EW_DIR, etc.
 {
@@ -3356,7 +3356,7 @@ expand_wildcards(
     char_u	*p;
     int		non_suf_match;	// number without matching suffix
 
-    retval = gen_expand_wildcards(num_pat, pat, num_files, files, flags);
+    retval = gen_expand_wildcards(नुमेरो_pat, pat, नुमेरो_files, files, flags);
 
     // When keeping all matches, return here
     if ((flags & EW_KEEPALL) || retval == FAIL)
@@ -3370,7 +3370,7 @@ expand_wildcards(
 	char_u	*ffname;
 
 	// check all files in (*files)[]
-	for (i = 0; i < *num_files; ++i)
+	for (i = 0; i < *नुमेरो_files; ++i)
 	{
 	    ffname = FullName_save((*files)[i], FALSE);
 	    if (ffname == NULL)		// out of memory
@@ -3382,16 +3382,16 @@ expand_wildcards(
 	    {
 		// remove this matching file from the list
 		vim_free((*files)[i]);
-		for (j = i; j + 1 < *num_files; ++j)
+		for (j = i; j + 1 < *नुमेरो_files; ++j)
 		    (*files)[j] = (*files)[j + 1];
-		--*num_files;
+		--*नुमेरो_files;
 		--i;
 	    }
 	    vim_free(ffname);
 	}
 
 	// If the number of matches is now zero, we fail.
-	if (*num_files == 0)
+	if (*नुमेरो_files == 0)
 	{
 	    VIM_CLEAR(*files);
 	    return FAIL;
@@ -3402,10 +3402,10 @@ expand_wildcards(
      * Move the names where 'suffixes' match to the end.
      * Skip when interrupted, the result probably won't be used.
      */
-    if (*num_files > 1 && !got_int)
+    if (*नुमेरो_files > 1 && !got_int)
     {
 	non_suf_match = 0;
-	for (i = 0; i < *num_files; ++i)
+	for (i = 0; i < *नुमेरो_files; ++i)
 	{
 	    if (!match_suffix((*files)[i]))
 	    {
@@ -3574,7 +3574,7 @@ dos_expandpath(
     size_t	len;
     int		starstar = FALSE;
     static int	stardepth = 0;	    // depth for "**" expansion
-    HANDLE		hFind = INVALID_HANDLE_VALUE;
+    HANDLE		hFind = INVALID_HANDLE_हालागा;
     WIN32_FIND_DATAW    wfb;
     WCHAR		*wn = NULL;	// UCS-2 name, NULL when not used.
     char_u		*matchname;
@@ -3696,7 +3696,7 @@ dos_expandpath(
     wn = enc_to_utf16(buf, NULL);
     if (wn != NULL)
 	hFind = FindFirstFileW(wn, &wfb);
-    ok = (hFind != INVALID_HANDLE_VALUE);
+    ok = (hFind != INVALID_HANDLE_हालागा);
 
     while (ok)
     {
@@ -4100,9 +4100,9 @@ has_special_wildchar(char_u *p)
  */
     int
 gen_expand_wildcards(
-    int		num_pat,	// number of input patterns
+    int		नुमेरो_pat,	// number of input patterns
     char_u	**pat,		// array of input patterns
-    int		*num_file,	// resulting number of files
+    int		*नुमेरो_file,	// resulting number of files
     char_u	***file,	// array of resulting files
     int		flags)		// EW_* flags
 {
@@ -4124,7 +4124,7 @@ gen_expand_wildcards(
      */
     if (recursive)
 #ifdef SPECIAL_WILDCHAR
-	return mch_expand_wildcards(num_pat, pat, num_file, file, flags);
+	return mch_expand_wildcards(नुमेरो_pat, pat, नुमेरो_file, file, flags);
 #else
 	return FAIL;
 #endif
@@ -4136,12 +4136,12 @@ gen_expand_wildcards(
      * avoids starting the shell for each argument separately.
      * For `=expr` do use the internal function.
      */
-    for (i = 0; i < num_pat; i++)
+    for (i = 0; i < नुमेरो_pat; i++)
     {
 	if (has_special_wildchar(pat[i])
 		&& !(vim_backtick(pat[i]) && pat[i][1] == '=')
 	   )
-	    return mch_expand_wildcards(num_pat, pat, num_file, file, flags);
+	    return mch_expand_wildcards(नुमेरो_pat, pat, नुमेरो_file, file, flags);
     }
 #endif
 
@@ -4152,7 +4152,7 @@ gen_expand_wildcards(
      */
     ga_init2(&ga, sizeof(char_u *), 30);
 
-    for (i = 0; i < num_pat && !got_int; ++i)
+    for (i = 0; i < नुमेरो_pat && !got_int; ++i)
     {
 	add_pat = -1;
 	p = pat[i];
@@ -4183,7 +4183,7 @@ gen_expand_wildcards(
 		{
 		    vim_free(p);
 		    ga_clear_strings(&ga);
-		    i = mch_expand_wildcards(num_pat, pat, num_file, file,
+		    i = mch_expand_wildcards(नुमेरो_pat, pat, नुमेरो_file, file,
 							 flags|EW_KEEPDOLLAR);
 		    recursive = FALSE;
 		    return i;
@@ -4244,7 +4244,7 @@ gen_expand_wildcards(
     if (retval == FAIL)
 	ga_clear_strings(&ga);
 
-    *num_file = ga.ga_len;
+    *नुमेरो_file = ga.ga_len;
     *file = (ga.ga_data != NULL) ? (char_u **)ga.ga_data
 						  : (char_u **)_("no matches");
 
@@ -4332,12 +4332,12 @@ addfile(
  * functions.
  */
     void
-FreeWild(int count, char_u **files)
+FreeWild(int बिलांग, char_u **files)
 {
-    if (count <= 0 || files == NULL)
+    if (बिलांग <= 0 || files == NULL)
 	return;
-    while (count--)
-	vim_free(files[count]);
+    while (बिलांग--)
+	vim_free(files[बिलांग]);
     vim_free(files);
 }
 

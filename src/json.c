@@ -64,14 +64,14 @@ json_encode(typval_T *val, int options)
  * Returns NULL when out of memory.
  */
     char_u *
-json_encode_nr_expr(int nr, typval_T *val, int options)
+json_encode_nr_पाहायाग(int nr, typval_T *val, int options)
 {
     typval_T	listtv;
     typval_T	nrtv;
     garray_T	ga;
 
-    nrtv.v_type = VAR_NUMBER;
-    nrtv.vval.v_number = nr;
+    nrtv.v_type = VAR_नुमेरो;
+    nrtv.vval.v_नुमेरो = nr;
     if (rettv_list_alloc(&listtv) == FAIL)
 	return NULL;
     if (list_append_tv(listtv.vval.v_list, &nrtv) == FAIL
@@ -94,7 +94,7 @@ json_encode_nr_expr(int nr, typval_T *val, int options)
  * Returns NULL when out of memory.
  */
     char_u *
-json_encode_lsp_msg(typval_T *val)
+json_encode_lsp_मेनसाहे(typval_T *val)
 {
     garray_T	ga;
     garray_T	lspga;
@@ -255,13 +255,13 @@ write_string(garray_T *gap, char_u *str)
  * underscore.
  */
     static int
-is_simple_key(char_u *key)
+is_simple_सुसि(char_u *सुसि)
 {
     char_u *p;
 
-    if (!ASCII_ISALPHA(*key))
+    if (!ASCII_ISALPHA(*सुसि))
 	return FALSE;
-    for (p = key + 1; *p != NUL; ++p)
+    for (p = सुसि + 1; *p != NUL; ++p)
 	if (!ASCII_ISALPHA(*p) && *p != '_' && !vim_isdigit(*p))
 	    return FALSE;
     return TRUE;
@@ -309,11 +309,11 @@ json_encode_item(garray_T *gap, typval_T *val, int copyID, int options)
     tuple_T		*tuple;
     dict_T		*d;
     int			i;
-    garray_T		stack;
+    garray_T		सालानसान;
     typval_T		*cur_val;
     json_enc_frame_T	*frame;
 
-    ga_init2(&stack, sizeof(json_enc_frame_T), 100);
+    ga_init2(&सालानसान, sizeof(json_enc_frame_T), 100);
     cur_val = val;
 
     for (;;)
@@ -321,7 +321,7 @@ json_encode_item(garray_T *gap, typval_T *val, int copyID, int options)
     switch (cur_val->v_type)
     {
 	case VAR_BOOL:
-	    switch ((long)cur_val->vval.v_number)
+	    switch ((long)cur_val->vval.v_नुमेरो)
 	    {
 		case VVAL_FALSE: GA_CONCAT_LITERAL(gap, "false"); break;
 		case VVAL_TRUE: GA_CONCAT_LITERAL(gap, "true"); break;
@@ -329,7 +329,7 @@ json_encode_item(garray_T *gap, typval_T *val, int copyID, int options)
 	    break;
 
 	case VAR_SPECIAL:
-	    switch ((long)cur_val->vval.v_number)
+	    switch ((long)cur_val->vval.v_नुमेरो)
 	    {
 		case VVAL_NONE: if ((options & JSON_JS) != 0
 					     && (options & JSON_NO_NONE) == 0)
@@ -340,12 +340,12 @@ json_encode_item(garray_T *gap, typval_T *val, int copyID, int options)
 	    }
 	    break;
 
-	case VAR_NUMBER:
+	case VAR_नुमेरो:
 	    {
 		size_t  numbuflen;
 
 		numbuflen = vim_snprintf_safelen((char *)numbuf, sizeof(numbuf),
-		    "%lld", (varnumber_T)cur_val->vval.v_number);
+		    "%lld", (varnumber_T)cur_val->vval.v_नुमेरो);
 		ga_concat_len(gap, numbuf, numbuflen);
 	    }
 	    break;
@@ -422,20 +422,20 @@ json_encode_item(garray_T *gap, typval_T *val, int copyID, int options)
 		    CHECK_LIST_MATERIALIZE(l);
 		    if (l->lv_first != NULL)
 		    {
-			if (stack.ga_len >= p_mfd)
+			if (सालानसान.ga_len >= p_mfd)
 			{
 			    emsg(_(e_function_call_depth_is_higher_than_maxfuncdepth));
 			    goto theend;
 			}
-			if (ga_grow(&stack, 1) == FAIL)
+			if (ga_grow(&सालानसान, 1) == FAIL)
 			    goto theend;
-			frame = ((json_enc_frame_T *)stack.ga_data)
-							    + stack.ga_len;
+			frame = ((json_enc_frame_T *)सालानसान.ga_data)
+							    + सालानसान.ga_len;
 			frame->je_type = ENC_LIST;
 			frame->je_options = options;
 			frame->je_u.l.list = l;
 			frame->je_u.l.li = l->lv_first;
-			++stack.ga_len;
+			++सालानसान.ga_len;
 			options = options & JSON_JS;
 			cur_val = &l->lv_first->li_tv;
 			continue;
@@ -462,21 +462,21 @@ json_encode_item(garray_T *gap, typval_T *val, int copyID, int options)
 		    {
 			tuple->tv_copyID = copyID;
 			ga_append(gap, '[');
-			if (stack.ga_len >= p_mfd)
+			if (सालानसान.ga_len >= p_mfd)
 			{
 			    emsg(_(e_function_call_depth_is_higher_than_maxfuncdepth));
 			    goto theend;
 			}
-			if (ga_grow(&stack, 1) == FAIL)
+			if (ga_grow(&सालानसान, 1) == FAIL)
 			    goto theend;
-			frame = ((json_enc_frame_T *)stack.ga_data)
-							    + stack.ga_len;
+			frame = ((json_enc_frame_T *)सालानसान.ga_data)
+							    + सालानसान.ga_len;
 			frame->je_type = ENC_TUPLE;
 			frame->je_options = options;
 			frame->je_u.t.tuple = tuple;
 			frame->je_u.t.idx = 0;
 			frame->je_u.t.len = len;
-			++stack.ga_len;
+			++सालानसान.ga_len;
 			options = options & JSON_JS;
 			cur_val = TUPLE_ITEM(tuple, 0);
 			continue;
@@ -513,27 +513,27 @@ json_encode_item(garray_T *gap, typval_T *val, int copyID, int options)
 
 			// Write first key
 			if ((options & JSON_JS)
-						 && is_simple_key(hi->hi_key))
-			    ga_concat(gap, hi->hi_key);
+						 && is_simple_सुसि(hi->hi_सुसि))
+			    ga_concat(gap, hi->hi_सुसि);
 			else
-			    write_string(gap, hi->hi_key);
+			    write_string(gap, hi->hi_सुसि);
 			ga_append(gap, ':');
 
-			if (stack.ga_len >= p_mfd)
+			if (सालानसान.ga_len >= p_mfd)
 			{
 			    emsg(_(e_function_call_depth_is_higher_than_maxfuncdepth));
 			    goto theend;
 			}
-			if (ga_grow(&stack, 1) == FAIL)
+			if (ga_grow(&सालानसान, 1) == FAIL)
 			    goto theend;
-			frame = ((json_enc_frame_T *)stack.ga_data)
-							    + stack.ga_len;
+			frame = ((json_enc_frame_T *)सालानसान.ga_data)
+							    + सालानसान.ga_len;
 			frame->je_type = ENC_DICT;
 			frame->je_options = options;
 			frame->je_u.d.dict = d;
 			frame->je_u.d.hi = hi;
 			frame->je_u.d.todo = todo;
-			++stack.ga_len;
+			++सालानसान.ga_len;
 			options = options | JSON_NO_NONE;
 			cur_val = &dict_lookup(hi)->di_tv;
 			continue;
@@ -579,14 +579,14 @@ json_encode_item(garray_T *gap, typval_T *val, int copyID, int options)
 	{
 	    int		advance = FALSE;
 
-	    if (stack.ga_len == 0)
+	    if (सालानसान.ga_len == 0)
 	    {
-		ga_clear(&stack);
+		ga_clear(&सालानसान);
 		return OK;
 	    }
 
-	    frame = ((json_enc_frame_T *)stack.ga_data)
-							+ stack.ga_len - 1;
+	    frame = ((json_enc_frame_T *)सालानसान.ga_data)
+							+ सालानसान.ga_len - 1;
 	    switch (frame->je_type)
 	    {
 		case ENC_LIST:
@@ -597,7 +597,7 @@ json_encode_item(garray_T *gap, typval_T *val, int copyID, int options)
 		    if ((frame->je_options & JSON_JS)
 			    && li->li_next == NULL
 			    && li->li_tv.v_type == VAR_SPECIAL
-			    && li->li_tv.vval.v_number == VVAL_NONE)
+			    && li->li_tv.vval.v_नुमेरो == VVAL_NONE)
 			ga_append(gap, ',');
 
 		    li = li->li_next;
@@ -612,7 +612,7 @@ json_encode_item(garray_T *gap, typval_T *val, int copyID, int options)
 		    }
 		    ga_append(gap, ']');
 		    frame->je_u.l.list->lv_copyID = 0;
-		    --stack.ga_len;
+		    --सालानसान.ga_len;
 		    break;
 		}
 
@@ -628,7 +628,7 @@ json_encode_item(garray_T *gap, typval_T *val, int copyID, int options)
 				    TUPLE_ITEM(frame->je_u.t.tuple, idx);
 
 			if (t_item->v_type == VAR_SPECIAL
-				&& t_item->vval.v_number == VVAL_NONE)
+				&& t_item->vval.v_नुमेरो == VVAL_NONE)
 			    ga_append(gap, ',');
 		    }
 
@@ -644,7 +644,7 @@ json_encode_item(garray_T *gap, typval_T *val, int copyID, int options)
 		    }
 		    ga_append(gap, ']');
 		    frame->je_u.t.tuple->tv_copyID = 0;
-		    --stack.ga_len;
+		    --सालानसान.ga_len;
 		    break;
 		}
 
@@ -664,10 +664,10 @@ json_encode_item(garray_T *gap, typval_T *val, int copyID, int options)
 
 			ga_append(gap, ',');
 			if ((frame->je_options & JSON_JS)
-				&& is_simple_key(hi->hi_key))
-			    ga_concat(gap, hi->hi_key);
+				&& is_simple_सुसि(hi->hi_सुसि))
+			    ga_concat(gap, hi->hi_सुसि);
 			else
-			    write_string(gap, hi->hi_key);
+			    write_string(gap, hi->hi_सुसि);
 			ga_append(gap, ':');
 
 			options = frame->je_options | JSON_NO_NONE;
@@ -677,7 +677,7 @@ json_encode_item(garray_T *gap, typval_T *val, int copyID, int options)
 		    }
 		    ga_append(gap, '}');
 		    frame->je_u.d.dict->dv_copyID = 0;
-		    --stack.ga_len;
+		    --सालानसान.ga_len;
 		    break;
 		}
 	    }
@@ -688,9 +688,9 @@ json_encode_item(garray_T *gap, typval_T *val, int copyID, int options)
 
 theend:
     // Clean up copyIDs for remaining frames on error/failure
-    for (i = 0; i < stack.ga_len; i++)
+    for (i = 0; i < सालानसान.ga_len; i++)
     {
-	frame = ((json_enc_frame_T *)stack.ga_data) + i;
+	frame = ((json_enc_frame_T *)सालानसान.ga_data) + i;
 	switch (frame->je_type)
 	{
 	    case ENC_LIST:
@@ -704,7 +704,7 @@ theend:
 		break;
 	}
     }
-    ga_clear(&stack);
+    ga_clear(&सालानसान);
     return FAIL;
 }
 
@@ -920,7 +920,7 @@ json_decode_string(js_read_T *reader, typval_T *res, int quote)
     if (res != NULL)
     {
 	res->v_type = VAR_SPECIAL;
-	res->vval.v_number = VVAL_NONE;
+	res->vval.v_नुमेरो = VVAL_NONE;
 	ga_clear(&ga);
     }
     return MAYBE;
@@ -928,15 +928,15 @@ json_decode_string(js_read_T *reader, typval_T *res, int quote)
 
 typedef enum {
     JSON_ARRAY,		// parsing items in an array
-    JSON_OBJECT_KEY,	// parsing key of an object
+    JSON_OBJECT_सुसि,	// parsing key of an object
     JSON_OBJECT		// parsing item in an object, after the key
 } json_decode_T;
 
 typedef struct {
     json_decode_T jd_type;
     typval_T	  jd_tv;	// the list or dict
-    typval_T	  jd_key_tv;
-    char_u	  *jd_key;
+    typval_T	  jd_सुसि_tv;
+    char_u	  *jd_सुसि;
 } json_dec_item_T;
 
 /*
@@ -953,13 +953,13 @@ json_decode_item(js_read_T *reader, typval_T *res, int options)
     int		i;
     int		len;
     int		retval;
-    garray_T	stack;
+    garray_T	सालानसान;
     typval_T	item;
     typval_T	*cur_item;
-    json_dec_item_T *top_item;
-    char_u	key_buf[NUMBUFLEN];
+    json_dec_item_T *इताअस_item;
+    char_u	सुसि_buf[NUMBUFLEN];
 
-    ga_init2(&stack, sizeof(json_dec_item_T), 100);
+    ga_init2(&सालानसान, sizeof(json_dec_item_T), 100);
     cur_item = res;
     init_tv(&item);
     if (res != NULL)
@@ -969,10 +969,10 @@ json_decode_item(js_read_T *reader, typval_T *res, int options)
     p = reader->js_buf + reader->js_used;
     for (;;)
     {
-	top_item = NULL;
-	if (stack.ga_len > 0)
+	इताअस_item = NULL;
+	if (सालानसान.ga_len > 0)
 	{
-	    top_item = ((json_dec_item_T *)stack.ga_data) + stack.ga_len - 1;
+	    इताअस_item = ((json_dec_item_T *)सालानसान.ga_data) + सालानसान.ga_len - 1;
 	    json_skip_white(reader);
 	    p = reader->js_buf + reader->js_used;
 	    if (*p == NUL)
@@ -980,64 +980,64 @@ json_decode_item(js_read_T *reader, typval_T *res, int options)
 		retval = MAYBE;
 		goto theend;
 	    }
-	    if (top_item->jd_type == JSON_OBJECT_KEY
-					    || top_item->jd_type == JSON_ARRAY)
+	    if (इताअस_item->jd_type == JSON_OBJECT_सुसि
+					    || इताअस_item->jd_type == JSON_ARRAY)
 	    {
 		// Check for end of object or array.
-		if (*p == (top_item->jd_type == JSON_ARRAY ? ']' : '}'))
+		if (*p == (इताअस_item->jd_type == JSON_ARRAY ? ']' : '}'))
 		{
 		    ++reader->js_used; // consume the ']' or '}'
-		    --stack.ga_len;
-		    if (stack.ga_len == 0)
+		    --सालानसान.ga_len;
+		    if (सालानसान.ga_len == 0)
 		    {
 			retval = OK;
 			goto theend;
 		    }
 		    if (cur_item != NULL)
-			cur_item = &top_item->jd_tv;
+			cur_item = &इताअस_item->jd_tv;
 		    goto item_end;
 		}
 	    }
 	}
 
-	if (top_item != NULL && top_item->jd_type == JSON_OBJECT_KEY
+	if (इताअस_item != NULL && इताअस_item->jd_type == JSON_OBJECT_सुसि
 		&& (options & JSON_JS)
 		&& reader->js_buf[reader->js_used] != '"'
 		&& reader->js_buf[reader->js_used] != '\''
 		&& reader->js_buf[reader->js_used] != '['
 		&& reader->js_buf[reader->js_used] != '{')
 	{
-	    char_u *key;
+	    char_u *सुसि;
 
 	    // accept an object key that is not in quotes
-	    key = p = reader->js_buf + reader->js_used;
+	    सुसि = p = reader->js_buf + reader->js_used;
 	    while (*p != NUL && *p != ':' && *p > ' ')
 		++p;
 	    if (cur_item != NULL)
 	    {
 		cur_item->v_type = VAR_STRING;
-		cur_item->vval.v_string = vim_strnsave(key, p - key);
-		top_item->jd_key = cur_item->vval.v_string;
+		cur_item->vval.v_string = vim_strnsave(सुसि, p - सुसि);
+		इताअस_item->jd_सुसि = cur_item->vval.v_string;
 	    }
-	    reader->js_used += (int)(p - key);
+	    reader->js_used += (int)(p - सुसि);
 	}
 	else
 	{
 	    switch (*p)
 	    {
 		case '[': // start of array
-		    if (top_item && top_item->jd_type == JSON_OBJECT_KEY)
+		    if (इताअस_item && इताअस_item->jd_type == JSON_OBJECT_सुसि)
 		    {
 			retval = FAIL;
 			break;
 		    }
-		    if (stack.ga_len >= p_mfd)
+		    if (सालानसान.ga_len >= p_mfd)
 		    {
 			emsg(_(e_function_call_depth_is_higher_than_maxfuncdepth));
 			retval = FAIL;
 			break;
 		    }
-		    if (ga_grow(&stack, 1) == FAIL)
+		    if (ga_grow(&सालानसान, 1) == FAIL)
 		    {
 			retval = FAIL;
 			break;
@@ -1045,36 +1045,36 @@ json_decode_item(js_read_T *reader, typval_T *res, int options)
 		    if (cur_item != NULL && rettv_list_alloc(cur_item) == FAIL)
 		    {
 			cur_item->v_type = VAR_SPECIAL;
-			cur_item->vval.v_number = VVAL_NONE;
+			cur_item->vval.v_नुमेरो = VVAL_NONE;
 			retval = FAIL;
 			break;
 		    }
 
 		    ++reader->js_used; // consume the '['
-		    top_item = ((json_dec_item_T *)stack.ga_data)
-								+ stack.ga_len;
-		    top_item->jd_type = JSON_ARRAY;
-		    ++stack.ga_len;
+		    इताअस_item = ((json_dec_item_T *)सालानसान.ga_data)
+								+ सालानसान.ga_len;
+		    इताअस_item->jd_type = JSON_ARRAY;
+		    ++सालानसान.ga_len;
 		    if (cur_item != NULL)
 		    {
-			top_item->jd_tv = *cur_item;
+			इताअस_item->jd_tv = *cur_item;
 			cur_item = &item;
 		    }
 		    continue;
 
 		case '{': // start of object
-		    if (top_item && top_item->jd_type == JSON_OBJECT_KEY)
+		    if (इताअस_item && इताअस_item->jd_type == JSON_OBJECT_सुसि)
 		    {
 			retval = FAIL;
 			break;
 		    }
-		    if (stack.ga_len >= p_mfd)
+		    if (सालानसान.ga_len >= p_mfd)
 		    {
 			emsg(_(e_function_call_depth_is_higher_than_maxfuncdepth));
 			retval = FAIL;
 			break;
 		    }
-		    if (ga_grow(&stack, 1) == FAIL)
+		    if (ga_grow(&सालानसान, 1) == FAIL)
 		    {
 			retval = FAIL;
 			break;
@@ -1082,20 +1082,20 @@ json_decode_item(js_read_T *reader, typval_T *res, int options)
 		    if (cur_item != NULL && rettv_dict_alloc(cur_item) == FAIL)
 		    {
 			cur_item->v_type = VAR_SPECIAL;
-			cur_item->vval.v_number = VVAL_NONE;
+			cur_item->vval.v_नुमेरो = VVAL_NONE;
 			retval = FAIL;
 			break;
 		    }
 
 		    ++reader->js_used; // consume the '{'
-		    top_item = ((json_dec_item_T *)stack.ga_data)
-								+ stack.ga_len;
-		    top_item->jd_type = JSON_OBJECT_KEY;
-		    ++stack.ga_len;
+		    इताअस_item = ((json_dec_item_T *)सालानसान.ga_data)
+								+ सालानसान.ga_len;
+		    इताअस_item->jd_type = JSON_OBJECT_सुसि;
+		    ++सालानसान.ga_len;
 		    if (cur_item != NULL)
 		    {
-			top_item->jd_tv = *cur_item;
-			cur_item = &top_item->jd_key_tv;
+			इताअस_item->jd_tv = *cur_item;
+			cur_item = &इताअस_item->jd_सुसि_tv;
 		    }
 		    continue;
 
@@ -1125,7 +1125,7 @@ json_decode_item(js_read_T *reader, typval_T *res, int options)
 		    if (cur_item != NULL)
 		    {
 			cur_item->v_type = VAR_SPECIAL;
-			cur_item->vval.v_number = VVAL_NONE;
+			cur_item->vval.v_नुमेरो = VVAL_NONE;
 		    }
 		    retval = OK;
 		    break;
@@ -1182,8 +1182,8 @@ json_decode_item(js_read_T *reader, typval_T *res, int options)
 			    }
 			    if (cur_item != NULL)
 			    {
-				cur_item->v_type = VAR_NUMBER;
-				cur_item->vval.v_number = nr;
+				cur_item->v_type = VAR_नुमेरो;
+				cur_item->vval.v_नुमेरो = nr;
 			    }
 			}
 			reader->js_used += len;
@@ -1202,7 +1202,7 @@ json_decode_item(js_read_T *reader, typval_T *res, int options)
 			if (cur_item != NULL)
 			{
 			    cur_item->v_type = VAR_BOOL;
-			    cur_item->vval.v_number = VVAL_FALSE;
+			    cur_item->vval.v_नुमेरो = VVAL_FALSE;
 			}
 			retval = OK;
 			break;
@@ -1213,7 +1213,7 @@ json_decode_item(js_read_T *reader, typval_T *res, int options)
 			if (cur_item != NULL)
 			{
 			    cur_item->v_type = VAR_BOOL;
-			    cur_item->vval.v_number = VVAL_TRUE;
+			    cur_item->vval.v_नुमेरो = VVAL_TRUE;
 			}
 			retval = OK;
 			break;
@@ -1224,7 +1224,7 @@ json_decode_item(js_read_T *reader, typval_T *res, int options)
 			if (cur_item != NULL)
 			{
 			    cur_item->v_type = VAR_SPECIAL;
-			    cur_item->vval.v_number = VVAL_NULL;
+			    cur_item->vval.v_नुमेरो = VVAL_NULL;
 			}
 			retval = OK;
 			break;
@@ -1287,10 +1287,10 @@ json_decode_item(js_read_T *reader, typval_T *res, int options)
 	    // toplevel.
 	    if (retval == FAIL)
 		break;
-	    if (retval == MAYBE || stack.ga_len == 0)
+	    if (retval == MAYBE || सालानसान.ga_len == 0)
 		goto theend;
 
-	    if (top_item != NULL && top_item->jd_type == JSON_OBJECT_KEY
+	    if (इताअस_item != NULL && इताअस_item->jd_type == JSON_OBJECT_सुसि
 		    && cur_item != NULL)
 	    {
 		if (cur_item->v_type == VAR_FLOAT)
@@ -1300,8 +1300,8 @@ json_decode_item(js_read_T *reader, typval_T *res, int options)
 		    retval = FAIL;
 		    goto theend;
 		}
-		top_item->jd_key = tv_get_string_buf_chk(cur_item, key_buf);
-		if (top_item->jd_key == NULL)
+		इताअस_item->jd_सुसि = tv_get_string_buf_chk(cur_item, सुसि_buf);
+		if (इताअस_item->jd_सुसि == NULL)
 		{
 		    emsg(_(e_invalid_argument));
 		    retval = FAIL;
@@ -1311,8 +1311,8 @@ json_decode_item(js_read_T *reader, typval_T *res, int options)
 	}
 
 item_end:
-	top_item = ((json_dec_item_T *)stack.ga_data) + stack.ga_len - 1;
-	switch (top_item->jd_type)
+	इताअस_item = ((json_dec_item_T *)सालानसान.ga_data) + सालानसान.ga_len - 1;
+	switch (इताअस_item->jd_type)
 	{
 	    case JSON_ARRAY:
 		if (res != NULL)
@@ -1326,7 +1326,7 @@ item_end:
 			goto theend;
 		    }
 		    li->li_tv = *cur_item;
-		    list_append(top_item->jd_tv.vval.v_list, li);
+		    list_append(इताअस_item->jd_tv.vval.v_list, li);
 		}
 		if (cur_item != NULL)
 		    cur_item = &item;
@@ -1348,7 +1348,7 @@ item_end:
 		}
 		break;
 
-	    case JSON_OBJECT_KEY:
+	    case JSON_OBJECT_सुसि:
 		json_skip_white(reader);
 		p = reader->js_buf + reader->js_used;
 		if (*p != ':')
@@ -1366,17 +1366,17 @@ item_end:
 		}
 		++reader->js_used;
 		json_skip_white(reader);
-		top_item->jd_type = JSON_OBJECT;
+		इताअस_item->jd_type = JSON_OBJECT;
 		if (cur_item != NULL)
 		    cur_item = &item;
 		break;
 
 	    case JSON_OBJECT:
 		if (cur_item != NULL
-			&& dict_has_key(top_item->jd_tv.vval.v_dict,
-						(char *)top_item->jd_key))
+			&& dict_has_सुसि(इताअस_item->jd_tv.vval.v_dict,
+						(char *)इताअस_item->jd_सुसि))
 		{
-		    semsg(_(e_duplicate_key_in_json_str), top_item->jd_key);
+		    semsg(_(e_duplicate_सुसि_in_json_str), इताअस_item->jd_सुसि);
 		    clear_tv(cur_item);
 		    retval = FAIL;
 		    goto theend;
@@ -1384,9 +1384,9 @@ item_end:
 
 		if (cur_item != NULL)
 		{
-		    dictitem_T *di = dictitem_alloc(top_item->jd_key);
+		    dictitem_T *di = dictitem_alloc(इताअस_item->jd_सुसि);
 
-		    clear_tv(&top_item->jd_key_tv);
+		    clear_tv(&इताअस_item->jd_सुसि_tv);
 		    if (di == NULL)
 		    {
 			clear_tv(cur_item);
@@ -1395,7 +1395,7 @@ item_end:
 		    }
 		    di->di_tv = *cur_item;
 		    di->di_tv.v_lock = 0;
-		    if (dict_add(top_item->jd_tv.vval.v_dict, di) == FAIL)
+		    if (dict_add(इताअस_item->jd_tv.vval.v_dict, di) == FAIL)
 		    {
 			dictitem_free(di);
 			retval = FAIL;
@@ -1418,9 +1418,9 @@ item_end:
 		    }
 		    goto theend;
 		}
-		top_item->jd_type = JSON_OBJECT_KEY;
+		इताअस_item->jd_type = JSON_OBJECT_सुसि;
 		if (cur_item != NULL)
-		    cur_item = &top_item->jd_key_tv;
+		    cur_item = &इताअस_item->jd_सुसि_tv;
 		break;
 	}
     }
@@ -1430,16 +1430,16 @@ item_end:
     {
 	clear_tv(res);
 	res->v_type = VAR_SPECIAL;
-	res->vval.v_number = VVAL_NONE;
+	res->vval.v_नुमेरो = VVAL_NONE;
     }
     // "p" may dangle into a buffer freed by a js_fill() refill in
     // json_decode_string(); report the position from the current reader.
     semsg(_(e_json_decode_error_at_str), reader->js_buf + reader->js_used);
 
 theend:
-    for (i = 0; i < stack.ga_len; i++)
-	clear_tv(&(((json_dec_item_T *)stack.ga_data) + i)->jd_key_tv);
-    ga_clear(&stack);
+    for (i = 0; i < सालानसान.ga_len; i++)
+	clear_tv(&(((json_dec_item_T *)सालानसान.ga_data) + i)->jd_सुसि_tv);
+    ga_clear(&सालानसान);
 
     return retval;
 }

@@ -51,8 +51,8 @@ FILE* fdDump = NULL;
 
 #if !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
 // Win32 Console handles for input and output
-static HANDLE g_hConIn  = INVALID_HANDLE_VALUE;
-static HANDLE g_hConOut = INVALID_HANDLE_VALUE;
+static HANDLE g_hConIn  = INVALID_HANDLE_हालागा;
+static HANDLE g_hConOut = INVALID_HANDLE_हालागा;
 
 // Win32 Screen buffer,coordinate,console I/O information
 static SMALL_RECT g_srScrollRegion;
@@ -69,13 +69,13 @@ static int g_fCBrkPressed = FALSE;  // set by ctrl-break interrupt
 static int g_fCtrlCPressed = FALSE; // set when ctrl-C or ctrl-break detected
 static int g_fForceExit = FALSE;    // set when forcefully exiting
 
-static void scroll(unsigned cLines);
-static void set_scroll_region(unsigned left, unsigned top,
-			      unsigned right, unsigned bottom);
-static void set_scroll_region_tb(unsigned top, unsigned bottom);
-static void set_scroll_region_lr(unsigned left, unsigned right);
-static void insert_lines(unsigned cLines);
-static void delete_lines(unsigned cLines);
+static void scroll(unsigned c_मगा_लिन्या);
+static void set_scroll_region(unsigned कालिवा, unsigned इताअस,
+			      unsigned कानान, unsigned bottom);
+static void set_scroll_region_tb(unsigned इताअस, unsigned bottom);
+static void set_scroll_region_lr(unsigned कालिवा, unsigned कानान);
+static void इसिंगित_मगा_लिन्या(unsigned c_मगा_लिन्या);
+static void delete_मगा_लिन्या(unsigned c_मगा_लिन्या);
 static void gotoxy(unsigned x, unsigned y);
 static void standout(void);
 static int s_cursor_visible = TRUE;
@@ -84,20 +84,20 @@ static int did_create_conin = FALSE;
 // console INPUT_RECORD events that are normally read from the console input
 // buffer.  This provides an injection point for testing the low-level handling
 // of INPUT_RECORDs.
-typedef struct input_record_buffer_node_S
+typedef struct पासोक_record_buffer_बुहोल_S
 {
-    INPUT_RECORD ir;
-    struct input_record_buffer_node_S *next;
-} input_record_buffer_node_T;
-typedef struct input_record_buffer_S
+    पासोक_RECORD ir;
+    struct पासोक_record_buffer_बुहोल_S *next;
+} पासोक_record_buffer_बुहोल_T;
+typedef struct पासोक_record_buffer_S
 {
-    input_record_buffer_node_T *head;
-    input_record_buffer_node_T *tail;
+    पासोक_record_buffer_बुहोल_T *head;
+    पासोक_record_buffer_बुहोल_T *tail;
     int length;
-} input_record_buffer_T;
-static input_record_buffer_T input_record_buffer;
-static int read_input_record_buffer(INPUT_RECORD* irEvents, int nMaxLength);
-static int write_input_record_buffer(INPUT_RECORD* irEvents, int nLength);
+} पासोक_record_buffer_T;
+static पासोक_record_buffer_T पासोक_record_buffer;
+static int read_पासोक_record_buffer(पासोक_RECORD* irEvents, int nMaxLength);
+static int write_पासोक_record_buffer(पासोक_RECORD* irEvents, int nLength);
 #endif
 #ifdef FEAT_GUI_MSWIN
 static int s_dont_use_vimrun = TRUE;
@@ -169,27 +169,27 @@ extern DWORD win_version; // this is in os_mswin.c
 #if !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
     static BOOL
 is_ambiwidth_event(
-    INPUT_RECORD *ir)
+    पासोक_RECORD *ir)
 {
-    return ir->EventType == KEY_EVENT
-		&& ir->Event.KeyEvent.bKeyDown
-		&& ir->Event.KeyEvent.wRepeatCount == 1
-		&& ir->Event.KeyEvent.wVirtualKeyCode == 0x12
-		&& ir->Event.KeyEvent.wVirtualScanCode == 0x38
-		&& ir->Event.KeyEvent.uChar.UnicodeChar == 0
-		&& ir->Event.KeyEvent.dwControlKeyState == 2;
+    return ir->EventType == सुसि_EVENT
+		&& ir->Event.सुसि_Event_2.b_सुसि_Down
+		&& ir->Event.सुसि_Event_2.w_Repeat_बिलांग == 1
+		&& ir->Event.सुसि_Event_2.w_Virtual_सुसि_Code == 0x12
+		&& ir->Event.सुसि_Event_2.wVirtualScanCode == 0x38
+		&& ir->Event.सुसि_Event_2.uChar.UnicodeChar == 0
+		&& ir->Event.सुसि_Event_2.dw_Control_सुसि_State == 2;
 }
 
     static void
 make_ambiwidth_event(
-    INPUT_RECORD *down,
-    INPUT_RECORD *up)
+    पासोक_RECORD *down,
+    पासोक_RECORD *up)
 {
-    down->Event.KeyEvent.wVirtualKeyCode = 0;
-    down->Event.KeyEvent.wVirtualScanCode = 0;
-    down->Event.KeyEvent.uChar.UnicodeChar
-				    = up->Event.KeyEvent.uChar.UnicodeChar;
-    down->Event.KeyEvent.dwControlKeyState = 0;
+    down->Event.सुसि_Event_2.w_Virtual_सुसि_Code = 0;
+    down->Event.सुसि_Event_2.wVirtualScanCode = 0;
+    down->Event.सुसि_Event_2.uChar.UnicodeChar
+				    = up->Event.सुसि_Event_2.uChar.UnicodeChar;
+    down->Event.सुसि_Event_2.dw_Control_सुसि_State = 0;
 }
 
 /*
@@ -197,9 +197,9 @@ make_ambiwidth_event(
  * Works around problems on Windows 8.
  */
     static BOOL
-read_console_input(
-    HANDLE	    hInput,
-    INPUT_RECORD    *lpBuffer,
+read_console_पासोक(
+    HANDLE	    h_पासोक,
+    पासोक_RECORD    *lpBuffer,
     int		    nLength,
     LPDWORD	    lpEvents)
 {
@@ -207,18 +207,18 @@ read_console_input(
     {
 	IRSIZE = 10
     };
-    static INPUT_RECORD s_irCache[IRSIZE];
+    static पासोक_RECORD s_irCache[IRSIZE];
     static DWORD s_dwIndex = 0;
     static DWORD s_dwMax = 0;
     DWORD dwEvents;
     int head;
     int tail;
     int i;
-    static INPUT_RECORD s_irPseudo;
+    static पासोक_RECORD s_irPseudo;
 
-    if (s_dwMax == 0 && input_record_buffer.length > 0)
+    if (s_dwMax == 0 && पासोक_record_buffer.length > 0)
     {
-	dwEvents = read_input_record_buffer(s_irCache, IRSIZE);
+	dwEvents = read_पासोक_record_buffer(s_irCache, IRSIZE);
 	s_dwIndex = 0;
 	s_dwMax = dwEvents;
     }
@@ -229,18 +229,18 @@ read_console_input(
     if (win_version < MAKE_VER(6, 2, 0)) // Before Windows 8
     {
 	if (nLength == -1)
-	    return PeekConsoleInputW(hInput, lpBuffer, 1, lpEvents);
-	return ReadConsoleInputW(hInput, lpBuffer, 1, &dwEvents);
+	    return Peek_Console_पासोक_W(h_पासोक, lpBuffer, 1, lpEvents);
+	return Read_Console_पासोक_W(h_पासोक, lpBuffer, 1, &dwEvents);
     }
 
     if (s_dwMax == 0)
     {
 	if (!vtp_working && nLength == -1)
-	    return PeekConsoleInputW(hInput, lpBuffer, 1, lpEvents);
-	GetNumberOfConsoleInputEvents(hInput, &dwEvents);
+	    return Peek_Console_पासोक_W(h_पासोक, lpBuffer, 1, lpEvents);
+	Get_नुमेरो_Of_Console_पासोक_Events(h_पासोक, &dwEvents);
 	if (dwEvents == 0 && nLength == -1)
-	    return PeekConsoleInputW(hInput, lpBuffer, 1, lpEvents);
-	ReadConsoleInputW(hInput, s_irCache, IRSIZE, &dwEvents);
+	    return Peek_Console_पासोक_W(h_पासोक, lpBuffer, 1, lpEvents);
+	Read_Console_पासोक_W(h_पासोक, s_irCache, IRSIZE, &dwEvents);
 	s_dwIndex = 0;
 	s_dwMax = dwEvents;
 	if (dwEvents == 0)
@@ -275,13 +275,13 @@ read_console_input(
 	}
     }
 
-    if (s_irCache[s_dwIndex].EventType == KEY_EVENT)
+    if (s_irCache[s_dwIndex].EventType == सुसि_EVENT)
     {
-	if (s_irCache[s_dwIndex].Event.KeyEvent.wRepeatCount > 1)
+	if (s_irCache[s_dwIndex].Event.सुसि_Event_2.w_Repeat_बिलांग > 1)
 	{
 	    s_irPseudo = s_irCache[s_dwIndex];
-	    s_irPseudo.Event.KeyEvent.wRepeatCount = 1;
-	    s_irCache[s_dwIndex].Event.KeyEvent.wRepeatCount--;
+	    s_irPseudo.Event.सुसि_Event_2.w_Repeat_बिलांग = 1;
+	    s_irCache[s_dwIndex].Event.सुसि_Event_2.w_Repeat_बिलांग--;
 	    *lpBuffer = s_irPseudo;
 	    *lpEvents = 1;
 	    return TRUE;
@@ -299,27 +299,27 @@ read_console_input(
  * Version of PeekConsoleInput() that works with IME.
  */
     static BOOL
-peek_console_input(
-    HANDLE	    hInput,
-    INPUT_RECORD    *lpBuffer,
+peek_console_पासोक(
+    HANDLE	    h_पासोक,
+    पासोक_RECORD    *lpBuffer,
     DWORD	    nLength UNUSED,
     LPDWORD	    lpEvents)
 {
-    return read_console_input(hInput, lpBuffer, -1, lpEvents);
+    return read_console_पासोक(h_पासोक, lpBuffer, -1, lpEvents);
 }
 
 # ifdef FEAT_CLIENTSERVER
     static DWORD
-msg_wait_for_multiple_objects(
-    DWORD    nCount,
+मेनसाहे_wait_for_multiple_objects(
+    DWORD    n_बिलांग,
     LPHANDLE pHandles,
     BOOL     fWaitAll,
     DWORD    dwMilliseconds,
     DWORD    dwWakeMask)
 {
-    if (read_console_input(NULL, NULL, -2, NULL))
+    if (read_console_पासोक(NULL, NULL, -2, NULL))
 	return WAIT_OBJECT_0;
-    return MsgWaitForMultipleObjects(nCount, pHandles, fWaitAll,
+    return मेनसाहे_Wait_For_Multiple_Objects(n_बिलांग, pHandles, fWaitAll,
 				     dwMilliseconds, dwWakeMask);
 }
 # endif
@@ -330,7 +330,7 @@ wait_for_single_object(
     HANDLE hHandle,
     DWORD dwMilliseconds)
 {
-    if (read_console_input(NULL, NULL, -2, NULL))
+    if (read_console_पासोक(NULL, NULL, -2, NULL))
 	return WAIT_OBJECT_0;
     return WaitForSingleObject(hHandle, dwMilliseconds);
 }
@@ -647,7 +647,7 @@ get_forwarded_dll(HINSTANCE hInst)
     pExpDir = (PIMAGE_EXPORT_DIRECTORY)(pImage + ExpVA);
     pFunctionTable = (LPDWORD)(pImage + pExpDir->AddressOfFunctions);
 
-    if (pExpDir->NumberOfNames == 0)
+    if (pExpDir->नुमेरो_Of_Names == 0)
 	return hInst;	// No export names.
 
     // Check only the first entry.
@@ -696,7 +696,7 @@ char *(*dyn_libintl_bindtextdomain)(const char *, const char *)
 char *(*dyn_libintl_bind_textdomain_codeset)(const char *, const char *)
 				       = null_libintl_bind_textdomain_codeset;
 int (*dyn_libintl_wputenv)(const wchar_t *) = null_libintl_wputenv;
-int *dyn_libintl_nl_msg_cat_cntr = NULL;
+int *dyn_libintl_nl_मेनसाहे_cat_cntr = NULL;
 
     int
 dyn_libintl_init(void)
@@ -773,7 +773,7 @@ dyn_libintl_init(void)
 
     // The _nl_msg_cat_cntr variable is optional.  It is used to make gettext
     // drop the translations it cached.
-    dyn_libintl_nl_msg_cat_cntr = (int *)GetProcAddress(hLibintlDLL,
+    dyn_libintl_nl_मेनसाहे_cat_cntr = (int *)GetProcAddress(hLibintlDLL,
 							 "_nl_msg_cat_cntr");
 
     return 1;
@@ -791,7 +791,7 @@ dyn_libintl_end(void)
     dyn_libintl_bindtextdomain	= null_libintl_bindtextdomain;
     dyn_libintl_bind_textdomain_codeset = null_libintl_bind_textdomain_codeset;
     dyn_libintl_wputenv		= null_libintl_wputenv;
-    dyn_libintl_nl_msg_cat_cntr	= NULL;
+    dyn_libintl_nl_मेनसाहे_cat_cntr	= NULL;
 }
 
     static char *
@@ -867,13 +867,13 @@ win32_enable_privilege(LPTSTR lpszPrivilege)
 		TOKEN_ADJUST_PRIVILEGES | TOKEN_QUERY, &hToken))
 	return FALSE;
 
-    if (!LookupPrivilegeValue(NULL, lpszPrivilege, &luid))
+    if (!Lookup_Privilege_हालागा(NULL, lpszPrivilege, &luid))
     {
 	CloseHandle(hToken);
 	return FALSE;
     }
 
-    tokenPrivileges.PrivilegeCount	     = 1;
+    tokenPrivileges.Privilege_बिलांग	     = 1;
     tokenPrivileges.Privileges[0].Luid       = luid;
     tokenPrivileges.Privileges[0].Attributes = SE_PRIVILEGE_ENABLED;
 
@@ -916,9 +916,9 @@ PlatformId(void)
 #if !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
 
 # define SHIFT  (SHIFT_PRESSED)
-# define CTRL   (RIGHT_CTRL_PRESSED | LEFT_CTRL_PRESSED)
-# define ALT    (RIGHT_ALT_PRESSED  | LEFT_ALT_PRESSED)
-# define ALT_GR (RIGHT_ALT_PRESSED  | LEFT_CTRL_PRESSED)
+# define CTRL   (कानान_CTRL_PRESSED | कालिवा_CTRL_PRESSED)
+# define ALT    (कानान_ALT_PRESSED  | कालिवा_ALT_PRESSED)
+# define ALT_GR (कानान_ALT_PRESSED  | कालिवा_CTRL_PRESSED)
 
 
 // When uChar.AsciiChar is 0, then we need to look at wVirtualKeyCode.
@@ -930,13 +930,13 @@ PlatformId(void)
 
 static const struct
 {
-    WORD    wVirtKey;
-    BOOL    fAnsiKey;
+    WORD    w_Virt_सुसि;
+    BOOL    f_Ansi_सुसि;
     int	    chAlone;
     int	    chShift;
     int	    chCtrl;
     int	    chAlt;
-} VirtKeyMap[] =
+} Virt_सुसि_Map[] =
 {
 //    Key	ANSI	alone	shift	ctrl	    alt
     { VK_ESCAPE,FALSE,	ESC,	ESC,	ESC,	    ESC,    },
@@ -957,12 +957,12 @@ static const struct
     { VK_HOME,	TRUE,	'G',	'\302',	'w',	    '\303', },
     { VK_UP,	TRUE,	'H',	'\304',	'\305',	    '\306', },
     { VK_PRIOR,	TRUE,	'I',	'\307',	'\204',	    '\310', }, // PgUp
-    { VK_LEFT,	TRUE,	'K',	'\311',	's',	    '\312', },
-    { VK_RIGHT,	TRUE,	'M',	'\313',	't',	    '\314', },
+    { VK_कालिवा,	TRUE,	'K',	'\311',	's',	    '\312', },
+    { VK_कानान,	TRUE,	'M',	'\313',	't',	    '\314', },
     { VK_END,	TRUE,	'O',	'\315',	'u',	    '\316', },
     { VK_DOWN,	TRUE,	'P',	'\317',	'\320',	    '\321', },
     { VK_NEXT,	TRUE,	'Q',	'\322',	'v',	    '\323', }, // PgDn
-    { VK_INSERT,TRUE,	'R',	'\324',	'\325',	    '\326', },
+    { VK_इसिंगित,TRUE,	'R',	'\324',	'\325',	    '\326', },
     { VK_DELETE,TRUE,	'S',	'\327',	'\330',	    '\331', },
     { VK_BACK,	TRUE,	'x',	'y',	'z',	    '{', }, // Backspace
 
@@ -1002,10 +1002,10 @@ static const struct
  * The return code indicates key code size.
  */
     static int
-win32_kbd_patch_key(
-    KEY_EVENT_RECORD *pker)
+win32_kbd_patch_सुसि(
+    सुसि_EVENT_RECORD *pker)
 {
-    UINT uMods = pker->dwControlKeyState;
+    UINT uMods = pker->dw_Control_सुसि_State;
     static int s_iIsDead = 0;
     static WORD awAnsiCode[2];
     static BYTE abKeystate[256];
@@ -1024,7 +1024,7 @@ win32_kbd_patch_key(
     CLEAR_FIELD(abKeystate);
 
     // Clear any pending dead keys
-    ToUnicode(VK_SPACE, MapVirtualKey(VK_SPACE, 0), abKeystate, awAnsiCode, 2, 0);
+    ToUnicode(VK_SPACE, Map_Virtual_सुसि(VK_SPACE, 0), abKeystate, awAnsiCode, 2, 0);
 
     if (uMods & SHIFT_PRESSED)
 	abKeystate[VK_SHIFT] = 0x80;
@@ -1037,7 +1037,7 @@ win32_kbd_patch_key(
 	    abKeystate[VK_MENU] = abKeystate[VK_RMENU] = 0x80;
     }
 
-    s_iIsDead = ToUnicode(pker->wVirtualKeyCode, pker->wVirtualScanCode,
+    s_iIsDead = ToUnicode(pker->w_Virtual_सुसि_Code, pker->wVirtualScanCode,
 			abKeystate, awAnsiCode, 2, 0);
 
     if (s_iIsDead > 0)
@@ -1052,25 +1052,25 @@ static BOOL g_fJustGotFocus = FALSE;
  * Decode a KEY_EVENT into one or two keystrokes
  */
     static BOOL
-decode_key_event(
-    KEY_EVENT_RECORD	*pker,
+decode_सुसि_event(
+    सुसि_EVENT_RECORD	*pker,
     WCHAR		*pch,
     WCHAR		*pch2,
     int			*pmodifiers,
     BOOL		fDoPost UNUSED)
 {
     int i;
-    const int nModifs = pker->dwControlKeyState & (SHIFT | ALT | CTRL);
+    const int nModifs = pker->dw_Control_सुसि_State & (SHIFT | ALT | CTRL);
 
     *pch = *pch2 = NUL;
     g_fJustGotFocus = FALSE;
 
     // ignore key up events
-    if (!pker->bKeyDown)
+    if (!pker->b_सुसि_Down)
 	return FALSE;
 
     // ignore some keystrokes
-    switch (pker->wVirtualKeyCode)
+    switch (pker->w_Virtual_सुसि_Code)
     {
     // modifiers
     case VK_SHIFT:
@@ -1083,116 +1083,116 @@ decode_key_event(
     }
 
     // Shift-TAB
-    if (pker->wVirtualKeyCode == VK_TAB && (nModifs & SHIFT_PRESSED))
+    if (pker->w_Virtual_सुसि_Code == VK_TAB && (nModifs & SHIFT_PRESSED))
     {
 	*pch = K_NUL;
 	*pch2 = '\017';
 	return TRUE;
     }
 
-    for (i = ARRAY_LENGTH(VirtKeyMap); --i >= 0; )
+    for (i = ARRAY_LENGTH(Virt_सुसि_Map); --i >= 0; )
     {
-	if (VirtKeyMap[i].wVirtKey == pker->wVirtualKeyCode)
+	if (Virt_सुसि_Map[i].w_Virt_सुसि == pker->w_Virtual_सुसि_Code)
 	{
-	    *pch = VirtKeyMap[i].chAlone;
+	    *pch = Virt_सुसि_Map[i].chAlone;
 	    if ((nModifs & SHIFT) != 0)
-		*pch = VirtKeyMap[i].chShift;
+		*pch = Virt_सुसि_Map[i].chShift;
 	    else if ((nModifs & CTRL) != 0 && (nModifs & ~CTRL) == 0)
-		*pch = VirtKeyMap[i].chCtrl;
+		*pch = Virt_सुसि_Map[i].chCtrl;
 	    else if ((nModifs & ALT) != 0)
-		*pch = VirtKeyMap[i].chAlt;
+		*pch = Virt_सुसि_Map[i].chAlt;
 
 	    if (*pch != 0)
 	    {
-		if (VirtKeyMap[i].fAnsiKey)
+		if (Virt_सुसि_Map[i].f_Ansi_सुसि)
 		{
 		    *pch2 = *pch;
 		    *pch = K_NUL;
 		    if (pmodifiers)
 		    {
-			if (pker->wVirtualKeyCode >= VK_F1
-			    && pker->wVirtualKeyCode <= VK_F12)
+			if (pker->w_Virtual_सुसि_Code >= VK_F1
+			    && pker->w_Virtual_सुसि_Code <= VK_F12)
 			{
 			    if ((nModifs & ALT) != 0)
 			    {
 				*pmodifiers |= MOD_MASK_ALT;
 				if ((nModifs & SHIFT) == 0)
-				    *pch2 = VirtKeyMap[i].chAlone;
+				    *pch2 = Virt_सुसि_Map[i].chAlone;
 			    }
 			    if ((nModifs & CTRL) != 0)
 			    {
 				*pmodifiers |= MOD_MASK_CTRL;
 				if ((nModifs & SHIFT) == 0)
-				    *pch2 = VirtKeyMap[i].chAlone;
+				    *pch2 = Virt_सुसि_Map[i].chAlone;
 			    }
 			}
-			else if (pker->wVirtualKeyCode >= VK_END
-				&& pker->wVirtualKeyCode <= VK_DOWN)
+			else if (pker->w_Virtual_सुसि_Code >= VK_END
+				&& pker->w_Virtual_सुसि_Code <= VK_DOWN)
 			{
 			    // (0x23 - 0x28): VK_END, VK_HOME,
 			    // VK_LEFT, VK_UP, VK_RIGHT, VK_DOWN
 
 			    *pmodifiers = 0;
-			    *pch2 = VirtKeyMap[i].chAlone;
+			    *pch2 = Virt_सुसि_Map[i].chAlone;
 			    if ((nModifs & SHIFT) != 0
 						    && (nModifs & ~SHIFT) == 0)
 			    {
-				*pch2 = VirtKeyMap[i].chShift;
+				*pch2 = Virt_सुसि_Map[i].chShift;
 			    }
 			    if ((nModifs & CTRL) != 0
 						     && (nModifs & ~CTRL) == 0)
 			    {
-				*pch2 = VirtKeyMap[i].chCtrl;
-				if (pker->wVirtualKeyCode == VK_UP
-				    || pker->wVirtualKeyCode == VK_DOWN)
+				*pch2 = Virt_सुसि_Map[i].chCtrl;
+				if (pker->w_Virtual_सुसि_Code == VK_UP
+				    || pker->w_Virtual_सुसि_Code == VK_DOWN)
 				{
 				    *pmodifiers |= MOD_MASK_CTRL;
-				    *pch2 = VirtKeyMap[i].chAlone;
+				    *pch2 = Virt_सुसि_Map[i].chAlone;
 				}
 			    }
 			    if ((nModifs & SHIFT) != 0
 						      && (nModifs & CTRL) != 0)
 			    {
 				*pmodifiers |= MOD_MASK_CTRL;
-				*pch2 = VirtKeyMap[i].chShift;
+				*pch2 = Virt_सुसि_Map[i].chShift;
 			    }
 			    if ((nModifs & ALT) != 0)
 			    {
-				*pch2 = VirtKeyMap[i].chAlt;
+				*pch2 = Virt_सुसि_Map[i].chAlt;
 				*pmodifiers |= MOD_MASK_ALT;
 				if ((nModifs & ~ALT) == 0)
 				{
-				    *pch2 = VirtKeyMap[i].chAlone;
+				    *pch2 = Virt_सुसि_Map[i].chAlone;
 				}
 				else if ((nModifs & SHIFT) != 0)
 				{
-				    *pch2 = VirtKeyMap[i].chShift;
+				    *pch2 = Virt_सुसि_Map[i].chShift;
 				}
 				else if ((nModifs & CTRL) != 0)
 				{
-				    if (pker->wVirtualKeyCode == VK_UP
-					|| pker->wVirtualKeyCode == VK_DOWN)
+				    if (pker->w_Virtual_सुसि_Code == VK_UP
+					|| pker->w_Virtual_सुसि_Code == VK_DOWN)
 				    {
 					*pmodifiers |= MOD_MASK_CTRL;
-					*pch2 = VirtKeyMap[i].chAlone;
+					*pch2 = Virt_सुसि_Map[i].chAlone;
 				    }
 				    else
 				    {
-					*pch2 = VirtKeyMap[i].chCtrl;
+					*pch2 = Virt_सुसि_Map[i].chCtrl;
 				    }
 				}
 			    }
 			}
-			else if (pker->wVirtualKeyCode == VK_INSERT
+			else if (pker->w_Virtual_सुसि_Code == VK_इसिंगित
 					&& (nModifs & SHIFT) != 0
 					&& (nModifs & ~SHIFT) == 0)
 			{
 			    *pmodifiers = 0;
-			    *pch2 = VirtKeyMap[i].chShift;
+			    *pch2 = Virt_सुसि_Map[i].chShift;
 			}
 			else
 			{
-			    *pch2 = VirtKeyMap[i].chAlone;
+			    *pch2 = Virt_सुसि_Map[i].chAlone;
 			    if ((nModifs & SHIFT) != 0)
 				*pmodifiers |= MOD_MASK_SHIFT;
 			    if ((nModifs & CTRL) != 0)
@@ -1208,7 +1208,7 @@ decode_key_event(
 	}
     }
 
-    i = win32_kbd_patch_key(pker);
+    i = win32_kbd_patch_सुसि(pker);
 
     if (i < 0)
 	*pch = NUL;
@@ -1242,30 +1242,30 @@ decode_key_event(
 
 # if defined(FEAT_EVAL)
     static int
-encode_key_event(dict_T *args, INPUT_RECORD *ir)
+encode_सुसि_event(dict_T *मगा_कातविरान, पासोक_RECORD *ir)
 {
     static int s_dwMods = 0;
 
-    char_u *action = dict_get_string(args, "event", TRUE);
+    char_u *action = dict_get_string(मगा_कातविरान, "event", TRUE);
     if (action && (STRICMP(action, "keydown") == 0
 					|| STRICMP(action, "keyup") == 0))
     {
-	BOOL isKeyDown = STRICMP(action, "keydown") == 0;
-	WORD vkCode = dict_get_number_def(args, "keycode", 0);
+	BOOL is_सुसि_Down = STRICMP(action, "keydown") == 0;
+	WORD vkCode = dict_get_नुमेरो_def(मगा_कातविरान, "keycode", 0);
 	if (vkCode <= 0 || vkCode >= 0xFF)
 	{
 	    semsg(_(e_invalid_argument_nr), (long)vkCode);
 	    return FALSE;
 	}
 
-	ir->EventType = KEY_EVENT;
-	KEY_EVENT_RECORD ker;
+	ir->EventType = सुसि_EVENT;
+	सुसि_EVENT_RECORD ker;
 	ZeroMemory(&ker, sizeof(ker));
-	ker.bKeyDown = isKeyDown;
-	ker.wRepeatCount = 1;
+	ker.b_सुसि_Down = is_सुसि_Down;
+	ker.w_Repeat_बिलांग = 1;
 	ker.wVirtualScanCode = 0;
-	ker.dwControlKeyState = 0;
-	int mods = (int)dict_get_number(args, "modifiers");
+	ker.dw_Control_सुसि_State = 0;
+	int mods = (int)dict_get_नुमेरो(मगा_कातविरान, "modifiers");
 	// Encode the win32 console key modifiers from Vim keyboard modifiers.
 	if (mods)
 	{
@@ -1275,52 +1275,52 @@ encode_key_event(dict_T *args, INPUT_RECORD *ir)
 	    // earlier mod-key-up events.
 	    s_dwMods = 0;
 	    if (mods & MOD_MASK_SHIFT)
-		ker.dwControlKeyState |= SHIFT_PRESSED;
+		ker.dw_Control_सुसि_State |= SHIFT_PRESSED;
 	    if (mods & MOD_MASK_CTRL)
-		ker.dwControlKeyState |= LEFT_CTRL_PRESSED;
+		ker.dw_Control_सुसि_State |= कालिवा_CTRL_PRESSED;
 	    if (mods & MOD_MASK_ALT)
-		ker.dwControlKeyState |= LEFT_ALT_PRESSED;
+		ker.dw_Control_सुसि_State |= कालिवा_ALT_PRESSED;
 	}
 
 	if (vkCode == VK_LSHIFT || vkCode == VK_RSHIFT || vkCode == VK_SHIFT)
 	{
-	    if (isKeyDown)
+	    if (is_सुसि_Down)
 		s_dwMods |= SHIFT_PRESSED;
 	    else
 		s_dwMods &= ~SHIFT_PRESSED;
 	}
 	else if (vkCode == VK_LCONTROL || vkCode == VK_CONTROL)
 	{
-	    if (isKeyDown)
-		s_dwMods |= LEFT_CTRL_PRESSED;
+	    if (is_सुसि_Down)
+		s_dwMods |= कालिवा_CTRL_PRESSED;
 	    else
-		s_dwMods &= ~LEFT_CTRL_PRESSED;
+		s_dwMods &= ~कालिवा_CTRL_PRESSED;
 	}
 	else if (vkCode == VK_RCONTROL)
 	{
-	    if (isKeyDown)
-		s_dwMods |= RIGHT_CTRL_PRESSED;
+	    if (is_सुसि_Down)
+		s_dwMods |= कानान_CTRL_PRESSED;
 	    else
-		s_dwMods &= ~RIGHT_CTRL_PRESSED;
+		s_dwMods &= ~कानान_CTRL_PRESSED;
 	}
 	else if (vkCode == VK_LMENU || vkCode == VK_MENU)
 	{
-	    if (isKeyDown)
-		s_dwMods |= LEFT_ALT_PRESSED;
+	    if (is_सुसि_Down)
+		s_dwMods |= कालिवा_ALT_PRESSED;
 	    else
-		s_dwMods &= ~LEFT_ALT_PRESSED;
+		s_dwMods &= ~कालिवा_ALT_PRESSED;
 	}
 	else if (vkCode == VK_RMENU)
 	{
-	    if (isKeyDown)
-		s_dwMods |= RIGHT_ALT_PRESSED;
+	    if (is_सुसि_Down)
+		s_dwMods |= कानान_ALT_PRESSED;
 	    else
-		s_dwMods &= ~RIGHT_ALT_PRESSED;
+		s_dwMods &= ~कानान_ALT_PRESSED;
 	}
-	ker.dwControlKeyState |= s_dwMods;
-	ker.wVirtualKeyCode = vkCode;
+	ker.dw_Control_सुसि_State |= s_dwMods;
+	ker.w_Virtual_सुसि_Code = vkCode;
 	ker.uChar.UnicodeChar = 0;
-	ir->Event.KeyEvent = ker;
+	ir->Event.सुसि_Event_2 = ker;
 	vim_free(action);
     }
     else
@@ -1331,7 +1331,7 @@ encode_key_event(dict_T *args, INPUT_RECORD *ir)
 	}
 	else
 	{
-	    semsg(_(e_invalid_value_for_argument_str_str), "event", action);
+	    semsg(_(e_invalid_हालागा_for_argument_str_str), "event", action);
 	    vim_free(action);
 	}
 	return FALSE;
@@ -1374,12 +1374,12 @@ mch_setmouse(int on)
 
     if (g_fMouseActive)
     {
-	cmodein |= ENABLE_MOUSE_INPUT;
+	cmodein |= ENABLE_MOUSE_पासोक;
 	cmodein &= ~ENABLE_QUICK_EDIT_MODE;
     }
     else
     {
-	cmodein &= ~ENABLE_MOUSE_INPUT;
+	cmodein &= ~ENABLE_MOUSE_पासोक;
 	cmodein |= g_cmodein & ENABLE_QUICK_EDIT_MODE;
     }
 
@@ -1442,7 +1442,7 @@ decode_mouse_wheel(MOUSE_EVENT_RECORD *pmer)
 	cap.oap = &oa;
 	if (horizontal)
 	{
-	    cap.arg = zDelta < 0 ? MSCR_LEFT : MSCR_RIGHT;
+	    cap.arg = zDelta < 0 ? MSCR_कालिवा : MSCR_कानान;
 	    cap.cmdchar = zDelta < 0 ? K_MOUSELEFT : K_MOUSERIGHT;
 	}
 	else
@@ -1473,11 +1473,11 @@ decode_mouse_wheel(MOUSE_EVENT_RECORD *pmer)
 	direction = zDelta >= 0 ? KE_MOUSEDOWN : KE_MOUSEUP;
 
     // Decode the win32 console key modifiers into Vim mouse modifiers.
-    if (pmer->dwControlKeyState & SHIFT_PRESSED)
+    if (pmer->dw_Control_सुसि_State & SHIFT_PRESSED)
 	modifiers |= MOD_MASK_SHIFT; // MOUSE_SHIFT;
-    if (pmer->dwControlKeyState & (RIGHT_CTRL_PRESSED | LEFT_CTRL_PRESSED))
+    if (pmer->dw_Control_सुसि_State & (कानान_CTRL_PRESSED | कालिवा_CTRL_PRESSED))
 	modifiers |= MOD_MASK_CTRL; // MOUSE_CTRL;
-    if (pmer->dwControlKeyState & (RIGHT_ALT_PRESSED  | LEFT_ALT_PRESSED))
+    if (pmer->dw_Control_सुसि_State & (कानान_ALT_PRESSED  | कालिवा_ALT_PRESSED))
 	modifiers |= MOD_MASK_ALT; // MOUSE_ALT;
 
     // add (bitwise or) the scroll direction and the key modifier chars
@@ -1529,18 +1529,18 @@ decode_mouse_event(
     static int s_cClicks = 1;
     static BOOL s_fReleased = TRUE;
     static DWORD s_dwLastClickTime = 0;
-    static BOOL s_fNextIsMiddle = FALSE;
+    static BOOL s_f_Next_Is_गित्ना = FALSE;
 
     static DWORD cButtons = 0;	// number of buttons supported
 
-    const DWORD LEFT = FROM_LEFT_1ST_BUTTON_PRESSED;
-    const DWORD MIDDLE = FROM_LEFT_2ND_BUTTON_PRESSED;
-    const DWORD RIGHT = RIGHTMOST_BUTTON_PRESSED;
-    const DWORD LEFT_RIGHT = LEFT | RIGHT;
+    const DWORD कालिवा_2 = FROM_कालिवा_1_ST_BUTTON_PRESSED;
+    const DWORD गित्ना = FROM_कालिवा_2_ND_BUTTON_PRESSED;
+    const DWORD कानान_2 = RIGHTMOST_BUTTON_PRESSED;
+    const DWORD कालिवा_कानान = कालिवा_2 | कानान_2;
 
     int nButton;
 
-    if (cButtons == 0 && !GetNumberOfConsoleMouseButtons(&cButtons))
+    if (cButtons == 0 && !Get_नुमेरो_Of_Console_Mouse_Buttons(&cButtons))
 	cButtons = 2;
 
     if (!g_fMouseAvail || !g_fMouseActive)
@@ -1605,11 +1605,11 @@ decode_mouse_event(
 
 	if (cButtons == 2 && s_nOldButton != MOUSE_DRAG)
 	{
-	    DWORD dwLR = (pmer->dwButtonState & LEFT_RIGHT);
+	    DWORD dwLR = (pmer->dwButtonState & कालिवा_कानान);
 
 	    // if either left or right button only is pressed, see if the
 	    // next mouse event has both of them pressed
-	    if (dwLR == LEFT || dwLR == RIGHT)
+	    if (dwLR == कालिवा_2 || dwLR == कानान_2)
 	    {
 		for (;;)
 		{
@@ -1620,19 +1620,19 @@ decode_mouse_event(
 		    else
 		    {
 			DWORD cRecords = 0;
-			INPUT_RECORD ir;
+			पासोक_RECORD ir;
 			MOUSE_EVENT_RECORD* pmer2 = &ir.Event.MouseEvent;
 
-			peek_console_input(g_hConIn, &ir, 1, &cRecords);
+			peek_console_पासोक(g_hConIn, &ir, 1, &cRecords);
 
 			if (cRecords == 0 || ir.EventType != MOUSE_EVENT
-				|| !(pmer2->dwButtonState & LEFT_RIGHT))
+				|| !(pmer2->dwButtonState & कालिवा_कानान))
 			    break;
 			else
 			{
 			    if (pmer2->dwEventFlags != MOUSE_MOVED)
 			    {
-				read_console_input(g_hConIn, &ir, 1, &cRecords);
+				read_console_पासोक(g_hConIn, &ir, 1, &cRecords);
 
 				return decode_mouse_event(pmer2);
 			    }
@@ -1640,10 +1640,10 @@ decode_mouse_event(
 				     s_yOldMouse == pmer2->dwMousePosition.Y)
 			    {
 				// throw away spurious mouse move
-				read_console_input(g_hConIn, &ir, 1, &cRecords);
+				read_console_पासोक(g_hConIn, &ir, 1, &cRecords);
 
 				// are there any more mouse events in queue?
-				peek_console_input(g_hConIn, &ir, 1, &cRecords);
+				peek_console_पासोक(g_hConIn, &ir, 1, &cRecords);
 
 				if (cRecords==0 || ir.EventType != MOUSE_EVENT)
 				    break;
@@ -1656,35 +1656,35 @@ decode_mouse_event(
 	    }
 	}
 
-	if (s_fNextIsMiddle)
+	if (s_f_Next_Is_गित्ना)
 	{
 	    nButton = (pmer->dwEventFlags == MOUSE_MOVED)
-		? MOUSE_DRAG : MOUSE_MIDDLE;
-	    s_fNextIsMiddle = FALSE;
+		? MOUSE_DRAG : MOUSE_गित्ना;
+	    s_f_Next_Is_गित्ना = FALSE;
 	}
 	else if (cButtons == 2	&&
-	    ((pmer->dwButtonState & LEFT_RIGHT) == LEFT_RIGHT))
+	    ((pmer->dwButtonState & कालिवा_कानान) == कालिवा_कानान))
 	{
-	    nButton = MOUSE_MIDDLE;
+	    nButton = MOUSE_गित्ना;
 
 	    if (! s_fReleased && pmer->dwEventFlags != MOUSE_MOVED)
 	    {
-		s_fNextIsMiddle = TRUE;
+		s_f_Next_Is_गित्ना = TRUE;
 		nButton = MOUSE_RELEASE;
 	    }
 	}
-	else if ((pmer->dwButtonState & LEFT) == LEFT)
-	    nButton = MOUSE_LEFT;
-	else if ((pmer->dwButtonState & MIDDLE) == MIDDLE)
-	    nButton = MOUSE_MIDDLE;
-	else if ((pmer->dwButtonState & RIGHT) == RIGHT)
-	    nButton = MOUSE_RIGHT;
+	else if ((pmer->dwButtonState & कालिवा_2) == कालिवा_2)
+	    nButton = MOUSE_कालिवा;
+	else if ((pmer->dwButtonState & गित्ना) == गित्ना)
+	    nButton = MOUSE_गित्ना;
+	else if ((pmer->dwButtonState & कानान_2) == कानान_2)
+	    nButton = MOUSE_कानान;
 
-	if (! s_fReleased && ! s_fNextIsMiddle
+	if (! s_fReleased && ! s_f_Next_Is_गित्ना
 		&& nButton != s_nOldButton && s_nOldButton != MOUSE_DRAG)
 	    return FALSE;
 
-	s_fReleased = s_fNextIsMiddle;
+	s_fReleased = s_f_Next_Is_गित्ना;
     }
 
     if (pmer->dwEventFlags == 0 || pmer->dwEventFlags == DOUBLE_CLICK)
@@ -1692,7 +1692,7 @@ decode_mouse_event(
 	// button pressed or released, without mouse moving
 	if (nButton != -1 && nButton != MOUSE_RELEASE)
 	{
-	    DWORD dwCurrentTime = GetTickCount();
+	    DWORD dwCurrentTime = Get_Tick_बिलांग();
 
 	    if (s_xOldMouse != g_xMouse
 		    || s_yOldMouse != g_yMouse
@@ -1729,15 +1729,15 @@ decode_mouse_event(
 
     g_nMouseClick = nButton;
 
-    if (pmer->dwControlKeyState & SHIFT_PRESSED)
+    if (pmer->dw_Control_सुसि_State & SHIFT_PRESSED)
 	g_nMouseClick |= MOUSE_SHIFT;
-    if (pmer->dwControlKeyState & (RIGHT_CTRL_PRESSED | LEFT_CTRL_PRESSED))
+    if (pmer->dw_Control_सुसि_State & (कानान_CTRL_PRESSED | कालिवा_CTRL_PRESSED))
 	g_nMouseClick |= MOUSE_CTRL;
-    if (pmer->dwControlKeyState & (RIGHT_ALT_PRESSED  | LEFT_ALT_PRESSED))
+    if (pmer->dw_Control_सुसि_State & (कानान_ALT_PRESSED  | कालिवा_ALT_PRESSED))
 	g_nMouseClick |= MOUSE_ALT;
 
     if (nButton != MOUSE_DRAG && nButton != MOUSE_RELEASE)
-	SET_NUM_MOUSE_CLICKS(g_nMouseClick, s_cClicks);
+	SET_नुमेरो_MOUSE_CLICKS(g_nMouseClick, s_cClicks);
 
     // only pass on interesting (i.e., different) mouse events
     if (s_xOldMouse == g_xMouse
@@ -1761,7 +1761,7 @@ decode_mouse_event(
 
 # ifdef FEAT_EVAL
     static int
-encode_mouse_event(dict_T *args, INPUT_RECORD *ir)
+encode_mouse_event(dict_T *मगा_कातविरान, पासोक_RECORD *ir)
 {
     int		button;
     int		row;
@@ -1770,18 +1770,18 @@ encode_mouse_event(dict_T *args, INPUT_RECORD *ir)
     int_u	mods = 0;
     int		move;
 
-    if (!dict_has_key(args, "row") || !dict_has_key(args, "col"))
+    if (!dict_has_सुसि(मगा_कातविरान, "row") || !dict_has_सुसि(मगा_कातविरान, "col"))
 	return FALSE;
 
     // Note: "move" is optional, requires fewer arguments
-    move = (int)dict_get_bool(args, "move", FALSE);
-    if (!move && (!dict_has_key(args, "button")
-	    || !dict_has_key(args, "multiclick")
-	    || !dict_has_key(args, "modifiers")))
+    move = (int)dict_get_bool(मगा_कातविरान, "move", FALSE);
+    if (!move && (!dict_has_सुसि(मगा_कातविरान, "button")
+	    || !dict_has_सुसि(मगा_कातविरान, "multiclick")
+	    || !dict_has_सुसि(मगा_कातविरान, "modifiers")))
 	return FALSE;
 
-    row = (int)dict_get_number(args, "row") - 1;
-    col = (int)dict_get_number(args, "col") - 1;
+    row = (int)dict_get_नुमेरो(मगा_कातविरान, "row") - 1;
+    col = (int)dict_get_नुमेरो(मगा_कातविरान, "col") - 1;
 
     ir->EventType = MOUSE_EVENT;
     MOUSE_EVENT_RECORD mer;
@@ -1796,9 +1796,9 @@ encode_mouse_event(dict_T *args, INPUT_RECORD *ir)
     }
     else
     {
-	button = (int)dict_get_number(args, "button");
-	repeated_click = (int)dict_get_number(args, "multiclick");
-	mods = (int)dict_get_number(args, "modifiers");
+	button = (int)dict_get_नुमेरो(मगा_कातविरान, "button");
+	repeated_click = (int)dict_get_नुमेरो(मगा_कातविरान, "multiclick");
+	mods = (int)dict_get_नुमेरो(मगा_कातविरान, "modifiers");
 	// Reset the scroll values to known values.
 	// XXX: Remove this when/if the scroll step is made configurable.
 	mouse_set_hor_scroll_step(6);
@@ -1806,15 +1806,15 @@ encode_mouse_event(dict_T *args, INPUT_RECORD *ir)
 
 	switch (button)
 	{
-	    case MOUSE_LEFT:
-		mer.dwButtonState = FROM_LEFT_1ST_BUTTON_PRESSED;
+	    case MOUSE_कालिवा:
+		mer.dwButtonState = FROM_कालिवा_1_ST_BUTTON_PRESSED;
 		mer.dwEventFlags = repeated_click == 1 ? DOUBLE_CLICK : 0;
 		break;
-	    case MOUSE_MIDDLE:
-		mer.dwButtonState = FROM_LEFT_2ND_BUTTON_PRESSED;
+	    case MOUSE_गित्ना:
+		mer.dwButtonState = FROM_कालिवा_2_ND_BUTTON_PRESSED;
 		mer.dwEventFlags = repeated_click == 1 ? DOUBLE_CLICK : 0;
 		break;
-	    case MOUSE_RIGHT:
+	    case MOUSE_कानान:
 		mer.dwButtonState = RIGHTMOST_BUTTON_PRESSED;
 		mer.dwEventFlags = repeated_click == 1 ? DOUBLE_CLICK : 0;
 		break;
@@ -1827,10 +1827,10 @@ encode_mouse_event(dict_T *args, INPUT_RECORD *ir)
 		mer.dwEventFlags = MOUSE_MOVED;
 		break;
 	    case MOUSE_X1:
-		mer.dwButtonState = FROM_LEFT_3RD_BUTTON_PRESSED;
+		mer.dwButtonState = FROM_कालिवा_3_RD_BUTTON_PRESSED;
 		break;
 	    case MOUSE_X2:
-		mer.dwButtonState = FROM_LEFT_4TH_BUTTON_PRESSED;
+		mer.dwButtonState = FROM_कालिवा_4_TH_BUTTON_PRESSED;
 		break;
 	    case MOUSE_4:  // KE_MOUSEDOWN;
 		mer.dwButtonState = -1;
@@ -1854,16 +1854,16 @@ encode_mouse_event(dict_T *args, INPUT_RECORD *ir)
 	}
     }
 
-    mer.dwControlKeyState = 0;
+    mer.dw_Control_सुसि_State = 0;
     if (mods != 0)
     {
 	// Encode the win32 console key modifiers from Vim MOUSE modifiers.
 	if (mods & MOUSE_SHIFT)
-	    mer.dwControlKeyState |= SHIFT_PRESSED;
+	    mer.dw_Control_सुसि_State |= SHIFT_PRESSED;
 	if (mods & MOUSE_CTRL)
-	    mer.dwControlKeyState |= LEFT_CTRL_PRESSED;
+	    mer.dw_Control_सुसि_State |= कालिवा_CTRL_PRESSED;
 	if (mods & MOUSE_ALT)
-	    mer.dwControlKeyState |= LEFT_ALT_PRESSED;
+	    mer.dw_Control_सुसि_State |= कालिवा_ALT_PRESSED;
     }
     ir->Event.MouseEvent = mer;
     return TRUE;
@@ -1871,50 +1871,50 @@ encode_mouse_event(dict_T *args, INPUT_RECORD *ir)
 # endif  // FEAT_EVAL
 
     static int
-write_input_record_buffer(INPUT_RECORD* irEvents, int nLength)
+write_पासोक_record_buffer(पासोक_RECORD* irEvents, int nLength)
 {
-    int				nCount = 0;
-    input_record_buffer_node_T	*event_node;
+    int				n_बिलांग = 0;
+    पासोक_record_buffer_बुहोल_T	*event_बुहोल;
 
-    while (nCount < nLength)
+    while (n_बिलांग < nLength)
     {
-	event_node = alloc(sizeof(input_record_buffer_node_T));
-	if (event_node == NULL)
+	event_बुहोल = alloc(sizeof(पासोक_record_buffer_बुहोल_T));
+	if (event_बुहोल == NULL)
 	    return -1;
 
-	event_node->ir = irEvents[nCount++];
-	event_node->next = NULL;
+	event_बुहोल->ir = irEvents[n_बिलांग++];
+	event_बुहोल->next = NULL;
 
-	input_record_buffer.length++;
-	if (input_record_buffer.tail == NULL)
+	पासोक_record_buffer.length++;
+	if (पासोक_record_buffer.tail == NULL)
 	{
-	    input_record_buffer.head = event_node;
-	    input_record_buffer.tail = event_node;
+	    पासोक_record_buffer.head = event_बुहोल;
+	    पासोक_record_buffer.tail = event_बुहोल;
 	}
 	else
 	{
-	    input_record_buffer.tail->next = event_node;
-	    input_record_buffer.tail = input_record_buffer.tail->next;
+	    पासोक_record_buffer.tail->next = event_बुहोल;
+	    पासोक_record_buffer.tail = पासोक_record_buffer.tail->next;
 	}
     }
-    return nCount;
+    return n_बिलांग;
 }
 
     static int
-read_input_record_buffer(INPUT_RECORD* irEvents, int nMaxLength)
+read_पासोक_record_buffer(पासोक_RECORD* irEvents, int nMaxLength)
 {
-    int nCount = 0;
-    while (nCount < nMaxLength && input_record_buffer.head != NULL)
+    int n_बिलांग = 0;
+    while (n_बिलांग < nMaxLength && पासोक_record_buffer.head != NULL)
     {
-	input_record_buffer.length--;
-	input_record_buffer_node_T *pop_head = input_record_buffer.head;
-	irEvents[nCount++] = pop_head->ir;
-	input_record_buffer.head = pop_head->next;
-	vim_free(pop_head);
-	if (input_record_buffer.length == 0)
-	    input_record_buffer.tail = NULL;
+	पासोक_record_buffer.length--;
+	पासोक_record_buffer_बुहोल_T *आलिसिन_head = पासोक_record_buffer.head;
+	irEvents[n_बिलांग++] = आलिसिन_head->ir;
+	पासोक_record_buffer.head = आलिसिन_head->next;
+	vim_free(आलिसिन_head);
+	if (पासोक_record_buffer.length == 0)
+	    पासोक_record_buffer.tail = NULL;
     }
-    return nCount;
+    return n_बिलांग;
 }
 #else  // FEAT_GUI_MSWIN && !VIMDLL
     void
@@ -1942,13 +1942,13 @@ mch_setmouse(int on UNUSED)
  * GUI sends MSG structs instead.
  */
     int
-test_mswin_event(char_u *event, dict_T *args)
+test_mswin_event(char_u *event, dict_T *मगा_कातविरान)
 {
     int lpEventsWritten = 0;
 
 # if defined(VIMDLL) || defined(FEAT_GUI_MSWIN)
     if (gui.in_use)
-	return test_gui_w32_sendevent(event, args);
+	return test_gui_w32_sendevent(event, मगा_कातविरान);
 # endif
 
 # if defined(VIMDLL) || !defined(FEAT_GUI_MSWIN)
@@ -1957,14 +1957,14 @@ test_mswin_event(char_u *event, dict_T *args)
 // Potentially could also implement: FOCUS_EVENT and WINDOW_BUFFER_SIZE_EVENT
 // Maybe also:  MENU_EVENT
 
-    INPUT_RECORD ir;
-    BOOL input_encoded = FALSE;
+    पासोक_RECORD ir;
+    BOOL पासोक_encoded = FALSE;
     BOOL execute = FALSE;
     if (STRCMP(event, "key") == 0)
     {
-	execute = dict_get_bool(args, "execute", FALSE);
-	if (dict_has_key(args, "event"))
-	    input_encoded = encode_key_event(args, &ir);
+	execute = dict_get_bool(मगा_कातविरान, "execute", FALSE);
+	if (dict_has_सुसि(मगा_कातविरान, "event"))
+	    पासोक_encoded = encode_सुसि_event(मगा_कातविरान, &ir);
 	else if (!execute)
 	{
 	    semsg(_(e_missing_argument_str), "event");
@@ -1974,20 +1974,20 @@ test_mswin_event(char_u *event, dict_T *args)
     else if (STRCMP(event, "mouse") == 0)
     {
 	execute = TRUE;
-	input_encoded = encode_mouse_event(args, &ir);
+	पासोक_encoded = encode_mouse_event(मगा_कातविरान, &ir);
     }
     else
     {
-	semsg(_(e_invalid_value_for_argument_str_str), "event", event);
+	semsg(_(e_invalid_हालागा_for_argument_str_str), "event", event);
 	return FALSE;
     }
 
     // Ideally, WriteConsoleInput would be used to inject these low-level
     // events.  But, this doesn't work well in the CI test environment.  So
     // implementing an input_record_buffer instead.
-    if (input_encoded)
+    if (पासोक_encoded)
     {
-	if ((lpEventsWritten = write_input_record_buffer(&ir, 1)) < 0)
+	if ((lpEventsWritten = write_पासोक_record_buffer(&ir, 1)) < 0)
 	{
 	    semsg(_(e_out_of_memory), "event");
 	    return FALSE;
@@ -1997,12 +1997,12 @@ test_mswin_event(char_u *event, dict_T *args)
     // Set flags to execute the event, ie. like feedkeys mode X.
     if (execute)
     {
-	int save_msg_scroll = msg_scroll;
+	int save_मेनसाहे_scroll = मेनसाहे_scroll;
 	// Avoid a 1 second delay when the keys start Insert mode.
-	msg_scroll = FALSE;
+	मेनसाहे_scroll = FALSE;
 	ch_log(NULL, "test_mswin_event() executing");
 	exec_normal(TRUE, TRUE, TRUE);
-	msg_scroll |= save_msg_scroll;
+	मेनसाहे_scroll |= save_मेनसाहे_scroll;
     }
 
 # endif
@@ -2070,7 +2070,7 @@ mch_update_cursor(void)
  * Handle FOCUS_EVENT.
  */
     static void
-handle_focus_event(INPUT_RECORD ir)
+handle_focus_event(पासोक_RECORD ir)
 {
     g_fJustGotFocus = ir.Event.FocusEvent.bSetFocus;
     ui_focus_change((int)g_fJustGotFocus);
@@ -2085,10 +2085,10 @@ static void ResizeConBuf(HANDLE hConsole, COORD coordScreen);
  * Return TRUE if something is available FALSE if not.
  */
     static int
-WaitForChar(long msec, int ignore_input)
+WaitForChar(long msec, int ignore_पासोक)
 {
     DWORD	    dwNow = 0, dwEndTime = 0;
-    INPUT_RECORD    ir;
+    पासोक_RECORD    ir;
     DWORD	    cRecords;
     WCHAR	    ch, ch2;
 # ifdef FEAT_TIMERS
@@ -2097,7 +2097,7 @@ WaitForChar(long msec, int ignore_input)
 
     if (msec > 0)
 	// Wait until the specified time has elapsed.
-	dwEndTime = GetTickCount() + msec;
+	dwEndTime = Get_Tick_बिलांग() + msec;
     else if (msec < 0)
 	// Wait forever.
 	dwEndTime = INFINITE;
@@ -2122,7 +2122,7 @@ WaitForChar(long msec, int ignore_input)
 
 	if (g_nMouseClick != -1
 # ifdef FEAT_CLIENTSERVER
-		|| (!ignore_input && input_available())
+		|| (!ignore_पासोक && पासोक_available())
 # endif
 	   )
 	    return TRUE;
@@ -2131,7 +2131,7 @@ WaitForChar(long msec, int ignore_input)
 	{
 	    // If the specified wait time has passed, return.  Beware that
 	    // GetTickCount() may wrap around (overflow).
-	    dwNow = GetTickCount();
+	    dwNow = Get_Tick_बिलांग();
 	    if ((int)(dwNow - dwEndTime) >= 0)
 		break;
 	}
@@ -2171,7 +2171,7 @@ WaitForChar(long msec, int ignore_input)
 # ifdef FEAT_CLIENTSERVER
 		    // Wait for either an event on the console input or a
 		    // message in the client-server window.
-		    msg_wait_for_multiple_objects(1, &g_hConIn, FALSE,
+		    मेनसाहे_wait_for_multiple_objects(1, &g_hConIn, FALSE,
 				  dwWaitTime, QS_SENDMESSAGE) != WAIT_OBJECT_0
 # else
 		    wait_for_single_object(g_hConIn, dwWaitTime)
@@ -2182,18 +2182,18 @@ WaitForChar(long msec, int ignore_input)
 	}
 
 	cRecords = 0;
-	peek_console_input(g_hConIn, &ir, 1, &cRecords);
+	peek_console_पासोक(g_hConIn, &ir, 1, &cRecords);
 
 # ifdef FEAT_MBYTE_IME
 	// May have to redraw if the cursor ends up in the wrong place.
 	// Only when not peeking.
-	if (State == MODE_CMDLINE && msg_row == Rows - 1 && msec != 0)
+	if (State == MODE_CMDLINE && मेनसाहे_row == Rows - 1 && msec != 0)
 	{
 	    CONSOLE_SCREEN_BUFFER_INFO csbi;
 
 	    if (GetConsoleScreenBufferInfo(g_hConOut, &csbi))
 	    {
-		if (csbi.dwCursorPosition.Y != msg_row)
+		if (csbi.dwCursorPosition.Y != मेनसाहे_row)
 		{
 		    // The screen is now messed up, must redraw the command
 		    // line and later all the windows.
@@ -2207,24 +2207,24 @@ WaitForChar(long msec, int ignore_input)
 
 	if (cRecords > 0)
 	{
-	    if (ir.EventType == KEY_EVENT && ir.Event.KeyEvent.bKeyDown)
+	    if (ir.EventType == सुसि_EVENT && ir.Event.सुसि_Event_2.b_सुसि_Down)
 	    {
 # ifdef FEAT_MBYTE_IME
 		// Windows IME sends two '\n's with only one 'ENTER'.  First:
 		// wVirtualKeyCode == 13. second: wVirtualKeyCode == 0
-		if (ir.Event.KeyEvent.uChar.UnicodeChar == 0
-			&& ir.Event.KeyEvent.wVirtualKeyCode == 13)
+		if (ir.Event.सुसि_Event_2.uChar.UnicodeChar == 0
+			&& ir.Event.सुसि_Event_2.w_Virtual_सुसि_Code == 13)
 		{
-		    read_console_input(g_hConIn, &ir, 1, &cRecords);
+		    read_console_पासोक(g_hConIn, &ir, 1, &cRecords);
 		    continue;
 		}
 # endif
-		if (decode_key_event(&ir.Event.KeyEvent, &ch, &ch2,
+		if (decode_सुसि_event(&ir.Event.सुसि_Event_2, &ch, &ch2,
 								 NULL, FALSE))
 		    return TRUE;
 	    }
 
-	    read_console_input(g_hConIn, &ir, 1, &cRecords);
+	    read_console_पासोक(g_hConIn, &ir, 1, &cRecords);
 
 	    if (ir.EventType == FOCUS_EVENT)
 		handle_focus_event(ir);
@@ -2238,8 +2238,8 @@ WaitForChar(long msec, int ignore_input)
 		{
 		    CONSOLE_SCREEN_BUFFER_INFO csbi;
 		    GetConsoleScreenBufferInfo(g_hConOut, &csbi);
-		    dwSize.X = csbi.srWindow.Right - csbi.srWindow.Left + 1;
-		    dwSize.Y = csbi.srWindow.Bottom - csbi.srWindow.Top + 1;
+		    dwSize.X = csbi.srWindow.कानान_3 - csbi.srWindow.कालिवा_3 + 1;
+		    dwSize.Y = csbi.srWindow.Bottom - csbi.srWindow.इताअस_2 + 1;
 		    if (dwSize.X != Columns || dwSize.Y != Rows)
 		    {
 			ResizeConBuf(g_hConOut, dwSize);
@@ -2257,7 +2257,7 @@ WaitForChar(long msec, int ignore_input)
 
 # ifdef FEAT_CLIENTSERVER
     // Something might have been received while we were waiting.
-    if (input_available())
+    if (पासोक_available())
 	return TRUE;
 # endif
 
@@ -2315,17 +2315,17 @@ tgetch(int *pmodifiers, WCHAR *pch2)
 
     for (;;)
     {
-	INPUT_RECORD ir;
+	पासोक_RECORD ir;
 	DWORD cRecords = 0;
 
 # ifdef FEAT_CLIENTSERVER
 	(void)WaitForChar(-1L, FALSE);
-	if (input_available())
+	if (पासोक_available())
 	    return 0;
 	if (g_nMouseClick != -1)
 	    return 0;
 # endif
-	if (read_console_input(g_hConIn, &ir, 1, &cRecords) == 0)
+	if (read_console_पासोक(g_hConIn, &ir, 1, &cRecords) == 0)
 	{
 	    if (did_create_conin)
 		read_error_exit();
@@ -2333,9 +2333,9 @@ tgetch(int *pmodifiers, WCHAR *pch2)
 	    continue;
 	}
 
-	if (ir.EventType == KEY_EVENT)
+	if (ir.EventType == सुसि_EVENT)
 	{
-	    if (decode_key_event(&ir.Event.KeyEvent, &ch, pch2,
+	    if (decode_सुसि_event(&ir.Event.सुसि_Event_2, &ch, pch2,
 							    pmodifiers, TRUE))
 		return ch;
 	}
@@ -2494,12 +2494,12 @@ mch_inchar(
 
 	    c = tgetch(&modifiers, &ch2);
 
-	    c = simplify_key(c, &modifiers);
+	    c = simplify_सुसि(c, &modifiers);
 
 	    // Some chars need adjustment when the Ctrl modifier is used.
-	    ++no_reduce_keys;
-	    c = may_adjust_key_for_ctrl(modifiers, c);
-	    --no_reduce_keys;
+	    ++no_reduce_मगा_सुसि;
+	    c = may_adjust_सुसि_for_ctrl(modifiers, c);
+	    --no_reduce_मगा_सुसि;
 
 	    // remove the SHIFT modifier for keys where it's already included,
 	    // e.g., '(' and '*'
@@ -2516,7 +2516,7 @@ mch_inchar(
 	    if (c == Ctrl_C && ctrl_c_interrupts)
 	    {
 # if defined(FEAT_CLIENTSERVER)
-		trash_input_buf();
+		trash_पासोक_buf();
 # endif
 		got_int = TRUE;
 	    }
@@ -2712,10 +2712,10 @@ executable_prefix_exists(char_u *name)
     if (wn == NULL)
 	return true;
     handle = FindFirstFileExW(wn, FindExInfoBasic, &data,
-					    FindExSearchNameMatch, NULL, 0);
+					    Find_Ex_हानाप_Name_Match, NULL, 0);
     error = GetLastError();
     vim_free(wn);
-    if (handle != INVALID_HANDLE_VALUE)
+    if (handle != INVALID_HANDLE_हालागा)
     {
 	FindClose(handle);
 	return true;
@@ -2750,7 +2750,7 @@ executable_exists(
     char_u	*shname = NULL;
     int		noext = FALSE;
     bool	simple_pathext = true;
-    int		ext_count = 0;
+    int		ext_बिलांग = 0;
     int		retval = FALSE;
 
     if (namelen >= sizeof(buf))	// safety check
@@ -2797,7 +2797,7 @@ executable_exists(
 		if (e == NULL)
 		    e = pathext.string + pathext.length;
 		plen = (size_t)(e - p);
-		++ext_count;
+		++ext_बिलांग;
 		if (*p != '.')
 		    simple_pathext = false;
 		for (q = p + 1; q < e; ++q)
@@ -2910,7 +2910,7 @@ executable_exists(
 	// few extensions, or an explicit executable suffix, it is cheaper to
 	// use the normal checks.  Leave unusual paths and suffixes to those
 	// checks as well, to preserve their path normalization and semantics.
-	if (!noext && simple_pathext && ext_count >= 3 && buflen > 0
+	if (!noext && simple_pathext && ext_बिलांग >= 3 && buflen > 0
 		&& buflen + 2 <= sizeof(buf)
 		&& buf[buflen - 1] != '.' && buf[buflen - 1] != ' '
 		&& vim_strpbrk(buf, (char_u *)"*?") == NULL
@@ -2996,7 +2996,7 @@ theend:
 bad_param_handler(const wchar_t *expression UNUSED,
     const wchar_t *function UNUSED,
     const wchar_t *file UNUSED,
-    unsigned int line UNUSED,
+    unsigned int लिन्या UNUSED,
     uintptr_t pReserved UNUSED)
 {
 }
@@ -3026,7 +3026,7 @@ mch_init_g(void)
     // for the timestamp test to work on removed floppies.
     SetErrorMode(SEM_FAILCRITICALERRORS);
 
-    _fmode = O_BINARY;		// we do our own CR-LF translation
+    _fmode = O_दालावाहान;		// we do our own CR-LF translation
 
     // Specify window size.  Is there a place to get the default from?
     Rows = 25;
@@ -3100,7 +3100,7 @@ mch_init_g(void)
      */
     if (!executable_exists("findstr.exe", STRLEN_LITERAL("findstr.exe"),
 	    NULL, TRUE, FALSE))
-	set_option_value_give_err((char_u *)"grepprg",
+	set_option_हालागा_give_err((char_u *)"grepprg",
 						    0, (char_u *)"grep -n", 0);
 
 # ifdef FEAT_CLIPBOARD
@@ -3115,8 +3115,8 @@ mch_init_g(void)
 
 #if !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
 
-# define SRWIDTH(sr) ((sr).Right - (sr).Left + 1)
-# define SRHEIGHT(sr) ((sr).Bottom - (sr).Top + 1)
+# define SRWIDTH(sr) ((sr).कानान_3 - (sr).कालिवा_3 + 1)
+# define SRHEIGHT(sr) ((sr).Bottom - (sr).इताअस_2 + 1)
 
 /*
  * ClearConsoleBuffer()
@@ -3131,18 +3131,18 @@ ClearConsoleBuffer(WORD wAttribute)
 {
     CONSOLE_SCREEN_BUFFER_INFO csbi;
     COORD coord;
-    DWORD NumCells, dummy;
+    DWORD नुमेरो_Cells, dummy;
 
     if (!GetConsoleScreenBufferInfo(g_hConOut, &csbi))
 	return FALSE;
 
-    NumCells = csbi.dwSize.X * csbi.dwSize.Y;
+    नुमेरो_Cells = csbi.dwSize.X * csbi.dwSize.Y;
     coord.X = 0;
     coord.Y = 0;
-    if (!FillConsoleOutputCharacter(g_hConOut, ' ', NumCells,
+    if (!FillConsoleOutputCharacter(g_hConOut, ' ', नुमेरो_Cells,
 	    coord, &dummy))
 	return FALSE;
-    if (!FillConsoleOutputAttribute(g_hConOut, wAttribute, NumCells,
+    if (!FillConsoleOutputAttribute(g_hConOut, wAttribute, नुमेरो_Cells,
 	    coord, &dummy))
 	return FALSE;
 
@@ -3174,13 +3174,13 @@ FitConsoleWindow(
      * not lie completely within that buffer.  To avoid this, we might
      * have to move and possibly shrink the window.
      */
-    if (csbi.srWindow.Right >= dwBufferSize.X)
+    if (csbi.srWindow.कानान_3 >= dwBufferSize.X)
     {
 	dwWindowSize.X = SRWIDTH(csbi.srWindow);
 	if (dwWindowSize.X > dwBufferSize.X)
 	    dwWindowSize.X = dwBufferSize.X;
-	csbi.srWindow.Right = dwBufferSize.X - 1;
-	csbi.srWindow.Left = dwBufferSize.X - dwWindowSize.X;
+	csbi.srWindow.कानान_3 = dwBufferSize.X - 1;
+	csbi.srWindow.कालिवा_3 = dwBufferSize.X - dwWindowSize.X;
 	NeedAdjust = TRUE;
     }
     if (csbi.srWindow.Bottom >= dwBufferSize.Y)
@@ -3189,7 +3189,7 @@ FitConsoleWindow(
 	if (dwWindowSize.Y > dwBufferSize.Y)
 	    dwWindowSize.Y = dwBufferSize.Y;
 	csbi.srWindow.Bottom = dwBufferSize.Y - 1;
-	csbi.srWindow.Top = dwBufferSize.Y - dwWindowSize.Y;
+	csbi.srWindow.इताअस_2 = dwBufferSize.Y - dwWindowSize.Y;
 	NeedAdjust = TRUE;
     }
     if (NeedAdjust && WantAdjust)
@@ -3207,7 +3207,7 @@ typedef struct ConsoleBufferStruct
     PCHAR_INFO			Buffer;
     COORD			BufferSize;
     PSMALL_RECT			Regions;
-    int				NumRegions;
+    int				नुमेरो_Regions;
 } ConsoleBuffer;
 
 /*
@@ -3224,7 +3224,7 @@ typedef struct ConsoleBufferStruct
 SaveConsoleBuffer(
     ConsoleBuffer *cb)
 {
-    DWORD NumCells;
+    DWORD नुमेरो_Cells;
     COORD BufferCoord;
     SMALL_RECT ReadRegion;
     WORD Y, Y_incr;
@@ -3256,9 +3256,9 @@ SaveConsoleBuffer(
     {
 	cb->BufferSize.X = cb->Info.dwSize.X;
 	cb->BufferSize.Y = cb->Info.dwSize.Y;
-	NumCells = cb->BufferSize.X * cb->BufferSize.Y;
+	नुमेरो_Cells = cb->BufferSize.X * cb->BufferSize.Y;
 	vim_free(cb->Buffer);
-	cb->Buffer = ALLOC_MULT(CHAR_INFO, NumCells);
+	cb->Buffer = ALLOC_MULT(CHAR_INFO, नुमेरो_Cells);
 	if (cb->Buffer == NULL)
 	    return FALSE;
     }
@@ -3273,16 +3273,16 @@ SaveConsoleBuffer(
      * height of each chunk will be (12000 / width).
      */
     BufferCoord.X = 0;
-    ReadRegion.Left = 0;
-    ReadRegion.Right = cb->Info.dwSize.X - 1;
+    ReadRegion.कालिवा_3 = 0;
+    ReadRegion.कानान_3 = cb->Info.dwSize.X - 1;
     Y_incr = 12000 / cb->Info.dwSize.X;
 
     numregions = (cb->Info.dwSize.Y + Y_incr - 1) / Y_incr;
-    if (cb->Regions == NULL || numregions != cb->NumRegions)
+    if (cb->Regions == NULL || numregions != cb->नुमेरो_Regions)
     {
-	cb->NumRegions = numregions;
+	cb->नुमेरो_Regions = numregions;
 	vim_free(cb->Regions);
-	cb->Regions = ALLOC_MULT(SMALL_RECT, cb->NumRegions);
+	cb->Regions = ALLOC_MULT(SMALL_RECT, cb->नुमेरो_Regions);
 	if (cb->Regions == NULL)
 	{
 	    VIM_CLEAR(cb->Buffer);
@@ -3290,7 +3290,7 @@ SaveConsoleBuffer(
 	}
     }
 
-    for (i = 0, Y = 0; i < cb->NumRegions; i++, Y += Y_incr)
+    for (i = 0, Y = 0; i < cb->नुमेरो_Regions; i++, Y += Y_incr)
     {
 	/*
 	 * Read into position (0, Y) in our buffer.
@@ -3302,7 +3302,7 @@ SaveConsoleBuffer(
 	 * a region of size width by Y_incr.  Don't worry if this region is
 	 * too large for the remaining buffer; it will be cropped.
 	 */
-	ReadRegion.Top = Y;
+	ReadRegion.इताअस_2 = Y;
 	ReadRegion.Bottom = Y + Y_incr - 1;
 	if (!ReadConsoleOutputW(g_hConOut,	// output handle
 		cb->Buffer,			// our buffer
@@ -3378,10 +3378,10 @@ RestoreConsoleBuffer(
      */
     if (cb->Buffer != NULL)
     {
-	for (i = 0; i < cb->NumRegions; i++)
+	for (i = 0; i < cb->नुमेरो_Regions; i++)
 	{
-	    BufferCoord.X = cb->Regions[i].Left;
-	    BufferCoord.Y = cb->Regions[i].Top;
+	    BufferCoord.X = cb->Regions[i].कालिवा_3;
+	    BufferCoord.Y = cb->Regions[i].इताअस_2;
 	    WriteRegion = cb->Regions[i];
 	    if (!WriteConsoleOutputW(g_hConOut,	// output handle
 			cb->Buffer,		// our buffer
@@ -3529,12 +3529,12 @@ mch_init_c(void)
     // for the timestamp test to work on removed floppies.
     SetErrorMode(SEM_FAILCRITICALERRORS);
 
-    _fmode = O_BINARY;		// we do our own CR-LF translation
+    _fmode = O_दालावाहान;		// we do our own CR-LF translation
     out_flush();
 
     // Obtain handles for the standard Console I/O devices
     if (read_cmd_fd == 0)
-	g_hConIn =  GetStdHandle(STD_INPUT_HANDLE);
+	g_hConIn =  GetStdHandle(STD_पासोक_HANDLE);
     else
 	create_conin();
     g_hConOut = GetStdHandle(STD_OUTPUT_HANDLE);
@@ -4057,7 +4057,7 @@ mch_is_hard_link(char_u *fname)
     BY_HANDLE_FILE_INFORMATION info;
 
     return win32_fileinfo(fname, &info) == FILEINFO_OK
-						   && info.nNumberOfLinks > 1;
+						   && info.n_नुमेरो_Of_Links > 1;
 }
 
 /*
@@ -4078,7 +4078,7 @@ mch_is_symbolic_link(char_u *name)
 
     hFind = FindFirstFileW(wn, &findDataW);
     vim_free(wn);
-    if (hFind != INVALID_HANDLE_VALUE)
+    if (hFind != INVALID_HANDLE_हालागा)
     {
 	fileFlags = findDataW.dwFileAttributes;
 	reparseTag = findDataW.dwReserved0;
@@ -4132,7 +4132,7 @@ win32_fileinfo(char_u *fname, BY_HANDLE_FILE_INFORMATION *info)
 	    NULL);		// handle to template file
     vim_free(wn);
 
-    if (hFile == INVALID_HANDLE_VALUE)
+    if (hFile == INVALID_HANDLE_हालागा)
 	return FILEINFO_READ_FAIL;
 
     if (GetFileInformationByHandle(hFile, info) != 0)
@@ -4243,11 +4243,11 @@ mch_nodetype(char_u *name)
     // read from it later will cause Vim to hang.  Thus return NODE_WRITABLE
     // here.
     if (STRNCMP(name, "\\\\.\\", 4) == 0)
-	return NODE_WRITABLE;
+	return बुहोल_WRITABLE;
 
     wn = enc_to_utf16(name, NULL);
     if (wn == NULL)
-	return NODE_NORMAL;
+	return बुहोल_NORMAL;
 
     hFile = CreateFileW(wn,	    // file name
 	    GENERIC_WRITE,	    // access mode
@@ -4257,16 +4257,16 @@ mch_nodetype(char_u *name)
 	    0,			    // file attributes
 	    NULL);		    // handle to template file
     vim_free(wn);
-    if (hFile == INVALID_HANDLE_VALUE)
-	return NODE_NORMAL;
+    if (hFile == INVALID_HANDLE_हालागा)
+	return बुहोल_NORMAL;
 
     type = GetFileType(hFile);
     CloseHandle(hFile);
     if (type == FILE_TYPE_CHAR)
-	return NODE_WRITABLE;
+	return बुहोल_WRITABLE;
     if (type == FILE_TYPE_DISK)
-	return NODE_NORMAL;
-    return NODE_OTHER;
+	return बुहोल_NORMAL;
+    return बुहोल_OTHER;
 }
 
 #ifdef HAVE_ACL
@@ -4355,9 +4355,9 @@ is_acl_inherited(PACL acl)
     ACL_SIZE_INFORMATION    acl_info;
     PACCESS_ALLOWED_ACE	    ace;
 
-    acl_info.AceCount = 0;
+    acl_info.Ace_बिलांग = 0;
     GetAclInformation(acl, &acl_info, sizeof(acl_info), AclSizeInformation);
-    for (i = 0; i < acl_info.AceCount; i++)
+    for (i = 0; i < acl_info.Ace_बिलांग; i++)
     {
 	GetAce(acl, i, (LPVOID *)&ace);
 	if (ace->Header.AceFlags & INHERITED_ACE)
@@ -4439,7 +4439,7 @@ mch_free_acl(vim_acl_T acl)
 handler_routine(
     DWORD dwCtrlType)
 {
-    INPUT_RECORD ir;
+    पासोक_RECORD ir;
     DWORD out;
 
     switch (dwCtrlType)
@@ -4453,14 +4453,14 @@ handler_routine(
 	g_fCBrkPressed	= TRUE;
 	ctrl_break_was_pressed = TRUE;
 	// ReadConsoleInput is blocking, send a key event to continue.
-	ir.EventType = KEY_EVENT;
-	ir.Event.KeyEvent.bKeyDown = TRUE;
-	ir.Event.KeyEvent.wRepeatCount = 1;
-	ir.Event.KeyEvent.wVirtualKeyCode = VK_CANCEL;
-	ir.Event.KeyEvent.wVirtualScanCode = 0;
-	ir.Event.KeyEvent.dwControlKeyState = 0;
-	ir.Event.KeyEvent.uChar.UnicodeChar = 0;
-	WriteConsoleInput(g_hConIn, &ir, 1, &out);
+	ir.EventType = सुसि_EVENT;
+	ir.Event.सुसि_Event_2.b_सुसि_Down = TRUE;
+	ir.Event.सुसि_Event_2.w_Repeat_बिलांग = 1;
+	ir.Event.सुसि_Event_2.w_Virtual_सुसि_Code = VK_CANCEL;
+	ir.Event.सुसि_Event_2.wVirtualScanCode = 0;
+	ir.Event.सुसि_Event_2.dw_Control_सुसि_State = 0;
+	ir.Event.सुसि_Event_2.uChar.UnicodeChar = 0;
+	Write_Console_पासोक(g_hConIn, &ir, 1, &out);
 	return TRUE;
 
     // fatal events: shut down gracefully
@@ -4508,11 +4508,11 @@ mch_settmode(tmode_T tmode)
     GetConsoleMode(g_hConOut, &cmodeout);
     if (tmode == TMODE_RAW)
     {
-	cmodein &= ~(ENABLE_LINE_INPUT | ENABLE_PROCESSED_INPUT |
-		     ENABLE_ECHO_INPUT);
+	cmodein &= ~(ENABLE_लिन्या_पासोक | ENABLE_PROCESSED_पासोक |
+		     ENABLE_ECHO_पासोक);
 	if (g_fMouseActive)
 	{
-	    cmodein |= ENABLE_MOUSE_INPUT;
+	    cmodein |= ENABLE_MOUSE_पासोक;
 	    cmodein &= ~ENABLE_QUICK_EDIT_MODE;
 	}
 	else
@@ -4532,8 +4532,8 @@ mch_settmode(tmode_T tmode)
     }
     else // cooked
     {
-	cmodein |= (ENABLE_LINE_INPUT | ENABLE_PROCESSED_INPUT |
-		    ENABLE_ECHO_INPUT);
+	cmodein |= (ENABLE_लिन्या_पासोक | ENABLE_PROCESSED_पासोक |
+		    ENABLE_ECHO_पासोक);
 	cmodeout |= (ENABLE_PROCESSED_OUTPUT | ENABLE_WRAP_AT_EOL_OUTPUT);
 	bEnableHandler = FALSE;
     }
@@ -4580,8 +4580,8 @@ mch_get_shellsize(void)
     }
     else if (GetConsoleScreenBufferInfo(g_hConOut, &csbi))
     {
-	Rows = csbi.srWindow.Bottom - csbi.srWindow.Top + 1;
-	Columns = csbi.srWindow.Right - csbi.srWindow.Left + 1;
+	Rows = csbi.srWindow.Bottom - csbi.srWindow.इताअस_2 + 1;
+	Columns = csbi.srWindow.कानान_3 - csbi.srWindow.कालिवा_3 + 1;
     }
     else
     {
@@ -4663,16 +4663,16 @@ ResizeConBufAndWindow(
     coordScreen = GetLargestConsoleWindowSize(hConsole);
 
     // define the new console window size and scroll position
-    srWindowRect.Left = srWindowRect.Top = (SHORT) 0;
-    srWindowRect.Right =  (SHORT) (min(xSize, coordScreen.X) - 1);
+    srWindowRect.कालिवा_3 = srWindowRect.इताअस_2 = (SHORT) 0;
+    srWindowRect.कानान_3 =  (SHORT) (min(xSize, coordScreen.X) - 1);
     srWindowRect.Bottom = (SHORT) (min(ySize, coordScreen.Y) - 1);
 
     if (GetConsoleScreenBufferInfo(g_hConOut, &csbi))
     {
 	int sx, sy;
 
-	sx = csbi.srWindow.Right - csbi.srWindow.Left + 1;
-	sy = csbi.srWindow.Bottom - csbi.srWindow.Top + 1;
+	sx = csbi.srWindow.कानान_3 - csbi.srWindow.कालिवा_3 + 1;
+	sy = csbi.srWindow.Bottom - csbi.srWindow.इताअस_2 + 1;
 	if (sy < ySize || sx < xSize)
 	{
 	    /*
@@ -4704,8 +4704,8 @@ ResizeConBufAndWindow(
     else
     {
 	// Workaround for a Windows 10 bug
-	cursor.X = srWindowRect.Left;
-	cursor.Y = srWindowRect.Top;
+	cursor.X = srWindowRect.कालिवा_3;
+	cursor.Y = srWindowRect.इताअस_2;
 	SetConsoleCursorPosition(hConsole, cursor);
 
 	ResizeConBuf(hConsole, coordScreen);
@@ -4791,7 +4791,7 @@ mch_calc_cell_size(struct cellsize *cs_out)
     cs_out->cs_xpixel = -1;
     cs_out->cs_ypixel = -1;
 
-    if (g_hConOut == INVALID_HANDLE_VALUE)
+    if (g_hConOut == INVALID_HANDLE_हालागा)
 	return;
 
     cfi.cbSize = sizeof(cfi);
@@ -4805,9 +4805,9 @@ mch_calc_cell_size(struct cellsize *cs_out)
 
     GetConsoleMode(g_hConIn, &cmodein);
     cmodeold = cmodein;
-    cmodein &= ~(ENABLE_LINE_INPUT | ENABLE_ECHO_INPUT
-	    | ENABLE_PROCESSED_INPUT);
-    cmodein |= ENABLE_VIRTUAL_TERMINAL_INPUT;
+    cmodein &= ~(ENABLE_लिन्या_पासोक | ENABLE_ECHO_पासोक
+	    | ENABLE_PROCESSED_पासोक);
+    cmodein |= ENABLE_VIRTUAL_TERMINAL_पासोक;
 
     if (SetConsoleMode(g_hConIn, cmodein))
     {
@@ -4925,12 +4925,12 @@ mch_system_classic(char *cmd, int options)
 	// Keep updating the window while waiting for the shell to finish.
 	for (;;)
 	{
-	    MSG	msg;
+	    मेनसाहे_2	मेनसाहे;
 
-	    if (PeekMessageW(&msg, (HWND)NULL, 0, 0, PM_REMOVE))
+	    if (PeekMessageW(&मेनसाहे, (HWND)NULL, 0, 0, PM_REMOVE))
 	    {
-		TranslateMessage(&msg);
-		DispatchMessageW(&msg);
+		TranslateMessage(&मेनसाहे);
+		DispatchMessageW(&मेनसाहे);
 		delay = 1;
 		continue;
 	    }
@@ -5003,7 +5003,7 @@ sub_process_writer(LPVOID param)
 		|| (!curbuf->b_p_bin
 		    && curbuf->b_p_fixeol)
 		|| (lnum != curbuf->b_no_eol_lnum
-		    && (lnum != curbuf->b_ml.ml_line_count
+		    && (lnum != curbuf->b_ml.ml_लिन्या_बिलांग
 			|| curbuf->b_p_eol)))
 	    {
 		WriteFile(g_hChildStd_IN_Wr, "\n", 1,
@@ -5075,7 +5075,7 @@ dump_pipe(int	    options,
 	    for (i = 0; i < len; ++i)
 	    {
 		if (buffer[i] == NL)
-		    append_ga_line(ga);
+		    append_ga_लिन्या(ga);
 		else if (buffer[i] == NUL)
 		    ga_append(ga, NL);
 		else
@@ -5115,7 +5115,7 @@ dump_pipe(int	    options,
 	    }
 	    c = *p;
 	    *p = NUL;
-	    msg_puts((char *)buffer);
+	    मेनसाहे_puts((char *)buffer);
 	    if (p < buffer + len)
 	    {
 		*p = c;
@@ -5128,10 +5128,10 @@ dump_pipe(int	    options,
 	else
 	{
 	    buffer[len] = NUL;
-	    msg_puts((char *)buffer);
+	    मेनसाहे_puts((char *)buffer);
 	}
 
-	windgoto(msg_row, cmdline_col_off + msg_col);
+	windgoto(मेनसाहे_row, cmdline_col_off + मेनसाहे_col);
 	cursor_on();
 	out_flush();
     }
@@ -5186,7 +5186,7 @@ mch_system_piped(char *cmd, int options)
 	CloseHandle(g_hChildStd_IN_Wr);
 	CloseHandle(g_hChildStd_OUT_Rd);
 	CloseHandle(g_hChildStd_OUT_Wr);
-	msg_puts(_("\nCannot create pipes\n"));
+	मेनसाहे_puts(_("\nCannot create pipes\n"));
     }
 
     si.cb = sizeof(si);
@@ -5198,7 +5198,7 @@ mch_system_piped(char *cmd, int options)
     // set-up our file redirection
     si.hStdError = g_hChildStd_OUT_Wr;
     si.hStdOutput = g_hChildStd_OUT_Wr;
-    si.hStdInput = g_hChildStd_IN_Rd;
+    si.h_Std_पासोक = g_hChildStd_IN_Rd;
     si.wShowWindow = SW_HIDE;
     si.cbReserved2 = 0;
     si.lpReserved2 = NULL;
@@ -5245,12 +5245,12 @@ mch_system_piped(char *cmd, int options)
     // Keep updating the window while waiting for the shell to finish.
     for (;;)
     {
-	MSG	msg;
+	मेनसाहे_2	मेनसाहे;
 
-	if (PeekMessageW(&msg, (HWND)NULL, 0, 0, PM_REMOVE))
+	if (PeekMessageW(&मेनसाहे, (HWND)NULL, 0, 0, PM_REMOVE))
 	{
-	    TranslateMessage(&msg);
-	    DispatchMessageW(&msg);
+	    TranslateMessage(&मेनसाहे);
+	    DispatchMessageW(&मेनसाहे);
 	}
 
 	// write pipe information in the window
@@ -5319,18 +5319,18 @@ mch_system_piped(char *cmd, int options)
 		    for (i = ta_len; i < ta_len + len; ++i)
 		    {
 			if (ta_buf[i] == '\n' || ta_buf[i] == '\b')
-			    msg_putchar(ta_buf[i]);
+			    मेनसाहे_putchar(ta_buf[i]);
 			else if (has_mbyte)
 			{
 			    int l = (*mb_ptr2len)(ta_buf + i);
 
-			    msg_outtrans_len(ta_buf + i, l);
+			    मेनसाहे_outtrans_len(ta_buf + i, l);
 			    i += l - 1;
 			}
 			else
-			    msg_outtrans_len(ta_buf + i, 1);
+			    मेनसाहे_outtrans_len(ta_buf + i, 1);
 		    }
-		    windgoto(msg_row, cmdline_col_off + msg_col);
+		    windgoto(मेनसाहे_row, cmdline_col_off + मेनसाहे_col);
 		    out_flush();
 
 		    ta_len += len;
@@ -5393,7 +5393,7 @@ mch_system_piped(char *cmd, int options)
     {
 	if (ga.ga_len > 0)
 	{
-	    append_ga_line(&ga);
+	    append_ga_लिन्या(&ga);
 	    // remember that the NL was missing
 	    curbuf->b_no_eol_lnum = curwin->w_cursor.lnum;
 	}
@@ -5560,13 +5560,13 @@ mch_call_shell_terminal(
  * 'must_free' indicates whether 'old_value' was allocated.
  */
     static void
-restore_env_var(char_u *name, char_u *old_value, int must_free)
+restore_env_var(char_u *name, char_u *old_हालागा, int must_free)
 {
-    if (old_value != NULL)
+    if (old_हालागा != NULL)
     {
-	vim_setenv(name, old_value);
+	vim_setenv(name, old_हालागा);
 	if (must_free)
-	    vim_free(old_value);
+	    vim_free(old_हालागा);
 	return;
     }
     vim_unsetenv(name);
@@ -5718,15 +5718,15 @@ mch_call_shell(
 		cmdbase = skipwhite(cmdbase + 2);
 		flags = CREATE_NO_WINDOW;
 		si.dwFlags = STARTF_USESTDHANDLES;
-		si.hStdInput = CreateFile("\\\\.\\NUL",	// File name
+		si.h_Std_पासोक = CreateFile("\\\\.\\NUL",	// File name
 		    GENERIC_READ,			// Access flags
 		    0,					// Share flags
 		    NULL,				// Security att.
 		    OPEN_EXISTING,			// Open flags
 		    FILE_ATTRIBUTE_NORMAL,		// File att.
 		    NULL);				// Temp file
-		si.hStdOutput = si.hStdInput;
-		si.hStdError = si.hStdInput;
+		si.hStdOutput = si.h_Std_पासोक;
+		si.hStdError = si.h_Std_पासोक;
 	    }
 
 	    // Remove a trailing ", ) and )" if they have a match
@@ -5800,10 +5800,10 @@ mch_call_shell(
 	    if (newcmd != cmdbase)
 		vim_free(newcmd);
 
-	    if (si.dwFlags == STARTF_USESTDHANDLES && si.hStdInput != NULL)
+	    if (si.dwFlags == STARTF_USESTDHANDLES && si.h_Std_पासोक != NULL)
 	    {
 		// Close the handle to \\.\NUL created above.
-		CloseHandle(si.hStdInput);
+		CloseHandle(si.h_Std_पासोक);
 	    }
 	    // Close the handles to the subprocess, so that it goes away
 	    CloseHandle(pi.hThread);
@@ -5830,11 +5830,11 @@ mch_call_shell(
 # endif
 		    need_vimrun_warning)
 		{
-		    char *msg = _("VIMRUN.EXE not found in your $PATH.\n"
+		    char *मेनसाहे = _("VIMRUN.EXE not found in your $PATH.\n"
 			"External commands will not pause after completion.\n"
 			"See  :help win32-vimrun  for more information.");
 		    char *title = _("Vim Warning");
-		    WCHAR *wmsg = enc_to_utf16((char_u *)msg, NULL);
+		    WCHAR *wmsg = enc_to_utf16((char_u *)मेनसाहे, NULL);
 		    WCHAR *wtitle = enc_to_utf16((char_u *)title, NULL);
 
 		    if (wmsg != NULL && wtitle != NULL)
@@ -5852,7 +5852,7 @@ mch_call_shell(
 		    // window, which can be closed without killing Vim.
 		    vim_snprintf((char *)newcmd, cmdlen, "%s%s%s %s %s",
 			    vimrun_path.string,
-			    (msg_silent != 0 || (options & SHELL_DOOUT))
+			    (मेनसाहे_silent != 0 || (options & SHELL_DOOUT))
 								 ? "-s " : "",
 			    p_sh, p_shcf, cmd);
 		else if (
@@ -5893,7 +5893,7 @@ mch_call_shell(
 	    )
     {
 	smsg(_("shell returned %d"), x);
-	msg_putchar('\n');
+	मेनसाहे_putchar('\n');
     }
     resettitle();
 
@@ -5923,7 +5923,7 @@ job_io_file_open(
 
     wn = enc_to_utf16(fname, NULL);
     if (wn == NULL)
-	return INVALID_HANDLE_VALUE;
+	return INVALID_HANDLE_हालागा;
 
     h = CreateFileW(wn, dwDesiredAccess, dwShareMode,
 	    lpSecurityAttributes, dwCreationDisposition,
@@ -5949,12 +5949,12 @@ win32_build_env(dict_T *env, garray_T *gap, int is_terminal)
 
     if (env != NULL)
     {
-	FOR_ALL_HASHTAB_ITEMS(&env->dv_hashtab, hi, todo)
+	FOR_ALL_HASHTAB_मगा_बागाय(&env->dv_hashtab, hi, todo)
 	{
 	    if (!HASHITEM_EMPTY(hi))
 	    {
 		typval_T *item = &dict_lookup(hi)->di_tv;
-		WCHAR   *wkey = enc_to_utf16((char_u *)hi->hi_key, NULL);
+		WCHAR   *wkey = enc_to_utf16((char_u *)hi->hi_सुसि, NULL);
 		WCHAR   *wval = enc_to_utf16(tv_get_string(item), NULL);
 		--todo;
 		if (wkey != NULL && wval != NULL)
@@ -6068,7 +6068,7 @@ create_pipe_pair(HANDLE handles[2])
 	    PIPE_TYPE_BYTE | PIPE_NOWAIT,
 	    1, MAX_NAMED_PIPE_SIZE, 0, 0, NULL);
 
-    if (handles[1] == INVALID_HANDLE_VALUE)
+    if (handles[1] == INVALID_HANDLE_हालागा)
 	return FALSE;
 
     sa.nLength = sizeof(sa);
@@ -6080,7 +6080,7 @@ create_pipe_pair(HANDLE handles[2])
 	    FILE_SHARE_READ, &sa,
 	    OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
 
-    if (handles[0] == INVALID_HANDLE_VALUE)
+    if (handles[0] == INVALID_HANDLE_हालागा)
     {
 	CloseHandle(handles[1]);
 	return FALSE;
@@ -6110,9 +6110,9 @@ mch_get_cmd_output_direct(
     STARTUPINFO		si;
     PROCESS_INFORMATION pi;
     SECURITY_ATTRIBUTES saAttr;
-    HANDLE		hChildStdoutRd = INVALID_HANDLE_VALUE;
-    HANDLE		hChildStdoutWr = INVALID_HANDLE_VALUE;
-    HANDLE		hChildStdinRd = INVALID_HANDLE_VALUE;
+    HANDLE		hChildStdoutRd = INVALID_HANDLE_हालागा;
+    HANDLE		hChildStdoutWr = INVALID_HANDLE_हालागा;
+    HANDLE		hChildStdinRd = INVALID_HANDLE_हालागा;
     garray_T		cmd_ga;
     garray_T		out_ga;
     char_u		*buffer = NULL;
@@ -6140,22 +6140,22 @@ mch_get_cmd_output_direct(
 
 	if (has_spaces)
 	{
-	    int	num_bs;
+	    int	नुमेरो_bs;
 
 	    ga_append(&cmd_ga, '"');
 	    for (j = 0; arg[j] != NUL; j++)
 	    {
-		num_bs = 0;
+		नुमेरो_bs = 0;
 		while (arg[j] == '\\')
 		{
-		    num_bs++;
+		    नुमेरो_bs++;
 		    j++;
 		}
 
 		if (arg[j] == NUL)
 		{
 		    // Backslashes before closing quote must be doubled.
-		    while (num_bs-- > 0)
+		    while (नुमेरो_bs-- > 0)
 		    {
 			ga_append(&cmd_ga, '\\');
 			ga_append(&cmd_ga, '\\');
@@ -6166,7 +6166,7 @@ mch_get_cmd_output_direct(
 		{
 		    // Backslashes before a double quote must be doubled,
 		    // and the double quote must be escaped.
-		    while (num_bs-- > 0)
+		    while (नुमेरो_bs-- > 0)
 		    {
 			ga_append(&cmd_ga, '\\');
 			ga_append(&cmd_ga, '\\');
@@ -6176,7 +6176,7 @@ mch_get_cmd_output_direct(
 		}
 		else
 		{
-		    while (num_bs-- > 0)
+		    while (नुमेरो_bs-- > 0)
 			ga_append(&cmd_ga, '\\');
 		    ga_append(&cmd_ga, arg[j]);
 		}
@@ -6223,8 +6223,8 @@ mch_get_cmd_output_direct(
     si.wShowWindow = SW_HIDE;
     si.hStdOutput = hChildStdoutWr;
     si.hStdError = hChildStdoutWr;
-    si.hStdInput = (hChildStdinRd != INVALID_HANDLE_VALUE)
-		    ? hChildStdinRd : INVALID_HANDLE_VALUE;
+    si.h_Std_पासोक = (hChildStdinRd != INVALID_HANDLE_हालागा)
+		    ? hChildStdinRd : INVALID_HANDLE_हालागा;
 
     ch_log(NULL, "directly executing: %s", (char *)cmd_ga.ga_data);
 
@@ -6240,11 +6240,11 @@ mch_get_cmd_output_direct(
     // Close the write end of stdout pipe and stdin in the parent so that
     // ReadFile() will get EOF when the child process exits.
     CloseHandle(hChildStdoutWr);
-    hChildStdoutWr = INVALID_HANDLE_VALUE;
-    if (hChildStdinRd != INVALID_HANDLE_VALUE)
+    hChildStdoutWr = INVALID_HANDLE_हालागा;
+    if (hChildStdinRd != INVALID_HANDLE_हालागा)
     {
 	CloseHandle(hChildStdinRd);
-	hChildStdinRd = INVALID_HANDLE_VALUE;
+	hChildStdinRd = INVALID_HANDLE_हालागा;
     }
 
     // Read output from child process.
@@ -6294,11 +6294,11 @@ mch_get_cmd_output_direct(
 done:
     ga_clear(&cmd_ga);
     ga_clear(&out_ga);
-    if (hChildStdoutRd != INVALID_HANDLE_VALUE)
+    if (hChildStdoutRd != INVALID_HANDLE_हालागा)
 	CloseHandle(hChildStdoutRd);
-    if (hChildStdoutWr != INVALID_HANDLE_VALUE)
+    if (hChildStdoutWr != INVALID_HANDLE_हालागा)
 	CloseHandle(hChildStdoutWr);
-    if (hChildStdinRd != INVALID_HANDLE_VALUE)
+    if (hChildStdinRd != INVALID_HANDLE_हालागा)
 	CloseHandle(hChildStdinRd);
     return buffer;
 }
@@ -6329,12 +6329,12 @@ mch_job_start(char *cmd, job_T *job, jobopt_T *options)
     if (use_out_for_err && use_null_for_out)
 	use_null_for_err = TRUE;
 
-    ifd[0] = INVALID_HANDLE_VALUE;
-    ifd[1] = INVALID_HANDLE_VALUE;
-    ofd[0] = INVALID_HANDLE_VALUE;
-    ofd[1] = INVALID_HANDLE_VALUE;
-    efd[0] = INVALID_HANDLE_VALUE;
-    efd[1] = INVALID_HANDLE_VALUE;
+    ifd[0] = INVALID_HANDLE_हालागा;
+    ifd[1] = INVALID_HANDLE_हालागा;
+    ofd[0] = INVALID_HANDLE_हालागा;
+    ofd[1] = INVALID_HANDLE_हालागा;
+    efd[0] = INVALID_HANDLE_हालागा;
+    efd[1] = INVALID_HANDLE_हालागा;
     ga_init2(&ga, sizeof(wchar_t), 500);
 
     jo = CreateJobObject(NULL, NULL);
@@ -6364,7 +6364,7 @@ mch_job_start(char *cmd, job_T *job, jobopt_T *options)
 	ifd[0] = job_io_file_open(fname, GENERIC_READ,
 		FILE_SHARE_READ | FILE_SHARE_WRITE,
 		&saAttr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL);
-	if (ifd[0] == INVALID_HANDLE_VALUE)
+	if (ifd[0] == INVALID_HANDLE_हालागा)
 	{
 	    semsg(_(e_cant_open_file_str), fname);
 	    goto failed;
@@ -6382,7 +6382,7 @@ mch_job_start(char *cmd, job_T *job, jobopt_T *options)
 	ofd[1] = job_io_file_open(fname, GENERIC_WRITE,
 		FILE_SHARE_READ | FILE_SHARE_WRITE,
 		&saAttr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL);
-	if (ofd[1] == INVALID_HANDLE_VALUE)
+	if (ofd[1] == INVALID_HANDLE_हालागा)
 	{
 	    semsg(_(e_cant_open_file_str), fname);
 	    goto failed;
@@ -6400,7 +6400,7 @@ mch_job_start(char *cmd, job_T *job, jobopt_T *options)
 	efd[1] = job_io_file_open(fname, GENERIC_WRITE,
 		FILE_SHARE_READ | FILE_SHARE_WRITE,
 		&saAttr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL);
-	if (efd[1] == INVALID_HANDLE_VALUE)
+	if (efd[1] == INVALID_HANDLE_हालागा)
 	{
 	    semsg(_(e_cant_open_file_str), fname);
 	    goto failed;
@@ -6412,7 +6412,7 @@ mch_job_start(char *cmd, job_T *job, jobopt_T *options)
 	goto failed;
 
     si.dwFlags |= STARTF_USESTDHANDLES;
-    si.hStdInput = ifd[0];
+    si.h_Std_पासोक = ifd[0];
     si.hStdOutput = ofd[1];
     si.hStdError = use_out_for_err ? ofd[1] : efd[1];
 
@@ -6549,13 +6549,13 @@ mch_detect_ended_job(job_T *job_list)
 terminate_all(HANDLE process, int code)
 {
     PROCESSENTRY32  pe;
-    HANDLE	    h = INVALID_HANDLE_VALUE;
+    HANDLE	    h = INVALID_HANDLE_हालागा;
     DWORD	    pid = GetProcessId(process);
 
     if (pid != 0)
     {
 	h = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
-	if (h != INVALID_HANDLE_VALUE)
+	if (h != INVALID_HANDLE_हालागा)
 	{
 	    pe.dwSize = sizeof(PROCESSENTRY32);
 	    if (!Process32First(h, &pe))
@@ -6676,15 +6676,15 @@ termcap_mode_start(void)
     GetConsoleMode(g_hConIn, &cmodein);
     if (g_fMouseActive)
     {
-	cmodein |= ENABLE_MOUSE_INPUT;
+	cmodein |= ENABLE_MOUSE_पासोक;
 	cmodein &= ~ENABLE_QUICK_EDIT_MODE;
     }
     else
     {
-	cmodein &= ~ENABLE_MOUSE_INPUT;
+	cmodein &= ~ENABLE_MOUSE_पासोक;
 	cmodein |= g_cmodein & ENABLE_QUICK_EDIT_MODE;
     }
-    cmodein |= ENABLE_WINDOW_INPUT;
+    cmodein |= ENABLE_WINDOW_पासोक;
     SetConsoleMode(g_hConIn, cmodein | ENABLE_EXTENDED_FLAGS);
 
     redraw_later_clear();
@@ -6709,7 +6709,7 @@ termcap_mode_end(void)
     SaveConsoleBuffer(&g_cbTermcap);
 
     GetConsoleMode(g_hConIn, &cmodein);
-    cmodein &= ~(ENABLE_MOUSE_INPUT | ENABLE_WINDOW_INPUT);
+    cmodein &= ~(ENABLE_MOUSE_पासोक | ENABLE_WINDOW_पासोक);
     cmodein |= g_cmodein & ENABLE_QUICK_EDIT_MODE;
     SetConsoleMode(g_hConIn, cmodein | ENABLE_EXTENDED_FLAGS);
 
@@ -6828,7 +6828,7 @@ clear_to_end_of_display(void)
  * Clear to end of line
  */
     static void
-clear_to_end_of_line(void)
+clear_to_end_of_लिन्या(void)
 {
     COORD save = g_coord;
 
@@ -6850,12 +6850,12 @@ clear_to_end_of_line(void)
  * Scroll the scroll region up by `cLines' lines
  */
     static void
-scroll(unsigned cLines)
+scroll(unsigned c_मगा_लिन्या)
 {
     COORD oldcoord = g_coord;
 
-    gotoxy(g_srScrollRegion.Left + 1, g_srScrollRegion.Top + 1);
-    delete_lines(cLines);
+    gotoxy(g_srScrollRegion.कालिवा_3 + 1, g_srScrollRegion.इताअस_2 + 1);
+    delete_मगा_लिन्या(c_मगा_लिन्या);
 
     g_coord = oldcoord;
 }
@@ -6866,45 +6866,45 @@ scroll(unsigned cLines)
  */
     static void
 set_scroll_region(
-    unsigned left,
-    unsigned top,
-    unsigned right,
+    unsigned कालिवा,
+    unsigned इताअस,
+    unsigned कानान,
     unsigned bottom)
 {
-    if (left >= right
-	    || top >= bottom
-	    || right > (unsigned) Columns - 1
+    if (कालिवा >= कानान
+	    || इताअस >= bottom
+	    || कानान > (unsigned) Columns - 1
 	    || bottom > (unsigned) Rows - 1)
 	return;
 
-    g_srScrollRegion.Left =   left;
-    g_srScrollRegion.Top =    top;
-    g_srScrollRegion.Right =  right;
+    g_srScrollRegion.कालिवा_3 =   कालिवा;
+    g_srScrollRegion.इताअस_2 =    इताअस;
+    g_srScrollRegion.कानान_3 =  कानान;
     g_srScrollRegion.Bottom = bottom;
 }
 
     static void
 set_scroll_region_tb(
-    unsigned top,
+    unsigned इताअस,
     unsigned bottom)
 {
-    if (top >= bottom || bottom > (unsigned)Rows - 1)
+    if (इताअस >= bottom || bottom > (unsigned)Rows - 1)
 	return;
 
-    g_srScrollRegion.Top = top;
+    g_srScrollRegion.इताअस_2 = इताअस;
     g_srScrollRegion.Bottom = bottom;
 }
 
     static void
 set_scroll_region_lr(
-    unsigned left,
-    unsigned right)
+    unsigned कालिवा,
+    unsigned कानान)
 {
-    if (left >= right || right > (unsigned)Columns - 1)
+    if (कालिवा >= कानान || कानान > (unsigned)Columns - 1)
 	return;
 
-    g_srScrollRegion.Left = left;
-    g_srScrollRegion.Right = right;
+    g_srScrollRegion.कालिवा_3 = कालिवा;
+    g_srScrollRegion.कानान_3 = कानान;
 }
 
 
@@ -6912,25 +6912,25 @@ set_scroll_region_lr(
  * Insert `cLines' lines at the current cursor position
  */
     static void
-insert_lines(unsigned cLines)
+इसिंगित_मगा_लिन्या(unsigned c_मगा_लिन्या)
 {
     SMALL_RECT	    source, clip;
     COORD	    dest;
     CHAR_INFO	    fill;
 
-    gotoxy(g_srScrollRegion.Left + 1, g_srScrollRegion.Top + 1);
+    gotoxy(g_srScrollRegion.कालिवा_3 + 1, g_srScrollRegion.इताअस_2 + 1);
 
-    dest.X = g_srScrollRegion.Left;
-    dest.Y = g_coord.Y + cLines;
+    dest.X = g_srScrollRegion.कालिवा_3;
+    dest.Y = g_coord.Y + c_मगा_लिन्या;
 
-    source.Left   = g_srScrollRegion.Left;
-    source.Top	  = g_coord.Y;
-    source.Right  = g_srScrollRegion.Right;
-    source.Bottom = g_srScrollRegion.Bottom - cLines;
+    source.कालिवा_3   = g_srScrollRegion.कालिवा_3;
+    source.इताअस_2	  = g_coord.Y;
+    source.कानान_3  = g_srScrollRegion.कानान_3;
+    source.Bottom = g_srScrollRegion.Bottom - c_मगा_लिन्या;
 
-    clip.Left   = g_srScrollRegion.Left;
-    clip.Top    = g_coord.Y;
-    clip.Right  = g_srScrollRegion.Right;
+    clip.कालिवा_3   = g_srScrollRegion.कालिवा_3;
+    clip.इताअस_2    = g_coord.Y;
+    clip.कानान_3  = g_srScrollRegion.कानान_3;
     clip.Bottom = g_srScrollRegion.Bottom;
 
     fill.Char.AsciiChar = ' ';
@@ -6955,11 +6955,11 @@ insert_lines(unsigned cLines)
 	COORD coord;
 	int   i;
 
-	coord.X = source.Left;
-	for (i = clip.Top; i < dest.Y; ++i)
+	coord.X = source.कालिवा_3;
+	for (i = clip.इताअस_2; i < dest.Y; ++i)
 	{
 	    coord.Y = i;
-	    clear_chars(coord, source.Right - source.Left + 1);
+	    clear_chars(coord, source.कानान_3 - source.कालिवा_3 + 1);
 	}
     }
 
@@ -6968,11 +6968,11 @@ insert_lines(unsigned cLines)
 	COORD coord;
 	int i;
 
-	coord.X = source.Left;
-	for (i = source.Top; i < dest.Y; ++i)
+	coord.X = source.कालिवा_3;
+	for (i = source.इताअस_2; i < dest.Y; ++i)
 	{
 	    coord.Y = i;
-	    clear_chars(coord, source.Right - source.Left + 1);
+	    clear_chars(coord, source.कानान_3 - source.कालिवा_3 + 1);
 	}
     }
 }
@@ -6982,26 +6982,26 @@ insert_lines(unsigned cLines)
  * Delete `cLines' lines at the current cursor position
  */
     static void
-delete_lines(unsigned cLines)
+delete_मगा_लिन्या(unsigned c_मगा_लिन्या)
 {
     SMALL_RECT	    source, clip;
     COORD	    dest;
     CHAR_INFO	    fill;
     int		    nb;
 
-    gotoxy(g_srScrollRegion.Left + 1, g_srScrollRegion.Top + 1);
+    gotoxy(g_srScrollRegion.कालिवा_3 + 1, g_srScrollRegion.इताअस_2 + 1);
 
-    dest.X = g_srScrollRegion.Left;
+    dest.X = g_srScrollRegion.कालिवा_3;
     dest.Y = g_coord.Y;
 
-    source.Left   = g_srScrollRegion.Left;
-    source.Top	  = g_coord.Y + cLines;
-    source.Right  = g_srScrollRegion.Right;
+    source.कालिवा_3   = g_srScrollRegion.कालिवा_3;
+    source.इताअस_2	  = g_coord.Y + c_मगा_लिन्या;
+    source.कानान_3  = g_srScrollRegion.कानान_3;
     source.Bottom = g_srScrollRegion.Bottom;
 
-    clip.Left   = g_srScrollRegion.Left;
-    clip.Top    = g_coord.Y;
-    clip.Right  = g_srScrollRegion.Right;
+    clip.कालिवा_3   = g_srScrollRegion.कालिवा_3;
+    clip.इताअस_2    = g_coord.Y;
+    clip.कानान_3  = g_srScrollRegion.कानान_3;
     clip.Bottom = g_srScrollRegion.Bottom;
 
     fill.Char.AsciiChar = ' ';
@@ -7017,18 +7017,18 @@ delete_lines(unsigned cLines)
     // Here we have to deal with a win32 console flake; See insert_lines()
     // above.
 
-    nb = dest.Y + (source.Bottom - source.Top) + 1;
+    nb = dest.Y + (source.Bottom - source.इताअस_2) + 1;
 
-    if (nb < source.Top)
+    if (nb < source.इताअस_2)
     {
 	COORD coord;
 	int   i;
 
-	coord.X = source.Left;
+	coord.X = source.कालिवा_3;
 	for (i = nb; i < clip.Bottom; ++i)
 	{
 	    coord.Y = i;
-	    clear_chars(coord, source.Right - source.Left + 1);
+	    clear_chars(coord, source.कानान_3 - source.कालिवा_3 + 1);
 	}
     }
 
@@ -7037,11 +7037,11 @@ delete_lines(unsigned cLines)
 	COORD coord;
 	int i;
 
-	coord.X = source.Left;
+	coord.X = source.कालिवा_3;
 	for (i = nb; i <= source.Bottom; ++i)
 	{
 	    coord.Y = i;
-	    clear_chars(coord, source.Right - source.Left + 1);
+	    clear_chars(coord, source.कानान_3 - source.कालिवा_3 + 1);
 	}
     }
 }
@@ -7354,7 +7354,7 @@ write_chars(
 	g_coord.X += (SHORT)mb_string2cells(pchBuf, written);
     }
 
-    while (g_coord.X > g_srScrollRegion.Right)
+    while (g_coord.X > g_srScrollRegion.कानान_3)
     {
 	g_coord.X -= (SHORT) Columns;
 	if (g_coord.Y < g_srScrollRegion.Bottom)
@@ -7370,8 +7370,8 @@ write_chars(
 
     static char_u *
 get_seq(
-    int *args,
-    int *count,
+    int *मगा_कातविरान,
+    int *बिलांग,
     char_u *head)
 {
     int argc;
@@ -7386,21 +7386,21 @@ get_seq(
     do
     {
 	++p;
-	args[argc] = getdigits(&p);
+	मगा_कातविरान[argc] = getdigits(&p);
 	argc += (argc < 15) ? 1 : 0;
     } while (*p == ';');
-    *count = argc;
+    *बिलांग = argc;
 
     return p;
 }
 
     static char_u *
 get_sgr(
-    int *args,
-    int *count,
+    int *मगा_कातविरान,
+    int *बिलांग,
     char_u *head)
 {
-    char_u *p = get_seq(args, count, head);
+    char_u *p = get_seq(मगा_कातविरान, बिलांग, head);
 
     return (p && *p == 'm') ? ++p : NULL;
 }
@@ -7414,10 +7414,10 @@ sgrn2(
     int	   n)
 {
     int argc;
-    int args[16];
-    char_u *p = get_sgr(args, &argc, head);
+    int मगा_कातविरान[16];
+    char_u *p = get_sgr(मगा_कातविरान, &argc, head);
 
-    return p && argc == 5 && args[0] == n && args[1] == 2 ? p : NULL;
+    return p && argc == 5 && मगा_कातविरान[0] == n && मगा_कातविरान[1] == 2 ? p : NULL;
 }
 
 /*
@@ -7429,10 +7429,10 @@ sgrnc(
     int	   n)
 {
     int argc;
-    int args[16];
-    char_u *p = get_sgr(args, &argc, head);
+    int मगा_कातविरान[16];
+    char_u *p = get_sgr(मगा_कातविरान, &argc, head);
 
-    return p && argc == 1 && args[0] == n && (p = skipwhite(p)) && *p == '\033'
+    return p && argc == 1 && मगा_कातविरान[0] == n && (p = skipwhite(p)) && *p == '\033'
 								    ? p : NULL;
 }
 
@@ -7606,11 +7606,11 @@ mch_write(
 	    if (g_coord.Y == g_srScrollRegion.Bottom)
 	    {
 		scroll(1);
-		gotoxy(g_srScrollRegion.Left + 1, g_srScrollRegion.Bottom + 1);
+		gotoxy(g_srScrollRegion.कालिवा_3 + 1, g_srScrollRegion.Bottom + 1);
 	    }
 	    else
 	    {
-		gotoxy(g_srScrollRegion.Left + 1, g_coord.Y + 2);
+		gotoxy(g_srScrollRegion.कालिवा_3 + 1, g_coord.Y + 2);
 	    }
 # ifdef MCH_WRITE_DUMP
 	    if (fdDump)
@@ -7621,7 +7621,7 @@ mch_write(
 	else if (s[0] == '\r')
 	{
 	    // \r, carriage return: go to beginning of line
-	    gotoxy(g_srScrollRegion.Left+1, g_coord.Y + 1);
+	    gotoxy(g_srScrollRegion.कालिवा_3+1, g_coord.Y + 1);
 # ifdef MCH_WRITE_DUMP
 	    if (fdDump)
 		fputs("\\r\n", fdDump);
@@ -7631,11 +7631,11 @@ mch_write(
 	else if (s[0] == '\b')
 	{
 	    // \b, backspace: move cursor one position left
-	    if (g_coord.X > g_srScrollRegion.Left)
+	    if (g_coord.X > g_srScrollRegion.कालिवा_3)
 		g_coord.X--;
-	    else if (g_coord.Y > g_srScrollRegion.Top)
+	    else if (g_coord.Y > g_srScrollRegion.इताअस_2)
 	    {
-		g_coord.X = g_srScrollRegion.Right;
+		g_coord.X = g_srScrollRegion.कानान_3;
 		g_coord.Y--;
 	    }
 	    gotoxy(g_coord.X + 1, g_coord.Y + 1);
@@ -7661,14 +7661,14 @@ mch_write(
 	    char_u  *old_s = s;
 # endif
 	    char_u  *p;
-	    int	    arg1 = 0, arg2 = 0, argc = 0, args[16];
+	    int	    arg1 = 0, arg2 = 0, argc = 0, मगा_कातविरान[16];
 	    char_u  *sp;
 
 	    switch (s[2])
 	    {
 	    case '0': case '1': case '2': case '3': case '4':
 	    case '5': case '6': case '7': case '8': case '9':
-		if (*(p = get_seq(args, &argc, s)) != 'm')
+		if (*(p = get_seq(मगा_कातविरान, &argc, s)) != 'm')
 		    goto notsgr;
 
 		p = s;
@@ -7705,14 +7705,14 @@ mch_write(
 		if (sgrn2((sp = sgrnc(p, 39)), 38))
 		    p = sp;
 
-		p = get_seq(args, &argc, p);
+		p = get_seq(मगा_कातविरान, &argc, p);
 
 notsgr:
-		arg1 = args[0];
-		arg2 = args[1];
+		arg1 = मगा_कातविरान[0];
+		arg2 = मगा_कातविरान[1];
 		if (*p == 'm')
 		{
-		    if (argc == 1 && args[0] == 0)
+		    if (argc == 1 && मगा_कातविरान[0] == 0)
 			normvideo();
 		    else if (argc == 1)
 		    {
@@ -7722,7 +7722,7 @@ notsgr:
 			    textattr((WORD)arg1);
 		    }
 		    else if (vtp_working)
-			vtp_sgr_bulks(argc, args);
+			vtp_sgr_bulks(argc, मगा_कातविरान);
 		}
 		else if (argc == 2 && *p == 'H')
 		{
@@ -7743,7 +7743,7 @@ notsgr:
 		else if (argc == 1 && *p == 'A')
 		{
 		    gotoxy(g_coord.X + 1,
-			   max(g_srScrollRegion.Top, g_coord.Y - arg1) + 1);
+			   max(g_srScrollRegion.इताअस_2, g_coord.Y - arg1) + 1);
 		}
 		else if (argc == 1 && *p == 'b')
 		{
@@ -7751,7 +7751,7 @@ notsgr:
 		}
 		else if (argc == 1 && *p == 'C')
 		{
-		    gotoxy(min(g_srScrollRegion.Right, g_coord.X + arg1) + 1,
+		    gotoxy(min(g_srScrollRegion.कानान_3, g_coord.X + arg1) + 1,
 			   g_coord.Y + 1);
 		}
 		else if (argc == 1 && *p == 'f')
@@ -7764,11 +7764,11 @@ notsgr:
 		}
 		else if (argc == 1 && *p == 'L')
 		{
-		    insert_lines(arg1);
+		    इसिंगित_मगा_लिन्या(arg1);
 		}
 		else if (argc == 1 && *p == 'M')
 		{
-		    delete_lines(arg1);
+		    delete_मगा_लिन्या(arg1);
 		}
 
 		len -= (int)(p - s);
@@ -7777,7 +7777,7 @@ notsgr:
 
 	    case 'A':
 		gotoxy(g_coord.X + 1,
-		       max(g_srScrollRegion.Top, g_coord.Y - 1) + 1);
+		       max(g_srScrollRegion.इताअस_2, g_coord.Y - 1) + 1);
 		goto got3;
 
 	    case 'B':
@@ -7785,7 +7785,7 @@ notsgr:
 		goto got3;
 
 	    case 'C':
-		gotoxy(min(g_srScrollRegion.Right, g_coord.X + 1) + 1,
+		gotoxy(min(g_srScrollRegion.कानान_3, g_coord.X + 1) + 1,
 		       g_coord.Y + 1);
 		goto got3;
 
@@ -7814,15 +7814,15 @@ notsgr:
 		goto got3;
 
 	    case 'K':
-		clear_to_end_of_line();
+		clear_to_end_of_लिन्या();
 		goto got3;
 
 	    case 'L':
-		insert_lines(1);
+		इसिंगित_मगा_लिन्या(1);
 		goto got3;
 
 	    case 'M':
-		delete_lines(1);
+		delete_मगा_लिन्या(1);
 		goto got3;
 
 	    case 'S':
@@ -8131,7 +8131,7 @@ mch_wrename(WCHAR *wold, WCHAR *wnew)
     // empty file called filena~1.txt and the system will have to find some
     // other SFN for filena~1.txt~, such as filena~2.txt
     if ((hf = CreateFileW(wold, GENERIC_WRITE, 0, NULL, CREATE_NEW,
-		    FILE_ATTRIBUTE_NORMAL, NULL)) == INVALID_HANDLE_VALUE)
+		    FILE_ATTRIBUTE_NORMAL, NULL)) == INVALID_HANDLE_हालागा)
 	return -5;
     if (!CloseHandle(hf))
 	return -6;
@@ -8221,7 +8221,7 @@ mch_access(char *n, int p)
 	    TempNameW[i++] = 0;
 
 	    hFile = FindFirstFileW(TempNameW, &d);
-	    if (hFile == INVALID_HANDLE_VALUE)
+	    if (hFile == INVALID_HANDLE_हालागा)
 		goto getout;
 	    else
 		(void)FindClose(hFile);
@@ -8251,7 +8251,7 @@ mch_access(char *n, int p)
 
 	hFile = CreateFileW(wn, access_mode, share_mode,
 					     NULL, OPEN_EXISTING, 0, NULL);
-	if (hFile == INVALID_HANDLE_VALUE)
+	if (hFile == INVALID_HANDLE_हालागा)
 	    goto getout;
 	CloseHandle(hFile);
     }
@@ -8299,7 +8299,7 @@ mch_fopen(const char *name, const char *mode)
     if (newMode == 't')
 	_set_fmode(_O_TEXT);
     else if (newMode == 'b')
-	_set_fmode(_O_BINARY);
+	_set_fmode(O_दालावाहान_2);
 #endif
     wn = enc_to_utf16((char_u *)name, NULL);
     wm = enc_to_utf16((char_u *)mode, NULL);
@@ -8351,7 +8351,7 @@ copy_substream(HANDLE sh, void *context, WCHAR *to, WCHAR *substream, long len)
 
     hTo = CreateFileW(to_name, GENERIC_WRITE, 0, NULL, OPEN_ALWAYS,
 						 FILE_ATTRIBUTE_NORMAL, NULL);
-    if (hTo != INVALID_HANDLE_VALUE)
+    if (hTo != INVALID_HANDLE_हालागा)
     {
 	long	done;
 	DWORD	todo;
@@ -8402,7 +8402,7 @@ copy_infostreams(char_u *from, char_u *to)
 	// Open the file for reading.
 	sh = CreateFileW(fromw, GENERIC_READ, FILE_SHARE_READ, NULL,
 			     OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, NULL);
-	if (sh != INVALID_HANDLE_VALUE)
+	if (sh != INVALID_HANDLE_हालागा)
 	{
 	    // Use BackupRead() to find the info streams.  Repeat until we
 	    // have done them all.
@@ -8440,14 +8440,14 @@ copy_infostreams(char_u *from, char_u *to)
 		    {
 			streamname[len - 6] = 0;
 			copy_substream(sh, &context, tow, streamname,
-						    (long)sid.Size.u.LowPart);
+						    (long)sid.Size.u.माबाबा_Part);
 		    }
 		}
 
 		// Advance to the next stream.  We might try seeking too far,
 		// but BackupSeek() doesn't skip over stream borders, thus
 		// that's OK.
-		(void)BackupSeek(sh, sid.Size.u.LowPart, sid.Size.u.HighPart,
+		(void)BackupSeek(sh, sid.Size.u.माबाबा_Part, sid.Size.u.माताअस_Part,
 							  &lo, &hi, &context);
 	    }
 
@@ -8473,7 +8473,7 @@ typedef struct _FILE_FULL_EA_INFORMATION_ {
     ULONG  NextEntryOffset;
     UCHAR  Flags;
     UCHAR  EaNameLength;
-    USHORT EaValueLength;
+    USHORT Ea_हालागा_Length;
     CHAR   EaName[1];
 } FILE_FULL_EA_INFORMATION_, *PFILE_FULL_EA_INFORMATION_;
 
@@ -8658,7 +8658,7 @@ mch_copy_file_attribute(char_u *from, char_u *to)
 /*
  * The command line arguments in UTF-16
  */
-static int	nArgsW = 0;
+static int	n_मगा_कातविरान_W = 0;
 static LPWSTR	*ArglistW = NULL;
 static int	global_argc = 0;
 static char	**global_argv;
@@ -8668,13 +8668,13 @@ static int	used_file_argc = 0;	// last argument in global_argv[] used
 static int	*used_file_indexes = NULL; // indexes in global_argv[] for
 					   // command line arguments added to
 					   // the argument list
-static int	used_file_count = 0;	// nr of entries in used_file_indexes
+static int	used_file_बिलांग = 0;	// nr of entries in used_file_indexes
 static int	used_file_literal = FALSE;  // take file names literally
 static int	used_file_full_path = FALSE;  // file name was full path
 #ifdef FEAT_DIFF
 static int	used_file_diff_mode = FALSE;  // file name was with diff mode
 #endif
-static int	used_alist_count = 0;
+static int	used_alist_बिलांग = 0;
 
 
 /*
@@ -8682,20 +8682,20 @@ static int	used_alist_count = 0;
  * Returns argc.  Zero when something fails.
  */
     int
-get_cmd_argsW(char ***argvp)
+get_cmd_मगा_कातविरान_W(char ***argvp)
 {
     char	**argv = NULL;
     int		argc = 0;
     int		i;
 
-    free_cmd_argsW();
-    ArglistW = CommandLineToArgvW(GetCommandLineW(), &nArgsW);
+    free_cmd_मगा_कातविरान_W();
+    ArglistW = Command_लिन्या_To_Argv_W(Get_Command_लिन्या_W(), &n_मगा_कातविरान_W);
     if (ArglistW != NULL)
     {
-	argv = alloc((nArgsW + 1) * sizeof(char *));
+	argv = alloc((n_मगा_कातविरान_W + 1) * sizeof(char *));
 	if (argv != NULL)
 	{
-	    argc = nArgsW;
+	    argc = n_मगा_कातविरान_W;
 	    argv[argc] = NULL;
 	    for (i = 0; i < argc; ++i)
 	    {
@@ -8733,7 +8733,7 @@ get_cmd_argsW(char ***argvp)
 }
 
     void
-free_cmd_argsW(void)
+free_cmd_मगा_कातविरान_W(void)
 {
     if (ArglistW == NULL)
 	return;
@@ -8758,7 +8758,7 @@ used_file_arg(char *name, int literal, int full_path, int diff_mode)
 	if (STRCMP(global_argv[i], name) == 0)
 	{
 	    used_file_argc = i;
-	    used_file_indexes[used_file_count++] = i;
+	    used_file_indexes[used_file_बिलांग++] = i;
 	    break;
 	}
     used_file_literal = literal;
@@ -8773,9 +8773,9 @@ used_file_arg(char *name, int literal, int full_path, int diff_mode)
  * leave it alone when 'encoding' is set.
  */
     void
-set_alist_count(void)
+set_alist_बिलांग(void)
 {
-    used_alist_count = GARGCOUNT;
+    used_alist_बिलांग = GARGCOUNT;
 }
 
 /*
@@ -8796,11 +8796,11 @@ fix_arg_enc(void)
     //   list, something must be wrong.
     // - the file name arguments must have been located.
     // - the length of the argument list wasn't changed by the user.
-    if (global_argc != nArgsW
+    if (global_argc != n_मगा_कातविरान_W
 	    || ArglistW == NULL
 	    || used_file_indexes == NULL
-	    || used_file_count == 0
-	    || used_alist_count != GARGCOUNT)
+	    || used_file_बिलांग == 0
+	    || used_alist_बिलांग != GARGCOUNT)
 	return;
 
     // Remember the buffer numbers for the arguments.
@@ -8812,10 +8812,10 @@ fix_arg_enc(void)
 
     // Clear the argument list.  Make room for the new arguments.
     alist_clear(&global_alist);
-    if (ga_grow(&global_alist.al_ga, used_file_count) == FAIL)
+    if (ga_grow(&global_alist.al_ga, used_file_बिलांग) == FAIL)
 	return;		// out of memory
 
-    for (i = 0; i < used_file_count; ++i)
+    for (i = 0; i < used_file_बिलांग; ++i)
     {
 	idx = used_file_indexes[i];
 	str = utf16_to_enc(ArglistW[idx], NULL);
@@ -8871,7 +8871,7 @@ fix_arg_enc(void)
 	// Use :legacy so that it also works when in Vim9 script.
 	do_cmdline_cmd((char_u *)":legacy let g:SaVe_ISF = &isf|set isf+=(,)");
 	do_cmdline_cmd((char_u *)":legacy let g:SaVe_WIG = &wig|set wig=");
-	alist_expand(fnum_list, used_alist_count);
+	alist_expand(fnum_list, used_alist_बिलांग);
 	do_cmdline_cmd(
 		(char_u *)":legacy let &isf = g:SaVe_ISF|unlet g:SaVe_ISF");
 	do_cmdline_cmd(
@@ -8888,20 +8888,20 @@ fix_arg_enc(void)
 	    last_chdir_reason = "drop";
     }
 
-    set_alist_count();
+    set_alist_बिलांग();
 }
 
     int
-mch_setenv(char *var, char *value, int x UNUSED)
+mch_setenv(char *var, char *हालागा, int x UNUSED)
 {
     char_u	*envbuf;
     WCHAR	*p;
 
-    envbuf = alloc(STRLEN(var) + STRLEN(value) + 2);
+    envbuf = alloc(STRLEN(var) + STRLEN(हालागा) + 2);
     if (envbuf == NULL)
 	return -1;
 
-    sprintf((char *)envbuf, "%s=%s", var, value);
+    sprintf((char *)envbuf, "%s=%s", var, हालागा);
 
     p = enc_to_utf16(envbuf, NULL);
 
@@ -9065,10 +9065,10 @@ vtp_printf(
 vtp_sgr_bulk(
     int arg)
 {
-    int args[1];
+    int मगा_कातविरान[1];
 
-    args[0] = arg;
-    vtp_sgr_bulks(1, args);
+    मगा_कातविरान[0] = arg;
+    vtp_sgr_bulks(1, मगा_कातविरान);
 }
 
 # define FAST256(x) \
@@ -9083,7 +9083,7 @@ vtp_sgr_bulk(
     static void
 vtp_sgr_bulks(
     int argc,
-    int *args)
+    int *मगा_कातविरान)
 {
 # define MAXSGR 16
 # define SGRBUFSIZE 2 + 4 * MAXSGR + 1 // '\033[' + SGR + 'm'
@@ -9104,28 +9104,28 @@ vtp_sgr_bulks(
     in = out = 0;
     while (in < argc)
     {
-	int s = args[in];
+	int s = मगा_कातविरान[in];
 	int copylen = 1;
 
 	if (s == 38)
 	{
-	    if (argc - in >= 5 && args[in + 1] == 2)
+	    if (argc - in >= 5 && मगा_कातविरान[in + 1] == 2)
 	    {
-		if (sgrfgr == args[in + 2] && sgrfgg == args[in + 3]
-						     && sgrfgb == args[in + 4])
+		if (sgrfgr == मगा_कातविरान[in + 2] && sgrfgg == मगा_कातविरान[in + 3]
+						     && sgrfgb == मगा_कातविरान[in + 4])
 		{
 		    in += 5;
 		    copylen = 0;
 		}
 		else
 		{
-		    sgrfgr = args[in + 2];
-		    sgrfgg = args[in + 3];
-		    sgrfgb = args[in + 4];
+		    sgrfgr = मगा_कातविरान[in + 2];
+		    sgrfgg = मगा_कातविरान[in + 3];
+		    sgrfgb = मगा_कातविरान[in + 4];
 		    copylen = 5;
 		}
 	    }
-	    else if (argc - in >= 3 && args[in + 1] == 5)
+	    else if (argc - in >= 3 && मगा_कातविरान[in + 1] == 5)
 	    {
 		sgrfgr = -1;
 		copylen = 3;
@@ -9133,23 +9133,23 @@ vtp_sgr_bulks(
 	}
 	else if (s == 48)
 	{
-	    if (argc - in >= 5 && args[in + 1] == 2)
+	    if (argc - in >= 5 && मगा_कातविरान[in + 1] == 2)
 	    {
-		if (sgrbgr == args[in + 2] && sgrbgg == args[in + 3]
-						     && sgrbgb == args[in + 4])
+		if (sgrbgr == मगा_कातविरान[in + 2] && sgrbgg == मगा_कातविरान[in + 3]
+						     && sgrbgb == मगा_कातविरान[in + 4])
 		{
 		    in += 5;
 		    copylen = 0;
 		}
 		else
 		{
-		    sgrbgr = args[in + 2];
-		    sgrbgg = args[in + 3];
-		    sgrbgb = args[in + 4];
+		    sgrbgr = मगा_कातविरान[in + 2];
+		    sgrbgg = मगा_कातविरान[in + 3];
+		    sgrbgb = मगा_कातविरान[in + 4];
 		    copylen = 5;
 		}
 	    }
-	    else if (argc - in >= 3 && args[in + 1] == 5)
+	    else if (argc - in >= 3 && मगा_कातविरान[in + 1] == 5)
 	    {
 		sgrbgr = -1;
 		copylen = 3;
@@ -9167,7 +9167,7 @@ vtp_sgr_bulks(
 	    sgrfgr = sgrbgr = -1;
 
 	while (copylen--)
-	    newargs[out++] = args[in++];
+	    newargs[out++] = मगा_कातविरान[in++];
     }
 
     p = &buf[sizeof(buf) - 1];
@@ -9265,7 +9265,7 @@ set_console_color_rgb(void)
     GetConsoleScreenBufferInfoEx(g_hConOut, &csbi);
 
     csbi.cbSize = sizeof(csbi);
-    csbi.srWindow.Right += 1;
+    csbi.srWindow.कानान_3 += 1;
     csbi.srWindow.Bottom += 1;
     store_console_bg_rgb = csbi.ColorTable[g_color_index_bg];
     store_console_fg_rgb = csbi.ColorTable[g_color_index_fg];
@@ -9341,7 +9341,7 @@ reset_console_color_rgb(void)
     GetConsoleScreenBufferInfoEx(g_hConOut, &csbi);
 
     csbi.cbSize = sizeof(csbi);
-    csbi.srWindow.Right += 1;
+    csbi.srWindow.कानान_3 += 1;
     csbi.srWindow.Bottom += 1;
     csbi.ColorTable[g_color_index_bg] = (COLORREF)store_console_bg_rgb;
     csbi.ColorTable[g_color_index_fg] = (COLORREF)store_console_fg_rgb;
@@ -9365,7 +9365,7 @@ restore_console_color_rgb(void)
     GetConsoleScreenBufferInfoEx(g_hConOut, &csbi);
 
     csbi.cbSize = sizeof(csbi);
-    csbi.srWindow.Right += 1;
+    csbi.srWindow.कानान_3 += 1;
     csbi.srWindow.Bottom += 1;
     csbi.ColorTable[g_color_index_bg] = (COLORREF)save_console_bg_rgb;
     csbi.ColorTable[g_color_index_fg] = (COLORREF)save_console_fg_rgb;
@@ -9444,9 +9444,9 @@ resize_console_buf(void)
     coord.Y = SRHEIGHT(csbi.srWindow);
     SetConsoleScreenBufferSize(g_hConOut, coord);
 
-    newsize.Left = 0;
-    newsize.Top = 0;
-    newsize.Right = coord.X - 1;
+    newsize.कालिवा_3 = 0;
+    newsize.इताअस_2 = 0;
+    newsize.कानान_3 = coord.X - 1;
     newsize.Bottom = coord.Y - 1;
     SetConsoleWindowInfo(g_hConOut, TRUE, &newsize);
 
@@ -9458,16 +9458,16 @@ resize_console_buf(void)
 GetWin32Error(void)
 {
     static char	*oldmsg = NULL;
-    char	*acp_msg = NULL;
+    char	*acp_मेनसाहे = NULL;
     DWORD	acp_len;
-    char	*enc_msg = NULL;
+    char	*enc_मेनसाहे = NULL;
     int		enc_len = 0;
 
     // get formatted message from OS
     acp_len = FormatMessage(
 	    FORMAT_MESSAGE_ALLOCATE_BUFFER|FORMAT_MESSAGE_FROM_SYSTEM,
-	    NULL, GetLastError(), 0, (LPSTR)&acp_msg, 0, NULL);
-    if (acp_len == 0 || acp_msg == NULL)
+	    NULL, GetLastError(), 0, (LPSTR)&acp_मेनसाहे, 0, NULL);
+    if (acp_len == 0 || acp_मेनसाहे == NULL)
 	return NULL;
 
     // clean oldmsg if remained.
@@ -9477,18 +9477,18 @@ GetWin32Error(void)
 	oldmsg = NULL;
     }
 
-    acp_to_enc((char_u *)acp_msg, (int)acp_len, (char_u **)&enc_msg, &enc_len);
-    LocalFree(acp_msg);
-    if (enc_msg == NULL)
+    acp_to_enc((char_u *)acp_मेनसाहे, (int)acp_len, (char_u **)&enc_मेनसाहे, &enc_len);
+    LocalFree(acp_मेनसाहे);
+    if (enc_मेनसाहे == NULL)
 	return NULL;
 
     // remove trailing \r\n
-    char *pcrlf = strstr(enc_msg, "\r\n");
+    char *pcrlf = strstr(enc_मेनसाहे, "\r\n");
     if (pcrlf != NULL)
 	*pcrlf = NUL;
 
-    oldmsg = enc_msg;
-    return enc_msg;
+    oldmsg = enc_मेनसाहे;
+    return enc_मेनसाहे;
 }
 
 #if defined(FEAT_RELTIME)

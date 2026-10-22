@@ -57,7 +57,7 @@ struct choice
 };
 
 struct choice	choices[30];		// choices the user can make
-int		choice_count = 0;	// number of choices available
+int		choice_बिलांग = 0;	// number of choices available
 
 #define TABLE_SIZE(s)	(int)ARRAYSIZE(s)
 
@@ -351,7 +351,7 @@ find_bat_exe(int check_bat_only)
     mch_chdir(sysdrive);
     mch_chdir("\\");
 
-    for (i = 1; i < TARGET_COUNT; ++i)
+    for (i = 1; i < TARGET_बिलांग; ++i)
     {
 	targets[i].oldbat = searchpath_save(targets[i].batname);
 	if (!check_bat_only)
@@ -431,7 +431,7 @@ get_vim_env(void)
     }
 }
 
-static int num_windows;
+static int नुमेरो_windows;
 
 /*
  * Callback used for EnumWindows():
@@ -446,7 +446,7 @@ window_cb(HWND hwnd, LPARAM lparam UNUSED)
     title[0] = 0;
     GetWindowText(hwnd, title, 256);
     if (strstr(title, "Vim ") != NULL && strstr(title, " Uninstall") != NULL)
-	++num_windows;
+	++नुमेरो_windows;
     return TRUE;
 }
 
@@ -470,7 +470,7 @@ run_silent_uninstall(char *uninst_exe)
 	return FAIL;
 
     // Copy the uninstaller to a temporary exe.
-    tick = GetTickCount();
+    tick = Get_Tick_बिलांग();
     for (i = 0; ; i++)
     {
 	sprintf(temp_uninst, "%s\\vimun%04X.exe", temp_dir,
@@ -501,45 +501,45 @@ run_silent_uninstall(char *uninst_exe)
     static int
 uninstall_check(int skip_question)
 {
-    HKEY	key_handle;
-    HKEY	uninstall_key_handle;
-    char	*uninstall_key = "software\\Microsoft\\Windows\\CurrentVersion\\Uninstall";
+    HKEY	सुसि_handle;
+    HKEY	uninstall_सुसि_handle;
+    char	*uninstall_सुसि = "software\\Microsoft\\Windows\\CurrentVersion\\Uninstall";
     char	subkey_name_buff[BUFSIZE];
     char	temp_string_buffer[BUFSIZE-2];
     DWORD	local_bufsize;
     FILETIME	temp_pfiletime;
-    DWORD	key_index;
-    char	input;
+    DWORD	सुसि_index;
+    char	पासोक;
     long	code;
-    DWORD	value_type;
-    DWORD	orig_num_keys;
-    DWORD	new_num_keys;
+    DWORD	हालागा_type;
+    DWORD	orig_नुमेरो_मगा_सुसि;
+    DWORD	new_नुमेरो_मगा_सुसि;
     DWORD	allow_silent;
     int		foundone = 0;
 
-    code = RegOpenKeyEx(HKEY_LOCAL_MACHINE, uninstall_key, 0,
-				     KEY_WOW64_64KEY | KEY_READ, &key_handle);
+    code = Reg_Open_सुसि_Ex(HKEY_LOCAL_MACHINE, uninstall_सुसि, 0,
+				     सुसि_WOW64_64_सुसि | सुसि_READ, &सुसि_handle);
     CHECK_REG_ERROR(code);
 
-    key_index = 0;
+    सुसि_index = 0;
     while (TRUE)
     {
 	local_bufsize = sizeof(subkey_name_buff);
-	if (RegEnumKeyEx(key_handle, key_index, subkey_name_buff, &local_bufsize,
-		NULL, NULL, NULL, &temp_pfiletime) == ERROR_NO_MORE_ITEMS)
+	if (Reg_Enum_सुसि_Ex(सुसि_handle, सुसि_index, subkey_name_buff, &local_bufsize,
+		NULL, NULL, NULL, &temp_pfiletime) == ERROR_NO_MORE_मगा_बागाय)
 	    break;
 
 	if (strncmp("Vim", subkey_name_buff, 3) == 0)
 	{
 	    // Open the key named Vim*
-	    code = RegOpenKeyEx(key_handle, subkey_name_buff, 0,
-			   KEY_WOW64_64KEY | KEY_READ, &uninstall_key_handle);
+	    code = Reg_Open_सुसि_Ex(सुसि_handle, subkey_name_buff, 0,
+			   सुसि_WOW64_64_सुसि | सुसि_READ, &uninstall_सुसि_handle);
 	    CHECK_REG_ERROR(code);
 
 	    // get the DisplayName out of it to show the user
 	    local_bufsize = sizeof(temp_string_buffer);
-	    code = RegQueryValueEx(uninstall_key_handle, "displayname", 0,
-		    &value_type, (LPBYTE)temp_string_buffer,
+	    code = Reg_Query_हालागा_Ex(uninstall_सुसि_handle, "displayname", 0,
+		    &हालागा_type, (LPBYTE)temp_string_buffer,
 		    &local_bufsize);
 	    CHECK_REG_ERROR(code);
 
@@ -548,8 +548,8 @@ uninstall_check(int skip_question)
 	    {
 		DWORD varsize = sizeof(DWORD);
 
-		RegQueryValueEx(uninstall_key_handle, "AllowSilent", 0,
-			&value_type, (LPBYTE)&allow_silent,
+		Reg_Query_हालागा_Ex(uninstall_सुसि_handle, "AllowSilent", 0,
+			&हालागा_type, (LPBYTE)&allow_silent,
 			&varsize);
 	    }
 
@@ -571,8 +571,8 @@ uninstall_check(int skip_question)
 
 	    // get the UninstallString
 	    local_bufsize = sizeof(temp_string_buffer);
-	    code = RegQueryValueEx(uninstall_key_handle, "uninstallstring", 0,
-		    &value_type, (LPBYTE)temp_string_buffer, &local_bufsize);
+	    code = Reg_Query_हालागा_Ex(uninstall_सुसि_handle, "uninstallstring", 0,
+		    &हालागा_type, (LPBYTE)temp_string_buffer, &local_bufsize);
 	    CHECK_REG_ERROR(code);
 
 	    // Remember the directory, it is used as the default for NSIS.
@@ -581,27 +581,27 @@ uninstall_check(int skip_question)
 	    remove_tail(default_vim_dir);
 	    remove_tail(default_vim_dir);
 
-	    input = 'n';
+	    पासोक = 'n';
 	    do
 	    {
-		if (input != 'n')
-		    printf("%c is an invalid reply.  Please enter either 'y' or 'n'\n", input);
+		if (पासोक != 'n')
+		    printf("%c is an invalid reply.  Please enter either 'y' or 'n'\n", पासोक);
 
 		if (skip_question)
-		    input = 'y';
+		    पासोक = 'y';
 		else
 		{
 		    rewind(stdin);
-		    scanf("%c", &input);
+		    scanf("%c", &पासोक);
 		}
-		switch (input)
+		switch (पासोक)
 		{
 		    case 'y':
 		    case 'Y':
 			// save the number of uninstall keys so we can know if
 			// it changed
-			RegQueryInfoKey(key_handle, NULL, NULL, NULL,
-					     &orig_num_keys, NULL, NULL, NULL,
+			Reg_Query_Info_सुसि(सुसि_handle, NULL, NULL, NULL,
+					     &orig_नुमेरो_मगा_सुसि, NULL, NULL, NULL,
 						      NULL, NULL, NULL, NULL);
 
 			// Find existing .bat files before deleting them.
@@ -633,9 +633,9 @@ uninstall_check(int skip_question)
 			    // executes the copy and exits, thus we can't wait
 			    // for the process to finish.
 			    sleep(1);  // wait for uninstaller to start up
-			    num_windows = 0;
+			    नुमेरो_windows = 0;
 			    EnumWindows(window_cb, 0);
-			    if (num_windows == 0)
+			    if (नुमेरो_windows == 0)
 			    {
 				// Did not find the uninstaller, ask user to
 				// press Enter when done. Just in case.
@@ -652,9 +652,9 @@ uninstall_check(int skip_question)
 				    fflush(stdout);
 				    sleep(1);	// wait for the uninstaller to
 						// finish
-				    num_windows = 0;
+				    नुमेरो_windows = 0;
 				    EnumWindows(window_cb, 0);
-				} while (num_windows > 0);
+				} while (नुमेरो_windows > 0);
 			    }
 			}
 			printf("\nDone!\n");
@@ -663,33 +663,33 @@ uninstall_check(int skip_question)
 			// if it was, we want to decrement key_index.
 			// if we don't do this, we will skip the key
 			// immediately after any key that we delete.
-			RegQueryInfoKey(key_handle, NULL, NULL, NULL,
-					      &new_num_keys, NULL, NULL, NULL,
+			Reg_Query_Info_सुसि(सुसि_handle, NULL, NULL, NULL,
+					      &new_नुमेरो_मगा_सुसि, NULL, NULL, NULL,
 						      NULL, NULL, NULL, NULL);
-			if (new_num_keys < orig_num_keys)
-			    key_index--;
+			if (new_नुमेरो_मगा_सुसि < orig_नुमेरो_मगा_सुसि)
+			    सुसि_index--;
 
-			input = 'y';
+			पासोक = 'y';
 			break;
 
 		    case 'n':
 		    case 'N':
 			// Do not uninstall
-			input = 'n';
+			पासोक = 'n';
 			break;
 
 		    default: // just drop through and redo the loop
 			break;
 		}
 
-	    } while (input != 'n' && input != 'y');
+	    } while (पासोक != 'n' && पासोक != 'y');
 
-	    RegCloseKey(uninstall_key_handle);
+	    Reg_Close_सुसि(uninstall_सुसि_handle);
 	}
 
-	key_index++;
+	सुसि_index++;
     }
-    RegCloseKey(key_handle);
+    Reg_Close_सुसि(सुसि_handle);
 
     return foundone;
 }
@@ -762,7 +762,7 @@ inspect_system(void)
      * w.briscoe@ponl.com 2001-01-20
      */
     foundone = 0;
-    for (i = 1; i < TARGET_COUNT; ++i)
+    for (i = 1; i < TARGET_बिलांग; ++i)
     {
 	findoldfile(&(targets[i].oldexe));
 	if (targets[i].oldexe != NULL)
@@ -772,7 +772,7 @@ inspect_system(void)
     if (foundone)
     {
 	printf("Warning: Found Vim executable(s) in your $PATH:\n");
-	for (i = 1; i < TARGET_COUNT; ++i)
+	for (i = 1; i < TARGET_बिलांग; ++i)
 	    if (targets[i].oldexe != NULL)
 		printf("%s\n", targets[i].oldexe);
 	printf("It will be used instead of the version you are installing.\n");
@@ -807,12 +807,12 @@ inspect_system(void)
     static void
 add_dummy_choice(void)
 {
-    choices[choice_count].installfunc = NULL;
-    choices[choice_count].active = 0;
-    choices[choice_count].changefunc = NULL;
-    choices[choice_count].text = NULL;
-    choices[choice_count].arg = 0;
-    ++choice_count;
+    choices[choice_बिलांग].installfunc = NULL;
+    choices[choice_बिलांग].active = 0;
+    choices[choice_बिलांग].changefunc = NULL;
+    choices[choice_बिलांग].text = NULL;
+    choices[choice_बिलांग].arg = 0;
+    ++choice_बिलांग;
 }
 
 ////////////////////////////////////////////////
@@ -973,7 +973,7 @@ change_bat_choice(int idx)
     int		n;
     char	*s;
     char	*p;
-    int		count;
+    int		बिलांग;
     char	**names = NULL;
     int		i;
     int		target = choices[idx].arg;
@@ -994,7 +994,7 @@ change_bat_choice(int idx)
      */
     for (;;)
     {
-	count = 1;
+	बिलांग = 1;
 	for (p = path; *p; )
 	{
 	    s = strchr(p, ';');
@@ -1002,29 +1002,29 @@ change_bat_choice(int idx)
 		s = p + strlen(p);
 	    if (names != NULL)
 	    {
-		names[count] = alloc(s - p + 1);
-		strncpy(names[count], p, s - p);
-		names[count][s - p] = NUL;
+		names[बिलांग] = alloc(s - p + 1);
+		strncpy(names[बिलांग], p, s - p);
+		names[बिलांग][s - p] = NUL;
 	    }
-	    ++count;
+	    ++बिलांग;
 	    p = s;
 	    if (*p != NUL)
 		++p;
 	}
 	if (names != NULL)
 	    break;
-	names = alloc((count + 1) * sizeof(char *));
+	names = alloc((बिलांग + 1) * sizeof(char *));
     }
     names[0] = alloc(50);
     sprintf(names[0], "Select directory to create %s in:", name);
-    names[count] = alloc(50);
+    names[बिलांग] = alloc(50);
     if (choices[idx].arg == 0)
-	sprintf(names[count], "Do not create any .bat file.");
+	sprintf(names[बिलांग], "Do not create any .bat file.");
     else
-	sprintf(names[count], "Do not create a %s file.", name);
-    n = get_choice(names, count + 1);
+	sprintf(names[बिलांग], "Do not create a %s file.", name);
+    n = get_choice(names, बिलांग + 1);
 
-    if (n == count)
+    if (n == बिलांग)
     {
 	// Selected last item, don't create bat file.
 	*batpath = NUL;
@@ -1041,7 +1041,7 @@ change_bat_choice(int idx)
 	    set_bat_text(idx, batpath, name);
     }
 
-    for (i = 0; i <= count; ++i)
+    for (i = 0; i <= बिलांग; ++i)
 	free(names[i]);
     free(names);
 }
@@ -1063,7 +1063,7 @@ change_main_bat_choice(int idx)
 	choices[idx].text = bat_text_no;
 
     // update the individual batch file selections
-    for (i = 1; i < TARGET_COUNT; ++i)
+    for (i = 1; i < TARGET_बिलांग; ++i)
     {
 	// Only make it active when the first item has a path and the vim.exe
 	// or gvim.exe exists (there is a changefunc then).
@@ -1094,16 +1094,16 @@ init_bat_choice(int target)
     char	*p;
     int		i;
 
-    choices[choice_count].arg = target;
-    choices[choice_count].installfunc = install_bat_choice;
-    choices[choice_count].active = 1;
-    choices[choice_count].text = NULL;	// will be set below
+    choices[choice_बिलांग].arg = target;
+    choices[choice_बिलांग].installfunc = install_bat_choice;
+    choices[choice_बिलांग].active = 1;
+    choices[choice_बिलांग].text = NULL;	// will be set below
     if (oldbat != NULL)
     {
 	// A [g]vim.bat exists: Only choice is to overwrite it or not.
-	choices[choice_count].changefunc = toggle_bat_choice;
+	choices[choice_बिलांग].changefunc = toggle_bat_choice;
 	*batpath = NUL;
-	toggle_bat_choice(choice_count);
+	toggle_bat_choice(choice_बिलांग);
     }
     else
     {
@@ -1132,11 +1132,11 @@ init_bat_choice(int target)
 	    }
 	}
 	add_pathsep(batpath);
-	set_bat_text(choice_count, batpath, targets[target].batname);
+	set_bat_text(choice_बिलांग, batpath, targets[target].batname);
 
-	choices[choice_count].changefunc = change_bat_choice;
+	choices[choice_बिलांग].changefunc = change_bat_choice;
     }
-    ++choice_count;
+    ++choice_बिलांग;
 }
 
 /*
@@ -1150,16 +1150,16 @@ init_bat_choices(void)
 
     // The first item is used to switch installing batch files on/off and
     // setting the default path.
-    choices[choice_count].text = bat_text_yes;
-    choices[choice_count].changefunc = change_main_bat_choice;
-    choices[choice_count].installfunc = NULL;
-    choices[choice_count].active = 1;
-    choices[choice_count].arg = 0;
-    ++choice_count;
+    choices[choice_बिलांग].text = bat_text_yes;
+    choices[choice_बिलांग].changefunc = change_main_bat_choice;
+    choices[choice_बिलांग].installfunc = NULL;
+    choices[choice_बिलांग].active = 1;
+    choices[choice_बिलांग].arg = 0;
+    ++choice_बिलांग;
 
     // Add items for each batch file target.  Only used when not disabled by
     // the first item.  When a .exe exists, don't offer to create a .bat.
-    for (i = 1; i < TARGET_COUNT; ++i)
+    for (i = 1; i < TARGET_बिलांग; ++i)
 	if (targets[i].oldexe == NULL
 		&& (targets[i].exenamearg[0] == 'g' ? has_gvim : has_vim))
 	    init_bat_choice(i);
@@ -1361,86 +1361,86 @@ init_vimrc_choices(void)
 
     // Set opposite value and then toggle it by calling change_vimrc_choice()
     if (*oldvimrc == NUL)
-	choices[choice_count].installfunc = NULL;
+	choices[choice_बिलांग].installfunc = NULL;
     else
-	choices[choice_count].installfunc = install_vimrc;
-    choices[choice_count].text = NULL;
-    change_vimrc_choice(choice_count);
-    choices[choice_count].changefunc = change_vimrc_choice;
-    choices[choice_count].active = 1;
-    ++choice_count;
+	choices[choice_बिलांग].installfunc = install_vimrc;
+    choices[choice_बिलांग].text = NULL;
+    change_vimrc_choice(choice_बिलांग);
+    choices[choice_बिलांग].changefunc = change_vimrc_choice;
+    choices[choice_बिलांग].active = 1;
+    ++choice_बिलांग;
 
     // default way to run Vim
-    alloc_text(choice_count, compat_text, compat_choices[compat_choice]);
-    choices[choice_count].changefunc = change_run_choice;
-    choices[choice_count].installfunc = NULL;
-    choices[choice_count].active = (*oldvimrc == NUL);
-    ++choice_count;
+    alloc_text(choice_बिलांग, compat_text, compat_choices[compat_choice]);
+    choices[choice_बिलांग].changefunc = change_run_choice;
+    choices[choice_बिलांग].installfunc = NULL;
+    choices[choice_बिलांग].active = (*oldvimrc == NUL);
+    ++choice_बिलांग;
 
     // Whether to remap keys
-    alloc_text(choice_count, remap_text , remap_choices[remap_choice]);
-    choices[choice_count].changefunc = change_remap_choice;
-    choices[choice_count].installfunc = NULL;
-    choices[choice_count].active = (*oldvimrc == NUL);
-    ++choice_count;
+    alloc_text(choice_बिलांग, remap_text , remap_choices[remap_choice]);
+    choices[choice_बिलांग].changefunc = change_remap_choice;
+    choices[choice_बिलांग].installfunc = NULL;
+    choices[choice_बिलांग].active = (*oldvimrc == NUL);
+    ++choice_बिलांग;
 
     // default way to use the mouse
-    alloc_text(choice_count, mouse_text, mouse_choices[mouse_choice]);
-    choices[choice_count].changefunc = change_mouse_choice;
-    choices[choice_count].installfunc = NULL;
-    choices[choice_count].active = (*oldvimrc == NUL);
-    ++choice_count;
+    alloc_text(choice_बिलांग, mouse_text, mouse_choices[mouse_choice]);
+    choices[choice_बिलांग].changefunc = change_mouse_choice;
+    choices[choice_बिलांग].installfunc = NULL;
+    choices[choice_बिलांग].active = (*oldvimrc == NUL);
+    ++choice_बिलांग;
 }
 
     static LONG
-reg_create_key(
-    HKEY root,
+reg_create_सुसि(
+    HKEY उगात,
     const char *subkey,
-    PHKEY phKey,
+    PHKEY ph_सुसि,
     DWORD flag)
 {
     DWORD disp;
 
-    *phKey = NULL;
-    return RegCreateKeyEx(
-		root, subkey,
+    *ph_सुसि = NULL;
+    return Reg_Create_सुसि_Ex(
+		उगात, subkey,
 		0, NULL, REG_OPTION_NON_VOLATILE,
-		flag | KEY_WRITE,
-		NULL, phKey, &disp);
+		flag | सुसि_WRITE,
+		NULL, ph_सुसि, &disp);
 }
 
     static LONG
-reg_set_string_value(
-    HKEY hKey,
-    const char *value_name,
+reg_set_string_हालागा(
+    HKEY h_सुसि,
+    const char *हालागा_name,
     const char *data)
 {
-    return RegSetValueEx(hKey, value_name, 0, REG_SZ,
+    return Reg_Set_हालागा_Ex(h_सुसि, हालागा_name, 0, REG_SZ,
 				     (LPBYTE)data, (DWORD)(1 + strlen(data)));
 }
 
     static LONG
-reg_create_key_and_value(
-    HKEY hRootKey,
+reg_create_सुसि_and_हालागा(
+    HKEY h_उगात_सुसि,
     const char *subkey,
-    const char *value_name,
+    const char *हालागा_name,
     const char *data,
     DWORD flag)
 {
-    HKEY hKey;
-    LONG lRet = reg_create_key(hRootKey, subkey, &hKey, flag);
+    HKEY h_सुसि;
+    LONG lRet = reg_create_सुसि(h_उगात_सुसि, subkey, &h_सुसि, flag);
 
     if (ERROR_SUCCESS == lRet)
     {
-	lRet = reg_set_string_value(hKey, value_name, data);
-	RegCloseKey(hKey);
+	lRet = reg_set_string_हालागा(h_सुसि, हालागा_name, data);
+	Reg_Close_सुसि(h_सुसि);
     }
     return lRet;
 }
 
     static LONG
 register_inproc_server(
-    HKEY hRootKey,
+    HKEY h_उगात_सुसि,
     const char *clsid,
     const char *extname,
     const char *module,
@@ -1451,14 +1451,14 @@ register_inproc_server(
     LONG lRet;
 
     sprintf(subkey, "CLSID\\%s", clsid);
-    lRet = reg_create_key_and_value(hRootKey, subkey, NULL, extname, flag);
+    lRet = reg_create_सुसि_and_हालागा(h_उगात_सुसि, subkey, NULL, extname, flag);
     if (ERROR_SUCCESS == lRet)
     {
 	sprintf(subkey, "CLSID\\%s\\InProcServer32", clsid);
-	lRet = reg_create_key_and_value(hRootKey, subkey, NULL, module, flag);
+	lRet = reg_create_सुसि_and_हालागा(h_उगात_सुसि, subkey, NULL, module, flag);
 	if (ERROR_SUCCESS == lRet)
 	{
-	    lRet = reg_create_key_and_value(hRootKey, subkey,
+	    lRet = reg_create_सुसि_and_हालागा(h_उगात_सुसि, subkey,
 					   "ThreadingModel", threading_model, flag);
 	}
     }
@@ -1467,14 +1467,14 @@ register_inproc_server(
 
     static LONG
 register_shellex(
-    HKEY hRootKey,
+    HKEY h_उगात_सुसि,
     const char *clsid,
     const char *name,
     const char *exe_path,
     DWORD flag)
 {
-    LONG lRet = reg_create_key_and_value(
-	    hRootKey,
+    LONG lRet = reg_create_सुसि_and_हालागा(
+	    h_उगात_सुसि,
 	    "*\\shellex\\ContextMenuHandlers\\gvim",
 	    NULL,
 	    clsid,
@@ -1482,7 +1482,7 @@ register_shellex(
 
     if (ERROR_SUCCESS == lRet)
     {
-	lRet = reg_create_key_and_value(
+	lRet = reg_create_सुसि_and_हालागा(
 		HKEY_LOCAL_MACHINE,
 		"Software\\Microsoft\\Windows\\CurrentVersion\\Shell Extensions\\Approved",
 		clsid,
@@ -1491,7 +1491,7 @@ register_shellex(
 
 	if (ERROR_SUCCESS == lRet)
 	{
-	    lRet = reg_create_key_and_value(
+	    lRet = reg_create_सुसि_and_हालागा(
 		    HKEY_LOCAL_MACHINE,
 		    "Software\\Vim\\Gvim",
 		    "path",
@@ -1504,7 +1504,7 @@ register_shellex(
 
     static LONG
 register_openwith(
-    HKEY hRootKey,
+    HKEY h_उगात_सुसि,
     const char *exe_path,
     DWORD flag)
 {
@@ -1512,8 +1512,8 @@ register_openwith(
     LONG	lRet;
 
     sprintf(exe_cmd, "\"%s\" \"%%1\"", exe_path);
-    lRet = reg_create_key_and_value(
-	    hRootKey,
+    lRet = reg_create_सुसि_and_हालागा(
+	    h_उगात_सुसि,
 	    "Applications\\gvim.exe\\shell\\edit\\command",
 	    NULL,
 	    exe_cmd,
@@ -1529,7 +1529,7 @@ register_openwith(
 	};
 
 	for (i = 0; ERROR_SUCCESS == lRet && i < (int)ARRAYSIZE(openwith); i++)
-	    lRet = reg_create_key_and_value(hRootKey, openwith[i], NULL, "", flag);
+	    lRet = reg_create_सुसि_and_हालागा(h_उगात_सुसि, openwith[i], NULL, "", flag);
     }
 
     return lRet;
@@ -1537,7 +1537,7 @@ register_openwith(
 
     static LONG
 register_uninstall(
-    HKEY hRootKey,
+    HKEY h_उगात_सुसि,
     const char *appname,
     const char *display_name,
     const char *uninstall_string,
@@ -1545,21 +1545,21 @@ register_uninstall(
     const char *display_version,
     const char *publisher)
 {
-    LONG lRet = reg_create_key_and_value(hRootKey, appname,
-			     "DisplayName", display_name, KEY_WOW64_64KEY);
+    LONG lRet = reg_create_सुसि_and_हालागा(h_उगात_सुसि, appname,
+			     "DisplayName", display_name, सुसि_WOW64_64_सुसि);
 
     if (ERROR_SUCCESS == lRet)
-	lRet = reg_create_key_and_value(hRootKey, appname,
-		     "UninstallString", uninstall_string, KEY_WOW64_64KEY);
+	lRet = reg_create_सुसि_and_हालागा(h_उगात_सुसि, appname,
+		     "UninstallString", uninstall_string, सुसि_WOW64_64_सुसि);
     if (ERROR_SUCCESS == lRet)
-	lRet = reg_create_key_and_value(hRootKey, appname,
-		     "DisplayIcon", display_icon, KEY_WOW64_64KEY);
+	lRet = reg_create_सुसि_and_हालागा(h_उगात_सुसि, appname,
+		     "DisplayIcon", display_icon, सुसि_WOW64_64_सुसि);
     if (ERROR_SUCCESS == lRet)
-	lRet = reg_create_key_and_value(hRootKey, appname,
-		     "DisplayVersion", display_version, KEY_WOW64_64KEY);
+	lRet = reg_create_सुसि_and_हालागा(h_उगात_सुसि, appname,
+		     "DisplayVersion", display_version, सुसि_WOW64_64_सुसि);
     if (ERROR_SUCCESS == lRet)
-	lRet = reg_create_key_and_value(hRootKey, appname,
-		     "Publisher", publisher, KEY_WOW64_64KEY);
+	lRet = reg_create_सुसि_and_हालागा(h_उगात_सुसि, appname,
+		     "Publisher", publisher, सुसि_WOW64_64_सुसि);
     return lRet;
 }
 
@@ -1583,7 +1583,7 @@ install_registry(void)
     char	icon_string[BUFSIZE];
     char	version_string[BUFSIZE];
     int		i;
-    int		loop_count = is_64bit_os() ? 2 : 1;
+    int		loop_बिलांग = is_64bit_os() ? 2 : 1;
     DWORD	flag;
 
     sprintf(vim_exe_path, "%s\\gvim.exe", installdir);
@@ -1594,26 +1594,26 @@ install_registry(void)
 
 	printf("Creating \"Edit with Vim\" popup menu entry\n");
 
-	for (i = 0; i < loop_count; i++)
+	for (i = 0; i < loop_बिलांग; i++)
 	{
 	    if (i == 0)
 	    {
 		sprintf(bufg, "%s\\" GVIMEXT32_PATH, installdir);
-		flag = KEY_WOW64_32KEY;
+		flag = सुसि_WOW64_32_सुसि;
 	    }
 	    else
 	    {
 		sprintf(bufg, "%s\\" GVIMEXT64_PATH, installdir);
-		flag = KEY_WOW64_64KEY;
+		flag = सुसि_WOW64_64_सुसि;
 	    }
 
 	    lRet = register_inproc_server(
-		    HKEY_CLASSES_ROOT, vim_ext_clsid, vim_ext_name,
+		    HKEY_CLASSES_उगात, vim_ext_clsid, vim_ext_name,
 		    bufg, vim_ext_ThreadingModel, flag);
 	    if (ERROR_SUCCESS != lRet)
 		return FAIL;
 	    lRet = register_shellex(
-		    HKEY_CLASSES_ROOT, vim_ext_clsid, vim_ext_name,
+		    HKEY_CLASSES_उगात, vim_ext_clsid, vim_ext_name,
 		    vim_exe_path, flag);
 	    if (ERROR_SUCCESS != lRet)
 		return FAIL;
@@ -1624,14 +1624,14 @@ install_registry(void)
     {
 	printf("Creating \"Open with ...\" list entry\n");
 
-	for (i = 0; i < loop_count; i++)
+	for (i = 0; i < loop_बिलांग; i++)
 	{
 	    if (i == 0)
-		flag = KEY_WOW64_32KEY;
+		flag = सुसि_WOW64_32_सुसि;
 	    else
-		flag = KEY_WOW64_64KEY;
+		flag = सुसि_WOW64_64_सुसि;
 
-	    lRet = register_openwith(HKEY_CLASSES_ROOT, vim_exe_path, flag);
+	    lRet = register_openwith(HKEY_CLASSES_उगात, vim_exe_path, flag);
 	    if (ERROR_SUCCESS != lRet)
 		return FAIL;
 	}
@@ -1698,11 +1698,11 @@ init_popup_choice(void)
 	    && (stat(GVIMEXT32_PATH, &st) >= 0
 		|| stat(GVIMEXT64_PATH, &st) >= 0))
     {
-	choices[choice_count].changefunc = change_popup_choice;
-	choices[choice_count].installfunc = NULL;
-	choices[choice_count].active = 1;
-	change_popup_choice(choice_count);  // set the text
-	++choice_count;
+	choices[choice_बिलांग].changefunc = change_popup_choice;
+	choices[choice_बिलांग].installfunc = NULL;
+	choices[choice_बिलांग].active = 1;
+	change_popup_choice(choice_बिलांग);  // set the text
+	++choice_बिलांग;
     }
     else
 	add_dummy_choice();
@@ -1732,11 +1732,11 @@ init_openwith_choice(void)
 {
     if (has_gvim)
     {
-	choices[choice_count].changefunc = change_openwith_choice;
-	choices[choice_count].installfunc = NULL;
-	choices[choice_count].active = 1;
-	change_openwith_choice(choice_count);  // set the text
-	++choice_count;
+	choices[choice_बिलांग].changefunc = change_openwith_choice;
+	choices[choice_बिलांग].installfunc = NULL;
+	choices[choice_बिलांग].active = 1;
+	change_openwith_choice(choice_बिलांग);  // set the text
+	++choice_बिलांग;
     }
     else
 	add_dummy_choice();
@@ -1755,7 +1755,7 @@ create_shortcut(
 	const char *iconfile_path,
 	int	    iconindex,
 	const char *shortcut_target,
-	const char *shortcut_args,
+	const char *shortcut_मगा_कातविरान,
 	const char *workingdir
 	)
 {
@@ -1800,7 +1800,7 @@ create_shortcut(
 								  workingdir);
 	    shelllink_ptr->lpVtbl->SetIconLocation(shelllink_ptr,
 						    iconfile_path, iconindex);
-	    shelllink_ptr->lpVtbl->SetArguments(shelllink_ptr, shortcut_args);
+	    shelllink_ptr->lpVtbl->SetArguments(shelllink_ptr, shortcut_मगा_कातविरान);
 
 	    // save the shortcut to a file and return the PersistFile object
 	    persistfile_ptr->lpVtbl->Save(persistfile_ptr, wsz, 1);
@@ -1858,7 +1858,7 @@ build_link_name(
 build_shortcut(
 	const char *name,	// Name of the shortcut
 	const char *exename,	// Name of the executable (e.g., vim.exe)
-	const char *args,
+	const char *मगा_कातविरान,
 	const char *shell_folder,
 	const char *workingdir)
 {
@@ -1877,7 +1877,7 @@ build_shortcut(
 
     // Create the shortcut:
     return create_shortcut(link_name, executable_path, 0,
-					   executable_path, args, workingdir);
+					   executable_path, मगा_कातविरान, workingdir);
 }
 
 /*
@@ -2040,11 +2040,11 @@ toggle_shortcut_choice(int idx)
 init_startmenu_choice(void)
 {
     // Start menu
-    choices[choice_count].changefunc = toggle_startmenu_choice;
-    choices[choice_count].installfunc = NULL;
-    choices[choice_count].active = 1;
-    toggle_startmenu_choice(choice_count);	// set the text
-    ++choice_count;
+    choices[choice_बिलांग].changefunc = toggle_startmenu_choice;
+    choices[choice_बिलांग].installfunc = NULL;
+    choices[choice_बिलांग].active = 1;
+    toggle_startmenu_choice(choice_बिलांग);	// set the text
+    ++choice_बिलांग;
 }
 
 /*
@@ -2054,31 +2054,31 @@ init_startmenu_choice(void)
 init_shortcut_choices(void)
 {
     // Shortcut to gvim
-    choices[choice_count].text = NULL;
-    choices[choice_count].arg = 0;
-    choices[choice_count].active = has_gvim;
-    choices[choice_count].changefunc = toggle_shortcut_choice;
-    choices[choice_count].installfunc = install_shortcut_gvim;
-    toggle_shortcut_choice(choice_count);
-    ++choice_count;
+    choices[choice_बिलांग].text = NULL;
+    choices[choice_बिलांग].arg = 0;
+    choices[choice_बिलांग].active = has_gvim;
+    choices[choice_बिलांग].changefunc = toggle_shortcut_choice;
+    choices[choice_बिलांग].installfunc = install_shortcut_gvim;
+    toggle_shortcut_choice(choice_बिलांग);
+    ++choice_बिलांग;
 
     // Shortcut to evim
-    choices[choice_count].text = NULL;
-    choices[choice_count].arg = 0;
-    choices[choice_count].active = has_gvim;
-    choices[choice_count].changefunc = toggle_shortcut_choice;
-    choices[choice_count].installfunc = install_shortcut_evim;
-    toggle_shortcut_choice(choice_count);
-    ++choice_count;
+    choices[choice_बिलांग].text = NULL;
+    choices[choice_बिलांग].arg = 0;
+    choices[choice_बिलांग].active = has_gvim;
+    choices[choice_बिलांग].changefunc = toggle_shortcut_choice;
+    choices[choice_बिलांग].installfunc = install_shortcut_evim;
+    toggle_shortcut_choice(choice_बिलांग);
+    ++choice_बिलांग;
 
     // Shortcut to gview
-    choices[choice_count].text = NULL;
-    choices[choice_count].arg = 0;
-    choices[choice_count].active = has_gvim;
-    choices[choice_count].changefunc = toggle_shortcut_choice;
-    choices[choice_count].installfunc = install_shortcut_gview;
-    toggle_shortcut_choice(choice_count);
-    ++choice_count;
+    choices[choice_बिलांग].text = NULL;
+    choices[choice_बिलांग].arg = 0;
+    choices[choice_बिलांग].active = has_gvim;
+    choices[choice_बिलांग].changefunc = toggle_shortcut_choice;
+    choices[choice_बिलांग].installfunc = install_shortcut_gview;
+    toggle_shortcut_choice(choice_बिलांग);
+    ++choice_बिलांग;
 }
 
 /*
@@ -2224,12 +2224,12 @@ init_homedir(void)
     static void
 change_directories_choice(int idx)
 {
-    int	    choice_count = TABLE_SIZE(vimfiles_dir_choices);
+    int	    choice_बिलांग = TABLE_SIZE(vimfiles_dir_choices);
 
     // Don't offer the $HOME choice if $HOME isn't set.
     if (homedir == NULL)
-	--choice_count;
-    choices[idx].arg = get_choice(vimfiles_dir_choices, choice_count);
+	--choice_बिलांग;
+    choices[idx].arg = get_choice(vimfiles_dir_choices, choice_बिलांग);
     set_directories_text(idx);
 }
 
@@ -2309,10 +2309,10 @@ init_directories_choice(void)
     char	*p;
     int		vimfiles_dir_choice;
 
-    choices[choice_count].text = alloc(150);
-    choices[choice_count].changefunc = change_directories_choice;
-    choices[choice_count].installfunc = install_vimfilesdir;
-    choices[choice_count].active = 1;
+    choices[choice_बिलांग].text = alloc(150);
+    choices[choice_बिलांग].changefunc = change_directories_choice;
+    choices[choice_बिलांग].installfunc = install_vimfilesdir;
+    choices[choice_बिलांग].active = 1;
 
     // Check if the "compiler" directory already exists.  That's a good
     // indication that the plugin directories were already created.
@@ -2337,9 +2337,9 @@ init_directories_choice(void)
 	    vimfiles_dir_choice = (int)vimfiles_dir_none;
     }
 
-    choices[choice_count].arg = vimfiles_dir_choice;
-    set_directories_text(choice_count);
-    ++choice_count;
+    choices[choice_बिलांग].arg = vimfiles_dir_choice;
+    set_directories_text(choice_बिलांग);
+    ++choice_बिलांग;
 }
 
 /*
@@ -2371,7 +2371,7 @@ setup_choices(void)
 }
 
     static void
-print_cmd_line_help(void)
+इलिम्बाग_cmd_लिन्या_help(void)
 {
     printf("Vim installer non-interactive command line arguments:\n");
     printf("\n");
@@ -2405,7 +2405,7 @@ print_cmd_line_help(void)
  * Setup installation choices based on command line switches
  */
     static void
-command_line_setup_choices(int argc, char **argv)
+command_लिन्या_setup_choices(int argc, char **argv)
 {
     int i, j;
 
@@ -2418,14 +2418,14 @@ command_line_setup_choices(int argc, char **argv)
 	    while (argv[i + 1][0] != '-' && i < argc)
 	    {
 		i++;
-		for (j = 1; j < TARGET_COUNT; ++j)
+		for (j = 1; j < TARGET_बिलांग; ++j)
 		    if ((targets[j].exenamearg[0] == 'g' ? has_gvim : has_vim)
 			    && strcmp(argv[i], targets[j].name) == 0)
 		    {
 			init_bat_choice(j);
 			break;
 		    }
-		if (j == TARGET_COUNT)
+		if (j == TARGET_बिलांग)
 		    printf("%s is not a valid choice for -create-batfiles\n",
 								     argv[i]);
 
@@ -2512,12 +2512,12 @@ command_line_setup_choices(int argc, char **argv)
 		{
 		    printf("Unknown argument for -create-directories: %s\n",
 								     argv[i]);
-		    print_cmd_line_help();
+		    इलिम्बाग_cmd_लिन्या_help();
 		}
 	    }
 	    else // No choice specified, default to vim directory
 		vimfiles_dir_choice = (int)vimfiles_dir_vim;
-	    choices[choice_count - 1].arg = vimfiles_dir_choice;
+	    choices[choice_बिलांग - 1].arg = vimfiles_dir_choice;
 	}
 	else if (strcmp(argv[i], "-register-OLE") == 0)
 	{
@@ -2526,7 +2526,7 @@ command_line_setup_choices(int argc, char **argv)
 	else // Unknown switch
 	{
 	    printf("Got unknown argument argv[%d] = %s\n", i, argv[i]);
-	    print_cmd_line_help();
+	    इलिम्बाग_cmd_लिन्या_help();
 	}
     }
 }
@@ -2538,7 +2538,7 @@ command_line_setup_choices(int argc, char **argv)
     static void
 show_help(void)
 {
-    static char *(items[]) =
+    static char *(मगा_बागाय[]) =
     {
 "Installing .bat files\n"
 "---------------------\n"
@@ -2641,9 +2641,9 @@ NULL
 
     rewind(stdin);
     printf("\n");
-    for (i = 0; items[i] != NULL; ++i)
+    for (i = 0; मगा_बागाय[i] != NULL; ++i)
     {
-	puts(items[i]);
+	puts(मगा_बागाय[i]);
 	printf("Hit Enter to continue, b (back) or q (quit help): ");
 	c = getchar();
 	rewind(stdin);
@@ -2669,7 +2669,7 @@ install(void)
     int		i;
 
     // Install the selected choices.
-    for (i = 0; i < choice_count; ++i)
+    for (i = 0; i < choice_बिलांग; ++i)
 	if (choices[i].installfunc != NULL && choices[i].active)
 	    (choices[i].installfunc)(i);
 
@@ -2694,7 +2694,7 @@ request_choice(void)
     int		      i;
 
     printf("\n\nInstall will do for you:\n");
-    for (i = 0; i < choice_count; ++i)
+    for (i = 0; i < choice_बिलांग; ++i)
 	if (choices[i].active)
 	    printf("%2d  %s\n", i + 1, choices[i].text);
     printf("To change an item, enter its number\n\n");
@@ -2764,7 +2764,7 @@ main(int argc, char **argv)
 		{
 		    // Change a choice.
 		    i = atoi(buf);
-		    if (i > 0 && i <= choice_count && choices[i - 1].active)
+		    if (i > 0 && i <= choice_बिलांग && choices[i - 1].active)
 			(choices[i - 1].changefunc)(i - 1);
 		    else
 			printf("\nIllegal choice\n");
@@ -2799,7 +2799,7 @@ main(int argc, char **argv)
 	/*
 	 * Run non-interactive - setup according to the command line switches
 	 */
-	command_line_setup_choices(argc, argv);
+	command_लिन्या_setup_choices(argc, argv);
 	install();
 
 	// Avoid that the user has to hit Enter, just wait a little bit to

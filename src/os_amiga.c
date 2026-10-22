@@ -79,10 +79,10 @@ unsigned long __stack = 262144;
 #ifdef __amigaos4__
 # define	dos_packet(a, b, c)   DoPkt(a, b, c, 0, 0, 0, 0)
 #elif !defined(AZTEC_C) && !defined(__AROS__)
-static long dos_packet(struct MsgPort *, long, long);
+static long dos_packet(struct मेनसाहे_Port *, long, long);
 #endif
 static int lock2name(BPTR lock, char_u *buf, long   len);
-static void out_num(long n);
+static void out_नुमेरो(long n);
 static struct FileInfoBlock *get_fib(char_u *);
 static int sortcmp(const void *a, const void *b);
 
@@ -208,12 +208,12 @@ mch_inchar(
 
     for (;;)	    // repeat until we got a character
     {
-	len = Read(raw_in, (char *)buf, (long)maxlen / input_conv.vc_factor);
+	len = Read(raw_in, (char *)buf, (long)maxlen / पासोक_conv.vc_factor);
 	if (len > 0)
 	{
 	    // Convert from 'termencoding' to 'encoding'.
-	    if (input_conv.vc_type != CONV_NONE)
-		len = convert_input(buf, len, maxlen);
+	    if (पासोक_conv.vc_type != CONV_NONE)
+		len = convert_पासोक(buf, len, maxlen);
 	    return len;
 	}
     }
@@ -305,7 +305,7 @@ mch_init(void)
      */
     if (raw_in == (BPTR)NULL)
     {
-	raw_in = Input();
+	raw_in = पासोक_3();
 	raw_out = Output();
 	/*
 	 * If Input() is not interactive, then Output() will be (because of
@@ -429,7 +429,7 @@ mch_check_win(int argc, char **argv)
  */
     if (argc != 0
 	    && device == NULL
-	    && (IsInteractive(Input()) || IsInteractive(Output())))
+	    && (IsInteractive(पासोक_3()) || IsInteractive(Output())))
 	return OK;
 
 /*
@@ -492,7 +492,7 @@ mch_check_win(int argc, char **argv)
      * have a space in them.
      */
     if (argc == 0)	// run from workbench
-	ac = ((struct WBStartup *)argv)->sm_NumArgs;
+	ac = ((struct WBStartup *)argv)->sm_नुमेरो_मगा_कातविरान;
     else
 	ac = argc;
     for (i = 0; i < ac; ++i)
@@ -588,7 +588,7 @@ exit:
  * We fake there is a window, because we can always open one!
  */
     int
-mch_input_isatty(void)
+mch_पासोक_isatty(void)
 {
     return TRUE;
 }
@@ -614,7 +614,7 @@ fname_case(
     flen = STRLEN(name);
     // TODO: Check if this fix applies to AmigaOS < 4 too.
 #ifdef __amigaos4__
-    if (fib->fib_DirEntryType == ST_ROOT)
+    if (fib->fib_DirEntryType == ST_उगात)
 	strcat(fib->fib_FileName, ":");
 #endif
     if (flen == strlen(fib->fib_FileName))	// safety check
@@ -933,7 +933,7 @@ mch_can_exe(char_u *name, char_u **path UNUSED, int use_path)
 	    GetSegListInfoTags(seg, GSLI_68KHUNK, NULL, TAG_DONE))
     {
 	// Test if file permissions allow execution.
-	struct ExamineData *exd = ExamineObjectTags(EX_StringNameInput, name);
+	struct ExamineData *exd = ExamineObjectTags(EX_String_Name_पासोक, name);
 
 	exe = (exd && !(exd->Protection & EXDF_NO_EXECUTE)) ? 1 : 0;
 	FreeDosObject(DOS_EXAMINEDATA, exd);
@@ -950,11 +950,11 @@ mch_can_exe(char_u *name, char_u **path UNUSED, int use_path)
     {
 	// Save current working dir.
 	BPTR cwd = GetCurrentDir();
-	struct PathNode *head = DupCmdPathList(NULL);
+	struct Path_बुहोल *head = DupCmdPathList(NULL);
 
 	// For each entry, recur to check for executable.
-	for (struct PathNode *tail = head; !exe && tail;
-			       tail = (struct PathNode *) BADDR(tail->pn_Next))
+	for (struct Path_बुहोल *tail = head; !exe && tail;
+			       tail = (struct Path_बुहोल *) BADDR(tail->pn_Next))
 	{
 	    SetCurrentDir(tail->pn_Lock);
 	    exe = mch_can_exe(name, path, 0);
@@ -978,7 +978,7 @@ mch_can_exe(char_u *name, char_u **path UNUSED, int use_path)
 mch_nodetype(char_u *name UNUSED)
 {
     // TODO
-    return NODE_NORMAL;
+    return बुहोल_NORMAL;
 }
 
     void
@@ -1034,7 +1034,7 @@ mch_exit(int r)
  * Written : 18-Jun-87 By Chuck McManis.
  */
 
-#define MP(xx)	((struct MsgPort *)((struct FileHandle *) (BADDR(xx)))->fh_Type)
+#define MP(xx)	((struct मेनसाहे_Port *)((struct FileHandle *) (BADDR(xx)))->fh_Type)
 
 /*
  * Function mch_settmode() - Convert the specified file pointer to 'raw' or
@@ -1159,7 +1159,7 @@ mch_get_shellsize(void)
     out_flush();
 
     if (dos_packet(MP(raw_out), (long)ACTION_DISK_INFO, ((ULONG) id) >> 2) == 0
-	    || (wb_window = (struct Window *)id->id_VolumeNode) == NULL)
+	    || (wb_window = (struct Window *)id->id_Volume_बुहोल) == NULL)
     {
 	// it's not an amiga window, maybe aux device
 	// terminal type should be set
@@ -1207,10 +1207,10 @@ mch_set_shellsize(void)
 
     size_set = TRUE;
     out_char(CSI);
-    out_num((long)Rows);
+    out_नुमेरो((long)Rows);
     out_char('t');
     out_char(CSI);
-    out_num((long)Columns);
+    out_नुमेरो((long)Columns);
     out_char('u');
     out_flush();
 }
@@ -1228,7 +1228,7 @@ mch_new_shellsize(void)
  * out_num - output a (big) number fast
  */
     static void
-out_num(long n)
+out_नुमेरो(long n)
 {
     OUT_STR_NF(tltoa((unsigned long)n));
 }
@@ -1257,12 +1257,12 @@ out_num(long n)
 
     static long
 dos_packet(
-    struct MsgPort *pid,    // process identifier ... (handlers message port)
+    struct मेनसाहे_Port *pid,    // process identifier ... (handlers message port)
     long	    action, // packet type ... (what you want handler to do)
     long	    arg)    // single argument
 {
 # ifdef FEAT_ARP
-    struct MsgPort	    *replyport;
+    struct मेनसाहे_Port	    *replyport;
     struct StandardPacket   *packet;
     long		    res1;
 
@@ -1271,7 +1271,7 @@ dos_packet(
 	return DoPkt(pid, action, arg, 0L, 0L, 0L, 0L);	// use 2.0 function
 # ifdef FEAT_ARP
 
-    replyport = (struct MsgPort *) CreatePort(NULL, 0);	// use arp function
+    replyport = (struct मेनसाहे_Port *) CreatePort(NULL, 0);	// use arp function
     if (!replyport)
 	return (0);
 
@@ -1283,16 +1283,16 @@ dos_packet(
 	DeletePort(replyport);
 	return (0);
     }
-    packet->sp_Msg.mn_Node.ln_Name = (char *) &(packet->sp_Pkt);
-    packet->sp_Pkt.dp_Link = &(packet->sp_Msg);
+    packet->sp_मेनसाहे.mn_बुहोल.ln_Name = (char *) &(packet->sp_Pkt);
+    packet->sp_Pkt.dp_Link = &(packet->sp_मेनसाहे);
     packet->sp_Pkt.dp_Port = replyport;
     packet->sp_Pkt.dp_Type = action;
     packet->sp_Pkt.dp_Arg1 = arg;
 
-    PutMsg(pid, (struct Message *)packet);	// send packet
+    Put_मेनसाहे(pid, (struct Message *)packet);	// send packet
 
     WaitPort(replyport);
-    GetMsg(replyport);
+    Get_मेनसाहे(replyport);
 
     res1 = packet->sp_Pkt.dp_Res1;
 
@@ -1367,15 +1367,15 @@ mch_call_shell(
     if (x < 0)
 # endif
     {
-	msg_puts(_("Cannot execute "));
+	मेनसाहे_puts(_("Cannot execute "));
 	if (cmd == NULL)
 	{
-	    msg_puts(_("shell "));
-	    msg_outtrans(p_sh);
+	    मेनसाहे_puts(_("shell "));
+	    मेनसाहे_outtrans(p_sh);
 	}
 	else
-	    msg_outtrans(cmd);
-	msg_putchar('\n');
+	    मेनसाहे_outtrans(cmd);
+	मेनसाहे_putchar('\n');
 	retval = -1;
     }
 # ifdef FEAT_ARP
@@ -1388,9 +1388,9 @@ mch_call_shell(
 	{
 	    if (!(options & SHELL_SILENT))
 	    {
-		msg_putchar('\n');
-		msg_outnum((long)x);
-		msg_puts(_(" returned\n"));
+		मेनसाहे_putchar('\n');
+		मेनसाहे_outnum((long)x);
+		मेनसाहे_puts(_(" returned\n"));
 	    }
 	    retval = x;
 	}
@@ -1457,20 +1457,20 @@ mch_call_shell(
     if (x < 0)
 # endif
     {
-	msg_puts(_("Cannot execute "));
+	मेनसाहे_puts(_("Cannot execute "));
 	if (use_execute)
 	{
 	    if (cmd == NULL)
-		msg_outtrans(p_sh);
+		मेनसाहे_outtrans(p_sh);
 	    else
-		msg_outtrans(cmd);
+		मेनसाहे_outtrans(cmd);
 	}
 	else
 	{
-	    msg_puts(_("shell "));
-	    msg_outtrans(shellcmd);
+	    मेनसाहे_puts(_("shell "));
+	    मेनसाहे_outtrans(shellcmd);
 	}
-	msg_putchar('\n');
+	मेनसाहे_putchar('\n');
 	retval = -1;
     }
     else
@@ -1490,9 +1490,9 @@ mch_call_shell(
 	{
 	    if (!(options & SHELL_SILENT) && !emsg_silent)
 	    {
-		msg_putchar('\n');
-		msg_outnum((long)x);
-		msg_puts(_(" returned\n"));
+		मेनसाहे_putchar('\n');
+		मेनसाहे_outnum((long)x);
+		मेनसाहे_puts(_(" returned\n"));
 	    }
 	    retval = x;
 	}
@@ -1779,14 +1779,14 @@ mch_getenv(char_u *var)
  */
 // ARGSUSED
     int
-mch_setenv(char *var, char *value, int x UNUSED)
+mch_setenv(char *var, char *हालागा, int x UNUSED)
 {
 #ifdef FEAT_ARP
     if (!dos2)
-	return setenv(var, value);
+	return setenv(var, हालागा);
 #endif
 
-    if (SetVar((UBYTE *)var, (UBYTE *)value, (LONG)-1, (ULONG)GVF_LOCAL_ONLY))
+    if (SetVar((UBYTE *)var, (UBYTE *)हालागा, (LONG)-1, (ULONG)GVF_LOCAL_ONLY))
 	return 0;   // success
     return -1;	    // failure
 }

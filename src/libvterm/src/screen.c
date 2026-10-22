@@ -233,7 +233,7 @@ static int premove(VTermRect rect, void *user)
      rect.end_col == screen->cols &&                      // full width
      screen->buffer == screen->buffers[BUFIDX_PRIMARY]) { // not altscreen
     for(int row = 0; row < rect.end_row; row++) {
-      const VTermLineInfo *lineinfo = vterm_state_get_lineinfo(screen->state, row);
+      const VTerm_लिन्या_Info *lineinfo = vterm_state_get_lineinfo(screen->state, row);
       sb_pushline_from_row(screen, row, lineinfo->continuation);
     }
   }
@@ -291,7 +291,7 @@ static int erase_internal(VTermRect rect, int selective, void *user)
   VTermScreen *screen = user;
 
   for(int row = rect.start_row; row < screen->state->rows && row < rect.end_row; row++) {
-    const VTermLineInfo *info = vterm_state_get_lineinfo(screen->state, row);
+    const VTerm_लिन्या_Info *info = vterm_state_get_lineinfo(screen->state, row);
 
     for(int col = rect.start_col; col < rect.end_col; col++) {
       ScreenCell *cell = getcell(screen, row, col);
@@ -428,7 +428,7 @@ static int movecursor(VTermPos pos, VTermPos oldpos, int visible, void *user)
   return 0;
 }
 
-static int setpenattr(VTermAttr attr, VTermValue *val, void *user)
+static int setpenattr(VTermAttr attr, VTerm_हालागा *val, void *user)
 {
   VTermScreen *screen = user;
 
@@ -437,7 +437,7 @@ static int setpenattr(VTermAttr attr, VTermValue *val, void *user)
     screen->pen.bold = val->boolean;
     return 1;
   case VTERM_ATTR_UNDERLINE:
-    screen->pen.underline = val->number;
+    screen->pen.underline = val->नुमेरो_2;
     return 1;
   case VTERM_ATTR_ITALIC:
     screen->pen.italic = val->boolean;
@@ -455,7 +455,7 @@ static int setpenattr(VTermAttr attr, VTermValue *val, void *user)
     screen->pen.strike = val->boolean;
     return 1;
   case VTERM_ATTR_FONT:
-    screen->pen.font = val->number;
+    screen->pen.font = val->नुमेरो_2;
     return 1;
   case VTERM_ATTR_FOREGROUND:
     screen->pen.fg = val->color;
@@ -467,7 +467,7 @@ static int setpenattr(VTermAttr attr, VTermValue *val, void *user)
     screen->pen.small = val->boolean;
     return 1;
   case VTERM_ATTR_BASELINE:
-    screen->pen.baseline = val->number;
+    screen->pen.baseline = val->नुमेरो_2;
     return 1;
 
   case VTERM_N_ATTRS:
@@ -477,7 +477,7 @@ static int setpenattr(VTermAttr attr, VTermValue *val, void *user)
   return 0;
 }
 
-static int settermprop(VTermProp prop, VTermValue *val, void *user)
+static int settermprop(VTermProp prop, VTerm_हालागा *val, void *user)
 {
   VTermScreen *screen = user;
 
@@ -519,7 +519,7 @@ static int bell(void *user)
 
 /* How many cells are non-blank
  * Returns the position of the first blank cell in the trailing blank end */
-static int line_popcount(ScreenCell *buffer, int row, int rows UNUSED, int cols)
+static int लिन्या_popcount(ScreenCell *buffer, int row, int rows UNUSED, int cols)
 {
   int col = cols - 1;
   while(col >= 0 && buffer[row * cols + col].chars[0] == 0)
@@ -535,10 +535,10 @@ static void resize_buffer(VTermScreen *screen, int bufidx, int new_rows, int new
   int old_cols = screen->cols;
 
   ScreenCell *old_buffer = screen->buffers[bufidx];
-  VTermLineInfo *old_lineinfo = statefields->lineinfos[bufidx];
+  VTerm_लिन्या_Info *old_lineinfo = statefields->lineinfos[bufidx];
 
   ScreenCell *new_buffer = vterm_allocator_malloc(screen->vt, sizeof(ScreenCell) * new_rows * new_cols);
-  VTermLineInfo *new_lineinfo = vterm_allocator_malloc(screen->vt, sizeof(new_lineinfo[0]) * new_rows);
+  VTerm_लिन्या_Info *new_lineinfo = vterm_allocator_malloc(screen->vt, sizeof(new_lineinfo[0]) * new_rows);
 
   // Find the final row of old buffer content
   int old_row = old_rows - 1;
@@ -569,7 +569,7 @@ static void resize_buffer(VTermScreen *screen, int bufidx, int new_rows, int new
       if(REFLOW && row < (old_rows - 1) && old_lineinfo[row + 1].continuation)
         width += old_cols;
       else
-        width += line_popcount(old_buffer, row, old_rows, old_cols);
+        width += लिन्या_popcount(old_buffer, row, old_rows, old_cols);
     }
 
     if(final_blank_row == (new_row + 1) && width == 0)
@@ -632,12 +632,12 @@ static void resize_buffer(VTermScreen *screen, int bufidx, int new_rows, int new
     }
 
     for(new_row = new_row_start, old_row = old_row_start; new_row <= new_row_end; new_row++) {
-      int count = width >= new_cols ? new_cols : width;
-      width -= count;
+      int बिलांग = width >= new_cols ? new_cols : width;
+      width -= बिलांग;
 
       int new_col = 0;
 
-      while(count) {
+      while(बिलांग) {
         /* TODO: This could surely be done a lot faster by memcpy()'ing the entire range */
         new_buffer[new_row * new_cols + new_col] = old_buffer[old_row * old_cols + old_col];
 
@@ -656,7 +656,7 @@ static void resize_buffer(VTermScreen *screen, int bufidx, int new_rows, int new
         }
 
         new_col++;
-        count--;
+        बिलांग--;
       }
 
       if(old_cursor.row == old_row && old_cursor.col >= old_col) {
@@ -702,7 +702,7 @@ static void resize_buffer(VTermScreen *screen, int bufidx, int new_rows, int new
     if((screen->callbacks && screen->callbacks->sb_pushline) ||
           (screen->callbacks_has_pushline4 && screen->callbacks && screen->callbacks->sb_pushline4))
       for(int row = 0; row <= old_row; row++) {
-        const VTermLineInfo *lineinfo = old_lineinfo + row;
+        const VTerm_लिन्या_Info *lineinfo = old_lineinfo + row;
         sb_pushline_from_row(screen, row, lineinfo->continuation);
       }
     if(active)
@@ -763,7 +763,7 @@ static void resize_buffer(VTermScreen *screen, int bufidx, int new_rows, int new
     for(new_row = moverows; new_row < new_rows; new_row++) {
       for(int col = 0; col < new_cols; col++)
         clearcell(screen, &new_buffer[new_row * new_cols + col]);
-      new_lineinfo[new_row] = (VTermLineInfo){ 0 };
+      new_lineinfo[new_row] = (VTerm_लिन्या_Info){ 0 };
     }
   }
 
@@ -810,9 +810,9 @@ static int resize(int new_rows, int new_cols, VTermStateFields *fields, void *us
      * but we should at least keep the lineinfo the right size */
     vterm_allocator_free(screen->vt, fields->lineinfos[BUFIDX_ALTSCREEN]);
 
-    VTermLineInfo *new_lineinfo = vterm_allocator_malloc(screen->vt, sizeof(new_lineinfo[0]) * new_rows);
+    VTerm_लिन्या_Info *new_lineinfo = vterm_allocator_malloc(screen->vt, sizeof(new_lineinfo[0]) * new_rows);
     for(int row = 0; row < new_rows; row++)
-      new_lineinfo[row] = (VTermLineInfo){ 0 };
+      new_lineinfo[row] = (VTerm_लिन्या_Info){ 0 };
 
     fields->lineinfos[BUFIDX_ALTSCREEN] = new_lineinfo;
   }
@@ -838,7 +838,7 @@ static int resize(int new_rows, int new_cols, VTermStateFields *fields, void *us
   return 1;
 }
 
-static int setlineinfo(int row, const VTermLineInfo *newinfo, const VTermLineInfo *oldinfo, void *user)
+static int setlineinfo(int row, const VTerm_लिन्या_Info *newinfo, const VTerm_लिन्या_Info *oldinfo, void *user)
 {
   VTermScreen *screen = user;
 

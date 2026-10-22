@@ -30,10 +30,10 @@ struct sign
     void *sn_image; // icon image
 # endif
     char_u *sn_text; // text used instead of pixmap
-    int sn_line_hl; // highlight ID for line
+    int sn_लिन्या_hl; // highlight ID for line
     int sn_text_hl; // highlight ID for text
     int sn_cul_hl; // highlight ID for text on current line when 'cursorline' is set
-    int sn_num_hl; // highlight ID for line number
+    int sn_नुमेरो_hl; // highlight ID for line number
     int sn_priority; // default priority of this sign, -1 means SIGN_DEF_PRIO
 };
 
@@ -202,7 +202,7 @@ sign_group_get_next_signid(buf_T *buf, char_u *groupname)
  * 'next' signs.
  */
 static void
-insert_sign(buf_T *buf, // buffer to store sign in
+इसिंगित_sign(buf_T *buf, // buffer to store sign in
             sign_entry_T *prev, // previous sign entry
             sign_entry_T *next, // next sign entry
             int id, // sign ID
@@ -212,7 +212,7 @@ insert_sign(buf_T *buf, // buffer to store sign in
             int typenr) // typenr of sign we are adding
 {
     sign_entry_T *newsign =
-        lalloc_id(sizeof(sign_entry_T), FALSE, aid_insert_sign);
+        lalloc_id(sizeof(sign_entry_T), FALSE, aid_इसिंगित_sign);
     if (newsign == NULL)
         return;
 
@@ -247,7 +247,7 @@ insert_sign(buf_T *buf, // buffer to store sign in
         if (buf->b_signlist == NULL)
         {
             redraw_buf_later(buf, UPD_NOT_VALID);
-            changed_line_abv_curs();
+            changed_लिन्या_abv_curs();
         }
 
         // first sign in signlist
@@ -271,7 +271,7 @@ insert_sign(buf_T *buf, // buffer to store sign in
  * Insert a new sign sorted by line number and sign priority.
  */
 static void
-insert_sign_by_lnum_prio(buf_T *buf, // buffer to store sign in
+इसिंगित_sign_by_lnum_prio(buf_T *buf, // buffer to store sign in
                          sign_entry_T *prev, // previous sign entry
                          int id, // sign ID
                          char_u *group, // sign group; NULL for global group
@@ -286,7 +286,7 @@ insert_sign_by_lnum_prio(buf_T *buf, // buffer to store sign in
 
     sign_entry_T *sign = (prev == NULL) ? buf->b_signlist : prev->se_next;
 
-    insert_sign(buf, prev, sign, id, group, prio, lnum, typenr);
+    इसिंगित_sign(buf, prev, sign, id, group, prio, lnum, typenr);
 }
 
 /*
@@ -325,14 +325,14 @@ sign_get_info(sign_entry_T *sign)
     if (d == NULL)
         return NULL;
 
-    dict_add_number(d, "id", sign->se_id);
+    dict_add_नुमेरो(d, "id", sign->se_id);
     if (sign->se_group == NULL)
         dict_add_string_len(d, "group", (char_u *)"", 0);
     else
         dict_add_string(d, "group", sign->se_group->sg_name);
-    dict_add_number(d, "lnum", sign->se_lnum);
+    dict_add_नुमेरो(d, "lnum", sign->se_lnum);
     dict_add_string(d, "name", sign_typenr2name(sign->se_typenr));
-    dict_add_number(d, "priority", sign->se_priority);
+    dict_add_नुमेरो(d, "priority", sign->se_priority);
 
     return d;
 }
@@ -343,7 +343,7 @@ sign_get_info(sign_entry_T *sign)
  * buffer are sorted by line number and priority.
  */
 static void
-sign_sort_by_prio_on_line(buf_T *buf, sign_entry_T *sign)
+sign_sort_by_prio_on_लिन्या(buf_T *buf, sign_entry_T *sign)
 {
     // If there is only one sign in the buffer or only one sign on the line or
     // the sign is already sorted by priority, then return.
@@ -439,19 +439,19 @@ buf_addsign(buf_T *buf, // buffer to store sign in
             // Update an existing sign
             sign->se_typenr = typenr;
             sign->se_priority = prio;
-            sign_sort_by_prio_on_line(buf, sign);
+            sign_sort_by_prio_on_लिन्या(buf, sign);
             return;
         }
         else if (lnum < sign->se_lnum)
         {
-            insert_sign_by_lnum_prio(buf, prev, id, groupname, prio, lnum,
+            इसिंगित_sign_by_lnum_prio(buf, prev, id, groupname, prio, lnum,
                                      typenr);
             return;
         }
         prev = sign;
     }
 
-    insert_sign_by_lnum_prio(buf, prev, id, groupname, prio, lnum, typenr);
+    इसिंगित_sign_by_lnum_prio(buf, prev, id, groupname, prio, lnum, typenr);
 }
 
 /*
@@ -472,7 +472,7 @@ buf_change_sign_type(buf_T *buf, // buffer to store sign in
         {
             sign->se_typenr = typenr;
             sign->se_priority = prio;
-            sign_sort_by_prio_on_line(buf, sign);
+            sign_sort_by_prio_on_लिन्या(buf, sign);
             return sign->se_lnum;
         }
     }
@@ -518,14 +518,14 @@ buf_get_signattrs(win_T *wp, linenr_T lnum, sign_attrs_T *sattr)
             if (sattr->sat_text != NULL && sp->sn_text_hl > 0)
                 sattr->sat_texthl = syn_id2attr(sp->sn_text_hl);
 
-            if (sp->sn_line_hl > 0)
-                sattr->sat_linehl = syn_id2attr(sp->sn_line_hl);
+            if (sp->sn_लिन्या_hl > 0)
+                sattr->sat_linehl = syn_id2attr(sp->sn_लिन्या_hl);
 
             if (sp->sn_cul_hl > 0)
                 sattr->sat_culhl = syn_id2attr(sp->sn_cul_hl);
 
-            if (sp->sn_num_hl > 0)
-                sattr->sat_numhl = syn_id2attr(sp->sn_num_hl);
+            if (sp->sn_नुमेरो_hl > 0)
+                sattr->sat_numhl = syn_id2attr(sp->sn_नुमेरो_hl);
 
             sattr->sat_priority = sign->se_priority;
 
@@ -550,14 +550,14 @@ buf_get_signattrs(win_T *wp, linenr_T lnum, sign_attrs_T *sattr)
                 if (sp->sn_text_hl <= 0 && next_sp->sn_text_hl > 0)
                     sattr->sat_texthl = syn_id2attr(next_sp->sn_text_hl);
 
-                if (sp->sn_line_hl <= 0 && next_sp->sn_line_hl > 0)
-                    sattr->sat_linehl = syn_id2attr(next_sp->sn_line_hl);
+                if (sp->sn_लिन्या_hl <= 0 && next_sp->sn_लिन्या_hl > 0)
+                    sattr->sat_linehl = syn_id2attr(next_sp->sn_लिन्या_hl);
 
                 if (sp->sn_cul_hl <= 0 && next_sp->sn_cul_hl > 0)
                     sattr->sat_culhl = syn_id2attr(next_sp->sn_cul_hl);
 
-                if (sp->sn_num_hl <= 0 && next_sp->sn_num_hl > 0)
-                    sattr->sat_numhl = syn_id2attr(next_sp->sn_num_hl);
+                if (sp->sn_नुमेरो_hl <= 0 && next_sp->sn_नुमेरो_hl > 0)
+                    sattr->sat_numhl = syn_id2attr(next_sp->sn_नुमेरो_hl);
             }
             return TRUE;
         }
@@ -605,7 +605,7 @@ buf_delsign(buf_T *buf, // buffer sign is stored in
                 sign_group_unref(sign->se_group->sg_name);
 
             vim_free(sign);
-            redraw_buf_line_later(buf, lnum);
+            redraw_buf_लिन्या_later(buf, lnum);
 
             // Check whether only one sign needs to be deleted
             // If deleting a sign with a specific identifier in a particular
@@ -626,7 +626,7 @@ buf_delsign(buf_T *buf, // buffer sign is stored in
     if (buf->b_signlist == NULL)
     {
         redraw_buf_later(buf, UPD_NOT_VALID);
-        changed_line_abv_curs();
+        changed_लिन्या_abv_curs();
     }
 
     return lnum;
@@ -655,7 +655,7 @@ buf_findsign(buf_T *buf, // buffer to store sign in
  * not found at the line. If 'groupname' is NULL, searches in the global group.
  */
 static sign_entry_T *
-buf_getsign_at_line(buf_T *buf, // buffer whose sign we are searching for
+buf_getsign_at_लिन्या(buf_T *buf, // buffer whose sign we are searching for
                     linenr_T lnum, // line number of sign
                     char_u *groupname) // sign group name
 {
@@ -683,7 +683,7 @@ buf_findsign_id(buf_T *buf, // buffer whose sign we are searching for
                 char_u *groupname) // sign group name
 {
     // a sign in the signlist
-    sign_entry_T *sign = buf_getsign_at_line(buf, lnum, groupname);
+    sign_entry_T *sign = buf_getsign_at_लिन्या(buf, lnum, groupname);
     if (sign != NULL)
         return sign->se_id;
 
@@ -721,7 +721,7 @@ buf_findsigntype_id(buf_T *buf, // buffer whose sign we are searching for
 int
 buf_signcount(buf_T *buf, linenr_T lnum)
 {
-    int count = 0;
+    int बिलांग = 0;
     sign_entry_T *sign = NULL; // a sign in the signlist
     FOR_ALL_SIGNS_IN_BUF(buf, sign)
     {
@@ -731,10 +731,10 @@ buf_signcount(buf_T *buf, linenr_T lnum)
             break;
 
         if (sign->se_lnum == lnum && sign_get_image(sign->se_typenr) != NULL)
-            count++;
+            बिलांग++;
     }
 
-    return count;
+    return बिलांग;
 }
 #  endif // FEAT_SIGN_ICONS
 # endif // FEAT_NETBEANS_INTG
@@ -752,7 +752,7 @@ buf_delete_signs(buf_T *buf, char_u *group)
     if (buf->b_signlist != NULL && curwin != NULL)
     {
         redraw_buf_later(buf, UPD_NOT_VALID);
-        changed_line_abv_curs();
+        changed_लिन्या_abv_curs();
     }
 
     // pointer to pointer to current sign
@@ -787,20 +787,20 @@ buf_delete_signs(buf_T *buf, char_u *group)
 static void
 sign_list_placed(buf_T *rbuf, char_u *sign_group)
 {
-    char lbuf[MSG_BUF_LEN];
-    char group[MSG_BUF_LEN];
+    char lbuf[मेनसाहे_BUF_LEN];
+    char group[मेनसाहे_BUF_LEN];
 
-    msg_puts_title(_("\n--- Signs ---"));
-    msg_putchar('\n');
+    मेनसाहे_puts_title(_("\n--- Signs ---"));
+    मेनसाहे_putchar('\n');
 
     buf_T *buf = (rbuf == NULL) ? firstbuf : rbuf;
     while (buf != NULL && !got_int)
     {
         if (buf->b_signlist != NULL)
         {
-            vim_snprintf(lbuf, MSG_BUF_LEN, _("Signs for %s:"), buf->b_fname);
-            msg_puts_attr(lbuf, HL_ATTR(HLF_D));
-            msg_putchar('\n');
+            vim_snprintf(lbuf, मेनसाहे_BUF_LEN, _("Signs for %s:"), buf->b_fname);
+            मेनसाहे_puts_attr(lbuf, HL_ATTR(HLF_D));
+            मेनसाहे_putchar('\n');
         }
 
         sign_entry_T *sign = NULL;
@@ -813,18 +813,18 @@ sign_list_placed(buf_T *rbuf, char_u *sign_group)
                 continue;
 
             if (sign->se_group != NULL)
-                vim_snprintf(group, MSG_BUF_LEN, _("  group=%s"),
+                vim_snprintf(group, मेनसाहे_BUF_LEN, _("  group=%s"),
                              sign->se_group->sg_name);
             else
                 group[0] = '\0';
 
-            vim_snprintf(lbuf, MSG_BUF_LEN,
+            vim_snprintf(lbuf, मेनसाहे_BUF_LEN,
                          _("    line=%ld  id=%d%s  name=%s  priority=%d"),
                          (long)sign->se_lnum, sign->se_id, group,
                          sign_typenr2name(sign->se_typenr), sign->se_priority);
 
-            msg_puts(lbuf);
-            msg_putchar('\n');
+            मेनसाहे_puts(lbuf);
+            मेनसाहे_putchar('\n');
         }
 
         if (rbuf != NULL)
@@ -868,7 +868,7 @@ sign_mark_adjust(
         // If the new sign line number is past the last line in the buffer,
         // then don't adjust the line number. Otherwise, it will always be past
         // the last line and will not be visible.
-        if (new_lnum <= curbuf->b_ml.ml_line_count)
+        if (new_lnum <= curbuf->b_ml.ml_लिन्या_बिलांग)
             sign->se_lnum = new_lnum;
     }
 }
@@ -1100,9 +1100,9 @@ sign_define_by_name(char_u *name,
     if (linehl != NULL)
     {
         if (*linehl == NUL)
-            sp->sn_line_hl = 0;
+            sp->sn_लिन्या_hl = 0;
         else
-            sp->sn_line_hl = syn_check_group(linehl, (int)STRLEN(linehl));
+            sp->sn_लिन्या_hl = syn_check_group(linehl, (int)STRLEN(linehl));
     }
 
     if (texthl != NULL)
@@ -1124,9 +1124,9 @@ sign_define_by_name(char_u *name,
     if (numhl != NULL)
     {
         if (*numhl == NUL)
-            sp->sn_num_hl = 0;
+            sp->sn_नुमेरो_hl = 0;
         else
-            sp->sn_num_hl = syn_check_group(numhl, (int)STRLEN(numhl));
+            sp->sn_नुमेरो_hl = syn_check_group(numhl, (int)STRLEN(numhl));
     }
 
     return OK;
@@ -1185,7 +1185,7 @@ may_force_numberwidth_recompute(buf_T *buf, int unplace)
         if (wp->w_buffer == buf && (wp->w_p_nu || wp->w_p_rnu) &&
             (unplace || wp->w_nrwidth_width < 2) &&
             (*wp->w_p_scl == 'n' && *(wp->w_p_scl + 1) == 'u'))
-            wp->w_nrwidth_line_count = 0;
+            wp->w_nrwidth_लिन्या_बिलांग = 0;
     }
 # endif
 }
@@ -1240,7 +1240,7 @@ sign_place(int *sign_id,
 
     if (lnum > 0)
     {
-        redraw_buf_line_later(buf, lnum);
+        redraw_buf_लिन्या_later(buf, lnum);
 
         // When displaying signs in the 'number' column, if the width of the
         // number column is less than 2, then force recomputing the width.
@@ -1299,7 +1299,7 @@ sign_unplace_at_cursor(char_u *groupname)
     if (id > 0)
         sign_unplace(id, groupname, curwin->w_buffer, curwin->w_cursor.lnum);
     else
-        emsg(_(e_missing_sign_number));
+        emsg(_(e_missing_sign_नुमेरो));
 }
 
 /*
@@ -1574,7 +1574,7 @@ sign_jump_cmd(buf_T *buf,
  * priority={prio} and file={fname} or buffer={nr}.
  */
 static int
-parse_sign_cmd_args(int cmd,
+parse_sign_cmd_मगा_कातविरान(int cmd,
                     char_u *arg,
                     char_u **sign_name,
                     int *signid,
@@ -1718,7 +1718,7 @@ ex_sign(exarg_T *eap)
         linenr_T lnum = -1;
 
         // Parse command line arguments
-        if (parse_sign_cmd_args(idx, arg, &sign_name, &id, &group, &prio, &buf,
+        if (parse_sign_cmd_मगा_कातविरान(idx, arg, &sign_name, &id, &group, &prio, &buf,
                                 &lnum) == FAIL)
             return;
 
@@ -1785,11 +1785,11 @@ sign_getinfo(sign_T *sp, dict_T *retdict)
         dict_add_string(retdict, "text", sp->sn_text);
 
     if (sp->sn_priority > 0)
-        dict_add_number(retdict, "priority", sp->sn_priority);
+        dict_add_नुमेरो(retdict, "priority", sp->sn_priority);
 
-    if (sp->sn_line_hl > 0)
+    if (sp->sn_लिन्या_hl > 0)
     {
-        char_u *p = get_highlight_name_ext(NULL, sp->sn_line_hl - 1, FALSE);
+        char_u *p = get_highlight_name_ext(NULL, sp->sn_लिन्या_hl - 1, FALSE);
         if (p == NULL)
             dict_add_string_len(retdict, "linehl",
                 (char_u *)"NONE", STRLEN_LITERAL("NONE"));
@@ -1817,9 +1817,9 @@ sign_getinfo(sign_T *sp, dict_T *retdict)
             dict_add_string(retdict, "culhl", p);
     }
 
-    if (sp->sn_num_hl > 0)
+    if (sp->sn_नुमेरो_hl > 0)
     {
-        char_u *p = get_highlight_name_ext(NULL, sp->sn_num_hl - 1, FALSE);
+        char_u *p = get_highlight_name_ext(NULL, sp->sn_नुमेरो_hl - 1, FALSE);
         if (p == NULL)
             dict_add_string_len(retdict, "numhl",
                 (char_u *)"NONE", STRLEN_LITERAL("NONE"));
@@ -1898,7 +1898,7 @@ sign_get_placed_in_buf(buf_T *buf,
         return;
     }
 
-    dict_add_number(d, "bufnr", (long)buf->b_fnum);
+    dict_add_नुमेरो(d, "bufnr", (long)buf->b_fnum);
 
     list_T *l = list_alloc_id(aid_sign_getplaced_list);
     if (l == NULL)
@@ -1977,76 +1977,76 @@ sign_gui_started(void)
 static void
 sign_list_defined(sign_T *sp)
 {
-    char lbuf[MSG_BUF_LEN];
+    char lbuf[मेनसाहे_BUF_LEN];
 
     smsg("sign %s", sp->sn_name);
 
     if (sp->sn_icon != NULL)
     {
-        msg_puts(" icon=");
-        msg_outtrans(sp->sn_icon);
+        मेनसाहे_puts(" icon=");
+        मेनसाहे_outtrans(sp->sn_icon);
 # ifdef FEAT_SIGN_ICONS
         if (sp->sn_image == NULL)
-            msg_puts(_(" (NOT FOUND)"));
+            मेनसाहे_puts(_(" (NOT FOUND)"));
 # else
-        msg_puts(_(" (not supported)"));
+        मेनसाहे_puts(_(" (not supported)"));
 # endif
     }
 
     if (sp->sn_text != NULL)
     {
-        msg_puts(" text=");
-        msg_outtrans(sp->sn_text);
+        मेनसाहे_puts(" text=");
+        मेनसाहे_outtrans(sp->sn_text);
     }
 
     if (sp->sn_priority > 0)
     {
-        vim_snprintf(lbuf, MSG_BUF_LEN, " priority=%d", sp->sn_priority);
-        msg_puts(lbuf);
+        vim_snprintf(lbuf, मेनसाहे_BUF_LEN, " priority=%d", sp->sn_priority);
+        मेनसाहे_puts(lbuf);
     }
 
-    if (sp->sn_line_hl > 0)
+    if (sp->sn_लिन्या_hl > 0)
     {
-        msg_puts(" linehl=");
+        मेनसाहे_puts(" linehl=");
 
-        char_u *p = get_highlight_name_ext(NULL, sp->sn_line_hl - 1, FALSE);
+        char_u *p = get_highlight_name_ext(NULL, sp->sn_लिन्या_hl - 1, FALSE);
         if (p == NULL)
-            msg_puts("NONE");
+            मेनसाहे_puts("NONE");
         else
-            msg_puts((char *)p);
+            मेनसाहे_puts((char *)p);
     }
 
     if (sp->sn_text_hl > 0)
     {
-        msg_puts(" texthl=");
+        मेनसाहे_puts(" texthl=");
 
         char_u *p = get_highlight_name_ext(NULL, sp->sn_text_hl - 1, FALSE);
         if (p == NULL)
-            msg_puts("NONE");
+            मेनसाहे_puts("NONE");
         else
-            msg_puts((char *)p);
+            मेनसाहे_puts((char *)p);
     }
 
     if (sp->sn_cul_hl > 0)
     {
-        msg_puts(" culhl=");
+        मेनसाहे_puts(" culhl=");
 
         char_u *p = get_highlight_name_ext(NULL, sp->sn_cul_hl - 1, FALSE);
         if (p == NULL)
-            msg_puts("NONE");
+            मेनसाहे_puts("NONE");
         else
-            msg_puts((char *)p);
+            मेनसाहे_puts((char *)p);
     }
 
-    if (sp->sn_num_hl > 0)
+    if (sp->sn_नुमेरो_hl > 0)
     {
-        msg_puts(" numhl=");
+        मेनसाहे_puts(" numhl=");
 
-        char_u *p = get_highlight_name_ext(NULL, sp->sn_num_hl - 1, FALSE);
+        char_u *p = get_highlight_name_ext(NULL, sp->sn_नुमेरो_hl - 1, FALSE);
         if (p == NULL)
-            msg_puts("NONE");
+            मेनसाहे_puts("NONE");
         else
-            msg_puts((char *)p);
+            मेनसाहे_puts((char *)p);
     }
 }
 
@@ -2139,7 +2139,7 @@ get_nth_sign_group_name(int idx)
     hashitem_T *hi = NULL;
 
     // Complete with name of sign groups already defined
-    FOR_ALL_HASHTAB_ITEMS(&sg_table, hi, todo)
+    FOR_ALL_HASHTAB_मगा_बागाय(&sg_table, hi, todo)
     {
         if (!HASHITEM_EMPTY(hi))
         {
@@ -2206,7 +2206,7 @@ set_context_in_sign_cmd(expand_T *xp, char_u *arg)
     char_u *end_subcmd;
     char_u *last;
     int cmd_idx;
-    char_u *begin_subcmd_args;
+    char_u *begin_subcmd_मगा_कातविरान;
 
     // Default: expand subcommands.
     xp->xp_context = EXPAND_SIGN;
@@ -2224,7 +2224,7 @@ set_context_in_sign_cmd(expand_T *xp, char_u *arg)
     // :sign {subcmd} {subcmd_args}
     //                |
     //                begin_subcmd_args
-    begin_subcmd_args = skipwhite(end_subcmd);
+    begin_subcmd_मगा_कातविरान = skipwhite(end_subcmd);
 
     // expand last argument of subcmd
 
@@ -2233,7 +2233,7 @@ set_context_in_sign_cmd(expand_T *xp, char_u *arg)
     //              p
 
     // Loop until reaching last argument.
-    p = begin_subcmd_args;
+    p = begin_subcmd_मगा_कातविरान;
     do
     {
         p = skipwhite(p);
@@ -2258,7 +2258,7 @@ set_context_in_sign_cmd(expand_T *xp, char_u *arg)
                 break;
             case SIGNCMD_PLACE:
                 // List placed signs
-                if (VIM_ISDIGIT(*begin_subcmd_args))
+                if (VIM_ISDIGIT(*begin_subcmd_मगा_कातविरान))
                     //   :sign place {id} {args}...
                     expand_what = EXP_PLACE;
                 else
@@ -2357,7 +2357,7 @@ sign_define_from_dict(char_u *name_arg, dict_T *dict)
         texthl = dict_get_string(dict, "texthl", TRUE);
         culhl = dict_get_string(dict, "culhl", TRUE);
         numhl = dict_get_string(dict, "numhl", TRUE);
-        prio = dict_get_number_def(dict, "priority", -1);
+        prio = dict_get_नुमेरो_def(dict, "priority", -1);
     }
 
     if (sign_define_by_name(name, icon, linehl, text, texthl, culhl, numhl,
@@ -2384,7 +2384,7 @@ static void
 sign_define_multiple(list_T *l, list_T *retlist)
 {
     listitem_T *li = NULL;
-    FOR_ALL_LIST_ITEMS(l, li)
+    FOR_ALL_LIST_मगा_बागाय(l, li)
     {
         int retval = -1;
 
@@ -2393,7 +2393,7 @@ sign_define_multiple(list_T *l, list_T *retlist)
         else
             emsg(_(e_dictionary_required));
 
-        list_append_number(retlist, retval);
+        list_append_नुमेरो(retlist, retval);
     }
 }
 
@@ -2418,7 +2418,7 @@ f_sign_define(typval_T *argvars, typval_T *rettv)
     }
 
     // Define a single sign
-    rettv->vval.v_number = -1;
+    rettv->vval.v_नुमेरो = -1;
 
     char_u *name = tv_get_string_chk(&argvars[0]);
     if (name == NULL)
@@ -2427,7 +2427,7 @@ f_sign_define(typval_T *argvars, typval_T *rettv)
     if (check_for_opt_dict_arg(argvars, 1) == FAIL)
         return;
 
-    rettv->vval.v_number = sign_define_from_dict(
+    rettv->vval.v_नुमेरो = sign_define_from_dict(
         name, argvars[1].v_type == VAR_DICT ? argvars[1].vval.v_dict : NULL);
 }
 
@@ -2488,7 +2488,7 @@ f_sign_getplaced(typval_T *argvars, typval_T *rettv)
             {
                 // get signs placed at this line
                 int notanum = FALSE;
-                tv_get_number_chk(&di->di_tv, &notanum);
+                tv_get_नुमेरो_chk(&di->di_tv, &notanum);
                 if (notanum)
                     return;
 
@@ -2499,7 +2499,7 @@ f_sign_getplaced(typval_T *argvars, typval_T *rettv)
             {
                 // get sign placed with this identifier
                 int notanum = FALSE;
-                sign_id = (int)tv_get_number_chk(&di->di_tv, &notanum);
+                sign_id = (int)tv_get_नुमेरो_chk(&di->di_tv, &notanum);
                 if (notanum)
                     return;
             }
@@ -2526,16 +2526,16 @@ void
 f_sign_jump(typval_T *argvars, typval_T *rettv)
 {
     char_u *sign_group = NULL;
-    rettv->vval.v_number = -1;
+    rettv->vval.v_नुमेरो = -1;
 
-    if (in_vim9script() && (check_for_number_arg(argvars, 0) == FAIL ||
+    if (in_vim9script() && (check_for_नुमेरो_arg(argvars, 0) == FAIL ||
                             check_for_string_arg(argvars, 1) == FAIL ||
                             check_for_buffer_arg(argvars, 2) == FAIL))
         return;
 
     int notanum = FALSE;
     // Sign identifier
-    int sign_id = (int)tv_get_number_chk(&argvars[0], &notanum);
+    int sign_id = (int)tv_get_नुमेरो_chk(&argvars[0], &notanum);
     if (notanum)
         return;
 
@@ -2566,7 +2566,7 @@ f_sign_jump(typval_T *argvars, typval_T *rettv)
     if (buf == NULL)
         goto cleanup;
 
-    rettv->vval.v_number = sign_jump(sign_id, sign_group, buf);
+    rettv->vval.v_नुमेरो = sign_jump(sign_id, sign_group, buf);
 
 cleanup:
     vim_free(sign_group);
@@ -2607,7 +2607,7 @@ sign_place_from_dict(typval_T *id_tv,
     else
     {
         int notanum = FALSE;
-        sign_id = tv_get_number_chk(id_tv, &notanum);
+        sign_id = tv_get_नुमेरो_chk(id_tv, &notanum);
 
         if (notanum)
             return -1;
@@ -2696,7 +2696,7 @@ sign_place_from_dict(typval_T *id_tv,
     if (di != NULL)
     {
         int notanum = FALSE;
-        prio = (int)tv_get_number_chk(&di->di_tv, &notanum);
+        prio = (int)tv_get_नुमेरो_chk(&di->di_tv, &notanum);
         if (notanum)
             goto cleanup;
     }
@@ -2717,9 +2717,9 @@ void
 f_sign_place(typval_T *argvars, typval_T *rettv)
 {
     dict_T *dict = NULL;
-    rettv->vval.v_number = -1;
+    rettv->vval.v_नुमेरो = -1;
 
-    if (in_vim9script() && (check_for_number_arg(argvars, 0) == FAIL ||
+    if (in_vim9script() && (check_for_नुमेरो_arg(argvars, 0) == FAIL ||
                             check_for_string_arg(argvars, 1) == FAIL ||
                             check_for_string_arg(argvars, 2) == FAIL ||
                             check_for_buffer_arg(argvars, 3) == FAIL ||
@@ -2733,7 +2733,7 @@ f_sign_place(typval_T *argvars, typval_T *rettv)
         dict = argvars[4].vval.v_dict;
     }
 
-    rettv->vval.v_number = sign_place_from_dict(&argvars[0], &argvars[1],
+    rettv->vval.v_नुमेरो = sign_place_from_dict(&argvars[0], &argvars[1],
                                                 &argvars[2], &argvars[3], dict);
 }
 
@@ -2754,7 +2754,7 @@ f_sign_placelist(typval_T *argvars, typval_T *rettv)
 
     // Process the List of sign attributes
     listitem_T *li = NULL;
-    FOR_ALL_LIST_ITEMS(argvars[0].vval.v_list, li)
+    FOR_ALL_LIST_मगा_बागाय(argvars[0].vval.v_list, li)
     {
         int sign_id = -1;
 
@@ -2764,7 +2764,7 @@ f_sign_placelist(typval_T *argvars, typval_T *rettv)
         else
             emsg(_(e_dictionary_required));
 
-        list_append_number(rettv->vval.v_list, sign_id);
+        list_append_नुमेरो(rettv->vval.v_list, sign_id);
     }
 }
 
@@ -2775,14 +2775,14 @@ static void
 sign_undefine_multiple(list_T *l, list_T *retlist)
 {
     listitem_T *li = NULL;
-    FOR_ALL_LIST_ITEMS(l, li)
+    FOR_ALL_LIST_मगा_बागाय(l, li)
     {
         int retval = -1;
         char_u *name = tv_get_string_chk(&li->li_tv);
         if (name != NULL && (sign_undefine_by_name(name, TRUE) == OK))
             retval = 0;
 
-        list_append_number(retlist, retval);
+        list_append_नुमेरो(retlist, retval);
     }
 }
 
@@ -2806,13 +2806,13 @@ f_sign_undefine(typval_T *argvars, typval_T *rettv)
         return;
     }
 
-    rettv->vval.v_number = -1;
+    rettv->vval.v_नुमेरो = -1;
 
     if (argvars[0].v_type == VAR_UNKNOWN)
     {
         // Free all the signs
         free_signs();
-        rettv->vval.v_number = 0;
+        rettv->vval.v_नुमेरो = 0;
     }
     else
     {
@@ -2822,7 +2822,7 @@ f_sign_undefine(typval_T *argvars, typval_T *rettv)
             return;
 
         if (sign_undefine_by_name(name, TRUE) == OK)
-            rettv->vval.v_number = 0;
+            rettv->vval.v_नुमेरो = 0;
     }
 }
 
@@ -2866,9 +2866,9 @@ sign_unplace_from_dict(typval_T *group_tv, dict_T *dict)
                 goto cleanup;
         }
 
-        if (dict_has_key(dict, "id"))
+        if (dict_has_सुसि(dict, "id"))
         {
-            sign_id = dict_get_number(dict, "id");
+            sign_id = dict_get_नुमेरो(dict, "id");
             if (sign_id <= 0)
             {
                 emsg(_(e_invalid_argument));
@@ -2938,7 +2938,7 @@ void
 f_sign_unplace(typval_T *argvars, typval_T *rettv)
 {
     dict_T *dict = NULL;
-    rettv->vval.v_number = -1;
+    rettv->vval.v_नुमेरो = -1;
 
     if ((check_for_string_arg(argvars, 0) == FAIL ||
          check_for_opt_dict_arg(argvars, 1) == FAIL))
@@ -2947,7 +2947,7 @@ f_sign_unplace(typval_T *argvars, typval_T *rettv)
     if (argvars[1].v_type != VAR_UNKNOWN)
         dict = argvars[1].vval.v_dict;
 
-    rettv->vval.v_number = sign_unplace_from_dict(&argvars[0], dict);
+    rettv->vval.v_नुमेरो = sign_unplace_from_dict(&argvars[0], dict);
 }
 
 /*
@@ -2966,7 +2966,7 @@ f_sign_unplacelist(typval_T *argvars, typval_T *rettv)
         return;
 
     listitem_T *li = NULL;
-    FOR_ALL_LIST_ITEMS(argvars[0].vval.v_list, li)
+    FOR_ALL_LIST_मगा_बागाय(argvars[0].vval.v_list, li)
     {
         int retval = -1;
 
@@ -2975,7 +2975,7 @@ f_sign_unplacelist(typval_T *argvars, typval_T *rettv)
         else
             emsg(_(e_dictionary_required));
 
-        list_append_number(rettv->vval.v_list, retval);
+        list_append_नुमेरो(rettv->vval.v_list, retval);
     }
 }
 

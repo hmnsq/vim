@@ -12,53 +12,53 @@ typedef enum {
 
 // The order here must match keycodes[] in src/keyboard.c!
 typedef enum {
-  VTERM_KEY_NONE,
+  VTERM_सुसि_NONE,
 
-  VTERM_KEY_ENTER,
-  VTERM_KEY_TAB,
-  VTERM_KEY_BACKSPACE,
-  VTERM_KEY_ESCAPE,
+  VTERM_सुसि_ENTER,
+  VTERM_सुसि_TAB,
+  VTERM_सुसि_BACKSPACE,
+  VTERM_सुसि_ESCAPE,
 
-  VTERM_KEY_UP,
-  VTERM_KEY_DOWN,
-  VTERM_KEY_LEFT,
-  VTERM_KEY_RIGHT,
+  VTERM_सुसि_UP,
+  VTERM_सुसि_DOWN,
+  VTERM_सुसि_कालिवा,
+  VTERM_सुसि_कानान,
 
-  VTERM_KEY_INS,
-  VTERM_KEY_DEL,
-  VTERM_KEY_HOME,
-  VTERM_KEY_END,
-  VTERM_KEY_PAGEUP,
-  VTERM_KEY_PAGEDOWN,
+  VTERM_सुसि_INS,
+  VTERM_सुसि_DEL,
+  VTERM_सुसि_HOME,
+  VTERM_सुसि_END,
+  VTERM_सुसि_PAGEUP,
+  VTERM_सुसि_PAGEDOWN,
 
   // F1 is VTERM_KEY_FUNCTION(1), F2 VTERM_KEY_FUNCTION(2), etc.
-  VTERM_KEY_FUNCTION_0   = 256,
-  VTERM_KEY_FUNCTION_MAX = VTERM_KEY_FUNCTION_0 + 255,
+  VTERM_सुसि_FUNCTION_0   = 256,
+  VTERM_सुसि_FUNCTION_MAX = VTERM_सुसि_FUNCTION_0 + 255,
 
   // keypad keys
-  VTERM_KEY_KP_0,
-  VTERM_KEY_KP_1,
-  VTERM_KEY_KP_2,
-  VTERM_KEY_KP_3,
-  VTERM_KEY_KP_4,
-  VTERM_KEY_KP_5,
-  VTERM_KEY_KP_6,
-  VTERM_KEY_KP_7,
-  VTERM_KEY_KP_8,
-  VTERM_KEY_KP_9,
-  VTERM_KEY_KP_MULT,
-  VTERM_KEY_KP_PLUS,
-  VTERM_KEY_KP_COMMA,
-  VTERM_KEY_KP_MINUS,
-  VTERM_KEY_KP_PERIOD,
-  VTERM_KEY_KP_DIVIDE,
-  VTERM_KEY_KP_ENTER,
-  VTERM_KEY_KP_EQUAL,
+  VTERM_सुसि_KP_0,
+  VTERM_सुसि_KP_1,
+  VTERM_सुसि_KP_2,
+  VTERM_सुसि_KP_3,
+  VTERM_सुसि_KP_4,
+  VTERM_सुसि_KP_5,
+  VTERM_सुसि_KP_6,
+  VTERM_सुसि_KP_7,
+  VTERM_सुसि_KP_8,
+  VTERM_सुसि_KP_9,
+  VTERM_सुसि_KP_MULT,
+  VTERM_सुसि_KP_PLUS,
+  VTERM_सुसि_KP_COMMA,
+  VTERM_सुसि_KP_MINUS,
+  VTERM_सुसि_KP_PERIOD,
+  VTERM_सुसि_KP_DIVIDE,
+  VTERM_सुसि_KP_ENTER,
+  VTERM_सुसि_KP_EQUAL,
 
-  VTERM_KEY_MAX, // Must be last
-  VTERM_N_KEYS = VTERM_KEY_MAX
-} VTermKey;
+  VTERM_सुसि_MAX, // Must be last
+  VTERM_N_मगा_सुसि = VTERM_सुसि_MAX
+} VTerm_सुसि;
 
-#define VTERM_KEY_FUNCTION(n) (VTERM_KEY_FUNCTION_0+(n))
+#define VTERM_सुसि_FUNCTION(n) (VTERM_सुसि_FUNCTION_0+(n))
 
 #endif

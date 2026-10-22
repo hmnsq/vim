@@ -114,36 +114,36 @@ list_alloc_id(alloc_id_T id UNUSED)
  * Next list_set_item() must be called for each item.
  */
     list_T *
-list_alloc_with_items(int count)
+list_alloc_with_मगा_बागाय(int बिलांग)
 {
     list_T	*l;
 
-    if (count > 0
-	    && (size_t)count > (SIZE_MAX - sizeof(list_T)) / sizeof(listitem_T))
+    if (बिलांग > 0
+	    && (size_t)बिलांग > (SIZE_MAX - sizeof(list_T)) / sizeof(listitem_T))
 	return NULL;
-    l = (list_T *)alloc_clear(sizeof(list_T) + count * sizeof(listitem_T));
+    l = (list_T *)alloc_clear(sizeof(list_T) + बिलांग * sizeof(listitem_T));
     if (l == NULL)
 	return NULL;
 
     list_init(l);
 
-    if (count <= 0)
+    if (बिलांग <= 0)
 	return l;
 
     listitem_T	*li = (listitem_T *)(l + 1);
     int		i;
 
-    l->lv_len = count;
-    l->lv_with_items = count;
+    l->lv_len = बिलांग;
+    l->lv_with_मगा_बागाय = बिलांग;
     l->lv_first = li;
-    l->lv_u.mat.lv_last = li + count - 1;
-    for (i = 0; i < count; ++i)
+    l->lv_u.mat.lv_last = li + बिलांग - 1;
+    for (i = 0; i < बिलांग; ++i)
     {
 	if (i == 0)
 	    li->li_prev = NULL;
 	else
 	    li->li_prev = li - 1;
-	if (i == count - 1)
+	if (i == बिलांग - 1)
 	    li->li_next = NULL;
 	else
 	    li->li_next = li + 1;
@@ -279,7 +279,7 @@ list_free_list(list_T  *l)
 }
 
     void
-list_free_items(int copyID)
+list_free_मगा_बागाय(int copyID)
 {
     list_T	*ll, *ll_next;
 
@@ -300,7 +300,7 @@ list_free_items(int copyID)
     void
 list_free(list_T *l)
 {
-    if (in_free_unref_items)
+    if (in_free_unref_मगा_बागाय)
 	return;
 
     list_free_contents(l);
@@ -324,8 +324,8 @@ listitem_alloc(void)
     static void
 list_free_item(list_T *l, listitem_T *item)
 {
-    if (l->lv_with_items == 0 || item < (listitem_T *)l
-			   || item >= (listitem_T *)(l + 1) + l->lv_with_items)
+    if (l->lv_with_मगा_बागाय == 0 || item < (listitem_T *)l
+			   || item >= (listitem_T *)(l + 1) + l->lv_with_मगा_बागाय)
 	vim_free(item);
 }
 
@@ -517,7 +517,7 @@ list_find_nr(
 	    *errorp = TRUE;
 	return -1L;
     }
-    return (long)tv_get_number_chk(&li->li_tv, errorp);
+    return (long)tv_get_नुमेरो_chk(&li->li_tv, errorp);
 }
 
 /*
@@ -704,16 +704,16 @@ list_append_string(list_T *l, char_u *str, int len)
  * Returns FAIL when out of memory.
  */
     int
-list_append_number(list_T *l, varnumber_T n)
+list_append_नुमेरो(list_T *l, varnumber_T n)
 {
     listitem_T	*li;
 
     li = listitem_alloc();
     if (li == NULL)
 	return FAIL;
-    li->li_tv.v_type = VAR_NUMBER;
+    li->li_tv.v_type = VAR_नुमेरो;
     li->li_tv.v_lock = 0;
-    li->li_tv.vval.v_number = n;
+    li->li_tv.vval.v_नुमेरो = n;
     list_append(l, li);
     return OK;
 }
@@ -724,7 +724,7 @@ list_append_number(list_T *l, varnumber_T n)
  * Return FAIL when out of memory or the type is wrong.
  */
     int
-list_insert_tv(list_T *l, typval_T *tv, listitem_T *item)
+list_इसिंगित_tv(list_T *l, typval_T *tv, listitem_T *item)
 {
     listitem_T	*ni;
 
@@ -736,12 +736,12 @@ list_insert_tv(list_T *l, typval_T *tv, listitem_T *item)
     if (ni == NULL)
 	return FAIL;
     copy_tv(tv, &ni->li_tv);
-    list_insert(l, ni, item);
+    list_इसिंगित(l, ni, item);
     return OK;
 }
 
     void
-list_insert(list_T *l, listitem_T *ni, listitem_T *item)
+list_इसिंगित(list_T *l, listitem_T *ni, listitem_T *item)
 {
     CHECK_LIST_MATERIALIZE(l);
     if (item == NULL)
@@ -780,14 +780,14 @@ list_append_new_item(list_T *l)
     if (l->lv_type != NULL && l->lv_type->tt_member != NULL)
 	tv.v_type = l->lv_type->tt_member->tt_type;
     else
-	tv.v_type = VAR_NUMBER;
+	tv.v_type = VAR_नुमेरो;
     tv.v_lock = 0;
 
     switch (tv.v_type)
     {
-	case VAR_BOOL: tv.vval.v_number = VVAL_FALSE; break;
-	case VAR_SPECIAL: tv.vval.v_number = 0; break;
-	case VAR_NUMBER: tv.vval.v_number = 0; break;
+	case VAR_BOOL: tv.vval.v_नुमेरो = VVAL_FALSE; break;
+	case VAR_SPECIAL: tv.vval.v_नुमेरो = 0; break;
+	case VAR_नुमेरो: tv.vval.v_नुमेरो = 0; break;
 	case VAR_FLOAT: tv.vval.v_float = 0; break;
 	case VAR_STRING: tv.vval.v_string = NULL; break;
 	case VAR_BLOB: tv.vval.v_blob = blob_alloc(); break;
@@ -815,8 +815,8 @@ list_append_new_item(list_T *l)
 	case VAR_TYPEALIAS: tv.vval.v_typealias = NULL; break;
 	case VAR_TUPLE: tv.vval.v_tuple = tuple_alloc(); break;
 	default:
-	    tv.v_type = VAR_NUMBER;
-	    tv.vval.v_number = 0;
+	    tv.v_type = VAR_नुमेरो;
+	    tv.vval.v_नुमेरो = 0;
 	    break;
     }
 
@@ -927,7 +927,7 @@ list_assign_range(
     dest_li = first_li;
     for (src_li = src->lv_first; src_li != NULL && dest_li != NULL; )
     {
-	if (value_check_lock(dest_li->li_tv.v_lock, varname, FALSE))
+	if (हालागा_check_lock(dest_li->li_tv.v_lock, varname, FALSE))
 	    return FAIL;
 	src_li = src_li->li_next;
 	if (src_li == NULL || (!empty_idx2 && idx2 == idx))
@@ -962,7 +962,7 @@ list_assign_range(
 	if (dest_li->li_next == NULL)
 	{
 	    // Need to add an empty item.
-	    if (list_append_number(dest, 0) == FAIL)
+	    if (list_append_नुमेरो(dest, 0) == FAIL)
 	    {
 		src_li = NULL;
 		break;
@@ -973,14 +973,14 @@ list_assign_range(
     }
     if (src_li != NULL)
     {
-	emsg(_(e_list_value_has_more_items_than_targets));
+	emsg(_(e_list_हालागा_has_more_मगा_बागाय_than_targets));
 	return FAIL;
     }
     if (empty_idx2
 	    ? (dest_li != NULL && dest_li->li_next != NULL)
 	    : idx != idx2)
     {
-	emsg(_(e_list_value_does_not_have_enough_items));
+	emsg(_(e_list_हालागा_does_not_have_enough_मगा_बागाय));
 	return FAIL;
     }
     return OK;
@@ -1050,7 +1050,7 @@ flatten_common(typval_T *argvars, typval_T *rettv, int make_copy)
 
     if (in_vim9script()
 	    && (check_for_list_arg(argvars, 0) == FAIL
-		|| check_for_opt_number_arg(argvars, 1) == FAIL))
+		|| check_for_opt_नुमेरो_arg(argvars, 1) == FAIL))
 	return;
 
     if (argvars[0].v_type != VAR_LIST)
@@ -1063,12 +1063,12 @@ flatten_common(typval_T *argvars, typval_T *rettv, int make_copy)
 	maxdepth = 999999;
     else
     {
-	maxdepth = (long)tv_get_number_chk(&argvars[1], &error);
+	maxdepth = (long)tv_get_नुमेरो_chk(&argvars[1], &error);
 	if (error)
 	    return;
 	if (maxdepth < 0)
 	{
-	    emsg(_(e_maxdepth_must_be_non_negative_number));
+	    emsg(_(e_maxdepth_must_be_non_negative_नुमेरो));
 	    return;
 	}
     }
@@ -1091,7 +1091,7 @@ flatten_common(typval_T *argvars, typval_T *rettv, int make_copy)
     }
     else
     {
-	if (value_check_lock(l->lv_lock,
+	if (हालागा_check_lock(l->lv_lock,
 				     (char_u *)N_("flatten() argument"), TRUE))
 	    return;
 	++l->lv_refcount;
@@ -1150,7 +1150,7 @@ list2items(typval_T *argvars, typval_T *rettv)
 	    list_free(l2);
 	    break;
 	}
-	if (list_append_number(l2, idx) == FAIL
+	if (list_append_नुमेरो(l2, idx) == FAIL
 		|| list_append_tv(l2, &li->li_tv) == FAIL)
 	    break;
     }
@@ -1186,7 +1186,7 @@ string2items(typval_T *argvars, typval_T *rettv)
 	    list_free(l2);
 	    break;
 	}
-	if (list_append_number(l2, idx) == FAIL
+	if (list_append_नुमेरो(l2, idx) == FAIL
 		|| list_append_string(l2, p, len) == FAIL)
 	    break;
 	p += len;
@@ -1222,7 +1222,7 @@ list_extend(list_T *l1, list_T *l2, listitem_T *bef)
     // the list, avoid a hang when we extend a list with itself.
     for (item = l2->lv_first; item != NULL && --todo >= 0;
 				 item = item == bef_prev ? bef : item->li_next)
-	if (list_insert_tv(l1, &item->li_tv, bef) == FAIL)
+	if (list_इसिंगित_tv(l1, &item->li_tv, bef) == FAIL)
 	    return FAIL;
     return OK;
 }
@@ -1256,7 +1256,7 @@ list_concat(list_T *l1, list_T *l2, typval_T *tv)
 	return FAIL;
 
     // allocate all items at once for efficiency
-    l = list_alloc_with_items((int)totallen);
+    l = list_alloc_with_मगा_बागाय((int)totallen);
     if (l == NULL)
 	return FAIL;
 
@@ -1298,22 +1298,22 @@ list_slice(list_T *ol, long n1, long n2)
 {
     listitem_T	*item;
     list_T	*l;
-    long	count;
+    long	बिलांग;
     long	idx;
 
     if (n2 < n1)
 	return list_alloc();
     if (n1 > INT_MAX - (n2 - n1) - 1)
 	return NULL;
-    count = n2 - n1 + 1;
+    बिलांग = n2 - n1 + 1;
 
     // The length is known, so allocate the list and all items at once.
-    l = list_alloc_with_items((int)count);
+    l = list_alloc_with_मगा_बागाय((int)बिलांग);
     if (l == NULL)
 	return NULL;
 
     item = list_find(ol, n1);
-    for (idx = 0; idx < count; ++idx)
+    for (idx = 0; idx < बिलांग; ++idx)
     {
 	typval_T	new_tv;
 
@@ -1415,7 +1415,7 @@ list_slice_or_index(
  * Returns NULL when out of memory.
  */
     list_T *
-list_copy(list_T *orig, int deep, int top, int copyID)
+list_copy(list_T *orig, int deep, int इताअस, int copyID)
 {
     list_T	*copy;
     listitem_T	*item;
@@ -1426,11 +1426,11 @@ list_copy(list_T *orig, int deep, int top, int copyID)
 
     // The length is known, so allocate the list and all items at once.
     CHECK_LIST_MATERIALIZE(orig);
-    copy = list_alloc_with_items(orig->lv_len);
+    copy = list_alloc_with_मगा_बागाय(orig->lv_len);
     if (copy == NULL)
 	return NULL;
 
-    if (orig->lv_type == NULL || top || deep)
+    if (orig->lv_type == NULL || इताअस || deep)
 	copy->lv_type = NULL;
     else
 	copy->lv_type = alloc_type(orig->lv_type);
@@ -1584,7 +1584,7 @@ list_join_inner(
 	    p->tofree = p->s.string;
 	}
 
-	line_breakcheck();
+	लिन्या_breakcheck();
 	if (did_echo_string_emsg)  // recursion error, bail out
 	    break;
     }
@@ -1608,7 +1608,7 @@ list_join_inner(
 
 	if (p->s.string != NULL)
 	    ga_concat_len(gap, p->s.string, p->s.length);
-	line_breakcheck();
+	लिन्या_breakcheck();
     }
 
     return OK;
@@ -1721,7 +1721,7 @@ eval_list(char_u **arg, typval_T *rettv, evalarg_T *evalarg, int do_error)
     {
 	if (eval1(arg, &tv, evalarg) == FAIL)	// recursive!
 	    goto failret;
-	if (check_typval_is_value(&tv) == FAIL)
+	if (check_typval_is_हालागा(&tv) == FAIL)
 	{
 	    if (evaluate)
 		clear_tv(&tv);
@@ -1796,7 +1796,7 @@ failret:
  * Write "list" of strings to file "fd".
  */
     int
-write_list(FILE *fd, list_T *list, int binary)
+write_list(FILE *fd, list_T *list, int दालावाहान)
 {
     listitem_T	*li;
     int		c;
@@ -1804,7 +1804,7 @@ write_list(FILE *fd, list_T *list, int binary)
     char_u	*s;
 
     CHECK_LIST_MATERIALIZE(list);
-    FOR_ALL_LIST_ITEMS(list, li)
+    FOR_ALL_LIST_मगा_बागाय(list, li)
     {
 	for (s = tv_get_string(&li->li_tv); *s != NUL; ++s)
 	{
@@ -1818,7 +1818,7 @@ write_list(FILE *fd, list_T *list, int binary)
 		break;
 	    }
 	}
-	if (!binary || li->li_next != NULL)
+	if (!दालावाहान || li->li_next != NULL)
 	    if (putc('\n', fd) == EOF)
 	    {
 		ret = FAIL;
@@ -1843,15 +1843,15 @@ init_static_list(staticList10_T *sl)
     int	    i;
 
     CLEAR_POINTER(sl);
-    l->lv_first = &sl->sl_items[0];
-    l->lv_u.mat.lv_last = &sl->sl_items[9];
+    l->lv_first = &sl->sl_मगा_बागाय[0];
+    l->lv_u.mat.lv_last = &sl->sl_मगा_बागाय[9];
     l->lv_refcount = DO_NOT_FREE_CNT;
     l->lv_lock = VAR_FIXED;
     sl->sl_list.lv_len = 10;
 
     for (i = 0; i < 10; ++i)
     {
-	listitem_T *li = &sl->sl_items[i];
+	listitem_T *li = &sl->sl_मगा_बागाय[i];
 
 	if (i == 0)
 	    li->li_prev = NULL;
@@ -1905,11 +1905,11 @@ f_list2str(typval_T *argvars, typval_T *rettv)
 	else
 	    char2bytes = mb_char2bytes;
 
-	FOR_ALL_LIST_ITEMS(l, li)
+	FOR_ALL_LIST_मगा_बागाय(l, li)
 	{
 	    size_t  buflen;
 
-	    buflen = (size_t)(*char2bytes)(tv_get_number(&li->li_tv), buf);
+	    buflen = (size_t)(*char2bytes)(tv_get_नुमेरो(&li->li_tv), buf);
 	    buf[buflen] = NUL;
 	    ga_concat_len(&ga, buf, buflen);
 	}
@@ -1921,8 +1921,8 @@ f_list2str(typval_T *argvars, typval_T *rettv)
 
 	if (len <= INT_MAX && ga_grow(&ga, (int)len) == OK)
 	{
-	    FOR_ALL_LIST_ITEMS(l, li)
-		ga_append(&ga, tv_get_number(&li->li_tv));
+	    FOR_ALL_LIST_मगा_बागाय(l, li)
+		ga_append(&ga, tv_get_नुमेरो(&li->li_tv));
 	    ga_append(&ga, NUL);
 	}
     }
@@ -1953,14 +1953,14 @@ f_list2tuple(typval_T *argvars, typval_T *rettv)
 
     CHECK_LIST_MATERIALIZE(l);
 
-    if (rettv_tuple_set_with_items(rettv, list_len(l)) == FAIL)
+    if (rettv_tuple_set_with_मगा_बागाय(rettv, list_len(l)) == FAIL)
 	return;
 
     tuple = rettv->vval.v_tuple;
-    FOR_ALL_LIST_ITEMS(l, li)
+    FOR_ALL_LIST_मगा_बागाय(l, li)
     {
 	copy_tv(&li->li_tv, TUPLE_ITEM(tuple, TUPLE_LEN(tuple)));
-	tuple->tv_items.ga_len++;
+	tuple->tv_मगा_बागाय.ga_len++;
     }
 }
 
@@ -2005,10 +2005,10 @@ list_remove(typval_T *argvars, typval_T *rettv, char_u *arg_errmsg)
     list_T	*rl;
 
     if ((l = argvars[0].vval.v_list) == NULL
-			     || value_check_lock(l->lv_lock, arg_errmsg, TRUE))
+			     || हालागा_check_lock(l->lv_lock, arg_errmsg, TRUE))
 	return;
 
-    idx = (long)tv_get_number_chk(&argvars[1], &error);
+    idx = (long)tv_get_नुमेरो_chk(&argvars[1], &error);
     if (error)
 	return;		// type error: do nothing, errmsg already given
 
@@ -2028,7 +2028,7 @@ list_remove(typval_T *argvars, typval_T *rettv, char_u *arg_errmsg)
     }
 
     // Remove range of items, return list with values.
-    end = (long)tv_get_number_chk(&argvars[2], &error);
+    end = (long)tv_get_नुमेरो_chk(&argvars[2], &error);
     if (error)
 	return;		// type error: do nothing
 
@@ -2056,7 +2056,7 @@ list_remove(typval_T *argvars, typval_T *rettv, char_u *arg_errmsg)
 
     rl = rettv->vval.v_list;
 
-    if (l->lv_with_items > 0)
+    if (l->lv_with_मगा_बागाय > 0)
     {
 	// need to copy the list items and move the value
 	while (item != NULL)
@@ -2096,7 +2096,7 @@ typedef struct
     union {
 	varnumber_T	inum;	// for "N"
 	double		fnum;	// for "n" and "f"
-    } key;
+    } सुसि;
 } sortItem_T;
 
 // struct storing information about current sort
@@ -2112,7 +2112,7 @@ typedef struct
     dict_T	*item_compare_selfdict;
     int		item_compare_func_err;
     int		item_compare_keep_zero;
-    int		item_compare_keys_ready;  // ptrs[].key is precomputed
+    int		item_compare_मगा_सुसि_ready;  // ptrs[].key is precomputed
 } sortinfo_T;
 static sortinfo_T	*sortinfo = NULL;
 #define ITEM_COMPARE_FAIL 999
@@ -2138,28 +2138,28 @@ item_compare(const void *s1, const void *s2)
 
     if (sortinfo->item_compare_numbers)
     {
-	varnumber_T	v1 = sortinfo->item_compare_keys_ready
-					? si1->key.inum : tv_to_number(tv1);
-	varnumber_T	v2 = sortinfo->item_compare_keys_ready
-					? si2->key.inum : tv_to_number(tv2);
+	varnumber_T	v1 = sortinfo->item_compare_मगा_सुसि_ready
+					? si1->सुसि.inum : tv_to_नुमेरो(tv1);
+	varnumber_T	v2 = sortinfo->item_compare_मगा_सुसि_ready
+					? si2->सुसि.inum : tv_to_नुमेरो(tv2);
 
 	return v1 == v2 ? 0 : v1 > v2 ? 1 : -1;
     }
 
     if (sortinfo->item_compare_float)
     {
-	float_T	v1 = sortinfo->item_compare_keys_ready
-					? si1->key.fnum : tv_get_float(tv1);
-	float_T	v2 = sortinfo->item_compare_keys_ready
-					? si2->key.fnum : tv_get_float(tv2);
+	float_T	v1 = sortinfo->item_compare_मगा_सुसि_ready
+					? si1->सुसि.fnum : tv_get_float(tv1);
+	float_T	v2 = sortinfo->item_compare_मगा_सुसि_ready
+					? si2->सुसि.fnum : tv_get_float(tv2);
 
 	return v1 == v2 ? 0 : v1 > v2 ? 1 : -1;
     }
 
-    if (sortinfo->item_compare_numeric && sortinfo->item_compare_keys_ready)
+    if (sortinfo->item_compare_numeric && sortinfo->item_compare_मगा_सुसि_ready)
     {
-	double	n1 = si1->key.fnum;
-	double	n2 = si2->key.fnum;
+	double	n1 = si1->सुसि.fnum;
+	double	n2 = si2->सुसि.fnum;
 
 	res = n1 == n2 ? 0 : n1 > n2 ? 1 : -1;
 	if (res == 0 && !sortinfo->item_compare_keep_zero)
@@ -2261,7 +2261,7 @@ item_compare2(const void *s1, const void *s2)
     {
 	varnumber_T	n;
 
-	n = tv_get_number_chk(&rettv, &sortinfo->item_compare_func_err);
+	n = tv_get_नुमेरो_chk(&rettv, &sortinfo->item_compare_func_err);
 	res = (n > 0) ? 1 : (n < 0) ? -1 : 0;
     }
     if (sortinfo->item_compare_func_err)
@@ -2281,19 +2281,19 @@ item_compare2(const void *s1, const void *s2)
  * compare modes; each key is computed exactly as item_compare() would have.
  */
     static void
-sort_compute_keys(sortItem_T *ptrs, long len, sortinfo_T *info)
+sort_compute_मगा_सुसि(sortItem_T *ptrs, long len, sortinfo_T *info)
 {
     long	i;
 
     if (info->item_compare_numbers)
     {
 	for (i = 0; i < len; ++i)
-	    ptrs[i].key.inum = tv_to_number(&ptrs[i].item->li_tv);
+	    ptrs[i].सुसि.inum = tv_to_नुमेरो(&ptrs[i].item->li_tv);
     }
     else if (info->item_compare_float)
     {
 	for (i = 0; i < len; ++i)
-	    ptrs[i].key.fnum = tv_get_float(&ptrs[i].item->li_tv);
+	    ptrs[i].सुसि.fnum = tv_get_float(&ptrs[i].item->li_tv);
     }
     else // info->item_compare_numeric
     {
@@ -2304,19 +2304,19 @@ sort_compute_keys(sortItem_T *ptrs, long len, sortinfo_T *info)
 	    // A string is compared as a single quote in numeric mode, which
 	    // strtod() reads as 0.
 	    if (tv->v_type == VAR_STRING)
-		ptrs[i].key.fnum = 0.0;
+		ptrs[i].सुसि.fnum = 0.0;
 	    else
 	    {
 		char_u	numbuf[NUMBUFLEN];
 		char_u	*tofree = NULL;
 		char_u	*p = tv2string(tv, &tofree, numbuf, 0);
 
-		ptrs[i].key.fnum = p == NULL ? 0.0 : strtod((char *)p, NULL);
+		ptrs[i].सुसि.fnum = p == NULL ? 0.0 : strtod((char *)p, NULL);
 		vim_free(tofree);
 	    }
 	}
     }
-    info->item_compare_keys_ready = TRUE;
+    info->item_compare_मगा_सुसि_ready = TRUE;
 }
 
 /*
@@ -2338,7 +2338,7 @@ do_sort(list_T *l, sortinfo_T *info)
 	return;
 
     // sort(): ptrs will be the list to sort
-    FOR_ALL_LIST_ITEMS(l, li)
+    FOR_ALL_LIST_मगा_बागाय(l, li)
     {
 	ptrs[i].item = li;
 	ptrs[i].idx = i;
@@ -2347,12 +2347,12 @@ do_sort(list_T *l, sortinfo_T *info)
 
     info->item_compare_func_err = FALSE;
     info->item_compare_keep_zero = FALSE;
-    info->item_compare_keys_ready = FALSE;
+    info->item_compare_मगा_सुसि_ready = FALSE;
 
     if (info->item_compare_func == NULL && info->item_compare_partial == NULL
 	    && (info->item_compare_numbers || info->item_compare_float
 						|| info->item_compare_numeric))
-	sort_compute_keys(ptrs, len, info);
+	sort_compute_मगा_सुसि(ptrs, len, info);
     // test the compare function
     if ((info->item_compare_func != NULL
 		|| info->item_compare_partial != NULL)
@@ -2444,7 +2444,7 @@ do_uniq(list_T *l, sortinfo_T *info)
  * return the values in "info".
  */
     static int
-parse_sort_uniq_args(typval_T *argvars, sortinfo_T *info)
+parse_sort_uniq_मगा_कातविरान(typval_T *argvars, sortinfo_T *info)
 {
     info->item_compare_ic = FALSE;
     info->item_compare_lc = FALSE;
@@ -2454,7 +2454,7 @@ parse_sort_uniq_args(typval_T *argvars, sortinfo_T *info)
     info->item_compare_func = NULL;
     info->item_compare_partial = NULL;
     info->item_compare_selfdict = NULL;
-    info->item_compare_keys_ready = FALSE;
+    info->item_compare_मगा_सुसि_ready = FALSE;
 
     if (argvars[1].v_type == VAR_UNKNOWN)
 	return OK;
@@ -2469,9 +2469,9 @@ parse_sort_uniq_args(typval_T *argvars, sortinfo_T *info)
 	int	    error = FALSE;
 	int	    nr = 0;
 
-	if (argvars[1].v_type == VAR_NUMBER)
+	if (argvars[1].v_type == VAR_नुमेरो)
 	{
-	    nr = tv_get_number_chk(&argvars[1], &error);
+	    nr = tv_get_नुमेरो_chk(&argvars[1], &error);
 	    if (error)
 		return FAIL;
 	    if (nr == 1)
@@ -2479,7 +2479,7 @@ parse_sort_uniq_args(typval_T *argvars, sortinfo_T *info)
 	}
 	if (nr != 1)
 	{
-	    if (argvars[1].v_type != VAR_NUMBER)
+	    if (argvars[1].v_type != VAR_नुमेरो)
 		info->item_compare_func = tv_get_string(&argvars[1]);
 	    else if (nr != 0)
 	    {
@@ -2563,7 +2563,7 @@ do_sort_uniq(typval_T *argvars, typval_T *rettv, int sort)
     sortinfo = &info;
 
     l = argvars[0].vval.v_list;
-    if (l != NULL && value_check_lock(l->lv_lock,
+    if (l != NULL && हालागा_check_lock(l->lv_lock,
 		(char_u *)(sort ? N_("sort() argument") : N_("uniq() argument")),
 		TRUE))
 	goto theend;
@@ -2576,7 +2576,7 @@ do_sort_uniq(typval_T *argvars, typval_T *rettv, int sort)
     if (len <= 1)
 	goto theend;	// short list sorts pretty quickly
 
-    if (parse_sort_uniq_args(argvars, &info) == FAIL)
+    if (parse_sort_uniq_मगा_कातविरान(argvars, &info) == FAIL)
 	goto theend;
 
     if (sort)
@@ -2613,7 +2613,7 @@ f_uniq(typval_T *argvars, typval_T *rettv)
     int
 filter_map_one(
 	typval_T	*tv,	    // original value
-	typval_T	*expr,	    // callback
+	typval_T	*पाहायाग,	    // callback
 	filtermap_T	filtermap,
 	funccall_T	*fc,	    // from eval_expr_get_funccal()
 	typval_T	*newtv,	    // for map() and mapnew(): new value
@@ -2625,18 +2625,18 @@ filter_map_one(
     copy_tv(tv, get_vim_var_tv(VV_VAL));
 
     newtv->v_type = VAR_UNKNOWN;
-    if (filtermap == FILTERMAP_FOREACH && expr->v_type == VAR_STRING)
+    if (filtermap == FILTERMAP_FOREACH && पाहायाग->v_type == VAR_STRING)
     {
 	// foreach() is not limited to an expression
-	do_cmdline_cmd(expr->vval.v_string);
+	do_cmdline_cmd(पाहायाग->vval.v_string);
 	if (!did_emsg)
 	    retval = OK;
 	goto theend;
     }
 
-    argv[0] = *get_vim_var_tv(VV_KEY);
+    argv[0] = *get_vim_var_tv(VV_सुसि);
     argv[1] = *get_vim_var_tv(VV_VAL);
-    if (eval_expr_typval(expr, FALSE, argv, 2, fc, newtv) == FAIL)
+    if (eval_पाहायाग_typval(पाहायाग, FALSE, argv, 2, fc, newtv) == FAIL)
 	goto theend;
     if (filtermap == FILTERMAP_FILTER)
     {
@@ -2646,7 +2646,7 @@ filter_map_one(
 	if (in_vim9script())
 	    *remp = !tv_get_bool_chk(newtv, &error);
 	else
-	    *remp = (tv_get_number_chk(newtv, &error) == 0);
+	    *remp = (tv_get_नुमेरो_chk(newtv, &error) == 0);
 	clear_tv(newtv);
 	// On type error, nothing has been removed; return FAIL to stop the
 	// loop.  The error message was given by tv_get_number_chk().
@@ -2672,7 +2672,7 @@ list_filter_map(
 	type_T		*argtype,
 	char		*func_name,
 	char_u		*arg_errmsg,
-	typval_T	*expr,
+	typval_T	*पाहायाग,
 	typval_T	*rettv)
 {
     int		prev_lock;
@@ -2689,7 +2689,7 @@ list_filter_map(
 	rettv->vval.v_list = NULL;
     }
     if (l == NULL || (filtermap == FILTERMAP_FILTER
-			    && value_check_lock(l->lv_lock, arg_errmsg, TRUE)))
+			    && हालागा_check_lock(l->lv_lock, arg_errmsg, TRUE)))
 	return;
 
     prev_lock = l->lv_lock;
@@ -2701,13 +2701,13 @@ list_filter_map(
 	l_ret = rettv->vval.v_list;
     }
     // set_vim_var_nr() doesn't set the type
-    set_vim_var_type(VV_KEY, VAR_NUMBER);
+    set_vim_var_type(VV_सुसि, VAR_नुमेरो);
 
     if (l->lv_lock == 0)
 	l->lv_lock = VAR_LOCKED;
 
     // Create one funccall_T for all eval_expr_typval() calls.
-    fc = eval_expr_get_funccal(expr, &newtv);
+    fc = eval_पाहायाग_get_funccal(पाहायाग, &newtv);
 
     if (l->lv_first == &range_list_item)
     {
@@ -2729,11 +2729,11 @@ list_filter_map(
 	{
 	    typval_T tv;
 
-	    tv.v_type = VAR_NUMBER;
+	    tv.v_type = VAR_नुमेरो;
 	    tv.v_lock = 0;
-	    tv.vval.v_number = val;
-	    set_vim_var_nr(VV_KEY, idx);
-	    if (filter_map_one(&tv, expr, filtermap, fc, &newtv, &rem) == FAIL)
+	    tv.vval.v_नुमेरो = val;
+	    set_vim_var_nr(VV_सुसि, idx);
+	    if (filter_map_one(&tv, पाहायाग, filtermap, fc, &newtv, &rem) == FAIL)
 		break;
 	    if (did_emsg)
 	    {
@@ -2774,12 +2774,12 @@ list_filter_map(
 	// Materialized list: loop over the items
 	for (li = l->lv_first; li != NULL; li = nli)
 	{
-	    if (filtermap == FILTERMAP_MAP && value_check_lock(
+	    if (filtermap == FILTERMAP_MAP && हालागा_check_lock(
 			li->li_tv.v_lock, arg_errmsg, TRUE))
 		break;
 	    nli = li->li_next;
-	    set_vim_var_nr(VV_KEY, idx);
-	    if (filter_map_one(&li->li_tv, expr, filtermap, fc,
+	    set_vim_var_nr(VV_सुसि, idx);
+	    if (filter_map_one(&li->li_tv, पाहायाग, filtermap, fc,
 							 &newtv, &rem) == FAIL)
 		break;
 	    if (did_emsg)
@@ -2823,7 +2823,7 @@ list_filter_map(
     static void
 filter_map(typval_T *argvars, typval_T *rettv, filtermap_T filtermap)
 {
-    typval_T	*expr;
+    typval_T	*पाहायाग;
     char	*func_name = filtermap == FILTERMAP_MAP ? "map()"
 				  : filtermap == FILTERMAP_MAPNEW ? "mapnew()"
 				  : filtermap == FILTERMAP_FILTER ? "filter()"
@@ -2870,28 +2870,28 @@ filter_map(typval_T *argvars, typval_T *rettv, filtermap_T filtermap)
 	    && argvars[0].v_type != VAR_DICT
 	    && argvars[0].v_type != VAR_STRING)
     {
-	char *msg;
+	char *मेनसाहे;
 
 	if (filtermap == FILTERMAP_FOREACH)
-	    msg = e_argument_of_str_must_be_list_tuple_string_dictionary_or_blob;
+	    मेनसाहे = e_argument_of_str_must_be_list_tuple_string_dictionary_or_blob;
 	else
-	    msg = e_argument_of_str_must_be_list_string_dictionary_or_blob;
-	semsg(_(msg), func_name);
+	    मेनसाहे = e_argument_of_str_must_be_list_string_dictionary_or_blob;
+	semsg(_(मेनसाहे), func_name);
 	return;
     }
 
     // On type errors, the preceding call has already displayed an error
     // message.  Avoid a misleading error message for an empty string that
     // was not passed as argument.
-    expr = &argvars[1];
-    if (expr->v_type == VAR_UNKNOWN)
+    पाहायाग = &argvars[1];
+    if (पाहायाग->v_type == VAR_UNKNOWN)
 	return;
 
     typval_T	save_val;
-    typval_T	save_key;
+    typval_T	save_सुसि;
 
     prepare_vimvar(VV_VAL, &save_val);
-    prepare_vimvar(VV_KEY, &save_key);
+    prepare_vimvar(VV_सुसि, &save_सुसि);
 
     // We reset "did_emsg" to be able to detect whether an error
     // occurred during evaluation of the expression.
@@ -2900,19 +2900,19 @@ filter_map(typval_T *argvars, typval_T *rettv, filtermap_T filtermap)
 
     if (argvars[0].v_type == VAR_DICT)
 	dict_filter_map(argvars[0].vval.v_dict, filtermap, type, func_name,
-						      arg_errmsg, expr, rettv);
+						      arg_errmsg, पाहायाग, rettv);
     else if (argvars[0].v_type == VAR_BLOB)
-	blob_filter_map(argvars[0].vval.v_blob, filtermap, expr,
+	blob_filter_map(argvars[0].vval.v_blob, filtermap, पाहायाग,
 							    arg_errmsg, rettv);
     else if (argvars[0].v_type == VAR_STRING)
-	string_filter_map(tv_get_string(&argvars[0]), filtermap, expr, rettv);
+	string_filter_map(tv_get_string(&argvars[0]), filtermap, पाहायाग, rettv);
     else if (argvars[0].v_type == VAR_TUPLE)
-	tuple_foreach(argvars[0].vval.v_tuple, filtermap, expr);
+	tuple_foreach(argvars[0].vval.v_tuple, filtermap, पाहायाग);
     else // argvars[0].v_type == VAR_LIST
 	list_filter_map(argvars[0].vval.v_list, filtermap, type, func_name,
-						      arg_errmsg, expr, rettv);
+						      arg_errmsg, पाहायाग, rettv);
 
-    restore_vimvar(VV_KEY, &save_key);
+    restore_vimvar(VV_सुसि, &save_सुसि);
     restore_vimvar(VV_VAL, &save_val);
 
     did_emsg |= save_did_emsg;
@@ -2967,7 +2967,7 @@ list_add(typval_T *argvars, typval_T *rettv)
 	if (in_vim9script())
 	    emsg(_(e_cannot_add_to_null_list));
     }
-    else if (!value_check_lock(l->lv_lock,
+    else if (!हालागा_check_lock(l->lv_lock,
 		(char_u *)N_("add() argument"), TRUE)
 	    && list_append_tv(l, &argvars[1]) == OK)
     {
@@ -2981,12 +2981,12 @@ list_add(typval_T *argvars, typval_T *rettv)
     void
 f_add(typval_T *argvars, typval_T *rettv)
 {
-    rettv->vval.v_number = 1; // Default: Failed
+    rettv->vval.v_नुमेरो = 1; // Default: Failed
 
     if (in_vim9script()
 	    && (check_for_list_or_blob_arg(argvars, 0) == FAIL
 		|| (argvars[0].v_type == VAR_BLOB
-		    && check_for_number_arg(argvars, 1) == FAIL)))
+		    && check_for_नुमेरो_arg(argvars, 1) == FAIL)))
 	return;
 
     if (argvars[0].v_type == VAR_LIST)
@@ -3002,7 +3002,7 @@ f_add(typval_T *argvars, typval_T *rettv)
  * "idx". Case is ignored if "ic" is TRUE.
  */
     static long
-list_count(list_T *l, typval_T *needle, long idx, int ic)
+list_बिलांग(list_T *l, typval_T *needle, long idx, int ic)
 {
     long	n = 0;
     listitem_T	*li;
@@ -3033,7 +3033,7 @@ list_count(list_T *l, typval_T *needle, long idx, int ic)
  * "count()" function
  */
     void
-f_count(typval_T *argvars, typval_T *rettv)
+f_बिलांग(typval_T *argvars, typval_T *rettv)
 {
     long	n = 0;
     int		ic = FALSE;
@@ -3043,14 +3043,14 @@ f_count(typval_T *argvars, typval_T *rettv)
 	    && (check_for_string_list_tuple_or_dict_arg(argvars, 0) == FAIL
 		|| check_for_opt_bool_arg(argvars, 2) == FAIL
 		|| (argvars[2].v_type != VAR_UNKNOWN
-		    && check_for_opt_number_arg(argvars, 3) == FAIL)))
+		    && check_for_opt_नुमेरो_arg(argvars, 3) == FAIL)))
 	return;
 
     if (argvars[2].v_type != VAR_UNKNOWN)
 	ic = (int)tv_get_bool_chk(&argvars[2], &error);
 
     if (!error && argvars[0].v_type == VAR_STRING)
-	n = string_count(argvars[0].vval.v_string,
+	n = string_बिलांग(argvars[0].vval.v_string,
 					tv_get_string_chk(&argvars[1]), ic);
     else if (!error && argvars[0].v_type == VAR_LIST)
     {
@@ -3058,9 +3058,9 @@ f_count(typval_T *argvars, typval_T *rettv)
 
 	if (argvars[2].v_type != VAR_UNKNOWN
 		&& argvars[3].v_type != VAR_UNKNOWN)
-	    idx = (long)tv_get_number_chk(&argvars[3], &error);
+	    idx = (long)tv_get_नुमेरो_chk(&argvars[3], &error);
 	if (!error)
-	    n = list_count(argvars[0].vval.v_list, &argvars[1], idx, ic);
+	    n = list_बिलांग(argvars[0].vval.v_list, &argvars[1], idx, ic);
     }
     else if (!error && argvars[0].v_type == VAR_TUPLE)
     {
@@ -3068,9 +3068,9 @@ f_count(typval_T *argvars, typval_T *rettv)
 
 	if (argvars[2].v_type != VAR_UNKNOWN
 		&& argvars[3].v_type != VAR_UNKNOWN)
-	    idx = (long)tv_get_number_chk(&argvars[3], &error);
+	    idx = (long)tv_get_नुमेरो_chk(&argvars[3], &error);
 	if (!error)
-	    n = tuple_count(argvars[0].vval.v_tuple, &argvars[1], idx, ic);
+	    n = tuple_बिलांग(argvars[0].vval.v_tuple, &argvars[1], idx, ic);
     }
     else if (!error && argvars[0].v_type == VAR_DICT)
     {
@@ -3078,12 +3078,12 @@ f_count(typval_T *argvars, typval_T *rettv)
 		&& argvars[3].v_type != VAR_UNKNOWN)
 	    emsg(_(e_invalid_argument));
 	else
-	    n = dict_count(argvars[0].vval.v_dict, &argvars[1], ic);
+	    n = dict_बिलांग(argvars[0].vval.v_dict, &argvars[1], ic);
     }
     else if (!error)
 	semsg(_(e_argument_of_str_must_be_list_string_or_dictionary),
 								    "count()");
-    rettv->vval.v_number = n;
+    rettv->vval.v_नुमेरो = n;
 }
 
 /*
@@ -3111,7 +3111,7 @@ list_extend_func(
 	emsg(_(e_cannot_extend_null_list));
 	return;
     }
-    if (is_new || !value_check_lock(l1->lv_lock, arg_errmsg, TRUE))
+    if (is_new || !हालागा_check_lock(l1->lv_lock, arg_errmsg, TRUE))
     {
 	if (is_new)
 	{
@@ -3126,7 +3126,7 @@ list_extend_func(
 
 	if (argvars[2].v_type != VAR_UNKNOWN)
 	{
-	    before = (long)tv_get_number_chk(&argvars[2], &error);
+	    before = (long)tv_get_नुमेरो_chk(&argvars[2], &error);
 	    if (error)
 		goto cleanup;		// type error; errmsg already given
 	    if (before == l1->lv_len)
@@ -3223,7 +3223,7 @@ f_extendnew(typval_T *argvars, typval_T *rettv)
 }
 
     static void
-list_insert_func(typval_T *argvars, typval_T *rettv)
+list_इसिंगित_func(typval_T *argvars, typval_T *rettv)
 {
     list_T	*l = argvars[0].vval.v_list;
     long	before = 0;
@@ -3237,11 +3237,11 @@ list_insert_func(typval_T *argvars, typval_T *rettv)
 	return;
     }
 
-    if (value_check_lock(l->lv_lock, (char_u *)N_("insert() argument"), TRUE))
+    if (हालागा_check_lock(l->lv_lock, (char_u *)N_("insert() argument"), TRUE))
 	return;
 
     if (argvars[2].v_type != VAR_UNKNOWN)
-	before = (long)tv_get_number_chk(&argvars[2], &error);
+	before = (long)tv_get_नुमेरो_chk(&argvars[2], &error);
     if (error)
 	return;		// type error; errmsg already given
 
@@ -3258,7 +3258,7 @@ list_insert_func(typval_T *argvars, typval_T *rettv)
     }
     if (l != NULL)
     {
-	(void)list_insert_tv(l, &argvars[1], item);
+	(void)list_इसिंगित_tv(l, &argvars[1], item);
 	copy_tv(&argvars[0], rettv);
     }
 }
@@ -3267,21 +3267,21 @@ list_insert_func(typval_T *argvars, typval_T *rettv)
  * "insert()" function
  */
     void
-f_insert(typval_T *argvars, typval_T *rettv)
+f_इसिंगित(typval_T *argvars, typval_T *rettv)
 {
     if (in_vim9script()
 	    && (check_for_list_or_blob_arg(argvars, 0) == FAIL
 		|| (argvars[0].v_type == VAR_BLOB
-		    && check_for_number_arg(argvars, 1) == FAIL)
-		|| check_for_opt_number_arg(argvars, 2) == FAIL))
+		    && check_for_नुमेरो_arg(argvars, 1) == FAIL)
+		|| check_for_opt_नुमेरो_arg(argvars, 2) == FAIL))
 	return;
 
     if (argvars[0].v_type == VAR_BLOB)
-	blob_insert_func(argvars, rettv);
+	blob_इसिंगित_func(argvars, rettv);
     else if (argvars[0].v_type != VAR_LIST)
 	semsg(_(e_argument_of_str_must_be_list_or_blob), "insert()");
     else
-	list_insert_func(argvars, rettv);
+	list_इसिंगित_func(argvars, rettv);
 }
 
 /*
@@ -3296,10 +3296,10 @@ f_remove(typval_T *argvars, typval_T *rettv)
 	    && (check_for_list_or_dict_or_blob_arg(argvars, 0) == FAIL
 		|| ((argvars[0].v_type == VAR_LIST
 			|| argvars[0].v_type == VAR_BLOB)
-		    && (check_for_number_arg(argvars, 1) == FAIL
-			|| check_for_opt_number_arg(argvars, 2) == FAIL))
+		    && (check_for_नुमेरो_arg(argvars, 1) == FAIL
+			|| check_for_opt_नुमेरो_arg(argvars, 2) == FAIL))
 		|| (argvars[0].v_type == VAR_DICT
-		    && check_for_string_or_number_arg(argvars, 1) == FAIL)))
+		    && check_for_string_or_नुमेरो_arg(argvars, 1) == FAIL)))
 	return;
 
     if (argvars[0].v_type == VAR_DICT)
@@ -3319,7 +3319,7 @@ list_reverse(list_T *l, typval_T *rettv)
 
     rettv_list_set(rettv, l);
     if (l != NULL
-	    && !value_check_lock(l->lv_lock,
+	    && !हालागा_check_lock(l->lv_lock,
 		(char_u *)N_("reverse() argument"), TRUE))
     {
 	if (l->lv_first == &range_list_item)
@@ -3378,7 +3378,7 @@ f_reverse(typval_T *argvars, typval_T *rettv)
     static void
 list_reduce(
 	typval_T	*argvars,
-	typval_T	*expr,
+	typval_T	*पाहायाग,
 	typval_T	*rettv)
 {
     list_T	*l = argvars[0].vval.v_list;
@@ -3402,13 +3402,13 @@ list_reduce(
     {
 	if (l == NULL || l->lv_len == 0)
 	{
-	    semsg(_(e_reduce_of_an_empty_str_with_no_initial_value), "List");
+	    semsg(_(e_reduce_of_an_empty_str_with_no_initial_हालागा), "List");
 	    return;
 	}
 	if (range_list)
 	{
-	    initial.v_type = VAR_NUMBER;
-	    initial.vval.v_number = range_val;
+	    initial.v_type = VAR_नुमेरो;
+	    initial.vval.v_नुमेरो = range_val;
 	    range_val += l->lv_u.nonmat.lv_stride;
 	    range_idx = 1;
 	}
@@ -3430,7 +3430,7 @@ list_reduce(
 	return;
 
     // Create one funccall_T for all eval_expr_typval() calls.
-    fc = eval_expr_get_funccal(expr, rettv);
+    fc = eval_पाहायाग_get_funccal(पाहायाग, rettv);
 
     prev_locked = l->lv_lock;
     l->lv_lock = VAR_FIXED;  // disallow the list changing here
@@ -3442,15 +3442,15 @@ list_reduce(
 
 	if (range_list)
 	{
-	    argv[1].v_type = VAR_NUMBER;
-	    argv[1].vval.v_number = range_val;
+	    argv[1].v_type = VAR_नुमेरो;
+	    argv[1].vval.v_नुमेरो = range_val;
 	}
 	else
 	    argv[1] = li->li_tv;
 
-	r = eval_expr_typval(expr, TRUE, argv, 2, fc, rettv);
+	r = eval_पाहायाग_typval(पाहायाग, TRUE, argv, 2, fc, rettv);
 
-	if (argv[0].v_type != VAR_NUMBER && argv[0].v_type != VAR_UNKNOWN)
+	if (argv[0].v_type != VAR_नुमेरो && argv[0].v_type != VAR_UNKNOWN)
 	    clear_tv(&argv[0]);
 	if (r == FAIL || called_emsg != called_emsg_start)
 	    break;
@@ -3519,8 +3519,8 @@ f_slice(typval_T *argvars, typval_T *rettv)
 		    && argvars[0].v_type != VAR_TUPLE
 		    && argvars[0].v_type != VAR_BLOB
 		    && check_for_list_arg(argvars, 0) == FAIL)
-		|| check_for_number_arg(argvars, 1) == FAIL
-		|| check_for_opt_number_arg(argvars, 2) == FAIL))
+		|| check_for_नुमेरो_arg(argvars, 1) == FAIL
+		|| check_for_opt_नुमेरो_arg(argvars, 2) == FAIL))
 	return;
 
     if (check_can_index(&argvars[0], TRUE, FALSE) != OK)

@@ -127,15 +127,15 @@ class VimFormView;
 class VimTextAreaView;
 class VimWindow;
 class VimToolbar;
-class VimTabLine;
+class Vim_Tab_लिन्या;
 
-extern key_map *keyMap;
-extern char *keyMapChars;
+extern सुसि_map *सुसि_Map;
+extern char *सुसि_Map_Chars;
 
 extern int main(int argc, char **argv);
 
-#ifndef B_MAX_PORT_COUNT
-#define B_MAX_PORT_COUNT    255
+#ifndef B_MAX_PORT_बिलांग
+#define B_MAX_PORT_बिलांग    255
 #endif
 
 // VimApp seems comparable to the X "vimShell"
@@ -150,7 +150,7 @@ class VimApp: public BApplication
 #if 0
     virtual void DispatchMessage(BMessage *m, BHandler *h)
     {
-	m->PrintToStream();
+	m->इलिम्बाग_To_Stream();
 	Inherited::DispatchMessage(m, h);
     }
 #endif
@@ -223,13 +223,13 @@ class VimFormView: public BView
 
 #ifdef FEAT_GUI_TABLINE
     public:
-    VimTabLine *TabLine() const	{ return tabLine; }
-    bool IsShowingTabLine() const { return showingTabLine; }
-    void SetShowingTabLine(bool showing) { showingTabLine = showing;	}
+    Vim_Tab_लिन्या *Tab_लिन्या() const	{ return tab_लिन्या; }
+    bool Is_Showing_Tab_लिन्या() const { return showing_Tab_लिन्या; }
+    void Set_Showing_Tab_लिन्या(bool showing) { showing_Tab_लिन्या = showing;	}
     float TablineHeight() const;
     private:
-    VimTabLine	*tabLine;
-    int	showingTabLine;
+    Vim_Tab_लिन्या	*tab_लिन्या;
+    int	showing_Tab_लिन्या;
 #endif
 };
 
@@ -242,7 +242,7 @@ class VimTextAreaView: public BView
 
     // callbacks:
     virtual void Draw(BRect updateRect);
-    virtual void KeyDown(const char *bytes, int32 numBytes);
+    virtual void सुसि_Down(const char *bytes, int32 नुमेरो_Bytes);
     virtual void MouseDown(BPoint point);
     virtual void MouseUp(BPoint point);
     virtual void MouseMoved(BPoint point, uint32 transit, const BMessage *message);
@@ -253,15 +253,15 @@ class VimTextAreaView: public BView
     void mchDrawString(int row, int col, char_u *s, int len, int flags);
     void mchClearBlock(int row1, int col1, int row2, int col2);
     void mchClearAll();
-    void mchDeleteLines(int row, int num_lines);
-    void mchInsertLines(int row, int num_lines);
+    void mch_Delete_मगा_लिन्या(int row, int नुमेरो_मगा_लिन्या);
+    void mch_इसिंगित_मगा_लिन्या(int row, int नुमेरो_मगा_लिन्या);
 
     static void guiSendMouseEvent(int button, int x, int y, int repeated_click, int_u modifiers);
     static void guiMouseMoved(int x, int y);
     static void guiBlankMouse(bool should_hide);
     static int_u mouseModifiersToVim(int32 beModifiers);
 
-    int32 mouseDragEventCount;
+    int32 mouse_Drag_Event_बिलांग;
 
 #ifdef FEAT_MBYTE_IME
     void DrawIMString(void);
@@ -280,7 +280,7 @@ class VimTextAreaView: public BView
 	BPoint location;
 	int row;
 	int col;
-	int count;
+	int बिलांग;
     } IMData;
 #endif
 };
@@ -292,17 +292,17 @@ class VimScrollBar: public BScrollBar
     VimScrollBar(scrollbar_T *gsb, orientation posture);
     ~VimScrollBar();
 
-    virtual void ValueChanged(float newValue);
+    virtual void हालागा_Changed(float new_हालागा);
     virtual void MouseUp(BPoint where);
-    void SetValue(float newval);
+    void Set_हालागा(float newval);
     scrollbar_T *getGsb()
     { return gsb; }
 
-    int32	scrollEventCount;
+    int32	scroll_Event_बिलांग;
 
     private:
     scrollbar_T *gsb;
-    float   ignoreValue;
+    float   ignore_हालागा;
 };
 
 
@@ -344,7 +344,7 @@ const float ButtonMargin  = 3.;
 
 #ifdef FEAT_GUI_TABLINE
 
-class VimTabLine : public BTabView
+class Vim_Tab_लिन्या : public BTabView
 {
     public:
 	class VimTab : public BTab {
@@ -354,8 +354,8 @@ class VimTabLine : public BTabView
 	    virtual void Select(BView* owner);
 	};
 
-	VimTabLine(BRect r) : BTabView(r, "vimTabLine", B_WIDTH_FROM_LABEL,
-	       B_FOLLOW_LEFT | B_FOLLOW_TOP | B_FOLLOW_RIGHT, B_WILL_DRAW | B_FRAME_EVENTS) {}
+	Vim_Tab_लिन्या(BRect r) : BTabView(r, "vimTabLine", B_WIDTH_FROM_LABEL,
+	       B_FOLLOW_कालिवा | B_FOLLOW_इताअस | B_FOLLOW_कानान, B_WILL_DRAW | B_FRAME_EVENTS) {}
 
     float TablineHeight() const;
     virtual void MouseDown(BPoint point);
@@ -415,15 +415,15 @@ class VimDialog : public BWindow
 
     int Go();
 
-    virtual void MessageReceived(BMessage *msg);
+    virtual void MessageReceived(BMessage *मेनसाहे);
 
     private:
     sem_id	    fDialogSem;
-    int		    fDialogValue;
+    int		    f_Dialog_हालागा;
     BList	    fButtonsList;
     BTextView*	    fMessageView;
-    BTextControl*   fInputControl;
-    const char*	    fInputValue;
+    BTextControl*   f_पासोक_Control;
+    const char*	    f_पासोक_हालागा;
 };
 
 class VimSelectFontDialog : public BWindow
@@ -432,7 +432,7 @@ class VimSelectFontDialog : public BWindow
 
     void _CleanList(BListView* list);
     void _UpdateFontStyles();
-    void _UpdateSizeInputPreview();
+    void Update_Size_पासोक_Preview();
     void _UpdateFontPreview();
     bool _UpdateFromListItem(BListView* list, char* text, int textSize);
     public:
@@ -442,12 +442,12 @@ class VimSelectFontDialog : public BWindow
 
     bool Go();
 
-    virtual void MessageReceived(BMessage *msg);
+    virtual void MessageReceived(BMessage *मेनसाहे);
 
     private:
     status_t	    fStatus;
     sem_id	    fDialogSem;
-    bool	    fDialogValue;
+    bool	    f_Dialog_हालागा;
     font_family*    fFamily;
     font_style*	    fStyle;
     float*	    fSize;
@@ -458,14 +458,14 @@ class VimSelectFontDialog : public BWindow
     BListView*	    fFamiliesList;
     BListView*	    fStylesList;
     BListView*	    fSizesList;
-    BTextControl*   fSizesInput;
+    BTextControl*   f_Sizes_पासोक;
 };
 
 #endif // FEAT_GUI_DIALOG
 
 // ---------------- end of GUI classes ----------------
 
-struct MainArgs {
+struct Main_मगा_कातविरान {
     int	     argc;
     char    **argv;
 };
@@ -475,33 +475,33 @@ struct MainArgs {
 // They must be of POD type (Plain Old Data)
 // as the C++ standard calls them.
 
-#define	KEY_MSG_BUFSIZ	7
-#if KEY_MSG_BUFSIZ < MAX_KEY_CODE_LEN
-#error Increase KEY_MSG_BUFSIZ!
+#define	सुसि_मेनसाहे_BUFSIZ	7
+#if सुसि_मेनसाहे_BUFSIZ < MAX_सुसि_CODE_LEN
+#error Increase सुसि_मेनसाहे_BUFSIZ!
 #endif
 
-struct VimKeyMsg {
+struct Vim_सुसि_मेनसाहे {
     char_u  length;
-    char_u  chars[KEY_MSG_BUFSIZ];  // contains Vim encoding
+    char_u  chars[सुसि_मेनसाहे_BUFSIZ];  // contains Vim encoding
     bool    csi_escape;
 };
 
-struct VimResizeMsg {
+struct Vim_Resize_मेनसाहे {
     int	    width;
     int	    height;
 };
 
-struct VimScrollBarMsg {
+struct Vim_Scroll_Bar_मेनसाहे {
     VimScrollBar *sb;
-    long    value;
+    long    हालागा;
     int	    stillDragging;
 };
 
-struct VimMenuMsg {
+struct Vim_Menu_मेनसाहे {
     vimmenu_T	*guiMenu;
 };
 
-struct VimMouseMsg {
+struct Vim_Mouse_मेनसाहे {
     int	    button;
     int	    x;
     int	    y;
@@ -509,45 +509,45 @@ struct VimMouseMsg {
     int_u   modifiers;
 };
 
-struct VimMouseMovedMsg {
+struct Vim_Mouse_Moved_मेनसाहे {
     int	    x;
     int	    y;
 };
 
-struct VimFocusMsg {
+struct Vim_Focus_मेनसाहे {
     bool    active;
 };
 
-struct VimRefsMsg {
+struct Vim_Refs_मेनसाहे {
     BMessage   *message;
     bool    changedir;
 };
 
-struct VimTablineMsg {
+struct Vim_Tabline_मेनसाहे {
     int	    index;
 };
 
-struct VimTablineMenuMsg {
+struct Vim_Tabline_Menu_मेनसाहे {
     int	    index;
     int	    event;
 };
 
-struct VimMsg {
-    enum VimMsgType {
-	Key, Resize, ScrollBar, Menu, Mouse, MouseMoved, Focus, Refs, Tabline, TablineMenu
+struct Vim_मेनसाहे {
+    enum Vim_मेनसाहे_Type {
+	सुसि_2, Resize, ScrollBar, Menu, Mouse, MouseMoved, Focus, Refs, Tabline, TablineMenu
     };
 
     union {
-	struct VimKeyMsg    Key;
-	struct VimResizeMsg NewSize;
-	struct VimScrollBarMsg	Scroll;
-	struct VimMenuMsg   Menu;
-	struct VimMouseMsg  Mouse;
-	struct VimMouseMovedMsg	MouseMoved;
-	struct VimFocusMsg  Focus;
-	struct VimRefsMsg   Refs;
-	struct VimTablineMsg	Tabline;
-	struct VimTablineMenuMsg    TablineMenu;
+	struct Vim_सुसि_मेनसाहे    सुसि_2;
+	struct Vim_Resize_मेनसाहे NewSize;
+	struct Vim_Scroll_Bar_मेनसाहे	Scroll;
+	struct Vim_Menu_मेनसाहे   Menu;
+	struct Vim_Mouse_मेनसाहे  Mouse;
+	struct Vim_Mouse_Moved_मेनसाहे	MouseMoved;
+	struct Vim_Focus_मेनसाहे  Focus;
+	struct Vim_Refs_मेनसाहे   Refs;
+	struct Vim_Tabline_मेनसाहे	Tabline;
+	struct Vim_Tabline_Menu_मेनसाहे    TablineMenu;
     } u;
 };
 
@@ -558,40 +558,40 @@ struct VimMsg {
 
 static struct specialkey
 {
-    uint16  BeKeys;
-#define KEY(a,b)    ((a)<<8|(b))
-#define K(a)	    KEY(0,a)		// for ASCII codes
-#define F(b)	    KEY(1,b)		// for scancodes
+    uint16  Be_मगा_सुसि;
+#define सुसि_3(a,b)    ((a)<<8|(b))
+#define K(a)	    सुसि_3(0,a)		// for ASCII codes
+#define F(b)	    सुसि_3(1,b)		// for scancodes
     char_u  vim_code0;
     char_u  vim_code1;
-} special_keys[] =
+} special_मगा_सुसि[] =
 {
     {K(B_UP_ARROW),	'k', 'u'},
     {K(B_DOWN_ARROW),	    'k', 'd'},
-    {K(B_LEFT_ARROW),	    'k', 'l'},
-    {K(B_RIGHT_ARROW),	    'k', 'r'},
+    {K(B_कालिवा_ARROW),	    'k', 'l'},
+    {K(B_कानान_ARROW),	    'k', 'r'},
     {K(B_BACKSPACE),	    'k', 'b'},
-    {K(B_INSERT),	'k', 'I'},
+    {K(B_इसिंगित),	'k', 'I'},
     {K(B_DELETE),	'k', 'D'},
     {K(B_HOME),		'k', 'h'},
     {K(B_END),		'@', '7'},
     {K(B_PAGE_UP),	'k', 'P'},	// XK_Prior
     {K(B_PAGE_DOWN),	    'k', 'N'},	    // XK_Next,
 
-#define FIRST_FUNCTION_KEY  11
-    {F(B_F1_KEY),	'k', '1'},
-    {F(B_F2_KEY),	'k', '2'},
-    {F(B_F3_KEY),	'k', '3'},
-    {F(B_F4_KEY),	'k', '4'},
-    {F(B_F5_KEY),	'k', '5'},
-    {F(B_F6_KEY),	'k', '6'},
-    {F(B_F7_KEY),	'k', '7'},
-    {F(B_F8_KEY),	'k', '8'},
-    {F(B_F9_KEY),	'k', '9'},
-    {F(B_F10_KEY),	'k', ';'},
+#define FIRST_FUNCTION_सुसि  11
+    {F(B_F1_सुसि),	'k', '1'},
+    {F(B_F2_सुसि),	'k', '2'},
+    {F(B_F3_सुसि),	'k', '3'},
+    {F(B_F4_सुसि),	'k', '4'},
+    {F(B_F5_सुसि),	'k', '5'},
+    {F(B_F6_सुसि),	'k', '6'},
+    {F(B_F7_सुसि),	'k', '7'},
+    {F(B_F8_सुसि),	'k', '8'},
+    {F(B_F9_सुसि),	'k', '9'},
+    {F(B_F10_सुसि),	'k', ';'},
 
-    {F(B_F11_KEY),	'F', '1'},
-    {F(B_F12_KEY),	'F', '2'},
+    {F(B_F11_सुसि),	'F', '1'},
+    {F(B_F12_सुसि),	'F', '2'},
     //	{XK_F13,	    'F', '3'},	// would be print screen
     // sysreq
     {F(0x0F),		'F', '4'},	// scroll lock
@@ -618,7 +618,7 @@ static struct specialkey
     //	{XK_F35,	'F', 'P'},	// keysymdef.h defines up to F35
 
     //	{XK_Help,	'%', '1'},	// XK_Help
-    {F(B_PRINT_KEY),	    '%', '9'},
+    {F(B_इलिम्बाग_सुसि),	    '%', '9'},
 
 #if 0
     // Keypad keys:
@@ -639,7 +639,7 @@ static struct specialkey
     {0,		    0, 0}
 };
 
-#define NUM_SPECIAL_KEYS    ARRAY_LENGTH(special_keys)
+#define नुमेरो_SPECIAL_मगा_सुसि    ARRAY_LENGTH(special_मगा_सुसि)
 
 // ---------------- VimApp ----------------
 
@@ -665,18 +665,18 @@ drop_callback(void *cookie)
 RefsReceived(BMessage *m, bool changedir)
 {
     uint32 type;
-    int32 count;
+    int32 बिलांग;
 
-    m->PrintToStream();
+    m->इलिम्बाग_To_Stream();
     switch (m->what) {
 	case B_REFS_RECEIVED:
 	case B_SIMPLE_DATA:
-	    m->GetInfo("refs", &type, &count);
+	    m->GetInfo("refs", &type, &बिलांग);
 	    if (type != B_REF_TYPE)
 		goto bad;
 	    break;
 	case B_ARGV_RECEIVED:
-	    m->GetInfo("argv", &type, &count);
+	    m->GetInfo("argv", &type, &बिलांग);
 	    if (type != B_STRING_TYPE)
 		goto bad;
 	    if (changedir) {
@@ -699,14 +699,14 @@ bad:
 #endif
 
     char_u  **fnames;
-    fnames = (char_u **) alloc(count * sizeof(char_u *));
+    fnames = (char_u **) alloc(बिलांग * sizeof(char_u *));
     int fname_index = 0;
 
     switch (m->what) {
 	case B_REFS_RECEIVED:
 	case B_SIMPLE_DATA:
 	    // fprintf(stderr, "case B_REFS_RECEIVED\n");
-	    for (int i = 0; i < count; ++i)
+	    for (int i = 0; i < बिलांग; ++i)
 	    {
 		entry_ref ref;
 		if (m->FindRef("refs", i, &ref) == B_OK) {
@@ -743,7 +743,7 @@ bad:
 	    break;
 	case B_ARGV_RECEIVED:
 	    // fprintf(stderr, "case B_ARGV_RECEIVED\n");
-	    for (int i = 1; i < count; ++i)
+	    for (int i = 1; i < बिलांग; ++i)
 	    {
 		char *fname;
 
@@ -831,11 +831,11 @@ VimApp::RefsReceived(BMessage *m)
     void
 VimApp::SendRefs(BMessage *m, bool changedir)
 {
-    VimRefsMsg rm;
+    Vim_Refs_मेनसाहे rm;
     rm.message = m;
     rm.changedir = changedir;
 
-    write_port(gui.vdcmp, VimMsg::Refs, &rm, sizeof(rm));
+    write_port(gui.vdcmp, Vim_मेनसाहे::Refs, &rm, sizeof(rm));
     //	calls ::RefsReceived
 }
 
@@ -958,20 +958,20 @@ VimWindow::WindowActivated(bool active)
     if (active && gui.vimTextArea)
 	gui.vimTextArea->MakeFocus(true);
 
-    struct VimFocusMsg fm;
+    struct Vim_Focus_मेनसाहे fm;
     fm.active = active;
 
-    write_port(gui.vdcmp, VimMsg::Focus, &fm, sizeof(fm));
+    write_port(gui.vdcmp, Vim_मेनसाहे::Focus, &fm, sizeof(fm));
 }
 
     bool
 VimWindow::QuitRequested()
 {
-    struct VimKeyMsg km;
+    struct Vim_सुसि_मेनसाहे km;
     km.length = 5;
     memcpy((char *)km.chars, "\033:qa\r", km.length);
     km.csi_escape = false;
-    write_port(gui.vdcmp, VimMsg::Key, &km, sizeof(km));
+    write_port(gui.vdcmp, Vim_मेनसाहे::सुसि_2, &km, sizeof(km));
     return false;
 }
     void
@@ -981,21 +981,21 @@ VimWindow::DispatchMessage(BMessage *m, BHandler *h)
 
     switch (m->what)
     {
-	case B_KEY_DOWN:
+	case B_सुसि_DOWN:
 	    {
 		int32 scancode = 0;
 		int32 beModifiers = 0;
 		m->FindInt32("raw_char", &scancode);
 		m->FindInt32("modifiers", &beModifiers);
 
-		if (scancode == B_ENTER && (beModifiers & B_LEFT_COMMAND_KEY))
+		if (scancode == B_ENTER && (beModifiers & B_कालिवा_COMMAND_सुसि))
 		    {
 			should_propagate = false;
 			if (this->is_fullscreen)
 			    {
 				this->is_fullscreen = false;
 				ResizeTo(this->saved_frame.Width(), this->saved_frame.Height());
-				MoveTo(this->saved_frame.left, this->saved_frame.top);
+				MoveTo(this->saved_frame.कालिवा, this->saved_frame.इताअस);
 				SetLook(this->saved_look);
 				SetFlags(Flags() & ~(B_NOT_RESIZABLE | B_NOT_MOVABLE));
 			    } else {
@@ -1005,7 +1005,7 @@ VimWindow::DispatchMessage(BMessage *m, BHandler *h)
 				BScreen s(this);
 				SetLook(B_NO_BORDER_WINDOW_LOOK);
 				ResizeTo(s.Frame().Width() + 1, s.Frame().Height() + 1);
-				MoveTo(s.Frame().left, s.Frame().top);
+				MoveTo(s.Frame().कालिवा, s.Frame().इताअस);
 				SetFlags(Flags() | (B_NOT_RESIZABLE | B_NOT_MOVABLE));
 			    }
 		    }
@@ -1028,7 +1028,7 @@ VimFormView::VimFormView(BRect frame):
 #endif
 #ifdef FEAT_GUI_TABLINE
 //  showingTabLine(false),
-    tabLine(NULL),
+    tab_लिन्या(NULL),
 #endif
     textArea(NULL)
 {
@@ -1051,7 +1051,7 @@ VimFormView::~VimFormView()
 #endif
 
 #ifdef FEAT_GUI_TABLINE
-    delete tabLine;
+    delete tab_लिन्या;
 #endif
 
     if (textArea) {
@@ -1076,9 +1076,9 @@ VimFormView::init(BRect frame)
 #endif
 
 #ifdef FEAT_GUI_TABLINE
-    tabLine = new VimTabLine(BRect(0,0,0,0));
+    tab_लिन्या = new Vim_Tab_लिन्या(BRect(0,0,0,0));
 //  tabLine->PrepareButtonBitmaps();
-    AddChild(tabLine);
+    AddChild(tab_लिन्या);
 #endif
 
     BRect remaining = frame;
@@ -1101,7 +1101,7 @@ VimFormView::ToolbarHeight() const
     float
 VimFormView::TablineHeight() const
 {
-    return (tabLine && IsShowingTabLine()) ? tabLine->TablineHeight() : 0.;
+    return (tab_लिन्या && Is_Showing_Tab_लिन्या()) ? tab_लिन्या->TablineHeight() : 0.;
 }
 #endif
 
@@ -1124,27 +1124,27 @@ VimFormView::AllAttached()
 	BRect remaining = Bounds();
 
 #ifdef FEAT_MENU
-	remaining.top += MenuHeight();
-	menuBar->ResizeTo(remaining.right, remaining.top);
+	remaining.इताअस += MenuHeight();
+	menuBar->ResizeTo(remaining.कानान, remaining.इताअस);
 	gui.menu_height = (int) MenuHeight();
 #endif
 
 #ifdef FEAT_TOOLBAR
-	toolBar->MoveTo(remaining.left, remaining.top);
-	toolBar->ResizeTo(remaining.right, ToolbarHeight());
-	remaining.top += ToolbarHeight();
+	toolBar->MoveTo(remaining.कालिवा, remaining.इताअस);
+	toolBar->ResizeTo(remaining.कानान, ToolbarHeight());
+	remaining.इताअस += ToolbarHeight();
 	gui.toolbar_height = ToolbarHeight();
 #endif
 
 #ifdef FEAT_GUI_TABLINE
-	tabLine->MoveTo(remaining.left, remaining.top);
-	tabLine->ResizeTo(remaining.right + 1, TablineHeight());
-	remaining.top += TablineHeight();
+	tab_लिन्या->MoveTo(remaining.कालिवा, remaining.इताअस);
+	tab_लिन्या->ResizeTo(remaining.कानान + 1, TablineHeight());
+	remaining.इताअस += TablineHeight();
 	gui.tabline_height = TablineHeight();
 #endif
 
 	textArea->ResizeTo(remaining.Width(), remaining.Height());
-	textArea->MoveTo(remaining.left, remaining.top);
+	textArea->MoveTo(remaining.कालिवा, remaining.इताअस);
     }
 
 
@@ -1154,7 +1154,7 @@ VimFormView::AllAttached()
     void
 VimFormView::FrameResized(float new_width, float new_height)
 {
-    struct VimResizeMsg sm;
+    struct Vim_Resize_मेनसाहे sm;
     int adjust_h, adjust_w;
 
     new_width += 1;	//  adjust from width to number of pixels occupied
@@ -1170,7 +1170,7 @@ VimFormView::FrameResized(float new_width, float new_height)
 	sm.height -= adjust_h;
     }
 
-    write_port(gui.vdcmp, VimMsg::Resize, &sm, sizeof(sm));
+    write_port(gui.vdcmp, Vim_मेनसाहे::Resize, &sm, sizeof(sm));
     //	calls gui_resize_shell(new_width, new_height);
 
     return;
@@ -1188,12 +1188,12 @@ VimFormView::FrameResized(float new_width, float new_height)
 VimTextAreaView::VimTextAreaView(BRect frame):
     BView(frame, "VimTextAreaView", B_FOLLOW_ALL_SIDES,
 #ifdef FEAT_MBYTE_IME
-	B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE | B_INPUT_METHOD_AWARE
+	B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE | B_पासोक_METHOD_AWARE
 #else
 	B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE
 #endif
 	),
-    mouseDragEventCount(0)
+    mouse_Drag_Event_बिलांग(0)
 {
 #ifdef FEAT_MBYTE_IME
     IMData.messenger = NULL;
@@ -1239,26 +1239,26 @@ VimTextAreaView::Draw(BRect updateRect)
      *	However, it would not hurt.
      */
     rgb_color rgb = GUI_TO_RGB(gui.back_pixel);
-    SetLowColor(rgb);
-    FillRect(updateRect, B_SOLID_LOW);
-    gui_redraw((int) updateRect.left, (int) updateRect.top,
+    Set_माबाबा_Color(rgb);
+    FillRect(updateRect, B_SOLID_माबाबा);
+    gui_redraw((int) updateRect.कालिवा, (int) updateRect.इताअस,
 	    (int) (updateRect.Width() + PEN_WIDTH), (int) (updateRect.Height() + PEN_WIDTH));
 
     // Clear the border areas if needed
-    SetLowColor(rgb);
+    Set_माबाबा_Color(rgb);
 
-    if (updateRect.left < FILL_X(0))	//  left border
-	FillRect(BRect(updateRect.left, updateRect.top,
-		    FILL_X(0)-PEN_WIDTH, updateRect.bottom), B_SOLID_LOW);
-    if (updateRect.top < FILL_Y(0)) //	top border
-	FillRect(BRect(updateRect.left, updateRect.top,
-		    updateRect.right, FILL_Y(0)-PEN_WIDTH), B_SOLID_LOW);
-    if (updateRect.right >= FILL_X(Columns)) //  right border
-	FillRect(BRect(FILL_X((int)Columns), updateRect.top,
-		    updateRect.right, updateRect.bottom), B_SOLID_LOW);
+    if (updateRect.कालिवा < FILL_X(0))	//  left border
+	FillRect(BRect(updateRect.कालिवा, updateRect.इताअस,
+		    FILL_X(0)-PEN_WIDTH, updateRect.bottom), B_SOLID_माबाबा);
+    if (updateRect.इताअस < FILL_Y(0)) //	top border
+	FillRect(BRect(updateRect.कालिवा, updateRect.इताअस,
+		    updateRect.कानान, FILL_Y(0)-PEN_WIDTH), B_SOLID_माबाबा);
+    if (updateRect.कानान >= FILL_X(Columns)) //  right border
+	FillRect(BRect(FILL_X((int)Columns), updateRect.इताअस,
+		    updateRect.कानान, updateRect.bottom), B_SOLID_माबाबा);
     if (updateRect.bottom >= FILL_Y(Rows))   //  bottom border
-	FillRect(BRect(updateRect.left, FILL_Y((int)Rows),
-		    updateRect.right, updateRect.bottom), B_SOLID_LOW);
+	FillRect(BRect(updateRect.कालिवा, FILL_Y((int)Rows),
+		    updateRect.कानान, updateRect.bottom), B_SOLID_माबाबा);
 
 #ifdef FEAT_MBYTE_IME
     DrawIMString();
@@ -1266,15 +1266,15 @@ VimTextAreaView::Draw(BRect updateRect)
 }
 
     void
-VimTextAreaView::KeyDown(const char *bytes, int32 numBytes)
+VimTextAreaView::सुसि_Down(const char *bytes, int32 नुमेरो_Bytes)
 {
-    struct VimKeyMsg km;
+    struct Vim_सुसि_मेनसाहे km;
     char_u *dest = km.chars;
 
     bool canHaveVimModifiers = false;
 
-    BMessage *msg = Window()->CurrentMessage();
-    assert(msg);
+    BMessage *मेनसाहे = Window()->CurrentMessage();
+    assert(मेनसाहे);
     // msg->PrintToStream();
 
     /*
@@ -1287,19 +1287,19 @@ VimTextAreaView::KeyDown(const char *bytes, int32 numBytes)
      * TODO: I'm not quite happy with detection of special
      * keys. Perhaps I should use scan codes after all...
      */
-    if (numBytes > 1) {
+    if (नुमेरो_Bytes > 1) {
 	// This cannot be a special key
-	if (numBytes > KEY_MSG_BUFSIZ)
-	    numBytes = KEY_MSG_BUFSIZ;	    //	should never happen... ???
-	km.length = numBytes;
-	memcpy((char *)dest, bytes, numBytes);
+	if (नुमेरो_Bytes > सुसि_मेनसाहे_BUFSIZ)
+	    नुमेरो_Bytes = सुसि_मेनसाहे_BUFSIZ;	    //	should never happen... ???
+	km.length = नुमेरो_Bytes;
+	memcpy((char *)dest, bytes, नुमेरो_Bytes);
 	km.csi_escape = true;
     } else {
 	int32 scancode = 0;
-	msg->FindInt32("key", &scancode);
+	मेनसाहे->FindInt32("key", &scancode);
 
 	int32 beModifiers = 0;
-	msg->FindInt32("modifiers", &beModifiers);
+	मेनसाहे->FindInt32("modifiers", &beModifiers);
 
 	char_u string[3];
 	int len = 0;
@@ -1312,7 +1312,7 @@ VimTextAreaView::KeyDown(const char *bytes, int32 numBytes)
 	assert(B_BACKSPACE <= 0x20);
 	assert(B_DELETE == 0x7F);
 	if (((char_u)bytes[0] <= 0x20 || (char_u)bytes[0] == 0x7F) &&
-		numBytes == 1) {
+		नुमेरो_Bytes == 1) {
 	    /*
 	     * Due to the great nature of Be's mapping of special keys,
 	     * viz. into the range of the control characters,
@@ -1320,10 +1320,10 @@ VimTextAreaView::KeyDown(const char *bytes, int32 numBytes)
 	     * if it is special without using ctrl. So, only if ctrl is
 	     * used, we need to check it unmodified.
 	     */
-	    if (beModifiers & B_CONTROL_KEY) {
-		int index = keyMap->normal_map[scancode];
-		int newNumBytes = keyMapChars[index];
-		char_u *newBytes = (char_u *)&keyMapChars[index + 1];
+	    if (beModifiers & B_CONTROL_सुसि) {
+		int index = सुसि_Map->normal_map[scancode];
+		int new_नुमेरो_Bytes = सुसि_Map_Chars[index];
+		char_u *newBytes = (char_u *)&सुसि_Map_Chars[index + 1];
 
 		/*
 		 * Check if still special without the control key.
@@ -1331,7 +1331,7 @@ VimTextAreaView::KeyDown(const char *bytes, int32 numBytes)
 		 * different values with modifiers (DEL).
 		 * Otherwise we could simply have checked for equality.
 		 */
-		if (newNumBytes != 1 || (*newBytes > 0x20 &&
+		if (new_नुमेरो_Bytes != 1 || (*newBytes > 0x20 &&
 			    *newBytes != 0x7F )) {
 		    goto notspecial;
 		}
@@ -1346,10 +1346,10 @@ VimTextAreaView::KeyDown(const char *bytes, int32 numBytes)
 	     * If numBytes == 0 that probably always indicates a special key.
 	     * (does not happen yet)
 	     */
-	    if (numBytes == 0 || bytes[0] == B_FUNCTION_KEY) {
+	    if (नुमेरो_Bytes == 0 || bytes[0] == B_FUNCTION_सुसि) {
 		beoskey = F(scancode);
-		first = FIRST_FUNCTION_KEY;
-		last = NUM_SPECIAL_KEYS;
+		first = FIRST_FUNCTION_सुसि;
+		last = नुमेरो_SPECIAL_मगा_सुसि;
 	    } else if (*bytes == '\n' && scancode == 0x47) {
 		// remap the (non-keypad) ENTER key from \n to \r.
 		string[0] = '\r';
@@ -1358,14 +1358,14 @@ VimTextAreaView::KeyDown(const char *bytes, int32 numBytes)
 	    } else {
 		beoskey = K(bytes[0]);
 		first = 0;
-		last = FIRST_FUNCTION_KEY;
+		last = FIRST_FUNCTION_सुसि;
 	    }
 
 	    for (int i = first; i < last; i++) {
-		if (special_keys[i].BeKeys == beoskey) {
+		if (special_मगा_सुसि[i].Be_मगा_सुसि == beoskey) {
 		    string[0] = CSI;
-		    string[1] = special_keys[i].vim_code0;
-		    string[2] = special_keys[i].vim_code1;
+		    string[1] = special_मगा_सुसि[i].vim_code0;
+		    string[2] = special_मगा_सुसि[i].vim_code1;
 		    len = 3;
 		}
 	    }
@@ -1388,11 +1388,11 @@ notspecial:
 	    {
 		int modifiers;
 		modifiers = 0;
-		if (beModifiers & B_SHIFT_KEY)
+		if (beModifiers & B_SHIFT_सुसि)
 		    modifiers |= MOD_MASK_SHIFT;
-		if (beModifiers & B_CONTROL_KEY)
+		if (beModifiers & B_CONTROL_सुसि)
 		    modifiers |= MOD_MASK_CTRL;
-		if (beModifiers & B_OPTION_KEY)
+		if (beModifiers & B_OPTION_सुसि)
 		    modifiers |= MOD_MASK_ALT;
 
 		/*
@@ -1401,22 +1401,22 @@ notspecial:
 		 * string[0] != CSI? (Not for BeOS, since len == 3 implies
 		 * string[0] == CSI...)
 		 */
-		int key;
+		int सुसि;
 		if (string[0] == CSI && len == 3)
-		    key = TO_SPECIAL(string[1], string[2]);
+		    सुसि = TO_SPECIAL(string[1], string[2]);
 		else
-		    key = string[0];
-		key = simplify_key(key, &modifiers);
-		if (IS_SPECIAL(key))
+		    सुसि = string[0];
+		सुसि = simplify_सुसि(सुसि, &modifiers);
+		if (IS_SPECIAL(सुसि))
 		{
 		    string[0] = CSI;
-		    string[1] = K_SECOND(key);
-		    string[2] = K_THIRD(key);
+		    string[1] = K_SECOND(सुसि);
+		    string[2] = K_THIRD(सुसि);
 		    len = 3;
 		}
 		else
 		{
-		    string[0] = key;
+		    string[0] = सुसि;
 		    len = 1;
 		}
 
@@ -1433,7 +1433,7 @@ notspecial:
 	km.csi_escape = false;
     }
 
-    write_port(gui.vdcmp, VimMsg::Key, &km, sizeof(km));
+    write_port(gui.vdcmp, Vim_मेनसाहे::सुसि_2, &km, sizeof(km));
 
     /*
      * blank out the pointer if necessary
@@ -1452,7 +1452,7 @@ VimTextAreaView::guiSendMouseEvent(
 	int	repeated_click,
 	int_u	modifiers)
 {
-    VimMouseMsg mm;
+    Vim_Mouse_मेनसाहे mm;
 
     mm.button = button;
     mm.x = x;
@@ -1460,7 +1460,7 @@ VimTextAreaView::guiSendMouseEvent(
     mm.repeated_click = repeated_click;
     mm.modifiers = modifiers;
 
-    write_port(gui.vdcmp, VimMsg::Mouse, &mm, sizeof(mm));
+    write_port(gui.vdcmp, Vim_मेनसाहे::Mouse, &mm, sizeof(mm));
     //	calls gui_send_mouse_event()
 
     /*
@@ -1478,12 +1478,12 @@ VimTextAreaView::guiMouseMoved(
 	int	x,
 	int	y)
 {
-    VimMouseMovedMsg mm;
+    Vim_Mouse_Moved_मेनसाहे mm;
 
     mm.x = x;
     mm.y = y;
 
-    write_port(gui.vdcmp, VimMsg::MouseMoved, &mm, sizeof(mm));
+    write_port(gui.vdcmp, Vim_मेनसाहे::MouseMoved, &mm, sizeof(mm));
 
     if (gui.pointer_hidden)
     {
@@ -1513,11 +1513,11 @@ VimTextAreaView::mouseModifiersToVim(int32 beModifiers)
 {
     int_u vim_modifiers = 0x0;
 
-    if (beModifiers & B_SHIFT_KEY)
+    if (beModifiers & B_SHIFT_सुसि)
 	vim_modifiers |= MOUSE_SHIFT;
-    if (beModifiers & B_CONTROL_KEY)
+    if (beModifiers & B_CONTROL_सुसि)
 	vim_modifiers |= MOUSE_CTRL;
-    if (beModifiers & B_OPTION_KEY)	// Alt or Meta key
+    if (beModifiers & B_OPTION_सुसि)	// Alt or Meta key
 	vim_modifiers |= MOUSE_ALT;
 
     return vim_modifiers;
@@ -1535,11 +1535,11 @@ VimTextAreaView::MouseDown(BPoint point)
     int vimButton;
 
     if (buttons & B_PRIMARY_MOUSE_BUTTON)
-	vimButton = MOUSE_LEFT;
+	vimButton = MOUSE_कालिवा;
     else if (buttons & B_SECONDARY_MOUSE_BUTTON)
-	vimButton = MOUSE_RIGHT;
+	vimButton = MOUSE_कानान;
     else if (buttons & B_TERTIARY_MOUSE_BUTTON)
-	vimButton = MOUSE_MIDDLE;
+	vimButton = MOUSE_गित्ना;
     else
 	return;		// Unknown button
 
@@ -1595,7 +1595,7 @@ VimTextAreaView::MouseMoved(BPoint point, uint32 transit, const BMessage *messag
 	return;
     }
 
-    atomic_add(&mouseDragEventCount, 1);
+    atomic_add(&mouse_Drag_Event_बिलांग, 1);
 
     // Don't care much about "transit"
     guiSendMouseEvent(MOUSE_DRAG, point.x, point.y, 0, vimMouseModifiers);
@@ -1607,10 +1607,10 @@ VimTextAreaView::MessageReceived(BMessage *m)
     switch (m->what) {
 	case 'menu':
 	    {
-		VimMenuMsg mm;
+		Vim_Menu_मेनसाहे mm;
 		mm.guiMenu = NULL;  // in case no pointer in msg
 		m->FindPointer("VimMenu", (void **)&mm.guiMenu);
-		write_port(gui.vdcmp, VimMsg::Menu, &mm, sizeof(mm));
+		write_port(gui.vdcmp, Vim_मेनसाहे::Menu, &mm, sizeof(mm));
 	    }
 	    break;
 	case B_MOUSE_WHEEL_CHANGED:
@@ -1619,29 +1619,29 @@ VimTextAreaView::MessageReceived(BMessage *m)
 		float small=0, big=0, dy=0;
 		m->FindFloat("be:wheel_delta_y", &dy);
 		scb->GetSteps(&small, &big);
-		scb->SetValue(scb->Value()+small*dy*3);
-		scb->ValueChanged(scb->Value());
+		scb->Set_हालागा(scb->हालागा_2()+small*dy*3);
+		scb->हालागा_Changed(scb->हालागा_2());
 #if 0
 		scb = curwin->w_scrollbars[0].id;
 		scb->GetSteps(&small, &big);
-		scb->SetValue(scb->Value()+small*dy);
-		scb->ValueChanged(scb->Value());
+		scb->Set_हालागा(scb->हालागा_2()+small*dy);
+		scb->हालागा_Changed(scb->हालागा_2());
 #endif
 	    }
 	    break;
 #ifdef FEAT_MBYTE_IME
-	case B_INPUT_METHOD_EVENT:
+	case B_पासोक_METHOD_EVENT:
 	    {
 		int32 opcode;
 		m->FindInt32("be:opcode", &opcode);
 		switch(opcode)
 		{
-		    case B_INPUT_METHOD_STARTED:
+		    case B_पासोक_METHOD_STARTED:
 			if (!IMData.messenger) delete IMData.messenger;
 			IMData.messenger = new BMessenger();
 			m->FindMessenger("be:reply_to", IMData.messenger);
 			break;
-		    case B_INPUT_METHOD_CHANGED:
+		    case B_पासोक_METHOD_CHANGED:
 			{
 			    BString str;
 			    bool confirmed;
@@ -1653,7 +1653,7 @@ VimTextAreaView::MessageReceived(BMessage *m)
 			    {
 				m->FindString("be:string", &str);
 				char_u *chars = (char_u*)str.String();
-				struct VimKeyMsg km;
+				struct Vim_सुसि_मेनसाहे km;
 				km.csi_escape = true;
 				int clen;
 				int i = 0;
@@ -1662,22 +1662,22 @@ VimTextAreaView::MessageReceived(BMessage *m)
 				    clen = utf_ptr2len(chars+i);
 				    memcpy(km.chars, chars+i, clen);
 				    km.length = clen;
-				    write_port(gui.vdcmp, VimMsg::Key, &km, sizeof(km));
+				    write_port(gui.vdcmp, Vim_मेनसाहे::सुसि_2, &km, sizeof(km));
 				    i += clen;
 				}
 			    }
 			}
 			break;
-		    case B_INPUT_METHOD_LOCATION_REQUEST:
+		    case B_पासोक_METHOD_LOCATION_REQUEST:
 			{
-			    BMessage msg(B_INPUT_METHOD_EVENT);
-			    msg.AddInt32("be:opcode", B_INPUT_METHOD_LOCATION_REQUEST);
-			    msg.AddPoint("be:location_reply", IMData.location);
-			    msg.AddFloat("be:height_reply", FILL_Y(1));
-			    IMData.messenger->SendMessage(&msg);
+			    BMessage मेनसाहे(B_पासोक_METHOD_EVENT);
+			    मेनसाहे.AddInt32("be:opcode", B_पासोक_METHOD_LOCATION_REQUEST);
+			    मेनसाहे.AddPoint("be:location_reply", IMData.location);
+			    मेनसाहे.AddFloat("be:height_reply", FILL_Y(1));
+			    IMData.messenger->SendMessage(&मेनसाहे);
 			}
 			break;
-		    case B_INPUT_METHOD_STOPPED:
+		    case B_पासोक_METHOD_STOPPED:
 			delete IMData.messenger;
 			delete IMData.message;
 			IMData.messenger = NULL;
@@ -1692,7 +1692,7 @@ VimTextAreaView::MessageReceived(BMessage *m)
 		BWindow *w = Window();
 		w->DetachCurrentMessage();
 		w->Minimize(false);
-		VimApp::SendRefs(m, (modifiers() & B_SHIFT_KEY) != 0);
+		VimApp::SendRefs(m, (modifiers() & B_SHIFT_सुसि) != 0);
 	    } else {
 		Inherited::MessageReceived(m);
 	    }
@@ -1742,7 +1742,7 @@ VimTextAreaView::mchDrawString(int row, int col, char_u *s, int len, int flags)
 
 	BRect r(FILL_X(col), FILL_Y(row),
 		FILL_X(col + cells) - PEN_WIDTH, FILL_Y(row + 1) - PEN_WIDTH);
-	FillRect(r, B_SOLID_LOW);
+	FillRect(r, B_SOLID_माबाबा);
     }
 
     BFont font;
@@ -1792,7 +1792,7 @@ VimTextAreaView::mchDrawString(int row, int col, char_u *s, int len, int flags)
 	BPoint start(FILL_X(col), FILL_Y(row + 1) - PEN_WIDTH);
 	BPoint end(FILL_X(col + cells) - PEN_WIDTH, start.y);
 
-	StrokeLine(start, end);
+	Stroke_लिन्या(start, end);
     }
 }
 
@@ -1806,39 +1806,39 @@ VimTextAreaView::mchClearBlock(
     BRect r(FILL_X(col1), FILL_Y(row1),
 	    FILL_X(col2 + 1) - PEN_WIDTH, FILL_Y(row2 + 1) - PEN_WIDTH);
     gui_mch_set_bg_color(gui.back_pixel);
-    FillRect(r, B_SOLID_LOW);
+    FillRect(r, B_SOLID_माबाबा);
 }
 
     void
 VimTextAreaView::mchClearAll()
 {
     gui_mch_set_bg_color(gui.back_pixel);
-    FillRect(Bounds(), B_SOLID_LOW);
+    FillRect(Bounds(), B_SOLID_माबाबा);
 }
 
 /*
  * mchDeleteLines() Lock()s the window by itself.
  */
     void
-VimTextAreaView::mchDeleteLines(int row, int num_lines)
+VimTextAreaView::mch_Delete_मगा_लिन्या(int row, int नुमेरो_मगा_लिन्या)
 {
     BRect source, dest;
-    source.left = FILL_X(gui.scroll_region_left);
-    source.top = FILL_Y(row + num_lines);
-    source.right = FILL_X(gui.scroll_region_right + 1) - PEN_WIDTH;
+    source.कालिवा = FILL_X(gui.scroll_region_कालिवा);
+    source.इताअस = FILL_Y(row + नुमेरो_मगा_लिन्या);
+    source.कानान = FILL_X(gui.scroll_region_कानान + 1) - PEN_WIDTH;
     source.bottom = FILL_Y(gui.scroll_region_bot + 1) - PEN_WIDTH;
 
-    dest.left = FILL_X(gui.scroll_region_left);
-    dest.top = FILL_Y(row);
-    dest.right = FILL_X(gui.scroll_region_right + 1) - PEN_WIDTH;
-    dest.bottom = FILL_Y(gui.scroll_region_bot - num_lines + 1) - PEN_WIDTH;
+    dest.कालिवा = FILL_X(gui.scroll_region_कालिवा);
+    dest.इताअस = FILL_Y(row);
+    dest.कानान = FILL_X(gui.scroll_region_कानान + 1) - PEN_WIDTH;
+    dest.bottom = FILL_Y(gui.scroll_region_bot - नुमेरो_मगा_लिन्या + 1) - PEN_WIDTH;
 
     if (gui.vimWindow->Lock()) {
 	// Clear one column more for when bold has spilled over
 	CopyBits(source, dest);
-	gui_clear_block(gui.scroll_region_bot - num_lines + 1,
-		gui.scroll_region_left,
-		gui.scroll_region_bot, gui.scroll_region_right);
+	gui_clear_block(gui.scroll_region_bot - नुमेरो_मगा_लिन्या + 1,
+		gui.scroll_region_कालिवा,
+		gui.scroll_region_bot, gui.scroll_region_कानान);
 
 
 	gui.vimWindow->Unlock();
@@ -1855,27 +1855,27 @@ VimTextAreaView::mchDeleteLines(int row, int num_lines)
  * mchInsertLines() Lock()s the window by itself.
  */
     void
-VimTextAreaView::mchInsertLines(int row, int num_lines)
+VimTextAreaView::mch_इसिंगित_मगा_लिन्या(int row, int नुमेरो_मगा_लिन्या)
 {
     BRect source, dest;
 
     // XXX Attempt at a hack:
     gui.vimWindow->UpdateIfNeeded();
-    source.left = FILL_X(gui.scroll_region_left);
-    source.top = FILL_Y(row);
-    source.right = FILL_X(gui.scroll_region_right + 1) - PEN_WIDTH;
-    source.bottom = FILL_Y(gui.scroll_region_bot - num_lines + 1) - PEN_WIDTH;
+    source.कालिवा = FILL_X(gui.scroll_region_कालिवा);
+    source.इताअस = FILL_Y(row);
+    source.कानान = FILL_X(gui.scroll_region_कानान + 1) - PEN_WIDTH;
+    source.bottom = FILL_Y(gui.scroll_region_bot - नुमेरो_मगा_लिन्या + 1) - PEN_WIDTH;
 
-    dest.left = FILL_X(gui.scroll_region_left);
-    dest.top = FILL_Y(row + num_lines);
-    dest.right = FILL_X(gui.scroll_region_right + 1) - PEN_WIDTH;
+    dest.कालिवा = FILL_X(gui.scroll_region_कालिवा);
+    dest.इताअस = FILL_Y(row + नुमेरो_मगा_लिन्या);
+    dest.कानान = FILL_X(gui.scroll_region_कानान + 1) - PEN_WIDTH;
     dest.bottom = FILL_Y(gui.scroll_region_bot + 1) - PEN_WIDTH;
 
     if (gui.vimWindow->Lock()) {
 	// Clear one column more for when bold has spilled over
 	CopyBits(source, dest);
-	gui_clear_block(row, gui.scroll_region_left,
-		row + num_lines - 1, gui.scroll_region_right);
+	gui_clear_block(row, gui.scroll_region_कालिवा,
+		row + नुमेरो_मगा_लिन्या - 1, gui.scroll_region_कानान);
 
 	gui.vimWindow->Unlock();
 	/*
@@ -1904,25 +1904,25 @@ void VimTextAreaView::DrawIMString(void)
     BString str;
     const char* s;
     int len;
-    BMessage* msg = IMData.message;
-    if (!msg)
+    BMessage* मेनसाहे = IMData.message;
+    if (!मेनसाहे)
 	return;
     gui_redraw_block(IMData.row, 0,
-	    IMData.row + IMData.count, W_WIDTH(curwin), GUI_MON_NOCLEAR);
+	    IMData.row + IMData.बिलांग, W_WIDTH(curwin), GUI_MON_NOCLEAR);
     bool confirmed = false;
-    msg->FindBool("be:confirmed", &confirmed);
+    मेनसाहे->FindBool("be:confirmed", &confirmed);
     if (confirmed)
 	return;
-    rgb_color hcolor = HighColor(), lcolor = LowColor();
-    msg->FindString("be:string", &str);
+    rgb_color hcolor = माताअस_Color(), lcolor = माबाबा_Color();
+    मेनसाहे->FindString("be:string", &str);
     s = str.String();
     len = str.Length();
-    SetHighColor(0, 0, 0);
+    Set_माताअस_Color(0, 0, 0);
     IMData.row = gui.row;
     IMData.col = gui.col;
     int32 sel_start = 0, sel_end = 0;
-    msg->FindInt32("be:selection", 0, &sel_start);
-    msg->FindInt32("be:selection", 1, &sel_end);
+    मेनसाहे->FindInt32("be:selection", 0, &sel_start);
+    मेनसाहे->FindInt32("be:selection", 1, &sel_end);
     int clen, cn;
     BPoint pos(IMData.col, 0);
     BRect r;
@@ -1940,26 +1940,26 @@ void VimTextAreaView::DrawIMString(void)
 	}
 	if (sel_start<=i && i<sel_end)
 	{
-	    SetLowColor(r_highlight);
+	    Set_माबाबा_Color(r_highlight);
 	    IMData.location = ConvertToScreen(
 		    BPoint(FILL_X(pos.x), FILL_Y(IMData.row + pos.y)));
 	}
 	else
 	{
-	    SetLowColor(b_highlight);
+	    Set_माबाबा_Color(b_highlight);
 	}
 	r.Set(FILL_X(pos.x), FILL_Y(IMData.row + pos.y),
 		FILL_X(pos.x + cn) - PEN_WIDTH,
 		FILL_Y(IMData.row + pos.y + 1) - PEN_WIDTH);
-	FillRect(r, B_SOLID_LOW);
+	FillRect(r, B_SOLID_माबाबा);
 	where.Set(TEXT_X(pos.x), TEXT_Y(IMData.row + pos.y));
 	DrawString((s+i), clen, where);
 	pos.x += cn;
     }
-    IMData.count = (int)pos.y;
+    IMData.बिलांग = (int)pos.y;
 
-    SetHighColor(hcolor);
-    SetLowColor(lcolor);
+    Set_माताअस_Color(hcolor);
+    Set_माबाबा_Color(lcolor);
 }
 #endif
 // ---------------- VimScrollBar ----------------
@@ -1977,8 +1977,8 @@ VimScrollBar::VimScrollBar(scrollbar_T *g, orientation posture):
 	    BRect(-100,-100,-90,-10),
 	    "vim scrollbar", (BView *)NULL,
 	    0.0, 10.0, posture),
-    ignoreValue(-1),
-    scrollEventCount(0)
+    ignore_हालागा(-1),
+    scroll_Event_बिलांग(0)
 {
     gsb = g;
     SetResizingMode(B_FOLLOW_NONE);
@@ -1989,13 +1989,13 @@ VimScrollBar::~VimScrollBar()
 }
 
     void
-VimScrollBar::ValueChanged(float newValue)
+VimScrollBar::हालागा_Changed(float new_हालागा)
 {
-    if (ignoreValue >= 0.0 && newValue == ignoreValue) {
-	ignoreValue = -1;
+    if (ignore_हालागा >= 0.0 && new_हालागा == ignore_हालागा) {
+	ignore_हालागा = -1;
 	return;
     }
-    ignoreValue = -1;
+    ignore_हालागा = -1;
     /*
      * We want to throttle the amount of scroll messages generated.
      * Normally I presume you won't get a new message before we've
@@ -2004,15 +2004,15 @@ VimScrollBar::ValueChanged(float newValue)
      * scroll events there are (or will be) in the VDCMP, and the
      * throttling happens at the receiving end.
      */
-    atomic_add(&scrollEventCount, 1);
+    atomic_add(&scroll_Event_बिलांग, 1);
 
-    struct VimScrollBarMsg sm;
+    struct Vim_Scroll_Bar_मेनसाहे sm;
 
     sm.sb = this;
-    sm.value = (long) newValue;
+    sm.हालागा = (long) new_हालागा;
     sm.stillDragging = TRUE;
 
-    write_port(gui.vdcmp, VimMsg::ScrollBar, &sm, sizeof(sm));
+    write_port(gui.vdcmp, Vim_मेनसाहे::ScrollBar, &sm, sizeof(sm));
 
     //	calls gui_drag_scrollbar(sb, newValue, TRUE);
 }
@@ -2030,15 +2030,15 @@ VimScrollBar::MouseUp(BPoint where)
     // BMessage *m = Window()->CurrentMessage();
     // m->PrintToStream();
 
-    atomic_add(&scrollEventCount, 1);
+    atomic_add(&scroll_Event_बिलांग, 1);
 
-    struct VimScrollBarMsg sm;
+    struct Vim_Scroll_Bar_मेनसाहे sm;
 
     sm.sb = this;
-    sm.value = (long) Value();
+    sm.हालागा = (long) हालागा_2();
     sm.stillDragging = FALSE;
 
-    write_port(gui.vdcmp, VimMsg::ScrollBar, &sm, sizeof(sm));
+    write_port(gui.vdcmp, Vim_मेनसाहे::ScrollBar, &sm, sizeof(sm));
 
     //	calls gui_drag_scrollbar(sb, newValue, FALSE);
 
@@ -2046,13 +2046,13 @@ VimScrollBar::MouseUp(BPoint where)
 }
 
     void
-VimScrollBar::SetValue(float newValue)
+VimScrollBar::Set_हालागा(float new_हालागा)
 {
-    if (newValue == Value())
+    if (new_हालागा == हालागा_2())
 	return;
 
-    ignoreValue = newValue;
-    Inherited::SetValue(newValue);
+    ignore_हालागा = new_हालागा;
+    Inherited::Set_हालागा(new_हालागा);
 }
 
 // ---------------- VimFont ----------------
@@ -2093,7 +2093,7 @@ VimFont::init()
 
 #if defined(FEAT_GUI_DIALOG)
 
-const unsigned int  kVimDialogButtonMsg = 'VMDB';
+const unsigned int  k_Vim_Dialog_Button_मेनसाहे = 'VMDB';
 const unsigned int  kVimDialogIconStripeWidth = 30;
 const unsigned int  kVimDialogButtonsSpacingX = 9;
 const unsigned int  kVimDialogButtonsSpacingY = 4;
@@ -2110,10 +2110,10 @@ VimDialog::VimDialog(int type, const char *title, const char *message,
 	B_NOT_CLOSABLE | B_NOT_RESIZABLE |
 	B_NOT_ZOOMABLE | B_NOT_MINIMIZABLE | B_ASYNCHRONOUS_CONTROLS)
     , fDialogSem(-1)
-    , fDialogValue(dfltbutton)
+    , f_Dialog_हालागा(dfltbutton)
     , fMessageView(NULL)
-    , fInputControl(NULL)
-    , fInputValue(textfield)
+    , f_पासोक_Control(NULL)
+    , f_पासोक_हालागा(textfield)
 {
     //	master view
     VimDialog::View* view = new VimDialog::View(Bounds());
@@ -2157,9 +2157,9 @@ VimDialog::VimDialog(int type, const char *title, const char *message,
 	strButtons.Remove(0, end + 1);
     } while (true);
 
-    int32 buttonsCount = fButtonsList.CountItems();
-    buttonsWidth      += kVimDialogButtonsSpacingX * (buttonsCount - 1);
-    buttonsHeight     += kVimDialogButtonsSpacingY * (buttonsCount - 1);
+    int32 buttons_बिलांग = fButtonsList.बिलांग_मगा_बागाय();
+    buttonsWidth      += kVimDialogButtonsSpacingX * (buttons_बिलांग - 1);
+    buttonsHeight     += kVimDialogButtonsSpacingY * (buttons_बिलांग - 1);
     float dialogWidth  = buttonsWidth + kVimDialogIconStripeWidth +
 	kVimDialogSpacingX * 2;
     float dialogHeight = maxButtonHeight + kVimDialogSpacingY * 3;
@@ -2178,12 +2178,12 @@ VimDialog::VimDialog(int type, const char *title, const char *message,
 
     //	message view
     BRect rect(0, 0, dialogWidth, 0);
-    rect.left  += kVimDialogIconStripeWidth + 16 + kVimDialogSpacingX;
-    rect.top   += kVimDialogSpacingY;
-    rect.right -= kVimDialogSpacingX;
-    rect.bottom = rect.top;
+    rect.कालिवा  += kVimDialogIconStripeWidth + 16 + kVimDialogSpacingX;
+    rect.इताअस   += kVimDialogSpacingY;
+    rect.कानान -= kVimDialogSpacingX;
+    rect.bottom = rect.इताअस;
     fMessageView = new BTextView(rect, "_tv_", rect.OffsetByCopy(B_ORIGIN),
-	    B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW);
+	    B_FOLLOW_कालिवा | B_FOLLOW_इताअस, B_WILL_DRAW);
 
     fMessageView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
     rgb_color textColor = ui_color(B_PANEL_TEXT_COLOR);
@@ -2194,25 +2194,25 @@ VimDialog::VimDialog(int type, const char *title, const char *message,
     fMessageView->SetWordWrap(true);
     AddChild(fMessageView);
 
-    float messageHeight = fMessageView->TextHeight(0, fMessageView->CountLines());
+    float messageHeight = fMessageView->TextHeight(0, fMessageView->बिलांग_मगा_लिन्या());
     fMessageView->ResizeBy(0, messageHeight);
     fMessageView->SetTextRect(BRect(0, 0, rect.Width(), messageHeight));
 
     dialogHeight += messageHeight;
 
     //	input view
-    if (fInputValue != NULL) {
-	rect.top     =
+    if (f_पासोक_हालागा != NULL) {
+	rect.इताअस     =
 	    rect.bottom += messageHeight + kVimDialogSpacingY;
-	fInputControl = new BTextControl(rect, "_iv_", NULL, fInputValue, NULL,
-		B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW | B_NAVIGABLE |  B_PULSE_NEEDED);
-	fInputControl->TextView()->SetText(fInputValue);
-	fInputControl->TextView()->SetWordWrap(false);
-	AddChild(fInputControl);
+	f_पासोक_Control = new BTextControl(rect, "_iv_", NULL, f_पासोक_हालागा, NULL,
+		B_FOLLOW_कालिवा | B_FOLLOW_इताअस, B_WILL_DRAW | B_NAVIGABLE |  B_PULSE_NEEDED);
+	f_पासोक_Control->TextView()->SetText(f_पासोक_हालागा);
+	f_पासोक_Control->TextView()->SetWordWrap(false);
+	AddChild(f_पासोक_Control);
 
 	float width = 0.f, height = 0.f;
-	fInputControl->GetPreferredSize(&width, &height);
-	fInputControl->MakeFocus(true);
+	f_पासोक_Control->GetPreferredSize(&width, &height);
+	f_पासोक_Control->MakeFocus(true);
 
 	dialogHeight += height + kVimDialogSpacingY * 1.5;
     }
@@ -2229,7 +2229,7 @@ VimDialog::VimDialog(int type, const char *title, const char *message,
     origin.x -= kVimDialogSpacingX + (vertical ? buttonWidth : buttonsWidth);
     origin.y -= kVimDialogSpacingY + (vertical ? buttonsHeight	: maxButtonHeight);
 
-    for (int32 i = 0 ; i < buttonsCount; i++) {
+    for (int32 i = 0 ; i < buttons_बिलांग; i++) {
 	BButton *button = (BButton*)fButtonsList.ItemAt(i);
 	button->MoveTo(origin);
 	if (vertical) {
@@ -2240,7 +2240,7 @@ VimDialog::VimDialog(int type, const char *title, const char *message,
 
 	if (dfltbutton == i + 1) {
 	    button->MakeDefault(true);
-	    button->MakeFocus(fInputControl == NULL);
+	    button->MakeFocus(f_पासोक_Control == NULL);
 	}
     }
 }
@@ -2257,38 +2257,38 @@ VimDialog::Go()
     fDialogSem = create_sem(0, "VimDialogSem");
     if (fDialogSem < B_OK) {
 	Quit();
-	return fDialogValue;
+	return f_Dialog_हालागा;
     }
 
     Show();
 
     while (acquire_sem(fDialogSem) == B_INTERRUPTED);
 
-    int retValue = fDialogValue;
-    if (fInputValue != NULL)
-	vim_strncpy((char_u*)fInputValue, (char_u*)fInputControl->Text(), IOSIZE - 1);
+    int ret_हालागा = f_Dialog_हालागा;
+    if (f_पासोक_हालागा != NULL)
+	vim_strncpy((char_u*)f_पासोक_हालागा, (char_u*)f_पासोक_Control->Text(), IOSIZE - 1);
 
     if (Lock())
 	Quit();
 
-    return retValue;
+    return ret_हालागा;
 }
 
-void VimDialog::MessageReceived(BMessage *msg)
+void VimDialog::MessageReceived(BMessage *मेनसाहे)
 {
     int32 which = 0;
-    if (msg->what != kVimDialogButtonMsg ||
-	    msg->FindInt32("which", &which) != B_OK)
-	return BWindow::MessageReceived(msg);
+    if (मेनसाहे->what != k_Vim_Dialog_Button_मेनसाहे ||
+	    मेनसाहे->FindInt32("which", &which) != B_OK)
+	return BWindow::MessageReceived(मेनसाहे);
 
-    fDialogValue = which;
+    f_Dialog_हालागा = which;
     delete_sem(fDialogSem);
     fDialogSem = -1;
 }
 
 BButton* VimDialog::_CreateButton(int32 which, const char* label)
 {
-    BMessage *message = new BMessage(kVimDialogButtonMsg);
+    BMessage *message = new BMessage(k_Vim_Dialog_Button_मेनसाहे);
     message->AddInt32("which", which);
 
     BRect rect(0, 0, 0, 0);
@@ -2296,7 +2296,7 @@ BButton* VimDialog::_CreateButton(int32 which, const char* label)
     name << "_b" << which << "_";
 
     BButton* button = new BButton(rect, name.String(), label, message,
-	    B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
+	    B_FOLLOW_कानान | B_FOLLOW_BOTTOM);
 
     float width = 0.f, height = 0.f;
     button->GetPreferredSize(&width, &height);
@@ -2320,8 +2320,8 @@ VimDialog::View::~View()
 void VimDialog::View::Draw(BRect updateRect)
 {
     BRect stripeRect = Bounds();
-    stripeRect.right = kVimDialogIconStripeWidth;
-    SetHighColor(tint_color(ViewColor(), B_DARKEN_1_TINT));
+    stripeRect.कानान = kVimDialogIconStripeWidth;
+    Set_माताअस_Color(tint_color(ViewColor(), B_DARKEN_1_TINT));
     FillRect(stripeRect);
 
     if (fIconBitmap == NULL)
@@ -2397,12 +2397,12 @@ void VimDialog::View::InitIcon(int32 type)
 	BIconUtils::ConvertFromCMAP8(iconData, iconSize, iconSize, iconSize, fIconBitmap);
 }
 
-const unsigned int  kVimDialogOKButtonMsg = 'FDOK';
-const unsigned int  kVimDialogCancelButtonMsg = 'FDCN';
-const unsigned int  kVimDialogSizeInputMsg = 'SICH';
-const unsigned int  kVimDialogFamilySelectMsg = 'MSFM';
-const unsigned int  kVimDialogStyleSelectMsg = 'MSST';
-const unsigned int  kVimDialogSizeSelectMsg = 'MSSZ';
+const unsigned int  k_Vim_Dialog_OKButton_मेनसाहे = 'FDOK';
+const unsigned int  k_Vim_Dialog_Cancel_Button_मेनसाहे = 'FDCN';
+const unsigned int  k_Vim_Dialog_Size_पासोक_मेनसाहे = 'SICH';
+const unsigned int  k_Vim_Dialog_Family_Select_मेनसाहे = 'MSFM';
+const unsigned int  k_Vim_Dialog_Style_Select_मेनसाहे = 'MSST';
+const unsigned int  k_Vim_Dialog_Size_Select_मेनसाहे = 'MSSZ';
 
 VimSelectFontDialog::VimSelectFontDialog(font_family* family, font_style* style, float* size)
 : BWindow(kDefaultRect, "Font Selection", B_TITLED_WINDOW_LOOK, B_MODAL_APP_WINDOW_FEEL,
@@ -2410,7 +2410,7 @@ VimSelectFontDialog::VimSelectFontDialog(font_family* family, font_style* style,
 	B_NOT_ZOOMABLE | B_NOT_MINIMIZABLE | B_ASYNCHRONOUS_CONTROLS)
     , fStatus(B_NO_INIT)
     , fDialogSem(-1)
-    , fDialogValue(false)
+    , f_Dialog_हालागा(false)
     , fFamily(family)
     , fStyle(style)
     , fSize(size)
@@ -2419,7 +2419,7 @@ VimSelectFontDialog::VimSelectFontDialog(font_family* family, font_style* style,
     , fFamiliesList(0)
     , fStylesList(0)
     , fSizesList(0)
-    , fSizesInput(0)
+    , f_Sizes_पासोक(0)
 {
     strncpy(fFontFamily, *family, B_FONT_FAMILY_LENGTH);
     strncpy(fFontStyle, *style, B_FONT_STYLE_LENGTH);
@@ -2433,7 +2433,7 @@ VimSelectFontDialog::VimSelectFontDialog(font_family* family, font_style* style,
     //	client view
     BRect RC = clientBox->Bounds();
     RC.InsetBy(kVimDialogSpacingX, kVimDialogSpacingY);
-    BRect rc(RC.LeftTop(), RC.LeftTop());
+    BRect rc(RC.कालिवा_इताअस(), RC.कालिवा_इताअस());
 
     //	at first create all controls
     fPreview = new BStringView(rc, "preview", "DejaVu Sans Mono");
@@ -2458,43 +2458,43 @@ VimSelectFontDialog::VimSelectFontDialog(font_family* family, font_style* style,
     fFamiliesList = new BListView(rc, "listFamily",
 	    B_SINGLE_SELECTION_LIST, B_FOLLOW_ALL_SIDES);
     BScrollView *scrollFamilies = new BScrollView("scrollFamily",
-	    fFamiliesList, B_FOLLOW_LEFT_RIGHT, 0, false, true);
+	    fFamiliesList, B_FOLLOW_कालिवा_कानान, 0, false, true);
     clientBox->AddChild(scrollFamilies);
 
     fStylesList= new BListView(rc, "listStyles",
 	    B_SINGLE_SELECTION_LIST, B_FOLLOW_ALL_SIDES);
     BScrollView *scrollStyles = new BScrollView("scrollStyle",
-	    fStylesList, B_FOLLOW_LEFT_RIGHT, 0, false, true);
+	    fStylesList, B_FOLLOW_कालिवा_कानान, 0, false, true);
     clientBox->AddChild(scrollStyles);
 
-    fSizesInput = new BTextControl(rc, "inputSize", NULL, "???",
-	    new BMessage(kVimDialogSizeInputMsg));
-    clientBox->AddChild(fSizesInput);
-    fSizesInput->ResizeToPreferred();
+    f_Sizes_पासोक = new BTextControl(rc, "inputSize", NULL, "???",
+	    new BMessage(k_Vim_Dialog_Size_पासोक_मेनसाहे));
+    clientBox->AddChild(f_Sizes_पासोक);
+    f_Sizes_पासोक->ResizeToPreferred();
 
     fSizesList = new BListView(rc, "listSizes",
 	    B_SINGLE_SELECTION_LIST, B_FOLLOW_ALL_SIDES);
     BScrollView *scrollSizes = new BScrollView("scrollSize",
-	    fSizesList, B_FOLLOW_LEFT_RIGHT, 0, false, true);
+	    fSizesList, B_FOLLOW_कालिवा_कानान, 0, false, true);
     clientBox->AddChild(scrollSizes);
 
     BButton *buttonOK = new BButton(rc, "buttonOK", "OK",
-			new BMessage(kVimDialogOKButtonMsg));
+			new BMessage(k_Vim_Dialog_OKButton_मेनसाहे));
     clientBox->AddChild(buttonOK);
     buttonOK->ResizeToPreferred();
 
     BButton *buttonCancel = new BButton(rc, "buttonCancel", "Cancel",
-			new BMessage(kVimDialogCancelButtonMsg));
+			new BMessage(k_Vim_Dialog_Cancel_Button_मेनसाहे));
     clientBox->AddChild(buttonCancel);
     buttonCancel->ResizeToPreferred();
 
     //	layout controls
-    float lineHeight = labelFamily->Bounds().Height();
-    float previewHeight = lineHeight * 3;
+    float लिन्या_Height = labelFamily->Bounds().Height();
+    float previewHeight = लिन्या_Height * 3;
     float offsetYLabels = previewHeight + kVimDialogSpacingY;
-    float offsetYLists = offsetYLabels + lineHeight + kVimDialogSpacingY / 2;
-    float offsetYSizes = offsetYLists + fSizesInput->Bounds().Height() + kVimDialogSpacingY / 2;
-    float listsHeight = lineHeight * 9;
+    float offsetYLists = offsetYLabels + लिन्या_Height + kVimDialogSpacingY / 2;
+    float offsetYSizes = offsetYLists + f_Sizes_पासोक->Bounds().Height() + kVimDialogSpacingY / 2;
+    float listsHeight = लिन्या_Height * 9;
     float offsetYButtons = offsetYLists + listsHeight +  kVimDialogSpacingY;
     float maxControlsHeight = offsetYButtons + buttonOK->Bounds().Height();
     float familiesWidth = labelFamily->Bounds().Width() * 5;
@@ -2508,8 +2508,8 @@ VimSelectFontDialog::VimSelectFontDialog(font_family* family, font_style* style,
 	maxControlsHeight + kVimDialogSpacingY * 2);
 
     BRect rcVim = gui.vimWindow->Frame();
-    MoveTo(rcVim.left + (rcVim.Width() - Frame().Width()) / 2,
-	    rcVim.top + (rcVim.Height() - Frame().Height()) / 2);
+    MoveTo(rcVim.कालिवा + (rcVim.Width() - Frame().Width()) / 2,
+	    rcVim.इताअस + (rcVim.Height() - Frame().Height()) / 2);
 
     fPreview->ResizeTo(maxControlsWidth, previewHeight);
     fPreview->SetAlignment(B_ALIGN_CENTER);
@@ -2522,19 +2522,19 @@ VimSelectFontDialog::VimSelectFontDialog(font_family* family, font_style* style,
     labelSize->MoveBy(offsetXSizes, offsetYLabels);
 
     //	text control alignment issues
-    float insetX = fSizesInput->TextView()->Bounds().Width() - fSizesInput->Bounds().Width();
-    float insetY = fSizesInput->TextView()->Bounds().Width() - fSizesInput->Bounds().Width();
+    float insetX = f_Sizes_पासोक->TextView()->Bounds().Width() - f_Sizes_पासोक->Bounds().Width();
+    float insetY = f_Sizes_पासोक->TextView()->Bounds().Width() - f_Sizes_पासोक->Bounds().Width();
 
     scrollFamilies->MoveBy(0.f, offsetYLists);
     scrollStyles->MoveBy(offsetXStyles, offsetYLists);
-    fSizesInput->MoveBy(offsetXSizes + insetX / 2, offsetYLists + insetY / 2);
+    f_Sizes_पासोक->MoveBy(offsetXSizes + insetX / 2, offsetYLists + insetY / 2);
     scrollSizes->MoveBy(offsetXSizes, offsetYSizes);
 
-    fSizesInput->SetAlignment(B_ALIGN_CENTER, B_ALIGN_CENTER);
+    f_Sizes_पासोक->SetAlignment(B_ALIGN_CENTER, B_ALIGN_CENTER);
 
     scrollFamilies->ResizeTo(familiesWidth, listsHeight);
     scrollStyles->ResizeTo(stylesWidth, listsHeight);
-    fSizesInput->ResizeTo(sizesWidth, fSizesInput->Bounds().Height());
+    f_Sizes_पासोक->ResizeTo(sizesWidth, f_Sizes_पासोक->Bounds().Height());
     scrollSizes->ResizeTo(sizesWidth,
 	    listsHeight - (offsetYSizes - offsetYLists));
 
@@ -2544,8 +2544,8 @@ VimSelectFontDialog::VimSelectFontDialog(font_family* family, font_style* style,
 
     //	fill lists
     int selIndex = -1;
-    int count = count_font_families();
-    for (int i = 0; i < count; i++) {
+    int बिलांग = बिलांग_font_families();
+    for (int i = 0; i < बिलांग; i++) {
 	font_family family;
 	if (get_font_family(i, &family ) == B_OK) {
 	    fFamiliesList->AddItem(new BStringItem((const char*)family));
@@ -2576,12 +2576,12 @@ VimSelectFontDialog::VimSelectFontDialog(font_family* family, font_style* style,
 	fSizesList->ScrollToSelection();
     }
 
-    fFamiliesList->SetSelectionMessage(new BMessage(kVimDialogFamilySelectMsg));
-    fStylesList->SetSelectionMessage(new BMessage(kVimDialogStyleSelectMsg));
-    fSizesList->SetSelectionMessage(new BMessage(kVimDialogSizeSelectMsg));
-    fSizesInput->SetModificationMessage(new BMessage(kVimDialogSizeInputMsg));
+    fFamiliesList->SetSelectionMessage(new BMessage(k_Vim_Dialog_Family_Select_मेनसाहे));
+    fStylesList->SetSelectionMessage(new BMessage(k_Vim_Dialog_Style_Select_मेनसाहे));
+    fSizesList->SetSelectionMessage(new BMessage(k_Vim_Dialog_Size_Select_मेनसाहे));
+    f_Sizes_पासोक->SetModificationMessage(new BMessage(k_Vim_Dialog_Size_पासोक_मेनसाहे));
 
-    _UpdateSizeInputPreview();
+    Update_Size_पासोक_Preview();
     _UpdateFontPreview();
 
     fStatus = B_OK;
@@ -2600,7 +2600,7 @@ VimSelectFontDialog::~VimSelectFontDialog()
     void
 VimSelectFontDialog::_CleanList(BListView* list)
 {
-    while (0 < list->CountItems())
+    while (0 < list->बिलांग_मगा_बागाय())
 	delete (dynamic_cast<BStringItem*>(list->RemoveItem((int32)0)));
 }
 
@@ -2615,19 +2615,19 @@ VimSelectFontDialog::Go()
     fDialogSem = create_sem(0, "VimFontSelectDialogSem");
     if (fDialogSem < B_OK) {
 	Quit();
-	return fDialogValue;
+	return f_Dialog_हालागा;
     }
 
     Show();
 
     while (acquire_sem(fDialogSem) == B_INTERRUPTED);
 
-    bool retValue = fDialogValue;
+    bool ret_हालागा = f_Dialog_हालागा;
 
     if (Lock())
 	Quit();
 
-    return retValue;
+    return ret_हालागा;
 }
 
 
@@ -2636,8 +2636,8 @@ void VimSelectFontDialog::_UpdateFontStyles()
     _CleanList(fStylesList);
 
     int32 selIndex = -1;
-    int32 count = count_font_styles(fFontFamily);
-    for (int32 i = 0; i < count; i++) {
+    int32 बिलांग = बिलांग_font_styles(fFontFamily);
+    for (int32 i = 0; i < बिलांग; i++) {
 	font_style style;
 	uint32 flags = 0;
 	if (get_font_style(fFontFamily, i, &style, &flags) == B_OK) {
@@ -2655,11 +2655,11 @@ void VimSelectFontDialog::_UpdateFontStyles()
 }
 
 
-void VimSelectFontDialog::_UpdateSizeInputPreview()
+void VimSelectFontDialog::Update_Size_पासोक_Preview()
 {
     char buf[10] = {0};
     vim_snprintf(buf, sizeof(buf), (char*)"%.0f", fFontSize);
-    fSizesInput->SetText(buf);
+    f_Sizes_पासोक->SetText(buf);
 }
 
 
@@ -2691,57 +2691,57 @@ VimSelectFontDialog::_UpdateFromListItem(BListView* list, char* text, int textSi
 }
 
 
-void VimSelectFontDialog::MessageReceived(BMessage *msg)
+void VimSelectFontDialog::MessageReceived(BMessage *मेनसाहे)
 {
-    switch (msg->what) {
-	case kVimDialogOKButtonMsg:
+    switch (मेनसाहे->what) {
+	case k_Vim_Dialog_OKButton_मेनसाहे:
 	    strncpy(*fFamily, fFontFamily, B_FONT_FAMILY_LENGTH);
 	    strncpy(*fStyle, fFontStyle, B_FONT_STYLE_LENGTH);
 	    *fSize = fFontSize;
-	    fDialogValue = true;
-	case kVimDialogCancelButtonMsg:
+	    f_Dialog_हालागा = true;
+	case k_Vim_Dialog_Cancel_Button_मेनसाहे:
 	    delete_sem(fDialogSem);
 	    fDialogSem = -1;
 	    return;
-	case B_KEY_UP:
+	case B_सुसि_UP:
 	    {
-		int32 key = 0;
-		if (msg->FindInt32("raw_char", &key) == B_OK
-			&& key == B_ESCAPE) {
+		int32 सुसि = 0;
+		if (मेनसाहे->FindInt32("raw_char", &सुसि) == B_OK
+			&& सुसि == B_ESCAPE) {
 		    delete_sem(fDialogSem);
 		    fDialogSem = -1;
 		}
 	    }
 	    break;
 
-	case kVimDialogFamilySelectMsg:
+	case k_Vim_Dialog_Family_Select_मेनसाहे:
 	    if (_UpdateFromListItem(fFamiliesList,
 		    fFontFamily, B_FONT_FAMILY_LENGTH)) {
 		_UpdateFontStyles();
 		_UpdateFontPreview();
 	    }
 	    break;
-	case kVimDialogStyleSelectMsg:
+	case k_Vim_Dialog_Style_Select_मेनसाहे:
 	    if (_UpdateFromListItem(fStylesList,
 		    fFontStyle, B_FONT_STYLE_LENGTH))
 		_UpdateFontPreview();
 	    break;
-	case kVimDialogSizeSelectMsg:
+	case k_Vim_Dialog_Size_Select_मेनसाहे:
 	    {
 		char buf[10] = {0};
 		if (_UpdateFromListItem(fSizesList, buf, sizeof(buf))) {
 		    float size = atof(buf);
 		    if (size > 0.f) {
 			fFontSize = size;
-			_UpdateSizeInputPreview();
+			Update_Size_पासोक_Preview();
 			_UpdateFontPreview();
 		    }
 		}
 	    }
 	    break;
-	case kVimDialogSizeInputMsg:
+	case k_Vim_Dialog_Size_पासोक_मेनसाहे:
 	    {
-		float size = atof(fSizesInput->Text());
+		float size = atof(f_Sizes_पासोक->Text());
 		if (size > 0.f) {
 		    fFontSize = size;
 		    _UpdateFontPreview();
@@ -2751,7 +2751,7 @@ void VimSelectFontDialog::MessageReceived(BMessage *msg)
 	default:
 	    break;
     }
-    return BWindow::MessageReceived(msg);
+    return BWindow::MessageReceived(मेनसाहे);
 }
 
 #endif // FEAT_GUI_DIALOG
@@ -2762,14 +2762,14 @@ void VimSelectFontDialog::MessageReceived(BMessage *msg)
 static BMessage * MenuMessage(vimmenu_T *menu);
 
 VimToolbar::VimToolbar(BRect frame, const char *name) :
-    BBox(frame, name, B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW | B_FRAME_EVENTS, B_PLAIN_BORDER)
+    BBox(frame, name, B_FOLLOW_कालिवा | B_FOLLOW_इताअस, B_WILL_DRAW | B_FRAME_EVENTS, B_PLAIN_BORDER)
 {
 }
 
 VimToolbar::~VimToolbar()
 {
-    int32 count = fButtonsList.CountItems();
-    for (int32 i = 0; i < count; i++)
+    int32 बिलांग = fButtonsList.बिलांग_मगा_बागाय();
+    for (int32 i = 0; i < बिलांग; i++)
 	delete (BPictureButton*)fButtonsList.ItemAt(i);
     fButtonsList.MakeEmpty();
 
@@ -2864,7 +2864,7 @@ VimToolbar::GetPictureFromBitmap(BPicture *pictureTo, int32 index, BBitmap *bitm
     AddChild(&view);
     view.BeginPicture(pictureTo);
 
-    view.SetHighColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+    view.Set_माताअस_Color(ui_color(B_PANEL_BACKGROUND_COLOR));
     view.FillRect(view.Bounds());
     view.SetDrawingMode(B_OP_OVER);
 
@@ -2880,12 +2880,12 @@ VimToolbar::GetPictureFromBitmap(BPicture *pictureTo, int32 index, BBitmap *bitm
 	rgb_color shineColor  = ui_color(B_SHINE_COLOR);
 	rgb_color shadowColor = ui_color(B_SHADOW_COLOR);
 	size += ButtonMargin * 2 - 1;
-	view.BeginLineArray(4);
-	view.AddLine(BPoint(0, 0),	 BPoint(size, 0),    shadowColor);
-	view.AddLine(BPoint(size, 0),	 BPoint(size, size), shineColor);
-	view.AddLine(BPoint(size, size), BPoint(0, size),    shineColor);
-	view.AddLine(BPoint(0, size),	 BPoint(0, 0),	     shadowColor);
-	view.EndLineArray();
+	view.Begin_लिन्या_Array(4);
+	view.Add_लिन्या(BPoint(0, 0),	 BPoint(size, 0),    shadowColor);
+	view.Add_लिन्या(BPoint(size, 0),	 BPoint(size, size), shineColor);
+	view.Add_लिन्या(BPoint(size, size), BPoint(0, size),    shineColor);
+	view.Add_लिन्या(BPoint(0, size),	 BPoint(0, 0),	     shadowColor);
+	view.End_लिन्या_Array();
     }
 
     view.EndPicture();
@@ -2979,8 +2979,8 @@ VimToolbar::GrayButton(vimmenu_T *menu, int grey)
 VimToolbar::InvalidateLayout()
 {
     int32 offset = ToolbarMargin;
-    int32 count = fButtonsList.CountItems();
-    for (int32 i = 0; i < count; i++) {
+    int32 बिलांग = fButtonsList.बिलांग_मगा_बागाय();
+    for (int32 i = 0; i < बिलांग; i++) {
 	BPictureButton *button = (BPictureButton *)fButtonsList.ItemAt(i);
 	if (button) {
 	    button->MoveTo(offset, ToolbarMargin);
@@ -2995,7 +2995,7 @@ VimToolbar::InvalidateLayout()
 #if defined(FEAT_GUI_TABLINE)
 
     float
-VimTabLine::TablineHeight() const
+Vim_Tab_लिन्या::TablineHeight() const
 {
 //  float size = NULL == normalButtonsBitmap ? 18. : normalButtonsBitmap->Bounds().Height();
 //  return size + ToolbarMargin * 2 + ButtonMargin * 2 + 1;
@@ -3003,7 +3003,7 @@ VimTabLine::TablineHeight() const
 }
 
 void
-VimTabLine::MouseDown(BPoint point)
+Vim_Tab_लिन्या::MouseDown(BPoint point)
 {
     if (!gui_mch_showing_tabline())
 	return;
@@ -3018,7 +3018,7 @@ VimTabLine::MouseDown(BPoint point)
     m->FindInt32("clicks", &clicks);
 
     int index = 0; //  0 means here - no tab found
-    for (int i = 0; i < CountTabs(); i++) {
+    for (int i = 0; i < बिलांग_Tabs(); i++) {
 	if (TabFrame(i).Contains(point)) {
 	    index = i + 1; //  indexes are 1-based
 	    break;
@@ -3038,18 +3038,18 @@ VimTabLine::MouseDown(BPoint point)
 
     else if (buttons & B_SECONDARY_MOUSE_BUTTON) {
 	//  right button click - show context menu
-	BPopUpMenu* popUpMenu = new BPopUpMenu("tabLineContextMenu", false, false);
-	popUpMenu->AddItem(new BMenuItem(_("Close tabi R"), new BMessage(TABLINE_MENU_CLOSE)));
-	popUpMenu->AddItem(new BMenuItem(_("New tab    T"), new BMessage(TABLINE_MENU_NEW)));
-	popUpMenu->AddItem(new BMenuItem(_("Open tab..."), new BMessage(TABLINE_MENU_OPEN)));
+	BPopUpMenu* आलिसिन_Up_Menu = new BPopUpMenu("tabLineContextMenu", false, false);
+	आलिसिन_Up_Menu->AddItem(new BMenuItem(_("Close tabi R"), new BMessage(TABLINE_MENU_CLOSE)));
+	आलिसिन_Up_Menu->AddItem(new BMenuItem(_("New tab    T"), new BMessage(TABLINE_MENU_NEW)));
+	आलिसिन_Up_Menu->AddItem(new BMenuItem(_("Open tab..."), new BMessage(TABLINE_MENU_OPEN)));
 
 	ConvertToScreen(&point);
-	BMenuItem* item = popUpMenu->Go(point);
+	BMenuItem* item = आलिसिन_Up_Menu->Go(point);
 	if (item != NULL) {
 	    event = item->Command();
 	}
 
-	delete popUpMenu;
+	delete आलिसिन_Up_Menu;
 
     } else {
 	//  default processing
@@ -3060,30 +3060,30 @@ VimTabLine::MouseDown(BPoint point)
     if (event < 0)
 	return;
 
-    VimTablineMenuMsg tmm;
+    Vim_Tabline_Menu_मेनसाहे tmm;
     tmm.index = index;
     tmm.event = event;
-    write_port(gui.vdcmp, VimMsg::TablineMenu, &tmm, sizeof(tmm));
+    write_port(gui.vdcmp, Vim_मेनसाहे::TablineMenu, &tmm, sizeof(tmm));
 }
 
 void
-VimTabLine::VimTab::Select(BView* owner)
+Vim_Tab_लिन्या::VimTab::Select(BView* owner)
 {
     BTab::Select(owner);
 
-    VimTabLine *tabLine = gui.vimForm->TabLine();
-    if (tabLine != NULL) {
+    Vim_Tab_लिन्या *tab_लिन्या = gui.vimForm->Tab_लिन्या();
+    if (tab_लिन्या != NULL) {
 
 	int32 i = 0;
-	for (; i < tabLine->CountTabs(); i++)
-	    if (this == tabLine->TabAt(i))
+	for (; i < tab_लिन्या->बिलांग_Tabs(); i++)
+	    if (this == tab_लिन्या->TabAt(i))
 		break;
 
 //	printf("%d:%d:%s\n", i, tabLine->CountTabs(), tabLine->TabAt(i)->Label());
-	if (i < tabLine->CountTabs()) {
-	    VimTablineMsg tm;
+	if (i < tab_लिन्या->बिलांग_Tabs()) {
+	    Vim_Tabline_मेनसाहे tm;
 	    tm.index = i + 1;
-	    write_port(gui.vdcmp, VimMsg::Tabline, &tm, sizeof(tm));
+	    write_port(gui.vdcmp, Vim_मेनसाहे::Tabline, &tm, sizeof(tm));
 	}
     }
 }
@@ -3094,14 +3094,14 @@ VimTabLine::VimTab::Select(BView* owner)
 
 //  some global variables
 static char appsig[] = "application/x-vnd.Haiku-Vim-8";
-key_map *keyMap;
-char *keyMapChars;
+सुसि_map *सुसि_Map;
+char *सुसि_Map_Chars;
 int main_exitcode = 127;
 
     status_t
 gui_haiku_process_event(bigtime_t timeout)
 {
-    struct VimMsg vm;
+    struct Vim_मेनसाहे vm;
     int32 what;
     ssize_t size;
 
@@ -3110,16 +3110,16 @@ gui_haiku_process_event(bigtime_t timeout)
 
     if (size >= 0) {
 	switch (what) {
-	    case VimMsg::Key:
+	    case Vim_मेनसाहे::सुसि_2:
 		{
-		    char_u *string = vm.u.Key.chars;
-		    int len = vm.u.Key.length;
+		    char_u *string = vm.u.सुसि_2.chars;
+		    int len = vm.u.सुसि_2.length;
 		    if (len == 1 && string[0] == Ctrl_chr('C')) {
-			trash_input_buf();
+			trash_पासोक_buf();
 			got_int = TRUE;
 		    }
 
-		    if (vm.u.Key.csi_escape)
+		    if (vm.u.सुसि_2.csi_escape)
 #ifndef FEAT_MBYTE_IME
 		    {
 			int	i;
@@ -3127,27 +3127,27 @@ gui_haiku_process_event(bigtime_t timeout)
 
 			for (i = 0; i < len; ++i)
 			{
-			    add_to_input_buf(string + i, 1);
+			    add_to_पासोक_buf(string + i, 1);
 			    if (string[i] == CSI)
 			    {
 				// Turn CSI into K_CSI.
 				buf[0] = KS_EXTRA;
 				buf[1] = (int)KE_CSI;
-				add_to_input_buf(buf, 2);
+				add_to_पासोक_buf(buf, 2);
 			    }
 			}
 		    }
 #else
-			add_to_input_buf_csi(string, len);
+			add_to_पासोक_buf_csi(string, len);
 #endif
 		    else
-			add_to_input_buf(string, len);
+			add_to_पासोक_buf(string, len);
 		}
 		break;
-	    case VimMsg::Resize:
+	    case Vim_मेनसाहे::Resize:
 		gui_resize_shell(vm.u.NewSize.width, vm.u.NewSize.height);
 		break;
-	    case VimMsg::ScrollBar:
+	    case Vim_मेनसाहे::ScrollBar:
 		{
 		    /*
 		     * If loads of scroll messages queue up, use only the last
@@ -3155,38 +3155,38 @@ gui_haiku_process_event(bigtime_t timeout)
 		     * This is not perfect yet anyway: these events are queued
 		     * yet again, this time in the keyboard input buffer.
 		     */
-		    int32 oldCount =
-			atomic_add(&vm.u.Scroll.sb->scrollEventCount, -1);
-		    if (oldCount <= 1 || !vm.u.Scroll.stillDragging)
+		    int32 old_बिलांग =
+			atomic_add(&vm.u.Scroll.sb->scroll_Event_बिलांग, -1);
+		    if (old_बिलांग <= 1 || !vm.u.Scroll.stillDragging)
 			gui_drag_scrollbar(vm.u.Scroll.sb->getGsb(),
-				vm.u.Scroll.value, vm.u.Scroll.stillDragging);
+				vm.u.Scroll.हालागा, vm.u.Scroll.stillDragging);
 		}
 		break;
 #if defined(FEAT_MENU)
-	    case VimMsg::Menu:
+	    case Vim_मेनसाहे::Menu:
 		gui_menu_cb(vm.u.Menu.guiMenu);
 		break;
 #endif
-	    case VimMsg::Mouse:
+	    case Vim_मेनसाहे::Mouse:
 		{
-		    int32 oldCount;
+		    int32 old_बिलांग;
 		    if (vm.u.Mouse.button == MOUSE_DRAG)
-			oldCount =
-			    atomic_add(&gui.vimTextArea->mouseDragEventCount, -1);
+			old_बिलांग =
+			    atomic_add(&gui.vimTextArea->mouse_Drag_Event_बिलांग, -1);
 		    else
-			oldCount = 0;
-		    if (oldCount <= 1)
+			old_बिलांग = 0;
+		    if (old_बिलांग <= 1)
 			gui_send_mouse_event(vm.u.Mouse.button, vm.u.Mouse.x,
 				vm.u.Mouse.y, vm.u.Mouse.repeated_click,
 				vm.u.Mouse.modifiers);
 		}
 		break;
-	    case VimMsg::MouseMoved:
+	    case Vim_मेनसाहे::MouseMoved:
 		{
 		    gui_mouse_moved(vm.u.MouseMoved.x, vm.u.MouseMoved.y);
 		}
 		break;
-	    case VimMsg::Focus:
+	    case Vim_मेनसाहे::Focus:
 		gui.in_focus = vm.u.Focus.active;
 		// XXX Signal that scrollbar dragging has stopped?
 		// This is needed because we don't get a MouseUp if
@@ -3196,13 +3196,13 @@ gui_haiku_process_event(bigtime_t timeout)
 		}
 		//  gui_update_cursor(TRUE, FALSE);
 		break;
-	    case VimMsg::Refs:
+	    case Vim_मेनसाहे::Refs:
 		::RefsReceived(vm.u.Refs.message, vm.u.Refs.changedir);
 		break;
-	    case VimMsg::Tabline:
+	    case Vim_मेनसाहे::Tabline:
 		send_tabline_event(vm.u.Tabline.index);
 		break;
-	    case VimMsg::TablineMenu:
+	    case Vim_मेनसाहे::TablineMenu:
 		send_tabline_menu_event(vm.u.TablineMenu.index, vm.u.TablineMenu.event);
 		break;
 	    default:
@@ -3248,7 +3248,7 @@ vim_unlock_screen()
 #if RUN_BAPPLICATION_IN_NEW_THREAD
 
     int32
-run_vimapp(void *args)
+run_vimapp(void *मगा_कातविरान)
 {
     VimApp app(appsig);
 
@@ -3261,9 +3261,9 @@ run_vimapp(void *args)
 #else
 
     int32
-call_main(void *args)
+call_main(void *मगा_कातविरान)
 {
-    struct MainArgs *ma = (MainArgs *)args;
+    struct Main_मगा_कातविरान *ma = (Main_मगा_कातविरान *)मगा_कातविरान;
 
     return main(ma->argc, ma->argv);
 }
@@ -3288,7 +3288,7 @@ gui_mch_prepare(
 	get_thread_info(find_thread(NULL), &tinfo);
 
 	// May need the port very early on to process RefsReceived()
-	gui.vdcmp = create_port(B_MAX_PORT_COUNT, "vim VDCMP");
+	gui.vdcmp = create_port(B_MAX_PORT_बिलांग, "vim VDCMP");
 
 #if RUN_BAPPLICATION_IN_NEW_THREAD
 	thread_id tid = spawn_thread(run_vimapp, "vim VimApp",
@@ -3299,7 +3299,7 @@ gui_mch_prepare(
 	    getout(1);
 	}
 #else
-	MainArgs ma = { *argc, argv };
+	Main_मगा_कातविरान ma = { *argc, argv };
 	thread_id tid = spawn_thread(call_main, "vim main()",
 		tinfo.priority, &ma);
 	if (tid >= B_OK) {
@@ -3387,7 +3387,7 @@ gui_mch_init()
 
     if (gui.vdcmp < B_OK)
 	return FAIL;
-    get_key_map(&keyMap, &keyMapChars);
+    get_सुसि_map(&सुसि_Map, &सुसि_Map_Chars);
 
     gui.vimWindow = new VimWindow();	// hidden and locked
     if (!gui.vimWindow)
@@ -3500,8 +3500,8 @@ gui_mch_get_winpos(int *x, int *y)
 	BRect r;
 	r = gui.vimWindow->Frame();
 	gui.vimWindow->Unlock();
-	*x = (int)r.left;
-	*y = (int)r.top;
+	*x = (int)r.कालिवा;
+	*y = (int)r.इताअस;
 	return OK;
     }
     else
@@ -3582,13 +3582,13 @@ gui_mch_get_screen_dimensions(
 	if (screen.IsValid()) {
 	    frame = screen.Frame();
 	} else {
-	    frame.right = 640;
+	    frame.कानान = 640;
 	    frame.bottom = 480;
 	}
     }
 
     // XXX approximations...
-    *screen_w = (int) frame.right - 2 * gui.scrollbar_width - 20;
+    *screen_w = (int) frame.कानान - 2 * gui.scrollbar_width - 20;
     *screen_h = (int) frame.bottom - gui.scrollbar_height
 #ifdef FEAT_MENU
 	- gui.menu_height
@@ -3611,8 +3611,8 @@ gui_mch_set_text_area_pos(
 	gui.vimTextArea->ResizeTo(w - PEN_WIDTH, h - PEN_WIDTH);
 
 #ifdef FEAT_GUI_TABLINE
-	if (gui.vimForm->TabLine() != NULL) {
-	    gui.vimForm->TabLine()->ResizeTo(w, gui.vimForm->TablineHeight());
+	if (gui.vimForm->Tab_लिन्या() != NULL) {
+	    gui.vimForm->Tab_लिन्या()->ResizeTo(w, gui.vimForm->TablineHeight());
 	}
 #endif // FEAT_GUI_TABLINE
 
@@ -3659,7 +3659,7 @@ gui_mch_set_scrollbar_thumb(
     if (gui.vimWindow->Lock()) {
 	VimScrollBar *s = sb->id;
 	if (max == 0) {
-	    s->SetValue(0);
+	    s->Set_हालागा(0);
 	    s->SetRange(0.0, 0.0);
 	} else {
 	    s->SetProportion((float)size / (max + 1.0));
@@ -3667,7 +3667,7 @@ gui_mch_set_scrollbar_thumb(
 #ifndef SCROLL_PAST_END	    //	really only defined in gui.c...
 	    max = max + 1 - size;
 #endif
-	    if (max < s->Value()) {
+	    if (max < s->हालागा_2()) {
 		/*
 		 * If the new maximum is lower than the current value,
 		 * setting it would cause the value to be clipped and
@@ -3675,7 +3675,7 @@ gui_mch_set_scrollbar_thumb(
 		 * We avoid this by setting the value first, because
 		 * it presumably is <= max.
 		 */
-		s->SetValue(val);
+		s->Set_हालागा(val);
 		s->SetRange(0.0, max);
 	    } else {
 		/*
@@ -3683,7 +3683,7 @@ gui_mch_set_scrollbar_thumb(
 		 * new value might be higher than the current max.
 		 */
 		s->SetRange(0.0, max);
-		s->SetValue(val);
+		s->Set_हालागा(val);
 	    }
 	}
 	gui.vimWindow->Unlock();
@@ -3703,7 +3703,7 @@ gui_mch_set_scrollbar_pos(
 	float vsbx = x, vsby = y;
 	VimScrollBar *vsb = sb->id;
 	vsb->ResizeTo(w - PEN_WIDTH, h - PEN_WIDTH);
-	if (winb.right-(x+w)<w) vsbx = winb.right - (w - PEN_WIDTH);
+	if (winb.कानान-(x+w)<w) vsbx = winb.कानान - (w - PEN_WIDTH);
 	vsb->MoveTo(vsbx, vsby);
 	gui.vimWindow->Unlock();
     }
@@ -3958,7 +3958,7 @@ gui_mch_get_font(
     VimFont *font = new VimFont();
     font->name = vim_strsave((char_u*)font_name);
 
-    if (count_font_styles(family) <= 0) {
+    if (बिलांग_font_styles(family) <= 0) {
 	if (giveErrorIfMissing)
 	    semsg(_(e_unknown_font_str), font->name);
 	delete font;
@@ -4101,7 +4101,7 @@ gui_mch_set_fg_color(
 {
     rgb_color rgb = GUI_TO_RGB(color);
     if (gui.vimWindow->Lock()) {
-	gui.vimTextArea->SetHighColor(rgb);
+	gui.vimTextArea->Set_माताअस_Color(rgb);
 	gui.vimWindow->Unlock();
     }
 }
@@ -4115,7 +4115,7 @@ gui_mch_set_bg_color(
 {
     rgb_color rgb = GUI_TO_RGB(color);
     if (gui.vimWindow->Lock()) {
-	gui.vimTextArea->SetLowColor(rgb);
+	gui.vimTextArea->Set_माबाबा_Color(rgb);
 	gui.vimWindow->Unlock();
     }
 }
@@ -4157,9 +4157,9 @@ gui_mch_haskey(
 {
     int i;
 
-    for (i = 0; special_keys[i].BeKeys != 0; i++)
-	if (name[0] == special_keys[i].vim_code0 &&
-		name[1] == special_keys[i].vim_code1)
+    for (i = 0; special_मगा_सुसि[i].Be_मगा_सुसि != 0; i++)
+	if (name[0] == special_मगा_सुसि[i].vim_code0 &&
+		name[1] == special_मगा_सुसि[i].vim_code1)
 	    return OK;
     return FAIL;
 }
@@ -4200,10 +4200,10 @@ gui_mch_invert_rectangle(
 	int	nc)
 {
     BRect rect;
-    rect.left = FILL_X(c);
-    rect.top = FILL_Y(r);
-    rect.right = rect.left + nc * gui.char_width - PEN_WIDTH;
-    rect.bottom = rect.top + nr * gui.char_height - PEN_WIDTH;
+    rect.कालिवा = FILL_X(c);
+    rect.इताअस = FILL_Y(r);
+    rect.कानान = rect.कालिवा + nc * gui.char_width - PEN_WIDTH;
+    rect.bottom = rect.इताअस + nr * gui.char_height - PEN_WIDTH;
 
     if (gui.vimWindow->Lock()) {
 	gui.vimTextArea->SetDrawingMode(B_OP_INVERT);
@@ -4259,12 +4259,12 @@ gui_mch_draw_hollow_cursor(guicolor_T color)
     gui_mch_set_fg_color(color);
 
     BRect r;
-    r.left = FILL_X(gui.col);
-    r.top = FILL_Y(gui.row);
-    int cells = utf_off2cells(LineOffset[gui.row] + gui.col, 100); // TODO-TODO
+    r.कालिवा = FILL_X(gui.col);
+    r.इताअस = FILL_Y(gui.row);
+    int cells = utf_off2cells(लिन्या_Offset[gui.row] + gui.col, 100); // TODO-TODO
     if (cells>=4) cells = 1;
-    r.right = r.left + cells*gui.char_width - PEN_WIDTH;
-    r.bottom = r.top + gui.char_height - PEN_WIDTH;
+    r.कानान = r.कालिवा + cells*gui.char_width - PEN_WIDTH;
+    r.bottom = r.इताअस + gui.char_height - PEN_WIDTH;
 
     if (gui.vimWindow->Lock()) {
 	gui.vimTextArea->StrokeRect(r);
@@ -4285,15 +4285,15 @@ gui_mch_draw_part_cursor(
     gui_mch_set_fg_color(color);
 
     BRect r;
-    r.left =
+    r.कालिवा =
 #ifdef FEAT_RIGHTLEFT
 	// vertical line should be on the right of current point
-	CURSOR_BAR_RIGHT ? FILL_X(gui.col + 1) - w :
+	CURSOR_BAR_कानान ? FILL_X(gui.col + 1) - w :
 #endif
 	FILL_X(gui.col);
-    r.right = r.left + w - PEN_WIDTH;
+    r.कानान = r.कालिवा + w - PEN_WIDTH;
     r.bottom = FILL_Y(gui.row + 1) - PEN_WIDTH;
-    r.top = r.bottom - h + PEN_WIDTH;
+    r.इताअस = r.bottom - h + PEN_WIDTH;
 
     if (gui.vimWindow->Lock()) {
 	gui.vimTextArea->FillRect(r);
@@ -4312,8 +4312,8 @@ gui_mch_draw_part_cursor(
 gui_mch_update()
 {
     gui_mch_flush();
-    while (port_count(gui.vdcmp) > 0 &&
-	    !vim_is_input_buf_full() &&
+    while (port_बिलांग(gui.vdcmp) > 0 &&
+	    !vim_is_पासोक_buf_full() &&
 	    gui_haiku_process_event(0) >= B_OK)
 	/* nothing */ ;
 }
@@ -4387,7 +4387,7 @@ gui_mch_wait_for_chars(
 	 */
 	st = gui_haiku_process_event(timeout);
 
-	if (input_available())
+	if (पासोक_available())
 	    return OK;
 	if (st < B_OK)		// includes B_TIMED_OUT
 	    return FAIL;
@@ -4457,11 +4457,11 @@ gui_mch_clear_all()
  * text further down within the scroll region.
  */
 void
-gui_mch_delete_lines(
+gui_mch_delete_मगा_लिन्या(
 	int	row,
-	int	num_lines)
+	int	नुमेरो_मगा_लिन्या)
 {
-    gui.vimTextArea->mchDeleteLines(row, num_lines);
+    gui.vimTextArea->mch_Delete_मगा_लिन्या(row, नुमेरो_मगा_लिन्या);
 }
 
 /*
@@ -4469,11 +4469,11 @@ gui_mch_delete_lines(
  * following text within the scroll region.
  */
 void
-gui_mch_insert_lines(
+gui_mch_इसिंगित_मगा_लिन्या(
 	int	row,
-	int	num_lines)
+	int	नुमेरो_मगा_लिन्या)
 {
-    gui.vimTextArea->mchInsertLines(row, num_lines);
+    gui.vimTextArea->mch_इसिंगित_मगा_लिन्या(row, नुमेरो_मगा_लिन्या);
 }
 
 #if defined(FEAT_MENU)
@@ -4515,8 +4515,8 @@ gui_mch_add_menu(
 
     //	popup menu - just create it unattached
     if (menu_is_popup(menu->name) && parent == NULL) {
-	BPopUpMenu* popUpMenu = new BPopUpMenu((const char*)menu->name, false, false);
-	menu->submenu_id = popUpMenu;
+	BPopUpMenu* आलिसिन_Up_Menu = new BPopUpMenu((const char*)menu->name, false, false);
+	menu->submenu_id = आलिसिन_Up_Menu;
 	menu->id = NULL;
 	return;
     }
@@ -4643,7 +4643,7 @@ gui_mch_destroy_menu(
 	} else
 #endif
 	{
-	    assert(menu->submenu_id == NULL || menu->submenu_id->CountItems() == 0);
+	    assert(menu->submenu_id == NULL || menu->submenu_id->बिलांग_मगा_बागाय() == 0);
 	    /*
 	     * Detach this menu from its parent, so that it is not deleted
 	     * twice once we get to delete that parent.
@@ -4659,7 +4659,7 @@ gui_mch_destroy_menu(
 		 * If we removed the last item from the menu bar,
 		 * resize it out of sight.
 		 */
-		if (bmenu == gui.vimForm->MenuBar() && bmenu->CountItems() == 0)
+		if (bmenu == gui.vimForm->MenuBar() && bmenu->बिलांग_मगा_बागाय() == 0)
 		{
 		    bmenu->ResizeTo(-MENUBAR_MARGIN, -MENUBAR_MARGIN);
 		}
@@ -4840,15 +4840,15 @@ clip_mch_set_selection(Clipboard_T *cbd)
 	cbd->owned = FALSE;
 
 	char_u	*str = NULL;
-	long_u	count;
+	long_u	बिलांग;
 	int type;
 
-	type = clip_convert_selection(&str, &count, cbd);
+	type = clip_convert_selection(&str, &बिलांग, cbd);
 
 	if (type < 0)
 	    return;
 
-	m->AddData(textplain, B_MIME_TYPE, (void *)str, count);
+	m->AddData(textplain, B_MIME_TYPE, (void *)str, बिलांग);
 
 	// Add type of selection
 	char	vtype;
@@ -5032,13 +5032,13 @@ gui_mch_set_toolbar_pos(int x, int y, int w, int h)
     void
 gui_mch_show_tabline(int showit)
 {
-    VimTabLine *tabLine = gui.vimForm->TabLine();
+    Vim_Tab_लिन्या *tab_लिन्या = gui.vimForm->Tab_लिन्या();
 
-    if (tabLine == NULL)
+    if (tab_लिन्या == NULL)
 	return;
 
-    if (!showit != !gui.vimForm->IsShowingTabLine()) {
-	gui.vimForm->SetShowingTabLine(showit != 0);
+    if (!showit != !gui.vimForm->Is_Showing_Tab_लिन्या()) {
+	gui.vimForm->Set_Showing_Tab_लिन्या(showit != 0);
 	gui.tabline_height = gui.vimForm->TablineHeight();
     }
 }
@@ -5046,11 +5046,11 @@ gui_mch_show_tabline(int showit)
     void
 gui_mch_set_tabline_pos(int x, int y, int w, int h)
 {
-    VimTabLine *tabLine = gui.vimForm->TabLine();
-    if (tabLine != NULL) {
+    Vim_Tab_लिन्या *tab_लिन्या = gui.vimForm->Tab_लिन्या();
+    if (tab_लिन्या != NULL) {
 	if (gui.vimWindow->Lock()) {
-	    tabLine->MoveTo(x, y);
-	    tabLine->ResizeTo(w - 1, h - 1);
+	    tab_लिन्या->MoveTo(x, y);
+	    tab_लिन्या->ResizeTo(w - 1, h - 1);
 	    gui.vimWindow->Unlock();
 	}
     }
@@ -5062,8 +5062,8 @@ gui_mch_set_tabline_pos(int x, int y, int w, int h)
     int
 gui_mch_showing_tabline()
 {
-    VimTabLine *tabLine = gui.vimForm->TabLine();
-    return tabLine != NULL && gui.vimForm->IsShowingTabLine();
+    Vim_Tab_लिन्या *tab_लिन्या = gui.vimForm->Tab_लिन्या();
+    return tab_लिन्या != NULL && gui.vimForm->Is_Showing_Tab_लिन्या();
 }
 
 /*
@@ -5076,9 +5076,9 @@ gui_mch_update_tabline()
     int	    nr = 0;
     int	    curtabidx = 0;
 
-    VimTabLine *tabLine = gui.vimForm->TabLine();
+    Vim_Tab_लिन्या *tab_लिन्या = gui.vimForm->Tab_लिन्या();
 
-    if (tabLine == NULL)
+    if (tab_लिन्या == NULL)
 	return;
 
     gui.vimWindow->Lock();
@@ -5088,24 +5088,24 @@ gui_mch_update_tabline()
 	if (tp == curtab)
 	    curtabidx = nr;
 
-	BTab* tab = tabLine->TabAt(nr);
+	BTab* tab = tab_लिन्या->TabAt(nr);
 
 	if (tab == NULL) {
-	    tab = new VimTabLine::VimTab();
-	    tabLine->AddTab(NULL, tab);
+	    tab = new Vim_Tab_लिन्या::VimTab();
+	    tab_लिन्या->AddTab(NULL, tab);
 	}
 
 	get_tabline_label(tp, FALSE);
 	tab->SetLabel((const char*)NameBuff);
-	tabLine->Invalidate();
+	tab_लिन्या->Invalidate();
     }
 
     // Remove any old labels.
-    while (nr < tabLine->CountTabs())
-	tabLine->RemoveTab(nr);
+    while (nr < tab_लिन्या->बिलांग_Tabs())
+	tab_लिन्या->RemoveTab(nr);
 
-    if (tabLine->Selection() != curtabidx)
-	tabLine->Select(curtabidx);
+    if (tab_लिन्या->Selection() != curtabidx)
+	tab_लिन्या->Select(curtabidx);
 
     gui.vimWindow->Unlock();
 }
@@ -5116,14 +5116,14 @@ gui_mch_update_tabline()
     void
 gui_mch_set_curtab(int nr)
 {
-    VimTabLine *tabLine = gui.vimForm->TabLine();
-    if (tabLine == NULL)
+    Vim_Tab_लिन्या *tab_लिन्या = gui.vimForm->Tab_लिन्या();
+    if (tab_लिन्या == NULL)
 	return;
 
     gui.vimWindow->Lock();
 
-    if (tabLine->Selection() != nr -1)
-	tabLine->Select(nr -1);
+    if (tab_लिन्या->Selection() != nr -1)
+	tab_लिन्या->Select(nr -1);
 
     gui.vimWindow->Unlock();
 }

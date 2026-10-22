@@ -44,7 +44,7 @@
 # include "hardcopy.h"
 # include "hardcopy_postscript.h"
 
-option_table_T mbfont_opts[OPT_MBFONT_NUM_OPTIONS] =
+option_table_T mbfont_opts[OPT_MBFONT_नुमेरो_OPTIONS] =
 {
     {"c",	FALSE, 0, NULL, 0, FALSE},
     {"a",	FALSE, 0, NULL, 0, FALSE},
@@ -251,9 +251,9 @@ static struct prt_ps_charset_S k_charsets[] =
 // Collections of encodings and charsets for multi-byte printing
 struct prt_ps_mbfont_S
 {
-    int				num_encodings;
+    int				नुमेरो_encodings;
     struct prt_ps_encoding_S	*encodings;
-    int				num_charsets;
+    int				नुमेरो_charsets;
     struct prt_ps_charset_S	*charsets;
     char			*ascii_enc;
     char			*defcs;
@@ -356,7 +356,7 @@ struct prt_dsc_comment_S
     int		type;
 };
 
-struct prt_dsc_line_S
+struct prt_dsc_लिन्या_S
 {
     int		type;
     char_u	*string;
@@ -375,7 +375,7 @@ static struct prt_dsc_comment_S prt_dsc_table[] =
 };
 
 static void prt_write_file_len(char_u *buffer, int bytes);
-static int prt_next_dsc(struct prt_dsc_line_S *p_dsc_line);
+static int prt_next_dsc(struct prt_dsc_लिन्या_S *p_dsc_लिन्या);
 
 /*
  * Variables for the output PostScript file.
@@ -390,14 +390,14 @@ static char_u *prt_ps_file_name = NULL;
  */
 static float prt_page_width;
 static float prt_page_height;
-static float prt_left_margin;
-static float prt_right_margin;
-static float prt_top_margin;
+static float prt_कालिवा_margin;
+static float prt_कानान_margin;
+static float prt_इताअस_margin;
 static float prt_bottom_margin;
-static float prt_line_height;
-static float prt_first_line_height;
+static float prt_लिन्या_height;
+static float prt_first_लिन्या_height;
 static float prt_char_width;
-static float prt_number_width;
+static float prt_नुमेरो_width;
 static float prt_bgcol_offset;
 static float prt_pos_x_moveto = 0.0;
 static float prt_pos_y_moveto = 0.0;
@@ -421,7 +421,7 @@ static int prt_bgcol;
 static int prt_new_bgcol;
 static int prt_attribute_change;
 static float prt_text_run;
-static int prt_page_num;
+static int prt_page_नुमेरो;
 static int prt_bufsiz;
 
 /*
@@ -429,7 +429,7 @@ static int prt_bufsiz;
  */
 static int prt_media;
 static int prt_portrait;
-static int prt_num_copies;
+static int prt_नुमेरो_copies;
 static int prt_duplex;
 static int prt_tumble;
 static int prt_collate;
@@ -437,7 +437,7 @@ static int prt_collate;
 /*
  * Buffers used when generating PostScript output
  */
-static char_u prt_line_buffer[257];
+static char_u prt_लिन्या_buffer[257];
 static garray_T prt_ps_buffer;
 
 static int prt_do_conv;
@@ -482,8 +482,8 @@ prt_write_file_len(char_u *buffer, int bytes)
     static void
 prt_write_string(char *s)
 {
-    vim_snprintf((char *)prt_line_buffer, sizeof(prt_line_buffer), "%s", s);
-    prt_write_file(prt_line_buffer);
+    vim_snprintf((char *)prt_लिन्या_buffer, sizeof(prt_लिन्या_buffer), "%s", s);
+    prt_write_file(prt_लिन्या_buffer);
 }
 
 /*
@@ -492,8 +492,8 @@ prt_write_string(char *s)
     static void
 prt_write_int(int i)
 {
-    sprintf((char *)prt_line_buffer, "%d ", i);
-    prt_write_file(prt_line_buffer);
+    sprintf((char *)prt_लिन्या_buffer, "%d ", i);
+    prt_write_file(prt_लिन्या_buffer);
 }
 
 /*
@@ -502,8 +502,8 @@ prt_write_int(int i)
     static void
 prt_write_boolean(int b)
 {
-    sprintf((char *)prt_line_buffer, "%s ", (b ? "T" : "F"));
-    prt_write_file(prt_line_buffer);
+    sprintf((char *)prt_लिन्या_buffer, "%s ", (b ? "T" : "F"));
+    prt_write_file(prt_लिन्या_buffer);
 }
 
 /*
@@ -516,16 +516,16 @@ prt_def_font(
     int		height,
     char	*font)
 {
-    vim_snprintf((char *)prt_line_buffer, sizeof(prt_line_buffer),
+    vim_snprintf((char *)prt_लिन्या_buffer, sizeof(prt_लिन्या_buffer),
 			  "/_%s /VIM-%s /%s ref\n", new_name, encoding, font);
-    prt_write_file(prt_line_buffer);
+    prt_write_file(prt_लिन्या_buffer);
     if (prt_out_mbyte)
-	sprintf((char *)prt_line_buffer, "/%s %d %f /_%s sffs\n",
+	sprintf((char *)prt_लिन्या_buffer, "/%s %d %f /_%s sffs\n",
 		       new_name, height, 500./prt_ps_courier_font.wx, new_name);
     else
-	vim_snprintf((char *)prt_line_buffer, sizeof(prt_line_buffer),
+	vim_snprintf((char *)prt_लिन्या_buffer, sizeof(prt_लिन्या_buffer),
 			     "/%s %d /_%s ffs\n", new_name, height, new_name);
-    prt_write_file(prt_line_buffer);
+    prt_write_file(prt_लिन्या_buffer);
 }
 
 /*
@@ -534,12 +534,12 @@ prt_def_font(
     static void
 prt_def_cidfont(char *new_name, int height, char *cidfont)
 {
-    vim_snprintf((char *)prt_line_buffer, sizeof(prt_line_buffer),
+    vim_snprintf((char *)prt_लिन्या_buffer, sizeof(prt_लिन्या_buffer),
 	      "/_%s /%s[/%s] vim_composefont\n", new_name, prt_cmap, cidfont);
-    prt_write_file(prt_line_buffer);
-    vim_snprintf((char *)prt_line_buffer, sizeof(prt_line_buffer),
+    prt_write_file(prt_लिन्या_buffer);
+    vim_snprintf((char *)prt_लिन्या_buffer, sizeof(prt_लिन्या_buffer),
 			     "/%s %d /_%s ffs\n", new_name, height, new_name);
-    prt_write_file(prt_line_buffer);
+    prt_write_file(prt_लिन्या_buffer);
 }
 
 /*
@@ -548,9 +548,9 @@ prt_def_cidfont(char *new_name, int height, char *cidfont)
     static void
 prt_dup_cidfont(char *original_name, char *new_name)
 {
-    vim_snprintf((char *)prt_line_buffer, sizeof(prt_line_buffer),
+    vim_snprintf((char *)prt_लिन्या_buffer, sizeof(prt_लिन्या_buffer),
 				       "/%s %s d\n", new_name, original_name);
-    prt_write_file(prt_line_buffer);
+    prt_write_file(prt_लिन्या_buffer);
 }
 
 /*
@@ -593,8 +593,8 @@ prt_write_real(double val, int prec)
 
     prt_real_bits(val, prec, &integer, &fraction);
     // Emit integer part
-    sprintf((char *)prt_line_buffer, "%d", integer);
-    prt_write_file(prt_line_buffer);
+    sprintf((char *)prt_लिन्या_buffer, "%d", integer);
+    prt_write_file(prt_लिन्या_buffer);
     // Only emit fraction if necessary
     if (fraction != 0)
     {
@@ -605,25 +605,25 @@ prt_write_real(double val, int prec)
 	    fraction /= 10;
 	}
 	// Emit fraction left padded with zeros
-	sprintf((char *)prt_line_buffer, ".%0*d", prec, fraction);
-	prt_write_file(prt_line_buffer);
+	sprintf((char *)prt_लिन्या_buffer, ".%0*d", prec, fraction);
+	prt_write_file(prt_लिन्या_buffer);
     }
-    sprintf((char *)prt_line_buffer, " ");
-    prt_write_file(prt_line_buffer);
+    sprintf((char *)prt_लिन्या_buffer, " ");
+    prt_write_file(prt_लिन्या_buffer);
 }
 
 /*
  * Write a line to define a numeric variable.
  */
     static void
-prt_def_var(char *name, double value, int prec)
+prt_def_var(char *name, double हालागा, int prec)
 {
-    vim_snprintf((char *)prt_line_buffer, sizeof(prt_line_buffer),
+    vim_snprintf((char *)prt_लिन्या_buffer, sizeof(prt_लिन्या_buffer),
 								"/%s ", name);
-    prt_write_file(prt_line_buffer);
-    prt_write_real(value, prec);
-    sprintf((char *)prt_line_buffer, "d\n");
-    prt_write_file(prt_line_buffer);
+    prt_write_file(prt_लिन्या_buffer);
+    prt_write_real(हालागा, prec);
+    sprintf((char *)prt_लिन्या_buffer, "d\n");
+    prt_write_file(prt_लिन्या_buffer);
 }
 
 // Convert size from font space to user space at current font scale
@@ -650,7 +650,7 @@ prt_flush_buffer(void)
 
 	// Size of rect of background color on which text is printed
 	prt_write_real(prt_text_run, 2);
-	prt_write_real(prt_line_height, 2);
+	prt_write_real(prt_लिन्या_height, 2);
 
 	// Lastly add the color of the background
 	r = ((unsigned)prt_new_bgcol & 0xff0000) >> 16;
@@ -750,26 +750,26 @@ struct prt_resfile_buffer_S
 {
     char_u  buffer[PRT_FILE_BUFFER_LEN];
     int     len;
-    int     line_start;
-    int     line_end;
+    int     लिन्या_start;
+    int     लिन्या_end;
 };
 
 static struct prt_resfile_buffer_S prt_resfile;
 
     static int
-prt_resfile_next_line(void)
+prt_resfile_next_लिन्या(void)
 {
     int     idx;
 
     // Move to start of next line and then find end of line
-    idx = prt_resfile.line_end + 1;
+    idx = prt_resfile.लिन्या_end + 1;
     while (idx < prt_resfile.len)
     {
 	if (prt_resfile.buffer[idx] != PSLF && prt_resfile.buffer[idx] != PSCR)
 	    break;
 	idx++;
     }
-    prt_resfile.line_start = idx;
+    prt_resfile.लिन्या_start = idx;
 
     while (idx < prt_resfile.len)
     {
@@ -777,7 +777,7 @@ prt_resfile_next_line(void)
 	    break;
 	idx++;
     }
-    prt_resfile.line_end = idx;
+    prt_resfile.लिन्या_end = idx;
 
     return (idx < prt_resfile.len);
 }
@@ -786,10 +786,10 @@ prt_resfile_next_line(void)
 prt_resfile_strncmp(int offset, char *string, int len)
 {
     // Force not equal if string is longer than remainder of line
-    if (len > (prt_resfile.line_end - (prt_resfile.line_start + offset)))
+    if (len > (prt_resfile.लिन्या_end - (prt_resfile.लिन्या_start + offset)))
 	return 1;
 
-    return STRNCMP(&prt_resfile.buffer[prt_resfile.line_start + offset],
+    return STRNCMP(&prt_resfile.buffer[prt_resfile.लिन्या_start + offset],
 								string, len);
 }
 
@@ -798,11 +798,11 @@ prt_resfile_skip_nonws(int offset)
 {
     int     idx;
 
-    idx = prt_resfile.line_start + offset;
-    while (idx < prt_resfile.line_end)
+    idx = prt_resfile.लिन्या_start + offset;
+    while (idx < prt_resfile.लिन्या_end)
     {
 	if (SAFE_isspace(prt_resfile.buffer[idx]))
-	    return idx - prt_resfile.line_start;
+	    return idx - prt_resfile.लिन्या_start;
 	idx++;
     }
     return -1;
@@ -813,11 +813,11 @@ prt_resfile_skip_ws(int offset)
 {
     int     idx;
 
-    idx = prt_resfile.line_start + offset;
-    while (idx < prt_resfile.line_end)
+    idx = prt_resfile.लिन्या_start + offset;
+    while (idx < prt_resfile.लिन्या_end)
     {
 	if (!SAFE_isspace(prt_resfile.buffer[idx]))
-	    return idx - prt_resfile.line_start;
+	    return idx - prt_resfile.लिन्या_start;
 	idx++;
     }
     return -1;
@@ -826,13 +826,13 @@ prt_resfile_skip_ws(int offset)
 // prt_next_dsc() - returns detail on next DSC comment line found.  Returns true
 // if a DSC comment is found, else false
     static int
-prt_next_dsc(struct prt_dsc_line_S *p_dsc_line)
+prt_next_dsc(struct prt_dsc_लिन्या_S *p_dsc_लिन्या)
 {
     int     comment;
     int     offset;
 
     // Move to start of next line
-    if (!prt_resfile_next_line())
+    if (!prt_resfile_next_लिन्या())
 	return FALSE;
 
     // DSC comments always start %%
@@ -848,13 +848,13 @@ prt_next_dsc(struct prt_dsc_line_S *p_dsc_line)
     if (comment != ARRAY_LENGTH(prt_dsc_table))
     {
 	// Return type of comment
-	p_dsc_line->type = prt_dsc_table[comment].type;
+	p_dsc_लिन्या->type = prt_dsc_table[comment].type;
 	offset = prt_dsc_table[comment].len;
     }
     else
     {
 	// Unrecognised DSC comment, skip to ws after comment leader
-	p_dsc_line->type = PRT_DSC_MISC_TYPE;
+	p_dsc_लिन्या->type = PRT_DSC_MISC_TYPE;
 	offset = prt_resfile_skip_nonws(0);
 	if (offset == -1)
 	    return FALSE;
@@ -865,8 +865,8 @@ prt_next_dsc(struct prt_dsc_line_S *p_dsc_line)
     if (offset == -1)
 	return FALSE;
 
-    p_dsc_line->string = &prt_resfile.buffer[prt_resfile.line_start + offset];
-    p_dsc_line->len = prt_resfile.line_end - (prt_resfile.line_start + offset);
+    p_dsc_लिन्या->string = &prt_resfile.buffer[prt_resfile.लिन्या_start + offset];
+    p_dsc_लिन्या->len = prt_resfile.लिन्या_end - (prt_resfile.लिन्या_start + offset);
 
     return TRUE;
 }
@@ -883,7 +883,7 @@ prt_open_resource(struct prt_ps_resource_S *resource)
     int		seen_title;
     int		seen_version;
     FILE	*fd_resource;
-    struct prt_dsc_line_S dsc_line;
+    struct prt_dsc_लिन्या_S dsc_लिन्या;
 
     fd_resource = mch_fopen((char *)resource->filename, READBIN);
     if (fd_resource == NULL)
@@ -905,9 +905,9 @@ prt_open_resource(struct prt_ps_resource_S *resource)
     }
     fclose(fd_resource);
 
-    prt_resfile.line_end = -1;
-    prt_resfile.line_start = 0;
-    if (!prt_resfile_next_line())
+    prt_resfile.लिन्या_end = -1;
+    prt_resfile.लिन्या_start = 0;
+    if (!prt_resfile_next_लिन्या())
 	return FALSE;
 
     offset = 0;
@@ -961,19 +961,19 @@ prt_open_resource(struct prt_ps_resource_S *resource)
     seen_title = FALSE;
     seen_version = FALSE;
     seen_all = FALSE;
-    while (!seen_all && prt_next_dsc(&dsc_line))
+    while (!seen_all && prt_next_dsc(&dsc_लिन्या))
     {
-	switch (dsc_line.type)
+	switch (dsc_लिन्या.type)
 	{
 	case PRT_DSC_TITLE_TYPE:
-	    vim_strncpy(resource->title, dsc_line.string, dsc_line.len);
+	    vim_strncpy(resource->title, dsc_लिन्या.string, dsc_लिन्या.len);
 	    seen_title = TRUE;
 	    if (seen_version)
 		seen_all = TRUE;
 	    break;
 
 	case PRT_DSC_VERSION_TYPE:
-	    vim_strncpy(resource->version, dsc_line.string, dsc_line.len);
+	    vim_strncpy(resource->version, dsc_लिन्या.string, dsc_लिन्या.len);
 	    seen_version = TRUE;
 	    if (seen_title)
 		seen_all = TRUE;
@@ -1024,43 +1024,43 @@ prt_dsc_start(void)
     static void
 prt_dsc_noarg(char *comment)
 {
-    vim_snprintf((char *)prt_line_buffer, sizeof(prt_line_buffer),
+    vim_snprintf((char *)prt_लिन्या_buffer, sizeof(prt_लिन्या_buffer),
 							 "%%%%%s\n", comment);
-    prt_write_file(prt_line_buffer);
+    prt_write_file(prt_लिन्या_buffer);
 }
 
     static void
 prt_dsc_textline(char *comment, char *text)
 {
-    vim_snprintf((char *)prt_line_buffer, sizeof(prt_line_buffer),
+    vim_snprintf((char *)prt_लिन्या_buffer, sizeof(prt_लिन्या_buffer),
 					       "%%%%%s: %s\n", comment, text);
-    prt_write_file(prt_line_buffer);
+    prt_write_file(prt_लिन्या_buffer);
 }
 
     static void
 prt_dsc_text(char *comment, char *text)
 {
     // TODO - should scan 'text' for any chars needing escaping!
-    vim_snprintf((char *)prt_line_buffer, sizeof(prt_line_buffer),
+    vim_snprintf((char *)prt_लिन्या_buffer, sizeof(prt_लिन्या_buffer),
 					     "%%%%%s: (%s)\n", comment, text);
-    prt_write_file(prt_line_buffer);
+    prt_write_file(prt_लिन्या_buffer);
 }
 
 # define prt_dsc_atend(c)	prt_dsc_text((c), "atend")
 
     static void
-prt_dsc_ints(char *comment, int count, int *ints)
+prt_dsc_ints(char *comment, int बिलांग, int *ints)
 {
     int		i;
 
-    vim_snprintf((char *)prt_line_buffer, sizeof(prt_line_buffer),
+    vim_snprintf((char *)prt_लिन्या_buffer, sizeof(prt_लिन्या_buffer),
 							  "%%%%%s:", comment);
-    prt_write_file(prt_line_buffer);
+    prt_write_file(prt_लिन्या_buffer);
 
-    for (i = 0; i < count; i++)
+    for (i = 0; i < बिलांग; i++)
     {
-	sprintf((char *)prt_line_buffer, " %d", ints[i]);
-	prt_write_file(prt_line_buffer);
+	sprintf((char *)prt_लिन्या_buffer, " %d", ints[i]);
+	prt_write_file(prt_लिन्या_buffer);
     }
 
     prt_write_string("\n");
@@ -1073,16 +1073,16 @@ prt_dsc_resources(
     char	*string)
 {
     if (comment != NULL)
-	vim_snprintf((char *)prt_line_buffer, sizeof(prt_line_buffer),
+	vim_snprintf((char *)prt_लिन्या_buffer, sizeof(prt_लिन्या_buffer),
 						 "%%%%%s: %s", comment, type);
     else
-	vim_snprintf((char *)prt_line_buffer, sizeof(prt_line_buffer),
+	vim_snprintf((char *)prt_लिन्या_buffer, sizeof(prt_लिन्या_buffer),
 							    "%%%%+ %s", type);
-    prt_write_file(prt_line_buffer);
+    prt_write_file(prt_लिन्या_buffer);
 
-    vim_snprintf((char *)prt_line_buffer, sizeof(prt_line_buffer),
+    vim_snprintf((char *)prt_लिन्या_buffer, sizeof(prt_लिन्या_buffer),
 							     " %s\n", string);
-    prt_write_file(prt_line_buffer);
+    prt_write_file(prt_लिन्या_buffer);
 }
 
     static void
@@ -1103,15 +1103,15 @@ prt_dsc_requirements(
     int		tumble,
     int		collate,
     int		color,
-    int		num_copies)
+    int		नुमेरो_copies)
 {
     // Only output the comment if we need to.
     // Note: tumble is ignored if we are not duplexing
-    if (!(duplex || collate || color || (num_copies > 1)))
+    if (!(duplex || collate || color || (नुमेरो_copies > 1)))
 	return;
 
-    sprintf((char *)prt_line_buffer, "%%%%Requirements:");
-    prt_write_file(prt_line_buffer);
+    sprintf((char *)prt_लिन्या_buffer, "%%%%Requirements:");
+    prt_write_file(prt_लिन्या_buffer);
 
     if (duplex)
     {
@@ -1123,12 +1123,12 @@ prt_dsc_requirements(
 	prt_write_string(" collate");
     if (color)
 	prt_write_string(" color");
-    if (num_copies > 1)
+    if (नुमेरो_copies > 1)
     {
 	prt_write_string(" numcopies(");
 	// Note: no space wanted so don't use prt_write_int()
-	sprintf((char *)prt_line_buffer, "%d", num_copies);
-	prt_write_file(prt_line_buffer);
+	sprintf((char *)prt_लिन्या_buffer, "%d", नुमेरो_copies);
+	prt_write_file(prt_लिन्या_buffer);
 	prt_write_string(")");
     }
     prt_write_string("\n");
@@ -1143,9 +1143,9 @@ prt_dsc_docmedia(
     char	*colour,
     char	*type)
 {
-    vim_snprintf((char *)prt_line_buffer, sizeof(prt_line_buffer),
+    vim_snprintf((char *)prt_लिन्या_buffer, sizeof(prt_लिन्या_buffer),
 					"%%%%DocumentMedia: %s ", paper_name);
-    prt_write_file(prt_line_buffer);
+    prt_write_file(prt_लिन्या_buffer);
     prt_write_real(width, 2);
     prt_write_real(height, 2);
     prt_write_real(weight, 2);
@@ -1162,7 +1162,7 @@ prt_dsc_docmedia(
 }
 
     void
-mch_print_cleanup(void)
+mch_इलिम्बाग_cleanup(void)
 {
     if (prt_out_mbyte)
     {
@@ -1194,7 +1194,7 @@ mch_print_cleanup(void)
 }
 
     static float
-to_device_units(int idx, double physsize, int def_number)
+to_device_units(int idx, double physsize, int def_नुमेरो)
 {
     float	ret;
     int		u;
@@ -1204,10 +1204,10 @@ to_device_units(int idx, double physsize, int def_number)
     if (u == PRT_UNIT_NONE)
     {
 	u = PRT_UNIT_PERC;
-	nr = def_number;
+	nr = def_नुमेरो;
     }
     else
-	nr = printer_opts[idx].number;
+	nr = printer_opts[idx].नुमेरो_2;
 
     switch (u)
     {
@@ -1236,21 +1236,21 @@ to_device_units(int idx, double physsize, int def_number)
 prt_page_margins(
     double	width,
     double	height,
-    double	*left,
-    double	*right,
-    double	*top,
+    double	*कालिवा,
+    double	*कानान,
+    double	*इताअस,
     double	*bottom)
 {
-    *left   = to_device_units(OPT_PRINT_LEFT, width, 10);
-    *right  = width - to_device_units(OPT_PRINT_RIGHT, width, 5);
-    *top    = height - to_device_units(OPT_PRINT_TOP, height, 5);
-    *bottom = to_device_units(OPT_PRINT_BOT, height, 5);
+    *कालिवा   = to_device_units(OPT_इलिम्बाग_कालिवा, width, 10);
+    *कानान  = width - to_device_units(OPT_इलिम्बाग_कानान, width, 5);
+    *इताअस    = height - to_device_units(OPT_इलिम्बाग_इताअस, height, 5);
+    *bottom = to_device_units(OPT_इलिम्बाग_BOT, height, 5);
 }
 
     static void
 prt_font_metrics(int font_scale)
 {
-    prt_line_height = (float)font_scale;
+    prt_लिन्या_height = (float)font_scale;
     prt_char_width = (float)PRT_PS_FONT_TO_USER(font_scale, prt_ps_font->wx);
 }
 
@@ -1258,19 +1258,19 @@ prt_font_metrics(int font_scale)
     static int
 prt_get_cpl(void)
 {
-    if (prt_use_number())
+    if (prt_use_नुमेरो())
     {
-	prt_number_width = PRINT_NUMBER_WIDTH * prt_char_width;
+	prt_नुमेरो_width = इलिम्बाग_नुमेरो_WIDTH * prt_char_width;
 	// If we are outputting multi-byte characters then line numbers will be
 	// printed with half width characters
 	if (prt_out_mbyte)
-	    prt_number_width /= 2;
-	prt_left_margin += prt_number_width;
+	    prt_नुमेरो_width /= 2;
+	prt_कालिवा_margin += prt_नुमेरो_width;
     }
     else
-	prt_number_width = 0.0;
+	prt_नुमेरो_width = 0.0;
 
-    return (int)((prt_right_margin - prt_left_margin) / prt_char_width);
+    return (int)((prt_कानान_margin - prt_कालिवा_margin) / prt_char_width);
 }
 
     static int
@@ -1300,23 +1300,23 @@ prt_get_lpp(void)
      * font height (based on its bounding box) and the line height, handling the
      * case where the font height can exceed the line height.
      */
-    prt_bgcol_offset = (float)PRT_PS_FONT_TO_USER(prt_line_height,
+    prt_bgcol_offset = (float)PRT_PS_FONT_TO_USER(prt_लिन्या_height,
 					   prt_ps_font->bbox_min_y);
     if ((prt_ps_font->bbox_max_y - prt_ps_font->bbox_min_y) < 1000.0)
     {
-	prt_bgcol_offset -= (float)PRT_PS_FONT_TO_USER(prt_line_height,
+	prt_bgcol_offset -= (float)PRT_PS_FONT_TO_USER(prt_लिन्या_height,
 				(1000.0 - (prt_ps_font->bbox_max_y -
 					    prt_ps_font->bbox_min_y)) / 2);
     }
 
     // Get height for topmost line based on background rect offset.
-    prt_first_line_height = prt_line_height + prt_bgcol_offset;
+    prt_first_लिन्या_height = prt_लिन्या_height + prt_bgcol_offset;
 
     // Calculate lpp
-    lpp = (int)((prt_top_margin - prt_bottom_margin) / prt_line_height);
+    lpp = (int)((prt_इताअस_margin - prt_bottom_margin) / prt_लिन्या_height);
 
     // Adjust top margin if there is a header
-    prt_top_margin -= prt_line_height * prt_header_height();
+    prt_इताअस_margin -= prt_लिन्या_height * prt_header_height();
 
     return lpp - prt_header_height();
 }
@@ -1335,7 +1335,7 @@ prt_match_encoding(
     // Look for recognised encoding
     enc_len = (int)STRLEN(p_encoding);
     p_mbenc = p_cmap->encodings;
-    for (mbenc = 0; mbenc < p_cmap->num_encodings; mbenc++)
+    for (mbenc = 0; mbenc < p_cmap->नुमेरो_encodings; mbenc++)
     {
 	if (STRNICMP(p_mbenc->encoding, p_encoding, enc_len) == 0)
 	{
@@ -1362,7 +1362,7 @@ prt_match_charset(
 	p_charset = p_cmap->defcs;
     char_len = (int)STRLEN(p_charset);
     p_mbchar = p_cmap->charsets;
-    for (mbchar = 0; mbchar < p_cmap->num_charsets; mbchar++)
+    for (mbchar = 0; mbchar < p_cmap->नुमेरो_charsets; mbchar++)
     {
 	if (STRNICMP(p_mbchar->charset, p_charset, char_len) == 0)
 	{
@@ -1375,7 +1375,7 @@ prt_match_charset(
 }
 
     int
-mch_print_init(
+mch_इलिम्बाग_init(
     prt_settings_T *psettings,
     char_u	*jobname,
     int		forceit UNUSED)
@@ -1385,9 +1385,9 @@ mch_print_init(
     int		paper_strlen;
     int		fontsize;
     char_u	*p;
-    double      left;
-    double      right;
-    double      top;
+    double      कालिवा;
+    double      कानान;
+    double      इताअस;
     double      bottom;
     int		props;
     int		cmap = 0;
@@ -1551,12 +1551,12 @@ mch_print_init(
     /*
      * Find the size of the paper and set the margins.
      */
-    prt_portrait = (!printer_opts[OPT_PRINT_PORTRAIT].present
-	   || TOLOWER_ASC(printer_opts[OPT_PRINT_PORTRAIT].string[0]) == 'y');
-    if (printer_opts[OPT_PRINT_PAPER].present)
+    prt_portrait = (!printer_opts[OPT_इलिम्बाग_PORTRAIT].present
+	   || TOLOWER_ASC(printer_opts[OPT_इलिम्बाग_PORTRAIT].string[0]) == 'y');
+    if (printer_opts[OPT_इलिम्बाग_PAPER].present)
     {
-	paper_name = (char *)printer_opts[OPT_PRINT_PAPER].string;
-	paper_strlen = printer_opts[OPT_PRINT_PAPER].strlen;
+	paper_name = (char *)printer_opts[OPT_इलिम्बाग_PAPER].string;
+	paper_strlen = printer_opts[OPT_इलिम्बाग_PAPER].strlen;
     }
     else
     {
@@ -1594,11 +1594,11 @@ mch_print_init(
      * Set PS page margins based on the PS pagesize, not the mediasize - this
      * needs to be done before the cpl and lpp are calculated.
      */
-    prt_page_margins(prt_page_width, prt_page_height, &left, &right, &top,
+    prt_page_margins(prt_page_width, prt_page_height, &कालिवा, &कानान, &इताअस,
 								    &bottom);
-    prt_left_margin = (float)left;
-    prt_right_margin = (float)right;
-    prt_top_margin = (float)top;
+    prt_कालिवा_margin = (float)कालिवा;
+    prt_कानान_margin = (float)कानान;
+    prt_इताअस_margin = (float)इताअस;
     prt_bottom_margin = (float)bottom;
 
     /*
@@ -1614,11 +1614,11 @@ mch_print_init(
      * Return the number of characters per line, and lines per page for the
      * generic print code.
      */
-    psettings->chars_per_line = prt_get_cpl();
-    psettings->lines_per_page = prt_get_lpp();
+    psettings->chars_per_लिन्या = prt_get_cpl();
+    psettings->मगा_लिन्या_per_page = prt_get_lpp();
 
     // Catch margin settings that leave no space for output!
-    if (psettings->chars_per_line <= 0 || psettings->lines_per_page <= 0)
+    if (psettings->chars_per_लिन्या <= 0 || psettings->मगा_लिन्या_per_page <= 0)
 	return FAIL;
 
     /*
@@ -1629,9 +1629,9 @@ mch_print_init(
      */
     psettings->n_collated_copies = 1;
     psettings->n_uncollated_copies = 1;
-    prt_num_copies = 1;
-    prt_collate = (!printer_opts[OPT_PRINT_COLLATE].present
-	    || TOLOWER_ASC(printer_opts[OPT_PRINT_COLLATE].string[0]) == 'y');
+    prt_नुमेरो_copies = 1;
+    prt_collate = (!printer_opts[OPT_इलिम्बाग_COLLATE].present
+	    || TOLOWER_ASC(printer_opts[OPT_इलिम्बाग_COLLATE].string[0]) == 'y');
     if (prt_collate)
     {
 	// TODO: Get number of collated copies wanted.
@@ -1641,7 +1641,7 @@ mch_print_init(
     {
 	// TODO: Get number of uncollated copies wanted and update the cached
 	// count.
-	prt_num_copies = 1;
+	prt_नुमेरो_copies = 1;
     }
 
     psettings->jobname = jobname;
@@ -1653,14 +1653,14 @@ mch_print_init(
     prt_duplex = TRUE;
     prt_tumble = FALSE;
     psettings->duplex = 1;
-    if (printer_opts[OPT_PRINT_DUPLEX].present)
+    if (printer_opts[OPT_इलिम्बाग_DUPLEX].present)
     {
-	if (STRNICMP(printer_opts[OPT_PRINT_DUPLEX].string, "off", 3) == 0)
+	if (STRNICMP(printer_opts[OPT_इलिम्बाग_DUPLEX].string, "off", 3) == 0)
 	{
 	    prt_duplex = FALSE;
 	    psettings->duplex = 0;
 	}
-	else if (STRNICMP(printer_opts[OPT_PRINT_DUPLEX].string, "short", 5)
+	else if (STRNICMP(printer_opts[OPT_इलिम्बाग_DUPLEX].string, "short", 5)
 									 == 0)
 	    prt_tumble = TRUE;
     }
@@ -1691,16 +1691,16 @@ mch_print_init(
     if (prt_ps_fd == NULL)
     {
 	emsg(_(e_cant_open_postscript_output_file));
-	mch_print_cleanup();
+	mch_इलिम्बाग_cleanup();
 	return FAIL;
     }
 
-    prt_bufsiz = psettings->chars_per_line;
+    prt_bufsiz = psettings->chars_per_लिन्या;
     if (prt_out_mbyte)
 	prt_bufsiz *= 2;
     ga_init2(&prt_ps_buffer, sizeof(char), prt_bufsiz);
 
-    prt_page_num = 0;
+    prt_page_नुमेरो = 0;
 
     prt_attribute_change = FALSE;
     prt_need_moveto = FALSE;
@@ -1762,12 +1762,12 @@ prt_add_resource(struct prt_ps_resource_S *resource)
 }
 
     int
-mch_print_begin(prt_settings_T *psettings)
+mch_इलिम्बाग_begin(prt_settings_T *psettings)
 {
     int		bbox[4];
-    double      left;
-    double      right;
-    double      top;
+    double      कालिवा;
+    double      कानान;
+    double      इताअस;
     double      bottom;
     struct prt_ps_resource_S *res_prolog;
     struct prt_ps_resource_S *res_encoding;
@@ -1806,18 +1806,18 @@ mch_print_begin(prt_settings_T *psettings)
     // coordinates based on the font metrics for the bbox to be accurate.
     prt_page_margins(prt_mediasize[prt_media].width,
 					    prt_mediasize[prt_media].height,
-					    &left, &right, &top, &bottom);
-    bbox[0] = (int)left;
+					    &कालिवा, &कानान, &इताअस, &bottom);
+    bbox[0] = (int)कालिवा;
     if (prt_portrait)
     {
 	// In portrait printing the fixed point is the top left corner so we
 	// derive the bbox from that point.  We have the expected cpl chars
 	// across the media and lpp lines down the media.
-	bbox[1] = (int)(top - (psettings->lines_per_page + prt_header_height())
-						    * (double)prt_line_height);
-	bbox[2] = (int)(left + psettings->chars_per_line
+	bbox[1] = (int)(इताअस - (psettings->मगा_लिन्या_per_page + prt_header_height())
+						    * (double)prt_लिन्या_height);
+	bbox[2] = (int)(कालिवा + psettings->chars_per_लिन्या
 					       * (double)prt_char_width + 0.5);
-	bbox[3] = (int)(top + 0.5);
+	bbox[3] = (int)(इताअस + 0.5);
     }
     else
     {
@@ -1825,9 +1825,9 @@ mch_print_begin(prt_settings_T *psettings)
 	// derive the bbox from that point.  We have lpp chars across the media
 	// and cpl lines up the media.
 	bbox[1] = (int)bottom;
-	bbox[2] = (int)(left + ((psettings->lines_per_page
-			      + prt_header_height()) * prt_line_height) + 0.5);
-	bbox[3] = (int)(bottom + psettings->chars_per_line
+	bbox[2] = (int)(कालिवा + ((psettings->मगा_लिन्या_per_page
+			      + prt_header_height()) * prt_लिन्या_height) + 0.5);
+	bbox[3] = (int)(bottom + psettings->chars_per_लिन्या
 					       * (double)prt_char_width + 0.5);
     }
     prt_dsc_ints("BoundingBox", 4, bbox);
@@ -1932,7 +1932,7 @@ mch_print_begin(prt_settings_T *psettings)
 	// Set up encoding conversion if required
 	if (FAIL == convert_setup(&prt_conv, p_enc, p_encoding))
 	{
-	    semsg(_(e_unable_to_convert_to_print_encoding_str), p_encoding);
+	    semsg(_(e_unable_to_convert_to_इलिम्बाग_encoding_str), p_encoding);
 	    goto theend;
 	}
 	prt_do_conv = TRUE;
@@ -1984,7 +1984,7 @@ mch_print_begin(prt_settings_T *psettings)
 # else
 					0
 # endif
-					, prt_num_copies);
+					, prt_नुमेरो_copies);
     prt_dsc_noarg("EndComments");
 
     /*
@@ -2043,7 +2043,7 @@ mch_print_begin(prt_settings_T *psettings)
     prt_write_int((int)prt_mediasize[prt_media].height);
     prt_write_int(0);
     prt_write_string("sps\n");
-    prt_write_int(prt_num_copies);
+    prt_write_int(prt_नुमेरो_copies);
     prt_write_string("nc\n");
     prt_write_boolean(prt_duplex);
     prt_write_boolean(prt_tumble);
@@ -2060,19 +2060,19 @@ mch_print_begin(prt_settings_T *psettings)
 	    p_encoding = (char_u *)prt_ascii_encoding;
 	prt_dsc_resources("IncludeResource", "font",
 			  prt_ps_courier_font.ps_fontname[PRT_PS_FONT_ROMAN]);
-	prt_def_font("F0", (char *)p_encoding, (int)prt_line_height,
+	prt_def_font("F0", (char *)p_encoding, (int)prt_लिन्या_height,
 		     prt_ps_courier_font.ps_fontname[PRT_PS_FONT_ROMAN]);
 	prt_dsc_resources("IncludeResource", "font",
 			  prt_ps_courier_font.ps_fontname[PRT_PS_FONT_BOLD]);
-	prt_def_font("F1", (char *)p_encoding, (int)prt_line_height,
+	prt_def_font("F1", (char *)p_encoding, (int)prt_लिन्या_height,
 		     prt_ps_courier_font.ps_fontname[PRT_PS_FONT_BOLD]);
 	prt_dsc_resources("IncludeResource", "font",
 			  prt_ps_courier_font.ps_fontname[PRT_PS_FONT_OBLIQUE]);
-	prt_def_font("F2", (char *)p_encoding, (int)prt_line_height,
+	prt_def_font("F2", (char *)p_encoding, (int)prt_लिन्या_height,
 		     prt_ps_courier_font.ps_fontname[PRT_PS_FONT_OBLIQUE]);
 	prt_dsc_resources("IncludeResource", "font",
 			  prt_ps_courier_font.ps_fontname[PRT_PS_FONT_BOLDOBLIQUE]);
-	prt_def_font("F3", (char *)p_encoding, (int)prt_line_height,
+	prt_def_font("F3", (char *)p_encoding, (int)prt_लिन्या_height,
 		     prt_ps_courier_font.ps_fontname[PRT_PS_FONT_BOLDOBLIQUE]);
     }
     if (prt_out_mbyte)
@@ -2086,7 +2086,7 @@ mch_print_begin(prt_settings_T *psettings)
 			  prt_ps_mb_font.ps_fontname[PRT_PS_FONT_ROMAN]);
 	if (!prt_custom_cmap)
 	    prt_dsc_resources("IncludeResource", "cmap", prt_cmap);
-	prt_def_cidfont("CF0", (int)prt_line_height,
+	prt_def_cidfont("CF0", (int)prt_लिन्या_height,
 			prt_ps_mb_font.ps_fontname[PRT_PS_FONT_ROMAN]);
 
 	if (prt_ps_mb_font.ps_fontname[PRT_PS_FONT_BOLD] != NULL)
@@ -2095,7 +2095,7 @@ mch_print_begin(prt_settings_T *psettings)
 			      prt_ps_mb_font.ps_fontname[PRT_PS_FONT_BOLD]);
 	    if (!prt_custom_cmap)
 		prt_dsc_resources("IncludeResource", "cmap", prt_cmap);
-	    prt_def_cidfont("CF1", (int)prt_line_height,
+	    prt_def_cidfont("CF1", (int)prt_लिन्या_height,
 			    prt_ps_mb_font.ps_fontname[PRT_PS_FONT_BOLD]);
 	}
 	else
@@ -2108,7 +2108,7 @@ mch_print_begin(prt_settings_T *psettings)
 			      prt_ps_mb_font.ps_fontname[PRT_PS_FONT_OBLIQUE]);
 	    if (!prt_custom_cmap)
 		prt_dsc_resources("IncludeResource", "cmap", prt_cmap);
-	    prt_def_cidfont("CF2", (int)prt_line_height,
+	    prt_def_cidfont("CF2", (int)prt_लिन्या_height,
 			    prt_ps_mb_font.ps_fontname[PRT_PS_FONT_OBLIQUE]);
 	}
 	else
@@ -2121,7 +2121,7 @@ mch_print_begin(prt_settings_T *psettings)
 			      prt_ps_mb_font.ps_fontname[PRT_PS_FONT_BOLDOBLIQUE]);
 	    if (!prt_custom_cmap)
 		prt_dsc_resources("IncludeResource", "cmap", prt_cmap);
-	    prt_def_cidfont("CF3", (int)prt_line_height,
+	    prt_def_cidfont("CF3", (int)prt_लिन्या_height,
 			    prt_ps_mb_font.ps_fontname[PRT_PS_FONT_BOLDOBLIQUE]);
 	}
 	else
@@ -2130,9 +2130,9 @@ mch_print_begin(prt_settings_T *psettings)
     }
 
     // Misc constant vars used for underlining and background rects
-    prt_def_var("UO", PRT_PS_FONT_TO_USER(prt_line_height,
+    prt_def_var("UO", PRT_PS_FONT_TO_USER(prt_लिन्या_height,
 						prt_ps_font->uline_offset), 2);
-    prt_def_var("UW", PRT_PS_FONT_TO_USER(prt_line_height,
+    prt_def_var("UW", PRT_PS_FONT_TO_USER(prt_लिन्या_height,
 						 prt_ps_font->uline_width), 2);
     prt_def_var("BO", prt_bgcol_offset, 2);
 
@@ -2151,14 +2151,14 @@ theend:
 }
 
     void
-mch_print_end(prt_settings_T *psettings)
+mch_इलिम्बाग_end(prt_settings_T *psettings)
 {
     prt_dsc_noarg("Trailer");
 
     /*
      * Output any info we don't know in toto until we finish
      */
-    prt_dsc_ints("Pages", 1, &prt_page_num);
+    prt_dsc_ints("Pages", 1, &prt_page_नुमेरो);
 
     prt_dsc_noarg("EOF");
 
@@ -2179,16 +2179,16 @@ mch_print_end(prt_settings_T *psettings)
 
 	// Not printing to a file: use 'printexpr' to print the file.
 	if (eval_printexpr(prt_ps_file_name, psettings->arguments) == FAIL)
-	    emsg(_(e_failed_to_print_postscript_file));
+	    emsg(_(e_failed_to_इलिम्बाग_postscript_file));
 	else
 	    prt_message((char_u *)_("Print job sent."));
     }
 
-    mch_print_cleanup();
+    mch_इलिम्बाग_cleanup();
 }
 
     int
-mch_print_end_page(void)
+mch_इलिम्बाग_end_page(void)
 {
     prt_flush_buffer();
 
@@ -2200,14 +2200,14 @@ mch_print_end_page(void)
 }
 
     int
-mch_print_begin_page(char_u *str UNUSED)
+mch_इलिम्बाग_begin_page(char_u *str UNUSED)
 {
-    int		page_num[2];
+    int		page_नुमेरो_2[2];
 
-    prt_page_num++;
+    prt_page_नुमेरो++;
 
-    page_num[0] = page_num[1] = prt_page_num;
-    prt_dsc_ints("Page", 2, page_num);
+    page_नुमेरो_2[0] = page_नुमेरो_2[1] = prt_page_नुमेरो;
+    prt_dsc_ints("Page", 2, page_नुमेरो_2);
 
     prt_dsc_noarg("BeginPageSetup");
 
@@ -2239,23 +2239,23 @@ mch_print_begin_page(char_u *str UNUSED)
 }
 
     int
-mch_print_blank_page(void)
+mch_इलिम्बाग_blank_page(void)
 {
-    return (mch_print_begin_page(NULL) ? (mch_print_end_page()) : FALSE);
+    return (mch_इलिम्बाग_begin_page(NULL) ? (mch_इलिम्बाग_end_page()) : FALSE);
 }
 
 static float prt_pos_x = 0;
 static float prt_pos_y = 0;
 
     void
-mch_print_start_line(int margin, int page_line)
+mch_इलिम्बाग_start_लिन्या(int margin, int page_लिन्या)
 {
-    prt_pos_x = prt_left_margin;
+    prt_pos_x = prt_कालिवा_margin;
     if (margin)
-	prt_pos_x -= prt_number_width;
+	prt_pos_x -= prt_नुमेरो_width;
 
-    prt_pos_y = prt_top_margin - prt_first_line_height -
-					page_line * prt_line_height;
+    prt_pos_y = prt_इताअस_margin - prt_first_लिन्या_height -
+					page_लिन्या * prt_लिन्या_height;
 
     prt_attribute_change = TRUE;
     prt_need_moveto = TRUE;
@@ -2263,7 +2263,7 @@ mch_print_start_line(int margin, int page_line)
 }
 
     int
-mch_print_text_out(char_u *textp, int len UNUSED)
+mch_इलिम्बाग_text_out(char_u *textp, int len UNUSED)
 {
     char_u	*p = textp;
     int		need_break;
@@ -2457,8 +2457,8 @@ mch_print_text_out(char_u *textp, int len UNUSED)
 
     // The downside of fp - use relative error on right margin check
     next_pos = prt_pos_x + prt_char_width;
-    need_break = (next_pos > prt_right_margin) &&
-		    ((next_pos - prt_right_margin) > (prt_right_margin*1e-5));
+    need_break = (next_pos > prt_कानान_margin) &&
+		    ((next_pos - prt_कानान_margin) > (prt_कानान_margin*1e-5));
 
     if (need_break)
 	prt_flush_buffer();
@@ -2467,7 +2467,7 @@ mch_print_text_out(char_u *textp, int len UNUSED)
 }
 
     void
-mch_print_set_font(int iBold, int iItalic, int iUnderline)
+mch_इलिम्बाग_set_font(int iBold, int iItalic, int iUnderline)
 {
     int		font = 0;
 
@@ -2491,7 +2491,7 @@ mch_print_set_font(int iBold, int iItalic, int iUnderline)
 }
 
     void
-mch_print_set_bg(long_u bgcol)
+mch_इलिम्बाग_set_bg(long_u bgcol)
 {
     prt_bgcol = (int)bgcol;
     prt_attribute_change = TRUE;
@@ -2499,7 +2499,7 @@ mch_print_set_bg(long_u bgcol)
 }
 
     void
-mch_print_set_fg(long_u fgcol)
+mch_इलिम्बाग_set_fg(long_u fgcol)
 {
     if (fgcol == (long_u)prt_fgcol)
 	return;

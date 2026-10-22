@@ -35,7 +35,7 @@ main(void)
     HANDLE	    hstdout;
     DWORD	    written;
 
-    p = (const wchar_t *)GetCommandLineW();
+    p = (const wchar_t *)Get_Command_लिन्या_W();
 
     /*
      * Skip the executable name, which might be in "".

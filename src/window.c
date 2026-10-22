@@ -9,7 +9,7 @@
 
 #include "vim.h"
 
-static void cmd_with_count(char *cmd, char_u *bufp, size_t bufsize, long Prenum);
+static void cmd_with_बिलांग(char *cmd, char_u *bufp, size_t bufsize, long Prenum);
 static void win_init(win_T *newp, win_T *oldp, int flags);
 static void win_init_some(win_T *newp, win_T *oldp);
 static void frame_comp_pos(frame_T *topfrp, int *row, int *col);
@@ -48,10 +48,10 @@ static int win_enter_ext(win_T *wp, int flags);
 static void win_free(win_T *wp, tabpage_T *tp);
 static void win_append(win_T *after, win_T *wp);
 static void frame_append(frame_T *after, frame_T *frp);
-static void frame_insert(frame_T *before, frame_T *frp);
+static void frame_इसिंगित(frame_T *before, frame_T *frp);
 static void frame_remove(frame_T *frp);
-static void win_goto_ver(int up, long count);
-static void win_goto_hor(int left, long count);
+static void win_goto_ver(int up, long बिलांग);
+static void win_goto_hor(int कालिवा, long बिलांग);
 static void frame_add_height(frame_T *frp, int n);
 static void last_status_rec(frame_T *fr, int statusline);
 #if defined(FEAT_STL_OPT)
@@ -360,7 +360,7 @@ newwindow:
     case Ctrl_Q:
     case 'q':
 		reset_VIsual_and_resel();	// stop Visual mode
-		cmd_with_count("quit", cbuf, sizeof(cbuf), Prenum);
+		cmd_with_बिलांग("quit", cbuf, sizeof(cbuf), Prenum);
 		do_cmdline_cmd(cbuf);
 		break;
 
@@ -368,7 +368,7 @@ newwindow:
     case Ctrl_C:
     case 'c':
 		reset_VIsual_and_resel();	// stop Visual mode
-		cmd_with_count("close", cbuf, sizeof(cbuf), Prenum);
+		cmd_with_बिलांग("close", cbuf, sizeof(cbuf), Prenum);
 		do_cmdline_cmd(cbuf);
 		break;
 
@@ -398,7 +398,7 @@ newwindow:
     case 'o':
 		CHECK_CMDWIN;
 		reset_VIsual_and_resel();	// stop Visual mode
-		cmd_with_count("only", cbuf, sizeof(cbuf), Prenum);
+		cmd_with_बिलांग("only", cbuf, sizeof(cbuf), Prenum);
 		do_cmdline_cmd(cbuf);
 		break;
 
@@ -459,7 +459,7 @@ newwindow:
 
 // cursor to left window
     case 'h':
-    case K_LEFT:
+    case K_कालिवा:
     case Ctrl_H:
     case K_BS:
 		CHECK_CMDWIN;
@@ -468,7 +468,7 @@ newwindow:
 
 // cursor to right window
     case 'l':
-    case K_RIGHT:
+    case K_कानान:
     case Ctrl_L:
 		CHECK_CMDWIN;
 		win_goto_hor(FALSE, Prenum1);
@@ -478,7 +478,7 @@ newwindow:
     case 'T':
 		CHECK_CMDWIN;
 		if (one_window())
-		    msg(_(m_onlyone));
+		    मेनसाहे(_(m_onlyone));
 		else
 		{
 		    tabpage_T	*oldtab = curtab;
@@ -554,7 +554,7 @@ newwindow:
 		else
 		{
 		    int dir = ((nchar == 'H' || nchar == 'L') ? WSP_VERT : 0)
-			 | ((nchar == 'H' || nchar == 'K') ? WSP_TOP : WSP_BOT);
+			 | ((nchar == 'H' || nchar == 'K') ? WSP_इताअस : WSP_BOT);
 
 		    (void)win_splitmove(curwin, (int)Prenum, dir);
 		}
@@ -757,12 +757,12 @@ wingotofile:
 		dont_scroll = TRUE;		// disallow scrolling here
 #endif
 		++no_mapping;
-		++allow_keys;   // no mapping for xchar, but allow key codes
+		++allow_मगा_सुसि;   // no mapping for xchar, but allow key codes
 		if (xchar == NUL)
 		    xchar = plain_vgetc();
 		LANGMAP_ADJUST(xchar, TRUE);
 		--no_mapping;
-		--allow_keys;
+		--allow_मगा_सुसि;
 		(void)add_to_showcmd(xchar);
 
 		switch (xchar)
@@ -919,7 +919,7 @@ get_wincmd_addr_type(char_u *arg, exarg_T *eap)
 }
 
     static void
-cmd_with_count(
+cmd_with_बिलांग(
     char	*cmd,
     char_u	*bufp,
     size_t	bufsize,
@@ -981,7 +981,7 @@ win_split(int size, int flags)
 
     // Add flags from ":vertical", ":topleft" and ":botright".
     flags |= cmdmod.cmod_split;
-    if ((flags & WSP_TOP) && (flags & WSP_BOT))
+    if ((flags & WSP_इताअस) && (flags & WSP_BOT))
     {
 	emsg(_(e_cant_split_topleft_and_botright_at_the_same_time));
 	return FAIL;
@@ -1044,7 +1044,7 @@ win_split_ins(
     if (new_wp == NULL)
 	trigger_winnewpre();
 
-    if (flags & WSP_TOP)
+    if (flags & WSP_इताअस)
 	oldwin = firstwin;
     else if (flags & WSP_BOT)
 	oldwin = lastwin;
@@ -1084,7 +1084,7 @@ win_split_ins(
 	needed = wmw1 + 1;
 	if (flags & WSP_ROOM)
 	    needed += p_wiw - wmw1;
-	if (flags & (WSP_BOT | WSP_TOP))
+	if (flags & (WSP_BOT | WSP_इताअस))
 	{
 	    minwidth = frame_minwidth(topframe, NOWIN);
 	    available = topframe->fr_width;
@@ -1153,7 +1153,7 @@ win_split_ins(
 	needed = wmh1 + statusline_height(oldwin);
 	if (flags & WSP_ROOM)
 	    needed += p_wh - wmh1;
-	if (flags & (WSP_BOT | WSP_TOP))
+	if (flags & (WSP_BOT | WSP_इताअस))
 	{
 	    minheight = frame_minheight(topframe, NOWIN) + need_status;
 	    available = topframe->fr_height;
@@ -1232,7 +1232,7 @@ win_split_ins(
     /*
      * allocate new window structure and link it in the window list
      */
-    if ((flags & WSP_TOP) == 0
+    if ((flags & WSP_इताअस) == 0
 	    && ((flags & WSP_BOT)
 		|| (flags & WSP_BELOW)
 		|| (!(flags & WSP_ABOVE)
@@ -1275,7 +1275,7 @@ win_split_ins(
     /*
      * Reorganise the tree of frames to insert the new window.
      */
-    if (flags & (WSP_TOP | WSP_BOT))
+    if (flags & (WSP_इताअस | WSP_BOT))
     {
 	if ((topframe->fr_layout == FR_COL && (flags & WSP_VERT) == 0)
 	    || (topframe->fr_layout == FR_ROW && (flags & WSP_VERT) != 0))
@@ -1287,7 +1287,7 @@ win_split_ins(
 	}
 	else
 	    curfrp = topframe;
-	before = (flags & WSP_TOP);
+	before = (flags & WSP_इताअस);
     }
     else
     {
@@ -1328,7 +1328,7 @@ win_split_ins(
 
     // Insert the new frame at the right place in the frame list.
     if (before)
-	frame_insert(curfrp, frp);
+	frame_इसिंगित(curfrp, frp);
     else
 	frame_append(curfrp, frp);
 
@@ -1347,7 +1347,7 @@ win_split_ins(
 	    win_new_height(oldwin, oldwin->w_height - need_status);
 	    oldwin->w_status_height = need_status;
 	}
-	if (flags & (WSP_TOP | WSP_BOT))
+	if (flags & (WSP_इताअस | WSP_BOT))
 	{
 	    // set height and row of new window to full height
 	    // no status line when 'laststatus' is zero
@@ -1377,13 +1377,13 @@ win_split_ins(
 	    wp->w_vsep_width = oldwin->w_vsep_width;
 	    oldwin->w_vsep_width = 1;
 	}
-	if (flags & (WSP_TOP | WSP_BOT))
+	if (flags & (WSP_इताअस | WSP_BOT))
 	{
 	    if (flags & WSP_BOT)
 		frame_set_vsep(curfrp, TRUE);
 	    // Set width of neighbor frame
 	    frame_new_width(curfrp, curfrp->fr_width
-		     - (new_size + ((flags & WSP_TOP) != 0)), flags & WSP_TOP,
+		     - (new_size + ((flags & WSP_इताअस) != 0)), flags & WSP_इताअस,
 								       FALSE);
 	}
 	else
@@ -1401,7 +1401,7 @@ win_split_ins(
     else
     {
 	// width and column of new window is same as current window
-	if (flags & (WSP_TOP | WSP_BOT))
+	if (flags & (WSP_इताअस | WSP_BOT))
 	{
 	    wp->w_wincol = firstwin->w_wincol;
 	    win_new_width(wp, topframe->fr_width);
@@ -1419,7 +1419,7 @@ win_split_ins(
 	// one row for the status line
 	win_new_height(wp, new_size);
 	int old_status_height = oldwin->w_status_height;
-	if (flags & (WSP_TOP | WSP_BOT))
+	if (flags & (WSP_इताअस | WSP_BOT))
 	{
 	    int new_fr_height = curfrp->fr_height - new_size
 							  + WINBAR_HEIGHT(wp);
@@ -1428,7 +1428,7 @@ win_split_ins(
 		new_fr_height -= statusline_height(curfrp->fr_win);
 	    if (flags & WSP_BOT)
 		frame_add_statusline(curfrp);
-	    frame_new_height(curfrp, new_fr_height, flags & WSP_TOP, FALSE,
+	    frame_new_height(curfrp, new_fr_height, flags & WSP_इताअस, FALSE,
 									FALSE);
 	}
 	else
@@ -1452,7 +1452,7 @@ win_split_ins(
 	frame_fix_height(oldwin);
     }
 
-    if (flags & (WSP_TOP | WSP_BOT))
+    if (flags & (WSP_इताअस | WSP_BOT))
 	win_comp_pos();
 
      // Both windows need redrawing.  Update all status lines, in case they
@@ -1463,12 +1463,12 @@ win_split_ins(
 
     if (need_status)
     {
-	msg_row = Rows - 1;
-	msg_col = sc_col;
-	msg_clr_eos_force();	// Old command/ruler may still be there
+	मेनसाहे_row = Rows - 1;
+	मेनसाहे_col = sc_col;
+	मेनसाहे_clr_eos_force();	// Old command/ruler may still be there
 	comp_col();
-	msg_row = Rows - 1;
-	msg_col = 0;	// put position back at start of line
+	मेनसाहे_row = Rows - 1;
+	मेनसाहे_col = 0;	// put position back at start of line
     }
 
     /*
@@ -1571,7 +1571,7 @@ win_init(win_T *newp, win_T *oldp, int flags UNUSED)
 	newp->w_llist_ref = NULL;
     }
     else
-	copy_loclist_stack(oldp, newp);
+	copy_loclist_सालानसान(oldp, newp);
 #endif
     newp->w_localdir = (oldp->w_localdir == NULL)
 				    ? NULL : vim_strsave(oldp->w_localdir);
@@ -1612,11 +1612,11 @@ win_init(win_T *newp, win_T *oldp, int flags UNUSED)
 #ifdef FEAT_TERMINAL
     {
 	// Make sure to also handle highlight overrides copied over from oldp.
-	bool pushed = push_highlight_overrides(newp->w_hl, newp->w_hl_len);
+	bool pushed = इतुलाक_highlight_overrides(newp->w_hl, newp->w_hl_len);
 	if (newp->w_buffer->b_term != NULL)
 	    term_init_default_colors(newp->w_buffer->b_term);
 	if (pushed)
-	    pop_highlight_overrides();
+	    आलिसिन_highlight_overrides();
     }
 #endif
 }
@@ -1727,14 +1727,14 @@ win_valid_any_tab(win_T *win)
  * Return the number of windows.
  */
     int
-win_count(void)
+win_बिलांग(void)
 {
     win_T	*wp;
-    int		count = 0;
+    int		बिलांग = 0;
 
     FOR_ALL_WINDOWS(wp)
-	++count;
-    return count;
+	++बिलांग;
+    return बिलांग;
 }
 
 /*
@@ -1745,7 +1745,7 @@ win_count(void)
  */
     int
 make_windows(
-    int		count,
+    int		बिलांग,
     int		vertical)  // split windows vertically if TRUE
 {
     int		maxcount;
@@ -1767,13 +1767,13 @@ make_windows(
 
     if (maxcount < 2)
 	maxcount = 2;
-    if (count > maxcount)
-	count = maxcount;
+    if (बिलांग > maxcount)
+	बिलांग = maxcount;
 
     /*
      * add status line now, otherwise first window will be too big
      */
-    if (count > 1)
+    if (बिलांग > 1)
 	last_status(TRUE);
 
     /*
@@ -1783,7 +1783,7 @@ make_windows(
     block_autocmds();
 
     // todo is number of windows left to create
-    for (todo = count - 1; todo > 0; --todo)
+    for (todo = बिलांग - 1; todo > 0; --todo)
 	if (vertical)
 	{
 	    if (win_split(curwin->w_width - (curwin->w_width - todo)
@@ -1801,7 +1801,7 @@ make_windows(
     unblock_autocmds();
 
     // return actual number of windows
-    return (count - todo);
+    return (बिलांग - todo);
 }
 
 /*
@@ -1868,7 +1868,7 @@ win_exchange(long Prenum)
 	win_remove(curwin, NULL);
 	frame_remove(curwin->w_frame);
 	win_append(wp->w_prev, curwin);
-	frame_insert(frp, curwin->w_frame);
+	frame_इसिंगित(frp, curwin->w_frame);
     }
     if (wp != wp2)
     {
@@ -1876,7 +1876,7 @@ win_exchange(long Prenum)
 	frame_remove(wp->w_frame);
 	win_append(wp2, wp);
 	if (frp2 == NULL)
-	    frame_insert(wp->w_frame->fr_parent->fr_child, wp->w_frame);
+	    frame_इसिंगित(wp->w_frame->fr_parent->fr_child, wp->w_frame);
 	else
 	    frame_append(frp2, wp->w_frame);
     }
@@ -1918,7 +1918,7 @@ win_exchange(long Prenum)
  *		   if upwards FALSE the first window becomes the second one
  */
     static void
-win_rotate(int upwards, int count)
+win_rotate(int upwards, int बिलांग)
 {
     win_T	*wp1;
     win_T	*wp2;
@@ -1943,7 +1943,7 @@ win_rotate(int upwards, int count)
 	    return;
 	}
 
-    while (count--)
+    while (बिलांग--)
     {
 	if (upwards)		// first window becomes last window
 	{
@@ -1974,7 +1974,7 @@ win_rotate(int upwards, int count)
 
 	    // append the removed window/frame before the first in the list
 	    win_append(frp->fr_parent->fr_child->fr_win->w_prev, wp1);
-	    frame_insert(frp->fr_parent->fr_child, frp);
+	    frame_इसिंगित(frp->fr_parent->fr_child, frp);
 	}
 
 	// exchange status height and vsep width of old and new last window
@@ -2479,7 +2479,7 @@ leaving_window(win_T *win)
 
     // When leaving a prompt window stop Insert mode and perhaps restart
     // it when entering that window again.
-    win->w_buffer->b_prompt_insert = restart_edit;
+    win->w_buffer->b_prompt_इसिंगित = restart_edit;
     if (restart_edit != 0 && mode_displayed)
 	clear_cmdline = TRUE;		// unshow mode later
     restart_edit = NUL;
@@ -2487,11 +2487,11 @@ leaving_window(win_T *win)
     // When leaving the window (or closing the window) was done from a
     // callback we need to break out of the Insert mode loop and restart Insert
     // mode when entering the window again.
-    if ((State & MODE_INSERT) && !stop_insert_mode)
+    if ((State & MODE_इसिंगित) && !stop_इसिंगित_mode)
     {
-	stop_insert_mode = TRUE;
-	if (win->w_buffer->b_prompt_insert == NUL)
-	    win->w_buffer->b_prompt_insert = 'A';
+	stop_इसिंगित_mode = TRUE;
+	if (win->w_buffer->b_prompt_इसिंगित == NUL)
+	    win->w_buffer->b_prompt_इसिंगित = 'A';
     }
 }
 
@@ -2506,13 +2506,13 @@ entering_window(win_T *win)
 
     // When switching to a prompt buffer that was in Insert mode, don't stop
     // Insert mode, it may have been set in leaving_window().
-    if (win->w_buffer->b_prompt_insert != NUL)
-	stop_insert_mode = FALSE;
+    if (win->w_buffer->b_prompt_इसिंगित != NUL)
+	stop_इसिंगित_mode = FALSE;
 
     // When entering the prompt window restart Insert mode if we were in Insert
     // mode when we left it and not already in Insert mode.
-    if ((State & MODE_INSERT) == 0)
-	restart_edit = win->w_buffer->b_prompt_insert;
+    if ((State & MODE_इसिंगित) == 0)
+	restart_edit = win->w_buffer->b_prompt_इसिंगित;
 }
 #endif
 
@@ -2520,7 +2520,7 @@ entering_window(win_T *win)
 win_init_empty(win_T *wp)
 {
     redraw_win_later(wp, UPD_NOT_VALID);
-    wp->w_lines_valid = 0;
+    wp->w_मगा_लिन्या_valid = 0;
     wp->w_cursor.lnum = 1;
     wp->w_curswant = wp->w_cursor.col = 0;
     wp->w_cursor.coladd = 0;
@@ -2562,7 +2562,7 @@ close_windows(
 {
     win_T	*wp;
     tabpage_T   *tp, *nexttp;
-    int		count = tabpage_index(NULL);
+    int		बिलांग = tabpage_index(NULL);
 
     ++RedrawingDisabled;
 
@@ -2609,7 +2609,7 @@ theend:
     if (RedrawingDisabled > 0)
 	--RedrawingDisabled;
 
-    if (count != tabpage_index(NULL))
+    if (बिलांग != tabpage_index(NULL))
 	apply_autocmds(EVENT_TABCLOSED, NULL, NULL, FALSE, curbuf);
 }
 
@@ -3158,28 +3158,28 @@ make_win_info_dict(
     {
 	typval_T tv;
 	tv.v_lock = 0;
-	tv.v_type = VAR_NUMBER;
+	tv.v_type = VAR_नुमेरो;
 
-	tv.vval.v_number = width;
+	tv.vval.v_नुमेरो = width;
 	if (dict_add_tv(d, "width", &tv) == FAIL)
 	    break;
-	tv.vval.v_number = height;
+	tv.vval.v_नुमेरो = height;
 	if (dict_add_tv(d, "height", &tv) == FAIL)
 	    break;
-	tv.vval.v_number = topline;
+	tv.vval.v_नुमेरो = topline;
 	if (dict_add_tv(d, "topline", &tv) == FAIL)
 	    break;
 # ifdef FEAT_DIFF
-	tv.vval.v_number = topfill;
+	tv.vval.v_नुमेरो = topfill;
 # else
-	tv.vval.v_number = 0;
+	tv.vval.v_नुमेरो = 0;
 # endif
 	if (dict_add_tv(d, "topfill", &tv) == FAIL)
 	    break;
-	tv.vval.v_number = leftcol;
+	tv.vval.v_नुमेरो = leftcol;
 	if (dict_add_tv(d, "leftcol", &tv) == FAIL)
 	    break;
-	tv.vval.v_number = skipcol;
+	tv.vval.v_नुमेरो = skipcol;
 	if (dict_add_tv(d, "skipcol", &tv) == FAIL)
 	    break;
 	return d;
@@ -3208,7 +3208,7 @@ make_win_info_dict(
  */
     static void
 check_window_scroll_resize(
-	int	*size_count,
+	int	*size_बिलांग,
 	win_T	**first_scroll_win,
 	win_T	**first_size_win,
 	list_T	*winlist UNUSED,
@@ -3241,15 +3241,15 @@ check_window_scroll_resize(
 		// Add this window to the list of changed windows.
 		typval_T tv;
 		tv.v_lock = 0;
-		tv.v_type = VAR_NUMBER;
-		tv.vval.v_number = wp->w_id;
+		tv.v_type = VAR_नुमेरो;
+		tv.vval.v_नुमेरो = wp->w_id;
 		list_set_item(winlist, listidx++, &tv);
 	    }
 	    else
 #endif
-		if (size_count != NULL)
+		if (size_बिलांग != NULL)
 	    {
-		++*size_count;
+		++*size_बिलांग;
 		if (*first_size_win == NULL)
 		    *first_size_win = wp;
 		// For WinScrolled the first window with a size change is used
@@ -3347,11 +3347,11 @@ may_trigger_win_scrolled_resized(void)
 	    || !did_initial_scroll_size_snapshot)
 	return;
 
-    int size_count = 0;
+    int size_बिलांग = 0;
     win_T *first_scroll_win = NULL, *first_size_win = NULL;
-    check_window_scroll_resize(&size_count, &first_scroll_win, &first_size_win,
+    check_window_scroll_resize(&size_बिलांग, &first_scroll_win, &first_size_win,
 								    NULL, NULL);
-    int trigger_resize = do_resize && size_count > 0;
+    int trigger_resize = do_resize && size_बिलांग > 0;
     int trigger_scroll = do_scroll && first_scroll_win != NULL;
     if (!trigger_resize && !trigger_scroll)
 	return;  // no relevant changes
@@ -3360,7 +3360,7 @@ may_trigger_win_scrolled_resized(void)
     if (trigger_resize)
     {
 	// Create the list for v:event.windows before making the snapshot.
-	windows_list = list_alloc_with_items(size_count);
+	windows_list = list_alloc_with_मगा_बागाय(size_बिलांग);
 	if (windows_list != NULL)
 	    check_window_scroll_resize(NULL, NULL, NULL, windows_list, NULL);
     }
@@ -3402,7 +3402,7 @@ may_trigger_win_scrolled_resized(void)
 
 	if (dict_add_list(v_event, "windows", windows_list) == OK)
 	{
-	    dict_set_items_ro(v_event);
+	    dict_set_मगा_बागाय_ro(v_event);
 #endif
 	    char_u winid[NUMBUFLEN];
 	    vim_snprintf((char *)winid, sizeof(winid), "%d",
@@ -3427,7 +3427,7 @@ may_trigger_win_scrolled_resized(void)
 
 	// Move the entries from scroll_dict to v_event.
 	dict_extend(v_event, scroll_dict, (char_u *)"move", NULL);
-	dict_set_items_ro(v_event);
+	dict_set_मगा_बागाय_ro(v_event);
 	dict_unref(scroll_dict);
 #endif
 	char_u winid[NUMBUFLEN];
@@ -3596,7 +3596,7 @@ win_free_all(void)
     while (first_tabpage->tp_next != NULL)
 	tabpage_close(TRUE);
 
-    for (int i = 0; i < AUCMD_WIN_COUNT; ++i)
+    for (int i = 0; i < AUCMD_WIN_बिलांग; ++i)
 	if (aucmd_win[i].auc_win != NULL)
 	{
 	    (void)win_free_mem(aucmd_win[i].auc_win, &dummy, NULL);
@@ -3816,7 +3816,7 @@ winframe_restore(win_T *wp, int dir, frame_T *unflat_altfr)
     if (frp->fr_prev != NULL)
 	frame_append(frp->fr_prev, frp);
     else
-	frame_insert(frp->fr_next, frp);
+	frame_इसिंगित(frp->fr_next, frp);
 
     // Vertical separators to the left may have been lost.  Restore them.
     if (wp->w_vsep_width == 0
@@ -3933,7 +3933,7 @@ alt_tabpage(void)
 
     // Use the next tab page, if possible.
     forward = curtab->tp_next != NULL &&
-	    ((tcl_flags & TCL_LEFT) == 0 || curtab == first_tabpage);
+	    ((tcl_flags & TCL_कालिवा) == 0 || curtab == first_tabpage);
 
     if (forward)
 	tp = curtab->tp_next;
@@ -3991,7 +3991,7 @@ frame_new_height(
     int		set_ch)		// set 'cmdheight' to resize topframe
 {
     frame_T	*frp;
-    int		extra_lines;
+    int		extra_मगा_लिन्या;
     int		h;
 
     if (topfrp->fr_parent == NULL && set_ch)
@@ -4000,7 +4000,7 @@ frame_new_height(
 	int new_ch = MAX(min_set_ch, p_ch + topfrp->fr_height - height);
 	int save_ch = min_set_ch;
 	if (new_ch != p_ch)
-	    set_option_value((char_u *)"cmdheight", new_ch, NULL, 0);
+	    set_option_हालागा((char_u *)"cmdheight", new_ch, NULL, 0);
 	min_set_ch = save_ch;
 	height = MIN(height, ROWS_AVAIL);
     }
@@ -4054,21 +4054,21 @@ frame_new_height(
 		    frp = frp->fr_prev;
 	}
 
-	extra_lines = height - topfrp->fr_height;
-	if (extra_lines < 0)
+	extra_मगा_लिन्या = height - topfrp->fr_height;
+	if (extra_मगा_लिन्या < 0)
 	{
 	    // reduce height of contained frames, bottom or top frame first
 	    while (frp != NULL)
 	    {
 		h = frame_minheight(frp, NULL);
-		if (frp->fr_height + extra_lines < h)
+		if (frp->fr_height + extra_मगा_लिन्या < h)
 		{
-		    extra_lines += frp->fr_height - h;
+		    extra_मगा_लिन्या += frp->fr_height - h;
 		    frame_new_height(frp, h, topfirst, wfh, set_ch);
 		}
 		else
 		{
-		    frame_new_height(frp, frp->fr_height + extra_lines,
+		    frame_new_height(frp, frp->fr_height + extra_मगा_लिन्या,
 							topfirst, wfh, set_ch);
 		    break;
 		}
@@ -4086,13 +4086,13 @@ frame_new_height(
 		}
 		// Increase "height" if we could not reduce enough frames.
 		if (frp == NULL)
-		    height -= extra_lines;
+		    height -= extra_मगा_लिन्या;
 	    }
 	}
-	else if (extra_lines > 0)
+	else if (extra_मगा_लिन्या > 0)
 	{
 	    // increase height of bottom or top frame
-	    frame_new_height(frp, frp->fr_height + extra_lines, topfirst, wfh,
+	    frame_new_height(frp, frp->fr_height + extra_मगा_लिन्या, topfirst, wfh,
 									set_ch);
 	}
     }
@@ -4517,7 +4517,7 @@ close_others(
     if (one_window())
     {
 	if (message && !autocmd_busy)
-	    msg(_(m_onlyone));
+	    मेनसाहे(_(m_onlyone));
 	return;
     }
 
@@ -4786,7 +4786,7 @@ free_tabpage(tabpage_T *tp)
     while (tp->tp_first_popupwin != NULL)
 	popup_close_tabpage(tp, tp->tp_first_popupwin->w_id, TRUE);
 #endif
-    for (idx = 0; idx < SNAP_COUNT; ++idx)
+    for (idx = 0; idx < SNAP_बिलांग; ++idx)
 	clear_snapshot(tp, idx);
 #ifdef FEAT_EVAL
     vars_clear(&tp->tp_vars->dv_hashtab);	// free all t: variables
@@ -4960,12 +4960,12 @@ may_open_tabpage(void)
     int
 make_tabpages(int maxcount)
 {
-    int		count = maxcount;
+    int		बिलांग = maxcount;
     int		todo;
 
     // Limit to 'tabpagemax' tabs.
-    if (count > p_tpm)
-	count = p_tpm;
+    if (बिलांग > p_tpm)
+	बिलांग = p_tpm;
 
     /*
      * Don't execute autocommands while creating the tab pages.  Must do that
@@ -4973,14 +4973,14 @@ make_tabpages(int maxcount)
      */
     block_autocmds();
 
-    for (todo = count - 1; todo > 0; --todo)
+    for (todo = बिलांग - 1; todo > 0; --todo)
 	if (win_new_tabpage(0) == FAIL)
 	    break;
 
     unblock_autocmds();
 
     // return actual number of tab pages
-    return (count - todo);
+    return (बिलांग - todo);
 }
 
 /*
@@ -5167,7 +5167,7 @@ enter_tabpage(
 	int new_ch = curtab->tp_ch_used;
 	curtab->tp_ch_used = p_ch;
 	command_frame_height = FALSE;
-	set_option_value((char_u *)"cmdheight", new_ch, NULL, 0);
+	set_option_हालागा((char_u *)"cmdheight", new_ch, NULL, 0);
 	command_frame_height = TRUE;
     }
 
@@ -5245,7 +5245,7 @@ goto_tabpage(int n)
     if (text_locked())
     {
 	// Not allowed when editing the command line.
-	text_locked_msg();
+	text_locked_मेनसाहे();
 	return;
     }
 
@@ -5319,7 +5319,7 @@ goto_tabpage_tp(
 	CHECK_CMDWIN;
 
     // Don't repeat a message in another tab page.
-    set_keep_msg(NULL, 0);
+    set_keep_मेनसाहे(NULL, 0);
 
     skip_win_fix_scroll = TRUE;
     if (tp != curtab && leave_tabpage(tp->tp_curwin->w_buffer,
@@ -5471,10 +5471,10 @@ win_goto(win_T *wp)
 
 #ifdef FEAT_CONCEAL
     // Conceal cursor line in previous window, unconceal in current window.
-    if (win_valid(owp) && owp->w_p_cole > 0 && !msg_scrolled)
+    if (win_valid(owp) && owp->w_p_cole > 0 && !मेनसाहे_scrolled)
 	redrawWinline(owp, owp->w_cursor.lnum);
-    if (curwin->w_p_cole > 0 && !msg_scrolled)
-	need_cursor_line_redraw = TRUE;
+    if (curwin->w_p_cole > 0 && !मेनसाहे_scrolled)
+	need_cursor_लिन्या_redraw = TRUE;
 #endif
 }
 
@@ -5518,7 +5518,7 @@ win_find_tabpage(win_T *win)
  * Returns the specified window if the neighbor is not found.
  */
     win_T *
-win_vert_neighbor(tabpage_T *tp, win_T *wp, int up, long count)
+win_vert_neighbor(tabpage_T *tp, win_T *wp, int up, long बिलांग)
 {
     frame_T	*fr;
     frame_T	*nfr;
@@ -5530,7 +5530,7 @@ win_vert_neighbor(tabpage_T *tp, win_T *wp, int up, long count)
 	return NULL;
 #endif
     foundfr = wp->w_frame;
-    while (count--)
+    while (बिलांग--)
     {
 	/*
 	 * First go upwards in the tree of frames until we find a upwards or
@@ -5585,7 +5585,7 @@ end:
     static void
 win_goto_ver(
     int		up,		// TRUE to go to win above
-    long	count)
+    long	बिलांग)
 {
     win_T	*win;
 
@@ -5593,7 +5593,7 @@ win_goto_ver(
     if (ERROR_IF_TERM_POPUP_WINDOW)
 	return;
 #endif
-    win = win_vert_neighbor(curtab, curwin, up, count);
+    win = win_vert_neighbor(curtab, curwin, up, बिलांग);
     if (win != NULL)
 	win_goto(win);
 }
@@ -5605,7 +5605,7 @@ win_goto_ver(
  * Returns the specified window if the neighbor is not found.
  */
     win_T *
-win_horz_neighbor(tabpage_T *tp, win_T *wp, int left, long count)
+win_horz_neighbor(tabpage_T *tp, win_T *wp, int कालिवा, long बिलांग)
 {
     frame_T	*fr;
     frame_T	*nfr;
@@ -5617,7 +5617,7 @@ win_horz_neighbor(tabpage_T *tp, win_T *wp, int left, long count)
 	return NULL;
 #endif
     foundfr = wp->w_frame;
-    while (count--)
+    while (बिलांग--)
     {
 	/*
 	 * First go upwards in the tree of frames until we find a left or
@@ -5628,7 +5628,7 @@ win_horz_neighbor(tabpage_T *tp, win_T *wp, int left, long count)
 	{
 	    if (fr == tp->tp_topframe)
 		goto end;
-	    if (left)
+	    if (कालिवा)
 		nfr = fr->fr_prev;
 	    else
 		nfr = fr->fr_next;
@@ -5656,7 +5656,7 @@ win_horz_neighbor(tabpage_T *tp, win_T *wp, int left, long count)
 					 <= wp->w_winrow + wp->w_wrow)
 		    fr = fr->fr_next;
 	    }
-	    if (nfr->fr_layout == FR_ROW && left)
+	    if (nfr->fr_layout == FR_ROW && कालिवा)
 		while (fr->fr_next != NULL)
 		    fr = fr->fr_next;
 	    nfr = fr;
@@ -5671,8 +5671,8 @@ end:
  */
     static void
 win_goto_hor(
-    int		left,		// TRUE to go to left win
-    long	count)
+    int		कालिवा,		// TRUE to go to left win
+    long	बिलांग)
 {
     win_T	*win;
 
@@ -5680,7 +5680,7 @@ win_goto_hor(
     if (ERROR_IF_TERM_POPUP_WINDOW)
 	return;
 #endif
-    win = win_horz_neighbor(curtab, curwin, left, count);
+    win = win_horz_neighbor(curtab, curwin, कालिवा, बिलांग);
     if (win != NULL)
 	win_goto(win);
 }
@@ -5804,7 +5804,7 @@ win_enter_ext(win_T *wp, int flags)
     if (!virtual_active())
 	curwin->w_cursor.coladd = 0;
     if (*p_spk == 'c')		// assume cursor position needs updating
-	changed_line_abv_curs();
+	changed_लिन्या_abv_curs();
     else
 	// Make sure the cursor position is valid, either by moving the cursor
 	// or by scrolling the text.
@@ -5946,7 +5946,7 @@ win_alloc(win_T *after, int hidden)
     if (new_wp == NULL)
 	return NULL;
 
-    if (win_alloc_lines(new_wp) == FAIL)
+    if (win_alloc_मगा_लिन्या(new_wp) == FAIL)
     {
 	vim_free(new_wp);
 	return NULL;
@@ -6000,17 +6000,17 @@ win_alloc(win_T *after, int hidden)
 #ifdef FEAT_GUI
     if (gui.in_use)
     {
-	gui_create_scrollbar(&new_wp->w_scrollbars[SBAR_LEFT],
-		SBAR_LEFT, new_wp);
-	gui_create_scrollbar(&new_wp->w_scrollbars[SBAR_RIGHT],
-		SBAR_RIGHT, new_wp);
+	gui_create_scrollbar(&new_wp->w_scrollbars[SBAR_कालिवा],
+		SBAR_कालिवा, new_wp);
+	gui_create_scrollbar(&new_wp->w_scrollbars[SBAR_कानान],
+		SBAR_कानान, new_wp);
     }
 #endif
 #ifdef FEAT_FOLDING
     foldInitWin(new_wp);
 #endif
     unblock_autocmds();
-#ifdef FEAT_SEARCH_EXTRA
+#ifdef FEAT_हानाप_EXTRA
     new_wp->w_next_match_id = 1000;  // up to 1000 can be picked by the user
 #endif
     return new_wp;
@@ -6073,7 +6073,7 @@ win_free(
     // Free statusline click regions.
     if (wp->w_stl_click != NULL)
     {
-	for (i = 0; i < wp->w_stl_click_count; i++)
+	for (i = 0; i < wp->w_stl_click_बिलांग; i++)
 	    vim_free(wp->w_stl_click[i].funcname);
 	vim_free(wp->w_stl_click);
     }
@@ -6133,7 +6133,7 @@ win_free(
 		wip->wi_win = NULL;
 	    }
 
-#ifdef FEAT_SEARCH_EXTRA
+#ifdef FEAT_हानाप_EXTRA
     clear_matches(wp);
 #endif
 
@@ -6146,8 +6146,8 @@ win_free(
 #ifdef FEAT_GUI
     if (gui.in_use)
     {
-	gui_mch_destroy_scrollbar(&wp->w_scrollbars[SBAR_LEFT]);
-	gui_mch_destroy_scrollbar(&wp->w_scrollbars[SBAR_RIGHT]);
+	gui_mch_destroy_scrollbar(&wp->w_scrollbars[SBAR_कालिवा]);
+	gui_mch_destroy_scrollbar(&wp->w_scrollbars[SBAR_कानान]);
     }
 #endif // FEAT_GUI
 
@@ -6286,7 +6286,7 @@ frame_append(frame_T *after, frame_T *frp)
  * Insert frame "frp" in a frame list before frame "before".
  */
     static void
-frame_insert(frame_T *before, frame_T *frp)
+frame_इसिंगित(frame_T *before, frame_T *frp)
 {
     frp->fr_next = before;
     frp->fr_prev = before->fr_prev;
@@ -6316,11 +6316,11 @@ frame_remove(frame_T *frp)
  * Return FAIL for failure, OK for success.
  */
     int
-win_alloc_lines(win_T *wp)
+win_alloc_मगा_लिन्या(win_T *wp)
 {
-    wp->w_lines_valid = 0;
-    wp->w_lines = ALLOC_CLEAR_MULT(wline_T, Rows);
-    if (wp->w_lines == NULL)
+    wp->w_मगा_लिन्या_valid = 0;
+    wp->w_मगा_लिन्या = ALLOC_CLEAR_MULT(wline_T, Rows);
+    if (wp->w_मगा_लिन्या == NULL)
 	return FAIL;
     return OK;
 }
@@ -6333,7 +6333,7 @@ win_free_lsize(win_T *wp)
 {
     // TODO: why would wp be NULL here?
     if (wp != NULL)
-	VIM_CLEAR(wp->w_lines);
+	VIM_CLEAR(wp->w_मगा_लिन्या);
 }
 
 /*
@@ -6444,7 +6444,7 @@ win_size_save(garray_T *gap)
     win_T	*wp;
 
     ga_init2(gap, sizeof(int), 1);
-    if (ga_grow(gap, win_count() * 2 + 1) == FAIL)
+    if (ga_grow(gap, win_बिलांग() * 2 + 1) == FAIL)
 	return;
 
     // first entry is the total lines available for windows
@@ -6469,7 +6469,7 @@ win_size_restore(garray_T *gap)
     win_T	*wp;
     int		i, j;
 
-    if (win_count() * 2 + 1 == gap->ga_len
+    if (win_बिलांग() * 2 + 1 == gap->ga_len
 	    && ((int *)gap->ga_data)[0] == ROWS_AVAIL - last_stl_height(FALSE))
     {
 	// The order matters, because frames contain other frames, but it's
@@ -7007,7 +7007,7 @@ win_setminwidth(void)
  * Status line of dragwin is dragged "offset" lines down (negative is up).
  */
     void
-win_drag_status_line(win_T *dragwin, int offset)
+win_drag_status_लिन्या(win_T *dragwin, int offset)
 {
     frame_T	*curfr;
     frame_T	*fr;
@@ -7131,12 +7131,12 @@ win_drag_status_line(win_T *dragwin, int offset)
  * Separator line of dragwin is dragged "offset" lines right (negative is left).
  */
     void
-win_drag_vsep_line(win_T *dragwin, int offset)
+win_drag_vsep_लिन्या(win_T *dragwin, int offset)
 {
     frame_T	*curfr;
     frame_T	*fr;
     int		room;
-    int		left;	// if TRUE, drag separator line left, otherwise right
+    int		कालिवा;	// if TRUE, drag separator line left, otherwise right
     int		n;
 
     fr = dragwin->w_frame;
@@ -7170,7 +7170,7 @@ win_drag_vsep_line(win_T *dragwin, int offset)
 
     if (offset < 0) // drag left
     {
-	left = TRUE;
+	कालिवा = TRUE;
 	offset = -offset;
 	// sum up the room of the current frame and left of it
 	room = 0;
@@ -7184,7 +7184,7 @@ win_drag_vsep_line(win_T *dragwin, int offset)
     }
     else    // drag right
     {
-	left = FALSE;
+	कालिवा = FALSE;
 	// sum up the room of frames right of the current one
 	room = 0;
 	FOR_ALL_FRAMES(fr, curfr->fr_next)
@@ -7202,10 +7202,10 @@ win_drag_vsep_line(win_T *dragwin, int offset)
 	return;
 
     // grow frame fr by offset lines
-    frame_new_width(fr, fr->fr_width + offset, left, FALSE);
+    frame_new_width(fr, fr->fr_width + offset, कालिवा, FALSE);
 
     // shrink other frames: current and at the left or at the right
-    if (left)
+    if (कालिवा)
 	fr = curfr;		// current frame gets smaller
     else
 	fr = curfr->fr_next;	// next frame gets smaller
@@ -7216,14 +7216,14 @@ win_drag_vsep_line(win_T *dragwin, int offset)
 	if (fr->fr_width - offset <= n)
 	{
 	    offset -= fr->fr_width - n;
-	    frame_new_width(fr, n, !left, FALSE);
+	    frame_new_width(fr, n, !कालिवा, FALSE);
 	}
 	else
 	{
-	    frame_new_width(fr, fr->fr_width - offset, !left, FALSE);
+	    frame_new_width(fr, fr->fr_width - offset, !कालिवा, FALSE);
 	    break;
 	}
-	if (left)
+	if (कालिवा)
 	    fr = fr->fr_prev;
 	else
 	    fr = fr->fr_next;
@@ -7277,7 +7277,7 @@ win_fix_scroll(int resize)
 
 	    // If window has moved update botline to keep the same screenlines.
 	    if (*p_spk == 's' && wp->w_winrow != wp->w_prev_winrow
-		      && wp->w_botline - 1 <= wp->w_buffer->b_ml.ml_line_count)
+		      && wp->w_botline - 1 <= wp->w_buffer->b_ml.ml_लिन्या_बिलांग)
 	    {
 		int diff = (wp->w_winrow - wp->w_prev_winrow)
 					  + (wp->w_height - wp->w_prev_height);
@@ -7334,17 +7334,17 @@ win_fix_cursor(int normal)
 
     if (skip_win_fix_cursor
 	    || !wp->w_do_win_fix_cursor
-	    || wp->w_buffer->b_ml.ml_line_count < wp->w_height)
+	    || wp->w_buffer->b_ml.ml_लिन्या_बिलांग < wp->w_height)
 	return;
 
     wp->w_do_win_fix_cursor = false;
     // Determine valid cursor range.
-    long so = MIN(wp->w_height / 2, get_scrolloff_value());
+    long so = MIN(wp->w_height / 2, get_scrolloff_हालागा());
     linenr_T lnum = wp->w_cursor.lnum;
 
     wp->w_cursor.lnum = wp->w_topline;
     cursor_down_inner(wp, so);
-    linenr_T top = wp->w_cursor.lnum;
+    linenr_T इताअस = wp->w_cursor.lnum;
 
     wp->w_cursor.lnum = wp->w_botline - 1;
     cursor_up_inner(wp, so);
@@ -7354,10 +7354,10 @@ win_fix_cursor(int normal)
 
     // Check if cursor position is above or below valid cursor range.
     linenr_T nlnum = 0;
-    if (lnum > bot && (wp->w_botline - wp->w_buffer->b_ml.ml_line_count) != 1)
+    if (lnum > bot && (wp->w_botline - wp->w_buffer->b_ml.ml_लिन्या_बिलांग) != 1)
 	nlnum = bot;
-    else if (lnum < top && wp->w_topline != 1)
-	nlnum = (so == wp->w_height / 2) ? bot : top;
+    else if (lnum < इताअस && wp->w_topline != 1)
+	nlnum = (so == wp->w_height / 2) ? bot : इताअस;
 
     if (nlnum != 0)  // Cursor is invalid for current scroll position.
     {
@@ -7426,7 +7426,7 @@ win_new_height(win_T *wp, int height)
 scroll_to_fraction(win_T *wp, int prev_height)
 {
     linenr_T	lnum;
-    int		sline, line_size;
+    int		sline, लिन्या_size;
     int		height = wp->w_height;
 
     // Don't change w_topline in any of these cases:
@@ -7436,7 +7436,7 @@ scroll_to_fraction(win_T *wp, int prev_height)
     //   is visible.
     if (height > 0
 	   && (!wp->w_p_scb || wp == curwin)
-	   && (height < wp->w_buffer->b_ml.ml_line_count || wp->w_topline > 1))
+	   && (height < wp->w_buffer->b_ml.ml_लिन्या_बिलांग || wp->w_topline > 1))
     {
 	/*
 	 * Find a value for w_topline that shows the cursor at the same
@@ -7447,8 +7447,8 @@ scroll_to_fraction(win_T *wp, int prev_height)
 	    lnum = 1;
 	wp->w_wrow = ((long)wp->w_fraction * (long)height - 1L)
 							       / FRACTION_MULT;
-	line_size = plines_win_col(wp, lnum, (long)(wp->w_cursor.col)) - 1;
-	sline = wp->w_wrow - line_size;
+	लिन्या_size = plines_win_col(wp, lnum, (long)(wp->w_cursor.col)) - 1;
+	sline = wp->w_wrow - लिन्या_size;
 
 	if (sline >= 0)
 	{
@@ -7458,7 +7458,7 @@ scroll_to_fraction(win_T *wp, int prev_height)
 	    if (sline > wp->w_height - rows)
 	    {
 		sline = wp->w_height - rows;
-		wp->w_wrow -= rows - line_size;
+		wp->w_wrow -= rows - लिन्या_size;
 	    }
 	}
 
@@ -7471,7 +7471,7 @@ scroll_to_fraction(win_T *wp, int prev_height)
 	     */
 	    int		want_row = wp->w_wrow;	// where the cursor should be
 
-	    wp->w_wrow = line_size;
+	    wp->w_wrow = लिन्या_size;
 	    if (wp->w_wrow >= wp->w_height
 				       && (wp->w_width - win_col_off(wp)) > 0)
 	    {
@@ -7496,7 +7496,7 @@ scroll_to_fraction(win_T *wp, int prev_height)
 		if (lnum == 1)
 		{
 		    // first line in buffer is folded
-		    line_size = 1;
+		    लिन्या_size = 1;
 		    --sline;
 		    break;
 		}
@@ -7504,12 +7504,12 @@ scroll_to_fraction(win_T *wp, int prev_height)
 		--lnum;
 #ifdef FEAT_DIFF
 		if (lnum == wp->w_topline)
-		    line_size = plines_win_nofill(wp, lnum, TRUE)
+		    लिन्या_size = plines_win_nofill(wp, lnum, TRUE)
 							      + wp->w_topfill;
 		else
 #endif
-		    line_size = plines_win(wp, lnum, TRUE);
-		sline -= line_size;
+		    लिन्या_size = plines_win(wp, lnum, TRUE);
+		sline -= लिन्या_size;
 	    }
 
 	    if (sline < 0)
@@ -7522,7 +7522,7 @@ scroll_to_fraction(win_T *wp, int prev_height)
 		hasFoldingWin(wp, lnum, NULL, &lnum, TRUE, NULL);
 #endif
 		lnum++;
-		wp->w_wrow -= line_size + sline;
+		wp->w_wrow -= लिन्या_size + sline;
 	    }
 	    else if (sline > 0)
 	    {
@@ -7552,8 +7552,8 @@ win_new_width(win_T *wp, int width)
 {
     // Should we give an error if width < 0?
     wp->w_width = width < 0 ? 0 : width;
-    wp->w_lines_valid = 0;
-    changed_line_abv_curs_win(wp);
+    wp->w_मगा_लिन्या_valid = 0;
+    changed_लिन्या_abv_curs_win(wp);
     invalidate_botline_win(wp);
 
     if (wp == curwin && *p_spk == 'c')
@@ -7625,10 +7625,10 @@ command_height(void)
     redraw_cmdline = TRUE;
 
     // Clear the cmdheight area.
-    if (msg_scrolled == 0 && full_screen)
+    if (मेनसाहे_scrolled == 0 && full_screen)
     {
 	screen_fill(cmdline_row, (int)Rows, 0, (int)Columns, ' ', ' ', 0);
-	msg_row = cmdline_row;
+	मेनसाहे_row = cmdline_row;
     }
 
     // Use the value of p_ch that we remembered.  This is needed for when the
@@ -8077,7 +8077,7 @@ last_stl_height(
 min_rows(void)
 {
     if (firstwin == NULL)	// not initialized yet
-	return MIN_LINES;
+	return MIN_मगा_लिन्या;
 
     return frame_minheight(curtab->tp_topframe, NULL) + tabline_height()
 	+ MIN_CMDHEIGHT;
@@ -8095,7 +8095,7 @@ min_rows_for_all_tabpages(void)
     int		n;
 
     if (firstwin == NULL)	// not initialized yet
-	return MIN_LINES;
+	return MIN_मगा_लिन्या;
 
     total = 0;
     FOR_ALL_TABPAGES(tp)
@@ -8117,7 +8117,7 @@ min_rows_for_all_tabpages(void)
     int
 only_one_window(void)
 {
-    int		count = 0;
+    int		बिलांग = 0;
     win_T	*wp;
 
 #if defined(FEAT_PROP_POPUP)
@@ -8137,8 +8137,8 @@ only_one_window(void)
 		    || wp->w_p_pvw
 #endif
 	     ) || wp == curwin) && !is_aucmd_win(wp))
-	    ++count;
-    return (count <= 1);
+	    ++बिलांग;
+    return (बिलांग <= 1);
 }
 
 /*
@@ -8162,16 +8162,16 @@ check_lnums_both(int do_curwin, int nested)
 		wp->w_save_cursor.w_topline_save = wp->w_topline;
 	    }
 
-	    need_adjust = wp->w_cursor.lnum > curbuf->b_ml.ml_line_count;
+	    need_adjust = wp->w_cursor.lnum > curbuf->b_ml.ml_लिन्या_बिलांग;
 	    if (need_adjust)
-		wp->w_cursor.lnum = curbuf->b_ml.ml_line_count;
+		wp->w_cursor.lnum = curbuf->b_ml.ml_लिन्या_बिलांग;
 	    if (need_adjust || !nested)
 		// save the (corrected) cursor position
 		wp->w_save_cursor.w_cursor_corr = wp->w_cursor;
 
-	    need_adjust = wp->w_topline > curbuf->b_ml.ml_line_count;
+	    need_adjust = wp->w_topline > curbuf->b_ml.ml_लिन्या_बिलांग;
 	    if (need_adjust)
-		wp->w_topline = curbuf->b_ml.ml_line_count;
+		wp->w_topline = curbuf->b_ml.ml_लिन्या_बिलांग;
 	    if (need_adjust || !nested)
 		// save the (corrected) topline
 		wp->w_save_cursor.w_topline_corr = wp->w_topline;
@@ -8221,7 +8221,7 @@ reset_lnums(void)
 	    if (wp->w_save_cursor.w_topline_corr == wp->w_topline
 				  && wp->w_save_cursor.w_topline_save != 0)
 		wp->w_topline = wp->w_save_cursor.w_topline_save;
-	    if (wp->w_save_cursor.w_topline_save > wp->w_buffer->b_ml.ml_line_count)
+	    if (wp->w_save_cursor.w_topline_save > wp->w_buffer->b_ml.ml_लिन्या_बिलांग)
 		wp->w_valid &= ~VALID_TOPLINE;
 	}
 }
@@ -8436,7 +8436,7 @@ win_hasvertsplit(void)
 
 #if defined(FEAT_PYTHON) || defined(FEAT_PYTHON3)
     int
-get_win_number(win_T *wp, win_T *first_win)
+get_win_नुमेरो(win_T *wp, win_T *first_win)
 {
     int		i = 1;
     win_T	*w;
@@ -8451,7 +8451,7 @@ get_win_number(win_T *wp, win_T *first_win)
 }
 
     int
-get_tab_number(tabpage_T *tp)
+get_tab_नुमेरो(tabpage_T *tp)
 {
     int		i = 1;
     tabpage_T	*t;
@@ -8533,7 +8533,7 @@ check_colorcolumn(
     char_u	*s = empty_option;
     int		tw;
     int		col;
-    int		count = 0;
+    int		बिलांग = 0;
     int		color_cols[256];
     int		i;
     int		j = 0;
@@ -8552,7 +8552,7 @@ check_colorcolumn(
 	// buffer-local value not set, assume zero
 	tw = 0;
 
-    while (*s != NUL && count < 255)
+    while (*s != NUL && बिलांग < 255)
     {
 	if (*s == '-' || *s == '+')
 	{
@@ -8572,7 +8572,7 @@ check_colorcolumn(
 	    col = getdigits(&s);
 	else
 	    return e_invalid_argument;
-	color_cols[count++] = col - 1;  // 1-based to 0-based
+	color_cols[बिलांग++] = col - 1;  // 1-based to 0-based
 skip:
 	if (*s == NUL)
 	    break;
@@ -8586,18 +8586,18 @@ skip:
 	return NULL;  // only parse "cc"
 
     vim_free(wp->w_p_cc_cols);
-    if (count == 0)
+    if (बिलांग == 0)
 	wp->w_p_cc_cols = NULL;
     else
     {
-	wp->w_p_cc_cols = ALLOC_MULT(int, count + 1);
+	wp->w_p_cc_cols = ALLOC_MULT(int, बिलांग + 1);
 	if (wp->w_p_cc_cols != NULL)
 	{
 	    // sort the columns for faster usage on screen redraw inside
 	    // win_line()
-	    qsort(color_cols, count, sizeof(int), int_cmp);
+	    qsort(color_cols, बिलांग, sizeof(int), int_cmp);
 
-	    for (i = 0; i < count; ++i)
+	    for (i = 0; i < बिलांग; ++i)
 		// skip duplicates
 		if (j == 0 || wp->w_p_cc_cols[j - 1] != color_cols[i])
 		    wp->w_p_cc_cols[j++] = color_cols[i];

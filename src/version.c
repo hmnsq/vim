@@ -65,8 +65,8 @@ init_longVersion(void)
 #  else
     char *date_time = __DATE__ " " __TIME__;
 #  endif
-    char *msg = _("%s (%s, compiled %s)");
-    size_t len = strlen(msg)
+    char *मेनसाहे = _("%s (%s, compiled %s)");
+    size_t len = strlen(मेनसाहे)
 	+ STRLEN_LITERAL(VIM_VERSION_LONG_ONLY)
 	+ STRLEN_LITERAL(VIM_VERSION_DATE_ONLY)
 	+ strlen(date_time);
@@ -75,7 +75,7 @@ init_longVersion(void)
     if (longVersion == NULL)
 	longVersion = VIM_VERSION_LONG;
     else
-	vim_snprintf(longVersion, len, msg,
+	vim_snprintf(longVersion, len, मेनसाहे,
 		VIM_VERSION_LONG_ONLY, VIM_VERSION_DATE_ONLY, date_time);
 }
 # endif
@@ -233,7 +233,7 @@ static char *(features[]) =
 	"-eval",
 #endif
 	"+ex_extra",
-#ifdef FEAT_SEARCH_EXTRA
+#ifdef FEAT_हानाप_EXTRA
 	"+extra_search",
 #else
 	"-extra_search",
@@ -442,7 +442,7 @@ static char *(features[]) =
 #else
 	"-packages",
 #endif
-#ifdef FEAT_PRINT_PANGO
+#ifdef FEAT_इलिम्बाग_PANGO
 	"+pango",
 #else
 	"-pango",
@@ -3253,7 +3253,7 @@ ex_version(exarg_T *eap)
      */
     if (*eap->arg == NUL)
     {
-	msg_putchar('\n');
+	मेनसाहे_putchar('\n');
 	list_version();
     }
 }
@@ -3264,27 +3264,27 @@ ex_version(exarg_T *eap)
  * When "wrap" is TRUE wrap the string in [].
  */
     static void
-version_msg_wrap(char_u *s, int wrap)
+version_मेनसाहे_wrap(char_u *s, int wrap)
 {
     int		len = vim_strsize(s) + (wrap ? 2 : 0);
 
-    if (!got_int && len < cmdline_width && msg_col + len >= cmdline_width
+    if (!got_int && len < cmdline_width && मेनसाहे_col + len >= cmdline_width
 								&& *s != '\n')
-	msg_putchar('\n');
+	मेनसाहे_putchar('\n');
     if (!got_int)
     {
 	if (wrap)
-	    msg_puts("[");
-	msg_puts((char *)s);
+	    मेनसाहे_puts("[");
+	मेनसाहे_puts((char *)s);
 	if (wrap)
-	    msg_puts("]");
+	    मेनसाहे_puts("]");
     }
 }
 
     static void
-version_msg(char *s)
+version_मेनसाहे(char *s)
 {
-    version_msg_wrap((char_u *)s, FALSE);
+    version_मेनसाहे_wrap((char_u *)s, FALSE);
 }
 
 /*
@@ -3302,38 +3302,38 @@ list_features(void)
  * The entry with index "current" is inclosed in [].
  */
     void
-list_in_columns(char_u **items, int size, int current)
+list_in_columns(char_u **मगा_बागाय, int size, int current)
 {
     int		i;
     int		ncol;
     int		nrow;
     int		cur_row = 1;
-    int		item_count = 0;
+    int		item_बिलांग = 0;
     int		width = 0;
 #ifdef FEAT_SYN_HL
-    int		use_highlight = (items == (char_u **)features);
+    int		use_highlight = (मगा_बागाय == (char_u **)features);
 #endif
 
     // Find the length of the longest item, use that + 1 as the column
     // width.
-    for (i = 0; size < 0 ? items[i] != NULL : i < size; ++i)
+    for (i = 0; size < 0 ? मगा_बागाय[i] != NULL : i < size; ++i)
     {
-	int l = vim_strsize(items[i]) + (i == current ? 2 : 0);
+	int l = vim_strsize(मगा_बागाय[i]) + (i == current ? 2 : 0);
 
 	if (l > width)
 	    width = l;
-	++item_count;
+	++item_बिलांग;
     }
     width += 1;
 
     if (cmdline_width < width)
     {
 	// Not enough screen columns - show one per line
-	for (i = 0; i < item_count; ++i)
+	for (i = 0; i < item_बिलांग; ++i)
 	{
-	    version_msg_wrap(items[i], i == current);
-	    if (msg_col > 0 && i < item_count - 1)
-		msg_putchar('\n');
+	    version_मेनसाहे_wrap(मगा_बागाय[i], i == current);
+	    if (मेनसाहे_col > 0 && i < item_बिलांग - 1)
+		मेनसाहे_putchar('\n');
 	}
 	return;
     }
@@ -3341,46 +3341,46 @@ list_in_columns(char_u **items, int size, int current)
     // The rightmost column doesn't need a separator.
     // Sacrifice it to fit in one more column if possible.
     ncol = (cmdline_width + 1) / width;
-    nrow = item_count / ncol + ((item_count % ncol) ? 1 : 0);
+    nrow = item_बिलांग / ncol + ((item_बिलांग % ncol) ? 1 : 0);
 
     // "i" counts columns then rows.  "idx" counts rows then columns.
     for (i = 0; !got_int && i < nrow * ncol; ++i)
     {
 	int idx = (i / ncol) + (i % ncol) * nrow;
 
-	if (idx < item_count)
+	if (idx < item_बिलांग)
 	{
 	    int last_col = (i + 1) % ncol == 0;
 
 	    if (idx == current)
-		msg_putchar('[');
+		मेनसाहे_putchar('[');
 #ifdef FEAT_SYN_HL
-	    if (use_highlight && items[idx][0] == '-')
-		msg_puts_attr((char *)items[idx], HL_ATTR(HLF_W));
+	    if (use_highlight && मगा_बागाय[idx][0] == '-')
+		मेनसाहे_puts_attr((char *)मगा_बागाय[idx], HL_ATTR(HLF_W));
 	    else
 #endif
-		msg_puts((char *)items[idx]);
+		मेनसाहे_puts((char *)मगा_बागाय[idx]);
 	    if (idx == current)
-		msg_putchar(']');
+		मेनसाहे_putchar(']');
 	    if (last_col)
 	    {
-		if (msg_col > 0 && cur_row < nrow)
-		    msg_putchar('\n');
+		if (मेनसाहे_col > 0 && cur_row < nrow)
+		    मेनसाहे_putchar('\n');
 		++cur_row;
 	    }
 	    else
 	    {
-		while (msg_col % width)
-		    msg_putchar(' ');
+		while (मेनसाहे_col % width)
+		    मेनसाहे_putchar(' ');
 	    }
 	}
 	else
 	{
 	    // this row is out of items, thus at the end of the row
-	    if (msg_col > 0)
+	    if (मेनसाहे_col > 0)
 	    {
 		if (cur_row < nrow)
-		    msg_putchar('\n');
+		    मेनसाहे_putchar('\n');
 		++cur_row;
 	    }
 	}
@@ -3399,69 +3399,69 @@ list_version(void)
      * internal variables in eval.c!
      */
     init_longVersion();
-    msg(longVersion);
+    मेनसाहे(longVersion);
 #ifdef MSWIN
 # ifdef FEAT_GUI_MSWIN
 #  ifdef VIMDLL
 #   ifdef _WIN64
 #    if defined(_M_ARM64) || defined(_M_ARM64EC)
-     msg_puts(_("\nMS-Windows ARM64 GUI/console version"));
+     मेनसाहे_puts(_("\nMS-Windows ARM64 GUI/console version"));
 #    else
-     msg_puts(_("\nMS-Windows 64-bit GUI/console version"));
+     मेनसाहे_puts(_("\nMS-Windows 64-bit GUI/console version"));
 #    endif
 #   else
-    msg_puts(_("\nMS-Windows 32-bit GUI/console version"));
+    मेनसाहे_puts(_("\nMS-Windows 32-bit GUI/console version"));
 #   endif
 #  else
 #   ifdef _WIN64
 #    if defined(_M_ARM64) || defined(_M_ARM64EC)
-     msg_puts(_("\nMS-Windows ARM64 GUI version"));
+     मेनसाहे_puts(_("\nMS-Windows ARM64 GUI version"));
 #    else
-     msg_puts(_("\nMS-Windows 64-bit GUI version"));
+     मेनसाहे_puts(_("\nMS-Windows 64-bit GUI version"));
 #    endif
 #   else
-    msg_puts(_("\nMS-Windows 32-bit GUI version"));
+    मेनसाहे_puts(_("\nMS-Windows 32-bit GUI version"));
 #   endif
 #  endif
 #  ifdef FEAT_OLE
-    msg_puts(_(" with OLE support"));
+    मेनसाहे_puts(_(" with OLE support"));
 #  endif
 # else
 #  ifdef _WIN64
 #   if defined(_M_ARM64) || defined(_M_ARM64EC)
-    msg_puts(_("\nMS-Windows ARM64 console version"));
+    मेनसाहे_puts(_("\nMS-Windows ARM64 console version"));
 #   else
-    msg_puts(_("\nMS-Windows 64-bit console version"));
+    मेनसाहे_puts(_("\nMS-Windows 64-bit console version"));
 #   endif
 #  else
-    msg_puts(_("\nMS-Windows 32-bit console version"));
+    मेनसाहे_puts(_("\nMS-Windows 32-bit console version"));
 #  endif
 # endif
 #endif
 #if defined(MACOS_X)
 # if defined(MACOS_X_DARWIN)
-    msg_puts(_("\nmacOS version"));
+    मेनसाहे_puts(_("\nmacOS version"));
 # else
-    msg_puts(_("\nmacOS version w/o darwin feat."));
+    मेनसाहे_puts(_("\nmacOS version w/o darwin feat."));
 # endif
 # if defined(__arm64__)
-    msg_puts(" - arm64");
+    मेनसाहे_puts(" - arm64");
 # elif defined(__x86_64__)
-    msg_puts(" - x86_64");
+    मेनसाहे_puts(" - x86_64");
 # endif
 #endif
 
 #ifdef VMS
-    msg_puts(_("\nOpenVMS (build) arch, version"));
+    मेनसाहे_puts(_("\nOpenVMS (build) arch, version"));
 # ifdef HAVE_PATHDEF
     if (*compiled_arch != NUL)
     {
-	msg_puts(": ");
-	msg_puts((char *)compiled_arch);
+	मेनसाहे_puts(": ");
+	मेनसाहे_puts((char *)compiled_arch);
 	if (*compiled_vers != NUL)
 	{
-	    msg_puts(", ");
-	    msg_puts((char *)compiled_vers);
+	    मेनसाहे_puts(", ");
+	    मेनसाहे_puts((char *)compiled_vers);
 	}
     }
 
@@ -3473,7 +3473,7 @@ list_version(void)
     // Print a range when patches are consecutive: "1-10, 12, 15-40, 42-45"
     if (included_patches[0] != 0)
     {
-	msg_puts(_("\nIncluded patches: "));
+	मेनसाहे_puts(_("\nIncluded patches: "));
 	first = -1;
 	i = (int)ARRAY_LENGTH(included_patches) - 1;
 	while (--i >= 0)
@@ -3482,13 +3482,13 @@ list_version(void)
 		first = included_patches[i];
 	    if (i == 0 || included_patches[i - 1] != included_patches[i] + 1)
 	    {
-		msg_puts(s);
+		मेनसाहे_puts(s);
 		s = ", ";
-		msg_outnum((long)first);
+		मेनसाहे_outnum((long)first);
 		if (first != included_patches[i])
 		{
-		    msg_puts("-");
-		    msg_outnum((long)included_patches[i]);
+		    मेनसाहे_puts("-");
+		    मेनसाहे_outnum((long)included_patches[i]);
 		}
 		first = -1;
 	    }
@@ -3498,178 +3498,178 @@ list_version(void)
     // Print the list of extra patch descriptions if there is at least one.
     if (extra_patches[0] != NULL)
     {
-	msg_puts(_("\nExtra patches: "));
+	मेनसाहे_puts(_("\nExtra patches: "));
 	s = "";
 	for (i = 0; extra_patches[i] != NULL; ++i)
 	{
-	    msg_puts(s);
+	    मेनसाहे_puts(s);
 	    s = ", ";
-	    msg_puts(extra_patches[i]);
+	    मेनसाहे_puts(extra_patches[i]);
 	}
     }
 
 #ifdef MODIFIED_BY
-    msg_puts("\n");
-    msg_puts(_("Modified by "));
-    msg_puts(MODIFIED_BY);
+    मेनसाहे_puts("\n");
+    मेनसाहे_puts(_("Modified by "));
+    मेनसाहे_puts(MODIFIED_BY);
 #endif
 
 #ifdef HAVE_PATHDEF
     if (*compiled_user != NUL || *compiled_sys != NUL)
     {
-	msg_puts(_("\nCompiled "));
+	मेनसाहे_puts(_("\nCompiled "));
 	if (*compiled_user != NUL)
 	{
-	    msg_puts(_("by "));
-	    msg_puts((char *)compiled_user);
+	    मेनसाहे_puts(_("by "));
+	    मेनसाहे_puts((char *)compiled_user);
 	}
 	if (*compiled_sys != NUL)
 	{
-	    msg_puts("@");
-	    msg_puts((char *)compiled_sys);
+	    मेनसाहे_puts("@");
+	    मेनसाहे_puts((char *)compiled_sys);
 	}
     }
 #endif
 
 #if defined(FEAT_HUGE)
-    msg_puts(_("\nHuge version "));
+    मेनसाहे_puts(_("\nHuge version "));
 #elif defined(FEAT_NORMAL)
-    msg_puts(_("\nNormal version "));
+    मेनसाहे_puts(_("\nNormal version "));
 #else
-    msg_puts(_("\nTiny version "));
+    मेनसाहे_puts(_("\nTiny version "));
 #endif
 #if !defined(FEAT_GUI)
-    msg_puts(_("without GUI."));
+    मेनसाहे_puts(_("without GUI."));
 #elif defined(FEAT_GUI_GTK)
 # if defined(USE_GTK4)
-    msg_puts(_("with GTK4 GUI."));
+    मेनसाहे_puts(_("with GTK4 GUI."));
 # elif defined(USE_GTK3)
-    msg_puts(_("with GTK3 GUI."));
+    मेनसाहे_puts(_("with GTK3 GUI."));
 # elif defined(FEAT_GUI_GNOME)
-    msg_puts(_("with GTK2-GNOME GUI."));
+    मेनसाहे_puts(_("with GTK2-GNOME GUI."));
 # else
-    msg_puts(_("with GTK2 GUI."));
+    मेनसाहे_puts(_("with GTK2 GUI."));
 # endif
 #elif defined(FEAT_GUI_MOTIF)
-    msg_puts(_("with X11-Motif GUI."));
+    मेनसाहे_puts(_("with X11-Motif GUI."));
 #elif defined(FEAT_GUI_HAIKU)
-    msg_puts(_("with Haiku GUI."));
+    मेनसाहे_puts(_("with Haiku GUI."));
 #elif defined(FEAT_GUI_PHOTON)
-    msg_puts(_("with Photon GUI."));
+    मेनसाहे_puts(_("with Photon GUI."));
 #elif defined(MSWIN)
-    msg_puts(_("with GUI."));
+    मेनसाहे_puts(_("with GUI."));
 #endif
-    version_msg(_("  Features included (+) or not (-):\n"));
+    version_मेनसाहे(_("  Features included (+) or not (-):\n"));
 
     list_features();
-    if (msg_col > 0)
-	msg_putchar('\n');
+    if (मेनसाहे_col > 0)
+	मेनसाहे_putchar('\n');
 
 #ifdef SYS_VIMRC_FILE
-    version_msg(_("   system vimrc file: \""));
-    version_msg(SYS_VIMRC_FILE);
-    version_msg("\"\n");
+    version_मेनसाहे(_("   system vimrc file: \""));
+    version_मेनसाहे(SYS_VIMRC_FILE);
+    version_मेनसाहे("\"\n");
 #endif
 #ifdef USR_VIMRC_FILE
-    version_msg(_("     user vimrc file: \""));
-    version_msg(USR_VIMRC_FILE);
-    version_msg("\"\n");
+    version_मेनसाहे(_("     user vimrc file: \""));
+    version_मेनसाहे(USR_VIMRC_FILE);
+    version_मेनसाहे("\"\n");
 #endif
 #ifdef USR_VIMRC_FILE2
-    version_msg(_(" 2nd user vimrc file: \""));
-    version_msg(USR_VIMRC_FILE2);
-    version_msg("\"\n");
+    version_मेनसाहे(_(" 2nd user vimrc file: \""));
+    version_मेनसाहे(USR_VIMRC_FILE2);
+    version_मेनसाहे("\"\n");
 #endif
 #if defined(USR_VIMRC_FILE3) && defined(XDG_VIMRC_FILE)
-    version_msg(_(" 3rd user vimrc file: \""));
-    version_msg(USR_VIMRC_FILE3);
-    version_msg("\"\n");
-    version_msg(_(" 4th user vimrc file: \""));
-    version_msg((char *)(XDG_VIMRC_FILE));
-    version_msg("\"\n");
+    version_मेनसाहे(_(" 3rd user vimrc file: \""));
+    version_मेनसाहे(USR_VIMRC_FILE3);
+    version_मेनसाहे("\"\n");
+    version_मेनसाहे(_(" 4th user vimrc file: \""));
+    version_मेनसाहे((char *)(XDG_VIMRC_FILE));
+    version_मेनसाहे("\"\n");
 #elif defined(USR_VIMRC_FILE3)
-    version_msg(_(" 3rd user vimrc file: \""));
-    version_msg(USR_VIMRC_FILE3);
-    version_msg("\"\n");
+    version_मेनसाहे(_(" 3rd user vimrc file: \""));
+    version_मेनसाहे(USR_VIMRC_FILE3);
+    version_मेनसाहे("\"\n");
 #elif defined(XDG_VIMRC_FILE)
-    version_msg(_(" 3rd user vimrc file: \""));
-    version_msg((char *)(XDG_VIMRC_FILE));
-    version_msg("\"\n");
+    version_मेनसाहे(_(" 3rd user vimrc file: \""));
+    version_मेनसाहे((char *)(XDG_VIMRC_FILE));
+    version_मेनसाहे("\"\n");
 #endif
 #ifdef USR_EXRC_FILE
-    version_msg(_("      user exrc file: \""));
-    version_msg(USR_EXRC_FILE);
-    version_msg("\"\n");
+    version_मेनसाहे(_("      user exrc file: \""));
+    version_मेनसाहे(USR_EXRC_FILE);
+    version_मेनसाहे("\"\n");
 #endif
 #ifdef USR_EXRC_FILE2
-    version_msg(_("  2nd user exrc file: \""));
-    version_msg(USR_EXRC_FILE2);
-    version_msg("\"\n");
+    version_मेनसाहे(_("  2nd user exrc file: \""));
+    version_मेनसाहे(USR_EXRC_FILE2);
+    version_मेनसाहे("\"\n");
 #endif
 #ifdef FEAT_GUI
 # ifdef SYS_GVIMRC_FILE
-    version_msg(_("  system gvimrc file: \""));
-    version_msg(SYS_GVIMRC_FILE);
-    version_msg("\"\n");
+    version_मेनसाहे(_("  system gvimrc file: \""));
+    version_मेनसाहे(SYS_GVIMRC_FILE);
+    version_मेनसाहे("\"\n");
 # endif
-    version_msg(_("    user gvimrc file: \""));
-    version_msg(USR_GVIMRC_FILE);
-    version_msg("\"\n");
+    version_मेनसाहे(_("    user gvimrc file: \""));
+    version_मेनसाहे(USR_GVIMRC_FILE);
+    version_मेनसाहे("\"\n");
 # ifdef USR_GVIMRC_FILE2
-    version_msg(_("2nd user gvimrc file: \""));
-    version_msg(USR_GVIMRC_FILE2);
-    version_msg("\"\n");
+    version_मेनसाहे(_("2nd user gvimrc file: \""));
+    version_मेनसाहे(USR_GVIMRC_FILE2);
+    version_मेनसाहे("\"\n");
 # endif
 # ifdef USR_GVIMRC_FILE3
-    version_msg(_("3rd user gvimrc file: \""));
-    version_msg(USR_GVIMRC_FILE3);
-    version_msg("\"\n");
+    version_मेनसाहे(_("3rd user gvimrc file: \""));
+    version_मेनसाहे(USR_GVIMRC_FILE3);
+    version_मेनसाहे("\"\n");
 # endif
 #endif
-    version_msg(_("       defaults file: \""));
-    version_msg(VIM_DEFAULTS_FILE);
-    version_msg("\"\n");
+    version_मेनसाहे(_("       defaults file: \""));
+    version_मेनसाहे(VIM_DEFAULTS_FILE);
+    version_मेनसाहे("\"\n");
 #ifdef FEAT_GUI
 # ifdef SYS_MENU_FILE
-    version_msg(_("    system menu file: \""));
-    version_msg(SYS_MENU_FILE);
-    version_msg("\"\n");
+    version_मेनसाहे(_("    system menu file: \""));
+    version_मेनसाहे(SYS_MENU_FILE);
+    version_मेनसाहे("\"\n");
 # endif
 #endif
 #ifdef HAVE_PATHDEF
     if (*default_vim_dir != NUL)
     {
-	version_msg(_("  fall-back for $VIM: \""));
-	version_msg((char *)default_vim_dir);
-	version_msg("\"\n");
+	version_मेनसाहे(_("  fall-back for $VIM: \""));
+	version_मेनसाहे((char *)default_vim_dir);
+	version_मेनसाहे("\"\n");
     }
     if (*default_vimruntime_dir != NUL)
     {
-	version_msg(_(" f-b for $VIMRUNTIME: \""));
-	version_msg((char *)default_vimruntime_dir);
-	version_msg("\"\n");
+	version_मेनसाहे(_(" f-b for $VIMRUNTIME: \""));
+	version_मेनसाहे((char *)default_vimruntime_dir);
+	version_मेनसाहे("\"\n");
     }
-    version_msg(_("Compilation: "));
-    version_msg((char *)all_cflags);
-    version_msg("\n");
+    version_मेनसाहे(_("Compilation: "));
+    version_मेनसाहे((char *)all_cflags);
+    version_मेनसाहे("\n");
 # ifdef VMS
     if (*compiler_version != NUL)
     {
-	version_msg(_("Compiler: "));
-	version_msg((char *)compiler_version);
-	version_msg("\n");
+	version_मेनसाहे(_("Compiler: "));
+	version_मेनसाहे((char *)compiler_version);
+	version_मेनसाहे("\n");
     }
 # endif
-    version_msg(_("Linking: "));
-    version_msg((char *)all_lflags);
+    version_मेनसाहे(_("Linking: "));
+    version_मेनसाहे((char *)all_lflags);
 #endif
 #ifdef DEBUG
-    version_msg("\n");
-    version_msg(_("  DEBUG BUILD"));
+    version_मेनसाहे("\n");
+    version_मेनसाहे(_("  DEBUG BUILD"));
 #endif
 }
 
-static void do_intro_line(int row, char_u *mesg, int add_version, int attr);
+static void do_intro_लिन्या(int row, char_u *mesg, int add_version, int attr);
 static void intro_message(int colon);
 
 /*
@@ -3699,7 +3699,7 @@ intro_message(
     int		blanklines;
     int		sponsor;
     char	*p;
-    static char	*(lines[]) =
+    static char	*(मगा_लिन्या[]) =
     {
 	N_("VIM - Vi IMproved"),
 	"",
@@ -3723,7 +3723,7 @@ intro_message(
 	N_("type  :help cp-default<Enter> for info on this"),
     };
 #ifdef FEAT_GUI
-    static char	*(gui_lines[]) =
+    static char	*(gui_मगा_लिन्या[]) =
     {
 	NULL,
 	NULL,
@@ -3749,7 +3749,7 @@ intro_message(
 #endif
 
     // blanklines = screen height - # message lines
-    blanklines = (int)Rows - (ARRAY_LENGTH(lines) - 1);
+    blanklines = (int)Rows - (ARRAY_LENGTH(मगा_लिन्या) - 1);
     if (!p_cp)
 	blanklines += 4;  // add 4 for not showing "Vi compatible" message
 
@@ -3767,12 +3767,12 @@ intro_message(
     row = blanklines / 2;
     if ((row >= 2 && topframe->fr_width >= 50) || colon)
     {
-	for (i = 0; i < (int)ARRAY_LENGTH(lines); ++i)
+	for (i = 0; i < (int)ARRAY_LENGTH(मगा_लिन्या); ++i)
 	{
-	    p = lines[i];
+	    p = मगा_लिन्या[i];
 #ifdef FEAT_GUI
-	    if (p_im && gui.in_use && gui_lines[i] != NULL)
-		p = gui_lines[i];
+	    if (p_im && gui.in_use && gui_मगा_लिन्या[i] != NULL)
+		p = gui_मगा_लिन्या[i];
 #endif
 	    if (p == NULL)
 	    {
@@ -3790,18 +3790,18 @@ intro_message(
 		    p = N_("menu  Help->Sponsor           for information    ");
 	    }
 	    if (*p != NUL)
-		do_intro_line(row, (char_u *)_(p), i == 2, 0);
+		do_intro_लिन्या(row, (char_u *)_(p), i == 2, 0);
 	    ++row;
 	}
     }
 
     // Make the wait-return message appear just below the text.
     if (colon)
-	msg_row = row;
+	मेनसाहे_row = row;
 }
 
     static void
-do_intro_line(
+do_intro_लिन्या(
     int		row,
     char_u	*mesg,
     int		add_version,

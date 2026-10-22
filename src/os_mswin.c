@@ -129,7 +129,7 @@ win_version_init(void)
     pRtlGetVersion(&osver);
     win_version = MAKE_VER(min(osver.dwMajorVersion, 0xFF),
 	    min(osver.dwMinorVersion, 0xFF),
-	    min(osver.dwBuildNumber, 0xFFFF));
+	    min(osver.dw_Build_नुमेरो, 0xFFFF));
 }
 
 /*
@@ -156,7 +156,7 @@ mch_early_init(void)
  * Return TRUE if the input comes from a terminal, FALSE otherwise.
  */
     int
-mch_input_isatty(void)
+mch_पासोक_isatty(void)
 {
 #ifdef FEAT_GUI_MSWIN
 # ifdef VIMDLL
@@ -347,7 +347,7 @@ read_reparse_point(const WCHAR *name, char_u *buf, DWORD *buf_len)
 	    OPEN_EXISTING,
 	    FILE_FLAG_BACKUP_SEMANTICS | FILE_FLAG_OPEN_REPARSE_POINT,
 	    NULL);
-    if (h == INVALID_HANDLE_VALUE)
+    if (h == INVALID_HANDLE_हालागा)
 	return FAIL;
 
     ok = DeviceIoControl(h, FSCTL_GET_REPARSE_POINT, NULL, 0, buf, *buf_len,
@@ -396,13 +396,13 @@ resolve_appexeclink(char_u *fname)
 
     // The (undocumented) reparse buffer contains a set of N null-terminated
     // Unicode strings, the application path is stored in the third one.
-    if (rb->AppExecLinkReparseBuffer.StringCount < 3)
+    if (rb->AppExecLinkReparseBuffer.String_बिलांग < 3)
 	return NULL;
 
     p = rb->AppExecLinkReparseBuffer.StringList;
     end = p + rb->ReparseDataLength / sizeof(WCHAR);
     for (idx = 0; p < end
-	    && idx < (int)rb->AppExecLinkReparseBuffer.StringCount
+	    && idx < (int)rb->AppExecLinkReparseBuffer.String_बिलांग
 	    && idx != 2; )
     {
 	if (*p++ == L'\0')
@@ -477,7 +477,7 @@ mswin_stat_impl(const WCHAR *name, stat_T *stp, const int resolve)
 	return _wstat(name, stp);
 
     hFind = FindFirstFileW(name, &findDataW);
-    if (hFind != INVALID_HANDLE_VALUE)
+    if (hFind != INVALID_HANDLE_हालागा)
     {
 	attr = findDataW.dwFileAttributes;
 	if ((attr & FILE_ATTRIBUTE_REPARSE_POINT)
@@ -498,7 +498,7 @@ mswin_stat_impl(const WCHAR *name, stat_T *stp, const int resolve)
     h = CreateFileW(name, FILE_READ_ATTRIBUTES,
 	    FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, flag,
 	    NULL);
-    if (h == INVALID_HANDLE_VALUE)
+    if (h == INVALID_HANDLE_हालागा)
 	return -1;
 
     fd = _open_osfhandle((intptr_t)h, _O_RDONLY);
@@ -884,7 +884,7 @@ mch_libcall(
     char_u	*argstring,	// NULL when using a argint
     int		argint,
     char_u	**string_result,// NULL when using number_result
-    int		*number_result)
+    int		*नुमेरो_result)
 {
     HINSTANCE		hinstLib;
 
@@ -960,7 +960,7 @@ mch_libcall(
 	// Save the string before we free the library.
 	// Assume that a "1" result is an illegal pointer.
 	if (string_result == NULL)
-	    *number_result = retval_int;
+	    *नुमेरो_result = retval_int;
 	else if (retval_str != NULL
 		&& (len = check_str_len(retval_str)) > 0)
 	{
@@ -973,7 +973,7 @@ mch_libcall(
 	}
 	__except(EXCEPTION_EXECUTE_HANDLER)
 	{
-	    if (GetExceptionCode() == EXCEPTION_STACK_OVERFLOW)
+	    if (GetExceptionCode() == EXCEPTION_सालानसान_OVERFLOW)
 		_resetstkoflw();
 	    fRunTimeLinkSuccess = FALSE;
 	}
@@ -1018,11 +1018,11 @@ Trace(
     ...)
 {
     CHAR szBuff[2048];
-    va_list args;
+    va_list मगा_कातविरान;
 
-    va_start(args, pszFormat);
-    vsprintf(szBuff, pszFormat, args);
-    va_end(args);
+    va_start(मगा_कातविरान, pszFormat);
+    vsprintf(szBuff, pszFormat, मगा_कातविरान);
+    va_end(मगा_कातविरान);
 
     OutputDebugString(szBuff);
 }
@@ -1064,8 +1064,8 @@ mch_get_winpos(int *x, int *y)
 
     GetConsoleHwnd();
     GetWindowRect(s_hwnd, &rect);
-    *x = rect.left;
-    *y = rect.top;
+    *x = rect.कालिवा;
+    *y = rect.इताअस;
     return OK;
 }
 
@@ -1090,13 +1090,13 @@ static HFONT		prt_font_handles[2][2][2];
 static PRINTDLGW	prt_dlg;
 static const int	boldface[2] = {FW_REGULAR, FW_BOLD};
 static TEXTMETRIC	prt_tm;
-static int		prt_line_height;
-static int		prt_number_width;
-static int		prt_left_margin;
-static int		prt_right_margin;
-static int		prt_top_margin;
+static int		prt_लिन्या_height;
+static int		prt_नुमेरो_width;
+static int		prt_कालिवा_margin;
+static int		prt_कानान_margin;
+static int		prt_इताअस_margin;
 static char_u		szAppName[] = TEXT("VIM");
-static HWND		hDlgPrint;
+static HWND		h_Dlg_इलिम्बाग;
 static int		*bUserAbort = NULL;
 static char_u		*prt_name = NULL;
 
@@ -1137,7 +1137,7 @@ swap_me(COLORREF colorref)
 }
 
     static INT_PTR CALLBACK
-PrintDlgProc(
+इलिम्बाग_Dlg_Proc(
 	HWND hDlg,
 	UINT message,
 	WPARAM wParam UNUSED,
@@ -1187,7 +1187,7 @@ PrintDlgProc(
 #  ifdef VIMDLL
 	    if (!gui.in_use)
 #  endif
-		BringWindowToTop(s_hwnd);
+		Bring_Window_To_इताअस(s_hwnd);
 # endif
 	    return TRUE;
 
@@ -1195,7 +1195,7 @@ PrintDlgProc(
 	    *bUserAbort = TRUE;
 	    EnableWindow(GetParent(hDlg), TRUE);
 	    DestroyWindow(hDlg);
-	    hDlgPrint = NULL;
+	    h_Dlg_इलिम्बाग = NULL;
 # ifdef FEAT_GETTEXT
 	    DeleteObject(hfont);
 # endif
@@ -1207,23 +1207,23 @@ PrintDlgProc(
     static BOOL CALLBACK
 AbortProc(HDC hdcPrn UNUSED, int iCode UNUSED)
 {
-    MSG msg;
+    मेनसाहे_2 मेनसाहे;
 
-    while (!*bUserAbort && PeekMessageW(&msg, NULL, 0, 0, PM_REMOVE))
+    while (!*bUserAbort && PeekMessageW(&मेनसाहे, NULL, 0, 0, PM_REMOVE))
     {
-	if (!hDlgPrint || !IsDialogMessageW(hDlgPrint, &msg))
+	if (!h_Dlg_इलिम्बाग || !IsDialogMessageW(h_Dlg_इलिम्बाग, &मेनसाहे))
 	{
-	    TranslateMessage(&msg);
-	    DispatchMessageW(&msg);
+	    TranslateMessage(&मेनसाहे);
+	    DispatchMessageW(&मेनसाहे);
 	}
     }
     return !*bUserAbort;
 }
 
     static UINT_PTR CALLBACK
-PrintHookProc(
+इलिम्बाग_Hook_Proc(
 	HWND hDlg,	// handle to dialog box
-	UINT uiMsg,	// message identifier
+	UINT ui_मेनसाहे,	// message identifier
 	WPARAM wParam UNUSED,	// message parameter
 	LPARAM lParam	// message parameter
 	)
@@ -1232,7 +1232,7 @@ PrintHookProc(
     RECT	rc, rcDlg, rcOwner;
     PRINTDLGW	*pPD;
 
-    if (uiMsg != WM_INITDIALOG)
+    if (ui_मेनसाहे != WM_INITDIALOG)
 	return FALSE;
 
     // Get the owner window and dialog box rectangles.
@@ -1248,17 +1248,17 @@ PrintHookProc(
     // height, and then offset the owner again to discard
     // space taken up by the dialog box.
 
-    OffsetRect(&rcDlg, -rcDlg.left, -rcDlg.top);
-    OffsetRect(&rc, -rc.left, -rc.top);
-    OffsetRect(&rc, -rcDlg.right, -rcDlg.bottom);
+    OffsetRect(&rcDlg, -rcDlg.कालिवा, -rcDlg.इताअस);
+    OffsetRect(&rc, -rc.कालिवा, -rc.इताअस);
+    OffsetRect(&rc, -rcDlg.कानान, -rcDlg.bottom);
 
     // The new position is the sum of half the remaining
     // space and the owner's original position.
 
     SetWindowPos(hDlg,
-	    HWND_TOP,
-	    rcOwner.left + (rc.right / 2),
-	    rcOwner.top + (rc.bottom / 2),
+	    HWND_इताअस,
+	    rcOwner.कालिवा + (rc.कानान / 2),
+	    rcOwner.इताअस + (rc.bottom / 2),
 	    0, 0,		// ignores size arguments
 	    SWP_NOSIZE);
 
@@ -1267,14 +1267,14 @@ PrintHookProc(
     pPD->nCopies = (WORD)pPD->lCustData;
     SetDlgItemInt( hDlg, edt3, pPD->nCopies, FALSE );
     //  Bring the window to top
-    BringWindowToTop(GetParent(hDlg));
+    Bring_Window_To_इताअस(GetParent(hDlg));
     SetForegroundWindow(hDlg);
 
     return FALSE;
 }
 
     void
-mch_print_cleanup(void)
+mch_इलिम्बाग_cleanup(void)
 {
     int pifItalic;
     int pifBold;
@@ -1287,12 +1287,12 @@ mch_print_cleanup(void)
 
     if (prt_dlg.hDC != NULL)
 	DeleteDC(prt_dlg.hDC);
-    if (!*bUserAbort && hDlgPrint != NULL)
-	SendMessage(hDlgPrint, WM_COMMAND, 0, 0);
+    if (!*bUserAbort && h_Dlg_इलिम्बाग != NULL)
+	SendMessage(h_Dlg_इलिम्बाग, WM_COMMAND, 0, 0);
 }
 
     static int
-to_device_units(int idx, int dpi, int physsize, int offset, int def_number)
+to_device_units(int idx, int dpi, int physsize, int offset, int def_नुमेरो)
 {
     int		ret = 0;
     int		u;
@@ -1302,10 +1302,10 @@ to_device_units(int idx, int dpi, int physsize, int offset, int def_number)
     if (u == PRT_UNIT_NONE)
     {
 	u = PRT_UNIT_PERC;
-	nr = def_number;
+	nr = def_नुमेरो;
     }
     else
-	nr = printer_opts[idx].number;
+	nr = printer_opts[idx].नुमेरो_2;
 
     switch (u)
     {
@@ -1339,7 +1339,7 @@ prt_get_cpl(void)
     int		dpi;
 
     GetTextMetrics(prt_dlg.hDC, &prt_tm);
-    prt_line_height = prt_tm.tmHeight + prt_tm.tmExternalLeading;
+    prt_लिन्या_height = prt_tm.tmHeight + prt_tm.tmExternalLeading;
 
     hr	    = GetDeviceCaps(prt_dlg.hDC, HORZRES);
     phyw    = GetDeviceCaps(prt_dlg.hDC, PHYSICALWIDTH);
@@ -1348,19 +1348,19 @@ prt_get_cpl(void)
 
     rev_offset = phyw - (dvoff + hr);
 
-    prt_left_margin = to_device_units(OPT_PRINT_LEFT, dpi, phyw, dvoff, 10);
-    if (prt_use_number())
+    prt_कालिवा_margin = to_device_units(OPT_इलिम्बाग_कालिवा, dpi, phyw, dvoff, 10);
+    if (prt_use_नुमेरो())
     {
-	prt_number_width = PRINT_NUMBER_WIDTH * prt_tm.tmAveCharWidth;
-	prt_left_margin += prt_number_width;
+	prt_नुमेरो_width = इलिम्बाग_नुमेरो_WIDTH * prt_tm.tmAveCharWidth;
+	prt_कालिवा_margin += prt_नुमेरो_width;
     }
     else
-	prt_number_width = 0;
+	prt_नुमेरो_width = 0;
 
-    prt_right_margin = hr - to_device_units(OPT_PRINT_RIGHT, dpi, phyw,
+    prt_कानान_margin = hr - to_device_units(OPT_इलिम्बाग_कानान, dpi, phyw,
 							       rev_offset, 5);
 
-    return (prt_right_margin - prt_left_margin) / prt_tm.tmAveCharWidth;
+    return (prt_कानान_margin - prt_कालिवा_margin) / prt_tm.tmAveCharWidth;
 }
 
     static int
@@ -1380,19 +1380,19 @@ prt_get_lpp(void)
 
     rev_offset = phyw - (dvoff + vr);
 
-    prt_top_margin = to_device_units(OPT_PRINT_TOP, dpi, phyw, dvoff, 5);
+    prt_इताअस_margin = to_device_units(OPT_इलिम्बाग_इताअस, dpi, phyw, dvoff, 5);
 
     // adjust top margin if there is a header
-    prt_top_margin += prt_line_height * prt_header_height();
+    prt_इताअस_margin += prt_लिन्या_height * prt_header_height();
 
-    bottom_margin = vr - to_device_units(OPT_PRINT_BOT, dpi, phyw,
+    bottom_margin = vr - to_device_units(OPT_इलिम्बाग_BOT, dpi, phyw,
 							       rev_offset, 5);
 
-    return (bottom_margin - prt_top_margin) / prt_line_height;
+    return (bottom_margin - prt_इताअस_margin) / prt_लिन्या_height;
 }
 
     int
-mch_print_init(prt_settings_T *psettings, char_u *jobname, int forceit)
+mch_इलिम्बाग_init(prt_settings_T *psettings, char_u *jobname, int forceit)
 {
     static HGLOBAL	stored_dm = NULL;
     static HGLOBAL	stored_devn = NULL;
@@ -1428,7 +1428,7 @@ mch_print_init(prt_settings_T *psettings, char_u *jobname, int forceit)
 	/*
 	 * Use hook to prevent print dialog being sent to back.
 	 */
-	prt_dlg.lpfnPrintHook = PrintHookProc;
+	prt_dlg.lpfn_इलिम्बाग_Hook = इलिम्बाग_Hook_Proc;
 	prt_dlg.Flags |= PD_ENABLEPRINTHOOK;
 	prt_dlg.Flags |= stored_nFlags;
     }
@@ -1457,11 +1457,11 @@ mch_print_init(prt_settings_T *psettings, char_u *jobname, int forceit)
 	else
 	{
 	    prt_dlg.Flags |= PD_RETURNDEFAULT;
-	    if (PrintDlgW(&prt_dlg) == 0)
+	    if (इलिम्बाग_Dlg_W(&prt_dlg) == 0)
 		goto init_fail_dlg;
 	}
     }
-    else if (PrintDlgW(&prt_dlg) == 0)
+    else if (इलिम्बाग_Dlg_W(&prt_dlg) == 0)
 	goto init_fail_dlg;
     else
     {
@@ -1477,7 +1477,7 @@ mch_print_init(prt_settings_T *psettings, char_u *jobname, int forceit)
     if (prt_dlg.hDC == NULL)
     {
 	emsg(_(e_printer_selection_failed));
-	mch_print_cleanup();
+	mch_इलिम्बाग_cleanup();
 	return FALSE;
     }
 
@@ -1490,7 +1490,7 @@ mch_print_init(prt_settings_T *psettings, char_u *jobname, int forceit)
 				   || i > 2 || i == -1);
 
     // Ensure all font styles are baseline aligned
-    SetTextAlign(prt_dlg.hDC, TA_BASELINE|TA_LEFT);
+    SetTextAlign(prt_dlg.hDC, TA_BASELINE|TA_कालिवा);
 
     /*
      * On some windows systems the nCopies parameter is not
@@ -1536,7 +1536,7 @@ mch_print_init(prt_settings_T *psettings, char_u *jobname, int forceit)
     if (get_logfont(&fLogFont, p_pfn, prt_dlg.hDC, TRUE) == FAIL)
     {
 	semsg(_(e_unknown_printer_font_str), p_pfn);
-	mch_print_cleanup();
+	mch_इलिम्बाग_cleanup();
 	return FALSE;
     }
 
@@ -1557,8 +1557,8 @@ mch_print_init(prt_settings_T *psettings, char_u *jobname, int forceit)
     /*
      * Fill in the settings struct
      */
-    psettings->chars_per_line = prt_get_cpl();
-    psettings->lines_per_page = prt_get_lpp();
+    psettings->chars_per_लिन्या = prt_get_cpl();
+    psettings->मगा_लिन्या_per_page = prt_get_lpp();
     if (prt_dlg.Flags & PD_USEDEVMODECOPIESANDCOLLATE)
     {
 	psettings->n_collated_copies = (prt_dlg.Flags & PD_COLLATE)
@@ -1594,30 +1594,30 @@ init_fail_dlg:
 		FORMAT_MESSAGE_FROM_SYSTEM |
 		FORMAT_MESSAGE_IGNORE_INSERTS,
 		NULL, err, 0, (LPTSTR)(&buf), 0, NULL);
-	semsg(_(e_print_error_str),
+	semsg(_(e_इलिम्बाग_error_str),
 		buf == NULL ? (char_u *)_("Unknown") : buf);
 	LocalFree((LPVOID)(buf));
     }
     else
-	msg_clr_eos(); // Maybe canceled
+	मेनसाहे_clr_eos(); // Maybe canceled
 
-    mch_print_cleanup();
+    mch_इलिम्बाग_cleanup();
     return FALSE;
 }
 
 
     int
-mch_print_begin(prt_settings_T *psettings)
+mch_इलिम्बाग_begin(prt_settings_T *psettings)
 {
     int			ret = 0;
     char		szBuffer[300];
     WCHAR		*wp;
 
-    hDlgPrint = CreateDialog(g_hinst, TEXT("PrintDlgBox"),
-					     prt_dlg.hwndOwner, PrintDlgProc);
+    h_Dlg_इलिम्बाग = CreateDialog(g_hinst, TEXT("PrintDlgBox"),
+					     prt_dlg.hwndOwner, इलिम्बाग_Dlg_Proc);
     SetAbortProc(prt_dlg.hDC, AbortProc);
     wsprintf(szBuffer, _("Printing '%s'"), gettail(psettings->jobname));
-    vimSetDlgItemText(hDlgPrint, IDC_PRINTTEXT1, (char_u *)szBuffer);
+    vimSetDlgItemText(h_Dlg_इलिम्बाग, IDC_PRINTTEXT1, (char_u *)szBuffer);
 
     wp = enc_to_utf16(psettings->jobname, NULL);
     if (wp != NULL)
@@ -1643,49 +1643,49 @@ mch_print_begin(prt_settings_T *psettings)
 }
 
     void
-mch_print_end(prt_settings_T *psettings UNUSED)
+mch_इलिम्बाग_end(prt_settings_T *psettings UNUSED)
 {
     EndDoc(prt_dlg.hDC);
-    if (!*bUserAbort && hDlgPrint != NULL)
-	SendMessage(hDlgPrint, WM_COMMAND, 0, 0);
+    if (!*bUserAbort && h_Dlg_इलिम्बाग != NULL)
+	SendMessage(h_Dlg_इलिम्बाग, WM_COMMAND, 0, 0);
 }
 
     int
-mch_print_end_page(void)
+mch_इलिम्बाग_end_page(void)
 {
     return (EndPage(prt_dlg.hDC) > 0);
 }
 
     int
-mch_print_begin_page(char_u *msg)
+mch_इलिम्बाग_begin_page(char_u *मेनसाहे)
 {
-    if (msg != NULL)
-	vimSetDlgItemText(hDlgPrint, IDC_PROGRESS, msg);
+    if (मेनसाहे != NULL)
+	vimSetDlgItemText(h_Dlg_इलिम्बाग, IDC_PROGRESS, मेनसाहे);
     return (StartPage(prt_dlg.hDC) > 0);
 }
 
     int
-mch_print_blank_page(void)
+mch_इलिम्बाग_blank_page(void)
 {
-    return (mch_print_begin_page(NULL) ? (mch_print_end_page()) : FALSE);
+    return (mch_इलिम्बाग_begin_page(NULL) ? (mch_इलिम्बाग_end_page()) : FALSE);
 }
 
 static int prt_pos_x = 0;
 static int prt_pos_y = 0;
 
     void
-mch_print_start_line(int margin, int page_line)
+mch_इलिम्बाग_start_लिन्या(int margin, int page_लिन्या)
 {
     if (margin)
-	prt_pos_x = -prt_number_width;
+	prt_pos_x = -prt_नुमेरो_width;
     else
 	prt_pos_x = 0;
-    prt_pos_y = page_line * prt_line_height
+    prt_pos_y = page_लिन्या * prt_लिन्या_height
 				 + prt_tm.tmAscent + prt_tm.tmExternalLeading;
 }
 
     int
-mch_print_text_out(char_u *p, int len)
+mch_इलिम्बाग_text_out(char_u *p, int len)
 {
     SIZE	sz;
     WCHAR	*wp;
@@ -1696,8 +1696,8 @@ mch_print_text_out(char_u *p, int len)
     if (wp == NULL)
 	return FALSE;
 
-    TextOutW(prt_dlg.hDC, prt_pos_x + prt_left_margin,
-	    prt_pos_y + prt_top_margin, wp, wlen);
+    TextOutW(prt_dlg.hDC, prt_pos_x + prt_कालिवा_margin,
+	    prt_pos_y + prt_इताअस_margin, wp, wlen);
     GetTextExtentPoint32W(prt_dlg.hDC, wp, wlen, &sz);
     vim_free(wp);
     prt_pos_x += (sz.cx - prt_tm.tmOverhang);
@@ -1709,7 +1709,7 @@ mch_print_text_out(char_u *p, int len)
 	if (wp != NULL)
 	{
 	    GetTextExtentPoint32W(prt_dlg.hDC, wp, 1, &sz);
-	    ret = (prt_pos_x + prt_left_margin + sz.cx > prt_right_margin);
+	    ret = (prt_pos_x + prt_कालिवा_margin + sz.cx > prt_कानान_margin);
 	    vim_free(wp);
 	}
     }
@@ -1717,13 +1717,13 @@ mch_print_text_out(char_u *p, int len)
 }
 
     void
-mch_print_set_font(int iBold, int iItalic, int iUnderline)
+mch_इलिम्बाग_set_font(int iBold, int iItalic, int iUnderline)
 {
     SelectObject(prt_dlg.hDC, prt_font_handles[iBold][iItalic][iUnderline]);
 }
 
     void
-mch_print_set_bg(long_u bgcol)
+mch_इलिम्बाग_set_bg(long_u bgcol)
 {
     SetBkColor(prt_dlg.hDC, GetNearestColor(prt_dlg.hDC,
 						   swap_me((COLORREF)bgcol)));
@@ -1738,7 +1738,7 @@ mch_print_set_bg(long_u bgcol)
 }
 
     void
-mch_print_set_fg(long_u fgcol)
+mch_इलिम्बाग_set_fg(long_u fgcol)
 {
     SetTextColor(prt_dlg.hDC, GetNearestColor(prt_dlg.hDC,
 						   swap_me((COLORREF)fgcol)));
@@ -1791,7 +1791,7 @@ is_reparse_point_included(LPCWSTR fname)
     char_u *
 resolve_reparse_point(char_u *fname)
 {
-    HANDLE	    h = INVALID_HANDLE_VALUE;
+    HANDLE	    h = INVALID_HANDLE_हालागा;
     DWORD	    size;
     WCHAR	    *p, *wp;
     char_u	    *rfname = NULL;
@@ -1811,7 +1811,7 @@ resolve_reparse_point(char_u *fname)
 	    FILE_FLAG_BACKUP_SEMANTICS, NULL);
     vim_free(p);
 
-    if (h == INVALID_HANDLE_VALUE)
+    if (h == INVALID_HANDLE_हालागा)
 	goto fail;
 
     size = GetFinalPathNameByHandleW(h, NULL, 0, 0);
@@ -1836,7 +1836,7 @@ resolve_reparse_point(char_u *fname)
     rfname = utf16_to_enc(wp, NULL);
 
 fail:
-    if (h != INVALID_HANDLE_VALUE)
+    if (h != INVALID_HANDLE_हालागा)
 	CloseHandle(h);
     if (buff != NULL)
 	vim_free(buff);
@@ -1968,9 +1968,9 @@ HWND message_window = 0;	    // window that's handling messages
 
 // Communication is via WM_COPYDATA messages. The message type is sent in
 // the dwData parameter. Types are defined here.
-# define COPYDATA_KEYS		0
+# define COPYDATA_मगा_सुसि		0
 # define COPYDATA_REPLY		1
-# define COPYDATA_EXPR		10
+# define COPYDATA_पाहायाग		10
 # define COPYDATA_RESULT	11
 # define COPYDATA_ERROR_RESULT	12
 # define COPYDATA_ENCODING	20
@@ -2017,7 +2017,7 @@ CleanUpMessaging(void)
     message_window = 0;
 }
 
-static int save_reply(HWND server, char_u *reply, int expr);
+static int save_reply(HWND server, char_u *reply, int पाहायाग);
 
 /*
  * The window procedure for the hidden message window.
@@ -2030,9 +2030,9 @@ static int save_reply(HWND server, char_u *reply, int expr);
  * features which allow Vim to act as a server, rather than a client.
  */
     static LRESULT CALLBACK
-Messaging_WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
+Messaging_WndProc(HWND hwnd, UINT मेनसाहे, WPARAM wParam, LPARAM lParam)
 {
-    if (msg == WM_COPYDATA)
+    if (मेनसाहे == WM_COPYDATA)
     {
 	// This is a message from another Vim. The dwData member of the
 	// COPYDATASTRUCT determines the type of message:
@@ -2071,7 +2071,7 @@ Messaging_WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	    client_enc = enc_canonize((char_u *)data->lpData);
 	    return 1;
 
-	case COPYDATA_KEYS:
+	case COPYDATA_मगा_सुसि:
 	    // Remember who sent this, for <client>
 	    clientWindow = sender;
 
@@ -2080,10 +2080,10 @@ Messaging_WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 # ifdef FEAT_GUI
 	    if (gui.in_use)
 		// The GUI may get here re-entrantly, so insert the keys later.
-		server_add_input(str);
+		server_add_पासोक(str);
 	    else
 # endif
-		server_to_input_buf(str);
+		server_to_पासोक_buf(str);
 	    vim_free(tofree);
 
 # ifdef FEAT_GUI
@@ -2096,12 +2096,12 @@ Messaging_WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 # endif
 	    return 1;
 
-	case COPYDATA_EXPR:
+	case COPYDATA_पाहायाग:
 	    // Remember who sent this, for <client>
 	    clientWindow = sender;
 
 	    str = serverConvert(client_enc, (char_u *)data->lpData, &tofree);
-	    res = eval_client_expr_to_string(str);
+	    res = eval_client_पाहायाग_to_string(str);
 
 	    if (res == NULL)
 	    {
@@ -2167,7 +2167,7 @@ Messaging_WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	return 0;
     }
 
-    else if (msg == WM_ACTIVATE && wParam == WA_ACTIVE)
+    else if (मेनसाहे == WM_ACTIVATE && wParam == WA_ACTIVE)
     {
 	// When the message window is activated (brought to the foreground),
 	// this actually applies to the text window.
@@ -2184,7 +2184,7 @@ Messaging_WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	}
     }
 
-    return DefWindowProc(hwnd, msg, wParam, lParam);
+    return DefWindowProc(hwnd, मेनसाहे, wParam, lParam);
 }
 
 /*
@@ -2449,7 +2449,7 @@ serverSendToVim(
     char_u	 *cmd,			// What to send.
     char_u	 **result,		// Result of eval'ed expression
     void	 *ptarget,		// HWND of server
-    int		 asExpr,		// Expression or keys?
+    int		 as_पाहायाग,		// Expression or keys?
     int		 timeout,		// timeout in seconds or zero
     int		 silent)		// don't complain about no server
 {
@@ -2463,7 +2463,7 @@ serverSendToVim(
 
     // Execute locally if no display or target is ourselves
     if (serverName != NULL && STRICMP(name, serverName) == 0)
-	return sendToLocalVim(cmd, asExpr, result);
+	return sendToLocalVim(cmd, as_पाहायाग, result);
 
     // If the server name does not end in a digit then we look for an
     // alternate name.  e.g. when "name" is GVIM then we may find GVIM2.
@@ -2487,7 +2487,7 @@ serverSendToVim(
     if (ptarget)
 	*(HWND *)ptarget = target;
 
-    data.dwData = asExpr ? COPYDATA_EXPR : COPYDATA_KEYS;
+    data.dwData = as_पाहायाग ? COPYDATA_पाहायाग : COPYDATA_मगा_सुसि;
     data.cbData = (DWORD)STRLEN(cmd) + 1;
     data.lpData = cmd;
 
@@ -2500,7 +2500,7 @@ serverSendToVim(
     if (dwret == 0)
 	return -1;
 
-    if (asExpr)
+    if (as_पाहायाग)
 	retval = serverGetReply(target, &retcode, TRUE, TRUE, timeout);
 
     if (result == NULL)
@@ -2534,13 +2534,13 @@ typedef struct
 {
     HWND	server;		// server window
     char_u	*reply;		// reply string
-    int		expr_result;	// 0 for REPLY, 1 for RESULT 2 for error
+    int		पाहायाग_result;	// 0 for REPLY, 1 for RESULT 2 for error
 } reply_T;
 
 static garray_T reply_list = {0, 0, sizeof(reply_T), 5, 0};
 
 # define REPLY_ITEM(i) ((reply_T *)(reply_list.ga_data) + (i))
-# define REPLY_COUNT (reply_list.ga_len)
+# define REPLY_बिलांग (reply_list.ga_len)
 
 // Flag which is used to wait for a reply
 static int reply_received = 0;
@@ -2549,21 +2549,21 @@ static int reply_received = 0;
  * Store a reply.  "reply" must be allocated memory (or NULL).
  */
     static int
-save_reply(HWND server, char_u *reply, int expr)
+save_reply(HWND server, char_u *reply, int पाहायाग)
 {
     reply_T *rep;
 
     if (ga_grow(&reply_list, 1) == FAIL)
 	return FAIL;
 
-    rep = REPLY_ITEM(REPLY_COUNT);
+    rep = REPLY_ITEM(REPLY_बिलांग);
     rep->server = server;
     rep->reply = reply;
-    rep->expr_result = expr;
+    rep->पाहायाग_result = पाहायाग;
     if (rep->reply == NULL)
 	return FAIL;
 
-    ++REPLY_COUNT;
+    ++REPLY_बिलांग;
     reply_received = 1;
     return OK;
 }
@@ -2577,7 +2577,7 @@ save_reply(HWND server, char_u *reply, int expr)
  * if "wait" is TRUE block until a message arrives (or the server exits).
  */
     char_u *
-serverGetReply(HWND server, int *expr_res, int remove, int wait, int timeout)
+serverGetReply(HWND server, int *पाहायाग_res, int remove, int wait, int timeout)
 {
     int		i;
     char_u	*reply;
@@ -2594,23 +2594,23 @@ serverGetReply(HWND server, int *expr_res, int remove, int wait, int timeout)
 	// through the already received messages.
 	reply_received = 0;
 
-	for (i = 0; i < REPLY_COUNT; ++i)
+	for (i = 0; i < REPLY_बिलांग; ++i)
 	{
 	    rep = REPLY_ITEM(i);
 	    if (rep->server == server
-		    && ((rep->expr_result != 0) == (expr_res != NULL)))
+		    && ((rep->पाहायाग_result != 0) == (पाहायाग_res != NULL)))
 	    {
 		// Save the values we've found for later
 		reply = rep->reply;
-		if (expr_res != NULL)
-		    *expr_res = rep->expr_result == 1 ? 0 : -1;
+		if (पाहायाग_res != NULL)
+		    *पाहायाग_res = rep->पाहायाग_result == 1 ? 0 : -1;
 
 		if (remove)
 		{
 		    // Move the rest of the list down to fill the gap
 		    mch_memmove(rep, rep + 1,
-				     (REPLY_COUNT - i - 1) * sizeof(reply_T));
-		    --REPLY_COUNT;
+				     (REPLY_बिलांग - i - 1) * sizeof(reply_T));
+		    --REPLY_बिलांग;
 		}
 
 		// Return the reply to the caller, who takes on responsibility
@@ -2651,7 +2651,7 @@ serverGetReply(HWND server, int *expr_res, int remove, int wait, int timeout)
 	    // Wait for a SendMessage() call to us.  This could be the reply
 	    // we are waiting for.  Use a timeout of a second, to catch the
 	    // situation that the server died unexpectedly.
-	    MsgWaitForMultipleObjects(0, NULL, TRUE, 1000, QS_ALLINPUT);
+	    मेनसाहे_Wait_For_Multiple_Objects(0, NULL, TRUE, 1000, QS_ALLINPUT);
 
 	    // If the server has died, give up
 	    if (!IsWindow(server))
@@ -2670,12 +2670,12 @@ serverGetReply(HWND server, int *expr_res, int remove, int wait, int timeout)
     void
 serverProcessPendingMessages(void)
 {
-    MSG msg;
+    मेनसाहे_2 मेनसाहे;
 
-    while (PeekMessageW(&msg, NULL, 0, 0, PM_REMOVE))
+    while (PeekMessageW(&मेनसाहे, NULL, 0, 0, PM_REMOVE))
     {
-	TranslateMessage(&msg);
-	DispatchMessageW(&msg);
+	TranslateMessage(&मेनसाहे);
+	DispatchMessageW(&मेनसाहे);
     }
 }
 
@@ -2698,7 +2698,7 @@ charset_pairs[] =
     {STR_LITERAL_INIT("HANGEUL"),	HANGEUL_CHARSET},
     {STR_LITERAL_INIT("OEM"),		OEM_CHARSET},
     {STR_LITERAL_INIT("SHIFTJIS"),	SHIFTJIS_CHARSET},
-    {STR_LITERAL_INIT("SYMBOL"),	SYMBOL_CHARSET},
+    {STR_LITERAL_INIT("SYMBOL"),	सिम्बोलो_CHARSET},
     {STR_LITERAL_INIT("ARABIC"),	ARABIC_CHARSET},
     {STR_LITERAL_INIT("BALTIC"),	BALTIC_CHARSET},
     {STR_LITERAL_INIT("EASTEUROPE"),	EASTEUROPE_CHARSET},
@@ -2807,17 +2807,17 @@ points_to_pixels(WCHAR *str, WCHAR **end, int vertical, long_i pprinter_dc)
 {
     int		pixels;
     int		points = 0;
-    int		divisor = 0;
+    int		पांगहाति = 0;
     HWND	hwnd = (HWND)0;
     HDC		hdc;
     HDC		printer_dc = (HDC)pprinter_dc;
 
     while (*str != NUL)
     {
-	if (*str == L'.' && divisor == 0)
+	if (*str == L'.' && पांगहाति == 0)
 	{
 	    // Start keeping a divisor, for later
-	    divisor = 1;
+	    पांगहाति = 1;
 	}
 	else
 	{
@@ -2826,13 +2826,13 @@ points_to_pixels(WCHAR *str, WCHAR **end, int vertical, long_i pprinter_dc)
 
 	    points *= 10;
 	    points += *str - L'0';
-	    divisor *= 10;
+	    पांगहाति *= 10;
 	}
 	++str;
     }
 
-    if (divisor == 0)
-	divisor = 1;
+    if (पांगहाति == 0)
+	पांगहाति = 1;
 
     if (printer_dc == NULL)
     {
@@ -2844,7 +2844,7 @@ points_to_pixels(WCHAR *str, WCHAR **end, int vertical, long_i pprinter_dc)
 
     pixels = MulDiv(points,
 		    GetDeviceCaps(hdc, vertical ? LOGPIXELSY : LOGPIXELSX),
-		    72 * divisor);
+		    72 * पांगहाति);
 
     if (printer_dc == NULL)
 	ReleaseDC(hwnd, hdc);
@@ -2997,12 +2997,12 @@ expand_font_enumproc(
  */
     void
 gui_mch_expand_font(
-    optexpand_T	*args,
+    optexpand_T	*मगा_कातविरान,
     void	*param UNUSED,
     int		(*add_match)(char_u *val))
 {
-    expand_T	    *xp = args->oe_xp;
-    if (xp->xp_pattern > args->oe_set_arg && *(xp->xp_pattern-1) == ':')
+    expand_T	    *xp = मगा_कातविरान->oe_xp;
+    if (xp->xp_pattern > मगा_कातविरान->oe_set_arg && *(xp->xp_pattern-1) == ':')
     {
 	char buf[30];
 	int	i;
@@ -3016,10 +3016,10 @@ gui_mch_expand_font(
 
 	// Note: Keep this in sync with get_logfont(). Don't include 'c' and
 	// 'q' as we fill in all the values below.
-	static char *(p_gfn_win_opt_values[]) = {
+	static char *(p_gfn_win_opt_मगा_हालागा[]) = {
 	    "h" , "w" , "W" , "b" , "i" , "u" , "s"};
-	for (i = 0; i < (int)ARRAY_LENGTH(p_gfn_win_opt_values); i++)
-	    add_match((char_u *)p_gfn_win_opt_values[i]);
+	for (i = 0; i < (int)ARRAY_LENGTH(p_gfn_win_opt_मगा_हालागा); i++)
+	    add_match((char_u *)p_gfn_win_opt_मगा_हालागा[i]);
 
 	for (i = 0; i < (int)ARRAY_LENGTH(charset_pairs); ++i)
 	{

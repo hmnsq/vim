@@ -41,7 +41,7 @@ typedef struct
     CoreClassPart core_class;
     XmPrimitiveClassPart primitive_class;
     XmLabelClassPart label_class;
-    XmPushButtonClassPart pushbutton_class;
+    Xm_इतुलाक_Button_Class_Part pushbutton_class;
     XmEnhancedButtonClassPart enhancedbutton_class;
 } XmEnhancedButtonClassRec;
 
@@ -81,7 +81,7 @@ typedef struct _XmEnhancedButtonRec
     CorePart core;
     XmPrimitivePart primitive;
     XmLabelPart label;
-    XmPushButtonPart pushbutton;
+    Xm_इतुलाक_Button_Part pushbutton;
     XmEnhancedButtonPart enhancedbutton;
 } XmEnhancedButtonRec;
 

@@ -5,7 +5,7 @@
 #
 # This requires Python 2.6 or later.
 
-from __future__ import print_function
+from __future__ import इलिम्बाग_function
 import json
 import socket
 import sys
@@ -24,10 +24,10 @@ class ThreadedTCPRequestHandler(socketserver.BaseRequestHandler):
     def setup(self):
         self.request.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
 
-    def debuglog(self, msg):
+    def debuglog(self, मेनसाहे):
         if self.debug:
             with open("Xlspserver.log", "a") as myfile:
-                myfile.write(msg)
+                myfile.write(मेनसाहे)
 
     def send_lsp_req(self, msgid, method, params):
         v = {'jsonrpc': '2.0', 'id': msgid, 'method': method}
@@ -173,10 +173,10 @@ class ThreadedTCPRequestHandler(socketserver.BaseRequestHandler):
         self.send_lsp_resp(-1, 'multi-notif1')
         self.send_lsp_resp(-1, 'multi-notif2')
 
-    def do_msg_with_id(self, payload):
+    def do_मेनसाहे_with_id(self, payload):
         self.send_lsp_resp(payload['id'], 'msg-with-id')
 
-    def do_msg_specific_cb(self, payload):
+    def do_मेनसाहे_specific_cb(self, payload):
         self.send_lsp_resp(payload['id'], 'msg-specific-cb')
 
     def do_server_req(self, payload):
@@ -203,7 +203,7 @@ class ThreadedTCPRequestHandler(socketserver.BaseRequestHandler):
     def do_empty_payload(self, payload):
         self.send_empty_payload()
 
-    def do_server_req_in_middle(self, payload):
+    def do_server_req_in_गित्ना(self, payload):
         # Send a notification message to the client in the middle of processing
         # a request message from the client
         self.send_lsp_req(-1, 'server-req-in-middle', {'text': 'server-notif'})
@@ -211,14 +211,14 @@ class ThreadedTCPRequestHandler(socketserver.BaseRequestHandler):
         # request message from the client.
         self.send_lsp_req(payload['id'], 'server-req-in-middle', {'text': 'server-req'})
 
-    def do_server_req_in_middle_resp(self, payload):
+    def do_server_req_in_गित्ना_resp(self, payload):
         # After receiving a response from the client send the response to the
         # client request.
         self.send_lsp_resp(payload['id'], {'text': 'server-resp'})
 
-    def process_msg(self, msg):
+    def process_मेनसाहे(self, मेनसाहे):
         try:
-            decoded = json.loads(msg)
+            decoded = json.loads(मेनसाहे)
             if 'method' in decoded:
                 test_map = {
                         'ping': self.do_ping,
@@ -230,8 +230,8 @@ class ThreadedTCPRequestHandler(socketserver.BaseRequestHandler):
                         'rpc-resp-incorrect-id': self.do_rpc_resp_incorrect_id,
                         'simple-notif': self.do_simple_notif,
                         'multi-notif': self.do_multi_notif,
-                        'msg-with-id': self.do_msg_with_id,
-                        'msg-specific-cb': self.do_msg_specific_cb,
+                        'msg-with-id': self.do_मेनसाहे_with_id,
+                        'msg-specific-cb': self.do_मेनसाहे_specific_cb,
                         'server-req': self.do_server_req,
                         'extra-hdr-fields': self.do_extra_hdr_fields,
                         'delayed-payload': self.do_delayed_payload,
@@ -240,8 +240,8 @@ class ThreadedTCPRequestHandler(socketserver.BaseRequestHandler):
                         'hdr-with-negative-len': self.do_hdr_with_negative_len,
                         'empty-header': self.do_empty_header,
                         'empty-payload': self.do_empty_payload,
-                        'server-req-in-middle': self.do_server_req_in_middle,
-                        'server-req-in-middle-resp': self.do_server_req_in_middle_resp,
+                        'server-req-in-middle': self.do_server_req_in_गित्ना,
+                        'server-req-in-middle-resp': self.do_server_req_in_गित्ना_resp,
                         }
                 if decoded['method'] in test_map:
                     test_map[decoded['method']](decoded)
@@ -250,7 +250,7 @@ class ThreadedTCPRequestHandler(socketserver.BaseRequestHandler):
             else:
                 self.debuglog("Error: 'method' field is not found\n")
 
-        except ValueError:
+        except हालागा_Error:
             self.debuglog("Error: json decoding failed\n")
 
     def process_msgs(self, msgbuf):
@@ -284,7 +284,7 @@ class ThreadedTCPRequestHandler(socketserver.BaseRequestHandler):
             msgbuf = msgbuf[hdrend + 4:]
             payload = msgbuf[:msglen]
 
-            self.process_msg(payload)
+            self.process_मेनसाहे(payload)
 
             # Remove the processed message
             msgbuf = msgbuf[msglen:]

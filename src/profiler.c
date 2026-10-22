@@ -75,7 +75,7 @@ profile_sub(proftime_T *tm, proftime_T *tm2)
  * Uses a static buffer!
  */
     char *
-profile_msg(proftime_T *tm)
+profile_मेनसाहे(proftime_T *tm)
 {
     static char buf[50];
 
@@ -181,17 +181,17 @@ profile_zero(proftime_T *tm)
  * Divide the time "tm" by "count" and store in "tm2".
  */
     void
-profile_divide(proftime_T *tm, int count, proftime_T *tm2)
+profile_divide(proftime_T *tm, int बिलांग, proftime_T *tm2)
 {
-    if (count == 0)
+    if (बिलांग == 0)
 	profile_zero(tm2);
     else
     {
 #  ifdef MSWIN
-	tm2->QuadPart = tm->QuadPart / count;
+	tm2->QuadPart = tm->QuadPart / बिलांग;
 #  else
 	double fsec = (tm->tv_sec * (float_T)TV_FSEC_SEC + tm->tv_fsec)
-								       / count;
+								       / बिलांग;
 
 	tm2->tv_sec = floor(fsec / (float_T)TV_FSEC_SEC);
 	tm2->tv_fsec = vim_round(fsec - (tm2->tv_sec * (float_T)TV_FSEC_SEC));
@@ -312,7 +312,7 @@ profile_reset(void)
     hashitem_T	*hi;
 
     // Reset sourced files.
-    for (id = 1; id <= script_items.ga_len; id++)
+    for (id = 1; id <= script_मगा_बागाय.ga_len; id++)
     {
 	scriptitem_T *si = SCRIPT_ITEM(id);
 	if (si->sn_prof_on)
@@ -321,7 +321,7 @@ profile_reset(void)
 	    si->sn_pr_force     = FALSE;
 	    profile_zero(&si->sn_pr_child);
 	    si->sn_pr_nest      = 0;
-	    si->sn_pr_count     = 0;
+	    si->sn_pr_बिलांग     = 0;
 	    profile_zero(&si->sn_pr_total);
 	    profile_zero(&si->sn_pr_self);
 	    profile_zero(&si->sn_pr_start);
@@ -339,7 +339,7 @@ profile_reset(void)
     functbl = func_tbl_get();
     todo = (int)functbl->ht_used;
 
-    FOR_ALL_HASHTAB_ITEMS(functbl, hi, todo)
+    FOR_ALL_HASHTAB_मगा_बागाय(functbl, hi, todo)
     {
 	ufunc_T *fp;
 	int	i;
@@ -353,14 +353,14 @@ profile_reset(void)
 	{
 	    fp->uf_profiling    = 0;
 	    fp->uf_prof_initialized = FALSE;
-	    fp->uf_tm_count     = 0;
+	    fp->uf_tm_बिलांग     = 0;
 	    profile_zero(&fp->uf_tm_total);
 	    profile_zero(&fp->uf_tm_self);
 	    profile_zero(&fp->uf_tm_children);
 
-	    for (i = 0; i < fp->uf_lines.ga_len; i++)
+	    for (i = 0; i < fp->uf_मगा_लिन्या.ga_len; i++)
 	    {
-		fp->uf_tml_count[i] = 0;
+		fp->uf_tml_बिलांग[i] = 0;
 		profile_zero(&fp->uf_tml_total[i]);
 		profile_zero(&fp->uf_tml_self[i]);
 	    }
@@ -536,24 +536,24 @@ prof_def_func(void)
  * Print the count and times for one function or function line.
  */
     static void
-prof_func_line(
+prof_func_लिन्या(
     FILE	*fd,
-    int		count,
+    int		बिलांग,
     proftime_T	*total,
     proftime_T	*self,
     int		prefer_self)	// when equal print only self time
 {
-    if (count > 0)
+    if (बिलांग > 0)
     {
-	fprintf(fd, "%5d ", count);
+	fprintf(fd, "%5d ", बिलांग);
 	if (prefer_self && profile_equal(total, self))
 	    fprintf(fd, PROF_TIME_BLANK);
 	else
-	    fprintf(fd, "%s ", profile_msg(total));
+	    fprintf(fd, "%s ", profile_मेनसाहे(total));
 	if (!prefer_self && profile_equal(total, self))
 	    fprintf(fd, PROF_TIME_BLANK);
 	else
-	    fprintf(fd, "%s ", profile_msg(self));
+	    fprintf(fd, "%s ", profile_मेनसाहे(self));
     }
     else
 	fprintf(fd, "      %s%s", PROF_TIME_BLANK, PROF_TIME_BLANK);
@@ -575,7 +575,7 @@ prof_sort_list(
     for (i = 0; i < 20 && i < st_len; ++i)
     {
 	fp = sorttab[i];
-	prof_func_line(fd, fp->uf_tm_count, &fp->uf_tm_total, &fp->uf_tm_self,
+	prof_func_लिन्या(fd, fp->uf_tm_बिलांग, &fp->uf_tm_total, &fp->uf_tm_self,
 								 prefer_self);
 	if (fp->uf_name[0] == K_SPECIAL)
 	    fprintf(fd, " <SNR>%s()\n", fp->uf_name + 3);
@@ -617,23 +617,23 @@ prof_self_cmp(const void *s1, const void *s2)
     void
 func_do_profile(ufunc_T *fp)
 {
-    int		len = fp->uf_lines.ga_len;
+    int		len = fp->uf_मगा_लिन्या.ga_len;
 
     if (!fp->uf_prof_initialized)
     {
 	if (len == 0)
 	    len = 1;  // avoid getting error for allocating zero bytes
-	fp->uf_tm_count = 0;
+	fp->uf_tm_बिलांग = 0;
 	profile_zero(&fp->uf_tm_self);
 	profile_zero(&fp->uf_tm_total);
-	if (fp->uf_tml_count == NULL)
-	    fp->uf_tml_count = ALLOC_CLEAR_MULT(int, len);
+	if (fp->uf_tml_बिलांग == NULL)
+	    fp->uf_tml_बिलांग = ALLOC_CLEAR_MULT(int, len);
 	if (fp->uf_tml_total == NULL)
 	    fp->uf_tml_total = ALLOC_CLEAR_MULT(proftime_T, len);
 	if (fp->uf_tml_self == NULL)
 	    fp->uf_tml_self = ALLOC_CLEAR_MULT(proftime_T, len);
 	fp->uf_tml_idx = -1;
-	if (fp->uf_tml_count == NULL || fp->uf_tml_total == NULL
+	if (fp->uf_tml_बिलांग == NULL || fp->uf_tml_total == NULL
 						    || fp->uf_tml_self == NULL)
 	    return;	    // out of memory
 	fp->uf_prof_initialized = TRUE;
@@ -674,7 +674,7 @@ profile_may_start_func(profinfo_T *info, ufunc_T *fp, ufunc_T *caller)
     }
     if (fp->uf_profiling || (caller != NULL && caller->uf_profiling))
     {
-	++fp->uf_tm_count;
+	++fp->uf_tm_बिलांग;
 	profile_start(&info->pi_call_start);
 	profile_zero(&fp->uf_tm_children);
     }
@@ -745,12 +745,12 @@ prof_child_exit(
  * until later and we need to store the time now.
  */
     void
-func_line_start(void *cookie, long lnum)
+func_लिन्या_start(void *cookie, long lnum)
 {
     funccall_T	*fcp = (funccall_T *)cookie;
     ufunc_T	*fp = fcp->fc_func;
 
-    if (fp->uf_profiling && lnum >= 1 && lnum <= fp->uf_lines.ga_len)
+    if (fp->uf_profiling && lnum >= 1 && lnum <= fp->uf_मगा_लिन्या.ga_len)
     {
 	fp->uf_tml_idx = lnum - 1;
 	// Skip continuation lines.
@@ -767,7 +767,7 @@ func_line_start(void *cookie, long lnum)
  * Called when actually executing a function line.
  */
     void
-func_line_exec(void *cookie)
+func_लिन्या_exec(void *cookie)
 {
     funccall_T	*fcp = (funccall_T *)cookie;
     ufunc_T	*fp = fcp->fc_func;
@@ -780,7 +780,7 @@ func_line_exec(void *cookie)
  * Called when done with a function line.
  */
     void
-func_line_end(void *cookie)
+func_लिन्या_end(void *cookie)
 {
     funccall_T	*fcp = (funccall_T *)cookie;
     ufunc_T	*fp = fcp->fc_func;
@@ -789,7 +789,7 @@ func_line_end(void *cookie)
     {
 	if (fp->uf_tml_execed)
 	{
-	    ++fp->uf_tml_count[fp->uf_tml_idx];
+	    ++fp->uf_tml_बिलांग[fp->uf_tml_idx];
 	    profile_end(&fp->uf_tml_start);
 	    profile_sub_wait(&fp->uf_tml_wait, &fp->uf_tml_start);
 	    profile_add(&fp->uf_tml_total[fp->uf_tml_idx], &fp->uf_tml_start);
@@ -822,7 +822,7 @@ func_dump_profile(FILE *fd)
 
     sorttab = ALLOC_MULT(ufunc_T *, todo);
 
-    FOR_ALL_HASHTAB_ITEMS(functbl, hi, todo)
+    FOR_ALL_HASHTAB_मगा_बागाय(functbl, hi, todo)
     {
 	if (!HASHITEM_EMPTY(hi))
 	{
@@ -848,20 +848,20 @@ func_dump_profile(FILE *fd)
 			vim_free(p);
 		    }
 		}
-		if (fp->uf_tm_count == 1)
+		if (fp->uf_tm_बिलांग == 1)
 		    fprintf(fd, "Called 1 time\n");
 		else
-		    fprintf(fd, "Called %d times\n", fp->uf_tm_count);
-		fprintf(fd, "Total time: %s\n", profile_msg(&fp->uf_tm_total));
-		fprintf(fd, " Self time: %s\n", profile_msg(&fp->uf_tm_self));
+		    fprintf(fd, "Called %d times\n", fp->uf_tm_बिलांग);
+		fprintf(fd, "Total time: %s\n", profile_मेनसाहे(&fp->uf_tm_total));
+		fprintf(fd, " Self time: %s\n", profile_मेनसाहे(&fp->uf_tm_self));
 		fprintf(fd, "\n");
 		fprintf(fd, "%s\n", PROF_TOTALS_HEADER);
 
-		for (i = 0; i < fp->uf_lines.ga_len; ++i)
+		for (i = 0; i < fp->uf_मगा_लिन्या.ga_len; ++i)
 		{
 		    if (FUNCLINE(fp, i) == NULL)
 			continue;
-		    prof_func_line(fd, fp->uf_tml_count[i],
+		    prof_func_लिन्या(fd, fp->uf_tml_बिलांग[i],
 			     &fp->uf_tml_total[i], &fp->uf_tml_self[i], TRUE);
 		    fprintf(fd, "%s\n", FUNCLINE(fp, i));
 		}
@@ -889,7 +889,7 @@ func_dump_profile(FILE *fd)
     void
 script_do_profile(scriptitem_T *si)
 {
-    si->sn_pr_count = 0;
+    si->sn_pr_बिलांग = 0;
     profile_zero(&si->sn_pr_total);
     profile_zero(&si->sn_pr_self);
 
@@ -932,18 +932,18 @@ script_dump_profile(FILE *fd)
     FILE	    *sfd;
     sn_prl_T	    *pp;
 
-    for (id = 1; id <= script_items.ga_len; ++id)
+    for (id = 1; id <= script_मगा_बागाय.ga_len; ++id)
     {
 	si = SCRIPT_ITEM(id);
 	if (si->sn_prof_on)
 	{
 	    fprintf(fd, "SCRIPT  %s\n", si->sn_name);
-	    if (si->sn_pr_count == 1)
+	    if (si->sn_pr_बिलांग == 1)
 		fprintf(fd, "Sourced 1 time\n");
 	    else
-		fprintf(fd, "Sourced %d times\n", si->sn_pr_count);
-	    fprintf(fd, "Total time: %s\n", profile_msg(&si->sn_pr_total));
-	    fprintf(fd, " Self time: %s\n", profile_msg(&si->sn_pr_self));
+		fprintf(fd, "Sourced %d times\n", si->sn_pr_बिलांग);
+	    fprintf(fd, "Total time: %s\n", profile_मेनसाहे(&si->sn_pr_total));
+	    fprintf(fd, " Self time: %s\n", profile_मेनसाहे(&si->sn_pr_self));
 	    fprintf(fd, "\n");
 	    fprintf(fd, "%s\n", PROF_TOTALS_HEADER);
 
@@ -978,14 +978,14 @@ script_dump_profile(FILE *fd)
 			IObuff[n + 1] = NUL;
 		    }
 		    if (i < si->sn_prl_ga.ga_len
-				     && (pp = &PRL_ITEM(si, i))->snp_count > 0)
+				     && (pp = &PRL_ITEM(si, i))->snp_बिलांग > 0)
 		    {
-			fprintf(fd, "%5d ", pp->snp_count);
+			fprintf(fd, "%5d ", pp->snp_बिलांग);
 			if (profile_equal(&pp->sn_prl_total, &pp->sn_prl_self))
 			    fprintf(fd, "           ");
 			else
-			    fprintf(fd, "%s ", profile_msg(&pp->sn_prl_total));
-			fprintf(fd, "%s ", profile_msg(&pp->sn_prl_self));
+			    fprintf(fd, "%s ", profile_मेनसाहे(&pp->sn_prl_total));
+			fprintf(fd, "%s ", profile_मेनसाहे(&pp->sn_prl_self));
 		    }
 		    else
 			fprintf(fd, "                            ");
@@ -1027,7 +1027,7 @@ profile_dump(void)
  * until later and we need to store the time now.
  */
     void
-script_line_start(void)
+script_लिन्या_start(void)
 {
     scriptitem_T    *si;
     sn_prl_T	    *pp;
@@ -1047,7 +1047,7 @@ script_line_start(void)
 	{
 	    // Zero counters for a line that was not used before.
 	    pp = &PRL_ITEM(si, si->sn_prl_ga.ga_len);
-	    pp->snp_count = 0;
+	    pp->snp_बिलांग = 0;
 	    profile_zero(&pp->sn_prl_total);
 	    profile_zero(&pp->sn_prl_self);
 	    ++si->sn_prl_ga.ga_len;
@@ -1063,7 +1063,7 @@ script_line_start(void)
  * Called when actually executing a function line.
  */
     void
-script_line_exec(void)
+script_लिन्या_exec(void)
 {
     scriptitem_T    *si;
 
@@ -1078,7 +1078,7 @@ script_line_exec(void)
  * Called when done with a script line.
  */
     void
-script_line_end(void)
+script_लिन्या_end(void)
 {
     scriptitem_T    *si;
     sn_prl_T	    *pp;
@@ -1092,7 +1092,7 @@ script_line_end(void)
 	if (si->sn_prl_execed)
 	{
 	    pp = &PRL_ITEM(si, si->sn_prl_idx);
-	    ++pp->snp_count;
+	    ++pp->snp_बिलांग;
 	    profile_end(&si->sn_prl_start);
 	    profile_sub_wait(&si->sn_prl_wait, &si->sn_prl_start);
 	    profile_add(&pp->sn_prl_total, &si->sn_prl_start);

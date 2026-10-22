@@ -26,7 +26,7 @@
 # endif
 # ifndef FEAT_GUI_GTK
 #  define GdkEvent int
-#  define GdkEventKey int
+#  define Gdk_Event_सुसि int
 # endif
 # ifndef FEAT_X11
 #  define XImage int
@@ -98,7 +98,7 @@ extern int _stricoll(char *a, char *b);
 # include "gc.pro"
 # include "gui_xim.pro"
 # include "hardcopy.pro"
-# ifdef FEAT_PRINT_PANGO
+# ifdef FEAT_इलिम्बाग_PANGO
 #  include "hardcopy_pango.pro"
 # endif
 # ifdef FEAT_POSTSCRIPT
@@ -164,7 +164,7 @@ char_u *vim_strpbrk(char_u *s, char_u *charset);
 # endif
 # ifndef HAVE_QSORT
 // Use our own qsort(), don't define the prototype when not used.
-void qsort(void *base, size_t elm_count, size_t elm_size, int (*cmp)(const void *, const void *));
+void qsort(void *base, size_t elm_बिलांग, size_t elm_size, int (*cmp)(const void *, const void *));
 # endif
 # include "mouse.pro"
 # include "move.pro"

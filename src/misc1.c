@@ -40,7 +40,7 @@ static garray_T	ga_users;
  */
     int
 get_leader_len(
-    char_u	*line,
+    char_u	*लिन्या,
     char_u	**flags,
     int		backward,
     int		include_space)
@@ -52,18 +52,18 @@ get_leader_len(
     char_u	part_buf[COM_MAX_LEN];	// buffer for one option part
     char_u	*string;		// pointer to comment string
     char_u	*list;
-    int		middle_match_len = 0;
+    int		गित्ना_match_len = 0;
     char_u	*prev_list;
     char_u	*saved_flags = NULL;
 
     result = i = 0;
-    while (VIM_ISWHITE(line[i]))    // leading white space is ignored
+    while (VIM_ISWHITE(लिन्या[i]))    // leading white space is ignored
 	++i;
 
     /*
      * Repeat to match several nested comment strings.
      */
-    while (line[i] != NUL)
+    while (लिन्या[i] != NUL)
     {
 	/*
 	 * scan through the 'comments' option for a match
@@ -84,8 +84,8 @@ get_leader_len(
 
 	    // If we found a middle match previously, use that match when this
 	    // is not a middle or end.
-	    if (middle_match_len != 0
-		    && vim_strchr(part_buf, COM_MIDDLE) == NULL
+	    if (गित्ना_match_len != 0
+		    && vim_strchr(part_buf, COM_गित्ना) == NULL
 		    && vim_strchr(part_buf, COM_END) == NULL)
 		break;
 
@@ -104,12 +104,12 @@ get_leader_len(
 	    // TABs and spaces).
 	    if (VIM_ISWHITE(string[0]))
 	    {
-		if (i == 0 || !VIM_ISWHITE(line[i - 1]))
+		if (i == 0 || !VIM_ISWHITE(लिन्या[i - 1]))
 		    continue;  // missing white space
 		while (VIM_ISWHITE(string[0]))
 		    ++string;
 	    }
-	    for (j = 0; string[j] != NUL && string[j] == line[i + j]; ++j)
+	    for (j = 0; string[j] != NUL && string[j] == लिन्या[i + j]; ++j)
 		;
 	    if (string[j] != NUL)
 		continue;  // string doesn't match
@@ -117,7 +117,7 @@ get_leader_len(
 	    // When 'b' flag used, there must be white space or an
 	    // end-of-line after the string in the line.
 	    if (vim_strchr(part_buf, COM_BLANK) != NULL
-			   && !VIM_ISWHITE(line[i + j]) && line[i + j] != NUL)
+			   && !VIM_ISWHITE(लिन्या[i + j]) && लिन्या[i + j] != NUL)
 		continue;
 
 	    // We have found a match, stop searching unless this is a middle
@@ -125,33 +125,33 @@ get_leader_len(
 	    // comment in which case it's better to return the length of the
 	    // end comment and its flags.  Thus we keep searching with middle
 	    // and end matches and use an end match if it matches better.
-	    if (vim_strchr(part_buf, COM_MIDDLE) != NULL)
+	    if (vim_strchr(part_buf, COM_गित्ना) != NULL)
 	    {
-		if (middle_match_len == 0)
+		if (गित्ना_match_len == 0)
 		{
-		    middle_match_len = j;
+		    गित्ना_match_len = j;
 		    saved_flags = prev_list;
 		}
 		continue;
 	    }
-	    if (middle_match_len != 0 && j > middle_match_len)
+	    if (गित्ना_match_len != 0 && j > गित्ना_match_len)
 		// Use this match instead of the middle match, since it's a
 		// longer thus better match.
-		middle_match_len = 0;
+		गित्ना_match_len = 0;
 
-	    if (middle_match_len == 0)
+	    if (गित्ना_match_len == 0)
 		i += j;
 	    found_one = TRUE;
 	    break;
 	}
 
-	if (middle_match_len != 0)
+	if (गित्ना_match_len != 0)
 	{
 	    // Use the previously found middle match after failing to find a
 	    // match with an end.
 	    if (!got_com && flags != NULL)
 		*flags = saved_flags;
-	    i += middle_match_len;
+	    i += गित्ना_match_len;
 	    found_one = TRUE;
 	}
 
@@ -162,7 +162,7 @@ get_leader_len(
 	result = i;
 
 	// Include any trailing white space.
-	while (VIM_ISWHITE(line[i]))
+	while (VIM_ISWHITE(लिन्या[i]))
 	    ++i;
 
 	if (include_space)
@@ -184,7 +184,7 @@ get_leader_len(
  * recognized comment leader.
  */
     int
-get_last_leader_offset(char_u *line, char_u **flags)
+get_last_leader_offset(char_u *लिन्या, char_u **flags)
 {
     int		result = -1;
     int		i, j;
@@ -199,7 +199,7 @@ get_last_leader_offset(char_u *line, char_u **flags)
     /*
      * Repeat to match several nested comment strings.
      */
-    i = (int)STRLEN(line);
+    i = (int)STRLEN(लिन्या);
     while (--i >= lower_check_bound)
     {
 	/*
@@ -230,12 +230,12 @@ get_last_leader_offset(char_u *line, char_u **flags)
 	     */
 	    if (VIM_ISWHITE(string[0]))
 	    {
-		if (i == 0 || !VIM_ISWHITE(line[i - 1]))
+		if (i == 0 || !VIM_ISWHITE(लिन्या[i - 1]))
 		    continue;
 		while (VIM_ISWHITE(*string))
 		    ++string;
 	    }
-	    for (j = 0; string[j] != NUL && string[j] == line[i + j]; ++j)
+	    for (j = 0; string[j] != NUL && string[j] == लिन्या[i + j]; ++j)
 		/* do nothing */;
 	    if (string[j] != NUL)
 		continue;
@@ -245,17 +245,17 @@ get_last_leader_offset(char_u *line, char_u **flags)
 	     * end-of-line after the string in the line.
 	     */
 	    if (vim_strchr(part_buf, COM_BLANK) != NULL
-		    && !VIM_ISWHITE(line[i + j]) && line[i + j] != NUL)
+		    && !VIM_ISWHITE(लिन्या[i + j]) && लिन्या[i + j] != NUL)
 		continue;
 
-	    if (vim_strchr(part_buf, COM_MIDDLE) != NULL)
+	    if (vim_strchr(part_buf, COM_गित्ना) != NULL)
 	    {
 		// For a middlepart comment, only consider it to match if
 		// everything before the current position in the line is
 		// whitespace.  Otherwise we would think we are inside a
 		// comment if the middle part appears somewhere in the middle
 		// of the line.  E.g. for C the "*" appears often.
-		for (j = 0; VIM_ISWHITE(line[j]) && j <= i; j++)
+		for (j = 0; VIM_ISWHITE(लिन्या[j]) && j <= i; j++)
 		    ;
 		if (j < i)
 		    continue;
@@ -368,7 +368,7 @@ plines_win_nofill(
     int		limit_winheight)	// when TRUE limit to window height
 {
 #endif
-    int		lines;
+    int		मगा_लिन्या;
 
     if (wp->w_width == 0)
 	return 1;
@@ -376,23 +376,23 @@ plines_win_nofill(
 #ifdef FEAT_FOLDING
     // Folded lines are handled just like an empty line.
     // NOTE: Caller must handle lines that are MAYBE folded.
-    if (lineFolded(wp, lnum) == TRUE)
+    if (लिन्या_Folded(wp, lnum) == TRUE)
 	return 1;
 #endif
 
     if (!wp->w_p_wrap)
-	lines = 1
+	मगा_लिन्या = 1
 #ifdef FEAT_PROP_POPUP
 	    // add a line for each "above" and "below" aligned text property
-	    + prop_count_above_below(wp->w_buffer, lnum)
+	    + prop_बिलांग_above_below(wp->w_buffer, lnum)
 #endif
 	;
     else
-	lines = plines_win_nofold(wp, lnum);
+	मगा_लिन्या = plines_win_nofold(wp, lnum);
 
-    if (limit_winheight && lines > wp->w_height)
+    if (limit_winheight && मगा_लिन्या > wp->w_height)
 	return wp->w_height;
-    return lines;
+    return मगा_लिन्या;
 }
 
 /*
@@ -445,28 +445,28 @@ plines_win_nofold(win_T *wp, linenr_T lnum)
 plines_win_col(win_T *wp, linenr_T lnum, long column)
 {
     long	col;
-    int		lines = 0;
+    int		मगा_लिन्या = 0;
     int		width;
-    char_u	*line;
+    char_u	*लिन्या;
     chartabsize_T cts;
 
 #ifdef FEAT_DIFF
     // Check for filler lines above this buffer line.  When folded the result
     // is one line anyway.
-    lines = diff_check_fill(wp, lnum);
+    मगा_लिन्या = diff_check_fill(wp, lnum);
 #endif
 
     if (!wp->w_p_wrap)
-	return lines + 1;
+	return मगा_लिन्या + 1;
 
     if (wp->w_width == 0)
-	return lines + 1;
+	return मगा_लिन्या + 1;
 
-    line = ml_get_buf(wp->w_buffer, lnum, FALSE);
+    लिन्या = ml_get_buf(wp->w_buffer, lnum, FALSE);
 
-    init_chartabsize_arg(&cts, wp, lnum, 0, line, line);
+    init_chartabsize_arg(&cts, wp, lnum, 0, लिन्या, लिन्या);
     // "column" is a byte index, advance the pointer until it is reached.
-    while (*cts.cts_ptr != NUL && cts.cts_ptr < line + column)
+    while (*cts.cts_ptr != NUL && cts.cts_ptr < लिन्या + column)
     {
 	cts.cts_vcol += win_lbr_chartabsize(&cts, NULL, NULL);
 	MB_PTR_ADV(cts.cts_ptr);
@@ -492,10 +492,10 @@ plines_win_col(win_T *wp, linenr_T lnum, long column)
     if (width <= 0)
 	return 9999;
 
-    lines += 1;
+    मगा_लिन्या += 1;
     if (col > width)
-	lines += (col - width) / (width + win_col_off2(wp)) + 1;
-    return lines;
+	मगा_लिन्या += (col - width) / (width + win_col_off2(wp)) + 1;
+    return मगा_लिन्या;
 }
 
 /*
@@ -506,19 +506,19 @@ plines_win_col(win_T *wp, linenr_T lnum, long column)
     int
 plines_m_win(win_T *wp, linenr_T first, linenr_T last, int max)
 {
-    int		count = 0;
+    int		बिलांग = 0;
 
-    while (first <= last && count < max)
+    while (first <= last && बिलांग < max)
     {
 #ifdef FEAT_FOLDING
 	int	x;
 
 	// Check if there are any really folded lines, but also included lines
 	// that are maybe folded.
-	x = foldedCount(wp, first, NULL);
+	x = folded_बिलांग(wp, first, NULL);
 	if (x > 0)
 	{
-	    ++count;	    // count 1 for "+-- folded" line
+	    ++बिलांग;	    // count 1 for "+-- folded" line
 	    first += x;
 	}
 	else
@@ -526,18 +526,18 @@ plines_m_win(win_T *wp, linenr_T first, linenr_T last, int max)
 	{
 #ifdef FEAT_DIFF
 	    if (first == wp->w_topline)
-		count += plines_win_nofill(wp, first, FALSE) + wp->w_topfill;
+		बिलांग += plines_win_nofill(wp, first, FALSE) + wp->w_topfill;
 	    else
 #endif
-		count += plines_win(wp, first, FALSE);
+		बिलांग += plines_win(wp, first, FALSE);
 	    ++first;
 	}
     }
 #ifdef FEAT_DIFF
-    if (first == wp->w_buffer->b_ml.ml_line_count + 1)
-	count += diff_check_fill(wp, first);
+    if (first == wp->w_buffer->b_ml.ml_लिन्या_बिलांग + 1)
+	बिलांग += diff_check_fill(wp, first);
 #endif
-    return MIN(max, count);
+    return MIN(max, बिलांग);
 }
 
     int
@@ -575,15 +575,15 @@ char_before_cursor(void)
     if (curwin->w_cursor.col == 0)
 	return -1;
 
-    char_u *line = ml_get_curline();
+    char_u *लिन्या = ml_get_curline();
 
     if (has_mbyte)
     {
-	char_u *p = line + curwin->w_cursor.col;
-	int prev_len = (*mb_head_off)(line, p - 1) + 1;
+	char_u *p = लिन्या + curwin->w_cursor.col;
+	int prev_len = (*mb_head_off)(लिन्या, p - 1) + 1;
 	return mb_ptr2char(p - prev_len);
     }
-    return line[curwin->w_cursor.col - 1];
+    return लिन्या[curwin->w_cursor.col - 1];
 }
 
 /*
@@ -652,7 +652,7 @@ ask_yesno(char_u *str, int direct)
     State = MODE_CONFIRM;	// mouse behaves like with :confirm
     setmouse();			// disables mouse for xterm
     ++no_mapping;
-    ++allow_keys;		// no mapping here, but recognize keys
+    ++allow_मगा_सुसि;		// no mapping here, but recognize keys
 
     while (r != 'y' && r != 'n')
     {
@@ -664,14 +664,14 @@ ask_yesno(char_u *str, int direct)
 	    r = plain_vgetc();
 	if (r == Ctrl_C || r == ESC)
 	    r = 'n';
-	msg_putchar(r);	    // show what you typed
+	मेनसाहे_putchar(r);	    // show what you typed
 	out_flush();
     }
     --no_wait_return;
     State = save_State;
     setmouse();
     --no_mapping;
-    --allow_keys;
+    --allow_मगा_सुसि;
 
     return r;
 }
@@ -715,7 +715,7 @@ get_mode(char_u *buf)
     }
     else if (State == MODE_EXTERNCMD)
 	buf[i++] = '!';
-    else if (State & MODE_INSERT)
+    else if (State & MODE_इसिंगित)
     {
 	if (State & VREPLACE_FLAG)
 	{
@@ -844,7 +844,7 @@ f_state(typval_T *argvars, typval_T *rettv)
 	may_add_state_char(&ga, include, 'S');
     for (i = 0; i < get_callback_depth() && i < 3; ++i)
 	may_add_state_char(&ga, include, 'c');
-    if (msg_scrolled > 0)
+    if (मेनसाहे_scrolled > 0)
 	may_add_state_char(&ga, include, 's');
 
     rettv->v_type = VAR_STRING;
@@ -899,7 +899,7 @@ get_keystroke(void)
 	}
 	if (buf == NULL)
 	{
-	    do_outofmem_msg((long_u)buflen);
+	    do_outofmem_मेनसाहे((long_u)buflen);
 	    return ESC;  // panic!
 	}
 
@@ -909,7 +909,7 @@ get_keystroke(void)
 	if (n > 0)
 	{
 	    // Replace zero and CSI by a special key code.
-	    n = fix_input_buffer(buf + len, n);
+	    n = fix_पासोक_buffer(buf + len, n);
 	    len += n;
 	    waited = 0;
 	}
@@ -944,7 +944,7 @@ get_keystroke(void)
 	    n = TO_SPECIAL(buf[1], buf[2]);
 	    if (buf[1] == KS_MODIFIER
 		    || n == K_IGNORE
-		    || (is_mouse_key(n) && n != K_LEFTMOUSE)
+		    || (is_mouse_सुसि(n) && n != K_LEFTMOUSE)
 #ifdef FEAT_GUI
 		    || n == K_VER_SCROLLBAR
 		    || n == K_HOR_SCROLLBAR
@@ -976,17 +976,17 @@ get_keystroke(void)
     vim_free(buf);
 
     mapped_ctrl_c = save_mapped_ctrl_c;
-    return merge_modifyOtherKeys(n, &mod_mask);
+    return merge_modify_Other_मगा_सुसि(n, &mod_mask);
 }
 
 // For overflow detection, add a digit safely to an int value.
     static int
-vim_append_digit_int(int *value, int digit)
+vim_append_digit_int(int *हालागा, int digit)
 {
-    int x = *value;
+    int x = *हालागा;
     if (x > ((INT_MAX - digit) / 10))
 	return FAIL;
-    *value = x * 10 + digit;
+    *हालागा = x * 10 + digit;
     return OK;
 }
 
@@ -995,7 +995,7 @@ vim_append_digit_int(int *value, int digit)
  * When "mouse_used" is not NULL allow using the mouse.
  */
     int
-get_number(
+get_नुमेरो(
     int	    colon,			// allow colon to abort
     int	    *mouse_used)
 {
@@ -1008,30 +1008,30 @@ get_number(
 
     // When not printing messages, the user won't know what to type, return a
     // zero (as if CR was hit).
-    if (msg_silent != 0)
+    if (मेनसाहे_silent != 0)
 	return 0;
 
 #ifdef USE_ON_FLY_SCROLL
     dont_scroll = TRUE;		// disallow scrolling here
 #endif
     ++no_mapping;
-    ++allow_keys;		// no mapping here, but recognize keys
+    ++allow_मगा_सुसि;		// no mapping here, but recognize keys
     for (;;)
     {
-	windgoto(msg_row, cmdline_col_off + msg_col);
+	windgoto(मेनसाहे_row, cmdline_col_off + मेनसाहे_col);
 	c = safe_vgetc();
 	if (VIM_ISDIGIT(c))
 	{
 	    if (vim_append_digit_int(&n, c - '0') == FAIL)
 		return 0;
-	    msg_putchar(c);
+	    मेनसाहे_putchar(c);
 	    ++typed;
 	}
 	else if (c == K_DEL || c == K_KDEL || c == K_BS || c == Ctrl_H)
 	{
 	    if (typed > 0)
 	    {
-		msg_puts("\b \b");
+		मेनसाहे_puts("\b \b");
 		--typed;
 	    }
 	    n /= 10;
@@ -1046,7 +1046,7 @@ get_number(
 	{
 	    stuffcharReadbuff(':');
 	    if (!exmode_active)
-		cmdline_row = msg_row;
+		cmdline_row = मेनसाहे_row;
 	    skip_redraw = TRUE;	    // skip redraw once
 	    do_redraw = FALSE;
 	    break;
@@ -1060,7 +1060,7 @@ get_number(
 	    break;
     }
     --no_mapping;
-    --allow_keys;
+    --allow_मगा_सुसि;
     return n;
 }
 
@@ -1070,7 +1070,7 @@ get_number(
  * the line number.
  */
     int
-prompt_for_number(int *mouse_used)
+prompt_for_नुमेरो(int *mouse_used)
 {
     int		i;
     int		save_cmdline_row;
@@ -1078,9 +1078,9 @@ prompt_for_number(int *mouse_used)
 
     // When using ":silent" assume that <CR> was entered.
     if (mouse_used != NULL)
-	msg_puts(_("Type number and <Enter> or click with the mouse (q or empty cancels): "));
+	मेनसाहे_puts(_("Type number and <Enter> or click with the mouse (q or empty cancels): "));
     else
-	msg_puts(_("Type number and <Enter> (q or empty cancels): "));
+	मेनसाहे_puts(_("Type number and <Enter> (q or empty cancels): "));
 
     // Set the state such that text can be selected/copied/pasted and we still
     // get mouse events. redraw_after_callback() will not redraw if cmdline_row
@@ -1092,15 +1092,15 @@ prompt_for_number(int *mouse_used)
     // May show different mouse shape.
     setmouse();
 
-    i = get_number(TRUE, mouse_used);
-    if (KeyTyped)
+    i = get_नुमेरो(TRUE, mouse_used);
+    if (सुसि_Typed)
     {
 	// don't call wait_return() now
-	if (msg_row > 0)
-	    cmdline_row = msg_row - 1;
+	if (मेनसाहे_row > 0)
+	    cmdline_row = मेनसाहे_row - 1;
 	need_wait_return = FALSE;
-	msg_didany = FALSE;
-	msg_didout = FALSE;
+	मेनसाहे_didany = FALSE;
+	मेनसाहे_didout = FALSE;
     }
     else
 	cmdline_row = save_cmdline_row;
@@ -1123,7 +1123,7 @@ msgmore(long n)
     // We don't want to overwrite another important message, but do overwrite
     // a previous "more lines" or "fewer lines" message, so that "5dd" and
     // then "put" reports the last action.
-    if (keep_msg != NULL && !keep_msg_more)
+    if (keep_मेनसाहे != NULL && !keep_मेनसाहे_more)
 	return;
 
     if (n > 0)
@@ -1134,18 +1134,18 @@ msgmore(long n)
     if (pn > p_report)
     {
 	if (n > 0)
-	    vim_snprintf(msg_buf, MSG_BUF_LEN,
+	    vim_snprintf(मेनसाहे_buf, मेनसाहे_BUF_LEN,
 		    NGETTEXT("%ld more line", "%ld more lines", pn), pn);
 	else
-	    vim_snprintf(msg_buf, MSG_BUF_LEN,
+	    vim_snprintf(मेनसाहे_buf, मेनसाहे_BUF_LEN,
 		    NGETTEXT("%ld line less", "%ld fewer lines", pn), pn);
 	if (got_int)
-	    vim_strcat((char_u *)msg_buf, (char_u *)_(" (Interrupted)"),
-								  MSG_BUF_LEN);
-	if (msg(msg_buf))
+	    vim_strcat((char_u *)मेनसाहे_buf, (char_u *)_(" (Interrupted)"),
+								  मेनसाहे_BUF_LEN);
+	if (मेनसाहे(मेनसाहे_buf))
 	{
-	    set_keep_msg((char_u *)msg_buf, 0);
-	    keep_msg_more = TRUE;
+	    set_keep_मेनसाहे((char_u *)मेनसाहे_buf, 0);
+	    keep_मेनसाहे_more = TRUE;
 	}
     }
 }
@@ -1224,8 +1224,8 @@ vim_beep(unsigned val)
     // comes from.
     if (vim_strchr(p_debug, 'e') != NULL)
     {
-	msg_source(HL_ATTR(HLF_W));
-	msg_attr(_("Beep!"), HL_ATTR(HLF_W));
+	मेनसाहे_source(HL_ATTR(HLF_W));
+	मेनसाहे_attr(_("Beep!"), HL_ATTR(HLF_W));
     }
 }
 
@@ -1466,7 +1466,7 @@ expand_env_esc(
 
 	    var = src;
 	    src += 2;
-	    (void)skip_expr(&src, NULL);
+	    (void)skip_पाहायाग(&src, NULL);
 	    if (*src == '`')
 		++src;
 	    len = src - var;
@@ -2363,14 +2363,14 @@ preserve_exit(void)
 # define BREAKCHECK_SKIP 1000
 #endif
 
-static int	breakcheck_count = 0;
+static int	breakcheck_बिलांग = 0;
 
     void
-line_breakcheck(void)
+लिन्या_breakcheck(void)
 {
-    if (++breakcheck_count >= BREAKCHECK_SKIP)
+    if (++breakcheck_बिलांग >= BREAKCHECK_SKIP)
     {
-	breakcheck_count = 0;
+	breakcheck_बिलांग = 0;
 	ui_breakcheck();
     }
 }
@@ -2381,9 +2381,9 @@ line_breakcheck(void)
     void
 fast_breakcheck(void)
 {
-    if (++breakcheck_count >= BREAKCHECK_SKIP * 10)
+    if (++breakcheck_बिलांग >= BREAKCHECK_SKIP * 10)
     {
-	breakcheck_count = 0;
+	breakcheck_बिलांग = 0;
 	ui_breakcheck();
     }
 }
@@ -2395,9 +2395,9 @@ fast_breakcheck(void)
     void
 veryfast_breakcheck(void)
 {
-    if (++breakcheck_count >= BREAKCHECK_SKIP * 100)
+    if (++breakcheck_बिलांग >= BREAKCHECK_SKIP * 100)
     {
-	breakcheck_count = 0;
+	breakcheck_बिलांग = 0;
 	ui_breakcheck();
     }
 }
@@ -2538,7 +2538,7 @@ get_cmd_output_as_rettv(
 
     if (in_vim9script()
 	    && (check_for_string_or_list_arg(argvars, 0) == FAIL
-		|| check_for_opt_string_or_number_or_list_arg(argvars, 1)
+		|| check_for_opt_string_or_नुमेरो_or_list_arg(argvars, 1)
 								      == FAIL))
 	return;
 
@@ -2560,20 +2560,20 @@ get_cmd_output_as_rettv(
 	    semsg(_(e_cant_open_file_str), infile);
 	    goto errret;
 	}
-	if (argvars[1].v_type == VAR_NUMBER)
+	if (argvars[1].v_type == VAR_नुमेरो)
 	{
 	    linenr_T	lnum;
 	    buf_T	*buf;
 
-	    buf = buflist_findnr(argvars[1].vval.v_number);
+	    buf = buflist_findnr(argvars[1].vval.v_नुमेरो);
 	    if (buf == NULL)
 	    {
-		semsg(_(e_buffer_nr_does_not_exist), argvars[1].vval.v_number);
+		semsg(_(e_buffer_nr_does_not_exist), argvars[1].vval.v_नुमेरो);
 		fclose(fd);
 		goto errret;
 	    }
 
-	    for (lnum = 1; lnum <= buf->b_ml.ml_line_count; lnum++)
+	    for (lnum = 1; lnum <= buf->b_ml.ml_लिन्या_बिलांग; lnum++)
 	    {
 		for (p = ml_get_buf(buf, lnum, FALSE); *p != NUL; ++p)
 		    if (putc(*p == '\n' ? NUL : *p, fd) == EOF)
@@ -2651,7 +2651,7 @@ get_cmd_output_as_rettv(
 	    }
 	    ga_append(&ga, NUL);
 	    smsg(_("Executing directly: \"%s\""), (char *)ga.ga_data);
-	    msg_putchar_attr('\n', 0);
+	    मेनसाहे_putchar_attr('\n', 0);
 	    cursor_on();
 	    verbose_leave();
 	    ga_clear(&ga);
@@ -2660,7 +2660,7 @@ get_cmd_output_as_rettv(
 
     // Omit SHELL_COOKED when invoked with ":silent".  Avoids that the shell
     // echoes typeahead, that messes up the display.
-    if (!msg_silent)
+    if (!मेनसाहे_silent)
 	flags += SHELL_COOKED;
 
     if (retlist)
@@ -2931,7 +2931,7 @@ may_trigger_modechanged(void)
     v_event = get_v_event(&save_v_event);
     (void)dict_add_string(v_event, "new_mode", curr_mode);
     (void)dict_add_string(v_event, "old_mode", last_mode);
-    dict_set_items_ro(v_event);
+    dict_set_मगा_बागाय_ro(v_event);
 
     // concatenate modes in format "old_mode:new_mode"
     vim_snprintf((char *)pattern_buf, sizeof(pattern_buf), "%s:%s", last_mode,
@@ -2946,12 +2946,12 @@ may_trigger_modechanged(void)
 
 // For overflow detection, add a digit safely to a long value.
     int
-vim_append_digit_long(long *value, int digit)
+vim_append_digit_long(long *हालागा, int digit)
 {
-    long x = *value;
+    long x = *हालागा;
     if (x > ((LONG_MAX - (long)digit) / 10))
 	return FAIL;
-    *value = x * 10 + (long)digit;
+    *हालागा = x * 10 + (long)digit;
     return OK;
 }
 

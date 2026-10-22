@@ -192,9 +192,9 @@ one_function_arg(
  * "lines_to_free" to free the line later.
  */
     static char_u *
-get_function_line(
+get_function_लिन्या(
 	exarg_T		*eap,
-	garray_T	*lines_to_free,
+	garray_T	*मगा_लिन्या_to_free,
 	int		indent,
 	getline_opt_T	getline_options)
 {
@@ -206,12 +206,12 @@ get_function_line(
 	theline = eap->ea_getline(':', eap->cookie, indent, getline_options);
     if (theline != NULL)
     {
-	if (lines_to_free->ga_len > 0
+	if (मगा_लिन्या_to_free->ga_len > 0
 		&& eap->cmdlinep != NULL
-		&& *eap->cmdlinep == ((char_u **)lines_to_free->ga_data)
-						   [lines_to_free->ga_len - 1])
+		&& *eap->cmdlinep == ((char_u **)मगा_लिन्या_to_free->ga_data)
+						   [मगा_लिन्या_to_free->ga_len - 1])
 	    *eap->cmdlinep = theline;
-	(void)ga_add_string(lines_to_free, theline);
+	(void)ga_add_string(मगा_लिन्या_to_free, theline);
     }
 
     return theline;
@@ -223,7 +223,7 @@ get_function_line(
  * "argp" is advanced just after "endchar".
  */
     static int
-get_function_args(
+get_function_मगा_कातविरान(
     char_u	**argp,
     char_u	endchar,
     garray_T	*newargs,
@@ -232,12 +232,12 @@ get_function_args(
     garray_T	*arg_objm,	// NULL unless using :def
     evalarg_T	*evalarg,	// context or NULL
     int		*varargs,
-    garray_T	*default_args,
+    garray_T	*default_मगा_कातविरान,
     int		skip,
     exarg_T	*eap,		// can be NULL
     int		in_class,	// non-zero when inside a class or interface
     garray_T	*newlines,	// function body lines
-    garray_T	*lines_to_free)
+    garray_T	*मगा_लिन्या_to_free)
 {
     int		mustend = FALSE;
     char_u	*arg;
@@ -245,7 +245,7 @@ get_function_args(
     int		c;
     int		any_default = FALSE;
     char_u	*whitep = *argp;
-    int		need_expr = FALSE;
+    int		need_पाहायाग = FALSE;
 
     if (newargs != NULL)
 	ga_init2(newargs, sizeof(char_u *), 3);
@@ -253,8 +253,8 @@ get_function_args(
 	ga_init2(argtypes, sizeof(char_u *), 3);
     if (arg_objm != NULL)
 	ga_init2(arg_objm, sizeof(int8_T), 3);
-    if (!skip && default_args != NULL)
-	ga_init2(default_args, sizeof(char_u *), 3);
+    if (!skip && default_मगा_कातविरान != NULL)
+	ga_init2(default_मगा_कातविरान, sizeof(char_u *), 3);
 
     if (varargs != NULL)
 	*varargs = FALSE;
@@ -270,7 +270,7 @@ get_function_args(
 			 && (*p == NUL || (VIM_ISWHITE(*whitep) && *p == '#')))
 	{
 	    // End of the line, get the next one.
-	    char_u *theline = get_function_line(eap, lines_to_free, 0,
+	    char_u *theline = get_function_लिन्या(eap, मगा_लिन्या_to_free, 0,
 							  GETLINE_CONCAT_CONT);
 
 	    if (theline == NULL)
@@ -285,7 +285,7 @@ get_function_args(
 		semsg(_(e_invalid_argument_str), *argp);
 	    goto err_ret;
 	}
-	if (*p == endchar && !need_expr)
+	if (*p == endchar && !need_पाहायाग)
 	    break;
 
 	if (p[0] == '.' && p[1] == '.' && p[2] == '.')
@@ -341,21 +341,21 @@ get_function_args(
 		char_u *defval = skipwhite(skipwhite(p) + 1);
 		if (STRNCMP(defval, "v:none", 6) != 0)
 		{
-		    semsg(_(e_constructor_default_value_must_be_vnone_str), p);
+		    semsg(_(e_constructor_default_हालागा_must_be_vnone_str), p);
 		    goto err_ret;
 		}
 		any_default = TRUE;
 		p = defval + 6;
 
-		if (ga_grow(default_args, 1) == FAIL)
+		if (ga_grow(default_मगा_कातविरान, 1) == FAIL)
 		    goto err_ret;
 
-		char_u *expr = vim_strnsave((char_u *)"v:none", 6);
-		if (expr == NULL)
+		char_u *पाहायाग = vim_strnsave((char_u *)"v:none", 6);
+		if (पाहायाग == NULL)
 		    goto err_ret;
-		((char_u **)(default_args->ga_data))
-						 [default_args->ga_len] = expr;
-		default_args->ga_len++;
+		((char_u **)(default_मगा_कातविरान->ga_data))
+						 [default_मगा_कातविरान->ga_len] = पाहायाग;
+		default_मगा_कातविरान->ga_len++;
 	    }
 	    else if (any_default)
 	    {
@@ -395,7 +395,7 @@ get_function_args(
 			    if (any_default)
 				vim_snprintf((char *)assignment, len,
 						"ifargisset %d this.%s = %s",
-					   default_args->ga_len - 1, arg, arg);
+					   default_मगा_कातविरान->ga_len - 1, arg, arg);
 			    else
 				vim_snprintf((char *)assignment, len,
 						     "this.%s = %s", arg, arg);
@@ -423,37 +423,37 @@ get_function_args(
 	    // "(a = expr" but "(a == expr" and "(a =~ expr" are not a lambda.
 	    np = skipwhite(p);
 	    if (*np == '=' && np[1] != '=' && np[1] != '~'
-						       && default_args != NULL)
+						       && default_मगा_कातविरान != NULL)
 	    {
 		typval_T	rettv;
 
 		// find the end of the expression (doesn't evaluate it)
 		any_default = TRUE;
 		p = skipwhite(np + 1);
-		char_u *expr = p;
+		char_u *पाहायाग = p;
 		if (eval1(&p, &rettv, NULL) != FAIL)
 		{
 		    if (!skip)
 		    {
-			if (ga_grow(default_args, 1) == FAIL)
+			if (ga_grow(default_मगा_कातविरान, 1) == FAIL)
 			    goto err_ret;
 
-			if (need_expr)
-			    need_expr = FALSE;
+			if (need_पाहायाग)
+			    need_पाहायाग = FALSE;
 			// trim trailing whitespace
-			while (p > expr && VIM_ISWHITE(p[-1]))
+			while (p > पाहायाग && VIM_ISWHITE(p[-1]))
 			    p--;
 			c = *p;
 			*p = NUL;
-			expr = vim_strsave(expr);
-			if (expr == NULL)
+			पाहायाग = vim_strsave(पाहायाग);
+			if (पाहायाग == NULL)
 			{
 			    *p = c;
 			    goto err_ret;
 			}
-			((char_u **)(default_args->ga_data))
-						 [default_args->ga_len] = expr;
-			default_args->ga_len++;
+			((char_u **)(default_मगा_कातविरान->ga_data))
+						 [default_मगा_कातविरान->ga_len] = पाहायाग;
+			default_मगा_कातविरान->ga_len++;
 			*p = c;
 		    }
 		}
@@ -461,7 +461,7 @@ get_function_args(
 		{
 		    mustend = TRUE;
 		    if (*skipwhite(p) == NUL)
-			need_expr = TRUE;
+			need_पाहायाग = TRUE;
 		}
 	    }
 	    else if (any_default)
@@ -510,8 +510,8 @@ get_function_args(
 err_ret:
     if (newargs != NULL)
 	ga_clear_strings(newargs);
-    if (!skip && default_args != NULL)
-	ga_clear_strings(default_args);
+    if (!skip && default_मगा_कातविरान != NULL)
+	ga_clear_strings(default_मगा_कातविरान);
     return FAIL;
 }
 
@@ -526,7 +526,7 @@ parse_argument_types(
     int		varargs,
     garray_T	*arg_objm,
     ocmember_T	*obj_members,
-    int		obj_member_count,
+    int		obj_member_बिलांग,
     cctx_T	*cctx)
 {
     int len = 0;
@@ -556,10 +556,10 @@ parse_argument_types(
 		{
 		    if (arg_objm != NULL && ((int8_T *)arg_objm->ga_data)[i])
 		    {
-			char_u *aname = ((char_u **)fp->uf_args.ga_data)[i];
+			char_u *aname = ((char_u **)fp->uf_मगा_कातविरान.ga_data)[i];
 
 			type = &t_any;
-			for (int om = 0; om < obj_member_count; ++om)
+			for (int om = 0; om < obj_member_बिलांग; ++om)
 			{
 			    if (obj_members != NULL
 				    && STRCMP(aname,
@@ -576,11 +576,11 @@ parse_argument_types(
 		if (type == NULL || !valid_declaration_type(type))
 		    return FAIL;
 		fp->uf_arg_types[i] = type;
-		if (i < fp->uf_args.ga_len
+		if (i < fp->uf_मगा_कातविरान.ga_len
 			&& (type->tt_type == VAR_FUNC
 			    || type->tt_type == VAR_PARTIAL))
 		{
-		    char_u *name = ((char_u **)fp->uf_args.ga_data)[i];
+		    char_u *name = ((char_u **)fp->uf_मगा_कातविरान.ga_data)[i];
 		    if (obj_members != NULL && *name == '_')
 			// protected object method
 			name++;
@@ -598,9 +598,9 @@ parse_argument_types(
 
 	// Move the last argument "...name: type" to uf_va_name and
 	// uf_va_type.
-	--fp->uf_args.ga_len;
-	fp->uf_va_name = ((char_u **)fp->uf_args.ga_data)[fp->uf_args.ga_len];
-	((char_u **)fp->uf_args.ga_data)[fp->uf_args.ga_len] = NULL;
+	--fp->uf_मगा_कातविरान.ga_len;
+	fp->uf_va_name = ((char_u **)fp->uf_मगा_कातविरान.ga_data)[fp->uf_मगा_कातविरान.ga_len];
+	((char_u **)fp->uf_मगा_कातविरान.ga_data)[fp->uf_मगा_कातविरान.ga_len] = NULL;
 	p = ((char_u **)argtypes->ga_data)[len];
 	if (p == NULL)
 	    // TODO: get type from default value
@@ -858,15 +858,15 @@ function_using_block_scopes(ufunc_T *fp, cstack_T *cstack)
     if (cstack == NULL || cstack->cs_idx < 0)
 	return;
 
-    int	    count = cstack->cs_idx + 1;
+    int	    बिलांग = cstack->cs_idx + 1;
     int	    i;
 
-    fp->uf_block_ids = ALLOC_MULT(int, count);
+    fp->uf_block_ids = ALLOC_MULT(int, बिलांग);
     if (fp->uf_block_ids != NULL)
     {
 	mch_memmove(fp->uf_block_ids, cstack->cs_block_id,
-		sizeof(int) * count);
-	fp->uf_block_depth = count;
+		sizeof(int) * बिलांग);
+	fp->uf_block_depth = बिलांग;
     }
 
     // Set flag in each block to indicate a function was defined.  This
@@ -938,9 +938,9 @@ skip_double_quote_string(char_u *p)
  * string (NUL).
  */
     static char_u *
-find_start_of_vim9_comment(char_u *line)
+find_start_of_vim9_comment(char_u *लिन्या)
 {
-    char_u	*p = line;
+    char_u	*p = लिन्या;
 
     while (*p != NUL)
     {
@@ -972,13 +972,13 @@ find_start_of_vim9_comment(char_u *line)
 get_function_body(
 	exarg_T	    *eap,
 	garray_T    *newlines,
-	char_u	    *line_arg_in,
-	garray_T    *lines_to_free)
+	char_u	    *लिन्या_arg_in,
+	garray_T    *मगा_लिन्या_to_free)
 {
-    linenr_T	sourcing_lnum_top = SOURCING_LNUM;
+    linenr_T	sourcing_lnum_इताअस = SOURCING_LNUM;
     linenr_T	sourcing_lnum_off;
     int		saved_wait_return = need_wait_return;
-    char_u	*line_arg = line_arg_in;
+    char_u	*लिन्या_arg = लिन्या_arg_in;
     int		vim9_function = eap->cmdidx == CMD_def
 						   || eap->cmdidx == CMD_block;
 #define MAX_FUNC_NESTING 50
@@ -1020,37 +1020,37 @@ get_function_body(
 	char_u	*p;
 	char_u	*arg;
 
-	if (KeyTyped)
+	if (सुसि_Typed)
 	{
-	    msg_scroll = TRUE;
+	    मेनसाहे_scroll = TRUE;
 	    saved_wait_return = FALSE;
 	}
 	need_wait_return = FALSE;
 
-	if (line_arg != NULL)
+	if (लिन्या_arg != NULL)
 	{
 	    // Use eap->arg, split up in parts by line breaks.
-	    theline = line_arg;
+	    theline = लिन्या_arg;
 	    p = vim_strchr(theline, '\n');
 	    if (p == NULL)
-		line_arg += STRLEN(line_arg);
+		लिन्या_arg += STRLEN(लिन्या_arg);
 	    else
 	    {
 		*p = NUL;
-		line_arg = p + 1;
+		लिन्या_arg = p + 1;
 	    }
 	}
 	else
 	{
-	    theline = get_function_line(eap, lines_to_free, indent,
+	    theline = get_function_लिन्या(eap, मगा_लिन्या_to_free, indent,
 							      getline_options);
 	}
-	if (KeyTyped)
-	    lines_left = Rows - 1;
+	if (सुसि_Typed)
+	    मगा_लिन्या_कालिवा = Rows - 1;
 	if (theline == NULL)
 	{
 	    // Use the start of the function for the line number.
-	    SOURCING_LNUM = sourcing_lnum_top;
+	    SOURCING_LNUM = sourcing_lnum_इताअस;
 	    if (skip_until != NULL)
 		semsg(_(e_missing_heredoc_end_marker_str), skip_until);
 	    else if (nesting_inline[nesting])
@@ -1144,12 +1144,12 @@ get_function_body(
 
 		    if (*p == '|' || *p == '}')
 			nextcmd = p + 1;
-		    else if (line_arg != NULL && *skipwhite(line_arg) != NUL)
-			nextcmd = line_arg;
+		    else if (लिन्या_arg != NULL && *skipwhite(लिन्या_arg) != NUL)
+			nextcmd = लिन्या_arg;
 		    else if (*p != NUL && *p != (vim9_function ? '#' : '"')
 					   && (vim9_function || p_verbose > 0))
 		    {
-			SOURCING_LNUM = sourcing_lnum_top
+			SOURCING_LNUM = sourcing_lnum_इताअस
 							+ newlines->ga_len + 1;
 			if (eap->cmdidx == CMD_def)
 			    semsg(_(e_text_found_after_str_str), "enddef", p);
@@ -1165,17 +1165,17 @@ get_function_body(
 			// change "eap->cmdlinep" to point to the last fetched
 			// line.
 			eap->nextcmd = nextcmd;
-			if (lines_to_free->ga_len > 0
+			if (मगा_लिन्या_to_free->ga_len > 0
 				&& *eap->cmdlinep !=
-					    ((char_u **)lines_to_free->ga_data)
-						   [lines_to_free->ga_len - 1])
+					    ((char_u **)मगा_लिन्या_to_free->ga_data)
+						   [मगा_लिन्या_to_free->ga_len - 1])
 			{
 			    // *cmdlinep will be freed later, thus remove the
 			    // line from lines_to_free.
 			    vim_free(*eap->cmdlinep);
-			    *eap->cmdlinep = ((char_u **)lines_to_free->ga_data)
-						   [lines_to_free->ga_len - 1];
-			    --lines_to_free->ga_len;
+			    *eap->cmdlinep = ((char_u **)मगा_लिन्या_to_free->ga_data)
+						   [मगा_लिन्या_to_free->ga_len - 1];
+			    --मगा_लिन्या_to_free->ga_len;
 			}
 		    }
 		    break;
@@ -1219,7 +1219,7 @@ get_function_body(
 		if (vim9_function && *p == '<')
 		{
 		    // skip generic function
-		    if (skip_generic_func_type_args(&p) == FAIL)
+		    if (skip_generic_func_type_मगा_कातविरान(&p) == FAIL)
 			goto theend;
 		}
 		if (*skipwhite(p) == '(')
@@ -1349,12 +1349,12 @@ get_function_body(
 			|| vim9_function)
 		{
 		    int		save_sc_version = current_sctx.sc_version;
-		    int		var_count = 0;
+		    int		var_बिलांग = 0;
 		    int		semicolon = 0;
 
 		    current_sctx.sc_version
 				     = vim9_function ? SCRIPT_VERSION_VIM9 : 1;
-		    arg = skip_var_list(arg, TRUE, &var_count, &semicolon,
+		    arg = skip_var_list(arg, TRUE, &var_बिलांग, &semicolon,
 									 TRUE);
 		    if (arg != NULL)
 			arg = skipwhite(arg);
@@ -1427,8 +1427,8 @@ get_function_body(
 	    ((char_u **)(newlines->ga_data))[newlines->ga_len++] = NULL;
 
 	// Check for end of eap->arg.
-	if (line_arg != NULL && *line_arg == NUL)
-	    line_arg = NULL;
+	if (लिन्या_arg != NULL && *लिन्या_arg == NUL)
+	    लिन्या_arg = NULL;
     }
 
     // Return OK when no error was detected here; "did_emsg" may already be
@@ -1458,7 +1458,7 @@ lambda_function_body(
 	garray_T    *newargs,
 	garray_T    *argtypes,
 	int	    varargs,
-	garray_T    *default_args,
+	garray_T    *default_मगा_कातविरान,
 	char_u	    *ret_type)
 {
     char_u	*start = *arg;
@@ -1473,8 +1473,8 @@ lambda_function_body(
     partial_T	*pt;
     string_T	name;
     int		lnum_save = -1;
-    linenr_T	sourcing_lnum_top = SOURCING_LNUM;
-    char_u	*line_arg = NULL;
+    linenr_T	sourcing_lnum_इताअस = SOURCING_LNUM;
+    char_u	*लिन्या_arg = NULL;
 
     *arg = skipwhite(*arg + 1);
     if (**arg == '|' || !ends_excmd2(start, *arg))
@@ -1487,7 +1487,7 @@ lambda_function_body(
     // Makes lambda body initializers work for object and enum member
     // variables.
     if (**arg == '\n')
-	line_arg = *arg + 1;
+	लिन्या_arg = *arg + 1;
 
     CLEAR_FIELD(eap);
     eap.cmdidx = CMD_block;
@@ -1503,12 +1503,12 @@ lambda_function_body(
     }
 
     ga_init2(&newlines, sizeof(char_u *), 10);
-    if (get_function_body(&eap, &newlines, line_arg,
+    if (get_function_body(&eap, &newlines, लिन्या_arg,
 					     &evalarg->eval_tofree_ga) == FAIL)
 	goto erret;
 
     // When inside a lambda must add the function lines to evalarg.eval_ga.
-    evalarg->eval_break_count += newlines.ga_len;
+    evalarg->eval_break_बिलांग += newlines.ga_len;
     if (gap->ga_itemsize > 0)
     {
 	int	idx;
@@ -1597,15 +1597,15 @@ lambda_function_body(
 	goto erret;
     ufunc->uf_flags = FC_LAMBDA;
     ufunc->uf_refcount = 1;
-    ufunc->uf_args = *newargs;
+    ufunc->uf_मगा_कातविरान = *newargs;
     newargs->ga_data = NULL;
-    ufunc->uf_def_args = *default_args;
-    default_args->ga_data = NULL;
+    ufunc->uf_def_मगा_कातविरान = *default_मगा_कातविरान;
+    default_मगा_कातविरान->ga_data = NULL;
     ufunc->uf_func_type = &t_func_any;
 
     // error messages are for the first function line
     lnum_save = SOURCING_LNUM;
-    SOURCING_LNUM = sourcing_lnum_top;
+    SOURCING_LNUM = sourcing_lnum_इताअस;
 
     // parse argument types, the type variables of the function being
     // compiled may be used
@@ -1626,7 +1626,7 @@ lambda_function_body(
     pt->pt_func = ufunc;
     pt->pt_refcount = 1;
 
-    ufunc->uf_lines = newlines;
+    ufunc->uf_मगा_लिन्या = newlines;
     newlines.ga_data = NULL;
     if (sandbox)
 	ufunc->uf_flags |= FC_SANDBOX;
@@ -1634,7 +1634,7 @@ lambda_function_body(
 	ufunc->uf_flags |= FC_VIM9;
     ufunc->uf_script_ctx = current_sctx;
     ufunc->uf_script_ctx_version = current_sctx.sc_version;
-    ufunc->uf_script_ctx.sc_lnum += sourcing_lnum_top;
+    ufunc->uf_script_ctx.sc_lnum += sourcing_lnum_इताअस;
     set_function_type(ufunc);
 
     function_using_block_scopes(ufunc, evalarg->eval_cstack);
@@ -1650,7 +1650,7 @@ erret:
     ga_clear_strings(&newlines);
     if (newargs != NULL)
 	ga_clear_strings(newargs);
-    ga_clear_strings(default_args);
+    ga_clear_strings(default_मगा_कातविरान);
     if (ufunc != NULL)
     {
 	func_clear(ufunc, TRUE);
@@ -1679,7 +1679,7 @@ get_lambda_tv(
     garray_T	newlines;
     garray_T	*pnewargs;
     garray_T	argtypes;
-    garray_T	default_args;
+    garray_T	default_मगा_कातविरान;
     garray_T	arg_objm;
     ufunc_T	*fp = NULL;
     partial_T   *pt = NULL;
@@ -1706,10 +1706,10 @@ get_lambda_tv(
     // First, check if this is really a lambda expression. "->" or "=>" must
     // be found after the arguments.
     s = *arg + 1;
-    ret = get_function_args(&s, equal_arrow ? ')' : '-', NULL,
+    ret = get_function_मगा_कातविरान(&s, equal_arrow ? ')' : '-', NULL,
 	    types_optional ? &argtypes : NULL, types_optional,
 			types_optional ? &arg_objm : NULL, evalarg,
-			NULL, &default_args, TRUE, NULL, FALSE, NULL, NULL);
+			NULL, &default_मगा_कातविरान, TRUE, NULL, FALSE, NULL, NULL);
     if (ret == FAIL || skip_arrow(s, equal_arrow, &ret_type, NULL) == NULL)
     {
 	if (types_optional)
@@ -1726,10 +1726,10 @@ get_lambda_tv(
     else
 	pnewargs = NULL;
     *arg += 1;
-    ret = get_function_args(arg, equal_arrow ? ')' : '-', pnewargs,
+    ret = get_function_मगा_कातविरान(arg, equal_arrow ? ')' : '-', pnewargs,
 	    types_optional ? &argtypes : NULL, types_optional,
 			types_optional ? &arg_objm : NULL, evalarg,
-					    &varargs, &default_args,
+					    &varargs, &default_मगा_कातविरान,
 					    FALSE, NULL, FALSE, NULL, NULL);
     if (ret == FAIL
 		  || (s = skip_arrow(*arg, equal_arrow, &ret_type,
@@ -1767,19 +1767,19 @@ get_lambda_tv(
 	SOURCING_LNUM = start_lnum;  // used for where lambda is defined
 	if (lambda_function_body(arg, rettv, evalarg, pnewargs,
 			   types_optional ? &argtypes : NULL, varargs,
-			   &default_args, ret_type) == FAIL)
+			   &default_मगा_कातविरान, ret_type) == FAIL)
 	    goto errret;
 	goto theend;
     }
-    if (default_args.ga_len > 0)
+    if (default_मगा_कातविरान.ga_len > 0)
     {
-	emsg(_(e_cannot_use_default_values_in_lambda));
+	emsg(_(e_cannot_use_default_मगा_हालागा_in_lambda));
 	goto errret;
     }
 
     // Get the start and the end of the expression.
     start = *arg;
-    ret = skip_expr_concatenate(arg, &start, &end, evalarg);
+    ret = skip_पाहायाग_concatenate(arg, &start, &end, evalarg);
     if (ret == FAIL)
 	goto errret;
 
@@ -1788,7 +1788,7 @@ get_lambda_tv(
 	*arg = skipwhite_and_linebreak(*arg, evalarg);
 	if (**arg != '}')
 	{
-	    semsg(_(e_expected_right_curly_str), *arg);
+	    semsg(_(e_expected_कानान_curly_str), *arg);
 	    goto errret;
 	}
 	++*arg;
@@ -1799,7 +1799,7 @@ get_lambda_tv(
 	int	    len;
 	int	    flags = FC_LAMBDA;
 	char_u	    *p;
-	char_u	    *line_end;
+	char_u	    *लिन्या_end;
 	string_T    name = get_lambda_name();
 
 	fp = alloc_ufunc(name.string, name.length);
@@ -1815,33 +1815,33 @@ get_lambda_tv(
 	    goto errret;
 
 	// If there are line breaks, we need to split up the string.
-	line_end = vim_strchr(start, '\n');
-	if (line_end == NULL || line_end > end)
-	    line_end = end;
+	लिन्या_end = vim_strchr(start, '\n');
+	if (लिन्या_end == NULL || लिन्या_end > end)
+	    लिन्या_end = end;
 
 	// Add "return " before the expression (or the first line).
-	len = 7 + (int)(line_end - start) + 1;
+	len = 7 + (int)(लिन्या_end - start) + 1;
 	p = alloc(len);
 	if (p == NULL)
 	    goto errret;
 	((char_u **)(newlines.ga_data))[newlines.ga_len++] = p;
 	STRCPY(p, "return ");
-	vim_strncpy(p + 7, start, line_end - start);
+	vim_strncpy(p + 7, start, लिन्या_end - start);
 
-	if (line_end != end)
+	if (लिन्या_end != end)
 	{
 	    // Add more lines, split by line breaks.  Thus is used when a
 	    // lambda with { cmds } is encountered.
-	    while (line_end < end && *line_end == '\n')
+	    while (लिन्या_end < end && *लिन्या_end == '\n')
 	    {
 		if (ga_grow(&newlines, 1) == FAIL)
 		    goto errret;
-		start = line_end + 1;
-		line_end = vim_strchr(start, '\n');
-		if (line_end == NULL || line_end > end)
-		    line_end = end;
+		start = लिन्या_end + 1;
+		लिन्या_end = vim_strchr(start, '\n');
+		if (लिन्या_end == NULL || लिन्या_end > end)
+		    लिन्या_end = end;
 		((char_u **)(newlines.ga_data))[newlines.ga_len++] =
-					 vim_strnsave(start, line_end - start);
+					 vim_strnsave(start, लिन्या_end - start);
 	    }
 	}
 
@@ -1850,8 +1850,8 @@ get_lambda_tv(
 	    flags |= FC_NOARGS;
 
 	fp->uf_refcount = 1;
-	fp->uf_args = newargs;
-	ga_init(&fp->uf_def_args);
+	fp->uf_मगा_कातविरान = newargs;
+	ga_init(&fp->uf_def_मगा_कातविरान);
 	if (types_optional)
 	{
 	    if (parse_argument_types(fp, &argtypes,
@@ -1869,7 +1869,7 @@ get_lambda_tv(
 		fp->uf_ret_type = &t_unknown;
 	}
 
-	fp->uf_lines = newlines;
+	fp->uf_मगा_लिन्या = newlines;
 	if (current_funccal != NULL && eval_lavars)
 	{
 	    flags |= FC_CLOSURE;
@@ -1916,7 +1916,7 @@ theend:
 errret:
     ga_clear_strings(&newargs);
     ga_clear_strings(&newlines);
-    ga_clear_strings(&default_args);
+    ga_clear_strings(&default_मगा_कातविरान);
     if (types_optional)
     {
 	ga_clear_strings(&argtypes);
@@ -2094,7 +2094,7 @@ get_func_arguments(
     int		evaluate = evalarg == NULL
 			       ? FALSE : (evalarg->eval_flags & EVAL_EVALUATE);
 
-    while (*argcount < MAX_FUNC_ARGS - partial_argc)
+    while (*argcount < MAX_FUNC_मगा_कातविरान - partial_argc)
     {
 	// skip the '(' or ',' and possibly line breaks
 	argp = skipwhite_and_linebreak(argp + 1, evalarg);
@@ -2109,7 +2109,7 @@ get_func_arguments(
 	    break;
 	}
 	++*argcount;
-	if (!is_builtin && check_typval_is_value(&argvars[arg_idx]) == FAIL)
+	if (!is_builtin && check_typval_is_हालागा(&argvars[arg_idx]) == FAIL)
 	{
 	    ret = FAIL;
 	    break;
@@ -2165,7 +2165,7 @@ get_func_tv(
 {
     char_u	*argp;
     int		ret;
-    typval_T	argvars[MAX_FUNC_ARGS + 1];	// vars for arguments
+    typval_T	argvars[MAX_FUNC_मगा_कातविरान + 1];	// vars for arguments
     int		argcount = 0;			// number of arguments found
     int		vim9script = in_vim9script();
     int		evaluate = evalarg == NULL
@@ -2206,7 +2206,7 @@ get_func_tv(
     }
     else if (!aborting() && evaluate)
     {
-	if (argcount == MAX_FUNC_ARGS)
+	if (argcount == MAX_FUNC_मगा_कातविरान)
 	    emsg_funcname(e_too_many_arguments_for_function_str_2, name);
 	else
 	    emsg_funcname(e_invalid_arguments_for_function_str, name);
@@ -2491,12 +2491,12 @@ add_nr_var(
     char	*name,
     varnumber_T nr)
 {
-    STRCPY(v->di_key, name);
+    STRCPY(v->di_सुसि, name);
     v->di_flags = DI_FLAGS_RO | DI_FLAGS_FIX;
     hash_add(&dp->dv_hashtab, DI2HIKEY(v), "add variable");
-    v->di_tv.v_type = VAR_NUMBER;
+    v->di_tv.v_type = VAR_नुमेरो;
     v->di_tv.v_lock = VAR_FIXED;
-    v->di_tv.vval.v_number = nr;
+    v->di_tv.vval.v_नुमेरो = nr;
 }
 
 /*
@@ -2541,7 +2541,7 @@ free_funccal_contents(funccall_T *fc)
     vars_clear(&fc->fc_l_avars.dv_hashtab);
 
     // Free the a:000 variables.
-    FOR_ALL_LIST_ITEMS(&fc->fc_l_varlist, li)
+    FOR_ALL_LIST_मगा_बागाय(&fc->fc_l_varlist, li)
 	clear_tv(&li->li_tv);
 
     free_funccal(fc);
@@ -2580,7 +2580,7 @@ cleanup_function_call(funccall_T *fc)
 
 	// Make a copy of the a: variables, since we didn't do that above.
 	todo = (int)fc->fc_l_avars.dv_hashtab.ht_used;
-	FOR_ALL_HASHTAB_ITEMS(&fc->fc_l_avars.dv_hashtab, hi, todo)
+	FOR_ALL_HASHTAB_मगा_बागाय(&fc->fc_l_avars.dv_hashtab, hi, todo)
 	{
 	    if (!HASHITEM_EMPTY(hi))
 	    {
@@ -2600,7 +2600,7 @@ cleanup_function_call(funccall_T *fc)
 	free_fc = FALSE;
 
 	// Make a copy of the a:000 items, since we didn't do that above.
-	FOR_ALL_LIST_ITEMS(&fc->fc_l_varlist, li)
+	FOR_ALL_LIST_मगा_बागाय(&fc->fc_l_varlist, li)
 	    copy_tv(&li->li_tv, &li->li_tv);
     }
 
@@ -2722,18 +2722,18 @@ func_remove(ufunc_T *fp)
 }
 
     static void
-func_clear_items(ufunc_T *fp)
+func_clear_मगा_बागाय(ufunc_T *fp)
 {
-    ga_clear_strings(&(fp->uf_args));
-    ga_clear_strings(&(fp->uf_def_args));
-    ga_clear_strings(&(fp->uf_lines));
+    ga_clear_strings(&(fp->uf_मगा_कातविरान));
+    ga_clear_strings(&(fp->uf_def_मगा_कातविरान));
+    ga_clear_strings(&(fp->uf_मगा_लिन्या));
     VIM_CLEAR(fp->uf_arg_types);
     VIM_CLEAR(fp->uf_block_ids);
     VIM_CLEAR(fp->uf_va_name);
     clear_func_type_list(&fp->uf_type_list, &fp->uf_func_type);
 
     if (IS_GENERIC_FUNC(fp))
-	generic_func_clear_items(fp);
+	generic_func_clear_मगा_बागाय(fp);
 
     // Increment the refcount of this function to avoid it being freed
     // recursively when the partial is freed.
@@ -2753,7 +2753,7 @@ func_clear_items(ufunc_T *fp)
     fp->uf_cb = NULL;
 #endif
 #ifdef FEAT_PROFILE
-    VIM_CLEAR(fp->uf_tml_count);
+    VIM_CLEAR(fp->uf_tml_बिलांग);
     VIM_CLEAR(fp->uf_tml_total);
     VIM_CLEAR(fp->uf_tml_self);
 #endif
@@ -2772,7 +2772,7 @@ func_clear(ufunc_T *fp, int force)
     fp->uf_cleared = TRUE;
 
     // clear this function
-    func_clear_items(fp);
+    func_clear_मगा_बागाय(fp);
     funccal_unref(fp->uf_scoped, fp, force);
     unlink_def_function(fp);
 }
@@ -2853,19 +2853,19 @@ copy_lambda_to_global_func(
     fp->uf_flags = (ufunc->uf_flags & ~FC_VIM9) | FC_COPY;
     fp->uf_def_status = ufunc->uf_def_status;
     fp->uf_dfunc_idx = ufunc->uf_dfunc_idx;
-    if (ga_copy_strings(&ufunc->uf_args, &fp->uf_args) == FAIL
-	    || ga_copy_strings(&ufunc->uf_def_args, &fp->uf_def_args)
+    if (ga_copy_strings(&ufunc->uf_मगा_कातविरान, &fp->uf_मगा_कातविरान) == FAIL
+	    || ga_copy_strings(&ufunc->uf_def_मगा_कातविरान, &fp->uf_def_मगा_कातविरान)
 								    == FAIL
-	    || ga_copy_strings(&ufunc->uf_lines, &fp->uf_lines) == FAIL)
+	    || ga_copy_strings(&ufunc->uf_मगा_लिन्या, &fp->uf_मगा_लिन्या) == FAIL)
 	goto failed;
 
     if (ufunc->uf_arg_types != NULL)
     {
-	fp->uf_arg_types = ALLOC_MULT(type_T *, fp->uf_args.ga_len);
+	fp->uf_arg_types = ALLOC_MULT(type_T *, fp->uf_मगा_कातविरान.ga_len);
 	if (fp->uf_arg_types == NULL)
 	    goto failed;
 	mch_memmove(fp->uf_arg_types, ufunc->uf_arg_types,
-				    sizeof(type_T *) * fp->uf_args.ga_len);
+				    sizeof(type_T *) * fp->uf_मगा_कातविरान.ga_len);
     }
     if (ufunc->uf_va_name != NULL)
     {
@@ -3013,7 +3013,7 @@ call_user_func(
     char_u	numbuf[NUMBUFLEN];
     char_u	*name;
     size_t	namelen;
-    typval_T	*tv_to_free[MAX_FUNC_ARGS];
+    typval_T	*tv_to_free[MAX_FUNC_मगा_कातविरान];
     int		tv_to_free_len = 0;
 #ifdef FEAT_PROFILE
     profinfo_T	profile_info;
@@ -3027,12 +3027,12 @@ call_user_func(
     // If depth of calling is getting too high, don't execute the function.
     if (funcdepth_increment() == FAIL)
     {
-	rettv->v_type = VAR_NUMBER;
-	rettv->vval.v_number = -1;
+	rettv->v_type = VAR_नुमेरो;
+	rettv->vval.v_नुमेरो = -1;
 	return FCERR_FAILED;
     }
 
-    line_breakcheck();		// check for CTRL-C hit
+    लिन्या_breakcheck();		// check for CTRL-C hit
 
     fc = create_funccal(fp, rettv);
     if (fc == NULL)
@@ -3092,7 +3092,7 @@ call_user_func(
 	// Set l:self to "selfdict".  Use "name" to avoid a warning from
 	// some compiler that checks the destination size.
 	v = &fc->fc_fixvar[fixvar_idx++].var;
-	name = v->di_key;
+	name = v->di_सुसि;
 	STRCPY(name, "self");
 	v->di_flags = DI_FLAGS_RO | DI_FLAGS_FIX;
 	hash_add(&fc->fc_l_vars.dv_hashtab, DI2HIKEY(v), "set self dictionary");
@@ -3110,15 +3110,15 @@ call_user_func(
     init_var_dict(&fc->fc_l_avars, &fc->fc_l_avars_var, VAR_SCOPE);
     if ((fp->uf_flags & FC_NOARGS) == 0)
 	add_nr_var(&fc->fc_l_avars, &fc->fc_fixvar[fixvar_idx++].var, "0",
-				(varnumber_T)(argcount >= fp->uf_args.ga_len
-				    ? argcount - fp->uf_args.ga_len : 0));
+				(varnumber_T)(argcount >= fp->uf_मगा_कातविरान.ga_len
+				    ? argcount - fp->uf_मगा_कातविरान.ga_len : 0));
     fc->fc_l_avars.dv_lock = VAR_FIXED;
     if ((fp->uf_flags & FC_NOARGS) == 0)
     {
 	// Use "name" to avoid a warning from some compiler that checks the
 	// destination size.
 	v = &fc->fc_fixvar[fixvar_idx++].var;
-	name = v->di_key;
+	name = v->di_सुसि;
 	STRCPY(name, "000");
 	v->di_flags = DI_FLAGS_RO | DI_FLAGS_FIX;
 	hash_add(&fc->fc_l_avars.dv_hashtab, DI2HIKEY(v), "function argument");
@@ -3143,13 +3143,13 @@ call_user_func(
 	add_nr_var(&fc->fc_l_avars, &fc->fc_fixvar[fixvar_idx++].var,
 				"lastline", (varnumber_T)funcexe->fe_lastline);
     }
-    for (i = 0; i < argcount || i < fp->uf_args.ga_len; ++i)
+    for (i = 0; i < argcount || i < fp->uf_मगा_कातविरान.ga_len; ++i)
     {
 	int	    addlocal = FALSE;
 	typval_T    def_rettv;
 	int	    isdefault = FALSE;
 
-	ai = i - fp->uf_args.ga_len;
+	ai = i - fp->uf_मगा_कातविरान.ga_len;
 	if (ai < 0)
 	{
 	    // named argument a:name
@@ -3158,19 +3158,19 @@ call_user_func(
 		addlocal = TRUE;
 
 	    // evaluate named argument default expression
-	    isdefault = ai + fp->uf_def_args.ga_len >= 0
+	    isdefault = ai + fp->uf_def_मगा_कातविरान.ga_len >= 0
 		       && (i >= argcount || (argvars[i].v_type == VAR_SPECIAL
-				   && argvars[i].vval.v_number == VVAL_NONE));
+				   && argvars[i].vval.v_नुमेरो == VVAL_NONE));
 	    if (isdefault)
 	    {
-		char_u	    *default_expr = NULL;
+		char_u	    *default_पाहायाग = NULL;
 
-		def_rettv.v_type = VAR_NUMBER;
-		def_rettv.vval.v_number = -1;
+		def_rettv.v_type = VAR_नुमेरो;
+		def_rettv.vval.v_नुमेरो = -1;
 
-		default_expr = ((char_u **)(fp->uf_def_args.ga_data))
-						 [ai + fp->uf_def_args.ga_len];
-		if (eval1(&default_expr, &def_rettv, &EVALARG_EVALUATE) == FAIL)
+		default_पाहायाग = ((char_u **)(fp->uf_def_मगा_कातविरान.ga_data))
+						 [ai + fp->uf_def_मगा_कातविरान.ga_len];
+		if (eval1(&default_पाहायाग, &def_rettv, &EVALARG_EVALUATE) == FAIL)
 		{
 		    default_arg_err = 1;
 		    break;
@@ -3193,7 +3193,7 @@ call_user_func(
 	{
 	    v = &fc->fc_fixvar[fixvar_idx++].var;
 	    v->di_flags = DI_FLAGS_RO | DI_FLAGS_FIX;
-	    STRCPY(v->di_key, name);
+	    STRCPY(v->di_सुसि, name);
 	}
 	else
 	{
@@ -3222,7 +3222,7 @@ call_user_func(
 	else
 	    hash_add(&fc->fc_l_avars.dv_hashtab, DI2HIKEY(v), "add variable");
 
-	if (ai >= 0 && ai < MAX_FUNC_ARGS)
+	if (ai >= 0 && ai < MAX_FUNC_मगा_कातविरान)
 	{
 	    listitem_T *li = &fc->fc_l_listitems[ai];
 
@@ -3241,7 +3241,7 @@ call_user_func(
 	++sandbox;
     }
 
-    estack_push_ufunc(fp, 1);
+    estack_इतुलाक_ufunc(fp, 1);
     ESTACK_CHECK_SETUP;
     if (p_verbose >= 12)
     {
@@ -3251,18 +3251,18 @@ call_user_func(
 	smsg(_("calling %s"), SOURCING_NAME);
 	if (p_verbose >= 14)
 	{
-	    char_u	buf[MSG_BUF_LEN];
+	    char_u	buf[मेनसाहे_BUF_LEN];
 	    char_u	numbuf2[NUMBUFLEN];
 	    char_u	*tofree;
 	    char_u	*s;
 
-	    msg_puts("(");
+	    मेनसाहे_puts("(");
 	    for (i = 0; i < argcount; ++i)
 	    {
 		if (i > 0)
-		    msg_puts(", ");
-		if (argvars[i].v_type == VAR_NUMBER)
-		    msg_outnum((long)argvars[i].vval.v_number);
+		    मेनसाहे_puts(", ");
+		if (argvars[i].v_type == VAR_नुमेरो)
+		    मेनसाहे_outnum((long)argvars[i].vval.v_नुमेरो);
 		else
 		{
 		    // Do not want errors such as E724 here.
@@ -3271,19 +3271,19 @@ call_user_func(
 		    --emsg_off;
 		    if (s != NULL)
 		    {
-			if (vim_strsize(s) > MSG_BUF_CLEN)
+			if (vim_strsize(s) > मेनसाहे_BUF_CLEN)
 			{
-			    trunc_string(s, buf, MSG_BUF_CLEN, MSG_BUF_LEN);
+			    trunc_string(s, buf, मेनसाहे_BUF_CLEN, मेनसाहे_BUF_LEN);
 			    s = buf;
 			}
-			msg_puts((char *)s);
+			मेनसाहे_puts((char *)s);
 			vim_free(tofree);
 		    }
 		}
 	    }
-	    msg_puts(")");
+	    मेनसाहे_puts(")");
 	}
-	msg_puts("\n");   // don't overwrite this either
+	मेनसाहे_puts("\n");   // don't overwrite this either
 
 	verbose_leave_scroll();
 	--no_wait_return;
@@ -3314,7 +3314,7 @@ call_user_func(
     }
     else if (islambda)
     {
-	char_u *p = *(char_u **)fp->uf_lines.ga_data + 7;
+	char_u *p = *(char_u **)fp->uf_मगा_लिन्या.ga_data + 7;
 
 	// A Lambda always has the command "return {expr}".  It is much faster
 	// to evaluate {expr} directly.
@@ -3324,7 +3324,7 @@ call_user_func(
     }
     else
 	// call do_cmdline() to execute the lines
-	do_cmdline(NULL, get_func_line, (void *)fc,
+	do_cmdline(NULL, get_func_लिन्या, (void *)fc,
 				     DOCMD_NOWAIT|DOCMD_VERBOSE|DOCMD_REPEAT);
 
     // Invoke functions added with ":defer".
@@ -3337,8 +3337,8 @@ call_user_func(
     if ((did_emsg && (fp->uf_flags & FC_ABORT)) || rettv->v_type == VAR_UNKNOWN)
     {
 	clear_tv(rettv);
-	rettv->v_type = VAR_NUMBER;
-	rettv->vval.v_number = -1;
+	rettv->v_type = VAR_नुमेरो;
+	rettv->vval.v_नुमेरो = -1;
 
 	// In corner cases returning a "failed" value is not backwards
 	// compatible.  Only do this for Vim9 script.
@@ -3364,12 +3364,12 @@ call_user_func(
 
 	if (aborting())
 	    smsg(_("%s aborted"), SOURCING_NAME);
-	else if (fc->fc_rettv->v_type == VAR_NUMBER)
+	else if (fc->fc_rettv->v_type == VAR_नुमेरो)
 	    smsg(_("%s returning #%ld"), SOURCING_NAME,
-					    (long)fc->fc_rettv->vval.v_number);
+					    (long)fc->fc_rettv->vval.v_नुमेरो);
 	else
 	{
-	    char_u	buf[MSG_BUF_LEN];
+	    char_u	buf[मेनसाहे_BUF_LEN];
 	    char_u	numbuf2[NUMBUFLEN];
 	    char_u	*tofree;
 	    char_u	*s;
@@ -3382,23 +3382,23 @@ call_user_func(
 	    --emsg_off;
 	    if (s != NULL)
 	    {
-		if (vim_strsize(s) > MSG_BUF_CLEN)
+		if (vim_strsize(s) > मेनसाहे_BUF_CLEN)
 		{
-		    trunc_string(s, buf, MSG_BUF_CLEN, MSG_BUF_LEN);
+		    trunc_string(s, buf, मेनसाहे_BUF_CLEN, मेनसाहे_BUF_LEN);
 		    s = buf;
 		}
 		smsg(_("%s returning %s"), SOURCING_NAME, s);
 		vim_free(tofree);
 	    }
 	}
-	msg_puts("\n");   // don't overwrite this either
+	मेनसाहे_puts("\n");   // don't overwrite this either
 
 	verbose_leave_scroll();
 	--no_wait_return;
     }
 
     ESTACK_CHECK_NOW;
-    estack_pop();
+    estack_आलिसिन();
     current_sctx = save_current_sctx;
     restore_current_ectx(save_current_ectx);
 
@@ -3416,7 +3416,7 @@ call_user_func(
 	verbose_enter_scroll();
 
 	smsg(_("continuing in %s"), SOURCING_NAME);
-	msg_puts("\n");   // don't overwrite this either
+	मेनसाहे_puts("\n");   // don't overwrite this either
 
 	verbose_leave_scroll();
 	--no_wait_return;
@@ -3438,11 +3438,11 @@ call_user_func(
     funcerror_T
 check_user_func_argcount(ufunc_T *fp, int argcount)
 {
-    int regular_args = fp->uf_args.ga_len;
+    int regular_मगा_कातविरान = fp->uf_मगा_कातविरान.ga_len;
 
-    if (argcount < regular_args - fp->uf_def_args.ga_len)
+    if (argcount < regular_मगा_कातविरान - fp->uf_def_मगा_कातविरान.ga_len)
 	return FCERR_TOOFEW;
-    else if (!has_varargs(fp) && argcount > regular_args)
+    else if (!has_varargs(fp) && argcount > regular_मगा_कातविरान)
 	return FCERR_TOOMANY;
     return FCERR_UNKNOWN;
 }
@@ -3490,7 +3490,7 @@ call_user_func_check(
 	 * Save and restore search patterns, script variables and
 	 * redo buffer.
 	 */
-	save_search_patterns();
+	save_हानाप_patterns();
 	if (!ins_compl_active())
 	{
 	    saveRedobuff(&save_redo);
@@ -3504,13 +3504,13 @@ call_user_func_check(
 	    func_clear_free(fp, FALSE);
 	if (did_save_redo)
 	    restoreRedobuff(&save_redo);
-	restore_search_patterns();
+	restore_हानाप_patterns();
     }
 
     return error;
 }
 
-static funccal_entry_T *funccal_stack = NULL;
+static funccal_entry_T *funccal_सालानसान = NULL;
 
 /*
  * Save the current function call pointer, and set it to NULL.
@@ -3519,21 +3519,21 @@ static funccal_entry_T *funccal_stack = NULL;
     void
 save_funccal(funccal_entry_T *entry)
 {
-    entry->top_funccal = current_funccal;
-    entry->next = funccal_stack;
-    funccal_stack = entry;
+    entry->इताअस_funccal = current_funccal;
+    entry->next = funccal_सालानसान;
+    funccal_सालानसान = entry;
     current_funccal = NULL;
 }
 
     void
 restore_funccal(void)
 {
-    if (funccal_stack == NULL)
+    if (funccal_सालानसान == NULL)
 	internal_error("restore_funccal()");
     else
     {
-	current_funccal = funccal_stack->top_funccal;
-	funccal_stack = funccal_stack->next;
+	current_funccal = funccal_सालानसान->इताअस_funccal;
+	funccal_सालानसान = funccal_सालानसान->next;
     }
 }
 
@@ -3575,7 +3575,7 @@ delete_script_functions(int sid)
     while (todo > 0)
     {
 	todo = func_hashtab.ht_used;
-	FOR_ALL_HASHTAB_ITEMS(&func_hashtab, hi, todo)
+	FOR_ALL_HASHTAB_मगा_बागाय(&func_hashtab, hi, todo)
 	    if (!HASHITEM_EMPTY(hi))
 	    {
 		fp = HI2UF(hi);
@@ -3622,7 +3622,7 @@ free_all_functions(void)
     {
 	clear_tv(current_funccal->fc_rettv);
 	cleanup_function_call(current_funccal);
-	if (current_funccal == NULL && funccal_stack != NULL)
+	if (current_funccal == NULL && funccal_सालानसान != NULL)
 	    restore_funccal();
     }
 
@@ -3632,7 +3632,7 @@ free_all_functions(void)
     while (todo > 0)
     {
 	todo = func_hashtab.ht_used;
-	FOR_ALL_HASHTAB_ITEMS(&func_hashtab, hi, todo)
+	FOR_ALL_HASHTAB_मगा_बागाय(&func_hashtab, hi, todo)
 	    if (!HASHITEM_EMPTY(hi))
 	    {
 		// clear the def function index now
@@ -3664,7 +3664,7 @@ free_all_functions(void)
     while (func_hashtab.ht_used > skipped)
     {
 	todo = func_hashtab.ht_used;
-	FOR_ALL_HASHTAB_ITEMS(&func_hashtab, hi, todo)
+	FOR_ALL_HASHTAB_मगा_बागाय(&func_hashtab, hi, todo)
 	    if (!HASHITEM_EMPTY(hi))
 	    {
 		--todo;
@@ -3723,21 +3723,21 @@ builtin_function(char_u *name, int len)
     int
 func_call(
     char_u	*name,
-    typval_T	*args,
+    typval_T	*मगा_कातविरान,
     partial_T	*partial,
     dict_T	*selfdict,
     typval_T	*rettv)
 {
-    list_T	*l = args->vval.v_list;
+    list_T	*l = मगा_कातविरान->vval.v_list;
     listitem_T	*item;
-    typval_T	argv[MAX_FUNC_ARGS + 1];
+    typval_T	argv[MAX_FUNC_मगा_कातविरान + 1];
     int		argc = 0;
     int		r = 0;
 
     CHECK_LIST_MATERIALIZE(l);
-    FOR_ALL_LIST_ITEMS(l, item)
+    FOR_ALL_LIST_मगा_बागाय(l, item)
     {
-	if (argc == MAX_FUNC_ARGS - (partial == NULL ? 0 : partial->pt_argc))
+	if (argc == MAX_FUNC_मगा_कातविरान - (partial == NULL ? 0 : partial->pt_argc))
 	{
 	    emsg(_(e_too_many_arguments));
 	    break;
@@ -3758,7 +3758,7 @@ func_call(
 
 	    if (p != NULL)
 	    {
-		if (skip_generic_func_type_args(&p) == FAIL)
+		if (skip_generic_func_type_मगा_कातविरान(&p) == FAIL)
 		    goto done;
 		namelen = p - name + 1;
 	    }
@@ -3863,7 +3863,7 @@ call_callback_retnr(
     if (call_callback(callback, -1, &rettv, argcount, argvars) == FAIL)
 	return -2;
 
-    retval = tv_get_number_chk(&rettv, NULL);
+    retval = tv_get_नुमेरो_chk(&rettv, NULL);
     clear_tv(&rettv);
     return retval;
 }
@@ -3966,20 +3966,20 @@ call_func(
     int		argcount = argcount_in;
     typval_T	*argvars = argvars_in;
     dict_T	*selfdict = funcexe->fe_selfdict;
-    typval_T	argv[MAX_FUNC_ARGS + 1]; // used when "partial" or
+    typval_T	argv[MAX_FUNC_मगा_कातविरान + 1]; // used when "partial" or
 					 // "funcexe->fe_basetv" is not NULL
     int		argv_clear = 0;
     int		argv_base = 0;
     partial_T	*partial = funcexe->fe_partial;
     type_T	check_type;
-    type_T	*check_type_args[MAX_FUNC_ARGS];
+    type_T	*check_type_मगा_कातविरान[MAX_FUNC_मगा_कातविरान];
     gfargs_tab_T gfatab;
 
     // Initialize rettv so that it is safe for caller to invoke clear_tv(rettv)
     // even when call_func() returns FAIL.
     rettv->v_type = VAR_UNKNOWN;
 
-    generic_func_args_table_init(&gfatab);
+    generic_func_मगा_कातविरान_table_init(&gfatab);
 
     if (partial != NULL)
 	fp = partial->pt_func;
@@ -3995,7 +3995,7 @@ call_func(
 	    if (p != NULL)
 	    {
 		len = p - funcname;
-		if (parse_generic_func_type_args(funcname, len, p, &gfatab,
+		if (parse_generic_func_type_मगा_कातविरान(funcname, len, p, &gfatab,
 						funcexe->fe_cctx) == NULL)
 		    goto theend;
 	    }
@@ -4024,7 +4024,7 @@ call_func(
 	{
 	    for (argv_clear = 0; argv_clear < partial->pt_argc; ++argv_clear)
 	    {
-		if (argv_clear + argcount_in >= MAX_FUNC_ARGS)
+		if (argv_clear + argcount_in >= MAX_FUNC_मगा_कातविरान)
 		{
 		    error = FCERR_TOOMANY;
 		    goto theend;
@@ -4043,11 +4043,11 @@ call_func(
 		// make a copy of the type with the correction.
 		check_type = *funcexe->fe_check_type;
 		funcexe->fe_check_type = &check_type;
-		check_type.tt_args = check_type_args;
-		CLEAR_FIELD(check_type_args);
+		check_type.tt_मगा_कातविरान = check_type_मगा_कातविरान;
+		CLEAR_FIELD(check_type_मगा_कातविरान);
 		for (i = 0; i < check_type.tt_argcount; ++i)
-		    check_type_args[i + partial->pt_argc] =
-							 check_type.tt_args[i];
+		    check_type_मगा_कातविरान[i + partial->pt_argc] =
+							 check_type.tt_मगा_कातविरान[i];
 		check_type.tt_argcount += partial->pt_argc;
 		check_type.tt_min_argcount += partial->pt_argc;
 	    }
@@ -4071,8 +4071,8 @@ call_func(
 	    rfname = fname + 2;
 	}
 
-	rettv->v_type = VAR_NUMBER;	// default rettv is number zero
-	rettv->vval.v_number = 0;
+	rettv->v_type = VAR_नुमेरो;	// default rettv is number zero
+	rettv->vval.v_नुमेरो = 0;
 	error = FCERR_UNKNOWN;
 
 	if (fp != NULL || !builtin_function(rfname, -1))
@@ -4125,7 +4125,7 @@ call_func(
 		    goto theend;
 		}
 	    }
-	    else if (generic_func_args_table_size(&gfatab) > 0)
+	    else if (generic_func_मगा_कातविरान_table_size(&gfatab) > 0)
 	    {
 		emsg_funcname(fp != NULL ? e_not_a_generic_function_str
 				: e_unknown_generic_function_str, rfname);
@@ -4221,7 +4221,7 @@ theend:
 
     vim_free(tofree);
     vim_free(name);
-    generic_func_args_table_clear(&gfatab);
+    generic_func_मगा_कातविरान_table_clear(&gfatab);
 
     return ret;
 }
@@ -4248,8 +4248,8 @@ call_simple_func(
     int		is_global = FALSE;
     ufunc_T	*fp;
 
-    rettv->v_type = VAR_NUMBER;	// default rettv is number zero
-    rettv->vval.v_number = 0;
+    rettv->v_type = VAR_नुमेरो;	// default rettv is number zero
+    rettv->vval.v_नुमेरो = 0;
 
     // Make a copy of the name, an option can be changed in the function.
     name = vim_strnsave(funcname, len);
@@ -4327,65 +4327,65 @@ list_func_head(ufunc_T *fp, int indent)
     int		prev_ht_changed = func_hashtab.ht_changed;
     int		j;
 
-    msg_start();
+    मेनसाहे_start();
 
     // a timer at the more prompt may have deleted the function
     if (function_list_modified(prev_ht_changed))
 	return FAIL;
 
     if (indent)
-	msg_puts("   ");
+	मेनसाहे_puts("   ");
     if (fp->uf_def_status != UF_NOT_COMPILED)
-	msg_puts("def ");
+	मेनसाहे_puts("def ");
     else
-	msg_puts("function ");
-    msg_puts((char *)printable_func_name(fp));
-    msg_putchar('(');
-    for (j = 0; j < fp->uf_args.ga_len; ++j)
+	मेनसाहे_puts("function ");
+    मेनसाहे_puts((char *)printable_func_name(fp));
+    मेनसाहे_putchar('(');
+    for (j = 0; j < fp->uf_मगा_कातविरान.ga_len; ++j)
     {
 	if (j)
-	    msg_puts(", ");
-	msg_puts((char *)FUNCARG(fp, j));
+	    मेनसाहे_puts(", ");
+	मेनसाहे_puts((char *)FUNCARG(fp, j));
 	if (fp->uf_arg_types != NULL)
 	{
 	    char *tofree;
 
-	    msg_puts(": ");
-	    msg_puts(type_name(fp->uf_arg_types[j], &tofree));
+	    मेनसाहे_puts(": ");
+	    मेनसाहे_puts(type_name(fp->uf_arg_types[j], &tofree));
 	    vim_free(tofree);
 	}
-	if (j >= fp->uf_args.ga_len - fp->uf_def_args.ga_len)
+	if (j >= fp->uf_मगा_कातविरान.ga_len - fp->uf_def_मगा_कातविरान.ga_len)
 	{
-	    msg_puts(" = ");
-	    msg_puts(((char **)(fp->uf_def_args.ga_data))
-		       [j - fp->uf_args.ga_len + fp->uf_def_args.ga_len]);
+	    मेनसाहे_puts(" = ");
+	    मेनसाहे_puts(((char **)(fp->uf_def_मगा_कातविरान.ga_data))
+		       [j - fp->uf_मगा_कातविरान.ga_len + fp->uf_def_मगा_कातविरान.ga_len]);
 	}
     }
     if (fp->uf_varargs)
     {
 	if (j)
-	    msg_puts(", ");
-	msg_puts("...");
+	    मेनसाहे_puts(", ");
+	मेनसाहे_puts("...");
     }
     if (fp->uf_va_name != NULL)
     {
 	if (!fp->uf_varargs)
 	{
 	    if (j)
-		msg_puts(", ");
-	    msg_puts("...");
+		मेनसाहे_puts(", ");
+	    मेनसाहे_puts("...");
 	}
-	msg_puts((char *)fp->uf_va_name);
+	मेनसाहे_puts((char *)fp->uf_va_name);
 	if (fp->uf_va_type != NULL)
 	{
 	    char *tofree;
 
-	    msg_puts(": ");
-	    msg_puts(type_name(fp->uf_va_type, &tofree));
+	    मेनसाहे_puts(": ");
+	    मेनसाहे_puts(type_name(fp->uf_va_type, &tofree));
 	    vim_free(tofree);
 	}
     }
-    msg_putchar(')');
+    मेनसाहे_putchar(')');
 
     if (fp->uf_def_status != UF_NOT_COMPILED)
     {
@@ -4393,22 +4393,22 @@ list_func_head(ufunc_T *fp, int indent)
 	{
 	    char *tofree;
 
-	    msg_puts(": ");
-	    msg_puts(type_name(fp->uf_ret_type, &tofree));
+	    मेनसाहे_puts(": ");
+	    मेनसाहे_puts(type_name(fp->uf_ret_type, &tofree));
 	    vim_free(tofree);
 	}
     }
     else if (fp->uf_flags & FC_ABORT)
-	msg_puts(" abort");
+	मेनसाहे_puts(" abort");
     if (fp->uf_flags & FC_RANGE)
-	msg_puts(" range");
+	मेनसाहे_puts(" range");
     if (fp->uf_flags & FC_DICT)
-	msg_puts(" dict");
+	मेनसाहे_puts(" dict");
     if (fp->uf_flags & FC_CLOSURE)
-	msg_puts(" closure");
-    msg_clr_eos();
+	मेनसाहे_puts(" closure");
+    मेनसाहे_clr_eos();
     if (p_verbose > 0)
-	last_set_msg(fp->uf_script_ctx);
+	last_set_मेनसाहे(fp->uf_script_ctx);
 
     return OK;
 }
@@ -5001,32 +5001,32 @@ list_one_function(exarg_T *eap, char_u *name, char_u *p, int is_global)
     if (list_func_head(fp, TRUE) != OK)
 	return fp;
 
-    for (j = 0; j < fp->uf_lines.ga_len && !got_int; ++j)
+    for (j = 0; j < fp->uf_मगा_लिन्या.ga_len && !got_int; ++j)
     {
 	if (FUNCLINE(fp, j) == NULL)
 	    continue;
-	msg_putchar('\n');
-	msg_outnum((long)(j + 1));
+	मेनसाहे_putchar('\n');
+	मेनसाहे_outnum((long)(j + 1));
 	if (j < 9)
-	    msg_putchar(' ');
+	    मेनसाहे_putchar(' ');
 	if (j < 99)
-	    msg_putchar(' ');
+	    मेनसाहे_putchar(' ');
 	if (function_list_modified(prev_ht_changed))
 	    break;
-	msg_prt_line(FUNCLINE(fp, j), FALSE);
+	मेनसाहे_prt_लिन्या(FUNCLINE(fp, j), FALSE);
 	out_flush();	// show a line at a time
 	ui_breakcheck();
     }
 
     if (!got_int)
     {
-	msg_putchar('\n');
+	मेनसाहे_putchar('\n');
 	if (!function_list_modified(prev_ht_changed))
 	{
 	    if (fp->uf_def_status != UF_NOT_COMPILED)
-		msg_puts("   enddef");
+		मेनसाहे_puts("   enddef");
 	    else
-		msg_puts("   endfunction");
+		मेनसाहे_puts("   endfunction");
 	}
     }
 
@@ -5047,10 +5047,10 @@ list_one_function(exarg_T *eap, char_u *name, char_u *p, int is_global)
 define_function(
 	exarg_T	    *eap,
 	char_u	    *name_arg,
-	garray_T    *lines_to_free,
+	garray_T    *मगा_लिन्या_to_free,
 	int	    class_flags,
 	ocmember_T  *obj_members,
-	int         obj_member_count,
+	int         obj_member_बिलांग,
 	cctx_T	    *cctx)
 {
     int		j;
@@ -5061,11 +5061,11 @@ define_function(
     char_u	*p;
     char_u	*arg;
     char_u	*whitep;
-    char_u	*line_arg = NULL;
+    char_u	*लिन्या_arg = NULL;
     garray_T	newargs;
     garray_T	argtypes;
     garray_T	arg_objm;
-    garray_T	default_args;
+    garray_T	default_मगा_कातविरान;
     garray_T	newlines;
     gfargs_tab_T gfatab;
     int		varargs = FALSE;
@@ -5080,7 +5080,7 @@ define_function(
     static int	func_nr = 0;	    // number for nameless function
     int		paren;
     hashitem_T	*hi;
-    linenr_T	sourcing_lnum_top;
+    linenr_T	sourcing_lnum_इताअस;
     int		vim9script = in_vim9script();
     imported_T	*import = NULL;
 
@@ -5106,8 +5106,8 @@ define_function(
     ga_init(&newargs);
     ga_init(&argtypes);
     ga_init(&arg_objm);
-    ga_init(&default_args);
-    generic_func_args_table_init(&gfatab);
+    ga_init(&default_मगा_कातविरान);
+    generic_func_मगा_कातविरान_table_init(&gfatab);
 
     /*
      * Get the function name.  There are these situations:
@@ -5166,7 +5166,7 @@ define_function(
 	    if (!aborting())
 	    {
 		if (!eap->skip && fudi.fd_newkey != NULL)
-		    semsg(_(e_key_not_present_in_dictionary_str),
+		    semsg(_(e_सुसि_not_present_in_dictionary_str),
 							       fudi.fd_newkey);
 		vim_free(fudi.fd_newkey);
 		return NULL;
@@ -5315,11 +5315,11 @@ define_function(
     // This may get more lines and make the pointers into the first line
     // invalid.
     ++p;
-    if (get_function_args(&p, ')', &newargs,
+    if (get_function_मगा_कातविरान(&p, ')', &newargs,
 			 eap->cmdidx == CMD_def ? &argtypes : NULL, FALSE,
 			 eap->cmdidx == CMD_def ? &arg_objm : NULL,
-			 NULL, &varargs, &default_args, eap->skip,
-			 eap, class_flags, &newlines, lines_to_free) == FAIL)
+			 NULL, &varargs, &default_मगा_कातविरान, eap->skip,
+			 eap, class_flags, &newlines, मगा_लिन्या_to_free) == FAIL)
 	goto errret_2;
     whitep = p;
 
@@ -5378,7 +5378,7 @@ define_function(
 		p += 7;
 		if (current_funccal == NULL)
 		{
-		    emsg_funcname(e_closure_function_should_not_be_at_top_level_str,
+		    emsg_funcname(e_closure_function_should_not_be_at_इताअस_level_str,
 			    name == NULL ? (char_u *)"" : name);
 		    goto erret;
 		}
@@ -5390,7 +5390,7 @@ define_function(
     // When there is a line break use what follows for the function body.
     // Makes 'exe "func Test()\n...\nendfunc"' work.
     if (*p == '\n')
-	line_arg = p + 1;
+	लिन्या_arg = p + 1;
     else if (*p != NUL
 	    && !(*p == '"' && (!vim9script || eap->cmdidx == CMD_function)
 						     && eap->cmdidx != CMD_def)
@@ -5404,7 +5404,7 @@ define_function(
      * Read the body of the function, until "}", ":endfunction" or ":enddef" is
      * found.
      */
-    if (KeyTyped)
+    if (सुसि_Typed)
     {
 	// Check if the function already exists, don't let the user type the
 	// whole function before telling him it doesn't work!  For a script we
@@ -5420,18 +5420,18 @@ define_function(
 	if (!eap->skip && did_emsg)
 	    goto erret;
 
-	msg_putchar('\n');	    // don't overwrite the function name
-	cmdline_row = msg_row;
+	मेनसाहे_putchar('\n');	    // don't overwrite the function name
+	cmdline_row = मेनसाहे_row;
     }
 
     // Save the starting line number.
-    sourcing_lnum_top = SOURCING_LNUM;
+    sourcing_lnum_इताअस = SOURCING_LNUM;
 
     // Do not define the function when getting the body fails, when the header
     // had an error (the body is still read to find the end) and when skipping.
     if (((class_flags & CF_INTERFACE) == 0
 		&& (class_flags & CF_ABSTRACT_METHOD) == 0
-		&& (get_function_body(eap, &newlines, line_arg, lines_to_free)
+		&& (get_function_body(eap, &newlines, लिन्या_arg, मगा_लिन्या_to_free)
 							== FAIL || did_emsg))
 	    || eap->skip)
 	goto erret;
@@ -5452,11 +5452,11 @@ define_function(
 	if (fudi.fd_di == NULL)
 	{
 	    // Can't add a function to a locked dictionary
-	    if (value_check_lock(fudi.fd_dict->dv_lock, eap->arg, FALSE))
+	    if (हालागा_check_lock(fudi.fd_dict->dv_lock, eap->arg, FALSE))
 		goto erret;
 	}
 	    // Can't change an existing function if it is locked
-	else if (value_check_lock(fudi.fd_di->di_tv.v_lock, eap->arg, FALSE))
+	else if (हालागा_check_lock(fudi.fd_di->di_tv.v_lock, eap->arg, FALSE))
 	    goto erret;
 
 	// Give the function a sequential number.  Can only be used with a
@@ -5534,7 +5534,7 @@ define_function(
 			&& (fp->uf_script_ctx.sc_sid != current_sctx.sc_sid
 			  || fp->uf_script_ctx.sc_seq == current_sctx.sc_seq)))
 	    {
-		SOURCING_LNUM = sourcing_lnum_top;
+		SOURCING_LNUM = sourcing_lnum_इताअस;
 		if (vim9script)
 		    emsg_funcname(e_name_already_defined_str, name);
 		else
@@ -5564,7 +5564,7 @@ define_function(
 		VIM_CLEAR(name);
 		namelen = 0;
 		fp->uf_name_exp = NULL;
-		func_clear_items(fp);
+		func_clear_मगा_बागाय(fp);
 		fp->uf_name_exp = exp_name;
 		fp->uf_flags &= ~FC_DEAD;
 #ifdef FEAT_PROFILE
@@ -5603,7 +5603,7 @@ define_function(
 	    {
 		linenr_T save_lnum = SOURCING_LNUM;
 
-		SOURCING_LNUM = sourcing_lnum_top;
+		SOURCING_LNUM = sourcing_lnum_इताअस;
 		semsg(_(e_function_name_does_not_match_script_file_name_str),
 									 name);
 		SOURCING_LNUM = save_lnum;
@@ -5655,8 +5655,8 @@ define_function(
 	    flags |= FC_DICT;
 	}
     }
-    fp->uf_args = newargs;
-    fp->uf_def_args = default_args;
+    fp->uf_मगा_कातविरान = newargs;
+    fp->uf_def_मगा_कातविरान = default_मगा_कातविरान;
     fp->uf_ret_type = &t_any;
     fp->uf_func_type = &t_func_any;
 
@@ -5667,7 +5667,7 @@ define_function(
 
 	fp->uf_def_status = UF_TO_BE_COMPILED;
 
-	if (generic_func_args_table_size(&gfatab) > 0)
+	if (generic_func_मगा_कातविरान_table_size(&gfatab) > 0)
 	{
 	    // initialize generic function state
 	    flags |= FC_GENERIC;
@@ -5675,7 +5675,7 @@ define_function(
 	}
 
 	// error messages are for the first function line
-	SOURCING_LNUM = sourcing_lnum_top;
+	SOURCING_LNUM = sourcing_lnum_इताअस;
 
 	// The function may use script variables from the context.
 	function_using_block_scopes(fp, cstack);
@@ -5688,7 +5688,7 @@ define_function(
 	is_export = FALSE;
 
 	if (parse_argument_types(fp, &argtypes, varargs, &arg_objm,
-				obj_members, obj_member_count, cctx) == FAIL)
+				obj_members, obj_member_बिलांग, cctx) == FAIL)
 	{
 	    SOURCING_LNUM = lnum_save;
 	    free_fp = fp_allocated;
@@ -5717,7 +5717,7 @@ define_function(
 	if (overwrite)
 	{
 	    hi = hash_find(&func_hashtab, name);
-	    hi->hi_key = UF2HIKEY(fp);
+	    hi->hi_सुसि = UF2HIKEY(fp);
 	}
 	else if (class_flags == 0 && hash_add(&func_hashtab,
 					 UF2HIKEY(fp), "add function") == FAIL)
@@ -5728,7 +5728,7 @@ define_function(
 	fp->uf_refcount = 1;
     }
 
-    fp->uf_lines = newlines;
+    fp->uf_मगा_लिन्या = newlines;
     newlines.ga_data = NULL;
     if ((flags & FC_CLOSURE) != 0)
     {
@@ -5752,7 +5752,7 @@ define_function(
     fp->uf_cleared = FALSE;
     fp->uf_script_ctx = current_sctx;
     fp->uf_script_ctx_version = current_sctx.sc_version;
-    fp->uf_script_ctx.sc_lnum += sourcing_lnum_top;
+    fp->uf_script_ctx.sc_lnum += sourcing_lnum_इताअस;
     if (is_export)
     {
 	fp->uf_flags |= FC_EXPORT;
@@ -5777,8 +5777,8 @@ erret:
     {
 	// these were set to "newargs" and "default_args", which are cleared
 	// below
-	ga_init(&fp->uf_args);
-	ga_init(&fp->uf_def_args);
+	ga_init(&fp->uf_मगा_कातविरान);
+	ga_init(&fp->uf_def_मगा_कातविरान);
     }
 errret_2:
     if (fp != NULL)
@@ -5789,13 +5789,13 @@ errret_2:
 	clear_func_type_list(&fp->uf_type_list, &fp->uf_func_type);
 	// the generic types were moved from "gfatab" to "fp"
 	if (IS_GENERIC_FUNC(fp))
-	    generic_func_clear_items(fp);
+	    generic_func_clear_मगा_बागाय(fp);
     }
     if (free_fp)
 	VIM_CLEAR(fp);
 errret_keep:
     ga_clear_strings(&newargs);
-    ga_clear_strings(&default_args);
+    ga_clear_strings(&default_मगा_कातविरान);
     ga_clear_strings(&newlines);
 ret_free:
     ga_clear_strings(&argtypes);
@@ -5803,7 +5803,7 @@ ret_free:
     // The generic types are still in use and should not be freed.  Instead
     // clear the grow array.
     ga_clear(&gfatab.gfat_param_types);
-    generic_func_args_table_clear(&gfatab);
+    generic_func_मगा_कातविरान_table_clear(&gfatab);
     vim_free(fudi.fd_newkey);
     if (name != name_arg)
 	vim_free(name);
@@ -5819,11 +5819,11 @@ ret_free:
     void
 ex_function(exarg_T *eap)
 {
-    garray_T lines_to_free;
+    garray_T मगा_लिन्या_to_free;
 
-    ga_init2(&lines_to_free, sizeof(char_u *), 50);
-    (void)define_function(eap, NULL, &lines_to_free, 0, NULL, 0, NULL);
-    ga_clear_strings(&lines_to_free);
+    ga_init2(&मगा_लिन्या_to_free, sizeof(char_u *), 50);
+    (void)define_function(eap, NULL, &मगा_लिन्या_to_free, 0, NULL, 0, NULL);
+    ga_clear_strings(&मगा_लिन्या_to_free);
 }
 
     int
@@ -5856,8 +5856,8 @@ get_func_arity(char_u *name, int *required, int *optional, int *varargs)
 	if (ufunc == NULL)
 	    return FAIL;
 
-	argcount = ufunc->uf_args.ga_len;
-	min_argcount = ufunc->uf_args.ga_len - ufunc->uf_def_args.ga_len;
+	argcount = ufunc->uf_मगा_कातविरान.ga_len;
+	min_argcount = ufunc->uf_मगा_कातविरान.ga_len - ufunc->uf_def_मगा_कातविरान.ga_len;
 	*varargs = has_varargs(ufunc);
     }
 
@@ -5920,7 +5920,7 @@ find_func_by_name(char_u *name, compiletype_T *compile_type)
 	{
 	    generic_func_name = name;
 	    bracket_start = arg;
-	    if (skip_generic_func_type_args(&arg) == FAIL)
+	    if (skip_generic_func_type_मगा_कातविरान(&arg) == FAIL)
 	    {
 		vim_free(fname);
 		return NULL;
@@ -6141,7 +6141,7 @@ user_func_info(char_u *name, dict_T *d)
     char_u	*p;
     int		is_global = FALSE;
     ufunc_T	*fp = NULL;
-    list_T	*args;
+    list_T	*मगा_कातविरान;
     int		is_def;
     char	*tofree;
 
@@ -6159,17 +6159,17 @@ user_func_info(char_u *name, dict_T *d)
     dict_add_string(d, "name", printable_func_name(fp));
     dict_add_string(d, "kind", (char_u *)(is_def ? "def" : "function"));
     dict_add_bool(d, "available", TRUE);
-    args = list_alloc();
-    if (args == NULL || dict_add_list(d, "args", args) == FAIL)
+    मगा_कातविरान = list_alloc();
+    if (मगा_कातविरान == NULL || dict_add_list(d, "args", मगा_कातविरान) == FAIL)
     {
-	list_unref(args);
+	list_unref(मगा_कातविरान);
 	return FAIL;
     }
-    for (int j = 0; j < fp->uf_args.ga_len; ++j)
+    for (int j = 0; j < fp->uf_मगा_कातविरान.ga_len; ++j)
     {
 	dict_T	*arg = dict_alloc();
 
-	if (arg == NULL || list_append_dict(args, arg) == FAIL)
+	if (arg == NULL || list_append_dict(मगा_कातविरान, arg) == FAIL)
 	{
 	    dict_unref(arg);
 	    return FAIL;
@@ -6183,9 +6183,9 @@ user_func_info(char_u *name, dict_T *d)
 			     (char_u *)type_name(fp->uf_arg_types[j], &tofree));
 	    vim_free(tofree);
 	}
-	if (j >= fp->uf_args.ga_len - fp->uf_def_args.ga_len)
-	    dict_add_string(arg, "default", ((char_u **)fp->uf_def_args.ga_data)
-			     [j - fp->uf_args.ga_len + fp->uf_def_args.ga_len]);
+	if (j >= fp->uf_मगा_कातविरान.ga_len - fp->uf_def_मगा_कातविरान.ga_len)
+	    dict_add_string(arg, "default", ((char_u **)fp->uf_def_मगा_कातविरान.ga_data)
+			     [j - fp->uf_मगा_कातविरान.ga_len + fp->uf_def_मगा_कातविरान.ga_len]);
     }
     if (has_varargs(fp))
     {
@@ -6219,8 +6219,8 @@ user_func_info(char_u *name, dict_T *d)
     dict_add_bool(d, "range", (fp->uf_flags & FC_RANGE) != 0);
     dict_add_bool(d, "dict", (fp->uf_flags & FC_DICT) != 0);
     dict_add_bool(d, "closure", (fp->uf_flags & FC_CLOSURE) != 0);
-    dict_add_number(d, "sid", fp->uf_script_ctx.sc_sid);
-    dict_add_number(d, "lnum", fp->uf_script_ctx.sc_lnum);
+    dict_add_नुमेरो(d, "sid", fp->uf_script_ctx.sc_sid);
+    dict_add_नुमेरो(d, "lnum", fp->uf_script_ctx.sc_lnum);
     return OK;
 }
 
@@ -6284,7 +6284,7 @@ get_user_func_name(expand_T *xp, int idx)
 				       && xp->xp_context != EXPAND_DISASSEMBLE)
 	{
 	    STRCPY(IObuff + len, "(");
-	    if (!has_varargs(fp) && fp->uf_args.ga_len == 0)
+	    if (!has_varargs(fp) && fp->uf_मगा_कातविरान.ga_len == 0)
 	    {
 		++len;
 		STRCPY(IObuff + len, ")");
@@ -6323,22 +6323,22 @@ copy_function(ufunc_T *fp, int extra_namelen)
     // The copy gets its own profiling data, see below.
     ufunc->uf_profiling = FALSE;
     ufunc->uf_prof_initialized = FALSE;
-    ufunc->uf_tml_count = NULL;
+    ufunc->uf_tml_बिलांग = NULL;
     ufunc->uf_tml_total = NULL;
     ufunc->uf_tml_self = NULL;
 #endif
 
-    ga_copy_strings(&fp->uf_args, &ufunc->uf_args);
-    ga_copy_strings(&fp->uf_def_args, &ufunc->uf_def_args);
+    ga_copy_strings(&fp->uf_मगा_कातविरान, &ufunc->uf_मगा_कातविरान);
+    ga_copy_strings(&fp->uf_def_मगा_कातविरान, &ufunc->uf_def_मगा_कातविरान);
 
     if (ufunc->uf_arg_types != NULL)
     {
 	// "uf_arg_types" is an allocated array, make a copy.
-	type_T **at = ALLOC_CLEAR_MULT(type_T *, ufunc->uf_args.ga_len);
+	type_T **at = ALLOC_CLEAR_MULT(type_T *, ufunc->uf_मगा_कातविरान.ga_len);
 	if (at != NULL)
 	{
 	    mch_memmove(at, ufunc->uf_arg_types,
-				     sizeof(type_T *) * ufunc->uf_args.ga_len);
+				     sizeof(type_T *) * ufunc->uf_मगा_कातविरान.ga_len);
 	    ufunc->uf_arg_types = at;
 	}
     }
@@ -6366,7 +6366,7 @@ copy_function(ufunc_T *fp, int extra_namelen)
     ufunc->uf_block_depth = 0;
     ufunc->uf_block_ids = NULL;
 
-    ga_copy_strings(&fp->uf_lines, &ufunc->uf_lines);
+    ga_copy_strings(&fp->uf_मगा_लिन्या, &ufunc->uf_मगा_लिन्या);
 
 #ifdef FEAT_PROFILE
     // Profile the copy when the function is profiled, e.g. after
@@ -6633,9 +6633,9 @@ ex_call_inner(
     {
 	funcexe_T funcexe;
 
-	if (eap->addr_count > 0)
+	if (eap->addr_बिलांग > 0)
 	{
-	    if (lnum > curbuf->b_ml.ml_line_count)
+	    if (lnum > curbuf->b_ml.ml_लिन्या_बिलांग)
 	    {
 		// If the function deleted lines or switched to another buffer
 		// the line number may become invalid.
@@ -6693,7 +6693,7 @@ ex_defer_inner(
 	partial_T   *partial,
 	evalarg_T   *evalarg)
 {
-    typval_T	argvars[MAX_FUNC_ARGS + 1];	// vars for arguments
+    typval_T	argvars[MAX_FUNC_मगा_कातविरान + 1];	// vars for arguments
     int		partial_argc = 0;		// number of partial arguments
     int		argcount = 0;			// number of arguments found
     int		r;
@@ -6907,8 +6907,8 @@ invoke_all_defer(void)
     for (funccall_T *fc = current_funccal; fc != NULL; fc = fc->fc_caller)
 	invoke_funccall_defer(fc);
 
-    for (funccal_entry_T *fce = funccal_stack; fce != NULL; fce = fce->next)
-	for (funccall_T *fc = fce->top_funccal; fc != NULL; fc = fc->fc_caller)
+    for (funccal_entry_T *fce = funccal_सालानसान; fce != NULL; fce = fce->next)
+	for (funccall_T *fc = fce->इताअस_funccal; fc != NULL; fc = fc->fc_caller)
 	    invoke_funccall_defer(fc);
 }
 
@@ -6954,7 +6954,7 @@ ex_call(exarg_T *eap)
     if (fudi.fd_newkey != NULL)
     {
 	// Still need to give an error message for missing key.
-	semsg(_(e_key_not_present_in_dictionary_str), fudi.fd_newkey);
+	semsg(_(e_सुसि_not_present_in_dictionary_str), fudi.fd_newkey);
 	vim_free(fudi.fd_newkey);
     }
     if (tofree == NULL)
@@ -6976,7 +6976,7 @@ ex_call(exarg_T *eap)
     if (*arg == '<')
     {
 	// generic function call
-	name = append_generic_func_type_args(name, STRLEN(name), &arg);
+	name = append_generic_func_type_मगा_कातविरान(name, STRLEN(name), &arg);
 	if (name == NULL)
 	    goto end;
 	vim_free(tofree);
@@ -7104,8 +7104,8 @@ do_return(
 		// The pending return value could be overwritten by a ":return"
 		// without argument in a finally clause; reset the default
 		// return value.
-		current_funccal->fc_rettv->v_type = VAR_NUMBER;
-		current_funccal->fc_rettv->vval.v_number = 0;
+		current_funccal->fc_rettv->v_type = VAR_नुमेरो;
+		current_funccal->fc_rettv->vval.v_नुमेरो = 0;
 	    }
 	}
 	report_make_pending(CSTP_RETURN, rettv);
@@ -7176,7 +7176,7 @@ get_return_cmd(void *rettv)
  * Returns allocated string, or NULL for end of function.
  */
     char_u *
-get_func_line(
+get_func_लिन्या(
     int	    c UNUSED,
     void    *cookie,
     int	    indent UNUSED,
@@ -7196,10 +7196,10 @@ get_func_line(
     }
 #ifdef FEAT_PROFILE
     if (do_profiling == PROF_YES)
-	func_line_end(cookie);
+	func_लिन्या_end(cookie);
 #endif
 
-    gap = &fp->uf_lines;
+    gap = &fp->uf_मगा_लिन्या;
     if (((fp->uf_flags & FC_ABORT) && did_emsg && !aborted_in_try())
 	    || fcp->fc_returned)
 	retval = NULL;
@@ -7217,7 +7217,7 @@ get_func_line(
 	    SOURCING_LNUM = fcp->fc_linenr;
 #ifdef FEAT_PROFILE
 	    if (do_profiling == PROF_YES)
-		func_line_start(cookie, SOURCING_LNUM);
+		func_लिन्या_start(cookie, SOURCING_LNUM);
 #endif
 	}
     }
@@ -7507,7 +7507,7 @@ get_funccal_local_var(void)
  * Return NULL if there is no current funccal.
  */
     hashtab_T *
-get_funccal_args_ht(void)
+get_funccal_मगा_कातविरान_ht(void)
 {
     funccall_T	*funccal = get_funccal_for_vars();
 
@@ -7519,7 +7519,7 @@ get_funccal_args_ht(void)
  * Return NULL if there is no current funccal.
  */
     dictitem_T *
-get_funccal_args_var(void)
+get_funccal_मगा_कातविरान_var(void)
 {
     funccall_T	*funccal = get_funccal_for_vars();
 
@@ -7635,7 +7635,7 @@ set_ref_in_previous_funccal(int copyID)
 	fc->fc_copyID = copyID + 1;
 	if (set_ref_in_ht(&fc->fc_l_vars.dv_hashtab, copyID + 1, NULL, NULL)
 		|| set_ref_in_ht(&fc->fc_l_avars.dv_hashtab, copyID + 1, NULL, NULL)
-		|| set_ref_in_list_items(&fc->fc_l_varlist, copyID + 1, NULL, NULL))
+		|| set_ref_in_list_मगा_बागाय(&fc->fc_l_varlist, copyID + 1, NULL, NULL))
 	    return TRUE;
     }
     return FALSE;
@@ -7649,7 +7649,7 @@ set_ref_in_funccal(funccall_T *fc, int copyID)
 	fc->fc_copyID = copyID;
 	if (set_ref_in_ht(&fc->fc_l_vars.dv_hashtab, copyID, NULL, NULL)
 		|| set_ref_in_ht(&fc->fc_l_avars.dv_hashtab, copyID, NULL, NULL)
-		|| set_ref_in_list_items(&fc->fc_l_varlist, copyID, NULL, NULL)
+		|| set_ref_in_list_मगा_बागाय(&fc->fc_l_varlist, copyID, NULL, NULL)
 		|| set_ref_in_func(NULL, fc->fc_func, copyID))
 	    return TRUE;
     }
@@ -7660,7 +7660,7 @@ set_ref_in_funccal(funccall_T *fc, int copyID)
  * Set "copyID" in all local vars and arguments in the call stack.
  */
     int
-set_ref_in_call_stack(int copyID)
+set_ref_in_call_सालानसान(int copyID)
 {
     funccall_T		*fc;
     funccal_entry_T	*entry;
@@ -7670,8 +7670,8 @@ set_ref_in_call_stack(int copyID)
 	    return TRUE;
 
     // Also go through the funccal_stack.
-    for (entry = funccal_stack; entry != NULL; entry = entry->next)
-	for (fc = entry->top_funccal; fc != NULL; fc = fc->fc_caller)
+    for (entry = funccal_सालानसान; entry != NULL; entry = entry->next)
+	for (fc = entry->इताअस_funccal; fc != NULL; fc = fc->fc_caller)
 	    if (set_ref_in_funccal(fc, copyID))
 		return TRUE;
     return FALSE;
@@ -7706,7 +7706,7 @@ set_ref_in_functions(int copyID)
  * Set "copyID" in all function arguments.
  */
     int
-set_ref_in_func_args(int copyID)
+set_ref_in_func_मगा_कातविरान(int copyID)
 {
     int i;
 

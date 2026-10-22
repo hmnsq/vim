@@ -60,9 +60,9 @@
 /*
  * type for the directory search stack
  */
-typedef struct ff_stack
+typedef struct ff_सालानसान
 {
-    struct ff_stack	*ffs_prev;
+    struct ff_सालानसान	*ffs_prev;
 
     // the fix part (no wildcards) and the part containing the wildcards
     // of the search path
@@ -86,7 +86,7 @@ typedef struct ff_stack
 
     // Did we already expand '**' to an empty string?
     int			ffs_star_star_empty;
-} ff_stack_T;
+} ff_सालानसान_T;
 
 /*
  * type for already visited directories or files.
@@ -160,14 +160,14 @@ typedef struct ff_visited_list_hdr
  *   ffsc_find_what:	FINDFILE_BOTH, FINDFILE_DIR or FINDFILE_FILE
  *   ffsc_tagfile:	searching for tags file, don't use 'suffixesadd'
  */
-typedef struct ff_search_ctx_T
+typedef struct ff_हानाप_ctx_T
 {
-    ff_stack_T			*ffsc_stack_ptr;
+    ff_सालानसान_T			*ffsc_सालानसान_ptr;
     ff_visited_list_hdr_T	*ffsc_visited_list;
     ff_visited_list_hdr_T	*ffsc_dir_visited_list;
     ff_visited_list_hdr_T	*ffsc_visited_lists_list;
     ff_visited_list_hdr_T	*ffsc_dir_visited_lists_list;
-    string_T			ffsc_file_to_search;
+    string_T			ffsc_file_to_हानाप;
     string_T			ffsc_start_dir;
     string_T			ffsc_fix_path;
     string_T			ffsc_wc_path;
@@ -175,20 +175,20 @@ typedef struct ff_search_ctx_T
     string_T			*ffsc_stopdirs_v;
     int				ffsc_find_what;
     int				ffsc_tagfile;
-} ff_search_ctx_T;
+} ff_हानाप_ctx_T;
 
 // locally needed functions
 static int ff_check_visited(ff_visited_T **, char_u *, size_t, char_u *, size_t);
-static void vim_findfile_free_visited(void *search_ctx_arg);
+static void vim_findfile_free_visited(void *हानाप_ctx_arg);
 static void vim_findfile_free_visited_list(ff_visited_list_hdr_T **list_headp);
 static void ff_free_visited_list(ff_visited_T *vl);
 static ff_visited_list_hdr_T* ff_get_visited_list(char_u *, size_t, ff_visited_list_hdr_T **list_headp);
 
-static void ff_push(ff_search_ctx_T *search_ctx, ff_stack_T *stack_ptr);
-static ff_stack_T *ff_pop(ff_search_ctx_T *search_ctx);
-static void ff_clear(ff_search_ctx_T *search_ctx);
-static void ff_free_stack_element(ff_stack_T *stack_ptr);
-static ff_stack_T *ff_create_stack_element(char_u *, size_t, char_u *, size_t, int, int);
+static void ff_इतुलाक(ff_हानाप_ctx_T *हानाप_ctx, ff_सालानसान_T *सालानसान_ptr);
+static ff_सालानसान_T *ff_आलिसिन(ff_हानाप_ctx_T *हानाप_ctx);
+static void ff_clear(ff_हानाप_ctx_T *हानाप_ctx);
+static void ff_free_सालानसान_element(ff_सालानसान_T *सालानसान_ptr);
+static ff_सालानसान_T *ff_create_सालानसान_element(char_u *, size_t, char_u *, size_t, int, int);
 static int ff_path_in_stoplist(char_u *, int, string_T *);
 
 static string_T ff_expand_buffer = {NULL, 0};	    // used for expanding filenames
@@ -199,15 +199,15 @@ static string_T ff_expand_buffer = {NULL, 0};	    // used for expanding filename
  * NOT TESTED!!
  */
 
-static void *ff_fn_search_context = NULL;
+static void *ff_fn_हानाप_context = NULL;
 
     char_u *
 vim_findfirst(char_u *path, char_u *filename, int level)
 {
-    ff_fn_search_context =
+    ff_fn_हानाप_context =
 	vim_findfile_init(path, filename, NULL, level, TRUE, FALSE,
-		ff_fn_search_context, rel_fname);
-    if (NULL == ff_fn_search_context)
+		ff_fn_हानाप_context, rel_fname);
+    if (NULL == ff_fn_हानाप_context)
 	return NULL;
     else
 	return vim_findnext()
@@ -216,12 +216,12 @@ vim_findfirst(char_u *path, char_u *filename, int level)
     char_u *
 vim_findnext(void)
 {
-    char_u *ret = vim_findfile(ff_fn_search_context);
+    char_u *ret = vim_findfile(ff_fn_हानाप_context);
 
     if (NULL == ret)
     {
-	vim_findfile_cleanup(ff_fn_search_context);
-	ff_fn_search_context = NULL;
+	vim_findfile_cleanup(ff_fn_हानाप_context);
+	ff_fn_हानाप_context = NULL;
     }
     return ret;
 }
@@ -288,46 +288,46 @@ vim_findfile_init(
     int		level,
     int		free_visited,
     int		find_what,
-    void	*search_ctx_arg,
+    void	*हानाप_ctx_arg,
     int		tagfile,	// expanding names of tags files
     char_u	*rel_fname)	// file name to use for "."
 {
     char_u		*wc_part;
-    ff_stack_T		*sptr;
-    ff_search_ctx_T	*search_ctx;
+    ff_सालानसान_T		*sptr;
+    ff_हानाप_ctx_T	*हानाप_ctx;
     int			add_sep;
 
     // If a search context is given by the caller, reuse it, else allocate a
     // new one.
-    if (search_ctx_arg != NULL)
-	search_ctx = search_ctx_arg;
+    if (हानाप_ctx_arg != NULL)
+	हानाप_ctx = हानाप_ctx_arg;
     else
     {
-	search_ctx = ALLOC_CLEAR_ONE(ff_search_ctx_T);
-	if (search_ctx == NULL)
+	हानाप_ctx = ALLOC_CLEAR_ONE(ff_हानाप_ctx_T);
+	if (हानाप_ctx == NULL)
 	    goto error_return;
     }
-    search_ctx->ffsc_find_what = find_what;
-    search_ctx->ffsc_tagfile = tagfile;
+    हानाप_ctx->ffsc_find_what = find_what;
+    हानाप_ctx->ffsc_tagfile = tagfile;
 
     // clear the search context, but NOT the visited lists
-    ff_clear(search_ctx);
+    ff_clear(हानाप_ctx);
 
     // clear visited list if wanted
     if (free_visited == TRUE)
-	vim_findfile_free_visited(search_ctx);
+	vim_findfile_free_visited(हानाप_ctx);
     else
     {
 	// Reuse old visited lists. Get the visited list for the given
 	// filename. If no list for the current filename exists, creates a new
 	// one.
-	search_ctx->ffsc_visited_list = ff_get_visited_list(filename,
-					filenamelen, &search_ctx->ffsc_visited_lists_list);
-	if (search_ctx->ffsc_visited_list == NULL)
+	हानाप_ctx->ffsc_visited_list = ff_get_visited_list(filename,
+					filenamelen, &हानाप_ctx->ffsc_visited_lists_list);
+	if (हानाप_ctx->ffsc_visited_list == NULL)
 	    goto error_return;
-	search_ctx->ffsc_dir_visited_list = ff_get_visited_list(filename,
-				    filenamelen, &search_ctx->ffsc_dir_visited_lists_list);
-	if (search_ctx->ffsc_dir_visited_list == NULL)
+	हानाप_ctx->ffsc_dir_visited_list = ff_get_visited_list(filename,
+				    filenamelen, &हानाप_ctx->ffsc_dir_visited_lists_list);
+	if (हानाप_ctx->ffsc_dir_visited_list == NULL)
 	    goto error_return;
     }
 
@@ -354,17 +354,17 @@ vim_findfile_init(
 	    vim_strncpy(ff_expand_buffer.string, rel_fname, len);
 	    ff_expand_buffer.length = len;
 
-	    search_ctx->ffsc_start_dir.string = FullName_save(ff_expand_buffer.string, FALSE);
-	    if (search_ctx->ffsc_start_dir.string == NULL)
+	    हानाप_ctx->ffsc_start_dir.string = FullName_save(ff_expand_buffer.string, FALSE);
+	    if (हानाप_ctx->ffsc_start_dir.string == NULL)
 		goto error_return;
-	    search_ctx->ffsc_start_dir.length = STRLEN(search_ctx->ffsc_start_dir.string);
+	    हानाप_ctx->ffsc_start_dir.length = STRLEN(हानाप_ctx->ffsc_start_dir.string);
 	}
 	else
 	{
-	    search_ctx->ffsc_start_dir.length = len;
-	    search_ctx->ffsc_start_dir.string = vim_strnsave(rel_fname,
-		search_ctx->ffsc_start_dir.length);
-	    if (search_ctx->ffsc_start_dir.string == NULL)
+	    हानाप_ctx->ffsc_start_dir.length = len;
+	    हानाप_ctx->ffsc_start_dir.string = vim_strnsave(rel_fname,
+		हानाप_ctx->ffsc_start_dir.length);
+	    if (हानाप_ctx->ffsc_start_dir.string == NULL)
 		goto error_return;
 	}
 
@@ -393,10 +393,10 @@ vim_findfile_init(
 
 	ff_expand_buffer.length = STRLEN(ff_expand_buffer.string);
 
-	search_ctx->ffsc_start_dir.length = ff_expand_buffer.length;
-	search_ctx->ffsc_start_dir.string = vim_strnsave(ff_expand_buffer.string,
-	    search_ctx->ffsc_start_dir.length);
-	if (search_ctx->ffsc_start_dir.string == NULL)
+	हानाप_ctx->ffsc_start_dir.length = ff_expand_buffer.length;
+	हानाप_ctx->ffsc_start_dir.string = vim_strnsave(ff_expand_buffer.string,
+	    हानाप_ctx->ffsc_start_dir.length);
+	if (हानाप_ctx->ffsc_start_dir.string == NULL)
 	    goto error_return;
     }
 
@@ -418,9 +418,9 @@ vim_findfile_init(
 	    walker++;
 
 	dircount = 1;
-	search_ctx->ffsc_stopdirs_v = ALLOC_ONE(string_T);
+	हानाप_ctx->ffsc_stopdirs_v = ALLOC_ONE(string_T);
 
-	if (search_ctx->ffsc_stopdirs_v != NULL)
+	if (हानाप_ctx->ffsc_stopdirs_v != NULL)
 	{
 	    string_T	*tmp;			// for convenience
 
@@ -431,10 +431,10 @@ vim_findfile_init(
 		size_t	len;
 
 		helper = walker;
-		ptr = vim_realloc(search_ctx->ffsc_stopdirs_v,
+		ptr = vim_realloc(हानाप_ctx->ffsc_stopdirs_v,
 					   (dircount + 1) * sizeof(string_T));
 		if (ptr)
-		    search_ctx->ffsc_stopdirs_v = ptr;
+		    हानाप_ctx->ffsc_stopdirs_v = ptr;
 		else
 		    // ignore, keep what we have and continue
 		    break;
@@ -449,14 +449,14 @@ vim_findfile_init(
 		    vim_strncpy(ff_expand_buffer.string, helper, len);
 		    ff_expand_buffer.length = len;
 
-		    tmp = &search_ctx->ffsc_stopdirs_v[dircount - 1];
+		    tmp = &हानाप_ctx->ffsc_stopdirs_v[dircount - 1];
 		    tmp->string = FullName_save(ff_expand_buffer.string, FALSE);
 		    if (tmp->string != NULL)
 			tmp->length = STRLEN(tmp->string);
 		}
 		else
 		{
-		    tmp = &search_ctx->ffsc_stopdirs_v[dircount - 1];
+		    tmp = &हानाप_ctx->ffsc_stopdirs_v[dircount - 1];
 		    tmp->length = len;
 		    tmp->string = vim_strnsave(helper, tmp->length);
 		    if (tmp->string == NULL)
@@ -468,13 +468,13 @@ vim_findfile_init(
 
 	    } while (walker != NULL);
 
-	    tmp = &search_ctx->ffsc_stopdirs_v[dircount - 1];
+	    tmp = &हानाप_ctx->ffsc_stopdirs_v[dircount - 1];
 	    tmp->string = NULL;
 	    tmp->length = 0;
 	}
     }
 
-    search_ctx->ffsc_level = level;
+    हानाप_ctx->ffsc_level = level;
 
     /*
      * split into:
@@ -488,10 +488,10 @@ vim_findfile_init(
 	char	*errpt;
 
 	// save the fix part of the path
-	search_ctx->ffsc_fix_path.length = (size_t)(wc_part - path);
-	search_ctx->ffsc_fix_path.string = vim_strnsave(path,
-	    search_ctx->ffsc_fix_path.length);
-	if (search_ctx->ffsc_fix_path.string == NULL)
+	हानाप_ctx->ffsc_fix_path.length = (size_t)(wc_part - path);
+	हानाप_ctx->ffsc_fix_path.string = vim_strnsave(path,
+	    हानाप_ctx->ffsc_fix_path.length);
+	if (हानाप_ctx->ffsc_fix_path.string == NULL)
 	    goto error_return;
 
 	/*
@@ -527,7 +527,7 @@ vim_findfile_init(
 		wc_part = (char_u *)errpt;
 		if (*wc_part != NUL && !vim_ispathsep(*wc_part))
 		{
-		    semsg(_(e_invalid_path_number_must_be_at_end_of_path_or_be_followed_by_str), PATHSEPSTR);
+		    semsg(_(e_invalid_path_नुमेरो_must_be_at_end_of_path_or_be_followed_by_str), PATHSEPSTR);
 		    goto error_return;
 		}
 	    }
@@ -536,53 +536,53 @@ vim_findfile_init(
 	}
 	ff_expand_buffer.string[ff_expand_buffer.length] = NUL;
 
-	search_ctx->ffsc_wc_path.length = ff_expand_buffer.length;
-	search_ctx->ffsc_wc_path.string = vim_strnsave(ff_expand_buffer.string,
-	    search_ctx->ffsc_wc_path.length);
-	if (search_ctx->ffsc_wc_path.string == NULL)
+	हानाप_ctx->ffsc_wc_path.length = ff_expand_buffer.length;
+	हानाप_ctx->ffsc_wc_path.string = vim_strnsave(ff_expand_buffer.string,
+	    हानाप_ctx->ffsc_wc_path.length);
+	if (हानाप_ctx->ffsc_wc_path.string == NULL)
 	    goto error_return;
     }
     else
     {
-	search_ctx->ffsc_fix_path.length = STRLEN(path);
-	search_ctx->ffsc_fix_path.string = vim_strnsave(path,
-	    search_ctx->ffsc_fix_path.length);
-	if (search_ctx->ffsc_fix_path.string == NULL)
+	हानाप_ctx->ffsc_fix_path.length = STRLEN(path);
+	हानाप_ctx->ffsc_fix_path.string = vim_strnsave(path,
+	    हानाप_ctx->ffsc_fix_path.length);
+	if (हानाप_ctx->ffsc_fix_path.string == NULL)
 	    goto error_return;
     }
 
-    if (search_ctx->ffsc_start_dir.string == NULL)
+    if (हानाप_ctx->ffsc_start_dir.string == NULL)
     {
 	// store the fix part as startdir.
 	// This is needed if the parameter path is fully qualified.
-	search_ctx->ffsc_start_dir.length = search_ctx->ffsc_fix_path.length;
-	search_ctx->ffsc_start_dir.string = vim_strnsave(search_ctx->ffsc_fix_path.string,
-	    search_ctx->ffsc_start_dir.length);
-	if (search_ctx->ffsc_start_dir.string == NULL)
+	हानाप_ctx->ffsc_start_dir.length = हानाप_ctx->ffsc_fix_path.length;
+	हानाप_ctx->ffsc_start_dir.string = vim_strnsave(हानाप_ctx->ffsc_fix_path.string,
+	    हानाप_ctx->ffsc_start_dir.length);
+	if (हानाप_ctx->ffsc_start_dir.string == NULL)
 	    goto error_return;
-	search_ctx->ffsc_fix_path.string[0] = NUL;
-	search_ctx->ffsc_fix_path.length = 0;
+	हानाप_ctx->ffsc_fix_path.string[0] = NUL;
+	हानाप_ctx->ffsc_fix_path.length = 0;
     }
 
     // create an absolute path
-    if (search_ctx->ffsc_start_dir.length
-	    + search_ctx->ffsc_fix_path.length + 3 >= MAXPATHL)
+    if (हानाप_ctx->ffsc_start_dir.length
+	    + हानाप_ctx->ffsc_fix_path.length + 3 >= MAXPATHL)
     {
 	emsg(_(e_path_too_long_for_completion));
 	goto error_return;
     }
 
-    add_sep = !after_pathsep(search_ctx->ffsc_start_dir.string,
-	search_ctx->ffsc_start_dir.string + search_ctx->ffsc_start_dir.length);
+    add_sep = !after_pathsep(हानाप_ctx->ffsc_start_dir.string,
+	हानाप_ctx->ffsc_start_dir.string + हानाप_ctx->ffsc_start_dir.length);
     ff_expand_buffer.length = vim_snprintf(
 	    (char *)ff_expand_buffer.string,
 	    MAXPATHL,
 	    "%s%s",
-	    search_ctx->ffsc_start_dir.string,
+	    हानाप_ctx->ffsc_start_dir.string,
 	    add_sep ? PATHSEPSTR : "");
 
     {
-	size_t	bufsize = ff_expand_buffer.length + search_ctx->ffsc_fix_path.length + 1;
+	size_t	bufsize = ff_expand_buffer.length + हानाप_ctx->ffsc_fix_path.length + 1;
 	char_u	*buf = alloc(bufsize);
 
 	if (buf == NULL)
@@ -593,53 +593,53 @@ vim_findfile_init(
 		bufsize,
 		"%s%s",
 		ff_expand_buffer.string,
-		search_ctx->ffsc_fix_path.string);
+		हानाप_ctx->ffsc_fix_path.string);
 	if (mch_isdir(buf))
 	{
-	    if (search_ctx->ffsc_fix_path.length > 0)
+	    if (हानाप_ctx->ffsc_fix_path.length > 0)
 	    {
-		add_sep = !after_pathsep(search_ctx->ffsc_fix_path.string,
-		    search_ctx->ffsc_fix_path.string + search_ctx->ffsc_fix_path.length);
+		add_sep = !after_pathsep(हानाप_ctx->ffsc_fix_path.string,
+		    हानाप_ctx->ffsc_fix_path.string + हानाप_ctx->ffsc_fix_path.length);
 		ff_expand_buffer.length += vim_snprintf(
 			(char *)ff_expand_buffer.string + ff_expand_buffer.length,
 			MAXPATHL - ff_expand_buffer.length,
 			"%s%s",
-			search_ctx->ffsc_fix_path.string,
+			हानाप_ctx->ffsc_fix_path.string,
 			add_sep ? PATHSEPSTR : "");
 	    }
 	}
 	else
 	{
-	    char_u *p = gettail(search_ctx->ffsc_fix_path.string);
-	    int    len = (int)search_ctx->ffsc_fix_path.length;
+	    char_u *p = gettail(हानाप_ctx->ffsc_fix_path.string);
+	    int    len = (int)हानाप_ctx->ffsc_fix_path.length;
 
-	    if (p > search_ctx->ffsc_fix_path.string)
+	    if (p > हानाप_ctx->ffsc_fix_path.string)
 	    {
 		// do not add '..' to the path and start upwards searching
-		len = (int)(p - search_ctx->ffsc_fix_path.string) - 1;
+		len = (int)(p - हानाप_ctx->ffsc_fix_path.string) - 1;
 		if ((len >= 2
-			&& STRNCMP(search_ctx->ffsc_fix_path.string, "..", 2) == 0)
-			&& (len == 2 || search_ctx->ffsc_fix_path.string[2] == PATHSEP))
+			&& STRNCMP(हानाप_ctx->ffsc_fix_path.string, "..", 2) == 0)
+			&& (len == 2 || हानाप_ctx->ffsc_fix_path.string[2] == PATHSEP))
 		{
 		    vim_free(buf);
 		    goto error_return;
 		}
 
-		add_sep = !after_pathsep(search_ctx->ffsc_fix_path.string,
-		    search_ctx->ffsc_fix_path.string + search_ctx->ffsc_fix_path.length);
+		add_sep = !after_pathsep(हानाप_ctx->ffsc_fix_path.string,
+		    हानाप_ctx->ffsc_fix_path.string + हानाप_ctx->ffsc_fix_path.length);
 		ff_expand_buffer.length += vim_snprintf(
 			(char *)ff_expand_buffer.string + ff_expand_buffer.length,
 			MAXPATHL - ff_expand_buffer.length,
 			"%.*s%s",
 			len,
-			search_ctx->ffsc_fix_path.string,
+			हानाप_ctx->ffsc_fix_path.string,
 			add_sep ? PATHSEPSTR : "");
 	    }
 
-	    if (search_ctx->ffsc_wc_path.string != NULL)
+	    if (हानाप_ctx->ffsc_wc_path.string != NULL)
 	    {
-		size_t	tempsize = (search_ctx->ffsc_fix_path.length - len)
-				+ search_ctx->ffsc_wc_path.length
+		size_t	tempsize = (हानाप_ctx->ffsc_fix_path.length - len)
+				+ हानाप_ctx->ffsc_wc_path.length
 				+ 1;
 		char_u	*temp = alloc(tempsize);
 
@@ -650,38 +650,38 @@ vim_findfile_init(
 		    goto error_return;
 		}
 
-		search_ctx->ffsc_wc_path.length = vim_snprintf(
+		हानाप_ctx->ffsc_wc_path.length = vim_snprintf(
 			    (char *)temp,
 			    tempsize,
 			    "%s%s",
-			    search_ctx->ffsc_fix_path.string + len,
-			    search_ctx->ffsc_wc_path.string);
-		vim_free(search_ctx->ffsc_wc_path.string);
-		search_ctx->ffsc_wc_path.string = temp;
+			    हानाप_ctx->ffsc_fix_path.string + len,
+			    हानाप_ctx->ffsc_wc_path.string);
+		vim_free(हानाप_ctx->ffsc_wc_path.string);
+		हानाप_ctx->ffsc_wc_path.string = temp;
 	    }
 	}
 	vim_free(buf);
     }
 
-    sptr = ff_create_stack_element(ff_expand_buffer.string,
+    sptr = ff_create_सालानसान_element(ff_expand_buffer.string,
 			ff_expand_buffer.length,
-			search_ctx->ffsc_wc_path.string,
-			search_ctx->ffsc_wc_path.length,
+			हानाप_ctx->ffsc_wc_path.string,
+			हानाप_ctx->ffsc_wc_path.length,
 			level,
 			0);
 
     if (sptr == NULL)
 	goto error_return;
 
-    ff_push(search_ctx, sptr);
+    ff_इतुलाक(हानाप_ctx, sptr);
 
-    search_ctx->ffsc_file_to_search.length = filenamelen;
-    search_ctx->ffsc_file_to_search.string = vim_strnsave(filename,
-	search_ctx->ffsc_file_to_search.length);
-    if (search_ctx->ffsc_file_to_search.string == NULL)
+    हानाप_ctx->ffsc_file_to_हानाप.length = filenamelen;
+    हानाप_ctx->ffsc_file_to_हानाप.string = vim_strnsave(filename,
+	हानाप_ctx->ffsc_file_to_हानाप.length);
+    if (हानाप_ctx->ffsc_file_to_हानाप.string == NULL)
 	goto error_return;
 
-    return search_ctx;
+    return हानाप_ctx;
 
 error_return:
     /*
@@ -689,7 +689,7 @@ error_return:
      * Even when the caller gave us a (perhaps valid) context we free it here,
      * as we might have already destroyed it.
      */
-    vim_findfile_cleanup(search_ctx);
+    vim_findfile_cleanup(हानाप_ctx);
     return NULL;
 }
 
@@ -754,18 +754,18 @@ vim_findfile_cleanup(void *ctx)
  * top of the list).
  */
     char_u *
-vim_findfile(void *search_ctx_arg)
+vim_findfile(void *हानाप_ctx_arg)
 {
     string_T	file_path;
     string_T	rest_of_wildcards;
     char_u	*path_end = NULL;
-    ff_stack_T	*stackp;
-    ff_search_ctx_T *search_ctx;
+    ff_सालानसान_T	*stackp;
+    ff_हानाप_ctx_T *हानाप_ctx;
 
-    if (search_ctx_arg == NULL)
+    if (हानाप_ctx_arg == NULL)
 	return NULL;
 
-    search_ctx = (ff_search_ctx_T *)search_ctx_arg;
+    हानाप_ctx = (ff_हानाप_ctx_T *)हानाप_ctx_arg;
 
     /*
      * filepath is used as buffer for various actions and as the storage to
@@ -775,9 +775,9 @@ vim_findfile(void *search_ctx_arg)
 	return NULL;
 
     // store the end of the start dir -- needed for upward search
-    if (search_ctx->ffsc_start_dir.string != NULL)
-	path_end = &search_ctx->ffsc_start_dir.string[
-					    search_ctx->ffsc_start_dir.length];
+    if (हानाप_ctx->ffsc_start_dir.string != NULL)
+	path_end = &हानाप_ctx->ffsc_start_dir.string[
+					    हानाप_ctx->ffsc_start_dir.length];
 
     // upward search loop
     for (;;)
@@ -791,7 +791,7 @@ vim_findfile(void *search_ctx_arg)
 		break;
 
 	    // get directory to work on from stack
-	    stackp = ff_pop(search_ctx);
+	    stackp = ff_आलिसिन(हानाप_ctx);
 	    if (stackp == NULL)
 		break;
 
@@ -815,7 +815,7 @@ vim_findfile(void *search_ctx_arg)
 	     * first time (hence stackp->ff_filearray == NULL)
 	     */
 	    if (stackp->ffs_filearray == NULL
-		    && ff_check_visited(&search_ctx->ffsc_dir_visited_list
+		    && ff_check_visited(&हानाप_ctx->ffsc_dir_visited_list
 							  ->ffvl_visited_list,
 			    stackp->ffs_fix_path.string,
 			    stackp->ffs_fix_path.length,
@@ -829,11 +829,11 @@ vim_findfile(void *search_ctx_arg)
 		    smsg("Already Searched: %s (%s)",
 				   stackp->ffs_fix_path.string, stackp->ffs_wc_path.string);
 		    // don't overwrite this either
-		    msg_puts("\n");
+		    मेनसाहे_puts("\n");
 		    verbose_leave_scroll();
 		}
 #endif
-		ff_free_stack_element(stackp);
+		ff_free_सालानसान_element(stackp);
 		continue;
 	    }
 #ifdef FF_VERBOSE
@@ -843,7 +843,7 @@ vim_findfile(void *search_ctx_arg)
 		smsg("Searching: %s (%s)",
 				   stackp->ffs_fix_path.string, stackp->ffs_wc_path.string);
 		// don't overwrite this either
-		msg_puts("\n");
+		मेनसाहे_puts("\n");
 		verbose_leave_scroll();
 	    }
 #endif
@@ -851,7 +851,7 @@ vim_findfile(void *search_ctx_arg)
 	    // check depth
 	    if (stackp->ffs_level <= 0)
 	    {
-		ff_free_stack_element(stackp);
+		ff_free_सालानसान_element(stackp);
 		continue;
 	    }
 
@@ -875,22 +875,22 @@ vim_findfile(void *search_ctx_arg)
 
 		// if we have a start dir copy it in
 		if (!vim_isAbsName(stackp->ffs_fix_path.string)
-						&& search_ctx->ffsc_start_dir.string)
+						&& हानाप_ctx->ffsc_start_dir.string)
 		{
-		    if (search_ctx->ffsc_start_dir.length + 1 < MAXPATHL)
+		    if (हानाप_ctx->ffsc_start_dir.length + 1 < MAXPATHL)
 		    {
-			int add_sep = !after_pathsep(search_ctx->ffsc_start_dir.string,
-			    search_ctx->ffsc_start_dir.string + search_ctx->ffsc_start_dir.length);
+			int add_sep = !after_pathsep(हानाप_ctx->ffsc_start_dir.string,
+			    हानाप_ctx->ffsc_start_dir.string + हानाप_ctx->ffsc_start_dir.length);
 			file_path.length = vim_snprintf(
 			    (char *)file_path.string,
 			    MAXPATHL,
 			    "%s%s",
-			    search_ctx->ffsc_start_dir.string,
+			    हानाप_ctx->ffsc_start_dir.string,
 			    add_sep ? PATHSEPSTR : "");
 		    }
 		    else
 		    {
-			ff_free_stack_element(stackp);
+			ff_free_सालानसान_element(stackp);
 			goto fail;
 		    }
 		}
@@ -909,7 +909,7 @@ vim_findfile(void *search_ctx_arg)
 		}
 		else
 		{
-		    ff_free_stack_element(stackp);
+		    ff_free_सालानसान_element(stackp);
 		    goto fail;
 		}
 
@@ -932,7 +932,7 @@ vim_findfile(void *search_ctx_arg)
 				file_path.string[file_path.length++] = '*';
 			    else
 			    {
-				ff_free_stack_element(stackp);
+				ff_free_सालानसान_element(stackp);
 				goto fail;
 			    }
 			}
@@ -977,7 +977,7 @@ vim_findfile(void *search_ctx_arg)
 			}
 			else
 			{
-			    ff_free_stack_element(stackp);
+			    ff_free_सालानसान_element(stackp);
 			    goto fail;
 			}
 		    }
@@ -1047,7 +1047,7 @@ vim_findfile(void *search_ctx_arg)
 			// prepare the filename to be checked for existence
 			// below
 			len = STRLEN(stackp->ffs_filearray[i]);
-			if (len + 1 + search_ctx->ffsc_file_to_search.length
+			if (len + 1 + हानाप_ctx->ffsc_file_to_हानाप.length
 									< MAXPATHL)
 			{
 			    int	add_sep = !after_pathsep(stackp->ffs_filearray[i],
@@ -1058,11 +1058,11 @@ vim_findfile(void *search_ctx_arg)
 				    "%s%s%s",
 				    stackp->ffs_filearray[i],
 				    add_sep ? PATHSEPSTR : "",
-				    search_ctx->ffsc_file_to_search.string);
+				    हानाप_ctx->ffsc_file_to_हानाप.string);
 			}
 			else
 			{
-			    ff_free_stack_element(stackp);
+			    ff_free_सालानसान_element(stackp);
 			    goto fail;
 			}
 
@@ -1071,7 +1071,7 @@ vim_findfile(void *search_ctx_arg)
 			 * from 'suffixesadd'.
 			 */
 			len = file_path.length;
-			if (search_ctx->ffsc_tagfile)
+			if (हानाप_ctx->ffsc_tagfile)
 			    suf = (char_u *)"";
 			else
 			    suf = curbuf->b_p_sua;
@@ -1080,14 +1080,14 @@ vim_findfile(void *search_ctx_arg)
 			    // if file exists and we didn't already find it
 			    if ((path_with_url(file_path.string)
 				  || (mch_getperm(file_path.string) >= 0
-				      && (search_ctx->ffsc_find_what
+				      && (हानाप_ctx->ffsc_find_what
 							      == FINDFILE_BOTH
-					  || ((search_ctx->ffsc_find_what
+					  || ((हानाप_ctx->ffsc_find_what
 							      == FINDFILE_DIR)
 						   == mch_isdir(file_path.string)))))
 #ifndef FF_VERBOSE
 				    && (ff_check_visited(
-					    &search_ctx->ffsc_visited_list
+					    &हानाप_ctx->ffsc_visited_list
 							   ->ffvl_visited_list,
 					    file_path.string,
 					    file_path.length,
@@ -1097,7 +1097,7 @@ vim_findfile(void *search_ctx_arg)
 			    {
 #ifdef FF_VERBOSE
 				if (ff_check_visited(
-					    &search_ctx->ffsc_visited_list
+					    &हानाप_ctx->ffsc_visited_list
 							   ->ffvl_visited_list,
 					      file_path.string,
 					      file_path.length,
@@ -1108,7 +1108,7 @@ vim_findfile(void *search_ctx_arg)
 					verbose_enter_scroll();
 					smsg("Already: %s", file_path.string);
 					// don't overwrite this either
-					msg_puts("\n");
+					मेनसाहे_puts("\n");
 					verbose_leave_scroll();
 				    }
 				    continue;
@@ -1117,7 +1117,7 @@ vim_findfile(void *search_ctx_arg)
 
 				// push dir to examine rest of subdirs later
 				stackp->ffs_filearray_cur = i + 1;
-				ff_push(search_ctx, stackp);
+				ff_इतुलाक(हानाप_ctx, stackp);
 
 				if (!path_with_url(file_path.string))
 				    file_path.length = simplify_filename(file_path.string);
@@ -1143,7 +1143,7 @@ vim_findfile(void *search_ctx_arg)
 				    verbose_enter_scroll();
 				    smsg("HIT: %s", file_path.string);
 				    // don't overwrite this either
-				    msg_puts("\n");
+				    मेनसाहे_puts("\n");
 				    verbose_leave_scroll();
 				}
 #endif
@@ -1171,8 +1171,8 @@ vim_findfile(void *search_ctx_arg)
 			if (!mch_isdir(stackp->ffs_filearray[i]))
 			    continue;	// not a directory
 
-			ff_push(search_ctx,
-				ff_create_stack_element(
+			ff_इतुलाक(हानाप_ctx,
+				ff_create_सालानसान_element(
 						     stackp->ffs_filearray[i],
 						     STRLEN(stackp->ffs_filearray[i]),
 						     rest_of_wildcards.string,
@@ -1200,8 +1200,8 @@ vim_findfile(void *search_ctx_arg)
 			continue; // don't repush same directory
 		    if (!mch_isdir(stackp->ffs_filearray[i]))
 			continue;   // not a directory
-		    ff_push(search_ctx,
-			    ff_create_stack_element(
+		    ff_इतुलाक(हानाप_ctx,
+			    ff_create_सालानसान_element(
 				stackp->ffs_filearray[i],
 				STRLEN(stackp->ffs_filearray[i]),
 				stackp->ffs_wc_path.string,
@@ -1211,63 +1211,63 @@ vim_findfile(void *search_ctx_arg)
 	    }
 
 	    // we are done with the current directory
-	    ff_free_stack_element(stackp);
+	    ff_free_सालानसान_element(stackp);
 	}
 
 	// If we reached this, we didn't find anything downwards.
 	// Let's check if we should do an upward search.
-	if (search_ctx->ffsc_start_dir.string
-		&& search_ctx->ffsc_stopdirs_v != NULL && !got_int)
+	if (हानाप_ctx->ffsc_start_dir.string
+		&& हानाप_ctx->ffsc_stopdirs_v != NULL && !got_int)
 	{
-	    ff_stack_T  *sptr;
+	    ff_सालानसान_T  *sptr;
 	    // path_end may point to the NUL or the previous path separator
-	    int plen = (path_end - search_ctx->ffsc_start_dir.string)
+	    int plen = (path_end - हानाप_ctx->ffsc_start_dir.string)
 							  + (*path_end != NUL);
 
 	    // is the last starting directory in the stop list?
-	    if (ff_path_in_stoplist(search_ctx->ffsc_start_dir.string,
-				    plen, search_ctx->ffsc_stopdirs_v) == TRUE)
+	    if (ff_path_in_stoplist(हानाप_ctx->ffsc_start_dir.string,
+				    plen, हानाप_ctx->ffsc_stopdirs_v) == TRUE)
 		break;
 
 	    // cut of last dir
-	    while (path_end > search_ctx->ffsc_start_dir.string
+	    while (path_end > हानाप_ctx->ffsc_start_dir.string
 						  && vim_ispathsep(*path_end))
 		path_end--;
-	    while (path_end > search_ctx->ffsc_start_dir.string
+	    while (path_end > हानाप_ctx->ffsc_start_dir.string
 					      && !vim_ispathsep(path_end[-1]))
 		path_end--;
 	    *path_end = NUL;
 
 	    // we may have shortened search_ctx->ffsc_start_dir, so update it's length
-	    search_ctx->ffsc_start_dir.length = (size_t)(path_end - search_ctx->ffsc_start_dir.string);
+	    हानाप_ctx->ffsc_start_dir.length = (size_t)(path_end - हानाप_ctx->ffsc_start_dir.string);
 	    path_end--;
 
-	    if (*search_ctx->ffsc_start_dir.string == NUL)
+	    if (*हानाप_ctx->ffsc_start_dir.string == NUL)
 		break;
 
-	    if (search_ctx->ffsc_start_dir.length + 1
-		    + search_ctx->ffsc_fix_path.length < MAXPATHL)
+	    if (हानाप_ctx->ffsc_start_dir.length + 1
+		    + हानाप_ctx->ffsc_fix_path.length < MAXPATHL)
 	    {
-		int add_sep = !after_pathsep(search_ctx->ffsc_start_dir.string,
-			    search_ctx->ffsc_start_dir.string + search_ctx->ffsc_start_dir.length);
+		int add_sep = !after_pathsep(हानाप_ctx->ffsc_start_dir.string,
+			    हानाप_ctx->ffsc_start_dir.string + हानाप_ctx->ffsc_start_dir.length);
 		file_path.length = vim_snprintf(
 			(char *)file_path.string,
 			MAXPATHL,
 			"%s%s%s",
-			search_ctx->ffsc_start_dir.string,
+			हानाप_ctx->ffsc_start_dir.string,
 			add_sep ? PATHSEPSTR : "",
-			search_ctx->ffsc_fix_path.string);
+			हानाप_ctx->ffsc_fix_path.string);
 	    }
 	    else
 		goto fail;
 
 	    // create a new stack entry
-	    sptr = ff_create_stack_element(file_path.string, file_path.length,
-		    search_ctx->ffsc_wc_path.string, search_ctx->ffsc_wc_path.length,
-		    search_ctx->ffsc_level, 0);
+	    sptr = ff_create_सालानसान_element(file_path.string, file_path.length,
+		    हानाप_ctx->ffsc_wc_path.string, हानाप_ctx->ffsc_wc_path.length,
+		    हानाप_ctx->ffsc_level, 0);
 	    if (sptr == NULL)
 		break;
-	    ff_push(search_ctx, sptr);
+	    ff_इतुलाक(हानाप_ctx, sptr);
 	}
 	else
 	    break;
@@ -1283,16 +1283,16 @@ fail:
  * Can handle it if the passed search_context is NULL;
  */
     static void
-vim_findfile_free_visited(void *search_ctx_arg)
+vim_findfile_free_visited(void *हानाप_ctx_arg)
 {
-    ff_search_ctx_T *search_ctx;
+    ff_हानाप_ctx_T *हानाप_ctx;
 
-    if (search_ctx_arg == NULL)
+    if (हानाप_ctx_arg == NULL)
 	return;
 
-    search_ctx = (ff_search_ctx_T *)search_ctx_arg;
-    vim_findfile_free_visited_list(&search_ctx->ffsc_visited_lists_list);
-    vim_findfile_free_visited_list(&search_ctx->ffsc_dir_visited_lists_list);
+    हानाप_ctx = (ff_हानाप_ctx_T *)हानाप_ctx_arg;
+    vim_findfile_free_visited_list(&हानाप_ctx->ffsc_visited_lists_list);
+    vim_findfile_free_visited_list(&हानाप_ctx->ffsc_dir_visited_lists_list);
 }
 
     static void
@@ -1354,7 +1354,7 @@ ff_get_visited_list(
 		    smsg("ff_get_visited_list: FOUND list for %s",
 								    filename);
 		    // don't overwrite this either
-		    msg_puts("\n");
+		    मेनसाहे_puts("\n");
 		    verbose_leave_scroll();
 		}
 #endif
@@ -1370,7 +1370,7 @@ ff_get_visited_list(
 	verbose_enter_scroll();
 	smsg("ff_get_visited_list: new list for %s", filename);
 	// don't overwrite this either
-	msg_puts("\n");
+	मेनसाहे_puts("\n");
 	verbose_leave_scroll();
     }
 #endif
@@ -1540,8 +1540,8 @@ ff_check_visited(
 /*
  * create stack element from given path pieces
  */
-    static ff_stack_T *
-ff_create_stack_element(
+    static ff_सालानसान_T *
+ff_create_सालानसान_element(
     char_u	*fix_part,
     size_t	fix_partlen,
     char_u	*wc_part,
@@ -1549,9 +1549,9 @@ ff_create_stack_element(
     int		level,
     int		star_star_empty)
 {
-    ff_stack_T	*new;
+    ff_सालानसान_T	*new;
 
-    new = ALLOC_ONE(ff_stack_T);
+    new = ALLOC_ONE(ff_सालानसान_T);
     if (new == NULL)
 	return NULL;
 
@@ -1582,7 +1582,7 @@ ff_create_stack_element(
 
     if (new->ffs_fix_path.string == NULL || new->ffs_wc_path.string == NULL)
     {
-	ff_free_stack_element(new);
+	ff_free_सालानसान_element(new);
 	new = NULL;
     }
 
@@ -1593,29 +1593,29 @@ ff_create_stack_element(
  * Push a dir on the directory stack.
  */
     static void
-ff_push(ff_search_ctx_T *search_ctx, ff_stack_T *stack_ptr)
+ff_इतुलाक(ff_हानाप_ctx_T *हानाप_ctx, ff_सालानसान_T *सालानसान_ptr)
 {
     // check for NULL pointer, not to return an error to the user, but
     // to prevent a crash
-    if (stack_ptr == NULL)
+    if (सालानसान_ptr == NULL)
 	return;
 
-    stack_ptr->ffs_prev = search_ctx->ffsc_stack_ptr;
-    search_ctx->ffsc_stack_ptr = stack_ptr;
+    सालानसान_ptr->ffs_prev = हानाप_ctx->ffsc_सालानसान_ptr;
+    हानाप_ctx->ffsc_सालानसान_ptr = सालानसान_ptr;
 }
 
 /*
  * Pop a dir from the directory stack.
  * Returns NULL if stack is empty.
  */
-    static ff_stack_T *
-ff_pop(ff_search_ctx_T *search_ctx)
+    static ff_सालानसान_T *
+ff_आलिसिन(ff_हानाप_ctx_T *हानाप_ctx)
 {
-    ff_stack_T  *sptr;
+    ff_सालानसान_T  *sptr;
 
-    sptr = search_ctx->ffsc_stack_ptr;
-    if (search_ctx->ffsc_stack_ptr != NULL)
-	search_ctx->ffsc_stack_ptr = search_ctx->ffsc_stack_ptr->ffs_prev;
+    sptr = हानाप_ctx->ffsc_सालानसान_ptr;
+    if (हानाप_ctx->ffsc_सालानसान_ptr != NULL)
+	हानाप_ctx->ffsc_सालानसान_ptr = हानाप_ctx->ffsc_सालानसान_ptr->ffs_prev;
 
     return sptr;
 }
@@ -1624,48 +1624,48 @@ ff_pop(ff_search_ctx_T *search_ctx)
  * free the given stack element
  */
     static void
-ff_free_stack_element(ff_stack_T *stack_ptr)
+ff_free_सालानसान_element(ff_सालानसान_T *सालानसान_ptr)
 {
     // VIM_CLEAR_STRING handles possible NULL pointers
-    VIM_CLEAR_STRING(stack_ptr->ffs_fix_path);
-    VIM_CLEAR_STRING(stack_ptr->ffs_wc_path);
+    VIM_CLEAR_STRING(सालानसान_ptr->ffs_fix_path);
+    VIM_CLEAR_STRING(सालानसान_ptr->ffs_wc_path);
 
-    if (stack_ptr->ffs_filearray != NULL)
-	FreeWild(stack_ptr->ffs_filearray_size, stack_ptr->ffs_filearray);
+    if (सालानसान_ptr->ffs_filearray != NULL)
+	FreeWild(सालानसान_ptr->ffs_filearray_size, सालानसान_ptr->ffs_filearray);
 
-    vim_free(stack_ptr);
+    vim_free(सालानसान_ptr);
 }
 
 /*
  * Clear the search context, but NOT the visited list.
  */
     static void
-ff_clear(ff_search_ctx_T *search_ctx)
+ff_clear(ff_हानाप_ctx_T *हानाप_ctx)
 {
-    ff_stack_T   *sptr;
+    ff_सालानसान_T   *sptr;
 
     // clear up stack
-    while ((sptr = ff_pop(search_ctx)) != NULL)
-	ff_free_stack_element(sptr);
+    while ((sptr = ff_आलिसिन(हानाप_ctx)) != NULL)
+	ff_free_सालानसान_element(sptr);
 
-    if (search_ctx->ffsc_stopdirs_v != NULL)
+    if (हानाप_ctx->ffsc_stopdirs_v != NULL)
     {
 	int  i = 0;
 
-	while (search_ctx->ffsc_stopdirs_v[i].string != NULL)
+	while (हानाप_ctx->ffsc_stopdirs_v[i].string != NULL)
 	{
-	    vim_free(search_ctx->ffsc_stopdirs_v[i].string);
+	    vim_free(हानाप_ctx->ffsc_stopdirs_v[i].string);
 	    i++;
 	}
-	VIM_CLEAR(search_ctx->ffsc_stopdirs_v);
+	VIM_CLEAR(हानाप_ctx->ffsc_stopdirs_v);
     }
 
     // reset everything
-    VIM_CLEAR_STRING(search_ctx->ffsc_file_to_search);
-    VIM_CLEAR_STRING(search_ctx->ffsc_start_dir);
-    VIM_CLEAR_STRING(search_ctx->ffsc_fix_path);
-    VIM_CLEAR_STRING(search_ctx->ffsc_wc_path);
-    search_ctx->ffsc_level = 0;
+    VIM_CLEAR_STRING(हानाप_ctx->ffsc_file_to_हानाप);
+    VIM_CLEAR_STRING(हानाप_ctx->ffsc_start_dir);
+    VIM_CLEAR_STRING(हानाप_ctx->ffsc_fix_path);
+    VIM_CLEAR_STRING(हानाप_ctx->ffsc_wc_path);
+    हानाप_ctx->ffsc_level = 0;
 }
 
 /*
@@ -1730,12 +1730,12 @@ find_file_in_path(
     int		first,		// use count'th matching file name
     char_u	*rel_fname,	// file name searching relative to
     char_u	**file_to_find,	// in/out: modified copy of file name
-    char	**search_ctx)	// in/out: state of the search
+    char	**हानाप_ctx)	// in/out: state of the search
 {
     return find_file_in_path_option(ptr, len, options, first,
 	    *curbuf->b_p_path == NUL ? p_path : curbuf->b_p_path,
 	    FINDFILE_BOTH, rel_fname, curbuf->b_p_sua,
-	    file_to_find, search_ctx);
+	    file_to_find, हानाप_ctx);
 }
 
 #if defined(EXITFREE)
@@ -1764,11 +1764,11 @@ find_directory_in_path(
     int		options,
     char_u	*rel_fname,	// file name searching relative to
     char_u	**file_to_find,	// in/out: modified copy of file name
-    char	**search_ctx)	// in/out: state of the search
+    char	**हानाप_ctx)	// in/out: state of the search
 {
     return find_file_in_path_option(ptr, len, options, TRUE, p_cdpath,
 				       FINDFILE_DIR, rel_fname, (char_u *)"",
-				       file_to_find, search_ctx);
+				       file_to_find, हानाप_ctx);
 }
 
     char_u *
@@ -1782,9 +1782,9 @@ find_file_in_path_option(
     char_u	*rel_fname,	// file name we are looking relative to.
     char_u	*suffixes,	// list of suffixes, 'suffixesadd' option
     char_u	**file_to_find,	// in/out: modified copy of file name
-    char	**search_ctx_arg) // in/out: state of the search
+    char	**हानाप_ctx_arg) // in/out: state of the search
 {
-    ff_search_ctx_T	**search_ctx = (ff_search_ctx_T **)search_ctx_arg;
+    ff_हानाप_ctx_T	**हानाप_ctx = (ff_हानाप_ctx_T **)हानाप_ctx_arg;
     static char_u	*dir;
     static int		did_findfile_init = FALSE;
     char_u		*file_name = NULL;
@@ -1930,7 +1930,7 @@ find_file_in_path_option(
 	if (first == TRUE)
 	{
 	    // vim_findfile_free_visited can handle a possible NULL pointer
-	    vim_findfile_free_visited(*search_ctx);
+	    vim_findfile_free_visited(*हानाप_ctx);
 	    dir = path_option;
 	    did_findfile_init = FALSE;
 	}
@@ -1939,7 +1939,7 @@ find_file_in_path_option(
 	{
 	    if (did_findfile_init)
 	    {
-		file_name = vim_findfile(*search_ctx);
+		file_name = vim_findfile(*हानाप_ctx);
 		if (file_name != NULL)
 		    break;
 
@@ -1954,8 +1954,8 @@ find_file_in_path_option(
 		{
 		    // We searched all paths of the option, now we can
 		    // free the search context.
-		    vim_findfile_cleanup(*search_ctx);
-		    *search_ctx = NULL;
+		    vim_findfile_cleanup(*हानाप_ctx);
+		    *हानाप_ctx = NULL;
 		    break;
 		}
 
@@ -1968,10 +1968,10 @@ find_file_in_path_option(
 
 		// get the stopdir string
 		r_ptr = vim_findfile_stopdir(buf);
-		*search_ctx = vim_findfile_init(buf, *file_to_find, file_to_findlen,
+		*हानाप_ctx = vim_findfile_init(buf, *file_to_find, file_to_findlen,
 					    r_ptr, 100, FALSE, find_what,
-					   *search_ctx, FALSE, rel_fname);
-		if (*search_ctx != NULL)
+					   *हानाप_ctx, FALSE, rel_fname);
+		if (*हानाप_ctx != NULL)
 		    did_findfile_init = TRUE;
 		vim_free(buf);
 	    }
@@ -2009,7 +2009,7 @@ theend:
  * Returns the name in allocated memory, NULL for failure.
  */
     char_u *
-grab_file_name(long count, linenr_T *file_lnum)
+grab_file_name(long बिलांग, linenr_T *file_lnum)
 {
     int options = FNAME_MESS|FNAME_EXP|FNAME_REL|FNAME_UNESC;
 
@@ -2028,9 +2028,9 @@ grab_file_name(long count, linenr_T *file_lnum)
 	    *file_lnum = getdigits(&p);
 	}
 	return find_file_name_in_path(ptr, len, options,
-						     count, curbuf->b_ffname);
+						     बिलांग, curbuf->b_ffname);
     }
-    return file_name_at_cursor(options | FNAME_HYP, count, file_lnum);
+    return file_name_at_cursor(options | FNAME_HYP, बिलांग, file_lnum);
 }
 
 /*
@@ -2047,10 +2047,10 @@ grab_file_name(long count, linenr_T *file_lnum)
  * FNAME_INCL	    apply "includeexpr"
  */
     char_u *
-file_name_at_cursor(int options, long count, linenr_T *file_lnum)
+file_name_at_cursor(int options, long बिलांग, linenr_T *file_lnum)
 {
-    return file_name_in_line(ml_get_curline(),
-		      curwin->w_cursor.col, options, count, curbuf->b_ffname,
+    return file_name_in_लिन्या(ml_get_curline(),
+		      curwin->w_cursor.col, options, बिलांग, curbuf->b_ffname,
 		      file_lnum);
 }
 
@@ -2059,11 +2059,11 @@ file_name_at_cursor(int options, long count, linenr_T *file_lnum)
  * Otherwise like file_name_at_cursor().
  */
     char_u *
-file_name_in_line(
-    char_u	*line,
+file_name_in_लिन्या(
+    char_u	*लिन्या,
     int		col,
     int		options,
-    long	count,
+    long	बिलांग,
     char_u	*rel_fname,	// file we are searching relative to
     linenr_T	*file_lnum)	// line number after the file name
 {
@@ -2075,7 +2075,7 @@ file_name_in_line(
     /*
      * search forward for what could be the start of a file name
      */
-    ptr = line + col;
+    ptr = लिन्या + col;
     while (*ptr != NUL && !vim_isfilec(*ptr))
 	MB_PTR_ADV(ptr);
     if (*ptr == NUL)		// nothing found
@@ -2089,9 +2089,9 @@ file_name_in_line(
      * Search backward for first char of the file name.
      * Go one char back to ":" before "//" even when ':' is not in 'isfname'.
      */
-    while (ptr > line)
+    while (ptr > लिन्या)
     {
-	if (has_mbyte && (len = (*mb_head_off)(line, ptr - 1)) > 0)
+	if (has_mbyte && (len = (*mb_head_off)(लिन्या, ptr - 1)) > 0)
 	    ptr -= len + 1;
 	else if (vim_isfilec(ptr[-1])
 		|| ((options & FNAME_HYP) && path_is_url(ptr - 1)))
@@ -2152,7 +2152,7 @@ file_name_in_line(
 	else
 	{
 	    // no match with english, try localized
-	    match_text = _(line_msg);
+	    match_text = _(लिन्या_मेनसाहे);
 	    match_textlen = STRLEN(match_text);
 
 	    if (STRNCMP(p, match_text, match_textlen) == 0)
@@ -2170,7 +2170,7 @@ file_name_in_line(
 	}
     }
 
-    return find_file_name_in_path(ptr, len, options, count, rel_fname);
+    return find_file_name_in_path(ptr, len, options, बिलांग, rel_fname);
 }
 
 #if defined(FEAT_FIND_ID) && defined(FEAT_EVAL)
@@ -2202,7 +2202,7 @@ find_file_name_in_path(
     char_u	*ptr,
     int		len,
     int		options,
-    long	count,
+    long	बिलांग,
     char_u	*rel_fname)	// file we are searching relative to
 {
     char_u	*file_name;
@@ -2229,10 +2229,10 @@ find_file_name_in_path(
     if (options & FNAME_EXP)
     {
 	char_u	*file_to_find = NULL;
-	char	*search_ctx = NULL;
+	char	*हानाप_ctx = NULL;
 
 	file_name = find_file_in_path(ptr, len, options & ~FNAME_MESS,
-				  TRUE, rel_fname, &file_to_find, &search_ctx);
+				  TRUE, rel_fname, &file_to_find, &हानाप_ctx);
 
 #if defined(FEAT_FIND_ID) && defined(FEAT_EVAL)
 	/*
@@ -2248,7 +2248,7 @@ find_file_name_in_path(
 		ptr = tofree;
 		len = (int)STRLEN(ptr);
 		file_name = find_file_in_path(ptr, len, options & ~FNAME_MESS,
-				  TRUE, rel_fname, &file_to_find, &search_ctx);
+				  TRUE, rel_fname, &file_to_find, &हानाप_ctx);
 	    }
 	}
 #endif
@@ -2262,15 +2262,15 @@ find_file_name_in_path(
 
 	// Repeat finding the file "count" times.  This matters when it
 	// appears several times in the path.
-	while (file_name != NULL && --count > 0)
+	while (file_name != NULL && --बिलांग > 0)
 	{
 	    vim_free(file_name);
 	    file_name = find_file_in_path(ptr, len, options, FALSE, rel_fname,
-						   &file_to_find, &search_ctx);
+						   &file_to_find, &हानाप_ctx);
 	}
 
 	vim_free(file_to_find);
-	vim_findfile_cleanup(search_ctx);
+	vim_findfile_cleanup(हानाप_ctx);
     }
     else
 	file_name = vim_strnsave(ptr, len);

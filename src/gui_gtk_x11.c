@@ -177,18 +177,18 @@ static GdkAtom vimenc_mt_atom = GDK_NONE;	// Vim's extended selection
  * NOTE: when changing this, the table in gui_x11.c probably needs the same
  * change!
  */
-static struct special_key
+static struct special_सुसि
 {
-    guint key_sym;
+    guint सुसि_sym;
     char_u code0;
     char_u code1;
 }
-const special_keys[] =
+const special_मगा_सुसि[] =
 {
     {GDK_Up,		'k', 'u'},
     {GDK_Down,		'k', 'd'},
-    {GDK_Left,		'k', 'l'},
-    {GDK_Right,		'k', 'r'},
+    {GDK_कालिवा,		'k', 'l'},
+    {GDK_कानान,		'k', 'r'},
     {GDK_F1,		'k', '1'},
     {GDK_F2,		'k', '2'},
     {GDK_F3,		'k', '3'},
@@ -232,7 +232,7 @@ const special_keys[] =
     {GDK_Help,		'%', '1'},
     {GDK_Undo,		'&', '8'},
     {GDK_BackSpace,	'k', 'b'},
-    {GDK_Insert,	'k', 'I'},
+    {GDK_इसिंगित,	'k', 'I'},
     {GDK_Delete,	'k', 'D'},
     {GDK_3270_BackTab,	'k', 'B'},
     {GDK_Clear,		'k', 'C'},
@@ -240,13 +240,13 @@ const special_keys[] =
     {GDK_End,		'@', '7'},
     {GDK_Prior,		'k', 'P'},
     {GDK_Next,		'k', 'N'},
-    {GDK_Print,		'%', '9'},
+    {GDK_इलिम्बाग,		'%', '9'},
     // Keypad keys:
-    {GDK_KP_Left,	'k', 'l'},
-    {GDK_KP_Right,	'k', 'r'},
+    {GDK_KP_कालिवा,	'k', 'l'},
+    {GDK_KP_कानान,	'k', 'r'},
     {GDK_KP_Up,		'k', 'u'},
     {GDK_KP_Down,	'k', 'd'},
-    {GDK_KP_Insert,	KS_EXTRA, (char_u)KE_KINS},
+    {GDK_KP_इसिंगित,	KS_EXTRA, (char_u)KE_KINS},
     {GDK_KP_Delete,	KS_EXTRA, (char_u)KE_KDEL},
     {GDK_KP_Home,	'K', '1'},
     {GDK_KP_End,	'K', '4'},
@@ -290,7 +290,7 @@ const special_keys[] =
 #define ARG_XRM		10	// ignored
 #define ARG_MENUFONT	11	// ignored
 #define ARG_INDEX_MASK	0x00ff
-#define ARG_HAS_VALUE	0x0100	// a value is expected after the argument
+#define ARG_HAS_हालागा	0x0100	// a value is expected after the argument
 #define ARG_NEEDS_GUI	0x0200	// need to initialize the GUI for this
 #define ARG_FOR_GTK	0x0400	// argument is handled by GTK+ or GNOME
 #define ARG_COMPAT_LONG	0x0800	// accept -foo but substitute with --foo
@@ -313,51 +313,51 @@ cmdline_option_T;
 static const cmdline_option_T cmdline_options[] =
 {
     // We handle these options ourselves
-    {"-fn",		ARG_FONT|ARG_HAS_VALUE},
-    {"-font",		ARG_FONT|ARG_HAS_VALUE},
-    {"-geom",		ARG_GEOMETRY|ARG_HAS_VALUE},
-    {"-geometry",	ARG_GEOMETRY|ARG_HAS_VALUE},
+    {"-fn",		ARG_FONT|ARG_HAS_हालागा},
+    {"-font",		ARG_FONT|ARG_HAS_हालागा},
+    {"-geom",		ARG_GEOMETRY|ARG_HAS_हालागा},
+    {"-geometry",	ARG_GEOMETRY|ARG_HAS_हालागा},
     {"-rv",		ARG_REVERSE},
     {"-reverse",	ARG_REVERSE},
     {"+rv",		ARG_NOREVERSE},
     {"+reverse",	ARG_NOREVERSE},
-    {"-bg",		ARG_BACKGROUND|ARG_HAS_VALUE},
-    {"-background",	ARG_BACKGROUND|ARG_HAS_VALUE},
-    {"-fg",		ARG_FOREGROUND|ARG_HAS_VALUE},
-    {"-foreground",	ARG_FOREGROUND|ARG_HAS_VALUE},
+    {"-bg",		ARG_BACKGROUND|ARG_HAS_हालागा},
+    {"-background",	ARG_BACKGROUND|ARG_HAS_हालागा},
+    {"-fg",		ARG_FOREGROUND|ARG_HAS_हालागा},
+    {"-foreground",	ARG_FOREGROUND|ARG_HAS_हालागा},
     {"-iconic",		ARG_ICONIC},
-    {"--role",		ARG_ROLE|ARG_HAS_VALUE},
+    {"--role",		ARG_ROLE|ARG_HAS_हालागा},
 #ifdef FEAT_NETBEANS_INTG
     {"-nb",		ARG_NETBEANS},	      // non-standard value format
-    {"-xrm",		ARG_XRM|ARG_HAS_VALUE},		// not implemented
-    {"-mf",		ARG_MENUFONT|ARG_HAS_VALUE},	// not implemented
-    {"-menufont",	ARG_MENUFONT|ARG_HAS_VALUE},	// not implemented
+    {"-xrm",		ARG_XRM|ARG_HAS_हालागा},		// not implemented
+    {"-mf",		ARG_MENUFONT|ARG_HAS_हालागा},	// not implemented
+    {"-menufont",	ARG_MENUFONT|ARG_HAS_हालागा},	// not implemented
 #endif
     // Arguments handled by GTK (and GNOME) internally.
     {"--g-fatal-warnings",	ARG_FOR_GTK},
-    {"--gdk-debug",		ARG_FOR_GTK|ARG_HAS_VALUE},
-    {"--gdk-no-debug",		ARG_FOR_GTK|ARG_HAS_VALUE},
-    {"--gtk-debug",		ARG_FOR_GTK|ARG_HAS_VALUE},
-    {"--gtk-no-debug",		ARG_FOR_GTK|ARG_HAS_VALUE},
-    {"--gtk-module",		ARG_FOR_GTK|ARG_HAS_VALUE},
+    {"--gdk-debug",		ARG_FOR_GTK|ARG_HAS_हालागा},
+    {"--gdk-no-debug",		ARG_FOR_GTK|ARG_HAS_हालागा},
+    {"--gtk-debug",		ARG_FOR_GTK|ARG_HAS_हालागा},
+    {"--gtk-no-debug",		ARG_FOR_GTK|ARG_HAS_हालागा},
+    {"--gtk-module",		ARG_FOR_GTK|ARG_HAS_हालागा},
     {"--sync",			ARG_FOR_GTK},
-    {"--display",		ARG_FOR_GTK|ARG_HAS_VALUE|ARG_COMPAT_LONG},
-    {"--name",			ARG_FOR_GTK|ARG_HAS_VALUE|ARG_COMPAT_LONG},
-    {"--class",			ARG_FOR_GTK|ARG_HAS_VALUE|ARG_COMPAT_LONG},
-    {"--screen",		ARG_FOR_GTK|ARG_HAS_VALUE},
-    {"--gxid-host",		ARG_FOR_GTK|ARG_HAS_VALUE},
-    {"--gxid-port",		ARG_FOR_GTK|ARG_HAS_VALUE},
+    {"--display",		ARG_FOR_GTK|ARG_HAS_हालागा|ARG_COMPAT_LONG},
+    {"--name",			ARG_FOR_GTK|ARG_HAS_हालागा|ARG_COMPAT_LONG},
+    {"--class",			ARG_FOR_GTK|ARG_HAS_हालागा|ARG_COMPAT_LONG},
+    {"--screen",		ARG_FOR_GTK|ARG_HAS_हालागा},
+    {"--gxid-host",		ARG_FOR_GTK|ARG_HAS_हालागा},
+    {"--gxid-port",		ARG_FOR_GTK|ARG_HAS_हालागा},
 #ifdef FEAT_GUI_GNOME
-    {"--load-modules",		ARG_FOR_GTK|ARG_HAS_VALUE},
-    {"--sm-client-id",		ARG_FOR_GTK|ARG_HAS_VALUE},
-    {"--sm-config-prefix",	ARG_FOR_GTK|ARG_HAS_VALUE},
+    {"--load-modules",		ARG_FOR_GTK|ARG_HAS_हालागा},
+    {"--sm-client-id",		ARG_FOR_GTK|ARG_HAS_हालागा},
+    {"--sm-config-prefix",	ARG_FOR_GTK|ARG_HAS_हालागा},
     {"--sm-disable",		ARG_FOR_GTK},
-    {"--oaf-ior-fd",		ARG_FOR_GTK|ARG_HAS_VALUE},
-    {"--oaf-activate-iid",	ARG_FOR_GTK|ARG_HAS_VALUE},
+    {"--oaf-ior-fd",		ARG_FOR_GTK|ARG_HAS_हालागा},
+    {"--oaf-activate-iid",	ARG_FOR_GTK|ARG_HAS_हालागा},
     {"--oaf-private",		ARG_FOR_GTK},
     {"--enable-sound",		ARG_FOR_GTK},
     {"--disable-sound",		ARG_FOR_GTK},
-    {"--espeaker",		ARG_FOR_GTK|ARG_HAS_VALUE},
+    {"--espeaker",		ARG_FOR_GTK|ARG_HAS_हालागा},
     {"-?",			ARG_FOR_GTK|ARG_NEEDS_GUI},
     {"--help",			ARG_FOR_GTK|ARG_NEEDS_GUI|ARG_KEEP},
     {"--usage",			ARG_FOR_GTK|ARG_NEEDS_GUI},
@@ -602,7 +602,7 @@ gui_mch_prepare(int *argc, char **argv)
 		if (argv[i][len] == '\0')
 		    break;
 		// allow --foo=bar style
-		if (argv[i][len] == '=' && (option->flags & ARG_HAS_VALUE))
+		if (argv[i][len] == '=' && (option->flags & ARG_HAS_हालागा))
 		    break;
 #ifdef FEAT_NETBEANS_INTG
 		// darn, -nb has non-standard syntax
@@ -634,16 +634,16 @@ gui_mch_prepare(int *argc, char **argv)
 	}
 	else
 	{
-	    char *value = NULL;
+	    char *हालागा = NULL;
 
 	    // Extract the option's value if there is one.
 	    // Accept both "--foo bar" and "--foo=bar" style.
-	    if (option->flags & ARG_HAS_VALUE)
+	    if (option->flags & ARG_HAS_हालागा)
 	    {
 		if (argv[i][len] == '=')
-		    value = &argv[i][len + 1];
+		    हालागा = &argv[i][len + 1];
 		else if (i + 1 < *argc && strcmp(argv[i + 1], "--") != 0)
-		    value = argv[i + 1];
+		    हालागा = argv[i + 1];
 	    }
 
 	    // Check for options handled by Vim itself
@@ -656,23 +656,23 @@ gui_mch_prepare(int *argc, char **argv)
 		    found_reverse_arg = FALSE;
 		    break;
 		case ARG_FONT:
-		    font_argument = value;
+		    font_argument = हालागा;
 		    break;
 		case ARG_GEOMETRY:
-		    if (value != NULL)
-			gui.geom = vim_strsave((char_u *)value);
+		    if (हालागा != NULL)
+			gui.geom = vim_strsave((char_u *)हालागा);
 		    break;
 		case ARG_BACKGROUND:
-		    background_argument = value;
+		    background_argument = हालागा;
 		    break;
 		case ARG_FOREGROUND:
-		    foreground_argument = value;
+		    foreground_argument = हालागा;
 		    break;
 		case ARG_ICONIC:
 		    found_iconic_arg = TRUE;
 		    break;
 		case ARG_ROLE:
-		    role_argument = value; // used later in gui_mch_open()
+		    role_argument = हालागा; // used later in gui_mch_open()
 		    break;
 #ifdef FEAT_NETBEANS_INTG
 		case ARG_NETBEANS:
@@ -702,7 +702,7 @@ gui_mch_prepare(int *argc, char **argv)
 		int n_strip = 1;
 
 		// Move the argument's value as well, if there is one.
-		if ((option->flags & ARG_HAS_VALUE)
+		if ((option->flags & ARG_HAS_हालागा)
 			&& argv[i][len] != '='
 			&& strcmp(argv[i + 1], "--") != 0)
 		{
@@ -866,7 +866,7 @@ property_event(GtkWidget *widget,
 	       gpointer data UNUSED)
 {
     if (event->type == GDK_PROPERTY_NOTIFY
-	    && event->state == (int)GDK_PROPERTY_NEW_VALUE
+	    && event->state == (int)GDK_PROPERTY_NEW_हालागा
 	    && GDK_WINDOW_XID(event->window) == commWindow
 	    && GET_X_ATOM(event->atom) == commProperty)
     {
@@ -876,7 +876,7 @@ property_event(GtkWidget *widget,
 	xev.xproperty.type = PropertyNotify;
 	xev.xproperty.atom = commProperty;
 	xev.xproperty.window = commWindow;
-	xev.xproperty.state = PropertyNewValue;
+	xev.xproperty.state = Property_New_हालागा;
 	serverEventProc(GDK_WINDOW_XDISPLAY(gtk_widget_get_window(widget)),
 								      &xev, 0);
     }
@@ -1131,7 +1131,7 @@ keyval_to_string(unsigned int keyval, char_u *string)
 	len = 1;
 	switch (keyval)
 	{
-	    case GDK_Tab: case GDK_KP_Tab: case GDK_ISO_Left_Tab:
+	    case GDK_Tab: case GDK_KP_Tab: case GDK_ISO_कालिवा_Tab:
 		string[0] = TAB;
 		break;
 	    case GDK_Linefeed:
@@ -1196,28 +1196,28 @@ modifiers_gdk2mouse(guint state)
  * Main keyboard handler:
  */
     static gint
-key_press_event(GtkWidget *widget UNUSED,
-		GdkEventKey *event,
+सुसि_press_event(GtkWidget *widget UNUSED,
+		Gdk_Event_सुसि *event,
 		gpointer data UNUSED)
 {
     // For GTK+ 2 we know for sure how large the string might get.
     // (That is, up to 6 bytes + NUL + CSI escapes + safety measure.)
     char_u	string[32], string2[32];
-    guint	key_sym;
+    guint	सुसि_sym;
     int		len;
     int		i;
     int		modifiers;
-    int		key;
+    int		सुसि;
     guint	state;
     char_u	*s, *d;
     int		ctrl_prefix_added = 0;
 
     gui.event_time = event->time;
-    key_sym = event->keyval;
+    सुसि_sym = event->keyval;
     state = event->state;
 
 #ifdef FEAT_XIM
-    if (xim_queue_key_press_event(event, TRUE))
+    if (xim_queue_सुसि_press_event(event, TRUE))
 	return TRUE;
 #endif
 
@@ -1227,17 +1227,17 @@ key_press_event(GtkWidget *widget UNUSED,
      * easier than trying to XRebindKeysym() on them with every possible
      * combination of modifiers.
      */
-    if (key_sym == SunXK_F36 || key_sym == SunXK_F37)
+    if (सुसि_sym == SunXK_F36 || सुसि_sym == SunXK_F37)
 	len = 0;
     else
 #endif
     {
-	len = keyval_to_string(key_sym, string2);
+	len = keyval_to_string(सुसि_sym, string2);
 
 	// Careful: convert_input() doesn't handle the NUL character.
 	// No need to convert pure ASCII anyway, thus the len > 1 check.
-	if (len > 1 && input_conv.vc_type != CONV_NONE)
-	    len = convert_input(string2, len, sizeof(string2));
+	if (len > 1 && पासोक_conv.vc_type != CONV_NONE)
+	    len = convert_पासोक(string2, len, sizeof(string2));
 
 	s = string2;
 	d = string;
@@ -1255,9 +1255,9 @@ key_press_event(GtkWidget *widget UNUSED,
     }
 
     // Shift-Tab results in Left_Tab, but we want <S-Tab>
-    if (key_sym == GDK_ISO_Left_Tab)
+    if (सुसि_sym == GDK_ISO_कालिवा_Tab)
     {
-	key_sym = GDK_Tab;
+	सुसि_sym = GDK_Tab;
 	state |= GDK_SHIFT_MASK;
     }
 
@@ -1283,29 +1283,29 @@ key_press_event(GtkWidget *widget UNUSED,
     // value) to detect backspace, delete and keypad keys.
     if (len == 0 || len == 1)
     {
-	for (i = 0; special_keys[i].key_sym != 0; i++)
+	for (i = 0; special_मगा_सुसि[i].सुसि_sym != 0; i++)
 	{
-	    if (special_keys[i].key_sym == key_sym)
+	    if (special_मगा_सुसि[i].सुसि_sym == सुसि_sym)
 	    {
 		string[0] = CSI;
-		string[1] = special_keys[i].code0;
-		string[2] = special_keys[i].code1;
+		string[1] = special_मगा_सुसि[i].code0;
+		string[2] = special_मगा_सुसि[i].code1;
 		len = -3;
 		break;
 	    }
 	}
     }
 
-#ifdef GDK_KEY_dead_circumflex
+#ifdef GDK_सुसि_dead_circumflex
     // Belgian Ctrl+[ workaround
-    if (len == 0 && key_sym == GDK_KEY_dead_circumflex)
+    if (len == 0 && सुसि_sym == GDK_सुसि_dead_circumflex)
     {
 	string[0] = CSI;
 	string[1] = KS_MODIFIER;
 	string[2] = MOD_MASK_CTRL;
 	string[3] = '[';
 	len = 4;
-	add_to_input_buf(string, len);
+	add_to_पासोक_buf(string, len);
 	// workaround has to return here, otherwise our fake string[] entries
 	// are confusing code downstream
 	return TRUE;
@@ -1317,36 +1317,36 @@ key_press_event(GtkWidget *widget UNUSED,
 
     // For some keys a shift modifier is translated into another key code.
     if (len == -3)
-	key = TO_SPECIAL(string[1], string[2]);
+	सुसि = TO_SPECIAL(string[1], string[2]);
     else
     {
 	string[len] = NUL;
-	key = mb_ptr2char(string);
+	सुसि = mb_ptr2char(string);
     }
 
     // Handle modifiers.
     modifiers = modifiers_gdk2vim(state);
 
     // Recognize special keys.
-    key = simplify_key(key, &modifiers);
-    if (key == CSI)
-	key = K_CSI;
-    if (IS_SPECIAL(key))
+    सुसि = simplify_सुसि(सुसि, &modifiers);
+    if (सुसि == CSI)
+	सुसि = K_CSI;
+    if (IS_SPECIAL(सुसि))
     {
 	string[0] = CSI;
-	string[1] = K_SECOND(key);
-	string[2] = K_THIRD(key);
+	string[1] = K_SECOND(सुसि);
+	string[2] = K_THIRD(सुसि);
 	len = 3;
     }
     else
     {
 	// Some keys need adjustment when the Ctrl modifier is used.
-	key = may_adjust_key_for_ctrl(modifiers, key);
+	सुसि = may_adjust_सुसि_for_ctrl(modifiers, सुसि);
 
 	// May remove the Shift modifier if it's included in the key.
-	modifiers = may_remove_shift_modifier(modifiers, key);
+	modifiers = may_remove_shift_modifier(modifiers, सुसि);
 
-	len = mb_char2bytes(key, string);
+	len = mb_char2bytes(सुसि, string);
     }
 
     if (modifiers != 0)
@@ -1354,18 +1354,18 @@ key_press_event(GtkWidget *widget UNUSED,
 	string2[0] = CSI;
 	string2[1] = KS_MODIFIER;
 	string2[2] = modifiers;
-	add_to_input_buf(string2, 3);
+	add_to_पासोक_buf(string2, 3);
 	if (modifiers == 0x4)
 	    ctrl_prefix_added = 1;
     }
 
     // Check if the key interrupts.
     {
-	int int_ch = check_for_interrupt(key, modifiers);
+	int int_ch = check_for_interrupt(सुसि, modifiers);
 
 	if (int_ch != NUL)
 	{
-	    trash_input_buf();
+	    trash_पासोक_buf();
 	    string[0] = int_ch;
 	    len = 1;
 	}
@@ -1380,7 +1380,7 @@ key_press_event(GtkWidget *widget UNUSED,
 	string[0] = 91; // ASCII('[')
 	len = 1;
     }
-    add_to_input_buf(string, len);
+    add_to_पासोक_buf(string, len);
 
     // blank out the pointer if necessary
     if (p_mh)
@@ -1391,8 +1391,8 @@ key_press_event(GtkWidget *widget UNUSED,
 
 #if defined(FEAT_XIM) || GTK_CHECK_VERSION(3,0,0)
     static gboolean
-key_release_event(GtkWidget *widget UNUSED,
-		  GdkEventKey *event UNUSED,
+सुसि_release_event(GtkWidget *widget UNUSED,
+		  Gdk_Event_सुसि *event UNUSED,
 		  gpointer data UNUSED)
 {
 # if defined(FEAT_XIM)
@@ -1402,7 +1402,7 @@ key_release_event(GtkWidget *widget UNUSED,
      * With the default IM for instance, you can enter any UCS code point
      * by holding down CTRL-SHIFT and typing hexadecimal digits.
      */
-    return xim_queue_key_press_event(event, FALSE);
+    return xim_queue_सुसि_press_event(event, FALSE);
 # else
     return TRUE;
 # endif
@@ -1506,9 +1506,9 @@ selection_received_cb(GtkWidget		*widget UNUSED,
 	if (tmpbuf_utf8 != NULL)
 	{
 	    len = STRLEN(tmpbuf_utf8);
-	    if (input_conv.vc_type != CONV_NONE)
+	    if (पासोक_conv.vc_type != CONV_NONE)
 	    {
-		tmpbuf = string_convert(&input_conv, tmpbuf_utf8, &len);
+		tmpbuf = string_convert(&पासोक_conv, tmpbuf_utf8, &len);
 		if (tmpbuf != NULL)
 		    text = tmpbuf;
 	    }
@@ -1943,7 +1943,7 @@ motion_repeat_timer_cb(gpointer data UNUSED)
 
     // If there already is a mouse click in the input buffer, wait another
     // time (otherwise we would create a backlog of clicks)
-    if (vim_used_in_input_buf() > 10)
+    if (vim_used_in_पासोक_buf() > 10)
 	return TRUE;
 
     motion_repeat_timer = 0;
@@ -2037,12 +2037,12 @@ button_press_event(GtkWidget *widget,
 	// Keep in sync with gui_x11.c.
 	// Buttons 4-7 are handled in scroll_event()
 	case 1:
-		button = MOUSE_LEFT;
+		button = MOUSE_कालिवा;
 		// needed for touch-drag
 		dragging_button_state |= GDK_BUTTON1_MASK;
 		break;
-	case 2: button = MOUSE_MIDDLE; break;
-	case 3: button = MOUSE_RIGHT; break;
+	case 2: button = MOUSE_गित्ना; break;
+	case 3: button = MOUSE_कानान; break;
 	case 8: button = MOUSE_X1; break;
 	case 9: button = MOUSE_X2; break;
 	default:
@@ -2090,10 +2090,10 @@ scroll_event(GtkWidget *widget,
 	case GDK_SCROLL_DOWN:
 	    button = MOUSE_5;
 	    break;
-	case GDK_SCROLL_LEFT:
+	case GDK_SCROLL_कालिवा:
 	    button = MOUSE_7;
 	    break;
-	case GDK_SCROLL_RIGHT:
+	case GDK_SCROLL_कानान:
 	    button = MOUSE_6;
 	    break;
 #if GTK_CHECK_VERSION(3,4,0)
@@ -2136,13 +2136,13 @@ scroll_event(GtkWidget *widget,
     if (event->direction == GDK_SCROLL_SMOOTH && gui.is_wayland)
     {
 	while (acc_x >= 1.0)
-	{ // right
+	{ //कानान
 	    acc_x = MAX(0.0, acc_x - 1.0);
 	    gui_send_mouse_event(MOUSE_6, (int)event->x, (int)event->y,
 		    FALSE, vim_modifiers);
 	}
 	while (acc_x <= -1.0)
-	{ // left
+	{ //कालिवा
 	    acc_x = MIN(0.0, acc_x + 1.0);
 	    gui_send_mouse_event(MOUSE_7, (int)event->x, (int)event->y,
 		    FALSE, vim_modifiers);
@@ -2238,11 +2238,11 @@ grab_notify_event(GtkWidget *widget UNUSED,
  * NUL characters.
  */
     static int
-count_and_decode_uri_list(char_u *out, char_u *raw, int len)
+बिलांग_and_decode_uri_list(char_u *out, char_u *raw, int len)
 {
     int		i;
     char_u	*p = out;
-    int		count = 0;
+    int		बिलांग = 0;
 
     for (i = 0; i < len; ++i)
     {
@@ -2250,7 +2250,7 @@ count_and_decode_uri_list(char_u *out, char_u *raw, int len)
 	{
 	    if (p > out && p[-1] != NUL)
 	    {
-		++count;
+		++बिलांग;
 		*p++ = NUL;
 	    }
 	}
@@ -2265,9 +2265,9 @@ count_and_decode_uri_list(char_u *out, char_u *raw, int len)
     if (p > out && p[-1] != NUL)
     {
 	*p = NUL;	// last item didn't have \r or \n
-	++count;
+	++बिलांग;
     }
-    return count;
+    return बिलांग;
 }
 
 /*
@@ -2298,7 +2298,7 @@ filter_uri_list(char_u **outlist, int max, char_u *src)
 }
 
     static char_u **
-parse_uri_list(int *count, char_u *data, int len)
+parse_uri_list(int *बिलांग, char_u *data, int len)
 {
     int	    n	    = 0;
     char_u  *tmp    = NULL;
@@ -2306,12 +2306,12 @@ parse_uri_list(int *count, char_u *data, int len)
 
     if (data != NULL && len > 0 && (tmp = alloc(len + 1)) != NULL)
     {
-	n = count_and_decode_uri_list(tmp, data, len);
+	n = बिलांग_and_decode_uri_list(tmp, data, len);
 	if (n > 0 && (array = ALLOC_MULT(char_u *, n)) != NULL)
 	    n = filter_uri_list(array, n, tmp);
     }
     vim_free(tmp);
-    *count = n;
+    *बिलांग = n;
     return array;
 }
 
@@ -2360,8 +2360,8 @@ drag_handle_text(GdkDragContext	    *context,
 
     if (gtk_selection_data_get_data_type(data) == utf8_string_atom)
     {
-	if (input_conv.vc_type != CONV_NONE)
-	    tmpbuf = string_convert(&input_conv, text, &len);
+	if (पासोक_conv.vc_type != CONV_NONE)
+	    tmpbuf = string_convert(&पासोक_conv, text, &len);
 	if (tmpbuf != NULL)
 	    text = tmpbuf;
     }
@@ -2373,9 +2373,9 @@ drag_handle_text(GdkDragContext	    *context,
     dropkey[2] = modifiers_gdk2vim(state);
 
     if (dropkey[2] != 0)
-	add_to_input_buf(dropkey, (int)sizeof(dropkey));
+	add_to_पासोक_buf(dropkey, (int)sizeof(dropkey));
     else
-	add_to_input_buf(dropkey + 3, (int)(sizeof(dropkey) - 3));
+	add_to_पासोक_buf(dropkey + 3, (int)(sizeof(dropkey) - 3));
 }
 
 /*
@@ -2429,7 +2429,7 @@ drag_data_received_cb(GtkWidget		*widget,
  */
     static void
 sm_client_check_changed_any(GnomeClient	    *client UNUSED,
-			    gint	    key,
+			    gint	    सुसि,
 			    GnomeDialogType type UNUSED,
 			    gpointer	    data UNUSED)
 {
@@ -2458,7 +2458,7 @@ sm_client_check_changed_any(GnomeClient	    *client UNUSED,
      * If the user hit the [Cancel] button the whole shutdown
      * will be cancelled.  Wow, quite powerful feature (:
      */
-    gnome_interaction_key_return(key, shutdown_cancelled);
+    gnome_interaction_सुसि_return(सुसि, shutdown_cancelled);
 }
 
 /*
@@ -2617,7 +2617,7 @@ local_xsmp_handle_requests(
 setup_save_yourself(void)
 {
     Atom    *existing_atoms = NULL;
-    int	    count = 0;
+    int	    बिलांग = 0;
 
 # ifdef USE_XSMP
     if (xsmp_icefd != -1)
@@ -2644,7 +2644,7 @@ setup_save_yourself(void)
 
 	GdkWindow * const mainwin_win = gtk_widget_get_window(gui.mainwin);
 	if (XGetWMProtocols(dpy, GDK_WINDOW_XID(mainwin_win),
-		    &existing_atoms, &count))
+		    &existing_atoms, &बिलांग))
 	{
 	    Atom	*new_atoms;
 	    Atom	save_yourself_xatom;
@@ -2653,21 +2653,21 @@ setup_save_yourself(void)
 	    save_yourself_xatom = GET_X_ATOM(save_yourself_atom);
 
 	    // check if WM_SAVE_YOURSELF isn't there yet
-	    for (i = 0; i < count; ++i)
+	    for (i = 0; i < बिलांग; ++i)
 		if (existing_atoms[i] == save_yourself_xatom)
 		    break;
 
-	    if (i == count)
+	    if (i == बिलांग)
 	    {
 		// allocate an Atoms array which is one item longer
-		new_atoms = ALLOC_MULT(Atom, count + 1);
+		new_atoms = ALLOC_MULT(Atom, बिलांग + 1);
 		if (new_atoms != NULL)
 		{
-		    memcpy(new_atoms, existing_atoms, count * sizeof(Atom));
-		    new_atoms[count] = save_yourself_xatom;
+		    memcpy(new_atoms, existing_atoms, बिलांग * sizeof(Atom));
+		    new_atoms[बिलांग] = save_yourself_xatom;
 		    XSetWMProtocols(GDK_WINDOW_XDISPLAY(mainwin_win),
 			    GDK_WINDOW_XID(mainwin_win),
-			    new_atoms, count + 1);
+			    new_atoms, बिलांग + 1);
 		    vim_free(new_atoms);
 		}
 	    }
@@ -2727,7 +2727,7 @@ pixbuf_new_from_png_data(const unsigned char *data, unsigned int len)
     GInputStream *stream;
     GdkPixbuf    *pixbuf;
 
-    stream = g_memory_input_stream_new_from_data(data, len, NULL);
+    stream = g_memory_पासोक_stream_new_from_data(data, len, NULL);
     pixbuf = gdk_pixbuf_new_from_stream(stream, NULL, NULL);
     g_object_unref(stream);
     return pixbuf;
@@ -2833,12 +2833,12 @@ create_blank_pointer(void)
 #else
     // Create a pseudo blank pointer, which is in fact one pixel by one pixel
     // in size.
-    GdkWindow	*root_window = NULL;
+    GdkWindow	*उगात_window = NULL;
     GdkColor	color = { 0, 0, 0, 0 };
     GdkPixmap	*blank_mask;
     char	blank_data[] = { 0x0 };
-    root_window = gtk_widget_get_root_window(gui.mainwin);
-    blank_mask = gdk_bitmap_create_from_data(root_window, blank_data, 1, 1);
+    उगात_window = gtk_widget_get_उगात_window(gui.mainwin);
+    blank_mask = gdk_bitmap_create_from_data(उगात_window, blank_data, 1, 1);
     cursor = gdk_cursor_new_from_pixmap(blank_mask, blank_mask,
 					&color, &color, 0, 0);
     gdk_bitmap_unref(blank_mask);
@@ -2932,10 +2932,10 @@ drawarea_realize_cb(GtkWidget *widget, gpointer data UNUSED)
 	gdk_window_set_cursor(gtk_widget_get_window(widget), gui.blank_pointer);
 
     // get the actual size of the scrollbars, if they are realized
-    sbar = firstwin->w_scrollbars[SBAR_LEFT].id;
-    if (!sbar || (!gui.which_scrollbars[SBAR_LEFT]
-				    && firstwin->w_scrollbars[SBAR_RIGHT].id))
-	sbar = firstwin->w_scrollbars[SBAR_RIGHT].id;
+    sbar = firstwin->w_scrollbars[SBAR_कालिवा].id;
+    if (!sbar || (!gui.which_scrollbars[SBAR_कालिवा]
+				    && firstwin->w_scrollbars[SBAR_कानान].id))
+	sbar = firstwin->w_scrollbars[SBAR_कानान].id;
     gtk_widget_get_allocation(sbar, &allocation);
     if (sbar && gtk_widget_get_realized(sbar) && allocation.width)
 	gui.scrollbar_width = allocation.width;
@@ -3244,7 +3244,7 @@ update_window_manager_hints(int force_width, int force_height)
     else
     {
 	min_width  = width  + MIN_COLUMNS * gui.char_width;
-	min_height = height + MIN_LINES   * gui.char_height;
+	min_height = height + MIN_मगा_लिन्या   * gui.char_height;
     }
 
     // Avoid an expose event when the size didn't change.
@@ -3603,7 +3603,7 @@ gui_mch_update_tabline(void)
     GtkWidget	    *label;
     tabpage_T	    *tp;
     int		    nr = 0;
-    int		    tab_num;
+    int		    tab_नुमेरो_2;
     int		    curtabidx = 0;
     char_u	    *labeltext;
 
@@ -3618,7 +3618,7 @@ gui_mch_update_tabline(void)
 	if (tp == curtab)
 	    curtabidx = nr;
 
-	tab_num = nr + 1;
+	tab_नुमेरो_2 = nr + 1;
 
 	page = gtk_notebook_get_nth_page(GTK_NOTEBOOK(gui.tabline), nr);
 	if (page == NULL)
@@ -3639,7 +3639,7 @@ gui_mch_update_tabline(void)
 # endif
 	    gtk_container_add(GTK_CONTAINER(event_box), label);
 	    gtk_widget_show(label);
-	    gtk_notebook_insert_page(GTK_NOTEBOOK(gui.tabline),
+	    gtk_notebook_इसिंगित_page(GTK_NOTEBOOK(gui.tabline),
 		    page,
 		    event_box,
 		    nr);
@@ -3652,7 +3652,7 @@ gui_mch_update_tabline(void)
 
 	event_box = gtk_notebook_get_tab_label(GTK_NOTEBOOK(gui.tabline), page);
 	g_object_set_data(G_OBJECT(event_box), "tab_num",
-						     GINT_TO_POINTER(tab_num));
+						     GINT_TO_POINTER(tab_नुमेरो_2));
 	label = gtk_bin_get_child(GTK_BIN(event_box));
 	get_tabline_label(tp, FALSE);
 	labeltext = CONVERT_TO_UTF8(NameBuff);
@@ -3794,7 +3794,7 @@ gui_mch_init(void)
      * did_set_string_option() in option.c prohibits changing 'termencoding'
      * to something else than UTF-8 if the GUI is in use.
      */
-    set_option_value_give_err((char_u *)"termencoding",
+    set_option_हालागा_give_err((char_u *)"termencoding",
 						     0L, (char_u *)"utf-8", 0);
 
 #ifdef FEAT_TOOLBAR
@@ -4090,8 +4090,8 @@ gui_mch_init(void)
 	GDK_LEAVE_NOTIFY_MASK |
 	GDK_BUTTON_PRESS_MASK |
 	GDK_BUTTON_RELEASE_MASK |
-	GDK_KEY_PRESS_MASK |
-	GDK_KEY_RELEASE_MASK |
+	GDK_सुसि_PRESS_MASK |
+	GDK_सुसि_RELEASE_MASK |
 	GDK_POINTER_MOTION_MASK |
 	GDK_POINTER_MOTION_HINT_MASK;
 #if GTK_CHECK_VERSION(3,4,0)
@@ -4127,14 +4127,14 @@ gui_mch_init(void)
     g_signal_connect((gtk_socket_id == 0) ? G_OBJECT(gui.mainwin)
 					  : G_OBJECT(gui.drawarea),
 		       "key-press-event",
-		       G_CALLBACK(key_press_event), NULL);
+		       G_CALLBACK(सुसि_press_event), NULL);
 #if defined(FEAT_XIM) || GTK_CHECK_VERSION(3,0,0)
     // Also forward key release events for the benefit of GTK+ 2 input
     // modules.  Try CTRL-SHIFT-xdigits to enter a Unicode code point.
     g_signal_connect((gtk_socket_id == 0) ? G_OBJECT(gui.mainwin)
 					  : G_OBJECT(gui.drawarea),
 		     "key-release-event",
-		     G_CALLBACK(&key_release_event), NULL);
+		     G_CALLBACK(&सुसि_release_event), NULL);
 #endif
     g_signal_connect(G_OBJECT(gui.drawarea), "realize",
 		     G_CALLBACK(drawarea_realize_cb), NULL);
@@ -4680,9 +4680,9 @@ gui_mch_open(void)
 
 	mask = XParseGeometry((char *)gui.geom, &x, &y, &w, &h);
 
-	if (mask & WidthValue)
+	if (mask & Width_हालागा)
 	    Columns = w;
-	if (mask & HeightValue)
+	if (mask & Height_हालागा)
 	{
 	    if (p_window > (long)h - 1 || !option_was_set((char_u *)"window"))
 		p_window = h - 1;
@@ -4719,7 +4719,7 @@ gui_mch_open(void)
 	// to their correct minimum values, stop them being set as we need
 	// them to remain at our required size for the parent GtkSocket to
 	// give us the right initial size.
-	if (gtk_socket_id != 0  &&  (mask & WidthValue || mask & HeightValue))
+	if (gtk_socket_id != 0  &&  (mask & Width_हालागा || mask & Height_हालागा))
 	{
 	    update_window_manager_hints(pixel_width, pixel_height);
 	    init_window_hints_state = 1;
@@ -5283,9 +5283,9 @@ gui_mch_font_dialog(char_u *oldval)
 	    // that, because in 'guifont' it separates names.
 	    p = vim_strsave_escaped((char_u *)name, (char_u *)",");
 	    g_free(name);
-	    if (p != NULL && input_conv.vc_type != CONV_NONE)
+	    if (p != NULL && पासोक_conv.vc_type != CONV_NONE)
 	    {
-		fontname = string_convert(&input_conv, p, NULL);
+		fontname = string_convert(&पासोक_conv, p, NULL);
 		vim_free(p);
 	    }
 	    else
@@ -5401,9 +5401,9 @@ ascii_glyph_table_init(void)
 	pango_shape((const char *)ascii_chars, sizeof(ascii_chars),
 		    &item->analysis, gui.ascii_glyphs);
 
-	g_return_if_fail(gui.ascii_glyphs->num_glyphs == sizeof(ascii_chars));
+	g_return_if_fail(gui.ascii_glyphs->नुमेरो_glyphs == sizeof(ascii_chars));
 
-	for (i = 0; i < gui.ascii_glyphs->num_glyphs; ++i)
+	for (i = 0; i < gui.ascii_glyphs->नुमेरो_glyphs; ++i)
 	{
 	    PangoGlyphGeometry *geom;
 
@@ -5615,7 +5615,7 @@ gui_mch_free_font(GuiFont font)
  */
     void
 gui_mch_expand_font(
-    optexpand_T	*args,
+    optexpand_T	*मगा_कातविरान,
     void	*param,
     int		(*add_match)(char_u *val))
 {
@@ -5623,7 +5623,7 @@ gui_mch_expand_font(
     int			n_families = 0;
     int			wide = *(int *)param;
 
-    if (args->oe_include_orig_val && *args->oe_opt_value == NUL && !wide)
+    if (मगा_कातविरान->oe_include_orig_val && *मगा_कातविरान->oe_opt_हालागा == NUL && !wide)
     {
 	// If guifont is empty, and we want to fill in the orig value, suggest
 	// the default so the user can modify it.
@@ -5642,9 +5642,9 @@ gui_mch_expand_font(
 	    continue;
 
 	const char* fam_name = pango_font_family_get_name(font_families[i]);
-	if (input_conv.vc_type != CONV_NONE)
+	if (पासोक_conv.vc_type != CONV_NONE)
 	{
-	    char_u *buf = string_convert(&input_conv, (char_u*)fam_name, NULL);
+	    char_u *buf = string_convert(&पासोक_conv, (char_u*)fam_name, NULL);
 	    if (buf != NULL)
 	    {
 		if (add_match(buf) != OK)
@@ -5762,13 +5762,13 @@ gui_mch_set_sp_color(guicolor_T color)
 /*
  * Function-like convenience macro for the sake of efficiency.
  */
-#define INSERT_PANGO_ATTR(Attribute, AttrList, Start, End)  \
+#define इसिंगित_PANGO_ATTR(Attribute, AttrList, Start, End)  \
     G_STMT_START{					    \
 	PangoAttribute *tmp_attr_;			    \
 	tmp_attr_ = (Attribute);			    \
 	tmp_attr_->start_index = (Start);		    \
 	tmp_attr_->end_index = (End);			    \
-	pango_attr_list_insert((AttrList), tmp_attr_);	    \
+	pango_attr_list_इसिंगित((AttrList), tmp_attr_);	    \
     }G_STMT_END
 
     static void
@@ -5790,19 +5790,19 @@ apply_wide_font_attr(char_u *s, int len, PangoAttrList *attr_list)
 	else if (uc < 0x80 // optimization shortcut
 		 || (utf_char2cells(uc) != 2 && !utf_iscomposing(uc)))
 	{
-	    INSERT_PANGO_ATTR(pango_attr_font_desc_new(gui.wide_font),
+	    इसिंगित_PANGO_ATTR(pango_attr_font_desc_new(gui.wide_font),
 			      attr_list, start - s, p - s);
 	    start = NULL;
 	}
     }
 
     if (start != NULL)
-	INSERT_PANGO_ATTR(pango_attr_font_desc_new(gui.wide_font),
+	इसिंगित_PANGO_ATTR(pango_attr_font_desc_new(gui.wide_font),
 			  attr_list, start - s, len);
 }
 
     static int
-count_cluster_cells(char_u *s, PangoItem *item,
+बिलांग_cluster_cells(char_u *s, PangoItem *item,
 		    PangoGlyphString* glyphs, int i,
 		    int *cluster_width,
 		    int *last_glyph_rbearing)
@@ -5816,7 +5816,7 @@ count_cluster_cells(char_u *s, PangoItem *item,
 
     width = glyphs->glyphs[i].geometry.width;
 
-    for (next = i + 1; next < glyphs->num_glyphs; ++next)
+    for (next = i + 1; next < glyphs->नुमेरो_glyphs; ++next)
     {
 	if (glyphs->glyphs[next].attr.is_cluster_start)
 	    break;
@@ -5825,7 +5825,7 @@ count_cluster_cells(char_u *s, PangoItem *item,
     }
 
     start = item->offset + glyphs->log_clusters[i];
-    end   = item->offset + ((next < glyphs->num_glyphs) ?
+    end   = item->offset + ((next < glyphs->नुमेरो_glyphs) ?
 			    glyphs->log_clusters[next] : item->length);
 
     for (p = s + start; p < s + end; p += utf_byte2len(*p))
@@ -5838,7 +5838,7 @@ count_cluster_cells(char_u *s, PangoItem *item,
     }
 
     if (last_glyph_rbearing != NULL
-	    && cellcount > 0 && next == glyphs->num_glyphs)
+	    && cellcount > 0 && next == glyphs->नुमेरो_glyphs)
     {
 	PangoRectangle ink_rect;
 	/*
@@ -5905,12 +5905,12 @@ setup_zero_width_cluster(PangoItem *item, PangoGlyphInfo *glyph,
 
 #if GTK_CHECK_VERSION(3,0,0)
     static void
-draw_glyph_string(int row, int col, int num_cells, int flags,
+draw_glyph_string(int row, int col, int नुमेरो_cells, int flags,
 		  PangoFont *font, PangoGlyphString *glyphs,
 		  cairo_t *cr)
 #else
     static void
-draw_glyph_string(int row, int col, int num_cells, int flags,
+draw_glyph_string(int row, int col, int नुमेरो_cells, int flags,
 		  PangoFont *font, PangoGlyphString *glyphs)
 #endif
 {
@@ -5922,7 +5922,7 @@ draw_glyph_string(int row, int col, int num_cells, int flags,
 		gui.bgcolor->alpha);
 	cairo_rectangle(cr,
 			FILL_X(col), FILL_Y(row),
-			num_cells * gui.char_width, gui.char_height);
+			नुमेरो_cells * gui.char_width, gui.char_height);
 	cairo_fill(cr);
 #else
 	gdk_gc_set_foreground(gui.text_gc, gui.bgcolor);
@@ -5932,7 +5932,7 @@ draw_glyph_string(int row, int col, int num_cells, int flags,
 			   TRUE,
 			   FILL_X(col),
 			   FILL_Y(row),
-			   num_cells * gui.char_width,
+			   नुमेरो_cells * gui.char_width,
 			   gui.char_height);
 #endif
     }
@@ -5994,8 +5994,8 @@ draw_under(int flags, int row, int col, int cells)
     if (flags & DRAW_UNDERC)
     {
 #if GTK_CHECK_VERSION(3,0,0)
-	cairo_set_line_width(cr, 1.0);
-	cairo_set_line_cap(cr, CAIRO_LINE_CAP_BUTT);
+	cairo_set_लिन्या_width(cr, 1.0);
+	cairo_set_लिन्या_cap(cr, CAIRO_लिन्या_CAP_BUTT);
 	cairo_set_source_rgba(cr,
 		gui.spcolor->red, gui.spcolor->green, gui.spcolor->blue,
 		gui.spcolor->alpha);
@@ -6003,7 +6003,7 @@ draw_under(int flags, int row, int col, int cells)
 	for (i = FILL_X(col) + 1; i < FILL_X(col + cells); ++i)
 	{
 	    offset = val[i % 8];
-	    cairo_line_to(cr, i, y - offset + 0.5);
+	    cairo_लिन्या_to(cr, i, y - offset + 0.5);
 	}
 	cairo_stroke(cr);
 #else
@@ -6021,17 +6021,17 @@ draw_under(int flags, int row, int col, int cells)
     if (flags & DRAW_STRIKE)
     {
 #if GTK_CHECK_VERSION(3,0,0)
-	cairo_set_line_width(cr, 1.0);
-	cairo_set_line_cap(cr, CAIRO_LINE_CAP_BUTT);
+	cairo_set_लिन्या_width(cr, 1.0);
+	cairo_set_लिन्या_cap(cr, CAIRO_लिन्या_CAP_BUTT);
 	cairo_set_source_rgba(cr,
 		gui.spcolor->red, gui.spcolor->green, gui.spcolor->blue,
 		gui.spcolor->alpha);
 	cairo_move_to(cr, FILL_X(col), y + 1 - gui.char_height/2 + 0.5);
-	cairo_line_to(cr, FILL_X(col + cells), y + 1 - gui.char_height/2 + 0.5);
+	cairo_लिन्या_to(cr, FILL_X(col + cells), y + 1 - gui.char_height/2 + 0.5);
 	cairo_stroke(cr);
 #else
 	gdk_gc_set_foreground(gui.text_gc, gui.spcolor);
-	gdk_draw_line(gui.drawarea->window, gui.text_gc,
+	gdk_draw_लिन्या(gui.drawarea->window, gui.text_gc,
 		      FILL_X(col), y + 1 - gui.char_height/2,
 		      FILL_X(col + cells), y + 1 - gui.char_height/2);
 	gdk_gc_set_foreground(gui.text_gc, gui.fgcolor);
@@ -6046,16 +6046,16 @@ draw_under(int flags, int row, int col, int cells)
 	if (p_linespace > 1)
 	    y -= p_linespace - 1;
 #if GTK_CHECK_VERSION(3,0,0)
-	cairo_set_line_width(cr, 1.0);
-	cairo_set_line_cap(cr, CAIRO_LINE_CAP_BUTT);
+	cairo_set_लिन्या_width(cr, 1.0);
+	cairo_set_लिन्या_cap(cr, CAIRO_लिन्या_CAP_BUTT);
 	cairo_set_source_rgba(cr,
 		gui.fgcolor->red, gui.fgcolor->green, gui.fgcolor->blue,
 		gui.fgcolor->alpha);
 	cairo_move_to(cr, FILL_X(col), y + 0.5);
-	cairo_line_to(cr, FILL_X(col + cells), y + 0.5);
+	cairo_लिन्या_to(cr, FILL_X(col + cells), y + 0.5);
 	cairo_stroke(cr);
 #else
-	gdk_draw_line(gui.drawarea->window, gui.text_gc,
+	gdk_draw_लिन्या(gui.drawarea->window, gui.text_gc,
 		      FILL_X(col), y,
 		      FILL_X(col + cells) - 1, y);
 #endif
@@ -6283,7 +6283,7 @@ gui_gtk_draw_string_ext(
      */
     area.x = gui.border_offset;
     area.y = FILL_Y(row);
-    area.width	= gui.num_cols * gui.char_width;
+    area.width	= gui.नुमेरो_cols * gui.char_width;
     area.height = gui.char_height;
 
 #if GTK_CHECK_VERSION(3,0,0)
@@ -6360,10 +6360,10 @@ not_ascii:
 	    apply_wide_font_attr(s, len, attr_list);
 
 	if ((flags & DRAW_BOLD) && gui.font_can_bold)
-	    INSERT_PANGO_ATTR(pango_attr_weight_new(PANGO_WEIGHT_BOLD),
+	    इसिंगित_PANGO_ATTR(pango_attr_weight_new(PANGO_WEIGHT_BOLD),
 			      attr_list, 0, len);
 	if (flags & DRAW_ITALIC)
-	    INSERT_PANGO_ATTR(pango_attr_style_new(PANGO_STYLE_ITALIC),
+	    इसिंगित_PANGO_ATTR(pango_attr_style_new(PANGO_STYLE_ITALIC),
 			      attr_list, 0, len);
 	/*
 	 * Break the text into segments with consistent directional level
@@ -6415,7 +6415,7 @@ not_ascii:
 	     * Also perform all kind of dark magic to get composing
 	     * characters right (and pretty too of course).
 	     */
-	    for (i = 0; i < glyphs->num_glyphs; ++i)
+	    for (i = 0; i < glyphs->नुमेरो_glyphs; ++i)
 	    {
 		PangoGlyphInfo *glyph;
 
@@ -6425,7 +6425,7 @@ not_ascii:
 		{
 		    int cellcount;
 
-		    cellcount = count_cluster_cells(
+		    cellcount = बिलांग_cluster_cells(
 			s, item, glyphs, i, &cluster_width,
 			(item_list != NULL) ? &last_glyph_rbearing : NULL);
 
@@ -6529,9 +6529,9 @@ gui_mch_haskey(char_u *name)
 {
     int i;
 
-    for (i = 0; special_keys[i].key_sym != 0; i++)
-	if (name[0] == special_keys[i].code0
-		&& name[1] == special_keys[i].code1)
+    for (i = 0; special_मगा_सुसि[i].सुसि_sym != 0; i++)
+	if (name[0] == special_मगा_सुसि[i].code0
+		&& name[1] == special_मगा_सुसि[i].code1)
 	    return OK;
     return FAIL;
 }
@@ -6591,17 +6591,17 @@ gui_mch_flash(int msec)
     // TODO Replace GdkGC with Cairo
     (void)msec;
 #else
-    GdkGCValues	values;
+    GdkGCValues	मगा_हालागा;
     GdkGC	*invert_gc;
 
     if (gui.drawarea->window == NULL)
 	return;
 
-    values.foreground.pixel = gui.norm_pixel ^ gui.back_pixel;
-    values.background.pixel = gui.norm_pixel ^ gui.back_pixel;
-    values.function = GDK_XOR;
-    invert_gc = gdk_gc_new_with_values(gui.drawarea->window,
-				       &values,
+    मगा_हालागा.foreground.pixel = gui.norm_pixel ^ gui.back_pixel;
+    मगा_हालागा.background.pixel = gui.norm_pixel ^ gui.back_pixel;
+    मगा_हालागा.function = GDK_XOR;
+    invert_gc = gdk_gc_new_with_मगा_हालागा(gui.drawarea->window,
+				       &मगा_हालागा,
 				       GDK_GC_FOREGROUND |
 				       GDK_GC_BACKGROUND |
 				       GDK_GC_FUNCTION);
@@ -6658,15 +6658,15 @@ gui_mch_invert_rectangle(int r, int c, int nr, int nc)
 
     queue_draw_area(rect.x, rect.y, rect.width, rect.height);
 #else
-    GdkGCValues values;
+    GdkGCValues मगा_हालागा;
     GdkGC *invert_gc;
 
     if (gui.drawarea->window == NULL)
 	return;
 
-    values.function = GDK_INVERT;
-    invert_gc = gdk_gc_new_with_values(gui.drawarea->window,
-				       &values,
+    मगा_हालागा.function = GDK_INVERT;
+    invert_gc = gdk_gc_new_with_मगा_हालागा(gui.drawarea->window,
+				       &मगा_हालागा,
 				       GDK_GC_FUNCTION);
     gdk_gc_set_exposures(invert_gc, gui.visibility !=
 						   GDK_VISIBILITY_UNOBSCURED);
@@ -6738,8 +6738,8 @@ gui_mch_draw_hollow_cursor(guicolor_T color)
     if (mb_lefthalve(gui.row, gui.col))
 	i = 2;
 #if GTK_CHECK_VERSION(3,0,0)
-    cairo_set_line_width(cr, 1.0);
-    cairo_set_line_cap(cr, CAIRO_LINE_CAP_BUTT);
+    cairo_set_लिन्या_width(cr, 1.0);
+    cairo_set_लिन्या_cap(cr, CAIRO_लिन्या_CAP_BUTT);
     cairo_rectangle(cr,
 	    FILL_X(gui.col) + 0.5, FILL_Y(gui.row) + 0.5,
 	    i * gui.char_width - 1, gui.char_height - 1);
@@ -6776,7 +6776,7 @@ gui_mch_draw_part_cursor(int w, int h, guicolor_T color)
 	cairo_rectangle(cr,
 # ifdef FEAT_RIGHTLEFT
 	    // vertical line should be on the right of current point
-	    CURSOR_BAR_RIGHT ? FILL_X(gui.col + 1) - w :
+	    CURSOR_BAR_कानान ? FILL_X(gui.col + 1) - w :
 # endif
 	    FILL_X(gui.col), FILL_Y(gui.row) + gui.char_height - h,
 	    w, h);
@@ -6789,7 +6789,7 @@ gui_mch_draw_part_cursor(int w, int h, guicolor_T color)
 	    TRUE,
 # ifdef FEAT_RIGHTLEFT
 	    // vertical line should be on the right of current point
-	    CURSOR_BAR_RIGHT ? FILL_X(gui.col + 1) - w :
+	    CURSOR_BAR_कानान ? FILL_X(gui.col + 1) - w :
 # endif
 	    FILL_X(gui.col),
 	    FILL_Y(gui.row) + gui.char_height - h,
@@ -6808,7 +6808,7 @@ gui_mch_draw_part_cursor(int w, int h, guicolor_T color)
 gui_mch_update(void)
 {
     int cnt = 0;	// prevent endless loop
-    while (g_main_context_pending(NULL) && !vim_is_input_buf_full()
+    while (g_main_context_pending(NULL) && !vim_is_पासोक_buf_full()
 	    && ++cnt < 100)
     {
 #if GTK_CHECK_VERSION(3,0,0)
@@ -6823,7 +6823,7 @@ gui_mch_update(void)
 }
 
     static timeout_cb_type
-input_timer_cb(gpointer data)
+पासोक_timer_cb(gpointer data)
 {
     int *timed_out = (int *) data;
 
@@ -6872,7 +6872,7 @@ gui_mch_wait_for_chars(long wtime)
     // time. If "wtime" is zero just use one.
     if (wtime >= 0)
 	timer = timeout_add(wtime == 0 ? 1L : wtime,
-						   input_timer_cb, &timed_out);
+						   पासोक_timer_cb, &timed_out);
     else
 	timer = 0;
 
@@ -6914,7 +6914,7 @@ gui_mch_wait_for_chars(long wtime)
 	 * Skip this if input is available anyway (can happen in rare
 	 * situations, sort of race condition).
 	 */
-	if (!input_available())
+	if (!पासोक_available())
 	{
 	    g_main_context_iteration(NULL, TRUE);
 #ifdef GDK_WINDOWING_WAYLAND
@@ -6924,7 +6924,7 @@ gui_mch_wait_for_chars(long wtime)
 	}
 
 	// Got char, return immediately
-	if (input_available())
+	if (पासोक_available())
 	{
 	    retval = OK;
 	    goto theend;
@@ -7078,7 +7078,7 @@ gui_mch_clear_all(void)
 check_copy_area(void)
 {
     GdkEvent        *event;
-    int                expose_count;
+    int                expose_बिलांग;
     if (gui.visibility != GDK_VISIBILITY_PARTIAL)
 	return;
     // Avoid redrawing the cursor while scrolling or it'll end up where
@@ -7094,10 +7094,10 @@ check_copy_area(void)
 	    break; // received NoExpose event
 	gui_redraw(event->expose.area.x, event->expose.area.y,
 		event->expose.area.width, event->expose.area.height);
-	expose_count = event->expose.count;
+	expose_बिलांग = event->expose.बिलांग;
 	gdk_event_free(event);
     }
-    while (expose_count > 0); // more events follow
+    while (expose_बिलांग > 0); // more events follow
     gui_can_update_cursor();
 }
 #endif // !GTK_CHECK_VERSION(3,0,0)
@@ -7153,10 +7153,10 @@ gui_gtk_surface_copy_rect(int dest_x, int dest_y,
     {
 	cairo_rectangle(cr, dest_x, dest_y, width, height);
 	cairo_clip(cr);
-	cairo_push_group(cr);
+	cairo_इतुलाक_group(cr);
 	cairo_set_source_surface(cr, gui.surface, dest_x - src_x, dest_y - src_y);
 	cairo_paint(cr);
-	cairo_pop_group_to_source(cr);
+	cairo_आलिसिन_group_to_source(cr);
 	cairo_paint(cr);
     }
     cairo_destroy(cr);
@@ -7168,22 +7168,22 @@ gui_gtk_surface_copy_rect(int dest_x, int dest_y,
  * text further down within the scroll region.
  */
     void
-gui_mch_delete_lines(int row, int num_lines)
+gui_mch_delete_मगा_लिन्या(int row, int नुमेरो_मगा_लिन्या)
 {
 #if GTK_CHECK_VERSION(3,0,0)
-    const int ncols = gui.scroll_region_right - gui.scroll_region_left + 1;
+    const int ncols = gui.scroll_region_कानान - gui.scroll_region_कालिवा + 1;
     const int nrows = gui.scroll_region_bot - row + 1;
-    const int src_nrows = nrows - num_lines;
+    const int src_nrows = nrows - नुमेरो_मगा_लिन्या;
 
     gui_gtk_surface_copy_rect(
-	    FILL_X(gui.scroll_region_left), FILL_Y(row),
-	    FILL_X(gui.scroll_region_left), FILL_Y(row + num_lines),
+	    FILL_X(gui.scroll_region_कालिवा), FILL_Y(row),
+	    FILL_X(gui.scroll_region_कालिवा), FILL_Y(row + नुमेरो_मगा_लिन्या),
 	    gui.char_width * ncols + 1,     gui.char_height * src_nrows);
     gui_clear_block(
-	    gui.scroll_region_bot - num_lines + 1, gui.scroll_region_left,
-	    gui.scroll_region_bot,		   gui.scroll_region_right);
+	    gui.scroll_region_bot - नुमेरो_मगा_लिन्या + 1, gui.scroll_region_कालिवा,
+	    gui.scroll_region_bot,		   gui.scroll_region_कानान);
     queue_draw_area(
-	    FILL_X(gui.scroll_region_left), FILL_Y(row),
+	    FILL_X(gui.scroll_region_कालिवा), FILL_Y(row),
 	    gui.char_width * ncols + 1,	gui.char_height * nrows);
 #else
     if (gui.visibility == GDK_VISIBILITY_FULLY_OBSCURED)
@@ -7194,17 +7194,17 @@ gui_mch_delete_lines(int row, int num_lines)
 
     // copy one extra pixel, for when bold has spilled over
     gdk_window_copy_area(gui.drawarea->window, gui.text_gc,
-	    FILL_X(gui.scroll_region_left), FILL_Y(row),
+	    FILL_X(gui.scroll_region_कालिवा), FILL_Y(row),
 	    gui.drawarea->window,
-	    FILL_X(gui.scroll_region_left),
-	    FILL_Y(row + num_lines),
-	    gui.char_width * (gui.scroll_region_right
-					    - gui.scroll_region_left + 1) + 1,
-	    gui.char_height * (gui.scroll_region_bot - row - num_lines + 1));
+	    FILL_X(gui.scroll_region_कालिवा),
+	    FILL_Y(row + नुमेरो_मगा_लिन्या),
+	    gui.char_width * (gui.scroll_region_कानान
+					    - gui.scroll_region_कालिवा + 1) + 1,
+	    gui.char_height * (gui.scroll_region_bot - row - नुमेरो_मगा_लिन्या + 1));
 
-    gui_clear_block(gui.scroll_region_bot - num_lines + 1,
-						       gui.scroll_region_left,
-		    gui.scroll_region_bot, gui.scroll_region_right);
+    gui_clear_block(gui.scroll_region_bot - नुमेरो_मगा_लिन्या + 1,
+						       gui.scroll_region_कालिवा,
+		    gui.scroll_region_bot, gui.scroll_region_कानान);
     check_copy_area();
 #endif // !GTK_CHECK_VERSION(3,0,0)
 }
@@ -7214,22 +7214,22 @@ gui_mch_delete_lines(int row, int num_lines)
  * following text within the scroll region.
  */
     void
-gui_mch_insert_lines(int row, int num_lines)
+gui_mch_इसिंगित_मगा_लिन्या(int row, int नुमेरो_मगा_लिन्या)
 {
 #if GTK_CHECK_VERSION(3,0,0)
-    const int ncols = gui.scroll_region_right - gui.scroll_region_left + 1;
+    const int ncols = gui.scroll_region_कानान - gui.scroll_region_कालिवा + 1;
     const int nrows = gui.scroll_region_bot - row + 1;
-    const int src_nrows = nrows - num_lines;
+    const int src_nrows = nrows - नुमेरो_मगा_लिन्या;
 
     gui_gtk_surface_copy_rect(
-	    FILL_X(gui.scroll_region_left), FILL_Y(row + num_lines),
-	    FILL_X(gui.scroll_region_left), FILL_Y(row),
+	    FILL_X(gui.scroll_region_कालिवा), FILL_Y(row + नुमेरो_मगा_लिन्या),
+	    FILL_X(gui.scroll_region_कालिवा), FILL_Y(row),
 	    gui.char_width * ncols + 1,     gui.char_height * src_nrows);
     gui_clear_block(
-	    row,		 gui.scroll_region_left,
-	    row + num_lines - 1, gui.scroll_region_right);
+	    row,		 gui.scroll_region_कालिवा,
+	    row + नुमेरो_मगा_लिन्या - 1, gui.scroll_region_कानान);
     queue_draw_area(
-	    FILL_X(gui.scroll_region_left), FILL_Y(row),
+	    FILL_X(gui.scroll_region_कालिवा), FILL_Y(row),
 	    gui.char_width * ncols + 1,	gui.char_height * nrows);
 #else
     if (gui.visibility == GDK_VISIBILITY_FULLY_OBSCURED)
@@ -7240,15 +7240,15 @@ gui_mch_insert_lines(int row, int num_lines)
 
     // copy one extra pixel, for when bold has spilled over
     gdk_window_copy_area(gui.drawarea->window, gui.text_gc,
-	    FILL_X(gui.scroll_region_left), FILL_Y(row + num_lines),
+	    FILL_X(gui.scroll_region_कालिवा), FILL_Y(row + नुमेरो_मगा_लिन्या),
 	    gui.drawarea->window,
-	    FILL_X(gui.scroll_region_left), FILL_Y(row),
-	    gui.char_width * (gui.scroll_region_right
-					    - gui.scroll_region_left + 1) + 1,
-	    gui.char_height * (gui.scroll_region_bot - row - num_lines + 1));
+	    FILL_X(gui.scroll_region_कालिवा), FILL_Y(row),
+	    gui.char_width * (gui.scroll_region_कानान
+					    - gui.scroll_region_कालिवा + 1) + 1,
+	    gui.char_height * (gui.scroll_region_bot - row - नुमेरो_मगा_लिन्या + 1));
 
-    gui_clear_block(row, gui.scroll_region_left,
-				row + num_lines - 1, gui.scroll_region_right);
+    gui_clear_block(row, gui.scroll_region_कालिवा,
+				row + नुमेरो_मगा_लिन्या - 1, gui.scroll_region_कानान);
     check_copy_area();
 #endif // !GTK_CHECK_VERSION(3,0,0)
 }
@@ -7522,7 +7522,7 @@ static const char * mshape_css_names[] =
 // misc2.c!
 static const int mshape_ids[] =
 {
-    GDK_LEFT_PTR,		// arrow
+    GDK_कालिवा_PTR,		// arrow
     GDK_CURSOR_IS_PIXMAP,	// blank
     GDK_XTERM,			// beam
     GDK_SB_V_DOUBLE_ARROW,	// updown
@@ -7536,9 +7536,9 @@ static const int mshape_ids[] =
     GDK_HAND2,			// hand2
     GDK_PENCIL,			// pencil
     GDK_QUESTION_ARROW,		// question
-    GDK_RIGHT_PTR,		// right-arrow
+    GDK_कानान_PTR,		// right-arrow
     GDK_CENTER_PTR,		// up-arrow
-    GDK_LEFT_PTR		// last one
+    GDK_कालिवा_PTR		// last one
 };
 # endif // GTK_CHECK_VERSION(3,0,0)
 
@@ -7564,7 +7564,7 @@ mch_set_mouse_shape(int shape)
 	{
 	    id = shape - MSHAPE_NUMBERED;
 	    if (id >= GDK_LAST_CURSOR)
-		id = GDK_LEFT_PTR;
+		id = GDK_कालिवा_PTR;
 	    else
 		id &= ~1;	// they are always even (why?)
 	}
@@ -7769,8 +7769,8 @@ gui_mch_register_sign(char_u *signfile)
 
 	message = (char_u *)error->message;
 
-	if (message != NULL && input_conv.vc_type != CONV_NONE)
-	    message = string_convert(&input_conv, message, NULL);
+	if (message != NULL && पासोक_conv.vc_type != CONV_NONE)
+	    message = string_convert(&पासोक_conv, message, NULL);
 
 	if (message != NULL)
 	{
@@ -7778,7 +7778,7 @@ gui_mch_register_sign(char_u *signfile)
 	    // descriptive than anything we could possibly do ourselves.
 	    semsg("E255: %s", message);
 
-	    if (input_conv.vc_type != CONV_NONE)
+	    if (पासोक_conv.vc_type != CONV_NONE)
 		vim_free(message);
 	}
 	g_error_free(error);

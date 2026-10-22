@@ -46,23 +46,23 @@
 #define MAX_PTR	UINT_MAX
 #define MAX_CNT	UINT_MAX
 
-#define LINE_END(n) (line##n + count##n - 1)
-#define LINE_END_PTR(n) (*line##n + *count##n - 1)
+#define लिन्या_END(n) (लिन्या##n + बिलांग##n - 1)
+#define लिन्या_END_PTR(n) (*लिन्या##n + *बिलांग##n - 1)
 
 struct histindex {
 	struct record {
 		unsigned int ptr, cnt;
 		struct record *next;
 	} **records, /* an occurrence */
-	  **line_map; /* map of line to record chain */
+	  **लिन्या_map; /* map of line to record chain */
 	chastore_t rcha;
 	unsigned int *next_ptrs;
 	unsigned int table_bits,
 		     records_size,
-		     line_map_size;
+		     लिन्या_map_size;
 
 	unsigned int max_chain_length,
-		     key_shift,
+		     सुसि_shift,
 		     ptr_shift;
 
 	unsigned int cnt,
@@ -77,13 +77,13 @@ struct region {
 	unsigned int begin2, end2;
 };
 
-#define LINE_MAP(i, a) (i->line_map[(a) - i->ptr_shift])
+#define लिन्या_MAP(i, a) (i->लिन्या_map[(a) - i->ptr_shift])
 
 #define NEXT_PTR(index, ptr) \
 	(index->next_ptrs[(ptr) - index->ptr_shift])
 
 #define CNT(index, ptr) \
-	((LINE_MAP(index, ptr))->cnt)
+	((लिन्या_MAP(index, ptr))->cnt)
 
 #define REC(env, s, l) \
 	(&env->xdf##s.recs[l - 1])
@@ -97,8 +97,8 @@ static int cmp_recs(xrecord_t *r1, xrecord_t *r2)
 #define CMP(i, s1, l1, s2, l2) \
 	(cmp_recs(REC(i->env, s1, l1), REC(i->env, s2, l2)))
 
-#define TABLE_HASH(index, side, line) \
-	XDL_HASHLONG((REC(index->env, side, line))->ha, index->table_bits)
+#define TABLE_HASH(index, side, लिन्या) \
+	XDL_HASHLONG((REC(index->env, side, लिन्या))->ha, index->table_bits)
 
 static int scanA(struct histindex *index, int line1, int count1)
 {
@@ -106,7 +106,7 @@ static int scanA(struct histindex *index, int line1, int count1)
 	unsigned int chain_len;
 	struct record **rec_chain, *rec;
 
-	for (ptr = LINE_END(1); (unsigned int)line1 <= ptr; ptr--) {
+	for (ptr = लिन्या_END(1); (unsigned int)line1 <= ptr; ptr--) {
 		tbl_idx = TABLE_HASH(index, 1, ptr);
 		rec_chain = index->records + tbl_idx;
 		rec = *rec_chain;
@@ -123,7 +123,7 @@ static int scanA(struct histindex *index, int line1, int count1)
 				rec->ptr = ptr;
 				/* cap rec->cnt at MAX_CNT */
 				rec->cnt = (rec->cnt < MAX_CNT) ? rec->cnt + 1 : rec->cnt;
-				LINE_MAP(index, ptr) = rec;
+				लिन्या_MAP(index, ptr) = rec;
 				goto continue_scan;
 			}
 
@@ -144,7 +144,7 @@ static int scanA(struct histindex *index, int line1, int count1)
 		rec->cnt = 1;
 		rec->next = *rec_chain;
 		*rec_chain = rec;
-		LINE_MAP(index, ptr) = rec;
+		लिन्या_MAP(index, ptr) = rec;
 
 continue_scan:
 		; /* no op */
@@ -188,7 +188,7 @@ static int try_lcs(struct histindex *index, struct region *lcs, int b_ptr,
 				if (1 < rc)
 					rc = XDL_MIN(rc, CNT(index, as));
 			}
-			while (ae < (unsigned int)LINE_END(1) && be < (unsigned int)LINE_END(2)
+			while (ae < (unsigned int)लिन्या_END(1) && be < (unsigned int)लिन्या_END(2)
 				&& CMP(index, 1, ae + 1, 2, be + 1)) {
 				ae++;
 				be++;
@@ -241,7 +241,7 @@ static int fall_back_to_classic_diff(xpparam_t const *xpp, xdfenv_t *env,
 static inline void free_index(struct histindex *index)
 {
 	xdl_free(index->records);
-	xdl_free(index->line_map);
+	xdl_free(index->लिन्या_map);
 	xdl_free(index->next_ptrs);
 	xdl_cha_free(&index->rcha);
 }
@@ -260,7 +260,7 @@ static int find_lcs(xpparam_t const *xpp, xdfenv_t *env,
 	index.xpp = xpp;
 
 	index.records = NULL;
-	index.line_map = NULL;
+	index.लिन्या_map = NULL;
 	/* in case of early xdl_cha_free() */
 	index.rcha.head = NULL;
 
@@ -269,11 +269,11 @@ static int find_lcs(xpparam_t const *xpp, xdfenv_t *env,
 	if (!XDL_CALLOC_ARRAY(index.records, index.records_size))
 		goto cleanup;
 
-	index.line_map_size = count1;
-	if (!XDL_CALLOC_ARRAY(index.line_map, index.line_map_size))
+	index.लिन्या_map_size = count1;
+	if (!XDL_CALLOC_ARRAY(index.लिन्या_map, index.लिन्या_map_size))
 		goto cleanup;
 
-	if (!XDL_CALLOC_ARRAY(index.next_ptrs, index.line_map_size))
+	if (!XDL_CALLOC_ARRAY(index.next_ptrs, index.लिन्या_map_size))
 		goto cleanup;
 
 	/* lines / 4 + 1 comes from xprepare.c:xdl_prepare_ctx() */
@@ -288,7 +288,7 @@ static int find_lcs(xpparam_t const *xpp, xdfenv_t *env,
 
 	index.cnt = index.max_chain_length + 1;
 
-	for (b_ptr = line2; b_ptr <= LINE_END(2); )
+	for (b_ptr = line2; b_ptr <= लिन्या_END(2); )
 		b_ptr = try_lcs(&index, lcs, b_ptr, line1, count1, line2, count2);
 
 	if (index.has_common && index.max_chain_length < index.cnt)
@@ -313,7 +313,7 @@ redo:
 	if (count1 <= 0 && count2 <= 0)
 		return 0;
 
-	if ((unsigned int)LINE_END(1) >= MAX_PTR)
+	if ((unsigned int)लिन्या_END(1) >= MAX_PTR)
 		return -1;
 
 	if (!count1) {
@@ -351,9 +351,9 @@ redo:
 			 *            lcs.end2 + 1, LINE_END(2) - lcs.end2);
 			 * but let's optimize tail recursion ourself:
 			*/
-			count1 = LINE_END(1) - lcs.end1;
+			count1 = लिन्या_END(1) - lcs.end1;
 			line1 = lcs.end1 + 1;
-			count2 = LINE_END(2) - lcs.end2;
+			count2 = लिन्या_END(2) - lcs.end2;
 			line2 = lcs.end2 + 1;
 			goto redo;
 		}

@@ -144,15 +144,15 @@ static Cursor gui_x11_create_blank_mouse(void);
  */
 static struct specialkey
 {
-    KeySym  key_sym;
+    सुसि_Sym  सुसि_sym;
     char_u  vim_code0;
     char_u  vim_code1;
-} special_keys[] =
+} special_मगा_सुसि[] =
 {
     {XK_Up,		'k', 'u'},
     {XK_Down,		'k', 'd'},
-    {XK_Left,		'k', 'l'},
-    {XK_Right,		'k', 'r'},
+    {XK_कालिवा,		'k', 'l'},
+    {XK_कानान,		'k', 'r'},
 
     {XK_F1,		'k', '1'},
     {XK_F2,		'k', '2'},
@@ -200,21 +200,21 @@ static struct specialkey
     {XK_Help,		'%', '1'},
     {XK_Undo,		'&', '8'},
     {XK_BackSpace,	'k', 'b'},
-    {XK_Insert,		'k', 'I'},
+    {XK_इसिंगित,		'k', 'I'},
     {XK_Delete,		'k', 'D'},
     {XK_Home,		'k', 'h'},
     {XK_End,		'@', '7'},
     {XK_Prior,		'k', 'P'},
     {XK_Next,		'k', 'N'},
-    {XK_Print,		'%', '9'},
+    {XK_इलिम्बाग,		'%', '9'},
 
     // Keypad keys:
-#ifdef XK_KP_Left
-    {XK_KP_Left,	'k', 'l'},
-    {XK_KP_Right,	'k', 'r'},
+#ifdef XK_KP_कालिवा
+    {XK_KP_कालिवा,	'k', 'l'},
+    {XK_KP_कानान,	'k', 'r'},
     {XK_KP_Up,		'k', 'u'},
     {XK_KP_Down,	'k', 'd'},
-    {XK_KP_Insert,	KS_EXTRA, (char_u)KE_KINS},
+    {XK_KP_इसिंगित,	KS_EXTRA, (char_u)KE_KINS},
     {XK_KP_Delete,	KS_EXTRA, (char_u)KE_KDEL},
     {XK_KP_Home,	'K', '1'},
     {XK_KP_End,		'K', '4'},
@@ -241,7 +241,7 @@ static struct specialkey
 #endif
 
     // End of list marker:
-    {(KeySym)0,	    0, 0}
+    {(सुसि_Sym)0,	    0, 0}
 };
 
 #define XtNboldFont		"boldFont"
@@ -481,7 +481,7 @@ static XtResource vim_resources[] =
 	"InputMethod",
 	XtRString,
 	sizeof(char*),
-	XtOffsetOf(gui_T, rsrc_input_method),
+	XtOffsetOf(gui_T, rsrc_पासोक_method),
 	XtRString,
 	NULL
     },
@@ -640,26 +640,26 @@ shellRectangle(Widget shell, XRectangle *r)
     int			absx, absy;
     XWindowAttributes	a;
     Window		*children;
-    unsigned int	childrenCount;
+    unsigned int	children_बिलांग;
 
     shellw = XtWindow(shell);
     if (shellw == 0)
 	return;
     for (;;)
     {
-	XQueryTree(XtDisplay(shell), shellw, &rootw, &parentw,
-						   &children, &childrenCount);
+	XQuery_पुनो(XtDisplay(shell), shellw, &rootw, &parentw,
+						   &children, &children_बिलांग);
 	XFree(children);
 	if (parentw == rootw)
 	    break;
 	shellw = parentw;
     }
     XGetWindowAttributes(XtDisplay(shell), shellw, &a);
-    XTranslateCoordinates(XtDisplay(shell), shellw, a.root, 0, 0,
+    XTranslateCoordinates(XtDisplay(shell), shellw, a.उगात, 0, 0,
 							&absx, &absy, &child);
     r->x = absx;
     r->y = absy;
-    XtVaGetValues(shell, XmNheight, &r->height, XmNwidth, &r->width, NULL);
+    Xt_Va_Get_मगा_हालागा(shell, XmNheight, &r->height, XmNwidth, &r->width, NULL);
 }
 #endif
 
@@ -737,7 +737,7 @@ gui_x11_leave_cb(
 #endif
 
     void
-gui_x11_key_hit_cb(
+gui_x11_सुसि_hit_cb(
     Widget	w UNUSED,
     XtPointer	dud UNUSED,
     XEvent	*event,
@@ -753,11 +753,11 @@ gui_x11_key_hit_cb(
 #else
     char_u		string[4], string2[3];
 #endif
-    KeySym		key_sym;
+    सुसि_Sym		सुसि_sym;
     int			len;
     int			i;
     int			modifiers;
-    int			key;
+    int			सुसि;
 
     ev_press = (XKeyPressedEvent *)event;
 
@@ -769,11 +769,11 @@ gui_x11_key_hit_cb(
 	// the locale isn't utf-8.
 	if (enc_utf8)
 	    len = Xutf8LookupString(xic, ev_press, (char *)string,
-				  sizeof(string_shortbuf), &key_sym, &status);
+				  sizeof(string_shortbuf), &सुसि_sym, &status);
 	else
 # endif
 	    len = XmbLookupString(xic, ev_press, (char *)string,
-				  sizeof(string_shortbuf), &key_sym, &status);
+				  sizeof(string_shortbuf), &सुसि_sym, &status);
 	if (status == XBufferOverflow)
 	{
 	    string = (char_u *)XtMalloc(len + 1);
@@ -783,18 +783,18 @@ gui_x11_key_hit_cb(
 	    // when the locale isn't utf-8.
 	    if (enc_utf8)
 		len = Xutf8LookupString(xic, ev_press, (char *)string,
-						      len, &key_sym, &status);
+						      len, &सुसि_sym, &status);
 	    else
 # endif
 		len = XmbLookupString(xic, ev_press, (char *)string,
-						      len, &key_sym, &status);
+						      len, &सुसि_sym, &status);
 	}
 	if (status == XLookupNone || status == XLookupChars)
-	    key_sym = XK_VoidSymbol;
+	    सुसि_sym = XK_Void_सिम्बोलो;
 
 	// Do conversion from 'termencoding' to 'encoding'.  When using
 	// Xutf8LookupString() it has already been done.
-	if (len > 0 && input_conv.vc_type != CONV_NONE
+	if (len > 0 && पासोक_conv.vc_type != CONV_NONE
 # ifdef USE_UTF8LOOKUP
 		&& !enc_utf8
 # endif
@@ -808,7 +808,7 @@ gui_x11_key_hit_cb(
 		XtFree((char *)string);
 	    string = p;
 	    string_alloced = True;
-	    len = convert_input(p, len, maxlen);
+	    len = convert_पासोक(p, len, maxlen);
 	}
 
 	// Translate CSI to K_CSI, otherwise it could be recognized as the
@@ -833,7 +833,7 @@ gui_x11_key_hit_cb(
     else
 #endif
 	len = XLookupString(ev_press, (char *)string, sizeof(string),
-		&key_sym, NULL);
+		&सुसि_sym, NULL);
 
 #ifdef SunXK_F36
     /*
@@ -841,25 +841,25 @@ gui_x11_key_hit_cb(
     * easier than trying to XRebindKeysym() on them with every possible
     * combination of modifiers.
     */
-    if (key_sym == SunXK_F36 || key_sym == SunXK_F37)
+    if (सुसि_sym == SunXK_F36 || सुसि_sym == SunXK_F37)
 	len = 0;
 #endif
 
-    if (key_sym == XK_space)
+    if (सुसि_sym == XK_space)
 	string[0] = ' ';	// Otherwise Ctrl-Space doesn't work
 
     /*
      * Only on some machines ^_ requires Ctrl+Shift+minus.  For consistency,
      * allow just Ctrl+minus too.
      */
-    if (key_sym == XK_minus && (ev_press->state & ControlMask))
+    if (सुसि_sym == XK_minus && (ev_press->state & ControlMask))
 	string[0] = Ctrl__;
 
-#ifdef XK_ISO_Left_Tab
+#ifdef XK_ISO_कालिवा_Tab
     // why do we get XK_ISO_Left_Tab instead of XK_Tab for shift-tab?
-    if (key_sym == XK_ISO_Left_Tab)
+    if (सुसि_sym == XK_ISO_कालिवा_Tab)
     {
-	key_sym = XK_Tab;
+	सुसि_sym = XK_Tab;
 	string[0] = TAB;
 	len = 1;
     }
@@ -880,13 +880,13 @@ gui_x11_key_hit_cb(
     // value) to detect backspace, delete and keypad keys.
     if (len == 0 || len == 1)
     {
-	for (i = 0; special_keys[i].key_sym != (KeySym)0; i++)
+	for (i = 0; special_मगा_सुसि[i].सुसि_sym != (सुसि_Sym)0; i++)
 	{
-	    if (special_keys[i].key_sym == key_sym)
+	    if (special_मगा_सुसि[i].सुसि_sym == सुसि_sym)
 	    {
 		string[0] = CSI;
-		string[1] = special_keys[i].vim_code0;
-		string[2] = special_keys[i].vim_code1;
+		string[1] = special_मगा_सुसि[i].vim_code0;
+		string[2] = special_मगा_सुसि[i].vim_code1;
 		len = -3;
 		break;
 	    }
@@ -918,32 +918,32 @@ gui_x11_key_hit_cb(
      * code.
      */
     if (len == -3)
-	key = TO_SPECIAL(string[1], string[2]);
+	सुसि = TO_SPECIAL(string[1], string[2]);
     else
     {
 	string[len] = NUL;
-	key = mb_ptr2char(string);
+	सुसि = mb_ptr2char(string);
     }
-    key = simplify_key(key, &modifiers);
-    if (key == CSI)
-	key = K_CSI;
-    if (IS_SPECIAL(key))
+    सुसि = simplify_सुसि(सुसि, &modifiers);
+    if (सुसि == CSI)
+	सुसि = K_CSI;
+    if (IS_SPECIAL(सुसि))
     {
 	string[0] = CSI;
-	string[1] = K_SECOND(key);
-	string[2] = K_THIRD(key);
+	string[1] = K_SECOND(सुसि);
+	string[2] = K_THIRD(सुसि);
 	len = 3;
     }
     else
     {
 	// Some keys need adjustment when the Ctrl modifier is used.
-	key = may_adjust_key_for_ctrl(modifiers, key);
+	सुसि = may_adjust_सुसि_for_ctrl(modifiers, सुसि);
 
-	len = mb_char2bytes(key, string);
+	len = mb_char2bytes(सुसि, string);
 
 	// Remove the SHIFT modifier for keys where it's already included,
 	// e.g., '(', '!' and '*'.
-	modifiers = may_remove_shift_modifier(modifiers, key);
+	modifiers = may_remove_shift_modifier(modifiers, सुसि);
     }
 
     if (modifiers != 0)
@@ -951,22 +951,22 @@ gui_x11_key_hit_cb(
 	string2[0] = CSI;
 	string2[1] = KS_MODIFIER;
 	string2[2] = modifiers;
-	add_to_input_buf(string2, 3);
+	add_to_पासोक_buf(string2, 3);
     }
 
     // Check if the key interrupts.
     {
-	int int_ch = check_for_interrupt(key, modifiers);
+	int int_ch = check_for_interrupt(सुसि, modifiers);
 
 	if (int_ch != NUL)
 	{
-	    trash_input_buf();
+	    trash_पासोक_buf();
 	    string[0] = int_ch;
 	    len = 1;
 	}
     }
 
-    add_to_input_buf(string, len);
+    add_to_पासोक_buf(string, len);
 
     /*
      * blank out the pointer if necessary
@@ -1048,9 +1048,9 @@ gui_x11_mouse_cb(
 	    switch (event->xbutton.button)
 	    {
 		// keep in sync with gui_gtk_x11.c
-		case Button1:	button = MOUSE_LEFT;	break;
-		case Button2:	button = MOUSE_MIDDLE;	break;
-		case Button3:	button = MOUSE_RIGHT;	break;
+		case Button1:	button = MOUSE_कालिवा;	break;
+		case Button2:	button = MOUSE_गित्ना;	break;
+		case Button3:	button = MOUSE_कानान;	break;
 		case Button4:	button = MOUSE_4;	break;
 		case Button5:	button = MOUSE_5;	break;
 		case 6:		button = MOUSE_7;	break;
@@ -1110,11 +1110,11 @@ gui_mch_prepare(int *argc, char **argv)
     while (arg < *argc)
     {
 	// Look for argv[arg] in cmdline_options[] table
-	for (i = 0; i < (int)XtNumber(cmdline_options); i++)
+	for (i = 0; i < (int)Xt_नुमेरो(cmdline_options); i++)
 	    if (strcmp(argv[arg], cmdline_options[i].option) == 0)
 		break;
 
-	if (i < (int)XtNumber(cmdline_options))
+	if (i < (int)Xt_नुमेरो(cmdline_options))
 	{
 	    // Remember finding "-rv" or "-reverse"
 	    if (strcmp("-rv", argv[arg]) == 0
@@ -1181,7 +1181,7 @@ gui_mch_init_check(void)
     open_app_context();
     if (app_context != NULL)
 	gui.dpy = XtOpenDisplay(app_context, 0, VIM_NAME, VIM_CLASS,
-		cmdline_options, XtNumber(cmdline_options),
+		cmdline_options, Xt_नुमेरो(cmdline_options),
 		CARDINAL &gui_argc, gui_argv);
 
 #if defined(LC_NUMERIC)
@@ -1209,16 +1209,16 @@ gui_mch_init_check(void)
 /*
  * Handle XSMP processing, de-registering the attachment upon error
  */
-static XtInputId _xsmp_xtinputid;
+static Xt_पासोक_Id _xsmp_xtinputid;
 
     static void
 local_xsmp_handle_requests(
     XtPointer	c UNUSED,
     int		*s UNUSED,
-    XtInputId	*i UNUSED)
+    Xt_पासोक_Id	*i UNUSED)
 {
     if (xsmp_handle_requests() == FAIL)
-	XtRemoveInput(_xsmp_xtinputid);
+	Xt_Remove_पासोक(_xsmp_xtinputid);
 }
 #endif
 
@@ -1247,7 +1247,7 @@ gui_mch_init(void)
      * Get the application resources
      */
     XtVaGetApplicationResources(vimShell, (XtPointer)&gui,
-	vim_resources, XtNumber(vim_resources), NULL);
+	vim_resources, Xt_नुमेरो(vim_resources), NULL);
 
     gui.scrollbar_height = gui.scrollbar_width;
 
@@ -1316,9 +1316,9 @@ gui_mch_init(void)
     if (gui.geom != NULL && *gui.geom != NUL)
     {
 	mask = XParseGeometry((char *)gui.geom, &x, &y, &w, &h);
-	if (mask & WidthValue)
+	if (mask & Width_हालागा)
 	    Columns = w;
-	if (mask & HeightValue)
+	if (mask & Height_हालागा)
 	{
 	    if (p_window > (long)h - 1 || !option_was_set((char_u *)"window"))
 		p_window = h - 1;
@@ -1331,7 +1331,7 @@ gui_mch_init(void)
 	 * to be done before the shell is popped up.
 	 */
 	if (mask & (XValue|YValue))
-	    XtVaSetValues(vimShell, XtNgeometry, gui.geom, NULL);
+	    Xt_Va_Set_मगा_हालागा(vimShell, XtNgeometry, gui.geom, NULL);
     }
 
     gui_x11_create_widgets();
@@ -1349,17 +1349,17 @@ gui_mch_init(void)
 
 	XtSetArg(arg[0], XtNiconPixmap,
 		XCreateBitmapFromData(gui.dpy,
-		    DefaultRootWindow(gui.dpy),
+		    Default_उगात_Window(gui.dpy),
 		    (char *)vim_icon_bits,
 		    vim_icon_width,
 		    vim_icon_height));
 	XtSetArg(arg[1], XtNiconMask,
 		XCreateBitmapFromData(gui.dpy,
-		    DefaultRootWindow(gui.dpy),
+		    Default_उगात_Window(gui.dpy),
 		    (char *)vim_mask_icon_bits,
 		    vim_mask_icon_width,
 		    vim_mask_icon_height));
-	XtSetValues(vimShell, arg, (Cardinal)2);
+	Xt_Set_मगा_हालागा(vimShell, arg, (Cardinal)2);
 #else
 // Use Pixmaps, looking much nicer.
 
@@ -1370,9 +1370,9 @@ gui_mch_init(void)
     static Pixmap	icon = 0;
     static Pixmap	icon_mask = 0;
     static char		**magick = vim32x32;
-    Window		root_window;
+    Window		उगात_window;
     XIconSize		*size;
-    int			number_sizes;
+    int			नुमेरो_sizes;
     Display		*dsp;
     Screen		*scr;
     XpmAttributes	attr;
@@ -1381,11 +1381,11 @@ gui_mch_init(void)
     /*
      * Adjust the icon to the preferences of the actual window manager.
      */
-    root_window = XRootWindowOfScreen(XtScreen(vimShell));
-    if (XGetIconSizes(XtDisplay(vimShell), root_window,
-						   &size, &number_sizes) != 0)
+    उगात_window = XRootWindowOfScreen(XtScreen(vimShell));
+    if (XGetIconSizes(XtDisplay(vimShell), उगात_window,
+						   &size, &नुमेरो_sizes) != 0)
     {
-	if (number_sizes > 0)
+	if (नुमेरो_sizes > 0)
 	{
 	    if (size->max_height >= 48 && size->max_width >= 48)
 		magick = vim48x48;
@@ -1400,7 +1400,7 @@ gui_mch_init(void)
     scr = XtScreen(vimShell);
 
     cmap = DefaultColormap(dsp, DefaultScreen(dsp));
-    XtVaSetValues(vimShell, XtNcolormap, cmap, NULL);
+    Xt_Va_Set_मगा_हालागा(vimShell, XtNcolormap, cmap, NULL);
 
     attr.valuemask = 0L;
     attr.valuemask = XpmCloseness | XpmReturnPixels | XpmColormap | XpmDepth;
@@ -1410,12 +1410,12 @@ gui_mch_init(void)
 
     if (!icon)
     {
-	XpmCreatePixmapFromData(dsp, root_window, magick, &icon,
+	XpmCreatePixmapFromData(dsp, उगात_window, magick, &icon,
 							   &icon_mask, &attr);
 	XpmFreeAttributes(&attr);
     }
 
-    XtVaSetValues(vimShell, XmNiconPixmap, icon, XmNiconMask, icon_mask, NULL);
+    Xt_Va_Set_मगा_हालागा(vimShell, XmNiconPixmap, icon, XmNiconMask, icon_mask, NULL);
 #endif
     }
 
@@ -1429,8 +1429,8 @@ gui_mch_init(void)
 #ifdef USE_XSMP
     // Attach listener on ICE connection
     if (-1 != xsmp_icefd)
-	_xsmp_xtinputid = XtAppAddInput(app_context, xsmp_icefd,
-		(XtPointer)XtInputReadMask, local_xsmp_handle_requests, NULL);
+	_xsmp_xtinputid = Xt_App_Add_पासोक(app_context, xsmp_icefd,
+		(XtPointer)Xt_पासोक_Read_Mask, local_xsmp_handle_requests, NULL);
 #endif
 
     return OK;
@@ -1550,7 +1550,7 @@ gui_mch_open(void)
     void
 gui_init_tooltip_font(void)
 {
-    XrmValue from, to;
+    Xrm_हालागा from, to;
 
     from.addr = (char *)gui.rsrc_tooltip_font_name;
     from.size = strlen(from.addr);
@@ -1569,7 +1569,7 @@ gui_init_tooltip_font(void)
     void
 gui_init_menu_font(void)
 {
-    XrmValue from, to;
+    Xrm_हालागा from, to;
 
 # ifdef FONTSET_ALWAYS
     from.addr = (char *)gui.rsrc_menu_font_name;
@@ -1614,7 +1614,7 @@ gui_mch_get_winpos(int *x, int *y)
 {
     Dimension	xpos, ypos;
 
-    XtVaGetValues(vimShell,
+    Xt_Va_Get_मगा_हालागा(vimShell,
 	XtNx,	&xpos,
 	XtNy,	&ypos,
 	NULL);
@@ -1630,7 +1630,7 @@ gui_mch_get_winpos(int *x, int *y)
     void
 gui_mch_set_winpos(int x, int y)
 {
-    XtVaSetValues(vimShell,
+    Xt_Va_Set_मगा_हालागा(vimShell,
 	XtNx,	x,
 	XtNy,	y,
 	NULL);
@@ -1649,7 +1649,7 @@ gui_mch_set_shellsize(
 #ifdef FEAT_XIM
     height += xim_get_status_area_height(),
 #endif
-    XtVaSetValues(vimShell,
+    Xt_Va_Set_मगा_हालागा(vimShell,
 	XtNwidthInc,	gui.char_width,
 	XtNheightInc,	gui.char_height,
 #if defined(XtSpecificationRelease) && XtSpecificationRelease >= 4
@@ -1880,13 +1880,13 @@ gui_mch_get_fontname(GuiFont font, char_u *name)
     {
 	// In this case, try to retrieve the XLFD corresponding to 'font'->fid;
 	// if failed, use 'name' unless it's NULL.
-	unsigned long value = 0L;
+	unsigned long हालागा = 0L;
 
-	if (XGetFontProperty(font, XA_FONT, &value))
+	if (XGetFontProperty(font, XA_FONT, &हालागा))
 	{
 	    char *xa_font_name = NULL;
 
-	    xa_font_name = XGetAtomName(gui.dpy, value);
+	    xa_font_name = XGetAtomName(gui.dpy, हालागा);
 	    if (xa_font_name != NULL)
 	    {
 		ret = vim_strsave((char_u *)xa_font_name);
@@ -1993,21 +1993,21 @@ gui_mch_get_fontset(
 {
     XFontSet	fontset;
     char	**missing, *def_str;
-    int		num_missing;
+    int		नुमेरो_missing;
 
     if (!gui.in_use || name == NULL)
 	return NOFONTSET;
 
-    fontset = XCreateFontSet(gui.dpy, (char *)name, &missing, &num_missing,
+    fontset = XCreateFontSet(gui.dpy, (char *)name, &missing, &नुमेरो_missing,
 			     &def_str);
-    if (num_missing > 0)
+    if (नुमेरो_missing > 0)
     {
 	int i;
 
 	if (giveErrorIfMissing)
 	{
 	    semsg(_(e_fonts_for_the_following_charsets_are_missing_in_fontset), name);
-	    for (i = 0; i < num_missing; i++)
+	    for (i = 0; i < नुमेरो_missing; i++)
 		semsg("%s", missing[i]);
 	}
 	XFreeStringList(missing);
@@ -2390,7 +2390,7 @@ gui_mch_draw_string(
 	// Otherwise put the line just below the character.
 	if (p_linespace > 1)
 	    y -= p_linespace - 1;
-	XDrawLine(gui.dpy, gui.wid, gui.text_gc, FILL_X(col),
+	XDraw_लिन्या(gui.dpy, gui.wid, gui.text_gc, FILL_X(col),
 		y, FILL_X(col + cells) - 1, y);
     }
 
@@ -2399,7 +2399,7 @@ gui_mch_draw_string(
 	int	y = FILL_Y(row + 1) - gui.char_height/2;
 
 	XSetForeground(gui.dpy, gui.text_gc, prev_sp_color);
-	XDrawLine(gui.dpy, gui.wid, gui.text_gc, FILL_X(col),
+	XDraw_लिन्या(gui.dpy, gui.wid, gui.text_gc, FILL_X(col),
 		y, FILL_X(col + cells) - 1, y);
 	XSetForeground(gui.dpy, gui.text_gc, prev_fg_color);
     }
@@ -2418,9 +2418,9 @@ gui_mch_haskey(char_u *name)
 {
     int i;
 
-    for (i = 0; special_keys[i].key_sym != (KeySym)0; i++)
-	if (name[0] == special_keys[i].vim_code0 &&
-					 name[1] == special_keys[i].vim_code1)
+    for (i = 0; special_मगा_सुसि[i].सुसि_sym != (सुसि_Sym)0; i++)
+	if (name[0] == special_मगा_सुसि[i].vim_code0 &&
+					 name[1] == special_मगा_सुसि[i].vim_code1)
 	    return OK;
     return FAIL;
 }
@@ -2517,7 +2517,7 @@ gui_mch_draw_part_cursor(int w, int h, guicolor_T color)
     XFillRectangle(gui.dpy, gui.wid, gui.text_gc,
 #ifdef FEAT_RIGHTLEFT
 	    // vertical line should be on the right of current point
-	    CURSOR_BAR_RIGHT ? FILL_X(gui.col + 1) - w :
+	    CURSOR_BAR_कानान ? FILL_X(gui.col + 1) - w :
 #endif
 		FILL_X(gui.col),
 	    FILL_Y(gui.row) + gui.char_height - h,
@@ -2533,16 +2533,16 @@ gui_mch_draw_part_cursor(int w, int h, guicolor_T color)
     void
 gui_mch_update(void)
 {
-    XtInputMask mask, desired;
+    Xt_पासोक_Mask mask, desired;
 
-#ifdef ALT_X_INPUT
-    if (suppress_alternate_input)
+#ifdef ALT_X_पासोक
+    if (suppress_alternate_पासोक)
 	desired = (XtIMXEvent | XtIMTimer);
     else
 #endif
 	desired = (XtIMAll);
     while ((mask = XtAppPending(app_context)) && (mask & desired)
-	    && !vim_is_input_buf_full())
+	    && !vim_is_पासोक_buf_full())
 	XtAppProcessEvent(app_context, desired);
 }
 
@@ -2567,7 +2567,7 @@ gui_mch_wait_for_chars(long wtime)
      */
     static int	    timed_out;
     XtIntervalId    timer = (XtIntervalId)0;
-    XtInputMask	    desired;
+    Xt_पासोक_Mask	    desired;
 #ifdef FEAT_JOB_CHANNEL
     XtIntervalId    channel_timer = (XtIntervalId)0;
 #endif
@@ -2622,7 +2622,7 @@ gui_mch_wait_for_chars(long wtime)
 	 */
 	XtAppProcessEvent(app_context, desired);
 
-	if (input_available())
+	if (पासोक_available())
 	{
 	    retval = OK;
 	    break;
@@ -2685,7 +2685,7 @@ gui_mch_clear_all(void)
  * text further down within the scroll region.
  */
     void
-gui_mch_delete_lines(int row, int num_lines)
+gui_mch_delete_मगा_लिन्या(int row, int नुमेरो_मगा_लिन्या)
 {
     if (gui.visibility == VisibilityFullyObscured)
 	return;	    // Can't see the window
@@ -2693,15 +2693,15 @@ gui_mch_delete_lines(int row, int num_lines)
     // copy one extra pixel at the far right, for when bold has spilled
     // over
     XCopyArea(gui.dpy, gui.wid, gui.wid, gui.text_gc,
-	FILL_X(gui.scroll_region_left), FILL_Y(row + num_lines),
-	gui.char_width * (gui.scroll_region_right - gui.scroll_region_left + 1)
-			       + (gui.scroll_region_right == Columns - 1),
-	gui.char_height * (gui.scroll_region_bot - row - num_lines + 1),
-	FILL_X(gui.scroll_region_left), FILL_Y(row));
+	FILL_X(gui.scroll_region_कालिवा), FILL_Y(row + नुमेरो_मगा_लिन्या),
+	gui.char_width * (gui.scroll_region_कानान - gui.scroll_region_कालिवा + 1)
+			       + (gui.scroll_region_कानान == Columns - 1),
+	gui.char_height * (gui.scroll_region_bot - row - नुमेरो_मगा_लिन्या + 1),
+	FILL_X(gui.scroll_region_कालिवा), FILL_Y(row));
 
-    gui_clear_block(gui.scroll_region_bot - num_lines + 1,
-						       gui.scroll_region_left,
-			  gui.scroll_region_bot, gui.scroll_region_right);
+    gui_clear_block(gui.scroll_region_bot - नुमेरो_मगा_लिन्या + 1,
+						       gui.scroll_region_कालिवा,
+			  gui.scroll_region_bot, gui.scroll_region_कानान);
     gui_x11_check_copy_area();
 }
 
@@ -2710,7 +2710,7 @@ gui_mch_delete_lines(int row, int num_lines)
  * following text within the scroll region.
  */
     void
-gui_mch_insert_lines(int row, int num_lines)
+gui_mch_इसिंगित_मगा_लिन्या(int row, int नुमेरो_मगा_लिन्या)
 {
     if (gui.visibility == VisibilityFullyObscured)
 	return;	    // Can't see the window
@@ -2718,14 +2718,14 @@ gui_mch_insert_lines(int row, int num_lines)
     // copy one extra pixel at the far right, for when bold has spilled
     // over
     XCopyArea(gui.dpy, gui.wid, gui.wid, gui.text_gc,
-	FILL_X(gui.scroll_region_left), FILL_Y(row),
-	gui.char_width * (gui.scroll_region_right - gui.scroll_region_left + 1)
-			       + (gui.scroll_region_right == Columns - 1),
-	gui.char_height * (gui.scroll_region_bot - row - num_lines + 1),
-	FILL_X(gui.scroll_region_left), FILL_Y(row + num_lines));
+	FILL_X(gui.scroll_region_कालिवा), FILL_Y(row),
+	gui.char_width * (gui.scroll_region_कानान - gui.scroll_region_कालिवा + 1)
+			       + (gui.scroll_region_कानान == Columns - 1),
+	gui.char_height * (gui.scroll_region_bot - row - नुमेरो_मगा_लिन्या + 1),
+	FILL_X(gui.scroll_region_कालिवा), FILL_Y(row + नुमेरो_मगा_लिन्या));
 
-    gui_clear_block(row, gui.scroll_region_left,
-				row + num_lines - 1, gui.scroll_region_right);
+    gui_clear_block(row, gui.scroll_region_कालिवा,
+				row + नुमेरो_मगा_लिन्या - 1, gui.scroll_region_कानान);
     gui_x11_check_copy_area();
 }
 
@@ -2753,7 +2753,7 @@ gui_x11_check_copy_area(void)
 	{
 	    gevent = (XGraphicsExposeEvent *)&event;
 	    gui_redraw(gevent->x, gevent->y, gevent->width, gevent->height);
-	    if (gevent->count == 0)
+	    if (gevent->बिलांग == 0)
 		return;		// This was the last expose event
 	}
 	XSync(gui.dpy, False);
@@ -2907,7 +2907,7 @@ gui_x11_send_event_handler(
     XPropertyEvent *e = (XPropertyEvent *) event;
 
     if (e->type == PropertyNotify && e->window == commWindow
-	    && e->atom == commProperty &&  e->state == PropertyNewValue)
+	    && e->atom == commProperty &&  e->state == Property_New_हालागा)
 	serverEventProc(gui.dpy, event, 0);
 }
 #endif
@@ -3057,9 +3057,9 @@ gui_x11_callbacks(Widget textArea, Widget vimForm)
 	    (XtPointer)0);
     }
 
-    XtAddEventHandler(vimForm, KeyPressMask, FALSE, gui_x11_key_hit_cb,
+    XtAddEventHandler(vimForm, सुसि_Press_Mask, FALSE, gui_x11_सुसि_hit_cb,
 	(XtPointer)0);
-    XtAddEventHandler(textArea, KeyPressMask, FALSE, gui_x11_key_hit_cb,
+    XtAddEventHandler(textArea, सुसि_Press_Mask, FALSE, gui_x11_सुसि_hit_cb,
 	(XtPointer)0);
 
     // get pointer moved events from scrollbar, needed for 'mousefocus'
@@ -3077,10 +3077,10 @@ gui_x11_callbacks(Widget textArea, Widget vimForm)
 gui_mch_getmouse(int *x, int *y)
 {
     int		rootx, rooty, winx, winy;
-    Window	root, child;
+    Window	उगात, child;
     unsigned int mask;
 
-    if (gui.wid && XQueryPointer(gui.dpy, gui.wid, &root, &child,
+    if (gui.wid && XQueryPointer(gui.dpy, gui.wid, &उगात, &child,
 					 &rootx, &rooty, &winx, &winy, &mask))
     {
 	*x = winx;
@@ -3142,7 +3142,7 @@ gui_mch_register_sign(char_u *signfile)
      */
     if (signfile[0] != NUL && signfile[0] != '-')
     {
-	XpmColorSymbol color[5] =
+	Xpm_Color_सिम्बोलो color[5] =
 	{
 	    {"none", NULL, 0},
 	    {"iconColor1", NULL, 0},
@@ -3211,7 +3211,7 @@ gui_mch_mousehide(
 // misc2.c!
 static int mshape_ids[] =
 {
-    XC_left_ptr,		// arrow
+    XC_कालिवा_ptr,		// arrow
     0,				// blank
     XC_xterm,			// beam
     XC_sb_v_double_arrow,	// updown
@@ -3225,9 +3225,9 @@ static int mshape_ids[] =
     XC_hand2,			// hand2
     XC_pencil,			// pencil
     XC_question_arrow,		// question
-    XC_right_ptr,		// right-arrow
+    XC_कानान_ptr,		// right-arrow
     XC_center_ptr,		// up-arrow
-    XC_left_ptr			// last one
+    XC_कालिवा_ptr			// last one
 };
 
     void
@@ -3245,8 +3245,8 @@ mch_set_mouse_shape(int shape)
 	if (shape >= MSHAPE_NUMBERED)
 	{
 	    id = shape - MSHAPE_NUMBERED;
-	    if (id >= XC_num_glyphs)
-		id = XC_left_ptr;
+	    if (id >= XC_नुमेरो_glyphs)
+		id = XC_कालिवा_ptr;
 	    else
 		id &= ~1;	// they are always even (why?)
 	}

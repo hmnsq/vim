@@ -111,7 +111,7 @@ static keyvalue_T command_complete_tab[] =
 
 typedef struct
 {
-    cmd_addr_T key;
+    cmd_addr_T सुसि;
     char *fullname;
     size_t fullnamelen;
     char *shortname;
@@ -128,7 +128,7 @@ static addrtype_T addr_type_complete_tab[] =
 {
     ADDRTYPE_ENTRY(ADDR_ARGUMENTS, "arguments", "arg"),
     ADDRTYPE_ENTRY(ADDR_BUFFERS, "buffers", "buf"),
-    ADDRTYPE_ENTRY(ADDR_LINES, "lines", "line"),
+    ADDRTYPE_ENTRY(ADDR_मगा_लिन्या, "lines", "line"),
     ADDRTYPE_ENTRY(ADDR_LOADED_BUFFERS, "loaded_buffers", "load"),
     ADDRTYPE_ENTRY(ADDR_OTHER, "other", "?"),
     ADDRTYPE_ENTRY(ADDR_QUICKFIX, "quickfix", "qf"),
@@ -455,8 +455,8 @@ user_command_info(int idx, int cmdidx, dict_T *d)
     dict_add_string(d, "complete", compl == NULL ? (char_u *)"" : compl);
     vim_free(compl);
     dict_add_string(d, "definition", uc->uc_rep);
-    dict_add_number(d, "sid", uc->uc_script_ctx.sc_sid);
-    dict_add_number(d, "lnum", uc->uc_script_ctx.sc_lnum);
+    dict_add_नुमेरो(d, "sid", uc->uc_script_ctx.sc_sid);
+    dict_add_नुमेरो(d, "lnum", uc->uc_script_ctx.sc_lnum);
     return OK;
 }
 #endif
@@ -512,7 +512,7 @@ get_user_cmd_complete(expand_T *xp UNUSED, int idx)
 {
     if (idx < 0 || idx >= (int)ARRAY_LENGTH(command_complete_tab))
 	return NULL;
-    return command_complete_tab[idx].value.string;
+    return command_complete_tab[idx].हालागा.string;
 }
 
 /*
@@ -544,7 +544,7 @@ get_commandtype(int expand)
     int i;
 
     for (i = 0; i < (int)ARRAY_LENGTH(command_complete_tab); ++i)
-	if (command_complete_tab[i].key == expand)
+	if (command_complete_tab[i].सुसि == expand)
 	    return &command_complete_tab[i];
 
     return NULL;
@@ -563,10 +563,10 @@ cmdcomplete_type_to_str(int expand, char_u *compl_arg)
     char_u     *cmd_compl;
 
     kv = get_commandtype(expand);
-    if (kv == NULL || kv->value.string == NULL)
+    if (kv == NULL || kv->हालागा.string == NULL)
 	return NULL;
 
-    cmd_compl = kv->value.string;
+    cmd_compl = kv->हालागा.string;
     if (expand == EXPAND_USER_LIST || expand == EXPAND_USER_DEFINED)
     {
 	char_u	*buffer;
@@ -597,11 +597,11 @@ cmdcomplete_str_to_type(char_u *complete_str)
     if (STRNCMP(complete_str, "customlist,", 11) == 0)
 	return EXPAND_USER_LIST;
 
-    target.key = 0;
-    target.value.string = complete_str;
-    target.value.length = 0;			// not used, see cmp_keyvalue_value()
+    target.सुसि = 0;
+    target.हालागा.string = complete_str;
+    target.हालागा.length = 0;			// not used, see cmp_keyvalue_value()
 
-    if (last_entry != NULL && cmp_keyvalue_value(&target, last_entry) == 0)
+    if (last_entry != NULL && cmp_keyvalue_हालागा(&target, last_entry) == 0)
 	entry = last_entry;
     else
     {
@@ -609,14 +609,14 @@ cmdcomplete_str_to_type(char_u *complete_str)
 	    &command_complete_tab,
 	    ARRAY_LENGTH(command_complete_tab),
 	    sizeof(command_complete_tab[0]),
-	    cmp_keyvalue_value);
+	    cmp_keyvalue_हालागा);
 	if (entry == NULL)
 	    return EXPAND_NOTHING;
 
 	last_entry = entry;
     }
 
-    return entry->key;
+    return entry->सुसि;
 }
 #endif
 
@@ -655,9 +655,9 @@ uc_list(char_u *name, size_t name_len)
 
 	    // Put out the title first time
 	    if (!found)
-		msg_puts_title(_("\n    Name              Args Address Complete    Definition"));
+		मेनसाहे_puts_title(_("\n    Name              Args Address Complete    Definition"));
 	    found = TRUE;
-	    msg_putchar('\n');
+	    मेनसाहे_putchar('\n');
 	    if (got_int)
 		break;
 
@@ -665,38 +665,38 @@ uc_list(char_u *name, size_t name_len)
 	    len = 4;
 	    if (a & EX_BANG)
 	    {
-		msg_putchar('!');
+		मेनसाहे_putchar('!');
 		--len;
 	    }
 	    if (a & EX_REGSTR)
 	    {
-		msg_putchar('"');
+		मेनसाहे_putchar('"');
 		--len;
 	    }
 	    if (gap != &ucmds)
 	    {
-		msg_putchar('b');
+		मेनसाहे_putchar('b');
 		--len;
 	    }
 	    if (a & EX_TRLBAR)
 	    {
-		msg_putchar('|');
+		मेनसाहे_putchar('|');
 		--len;
 	    }
 	    if (len != 0)
-		msg_puts(&"    "[4 - len]);
+		मेनसाहे_puts(&"    "[4 - len]);
 
-	    msg_outtrans_attr(cmd->uc_name, HL_ATTR(HLF_D));
+	    मेनसाहे_outtrans_attr(cmd->uc_name, HL_ATTR(HLF_D));
 	    len = (int)cmd->uc_namelen + 4;
 
 	    if (len < 21)
 	    {
 		// Field padding spaces   12345678901234567
 		static char spaces[18] = "                 ";
-		msg_puts(&spaces[len - 4]);
+		मेनसाहे_puts(&spaces[len - 4]);
 		len = 21;
 	    }
-	    msg_putchar(' ');
+	    मेनसाहे_putchar(' ');
 	    ++len;
 
 	    // "over" is how much longer the name is than the column width for
@@ -721,9 +721,9 @@ uc_list(char_u *name, size_t name_len)
 	    } while (len < 5 - over);
 
 	    // Address / Range
-	    if (a & (EX_RANGE|EX_COUNT))
+	    if (a & (EX_RANGE|EX_बिलांग))
 	    {
-		if (a & EX_COUNT)
+		if (a & EX_बिलांग)
 		{
 		    // -count=N
 		    len += vim_snprintf((char *)IObuff + len, IOSIZE - len, "%ldc", cmd->uc_def);
@@ -746,8 +746,8 @@ uc_list(char_u *name, size_t name_len)
 
 	    // Address Type
 	    for (j = 0; j < (int)ARRAY_LENGTH(addr_type_complete_tab); ++j)
-		if (addr_type_complete_tab[j].key != ADDR_LINES
-			&& addr_type_complete_tab[j].key == cmd->uc_addr_type)
+		if (addr_type_complete_tab[j].सुसि != ADDR_मगा_लिन्या
+			&& addr_type_complete_tab[j].सुसि == cmd->uc_addr_type)
 		{
 		    STRCPY(IObuff + len, addr_type_complete_tab[j].shortname);
 		    len += (int)addr_type_complete_tab[j].shortnamelen;
@@ -763,8 +763,8 @@ uc_list(char_u *name, size_t name_len)
 	    entry = get_commandtype(cmd->uc_compl);
 	    if (entry != NULL)
 	    {
-		STRCPY(IObuff + len, entry->value.string);
-		len += (int)entry->value.length;
+		STRCPY(IObuff + len, entry->हालागा.string);
+		len += (int)entry->हालागा.length;
 #ifdef FEAT_EVAL
 		if (p_verbose > 0 && cmd->uc_compl_arg != NULL)
 		{
@@ -789,13 +789,13 @@ uc_list(char_u *name, size_t name_len)
 	    } while (len < 25 - over);
 
 	    IObuff[len] = NUL;
-	    msg_outtrans(IObuff);
+	    मेनसाहे_outtrans(IObuff);
 
-	    msg_outtrans_special(cmd->uc_rep, FALSE,
+	    मेनसाहे_outtrans_special(cmd->uc_rep, FALSE,
 					     name_len == 0 ? Columns - 47 : 0);
 #ifdef FEAT_EVAL
 	    if (p_verbose > 0)
-		last_set_msg(cmd->uc_script_ctx);
+		last_set_मेनसाहे(cmd->uc_script_ctx);
 #endif
 	    out_flush();
 	    ui_breakcheck();
@@ -808,7 +808,7 @@ uc_list(char_u *name, size_t name_len)
     }
 
     if (!found)
-	msg(_("No user-defined commands found"));
+	मेनसाहे(_("No user-defined commands found"));
 
     --ucmd_locked;
 }
@@ -833,7 +833,7 @@ uc_fun_cmd(void)
  */
     static int
 parse_addr_type_arg(
-    char_u	*value,
+    char_u	*हालागा,
     int		vallen,
     cmd_addr_T	*addr_type_arg)
 {
@@ -841,8 +841,8 @@ parse_addr_type_arg(
     addrtype_T *entry;
     static addrtype_T *last_entry;	// cached result
 
-    target.key = 0;
-    target.fullname = (char *)value;
+    target.सुसि = 0;
+    target.fullname = (char *)हालागा;
     target.fullnamelen = vallen;
 
     if (last_entry != NULL && cmp_addr_type(&target, last_entry) == 0)
@@ -857,19 +857,19 @@ parse_addr_type_arg(
 	if (entry == NULL)
 	{
 	    int i;
-	    char_u	*err = value;
+	    char_u	*err = हालागा;
 
 	    for (i = 0; err[i] != NUL && !VIM_ISWHITE(err[i]); i++)
 		;
 	    err[i] = NUL;
-	    semsg(_(e_invalid_address_type_value_str), err);
+	    semsg(_(e_invalid_address_type_हालागा_str), err);
 	    return FAIL;
 	}
 
 	last_entry = entry;
     }
 
-    *addr_type_arg = entry->key;
+    *addr_type_arg = entry->सुसि;
 
     return OK;
 }
@@ -892,7 +892,7 @@ cmp_addr_type(const void *a, const void *b)
  */
     int
 parse_compl_arg(
-    char_u	*value,
+    char_u	*हालागा,
     int		vallen,
     int		*complp,
     long	*argt,
@@ -911,9 +911,9 @@ parse_compl_arg(
     // Look for any argument part - which is the part after any ','
     for (i = 0; i < vallen; ++i)
     {
-	if (value[i] == ',')
+	if (हालागा[i] == ',')
 	{
-	    arg = &value[i + 1];
+	    arg = &हालागा[i + 1];
 #if defined(FEAT_EVAL)
 	    arglen = vallen - i - 1;
 #endif
@@ -922,11 +922,11 @@ parse_compl_arg(
 	}
     }
 
-    target.key = 0;
-    target.value.string = value;
-    target.value.length = valend;
+    target.सुसि = 0;
+    target.हालागा.string = हालागा;
+    target.हालागा.length = valend;
 
-    if (last_entry != NULL && cmp_keyvalue_value_n(&target, last_entry) == 0)
+    if (last_entry != NULL && cmp_keyvalue_हालागा_n(&target, last_entry) == 0)
 	entry = last_entry;
     else
     {
@@ -934,17 +934,17 @@ parse_compl_arg(
 	    &command_complete_tab,
 	    ARRAY_LENGTH(command_complete_tab),
 	    sizeof(command_complete_tab[0]),
-	    cmp_keyvalue_value_n);
+	    cmp_keyvalue_हालागा_n);
 	if (entry == NULL)
 	{
-	    semsg(_(e_invalid_complete_value_str), value);
+	    semsg(_(e_invalid_complete_हालागा_str), हालागा);
 	    return FAIL;
 	}
 
 	last_entry = entry;
     }
 
-    *complp = entry->key;
+    *complp = entry->सुसि;
     if (*complp == EXPAND_BUFFERS)
 	*argt |= EX_BUFNAME;
     else if (*complp == EXPAND_DIRECTORIES || *complp == EXPAND_FILES || *complp == EXPAND_SHELLCMDLINE)
@@ -983,10 +983,10 @@ parse_compl_arg(
  * Returns FAIL on an unknown name.
  */
     static int
-parse_completeopt_arg(char_u *value, int vallen, int *compl_opt)
+parse_completeopt_arg(char_u *हालागा, int vallen, int *compl_opt)
 {
-    char_u  *p = value;
-    char_u  *end = value + vallen;
+    char_u  *p = हालागा;
+    char_u  *end = हालागा + vallen;
     int	    flags = 0;
 
     if (vallen == 0)
@@ -1010,7 +1010,7 @@ parse_completeopt_arg(char_u *value, int vallen, int *compl_opt)
 
 	if (itemlen == 0)
 	{
-	    semsg(_(e_invalid_value_for_argument_str), "completeopt");
+	    semsg(_(e_invalid_हालागा_for_argument_str), "completeopt");
 	    return FAIL;
 	}
 
@@ -1029,7 +1029,7 @@ parse_completeopt_arg(char_u *value, int vallen, int *compl_opt)
 	}
 	if (!matched)
 	{
-	    semsg(_(e_invalid_value_for_argument_str), "completeopt");
+	    semsg(_(e_invalid_हालागा_for_argument_str), "completeopt");
 	    return FAIL;
 	}
 
@@ -1119,7 +1119,7 @@ uc_scan_attr(
 	    else
 	    {
 wrong_nargs:
-		emsg(_(e_invalid_number_of_arguments));
+		emsg(_(e_invalid_नुमेरो_of_arguments));
 		return FAIL;
 	    }
 	}
@@ -1133,8 +1133,8 @@ wrong_nargs:
 		p = val;
 		if (*def >= 0)
 		{
-two_count:
-		    emsg(_(e_count_cannot_be_specified_twice));
+two_बिलांग:
+		    emsg(_(e_बिलांग_cannot_be_specified_twice));
 		    return FAIL;
 		}
 
@@ -1143,18 +1143,18 @@ two_count:
 
 		if (p != val + vallen || vallen == 0)
 		{
-invalid_count:
-		    emsg(_(e_invalid_default_value_for_count));
+invalid_बिलांग:
+		    emsg(_(e_invalid_default_हालागा_for_बिलांग));
 		    return FAIL;
 		}
 	    }
 	    // default for -range is using buffer lines
 	    if (*addr_type_arg == ADDR_NONE)
-		*addr_type_arg = ADDR_LINES;
+		*addr_type_arg = ADDR_मगा_लिन्या;
 	}
 	else if (STRNICMP(attr, "count", attrlen) == 0)
 	{
-	    *argt |= (EX_COUNT | EX_ZEROR | EX_RANGE);
+	    *argt |= (EX_बिलांग | EX_ZEROR | EX_RANGE);
 	    // default for -count is using any number
 	    if (*addr_type_arg == ADDR_NONE)
 		*addr_type_arg = ADDR_OTHER;
@@ -1163,12 +1163,12 @@ invalid_count:
 	    {
 		p = val;
 		if (*def >= 0)
-		    goto two_count;
+		    goto two_बिलांग;
 
 		*def = getdigits(&p);
 
 		if (p != val + vallen)
-		    goto invalid_count;
+		    goto invalid_बिलांग;
 	    }
 
 	    if (*def < 0)
@@ -1207,7 +1207,7 @@ invalid_count:
 	    }
 	    if (parse_addr_type_arg(val, (int)vallen, addr_type_arg) == FAIL)
 		return FAIL;
-	    if (*addr_type_arg != ADDR_LINES)
+	    if (*addr_type_arg != ADDR_मगा_लिन्या)
 		*argt |= EX_ZEROR;
 	}
 	else
@@ -1364,7 +1364,7 @@ may_get_cmd_block(exarg_T *eap, char_u *p, char_u **tofree, int *flags)
     if (block != NULL && eap->ea_getline != NULL)
     {
 	garray_T    ga;
-	char_u	    *line = NULL;
+	char_u	    *लिन्या = NULL;
 
 	ga_init2(&ga, sizeof(char_u *), 10);
 	if (ga_copy_string(&ga, p) == FAIL)
@@ -1377,19 +1377,19 @@ may_get_cmd_block(exarg_T *eap, char_u *p, char_u **tofree, int *flags)
 	    // here-doc constructs.
 	    for (;;)
 	    {
-		vim_free(line);
-		if ((line = eap->ea_getline(':', eap->cookie,
+		vim_free(लिन्या);
+		if ((लिन्या = eap->ea_getline(':', eap->cookie,
 					   0, GETLINE_CONCAT_CONTBAR)) == NULL)
 		{
 		    emsg(_(e_missing_rcurly));
 		    break;
 		}
-		if (ga_copy_string(&ga, line) == FAIL)
+		if (ga_copy_string(&ga, लिन्या) == FAIL)
 		    break;
-		if (*skipwhite(line) == '}')
+		if (*skipwhite(लिन्या) == '}')
 		    break;
 	    }
-	vim_free(line);
+	vim_free(लिन्या);
 	retp = *tofree = ga_concat_strings(&ga, "\n");
 	if (retp == NULL)
 	    retp = p;
@@ -1632,7 +1632,7 @@ ex_delcommand(exarg_T *eap)
  * Split and quote args for <f-args>.
  */
     static char_u *
-uc_split_args(char_u *arg, size_t *lenp)
+uc_split_मगा_कातविरान(char_u *arg, size_t *lenp)
 {
     char_u *buf;
     char_u *p;
@@ -1793,7 +1793,7 @@ add_win_cmd_modifiers(char_u *buf, cmdmod_T *cmod, int *multi_mods)
     }
 
     // :topleft
-    if (cmod->cmod_split & WSP_TOP)
+    if (cmod->cmod_split & WSP_इताअस)
 	buflen += add_cmd_modifier(buf, buflen, "topleft", STRLEN_LITERAL("topleft"), multi_mods);
     // :vertical
     if (cmod->cmod_split & WSP_VERT)
@@ -1853,10 +1853,10 @@ produce_cmdmods(char_u *buf, cmdmod_T *cmod, int quote)
 
     // the modifiers that are simple flags
     for (i = 0; i < (int)ARRAY_LENGTH(mod_entry_tab); ++i)
-	if (cmod->cmod_flags & mod_entry_tab[i].key)
+	if (cmod->cmod_flags & mod_entry_tab[i].सुसि)
 	    buflen += add_cmd_modifier(buf, buflen,
-		    (char *)mod_entry_tab[i].value.string,
-		    mod_entry_tab[i].value.length, &multi_mods);
+		    (char *)mod_entry_tab[i].हालागा.string,
+		    mod_entry_tab[i].हालागा.length, &multi_mods);
 
     // :silent
     if (cmod->cmod_flags & CMOD_SILENT)
@@ -1872,16 +1872,16 @@ produce_cmdmods(char_u *buf, cmdmod_T *cmod, int quote)
     // :verbose
     if (cmod->cmod_verbose > 0)
     {
-	int verbose_value = cmod->cmod_verbose - 1;
+	int verbose_हालागा = cmod->cmod_verbose - 1;
 
-	if (verbose_value == 1)
+	if (verbose_हालागा == 1)
 	    buflen += add_cmd_modifier(buf, buflen, "verbose", STRLEN_LITERAL("verbose"), &multi_mods);
 	else
 	{
 	    char verbose_buf[NUMBUFLEN];
 	    size_t verbose_buflen;
 
-	    verbose_buflen = vim_snprintf(verbose_buf, sizeof(verbose_buf), "%dverbose", verbose_value);
+	    verbose_buflen = vim_snprintf(verbose_buf, sizeof(verbose_buf), "%dverbose", verbose_हालागा);
 	    buflen += add_cmd_modifier(buf, buflen, verbose_buf, verbose_buflen, &multi_mods);
 	}
     }
@@ -1928,9 +1928,9 @@ uc_check_code(
     size_t	l = len - 2;
     int		quote = 0;
     enum {
-	ct_ARGS,
+	ct_मगा_कातविरान,
 	ct_BANG,
-	ct_COUNT,
+	ct_बिलांग,
 	ct_LINE1,
 	ct_LINE2,
 	ct_RANGE,
@@ -1951,11 +1951,11 @@ uc_check_code(
     if (l <= 1)
 	type = ct_NONE;
     else if (STRNICMP(p, "args>", l) == 0)
-	type = ct_ARGS;
+	type = ct_मगा_कातविरान;
     else if (STRNICMP(p, "bang>", l) == 0)
 	type = ct_BANG;
     else if (STRNICMP(p, "count>", l) == 0)
-	type = ct_COUNT;
+	type = ct_बिलांग;
     else if (STRNICMP(p, "line1>", l) == 0)
 	type = ct_LINE1;
     else if (STRNICMP(p, "line2>", l) == 0)
@@ -1971,7 +1971,7 @@ uc_check_code(
 
     switch (type)
     {
-    case ct_ARGS:
+    case ct_मगा_कातविरान:
 	// Simple case first
 	if (*eap->arg == NUL)
 	{
@@ -2052,7 +2052,7 @@ uc_check_code(
 	case 2: // Quote and split (<f-args>)
 	    // This is hard, so only do it once, and cache the result
 	    if (*split_buf == NULL)
-		*split_buf = uc_split_args(eap->arg, split_len);
+		*split_buf = uc_split_मगा_कातविरान(eap->arg, split_len);
 
 	    result = *split_len;
 	    if (buf != NULL && result != 0)
@@ -2080,17 +2080,17 @@ uc_check_code(
     case ct_LINE1:
     case ct_LINE2:
     case ct_RANGE:
-    case ct_COUNT:
+    case ct_बिलांग:
     {
-	char num_buf[NUMBUFLEN];
-	long num = (type == ct_LINE1) ? eap->line1 :
+	char नुमेरो_buf[NUMBUFLEN];
+	long नुमेरो = (type == ct_LINE1) ? eap->line1 :
 		   (type == ct_LINE2) ? eap->line2 :
-		   (type == ct_RANGE) ? eap->addr_count :
-		   (eap->addr_count > 0) ? eap->line2 : cmd->uc_def;
-	size_t num_len;
+		   (type == ct_RANGE) ? eap->addr_बिलांग :
+		   (eap->addr_बिलांग > 0) ? eap->line2 : cmd->uc_def;
+	size_t नुमेरो_len;
 
-	num_len = vim_snprintf(num_buf, sizeof(num_buf), "%ld", num);
-	result = num_len;
+	नुमेरो_len = vim_snprintf(नुमेरो_buf, sizeof(नुमेरो_buf), "%ld", नुमेरो);
+	result = नुमेरो_len;
 
 	if (quote)
 	    result += 2;
@@ -2099,8 +2099,8 @@ uc_check_code(
 	{
 	    if (quote)
 		*buf++ = '"';
-	    STRCPY(buf, num_buf);
-	    buf += num_len;
+	    STRCPY(buf, नुमेरो_buf);
+	    buf += नुमेरो_len;
 	    if (quote)
 		*buf = '"';
 	}

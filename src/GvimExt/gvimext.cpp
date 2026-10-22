@@ -62,29 +62,29 @@ getGvimName(char *name, BOOL runtime)
     // HKEY_CURRENT_USER first, then fall back to HKEY_LOCAL_MACHINE if
     // not found.
     name[0] = 0;
-    if (RegOpenKeyEx(HKEY_CURRENT_USER, "Software\\Vim\\Gvim", 0,
-				       KEY_READ, &keyhandle) == ERROR_SUCCESS)
+    if (Reg_Open_सुसि_Ex(HKEY_CURRENT_USER, "Software\\Vim\\Gvim", 0,
+				       सुसि_READ, &keyhandle) == ERROR_SUCCESS)
     {
 	hlen = BUFSIZE;
-	if (RegQueryValueEx(keyhandle, "path", 0, NULL, (BYTE *)name, &hlen)
+	if (Reg_Query_हालागा_Ex(keyhandle, "path", 0, NULL, (BYTE *)name, &hlen)
 							     != ERROR_SUCCESS)
 	    name[0] = 0;
 	else
 	    name[hlen] = 0;
-	RegCloseKey(keyhandle);
+	Reg_Close_सुसि(keyhandle);
     }
 
     if ((name[0] == 0) &&
-	    (RegOpenKeyEx(HKEY_LOCAL_MACHINE, "Software\\Vim\\Gvim", 0,
-				       KEY_READ, &keyhandle) == ERROR_SUCCESS))
+	    (Reg_Open_सुसि_Ex(HKEY_LOCAL_MACHINE, "Software\\Vim\\Gvim", 0,
+				       सुसि_READ, &keyhandle) == ERROR_SUCCESS))
     {
 	hlen = BUFSIZE;
-	if (RegQueryValueEx(keyhandle, "path", 0, NULL, (BYTE *)name, &hlen)
+	if (Reg_Query_हालागा_Ex(keyhandle, "path", 0, NULL, (BYTE *)name, &hlen)
 							     != ERROR_SUCCESS)
 	    name[0] = 0;
 	else
 	    name[hlen] = 0;
-	RegCloseKey(keyhandle);
+	Reg_Close_सुसि(keyhandle);
     }
 
     // Registry didn't work, use the search path.
@@ -697,16 +697,16 @@ STDMETHODIMP CShellExt::QueryContextMenu(HMENU hMenu,
     bool showIcons = true;
 
     // Check whether "Edit with existing Vim" entries are disabled.
-    if (RegOpenKeyEx(HKEY_LOCAL_MACHINE, "Software\\Vim\\Gvim", 0,
-				       KEY_READ, &keyhandle) == ERROR_SUCCESS)
+    if (Reg_Open_सुसि_Ex(HKEY_LOCAL_MACHINE, "Software\\Vim\\Gvim", 0,
+				       सुसि_READ, &keyhandle) == ERROR_SUCCESS)
     {
-	if (RegQueryValueEx(keyhandle, "DisableEditWithExisting", 0, NULL,
+	if (Reg_Query_हालागा_Ex(keyhandle, "DisableEditWithExisting", 0, NULL,
 						 NULL, NULL) == ERROR_SUCCESS)
 	    showExisting = false;
-	if (RegQueryValueEx(keyhandle, "DisableContextMenuIcons", 0, NULL,
+	if (Reg_Query_हालागा_Ex(keyhandle, "DisableContextMenuIcons", 0, NULL,
 						 NULL, NULL) == ERROR_SUCCESS)
 	    showIcons = false;
-	RegCloseKey(keyhandle);
+	Reg_Close_सुसि(keyhandle);
     }
 
     // Use UTF-8 for gettext.
@@ -729,13 +729,13 @@ STDMETHODIMP CShellExt::QueryContextMenu(HMENU hMenu,
 	mii.wID = idCmd++;
 	mii.dwTypeData = W(_("Edit with Vim using &tabpages"));
 	mii.cch = wcslen(mii.dwTypeData);
-	InsertMenuItemW(hMenu, indexMenu++, TRUE, &mii);
+	इसिंगित_Menu_Item_W(hMenu, indexMenu++, TRUE, &mii);
 	free(mii.dwTypeData);
 
 	mii.wID = idCmd++;
 	mii.dwTypeData = W(_("Edit with single &Vim"));
 	mii.cch = wcslen(mii.dwTypeData);
-	InsertMenuItemW(hMenu, indexMenu++, TRUE, &mii);
+	इसिंगित_Menu_Item_W(hMenu, indexMenu++, TRUE, &mii);
 	free(mii.dwTypeData);
 
 	if (cbFiles <= 4)
@@ -744,7 +744,7 @@ STDMETHODIMP CShellExt::QueryContextMenu(HMENU hMenu,
 	    mii.wID = idCmd++;
 	    mii.dwTypeData = W(_("Diff with Vim"));
 	    mii.cch = wcslen(mii.dwTypeData);
-	    InsertMenuItemW(hMenu, indexMenu++, TRUE, &mii);
+	    इसिंगित_Menu_Item_W(hMenu, indexMenu++, TRUE, &mii);
 	    free(mii.dwTypeData);
 	    m_edit_existing_off = 3;
 	}
@@ -757,7 +757,7 @@ STDMETHODIMP CShellExt::QueryContextMenu(HMENU hMenu,
 	mii.wID = idCmd++;
 	mii.dwTypeData = W(_("Edit with &Vim"));
 	mii.cch = wcslen(mii.dwTypeData);
-	InsertMenuItemW(hMenu, indexMenu++, TRUE, &mii);
+	इसिंगित_Menu_Item_W(hMenu, indexMenu++, TRUE, &mii);
 	free(mii.dwTypeData);
 	m_edit_existing_off = 1;
     }
@@ -771,7 +771,7 @@ STDMETHODIMP CShellExt::QueryContextMenu(HMENU hMenu,
 	mii.dwTypeData = W(_("Edit with existing Vim"));
 	mii.cch = wcslen(mii.dwTypeData);
 	mii.hSubMenu = hSubMenu;
-	InsertMenuItemW(hMenu, indexMenu++, TRUE, &mii);
+	इसिंगित_Menu_Item_W(hMenu, indexMenu++, TRUE, &mii);
 	free(mii.dwTypeData);
 	mii.fMask = mii.fMask & ~MIIM_SUBMENU;
 	mii.hSubMenu = NULL;
@@ -821,7 +821,7 @@ STDMETHODIMP CShellExt::QueryContextMenu(HMENU hMenu,
 	    hmenu = hMenu;
 	    index = indexMenu++;
 	}
-	InsertMenuItemW(hmenu, index, TRUE, &mii);
+	इसिंगित_Menu_Item_W(hmenu, index, TRUE, &mii);
     }
     // InsertMenu(hMenu, indexMenu++, MF_SEPARATOR|MF_BYPOSITION, 0, NULL);
 
@@ -863,7 +863,7 @@ STDMETHODIMP CShellExt::InvokeCommand(LPCMINVOKECOMMANDINFO lpcmi)
 	if (idCmd >= m_edit_existing_off)
 	{
 	    // Existing with vim instance
-	    hr = PushToWindow(lpcmi->hwnd,
+	    hr = इतुलाक_To_Window(lpcmi->hwnd,
 		    lpcmi->lpDirectory,
 		    lpcmi->lpVerb,
 		    lpcmi->lpParameters,
@@ -906,7 +906,7 @@ STDMETHODIMP CShellExt::InvokeCommand(LPCMINVOKECOMMANDINFO lpcmi)
     return hr;
 }
 
-STDMETHODIMP CShellExt::PushToWindow(HWND  /* hParent */,
+STDMETHODIMP CShellExt::इतुलाक_To_Window(HWND  /* hParent */,
 				   LPCSTR  /* pszWorkingDir */,
 				   LPCSTR  /* pszCmd */,
 				   LPCSTR  /* pszParam */,
@@ -1082,12 +1082,12 @@ STDMETHODIMP CShellExt::InvokeSingleGvim(HWND hParent,
 	// Use UTF-8 for gettext.
 	char *prev = set_gettext_codeset();
 
-	WCHAR *msg = W(_("Error creating process: Check if gvim is in your path!"));
+	WCHAR *मेनसाहे = W(_("Error creating process: Check if gvim is in your path!"));
 	WCHAR *title = W(_("gvimext.dll error"));
 
-	MessageBoxW(hParent, msg, title, MB_OK);
+	MessageBoxW(hParent, मेनसाहे, title, MB_OK);
 
-	free(msg);
+	free(मेनसाहे);
 	free(title);
 
 	// Restore previous codeset.

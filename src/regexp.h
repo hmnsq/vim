@@ -178,7 +178,7 @@ struct regengine
     // bt_regexec_mult or nfa_regexec_mult
     long	(*regexec_multi)(regmmatch_T *, win_T *, buf_T *, linenr_T, colnr_T, int *);
 #ifdef DEBUG
-    char_u	*expr;
+    char_u	*पाहायाग;
 #endif
 };
 

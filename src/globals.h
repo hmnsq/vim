@@ -40,11 +40,11 @@ EXTERN long	Columns INIT(= 80);	// nr of columns in the screen
  * Note: before the screen is initialized and when out of memory these can be
  * NULL.
  */
-EXTERN schar_T	*ScreenLines INIT(= NULL);
+EXTERN schar_T	*Screen_मगा_लिन्या INIT(= NULL);
 EXTERN sattr_T	*ScreenAttrs INIT(= NULL);
 EXTERN colnr_T  *ScreenCols INIT(= NULL);
-EXTERN unsigned	*LineOffset INIT(= NULL);
-EXTERN char_u	*LineWraps INIT(= NULL);	// line wraps to next line
+EXTERN unsigned	*लिन्या_Offset INIT(= NULL);
+EXTERN char_u	*लिन्या_Wraps INIT(= NULL);	// line wraps to next line
 
 /*
  * When using Unicode characters (in UTF-8 encoding) the character in
@@ -54,8 +54,8 @@ EXTERN char_u	*LineWraps INIT(= NULL);	// line wraps to next line
  * ScreenLinesC[0][off] is only to be used when ScreenLinesUC[off] != 0.
  * Note: These three are only allocated when enc_utf8 is set!
  */
-EXTERN u8char_T	*ScreenLinesUC INIT(= NULL);	// decoded UTF-8 characters
-EXTERN u8char_T	*ScreenLinesC[MAX_MCO];		// composing characters
+EXTERN u8char_T	*Screen_मगा_लिन्या_UC INIT(= NULL);	// decoded UTF-8 characters
+EXTERN u8char_T	*Screen_मगा_लिन्या_C[MAX_MCO];		// composing characters
 EXTERN int	Screen_mco INIT(= 0);		// value of p_mco used when
 						// allocating ScreenLinesC[]
 
@@ -66,7 +66,7 @@ EXTERN schar_T	*ScreenLines2 INIT(= NULL);
 /*
  * One screen line to be displayed.  Points into ScreenLines.
  */
-EXTERN schar_T	*current_ScreenLine INIT(= NULL);
+EXTERN schar_T	*current_Screen_लिन्या INIT(= NULL);
 
 /*
  * Last known cursor position.
@@ -76,12 +76,12 @@ EXTERN schar_T	*current_ScreenLine INIT(= NULL);
 EXTERN int	screen_cur_row INIT(= 0);
 EXTERN int	screen_cur_col INIT(= 0);
 
-#ifdef FEAT_SEARCH_EXTRA
+#ifdef FEAT_हानाप_EXTRA
 // used for 'hlsearch' highlight matching
-EXTERN match_T	screen_search_hl;
+EXTERN match_T	screen_हानाप_hl;
 
 // last lnum where CurSearch was displayed
-EXTERN linenr_T search_hl_has_cursor_lnum INIT(= 0);
+EXTERN linenr_T हानाप_hl_has_cursor_lnum INIT(= 0);
 
 // don't use 'hlsearch' temporarily
 EXTERN int	no_hlsearch INIT(= FALSE);
@@ -106,11 +106,11 @@ EXTERN short	*TabPageIdxs INIT(= NULL);
 
 // Click regions for 'tabline' (%[FuncName]).
 EXTERN stl_click_region_T *tabline_stl_click INIT(= NULL);
-EXTERN int	tabline_stl_click_count INIT(= 0);
+EXTERN int	tabline_stl_click_बिलांग INIT(= 0);
 
 // Click regions for 'tabpanel' (%[FuncName]).
 EXTERN stl_click_region_T *tabpanel_stl_click INIT(= NULL);
-EXTERN int	tabpanel_stl_click_count INIT(= 0);
+EXTERN int	tabpanel_stl_click_बिलांग INIT(= 0);
 
 #ifdef FEAT_PROP_POPUP
 // Array with size Rows x Columns containing zindex of popups.
@@ -143,10 +143,10 @@ EXTERN int	screen_pum_blend INIT(= 0);
 
 // Saved background screen content for pum opacity blending.
 EXTERN sattr_T	*pum_bg_attrs INIT(= NULL);
-EXTERN schar_T	*pum_bg_lines INIT(= NULL);
-EXTERN u8char_T	*pum_bg_linesUC INIT(= NULL);
-EXTERN u8char_T	*pum_bg_linesC[MAX_MCO];
-EXTERN int	pum_bg_top INIT(= 0);
+EXTERN schar_T	*pum_bg_मगा_लिन्या INIT(= NULL);
+EXTERN u8char_T	*pum_bg_मगा_लिन्या_UC INIT(= NULL);
+EXTERN u8char_T	*pum_bg_मगा_लिन्या_C[MAX_MCO];
+EXTERN int	pum_bg_इताअस INIT(= 0);
 EXTERN int	pum_bg_bot INIT(= 0);
 EXTERN int	pum_bg_cols INIT(= 0);
 
@@ -181,7 +181,7 @@ EXTERN int	redraw_cmdline INIT(= FALSE);	// cmdline must be redrawn
 EXTERN int	redraw_mode INIT(= FALSE);	// mode must be redrawn
 EXTERN int	clear_cmdline INIT(= FALSE);	// cmdline must be cleared
 EXTERN int	mode_displayed INIT(= FALSE);	// mode is being displayed
-EXTERN int	no_win_do_lines_ins INIT(= FALSE); // don't insert lines
+EXTERN int	no_win_do_मगा_लिन्या_ins INIT(= FALSE); // don't insert lines
 #if defined(FEAT_CRYPT) || defined(FEAT_EVAL)
 EXTERN int	cmdline_star INIT(= FALSE);	// cmdline is crypted
 #endif
@@ -214,27 +214,27 @@ EXTERN hlf_T	edit_submode_highl;	// highl. method for extra info
 #ifdef FEAT_RIGHTLEFT
 EXTERN int	cmdmsg_rl INIT(= FALSE);    // cmdline is drawn right to left
 #endif
-EXTERN int	msg_col;
-EXTERN int	msg_row;
-EXTERN int	msg_scrolled;	// Number of screen lines that windows have
+EXTERN int	मेनसाहे_col;
+EXTERN int	मेनसाहे_row;
+EXTERN int	मेनसाहे_scrolled;	// Number of screen lines that windows have
 				// scrolled because of printing messages.
-EXTERN int	msg_scrolled_ign INIT(= FALSE);
+EXTERN int	मेनसाहे_scrolled_ign INIT(= FALSE);
 				// when TRUE don't set need_wait_return in
 				// msg_puts_attr() when msg_scrolled is
 				// non-zero
 
-EXTERN char_u	*keep_msg INIT(= NULL);	    // msg to be shown after redraw
-EXTERN int	keep_msg_attr INIT(= 0);    // highlight attr for keep_msg
-EXTERN int	keep_msg_more INIT(= FALSE); // keep_msg was set by msgmore()
+EXTERN char_u	*keep_मेनसाहे INIT(= NULL);	    // msg to be shown after redraw
+EXTERN int	keep_मेनसाहे_attr INIT(= 0);    // highlight attr for keep_msg
+EXTERN int	keep_मेनसाहे_more INIT(= FALSE); // keep_msg was set by msgmore()
 EXTERN int	need_fileinfo INIT(= FALSE);// do fileinfo() after redraw
-EXTERN int	msg_scroll INIT(= FALSE);   // msg_start() will scroll
-EXTERN int	msg_didout INIT(= FALSE);   // msg_outstr() was used in line
-EXTERN int	msg_didany INIT(= FALSE);   // msg_outstr() was used at all
-EXTERN int	msg_nowait INIT(= FALSE);   // don't wait for this msg
+EXTERN int	मेनसाहे_scroll INIT(= FALSE);   // msg_start() will scroll
+EXTERN int	मेनसाहे_didout INIT(= FALSE);   // msg_outstr() was used in line
+EXTERN int	मेनसाहे_didany INIT(= FALSE);   // msg_outstr() was used at all
+EXTERN int	मेनसाहे_nowait INIT(= FALSE);   // don't wait for this msg
 EXTERN int	emsg_off INIT(= 0);	    // don't display errors for now,
 					    // unless 'debug' is set.
 EXTERN int	info_message INIT(= FALSE); // printing informative message
-EXTERN int      msg_hist_off INIT(= FALSE); // don't add messages to history
+EXTERN int      मेनसाहे_hist_off INIT(= FALSE); // don't add messages to history
 #ifdef FEAT_EVAL
 EXTERN int	need_clr_eos INIT(= FALSE); // need to clear text before
 					    // displaying a message.
@@ -243,7 +243,7 @@ EXTERN int	emsg_skip INIT(= 0);	    // don't display errors for
 EXTERN int	emsg_severe INIT(= FALSE);  // use message of next of several
 					    // emsg() calls for throw
 // used by assert_fails()
-EXTERN char_u	*emsg_assert_fails_msg INIT(= NULL);
+EXTERN char_u	*emsg_assert_fails_मेनसाहे INIT(= NULL);
 EXTERN long	emsg_assert_fails_lnum INIT(= 0);
 EXTERN char_u	*emsg_assert_fails_context INIT(= NULL);
 
@@ -300,8 +300,8 @@ EXTERN int	didset_vimruntime INIT(= FALSE);    // idem for $VIMRUNTIME
  * Lines left before a "more" message.	Ex mode needs to be able to reset this
  * after you type something.
  */
-EXTERN int	lines_left INIT(= -1);	    // lines left for listing
-EXTERN int	msg_no_more INIT(= FALSE);  // don't use more prompt, truncate
+EXTERN int	मगा_लिन्या_कालिवा INIT(= -1);	    // lines left for listing
+EXTERN int	मेनसाहे_no_more INIT(= FALSE);  // don't use more prompt, truncate
 					    // messages
 
 /*
@@ -329,19 +329,19 @@ EXTERN int	estack_compiling INIT(= FALSE);
 
 EXTERN int	ex_nesting_level INIT(= 0);	// nesting level
 EXTERN int	debug_break_level INIT(= -1);	// break below this level
-EXTERN int	debug_did_msg INIT(= FALSE);	// did "debug mode" message
+EXTERN int	debug_did_मेनसाहे INIT(= FALSE);	// did "debug mode" message
 EXTERN int	debug_tick INIT(= 0);		// breakpoint change count
 EXTERN int	debug_backtrace_level INIT(= 0); // breakpoint backtrace level
 # ifdef FEAT_PROFILE
 EXTERN int	do_profiling INIT(= PROF_NONE);	// PROF_ values
 # endif
-EXTERN garray_T script_items INIT5(0, 0, sizeof(scriptitem_T *), 20, NULL);
-# define SCRIPT_ITEM(id)    (((scriptitem_T **)script_items.ga_data)[(id) - 1])
-# define SCRIPT_ID_VALID(id)    ((id) > 0 && (id) <= script_items.ga_len)
+EXTERN garray_T script_मगा_बागाय INIT5(0, 0, sizeof(scriptitem_T *), 20, NULL);
+# define SCRIPT_ITEM(id)    (((scriptitem_T **)script_मगा_बागाय.ga_data)[(id) - 1])
+# define SCRIPT_ID_VALID(id)    ((id) > 0 && (id) <= script_मगा_बागाय.ga_len)
 # define SCRIPT_SV(id)		(SCRIPT_ITEM(id)->sn_vars)
 # define SCRIPT_VARS(id)	(SCRIPT_SV(id)->sv_dict.dv_hashtab)
 
-# define FUNCLINE(fp, j)	((char_u **)(fp->uf_lines.ga_data))[j]
+# define FUNCLINE(fp, j)	((char_u **)(fp->uf_मगा_लिन्या.ga_data))[j]
 
 /*
  * The exception currently being thrown.  Used to pass an exception to
@@ -395,7 +395,7 @@ EXTERN int force_abort INIT(= FALSE);
  * field of a later list element, when the "emsg_severe" flag was set when the
  * emsg() call was made.
  */
-EXTERN msglist_T **msg_list INIT(= NULL);
+EXTERN msglist_T **मेनसाहे_list INIT(= NULL);
 
 /*
  * suppress_errthrow: When TRUE, don't convert an error to an exception.  Used
@@ -411,7 +411,7 @@ EXTERN int suppress_errthrow INIT(= FALSE);
  * stack of all caught and pending exceptions is embedded in the various
  * cstacks; the pending exceptions, however, are not on the caught stack.
  */
-EXTERN except_T *caught_stack INIT(= NULL);
+EXTERN except_T *caught_सालानसान INIT(= NULL);
 
 /*
  * Garbage collection can only take place when we are sure there are no Lists
@@ -453,16 +453,16 @@ EXTERN int	garbage_collect_at_exit INIT(= FALSE);
 # define t_none			(static_types[10])
 # define t_const_none		(static_types[11])
 
-# define t_number		(static_types[12])
-# define t_const_number		(static_types[13])
+# define t_नुमेरो		(static_types[12])
+# define t_const_नुमेरो		(static_types[13])
 
 // t_number_bool - number that can be used as a bool
-# define t_number_bool		(static_types[14])
-# define t_const_number_bool	(static_types[15])
+# define t_नुमेरो_bool		(static_types[14])
+# define t_const_नुमेरो_bool	(static_types[15])
 
 // t_number_float - number that can be used as a float
-# define t_number_float		(static_types[16])
-# define t_const_number_float	(static_types[17])
+# define t_नुमेरो_float		(static_types[16])
+# define t_const_नुमेरो_float	(static_types[17])
 
 # define t_float			(static_types[18])
 # define t_const_float		(static_types[19])
@@ -483,8 +483,8 @@ EXTERN int	garbage_collect_at_exit INIT(= FALSE);
 # define t_const_channel		(static_types[29])
 
 // t_number_or_string - Special value used for @#.
-# define t_number_or_string	(static_types[30])
-# define t_const_number_or_string (static_types[31])
+# define t_नुमेरो_or_string	(static_types[30])
+# define t_const_नुमेरो_or_string (static_types[31])
 
 // t_func_unknown - function with any arguments and no or unknown return value
 # define t_func_unknown		(static_types[32])
@@ -497,8 +497,8 @@ EXTERN int	garbage_collect_at_exit INIT(= FALSE);
 # define t_func_any		(static_types[36])
 # define t_const_func_any	(static_types[37])
 
-# define t_func_number		(static_types[38])
-# define t_const_func_number	(static_types[39])
+# define t_func_नुमेरो		(static_types[38])
+# define t_const_func_नुमेरो	(static_types[39])
 
 # define t_func_string		(static_types[40])
 # define t_const_func_string	(static_types[41])
@@ -513,8 +513,8 @@ EXTERN int	garbage_collect_at_exit INIT(= FALSE);
 # define t_func_0_any		(static_types[46])
 # define t_const_func_0_any	(static_types[47])
 
-# define t_func_0_number		(static_types[48])
-# define t_const_func_0_number	(static_types[49])
+# define t_func_0_नुमेरो		(static_types[48])
+# define t_const_func_0_नुमेरो	(static_types[49])
 
 # define t_func_0_string		(static_types[50])
 # define t_const_func_0_string	(static_types[51])
@@ -534,8 +534,8 @@ EXTERN int	garbage_collect_at_exit INIT(= FALSE);
 # define t_list_bool		(static_types[60])
 # define t_const_list_bool	(static_types[61])
 
-# define t_list_number		(static_types[62])
-# define t_const_list_number	(static_types[63])
+# define t_list_नुमेरो		(static_types[62])
+# define t_const_list_नुमेरो	(static_types[63])
 
 # define t_list_string		(static_types[64])
 # define t_const_list_string	(static_types[65])
@@ -549,20 +549,20 @@ EXTERN int	garbage_collect_at_exit INIT(= FALSE);
 # define t_list_list_any		(static_types[70])
 # define t_const_list_list_any	(static_types[71])
 
-# define t_list_list_number	(static_types[72])
-# define t_const_list_list_number (static_types[73])
+# define t_list_list_नुमेरो	(static_types[72])
+# define t_const_list_list_नुमेरो (static_types[73])
 
 # define t_list_list_string	(static_types[74])
 # define t_const_list_list_string (static_types[75])
 
-# define t_list_list_list_number	(static_types[76])
-# define t_const_list_list_list_number (static_types[77])
+# define t_list_list_list_नुमेरो	(static_types[76])
+# define t_const_list_list_list_नुमेरो (static_types[77])
 
 # define t_dict_bool		(static_types[78])
 # define t_const_dict_bool	(static_types[79])
 
-# define t_dict_number		(static_types[80])
-# define t_const_dict_number	(static_types[81])
+# define t_dict_नुमेरो		(static_types[80])
+# define t_const_dict_नुमेरो	(static_types[81])
 
 # define t_dict_string		(static_types[82])
 # define t_const_dict_string	(static_types[83])
@@ -614,16 +614,16 @@ EXTERN type_T static_types[96]
     {VAR_SPECIAL, 0, 0, TTFLAG_STATIC|TTFLAG_CONST, NULL, NULL, NULL},
 
     // 12: t_number
-    {VAR_NUMBER, 0, 0, TTFLAG_STATIC, NULL, NULL, NULL},
-    {VAR_NUMBER, 0, 0, TTFLAG_STATIC|TTFLAG_CONST, NULL, NULL, NULL},
+    {VAR_नुमेरो, 0, 0, TTFLAG_STATIC, NULL, NULL, NULL},
+    {VAR_नुमेरो, 0, 0, TTFLAG_STATIC|TTFLAG_CONST, NULL, NULL, NULL},
 
     // 14: t_number_bool
-    {VAR_NUMBER, 0, 0, TTFLAG_STATIC|TTFLAG_BOOL_OK, NULL, NULL, NULL},
-    {VAR_NUMBER, 0, 0, TTFLAG_STATIC|TTFLAG_BOOL_OK|TTFLAG_CONST, NULL, NULL, NULL},
+    {VAR_नुमेरो, 0, 0, TTFLAG_STATIC|TTFLAG_BOOL_OK, NULL, NULL, NULL},
+    {VAR_नुमेरो, 0, 0, TTFLAG_STATIC|TTFLAG_BOOL_OK|TTFLAG_CONST, NULL, NULL, NULL},
 
     // 16: t_number_float
-    {VAR_NUMBER, 0, 0, TTFLAG_STATIC|TTFLAG_FLOAT_OK, NULL, NULL, NULL},
-    {VAR_NUMBER, 0, 0, TTFLAG_STATIC|TTFLAG_FLOAT_OK|TTFLAG_CONST, NULL, NULL, NULL},
+    {VAR_नुमेरो, 0, 0, TTFLAG_STATIC|TTFLAG_FLOAT_OK, NULL, NULL, NULL},
+    {VAR_नुमेरो, 0, 0, TTFLAG_STATIC|TTFLAG_FLOAT_OK|TTFLAG_CONST, NULL, NULL, NULL},
 
     // 18: t_float
     {VAR_FLOAT, 0, 0, TTFLAG_STATIC, NULL, NULL, NULL},
@@ -666,8 +666,8 @@ EXTERN type_T static_types[96]
     {VAR_FUNC, -1, 0, TTFLAG_STATIC|TTFLAG_CONST, &t_any, NULL, NULL},
 
     // 38: t_func_number
-    {VAR_FUNC, -1, 0, TTFLAG_STATIC, &t_number, NULL, NULL},
-    {VAR_FUNC, -1, 0, TTFLAG_STATIC|TTFLAG_CONST, &t_number, NULL, NULL},
+    {VAR_FUNC, -1, 0, TTFLAG_STATIC, &t_नुमेरो, NULL, NULL},
+    {VAR_FUNC, -1, 0, TTFLAG_STATIC|TTFLAG_CONST, &t_नुमेरो, NULL, NULL},
 
     // 40: t_func_string
     {VAR_FUNC, -1, 0, TTFLAG_STATIC, &t_string, NULL, NULL},
@@ -686,8 +686,8 @@ EXTERN type_T static_types[96]
     {VAR_FUNC, 0, 0, TTFLAG_STATIC|TTFLAG_CONST, &t_any, NULL, NULL},
 
     // 48: t_func_0_number
-    {VAR_FUNC, 0, 0, TTFLAG_STATIC, &t_number, NULL, NULL},
-    {VAR_FUNC, 0, 0, TTFLAG_STATIC|TTFLAG_CONST, &t_number, NULL, NULL},
+    {VAR_FUNC, 0, 0, TTFLAG_STATIC, &t_नुमेरो, NULL, NULL},
+    {VAR_FUNC, 0, 0, TTFLAG_STATIC|TTFLAG_CONST, &t_नुमेरो, NULL, NULL},
 
     // 50: t_func_0_string
     {VAR_FUNC, 0, 0, TTFLAG_STATIC, &t_string, NULL, NULL},
@@ -714,8 +714,8 @@ EXTERN type_T static_types[96]
     {VAR_LIST, 0, 0, TTFLAG_STATIC|TTFLAG_CONST, &t_bool, NULL, NULL},
 
     // 62: t_list_number
-    {VAR_LIST, 0, 0, TTFLAG_STATIC, &t_number, NULL, NULL},
-    {VAR_LIST, 0, 0, TTFLAG_STATIC|TTFLAG_CONST, &t_number, NULL, NULL},
+    {VAR_LIST, 0, 0, TTFLAG_STATIC, &t_नुमेरो, NULL, NULL},
+    {VAR_LIST, 0, 0, TTFLAG_STATIC|TTFLAG_CONST, &t_नुमेरो, NULL, NULL},
 
     // 64: t_list_string
     {VAR_LIST, 0, 0, TTFLAG_STATIC, &t_string, NULL, NULL},
@@ -734,24 +734,24 @@ EXTERN type_T static_types[96]
     {VAR_LIST, 0, 0, TTFLAG_STATIC|TTFLAG_CONST, &t_list_any, NULL, NULL},
 
     // 74: t_list_list_number
-    {VAR_LIST, 0, 0, TTFLAG_STATIC, &t_list_number, NULL, NULL},
-    {VAR_LIST, 0, 0, TTFLAG_STATIC|TTFLAG_CONST, &t_list_number, NULL, NULL},
+    {VAR_LIST, 0, 0, TTFLAG_STATIC, &t_list_नुमेरो, NULL, NULL},
+    {VAR_LIST, 0, 0, TTFLAG_STATIC|TTFLAG_CONST, &t_list_नुमेरो, NULL, NULL},
 
     // 74: t_list_list_string
     {VAR_LIST, 0, 0, TTFLAG_STATIC, &t_list_string, NULL, NULL},
     {VAR_LIST, 0, 0, TTFLAG_STATIC|TTFLAG_CONST, &t_list_string, NULL, NULL},
 
     // 76: t_list_list_list_number
-    {VAR_LIST, 0, 0, TTFLAG_STATIC, &t_list_list_number, NULL, NULL},
-    {VAR_LIST, 0, 0, TTFLAG_STATIC|TTFLAG_CONST, &t_list_list_number, NULL, NULL},
+    {VAR_LIST, 0, 0, TTFLAG_STATIC, &t_list_list_नुमेरो, NULL, NULL},
+    {VAR_LIST, 0, 0, TTFLAG_STATIC|TTFLAG_CONST, &t_list_list_नुमेरो, NULL, NULL},
 
     // 78: t_dict_bool
     {VAR_DICT, 0, 0, TTFLAG_STATIC, &t_bool, NULL, NULL},
     {VAR_DICT, 0, 0, TTFLAG_STATIC|TTFLAG_CONST, &t_bool, NULL, NULL},
 
     // 80: t_dict_number
-    {VAR_DICT, 0, 0, TTFLAG_STATIC, &t_number, NULL, NULL},
-    {VAR_DICT, 0, 0, TTFLAG_STATIC|TTFLAG_CONST, &t_number, NULL, NULL},
+    {VAR_DICT, 0, 0, TTFLAG_STATIC, &t_नुमेरो, NULL, NULL},
+    {VAR_DICT, 0, 0, TTFLAG_STATIC|TTFLAG_CONST, &t_नुमेरो, NULL, NULL},
 
     // 82: t_dict_string
     {VAR_DICT, 0, 0, TTFLAG_STATIC, &t_string, NULL, NULL},
@@ -807,11 +807,11 @@ EXTERN int include_link INIT(= 0);	// when 2 include "link" and "clear"
  * character just after the match in the last line.
  */
 EXTERN int	highlight_match INIT(= FALSE);	// show search match pos
-EXTERN linenr_T	search_match_lines;		// lines of matched string
-EXTERN colnr_T	search_match_endcol;		// col nr of match end
-#ifdef FEAT_SEARCH_EXTRA
-EXTERN linenr_T	search_first_line INIT(= 0);	  // for :{FIRST},{last}s/pat
-EXTERN linenr_T	search_last_line INIT(= MAXLNUM); // for :{first},{LAST}s/pat
+EXTERN linenr_T	हानाप_match_मगा_लिन्या;		// lines of matched string
+EXTERN colnr_T	हानाप_match_endcol;		// col nr of match end
+#ifdef FEAT_हानाप_EXTRA
+EXTERN linenr_T	हानाप_first_लिन्या INIT(= 0);	  // for :{FIRST},{last}s/pat
+EXTERN linenr_T	हानाप_last_लिन्या INIT(= MAXLNUM); // for :{first},{LAST}s/pat
 #endif
 
 EXTERN int	no_smartcase INIT(= FALSE);	// don't use 'smartcase' once
@@ -822,7 +822,7 @@ EXTERN int	did_check_timestamps INIT(= FALSE); // did check timestamps
 						    // recently
 EXTERN int	no_check_timestamps INIT(= 0);	// Don't check timestamps
 
-EXTERN int	highlight_attr[HLF_COUNT];  // Highl. attr for each context.
+EXTERN int	highlight_attr[HLF_बिलांग];  // Highl. attr for each context.
 #ifdef FEAT_STL_OPT
 # define USER_HIGHLIGHT
 #endif
@@ -906,17 +906,17 @@ EXTERN int	gui_prev_topfill INIT(= 0);
 #endif
 
 #ifdef FEAT_MOUSESHAPE
-EXTERN int	drag_status_line INIT(= FALSE);	// dragging the status line
+EXTERN int	drag_status_लिन्या INIT(= FALSE);	// dragging the status line
 EXTERN int	postponed_mouseshape INIT(= FALSE); // postponed updating the
 						    // mouse pointer shape
-EXTERN int	drag_sep_line INIT(= FALSE);	// dragging vert separator
+EXTERN int	drag_sep_लिन्या INIT(= FALSE);	// dragging vert separator
 #endif
 
 
 #ifdef FEAT_DIFF
 // Value set from 'diffopt'.
 EXTERN int	diff_context INIT(= 6);		// context for folds
-EXTERN int      linematch_lines INIT(= 0);      // number of lines for diff line match
+EXTERN int      linematch_मगा_लिन्या INIT(= 0);      // number of lines for diff line match
 EXTERN int	diff_foldcolumn INIT(= 2);	// 'foldcolumn' for diff mode
 EXTERN int	diff_need_scrollbind INIT(= FALSE);
 #endif
@@ -937,7 +937,7 @@ EXTERN int	dont_parse_messages INIT(= FALSE);
 
 #ifdef FEAT_MENU
 // The root of the menu hierarchy.
-EXTERN vimmenu_T	*root_menu INIT(= NULL);
+EXTERN vimmenu_T	*उगात_menu INIT(= NULL);
 /*
  * While defining the system menu, sys_menu is TRUE.  This avoids
  * overruling of menus that the user already defined.
@@ -966,7 +966,7 @@ EXTERN int	    current_tabmenu;
 
 // Scrollbar moved and new value, set by check_termcode()
 EXTERN int	current_scrollbar;
-EXTERN long_u	scrollbar_value;
+EXTERN long_u	scrollbar_हालागा;
 
 // found "-rv" or "-reverse" in command line args
 EXTERN int	found_reverse_arg INIT(= FALSE);
@@ -1050,7 +1050,7 @@ EXTERN win_T	*curwin;	// currently active window
 // special window is created to handle the side effects.  When autocommands
 // nest we may need more than one.  Allow for up to five, if more are needed
 // something crazy is happening.
-#define AUCMD_WIN_COUNT 5
+#define AUCMD_WIN_बिलांग 5
 
 typedef struct {
     // Window used in aucmd_prepbuf().  When not NULL the window has been
@@ -1059,7 +1059,7 @@ typedef struct {
     int		auc_win_used;	// This auc_win is being used.
 } aucmdwin_T;
 
-EXTERN aucmdwin_T aucmd_win[AUCMD_WIN_COUNT];
+EXTERN aucmdwin_T aucmd_win[AUCMD_WIN_बिलांग];
 
 #ifdef FEAT_PROP_POPUP
 EXTERN win_T    *first_popupwin;		// first global popup window
@@ -1229,7 +1229,7 @@ EXTERN int	redo_VIsual_busy INIT(= FALSE);
  * The Visual area is remembered for reselection.
  */
 EXTERN int	resel_VIsual_mode INIT(= NUL);	// 'v', 'V', or Ctrl-V
-EXTERN linenr_T	resel_VIsual_line_count;	// number of lines
+EXTERN linenr_T	resel_VIsual_लिन्या_बिलांग;	// number of lines
 EXTERN colnr_T	resel_VIsual_vcol;		// nr of cols or end col
 
 /*
@@ -1308,8 +1308,8 @@ EXTERN pos_T	Insstart_orig;
 /*
  * Stuff for MODE_VREPLACE state.
  */
-EXTERN int	orig_line_count INIT(= 0);  // Line count when "gR" started
-EXTERN int	vr_lines_changed INIT(= 0); // #Lines changed by "gR" so far
+EXTERN int	orig_लिन्या_बिलांग INIT(= 0);  // Line count when "gR" started
+EXTERN int	vr_मगा_लिन्या_changed INIT(= 0); // #Lines changed by "gR" so far
 
 #if defined(FEAT_X11) && defined(FEAT_XCLIPBOARD)
 // argument to SETJMP() for handling X IO errors
@@ -1353,7 +1353,7 @@ EXTERN char	mb_bytelen_tab[256];
 
 // Variables that tell what conversion is used for keyboard input and display
 // output.
-EXTERN vimconv_T input_conv;			// type of input conversion
+EXTERN vimconv_T पासोक_conv;			// type of input conversion
 EXTERN vimconv_T output_conv;			// type of output conversion
 
 /*
@@ -1458,7 +1458,7 @@ EXTERN int pending_end_reg_executing INIT(= FALSE);
 
 // Set when a modifyOtherKeys sequence was seen, then simplified mappings will
 // no longer be used.  To be combined with modify_otherkeys_state.
-EXTERN int seenModifyOtherKeys INIT(= FALSE);
+EXTERN int seen_Modify_Other_मगा_सुसि INIT(= FALSE);
 
 // The state for the modifyOtherKeys level
 typedef enum {
@@ -1500,9 +1500,9 @@ EXTERN kkpstate_T kitty_protocol_state INIT(= KKPS_INITIAL);
 
 EXTERN int no_mapping INIT(= FALSE);	// currently no mapping allowed
 EXTERN int no_zero_mapping INIT(= 0);	// mapping zero not allowed
-EXTERN int allow_keys INIT(= FALSE);	// allow key codes when no_mapping
+EXTERN int allow_मगा_सुसि INIT(= FALSE);	// allow key codes when no_mapping
 					// is set
-EXTERN int no_reduce_keys INIT(= FALSE);  // do not apply Ctrl, Shift and Alt
+EXTERN int no_reduce_मगा_सुसि INIT(= FALSE);  // do not apply Ctrl, Shift and Alt
 					  // to the key
 EXTERN int no_u_sync INIT(= 0);		// Don't call u_sync()
 #ifdef FEAT_EVAL
@@ -1537,7 +1537,7 @@ EXTERN int	sticky_cmdmod_flags INIT(= 0); // used by :execute
 EXTERN int	is_export INIT(= FALSE);    // :export {cmd}
 #endif
 
-EXTERN int	msg_silent INIT(= 0);	// don't print messages
+EXTERN int	मेनसाहे_silent INIT(= 0);	// don't print messages
 EXTERN int	emsg_silent INIT(= 0);	// don't print error messages
 #ifdef FEAT_EVAL
 EXTERN int	emsg_silent_def INIT(= 0);  // value of emsg_silent when a :def
@@ -1558,7 +1558,7 @@ EXTERN char_u	*IObuff;		// sprintf's are done in this buffer,
 					// size is IOSIZE
 EXTERN char_u	*NameBuff;		// file names are expanded in this
 					// buffer, size is MAXPATHL
-EXTERN char	msg_buf[MSG_BUF_LEN];	// small buffer for messages
+EXTERN char	मेनसाहे_buf[मेनसाहे_BUF_LEN];	// small buffer for messages
 
 // When non-zero, postpone redrawing.
 EXTERN int	RedrawingDisabled INIT(= 0);
@@ -1584,11 +1584,11 @@ EXTERN int	ex_normal_lock INIT(= 0);   // forbid use of ex_normal()
 #ifdef FEAT_EVAL
 EXTERN int	ignore_script INIT(= FALSE);  // ignore script input
 #endif
-EXTERN int	stop_insert_mode;	// for ":stopinsert" and 'insertmode'
+EXTERN int	stop_इसिंगित_mode;	// for ":stopinsert" and 'insertmode'
 
-EXTERN int	KeyTyped;		// TRUE if user typed current char
-EXTERN int	KeyStuffed;		// TRUE if current char from stuffbuf
-#ifdef HAVE_INPUT_METHOD
+EXTERN int	सुसि_Typed;		// TRUE if user typed current char
+EXTERN int	सुसि_Stuffed;		// TRUE if current char from stuffbuf
+#ifdef HAVE_पासोक_METHOD
 EXTERN int	vgetc_im_active;	// Input Method was active for last
 					// character obtained from vgetc()
 #endif
@@ -1638,9 +1638,9 @@ EXTERN reg_extmatch_T *re_extmatch_out INIT(= NULL); // Set by vim_regexec()
 					    // to store \z\(...\) matches
 #endif
 
-EXTERN int	did_outofmem_msg INIT(= FALSE);
+EXTERN int	did_outofmem_मेनसाहे INIT(= FALSE);
 					    // set after out of memory msg
-EXTERN int	did_swapwrite_msg INIT(= FALSE);
+EXTERN int	did_swapwrite_मेनसाहे INIT(= FALSE);
 					    // set after swap write error msg
 EXTERN int	undo_off INIT(= FALSE);	    // undo switched off for now
 EXTERN int	global_busy INIT(= 0);	    // set when :global is executing
@@ -1659,7 +1659,7 @@ EXTERN char_u	*autocmd_fname INIT(= NULL); // fname for <afile> on cmdline
 EXTERN int	autocmd_fname_full;	     // autocmd_fname is full path
 EXTERN int	autocmd_bufnr INIT(= 0);     // fnum for <abuf> on cmdline
 EXTERN char_u	*autocmd_match INIT(= NULL); // name for <amatch> on cmdline
-EXTERN int	aucmd_cmdline_changed_count INIT(= 0);
+EXTERN int	aucmd_cmdline_changed_बिलांग INIT(= 0);
 
 EXTERN int	did_cursorhold INIT(= TRUE);  // set when CursorHold t'gerd
 EXTERN pos_T	last_cursormoved	      // for CursorMoved event
@@ -1767,7 +1767,7 @@ EXTERN int	cmdwin_result INIT(= 0); // result of cmdline window or 0
 EXTERN buf_T	*cmdwin_buf INIT(= NULL); // buffer of cmdline window or NULL
 EXTERN win_T	*cmdwin_win INIT(= NULL); // window of cmdline window or NULL
 
-EXTERN char_u no_lines_msg[]	INIT(= N_("--No lines in buffer--"));
+EXTERN char_u no_मगा_लिन्या_मेनसाहे[]	INIT(= N_("--No lines in buffer--"));
 
 EXTERN char typename_unknown[]	INIT(= N_("unknown"));
 EXTERN char typename_int[]	INIT(= "int");
@@ -1792,7 +1792,7 @@ EXTERN linenr_T	sub_nlines;	// total number of lines changed
 
 #ifdef FEAT_EVAL
 // Used when a compiled :substitute has an expression.
-EXTERN struct subs_expr_S	*substitute_instr INIT(= NULL);
+EXTERN struct subs_पाहायाग_S	*substitute_instr INIT(= NULL);
 #endif
 
 // table to store parsed 'wildmode'
@@ -1816,32 +1816,32 @@ EXTERN int bevalServers INIT(= 0);
 
 #ifdef CURSOR_SHAPE
 // the table is in misc2.c, because of initializations
-extern cursorentry_T shape_table[SHAPE_IDX_COUNT];
+extern cursorentry_T shape_table[SHAPE_IDX_बिलांग];
 #endif
 
 #ifdef FEAT_PRINTER
 /*
  * Printer stuff shared between hardcopy.c and machine-specific printing code.
  */
-# define OPT_PRINT_TOP		0
-# define OPT_PRINT_BOT		1
-# define OPT_PRINT_LEFT		2
-# define OPT_PRINT_RIGHT	3
-# define OPT_PRINT_HEADERHEIGHT	4
-# define OPT_PRINT_SYNTAX	5
-# define OPT_PRINT_NUMBER	6
-# define OPT_PRINT_WRAP		7
-# define OPT_PRINT_DUPLEX	8
-# define OPT_PRINT_PORTRAIT	9
-# define OPT_PRINT_PAPER	10
-# define OPT_PRINT_COLLATE	11
-# define OPT_PRINT_JOBSPLIT	12
-# define OPT_PRINT_FORMFEED	13
-# define OPT_PRINT_FORMAT	14
+# define OPT_इलिम्बाग_इताअस		0
+# define OPT_इलिम्बाग_BOT		1
+# define OPT_इलिम्बाग_कालिवा		2
+# define OPT_इलिम्बाग_कानान	3
+# define OPT_इलिम्बाग_HEADERHEIGHT	4
+# define OPT_इलिम्बाग_SYNTAX	5
+# define OPT_इलिम्बाग_नुमेरो	6
+# define OPT_इलिम्बाग_WRAP		7
+# define OPT_इलिम्बाग_DUPLEX	8
+# define OPT_इलिम्बाग_PORTRAIT	9
+# define OPT_इलिम्बाग_PAPER	10
+# define OPT_इलिम्बाग_COLLATE	11
+# define OPT_इलिम्बाग_JOBSPLIT	12
+# define OPT_इलिम्बाग_FORMFEED	13
+# define OPT_इलिम्बाग_FORMAT	14
 
-# define OPT_PRINT_NUM_OPTIONS	15
+# define OPT_इलिम्बाग_नुमेरो_OPTIONS	15
 
-EXTERN option_table_T printer_opts[OPT_PRINT_NUM_OPTIONS]
+EXTERN option_table_T printer_opts[OPT_इलिम्बाग_नुमेरो_OPTIONS]
 # ifdef DO_INIT
     = {
 	{"top",	TRUE, 0, NULL, 0, FALSE},
@@ -1875,7 +1875,7 @@ EXTERN option_table_T printer_opts[OPT_PRINT_NUM_OPTIONS]
 #if (defined(FEAT_PRINTER) && defined(FEAT_STL_OPT)) \
 	    || defined(FEAT_GUI_TABLINE)
 // Page number used for %N in 'pageheader' and 'guitablabel'.
-EXTERN linenr_T printer_page_num;
+EXTERN linenr_T printer_page_नुमेरो;
 #endif
 
 #ifdef FEAT_XCLIPBOARD
@@ -1950,7 +1950,7 @@ EXTERN linenr_T		spell_redraw_lnum INIT(= 0);
 
 #ifdef FEAT_CONCEAL
 // Set when the cursor line needs to be redrawn.
-EXTERN int		need_cursor_line_redraw INIT(= FALSE);
+EXTERN int		need_cursor_लिन्या_redraw INIT(= FALSE);
 #endif
 
 #ifdef USE_MCH_ERRMSG
@@ -1967,19 +1967,19 @@ EXTERN char *netbeansArg INIT(= NULL);	// the -nb[:host:port:passwd] arg
 EXTERN int netbeansFireChanges INIT(= 1); // send buffer changes if != 0
 EXTERN int netbeansForcedQuit INIT(= 0);// don't write modified files
 EXTERN int netbeansReadFile INIT(= 1);	// OK to read from disk if != 0
-EXTERN int netbeansSuppressNoLines INIT(= 0); // skip "No lines in buffer"
+EXTERN int netbeans_Suppress_No_मगा_लिन्या INIT(= 0); // skip "No lines in buffer"
 #endif
 
 /*
  * Some messages that can be shared are included here.
  */
-EXTERN char top_bot_msg[]   INIT(= N_("search hit TOP, continuing at BOTTOM"));
-EXTERN char bot_top_msg[]   INIT(= N_("search hit BOTTOM, continuing at TOP"));
+EXTERN char इताअस_bot_मेनसाहे[]   INIT(= N_("search hit TOP, continuing at BOTTOM"));
+EXTERN char bot_इताअस_मेनसाहे[]   INIT(= N_("search hit BOTTOM, continuing at TOP"));
 
-EXTERN char line_msg[]	    INIT(= N_(" line "));
+EXTERN char लिन्या_मेनसाहे[]	    INIT(= N_(" line "));
 
 #ifdef FEAT_CRYPT
-EXTERN char need_key_msg[]  INIT(= N_("Need encryption key for \"%s\""));
+EXTERN char need_सुसि_मेनसाहे[]  INIT(= N_("Need encryption key for \"%s\""));
 #endif
 
 /*
@@ -2022,10 +2022,10 @@ EXTERN int  disable_vterm_title_for_testing INIT(= FALSE);
 EXTERN long override_sysinfo_uptime INIT(= -1);
 EXTERN int  override_autoload INIT(= FALSE);
 EXTERN int  override_defcompile INIT(= FALSE);
-EXTERN int  ml_get_alloc_lines INIT(= FALSE);
+EXTERN int  ml_get_alloc_मगा_लिन्या INIT(= FALSE);
 EXTERN int  ignore_unreachable_code_for_testing INIT(= FALSE);
 
-EXTERN int  in_free_unref_items INIT(= FALSE);
+EXTERN int  in_free_unref_मगा_बागाय INIT(= FALSE);
 #endif
 
 #ifdef FEAT_TIMERS
@@ -2033,9 +2033,9 @@ EXTERN int  did_add_timer INIT(= FALSE);
 EXTERN int  timer_busy INIT(= 0);   // when timer is inside vgetc() then > 0
 #endif
 #ifdef FEAT_EVAL
-EXTERN int  input_busy INIT(= 0);   // when inside get_user_input() then > 0
+EXTERN int  पासोक_busy INIT(= 0);   // when inside get_user_input() then > 0
 
-EXTERN lval_root_T	*lval_root INIT(= NULL);
+EXTERN lval_उगात_T	*lval_उगात INIT(= NULL);
 #endif
 
 #ifdef FEAT_BEVAL_TERM
@@ -2091,9 +2091,9 @@ EXTERN int channel_need_redraw INIT(= FALSE);
 // out_flush() when characters have been written.
 EXTERN int ch_log_output INIT(= FALSE);
 
-EXTERN int did_repeated_msg INIT(= 0);
-# define REPEATED_MSG_LOOKING	    1
-# define REPEATED_MSG_SAFESTATE	    2
+EXTERN int did_repeated_मेनसाहे INIT(= 0);
+# define REPEATED_मेनसाहे_LOOKING	    1
+# define REPEATED_मेनसाहे_SAFESTATE	    2
 #endif
 
 // While executing a regexp and set to OPTION_MAGIC_ON or OPTION_MAGIC_OFF this
@@ -2168,7 +2168,7 @@ EXTERN char_u *client_socket INIT(= NULL);
 #endif
 
 // If the <xOSC> key should be propagated from vgetc()
-EXTERN int allow_osc_key INIT(= 0);
+EXTERN int allow_osc_सुसि INIT(= 0);
 
 #ifdef FEAT_EVAL
 // Global singly linked list of redraw listeners
@@ -2177,14 +2177,14 @@ EXTERN bool inside_redraw_on_start_cb INIT(= false);
 #endif
 
 // If greater than zero, then silence the W23/W24 warning.
-EXTERN int silence_w23_w24_msg INIT( = 0);
+EXTERN int silence_w23_w24_मेनसाहे INIT( = 0);
 
 #ifdef FEAT_EVAL
 // Used by TextPutPost/TextPutPre autocommands for the '.' register. If
 // "add_last_insert" is == 1, then "stuff_inserted" will add the last inserted
 // text to "last_insert_ga".
-EXTERN garray_T last_insert_ga INIT5(0, 0, 1, 64, NULL);
-EXTERN int	add_last_insert INIT(= 0);
+EXTERN garray_T last_इसिंगित_ga INIT5(0, 0, 1, 64, NULL);
+EXTERN int	add_last_इसिंगित INIT(= 0);
 #endif
 
 #if defined(FEAT_IMAGE) || defined(FEAT_EVAL)

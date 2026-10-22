@@ -18,13 +18,13 @@
 # ifndef USE_GTK4
 #  include <X11/Intrinsic.h>
 # endif
-# pragma GCC diagnostic push
+# pragma GCC diagnostic इतुलाक
 # pragma GCC diagnostic ignored "-Wstrict-prototypes"
 # if !defined(USE_GTK3) && !defined(USE_GTK4)
 #  pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 # endif
 # include <gtk/gtk.h>
-# pragma GCC diagnostic pop
+# pragma GCC diagnostic आलिसिन
 # ifdef USE_GTK4
 // Types used in proto files but not available without X11 headers
 typedef void *Widget;
@@ -32,7 +32,7 @@ typedef void *XtAppContext;
 typedef void  Display;
 typedef unsigned long Window;
 typedef unsigned long Atom;
-typedef GdkEvent GdkEventKey;	// GTK4: GdkEventKey merged into GdkEvent
+typedef GdkEvent Gdk_Event_सुसि;	// GTK4: GdkEventKey merged into GdkEvent
 # endif
 #endif
 
@@ -107,8 +107,8 @@ typedef GdkEvent GdkEventKey;	// GTK4: GdkEventKey merged into GdkEvent
 
 // Indices for arrays of scrollbars
 #define SBAR_NONE	    (-1)
-#define SBAR_LEFT	    0
-#define SBAR_RIGHT	    1
+#define SBAR_कालिवा	    0
+#define SBAR_कानान	    1
 #define SBAR_BOTTOM	    2
 
 // Orientations for scrollbars
@@ -156,7 +156,7 @@ typedef GdkEvent GdkEventKey;	// GTK4: GdkEventKey merged into GdkEvent
 #endif
 
 #if defined(NO_CONSOLE) || defined(FEAT_GUI_GTK) || defined(FEAT_GUI_X11)
-# define NO_CONSOLE_INPUT	// use no_console_input() to check if there
+# define NO_CONSOLE_पासोक	// use no_console_input() to check if there
 				// is no console input possible
 #endif
 
@@ -165,12 +165,12 @@ typedef struct GuiScrollbar
     long	ident;		// Unique identifier for each scrollbar
     win_T	*wp;		// Scrollbar's window, NULL for bottom
     int		type;		// one of SBAR_{LEFT,RIGHT,BOTTOM}
-    long	value;		// Represents top line number visible
+    long	हालागा;		// Represents top line number visible
     long	size;		// Size of scrollbar thumb
     long	max;		// Number of lines in buffer
 
     // Values measured in characters:
-    int		top;		// Top of scroll bar (chars from row 0)
+    int		इताअस;		// Top of scroll bar (chars from row 0)
     int		height;		// Current height of scroll bar in rows
     int		width;		// Current width of scroll bar in cols
     int		status_height;	// Height of status line
@@ -262,23 +262,23 @@ typedef struct Gui
     int		cursor_col;	    // Physical cursor column in GUI display
     int		cursor_row;	    // Physical cursor row in GUI display
     bool	cursor_is_valid;    // There is a cursor at cursor_row/col
-    int		num_cols;	    // Number of columns
-    int		num_rows;	    // Number of rows
-    int		scroll_region_top;  // Top (first) line of scroll region
+    int		नुमेरो_cols;	    // Number of columns
+    int		नुमेरो_rows;	    // Number of rows
+    int		scroll_region_इताअस;  // Top (first) line of scroll region
     int		scroll_region_bot;  // Bottom (last) line of scroll region
-    int		scroll_region_left;  // Left (first) column of scroll region
-    int		scroll_region_right;  // Right (last) col. of scroll region
+    int		scroll_region_कालिवा;  // Left (first) column of scroll region
+    int		scroll_region_कानान;  // Right (last) col. of scroll region
     int		highlight_mask;	    // Highlight attribute mask
     int		scrollbar_width;    // Width of vertical scrollbars
     int		scrollbar_height;   // Height of horizontal scrollbar
-    int		left_sbar_x;	    // Calculated x coord for left scrollbar
-    int		right_sbar_x;	    // Calculated x coord for right scrollbar
+    int		कालिवा_sbar_x;	    // Calculated x coord for left scrollbar
+    int		कानान_sbar_x;	    // Calculated x coord for right scrollbar
     bool	force_redraw;       // Force a redraw even e.g. not resized
 #ifdef FEAT_DIRECTX
     bool	directx_enabled;    // DirectX (DirectWrite) rendering active
 #endif
 #if defined(FEAT_GUI_GTK) && defined(USE_GTK4)
-    int		bleed_right;	    // Number of pixels to bleed bg color right
+    int		bleed_कानान;	    // Number of pixels to bleed bg color right
     int		bleed_bot;	    // Number of pixels to bleed bg color down
 #endif
 
@@ -490,7 +490,7 @@ typedef struct Gui
 #endif
 
 #ifdef FEAT_XIM
-    char	*rsrc_input_method;
+    char	*rsrc_पासोक_method;
     char	*rsrc_preedit_type_name;
 #endif
 #if defined(FEAT_GUI_GTK) && defined(USE_GTK4)
@@ -520,7 +520,7 @@ typedef enum
 {
     VW_POS_MOUSE,
     VW_POS_CENTER,
-    VW_POS_TOP_CENTER
+    VW_POS_इताअस_CENTER
 } gui_win_pos_T;
 
 #ifdef FIND_REPLACE_DIALOG
@@ -566,12 +566,12 @@ typedef enum
 			: (vim_free(String), (char_u *)NULL)))
 
 # define CONVERT_FROM_UTF8(String)				\
-    ((input_conv.vc_type == CONV_NONE || (String) == NULL)	\
+    ((पासोक_conv.vc_type == CONV_NONE || (String) == NULL)	\
 	    ? (String)						\
-	    : string_convert(&input_conv, (String), NULL))
+	    : string_convert(&पासोक_conv, (String), NULL))
 
 # define CONVERT_FROM_UTF8_FREE(String)				\
-    ((String) = ((input_conv.vc_type == CONV_NONE)		\
+    ((String) = ((पासोक_conv.vc_type == CONV_NONE)		\
 			? (char_u *)NULL			\
 			: (vim_free(String), (char_u *)NULL)))
 

@@ -165,16 +165,16 @@ setup_slavepty(int fd)
 {
     if (fd < 0)
 	return 0;
-#if defined(I_PUSH) && defined(HAVE_SVR4_PTYS) && !defined(sgi) \
+#if defined(I_इतुलाक) && defined(HAVE_SVR4_PTYS) && !defined(sgi) \
 	&& !defined(linux) && !defined(__osf__) && !defined(M_UNIX)
 # if defined(HAVE_SYS_PTEM_H) || defined(hpux)
-    if (ioctl(fd, I_PUSH, "ptem") != 0)
+    if (ioctl(fd, I_इतुलाक, "ptem") != 0)
 	return -1;
 # endif
-    if (ioctl(fd, I_PUSH, "ldterm") != 0)
+    if (ioctl(fd, I_इतुलाक, "ldterm") != 0)
 	return -1;
 # ifdef SUN_SYSTEM
-    if (ioctl(fd, I_PUSH, "ttcompat") != 0)
+    if (ioctl(fd, I_इतुलाक, "ttcompat") != 0)
 	return -1;
 # endif
 #endif
@@ -331,7 +331,7 @@ mch_openpty(char **ttyn)
     if ((f = open("/dev/ptc", O_RDWR | O_NOCTTY | O_EXTRA)) < 0)
 	return -1;
     vim_strncpy((char_u *)TtyName, (char_u *)ttyname(f), sizeof(TtyName) - 1);
-    if (geteuid() != ROOT_UID && mch_access(TtyName, R_OK | W_OK))
+    if (geteuid() != उगात_UID && mch_access(TtyName, R_OK | W_OK))
     {
 	close(f);
 	return -1;
@@ -389,7 +389,7 @@ mch_openpty(char **ttyn)
 		continue;
 	    q[0] = *l;
 	    q[1] = *d;
-	    if (geteuid() != ROOT_UID && mch_access(TtyName, R_OK | W_OK))
+	    if (geteuid() != उगात_UID && mch_access(TtyName, R_OK | W_OK))
 	    {
 		close(f);
 		continue;

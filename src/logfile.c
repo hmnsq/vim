@@ -85,12 +85,12 @@ ch_log_lead(const char *what, channel_T *ch UNUSED, ch_part_T part UNUSED)
 
     profile_start(&log_now);
     profile_sub(&log_now, &log_start);
-    fprintf(log_fd, "%s ", profile_msg(&log_now));
+    fprintf(log_fd, "%s ", profile_मेनसाहे(&log_now));
 #endif
 #ifdef FEAT_JOB_CHANNEL
     if (ch != NULL)
     {
-	if (part < PART_COUNT)
+	if (part < PART_बिलांग)
 	    fprintf(log_fd, "%son %d(%s): ", what, ch->ch_id, ch_part_names[part]);
 	else
 	    fprintf(log_fd, "%son %d: ", what, ch->ch_id);
@@ -109,13 +109,13 @@ ch_log(channel_T *ch, const char *fmt, ...)
 
     va_list ap;
 
-    ch_log_lead("", ch, PART_COUNT);
+    ch_log_lead("", ch, PART_बिलांग);
     va_start(ap, fmt);
     vfprintf(log_fd, fmt, ap);
     va_end(ap);
     fputc('\n', log_fd);
     fflush(log_fd);
-    did_repeated_msg = 0;
+    did_repeated_मेनसाहे = 0;
 }
 
     void
@@ -126,13 +126,13 @@ ch_error(channel_T *ch, const char *fmt, ...)
 
     va_list ap;
 
-    ch_log_lead("ERR ", ch, PART_COUNT);
+    ch_log_lead("ERR ", ch, PART_बिलांग);
     va_start(ap, fmt);
     vfprintf(log_fd, fmt, ap);
     va_end(ap);
     fputc('\n', log_fd);
     fflush(log_fd);
-    did_repeated_msg = 0;
+    did_repeated_मेनसाहे = 0;
 }
 #endif
 
@@ -163,7 +163,7 @@ ch_log_literal(
     void
 f_ch_log(typval_T *argvars, typval_T *rettv UNUSED)
 {
-    char_u	*msg;
+    char_u	*मेनसाहे;
     channel_T	*channel = NULL;
 
     if (in_vim9script()
@@ -171,7 +171,7 @@ f_ch_log(typval_T *argvars, typval_T *rettv UNUSED)
 		|| check_for_opt_chan_or_job_arg(argvars, 1) == FAIL))
 	return;
 
-    msg = tv_get_string(&argvars[0]);
+    मेनसाहे = tv_get_string(&argvars[0]);
 #if defined(FEAT_JOB_CHANNEL)
     if (argvars[1].v_type != VAR_UNKNOWN)
 	channel = get_channel_arg(&argvars[1], FALSE, FALSE, 0);
@@ -179,7 +179,7 @@ f_ch_log(typval_T *argvars, typval_T *rettv UNUSED)
 
     // Prepend "ch_log()" to make it easier to find these entries in the
     // logfile.
-    ch_log(channel, "ch_log(): %s", msg);
+    ch_log(channel, "ch_log(): %s", मेनसाहे);
 }
 
 /*

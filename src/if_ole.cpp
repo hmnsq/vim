@@ -94,14 +94,14 @@ public:
     STDMETHOD_(unsigned long, Release)(void);
 
     // IDispatch members
-    STDMETHOD(GetTypeInfoCount)(UINT *pCount);
+    STDMETHOD(Get_Type_Info_बिलांग)(UINT *p_बिलांग);
     STDMETHOD(GetTypeInfo)(UINT iTypeInfo, LCID, ITypeInfo **ppITypeInfo);
     STDMETHOD(GetIDsOfNames)(const IID &iid, OLECHAR **names, UINT n, LCID, DISPID *dispids);
     STDMETHOD(Invoke)(DISPID member, const IID &iid, LCID, WORD flags, DISPPARAMS *dispparams, VARIANT *result, EXCEPINFO *excepinfo, UINT *argerr);
 
     // IVim members
-    STDMETHOD(SendKeys)(BSTR keys);
-    STDMETHOD(Eval)(BSTR expr, BSTR *result);
+    STDMETHOD(Send_मगा_सुसि)(BSTR मगा_सुसि);
+    STDMETHOD(Eval)(BSTR पाहायाग, BSTR *result);
     STDMETHOD(SetForeground)(void);
     STDMETHOD(GetHwnd)(UINT_PTR *result);
 
@@ -141,18 +141,18 @@ CVim *CVim::Create(int *pbDoRestart)
     hr = LoadRegTypeLib(MYLIBID, 1, 0, 0x00, &typelib);
     if (FAILED(hr))
     {
-	HKEY hKey;
+	HKEY h_सुसि;
 
 	// Check we can write to the registry.
 	// RegCreateKeyEx succeeds even if key exists. W.Briscoe W2K 20021011
-	if (RegCreateKeyEx(HKEY_CLASSES_ROOT, MYVIPROGID, 0, NULL,
+	if (Reg_Create_सुसि_Ex(HKEY_CLASSES_उगात, MYVIPROGID, 0, NULL,
 		  REG_OPTION_NON_VOLATILE,
-		  KEY_ALL_ACCESS, NULL, &hKey, NULL))
+		  सुसि_ALL_ACCESS, NULL, &h_सुसि, NULL))
 	{
 	    delete me;
 	    return NULL; // Unable to write to registry. Quietly fail.
 	}
-	RegCloseKey(hKey);
+	Reg_Close_सुसि(h_सुसि);
 
 	if (MessageBox(0, "Cannot load registered type library.\nDo you want to register Vim now?",
 		    "Vim Initialisation", MB_YESNO | MB_ICONQUESTION) != IDYES)
@@ -231,9 +231,9 @@ CVim::Release()
 }
 
 STDMETHODIMP
-CVim::GetTypeInfoCount(UINT *pCount)
+CVim::Get_Type_Info_बिलांग(UINT *p_बिलांग)
 {
-    *pCount = 1;
+    *p_बिलांग = 1;
     return S_OK;
 }
 
@@ -300,7 +300,7 @@ CVim::SetForeground(void)
 }
 
 STDMETHODIMP
-CVim::SendKeys(BSTR keys)
+CVim::Send_मगा_सुसि(BSTR मगा_सुसि)
 {
     int len;
     char *buffer;
@@ -308,13 +308,13 @@ CVim::SendKeys(BSTR keys)
     char_u *ptr;
 
     /* Get a suitable buffer */
-    len = WideCharToMultiByte(CP_ACP, 0, keys, -1, 0, 0, 0, 0);
+    len = WideCharToMultiByte(CP_ACP, 0, मगा_सुसि, -1, 0, 0, 0, 0);
     buffer = (char *)alloc(len+1);
 
     if (buffer == NULL)
 	return E_OUTOFMEMORY;
 
-    len = WideCharToMultiByte(CP_ACP, 0, keys, -1, buffer, len, 0, 0);
+    len = WideCharToMultiByte(CP_ACP, 0, मगा_सुसि, -1, buffer, len, 0, 0);
 
     if (len == 0)
     {
@@ -337,7 +337,7 @@ CVim::SendKeys(BSTR keys)
      * processed. If more than 10 characters enter the input buffer in that
      * time, the WM_OLE processing will simply fail to insert the characters.
      */
-    if ((int)(STRLEN(str)) > (vim_free_in_input_buf() - 10))
+    if ((int)(STRLEN(str)) > (vim_free_in_पासोक_buf() - 10))
     {
 	vim_free(str);
 	return E_INVALIDARG;
@@ -356,7 +356,7 @@ CVim::SendKeys(BSTR keys)
 }
 
 STDMETHODIMP
-CVim::Eval(BSTR expr, BSTR *result)
+CVim::Eval(BSTR पाहायाग, BSTR *result)
 {
 #ifdef FEAT_EVAL
     int len;
@@ -365,7 +365,7 @@ CVim::Eval(BSTR expr, BSTR *result)
     wchar_t *w_buffer;
 
     /* Get a suitable buffer */
-    len = WideCharToMultiByte(CP_ACP, 0, expr, -1, 0, 0, 0, 0);
+    len = WideCharToMultiByte(CP_ACP, 0, पाहायाग, -1, 0, 0, 0, 0);
     if (len == 0)
 	return E_INVALIDARG;
 
@@ -375,7 +375,7 @@ CVim::Eval(BSTR expr, BSTR *result)
 	return E_OUTOFMEMORY;
 
     /* Convert the (wide character) expression to an ASCII string */
-    len = WideCharToMultiByte(CP_ACP, 0, expr, -1, buffer, len, 0, 0);
+    len = WideCharToMultiByte(CP_ACP, 0, पाहायाग, -1, buffer, len, 0, 0);
     if (len == 0)
 	return E_INVALIDARG;
 
@@ -501,9 +501,9 @@ CVimCF::LockServer(BOOL lock)
 *****************************************************************************/
 
 // Internal use only
-static void SetKeyAndValue(const char *path, const char *subkey, const char *value);
+static void Set_सुसि_And_हालागा(const char *path, const char *subkey, const char *हालागा);
 static void GUIDtochar(const GUID &guid, char *GUID, int length);
-static void RecursiveDeleteKey(HKEY hKeyParent, const char *child);
+static void Recursive_Delete_सुसि(HKEY h_सुसि_Parent, const char *child);
 static const int GUID_STRING_SIZE = 39;
 
 // Register the component in the registry
@@ -530,25 +530,25 @@ extern "C" void RegisterMe(int silent)
     GUIDtochar(MYLIBID, libid, sizeof(libid));
 
     // Build the key CLSID\\{...}
-    char Key[MAX_CLSID_LEN];
-    strcpy(Key, "CLSID\\");
-    strcat(Key, clsid);
+    char सुसि_2[MAX_CLSID_LEN];
+    strcpy(सुसि_2, "CLSID\\");
+    strcat(सुसि_2, clsid);
 
     // Add the CLSID to the registry
-    SetKeyAndValue(Key, NULL, MYNAME);
-    SetKeyAndValue(Key, "LocalServer32", module);
-    SetKeyAndValue(Key, "ProgID", MYPROGID);
-    SetKeyAndValue(Key, "VersionIndependentProgID", MYVIPROGID);
-    SetKeyAndValue(Key, "TypeLib", libid);
+    Set_सुसि_And_हालागा(सुसि_2, NULL, MYNAME);
+    Set_सुसि_And_हालागा(सुसि_2, "LocalServer32", module);
+    Set_सुसि_And_हालागा(सुसि_2, "ProgID", MYPROGID);
+    Set_सुसि_And_हालागा(सुसि_2, "VersionIndependentProgID", MYVIPROGID);
+    Set_सुसि_And_हालागा(सुसि_2, "TypeLib", libid);
 
     // Add the version-independent ProgID subkey under HKEY_CLASSES_ROOT
-    SetKeyAndValue(MYVIPROGID, NULL, MYNAME);
-    SetKeyAndValue(MYVIPROGID, "CLSID", clsid);
-    SetKeyAndValue(MYVIPROGID, "CurVer", MYPROGID);
+    Set_सुसि_And_हालागा(MYVIPROGID, NULL, MYNAME);
+    Set_सुसि_And_हालागा(MYVIPROGID, "CLSID", clsid);
+    Set_सुसि_And_हालागा(MYVIPROGID, "CurVer", MYPROGID);
 
     // Add the versioned ProgID subkey under HKEY_CLASSES_ROOT
-    SetKeyAndValue(MYPROGID, NULL, MYNAME);
-    SetKeyAndValue(MYPROGID, "CLSID", clsid);
+    Set_सुसि_And_हालागा(MYPROGID, NULL, MYNAME);
+    Set_सुसि_And_हालागा(MYPROGID, "CLSID", clsid);
 
     wchar_t w_module[MAX_PATH];
     MultiByteToWideChar(CP_ACP, 0, module, -1, w_module, MAX_PATH);
@@ -590,7 +590,7 @@ extern "C" void UnregisterMe(int bNotifyUser)
 	TLIBATTR *tla;
 	if (SUCCEEDED(typelib->GetLibAttr(&tla)))
 	{
-	    UnRegisterTypeLib(tla->guid, tla->wMajorVerNum, tla->wMinorVerNum,
+	    UnRegisterTypeLib(tla->guid, tla->w_Major_Ver_नुमेरो, tla->w_Minor_Ver_नुमेरो,
 			      tla->lcid, tla->syskind);
 	    typelib->ReleaseTLibAttr(tla);
 	}
@@ -602,18 +602,18 @@ extern "C" void UnregisterMe(int bNotifyUser)
     GUIDtochar(MYCLSID, clsid, sizeof(clsid));
 
     // Build the key CLSID\\{...}
-    char Key[MAX_CLSID_LEN];
-    strcpy(Key, "CLSID\\");
-    strcat(Key, clsid);
+    char सुसि_2[MAX_CLSID_LEN];
+    strcpy(सुसि_2, "CLSID\\");
+    strcat(सुसि_2, clsid);
 
     // Delete the CLSID Key - CLSID\{...}
-    RecursiveDeleteKey(HKEY_CLASSES_ROOT, Key);
+    Recursive_Delete_सुसि(HKEY_CLASSES_उगात, सुसि_2);
 
     // Delete the version-independent ProgID Key
-    RecursiveDeleteKey(HKEY_CLASSES_ROOT, MYVIPROGID);
+    Recursive_Delete_सुसि(HKEY_CLASSES_उगात, MYVIPROGID);
 
     // Delete the ProgID key
-    RecursiveDeleteKey(HKEY_CLASSES_ROOT, MYPROGID);
+    Recursive_Delete_सुसि(HKEY_CLASSES_उगात, MYPROGID);
 
     if (bNotifyUser)
 	MessageBox(0, "Unregistered successfully", "Vim", 0);
@@ -636,12 +636,12 @@ static void GUIDtochar(const GUID &guid, char *GUID, int length)
 }
 
 // Delete a key and all of its descendants
-static void RecursiveDeleteKey(HKEY hKeyParent, const char *child)
+static void Recursive_Delete_सुसि(HKEY h_सुसि_Parent, const char *child)
 {
     // Open the child
-    HKEY hKeyChild;
-    LONG result = RegOpenKeyEx(hKeyParent, child, 0,
-			       KEY_ALL_ACCESS, &hKeyChild);
+    HKEY h_सुसि_Child;
+    LONG result = Reg_Open_सुसि_Ex(h_सुसि_Parent, child, 0,
+			       सुसि_ALL_ACCESS, &h_सुसि_Child);
     if (result != ERROR_SUCCESS)
 	return;
 
@@ -650,28 +650,28 @@ static void RecursiveDeleteKey(HKEY hKeyParent, const char *child)
     char buffer[1024];
     DWORD size = 1024;
 
-    while (RegEnumKeyEx(hKeyChild, 0, buffer, &size, NULL,
+    while (Reg_Enum_सुसि_Ex(h_सुसि_Child, 0, buffer, &size, NULL,
 			NULL, NULL, &time) == S_OK)
     {
 	// Delete the descendants of this child
-	RecursiveDeleteKey(hKeyChild, buffer);
+	Recursive_Delete_सुसि(h_सुसि_Child, buffer);
 	size = 256;
     }
 
     // Close the child
-    RegCloseKey(hKeyChild);
+    Reg_Close_सुसि(h_सुसि_Child);
 
     // Delete this child
-    RegDeleteKey(hKeyParent, child);
+    Reg_Delete_सुसि(h_सुसि_Parent, child);
 }
 
 // Create a key and set its value
-static void SetKeyAndValue(const char *key, const char *subkey, const char *value)
+static void Set_सुसि_And_हालागा(const char *सुसि, const char *subkey, const char *हालागा)
 {
-    HKEY hKey;
+    HKEY h_सुसि;
     char buffer[1024];
 
-    strcpy(buffer, key);
+    strcpy(buffer, सुसि);
 
     // Add subkey name to buffer.
     if (subkey)
@@ -681,20 +681,20 @@ static void SetKeyAndValue(const char *key, const char *subkey, const char *valu
     }
 
     // Create and open key and subkey.
-    long result = RegCreateKeyEx(HKEY_CLASSES_ROOT,
+    long result = Reg_Create_सुसि_Ex(HKEY_CLASSES_उगात,
 				 buffer,
 				 0, NULL, REG_OPTION_NON_VOLATILE,
-				 KEY_ALL_ACCESS, NULL,
-				 &hKey, NULL);
+				 सुसि_ALL_ACCESS, NULL,
+				 &h_सुसि, NULL);
     if (result != ERROR_SUCCESS)
 	return;
 
     // Set the value
-    if (value)
-	RegSetValueEx(hKey, NULL, 0, REG_SZ, (BYTE *)value,
-		      (DWORD)STRLEN(value)+1);
+    if (हालागा)
+	Reg_Set_हालागा_Ex(h_सुसि, NULL, 0, REG_SZ, (BYTE *)हालागा,
+		      (DWORD)STRLEN(हालागा)+1);
 
-    RegCloseKey(hKey);
+    Reg_Close_सुसि(h_सुसि);
 }
 
 /*****************************************************************************

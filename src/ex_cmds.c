@@ -20,7 +20,7 @@ static int linelen(int *has_tab);
 static void do_filter(linenr_T line1, linenr_T line2, exarg_T *eap, char_u *cmd, int do_in, int do_out);
 static int not_writing(void);
 static int check_readonly(int *forceit, buf_T *buf);
-static void delbuf_msg(char_u *name);
+static void delbuf_मेनसाहे(char_u *name);
 
 /*
  * ":ascii" and "ga".
@@ -46,7 +46,7 @@ do_ascii(exarg_T *eap UNUSED)
 	c = gchar_cursor();
     if (c == NUL)
     {
-	msg("NUL");
+	मेनसाहे("NUL");
 	return;
     }
 
@@ -124,7 +124,7 @@ do_ascii(exarg_T *eap UNUSED)
 	    c = 0;
     }
 
-    msg((char *)IObuff);
+    मेनसाहे((char *)IObuff);
 }
 
 /*
@@ -144,16 +144,16 @@ ex_align(exarg_T *eap)
     if (curwin->w_p_rl)
     {
 	// switch left and right aligning
-	if (eap->cmdidx == CMD_right)
-	    eap->cmdidx = CMD_left;
-	else if (eap->cmdidx == CMD_left)
-	    eap->cmdidx = CMD_right;
+	if (eap->cmdidx == CMD_कानान)
+	    eap->cmdidx = CMD_कालिवा;
+	else if (eap->cmdidx == CMD_कालिवा)
+	    eap->cmdidx = CMD_कानान;
     }
 #endif
 
     width = atoi((char *)eap->arg);
     save_curpos = curwin->w_cursor;
-    if (eap->cmdidx == CMD_left)    // width is used for new indent
+    if (eap->cmdidx == CMD_कालिवा)    // width is used for new indent
     {
 	if (width >= 0)
 	    indent = width;
@@ -179,12 +179,12 @@ ex_align(exarg_T *eap)
     for (curwin->w_cursor.lnum = eap->line1;
 		 curwin->w_cursor.lnum <= eap->line2; ++curwin->w_cursor.lnum)
     {
-	if (eap->cmdidx == CMD_left)		// left align
+	if (eap->cmdidx == CMD_कालिवा)		// left align
 	    new_indent = indent;
 	else
 	{
 	    has_tab = FALSE;	// avoid uninit warnings
-	    len = linelen(eap->cmdidx == CMD_right ? &has_tab
+	    len = linelen(eap->cmdidx == CMD_कानान ? &has_tab
 						   : NULL) - get_indent();
 
 	    if (len <= 0)			// skip blank lines
@@ -224,7 +224,7 @@ ex_align(exarg_T *eap)
 	    new_indent = 0;
 	(void)set_indent(new_indent, 0);		// set indent
     }
-    changed_lines(eap->line1, 0, eap->line2 + 1, 0L);
+    changed_मगा_लिन्या(eap->line1, 0, eap->line2 + 1, 0L);
     curwin->w_cursor = save_curpos;
     beginline(BL_WHITE | BL_FIX);
 }
@@ -235,7 +235,7 @@ ex_align(exarg_T *eap)
     static int
 linelen(int *has_tab)
 {
-    char_u  *line;
+    char_u  *लिन्या;
     char_u  *first;
     char_u  *last;
     int	    save;
@@ -243,12 +243,12 @@ linelen(int *has_tab)
 
     // Get the line.  If it's empty bail out early (could be the empty string
     // for an unloaded buffer).
-    line = ml_get_curline();
-    if (*line == NUL)
+    लिन्या = ml_get_curline();
+    if (*लिन्या == NUL)
 	return 0;
 
     // find the first non-blank character
-    first = skipwhite(line);
+    first = skipwhite(लिन्या);
 
     // find the character after the last non-blank character
     for (last = first + STRLEN(first);
@@ -256,7 +256,7 @@ linelen(int *has_tab)
 	;
     save = *last;
     *last = NUL;
-    len = linetabsize_str(line);	// get line length on screen
+    len = linetabsize_str(लिन्या);	// get line length on screen
     if (has_tab != NULL)		// check for embedded TAB
 	*has_tab = (vim_strchr(first, TAB) != NULL);
     *last = save;
@@ -286,13 +286,13 @@ typedef struct
 	{
 	    varnumber_T	start_col_nr;	// starting column number
 	    varnumber_T	end_col_nr;	// ending column number
-	} line;
+	} लिन्या;
 	struct
 	{
-	    varnumber_T	value;		// value if sorting by integer
-	    int is_number;		// TRUE when line contains a number
-	} num;
-	float_T value_flt;		// value if sorting by float
+	    varnumber_T	हालागा;		// value if sorting by integer
+	    int is_नुमेरो;		// TRUE when line contains a number
+	} नुमेरो;
+	float_T हालागा_flt;		// value if sorting by float
     } st_u;
 } sorti_T;
 
@@ -322,26 +322,26 @@ sort_compare(const void *s1, const void *s2)
 
     if (sort_nr)
     {
-	if (l1.st_u.num.is_number != l2.st_u.num.is_number)
-	    result = l1.st_u.num.is_number > l2.st_u.num.is_number ? 1 : -1;
+	if (l1.st_u.नुमेरो.is_नुमेरो != l2.st_u.नुमेरो.is_नुमेरो)
+	    result = l1.st_u.नुमेरो.is_नुमेरो > l2.st_u.नुमेरो.is_नुमेरो ? 1 : -1;
 	else
-	    result = l1.st_u.num.value == l2.st_u.num.value ? 0
-			     : l1.st_u.num.value > l2.st_u.num.value ? 1 : -1;
+	    result = l1.st_u.नुमेरो.हालागा == l2.st_u.नुमेरो.हालागा ? 0
+			     : l1.st_u.नुमेरो.हालागा > l2.st_u.नुमेरो.हालागा ? 1 : -1;
     }
     else if (sort_flt)
-	result = l1.st_u.value_flt == l2.st_u.value_flt ? 0
-			     : l1.st_u.value_flt > l2.st_u.value_flt ? 1 : -1;
+	result = l1.st_u.हालागा_flt == l2.st_u.हालागा_flt ? 0
+			     : l1.st_u.हालागा_flt > l2.st_u.हालागा_flt ? 1 : -1;
     else
     {
 	// We need to copy one line into "sortbuf1", because there is no
 	// guarantee that the first pointer becomes invalid when obtaining the
 	// second one.
-	STRNCPY(sortbuf1, ml_get(l1.lnum) + l1.st_u.line.start_col_nr,
-		     l1.st_u.line.end_col_nr - l1.st_u.line.start_col_nr + 1);
-	sortbuf1[l1.st_u.line.end_col_nr - l1.st_u.line.start_col_nr] = 0;
-	STRNCPY(sortbuf2, ml_get(l2.lnum) + l2.st_u.line.start_col_nr,
-		     l2.st_u.line.end_col_nr - l2.st_u.line.start_col_nr + 1);
-	sortbuf2[l2.st_u.line.end_col_nr - l2.st_u.line.start_col_nr] = 0;
+	STRNCPY(sortbuf1, ml_get(l1.lnum) + l1.st_u.लिन्या.start_col_nr,
+		     l1.st_u.लिन्या.end_col_nr - l1.st_u.लिन्या.start_col_nr + 1);
+	sortbuf1[l1.st_u.लिन्या.end_col_nr - l1.st_u.लिन्या.start_col_nr] = 0;
+	STRNCPY(sortbuf2, ml_get(l2.lnum) + l2.st_u.लिन्या.start_col_nr,
+		     l2.st_u.लिन्या.end_col_nr - l2.st_u.लिन्या.start_col_nr + 1);
+	sortbuf2[l2.st_u.लिन्या.end_col_nr - l2.st_u.लिन्या.start_col_nr] = 0;
 
 	result = string_compare(sortbuf1, sortbuf2);
     }
@@ -363,7 +363,7 @@ ex_sort(exarg_T *eap)
     linenr_T	lnum;
     long	maxlen = 0;
     sorti_T	*nrs;
-    size_t	count = (size_t)(eap->line2 - eap->line1 + 1);
+    size_t	बिलांग = (size_t)(eap->line2 - eap->line1 + 1);
     size_t	i;
     char_u	*p;
     char_u	*s;
@@ -378,7 +378,7 @@ ex_sort(exarg_T *eap)
     int		change_occurred = FALSE; // Buffer contents changed.
 
     // Sorting one line is really quick!
-    if (count <= 1)
+    if (बिलांग <= 1)
 	return;
 
     if (u_save((linenr_T)(eap->line1 - 1), (linenr_T)(eap->line2 + 1)) == FAIL)
@@ -386,7 +386,7 @@ ex_sort(exarg_T *eap)
     sortbuf1 = NULL;
     sortbuf2 = NULL;
     regmatch.regprog = NULL;
-    nrs = ALLOC_MULT(sorti_T, count);
+    nrs = ALLOC_MULT(sorti_T, बिलांग);
     if (nrs == NULL)
 	goto sortend;
 
@@ -446,12 +446,12 @@ ex_sort(exarg_T *eap)
 	    // Use last search pattern if sort pattern is empty.
 	    if (s == p + 1)
 	    {
-		if (last_search_pat() == NULL)
+		if (last_हानाप_pat() == NULL)
 		{
 		    emsg(_(e_no_previous_regular_expression));
 		    goto sortend;
 		}
-		regmatch.regprog = vim_regcomp(last_search_pat(), RE_MAGIC);
+		regmatch.regprog = vim_regcomp(last_हानाप_pat(), RE_MAGIC);
 	    }
 	    else
 		regmatch.regprog = vim_regcomp(p + 1, RE_MAGIC);
@@ -531,14 +531,14 @@ ex_sort(exarg_T *eap)
 		if (*s == NUL)
 		{
 		    // line without number should sort before any number
-		    nrs[lnum - eap->line1].st_u.num.is_number = FALSE;
-		    nrs[lnum - eap->line1].st_u.num.value = 0;
+		    nrs[lnum - eap->line1].st_u.नुमेरो.is_नुमेरो = FALSE;
+		    nrs[lnum - eap->line1].st_u.नुमेरो.हालागा = 0;
 		}
 		else
 		{
-		    nrs[lnum - eap->line1].st_u.num.is_number = TRUE;
+		    nrs[lnum - eap->line1].st_u.नुमेरो.is_नुमेरो = TRUE;
 		    vim_str2nr(s, NULL, NULL, sort_what,
-			&nrs[lnum - eap->line1].st_u.num.value,
+			&nrs[lnum - eap->line1].st_u.नुमेरो.हालागा,
 			NULL, 0, FALSE, NULL);
 		}
 	    }
@@ -550,9 +550,9 @@ ex_sort(exarg_T *eap)
 
 		if (*s == NUL)
 		    // empty line should sort before any number
-		    nrs[lnum - eap->line1].st_u.value_flt = -DBL_MAX;
+		    nrs[lnum - eap->line1].st_u.हालागा_flt = -DBL_MAX;
 		else
-		    nrs[lnum - eap->line1].st_u.value_flt =
+		    nrs[lnum - eap->line1].st_u.हालागा_flt =
 						      strtod((char *)s, NULL);
 	    }
 	    *s2 = c;
@@ -560,8 +560,8 @@ ex_sort(exarg_T *eap)
 	else
 	{
 	    // Store the column to sort at.
-	    nrs[lnum - eap->line1].st_u.line.start_col_nr = start_col;
-	    nrs[lnum - eap->line1].st_u.line.end_col_nr = end_col;
+	    nrs[lnum - eap->line1].st_u.लिन्या.start_col_nr = start_col;
+	    nrs[lnum - eap->line1].st_u.लिन्या.end_col_nr = end_col;
 	}
 
 	nrs[lnum - eap->line1].lnum = lnum;
@@ -581,20 +581,20 @@ ex_sort(exarg_T *eap)
 	goto sortend;
 
     // Sort the array of line numbers.  Note: can't be interrupted!
-    qsort((void *)nrs, count, sizeof(sorti_T), sort_compare);
+    qsort((void *)nrs, बिलांग, sizeof(sorti_T), sort_compare);
 
     if (sort_abort)
 	goto sortend;
 
     // Insert the lines in the sorted order below the last one.
     lnum = eap->line2;
-    for (i = 0; i < count; ++i)
+    for (i = 0; i < बिलांग; ++i)
     {
-	linenr_T get_lnum = nrs[eap->forceit ? count - i - 1 : i].lnum;
+	linenr_T get_lnum = nrs[eap->forceit ? बिलांग - i - 1 : i].lnum;
 
 	// If the original line number of the line being placed is not the same
 	// as "lnum" (accounting for offset), we know that the buffer changed.
-	if (get_lnum + ((linenr_T)count - 1) != lnum)
+	if (get_lnum + ((linenr_T)बिलांग - 1) != lnum)
 	    change_occurred = TRUE;
 
 	s = ml_get(get_lnum);
@@ -612,14 +612,14 @@ ex_sort(exarg_T *eap)
     }
 
     // delete the original lines if appending worked
-    if (i == count)
-	for (i = 0; i < count; ++i)
+    if (i == बिलांग)
+	for (i = 0; i < बिलांग; ++i)
 	    ml_delete(eap->line1);
     else
-	count = 0;
+	बिलांग = 0;
 
     // Adjust marks for deleted (or added) lines and prepare for displaying.
-    deleted = (long)(count - (lnum - eap->line2));
+    deleted = (long)(बिलांग - (lnum - eap->line2));
     if (deleted > 0)
     {
 	mark_adjust(eap->line2 - deleted, eap->line2, (long)MAXLNUM, -deleted);
@@ -629,7 +629,7 @@ ex_sort(exarg_T *eap)
 	mark_adjust(eap->line2, MAXLNUM, -deleted, 0L);
 
     if (change_occurred || deleted != 0)
-	changed_lines(eap->line1, 0, eap->line2 + 1, -deleted);
+	changed_मगा_लिन्या(eap->line1, 0, eap->line2 + 1, -deleted);
 
     curwin->w_cursor.lnum = eap->line1;
     beginline(BL_WHITE | BL_FIX);
@@ -653,7 +653,7 @@ ex_uniq(exarg_T *eap)
     int		len;
     linenr_T	lnum;
     long	maxlen = 0;
-    linenr_T	count = eap->line2 - eap->line1 + 1;
+    linenr_T	बिलांग = eap->line2 - eap->line1 + 1;
     char_u	*p;
     char_u	*s;
     char_u	save_c = 0;		// temporary character storage
@@ -665,7 +665,7 @@ ex_uniq(exarg_T *eap)
     int		change_occurred = FALSE; // Buffer contents changed.
 
     // Uniq one line is really quick!
-    if (count <= 1)
+    if (बिलांग <= 1)
 	return;
 
     if (u_save((linenr_T)(eap->line1 - 1), (linenr_T)(eap->line2 + 1)) == FAIL)
@@ -708,12 +708,12 @@ ex_uniq(exarg_T *eap)
 	    // Use last search pattern if uniq pattern is empty.
 	    if (s == p + 1)
 	    {
-		if (last_search_pat() == NULL)
+		if (last_हानाप_pat() == NULL)
 		{
 		    emsg(_(e_no_previous_regular_expression));
 		    goto uniqend;
 		}
-		regmatch.regprog = vim_regcomp(last_search_pat(), RE_MAGIC);
+		regmatch.regprog = vim_regcomp(last_हानाप_pat(), RE_MAGIC);
 	    }
 	    else
 		regmatch.regprog = vim_regcomp(p + 1, RE_MAGIC);
@@ -751,7 +751,7 @@ ex_uniq(exarg_T *eap)
     int is_match;
     linenr_T done_lnum = eap->line1 - 1;
     linenr_T delete_lnum = 0;
-    for (linenr_T i = 0; i < count; ++i)
+    for (linenr_T i = 0; i < बिलांग; ++i)
     {
 	linenr_T get_lnum = eap->line1 + i;
 
@@ -809,7 +809,7 @@ ex_uniq(exarg_T *eap)
 		    delete_lnum = get_lnum - 1;
 		    next_is_unmatch = TRUE;
 		}
-		else if (i >= count - 1)
+		else if (i >= बिलांग - 1)
 		    delete_lnum = get_lnum;
 		match_continue = FALSE;
 		STRCPY(sortbuf1, &s[start_col]);
@@ -841,7 +841,7 @@ ex_uniq(exarg_T *eap)
 	{
 	    ml_delete(delete_lnum);
 	    i -= get_lnum - delete_lnum + 1;
-	    count--;
+	    बिलांग--;
 	    deleted++;
 	    change_occurred = TRUE;
 	}
@@ -856,7 +856,7 @@ ex_uniq(exarg_T *eap)
     msgmore(-deleted);
 
     if (change_occurred)
-	changed_lines(eap->line1, 0, eap->line2 + 1, -deleted);
+	changed_मगा_लिन्या(eap->line1, 0, eap->line2 + 1, -deleted);
 
     curwin->w_cursor.lnum = eap->line1;
     beginline(BL_WHITE | BL_FIX);
@@ -879,8 +879,8 @@ do_move(linenr_T line1, linenr_T line2, linenr_T dest)
     char_u	*str;
     linenr_T	l;
     linenr_T	extra;	    // Num lines added before line1
-    linenr_T	num_lines;  // Num lines moved
-    linenr_T	last_line;  // Last line in file after adding new text
+    linenr_T	नुमेरो_मगा_लिन्या;  // Num lines moved
+    linenr_T	last_लिन्या;  // Last line in file after adding new text
 #ifdef FEAT_FOLDING
     win_T	*win;
     tabpage_T	*tp;
@@ -888,7 +888,7 @@ do_move(linenr_T line1, linenr_T line2, linenr_T dest)
 
     if (dest >= line1 && dest < line2)
     {
-	emsg(_(e_cannot_move_range_of_lines_into_itself));
+	emsg(_(e_cannot_move_range_of_मगा_लिन्या_into_itself));
 	return FAIL;
     }
 
@@ -906,7 +906,7 @@ do_move(linenr_T line1, linenr_T line2, linenr_T dest)
 	return OK;
     }
 
-    num_lines = line2 - line1 + 1;
+    नुमेरो_मगा_लिन्या = line2 - line1 + 1;
 
     /*
      * First we copy the old text to its new location -- webb
@@ -941,11 +941,11 @@ do_move(linenr_T line1, linenr_T line2, linenr_T dest)
      * And Finally we adjust the marks we put at the end of the file back to
      * their final destination at the new text position -- webb
      */
-    last_line = curbuf->b_ml.ml_line_count;
-    mark_adjust_nofold(line1, line2, last_line - line2, 0L);
+    last_लिन्या = curbuf->b_ml.ml_लिन्या_बिलांग;
+    mark_adjust_nofold(line1, line2, last_लिन्या - line2, 0L);
     if (dest >= line2)
     {
-	mark_adjust_nofold(line2 + 1, dest, -num_lines, 0L);
+	mark_adjust_nofold(line2 + 1, dest, -नुमेरो_मगा_लिन्या, 0L);
 #ifdef FEAT_FOLDING
 	FOR_ALL_TAB_WINDOWS(tp, win)
 	{
@@ -955,13 +955,13 @@ do_move(linenr_T line1, linenr_T line2, linenr_T dest)
 #endif
 	if ((cmdmod.cmod_flags & CMOD_LOCKMARKS) == 0)
 	{
-	    curbuf->b_op_start.lnum = dest - num_lines + 1;
+	    curbuf->b_op_start.lnum = dest - नुमेरो_मगा_लिन्या + 1;
 	    curbuf->b_op_end.lnum = dest;
 	}
     }
     else
     {
-	mark_adjust_nofold(dest + 1, line1 - 1, num_lines, 0L);
+	mark_adjust_nofold(dest + 1, line1 - 1, नुमेरो_मगा_लिन्या, 0L);
 #ifdef FEAT_FOLDING
 	FOR_ALL_TAB_WINDOWS(tp, win)
 	{
@@ -972,13 +972,13 @@ do_move(linenr_T line1, linenr_T line2, linenr_T dest)
 	if ((cmdmod.cmod_flags & CMOD_LOCKMARKS) == 0)
 	{
 	    curbuf->b_op_start.lnum = dest + 1;
-	    curbuf->b_op_end.lnum = dest + num_lines;
+	    curbuf->b_op_end.lnum = dest + नुमेरो_मगा_लिन्या;
 	}
     }
     if ((cmdmod.cmod_flags & CMOD_LOCKMARKS) == 0)
 	curbuf->b_op_start.col = curbuf->b_op_end.col = 0;
-    mark_adjust_nofold(last_line - num_lines + 1, last_line,
-					     -(last_line - dest - extra), 0L);
+    mark_adjust_nofold(last_लिन्या - नुमेरो_मगा_लिन्या + 1, last_लिन्या,
+					     -(last_लिन्या - dest - extra), 0L);
 
     /*
      * Now we delete the original text -- webb
@@ -989,9 +989,9 @@ do_move(linenr_T line1, linenr_T line2, linenr_T dest)
     for (l = line1; l <= line2; l++)
 	ml_delete_flags(line1 + extra, ML_DEL_MESSAGE);
 
-    if (!global_busy && num_lines > p_report)
-	smsg(NGETTEXT("%ld line moved", "%ld lines moved", num_lines),
-			(long)num_lines);
+    if (!global_busy && नुमेरो_मगा_लिन्या > p_report)
+	smsg(NGETTEXT("%ld line moved", "%ld lines moved", नुमेरो_मगा_लिन्या),
+			(long)नुमेरो_मगा_लिन्या);
 
     /*
      * Leave the cursor on the last of the moved lines.
@@ -1003,14 +1003,14 @@ do_move(linenr_T line1, linenr_T line2, linenr_T dest)
 
     if (line1 < dest)
     {
-	dest += num_lines + 1;
-	last_line = curbuf->b_ml.ml_line_count;
-	if (dest > last_line + 1)
-	    dest = last_line + 1;
-	changed_lines(line1, 0, dest, 0L);
+	dest += नुमेरो_मगा_लिन्या + 1;
+	last_लिन्या = curbuf->b_ml.ml_लिन्या_बिलांग;
+	if (dest > last_लिन्या + 1)
+	    dest = last_लिन्या + 1;
+	changed_मगा_लिन्या(line1, 0, dest, 0L);
     }
     else
-	changed_lines(dest + 1, 0, line1 + num_lines, 0L);
+	changed_मगा_लिन्या(dest + 1, 0, line1 + नुमेरो_मगा_लिन्या, 0L);
 
     return OK;
 }
@@ -1021,14 +1021,14 @@ do_move(linenr_T line1, linenr_T line2, linenr_T dest)
     void
 ex_copy(linenr_T line1, linenr_T line2, linenr_T n)
 {
-    linenr_T	count;
+    linenr_T	बिलांग;
     char_u	*p;
 
-    count = line2 - line1 + 1;
+    बिलांग = line2 - line1 + 1;
     if ((cmdmod.cmod_flags & CMOD_LOCKMARKS) == 0)
     {
 	curbuf->b_op_start.lnum = n + 1;
-	curbuf->b_op_end.lnum = n + count;
+	curbuf->b_op_end.lnum = n + बिलांग;
 	curbuf->b_op_start.col = curbuf->b_op_end.col = 0;
     }
 
@@ -1068,11 +1068,11 @@ ex_copy(linenr_T line1, linenr_T line2, linenr_T n)
 	++curwin->w_cursor.lnum;
     }
 
-    appended_lines_mark(n, count);
+    appended_मगा_लिन्या_mark(n, बिलांग);
     if (VIsual_active)
 	check_pos(curbuf, &VIsual);
 
-    msgmore((long)count);
+    msgmore((long)बिलांग);
 }
 
 static char_u	*prevcmd = NULL;	// the previous command
@@ -1107,7 +1107,7 @@ prevcmd_is_set(void)
  */
     void
 do_bang(
-    int		addr_count,
+    int		addr_बिलांग,
     exarg_T	*eap,
     int		forceit,
     int		do_in,
@@ -1123,7 +1123,7 @@ do_bang(
     char_u		*p;
     char_u		*trailarg;
     int			len;
-    int			scroll_save = msg_scroll;
+    int			scroll_save = मेनसाहे_scroll;
 
     /*
      * Disallow shell commands for "rvim".
@@ -1133,11 +1133,11 @@ do_bang(
     if (check_restricted() || check_secure())
 	return;
 
-    if (addr_count == 0)		// :!
+    if (addr_बिलांग == 0)		// :!
     {
-	msg_scroll = FALSE;	    // don't scroll here
+	मेनसाहे_scroll = FALSE;	    // don't scroll here
 	autowrite_all();
-	msg_scroll = scroll_save;
+	मेनसाहे_scroll = scroll_save;
     }
 
     /*
@@ -1245,15 +1245,15 @@ do_bang(
 	STRCAT(newcmd, p_shq);
 	free_newcmd = TRUE;
     }
-    if (addr_count == 0)		// :!
+    if (addr_बिलांग == 0)		// :!
     {
 	// echo the command
-	msg_start();
-	msg_putchar(':');
-	msg_putchar('!');
-	msg_outtrans(newcmd);
-	msg_clr_eos();
-	windgoto(msg_row, cmdline_col_off + msg_col);
+	मेनसाहे_start();
+	मेनसाहे_putchar(':');
+	मेनसाहे_putchar('!');
+	मेनसाहे_outtrans(newcmd);
+	मेनसाहे_clr_eos();
+	windgoto(मेनसाहे_row, cmdline_col_off + मेनसाहे_col);
 
 	do_shell(newcmd, 0);
     }
@@ -1320,7 +1320,7 @@ do_filter(
     linecount = line2 - line1 + 1;
     curwin->w_cursor.lnum = line1;
     curwin->w_cursor.col = 0;
-    changed_line_abv_curs();
+    changed_लिन्या_abv_curs();
     invalidate_botline();
 
     /*
@@ -1384,7 +1384,7 @@ do_filter(
     if (itmp != NULL && buf_write(curbuf, itmp, NULL, line1, line2, eap,
 					   FALSE, FALSE, FALSE, TRUE) == FAIL)
     {
-	msg_putchar('\n');		// keep message from buf_write()
+	मेनसाहे_putchar('\n');		// keep message from buf_write()
 	--no_wait_return;
 #if defined(FEAT_EVAL)
 	if (!aborting())
@@ -1397,7 +1397,7 @@ do_filter(
 	goto filterend;
 
     if (!do_out)
-	msg_putchar('\n');
+	मेनसाहे_putchar('\n');
 
     // Create the shell command in allocated memory.
     cmd_buf = make_filter_cmd(cmd, itmp, otmp);
@@ -1426,7 +1426,7 @@ do_filter(
 	}
 	redraw_curbuf_later(UPD_VALID);
     }
-    read_linecount = curbuf->b_ml.ml_line_count;
+    read_linecount = curbuf->b_ml.ml_लिन्या_बिलांग;
 
     /*
      * When call_shell() fails wait_return() is called to give the user a
@@ -1464,7 +1464,7 @@ do_filter(
 		if (!aborting())
 #endif
 		{
-		    msg_putchar('\n');
+		    मेनसाहे_putchar('\n');
 		    semsg(_(e_cant_read_file_str), otmp);
 		}
 		goto error;
@@ -1473,13 +1473,13 @@ do_filter(
 		goto filterend;
 	}
 
-	read_linecount = curbuf->b_ml.ml_line_count - read_linecount;
+	read_linecount = curbuf->b_ml.ml_लिन्या_बिलांग - read_linecount;
 
 	if (shell_flags & SHELL_READ)
 	{
 	    curbuf->b_op_start.lnum = line2 + 1;
 	    curbuf->b_op_end.lnum = curwin->w_cursor.lnum;
-	    appended_lines_mark(line2, read_linecount);
+	    appended_मगा_लिन्या_mark(line2, read_linecount);
 	}
 
 	if (do_in)
@@ -1515,12 +1515,12 @@ do_filter(
 	     * Adjust '[ and '] (set by buf_write()).
 	     */
 	    curwin->w_cursor.lnum = line1;
-	    del_lines(linecount, TRUE);
+	    del_मगा_लिन्या(linecount, TRUE);
 	    if (read_linecount == 0)
 	    {
 		// no filter output: clamp '[ and '] to a valid line
 		curbuf->b_op_start.lnum = curbuf->b_op_end.lnum =
-					MIN(line1, curbuf->b_ml.ml_line_count);
+					MIN(line1, curbuf->b_ml.ml_लिन्या_बिलांग);
 		curbuf->b_op_start.col = curbuf->b_op_end.col = 0;
 	    }
 	    else
@@ -1550,11 +1550,11 @@ do_filter(
 	{
 	    if (do_in)
 	    {
-		vim_snprintf(msg_buf, sizeof(msg_buf),
+		vim_snprintf(मेनसाहे_buf, sizeof(मेनसाहे_buf),
 				    _("%ld lines filtered"), (long)linecount);
-		if (msg(msg_buf) && !msg_scroll)
+		if (मेनसाहे(मेनसाहे_buf) && !मेनसाहे_scroll)
 		    // save message to display it after redraw
-		    set_keep_msg((char_u *)msg_buf, 0);
+		    set_keep_मेनसाहे((char_u *)मेनसाहे_buf, 0);
 	    }
 	    else
 		msgmore((long)linecount);
@@ -1616,7 +1616,7 @@ do_shell(
      */
     if (check_restricted() || check_secure())
     {
-	msg_end();
+	मेनसाहे_end();
 	return;
     }
 
@@ -1638,7 +1638,7 @@ do_shell(
      * For autocommands we want to get the output on the current screen, to
      * avoid having to type return below.
      */
-    msg_putchar('\r');			// put cursor at start of line
+    मेनसाहे_putchar('\r');			// put cursor at start of line
     if (!autocmd_busy)
     {
 	if (!keep_termcap)
@@ -1647,10 +1647,10 @@ do_shell(
 #ifdef MSWIN
     if (!winstart)
 #endif
-	msg_putchar('\n');		// may shift screen one line up
+	मेनसाहे_putchar('\n');		// may shift screen one line up
 
     // warning message before calling the shell
-    if (p_warn && !autocmd_busy && msg_silent == 0)
+    if (p_warn && !autocmd_busy && मेनसाहे_silent == 0)
 	FOR_ALL_BUFFERS(buf)
 	    if (bufIsChangedNotTerm(buf))
 	    {
@@ -1658,7 +1658,7 @@ do_shell(
 		if (!keep_termcap)
 		    starttermcap();	// don't want a message box here
 #endif
-		msg_puts(_("[No write since last change]\n"));
+		मेनसाहे_puts(_("[No write since last change]\n"));
 #ifdef FEAT_GUI_MSWIN
 		if (!keep_termcap)
 		    stoptermcap();
@@ -1669,7 +1669,7 @@ do_shell(
     // This windgoto is required for when the '\n' resulted in a "delete line
     // 1" command to the terminal.
     if (!swapping_screen())
-	windgoto(msg_row, cmdline_col_off + msg_col);
+	windgoto(मेनसाहे_row, cmdline_col_off + मेनसाहे_col);
     cursor_on();
     (void)call_shell(cmd, SHELL_COOKED | flags);
     did_check_timestamps = FALSE;
@@ -1681,13 +1681,13 @@ do_shell(
      */
     if (!swapping_screen())
     {
-	msg_row = Rows - 1;
-	msg_col = 0;
+	मेनसाहे_row = Rows - 1;
+	मेनसाहे_col = 0;
     }
 
     if (autocmd_busy)
     {
-	if (msg_silent == 0)
+	if (मेनसाहे_silent == 0)
 	    redraw_later_clear();
     }
     else
@@ -1709,7 +1709,7 @@ do_shell(
 # endif
 	       )
 	    {
-		if (msg_silent == 0)
+		if (मेनसाहे_silent == 0)
 		    redraw_later_clear();
 		need_wait_return = FALSE;
 	    }
@@ -1724,7 +1724,7 @@ do_shell(
 		    no_wait_return = FALSE;
 		// ":silent" leaves the output of the command on the screen,
 		// except where it cannot be seen there anyway.
-		int redraw = msg_silent == 0 || swapping_screen();
+		int redraw = मेनसाहे_silent == 0 || swapping_screen();
 # ifdef FEAT_GUI
 		if (gui.in_use)
 		    redraw = TRUE;
@@ -1752,13 +1752,13 @@ do_shell(
 #ifdef AMIGA
 	if (skip_redraw)		// ':' hit in wait_return()
 	{
-	    if (msg_silent == 0)
+	    if (मेनसाहे_silent == 0)
 		redraw_later_clear();
 	}
 	else if (term_console)
 	{
 	    OUT_STR("\033[0 q");	// get window size
-	    if (got_int && msg_silent == 0)
+	    if (got_int && मेनसाहे_silent == 0)
 		redraw_later_clear();	// if got_int is TRUE, redraw needed
 	    else
 		must_redraw = 0;	// no extra redraw needed
@@ -1986,27 +1986,27 @@ do_fixdel(exarg_T *eap UNUSED)
 }
 
     void
-print_line_no_prefix(
+इलिम्बाग_लिन्या_no_prefix(
     linenr_T	lnum,
-    int		use_number,
+    int		use_नुमेरो,
     int		list)
 {
     char	numbuf[30];
 
-    if (curwin->w_p_nu || use_number)
+    if (curwin->w_p_nu || use_नुमेरो)
     {
 	vim_snprintf(numbuf, sizeof(numbuf),
-				   "%*ld ", number_width(curwin), (long)lnum);
-	msg_puts_attr(numbuf, HL_ATTR(HLF_N));	// Highlight line nrs
+				   "%*ld ", नुमेरो_width(curwin), (long)lnum);
+	मेनसाहे_puts_attr(numbuf, HL_ATTR(HLF_N));	// Highlight line nrs
     }
-    msg_prt_line(ml_get(lnum), list);
+    मेनसाहे_prt_लिन्या(ml_get(lnum), list);
 }
 
 /*
  * Print a text line.  Also in silent mode ("ex -s").
  */
     void
-print_line(linenr_T lnum, int use_number, int list)
+इलिम्बाग_लिन्या(linenr_T lnum, int use_नुमेरो, int list)
 {
     int		save_silent = silent_mode;
 
@@ -2014,13 +2014,13 @@ print_line(linenr_T lnum, int use_number, int list)
     if (message_filtered(ml_get(lnum)))
 	return;
 
-    msg_start();
+    मेनसाहे_start();
     silent_mode = FALSE;
     info_message = TRUE;	// use mch_msg(), not mch_errmsg()
-    print_line_no_prefix(lnum, use_number, list);
+    इलिम्बाग_लिन्या_no_prefix(lnum, use_नुमेरो, list);
     if (save_silent)
     {
-	msg_putchar('\n');
+	मेनसाहे_putchar('\n');
 	cursor_on();		// msg_start() switches it off
 	out_flush();
 	silent_mode = save_silent;
@@ -2085,16 +2085,16 @@ ex_file(exarg_T *eap)
 {
     // ":0file" removes the file name.  Check for illegal uses ":3file",
     // "0file name", etc.
-    if (eap->addr_count > 0
+    if (eap->addr_बिलांग > 0
 	    && (*eap->arg != NUL
 		|| eap->line2 > 0
-		|| eap->addr_count > 1))
+		|| eap->addr_बिलांग > 1))
     {
 	emsg(_(e_invalid_argument));
 	return;
     }
 
-    if (*eap->arg != NUL || eap->addr_count == 1)
+    if (*eap->arg != NUL || eap->addr_बिलांग == 1)
     {
 	if (rename_buffer(eap->arg) == FAIL)
 	    return;
@@ -2129,7 +2129,7 @@ ex_write(exarg_T *eap)
     {
 	// :saveas does not take a range, uses all lines.
 	eap->line1 = 1;
-	eap->line2 = curbuf->b_ml.ml_line_count;
+	eap->line2 = curbuf->b_ml.ml_लिन्या_बिलांग;
     }
 
     if (eap->usefilter)		// input lines to shell command
@@ -2142,7 +2142,7 @@ ex_write(exarg_T *eap)
     static int
 check_writable(char_u *fname)
 {
-    if (mch_nodetype(fname) == NODE_OTHER)
+    if (mch_nodetype(fname) == बुहोल_OTHER)
     {
 	semsg(_(e_str_is_not_file_or_writable_device), fname);
 	return FAIL;
@@ -2233,7 +2233,7 @@ do_write(exarg_T *eap)
      * and a file name is required.
      * "nofile" and "nowrite" buffers cannot be written implicitly either.
      */
-    if (!other && (bt_dontwrite_msg(curbuf) || check_fname() == FAIL
+    if (!other && (bt_dontwrite_मेनसाहे(curbuf) || check_fname() == FAIL
 #ifdef UNIX
 		|| check_writable(curbuf->b_ffname) == FAIL
 #endif
@@ -2248,7 +2248,7 @@ do_write(exarg_T *eap)
 	 * Not writing the whole file is only allowed with '!'.
 	 */
 	if (	   (eap->line1 != 1
-		    || eap->line2 != curbuf->b_ml.ml_line_count)
+		    || eap->line2 != curbuf->b_ml.ml_लिन्या_बिलांग)
 		&& !eap->forceit
 		&& !eap->append
 		&& !p_wa)
@@ -2413,9 +2413,9 @@ check_overwrite(
 #if defined(FEAT_GUI_DIALOG) || defined(FEAT_CON_DIALOG)
 	    if (p_confirm || (cmdmod.cmod_flags & CMOD_CONFIRM))
 	    {
-		char_u	buff[DIALOG_MSG_SIZE];
+		char_u	buff[DIALOG_मेनसाहे_SIZE];
 
-		dialog_msg(buff, _("Overwrite existing file \"%s\"?"), fname);
+		dialog_मेनसाहे(buff, _("Overwrite existing file \"%s\"?"), fname);
 		if (vim_dialog_yesno(VIM_QUESTION, NULL, buff, 2) != VIM_YES)
 		    return FAIL;
 		eap->forceit = TRUE;
@@ -2464,9 +2464,9 @@ check_overwrite(
 #if defined(FEAT_GUI_DIALOG) || defined(FEAT_CON_DIALOG)
 		if (p_confirm || (cmdmod.cmod_flags & CMOD_CONFIRM))
 		{
-		    char_u	buff[DIALOG_MSG_SIZE];
+		    char_u	buff[DIALOG_मेनसाहे_SIZE];
 
-		    dialog_msg(buff,
+		    dialog_मेनसाहे(buff,
 			    _("Swap file \"%s\" exists, overwrite anyway?"),
 								    swapname);
 		    if (vim_dialog_yesno(VIM_QUESTION, NULL, buff, 2)
@@ -2504,7 +2504,7 @@ ex_wnext(exarg_T *eap)
     else
 	i = curwin->w_arg_idx - (int)eap->line2;
     eap->line1 = 1;
-    eap->line2 = curbuf->b_ml.ml_line_count;
+    eap->line2 = curbuf->b_ml.ml_लिन्या_बिलांग;
     if (do_write(eap) != FAIL)
 	do_argfile(eap, i);
 }
@@ -2633,13 +2633,13 @@ check_readonly(int *forceit, buf_T *buf)
 	if ((p_confirm || (cmdmod.cmod_flags & CMOD_CONFIRM))
 						       && buf->b_fname != NULL)
 	{
-	    char_u	buff[DIALOG_MSG_SIZE];
+	    char_u	buff[DIALOG_मेनसाहे_SIZE];
 
 	    if (buf->b_p_ro)
-		dialog_msg(buff, _("'readonly' option is set for \"%s\".\nDo you wish to write anyway?"),
+		dialog_मेनसाहे(buff, _("'readonly' option is set for \"%s\".\nDo you wish to write anyway?"),
 		    buf->b_fname);
 	    else
-		dialog_msg(buff, _("File permissions of \"%s\" are read-only.\nIt may still be possible to write it.\nDo you wish to try?"),
+		dialog_मेनसाहे(buff, _("File permissions of \"%s\" are read-only.\nIt may still be possible to write it.\nDo you wish to try?"),
 		    buf->b_fname);
 
 	    if (vim_dialog_yesno(VIM_QUESTION, NULL, buff, 2) == VIM_YES)
@@ -3088,7 +3088,7 @@ do_ecmd(
 	    if (!bufref_valid(&au_new_curbuf))
 	    {
 		// new buffer has been deleted
-		delbuf_msg(new_name);	// frees new_name
+		delbuf_मेनसाहे(new_name);	// frees new_name
 		au_new_curbuf = save_au_new_curbuf;
 		goto theend;
 	    }
@@ -3144,7 +3144,7 @@ do_ecmd(
 			buf = lastbuf;
 		    else
 		    {
-			delbuf_msg(new_name);	// frees new_name
+			delbuf_मेनसाहे(new_name);	// frees new_name
 			au_new_curbuf = save_au_new_curbuf;
 			goto theend;
 		    }
@@ -3259,11 +3259,11 @@ do_ecmd(
 	// the reload can be undone.  Do not do this if the (empty) buffer is
 	// being re-used for another file.
 	if (!(curbuf->b_flags & BF_NEVERLOADED)
-		&& (p_ur < 0 || curbuf->b_ml.ml_line_count <= p_ur))
+		&& (p_ur < 0 || curbuf->b_ml.ml_लिन्या_बिलांग <= p_ur))
 	{
 	    // Sync first so that this is a separate undo-able action.
 	    u_sync(FALSE);
-	    if (u_savecommon(0, curbuf->b_ml.ml_line_count + 1, 0, TRUE)
+	    if (u_savecommon(0, curbuf->b_ml.ml_लिन्या_बिलांग + 1, 0, TRUE)
 								     == FAIL)
 	    {
 		vim_free(new_name);
@@ -3282,7 +3282,7 @@ do_ecmd(
 	// up and jump to the end.
 	if (!bufref_valid(&bufref))
 	{
-	    delbuf_msg(new_name);	// frees new_name
+	    delbuf_मेनसाहे(new_name);	// frees new_name
 	    goto theend;
 	}
 	vim_free(new_name);
@@ -3411,7 +3411,7 @@ do_ecmd(
 	    topline = 0;
 
 	// Even when cursor didn't move we need to recompute topline.
-	changed_line_abv_curs();
+	changed_लिन्या_abv_curs();
 
 	maketitle();
 #if defined(FEAT_PROP_POPUP) && defined(FEAT_QUICKFIX)
@@ -3464,7 +3464,7 @@ do_ecmd(
 	else			// no line number, go to last line in Ex mode
 	{
 	    if (exmode_active)
-		curwin->w_cursor.lnum = curbuf->b_ml.ml_line_count;
+		curwin->w_cursor.lnum = curbuf->b_ml.ml_लिन्या_बिलांग;
 	    beginline(BL_WHITE | BL_FIX);
 	}
     }
@@ -3478,22 +3478,22 @@ do_ecmd(
      */
     if (oldbuf && !auto_buf)
     {
-	int	msg_scroll_save = msg_scroll;
+	int	मेनसाहे_scroll_save = मेनसाहे_scroll;
 
 	// Obey the 'O' flag in 'cpoptions': overwrite any previous file
 	// message.
 	if (shortmess(SHM_OVERALL) && !exiting && p_verbose == 0)
-	    msg_scroll = FALSE;
-	if (!msg_scroll)	// wait a bit when overwriting an error msg
+	    मेनसाहे_scroll = FALSE;
+	if (!मेनसाहे_scroll)	// wait a bit when overwriting an error msg
 	    check_for_delay(FALSE);
-	msg_start();
-	msg_scroll = msg_scroll_save;
-	msg_scrolled_ign = TRUE;
+	मेनसाहे_start();
+	मेनसाहे_scroll = मेनसाहे_scroll_save;
+	मेनसाहे_scrolled_ign = TRUE;
 
 	if (!shortmess(SHM_FILEINFO))
 	    fileinfo(FALSE, TRUE, FALSE);
 
-	msg_scrolled_ign = FALSE;
+	मेनसाहे_scrolled_ign = FALSE;
     }
 
 #ifdef FEAT_VIMINFO
@@ -3522,7 +3522,7 @@ do_ecmd(
 	redraw_curbuf_later(UPD_NOT_VALID);	// redraw this buffer later
     }
 
-    if (p_im && (State & MODE_INSERT) == 0)
+    if (p_im && (State & MODE_इसिंगित) == 0)
 	need_start_insertmode = TRUE;
 
 #ifdef FEAT_AUTOCHDIR
@@ -3567,13 +3567,13 @@ theend:
 }
 
     static void
-delbuf_msg(char_u *name)
+delbuf_मेनसाहे(char_u *name)
 {
     semsg(_(e_autocommands_unexpectedly_deleted_new_buffer_str),
 					   name == NULL ? (char_u *)"" : name);
     vim_free(name);
     au_new_curbuf.br_buf = NULL;
-    au_new_curbuf.br_buf_free_count = 0;
+    au_new_curbuf.br_buf_free_बिलांग = 0;
 }
 
 static int append_indent = 0;	    // autoindent for first line
@@ -3584,7 +3584,7 @@ static int append_indent = 0;	    // autoindent for first line
  * the user.  Returns NULL when there is no more.
  */
     static char_u *
-get_append_line(exarg_T *eap, int indent)
+get_append_लिन्या(exarg_T *eap, int indent)
 {
     char_u	*theline;
     char_u	*p;
@@ -3649,7 +3649,7 @@ ex_append(exarg_T *eap)
     if (eap->skip)
     {
 	// Not executing the command, only read the lines up to the ".".
-	while ((theline = get_append_line(eap, 0)) != NULL)
+	while ((theline = get_append_लिन्या(eap, 0)) != NULL)
 	{
 	    int end = theline[0] == '.' && theline[1] == NUL;
 
@@ -3675,13 +3675,13 @@ ex_append(exarg_T *eap)
     if (empty && lnum == 1)
 	lnum = 0;
 
-    State = MODE_INSERT;		    // behave like in Insert mode
+    State = MODE_इसिंगित;		    // behave like in Insert mode
     if (curbuf->b_p_iminsert == B_IMODE_LMAP)
 	State |= MODE_LANGMAP;
 
     for (;;)
     {
-	msg_scroll = TRUE;
+	मेनसाहे_scroll = TRUE;
 	need_wait_return = FALSE;
 	if (curbuf->b_p_ai)
 	{
@@ -3694,8 +3694,8 @@ ex_append(exarg_T *eap)
 		indent = get_indent_lnum(lnum);
 	}
 	ex_keep_indent = FALSE;
-	theline = get_append_line(eap, indent);
-	lines_left = Rows - 1;
+	theline = get_append_लिन्या(eap, indent);
+	मगा_लिन्या_कालिवा = Rows - 1;
 	if (theline == NULL)
 	    break;
 
@@ -3730,9 +3730,9 @@ ex_append(exarg_T *eap)
 	ml_append(lnum, theline, (colnr_T)0, FALSE);
 	if (empty)
 	    // there are no marks below the inserted lines
-	    appended_lines(lnum, 1L);
+	    appended_मगा_लिन्या(lnum, 1L);
 	else
-	    appended_lines_mark(lnum, 1L);
+	    appended_मगा_लिन्या_mark(lnum, 1L);
 
 	vim_free(theline);
 	++lnum;
@@ -3754,8 +3754,8 @@ ex_append(exarg_T *eap)
     // it is the same as "start"  -- Acevedo
     if ((cmdmod.cmod_flags & CMOD_LOCKMARKS) == 0)
     {
-	curbuf->b_op_start.lnum = (eap->line2 < curbuf->b_ml.ml_line_count) ?
-	    eap->line2 + 1 : curbuf->b_ml.ml_line_count;
+	curbuf->b_op_start.lnum = (eap->line2 < curbuf->b_ml.ml_लिन्या_बिलांग) ?
+	    eap->line2 + 1 : curbuf->b_ml.ml_लिन्या_बिलांग;
 	if (eap->cmdidx != CMD_append)
 	    --curbuf->b_op_start.lnum;
 	curbuf->b_op_end.lnum = (eap->line2 < lnum)
@@ -3804,7 +3804,7 @@ ex_change(exarg_T *eap)
 
     // make sure the cursor is not beyond the end of the file now
     check_cursor_lnum();
-    deleted_lines_mark(eap->line1, (long)(eap->line2 - lnum));
+    deleted_मगा_लिन्या_mark(eap->line1, (long)(eap->line2 - lnum));
 
     // ":append" on the line above the deleted lines.
     eap->line2 = eap->line1;
@@ -3853,8 +3853,8 @@ ex_z(exarg_T *eap)
 	    bigness = atol((char *)x);
 
 	    // bigness could be < 0 if atol(x) overflows.
-	    if (bigness > 2 * curbuf->b_ml.ml_line_count || bigness < 0)
-		bigness = 2 * curbuf->b_ml.ml_line_count;
+	    if (bigness > 2 * curbuf->b_ml.ml_लिन्या_बिलांग || bigness < 0)
+		bigness = 2 * curbuf->b_ml.ml_लिन्या_बिलांग;
 
 	    p_window = bigness;
 	    if (*kind == '=')
@@ -3898,7 +3898,7 @@ ex_z(exarg_T *eap)
 	    start = lnum;
 	    if (*kind == '+')
 		start += bigness * (linenr_T)(x - kind - 1) + 1;
-	    else if (eap->addr_count == 0)
+	    else if (eap->addr_बिलांग == 0)
 		++start;
 	    end = start + bigness - 1;
 	    curs = end;
@@ -3908,11 +3908,11 @@ ex_z(exarg_T *eap)
     if (start < 1)
 	start = 1;
 
-    if (end > curbuf->b_ml.ml_line_count)
-	end = curbuf->b_ml.ml_line_count;
+    if (end > curbuf->b_ml.ml_लिन्या_बिलांग)
+	end = curbuf->b_ml.ml_लिन्या_बिलांग;
 
-    if (curs > curbuf->b_ml.ml_line_count)
-	curs = curbuf->b_ml.ml_line_count;
+    if (curs > curbuf->b_ml.ml_लिन्या_बिलांग)
+	curs = curbuf->b_ml.ml_लिन्या_बिलांग;
     else if (curs < 1)
 	curs = 1;
 
@@ -3920,20 +3920,20 @@ ex_z(exarg_T *eap)
     {
 	if (minus && i == lnum)
 	{
-	    msg_putchar('\n');
+	    मेनसाहे_putchar('\n');
 
 	    for (j = 1; j < Columns; j++)
-		msg_putchar('-');
+		मेनसाहे_putchar('-');
 	}
 
-	print_line(i, eap->flags & EXFLAG_NR, eap->flags & EXFLAG_LIST);
+	इलिम्बाग_लिन्या(i, eap->flags & EXFLAG_NR, eap->flags & EXFLAG_LIST);
 
 	if (minus && i == lnum)
 	{
-	    msg_putchar('\n');
+	    मेनसाहे_putchar('\n');
 
 	    for (j = 1; j < Columns; j++)
-		msg_putchar('-');
+		मेनसाहे_putchar('-');
 	}
     }
 
@@ -3972,7 +3972,7 @@ check_secure(void)
     if (secure)
     {
 	secure = 2;
-	emsg(_(e_command_not_allowed_from_vimrc_in_current_dir_or_tag_search));
+	emsg(_(e_command_not_allowed_from_vimrc_in_current_dir_or_tag_हानाप));
 	return TRUE;
     }
 #ifdef HAVE_SANDBOX
@@ -3998,11 +3998,11 @@ static int	global_need_beginline;	// call beginline() after ":g"
 typedef struct {
     int	do_all;		// do multiple substitutions per line
     int	do_ask;		// ask for confirmation
-    int	do_count;	// count only
+    int	do_बिलांग;	// count only
     int	do_error;	// if false, ignore errors
-    int	do_print;	// print last line with subs.
+    int	do_इलिम्बाग;	// print last line with subs.
     int	do_list;	// list last line with subs.
-    int	do_number;	// list last line with line nr
+    int	do_नुमेरो;	// list last line with line nr
     int	do_ic;		// ignore case flag
 } subflags_T;
 
@@ -4071,10 +4071,10 @@ ex_substitute(exarg_T *eap)
     char_u	*cmd;
     char_u	*p;
     int		save_State;
-    linenr_T	first_line = 0;		// first changed line
-    linenr_T	last_line = 0;		// below last changed line AFTER the
+    linenr_T	first_लिन्या = 0;		// first changed line
+    linenr_T	last_लिन्या = 0;		// below last changed line AFTER the
 					// change
-    linenr_T	old_line_count = curbuf->b_ml.ml_line_count;
+    linenr_T	old_लिन्या_बिलांग = curbuf->b_ml.ml_लिन्या_बिलांग;
     linenr_T	line2;
     long	nmatch;			// number of lines in match
     string_T	sub_firstline;		// allocated copy of first sub line
@@ -4135,7 +4135,7 @@ ex_substitute(exarg_T *eap)
 		return;
 	    }
 	    if (*cmd != '&')
-		which_pat = RE_SEARCH;	    // use last '/' pattern
+		which_pat = RE_हानाप;	    // use last '/' pattern
 	    STR_LITERAL_SET(pat, "");	    // empty search pattern
 	    delimiter = *cmd++;		    // remember delimiter character
 	}
@@ -4220,7 +4220,7 @@ ex_substitute(exarg_T *eap)
 	    && (*cmd == NUL || (cmd[1] == NUL && (*cmd == 'g' || *cmd == 'l'
 					     || *cmd == 'p' || *cmd == '#'))))
     {
-	linenr_T    joined_lines_count;
+	linenr_T    joined_मगा_लिन्या_बिलांग;
 
 	if (eap->skip)
 	{
@@ -4233,26 +4233,26 @@ ex_substitute(exarg_T *eap)
 	else if (*cmd == '#')
 	    eap->flags = EXFLAG_NR;
 	else if (*cmd == 'p')
-	    eap->flags = EXFLAG_PRINT;
+	    eap->flags = EXFLAG_इलिम्बाग;
 
 	// The number of lines joined is the number of lines in the range plus
 	// one.  One less when the last line is included.
-	joined_lines_count = eap->line2 - eap->line1 + 1;
-	if (eap->line2 < curbuf->b_ml.ml_line_count)
-	    ++joined_lines_count;
-	if (joined_lines_count > 1)
+	joined_मगा_लिन्या_बिलांग = eap->line2 - eap->line1 + 1;
+	if (eap->line2 < curbuf->b_ml.ml_लिन्या_बिलांग)
+	    ++joined_मगा_लिन्या_बिलांग;
+	if (joined_मगा_लिन्या_बिलांग > 1)
 	{
-	    (void)do_join(joined_lines_count, FALSE, TRUE, FALSE, TRUE);
-	    sub_nsubs = joined_lines_count - 1;
+	    (void)do_join(joined_मगा_लिन्या_बिलांग, FALSE, TRUE, FALSE, TRUE);
+	    sub_nsubs = joined_मगा_लिन्या_बिलांग - 1;
 	    sub_nlines = 1;
-	    (void)do_sub_msg(FALSE);
-	    ex_may_print(eap);
+	    (void)do_sub_मेनसाहे(FALSE);
+	    ex_may_इलिम्बाग(eap);
 	}
 
 	if (!keeppatterns)
 	    save_re_pat(RE_SUBST, pat.string, pat.length, magic_isset());
 	// put pattern in history
-	add_to_history(HIST_SEARCH, pat.string, pat.length, TRUE, NUL);
+	add_to_history(HIST_हानाप, pat.string, pat.length, TRUE, NUL);
 	vim_free(sub);
 
 	return;
@@ -4283,10 +4283,10 @@ ex_substitute(exarg_T *eap)
 	    subflags.do_ask = FALSE;
 	}
 	subflags.do_error = TRUE;
-	subflags.do_print = FALSE;
+	subflags.do_इलिम्बाग = FALSE;
 	subflags.do_list = FALSE;
-	subflags.do_count = FALSE;
-	subflags.do_number = FALSE;
+	subflags.do_बिलांग = FALSE;
+	subflags.do_नुमेरो = FALSE;
 	subflags.do_ic = 0;
     }
     while (*cmd)
@@ -4300,21 +4300,21 @@ ex_substitute(exarg_T *eap)
 	else if (*cmd == 'c')
 	    subflags.do_ask = !subflags.do_ask;
 	else if (*cmd == 'n')
-	    subflags.do_count = TRUE;
+	    subflags.do_बिलांग = TRUE;
 	else if (*cmd == 'e')
 	    subflags.do_error = !subflags.do_error;
 	else if (*cmd == 'r')	    // use last used regexp
 	    which_pat = RE_LAST;
 	else if (*cmd == 'p')
-	    subflags.do_print = TRUE;
+	    subflags.do_इलिम्बाग = TRUE;
 	else if (*cmd == '#')
 	{
-	    subflags.do_print = TRUE;
-	    subflags.do_number = TRUE;
+	    subflags.do_इलिम्बाग = TRUE;
+	    subflags.do_नुमेरो = TRUE;
 	}
 	else if (*cmd == 'l')
 	{
-	    subflags.do_print = TRUE;
+	    subflags.do_इलिम्बाग = TRUE;
 	    subflags.do_list = TRUE;
 	}
 	else if (*cmd == 'i')	    // ignore case
@@ -4325,7 +4325,7 @@ ex_substitute(exarg_T *eap)
 	    break;
 	++cmd;
     }
-    if (subflags.do_count)
+    if (subflags.do_बिलांग)
 	subflags.do_ask = FALSE;
 
     save_do_all = subflags.do_all;
@@ -4340,7 +4340,7 @@ ex_substitute(exarg_T *eap)
 	i = getdigits(&cmd);
 	if (i <= 0 && !eap->skip && subflags.do_error)
 	{
-	    emsg(_(e_positive_count_required));
+	    emsg(_(e_positive_बिलांग_required));
 	    vim_free(sub);
 	    return;
 	}
@@ -4354,8 +4354,8 @@ ex_substitute(exarg_T *eap)
 	}
 	eap->line1 = eap->line2;
 	eap->line2 += i - 1;
-	if (eap->line2 > curbuf->b_ml.ml_line_count)
-	    eap->line2 = curbuf->b_ml.ml_line_count;
+	if (eap->line2 > curbuf->b_ml.ml_लिन्या_बिलांग)
+	    eap->line2 = curbuf->b_ml.ml_लिन्या_बिलांग;
     }
 
     /*
@@ -4379,7 +4379,7 @@ ex_substitute(exarg_T *eap)
 	return;
     }
 
-    if (!subflags.do_count && !curbuf->b_p_ma)
+    if (!subflags.do_बिलांग && !curbuf->b_p_ma)
     {
 	// Substitution is not allowed in non-'modifiable' buffer
 	emsg(_(e_cannot_make_changes_modifiable_is_off));
@@ -4387,7 +4387,7 @@ ex_substitute(exarg_T *eap)
 	return;
     }
 
-    if (search_regcomp(pat.string, pat.length, NULL, RE_SUBST, which_pat, SEARCH_HIS, &regmatch) == FAIL)
+    if (हानाप_regcomp(pat.string, pat.length, NULL, RE_SUBST, which_pat, हानाप_HIS, &regmatch) == FAIL)
     {
 	if (subflags.do_error)
 	    emsg(_(e_invalid_command));
@@ -4462,7 +4462,7 @@ ex_substitute(exarg_T *eap)
 #ifdef FEAT_PROP_POPUP
 	    int		apc_flags = APC_SAVE_FOR_UNDO | APC_SUBSTITUTE;
 	    colnr_T	total_added =  0;
-	    int		text_prop_count = 0;
+	    int		text_prop_बिलांग = 0;
 #endif
 
 	    /*
@@ -4548,7 +4548,7 @@ ex_substitute(exarg_T *eap)
 
 		// Match might be after the last line for "\n\zs" matching at
 		// the end of the last line.
-		if (lnum > curbuf->b_ml.ml_line_count)
+		if (lnum > curbuf->b_ml.ml_लिन्या_बिलांग)
 		    break;
 
 		if (sub_firstline.string == NULL)
@@ -4601,7 +4601,7 @@ ex_substitute(exarg_T *eap)
 		 * 2. If do_count is set only increase the counter.
 		 *    If do_ask is set, ask for confirmation.
 		 */
-		if (subflags.do_count)
+		if (subflags.do_बिलांग)
 		{
 		    // For a multi-line match, put matchcol at the NUL at
 		    // the end of the line and set nmatch to one, so that
@@ -4651,8 +4651,8 @@ ex_substitute(exarg_T *eap)
 			    char_u	*resp;
 			    colnr_T	sc, ec;
 
-			    print_line_no_prefix(lnum,
-					 subflags.do_number, subflags.do_list);
+			    इलिम्बाग_लिन्या_no_prefix(lnum,
+					 subflags.do_नुमेरो, subflags.do_list);
 
 			    getvcol(curwin, &curwin->w_cursor,
 							   &sc, NULL, NULL, 0);
@@ -4662,17 +4662,17 @@ ex_substitute(exarg_T *eap)
 			    getvcol(curwin, &curwin->w_cursor,
 							   NULL, NULL, &ec, 0);
 			    curwin->w_cursor.col = regmatch.startpos[0].col;
-			    if (subflags.do_number || curwin->w_p_nu)
+			    if (subflags.do_नुमेरो || curwin->w_p_nu)
 			    {
-				int numw = number_width(curwin) + 1;
+				int numw = नुमेरो_width(curwin) + 1;
 				sc += numw;
 				ec += numw;
 			    }
-			    msg_start();
+			    मेनसाहे_start();
 			    for (i = 0; i < (long)sc; ++i)
-				msg_putchar(' ');
+				मेनसाहे_putchar(' ');
 			    for ( ; i <= (long)ec; ++i)
-				msg_putchar('^');
+				मेनसाहे_putchar('^');
 
 			    resp = getexmodeline('?', NULL, 0, TRUE);
 			    if (resp != NULL)
@@ -4688,7 +4688,7 @@ ex_substitute(exarg_T *eap)
 			}
 			else
 			{
-			    string_T orig_line = {NULL, 0};
+			    string_T orig_लिन्या = {NULL, 0};
 			    int    len_change = 0;
 			    int	   save_p_lz = p_lz;
 #ifdef FEAT_FOLDING
@@ -4711,19 +4711,19 @@ ex_substitute(exarg_T *eap)
 				// really update the line, it would change
 				// what matches.  Temporarily replace the line
 				// and change it back afterwards.
-				orig_line.length = ml_get_len(lnum);
-				orig_line.string = vim_strnsave(ml_get(lnum), orig_line.length);
-				if (orig_line.string != NULL)
+				orig_लिन्या.length = ml_get_len(lnum);
+				orig_लिन्या.string = vim_strnsave(ml_get(lnum), orig_लिन्या.length);
+				if (orig_लिन्या.string != NULL)
 				{
-				    string_T new_line;
+				    string_T new_लिन्या;
 
-				    new_line.string = concat_str(new_start.string,
+				    new_लिन्या.string = concat_str(new_start.string,
 						     sub_firstline.string + copycol);
-				    if (new_line.string == NULL)
-					VIM_CLEAR_STRING(orig_line);
+				    if (new_लिन्या.string == NULL)
+					VIM_CLEAR_STRING(orig_लिन्या);
 				    else
 				    {
-					new_line.length =
+					new_लिन्या.length =
 					    new_start.length + (sub_firstline.length - copycol);
 					// Position the cursor relative to the
 					// end of the line, the previous
@@ -4731,21 +4731,21 @@ ex_substitute(exarg_T *eap)
 					// deleted characters before the
 					// cursor.
 					len_change =
-					    (int)new_line.length - (int)orig_line.length;
+					    (int)new_लिन्या.length - (int)orig_लिन्या.length;
 					curwin->w_cursor.col += len_change;
-					ml_replace(lnum, new_line.string, FALSE);
+					ml_replace(lnum, new_लिन्या.string, FALSE);
 				    }
 				}
 			    }
 
-			    search_match_lines = regmatch.endpos[0].lnum
+			    हानाप_match_मगा_लिन्या = regmatch.endpos[0].lnum
 						  - regmatch.startpos[0].lnum;
-			    search_match_endcol = regmatch.endpos[0].col
+			    हानाप_match_endcol = regmatch.endpos[0].col
 								 + len_change;
-			    if (search_match_lines == 0
-						   && search_match_endcol == 0)
+			    if (हानाप_match_मगा_लिन्या == 0
+						   && हानाप_match_endcol == 0)
 				// highlight at least one character for /^/
-				search_match_endcol = 1;
+				हानाप_match_endcol = 1;
 			    highlight_match = TRUE;
 
 			    update_topline();
@@ -4757,41 +4757,41 @@ ex_substitute(exarg_T *eap)
 #ifdef FEAT_FOLDING
 			    curwin->w_p_fen = save_p_fen;
 #endif
-			    if (msg_row == Rows - 1)
-				msg_didout = FALSE;	// avoid a scroll-up
-			    msg_starthere();
-			    i = msg_scroll;
-			    msg_scroll = 0;		// truncate msg when
+			    if (मेनसाहे_row == Rows - 1)
+				मेनसाहे_didout = FALSE;	// avoid a scroll-up
+			    मेनसाहे_starthere();
+			    i = मेनसाहे_scroll;
+			    मेनसाहे_scroll = 0;		// truncate msg when
 							// needed
-			    msg_no_more = TRUE;
+			    मेनसाहे_no_more = TRUE;
 			    // write message same highlighting as for
 			    // wait_return()
 			    smsg_attr(HL_ATTR(HLF_R),
 				_("replace with %s (y/n/a/q/l/^E/^Y)?"), sub);
-			    msg_no_more = FALSE;
-			    msg_scroll = i;
+			    मेनसाहे_no_more = FALSE;
+			    मेनसाहे_scroll = i;
 			    showruler(TRUE);
-			    windgoto(msg_row, cmdline_col_off + msg_col);
+			    windgoto(मेनसाहे_row, cmdline_col_off + मेनसाहे_col);
 			    RedrawingDisabled = save_RedrawingDisabled;
 
 #ifdef USE_ON_FLY_SCROLL
 			    dont_scroll = FALSE; // allow scrolling here
 #endif
 			    ++no_mapping;	// don't map this key
-			    ++allow_keys;	// allow special keys
+			    ++allow_मगा_सुसि;	// allow special keys
 			    typed = plain_vgetc();
-			    --allow_keys;
+			    --allow_मगा_सुसि;
 			    --no_mapping;
 
 			    // clear the question
-			    msg_didout = FALSE;	// don't scroll up
-			    msg_col = 0;
+			    मेनसाहे_didout = FALSE;	// don't scroll up
+			    मेनसाहे_col = 0;
 			    gotocmdline(TRUE);
 			    p_lz = save_p_lz;
 
 			    // restore the line
-			    if (orig_line.string != NULL)
-				ml_replace(lnum, orig_line.string, FALSE);
+			    if (orig_लिन्या.string != NULL)
+				ml_replace(lnum, orig_लिन्या.string, FALSE);
 			}
 
 			need_wait_return = FALSE; // no hit-return prompt
@@ -4858,7 +4858,7 @@ ex_substitute(exarg_T *eap)
 #ifdef FEAT_EVAL
 		save_ma = curbuf->b_p_ma;
 		save_sandbox = sandbox;
-		if (subflags.do_count)
+		if (subflags.do_बिलांग)
 		{
 		    // prevent accidentally changing the buffer by a function
 		    curbuf->b_p_ma = FALSE;
@@ -4884,7 +4884,7 @@ ex_substitute(exarg_T *eap)
 		// the replacement.
 		// Don't keep flags set by a recursive call.
 		subflags = subflags_save;
-		if (sublen == 0 || aborting() || subflags.do_count)
+		if (sublen == 0 || aborting() || subflags.do_बिलांग)
 		{
 		    curbuf->b_p_ma = save_ma;
 		    sandbox = save_sandbox;
@@ -4894,9 +4894,9 @@ ex_substitute(exarg_T *eap)
 
 		// When the match included the "$" of the last line it may
 		// go beyond the last line of the buffer.
-		if (nmatch > curbuf->b_ml.ml_line_count - sub_firstlnum + 1)
+		if (nmatch > curbuf->b_ml.ml_लिन्या_बिलांग - sub_firstlnum + 1)
 		{
-		    nmatch = curbuf->b_ml.ml_line_count - sub_firstlnum + 1;
+		    nmatch = curbuf->b_ml.ml_लिन्या_बिलांग - sub_firstlnum + 1;
 		    skip_match = TRUE;
 		    // safety check
 		    if (nmatch < 0)
@@ -4957,23 +4957,23 @@ ex_substitute(exarg_T *eap)
 
 			// Copy the text props of the last line, they will be
 			// later appended to the changed line.
-			text_prop_count = get_text_props(curbuf, lastlnum,
+			text_prop_बिलांग = get_text_props(curbuf, lastlnum,
 							   &prop_start, FALSE);
-			if (text_prop_count > 0)
+			if (text_prop_बिलांग > 0)
 			{
 			    // TODO: what when we already did this?
 			    vim_free(text_props);
 			    text_props = ALLOC_MULT(textprop_T,
-							      text_prop_count);
+							      text_prop_बिलांग);
 			    if (text_props != NULL)
 			    {
 				mch_memmove(text_props, prop_start,
-					 text_prop_count * sizeof(textprop_T));
+					 text_prop_बिलांग * sizeof(textprop_T));
 				// Filter out virtual text and continuation
 				// properties from deleted lines, convert
 				// offsets to pointers, and adjust columns.
 				int wi = 0;
-				for (int pi = 0; pi < text_prop_count; ++pi)
+				for (int pi = 0; pi < text_prop_बिलांग; ++pi)
 				{
 				    // Skip virtual text and continuation
 				    // properties from the deleted line.
@@ -4987,7 +4987,7 @@ ex_substitute(exarg_T *eap)
 				    text_props[wi].u.tp_text = NULL;
 				    ++wi;
 				}
-				text_prop_count = wi;
+				text_prop_बिलांग = wi;
 			    }
 			}
 		    }
@@ -5151,12 +5151,12 @@ ex_substitute(exarg_T *eap)
 			    ml_append(lnum - 1, new_start.string, plen, FALSE);
 			    mark_adjust(lnum + 1, (linenr_T)MAXLNUM, 1L, 0L);
 			    if (subflags.do_ask)
-				appended_lines(lnum - 1, 1L);
+				appended_मगा_लिन्या(lnum - 1, 1L);
 			    else
 			    {
-				if (first_line == 0)
-				    first_line = lnum;
-				last_line = lnum + 1;
+				if (first_लिन्या == 0)
+				    first_लिन्या = lnum;
+				last_लिन्या = lnum + 1;
 			    }
 #ifdef FEAT_PROP_POPUP
 			    adjust_props_for_split(lnum + 1, lnum,
@@ -5241,7 +5241,7 @@ skip:
 			ml_replace(lnum, new_start.string, TRUE);
 #ifdef FEAT_PROP_POPUP
 			if (text_props != NULL)
-			    add_text_props(lnum, text_props, text_prop_count);
+			    add_text_props(lnum, text_props, text_prop_बिलांग);
 #endif
 			if (nmatch_tl > 0)
 			{
@@ -5266,7 +5266,7 @@ skip:
 				mark_adjust(lnum - 1, lnum - 1,
 						   (long)MAXLNUM, -nmatch_tl);
 			    if (subflags.do_ask)
-				deleted_lines(lnum, nmatch_tl);
+				deleted_मगा_लिन्या(lnum, nmatch_tl);
 			    --lnum;
 			    line2 -= nmatch_tl; // nr of lines decreases
 			    nmatch_tl = 0;
@@ -5278,9 +5278,9 @@ skip:
 			    changed_bytes(lnum, 0);
 			else
 			{
-			    if (first_line == 0)
-				first_line = lnum;
-			    last_line = lnum + 1;
+			    if (first_लिन्या == 0)
+				first_लिन्या = lnum;
+			    last_लिन्या = lnum + 1;
 			}
 
 			sub_firstlnum = lnum;
@@ -5313,7 +5313,7 @@ skip:
 		    }
 		}
 
-		line_breakcheck();
+		लिन्या_breakcheck();
 	    }
 
 	    if (did_sub)
@@ -5322,16 +5322,16 @@ skip:
 	    VIM_CLEAR_STRING(sub_firstline);	// free the copy of the original line
 	}
 
-	line_breakcheck();
+	लिन्या_breakcheck();
     }
 
-    if (first_line != 0)
+    if (first_लिन्या != 0)
     {
 	// Need to subtract the number of added lines from "last_line" to get
 	// the line number before the change (same as adding the number of
 	// deleted lines).
-	i = curbuf->b_ml.ml_line_count - old_line_count;
-	changed_lines(first_line, 0, last_line - i, i);
+	i = curbuf->b_ml.ml_लिन्या_बिलांग - old_लिन्या_बिलांग;
+	changed_मगा_लिन्या(first_लिन्या, 0, last_लिन्या - i, i);
     }
 
 outofmem:
@@ -5342,7 +5342,7 @@ outofmem:
 #endif
 
     // ":s/pat//n" doesn't move the cursor
-    if (subflags.do_count)
+    if (subflags.do_बिलांग)
 	curwin->w_cursor = old_cursor;
 
     if (sub_nsubs > start_nsubs)
@@ -5365,23 +5365,23 @@ outofmem:
 		else
 		    beginline(BL_WHITE | BL_FIX);
 	    }
-	    if (!do_sub_msg(subflags.do_count) && subflags.do_ask)
-		msg("");
+	    if (!do_sub_मेनसाहे(subflags.do_बिलांग) && subflags.do_ask)
+		मेनसाहे("");
 	}
 	else
 	    global_need_beginline = TRUE;
-	if (subflags.do_print)
-	    print_line(curwin->w_cursor.lnum,
-					 subflags.do_number, subflags.do_list);
+	if (subflags.do_इलिम्बाग)
+	    इलिम्बाग_लिन्या(curwin->w_cursor.lnum,
+					 subflags.do_नुमेरो, subflags.do_list);
     }
     else if (!global_busy)
     {
 	if (got_int)		// interrupted
 	    emsg(_(e_interrupted));
 	else if (got_match)	// did find something but nothing substituted
-	    msg("");
+	    मेनसाहे("");
 	else if (subflags.do_error)	// nothing found
-	    semsg(_(e_pattern_not_found_str), get_search_pat());
+	    semsg(_(e_pattern_not_found_str), get_हानाप_pat());
     }
 
 #ifdef FEAT_FOLDING
@@ -5404,8 +5404,8 @@ outofmem:
  * Return TRUE if a message was given.
  */
     int
-do_sub_msg(
-    int	    count_only)		// used 'n' flag for ":s"
+do_sub_मेनसाहे(
+    int	    बिलांग_only)		// used 'n' flag for ":s"
 {
     /*
      * Only report substitutions when:
@@ -5413,36 +5413,36 @@ do_sub_msg(
      * - command was typed by user, or number of changed lines > 'report'
      * - giving messages is not disabled by 'lazyredraw'
      */
-    if (((sub_nsubs > p_report && (KeyTyped || sub_nlines > 1 || p_report < 1))
-		|| count_only)
+    if (((sub_nsubs > p_report && (सुसि_Typed || sub_nlines > 1 || p_report < 1))
+		|| बिलांग_only)
 	    && messaging())
     {
-	char	*msg_single;
-	char	*msg_plural;
+	char	*मेनसाहे_single;
+	char	*मेनसाहे_plural;
 
 	if (got_int)
-	    STRCPY(msg_buf, _("(Interrupted) "));
+	    STRCPY(मेनसाहे_buf, _("(Interrupted) "));
 	else
-	    *msg_buf = NUL;
+	    *मेनसाहे_buf = NUL;
 
-	msg_single = count_only
+	मेनसाहे_single = बिलांग_only
 		    ? NGETTEXT("%ld match on %ld line",
 					  "%ld matches on %ld line", sub_nsubs)
 		    : NGETTEXT("%ld substitution on %ld line",
 				   "%ld substitutions on %ld line", sub_nsubs);
-	msg_plural = count_only
+	मेनसाहे_plural = बिलांग_only
 		    ? NGETTEXT("%ld match on %ld lines",
 					 "%ld matches on %ld lines", sub_nsubs)
 		    : NGETTEXT("%ld substitution on %ld lines",
 				  "%ld substitutions on %ld lines", sub_nsubs);
 
-	vim_snprintf_add(msg_buf, sizeof(msg_buf),
-				 NGETTEXT(msg_single, msg_plural, sub_nlines),
+	vim_snprintf_add(मेनसाहे_buf, sizeof(मेनसाहे_buf),
+				 NGETTEXT(मेनसाहे_single, मेनसाहे_plural, sub_nlines),
 				 sub_nsubs, (long)sub_nlines);
 
-	if (msg(msg_buf))
+	if (मेनसाहे(मेनसाहे_buf))
 	    // save message to display it after redraw
-	    set_keep_msg((char_u *)msg_buf, 0);
+	    set_keep_मेनसाहे((char_u *)मेनसाहे_buf, 0);
 	return TRUE;
     }
     if (got_int)
@@ -5499,7 +5499,7 @@ ex_global(exarg_T *eap)
     // When nesting the command works on one line.  This allows for
     // ":g/found/v/notfound/command".
     if (global_busy && (eap->line1 != 1
-				  || eap->line2 != curbuf->b_ml.ml_line_count))
+				  || eap->line2 != curbuf->b_ml.ml_लिन्या_बिलांग))
     {
 	// will increment global_busy to break out of the loop
 	emsg(_(e_cannot_do_global_recursive_with_range));
@@ -5534,7 +5534,7 @@ ex_global(exarg_T *eap)
 	if (*cmd == '&')
 	    which_pat = RE_SUBST;	// use previous substitute pattern
 	else
-	    which_pat = RE_SEARCH;	// use previous search pattern
+	    which_pat = RE_हानाप;	// use previous search pattern
 	++cmd;
 	pat = (char_u *)"";
 	patlen = 0;
@@ -5559,7 +5559,7 @@ ex_global(exarg_T *eap)
 	patlen = STRLEN(pat);
     }
 
-    if (search_regcomp(pat, patlen, &used_pat, RE_BOTH, which_pat, SEARCH_HIS,
+    if (हानाप_regcomp(pat, patlen, &used_pat, RE_BOTH, which_pat, हानाप_HIS,
 							    &regmatch) == FAIL)
     {
 	emsg(_(e_invalid_command));
@@ -5591,20 +5591,20 @@ ex_global(exarg_T *eap)
 		ml_setmarked(lnum);
 		ndone++;
 	    }
-	    line_breakcheck();
+	    लिन्या_breakcheck();
 	}
 
 	/*
 	 * pass 2: execute the command for each line that has been marked
 	 */
 	if (got_int)
-	    msg(_(e_interrupted));
+	    मेनसाहे(_(e_interrupted));
 	else if (ndone == 0)
 	{
 	    if (type == 'v')
 	    {
 		if (in_vim9script())
-		    semsg(_(e_pattern_found_in_every_line_str), used_pat);
+		    semsg(_(e_pattern_found_in_every_लिन्या_str), used_pat);
 		else
 		    smsg(_("Pattern found in every line: %s"), used_pat);
 	    }
@@ -5657,13 +5657,13 @@ global_exe(char_u *cmd)
     setpcmark();
 
     // When the command writes a message, don't overwrite the command.
-    msg_didout = TRUE;
+    मेनसाहे_didout = TRUE;
 
     sub_nsubs = 0;
     sub_nlines = 0;
     global_need_beginline = FALSE;
     global_busy = 1;
-    old_lcount = curbuf->b_ml.ml_line_count;
+    old_lcount = curbuf->b_ml.ml_लिन्या_बिलांग;
     while (!got_int && (lnum = ml_firstmarked()) != 0 && global_busy == 1)
     {
 	global_exe_one(cmd, lnum);
@@ -5678,19 +5678,19 @@ global_exe(char_u *cmd)
 
     // the cursor may not have moved in the text but a change in a previous
     // line may move it on the screen
-    changed_line_abv_curs();
+    changed_लिन्या_abv_curs();
 
     // If it looks like no message was written, allow overwriting the
     // command with the report for number of changes.
-    if (msg_col == 0 && msg_scrolled == 0)
-	msg_didout = FALSE;
+    if (मेनसाहे_col == 0 && मेनसाहे_scrolled == 0)
+	मेनसाहे_didout = FALSE;
 
     // If substitutes done, report number of substitutes, otherwise report
     // number of extra or deleted lines.
     // Don't report extra or deleted lines in the edge case where the buffer
     // we are in after execution is different from the buffer we started in.
-    if (!do_sub_msg(FALSE) && curbuf == old_buf)
-	msgmore(curbuf->b_ml.ml_line_count - old_lcount);
+    if (!do_sub_मेनसाहे(FALSE) && curbuf == old_buf)
+	msgmore(curbuf->b_ml.ml_लिन्या_बिलांग - old_lcount);
 }
 
 #ifdef FEAT_VIMINFO
@@ -5819,19 +5819,19 @@ ex_smile(exarg_T *eap UNUSED)
     int n;
     int i;
 
-    msg_start();
-    msg_putchar('\n');
+    मेनसाहे_start();
+    मेनसाहे_putchar('\n');
     for (i = 0; i < 2; ++i)
 	for (p = code[i]; *p != NUL; ++p)
 	    if (*p == 'x')
-		msg_putchar('\n');
+		मेनसाहे_putchar('\n');
 	    else
 		for (n = *p++; n > 0; --n)
 		    if (*p == 'o' || *p == '$')
-			msg_putchar_attr(*p, HL_ATTR(HLF_L));
+			मेनसाहे_putchar_attr(*p, HL_ATTR(HLF_L));
 		    else
-			msg_putchar(*p);
-    msg_clr_eos();
+			मेनसाहे_putchar(*p);
+    मेनसाहे_clr_eos();
 }
 
 /*
@@ -6023,12 +6023,12 @@ ex_oldfiles(exarg_T *eap UNUSED)
 
     if (l == NULL)
     {
-	msg(_("No old files"));
+	मेनसाहे(_("No old files"));
 	return;
     }
 
-    msg_start();
-    msg_scroll = TRUE;
+    मेनसाहे_start();
+    मेनसाहे_scroll = TRUE;
     for (li = l->lv_first; li != NULL && !got_int; li = li->li_next)
     {
 	++nr;
@@ -6039,11 +6039,11 @@ ex_oldfiles(exarg_T *eap UNUSED)
 		matches = nr;
 	    else
 		matches = 0;
-	    msg_outnum((long)nr);
-	    msg_puts(": ");
-	    msg_outtrans(fname);
-	    msg_clr_eos();
-	    msg_putchar('\n');
+	    मेनसाहे_outnum((long)nr);
+	    मेनसाहे_puts(": ");
+	    मेनसाहे_outtrans(fname);
+	    मेनसाहे_clr_eos();
+	    मेनसाहे_putchar('\n');
 	    out_flush();	    // output one line at a time
 	    ui_breakcheck();
 	}
@@ -6064,8 +6064,8 @@ ex_oldfiles(exarg_T *eap UNUSED)
 	    need_wait_return = FALSE;
 	}
 	else
-	    nr = prompt_for_number(FALSE);
-	msg_starthere();
+	    nr = prompt_for_नुमेरो(FALSE);
+	मेनसाहे_starthere();
 	if (nr > 0)
 	{
 	    char_u *p = list_find_str(get_vim_var_list(VV_OLDFILES),

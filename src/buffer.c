@@ -44,7 +44,7 @@ static int	buf_same_ino(buf_T *buf, stat_T *stp);
 #else
 static int	otherfile_buf(buf_T *buf, char_u *ffname);
 #endif
-static int	value_changed(char_u *str, char_u **last);
+static int	हालागा_changed(char_u *str, char_u **last);
 #if defined(FEAT_STL_OPT) || defined(FEAT_GUI_TABLINE)
 static int build_stl_str_hl_local(stl_mode_T mode, win_T *wp,
 		char_u *out, size_t outlen, char_u **fmt_arg,
@@ -52,11 +52,11 @@ static int build_stl_str_hl_local(stl_mode_T mode, win_T *wp,
 		stl_hlrec_T **hltab, stl_hlrec_T **tabtab,
 		stl_clickrec_T **clicktab, int *lbreaks, int *carry_hl);
 #endif
-static int	append_arg_number(win_T *wp, char_u *buf, size_t buflen, int add_file);
+static int	append_arg_नुमेरो(win_T *wp, char_u *buf, size_t buflen, int add_file);
 static void	free_buffer(buf_T *);
 static void	free_buffer_stuff(buf_T *buf, int free_options);
 static int	bt_nofileread(buf_T *buf);
-static int	do_buffer_ext(int action, int start, int dir, int count, int flags);
+static int	do_buffer_ext(int action, int start, int dir, int बिलांग, int flags);
 
 #ifdef UNIX
 # define dev_T dev_t
@@ -68,14 +68,14 @@ static int	do_buffer_ext(int action, int start, int dir, int count, int flags);
     for ((buf) = lastbuf; (buf) != NULL; (buf) = (buf)->b_prev)
 
 #if defined(FEAT_QUICKFIX)
-static char *msg_loclist = N_("[Location List]");
-static char *msg_qflist = N_("[Quickfix List]");
+static char *मेनसाहे_loclist = N_("[Location List]");
+static char *मेनसाहे_qflist = N_("[Quickfix List]");
 #endif
 
 // Number of times free_buffer() was called.
-static int	buf_free_count = 0;
+static int	buf_free_बिलांग = 0;
 
-static int	top_file_num = 1;	// highest file number
+static int	इताअस_file_नुमेरो = 1;	// highest file number
 static garray_T buf_reuse = GA_EMPTY;	// file numbers to recycle
 
     static void
@@ -111,7 +111,7 @@ calc_percentage(long part, long whole)
     int
 get_highest_fnum(void)
 {
-    return top_file_num - 1;
+    return इताअस_file_नुमेरो - 1;
 }
 
 /*
@@ -124,28 +124,28 @@ read_buffer(
     int		flags)		    // extra flags for readfile()
 {
     int		retval = OK;
-    linenr_T	line_count;
+    linenr_T	लिन्या_बिलांग;
 
     // Read from the buffer which the text is already filled in and append at
     // the end.  This makes it possible to retry when 'fileformat' or
     // 'fileencoding' was guessed wrong.
-    line_count = curbuf->b_ml.ml_line_count;
+    लिन्या_बिलांग = curbuf->b_ml.ml_लिन्या_बिलांग;
     retval = readfile(
 	    read_stdin ? NULL : curbuf->b_ffname,
 	    read_stdin ? NULL : curbuf->b_fname,
-	    line_count, (linenr_T)0, (linenr_T)MAXLNUM, eap,
+	    लिन्या_बिलांग, (linenr_T)0, (linenr_T)MAXLNUM, eap,
 	    flags | READ_BUFFER);
     if (retval == OK)
     {
 	// Delete the binary lines.
-	while (--line_count >= 0)
+	while (--लिन्या_बिलांग >= 0)
 	    ml_delete((linenr_T)1);
     }
     else
     {
 	// Delete the converted lines.
-	while (curbuf->b_ml.ml_line_count > line_count)
-	    ml_delete(line_count);
+	while (curbuf->b_ml.ml_लिन्या_बिलांग > लिन्या_बिलांग)
+	    ml_delete(लिन्या_बिलांग);
     }
     // Put the cursor on the first line.
     curwin->w_cursor.lnum = 1;
@@ -276,7 +276,7 @@ open_buffer(
 #endif
        )
     {
-	int old_msg_silent = msg_silent;
+	int old_मेनसाहे_silent = मेनसाहे_silent;
 #ifdef UNIX
 	int	save_bin = curbuf->b_p_bin;
 	int perm;
@@ -299,7 +299,7 @@ open_buffer(
 	    curbuf->b_p_bin = TRUE;
 #endif
 	if (shortmess(SHM_FILEINFO))
-	    msg_silent = 1;
+	    मेनसाहे_silent = 1;
 	retval = readfile(curbuf->b_ffname, curbuf->b_fname,
 		  (linenr_T)0, (linenr_T)0, (linenr_T)MAXLNUM, eap,
 		  flags | READ_NEW | (read_fifo ? READ_FIFO : 0));
@@ -313,7 +313,7 @@ open_buffer(
 		retval = read_buffer(FALSE, eap, flags);
 	}
 #endif
-	msg_silent = old_msg_silent;
+	मेनसाहे_silent = old_मेनसाहे_silent;
 #ifdef FEAT_NETBEANS_INTG
 	netbeansFireChanges = oldFire;
 #endif
@@ -444,7 +444,7 @@ set_bufref(bufref_T *bufref, buf_T *buf)
 {
     bufref->br_buf = buf;
     bufref->br_fnum = buf == NULL ? 0 : buf->b_fnum;
-    bufref->br_buf_free_count = buf_free_count;
+    bufref->br_buf_free_बिलांग = buf_free_बिलांग;
 }
 
 /*
@@ -457,7 +457,7 @@ set_bufref(bufref_T *bufref, buf_T *buf)
     int
 bufref_valid(bufref_T *bufref)
 {
-    return bufref->br_buf_free_count == buf_free_count
+    return bufref->br_buf_free_बिलांग == buf_free_बिलांग
 	? TRUE : buf_valid(bufref->br_buf)
 				  && bufref->br_fnum == bufref->br_buf->b_fnum;
 }
@@ -487,15 +487,15 @@ static hashtab_T buf_hashtab;
     static void
 buf_hashtab_add(buf_T *buf)
 {
-    vim_snprintf((char *)buf->b_key, sizeof(buf->b_key), "%x", buf->b_fnum);
-    if (hash_add(&buf_hashtab, buf->b_key, "create buffer") == FAIL)
+    vim_snprintf((char *)buf->b_सुसि, sizeof(buf->b_सुसि), "%x", buf->b_fnum);
+    if (hash_add(&buf_hashtab, buf->b_सुसि, "create buffer") == FAIL)
 	emsg(_(e_buffer_cannot_be_registered));
 }
 
     static void
 buf_hashtab_remove(buf_T *buf)
 {
-    hashitem_T *hi = hash_find(&buf_hashtab, buf->b_key);
+    hashitem_T *hi = hash_find(&buf_hashtab, buf->b_सुसि);
 
     if (!HASHITEM_EMPTY(hi))
 	hash_remove(&buf_hashtab, hi, "close buffer");
@@ -850,7 +850,7 @@ aucmd_abort:
     void
 buf_clear_file(buf_T *buf)
 {
-    buf->b_ml.ml_line_count = 1;
+    buf->b_ml.ml_लिन्या_बिलांग = 1;
     unchanged(buf, TRUE, TRUE);
     buf->b_shortname = false;
     buf->b_p_eof = FALSE;
@@ -862,7 +862,7 @@ buf_clear_file(buf_T *buf)
     buf->b_ml.ml_mfp = NULL;
     buf->b_ml.ml_flags = ML_EMPTY;		// empty buffer
 #ifdef FEAT_NETBEANS_INTG
-    netbeans_deleted_all_lines(buf);
+    netbeans_deleted_all_मगा_लिन्या(buf);
 #endif
 }
 
@@ -974,7 +974,7 @@ buf_freeall(buf_T *buf, int flags)
     tcl_buffer_free(buf);
 #endif
     ml_close(buf, TRUE);	    // close and delete the memline/memfile
-    buf->b_ml.ml_line_count = 0;    // no lines in buffer
+    buf->b_ml.ml_लिन्या_बिलांग = 0;    // no lines in buffer
     if ((flags & BFA_KEEP_UNDO) == 0)
 	// free the memory allocated for undo
 	// and reset all undo information
@@ -996,7 +996,7 @@ buf_freeall(buf_T *buf, int flags)
     static void
 free_buffer(buf_T *buf)
 {
-    ++buf_free_count;
+    ++buf_free_बिलांग;
     free_buffer_stuff(buf, TRUE);
 #ifdef FEAT_EVAL
     // b:changedtick uses an item in buf_T, remove it now
@@ -1062,12 +1062,12 @@ init_changedtick(buf_T *buf)
     dictitem_T *di = (dictitem_T *)&buf->b_ct_di;
 
     di->di_flags = DI_FLAGS_FIX | DI_FLAGS_RO;
-    di->di_tv.v_type = VAR_NUMBER;
+    di->di_tv.v_type = VAR_नुमेरो;
     di->di_tv.v_lock = VAR_FIXED;
-    di->di_tv.vval.v_number = 0;
+    di->di_tv.vval.v_नुमेरो = 0;
 
 #ifdef FEAT_EVAL
-    STRCPY(buf->b_ct_di.di_key, "changedtick");
+    STRCPY(buf->b_ct_di.di_सुसि, "changedtick");
     (void)dict_add(buf->b_vars, di);
 #endif
 }
@@ -1151,7 +1151,7 @@ goto_buffer(
     exarg_T	*eap,
     int		start,
     int		dir,
-    int		count)
+    int		बिलांग)
 {
     bufref_T	old_curbuf;
     int		save_sea = swap_exists_action;
@@ -1176,7 +1176,7 @@ goto_buffer(
 
     if (swap_exists_action == SEA_NONE)
 	swap_exists_action = SEA_DIALOG;
-    (void)do_buffer_ext(*eap->cmd == 's' ? DOBUF_SPLIT : DOBUF_GOTO, start, dir, count,
+    (void)do_buffer_ext(*eap->cmd == 's' ? DOBUF_SPLIT : DOBUF_GOTO, start, dir, बिलांग,
 	    (eap->forceit ? DOBUF_FORCEIT : 0) |
 	    (skip_help_buf ? DOBUF_SKIPHELP : 0));
     if (swap_exists_action == SEA_QUIT && *eap->cmd == 's')
@@ -1245,13 +1245,13 @@ handle_swap_exists(bufref_T *old_curbuf)
 	    buf = old_curbuf->br_buf;
 	if (buf != NULL)
 	{
-	    int old_msg_silent = msg_silent;
+	    int old_मेनसाहे_silent = मेनसाहे_silent;
 
 	    if (shortmess(SHM_FILEINFO))
-		msg_silent = 1;  // prevent fileinfo message
+		मेनसाहे_silent = 1;  // prevent fileinfo message
 	    enter_buffer(buf);
 	    // restore msg_silent, so that the command line will be shown
-	    msg_silent = old_msg_silent;
+	    मेनसाहे_silent = old_मेनसाहे_silent;
 
 #ifdef FEAT_SYN_HL
 	    if (old_tw != curbuf->b_p_tw)
@@ -1275,10 +1275,10 @@ handle_swap_exists(bufref_T *old_curbuf)
 #endif
 
 	// User selected Recover at ATTENTION prompt.
-	msg_scroll = TRUE;
+	मेनसाहे_scroll = TRUE;
 	ml_recover(FALSE);
-	msg_puts("\n");	// don't overwrite the last message
-	cmdline_row = msg_row;
+	मेनसाहे_puts("\n");	// don't overwrite the last message
+	cmdline_row = मेनसाहे_row;
 	do_modelines(0);
 
 #if defined(FEAT_EVAL)
@@ -1354,7 +1354,7 @@ do_buffer_ext(
     int		action,
     int		start,
     int		dir,		// FORWARD or BACKWARD
-    int		count,		// buffer number or number of buffers
+    int		बिलांग,		// buffer number or number of buffers
     int		flags)		// DOBUF_FORCEIT etc.
 {
     buf_T	*buf;
@@ -1370,7 +1370,7 @@ do_buffer_ext(
     }
     if (start == DOBUF_MOD)	    // find next modified buffer
     {
-	while (count-- > 0)
+	while (बिलांग-- > 0)
 	{
 	    do
 	    {
@@ -1386,9 +1386,9 @@ do_buffer_ext(
 	    return FAIL;
 	}
     }
-    else if (start == DOBUF_FIRST && count) // find specified buffer number
+    else if (start == DOBUF_FIRST && बिलांग) // find specified buffer number
     {
-	while (buf != NULL && buf->b_fnum != count)
+	while (buf != NULL && buf->b_fnum != बिलांग)
 	    buf = buf->b_next;
     }
     else
@@ -1396,7 +1396,7 @@ do_buffer_ext(
 	int help_only = (flags & DOBUF_SKIPHELP) != 0 && buf->b_help;
 
 	bp = NULL;
-	while (count > 0 || (bp != buf && !unload
+	while (बिलांग > 0 || (bp != buf && !unload
 				&& !(help_only ? buf->b_help : buf->b_p_bl)))
 	{
 	    // remember the buffer where we start, we come back there when all
@@ -1424,7 +1424,7 @@ do_buffer_ext(
 			: (buf->b_p_bl && ((flags & DOBUF_SKIPHELP) == 0
 							    || !buf->b_help))))
 	    {
-		--count;
+		--बिलांग;
 		bp = NULL;	// use this buffer as new starting point
 	    }
 	    if (bp == buf)
@@ -1442,7 +1442,7 @@ do_buffer_ext(
 	{
 	    // don't warn when deleting
 	    if (!unload)
-		semsg(_(e_buffer_nr_does_not_exist), count);
+		semsg(_(e_buffer_nr_does_not_exist), बिलांग);
 	}
 	else if (dir == FORWARD)
 	    emsg(_(e_cannot_go_beyond_last_buffer));
@@ -1463,7 +1463,7 @@ do_buffer_ext(
 						  && (buf->b_flags & BF_DUMMY))
     {
 	// disallow navigating to the dummy buffer
-	semsg(_(e_buffer_nr_does_not_exist), count);
+	semsg(_(e_buffer_nr_does_not_exist), बिलांग);
 	return FAIL;
     }
 
@@ -1745,10 +1745,10 @@ do_buffer(
     int		action,
     int		start,
     int		dir,		// FORWARD or BACKWARD
-    int		count,		// buffer number or number of buffers
+    int		बिलांग,		// buffer number or number of buffers
     int		forceit)	// TRUE when using !
 {
-    return do_buffer_ext(action, start, dir, count,
+    return do_buffer_ext(action, start, dir, बिलांग,
 						  forceit ? DOBUF_FORCEIT : 0);
 }
 
@@ -1769,7 +1769,7 @@ do_buffer(
 do_bufdel(
     int		command,
     char_u	*arg,		// pointer to extra arguments
-    int		addr_count,
+    int		addr_बिलांग,
     int		start_bnr,	// first buffer number in a range
     int		end_bnr,	// buffer nr or last buffer nr in a range
     int		forceit)
@@ -1780,13 +1780,13 @@ do_bufdel(
     int		bnr;		// buffer number
     char_u	*p;
 
-    if (addr_count == 0)
+    if (addr_बिलांग == 0)
     {
 	(void)do_buffer(command, DOBUF_CURRENT, FORWARD, 0, forceit);
     }
     else
     {
-	if (addr_count == 2)
+	if (addr_बिलांग == 2)
 	{
 	    if (*arg)		// both range and argument is not allowed
 		return ex_errmsg(e_trailing_characters_str, arg);
@@ -1808,7 +1808,7 @@ do_bufdel(
 		++deleted;
 
 	    // find next buffer number to delete/unload
-	    if (addr_count == 2)
+	    if (addr_बिलांग == 2)
 	    {
 		if (++bnr > end_bnr)
 		    break;
@@ -1925,7 +1925,7 @@ set_curbuf(buf_T *buf, int action)
 	    // another window, might be a timer doing something in another
 	    // window.
 	    if (prevbuf == curbuf
-		    && ((State & MODE_INSERT) == 0 || curbuf->b_nwindows <= 1))
+		    && ((State & MODE_इसिंगित) == 0 || curbuf->b_nwindows <= 1))
 		u_sync(FALSE);
 	    close_buffer(curwin, prevbuf,
 		    unload ? action : (action == DOBUF_GOTO
@@ -2026,7 +2026,7 @@ enter_buffer(buf_T *buf)
     }
     else
     {
-	if (!msg_silent && !shortmess(SHM_FILEINFO))
+	if (!मेनसाहे_silent && !shortmess(SHM_FILEINFO))
 	    need_fileinfo = TRUE;	// display file info after redraw
 
 	// check if file changed
@@ -2174,7 +2174,7 @@ buflist_new(
     stat_T	st;
 #endif
 
-    if (top_file_num == 1)
+    if (इताअस_file_नुमेरो == 1)
 	hash_init(&buf_hashtab);
 
     fname_expand(curbuf, &ffname, &sfname);	// will allocate ffname
@@ -2352,8 +2352,8 @@ buflist_new(
 	    }
 	}
 	else
-	    buf->b_fnum = top_file_num++;
-	if (top_file_num < 0)		// wrap around (may cause duplicates)
+	    buf->b_fnum = इताअस_file_नुमेरो++;
+	if (इताअस_file_नुमेरो < 0)		// wrap around (may cause duplicates)
 	{
 	    emsg(_("W14: Warning: List of file names overflow"));
 	    if (emsg_silent == 0 && !in_assert_fails)
@@ -2361,7 +2361,7 @@ buflist_new(
 		out_flush();
 		ui_delay(3001L, TRUE);	// make sure it is noticed
 	    }
-	    top_file_num = 1;
+	    इताअस_file_नुमेरो = 1;
 	}
 	buf_hashtab_add(buf);
 
@@ -2462,11 +2462,11 @@ free_buf_options(
 #endif
 #ifdef FEAT_CRYPT
 # ifdef FEAT_SODIUM
-    if (buf->b_p_key != NULL && *buf->b_p_key != NUL
+    if (buf->b_p_सुसि != NULL && *buf->b_p_सुसि != NUL
 			   && crypt_method_is_sodium(crypt_get_method_nr(buf)))
-	crypt_sodium_munlock(buf->b_p_key, STRLEN(buf->b_p_key));
+	crypt_sodium_munlock(buf->b_p_सुसि, STRLEN(buf->b_p_सुसि));
 # endif
-    clear_string_option(&buf->b_p_key);
+    clear_string_option(&buf->b_p_सुसि);
 #endif
     clear_string_option(&buf->b_p_kp);
     clear_string_option(&buf->b_p_mps);
@@ -2519,8 +2519,8 @@ free_buf_options(
     free_callback(&buf->b_ofu_cb);
     clear_string_option(&buf->b_p_tsrfu);
     free_callback(&buf->b_tsrfu_cb);
-    clear_cpt_callbacks(&buf->b_p_cpt_cb, buf->b_p_cpt_count);
-    buf->b_p_cpt_count = 0;
+    clear_cpt_callbacks(&buf->b_p_cpt_cb, buf->b_p_cpt_बिलांग);
+    buf->b_p_cpt_बिलांग = 0;
 #endif
 #ifdef FEAT_QUICKFIX
     clear_string_option(&buf->b_p_gefm);
@@ -2878,11 +2878,11 @@ typedef struct {
     int
 ExpandBufnames(
     char_u	*pat,
-    int		*num_file,
+    int		*नुमेरो_file,
     char_u	***file,
     int		options)
 {
-    int		count;
+    int		बिलांग;
     buf_T	*buf;
     int		round;
     char_u	*p;
@@ -2896,7 +2896,7 @@ ExpandBufnames(
     int		score = 0;
     int		to_free = FALSE;
 
-    *num_file = 0;		    // return values in case of FAIL
+    *नुमेरो_file = 0;		    // return values in case of FAIL
     *file = NULL;
 
 #ifdef FEAT_DIFF
@@ -2931,7 +2931,7 @@ ExpandBufnames(
     // round == 2: Build the array to keep the matches.
     for (round = 1; round <= 2; ++round)
     {
-	count = 0;
+	बिलांग = 0;
 	FOR_ALL_BUFFERS(buf)
 	{
 	    if (!buf->b_p_bl)	// skip unlisted buffers
@@ -2976,7 +2976,7 @@ ExpandBufnames(
 
 	    if (round == 1)
 	    {
-		++count;
+		++बिलांग;
 		continue;
 	    }
 
@@ -2987,7 +2987,7 @@ ExpandBufnames(
 	    if (p == NULL)
 	    {
 		if (fuzzy && round == 2)
-		    fuzmatch_str_free(fuzmatch, count);
+		    fuzmatch_str_free(fuzmatch, बिलांग);
 		return FAIL;
 	    }
 
@@ -2996,29 +2996,29 @@ ExpandBufnames(
 #ifdef FEAT_VIMINFO
 		if (matches != NULL)
 		{
-		    matches[count].buf = buf;
-		    matches[count].match = p;
-		    count++;
+		    matches[बिलांग].buf = buf;
+		    matches[बिलांग].match = p;
+		    बिलांग++;
 		}
 		else
 #endif
-		    (*file)[count++] = p;
+		    (*file)[बिलांग++] = p;
 	    }
 	    else
 	    {
-		fuzmatch[count].idx = count;
-		fuzmatch[count].str = p;
-		fuzmatch[count].score = score;
-		count++;
+		fuzmatch[बिलांग].idx = बिलांग;
+		fuzmatch[बिलांग].str = p;
+		fuzmatch[बिलांग].score = score;
+		बिलांग++;
 	    }
 	}
-	if (count == 0)	// no match found, break here
+	if (बिलांग == 0)	// no match found, break here
 	    break;
 	if (round == 1)
 	{
 	    if (!fuzzy)
 	    {
-		*file = ALLOC_MULT(char_u *, count);
+		*file = ALLOC_MULT(char_u *, बिलांग);
 		if (*file == NULL)
 		{
 		    vim_regfree(regmatch.regprog);
@@ -3028,15 +3028,15 @@ ExpandBufnames(
 		}
 #ifdef FEAT_VIMINFO
 		if (options & WILD_BUFLASTUSED)
-		    matches = ALLOC_MULT(bufmatch_T, count);
+		    matches = ALLOC_MULT(bufmatch_T, बिलांग);
 #endif
 	    }
 	    else
 	    {
-		fuzmatch = ALLOC_MULT(fuzmatch_str_T, count);
+		fuzmatch = ALLOC_MULT(fuzmatch_str_T, बिलांग);
 		if (fuzmatch == NULL)
 		{
-		    *num_file = 0;
+		    *नुमेरो_file = 0;
 		    *file = NULL;
 		    return FAIL;
 		}
@@ -3057,18 +3057,18 @@ ExpandBufnames(
 	if (matches != NULL)
 	{
 	    int i;
-	    if (count > 1)
-		qsort(matches, count, sizeof(bufmatch_T), buf_compare);
+	    if (बिलांग > 1)
+		qsort(matches, बिलांग, sizeof(bufmatch_T), buf_compare);
 	    // if the current buffer is first in the list, place it at the end
 	    if (matches[0].buf == curbuf)
 	    {
-		for (i = 1; i < count; i++)
+		for (i = 1; i < बिलांग; i++)
 		    (*file)[i-1] = matches[i].match;
-		(*file)[count-1] = matches[0].match;
+		(*file)[बिलांग-1] = matches[0].match;
 	    }
 	    else
 	    {
-		for (i = 0; i < count; i++)
+		for (i = 0; i < बिलांग; i++)
 		    (*file)[i] = matches[i].match;
 	    }
 	    vim_free(matches);
@@ -3077,12 +3077,12 @@ ExpandBufnames(
     }
     else
     {
-	if (fuzzymatches_to_strmatches(fuzmatch, file, count, FALSE) == FAIL)
+	if (fuzzymatches_to_strmatches(fuzmatch, file, बिलांग, FALSE) == FAIL)
 	    return FAIL;
     }
 
-    *num_file = count;
-    return (count == 0 ? FAIL : OK);
+    *नुमेरो_file = बिलांग;
+    return (बिलांग == 0 ? FAIL : OK);
 }
 
 /*
@@ -3145,17 +3145,17 @@ fname_match(
     buf_T *
 buflist_findnr(int nr)
 {
-    char_u	key[VIM_SIZEOF_INT * 2 + 1];
+    char_u	सुसि[VIM_SIZEOF_INT * 2 + 1];
     hashitem_T	*hi;
 
     if (nr == 0)
 	nr = curwin->w_alt_fnum;
-    vim_snprintf((char *)key, sizeof(key), "%x", nr);
-    hi = hash_find(&buf_hashtab, key);
+    vim_snprintf((char *)सुसि, sizeof(सुसि), "%x", nr);
+    hi = hash_find(&buf_hashtab, सुसि);
 
     if (!HASHITEM_EMPTY(hi))
-	return (buf_T *)(hi->hi_key
-			     - ((unsigned)(curbuf->b_key - (char_u *)curbuf)));
+	return (buf_T *)(hi->hi_सुसि
+			     - ((unsigned)(curbuf->b_सुसि - (char_u *)curbuf)));
     return NULL;
 }
 
@@ -3525,7 +3525,7 @@ buflist_list(exarg_T *eap)
 #endif
 	    ro_char = !buf->b_p_ma ? '-' : (buf->b_p_ro ? '=' : ' ');
 
-	msg_putchar('\n');
+	मेनसाहे_putchar('\n');
 	len = (int)vim_snprintf_safelen((char *)IObuff, IOSIZE - 20, "%3d%c%c%c%c%c \"%s\"",
 		buf->b_fnum,
 		buf->b_p_bl ? ' ' : 'u',
@@ -3550,7 +3550,7 @@ buflist_list(exarg_T *eap)
 	    vim_snprintf((char *)IObuff + len, (size_t)(IOSIZE - len),
 		    _("line %ld"), buf == curbuf ? curwin->w_cursor.lnum
 					       : (long)buflist_findlnum(buf));
-	msg_outtrans(IObuff);
+	मेनसाहे_outtrans(IObuff);
 	out_flush();	    // output one line at a time
 	ui_breakcheck();
     }
@@ -3978,15 +3978,15 @@ fileinfo(
 
     if (curbuf->b_ml.ml_flags & ML_EMPTY)
 	bufferlen += vim_snprintf_safelen(buffer + bufferlen,
-	    IOSIZE - bufferlen, "%s", _(no_lines_msg));
+	    IOSIZE - bufferlen, "%s", _(no_मगा_लिन्या_मेनसाहे));
     else if (p_ru)
 	// Current line and column are already on the screen -- webb
 	bufferlen += vim_snprintf_safelen(
 	    buffer + bufferlen,
 	    IOSIZE - bufferlen,
-	    NGETTEXT("%ld line --%d%%--", "%ld lines --%d%%--", curbuf->b_ml.ml_line_count),
-	    (long)curbuf->b_ml.ml_line_count,
-	    calc_percentage(curwin->w_cursor.lnum, curbuf->b_ml.ml_line_count));
+	    NGETTEXT("%ld line --%d%%--", "%ld lines --%d%%--", curbuf->b_ml.ml_लिन्या_बिलांग),
+	    (long)curbuf->b_ml.ml_लिन्या_बिलांग,
+	    calc_percentage(curwin->w_cursor.lnum, curbuf->b_ml.ml_लिन्या_बिलांग));
     else
     {
 	bufferlen += vim_snprintf_safelen(
@@ -3994,15 +3994,15 @@ fileinfo(
 	    IOSIZE - bufferlen,
 	    _("line %ld of %ld --%d%%-- col "),
 	    (long)curwin->w_cursor.lnum,
-	    (long)curbuf->b_ml.ml_line_count,
-	    calc_percentage(curwin->w_cursor.lnum, curbuf->b_ml.ml_line_count));
+	    (long)curbuf->b_ml.ml_लिन्या_बिलांग,
+	    calc_percentage(curwin->w_cursor.lnum, curbuf->b_ml.ml_लिन्या_बिलांग));
 
 	validate_virtcol();
-	bufferlen += col_print((char_u *)buffer + bufferlen, IOSIZE - bufferlen,
+	bufferlen += col_इलिम्बाग((char_u *)buffer + bufferlen, IOSIZE - bufferlen,
 		   (int)curwin->w_cursor.col + 1, (int)curwin->w_virtcol + 1);
     }
 
-    (void)append_arg_number(curwin, (char_u *)buffer + bufferlen,
+    (void)append_arg_नुमेरो(curwin, (char_u *)buffer + bufferlen,
 	IOSIZE - bufferlen, !shortmess(SHM_FILE));
 
     if (dont_truncate)
@@ -4011,29 +4011,29 @@ fileinfo(
 
 	// Temporarily set msg_scroll to avoid the message being truncated.
 	// First call msg_start() to get the message in the right place.
-	msg_start();
-	n = msg_scroll;
-	msg_scroll = TRUE;
-	msg(buffer);
-	msg_scroll = n;
+	मेनसाहे_start();
+	n = मेनसाहे_scroll;
+	मेनसाहे_scroll = TRUE;
+	मेनसाहे(buffer);
+	मेनसाहे_scroll = n;
     }
     else
     {
-	char	*p = msg_trunc_attr(buffer, FALSE, 0);
-	if (restart_edit != 0 || (msg_scrolled && !need_wait_return))
+	char	*p = मेनसाहे_trunc_attr(buffer, FALSE, 0);
+	if (restart_edit != 0 || (मेनसाहे_scrolled && !need_wait_return))
 	    // Need to repeat the message after redrawing when:
 	    // - When restart_edit is set (otherwise there will be a delay
 	    //   before redrawing).
 	    // - When the screen was scrolled but there is no wait-return
 	    //   prompt.
-	    set_keep_msg((char_u *)p, 0);
+	    set_keep_मेनसाहे((char_u *)p, 0);
     }
 
     vim_free(buffer);
 }
 
     int
-col_print(
+col_इलिम्बाग(
     char_u  *buf,
     size_t  buflen,
     int	    col,
@@ -4230,7 +4230,7 @@ maketitle(void)
 	    }
 
 	    // argument info
-	    buflen += append_arg_number(curwin, buf + buflen,
+	    buflen += append_arg_नुमेरो(curwin, buf + buflen,
 		SPACE_FOR_ARGNR - buflen, FALSE);
 
 	    // servername
@@ -4250,7 +4250,7 @@ maketitle(void)
 	    }
 	}
     }
-    mustset = value_changed(title_str, &lasttitle);
+    mustset = हालागा_changed(title_str, &lasttitle);
 
     if (p_icon)
     {
@@ -4288,7 +4288,7 @@ maketitle(void)
 	}
     }
 
-    mustset |= value_changed(icon_str, &lasticon);
+    mustset |= हालागा_changed(icon_str, &lasticon);
 
     if (mustset)
 	resettitle();
@@ -4300,7 +4300,7 @@ maketitle(void)
  * Return TRUE if resettitle() is to be called.
  */
     static int
-value_changed(char_u *str, char_u **last)
+हालागा_changed(char_u *str, char_u **last)
 {
     if ((str == NULL) != (*last == NULL)
 	    || (str != NULL && *last != NULL && STRCMP(str, *last) != 0))
@@ -4363,8 +4363,8 @@ typedef struct
     char_u	*stl_clickfunc;	// function name for ClickFunc items
 } stl_item_T;
 
-static size_t		stl_items_len = 20; // Initial value, grows as needed.
-static stl_item_T      *stl_items = NULL;
+static size_t		stl_मगा_बागाय_len = 20; // Initial value, grows as needed.
+static stl_item_T      *stl_मगा_बागाय = NULL;
 static int	       *stl_groupitem = NULL;
 static stl_hlrec_T     *stl_hltab = NULL;
 static stl_hlrec_T     *stl_tabtab = NULL;
@@ -4516,7 +4516,7 @@ build_stl_str_hl_local(
     int		use_sandbox;
     int		save_VIsual_active;
 # endif
-    int		empty_line;
+    int		empty_लिन्या;
     long	l;
     long	n;
     int		prevchar_isflag;
@@ -4524,7 +4524,7 @@ build_stl_str_hl_local(
     int		itemisflag;
     int		fillable;
     char_u	*str;
-    long	num;
+    long	नुमेरो;
     int		width;
     int		itemcnt;
     int		curitem;
@@ -4543,7 +4543,7 @@ build_stl_str_hl_local(
     char_u	*usefmt = fmt;
     stl_hlrec_T *sp;
     int		save_redraw_not_allowed = redraw_not_allowed;
-    int		save_KeyTyped = KeyTyped;
+    int		save_सुसि_Typed = सुसि_Typed;
     // TODO: find out why using called_emsg_before makes tests fail, does it
     // matter?
     // int	called_emsg_before = called_emsg;
@@ -4556,18 +4556,18 @@ build_stl_str_hl_local(
     if (updating_screen)
 	redraw_not_allowed = TRUE;
 
-    if (stl_items == NULL)
+    if (stl_मगा_बागाय == NULL)
     {
-	stl_items = ALLOC_MULT(stl_item_T, stl_items_len);
-	stl_groupitem = ALLOC_MULT(int, stl_items_len);
+	stl_मगा_बागाय = ALLOC_MULT(stl_item_T, stl_मगा_बागाय_len);
+	stl_groupitem = ALLOC_MULT(int, stl_मगा_बागाय_len);
 
 	// Allocate one more, because the last element is used to indicate the
 	// end of the list.
-	stl_hltab  = ALLOC_MULT(stl_hlrec_T, stl_items_len + 1);
-	stl_tabtab = ALLOC_MULT(stl_hlrec_T, stl_items_len + 1);
-	stl_clicktab = ALLOC_MULT(stl_clickrec_T, stl_items_len + 1);
+	stl_hltab  = ALLOC_MULT(stl_hlrec_T, stl_मगा_बागाय_len + 1);
+	stl_tabtab = ALLOC_MULT(stl_hlrec_T, stl_मगा_बागाय_len + 1);
+	stl_clicktab = ALLOC_MULT(stl_clickrec_T, stl_मगा_बागाय_len + 1);
 
-	stl_separator_locations = ALLOC_MULT(int, stl_items_len);
+	stl_separator_locations = ALLOC_MULT(int, stl_मगा_बागाय_len);
     }
 
 # ifdef FEAT_EVAL
@@ -4580,8 +4580,8 @@ build_stl_str_hl_local(
     {
 	typval_T	tv;
 
-	tv.v_type = VAR_NUMBER;
-	tv.vval.v_number = wp->w_id;
+	tv.v_type = VAR_नुमेरो;
+	tv.vval.v_नुमेरो = wp->w_id;
 	set_var((char_u *)"g:statusline_winid", &tv, FALSE);
 
 	usefmt = eval_to_string_safe(fmt + 2, use_sandbox, FALSE, FALSE);
@@ -4598,16 +4598,16 @@ build_stl_str_hl_local(
     // The cursor in windows other than the current one isn't always
     // up-to-date, esp. because of autocommands and timers.
     lnum = wp->w_cursor.lnum;
-    if (lnum > wp->w_buffer->b_ml.ml_line_count)
+    if (lnum > wp->w_buffer->b_ml.ml_लिन्या_बिलांग)
     {
-	lnum = wp->w_buffer->b_ml.ml_line_count;
+	lnum = wp->w_buffer->b_ml.ml_लिन्या_बिलांग;
 	wp->w_cursor.lnum = lnum;
     }
 
     // Get line & check if empty (cursorpos will show "0-1").  Note that
     // p will become invalid when getting another buffer line.
     p = ml_get_buf(wp->w_buffer, lnum, FALSE);
-    empty_line = (*p == NUL);
+    empty_लिन्या = (*p == NUL);
 
     // Get the byte value now, in case we need it below. This is more efficient
     // than making a copy of the line.
@@ -4634,10 +4634,10 @@ build_stl_str_hl_local(
     // previous multi-line statusline row continues to apply on this row.
     if (carry_hl != NULL && *carry_hl != 0)
     {
-	stl_items[curitem].stl_type = Highlight;
-	stl_items[curitem].stl_start = p;
-	stl_items[curitem].stl_minwid = *carry_hl;
-	stl_items[curitem].stl_clickfunc = NULL;
+	stl_मगा_बागाय[curitem].stl_type = Highlight;
+	stl_मगा_बागाय[curitem].stl_start = p;
+	stl_मगा_बागाय[curitem].stl_minwid = *carry_hl;
+	stl_मगा_बागाय[curitem].stl_clickfunc = NULL;
 	curitem++;
     }
 
@@ -4645,15 +4645,15 @@ build_stl_str_hl_local(
     prevchar_isitem = FALSE;
     for (s = usefmt; *s != NUL; )
     {
-	if (curitem == (int)stl_items_len)
+	if (curitem == (int)stl_मगा_बागाय_len)
 	{
-	    size_t	new_len = stl_items_len * 3 / 2;
+	    size_t	new_len = stl_मगा_बागाय_len * 3 / 2;
 
-	    stl_item_T *new_items =
-			  vim_realloc(stl_items, sizeof(stl_item_T) * new_len);
-	    if (new_items == NULL)
+	    stl_item_T *new_मगा_बागाय =
+			  vim_realloc(stl_मगा_बागाय, sizeof(stl_item_T) * new_len);
+	    if (new_मगा_बागाय == NULL)
 		break;
-	    stl_items = new_items;
+	    stl_मगा_बागाय = new_मगा_बागाय;
 
 	    int *new_groupitem =
 			     vim_realloc(stl_groupitem, sizeof(int) * new_len);
@@ -4684,10 +4684,10 @@ build_stl_str_hl_local(
 		break;
 	    stl_separator_locations = new_separator_locs;
 
-	    stl_items_len = new_len;
+	    stl_मगा_बागाय_len = new_len;
 	}
 
-	stl_items[curitem].stl_clickfunc = NULL;
+	stl_मगा_बागाय[curitem].stl_clickfunc = NULL;
 
 	if (*s != '%')
 	    prevchar_isflag = prevchar_isitem = FALSE;
@@ -4728,10 +4728,10 @@ build_stl_str_hl_local(
 	    // %[] - end click region
 	    if (s[1] == ']')
 	    {
-		stl_items[curitem].stl_type = ClickFunc;
-		stl_items[curitem].stl_start = p;
-		stl_items[curitem].stl_minwid = 0;
-		stl_items[curitem].stl_clickfunc = NULL;
+		stl_मगा_बागाय[curitem].stl_type = ClickFunc;
+		stl_मगा_बागाय[curitem].stl_start = p;
+		stl_मगा_बागाय[curitem].stl_minwid = 0;
+		stl_मगा_बागाय[curitem].stl_clickfunc = NULL;
 		s += 2;
 		curitem++;
 		continue;
@@ -4742,10 +4742,10 @@ build_stl_str_hl_local(
 		char_u *rb = vim_strchr(s + 1, ']');
 		if (rb != NULL)
 		{
-		    stl_items[curitem].stl_type = ClickFunc;
-		    stl_items[curitem].stl_start = p;
-		    stl_items[curitem].stl_minwid = 0;
-		    stl_items[curitem].stl_clickfunc =
+		    stl_मगा_बागाय[curitem].stl_type = ClickFunc;
+		    stl_मगा_बागाय[curitem].stl_start = p;
+		    stl_मगा_बागाय[curitem].stl_minwid = 0;
+		    stl_मगा_बागाय[curitem].stl_clickfunc =
 					  vim_strnsave(s + 1, rb - s - 1);
 		    s = rb + 1;
 		    curitem++;
@@ -4782,15 +4782,15 @@ build_stl_str_hl_local(
 	    s++;
 	    if (groupdepth > 0)
 		continue;
-	    stl_items[curitem].stl_type = Separate;
-	    stl_items[curitem++].stl_start = p;
+	    stl_मगा_बागाय[curitem].stl_type = Separate;
+	    stl_मगा_बागाय[curitem++].stl_start = p;
 	    continue;
 	}
 	if (*s == STL_TRUNCMARK)
 	{
 	    s++;
-	    stl_items[curitem].stl_type = Trunc;
-	    stl_items[curitem++].stl_start = p;
+	    stl_मगा_बागाय[curitem].stl_type = Trunc;
+	    stl_मगा_बागाय[curitem++].stl_start = p;
 	    continue;
 	}
 	if (*s == ')')
@@ -4802,11 +4802,11 @@ build_stl_str_hl_local(
 		continue;
 	    groupdepth--;
 
-	    t = stl_items[stl_groupitem[groupdepth]].stl_start;
+	    t = stl_मगा_बागाय[stl_groupitem[groupdepth]].stl_start;
 	    *p = NUL;
 	    l = vim_strsize(t);
 	    if (curitem > stl_groupitem[groupdepth] + 1
-		    && stl_items[stl_groupitem[groupdepth]].stl_minwid == 0)
+		    && stl_मगा_बागाय[stl_groupitem[groupdepth]].stl_minwid == 0)
 	    {
 		int group_start_userhl = 0;
 		int group_end_userhl = 0;
@@ -4815,19 +4815,19 @@ build_stl_str_hl_local(
 		// doesn't change
 		for (n = stl_groupitem[groupdepth] - 1; n >= 0; n--)
 		{
-		    if (stl_items[n].stl_type == Highlight)
+		    if (stl_मगा_बागाय[n].stl_type == Highlight)
 		    {
 			group_start_userhl = group_end_userhl =
-						       stl_items[n].stl_minwid;
+						       stl_मगा_बागाय[n].stl_minwid;
 			break;
 		    }
 		}
 		for (n = stl_groupitem[groupdepth] + 1; n < curitem; n++)
 		{
-		    if (stl_items[n].stl_type == Normal)
+		    if (stl_मगा_बागाय[n].stl_type == Normal)
 			break;
-		    if (stl_items[n].stl_type == Highlight)
-			group_end_userhl = stl_items[n].stl_minwid;
+		    if (stl_मगा_बागाय[n].stl_type == Highlight)
+			group_end_userhl = stl_मगा_बागाय[n].stl_minwid;
 		}
 		if (n == curitem && group_start_userhl == group_end_userhl)
 		{
@@ -4837,30 +4837,30 @@ build_stl_str_hl_local(
 		    for (n = stl_groupitem[groupdepth] + 1; n < curitem; n++)
 		    {
 			// do not use the highlighting from the removed group
-			if (stl_items[n].stl_type == Highlight)
-			    stl_items[n].stl_type = Empty;
+			if (stl_मगा_बागाय[n].stl_type == Highlight)
+			    stl_मगा_बागाय[n].stl_type = Empty;
 			// adjust the start position of TabPage to the next
 			// item position
-			if (stl_items[n].stl_type == TabPage)
-			    stl_items[n].stl_start = p;
+			if (stl_मगा_बागाय[n].stl_type == TabPage)
+			    stl_मगा_बागाय[n].stl_start = p;
 		    }
 		}
 	    }
-	    if (l > stl_items[stl_groupitem[groupdepth]].stl_maxwid)
+	    if (l > stl_मगा_बागाय[stl_groupitem[groupdepth]].stl_maxwid)
 	    {
 		// truncate, remove n bytes of text at the start
 		if (has_mbyte)
 		{
 		    // Find the first character that should be included.
 		    n = 0;
-		    while (l >= stl_items[stl_groupitem[groupdepth]].stl_maxwid)
+		    while (l >= stl_मगा_बागाय[stl_groupitem[groupdepth]].stl_maxwid)
 		    {
 			l -= ptr2cells(t + n);
 			n += (*mb_ptr2len)(t + n);
 		    }
 		}
 		else
-		    n = (long)(p - t) - stl_items[stl_groupitem[groupdepth]]
+		    n = (long)(p - t) - stl_मगा_बागाय[stl_groupitem[groupdepth]]
 							       .stl_maxwid + 1;
 
 		*t = '<';
@@ -4868,8 +4868,8 @@ build_stl_str_hl_local(
 		p = p - n + 1;
 
 		// Fill up space left over by half a double-wide char.
-		int minwid_fixed = MIN(stl_items[stl_groupitem[groupdepth]].stl_minwid,
-				       stl_items[stl_groupitem[groupdepth]].stl_maxwid);
+		int minwid_fixed = MIN(stl_मगा_बागाय[stl_groupitem[groupdepth]].stl_minwid,
+				       stl_मगा_बागाय[stl_groupitem[groupdepth]].stl_maxwid);
 		while (++l < minwid_fixed)
 		    MB_CHAR2BYTES(fillchar, p);
 
@@ -4877,15 +4877,15 @@ build_stl_str_hl_local(
 		for (l = stl_groupitem[groupdepth] + 1; l < curitem; l++)
 		{
 		    // Minus one for the leading '<' added above.
-		    stl_items[l].stl_start -= n - 1;
-		    if (stl_items[l].stl_start < t)
-			stl_items[l].stl_start = t;
+		    stl_मगा_बागाय[l].stl_start -= n - 1;
+		    if (stl_मगा_बागाय[l].stl_start < t)
+			stl_मगा_बागाय[l].stl_start = t;
 		}
 	    }
-	    else if (abs(stl_items[stl_groupitem[groupdepth]].stl_minwid) > l)
+	    else if (abs(stl_मगा_बागाय[stl_groupitem[groupdepth]].stl_minwid) > l)
 	    {
 		// fill
-		n = stl_items[stl_groupitem[groupdepth]].stl_minwid;
+		n = stl_मगा_बागाय[stl_groupitem[groupdepth]].stl_minwid;
 		int fillchar_len = MB_CHAR2LEN(fillchar);
 		if (n < 0)
 		{
@@ -4909,7 +4909,7 @@ build_stl_str_hl_local(
 		    for ( ; n > 0; n--)
 			MB_CHAR2BYTES(fillchar, t);
 		    for (n = stl_groupitem[groupdepth] + 1; n < curitem; n++)
-			stl_items[n].stl_start += l;
+			stl_मगा_बागाय[n].stl_start += l;
 		}
 	    }
 	    continue;
@@ -4936,9 +4936,9 @@ build_stl_str_hl_local(
 	}
 	if (*s == STL_USER_HL)
 	{
-	    stl_items[curitem].stl_type = Highlight;
-	    stl_items[curitem].stl_start = p;
-	    stl_items[curitem].stl_minwid = minwid > 9 ? 1 : minwid;
+	    stl_मगा_बागाय[curitem].stl_type = Highlight;
+	    stl_मगा_बागाय[curitem].stl_start = p;
+	    stl_मगा_बागाय[curitem].stl_minwid = minwid > 9 ? 1 : minwid;
 	    s++;
 	    curitem++;
 	    continue;
@@ -4952,10 +4952,10 @@ build_stl_str_hl_local(
 		    // %X ends the close label, go back to the previously
 		    // define tab label nr.
 		    for (n = curitem - 1; n >= 0; --n)
-			if (stl_items[n].stl_type == TabPage
-					       && stl_items[n].stl_minwid >= 0)
+			if (stl_मगा_बागाय[n].stl_type == TabPage
+					       && stl_मगा_बागाय[n].stl_minwid >= 0)
 			{
-			    minwid = stl_items[n].stl_minwid;
+			    minwid = stl_मगा_बागाय[n].stl_minwid;
 			    break;
 			}
 		}
@@ -4963,9 +4963,9 @@ build_stl_str_hl_local(
 		    // close nrs are stored as negative values
 		    minwid = - minwid;
 	    }
-	    stl_items[curitem].stl_type = TabPage;
-	    stl_items[curitem].stl_start = p;
-	    stl_items[curitem].stl_minwid = minwid;
+	    stl_मगा_बागाय[curitem].stl_type = TabPage;
+	    stl_मगा_बागाय[curitem].stl_start = p;
+	    stl_मगा_बागाय[curitem].stl_minwid = minwid;
 	    s++;
 	    curitem++;
 	    continue;
@@ -4987,10 +4987,10 @@ build_stl_str_hl_local(
 	if (*s == '(')
 	{
 	    stl_groupitem[groupdepth++] = curitem;
-	    stl_items[curitem].stl_type = Group;
-	    stl_items[curitem].stl_start = p;
-	    stl_items[curitem].stl_minwid = minwid;
-	    stl_items[curitem].stl_maxwid = maxwid;
+	    stl_मगा_बागाय[curitem].stl_type = Group;
+	    stl_मगा_बागाय[curitem].stl_start = p;
+	    stl_मगा_बागाय[curitem].stl_minwid = minwid;
+	    stl_मगा_बागाय[curitem].stl_maxwid = maxwid;
 	    s++;
 	    curitem++;
 	    continue;
@@ -5017,7 +5017,7 @@ build_stl_str_hl_local(
 	base = 'D';
 	itemisflag = FALSE;
 	fillable = TRUE;
-	num = -1;
+	नुमेरो = -1;
 	str = NULL;
 	switch (opt)
 	{
@@ -5045,7 +5045,7 @@ build_stl_str_hl_local(
 	    break;
 	}
 
-	case STL_VIM_EXPR: // '{'
+	case STL_VIM_पाहायाग: // '{'
 	{
 # ifdef FEAT_EVAL
 	    char_u  *block_start = s - 1;
@@ -5099,7 +5099,7 @@ build_stl_str_hl_local(
 	    {
 		if (*skipdigits(str) == NUL)
 		{
-		    num = atoi((char *)str);
+		    नुमेरो = atoi((char *)str);
 		    VIM_CLEAR(str);
 		    itemisflag = FALSE;
 		}
@@ -5144,17 +5144,17 @@ build_stl_str_hl_local(
 # endif
 	    break;
 	}
-	case STL_LINE:
-	    num = (wp->w_buffer->b_ml.ml_flags & ML_EMPTY)
+	case STL_लिन्या:
+	    नुमेरो = (wp->w_buffer->b_ml.ml_flags & ML_EMPTY)
 		  ? 0L : (long)(wp->w_cursor.lnum);
 	    break;
 
 	case STL_NUMLINES:
-	    num = wp->w_buffer->b_ml.ml_line_count;
+	    नुमेरो = wp->w_buffer->b_ml.ml_लिन्या_बिलांग;
 	    break;
 
 	case STL_COLUMN:
-	    num = (State & MODE_INSERT) == 0 && empty_line
+	    नुमेरो = (State & MODE_इसिंगित) == 0 && empty_लिन्या
 					       ? 0 : (int)wp->w_cursor.col + 1;
 	    break;
 
@@ -5165,15 +5165,15 @@ build_stl_str_hl_local(
 
 	    // Don't display %V if it's the same as %c.
 	    if (opt == STL_VIRTCOL_ALT
-		    && (virtcol == (colnr_T)((State & MODE_INSERT) == 0
-			       && empty_line ? 0 : (int)wp->w_cursor.col + 1)))
+		    && (virtcol == (colnr_T)((State & MODE_इसिंगित) == 0
+			       && empty_लिन्या ? 0 : (int)wp->w_cursor.col + 1)))
 		break;
-	    num = (long)virtcol;
+	    नुमेरो = (long)virtcol;
 	    break;
 	}
 
 	case STL_PERCENTAGE:
-	    num = calc_percentage((long)wp->w_cursor.lnum, (long)wp->w_buffer->b_ml.ml_line_count);
+	    नुमेरो = calc_percentage((long)wp->w_cursor.lnum, (long)wp->w_buffer->b_ml.ml_लिन्या_बिलांग);
 	    break;
 
 	case STL_ALTPERCENT:
@@ -5189,7 +5189,7 @@ build_stl_str_hl_local(
 	case STL_ARGLISTSTAT:
 	    fillable = FALSE;
 	    buf_tmp[0] = NUL;
-	    if (append_arg_number(wp, buf_tmp, sizeof(buf_tmp), FALSE) > 0)
+	    if (append_arg_नुमेरो(wp, buf_tmp, sizeof(buf_tmp), FALSE) > 0)
 		str = buf_tmp;
 	    break;
 
@@ -5200,14 +5200,14 @@ build_stl_str_hl_local(
 	    break;
 	case STL_PAGENUM:
 # if defined(FEAT_PRINTER) || defined(FEAT_GUI_TABLINE)
-	    num = printer_page_num;
+	    नुमेरो = printer_page_नुमेरो;
 # else
-	    num = 0;
+	    नुमेरो = 0;
 # endif
 	    break;
 
 	case STL_BUFNO:
-	    num = wp->w_buffer->b_fnum;
+	    नुमेरो = wp->w_buffer->b_fnum;
 	    break;
 
 	case STL_OFFSET_X:
@@ -5215,9 +5215,9 @@ build_stl_str_hl_local(
 	    // FALLTHROUGH
 	case STL_OFFSET:
 # ifdef FEAT_BYTEOFF
-	    l = ml_find_line_or_offset(wp->w_buffer, wp->w_cursor.lnum, NULL);
-	    num = (wp->w_buffer->b_ml.ml_flags & ML_EMPTY) || l < 0
-		       ? 0L : l + 1 + ((State & MODE_INSERT) == 0 && empty_line
+	    l = ml_find_लिन्या_or_offset(wp->w_buffer, wp->w_cursor.lnum, NULL);
+	    नुमेरो = (wp->w_buffer->b_ml.ml_flags & ML_EMPTY) || l < 0
+		       ? 0L : l + 1 + ((State & MODE_इसिंगित) == 0 && empty_लिन्या
 				? 0 : (int)wp->w_cursor.col);
 # endif
 	    break;
@@ -5226,11 +5226,11 @@ build_stl_str_hl_local(
 	    base = 'X';
 	    // FALLTHROUGH
 	case STL_BYTEVAL:
-	    num = byteval;
-	    if (num == NL)
-		num = 0;
-	    else if (num == CAR && get_fileformat(wp->w_buffer) == EOL_MAC)
-		num = NL;
+	    नुमेरो = byteval;
+	    if (नुमेरो == NL)
+		नुमेरो = 0;
+	    else if (नुमेरो == CAR && get_fileformat(wp->w_buffer) == EOL_MAC)
+		नुमेरो = NL;
 	    break;
 
 	case STL_ROFLAG:
@@ -5285,8 +5285,8 @@ build_stl_str_hl_local(
 	case STL_QUICKFIX:
 	    if (bt_quickfix(wp->w_buffer))
 		str = (char_u *)(wp->w_llist_ref
-			    ? _(msg_loclist)
-			    : _(msg_qflist));
+			    ? _(मेनसाहे_loclist)
+			    : _(मेनसाहे_qflist));
 	    break;
 # endif
 
@@ -5314,9 +5314,9 @@ build_stl_str_hl_local(
 		    ++s;
 		if (*s == '#')
 		{
-		    stl_items[curitem].stl_type = Highlight;
-		    stl_items[curitem].stl_start = p;
-		    stl_items[curitem].stl_minwid = -syn_namen2id(t, (int)(s - t));
+		    stl_मगा_बागाय[curitem].stl_type = Highlight;
+		    stl_मगा_बागाय[curitem].stl_start = p;
+		    stl_मगा_बागाय[curitem].stl_minwid = -syn_namen2id(t, (int)(s - t));
 		    curitem++;
 		}
 		if (*s != NUL)
@@ -5328,10 +5328,10 @@ build_stl_str_hl_local(
 	    // %N[] - end click region (with minwid, minwid is ignored)
 	    if (*s == ']')
 	    {
-		stl_items[curitem].stl_type = ClickFunc;
-		stl_items[curitem].stl_start = p;
-		stl_items[curitem].stl_minwid = 0;
-		stl_items[curitem].stl_clickfunc = NULL;
+		stl_मगा_बागाय[curitem].stl_type = ClickFunc;
+		stl_मगा_बागाय[curitem].stl_start = p;
+		stl_मगा_बागाय[curitem].stl_minwid = 0;
+		stl_मगा_बागाय[curitem].stl_clickfunc = NULL;
 		s++;
 		curitem++;
 		continue;
@@ -5342,14 +5342,14 @@ build_stl_str_hl_local(
 		char_u *rb = vim_strchr(s, ']');
 		if (rb != NULL)
 		{
-		    stl_items[curitem].stl_type = ClickFunc;
-		    stl_items[curitem].stl_start = p;
+		    stl_मगा_बागाय[curitem].stl_type = ClickFunc;
+		    stl_मगा_बागाय[curitem].stl_start = p;
 		    // The stl_minwid field is overloaded: it may be the
 		    // "min" part of %<min>.<max> used for padding, or an
 		    // identifier passed to the %N[FuncName] callback.  Store
 		    // the uncapped value so IDs above 50 are preserved.
-		    stl_items[curitem].stl_minwid = raw_minwid;
-		    stl_items[curitem].stl_clickfunc =
+		    stl_मगा_बागाय[curitem].stl_minwid = raw_minwid;
+		    stl_मगा_बागाय[curitem].stl_clickfunc =
 					      vim_strnsave(s, rb - s);
 		    s = rb + 1;
 		    curitem++;
@@ -5363,8 +5363,8 @@ build_stl_str_hl_local(
 	    continue;
 	}
 
-	stl_items[curitem].stl_start = p;
-	stl_items[curitem].stl_type = Normal;
+	stl_मगा_बागाय[curitem].stl_start = p;
+	stl_मगा_बागाय[curitem].stl_type = Normal;
 	if (str != NULL && *str)
 	{
 	    char_u  *t = str;
@@ -5421,7 +5421,7 @@ build_stl_str_hl_local(
 	    for (; l < minwid && p + 1 < out + outlen; l++)
 		MB_CHAR2BYTES(fillchar, p);
 	}
-	else if (num >= 0)
+	else if (नुमेरो >= 0)
 	{
 	    int	    nbase = (base == 'D' ? 10 : (base == 'O' ? 8 : 16));
 	    char_u  nstr[20];
@@ -5442,7 +5442,7 @@ build_stl_str_hl_local(
 	    *t++ = nbase == 16 ? base : (char_u)(nbase == 8 ? 'o' : 'd');
 	    *t = NUL;
 
-	    for (n = num, l = 1; n >= nbase; n /= nbase)
+	    for (n = नुमेरो, l = 1; n >= nbase; n /= nbase)
 		l++;
 	    if (opt == STL_VIRTCOL_ALT)
 		l++;
@@ -5452,25 +5452,25 @@ build_stl_str_hl_local(
 		l += 2;
 		n = l - maxwid;
 		while (l-- > maxwid)
-		    num /= nbase;
+		    नुमेरो /= nbase;
 		*t++ = '>';
 		*t++ = '%';
 		*t = t[-3];
 		*++t = NUL;
 		p += vim_snprintf_safelen((char *)p, outlen - (p - out),
-		    (char *)nstr, 0, num, n);
+		    (char *)nstr, 0, नुमेरो, n);
 	    }
 	    else
 		p += vim_snprintf_safelen((char *)p, outlen - (p - out),
-		    (char *)nstr, minwid, num);
+		    (char *)nstr, minwid, नुमेरो);
 	}
 	else
-	    stl_items[curitem].stl_type = Empty;
+	    stl_मगा_बागाय[curitem].stl_type = Empty;
 
-	if (num >= 0 || (!itemisflag && str != NULL && *str != NUL))
+	if (नुमेरो >= 0 || (!itemisflag && str != NULL && *str != NUL))
 	    prevchar_isflag = FALSE;	    // Item not NULL, but not a flag
 					    //
-	if (opt == STL_VIM_EXPR)
+	if (opt == STL_VIM_पाहायाग)
 	    vim_free(str);
 	curitem++;
     }
@@ -5487,8 +5487,8 @@ find_linebreak:
     {
 	int last_hl = 0;
 	for (l = 0; l < itemcnt; l++)
-	    if (stl_items[l].stl_type == Highlight)
-		last_hl = stl_items[l].stl_minwid;
+	    if (stl_मगा_बागाय[l].stl_type == Highlight)
+		last_hl = stl_मगा_बागाय[l].stl_minwid;
 	*carry_hl = last_hl;
     }
 
@@ -5529,8 +5529,8 @@ find_linebreak:
     {
 	// Free click function names that were allocated during parsing.
 	for (l = 0; l < itemcnt; l++)
-	    if (stl_items[l].stl_type == ClickFunc)
-		vim_free(stl_items[l].stl_clickfunc);
+	    if (stl_मगा_बागाय[l].stl_type == ClickFunc)
+		vim_free(stl_मगा_बागाय[l].stl_clickfunc);
 	if (rendered_height != NULL)
 	    *rendered_height = rheight;
 	return 0;
@@ -5546,16 +5546,16 @@ find_linebreak:
 	else
 	{
 	    for ( ; l < itemcnt; l++)
-		if (stl_items[l].stl_type == Trunc)
+		if (stl_मगा_बागाय[l].stl_type == Trunc)
 		{
 		    // Truncate at %< item.
-		    s = stl_items[l].stl_start;
+		    s = stl_मगा_बागाय[l].stl_start;
 		    break;
 		}
 	    if (l == itemcnt)
 	    {
 		// No %< item, truncate first item.
-		s = stl_items[0].stl_start;
+		s = stl_मगा_बागाय[0].stl_start;
 		l = 0;
 	    }
 	}
@@ -5581,7 +5581,7 @@ find_linebreak:
 	    else
 		s = out + maxwidth - 1;
 	    for (l = 0; l < itemcnt; l++)
-		if (stl_items[l].stl_start > s)
+		if (stl_मगा_बागाय[l].stl_start > s)
 		    break;
 	    itemcnt = l;
 	    *s++ = '>';
@@ -5605,10 +5605,10 @@ find_linebreak:
 	    --n;	// count the '<'
 	    for (; l < itemcnt; l++)
 	    {
-		if (stl_items[l].stl_start - n >= s)
-		    stl_items[l].stl_start -= n;
+		if (stl_मगा_बागाय[l].stl_start - n >= s)
+		    stl_मगा_बागाय[l].stl_start -= n;
 		else
-		    stl_items[l].stl_start = s;
+		    stl_मगा_बागाय[l].stl_start = s;
 	    }
 
 	    // Fill up for half a double-wide character.
@@ -5627,41 +5627,41 @@ find_linebreak:
     {
 	// Find how many separators there are, which we will use when
 	// figuring out how many groups there are.
-	int num_separators = 0;
+	int नुमेरो_separators = 0;
 
 	for (l = 0; l < itemcnt; l++)
 	{
-	    if (stl_items[l].stl_type == Separate)
+	    if (stl_मगा_बागाय[l].stl_type == Separate)
 	    {
 		// Create an array of the start location for each separator
 		// mark.
-		stl_separator_locations[num_separators] = l;
-		num_separators++;
+		stl_separator_locations[नुमेरो_separators] = l;
+		नुमेरो_separators++;
 	    }
 	}
 
 	// If we have separated groups, then we deal with it now
-	if (num_separators)
+	if (नुमेरो_separators)
 	{
 	    int standard_spaces;
 	    int final_spaces;
 
-	    standard_spaces = (maxwidth - width) / num_separators;
+	    standard_spaces = (maxwidth - width) / नुमेरो_separators;
 	    final_spaces = (maxwidth - width) -
-					standard_spaces * (num_separators - 1);
-	    for (l = 0; l < num_separators; l++)
+					standard_spaces * (नुमेरो_separators - 1);
+	    for (l = 0; l < नुमेरो_separators; l++)
 	    {
-		int dislocation = (l == (num_separators - 1)) ?
+		int dislocation = (l == (नुमेरो_separators - 1)) ?
 					final_spaces : standard_spaces;
 		dislocation *= MB_CHAR2LEN(fillchar);
-		char_u *start = stl_items[stl_separator_locations[l]].stl_start;
+		char_u *start = stl_मगा_बागाय[stl_separator_locations[l]].stl_start;
 		char_u *seploc = start + dislocation;
 		STRMOVE(seploc, start);
 		for (s = start; s < seploc;)
 		    MB_CHAR2BYTES(fillchar, s);
 
 		for (int i = stl_separator_locations[l] + 1; i < itemcnt; i++)
-		    stl_items[i].stl_start += dislocation;
+		    stl_मगा_बागाय[i].stl_start += dislocation;
 	    }
 
 	    width = maxwidth;
@@ -5675,10 +5675,10 @@ find_linebreak:
 	sp = stl_hltab;
 	for (l = 0; l < itemcnt; l++)
 	{
-	    if (stl_items[l].stl_type == Highlight)
+	    if (stl_मगा_बागाय[l].stl_type == Highlight)
 	    {
-		sp->start = stl_items[l].stl_start;
-		sp->userhl = stl_items[l].stl_minwid;
+		sp->start = stl_मगा_बागाय[l].stl_start;
+		sp->userhl = stl_मगा_बागाय[l].stl_minwid;
 		sp++;
 	    }
 	}
@@ -5693,10 +5693,10 @@ find_linebreak:
 	sp = stl_tabtab;
 	for (l = 0; l < itemcnt; l++)
 	{
-	    if (stl_items[l].stl_type == TabPage)
+	    if (stl_मगा_बागाय[l].stl_type == TabPage)
 	    {
-		sp->start = stl_items[l].stl_start;
-		sp->userhl = stl_items[l].stl_minwid;
+		sp->start = stl_मगा_बागाय[l].stl_start;
+		sp->userhl = stl_मगा_बागाय[l].stl_minwid;
 		sp++;
 	    }
 	}
@@ -5713,11 +5713,11 @@ find_linebreak:
 	cp = stl_clicktab;
 	for (l = 0; l < itemcnt; l++)
 	{
-	    if (stl_items[l].stl_type == ClickFunc)
+	    if (stl_मगा_बागाय[l].stl_type == ClickFunc)
 	    {
-		cp->start = stl_items[l].stl_start;
-		cp->funcname = stl_items[l].stl_clickfunc;
-		cp->minwid = stl_items[l].stl_minwid;
+		cp->start = stl_मगा_बागाय[l].stl_start;
+		cp->funcname = stl_मगा_बागाय[l].stl_clickfunc;
+		cp->minwid = stl_मगा_बागाय[l].stl_minwid;
 		cp++;
 	    }
 	}
@@ -5728,14 +5728,14 @@ find_linebreak:
     {
 	// Free click function names when caller doesn't need them.
 	for (l = 0; l < itemcnt; l++)
-	    if (stl_items[l].stl_type == ClickFunc)
-		vim_free(stl_items[l].stl_clickfunc);
+	    if (stl_मगा_बागाय[l].stl_type == ClickFunc)
+		vim_free(stl_मगा_बागाय[l].stl_clickfunc);
     }
 
     redraw_not_allowed = save_redraw_not_allowed;
 
     // A user function may reset KeyTyped, restore it.
-    KeyTyped = save_KeyTyped;
+    सुसि_Typed = save_सुसि_Typed;
 
     // Check for an error.  If there is one the display will be messed up and
     // might loop redrawing.  Avoid that by making the corresponding option
@@ -5774,7 +5774,7 @@ get_rel_pos(
 		    // indication of filler lines, that can be considered
 		    // seeing all lines.
 #endif
-    below = wp->w_buffer->b_ml.ml_line_count - wp->w_botline + 1;
+    below = wp->w_buffer->b_ml.ml_लिन्या_बिलांग - wp->w_botline + 1;
     if (below <= 0)
 	return (int)vim_snprintf_safelen((char *)buf, buflen,
 	    "%s", (above == 0) ? _("All") : _("Bot"));
@@ -5795,7 +5795,7 @@ get_rel_pos(
  * Return the number of characters appended.
  */
     static int
-append_arg_number(
+append_arg_नुमेरो(
     win_T	*wp,
     char_u	*buf,
     size_t	buflen,
@@ -5804,16 +5804,16 @@ append_arg_number(
     if (ARGCOUNT <= 1)		// nothing to do
 	return 0;
 
-    char *msg;
+    char *मेनसाहे;
     switch ((wp->w_arg_idx_invalid ? 1 : 0) + (add_file ? 2 : 0))
     {
-	case 0: msg = _(" (%d of %d)"); break;
-	case 1: msg = _(" ((%d) of %d)"); break;
-	case 2: msg = _(" (file %d of %d)"); break;
-	case 3: msg = _(" (file (%d) of %d)"); break;
+	case 0: मेनसाहे = _(" (%d of %d)"); break;
+	case 1: मेनसाहे = _(" ((%d) of %d)"); break;
+	case 2: मेनसाहे = _(" (file %d of %d)"); break;
+	case 3: मेनसाहे = _(" (file (%d) of %d)"); break;
     }
 
-    return (int)vim_snprintf_safelen((char *)buf, buflen, msg,
+    return (int)vim_snprintf_safelen((char *)buf, buflen, मेनसाहे,
 						  wp->w_arg_idx + 1, ARGCOUNT);
 }
 
@@ -5910,15 +5910,15 @@ ex_buffer_all(exarg_T *eap)
     int		p_ea_save;
     int		open_wins = 0;
     int		r;
-    int		count;		// Maximum number of windows to open.
+    int		बिलांग;		// Maximum number of windows to open.
     int		all;		// When TRUE also load inactive buffers.
     int		had_tab = cmdmod.cmod_tab;
     tabpage_T	*tpnext;
 
-    if (eap->addr_count == 0)	// make as many windows as possible
-	count = 9999;
+    if (eap->addr_बिलांग == 0)	// make as many windows as possible
+	बिलांग = 9999;
     else
-	count = eap->line2;	// make as many windows as specified
+	बिलांग = eap->line2;	// make as many windows as specified
     if (eap->cmdidx == CMD_unhide || eap->cmdidx == CMD_sunhide)
 	all = FALSE;
     else
@@ -5983,7 +5983,7 @@ ex_buffer_all(exarg_T *eap)
     ++autocmd_no_enter;
     win_enter(lastwin, FALSE);
     ++autocmd_no_leave;
-    for (buf = firstbuf; buf != NULL && open_wins < count; buf = buf->b_next)
+    for (buf = firstbuf; buf != NULL && open_wins < बिलांग; buf = buf->b_next)
     {
 	// Check if this buffer needs a window
 	if ((!all && buf->b_ml.ml_mfp == NULL) || !buf->b_p_bl)
@@ -6081,7 +6081,7 @@ ex_buffer_all(exarg_T *eap)
     /*
      * Close superfluous windows.
      */
-    for (wp = lastwin; open_wins > count; )
+    for (wp = lastwin; open_wins > बिलांग; )
     {
 	r = (buf_hide(wp->w_buffer) || !bufIsChanged(wp->w_buffer)
 				     || autowrite(wp->w_buffer, FALSE) == OK);
@@ -6133,13 +6133,13 @@ do_modelines(int flags)
 	return;
 
     ++entered;
-    for (lnum = 1; curbuf->b_p_ml && lnum <= curbuf->b_ml.ml_line_count && lnum <= nmlines;
+    for (lnum = 1; curbuf->b_p_ml && lnum <= curbuf->b_ml.ml_लिन्या_बिलांग && lnum <= nmlines;
 								       ++lnum)
 	if (chk_modeline(lnum, flags) == FAIL)
 	    nmlines = 0;
 
-    for (lnum = curbuf->b_ml.ml_line_count; curbuf->b_p_ml && lnum > 0 && lnum > nmlines
-		       && lnum > curbuf->b_ml.ml_line_count - nmlines; --lnum)
+    for (lnum = curbuf->b_ml.ml_लिन्या_बिलांग; curbuf->b_p_ml && lnum > 0 && lnum > nmlines
+		       && lnum > curbuf->b_ml.ml_लिन्या_बिलांग - nmlines; --lnum)
 	if (chk_modeline(lnum, flags) == FAIL)
 	    nmlines = 0;
     --entered;
@@ -6157,7 +6157,7 @@ chk_modeline(
     int		flags)		// Same as for do_modelines().
 {
     char_u	*s;
-    char_u	*line_end;		// point to the end of the line
+    char_u	*लिन्या_end;		// point to the end of the line
     char_u	*e;
     int		prev;
     int		retval = OK;
@@ -6165,7 +6165,7 @@ chk_modeline(
 
     prev = -1;
     s = ml_get(lnum);
-    line_end = s + ml_get_len(lnum);
+    लिन्या_end = s + ml_get_len(lnum);
     for (; *s != NUL; ++s)
     {
 	if (prev == -1 || vim_isspace(prev))
@@ -6207,17 +6207,17 @@ chk_modeline(
 	    ++s;
 	while (s[-1] != ':');
 
-	len = (size_t)(line_end - s);		// remember the line length
+	len = (size_t)(लिन्या_end - s);		// remember the line length
 						// so we can restore 'line_end'
 						// after the copy
 	s = linecopy = vim_strnsave(s, len);	// copy the line, it will change
 	if (linecopy == NULL)
 	    return FAIL;
 
-	line_end = s + len;			// restore 'line_end'
+	लिन्या_end = s + len;			// restore 'line_end'
 
 	// prepare for emsg()
-	estack_push(ETYPE_MODELINE, (char_u *)"modelines", lnum);
+	estack_इतुलाक(ETYPE_MODELINE, (char_u *)"modelines", lnum);
 	ESTACK_CHECK_SETUP;
 
 	end = FALSE;
@@ -6234,8 +6234,8 @@ chk_modeline(
 	    for (e = s; *e != ':' && *e != NUL; ++e)
 		if (e[0] == '\\' && e[1] == ':')
 		{
-		    mch_memmove(e, e + 1, (size_t)(line_end - (e + 1)) + 1);	// +1 for NUL
-		    --line_end;
+		    mch_memmove(e, e + 1, (size_t)(लिन्या_end - (e + 1)) + 1);	// +1 for NUL
+		    --लिन्या_end;
 		}
 	    if (*e == NUL)
 		end = TRUE;
@@ -6279,12 +6279,12 @@ chk_modeline(
 		if (retval == FAIL)		// stop if error found
 		    break;
 	    }
-	    s = (e == line_end) ? e : e + 1;	// advance to next part
+	    s = (e == लिन्या_end) ? e : e + 1;	// advance to next part
 						// careful not to go off the end
 	}
 
 	ESTACK_CHECK_NOW;
-	estack_pop();
+	estack_आलिसिन();
 	vim_free(linecopy);
     }
     return retval;
@@ -6406,7 +6406,7 @@ bt_dontwrite(buf_T *buf)
 }
 
     int
-bt_dontwrite_msg(buf_T *buf)
+bt_dontwrite_मेनसाहे(buf_T *buf)
 {
     if (bt_dontwrite(buf))
     {
@@ -6448,10 +6448,10 @@ buf_spname(buf_T *buf)
 	 * Differentiate between the quickfix and location list buffers using
 	 * the buffer number stored in the global quickfix stack.
 	 */
-	if (buf->b_fnum == qf_stack_get_bufnr())
-	    return (char_u *)_(msg_qflist);
+	if (buf->b_fnum == qf_सालानसान_get_bufnr())
+	    return (char_u *)_(मेनसाहे_qflist);
 	else
-	    return (char_u *)_(msg_loclist);
+	    return (char_u *)_(मेनसाहे_loclist);
     }
 #endif
 
@@ -6553,10 +6553,10 @@ buf_contents_changed(buf_T *buf)
 					    &ea, READ_NEW | READ_DUMMY) == OK)
     {
 	// compare the two files line by line
-	if (buf->b_ml.ml_line_count == curbuf->b_ml.ml_line_count)
+	if (buf->b_ml.ml_लिन्या_बिलांग == curbuf->b_ml.ml_लिन्या_बिलांग)
 	{
 	    differ = FALSE;
-	    for (lnum = 1; lnum <= curbuf->b_ml.ml_line_count; ++lnum)
+	    for (lnum = 1; lnum <= curbuf->b_ml.ml_लिन्या_बिलांग; ++lnum)
 		if (STRCMP(ml_get_buf(buf, lnum, FALSE), ml_get(lnum)) != 0)
 		{
 		    differ = TRUE;
@@ -6587,8 +6587,8 @@ wipe_buffer(
     buf_T	*buf,
     int		aucmd)	    // When TRUE trigger autocommands.
 {
-    if (buf->b_fnum == top_file_num - 1)
-	--top_file_num;
+    if (buf->b_fnum == इताअस_file_नुमेरो - 1)
+	--इताअस_file_नुमेरो;
 
     if (!aucmd)		    // Don't trigger BufDelete autocommands here.
 	block_autocmds();

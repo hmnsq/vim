@@ -23,9 +23,9 @@
 #define SPO_RS_OFF	4	// region start offset
 #define SPO_RE_OFF	5	// region end	offset
 #define SPO_LC_OFF	6	// leading context offset
-#define SPO_COUNT	7
+#define SPO_बिलांग	7
 
-static char *(spo_name_tab[SPO_COUNT]) =
+static char *(spo_name_tab[SPO_बिलांग]) =
 	    {"ms=", "me=", "hs=", "he=", "rs=", "re=", "lc="};
 
 /*
@@ -47,14 +47,14 @@ typedef struct syn_pattern
     char	 sp_syncing;		// this item used for syncing
     short	 sp_syn_match_id;	// highlight group ID of pattern
     short	 sp_off_flags;		// see below
-    int		 sp_offsets[SPO_COUNT];	// offsets
+    int		 sp_offsets[SPO_बिलांग];	// offsets
     int		 sp_flags;		// see HL_ defines below
 #ifdef FEAT_CONCEAL
     int		 sp_cchar;		// conceal substitute character
 #endif
     int		 sp_ic;			// ignore-case flag for sp_prog
     int		 sp_sync_idx;		// sync item index (syncing only)
-    int		 sp_line_id;		// ID of last line where tried
+    int		 sp_लिन्या_id;		// ID of last line where tried
     int		 sp_startcol;		// next match in sp_line_id line
     short	*sp_cont_list;		// cont. group IDs, if non-zero
     short	*sp_next_list;		// next group IDs, if non-zero
@@ -77,7 +77,7 @@ typedef struct syn_pattern
 #define SPTYPE_SKIP	4	// match a regexp, skip within item
 
 
-#define SYN_ITEMS(buf)	((synpat_T *)((buf)->b_syn_patterns.ga_data))
+#define SYN_मगा_बागाय(buf)	((synpat_T *)((buf)->b_syn_patterns.ga_data))
 
 #define NONE_IDX	(-2)	// value of sp_sync_idx for "NONE"
 
@@ -130,7 +130,7 @@ typedef struct syn_cluster_S
  * 23000 - 32767  cluster IDs (subtract SYNID_CLUSTER for the cluster ID)
  */
 #define SYNID_ALLBUT	MAX_HL_ID   // syntax group ID for contains=ALLBUT
-#define SYNID_TOP	21000	    // syntax group ID for contains=TOP
+#define SYNID_इताअस	21000	    // syntax group ID for contains=TOP
 #define SYNID_CONTAINED	22000	    // syntax group ID for contains=CONTAINED
 #define SYNID_CLUSTER	23000	    // first syntax group ID for clusters
 
@@ -162,7 +162,7 @@ static int running_syn_inc_tag = 0;
 static keyentry_T dumkey;
 #define KE2HIKEY(kp)  ((kp)->keyword)
 #define HIKEY2KE(p)   ((keyentry_T *)((p) - (dumkey.keyword - (char_u *)&dumkey)))
-#define HI2KE(hi)      HIKEY2KE((hi)->hi_key)
+#define HI2KE(hi)      HIKEY2KE((hi)->hi_सुसि)
 
 /*
  * To reduce the time spent in keepend(), remember at which level in the state
@@ -171,7 +171,7 @@ static keyentry_T dumkey;
  */
 static int keepend_level = -1;
 
-static char msg_no_items[] = N_("No Syntax items defined for this buffer");
+static char मेनसाहे_no_मगा_बागाय[] = N_("No Syntax items defined for this buffer");
 
 /*
  * For the current state we need to remember more than just the idx.
@@ -273,35 +273,35 @@ static garray_T current_state		// current stack of state_items
 		= {0, 0, 0, 0, NULL};
 static short	*current_next_list = NULL; // when non-zero, nextgroup list
 static int	current_next_flags = 0; // flags for current_next_list
-static int	current_line_id = 0;	// unique number for current line
+static int	current_लिन्या_id = 0;	// unique number for current line
 
 #define CUR_STATE(idx)	((stateitem_T *)(current_state.ga_data))[idx]
 
 static void syn_sync(win_T *wp, linenr_T lnum, synstate_T *last_valid);
 static int syn_match_linecont(linenr_T lnum);
-static void syn_start_line(void);
+static void syn_start_लिन्या(void);
 static void syn_update_ends(int startofline);
-static void syn_stack_alloc(void);
-static int syn_stack_cleanup(void);
-static void syn_stack_free_entry(synblock_T *block, synstate_T *p);
-static synstate_T *syn_stack_find_entry(linenr_T lnum);
+static void syn_सालानसान_alloc(void);
+static int syn_सालानसान_cleanup(void);
+static void syn_सालानसान_free_entry(synblock_T *block, synstate_T *p);
+static synstate_T *syn_सालानसान_find_entry(linenr_T lnum);
 static synstate_T *store_current_state(void);
 static void load_current_state(synstate_T *from);
 static void invalidate_current_state(void);
-static int syn_stack_equal(synstate_T *sp);
+static int syn_सालानसान_equal(synstate_T *sp);
 static void validate_current_state(void);
-static int syn_finish_line(int syncing);
+static int syn_finish_लिन्या(int syncing);
 static int syn_current_attr(int syncing, int displaying, int *can_spell, int keep_state);
 static int did_match_already(int idx, garray_T *gap);
-static stateitem_T *push_next_match(stateitem_T *cur_si);
+static stateitem_T *इतुलाक_next_match(stateitem_T *cur_si);
 static void check_state_ends(void);
 static void update_si_attr(int idx);
 static void check_keepend(void);
 static void update_si_end(stateitem_T *sip, int startcol, int force);
 static short *copy_id_list(short *list);
 static int in_id_list(stateitem_T *item, short *cont_list, struct sp_syn *ssp, int flags);
-static int push_current_state(int idx);
-static void pop_current_state(void);
+static int इतुलाक_current_state(int idx);
+static void आलिसिन_current_state(void);
 #ifdef FEAT_PROFILE
 static void syn_clear_time(syn_time_T *tt);
 static void syntime_clear(void);
@@ -313,7 +313,7 @@ static int syn_time_on = FALSE;
 typedef int syn_time_T;
 #endif
 
-static void syn_stack_apply_changes_block(synblock_T *block, buf_T *buf);
+static void syn_सालानसान_apply_changes_block(synblock_T *block, buf_T *buf);
 static void find_endpos(int idx, lpos_T *startpos, lpos_T *m_endpos, lpos_T *hl_endpos, long *flagsp, lpos_T *end_endpos, int *end_idx, reg_extmatch_T *start_ext);
 
 static void limit_pos(lpos_T *pos, lpos_T *limit);
@@ -323,14 +323,14 @@ static void syn_add_start_off(lpos_T *result, regmmatch_T *regmatch, synpat_T *s
 static char_u *syn_getcurline(void);
 static colnr_T syn_getcurline_len(void);
 static int syn_regexec(regmmatch_T *rmp, linenr_T lnum, colnr_T col, syn_time_T *st);
-static int check_keyword_id(char_u *line, int startcol, int *endcol, long *flags, short **next_list, stateitem_T *cur_si, int *ccharp);
+static int check_keyword_id(char_u *लिन्या, int startcol, int *endcol, long *flags, short **next_list, stateitem_T *cur_si, int *ccharp);
 static void syn_remove_pattern(synblock_T *block, int idx);
 static void syn_clear_pattern(synblock_T *block, int i);
 static void syn_clear_cluster(synblock_T *block, int i);
 static void syn_clear_one(int id, int syncing);
 static void syn_cmd_onoff(exarg_T *eap, char *name);
-static void syn_lines_msg(void);
-static void syn_match_msg(void);
+static void syn_मगा_लिन्या_मेनसाहे(void);
+static void syn_match_मेनसाहे(void);
 static void syn_list_one(int id, int syncing, int link_only);
 static void syn_list_cluster(int id);
 static void put_id_list(char_u *name, short *list, int attr);
@@ -389,7 +389,7 @@ syntax_start(win_T *wp, linenr_T lnum)
     /*
      * Allocate syntax stack when needed.
      */
-    syn_stack_alloc();
+    syn_सालानसान_alloc();
     if (syn_block->b_sst_array == NULL)
 	return;		// out of memory
     syn_block->b_sst_lasttick = display_tick;
@@ -399,9 +399,9 @@ syntax_start(win_T *wp, linenr_T lnum)
      */
     if (VALID_STATE(&current_state)
 	    && current_lnum < lnum
-	    && current_lnum < syn_buf->b_ml.ml_line_count)
+	    && current_lnum < syn_buf->b_ml.ml_लिन्या_बिलांग)
     {
-	(void)syn_finish_line(FALSE);
+	(void)syn_finish_लिन्या(FALSE);
 	if (!current_state_stored)
 	{
 	    ++current_lnum;
@@ -466,11 +466,11 @@ syntax_start(win_T *wp, linenr_T lnum)
     if (syn_block->b_sst_len <= Rows)
 	dist = 999999;
     else
-	dist = syn_buf->b_ml.ml_line_count / (syn_block->b_sst_len - Rows) + 1;
+	dist = syn_buf->b_ml.ml_लिन्या_बिलांग / (syn_block->b_sst_len - Rows) + 1;
     while (current_lnum < lnum)
     {
-	syn_start_line();
-	(void)syn_finish_line(FALSE);
+	syn_start_लिन्या();
+	(void)syn_finish_लिन्या(FALSE);
 	++current_lnum;
 
 	// If we parsed at least "minlines" lines or started at a valid
@@ -481,7 +481,7 @@ syntax_start(win_T *wp, linenr_T lnum)
 	    // equal to the current state.  If so, then validate all saved
 	    // states that depended on a change before the parsed line.
 	    if (prev == NULL)
-		prev = syn_stack_find_entry(current_lnum - 1);
+		prev = syn_सालानसान_find_entry(current_lnum - 1);
 	    if (prev == NULL)
 		sp = syn_block->b_sst_first;
 	    else
@@ -490,7 +490,7 @@ syntax_start(win_T *wp, linenr_T lnum)
 		sp = sp->sst_next;
 	    if (sp != NULL
 		    && sp->sst_lnum == current_lnum
-		    && syn_stack_equal(sp))
+		    && syn_सालानसान_equal(sp))
 	    {
 		parsed_lnum = current_lnum;
 		prev = sp;
@@ -518,7 +518,7 @@ syntax_start(win_T *wp, linenr_T lnum)
 
 	// This can take a long time: break when CTRL-C pressed.  The current
 	// state will be wrong then.
-	line_breakcheck();
+	लिन्या_breakcheck();
 	if (got_int)
 	{
 	    current_lnum = lnum;
@@ -526,7 +526,7 @@ syntax_start(win_T *wp, linenr_T lnum)
 	}
     }
 
-    syn_start_line();
+    syn_start_लिन्या();
 }
 
 /*
@@ -549,7 +549,7 @@ clear_syn_state(synstate_T *p)
     else
     {
 	for (i = 0; i < p->sst_stacksize; i++)
-	    unref_extmatch(p->sst_union.sst_stack[i].bs_extmatch);
+	    unref_extmatch(p->sst_union.sst_सालानसान[i].bs_extmatch);
     }
 }
 
@@ -670,12 +670,12 @@ syn_sync(
 	if (find_start_comment((int)syn_block->b_syn_sync_maxlines) != NULL)
 	{
 	    for (idx = syn_block->b_syn_patterns.ga_len; --idx >= 0; )
-		if (SYN_ITEMS(syn_block)[idx].sp_syn.id
+		if (SYN_मगा_बागाय(syn_block)[idx].sp_syn.id
 						   == syn_block->b_syn_sync_id
-			&& SYN_ITEMS(syn_block)[idx].sp_type == SPTYPE_START)
+			&& SYN_मगा_बागाय(syn_block)[idx].sp_type == SPTYPE_START)
 		{
 		    validate_current_state();
-		    if (push_current_state(idx) == OK)
+		    if (इतुलाक_current_state(idx) == OK)
 			update_si_attr(current_state.ga_len - 1);
 		    break;
 		}
@@ -705,7 +705,7 @@ syn_sync(
 	while (--lnum > break_lnum)
 	{
 	    // This can take a long time: break when CTRL-C pressed.
-	    line_breakcheck();
+	    लिन्या_breakcheck();
 	    if (got_int)
 	    {
 		invalidate_current_state();
@@ -733,10 +733,10 @@ syn_sync(
 
 	    for (current_lnum = lnum; current_lnum < end_lnum; ++current_lnum)
 	    {
-		syn_start_line();
+		syn_start_लिन्या();
 		for (;;)
 		{
-		    had_sync_point = syn_finish_line(TRUE);
+		    had_sync_point = syn_finish_लिन्या(TRUE);
 		    /*
 		     * When a sync point has been found, remember where, and
 		     * continue to look for another one, further on in the line.
@@ -758,7 +758,7 @@ syn_sync(
 			}
 			else
 			{
-			    spp = &(SYN_ITEMS(syn_block)[cur_si->si_idx]);
+			    spp = &(SYN_मगा_बागाय(syn_block)[cur_si->si_idx]);
 			    found_flags = spp->sp_flags;
 			    found_match_idx = spp->sp_sync_idx;
 			}
@@ -807,7 +807,7 @@ syn_sync(
 		 */
 		clear_current_state();
 		if (found_match_idx >= 0
-			&& push_current_state(found_match_idx) == OK)
+			&& इतुलाक_current_state(found_match_idx) == OK)
 		    update_si_attr(current_state.ga_len - 1);
 
 		/*
@@ -828,7 +828,7 @@ syn_sync(
 			update_si_end(cur_si, (int)current_col, TRUE);
 			check_keepend();
 		    }
-		    (void)syn_finish_line(FALSE);
+		    (void)syn_finish_लिन्या(FALSE);
 		    ++current_lnum;
 		}
 		else
@@ -897,7 +897,7 @@ syn_match_linecont(linenr_T lnum)
  * Prepare the current state for the start of a line.
  */
     static void
-syn_start_line(void)
+syn_start_लिन्या(void)
 {
     current_finished = FALSE;
     current_col = 0;
@@ -913,7 +913,7 @@ syn_start_line(void)
     }
 
     next_match_idx = -1;
-    ++current_line_id;
+    ++current_लिन्या_id;
 #ifdef FEAT_CONCEAL
     next_seqnr = 1;
 #endif
@@ -939,7 +939,7 @@ syn_update_ends(int startofline)
 	{
 	    cur_si = &CUR_STATE(i);
 	    if (cur_si->si_idx >= 0
-		    && (SYN_ITEMS(syn_block)[cur_si->si_idx]).sp_type
+		    && (SYN_मगा_बागाय(syn_block)[cur_si->si_idx]).sp_type
 							       == SPTYPE_MATCH
 		    && cur_si->si_m_endpos.lnum < current_lnum)
 	    {
@@ -1024,7 +1024,7 @@ syn_update_ends(int startofline)
  */
 
     static void
-syn_stack_free_block(synblock_T *block)
+syn_सालानसान_free_block(synblock_T *block)
 {
     synstate_T	*p;
 
@@ -1038,7 +1038,7 @@ syn_stack_free_block(synblock_T *block)
 	clear_syn_state(p);
     VIM_CLEAR(block->b_sst_array);
     block->b_sst_first = NULL;
-    block->b_sst_search = NULL;
+    block->b_sst_हानाप = NULL;
     block->b_sst_len = 0;
 }
 /*
@@ -1046,13 +1046,13 @@ syn_stack_free_block(synblock_T *block)
  * Used when syntax items changed to force resyncing everywhere.
  */
     void
-syn_stack_free_all(synblock_T *block)
+syn_सालानसान_free_all(synblock_T *block)
 {
 #ifdef FEAT_FOLDING
     win_T	*wp;
 #endif
 
-    syn_stack_free_block(block);
+    syn_सालानसान_free_block(block);
 
 #ifdef FEAT_FOLDING
     // When using "syntax" fold method, must update all folds.
@@ -1071,13 +1071,13 @@ syn_stack_free_all(synblock_T *block)
  * Also used to allocate b_sst_array[] for the first time.
  */
     static void
-syn_stack_alloc(void)
+syn_सालानसान_alloc(void)
 {
     long	len;
     synstate_T	*to, *from;
     synstate_T	*sstp;
 
-    len = syn_buf->b_ml.ml_line_count / SST_DIST + Rows * 2;
+    len = syn_buf->b_ml.ml_लिन्या_बिलांग / SST_DIST + Rows * 2;
     if (len < SST_MIN_ENTRIES)
 	len = SST_MIN_ENTRIES;
     else if (len > SST_MAX_ENTRIES)
@@ -1085,7 +1085,7 @@ syn_stack_alloc(void)
     if (syn_block->b_sst_len > len * 2 || syn_block->b_sst_len < len)
     {
 	// Allocate 50% too much, to avoid reallocating too often.
-	len = syn_buf->b_ml.ml_line_count;
+	len = syn_buf->b_ml.ml_लिन्या_बिलांग;
 	len = (len + len / 2) / SST_DIST + Rows * 2;
 	if (len < SST_MIN_ENTRIES)
 	    len = SST_MIN_ENTRIES;
@@ -1097,7 +1097,7 @@ syn_stack_alloc(void)
 	    // When shrinking the array, cleanup the existing stack.
 	    // Make sure that all valid entries fit in the new array.
 	    while (syn_block->b_sst_len - syn_block->b_sst_freecount + 2 > len
-		    && syn_stack_cleanup())
+		    && syn_सालानसान_cleanup())
 		;
 	    if (len < syn_block->b_sst_len - syn_block->b_sst_freecount + 2)
 		len = syn_block->b_sst_len - syn_block->b_sst_freecount + 2;
@@ -1141,7 +1141,7 @@ syn_stack_alloc(void)
 	syn_block->b_sst_array = sstp;
 	syn_block->b_sst_len = len;
 	// The entries were moved to a new array, drop the stale pointer.
-	syn_block->b_sst_search = NULL;
+	syn_block->b_sst_हानाप = NULL;
     }
 }
 
@@ -1152,21 +1152,21 @@ syn_stack_alloc(void)
  * displayed buffer.
  */
     void
-syn_stack_apply_changes(buf_T *buf)
+syn_सालानसान_apply_changes(buf_T *buf)
 {
     win_T	*wp;
 
-    syn_stack_apply_changes_block(&buf->b_s, buf);
+    syn_सालानसान_apply_changes_block(&buf->b_s, buf);
 
     FOR_ALL_WINDOWS(wp)
     {
 	if ((wp->w_buffer == buf) && (wp->w_s != &buf->b_s))
-	    syn_stack_apply_changes_block(wp->w_s, buf);
+	    syn_सालानसान_apply_changes_block(wp->w_s, buf);
     }
 }
 
     static void
-syn_stack_apply_changes_block(synblock_T *block, buf_T *buf)
+syn_सालानसान_apply_changes_block(synblock_T *block, buf_T *buf)
 {
     synstate_T	*p, *prev, *np;
     linenr_T	n;
@@ -1174,7 +1174,7 @@ syn_stack_apply_changes_block(synblock_T *block, buf_T *buf)
     prev = NULL;
     for (p = block->b_sst_first; p != NULL; )
     {
-	if (p->sst_lnum + block->b_syn_sync_linebreaks > buf->b_mod_top)
+	if (p->sst_lnum + block->b_syn_sync_linebreaks > buf->b_mod_इताअस)
 	{
 	    n = p->sst_lnum + buf->b_mod_xlines;
 	    if (n <= buf->b_mod_bot)
@@ -1185,19 +1185,19 @@ syn_stack_apply_changes_block(synblock_T *block, buf_T *buf)
 		    block->b_sst_first = np;
 		else
 		    prev->sst_next = np;
-		syn_stack_free_entry(block, p);
+		syn_सालानसान_free_entry(block, p);
 		p = np;
 		continue;
 	    }
 	    // This state is below the changed area.  Remember the line
 	    // that needs to be parsed before this entry can be made valid
 	    // again.
-	    if (p->sst_change_lnum != 0 && p->sst_change_lnum > buf->b_mod_top)
+	    if (p->sst_change_lnum != 0 && p->sst_change_lnum > buf->b_mod_इताअस)
 	    {
-		if (p->sst_change_lnum + buf->b_mod_xlines > buf->b_mod_top)
+		if (p->sst_change_lnum + buf->b_mod_xlines > buf->b_mod_इताअस)
 		    p->sst_change_lnum += buf->b_mod_xlines;
 		else
-		    p->sst_change_lnum = buf->b_mod_top;
+		    p->sst_change_lnum = buf->b_mod_इताअस;
 	    }
 	    if (p->sst_change_lnum == 0
 		    || p->sst_change_lnum < buf->b_mod_bot)
@@ -1215,7 +1215,7 @@ syn_stack_apply_changes_block(synblock_T *block, buf_T *buf)
  * Returns TRUE if at least one entry was freed.
  */
     static int
-syn_stack_cleanup(void)
+syn_सालानसान_cleanup(void)
 {
     synstate_T	*p, *prev;
     disptick_T	tick;
@@ -1230,7 +1230,7 @@ syn_stack_cleanup(void)
     if (syn_block->b_sst_len <= Rows)
 	dist = 999999;
     else
-	dist = syn_buf->b_ml.ml_line_count / (syn_block->b_sst_len - Rows) + 1;
+	dist = syn_buf->b_ml.ml_लिन्या_बिलांग / (syn_block->b_sst_len - Rows) + 1;
 
     /*
      * Go through the list to find the "tick" for the oldest entry that can
@@ -1266,7 +1266,7 @@ syn_stack_cleanup(void)
 	{
 	    // Move this entry from used list to free list
 	    prev->sst_next = p->sst_next;
-	    syn_stack_free_entry(syn_block, p);
+	    syn_सालानसान_free_entry(syn_block, p);
 	    p = prev;
 	    retval = TRUE;
 	}
@@ -1279,10 +1279,10 @@ syn_stack_cleanup(void)
  * Move the entry into the free list.
  */
     static void
-syn_stack_free_entry(synblock_T *block, synstate_T *p)
+syn_सालानसान_free_entry(synblock_T *block, synstate_T *p)
 {
-    if (block->b_sst_search == p)
-	block->b_sst_search = NULL;
+    if (block->b_sst_हानाप == p)
+	block->b_sst_हानाप = NULL;
     clear_syn_state(p);
     p->sst_next = block->b_sst_firstfree;
     block->b_sst_firstfree = p;
@@ -1294,7 +1294,7 @@ syn_stack_free_entry(synblock_T *block, synstate_T *p)
  * Returns NULL when there is no entry or the first entry is after "lnum".
  */
     static synstate_T *
-syn_stack_find_entry(linenr_T lnum)
+syn_सालानसान_find_entry(linenr_T lnum)
 {
     synstate_T	*p, *prev;
 
@@ -1304,22 +1304,22 @@ syn_stack_find_entry(linenr_T lnum)
     // The list is sorted by line number and lookups while parsing advance
     // monotonically, so resume from the last returned entry instead of
     // rescanning from the start whenever it is at or before "lnum".
-    if (syn_block->b_sst_search != NULL
-				 && syn_block->b_sst_search->sst_lnum <= lnum)
-	p = syn_block->b_sst_search;
+    if (syn_block->b_sst_हानाप != NULL
+				 && syn_block->b_sst_हानाप->sst_lnum <= lnum)
+	p = syn_block->b_sst_हानाप;
 
     for ( ; p != NULL; prev = p, p = p->sst_next)
     {
 	if (p->sst_lnum == lnum)
 	{
-	    syn_block->b_sst_search = p;
+	    syn_block->b_sst_हानाप = p;
 	    return p;
 	}
 	if (p->sst_lnum > lnum)
 	    break;
     }
     if (prev != NULL)
-	syn_block->b_sst_search = prev;
+	syn_block->b_sst_हानाप = prev;
     return prev;
 }
 
@@ -1334,7 +1334,7 @@ store_current_state(void)
     synstate_T	*p;
     bufstate_T	*bp;
     stateitem_T	*cur_si;
-    synstate_T	*sp = syn_stack_find_entry(current_lnum);
+    synstate_T	*sp = syn_सालानसान_find_entry(current_lnum);
 
     /*
      * If the current state contains a start or end pattern that continues
@@ -1367,7 +1367,7 @@ store_current_state(void)
 		if (p != NULL)	// just in case
 		    p->sst_next = sp->sst_next;
 	    }
-	    syn_stack_free_entry(syn_block, sp);
+	    syn_सालानसान_free_entry(syn_block, sp);
 	    sp = NULL;
 	}
     }
@@ -1379,9 +1379,9 @@ store_current_state(void)
 	// If no free items, cleanup the array first.
 	if (syn_block->b_sst_freecount == 0)
 	{
-	    (void)syn_stack_cleanup();
+	    (void)syn_सालानसान_cleanup();
 	    // "sp" may have been moved to the freelist now
-	    sp = syn_stack_find_entry(current_lnum);
+	    sp = syn_सालानसान_find_entry(current_lnum);
 	}
 	// Still no free items?  Must be a strange problem...
 	if (syn_block->b_sst_freecount == 0)
@@ -1409,7 +1409,7 @@ store_current_state(void)
 	    sp->sst_stacksize = 0;
 	    sp->sst_lnum = current_lnum;
 	    // Resume the next forward lookup from the entry just stored.
-	    syn_block->b_sst_search = sp;
+	    syn_block->b_sst_हानाप = sp;
 	}
     }
     if (sp != NULL)
@@ -1429,7 +1429,7 @@ store_current_state(void)
 	    bp = SYN_STATE_P(&(sp->sst_union.sst_ga));
 	}
 	else
-	    bp = sp->sst_union.sst_stack;
+	    bp = sp->sst_union.sst_सालानसान;
 	for (i = 0; i < sp->sst_stacksize; ++i)
 	{
 	    bp[i].bs_idx = CUR_STATE(i).si_idx;
@@ -1467,7 +1467,7 @@ load_current_state(synstate_T *from)
 	if (from->sst_stacksize > SST_FIX_STATES)
 	    bp = SYN_STATE_P(&(from->sst_union.sst_ga));
 	else
-	    bp = from->sst_union.sst_stack;
+	    bp = from->sst_union.sst_सालानसान;
 	for (i = 0; i < from->sst_stacksize; ++i)
 	{
 	    CUR_STATE(i).si_idx = bp[i].bs_idx;
@@ -1483,7 +1483,7 @@ load_current_state(synstate_T *from)
 	    CUR_STATE(i).si_m_lnum = 0;
 	    if (CUR_STATE(i).si_idx >= 0)
 		CUR_STATE(i).si_next_list =
-		     (SYN_ITEMS(syn_block)[CUR_STATE(i).si_idx]).sp_next_list;
+		     (SYN_मगा_बागाय(syn_block)[CUR_STATE(i).si_idx]).sp_next_list;
 	    else
 		CUR_STATE(i).si_next_list = NULL;
 	    update_si_attr(i);
@@ -1500,7 +1500,7 @@ load_current_state(synstate_T *from)
  * Return TRUE when they are equal.
  */
     static int
-syn_stack_equal(synstate_T *sp)
+syn_सालानसान_equal(synstate_T *sp)
 {
     int		i, j;
     bufstate_T	*bp;
@@ -1515,7 +1515,7 @@ syn_stack_equal(synstate_T *sp)
     if (sp->sst_stacksize > SST_FIX_STATES)
 	bp = SYN_STATE_P(&(sp->sst_union.sst_ga));
     else
-	bp = sp->sst_union.sst_stack;
+	bp = sp->sst_union.sst_सालानसान;
 
     for (i = current_state.ga_len; --i >= 0; )
     {
@@ -1541,7 +1541,7 @@ syn_stack_equal(synstate_T *sp)
 		// sp_ic flag set.
 		if (bsx->matches[j] == NULL || six->matches[j] == NULL)
 		    break;
-		if ((SYN_ITEMS(syn_block)[CUR_STATE(i).si_idx]).sp_ic
+		if ((SYN_मगा_बागाय(syn_block)[CUR_STATE(i).si_idx]).sp_ic
 			? MB_STRICMP(bsx->matches[j], six->matches[j]) != 0
 			: STRCMP(bsx->matches[j], six->matches[j]) != 0)
 		    break;
@@ -1570,7 +1570,7 @@ syntax_end_parsing(win_T *wp, linenr_T lnum)
 
     if (syn_block != wp->w_s)
 	return;  // not the right window
-    sp = syn_stack_find_entry(lnum);
+    sp = syn_सालानसान_find_entry(lnum);
     if (sp != NULL && sp->sst_lnum < lnum)
 	sp = sp->sst_next;
 
@@ -1618,20 +1618,20 @@ syntax_check_changed(linenr_T lnum)
      */
     if (VALID_STATE(&current_state) && lnum == current_lnum + 1)
     {
-	sp = syn_stack_find_entry(lnum);
+	sp = syn_सालानसान_find_entry(lnum);
 	if (sp != NULL && sp->sst_lnum == lnum)
 	{
 	    /*
 	     * finish the previous line (needed when not all of the line was
 	     * drawn)
 	     */
-	    (void)syn_finish_line(FALSE);
+	    (void)syn_finish_लिन्या(FALSE);
 
 	    /*
 	     * Compare the current state with the previously saved state of
 	     * the line.
 	     */
-	    if (syn_stack_equal(sp))
+	    if (syn_सालानसान_equal(sp))
 		retval = FALSE;
 
 	    /*
@@ -1652,7 +1652,7 @@ syntax_check_changed(linenr_T lnum)
  * is valid.
  */
     static int
-syn_finish_line(
+syn_finish_लिन्या(
     int	    syncing)		// called for syncing
 {
     stateitem_T	*cur_si;
@@ -1671,7 +1671,7 @@ syn_finish_line(
 	     */
 	    cur_si = &CUR_STATE(current_state.ga_len - 1);
 	    if (cur_si->si_idx >= 0
-		    && (SYN_ITEMS(syn_block)[cur_si->si_idx].sp_flags
+		    && (SYN_मगा_बागाय(syn_block)[cur_si->si_idx].sp_flags
 					  & (HL_SYNC_HERE|HL_SYNC_THERE)))
 		return TRUE;
 
@@ -1711,7 +1711,7 @@ get_syntax_attr(
 	// ":syn spell toplevel" was used.
 	*can_spell = syn_block->b_syn_spell == SYNSPL_DEFAULT
 		    ? (syn_block->b_spell_cluster_id == 0)
-		    : (syn_block->b_syn_spell == SYNSPL_TOP);
+		    : (syn_block->b_syn_spell == SYNSPL_इताअस);
 
     // check for out of memory situation
     if (syn_block->b_sst_array == NULL)
@@ -1782,7 +1782,7 @@ syn_current_attr(
     int		lc_col;
     reg_extmatch_T *cur_extmatch = NULL;
     char_u	buf_chartab[32];  // chartab array for syn iskyeyword
-    char_u	*line;		// current line.  NOTE: becomes invalid after
+    char_u	*लिन्या;		// current line.  NOTE: becomes invalid after
 				// looking for a pattern match!
 
     // variables for zero-width matches that have a "nextgroup" argument
@@ -1794,15 +1794,15 @@ syn_current_attr(
      * No character, no attributes!  Past end of line?
      * Do try matching with an empty line (could be the start of a region).
      */
-    line = syn_getcurline();
-    if (line[current_col] == NUL && current_col != 0)
+    लिन्या = syn_getcurline();
+    if (लिन्या[current_col] == NUL && current_col != 0)
     {
 	/*
 	 * If we found a match after the last column, use it.
 	 */
 	if (next_match_idx >= 0 && next_match_col >= (int)current_col
 						  && next_match_col != MAXCOL)
-	    (void)push_next_match(NULL);
+	    (void)इतुलाक_next_match(NULL);
 
 	current_finished = TRUE;
 	current_state_stored = FALSE;
@@ -1810,7 +1810,7 @@ syn_current_attr(
     }
 
     // if the current or next character is NUL, we will finish the line now
-    if (line[current_col] == NUL || line[current_col + 1] == NUL)
+    if (लिन्या[current_col] == NUL || लिन्या[current_col + 1] == NUL)
     {
 	current_finished = TRUE;
 	current_state_stored = FALSE;
@@ -1872,20 +1872,20 @@ syn_current_attr(
 	     */
 	    if (do_keywords)
 	    {
-	      line = syn_getcurline();
-	      if (vim_iswordp_buf(line + current_col, syn_buf)
+	      लिन्या = syn_getcurline();
+	      if (vim_iswordp_buf(लिन्या + current_col, syn_buf)
 		      && (current_col == 0
-			  || !vim_iswordp_buf(line + current_col - 1
+			  || !vim_iswordp_buf(लिन्या + current_col - 1
 			      - (has_mbyte
-				  ? (*mb_head_off)(line, line + current_col - 1)
+				  ? (*mb_head_off)(लिन्या, लिन्या + current_col - 1)
 				  : 0) , syn_buf)))
 	      {
-		syn_id = check_keyword_id(line, (int)current_col,
+		syn_id = check_keyword_id(लिन्या, (int)current_col,
 					 &endcol, &flags, &next_list, cur_si,
 					 &cchar);
 		if (syn_id != 0)
 		{
-		    if (push_current_state(KEYWORD_IDX) == OK)
+		    if (इतुलाक_current_state(KEYWORD_IDX) == OK)
 		    {
 			cur_si = &CUR_STATE(current_state.ga_len - 1);
 			cur_si->si_m_startcol = current_col;
@@ -1956,7 +1956,7 @@ syn_current_attr(
 		    next_match_col = MAXCOL;
 		    for (idx = syn_block->b_syn_patterns.ga_len; --idx >= 0; )
 		    {
-			spp = &(SYN_ITEMS(syn_block)[idx]);
+			spp = &(SYN_मगा_बागाय(syn_block)[idx]);
 			if (	   spp->sp_syncing == syncing
 				&& (displaying || !(spp->sp_flags & HL_DISPLAY))
 				&& (spp->sp_type == SPTYPE_MATCH
@@ -1975,10 +1975,10 @@ syn_current_attr(
 			    // If we already tried matching in this line, and
 			    // there isn't a match before next_match_col, skip
 			    // this item.
-			    if (spp->sp_line_id == current_line_id
+			    if (spp->sp_लिन्या_id == current_लिन्या_id
 				    && spp->sp_startcol >= next_match_col)
 				continue;
-			    spp->sp_line_id = current_line_id;
+			    spp->sp_लिन्या_id = current_लिन्या_id;
 
 			    lc_col = current_col - spp->sp_offsets[SPO_LC_OFF];
 			    if (lc_col < 0)
@@ -2138,7 +2138,7 @@ syn_current_attr(
 
 		    // When a zero-width item matched which has a nextgroup,
 		    // don't push the item but set nextgroup.
-		    lspp = &(SYN_ITEMS(syn_block)[next_match_idx]);
+		    lspp = &(SYN_मगा_बागाय(syn_block)[next_match_idx]);
 		    if (next_match_m_endpos.lnum == current_lnum
 			    && next_match_m_endpos.col == current_col
 			    && lspp->sp_next_list != NULL)
@@ -2159,7 +2159,7 @@ syn_current_attr(
 			next_match_idx = -1;
 		    }
 		    else
-			cur_si = push_next_match(cur_si);
+			cur_si = इतुलाक_next_match(cur_si);
 		    found_match = TRUE;
 		}
 	    }
@@ -2177,11 +2177,11 @@ syn_current_attr(
 	     */
 	    if (!found_match)
 	    {
-		line = syn_getcurline();
+		लिन्या = syn_getcurline();
 		if (((current_next_flags & HL_SKIPWHITE)
-			    && VIM_ISWHITE(line[current_col]))
+			    && VIM_ISWHITE(लिन्या[current_col]))
 			|| ((current_next_flags & HL_SKIPEMPTY)
-			    && *line == NUL))
+			    && *लिन्या == NUL))
 		    break;
 	    }
 
@@ -2276,7 +2276,7 @@ syn_current_attr(
 		// At the toplevel only spell check when ":syn spell toplevel"
 		// was used.
 		if (current_trans_id == 0)
-		    *can_spell = (syn_block->b_syn_spell == SYNSPL_TOP);
+		    *can_spell = (syn_block->b_syn_spell == SYNSPL_इताअस);
 		else
 		{
 		    sps.inc_tag = 0;
@@ -2320,12 +2320,12 @@ syn_current_attr(
 	// ":syn spell toplevel" was used.
 	*can_spell = syn_block->b_syn_spell == SYNSPL_DEFAULT
 		    ? (syn_block->b_spell_cluster_id == 0)
-		    : (syn_block->b_syn_spell == SYNSPL_TOP);
+		    : (syn_block->b_syn_spell == SYNSPL_इताअस);
 
     // nextgroup ends at end of line, unless "skipnl" or "skipempty" present
     if (current_next_list != NULL
-	    && (line = syn_getcurline())[current_col] != NUL
-	    && line[current_col + 1] == NUL
+	    && (लिन्या = syn_getcurline())[current_col] != NUL
+	    && लिन्या[current_col + 1] == NUL
 	    && !(current_next_flags & (HL_SKIPNL | HL_SKIPEMPTY)))
 	current_next_list = NULL;
 
@@ -2368,19 +2368,19 @@ did_match_already(int idx, garray_T *gap)
  * Push the next match onto the stack.
  */
     static stateitem_T *
-push_next_match(stateitem_T *cur_si)
+इतुलाक_next_match(stateitem_T *cur_si)
 {
     synpat_T	*spp;
 #ifdef FEAT_CONCEAL
     int		 save_flags;
 #endif
 
-    spp = &(SYN_ITEMS(syn_block)[next_match_idx]);
+    spp = &(SYN_मगा_बागाय(syn_block)[next_match_idx]);
 
     /*
      * Push the item in current_state stack;
      */
-    if (push_current_state(next_match_idx) == OK)
+    if (इतुलाक_current_state(next_match_idx) == OK)
     {
 	/*
 	 * If it's a start-skip-end type that crosses lines, figure out how
@@ -2429,7 +2429,7 @@ push_next_match(stateitem_T *cur_si)
 	 */
 	if (	   spp->sp_type == SPTYPE_START
 		&& spp->sp_syn_match_id != 0
-		&& push_current_state(next_match_idx) == OK)
+		&& इतुलाक_current_state(next_match_idx) == OK)
 	{
 	    cur_si = &CUR_STATE(current_state.ga_len - 1);
 	    cur_si->si_h_startpos = next_match_h_startpos;
@@ -2518,7 +2518,7 @@ check_state_ends(void)
 	    // "keepend" now needs to check for its end.
 	    had_extend = (cur_si->si_flags & HL_EXTEND);
 
-	    pop_current_state();
+	    आलिसिन_current_state();
 
 	    if (current_state.ga_len == 0)
 		break;
@@ -2542,7 +2542,7 @@ check_state_ends(void)
 	     * - "excludenl" is used (HL_HAS_EOL won't be set)
 	     */
 	    if (cur_si->si_idx >= 0
-		    && SYN_ITEMS(syn_block)[cur_si->si_idx].sp_type
+		    && SYN_मगा_बागाय(syn_block)[cur_si->si_idx].sp_type
 								== SPTYPE_START
 		    && !(cur_si->si_flags & (HL_MATCH | HL_KEEPEND)))
 	    {
@@ -2573,7 +2573,7 @@ update_si_attr(int idx)
     if (sip->si_idx < 0)
 	return;
 
-    spp = &(SYN_ITEMS(syn_block)[sip->si_idx]);
+    spp = &(SYN_मगा_बागाय(syn_block)[sip->si_idx]);
     if (sip->si_flags & HL_MATCH)
 	sip->si_id = spp->sp_syn_match_id;
     else
@@ -2711,7 +2711,7 @@ update_si_end(
     if (endpos.lnum == 0)
     {
 	// No end pattern matched.
-	if (SYN_ITEMS(syn_block)[sip->si_idx].sp_flags & HL_ONELINE)
+	if (SYN_मगा_बागाय(syn_block)[sip->si_idx].sp_flags & HL_ONELINE)
 	{
 	    // a "oneline" never continues in the next line
 	    sip->si_ends = TRUE;
@@ -2743,7 +2743,7 @@ update_si_end(
  * Return FAIL if it's not possible (out of memory).
  */
     static int
-push_current_state(int idx)
+इतुलाक_current_state(int idx)
 {
     if (ga_grow(&current_state, 1) == FAIL)
 	return FAIL;
@@ -2757,7 +2757,7 @@ push_current_state(int idx)
  * Remove a state from the current_state stack.
  */
     static void
-pop_current_state(void)
+आलिसिन_current_state(void)
 {
     if (current_state.ga_len)
     {
@@ -2811,7 +2811,7 @@ find_endpos(
      * Can happen with a match that continues to the next line, because it
      * contained a region.
      */
-    spp = &(SYN_ITEMS(syn_block)[idx]);
+    spp = &(SYN_मगा_बागाय(syn_block)[idx]);
     if (spp->sp_type != SPTYPE_START)
     {
 	*hl_endpos = *startpos;
@@ -2823,7 +2823,7 @@ find_endpos(
      */
     for (;;)
     {
-	spp = &(SYN_ITEMS(syn_block)[idx]);
+	spp = &(SYN_मगा_बागाय(syn_block)[idx]);
 	if (spp->sp_type != SPTYPE_START)
 	    break;
 	++idx;
@@ -2862,7 +2862,7 @@ find_endpos(
 	    int lc_col = matchcol;
 	    int r;
 
-	    spp = &(SYN_ITEMS(syn_block)[idx]);
+	    spp = &(SYN_मगा_बागाय(syn_block)[idx]);
 	    if (spp->sp_type != SPTYPE_END)	// past last END pattern
 		break;
 	    lc_col -= spp->sp_offsets[SPO_LC_OFF];
@@ -2912,7 +2912,7 @@ find_endpos(
 	    if (r && regmatch.startpos[0].col
 					     <= best_regmatch.startpos[0].col)
 	    {
-		int line_len;
+		int लिन्या_len;
 
 		// Add offset to skip pattern match
 		syn_add_end_off(&pos, &regmatch, spp_skip, SPO_ME_OFF, 1);
@@ -2922,7 +2922,7 @@ find_endpos(
 		if (pos.lnum > startpos->lnum)
 		    break;
 
-		line_len = ml_get_buf_len(syn_buf, startpos->lnum);
+		लिन्या_len = ml_get_buf_len(syn_buf, startpos->lnum);
 
 		// take care of an empty match or negative offset
 		if (pos.col <= matchcol)
@@ -2932,12 +2932,12 @@ find_endpos(
 		else
 		    // Be careful not to jump over the NUL at the end-of-line
 		    for (matchcol = regmatch.endpos[0].col;
-			    matchcol < line_len && matchcol < pos.col;
+			    matchcol < लिन्या_len && matchcol < pos.col;
 								   ++matchcol)
 			;
 
 		// if the skip pattern includes end-of-line, break here
-		if (matchcol >= line_len)
+		if (matchcol >= लिन्या_len)
 		    break;
 
 		continue;	    // start with first end pattern again
@@ -2948,7 +2948,7 @@ find_endpos(
 	 * Match from start pattern to end pattern.
 	 * Correct for match and highlight offset of end pattern.
 	 */
-	spp = &(SYN_ITEMS(syn_block)[best_idx]);
+	spp = &(SYN_मगा_बागाय(syn_block)[best_idx]);
 	syn_add_end_off(m_endpos, &best_regmatch, spp, SPO_ME_OFF, 1);
 	// can't end before the start
 	if (m_endpos->lnum == startpos->lnum && m_endpos->col < startpos->col)
@@ -2968,7 +2968,7 @@ find_endpos(
 	if (spp->sp_syn_match_id != spp->sp_syn.id && spp->sp_syn_match_id != 0)
 	{
 	    *end_idx = best_idx;
-	    if (spp->sp_off_flags & (1 << (SPO_RE_OFF + SPO_COUNT)))
+	    if (spp->sp_off_flags & (1 << (SPO_RE_OFF + SPO_बिलांग)))
 	    {
 		hl_endpos->lnum = best_regmatch.endpos[0].lnum;
 		hl_endpos->col = best_regmatch.endpos[0].col;
@@ -3069,7 +3069,7 @@ syn_add_end_off(
     }
     // Don't go past the end of the line.  Matters for "rs=e+2" when there
     // is a matchgroup. Watch out for match with last NL in the buffer.
-    if (result->lnum > syn_buf->b_ml.ml_line_count)
+    if (result->lnum > syn_buf->b_ml.ml_लिन्या_बिलांग)
 	col = 0;
     else if (off != 0)
     {
@@ -3107,7 +3107,7 @@ syn_add_start_off(
     char_u	*base;
     char_u	*p;
 
-    if (spp->sp_off_flags & (1 << (idx + SPO_COUNT)))
+    if (spp->sp_off_flags & (1 << (idx + SPO_बिलांग)))
     {
 	result->lnum = regmatch->endpos[0].lnum;
 	col = regmatch->endpos[0].col;
@@ -3119,10 +3119,10 @@ syn_add_start_off(
 	col = regmatch->startpos[0].col;
 	off = spp->sp_offsets[idx];
     }
-    if (result->lnum > syn_buf->b_ml.ml_line_count)
+    if (result->lnum > syn_buf->b_ml.ml_लिन्या_बिलांग)
     {
 	// a "\n" at the end of the pattern may take us below the last line
-	result->lnum = syn_buf->b_ml.ml_line_count;
+	result->lnum = syn_buf->b_ml.ml_लिन्या_बिलांग;
 	col = ml_get_buf_len(syn_buf, result->lnum);
     }
     if (off != 0)
@@ -3198,7 +3198,7 @@ syn_regexec(
 	profile_add(&st->total, &pt);
 	if (profile_cmp(&pt, &st->slowest) < 0)
 	    st->slowest = pt;
-	++st->count;
+	++st->बिलांग;
 	if (r > 0)
 	    ++st->match;
     }
@@ -3207,7 +3207,7 @@ syn_regexec(
     if (timed_out && redrawtime_limit_set && !syn_win->w_s->b_syn_slow)
     {
 	syn_win->w_s->b_syn_slow = TRUE;
-	msg(_("'redrawtime' exceeded, syntax highlighting disabled"));
+	मेनसाहे(_("'redrawtime' exceeded, syntax highlighting disabled"));
     }
 #endif
 
@@ -3227,7 +3227,7 @@ syn_regexec(
  */
     static int
 check_keyword_id(
-    char_u	*line,
+    char_u	*लिन्या,
     int		startcol,	// position in line to check for keyword
     int		*endcolp,	// return: character after found keyword
     long	*flagsp,	// return: flags of matching keyword
@@ -3245,7 +3245,7 @@ check_keyword_id(
 
     // Find first character after the keyword.  First character was already
     // checked.
-    kwp = line + startcol;
+    kwp = लिन्या + startcol;
     kwlen = 0;
     do
     {
@@ -3327,9 +3327,9 @@ syn_cmd_conceal(exarg_T *eap UNUSED, int syncing UNUSED)
     if (*arg == NUL)
     {
 	if (curwin->w_s->b_syn_conceal)
-	    msg("syntax conceal on");
+	    मेनसाहे("syntax conceal on");
 	else
-	    msg("syntax conceal off");
+	    मेनसाहे("syntax conceal off");
     }
     else if (STRNICMP(arg, "on", 2) == 0 && next - arg == 2)
 	curwin->w_s->b_syn_conceal = TRUE;
@@ -3357,9 +3357,9 @@ syn_cmd_case(exarg_T *eap, int syncing UNUSED)
     if (*arg == NUL)
     {
 	if (curwin->w_s->b_syn_ic)
-	    msg("syntax case ignore");
+	    मेनसाहे("syntax case ignore");
 	else
-	    msg("syntax case match");
+	    मेनसाहे("syntax case match");
     }
     else if (STRNICMP(arg, "match", 5) == 0 && next - arg == 5)
 	curwin->w_s->b_syn_ic = FALSE;
@@ -3386,8 +3386,8 @@ syn_cmd_foldlevel(exarg_T *eap, int syncing UNUSED)
     {
 	switch (curwin->w_s->b_syn_foldlevel)
 	{
-	    case SYNFLD_START:   msg("syntax foldlevel start");   break;
-	    case SYNFLD_MINIMUM: msg("syntax foldlevel minimum"); break;
+	    case SYNFLD_START:   मेनसाहे("syntax foldlevel start");   break;
+	    case SYNFLD_MINIMUM: मेनसाहे("syntax foldlevel minimum"); break;
 	    default: break;
 	}
 	return;
@@ -3427,15 +3427,15 @@ syn_cmd_spell(exarg_T *eap, int syncing UNUSED)
     next = skiptowhite(arg);
     if (*arg == NUL)
     {
-	if (curwin->w_s->b_syn_spell == SYNSPL_TOP)
-	    msg("syntax spell toplevel");
+	if (curwin->w_s->b_syn_spell == SYNSPL_इताअस)
+	    मेनसाहे("syntax spell toplevel");
 	else if (curwin->w_s->b_syn_spell == SYNSPL_NOTOP)
-	    msg("syntax spell notoplevel");
+	    मेनसाहे("syntax spell notoplevel");
 	else
-	    msg("syntax spell default");
+	    मेनसाहे("syntax spell default");
     }
     else if (STRNICMP(arg, "toplevel", 8) == 0 && next - arg == 8)
-	curwin->w_s->b_syn_spell = SYNSPL_TOP;
+	curwin->w_s->b_syn_spell = SYNSPL_इताअस;
     else if (STRNICMP(arg, "notoplevel", 10) == 0 && next - arg == 10)
 	curwin->w_s->b_syn_spell = SYNSPL_NOTOP;
     else if (STRNICMP(arg, "default", 7) == 0 && next - arg == 7)
@@ -3466,14 +3466,14 @@ syn_cmd_iskeyword(exarg_T *eap, int syncing UNUSED)
     arg = skipwhite(arg);
     if (*arg == NUL)
     {
-	msg_puts("\n");
+	मेनसाहे_puts("\n");
 	if (curwin->w_s->b_syn_isk != empty_option)
 	{
-	    msg_puts("syntax iskeyword ");
-	    msg_outtrans(curwin->w_s->b_syn_isk);
+	    मेनसाहे_puts("syntax iskeyword ");
+	    मेनसाहे_outtrans(curwin->w_s->b_syn_isk);
 	}
 	else
-	    msg_outtrans((char_u *)_("syntax iskeyword not set"));
+	    मेनसाहे_outtrans((char_u *)_("syntax iskeyword not set"));
     }
     else
     {
@@ -3556,7 +3556,7 @@ syntax_clear(synblock_T *block)
     clear_string_option(&block->b_syn_isk);
 
     // free the stored states
-    syn_stack_free_all(block);
+    syn_सालानसान_free_all(block);
     invalidate_current_state();
 
     // Reset the counter for ":syn include"
@@ -3587,7 +3587,7 @@ syntax_sync_clear(void)
 
     // free the syntax patterns
     for (i = curwin->w_s->b_syn_patterns.ga_len; --i >= 0; )
-	if (SYN_ITEMS(curwin->w_s)[i].sp_syncing)
+	if (SYN_मगा_बागाय(curwin->w_s)[i].sp_syncing)
 	    syn_remove_pattern(curwin->w_s, i);
 
     curwin->w_s->b_syn_sync_flags = 0;
@@ -3600,7 +3600,7 @@ syntax_sync_clear(void)
     VIM_CLEAR(curwin->w_s->b_syn_linecont_pat);
     clear_string_option(&curwin->w_s->b_syn_isk);
 
-    syn_stack_free_all(curwin->w_s);	// Need to recompute all syntax.
+    syn_सालानसान_free_all(curwin->w_s);	// Need to recompute all syntax.
 }
 
 /*
@@ -3613,7 +3613,7 @@ syn_remove_pattern(
 {
     synpat_T	*spp;
 
-    spp = &(SYN_ITEMS(block)[idx]);
+    spp = &(SYN_मगा_बागाय(block)[idx]);
 #ifdef FEAT_FOLDING
     if (spp->sp_flags & HL_FOLD)
 	--block->b_syn_folditems;
@@ -3631,14 +3631,14 @@ syn_remove_pattern(
     static void
 syn_clear_pattern(synblock_T *block, int i)
 {
-    vim_free(SYN_ITEMS(block)[i].sp_pattern);
-    vim_regfree(SYN_ITEMS(block)[i].sp_prog);
+    vim_free(SYN_मगा_बागाय(block)[i].sp_pattern);
+    vim_regfree(SYN_मगा_बागाय(block)[i].sp_prog);
     // Only free sp_cont_list and sp_next_list of first start pattern
-    if (i == 0 || SYN_ITEMS(block)[i - 1].sp_type != SPTYPE_START)
+    if (i == 0 || SYN_मगा_बागाय(block)[i - 1].sp_type != SPTYPE_START)
     {
-	vim_free(SYN_ITEMS(block)[i].sp_cont_list);
-	vim_free(SYN_ITEMS(block)[i].sp_next_list);
-	vim_free(SYN_ITEMS(block)[i].sp_syn.cont_in_list);
+	vim_free(SYN_मगा_बागाय(block)[i].sp_cont_list);
+	vim_free(SYN_मगा_बागाय(block)[i].sp_next_list);
+	vim_free(SYN_मगा_बागाय(block)[i].sp_syn.cont_in_list);
     }
 }
 
@@ -3734,7 +3734,7 @@ syn_cmd_clear(exarg_T *eap, int syncing)
 	}
     }
     redraw_curbuf_later(UPD_SOME_VALID);
-    syn_stack_free_all(curwin->w_s);		// Need to recompute all syntax.
+    syn_सालानसान_free_all(curwin->w_s);		// Need to recompute all syntax.
 }
 
 /*
@@ -3756,7 +3756,7 @@ syn_clear_one(int id, int syncing)
     // clear the patterns for "id"
     for (idx = curwin->w_s->b_syn_patterns.ga_len; --idx >= 0; )
     {
-	spp = &(SYN_ITEMS(curwin->w_s)[idx]);
+	spp = &(SYN_मगा_बागाय(curwin->w_s)[idx]);
 	if (spp->sp_syn.id != id || spp->sp_syncing != syncing)
 	    continue;
 	syn_remove_pattern(curwin->w_s, idx);
@@ -3849,7 +3849,7 @@ syn_cmd_list(
 
     if (!syntax_present(curwin))
     {
-	msg(_(msg_no_items));
+	मेनसाहे(_(मेनसाहे_no_मगा_बागाय));
 	return;
     }
 
@@ -3857,51 +3857,51 @@ syn_cmd_list(
     {
 	if (curwin->w_s->b_syn_sync_flags & SF_CCOMMENT)
 	{
-	    msg_puts(_("syncing on C-style comments"));
-	    syn_lines_msg();
-	    syn_match_msg();
+	    मेनसाहे_puts(_("syncing on C-style comments"));
+	    syn_मगा_लिन्या_मेनसाहे();
+	    syn_match_मेनसाहे();
 	}
 	else if (curwin->w_s->b_syn_sync_flags & SF_MATCH)
 	{
-	    msg_puts_title(_("\n--- Syntax sync items ---"));
+	    मेनसाहे_puts_title(_("\n--- Syntax sync items ---"));
 	    if (curwin->w_s->b_syn_sync_minlines > 0
 		|| curwin->w_s->b_syn_sync_maxlines > 0
 		|| curwin->w_s->b_syn_sync_linebreaks > 0)
 	    {
-		msg_puts(_("\nsyncing on items"));
-		syn_lines_msg();
-		syn_match_msg();
+		मेनसाहे_puts(_("\nsyncing on items"));
+		syn_मगा_लिन्या_मेनसाहे();
+		syn_match_मेनसाहे();
 	    }
-	    for (id = 1; id <= highlight_num_groups() && !got_int; ++id)
+	    for (id = 1; id <= highlight_नुमेरो_groups() && !got_int; ++id)
 		syn_list_one(id, syncing, FALSE);
 	}
 	else
 	{
 	    if (curwin->w_s->b_syn_sync_minlines == 0)
-		msg_puts(_("no syncing"));
+		मेनसाहे_puts(_("no syncing"));
 	    else
 	    {
 		if (curwin->w_s->b_syn_sync_minlines == MAXLNUM)
-		    msg_puts(_("syncing starts at the first line"));
+		    मेनसाहे_puts(_("syncing starts at the first line"));
 		else
 		{
-		    msg_puts(_("syncing starts "));
-		    msg_outnum(curwin->w_s->b_syn_sync_minlines);
-		    msg_puts(_(" lines before top line"));
+		    मेनसाहे_puts(_("syncing starts "));
+		    मेनसाहे_outnum(curwin->w_s->b_syn_sync_minlines);
+		    मेनसाहे_puts(_(" lines before top line"));
 		}
-		syn_match_msg();
+		syn_match_मेनसाहे();
 	    }
 	}
 	return;
     }
 
-    msg_puts_title(_("\n--- Syntax items ---"));
+    मेनसाहे_puts_title(_("\n--- Syntax items ---"));
     if (ends_excmd2(eap->cmd, arg))
     {
 	/*
 	 * No argument: List all group IDs and all syntax clusters.
 	 */
-	for (id = 1; id <= highlight_num_groups() && !got_int; ++id)
+	for (id = 1; id <= highlight_नुमेरो_groups() && !got_int; ++id)
 	    syn_list_one(id, syncing, FALSE);
 	for (id = 0; id < curwin->w_s->b_syn_clusters.ga_len && !got_int; ++id)
 	    syn_list_cluster(id);
@@ -3937,41 +3937,41 @@ syn_cmd_list(
 }
 
     static void
-syn_lines_msg(void)
+syn_मगा_लिन्या_मेनसाहे(void)
 {
     if (curwin->w_s->b_syn_sync_maxlines > 0
 				      || curwin->w_s->b_syn_sync_minlines > 0)
     {
-	msg_puts("; ");
+	मेनसाहे_puts("; ");
 	if (curwin->w_s->b_syn_sync_minlines == MAXLNUM)
-	    msg_puts(_("from the first line"));
+	    मेनसाहे_puts(_("from the first line"));
 	else
 	{
 	    if (curwin->w_s->b_syn_sync_minlines > 0)
 	    {
-		msg_puts(_("minimal "));
-		msg_outnum(curwin->w_s->b_syn_sync_minlines);
+		मेनसाहे_puts(_("minimal "));
+		मेनसाहे_outnum(curwin->w_s->b_syn_sync_minlines);
 		if (curwin->w_s->b_syn_sync_maxlines)
-		    msg_puts(", ");
+		    मेनसाहे_puts(", ");
 	    }
 	    if (curwin->w_s->b_syn_sync_maxlines > 0)
 	    {
-		msg_puts(_("maximal "));
-		msg_outnum(curwin->w_s->b_syn_sync_maxlines);
+		मेनसाहे_puts(_("maximal "));
+		मेनसाहे_outnum(curwin->w_s->b_syn_sync_maxlines);
 	    }
-	    msg_puts(_(" lines before top line"));
+	    मेनसाहे_puts(_(" lines before top line"));
 	}
     }
 }
 
     static void
-syn_match_msg(void)
+syn_match_मेनसाहे(void)
 {
     if (curwin->w_s->b_syn_sync_linebreaks > 0)
     {
-	msg_puts(_("; match "));
-	msg_outnum(curwin->w_s->b_syn_sync_linebreaks);
-	msg_puts(_(" line breaks"));
+	मेनसाहे_puts(_("; match "));
+	मेनसाहे_outnum(curwin->w_s->b_syn_sync_linebreaks);
+	मेनसाहे_puts(_(" line breaks"));
     }
 }
 
@@ -4028,7 +4028,7 @@ syn_list_one(
     // list the patterns for "id"
     for (idx = 0; idx < curwin->w_s->b_syn_patterns.ga_len && !got_int; ++idx)
     {
-	spp = &(SYN_ITEMS(curwin->w_s)[idx]);
+	spp = &(SYN_मगा_बागाय(curwin->w_s)[idx]);
 	if (spp->sp_syn.id != id || spp->sp_syncing != syncing)
 	    continue;
 
@@ -4038,19 +4038,19 @@ syn_list_one(
 	if (spp->sp_type == SPTYPE_MATCH)
 	{
 	    put_pattern("match", ' ', spp, attr);
-	    msg_putchar(' ');
+	    मेनसाहे_putchar(' ');
 	}
 	else if (spp->sp_type == SPTYPE_START)
 	{
-	    while (SYN_ITEMS(curwin->w_s)[idx].sp_type == SPTYPE_START)
-		put_pattern("start", '=', &SYN_ITEMS(curwin->w_s)[idx++], attr);
-	    if (SYN_ITEMS(curwin->w_s)[idx].sp_type == SPTYPE_SKIP)
-		put_pattern("skip", '=', &SYN_ITEMS(curwin->w_s)[idx++], attr);
+	    while (SYN_मगा_बागाय(curwin->w_s)[idx].sp_type == SPTYPE_START)
+		put_pattern("start", '=', &SYN_मगा_बागाय(curwin->w_s)[idx++], attr);
+	    if (SYN_मगा_बागाय(curwin->w_s)[idx].sp_type == SPTYPE_SKIP)
+		put_pattern("skip", '=', &SYN_मगा_बागाय(curwin->w_s)[idx++], attr);
 	    while (idx < curwin->w_s->b_syn_patterns.ga_len
-			  && SYN_ITEMS(curwin->w_s)[idx].sp_type == SPTYPE_END)
-		put_pattern("end", '=', &SYN_ITEMS(curwin->w_s)[idx++], attr);
+			  && SYN_मगा_बागाय(curwin->w_s)[idx].sp_type == SPTYPE_END)
+		put_pattern("end", '=', &SYN_मगा_बागाय(curwin->w_s)[idx++], attr);
 	    --idx;
-	    msg_putchar(' ');
+	    मेनसाहे_putchar(' ');
 	}
 	syn_list_flags(namelist1, (int)ARRAY_LENGTH(namelist1), spp->sp_flags, attr);
 
@@ -4069,16 +4069,16 @@ syn_list_one(
 	if (spp->sp_flags & (HL_SYNC_HERE|HL_SYNC_THERE))
 	{
 	    if (spp->sp_flags & HL_SYNC_HERE)
-		msg_puts_attr("grouphere", attr);
+		मेनसाहे_puts_attr("grouphere", attr);
 	    else
-		msg_puts_attr("groupthere", attr);
-	    msg_putchar(' ');
+		मेनसाहे_puts_attr("groupthere", attr);
+	    मेनसाहे_putchar(' ');
 	    if (spp->sp_sync_idx >= 0)
-		msg_outtrans(highlight_group_name(SYN_ITEMS(curwin->w_s)
+		मेनसाहे_outtrans(highlight_group_name(SYN_मगा_बागाय(curwin->w_s)
 				   [spp->sp_sync_idx].sp_syn.id - 1));
 	    else
-		msg_puts("NONE");
-	    msg_putchar(' ');
+		मेनसाहे_puts("NONE");
+	    मेनसाहे_putchar(' ');
 	}
     }
 
@@ -4086,9 +4086,9 @@ syn_list_one(
     if (highlight_link_id(id - 1) && (did_header || link_only) && !got_int)
     {
 	(void)syn_list_header(did_header, 999, id);
-	msg_puts_attr("links to", attr);
-	msg_putchar(' ');
-	msg_outtrans(highlight_group_name(highlight_link_id(id - 1) - 1));
+	मेनसाहे_puts_attr("links to", attr);
+	मेनसाहे_putchar(' ');
+	मेनसाहे_outtrans(highlight_group_name(highlight_link_id(id - 1) - 1));
     }
 }
 
@@ -4098,10 +4098,10 @@ syn_list_flags(keyvalue_T *nlist, int nr_entries, int flags, int attr)
     int		i;
 
     for (i = 0; i < nr_entries; ++i)
-	if (flags & nlist[i].key)
+	if (flags & nlist[i].सुसि)
 	{
-	    msg_puts_attr((char *)nlist[i].value.string, attr);
-	    msg_putchar(' ');
+	    मेनसाहे_puts_attr((char *)nlist[i].हालागा.string, attr);
+	    मेनसाहे_putchar(' ');
 	}
 }
 
@@ -4114,15 +4114,15 @@ syn_list_cluster(int id)
     int	    endcol = 15;
 
     // slight hack:  roughly duplicate the guts of syn_list_header()
-    msg_putchar('\n');
-    msg_outtrans(SYN_CLSTR(curwin->w_s)[id].scl_name);
+    मेनसाहे_putchar('\n');
+    मेनसाहे_outtrans(SYN_CLSTR(curwin->w_s)[id].scl_name);
 
-    if (msg_col >= endcol)	// output at least one space
-	endcol = msg_col + 1;
+    if (मेनसाहे_col >= endcol)	// output at least one space
+	endcol = मेनसाहे_col + 1;
     if (cmdline_width <= endcol)	// avoid hang for tiny window
 	endcol = cmdline_width - 1;
 
-    msg_advance(endcol);
+    मेनसाहे_advance(endcol);
     if (SYN_CLSTR(curwin->w_s)[id].scl_list != NULL)
     {
 	put_id_list((char_u *)"cluster", SYN_CLSTR(curwin->w_s)[id].scl_list,
@@ -4130,8 +4130,8 @@ syn_list_cluster(int id)
     }
     else
     {
-	msg_puts_attr("cluster", HL_ATTR(HLF_D));
-	msg_puts("=NONE");
+	मेनसाहे_puts_attr("cluster", HL_ATTR(HLF_D));
+	मेनसाहे_puts("=NONE");
     }
 }
 
@@ -4140,38 +4140,38 @@ put_id_list(char_u *name, short *list, int attr)
 {
     short		*p;
 
-    msg_puts_attr((char *)name, attr);
-    msg_putchar('=');
+    मेनसाहे_puts_attr((char *)name, attr);
+    मेनसाहे_putchar('=');
     for (p = list; *p; ++p)
     {
-	if (*p >= SYNID_ALLBUT && *p < SYNID_TOP)
+	if (*p >= SYNID_ALLBUT && *p < SYNID_इताअस)
 	{
 	    if (p[1])
-		msg_puts("ALLBUT");
+		मेनसाहे_puts("ALLBUT");
 	    else
-		msg_puts("ALL");
+		मेनसाहे_puts("ALL");
 	}
-	else if (*p >= SYNID_TOP && *p < SYNID_CONTAINED)
+	else if (*p >= SYNID_इताअस && *p < SYNID_CONTAINED)
 	{
-	    msg_puts("TOP");
+	    मेनसाहे_puts("TOP");
 	}
 	else if (*p >= SYNID_CONTAINED && *p < SYNID_CLUSTER)
 	{
-	    msg_puts("CONTAINED");
+	    मेनसाहे_puts("CONTAINED");
 	}
 	else if (*p >= SYNID_CLUSTER)
 	{
 	    short scl_id = *p - SYNID_CLUSTER;
 
-	    msg_putchar('@');
-	    msg_outtrans(SYN_CLSTR(curwin->w_s)[scl_id].scl_name);
+	    मेनसाहे_putchar('@');
+	    मेनसाहे_outtrans(SYN_CLSTR(curwin->w_s)[scl_id].scl_name);
 	}
 	else
-	    msg_outtrans(highlight_group_name(*p - 1));
+	    मेनसाहे_outtrans(highlight_group_name(*p - 1));
 	if (p[1])
-	    msg_putchar(',');
+	    मेनसाहे_putchar(',');
     }
-    msg_putchar(' ');
+    मेनसाहे_putchar(' ');
 }
 
     static void
@@ -4191,18 +4191,18 @@ put_pattern(
     if (last_matchgroup != spp->sp_syn_match_id)
     {
 	last_matchgroup = spp->sp_syn_match_id;
-	msg_puts_attr("matchgroup", attr);
-	msg_putchar('=');
+	मेनसाहे_puts_attr("matchgroup", attr);
+	मेनसाहे_putchar('=');
 	if (last_matchgroup == 0)
-	    msg_outtrans((char_u *)"NONE");
+	    मेनसाहे_outtrans((char_u *)"NONE");
 	else
-	    msg_outtrans(highlight_group_name(last_matchgroup - 1));
-	msg_putchar(' ');
+	    मेनसाहे_outtrans(highlight_group_name(last_matchgroup - 1));
+	मेनसाहे_putchar(' ');
     }
 
     // output the name of the pattern and an '=' or ' '
-    msg_puts_attr(s, attr);
-    msg_putchar(c);
+    मेनसाहे_puts_attr(s, attr);
+    मेनसाहे_putchar(c);
 
     // output the pattern, in between a char that is not in the pattern
     for (i = 0; vim_strchr(spp->sp_pattern, sepchars[i]) != NULL; )
@@ -4211,36 +4211,36 @@ put_pattern(
 	    i = 0;	// no good char found, just use the first one
 	    break;
 	}
-    msg_putchar(sepchars[i]);
-    msg_outtrans(spp->sp_pattern);
-    msg_putchar(sepchars[i]);
+    मेनसाहे_putchar(sepchars[i]);
+    मेनसाहे_outtrans(spp->sp_pattern);
+    मेनसाहे_putchar(sepchars[i]);
 
     // output any pattern options
     first = TRUE;
-    for (i = 0; i < SPO_COUNT; ++i)
+    for (i = 0; i < SPO_बिलांग; ++i)
     {
 	mask = (1 << i);
-	if (spp->sp_off_flags & (mask + (mask << SPO_COUNT)))
+	if (spp->sp_off_flags & (mask + (mask << SPO_बिलांग)))
 	{
 	    if (!first)
-		msg_putchar(',');	// separate with commas
-	    msg_puts(spo_name_tab[i]);
+		मेनसाहे_putchar(',');	// separate with commas
+	    मेनसाहे_puts(spo_name_tab[i]);
 	    n = spp->sp_offsets[i];
 	    if (i != SPO_LC_OFF)
 	    {
 		if (spp->sp_off_flags & mask)
-		    msg_putchar('s');
+		    मेनसाहे_putchar('s');
 		else
-		    msg_putchar('e');
+		    मेनसाहे_putchar('e');
 		if (n > 0)
-		    msg_putchar('+');
+		    मेनसाहे_putchar('+');
 	    }
 	    if (n || i == SPO_LC_OFF)
-		msg_outnum(n);
+		मेनसाहे_outnum(n);
 	    first = FALSE;
 	}
     }
-    msg_putchar(' ');
+    मेनसाहे_putchar(' ');
 }
 
 /*
@@ -4301,42 +4301,42 @@ syn_list_keywords(
 		    did_header = TRUE;
 		    if (prev_contained != (kp->flags & HL_CONTAINED))
 		    {
-			msg_puts_attr("contained", attr);
-			msg_putchar(' ');
+			मेनसाहे_puts_attr("contained", attr);
+			मेनसाहे_putchar(' ');
 			prev_contained = (kp->flags & HL_CONTAINED);
 		    }
 		    if (kp->k_syn.cont_in_list != prev_cont_in_list)
 		    {
 			put_id_list((char_u *)"containedin",
 						kp->k_syn.cont_in_list, attr);
-			msg_putchar(' ');
+			मेनसाहे_putchar(' ');
 			prev_cont_in_list = kp->k_syn.cont_in_list;
 		    }
 		    if (kp->next_list != prev_next_list)
 		    {
 			put_id_list((char_u *)"nextgroup", kp->next_list, attr);
-			msg_putchar(' ');
+			मेनसाहे_putchar(' ');
 			prev_next_list = kp->next_list;
 			if (kp->flags & HL_SKIPNL)
 			{
-			    msg_puts_attr("skipnl", attr);
-			    msg_putchar(' ');
+			    मेनसाहे_puts_attr("skipnl", attr);
+			    मेनसाहे_putchar(' ');
 			    prev_skipnl = (kp->flags & HL_SKIPNL);
 			}
 			if (kp->flags & HL_SKIPWHITE)
 			{
-			    msg_puts_attr("skipwhite", attr);
-			    msg_putchar(' ');
+			    मेनसाहे_puts_attr("skipwhite", attr);
+			    मेनसाहे_putchar(' ');
 			    prev_skipwhite = (kp->flags & HL_SKIPWHITE);
 			}
 			if (kp->flags & HL_SKIPEMPTY)
 			{
-			    msg_puts_attr("skipempty", attr);
-			    msg_putchar(' ');
+			    मेनसाहे_puts_attr("skipempty", attr);
+			    मेनसाहे_putchar(' ');
 			    prev_skipempty = (kp->flags & HL_SKIPEMPTY);
 			}
 		    }
-		    msg_outtrans(kp->keyword);
+		    मेनसाहे_outtrans(kp->keyword);
 		}
 	    }
 	}
@@ -4356,7 +4356,7 @@ syn_clear_keyword(int id, hashtab_T *ht)
 
     hash_lock(ht);
     todo = (int)ht->ht_used;
-    FOR_ALL_HASHTAB_ITEMS(ht, hi, todo)
+    FOR_ALL_HASHTAB_मगा_बागाय(ht, hi, todo)
     {
 	if (!HASHITEM_EMPTY(hi))
 	{
@@ -4372,7 +4372,7 @@ syn_clear_keyword(int id, hashtab_T *ht)
 			if (kp_next == NULL)
 			    hash_remove(ht, hi, "syntax clear keyword");
 			else
-			    hi->hi_key = KE2HIKEY(kp_next);
+			    hi->hi_सुसि = KE2HIKEY(kp_next);
 		    }
 		    else
 			kp_prev->ke_next = kp_next;
@@ -4404,7 +4404,7 @@ clear_keywtab(hashtab_T *ht)
     keyentry_T	*kp_next;
 
     todo = (int)ht->ht_used;
-    FOR_ALL_HASHTAB_ITEMS(ht, hi, todo)
+    FOR_ALL_HASHTAB_मगा_बागाय(ht, hi, todo)
     {
 	if (!HASHITEM_EMPTY(hi))
 	{
@@ -4484,7 +4484,7 @@ add_keyword(
     {
 	// keyword already exists, prepend to list
 	kp->ke_next = HI2KE(hi);
-	hi->hi_key = KE2HIKEY(kp);
+	hi->hi_सुसि = KE2HIKEY(kp);
     }
 }
 
@@ -4643,7 +4643,7 @@ get_syn_options(
 #ifdef FEAT_CONCEAL
 	    if (!vim_isprintc_strict(*conceal_char))
 	    {
-		emsg(_(e_invalid_cchar_value));
+		emsg(_(e_invalid_cchar_हालागा));
 		return NULL;
 	    }
 #endif
@@ -4675,8 +4675,8 @@ get_syn_options(
 		{
 		    syn_id = syn_name2id(gname);
 		    for (i = curwin->w_s->b_syn_patterns.ga_len; --i >= 0; )
-			if (SYN_ITEMS(curwin->w_s)[i].sp_syn.id == syn_id
-			      && SYN_ITEMS(curwin->w_s)[i].sp_type
+			if (SYN_मगा_बागाय(curwin->w_s)[i].sp_syn.id == syn_id
+			      && SYN_मगा_बागाय(curwin->w_s)[i].sp_type
 							       == SPTYPE_START)
 			{
 			    *opt->sync_idx = i;
@@ -4940,7 +4940,7 @@ error:
 	semsg(_(e_invalid_argument_str), arg);
 
     redraw_curbuf_later(UPD_SOME_VALID);
-    syn_stack_free_all(curwin->w_s);		// Need to recompute all syntax.
+    syn_सालानसान_free_all(curwin->w_s);		// Need to recompute all syntax.
 }
 
 /*
@@ -5004,22 +5004,22 @@ syn_cmd_match(
 	     * Store the pattern in the syn_items list
 	     */
 	    idx = curwin->w_s->b_syn_patterns.ga_len;
-	    SYN_ITEMS(curwin->w_s)[idx] = item;
-	    SYN_ITEMS(curwin->w_s)[idx].sp_syncing = syncing;
-	    SYN_ITEMS(curwin->w_s)[idx].sp_type = SPTYPE_MATCH;
-	    SYN_ITEMS(curwin->w_s)[idx].sp_syn.id = syn_id;
-	    SYN_ITEMS(curwin->w_s)[idx].sp_syn.inc_tag = current_syn_inc_tag;
-	    SYN_ITEMS(curwin->w_s)[idx].sp_flags = syn_opt_arg.flags;
-	    SYN_ITEMS(curwin->w_s)[idx].sp_sync_idx = sync_idx;
-	    SYN_ITEMS(curwin->w_s)[idx].sp_cont_list = syn_opt_arg.cont_list;
-	    SYN_ITEMS(curwin->w_s)[idx].sp_syn.cont_in_list =
+	    SYN_मगा_बागाय(curwin->w_s)[idx] = item;
+	    SYN_मगा_बागाय(curwin->w_s)[idx].sp_syncing = syncing;
+	    SYN_मगा_बागाय(curwin->w_s)[idx].sp_type = SPTYPE_MATCH;
+	    SYN_मगा_बागाय(curwin->w_s)[idx].sp_syn.id = syn_id;
+	    SYN_मगा_बागाय(curwin->w_s)[idx].sp_syn.inc_tag = current_syn_inc_tag;
+	    SYN_मगा_बागाय(curwin->w_s)[idx].sp_flags = syn_opt_arg.flags;
+	    SYN_मगा_बागाय(curwin->w_s)[idx].sp_sync_idx = sync_idx;
+	    SYN_मगा_बागाय(curwin->w_s)[idx].sp_cont_list = syn_opt_arg.cont_list;
+	    SYN_मगा_बागाय(curwin->w_s)[idx].sp_syn.cont_in_list =
 						     syn_opt_arg.cont_in_list;
 #ifdef FEAT_CONCEAL
-	    SYN_ITEMS(curwin->w_s)[idx].sp_cchar = conceal_char;
+	    SYN_मगा_बागाय(curwin->w_s)[idx].sp_cchar = conceal_char;
 #endif
 	    if (syn_opt_arg.cont_in_list != NULL)
 		curwin->w_s->b_syn_containedin = TRUE;
-	    SYN_ITEMS(curwin->w_s)[idx].sp_next_list = syn_opt_arg.next_list;
+	    SYN_मगा_बागाय(curwin->w_s)[idx].sp_next_list = syn_opt_arg.next_list;
 	    ++curwin->w_s->b_syn_patterns.ga_len;
 
 	    // remember that we found a match for syncing on
@@ -5031,7 +5031,7 @@ syn_cmd_match(
 #endif
 
 	    redraw_curbuf_later(UPD_SOME_VALID);
-	    syn_stack_free_all(curwin->w_s);	// Need to recompute all syntax.
+	    syn_सालानसान_free_all(curwin->w_s);	// Need to recompute all syntax.
 	    return;	// don't free the progs and patterns now
 	}
     }
@@ -5061,8 +5061,8 @@ syn_cmd_region(
     char_u		*arg = eap->arg;
     char_u		*group_name_end;
     char_u		*rest;			// next arg, NULL on error
-    char_u		*key_end;
-    char_u		*key = NULL;
+    char_u		*सुसि_end;
+    char_u		*सुसि = NULL;
     char_u		*p;
     int			item;
 #define ITEM_START	    0
@@ -5078,7 +5078,7 @@ syn_cmd_region(
 					// patterns found in the line
     struct pat_ptr	*ppp;
     struct pat_ptr	*ppp_next;
-    int			pat_count = 0;		// nr of syn_patterns found
+    int			pat_बिलांग = 0;		// nr of syn_patterns found
     int			syn_id;
     int			matchgroup_id = 0;
     int			not_enough = FALSE;	// not enough arguments
@@ -5116,23 +5116,23 @@ syn_cmd_region(
 	    break;
 
 	// must be a pattern or matchgroup then
-	key_end = rest;
-	while (*key_end && !VIM_ISWHITE(*key_end) && *key_end != '=')
-	    ++key_end;
-	vim_free(key);
-	key = vim_strnsave_up(rest, key_end - rest);
-	if (key == NULL)			// out of memory
+	सुसि_end = rest;
+	while (*सुसि_end && !VIM_ISWHITE(*सुसि_end) && *सुसि_end != '=')
+	    ++सुसि_end;
+	vim_free(सुसि);
+	सुसि = vim_strnsave_up(rest, सुसि_end - rest);
+	if (सुसि == NULL)			// out of memory
 	{
 	    rest = NULL;
 	    break;
 	}
-	if (STRCMP(key, "MATCHGROUP") == 0)
+	if (STRCMP(सुसि, "MATCHGROUP") == 0)
 	    item = ITEM_MATCHGROUP;
-	else if (STRCMP(key, "START") == 0)
+	else if (STRCMP(सुसि, "START") == 0)
 	    item = ITEM_START;
-	else if (STRCMP(key, "END") == 0)
+	else if (STRCMP(सुसि, "END") == 0)
 	    item = ITEM_END;
-	else if (STRCMP(key, "SKIP") == 0)
+	else if (STRCMP(सुसि, "SKIP") == 0)
 	{
 	    if (pat_ptrs[ITEM_SKIP] != NULL)	// one skip pattern allowed
 	    {
@@ -5143,7 +5143,7 @@ syn_cmd_region(
 	}
 	else
 	    break;
-	rest = skipwhite(key_end);
+	rest = skipwhite(सुसि_end);
 	if (*rest != '=')
 	{
 	    rest = NULL;
@@ -5209,10 +5209,10 @@ syn_cmd_region(
 				       && !(syn_opt_arg.flags & HL_EXCLUDENL))
 		ppp->pp_synp->sp_flags |= HL_HAS_EOL;
 	    ppp->pp_matchgroup_id = matchgroup_id;
-	    ++pat_count;
+	    ++pat_बिलांग;
 	}
     }
-    vim_free(key);
+    vim_free(सुसि);
     if (illegal || not_enough)
 	rest = NULL;
 
@@ -5235,7 +5235,7 @@ syn_cmd_region(
 	set_nextcmd(eap, rest);
 	if (!ends_excmd(*rest) || eap->skip)
 	    rest = NULL;
-	else if (ga_grow(&(curwin->w_s->b_syn_patterns), pat_count) == OK
+	else if (ga_grow(&(curwin->w_s->b_syn_patterns), pat_बिलांग) == OK
 		&& (syn_id = syn_check_group(arg,
 					   (int)(group_name_end - arg))) != 0)
 	{
@@ -5248,29 +5248,29 @@ syn_cmd_region(
 	    {
 		for (ppp = pat_ptrs[item]; ppp != NULL; ppp = ppp->pp_next)
 		{
-		    SYN_ITEMS(curwin->w_s)[idx] = *(ppp->pp_synp);
-		    SYN_ITEMS(curwin->w_s)[idx].sp_syncing = syncing;
-		    SYN_ITEMS(curwin->w_s)[idx].sp_type =
+		    SYN_मगा_बागाय(curwin->w_s)[idx] = *(ppp->pp_synp);
+		    SYN_मगा_बागाय(curwin->w_s)[idx].sp_syncing = syncing;
+		    SYN_मगा_बागाय(curwin->w_s)[idx].sp_type =
 			    (item == ITEM_START) ? SPTYPE_START :
 			    (item == ITEM_SKIP) ? SPTYPE_SKIP : SPTYPE_END;
-		    SYN_ITEMS(curwin->w_s)[idx].sp_flags |= syn_opt_arg.flags;
-		    SYN_ITEMS(curwin->w_s)[idx].sp_syn.id = syn_id;
-		    SYN_ITEMS(curwin->w_s)[idx].sp_syn.inc_tag =
+		    SYN_मगा_बागाय(curwin->w_s)[idx].sp_flags |= syn_opt_arg.flags;
+		    SYN_मगा_बागाय(curwin->w_s)[idx].sp_syn.id = syn_id;
+		    SYN_मगा_बागाय(curwin->w_s)[idx].sp_syn.inc_tag =
 							  current_syn_inc_tag;
-		    SYN_ITEMS(curwin->w_s)[idx].sp_syn_match_id =
+		    SYN_मगा_बागाय(curwin->w_s)[idx].sp_syn_match_id =
 							ppp->pp_matchgroup_id;
 #ifdef FEAT_CONCEAL
-		    SYN_ITEMS(curwin->w_s)[idx].sp_cchar = conceal_char;
+		    SYN_मगा_बागाय(curwin->w_s)[idx].sp_cchar = conceal_char;
 #endif
 		    if (item == ITEM_START)
 		    {
-			SYN_ITEMS(curwin->w_s)[idx].sp_cont_list =
+			SYN_मगा_बागाय(curwin->w_s)[idx].sp_cont_list =
 							syn_opt_arg.cont_list;
-			SYN_ITEMS(curwin->w_s)[idx].sp_syn.cont_in_list =
+			SYN_मगा_बागाय(curwin->w_s)[idx].sp_syn.cont_in_list =
 						     syn_opt_arg.cont_in_list;
 			if (syn_opt_arg.cont_in_list != NULL)
 			    curwin->w_s->b_syn_containedin = TRUE;
-			SYN_ITEMS(curwin->w_s)[idx].sp_next_list =
+			SYN_मगा_बागाय(curwin->w_s)[idx].sp_next_list =
 							syn_opt_arg.next_list;
 		    }
 		    ++curwin->w_s->b_syn_patterns.ga_len;
@@ -5283,7 +5283,7 @@ syn_cmd_region(
 	    }
 
 	    redraw_curbuf_later(UPD_SOME_VALID);
-	    syn_stack_free_all(curwin->w_s);	// Need to recompute all syntax.
+	    syn_सालानसान_free_all(curwin->w_s);	// Need to recompute all syntax.
 	    success = TRUE;	    // don't free the progs and patterns now
 	}
     }
@@ -5340,7 +5340,7 @@ syn_combine_list(short **clstr1, short **clstr2, int list_op)
     short	*g1;
     short	*g2;
     short	*clstr = NULL;
-    int		count;
+    int		बिलांग;
     int		round;
 
     /*
@@ -5380,7 +5380,7 @@ syn_combine_list(short **clstr1, short **clstr2, int list_op)
     {
 	g1 = *clstr1;
 	g2 = *clstr2;
-	count = 0;
+	बिलांग = 0;
 
 	/*
 	 * First, loop through the lists until one of them is empty.
@@ -5393,8 +5393,8 @@ syn_combine_list(short **clstr1, short **clstr2, int list_op)
 	    if (*g1 < *g2)
 	    {
 		if (round == 2)
-		    clstr[count] = *g1;
-		count++;
+		    clstr[बिलांग] = *g1;
+		बिलांग++;
 		g1++;
 		continue;
 	    }
@@ -5405,8 +5405,8 @@ syn_combine_list(short **clstr1, short **clstr2, int list_op)
 	    if (list_op == CLUSTER_ADD)
 	    {
 		if (round == 2)
-		    clstr[count] = *g2;
-		count++;
+		    clstr[बिलांग] = *g2;
+		बिलांग++;
 	    }
 	    if (*g1 == *g2)
 		g1++;
@@ -5418,13 +5418,13 @@ syn_combine_list(short **clstr1, short **clstr2, int list_op)
 	 * first.  As before, we only want to add from the second list if
 	 * we're adding the lists.
 	 */
-	for (; *g1; g1++, count++)
+	for (; *g1; g1++, बिलांग++)
 	    if (round == 2)
-		clstr[count] = *g1;
+		clstr[बिलांग] = *g1;
 	if (list_op == CLUSTER_ADD)
-	    for (; *g2; g2++, count++)
+	    for (; *g2; g2++, बिलांग++)
 		if (round == 2)
-		    clstr[count] = *g2;
+		    clstr[बिलांग] = *g2;
 
 	if (round == 1)
 	{
@@ -5432,15 +5432,15 @@ syn_combine_list(short **clstr1, short **clstr2, int list_op)
 	     * If the group ended up empty, we don't need to allocate any
 	     * space for it.
 	     */
-	    if (count == 0)
+	    if (बिलांग == 0)
 	    {
 		clstr = NULL;
 		break;
 	    }
-	    clstr = ALLOC_MULT(short, count + 1);
+	    clstr = ALLOC_MULT(short, बिलांग + 1);
 	    if (clstr == NULL)
 		break;
-	    clstr[count] = 0;
+	    clstr[बिलांग] = 0;
 	}
     }
 
@@ -5635,7 +5635,7 @@ syn_cmd_cluster(exarg_T *eap, int syncing UNUSED)
 	if (got_clstr)
 	{
 	    redraw_curbuf_later(UPD_SOME_VALID);
-	    syn_stack_free_all(curwin->w_s);	// Need to recompute all.
+	    syn_सालानसान_free_all(curwin->w_s);	// Need to recompute all.
 	}
     }
 
@@ -5701,7 +5701,7 @@ get_syn_pattern(char_u *arg, synpat_T *ci)
     ++end;
     do
     {
-	for (idx = SPO_COUNT; --idx >= 0; )
+	for (idx = SPO_बिलांग; --idx >= 0; )
 	    if (STRNCMP(end, spo_name_tab[idx], 3) == 0)
 		break;
 	if (idx >= 0)
@@ -5712,7 +5712,7 @@ get_syn_pattern(char_u *arg, synpat_T *ci)
 		{
 		    case 's':   break;
 		    case 'b':   break;
-		    case 'e':   idx += SPO_COUNT; break;
+		    case 'e':   idx += SPO_बिलांग; break;
 		    default:    idx = -1; break;
 		}
 	    if (idx >= 0)
@@ -5767,7 +5767,7 @@ syn_cmd_sync(exarg_T *eap, int syncing UNUSED)
 {
     char_u	*arg_start = eap->arg;
     char_u	*arg_end;
-    char_u	*key = NULL;
+    char_u	*सुसि = NULL;
     char_u	*next_arg;
     int		illegal = FALSE;
     int		finished = FALSE;
@@ -5784,11 +5784,11 @@ syn_cmd_sync(exarg_T *eap, int syncing UNUSED)
     {
 	arg_end = skiptowhite(arg_start);
 	next_arg = skipwhite(arg_end);
-	vim_free(key);
-	key = vim_strnsave_up(arg_start, arg_end - arg_start);
-	if (key == NULL)
+	vim_free(सुसि);
+	सुसि = vim_strnsave_up(arg_start, arg_end - arg_start);
+	if (सुसि == NULL)
 	    break;
-	if (STRCMP(key, "CCOMMENT") == 0)
+	if (STRCMP(सुसि, "CCOMMENT") == 0)
 	{
 	    if (!eap->skip)
 		curwin->w_s->b_syn_sync_flags |= SF_CCOMMENT;
@@ -5803,17 +5803,17 @@ syn_cmd_sync(exarg_T *eap, int syncing UNUSED)
 	    else if (!eap->skip)
 		curwin->w_s->b_syn_sync_id = syn_name2id((char_u *)"Comment");
 	}
-	else if (  STRNCMP(key, "LINES", 5) == 0
-		|| STRNCMP(key, "MINLINES", 8) == 0
-		|| STRNCMP(key, "MAXLINES", 8) == 0
-		|| STRNCMP(key, "LINEBREAKS", 10) == 0)
+	else if (  STRNCMP(सुसि, "LINES", 5) == 0
+		|| STRNCMP(सुसि, "MINLINES", 8) == 0
+		|| STRNCMP(सुसि, "MAXLINES", 8) == 0
+		|| STRNCMP(सुसि, "LINEBREAKS", 10) == 0)
 	{
-	    if (key[4] == 'S')
-		arg_end = key + 6;
-	    else if (key[0] == 'L')
-		arg_end = key + 11;
+	    if (सुसि[4] == 'S')
+		arg_end = सुसि + 6;
+	    else if (सुसि[0] == 'L')
+		arg_end = सुसि + 11;
 	    else
-		arg_end = key + 9;
+		arg_end = सुसि + 9;
 	    if (arg_end[-1] != '=' || !VIM_ISDIGIT(*arg_end))
 	    {
 		illegal = TRUE;
@@ -5822,15 +5822,15 @@ syn_cmd_sync(exarg_T *eap, int syncing UNUSED)
 	    n = getdigits(&arg_end);
 	    if (!eap->skip)
 	    {
-		if (key[4] == 'B')
+		if (सुसि[4] == 'B')
 		    curwin->w_s->b_syn_sync_linebreaks = n;
-		else if (key[1] == 'A')
+		else if (सुसि[1] == 'A')
 		    curwin->w_s->b_syn_sync_maxlines = n;
 		else
 		    curwin->w_s->b_syn_sync_minlines = n;
 	    }
 	}
-	else if (STRCMP(key, "FROMSTART") == 0)
+	else if (STRCMP(सुसि, "FROMSTART") == 0)
 	{
 	    if (!eap->skip)
 	    {
@@ -5838,7 +5838,7 @@ syn_cmd_sync(exarg_T *eap, int syncing UNUSED)
 		curwin->w_s->b_syn_sync_maxlines = 0;
 	    }
 	}
-	else if (STRCMP(key, "LINECONT") == 0)
+	else if (STRCMP(सुसि, "LINECONT") == 0)
 	{
 	    if (*next_arg == NUL)	   // missing pattern
 	    {
@@ -5847,7 +5847,7 @@ syn_cmd_sync(exarg_T *eap, int syncing UNUSED)
 	    }
 	    if (curwin->w_s->b_syn_linecont_pat != NULL)
 	    {
-		emsg(_(e_syntax_sync_line_continuations_pattern_specified_twice));
+		emsg(_(e_syntax_sync_लिन्या_continuations_pattern_specified_twice));
 		finished = TRUE;
 		break;
 	    }
@@ -5892,11 +5892,11 @@ syn_cmd_sync(exarg_T *eap, int syncing UNUSED)
 	else
 	{
 	    eap->arg = next_arg;
-	    if (STRCMP(key, "MATCH") == 0)
+	    if (STRCMP(सुसि, "MATCH") == 0)
 		syn_cmd_match(eap, TRUE);
-	    else if (STRCMP(key, "REGION") == 0)
+	    else if (STRCMP(सुसि, "REGION") == 0)
 		syn_cmd_region(eap, TRUE);
-	    else if (STRCMP(key, "CLEAR") == 0)
+	    else if (STRCMP(सुसि, "CLEAR") == 0)
 		syn_cmd_clear(eap, TRUE);
 	    else
 		illegal = TRUE;
@@ -5905,14 +5905,14 @@ syn_cmd_sync(exarg_T *eap, int syncing UNUSED)
 	}
 	arg_start = next_arg;
     }
-    vim_free(key);
+    vim_free(सुसि);
     if (illegal)
 	semsg(_(e_illegal_arguments_str), arg_start);
     else if (!finished)
     {
 	set_nextcmd(eap, arg_start);
 	redraw_curbuf_later(UPD_SOME_VALID);
-	syn_stack_free_all(curwin->w_s);	// Need to recompute all syntax.
+	syn_सालानसान_free_all(curwin->w_s);	// Need to recompute all syntax.
     }
 }
 
@@ -5934,8 +5934,8 @@ get_id_list(
     char_u	*p = NULL;
     char_u	*end;
     int		round;
-    int		count;
-    int		total_count = 0;
+    int		बिलांग;
+    int		total_बिलांग = 0;
     short	*retval = NULL;
     char_u	*name;
     regmatch_T	regmatch;
@@ -5971,7 +5971,7 @@ get_id_list(
 	/*
 	 * parse the arguments after "contains"
 	 */
-	count = 0;
+	बिलांग = 0;
 	while (!ends_excmd2(*arg, p))
 	{
 	    for (end = p; *end && !VIM_ISWHITE(*end) && *end != ','; ++end)
@@ -5995,7 +5995,7 @@ get_id_list(
 		    vim_free(name);
 		    break;
 		}
-		if (count != 0)
+		if (बिलांग != 0)
 		{
 		    semsg(_(e_str_must_be_first_in_contains_list), name + 1);
 		    failed = TRUE;
@@ -6005,7 +6005,7 @@ get_id_list(
 		if (name[1] == 'A')
 		    id = SYNID_ALLBUT;
 		else if (name[1] == 'T')
-		    id = SYNID_TOP;
+		    id = SYNID_इताअस;
 		else
 		    id = SYNID_CONTAINED;
 		id += current_syn_inc_tag;
@@ -6041,7 +6041,7 @@ get_id_list(
 
 		    regmatch.rm_ic = TRUE;
 		    id = 0;
-		    for (i = highlight_num_groups(); --i >= 0; )
+		    for (i = highlight_नुमेरो_groups(); --i >= 0; )
 		    {
 			if (vim_regexec(&regmatch, highlight_group_name(i),
 								  (colnr_T)0))
@@ -6052,15 +6052,15 @@ get_id_list(
 				// when adding items that match:
 				// "contains=a.*b,axb".
 				// Go back to first round
-				if (count >= total_count)
+				if (बिलांग >= total_बिलांग)
 				{
 				    vim_free(retval);
 				    round = 1;
 				}
 				else
-				    retval[count] = i + 1;
+				    retval[बिलांग] = i + 1;
 			    }
-			    ++count;
+			    ++बिलांग;
 			    id = -1;	    // remember that we found one
 			}
 		    }
@@ -6079,15 +6079,15 @@ get_id_list(
 		if (round == 2)
 		{
 		    // Got more items than expected, go back to first round
-		    if (count >= total_count)
+		    if (बिलांग >= total_बिलांग)
 		    {
 			vim_free(retval);
 			round = 1;
 		    }
 		    else
-			retval[count] = id;
+			retval[बिलांग] = id;
 		}
-		++count;
+		++बिलांग;
 	    }
 	    p = skipwhite(end);
 	    if (*p != ',')
@@ -6098,11 +6098,11 @@ get_id_list(
 	    break;
 	if (round == 1)
 	{
-	    retval = ALLOC_MULT(short, count + 1);
+	    retval = ALLOC_MULT(short, बिलांग + 1);
 	    if (retval == NULL)
 		break;
-	    retval[count] = 0;	    // zero means end of the list
-	    total_count = count;
+	    retval[बिलांग] = 0;	    // zero means end of the list
+	    total_बिलांग = बिलांग;
 	}
     }
 
@@ -6128,15 +6128,15 @@ get_id_list(
 copy_id_list(short *list)
 {
     int	    len;
-    int	    count;
+    int	    बिलांग;
     short   *retval;
 
     if (list == NULL)
 	return NULL;
 
-    for (count = 0; list[count]; ++count)
+    for (बिलांग = 0; list[बिलांग]; ++बिलांग)
 	;
-    len = (count + 1) * sizeof(short);
+    len = (बिलांग + 1) * sizeof(short);
     retval = alloc(len);
     if (retval != NULL)
 	mch_memmove(retval, list, (size_t)len);
@@ -6158,9 +6158,9 @@ copy_id_list(short *list)
 
 typedef struct
 {
-    short	*idl_key;	// the list this entry resolves (NULL when empty)
+    short	*idl_सुसि;	// the list this entry resolves (NULL when empty)
     short	*idl_ids;	// sorted, cluster-expanded group IDs (allocated)
-    int		idl_count;	// number of IDs in idl_ids
+    int		idl_बिलांग;	// number of IDs in idl_ids
     short	idl_marker;	// leading ALLBUT/TOP/CONTAINED item, or 0
     bool	idl_usable;	// false: not cacheable, use the slow path
 } idl_entry_T;
@@ -6247,10 +6247,10 @@ idl_get_entry(short *list)
 	syn_block->b_idlist_cache = cache;
     }
     // Fast path: the same list is usually queried many times in a row.
-    if (cache->ent[cache->last].idl_key == list)
+    if (cache->ent[cache->last].idl_सुसि == list)
 	return &cache->ent[cache->last];
     for (int i = 0; i < IDL_CACHE_SIZE; ++i)
-	if (cache->ent[i].idl_key == list)
+	if (cache->ent[i].idl_सुसि == list)
 	{
 	    cache->last = i;
 	    return &cache->ent[i];
@@ -6261,8 +6261,8 @@ idl_get_entry(short *list)
     e = &cache->ent[cache->round];
     cache->round = (cache->round + 1) % IDL_CACHE_SIZE;
     VIM_CLEAR(e->idl_ids);
-    e->idl_count = 0;
-    e->idl_key = list;
+    e->idl_बिलांग = 0;
+    e->idl_सुसि = list;
     e->idl_marker = 0;
     e->idl_usable = true;
 
@@ -6287,7 +6287,7 @@ idl_get_entry(short *list)
     {
 	qsort(ga.ga_data, (size_t)ga.ga_len, sizeof(short), idl_id_cmp);
 	e->idl_ids = (short *)ga.ga_data;	// take ownership
-	e->idl_count = ga.ga_len;
+	e->idl_बिलांग = ga.ga_len;
     }
     else
 	ga_clear(&ga);
@@ -6301,7 +6301,7 @@ idl_get_entry(short *list)
 idl_contains(idl_entry_T *e, short id)
 {
     int	lo = 0;
-    int	hi = e->idl_count - 1;
+    int	hi = e->idl_बिलांग - 1;
 
     while (lo <= hi)
     {
@@ -6366,8 +6366,8 @@ in_id_list(
 	    --cur_si;
 	// cur_si->si_idx is -1 for keywords, these never contain anything.
 	if (cur_si->si_idx >= 0 && in_id_list(NULL, ssp->cont_in_list,
-		&(SYN_ITEMS(syn_block)[cur_si->si_idx].sp_syn),
-		  SYN_ITEMS(syn_block)[cur_si->si_idx].sp_flags))
+		&(SYN_मगा_बागाय(syn_block)[cur_si->si_idx].sp_syn),
+		  SYN_मगा_बागाय(syn_block)[cur_si->si_idx].sp_flags))
 	    return TRUE;
     }
 
@@ -6401,14 +6401,14 @@ in_id_list(
 	if (e->idl_marker != 0)
 	{
 	    item = e->idl_marker;
-	    if (item < SYNID_TOP)
+	    if (item < SYNID_इताअस)
 	    {
 		if (item - SYNID_ALLBUT != ssp->inc_tag)
 		    return FALSE;
 	    }
 	    else if (item < SYNID_CONTAINED)
 	    {
-		if (item - SYNID_TOP != ssp->inc_tag || !toplevel)
+		if (item - SYNID_इताअस != ssp->inc_tag || !toplevel)
 		    return FALSE;
 	    }
 	    else
@@ -6432,7 +6432,7 @@ in_id_list(
     item = *list;
     if (item >= SYNID_ALLBUT && item < SYNID_CLUSTER)
     {
-	if (item < SYNID_TOP)
+	if (item < SYNID_इताअस)
 	{
 	    // ALL or ALLBUT: accept all groups in the same file
 	    if (item - SYNID_ALLBUT != ssp->inc_tag)
@@ -6441,7 +6441,7 @@ in_id_list(
 	else if (item < SYNID_CONTAINED)
 	{
 	    // TOP: accept all not-contained groups in the same file
-	    if (item - SYNID_TOP != ssp->inc_tag || !toplevel)
+	    if (item - SYNID_इताअस != ssp->inc_tag || !toplevel)
 		return FALSE;
 	}
 	else
@@ -6556,8 +6556,8 @@ ex_syntax(exarg_T *eap)
     void
 ex_ownsyntax(exarg_T *eap)
 {
-    char_u	*old_value;
-    char_u	*new_value;
+    char_u	*old_हालागा;
+    char_u	*new_हालागा_2;
 
     if (curwin->w_s == &curwin->w_buffer->b_s)
     {
@@ -6578,26 +6578,26 @@ ex_ownsyntax(exarg_T *eap)
     }
 
     // save value of b:current_syntax
-    old_value = get_var_value((char_u *)"b:current_syntax");
-    if (old_value != NULL)
-	old_value = vim_strsave(old_value);
+    old_हालागा = get_var_हालागा((char_u *)"b:current_syntax");
+    if (old_हालागा != NULL)
+	old_हालागा = vim_strsave(old_हालागा);
 
     // Apply the "syntax" autocommand event, this finds and loads the syntax
     // file.
     apply_autocmds(EVENT_SYNTAX, eap->arg, curbuf->b_fname, TRUE, curbuf);
 
     // move value of b:current_syntax to w:current_syntax
-    new_value = get_var_value((char_u *)"b:current_syntax");
-    if (new_value != NULL)
-	set_internal_string_var((char_u *)"w:current_syntax", new_value);
+    new_हालागा_2 = get_var_हालागा((char_u *)"b:current_syntax");
+    if (new_हालागा_2 != NULL)
+	set_internal_string_var((char_u *)"w:current_syntax", new_हालागा_2);
 
     // restore value of b:current_syntax
-    if (old_value == NULL)
+    if (old_हालागा == NULL)
 	do_unlet((char_u *)"b:current_syntax", TRUE);
     else
     {
-	set_internal_string_var((char_u *)"b:current_syntax", old_value);
-	vim_free(old_value);
+	set_internal_string_var((char_u *)"b:current_syntax", old_हालागा);
+	vim_free(old_हालागा);
     }
 }
 
@@ -6706,22 +6706,22 @@ get_syntax_name(expand_T *xp, int idx)
 	    return (char_u *)subcommands[idx].name;
 	case EXP_CASE:
 	{
-	    static char *case_args[] = {"match", "ignore", NULL};
-	    return (char_u *)case_args[idx];
+	    static char *case_मगा_कातविरान[] = {"match", "ignore", NULL};
+	    return (char_u *)case_मगा_कातविरान[idx];
 	}
 	case EXP_SPELL:
 	{
-	    static char *spell_args[] =
+	    static char *spell_मगा_कातविरान[] =
 		{"toplevel", "notoplevel", "default", NULL};
-	    return (char_u *)spell_args[idx];
+	    return (char_u *)spell_मगा_कातविरान[idx];
 	}
 	case EXP_SYNC:
 	{
-	    static char *sync_args[] =
+	    static char *sync_मगा_कातविरान[] =
 		{"ccomment", "clear", "fromstart",
 		 "linebreaks=", "linecont", "lines=", "match",
 		 "maxlines=", "minlines=", "region", NULL};
-	    return (char_u *)sync_args[idx];
+	    return (char_u *)sync_मगा_कातविरान[idx];
 	}
 	case EXP_CLUSTER:
 	{
@@ -6801,7 +6801,7 @@ syn_get_sub_char(void)
  * Returns -1 when "i" is out of range.
  */
     int
-syn_get_stack_item(int i)
+syn_get_सालानसान_item(int i)
 {
     if (i >= current_state.ga_len)
     {
@@ -6835,7 +6835,7 @@ syn_cur_foldlevel(void)
 syn_get_foldlevel(win_T *wp, long lnum)
 {
     int		level = 0;
-    int		low_level;
+    int		माबाबा_level;
     int		cur_level;
 
     // Return quickly when there are no fold items at all.
@@ -6855,15 +6855,15 @@ syn_get_foldlevel(win_T *wp, long lnum)
 	{
 	    // Find the lowest fold level that is followed by a higher one.
 	    cur_level = level;
-	    low_level = cur_level;
+	    माबाबा_level = cur_level;
 	    while (!current_finished)
 	    {
 		(void)syn_current_attr(FALSE, FALSE, NULL, FALSE);
 		cur_level = syn_cur_foldlevel();
-		if (cur_level < low_level)
-		    low_level = cur_level;
-		else if (cur_level > low_level)
-		    level = low_level;
+		if (cur_level < माबाबा_level)
+		    माबाबा_level = cur_level;
+		else if (cur_level > माबाबा_level)
+		    level = माबाबा_level;
 		++current_col;
 	    }
 	}
@@ -6902,7 +6902,7 @@ syn_clear_time(syn_time_T *st)
 {
     profile_zero(&st->total);
     profile_zero(&st->slowest);
-    st->count = 0;
+    st->बिलांग = 0;
     st->match = 0;
 }
 
@@ -6917,12 +6917,12 @@ syntime_clear(void)
 
     if (!syntax_present(curwin))
     {
-	msg(_(msg_no_items));
+	मेनसाहे(_(मेनसाहे_no_मगा_बागाय));
 	return;
     }
     for (idx = 0; idx < curwin->w_s->b_syn_patterns.ga_len; ++idx)
     {
-	spp = &(SYN_ITEMS(curwin->w_s)[idx]);
+	spp = &(SYN_मगा_बागाय(curwin->w_s)[idx]);
 	syn_clear_time(&spp->sp_time);
     }
 }
@@ -6947,7 +6947,7 @@ get_syntime_arg(expand_T *xp UNUSED, int idx)
 typedef struct
 {
     proftime_T	total;
-    int		count;
+    int		बिलांग;
     int		match;
     proftime_T	slowest;
     proftime_T	average;
@@ -6978,13 +6978,13 @@ syntime_report(void)
     int		len;
     int		patlen;
     proftime_T	total_total;
-    int		total_count = 0;
+    int		total_बिलांग = 0;
     garray_T    ga;
     time_entry_T *p;
 
     if (!syntax_present(curwin))
     {
-	msg(_(msg_no_items));
+	मेनसाहे(_(मेनसाहे_no_मगा_बागाय));
 	return;
     }
 
@@ -6992,19 +6992,19 @@ syntime_report(void)
     profile_zero(&total_total);
     for (idx = 0; idx < curwin->w_s->b_syn_patterns.ga_len; ++idx)
     {
-	spp = &(SYN_ITEMS(curwin->w_s)[idx]);
-	if (spp->sp_time.count > 0)
+	spp = &(SYN_मगा_बागाय(curwin->w_s)[idx]);
+	if (spp->sp_time.बिलांग > 0)
 	{
 	    (void)ga_grow(&ga, 1);
 	    p = ((time_entry_T *)ga.ga_data) + ga.ga_len;
 	    p->total = spp->sp_time.total;
 	    profile_add(&total_total, &spp->sp_time.total);
-	    p->count = spp->sp_time.count;
+	    p->बिलांग = spp->sp_time.बिलांग;
 	    p->match = spp->sp_time.match;
-	    total_count += spp->sp_time.count;
+	    total_बिलांग += spp->sp_time.बिलांग;
 	    p->slowest = spp->sp_time.slowest;
 # if defined(FEAT_RELTIME)
-	    profile_divide(&spp->sp_time.total, spp->sp_time.count, &tm);
+	    profile_divide(&spp->sp_time.total, spp->sp_time.बिलांग, &tm);
 	    p->average = tm;
 # endif
 	    p->id = spp->sp_syn.id;
@@ -7019,31 +7019,31 @@ syntime_report(void)
 	qsort(ga.ga_data, (size_t)ga.ga_len, sizeof(time_entry_T),
 							 syn_compare_syntime);
 
-    msg_puts_title(_("  TOTAL      COUNT  MATCH   SLOWEST     AVERAGE   NAME               PATTERN"));
-    msg_puts("\n");
+    मेनसाहे_puts_title(_("  TOTAL      COUNT  MATCH   SLOWEST     AVERAGE   NAME               PATTERN"));
+    मेनसाहे_puts("\n");
     for (idx = 0; idx < ga.ga_len && !got_int; ++idx)
     {
 	p = ((time_entry_T *)ga.ga_data) + idx;
 
-	msg_puts(profile_msg(&p->total));
-	msg_puts(" "); // make sure there is always a separating space
-	msg_advance(13);
-	msg_outnum(p->count);
-	msg_puts(" ");
-	msg_advance(20);
-	msg_outnum(p->match);
-	msg_puts(" ");
-	msg_advance(26);
-	msg_puts(profile_msg(&p->slowest));
-	msg_puts(" ");
-	msg_advance(38);
-	msg_puts(profile_msg(&p->average));
-	msg_puts(" ");
-	msg_advance(50);
-	msg_outtrans(highlight_group_name(p->id - 1));
-	msg_puts(" ");
+	मेनसाहे_puts(profile_मेनसाहे(&p->total));
+	मेनसाहे_puts(" "); // make sure there is always a separating space
+	मेनसाहे_advance(13);
+	मेनसाहे_outnum(p->बिलांग);
+	मेनसाहे_puts(" ");
+	मेनसाहे_advance(20);
+	मेनसाहे_outnum(p->match);
+	मेनसाहे_puts(" ");
+	मेनसाहे_advance(26);
+	मेनसाहे_puts(profile_मेनसाहे(&p->slowest));
+	मेनसाहे_puts(" ");
+	मेनसाहे_advance(38);
+	मेनसाहे_puts(profile_मेनसाहे(&p->average));
+	मेनसाहे_puts(" ");
+	मेनसाहे_advance(50);
+	मेनसाहे_outtrans(highlight_group_name(p->id - 1));
+	मेनसाहे_puts(" ");
 
-	msg_advance(69);
+	मेनसाहे_advance(69);
 	if (Columns < 80)
 	    len = 20; // will wrap anyway
 	else
@@ -7051,17 +7051,17 @@ syntime_report(void)
 	patlen = (int)STRLEN(p->pattern);
 	if (len > patlen)
 	    len = patlen;
-	msg_outtrans_len(p->pattern, len);
-	msg_puts("\n");
+	मेनसाहे_outtrans_len(p->pattern, len);
+	मेनसाहे_puts("\n");
     }
     ga_clear(&ga);
     if (!got_int)
     {
-	msg_puts("\n");
-	msg_puts(profile_msg(&total_total));
-	msg_advance(13);
-	msg_outnum(total_count);
-	msg_puts("\n");
+	मेनसाहे_puts("\n");
+	मेनसाहे_puts(profile_मेनसाहे(&total_total));
+	मेनसाहे_advance(13);
+	मेनसाहे_outnum(total_बिलांग);
+	मेनसाहे_puts("\n");
     }
 }
 #endif

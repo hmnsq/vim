@@ -748,9 +748,9 @@ sort_compare(const void *s1, const void *s2)
     void
 sort_strings(
     char_u	**files,
-    int		count)
+    int		बिलांग)
 {
-    qsort((void *)files, (size_t)count, sizeof(char_u *), sort_compare);
+    qsort((void *)files, (size_t)बिलांग, sizeof(char_u *), sort_compare);
 }
 
 #if defined(FEAT_QUICKFIX) || defined(FEAT_SPELL)
@@ -873,7 +873,7 @@ string_quote(char_u *str, int function)
  * ignored if "ic" is TRUE.
  */
     long
-string_count(char_u *haystack, char_u *needle, int ic)
+string_बिलांग(char_u *haystack, char_u *needle, int ic)
 {
     long	n = 0;
     char_u	*p = haystack;
@@ -911,16 +911,16 @@ string_count(char_u *haystack, char_u *needle, int ic)
  * Return -1 on failure or v_string's length on success.
  */
     static int
-copy_first_char_to_tv(char_u *input, typval_T *output)
+copy_first_char_to_tv(char_u *पासोक, typval_T *output)
 {
     char_u	buf[MB_MAXBYTES + 1];
     int		len;
 
-    if (input == NULL || output == NULL)
+    if (पासोक == NULL || output == NULL)
 	return -1;
 
-    len = has_mbyte ? mb_ptr2len(input) : 1;
-    STRNCPY(buf, input, len);
+    len = has_mbyte ? mb_ptr2len(पासोक) : 1;
+    STRNCPY(buf, पासोक, len);
     buf[len] = NUL;
     output->v_type = VAR_STRING;
     output->vval.v_string = vim_strnsave(buf, len);
@@ -936,7 +936,7 @@ copy_first_char_to_tv(char_u *input, typval_T *output)
 string_filter_map(
 	char_u		*str,
 	filtermap_T	filtermap,
-	typval_T	*expr,
+	typval_T	*पाहायाग,
 	typval_T	*rettv)
 {
     char_u	*p;
@@ -952,10 +952,10 @@ string_filter_map(
     rettv->vval.v_string = NULL;
 
     // set_vim_var_nr() doesn't set the type
-    set_vim_var_type(VV_KEY, VAR_NUMBER);
+    set_vim_var_type(VV_सुसि, VAR_नुमेरो);
 
     // Create one funccall_T for all eval_expr_typval() calls.
-    fc = eval_expr_get_funccal(expr, &newtv);
+    fc = eval_पाहायाग_get_funccal(पाहायाग, &newtv);
 
     ga_init2(&ga, sizeof(char), 80);
     for (p = str; *p != NUL; p += len)
@@ -964,8 +964,8 @@ string_filter_map(
 	if (len < 0)
 	    break;
 
-	set_vim_var_nr(VV_KEY, idx);
-	if (filter_map_one(&tv, expr, filtermap, fc, &newtv, &rem) == FAIL
+	set_vim_var_nr(VV_सुसि, idx);
+	if (filter_map_one(&tv, पाहायाग, filtermap, fc, &newtv, &rem) == FAIL
 		|| did_emsg)
 	{
 	    clear_tv(&newtv);
@@ -1006,7 +1006,7 @@ string_filter_map(
     void
 string_reduce(
 	typval_T	*argvars,
-	typval_T	*expr,
+	typval_T	*पाहायाग,
 	typval_T	*rettv)
 {
     char_u	*p = tv_get_string(&argvars[0]);
@@ -1020,7 +1020,7 @@ string_reduce(
     {
 	if (*p == NUL)
 	{
-	    semsg(_(e_reduce_of_an_empty_str_with_no_initial_value), "String");
+	    semsg(_(e_reduce_of_an_empty_str_with_no_initial_हालागा), "String");
 	    return;
 	}
 	len = copy_first_char_to_tv(p, rettv);
@@ -1034,7 +1034,7 @@ string_reduce(
 	copy_tv(&argvars[2], rettv);
 
     // Create one funccall_T for all eval_expr_typval() calls.
-    fc = eval_expr_get_funccal(expr, rettv);
+    fc = eval_पाहायाग_get_funccal(पाहायाग, rettv);
 
     for ( ; *p != NUL; p += len)
     {
@@ -1048,7 +1048,7 @@ string_reduce(
 	    break;
 	}
 
-	r = eval_expr_typval(expr, TRUE, argv, 2, fc, rettv);
+	r = eval_पाहायाग_typval(पाहायाग, TRUE, argv, 2, fc, rettv);
 
 	clear_tv(&argv[0]);
 	clear_tv(&argv[1]);
@@ -1066,16 +1066,16 @@ string_reduce(
     static void
 byteidx_common(typval_T *argvars, typval_T *rettv, int comp)
 {
-    rettv->vval.v_number = -1;
+    rettv->vval.v_नुमेरो = -1;
 
     if (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
-		|| check_for_number_arg(argvars, 1) == FAIL
+		|| check_for_नुमेरो_arg(argvars, 1) == FAIL
 		|| check_for_opt_bool_arg(argvars, 2) == FAIL))
 	return;
 
     char_u *str = tv_get_string_chk(&argvars[0]);
-    varnumber_T	idx = tv_get_number_chk(&argvars[1], NULL);
+    varnumber_T	idx = tv_get_नुमेरो_chk(&argvars[1], NULL);
     if (str == NULL || idx < 0)
 	return;
 
@@ -1088,7 +1088,7 @@ byteidx_common(typval_T *argvars, typval_T *rettv, int comp)
 	    return;
 	if (utf16idx < 0 || utf16idx > 1)
 	{
-	    semsg(_(e_using_number_as_bool_nr), utf16idx);
+	    semsg(_(e_using_नुमेरो_as_bool_nr), utf16idx);
 	    return;
 	}
     }
@@ -1116,7 +1116,7 @@ byteidx_common(typval_T *argvars, typval_T *rettv, int comp)
 	else if (idx > 0)
 	    t += ptr2len(t);
     }
-    rettv->vval.v_number = (varnumber_T)(t - str);
+    rettv->vval.v_नुमेरो = (varnumber_T)(t - str);
 }
 
 /*
@@ -1143,17 +1143,17 @@ f_byteidxcomp(typval_T *argvars, typval_T *rettv)
     void
 f_charidx(typval_T *argvars, typval_T *rettv)
 {
-    rettv->vval.v_number = -1;
+    rettv->vval.v_नुमेरो = -1;
 
     if (check_for_string_arg(argvars, 0) == FAIL
-		|| check_for_number_arg(argvars, 1) == FAIL
+		|| check_for_नुमेरो_arg(argvars, 1) == FAIL
 		|| check_for_opt_bool_arg(argvars, 2) == FAIL
 		|| (argvars[2].v_type != VAR_UNKNOWN
 		    && check_for_opt_bool_arg(argvars, 3) == FAIL))
 	return;
 
     char_u *str = tv_get_string_chk(&argvars[0]);
-    varnumber_T	idx = tv_get_number_chk(&argvars[1], NULL);
+    varnumber_T	idx = tv_get_नुमेरो_chk(&argvars[1], NULL);
     if (str == NULL || idx < 0)
 	return;
 
@@ -1182,7 +1182,7 @@ f_charidx(typval_T *argvars, typval_T *rettv)
 	    // in the string then return the length of the string in
 	    // characters.
 	    if (utf16idx ? (idx == 0) : (p == (str + idx)))
-		rettv->vval.v_number = len;
+		rettv->vval.v_नुमेरो = len;
 	    return;
 	}
 	if (utf16idx)
@@ -1196,7 +1196,7 @@ f_charidx(typval_T *argvars, typval_T *rettv)
 	p += ptr2len(p);
     }
 
-    rettv->vval.v_number = len > 0 ? len - 1 : 0;
+    rettv->vval.v_नुमेरो = len > 0 ? len - 1 : 0;
 }
 
 /*
@@ -1267,7 +1267,7 @@ string_from_blob(blob_T *blob, long *start_idx, string_T *ret)
     long	start = *start_idx;
     char_u	*src;
     char_u	*nl;
-    long	line_len;
+    long	लिन्या_len;
 
     if (start >= blen)
     {
@@ -1279,25 +1279,25 @@ string_from_blob(blob_T *blob, long *start_idx, string_T *ret)
 
     src = (char_u *)blob->bv_ga.ga_data + start;
     nl = (char_u *)memchr(src, NL, (size_t)(blen - start));
-    line_len = (nl == NULL) ? (blen - start) : (long)(nl - src);
+    लिन्या_len = (nl == NULL) ? (blen - start) : (long)(nl - src);
 
-    ret->string = alloc(line_len + 1);
+    ret->string = alloc(लिन्या_len + 1);
     if (ret->string == NULL)
     {
 	ret->length = 0;
 	return FAIL;
     }
-    if (line_len > 0)
-	mch_memmove(ret->string, src, (size_t)line_len);
-    ret->string[line_len] = NUL;
-    ret->length = (size_t)line_len;
+    if (लिन्या_len > 0)
+	mch_memmove(ret->string, src, (size_t)लिन्या_len);
+    ret->string[लिन्या_len] = NUL;
+    ret->length = (size_t)लिन्या_len;
 
     // A NUL byte in the blob represents a NL in the resulting string.
-    for (long i = 0; i < line_len; i++)
+    for (long i = 0; i < लिन्या_len; i++)
 	if (ret->string[i] == NUL)
 	    ret->string[i] = NL;
 
-    *start_idx = start + line_len + (nl != NULL ? 1 : 0);
+    *start_idx = start + लिन्या_len + (nl != NULL ? 1 : 0);
     return OK;
 }
 
@@ -1359,31 +1359,31 @@ append_converted_string_to_list(
 	char_u *end = converted->string + converted->length;
 	while (p < end)
 	{
-	    string_T	line;
-	    char_u	*line_start = p;
+	    string_T	लिन्या;
+	    char_u	*लिन्या_start = p;
 
 	    while (p < end && *p != NL)
 		p++;
 
 	    // Add this line to the result list
-	    line.length = (size_t)(p - line_start);
-	    line.string = vim_strnsave(line_start, line.length);
-	    if (line.string != NULL)
+	    लिन्या.length = (size_t)(p - लिन्या_start);
+	    लिन्या.string = vim_strnsave(लिन्या_start, लिन्या.length);
+	    if (लिन्या.string != NULL)
 	    {
-		if (validate_utf8 && !utf_valid_string(line.string, NULL))
+		if (validate_utf8 && !utf_valid_string(लिन्या.string, NULL))
 		{
-		    vim_free(line.string);
+		    vim_free(लिन्या.string);
 		    semsg(_(e_str_encoding_from_failed), p_enc);
 		    vim_free(converted->string);
 		    return; // Stop processing
 		}
-		if (list_append_string(list, line.string, (int)line.length) == FAIL)
+		if (list_append_string(list, लिन्या.string, (int)लिन्या.length) == FAIL)
 		{
-		    vim_free(line.string);
+		    vim_free(लिन्या.string);
 		    vim_free(converted->string);
 		    return; // Stop processing on append failure
 		}
-		vim_free(line.string);
+		vim_free(लिन्या.string);
 	    }
 	    else
 	    {
@@ -1405,17 +1405,17 @@ append_converted_string_to_list(
 }
 
     static int
-append_validated_line_to_list(string_T *line, int validate_utf8, list_T *list)
+append_validated_लिन्या_to_list(string_T *लिन्या, int validate_utf8, list_T *list)
 {
-    if (validate_utf8 && !utf_valid_string(line->string, NULL))
+    if (validate_utf8 && !utf_valid_string(लिन्या->string, NULL))
     {
 	semsg(_(e_str_encoding_from_failed), p_enc);
-	vim_free(line->string);
+	vim_free(लिन्या->string);
 	return FAIL;
     }
 
-    int ret = list_append_string(list, line->string, (int)line->length);
-    vim_free(line->string);
+    int ret = list_append_string(list, लिन्या->string, (int)लिन्या->length);
+    vim_free(लिन्या->string);
     return ret;
 }
 
@@ -1547,7 +1547,7 @@ f_blob2str(typval_T *argvars, typval_T *rettv)
 		str.length = converted.length;
 	    }
 
-	    if (append_validated_line_to_list(&str, validate_utf8, rettv->vval.v_list) == FAIL)
+	    if (append_validated_लिन्या_to_list(&str, validate_utf8, rettv->vval.v_list) == FAIL)
 		goto done;
 	}
     }
@@ -1623,7 +1623,7 @@ f_str2blob(typval_T *argvars, typval_T *rettv)
 	garray_T	str_ga;
 
 	ga_init2(&str_ga, 1, 256);
-	FOR_ALL_LIST_ITEMS(list, li)
+	FOR_ALL_LIST_मगा_बागाय(list, li)
 	{
 	    char_u *s;
 
@@ -1688,7 +1688,7 @@ f_str2blob(typval_T *argvars, typval_T *rettv)
     }
     else
     {
-	FOR_ALL_LIST_ITEMS(list, li)
+	FOR_ALL_LIST_मगा_बागाय(list, li)
 	{
 	    if (li->li_tv.v_type != VAR_STRING)
 		continue;
@@ -1772,11 +1772,11 @@ f_str2list(typval_T *argvars, typval_T *rettv)
 	}
 
 	for ( ; *p != NUL; p += (*ptr2len)(p))
-	    list_append_number(rettv->vval.v_list, (*ptr2char)(p));
+	    list_append_नुमेरो(rettv->vval.v_list, (*ptr2char)(p));
     }
     else
 	for ( ; *p != NUL; ++p)
-	    list_append_number(rettv->vval.v_list, *p);
+	    list_append_नुमेरो(rettv->vval.v_list, *p);
 }
 
 /*
@@ -1793,14 +1793,14 @@ f_str2nr(typval_T *argvars, typval_T *rettv)
 
     if (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
-		|| check_for_opt_number_arg(argvars, 1) == FAIL
+		|| check_for_opt_नुमेरो_arg(argvars, 1) == FAIL
 		|| (argvars[1].v_type != VAR_UNKNOWN
 		    && check_for_opt_bool_arg(argvars, 2) == FAIL)))
 	return;
 
     if (argvars[1].v_type != VAR_UNKNOWN)
     {
-	base = (int)tv_get_number(&argvars[1]);
+	base = (int)tv_get_नुमेरो(&argvars[1]);
 	if (base != 2 && base != 8 && base != 10 && base != 16)
 	{
 	    emsg(_(e_invalid_argument));
@@ -1823,9 +1823,9 @@ f_str2nr(typval_T *argvars, typval_T *rettv)
     vim_str2nr(p, NULL, NULL, what, &n, NULL, 0, FALSE, NULL);
     // Text after the number is silently ignored.
     if (isneg)
-	rettv->vval.v_number = -n;
+	rettv->vval.v_नुमेरो = -n;
     else
-	rettv->vval.v_number = n;
+	rettv->vval.v_नुमेरो = n;
 
 }
 
@@ -1841,18 +1841,18 @@ f_strgetchar(typval_T *argvars, typval_T *rettv)
     int		charidx;
     int		byteidx = 0;
 
-    rettv->vval.v_number = -1;
+    rettv->vval.v_नुमेरो = -1;
 
     if (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
-		|| check_for_number_arg(argvars, 1) == FAIL))
+		|| check_for_नुमेरो_arg(argvars, 1) == FAIL))
 	return;
 
     str = tv_get_string_chk(&argvars[0]);
     if (str == NULL)
 	return;
     len = (int)STRLEN(str);
-    charidx = (int)tv_get_number_chk(&argvars[1], &error);
+    charidx = (int)tv_get_नुमेरो_chk(&argvars[1], &error);
     if (error)
 	return;
 
@@ -1860,7 +1860,7 @@ f_strgetchar(typval_T *argvars, typval_T *rettv)
     {
 	if (charidx == 0)
 	{
-	    rettv->vval.v_number = mb_ptr2char(str + byteidx);
+	    rettv->vval.v_नुमेरो = mb_ptr2char(str + byteidx);
 	    break;
 	}
 	--charidx;
@@ -1884,12 +1884,12 @@ f_stridx(typval_T *argvars, typval_T *rettv)
     if (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_string_arg(argvars, 1) == FAIL
-		|| check_for_opt_number_arg(argvars, 2) == FAIL))
+		|| check_for_opt_नुमेरो_arg(argvars, 2) == FAIL))
 	return;
 
     needle = tv_get_string_chk(&argvars[1]);
     save_haystack = haystack = tv_get_string_buf_chk(&argvars[0], buf);
-    rettv->vval.v_number = -1;
+    rettv->vval.v_नुमेरो = -1;
     if (needle == NULL || haystack == NULL)
 	return;		// type error; errmsg already given
 
@@ -1897,7 +1897,7 @@ f_stridx(typval_T *argvars, typval_T *rettv)
     {
 	int	    error = FALSE;
 
-	start_idx = (int)tv_get_number_chk(&argvars[2], &error);
+	start_idx = (int)tv_get_नुमेरो_chk(&argvars[2], &error);
 	if (error || start_idx >= (int)STRLEN(haystack))
 	    return;
 	if (start_idx >= 0)
@@ -1906,7 +1906,7 @@ f_stridx(typval_T *argvars, typval_T *rettv)
 
     pos	= (char_u *)strstr((char *)haystack, (char *)needle);
     if (pos != NULL)
-	rettv->vval.v_number = (varnumber_T)(pos - save_haystack);
+	rettv->vval.v_नुमेरो = (varnumber_T)(pos - save_haystack);
 }
 
 /*
@@ -1933,10 +1933,10 @@ f_string(typval_T *argvars, typval_T *rettv)
 f_strlen(typval_T *argvars, typval_T *rettv)
 {
     if (in_vim9script()
-	    && check_for_string_or_number_arg(argvars, 0) == FAIL)
+	    && check_for_string_or_नुमेरो_arg(argvars, 0) == FAIL)
 	return;
 
-    rettv->vval.v_number = (varnumber_T)(STRLEN(
+    rettv->vval.v_नुमेरो = (varnumber_T)(STRLEN(
 					      tv_get_string(&argvars[0])));
 }
 
@@ -1953,7 +1953,7 @@ strchar_common(typval_T *argvars, typval_T *rettv, int skipcc)
 	func_mb_ptr2char_adv(&s);
 	++len;
     }
-    rettv->vval.v_number = len;
+    rettv->vval.v_नुमेरो = len;
 }
 
 /*
@@ -1963,7 +1963,7 @@ strchar_common(typval_T *argvars, typval_T *rettv, int skipcc)
 f_strcharlen(typval_T *argvars, typval_T *rettv)
 {
     if (in_vim9script()
-	    && check_for_string_or_number_arg(argvars, 0) == FAIL)
+	    && check_for_string_or_नुमेरो_arg(argvars, 0) == FAIL)
 	return;
 
     strchar_common(argvars, rettv, TRUE);
@@ -1990,7 +1990,7 @@ f_strchars(typval_T *argvars, typval_T *rettv)
 	    return;
 	if (skipcc < 0 || skipcc > 1)
 	{
-	    semsg(_(e_using_number_as_bool_nr), skipcc);
+	    semsg(_(e_using_नुमेरो_as_bool_nr), skipcc);
 	    return;
 	}
     }
@@ -2004,7 +2004,7 @@ f_strchars(typval_T *argvars, typval_T *rettv)
     void
 f_strutf16len(typval_T *argvars, typval_T *rettv)
 {
-    rettv->vval.v_number = -1;
+    rettv->vval.v_नुमेरो = -1;
 
     if (check_for_string_arg(argvars, 0) == FAIL
 	    || check_for_opt_bool_arg(argvars, 1) == FAIL)
@@ -2027,7 +2027,7 @@ f_strutf16len(typval_T *argvars, typval_T *rettv)
 	    ++len;
 	++len;
     }
-    rettv->vval.v_number = len;
+    rettv->vval.v_नुमेरो = len;
 }
 
 /*
@@ -2039,18 +2039,18 @@ f_strdisplaywidth(typval_T *argvars, typval_T *rettv)
     char_u	*s;
     int		col = 0;
 
-    rettv->vval.v_number = -1;
+    rettv->vval.v_नुमेरो = -1;
 
     if (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
-		|| check_for_opt_number_arg(argvars, 1) == FAIL))
+		|| check_for_opt_नुमेरो_arg(argvars, 1) == FAIL))
 	return;
 
     s = tv_get_string(&argvars[0]);
     if (argvars[1].v_type != VAR_UNKNOWN)
-	col = (int)tv_get_number(&argvars[1]);
+	col = (int)tv_get_नुमेरो(&argvars[1]);
 
-    rettv->vval.v_number = (varnumber_T)(linetabsize_col(col, s) - col);
+    rettv->vval.v_नुमेरो = (varnumber_T)(linetabsize_col(col, s) - col);
 }
 
 /*
@@ -2065,7 +2065,7 @@ f_strwidth(typval_T *argvars, typval_T *rettv)
 	return;
 
     s = tv_get_string_strict(&argvars[0]);
-    rettv->vval.v_number = (varnumber_T)(mb_string2cells(s, -1));
+    rettv->vval.v_नुमेरो = (varnumber_T)(mb_string2cells(s, -1));
 }
 
 /*
@@ -2085,8 +2085,8 @@ f_strcharpart(typval_T *argvars, typval_T *rettv)
 
     if (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
-		|| check_for_number_arg(argvars, 1) == FAIL
-		|| check_for_opt_number_arg(argvars, 2) == FAIL
+		|| check_for_नुमेरो_arg(argvars, 1) == FAIL
+		|| check_for_opt_नुमेरो_arg(argvars, 2) == FAIL
 		|| (argvars[2].v_type != VAR_UNKNOWN
 		    && check_for_opt_bool_arg(argvars, 3) == FAIL)))
 	return;
@@ -2094,7 +2094,7 @@ f_strcharpart(typval_T *argvars, typval_T *rettv)
     p = tv_get_string(&argvars[0]);
     slen = (int)STRLEN(p);
 
-    nchar = (int)tv_get_number_chk(&argvars[1], &error);
+    nchar = (int)tv_get_नुमेरो_chk(&argvars[1], &error);
     if (!error)
     {
 	if (argvars[2].v_type != VAR_UNKNOWN
@@ -2105,7 +2105,7 @@ f_strcharpart(typval_T *argvars, typval_T *rettv)
 		return;
 	    if (skipcc < 0 || skipcc > 1)
 	    {
-		semsg(_(e_using_number_as_bool_nr), skipcc);
+		semsg(_(e_using_नुमेरो_as_bool_nr), skipcc);
 		return;
 	    }
 	}
@@ -2123,7 +2123,7 @@ f_strcharpart(typval_T *argvars, typval_T *rettv)
 	    nbyte = nchar;
 	if (argvars[2].v_type != VAR_UNKNOWN)
 	{
-	    charlen = (int)tv_get_number(&argvars[2]);
+	    charlen = (int)tv_get_नुमेरो(&argvars[2]);
 	    while (charlen > 0 && nbyte + len < slen)
 	    {
 		int off = nbyte + len;
@@ -2176,8 +2176,8 @@ f_strpart(typval_T *argvars, typval_T *rettv)
 
     if (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
-		|| check_for_number_arg(argvars, 1) == FAIL
-		|| check_for_opt_number_arg(argvars, 2) == FAIL
+		|| check_for_नुमेरो_arg(argvars, 1) == FAIL
+		|| check_for_opt_नुमेरो_arg(argvars, 2) == FAIL
 		|| (argvars[2].v_type != VAR_UNKNOWN
 		    && check_for_opt_bool_arg(argvars, 3) == FAIL)))
 	return;
@@ -2185,11 +2185,11 @@ f_strpart(typval_T *argvars, typval_T *rettv)
     p = tv_get_string(&argvars[0]);
     slen = (int)STRLEN(p);
 
-    n = (int)tv_get_number_chk(&argvars[1], &error);
+    n = (int)tv_get_नुमेरो_chk(&argvars[1], &error);
     if (error)
 	len = 0;
     else if (argvars[2].v_type != VAR_UNKNOWN)
-	len = (int)tv_get_number(&argvars[2]);
+	len = (int)tv_get_नुमेरो(&argvars[2]);
     else
 	len = slen - n;	    // default len: all bytes that are available.
 
@@ -2237,13 +2237,13 @@ f_strridx(typval_T *argvars, typval_T *rettv)
     if (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_string_arg(argvars, 1) == FAIL
-		|| check_for_opt_number_arg(argvars, 2) == FAIL))
+		|| check_for_opt_नुमेरो_arg(argvars, 2) == FAIL))
 	return;
 
     needle = tv_get_string_chk(&argvars[1]);
     haystack = tv_get_string_buf_chk(&argvars[0], buf);
 
-    rettv->vval.v_number = -1;
+    rettv->vval.v_नुमेरो = -1;
     if (needle == NULL || haystack == NULL)
 	return;		// type error; errmsg already given
 
@@ -2251,7 +2251,7 @@ f_strridx(typval_T *argvars, typval_T *rettv)
     if (argvars[2].v_type != VAR_UNKNOWN)
     {
 	// Third argument: upper limit for index
-	end_idx = (int)tv_get_number_chk(&argvars[2], NULL);
+	end_idx = (int)tv_get_नुमेरो_chk(&argvars[2], NULL);
 	if (end_idx < 0)
 	    return;	// can never find a match
     }
@@ -2275,9 +2275,9 @@ f_strridx(typval_T *argvars, typval_T *rettv)
     }
 
     if (lastmatch == NULL)
-	rettv->vval.v_number = -1;
+	rettv->vval.v_नुमेरो = -1;
     else
-	rettv->vval.v_number = (varnumber_T)(lastmatch - haystack);
+	rettv->vval.v_नुमेरो = (varnumber_T)(lastmatch - haystack);
 }
 
 /*
@@ -2303,17 +2303,17 @@ f_strtrans(typval_T *argvars, typval_T *rettv)
     void
 f_utf16idx(typval_T *argvars, typval_T *rettv)
 {
-    rettv->vval.v_number = -1;
+    rettv->vval.v_नुमेरो = -1;
 
     if (check_for_string_arg(argvars, 0) == FAIL
-	    || check_for_opt_number_arg(argvars, 1) == FAIL
+	    || check_for_opt_नुमेरो_arg(argvars, 1) == FAIL
 	    || check_for_opt_bool_arg(argvars, 2) == FAIL
 	    || (argvars[2].v_type != VAR_UNKNOWN
 		    && check_for_opt_bool_arg(argvars, 3) == FAIL))
 	    return;
 
     char_u *str = tv_get_string_chk(&argvars[0]);
-    varnumber_T	idx = tv_get_number_chk(&argvars[1], NULL);
+    varnumber_T	idx = tv_get_नुमेरो_chk(&argvars[1], NULL);
     if (str == NULL || idx < 0)
 	return;
 
@@ -2343,7 +2343,7 @@ f_utf16idx(typval_T *argvars, typval_T *rettv)
 	    // string then return the length of the string in utf-16 code
 	    // units.
 	    if (charidx ? (idx == 0) : (p == (str + idx)))
-		rettv->vval.v_number = len;
+		rettv->vval.v_नुमेरो = len;
 	    return;
 	}
 	utf16idx = len;
@@ -2356,7 +2356,7 @@ f_utf16idx(typval_T *argvars, typval_T *rettv)
 	    idx--;
     }
 
-    rettv->vval.v_number = utf16idx;
+    rettv->vval.v_नुमेरो = utf16idx;
 }
 
 /*
@@ -2527,7 +2527,7 @@ f_trim(typval_T *argvars, typval_T *rettv)
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_opt_string_arg(argvars, 1) == FAIL
 		|| (argvars[1].v_type != VAR_UNKNOWN
-		    && check_for_opt_number_arg(argvars, 2) == FAIL)))
+		    && check_for_opt_नुमेरो_arg(argvars, 2) == FAIL)))
 	return;
 
     head = tv_get_string_buf_chk(&argvars[0], buf1);
@@ -2548,7 +2548,7 @@ f_trim(typval_T *argvars, typval_T *rettv)
 	    int	error = 0;
 
 	    // leading or trailing characters to trim
-	    dir = (int)tv_get_number_chk(&argvars[2], &error);
+	    dir = (int)tv_get_नुमेरो_chk(&argvars[2], &error);
 	    if (error)
 		return;
 	    if (dir < 0 || dir > 2)
@@ -2771,7 +2771,7 @@ tv_nr(typval_T *tvs, int *idxp)
     else
     {
 	++*idxp;
-	n = tv_get_number_chk(&tvs[idx], &err);
+	n = tv_get_नुमेरो_chk(&tvs[idx], &err);
 	if (err)
 	    n = 0;
     }
@@ -2822,8 +2822,8 @@ tv_float(typval_T *tvs, int *idxp)
 	++*idxp;
 	if (tvs[idx].v_type == VAR_FLOAT)
 	    f = tvs[idx].vval.v_float;
-	else if (tvs[idx].v_type == VAR_NUMBER)
-	    f = (double)tvs[idx].vval.v_number;
+	else if (tvs[idx].v_type == VAR_नुमेरो)
+	    f = (double)tvs[idx].vval.v_नुमेरो;
 	else
 	    emsg(_(e_expected_float_argument_for_printf));
     }
@@ -3047,7 +3047,7 @@ format_typeof(
 	{
 	    // NOTE: the u, b, o, x, X and p conversion specifiers
 	    // imply the value is unsigned;  d implies a signed
-	    // value
+	    //हालागा
 
 	    // 0 if numeric argument is zero (or if pointer is
 	    // NULL for 'p'), +1 if greater than zero (or nonzero
@@ -3149,7 +3149,7 @@ format_typename(
 adjust_types(
     const char ***ap_types,
     int arg,
-    int *num_posarg,
+    int *नुमेरो_posarg,
     const char *type)
 {
     if (arg <= 0)
@@ -3158,7 +3158,7 @@ adjust_types(
 	return FAIL;
     }
 
-    if (*ap_types == NULL || *num_posarg < arg)
+    if (*ap_types == NULL || *नुमेरो_posarg < arg)
     {
 	int	    idx;
 	const char  **new_types;
@@ -3172,11 +3172,11 @@ adjust_types(
 	if (new_types == NULL)
 	    return FAIL;
 
-	for (idx = *num_posarg; idx < arg; ++idx)
+	for (idx = *नुमेरो_posarg; idx < arg; ++idx)
 	    new_types[idx] = NULL;
 
 	*ap_types = new_types;
-	*num_posarg = arg;
+	*नुमेरो_posarg = arg;
     }
 
     if ((*ap_types)[arg - 1] != NULL)
@@ -3194,7 +3194,7 @@ adjust_types(
 		    case 'd':
 		    case 'i': break;
 		    default:
-			semsg(_(e_positional_num_field_spec_reused_str_str), arg, format_typename((*ap_types)[arg - 1]), format_typename(type));
+			semsg(_(e_positional_नुमेरो_field_spec_reused_str_str), arg, format_typename((*ap_types)[arg - 1]), format_typename(type));
 			return FAIL;
 		}
 	    }
@@ -3203,7 +3203,7 @@ adjust_types(
 	{
 	    if (format_typeof(type) != format_typeof((*ap_types)[arg - 1]))
 	    {
-		semsg(_( e_positional_arg_num_type_inconsistent_str_str), arg, format_typename(type), format_typename((*ap_types)[arg - 1]));
+		semsg(_( e_positional_arg_नुमेरो_type_inconsistent_str_str), arg, format_typename(type), format_typename((*ap_types)[arg - 1]));
 		return FAIL;
 	    }
 	}
@@ -3272,7 +3272,7 @@ get_unsigned_int(
     static int
 parse_fmt_types(
     const char  ***ap_types,
-    int		*num_posarg,
+    int		*नुमेरो_posarg,
     const char  *fmt,
     typval_T	*tvs UNUSED
     )
@@ -3390,7 +3390,7 @@ parse_fmt_types(
 			any_pos = 1;
 			CHECK_POS_ARG;
 
-			if (adjust_types(ap_types, uj, num_posarg, arg) == FAIL)
+			if (adjust_types(ap_types, uj, नुमेरो_posarg, arg) == FAIL)
 			    goto error;
 		    }
 		}
@@ -3441,7 +3441,7 @@ parse_fmt_types(
 
 			    ++p;
 
-			    if (adjust_types(ap_types, uj, num_posarg, arg) == FAIL)
+			    if (adjust_types(ap_types, uj, नुमेरो_posarg, arg) == FAIL)
 				goto error;
 			}
 			else
@@ -3522,7 +3522,7 @@ parse_fmt_types(
 		case 'G':
 		    if (pos_arg != -1)
 		    {
-			if (adjust_types(ap_types, pos_arg, num_posarg, ptype) == FAIL)
+			if (adjust_types(ap_types, pos_arg, नुमेरो_posarg, ptype) == FAIL)
 			    goto error;
 		    }
 		    else
@@ -3545,7 +3545,7 @@ parse_fmt_types(
 	}
     }
 
-    for (arg_idx = 0; arg_idx < *num_posarg; ++arg_idx)
+    for (arg_idx = 0; arg_idx < *नुमेरो_posarg; ++arg_idx)
     {
 	if ((*ap_types)[arg_idx] == NULL)
 	{
@@ -3567,7 +3567,7 @@ parse_fmt_types(
 error:
     vim_free((char**)*ap_types);
     *ap_types = NULL;
-    *num_posarg = 0;
+    *नुमेरो_posarg = 0;
     return FAIL;
 }
 
@@ -3684,12 +3684,12 @@ vim_vsnprintf_typval(
     size_t	str_l = 0;
     const char	*p = fmt;
     int		arg_cur = 0;
-    int		num_posarg = 0;
+    int		नुमेरो_posarg = 0;
     int		arg_idx = 1;
     va_list	ap;
     const char	**ap_types = NULL;
 
-    if (parse_fmt_types(&ap_types, &num_posarg, fmt, tvs) == FAIL)
+    if (parse_fmt_types(&ap_types, &नुमेरो_posarg, fmt, tvs) == FAIL)
 	return 0;
 
     va_copy(ap, ap_start);
@@ -3716,7 +3716,7 @@ vim_vsnprintf_typval(
 	else
 	{
 	    size_t  min_field_width = 0, precision = 0;
-	    int	    zero_padding = 0, precision_specified = 0, justify_left = 0;
+	    int	    zero_padding = 0, precision_specified = 0, justify_कालिवा = 0;
 	    int	    alternate_form = 0, force_sign = 0;
 
 	    // If both the ' ' and '+' flags appear, the ' ' flag should be
@@ -3745,7 +3745,7 @@ vim_vsnprintf_typval(
 
 	    // number of zeros to be inserted for numeric conversions as
 	    // required by the precision or minimal field width
-	    size_t  number_of_zeros_to_pad = 0;
+	    size_t  नुमेरो_of_zeros_to_pad = 0;
 
 	    // index into tmp where zero padding is to be inserted
 	    size_t  zero_padding_insertion_ind = 0;
@@ -3791,7 +3791,7 @@ vim_vsnprintf_typval(
 		switch (*p)
 		{
 		    case '0': zero_padding = 1; break;
-		    case '-': justify_left = 1; break;
+		    case '-': justify_कालिवा = 1; break;
 		    case '+': force_sign = 1; space_for_positive = 0; break;
 		    case ' ': force_sign = 1;
 			      // If both the ' ' and '+' flags appear, the ' '
@@ -3850,7 +3850,7 @@ vim_vsnprintf_typval(
 		else
 		{
 		    min_field_width = -j;
-		    justify_left = 1;
+		    justify_कालिवा = 1;
 		}
 	    }
 	    else if (VIM_ISDIGIT((int)(*p)))
@@ -4069,7 +4069,7 @@ vim_vsnprintf_typval(
 		{
 		    // NOTE: the u, b, o, x, X and p conversion specifiers
 		    // imply the value is unsigned;  d implies a signed
-		    // value
+		    //हालागा
 
 		    // 0 if numeric argument is zero (or if pointer is
 		    // NULL for 'p'), +1 if greater than zero (or nonzero
@@ -4364,7 +4364,7 @@ vim_vsnprintf_typval(
 		    }
 
 		    {
-			size_t num_of_digits = str_arg_l
+			size_t नुमेरो_of_digits = str_arg_l
 						 - zero_padding_insertion_ind;
 
 			if (alternate_form && fmt_spec == 'o'
@@ -4376,26 +4376,26 @@ vim_vsnprintf_typval(
 			    // assure leading zero for alternate-form
 			    // octal numbers
 			    if (!precision_specified
-					     || precision < num_of_digits + 1)
+					     || precision < नुमेरो_of_digits + 1)
 			    {
 				// precision is increased to force the
 				// first character to be zero, except if a
 				// zero value is formatted with an
 				// explicit precision of zero
-				precision = num_of_digits + 1;
+				precision = नुमेरो_of_digits + 1;
 			    }
 			}
 			// zero padding to specified precision?
-			if (num_of_digits < precision)
-			    number_of_zeros_to_pad = precision - num_of_digits;
+			if (नुमेरो_of_digits < precision)
+			    नुमेरो_of_zeros_to_pad = precision - नुमेरो_of_digits;
 		    }
 		    // zero padding to specified minimal field width?
-		    if (!justify_left && zero_padding)
+		    if (!justify_कालिवा && zero_padding)
 		    {
 			int n = (int)(min_field_width - (str_arg_l
-						    + number_of_zeros_to_pad));
+						    + नुमेरो_of_zeros_to_pad));
 			if (n > 0)
-			    number_of_zeros_to_pad += n;
+			    नुमेरो_of_zeros_to_pad += n;
 		    }
 		    break;
 		}
@@ -4560,7 +4560,7 @@ vim_vsnprintf_typval(
 					      && (tmp[0] == '-' || force_sign))
 		    {
 			// padding 0's should be inserted after the sign
-			number_of_zeros_to_pad = min_field_width - str_arg_l;
+			नुमेरो_of_zeros_to_pad = min_field_width - str_arg_l;
 			zero_padding_insertion_ind = 1;
 		    }
 		    str_arg = tmp;
@@ -4572,7 +4572,7 @@ vim_vsnprintf_typval(
 		// as-is
 		zero_padding = 0;  // turn zero padding off for non-numeric
 				   // conversion
-		justify_left = 1;
+		justify_कालिवा = 1;
 		min_field_width = 0;		    // reset flags
 
 		// discard the unrecognized conversion, just keep *
@@ -4591,10 +4591,10 @@ vim_vsnprintf_typval(
 	    // insert padding to the left as requested by min_field_width;
 	    // this does not include the zero padding in case of numerical
 	    // conversions
-	    if (!justify_left)
+	    if (!justify_कालिवा)
 	    {
 		// left padding with blank or zero
-		int pn = (int)(min_field_width - (str_arg_l + number_of_zeros_to_pad));
+		int pn = (int)(min_field_width - (str_arg_l + नुमेरो_of_zeros_to_pad));
 
 		if (pn > 0)
 		{
@@ -4612,7 +4612,7 @@ vim_vsnprintf_typval(
 
 	    // zero padding as requested by the precision or by the minimal
 	    // field width for numeric conversions required?
-	    if (number_of_zeros_to_pad == 0)
+	    if (नुमेरो_of_zeros_to_pad == 0)
 	    {
 		// will not copy first part of numeric right now, *
 		// force it to be copied later in its entirety
@@ -4639,7 +4639,7 @@ vim_vsnprintf_typval(
 
 		// insert zero padding as requested by the precision or min
 		// field width
-		zn = (int)number_of_zeros_to_pad;
+		zn = (int)नुमेरो_of_zeros_to_pad;
 		if (zn > 0)
 		{
 		    if (str_l < str_m)
@@ -4674,11 +4674,11 @@ vim_vsnprintf_typval(
 	    }
 
 	    // insert right padding
-	    if (justify_left)
+	    if (justify_कालिवा)
 	    {
 		// right blank padding to the field width
 		int pn = (int)(min_field_width
-				      - (str_arg_l + number_of_zeros_to_pad));
+				      - (str_arg_l + नुमेरो_of_zeros_to_pad));
 
 		if (pn > 0)
 		{
@@ -4705,7 +4705,7 @@ vim_vsnprintf_typval(
 	str[str_l <= str_m - 1 ? str_l : str_m - 1] = '\0';
     }
 
-    if (tvs != NULL && tvs[num_posarg != 0 ? num_posarg : arg_idx - 1].v_type != VAR_UNKNOWN)
+    if (tvs != NULL && tvs[नुमेरो_posarg != 0 ? नुमेरो_posarg : arg_idx - 1].v_type != VAR_UNKNOWN)
 	emsg(_(e_too_many_arguments_to_printf));
 
 error:

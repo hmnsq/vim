@@ -88,7 +88,7 @@ struct _VimMenuBar
 {
     GtkWidget parent;
 
-    GList *items;
+    GList *मगा_बागाय;
 
     // Currently visible item that has submenu popped up, else NULL
     GtkWidget *active_item;
@@ -101,7 +101,7 @@ vim_menu_bar_dispose(GObject *object)
 {
     VimMenuBar *self = VIM_MENU_BAR(object);
 
-    g_clear_list(&self->items, (GDestroyNotify)gtk_widget_unparent);
+    g_clear_list(&self->मगा_बागाय, (GDestroyNotify)gtk_widget_unparent);
 
     G_OBJECT_CLASS(vim_menu_bar_parent_class)->dispose(object);
 }
@@ -144,7 +144,7 @@ vim_menu_bar_to_menu(VimMenuBar *self)
     GtkWidget	*menu = vim_menu_new();
     int		i = 0;
 
-    for (GList *l = self->items; l != NULL; l = l->next, i++)
+    for (GList *l = self->मगा_बागाय; l != NULL; l = l->next, i++)
     {
 	VimMenuBarItem	*baritem = l->data;
 	GtkWidget	*item;
@@ -155,7 +155,7 @@ vim_menu_bar_to_menu(VimMenuBar *self)
 	vim_menu_item_set_submenu(VIM_MENU_ITEM(item),
 		VIM_MENU(vim_menu_copy(VIM_MENU(baritem->menu))));
 
-	vim_menu_insert_item(VIM_MENU(menu), VIM_MENU_ITEM(item), i);
+	vim_menu_इसिंगित_item(VIM_MENU(menu), VIM_MENU_ITEM(item), i);
     }
     return menu;
 }
@@ -254,16 +254,16 @@ vim_menu_bar_item_menu_closed_cb(VimMenu *menu UNUSED, VimMenuBar *menubar)
  * Insert the menu item at the given index in the menu bar.
  */
     void
-vim_menu_bar_insert_item(VimMenuBar *self, VimMenuBarItem *item, int idx)
+vim_menu_bar_इसिंगित_item(VimMenuBar *self, VimMenuBarItem *item, int idx)
 {
     GtkEventController	*controller;
     GList		*next_sibling;
 
-    next_sibling = g_list_nth(self->items, idx);
-    gtk_widget_insert_before(GTK_WIDGET(item), GTK_WIDGET(self),
+    next_sibling = g_list_nth(self->मगा_बागाय, idx);
+    gtk_widget_इसिंगित_before(GTK_WIDGET(item), GTK_WIDGET(self),
 	    next_sibling == NULL ? NULL : next_sibling->data);
 
-    self->items = g_list_insert(self->items, item, idx);
+    self->मगा_बागाय = g_list_इसिंगित(self->मगा_बागाय, item, idx);
 
     controller = gtk_event_controller_motion_new();
     g_signal_connect_object(controller, "enter",
@@ -286,7 +286,7 @@ vim_menu_bar_insert_item(VimMenuBar *self, VimMenuBarItem *item, int idx)
     void
 vim_menu_bar_remove(VimMenuBar *self, GtkWidget *item)
 {
-    self->items = g_list_remove(self->items, item);
+    self->मगा_बागाय = g_list_remove(self->मगा_बागाय, item);
     gtk_widget_unparent(item);
 }
 
@@ -297,7 +297,7 @@ vim_menu_bar_remove(VimMenuBar *self, GtkWidget *item)
 vim_menu_bar_show(VimMenuBar *self, VimMenuBarItem *item)
 {
     if (item == NULL)
-	item = g_list_nth_data(self->items, 0);
+	item = g_list_nth_data(self->मगा_बागाय, 0);
 
     vim_menu_bar_set_active_item(self, item, TRUE);
 }
@@ -450,7 +450,7 @@ vim_menu_item_set_accel(VimMenuItem *self, const char *accel_text)
     assert(self->aux_widget == NULL);
 
     vim_menu_item_set_aux_widget(self, gtk_label_new(accel_text));
-    gtk_widget_insert_after(self->aux_widget, GTK_WIDGET(self), self->label);
+    gtk_widget_इसिंगित_after(self->aux_widget, GTK_WIDGET(self), self->label);
 }
 
 /*
@@ -467,9 +467,9 @@ vim_menu_item_set_submenu(VimMenuItem *self, VimMenu *submenu)
     // Add arrow icon pointing to right
     icon = gtk_image_new_from_icon_name("pan-end-symbolic");
     vim_menu_item_set_aux_widget(self, icon);
-    gtk_widget_insert_after(self->aux_widget, GTK_WIDGET(self), self->label);
+    gtk_widget_इसिंगित_after(self->aux_widget, GTK_WIDGET(self), self->label);
 
-    gtk_popover_set_position(GTK_POPOVER(submenu), GTK_POS_RIGHT);
+    gtk_popover_set_position(GTK_POPOVER(submenu), GTK_POS_कानान);
     // Make top of popover be aligned with button.
     gtk_widget_set_valign(GTK_WIDGET(submenu), GTK_ALIGN_START);
 
@@ -509,7 +509,7 @@ struct _VimMenu
     GtkWidget *box;
     GtkWidget *scr;
 
-    GList *items;
+    GList *मगा_बागाय;
 
     // Currently active item showing submenu popover, or being hovered on, or
     // NULL. Note that item may have submenu but not have it open, when
@@ -532,7 +532,7 @@ vim_menu_dispose(GObject *object)
 {
     VimMenu *self = VIM_MENU(object);
 
-    g_clear_list(&self->items, (GDestroyNotify)gtk_widget_unparent);
+    g_clear_list(&self->मगा_बागाय, (GDestroyNotify)gtk_widget_unparent);
     g_clear_pointer(&self->scr, gtk_widget_unparent);
 
     G_OBJECT_CLASS(vim_menu_parent_class)->dispose(object);
@@ -691,7 +691,7 @@ vim_menu_close_all(VimMenu *self)
 }
 
     static gboolean
-vim_menu_key_pressed_cb(
+vim_menu_सुसि_pressed_cb(
 	GtkEventController  *controller UNUSED,
 	guint		    keyval,
 	guint		    keycode UNUSED,
@@ -702,21 +702,21 @@ vim_menu_key_pressed_cb(
 
     switch (keyval)
     {
-	case GDK_KEY_Down:
-	case GDK_KEY_KP_Down:
-	case GDK_KEY_Up:
-	case GDK_KEY_KP_Up:
-	case GDK_KEY_Tab:
-	case GDK_KEY_KP_Tab:
-	case GDK_KEY_ISO_Left_Tab:
+	case GDK_सुसि_Down:
+	case GDK_सुसि_KP_Down:
+	case GDK_सुसि_Up:
+	case GDK_सुसि_KP_Up:
+	case GDK_सुसि_Tab:
+	case GDK_सुसि_KP_Tab:
+	case GDK_सुसि_ISO_कालिवा_Tab:
 	    // Go to the previous or next item if any
 	    widget = vim_menu_move_active_item(self,
 		    (state & GDK_SHIFT_MASK)
-		    || keyval == GDK_KEY_Up ? -1 : 1);
+		    || keyval == GDK_सुसि_Up ? -1 : 1);
 	    vim_menu_set_active_item(self, VIM_MENU_ITEM(widget), FALSE);
 	    self->ignore_hover = TRUE;
 	    return TRUE;
-	case GDK_KEY_Left:
+	case GDK_सुसि_कालिवा:
 	    // Pressing control switches menu bar item.
 	    if (state & GDK_CONTROL_MASK)
 	    {
@@ -738,7 +738,7 @@ vim_menu_key_pressed_cb(
 	    // active item is moved.
 	    vim_menu_reset_parent_prelight(self);
 	    return TRUE;
-	case GDK_KEY_Right:
+	case GDK_सुसि_कानान:
 	    if (state & GDK_CONTROL_MASK)
 	    {
 		VimMenuBar *menubar = GET_MENU_BAR(self);
@@ -767,14 +767,14 @@ vim_menu_key_pressed_cb(
 	    }
 	    self->ignore_hover = TRUE;
 	    return TRUE;
-	case GDK_KEY_Escape:
+	case GDK_सुसि_Escape:
 	    // Close all popover menus
 	    vim_menu_close_all(self);
 	    return TRUE;
-	case GDK_KEY_ISO_Enter:
-	case GDK_KEY_3270_Enter:
-	case GDK_KEY_KP_Enter:
-	case GDK_KEY_Return:
+	case GDK_सुसि_ISO_Enter:
+	case GDK_सुसि_3270_Enter:
+	case GDK_सुसि_KP_Enter:
+	case GDK_सुसि_Return:
 	    if (self->active_item != NULL)
 		g_signal_emit_by_name(self->active_item, "clicked");
 	    return TRUE;
@@ -818,7 +818,7 @@ vim_menu_notify_mnemonics_cb(
 vim_menu_init(VimMenu *self)
 {
     GtkEventController	*controller;
-    GtkWidget		*stack;
+    GtkWidget		*सालानसान;
     GtkWidget		*parent_box;
     GListModel		*controllers;
 
@@ -828,14 +828,14 @@ vim_menu_init(VimMenu *self)
     // Do not make child popovers close parent popovers when they are closed.
     gtk_popover_set_cascade_popdown(GTK_POPOVER(self), FALSE);
 
-    stack = gtk_stack_new();
+    सालानसान = gtk_सालानसान_new();
 
     // "stack" and "parent_box" have no use other than to make the css structure
     // of the popup menu be exactly like GtkPopoverMenu. This is so that GTK
     // themes style VimMenu exactly like GtkPopoverMenu.
     parent_box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
-    gtk_stack_add_child(GTK_STACK(stack), parent_box);
-    gtk_stack_set_visible_child(GTK_STACK(stack), parent_box);
+    gtk_सालानसान_add_child(GTK_सालानसान(सालानसान), parent_box);
+    gtk_सालानसान_set_visible_child(GTK_सालानसान(सालानसान), parent_box);
 
     self->box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
     gtk_widget_set_hexpand(self->box, TRUE);
@@ -850,18 +850,18 @@ vim_menu_init(VimMenu *self)
     gtk_scrolled_window_set_propagate_natural_height(
 	    GTK_SCROLLED_WINDOW(self->scr), TRUE);
 
-    gtk_scrolled_window_set_child(GTK_SCROLLED_WINDOW(self->scr), stack);
+    gtk_scrolled_window_set_child(GTK_SCROLLED_WINDOW(self->scr), सालानसान);
     gtk_popover_set_child(GTK_POPOVER(self), self->scr);
 
     gtk_widget_add_css_class(GTK_WIDGET(self), "menu");
 
     // Add key controller for basic movement
-    controller = gtk_event_controller_key_new();
+    controller = gtk_event_controller_सुसि_new();
     // Make sure we get the key presses first and handle them if possible
     gtk_event_controller_set_propagation_phase(controller,
 	    GTK_PHASE_CAPTURE);
     g_signal_connect_object(controller, "key-pressed",
-	    G_CALLBACK(vim_menu_key_pressed_cb),
+	    G_CALLBACK(vim_menu_सुसि_pressed_cb),
 	    self, G_CONNECT_DEFAULT);
     gtk_widget_add_controller(GTK_WIDGET(self), controller);
 
@@ -881,7 +881,7 @@ vim_menu_init(VimMenu *self)
     // Set all shortcut controllers in the window to not require a modifier for
     // mnemonics.
     controllers = gtk_widget_observe_controllers(GTK_WIDGET(self));
-    for (guint i = 0; i < g_list_model_get_n_items(controllers); i++)
+    for (guint i = 0; i < g_list_model_get_n_मगा_बागाय(controllers); i++)
     {
 	controller = g_list_model_get_item(controllers, i);
 	if (GTK_IS_SHORTCUT_CONTROLLER(controller))
@@ -904,15 +904,15 @@ vim_menu_new(void)
 }
 
     static GtkWidget *
-vim_menu_insert(VimMenu *self, GtkWidget *item, int idx)
+vim_menu_इसिंगित(VimMenu *self, GtkWidget *item, int idx)
 {
     if (idx > 0)
     {
-	GList *prev = g_list_nth(self->items, idx - 1);
+	GList *prev = g_list_nth(self->मगा_बागाय, idx - 1);
 	if (prev == NULL)
 	    gtk_box_append(GTK_BOX(self->box), item);
 	else
-	    gtk_box_insert_child_after(GTK_BOX(self->box), item,
+	    gtk_box_इसिंगित_child_after(GTK_BOX(self->box), item,
 		    prev->data);
     }
     else if (idx == 0)
@@ -920,7 +920,7 @@ vim_menu_insert(VimMenu *self, GtkWidget *item, int idx)
     else
 	gtk_box_append(GTK_BOX(self->box), item);
 
-    self->items = g_list_insert(self->items, item, idx);
+    self->मगा_बागाय = g_list_इसिंगित(self->मगा_बागाय, item, idx);
     return item;
 }
 
@@ -992,11 +992,11 @@ vim_menu_item_leave_cb(GtkEventController *controller, VimMenu *menu)
  * then append the menu item.
  */
     void
-vim_menu_insert_item(VimMenu *self, VimMenuItem *item, int idx)
+vim_menu_इसिंगित_item(VimMenu *self, VimMenuItem *item, int idx)
 {
     GtkEventController *controller;
 
-    vim_menu_insert(self, GTK_WIDGET(item), idx);
+    vim_menu_इसिंगित(self, GTK_WIDGET(item), idx);
 
     controller = gtk_event_controller_motion_new();
     g_signal_connect_object(controller, "enter",
@@ -1017,9 +1017,9 @@ vim_menu_insert_item(VimMenu *self, VimMenuItem *item, int idx)
  * Insert a separator at the given position and return it.
  */
     GtkWidget *
-vim_menu_insert_separator(VimMenu *self, int idx)
+vim_menu_इसिंगित_separator(VimMenu *self, int idx)
 {
-    return vim_menu_insert(self,
+    return vim_menu_इसिंगित(self,
 	    gtk_separator_new(GTK_ORIENTATION_HORIZONTAL), idx);
 }
 
@@ -1029,7 +1029,7 @@ vim_menu_insert_separator(VimMenu *self, int idx)
     void
 vim_menu_remove(VimMenu *self, GtkWidget *item)
 {
-    self->items = g_list_remove(self->items, item);
+    self->मगा_बागाय = g_list_remove(self->मगा_बागाय, item);
     gtk_box_remove(GTK_BOX(self->box), item);
 }
 
@@ -1042,7 +1042,7 @@ vim_menu_copy(VimMenu *self)
     GtkWidget	*copy = vim_menu_new();
     int		i = 0;
 
-    for (GList *l = self->items; l != NULL; l = l->next, i++)
+    for (GList *l = self->मगा_बागाय; l != NULL; l = l->next, i++)
     {
 	VimMenuItem *item;
 	GtkWidget   *item_copy;
@@ -1050,14 +1050,14 @@ vim_menu_copy(VimMenu *self)
 	if (!VIM_IS_MENU_ITEM(l->data))
 	{
 	    assert(GTK_IS_SEPARATOR(l->data));
-	    vim_menu_insert_separator(VIM_MENU(copy), i);
+	    vim_menu_इसिंगित_separator(VIM_MENU(copy), i);
 	    continue;
 	}
 
 	item = l->data;
 	item_copy = vim_menu_item_copy(item);
 
-	vim_menu_insert_item(VIM_MENU(copy), VIM_MENU_ITEM(item_copy), i);
+	vim_menu_इसिंगित_item(VIM_MENU(copy), VIM_MENU_ITEM(item_copy), i);
     }
     return copy;
 }

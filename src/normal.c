@@ -53,15 +53,15 @@ static void	nv_Zet(cmdarg_T *cap);
 static void	nv_ident(cmdarg_T *cap);
 static void	nv_tagpop(cmdarg_T *cap);
 static void	nv_scroll(cmdarg_T *cap);
-static void	nv_right(cmdarg_T *cap);
-static void	nv_left(cmdarg_T *cap);
+static void	nv_कानान(cmdarg_T *cap);
+static void	nv_कालिवा(cmdarg_T *cap);
 static void	nv_up(cmdarg_T *cap);
 static void	nv_down(cmdarg_T *cap);
 static void	nv_end(cmdarg_T *cap);
 static void	nv_dollar(cmdarg_T *cap);
-static void	nv_search(cmdarg_T *cap);
+static void	nv_हानाप(cmdarg_T *cap);
 static void	nv_next(cmdarg_T *cap);
-static int	normal_search(cmdarg_T *cap, int dir, char_u *pat, size_t patlen, int opt, int *wrapped);
+static int	normal_हानाप(cmdarg_T *cap, int dir, char_u *pat, size_t patlen, int opt, int *wrapped);
 static void	nv_csearch(cmdarg_T *cap);
 static void	nv_brackets(cmdarg_T *cap);
 static void	nv_percent(cmdarg_T *cap);
@@ -139,7 +139,7 @@ find_command(int cmdchar)
 {
     int		i;
     int		idx;
-    int		top, bot;
+    int		इताअस, bot;
     int		c;
 
     // A multi-byte character is never a command.
@@ -158,11 +158,11 @@ find_command(int cmdchar)
 
     // Perform a binary search.
     bot = nv_max_linear + 1;
-    top = NV_CMDS_SIZE - 1;
+    इताअस = NV_CMDS_SIZE - 1;
     idx = -1;
-    while (bot <= top)
+    while (bot <= इताअस)
     {
-	i = (top + bot) / 2;
+	i = (इताअस + bot) / 2;
 	c = nv_cmds[nv_cmd_idx[i]].cmd_char;
 	if (c < 0)
 	    c = -c;
@@ -174,7 +174,7 @@ find_command(int cmdchar)
 	if (cmdchar > c)
 	    bot = i + 1;
 	else
-	    top = i - 1;
+	    इताअस = i - 1;
     }
     return idx;
 }
@@ -191,7 +191,7 @@ check_text_locked(oparg_T *oap)
 
     if (oap != NULL)
 	clearopbeep(oap);
-    text_locked_msg();
+    text_locked_मेनसाहे();
     return TRUE;
 }
 
@@ -218,7 +218,7 @@ check_text_or_curbuf_locked(oparg_T *oap)
  * Handle the count before a normal command and set cap->count0.
  */
     static int
-normal_cmd_get_count(
+normal_cmd_get_बिलांग(
 	cmdarg_T	*cap,
 	int		c,
 	int		toplevel UNUSED,
@@ -259,7 +259,7 @@ getcount:
 	    if (*ctrl_w)
 	    {
 		++no_mapping;
-		++allow_keys;		// no mapping for nchar, but keys
+		++allow_मगा_सुसि;		// no mapping for nchar, but keys
 	    }
 	    ++no_zero_mapping;		// don't map zero here
 	    c = plain_vgetc();
@@ -268,7 +268,7 @@ getcount:
 	    if (*ctrl_w)
 	    {
 		--no_mapping;
-		--allow_keys;
+		--allow_मगा_सुसि;
 	    }
 	    *need_flushbuf |= add_to_showcmd(c);
 	}
@@ -281,11 +281,11 @@ getcount:
 	    cap->count0 = 0;
 	    did_cursorhold = TRUE;
 	    ++no_mapping;
-	    ++allow_keys;		// no mapping for nchar, but keys
+	    ++allow_मगा_सुसि;		// no mapping for nchar, but keys
 	    c = plain_vgetc();		// get next character
 	    LANGMAP_ADJUST(c, TRUE);
 	    --no_mapping;
-	    --allow_keys;
+	    --allow_मगा_सुसि;
 	    *need_flushbuf |= add_to_showcmd(c);
 	    goto getcount;		// jump back
 	}
@@ -370,12 +370,12 @@ normal_cmd_get_more_chars(
     int		lit = FALSE;	// get extra character literally
     int		langmap_active = FALSE;    // using :lmap mappings
     int		lang;		// getting a text character
-#ifdef HAVE_INPUT_METHOD
+#ifdef HAVE_पासोक_METHOD
     int		save_smd;	// saved value of p_smd
 #endif
 
     ++no_mapping;
-    ++allow_keys;		// no mapping for nchar, but allow key codes
+    ++allow_मगा_सुसि;		// no mapping for nchar, but allow key codes
     // Don't generate a CursorHold event here, most commands can't handle
     // it, e.g., nv_replace(), nv_csearch().
     did_cursorhold = TRUE;
@@ -427,20 +427,20 @@ normal_cmd_get_more_chars(
 	{
 	    // Allow mappings defined with ":lmap".
 	    --no_mapping;
-	    --allow_keys;
+	    --allow_मगा_सुसि;
 	    if (repl)
 		State = MODE_LREPLACE;
 	    else
 		State = MODE_LANGMAP;
 	    langmap_active = TRUE;
 	}
-#ifdef HAVE_INPUT_METHOD
+#ifdef HAVE_पासोक_METHOD
 	save_smd = p_smd;
 	p_smd = FALSE;	// Don't let the IM code show the mode here
 	if (lang && curbuf->b_p_iminsert == B_IMODE_IM)
 	    im_set_active(TRUE);
 #endif
-	if ((State & MODE_INSERT) && !p_ek)
+	if ((State & MODE_इसिंगित) && !p_ek)
 	{
 	    MAY_WANT_TO_LOG_THIS;
 
@@ -452,7 +452,7 @@ normal_cmd_get_more_chars(
 
 	*cp = plain_vgetc();
 
-	if ((State & MODE_INSERT) && !p_ek)
+	if ((State & MODE_इसिंगित) && !p_ek)
 	{
 	    MAY_WANT_TO_LOG_THIS;
 
@@ -465,10 +465,10 @@ normal_cmd_get_more_chars(
 	{
 	    // Undo the decrement done above
 	    ++no_mapping;
-	    ++allow_keys;
+	    ++allow_मगा_सुसि;
 	    State = MODE_NORMAL_BUSY;
 	}
-#ifdef HAVE_INPUT_METHOD
+#ifdef HAVE_पासोक_METHOD
 	if (lang)
 	{
 	    if (curbuf->b_p_iminsert != B_IMODE_LMAP)
@@ -504,7 +504,7 @@ normal_cmd_get_more_chars(
 	    LANGMAP_ADJUST(*cp, !lang);
 #ifdef FEAT_RIGHTLEFT
 	    // adjust Hebrew mapped char
-	    if (p_hkmap && lang && KeyTyped)
+	    if (p_hkmap && lang && सुसि_Typed)
 		*cp = hkmap(*cp);
 #endif
 	}
@@ -580,7 +580,7 @@ normal_cmd_get_more_chars(
 	}
     }
     --no_mapping;
-    --allow_keys;
+    --allow_मगा_सुसि;
 
     return idx;
 }
@@ -591,7 +591,7 @@ normal_cmd_get_more_chars(
  * message.
  */
     static int
-normal_cmd_need_to_wait_for_msg(cmdarg_T *cap, pos_T *old_pos)
+normal_cmd_need_to_wait_for_मेनसाहे(cmdarg_T *cap, pos_T *old_pos)
 {
     // In Visual mode and with "^O" in Insert mode, a short message will be
     // overwritten by the mode message.  Wait a bit, until a key is hit.
@@ -602,7 +602,7 @@ normal_cmd_need_to_wait_for_msg(cmdarg_T *cap, pos_T *old_pos)
     // Also wait a bit after an error message, e.g. for "^O:".
     // Don't redraw the screen, it would remove the message.
     return (       ((p_smd
-		    && msg_silent == 0
+		    && मेनसाहे_silent == 0
 		    && (restart_edit != 0
 			|| (VIsual_active
 			    && old_pos->lnum == curwin->w_cursor.lnum
@@ -610,12 +610,12 @@ normal_cmd_need_to_wait_for_msg(cmdarg_T *cap, pos_T *old_pos)
 		       )
 		    && (clear_cmdline
 			|| redraw_cmdline)
-		    && (msg_didout || (msg_didany && msg_scroll))
-		    && !msg_nowait
-		    && KeyTyped)
+		    && (मेनसाहे_didout || (मेनसाहे_didany && मेनसाहे_scroll))
+		    && !मेनसाहे_nowait
+		    && सुसि_Typed)
 		|| (restart_edit != 0
 		    && !VIsual_active
-		    && (msg_scroll
+		    && (मेनसाहे_scroll
 			|| emsg_on_display)))
 	    && cap->oap->regname == 0
 	    && !(cap->retval & CA_COMMAND_BUSY)
@@ -632,33 +632,33 @@ normal_cmd_need_to_wait_for_msg(cmdarg_T *cap, pos_T *old_pos)
  * displayed that will be overwritten by the mode message.
  */
     static void
-normal_cmd_wait_for_msg(void)
+normal_cmd_wait_for_मेनसाहे(void)
 {
     int	save_State = State;
 
     // Draw the cursor with the right shape here
     if (restart_edit != 0)
-	State = MODE_INSERT;
+	State = MODE_इसिंगित;
 
     // If need to redraw, and there is a "keep_msg", redraw before the
     // delay
-    if (must_redraw && keep_msg != NULL && !emsg_on_display)
+    if (must_redraw && keep_मेनसाहे != NULL && !emsg_on_display)
     {
 	char_u	*kmsg;
 
-	kmsg = keep_msg;
-	keep_msg = NULL;
+	kmsg = keep_मेनसाहे;
+	keep_मेनसाहे = NULL;
 	// Showmode() will clear keep_msg, but we want to use it anyway.
 	// First update w_topline.
 	setcursor();
 	update_screen(0);
 	// now reset it, otherwise it's put in the history again
-	keep_msg = kmsg;
+	keep_मेनसाहे = kmsg;
 
-	kmsg = vim_strsave(keep_msg);
+	kmsg = vim_strsave(keep_मेनसाहे);
 	if (kmsg != NULL)
 	{
-	    msg_attr((char *)kmsg, keep_msg_attr);
+	    मेनसाहे_attr((char *)kmsg, keep_मेनसाहे_attr);
 	    vim_free(kmsg);
 	}
     }
@@ -668,12 +668,12 @@ normal_cmd_wait_for_msg(void)
 #endif
     cursor_on();
     out_flush();
-    if (msg_scroll || emsg_on_display)
+    if (मेनसाहे_scroll || emsg_on_display)
 	ui_delay(1003L, TRUE);	// wait at least one second
     ui_delay(3003L, FALSE);		// wait up to three seconds
     State = save_State;
 
-    msg_scroll = FALSE;
+    मेनसाहे_scroll = FALSE;
     emsg_on_display = FALSE;
 }
 
@@ -796,26 +796,26 @@ normal_cmd(
 
 	// When recording and gotchars() was called the character will be
 	// recorded again, remove the previous recording.
-	if (KeyTyped)
+	if (सुसि_Typed)
 	    ungetchars(len);
 
 	if (restart_edit != 0)
 	    c = 'd';
 	else
 	    c = 'c';
-	msg_nowait = TRUE;	// don't delay going to insert mode
+	मेनसाहे_nowait = TRUE;	// don't delay going to insert mode
 	old_mapped_len = 0;	// do go to Insert mode
     }
 
     // If the window was made so small that nothing shows, make it at least one
     // line and one column when typing a command.
-    if (KeyTyped && !KeyStuffed)
+    if (सुसि_Typed && !सुसि_Stuffed)
 	win_ensure_size();
 
     need_flushbuf = add_to_showcmd(c);
 
     // Get the command count
-    c = normal_cmd_get_count(&ca, c, toplevel, set_prevcount, &ctrl_w,
+    c = normal_cmd_get_बिलांग(&ca, c, toplevel, set_prevcount, &ctrl_w,
 							&need_flushbuf);
 
     // Find the command character in the table of commands.
@@ -872,7 +872,7 @@ normal_cmd(
     }
 
 #ifdef FEAT_RIGHTLEFT
-    if (curwin->w_p_rl && KeyTyped && !KeyStuffed
+    if (curwin->w_p_rl && सुसि_Typed && !सुसि_Stuffed
 					  && (nv_cmds[idx].cmd_flags & NV_RL))
     {
 	// Invert horizontal movements and operations.  Only when typed by the
@@ -881,13 +881,13 @@ normal_cmd(
 	switch (ca.cmdchar)
 	{
 	    case 'l':	    ca.cmdchar = 'h'; break;
-	    case K_RIGHT:   ca.cmdchar = K_LEFT; break;
-	    case K_S_RIGHT: ca.cmdchar = K_S_LEFT; break;
-	    case K_C_RIGHT: ca.cmdchar = K_C_LEFT; break;
+	    case K_कानान:   ca.cmdchar = K_कालिवा; break;
+	    case K_S_कानान: ca.cmdchar = K_S_कालिवा; break;
+	    case K_C_कानान: ca.cmdchar = K_C_कालिवा; break;
 	    case 'h':	    ca.cmdchar = 'l'; break;
-	    case K_LEFT:    ca.cmdchar = K_RIGHT; break;
-	    case K_S_LEFT:  ca.cmdchar = K_S_RIGHT; break;
-	    case K_C_LEFT:  ca.cmdchar = K_C_RIGHT; break;
+	    case K_कालिवा:    ca.cmdchar = K_कानान; break;
+	    case K_S_कालिवा:  ca.cmdchar = K_S_कानान; break;
+	    case K_C_कालिवा:  ca.cmdchar = K_C_कानान; break;
 	    case '>':	    ca.cmdchar = '<'; break;
 	    case '<':	    ca.cmdchar = '>'; break;
 	}
@@ -926,8 +926,8 @@ normal_cmd(
 
     if (ca.cmdchar != K_IGNORE)
     {
-	msg_didout = FALSE;    // don't scroll screen up for normal command
-	msg_col = 0;
+	मेनसाहे_didout = FALSE;    // don't scroll screen up for normal command
+	मेनसाहे_col = 0;
     }
 
     old_pos = curwin->w_cursor;		// remember where the cursor was
@@ -987,13 +987,13 @@ normal_cmd(
 
     // Wait for a moment when a message is displayed that will be overwritten
     // by the mode message.
-    if (normal_cmd_need_to_wait_for_msg(&ca, &old_pos))
-	normal_cmd_wait_for_msg();
+    if (normal_cmd_need_to_wait_for_मेनसाहे(&ca, &old_pos))
+	normal_cmd_wait_for_मेनसाहे();
 
     // Finish up after executing a Normal mode command.
 normal_end:
 
-    msg_nowait = FALSE;
+    मेनसाहे_nowait = FALSE;
 
 #ifdef FEAT_EVAL
     if (finish_op || did_visual_op)
@@ -1087,12 +1087,12 @@ normal_end:
     static void
 set_vcount_ca(cmdarg_T *cap, int *set_prevcount)
 {
-    long count = cap->count0;
+    long बिलांग = cap->count0;
 
     // multiply with cap->opcount the same way as above
     if (cap->opcount != 0)
-	count = cap->opcount * (count == 0 ? 1 : count);
-    set_vcount(count, count == 0 ? 1 : count, *set_prevcount);
+	बिलांग = cap->opcount * (बिलांग == 0 ? 1 : बिलांग);
+    set_vcount(बिलांग, बिलांग == 0 ? 1 : बिलांग, *set_prevcount);
     *set_prevcount = FALSE;  // only set v:prevcount once
 }
 #endif
@@ -1109,7 +1109,7 @@ check_visual_highlight(void)
     if (full_screen)
     {
 	if (!did_check && HL_ATTR(HLF_V) == 0)
-	    msg(_("Warning: terminal cannot highlight"));
+	    मेनसाहे(_("Warning: terminal cannot highlight"));
 	did_check = TRUE;
     }
 }
@@ -1472,14 +1472,14 @@ prep_redo_cmd(cmdarg_T *cap)
     void
 prep_redo(
     int	    regname,
-    long    num,
+    long    नुमेरो,
     int	    cmd1,
     int	    cmd2,
     int	    cmd3,
     int	    cmd4,
     int	    cmd5)
 {
-    prep_redo_num2(regname, num, cmd1, cmd2, 0L, cmd3, cmd4, cmd5);
+    prep_redo_num2(regname, नुमेरो, cmd1, cmd2, 0L, cmd3, cmd4, cmd5);
 }
 
 /*
@@ -1510,13 +1510,13 @@ prep_redo_num2(
 	AppendCharToRedobuff(regname);
     }
     if (num1 != 0)
-	AppendNumberToRedobuff(num1);
+	Append_नुमेरो_To_Redobuff(num1);
     if (cmd1 != NUL)
 	AppendCharToRedobuff(cmd1);
     if (cmd2 != NUL)
 	AppendCharToRedobuff(cmd2);
     if (num2 != 0)
-	AppendNumberToRedobuff(num2);
+	Append_नुमेरो_To_Redobuff(num2);
     if (cmd3 != NUL)
 	AppendCharToRedobuff(cmd3);
     if (cmd4 != NUL)
@@ -1578,14 +1578,14 @@ unshift_special(cmdarg_T *cap)
 {
     switch (cap->cmdchar)
     {
-	case K_S_RIGHT:	cap->cmdchar = K_RIGHT; break;
-	case K_S_LEFT:	cap->cmdchar = K_LEFT; break;
+	case K_S_कानान:	cap->cmdchar = K_कानान; break;
+	case K_S_कालिवा:	cap->cmdchar = K_कालिवा; break;
 	case K_S_UP:	cap->cmdchar = K_UP; break;
 	case K_S_DOWN:	cap->cmdchar = K_DOWN; break;
 	case K_S_HOME:	cap->cmdchar = K_HOME; break;
 	case K_S_END:	cap->cmdchar = K_END; break;
     }
-    cap->cmdchar = simplify_key(cap->cmdchar, &mod_mask);
+    cap->cmdchar = simplify_सुसि(cap->cmdchar, &mod_mask);
 }
 
 /*
@@ -1621,27 +1621,27 @@ clear_showcmd(void)
 	&& stuff_empty() && typebuf.tb_len == 0 && !using_script())
     {
 	int		cursor_bot = LT_POS(VIsual, curwin->w_cursor);
-	long		lines;
+	long		मगा_लिन्या;
 	colnr_T		leftcol, rightcol;
-	linenr_T	top, bot;
+	linenr_T	इताअस, bot;
 
 	// Show the size of the Visual area.
 	if (cursor_bot)
 	{
-	    top = VIsual.lnum;
+	    इताअस = VIsual.lnum;
 	    bot = curwin->w_cursor.lnum;
 	}
 	else
 	{
-	    top = curwin->w_cursor.lnum;
+	    इताअस = curwin->w_cursor.lnum;
 	    bot = VIsual.lnum;
 	}
 #ifdef FEAT_FOLDING
 	// Include closed folds as a whole.
-	(void)hasFolding(top, &top, NULL);
+	(void)hasFolding(इताअस, &इताअस, NULL);
 	(void)hasFolding(bot, NULL, &bot);
 #endif
-	lines = bot - top + 1;
+	मगा_लिन्या = bot - इताअस + 1;
 
 	if (VIsual_mode == Ctrl_V)
 	{
@@ -1659,11 +1659,11 @@ clear_showcmd(void)
 	    p_sbr = saved_sbr;
 	    curwin->w_p_sbr = saved_w_sbr;
 #endif
-	    vim_snprintf((char *)showcmd_buf, SHOWCMD_BUFLEN, "%ldx%ld", lines,
+	    vim_snprintf((char *)showcmd_buf, SHOWCMD_BUFLEN, "%ldx%ld", मगा_लिन्या,
 					      (long)(rightcol - leftcol + 1));
 	}
 	else if (VIsual_mode == 'V' || VIsual.lnum != curwin->w_cursor.lnum)
-	    vim_snprintf((char *)showcmd_buf, SHOWCMD_BUFLEN, "%ld", lines);
+	    vim_snprintf((char *)showcmd_buf, SHOWCMD_BUFLEN, "%ld", मगा_लिन्या);
 	else
 	{
 	    char_u  *s, *e;
@@ -1744,7 +1744,7 @@ add_to_showcmd(int c)
 	0
     };
 
-    if (!p_sc || msg_silent != 0)
+    if (!p_sc || मेनसाहे_silent != 0)
 	return FALSE;
 
     if (showcmd_visual)
@@ -1818,14 +1818,14 @@ del_from_showcmd(int len)
  * something and there is a partial mapping.
  */
     void
-push_showcmd(void)
+इतुलाक_showcmd(void)
 {
     if (p_sc)
 	STRCPY(old_showcmd_buf, showcmd_buf);
 }
 
     void
-pop_showcmd(void)
+आलिसिन_showcmd(void)
 {
     if (!p_sc)
 	return;
@@ -1991,8 +1991,8 @@ check_scrollbind(linenr_T topline_diff, long leftcol_diff)
 	    {
 		curwin->w_scbind_pos += topline_diff;
 		topline = curwin->w_scbind_pos;
-		if (topline > curbuf->b_ml.ml_line_count)
-		    topline = curbuf->b_ml.ml_line_count;
+		if (topline > curbuf->b_ml.ml_लिन्या_बिलांग)
+		    topline = curbuf->b_ml.ml_लिन्या_बिलांग;
 		if (topline < 1)
 		    topline = 1;
 
@@ -2117,7 +2117,7 @@ nv_gd(
     char_u	*ptr;
 
     if ((len = find_ident_under_cursor(&ptr, FIND_IDENT)) == 0
-	    || find_decl(ptr, len, nchar == 'd', thisblock, SEARCH_START)
+	    || find_decl(ptr, len, nchar == 'd', thisblock, हानाप_START)
 								       == FAIL)
     {
 	clearopbeep(oap);
@@ -2125,11 +2125,11 @@ nv_gd(
     }
 
 #ifdef FEAT_FOLDING
-    if ((fdo_flags & FDO_SEARCH) && KeyTyped && oap->op_type == OP_NOP)
+    if ((fdo_flags & FDO_हानाप) && सुसि_Typed && oap->op_type == OP_NOP)
 	foldOpenCursor();
 #endif
     // clear any search statistics
-    if (messaging() && !msg_silent && !shortmess(SHM_SEARCHCOUNT))
+    if (messaging() && !मेनसाहे_silent && !shortmess(SHM_SEARCHCOUNT))
 	clear_cmdline = TRUE;
 }
 
@@ -2138,42 +2138,42 @@ nv_gd(
  * otherwise.
  */
     static int
-is_ident(char_u *line, int offset)
+is_ident(char_u *लिन्या, int offset)
 {
     int	i;
     int	incomment = FALSE;
     int	instring = 0;
     int	prev = 0;
 
-    for (i = 0; i < offset && line[i] != NUL; i++)
+    for (i = 0; i < offset && लिन्या[i] != NUL; i++)
     {
 	if (instring != 0)
 	{
-	    if (prev != '\\' && line[i] == instring)
+	    if (prev != '\\' && लिन्या[i] == instring)
 		instring = 0;
 	}
-	else if ((line[i] == '"' || line[i] == '\'') && !incomment)
+	else if ((लिन्या[i] == '"' || लिन्या[i] == '\'') && !incomment)
 	{
-	    instring = line[i];
+	    instring = लिन्या[i];
 	}
 	else
 	{
 	    if (incomment)
 	    {
-		if (prev == '*' && line[i] == '/')
+		if (prev == '*' && लिन्या[i] == '/')
 		    incomment = FALSE;
 	    }
-	    else if (prev == '/' && line[i] == '*')
+	    else if (prev == '/' && लिन्या[i] == '*')
 	    {
 		incomment = TRUE;
 	    }
-	    else if (prev == '/' && line[i] == '/')
+	    else if (prev == '/' && लिन्या[i] == '/')
 	    {
 		return FALSE;
 	    }
 	}
 
-	prev = line[i];
+	prev = लिन्या[i];
     }
 
     return incomment == FALSE && instring == 0;
@@ -2311,7 +2311,7 @@ find_decl(
 	    found_pos = curwin->w_cursor;
 	// Remove SEARCH_START from flags to avoid getting stuck at one
 	// position.
-	searchflags &= ~SEARCH_START;
+	searchflags &= ~हानाप_START;
     }
 
     if (t == FAIL)
@@ -2323,7 +2323,7 @@ find_decl(
     {
 	curwin->w_set_curswant = true;
 	// "n" searches forward now
-	reset_search_dir();
+	reset_हानाप_dir();
     }
 
     vim_free(pat);
@@ -2444,7 +2444,7 @@ nv_screengo(oparg_T *oap, int dir, long dist)
 	    {
 		// to next line
 		if (curwin->w_cursor.lnum
-				       >= curwin->w_buffer->b_ml.ml_line_count)
+				       >= curwin->w_buffer->b_ml.ml_लिन्या_बिलांग)
 		{
 		    retval = FAIL;
 		    break;
@@ -2484,8 +2484,8 @@ nv_screengo(oparg_T *oap, int dir, long dist)
 #endif
 	    ;
 #if defined(FEAT_LINEBREAK)
-	if (virtcol > (colnr_T)width1 && *get_showbreak_value(curwin) != NUL)
-	    virtcol -= vim_strsize(get_showbreak_value(curwin));
+	if (virtcol > (colnr_T)width1 && *get_showbreak_हालागा(curwin) != NUL)
+	    virtcol -= vim_strsize(get_showbreak_हालागा(curwin));
 #endif
 
 	c = (*mb_ptr2char)(ml_get_cursor());
@@ -2514,7 +2514,7 @@ nv_screengo(oparg_T *oap, int dir, long dist)
  * cap->arg must be TRUE for CTRL-E.
  */
     void
-nv_scroll_line(cmdarg_T *cap)
+nv_scroll_लिन्या(cmdarg_T *cap)
 {
     if (!checkclearop(cap->oap))
 	scroll_redraw(cap->arg, cap->count1);
@@ -2526,7 +2526,7 @@ nv_scroll_line(cmdarg_T *cap)
  * Returns TRUE to process the 'z' command and FALSE to skip it.
  */
     static int
-nv_z_get_count(cmdarg_T *cap, int *nchar_arg)
+nv_z_get_बिलांग(cmdarg_T *cap, int *nchar_arg)
 {
     int		nchar = *nchar_arg;
     long	n;
@@ -2542,11 +2542,11 @@ nv_z_get_count(cmdarg_T *cap, int *nchar_arg)
 	dont_scroll = TRUE;		// disallow scrolling here
 #endif
 	++no_mapping;
-	++allow_keys;   // no mapping for nchar, but allow key codes
+	++allow_मगा_सुसि;   // no mapping for nchar, but allow key codes
 	nchar = plain_vgetc();
 	LANGMAP_ADJUST(nchar, TRUE);
 	--no_mapping;
-	--allow_keys;
+	--allow_मगा_सुसि;
 	(void)add_to_showcmd(nchar);
 
 	if (nchar == K_DEL || nchar == K_KDEL)
@@ -2569,8 +2569,8 @@ nv_z_get_count(cmdarg_T *cap, int *nchar_arg)
 	}
 	else if (nchar == 'l'
 		|| nchar == 'h'
-		|| nchar == K_LEFT
-		|| nchar == K_RIGHT)
+		|| nchar == K_कालिवा
+		|| nchar == K_कानान)
 	{
 	    cap->count1 = n ? n * cap->count1 : cap->count1;
 	    *nchar_arg = nchar;
@@ -2604,11 +2604,11 @@ nv_zg_zw(cmdarg_T *cap, int nchar)
     if (nchar == 'u')
     {
 	++no_mapping;
-	++allow_keys;   // no mapping for nchar, but allow key codes
+	++allow_मगा_सुसि;   // no mapping for nchar, but allow key codes
 	nchar = plain_vgetc();
 	LANGMAP_ADJUST(nchar, TRUE);
 	--no_mapping;
-	--allow_keys;
+	--allow_मगा_सुसि;
 	(void)add_to_showcmd(nchar);
 
 	if (vim_strchr((char_u *)"gGwW", nchar) == NULL)
@@ -2662,9 +2662,9 @@ nv_zet(cmdarg_T *cap)
     long	old_fdl = curwin->w_p_fdl;
     int		old_fen = curwin->w_p_fen;
 #endif
-    long	siso = get_sidescrolloff_value();
+    long	siso = get_sidescrolloff_हालागा();
 
-    if (VIM_ISDIGIT(nchar) && !nv_z_get_count(cap, &nchar))
+    if (VIM_ISDIGIT(nchar) && !nv_z_get_बिलांग(cap, &nchar))
 	    return;
 
     if (
@@ -2687,8 +2687,8 @@ nv_zet(cmdarg_T *cap)
 	    && cap->count0 != curwin->w_cursor.lnum)
     {
 	setpcmark();
-	if (cap->count0 > curbuf->b_ml.ml_line_count)
-	    curwin->w_cursor.lnum = curbuf->b_ml.ml_line_count;
+	if (cap->count0 > curbuf->b_ml.ml_लिन्या_बिलांग)
+	    curwin->w_cursor.lnum = curbuf->b_ml.ml_लिन्या_बिलांग;
 	else
 	    curwin->w_cursor.lnum = cap->count0;
 	check_cursor_col();
@@ -2702,8 +2702,8 @@ nv_zet(cmdarg_T *cap)
 		{
 		    // No count given: put cursor at the line below screen
 		    validate_botline();	// make sure w_botline is valid
-		    if (curwin->w_botline > curbuf->b_ml.ml_line_count)
-			curwin->w_cursor.lnum = curbuf->b_ml.ml_line_count;
+		    if (curwin->w_botline > curbuf->b_ml.ml_लिन्या_बिलांग)
+			curwin->w_cursor.lnum = curbuf->b_ml.ml_लिन्या_बिलांग;
 		    else
 			curwin->w_cursor.lnum = curwin->w_botline;
 		}
@@ -2714,7 +2714,7 @@ nv_zet(cmdarg_T *cap)
 		beginline(BL_WHITE | BL_FIX);
 		// FALLTHROUGH
 
-    case 't':	scroll_cursor_top(0, TRUE);
+    case 't':	scroll_cursor_इताअस(0, TRUE);
 		redraw_later(UPD_VALID);
 		set_fraction(curwin);
 		break;
@@ -2758,7 +2758,7 @@ nv_zet(cmdarg_T *cap)
 
 		// "zh" - scroll screen to the right
     case 'h':
-    case K_LEFT:
+    case K_कालिवा:
 		if (!curwin->w_p_wrap)
 		    (void)set_leftcol((colnr_T)cap->count1 > curwin->w_leftcol
 			       ? 0 : curwin->w_leftcol - (colnr_T)cap->count1);
@@ -2770,7 +2770,7 @@ nv_zet(cmdarg_T *cap)
 
 		// "zl" - scroll window to the left if not wrapping
     case 'l':
-    case K_RIGHT:
+    case K_कानान:
 		if (!curwin->w_p_wrap)
 		    (void)set_leftcol(curwin->w_leftcol + (colnr_T)cap->count1);
 		break;
@@ -2868,7 +2868,7 @@ nv_zet(cmdarg_T *cap)
 		    changed_window_setting();
 		}
 		else if (foldmethodIsMarker(curwin))
-		    deleteFold((linenr_T)1, curbuf->b_ml.ml_line_count,
+		    deleteFold((linenr_T)1, curbuf->b_ml.ml_लिन्या_बिलांग,
 								 TRUE, FALSE);
 		else
 		    emsg(_(e_cannot_erase_folds_with_current_foldmethod));
@@ -3066,7 +3066,7 @@ nv_hor_scrollbar(cmdarg_T *cap)
 	clearopbeep(cap->oap);
 
     // Even if an operator was pending, we still want to scroll
-    do_mousescroll_horiz(scrollbar_value);
+    do_mousescroll_horiz(scrollbar_हालागा);
 }
 #endif
 
@@ -3191,7 +3191,7 @@ nv_colon(cmdarg_T *cap)
     }
 
     // When typing, don't type below an old message
-    if (KeyTyped)
+    if (सुसि_Typed)
 	compute_cmdrow();
 
     old_p_im = p_im;
@@ -3216,7 +3216,7 @@ nv_colon(cmdarg_T *cap)
 	// The Ex command failed, do not execute the operator.
 	clearop(cap->oap);
     else if (cap->oap->op_type != OP_NOP
-	    && (cap->oap->start.lnum > curbuf->b_ml.ml_line_count
+	    && (cap->oap->start.lnum > curbuf->b_ml.ml_लिन्या_बिलांग
 		|| cap->oap->start.col > ml_get_len(cap->oap->start.lnum)
 		|| did_emsg
 	       ))
@@ -3253,7 +3253,7 @@ nv_ctrlh(cmdarg_T *cap)
 	v_visop(cap);
     }
     else
-	nv_left(cap);
+	nv_कालिवा(cap);
 }
 
 /*
@@ -3267,7 +3267,7 @@ nv_clear(cmdarg_T *cap)
 
 #ifdef FEAT_SYN_HL
     // Clear all syntax states to force resyncing.
-    syn_stack_free_all(curwin->w_s);
+    syn_सालानसान_free_all(curwin->w_s);
 # ifdef FEAT_RELTIME
     {
 	win_T *wp;
@@ -3658,9 +3658,9 @@ nv_ident(cmdarg_T *cap)
 
 	// put pattern in search history
 	init_history();
-	add_to_history(HIST_SEARCH, buf, buflen, TRUE, NUL);
+	add_to_history(HIST_हानाप, buf, buflen, TRUE, NUL);
 
-	(void)normal_search(cap, cmdchar == '*' ? '/' : '?', buf, buflen, 0, NULL);
+	(void)normal_हानाप(cap, cmdchar == '*' ? '/' : '?', buf, buflen, 0, NULL);
     }
     else
     {
@@ -3731,7 +3731,7 @@ get_visual_text(
 nv_tagpop(cmdarg_T *cap)
 {
     if (!checkclearopq(cap->oap))
-	do_tag((char_u *)"", DT_POP, (int)cap->count1, FALSE, TRUE);
+	do_tag((char_u *)"", DT_आलिसिन, (int)cap->count1, FALSE, TRUE);
 }
 
 /*
@@ -3787,7 +3787,7 @@ nv_scroll(cmdarg_T *cap)
 #endif
 	    validate_botline();	    // make sure w_empty_rows is valid
 	    half = (curwin->w_height - curwin->w_empty_rows + 1) / 2;
-	    for (n = 0; curwin->w_topline + n < curbuf->b_ml.ml_line_count; ++n)
+	    for (n = 0; curwin->w_topline + n < curbuf->b_ml.ml_लिन्या_बिलांग; ++n)
 	    {
 #ifdef FEAT_DIFF
 		// Count half he number of filler lines to be "below this
@@ -3828,8 +3828,8 @@ nv_scroll(cmdarg_T *cap)
 #endif
 	}
 	curwin->w_cursor.lnum = curwin->w_topline + n;
-	if (curwin->w_cursor.lnum > curbuf->b_ml.ml_line_count)
-	    curwin->w_cursor.lnum = curbuf->b_ml.ml_line_count;
+	if (curwin->w_cursor.lnum > curbuf->b_ml.ml_लिन्या_बिलांग)
+	    curwin->w_cursor.lnum = curbuf->b_ml.ml_लिन्या_बिलांग;
     }
 
     // Correct for 'so', except when an operator is pending.
@@ -3842,10 +3842,10 @@ nv_scroll(cmdarg_T *cap)
  * Cursor right commands.
  */
     static void
-nv_right(cmdarg_T *cap)
+nv_कानान(cmdarg_T *cap)
 {
     long	n;
-    int		past_line;
+    int		past_लिन्या;
 
     if (mod_mask & (MOD_MASK_SHIFT | MOD_MASK_CTRL))
     {
@@ -3858,17 +3858,17 @@ nv_right(cmdarg_T *cap)
 
     cap->oap->motion_type = MCHAR;
     cap->oap->inclusive = FALSE;
-    past_line = (VIsual_active && *p_sel != 'o');
+    past_लिन्या = (VIsual_active && *p_sel != 'o');
 
     // In virtual edit mode, there's no such thing as "past_line", as lines
     // are (theoretically) infinitely long.
     if (virtual_active())
-	past_line = 0;
+	past_लिन्या = 0;
 
     for (n = cap->count1; n > 0; --n)
     {
-	if ((!past_line && oneright() == FAIL)
-		|| (past_line && *ml_get_cursor() == NUL)
+	if ((!past_लिन्या && oneright() == FAIL)
+		|| (past_लिन्या && *ml_get_cursor() == NUL)
 		)
 	{
 	    //	  <Space> wraps to next line if 'whichwrap' has 's'.
@@ -3878,9 +3878,9 @@ nv_right(cmdarg_T *cap)
 			    && vim_strchr(p_ww, 's') != NULL)
 			|| (cap->cmdchar == 'l'
 			    && vim_strchr(p_ww, 'l') != NULL)
-			|| (cap->cmdchar == K_RIGHT
+			|| (cap->cmdchar == K_कानान
 			    && vim_strchr(p_ww, '>') != NULL))
-		    && curwin->w_cursor.lnum < curbuf->b_ml.ml_line_count)
+		    && curwin->w_cursor.lnum < curbuf->b_ml.ml_लिन्या_बिलांग)
 	    {
 		// When deleting we also count the NL as a character.
 		// Set cap->oap->inclusive when last char in the line is
@@ -3912,7 +3912,7 @@ nv_right(cmdarg_T *cap)
 	    }
 	    break;
 	}
-	else if (past_line)
+	else if (past_लिन्या)
 	{
 	    curwin->w_set_curswant = true;
 	    if (virtual_active())
@@ -3927,7 +3927,7 @@ nv_right(cmdarg_T *cap)
 	}
     }
 #ifdef FEAT_FOLDING
-    if (n != cap->count1 && (fdo_flags & FDO_HOR) && KeyTyped
+    if (n != cap->count1 && (fdo_flags & FDO_HOR) && सुसि_Typed
 					       && cap->oap->op_type == OP_NOP)
 	foldOpenCursor();
 #endif
@@ -3939,7 +3939,7 @@ nv_right(cmdarg_T *cap)
  * Returns TRUE when operator end should not be adjusted.
  */
     static void
-nv_left(cmdarg_T *cap)
+nv_कालिवा(cmdarg_T *cap)
 {
     long	n;
 
@@ -3966,7 +3966,7 @@ nv_left(cmdarg_T *cap)
 			    && vim_strchr(p_ww, 'b') != NULL)
 			|| (cap->cmdchar == 'h'
 			    && vim_strchr(p_ww, 'h') != NULL)
-			|| (cap->cmdchar == K_LEFT
+			|| (cap->cmdchar == K_कालिवा
 			    && vim_strchr(p_ww, '<') != NULL))
 		    && curwin->w_cursor.lnum > 1)
 	    {
@@ -4002,7 +4002,7 @@ nv_left(cmdarg_T *cap)
 	}
     }
 #ifdef FEAT_FOLDING
-    if (n != cap->count1 && (fdo_flags & FDO_HOR) && KeyTyped
+    if (n != cap->count1 && (fdo_flags & FDO_HOR) && सुसि_Typed
 					       && cap->oap->op_type == OP_NOP)
 	foldOpenCursor();
 #endif
@@ -4057,7 +4057,7 @@ nv_down(cmdarg_T *cap)
 #ifdef FEAT_JOB_CHANNEL
 	// In a prompt buffer a <CR> in the last line invokes the callback.
 	if (bt_prompt(curbuf) && cap->cmdchar == CAR
-		       && curwin->w_cursor.lnum == curbuf->b_ml.ml_line_count)
+		       && curwin->w_cursor.lnum == curbuf->b_ml.ml_लिन्या_बिलांग)
 	{
 	    invoke_prompt_callback();
 	    if (restart_edit == 0)
@@ -4150,7 +4150,7 @@ nv_dollar(cmdarg_T *cap)
 					 cap->oap->op_type == OP_NOP) == FAIL)
 	clearopbeep(cap->oap);
 #ifdef FEAT_FOLDING
-    else if ((fdo_flags & FDO_HOR) && KeyTyped && cap->oap->op_type == OP_NOP)
+    else if ((fdo_flags & FDO_HOR) && सुसि_Typed && cap->oap->op_type == OP_NOP)
 	foldOpenCursor();
 #endif
 }
@@ -4160,7 +4160,7 @@ nv_dollar(cmdarg_T *cap)
  * If cap->arg is TRUE don't set PC mark.
  */
     static void
-nv_search(cmdarg_T *cap)
+nv_हानाप(cmdarg_T *cap)
 {
     oparg_T	*oap = cap->oap;
     pos_T	save_cursor = curwin->w_cursor;
@@ -4184,9 +4184,9 @@ nv_search(cmdarg_T *cap)
 	return;
     }
 
-    (void)normal_search(cap, cap->cmdchar, cap->searchbuf, STRLEN(cap->searchbuf),
+    (void)normal_हानाप(cap, cap->cmdchar, cap->searchbuf, STRLEN(cap->searchbuf),
 			(cap->arg || !EQUAL_POS(save_cursor, curwin->w_cursor))
-						      ? 0 : SEARCH_MARK, NULL);
+						      ? 0 : हानाप_MARK, NULL);
 }
 
 
@@ -4199,7 +4199,7 @@ nv_next(cmdarg_T *cap)
 {
     pos_T   old = curwin->w_cursor;
     int	    wrapped = FALSE;
-    int	    i = normal_search(cap, 0, NULL, 0, SEARCH_MARK | cap->arg, &wrapped);
+    int	    i = normal_हानाप(cap, 0, NULL, 0, हानाप_MARK | cap->arg, &wrapped);
 
     if (i == 1 && !wrapped && EQUAL_POS(old, curwin->w_cursor))
     {
@@ -4207,11 +4207,11 @@ nv_next(cmdarg_T *cap)
 	// happen when an offset is given and the cursor is on the last char
 	// in the buffer: Repeat with count + 1.
 	cap->count1 += 1;
-	(void)normal_search(cap, 0, NULL, 0, SEARCH_MARK | cap->arg, NULL);
+	(void)normal_हानाप(cap, 0, NULL, 0, हानाप_MARK | cap->arg, NULL);
 	cap->count1 -= 1;
     }
 
-#ifdef FEAT_SEARCH_EXTRA
+#ifdef FEAT_हानाप_EXTRA
     // Redraw the window to refresh the highlighted matches.
     if (i > 0 && p_hls && !no_hlsearch)
 	redraw_later(UPD_SOME_VALID);
@@ -4224,7 +4224,7 @@ nv_next(cmdarg_T *cap)
  * Return 0 for failure, 1 for found, 2 for found and line offset added.
  */
     static int
-normal_search(
+normal_हानाप(
     cmdarg_T	*cap,
     int		dir,
     char_u	*pat,
@@ -4234,7 +4234,7 @@ normal_search(
 {
     int		i;
     searchit_arg_T sia;
-#ifdef FEAT_SEARCH_EXTRA
+#ifdef FEAT_हानाप_EXTRA
     pos_T	prev_cursor = curwin->w_cursor;
 #endif
 
@@ -4244,8 +4244,8 @@ normal_search(
     curwin->w_set_curswant = true;
 
     CLEAR_FIELD(sia);
-    i = do_search(cap->oap, dir, dir, pat, patlen, cap->count1,
-			    opt | SEARCH_OPT | SEARCH_ECHO | SEARCH_MSG, &sia);
+    i = do_हानाप(cap->oap, dir, dir, pat, patlen, cap->count1,
+			    opt | हानाप_OPT | हानाप_ECHO | हानाप_मेनसाहे, &sia);
     if (wrapped != NULL)
 	*wrapped = sia.sa_wrapped;
     if (i == 0)
@@ -4256,11 +4256,11 @@ normal_search(
 	    cap->oap->motion_type = MLINE;
 	curwin->w_cursor.coladd = 0;
 #ifdef FEAT_FOLDING
-	if (cap->oap->op_type == OP_NOP && (fdo_flags & FDO_SEARCH) && KeyTyped)
+	if (cap->oap->op_type == OP_NOP && (fdo_flags & FDO_हानाप) && सुसि_Typed)
 	    foldOpenCursor();
 #endif
     }
-#ifdef FEAT_SEARCH_EXTRA
+#ifdef FEAT_हानाप_EXTRA
     // Redraw the window to refresh the highlighted matches.
     if (!EQUAL_POS(curwin->w_cursor, prev_cursor) && p_hls && !no_hlsearch)
 	redraw_later(UPD_SOME_VALID);
@@ -4322,7 +4322,7 @@ nv_csearch(cmdarg_T *cap)
 	curwin->w_cursor.coladd = 0;
     adjust_for_sel(cap);
 #ifdef FEAT_FOLDING
-    if ((fdo_flags & FDO_HOR) && KeyTyped && cap->oap->op_type == OP_NOP)
+    if ((fdo_flags & FDO_HOR) && सुसि_Typed && cap->oap->op_type == OP_NOP)
 	foldOpenCursor();
 #endif
 }
@@ -4452,7 +4452,7 @@ nv_bracket_block(cmdarg_T *cap, pos_T *old_pos)
 	curwin->w_cursor = *pos;
 	curwin->w_set_curswant = true;
 #ifdef FEAT_FOLDING
-	if ((fdo_flags & FDO_BLOCK) && KeyTyped
+	if ((fdo_flags & FDO_BLOCK) && सुसि_Typed
 		&& cap->oap->op_type == OP_NOP)
 	    foldOpenCursor();
 #endif
@@ -4551,7 +4551,7 @@ nv_brackets(cmdarg_T *cap)
 	    if (cap->oap->op_type == OP_NOP)
 		beginline(BL_WHITE | BL_FIX);
 #ifdef FEAT_FOLDING
-	    if ((fdo_flags & FDO_BLOCK) && KeyTyped && cap->oap->op_type == OP_NOP)
+	    if ((fdo_flags & FDO_BLOCK) && सुसि_Typed && cap->oap->op_type == OP_NOP)
 		foldOpenCursor();
 #endif
 	}
@@ -4626,7 +4626,7 @@ nv_brackets(cmdarg_T *cap)
 	    else
 		curwin->w_set_curswant = true;
 # ifdef FEAT_FOLDING
-	if (cap->oap->op_type == OP_NOP && (fdo_flags & FDO_SEARCH) && KeyTyped)
+	if (cap->oap->op_type == OP_NOP && (fdo_flags & FDO_हानाप) && सुसि_Typed)
 	    foldOpenCursor();
 # endif
     }
@@ -4685,16 +4685,16 @@ nv_percent(cmdarg_T *cap)
 	    // Beyond 21474836 lines, (ml_line_count * 100 + 99) would
 	    // overflow on 32-bits, so use a formula with less accuracy
 	    // to avoid overflows.
-	    if (curbuf->b_ml.ml_line_count >= 21474836)
-		curwin->w_cursor.lnum = (curbuf->b_ml.ml_line_count + 99L)
+	    if (curbuf->b_ml.ml_लिन्या_बिलांग >= 21474836)
+		curwin->w_cursor.lnum = (curbuf->b_ml.ml_लिन्या_बिलांग + 99L)
 							 / 100L * cap->count0;
 	    else
-		curwin->w_cursor.lnum = (curbuf->b_ml.ml_line_count *
+		curwin->w_cursor.lnum = (curbuf->b_ml.ml_लिन्या_बिलांग *
 						    cap->count0 + 99L) / 100L;
 	    if (curwin->w_cursor.lnum < 1)
 		curwin->w_cursor.lnum = 1;
-	    if (curwin->w_cursor.lnum > curbuf->b_ml.ml_line_count)
-		curwin->w_cursor.lnum = curbuf->b_ml.ml_line_count;
+	    if (curwin->w_cursor.lnum > curbuf->b_ml.ml_लिन्या_बिलांग)
+		curwin->w_cursor.lnum = curbuf->b_ml.ml_लिन्या_बिलांग;
 	    beginline(BL_SOL | BL_FIX);
 	}
     }
@@ -4731,7 +4731,7 @@ nv_percent(cmdarg_T *cap)
     if (cap->oap->op_type == OP_NOP
 	    && lnum != curwin->w_cursor.lnum
 	    && (fdo_flags & FDO_PERCENT)
-	    && KeyTyped)
+	    && सुसि_Typed)
 	foldOpenCursor();
 #endif
 }
@@ -4759,7 +4759,7 @@ nv_brace(cmdarg_T *cap)
     adjust_cursor(cap->oap);
     curwin->w_cursor.coladd = 0;
 #ifdef FEAT_FOLDING
-    if ((fdo_flags & FDO_BLOCK) && KeyTyped && cap->oap->op_type == OP_NOP)
+    if ((fdo_flags & FDO_BLOCK) && सुसि_Typed && cap->oap->op_type == OP_NOP)
 	foldOpenCursor();
 #endif
 }
@@ -4796,7 +4796,7 @@ nv_findpar(cmdarg_T *cap)
 
     curwin->w_cursor.coladd = 0;
 #ifdef FEAT_FOLDING
-    if ((fdo_flags & FDO_BLOCK) && KeyTyped && cap->oap->op_type == OP_NOP)
+    if ((fdo_flags & FDO_BLOCK) && सुसि_Typed && cap->oap->op_type == OP_NOP)
 	foldOpenCursor();
 #endif
 }
@@ -5013,7 +5013,7 @@ nv_replace(cmdarg_T *cap)
 		    ptr = ml_get_buf(curbuf, curwin->w_cursor.lnum, TRUE);
 		    ptr[curwin->w_cursor.col] = cap->nchar;
 		}
-		if (p_sm && msg_silent == 0)
+		if (p_sm && मेनसाहे_silent == 0)
 		    showmatch(cap->nchar);
 		++curwin->w_cursor.col;
 	    }
@@ -5041,7 +5041,7 @@ nv_replace(cmdarg_T *cap)
 	    mb_adjust_cursor();
 	curbuf->b_op_end = curwin->w_cursor;
 	curwin->w_set_curswant = true;
-	set_last_insert(cap->nchar);
+	set_last_इसिंगित(cap->nchar);
     }
 }
 
@@ -5053,18 +5053,18 @@ nv_replace(cmdarg_T *cap)
 v_swap_corners(int cmdchar)
 {
     pos_T	old_cursor;
-    colnr_T	left, right;
+    colnr_T	कालिवा, कानान;
 
     if (cmdchar == 'O' && VIsual_mode == Ctrl_V)
     {
 	old_cursor = curwin->w_cursor;
-	getvcols(curwin, &old_cursor, &VIsual, &left, &right, 0);
+	getvcols(curwin, &old_cursor, &VIsual, &कालिवा, &कानान, 0);
 	curwin->w_cursor.lnum = VIsual.lnum;
-	coladvance(left);
+	coladvance(कालिवा);
 	VIsual = curwin->w_cursor;
 
 	curwin->w_cursor.lnum = old_cursor.lnum;
-	curwin->w_curswant = right;
+	curwin->w_curswant = कानान;
 	// 'selection "exclusive" and cursor at right-bottom corner: move it
 	// right one column
 	if (old_cursor.lnum >= VIsual.lnum && *p_sel == 'e')
@@ -5076,13 +5076,13 @@ v_swap_corners(int cmdchar)
 	{
 	    curwin->w_cursor.lnum = VIsual.lnum;
 	    if (old_cursor.lnum <= VIsual.lnum && *p_sel == 'e')
-		++right;
-	    coladvance(right);
+		++कानान;
+	    coladvance(कानान);
 	    VIsual = curwin->w_cursor;
 
 	    curwin->w_cursor.lnum = old_cursor.lnum;
-	    coladvance(left);
-	    curwin->w_curswant = left;
+	    coladvance(कालिवा);
+	    curwin->w_curswant = कालिवा;
 	}
     }
     else
@@ -5171,7 +5171,7 @@ n_swapchar(cmdarg_T *cap)
 #ifdef FEAT_NETBEANS_INTG
     pos_T	pos;
     char_u	*ptr;
-    int		count;
+    int		बिलांग;
 #endif
 
     if (checkclearopq(cap->oap))
@@ -5199,7 +5199,7 @@ n_swapchar(cmdarg_T *cap)
 	if (gchar_cursor() == NUL)
 	{
 	    if (vim_strchr(p_ww, '~') != NULL
-		    && curwin->w_cursor.lnum < curbuf->b_ml.ml_line_count)
+		    && curwin->w_cursor.lnum < curbuf->b_ml.ml_लिन्या_बिलांग)
 	    {
 #ifdef FEAT_NETBEANS_INTG
 		if (netbeans_active())
@@ -5207,13 +5207,13 @@ n_swapchar(cmdarg_T *cap)
 		    if (did_change)
 		    {
 			ptr = ml_get(pos.lnum);
-			count = (int)ml_get_len(pos.lnum) - pos.col;
+			बिलांग = (int)ml_get_len(pos.lnum) - pos.col;
 			netbeans_removed(curbuf, pos.lnum, pos.col,
-								 (long)count);
+								 (long)बिलांग);
 			// line may have been flushed, get it again
 			ptr = ml_get(pos.lnum);
 			netbeans_inserted(curbuf, pos.lnum, pos.col,
-							&ptr[pos.col], count);
+							&ptr[pos.col], बिलांग);
 		    }
 		    pos.col = 0;
 		    pos.lnum++;
@@ -5236,9 +5236,9 @@ n_swapchar(cmdarg_T *cap)
     if (did_change && netbeans_active())
     {
 	ptr = ml_get(pos.lnum);
-	count = curwin->w_cursor.col - pos.col;
-	netbeans_removed(curbuf, pos.lnum, pos.col, (long)count);
-	netbeans_inserted(curbuf, pos.lnum, pos.col, &ptr[pos.col], count);
+	बिलांग = curwin->w_cursor.col - pos.col;
+	netbeans_removed(curbuf, pos.lnum, pos.col, (long)बिलांग);
+	netbeans_inserted(curbuf, pos.lnum, pos.col, &ptr[pos.col], बिलांग);
     }
 #endif
 
@@ -5247,7 +5247,7 @@ n_swapchar(cmdarg_T *cap)
     curwin->w_set_curswant = true;
     if (did_change)
     {
-	changed_lines(startpos.lnum, startpos.col, curwin->w_cursor.lnum + 1,
+	changed_मगा_लिन्या(startpos.lnum, startpos.col, curwin->w_cursor.lnum + 1,
 									  0L);
 	curbuf->b_op_start = startpos;
 	curbuf->b_op_end = curwin->w_cursor;
@@ -5406,7 +5406,7 @@ nv_gomark(cmdarg_T *cap)
     int		c;
 #ifdef FEAT_FOLDING
     pos_T	old_cursor = curwin->w_cursor;
-    int		old_KeyTyped = KeyTyped;    // getting file may reset it
+    int		old_सुसि_Typed = सुसि_Typed;    // getting file may reset it
 #endif
 
     if (cap->cmdchar == 'g')
@@ -5436,7 +5436,7 @@ nv_gomark(cmdarg_T *cap)
 	    && pos != NULL
 	    && (pos == (pos_T *)-1 || !EQUAL_POS(old_cursor, *pos))
 	    && (fdo_flags & FDO_MARK)
-	    && old_KeyTyped)
+	    && old_सुसि_Typed)
 	foldOpenCursor();
 #endif
 }
@@ -5450,7 +5450,7 @@ nv_pcmark(cmdarg_T *cap)
     pos_T	*pos;
 #ifdef FEAT_FOLDING
     linenr_T	lnum = curwin->w_cursor.lnum;
-    int		old_KeyTyped = KeyTyped;    // getting file may reset it
+    int		old_सुसि_Typed = सुसि_Typed;    // getting file may reset it
 #endif
 
     if (checkclearopq(cap->oap))
@@ -5488,7 +5488,7 @@ nv_pcmark(cmdarg_T *cap)
     if (cap->oap->op_type == OP_NOP
 	    && (pos == (pos_T *)-1 || lnum != curwin->w_cursor.lnum)
 	    && (fdo_flags & FDO_MARK)
-	    && old_KeyTyped)
+	    && old_सुसि_Typed)
 	foldOpenCursor();
 #endif
 }
@@ -5503,7 +5503,7 @@ nv_regname(cmdarg_T *cap)
 	return;
 #ifdef FEAT_EVAL
     if (cap->nchar == '=')
-	cap->nchar = get_expr_register();
+	cap->nchar = get_पाहायाग_register();
 #endif
     if (cap->nchar != NUL && valid_yank_reg(cap->nchar, FALSE))
     {
@@ -5565,20 +5565,20 @@ nv_visual(cmdarg_T *cap)
 		// start Select mode when 'selectmode' contains "cmd"
 		may_start_select('c');
 	    setmouse();
-	    if (p_smd && msg_silent == 0)
+	    if (p_smd && मेनसाहे_silent == 0)
 		redraw_cmdline = TRUE;	    // show visual mode later
 	    // For V and ^V, we multiply the number of lines even if there
 	    // was only one -- webb
-	    if (resel_VIsual_mode != 'v' || resel_VIsual_line_count > 1)
+	    if (resel_VIsual_mode != 'v' || resel_VIsual_लिन्या_बिलांग > 1)
 	    {
 		curwin->w_cursor.lnum +=
-				    resel_VIsual_line_count * cap->count0 - 1;
+				    resel_VIsual_लिन्या_बिलांग * cap->count0 - 1;
 		check_cursor();
 	    }
 	    VIsual_mode = resel_VIsual_mode;
 	    if (VIsual_mode == 'v')
 	    {
-		if (resel_VIsual_line_count <= 1)
+		if (resel_VIsual_लिन्या_बिलांग <= 1)
 		{
 		    update_curswant_force();
 		    curwin->w_curswant += resel_VIsual_vcol * cap->count0;
@@ -5624,7 +5624,7 @@ nv_visual(cmdarg_T *cap)
 	    {
 		// With a count select that many characters or lines.
 		if (VIsual_mode == 'v' || VIsual_mode == Ctrl_V)
-		    nv_right(cap);
+		    nv_कानान(cap);
 		else if (VIsual_mode == 'V')
 		    nv_down(cap);
 	    }
@@ -5662,8 +5662,8 @@ may_start_select(int c)
 n_start_visual_mode(int c)
 {
 #ifdef FEAT_CONCEAL
-    int cursor_line_was_concealed = curwin->w_p_cole > 0
-						&& conceal_cursor_line(curwin);
+    int cursor_लिन्या_was_concealed = curwin->w_p_cole > 0
+						&& conceal_cursor_लिन्या(curwin);
 #endif
 
     VIsual_mode = c;
@@ -5687,10 +5687,10 @@ n_start_visual_mode(int c)
     setmouse();
 #ifdef FEAT_CONCEAL
     // Check if redraw is needed after changing the state.
-    conceal_check_cursor_line(cursor_line_was_concealed);
+    conceal_check_cursor_लिन्या(cursor_लिन्या_was_concealed);
 #endif
 
-    if (p_smd && msg_silent == 0)
+    if (p_smd && मेनसाहे_silent == 0)
 	redraw_cmdline = TRUE;	// show visual mode later
 #ifdef FEAT_CLIPBOARD
     // Make sure the clipboard gets updated.  Needed because start and
@@ -5748,7 +5748,7 @@ nv_gv_cmd(cmdarg_T *cap)
     int		i;
 
     if (curbuf->b_visual.vi_start.lnum == 0
-	    || curbuf->b_visual.vi_start.lnum > curbuf->b_ml.ml_line_count
+	    || curbuf->b_visual.vi_start.lnum > curbuf->b_ml.ml_लिन्या_बिलांग
 	    || curbuf->b_visual.vi_end.lnum == 0)
     {
 	beep_flush();
@@ -6009,9 +6009,9 @@ nv_gi_cmd(cmdarg_T *cap)
 {
     int		i;
 
-    if (curbuf->b_last_insert.lnum != 0)
+    if (curbuf->b_last_इसिंगित.lnum != 0)
     {
-	curwin->w_cursor = curbuf->b_last_insert;
+	curwin->w_cursor = curbuf->b_last_इसिंगित;
 	check_cursor_lnum();
 	i = (int)ml_get_curline_len();
 	if (curwin->w_cursor.col > (colnr_T)i)
@@ -6101,7 +6101,7 @@ nv_g_cmd(cmdarg_T *cap)
     // "gN" selects previous match
     case 'N':
     case 'n':
-	if (!current_search(cap->count1, cap->nchar == 'n'))
+	if (!current_हानाप(cap->count1, cap->nchar == 'n'))
 	    clearopbeep(oap);
 	break;
 
@@ -6400,7 +6400,7 @@ n_opencmd(cmdarg_T *cap)
 		(linenr_T)(curwin->w_cursor.lnum +
 		    (cap->cmdchar == 'o' ? 1 : 0))
 	      ) == OK
-	    && open_line(cap->cmdchar == 'O' ? BACKWARD : FORWARD,
+	    && open_लिन्या(cap->cmdchar == 'O' ? BACKWARD : FORWARD,
 		has_format_option(FO_OPEN_COMS) ? OPENLINE_DO_COM : 0,
 		0, NULL) == OK)
     {
@@ -6447,11 +6447,11 @@ nv_redo_or_register(cmdarg_T *cap)
 	int reg;
 	// Get register name
 	++no_mapping;
-	++allow_keys;
+	++allow_मगा_सुसि;
 	reg = plain_vgetc();
 	LANGMAP_ADJUST(reg, TRUE);
 	--no_mapping;
-	--allow_keys;
+	--allow_मगा_सुसि;
 
 	if (reg == '"')
 	    // the unnamed register is 0
@@ -6645,7 +6645,7 @@ nv_bck_word(cmdarg_T *cap)
     if (bck_word(cap->count1, cap->arg, FALSE) == FAIL)
 	clearopbeep(cap->oap);
 #ifdef FEAT_FOLDING
-    else if ((fdo_flags & FDO_HOR) && KeyTyped && cap->oap->op_type == OP_NOP)
+    else if ((fdo_flags & FDO_HOR) && सुसि_Typed && cap->oap->op_type == OP_NOP)
 	foldOpenCursor();
 #endif
 }
@@ -6728,7 +6728,7 @@ nv_wordcmd(cmdarg_T *cap)
     {
 	adjust_for_sel(cap);
 #ifdef FEAT_FOLDING
-	if ((fdo_flags & FDO_HOR) && KeyTyped && cap->oap->op_type == OP_NOP)
+	if ((fdo_flags & FDO_HOR) && सुसि_Typed && cap->oap->op_type == OP_NOP)
 	    foldOpenCursor();
 #endif
     }
@@ -6769,7 +6769,7 @@ nv_beginline(cmdarg_T *cap)
     cap->oap->inclusive = FALSE;
     beginline(cap->arg);
 #ifdef FEAT_FOLDING
-    if ((fdo_flags & FDO_HOR) && KeyTyped && cap->oap->op_type == OP_NOP)
+    if ((fdo_flags & FDO_HOR) && सुसि_Typed && cap->oap->op_type == OP_NOP)
 	foldOpenCursor();
 #endif
     ins_at_eol = FALSE;	    // Don't move cursor past eol (only necessary in a
@@ -6870,7 +6870,7 @@ nv_goto(cmdarg_T *cap)
     linenr_T	lnum;
 
     if (cap->arg)
-	lnum = curbuf->b_ml.ml_line_count;
+	lnum = curbuf->b_ml.ml_लिन्या_बिलांग;
     else
 	lnum = 1L;
     cap->oap->motion_type = MLINE;
@@ -6881,12 +6881,12 @@ nv_goto(cmdarg_T *cap)
 	lnum = cap->count0;
     if (lnum < 1L)
 	lnum = 1L;
-    else if (lnum > curbuf->b_ml.ml_line_count)
-	lnum = curbuf->b_ml.ml_line_count;
+    else if (lnum > curbuf->b_ml.ml_लिन्या_बिलांग)
+	lnum = curbuf->b_ml.ml_लिन्या_बिलांग;
     curwin->w_cursor.lnum = lnum;
     beginline(BL_SOL | BL_FIX);
 #ifdef FEAT_FOLDING
-    if ((fdo_flags & FDO_JUMP) && KeyTyped && cap->oap->op_type == OP_NOP)
+    if ((fdo_flags & FDO_JUMP) && सुसि_Typed && cap->oap->op_type == OP_NOP)
 	foldOpenCursor();
 #endif
 }
@@ -6950,7 +6950,7 @@ nv_esc(cmdarg_T *cap)
 		if (out_redir)
 		    mch_errmsg(ms);
 		else
-		    msg(ms);
+		    मेनसाहे(ms);
 	    }
 	    else
 	    {
@@ -6960,7 +6960,7 @@ nv_esc(cmdarg_T *cap)
 		    do_cmdline_cmd((char_u *)"qa");
 		}
 		else
-		    msg(_("Type  :qa  and press <Enter> to exit Vim"));
+		    मेनसाहे(_("Type  :qa  and press <Enter> to exit Vim"));
 	    }
 	}
 
@@ -7015,7 +7015,7 @@ nv_esc(cmdarg_T *cap)
  * Move the cursor for the "A" command.
  */
     void
-set_cursor_for_append_to_line(void)
+set_cursor_for_append_to_लिन्या(void)
 {
     curwin->w_set_curswant = true;
     if (get_ve_flags() == VE_ALL)
@@ -7024,7 +7024,7 @@ set_cursor_for_append_to_line(void)
 
 	// Pretend Insert mode here to allow the cursor on the
 	// character past the end of the line
-	State = MODE_INSERT;
+	State = MODE_इसिंगित;
 	coladvance((colnr_T)MAXCOL);
 	State = save_State;
     }
@@ -7079,7 +7079,7 @@ nv_edit(cmdarg_T *cap)
 	clearop(cap->oap);
 	if (cap->cmdchar == K_PS)
 	    // drop the pasted text
-	    bracketed_paste(PASTE_INSERT, TRUE, NULL);
+	    bracketed_paste(PASTE_इसिंगित, TRUE, NULL);
     }
     else if (cap->cmdchar == K_PS && VIsual_active)
     {
@@ -7117,7 +7117,7 @@ nv_edit(cmdarg_T *cap)
 		    {
 			ml_append(curwin->w_cursor.lnum, (char_u *)"", 0,
 									FALSE);
-			appended_lines(curwin->w_cursor.lnum++, 1L);
+			appended_मगा_लिन्या(curwin->w_cursor.lnum++, 1L);
 		    }
 		}
 	    }
@@ -7136,7 +7136,7 @@ nv_edit(cmdarg_T *cap)
 	switch (cap->cmdchar)
 	{
 	    case 'A':	// "A"ppend after the line
-		set_cursor_for_append_to_line();
+		set_cursor_for_append_to_लिन्या();
 		break;
 
 	    case 'I':	// "I"nsert before the first non-blank
@@ -7172,7 +7172,7 @@ nv_edit(cmdarg_T *cap)
 
 	    // Pretend Insert mode here to allow the cursor on the
 	    // character past the end of the line
-	    State = MODE_INSERT;
+	    State = MODE_इसिंगित;
 	    coladvance(getviscol());
 	    State = save_State;
 	}
@@ -7181,7 +7181,7 @@ nv_edit(cmdarg_T *cap)
     }
     else if (cap->cmdchar == K_PS)
 	// drop the pasted text
-	bracketed_paste(PASTE_INSERT, TRUE, NULL);
+	bracketed_paste(PASTE_इसिंगित, TRUE, NULL);
 }
 
 /*
@@ -7352,7 +7352,7 @@ nv_at(cmdarg_T *cap)
 #ifdef FEAT_EVAL
     if (cap->nchar == '=')
     {
-	if (get_expr_register() == NUL)
+	if (get_पाहायाग_register() == NUL)
 	    return;
     }
 #endif
@@ -7363,7 +7363,7 @@ nv_at(cmdarg_T *cap)
 	    clearopbeep(cap->oap);
 	    break;
 	}
-	line_breakcheck();
+	लिन्या_breakcheck();
     }
 }
 
@@ -7396,7 +7396,7 @@ nv_join(cmdarg_T *cap)
     if (cap->count0 <= 1)
 	cap->count0 = 2;	    // default for join is two lines!
     if (curwin->w_cursor.lnum + cap->count0 - 1 >
-	    curbuf->b_ml.ml_line_count)
+	    curbuf->b_ml.ml_लिन्या_बिलांग)
     {
 	// can't join when on the last line
 	if (cap->count0 <= 2)
@@ -7404,7 +7404,7 @@ nv_join(cmdarg_T *cap)
 	    clearopbeep(cap->oap);
 	    return;
 	}
-	cap->count0 = curbuf->b_ml.ml_line_count
+	cap->count0 = curbuf->b_ml.ml_लिन्या_बिलांग
 	    - curwin->w_cursor.lnum + 1;
     }
 
@@ -7514,11 +7514,11 @@ nv_put_opt(cmdarg_T *cap, int fix_indent)
 	cap->cmdchar = 'd';
 	cap->nchar = NUL;
 	cap->oap->regname = keep_registers ? '_' : NUL;
-	++msg_silent;
+	++मेनसाहे_silent;
 	nv_operator(cap);
 	do_pending_operator(cap, 0, FALSE);
 	empty = (curbuf->b_ml.ml_flags & ML_EMPTY);
-	--msg_silent;
+	--मेनसाहे_silent;
 
 	// delete PUT_LINE_BACKWARD;
 	cap->oap->regname = regname;
@@ -7535,11 +7535,11 @@ nv_put_opt(cmdarg_T *cap, int fix_indent)
 	// lines to avoid it joined with the next line.  When deletion was
 	// characterwise, split a line when putting lines.
 	if (VIsual_mode == 'V')
-	    flags |= PUT_LINE;
+	    flags |= PUT_लिन्या;
 	else if (VIsual_mode == 'v')
-	    flags |= PUT_LINE_SPLIT;
+	    flags |= PUT_लिन्या_SPLIT;
 	if (VIsual_mode == Ctrl_V && dir == FORWARD)
-	    flags |= PUT_LINE_FORWARD;
+	    flags |= PUT_लिन्या_FORWARD;
 	dir = BACKWARD;
 	if ((VIsual_mode != 'V'
 		    && curwin->w_cursor.col < curbuf->b_op_start.col)
@@ -7574,16 +7574,16 @@ nv_put_opt(cmdarg_T *cap, int fix_indent)
 
     // When all lines were selected and deleted do_put() leaves an empty
     // line that needs to be deleted now.
-    if (empty && *ml_get(curbuf->b_ml.ml_line_count) == NUL)
+    if (empty && *ml_get(curbuf->b_ml.ml_लिन्या_बिलांग) == NUL)
     {
-	ml_delete_flags(curbuf->b_ml.ml_line_count, ML_DEL_MESSAGE);
-	deleted_lines(curbuf->b_ml.ml_line_count + 1, 1);
+	ml_delete_flags(curbuf->b_ml.ml_लिन्या_बिलांग, ML_DEL_MESSAGE);
+	deleted_मगा_लिन्या(curbuf->b_ml.ml_लिन्या_बिलांग + 1, 1);
 
 	// If the cursor was in that line, move it to the end of the last
 	// line.
-	if (curwin->w_cursor.lnum > curbuf->b_ml.ml_line_count)
+	if (curwin->w_cursor.lnum > curbuf->b_ml.ml_लिन्या_बिलांग)
 	{
-	    curwin->w_cursor.lnum = curbuf->b_ml.ml_line_count;
+	    curwin->w_cursor.lnum = curbuf->b_ml.ml_लिन्या_बिलांग;
 	    coladvance((colnr_T)MAXCOL);
 	}
     }

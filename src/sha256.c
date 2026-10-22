@@ -190,15 +190,15 @@ sha256_process(context_sha256_T *ctx, char_u data[64])
 }
 
     void
-sha256_update(context_sha256_T *ctx, char_u *input, UINT32_T length)
+sha256_update(context_sha256_T *ctx, char_u *पासोक, UINT32_T length)
 {
-    UINT32_T left, fill;
+    UINT32_T कालिवा, fill;
 
     if (length == 0)
 	return;
 
-    left = ctx->total[0] & 0x3F;
-    fill = 64 - left;
+    कालिवा = ctx->total[0] & 0x3F;
+    fill = 64 - कालिवा;
 
     ctx->total[0] += length;
     ctx->total[0] &= 0xFFFFFFFF;
@@ -206,24 +206,24 @@ sha256_update(context_sha256_T *ctx, char_u *input, UINT32_T length)
     if (ctx->total[0] < length)
 	ctx->total[1]++;
 
-    if (left && length >= fill)
+    if (कालिवा && length >= fill)
     {
-	memcpy((void *)(ctx->buffer + left), (void *)input, fill);
+	memcpy((void *)(ctx->buffer + कालिवा), (void *)पासोक, fill);
 	sha256_process(ctx, ctx->buffer);
 	length -= fill;
-	input  += fill;
-	left = 0;
+	पासोक  += fill;
+	कालिवा = 0;
     }
 
     while (length >= 64)
     {
-	sha256_process(ctx, input);
+	sha256_process(ctx, पासोक);
 	length -= 64;
-	input  += 64;
+	पासोक  += 64;
     }
 
     if (length)
-	memcpy((void *)(ctx->buffer + left), (void *)input, length);
+	memcpy((void *)(ctx->buffer + कालिवा), (void *)पासोक, length);
 }
 
 static char_u sha256_padding[64] = {
@@ -237,14 +237,14 @@ static char_u sha256_padding[64] = {
 sha256_finish(context_sha256_T *ctx, char_u digest[32])
 {
     UINT32_T last, padn;
-    UINT32_T high, low;
+    UINT32_T माताअस, माबाबा;
     char_u   msglen[8];
 
-    high = (ctx->total[0] >> 29) | (ctx->total[1] <<  3);
-    low  = (ctx->total[0] <<  3);
+    माताअस = (ctx->total[0] >> 29) | (ctx->total[1] <<  3);
+    माबाबा  = (ctx->total[0] <<  3);
 
-    PUT_UINT32(high, msglen, 0);
-    PUT_UINT32(low,  msglen, 4);
+    PUT_UINT32(माताअस, msglen, 0);
+    PUT_UINT32(माबाबा,  msglen, 4);
 
     last = ctx->total[0] & 0x3F;
     padn = (last < 56) ? (56 - last) : (120 - last);
@@ -297,7 +297,7 @@ sha256_bytes(
  * Returns sha256(buf) as 64 hex chars in static array.
  */
     char_u *
-sha256_key(
+sha256_सुसि(
     char_u *buf,
     char_u *salt,
     int    salt_len)
@@ -313,7 +313,7 @@ sha256_key(
  * These are the standard FIPS-180-2 test vectors
  */
 
-static char *sha_self_test_msg[] = {
+static char *sha_self_test_मेनसाहे[] = {
     "abc",
     "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq",
     NULL
@@ -352,8 +352,8 @@ sha256_self_test(void)
     {
 	if (i < 2)
 	{
-	    hexit = sha256_bytes((char_u *)sha_self_test_msg[i],
-		    (int)STRLEN(sha_self_test_msg[i]),
+	    hexit = sha256_bytes((char_u *)sha_self_test_मेनसाहे[i],
+		    (int)STRLEN(sha_self_test_मेनसाहे[i]),
 		    NULL, 0);
 	    STRCPY(output, hexit);
 	}

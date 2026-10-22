@@ -119,7 +119,7 @@ typedef struct {
 typedef struct {
     buf_T   *br_buf;
     int	    br_fnum;
-    int	    br_buf_free_count;
+    int	    br_buf_free_बिलांग;
 } bufref_T;
 
 /*
@@ -375,7 +375,7 @@ typedef struct
 #endif
 
 #ifdef FEAT_EVAL
-    sctx_T	wo_script_ctx[WV_COUNT];	// SCTXs for window-local options
+    sctx_T	wo_script_ctx[WV_बिलांग];	// SCTXs for window-local options
 # define w_p_script_ctx w_onebuf_opt.wo_script_ctx
 #endif
     char_u	*wo_whl;
@@ -416,8 +416,8 @@ typedef struct foldinfo
     int		fi_level;	// level of the fold; when this is zero the
 				// other fields are invalid
     int		fi_lnum;	// line number where fold starts
-    int		fi_low_level;	// lowest fold level that starts in the same
-				// line
+    int		fi_माबाबा_level;	// lowest fold level that starts in the same
+				//लिन्या
 } foldinfo_T;
 
 /*
@@ -438,7 +438,7 @@ typedef struct
 // One line saved for undo.  After the NUL terminated text there might be text
 // properties, thus ul_len can be larger than STRLEN(ul_line) + 1.
 typedef struct {
-    char_u	*ul_line;	// text of the line
+    char_u	*ul_लिन्या;	// text of the line
     long	ul_len;		// length of the line including NUL, plus text
 				// properties
     colnr_T	ul_textlen;	// length of the line excluding NUL and any text
@@ -469,7 +469,7 @@ typedef struct
 struct u_entry
 {
     u_entry_T	*ue_next;	// pointer to next entry in list
-    linenr_T	ue_top;		// number of line above undo block
+    linenr_T	ue_इताअस;		// number of line above undo block
     linenr_T	ue_bot;		// number of line below undo block
     linenr_T	ue_lcount;	// linecount when u_save called
     undoline_T	*ue_array;	// array of lines in undo block
@@ -567,7 +567,7 @@ struct mf_hashitem_S
 {
     mf_hashitem_T   *mhi_next;
     mf_hashitem_T   *mhi_prev;
-    blocknr_T	    mhi_key;
+    blocknr_T	    mhi_सुसि;
 };
 
 #define MHT_INIT_SIZE   64
@@ -576,7 +576,7 @@ typedef struct mf_hashtab_S
 {
     long_u	    mht_mask;	    // mask used for hash value (nr of items
 				    // in array is "mht_mask" + 1)
-    long_u	    mht_count;	    // nr of items inserted into hashtable
+    long_u	    mht_बिलांग;	    // nr of items inserted into hashtable
     mf_hashitem_T   **mht_buckets;  // points to mht_small_buckets or
 				    //dynamically allocated array
     mf_hashitem_T   *mht_small_buckets[MHT_INIT_SIZE];   // initial buckets
@@ -601,12 +601,12 @@ typedef struct mf_hashtab_S
 struct block_hdr
 {
     mf_hashitem_T bh_hashitem;      // header for hash table and key
-#define bh_bnum bh_hashitem.mhi_key // block number, part of bh_hashitem
+#define bh_bnum bh_hashitem.mhi_सुसि // block number, part of bh_hashitem
 
     bhdr_T	*bh_next;	    // next block_hdr in free or used list
     bhdr_T	*bh_prev;	    // previous block_hdr in used list
     char_u	*bh_data;	    // pointer to memory (for used block)
-    int		bh_page_count;	    // number of pages in this block
+    int		bh_page_बिलांग;	    // number of pages in this block
 
 #define BH_DIRTY    1
 #define BH_LOCKED   2
@@ -624,7 +624,7 @@ typedef struct nr_trans NR_TRANS;
 struct nr_trans
 {
     mf_hashitem_T nt_hashitem;		// header for hash table and key
-#define nt_old_bnum nt_hashitem.mhi_key	// old, negative, number
+#define nt_old_bnum nt_hashitem.mhi_सुसि	// old, negative, number
 
     blocknr_T	nt_new_bnum;		// new, positive, number
 };
@@ -714,10 +714,10 @@ typedef struct expand
     char_u	**xp_files_info;	// optional parallel array of "info"
 					// strings (shown in info popup);
 					// NULL if unused
-    char_u	*xp_line;		// text being completed
+    char_u	*xp_लिन्या;		// text being completed
 #define EXPAND_BUF_LEN 256
     char_u	xp_buf[EXPAND_BUF_LEN];	// buffer for returned match
-    int		xp_search_dir;		// Direction of search
+    int		xp_हानाप_dir;		// Direction of search
     pos_T	xp_pre_incsearch_pos;	// Cursor position before incsearch
 } expand_T;
 
@@ -752,7 +752,7 @@ typedef struct
     int		xp_context;	// type of expansion
 #ifdef FEAT_EVAL
     char_u	*xp_arg;	// user-defined expansion arg
-    int		input_fn;	// when TRUE Invoked for input() function
+    int		पासोक_fn;	// when TRUE Invoked for input() function
 #endif
     int		cmdbuff_replaced; // when TRUE cmdline was replaced externally
 				  // (e.g. by setcmdline())
@@ -798,9 +798,9 @@ typedef struct
 #endif
     long	cmod_verbose_save;	// if 'verbose' was set: value of
 					// p_verbose plus one
-    int		cmod_save_msg_silent;	// if non-zero: saved value of
+    int		cmod_save_मेनसाहे_silent;	// if non-zero: saved value of
 					// msg_silent + 1
-    int		cmod_save_msg_scroll;	// for restoring msg_scroll
+    int		cmod_save_मेनसाहे_scroll;	// for restoring msg_scroll
     int		cmod_did_esilent;	// incremented when emsg_silent is
 } cmdmod_T;
 
@@ -822,14 +822,14 @@ struct memfile
     bhdr_T	*mf_free_first;		// first block_hdr in free list
     bhdr_T	*mf_used_first;		// mru block_hdr in used list
     bhdr_T	*mf_used_last;		// lru block_hdr in used list
-    unsigned	mf_used_count;		// number of pages in used list
-    unsigned	mf_used_count_max;	// maximum number of pages in memory
+    unsigned	mf_used_बिलांग;		// number of pages in used list
+    unsigned	mf_used_बिलांग_max;	// maximum number of pages in memory
     mf_hashtab_T mf_hash;		// hash lists
     mf_hashtab_T mf_trans;		// trans lists
     blocknr_T	mf_blocknr_max;		// highest positive block number + 1
     blocknr_T	mf_blocknr_min;		// lowest negative block number - 1
-    blocknr_T	mf_neg_count;		// number of negative blocks numbers
-    blocknr_T	mf_infile_count;	// number of pages in the file
+    blocknr_T	mf_neg_बिलांग;		// number of negative blocks numbers
+    blocknr_T	mf_infile_बिलांग;	// number of pages in the file
     unsigned	mf_page_size;		// number of bytes in a page
     mfdirty_T	mf_dirty;
 #ifdef FEAT_CRYPT
@@ -838,7 +838,7 @@ struct memfile
 
     // Values for key, method and seed used for reading data blocks when
     // updating for a newly set key or method. Only when mf_old_key != NULL.
-    char_u	*mf_old_key;
+    char_u	*mf_old_सुसि;
     int		mf_old_cm;
     char_u	mf_old_seed[MF_SEED_LEN];
 #endif
@@ -855,8 +855,8 @@ struct memfile
 typedef struct info_pointer
 {
     blocknr_T	ip_bnum;	// block number
-    linenr_T	ip_low;		// lowest lnum in this block
-    linenr_T	ip_high;	// highest lnum in this block
+    linenr_T	ip_माबाबा;		// lowest lnum in this block
+    linenr_T	ip_माताअस;	// highest lnum in this block
     int		ip_index;	// index for block with current lnum
 } infoptr_T;	// block/index pair
 
@@ -880,29 +880,29 @@ typedef struct ml_chunksize
  */
 typedef struct memline
 {
-    linenr_T	ml_line_count;	// number of lines in the buffer
+    linenr_T	ml_लिन्या_बिलांग;	// number of lines in the buffer
 
     memfile_T	*ml_mfp;	// pointer to associated memfile
 
-    infoptr_T	*ml_stack;	// stack of pointer blocks (array of IPTRs)
-    int		ml_stack_top;	// current top of ml_stack
-    int		ml_stack_size;	// total number of entries in ml_stack
+    infoptr_T	*ml_सालानसान;	// stack of pointer blocks (array of IPTRs)
+    int		ml_सालानसान_इताअस;	// current top of ml_stack
+    int		ml_सालानसान_size;	// total number of entries in ml_stack
 
 #define ML_EMPTY	0x01	// empty buffer
-#define ML_LINE_DIRTY	0x02	// cached line was changed and allocated
+#define ML_लिन्या_DIRTY	0x02	// cached line was changed and allocated
 #define ML_LOCKED_DIRTY	0x04	// ml_locked was changed
 #define ML_LOCKED_POS	0x08	// ml_locked needs positive block number
 #define ML_ALLOCATED	0x10	// ml_line_ptr is an allocated copy
     int		ml_flags;
 
-    colnr_T	ml_line_len;	// length of the cached line + NUL + text properties
-    colnr_T	ml_line_textlen;// length of the cached line + NUL, 0 if not known yet
-    linenr_T	ml_line_lnum;	// line number of cached line, 0 if not valid
-    char_u	*ml_line_ptr;	// pointer to cached line
+    colnr_T	ml_लिन्या_len;	// length of the cached line + NUL + text properties
+    colnr_T	ml_लिन्या_textlen;// length of the cached line + NUL, 0 if not known yet
+    linenr_T	ml_लिन्या_lnum;	// line number of cached line, 0 if not valid
+    char_u	*ml_लिन्या_ptr;	// pointer to cached line
 
     bhdr_T	*ml_locked;	// block used by last ml_get
-    linenr_T	ml_locked_low;	// first line in ml_locked
-    linenr_T	ml_locked_high;	// last line in ml_locked
+    linenr_T	ml_locked_माबाबा;	// first line in ml_locked
+    linenr_T	ml_locked_माताअस;	// last line in ml_locked
     int		ml_locked_lineadd;  // number of lines inserted in ml_locked
 #ifdef FEAT_BYTEOFF
     chunksize_T *ml_chunksize;
@@ -953,7 +953,7 @@ typedef struct textprop_S
 #define TP_FLAG_CONT_PREV	0x2	// property was continued from prev line
 
 // without these text is placed after the end of the line
-#define TP_FLAG_ALIGN_RIGHT	0x010	// virtual text is right-aligned
+#define TP_FLAG_ALIGN_कानान	0x010	// virtual text is right-aligned
 #define TP_FLAG_ALIGN_ABOVE	0x020	// virtual text above the line
 #define TP_FLAG_ALIGN_BELOW	0x040	// virtual text on next screen line
 
@@ -964,7 +964,7 @@ typedef struct textprop_S
 					// unpacked_memline_T
 #define TP_FLAG_VTEXT_PTR	0x400	// u.tp_text access is valid
 
-#define PROP_COUNT_SIZE	sizeof(uint16_t)    // size of prop_count in memline
+#define PROP_बिलांग_SIZE	sizeof(uint16_t)    // size of prop_count in memline
 
 #define PROP_TEXT_MIN_CELLS	4	// minimum number of cells to use for
 					// the text, even when truncating
@@ -991,7 +991,7 @@ typedef struct unpacked_memline_S
     colnr_T	text_size;	// size of text including NUL
     char_u	*text;		// NUL-terminated text
     int		prop_size;	// number of allocated prop slots
-    int		prop_count;	// number of properties
+    int		prop_बिलांग;	// number of properties
     textprop_T	*props;		// property array
     bool	text_changed;	// true if text was modified
 } unpacked_memline_T;
@@ -1050,8 +1050,8 @@ typedef struct sign_attrs_S {
 
 #if defined(FEAT_SIGNS)
 // Macros to get the sign group structure from the group name
-# define SGN_KEY_OFF	offsetof(signgroup_T, sg_name)
-# define HI2SG(hi)	((signgroup_T *)((hi)->hi_key - SGN_KEY_OFF))
+# define SGN_सुसि_OFF	offsetof(signgroup_T, sg_name)
+# define HI2SG(hi)	((signgroup_T *)((hi)->hi_सुसि - SGN_सुसि_OFF))
 
 // Default sign priority for highlighting
 # define SIGN_DEF_PRIO	10
@@ -1116,7 +1116,7 @@ typedef struct {
 	void	*csp_ex[CSTACK_LEN];	// exception for pending throw
     }		cs_pend;
     void	*cs_forinfo[CSTACK_LEN]; // info used by ":for"
-    int		cs_line[CSTACK_LEN];	// line nr of ":while"/":for" line
+    int		cs_लिन्या[CSTACK_LEN];	// line nr of ":while"/":for" line
     int		cs_block_id[CSTACK_LEN];    // block ID stack
     int		cs_script_var_len[CSTACK_LEN];	// value of sn_var_vals.ga_len
 						// when entering the block
@@ -1181,11 +1181,11 @@ typedef struct msglist msglist_T;
 struct msglist
 {
     msglist_T	*next;		// next of several messages in a row
-    char	*msg;		// original message, allocated
-    char	*throw_msg;	// msg to throw: usually original one
+    char	*मेनसाहे;		// original message, allocated
+    char	*throw_मेनसाहे;	// msg to throw: usually original one
     char_u	*sfile;		// value from estack_sfile(), allocated
     long	slnum;		// line number for "sfile"
-    int		msg_compiling;	// saved value of estack_compiling
+    int		मेनसाहे_compiling;	// saved value of estack_compiling
 };
 
 /*
@@ -1206,7 +1206,7 @@ typedef struct vim_exception except_T;
 struct vim_exception
 {
     except_type_T	type;		// exception type
-    char		*value;		// exception value
+    char		*हालागा;		// exception value
     struct msglist	*messages;	// message(s) causing error exception
     char_u		*throw_name;	// name of the throw point
     linenr_T		throw_lnum;	// line number of the throw point
@@ -1290,7 +1290,7 @@ struct syn_state
     linenr_T	sst_lnum;	// line number for this state
     union
     {
-	bufstate_T	sst_stack[SST_FIX_STATES]; // short state stack
+	bufstate_T	sst_सालानसान[SST_FIX_STATES]; // short state stack
 	garray_T	sst_ga;	// growarray for long state stack
     } sst_union;
     int		sst_next_flags;	// flags for sst_next_list
@@ -1388,7 +1388,7 @@ typedef struct
     int			old_mod_mask;
     buffheader_T	save_readbuf1;
     buffheader_T	save_readbuf2;
-#ifdef USE_INPUT_BUF
+#ifdef USE_पासोक_BUF
     char_u		*save_inputbuf;
 #endif
 } tasave_T;
@@ -1448,7 +1448,7 @@ struct mapblock
     mapblock_T	*m_alt;		// pointer to mapblock of the same mapping
 				// with an alternative form of m_keys, or NULL
 				// if there is no such mapblock
-    char_u	*m_keys;	// mapped from, lhs
+    char_u	*m_मगा_सुसि;	// mapped from, lhs
     char_u	*m_str;		// mapped to, rhs
     char_u	*m_orig_str;	// rhs as entered by the user
     int		m_keylen;	// strlen(m_keys)
@@ -1459,7 +1459,7 @@ struct mapblock
     char	m_silent;	// <silent> used, don't echo commands
     char	m_nowait;	// <nowait> used
 #ifdef FEAT_EVAL
-    char	m_expr;		// <expr> used, m_str is an expression
+    char	m_पाहायाग;		// <expr> used, m_str is an expression
     sctx_T	m_script_ctx;	// SCTX where map was defined
 #endif
 };
@@ -1511,13 +1511,13 @@ typedef struct {
 typedef struct hashitem_S
 {
     long_u	hi_hash;	// cached hash number of hi_key
-    char_u	*hi_key;
+    char_u	*hi_सुसि;
 } hashitem_T;
 
 // The address of "hash_removed" is used as a magic number for hi_key to
 // indicate a removed item.
-#define HI_KEY_REMOVED &hash_removed
-#define HASHITEM_EMPTY(hi) ((hi)->hi_key == NULL || (hi)->hi_key == &hash_removed)
+#define HI_सुसि_REMOVED &hash_removed
+#define HASHITEM_EMPTY(hi) ((hi)->hi_सुसि == NULL || (hi)->hi_सुसि == &hash_removed)
 
 // Initial size for a hashtable.  Our items are relatively small and growing
 // is expensive, thus use 16 as a start.  Must be a power of 2.
@@ -1620,7 +1620,7 @@ typedef enum
     VAR_VOID,		// no value (function not returning anything)
     VAR_BOOL,		// "v_number" is used: VVAL_TRUE or VVAL_FALSE
     VAR_SPECIAL,	// "v_number" is used: VVAL_NULL or VVAL_NONE
-    VAR_NUMBER,		// "v_number" is used
+    VAR_नुमेरो,		// "v_number" is used
     VAR_FLOAT,		// "v_float" is used
     VAR_STRING,		// "v_string" is used
     VAR_BLOB,		// "v_blob" is used
@@ -1645,7 +1645,7 @@ struct type_S {
     short_u	    tt_flags;	    // TTFLAG_ values
     type_T	    *tt_member;	    // for list, dict, func return type
     class_T	    *tt_class;	    // for class and object
-    type_T	    **tt_args;	    // func argument types, allocated
+    type_T	    **tt_मगा_कातविरान;	    // func argument types, allocated
 };
 
 typedef struct {
@@ -1656,7 +1656,7 @@ typedef struct {
 #define TTFLAG_VARARGS	    0x01    // func args ends with "..."
 #define TTFLAG_BOOL_OK	    0x02    // can be converted to bool
 #define TTFLAG_FLOAT_OK	    0x04    // number can be used/converted to float
-#define TTFLAG_NUMBER_OK    0x08    // number can be used for a float
+#define TTFLAG_नुमेरो_OK    0x08    // number can be used for a float
 #define TTFLAG_STATIC	    0x10    // one of the static types, e.g. t_any
 #define TTFLAG_CONST	    0x20    // cannot be changed
 #define TTFLAG_SUPER	    0x40    // object from "super".
@@ -1667,7 +1667,7 @@ typedef struct {
     ((type->tt_flags & TTFLAG_GENERIC) == TTFLAG_GENERIC)
 
 // Type check flags
-#define TYPECHK_NUMBER_OK	0x1	// number is accepted for a float
+#define TYPECHK_नुमेरो_OK	0x1	// number is accepted for a float
 #define TYPECHK_TUPLE_OK	0x2	// tuple is accepted for a list
 
 typedef enum {
@@ -1732,28 +1732,28 @@ struct class_S
     class_T	*class_extends;		// parent class or NULL
 
     // interfaces declared for the class
-    int		class_interface_count;
+    int		class_interface_बिलांग;
     char_u	**class_interfaces;	// allocated array of names
     class_T	**class_interfaces_cl;	// interfaces (counts as reference)
     itf2class_T	*class_itf2class;	// member index lookup tables
 
     // class members: "static varname"
-    int		class_class_member_count;
+    int		class_class_member_बिलांग;
     ocmember_T	*class_class_members;	// allocated
     typval_T	*class_members_tv;	// allocated array of class member vals
 
     // class functions: "static def SomeMethod()"
-    int		class_class_function_count;	    // total count
-    int		class_class_function_count_child;   // count without "extends"
+    int		class_class_function_बिलांग;	    // total count
+    int		class_class_function_बिलांग_child;   // count without "extends"
     ufunc_T	**class_class_functions;	// allocated
 
     // object members: "this.varname"
-    int		class_obj_member_count;
+    int		class_obj_member_बिलांग;
     ocmember_T	*class_obj_members;	// allocated
 
     // object methods: "def SomeMethod()"
-    int		class_obj_method_count;		    // total count
-    int		class_obj_method_count_child;	    // count without "extends"
+    int		class_obj_method_बिलांग;		    // total count
+    int		class_obj_method_बिलांग_child;	    // count without "extends"
     ufunc_T	**class_obj_methods;	// allocated
 
 					// index of builtin methods
@@ -1797,7 +1797,7 @@ struct typval_S
     char	v_lock;	    // see below: VAR_LOCKED, VAR_FIXED
     union
     {
-	varnumber_T	v_number;	// number value
+	varnumber_T	v_नुमेरो;	// number value
 	float_T		v_float;	// floating point number value
 	char_u		*v_string;	// string value (can be NULL)
 	list_T		*v_list;	// list value (can be NULL)
@@ -1824,7 +1824,7 @@ struct typval_S
 // Values for "v_lock".
 #define VAR_LOCKED	    1	// locked with lock(), can use unlock()
 #define VAR_FIXED	    2	// locked forever
-#define VAR_ITEMS_LOCKED    4	// items of non-materialized list locked
+#define VAR_मगा_बागाय_LOCKED    4	// items of non-materialized list locked
 
 /*
  * Structure to hold an item of a list: an internal variable without a name.
@@ -1878,7 +1878,7 @@ struct listvar_S
     list_T	*lv_used_prev;	// previous list in used lists list
     int		lv_refcount;	// reference count
     int		lv_len;		// number of items
-    int		lv_with_items;	// number of items following this struct that
+    int		lv_with_मगा_बागाय;	// number of items following this struct that
 				// should not be freed
     int		lv_copyID;	// ID used by deepcopy()
     char	lv_lock;	// zero, VAR_LOCKED, VAR_FIXED
@@ -1889,7 +1889,7 @@ struct listvar_S
  */
 typedef struct {
     list_T	sl_list;	// must be first
-    listitem_T	sl_items[10];
+    listitem_T	sl_मगा_बागाय[10];
 } staticList10_T;
 
 /*
@@ -1901,7 +1901,7 @@ struct dictitem_S
 {
     typval_T	di_tv;		// type and value of the variable
     char_u	di_flags;	// DI_FLAGS_ flags (only used for variable)
-    char_u	di_key[1];	// key (actually longer!)
+    char_u	di_सुसि[1];	// key (actually longer!)
 };
 typedef struct dictitem_S dictitem_T;
 
@@ -1909,12 +1909,12 @@ typedef struct dictitem_S dictitem_T;
  * A dictitem with a 16 character key (plus NUL).  This is an efficient way to
  * have a fixed-size dictitem.
  */
-#define DICTITEM16_KEY_LEN 16
+#define DICTITEM16_सुसि_LEN 16
 struct dictitem16_S
 {
     typval_T	di_tv;		// type and value of the variable
     char_u	di_flags;	// DI_FLAGS_ flags (only used for variable)
-    char_u	di_key[DICTITEM16_KEY_LEN + 1];	// key
+    char_u	di_सुसि[DICTITEM16_सुसि_LEN + 1];	//सुसि
 };
 typedef struct dictitem16_S dictitem16_T;
 
@@ -1957,7 +1957,7 @@ struct blobvar_S
  */
 struct tuplevar_S
 {
-    garray_T	tv_items;	// tuple items
+    garray_T	tv_मगा_बागाय;	// tuple items
     type_T	*tv_type;	// current type, allocated by alloc_type()
     tuple_T	*tv_copytuple;	// copied tuple used by deepcopy()
     tuple_T	*tv_used_next;	// next tuple in used tuples list
@@ -1981,7 +1981,7 @@ struct generictype_S
  */
 struct gfargs_tab_S
 {
-    garray_T	gfat_args;
+    garray_T	gfat_मगा_कातविरान;
     garray_T	gfat_param_types;
     garray_T	gfat_arg_types;
 };
@@ -2007,7 +2007,7 @@ typedef struct
 {
     int		fi_semicolon;	// TRUE if ending in '; var]'
     int		fi_varcount;	// nr of variables in [] or zero
-    int		fi_break_count;	// nr of line breaks encountered
+    int		fi_break_बिलांग;	// nr of line breaks encountered
     listwatch_T	fi_lw;		// keep an eye on the item used.
     list_T	*fi_list;	// list being used
     int		fi_bi;		// index of blob
@@ -2049,9 +2049,9 @@ struct ufunc_S
 				// function.
     class_T	*uf_defclass;	// class where this function is defined.
 
-    garray_T	uf_args;	// arguments, including optional arguments
-    garray_T	uf_def_args;	// default argument expressions
-    int		uf_args_visible; // normally uf_args.ga_len, less when
+    garray_T	uf_मगा_कातविरान;	// arguments, including optional arguments
+    garray_T	uf_def_मगा_कातविरान;	// default argument expressions
+    int		uf_मगा_कातविरान_visible; // normally uf_args.ga_len, less when
 				 // compiling default argument expression.
 
     // for :def (for :function uf_ret_type is NULL)
@@ -2074,12 +2074,12 @@ struct ufunc_S
 
     // for generic functions
     int		uf_generic_argcount;// type argument count
-    generic_T	*uf_generic_args;   // generic types
+    generic_T	*uf_generic_मगा_कातविरान;   // generic types
     type_T	*uf_generic_param_types; // list of allocated generic types
     garray_T	uf_generic_arg_types; // list of allocated type arguments
     hashtab_T	uf_generic_functab; // generic function table
 
-    garray_T	uf_lines;	// function lines
+    garray_T	uf_मगा_लिन्या;	// function lines
 
     int		uf_debug_tick;	// when last checked for a breakpoint in this
 				// function.
@@ -2090,12 +2090,12 @@ struct ufunc_S
     int		uf_prof_initialized;
     hash_T	uf_hash;	// hash for uf_name when profiling
     // profiling the function as a whole
-    int		uf_tm_count;	// nr of calls
+    int		uf_tm_बिलांग;	// nr of calls
     proftime_T	uf_tm_total;	// time spent in function + children
     proftime_T	uf_tm_self;	// time spent in function itself
     proftime_T	uf_tm_children;	// time spent in children this call
     // profiling the function per line
-    int		*uf_tml_count;	// nr of times line was executed
+    int		*uf_tml_बिलांग;	// nr of times line was executed
     proftime_T	*uf_tml_total;	// time spent in a line + children
     proftime_T	*uf_tml_self;	// time spent in a line itself
     proftime_T	uf_tml_start;	// start time for current line
@@ -2150,7 +2150,7 @@ struct ufunc_S
 # define IS_ABSTRACT_METHOD(ufunc) ((ufunc->uf_flags & FC_ABSTRACT) == FC_ABSTRACT)
 # define IS_GENERIC_FUNC(ufunc) (((ufunc)->uf_flags & FC_GENERIC) == FC_GENERIC)
 
-# define MAX_FUNC_ARGS	20	// maximum number of function arguments
+# define MAX_FUNC_मगा_कातविरान	20	// maximum number of function arguments
 # define VAR_SHORT_LEN	20	// short variable name length
 # define FIXVAR_CNT	12	// number of fixed variables
 
@@ -2172,7 +2172,7 @@ struct funccall_S
     dict_T	fc_l_avars;	// a: argument variables
     dictitem_T	fc_l_avars_var;	// variable for a: scope
     list_T	fc_l_varlist;	// list for a:000
-    listitem_T	fc_l_listitems[MAX_FUNC_ARGS];	// listitems for a:000
+    listitem_T	fc_l_listitems[MAX_FUNC_मगा_कातविरान];	// listitems for a:000
     typval_T	*fc_rettv;	// return value
     linenr_T	fc_breakpoint;	// next line with breakpoint or zero
     int		fc_dbg_tick;	// debug_tick when breakpoint was set
@@ -2200,7 +2200,7 @@ struct funccall_S
 typedef struct
 {
     char_u	*dr_name;	// function name, allocated
-    typval_T	dr_argvars[MAX_FUNC_ARGS + 1];
+    typval_T	dr_argvars[MAX_FUNC_मगा_कातविरान + 1];
     int		dr_argcount;
 } defer_T;
 
@@ -2216,14 +2216,14 @@ typedef struct
 
 typedef struct funccal_entry funccal_entry_T;
 struct funccal_entry {
-    void	    *top_funccal;
+    void	    *इताअस_funccal;
     funccal_entry_T *next;
 };
 
 // From user function to hashitem and back.
 # define UF2HIKEY(fp) ((fp)->uf_name)
 # define HIKEY2UF(p)  ((ufunc_T *)((p) - offsetof(ufunc_T, uf_name)))
-# define HI2UF(hi)     HIKEY2UF((hi)->hi_key)
+# define HI2UF(hi)     HIKEY2UF((hi)->hi_सुसि)
 
 /*
  * Holds the hashtab with variables local to each sourced script.
@@ -2250,7 +2250,7 @@ struct sallvar_S {
     dictitem_T *sav_di;		// dictitem with di_key and di_tv
     typval_T	sav_tv;		// type and value of the variable
     char_u	sav_flags;	// DI_FLAGS_ flags (only used for variable)
-    char_u	sav_key[1];	// key (actually longer!)
+    char_u	sav_सुसि[1];	// key (actually longer!)
 };
 
 /*
@@ -2260,9 +2260,9 @@ struct sallvar_S {
  * HIKEY2SAV() converts a hashitem key pointer to a sallvar_T pointer.
  * HI2SAV() converts a hashitem pointer to a sallvar_T pointer.
  */
-# define SAV2HIKEY(sav) ((sav)->sav_key)
-# define HIKEY2SAV(p)  ((sallvar_T *)(p - offsetof(sallvar_T, sav_key)))
-# define HI2SAV(hi)     HIKEY2SAV((hi)->hi_key)
+# define SAV2HIKEY(sav) ((sav)->sav_सुसि)
+# define HIKEY2SAV(p)  ((sallvar_T *)(p - offsetof(sallvar_T, sav_सुसि)))
+# define HI2SAV(hi)     HIKEY2SAV((hi)->hi_सुसि)
 
 # define SVFLAG_TYPE_ALLOCATED	1  // call free_type() for "sv_type"
 # define SVFLAG_EXPORTED		2  // "export let var = val"
@@ -2344,7 +2344,7 @@ typedef struct
     proftime_T	sn_pr_child;	// time set when going into first child
     int		sn_pr_nest;	// nesting for sn_pr_child
     // profiling the script as a whole
-    int		sn_pr_count;	// nr of times sourced
+    int		sn_pr_बिलांग;	// nr of times sourced
     proftime_T	sn_pr_total;	// time spent in script + children
     proftime_T	sn_pr_self;	// time spent in script itself
     proftime_T	sn_pr_start;	// time at script start
@@ -2368,7 +2368,7 @@ typedef struct
 // See EVALARG_EVALUATE for a fixed value with eval_flags set to EVAL_EVALUATE.
 typedef struct {
     int		eval_flags;	    // EVAL_ flag values below
-    int		eval_break_count;   // nr of line breaks consumed
+    int		eval_break_बिलांग;   // nr of line breaks consumed
 
     // copied from exarg_T when "getline" is "getsourceline". Can be NULL.
     char_u	*(*eval_getline)(int, void *, int, getline_opt_T);
@@ -2412,7 +2412,7 @@ typedef struct {
  */
 typedef struct sn_prl_S
 {
-    int		snp_count;	// nr of times line was executed
+    int		snp_बिलांग;	// nr of times line was executed
     proftime_T	sn_prl_total;	// time spent in a line + children
     proftime_T	sn_prl_self;	// time spent in a line itself
 } sn_prl_T;
@@ -2527,18 +2527,18 @@ struct loopvars_S
 
 typedef struct outer_S outer_T;
 struct outer_S {
-    garray_T	*out_stack;	    // stack from outer scope, or a copy
+    garray_T	*out_सालानसान;	    // stack from outer scope, or a copy
 				    // containing only arguments and local vars
     int		out_frame_idx;	    // index of stack frame in out_stack
     outer_T	*out_up;	    // outer scope of outer scope or NULL
     partial_T	*out_up_partial;    // partial owning out_up or NULL
 
     struct {
-	garray_T *stack;	    // stack from outer scope, or a copy
+	garray_T *सालानसान;	    // stack from outer scope, or a copy
 				    // containing only vars inside the loop
 	short	 var_idx;	    // first variable defined in a loop in
 				    // out_loop_stack
-	short	 var_count;	    // number of variables defined in a loop
+	short	 var_बिलांग;	    // number of variables defined in a loop
     } out_loop[MAX_LOOP_DEPTH];
     int		out_loop_size;	    // nr of used entries in out_loop[]
 };
@@ -2577,7 +2577,7 @@ typedef struct {
     short	lvi_depth;	    // current nested loop depth
     struct {
 	short	var_idx;	    // index of first variable inside loop
-	short	var_count;	    // number of variables inside loop
+	short	var_बिलांग;	    // number of variables inside loop
     } lvi_loop[MAX_LOOP_DEPTH];
 } loopvarinfo_T;
 
@@ -2587,13 +2587,13 @@ typedef struct AutoPatCmd_S AutoPatCmd_T;
  * Entry in the execution stack "exestack".
  */
 typedef enum {
-    ETYPE_TOP,		    // toplevel
+    ETYPE_इताअस,		    // toplevel
     ETYPE_SCRIPT,	    // sourcing script, use es_info.sctx
     ETYPE_UFUNC,	    // user function, use es_info.ufunc
     ETYPE_AUCMD,	    // autocomand, use es_info.aucmd
     ETYPE_MODELINE,	    // modeline, use es_info.sctx
     ETYPE_EXCEPT,	    // exception, use es_info.exception
-    ETYPE_ARGS,		    // command line argument
+    ETYPE_मगा_कातविरान,		    // command line argument
     ETYPE_ENV,		    // environment variable
     ETYPE_INTERNAL,	    // internal operation
     ETYPE_SPELL,	    // loading spell file
@@ -2689,7 +2689,7 @@ struct writeq_S
 
 struct jsonq_S
 {
-    typval_T	*jq_value;
+    typval_T	*jq_हालागा;
     jsonq_T	*jq_next;
     jsonq_T	*jq_prev;
     int		jq_no_callback; // TRUE when no callback was found
@@ -2739,7 +2739,7 @@ typedef enum {
     PART_IN,
 # define CH_IN_FD	CH_PART_FD(PART_IN)
 #endif
-    PART_COUNT,
+    PART_बिलांग,
 } ch_part_T;
 
 #define INVALID_FD	(-1)
@@ -2753,10 +2753,10 @@ typedef struct {
 #endif
 
 #ifdef FEAT_GUI_X11
-    XtInputId	ch_inputHandler; // Cookie for input
+    Xt_पासोक_Id	ch_पासोक_Handler; // Cookie for input
 #endif
 #ifdef FEAT_GUI_GTK
-    gint	ch_inputHandler; // Cookie for input
+    gint	ch_पासोक_Handler; // Cookie for input
 #endif
 
     ch_mode_T	ch_mode;
@@ -2789,7 +2789,7 @@ typedef struct {
     int		ch_nomodifiable; // TRUE when buffer can be 'nomodifiable'
     int		ch_nomod_error;	// TRUE when e_modifiable was given
     int		ch_buf_append;	// write appended lines instead top-bot
-    linenr_T	ch_buf_top;	// next line to send
+    linenr_T	ch_buf_इताअस;	// next line to send
     linenr_T	ch_buf_bot;	// last line to send
 } chanpart_T;
 
@@ -2798,9 +2798,9 @@ struct channel_S {
     channel_T	*ch_prev;
 
     int		ch_id;		// ID of the channel
-    int		ch_last_msg_id;	// ID of the last message
+    int		ch_last_मेनसाहे_id;	// ID of the last message
 
-    chanpart_T	ch_part[PART_COUNT]; // info for socket, out, err and in
+    chanpart_T	ch_part[PART_बिलांग]; // info for socket, out, err and in
     int		ch_write_text_mode; // write buffer lines with CR, not NL
 
     char	*ch_hostname;	// only for socket, allocated
@@ -2878,7 +2878,7 @@ struct channel_S {
 #define JO_OUT_NAME	    0x80000	// "out_name"
 #define JO_ERR_NAME	    0x100000	// "err_name" (JO_OUT_NAME << 1)
 #define JO_IN_NAME	    0x200000	// "in_name" (JO_OUT_NAME << 2)
-#define JO_IN_TOP	    0x400000	// "in_top"
+#define JO_IN_इताअस	    0x400000	// "in_top"
 #define JO_IN_BOT	    0x800000	// "in_bot"
 #define JO_OUT_BUF	    0x1000000	// "out_buf"
 #define JO_ERR_BUF	    0x2000000	// "err_buf" (JO_OUT_BUF << 1)
@@ -2889,8 +2889,8 @@ struct channel_S {
 #define JO_ERR_MODIFIABLE   0x40000000	// "err_modifiable" (JO_OUT_ << 1)
 #define JO_ALL		    0x7fffffff
 
-#define JO2_OUT_MSG	    0x0001	// "out_msg"
-#define JO2_ERR_MSG	    0x0002	// "err_msg" (JO_OUT_ << 1)
+#define JO2_OUT_मेनसाहे	    0x0001	// "out_msg"
+#define JO2_ERR_मेनसाहे	    0x0002	// "err_msg" (JO_OUT_ << 1)
 #define JO2_TERM_NAME	    0x0004	// "term_name"
 #define JO2_TERM_FINISH	    0x0008	// "term_finish"
 #define JO2_ENV		    0x0010	// "env"
@@ -2938,7 +2938,7 @@ typedef struct
     int		jo_message[4];
     channel_T	*jo_channel;
 
-    linenr_T	jo_in_top;
+    linenr_T	jo_in_इताअस;
     linenr_T	jo_in_bot;
 
     callback_T	jo_callback;
@@ -3019,29 +3019,29 @@ struct redraw_listener_S
 /*
  * structure used for explicit stack while garbage collecting hash tables
  */
-typedef struct ht_stack_S
+typedef struct ht_सालानसान_S
 {
     hashtab_T		*ht;
-    struct ht_stack_S	*prev;
-} ht_stack_T;
+    struct ht_सालानसान_S	*prev;
+} ht_सालानसान_T;
 
 /*
  * structure used for explicit stack while garbage collecting lists
  */
-typedef struct list_stack_S
+typedef struct list_सालानसान_S
 {
     list_T		*list;
-    struct list_stack_S	*prev;
-} list_stack_T;
+    struct list_सालानसान_S	*prev;
+} list_सालानसान_T;
 
 /*
  * structure used for explicit stack while garbage collecting tuples
  */
-typedef struct tuple_stack_S
+typedef struct tuple_सालानसान_S
 {
     tuple_T			*tuple;
-    struct tuple_stack_S	*prev;
-} tuple_stack_T;
+    struct tuple_सालानसान_S	*prev;
+} tuple_सालानसान_T;
 
 /*
  * Structure used for iterating over dictionary items.
@@ -3055,7 +3055,7 @@ typedef struct
 
 // values for b_syn_spell: what to do with toplevel text
 #define SYNSPL_DEFAULT	0	// spell check if @Spell not defined
-#define SYNSPL_TOP	1	// spell check toplevel text
+#define SYNSPL_इताअस	1	// spell check toplevel text
 #define SYNSPL_NOTOP	2	// don't spell check toplevel text
 
 // values for b_syn_foldlevel: how to compute foldlevel on a line
@@ -3078,7 +3078,7 @@ typedef struct qf_info_S qf_info_T;
 typedef struct {
     proftime_T	total;		// total time used
     proftime_T	slowest;	// time of slowest call
-    long	count;		// nr of times used
+    long	बिलांग;		// nr of times used
     long	match;		// nr of times matched
 } syn_time_T;
 #endif
@@ -3097,7 +3097,7 @@ struct timer_S
     int		tr_repeat;	    // number of times to repeat, -1 forever
     long	tr_interval;	    // msec
     callback_T	tr_callback;
-    int		tr_emsg_count;
+    int		tr_emsg_बिलांग;
 #endif
 };
 
@@ -3117,7 +3117,7 @@ typedef struct {
 # define CRYPT_M_BF2	2
 # define CRYPT_M_SOD    3
 # define CRYPT_M_SOD2   4
-# define CRYPT_M_COUNT	5 // number of crypt methods
+# define CRYPT_M_बिलांग	5 // number of crypt methods
 
 // Currently all crypt methods work inplace.  If one is added that isn't then
 // define this.
@@ -3218,7 +3218,7 @@ typedef struct {
     synstate_T	*b_sst_array;
     int		b_sst_len;
     synstate_T	*b_sst_first;
-    synstate_T	*b_sst_search;
+    synstate_T	*b_sst_हानाप;
     synstate_T	*b_sst_firstfree;
     int		b_sst_freecount;
     linenr_T	b_sst_check_lnum;
@@ -3295,7 +3295,7 @@ struct file_buffer
     unsigned int b_fab_mrs;	// Max record size
 #endif
     int		b_fnum;		// buffer number for this file.
-    char_u	b_key[VIM_SIZEOF_INT * 2 + 1];
+    char_u	b_सुसि[VIM_SIZEOF_INT * 2 + 1];
 				// key used for buf_hashtab, holds b_fnum as
 				// hex string
 
@@ -3304,7 +3304,7 @@ struct file_buffer
     dictitem16_T b_ct_di;	// holds the b:changedtick value in
 				// b_ct_di.di_tv.vval.v_number;
 				// incremented for each change, also for undo
-#define CHANGEDTICK(buf) ((buf)->b_ct_di.di_tv.vval.v_number)
+#define CHANGEDTICK(buf) ((buf)->b_ct_di.di_tv.vval.v_नुमेरो)
 
     varnumber_T	b_last_changedtick;	// b:changedtick when TextChanged was
 					// last triggered.
@@ -3320,7 +3320,7 @@ struct file_buffer
      */
     bool	b_mod_set;	// true when there are changes since the last
 				// time the display was updated
-    linenr_T	b_mod_top;	// topmost lnum that was changed
+    linenr_T	b_mod_इताअस;	// topmost lnum that was changed
     linenr_T	b_mod_bot;	// lnum below last changed line, AFTER the
 				// change
     long	b_mod_xlines;	// number of extra buffer lines inserted;
@@ -3349,7 +3349,7 @@ struct file_buffer
 
     pos_T	b_last_cursor;	// cursor position when last unloading this
 				// buffer
-    pos_T	b_last_insert;	// where Insert mode was left
+    pos_T	b_last_इसिंगित;	// where Insert mode was left
     pos_T	b_last_change;	// position of last change: '. mark
 
     /*
@@ -3413,16 +3413,16 @@ struct file_buffer
     /*
      * variables for "U" command in undo.c
      */
-    undoline_T	b_u_line_ptr;	// saved line for "U" command
-    linenr_T	b_u_line_lnum;	// line number of line in u_line
-    colnr_T	b_u_line_colnr;	// optional column number
+    undoline_T	b_u_लिन्या_ptr;	// saved line for "U" command
+    linenr_T	b_u_लिन्या_lnum;	// line number of line in u_line
+    colnr_T	b_u_लिन्या_colnr;	// optional column number
 
     bool	b_scanned;	// ^N/^P have scanned this buffer
 
     // flags for use of ":lmap" and IM control
     long	b_p_iminsert;	// input mode for insert
     long	b_p_imsearch;	// input mode for search
-#define B_IMODE_USE_INSERT (-1)	//	Use b_p_iminsert value for search
+#define B_IMODE_USE_इसिंगित (-1)	//	Use b_p_iminsert value for search
 #define B_IMODE_NONE 0		//	Input via none
 #define B_IMODE_LMAP 1		//	Input via langmap
 #define B_IMODE_IM 2		//	Input via input method
@@ -3443,7 +3443,7 @@ struct file_buffer
     bool	b_p_initialized;	// set when options initialized
 
 #ifdef FEAT_EVAL
-    sctx_T	b_p_script_ctx[BV_COUNT]; // SCTXs for buffer-local options
+    sctx_T	b_p_script_ctx[BV_बिलांग]; // SCTXs for buffer-local options
 #endif
 
     int		b_p_ac;		// 'autocomplete'
@@ -3478,7 +3478,7 @@ struct file_buffer
 #ifdef FEAT_COMPL_FUNC
     long_u	b_p_cpt_flags;	// flags for 'complete'
     callback_T	*b_p_cpt_cb;	// F{func} in 'complete' callback
-    int		b_p_cpt_count;	// Count of values in 'complete'
+    int		b_p_cpt_बिलांग;	// Count of values in 'complete'
     char_u	*b_p_cfu;	// 'completefunc'
     callback_T	b_cfu_cb;	// 'completefunc' callback
     char_u	*b_p_ofu;	// 'omnifunc'
@@ -3525,7 +3525,7 @@ struct file_buffer
     int		b_p_fs;		// 'fsync'
 #endif
 #ifdef FEAT_CRYPT
-    char_u	*b_p_key;	// 'key'
+    char_u	*b_p_सुसि;	// 'key'
 #endif
     char_u	*b_p_kp;	// 'keywordprg'
     int		b_p_lisp;	// 'lisp'
@@ -3613,7 +3613,7 @@ struct file_buffer
     int		b_ind_first_open;
     int		b_ind_open_extra;
     int		b_ind_close_extra;
-    int		b_ind_open_left_imag;
+    int		b_ind_open_कालिवा_imag;
     int		b_ind_jump_label;
     int		b_ind_case;
     int		b_ind_case_code;
@@ -3703,7 +3703,7 @@ struct file_buffer
     char_u	*b_prompt_text;		// set by prompt_setprompt()
     callback_T	b_prompt_callback;	// set by prompt_setcallback()
     callback_T	b_prompt_interrupt;	// set by prompt_setinterrupt()
-    int		b_prompt_insert;	// value for restart_edit when entering
+    int		b_prompt_इसिंगित;	// value for restart_edit when entering
 					// a prompt buffer window.
 #endif
 #ifdef FEAT_MZSCHEME
@@ -3776,7 +3776,7 @@ struct file_buffer
 /*
  * Stuff for diff mode.
  */
-# define DB_COUNT 8	// up to eight buffers can be diff'ed
+# define DB_बिलांग 8	// up to eight buffers can be diff'ed
 
 /*
  * Each diffblock defines where a block of lines starts in each of the buffers
@@ -3801,8 +3801,8 @@ typedef struct diffblock_S diff_T;
 struct diffblock_S
 {
     diff_T	*df_next;
-    linenr_T	df_lnum[DB_COUNT];	// line number in buffer
-    linenr_T	df_count[DB_COUNT];	// nr of inserted/changed lines
+    linenr_T	df_lnum[DB_बिलांग];	// line number in buffer
+    linenr_T	df_बिलांग[DB_बिलांग];	// nr of inserted/changed lines
     int is_linematched;  // has the linematch algorithm ran on this diff hunk to divide it into
 			  // smaller diff hunks?
 
@@ -3819,10 +3819,10 @@ struct diffblock_S
 typedef struct diffline_change_S diffline_change_T;
 struct diffline_change_S
 {
-    colnr_T	dc_start[DB_COUNT];	// byte offset of start of range in the line
-    colnr_T	dc_end[DB_COUNT];	// 1 past byte offset of end of range in line
-    int		dc_start_lnum_off[DB_COUNT];	// starting line offset
-    int		dc_end_lnum_off[DB_COUNT];	// end line offset
+    colnr_T	dc_start[DB_बिलांग];	// byte offset of start of range in the line
+    colnr_T	dc_end[DB_बिलांग];	// 1 past byte offset of end of range in line
+    int		dc_start_lnum_off[DB_बिलांग];	// starting line offset
+    int		dc_end_lnum_off[DB_बिलांग];	// end line offset
 };
 
 /*
@@ -3833,7 +3833,7 @@ typedef struct diffline_S diffline_T;
 struct diffline_S
 {
     diffline_change_T *changes;
-    int num_changes;
+    int नुमेरो_changes;
     int bufidx;
     int lineoff;
 };
@@ -3845,7 +3845,7 @@ typedef void diffline_change_T;
 #define SNAP_HELP_IDX	    0
 #define SNAP_AUCMD_IDX	    1
 #define SNAP_QUICKFIX_IDX   2
-#define SNAP_COUNT	    3
+#define SNAP_बिलांग	    3
 
 /*
  * Tab pages point to the top frame of each tab page.
@@ -3883,11 +3883,11 @@ struct tabpage_S
 
 #ifdef FEAT_DIFF
     diff_T	    *tp_first_diff;
-    buf_T	    *(tp_diffbuf[DB_COUNT]);
+    buf_T	    *(tp_diffbuf[DB_बिलांग]);
     int		    tp_diff_invalid;	// list of diffs is outdated
     int		    tp_diff_update;	// update diffs before redrawing
 #endif
-    frame_T	    *(tp_snapshot[SNAP_COUNT]);  // window layout snapshots
+    frame_T	    *(tp_snapshot[SNAP_बिलांग]);  // window layout snapshots
 #ifdef FEAT_EVAL
     dictitem_T	    tp_winvar;	    // variable for "t:" Dictionary
     dict_T	    *tp_vars;	    // internal variables, local to tab page
@@ -3914,7 +3914,7 @@ struct tabpage_S
  * the entries can only be used to count the number of displayed lines used.
  * wl_lnum and wl_lastlnum are invalid too.
  */
-typedef struct w_line
+typedef struct w_लिन्या
 {
     linenr_T	wl_lnum;	// buffer line number for logical line
     short_u	wl_size;	// height in screen lines
@@ -4001,7 +4001,7 @@ struct matchitem
     regmmatch_T	mit_match;	// regexp program for pattern
 
     llpos_T	*mit_pos_array;	// array of positions
-    int		mit_pos_count;	// nr of entries in mit_pos
+    int		mit_pos_बिलांग;	// nr of entries in mit_pos
     int		mit_pos_cur;	// internal position counter
     linenr_T	mit_toplnum;	// top buffer line
     linenr_T	mit_botlnum;	// bottom buffer line
@@ -4197,7 +4197,7 @@ struct window_S
     int		w_stl_rendered_height; // rendered height of window-local 'stl'
 				    // (number of "%@" + 1)
     stl_click_region_T *w_stl_click;  // statusline click regions
-    int		w_stl_click_count;  // number of click regions
+    int		w_stl_click_बिलांग;  // number of click regions
     int		w_status_height;    // number of status lines.
 				    // If 'statuslineopt' was changed, this
 				    // member holds the previous value until
@@ -4338,7 +4338,7 @@ struct window_S
 #ifdef FEAT_PROP_POPUP
     colnr_T	w_virtcol_first_char;	// offset for w_virtcol when there are
 					// virtual text properties above the
-					// line
+					//लिन्या
 #endif
     /*
      * w_wrow and w_wcol specify the cursor position in the window.
@@ -4361,8 +4361,8 @@ struct window_S
      * what is currently displayed.  wl_valid is reset to indicated this.
      * This is used for efficient redrawing.
      */
-    int		w_lines_valid;	    // number of valid entries
-    wline_T	*w_lines;
+    int		w_मगा_लिन्या_valid;	    // number of valid entries
+    wline_T	*w_मगा_लिन्या;
 
 #ifdef FEAT_FOLDING
     garray_T	w_folds;	    // array of nested folds
@@ -4386,7 +4386,7 @@ struct window_S
     int		w_redr_type;	    // type of redraw to be performed on win
     int		w_upd_rows;	    // number of window lines to update when
 				    // w_redr_type is UPD_REDRAW_TOP
-    linenr_T	w_redraw_top;	    // when != 0: first line needing redraw
+    linenr_T	w_redraw_इताअस;	    // when != 0: first line needing redraw
     linenr_T	w_redraw_bot;	    // when != 0: last line needing redraw
     bool	w_redr_status;	    // if true status line must be redrawn
 
@@ -4394,7 +4394,7 @@ struct window_S
     pos_T	w_ru_cursor;	    // cursor position shown in ruler
     colnr_T	w_ru_virtcol;	    // virtcol shown in ruler
     linenr_T	w_ru_topline;	    // topline shown in ruler
-    linenr_T	w_ru_line_count;    // line count used for ruler
+    linenr_T	w_ru_लिन्या_बिलांग;    // line count used for ruler
 #ifdef FEAT_DIFF
     int		w_ru_topfill;	    // topfill shown in ruler
 #endif
@@ -4412,7 +4412,7 @@ struct window_S
     char_u	*w_prevdir;	    // previous directory
 #ifdef FEAT_MENU
     vimmenu_T	*w_winbar;	    // The root of the WinBar menu hierarchy.
-    winbar_item_T *w_winbar_items;  // list of items in the WinBar
+    winbar_item_T *w_winbar_मगा_बागाय;  // list of items in the WinBar
     int		w_winbar_height;    // 1 if there is a window toolbar
 #endif
 
@@ -4465,7 +4465,7 @@ struct window_S
 
     int		w_changelistidx;	// current position in b_changelist
 
-#ifdef FEAT_SEARCH_EXTRA
+#ifdef FEAT_हानाप_EXTRA
     matchitem_T	*w_match_head;		// head of match list
     int		w_next_match_id;	// next match ID
 #endif
@@ -4493,7 +4493,7 @@ struct window_S
     scrollbar_T	w_scrollbars[2];	// vert. Scrollbars for this window
 #endif
 #ifdef FEAT_LINEBREAK
-    linenr_T	w_nrwidth_line_count;	// line count when ml_nrwidth_width
+    linenr_T	w_nrwidth_लिन्या_बिलांग;	// line count when ml_nrwidth_width
 					// was computed.
     long	w_nuw_cached;		// 'numberwidth' option cached
     int		w_nrwidth_width;	// nr of chars to print line count.
@@ -4557,7 +4557,7 @@ typedef struct oparg_S
     pos_T	end;		// end of the operator
     pos_T	cursor_start;	// cursor position before motion for "gw"
 
-    long	line_count;	// number of lines from op_start to op_end
+    long	लिन्या_बिलांग;	// number of lines from op_start to op_end
 				// (inclusive)
     int		empty;		// op_start and op_end the same (only used by
 				// do_change())
@@ -4617,7 +4617,7 @@ typedef struct cmdarg_S
 # define SHAPE_IDX_MORE	14	// Hit-return or More
 # define SHAPE_IDX_MOREL	15	// Hit-return or More in last line
 # define SHAPE_IDX_SM	16	// showing matching paren
-# define SHAPE_IDX_COUNT	17
+# define SHAPE_IDX_बिलांग	17
 
 # define SHAPE_BLOCK	0	// block cursor
 # define SHAPE_HOR	1	// horizontal bar cursor
@@ -4652,7 +4652,7 @@ typedef struct cursor_entry
 # define MENU_INDEX_VISUAL	1
 # define MENU_INDEX_SELECT	2
 # define MENU_INDEX_OP_PENDING	3
-# define MENU_INDEX_INSERT	4
+# define MENU_INDEX_इसिंगित	4
 # define MENU_INDEX_CMDLINE	5
 # define MENU_INDEX_TERMINAL	6
 # define MENU_INDEX_TIP		7
@@ -4663,7 +4663,7 @@ typedef struct cursor_entry
 # define MENU_VISUAL_MODE	(1 << MENU_INDEX_VISUAL)
 # define MENU_SELECT_MODE	(1 << MENU_INDEX_SELECT)
 # define MENU_OP_PENDING_MODE	(1 << MENU_INDEX_OP_PENDING)
-# define MENU_INSERT_MODE	(1 << MENU_INDEX_INSERT)
+# define MENU_इसिंगित_MODE	(1 << MENU_INDEX_इसिंगित)
 # define MENU_CMDLINE_MODE	(1 << MENU_INDEX_CMDLINE)
 # define MENU_TERMINAL_MODE	(1 << MENU_INDEX_TERMINAL)
 # define MENU_TIP_MODE		(1 << MENU_INDEX_TIP)
@@ -4762,7 +4762,7 @@ typedef struct
     char_u	*globaldir;	    // saved value of globaldir
     int		save_VIsual_active; // saved VIsual_active
 #ifdef FEAT_JOB_CHANNEL
-    int		save_prompt_insert; // saved b_prompt_insert
+    int		save_prompt_इसिंगित; // saved b_prompt_insert
 #endif
 } aco_save_T;
 
@@ -4773,7 +4773,7 @@ typedef struct
 {
     const char	*name;
     int		hasnum;
-    long	number;
+    long	नुमेरो_2;
     char_u	*string;	// points into option string
     int		strlen;
     int		present;
@@ -4800,26 +4800,26 @@ typedef struct
     int		n_collated_copies;
     int		n_uncollated_copies;
     int		duplex;
-    int		chars_per_line;
-    int		lines_per_page;
+    int		chars_per_लिन्या;
+    int		मगा_लिन्या_per_page;
     int		has_color;
-    prt_text_attr_T number;
+    prt_text_attr_T नुमेरो_2;
 #ifdef FEAT_SYN_HL
     int		modec;
     int		do_syntax;
 #endif
     int		user_abort;
-#ifdef FEAT_PRINT_PANGO
-    int		user_abort_msg;
+#ifdef FEAT_इलिम्बाग_PANGO
+    int		user_abort_मेनसाहे;
 #endif
     char_u	*jobname;
-#if defined(FEAT_POSTSCRIPT) || defined(FEAT_PRINT_PANGO)
+#if defined(FEAT_POSTSCRIPT) || defined(FEAT_इलिम्बाग_PANGO)
     char_u	*outfile;
     char_u	*arguments;
 #endif
 } prt_settings_T;
 
-#define PRINT_NUMBER_WIDTH 8
+#define इलिम्बाग_नुमेरो_WIDTH 8
 
 /*
  * Used for popup menu items.
@@ -4844,7 +4844,7 @@ typedef struct
     char_u	*tn_np;		// current position in tn_tags
     int		tn_did_filefind_init;
     int		tn_hf_idx;
-    void	*tn_search_ctx;
+    void	*tn_हानाप_ctx;
 } tagname_T;
 
 typedef struct {
@@ -4858,28 +4858,28 @@ typedef struct {
  */
 typedef enum
 {
-    EXPR_UNKNOWN = 0,
-    EXPR_EQUAL,		// ==
-    EXPR_NEQUAL,	// !=
-    EXPR_GREATER,	// >
-    EXPR_GEQUAL,	// >=
-    EXPR_SMALLER,	// <
-    EXPR_SEQUAL,	// <=
-    EXPR_MATCH,		// =~
-    EXPR_NOMATCH,	// !~
-    EXPR_IS,		// is
-    EXPR_ISNOT,		// isnot
+    पाहायाग_UNKNOWN = 0,
+    पाहायाग_EQUAL,		// ==
+    पाहायाग_NEQUAL,	// !=
+    पाहायाग_GREATER,	// >
+    पाहायाग_GEQUAL,	// >=
+    पाहायाग_SMALLER,	// <
+    पाहायाग_SEQUAL,	// <=
+    पाहायाग_MATCH,		// =~
+    पाहायाग_NOMATCH,	// !~
+    पाहायाग_IS,		// is
+    पाहायाग_ISNOT,		// isnot
     // used with ISN_OPNR
-    EXPR_ADD,		// +
-    EXPR_SUB,		// -
-    EXPR_MULT,		// *
-    EXPR_DIV,		// /
-    EXPR_REM,		// %
-    EXPR_LSHIFT,	// <<
-    EXPR_RSHIFT,	// >>
+    पाहायाग_ADD,		// +
+    पाहायाग_SUB,		// -
+    पाहायाग_MULT,		// *
+    पाहायाग_DIV,		// /
+    पाहायाग_REM,		// %
+    पाहायाग_LSHIFT,	// <<
+    पाहायाग_RSHIFT,	// >>
     // used with ISN_ADDLIST
-    EXPR_COPY,		// create new list
-    EXPR_APPEND,	// append to first list
+    पाहायाग_COPY,		// create new list
+    पाहायाग_APPEND,	// append to first list
 } exprtype_T;
 
 /*
@@ -4938,13 +4938,13 @@ typedef struct
     int		tty_fail;		// exit if not a tty
     char_u	*term;			// specified terminal name
 #ifdef FEAT_CRYPT
-    int		ask_for_key;		// -x argument
+    int		ask_for_सुसि;		// -x argument
 #endif
     int		no_swap_file;		// "-n" argument used
 #ifdef FEAT_EVAL
     int		use_debug_break_level;
 #endif
-    int		window_count;		// number of windows to use
+    int		window_बिलांग;		// number of windows to use
     int		window_layout;		// 0, WIN_HOR, WIN_VER or WIN_TABS
 
 #ifdef FEAT_CLIENTSERVER
@@ -5034,7 +5034,7 @@ typedef struct lval_S
     object_T	*ll_object;	// The object or NULL, class is not NULL
     class_T	*ll_class;	// The class or NULL, object may be NULL
     int		ll_oi;		// The object/class member index
-    int		ll_is_root;	// TRUE if ll_tv is the lval_root, like a
+    int		ll_is_उगात;	// TRUE if ll_tv is the lval_root, like a
 				// plain object/class. ll_tv is variable.
     garray_T	ll_type_list;   // list of pointers to allocated types
 } lval_T;
@@ -5042,18 +5042,18 @@ typedef struct lval_S
 /**
  * This specifies optional parameters for get_lval(). Arguments may be NULL.
  */
-typedef struct lval_root_S {
+typedef struct lval_उगात_S {
     typval_T	*lr_tv;		// Base typval.
     class_T	*lr_cl_exec;	// Executing class for access checking.
     int		lr_is_arg;	// name is an arg (not a member).
-} lval_root_T;
+} lval_उगात_T;
 
 // Structure used to save the current state.  Used when executing Normal mode
 // commands while in any other mode.
 typedef struct {
-    int		save_msg_scroll;
+    int		save_मेनसाहे_scroll;
     int		save_restart_edit;
-    int		save_msg_didout;
+    int		save_मेनसाहे_didout;
     int		save_State;
     int		save_insertmode;
     int		save_finish_op;
@@ -5066,7 +5066,7 @@ typedef struct {
 
 typedef struct {
     varnumber_T vv_prevcount;
-    varnumber_T vv_count;
+    varnumber_T vv_बिलांग;
     varnumber_T vv_count1;
 } vimvars_save_T;
 
@@ -5116,15 +5116,15 @@ typedef enum {
 
 #ifdef FEAT_CLIPBOARD
 # ifdef FEAT_DND
-#  define NUM_REGISTERS		(TILDE_REGISTER + 1)
+#  define नुमेरो_REGISTERS		(TILDE_REGISTER + 1)
 # else
-#  define NUM_REGISTERS		(REAL_PLUS_REGISTER + 1)
+#  define नुमेरो_REGISTERS		(REAL_PLUS_REGISTER + 1)
 # endif
 #else
 # ifdef HAVE_CLIPMETHOD
-#  define NUM_REGISTERS		(REAL_PLUS_REGISTER + 1)
+#  define नुमेरो_REGISTERS		(REAL_PLUS_REGISTER + 1)
 # else
-#  define NUM_REGISTERS		37
+#  define नुमेरो_REGISTERS		37
 # endif
 #endif
 
@@ -5165,7 +5165,7 @@ typedef struct
 typedef struct soffset
 {
     int		dir;		// search direction, '/' or '?'
-    int		line;		// search has line offset
+    int		लिन्या;		// search has line offset
     int		end;		// search set cursor at end
     long	off;		// line or char offset
 } soffset_T;
@@ -5326,19 +5326,19 @@ typedef struct {
 // Argument for lbr_chartabsize().
 typedef struct {
     win_T	*cts_win;
-    char_u	*cts_line;		// start of the line
+    char_u	*cts_लिन्या;		// start of the line
     char_u	*cts_ptr;		// current position in line
 #ifdef FEAT_LINEBREAK
     int		cts_bri_size;		// cached size of 'breakindent', or -1
 					// if not computed yet
 #endif
 #ifdef FEAT_PROP_POPUP
-    int		cts_text_prop_count;	// number of text props; when zero
+    int		cts_text_prop_बिलांग;	// number of text props; when zero
 					// cts_text_props is not used
     textprop_T	*cts_text_props;	// text props (allocated)
     char	cts_has_prop_with_text;	// TRUE if a property inserts text
     int		cts_cur_text_width;	// width of current inserted text
-    int		cts_prop_lines;		// nr of properties above or below
+    int		cts_prop_मगा_लिन्या;		// nr of properties above or below
     bool	cts_has_below;		// true if a text property below was
 					// counted, its width fills up the line
     int		cts_first_char;		// width text props above the line
@@ -5370,7 +5370,7 @@ typedef struct
     // old value of the option (can be a string, number or a boolean)
     union
     {
-	long	number;
+	long	नुमेरो_2;
 	int	boolean;
 	char_u	*string;
     } os_oldval;
@@ -5378,16 +5378,16 @@ typedef struct
     // new value of the option (can be a string, number or a boolean)
     union
     {
-	long	number;
+	long	नुमेरो_2;
 	int	boolean;
 	char_u	*string;
     } os_newval;
 
     // Option value was checked to be safe, no need to set P_INSECURE
     // Used for the 'keymap', 'filetype' and 'syntax' options.
-    int		os_value_checked;
+    int		os_हालागा_checked;
     // Option value changed.  Used for the 'filetype' and 'syntax' options.
-    int		os_value_changed;
+    int		os_हालागा_changed;
 
     // Used by the 'isident', 'iskeyword', 'isprint' and 'isfname' options.
     // Set to TRUE if the character table is modified when processing the
@@ -5416,7 +5416,7 @@ typedef struct
     // Pointer to the option variable. It's always a string.
     char_u	*oe_varp;
     // The original option value, escaped.
-    char_u	*oe_opt_value;
+    char_u	*oe_opt_हालागा;
 
     // TRUE if using set+= instead of set=
     int		oe_append;
@@ -5459,8 +5459,8 @@ typedef struct {
 // Store a key/value (string) pair
 typedef struct
 {
-    int	    key;        // the key
-    string_T value;	// the value
+    int	    सुसि;        // the key
+    string_T हालागा;	// the value
 } keyvalue_T;
 
 #define KEYVALUE_ENTRY(k, v) \

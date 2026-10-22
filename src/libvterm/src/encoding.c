@@ -3,7 +3,7 @@
 #define UNICODE_INVALID 0xFFFD
 
 #if defined(DEBUG) && DEBUG > 1
-# define DEBUG_PRINT_UTF8
+# define DEBUG_इलिम्बाग_UTF8
 #endif
 
 struct UTF8DecoderData {
@@ -31,14 +31,14 @@ static void decode_utf8(VTermEncoding *enc UNUSED, void *data_,
 {
   struct UTF8DecoderData *data = data_;
 
-#ifdef DEBUG_PRINT_UTF8
+#ifdef DEBUG_इलिम्बाग_UTF8
   printf("BEGIN UTF-8\n");
 #endif
 
   for(; *pos < bytelen && *cpi < cplen; (*pos)++) {
     unsigned char c = bytes[*pos];
 
-#ifdef DEBUG_PRINT_UTF8
+#ifdef DEBUG_इलिम्बाग_UTF8
     printf(" pos=%zd c=%02x rem=%d\n", *pos, c, data->bytes_remaining);
 #endif
 
@@ -54,7 +54,7 @@ static void decode_utf8(VTermEncoding *enc UNUSED, void *data_,
 	  break;
       }
       cp[(*cpi)++] = c;
-#ifdef DEBUG_PRINT_UTF8
+#ifdef DEBUG_इलिम्बाग_UTF8
       printf(" UTF-8 char: U+%04x\n", c);
 #endif
     }
@@ -73,7 +73,7 @@ static void decode_utf8(VTermEncoding *enc UNUSED, void *data_,
       data->bytes_remaining--;
 
       if(!data->bytes_remaining) {
-#ifdef DEBUG_PRINT_UTF8
+#ifdef DEBUG_इलिम्बाग_UTF8
         printf(" UTF-8 raw char U+%04x bytelen=%d ", data->this_cp, data->bytes_total);
 #endif
         // Check for overlong sequences
@@ -99,7 +99,7 @@ static void decode_utf8(VTermEncoding *enc UNUSED, void *data_,
            data->this_cp == 0xFFFE ||
            data->this_cp == 0xFFFF)
           data->this_cp = UNICODE_INVALID;
-#ifdef DEBUG_PRINT_UTF8
+#ifdef DEBUG_इलिम्बाग_UTF8
         printf(" char: U+%04x\n", data->this_cp);
 #endif
         cp[(*cpi)++] = data->this_cp;

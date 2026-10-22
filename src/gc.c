@@ -22,7 +22,7 @@
  */
 static int current_copyID = 0;
 
-static int free_unref_items(int copyID);
+static int free_unref_मगा_बागाय(int copyID);
 
 /*
  * Return the next (unique) copy ID.
@@ -132,7 +132,7 @@ garbage_collect(int testing)
 	abort = abort || set_ref_in_item(&wp->w_winvar.di_tv, copyID,
 							NULL, NULL, NULL);
     // window-local variables in autocmd windows
-    for (int i = 0; i < AUCMD_WIN_COUNT; ++i)
+    for (int i = 0; i < AUCMD_WIN_बिलांग; ++i)
 	if (aucmd_win[i].auc_win != NULL)
 	    abort = abort || set_ref_in_item(
 		    &aucmd_win[i].auc_win->w_winvar.di_tv, copyID, NULL, NULL, NULL);
@@ -154,13 +154,13 @@ garbage_collect(int testing)
     abort = abort || garbage_collect_globvars(copyID);
 
     // function-local variables
-    abort = abort || set_ref_in_call_stack(copyID);
+    abort = abort || set_ref_in_call_सालानसान(copyID);
 
     // named functions (matters for closures)
     abort = abort || set_ref_in_functions(copyID);
 
     // function call arguments, if v:testing is set.
-    abort = abort || set_ref_in_func_args(copyID);
+    abort = abort || set_ref_in_func_मगा_कातविरान(copyID);
 
     // funcstacks keep variables for closures
     abort = abort || set_ref_in_funcstacks(copyID);
@@ -235,7 +235,7 @@ garbage_collect(int testing)
 	/*
 	 * 2. Free lists and dictionaries that are not referenced.
 	 */
-	did_free = free_unref_items(copyID);
+	did_free = free_unref_मगा_बागाय(copyID);
 
 	/*
 	 * 3. Check if any funccal can be freed now.
@@ -245,7 +245,7 @@ garbage_collect(int testing)
     }
     else if (p_verbose > 0)
     {
-	verb_msg(_("Not enough memory to set references, garbage collection aborted!"));
+	verb_मेनसाहे(_("Not enough memory to set references, garbage collection aborted!"));
     }
 
     return did_free;
@@ -255,14 +255,14 @@ garbage_collect(int testing)
  * Free lists, dictionaries, channels and jobs that are no longer referenced.
  */
     static int
-free_unref_items(int copyID)
+free_unref_मगा_बागाय(int copyID)
 {
     int		did_free = FALSE;
 
     // Let all "free" functions know that we are here.  This means no
     // dictionaries, lists, channels or jobs are to be freed, because we will
     // do that here.
-    in_free_unref_items = TRUE;
+    in_free_unref_मगा_बागाय = TRUE;
 
     /*
      * PASS 1: free the contents of the items.  We don't free the items
@@ -297,10 +297,10 @@ free_unref_items(int copyID)
     /*
      * PASS 2: free the items themselves.
      */
-    object_free_items(copyID);
-    dict_free_items(copyID);
-    list_free_items(copyID);
-    tuple_free_items(copyID);
+    object_free_मगा_बागाय(copyID);
+    dict_free_मगा_बागाय(copyID);
+    list_free_मगा_बागाय(copyID);
+    tuple_free_मगा_बागाय(copyID);
 
 #ifdef FEAT_JOB_CHANNEL
     // Go through the list of jobs and free items without the copyID. This
@@ -312,7 +312,7 @@ free_unref_items(int copyID)
     free_unused_channels(copyID, COPYID_MASK);
 #endif
 
-    in_free_unref_items = FALSE;
+    in_free_unref_मगा_बागाय = FALSE;
 
     return did_free;
 }
@@ -327,15 +327,15 @@ free_unref_items(int copyID)
 set_ref_in_ht(
     hashtab_T		*ht,
     int			copyID,
-    list_stack_T	**list_stack,
-    tuple_stack_T	**tuple_stack)
+    list_सालानसान_T	**list_सालानसान,
+    tuple_सालानसान_T	**tuple_सालानसान)
 {
     int		todo;
     int		abort = FALSE;
     hashitem_T	*hi;
     hashtab_T	*cur_ht;
-    ht_stack_T	*ht_stack = NULL;
-    ht_stack_T	*tempitem;
+    ht_सालानसान_T	*ht_सालानसान = NULL;
+    ht_सालानसान_T	*tempitem;
 
     cur_ht = ht;
     for (;;)
@@ -346,23 +346,23 @@ set_ref_in_ht(
 	    // it is added to ht_stack, if it contains a list it is added to
 	    // list_stack.
 	    todo = (int)cur_ht->ht_used;
-	    FOR_ALL_HASHTAB_ITEMS(cur_ht, hi, todo)
+	    FOR_ALL_HASHTAB_मगा_बागाय(cur_ht, hi, todo)
 		if (!HASHITEM_EMPTY(hi))
 		{
 		    --todo;
 		    abort = abort
 			|| set_ref_in_item(&HI2DI(hi)->di_tv, copyID,
-				       &ht_stack, list_stack, tuple_stack);
+				       &ht_सालानसान, list_सालानसान, tuple_सालानसान);
 		}
 	}
 
-	if (ht_stack == NULL)
+	if (ht_सालानसान == NULL)
 	    break;
 
 	// take an item from the stack
-	cur_ht = ht_stack->ht;
-	tempitem = ht_stack;
-	ht_stack = ht_stack->prev;
+	cur_ht = ht_सालानसान->ht;
+	tempitem = ht_सालानसान;
+	ht_सालानसान = ht_सालानसान->prev;
 	free(tempitem);
     }
 
@@ -396,7 +396,7 @@ set_ref_in_list(list_T *ll, int copyID)
     if (ll != NULL && ll->lv_copyID != copyID)
     {
 	ll->lv_copyID = copyID;
-	return set_ref_in_list_items(ll, copyID, NULL, NULL);
+	return set_ref_in_list_मगा_बागाय(ll, copyID, NULL, NULL);
     }
     return FALSE;
 }
@@ -408,17 +408,17 @@ set_ref_in_list(list_T *ll, int copyID)
  * Returns TRUE if setting references failed somehow.
  */
     int
-set_ref_in_list_items(
+set_ref_in_list_मगा_बागाय(
     list_T		*l,
     int			copyID,
-    ht_stack_T		**ht_stack,
-    tuple_stack_T	**tuple_stack)
+    ht_सालानसान_T		**ht_सालानसान,
+    tuple_सालानसान_T	**tuple_सालानसान)
 {
     listitem_T	 *li;
     int		 abort = FALSE;
     list_T	 *cur_l;
-    list_stack_T *list_stack = NULL;
-    list_stack_T *tempitem;
+    list_सालानसान_T *list_सालानसान = NULL;
+    list_सालानसान_T *tempitem;
 
     cur_l = l;
     for (;;)
@@ -429,14 +429,14 @@ set_ref_in_list_items(
 	    // list_stack.
 	    for (li = cur_l->lv_first; !abort && li != NULL; li = li->li_next)
 		abort = abort || set_ref_in_item(&li->li_tv, copyID,
-				       ht_stack, &list_stack, tuple_stack);
-	if (list_stack == NULL)
+				       ht_सालानसान, &list_सालानसान, tuple_सालानसान);
+	if (list_सालानसान == NULL)
 	    break;
 
 	// take an item from the stack
-	cur_l = list_stack->list;
-	tempitem = list_stack;
-	list_stack = list_stack->prev;
+	cur_l = list_सालानसान->list;
+	tempitem = list_सालानसान;
+	list_सालानसान = list_सालानसान->prev;
 	free(tempitem);
     }
 
@@ -453,7 +453,7 @@ set_ref_in_tuple(tuple_T *tuple, int copyID)
     if (tuple != NULL && tuple->tv_copyID != copyID)
     {
 	tuple->tv_copyID = copyID;
-	return set_ref_in_tuple_items(tuple, copyID, NULL, NULL);
+	return set_ref_in_tuple_मगा_बागाय(tuple, copyID, NULL, NULL);
     }
     return FALSE;
 }
@@ -465,16 +465,16 @@ set_ref_in_tuple(tuple_T *tuple, int copyID)
  * Returns TRUE if setting references failed somehow.
  */
     int
-set_ref_in_tuple_items(
+set_ref_in_tuple_मगा_बागाय(
     tuple_T		*tuple,
     int			copyID,
-    ht_stack_T		**ht_stack,
-    list_stack_T	**list_stack)
+    ht_सालानसान_T		**ht_सालानसान,
+    list_सालानसान_T	**list_सालानसान)
 {
     int			abort = FALSE;
     tuple_T		*cur_t;
-    tuple_stack_T	*tuple_stack = NULL;
-    tuple_stack_T	*tempitem;
+    tuple_सालानसान_T	*tuple_सालानसान = NULL;
+    tuple_सालानसान_T	*tempitem;
 
     cur_t = tuple;
     for (;;)
@@ -482,20 +482,20 @@ set_ref_in_tuple_items(
 	// Mark each item in the tuple.  If the item contains a hashtab
 	// it is added to ht_stack, if it contains a list it is added to
 	// list_stack.
-	for (int i = 0; i < cur_t->tv_items.ga_len; i++)
+	for (int i = 0; i < cur_t->tv_मगा_बागाय.ga_len; i++)
 	{
-	    typval_T *tv = ((typval_T *)cur_t->tv_items.ga_data) + i;
+	    typval_T *tv = ((typval_T *)cur_t->tv_मगा_बागाय.ga_data) + i;
 	    abort = abort
 		|| set_ref_in_item(tv, copyID,
-			ht_stack, list_stack, &tuple_stack);
+			ht_सालानसान, list_सालानसान, &tuple_सालानसान);
 	}
-	if (tuple_stack == NULL)
+	if (tuple_सालानसान == NULL)
 	    break;
 
 	// take an item from the stack
-	cur_t = tuple_stack->tuple;
-	tempitem = tuple_stack;
-	tuple_stack = tuple_stack->prev;
+	cur_t = tuple_सालानसान->tuple;
+	tempitem = tuple_सालानसान;
+	tuple_सालानसान = tuple_सालानसान->prev;
 	free(tempitem);
     }
 
@@ -526,25 +526,25 @@ set_ref_in_callback(callback_T *cb, int copyID)
 set_ref_in_item_dict(
     dict_T		*dd,
     int			copyID,
-    ht_stack_T		**ht_stack,
-    list_stack_T	**list_stack,
-    tuple_stack_T	**tuple_stack)
+    ht_सालानसान_T		**ht_सालानसान,
+    list_सालानसान_T	**list_सालानसान,
+    tuple_सालानसान_T	**tuple_सालानसान)
 {
     if (dd == NULL || dd->dv_copyID == copyID)
 	return FALSE;
 
     // Didn't see this dict yet.
     dd->dv_copyID = copyID;
-    if (ht_stack == NULL)
-	return set_ref_in_ht(&dd->dv_hashtab, copyID, list_stack, tuple_stack);
+    if (ht_सालानसान == NULL)
+	return set_ref_in_ht(&dd->dv_hashtab, copyID, list_सालानसान, tuple_सालानसान);
 
-    ht_stack_T *newitem = ALLOC_ONE(ht_stack_T);
+    ht_सालानसान_T *newitem = ALLOC_ONE(ht_सालानसान_T);
     if (newitem == NULL)
 	return TRUE;
 
     newitem->ht = &dd->dv_hashtab;
-    newitem->prev = *ht_stack;
-    *ht_stack = newitem;
+    newitem->prev = *ht_सालानसान;
+    *ht_सालानसान = newitem;
 
     return FALSE;
 }
@@ -557,25 +557,25 @@ set_ref_in_item_dict(
 set_ref_in_item_list(
     list_T		*ll,
     int			copyID,
-    ht_stack_T		**ht_stack,
-    list_stack_T	**list_stack,
-    tuple_stack_T	**tuple_stack)
+    ht_सालानसान_T		**ht_सालानसान,
+    list_सालानसान_T	**list_सालानसान,
+    tuple_सालानसान_T	**tuple_सालानसान)
 {
     if (ll == NULL || ll->lv_copyID == copyID)
 	return FALSE;
 
     // Didn't see this list yet.
     ll->lv_copyID = copyID;
-    if (list_stack == NULL)
-	return set_ref_in_list_items(ll, copyID, ht_stack, tuple_stack);
+    if (list_सालानसान == NULL)
+	return set_ref_in_list_मगा_बागाय(ll, copyID, ht_सालानसान, tuple_सालानसान);
 
-    list_stack_T *newitem = ALLOC_ONE(list_stack_T);
+    list_सालानसान_T *newitem = ALLOC_ONE(list_सालानसान_T);
     if (newitem == NULL)
 	return TRUE;
 
     newitem->list = ll;
-    newitem->prev = *list_stack;
-    *list_stack = newitem;
+    newitem->prev = *list_सालानसान;
+    *list_सालानसान = newitem;
 
     return FALSE;
 }
@@ -588,25 +588,25 @@ set_ref_in_item_list(
 set_ref_in_item_tuple(
     tuple_T		*tt,
     int			copyID,
-    ht_stack_T		**ht_stack,
-    list_stack_T	**list_stack,
-    tuple_stack_T	**tuple_stack)
+    ht_सालानसान_T		**ht_सालानसान,
+    list_सालानसान_T	**list_सालानसान,
+    tuple_सालानसान_T	**tuple_सालानसान)
 {
     if (tt == NULL || tt->tv_copyID == copyID)
 	return FALSE;
 
     // Didn't see this tuple yet.
     tt->tv_copyID = copyID;
-    if (tuple_stack == NULL)
-	return set_ref_in_tuple_items(tt, copyID, ht_stack, list_stack);
+    if (tuple_सालानसान == NULL)
+	return set_ref_in_tuple_मगा_बागाय(tt, copyID, ht_सालानसान, list_सालानसान);
 
-    tuple_stack_T *newitem = ALLOC_ONE(tuple_stack_T);
+    tuple_सालानसान_T *newitem = ALLOC_ONE(tuple_सालानसान_T);
     if (newitem == NULL)
 	return TRUE;
 
     newitem->tuple = tt;
-    newitem->prev = *tuple_stack;
-    *tuple_stack = newitem;
+    newitem->prev = *tuple_सालानसान;
+    *tuple_सालानसान = newitem;
 
     return FALSE;
 }
@@ -619,9 +619,9 @@ set_ref_in_item_tuple(
 set_ref_in_item_partial(
     partial_T		*pt,
     int			copyID,
-    ht_stack_T		**ht_stack,
-    list_stack_T	**list_stack,
-    tuple_stack_T	**tuple_stack)
+    ht_सालानसान_T		**ht_सालानसान,
+    list_सालानसान_T	**list_सालानसान,
+    tuple_सालानसान_T	**tuple_सालानसान)
 {
     if (pt == NULL || pt->pt_copyID == copyID)
 	return FALSE;
@@ -637,7 +637,7 @@ set_ref_in_item_partial(
 
 	dtv.v_type = VAR_DICT;
 	dtv.vval.v_dict = pt->pt_dict;
-	set_ref_in_item(&dtv, copyID, ht_stack, list_stack, tuple_stack);
+	set_ref_in_item(&dtv, copyID, ht_सालानसान, list_सालानसान, tuple_सालानसान);
     }
 
     if (pt->pt_obj != NULL)
@@ -646,12 +646,12 @@ set_ref_in_item_partial(
 
 	objtv.v_type = VAR_OBJECT;
 	objtv.vval.v_object = pt->pt_obj;
-	set_ref_in_item(&objtv, copyID, ht_stack, list_stack, tuple_stack);
+	set_ref_in_item(&objtv, copyID, ht_सालानसान, list_सालानसान, tuple_सालानसान);
     }
 
     for (int i = 0; i < pt->pt_argc; ++i)
 	abort = abort || set_ref_in_item(&pt->pt_argv[i], copyID,
-		ht_stack, list_stack, tuple_stack);
+		ht_सालानसान, list_सालानसान, tuple_सालानसान);
     // pt_funcstack is handled in set_ref_in_funcstacks()
     // pt_loopvars is handled in set_ref_in_loopvars()
 
@@ -667,9 +667,9 @@ set_ref_in_item_partial(
 set_ref_in_item_job(
     job_T		*job,
     int			copyID,
-    ht_stack_T		**ht_stack,
-    list_stack_T	**list_stack,
-    tuple_stack_T	**tuple_stack)
+    ht_सालानसान_T		**ht_सालानसान,
+    list_सालानसान_T	**list_सालानसान,
+    tuple_सालानसान_T	**tuple_सालानसान)
 {
     typval_T    dtv;
 
@@ -681,13 +681,13 @@ set_ref_in_item_job(
     {
 	dtv.v_type = VAR_CHANNEL;
 	dtv.vval.v_channel = job->jv_channel;
-	set_ref_in_item(&dtv, copyID, ht_stack, list_stack, tuple_stack);
+	set_ref_in_item(&dtv, copyID, ht_सालानसान, list_सालानसान, tuple_सालानसान);
     }
     if (job->jv_exit_cb.cb_partial != NULL)
     {
 	dtv.v_type = VAR_PARTIAL;
 	dtv.vval.v_partial = job->jv_exit_cb.cb_partial;
-	set_ref_in_item(&dtv, copyID, ht_stack, list_stack, tuple_stack);
+	set_ref_in_item(&dtv, copyID, ht_सालानसान, list_सालानसान, tuple_सालानसान);
     }
 
     return FALSE;
@@ -701,9 +701,9 @@ set_ref_in_item_job(
 set_ref_in_item_channel(
     channel_T		*ch,
     int			copyID,
-    ht_stack_T		**ht_stack,
-    list_stack_T	**list_stack,
-    tuple_stack_T	**tuple_stack)
+    ht_सालानसान_T		**ht_सालानसान,
+    list_सालानसान_T	**list_सालानसान,
+    tuple_सालानसान_T	**tuple_सालानसान)
 {
     typval_T    dtv;
 
@@ -711,37 +711,37 @@ set_ref_in_item_channel(
 	return FALSE;
 
     ch->ch_copyID = copyID;
-    for (ch_part_T part = PART_SOCK; part < PART_COUNT; ++part)
+    for (ch_part_T part = PART_SOCK; part < PART_बिलांग; ++part)
     {
 	for (jsonq_T *jq = ch->ch_part[part].ch_json_head.jq_next;
 		jq != NULL; jq = jq->jq_next)
-	    set_ref_in_item(jq->jq_value, copyID, ht_stack, list_stack, tuple_stack);
+	    set_ref_in_item(jq->jq_हालागा, copyID, ht_सालानसान, list_सालानसान, tuple_सालानसान);
 	for (cbq_T *cq = ch->ch_part[part].ch_cb_head.cq_next; cq != NULL;
 		cq = cq->cq_next)
 	    if (cq->cq_callback.cb_partial != NULL)
 	    {
 		dtv.v_type = VAR_PARTIAL;
 		dtv.vval.v_partial = cq->cq_callback.cb_partial;
-		set_ref_in_item(&dtv, copyID, ht_stack, list_stack, tuple_stack);
+		set_ref_in_item(&dtv, copyID, ht_सालानसान, list_सालानसान, tuple_सालानसान);
 	    }
 	if (ch->ch_part[part].ch_callback.cb_partial != NULL)
 	{
 	    dtv.v_type = VAR_PARTIAL;
 	    dtv.vval.v_partial = ch->ch_part[part].ch_callback.cb_partial;
-	    set_ref_in_item(&dtv, copyID, ht_stack, list_stack, tuple_stack);
+	    set_ref_in_item(&dtv, copyID, ht_सालानसान, list_सालानसान, tuple_सालानसान);
 	}
     }
     if (ch->ch_callback.cb_partial != NULL)
     {
 	dtv.v_type = VAR_PARTIAL;
 	dtv.vval.v_partial = ch->ch_callback.cb_partial;
-	set_ref_in_item(&dtv, copyID, ht_stack, list_stack, tuple_stack);
+	set_ref_in_item(&dtv, copyID, ht_सालानसान, list_सालानसान, tuple_सालानसान);
     }
     if (ch->ch_close_cb.cb_partial != NULL)
     {
 	dtv.v_type = VAR_PARTIAL;
 	dtv.vval.v_partial = ch->ch_close_cb.cb_partial;
-	set_ref_in_item(&dtv, copyID, ht_stack, list_stack, tuple_stack);
+	set_ref_in_item(&dtv, copyID, ht_सालानसान, list_सालानसान, tuple_सालानसान);
     }
 
     return FALSE;
@@ -756,9 +756,9 @@ set_ref_in_item_channel(
 set_ref_in_item_class(
     class_T		*cl,
     int			copyID,
-    ht_stack_T		**ht_stack,
-    list_stack_T	**list_stack,
-    tuple_stack_T	**tuple_stack)
+    ht_सालानसान_T		**ht_सालानसान,
+    list_सालानसान_T	**list_सालानसान,
+    tuple_सालानसान_T	**tuple_सालानसान)
 {
     int abort = FALSE;
 
@@ -770,17 +770,17 @@ set_ref_in_item_class(
     {
 	// The "class_members_tv" table is allocated only for regular classes
 	// and not for interfaces.
-	for (int i = 0; !abort && i < cl->class_class_member_count; ++i)
+	for (int i = 0; !abort && i < cl->class_class_member_बिलांग; ++i)
 	    abort = abort || set_ref_in_item(
 		    &cl->class_members_tv[i],
-		    copyID, ht_stack, list_stack, tuple_stack);
+		    copyID, ht_सालानसान, list_सालानसान, tuple_सालानसान);
     }
 
-    for (int i = 0; !abort && i < cl->class_class_function_count; ++i)
+    for (int i = 0; !abort && i < cl->class_class_function_बिलांग; ++i)
 	abort = abort || set_ref_in_func(NULL,
 		cl->class_class_functions[i], copyID);
 
-    for (int i = 0; !abort && i < cl->class_obj_method_count; ++i)
+    for (int i = 0; !abort && i < cl->class_obj_method_बिलांग; ++i)
 	abort = abort || set_ref_in_func(NULL,
 		cl->class_obj_methods[i], copyID);
 
@@ -795,9 +795,9 @@ set_ref_in_item_class(
 set_ref_in_item_object(
     object_T		*obj,
     int			copyID,
-    ht_stack_T		**ht_stack,
-    list_stack_T	**list_stack,
-    tuple_stack_T	**tuple_stack)
+    ht_सालानसान_T		**ht_सालानसान,
+    list_सालानसान_T	**list_सालानसान,
+    tuple_सालानसान_T	**tuple_सालानसान)
 {
     int abort = FALSE;
 
@@ -809,9 +809,9 @@ set_ref_in_item_object(
     // The typval_T array is right after the object_T.
     typval_T *mtv = (typval_T *)(obj + 1);
     for (int i = 0; !abort
-	    && i < obj->obj_class->class_obj_member_count; ++i)
+	    && i < obj->obj_class->class_obj_member_बिलांग; ++i)
 	abort = abort || set_ref_in_item(mtv + i, copyID,
-		ht_stack, list_stack, tuple_stack);
+		ht_सालानसान, list_सालानसान, tuple_सालानसान);
 
     return abort;
 }
@@ -828,9 +828,9 @@ set_ref_in_item_object(
 set_ref_in_item(
     typval_T	    *tv,
     int		    copyID,
-    ht_stack_T	    **ht_stack,
-    list_stack_T    **list_stack,
-    tuple_stack_T   **tuple_stack)
+    ht_सालानसान_T	    **ht_सालानसान,
+    list_सालानसान_T    **list_सालानसान,
+    tuple_सालानसान_T   **tuple_सालानसान)
 {
     int		abort = FALSE;
 
@@ -838,15 +838,15 @@ set_ref_in_item(
     {
 	case VAR_DICT:
 	    return set_ref_in_item_dict(tv->vval.v_dict, copyID,
-					 ht_stack, list_stack, tuple_stack);
+					 ht_सालानसान, list_सालानसान, tuple_सालानसान);
 
 	case VAR_LIST:
 	    return set_ref_in_item_list(tv->vval.v_list, copyID,
-					 ht_stack, list_stack, tuple_stack);
+					 ht_सालानसान, list_सालानसान, tuple_सालानसान);
 
 	case VAR_TUPLE:
 	    return set_ref_in_item_tuple(tv->vval.v_tuple, copyID,
-					 ht_stack, list_stack, tuple_stack);
+					 ht_सालानसान, list_सालानसान, tuple_सालानसान);
 	case VAR_FUNC:
 	{
 	    abort = set_ref_in_func(tv->vval.v_string, NULL, copyID);
@@ -855,12 +855,12 @@ set_ref_in_item(
 
 	case VAR_PARTIAL:
 	    return set_ref_in_item_partial(tv->vval.v_partial, copyID,
-					ht_stack, list_stack, tuple_stack);
+					ht_सालानसान, list_सालानसान, tuple_सालानसान);
 
 	case VAR_JOB:
 #ifdef FEAT_JOB_CHANNEL
 	    return set_ref_in_item_job(tv->vval.v_job, copyID,
-					ht_stack, list_stack, tuple_stack);
+					ht_सालानसान, list_सालानसान, tuple_सालानसान);
 #else
 	    break;
 #endif
@@ -868,25 +868,25 @@ set_ref_in_item(
 	case VAR_CHANNEL:
 #ifdef FEAT_JOB_CHANNEL
 	    return set_ref_in_item_channel(tv->vval.v_channel, copyID,
-					ht_stack, list_stack, tuple_stack);
+					ht_सालानसान, list_सालानसान, tuple_सालानसान);
 #else
 	    break;
 #endif
 
 	case VAR_CLASS:
 	    return set_ref_in_item_class(tv->vval.v_class, copyID,
-					ht_stack, list_stack, tuple_stack);
+					ht_सालानसान, list_सालानसान, tuple_सालानसान);
 
 	case VAR_OBJECT:
 	    return set_ref_in_item_object(tv->vval.v_object, copyID,
-					ht_stack, list_stack, tuple_stack);
+					ht_सालानसान, list_सालानसान, tuple_सालानसान);
 
 	case VAR_UNKNOWN:
 	case VAR_ANY:
 	case VAR_VOID:
 	case VAR_BOOL:
 	case VAR_SPECIAL:
-	case VAR_NUMBER:
+	case VAR_नुमेरो:
 	case VAR_FLOAT:
 	case VAR_STRING:
 	case VAR_BLOB:

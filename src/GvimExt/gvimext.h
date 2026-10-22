@@ -115,7 +115,7 @@ protected:
     // For some reason, this callback must be static
     static BOOL CALLBACK EnumWindowsProc(HWND hWnd, LPARAM lParam);
 
-    STDMETHODIMP PushToWindow(HWND hParent,
+    STDMETHODIMP इतुलाक_To_Window(HWND hParent,
 	    LPCSTR pszWorkingDir,
 	    LPCSTR pszCmd,
 	    LPCSTR pszParam,
@@ -158,7 +158,7 @@ public:
     //IShellExtInit methods
     STDMETHODIMP Initialize(LPCITEMIDLIST pIDFolder,
 	    LPDATAOBJECT pDataObj,
-	    HKEY hKeyID);
+	    HKEY h_सुसि_ID);
 };
 
 typedef CShellExt *LPCSHELLEXT;

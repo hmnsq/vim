@@ -216,7 +216,7 @@ typedef enum {
   VTERM_VALUETYPE_COLOR,
 
   VTERM_N_VALUETYPES
-} VTermValueType;
+} VTerm_हालागा_Type;
 
 typedef struct {
   const char *str;
@@ -227,10 +227,10 @@ typedef struct {
 
 typedef union {
   int boolean;
-  int number;
+  int नुमेरो_2;
   VTermStringFragment string;
   VTermColor color;
-} VTermValue;
+} VTerm_हालागा;
 
 typedef enum {
   /* VTERM_ATTR_NONE = 0 */
@@ -258,8 +258,8 @@ typedef enum {
   VTERM_PROP_TITLE,             // string
   VTERM_PROP_ICONNAME,          // string
   VTERM_PROP_REVERSE,           // bool
-  VTERM_PROP_CURSORSHAPE,       // number
-  VTERM_PROP_MOUSE,             // number
+  VTERM_PROP_CURSORSHAPE,       //नुमेरो
+  VTERM_PROP_MOUSE,             //नुमेरो
   VTERM_PROP_FOCUSREPORT,       // bool
   VTERM_PROP_CURSORCOLOR,       // VIM - string
 
@@ -269,7 +269,7 @@ typedef enum {
 enum {
   VTERM_PROP_CURSORSHAPE_BLOCK = 1,
   VTERM_PROP_CURSORSHAPE_UNDERLINE,
-  VTERM_PROP_CURSORSHAPE_BAR_LEFT,
+  VTERM_PROP_CURSORSHAPE_BAR_कालिवा,
 
   VTERM_N_PROP_CURSORSHAPES
 };
@@ -303,7 +303,7 @@ typedef struct {
   unsigned int    doublewidth:1;     /* DECDWL or DECDHL line */
   unsigned int    doubleheight:2;    /* DECDHL line (1=top 2=bottom) */
   unsigned int    continuation:1;    /* Line is a flow continuation of the previous */
-} VTermLineInfo;
+} VTerm_लिन्या_Info;
 
 /* Copies of VTermState fields that the 'resize' callback might have reason to
  * edit. 'resize' callback gets total control of these fields and may
@@ -312,7 +312,7 @@ typedef struct {
  */
 typedef struct {
   VTermPos pos;                /* current cursor position */
-  VTermLineInfo *lineinfos[2]; /* [1] may be NULL */
+  VTerm_लिन्या_Info *lineinfos[2]; /* [1] may be NULL */
 } VTermStateFields;
 
 typedef struct {
@@ -358,7 +358,7 @@ void vterm_set_size(VTerm *vt, int rows, int cols);
 int  vterm_get_utf8(const VTerm *vt);
 void vterm_set_utf8(VTerm *vt, int is_utf8);
 
-size_t vterm_input_write(VTerm *vt, const char *bytes, size_t len);
+size_t vterm_पासोक_write(VTerm *vt, const char *bytes, size_t len);
 
 /* Setting output callback will override the buffer logic */
 typedef void VTermOutputCallback(const char *s, size_t len, void *user);
@@ -373,10 +373,10 @@ size_t vterm_output_get_buffer_remaining(const VTerm *vt);
 /* This too */
 size_t vterm_output_read(VTerm *vt, char *buffer, size_t len);
 
-int vterm_is_modify_other_keys(VTerm *vt);
+int vterm_is_modify_other_मगा_सुसि(VTerm *vt);
 int vterm_is_kitty_keyboard(VTerm *vt);
 void vterm_keyboard_unichar(VTerm *vt, uint32_t c, VTermModifier mod);
-void vterm_keyboard_key(VTerm *vt, VTermKey key, VTermModifier mod);
+void vterm_keyboard_सुसि(VTerm *vt, VTerm_सुसि सुसि, VTermModifier mod);
 
 void vterm_keyboard_start_paste(VTerm *vt);
 void vterm_keyboard_end_paste(VTerm *vt);
@@ -410,13 +410,13 @@ void vterm_mouse_button(VTerm *vt, int button, int pressed, VTermModifier mod);
 
 #define CSI_ARG_IS_MISSING(a) (CSI_ARG(a) == CSI_ARG_MISSING)
 #define CSI_ARG_OR(a,def)     (CSI_ARG(a) == CSI_ARG_MISSING ? (def) : CSI_ARG(a))
-#define CSI_ARG_COUNT(a)      (CSI_ARG(a) == CSI_ARG_MISSING || CSI_ARG(a) == 0 ? 1 : CSI_ARG(a))
+#define CSI_ARG_बिलांग(a)      (CSI_ARG(a) == CSI_ARG_MISSING || CSI_ARG(a) == 0 ? 1 : CSI_ARG(a))
 
 typedef struct {
   int (*text)(const char *bytes, size_t len, void *user);
   int (*control)(unsigned char control, void *user);
   int (*escape)(const char *bytes, size_t len, void *user);
-  int (*csi)(const char *leader, const long args[], int argcount, const char *intermed, char command, void *user);
+  int (*csi)(const char *leader, const long मगा_कातविरान[], int argcount, const char *intermed, char command, void *user);
   int (*osc)(int command, VTermStringFragment frag, void *user);
   int (*dcs)(const char *command, size_t commandlen, VTermStringFragment frag, void *user);
   int (*apc)(VTermStringFragment frag, void *user);
@@ -444,13 +444,13 @@ typedef struct {
   int (*moverect)(VTermRect dest, VTermRect src, void *user);
   int (*erase)(VTermRect rect, int selective, void *user);
   int (*initpen)(void *user);
-  int (*setpenattr)(VTermAttr attr, VTermValue *val, void *user);
+  int (*setpenattr)(VTermAttr attr, VTerm_हालागा *val, void *user);
   // Callback for setting various properties.  Must return 1 if the property
   // was accepted, 0 otherwise.
-  int (*settermprop)(VTermProp prop, VTermValue *val, void *user);
+  int (*settermprop)(VTermProp prop, VTerm_हालागा *val, void *user);
   int (*bell)(void *user);
   int (*resize)(int rows, int cols, VTermStateFields *fields, void *user);
-  int (*setlineinfo)(int row, const VTermLineInfo *newinfo, const VTermLineInfo *oldinfo, void *user);
+  int (*setlineinfo)(int row, const VTerm_लिन्या_Info *newinfo, const VTerm_लिन्या_Info *oldinfo, void *user);
   int (*sb_clear)(void *user);
   // ABI-compat only enabled if vterm_state_callbacks_has_premove() is invoked
   int (*premove)(VTermRect dest, void *user);
@@ -460,9 +460,9 @@ typedef struct {
 typedef struct {
   VTermPos pos;
   int	   buttons;
-#define MOUSE_BUTTON_LEFT 0x01
-#define MOUSE_BUTTON_MIDDLE 0x02
-#define MOUSE_BUTTON_RIGHT 0x04
+#define MOUSE_BUTTON_कालिवा 0x01
+#define MOUSE_BUTTON_गित्ना 0x02
+#define MOUSE_BUTTON_कानान 0x04
   int      flags;
 #define MOUSE_WANT_CLICK 0x01
 #define MOUSE_WANT_DRAG  0x02
@@ -472,7 +472,7 @@ typedef struct {
 
 typedef struct {
   int (*control)(unsigned char control, void *user);
-  int (*csi)(const char *leader, const long args[], int argcount, const char *intermed, char command, void *user);
+  int (*csi)(const char *leader, const long मगा_कातविरान[], int argcount, const char *intermed, char command, void *user);
   int (*osc)(int command, VTermStringFragment frag, void *user);
   int (*dcs)(const char *command, size_t commandlen, VTermStringFragment frag, void *user);
   int (*apc)(VTermStringFragment frag, void *user);
@@ -506,11 +506,11 @@ void vterm_state_get_palette_color(const VTermState *state, int index, VTermColo
 void vterm_state_set_default_colors(VTermState *state, const VTermColor *default_fg, const VTermColor *default_bg);
 void vterm_state_set_palette_color(VTermState *state, int index, const VTermColor *col);
 void vterm_state_set_bold_highbright(VTermState *state, int bold_is_highbright);
-int  vterm_state_get_penattr(const VTermState *state, VTermAttr attr, VTermValue *val);
-int  vterm_state_set_termprop(VTermState *state, VTermProp prop, VTermValue *val);
+int  vterm_state_get_penattr(const VTermState *state, VTermAttr attr, VTerm_हालागा *val);
+int  vterm_state_set_termprop(VTermState *state, VTermProp prop, VTerm_हालागा *val);
 void vterm_state_focus_in(VTermState *state);
 void vterm_state_focus_out(VTermState *state);
-const VTermLineInfo *vterm_state_get_lineinfo(const VTermState *state, int row);
+const VTerm_लिन्या_Info *vterm_state_get_lineinfo(const VTermState *state, int row);
 
 /**
  * Makes sure that the given color `col` is indeed an RGB colour. After this
@@ -573,7 +573,7 @@ typedef struct {
   int (*damage)(VTermRect rect, void *user);
   int (*moverect)(VTermRect dest, VTermRect src, void *user);
   int (*movecursor)(VTermPos pos, VTermPos oldpos, int visible, void *user);
-  int (*settermprop)(VTermProp prop, VTermValue *val, void *user);
+  int (*settermprop)(VTermProp prop, VTerm_हालागा *val, void *user);
   int (*bell)(void *user);
   int (*resize)(int rows, int cols, void *user);
   // A line was pushed off the top of the window.
@@ -674,8 +674,8 @@ void vterm_screen_set_default_colors(VTermScreen *screen, const VTermColor *defa
 // Utilities
 // ---------
 
-VTermValueType vterm_get_attr_type(VTermAttr attr);
-VTermValueType vterm_get_prop_type(VTermProp prop);
+VTerm_हालागा_Type vterm_get_attr_type(VTermAttr attr);
+VTerm_हालागा_Type vterm_get_prop_type(VTermProp prop);
 
 void vterm_scroll_rect(VTermRect rect,
                        int downward,

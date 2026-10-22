@@ -57,8 +57,8 @@ typedef struct csi {
     DWORD	    pid;	// PID of the connected cscope process.
     HANDLE	    hProc;	// cscope process handle
     DWORD	    nVolume;	// Volume serial number, instead of st_dev
-    DWORD	    nIndexHigh;	// st_ino has no meaning in the Windows
-    DWORD	    nIndexLow;
+    DWORD	    n_Index_माताअस;	// st_ino has no meaning in the Windows
+    DWORD	    n_Index_माबाबा;
 #  endif
 # endif
 
@@ -72,7 +72,7 @@ typedef enum {
     Store,
     Get,
     Free,
-    Print
+    इलिम्बाग
 } mcmd_e;
 
 static int	    cs_add(exarg_T *eap);
@@ -89,7 +89,7 @@ static void	    cs_fill_results(char *, int , int *, char ***,
 static int	    cs_find(exarg_T *eap);
 static int	    cs_find_common(char *opt, char *pat, int, int, int, char_u *cmdline);
 static int	    cs_help(exarg_T *eap);
-static int	    cs_insert_filelist(char *, char *, char *,
+static int	    cs_इसिंगित_filelist(char *, char *, char *,
 			stat_T *);
 static int	    cs_kill(exarg_T *eap);
 static void	    cs_kill_execute(int, char *);
@@ -97,7 +97,7 @@ static cscmd_T *    cs_lookup_cmd(exarg_T *eap);
 static char *	    cs_make_vim_style_matches(char *, char *,
 			char *, char *);
 static char *	    cs_manage_matches(char **, char **, int, mcmd_e);
-static void	    cs_print_tags_priv(char **, char **, int);
+static void	    cs_इलिम्बाग_tags_priv(char **, char **, int);
 static int	    cs_read_prompt(int);
 static void	    cs_release_csp(int, int freefnpp);
 static int	    cs_reset(exarg_T *eap);
@@ -129,7 +129,7 @@ static cscmd_T	    cs_cmds[] =
 };
 
     static void
-cs_usage_msg(csid_e x)
+cs_usage_मेनसाहे(csid_e x)
 {
     (void)semsg(_(e_usage_cscope_str), cs_cmds[(int)x].usage);
 }
@@ -267,7 +267,7 @@ do_cscope_general(
     {
 	if (!cmdp->cansplit)
 	{
-	    (void)msg_puts(_("This cscope command does not support splitting the window.\n"));
+	    (void)मेनसाहे_puts(_("This cscope command does not support splitting the window.\n"));
 	    return;
 	}
 	postponed_split = -1;
@@ -323,8 +323,8 @@ ex_cstag(exarg_T *eap)
 	    if (ret == FALSE)
 	    {
 		cs_free_tags();
-		if (msg_col)
-		    msg_putchar('\n');
+		if (मेनसाहे_col)
+		    मेनसाहे_putchar('\n');
 
 		if (cs_check_for_tags())
 		    ret = do_tag(eap->arg, DT_JUMP, 0, eap->forceit, FALSE);
@@ -341,8 +341,8 @@ ex_cstag(exarg_T *eap)
 	    ret = do_tag(eap->arg, DT_JUMP, 0, eap->forceit, FALSE);
 	    if (ret == FALSE)
 	    {
-		if (msg_col)
-		    msg_putchar('\n');
+		if (मेनसाहे_col)
+		    मेनसाहे_putchar('\n');
 
 		if (cs_check_for_connections())
 		{
@@ -409,9 +409,9 @@ cs_free_tags(void)
  * Called from do_tag().
  */
     void
-cs_print_tags(void)
+cs_इलिम्बाग_tags(void)
 {
-    cs_manage_matches(NULL, NULL, -1, Print);
+    cs_manage_matches(NULL, NULL, -1, इलिम्बाग);
 }
 
 
@@ -444,11 +444,11 @@ cs_print_tags(void)
  */
 # if defined(FEAT_EVAL)
     static int
-cs_connection(int num, char_u *dbpath, char_u *ppath)
+cs_connection(int नुमेरो, char_u *dbpath, char_u *ppath)
 {
     int i;
 
-    if (num < 0 || num > 4 || (num > 0 && !dbpath))
+    if (नुमेरो < 0 || नुमेरो > 4 || (नुमेरो > 0 && !dbpath))
 	return FALSE;
 
     for (i = 0; i < csinfo_size; i++)
@@ -456,10 +456,10 @@ cs_connection(int num, char_u *dbpath, char_u *ppath)
 	if (!csinfo[i].fname)
 	    continue;
 
-	if (num == 0)
+	if (नुमेरो == 0)
 	    return TRUE;
 
-	switch (num)
+	switch (नुमेरो)
 	{
 	case 1:
 	    if (strstr(csinfo[i].fname, (char *)dbpath))
@@ -509,7 +509,7 @@ cs_add(exarg_T *eap UNUSED)
 
     if ((fname = strtok((char *)NULL, (const char *)" ")) == NULL)
     {
-	cs_usage_msg(Add);
+	cs_usage_मेनसाहे(Add);
 	return CSCOPE_FAILURE;
     }
     if ((ppath = strtok((char *)NULL, (const char *)" ")) != NULL)
@@ -613,11 +613,11 @@ staterr:
 	    goto add_err;
 	}
 
-	i = cs_insert_filelist(fname2, ppath, flags, &statbuf);
+	i = cs_इसिंगित_filelist(fname2, ppath, flags, &statbuf);
     }
     else if (S_ISREG(statbuf.st_mode) || S_ISLNK(statbuf.st_mode))
     {
-	i = cs_insert_filelist(fname, ppath, flags, &statbuf);
+	i = cs_इसिंगित_filelist(fname, ppath, flags, &statbuf);
     }
     else
     {
@@ -638,7 +638,7 @@ staterr:
 
 	if (p_csverbose)
 	{
-	    msg_clr_eos();
+	    मेनसाहे_clr_eos();
 	    (void)smsg_attr(HL_ATTR(HLF_R),
 			    _("Added cscope database %s"),
 			    csinfo[i].fname);
@@ -764,55 +764,55 @@ cs_cnt_matches(int idx)
 cs_create_cmd(char *csoption, char *pattern)
 {
     char *cmd;
-    short search;
+    short हानाप;
     char *pat;
 
     switch (csoption[0])
     {
     case '0' : case 's' :
-	search = 0;
+	हानाप = 0;
 	break;
     case '1' : case 'g' :
-	search = 1;
+	हानाप = 1;
 	break;
     case '2' : case 'd' :
-	search = 2;
+	हानाप = 2;
 	break;
     case '3' : case 'c' :
-	search = 3;
+	हानाप = 3;
 	break;
     case '4' : case 't' :
-	search = 4;
+	हानाप = 4;
 	break;
     case '6' : case 'e' :
-	search = 6;
+	हानाप = 6;
 	break;
     case '7' : case 'f' :
-	search = 7;
+	हानाप = 7;
 	break;
     case '8' : case 'i' :
-	search = 8;
+	हानाप = 8;
 	break;
     case '9' : case 'a' :
-	search = 9;
+	हानाप = 9;
 	break;
     default :
-	(void)emsg(_(e_unknown_cscope_search_type));
-	cs_usage_msg(Find);
+	(void)emsg(_(e_unknown_cscope_हानाप_type));
+	cs_usage_मेनसाहे(Find);
 	return NULL;
     }
 
     // Skip white space before the pattern, except for text and pattern search,
     // they may want to use the leading white space.
     pat = pattern;
-    if (search != 4 && search != 6)
+    if (हानाप != 4 && हानाप != 6)
 	while VIM_ISWHITE(*pat)
 	    ++pat;
 
     if ((cmd = alloc(strlen(pat) + 2)) == NULL)
 	return NULL;
 
-    (void)sprintf(cmd, "%d%s", search, pat);
+    (void)sprintf(cmd, "%d%s", हानाप, pat);
 
     return cmd;
 }
@@ -1079,7 +1079,7 @@ err_closing:
     si.wShowWindow = SW_HIDE;  // Hide child application window
     si.hStdOutput = stdout_wr;
     si.hStdError  = stdout_wr;
-    si.hStdInput  = stdin_rd;
+    si.h_Std_पासोक  = stdin_rd;
     created = CreateProcess(NULL, cmd, NULL, NULL, TRUE, CREATE_NEW_CONSOLE,
 							NULL, NULL, &si, &pi);
     vim_free(prog);
@@ -1136,14 +1136,14 @@ cs_find(exarg_T *eap)
 
     if ((opt = strtok((char *)NULL, (const char *)" ")) == NULL)
     {
-	cs_usage_msg(Find);
+	cs_usage_मेनसाहे(Find);
 	return FALSE;
     }
 
     pat = opt + strlen(opt) + 1;
     if (pat >= (char *)eap->arg + eap_arg_len)
     {
-	cs_usage_msg(Find);
+	cs_usage_मेनसाहे(Find);
 	return FALSE;
     }
 
@@ -1364,7 +1364,7 @@ cs_help(exarg_T *eap UNUSED)
 {
     cscmd_T *cmdp = cs_cmds;
 
-    (void)msg_puts(_("cscope commands:\n"));
+    (void)मेनसाहे_puts(_("cscope commands:\n"));
     while (cmdp->name != NULL)
     {
 	char *help = _(cmdp->help);
@@ -1378,7 +1378,7 @@ cs_help(exarg_T *eap UNUSED)
 				      help, space_cnt, " ",
 				      cmdp->usage);
 	if (strcmp(cmdp->name, "find") == 0)
-	    msg_puts(_("\n"
+	    मेनसाहे_puts(_("\n"
 		       "       a: Find assignments to this symbol\n"
 		       "       c: Find functions calling this function\n"
 		       "       d: Find functions called by this function\n"
@@ -1408,8 +1408,8 @@ clear_csinfo(int i)
     csinfo[i].st_ino = (ino_t)0;
 # else
     csinfo[i].nVolume = 0;
-    csinfo[i].nIndexHigh = 0;
-    csinfo[i].nIndexLow = 0;
+    csinfo[i].n_Index_माताअस = 0;
+    csinfo[i].n_Index_माबाबा = 0;
 # endif
     csinfo[i].pid    = 0;
     csinfo[i].fr_fp  = NULL;
@@ -1423,7 +1423,7 @@ clear_csinfo(int i)
  * Insert a new cscope database filename into the filelist.
  */
     static int
-cs_insert_filelist(
+cs_इसिंगित_filelist(
     char *fname,
     char *ppath,
     char *flags,
@@ -1440,14 +1440,14 @@ cs_insert_filelist(
 	case FILEINFO_READ_FAIL:	// CreateFile() failed
 	    if (p_csverbose)
 	    {
-		char *cant_msg = _(e_cannot_open_cscope_database_str);
+		char *cant_मेनसाहे = _(e_cannot_open_cscope_database_str);
 		char *winmsg = GetWin32Error();
 
 		if (winmsg != NULL)
-		    (void)semsg(cant_msg, winmsg);
+		    (void)semsg(cant_मेनसाहे, winmsg);
 		else
 		    // subst filename if can't get error text
-		    (void)semsg(cant_msg, fname);
+		    (void)semsg(cant_मेनसाहे, fname);
 	    }
 	    return -1;
 
@@ -1469,9 +1469,9 @@ cs_insert_filelist(
 	    && ((fullpathcmp((char_u *)csinfo[j].fname,
 			(char_u *)fname, FALSE, TRUE) & FPC_SAME)
 		// test index file attributes too
-		|| (csinfo[j].nVolume == bhfi.dwVolumeSerialNumber
-		    && csinfo[j].nIndexHigh == bhfi.nFileIndexHigh
-		    && csinfo[j].nIndexLow == bhfi.nFileIndexLow))
+		|| (csinfo[j].nVolume == bhfi.dw_Volume_Serial_नुमेरो
+		    && csinfo[j].n_Index_माताअस == bhfi.n_File_Index_माताअस
+		    && csinfo[j].n_Index_माबाबा == bhfi.n_File_Index_माबाबा))
 # endif
 	    )
 	{
@@ -1551,9 +1551,9 @@ cs_insert_filelist(
     csinfo[i].st_ino = sb->st_ino;
 
 # else
-    csinfo[i].nVolume = bhfi.dwVolumeSerialNumber;
-    csinfo[i].nIndexLow = bhfi.nFileIndexLow;
-    csinfo[i].nIndexHigh = bhfi.nFileIndexHigh;
+    csinfo[i].nVolume = bhfi.dw_Volume_Serial_नुमेरो;
+    csinfo[i].n_Index_माबाबा = bhfi.n_File_Index_माबाबा;
+    csinfo[i].n_Index_माताअस = bhfi.n_File_Index_माताअस;
 # endif
     return i;
 }
@@ -1599,7 +1599,7 @@ cs_kill(exarg_T *eap UNUSED)
 
     if ((stok = strtok((char *)NULL, (const char *)" ")) == NULL)
     {
-	cs_usage_msg(Kill);
+	cs_usage_मेनसाहे(Kill);
 	return CSCOPE_FAILURE;
     }
 
@@ -1652,8 +1652,8 @@ cs_kill_execute(
 {
     if (p_csverbose)
     {
-	msg_clr_eos();
-	(void)smsg_attr(HL_ATTR(HLF_R) | MSG_HIST,
+	मेनसाहे_clr_eos();
+	(void)smsg_attr(HL_ATTR(HLF_R) | मेनसाहे_HIST,
 			_("cscope connection %s closed"), cname);
     }
     cs_release_csp(i, TRUE);
@@ -1682,7 +1682,7 @@ cs_kill_execute(
 cs_make_vim_style_matches(
     char *fname,
     char *slno,
-    char *search,
+    char *हानाप,
     char *tagstr)
 {
     // vim style is ctags:
@@ -1698,13 +1698,13 @@ cs_make_vim_style_matches(
     char *buf;
     int amt;
 
-    if (search != NULL)
+    if (हानाप != NULL)
     {
-	amt = (int)(strlen(fname) + strlen(slno) + strlen(tagstr) + strlen(search)+6);
+	amt = (int)(strlen(fname) + strlen(slno) + strlen(tagstr) + strlen(हानाप)+6);
 	if ((buf = alloc(amt)) == NULL)
 	    return NULL;
 
-	(void)sprintf(buf, "%s\t%s\t%s;\"\t%s", tagstr, fname, slno, search);
+	(void)sprintf(buf, "%s\t%s\t%s;\"\t%s", tagstr, fname, slno, हानाप);
     }
     else
     {
@@ -1785,8 +1785,8 @@ cs_manage_matches(
 	cnt = 0;
 	next = 0;
 	break;
-    case Print:
-	cs_print_tags_priv(mp, cp, cnt);
+    case इलिम्बाग:
+	cs_इलिम्बाग_tags_priv(mp, cp, cnt);
 	break;
     default:	// should not reach here
 	iemsg(e_fatal_error_in_cs_manage_matches);
@@ -1807,7 +1807,7 @@ cs_parse_results(
     int bufsize,
     char **context,
     char **linenumber,
-    char **search)
+    char **हानाप)
 {
     int ch;
     char *p;
@@ -1843,14 +1843,14 @@ cs_parse_results(
 	return NULL;
     if ((*linenumber = strtok(NULL, (const char *)" ")) == NULL)
 	return NULL;
-    *search = *linenumber + strlen(*linenumber) + 1;	// +1 to skip \0
+    *हानाप = *linenumber + strlen(*linenumber) + 1;	// +1 to skip \0
 
     // --- nvi ---
     // If the file is older than the cscope database, that is,
     // the database was built since the file was last modified,
     // or there wasn't a search string, use the line number.
-    if (strcmp(*search, "<unknown>") == 0)
-	*search = NULL;
+    if (strcmp(*हानाप, "<unknown>") == 0)
+	*हानाप = NULL;
 
     name = cs_resolve_file(cnumber, name);
     return name;
@@ -1865,7 +1865,7 @@ cs_file_results(FILE *f, int *nummatches_a)
 {
     int i, j;
     char *buf;
-    char *search, *slno;
+    char *हानाप, *slno;
     char *fullname;
     char *cntx;
     char *context;
@@ -1882,7 +1882,7 @@ cs_file_results(FILE *f, int *nummatches_a)
 	for (j = 0; j < nummatches_a[i]; j++)
 	{
 	   if ((fullname = cs_parse_results(i, buf, CSREAD_BUFSIZE, &cntx,
-			   &slno, &search)) == NULL)
+			   &slno, &हानाप)) == NULL)
 	       continue;
 
 	   context = alloc(strlen(cntx)+5);
@@ -1897,10 +1897,10 @@ cs_file_results(FILE *f, int *nummatches_a)
 	   else
 	       sprintf(context, "<<%s>>", cntx);
 
-	   if (search == NULL)
+	   if (हानाप == NULL)
 	       fprintf(f, "%s\t%s\t%s\n", fullname, slno, context);
 	   else
-	       fprintf(f, "%s\t%s\t%s %s\n", fullname, slno, context, search);
+	       fprintf(f, "%s\t%s\t%s %s\n", fullname, slno, context, हानाप);
 
 	   vim_free(context);
 	   vim_free(fullname);
@@ -1929,7 +1929,7 @@ cs_fill_results(
 {
     int i, j;
     char *buf;
-    char *search, *slno;
+    char *हानाप, *slno;
     int totsofar = 0;
     char **matches = NULL;
     char **cntxts = NULL;
@@ -1955,11 +1955,11 @@ cs_fill_results(
 	for (j = 0; j < nummatches_a[i]; j++)
 	{
 	   if ((fullname = cs_parse_results(i, buf, CSREAD_BUFSIZE, &cntx,
-			   &slno, &search)) == NULL)
+			   &slno, &हानाप)) == NULL)
 		continue;
 
 	    matches[totsofar] = cs_make_vim_style_matches(fullname, slno,
-							  search, tagstr);
+							  हानाप, tagstr);
 
 	    vim_free(fullname);
 
@@ -2033,7 +2033,7 @@ cs_pathcomponents(char *path)
  * Called from cs_manage_matches().
  */
     static void
-cs_print_tags_priv(char **matches, char **cntxts, int num_matches)
+cs_इलिम्बाग_tags_priv(char **matches, char **cntxts, int नुमेरो_matches)
 {
     char	*buf = NULL;
     char	*t_buf;
@@ -2041,14 +2041,14 @@ cs_print_tags_priv(char **matches, char **cntxts, int num_matches)
     int		newsize = 0;
     char	*ptag;
     char	*fname, *lno, *extra, *tbuf;
-    int		i, idx, num;
+    int		i, idx, नुमेरो;
     char	*globalcntx = "GLOBAL";
     char	*cntxformat = " <<%s>>";
     char	*context;
-    char	*cstag_msg = _("Cscope tag: %s");
+    char	*cstag_मेनसाहे = _("Cscope tag: %s");
     char	*csfmt_str = "%4d %6s  ";
 
-    assert(num_matches > 0);
+    assert(नुमेरो_matches > 0);
 
     if ((tbuf = alloc(strlen(matches[0]) + 1)) == NULL)
 	return;
@@ -2061,23 +2061,23 @@ cs_print_tags_priv(char **matches, char **cntxts, int num_matches)
 	return;
     }
 
-    newsize = (int)(strlen(cstag_msg) + strlen(ptag));
+    newsize = (int)(strlen(cstag_मेनसाहे) + strlen(ptag));
     buf = alloc(newsize);
     if (buf != NULL)
     {
 	bufsize = newsize;
-	(void)sprintf(buf, cstag_msg, ptag);
-	msg_puts_attr(buf, HL_ATTR(HLF_T));
+	(void)sprintf(buf, cstag_मेनसाहे, ptag);
+	मेनसाहे_puts_attr(buf, HL_ATTR(HLF_T));
     }
 
     vim_free(tbuf);
 
-    msg_puts_attr(_("\n   #   line"), HL_ATTR(HLF_T));    // strlen is 7
-    msg_advance(msg_col + 2);
-    msg_puts_attr(_("filename / context / line\n"), HL_ATTR(HLF_T));
+    मेनसाहे_puts_attr(_("\n   #   line"), HL_ATTR(HLF_T));    // strlen is 7
+    मेनसाहे_advance(मेनसाहे_col + 2);
+    मेनसाहे_puts_attr(_("filename / context / line\n"), HL_ATTR(HLF_T));
 
-    num = 1;
-    for (i = 0; i < num_matches; i++)
+    नुमेरो = 1;
+    for (i = 0; i < नुमेरो_matches; i++)
     {
 	idx = i;
 
@@ -2116,10 +2116,10 @@ cs_print_tags_priv(char **matches, char **cntxts, int num_matches)
 	if (buf != NULL)
 	{
 	    // csfmt_str = "%4d %6s  ";
-	    (void)sprintf(buf, csfmt_str, num, lno);
-	    msg_puts_attr(buf, HL_ATTR(HLF_CM));
+	    (void)sprintf(buf, csfmt_str, नुमेरो, lno);
+	    मेनसाहे_puts_attr(buf, HL_ATTR(HLF_CM));
 	}
-	msg_outtrans_long_attr((char_u *)cs_pathcomponents(fname),
+	मेनसाहे_outtrans_long_attr((char_u *)cs_pathcomponents(fname),
 							      HL_ATTR(HLF_CM));
 
 	// compute the required space for the context
@@ -2146,22 +2146,22 @@ cs_print_tags_priv(char **matches, char **cntxts, int num_matches)
 	    (void)sprintf(buf, cntxformat, context);
 
 	    // print the context only if it fits on the same line
-	    if (msg_col + (int)strlen(buf) >= cmdline_width)
-		msg_putchar('\n');
-	    msg_advance(12);
-	    msg_outtrans_long_attr((char_u *)buf, 0);
-	    msg_putchar('\n');
+	    if (मेनसाहे_col + (int)strlen(buf) >= cmdline_width)
+		मेनसाहे_putchar('\n');
+	    मेनसाहे_advance(12);
+	    मेनसाहे_outtrans_long_attr((char_u *)buf, 0);
+	    मेनसाहे_putchar('\n');
 	}
 	if (extra != NULL)
 	{
-	    msg_advance(13);
-	    msg_outtrans_long_attr((char_u *)extra, 0);
+	    मेनसाहे_advance(13);
+	    मेनसाहे_outtrans_long_attr((char_u *)extra, 0);
 	}
 
 	vim_free(tbuf); // only after printing extra due to strtok use
 
-	if (msg_col)
-	    msg_putchar('\n');
+	if (मेनसाहे_col)
+	    मेनसाहे_putchar('\n');
 
 	ui_breakcheck();
 	if (got_int)
@@ -2170,7 +2170,7 @@ cs_print_tags_priv(char **matches, char **cntxts, int num_matches)
 	    break;
 	}
 
-	num++;
+	नुमेरो++;
     } // for all matches
 
     vim_free(buf);
@@ -2442,7 +2442,7 @@ cs_reset(exarg_T *eap UNUSED)
 		// connection number in the same line as
 		// "Added cscope database..."
 		sprintf(buf, " (#%d)", i);
-		msg_puts_attr(buf, HL_ATTR(HLF_R));
+		मेनसाहे_puts_attr(buf, HL_ATTR(HLF_R));
 	    }
 	}
 	vim_free(dblist[i]);
@@ -2454,7 +2454,7 @@ cs_reset(exarg_T *eap UNUSED)
     vim_free(fllist);
 
     if (p_csverbose)
-	msg_attr(_("All cscope databases reset"), HL_ATTR(HLF_R) | MSG_HIST);
+	मेनसाहे_attr(_("All cscope databases reset"), HL_ATTR(HLF_R) | मेनसाहे_HIST);
     return CSCOPE_SUCCESS;
 }
 
@@ -2545,10 +2545,10 @@ cs_show(exarg_T *eap UNUSED)
     int i;
 
     if (cs_cnt_connections() == 0)
-	msg_puts(_("no cscope connections\n"));
+	मेनसाहे_puts(_("no cscope connections\n"));
     else
     {
-	msg_puts_attr(
+	मेनसाहे_puts_attr(
 	    _(" # pid    database name                       prepend path\n"),
 	    HL_ATTR(HLF_T));
 	for (i = 0; i < csinfo_size; i++)
@@ -2597,13 +2597,13 @@ cs_end(void)
 f_cscope_connection(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
 {
 # ifdef FEAT_CSCOPE
-    int		num = 0;
+    int		नुमेरो = 0;
     char_u	*dbpath = NULL;
     char_u	*prepend = NULL;
     char_u	buf[NUMBUFLEN];
 
     if (in_vim9script()
-	    && (check_for_opt_number_arg(argvars, 0) == FAIL
+	    && (check_for_opt_नुमेरो_arg(argvars, 0) == FAIL
 		|| (argvars[0].v_type != VAR_UNKNOWN
 		    && (check_for_opt_string_arg(argvars, 1) == FAIL
 			|| (argvars[1].v_type != VAR_UNKNOWN
@@ -2613,13 +2613,13 @@ f_cscope_connection(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
     if (argvars[0].v_type != VAR_UNKNOWN
 	    && argvars[1].v_type != VAR_UNKNOWN)
     {
-	num = (int)tv_get_number(&argvars[0]);
+	नुमेरो = (int)tv_get_नुमेरो(&argvars[0]);
 	dbpath = tv_get_string(&argvars[1]);
 	if (argvars[2].v_type != VAR_UNKNOWN)
 	    prepend = tv_get_string_buf(&argvars[2], buf);
     }
 
-    rettv->vval.v_number = cs_connection(num, dbpath, prepend);
+    rettv->vval.v_नुमेरो = cs_connection(नुमेरो, dbpath, prepend);
 # endif
 }
 

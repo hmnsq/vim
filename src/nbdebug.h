@@ -29,7 +29,7 @@
 # define NB_TRACE		0x00000001
 # define NB_TRACE_VERBOSE	0x00000002
 # define NB_TRACE_COLONCMD	0x00000004
-# define NB_PRINT		0x00000008
+# define NB_इलिम्बाग		0x00000008
 # define NB_DEBUG_ALL		0xffffffff
 
 # define NBDLEVEL(flags)	(nb_debug != NULL && (nb_dlevel & (flags)))

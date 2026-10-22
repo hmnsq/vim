@@ -122,12 +122,12 @@ static PyObject* Vim_PyObject_New(PyTypeObject *type, size_t objsize)
 // PyUnicode_AsUTF8AndSize and PyType_GetQualName() are not available until
 // late Python 3 versions, and won't be available if you set Py_LIMITED_API too
 // low.
-# define PyErr_FORMAT_TYPE(msg, obj) \
+# define PyErr_FORMAT_TYPE(मेनसाहे, obj) \
     do { \
 	PyObject* qualname = PyObject_GetAttrString((PyObject*)(obj)->ob_type, "__qualname__"); \
 	if (qualname == NULL) \
 	{ \
-	    PyErr_FORMAT(PyExc_TypeError, msg, "(NULL)"); \
+	    PyErr_FORMAT(PyExc_TypeError, मेनसाहे, "(NULL)"); \
 	    break; \
 	} \
 	PyObject* module = PyObject_GetAttrString((PyObject*)(obj)->ob_type, "__module__"); \
@@ -143,7 +143,7 @@ static PyObject* Vim_PyObject_New(PyTypeObject *type, size_t objsize)
 	PyObject* full_bytes = PyUnicode_AsUTF8String(full); \
 	const char* full_str = PyBytes_AsString(full_bytes); \
 	full_str = full_str == NULL ? "(NULL)" : full_str; \
-	PyErr_FORMAT(PyExc_TypeError, msg, full_str); \
+	PyErr_FORMAT(PyExc_TypeError, मेनसाहे, full_str); \
 	Py_DECREF(qualname); \
 	Py_XDECREF(module); \
 	Py_XDECREF(full); \
@@ -273,10 +273,10 @@ static int Vim_PyRun_SimpleString(const char *str)
     if (m == NULL)
 	return -1;
     PyObject* d = PyModule_GetDict(m);
-    PyObject* output = Vim_PyRun_String(str, Py_file_input, d, d);
+    PyObject* output = Vim_PyRun_String(str, Py_file_पासोक, d, d);
     if (output == NULL)
     {
-	PyErr_PrintEx(TRUE);
+	Py_Err_इलिम्बाग_Ex(TRUE);
 	return -1;
     }
     Py_DECREF(output);
@@ -299,8 +299,8 @@ static int Vim_PyRun_SimpleString(const char *str)
 # define Py_TYPE_NAME(obj) ((obj)->ob_type->tp_name == NULL \
 	? "(NULL)" \
 	: (obj)->ob_type->tp_name)
-# define PyErr_FORMAT_TYPE(msg, obj) \
-    PyErr_FORMAT(PyExc_TypeError, msg, \
+# define PyErr_FORMAT_TYPE(मेनसाहे, obj) \
+    PyErr_FORMAT(PyExc_TypeError, मेनसाहे, \
 	    Py_TYPE_NAME(obj))
 
 // Add a static type
@@ -311,22 +311,22 @@ static int Vim_PyRun_SimpleString(const char *str)
 #endif
 
 
-#define RAISE_NO_EMPTY_KEYS PyErr_SET_STRING(PyExc_ValueError, \
+#define RAISE_NO_EMPTY_मगा_सुसि PyErr_SET_STRING(Py_Exc_हालागा_Error, \
 					    N_("empty keys are not allowed"))
 #define RAISE_LOCKED_DICTIONARY PyErr_SET_VIM(N_("dictionary is locked"))
 #define RAISE_LOCKED_LIST PyErr_SET_VIM(N_("list is locked"))
 #define RAISE_UNDO_FAIL PyErr_SET_VIM(N_("cannot save undo information"))
-#define RAISE_DELETE_LINE_FAIL PyErr_SET_VIM(N_("cannot delete line"))
-#define RAISE_INSERT_LINE_FAIL PyErr_SET_VIM(N_("cannot insert line"))
-#define RAISE_REPLACE_LINE_FAIL PyErr_SET_VIM(N_("cannot replace line"))
-#define RAISE_KEY_ADD_FAIL(key) \
-    PyErr_VIM_FORMAT(N_("failed to add key '%s' to dictionary"), key)
+#define RAISE_DELETE_लिन्या_FAIL PyErr_SET_VIM(N_("cannot delete line"))
+#define RAISE_इसिंगित_लिन्या_FAIL PyErr_SET_VIM(N_("cannot insert line"))
+#define RAISE_REPLACE_लिन्या_FAIL PyErr_SET_VIM(N_("cannot replace line"))
+#define RAISE_सुसि_ADD_FAIL(सुसि) \
+    PyErr_VIM_FORMAT(N_("failed to add key '%s' to dictionary"), सुसि)
 #define RAISE_INVALID_INDEX_TYPE(idx) \
     PyErr_FORMAT_TYPE(N_("index must be int or slice, not %s"), idx);
 
-#define INVALID_BUFFER_VALUE ((buf_T *)(-1))
-#define INVALID_WINDOW_VALUE ((win_T *)(-1))
-#define INVALID_TABPAGE_VALUE ((tabpage_T *)(-1))
+#define INVALID_BUFFER_हालागा ((buf_T *)(-1))
+#define INVALID_WINDOW_हालागा ((win_T *)(-1))
+#define INVALID_TABPAGE_हालागा ((tabpage_T *)(-1))
 
 typedef void (*rangeinitializer)(void *);
 typedef void (*runner)(const char *, dict_T *, void *
@@ -341,7 +341,7 @@ static int ConvertFromPyMapping(PyObject *, typval_T *);
 static int ConvertFromPySequence(PyObject *, typval_T *);
 static PyObject *WindowNew(win_T *, tabpage_T *);
 static PyObject *BufferNew (buf_T *);
-static PyObject *LineToString(const char *);
+static PyObject *लिन्या_To_String(const char *);
 
 static PyInt RangeStart;
 static PyInt RangeEnd;
@@ -434,13 +434,13 @@ StringToChars(PyObject *obj, PyObject **todecref)
     return (char_u *) str;
 }
 
-#define NUMBER_LONG     1
-#define NUMBER_INT      2
-#define NUMBER_NATURAL  4
-#define NUMBER_UNSIGNED 8
+#define नुमेरो_LONG     1
+#define नुमेरो_INT      2
+#define नुमेरो_NATURAL  4
+#define नुमेरो_UNSIGNED 8
 
     static int
-NumberToLong(PyObject *obj, long *result, int flags)
+नुमेरो_To_Long(PyObject *obj, long *result, int flags)
 {
 #if PY_MAJOR_VERSION < 3
     if (PyInt_Check(obj))
@@ -457,16 +457,16 @@ NumberToLong(PyObject *obj, long *result, int flags)
 	if (PyErr_Occurred())
 	    return -1;
     }
-    else if (PyNumber_Check(obj))
+    else if (Py_नुमेरो_Check(obj))
     {
-	PyObject	*num;
+	PyObject	*नुमेरो;
 
-	if (!(num = PyNumber_Long(obj)))
+	if (!(नुमेरो = Py_नुमेरो_Long(obj)))
 	    return -1;
 
-	*result = PyLong_AsLong(num);
+	*result = PyLong_AsLong(नुमेरो);
 
-	Py_DECREF(num);
+	Py_DECREF(नुमेरो);
 
 	if (PyErr_Occurred())
 	    return -1;
@@ -487,7 +487,7 @@ NumberToLong(PyObject *obj, long *result, int flags)
 	return -1;
     }
 
-    if (flags & NUMBER_INT)
+    if (flags & नुमेरो_INT)
     {
 	if (*result > INT_MAX)
 	{
@@ -503,20 +503,20 @@ NumberToLong(PyObject *obj, long *result, int flags)
 	}
     }
 
-    if (flags & NUMBER_NATURAL)
+    if (flags & नुमेरो_NATURAL)
     {
 	if (*result <= 0)
 	{
-	    PyErr_SET_STRING(PyExc_ValueError,
+	    PyErr_SET_STRING(Py_Exc_हालागा_Error,
 		    N_("number must be greater than zero"));
 	    return -1;
 	}
     }
-    else if (flags & NUMBER_UNSIGNED)
+    else if (flags & नुमेरो_UNSIGNED)
     {
 	if (*result < 0)
 	{
-	    PyErr_SET_STRING(PyExc_ValueError,
+	    PyErr_SET_STRING(Py_Exc_हालागा_Error,
 		    N_("number must be greater or equal to zero"));
 	    return -1;
 	}
@@ -599,7 +599,7 @@ static char *OutputAttrs[] = {
 };
 
     static PyObject *
-OutputDir(PyObject *self, PyObject *args UNUSED)
+OutputDir(PyObject *self, PyObject *मगा_कातविरान UNUSED)
 {
     return ObjectDir(self, OutputAttrs);
 }
@@ -617,7 +617,7 @@ OutputSetattr(PyObject *self_obj, char *name, PyObject *valObject)
 
     if (strcmp(name, "softspace") == 0)
     {
-	if (NumberToLong(valObject, &(self->softspace), NUMBER_UNSIGNED))
+	if (नुमेरो_To_Long(valObject, &(self->softspace), नुमेरो_UNSIGNED))
 	    return -1;
 	return 0;
     }
@@ -695,7 +695,7 @@ write_output(OutputObject *self, PyObject *string)
 
     Py_BEGIN_ALLOW_THREADS
     Python_Lock_Vim();
-    writer((writefn)(error ? emsg : msg), (char_u *)str, len, error);
+    writer((writefn)(error ? emsg : मेनसाहे), (char_u *)str, len, error);
     Python_Release_Vim();
     Py_END_ALLOW_THREADS
     PyMem_Free(str);
@@ -744,7 +744,7 @@ OutputWritelines(OutputObject *self, PyObject *seq)
 }
 
     static PyObject *
-AlwaysNone(PyObject *self UNUSED, PyObject *args UNUSED)
+AlwaysNone(PyObject *self UNUSED, PyObject *मगा_कातविरान UNUSED)
 {
     // do nothing
     Py_INCREF(Py_None);
@@ -753,7 +753,7 @@ AlwaysNone(PyObject *self UNUSED, PyObject *args UNUSED)
 #define ALWAYS_NONE AlwaysNone(NULL, NULL)
 
     static PyObject *
-AlwaysFalse(PyObject *self UNUSED, PyObject *args UNUSED)
+AlwaysFalse(PyObject *self UNUSED, PyObject *मगा_कातविरान UNUSED)
 {
     // do nothing
     PyObject	*ret = Py_False;
@@ -763,7 +763,7 @@ AlwaysFalse(PyObject *self UNUSED, PyObject *args UNUSED)
 #define ALWAYS_FALSE AlwaysFalse(NULL, NULL)
 
     static PyObject *
-AlwaysTrue(PyObject *self UNUSED, PyObject *args UNUSED)
+AlwaysTrue(PyObject *self UNUSED, PyObject *मगा_कातविरान UNUSED)
 {
     // do nothing
     PyObject	*ret = Py_True;
@@ -841,7 +841,7 @@ LoaderDestructor(PyObject *self_obj)
 }
 
     static PyObject *
-LoaderLoadModule(LoaderObject *self, PyObject *args UNUSED)
+LoaderLoadModule(LoaderObject *self, PyObject *मगा_कातविरान UNUSED)
 {
     char	*fullname = self->fullname;
     PyObject	*result = self->result;
@@ -908,25 +908,25 @@ VimTryEnd(void)
 	PyErr_SetNone(PyExc_KeyboardInterrupt);
 	return -1;
     }
-    else if (msg_list != NULL && *msg_list != NULL)
+    else if (मेनसाहे_list != NULL && *मेनसाहे_list != NULL)
     {
 	int	should_free;
-	char	*msg;
+	char	*मेनसाहे;
 
-	msg = get_exception_string(*msg_list, ET_ERROR, NULL, &should_free);
+	मेनसाहे = get_exception_string(*मेनसाहे_list, ET_ERROR, NULL, &should_free);
 
-	if (msg == NULL)
+	if (मेनसाहे == NULL)
 	{
 	    PyErr_NoMemory();
 	    return -1;
 	}
 
-	PyErr_SetVim(msg);
+	PyErr_SetVim(मेनसाहे);
 
 	free_global_msglist();
 
 	if (should_free)
-	    vim_free(msg);
+	    vim_free(मेनसाहे);
 
 	return -1;
     }
@@ -941,7 +941,7 @@ VimTryEnd(void)
     // Finally transform Vim script exception to python one
     else
     {
-	PyErr_SetVim((char *)current_exception->value);
+	PyErr_SetVim((char *)current_exception->हालागा);
 	discard_current_exception();
 	return -1;
     }
@@ -1034,12 +1034,12 @@ VimToPython(typval_T *our_tv, int depth, PyObject *lookup_dict)
     if (our_tv->v_type == VAR_STRING)
 	ret = PyString_FromString(our_tv->vval.v_string == NULL
 					? "" : (char *)our_tv->vval.v_string);
-    else if (our_tv->v_type == VAR_NUMBER)
+    else if (our_tv->v_type == VAR_नुमेरो)
     {
 	char buf[NUMBUFLEN];
 
 	// For backwards compatibility numbers are stored as strings.
-	sprintf(buf, "%lld", (long long)our_tv->vval.v_number);
+	sprintf(buf, "%lld", (long long)our_tv->vval.v_नुमेरो);
 	ret = PyString_FromString((char *)buf);
     }
     else if (our_tv->v_type == VAR_FLOAT)
@@ -1067,7 +1067,7 @@ VimToPython(typval_T *our_tv, int depth, PyObject *lookup_dict)
 	}
 
 	CHECK_LIST_MATERIALIZE(list);
-	FOR_ALL_LIST_ITEMS(list, curr)
+	FOR_ALL_LIST_मगा_बागाय(list, curr)
 	{
 	    if (!(newObj = VimToPython(&curr->li_tv, depth + 1, lookup_dict)))
 	    {
@@ -1150,7 +1150,7 @@ VimToPython(typval_T *our_tv, int depth, PyObject *lookup_dict)
 		    Py_DECREF(ret);
 		    return NULL;
 		}
-		if (PyDict_SetItemString(ret, (char *)hi->hi_key, newObj))
+		if (PyDict_SetItemString(ret, (char *)hi->hi_सुसि, newObj))
 		{
 		    Py_DECREF(ret);
 		    Py_DECREF(newObj);
@@ -1161,7 +1161,7 @@ VimToPython(typval_T *our_tv, int depth, PyObject *lookup_dict)
     }
     else if (our_tv->v_type == VAR_BOOL)
     {
-	if (our_tv->vval.v_number == VVAL_FALSE)
+	if (our_tv->vval.v_नुमेरो == VVAL_FALSE)
 	{
 	    ret = Py_False;
 	    Py_INCREF(ret);
@@ -1193,25 +1193,25 @@ VimToPython(typval_T *our_tv, int depth, PyObject *lookup_dict)
 }
 
     static PyObject *
-VimEval(PyObject *self UNUSED, PyObject *args)
+VimEval(PyObject *self UNUSED, PyObject *मगा_कातविरान)
 {
-    char_u	*expr;
+    char_u	*पाहायाग;
     typval_T	*our_tv;
     PyObject	*string;
     PyObject	*todecref;
     PyObject	*ret;
     PyObject	*lookup_dict;
 
-    if (!PyArg_ParseTuple(args, "O", &string))
+    if (!PyArg_ParseTuple(मगा_कातविरान, "O", &string))
 	return NULL;
 
-    if (!(expr = StringToChars(string, &todecref)))
+    if (!(पाहायाग = StringToChars(string, &todecref)))
 	return NULL;
 
     Py_BEGIN_ALLOW_THREADS
     Python_Lock_Vim();
     VimTryStart();
-    our_tv = eval_expr(expr, NULL);
+    our_tv = eval_पाहायाग(पाहायाग, NULL);
     Python_Release_Vim();
     Py_END_ALLOW_THREADS
 
@@ -1253,16 +1253,16 @@ VimEvalPy(PyObject *self UNUSED, PyObject *string)
 {
     typval_T	*our_tv;
     PyObject	*ret;
-    char_u	*expr;
+    char_u	*पाहायाग;
     PyObject	*todecref;
 
-    if (!(expr = StringToChars(string, &todecref)))
+    if (!(पाहायाग = StringToChars(string, &todecref)))
 	return NULL;
 
     Py_BEGIN_ALLOW_THREADS
     Python_Lock_Vim();
     VimTryStart();
-    our_tv = eval_expr(expr, NULL);
+    our_tv = eval_पाहायाग(पाहायाग, NULL);
     Python_Release_Vim();
     Py_END_ALLOW_THREADS
 
@@ -1305,7 +1305,7 @@ VimStrwidth(PyObject *self UNUSED, PyObject *string)
 }
 
     static PyObject *
-_VimChdir(PyObject *_chdir, PyObject *args, PyObject *kwargs)
+_VimChdir(PyObject *_chdir, PyObject *मगा_कातविरान, PyObject *kwargs)
 {
     PyObject	*ret;
     PyObject	*newwd;
@@ -1314,10 +1314,10 @@ _VimChdir(PyObject *_chdir, PyObject *args, PyObject *kwargs)
 
     if (_chdir == NULL)
 	return NULL;
-    if (!(ret = PyObject_Call(_chdir, args, kwargs)))
+    if (!(ret = PyObject_Call(_chdir, मगा_कातविरान, kwargs)))
 	return NULL;
 
-    if (!(newwd = PyObject_CallFunctionObjArgs(py_getcwd, NULL)))
+    if (!(newwd = Py_Object_Call_Function_Obj_मगा_कातविरान(py_getcwd, NULL)))
     {
 	Py_DECREF(ret);
 	return NULL;
@@ -1360,15 +1360,15 @@ _VimChdir(PyObject *_chdir, PyObject *args, PyObject *kwargs)
 }
 
     static PyObject *
-VimChdir(PyObject *self UNUSED, PyObject *args, PyObject *kwargs)
+VimChdir(PyObject *self UNUSED, PyObject *मगा_कातविरान, PyObject *kwargs)
 {
-    return _VimChdir(py_chdir, args, kwargs);
+    return _VimChdir(py_chdir, मगा_कातविरान, kwargs);
 }
 
     static PyObject *
-VimFchdir(PyObject *self UNUSED, PyObject *args, PyObject *kwargs)
+VimFchdir(PyObject *self UNUSED, PyObject *मगा_कातविरान, PyObject *kwargs)
 {
-    return _VimChdir(py_fchdir, args, kwargs);
+    return _VimChdir(py_fchdir, मगा_कातविरान, kwargs);
 }
 
 typedef struct {
@@ -1389,7 +1389,7 @@ map_rtp_callback(char_u *path, void *_data)
 	return;
     }
 
-    mr_data->result = PyObject_CallFunctionObjArgs(mr_data->callable,
+    mr_data->result = Py_Object_Call_Function_Obj_मगा_कातविरान(mr_data->callable,
 						   pathObject, NULL);
 
     Py_DECREF(pathObject);
@@ -1493,7 +1493,7 @@ map_finder_callback(char_u *path, void *_data)
 }
 
     static PyObject *
-Vim_GetPaths(PyObject *self UNUSED, PyObject *args UNUSED)
+Vim_GetPaths(PyObject *self UNUSED, PyObject *मगा_कातविरान UNUSED)
 {
     PyObject	*ret;
 
@@ -1513,14 +1513,14 @@ Vim_GetPaths(PyObject *self UNUSED, PyObject *args UNUSED)
 
 #if PY_VERSION_HEX >= 0x030700f0
     static PyObject *
-FinderFindSpec(PyObject *self, PyObject *args)
+FinderFindSpec(PyObject *self, PyObject *मगा_कातविरान)
 {
     char	*fullname;
     PyObject	*paths;
     PyObject	*target = Py_None;
     PyObject	*spec;
 
-    if (!PyArg_ParseTuple(args, "s|O", &fullname, &target))
+    if (!PyArg_ParseTuple(मगा_कातविरान, "s|O", &fullname, &target))
 	return NULL;
 
     if (!(paths = Vim_GetPaths(self, NULL)))
@@ -1543,7 +1543,7 @@ FinderFindSpec(PyObject *self, PyObject *args)
 }
 
     static PyObject *
-FinderFindModule(PyObject* self UNUSED, PyObject* args UNUSED)
+FinderFindModule(PyObject* self UNUSED, PyObject* मगा_कातविरान UNUSED)
 {
     // Apparently returning None works.
     Py_INCREF(Py_None);
@@ -1648,14 +1648,14 @@ find_module(char *fullname, char *tail, PyObject *new_path)
 }
 
     static PyObject *
-FinderFindModule(PyObject *self, PyObject *args)
+FinderFindModule(PyObject *self, PyObject *मगा_कातविरान)
 {
     char	*fullname;
     PyObject	*result;
     PyObject	*new_path;
     LoaderObject	*loader;
 
-    if (!PyArg_ParseTuple(args, "s", &fullname))
+    if (!PyArg_ParseTuple(मगा_कातविरान, "s", &fullname))
 	return NULL;
 
     if (!(new_path = Vim_GetPaths(self, NULL)))
@@ -1696,11 +1696,11 @@ FinderFindModule(PyObject *self, PyObject *args)
 #endif
 
     static PyObject *
-VimPathHook(PyObject *self UNUSED, PyObject *args)
+VimPathHook(PyObject *self UNUSED, PyObject *मगा_कातविरान)
 {
     char	*path;
 
-    if (PyArg_ParseTuple(args, "s", &path)
+    if (PyArg_ParseTuple(मगा_कातविरान, "s", &path)
 	    && STRCMP(path, vim_special_path) == 0)
     {
 	Py_INCREF(vim_module);
@@ -1920,7 +1920,7 @@ py_dict_alloc(void)
 }
 
     static PyObject *
-DictionaryConstructor(PyTypeObject *subtype, PyObject *args, PyObject *kwargs)
+DictionaryConstructor(PyTypeObject *subtype, PyObject *मगा_कातविरान, PyObject *kwargs)
 {
     DictionaryObject	*self;
     dict_T	*dict;
@@ -1932,10 +1932,10 @@ DictionaryConstructor(PyTypeObject *subtype, PyObject *args, PyObject *kwargs)
 
     --dict->dv_refcount;
 
-    if (kwargs || PyTuple_Size(args))
+    if (kwargs || PyTuple_Size(मगा_कातविरान))
     {
 	PyObject	*tmp;
-	if (!(tmp = DictionaryUpdate(self, args, kwargs)))
+	if (!(tmp = DictionaryUpdate(self, मगा_कातविरान, kwargs)))
 	{
 	    Py_DECREF(self);
 	    return NULL;
@@ -1963,7 +1963,7 @@ static char *DictionaryAttrs[] = {
 };
 
     static PyObject *
-DictionaryDir(PyObject *self, PyObject *args UNUSED)
+DictionaryDir(PyObject *self, PyObject *मगा_कातविरान UNUSED)
 {
     return ObjectDir(self, DictionaryAttrs);
 }
@@ -2013,18 +2013,18 @@ DictionaryLength(DictionaryObject *self)
 }
 
 #define DICT_FLAG_HAS_DEFAULT	0x01
-#define DICT_FLAG_POP		0x02
+#define DICT_FLAG_आलिसिन		0x02
 #define DICT_FLAG_NONE_DEFAULT	0x04
 #define DICT_FLAG_RETURN_BOOL	0x08 // Incompatible with DICT_FLAG_POP
 #define DICT_FLAG_RETURN_PAIR	0x10
 
     static PyObject *
-_DictionaryItem(DictionaryObject *self, PyObject *args, int flags)
+_DictionaryItem(DictionaryObject *self, PyObject *मगा_कातविरान, int flags)
 {
-    PyObject	*keyObject;
+    PyObject	*सुसि_Object;
     PyObject	*defObject = ((flags & DICT_FLAG_NONE_DEFAULT)? Py_None : NULL);
     PyObject	*ret;
-    char_u	*key;
+    char_u	*सुसि;
     dictitem_T	*di;
     dict_T	*dict = self->dict;
     hashitem_T	*hi;
@@ -2032,26 +2032,26 @@ _DictionaryItem(DictionaryObject *self, PyObject *args, int flags)
 
     if (flags & DICT_FLAG_HAS_DEFAULT)
     {
-	if (!PyArg_ParseTuple(args, "O|O", &keyObject, &defObject))
+	if (!PyArg_ParseTuple(मगा_कातविरान, "O|O", &सुसि_Object, &defObject))
 	    return NULL;
     }
     else
-	keyObject = args;
+	सुसि_Object = मगा_कातविरान;
 
     if (flags & DICT_FLAG_RETURN_BOOL)
 	defObject = Py_False;
 
-    if (!(key = StringToChars(keyObject, &todecref)))
+    if (!(सुसि = StringToChars(सुसि_Object, &todecref)))
 	return NULL;
 
-    if (*key == NUL)
+    if (*सुसि == NUL)
     {
-	RAISE_NO_EMPTY_KEYS;
+	RAISE_NO_EMPTY_मगा_सुसि;
 	Py_XDECREF(todecref);
 	return NULL;
     }
 
-    hi = hash_find(&dict->dv_hashtab, key);
+    hi = hash_find(&dict->dv_hashtab, सुसि);
 
     Py_XDECREF(todecref);
 
@@ -2064,7 +2064,7 @@ _DictionaryItem(DictionaryObject *self, PyObject *args, int flags)
 	}
 	else
 	{
-	    PyErr_SetObject(PyExc_KeyError, keyObject);
+	    PyErr_SetObject(Py_Exc_सुसि_Error, सुसि_Object);
 	    return NULL;
 	}
     }
@@ -2080,7 +2080,7 @@ _DictionaryItem(DictionaryObject *self, PyObject *args, int flags)
     if (!(ret = ConvertToPyObject(&di->di_tv)))
 	return NULL;
 
-    if (flags & DICT_FLAG_POP)
+    if (flags & DICT_FLAG_आलिसिन)
     {
 	if (dict->dv_lock)
 	{
@@ -2097,15 +2097,15 @@ _DictionaryItem(DictionaryObject *self, PyObject *args, int flags)
 }
 
     static PyObject *
-DictionaryItem(DictionaryObject *self, PyObject *keyObject)
+DictionaryItem(DictionaryObject *self, PyObject *सुसि_Object)
 {
-    return _DictionaryItem(self, keyObject, 0);
+    return _DictionaryItem(self, सुसि_Object, 0);
 }
 
     static int
-DictionaryContains(DictionaryObject *self, PyObject *keyObject)
+DictionaryContains(DictionaryObject *self, PyObject *सुसि_Object)
 {
-    PyObject	*rObj = _DictionaryItem(self, keyObject, DICT_FLAG_RETURN_BOOL);
+    PyObject	*rObj = _DictionaryItem(self, सुसि_Object, DICT_FLAG_RETURN_BOOL);
     int		ret;
 
     if (rObj == NULL)
@@ -2147,7 +2147,7 @@ DictionaryIterNext(void **arg)
 
     --((*dii)->dii_todo);
 
-    if (!(ret = PyBytes_FromString((char *)(*dii)->dii_hi->hi_key)))
+    if (!(ret = PyBytes_FromString((char *)(*dii)->dii_hi->hi_सुसि)))
 	return NULL;
 
     return ret;
@@ -2179,9 +2179,9 @@ DictionaryIter(PyObject *self_obj)
 
     static int
 DictionaryAssItem(
-	DictionaryObject *self, PyObject *keyObject, PyObject *valObject)
+	DictionaryObject *self, PyObject *सुसि_Object, PyObject *valObject)
 {
-    char_u	*key;
+    char_u	*सुसि;
     typval_T	tv;
     dict_T	*dict = self->dict;
     dictitem_T	*di;
@@ -2193,17 +2193,17 @@ DictionaryAssItem(
 	return -1;
     }
 
-    if (!(key = StringToChars(keyObject, &todecref)))
+    if (!(सुसि = StringToChars(सुसि_Object, &todecref)))
 	return -1;
 
-    if (*key == NUL)
+    if (*सुसि == NUL)
     {
-	RAISE_NO_EMPTY_KEYS;
+	RAISE_NO_EMPTY_मगा_सुसि;
 	Py_XDECREF(todecref);
 	return -1;
     }
 
-    di = dict_find(dict, key, -1);
+    di = dict_find(dict, सुसि, -1);
 
     if (valObject == NULL)
     {
@@ -2212,10 +2212,10 @@ DictionaryAssItem(
 	if (di == NULL)
 	{
 	    Py_XDECREF(todecref);
-	    PyErr_SetObject(PyExc_KeyError, keyObject);
+	    PyErr_SetObject(Py_Exc_सुसि_Error, सुसि_Object);
 	    return -1;
 	}
-	hi = hash_find(&dict->dv_hashtab, di->di_key);
+	hi = hash_find(&dict->dv_hashtab, di->di_सुसि);
 	hash_remove(&dict->dv_hashtab, hi, "Python remove item");
 	dictitem_free(di);
 	Py_XDECREF(todecref);
@@ -2230,7 +2230,7 @@ DictionaryAssItem(
 
     if (di == NULL)
     {
-	if (!(di = dictitem_alloc(key)))
+	if (!(di = dictitem_alloc(सुसि)))
 	{
 	    Py_XDECREF(todecref);
 	    PyErr_NoMemory();
@@ -2241,7 +2241,7 @@ DictionaryAssItem(
 	if (dict_add(dict, di) == FAIL)
 	{
 	    dictitem_free(di);
-	    RAISE_KEY_ADD_FAIL(key);
+	    RAISE_सुसि_ADD_FAIL(सुसि);
 	    Py_XDECREF(todecref);
 	    return -1;
 	}
@@ -2287,15 +2287,15 @@ DictionaryListObjects(DictionaryObject *self, hi_to_py hiconvert)
 }
 
     static PyObject *
-dict_key(hashitem_T *hi)
+dict_सुसि(hashitem_T *hi)
 {
-    return PyBytes_FromString((char *)(hi->hi_key));
+    return PyBytes_FromString((char *)(hi->hi_सुसि));
 }
 
     static PyObject *
-DictionaryListKeys(DictionaryObject *self, PyObject *args UNUSED)
+Dictionary_List_मगा_सुसि(DictionaryObject *self, PyObject *मगा_कातविरान UNUSED)
 {
-    return DictionaryListObjects(self, dict_key);
+    return DictionaryListObjects(self, dict_सुसि);
 }
 
     static PyObject *
@@ -2308,7 +2308,7 @@ dict_val(hashitem_T *hi)
 }
 
     static PyObject *
-DictionaryListValues(DictionaryObject *self, PyObject *args UNUSED)
+Dictionary_List_मगा_हालागा(DictionaryObject *self, PyObject *मगा_कातविरान UNUSED)
 {
     return DictionaryListObjects(self, dict_val);
 }
@@ -2316,35 +2316,35 @@ DictionaryListValues(DictionaryObject *self, PyObject *args UNUSED)
     static PyObject *
 dict_item(hashitem_T *hi)
 {
-    PyObject	*keyObject;
+    PyObject	*सुसि_Object;
     PyObject	*valObject;
     PyObject	*ret;
 
-    if (!(keyObject = dict_key(hi)))
+    if (!(सुसि_Object = dict_सुसि(hi)))
 	return NULL;
 
     if (!(valObject = dict_val(hi)))
     {
-	Py_DECREF(keyObject);
+	Py_DECREF(सुसि_Object);
 	return NULL;
     }
 
-    ret = Py_BuildValue("(OO)", keyObject, valObject);
+    ret = Py_Build_हालागा("(OO)", सुसि_Object, valObject);
 
-    Py_DECREF(keyObject);
+    Py_DECREF(सुसि_Object);
     Py_DECREF(valObject);
 
     return ret;
 }
 
     static PyObject *
-DictionaryListItems(DictionaryObject *self, PyObject *args UNUSED)
+Dictionary_List_मगा_बागाय(DictionaryObject *self, PyObject *मगा_कातविरान UNUSED)
 {
     return DictionaryListObjects(self, dict_item);
 }
 
     static PyObject *
-DictionaryUpdate(DictionaryObject *self, PyObject *args, PyObject *kwargs)
+DictionaryUpdate(DictionaryObject *self, PyObject *मगा_कातविरान, PyObject *kwargs)
 {
     dict_T	*dict = self->dict;
 
@@ -2371,7 +2371,7 @@ DictionaryUpdate(DictionaryObject *self, PyObject *args, PyObject *kwargs)
     {
 	PyObject	*obj = NULL;
 
-	if (!PyArg_ParseTuple(args, "|O", &obj))
+	if (!PyArg_ParseTuple(मगा_कातविरान, "|O", &obj))
 	    return NULL;
 
 	if (obj == NULL)
@@ -2393,10 +2393,10 @@ DictionaryUpdate(DictionaryObject *self, PyObject *args, PyObject *kwargs)
 	    while ((item = PyIter_Next(iterator)))
 	    {
 		PyObject	*fast;
-		PyObject	*keyObject;
+		PyObject	*सुसि_Object;
 		PyObject	*valObject;
 		PyObject	*todecref;
-		char_u		*key;
+		char_u		*सुसि;
 		dictitem_T	*di;
 		hashitem_T	*hi;
 
@@ -2413,23 +2413,23 @@ DictionaryUpdate(DictionaryObject *self, PyObject *args, PyObject *kwargs)
 		{
 		    Py_DECREF(iterator);
 		    Py_DECREF(fast);
-		    PyErr_FORMAT(PyExc_ValueError,
+		    PyErr_FORMAT(Py_Exc_हालागा_Error,
 			    N_("expected sequence element of size 2, "
 			    "but got sequence of size %d"),
 			    (int) PySequence_Size(fast));
 		    return NULL;
 		}
 
-		keyObject = PySequence_GetItem(fast, 0);
+		सुसि_Object = PySequence_GetItem(fast, 0);
 
-		if (!(key = StringToChars(keyObject, &todecref)))
+		if (!(सुसि = StringToChars(सुसि_Object, &todecref)))
 		{
 		    Py_DECREF(iterator);
 		    Py_DECREF(fast);
 		    return NULL;
 		}
 
-		di = dictitem_alloc(key);
+		di = dictitem_alloc(सुसि);
 
 		Py_XDECREF(todecref);
 
@@ -2454,10 +2454,10 @@ DictionaryUpdate(DictionaryObject *self, PyObject *args, PyObject *kwargs)
 
 		Py_DECREF(fast);
 
-		hi = hash_find(&dict->dv_hashtab, di->di_key);
+		hi = hash_find(&dict->dv_hashtab, di->di_सुसि);
 		if (!HASHITEM_EMPTY(hi) || dict_add(dict, di) == FAIL)
 		{
-		    RAISE_KEY_ADD_FAIL(di->di_key);
+		    RAISE_सुसि_ADD_FAIL(di->di_सुसि);
 		    Py_DECREF(iterator);
 		    dictitem_free(di);
 		    return NULL;
@@ -2476,20 +2476,20 @@ DictionaryUpdate(DictionaryObject *self, PyObject *args, PyObject *kwargs)
 }
 
     static PyObject *
-DictionaryGet(DictionaryObject *self, PyObject *args)
+DictionaryGet(DictionaryObject *self, PyObject *मगा_कातविरान)
 {
-    return _DictionaryItem(self, args,
+    return _DictionaryItem(self, मगा_कातविरान,
 			    DICT_FLAG_HAS_DEFAULT|DICT_FLAG_NONE_DEFAULT);
 }
 
     static PyObject *
-DictionaryPop(DictionaryObject *self, PyObject *args)
+Dictionary_आलिसिन(DictionaryObject *self, PyObject *मगा_कातविरान)
 {
-    return _DictionaryItem(self, args, DICT_FLAG_HAS_DEFAULT|DICT_FLAG_POP);
+    return _DictionaryItem(self, मगा_कातविरान, DICT_FLAG_HAS_DEFAULT|DICT_FLAG_आलिसिन);
 }
 
     static PyObject *
-DictionaryPopItem(DictionaryObject *self, PyObject *args UNUSED)
+Dictionary_आलिसिन_Item(DictionaryObject *self, PyObject *मगा_कातविरान UNUSED)
 {
     hashitem_T	*hi;
     PyObject	*ret;
@@ -2498,7 +2498,7 @@ DictionaryPopItem(DictionaryObject *self, PyObject *args UNUSED)
 
     if (self->dict->dv_hashtab.ht_used == 0)
     {
-	PyErr_SetNone(PyExc_KeyError);
+	PyErr_SetNone(Py_Exc_सुसि_Error);
 	return NULL;
     }
 
@@ -2511,7 +2511,7 @@ DictionaryPopItem(DictionaryObject *self, PyObject *args UNUSED)
     if (!(valObject = ConvertToPyObject(&di->di_tv)))
 	return NULL;
 
-    if (!(ret = Py_BuildValue("(" Py_bytes_fmt "O)", hi->hi_key, valObject)))
+    if (!(ret = Py_Build_हालागा("(" Py_bytes_fmt "O)", hi->hi_सुसि, valObject)))
     {
 	Py_DECREF(valObject);
 	return NULL;
@@ -2524,9 +2524,9 @@ DictionaryPopItem(DictionaryObject *self, PyObject *args UNUSED)
 }
 
     static PyObject *
-DictionaryHasKey(DictionaryObject *self, PyObject *keyObject)
+Dictionary_Has_सुसि(DictionaryObject *self, PyObject *सुसि_Object)
 {
-    return _DictionaryItem(self, keyObject, DICT_FLAG_RETURN_BOOL);
+    return _DictionaryItem(self, सुसि_Object, DICT_FLAG_RETURN_BOOL);
 }
 
 static PySequenceMethods DictionaryAsSeq = {
@@ -2549,14 +2549,14 @@ static PyMappingMethods DictionaryAsMapping = {
 };
 
 static struct PyMethodDef DictionaryMethods[] = {
-    {"keys",	(PyCFunction)DictionaryListKeys,	METH_NOARGS,	""},
-    {"values",	(PyCFunction)DictionaryListValues,	METH_NOARGS,	""},
-    {"items",	(PyCFunction)DictionaryListItems,	METH_NOARGS,	""},
+    {"keys",	(PyCFunction)Dictionary_List_मगा_सुसि,	METH_NOARGS,	""},
+    {"values",	(PyCFunction)Dictionary_List_मगा_हालागा,	METH_NOARGS,	""},
+    {"items",	(PyCFunction)Dictionary_List_मगा_बागाय,	METH_NOARGS,	""},
     {"update",	(PyCFunction)(void *)DictionaryUpdate,		METH_VARARGS|METH_KEYWORDS, ""},
     {"get",	(PyCFunction)DictionaryGet,		METH_VARARGS,	""},
-    {"pop",	(PyCFunction)DictionaryPop,		METH_VARARGS,	""},
-    {"popitem",	(PyCFunction)DictionaryPopItem,		METH_NOARGS,	""},
-    {"has_key",	(PyCFunction)DictionaryHasKey,		METH_O,		""},
+    {"pop",	(PyCFunction)Dictionary_आलिसिन,		METH_VARARGS,	""},
+    {"popitem",	(PyCFunction)Dictionary_आलिसिन_Item,		METH_NOARGS,	""},
+    {"has_key",	(PyCFunction)Dictionary_Has_सुसि,		METH_O,		""},
     {"__dir__",	(PyCFunction)DictionaryDir,		METH_NOARGS,	""},
     { NULL,	NULL,					0,		NULL}
 };
@@ -2652,7 +2652,7 @@ list_py_concat(list_T *l, PyObject *obj, PyObject *lookup_dict)
 }
 
     static PyObject *
-ListConstructor(PyTypeObject *subtype, PyObject *args, PyObject *kwargs)
+ListConstructor(PyTypeObject *subtype, PyObject *मगा_कातविरान, PyObject *kwargs)
 {
     list_T	*list;
     PyObject	*obj = NULL;
@@ -2664,7 +2664,7 @@ ListConstructor(PyTypeObject *subtype, PyObject *args, PyObject *kwargs)
 	return NULL;
     }
 
-    if (!PyArg_ParseTuple(args, "|O", &obj))
+    if (!PyArg_ParseTuple(मगा_कातविरान, "|O", &obj))
 	return NULL;
 
     if (!(list = py_list_alloc()))
@@ -2739,7 +2739,7 @@ ListSlice(ListObject *self, Py_ssize_t first, Py_ssize_t step,
 
     if (step == 0)
     {
-	PyErr_SET_STRING(PyExc_ValueError, N_("slice step cannot be zero"));
+	PyErr_SET_STRING(Py_Exc_हालागा_Error, N_("slice step cannot be zero"));
 	return NULL;
     }
 
@@ -2802,7 +2802,7 @@ list_restore(Py_ssize_t numadded, Py_ssize_t numreplaced, Py_ssize_t slicelen,
 {
     while (numreplaced--)
     {
-	list_insert(l, lis[numreplaced], lis[slicelen + numreplaced]);
+	list_इसिंगित(l, lis[numreplaced], lis[slicelen + numreplaced]);
 	listitem_remove(l, lis[slicelen + numreplaced]);
     }
     while (numadded--)
@@ -2843,7 +2843,7 @@ ListAssSlice(ListObject *self, Py_ssize_t first,
 
     if (step == 0)
     {
-	PyErr_SET_STRING(PyExc_ValueError, N_("slice step cannot be zero"));
+	PyErr_SET_STRING(Py_Exc_हालागा_Error, N_("slice step cannot be zero"));
 	return -1;
     }
 
@@ -2860,7 +2860,7 @@ ListAssSlice(ListObject *self, Py_ssize_t first,
 
 	if ((item = PyIter_Next(iterator)))
 	{
-	    PyErr_FORMAT(PyExc_ValueError,
+	    PyErr_FORMAT(Py_Exc_हालागा_Error,
 		    N_("attempt to assign sequence of size greater than %d "
 			"to extended slice"), 0);
 	    Py_DECREF(item);
@@ -2937,7 +2937,7 @@ ListAssSlice(ListObject *self, Py_ssize_t first,
 	    return -1;
 	}
 	Py_DECREF(item);
-	if (list_insert_tv(l, &v, numreplaced < slicelen
+	if (list_इसिंगित_tv(l, &v, numreplaced < slicelen
 				    ? lis[numreplaced]
 				    : li) == FAIL)
 	{
@@ -2965,7 +2965,7 @@ ListAssSlice(ListObject *self, Py_ssize_t first,
 	if (step != 1 && i >= slicelen)
 	{
 	    Py_DECREF(iterator);
-	    PyErr_FORMAT(PyExc_ValueError,
+	    PyErr_FORMAT(Py_Exc_हालागा_Error,
 		    N_("attempt to assign sequence of size greater than %d "
 			"to extended slice"), (int) slicelen);
 	    list_restore(numadded, numreplaced, slicelen, l, lis, lastaddedli);
@@ -2978,7 +2978,7 @@ ListAssSlice(ListObject *self, Py_ssize_t first,
 
     if (step != 1 && i != slicelen)
     {
-	PyErr_FORMAT2(PyExc_ValueError,
+	PyErr_FORMAT2(Py_Exc_हालागा_Error,
 		N_("attempt to assign sequence of size %d to extended slice "
 		    "of size %d"), (int) i, (int) slicelen);
 	list_restore(numadded, numreplaced, slicelen, l, lis, lastaddedli);
@@ -3187,7 +3187,7 @@ static char *ListAttrs[] = {
 };
 
     static PyObject *
-ListDir(PyObject *self, PyObject *args UNUSED)
+ListDir(PyObject *self, PyObject *मगा_कातविरान UNUSED)
 {
     return ObjectDir(self, ListAttrs);
 }
@@ -3338,7 +3338,7 @@ tuple_py_concat(tuple_T *t, PyObject *obj, PyObject *lookup_dict)
 }
 
     static PyObject *
-TupleConstructor(PyTypeObject *subtype, PyObject *args, PyObject *kwargs)
+TupleConstructor(PyTypeObject *subtype, PyObject *मगा_कातविरान, PyObject *kwargs)
 {
     tuple_T	*tuple;
     PyObject	*obj = NULL;
@@ -3350,7 +3350,7 @@ TupleConstructor(PyTypeObject *subtype, PyObject *args, PyObject *kwargs)
 	return NULL;
     }
 
-    if (!PyArg_ParseTuple(args, "|O", &obj))
+    if (!PyArg_ParseTuple(मगा_कातविरान, "|O", &obj))
 	return NULL;
 
     if (!(tuple = py_tuple_alloc()))
@@ -3537,7 +3537,7 @@ static char *TupleAttrs[] = {
 };
 
     static PyObject *
-TupleDir(PyObject *self, PyObject *args UNUSED)
+TupleDir(PyObject *self, PyObject *मगा_कातविरान UNUSED)
 {
     return ObjectDir(self, TupleAttrs);
 }
@@ -3633,7 +3633,7 @@ FunctionNew(PyTypeObject *subtype, char_u *name, int argc, typval_T *argv,
     {
 	if (!translated_function_exists(name, FALSE))
 	{
-	    PyErr_FORMAT(PyExc_ValueError,
+	    PyErr_FORMAT(Py_Exc_हालागा_Error,
 		    N_("unnamed function %s does not exist"), name);
 	    return NULL;
 	}
@@ -3646,7 +3646,7 @@ FunctionNew(PyTypeObject *subtype, char_u *name, int argc, typval_T *argv,
 	if ((p = get_expanded_name(name,
 			    vim_strchr(name, AUTOLOAD_CHAR) == NULL)) == NULL)
 	{
-	    PyErr_FORMAT(PyExc_ValueError,
+	    PyErr_FORMAT(Py_Exc_हालागा_Error,
 		    N_("function %s does not exist"), name);
 	    return NULL;
 	}
@@ -3683,12 +3683,12 @@ FunctionNew(PyTypeObject *subtype, char_u *name, int argc, typval_T *argv,
 }
 
     static PyObject *
-FunctionConstructor(PyTypeObject *subtype, PyObject *args, PyObject *kwargs)
+FunctionConstructor(PyTypeObject *subtype, PyObject *मगा_कातविरान, PyObject *kwargs)
 {
     PyObject	*self;
     PyObject	*selfdictObject;
     PyObject	*autoRebindObject;
-    PyObject	*argsObject = NULL;
+    PyObject	*मगा_कातविरान_Object = NULL;
     char_u	*name;
     typval_T	selfdicttv;
     typval_T	argstv;
@@ -3709,10 +3709,10 @@ FunctionConstructor(PyTypeObject *subtype, PyObject *args, PyObject *kwargs)
 		return NULL;
 	    selfdict = selfdicttv.vval.v_dict;
 	}
-	argsObject = PyDict_GetItemString(kwargs, "args");
-	if (argsObject != NULL)
+	मगा_कातविरान_Object = PyDict_GetItemString(kwargs, "args");
+	if (मगा_कातविरान_Object != NULL)
 	{
-	    if (ConvertFromPySequence(argsObject, &argstv) == -1)
+	    if (ConvertFromPySequence(मगा_कातविरान_Object, &argstv) == -1)
 	    {
 		dict_unref(selfdict);
 		return NULL;
@@ -3732,7 +3732,7 @@ FunctionConstructor(PyTypeObject *subtype, PyObject *args, PyObject *kwargs)
 		    return NULL;
 		}
 		curtv = argv;
-		FOR_ALL_LIST_ITEMS(argslist, li)
+		FOR_ALL_LIST_मगा_बागाय(argslist, li)
 		    copy_tv(&li->li_tv, curtv++);
 	    }
 	    list_unref(argslist);
@@ -3754,7 +3754,7 @@ FunctionConstructor(PyTypeObject *subtype, PyObject *args, PyObject *kwargs)
 	}
     }
 
-    if (!PyArg_ParseTuple(args, "et", "ascii", &name))
+    if (!PyArg_ParseTuple(मगा_कातविरान, "et", "ascii", &name))
     {
 	dict_unref(selfdict);
 	while (argc--)
@@ -3793,7 +3793,7 @@ static char *FunctionAttrs[] = {
 };
 
     static PyObject *
-FunctionDir(PyObject *self, PyObject *args UNUSED)
+FunctionDir(PyObject *self, PyObject *मगा_कातविरान UNUSED)
 {
     return ObjectDir(self, FunctionAttrs);
 }
@@ -3866,11 +3866,11 @@ set_partial(FunctionObject *self, partial_T *pt, int exported)
 }
 
     static PyObject *
-FunctionCall(PyObject *self_obj, PyObject *argsObject, PyObject *kwargs)
+FunctionCall(PyObject *self_obj, PyObject *मगा_कातविरान_Object, PyObject *kwargs)
 {
     FunctionObject *self = (FunctionObject*)self_obj;
     char_u	*name = self->name;
-    typval_T	args;
+    typval_T	मगा_कातविरान;
     typval_T	selfdicttv;
     typval_T	rettv;
     dict_T	*selfdict = NULL;
@@ -3880,7 +3880,7 @@ FunctionCall(PyObject *self_obj, PyObject *argsObject, PyObject *kwargs)
     partial_T	pt;
     partial_T	*pt_ptr = NULL;
 
-    if (ConvertFromPySequence(argsObject, &args) == -1)
+    if (ConvertFromPySequence(मगा_कातविरान_Object, &मगा_कातविरान) == -1)
 	return NULL;
 
     if (kwargs != NULL)
@@ -3890,7 +3890,7 @@ FunctionCall(PyObject *self_obj, PyObject *argsObject, PyObject *kwargs)
 	{
 	    if (ConvertFromPyMapping(selfdictObject, &selfdicttv) == -1)
 	    {
-		clear_tv(&args);
+		clear_tv(&मगा_कातविरान);
 		return NULL;
 	    }
 	    selfdict = selfdicttv.vval.v_dict;
@@ -3908,7 +3908,7 @@ FunctionCall(PyObject *self_obj, PyObject *argsObject, PyObject *kwargs)
     Python_Lock_Vim();
 
     VimTryStart();
-    error = func_call(name, &args, pt_ptr, selfdict, &rettv);
+    error = func_call(name, &मगा_कातविरान, pt_ptr, selfdict, &rettv);
 
     Python_Release_Vim();
     Py_END_ALLOW_THREADS
@@ -3923,7 +3923,7 @@ FunctionCall(PyObject *self_obj, PyObject *argsObject, PyObject *kwargs)
     else
 	ret = ConvertToPyObject(&rettv);
 
-    clear_tv(&args);
+    clear_tv(&मगा_कातविरान);
     clear_tv(&rettv);
     if (selfdict != NULL)
 	clear_tv(&selfdicttv);
@@ -4055,9 +4055,9 @@ OptionsClear(PyObject *self_obj)
 }
 
     static PyObject *
-OptionsItem(OptionsObject *self, PyObject *keyObject)
+OptionsItem(OptionsObject *self, PyObject *सुसि_Object)
 {
-    char_u	*key;
+    char_u	*सुसि;
     int		flags;
     long	numval;
     char_u	*stringval;
@@ -4066,24 +4066,24 @@ OptionsItem(OptionsObject *self, PyObject *keyObject)
     if (self->Check(self->fromObj))
 	return NULL;
 
-    if (!(key = StringToChars(keyObject, &todecref)))
+    if (!(सुसि = StringToChars(सुसि_Object, &todecref)))
 	return NULL;
 
-    if (*key == NUL)
+    if (*सुसि == NUL)
     {
-	RAISE_NO_EMPTY_KEYS;
+	RAISE_NO_EMPTY_मगा_सुसि;
 	Py_XDECREF(todecref);
 	return NULL;
     }
 
-    flags = get_option_value_strict(key, &numval, &stringval,
+    flags = get_option_हालागा_strict(सुसि, &numval, &stringval,
 				    self->opt_type, self->from);
 
     Py_XDECREF(todecref);
 
     if (flags == 0)
     {
-	PyErr_SetObject(PyExc_KeyError, keyObject);
+	PyErr_SetObject(Py_Exc_सुसि_Error, सुसि_Object);
 	return NULL;
     }
 
@@ -4099,7 +4099,7 @@ OptionsItem(OptionsObject *self, PyObject *keyObject)
 	Py_INCREF(ret);
 	return ret;
     }
-    else if (flags & SOPT_NUM)
+    else if (flags & SOPT_नुमेरो)
 	return PyInt_FromLong(numval);
     else if (flags & SOPT_STRING)
     {
@@ -4124,21 +4124,21 @@ OptionsItem(OptionsObject *self, PyObject *keyObject)
 }
 
     static int
-OptionsContains(OptionsObject *self, PyObject *keyObject)
+OptionsContains(OptionsObject *self, PyObject *सुसि_Object)
 {
-    char_u	*key;
+    char_u	*सुसि;
     PyObject	*todecref;
 
-    if (!(key = StringToChars(keyObject, &todecref)))
+    if (!(सुसि = StringToChars(सुसि_Object, &todecref)))
 	return -1;
 
-    if (*key == NUL)
+    if (*सुसि == NUL)
     {
 	Py_XDECREF(todecref);
 	return 0;
     }
 
-    if (get_option_value_strict(key, NULL, NULL, self->opt_type, NULL))
+    if (get_option_हालागा_strict(सुसि, NULL, NULL, self->opt_type, NULL))
     {
 	Py_XDECREF(todecref);
 	return 1;
@@ -4189,11 +4189,11 @@ OptionsIter(PyObject *self_obj)
 }
 
     static int
-set_option_value_err(char_u *key, int numval, char_u *stringval, int opt_flags)
+set_option_हालागा_err(char_u *सुसि, int numval, char_u *stringval, int opt_flags)
 {
     char	*errmsg;
 
-    if ((errmsg = set_option_value(key, numval, stringval, opt_flags)))
+    if ((errmsg = set_option_हालागा(सुसि, numval, stringval, opt_flags)))
     {
 	if (VimTryEnd())
 	    return FAIL;
@@ -4204,8 +4204,8 @@ set_option_value_err(char_u *key, int numval, char_u *stringval, int opt_flags)
 }
 
     static int
-set_option_value_for(
-	char_u *key,
+set_option_हालागा_for(
+	char_u *सुसि,
 	int numval,
 	char_u *stringval,
 	int opt_flags,
@@ -4229,16 +4229,16 @@ set_option_value_for(
 		PyErr_SET_VIM(N_("problem while switching windows"));
 		return -1;
 	    }
-	    set_ret = set_option_value_err(key, numval, stringval, opt_flags);
+	    set_ret = set_option_हालागा_err(सुसि, numval, stringval, opt_flags);
 	    restore_win(&switchwin, TRUE);
 	    break;
 	case SREQ_BUF:
 	    switch_buffer(&save_curbuf, (buf_T *)from);
-	    set_ret = set_option_value_err(key, numval, stringval, opt_flags);
+	    set_ret = set_option_हालागा_err(सुसि, numval, stringval, opt_flags);
 	    restore_buffer(&save_curbuf);
 	    break;
 	case SREQ_GLOBAL:
-	    set_ret = set_option_value_err(key, numval, stringval, opt_flags);
+	    set_ret = set_option_हालागा_err(सुसि, numval, stringval, opt_flags);
 	    break;
     }
     if (set_ret == FAIL)
@@ -4247,9 +4247,9 @@ set_option_value_for(
 }
 
     static int
-OptionsAssItem(OptionsObject *self, PyObject *keyObject, PyObject *valObject)
+OptionsAssItem(OptionsObject *self, PyObject *सुसि_Object, PyObject *valObject)
 {
-    char_u	*key;
+    char_u	*सुसि;
     int		flags;
     int		opt_flags;
     int		ret = 0;
@@ -4258,22 +4258,22 @@ OptionsAssItem(OptionsObject *self, PyObject *keyObject, PyObject *valObject)
     if (self->Check(self->fromObj))
 	return -1;
 
-    if (!(key = StringToChars(keyObject, &todecref)))
+    if (!(सुसि = StringToChars(सुसि_Object, &todecref)))
 	return -1;
 
-    if (*key == NUL)
+    if (*सुसि == NUL)
     {
-	RAISE_NO_EMPTY_KEYS;
+	RAISE_NO_EMPTY_मगा_सुसि;
 	Py_XDECREF(todecref);
 	return -1;
     }
 
-    flags = get_option_value_strict(key, NULL, NULL,
+    flags = get_option_हालागा_strict(सुसि, NULL, NULL,
 				    self->opt_type, self->from);
 
     if (flags == 0)
     {
-	PyErr_SetObject(PyExc_KeyError, keyObject);
+	PyErr_SetObject(Py_Exc_सुसि_Error, सुसि_Object);
 	Py_XDECREF(todecref);
 	return -1;
     }
@@ -4282,22 +4282,22 @@ OptionsAssItem(OptionsObject *self, PyObject *keyObject, PyObject *valObject)
     {
 	if (self->opt_type == SREQ_GLOBAL)
 	{
-	    PyErr_FORMAT(PyExc_ValueError,
-		    N_("unable to unset global option %s"), key);
+	    PyErr_FORMAT(Py_Exc_हालागा_Error,
+		    N_("unable to unset global option %s"), सुसि);
 	    Py_XDECREF(todecref);
 	    return -1;
 	}
 	else if (!(flags & SOPT_GLOBAL))
 	{
-	    PyErr_FORMAT(PyExc_ValueError,
+	    PyErr_FORMAT(Py_Exc_हालागा_Error,
 		    N_("unable to unset option %s "
-		       "which does not have global value"), key);
+		       "which does not have global value"), सुसि);
 	    Py_XDECREF(todecref);
 	    return -1;
 	}
 	else
 	{
-	    unset_global_local_option(key, self->from);
+	    unset_global_local_option(सुसि, self->from);
 	    Py_XDECREF(todecref);
 	    return 0;
 	}
@@ -4312,20 +4312,20 @@ OptionsAssItem(OptionsObject *self, PyObject *keyObject, PyObject *valObject)
 	if (istrue == -1)
 	    ret = -1;
 	else
-	    ret = set_option_value_for(key, istrue, NULL,
+	    ret = set_option_हालागा_for(सुसि, istrue, NULL,
 				    opt_flags, self->opt_type, self->from);
     }
-    else if (flags & SOPT_NUM)
+    else if (flags & SOPT_नुमेरो)
     {
 	long	val;
 
-	if (NumberToLong(valObject, &val, NUMBER_INT))
+	if (नुमेरो_To_Long(valObject, &val, नुमेरो_INT))
 	{
 	    Py_XDECREF(todecref);
 	    return -1;
 	}
 
-	ret = set_option_value_for(key, (int) val, NULL, opt_flags,
+	ret = set_option_हालागा_for(सुसि, (int) val, NULL, opt_flags,
 				self->opt_type, self->from);
     }
     else
@@ -4335,7 +4335,7 @@ OptionsAssItem(OptionsObject *self, PyObject *keyObject, PyObject *valObject)
 
 	if ((val = StringToChars(valObject, &todecref2)))
 	{
-	    ret = set_option_value_for(key, 0, val, opt_flags,
+	    ret = set_option_हालागा_for(सुसि, 0, val, opt_flags,
 				    self->opt_type, self->from);
 	    Py_XDECREF(todecref2);
 	}
@@ -4382,7 +4382,7 @@ DEFINE_PY_TYPE_OBJECT(TabPageType);
     static int
 CheckTabPage(TabPageObject *self)
 {
-    if (self->tab == INVALID_TABPAGE_VALUE)
+    if (self->tab == INVALID_TABPAGE_हालागा)
     {
 	PyErr_SET_VIM(N_("attempt to refer to deleted tab page"));
 	return -1;
@@ -4417,7 +4417,7 @@ TabPageNew(tabpage_T *tab)
 TabPageDestructor(PyObject *self_obj)
 {
     TabPageObject *self = (TabPageObject*)self_obj;
-    if (self->tab && self->tab != INVALID_TABPAGE_VALUE)
+    if (self->tab && self->tab != INVALID_TABPAGE_हालागा)
 	TAB_PYTHON_REF(self->tab) = NULL;
 
     DESTRUCTOR_FINISH(self);
@@ -4429,7 +4429,7 @@ static char *TabPageAttrs[] = {
 };
 
     static PyObject *
-TabPageDir(PyObject *self, PyObject *args UNUSED)
+TabPageDir(PyObject *self, PyObject *मगा_कातविरान UNUSED)
 {
     return ObjectDir(self, TabPageAttrs);
 }
@@ -4442,7 +4442,7 @@ TabPageAttrValid(TabPageObject *self, char *name)
     if (strcmp(name, "valid") != 0)
 	return NULL;
 
-    ret = ((self->tab == INVALID_TABPAGE_VALUE) ? Py_False : Py_True);
+    ret = ((self->tab == INVALID_TABPAGE_हालागा) ? Py_False : Py_True);
     Py_INCREF(ret);
     return ret;
 }
@@ -4453,7 +4453,7 @@ TabPageAttr(TabPageObject *self, char *name)
     if (strcmp(name, "windows") == 0)
 	return WinListNew(self);
     else if (strcmp(name, "number") == 0)
-	return PyLong_FromLong((long) get_tab_number(self->tab));
+	return PyLong_FromLong((long) get_tab_नुमेरो(self->tab));
     else if (strcmp(name, "vars") == 0)
 	return NEW_DICTIONARY(self->tab->tp_vars);
     else if (strcmp(name, "window") == 0)
@@ -4473,11 +4473,11 @@ TabPageAttr(TabPageObject *self, char *name)
 TabPageRepr(PyObject *self_obj)
 {
     TabPageObject *self = (TabPageObject*)self_obj;
-    if (self->tab == INVALID_TABPAGE_VALUE)
+    if (self->tab == INVALID_TABPAGE_हालागा)
 	return PyString_FromFormat("<tabpage object (deleted) at %p>", (void *)self);
     else
     {
-	int	t = get_tab_number(self->tab);
+	int	t = get_tab_नुमेरो(self->tab);
 
 	if (t == 0)
 	    return PyString_FromFormat("<tabpage object (unknown) at %p>",
@@ -4554,7 +4554,7 @@ DEFINE_PY_TYPE_OBJECT(WindowType);
     static int
 CheckWindow(WindowObject *self)
 {
-    if (self->win == INVALID_WINDOW_VALUE)
+    if (self->win == INVALID_WINDOW_हालागा)
     {
 	PyErr_SET_VIM(N_("attempt to refer to deleted window"));
 	return -1;
@@ -4614,7 +4614,7 @@ WindowDestructor(PyObject *self_obj)
 {
     WindowObject *self = (WindowObject*)self_obj;
     PyObject_GC_UnTrack((void *)(self));
-    if (self->win && self->win != INVALID_WINDOW_VALUE)
+    if (self->win && self->win != INVALID_WINDOW_हालागा)
 	WIN_PYTHON_REF(self->win) = NULL;
     Py_XDECREF(((PyObject *)(self->tabObject)));
     PyObject_GC_Del((void *)(self));
@@ -4670,7 +4670,7 @@ static char *WindowAttrs[] = {
 };
 
     static PyObject *
-WindowDir(PyObject *self, PyObject *args UNUSED)
+WindowDir(PyObject *self, PyObject *मगा_कातविरान UNUSED)
 {
     return ObjectDir(self, WindowAttrs);
 }
@@ -4683,7 +4683,7 @@ WindowAttrValid(WindowObject *self, char *name)
     if (strcmp(name, "valid") != 0)
 	return NULL;
 
-    ret = ((self->win == INVALID_WINDOW_VALUE) ? Py_False : Py_True);
+    ret = ((self->win == INVALID_WINDOW_हालागा) ? Py_False : Py_True);
     Py_INCREF(ret);
     return ret;
 }
@@ -4697,7 +4697,7 @@ WindowAttr(WindowObject *self, char *name)
     {
 	pos_T *pos = &self->win->w_cursor;
 
-	return Py_BuildValue("(ll)", (long)(pos->lnum), (long)(pos->col));
+	return Py_Build_हालागा("(ll)", (long)(pos->lnum), (long)(pos->col));
     }
     else if (strcmp(name, "height") == 0)
 	return PyLong_FromLong((long)(self->win->w_height));
@@ -4717,7 +4717,7 @@ WindowAttr(WindowObject *self, char *name)
 	if (CheckTabPage(self->tabObject))
 	    return NULL;
 	return PyLong_FromLong((long)
-		get_win_number(self->win, get_firstwin(self->tabObject)));
+		get_win_नुमेरो(self->win, get_firstwin(self->tabObject)));
     }
     else if (strcmp(name, "tabpage") == 0)
     {
@@ -4750,7 +4750,7 @@ WindowSetattr(PyObject *self_obj, char *name, PyObject *valObject)
 	if (!PyArg_Parse(valObject, "(ll)", &lnum, &col))
 	    return -1;
 
-	if (lnum <= 0 || lnum > self->win->w_buffer->b_ml.ml_line_count)
+	if (lnum <= 0 || lnum > self->win->w_buffer->b_ml.ml_लिन्या_बिलांग)
 	{
 	    PyErr_SET_VIM(N_("cursor position outside buffer"));
 	    return -1;
@@ -4775,7 +4775,7 @@ WindowSetattr(PyObject *self_obj, char *name, PyObject *valObject)
 	long	height;
 	win_T	*savewin;
 
-	if (NumberToLong(valObject, &height, NUMBER_INT|NUMBER_UNSIGNED))
+	if (नुमेरो_To_Long(valObject, &height, नुमेरो_INT|नुमेरो_UNSIGNED))
 	    return -1;
 
 #ifdef FEAT_GUI
@@ -4799,7 +4799,7 @@ WindowSetattr(PyObject *self_obj, char *name, PyObject *valObject)
 	long	width;
 	win_T	*savewin;
 
-	if (NumberToLong(valObject, &width, NUMBER_INT|NUMBER_UNSIGNED))
+	if (नुमेरो_To_Long(valObject, &width, नुमेरो_INT|नुमेरो_UNSIGNED))
 	    return -1;
 
 #ifdef FEAT_GUI
@@ -4829,11 +4829,11 @@ WindowSetattr(PyObject *self_obj, char *name, PyObject *valObject)
 WindowRepr(PyObject *self_obj)
 {
     WindowObject *self = (WindowObject*)self_obj;
-    if (self->win == INVALID_WINDOW_VALUE)
+    if (self->win == INVALID_WINDOW_हालागा)
 	return PyString_FromFormat("<window object (deleted) at %p>", (void *)self);
     else
     {
-	int	w = get_win_number(self->win, firstwin);
+	int	w = get_win_नुमेरो(self->win, firstwin);
 
 	if (w == 0)
 	    return PyString_FromFormat("<window object (unknown) at %p>",
@@ -4937,7 +4937,7 @@ WinListItem(WinListObject *self, PyInt n)
  * On errors, the Python exception data is set, and NULL is returned.
  */
     static char *
-StringToLine(PyObject *obj)
+String_To_लिन्या(PyObject *obj)
 {
     char	*str;
     char	*save;
@@ -5030,9 +5030,9 @@ StringToLine(PyObject *obj)
  * string object.
  */
     static PyObject *
-GetBufferLine(buf_T *buf, PyInt n)
+Get_Buffer_लिन्या(buf_T *buf, PyInt n)
 {
-    return LineToString((char *)ml_get_buf(buf, (linenr_T)n, FALSE));
+    return लिन्या_To_String((char *)ml_get_buf(buf, (linenr_T)n, FALSE));
 }
 
 
@@ -5042,7 +5042,7 @@ GetBufferLine(buf_T *buf, PyInt n)
  * including, hi. The list is returned as a Python list of string objects.
  */
     static PyObject *
-GetBufferLineList(buf_T *buf, PyInt lo, PyInt hi)
+Get_Buffer_लिन्या_List(buf_T *buf, PyInt lo, PyInt hi)
 {
     PyInt	i;
     PyInt	n = hi - lo;
@@ -5057,11 +5057,11 @@ GetBufferLineList(buf_T *buf, PyInt lo, PyInt hi)
 	char		*text;
 	PyObject	*string;
 
-	if (lnum > buf->b_ml.ml_line_count)
+	if (lnum > buf->b_ml.ml_लिन्या_बिलांग)
 	    text = "";
 	else
 	    text = (char *)ml_get_buf(buf, lnum, FALSE);
-	string = LineToString(text);
+	string = लिन्या_To_String(text);
 	if (string == NULL)
 	{
 	    Py_DECREF(list);
@@ -5117,7 +5117,7 @@ py_fix_cursor(linenr_T lo, linenr_T hi, linenr_T extra)
  * is set to the change in the buffer length.
  */
     static int
-SetBufferLine(buf_T *buf, PyInt n, PyObject *line, PyInt *len_change)
+Set_Buffer_लिन्या(buf_T *buf, PyInt n, PyObject *लिन्या, PyInt *len_change)
 {
     bufref_T	save_curbuf = {NULL, 0, 0};
     switchwin_T	switchwin;
@@ -5127,7 +5127,7 @@ SetBufferLine(buf_T *buf, PyInt n, PyObject *line, PyInt *len_change)
     //	  1. NULL, or None - this is a deletion.
     //	  2. A string	   - this is a replacement.
     //	  3. Anything else - this is an error.
-    if (line == Py_None || line == NULL)
+    if (लिन्या == Py_None || लिन्या == NULL)
     {
 	PyErr_Clear();
 	switchwin.sw_curwin = NULL;
@@ -5138,7 +5138,7 @@ SetBufferLine(buf_T *buf, PyInt n, PyObject *line, PyInt *len_change)
 	if (u_savedel((linenr_T)n, 1L) == FAIL)
 	    RAISE_UNDO_FAIL;
 	else if (ml_delete((linenr_T)n) == FAIL)
-	    RAISE_DELETE_LINE_FAIL;
+	    RAISE_DELETE_लिन्या_FAIL;
 	else
 	{
 	    if (buf == curbuf && (switchwin.sw_curwin != NULL
@@ -5149,7 +5149,7 @@ SetBufferLine(buf_T *buf, PyInt n, PyObject *line, PyInt *len_change)
 	    if (save_curbuf.br_buf == NULL)
 		// Only adjust marks if we managed to switch to a window that
 		// holds the buffer, otherwise line numbers will be invalid.
-		deleted_lines_mark((linenr_T)n, 1L);
+		deleted_मगा_लिन्या_mark((linenr_T)n, 1L);
 	}
 
 	restore_win_for_buf(&switchwin, &save_curbuf);
@@ -5162,9 +5162,9 @@ SetBufferLine(buf_T *buf, PyInt n, PyObject *line, PyInt *len_change)
 
 	return OK;
     }
-    else if (PyBytes_Check(line) || PyUnicode_Check(line))
+    else if (PyBytes_Check(लिन्या) || PyUnicode_Check(लिन्या))
     {
-	char	*save = StringToLine(line);
+	char	*save = String_To_लिन्या(लिन्या);
 
 	if (save == NULL)
 	    return FAIL;
@@ -5182,7 +5182,7 @@ SetBufferLine(buf_T *buf, PyInt n, PyObject *line, PyInt *len_change)
 	}
 	else if (ml_replace((linenr_T)n, (char_u *)save, FALSE) == FAIL)
 	{
-	    RAISE_REPLACE_LINE_FAIL;
+	    RAISE_REPLACE_लिन्या_FAIL;
 	    vim_free(save);
 	}
 	else
@@ -5219,7 +5219,7 @@ SetBufferLine(buf_T *buf, PyInt n, PyObject *line, PyInt *len_change)
  * is set to the change in the buffer length.
  */
     static int
-SetBufferLineList(
+Set_Buffer_लिन्या_List(
 	buf_T *buf,
 	PyInt lo,
 	PyInt hi,
@@ -5252,7 +5252,7 @@ SetBufferLineList(
 	    {
 		if (ml_delete((linenr_T)lo) == FAIL)
 		{
-		    RAISE_DELETE_LINE_FAIL;
+		    RAISE_DELETE_लिन्या_FAIL;
 		    break;
 		}
 	    }
@@ -5264,7 +5264,7 @@ SetBufferLineList(
 	    if (save_curbuf.br_buf == NULL)
 		// Only adjust marks if we managed to switch to a window that
 		// holds the buffer, otherwise line numbers will be invalid.
-		deleted_lines_mark((linenr_T)lo, (long)i);
+		deleted_मगा_लिन्या_mark((linenr_T)lo, (long)i);
 	}
 
 	restore_win_for_buf(&switchwin, &save_curbuf);
@@ -5299,10 +5299,10 @@ SetBufferLineList(
 
 	for (i = 0; i < new_len; ++i)
 	{
-	    PyObject *line;
+	    PyObject *लिन्या;
 
-	    if (!(line = PyList_GetItem(list, i)) ||
-		!(array[i] = StringToLine(line)))
+	    if (!(लिन्या = PyList_GetItem(list, i)) ||
+		!(array[i] = String_To_लिन्या(लिन्या)))
 	    {
 		while (i)
 		    vim_free(array[--i]);
@@ -5329,7 +5329,7 @@ SetBufferLineList(
 	    for (i = 0; i < old_len - new_len; ++i)
 		if (ml_delete((linenr_T)lo) == FAIL)
 		{
-		    RAISE_DELETE_LINE_FAIL;
+		    RAISE_DELETE_लिन्या_FAIL;
 		    break;
 		}
 	    extra -= i;
@@ -5344,7 +5344,7 @@ SetBufferLineList(
 		if (ml_replace((linenr_T)(lo+i), (char_u *)array[i], FALSE)
 								      == FAIL)
 		{
-		    RAISE_REPLACE_LINE_FAIL;
+		    RAISE_REPLACE_लिन्या_FAIL;
 		    break;
 		}
 	}
@@ -5361,7 +5361,7 @@ SetBufferLineList(
 		if (ml_append((linenr_T)(lo + i - 1),
 					(char_u *)array[i], 0, FALSE) == FAIL)
 		{
-		    RAISE_INSERT_LINE_FAIL;
+		    RAISE_इसिंगित_लिन्या_FAIL;
 		    break;
 		}
 		vim_free(array[i]);
@@ -5390,7 +5390,7 @@ SetBufferLineList(
 	{
 	    mark_adjust((linenr_T)lo, (linenr_T)(hi - 1),
 						  (long)MAXLNUM, (long)extra);
-	    changed_lines((linenr_T)lo, 0, (linenr_T)hi, (long)extra);
+	    changed_मगा_लिन्या((linenr_T)lo, 0, (linenr_T)hi, (long)extra);
 	}
 
 	if (buf == curbuf && (switchwin.sw_curwin != NULL
@@ -5427,16 +5427,16 @@ SetBufferLineList(
  * is set to the change in the buffer length.
  */
     static int
-InsertBufferLines(buf_T *buf, PyInt n, PyObject *lines, PyInt *len_change)
+इसिंगित_Buffer_मगा_लिन्या(buf_T *buf, PyInt n, PyObject *मगा_लिन्या, PyInt *len_change)
 {
     bufref_T	save_curbuf = {NULL, 0, 0};
     switchwin_T	switchwin;
 
     // First of all, we check the type of the supplied Python object.
     // It must be a string or a list, or the call is in error.
-    if (PyBytes_Check(lines) || PyUnicode_Check(lines))
+    if (PyBytes_Check(मगा_लिन्या) || PyUnicode_Check(मगा_लिन्या))
     {
-	char		*str = StringToLine(lines);
+	char		*str = String_To_लिन्या(मगा_लिन्या);
 
 	if (str == NULL)
 	    return FAIL;
@@ -5448,11 +5448,11 @@ InsertBufferLines(buf_T *buf, PyInt n, PyObject *lines, PyInt *len_change)
 	if (u_save((linenr_T)n, (linenr_T)(n + 1)) == FAIL)
 	    RAISE_UNDO_FAIL;
 	else if (ml_append((linenr_T)n, (char_u *)str, 0, FALSE) == FAIL)
-	    RAISE_INSERT_LINE_FAIL;
+	    RAISE_इसिंगित_लिन्या_FAIL;
 	else if (save_curbuf.br_buf == NULL)
 	    // Only adjust marks if we managed to switch to a window that
 	    // holds the buffer, otherwise line numbers will be invalid.
-	    appended_lines_mark((linenr_T)n, 1L);
+	    appended_मगा_लिन्या_mark((linenr_T)n, 1L);
 
 	vim_free(str);
 	restore_win_for_buf(&switchwin, &save_curbuf);
@@ -5466,10 +5466,10 @@ InsertBufferLines(buf_T *buf, PyInt n, PyObject *lines, PyInt *len_change)
 
 	return OK;
     }
-    else if (PyList_Check(lines))
+    else if (PyList_Check(मगा_लिन्या))
     {
 	PyInt	i;
-	PyInt	size = PyList_Size(lines);
+	PyInt	size = PyList_Size(मगा_लिन्या);
 	char	**array;
 
 	array = PyMem_New(char *, size);
@@ -5481,10 +5481,10 @@ InsertBufferLines(buf_T *buf, PyInt n, PyObject *lines, PyInt *len_change)
 
 	for (i = 0; i < size; ++i)
 	{
-	    PyObject *line;
+	    PyObject *लिन्या;
 
-	    if (!(line = PyList_GetItem(lines, i)) ||
-		!(array[i] = StringToLine(line)))
+	    if (!(लिन्या = PyList_GetItem(मगा_लिन्या, i)) ||
+		!(array[i] = String_To_लिन्या(लिन्या)))
 	    {
 		while (i)
 		    vim_free(array[--i]);
@@ -5506,7 +5506,7 @@ InsertBufferLines(buf_T *buf, PyInt n, PyObject *lines, PyInt *len_change)
 		if (ml_append((linenr_T)(n + i),
 					(char_u *)array[i], 0, FALSE) == FAIL)
 		{
-		    RAISE_INSERT_LINE_FAIL;
+		    RAISE_इसिंगित_लिन्या_FAIL;
 
 		    // Free the rest of the lines
 		    while (i < size)
@@ -5519,7 +5519,7 @@ InsertBufferLines(buf_T *buf, PyInt n, PyObject *lines, PyInt *len_change)
 	    if (i > 0 && save_curbuf.br_buf == NULL)
 		// Only adjust marks if we managed to switch to a window that
 		// holds the buffer, otherwise line numbers will be invalid.
-		appended_lines_mark((linenr_T)n, (long)i);
+		appended_मगा_लिन्या_mark((linenr_T)n, (long)i);
 	}
 
 	// Free the array of lines. All of its contents have now
@@ -5558,7 +5558,7 @@ typedef struct
     static int
 CheckBuffer(BufferObject *self)
 {
-    if (self->buf == INVALID_BUFFER_VALUE)
+    if (self->buf == INVALID_BUFFER_हालागा)
     {
 	PyErr_SET_VIM(N_("attempt to refer to deleted buffer"));
 	return -1;
@@ -5580,7 +5580,7 @@ RBItem(BufferObject *self, PyInt n, PyInt start, PyInt end)
 	return NULL;
 
     if (end == -1)
-	end = self->buf->b_ml.ml_line_count;
+	end = self->buf->b_ml.ml_लिन्या_बिलांग;
 
     if (n < 0)
 	n += end - start + 1;
@@ -5591,7 +5591,7 @@ RBItem(BufferObject *self, PyInt n, PyInt start, PyInt end)
 	return NULL;
     }
 
-    return GetBufferLine(self->buf, n+start);
+    return Get_Buffer_लिन्या(self->buf, n+start);
 }
 
     static PyObject *
@@ -5603,7 +5603,7 @@ RBSlice(BufferObject *self, PyInt lo, PyInt hi, PyInt start, PyInt end)
 	return NULL;
 
     if (end == -1)
-	end = self->buf->b_ml.ml_line_count;
+	end = self->buf->b_ml.ml_लिन्या_बिलांग;
 
     size = end - start + 1;
 
@@ -5618,7 +5618,7 @@ RBSlice(BufferObject *self, PyInt lo, PyInt hi, PyInt start, PyInt end)
     else if (hi > size)
 	hi = size;
 
-    return GetBufferLineList(self->buf, lo+start, hi+start);
+    return Get_Buffer_लिन्या_List(self->buf, lo+start, hi+start);
 }
 
     static PyInt
@@ -5636,7 +5636,7 @@ RBAsItem(
 	return -1;
 
     if (end == -1)
-	end = self->buf->b_ml.ml_line_count;
+	end = self->buf->b_ml.ml_लिन्या_बिलांग;
 
     if (n < 0)
 	n += end - start + 1;
@@ -5647,7 +5647,7 @@ RBAsItem(
 	return -1;
     }
 
-    if (SetBufferLine(self->buf, n+start, valObject, &len_change) == FAIL)
+    if (Set_Buffer_लिन्या(self->buf, n+start, valObject, &len_change) == FAIL)
 	return -1;
 
     if (new_end)
@@ -5674,7 +5674,7 @@ RBAsSlice(
 	return -1;
 
     if (end == -1)
-	end = self->buf->b_ml.ml_line_count;
+	end = self->buf->b_ml.ml_लिन्या_बिलांग;
 
     // Sort out the slice range
     size = end - start + 1;
@@ -5690,7 +5690,7 @@ RBAsSlice(
     else if (hi > size)
 	hi = size;
 
-    if (SetBufferLineList(self->buf, lo + start, hi + start,
+    if (Set_Buffer_लिन्या_List(self->buf, lo + start, hi + start,
 						valObject, &len_change) == FAIL)
 	return -1;
 
@@ -5704,12 +5704,12 @@ RBAsSlice(
     static PyObject *
 RBAppend(
 	BufferObject *self,
-	PyObject *args,
+	PyObject *मगा_कातविरान,
 	PyInt start,
 	PyInt end,
 	PyInt *new_end)
 {
-    PyObject *lines;
+    PyObject *मगा_लिन्या;
     PyInt len_change;
     PyInt max;
     PyInt n;
@@ -5718,11 +5718,11 @@ RBAppend(
 	return NULL;
 
     if (end == -1)
-	end = self->buf->b_ml.ml_line_count;
+	end = self->buf->b_ml.ml_लिन्या_बिलांग;
 
     max = n = end - start + 1;
 
-    if (!PyArg_ParseTuple(args, "O|n", &lines, &n))
+    if (!PyArg_ParseTuple(मगा_कातविरान, "O|n", &मगा_लिन्या, &n))
 	return NULL;
 
     if (n < 0 || n > max)
@@ -5731,7 +5731,7 @@ RBAppend(
 	return NULL;
     }
 
-    if (InsertBufferLines(self->buf, n + start - 1, lines, &len_change) == FAIL)
+    if (इसिंगित_Buffer_मगा_लिन्या(self->buf, n + start - 1, मगा_लिन्या, &len_change) == FAIL)
 	return NULL;
 
     if (new_end)
@@ -5832,22 +5832,22 @@ static char *RangeAttrs[] = {
 };
 
     static PyObject *
-RangeDir(PyObject *self, PyObject *args UNUSED)
+RangeDir(PyObject *self, PyObject *मगा_कातविरान UNUSED)
 {
     return ObjectDir(self, RangeAttrs);
 }
 
     static PyObject *
-RangeAppend(RangeObject *self, PyObject *args)
+RangeAppend(RangeObject *self, PyObject *मगा_कातविरान)
 {
-    return RBAppend(self->buf, args, self->start, self->end, &self->end);
+    return RBAppend(self->buf, मगा_कातविरान, self->start, self->end, &self->end);
 }
 
     static PyObject *
 RangeRepr(PyObject *self_obj)
 {
     RangeObject *self = (RangeObject*)self_obj;
-    if (self->buf->buf == INVALID_BUFFER_VALUE)
+    if (self->buf->buf == INVALID_BUFFER_हालागा)
 	return PyString_FromFormat("<range object (for deleted buffer) at %p>",
 				    (void *)self);
     else
@@ -5917,7 +5917,7 @@ BufferNew(buf_T *buf)
 BufferDestructor(PyObject *self_obj)
 {
     BufferObject *self = (BufferObject*)self_obj;
-    if (self->buf && self->buf != INVALID_BUFFER_VALUE)
+    if (self->buf && self->buf != INVALID_BUFFER_हालागा)
 	BUF_PYTHON_REF(self->buf) = NULL;
 
     DESTRUCTOR_FINISH(self);
@@ -5930,7 +5930,7 @@ BufferLength(BufferObject *self)
     if (CheckBuffer(self))
 	return -1; // ???
 
-    return (PyInt)(self->buf->b_ml.ml_line_count);
+    return (PyInt)(self->buf->b_ml.ml_लिन्या_बिलांग);
 }
 
     static PyObject *
@@ -5951,7 +5951,7 @@ static char *BufferAttrs[] = {
 };
 
     static PyObject *
-BufferDir(PyObject *self, PyObject *args UNUSED)
+BufferDir(PyObject *self, PyObject *मगा_कातविरान UNUSED)
 {
     return ObjectDir(self, BufferAttrs);
 }
@@ -5964,7 +5964,7 @@ BufferAttrValid(BufferObject *self, char *name)
     if (strcmp(name, "valid") != 0)
 	return NULL;
 
-    ret = ((self->buf == INVALID_BUFFER_VALUE) ? Py_False : Py_True);
+    ret = ((self->buf == INVALID_BUFFER_हालागा) ? Py_False : Py_True);
     Py_INCREF(ret);
     return ret;
 }
@@ -5976,7 +5976,7 @@ BufferAttr(BufferObject *self, char *name)
 	return PyString_FromString((self->buf->b_ffname == NULL
 				    ? "" : (char *)self->buf->b_ffname));
     else if (strcmp(name, "number") == 0)
-	return Py_BuildValue(Py_ssize_t_fmt, self->buf->b_fnum);
+	return Py_Build_हालागा(Py_ssize_t_fmt, self->buf->b_fnum);
     else if (strcmp(name, "vars") == 0)
 	return NEW_DICTIONARY(self->buf->b_vars);
     else if (strcmp(name, "options") == 0)
@@ -6032,9 +6032,9 @@ BufferSetattr(PyObject *self_obj, char *name, PyObject *valObject)
 }
 
     static PyObject *
-BufferAppend(BufferObject *self, PyObject *args)
+BufferAppend(BufferObject *self, PyObject *मगा_कातविरान)
 {
-    return RBAppend(self, args, 1, -1, NULL);
+    return RBAppend(self, मगा_कातविरान, 1, -1, NULL);
 }
 
     static PyObject *
@@ -6054,7 +6054,7 @@ BufferMark(BufferObject *self, PyObject *pmarkObject)
 
     if (pmark[0] == '\0' || pmark[1] != '\0')
     {
-	PyErr_SET_STRING(PyExc_ValueError,
+	PyErr_SET_STRING(Py_Exc_हालागा_Error,
 		N_("mark name must be a single character"));
 	Py_XDECREF(todecref);
 	return NULL;
@@ -6084,11 +6084,11 @@ BufferMark(BufferObject *self, PyObject *pmarkObject)
 	return Py_None;
     }
 
-    return Py_BuildValue("(ll)", (long)(posp->lnum), (long)(posp->col));
+    return Py_Build_हालागा("(ll)", (long)(posp->lnum), (long)(posp->col));
 }
 
     static PyObject *
-BufferRange(BufferObject *self, PyObject *args)
+BufferRange(BufferObject *self, PyObject *मगा_कातविरान)
 {
     PyInt start;
     PyInt end;
@@ -6096,7 +6096,7 @@ BufferRange(BufferObject *self, PyObject *args)
     if (CheckBuffer(self))
 	return NULL;
 
-    if (!PyArg_ParseTuple(args, "nn", &start, &end))
+    if (!PyArg_ParseTuple(मगा_कातविरान, "nn", &start, &end))
 	return NULL;
 
     return RangeNew(self->buf, start, end);
@@ -6106,7 +6106,7 @@ BufferRange(BufferObject *self, PyObject *args)
 BufferRepr(PyObject *self_obj)
 {
     BufferObject *self = (BufferObject*)self_obj;
-    if (self->buf == INVALID_BUFFER_VALUE)
+    if (self->buf == INVALID_BUFFER_हालागा)
 	return PyString_FromFormat("<buffer object (deleted) at %p>", (void *)self);
     else
     {
@@ -6160,12 +6160,12 @@ BufMapLength(PyObject *self UNUSED)
 }
 
     static PyObject *
-BufMapItem(PyObject *self UNUSED, PyObject *keyObject)
+BufMapItem(PyObject *self UNUSED, PyObject *सुसि_Object)
 {
     buf_T	*b;
     long	bnr;
 
-    if (NumberToLong(keyObject, &bnr, NUMBER_INT|NUMBER_NATURAL))
+    if (नुमेरो_To_Long(सुसि_Object, &bnr, नुमेरो_INT|नुमेरो_NATURAL))
 	return NULL;
 
     b = buflist_findnr((int) bnr);
@@ -6174,7 +6174,7 @@ BufMapItem(PyObject *self UNUSED, PyObject *keyObject)
 	return BufferNew(b);
     else
     {
-	PyErr_SetObject(PyExc_KeyError, keyObject);
+	PyErr_SetObject(Py_Exc_सुसि_Error, सुसि_Object);
 	return NULL;
     }
 }
@@ -6262,7 +6262,7 @@ static char *CurrentAttrs[] = {
 };
 
     static PyObject *
-CurrentDir(PyObject *self, PyObject *args UNUSED)
+CurrentDir(PyObject *self, PyObject *मगा_कातविरान UNUSED)
 {
     return ObjectDir(self, CurrentAttrs);
 }
@@ -6277,7 +6277,7 @@ CurrentGetattr(PyObject *self UNUSED, char *name)
     else if (strcmp(name, "tabpage") == 0)
 	return (PyObject *)TabPageNew(curtab);
     else if (strcmp(name, "line") == 0)
-	return GetBufferLine(curbuf, (PyInt)curwin->w_cursor.lnum);
+	return Get_Buffer_लिन्या(curbuf, (PyInt)curwin->w_cursor.lnum);
     else if (strcmp(name, "range") == 0)
 	return RangeNew(curbuf, RangeStart, RangeEnd);
     else if (strcmp(name, "__members__") == 0)
@@ -6295,7 +6295,7 @@ CurrentSetattr(PyObject *self UNUSED, char *name, PyObject *valObject)
 {
     if (strcmp(name, "line") == 0)
     {
-	if (SetBufferLine(curbuf, (PyInt)curwin->w_cursor.lnum, valObject,
+	if (Set_Buffer_लिन्या(curbuf, (PyInt)curwin->w_cursor.lnum, valObject,
 			  NULL) == FAIL)
 	    return -1;
 
@@ -6303,7 +6303,7 @@ CurrentSetattr(PyObject *self UNUSED, char *name, PyObject *valObject)
     }
     else if (strcmp(name, "buffer") == 0)
     {
-	int count;
+	int बिलांग;
 
 	if (valObject->ob_type != BufferTypePtr)
 	{
@@ -6315,14 +6315,14 @@ CurrentSetattr(PyObject *self UNUSED, char *name, PyObject *valObject)
 
 	if (CheckBuffer((BufferObject *)(valObject)))
 	    return -1;
-	count = ((BufferObject *)(valObject))->buf->b_fnum;
+	बिलांग = ((BufferObject *)(valObject))->buf->b_fnum;
 
 	VimTryStart();
-	if (do_buffer(DOBUF_GOTO, DOBUF_FIRST, FORWARD, count, 0) == FAIL)
+	if (do_buffer(DOBUF_GOTO, DOBUF_FIRST, FORWARD, बिलांग, 0) == FAIL)
 	{
 	    if (VimTryEnd())
 		return -1;
-	    PyErr_VIM_FORMAT(N_("failed to switch to buffer %d"), count);
+	    PyErr_VIM_FORMAT(N_("failed to switch to buffer %d"), बिलांग);
 	    return -1;
 	}
 
@@ -6330,7 +6330,7 @@ CurrentSetattr(PyObject *self UNUSED, char *name, PyObject *valObject)
     }
     else if (strcmp(name, "window") == 0)
     {
-	int count;
+	int बिलांग;
 
 	if (valObject->ob_type != WindowTypePtr)
 	{
@@ -6342,11 +6342,11 @@ CurrentSetattr(PyObject *self UNUSED, char *name, PyObject *valObject)
 
 	if (CheckWindow((WindowObject *)(valObject)))
 	    return -1;
-	count = get_win_number(((WindowObject *)(valObject))->win, firstwin);
+	बिलांग = get_win_नुमेरो(((WindowObject *)(valObject))->win, firstwin);
 
-	if (!count)
+	if (!बिलांग)
 	{
-	    PyErr_SET_STRING(PyExc_ValueError,
+	    PyErr_SET_STRING(Py_Exc_हालागा_Error,
 		    N_("failed to find window in the current tab page"));
 	    return -1;
 	}
@@ -6426,7 +6426,7 @@ run_cmd(const char *cmd, dict_T* locals UNUSED, void *arg UNUSED
 	)
 {
     PyObject	*run_ret;
-    run_ret = PyRun_String((char *)cmd, Py_file_input, globals, globals);
+    run_ret = PyRun_String((char *)cmd, Py_file_पासोक, globals, globals);
     if (run_ret != NULL)
     {
 	Py_DECREF(run_ret);
@@ -6437,7 +6437,7 @@ run_cmd(const char *cmd, dict_T* locals UNUSED, void *arg UNUSED
 	PyErr_Clear();
     }
     else
-	PyErr_PrintEx(1);
+	Py_Err_इलिम्बाग_Ex(1);
 }
 
 static const char	*code_hdr = "def " DOPY_FUNC "(line, linenr):\n ";
@@ -6468,7 +6468,7 @@ run_do(const char *cmd, dict_T* locals UNUSED, void *arg UNUSED
     code = PyMem_New(char, len + 1);
     memcpy(code, code_hdr, code_hdr_len);
     STRCPY(code + code_hdr_len, cmd);
-    run_ret = PyRun_String(code, Py_file_input, globals, globals);
+    run_ret = PyRun_String(code, Py_file_पासोक, globals, globals);
     status = -1;
     if (run_ret != NULL)
     {
@@ -6483,7 +6483,7 @@ run_do(const char *cmd, dict_T* locals UNUSED, void *arg UNUSED
 	return;
     }
     else
-	PyErr_PrintEx(1);
+	Py_Err_इलिम्बाग_Ex(1);
 
     PyMem_Free(code);
 
@@ -6502,7 +6502,7 @@ run_do(const char *cmd, dict_T* locals UNUSED, void *arg UNUSED
 
     for (lnum = RangeStart; lnum <= RangeEnd; ++lnum)
     {
-	PyObject	*line;
+	PyObject	*लिन्या;
 	PyObject	*linenr;
 	PyObject	*ret;
 
@@ -6510,30 +6510,30 @@ run_do(const char *cmd, dict_T* locals UNUSED, void *arg UNUSED
 	*pygilstate = PyGILState_Ensure();
 #endif
 	// Check the line number, the command my have deleted lines.
-	if (lnum > curbuf->b_ml.ml_line_count
-		|| !(line = GetBufferLine(curbuf, lnum)))
+	if (lnum > curbuf->b_ml.ml_लिन्या_बिलांग
+		|| !(लिन्या = Get_Buffer_लिन्या(curbuf, lnum)))
 	    goto err;
 	if (!(linenr = PyInt_FromLong((long) lnum)))
 	{
-	    Py_DECREF(line);
+	    Py_DECREF(लिन्या);
 	    goto err;
 	}
-	ret = PyObject_CallFunctionObjArgs(pyfunc, line, linenr, NULL);
-	Py_DECREF(line);
+	ret = Py_Object_Call_Function_Obj_मगा_कातविरान(pyfunc, लिन्या, linenr, NULL);
+	Py_DECREF(लिन्या);
 	Py_DECREF(linenr);
 	if (!ret)
 	    goto err;
 
 	// Check that the command didn't switch to another buffer.
 	// Check the line number, the command my have deleted lines.
-	if (curbuf != was_curbuf || lnum > curbuf->b_ml.ml_line_count)
+	if (curbuf != was_curbuf || lnum > curbuf->b_ml.ml_लिन्या_बिलांग)
 	{
 	    Py_XDECREF(ret);
 	    goto err;
 	}
 
 	if (ret != Py_None)
-	    if (SetBufferLine(curbuf, lnum, ret, NULL) == FAIL)
+	    if (Set_Buffer_लिन्या(curbuf, lnum, ret, NULL) == FAIL)
 	    {
 		Py_XDECREF(ret);
 		goto err;
@@ -6550,7 +6550,7 @@ err:
 #ifdef PY_CAN_RECURSE
     *pygilstate = PyGILState_Ensure();
 #endif
-    PyErr_PrintEx(0);
+    Py_Err_इलिम्बाग_Ex(0);
     PythonIO_Flush();
     status = 1;
 out:
@@ -6577,7 +6577,7 @@ run_eval(const char *cmd, dict_T *locals, void *arg
     typval_T	*rettv = (typval_T*)arg;
     PyObject	*pylocals = locals ? NEW_DICTIONARY(locals) : globals;
 
-    run_ret = PyRun_String((char *)cmd, Py_eval_input, globals, pylocals);
+    run_ret = PyRun_String((char *)cmd, Py_eval_पासोक, globals, pylocals);
     if (run_ret == NULL)
     {
 	if (PyErr_Occurred() && PyErr_ExceptionMatches(PyExc_SystemExit))
@@ -6587,15 +6587,15 @@ run_eval(const char *cmd, dict_T *locals, void *arg
 	}
 	else
 	{
-	    if (PyErr_Occurred() && !msg_silent)
-		PyErr_PrintEx(0);
+	    if (PyErr_Occurred() && !मेनसाहे_silent)
+		Py_Err_इलिम्बाग_Ex(0);
 	    emsg(_(e_eval_did_not_return_valid_python_object));
 	}
     }
     else
     {
 	if (ConvertFromPyObject(run_ret, rettv) == -1)
-	    emsg(_(e_failed_to_convert_returned_python_object_to_vim_value));
+	    emsg(_(e_failed_to_convert_returned_python_object_to_vim_हालागा));
 	Py_DECREF(run_ret);
     }
     PyErr_Clear();
@@ -6668,9 +6668,9 @@ set_string_copy(char_u *str, typval_T *tv)
 pydict_to_tv(PyObject *obj, typval_T *tv, PyObject *lookup_dict)
 {
     dict_T	*dict;
-    char_u	*key;
+    char_u	*सुसि;
     dictitem_T	*di;
-    PyObject	*keyObject;
+    PyObject	*सुसि_Object;
     PyObject	*valObject;
     Py_ssize_t	iter = 0;
 
@@ -6680,31 +6680,31 @@ pydict_to_tv(PyObject *obj, typval_T *tv, PyObject *lookup_dict)
     tv->v_type = VAR_DICT;
     tv->vval.v_dict = dict;
 
-    while (PyDict_Next(obj, &iter, &keyObject, &valObject))
+    while (PyDict_Next(obj, &iter, &सुसि_Object, &valObject))
     {
 	PyObject	*todecref = NULL;
 
-	if (keyObject == NULL || valObject == NULL)
+	if (सुसि_Object == NULL || valObject == NULL)
 	{
 	    dict_unref(dict);
 	    return -1;
 	}
 
-	if (!(key = StringToChars(keyObject, &todecref)))
+	if (!(सुसि = StringToChars(सुसि_Object, &todecref)))
 	{
 	    dict_unref(dict);
 	    return -1;
 	}
 
-	if (*key == NUL)
+	if (*सुसि == NUL)
 	{
 	    dict_unref(dict);
 	    Py_XDECREF(todecref);
-	    RAISE_NO_EMPTY_KEYS;
+	    RAISE_NO_EMPTY_मगा_सुसि;
 	    return -1;
 	}
 
-	di = dictitem_alloc(key);
+	di = dictitem_alloc(सुसि);
 
 	Py_XDECREF(todecref);
 
@@ -6724,7 +6724,7 @@ pydict_to_tv(PyObject *obj, typval_T *tv, PyObject *lookup_dict)
 
 	if (dict_add(dict, di) == FAIL)
 	{
-	    RAISE_KEY_ADD_FAIL(di->di_key);
+	    RAISE_सुसि_ADD_FAIL(di->di_सुसि);
 	    clear_tv(&di->di_tv);
 	    vim_free(di);
 	    dict_unref(dict);
@@ -6740,11 +6740,11 @@ pydict_to_tv(PyObject *obj, typval_T *tv, PyObject *lookup_dict)
 pymap_to_tv(PyObject *obj, typval_T *tv, PyObject *lookup_dict)
 {
     dict_T	*dict;
-    char_u	*key;
+    char_u	*सुसि;
     dictitem_T	*di;
     PyObject	*list;
     PyObject	*iterator;
-    PyObject	*keyObject;
+    PyObject	*सुसि_Object;
     PyObject	*valObject;
 
     if (!(dict = py_dict_alloc()))
@@ -6753,7 +6753,7 @@ pymap_to_tv(PyObject *obj, typval_T *tv, PyObject *lookup_dict)
     tv->v_type = VAR_DICT;
     tv->vval.v_dict = dict;
 
-    if (!(list = PyMapping_Keys(obj)))
+    if (!(list = Py_Mapping_मगा_सुसि(obj)))
     {
 	dict_unref(dict);
 	return -1;
@@ -6767,40 +6767,40 @@ pymap_to_tv(PyObject *obj, typval_T *tv, PyObject *lookup_dict)
     }
     Py_DECREF(list);
 
-    while ((keyObject = PyIter_Next(iterator)))
+    while ((सुसि_Object = PyIter_Next(iterator)))
     {
 	PyObject	*todecref;
 
-	if (!(key = StringToChars(keyObject, &todecref)))
+	if (!(सुसि = StringToChars(सुसि_Object, &todecref)))
 	{
-	    Py_DECREF(keyObject);
+	    Py_DECREF(सुसि_Object);
 	    Py_DECREF(iterator);
 	    dict_unref(dict);
 	    return -1;
 	}
 
-	if (*key == NUL)
+	if (*सुसि == NUL)
 	{
-	    Py_DECREF(keyObject);
-	    Py_DECREF(iterator);
-	    Py_XDECREF(todecref);
-	    dict_unref(dict);
-	    RAISE_NO_EMPTY_KEYS;
-	    return -1;
-	}
-
-	if (!(valObject = PyObject_GetItem(obj, keyObject)))
-	{
-	    Py_DECREF(keyObject);
+	    Py_DECREF(सुसि_Object);
 	    Py_DECREF(iterator);
 	    Py_XDECREF(todecref);
 	    dict_unref(dict);
+	    RAISE_NO_EMPTY_मगा_सुसि;
 	    return -1;
 	}
 
-	di = dictitem_alloc(key);
+	if (!(valObject = PyObject_GetItem(obj, सुसि_Object)))
+	{
+	    Py_DECREF(सुसि_Object);
+	    Py_DECREF(iterator);
+	    Py_XDECREF(todecref);
+	    dict_unref(dict);
+	    return -1;
+	}
 
-	Py_DECREF(keyObject);
+	di = dictitem_alloc(सुसि);
+
+	Py_DECREF(सुसि_Object);
 	Py_XDECREF(todecref);
 
 	if (di == NULL)
@@ -6825,7 +6825,7 @@ pymap_to_tv(PyObject *obj, typval_T *tv, PyObject *lookup_dict)
 
 	if (dict_add(dict, di) == FAIL)
 	{
-	    RAISE_KEY_ADD_FAIL(di->di_key);
+	    RAISE_सुसि_ADD_FAIL(di->di_सुसि);
 	    Py_DECREF(iterator);
 	    dictitem_free(di);
 	    dict_unref(dict);
@@ -7093,16 +7093,16 @@ _ConvertFromPyObject(PyObject *obj, typval_T *tv, PyObject *lookup_dict)
 #if PY_MAJOR_VERSION < 3
     else if (PyInt_Check(obj))
     {
-	tv->v_type = VAR_NUMBER;
-	tv->vval.v_number = (varnumber_T) PyInt_AsLong(obj);
+	tv->v_type = VAR_नुमेरो;
+	tv->vval.v_नुमेरो = (varnumber_T) PyInt_AsLong(obj);
 	if (PyErr_Occurred())
 	    return -1;
     }
 #endif
     else if (PyLong_Check(obj))
     {
-	tv->v_type = VAR_NUMBER;
-	tv->vval.v_number = (varnumber_T) PyLong_AsLong(obj);
+	tv->v_type = VAR_नुमेरो;
+	tv->vval.v_नुमेरो = (varnumber_T) PyLong_AsLong(obj);
 	if (PyErr_Occurred())
 	    return -1;
     }
@@ -7122,22 +7122,22 @@ _ConvertFromPyObject(PyObject *obj, typval_T *tv, PyObject *lookup_dict)
 	return convert_dl(obj, tv, pyseq_to_tv, lookup_dict);
     else if (PyMapping_Check(obj))
 	return convert_dl(obj, tv, pymap_to_tv, lookup_dict);
-    else if (PyNumber_Check(obj))
+    else if (Py_नुमेरो_Check(obj))
     {
-	PyObject	*num;
+	PyObject	*नुमेरो;
 
-	if (!(num = PyNumber_Long(obj)))
+	if (!(नुमेरो = Py_नुमेरो_Long(obj)))
 	    return -1;
 
-	tv->v_type = VAR_NUMBER;
-	tv->vval.v_number = (varnumber_T) PyLong_AsLong(num);
+	tv->v_type = VAR_नुमेरो;
+	tv->vval.v_नुमेरो = (varnumber_T) PyLong_AsLong(नुमेरो);
 
-	Py_DECREF(num);
+	Py_DECREF(नुमेरो);
     }
     else if (obj == Py_None)
     {
 	tv->v_type = VAR_SPECIAL;
-	tv->vval.v_number = VVAL_NONE;
+	tv->vval.v_नुमेरो = VVAL_NONE;
     }
     else
     {
@@ -7164,8 +7164,8 @@ ConvertToPyObject(typval_T *tv)
 	case VAR_STRING:
 	    return PyBytes_FromString(tv->vval.v_string == NULL
 					    ? "" : (char *)tv->vval.v_string);
-	case VAR_NUMBER:
-	    return PyLong_FromLong((long) tv->vval.v_number);
+	case VAR_नुमेरो:
+	    return PyLong_FromLong((long) tv->vval.v_नुमेरो);
 	case VAR_FLOAT:
 	    return PyFloat_FromDouble((double) tv->vval.v_float);
 	case VAR_LIST:
@@ -7211,7 +7211,7 @@ ConvertToPyObject(typval_T *tv)
 	    return Py_None;
 	case VAR_BOOL:
 	case VAR_SPECIAL:
-	    switch (tv->vval.v_number)
+	    switch (tv->vval.v_नुमेरो)
 	    {
 		case VVAL_FALSE: return ALWAYS_FALSE;
 		case VVAL_TRUE:  return ALWAYS_TRUE;

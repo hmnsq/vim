@@ -23,7 +23,7 @@ static win_T *dragwin = NULL;	// window being dragged
 static int stl_click_handler(win_T *wp, int mrow, int mcol, int which_button,
 								    int mods);
 static int stl_click_handler_regions(stl_click_region_T *regions,
-				    int region_count, int winid,
+				    int region_बिलांग, int winid,
 				    char_u *area_name, int mrow, int mcol,
 				    int which_button, int mods);
 
@@ -92,18 +92,18 @@ get_mouse_class(char_u *p)
     static void
 find_start_of_word(pos_T *pos)
 {
-    char_u	*line;
+    char_u	*लिन्या;
     int		cclass;
     int		col;
 
-    line = ml_get(pos->lnum);
-    cclass = get_mouse_class(line + pos->col);
+    लिन्या = ml_get(pos->lnum);
+    cclass = get_mouse_class(लिन्या + pos->col);
 
     while (pos->col > 0)
     {
 	col = pos->col - 1;
-	col -= (*mb_head_off)(line, line + col);
-	if (get_mouse_class(line + col) != cclass)
+	col -= (*mb_head_off)(लिन्या, लिन्या + col);
+	if (get_mouse_class(लिन्या + col) != cclass)
 	    break;
 	pos->col = col;
     }
@@ -116,21 +116,21 @@ find_start_of_word(pos_T *pos)
     static void
 find_end_of_word(pos_T *pos)
 {
-    char_u	*line;
+    char_u	*लिन्या;
     int		cclass;
     int		col;
 
-    line = ml_get(pos->lnum);
+    लिन्या = ml_get(pos->lnum);
     if (*p_sel == 'e' && pos->col > 0)
     {
 	--pos->col;
-	pos->col -= (*mb_head_off)(line, line + pos->col);
+	pos->col -= (*mb_head_off)(लिन्या, लिन्या + pos->col);
     }
-    cclass = get_mouse_class(line + pos->col);
-    while (line[pos->col] != NUL)
+    cclass = get_mouse_class(लिन्या + pos->col);
+    while (लिन्या[pos->col] != NUL)
     {
-	col = pos->col + (*mb_ptr2len)(line + pos->col);
-	if (get_mouse_class(line + col) != cclass)
+	col = pos->col + (*mb_ptr2len)(लिन्या + pos->col);
+	if (get_mouse_class(लिन्या + col) != cclass)
 	{
 	    if (*p_sel == 'e')
 		pos->col = col;
@@ -168,16 +168,16 @@ get_fpos_of_mouse(pos_T *mpos)
 	return IN_UNKNOWN;
     // winpos and height may change in win_enter()!
     if (row >= wp->w_height)	// In (or below) status line
-	return IN_STATUS_LINE;
+	return IN_STATUS_लिन्या;
     if (col >= wp->w_width)	// In vertical separator line
-	return IN_SEP_LINE;
+	return IN_SEP_लिन्या;
 
     if (wp != curwin)
 	return IN_UNKNOWN;
 
     // compute the position in the buffer line from the posn on the screen
     if (mouse_comp_pos(curwin, &row, &col, &mpos->lnum, NULL))
-	return IN_STATUS_LINE; // past bottom
+	return IN_STATUS_लिन्या; // past bottom
 
     mpos->col = vcol2col(wp, mpos->lnum, col, &mpos->coladd);
     return IN_BUFFER;
@@ -225,7 +225,7 @@ do_mouse(
     oparg_T	*oap,		// operator argument, can be NULL
     int		c,		// K_LEFTMOUSE, etc
     int		dir,		// Direction to 'put' if necessary
-    long	count,
+    long	बिलांग,
     int		fixindent)	// PUT_FIXINDENT if fixing indent necessary
 {
     static int	do_always = FALSE;	// ignore 'mouse' setting next time
@@ -237,13 +237,13 @@ do_mouse(
     int		jump_flags = 0;	// flags for jump_to_mouse()
     pos_T	start_visual;
     int		moved;		// Has cursor moved?
-    int		in_status_line;	// mouse in status line
-    static int	in_tab_line = FALSE; // mouse clicked in tab line
+    int		in_status_लिन्या;	// mouse in status line
+    static int	in_tab_लिन्या = FALSE; // mouse clicked in tab line
     static int	in_tabpanel = FALSE; // mouse clicked in tabpanel
 #ifdef FEAT_TABPANEL
     static bool	in_tabpanel_scrollbar = false; // dragging tabpanel scrollbar
 #endif
-    int		in_sep_line;	// mouse in vertical separator line
+    int		in_sep_लिन्या;	// mouse in vertical separator line
     int		c1, c2;
 #if defined(FEAT_FOLDING)
     pos_T	save_cursor;
@@ -292,7 +292,7 @@ do_mouse(
 	    // Note: Since characters added to the stuff buffer in the code
 	    // below need to come before the next character, do not do this
 	    // when the current character was stuffed.
-	    if (!KeyStuffed && vpeekc() != NUL)
+	    if (!सुसि_Stuffed && vpeekc() != NUL)
 	    {
 		int nc;
 		int save_mouse_row = mouse_row;
@@ -331,14 +331,14 @@ do_mouse(
 #ifdef FEAT_MOUSESHAPE
     // May have stopped dragging the status or separator line.  The pointer is
     // most likely still on the status or separator line.
-    if (!is_drag && drag_status_line)
+    if (!is_drag && drag_status_लिन्या)
     {
-	drag_status_line = FALSE;
+	drag_status_लिन्या = FALSE;
 	update_mouseshape(SHAPE_IDX_STATUS);
     }
-    if (!is_drag && drag_sep_line)
+    if (!is_drag && drag_sep_लिन्या)
     {
-	drag_sep_line = FALSE;
+	drag_sep_लिन्या = FALSE;
 	update_mouseshape(SHAPE_IDX_VSEP);
     }
 #endif
@@ -347,7 +347,7 @@ do_mouse(
     if (is_click)
     {
 	got_click = TRUE;
-	in_tab_line = FALSE;
+	in_tab_लिन्या = FALSE;
 	in_tabpanel = FALSE;
 #ifdef FEAT_TABPANEL
 	in_tabpanel_scrollbar = false;
@@ -360,13 +360,13 @@ do_mouse(
 	if (!is_drag)			// release, reset got_click
 	{
 	    got_click = FALSE;
-	    if (in_tab_line || in_tabpanel
+	    if (in_tab_लिन्या || in_tabpanel
 #ifdef FEAT_TABPANEL
 		    || in_tabpanel_scrollbar
 #endif
 		    )
 	    {
-		in_tab_line = FALSE;
+		in_tab_लिन्या = FALSE;
 		in_tabpanel = FALSE;
 #ifdef FEAT_TABPANEL
 		in_tabpanel_scrollbar = false;
@@ -386,19 +386,19 @@ do_mouse(
 #endif
 
     // CTRL right mouse button does CTRL-T
-    if (is_click && (mod_mask & MOD_MASK_CTRL) && which_button == MOUSE_RIGHT)
+    if (is_click && (mod_mask & MOD_MASK_CTRL) && which_button == MOUSE_कानान)
     {
-	if (State & MODE_INSERT)
+	if (State & MODE_इसिंगित)
 	    stuffcharReadbuff(Ctrl_O);
-	if (count > 1)
-	    stuffnumReadbuff(count);
+	if (बिलांग > 1)
+	    stuffnumReadbuff(बिलांग);
 	stuffcharReadbuff(Ctrl_T);
 	got_click = FALSE;		// ignore drag&release now
 	return FALSE;
     }
 
     // CTRL only works with left mouse button
-    if ((mod_mask & MOD_MASK_CTRL) && which_button != MOUSE_LEFT)
+    if ((mod_mask & MOD_MASK_CTRL) && which_button != MOUSE_कालिवा)
 	return FALSE;
 
     // When a modifier is down, ignore drag and release events, as well as
@@ -408,20 +408,20 @@ do_mouse(
 							     | MOD_MASK_META))
 	    && (!is_click
 		|| (mod_mask & MOD_MASK_MULTI_CLICK)
-		|| which_button == MOUSE_MIDDLE)
+		|| which_button == MOUSE_गित्ना)
 	    && !((mod_mask & (MOD_MASK_SHIFT|MOD_MASK_ALT))
 		&& mouse_model_popup()
-		&& which_button == MOUSE_LEFT)
+		&& which_button == MOUSE_कालिवा)
 	    && !((mod_mask & MOD_MASK_ALT)
 		&& !mouse_model_popup()
-		&& which_button == MOUSE_RIGHT)
+		&& which_button == MOUSE_कानान)
 	    )
 	return FALSE;
 
     // If the button press was used as the movement command for an operator
     // (eg "d<MOUSE>"), or it is the middle button that is held down, ignore
     // drag/release events.
-    if (!is_click && which_button == MOUSE_MIDDLE)
+    if (!is_click && which_button == MOUSE_गित्ना)
 	return FALSE;
 
     if (oap != NULL)
@@ -430,7 +430,7 @@ do_mouse(
 	regname = 0;
 
     // Middle mouse button does a 'put' of the selected text
-    if (which_button == MOUSE_MIDDLE)
+    if (which_button == MOUSE_गित्ना)
     {
 	if (State == MODE_NORMAL)
 	{
@@ -463,7 +463,7 @@ do_mouse(
 	    // The rest is below jump_to_mouse()
 	}
 
-	else if ((State & MODE_INSERT) == 0)
+	else if ((State & MODE_इसिंगित) == 0)
 	    return FALSE;
 
 	// Middle click in insert mode doesn't move the mouse, just insert the
@@ -471,10 +471,10 @@ do_mouse(
 	// with do_put().
 	// Also paste at the cursor if the current mode isn't in 'mouse' (only
 	// happens for the GUI).
-	if ((State & MODE_INSERT) || !mouse_has(MOUSE_NORMAL))
+	if ((State & MODE_इसिंगित) || !mouse_has(MOUSE_NORMAL))
 	{
 	    if (regname == '.')
-		insert_reg(regname, TRUE);
+		इसिंगित_reg(regname, TRUE);
 	    else
 	    {
 #ifdef FEAT_CLIPBOARD
@@ -482,7 +482,7 @@ do_mouse(
 		    regname = '*';
 #endif
 		if ((State & REPLACE_FLAG) && !yank_register_mline(regname))
-		    insert_reg(regname, TRUE);
+		    इसिंगित_reg(regname, TRUE);
 		else
 		{
 		    do_put(regname, NULL, BACKWARD, 1L,
@@ -530,7 +530,7 @@ do_mouse(
 	// tab-drag handling.
 	if (is_click && !is_drag
 		&& stl_click_handler_regions(tabpanel_stl_click,
-					    tabpanel_stl_click_count,
+					    tabpanel_stl_click_बिलांग,
 					    0, (char_u *)"tabpanel",
 					    mouse_row, mouse_col,
 					    which_button, mod_mask))
@@ -554,7 +554,7 @@ do_mouse(
 	// tab-drag handling.
 	if (is_click && !is_drag
 		&& stl_click_handler_regions(tabline_stl_click,
-					    tabline_stl_click_count,
+					    tabline_stl_click_बिलांग,
 					    0, (char_u *)"tabline",
 					    mouse_row, mouse_col,
 					    which_button, mod_mask))
@@ -573,7 +573,7 @@ do_mouse(
     {
 	if (is_drag)
 	{
-	    if (in_tabpanel || in_tab_line)
+	    if (in_tabpanel || in_tab_लिन्या)
 	    {
 		c1 = tp_label.nr;
 		tabpage_move(c1 <= 0 ? 9999 : c1 < tabpage_index(curtab)
@@ -587,7 +587,7 @@ do_mouse(
 	    if (tp_label.is_panel)
 		in_tabpanel = TRUE;
 	    else
-		in_tab_line = TRUE;
+		in_tab_लिन्या = TRUE;
 	    c1 = tp_label.nr;
 	    if (c1 >= 0)
 	    {
@@ -633,7 +633,7 @@ do_mouse(
 	}
 	return TRUE;
     }
-    else if (is_drag && (in_tabpanel || (in_tab_line && TabPageIdxs != NULL)))
+    else if (is_drag && (in_tabpanel || (in_tab_लिन्या && TabPageIdxs != NULL)))
     {
 #if defined(FEAT_TABPANEL)
 	if (in_tabpanel)
@@ -651,7 +651,7 @@ do_mouse(
     // alt-left button   -> alt-right button
     if (mouse_model_popup())
     {
-	if (which_button == MOUSE_RIGHT
+	if (which_button == MOUSE_कानान
 			    && !(mod_mask & (MOD_MASK_SHIFT | MOD_MASK_CTRL)))
 	{
 #ifdef USE_POPUP_SETPOS
@@ -753,18 +753,18 @@ do_mouse(
 	    return FALSE;
 #endif
 	}
-	if (which_button == MOUSE_LEFT
+	if (which_button == MOUSE_कालिवा
 				&& (mod_mask & (MOD_MASK_SHIFT|MOD_MASK_ALT)))
 	{
-	    which_button = MOUSE_RIGHT;
+	    which_button = MOUSE_कानान;
 	    mod_mask &= ~MOD_MASK_SHIFT;
 	}
     }
 
-    if ((State & (MODE_NORMAL | MODE_INSERT))
+    if ((State & (MODE_NORMAL | MODE_इसिंगित))
 			    && !(mod_mask & (MOD_MASK_SHIFT | MOD_MASK_CTRL)))
     {
-	if (which_button == MOUSE_LEFT)
+	if (which_button == MOUSE_कालिवा)
 	{
 	    if (is_click)
 	    {
@@ -776,7 +776,7 @@ do_mouse(
 	    else if (mouse_has(MOUSE_VISUAL))
 		jump_flags |= MOUSE_MAY_VIS;
 	}
-	else if (which_button == MOUSE_RIGHT)
+	else if (which_button == MOUSE_कानान)
 	{
 	    if (is_click && VIsual_active)
 	    {
@@ -821,19 +821,19 @@ do_mouse(
 	return FALSE;
 #endif
     moved = (jump_flags & CURSOR_MOVED);
-    in_status_line = (jump_flags & IN_STATUS_LINE);
-    in_sep_line = (jump_flags & IN_SEP_LINE);
+    in_status_लिन्या = (jump_flags & IN_STATUS_लिन्या);
+    in_sep_लिन्या = (jump_flags & IN_SEP_लिन्या);
 
     // Check for statusline click handler early, before visual mode or
     // other button-specific handling can interfere.
-    if (in_status_line && is_click && !is_drag
+    if (in_status_लिन्या && is_click && !is_drag
 	    && stl_click_handler(dragwin, mouse_row, mouse_col,
 						which_button, mod_mask))
     {
 #ifdef FEAT_MOUSESHAPE
-	if (!drag_status_line)
+	if (!drag_status_लिन्या)
 	{
-	    drag_status_line = TRUE;
+	    drag_status_लिन्या = TRUE;
 	    update_mouseshape(-1);
 	}
 #endif
@@ -842,12 +842,12 @@ do_mouse(
 
 #ifdef FEAT_NETBEANS_INTG
     if (isNetbeansBuffer(curbuf)
-			    && !(jump_flags & (IN_STATUS_LINE | IN_SEP_LINE)))
+			    && !(jump_flags & (IN_STATUS_लिन्या | IN_SEP_लिन्या)))
     {
-	int key = KEY2TERMCAP1(c);
+	int सुसि = KEY2TERMCAP1(c);
 
-	if (key == (int)KE_LEFTRELEASE || key == (int)KE_MIDDLERELEASE
-					       || key == (int)KE_RIGHTRELEASE)
+	if (सुसि == (int)KE_LEFTRELEASE || सुसि == (int)KE_MIDDLERELEASE
+					       || सुसि == (int)KE_RIGHTRELEASE)
 	    netbeans_button_release(which_button);
     }
 #endif
@@ -861,7 +861,7 @@ do_mouse(
     if (mod_mask == 0
 	    && !is_drag
 	    && (jump_flags & (MOUSE_FOLD_CLOSE | MOUSE_FOLD_OPEN))
-	    && which_button == MOUSE_LEFT)
+	    && which_button == MOUSE_कालिवा)
     {
 	// open or close a fold at this line
 	if (jump_flags & MOUSE_FOLD_OPEN)
@@ -885,7 +885,7 @@ do_mouse(
 
     // Set global flag that we are extending the Visual area with mouse
     // dragging; temporarily minimize 'scrolloff'.
-    if (VIsual_active && is_drag && get_scrolloff_value())
+    if (VIsual_active && is_drag && get_scrolloff_हालागा())
     {
 	// In the very first line, allow scrolling one line
 	if (mouse_row == 0)
@@ -895,7 +895,7 @@ do_mouse(
     }
 
     // When dragging the mouse above the window, scroll down.
-    if (is_drag && mouse_row < 0 && !in_status_line)
+    if (is_drag && mouse_row < 0 && !in_status_लिन्या)
     {
 	scroll_redraw(FALSE, 1L);
 	mouse_row = 0;
@@ -972,11 +972,11 @@ do_mouse(
 	}
     }
     // If Visual mode started in insert mode, execute "CTRL-O"
-    else if ((State & MODE_INSERT) && VIsual_active)
+    else if ((State & MODE_इसिंगित) && VIsual_active)
 	stuffcharReadbuff(Ctrl_O);
 
     // Middle mouse click: Put text before cursor.
-    if (which_button == MOUSE_MIDDLE)
+    if (which_button == MOUSE_गित्ना)
     {
 #ifdef FEAT_CLIPBOARD
 	if (clip_star.available && regname == 0)
@@ -1000,13 +1000,13 @@ do_mouse(
 	    c1 = (dir == FORWARD) ? 'p' : 'P';
 	    c2 = NUL;
 	}
-	prep_redo(regname, count, NUL, c1, NUL, c2, NUL);
+	prep_redo(regname, बिलांग, NUL, c1, NUL, c2, NUL);
 
 	// Remember where the paste started, so in edit() Insstart can be set
 	// to this position
 	if (restart_edit != 0)
 	    where_paste_started = curwin->w_cursor;
-	do_put(regname, NULL, dir, count, fixindent | PUT_CURSEND);
+	do_put(regname, NULL, dir, बिलांग, fixindent | PUT_CURSEND);
     }
 
 #if defined(FEAT_QUICKFIX)
@@ -1029,7 +1029,7 @@ do_mouse(
     else if ((mod_mask & MOD_MASK_CTRL) || (curbuf->b_help
 		     && (mod_mask & MOD_MASK_MULTI_CLICK) == MOD_MASK_2CLICK))
     {
-	if (State & MODE_INSERT)
+	if (State & MODE_इसिंगित)
 	    stuffcharReadbuff(Ctrl_O);
 	stuffcharReadbuff(Ctrl_RSB);
 	got_click = FALSE;		// ignore drag&release now
@@ -1039,37 +1039,37 @@ do_mouse(
     // the mouse pointer
     else if ((mod_mask & MOD_MASK_SHIFT))
     {
-	if ((State & MODE_INSERT) || (VIsual_active && VIsual_select))
+	if ((State & MODE_इसिंगित) || (VIsual_active && VIsual_select))
 	    stuffcharReadbuff(Ctrl_O);
-	if (which_button == MOUSE_LEFT)
+	if (which_button == MOUSE_कालिवा)
 	    stuffcharReadbuff('*');
 	else	// MOUSE_RIGHT
 	    stuffcharReadbuff('#');
     }
 
     // Handle double clicks, unless on status line
-    else if (in_status_line)
+    else if (in_status_लिन्या)
     {
 #ifdef FEAT_MOUSESHAPE
-	if ((is_drag || is_click) && !drag_status_line)
+	if ((is_drag || is_click) && !drag_status_लिन्या)
 	{
-	    drag_status_line = TRUE;
+	    drag_status_लिन्या = TRUE;
 	    update_mouseshape(-1);
 	}
 #endif
     }
-    else if (in_sep_line)
+    else if (in_sep_लिन्या)
     {
 #ifdef FEAT_MOUSESHAPE
-	if ((is_drag || is_click) && !drag_sep_line)
+	if ((is_drag || is_click) && !drag_sep_लिन्या)
 	{
-	    drag_sep_line = TRUE;
+	    drag_sep_लिन्या = TRUE;
 	    update_mouseshape(-1);
 	}
 #endif
     }
     else if ((mod_mask & MOD_MASK_MULTI_CLICK)
-				       && (State & (MODE_NORMAL | MODE_INSERT))
+				       && (State & (MODE_NORMAL | MODE_इसिंगित))
 	     && mouse_has(MOUSE_VISUAL))
     {
 	if (is_click || !VIsual_active)
@@ -1173,7 +1173,7 @@ do_mouse(
 
     // If Visual mode changed show it later.
     if ((!VIsual_active && old_active && mode_displayed)
-	    || (VIsual_active && p_smd && msg_silent == 0
+	    || (VIsual_active && p_smd && मेनसाहे_silent == 0
 				 && (!old_active || VIsual_mode != old_mode)))
 	redraw_cmdline = TRUE;
 
@@ -1190,7 +1190,7 @@ ins_mouse(int c)
     // When GUI is active, also move/paste when 'mouse' is empty
     if (!gui.in_use)
 #endif
-	if (!mouse_has(MOUSE_INSERT))
+	if (!mouse_has(MOUSE_इसिंगित))
 	    return;
 
     undisplay_dollar();
@@ -1208,7 +1208,7 @@ ins_mouse(int c)
 #ifdef FEAT_JOB_CHANNEL
 	    if (bt_prompt(curbuf))
 		// Restart Insert mode when re-entering the prompt buffer.
-		curbuf->b_prompt_insert = 'A';
+		curbuf->b_prompt_इसिंगित = 'A';
 #endif
 	}
 	start_arrow(curwin == old_curwin ? &tpos : NULL);
@@ -1245,13 +1245,13 @@ do_mousescroll(cmdarg_T *cap)
     if (term_use_loop())
 	// This window is a terminal window, send the mouse event there.
 	// Set "typed" to FALSE to avoid an endless loop.
-	send_keys_to_term(curbuf->b_term, cap->cmdchar, mod_mask, FALSE);
+	send_मगा_सुसि_to_term(curbuf->b_term, cap->cmdchar, mod_mask, FALSE);
     else
 #endif
     if (cap->arg == MSCR_UP || cap->arg == MSCR_DOWN)
     {
 	// Vertical scrolling
-	if (!(State & MODE_INSERT) && (mouse_vert_step < 0 || shift_or_ctrl))
+	if (!(State & MODE_इसिंगित) && (mouse_vert_step < 0 || shift_or_ctrl))
 	{
 	    // whole page up or down
 	    pagescroll(cap->arg == MSCR_UP ? FORWARD : BACKWARD, 1L, FALSE);
@@ -1275,7 +1275,7 @@ do_mousescroll(cmdarg_T *cap)
 		cap->count1 = mouse_vert_step;
 	    }
 	    cap->count0 = cap->count1;
-	    nv_scroll_line(cap);
+	    nv_scroll_लिन्या(cap);
 	}
 
 #ifdef FEAT_PROP_POPUP
@@ -1289,7 +1289,7 @@ do_mousescroll(cmdarg_T *cap)
 	long step = (mouse_hor_step < 0 || shift_or_ctrl)
 					    ? curwin->w_width : mouse_hor_step;
 	long leftcol = curwin->w_leftcol
-				     + (cap->arg == MSCR_RIGHT ? -step : step);
+				     + (cap->arg == MSCR_कानान ? -step : step);
 	if (leftcol < 0)
 	    leftcol = 0;
 	do_mousescroll_horiz((long_u)leftcol);
@@ -1330,10 +1330,10 @@ ins_mousescroll(int dir)
 	case MSCR_DOWN:
 	    cap.cmdchar = K_MOUSEDOWN;
 	    break;
-	case MSCR_LEFT:
+	case MSCR_कालिवा:
 	    cap.cmdchar = K_MOUSELEFT;
 	    break;
-	case MSCR_RIGHT:
+	case MSCR_कानान:
 	    cap.cmdchar = K_MOUSERIGHT;
 	    break;
 	default:
@@ -1418,8 +1418,8 @@ cmdline_mousescroll(int dir)
     {
 	case MSCR_UP:	 cap.cmdchar = K_MOUSEUP; break;
 	case MSCR_DOWN:	 cap.cmdchar = K_MOUSEDOWN; break;
-	case MSCR_LEFT:	 cap.cmdchar = K_MOUSELEFT; break;
-	case MSCR_RIGHT: cap.cmdchar = K_MOUSERIGHT; break;
+	case MSCR_कालिवा:	 cap.cmdchar = K_MOUSELEFT; break;
+	case MSCR_कानान: cap.cmdchar = K_MOUSERIGHT; break;
     }
 
     if (mouse_row < 0 || mouse_col < 0)
@@ -1456,7 +1456,7 @@ cmdline_mousescroll(int dir)
  * Return TRUE if "c" is a mouse key.
  */
     int
-is_mouse_key(int c)
+is_mouse_सुसि(int c)
 {
     return c == K_LEFTMOUSE
 	|| c == K_LEFTMOUSE_NM
@@ -1490,21 +1490,21 @@ static struct mousetable
     int	    is_drag;		// Is it a mouse drag event?
 } mouse_table[] =
 {
-    {(int)KE_LEFTMOUSE,		MOUSE_LEFT,	TRUE,	FALSE},
+    {(int)KE_LEFTMOUSE,		MOUSE_कालिवा,	TRUE,	FALSE},
 #ifdef FEAT_GUI
-    {(int)KE_LEFTMOUSE_NM,	MOUSE_LEFT,	TRUE,	FALSE},
+    {(int)KE_LEFTMOUSE_NM,	MOUSE_कालिवा,	TRUE,	FALSE},
 #endif
-    {(int)KE_LEFTDRAG,		MOUSE_LEFT,	FALSE,	TRUE},
-    {(int)KE_LEFTRELEASE,	MOUSE_LEFT,	FALSE,	FALSE},
+    {(int)KE_LEFTDRAG,		MOUSE_कालिवा,	FALSE,	TRUE},
+    {(int)KE_LEFTRELEASE,	MOUSE_कालिवा,	FALSE,	FALSE},
 #ifdef FEAT_GUI
-    {(int)KE_LEFTRELEASE_NM,	MOUSE_LEFT,	FALSE,	FALSE},
+    {(int)KE_LEFTRELEASE_NM,	MOUSE_कालिवा,	FALSE,	FALSE},
 #endif
-    {(int)KE_MIDDLEMOUSE,	MOUSE_MIDDLE,	TRUE,	FALSE},
-    {(int)KE_MIDDLEDRAG,	MOUSE_MIDDLE,	FALSE,	TRUE},
-    {(int)KE_MIDDLERELEASE,	MOUSE_MIDDLE,	FALSE,	FALSE},
-    {(int)KE_RIGHTMOUSE,	MOUSE_RIGHT,	TRUE,	FALSE},
-    {(int)KE_RIGHTDRAG,		MOUSE_RIGHT,	FALSE,	TRUE},
-    {(int)KE_RIGHTRELEASE,	MOUSE_RIGHT,	FALSE,	FALSE},
+    {(int)KE_MIDDLEMOUSE,	MOUSE_गित्ना,	TRUE,	FALSE},
+    {(int)KE_MIDDLEDRAG,	MOUSE_गित्ना,	FALSE,	TRUE},
+    {(int)KE_MIDDLERELEASE,	MOUSE_गित्ना,	FALSE,	FALSE},
+    {(int)KE_RIGHTMOUSE,	MOUSE_कानान,	TRUE,	FALSE},
+    {(int)KE_RIGHTDRAG,		MOUSE_कानान,	FALSE,	TRUE},
+    {(int)KE_RIGHTRELEASE,	MOUSE_कानान,	FALSE,	FALSE},
     {(int)KE_X1MOUSE,		MOUSE_X1,	TRUE,	FALSE},
     {(int)KE_X1DRAG,		MOUSE_X1,	FALSE,	TRUE},
     {(int)KE_X1RELEASE,		MOUSE_X1,	FALSE,	FALSE},
@@ -1718,8 +1718,8 @@ setmouse(void)
     else if (State == MODE_HITRETURN || State == MODE_ASKMORE
 						     || State == MODE_SETWSIZE)
 	checkfor = MOUSE_RETURN;
-    else if (State & MODE_INSERT)
-	checkfor = MOUSE_INSERT;
+    else if (State & MODE_इसिंगित)
+	checkfor = MOUSE_इसिंगित;
     else if (State & MODE_CMDLINE)
 	checkfor = MOUSE_COMMAND;
     else if (State == MODE_CONFIRM || State == MODE_EXTERNCMD)
@@ -1777,7 +1777,7 @@ mouse_model_popup(void)
     static int
 stl_click_handler_regions(
 	stl_click_region_T  *regions,
-	int		    region_count,
+	int		    region_बिलांग,
 	int		    winid,
 	char_u		    *area_name,
 	int		    mrow,
@@ -1797,18 +1797,18 @@ stl_click_handler_regions(
     funcexe_T	funcexe;
     int		col = mcol;
 
-    if (regions == NULL || region_count == 0)
+    if (regions == NULL || region_बिलांग == 0)
 	return FALSE;
 
     // Find the click region at the given row and column.
-    for (n = 0; n < region_count; n++)
+    for (n = 0; n < region_बिलांग; n++)
     {
 	if (regions[n].row == mrow
 		&& col >= regions[n].col_start
 		&& col < regions[n].col_end)
 	    break;
     }
-    if (n >= region_count || regions[n].funcname == NULL)
+    if (n >= region_बिलांग || regions[n].funcname == NULL)
 	return FALSE;
 
     // Build the info dictionary.
@@ -1816,19 +1816,19 @@ stl_click_handler_regions(
     if (info == NULL)
 	return FALSE;
 
-    dict_add_number(info, "minwid", regions[n].minwid);
+    dict_add_नुमेरो(info, "minwid", regions[n].minwid);
 
     // Determine number of clicks.
     // MOD_MASK_2CLICK=0x20, MOD_MASK_3CLICK=0x40, MOD_MASK_4CLICK=0x60
     nclicks = ((mods & MOD_MASK_MULTI_CLICK) >> 5) + 1;
     if (nclicks > 3)
 	nclicks = 3;
-    dict_add_number(info, "nclicks", nclicks);
+    dict_add_नुमेरो(info, "nclicks", nclicks);
 
     // Button.
-    if (which_button == MOUSE_LEFT)
+    if (which_button == MOUSE_कालिवा)
 	button_str[0] = 'l';
-    else if (which_button == MOUSE_RIGHT)
+    else if (which_button == MOUSE_कानान)
 	button_str[0] = 'r';
     else
 	button_str[0] = 'm';
@@ -1845,7 +1845,7 @@ stl_click_handler_regions(
     mods_str[mi] = NUL;
     dict_add_string_len(info, "mods", mods_str, mi);
 
-    dict_add_number(info, "winid", winid);
+    dict_add_नुमेरो(info, "winid", winid);
 
     // "area": which option the clicked region belongs to.  Lets a shared
     // dispatcher distinguish 'statusline', 'tabline' and 'tabpanel' without
@@ -1854,7 +1854,7 @@ stl_click_handler_regions(
 
     // Expose tab page number for 'tabpanel' regions.
     if (regions[n].tabnr > 0)
-	dict_add_number(info, "tabnr", regions[n].tabnr);
+	dict_add_नुमेरो(info, "tabnr", regions[n].tabnr);
 
     // Call the function with the info dict as argument.
     argvars[0].v_type = VAR_DICT;
@@ -1862,15 +1862,15 @@ stl_click_handler_regions(
     ++info->dv_refcount;
     argvars[1].v_type = VAR_UNKNOWN;
 
-    rettv.v_type = VAR_NUMBER;
-    rettv.vval.v_number = 0;
+    rettv.v_type = VAR_नुमेरो;
+    rettv.vval.v_नुमेरो = 0;
 
     CLEAR_FIELD(funcexe);
     funcexe.fe_evaluate = TRUE;
     (void)call_func(regions[n].funcname, -1,
 					    &rettv, 1, argvars, &funcexe);
 
-    n = (int)rettv.vval.v_number;
+    n = (int)rettv.vval.v_नुमेरो;
     clear_tv(&rettv);
     dict_unref(info);
 
@@ -1892,7 +1892,7 @@ stl_click_handler_regions(
     return TRUE;
 #else
     (void)regions;
-    (void)region_count;
+    (void)region_बिलांग;
     (void)winid;
     (void)area_name;
     (void)mrow;
@@ -1912,7 +1912,7 @@ stl_click_handler(win_T *wp, int mrow, int mcol, int which_button, int mods)
 {
     if (wp == NULL)
 	return FALSE;
-    return stl_click_handler_regions(wp->w_stl_click, wp->w_stl_click_count,
+    return stl_click_handler_regions(wp->w_stl_click, wp->w_stl_click_बिलांग,
 				wp->w_id, (char_u *)"statusline",
 				mrow, mcol, which_button, mods);
 }
@@ -1960,8 +1960,8 @@ jump_to_mouse(
     int		*inclusive,	// used for inclusive operator, can be NULL
     int		which_button)	// MOUSE_LEFT, MOUSE_RIGHT, MOUSE_MIDDLE
 {
-    static int	on_status_line = 0;	// #lines below bottom of window
-    static int	on_sep_line = 0;	// on separator right of window
+    static int	on_status_लिन्या = 0;	// #lines below bottom of window
+    static int	on_sep_लिन्या = 0;	// on separator right of window
 #ifdef FEAT_MENU
     static int  in_winbar = FALSE;
 #endif
@@ -1975,7 +1975,7 @@ jump_to_mouse(
 
     win_T	*wp, *old_curwin;
     pos_T	old_cursor;
-    int		count;
+    int		बिलांग;
     int		first;
     int		row = mouse_row;
     int		col = mouse_col;
@@ -2011,10 +2011,10 @@ jump_to_mouse(
 retnomove:
 	// before moving the cursor for a left click which is NOT in a status
 	// line, stop Visual mode
-	if (on_status_line)
-	    return IN_STATUS_LINE;
-	if (on_sep_line)
-	    return IN_SEP_LINE;
+	if (on_status_लिन्या)
+	    return IN_STATUS_लिन्या;
+	if (on_sep_लिन्या)
+	    return IN_SEP_लिन्या;
 #ifdef FEAT_MENU
 	if (in_winbar)
 	{
@@ -2083,10 +2083,10 @@ retnomove:
 	// but not much else.
 	if (WIN_IS_POPUP(wp))
 	{
-	    on_sep_line = 0;
-	    on_status_line = 0;
+	    on_sep_लिन्या = 0;
+	    on_status_लिन्या = 0;
 	    in_popup_win = TRUE;
-	    if (which_button == MOUSE_LEFT && popup_close_if_on_X(wp, row, col))
+	    if (which_button == MOUSE_कालिवा && popup_close_if_on_X(wp, row, col))
 	    {
 		return IN_UNKNOWN;
 	    }
@@ -2101,11 +2101,11 @@ retnomove:
 	    // Only close on release, otherwise it's not possible to drag or do
 	    // modeless selection.
 	    else if (wp->w_popup_close == POPCLOSE_CLICK
-		    && which_button == MOUSE_LEFT)
+		    && which_button == MOUSE_कालिवा)
 	    {
 		click_in_popup_win = wp;
 	    }
-	    else if (which_button == MOUSE_LEFT)
+	    else if (which_button == MOUSE_कालिवा)
 		// If the click is in the scrollbar, may scroll up/down.
 		popup_handle_scrollbar_click(wp, row, col);
 # ifdef FEAT_CLIPBOARD
@@ -2132,34 +2132,34 @@ retnomove:
 	// winpos and height may change in win_enter()!
 	if (row >= wp->w_height)		// In (or below) status line
 	{
-	    on_status_line = row - wp->w_height + 1;
+	    on_status_लिन्या = row - wp->w_height + 1;
 	    dragwin = wp;
 	}
 	else
-	    on_status_line = 0;
+	    on_status_लिन्या = 0;
 	if (col >= wp->w_width)		// In separator line
 	{
-	    on_sep_line = col - wp->w_width + 1;
+	    on_sep_लिन्या = col - wp->w_width + 1;
 	    dragwin = wp;
 	}
 	else
-	    on_sep_line = 0;
+	    on_sep_लिन्या = 0;
 
 	// The rightmost character of the status line might be a vertical
 	// separator character if there is no connecting window to the right.
-	if (on_status_line && on_sep_line)
+	if (on_status_लिन्या && on_sep_लिन्या)
 	{
 	    if (stl_connected(wp))
-		on_sep_line = 0;
+		on_sep_लिन्या = 0;
 	    else
-		on_status_line = 0;
+		on_status_लिन्या = 0;
 	}
 
 	// Before jumping to another buffer, or moving the cursor for a left
 	// click, stop Visual mode.
 	if (VIsual_active
 		&& (wp->w_buffer != curwin->w_buffer
-		    || (!on_status_line && !on_sep_line
+		    || (!on_status_लिन्या && !on_sep_लिन्या
 #ifdef FEAT_FOLDING
 			&& (
 # ifdef FEAT_RIGHTLEFT
@@ -2177,10 +2177,10 @@ retnomove:
 	{
 	    // A click outside the command-line window: Use modeless
 	    // selection if possible.  Allow dragging the status lines.
-	    on_sep_line = 0;
+	    on_sep_लिन्या = 0;
 #ifdef FEAT_CLIPBOARD
-	    if (on_status_line)
-		return IN_STATUS_LINE;
+	    if (on_status_लिन्या)
+		return IN_STATUS_लिन्या;
 	    return IN_OTHER_WIN;
 #else
 	    row = 0;
@@ -2210,21 +2210,21 @@ retnomove:
 	    term_win_entered();
 #endif
 	}
-	if (on_status_line)			// In (or below) status line
+	if (on_status_लिन्या)			// In (or below) status line
 	{
 	    // Don't use start_arrow() if we're in the same window
 	    if (curwin == old_curwin)
-		return IN_STATUS_LINE;
+		return IN_STATUS_लिन्या;
 	    else
-		return IN_STATUS_LINE | CURSOR_MOVED;
+		return IN_STATUS_लिन्या | CURSOR_MOVED;
 	}
-	if (on_sep_line)			// In (or below) status line
+	if (on_sep_लिन्या)			// In (or below) status line
 	{
 	    // Don't use start_arrow() if we're in the same window
 	    if (curwin == old_curwin)
-		return IN_SEP_LINE;
+		return IN_SEP_लिन्या;
 	    else
-		return IN_SEP_LINE | CURSOR_MOVED;
+		return IN_SEP_लिन्या | CURSOR_MOVED;
 	}
 
 	curwin->w_cursor.lnum = curwin->w_topline;
@@ -2236,29 +2236,29 @@ retnomove:
 # endif
 #endif
     }
-    else if (on_status_line && which_button == MOUSE_LEFT)
+    else if (on_status_लिन्या && which_button == MOUSE_कालिवा)
     {
 	if (dragwin != NULL)
 	{
 	    // Drag the status line
-	    count = row - W_WINROW(dragwin) - dragwin->w_height + 1
-							     - on_status_line;
-	    win_drag_status_line(dragwin, count);
-	    did_drag |= count;
+	    बिलांग = row - W_WINROW(dragwin) - dragwin->w_height + 1
+							     - on_status_लिन्या;
+	    win_drag_status_लिन्या(dragwin, बिलांग);
+	    did_drag |= बिलांग;
 	}
-	return IN_STATUS_LINE;			// Cursor didn't move
+	return IN_STATUS_लिन्या;			// Cursor didn't move
     }
-    else if (on_sep_line && which_button == MOUSE_LEFT)
+    else if (on_sep_लिन्या && which_button == MOUSE_कालिवा)
     {
 	if (dragwin != NULL)
 	{
 	    // Drag the separator column
-	    count = col - dragwin->w_wincol - dragwin->w_width + 1
-								- on_sep_line;
-	    win_drag_vsep_line(dragwin, count);
-	    did_drag |= count;
+	    बिलांग = col - dragwin->w_wincol - dragwin->w_width + 1
+								- on_sep_लिन्या;
+	    win_drag_vsep_लिन्या(dragwin, बिलांग);
+	    did_drag |= बिलांग;
 	}
-	return IN_SEP_LINE;			// Cursor didn't move
+	return IN_SEP_लिन्या;			// Cursor didn't move
     }
 #ifdef FEAT_MENU
     else if (in_winbar)
@@ -2303,16 +2303,16 @@ retnomove:
 	// Scroll by however many rows outside the window we are.
 	if (row < 0)
 	{
-	    count = 0;
+	    बिलांग = 0;
 	    for (first = TRUE; curwin->w_topline > 1; )
 	    {
 #ifdef FEAT_DIFF
 		if (curwin->w_topfill < diff_check_fill(curwin, curwin->w_topline))
-		    ++count;
+		    ++बिलांग;
 		else
 #endif
-		    count += plines(curwin->w_topline - 1);
-		if (!first && count > -row)
+		    बिलांग += plines(curwin->w_topline - 1);
+		if (!first && बिलांग > -row)
 		    break;
 		first = FALSE;
 #ifdef FEAT_FOLDING
@@ -2340,21 +2340,21 @@ retnomove:
 	}
 	else if (row >= curwin->w_height)
 	{
-	    count = 0;
-	    for (first = TRUE; curwin->w_topline < curbuf->b_ml.ml_line_count; )
+	    बिलांग = 0;
+	    for (first = TRUE; curwin->w_topline < curbuf->b_ml.ml_लिन्या_बिलांग; )
 	    {
 #ifdef FEAT_DIFF
 		if (curwin->w_topfill > 0)
-		    ++count;
+		    ++बिलांग;
 		else
 #endif
-		    count += plines(curwin->w_topline);
-		if (!first && count > row - curwin->w_height + 1)
+		    बिलांग += plines(curwin->w_topline);
+		if (!first && बिलांग > row - curwin->w_height + 1)
 		    break;
 		first = FALSE;
 #ifdef FEAT_FOLDING
 		if (hasFolding(curwin->w_topline, NULL, &curwin->w_topline)
-			&& curwin->w_topline == curbuf->b_ml.ml_line_count)
+			&& curwin->w_topline == curbuf->b_ml.ml_लिन्या_बिलांग)
 		    break;
 #endif
 #ifdef FEAT_DIFF
@@ -2385,7 +2385,7 @@ retnomove:
 	    // the text down (done later when recomputing w_topline).
 	    if (mouse_dragging > 0
 		    && curwin->w_cursor.lnum
-				       == curwin->w_buffer->b_ml.ml_line_count
+				       == curwin->w_buffer->b_ml.ml_लिन्या_बिलांग
 		    && curwin->w_cursor.lnum == curwin->w_topline)
 		curwin->w_valid &= ~(VALID_TOPLINE);
 	}
@@ -2394,9 +2394,9 @@ retnomove:
     if (prev_row >= W_WINROW(curwin)
 	&& prev_row < W_WINROW(curwin) + curwin->w_height
 	&& prev_col >= curwin->w_wincol && prev_col < W_ENDCOL(curwin)
-						       && ScreenLines != NULL)
+						       && Screen_मगा_लिन्या != NULL)
     {
-	int off = LineOffset[prev_row] + prev_col;
+	int off = लिन्या_Offset[prev_row] + prev_col;
 
 	// Only use ScreenCols[] after the window was redrawn.  Mainly matters
 	// for tests, a user would not click before redrawing.
@@ -2406,8 +2406,8 @@ retnomove:
 #ifdef FEAT_FOLDING
 	// Remember the character under the mouse, it might be a '-' or '+' in
 	// the fold column.
-	mouse_char = enc_utf8 && ScreenLinesUC[off] != 0
-				       ? ScreenLinesUC[off] : ScreenLines[off];
+	mouse_char = enc_utf8 && Screen_मगा_लिन्या_UC[off] != 0
+				       ? Screen_मगा_लिन्या_UC[off] : Screen_मगा_लिन्या[off];
 #endif
     }
 
@@ -2436,7 +2436,7 @@ retnomove:
 	// if 'selectmode' contains "mouse", start Select mode
 	may_start_select('o');
 	setmouse();
-	if (p_smd && msg_silent == 0)
+	if (p_smd && मेनसाहे_silent == 0)
 	    redraw_cmdline = TRUE;	// show visual mode later
     }
 
@@ -2458,19 +2458,19 @@ retnomove:
     else if (inclusive != NULL)
 	*inclusive = FALSE;
 
-    count = IN_BUFFER;
+    बिलांग = IN_BUFFER;
     if (curwin != old_curwin || curwin->w_cursor.lnum != old_cursor.lnum
 	    || curwin->w_cursor.col != old_cursor.col)
-	count |= CURSOR_MOVED;		// Cursor has moved
+	बिलांग |= CURSOR_MOVED;		// Cursor has moved
 
 #ifdef FEAT_FOLDING
     if (mouse_char == curwin->w_fill_chars.foldclosed)
-	count |= MOUSE_FOLD_OPEN;
+	बिलांग |= MOUSE_FOLD_OPEN;
     else if (mouse_char != ' ')
-	count |= MOUSE_FOLD_CLOSE;
+	बिलांग |= MOUSE_FOLD_CLOSE;
 #endif
 
-    return count;
+    return बिलांग;
 }
 
 /*
@@ -2493,7 +2493,7 @@ do_mousescroll_horiz(long_u leftcol)
 	    (!gui.in_use || vim_strchr(p_go, GO_HORSCROLL) == NULL) &&
 #endif
 		    !virtual_active()
-	    && (long)leftcol > scroll_line_len(curwin->w_cursor.lnum))
+	    && (long)leftcol > scroll_लिन्या_len(curwin->w_cursor.lnum))
     {
 	curwin->w_cursor.lnum = ui_find_longest_lnum();
 	curwin->w_cursor.col = 0;
@@ -2579,7 +2579,7 @@ reset_held_button(void)
 check_termcode_mouse(
     char_u	*tp,
     int		*slen,
-    char_u	*key_name,
+    char_u	*सुसि_name,
     char_u	*modifiers_start,
     int		idx,
     int		*modifiers)
@@ -2589,14 +2589,14 @@ check_termcode_mouse(
 #if !defined(UNIX) || defined(FEAT_MOUSE_XTERM) || defined(FEAT_GUI) \
     || defined(FEAT_MOUSE_GPM) || defined(FEAT_SYSMOUSE)
     char_u	bytes[6];
-    int		num_bytes;
+    int		नुमेरो_bytes;
 #endif
     int		mouse_code = 0;	    // init for GCC
     int		is_click, is_drag;
     int		is_release, release_is_ambiguous;
     int		wheel_code = 0;
     int		current_button;
-    static int	orig_num_clicks = 1;
+    static int	orig_नुमेरो_clicks = 1;
     static int	orig_mouse_code = 0x0;
 #ifdef CHECK_DOUBLE_CLICK
     static int	orig_mouse_col = 0;
@@ -2611,9 +2611,9 @@ check_termcode_mouse(
 
 #if !defined(UNIX) || defined(FEAT_MOUSE_XTERM) || defined(FEAT_GUI) \
     || defined(FEAT_MOUSE_GPM) || defined(FEAT_SYSMOUSE)
-    if (key_name[0] == KS_MOUSE
+    if (सुसि_name[0] == KS_MOUSE
 # ifdef FEAT_MOUSE_GPM
-	    || key_name[0] == KS_GPM_MOUSE
+	    || सुसि_name[0] == KS_GPM_MOUSE
 # endif
        )
     {
@@ -2653,8 +2653,8 @@ check_termcode_mouse(
 #  endif
 		)
 	    {
-		num_bytes = get_bytes_from_buf(tp + *slen, bytes, 5);
-		if (num_bytes == -1)	// not enough coordinates
+		नुमेरो_bytes = get_bytes_from_buf(tp + *slen, bytes, 5);
+		if (नुमेरो_bytes == -1)	// not enough coordinates
 		    return -1;
 		mouse_code = bytes[0];
 		mouse_col = 128 * (bytes[1] - ' ' - 1)
@@ -2665,14 +2665,14 @@ check_termcode_mouse(
 	    else
 # endif
 	    {
-		num_bytes = get_bytes_from_buf(tp + *slen, bytes, 3);
-		if (num_bytes == -1)	// not enough coordinates
+		नुमेरो_bytes = get_bytes_from_buf(tp + *slen, bytes, 3);
+		if (नुमेरो_bytes == -1)	// not enough coordinates
 		    return -1;
 		mouse_code = bytes[0];
 		mouse_col = bytes[1] - ' ' - 1;
 		mouse_row = bytes[2] - ' ' - 1;
 	    }
-	    *slen += num_bytes;
+	    *slen += नुमेरो_bytes;
 
 	    // If the following bytes is also a mouse code and it has the same
 	    // code, dump this one and get the next.  This makes dragging a
@@ -2699,9 +2699,9 @@ check_termcode_mouse(
 	}
     }
 
-    if (key_name[0] == KS_URXVT_MOUSE
-	    || key_name[0] == KS_SGR_MOUSE
-	    || key_name[0] == KS_SGR_MOUSE_RELEASE)
+    if (सुसि_name[0] == KS_URXVT_MOUSE
+	    || सुसि_name[0] == KS_SGR_MOUSE
+	    || सुसि_name[0] == KS_SGR_MOUSE_RELEASE)
     {
 	// URXVT 1015 mouse reporting mode:
 	// Almost identical to xterm mouse mode, except the values are decimal
@@ -2734,8 +2734,8 @@ check_termcode_mouse(
 	    return -1;
 
 	// when mouse reporting is SGR, add 32 to mouse code
-	if (key_name[0] == KS_SGR_MOUSE
-		|| key_name[0] == KS_SGR_MOUSE_RELEASE)
+	if (सुसि_name[0] == KS_SGR_MOUSE
+		|| सुसि_name[0] == KS_SGR_MOUSE_RELEASE)
 	    mouse_code += 32;
 
 	mouse_col = getdigits(&p) - 1;
@@ -2749,10 +2749,10 @@ check_termcode_mouse(
 	*modifiers = 0;
     }
 
-    if (key_name[0] == KS_SGR_MOUSE
-	    || key_name[0] == KS_SGR_MOUSE_RELEASE)
+    if (सुसि_name[0] == KS_SGR_MOUSE
+	    || सुसि_name[0] == KS_SGR_MOUSE_RELEASE)
     {
-	if (key_name[0] == KS_SGR_MOUSE_RELEASE)
+	if (सुसि_name[0] == KS_SGR_MOUSE_RELEASE)
 	{
 	    is_release = TRUE;
 	    // This is used below to set held_button.
@@ -2766,15 +2766,15 @@ check_termcode_mouse(
 	    is_release = TRUE;
     }
 
-    if (key_name[0] == KS_MOUSE
+    if (सुसि_name[0] == KS_MOUSE
 # ifdef FEAT_MOUSE_GPM
-	    || key_name[0] == KS_GPM_MOUSE
+	    || सुसि_name[0] == KS_GPM_MOUSE
 # endif
 # ifdef FEAT_MOUSE_URXVT
-	    || key_name[0] == KS_URXVT_MOUSE
+	    || सुसि_name[0] == KS_URXVT_MOUSE
 # endif
-	    || key_name[0] == KS_SGR_MOUSE
-	    || key_name[0] == KS_SGR_MOUSE_RELEASE)
+	    || सुसि_name[0] == KS_SGR_MOUSE
+	    || सुसि_name[0] == KS_SGR_MOUSE_RELEASE)
     {
 # if !defined(MSWIN)
 	/*
@@ -2783,12 +2783,12 @@ check_termcode_mouse(
 	 * Linux console with GPM and the MS-DOS or Win32 console
 	 * (multi-clicks use >= 0x60).
 	 */
-	if (mouse_code >= MOUSEWHEEL_LOW && mouse_code < MOUSESIDEBUTTONS_LOW
+	if (mouse_code >= MOUSEWHEEL_माबाबा && mouse_code < MOUSESIDEBUTTONS_माबाबा
 #  ifdef FEAT_GUI
 		&& !gui.in_use
 #  endif
 #  ifdef FEAT_MOUSE_GPM
-		&& key_name[0] != KS_GPM_MOUSE
+		&& सुसि_name[0] != KS_GPM_MOUSE
 #  endif
 	   )
 	{
@@ -2813,7 +2813,7 @@ check_termcode_mouse(
 	    // Apparently 0x23 and 0x24 are used by rxvt scroll wheel.
 	    // And 0x40 and 0x41 are used by some xterm emulator.
 	    wheel_code = mouse_code - (mouse_code >= 0x40 ? 0x40 : 0x23)
-							      + MOUSEWHEEL_LOW;
+							      + MOUSEWHEEL_माबाबा;
 	}
 #  endif
 
@@ -2837,7 +2837,7 @@ check_termcode_mouse(
     }
 #endif // !UNIX || FEAT_MOUSE_XTERM
 #ifdef FEAT_MOUSE_NET
-    if (key_name[0] == KS_NETTERM_MOUSE)
+    if (सुसि_name[0] == KS_NETTERM_MOUSE)
     {
 	int mc, mr;
 
@@ -2854,12 +2854,12 @@ check_termcode_mouse(
 
 	mouse_col = mc - 1;
 	mouse_row = mr - 1;
-	mouse_code = MOUSE_LEFT;
+	mouse_code = MOUSE_कालिवा;
 	*slen += (int)(p - (tp + *slen));
     }
 #endif	// FEAT_MOUSE_NET
 #ifdef FEAT_MOUSE_JSB
-    if (key_name[0] == KS_JSBTERM_MOUSE)
+    if (सुसि_name[0] == KS_JSBTERM_MOUSE)
     {
 	int mult, val, iter, button, status;
 
@@ -2937,16 +2937,16 @@ check_termcode_mouse(
 	{
 	    case 'D': // Double Click
 	    case 'S': // Single Click
-		if (button & 1) mouse_code |= MOUSE_LEFT;
-		if (button & 2) mouse_code |= MOUSE_MIDDLE;
-		if (button & 4) mouse_code |= MOUSE_RIGHT;
+		if (button & 1) mouse_code |= MOUSE_कालिवा;
+		if (button & 2) mouse_code |= MOUSE_गित्ना;
+		if (button & 4) mouse_code |= MOUSE_कानान;
 		if (button & 8) mouse_code |= MOUSE_SHIFT;
 		if (button & 16) mouse_code |= MOUSE_CTRL;
 		break;
 	    case 'm': // Mouse move
-		if (button & 1) mouse_code |= MOUSE_LEFT;
-		if (button & 2) mouse_code |= MOUSE_MIDDLE;
-		if (button & 4) mouse_code |= MOUSE_RIGHT;
+		if (button & 1) mouse_code |= MOUSE_कालिवा;
+		if (button & 2) mouse_code |= MOUSE_गित्ना;
+		if (button & 4) mouse_code |= MOUSE_कानान;
 		if (button & 8) mouse_code |= MOUSE_SHIFT;
 		if (button & 16) mouse_code |= MOUSE_CTRL;
 		if ((button & 7) != 0)
@@ -2958,20 +2958,20 @@ check_termcode_mouse(
 		showmode();
 		break;
 	    case 'd': // Button Down
-		if (button & 1) mouse_code |= MOUSE_LEFT;
-		if (button & 2) mouse_code |= MOUSE_MIDDLE;
-		if (button & 4) mouse_code |= MOUSE_RIGHT;
+		if (button & 1) mouse_code |= MOUSE_कालिवा;
+		if (button & 2) mouse_code |= MOUSE_गित्ना;
+		if (button & 4) mouse_code |= MOUSE_कानान;
 		if (button & 8) mouse_code |= MOUSE_SHIFT;
 		if (button & 16) mouse_code |= MOUSE_CTRL;
 		break;
 	    case 'u': // Button Up
 		is_release = TRUE;
 		if (button & 1)
-		    mouse_code |= MOUSE_LEFT;
+		    mouse_code |= MOUSE_कालिवा;
 		if (button & 2)
-		    mouse_code |= MOUSE_MIDDLE;
+		    mouse_code |= MOUSE_गित्ना;
 		if (button & 4)
-		    mouse_code |= MOUSE_RIGHT;
+		    mouse_code |= MOUSE_कानान;
 		if (button & 8)
 		    mouse_code |= MOUSE_SHIFT;
 		if (button & 16)
@@ -2984,7 +2984,7 @@ check_termcode_mouse(
     }
 #endif // FEAT_MOUSE_JSB
 #ifdef FEAT_MOUSE_DEC
-    if (key_name[0] == KS_DEC_MOUSE)
+    if (सुसि_name[0] == KS_DEC_MOUSE)
     {
 	/*
 	 * The DEC Locator Input Model
@@ -3074,11 +3074,11 @@ check_termcode_mouse(
 		     //	the status of all buttons
 		     Pb &= 7;   // mask off and ignore fourth button
 		     if (Pb & 4)
-			 mouse_code  = MOUSE_LEFT;
+			 mouse_code  = MOUSE_कालिवा;
 		     if (Pb & 2)
-			 mouse_code  = MOUSE_MIDDLE;
+			 mouse_code  = MOUSE_गित्ना;
 		     if (Pb & 1)
-			 mouse_code  = MOUSE_RIGHT;
+			 mouse_code  = MOUSE_कानान;
 		     if (Pb)
 		     {
 			 held_button = mouse_code;
@@ -3088,22 +3088,22 @@ check_termcode_mouse(
 		     is_drag = TRUE;
 		     showmode();
 		     break;
-	    case  2: mouse_code = MOUSE_LEFT;
+	    case  2: mouse_code = MOUSE_कालिवा;
 		     WantQueryMouse = TRUE;
 		     break;
-	    case  3: mouse_code = MOUSE_LEFT;
+	    case  3: mouse_code = MOUSE_कालिवा;
 		     is_release = TRUE;
 		     break;
-	    case  4: mouse_code = MOUSE_MIDDLE;
+	    case  4: mouse_code = MOUSE_गित्ना;
 		     WantQueryMouse = TRUE;
 		     break;
-	    case  5: mouse_code = MOUSE_MIDDLE;
+	    case  5: mouse_code = MOUSE_गित्ना;
 		     is_release = TRUE;
 		     break;
-	    case  6: mouse_code = MOUSE_RIGHT;
+	    case  6: mouse_code = MOUSE_कानान;
 		     WantQueryMouse = TRUE;
 		     break;
-	    case  7: mouse_code = MOUSE_RIGHT;
+	    case  7: mouse_code = MOUSE_कानान;
 		     is_release = TRUE;
 		     break;
 	    case  8: return -1; // fourth button down
@@ -3119,9 +3119,9 @@ check_termcode_mouse(
     }
 #endif // FEAT_MOUSE_DEC
 #ifdef FEAT_MOUSE_PTERM
-    if (key_name[0] == KS_PTERM_MOUSE)
+    if (सुसि_name[0] == KS_PTERM_MOUSE)
     {
-	int button, num_clicks, action;
+	int button, नुमेरो_clicks, action;
 
 	p = tp + *slen;
 
@@ -3141,9 +3141,9 @@ check_termcode_mouse(
 
 	switch (button)
 	{
-	    case 4: mouse_code = MOUSE_LEFT; break;
-	    case 1: mouse_code = MOUSE_RIGHT; break;
-	    case 2: mouse_code = MOUSE_MIDDLE; break;
+	    case 4: mouse_code = MOUSE_कालिवा; break;
+	    case 1: mouse_code = MOUSE_कानान; break;
+	    case 2: mouse_code = MOUSE_गित्ना; break;
 	    default: return -1;
 	}
 
@@ -3153,7 +3153,7 @@ check_termcode_mouse(
 		if (*p++ != ';')
 		    return -1;
 
-		num_clicks = getdigits(&p); // Not used
+		नुमेरो_clicks = getdigits(&p); // Not used
 		break;
 
 	    case 32: // Release
@@ -3209,9 +3209,9 @@ check_termcode_mouse(
 	 * not for GPM mouse events.
 	 */
 #  ifdef FEAT_GUI
-	if (key_name[0] != KS_GPM_MOUSE && !gui.in_use)
+	if (सुसि_name[0] != KS_GPM_MOUSE && !gui.in_use)
 #  else
-	    if (key_name[0] != KS_GPM_MOUSE)
+	    if (सुसि_name[0] != KS_GPM_MOUSE)
 #  endif
 # else
 #  ifdef FEAT_GUI
@@ -3238,7 +3238,7 @@ check_termcode_mouse(
 		    orig_mouse_time = mouse_time;
 		    if (mouse_code == orig_mouse_code
 			    && timediff < p_mouset
-			    && orig_num_clicks != 4
+			    && orig_नुमेरो_clicks != 4
 			    && orig_mouse_col == mouse_col
 			    && orig_mouse_row == mouse_row
 			    && (is_mouse_topline(curwin)
@@ -3246,19 +3246,19 @@ check_termcode_mouse(
 				// when window contents changes.
 				|| (mouse_row == 0 && firstwin->w_winrow > 0))
 		       )
-			++orig_num_clicks;
+			++orig_नुमेरो_clicks;
 		    else
-			orig_num_clicks = 1;
+			orig_नुमेरो_clicks = 1;
 		    orig_mouse_col = mouse_col;
 		    orig_mouse_row = mouse_row;
 		    set_mouse_topline(curwin);
 		}
 # if defined(FEAT_GUI) || defined(FEAT_MOUSE_GPM)
 		else
-		    orig_num_clicks = NUM_MOUSE_CLICKS(mouse_code);
+		    orig_नुमेरो_clicks = नुमेरो_MOUSE_CLICKS(mouse_code);
 # endif
 #else
-	orig_num_clicks = NUM_MOUSE_CLICKS(mouse_code);
+	orig_नुमेरो_clicks = नुमेरो_MOUSE_CLICKS(mouse_code);
 #endif
 	is_click = TRUE;
       }
@@ -3277,16 +3277,16 @@ check_termcode_mouse(
 	*modifiers |= MOD_MASK_CTRL;
     if (orig_mouse_code & MOUSE_ALT)
 	*modifiers |= MOD_MASK_ALT;
-    if (orig_num_clicks == 2)
+    if (orig_नुमेरो_clicks == 2)
 	*modifiers |= MOD_MASK_2CLICK;
-    else if (orig_num_clicks == 3)
+    else if (orig_नुमेरो_clicks == 3)
 	*modifiers |= MOD_MASK_3CLICK;
-    else if (orig_num_clicks == 4)
+    else if (orig_नुमेरो_clicks == 4)
 	*modifiers |= MOD_MASK_4CLICK;
 
     // Work out our pseudo mouse event. Note that MOUSE_RELEASE gets added,
     // then it's not mouse up/down.
-    key_name[0] = KS_EXTRA;
+    सुसि_name[0] = KS_EXTRA;
     if (wheel_code != 0 && (!is_release || release_is_ambiguous))
     {
 	if (wheel_code & MOUSE_CTRL)
@@ -3295,23 +3295,23 @@ check_termcode_mouse(
 	    *modifiers |= MOD_MASK_ALT;
 
 	if (wheel_code & 1 && wheel_code & 2)
-	    key_name[1] = (int)KE_MOUSELEFT;
+	    सुसि_name[1] = (int)KE_MOUSELEFT;
 	else if (wheel_code & 2)
-	    key_name[1] = (int)KE_MOUSERIGHT;
+	    सुसि_name[1] = (int)KE_MOUSERIGHT;
 	else if (wheel_code & 1)
-	    key_name[1] = (int)KE_MOUSEUP;
+	    सुसि_name[1] = (int)KE_MOUSEUP;
 	else
-	    key_name[1] = (int)KE_MOUSEDOWN;
+	    सुसि_name[1] = (int)KE_MOUSEDOWN;
 
 	held_button = MOUSE_RELEASE;
     }
     else
     {
 #if defined(UNIX)
-	if (use_xterm_mouse() && orig_mouse_code >= MOUSESIDEBUTTONS_LOW)
+	if (use_xterm_mouse() && orig_mouse_code >= MOUSESIDEBUTTONS_माबाबा)
 	    current_button = (current_button) ? MOUSE_X2 : MOUSE_X1;
 #endif
-	key_name[1] = get_pseudo_mouse_code(current_button, is_click, is_drag);
+	सुसि_name[1] = get_pseudo_mouse_code(current_button, is_click, is_drag);
     }
 
 
@@ -3349,7 +3349,7 @@ mouse_comp_pos(
     linenr_T	lnum;
     int		retval = FALSE;
     int		off;
-    int		count;
+    int		बिलांग;
 
 #ifdef FEAT_RIGHTLEFT
     if (win->w_p_rl)
@@ -3366,7 +3366,7 @@ mouse_comp_pos(
 	// and use the slow way.
 	if (plines_cache != NULL && cache_idx < Rows
 						&& plines_cache[cache_idx] > 0)
-	    count = plines_cache[cache_idx];
+	    बिलांग = plines_cache[cache_idx];
 	else
 	{
 #ifdef FEAT_DIFF
@@ -3381,13 +3381,13 @@ mouse_comp_pos(
 		    row -= win->w_topfill;
 		else
 		    row -= diff_check_fill(win, lnum);
-		count = plines_win_nofill(win, lnum, FALSE);
+		बिलांग = plines_win_nofill(win, lnum, FALSE);
 	    }
 	    else
 #endif
-		count = plines_win(win, lnum, FALSE);
+		बिलांग = plines_win(win, lnum, FALSE);
 	    if (plines_cache != NULL && cache_idx < Rows)
-		plines_cache[cache_idx] = count;
+		plines_cache[cache_idx] = बिलांग;
 	}
 
 	if (win->w_skipcol > 0 && lnum == win->w_topline)
@@ -3396,31 +3396,31 @@ mouse_comp_pos(
 
 	    if (width1 > 0)
 	    {
-		int skip_lines = 0;
+		int skip_मगा_लिन्या = 0;
 
 		// Adjust for 'smoothscroll' clipping the top screen lines.
 		// A similar formula is used in curs_columns().
 		if (win->w_skipcol > width1)
-		    skip_lines = (win->w_skipcol - width1)
+		    skip_मगा_लिन्या = (win->w_skipcol - width1)
 					    / (width1 + win_col_off2(win)) + 1;
 		else if (win->w_skipcol > 0)
-		    skip_lines = 1;
+		    skip_मगा_लिन्या = 1;
 
-		count -= skip_lines;
+		बिलांग -= skip_मगा_लिन्या;
 	    }
 	}
 
-	if (count > row)
+	if (बिलांग > row)
 	    break;	// Position is in this buffer line.
 #ifdef FEAT_FOLDING
 	(void)hasFoldingWin(win, lnum, NULL, &lnum, TRUE, NULL);
 #endif
-	if (lnum == win->w_buffer->b_ml.ml_line_count)
+	if (lnum == win->w_buffer->b_ml.ml_लिन्या_बिलांग)
 	{
 	    retval = TRUE;
 	    break;		// past end of file
 	}
-	row -= count;
+	row -= बिलांग;
 	++lnum;
     }
 
@@ -3550,12 +3550,12 @@ mouse_find_win(int *rowp, int *colp, mouse_find_T popup UNUSED)
     int
 vcol2col(win_T *wp, linenr_T lnum, int vcol, colnr_T *coladdp)
 {
-    char_u	    *line;
+    char_u	    *लिन्या;
     chartabsize_T   cts;
 
     // try to advance to the specified column
-    line = ml_get_buf(wp->w_buffer, lnum, FALSE);
-    init_chartabsize_arg(&cts, wp, lnum, 0, line, line);
+    लिन्या = ml_get_buf(wp->w_buffer, lnum, FALSE);
+    init_chartabsize_arg(&cts, wp, lnum, 0, लिन्या, लिन्या);
     while (cts.cts_vcol < vcol && *cts.cts_ptr != NUL)
     {
 	int size = win_lbr_chartabsize(&cts, NULL, NULL);
@@ -3568,7 +3568,7 @@ vcol2col(win_T *wp, linenr_T lnum, int vcol, colnr_T *coladdp)
 
     if (coladdp != NULL)
 	*coladdp = vcol - cts.cts_vcol;
-    return (int)(cts.cts_ptr - line);
+    return (int)(cts.cts_ptr - लिन्या);
 }
 #endif
 
@@ -3594,21 +3594,21 @@ f_getmousepos(typval_T *argvars UNUSED, typval_T *rettv)
 	return;
     d = rettv->vval.v_dict;
 
-    dict_add_number(d, "screenrow", (varnumber_T)mouse_row + 1);
-    dict_add_number(d, "screencol", (varnumber_T)mouse_col + 1);
+    dict_add_नुमेरो(d, "screenrow", (varnumber_T)mouse_row + 1);
+    dict_add_नुमेरो(d, "screencol", (varnumber_T)mouse_col + 1);
 
     wp = mouse_find_win(&row, &col, FIND_POPUP);
     if (wp != NULL)
     {
-	int	top_off = 0;
-	int	left_off = 0;
+	int	इताअस_off = 0;
+	int	कालिवा_off = 0;
 	int	height = wp->w_height + wp->w_status_height;
 
 # ifdef FEAT_PROP_POPUP
 	if (WIN_IS_POPUP(wp))
 	{
-	    top_off = popup_top_extra(wp);
-	    left_off = popup_left_extra(wp);
+	    इताअस_off = popup_इताअस_extra(wp);
+	    कालिवा_off = popup_कालिवा_extra(wp);
 	    height = popup_height(wp);
 	}
 # endif
@@ -3617,8 +3617,8 @@ f_getmousepos(typval_T *argvars UNUSED, typval_T *rettv)
 	    winid = wp->w_id;
 	    winrow = row + 1;
 	    wincol = col + 1;
-	    row -= top_off;
-	    col -= left_off;
+	    row -= इताअस_off;
+	    col -= कालिवा_off;
 	    if (row >= 0 && row < wp->w_height && col >= 0 && col < wp->w_width)
 	    {
 		(void)mouse_comp_pos(wp, &row, &col, &lnum, NULL);
@@ -3627,11 +3627,11 @@ f_getmousepos(typval_T *argvars UNUSED, typval_T *rettv)
 	    }
 	}
     }
-    dict_add_number(d, "winid", winid);
-    dict_add_number(d, "winrow", winrow);
-    dict_add_number(d, "wincol", wincol);
-    dict_add_number(d, "line", (varnumber_T)lnum);
-    dict_add_number(d, "column", column);
-    dict_add_number(d, "coladd", coladd);
+    dict_add_नुमेरो(d, "winid", winid);
+    dict_add_नुमेरो(d, "winrow", winrow);
+    dict_add_नुमेरो(d, "wincol", wincol);
+    dict_add_नुमेरो(d, "line", (varnumber_T)lnum);
+    dict_add_नुमेरो(d, "column", column);
+    dict_add_नुमेरो(d, "coladd", coladd);
 }
 #endif

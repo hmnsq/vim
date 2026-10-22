@@ -16,155 +16,155 @@
 static char_u shm_buf[SHM_LEN];
 static int set_shm_recursive = 0;
 
-static char *(p_ambw_values[]) = {"single", "double", NULL};
-static char *(p_bg_values[]) = {"light", "dark", NULL};
-static char *(p_bkc_values[]) = {"yes", "auto", "no", "breaksymlink", "breakhardlink", NULL};
-static char *(p_bo_values[]) = {"all", "backspace", "cursor", "complete",
+static char *(p_ambw_मगा_हालागा[]) = {"single", "double", NULL};
+static char *(p_bg_मगा_हालागा[]) = {"light", "dark", NULL};
+static char *(p_bkc_मगा_हालागा[]) = {"yes", "auto", "no", "breaksymlink", "breakhardlink", NULL};
+static char *(p_bo_मगा_हालागा[]) = {"all", "backspace", "cursor", "complete",
 				 "copy", "ctrlg", "error", "esc", "ex",
 				 "hangul", "insertmode", "lang", "mess",
 				 "showmatch", "operator", "register", "shell",
 				 "spell", "term", "wildmode", NULL};
 #if defined(FEAT_LINEBREAK)
 // Note: Keep this in sync with briopt_check()
-static char *(p_briopt_values[]) = {"shift:", "min:", "sbr", "list:", "column:", NULL};
+static char *(p_briopt_मगा_हालागा[]) = {"shift:", "min:", "sbr", "list:", "column:", NULL};
 #endif
 #if defined(FEAT_TABPANEL)
 // Note: Keep this in sync with tabpanelopt_changed()
-static char *(p_tplo_values[]) = {"align:", "columns:", "scrollbar", "vert", NULL};
-static char *(p_tplo_align_values[]) = {"left", "right", NULL};
+static char *(p_tplo_मगा_हालागा[]) = {"align:", "columns:", "scrollbar", "vert", NULL};
+static char *(p_tplo_align_मगा_हालागा[]) = {"left", "right", NULL};
 #endif
 #if defined(FEAT_DIFF)
 // Note: Keep this in sync with diffopt_changed()
-static char *(p_dip_values[]) = {"filler", "anchor", "context:", "iblank", "icase", "iwhite", "iwhiteall", "iwhiteeol", "horizontal", "vertical", "closeoff", "hiddenoff", "foldcolumn:", "followwrap", "internal", "indent-heuristic", "algorithm:", "inline:", "linematch:", NULL};
-static char *(p_dip_algorithm_values[]) = {"myers", "minimal", "patience", "histogram", NULL};
-static char *(p_dip_inline_values[]) = {"none", "simple", "char", "word", NULL};
+static char *(p_dip_मगा_हालागा[]) = {"filler", "anchor", "context:", "iblank", "icase", "iwhite", "iwhiteall", "iwhiteeol", "horizontal", "vertical", "closeoff", "hiddenoff", "foldcolumn:", "followwrap", "internal", "indent-heuristic", "algorithm:", "inline:", "linematch:", NULL};
+static char *(p_dip_algorithm_मगा_हालागा[]) = {"myers", "minimal", "patience", "histogram", NULL};
+static char *(p_dip_inline_मगा_हालागा[]) = {"none", "simple", "char", "word", NULL};
 #endif
-static char *(p_nf_values[]) = {"bin", "octal", "hex", "alpha", "unsigned", "blank", NULL};
-static char *(p_ff_values[]) = {FF_UNIX, FF_DOS, FF_MAC, NULL};
+static char *(p_nf_मगा_हालागा[]) = {"bin", "octal", "hex", "alpha", "unsigned", "blank", NULL};
+static char *(p_ff_मगा_हालागा[]) = {FF_UNIX, FF_DOS, FF_MAC, NULL};
 #ifdef HAVE_CLIPMETHOD
 // Note: Keep this in sync with did_set_clipboard()
-static char *(p_cb_values[]) = {"unnamed", "unnamedplus",
+static char *(p_cb_मगा_हालागा[]) = {"unnamed", "unnamedplus",
 # ifdef FEAT_CLIPBOARD
     "autoselect", "autoselectplus", "autoselectml", "html", "exclude:",
 # endif
     NULL};
 #endif
 #ifdef FEAT_CRYPT
-static char *(p_cm_values[]) = {"zip", "blowfish", "blowfish2",
+static char *(p_cm_मगा_हालागा[]) = {"zip", "blowfish", "blowfish2",
 # ifdef FEAT_SODIUM
     "xchacha20", "xchacha20v2",
 # endif
     NULL};
 #endif
-static char *(p_cmp_values[]) = {"internal", "keepascii", NULL};
+static char *(p_cmp_मगा_हालागा[]) = {"internal", "keepascii", NULL};
 #ifdef FEAT_SYN_HL
 // Note: Keep this in sync with fill_culopt_flags()
-static char *(p_culopt_values[]) = {"line", "screenline", "number", "both", NULL};
+static char *(p_culopt_मगा_हालागा[]) = {"line", "screenline", "number", "both", NULL};
 #endif
-static char *(p_dy_values[]) = {"lastline", "truncate", "uhex", NULL};
-static char *(p_jop_values[]) = {"stack", NULL};
+static char *(p_dy_मगा_हालागा[]) = {"lastline", "truncate", "uhex", NULL};
+static char *(p_jop_मगा_हालागा[]) = {"stack", NULL};
 #ifdef FEAT_FOLDING
-static char *(p_fdo_values[]) = {"all", "block", "hor", "mark", "percent",
+static char *(p_fdo_मगा_हालागा[]) = {"all", "block", "hor", "mark", "percent",
 				 "quickfix", "search", "tag", "insert",
 				 "undo", "jump", NULL};
 #endif
 // Note: Keep this in sync with match_keyprotocol()
-static char *(p_kpc_protocol_values[]) = {"none", "mok2", "kitty", NULL};
+static char *(p_kpc_protocol_मगा_हालागा[]) = {"none", "mok2", "kitty", NULL};
 #ifdef FEAT_IMAGE
 // Note: Keep this in sync with match_imageprotocol()
-static char *(p_ipc_protocol_values[]) = {"none", "kitty", "sixel", NULL};
+static char *(p_ipc_protocol_मगा_हालागा[]) = {"none", "kitty", "sixel", NULL};
 #endif
 #ifdef FEAT_PROP_POPUP
 // Note: Keep this in sync with parse_popup_option()
-static char *(p_popup_cpp_option_values[]) = {"align:", "border:",
+static char *(p_popup_cpp_option_मगा_हालागा[]) = {"align:", "border:",
     "borderhighlight:", "close:", "height:", "highlight:", "opacity:",
     "resize:", "shadow:", "width:", NULL};
-static char *(p_popup_pvp_option_values[]) = {"border:",
+static char *(p_popup_pvp_option_मगा_हालागा[]) = {"border:",
     "borderhighlight:", "close:", "height:", "highlight:", "opacity:",
     "resize:", "shadow:", "width:", NULL};
-static char *(p_popup_option_on_off_values[]) = {"on", "off", NULL};
-static char *(p_popup_cpp_border_values[]) = {"single", "double", "round",
+static char *(p_popup_option_on_off_मगा_हालागा[]) = {"on", "off", NULL};
+static char *(p_popup_cpp_border_मगा_हालागा[]) = {"single", "double", "round",
     "ascii", "on", "off", "custom:", NULL};
-static char *(p_popup_pvp_border_values[]) = {"single", "double", "round",
+static char *(p_popup_pvp_border_मगा_हालागा[]) = {"single", "double", "round",
     "ascii", "on", "off", "custom:", NULL};
-static char *(p_popup_option_align_values[]) = {"item", "menu", NULL};
+static char *(p_popup_option_align_मगा_हालागा[]) = {"item", "menu", NULL};
 #endif
 #if defined(FEAT_SPELL)
 // Note: Keep this in sync with spell_check_sps()
-static char *(p_sps_values[]) = {"best", "fast", "double", "expr:", "file:", "timeout:", NULL};
+static char *(p_sps_मगा_हालागा[]) = {"best", "fast", "double", "expr:", "file:", "timeout:", NULL};
 #endif
 #ifdef FEAT_SESSION
 // Also used for 'viewoptions'!  Keep in sync with SSOP_ flags.
-static char *(p_ssop_values[]) = {"buffers", "winpos", "resize", "winsize",
+static char *(p_ssop_मगा_हालागा[]) = {"buffers", "winpos", "resize", "winsize",
     "localoptions", "options", "help", "blank", "globals", "slash", "unix",
     "sesdir", "curdir", "folds", "cursor", "tabpages", "terminal", "skiprtp",
     NULL};
 #endif
 #if defined(FEAT_STL_OPT)
-static char *(p_stlo_values[]) = {"fixedheight", "maxheight:", NULL};
+static char *(p_stlo_मगा_हालागा[]) = {"fixedheight", "maxheight:", NULL};
 #endif
 // Keep in sync with SWB_ flags in option.h
-static char *(p_swb_values[]) = {"useopen", "usetab", "split", "newtab", "vsplit", "uselast", NULL};
-static char *(p_spk_values[]) = {"cursor", "screen", "topline", NULL};
-static char *(p_tc_values[]) = {"followic", "ignore", "match", "followscs", "smart", NULL};
+static char *(p_swb_मगा_हालागा[]) = {"useopen", "usetab", "split", "newtab", "vsplit", "uselast", NULL};
+static char *(p_spk_मगा_हालागा[]) = {"cursor", "screen", "topline", NULL};
+static char *(p_tc_मगा_हालागा[]) = {"followic", "ignore", "match", "followscs", "smart", NULL};
 // Keep in sync with TCL_ flags in option.h
-static char *(p_tcl_values[]) = {"left", "uselast", NULL};
+static char *(p_tcl_मगा_हालागा[]) = {"left", "uselast", NULL};
 #if defined(FEAT_TOOLBAR) && !defined(FEAT_GUI_MSWIN)
-static char *(p_toolbar_values[]) = {"text", "icons", "tooltips", "horiz", NULL};
+static char *(p_toolbar_मगा_हालागा[]) = {"text", "icons", "tooltips", "horiz", NULL};
 #endif
 #if defined(FEAT_TOOLBAR) && defined(FEAT_GUI_GTK)
-static char *(p_tbis_values[]) = {"tiny", "small", "medium", "large", "huge", "giant", NULL};
+static char *(p_tbis_मगा_हालागा[]) = {"tiny", "small", "medium", "large", "huge", "giant", NULL};
 #endif
 #if defined(UNIX) || defined(VMS)
-static char *(p_ttym_values[]) = {"xterm", "xterm2", "dec", "netterm", "jsbterm", "pterm", "urxvt", "sgr", NULL};
+static char *(p_ttym_मगा_हालागा[]) = {"xterm", "xterm2", "dec", "netterm", "jsbterm", "pterm", "urxvt", "sgr", NULL};
 #endif
-static char *(p_ve_values[]) = {"block", "insert", "all", "onemore", "none", "NONE", NULL};
+static char *(p_ve_मगा_हालागा[]) = {"block", "insert", "all", "onemore", "none", "NONE", NULL};
 // Note: Keep this in sync with check_opt_wim()
-static char *(p_wim_values[]) = {"full", "longest", "list", "lastused", "noselect", "noinsert", NULL};
-static char *(p_wop_values[]) = {"fuzzy", "tagfile", "pum", "exacttext", NULL};
+static char *(p_wim_मगा_हालागा[]) = {"full", "longest", "list", "lastused", "noselect", "noinsert", NULL};
+static char *(p_wop_मगा_हालागा[]) = {"fuzzy", "tagfile", "pum", "exacttext", NULL};
 #ifdef FEAT_WAK
-static char *(p_wak_values[]) = {"yes", "menu", "no", NULL};
+static char *(p_wak_मगा_हालागा[]) = {"yes", "menu", "no", NULL};
 #endif
-static char *(p_mousem_values[]) = {"extend", "popup", "popup_setpos", "mac", NULL};
-static char *(p_sel_values[]) = {"inclusive", "exclusive", "old", NULL};
-static char *(p_slm_values[]) = {"mouse", "key", "cmd", NULL};
-static char *(p_km_values[]) = {"startsel", "stopsel", NULL};
+static char *(p_mousem_मगा_हालागा[]) = {"extend", "popup", "popup_setpos", "mac", NULL};
+static char *(p_sel_मगा_हालागा[]) = {"inclusive", "exclusive", "old", NULL};
+static char *(p_slm_मगा_हालागा[]) = {"mouse", "key", "cmd", NULL};
+static char *(p_km_मगा_हालागा[]) = {"startsel", "stopsel", NULL};
 #ifdef FEAT_BROWSE
-static char *(p_bsdir_values[]) = {"current", "last", "buffer", NULL};
+static char *(p_bsdir_मगा_हालागा[]) = {"current", "last", "buffer", NULL};
 #endif
-static char *(p_scbopt_values[]) = {"ver", "hor", "jump", NULL};
-static char *(p_debug_values[]) = {"msg", "throw", "beep", NULL};
-static char *(p_ead_values[]) = {"both", "ver", "hor", NULL};
-static char *(p_buftype_values[]) = {"nofile", "nowrite", "quickfix", "help", "terminal", "acwrite", "prompt", "popup", NULL};
-static char *(p_bufhidden_values[]) = {"hide", "unload", "delete", "wipe", NULL};
-static char *(p_bs_values[]) = {"indent", "eol", "start", "nostop", NULL};
+static char *(p_scbopt_मगा_हालागा[]) = {"ver", "hor", "jump", NULL};
+static char *(p_debug_मगा_हालागा[]) = {"msg", "throw", "beep", NULL};
+static char *(p_ead_मगा_हालागा[]) = {"both", "ver", "hor", NULL};
+static char *(p_buftype_मगा_हालागा[]) = {"nofile", "nowrite", "quickfix", "help", "terminal", "acwrite", "prompt", "popup", NULL};
+static char *(p_bufhidden_मगा_हालागा[]) = {"hide", "unload", "delete", "wipe", NULL};
+static char *(p_bs_मगा_हालागा[]) = {"indent", "eol", "start", "nostop", NULL};
 #ifdef FEAT_FOLDING
-static char *(p_fdm_values[]) = {"manual", "expr", "marker", "indent", "syntax",
+static char *(p_fdm_मगा_हालागा[]) = {"manual", "expr", "marker", "indent", "syntax",
 # ifdef FEAT_DIFF
 				"diff",
 # endif
 				NULL};
-static char *(p_fcl_values[]) = {"all", NULL};
+static char *(p_fcl_मगा_हालागा[]) = {"all", NULL};
 #endif
-static char *(p_cfc_values[]) = {"keyword", "files", "whole_line", NULL};
-static char *(p_cot_values[]) = {"menu", "menuone", "longest", "preview", "popup", "popuphidden", "noinsert", "noselect", "fuzzy", "nosort", "preinsert", "nearest", NULL};
+static char *(p_cfc_मगा_हालागा[]) = {"keyword", "files", "whole_line", NULL};
+static char *(p_cot_मगा_हालागा[]) = {"menu", "menuone", "longest", "preview", "popup", "popuphidden", "noinsert", "noselect", "fuzzy", "nosort", "preinsert", "nearest", NULL};
 #ifdef BACKSLASH_IN_FILENAME
-static char *(p_csl_values[]) = {"slash", "backslash", NULL};
+static char *(p_csl_मगा_हालागा[]) = {"slash", "backslash", NULL};
 #endif
 #ifdef FEAT_SIGNS
-static char *(p_scl_values[]) = {"yes", "no", "auto", "number", NULL};
+static char *(p_scl_मगा_हालागा[]) = {"yes", "no", "auto", "number", NULL};
 #endif
 #ifdef UNIX
-static char *(p_trz_values[]) = {"inband", "sigwinch", "", NULL};
+static char *(p_trz_मगा_हालागा[]) = {"inband", "sigwinch", "", NULL};
 #endif
 #if defined(MSWIN) && defined(FEAT_TERMINAL)
-static char *(p_twt_values[]) = {"winpty", "conpty", "", NULL};
+static char *(p_twt_मगा_हालागा[]) = {"winpty", "conpty", "", NULL};
 #endif
-static char *(p_sloc_values[]) = {"last", "statusline", "tabline", NULL};
-static char *(p_sws_values[]) = {"fsync", "sync", NULL};
+static char *(p_sloc_मगा_हालागा[]) = {"last", "statusline", "tabline", NULL};
+static char *(p_sws_मगा_हालागा[]) = {"fsync", "sync", NULL};
 
-static int check_opt_strings(char_u *val, char **values, int list);
-static int opt_strings_flags(char_u *val, char **values, unsigned *flagp, int list);
+static int check_opt_strings(char_u *val, char **मगा_हालागा, int list);
+static int opt_strings_flags(char_u *val, char **मगा_हालागा, unsigned *flagp, int list);
 
 /*
  * After setting various option values: recompute variables that depend on
@@ -173,32 +173,32 @@ static int opt_strings_flags(char_u *val, char **values, unsigned *flagp, int li
     void
 didset_string_options(void)
 {
-    (void)opt_strings_flags(p_cmp, p_cmp_values, &cmp_flags, TRUE);
-    (void)opt_strings_flags(p_bkc, p_bkc_values, &bkc_flags, TRUE);
-    (void)opt_strings_flags(p_bo, p_bo_values, &bo_flags, TRUE);
-    (void)opt_strings_flags(p_cot, p_cot_values, &cot_flags, TRUE);
+    (void)opt_strings_flags(p_cmp, p_cmp_मगा_हालागा, &cmp_flags, TRUE);
+    (void)opt_strings_flags(p_bkc, p_bkc_मगा_हालागा, &bkc_flags, TRUE);
+    (void)opt_strings_flags(p_bo, p_bo_मगा_हालागा, &bo_flags, TRUE);
+    (void)opt_strings_flags(p_cot, p_cot_मगा_हालागा, &cot_flags, TRUE);
 #ifdef FEAT_SESSION
-    (void)opt_strings_flags(p_ssop, p_ssop_values, &ssop_flags, TRUE);
-    (void)opt_strings_flags(p_vop, p_ssop_values, &vop_flags, TRUE);
+    (void)opt_strings_flags(p_ssop, p_ssop_मगा_हालागा, &ssop_flags, TRUE);
+    (void)opt_strings_flags(p_vop, p_ssop_मगा_हालागा, &vop_flags, TRUE);
 #endif
 #ifdef FEAT_FOLDING
-    (void)opt_strings_flags(p_fdo, p_fdo_values, &fdo_flags, TRUE);
+    (void)opt_strings_flags(p_fdo, p_fdo_मगा_हालागा, &fdo_flags, TRUE);
 #endif
-    (void)opt_strings_flags(p_dy, p_dy_values, &dy_flags, TRUE);
-    (void)opt_strings_flags(p_jop, p_jop_values, &jop_flags, TRUE);
-    (void)opt_strings_flags(p_tc, p_tc_values, &tc_flags, FALSE);
-    (void)opt_strings_flags(p_ve, p_ve_values, &ve_flags, TRUE);
+    (void)opt_strings_flags(p_dy, p_dy_मगा_हालागा, &dy_flags, TRUE);
+    (void)opt_strings_flags(p_jop, p_jop_मगा_हालागा, &jop_flags, TRUE);
+    (void)opt_strings_flags(p_tc, p_tc_मगा_हालागा, &tc_flags, FALSE);
+    (void)opt_strings_flags(p_ve, p_ve_मगा_हालागा, &ve_flags, TRUE);
 #if defined(UNIX) || defined(VMS)
-    (void)opt_strings_flags(p_ttym, p_ttym_values, &ttym_flags, FALSE);
+    (void)opt_strings_flags(p_ttym, p_ttym_मगा_हालागा, &ttym_flags, FALSE);
 #endif
 #if defined(FEAT_TOOLBAR) && !defined(FEAT_GUI_MSWIN)
-    (void)opt_strings_flags(p_toolbar, p_toolbar_values, &toolbar_flags, TRUE);
+    (void)opt_strings_flags(p_toolbar, p_toolbar_मगा_हालागा, &toolbar_flags, TRUE);
 #endif
 #if defined(FEAT_TOOLBAR) && defined(FEAT_GUI_GTK)
-    (void)opt_strings_flags(p_tbis, p_tbis_values, &tbis_flags, FALSE);
+    (void)opt_strings_flags(p_tbis, p_tbis_मगा_हालागा, &tbis_flags, FALSE);
 #endif
-    (void)opt_strings_flags(p_swb, p_swb_values, &swb_flags, TRUE);
-    (void)opt_strings_flags(p_tcl, p_tcl_values, &tcl_flags, TRUE);
+    (void)opt_strings_flags(p_swb, p_swb_मगा_हालागा, &swb_flags, TRUE);
+    (void)opt_strings_flags(p_tcl, p_tcl_मगा_हालागा, &tcl_flags, TRUE);
 }
 
 #if defined(FEAT_EVAL)
@@ -316,7 +316,7 @@ check_buf_options(buf_T *buf)
     check_string_option(&buf->b_p_fex);
 #endif
 #ifdef FEAT_CRYPT
-    check_string_option(&buf->b_p_key);
+    check_string_option(&buf->b_p_सुसि);
 #endif
     check_string_option(&buf->b_p_kp);
     check_string_option(&buf->b_p_mps);
@@ -571,7 +571,7 @@ set_string_option_direct_in_buf(
     char *
 set_string_option(
     int		opt_idx,
-    char_u	*value,
+    char_u	*हालागा,
     int		opt_flags,	// OPT_LOCAL and/or OPT_GLOBAL
     char	*errbuf,
     size_t	errbuflen)
@@ -588,12 +588,12 @@ set_string_option(
     char_u	*saved_newval = NULL;
 #endif
     char	*errmsg = NULL;
-    int		value_checked = FALSE;
+    int		हालागा_checked = FALSE;
 
     if (is_hidden_option(opt_idx))	// don't set hidden option
 	return NULL;
 
-    s = vim_strsave(value == NULL ? (char_u *)"" : value);
+    s = vim_strsave(हालागा == NULL ? (char_u *)"" : हालागा);
     if (s == NULL)
 	return NULL;
 
@@ -615,7 +615,7 @@ set_string_option(
 #if defined(FEAT_EVAL)
     if (!starting
 # ifdef FEAT_CRYPT
-	    && !is_crypt_key_option(opt_idx)
+	    && !is_crypt_सुसि_option(opt_idx)
 # endif
        )
     {
@@ -627,9 +627,9 @@ set_string_option(
 	saved_newval = vim_strsave(s);
     }
 #endif
-    if ((errmsg = did_set_string_option(opt_idx, varp, oldval, value, errbuf,
-		    errbuflen, opt_flags, OP_NONE, &value_checked)) == NULL)
-	did_set_option(opt_idx, opt_flags, TRUE, value_checked);
+    if ((errmsg = did_set_string_option(opt_idx, varp, oldval, हालागा, errbuf,
+		    errbuflen, opt_flags, OP_NONE, &हालागा_checked)) == NULL)
+	did_set_option(opt_idx, opt_flags, TRUE, हालागा_checked);
 
 #if defined(FEAT_EVAL)
     // call autocommand after handling side effects
@@ -800,9 +800,9 @@ check_illegal_path_names(int opt_idx, char_u **varp)
  * e.g. 'viewoptions', 'switchbuf', 'casemap', etc.
  */
     static char *
-did_set_opt_flags(char_u *val, char **values, unsigned *flagp, int list)
+did_set_opt_flags(char_u *val, char **मगा_हालागा, unsigned *flagp, int list)
 {
-    if (opt_strings_flags(val, values, flagp, list) == FAIL)
+    if (opt_strings_flags(val, मगा_हालागा, flagp, list) == FAIL)
 	return e_invalid_argument;
 
     return NULL;
@@ -813,9 +813,9 @@ did_set_opt_flags(char_u *val, char **values, unsigned *flagp, int list)
  * e.g. 'nrformats', 'scrollopt', 'wildoptions', etc.
  */
     static char *
-did_set_opt_strings(char_u *val, char **values, int list)
+did_set_opt_strings(char_u *val, char **मगा_हालागा, int list)
 {
-    return did_set_opt_flags(val, values, NULL, list);
+    return did_set_opt_flags(val, मगा_हालागा, NULL, list);
 }
 
 /*
@@ -843,24 +843,24 @@ did_set_option_listflag(
  */
     static int
 expand_set_opt_string(
-	optexpand_T *args,
-	char **values,
-	size_t numValues,
-	int *numMatches,
+	optexpand_T *मगा_कातविरान,
+	char **मगा_हालागा,
+	size_t नुमेरो_मगा_हालागा,
+	int *नुमेरो_Matches,
 	char_u ***matches)
 {
     char_u	*p;
-    regmatch_T	*regmatch = args->oe_regmatch;
-    int		include_orig_val = args->oe_include_orig_val;
-    char_u	*option_val = args->oe_opt_value;
+    regmatch_T	*regmatch = मगा_कातविरान->oe_regmatch;
+    int		include_orig_val = मगा_कातविरान->oe_include_orig_val;
+    char_u	*option_val = मगा_कातविरान->oe_opt_हालागा;
 
     // Assume numValues is small since they are fixed enums, so just allocate
     // upfront instead of needing two passes to calculate output size.
-    *matches = ALLOC_MULT(char_u *, numValues + 1);
+    *matches = ALLOC_MULT(char_u *, नुमेरो_मगा_हालागा + 1);
     if (*matches == NULL)
 	return FAIL;
 
-    int count = 0;
+    int बिलांग = 0;
 
     if (include_orig_val && *option_val != NUL)
     {
@@ -870,10 +870,10 @@ expand_set_opt_string(
 	    VIM_CLEAR(*matches);
 	    return FAIL;
 	}
-	(*matches)[count++] = p;
+	(*matches)[बिलांग++] = p;
     }
 
-    for (char **val = values; *val != NULL; val++)
+    for (char **val = मगा_हालागा; *val != NULL; val++)
     {
 	if (include_orig_val && *option_val != NUL)
 	{
@@ -885,7 +885,7 @@ expand_set_opt_string(
 	    p = vim_strsave((char_u*)*val);
 	    if (p == NULL)
 	    {
-		if (count == 0)
+		if (बिलांग == 0)
 		{
 		    VIM_CLEAR(*matches);
 		    return FAIL;
@@ -893,15 +893,15 @@ expand_set_opt_string(
 		else
 		    break;
 	    }
-	    (*matches)[count++] = p;
+	    (*matches)[बिलांग++] = p;
 	}
     }
-    if (count == 0)
+    if (बिलांग == 0)
     {
 	VIM_CLEAR(*matches);
 	return FAIL;
     }
-    *numMatches = count;
+    *नुमेरो_Matches = बिलांग;
     return OK;
 }
 
@@ -931,23 +931,23 @@ expand_set_opt_generic_cb(expand_T *xp, int idx)
  */
     static int
 expand_set_opt_generic(
-	optexpand_T *args,
+	optexpand_T *मगा_कातविरान,
 	char_u *((*func)(expand_T *, int)),
-	int *numMatches,
+	int *नुमेरो_Matches,
 	char_u ***matches)
 {
     int ret;
 
-    set_opt_callback_orig_option = args->oe_include_orig_val ?
-	args->oe_opt_value : NULL;
+    set_opt_callback_orig_option = मगा_कातविरान->oe_include_orig_val ?
+	मगा_कातविरान->oe_opt_हालागा : NULL;
     set_opt_callback_func = func;
 
     ret = ExpandGeneric(
 	    (char_u*)"", // not using fuzzy as currently EXPAND_STRING_SETTING doesn't use it
-	    args->oe_xp,
-	    args->oe_regmatch,
+	    मगा_कातविरान->oe_xp,
+	    मगा_कातविरान->oe_regmatch,
 	    matches,
-	    numMatches,
+	    नुमेरो_Matches,
 	    expand_set_opt_generic_cb,
 	    FALSE);
 
@@ -958,7 +958,7 @@ expand_set_opt_generic(
 
 #if defined(FEAT_GUI_MSWIN) || defined(FEAT_GUI_GTK)
 static garray_T *expand_cb_ga;
-static optexpand_T *expand_cb_args;
+static optexpand_T *expand_cb_मगा_कातविरान;
 
 /*
  * Callback provided to a function in expand_set_opt_callback. Will perform
@@ -970,8 +970,8 @@ static optexpand_T *expand_cb_args;
     static int
 expand_set_opt_callback_cb(char_u *val)
 {
-    regmatch_T	*regmatch = expand_cb_args->oe_regmatch;
-    expand_T	*xp = expand_cb_args->oe_xp;
+    regmatch_T	*regmatch = expand_cb_मगा_कातविरान->oe_regmatch;
+    expand_T	*xp = expand_cb_मगा_कातविरान->oe_xp;
     garray_T	*ga = expand_cb_ga;
     char_u	*str;
 
@@ -1008,15 +1008,15 @@ expand_set_opt_callback_cb(char_u *val)
  */
     static int
 expand_set_opt_callback(
-	optexpand_T *args,
+	optexpand_T *मगा_कातविरान,
 	void (*func)(optexpand_T *, void* params, int (*cb)(char_u *val)),
 	void *func_params,
-	int *numMatches,
+	int *नुमेरो_Matches,
 	char_u ***matches)
 {
     garray_T	ga;
-    int		include_orig_val = args->oe_include_orig_val;
-    char_u	*option_val = args->oe_opt_value;
+    int		include_orig_val = मगा_कातविरान->oe_include_orig_val;
+    char_u	*option_val = मगा_कातविरान->oe_opt_हालागा;
 
     ga_init2(&ga, sizeof(char *), 30);
 
@@ -1035,15 +1035,15 @@ expand_set_opt_callback(
     }
 
     expand_cb_ga = &ga;
-    expand_cb_args = args;
+    expand_cb_मगा_कातविरान = मगा_कातविरान;
 
-    func(args, func_params, expand_set_opt_callback_cb);
+    func(मगा_कातविरान, func_params, expand_set_opt_callback_cb);
 
     expand_cb_ga = NULL;
-    expand_cb_args = NULL;
+    expand_cb_मगा_कातविरान = NULL;
 
     *matches = ga.ga_data;
-    *numMatches = ga.ga_len;
+    *नुमेरो_Matches = ga.ga_len;
     return OK;
 }
 #endif
@@ -1053,25 +1053,25 @@ expand_set_opt_callback(
  */
     static int
 expand_set_opt_listflag(
-	optexpand_T *args,
+	optexpand_T *मगा_कातविरान,
 	char_u *flags,
-	int *numMatches,
+	int *नुमेरो_Matches,
 	char_u ***matches)
 {
     char_u  *p;
-    char_u  *option_val = args->oe_opt_value;
-    char_u  *cmdline_val = args->oe_set_arg;
-    int	    append = args->oe_append;
-    int	    include_orig_val = args->oe_include_orig_val && (*option_val != NUL);
+    char_u  *option_val = मगा_कातविरान->oe_opt_हालागा;
+    char_u  *cmdline_val = मगा_कातविरान->oe_set_arg;
+    int	    append = मगा_कातविरान->oe_append;
+    int	    include_orig_val = मगा_कातविरान->oe_include_orig_val && (*option_val != NUL);
 
-    size_t num_flags = STRLEN(flags);
+    size_t नुमेरो_flags = STRLEN(flags);
 
     // Assume we only have small number of flags, so just allocate max size.
-    *matches = ALLOC_MULT(char_u *, num_flags + 1);
+    *matches = ALLOC_MULT(char_u *, नुमेरो_flags + 1);
     if (*matches == NULL)
 	return FAIL;
 
-    int count = 0;
+    int बिलांग = 0;
 
     if (include_orig_val)
     {
@@ -1081,7 +1081,7 @@ expand_set_opt_listflag(
 	    VIM_CLEAR(*matches);
 	    return FAIL;
 	}
-	(*matches)[count++] = p;
+	(*matches)[बिलांग++] = p;
     }
 
     for (char_u *flag = flags; *flag != NUL; flag++)
@@ -1102,7 +1102,7 @@ expand_set_opt_listflag(
 	    p = vim_strnsave(flag, 1);
 	    if (p == NULL)
 	    {
-		if (count == 0)
+		if (बिलांग == 0)
 		{
 		    VIM_CLEAR(*matches);
 		    return FAIL;
@@ -1110,16 +1110,16 @@ expand_set_opt_listflag(
 		else
 		    break;
 	    }
-	    (*matches)[count++] = p;
+	    (*matches)[बिलांग++] = p;
 	}
     }
 
-    if (count == 0)
+    if (बिलांग == 0)
     {
 	VIM_CLEAR(*matches);
 	return FAIL;
     }
-    *numMatches = count;
+    *नुमेरो_Matches = बिलांग;
     return OK;
 }
 
@@ -1127,27 +1127,27 @@ expand_set_opt_listflag(
  * The 'ambiwidth' option is changed.
  */
     char *
-did_set_ambiwidth(optset_T *args UNUSED)
+did_set_ambiwidth(optset_T *मगा_कातविरान UNUSED)
 {
-    if (check_opt_strings(p_ambw, p_ambw_values, FALSE) != OK)
+    if (check_opt_strings(p_ambw, p_ambw_मगा_हालागा, FALSE) != OK)
 	return e_invalid_argument;
 
     return check_chars_options();
 }
 
 // "name" must be a string literal, the length is computed at compile time.
-#define completing_value_for_subopt(args, name) \
-	  completing_value_for_subopt_len(args, name, (int)STRLEN_LITERAL(name))
+#define completing_हालागा_for_subopt(मगा_कातविरान, name) \
+	  completing_हालागा_for_subopt_len(मगा_कातविरान, name, (int)STRLEN_LITERAL(name))
 
 /*
  * Return true when completing the value of the sub-option "name" with length
  * "len", e.g. the value after "close:" in 'completepopup'.
  */
     static bool
-completing_value_for_subopt_len(optexpand_T *args, char *name, int len)
+completing_हालागा_for_subopt_len(optexpand_T *मगा_कातविरान, char *name, int len)
 {
-    char_u  *colon = args->oe_xp->xp_pattern - 1;
-    int	    off = (int)(colon - args->oe_set_arg);
+    char_u  *colon = मगा_कातविरान->oe_xp->xp_pattern - 1;
+    int	    off = (int)(colon - मगा_कातविरान->oe_set_arg);
 
     if (off < len)
 	return false;
@@ -1159,13 +1159,13 @@ completing_value_for_subopt_len(optexpand_T *args, char *name, int len)
 }
 
     int
-expand_set_ambiwidth(optexpand_T *args, int *numMatches, char_u ***matches)
+expand_set_ambiwidth(optexpand_T *मगा_कातविरान, int *नुमेरो_Matches, char_u ***matches)
 {
     return expand_set_opt_string(
-	    args,
-	    p_ambw_values,
-	    ARRAY_LENGTH(p_ambw_values) - 1,
-	    numMatches,
+	    मगा_कातविरान,
+	    p_ambw_मगा_हालागा,
+	    ARRAY_LENGTH(p_ambw_मगा_हालागा) - 1,
+	    नुमेरो_Matches,
 	    matches);
 }
 
@@ -1173,12 +1173,12 @@ expand_set_ambiwidth(optexpand_T *args, int *numMatches, char_u ***matches)
  * The 'background' option is changed.
  */
     char *
-did_set_background(optset_T *args)
+did_set_background(optset_T *मगा_कातविरान)
 {
-    if (check_opt_strings(p_bg, p_bg_values, FALSE) == FAIL)
+    if (check_opt_strings(p_bg, p_bg_मगा_हालागा, FALSE) == FAIL)
 	return e_invalid_argument;
 
-    if (args->os_oldval.string != NULL && args->os_oldval.string[0] == *p_bg)
+    if (मगा_कातविरान->os_oldval.string != NULL && मगा_कातविरान->os_oldval.string[0] == *p_bg)
 	// Value was not changed
 	return NULL;
 
@@ -1190,7 +1190,7 @@ did_set_background(optset_T *args)
 
 #ifdef FEAT_EVAL
     if (dark != (*p_bg == 'd')
-	    && get_var_value((char_u *)"g:colors_name") != NULL)
+	    && get_var_हालागा((char_u *)"g:colors_name") != NULL)
     {
 	// The color scheme must have set 'background' back to another
 	// value, that's not what we want here.  Disable the color
@@ -1210,13 +1210,13 @@ did_set_background(optset_T *args)
 }
 
     int
-expand_set_background(optexpand_T *args, int *numMatches, char_u ***matches)
+expand_set_background(optexpand_T *मगा_कातविरान, int *नुमेरो_Matches, char_u ***matches)
 {
     return expand_set_opt_string(
-	    args,
-	    p_bg_values,
-	    ARRAY_LENGTH(p_bg_values) - 1,
-	    numMatches,
+	    मगा_कातविरान,
+	    p_bg_मगा_हालागा,
+	    ARRAY_LENGTH(p_bg_मगा_हालागा) - 1,
+	    नुमेरो_Matches,
 	    matches);
 }
 
@@ -1224,27 +1224,27 @@ expand_set_background(optexpand_T *args, int *numMatches, char_u ***matches)
  * The 'backspace' option is changed.
  */
     char *
-did_set_backspace(optset_T *args UNUSED)
+did_set_backspace(optset_T *मगा_कातविरान UNUSED)
 {
     if (VIM_ISDIGIT(*p_bs))
     {
 	if (*p_bs > '3' || p_bs[1] != NUL)
 	    return e_invalid_argument;
     }
-    else if (check_opt_strings(p_bs, p_bs_values, TRUE) != OK)
+    else if (check_opt_strings(p_bs, p_bs_मगा_हालागा, TRUE) != OK)
 	return e_invalid_argument;
 
     return NULL;
 }
 
     int
-expand_set_backspace(optexpand_T *args, int *numMatches, char_u ***matches)
+expand_set_backspace(optexpand_T *मगा_कातविरान, int *नुमेरो_Matches, char_u ***matches)
 {
     return expand_set_opt_string(
-	    args,
-	    p_bs_values,
-	    ARRAY_LENGTH(p_bs_values) - 1,
-	    numMatches,
+	    मगा_कातविरान,
+	    p_bs_मगा_हालागा,
+	    ARRAY_LENGTH(p_bs_मगा_हालागा) - 1,
+	    नुमेरो_Matches,
 	    matches);
 }
 
@@ -1252,34 +1252,34 @@ expand_set_backspace(optexpand_T *args, int *numMatches, char_u ***matches)
  * The 'backupcopy' option is changed.
  */
     char *
-did_set_backupcopy(optset_T *args)
+did_set_backupcopy(optset_T *मगा_कातविरान)
 {
     char_u		*bkc = p_bkc;
     unsigned int	*flags = &bkc_flags;
     char		*errmsg = NULL;
 
-    if (args->os_flags & OPT_LOCAL)
+    if (मगा_कातविरान->os_flags & OPT_LOCAL)
     {
 	bkc = curbuf->b_p_bkc;
 	flags = &curbuf->b_bkc_flags;
     }
-    else if (!(args->os_flags & OPT_GLOBAL))
+    else if (!(मगा_कातविरान->os_flags & OPT_GLOBAL))
 	// When using :set, clear the local flags.
 	curbuf->b_bkc_flags = 0;
 
-    if ((args->os_flags & OPT_LOCAL) && *bkc == NUL)
+    if ((मगा_कातविरान->os_flags & OPT_LOCAL) && *bkc == NUL)
 	// make the local value empty: use the global value
 	*flags = 0;
     else
     {
-	if (opt_strings_flags(bkc, p_bkc_values, flags, TRUE) != OK)
+	if (opt_strings_flags(bkc, p_bkc_मगा_हालागा, flags, TRUE) != OK)
 	    errmsg = e_invalid_argument;
 	if ((((int)*flags & BKC_AUTO) != 0)
 		+ (((int)*flags & BKC_YES) != 0)
 		+ (((int)*flags & BKC_NO) != 0) != 1)
 	{
 	    // Must have exactly one of "auto", "yes"  and "no".
-	    (void)opt_strings_flags(args->os_oldval.string, p_bkc_values,
+	    (void)opt_strings_flags(मगा_कातविरान->os_oldval.string, p_bkc_मगा_हालागा,
 								  flags, TRUE);
 	    errmsg = e_invalid_argument;
 	}
@@ -1289,13 +1289,13 @@ did_set_backupcopy(optset_T *args)
 }
 
     int
-expand_set_backupcopy(optexpand_T *args, int *numMatches, char_u ***matches)
+expand_set_backupcopy(optexpand_T *मगा_कातविरान, int *नुमेरो_Matches, char_u ***matches)
 {
     return expand_set_opt_string(
-	    args,
-	    p_bkc_values,
-	    ARRAY_LENGTH(p_bkc_values) - 1,
-	    numMatches,
+	    मगा_कातविरान,
+	    p_bkc_मगा_हालागा,
+	    ARRAY_LENGTH(p_bkc_मगा_हालागा) - 1,
+	    नुमेरो_Matches,
 	    matches);
 }
 
@@ -1303,7 +1303,7 @@ expand_set_backupcopy(optexpand_T *args, int *numMatches, char_u ***matches)
  * The 'backupext' or the 'patchmode' option is changed.
  */
     char *
-did_set_backupext_or_patchmode(optset_T *args UNUSED)
+did_set_backupext_or_patchmode(optset_T *मगा_कातविरान UNUSED)
 {
     if (STRCMP(*p_bex == '.' ? p_bex + 1 : p_bex,
 		*p_pm == '.' ? p_pm + 1 : p_pm) == 0)
@@ -1316,19 +1316,19 @@ did_set_backupext_or_patchmode(optset_T *args UNUSED)
  * The 'belloff' option is changed.
  */
     char *
-did_set_belloff(optset_T *args UNUSED)
+did_set_belloff(optset_T *मगा_कातविरान UNUSED)
 {
-    return did_set_opt_flags(p_bo, p_bo_values, &bo_flags, TRUE);
+    return did_set_opt_flags(p_bo, p_bo_मगा_हालागा, &bo_flags, TRUE);
 }
 
     int
-expand_set_belloff(optexpand_T *args, int *numMatches, char_u ***matches)
+expand_set_belloff(optexpand_T *मगा_कातविरान, int *नुमेरो_Matches, char_u ***matches)
 {
     return expand_set_opt_string(
-	    args,
-	    p_bo_values,
-	    ARRAY_LENGTH(p_bo_values) - 1,
-	    numMatches,
+	    मगा_कातविरान,
+	    p_bo_मगा_हालागा,
+	    ARRAY_LENGTH(p_bo_मगा_हालागा) - 1,
+	    नुमेरो_Matches,
 	    matches);
 }
 
@@ -1337,7 +1337,7 @@ expand_set_belloff(optexpand_T *args, int *numMatches, char_u ***matches)
  * The 'breakat' option is changed.
  */
     char *
-did_set_breakat(optset_T *args UNUSED)
+did_set_breakat(optset_T *मगा_कातविरान UNUSED)
 {
     char_u	*p;
     int		i;
@@ -1356,9 +1356,9 @@ did_set_breakat(optset_T *args UNUSED)
  * The 'breakindentopt' option is changed.
  */
     char *
-did_set_breakindentopt(optset_T *args)
+did_set_breakindentopt(optset_T *मगा_कातविरान)
 {
-    char_u	**varp = (char_u **)args->os_varp;
+    char_u	**varp = (char_u **)मगा_कातविरान->os_varp;
 
     if (briopt_check(*varp, varp == &curwin->w_p_briopt ? curwin : NULL)
 								      == FAIL)
@@ -1373,15 +1373,15 @@ did_set_breakindentopt(optset_T *args)
 
     int
 expand_set_breakindentopt(
-    optexpand_T		*args,
-    int			*numMatches,
+    optexpand_T		*मगा_कातविरान,
+    int			*नुमेरो_Matches,
     char_u		***matches)
 {
     return expand_set_opt_string(
-	    args,
-	    p_briopt_values,
-	    ARRAY_LENGTH(p_briopt_values) - 1,
-	    numMatches,
+	    मगा_कातविरान,
+	    p_briopt_मगा_हालागा,
+	    ARRAY_LENGTH(p_briopt_मगा_हालागा) - 1,
+	    नुमेरो_Matches,
 	    matches);
 }
 #endif
@@ -1391,9 +1391,9 @@ expand_set_breakindentopt(
  * The 'browsedir' option is changed.
  */
     char *
-did_set_browsedir(optset_T *args UNUSED)
+did_set_browsedir(optset_T *मगा_कातविरान UNUSED)
 {
-    if (check_opt_strings(p_bsdir, p_bsdir_values, FALSE) != OK
+    if (check_opt_strings(p_bsdir, p_bsdir_मगा_हालागा, FALSE) != OK
 	    && !mch_isdir(p_bsdir))
 	return e_invalid_argument;
 
@@ -1401,13 +1401,13 @@ did_set_browsedir(optset_T *args UNUSED)
 }
 
     int
-expand_set_browsedir(optexpand_T *args, int *numMatches, char_u ***matches)
+expand_set_browsedir(optexpand_T *मगा_कातविरान, int *नुमेरो_Matches, char_u ***matches)
 {
     return expand_set_opt_string(
-	    args,
-	    p_bsdir_values,
-	    ARRAY_LENGTH(p_bsdir_values) - 1,
-	    numMatches,
+	    मगा_कातविरान,
+	    p_bsdir_मगा_हालागा,
+	    ARRAY_LENGTH(p_bsdir_मगा_हालागा) - 1,
+	    नुमेरो_Matches,
 	    matches);
 }
 #endif
@@ -1416,19 +1416,19 @@ expand_set_browsedir(optexpand_T *args, int *numMatches, char_u ***matches)
  * The 'bufhidden' option is changed.
  */
     char *
-did_set_bufhidden(optset_T *args UNUSED)
+did_set_bufhidden(optset_T *मगा_कातविरान UNUSED)
 {
-    return did_set_opt_strings(curbuf->b_p_bh, p_bufhidden_values, FALSE);
+    return did_set_opt_strings(curbuf->b_p_bh, p_bufhidden_मगा_हालागा, FALSE);
 }
 
     int
-expand_set_bufhidden(optexpand_T *args, int *numMatches, char_u ***matches)
+expand_set_bufhidden(optexpand_T *मगा_कातविरान, int *नुमेरो_Matches, char_u ***matches)
 {
     return expand_set_opt_string(
-	    args,
-	    p_bufhidden_values,
-	    ARRAY_LENGTH(p_bufhidden_values) - 1,
-	    numMatches,
+	    मगा_कातविरान,
+	    p_bufhidden_मगा_हालागा,
+	    ARRAY_LENGTH(p_bufhidden_मगा_हालागा) - 1,
+	    नुमेरो_Matches,
 	    matches);
 }
 
@@ -1436,9 +1436,9 @@ expand_set_bufhidden(optexpand_T *args, int *numMatches, char_u ***matches)
  * The 'buftype' option is changed.
  */
     char *
-did_set_buftype(optset_T *args UNUSED)
+did_set_buftype(optset_T *मगा_कातविरान UNUSED)
 {
-    if (check_opt_strings(curbuf->b_p_bt, p_buftype_values, FALSE) != OK)
+    if (check_opt_strings(curbuf->b_p_bt, p_buftype_मगा_हालागा, FALSE) != OK)
 	return e_invalid_argument;
 
     if (curwin->w_status_height)
@@ -1453,13 +1453,13 @@ did_set_buftype(optset_T *args UNUSED)
 }
 
     int
-expand_set_buftype(optexpand_T *args, int *numMatches, char_u ***matches)
+expand_set_buftype(optexpand_T *मगा_कातविरान, int *नुमेरो_Matches, char_u ***matches)
 {
     return expand_set_opt_string(
-	    args,
-	    p_buftype_values,
-	    ARRAY_LENGTH(p_buftype_values) - 1,
-	    numMatches,
+	    मगा_कातविरान,
+	    p_buftype_मगा_हालागा,
+	    ARRAY_LENGTH(p_buftype_मगा_हालागा) - 1,
+	    नुमेरो_Matches,
 	    matches);
 }
 
@@ -1467,50 +1467,50 @@ expand_set_buftype(optexpand_T *args, int *numMatches, char_u ***matches)
  * The 'casemap' option is changed.
  */
     char *
-did_set_casemap(optset_T *args UNUSED)
+did_set_casemap(optset_T *मगा_कातविरान UNUSED)
 {
-    return did_set_opt_flags(p_cmp, p_cmp_values, &cmp_flags, TRUE);
+    return did_set_opt_flags(p_cmp, p_cmp_मगा_हालागा, &cmp_flags, TRUE);
 }
 
     int
-expand_set_casemap(optexpand_T *args, int *numMatches, char_u ***matches)
+expand_set_casemap(optexpand_T *मगा_कातविरान, int *नुमेरो_Matches, char_u ***matches)
 {
     return expand_set_opt_string(
-	    args,
-	    p_cmp_values,
-	    ARRAY_LENGTH(p_cmp_values) - 1,
-	    numMatches,
+	    मगा_कातविरान,
+	    p_cmp_मगा_हालागा,
+	    ARRAY_LENGTH(p_cmp_मगा_हालागा) - 1,
+	    नुमेरो_Matches,
 	    matches);
 }
 
 #if defined(HAVE_CLIPMETHOD)
     int
-expand_set_clipboard(optexpand_T *args, int *numMatches, char_u ***matches)
+expand_set_clipboard(optexpand_T *मगा_कातविरान, int *नुमेरो_Matches, char_u ***matches)
 {
     return expand_set_opt_string(
-	    args,
-	    p_cb_values,
-	    ARRAY_LENGTH(p_cb_values) - 1,
-	    numMatches,
+	    मगा_कातविरान,
+	    p_cb_मगा_हालागा,
+	    ARRAY_LENGTH(p_cb_मगा_हालागा) - 1,
+	    नुमेरो_Matches,
 	    matches);
 }
 #endif
 
 #ifdef HAVE_CLIPMETHOD
     char *
-did_set_clipmethod(optset_T *args UNUSED)
+did_set_clipmethod(optset_T *मगा_कातविरान UNUSED)
 {
     return choose_clipmethod();
 }
 
     int
-expand_set_clipmethod(optexpand_T *args, int *numMatches, char_u ***matches)
+expand_set_clipmethod(optexpand_T *मगा_कातविरान, int *नुमेरो_Matches, char_u ***matches)
 {
     // We want to expand using the predefined clipmethod values + clipboard
     // provider names.
     int		result;
-    char	**values;
-    int		count, pos = 0, start = 0;
+    char	**मगा_हालागा;
+    int		बिलांग, pos = 0, start = 0;
 # ifdef FEAT_EVAL
     dict_T	*providers = get_vim_var_dict(VV_CLIPPROVIDERS);
 # else
@@ -1518,25 +1518,25 @@ expand_set_clipmethod(optexpand_T *args, int *numMatches, char_u ***matches)
 # endif
     hashtab_T	*ht = providers == NULL ? NULL : &providers->dv_hashtab;
 
-    count = (ht == NULL ? 0 : ht->ht_used);
+    बिलांग = (ht == NULL ? 0 : ht->ht_used);
 # ifdef FEAT_WAYLAND_CLIPBOARD
-    count++;
+    बिलांग++;
     start++;
 # endif
 # ifdef FEAT_XCLIPBOARD
-    count++;
+    बिलांग++;
     start++;
 # endif
-    values = ALLOC_MULT(char *, count + 1); // Add NULL terminator too
+    मगा_हालागा = ALLOC_MULT(char *, बिलांग + 1); // Add NULL terminator too
 
-    if (values == NULL)
+    if (मगा_हालागा == NULL)
 	return FAIL;
 
 # ifdef FEAT_WAYLAND_CLIPBOARD
-    values[pos++] = "wayland";
+    मगा_हालागा[pos++] = "wayland";
 # endif
 # ifdef FEAT_XCLIPBOARD
-    values[pos++] = "x11";
+    मगा_हालागा[pos++] = "x11";
 # endif
 
     if (ht != NULL)
@@ -1545,20 +1545,20 @@ expand_set_clipmethod(optexpand_T *args, int *numMatches, char_u ***matches)
 	    hashitem_T	*hi = ht->ht_array + i;
 
 	    if (!HASHITEM_EMPTY(hi))
-		values[pos++] = (char *)vim_strsave(hi->hi_key);
+		मगा_हालागा[pos++] = (char *)vim_strsave(hi->hi_सुसि);
 	}
-    values[pos++] = NULL;
+    मगा_हालागा[pos++] = NULL;
 
     result = expand_set_opt_string(
-	    args,
-	    values,
-	    count,
-	    numMatches,
+	    मगा_कातविरान,
+	    मगा_हालागा,
+	    बिलांग,
+	    नुमेरो_Matches,
 	    matches);
 
-    for (int i = start; i < count; i++)
-	vim_free(values[i]);
-    vim_free(values);
+    for (int i = start; i < बिलांग; i++)
+	vim_free(मगा_हालागा[i]);
+    vim_free(मगा_हालागा);
 
     return result;
 }
@@ -1621,21 +1621,21 @@ did_set_global_listfillchars(char_u *val, int opt_lcs, int opt_flags,
  * The 'fillchars' option or the 'listchars' option is changed.
  */
     char *
-did_set_chars_option(optset_T *args)
+did_set_chars_option(optset_T *मगा_कातविरान)
 {
-    char_u **varp = (char_u **)args->os_varp;
+    char_u **varp = (char_u **)मगा_कातविरान->os_varp;
     char *errmsg = NULL;
 
     if (   varp == &p_lcs		// global 'listchars'
 	|| varp == &p_fcs)		// global 'fillchars'
 	errmsg = did_set_global_listfillchars(*varp, varp == &p_lcs,
-			  args->os_flags, args->os_errbuf, args->os_errbuflen);
+			  मगा_कातविरान->os_flags, मगा_कातविरान->os_errbuf, मगा_कातविरान->os_errbuflen);
     else if (varp == &curwin->w_p_lcs)	// local 'listchars'
 	errmsg = set_listchars_option(curwin, *varp, TRUE,
-					  args->os_errbuf, args->os_errbuflen);
+					  मगा_कातविरान->os_errbuf, मगा_कातविरान->os_errbuflen);
     else if (varp == &curwin->w_p_fcs)	// local 'fillchars'
 	errmsg = set_fillchars_option(curwin, *varp, TRUE,
-					  args->os_errbuf, args->os_errbuflen);
+					  मगा_कातविरान->os_errbuf, मगा_कातविरान->os_errbuflen);
 
     return errmsg;
 }
@@ -1644,14 +1644,14 @@ did_set_chars_option(optset_T *args)
  * Expand 'fillchars' or 'listchars' option value.
  */
     int
-expand_set_chars_option(optexpand_T *args, int *numMatches, char_u ***matches)
+expand_set_chars_option(optexpand_T *मगा_कातविरान, int *नुमेरो_Matches, char_u ***matches)
 {
-    char_u **varp = (char_u **)args->oe_varp;
+    char_u **varp = (char_u **)मगा_कातविरान->oe_varp;
     int is_lcs = (varp == &p_lcs || varp == &curwin->w_p_lcs);
     return expand_set_opt_generic(
-	    args,
+	    मगा_कातविरान,
 	    is_lcs ? get_listchars_name : get_fillchars_name,
-	    numMatches,
+	    नुमेरो_Matches,
 	    matches);
 }
 
@@ -1659,7 +1659,7 @@ expand_set_chars_option(optexpand_T *args, int *numMatches, char_u ***matches)
  * The 'cinoptions' option is changed.
  */
     char *
-did_set_cinoptions(optset_T *args UNUSED)
+did_set_cinoptions(optset_T *मगा_कातविरान UNUSED)
 {
     // TODO: recognize errors
     parse_cino(curbuf);
@@ -1672,9 +1672,9 @@ did_set_cinoptions(optset_T *args UNUSED)
  * The 'colorcolumn' option is changed.
  */
     char *
-did_set_colorcolumn(optset_T *args)
+did_set_colorcolumn(optset_T *मगा_कातविरान)
 {
-    char_u	**varp = (char_u **)args->os_varp;
+    char_u	**varp = (char_u **)मगा_कातविरान->os_varp;
 
     return check_colorcolumn(*varp, varp == &curwin->w_p_cc ? curwin : NULL);
 }
@@ -1684,9 +1684,9 @@ did_set_colorcolumn(optset_T *args)
  * The 'comments' option is changed.
  */
     char *
-did_set_comments(optset_T *args)
+did_set_comments(optset_T *मगा_कातविरान)
 {
-    char_u	**varp = (char_u **)args->os_varp;
+    char_u	**varp = (char_u **)मगा_कातविरान->os_varp;
     char_u	*s;
     char	*errmsg = NULL;
 
@@ -1697,7 +1697,7 @@ did_set_comments(optset_T *args)
 	    if (vim_strchr((char_u *)COM_ALL, *s) == NULL
 		    && !VIM_ISDIGIT(*s) && *s != '-')
 	    {
-		errmsg = illegal_char(args->os_errbuf, args->os_errbuflen, *s);
+		errmsg = illegal_char(मगा_कातविरान->os_errbuf, मगा_कातविरान->os_errbuflen, *s);
 		break;
 	    }
 	    ++s;
@@ -1724,9 +1724,9 @@ did_set_comments(optset_T *args)
  * The 'commentstring' option is changed.
  */
     char *
-did_set_commentstring(optset_T *args)
+did_set_commentstring(optset_T *मगा_कातविरान)
 {
-    char_u	**varp = (char_u **)args->os_varp;
+    char_u	**varp = (char_u **)मगा_कातविरान->os_varp;
 
     if (**varp != NUL && strstr((char *)*varp, "%s") == NULL)
 	return e_commentstring_must_be_empty_or_contain_str;
@@ -1738,9 +1738,9 @@ did_set_commentstring(optset_T *args)
  * Check if value for 'complete' is valid when 'complete' option is changed.
  */
     char *
-did_set_complete(optset_T *args)
+did_set_complete(optset_T *मगा_कातविरान)
 {
-    char_u	**varp = (char_u **)args->os_varp;
+    char_u	**varp = (char_u **)मगा_कातविरान->os_varp;
     char_u	*p, *t;
     char_u	buffer[LSIZE];
     char_u	*buf_ptr;
@@ -1771,7 +1771,7 @@ did_set_complete(optset_T *args)
 	*buf_ptr = NUL;
 
 	if (vim_strchr((char_u *)".wbuksid]tUFo", *buffer) == NULL)
-	    return illegal_char(args->os_errbuf, args->os_errbuflen, *buffer);
+	    return illegal_char(मगा_कातविरान->os_errbuf, मगा_कातविरान->os_errbuflen, *buffer);
 
 	if (vim_strchr((char_u *)"ksF", *buffer) == NULL && *(buffer + 1) != NUL
 		&& *(buffer + 1) != '^')
@@ -1798,7 +1798,7 @@ did_set_complete(optset_T *args)
 	    }
 	}
 	if (char_before != NUL)
-	    return illegal_char_after_chr(args->os_errbuf, args->os_errbuflen,
+	    return illegal_char_after_chr(मगा_कातविरान->os_errbuf, मगा_कातविरान->os_errbuflen,
 		    char_before);
 	// Skip comma and spaces
 	while (*p == ',' || *p == ' ')
@@ -1806,24 +1806,24 @@ did_set_complete(optset_T *args)
     }
 
 #ifdef FEAT_COMPL_FUNC
-    if (set_cpt_callbacks(args) != OK)
-	return illegal_char_after_chr(args->os_errbuf, args->os_errbuflen,
+    if (set_cpt_callbacks(मगा_कातविरान) != OK)
+	return illegal_char_after_chr(मगा_कातविरान->os_errbuf, मगा_कातविरान->os_errbuflen,
 		'F');
 #endif
     return NULL;
 }
 
     int
-expand_set_complete(optexpand_T *args, int *numMatches, char_u ***matches)
+expand_set_complete(optexpand_T *मगा_कातविरान, int *नुमेरो_Matches, char_u ***matches)
 {
-    static char *(p_cpt_values[]) = {
+    static char *(p_cpt_मगा_हालागा[]) = {
 	".", "w", "b", "u", "k", "kspell", "s", "i", "d", "]", "t", "U", "F", "o",
 	NULL};
     return expand_set_opt_string(
-	    args,
-	    p_cpt_values,
-	    ARRAY_LENGTH(p_cpt_values) - 1,
-	    numMatches,
+	    मगा_कातविरान,
+	    p_cpt_मगा_हालागा,
+	    ARRAY_LENGTH(p_cpt_मगा_हालागा) - 1,
+	    नुमेरो_Matches,
 	    matches);
 }
 
@@ -1831,34 +1831,34 @@ expand_set_complete(optexpand_T *args, int *numMatches, char_u ***matches)
  * The 'completeopt' option is changed.
  */
     char *
-did_set_completeopt(optset_T *args UNUSED)
+did_set_completeopt(optset_T *मगा_कातविरान UNUSED)
 {
     char_u	*cot = p_cot;
     unsigned	*flags = &cot_flags;
 
-    if (args->os_flags & OPT_LOCAL)
+    if (मगा_कातविरान->os_flags & OPT_LOCAL)
     {
 	cot = curbuf->b_p_cot;
 	flags = &curbuf->b_cot_flags;
     }
-    else if (!(args->os_flags & OPT_GLOBAL))
+    else if (!(मगा_कातविरान->os_flags & OPT_GLOBAL))
 	// When using :set, clear the local flags.
 	curbuf->b_cot_flags = 0;
 
-    if (opt_strings_flags(cot, p_cot_values, flags, TRUE) != OK)
+    if (opt_strings_flags(cot, p_cot_मगा_हालागा, flags, TRUE) != OK)
 	return e_invalid_argument;
 
     return NULL;
 }
 
     int
-expand_set_completeopt(optexpand_T *args, int *numMatches, char_u ***matches)
+expand_set_completeopt(optexpand_T *मगा_कातविरान, int *नुमेरो_Matches, char_u ***matches)
 {
     return expand_set_opt_string(
-	    args,
-	    p_cot_values,
-	    ARRAY_LENGTH(p_cot_values) - 1,
-	    numMatches,
+	    मगा_कातविरान,
+	    p_cot_मगा_हालागा,
+	    ARRAY_LENGTH(p_cot_मगा_हालागा) - 1,
+	    नुमेरो_Matches,
 	    matches);
 }
 
@@ -1866,24 +1866,24 @@ expand_set_completeopt(optexpand_T *args, int *numMatches, char_u ***matches)
  * The 'completefuzzycollect' option is changed.
  */
     char *
-did_set_completefuzzycollect(optset_T *args UNUSED)
+did_set_completefuzzycollect(optset_T *मगा_कातविरान UNUSED)
 {
-    if (opt_strings_flags(p_cfc, p_cfc_values, &cfc_flags, TRUE) != OK)
+    if (opt_strings_flags(p_cfc, p_cfc_मगा_हालागा, &cfc_flags, TRUE) != OK)
 	return e_invalid_argument;
     return NULL;
 }
 
     int
 expand_set_completefuzzycollect(
-	optexpand_T *args,
-	int *numMatches,
+	optexpand_T *मगा_कातविरान,
+	int *नुमेरो_Matches,
 	char_u ***matches)
 {
     return expand_set_opt_string(
-	    args,
-	    p_cfc_values,
-	    ARRAY_LENGTH(p_cfc_values) - 1,
-	    numMatches,
+	    मगा_कातविरान,
+	    p_cfc_मगा_हालागा,
+	    ARRAY_LENGTH(p_cfc_मगा_हालागा) - 1,
+	    नुमेरो_Matches,
 	    matches);
 }
 
@@ -1891,18 +1891,18 @@ expand_set_completefuzzycollect(
  * The 'completeitemalign' option is changed.
  */
     char *
-did_set_completeitemalign(optset_T *args UNUSED)
+did_set_completeitemalign(optset_T *मगा_कातविरान UNUSED)
 {
     char_u	*p = p_cia;
     unsigned	new_cia_flags = 0;
     int		seen[3] = { FALSE, FALSE, FALSE };
-    int		count = 0;
+    int		बिलांग = 0;
     char_u	buf[10];
 
     while (*p)
     {
 	copy_option_part(&p, buf, sizeof(buf), ",");
-	if (count >= 3)
+	if (बिलांग >= 3)
 	    return e_invalid_argument;
 
 	if (STRCMP(buf, "abbr") == 0)
@@ -1911,7 +1911,7 @@ did_set_completeitemalign(optset_T *args UNUSED)
 		return e_invalid_argument;
 	    new_cia_flags = new_cia_flags * 10 + CPT_ABBR;
 	    seen[CPT_ABBR] = TRUE;
-	    count++;
+	    बिलांग++;
 	}
 	else if (STRCMP(buf, "kind") == 0)
 	{
@@ -1919,7 +1919,7 @@ did_set_completeitemalign(optset_T *args UNUSED)
 		return e_invalid_argument;
 	    new_cia_flags = new_cia_flags * 10 + CPT_KIND;
 	    seen[CPT_KIND] = TRUE;
-	    count++;
+	    बिलांग++;
 	}
 	else if (STRCMP(buf, "menu") == 0)
 	{
@@ -1927,12 +1927,12 @@ did_set_completeitemalign(optset_T *args UNUSED)
 		return e_invalid_argument;
 	    new_cia_flags = new_cia_flags * 10 + CPT_MENU;
 	    seen[CPT_MENU] = TRUE;
-	    count++;
+	    बिलांग++;
 	}
 	else
 	    return e_invalid_argument;
     }
-    if (new_cia_flags == 0 || count != 3)
+    if (new_cia_flags == 0 || बिलांग != 3)
 	return e_invalid_argument;
 
     cia_flags = new_cia_flags;
@@ -1944,7 +1944,7 @@ did_set_completeitemalign(optset_T *args UNUSED)
  * The 'completepopup' option is changed.
  */
     char *
-did_set_completepopup(optset_T *args UNUSED)
+did_set_completepopup(optset_T *मगा_कातविरान UNUSED)
 {
     if (parse_completepopup(NULL) == FAIL)
 	return e_invalid_argument;
@@ -1959,23 +1959,23 @@ did_set_completepopup(optset_T *args UNUSED)
  * The 'completeslash' option is changed.
  */
     char *
-did_set_completeslash(optset_T *args UNUSED)
+did_set_completeslash(optset_T *मगा_कातविरान UNUSED)
 {
-    if (check_opt_strings(p_csl, p_csl_values, FALSE) != OK
-	    || check_opt_strings(curbuf->b_p_csl, p_csl_values, FALSE) != OK)
+    if (check_opt_strings(p_csl, p_csl_मगा_हालागा, FALSE) != OK
+	    || check_opt_strings(curbuf->b_p_csl, p_csl_मगा_हालागा, FALSE) != OK)
 	return e_invalid_argument;
 
     return NULL;
 }
 
     int
-expand_set_completeslash(optexpand_T *args, int *numMatches, char_u ***matches)
+expand_set_completeslash(optexpand_T *मगा_कातविरान, int *नुमेरो_Matches, char_u ***matches)
 {
     return expand_set_opt_string(
-	    args,
-	    p_csl_values,
-	    ARRAY_LENGTH(p_csl_values) - 1,
-	    numMatches,
+	    मगा_कातविरान,
+	    p_csl_मगा_हालागा,
+	    ARRAY_LENGTH(p_csl_मगा_हालागा) - 1,
+	    नुमेरो_Matches,
 	    matches);
 }
 #endif
@@ -1985,18 +1985,18 @@ expand_set_completeslash(optexpand_T *args, int *numMatches, char_u ***matches)
  * The 'concealcursor' option is changed.
  */
     char *
-did_set_concealcursor(optset_T *args)
+did_set_concealcursor(optset_T *मगा_कातविरान)
 {
-    char_u	**varp = (char_u **)args->os_varp;
+    char_u	**varp = (char_u **)मगा_कातविरान->os_varp;
 
-    return did_set_option_listflag(*varp, (char_u *)COCU_ALL, args->os_errbuf,
-		    args->os_errbuflen);
+    return did_set_option_listflag(*varp, (char_u *)COCU_ALL, मगा_कातविरान->os_errbuf,
+		    मगा_कातविरान->os_errbuflen);
 }
 
     int
-expand_set_concealcursor(optexpand_T *args, int *numMatches, char_u ***matches)
+expand_set_concealcursor(optexpand_T *मगा_कातविरान, int *नुमेरो_Matches, char_u ***matches)
 {
-    return expand_set_opt_listflag(args, (char_u*)COCU_ALL, numMatches, matches);
+    return expand_set_opt_listflag(मगा_कातविरान, (char_u*)COCU_ALL, नुमेरो_Matches, matches);
 }
 #endif
 
@@ -2004,18 +2004,18 @@ expand_set_concealcursor(optexpand_T *args, int *numMatches, char_u ***matches)
  * The 'cpoptions' option is changed.
  */
     char *
-did_set_cpoptions(optset_T *args)
+did_set_cpoptions(optset_T *मगा_कातविरान)
 {
-    char_u	**varp = (char_u **)args->os_varp;
+    char_u	**varp = (char_u **)मगा_कातविरान->os_varp;
 
-    return did_set_option_listflag(*varp, (char_u *)CPO_ALL, args->os_errbuf,
-		    args->os_errbuflen);
+    return did_set_option_listflag(*varp, (char_u *)CPO_ALL, मगा_कातविरान->os_errbuf,
+		    मगा_कातविरान->os_errbuflen);
 }
 
     int
-expand_set_cpoptions(optexpand_T *args, int *numMatches, char_u ***matches)
+expand_set_cpoptions(optexpand_T *मगा_कातविरान, int *नुमेरो_Matches, char_u ***matches)
 {
-    return expand_set_opt_listflag(args, (char_u*)CPO_ALL, numMatches, matches);
+    return expand_set_opt_listflag(मगा_कातविरान, (char_u*)CPO_ALL, नुमेरो_Matches, matches);
 }
 
 #if defined(FEAT_CRYPT)
@@ -2023,26 +2023,26 @@ expand_set_cpoptions(optexpand_T *args, int *numMatches, char_u ***matches)
  * The 'cryptkey' option is changed.
  */
     char *
-did_set_cryptkey(optset_T *args)
+did_set_cryptkey(optset_T *मगा_कातविरान)
 {
     // Make sure the ":set" command doesn't show the new value in the
     // history.
-    remove_key_from_history();
+    remove_सुसि_from_history();
 
-    if (args->os_op != OP_NONE)
+    if (मगा_कातविरान->os_op != OP_NONE)
 	// Don't allow set+=/-=/^= as they can allow for substring guessing
 	return e_invalid_argument;
 
-    if (STRCMP(curbuf->b_p_key, args->os_oldval.string) != 0)
+    if (STRCMP(curbuf->b_p_सुसि, मगा_कातविरान->os_oldval.string) != 0)
     {
 	// Need to update the swapfile.
-	ml_set_crypt_key(curbuf, args->os_oldval.string,
+	ml_set_crypt_सुसि(curbuf, मगा_कातविरान->os_oldval.string,
 		*curbuf->b_p_cm == NUL ? p_cm : curbuf->b_p_cm);
 	changed_internal();
     }
 # ifdef FEAT_SODIUM
     if (crypt_method_is_sodium(crypt_get_method_nr(curbuf)))
-	crypt_sodium_lock_key(args->os_newval.string);
+	crypt_sodium_lock_सुसि(मगा_कातविरान->os_newval.string);
 # endif
 
     return NULL;
@@ -2052,16 +2052,16 @@ did_set_cryptkey(optset_T *args)
  * The 'cryptmethod' option is changed.
  */
     char *
-did_set_cryptmethod(optset_T *args)
+did_set_cryptmethod(optset_T *मगा_कातविरान)
 {
     char_u  *p;
     char_u  *s;
 
-    if (args->os_flags & OPT_LOCAL)
+    if (मगा_कातविरान->os_flags & OPT_LOCAL)
 	p = curbuf->b_p_cm;
     else
 	p = p_cm;
-    if (check_opt_strings(p, p_cm_values, TRUE) != OK)
+    if (check_opt_strings(p, p_cm_मगा_हालागा, TRUE) != OK)
 	return e_invalid_argument;
     else if (crypt_self_test() == FAIL)
 	return e_invalid_argument;
@@ -2075,7 +2075,7 @@ did_set_cryptmethod(optset_T *args)
     // When using ":set cm=name" the local value is going to be empty.
     // Do that here, otherwise the crypt functions will still use the
     // local value.
-    if ((args->os_flags & (OPT_LOCAL | OPT_GLOBAL)) == 0)
+    if ((मगा_कातविरान->os_flags & (OPT_LOCAL | OPT_GLOBAL)) == 0)
     {
 	free_string_option(curbuf->b_p_cm);
 	curbuf->b_p_cm = empty_option;
@@ -2084,39 +2084,39 @@ did_set_cryptmethod(optset_T *args)
     // Need to update the swapfile when the effective method changed.
     // Set "s" to the effective old value, "p" to the effective new
     // method and compare.
-    if ((args->os_flags & OPT_LOCAL) && *args->os_oldval.string == NUL)
+    if ((मगा_कातविरान->os_flags & OPT_LOCAL) && *मगा_कातविरान->os_oldval.string == NUL)
 	s = p_cm;  // was previously using the global value
     else
-	s = args->os_oldval.string;
+	s = मगा_कातविरान->os_oldval.string;
     if (*curbuf->b_p_cm == NUL)
 	p = p_cm;  // is now using the global value
     else
 	p = curbuf->b_p_cm;
     if (STRCMP(s, p) != 0)
-	ml_set_crypt_key(curbuf, curbuf->b_p_key, s);
+	ml_set_crypt_सुसि(curbuf, curbuf->b_p_सुसि, s);
 
     // If the global value changes need to update the swapfile for all
     // buffers using that value.
-    if ((args->os_flags & OPT_GLOBAL)
-	    && STRCMP(p_cm, args->os_oldval.string) != 0)
+    if ((मगा_कातविरान->os_flags & OPT_GLOBAL)
+	    && STRCMP(p_cm, मगा_कातविरान->os_oldval.string) != 0)
     {
 	buf_T	*buf;
 
 	FOR_ALL_BUFFERS(buf)
 	    if (buf != curbuf && *buf->b_p_cm == NUL)
-		ml_set_crypt_key(buf, buf->b_p_key, args->os_oldval.string);
+		ml_set_crypt_सुसि(buf, buf->b_p_सुसि, मगा_कातविरान->os_oldval.string);
     }
     return NULL;
 }
 
     int
-expand_set_cryptmethod(optexpand_T *args, int *numMatches, char_u ***matches)
+expand_set_cryptmethod(optexpand_T *मगा_कातविरान, int *नुमेरो_Matches, char_u ***matches)
 {
     return expand_set_opt_string(
-	    args,
-	    p_cm_values,
-	    ARRAY_LENGTH(p_cm_values) - 1,
-	    numMatches,
+	    मगा_कातविरान,
+	    p_cm_मगा_हालागा,
+	    ARRAY_LENGTH(p_cm_मगा_हालागा) - 1,
+	    नुमेरो_Matches,
 	    matches);
 }
 #endif
@@ -2126,7 +2126,7 @@ expand_set_cryptmethod(optexpand_T *args, int *numMatches, char_u ***matches)
  * The 'cscopequickfix' option is changed.
  */
     char *
-did_set_cscopequickfix(optset_T *args UNUSED)
+did_set_cscopequickfix(optset_T *मगा_कातविरान UNUSED)
 {
     char_u	*p;
 
@@ -2156,9 +2156,9 @@ did_set_cscopequickfix(optset_T *args UNUSED)
  * The 'cursorlineopt' option is changed.
  */
     char *
-did_set_cursorlineopt(optset_T *args)
+did_set_cursorlineopt(optset_T *मगा_कातविरान)
 {
-    char_u	**varp = (char_u **)args->os_varp;
+    char_u	**varp = (char_u **)मगा_कातविरान->os_varp;
 
     // This could be changed to use opt_strings_flags() instead.
     if (**varp == NUL || fill_culopt_flags(*varp, curwin) != OK)
@@ -2168,13 +2168,13 @@ did_set_cursorlineopt(optset_T *args)
 }
 
     int
-expand_set_cursorlineopt(optexpand_T *args, int *numMatches, char_u ***matches)
+expand_set_cursorlineopt(optexpand_T *मगा_कातविरान, int *नुमेरो_Matches, char_u ***matches)
 {
     return expand_set_opt_string(
-	    args,
-	    p_culopt_values,
-	    ARRAY_LENGTH(p_culopt_values) - 1,
-	    numMatches,
+	    मगा_कातविरान,
+	    p_culopt_मगा_हालागा,
+	    ARRAY_LENGTH(p_culopt_मगा_हालागा) - 1,
+	    नुमेरो_Matches,
 	    matches);
 }
 #endif
@@ -2183,19 +2183,19 @@ expand_set_cursorlineopt(optexpand_T *args, int *numMatches, char_u ***matches)
  * The 'debug' option is changed.
  */
     char *
-did_set_debug(optset_T *args UNUSED)
+did_set_debug(optset_T *मगा_कातविरान UNUSED)
 {
-    return did_set_opt_strings(p_debug, p_debug_values, TRUE);
+    return did_set_opt_strings(p_debug, p_debug_मगा_हालागा, TRUE);
 }
 
     int
-expand_set_debug(optexpand_T *args, int *numMatches, char_u ***matches)
+expand_set_debug(optexpand_T *मगा_कातविरान, int *नुमेरो_Matches, char_u ***matches)
 {
     return expand_set_opt_string(
-	    args,
-	    p_debug_values,
-	    ARRAY_LENGTH(p_debug_values) - 1,
-	    numMatches,
+	    मगा_कातविरान,
+	    p_debug_मगा_हालागा,
+	    ARRAY_LENGTH(p_debug_मगा_हालागा) - 1,
+	    नुमेरो_Matches,
 	    matches);
 }
 
@@ -2204,9 +2204,9 @@ expand_set_debug(optexpand_T *args, int *numMatches, char_u ***matches)
  * The 'diffanchors' option is changed.
  */
     char *
-did_set_diffanchors(optset_T *args)
+did_set_diffanchors(optset_T *मगा_कातविरान)
 {
-    if (diffanchors_changed(args->os_flags & OPT_LOCAL) == FAIL)
+    if (diffanchors_changed(मगा_कातविरान->os_flags & OPT_LOCAL) == FAIL)
 	return e_invalid_argument;
 
     return NULL;
@@ -2216,7 +2216,7 @@ did_set_diffanchors(optset_T *args)
  * The 'diffopt' option is changed.
  */
     char *
-did_set_diffopt(optset_T *args UNUSED)
+did_set_diffopt(optset_T *मगा_कातविरान UNUSED)
 {
     if (diffopt_changed() == FAIL)
 	return e_invalid_argument;
@@ -2225,38 +2225,38 @@ did_set_diffopt(optset_T *args UNUSED)
 }
 
     int
-expand_set_diffopt(optexpand_T *args, int *numMatches, char_u ***matches)
+expand_set_diffopt(optexpand_T *मगा_कातविरान, int *नुमेरो_Matches, char_u ***matches)
 {
-    expand_T *xp = args->oe_xp;
+    expand_T *xp = मगा_कातविरान->oe_xp;
 
-    if (xp->xp_pattern > args->oe_set_arg && *(xp->xp_pattern-1) == ':')
+    if (xp->xp_pattern > मगा_कातविरान->oe_set_arg && *(xp->xp_pattern-1) == ':')
     {
-	if (completing_value_for_subopt(args, "algorithm"))
+	if (completing_हालागा_for_subopt(मगा_कातविरान, "algorithm"))
 	{
 	    return expand_set_opt_string(
-		    args,
-		    p_dip_algorithm_values,
-		    ARRAY_LENGTH(p_dip_algorithm_values) - 1,
-		    numMatches,
+		    मगा_कातविरान,
+		    p_dip_algorithm_मगा_हालागा,
+		    ARRAY_LENGTH(p_dip_algorithm_मगा_हालागा) - 1,
+		    नुमेरो_Matches,
 		    matches);
 	}
-	if (completing_value_for_subopt(args, "inline"))
+	if (completing_हालागा_for_subopt(मगा_कातविरान, "inline"))
 	{
 	    return expand_set_opt_string(
-		    args,
-		    p_dip_inline_values,
-		    ARRAY_LENGTH(p_dip_inline_values) - 1,
-		    numMatches,
+		    मगा_कातविरान,
+		    p_dip_inline_मगा_हालागा,
+		    ARRAY_LENGTH(p_dip_inline_मगा_हालागा) - 1,
+		    नुमेरो_Matches,
 		    matches);
 	}
 	return FAIL;
     }
 
     return expand_set_opt_string(
-	    args,
-	    p_dip_values,
-	    ARRAY_LENGTH(p_dip_values) - 1,
-	    numMatches,
+	    मगा_कातविरान,
+	    p_dip_मगा_हालागा,
+	    ARRAY_LENGTH(p_dip_मगा_हालागा) - 1,
+	    नुमेरो_Matches,
 	    matches);
 }
 #endif
@@ -2265,9 +2265,9 @@ expand_set_diffopt(optexpand_T *args, int *numMatches, char_u ***matches)
  * The 'display' option is changed.
  */
     char *
-did_set_display(optset_T *args UNUSED)
+did_set_display(optset_T *मगा_कातविरान UNUSED)
 {
-    if (opt_strings_flags(p_dy, p_dy_values, &dy_flags, TRUE) != OK)
+    if (opt_strings_flags(p_dy, p_dy_मगा_हालागा, &dy_flags, TRUE) != OK)
 	return e_invalid_argument;
 
     (void)init_chartab();
@@ -2275,13 +2275,13 @@ did_set_display(optset_T *args UNUSED)
 }
 
     int
-expand_set_display(optexpand_T *args, int *numMatches, char_u ***matches)
+expand_set_display(optexpand_T *मगा_कातविरान, int *नुमेरो_Matches, char_u ***matches)
 {
     return expand_set_opt_string(
-	    args,
-	    p_dy_values,
-	    ARRAY_LENGTH(p_dy_values) - 1,
-	    numMatches,
+	    मगा_कातविरान,
+	    p_dy_मगा_हालागा,
+	    ARRAY_LENGTH(p_dy_मगा_हालागा) - 1,
+	    नुमेरो_Matches,
 	    matches);
 }
 
@@ -2289,19 +2289,19 @@ expand_set_display(optexpand_T *args, int *numMatches, char_u ***matches)
  * The 'eadirection' option is changed.
  */
     char *
-did_set_eadirection(optset_T *args UNUSED)
+did_set_eadirection(optset_T *मगा_कातविरान UNUSED)
 {
-    return did_set_opt_strings(p_ead, p_ead_values, FALSE);
+    return did_set_opt_strings(p_ead, p_ead_मगा_हालागा, FALSE);
 }
 
     int
-expand_set_eadirection(optexpand_T *args, int *numMatches, char_u ***matches)
+expand_set_eadirection(optexpand_T *मगा_कातविरान, int *नुमेरो_Matches, char_u ***matches)
 {
     return expand_set_opt_string(
-	    args,
-	    p_ead_values,
-	    ARRAY_LENGTH(p_ead_values) - 1,
-	    numMatches,
+	    मगा_कातविरान,
+	    p_ead_मगा_हालागा,
+	    ARRAY_LENGTH(p_ead_मगा_हालागा) - 1,
+	    नुमेरो_Matches,
 	    matches);
 }
 
@@ -2310,20 +2310,20 @@ expand_set_eadirection(optexpand_T *args, int *numMatches, char_u ***matches)
  * options is changed.
  */
     char *
-did_set_encoding(optset_T *args)
+did_set_encoding(optset_T *मगा_कातविरान)
 {
-    char_u	**varp = (char_u **)args->os_varp;
+    char_u	**varp = (char_u **)मगा_कातविरान->os_varp;
     char_u	**gvarp;
     char	*errmsg = NULL;
     char_u	*p;
 
     // Get the global option to compare with, otherwise we would have to check
     // two values for all local options.
-    gvarp = (char_u **)get_option_varp_scope(args->os_idx, OPT_GLOBAL);
+    gvarp = (char_u **)get_option_varp_scope(मगा_कातविरान->os_idx, OPT_GLOBAL);
 
     if (gvarp == &p_fenc)
     {
-	if (!curbuf->b_p_ma && args->os_flags != OPT_GLOBAL)
+	if (!curbuf->b_p_ma && मगा_कातविरान->os_flags != OPT_GLOBAL)
 	    errmsg = e_cannot_make_changes_modifiable_is_off;
 	else if (vim_strchr(*varp, ',') != NULL)
 	    // No comma allowed in 'fileencoding'; catches confusing it
@@ -2376,7 +2376,7 @@ did_set_encoding(optset_T *args)
 	// display output conversion.
 	if (((varp == &p_enc && *p_tenc != NUL) || varp == &p_tenc))
 	{
-	    if (convert_setup(&input_conv, p_tenc, p_enc) == FAIL
+	    if (convert_setup(&पासोक_conv, p_tenc, p_enc) == FAIL
 		    || convert_setup(&output_conv, p_enc, p_tenc) == FAIL)
 	    {
 		semsg(_(e_cannot_convert_between_str_and_str),
@@ -2399,12 +2399,12 @@ did_set_encoding(optset_T *args)
 }
 
     int
-expand_set_encoding(optexpand_T *args, int *numMatches, char_u ***matches)
+expand_set_encoding(optexpand_T *मगा_कातविरान, int *नुमेरो_Matches, char_u ***matches)
 {
     return expand_set_opt_generic(
-	    args,
+	    मगा_कातविरान,
 	    get_encoding_name,
-	    numMatches,
+	    नुमेरो_Matches,
 	    matches);
 }
 
@@ -2412,10 +2412,10 @@ expand_set_encoding(optexpand_T *args, int *numMatches, char_u ***matches)
  * The 'eventignore(win)' option is changed.
  */
     char *
-did_set_eventignore(optset_T *args)
+did_set_eventignore(optset_T *मगा_कातविरान)
 {
-    char_u	**varp = (char_u **)args->os_varp;
-    char_u	*oldval = args->os_oldval.string;
+    char_u	**varp = (char_u **)मगा_कातविरान->os_varp;
+    char_u	*oldval = मगा_कातविरान->os_oldval.string;
 
     if (check_ei(*varp) == FAIL)
 	return e_invalid_argument;
@@ -2432,7 +2432,7 @@ did_set_eventignore(optset_T *args)
     if (save_ei != NULL)
     {
 	char_u	*newval = *varp;
-	win_T	*wp = is_window_local_option(args->os_idx) ? curwin : NULL;
+	win_T	*wp = is_window_local_option(मगा_कातविरान->os_idx) ? curwin : NULL;
 
 	*varp = save_ei;
 	// "varp" points into "wp" for 'eventignorewin'.
@@ -2469,13 +2469,13 @@ get_eventignore_name(expand_T *xp, int idx)
 }
 
     int
-expand_set_eventignore(optexpand_T *args, int *numMatches, char_u ***matches)
+expand_set_eventignore(optexpand_T *मगा_कातविरान, int *नुमेरो_Matches, char_u ***matches)
 {
-    expand_eiw = args->oe_varp != (char_u *)&p_ei;
+    expand_eiw = मगा_कातविरान->oe_varp != (char_u *)&p_ei;
     return expand_set_opt_generic(
-	    args,
+	    मगा_कातविरान,
 	    get_eventignore_name,
-	    numMatches,
+	    नुमेरो_Matches,
 	    matches);
 }
 
@@ -2483,13 +2483,13 @@ expand_set_eventignore(optexpand_T *args, int *numMatches, char_u ***matches)
  * The 'fileformat' option is changed.
  */
     char *
-did_set_fileformat(optset_T *args)
+did_set_fileformat(optset_T *मगा_कातविरान)
 {
-    char_u	**varp = (char_u **)args->os_varp;
+    char_u	**varp = (char_u **)मगा_कातविरान->os_varp;
 
-    if (!curbuf->b_p_ma && !(args->os_flags & OPT_GLOBAL))
+    if (!curbuf->b_p_ma && !(मगा_कातविरान->os_flags & OPT_GLOBAL))
 	return e_cannot_make_changes_modifiable_is_off;
-    else if (check_opt_strings(*varp, p_ff_values, FALSE) != OK)
+    else if (check_opt_strings(*varp, p_ff_मगा_हालागा, FALSE) != OK)
 	return e_invalid_argument;
 
     // may also change 'textmode'
@@ -2502,20 +2502,20 @@ did_set_fileformat(optset_T *args)
     ml_setflags(curbuf);
     // Redraw needed when switching to/from "mac": a CR in the text
     // will be displayed differently.
-    if (get_fileformat(curbuf) == EOL_MAC || *args->os_oldval.string == 'm')
+    if (get_fileformat(curbuf) == EOL_MAC || *मगा_कातविरान->os_oldval.string == 'm')
 	redraw_curbuf_later(UPD_NOT_VALID);
 
     return NULL;
 }
 
     int
-expand_set_fileformat(optexpand_T *args, int *numMatches, char_u ***matches)
+expand_set_fileformat(optexpand_T *मगा_कातविरान, int *नुमेरो_Matches, char_u ***matches)
 {
     return expand_set_opt_string(
-	    args,
-	    p_ff_values,
-	    ARRAY_LENGTH(p_ff_values) - 1,
-	    numMatches,
+	    मगा_कातविरान,
+	    p_ff_मगा_हालागा,
+	    ARRAY_LENGTH(p_ff_मगा_हालागा) - 1,
+	    नुमेरो_Matches,
 	    matches);
 }
 
@@ -2526,19 +2526,19 @@ expand_set_fileformat(optexpand_T *args, int *numMatches, char_u ***matches)
     char_u *
 get_fileformat_name(expand_T *xp UNUSED, int idx)
 {
-    if (idx >= (int)ARRAY_LENGTH(p_ff_values))
+    if (idx >= (int)ARRAY_LENGTH(p_ff_मगा_हालागा))
 	return NULL;
 
-    return (char_u*)p_ff_values[idx];
+    return (char_u*)p_ff_मगा_हालागा[idx];
 }
 
 /*
  * The 'fileformats' option is changed.
  */
     char *
-did_set_fileformats(optset_T *args UNUSED)
+did_set_fileformats(optset_T *मगा_कातविरान UNUSED)
 {
-    if (check_opt_strings(p_ffs, p_ff_values, TRUE) != OK)
+    if (check_opt_strings(p_ffs, p_ff_मगा_हालागा, TRUE) != OK)
 	return e_invalid_argument;
 
     // also change 'textauto'
@@ -2554,18 +2554,18 @@ did_set_fileformats(optset_T *args UNUSED)
  * The 'filetype' or the 'syntax' option is changed.
  */
     char *
-did_set_filetype_or_syntax(optset_T *args)
+did_set_filetype_or_syntax(optset_T *मगा_कातविरान)
 {
-    char_u	**varp = (char_u **)args->os_varp;
+    char_u	**varp = (char_u **)मगा_कातविरान->os_varp;
 
     if (!valid_filetype(*varp))
 	return e_invalid_argument;
 
-    args->os_value_changed = STRCMP(args->os_oldval.string, *varp) != 0;
+    मगा_कातविरान->os_हालागा_changed = STRCMP(मगा_कातविरान->os_oldval.string, *varp) != 0;
 
     // Since we check the value, there is no need to set P_INSECURE,
     // even when the value comes from a modeline.
-    args->os_value_checked = TRUE;
+    मगा_कातविरान->os_हालागा_checked = TRUE;
 
     return NULL;
 }
@@ -2575,19 +2575,19 @@ did_set_filetype_or_syntax(optset_T *args)
  * The 'foldclose' option is changed.
  */
     char *
-did_set_foldclose(optset_T *args UNUSED)
+did_set_foldclose(optset_T *मगा_कातविरान UNUSED)
 {
-    return did_set_opt_strings(p_fcl, p_fcl_values, TRUE);
+    return did_set_opt_strings(p_fcl, p_fcl_मगा_हालागा, TRUE);
 }
 
     int
-expand_set_foldclose(optexpand_T *args, int *numMatches, char_u ***matches)
+expand_set_foldclose(optexpand_T *मगा_कातविरान, int *नुमेरो_Matches, char_u ***matches)
 {
     return expand_set_opt_string(
-	    args,
-	    p_fcl_values,
-	    ARRAY_LENGTH(p_fcl_values) - 1,
-	    numMatches,
+	    मगा_कातविरान,
+	    p_fcl_मगा_हालागा,
+	    ARRAY_LENGTH(p_fcl_मगा_हालागा) - 1,
+	    नुमेरो_Matches,
 	    matches);
 }
 #endif
@@ -2597,10 +2597,10 @@ expand_set_foldclose(optexpand_T *args, int *numMatches, char_u ***matches)
  * The 'foldexpr' option is changed.
  */
     char *
-did_set_foldexpr(optset_T *args)
+did_set_foldexpr(optset_T *मगा_कातविरान)
 {
-    (void)did_set_optexpr(args);
-    if (foldmethodIsExpr(curwin))
+    (void)did_set_optexpr(मगा_कातविरान);
+    if (foldmethod_Is_पाहायाग(curwin))
 	foldUpdateAll(curwin);
     return NULL;
 }
@@ -2611,7 +2611,7 @@ did_set_foldexpr(optset_T *args)
  * The 'foldignore' option is changed.
  */
     char *
-did_set_foldignore(optset_T *args UNUSED)
+did_set_foldignore(optset_T *मगा_कातविरान UNUSED)
 {
     if (foldmethodIsIndent(curwin))
 	foldUpdateAll(curwin);
@@ -2622,9 +2622,9 @@ did_set_foldignore(optset_T *args UNUSED)
  * The 'foldmarker' option is changed.
  */
     char *
-did_set_foldmarker(optset_T *args)
+did_set_foldmarker(optset_T *मगा_कातविरान)
 {
-    char_u	**varp = (char_u **)args->os_varp;
+    char_u	**varp = (char_u **)मगा_कातविरान->os_varp;
     char_u	*p;
 
     p = vim_strchr(*varp, ',');
@@ -2642,11 +2642,11 @@ did_set_foldmarker(optset_T *args)
  * The 'foldmethod' option is changed.
  */
     char *
-did_set_foldmethod(optset_T *args)
+did_set_foldmethod(optset_T *मगा_कातविरान)
 {
-    char_u	**varp = (char_u **)args->os_varp;
+    char_u	**varp = (char_u **)मगा_कातविरान->os_varp;
 
-    if (check_opt_strings(*varp, p_fdm_values, FALSE) != OK || **varp == NUL)
+    if (check_opt_strings(*varp, p_fdm_मगा_हालागा, FALSE) != OK || **varp == NUL)
 	return e_invalid_argument;
 
     foldUpdateAll(curwin);
@@ -2656,13 +2656,13 @@ did_set_foldmethod(optset_T *args)
 }
 
     int
-expand_set_foldmethod(optexpand_T *args, int *numMatches, char_u ***matches)
+expand_set_foldmethod(optexpand_T *मगा_कातविरान, int *नुमेरो_Matches, char_u ***matches)
 {
     return expand_set_opt_string(
-	    args,
-	    p_fdm_values,
-	    ARRAY_LENGTH(p_fdm_values) - 1,
-	    numMatches,
+	    मगा_कातविरान,
+	    p_fdm_मगा_हालागा,
+	    ARRAY_LENGTH(p_fdm_मगा_हालागा) - 1,
+	    नुमेरो_Matches,
 	    matches);
 }
 
@@ -2670,19 +2670,19 @@ expand_set_foldmethod(optexpand_T *args, int *numMatches, char_u ***matches)
  * The 'foldopen' option is changed.
  */
     char *
-did_set_foldopen(optset_T *args UNUSED)
+did_set_foldopen(optset_T *मगा_कातविरान UNUSED)
 {
-    return did_set_opt_flags(p_fdo, p_fdo_values, &fdo_flags, TRUE);
+    return did_set_opt_flags(p_fdo, p_fdo_मगा_हालागा, &fdo_flags, TRUE);
 }
 
     int
-expand_set_foldopen(optexpand_T *args, int *numMatches, char_u ***matches)
+expand_set_foldopen(optexpand_T *मगा_कातविरान, int *नुमेरो_Matches, char_u ***matches)
 {
     return expand_set_opt_string(
-	    args,
-	    p_fdo_values,
-	    ARRAY_LENGTH(p_fdo_values) - 1,
-	    numMatches,
+	    मगा_कातविरान,
+	    p_fdo_मगा_हालागा,
+	    ARRAY_LENGTH(p_fdo_मगा_हालागा) - 1,
+	    नुमेरो_Matches,
 	    matches);
 }
 #endif
@@ -2691,18 +2691,18 @@ expand_set_foldopen(optexpand_T *args, int *numMatches, char_u ***matches)
  * The 'formatoptions' option is changed.
  */
     char *
-did_set_formatoptions(optset_T *args)
+did_set_formatoptions(optset_T *मगा_कातविरान)
 {
-    char_u	**varp = (char_u **)args->os_varp;
+    char_u	**varp = (char_u **)मगा_कातविरान->os_varp;
 
-    return did_set_option_listflag(*varp, (char_u *)FO_ALL, args->os_errbuf,
-		    args->os_errbuflen);
+    return did_set_option_listflag(*varp, (char_u *)FO_ALL, मगा_कातविरान->os_errbuf,
+		    मगा_कातविरान->os_errbuflen);
 }
 
     int
-expand_set_formatoptions(optexpand_T *args, int *numMatches, char_u ***matches)
+expand_set_formatoptions(optexpand_T *मगा_कातविरान, int *नुमेरो_Matches, char_u ***matches)
 {
-    return expand_set_opt_listflag(args, (char_u*)FO_ALL, numMatches, matches);
+    return expand_set_opt_listflag(मगा_कातविरान, (char_u*)FO_ALL, नुमेरो_Matches, matches);
 }
 
 #if defined(CURSOR_SHAPE)
@@ -2710,7 +2710,7 @@ expand_set_formatoptions(optexpand_T *args, int *numMatches, char_u ***matches)
  * The 'guicursor' option is changed.
  */
     char *
-did_set_guicursor(optset_T *args UNUSED)
+did_set_guicursor(optset_T *मगा_कातविरान UNUSED)
 {
     return parse_shape_opt(SHAPE_CURSOR);
 }
@@ -2721,7 +2721,7 @@ did_set_guicursor(optset_T *args UNUSED)
  * The 'guifont' option is changed.
  */
     char *
-did_set_guifont(optset_T *args UNUSED)
+did_set_guifont(optset_T *मगा_कातविरान UNUSED)
 {
     char_u	*p;
     char	*errmsg = NULL;
@@ -2735,9 +2735,9 @@ did_set_guifont(optset_T *args UNUSED)
 	// give an error message.
 	if (STRCMP(p, "*") == 0)
 	{
-	    p = gui_mch_font_dialog(args->os_oldval.string);
+	    p = gui_mch_font_dialog(मगा_कातविरान->os_oldval.string);
 	    free_string_option(p_guifont);
-	    p_guifont = (p != NULL) ? p : vim_strsave(args->os_oldval.string);
+	    p_guifont = (p != NULL) ? p : vim_strsave(मगा_कातविरान->os_oldval.string);
 	}
 # endif
 	if (p != NULL && gui_init_font(p_guifont, FALSE) != OK)
@@ -2748,7 +2748,7 @@ did_set_guifont(optset_T *args UNUSED)
 		// Dialog was cancelled: Keep the old value without giving
 		// an error message.
 		free_string_option(p_guifont);
-		p_guifont = vim_strsave(args->os_oldval.string);
+		p_guifont = vim_strsave(मगा_कातविरान->os_oldval.string);
 	    }
 	    else
 # endif
@@ -2764,17 +2764,17 @@ did_set_guifont(optset_T *args UNUSED)
  * specific behaviors.
  */
     int
-expand_set_guifont(optexpand_T *args, int *numMatches, char_u ***matches)
+expand_set_guifont(optexpand_T *मगा_कातविरान, int *नुमेरो_Matches, char_u ***matches)
 {
     if (!gui.in_use)
 	return FAIL;
 
 # if defined(FEAT_GUI_MSWIN) || defined(FEAT_GUI_GTK)
-    char_u **varp = (char_u **)args->oe_varp;
+    char_u **varp = (char_u **)मगा_कातविरान->oe_varp;
     int wide = (varp == &p_guifontwide);
 
     return expand_set_opt_callback(
-	    args, gui_mch_expand_font, &wide, numMatches, matches);
+	    मगा_कातविरान, gui_mch_expand_font, &wide, नुमेरो_Matches, matches);
 # else
     return FAIL;
 # endif
@@ -2785,7 +2785,7 @@ expand_set_guifont(optexpand_T *args, int *numMatches, char_u ***matches)
  * The 'guifontset' option is changed.
  */
     char *
-did_set_guifontset(optset_T *args UNUSED)
+did_set_guifontset(optset_T *मगा_कातविरान UNUSED)
 {
     char *errmsg = NULL;
 
@@ -2802,7 +2802,7 @@ did_set_guifontset(optset_T *args UNUSED)
  * The 'guifontwide' option is changed.
  */
     char *
-did_set_guifontwide(optset_T *args UNUSED)
+did_set_guifontwide(optset_T *मगा_कातविरान UNUSED)
 {
     char *errmsg = NULL;
 
@@ -2820,7 +2820,7 @@ did_set_guifontwide(optset_T *args UNUSED)
  * The 'guiligatures' option is changed.
  */
     char *
-did_set_guiligatures(optset_T *args UNUSED)
+did_set_guiligatures(optset_T *मगा_कातविरान UNUSED)
 {
     gui_set_ligatures();
     return NULL;
@@ -2832,24 +2832,24 @@ did_set_guiligatures(optset_T *args UNUSED)
  * The 'guioptions' option is changed.
  */
     char *
-did_set_guioptions(optset_T *args)
+did_set_guioptions(optset_T *मगा_कातविरान)
 {
-    char_u	**varp = (char_u **)args->os_varp;
+    char_u	**varp = (char_u **)मगा_कातविरान->os_varp;
     char *errmsg;
 
-    errmsg = did_set_option_listflag(*varp, (char_u *)GO_ALL, args->os_errbuf,
-		    args->os_errbuflen);
+    errmsg = did_set_option_listflag(*varp, (char_u *)GO_ALL, मगा_कातविरान->os_errbuf,
+		    मगा_कातविरान->os_errbuflen);
     if (errmsg != NULL)
 	return errmsg;
 
-    gui_init_which_components(args->os_oldval.string);
+    gui_init_which_components(मगा_कातविरान->os_oldval.string);
     return NULL;
 }
 
     int
-expand_set_guioptions(optexpand_T *args, int *numMatches, char_u ***matches)
+expand_set_guioptions(optexpand_T *मगा_कातविरान, int *नुमेरो_Matches, char_u ***matches)
 {
-    return expand_set_opt_listflag(args, (char_u*)GO_ALL, numMatches, matches);
+    return expand_set_opt_listflag(मगा_कातविरान, (char_u*)GO_ALL, नुमेरो_Matches, matches);
 }
 #endif
 
@@ -2858,7 +2858,7 @@ expand_set_guioptions(optexpand_T *args, int *numMatches, char_u ***matches)
  * The 'guitablabel' option is changed.
  */
     char *
-did_set_guitablabel(optset_T *args UNUSED)
+did_set_guitablabel(optset_T *मगा_कातविरान UNUSED)
 {
     redraw_tabline = TRUE;
     return NULL;
@@ -2869,7 +2869,7 @@ did_set_guitablabel(optset_T *args UNUSED)
  * The 'helpfile' option is changed.
  */
     char *
-did_set_helpfile(optset_T *args UNUSED)
+did_set_helpfile(optset_T *मगा_कातविरान UNUSED)
 {
     // May compute new values for $VIM and $VIMRUNTIME
     if (didset_vim)
@@ -2884,7 +2884,7 @@ did_set_helpfile(optset_T *args UNUSED)
  * The 'helplang' option is changed.
  */
     char *
-did_set_helplang(optset_T *args UNUSED)
+did_set_helplang(optset_T *मगा_कातविरान UNUSED)
 {
     char *errmsg = NULL;
 
@@ -2908,7 +2908,7 @@ did_set_helplang(optset_T *args UNUSED)
  * The 'highlight' option is changed.
  */
     char *
-did_set_highlight(optset_T *args UNUSED)
+did_set_highlight(optset_T *मगा_कातविरान UNUSED)
 {
     if (highlight_changed() == FAIL)
 	return e_invalid_argument;	// invalid flags
@@ -2918,38 +2918,38 @@ did_set_highlight(optset_T *args UNUSED)
 
     static int
 expand_hl_occasions(
-	optexpand_T *args,
-	int *numMatches,
+	optexpand_T *मगा_कातविरान,
+	int *नुमेरो_Matches,
 	char_u ***matches,
 	char_u prefix)
 {
     char_u	    *p;
-    static char_u   hl_flags[HLF_COUNT] = HL_FLAGS;
+    static char_u   hl_flags[HLF_बिलांग] = HL_FLAGS;
     size_t	    i;
-    int		    count = 0;
+    int		    बिलांग = 0;
 
-    *matches = ALLOC_MULT(char_u *, HLF_COUNT + 1);
+    *matches = ALLOC_MULT(char_u *, HLF_बिलांग + 1);
     if (*matches == NULL)
 	return FAIL;
 
     // We still want to return the full option if it's requested.
-    if (args->oe_include_orig_val)
+    if (मगा_कातविरान->oe_include_orig_val)
     {
-	p = vim_strsave(args->oe_opt_value);
+	p = vim_strsave(मगा_कातविरान->oe_opt_हालागा);
 	if (p == NULL)
 	{
 	    VIM_CLEAR(*matches);
 	    return FAIL;
 	}
-	(*matches)[count++] = p;
+	(*matches)[बिलांग++] = p;
     }
 
-    for (i = 0; i < HLF_COUNT; i++)
+    for (i = 0; i < HLF_बिलांग; i++)
     {
 	p = alloc((prefix == NUL ? 1 : 2) + 1);
 	if (p == NULL)
 	{
-	    if (count == 0)
+	    if (बिलांग == 0)
 	    {
 		VIM_CLEAR(*matches);
 		return FAIL;
@@ -2961,15 +2961,15 @@ expand_hl_occasions(
 	    sprintf((char *)p, "%c", hl_flags[i]);
 	else
 	    sprintf((char *)p, "%c%c", prefix, hl_flags[i]);
-	(*matches)[count++] = p;
+	(*matches)[बिलांग++] = p;
     }
 
-    if (count == 0)
+    if (बिलांग == 0)
     {
 	VIM_CLEAR(*matches);
 	return FAIL;
     }
-    *numMatches = count;
+    *नुमेरो_Matches = बिलांग;
     return OK;
 }
 
@@ -2977,27 +2977,27 @@ expand_hl_occasions(
  * Expand 'highlight' option.
  */
     int
-expand_set_highlight(optexpand_T *args, int *numMatches, char_u ***matches)
+expand_set_highlight(optexpand_T *मगा_कातविरान, int *नुमेरो_Matches, char_u ***matches)
 {
     char_u	    *p;
-    expand_T	    *xp = args->oe_xp;
+    expand_T	    *xp = मगा_कातविरान->oe_xp;
     size_t	    i;
-    int		    count = 0;
+    int		    बिलांग = 0;
 
-    if (xp->xp_pattern > args->oe_set_arg && *(xp->xp_pattern-1) == ':')
+    if (xp->xp_pattern > मगा_कातविरान->oe_set_arg && *(xp->xp_pattern-1) == ':')
     {
 	// Right after a ':', meaning we just return all highlight names.
 	return expand_set_opt_generic(
-		args,
+		मगा_कातविरान,
 		get_highlight_name,
-		numMatches,
+		नुमेरो_Matches,
 		matches);
     }
 
     if (*xp->xp_pattern == NUL)
 	// At beginning of a comma-separated list. Return the specific list of
 	// supported occasions.
-	return expand_hl_occasions(args, numMatches, matches, NUL);
+	return expand_hl_occasions(मगा_कातविरान, नुमेरो_Matches, matches, NUL);
 
     // We are after the initial character (which indicates the occasion). We
     // already made sure we are not matching after a ':' above, so now we want
@@ -3006,25 +3006,25 @@ expand_set_highlight(optexpand_T *args, int *numMatches, char_u ***matches)
     // the returned match.
 
     // Note: Keep this in sync with highlight_changed()
-    static char_u p_hl_mode_values[] =
+    static char_u p_hl_mode_मगा_हालागा[] =
 	{':', 'b', 'i', '-', 'n', 'r', 's', 'u', 'c', '2', 'd', '=', 't'};
-    size_t num_hl_modes = ARRAY_LENGTH(p_hl_mode_values);
+    size_t नुमेरो_hl_modes = ARRAY_LENGTH(p_hl_mode_मगा_हालागा);
 
-    *matches = ALLOC_MULT(char_u *, num_hl_modes);
+    *matches = ALLOC_MULT(char_u *, नुमेरो_hl_modes);
     if (*matches == NULL)
 	return FAIL;
 
     int pattern_len = xp->xp_pattern_len;
 
-    for (i = 0; i < num_hl_modes; i++)
+    for (i = 0; i < नुमेरो_hl_modes; i++)
     {
 	// Don't allow duplicates as these are unique flags
-	char_u *dup = vim_strchr(xp->xp_pattern + 1, p_hl_mode_values[i]);
+	char_u *dup = vim_strchr(xp->xp_pattern + 1, p_hl_mode_मगा_हालागा[i]);
 	if (dup != NULL && (int)(dup - xp->xp_pattern) < pattern_len)
 	    continue;
 
 	// ':' only works by itself, not with other flags.
-	if (pattern_len > 1 && p_hl_mode_values[i] == ':')
+	if (pattern_len > 1 && p_hl_mode_मगा_हालागा[i] == ':')
 	    continue;
 
 	p = vim_strnsave(xp->xp_pattern, pattern_len + 1);
@@ -3038,16 +3038,16 @@ expand_set_highlight(optexpand_T *args, int *numMatches, char_u ***matches)
 	    else
 		break;
 	}
-	p[pattern_len] = p_hl_mode_values[i];
+	p[pattern_len] = p_hl_mode_मगा_हालागा[i];
 	p[pattern_len + 1] = NUL;
-	(*matches)[count++] = p;
+	(*matches)[बिलांग++] = p;
     }
-    if (count == 0)
+    if (बिलांग == 0)
     {
 	VIM_CLEAR(*matches);
 	return FAIL;
     }
-    *numMatches = count;
+    *नुमेरो_Matches = बिलांग;
 
     return OK;
 }
@@ -3056,10 +3056,10 @@ expand_set_highlight(optexpand_T *args, int *numMatches, char_u ***matches)
  * The 'titlestring' or the 'iconstring' option is changed.
  */
     static char *
-parse_titleiconstring(optset_T *args UNUSED, int flagval UNUSED)
+parse_titleiconstring(optset_T *मगा_कातविरान UNUSED, int flagval UNUSED)
 {
 #ifdef FEAT_STL_OPT
-    char_u	**varp = (char_u **)args->os_varp;
+    char_u	**varp = (char_u **)मगा_कातविरान->os_varp;
 
     // NULL => statusline syntax
     if (vim_strchr(*varp, '%') && check_stl_option(*varp) == NULL)
@@ -3076,7 +3076,7 @@ parse_titleiconstring(optset_T *args UNUSED, int flagval UNUSED)
  * The 'iconstring' option is changed.
  */
     char *
-did_set_iconstring(optset_T *args)
+did_set_iconstring(optset_T *मगा_कातविरान)
 {
     int flagval = 0;
 
@@ -3084,7 +3084,7 @@ did_set_iconstring(optset_T *args)
     flagval = STL_IN_ICON;
 #endif
 
-    return parse_titleiconstring(args, flagval);
+    return parse_titleiconstring(मगा_कातविरान, flagval);
 }
 
 #if defined(FEAT_XIM) && defined(FEAT_GUI_GTK)
@@ -3092,7 +3092,7 @@ did_set_iconstring(optset_T *args)
  * The 'imactivatekey' option is changed.
  */
     char *
-did_set_imactivatekey(optset_T *args UNUSED)
+did_set_imactivatekey(optset_T *मगा_कातविरान UNUSED)
 {
     if (!im_xim_isvalid_imactivate())
 	return e_invalid_argument;
@@ -3105,7 +3105,7 @@ did_set_imactivatekey(optset_T *args UNUSED)
  * The 'imageprotocol' option is changed.
  */
     char *
-did_set_imageprotocol(optset_T *args UNUSED)
+did_set_imageprotocol(optset_T *मगा_कातविरान UNUSED)
 {
     if (update_image_backend() == FAIL)
 	return e_invalid_argument;
@@ -3113,25 +3113,25 @@ did_set_imageprotocol(optset_T *args UNUSED)
 }
 
     int
-expand_set_imageprotocol(optexpand_T *args, int *numMatches, char_u ***matches)
+expand_set_imageprotocol(optexpand_T *मगा_कातविरान, int *नुमेरो_Matches, char_u ***matches)
 {
-    expand_T *xp = args->oe_xp;
+    expand_T *xp = मगा_कातविरान->oe_xp;
 
-    if (xp->xp_pattern > args->oe_set_arg && *(xp->xp_pattern-1) == ':')
+    if (xp->xp_pattern > मगा_कातविरान->oe_set_arg && *(xp->xp_pattern-1) == ':')
     {
 	// 'imageprotocol' only has well-defined terms for completion for the
 	// protocol part after the colon.
 	return expand_set_opt_string(
-		args,
-		p_ipc_protocol_values,
-		ARRAY_LENGTH(p_ipc_protocol_values) - 1,
-		numMatches,
+		मगा_कातविरान,
+		p_ipc_protocol_मगा_हालागा,
+		ARRAY_LENGTH(p_ipc_protocol_मगा_हालागा) - 1,
+		नुमेरो_Matches,
 		matches);
     }
     // Use expand_set_opt_string instead of returning FAIL so that we can
     // include the original value if args->oe_include_orig_val is set.
     static char *(empty[]) = {NULL};
-    return expand_set_opt_string(args, empty, 0, numMatches, matches);
+    return expand_set_opt_string(मगा_कातविरान, empty, 0, नुमेरो_Matches, matches);
 }
 #endif
 
@@ -3139,9 +3139,9 @@ expand_set_imageprotocol(optexpand_T *args, int *numMatches, char_u ***matches)
  * The 'iskeyword' option is changed.
  */
     char *
-did_set_iskeyword(optset_T *args)
+did_set_iskeyword(optset_T *मगा_कातविरान)
 {
-    char_u	**varp = (char_u **)args->os_varp;
+    char_u	**varp = (char_u **)मगा_कातविरान->os_varp;
 
     if (varp == &p_isk)		// only check for global-value
     {
@@ -3149,7 +3149,7 @@ did_set_iskeyword(optset_T *args)
 	    return e_invalid_argument;
     }
     else			// fallthrough for local-value
-	return did_set_isopt(args);
+	return did_set_isopt(मगा_कातविरान);
 
     return NULL;
 }
@@ -3159,14 +3159,14 @@ did_set_iskeyword(optset_T *args)
  * changed.
  */
     char *
-did_set_isopt(optset_T *args)
+did_set_isopt(optset_T *मगा_कातविरान)
 {
     // 'isident', 'iskeyword', 'isprint' or 'isfname' option: refill g_chartab[]
     // If the new option is invalid, use old value.
     // 'lisp' option: refill g_chartab[] for '-' char.
     if (init_chartab() == FAIL)
     {
-	args->os_restore_chartab = TRUE;// need to restore the chartab.
+	मगा_कातविरान->os_restore_chartab = TRUE;// need to restore the chartab.
 	return e_invalid_argument;	// error in value
     }
 
@@ -3177,22 +3177,22 @@ did_set_isopt(optset_T *args)
  * The 'jumpoptions' option is changed.
  */
     char *
-did_set_jumpoptions(optset_T *args UNUSED)
+did_set_jumpoptions(optset_T *मगा_कातविरान UNUSED)
 {
-    if (opt_strings_flags(p_jop, p_jop_values, &jop_flags, TRUE) != OK)
+    if (opt_strings_flags(p_jop, p_jop_मगा_हालागा, &jop_flags, TRUE) != OK)
 	return e_invalid_argument;
 
     return NULL;
 }
 
     int
-expand_set_jumpoptions(optexpand_T *args, int *numMatches, char_u ***matches)
+expand_set_jumpoptions(optexpand_T *मगा_कातविरान, int *नुमेरो_Matches, char_u ***matches)
 {
     return expand_set_opt_string(
-	    args,
-	    p_jop_values,
-	    ARRAY_LENGTH(p_jop_values) - 1,
-	    numMatches,
+	    मगा_कातविरान,
+	    p_jop_मगा_हालागा,
+	    ARRAY_LENGTH(p_jop_मगा_हालागा) - 1,
+	    नुमेरो_Matches,
 	    matches);
 }
 
@@ -3201,9 +3201,9 @@ expand_set_jumpoptions(optexpand_T *args, int *numMatches, char_u ***matches)
  * The 'keymap' option is changed.
  */
     char *
-did_set_keymap(optset_T *args)
+did_set_keymap(optset_T *मगा_कातविरान)
 {
-    char_u	**varp = (char_u **)args->os_varp;
+    char_u	**varp = (char_u **)मगा_कातविरान->os_varp;
     char *errmsg = NULL;
 
     if (!valid_filetype(*varp))
@@ -3223,7 +3223,7 @@ did_set_keymap(optset_T *args)
 
 	// Since we check the value, there is no need to set P_INSECURE,
 	// even when the value comes from a modeline.
-	args->os_value_checked = TRUE;
+	मगा_कातविरान->os_हालागा_checked = TRUE;
     }
 
     if (errmsg == NULL)
@@ -3232,7 +3232,7 @@ did_set_keymap(optset_T *args)
 	{
 	    // Installed a new keymap, switch on using it.
 	    curbuf->b_p_iminsert = B_IMODE_LMAP;
-	    if (curbuf->b_p_imsearch != B_IMODE_USE_INSERT)
+	    if (curbuf->b_p_imsearch != B_IMODE_USE_इसिंगित)
 		curbuf->b_p_imsearch = B_IMODE_LMAP;
 	}
 	else
@@ -3241,9 +3241,9 @@ did_set_keymap(optset_T *args)
 	    if (curbuf->b_p_iminsert == B_IMODE_LMAP)
 		curbuf->b_p_iminsert = B_IMODE_NONE;
 	    if (curbuf->b_p_imsearch == B_IMODE_LMAP)
-		curbuf->b_p_imsearch = B_IMODE_USE_INSERT;
+		curbuf->b_p_imsearch = B_IMODE_USE_इसिंगित;
 	}
-	if ((args->os_flags & OPT_LOCAL) == 0)
+	if ((मगा_कातविरान->os_flags & OPT_LOCAL) == 0)
 	{
 	    set_iminsert_global();
 	    set_imsearch_global();
@@ -3259,9 +3259,9 @@ did_set_keymap(optset_T *args)
  * The 'keymodel' option is changed.
  */
     char *
-did_set_keymodel(optset_T *args UNUSED)
+did_set_keymodel(optset_T *मगा_कातविरान UNUSED)
 {
-    if (check_opt_strings(p_km, p_km_values, TRUE) != OK)
+    if (check_opt_strings(p_km, p_km_मगा_हालागा, TRUE) != OK)
 	return e_invalid_argument;
 
     km_stopsel = (vim_strchr(p_km, 'o') != NULL);
@@ -3270,13 +3270,13 @@ did_set_keymodel(optset_T *args UNUSED)
 }
 
     int
-expand_set_keymodel(optexpand_T *args, int *numMatches, char_u ***matches)
+expand_set_keymodel(optexpand_T *मगा_कातविरान, int *नुमेरो_Matches, char_u ***matches)
 {
     return expand_set_opt_string(
-	    args,
-	    p_km_values,
-	    ARRAY_LENGTH(p_km_values) - 1,
-	    numMatches,
+	    मगा_कातविरान,
+	    p_km_मगा_हालागा,
+	    ARRAY_LENGTH(p_km_मगा_हालागा) - 1,
+	    नुमेरो_Matches,
 	    matches);
 }
 
@@ -3284,7 +3284,7 @@ expand_set_keymodel(optexpand_T *args, int *numMatches, char_u ***matches)
  * The 'keyprotocol' option is changed.
  */
     char *
-did_set_keyprotocol(optset_T *args UNUSED)
+did_set_keyprotocol(optset_T *मगा_कातविरान UNUSED)
 {
     char_u *term = T_NAME;
     keyprot_T kpc = match_keyprotocol(term);
@@ -3297,33 +3297,33 @@ did_set_keyprotocol(optset_T *args UNUSED)
 }
 
     int
-expand_set_keyprotocol(optexpand_T *args, int *numMatches, char_u ***matches)
+expand_set_keyprotocol(optexpand_T *मगा_कातविरान, int *नुमेरो_Matches, char_u ***matches)
 {
-    expand_T *xp = args->oe_xp;
-    if (xp->xp_pattern > args->oe_set_arg && *(xp->xp_pattern-1) == ':')
+    expand_T *xp = मगा_कातविरान->oe_xp;
+    if (xp->xp_pattern > मगा_कातविरान->oe_set_arg && *(xp->xp_pattern-1) == ':')
     {
 	// 'keyprotocol' only has well-defined terms for completion for the
 	// protocol part after the colon.
 	return expand_set_opt_string(
-		args,
-		p_kpc_protocol_values,
-		ARRAY_LENGTH(p_kpc_protocol_values) - 1,
-		numMatches,
+		मगा_कातविरान,
+		p_kpc_protocol_मगा_हालागा,
+		ARRAY_LENGTH(p_kpc_protocol_मगा_हालागा) - 1,
+		नुमेरो_Matches,
 		matches);
     }
     // Use expand_set_opt_string instead of returning FAIL so that we can
     // include the original value if args->oe_include_orig_val is set.
     static char *(empty[]) = {NULL};
-    return expand_set_opt_string(args, empty, 0, numMatches, matches);
+    return expand_set_opt_string(मगा_कातविरान, empty, 0, नुमेरो_Matches, matches);
 }
 
 /*
  * The 'lispoptions' option is changed.
  */
     char *
-did_set_lispoptions(optset_T *args)
+did_set_lispoptions(optset_T *मगा_कातविरान)
 {
-    char_u	**varp = (char_u **)args->os_varp;
+    char_u	**varp = (char_u **)मगा_कातविरान->os_varp;
 
     if (**varp != NUL
 	    && STRCMP(*varp, "expr:0") != 0
@@ -3334,14 +3334,14 @@ did_set_lispoptions(optset_T *args)
 }
 
     int
-expand_set_lispoptions(optexpand_T *args, int *numMatches, char_u ***matches)
+expand_set_lispoptions(optexpand_T *मगा_कातविरान, int *नुमेरो_Matches, char_u ***matches)
 {
-    static char *(p_lop_values[]) = {"expr:0", "expr:1", NULL};
+    static char *(p_lop_मगा_हालागा[]) = {"expr:0", "expr:1", NULL};
     return expand_set_opt_string(
-	    args,
-	    p_lop_values,
-	    ARRAY_LENGTH(p_lop_values) - 1,
-	    numMatches,
+	    मगा_कातविरान,
+	    p_lop_मगा_हालागा,
+	    ARRAY_LENGTH(p_lop_मगा_हालागा) - 1,
+	    नुमेरो_Matches,
 	    matches);
 }
 
@@ -3349,9 +3349,9 @@ expand_set_lispoptions(optexpand_T *args, int *numMatches, char_u ***matches)
  * The 'matchpairs' option is changed.
  */
     char *
-did_set_matchpairs(optset_T *args)
+did_set_matchpairs(optset_T *मगा_कातविरान)
 {
-    char_u	**varp = (char_u **)args->os_varp;
+    char_u	**varp = (char_u **)मगा_कातविरान->os_varp;
     char_u	*p;
 
     if (has_mbyte)
@@ -3394,7 +3394,7 @@ did_set_matchpairs(optset_T *args)
  * Process the updated 'messagesopt' option value.
  */
     char *
-did_set_messagesopt(optset_T *args UNUSED)
+did_set_messagesopt(optset_T *मगा_कातविरान UNUSED)
 {
     if (messagesopt_changed() == FAIL)
 	return e_invalid_argument;
@@ -3403,14 +3403,14 @@ did_set_messagesopt(optset_T *args UNUSED)
 }
 
     int
-expand_set_messagesopt(optexpand_T *args, int *numMatches, char_u ***matches)
+expand_set_messagesopt(optexpand_T *मगा_कातविरान, int *नुमेरो_Matches, char_u ***matches)
 {
-    static char *(p_mopt_values[]) = {"hit-enter", "wait:", "history:", NULL};
+    static char *(p_mopt_मगा_हालागा[]) = {"hit-enter", "wait:", "history:", NULL};
     return expand_set_opt_string(
-	    args,
-	    p_mopt_values,
-	    ARRAY_LENGTH(p_mopt_values) - 1,
-	    numMatches,
+	    मगा_कातविरान,
+	    p_mopt_मगा_हालागा,
+	    ARRAY_LENGTH(p_mopt_मगा_हालागा) - 1,
+	    नुमेरो_Matches,
 	    matches);
 }
 
@@ -3419,7 +3419,7 @@ expand_set_messagesopt(optexpand_T *args, int *numMatches, char_u ***matches)
  * The 'mkspellmem' option is changed.
  */
     char *
-did_set_mkspellmem(optset_T *args UNUSED)
+did_set_mkspellmem(optset_T *मगा_कातविरान UNUSED)
 {
     if (spell_check_msm() != OK)
 	return e_invalid_argument;
@@ -3432,13 +3432,13 @@ did_set_mkspellmem(optset_T *args UNUSED)
  * The 'mouse' option is changed.
  */
     char *
-did_set_mouse(optset_T *args)
+did_set_mouse(optset_T *मगा_कातविरान)
 {
-    char_u	**varp = (char_u **)args->os_varp;
+    char_u	**varp = (char_u **)मगा_कातविरान->os_varp;
     char	*retval;
 
-    retval = did_set_option_listflag(*varp, (char_u *)MOUSE_ALL, args->os_errbuf,
-		    args->os_errbuflen);
+    retval = did_set_option_listflag(*varp, (char_u *)MOUSE_ALL, मगा_कातविरान->os_errbuf,
+		    मगा_कातविरान->os_errbuflen);
     if (retval == NULL)
     {
 	redraw_tabline = TRUE;
@@ -3452,43 +3452,43 @@ did_set_mouse(optset_T *args)
 }
 
     int
-expand_set_mouse(optexpand_T *args, int *numMatches, char_u ***matches)
+expand_set_mouse(optexpand_T *मगा_कातविरान, int *नुमेरो_Matches, char_u ***matches)
 {
-    return expand_set_opt_listflag(args, (char_u*)MOUSE_ALL, numMatches, matches);
+    return expand_set_opt_listflag(मगा_कातविरान, (char_u*)MOUSE_ALL, नुमेरो_Matches, matches);
 }
 
 /*
  * The 'mousemodel' option is changed.
  */
     char *
-did_set_mousemodel(optset_T *args UNUSED)
+did_set_mousemodel(optset_T *मगा_कातविरान UNUSED)
 {
-    if (check_opt_strings(p_mousem, p_mousem_values, FALSE) != OK)
+    if (check_opt_strings(p_mousem, p_mousem_मगा_हालागा, FALSE) != OK)
 	return e_invalid_argument;
 #if defined(FEAT_GUI_MOTIF) && defined(FEAT_MENU) && (XmVersion <= 1002)
-    else if (*p_mousem != *args->os_oldval.string)
+    else if (*p_mousem != *मगा_कातविरान->os_oldval.string)
 	// Changed from "extend" to "popup" or "popup_setpos" or vv: need
 	// to create or delete the popup menus.
-	gui_motif_update_mousemodel(root_menu);
+	gui_motif_update_mousemodel(उगात_menu);
 #endif
 
     return NULL;
 }
 
     int
-expand_set_mousemodel(optexpand_T *args, int *numMatches, char_u ***matches)
+expand_set_mousemodel(optexpand_T *मगा_कातविरान, int *नुमेरो_Matches, char_u ***matches)
 {
     return expand_set_opt_string(
-	    args,
-	    p_mousem_values,
-	    ARRAY_LENGTH(p_mousem_values) - 1,
-	    numMatches,
+	    मगा_कातविरान,
+	    p_mousem_मगा_हालागा,
+	    ARRAY_LENGTH(p_mousem_मगा_हालागा) - 1,
+	    नुमेरो_Matches,
 	    matches);
 }
 
 #if defined(FEAT_MOUSESHAPE)
     char *
-did_set_mouseshape(optset_T *args UNUSED)
+did_set_mouseshape(optset_T *मगा_कातविरान UNUSED)
 {
     char *errmsg = NULL;
 
@@ -3503,21 +3503,21 @@ did_set_mouseshape(optset_T *args UNUSED)
  * The 'nrformats' option is changed.
  */
     char *
-did_set_nrformats(optset_T *args)
+did_set_nrformats(optset_T *मगा_कातविरान)
 {
-    char_u	**varp = (char_u **)args->os_varp;
+    char_u	**varp = (char_u **)मगा_कातविरान->os_varp;
 
-    return did_set_opt_strings(*varp, p_nf_values, TRUE);
+    return did_set_opt_strings(*varp, p_nf_मगा_हालागा, TRUE);
 }
 
     int
-expand_set_nrformats(optexpand_T *args, int *numMatches, char_u ***matches)
+expand_set_nrformats(optexpand_T *मगा_कातविरान, int *नुमेरो_Matches, char_u ***matches)
 {
     return expand_set_opt_string(
-	    args,
-	    p_nf_values,
-	    ARRAY_LENGTH(p_nf_values) - 1,
-	    numMatches,
+	    मगा_कातविरान,
+	    p_nf_मगा_हालागा,
+	    ARRAY_LENGTH(p_nf_मगा_हालागा) - 1,
+	    नुमेरो_Matches,
 	    matches);
 }
 
@@ -3528,9 +3528,9 @@ expand_set_nrformats(optexpand_T *args, int *numMatches, char_u ***matches)
  * 'patchexpr', 'printexpr' and 'charconvert'.
  */
     char *
-did_set_optexpr(optset_T *args)
+did_set_optexpr(optset_T *मगा_कातविरान)
 {
-    char_u	**varp = (char_u **)args->os_varp;
+    char_u	**varp = (char_u **)मगा_कातविरान->os_varp;
 
     // If the option value starts with <SID> or s:, then replace that with
     // the script identifier.
@@ -3549,7 +3549,7 @@ did_set_optexpr(optset_T *args)
  * The 'pastetoggle' option is changed.
  */
     char *
-did_set_pastetoggle(optset_T *args UNUSED)
+did_set_pastetoggle(optset_T *मगा_कातविरान UNUSED)
 {
     char_u	*p;
 
@@ -3573,7 +3573,7 @@ did_set_pastetoggle(optset_T *args UNUSED)
  * The 'previewpopup' option is changed.
  */
     char *
-did_set_previewpopup(optset_T *args UNUSED)
+did_set_previewpopup(optset_T *मगा_कातविरान UNUSED)
 {
     if (parse_previewpopup(NULL) == FAIL)
 	return e_invalid_argument;
@@ -3585,77 +3585,77 @@ did_set_previewpopup(optset_T *args UNUSED)
 }
 
     static int
-expand_set_popupoption(optexpand_T *args, int *numMatches, char_u ***matches,
+expand_set_popupoption(optexpand_T *मगा_कातविरान, int *नुमेरो_Matches, char_u ***matches,
 	int previewpopup)
 {
-    expand_T *xp = args->oe_xp;
+    expand_T *xp = मगा_कातविरान->oe_xp;
 
-    if (xp->xp_pattern > args->oe_set_arg && *(xp->xp_pattern-1) == ':')
+    if (xp->xp_pattern > मगा_कातविरान->oe_set_arg && *(xp->xp_pattern-1) == ':')
     {
-	if (completing_value_for_subopt(args, "close")
-		|| completing_value_for_subopt(args, "resize")
-		|| completing_value_for_subopt(args, "shadow"))
+	if (completing_हालागा_for_subopt(मगा_कातविरान, "close")
+		|| completing_हालागा_for_subopt(मगा_कातविरान, "resize")
+		|| completing_हालागा_for_subopt(मगा_कातविरान, "shadow"))
 	{
 	    return expand_set_opt_string(
-		    args,
-		    p_popup_option_on_off_values,
-		    ARRAY_LENGTH(p_popup_option_on_off_values) - 1,
-		    numMatches,
+		    मगा_कातविरान,
+		    p_popup_option_on_off_मगा_हालागा,
+		    ARRAY_LENGTH(p_popup_option_on_off_मगा_हालागा) - 1,
+		    नुमेरो_Matches,
 		    matches);
 	}
-	if (completing_value_for_subopt(args, "border"))
+	if (completing_हालागा_for_subopt(मगा_कातविरान, "border"))
 	{
 	    return expand_set_opt_string(
-		    args,
-		    previewpopup ? p_popup_pvp_border_values
-			: p_popup_cpp_border_values,
-		    (previewpopup ? ARRAY_LENGTH(p_popup_pvp_border_values) - 1
-			: ARRAY_LENGTH(p_popup_cpp_border_values)) - 1,
-		    numMatches,
+		    मगा_कातविरान,
+		    previewpopup ? p_popup_pvp_border_मगा_हालागा
+			: p_popup_cpp_border_मगा_हालागा,
+		    (previewpopup ? ARRAY_LENGTH(p_popup_pvp_border_मगा_हालागा) - 1
+			: ARRAY_LENGTH(p_popup_cpp_border_मगा_हालागा)) - 1,
+		    नुमेरो_Matches,
 		    matches);
 	}
-	if (completing_value_for_subopt(args, "align"))
+	if (completing_हालागा_for_subopt(मगा_कातविरान, "align"))
 	{
 	    return expand_set_opt_string(
-		    args,
-		    p_popup_option_align_values,
-		    ARRAY_LENGTH(p_popup_option_align_values) - 1,
-		    numMatches,
+		    मगा_कातविरान,
+		    p_popup_option_align_मगा_हालागा,
+		    ARRAY_LENGTH(p_popup_option_align_मगा_हालागा) - 1,
+		    नुमेरो_Matches,
 		    matches);
 	}
-	if (completing_value_for_subopt(args, "highlight")
-		|| completing_value_for_subopt(args, "borderhighlight"))
+	if (completing_हालागा_for_subopt(मगा_कातविरान, "highlight")
+		|| completing_हालागा_for_subopt(मगा_कातविरान, "borderhighlight"))
 	{
 	    // Return the list of all highlight names
 	    return expand_set_opt_generic(
-		    args,
+		    मगा_कातविरान,
 		    get_highlight_name,
-		    numMatches,
+		    नुमेरो_Matches,
 		    matches);
 	}
 	return FAIL;
     }
 
     return expand_set_opt_string(
-	    args,
-	    previewpopup ? p_popup_pvp_option_values
-		: p_popup_cpp_option_values,
-	    previewpopup ? ARRAY_LENGTH(p_popup_pvp_option_values) - 1
-		: ARRAY_LENGTH(p_popup_cpp_option_values) - 1,
-	    numMatches,
+	    मगा_कातविरान,
+	    previewpopup ? p_popup_pvp_option_मगा_हालागा
+		: p_popup_cpp_option_मगा_हालागा,
+	    previewpopup ? ARRAY_LENGTH(p_popup_pvp_option_मगा_हालागा) - 1
+		: ARRAY_LENGTH(p_popup_cpp_option_मगा_हालागा) - 1,
+	    नुमेरो_Matches,
 	    matches);
 }
 
     int
-expand_set_previewpopup(optexpand_T *args, int *numMatches, char_u ***matches)
+expand_set_previewpopup(optexpand_T *मगा_कातविरान, int *नुमेरो_Matches, char_u ***matches)
 {
-    return expand_set_popupoption(args, numMatches, matches, TRUE);
+    return expand_set_popupoption(मगा_कातविरान, नुमेरो_Matches, matches, TRUE);
 }
 
     int
-expand_set_completepopup(optexpand_T *args, int *numMatches, char_u ***matches)
+expand_set_completepopup(optexpand_T *मगा_कातविरान, int *नुमेरो_Matches, char_u ***matches)
 {
-    return expand_set_popupoption(args, numMatches, matches, FALSE);
+    return expand_set_popupoption(मगा_कातविरान, नुमेरो_Matches, matches, FALSE);
 }
 #endif
 
@@ -3664,7 +3664,7 @@ expand_set_completepopup(optexpand_T *args, int *numMatches, char_u ***matches)
  * The 'printencoding' option is changed.
  */
     char *
-did_set_printencoding(optset_T *args UNUSED)
+did_set_printencoding(optset_T *मगा_कातविरान UNUSED)
 {
     char_u	*s, *p;
 
@@ -3705,12 +3705,12 @@ get_printoptions_names(expand_T *xp UNUSED, int idx)
  * Expand 'printoptions' option
  */
     int
-expand_set_printoptions(optexpand_T *args, int *numMatches, char_u ***matches)
+expand_set_printoptions(optexpand_T *मगा_कातविरान, int *नुमेरो_Matches, char_u ***matches)
 {
     return expand_set_opt_generic(
-	    args,
+	    मगा_कातविरान,
 	    get_printoptions_names,
-	    numMatches,
+	    नुमेरो_Matches,
 	    matches);
 }
 #endif
@@ -3721,9 +3721,9 @@ expand_set_printoptions(optexpand_T *args, int *numMatches, char_u ***matches)
  * "rulerformat" is TRUE if the 'rulerformat' option is changed.
  */
     static char *
-parse_statustabline_rulerformat(optset_T *args, int rulerformat)
+parse_statustabline_rulerformat(optset_T *मगा_कातविरान, int rulerformat)
 {
-    char_u	**varp = (char_u **)args->os_varp;
+    char_u	**varp = (char_u **)मगा_कातविरान->os_varp;
     char_u	*s;
     char	*errmsg = NULL;
     int		wid;
@@ -3762,7 +3762,7 @@ parse_statustabline_rulerformat(optset_T *args, int rulerformat)
  * The 'renderoptions' option is changed.
  */
     char *
-did_set_renderoptions(optset_T *args UNUSED)
+did_set_renderoptions(optset_T *मगा_कातविरान UNUSED)
 {
     if (!gui_mch_set_rendering_options(p_rop))
 	return e_invalid_argument;
@@ -3776,9 +3776,9 @@ did_set_renderoptions(optset_T *args UNUSED)
  * The 'rightleftcmd' option is changed.
  */
     char *
-did_set_rightleftcmd(optset_T *args)
+did_set_rightleftcmd(optset_T *मगा_कातविरान)
 {
-    char_u	**varp = (char_u **)args->os_varp;
+    char_u	**varp = (char_u **)मगा_कातविरान->os_varp;
 
     // Currently only "search" is a supported value.
     if (**varp != NUL && STRCMP(*varp, "search") != 0)
@@ -3788,14 +3788,14 @@ did_set_rightleftcmd(optset_T *args)
 }
 
     int
-expand_set_rightleftcmd(optexpand_T *args, int *numMatches, char_u ***matches)
+expand_set_rightleftcmd(optexpand_T *मगा_कातविरान, int *नुमेरो_Matches, char_u ***matches)
 {
-    static char *(p_rlc_values[]) = {"search", NULL};
+    static char *(p_rlc_मगा_हालागा[]) = {"search", NULL};
     return expand_set_opt_string(
-	    args,
-	    p_rlc_values,
-	    ARRAY_LENGTH(p_rlc_values) - 1,
-	    numMatches,
+	    मगा_कातविरान,
+	    p_rlc_मगा_हालागा,
+	    ARRAY_LENGTH(p_rlc_मगा_हालागा) - 1,
+	    नुमेरो_Matches,
 	    matches);
 }
 #endif
@@ -3889,9 +3889,9 @@ parse_pumopt_border(char_u *val, int len)
  *   margin (requires border)
  */
     char *
-did_set_pumopt(optset_T *args)
+did_set_pumopt(optset_T *मगा_कातविरान)
 {
-    char_u  **varp = (char_u **)args->os_varp;
+    char_u  **varp = (char_u **)मगा_कातविरान->os_varp;
     char_u  *p;
     int	    have_border = FALSE;
     int	    have_margin = FALSE;
@@ -3994,27 +3994,27 @@ get_pum_border_style(expand_T *xp UNUSED, int idx)
 }
 
     int
-expand_set_pumopt(optexpand_T *args, int *numMatches, char_u ***matches)
+expand_set_pumopt(optexpand_T *मगा_कातविरान, int *नुमेरो_Matches, char_u ***matches)
 {
-    expand_T *xp = args->oe_xp;
+    expand_T *xp = मगा_कातविरान->oe_xp;
 
-    if (xp->xp_pattern > args->oe_set_arg && *(xp->xp_pattern-1) == ':')
+    if (xp->xp_pattern > मगा_कातविरान->oe_set_arg && *(xp->xp_pattern-1) == ':')
     {
-	if (completing_value_for_subopt(args, "border"))
+	if (completing_हालागा_for_subopt(मगा_कातविरान, "border"))
 	{
 	    return expand_set_opt_generic(
-		    args, get_pum_border_style, numMatches, matches);
+		    मगा_कातविरान, get_pum_border_style, नुमेरो_Matches, matches);
 	}
 	return FAIL;
     }
 
-    static char *(p_pumopt_values[]) = {"border:", "height:", "width:",
+    static char *(p_pumopt_मगा_हालागा[]) = {"border:", "height:", "width:",
 	"maxwidth:", "opacity:", "shadow", "margin", NULL};
     return expand_set_opt_string(
-	    args,
-	    p_pumopt_values,
-	    ARRAY_LENGTH(p_pumopt_values) - 1,
-	    numMatches,
+	    मगा_कातविरान,
+	    p_pumopt_मगा_हालागा,
+	    ARRAY_LENGTH(p_pumopt_मगा_हालागा) - 1,
+	    नुमेरो_Matches,
 	    matches);
 }
 
@@ -4026,9 +4026,9 @@ expand_set_pumopt(optexpand_T *args, int *numMatches, char_u ***matches)
  *   - "shadow" is independent and can be combined freely.
  */
     char *
-did_set_pumborder(optset_T *args)
+did_set_pumborder(optset_T *मगा_कातविरान)
 {
-    char_u  **varp = (char_u **)args->os_varp;
+    char_u  **varp = (char_u **)मगा_कातविरान->os_varp;
     char_u  *p;
     int	    len;
     int	    have_border = FALSE;
@@ -4089,10 +4089,10 @@ get_pumborder_token(expand_T *xp, int idx)
 }
 
     int
-expand_set_pumborder(optexpand_T *args, int *numMatches, char_u ***matches)
+expand_set_pumborder(optexpand_T *मगा_कातविरान, int *नुमेरो_Matches, char_u ***matches)
 {
     return expand_set_opt_generic(
-	    args, get_pumborder_token, numMatches, matches);
+	    मगा_कातविरान, get_pumborder_token, नुमेरो_Matches, matches);
 }
 
 #if defined(FEAT_STL_OPT)
@@ -4101,9 +4101,9 @@ expand_set_pumborder(optexpand_T *args, int *numMatches, char_u ***matches)
  * The 'rulerformat' option is changed.
  */
     char *
-did_set_rulerformat(optset_T *args)
+did_set_rulerformat(optset_T *मगा_कातविरान)
 {
-    return parse_statustabline_rulerformat(args, TRUE);
+    return parse_statustabline_rulerformat(मगा_कातविरान, TRUE);
 }
 #endif
 
@@ -4112,7 +4112,7 @@ did_set_rulerformat(optset_T *args)
  * Process the new 'tabpanelopt' option value.
  */
     char *
-did_set_tabpanelopt(optset_T *args UNUSED)
+did_set_tabpanelopt(optset_T *मगा_कातविरान UNUSED)
 {
     if (tabpanelopt_changed() == FAIL)
 	return e_invalid_argument;
@@ -4121,29 +4121,29 @@ did_set_tabpanelopt(optset_T *args UNUSED)
 }
 
     int
-expand_set_tabpanelopt(optexpand_T *args, int *numMatches, char_u ***matches)
+expand_set_tabpanelopt(optexpand_T *मगा_कातविरान, int *नुमेरो_Matches, char_u ***matches)
 {
-    expand_T *xp = args->oe_xp;
+    expand_T *xp = मगा_कातविरान->oe_xp;
 
-    if (xp->xp_pattern > args->oe_set_arg && *(xp->xp_pattern-1) == ':')
+    if (xp->xp_pattern > मगा_कातविरान->oe_set_arg && *(xp->xp_pattern-1) == ':')
     {
-	if (completing_value_for_subopt(args, "align"))
+	if (completing_हालागा_for_subopt(मगा_कातविरान, "align"))
 	{
 	    return expand_set_opt_string(
-		    args,
-		    p_tplo_align_values,
-		    ARRAY_LENGTH(p_tplo_align_values) - 1,
-		    numMatches,
+		    मगा_कातविरान,
+		    p_tplo_align_मगा_हालागा,
+		    ARRAY_LENGTH(p_tplo_align_मगा_हालागा) - 1,
+		    नुमेरो_Matches,
 		    matches);
 	}
 	return FAIL;
     }
 
     return expand_set_opt_string(
-	    args,
-	    p_tplo_values,
-	    ARRAY_LENGTH(p_tplo_values) - 1,
-	    numMatches,
+	    मगा_कातविरान,
+	    p_tplo_मगा_हालागा,
+	    ARRAY_LENGTH(p_tplo_मगा_हालागा) - 1,
+	    नुमेरो_Matches,
 	    matches);
 }
 #endif
@@ -4152,19 +4152,19 @@ expand_set_tabpanelopt(optexpand_T *args, int *numMatches, char_u ***matches)
  * The 'scrollopt' option is changed.
  */
     char *
-did_set_scrollopt(optset_T *args UNUSED)
+did_set_scrollopt(optset_T *मगा_कातविरान UNUSED)
 {
-    return did_set_opt_strings(p_sbo, p_scbopt_values, TRUE);
+    return did_set_opt_strings(p_sbo, p_scbopt_मगा_हालागा, TRUE);
 }
 
     int
-expand_set_scrollopt(optexpand_T *args, int *numMatches, char_u ***matches)
+expand_set_scrollopt(optexpand_T *मगा_कातविरान, int *नुमेरो_Matches, char_u ***matches)
 {
     return expand_set_opt_string(
-	    args,
-	    p_scbopt_values,
-	    ARRAY_LENGTH(p_scbopt_values) - 1,
-	    numMatches,
+	    मगा_कातविरान,
+	    p_scbopt_मगा_हालागा,
+	    ARRAY_LENGTH(p_scbopt_मगा_हालागा) - 1,
+	    नुमेरो_Matches,
 	    matches);
 }
 
@@ -4172,7 +4172,7 @@ expand_set_scrollopt(optexpand_T *args, int *numMatches, char_u ***matches)
  * The 'wlseat' option is changed
  */
     char *
-did_set_wlseat(optset_T *args UNUSED)
+did_set_wlseat(optset_T *मगा_कातविरान UNUSED)
 {
 #ifdef FEAT_WAYLAND_CLIPBOARD
     // If there isn't any seat named 'wlseat', then let the Wayland clipboard be
@@ -4187,22 +4187,22 @@ did_set_wlseat(optset_T *args UNUSED)
  * The 'selection' option is changed.
  */
     char *
-did_set_selection(optset_T *args UNUSED)
+did_set_selection(optset_T *मगा_कातविरान UNUSED)
 {
-    if (*p_sel == NUL || check_opt_strings(p_sel, p_sel_values, FALSE) != OK)
+    if (*p_sel == NUL || check_opt_strings(p_sel, p_sel_मगा_हालागा, FALSE) != OK)
 	return e_invalid_argument;
 
     return NULL;
 }
 
     int
-expand_set_selection(optexpand_T *args, int *numMatches, char_u ***matches)
+expand_set_selection(optexpand_T *मगा_कातविरान, int *नुमेरो_Matches, char_u ***matches)
 {
     return expand_set_opt_string(
-	    args,
-	    p_sel_values,
-	    ARRAY_LENGTH(p_sel_values) - 1,
-	    numMatches,
+	    मगा_कातविरान,
+	    p_sel_मगा_हालागा,
+	    ARRAY_LENGTH(p_sel_मगा_हालागा) - 1,
+	    नुमेरो_Matches,
 	    matches);
 }
 
@@ -4210,19 +4210,19 @@ expand_set_selection(optexpand_T *args, int *numMatches, char_u ***matches)
  * The 'selectmode' option is changed.
  */
     char *
-did_set_selectmode(optset_T *args UNUSED)
+did_set_selectmode(optset_T *मगा_कातविरान UNUSED)
 {
-    return did_set_opt_strings(p_slm, p_slm_values, TRUE);
+    return did_set_opt_strings(p_slm, p_slm_मगा_हालागा, TRUE);
 }
 
     int
-expand_set_selectmode(optexpand_T *args, int *numMatches, char_u ***matches)
+expand_set_selectmode(optexpand_T *मगा_कातविरान, int *नुमेरो_Matches, char_u ***matches)
 {
     return expand_set_opt_string(
-	    args,
-	    p_slm_values,
-	    ARRAY_LENGTH(p_slm_values) - 1,
-	    numMatches,
+	    मगा_कातविरान,
+	    p_slm_मगा_हालागा,
+	    ARRAY_LENGTH(p_slm_मगा_हालागा) - 1,
+	    नुमेरो_Matches,
 	    matches);
 }
 
@@ -4231,14 +4231,14 @@ expand_set_selectmode(optexpand_T *args, int *numMatches, char_u ***matches)
  * The 'sessionoptions' option is changed.
  */
     char *
-did_set_sessionoptions(optset_T *args)
+did_set_sessionoptions(optset_T *मगा_कातविरान)
 {
-    if (opt_strings_flags(p_ssop, p_ssop_values, &ssop_flags, TRUE) != OK)
+    if (opt_strings_flags(p_ssop, p_ssop_मगा_हालागा, &ssop_flags, TRUE) != OK)
 	return e_invalid_argument;
     if ((ssop_flags & SSOP_CURDIR) && (ssop_flags & SSOP_SESDIR))
     {
 	// Don't allow both "sesdir" and "curdir".
-	(void)opt_strings_flags(args->os_oldval.string, p_ssop_values,
+	(void)opt_strings_flags(मगा_कातविरान->os_oldval.string, p_ssop_मगा_हालागा,
 							&ssop_flags, TRUE);
 	return e_invalid_argument;
     }
@@ -4248,15 +4248,15 @@ did_set_sessionoptions(optset_T *args)
 
     int
 expand_set_sessionoptions(
-    optexpand_T		*args,
-    int			*numMatches,
+    optexpand_T		*मगा_कातविरान,
+    int			*नुमेरो_Matches,
     char_u		***matches)
 {
     return expand_set_opt_string(
-	    args,
-	    p_ssop_values,
-	    ARRAY_LENGTH(p_ssop_values) - 1,
-	    numMatches,
+	    मगा_कातविरान,
+	    p_ssop_मगा_हालागा,
+	    ARRAY_LENGTH(p_ssop_मगा_हालागा) - 1,
+	    नुमेरो_Matches,
 	    matches);
 }
 #endif
@@ -4265,12 +4265,12 @@ expand_set_sessionoptions(
  * Validate 'shellpipe'/'shellredir' option.
  */
     char *
-did_set_shellpipe_redir(optset_T *args)
+did_set_shellpipe_redir(optset_T *मगा_कातविरान)
 {
     char_u	*p;
     bool	seen = false;
 
-    for (p = args->os_newval.string; *p != NUL; ++p)
+    for (p = मगा_कातविरान->os_newval.string; *p != NUL; ++p)
     {
 	if (*p != '%')
 	    continue;
@@ -4302,18 +4302,18 @@ did_set_shellpipe_redir(optset_T *args)
  * The 'shortmess' option is changed.
  */
     char *
-did_set_shortmess(optset_T *args)
+did_set_shortmess(optset_T *मगा_कातविरान)
 {
-    char_u	**varp = (char_u **)args->os_varp;
+    char_u	**varp = (char_u **)मगा_कातविरान->os_varp;
 
-    return did_set_option_listflag(*varp, (char_u *)SHM_ALL, args->os_errbuf,
-		    args->os_errbuflen);
+    return did_set_option_listflag(*varp, (char_u *)SHM_ALL, मगा_कातविरान->os_errbuf,
+		    मगा_कातविरान->os_errbuflen);
 }
 
     int
-expand_set_shortmess(optexpand_T *args, int *numMatches, char_u ***matches)
+expand_set_shortmess(optexpand_T *मगा_कातविरान, int *नुमेरो_Matches, char_u ***matches)
 {
-    return expand_set_opt_listflag(args, (char_u*)SHM_ALL, numMatches, matches);
+    return expand_set_opt_listflag(मगा_कातविरान, (char_u*)SHM_ALL, नुमेरो_Matches, matches);
 }
 
 #if defined(FEAT_LINEBREAK)
@@ -4321,9 +4321,9 @@ expand_set_shortmess(optexpand_T *args, int *numMatches, char_u ***matches)
  * The 'showbreak' option is changed.
  */
     char *
-did_set_showbreak(optset_T *args)
+did_set_showbreak(optset_T *मगा_कातविरान)
 {
-    char_u	**varp = (char_u **)args->os_varp;
+    char_u	**varp = (char_u **)मगा_कातविरान->os_varp;
     char_u	*s;
 
     for (s = *varp; *s; )
@@ -4341,9 +4341,9 @@ did_set_showbreak(optset_T *args)
  * The 'showcmdloc' option is changed.
  */
     char *
-did_set_showcmdloc(optset_T *args UNUSED)
+did_set_showcmdloc(optset_T *मगा_कातविरान UNUSED)
 {
-    char	*errmsg = did_set_opt_strings(p_sloc, p_sloc_values, FALSE);
+    char	*errmsg = did_set_opt_strings(p_sloc, p_sloc_मगा_हालागा, FALSE);
 
     if (errmsg == NULL)
 	comp_col();
@@ -4352,13 +4352,13 @@ did_set_showcmdloc(optset_T *args UNUSED)
 }
 
     int
-expand_set_showcmdloc(optexpand_T *args, int *numMatches, char_u ***matches)
+expand_set_showcmdloc(optexpand_T *मगा_कातविरान, int *नुमेरो_Matches, char_u ***matches)
 {
     return expand_set_opt_string(
-	    args,
-	    p_sloc_values,
-	    ARRAY_LENGTH(p_sloc_values) - 1,
-	    numMatches,
+	    मगा_कातविरान,
+	    p_sloc_मगा_हालागा,
+	    ARRAY_LENGTH(p_sloc_मगा_हालागा) - 1,
+	    नुमेरो_Matches,
 	    matches);
 }
 
@@ -4367,19 +4367,19 @@ expand_set_showcmdloc(optexpand_T *args, int *numMatches, char_u ***matches)
  * The 'signcolumn' option is changed.
  */
     char *
-did_set_signcolumn(optset_T *args)
+did_set_signcolumn(optset_T *मगा_कातविरान)
 {
-    char_u	**varp = (char_u **)args->os_varp;
+    char_u	**varp = (char_u **)मगा_कातविरान->os_varp;
 
 # if defined(FEAT_LINEBREAK)
-    if (check_opt_strings(*varp, p_scl_values, FALSE) != OK)
+    if (check_opt_strings(*varp, p_scl_मगा_हालागा, FALSE) != OK)
 	return e_invalid_argument;
     // When changing the 'signcolumn' to or from 'number', recompute the
     // width of the number column if 'number' or 'relativenumber' is set.
-    if (((*args->os_oldval.string == 'n' && args->os_oldval.string[1] == 'u')
+    if (((*मगा_कातविरान->os_oldval.string == 'n' && मगा_कातविरान->os_oldval.string[1] == 'u')
 		|| (*curwin->w_p_scl == 'n' && *(curwin->w_p_scl + 1) =='u'))
 	    && (curwin->w_p_nu || curwin->w_p_rnu))
-	curwin->w_nrwidth_line_count = 0;
+	curwin->w_nrwidth_लिन्या_बिलांग = 0;
 # endif
 
 # if defined(FEAT_GUI)
@@ -4393,13 +4393,13 @@ did_set_signcolumn(optset_T *args)
 }
 
     int
-expand_set_signcolumn(optexpand_T *args, int *numMatches, char_u ***matches)
+expand_set_signcolumn(optexpand_T *मगा_कातविरान, int *नुमेरो_Matches, char_u ***matches)
 {
     return expand_set_opt_string(
-	    args,
-	    p_scl_values,
-	    ARRAY_LENGTH(p_scl_values) - 1,
-	    numMatches,
+	    मगा_कातविरान,
+	    p_scl_मगा_हालागा,
+	    ARRAY_LENGTH(p_scl_मगा_हालागा) - 1,
+	    नुमेरो_Matches,
 	    matches);
 }
 #endif
@@ -4409,7 +4409,7 @@ expand_set_signcolumn(optexpand_T *args, int *numMatches, char_u ***matches)
  * The 'spellcapcheck' option is changed.
  */
     char *
-did_set_spellcapcheck(optset_T *args UNUSED)
+did_set_spellcapcheck(optset_T *मगा_कातविरान UNUSED)
 {
     // compile the regexp program.
     return compile_cap_prog(curwin->w_s);
@@ -4419,9 +4419,9 @@ did_set_spellcapcheck(optset_T *args UNUSED)
  * The 'spellfile' option is changed.
  */
     char *
-did_set_spellfile(optset_T *args)
+did_set_spellfile(optset_T *मगा_कातविरान)
 {
-    char_u	**varp = (char_u **)args->os_varp;
+    char_u	**varp = (char_u **)मगा_कातविरान->os_varp;
 
     if (!valid_spellfile(*varp))
 	return e_invalid_argument;
@@ -4435,9 +4435,9 @@ did_set_spellfile(optset_T *args)
  * The 'spell' option is changed.
  */
     char *
-did_set_spelllang(optset_T *args)
+did_set_spelllang(optset_T *मगा_कातविरान)
 {
-    char_u	**varp = (char_u **)args->os_varp;
+    char_u	**varp = (char_u **)मगा_कातविरान->os_varp;
 
     if (!valid_spelllang(*varp))
 	return e_invalid_argument;
@@ -4451,9 +4451,9 @@ did_set_spelllang(optset_T *args)
  * The 'spelloptions' option is changed.
  */
     char *
-did_set_spelloptions(optset_T *args)
+did_set_spelloptions(optset_T *मगा_कातविरान)
 {
-    char_u	**varp = (char_u **)args->os_varp;
+    char_u	**varp = (char_u **)मगा_कातविरान->os_varp;
 
     if (**varp != NUL && STRCMP(*varp, "camel") != 0)
 	return e_invalid_argument;
@@ -4462,14 +4462,14 @@ did_set_spelloptions(optset_T *args)
 }
 
     int
-expand_set_spelloptions(optexpand_T *args, int *numMatches, char_u ***matches)
+expand_set_spelloptions(optexpand_T *मगा_कातविरान, int *नुमेरो_Matches, char_u ***matches)
 {
-    static char *(p_spo_values[]) = {"camel", NULL};
+    static char *(p_spo_मगा_हालागा[]) = {"camel", NULL};
     return expand_set_opt_string(
-	    args,
-	    p_spo_values,
-	    ARRAY_LENGTH(p_spo_values) - 1,
-	    numMatches,
+	    मगा_कातविरान,
+	    p_spo_मगा_हालागा,
+	    ARRAY_LENGTH(p_spo_मगा_हालागा) - 1,
+	    नुमेरो_Matches,
 	    matches);
 }
 
@@ -4477,7 +4477,7 @@ expand_set_spelloptions(optexpand_T *args, int *numMatches, char_u ***matches)
  * The 'spellsuggest' option is changed.
  */
     char *
-did_set_spellsuggest(optset_T *args UNUSED)
+did_set_spellsuggest(optset_T *मगा_कातविरान UNUSED)
 {
     if (spell_check_sps() != OK)
 	return e_invalid_argument;
@@ -4486,13 +4486,13 @@ did_set_spellsuggest(optset_T *args UNUSED)
 }
 
     int
-expand_set_spellsuggest(optexpand_T *args, int *numMatches, char_u ***matches)
+expand_set_spellsuggest(optexpand_T *मगा_कातविरान, int *नुमेरो_Matches, char_u ***matches)
 {
     return expand_set_opt_string(
-	    args,
-	    p_sps_values,
-	    ARRAY_LENGTH(p_sps_values) - 1,
-	    numMatches,
+	    मगा_कातविरान,
+	    p_sps_मगा_हालागा,
+	    ARRAY_LENGTH(p_sps_मगा_हालागा) - 1,
+	    नुमेरो_Matches,
 	    matches);
 }
 #endif
@@ -4501,7 +4501,7 @@ expand_set_spellsuggest(optexpand_T *args, int *numMatches, char_u ***matches)
  * The 'splitkeep' option is changed.
  */
     char *
-did_set_splitkeep(optset_T *args UNUSED)
+did_set_splitkeep(optset_T *मगा_कातविरान UNUSED)
 {
     win_T	*wp;
     tabpage_T	*tp;
@@ -4510,17 +4510,17 @@ did_set_splitkeep(optset_T *args UNUSED)
 	wp->w_prev_height = wp->w_height;
 	wp->w_prev_winrow = wp->w_winrow;
     }
-    return did_set_opt_strings(p_spk, p_spk_values, FALSE);
+    return did_set_opt_strings(p_spk, p_spk_मगा_हालागा, FALSE);
 }
 
     int
-expand_set_splitkeep(optexpand_T *args, int *numMatches, char_u ***matches)
+expand_set_splitkeep(optexpand_T *मगा_कातविरान, int *नुमेरो_Matches, char_u ***matches)
 {
     return expand_set_opt_string(
-	    args,
-	    p_spk_values,
-	    ARRAY_LENGTH(p_spk_values) - 1,
-	    numMatches,
+	    मगा_कातविरान,
+	    p_spk_मगा_हालागा,
+	    ARRAY_LENGTH(p_spk_मगा_हालागा) - 1,
+	    नुमेरो_Matches,
 	    matches);
 }
 
@@ -4529,10 +4529,10 @@ expand_set_splitkeep(optexpand_T *args, int *numMatches, char_u ***matches)
  * The 'statusline' option is changed.
  */
     char *
-did_set_statusline(optset_T *args)
+did_set_statusline(optset_T *मगा_कातविरान)
 {
-    char_u  **varp = (char_u **)args->os_varp;
-    char    *ret = parse_statustabline_rulerformat(args, FALSE);
+    char_u  **varp = (char_u **)मगा_कातविरान->os_varp;
+    char    *ret = parse_statustabline_rulerformat(मगा_कातविरान, FALSE);
 
     if (ret != NULL)
 	return ret;
@@ -4618,9 +4618,9 @@ update_stlo_maxheight(char_u **varp, int actual_stlh)
  * The 'statuslineopt' option is changed.
  */
     char *
-did_set_statuslineopt(optset_T *args)
+did_set_statuslineopt(optset_T *मगा_कातविरान)
 {
-    char_u	**varp = (char_u **)args->os_varp;
+    char_u	**varp = (char_u **)मगा_कातविरान->os_varp;
     win_T       *wp = varp == &curwin->w_p_stlo ? curwin : NULL;
 
     if (statuslineopt_changed(*varp, wp) == FAIL)
@@ -4658,7 +4658,7 @@ did_set_statuslineopt(optset_T *args)
     else
 	frame_change_statusline_height();
 
-    if ((args->os_flags & (OPT_LOCAL | OPT_GLOBAL)) == 0)
+    if ((मगा_कातविरान->os_flags & (OPT_LOCAL | OPT_GLOBAL)) == 0)
     {
 	// :set clears the local values.
 	clear_string_option(&curwin->w_p_stlo);
@@ -4670,13 +4670,13 @@ did_set_statuslineopt(optset_T *args)
 }
 
     int
-expand_set_statuslineopt(optexpand_T *args, int *numMatches, char_u ***matches)
+expand_set_statuslineopt(optexpand_T *मगा_कातविरान, int *नुमेरो_Matches, char_u ***matches)
 {
     return expand_set_opt_string(
-	    args,
-	    p_stlo_values,
-	    ARRAY_LENGTH(p_stlo_values) - 1,
-	    numMatches,
+	    मगा_कातविरान,
+	    p_stlo_मगा_हालागा,
+	    ARRAY_LENGTH(p_stlo_मगा_हालागा) - 1,
+	    नुमेरो_Matches,
 	    matches);
 }
 #endif
@@ -4685,19 +4685,19 @@ expand_set_statuslineopt(optexpand_T *args, int *numMatches, char_u ***matches)
  * The 'swapsync' option is changed.
  */
     char *
-did_set_swapsync(optset_T *args UNUSED)
+did_set_swapsync(optset_T *मगा_कातविरान UNUSED)
 {
-    return did_set_opt_strings(p_sws, p_sws_values, FALSE);
+    return did_set_opt_strings(p_sws, p_sws_मगा_हालागा, FALSE);
 }
 
     int
-expand_set_swapsync(optexpand_T *args, int *numMatches, char_u ***matches)
+expand_set_swapsync(optexpand_T *मगा_कातविरान, int *नुमेरो_Matches, char_u ***matches)
 {
     return expand_set_opt_string(
-	    args,
-	    p_sws_values,
-	    ARRAY_LENGTH(p_sws_values) - 1,
-	    numMatches,
+	    मगा_कातविरान,
+	    p_sws_मगा_हालागा,
+	    ARRAY_LENGTH(p_sws_मगा_हालागा) - 1,
+	    नुमेरो_Matches,
 	    matches);
 }
 
@@ -4705,19 +4705,19 @@ expand_set_swapsync(optexpand_T *args, int *numMatches, char_u ***matches)
  * The 'switchbuf' option is changed.
  */
     char *
-did_set_switchbuf(optset_T *args UNUSED)
+did_set_switchbuf(optset_T *मगा_कातविरान UNUSED)
 {
-    return did_set_opt_flags(p_swb, p_swb_values, &swb_flags, TRUE);
+    return did_set_opt_flags(p_swb, p_swb_मगा_हालागा, &swb_flags, TRUE);
 }
 
     int
-expand_set_switchbuf(optexpand_T *args, int *numMatches, char_u ***matches)
+expand_set_switchbuf(optexpand_T *मगा_कातविरान, int *नुमेरो_Matches, char_u ***matches)
 {
     return expand_set_opt_string(
-	    args,
-	    p_swb_values,
-	    ARRAY_LENGTH(p_swb_values) - 1,
-	    numMatches,
+	    मगा_कातविरान,
+	    p_swb_मगा_हालागा,
+	    ARRAY_LENGTH(p_swb_मगा_हालागा) - 1,
+	    नुमेरो_Matches,
 	    matches);
 }
 
@@ -4725,19 +4725,19 @@ expand_set_switchbuf(optexpand_T *args, int *numMatches, char_u ***matches)
  * The 'tabclose' option is changed.
  */
     char *
-did_set_tabclose(optset_T *args UNUSED)
+did_set_tabclose(optset_T *मगा_कातविरान UNUSED)
 {
-    return did_set_opt_flags(p_tcl, p_tcl_values, &tcl_flags, TRUE);
+    return did_set_opt_flags(p_tcl, p_tcl_मगा_हालागा, &tcl_flags, TRUE);
 }
 
     int
-expand_set_tabclose(optexpand_T *args, int *numMatches, char_u ***matches)
+expand_set_tabclose(optexpand_T *मगा_कातविरान, int *नुमेरो_Matches, char_u ***matches)
 {
     return expand_set_opt_string(
-	    args,
-	    p_tcl_values,
-	    ARRAY_LENGTH(p_tcl_values) - 1,
-	    numMatches,
+	    मगा_कातविरान,
+	    p_tcl_मगा_हालागा,
+	    ARRAY_LENGTH(p_tcl_मगा_हालागा) - 1,
+	    नुमेरो_Matches,
 	    matches);
 }
 
@@ -4746,9 +4746,9 @@ expand_set_tabclose(optexpand_T *args, int *numMatches, char_u ***matches)
  * The 'tabline' option is changed.
  */
     char *
-did_set_tabline(optset_T *args)
+did_set_tabline(optset_T *मगा_कातविरान)
 {
-    return parse_statustabline_rulerformat(args, FALSE);
+    return parse_statustabline_rulerformat(मगा_कातविरान, FALSE);
 }
 #endif
 
@@ -4756,12 +4756,12 @@ did_set_tabline(optset_T *args)
  * The 'tagcase' option is changed.
  */
     char *
-did_set_tagcase(optset_T *args)
+did_set_tagcase(optset_T *मगा_कातविरान)
 {
     unsigned int	*flags;
     char_u		*p;
 
-    if (args->os_flags & OPT_LOCAL)
+    if (मगा_कातविरान->os_flags & OPT_LOCAL)
     {
 	p = curbuf->b_p_tc;
 	flags = &curbuf->b_tc_flags;
@@ -4772,24 +4772,24 @@ did_set_tagcase(optset_T *args)
 	flags = &tc_flags;
     }
 
-    if ((args->os_flags & OPT_LOCAL) && *p == NUL)
+    if ((मगा_कातविरान->os_flags & OPT_LOCAL) && *p == NUL)
 	// make the local value empty: use the global value
 	*flags = 0;
     else if (*p == NUL
-	    || opt_strings_flags(p, p_tc_values, flags, FALSE) != OK)
+	    || opt_strings_flags(p, p_tc_मगा_हालागा, flags, FALSE) != OK)
 	return e_invalid_argument;
 
     return NULL;
 }
 
     int
-expand_set_tagcase(optexpand_T *args, int *numMatches, char_u ***matches)
+expand_set_tagcase(optexpand_T *मगा_कातविरान, int *नुमेरो_Matches, char_u ***matches)
 {
     return expand_set_opt_string(
-	    args,
-	    p_tc_values,
-	    ARRAY_LENGTH(p_tc_values) - 1,
-	    numMatches,
+	    मगा_कातविरान,
+	    p_tc_मगा_हालागा,
+	    ARRAY_LENGTH(p_tc_मगा_हालागा) - 1,
+	    नुमेरो_Matches,
 	    matches);
 }
 
@@ -4797,7 +4797,7 @@ expand_set_tagcase(optexpand_T *args, int *numMatches, char_u ***matches)
  * The 'term' option is changed.
  */
     char *
-did_set_term(optset_T *args UNUSED)
+did_set_term(optset_T *मगा_कातविरान UNUSED)
 {
     if (T_NAME[0] == NUL)
 	return e_cannot_set_term_to_empty_string;
@@ -4820,9 +4820,9 @@ did_set_term(optset_T *args UNUSED)
  * Some terminal option (t_xxx) is changed
  */
     char *
-did_set_term_option(optset_T *args)
+did_set_term_option(optset_T *मगा_कातविरान)
 {
-    char_u	**varp = (char_u **)args->os_varp;
+    char_u	**varp = (char_u **)मगा_कातविरान->os_varp;
 
     if (!full_screen)
 	return NULL;
@@ -4847,7 +4847,7 @@ did_set_term_option(optset_T *args)
 	    if (is_term_win32())
 	    {
 		swap_tcap();
-		args->os_did_swaptcap = TRUE;
+		मगा_कातविरान->os_did_swaptcap = TRUE;
 	    }
 #endif
 	    // We now have a different color setup, initialize it again.
@@ -4893,7 +4893,7 @@ did_set_term_option(optset_T *args)
  * The 'termresize' option is changed.
  */
     char *
-did_set_termresize(optset_T *args UNUSED)
+did_set_termresize(optset_T *मगा_कातविरान UNUSED)
 {
     // If empty or "inband", then attempt to enable in-band resize events.
     if (*p_trz == NUL || STRCMP(p_trz, "inband") == 0)
@@ -4907,13 +4907,13 @@ did_set_termresize(optset_T *args UNUSED)
 }
 
     int
-expand_set_termresize(optexpand_T *args, int *numMatches, char_u ***matches)
+expand_set_termresize(optexpand_T *मगा_कातविरान, int *नुमेरो_Matches, char_u ***matches)
 {
     return expand_set_opt_string(
-	    args,
-	    p_trz_values,
-	    ARRAY_LENGTH(p_trz_values) - 1,
-	    numMatches,
+	    मगा_कातविरान,
+	    p_trz_मगा_हालागा,
+	    ARRAY_LENGTH(p_trz_मगा_हालागा) - 1,
+	    नुमेरो_Matches,
 	    matches);
 }
 #endif
@@ -4923,11 +4923,11 @@ expand_set_termresize(optexpand_T *args, int *numMatches, char_u ***matches)
  * The 'termwinkey' option is changed.
  */
     char *
-did_set_termwinkey(optset_T *args)
+did_set_termwinkey(optset_T *मगा_कातविरान)
 {
-    char_u	**varp = (char_u **)args->os_varp;
+    char_u	**varp = (char_u **)मगा_कातविरान->os_varp;
 
-    if ((*varp)[0] != NUL && string_to_key(*varp, TRUE) == 0)
+    if ((*varp)[0] != NUL && string_to_सुसि(*varp, TRUE) == 0)
 	return e_invalid_argument;
 
     return NULL;
@@ -4937,9 +4937,9 @@ did_set_termwinkey(optset_T *args)
  * The 'termwinsize' option is changed.
  */
     char *
-did_set_termwinsize(optset_T *args)
+did_set_termwinsize(optset_T *मगा_कातविरान)
 {
-    char_u	**varp = (char_u **)args->os_varp;
+    char_u	**varp = (char_u **)मगा_कातविरान->os_varp;
     char_u	*p;
 
     if ((*varp)[0] == NUL)
@@ -4957,19 +4957,19 @@ did_set_termwinsize(optset_T *args)
  * The 'termwintype' option is changed.
  */
     char *
-did_set_termwintype(optset_T *args UNUSED)
+did_set_termwintype(optset_T *मगा_कातविरान UNUSED)
 {
-    return did_set_opt_strings(p_twt, p_twt_values, FALSE);
+    return did_set_opt_strings(p_twt, p_twt_मगा_हालागा, FALSE);
 }
 
     int
-expand_set_termwintype(optexpand_T *args, int *numMatches, char_u ***matches)
+expand_set_termwintype(optexpand_T *मगा_कातविरान, int *नुमेरो_Matches, char_u ***matches)
 {
     return expand_set_opt_string(
-	    args,
-	    p_twt_values,
-	    ARRAY_LENGTH(p_twt_values) - 1,
-	    numMatches,
+	    मगा_कातविरान,
+	    p_twt_मगा_हालागा,
+	    ARRAY_LENGTH(p_twt_मगा_हालागा) - 1,
+	    नुमेरो_Matches,
 	    matches);
 }
 # endif
@@ -4979,14 +4979,14 @@ expand_set_termwintype(optexpand_T *args, int *numMatches, char_u ***matches)
  * The 'titlestring' option is changed.
  */
     char *
-did_set_titlestring(optset_T *args)
+did_set_titlestring(optset_T *मगा_कातविरान)
 {
     int flagval = 0;
 
 #ifdef FEAT_STL_OPT
     flagval = STL_IN_TITLE;
 #endif
-    return parse_titleiconstring(args, flagval);
+    return parse_titleiconstring(मगा_कातविरान, flagval);
 }
 
 #if defined(FEAT_TOOLBAR) && !defined(FEAT_GUI_MSWIN)
@@ -4994,9 +4994,9 @@ did_set_titlestring(optset_T *args)
  * The 'toolbar' option is changed.
  */
     char *
-did_set_toolbar(optset_T *args UNUSED)
+did_set_toolbar(optset_T *मगा_कातविरान UNUSED)
 {
-    if (opt_strings_flags(p_toolbar, p_toolbar_values, &toolbar_flags,
+    if (opt_strings_flags(p_toolbar, p_toolbar_मगा_हालागा, &toolbar_flags,
 								TRUE) != OK)
 	return e_invalid_argument;
 
@@ -5007,13 +5007,13 @@ did_set_toolbar(optset_T *args UNUSED)
 }
 
     int
-expand_set_toolbar(optexpand_T *args, int *numMatches, char_u ***matches)
+expand_set_toolbar(optexpand_T *मगा_कातविरान, int *नुमेरो_Matches, char_u ***matches)
 {
     return expand_set_opt_string(
-	    args,
-	    p_toolbar_values,
-	    ARRAY_LENGTH(p_toolbar_values) - 1,
-	    numMatches,
+	    मगा_कातविरान,
+	    p_toolbar_मगा_हालागा,
+	    ARRAY_LENGTH(p_toolbar_मगा_हालागा) - 1,
+	    नुमेरो_Matches,
 	    matches);
 }
 #endif
@@ -5023,9 +5023,9 @@ expand_set_toolbar(optexpand_T *args, int *numMatches, char_u ***matches)
  * The 'toolbariconsize' option is changed.  GTK+ 2 only.
  */
     char *
-did_set_toolbariconsize(optset_T *args UNUSED)
+did_set_toolbariconsize(optset_T *मगा_कातविरान UNUSED)
 {
-    if (opt_strings_flags(p_tbis, p_tbis_values, &tbis_flags, FALSE) != OK)
+    if (opt_strings_flags(p_tbis, p_tbis_मगा_हालागा, &tbis_flags, FALSE) != OK)
 	return e_invalid_argument;
 
     out_flush();
@@ -5036,15 +5036,15 @@ did_set_toolbariconsize(optset_T *args UNUSED)
 
     int
 expand_set_toolbariconsize(
-    optexpand_T	*args,
-    int		*numMatches,
+    optexpand_T	*मगा_कातविरान,
+    int		*नुमेरो_Matches,
     char_u	***matches)
 {
     return expand_set_opt_string(
-	    args,
-	    p_tbis_values,
-	    ARRAY_LENGTH(p_tbis_values) - 1,
-	    numMatches,
+	    मगा_कातविरान,
+	    p_tbis_मगा_हालागा,
+	    ARRAY_LENGTH(p_tbis_मगा_हालागा) - 1,
+	    नुमेरो_Matches,
 	    matches);
 }
 #endif
@@ -5054,14 +5054,14 @@ expand_set_toolbariconsize(
  * The 'ttymouse' option is changed.
  */
     char *
-did_set_ttymouse(optset_T *args UNUSED)
+did_set_ttymouse(optset_T *मगा_कातविरान UNUSED)
 {
     char *errmsg = NULL;
 
     // Switch the mouse off before changing the escape sequences used for
     // that.
     mch_setmouse(FALSE);
-    if (opt_strings_flags(p_ttym, p_ttym_values, &ttym_flags, FALSE) != OK)
+    if (opt_strings_flags(p_ttym, p_ttym_मगा_हालागा, &ttym_flags, FALSE) != OK)
 	errmsg = e_invalid_argument;
     else
 	check_mouse_termcode();
@@ -5072,13 +5072,13 @@ did_set_ttymouse(optset_T *args UNUSED)
 }
 
     int
-expand_set_ttymouse(optexpand_T *args, int *numMatches, char_u ***matches)
+expand_set_ttymouse(optexpand_T *मगा_कातविरान, int *नुमेरो_Matches, char_u ***matches)
 {
     return expand_set_opt_string(
-	    args,
-	    p_ttym_values,
-	    ARRAY_LENGTH(p_ttym_values) - 1,
-	    numMatches,
+	    मगा_कातविरान,
+	    p_ttym_मगा_हालागा,
+	    ARRAY_LENGTH(p_ttym_मगा_हालागा) - 1,
+	    नुमेरो_Matches,
 	    matches);
 }
 #endif
@@ -5088,9 +5088,9 @@ expand_set_ttymouse(optexpand_T *args, int *numMatches, char_u ***matches)
  * The 'varsofttabstop' option is changed.
  */
     char *
-did_set_varsofttabstop(optset_T *args)
+did_set_varsofttabstop(optset_T *मगा_कातविरान)
 {
-    char_u	**varp = (char_u **)args->os_varp;
+    char_u	**varp = (char_u **)मगा_कातविरान->os_varp;
     char_u *cp;
 
     if (!((*varp)[0]) || ((*varp)[0] == '0' && !((*varp)[1])))
@@ -5123,9 +5123,9 @@ did_set_varsofttabstop(optset_T *args)
  * The 'vartabstop' option is changed.
  */
     char *
-did_set_vartabstop(optset_T *args)
+did_set_vartabstop(optset_T *मगा_कातविरान)
 {
-    char_u	**varp = (char_u **)args->os_varp;
+    char_u	**varp = (char_u **)मगा_कातविरान->os_varp;
     char_u *cp;
 
     if (!((*varp)[0]) || ((*varp)[0] == '0' && !((*varp)[1])))
@@ -5163,7 +5163,7 @@ did_set_vartabstop(optset_T *args)
  * The 'verbosefile' option is changed.
  */
     char *
-did_set_verbosefile(optset_T *args UNUSED)
+did_set_verbosefile(optset_T *मगा_कातविरान UNUSED)
 {
     verbose_stop();
     if (*p_vfile != NUL && verbose_open() == FAIL)
@@ -5177,9 +5177,9 @@ did_set_verbosefile(optset_T *args UNUSED)
  * The 'viewoptions' option is changed.
  */
     char *
-did_set_viewoptions(optset_T *args UNUSED)
+did_set_viewoptions(optset_T *मगा_कातविरान UNUSED)
 {
-    return did_set_opt_flags(p_vop, p_ssop_values, &vop_flags, TRUE);
+    return did_set_opt_flags(p_vop, p_ssop_मगा_हालागा, &vop_flags, TRUE);
 }
 #endif
 
@@ -5188,7 +5188,7 @@ did_set_viewoptions(optset_T *args UNUSED)
  * The 'viminfo' option is changed.
  */
     char *
-did_set_viminfo(optset_T *args)
+did_set_viminfo(optset_T *मगा_कातविरान)
 {
     char_u	*s;
     char	*errmsg = NULL;
@@ -5198,7 +5198,7 @@ did_set_viminfo(optset_T *args)
 	// Check it's a valid character
 	if (vim_strchr((char_u *)"!\"%'/:<@cfhnrs", *s) == NULL)
 	{
-	    errmsg = illegal_char(args->os_errbuf, args->os_errbuflen, *s);
+	    errmsg = illegal_char(मगा_कातविरान->os_errbuf, मगा_कातविरान->os_errbuflen, *s);
 	    break;
 	}
 	if (*s == 'n')	// name is always last one
@@ -5223,12 +5223,12 @@ did_set_viminfo(optset_T *args)
 
 	    if (!VIM_ISDIGIT(*(s - 1)))
 	    {
-		if (args->os_errbuf != NULL)
+		if (मगा_कातविरान->os_errbuf != NULL)
 		{
-		    vim_snprintf(args->os_errbuf, args->os_errbuflen,
-			    _(e_missing_number_after_angle_str_angle),
+		    vim_snprintf(मगा_कातविरान->os_errbuf, मगा_कातविरान->os_errbuflen,
+			    _(e_missing_नुमेरो_after_angle_str_angle),
 			    transchar_byte(*(s - 1)));
-		    errmsg = args->os_errbuf;
+		    errmsg = मगा_कातविरान->os_errbuf;
 		}
 		else
 		    errmsg = "";
@@ -5239,7 +5239,7 @@ did_set_viminfo(optset_T *args)
 	    ++s;
 	else if (*s)
 	{
-	    if (args->os_errbuf != NULL)
+	    if (मगा_कातविरान->os_errbuf != NULL)
 		errmsg = e_missing_comma;
 	    else
 		errmsg = "";
@@ -5247,7 +5247,7 @@ did_set_viminfo(optset_T *args)
 	}
     }
     if (*p_viminfo && errmsg == NULL && get_viminfo_parameter('\'') < 0)
-	errmsg = e_must_specify_a_value;
+	errmsg = e_must_specify_a_हालागा;
 
     return errmsg;
 }
@@ -5257,25 +5257,25 @@ did_set_viminfo(optset_T *args)
  * The 'virtualedit' option is changed.
  */
     char *
-did_set_virtualedit(optset_T *args)
+did_set_virtualedit(optset_T *मगा_कातविरान)
 {
     char_u		*ve = p_ve;
     unsigned int	*flags = &ve_flags;
 
-    if (args->os_flags & OPT_LOCAL)
+    if (मगा_कातविरान->os_flags & OPT_LOCAL)
     {
 	ve = curwin->w_p_ve;
 	flags = &curwin->w_ve_flags;
     }
 
-    if ((args->os_flags & OPT_LOCAL) && *ve == NUL)
+    if ((मगा_कातविरान->os_flags & OPT_LOCAL) && *ve == NUL)
 	// make the local value empty: use the global value
 	*flags = 0;
     else
     {
-	if (opt_strings_flags(ve, p_ve_values, flags, TRUE) != OK)
+	if (opt_strings_flags(ve, p_ve_मगा_हालागा, flags, TRUE) != OK)
 	    return e_invalid_argument;
-	else if (STRCMP(ve, args->os_oldval.string) != 0)
+	else if (STRCMP(ve, मगा_कातविरान->os_oldval.string) != 0)
 	{
 	    // Recompute cursor position in case the new 've' setting
 	    // changes something.
@@ -5288,13 +5288,13 @@ did_set_virtualedit(optset_T *args)
 }
 
     int
-expand_set_virtualedit(optexpand_T *args, int *numMatches, char_u ***matches)
+expand_set_virtualedit(optexpand_T *मगा_कातविरान, int *नुमेरो_Matches, char_u ***matches)
 {
     return expand_set_opt_string(
-	    args,
-	    p_ve_values,
-	    ARRAY_LENGTH(p_ve_values) - 1,
-	    numMatches,
+	    मगा_कातविरान,
+	    p_ve_मगा_हालागा,
+	    ARRAY_LENGTH(p_ve_मगा_हालागा) - 1,
+	    नुमेरो_Matches,
 	    matches);
 }
 
@@ -5302,27 +5302,27 @@ expand_set_virtualedit(optexpand_T *args, int *numMatches, char_u ***matches)
  * The 'whichwrap' option is changed.
  */
     char *
-did_set_whichwrap(optset_T *args)
+did_set_whichwrap(optset_T *मगा_कातविरान)
 {
-    char_u	**varp = (char_u **)args->os_varp;
+    char_u	**varp = (char_u **)मगा_कातविरान->os_varp;
 
     // Add ',' to the list flags because 'whichwrap' is a flag
     // list that is comma-separated.
     return did_set_option_listflag(*varp, (char_u *)(WW_ALL ","),
-		    args->os_errbuf, args->os_errbuflen);
+		    मगा_कातविरान->os_errbuf, मगा_कातविरान->os_errbuflen);
 }
 
     int
-expand_set_whichwrap(optexpand_T *args, int *numMatches, char_u ***matches)
+expand_set_whichwrap(optexpand_T *मगा_कातविरान, int *नुमेरो_Matches, char_u ***matches)
 {
-    return expand_set_opt_listflag(args, (char_u*)WW_ALL, numMatches, matches);
+    return expand_set_opt_listflag(मगा_कातविरान, (char_u*)WW_ALL, नुमेरो_Matches, matches);
 }
 
 /*
  * The 'wildmode' option is changed.
  */
     char *
-did_set_wildmode(optset_T *args UNUSED)
+did_set_wildmode(optset_T *मगा_कातविरान UNUSED)
 {
     if (check_opt_wim() == FAIL)
 	return e_invalid_argument;
@@ -5330,13 +5330,13 @@ did_set_wildmode(optset_T *args UNUSED)
 }
 
     int
-expand_set_wildmode(optexpand_T *args, int *numMatches, char_u ***matches)
+expand_set_wildmode(optexpand_T *मगा_कातविरान, int *नुमेरो_Matches, char_u ***matches)
 {
     return expand_set_opt_string(
-	    args,
-	    p_wim_values,
-	    ARRAY_LENGTH(p_wim_values) - 1,
-	    numMatches,
+	    मगा_कातविरान,
+	    p_wim_मगा_हालागा,
+	    ARRAY_LENGTH(p_wim_मगा_हालागा) - 1,
+	    नुमेरो_Matches,
 	    matches);
 }
 
@@ -5344,19 +5344,19 @@ expand_set_wildmode(optexpand_T *args, int *numMatches, char_u ***matches)
  * The 'wildoptions' option is changed.
  */
     char *
-did_set_wildoptions(optset_T *args UNUSED)
+did_set_wildoptions(optset_T *मगा_कातविरान UNUSED)
 {
-    return did_set_opt_strings(p_wop, p_wop_values, TRUE);
+    return did_set_opt_strings(p_wop, p_wop_मगा_हालागा, TRUE);
 }
 
     int
-expand_set_wildoptions(optexpand_T *args, int *numMatches, char_u ***matches)
+expand_set_wildoptions(optexpand_T *मगा_कातविरान, int *नुमेरो_Matches, char_u ***matches)
 {
     return expand_set_opt_string(
-	    args,
-	    p_wop_values,
-	    ARRAY_LENGTH(p_wop_values) - 1,
-	    numMatches,
+	    मगा_कातविरान,
+	    p_wop_मगा_हालागा,
+	    ARRAY_LENGTH(p_wop_मगा_हालागा) - 1,
+	    नुमेरो_Matches,
 	    matches);
 }
 
@@ -5365,11 +5365,11 @@ expand_set_wildoptions(optexpand_T *args, int *numMatches, char_u ***matches)
  * The 'winaltkeys' option is changed.
  */
     char *
-did_set_winaltkeys(optset_T *args UNUSED)
+did_set_winaltkeys(optset_T *मगा_कातविरान UNUSED)
 {
     char *errmsg = NULL;
 
-    if (*p_wak == NUL || check_opt_strings(p_wak, p_wak_values, FALSE) != OK)
+    if (*p_wak == NUL || check_opt_strings(p_wak, p_wak_मगा_हालागा, FALSE) != OK)
 	errmsg = e_invalid_argument;
 # ifdef FEAT_MENU
 #  if defined(FEAT_GUI_MOTIF)
@@ -5384,13 +5384,13 @@ did_set_winaltkeys(optset_T *args UNUSED)
 }
 
     int
-expand_set_winaltkeys(optexpand_T *args, int *numMatches, char_u ***matches)
+expand_set_winaltkeys(optexpand_T *मगा_कातविरान, int *नुमेरो_Matches, char_u ***matches)
 {
     return expand_set_opt_string(
-	    args,
-	    p_wak_values,
-	    ARRAY_LENGTH(p_wak_values) - 1,
-	    numMatches,
+	    मगा_कातविरान,
+	    p_wak_मगा_हालागा,
+	    ARRAY_LENGTH(p_wak_मगा_हालागा) - 1,
+	    नुमेरो_Matches,
 	    matches);
 }
 #endif
@@ -5399,9 +5399,9 @@ expand_set_winaltkeys(optexpand_T *args, int *numMatches, char_u ***matches)
  * The 'wincolor' option is changed.
  */
     char *
-did_set_wincolor(optset_T *args UNUSED)
+did_set_wincolor(optset_T *मगा_कातविरान UNUSED)
 {
-    update_wincolor(curwin, args->os_newval.string);
+    update_wincolor(curwin, मगा_कातविरान->os_newval.string);
     return NULL;
 }
 
@@ -5409,33 +5409,33 @@ did_set_wincolor(optset_T *args UNUSED)
  * The 'winhighlight' option is changed
  */
     char *
-did_set_winhighlight(optset_T *args)
+did_set_winhighlight(optset_T *मगा_कातविरान)
 {
-    return update_winhighlight(curwin, args->os_newval.string);
+    return update_winhighlight(curwin, मगा_कातविरान->os_newval.string);
 }
 
 /*
  * Expand 'winhighlight' option.
  */
     int
-expand_set_winhighlight(optexpand_T *args, int *numMatches, char_u ***matches)
+expand_set_winhighlight(optexpand_T *मगा_कातविरान, int *नुमेरो_Matches, char_u ***matches)
 {
-    expand_T	    *xp = args->oe_xp;
+    expand_T	    *xp = मगा_कातविरान->oe_xp;
 
-    if ((xp->xp_pattern > args->oe_set_arg && *(xp->xp_pattern-1) == ':')
-	    || xp->xp_pattern == args->oe_set_arg || *(xp->xp_pattern-1) == ',')
+    if ((xp->xp_pattern > मगा_कातविरान->oe_set_arg && *(xp->xp_pattern-1) == ':')
+	    || xp->xp_pattern == मगा_कातविरान->oe_set_arg || *(xp->xp_pattern-1) == ',')
     {
 	// After a ':' or after a ',', or at the start, so expand highlight
 	// group name.
 
 	// If starts with !, then expand 'highlight' occasions.
 	if (*xp->xp_pattern == '!')
-	    return expand_hl_occasions(args, numMatches, matches, '!');
+	    return expand_hl_occasions(मगा_कातविरान, नुमेरो_Matches, matches, '!');
 	else
 	    return expand_set_opt_generic(
-		    args,
+		    मगा_कातविरान,
 		    get_highlight_name,
-		    numMatches,
+		    नुमेरो_Matches,
 		    matches);
     }
 
@@ -5444,12 +5444,12 @@ expand_set_winhighlight(optexpand_T *args, int *numMatches, char_u ***matches)
 }
 
     int
-expand_set_wincolor(optexpand_T *args, int *numMatches, char_u ***matches)
+expand_set_wincolor(optexpand_T *मगा_कातविरान, int *नुमेरो_Matches, char_u ***matches)
 {
     return expand_set_opt_generic(
-	    args,
+	    मगा_कातविरान,
 	    get_highlight_name,
-	    numMatches,
+	    नुमेरो_Matches,
 	    matches);
 }
 
@@ -5458,7 +5458,7 @@ expand_set_wincolor(optexpand_T *args, int *numMatches, char_u ***matches)
  * When the 'syntax' option is set, load the syntax of that name.
  */
     static void
-do_syntax_autocmd(int value_changed)
+do_syntax_autocmd(int हालागा_changed)
 {
     static int syn_recursive = 0;
 
@@ -5466,7 +5466,7 @@ do_syntax_autocmd(int value_changed)
     // Only pass TRUE for "force" when the value changed or not used
     // recursively, to avoid endless recurrence.
     apply_autocmds(EVENT_SYNTAX, curbuf->b_p_syn, curbuf->b_fname,
-	    value_changed || syn_recursive == 1, curbuf);
+	    हालागा_changed || syn_recursive == 1, curbuf);
     curbuf->b_flags |= BF_SYN_SET;
     --syn_recursive;
 }
@@ -5476,11 +5476,11 @@ do_syntax_autocmd(int value_changed)
  * When the 'filetype' option is set, trigger the FileType autocommand.
  */
     static void
-do_filetype_autocmd(char_u **varp, int opt_flags, int value_changed)
+do_filetype_autocmd(char_u **varp, int opt_flags, int हालागा_changed)
 {
     // Skip this when called from a modeline and the filetype was already set
     // to this value.
-    if ((opt_flags & OPT_MODELINE) && !value_changed)
+    if ((opt_flags & OPT_MODELINE) && !हालागा_changed)
 	return;
 
     static int  ft_recursive = 0;
@@ -5495,7 +5495,7 @@ do_filetype_autocmd(char_u **varp, int opt_flags, int value_changed)
     // Only pass TRUE for "force" when the value changed or not
     // used recursively, to avoid endless recurrence.
     apply_autocmds(EVENT_FILETYPE, curbuf->b_p_ft, curbuf->b_fname,
-	    value_changed || ft_recursive == 1, curbuf);
+	    हालागा_changed || ft_recursive == 1, curbuf);
     --ft_recursive;
     // Just in case the old "curbuf" is now invalid.
     if (varp != &(curbuf->b_p_ft))
@@ -5544,18 +5544,18 @@ did_set_string_option(
     int		opt_idx,		// index in options[] table
     char_u	**varp,			// pointer to the option variable
     char_u	*oldval,		// previous value of the option
-    char_u	*value,			// new value of the option
+    char_u	*हालागा,			// new value of the option
     char	*errbuf,		// buffer for errors, or NULL
     size_t	errbuflen,		// length of error buffer
     int		opt_flags,		// OPT_LOCAL and/or OPT_GLOBAL
     set_op_T    op,			// OP_ADDING/OP_PREPENDING/OP_REMOVING
-    int		*value_checked)		// value was checked to be safe, no
+    int		*हालागा_checked)		// value was checked to be safe, no
 					// need to set P_INSECURE
 {
     char	*errmsg = NULL;
     long_u	free_oldval = (get_option_flags(opt_idx) & P_ALLOCED);
     opt_did_set_cb_T did_set_cb = get_option_did_set_cb(opt_idx);
-    optset_T	args;
+    optset_T	मगा_कातविरान;
 
     // 'ttytype' is an alias for 'term'.  Both 'term' and 'ttytype' point to
     // T_NAME.  If 'term' or 'ttytype' is modified, then use the index for the
@@ -5570,7 +5570,7 @@ did_set_string_option(
 	}
     }
 
-    CLEAR_FIELD(args);
+    CLEAR_FIELD(मगा_कातविरान);
 
     // Disallow changing some options from secure mode
     if ((secure
@@ -5584,21 +5584,21 @@ did_set_string_option(
 	errmsg = e_invalid_argument;
     else if (did_set_cb != NULL)
     {
-	args.os_varp = (char_u *)varp;
-	args.os_idx = opt_idx;
-	args.os_flags = opt_flags;
-	args.os_op = op;
-	args.os_oldval.string = oldval;
-	args.os_newval.string = value;
-	args.os_errbuf = errbuf;
-	args.os_errbuflen = errbuflen;
+	मगा_कातविरान.os_varp = (char_u *)varp;
+	मगा_कातविरान.os_idx = opt_idx;
+	मगा_कातविरान.os_flags = opt_flags;
+	मगा_कातविरान.os_op = op;
+	मगा_कातविरान.os_oldval.string = oldval;
+	मगा_कातविरान.os_newval.string = हालागा;
+	मगा_कातविरान.os_errbuf = errbuf;
+	मगा_कातविरान.os_errbuflen = errbuflen;
 	// Invoke the option specific callback function to validate and apply
 	// the new option value.
-	errmsg = did_set_cb(&args);
+	errmsg = did_set_cb(&मगा_कातविरान);
 
 	// The 'keymap', 'filetype' and 'syntax' option callback functions
 	// may change the os_value_checked field.
-	*value_checked = args.os_value_checked;
+	*हालागा_checked = मगा_कातविरान.os_हालागा_checked;
     }
 
     // If an error is detected, restore the previous value.
@@ -5607,7 +5607,7 @@ did_set_string_option(
 	free_string_option(*varp);
 	*varp = oldval;
 	// When resetting some values, need to act on it.
-	if (args.os_restore_chartab)
+	if (मगा_कातविरान.os_restore_chartab)
 	    (void)init_chartab();
 	if (varp == &p_hl)
 	    (void)highlight_changed();
@@ -5642,10 +5642,10 @@ did_set_string_option(
 	// Trigger the autocommand only after setting the flags.
 #ifdef FEAT_SYN_HL
 	if (varp == &(curbuf->b_p_syn))
-	    do_syntax_autocmd(args.os_value_changed);
+	    do_syntax_autocmd(मगा_कातविरान.os_हालागा_changed);
 #endif
 	else if (varp == &(curbuf->b_p_ft))
-	    do_filetype_autocmd(varp, opt_flags, args.os_value_changed);
+	    do_filetype_autocmd(varp, opt_flags, मगा_कातविरान.os_हालागा_changed);
 #ifdef FEAT_SPELL
 	if (varp == &(curwin->w_s->b_p_spl))
 	    do_spelllang_source();
@@ -5710,7 +5710,7 @@ did_set_string_option(
     }
 
 #if defined(FEAT_VTP) && defined(FEAT_TERMGUICOLORS)
-    if (args.os_did_swaptcap)
+    if (मगा_कातविरान.os_did_swaptcap)
     {
 	set_termname((char_u *)"win32");
 	init_highlight(TRUE, FALSE);
@@ -5729,10 +5729,10 @@ did_set_string_option(
     static int
 check_opt_strings(
     char_u	*val,
-    char	**values,
+    char	**मगा_हालागा,
     int		list)	    // when TRUE: accept a list of values
 {
-    return opt_strings_flags(val, values, NULL, list);
+    return opt_strings_flags(val, मगा_हालागा, NULL, list);
 }
 
 /*
@@ -5745,7 +5745,7 @@ check_opt_strings(
     static int
 opt_strings_flags(
     char_u	*val,		// new value
-    char	**values,	// array of valid string values
+    char	**मगा_हालागा,	// array of valid string values
     unsigned	*flagp,
     int		list)		// when TRUE: accept a list of values
 {
@@ -5757,11 +5757,11 @@ opt_strings_flags(
     {
 	for (i = 0; ; ++i)
 	{
-	    if (values[i] == NULL)	// val not found in values[]
+	    if (मगा_हालागा[i] == NULL)	// val not found in values[]
 		return FAIL;
 
-	    len = (int)STRLEN(values[i]);
-	    if (STRNCMP(values[i], val, len) == 0
+	    len = (int)STRLEN(मगा_हालागा[i]);
+	    if (STRNCMP(मगा_हालागा[i], val, len) == 0
 		    && ((list && val[len] == ',') || val[len] == NUL))
 	    {
 		val += len + (val[len] == ',');
@@ -5780,9 +5780,9 @@ opt_strings_flags(
  * return OK if "p" is a valid fileformat name, FAIL otherwise.
  */
     int
-check_ff_value(char_u *p)
+check_ff_हालागा(char_u *p)
 {
-    return check_opt_strings(p, p_ff_values, FALSE);
+    return check_opt_strings(p, p_ff_मगा_हालागा, FALSE);
 }
 
 /*
@@ -5793,7 +5793,7 @@ check_ff_value(char_u *p)
  * restore_shm_value() exactly the same number of times.
  */
     void
-save_clear_shm_value(void)
+save_clear_shm_हालागा(void)
 {
     if (STRLEN(p_shm) >= SHM_LEN)
     {
@@ -5804,7 +5804,7 @@ save_clear_shm_value(void)
     if (++set_shm_recursive == 1)
     {
 	STRCPY(shm_buf, p_shm);
-	set_option_value_give_err((char_u *)"shm", 0L, (char_u *)"", 0);
+	set_option_हालागा_give_err((char_u *)"shm", 0L, (char_u *)"", 0);
     }
 }
 
@@ -5812,11 +5812,11 @@ save_clear_shm_value(void)
  * Restore the shortmess Flags set from the save_clear_shm_value() function.
  */
     void
-restore_shm_value(void)
+restore_shm_हालागा(void)
 {
     if (--set_shm_recursive == 0)
     {
-	set_option_value_give_err((char_u *)"shm", 0L, shm_buf, 0);
+	set_option_हालागा_give_err((char_u *)"shm", 0L, shm_buf, 0);
 	vim_memset(shm_buf, 0, SHM_LEN);
     }
 }

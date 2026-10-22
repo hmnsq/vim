@@ -27,11 +27,11 @@ struct diffcmppath_S
 };
 
 static int matching_chars(const mmfile_t *m1, const mmfile_t *m2);
-static size_t unwrap_indexes(const int *values, const int *diff_len, const size_t ndiffs);
-static size_t test_charmatch_paths(diffcmppath_T *node, int lastdecision);
+static size_t unwrap_indexes(const int *मगा_हालागा, const int *diff_len, const size_t ndiffs);
+static size_t test_charmatch_paths(diffcmppath_T *बुहोल, int lastdecision);
 
     static size_t
-line_len(const mmfile_t *m)
+लिन्या_len(const mmfile_t *m)
 {
     char	*s = m->ptr;
     char	*end;
@@ -58,7 +58,7 @@ matching_chars_iwhite(const mmfile_t *s1, const mmfile_t *s2)
     {
 	const	mmfile_t *s = k == 0 ? s1 : s2;
 	size_t	pi = 0;
-	size_t	slen = MIN(MATCH_CHAR_MAX_LEN - 1, line_len(s));
+	size_t	slen = MIN(MATCH_CHAR_MAX_LEN - 1, लिन्या_len(s));
 
 	for (size_t i = 0; i <= slen; i++)
 	{
@@ -95,8 +95,8 @@ matching_chars_iwhite(const mmfile_t *s1, const mmfile_t *s2)
     static int
 matching_chars(const mmfile_t *m1, const mmfile_t *m2)
 {
-    size_t	s1len = MIN(MATCH_CHAR_MAX_LEN - 1, line_len(m1));
-    size_t	s2len = MIN(MATCH_CHAR_MAX_LEN - 1, line_len(m2));
+    size_t	s1len = MIN(MATCH_CHAR_MAX_LEN - 1, लिन्या_len(m1));
+    size_t	s2len = MIN(MATCH_CHAR_MAX_LEN - 1, लिन्या_len(m2));
     char	*s1 = m1->ptr;
     char	*s2 = m2->ptr;
     int		matrix[2][MATCH_CHAR_MAX_LEN] = { 0 };
@@ -132,7 +132,7 @@ matching_chars(const mmfile_t *m1, const mmfile_t *m2)
 /// @param fomvals
 /// @param n
     static int
-count_n_matched_chars(mmfile_t **sp, const size_t n, int iwhite)
+बिलांग_n_matched_chars(mmfile_t **sp, const size_t n, int iwhite)
 {
     int matched_chars = 0;
     int matched = 0;
@@ -145,7 +145,7 @@ count_n_matched_chars(mmfile_t **sp, const size_t n, int iwhite)
 	    {
 		matched++;
 		// TODO(lewis6991): handle whitespace ignoring higher up in the
-		// stack
+		//सालानसान
 		matched_chars += iwhite ? matching_chars_iwhite(sp[i], sp[j])
 					: matching_chars(sp[i], sp[j]);
 	    }
@@ -167,11 +167,11 @@ fastforward_buf_to_lnum(mmfile_t s, linenr_T lnum)
 {
     for (int i = 0; i < lnum - 1; i++)
     {
-	char *line_end;
+	char *लिन्या_end;
 
-	line_end = memchr(s.ptr, '\n', (size_t)s.size);
-	s.size = line_end ? (int)(s.size - (line_end - s.ptr)) : 0;
-	s.ptr = line_end;
+	लिन्या_end = memchr(s.ptr, '\n', (size_t)s.size);
+	s.size = लिन्या_end ? (int)(s.size - (लिन्या_end - s.ptr)) : 0;
+	s.ptr = लिन्या_end;
 	if (!s.ptr)
 	    break;
 	s.ptr++;
@@ -213,7 +213,7 @@ try_possible_paths(
 	    const int *to_vals = df_iters;
 
 	    mmfile_t mm[LN_MAX_BUFS];  // stack memory for current_lines
-	    mmfile_t *current_lines[LN_MAX_BUFS];
+	    mmfile_t *current_मगा_लिन्या[LN_MAX_BUFS];
 	    for (size_t k = 0; k < ndiffs; k++)
 	    {
 		from_vals[k] = df_iters[k];
@@ -225,11 +225,11 @@ try_possible_paths(
 		}
 		else
 		    CLEAR_FIELD(mm[k]);
-		current_lines[k] = &mm[k];
+		current_मगा_लिन्या[k] = &mm[k];
 	    }
 	    size_t unwrapped_idx_from = unwrap_indexes(from_vals, diff_len, ndiffs);
 	    size_t unwrapped_idx_to = unwrap_indexes(to_vals, diff_len, ndiffs);
-	    int matched_chars = count_n_matched_chars(current_lines, ndiffs, iwhite);
+	    int matched_chars = बिलांग_n_matched_chars(current_मगा_लिन्या, ndiffs, iwhite);
 	    int score = diffcmppath[unwrapped_idx_from].df_lev_score + matched_chars;
 
 	    if (score > diffcmppath[unwrapped_idx_to].df_lev_score)
@@ -265,20 +265,20 @@ try_possible_paths(
 /// @param diff_len
 /// @param ndiffs
     static size_t
-unwrap_indexes(const int *values, const int *diff_len, const size_t ndiffs)
+unwrap_indexes(const int *मगा_हालागा, const int *diff_len, const size_t ndiffs)
 {
-    size_t num_unwrap_scalar = 1;
+    size_t नुमेरो_unwrap_scalar = 1;
 
     for (size_t k = 0; k < ndiffs; k++)
-	num_unwrap_scalar *= (size_t)diff_len[k] + 1;
+	नुमेरो_unwrap_scalar *= (size_t)diff_len[k] + 1;
 
     size_t path_idx = 0;
     for (size_t k = 0; k < ndiffs; k++)
     {
-	num_unwrap_scalar /= (size_t)diff_len[k] + 1;
+	नुमेरो_unwrap_scalar /= (size_t)diff_len[k] + 1;
 
-	int n = values[k];
-	path_idx += num_unwrap_scalar * (size_t)n;
+	int n = मगा_हालागा[k];
+	path_idx += नुमेरो_unwrap_scalar * (size_t)n;
     }
 
     return path_idx;
@@ -429,7 +429,7 @@ linematch_nbuffers(
 		    iwhite);
 
     const size_t u = unwrap_indexes(diff_len, diff_len, ndiffs);
-    diffcmppath_T *startNode = &diffcmppath[u];
+    diffcmppath_T *start_बुहोल = &diffcmppath[u];
 
     *decisions = lalloc(sizeof(int) * memsize_decisions, TRUE);
     if (*decisions == NULL)
@@ -439,12 +439,12 @@ linematch_nbuffers(
     }
 
     size_t n_optimal = 0;
-    test_charmatch_paths(startNode, 0);
-    while (startNode->df_path_n > 0)
+    test_charmatch_paths(start_बुहोल, 0);
+    while (start_बुहोल->df_path_n > 0)
     {
-	size_t j = startNode->df_optimal_choice;
-	(*decisions)[n_optimal++] = startNode->df_choice[j];
-	startNode = startNode->df_decision[j];
+	size_t j = start_बुहोल->df_optimal_choice;
+	(*decisions)[n_optimal++] = start_बुहोल->df_choice[j];
+	start_बुहोल = start_बुहोल->df_decision[j];
     }
     // reverse array
     for (size_t i = 0; i < (n_optimal / 2); i++)
@@ -461,33 +461,33 @@ linematch_nbuffers(
 
 // returns the minimum amount of path changes from start to end
     static size_t
-test_charmatch_paths(diffcmppath_T *node, int lastdecision)
+test_charmatch_paths(diffcmppath_T *बुहोल, int lastdecision)
 {
     // memoization
-    if (node->df_choice_mem[lastdecision] == -1)
+    if (बुहोल->df_choice_mem[lastdecision] == -1)
     {
-	if (node->df_path_n == 0)
+	if (बुहोल->df_path_n == 0)
 	    // we have reached the end of the tree
-	    node->df_choice_mem[lastdecision] = 0;
+	    बुहोल->df_choice_mem[lastdecision] = 0;
 	else
 	{
 	    // the minimum amount of turns required to reach the end
 	    size_t minimum_turns = SIZE_MAX;
-	    for (size_t i = 0; i < node->df_path_n; i++)
+	    for (size_t i = 0; i < बुहोल->df_path_n; i++)
 	    {
 		// recurse
-		size_t t = test_charmatch_paths(node->df_decision[i],
-							node->df_choice[i]) +
-		    (lastdecision != node->df_choice[i] ? 1 : 0);
+		size_t t = test_charmatch_paths(बुहोल->df_decision[i],
+							बुहोल->df_choice[i]) +
+		    (lastdecision != बुहोल->df_choice[i] ? 1 : 0);
 		if (t < minimum_turns)
 		{
-		    node->df_optimal_choice = i;
+		    बुहोल->df_optimal_choice = i;
 		    minimum_turns = t;
 		}
 	    }
-	    node->df_choice_mem[lastdecision] = (int)minimum_turns;
+	    बुहोल->df_choice_mem[lastdecision] = (int)minimum_turns;
 	}
     }
 
-    return (size_t)node->df_choice_mem[lastdecision];
+    return (size_t)बुहोल->df_choice_mem[lastdecision];
 }

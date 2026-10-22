@@ -28,7 +28,7 @@ static xfmark_T namedfm[NMARKS + EXTRA_MARKS];		// marks with file nr
 
 static void fname2fnum(xfmark_T *fm);
 static void fmarks_check_one(xfmark_T *fm, char_u *name, buf_T *buf);
-static char_u *mark_line(pos_T *mp, int lead_len);
+static char_u *mark_लिन्या(pos_T *mp, int lead_len);
 static void show_one_mark(int, char_u *, pos_T *, char_u *, int current);
 static void mark_adjust_internal(linenr_T line1, linenr_T line2, long amount,
     long amount_after, int adjust_folds);
@@ -178,7 +178,7 @@ setpcmark(void)
     curwin->w_prev_pcmark = curwin->w_pcmark;
     curwin->w_pcmark = curwin->w_cursor;
 
-    if (jop_flags & JOP_STACK)
+    if (jop_flags & JOP_सालानसान)
     {
 	// jumpoptions=stack: if we're somewhere in the middle of the jumplist
 	// discard everything after the current index.
@@ -227,7 +227,7 @@ checkpcmark(void)
  * move "count" positions in the jump list (count may be negative)
  */
     pos_T *
-movemark(int count)
+movemark(int बिलांग)
 {
     pos_T	*pos;
     xfmark_T	*jmp;
@@ -239,8 +239,8 @@ movemark(int count)
 
     for (;;)
     {
-	if (curwin->w_jumplistidx + count < 0
-		|| curwin->w_jumplistidx + count >= curwin->w_jumplistlen)
+	if (curwin->w_jumplistidx + बिलांग < 0
+		|| curwin->w_jumplistidx + बिलांग >= curwin->w_jumplistlen)
 	    return (pos_T *)NULL;
 
 	/*
@@ -252,11 +252,11 @@ movemark(int count)
 	{
 	    setpcmark();
 	    --curwin->w_jumplistidx;	// skip the new entry
-	    if (curwin->w_jumplistidx + count < 0)
+	    if (curwin->w_jumplistidx + बिलांग < 0)
 		return (pos_T *)NULL;
 	}
 
-	curwin->w_jumplistidx += count;
+	curwin->w_jumplistidx += बिलांग;
 
 	jmp = curwin->w_jumplist + curwin->w_jumplistidx;
 	if (jmp->fmark.fnum == 0)
@@ -269,7 +269,7 @@ movemark(int count)
 	    // jump to the file with the mark
 	    if (buflist_findnr(fmark.fnum) == NULL)
 	    {					     // Skip this one ..
-		count += count < 0 ? -1 : 1;
+		बिलांग += बिलांग < 0 ? -1 : 1;
 		continue;
 	    }
 	    if (buflist_getfile(fmark.fnum, fmark.mark.lnum, 0, FALSE) == FAIL)
@@ -288,7 +288,7 @@ movemark(int count)
  * Move "count" positions in the changelist (count may be negative).
  */
     pos_T *
-movechangelist(int count)
+movechangelist(int बिलांग)
 {
     int		n;
 
@@ -296,20 +296,20 @@ movechangelist(int count)
 	return (pos_T *)NULL;
 
     n = curwin->w_changelistidx;
-    if (n + count < 0)
+    if (n + बिलांग < 0)
     {
 	if (n == 0)
 	    return (pos_T *)NULL;
 	n = 0;
     }
-    else if (n + count >= curbuf->b_changelistlen)
+    else if (n + बिलांग >= curbuf->b_changelistlen)
     {
 	if (n == curbuf->b_changelistlen - 1)
 	    return (pos_T *)NULL;
 	n = curbuf->b_changelistlen - 1;
     }
     else
-	n += count;
+	n += बिलांग;
     curwin->w_changelistidx = n;
     return curbuf->b_changelist + n;
 }
@@ -364,7 +364,7 @@ getmark_buf_fnum(
     else if (c == '"')			// to pos when leaving buffer
 	posp = &(buf->b_last_cursor);
     else if (c == '^')			// to where Insert mode stopped
-	posp = &(buf->b_last_insert);
+	posp = &(buf->b_last_इसिंगित);
     else if (c == '.')			// to where last change was made
 	posp = &(buf->b_last_change);
     else if (c == '[')			// to start of previous operator
@@ -478,7 +478,7 @@ getmark_buf_fnum(
 getnextmark(
     pos_T	*startpos,	// where to start
     int		dir,	// direction for search
-    int		begin_line)
+    int		begin_लिन्या)
 {
     int		i;
     pos_T	*result = NULL;
@@ -490,9 +490,9 @@ getnextmark(
     // position must be in a previous line.
     // When searching forward and leaving the cursor on the first non-blank,
     // position must be in a next line.
-    if (dir == BACKWARD && begin_line)
+    if (dir == BACKWARD && begin_लिन्या)
 	pos.col = 0;
-    else if (dir == FORWARD && begin_line)
+    else if (dir == FORWARD && begin_लिन्या)
 	pos.col = MAXCOL;
 
     for (i = 0; i < NMARKS; i++)
@@ -619,9 +619,9 @@ check_mark(pos_T *pos)
 	    emsg(_(e_mark_not_set));
 	return FAIL;
     }
-    if (pos->lnum > curbuf->b_ml.ml_line_count)
+    if (pos->lnum > curbuf->b_ml.ml_लिन्या_बिलांग)
     {
-	emsg(_(e_mark_has_invalid_line_number));
+	emsg(_(e_mark_has_invalid_लिन्या_नुमेरो));
 	return FAIL;
     }
     return OK;
@@ -654,7 +654,7 @@ clrallmarks(buf_T *buf)
     buf->b_last_cursor.lnum = 1;	// '" mark cleared
     buf->b_last_cursor.col = 0;
     buf->b_last_cursor.coladd = 0;
-    buf->b_last_insert.lnum = 0;	// '^ mark cleared
+    buf->b_last_इसिंगित.lnum = 0;	// '^ mark cleared
     buf->b_last_change.lnum = 0;	// '. mark cleared
     buf->b_changelistlen = 0;
 }
@@ -668,7 +668,7 @@ clrallmarks(buf_T *buf)
 fm_getname(fmark_T *fmark, int lead_len)
 {
     if (fmark->fnum == curbuf->b_fnum)		    // current buffer
-	return mark_line(&(fmark->mark), lead_len);
+	return mark_लिन्या(&(fmark->mark), lead_len);
     return buflist_nr2name(fmark->fnum, FALSE, TRUE);
 }
 
@@ -677,12 +677,12 @@ fm_getname(fmark_T *fmark, int lead_len)
  * The returned string has been allocated.
  */
     static char_u *
-mark_line(pos_T *mp, int lead_len)
+mark_लिन्या(pos_T *mp, int lead_len)
 {
     char_u	*s, *p;
     int		len;
 
-    if (mp->lnum == 0 || mp->lnum > curbuf->b_ml.ml_line_count)
+    if (mp->lnum == 0 || mp->lnum > curbuf->b_ml.ml_लिन्या_बिलांग)
 	return vim_strsave((char_u *)"-invalid-");
     // Allow for up to 5 bytes per character.
     s = vim_strnsave(skipwhite(ml_get(mp->lnum)), Columns * 5);
@@ -735,7 +735,7 @@ ex_marks(exarg_T *eap)
     show_one_mark('"', arg, &curbuf->b_last_cursor, NULL, TRUE);
     show_one_mark('[', arg, &curbuf->b_op_start, NULL, TRUE);
     show_one_mark(']', arg, &curbuf->b_op_end, NULL, TRUE);
-    show_one_mark('^', arg, &curbuf->b_last_insert, NULL, TRUE);
+    show_one_mark('^', arg, &curbuf->b_last_इसिंगित, NULL, TRUE);
     show_one_mark('.', arg, &curbuf->b_last_change, NULL, TRUE);
 
     // Show the marks as where they will jump to.
@@ -770,7 +770,7 @@ show_one_mark(
 	else
 	{
 	    if (arg == NULL)
-		msg(_("No marks set"));
+		मेनसाहे(_("No marks set"));
 	    else
 		semsg(_(e_no_marks_matching_str), arg);
 	}
@@ -782,7 +782,7 @@ show_one_mark(
     {
 	if (name == NULL && current)
 	{
-	    name = mark_line(p, 15);
+	    name = mark_लिन्या(p, 15);
 	    if (name == NULL)
 	    {
 		emsg(_(e_out_of_memory));
@@ -795,17 +795,17 @@ show_one_mark(
 	    if (!did_title)
 	    {
 		// Highlight title
-		msg_puts_title(_("\nmark line  col file/text"));
+		मेनसाहे_puts_title(_("\nmark line  col file/text"));
 		did_title = TRUE;
 	    }
-	    msg_putchar('\n');
+	    मेनसाहे_putchar('\n');
 	    if (!got_int)
 	    {
 		sprintf((char *)IObuff, " %c %6ld %4d ", c, p->lnum, p->col);
-		msg_outtrans(IObuff);
+		मेनसाहे_outtrans(IObuff);
 		if (name != NULL)
 		{
-		    msg_outtrans_attr(name, current ? HL_ATTR(HLF_D) : 0);
+		    मेनसाहे_outtrans_attr(name, current ? HL_ATTR(HLF_D) : 0);
 		}
 	    }
 	    out_flush();		    // show one line at a time
@@ -886,7 +886,7 @@ ex_delmarks(exarg_T *eap)
 		switch (*p)
 		{
 		    case '"': curbuf->b_last_cursor.lnum = 0; break;
-		    case '^': curbuf->b_last_insert.lnum = 0; break;
+		    case '^': curbuf->b_last_इसिंगित.lnum = 0; break;
 		    case '.': curbuf->b_last_change.lnum = 0; break;
 		    case '[': curbuf->b_op_start.lnum    = 0; break;
 		    case ']': curbuf->b_op_end.lnum      = 0; break;
@@ -912,7 +912,7 @@ ex_jumps(exarg_T *eap UNUSED)
     cleanup_jumplist(curwin, TRUE);
 
     // Highlight title
-    msg_puts_title(_("\n jump line  col file/text"));
+    मेनसाहे_puts_title(_("\n jump line  col file/text"));
     for (i = 0; i < curwin->w_jumplistlen && !got_int; ++i)
     {
 	if (curwin->w_jumplist[i].fmark.mark.lnum != 0)
@@ -930,7 +930,7 @@ ex_jumps(exarg_T *eap UNUSED)
 		continue;
 	    }
 
-	    msg_putchar('\n');
+	    मेनसाहे_putchar('\n');
 	    if (got_int)
 	    {
 		vim_free(name);
@@ -942,8 +942,8 @@ ex_jumps(exarg_T *eap UNUSED)
 					  : curwin->w_jumplistidx - i,
 		curwin->w_jumplist[i].fmark.mark.lnum,
 		curwin->w_jumplist[i].fmark.mark.col);
-	    msg_outtrans(IObuff);
-	    msg_outtrans_attr(name,
+	    मेनसाहे_outtrans(IObuff);
+	    मेनसाहे_outtrans_attr(name,
 			    curwin->w_jumplist[i].fmark.fnum == curbuf->b_fnum
 							? HL_ATTR(HLF_D) : 0);
 	    vim_free(name);
@@ -952,7 +952,7 @@ ex_jumps(exarg_T *eap UNUSED)
 	out_flush();
     }
     if (curwin->w_jumplistidx == curwin->w_jumplistlen)
-	msg_puts("\n>");
+	मेनसाहे_puts("\n>");
 }
 
     void
@@ -973,13 +973,13 @@ ex_changes(exarg_T *eap UNUSED)
     char_u	*name;
 
     // Highlight title
-    msg_puts_title(_("\nchange line  col text"));
+    मेनसाहे_puts_title(_("\nchange line  col text"));
 
     for (i = 0; i < curbuf->b_changelistlen && !got_int; ++i)
     {
 	if (curbuf->b_changelist[i].lnum != 0)
 	{
-	    msg_putchar('\n');
+	    मेनसाहे_putchar('\n');
 	    if (got_int)
 		break;
 	    sprintf((char *)IObuff, "%c %3d %5ld %4d ",
@@ -988,18 +988,18 @@ ex_changes(exarg_T *eap UNUSED)
 						: curwin->w_changelistidx - i,
 		    (long)curbuf->b_changelist[i].lnum,
 		    curbuf->b_changelist[i].col);
-	    msg_outtrans(IObuff);
-	    name = mark_line(&curbuf->b_changelist[i], 17);
+	    मेनसाहे_outtrans(IObuff);
+	    name = mark_लिन्या(&curbuf->b_changelist[i], 17);
 	    if (name == NULL)
 		break;
-	    msg_outtrans_attr(name, HL_ATTR(HLF_D));
+	    मेनसाहे_outtrans_attr(name, HL_ATTR(HLF_D));
 	    vim_free(name);
 	    ui_breakcheck();
 	}
 	out_flush();
     }
     if (curwin->w_changelistidx == curbuf->b_changelistlen)
-	msg_puts("\n>");
+	मेनसाहे_puts("\n>");
 }
 
 #define one_adjust(add) \
@@ -1116,7 +1116,7 @@ mark_adjust_internal(
 	}
 
 	// last Insert position
-	one_adjust(&(curbuf->b_last_insert.lnum));
+	one_adjust(&(curbuf->b_last_इसिंगित.lnum));
 
 	// last change position
 	one_adjust(&(curbuf->b_last_change.lnum));
@@ -1287,7 +1287,7 @@ mark_col_adjust(
     }
 
     // last Insert position
-    col_adjust(&(curbuf->b_last_insert));
+    col_adjust(&(curbuf->b_last_इसिंगित));
 
     // last change position
     col_adjust(&(curbuf->b_last_change));
@@ -1375,7 +1375,7 @@ cleanup_jumplist(win_T *wp, int loadfiles)
 	    mustfree = FALSE;
 	else if (i > from + 1)		// non-adjacent duplicate
 	    // jumpoptions=stack: remove duplicates only when adjacent.
-	    mustfree = !(jop_flags & JOP_STACK);
+	    mustfree = !(jop_flags & JOP_सालानसान);
 	else				// adjacent duplicate
 	    mustfree = TRUE;
 
@@ -1476,10 +1476,10 @@ add_mark(list_T *l, char_u *mname, size_t mnamelen, pos_T *pos, int bufnr, char_
     if (lpos == NULL)
 	return FAIL;
 
-    list_append_number(lpos, bufnr);
-    list_append_number(lpos, pos->lnum);
-    list_append_number(lpos, pos->col < MAXCOL ? pos->col + 1 : MAXCOL);
-    list_append_number(lpos, pos->coladd);
+    list_append_नुमेरो(lpos, bufnr);
+    list_append_नुमेरो(lpos, pos->lnum);
+    list_append_नुमेरो(lpos, pos->col < MAXCOL ? pos->col + 1 : MAXCOL);
+    list_append_नुमेरो(lpos, pos->coladd);
 
     if (dict_add_string_len(d, "mark", mname, (int)mnamelen) == FAIL
 	    || dict_add_list(d, "pos", lpos) == FAIL
@@ -1516,7 +1516,7 @@ get_buf_local_marks(buf_T *buf, list_T *l)
     add_mark(l, (char_u *)"'\"", STRLEN_LITERAL("'\""), &buf->b_last_cursor, buf->b_fnum, NULL);
     add_mark(l, (char_u *)"'[", STRLEN_LITERAL("'["), &buf->b_op_start, buf->b_fnum, NULL);
     add_mark(l, (char_u *)"']", STRLEN_LITERAL("']"), &buf->b_op_end, buf->b_fnum, NULL);
-    add_mark(l, (char_u *)"'^", STRLEN_LITERAL("'^"), &buf->b_last_insert, buf->b_fnum, NULL);
+    add_mark(l, (char_u *)"'^", STRLEN_LITERAL("'^"), &buf->b_last_इसिंगित, buf->b_fnum, NULL);
     add_mark(l, (char_u *)"'.", STRLEN_LITERAL("'."), &buf->b_last_change, buf->b_fnum, NULL);
     add_mark(l, (char_u *)"'<", STRLEN_LITERAL("'<"), &buf->b_visual.vi_start, buf->b_fnum, NULL);
     add_mark(l, (char_u *)"'>", STRLEN_LITERAL("'>"), &buf->b_visual.vi_end, buf->b_fnum, NULL);

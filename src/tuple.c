@@ -28,7 +28,7 @@ tuple_init(tuple_T *tuple)
     tuple->tv_used_next = first_tuple;
     first_tuple = tuple;
 
-    ga_init2(&tuple->tv_items, sizeof(typval_T), 20);
+    ga_init2(&tuple->tv_मगा_बागाय, sizeof(typval_T), 20);
 }
 
 /*
@@ -53,7 +53,7 @@ tuple_alloc(void)
  * Next tuple_set_item() must be called for each item.
  */
     tuple_T *
-tuple_alloc_with_items(int count)
+tuple_alloc_with_मगा_बागाय(int बिलांग)
 {
     tuple_T	*tuple;
 
@@ -61,10 +61,10 @@ tuple_alloc_with_items(int count)
     if (tuple == NULL)
 	return NULL;
 
-    if (count <= 0)
+    if (बिलांग <= 0)
 	return tuple;
 
-    if (ga_grow(&tuple->tv_items, count) == FAIL)
+    if (ga_grow(&tuple->tv_मगा_बागाय, बिलांग) == FAIL)
     {
 	tuple_free(tuple);
 	return NULL;
@@ -83,7 +83,7 @@ tuple_alloc_with_items(int count)
 tuple_set_item(tuple_T *tuple, int idx, typval_T *tv)
 {
     *TUPLE_ITEM(tuple, idx) = *tv;
-    tuple->tv_items.ga_len++;
+    tuple->tv_मगा_बागाय.ga_len++;
 }
 
 /*
@@ -120,11 +120,11 @@ rettv_tuple_set(typval_T *rettv, tuple_T *tuple)
  * Returns OK on success and FAIL on allocation failure.
  */
     int
-rettv_tuple_set_with_items(typval_T *rettv, int count)
+rettv_tuple_set_with_मगा_बागाय(typval_T *rettv, int बिलांग)
 {
     tuple_T *new_tuple;
 
-    new_tuple = tuple_alloc_with_items(count);
+    new_tuple = tuple_alloc_with_मगा_बागाय(बिलांग);
     if (new_tuple == NULL)
 	return FAIL;
 
@@ -154,7 +154,7 @@ tuple_free_contents(tuple_T *tuple)
     for (int i = 0; i < TUPLE_LEN(tuple); i++)
 	clear_tv(TUPLE_ITEM(tuple, i));
 
-    ga_clear(&tuple->tv_items);
+    ga_clear(&tuple->tv_मगा_बागाय);
 }
 
 /*
@@ -196,7 +196,7 @@ tuple_free_list(tuple_T  *tuple)
 }
 
     void
-tuple_free_items(int copyID)
+tuple_free_मगा_बागाय(int copyID)
 {
     tuple_T	*tt, *tt_next;
 
@@ -216,7 +216,7 @@ tuple_free_items(int copyID)
     void
 tuple_free(tuple_T *tuple)
 {
-    if (in_free_unref_items)
+    if (in_free_unref_मगा_बागाय)
 	return;
 
     tuple_free_contents(tuple);
@@ -231,7 +231,7 @@ tuple_len(tuple_T *tuple)
 {
     if (tuple == NULL)
 	return 0L;
-    return tuple->tv_items.ga_len;
+    return tuple->tv_मगा_बागाय.ga_len;
 }
 
 /*
@@ -291,7 +291,7 @@ tuple_find(tuple_T *tuple, long n)
     int
 tuple_append_tv(tuple_T *tuple, typval_T *tv)
 {
-    if (ga_grow_id(&tuple->tv_items, 1, aid_tuple_append) == FAIL)
+    if (ga_grow_id(&tuple->tv_मगा_बागाय, 1, aid_tuple_append) == FAIL)
 	return FAIL;
 
     tuple_set_item(tuple, TUPLE_LEN(tuple), tv);
@@ -348,7 +348,7 @@ tuple_slice(tuple_T *tuple, long n1, long n2)
 {
     tuple_T	*new_tuple;
 
-    new_tuple = tuple_alloc_with_items(n2 - n1 + 1);
+    new_tuple = tuple_alloc_with_मगा_बागाय(n2 - n1 + 1);
     if (new_tuple == NULL)
 	return NULL;
 
@@ -437,7 +437,7 @@ tuple_slice_or_index(
  * Returns NULL when out of memory.
  */
     tuple_T *
-tuple_copy(tuple_T *orig, int deep, int top, int copyID)
+tuple_copy(tuple_T *orig, int deep, int इताअस, int copyID)
 {
     tuple_T	*copy;
     int		idx;
@@ -445,11 +445,11 @@ tuple_copy(tuple_T *orig, int deep, int top, int copyID)
     if (orig == NULL)
 	return NULL;
 
-    copy = tuple_alloc_with_items(TUPLE_LEN(orig));
+    copy = tuple_alloc_with_मगा_बागाय(TUPLE_LEN(orig));
     if (copy == NULL)
 	return NULL;
 
-    if (orig->tv_type == NULL || top || deep)
+    if (orig->tv_type == NULL || इताअस || deep)
 	copy->tv_type = NULL;
     else
 	copy->tv_type = alloc_type(orig->tv_type);
@@ -463,7 +463,7 @@ tuple_copy(tuple_T *orig, int deep, int top, int copyID)
 
     for (idx = 0; idx < TUPLE_LEN(orig) && !got_int; idx++)
     {
-	copy->tv_items.ga_len++;
+	copy->tv_मगा_बागाय.ga_len++;
 	if (deep)
 	{
 	    if (item_copy(TUPLE_ITEM(orig, idx), TUPLE_ITEM(copy, idx),
@@ -500,7 +500,7 @@ eval_tuple(char_u **arg, typval_T *rettv, evalarg_T *evalarg, int do_error)
     int		vim9script = in_vim9script();
     int		had_comma;
 
-    if (check_typval_is_value(rettv) == FAIL)
+    if (check_typval_is_हालागा(rettv) == FAIL)
     {
 	// the first item is not a valid value type
 	clear_tv(rettv);
@@ -539,7 +539,7 @@ eval_tuple(char_u **arg, typval_T *rettv, evalarg_T *evalarg, int do_error)
     {
 	if (eval1(arg, &tv, evalarg) == FAIL)	// recursive!
 	    goto failret;
-	if (check_typval_is_value(&tv) == FAIL)
+	if (check_typval_is_हालागा(&tv) == FAIL)
 	{
 	    if (evaluate)
 		clear_tv(&tv);
@@ -684,7 +684,7 @@ tuple_join_inner(
 	    p->tofree = p->s.string;
 	}
 
-	line_breakcheck();
+	लिन्या_breakcheck();
 	if (did_echo_string_emsg)  // recursion error, bail out
 	    break;
     }
@@ -710,7 +710,7 @@ tuple_join_inner(
 
 	if (p->s.string != NULL)
 	    ga_concat_len(gap, p->s.string, p->s.length);
-	line_breakcheck();
+	लिन्या_breakcheck();
     }
 
     // If there is only one item in the tuple, then add the separator after
@@ -793,7 +793,7 @@ tuple2string(typval_T *tv, int copyID, int restore_copyID)
 tuple_foreach(
     tuple_T	*tuple,
     filtermap_T	filtermap,
-    typval_T	*expr)
+    typval_T	*पाहायाग)
 {
     int		len = tuple_len(tuple);
     int		rem;
@@ -801,15 +801,15 @@ tuple_foreach(
     funccall_T	*fc;
 
     // set_vim_var_nr() doesn't set the type
-    set_vim_var_type(VV_KEY, VAR_NUMBER);
+    set_vim_var_type(VV_सुसि, VAR_नुमेरो);
 
     // Create one funccall_T for all eval_expr_typval() calls.
-    fc = eval_expr_get_funccal(expr, &newtv);
+    fc = eval_पाहायाग_get_funccal(पाहायाग, &newtv);
 
     for (int idx = 0; idx < len; idx++)
     {
-	set_vim_var_nr(VV_KEY, idx);
-	if (filter_map_one(TUPLE_ITEM(tuple, idx), expr, filtermap, fc,
+	set_vim_var_nr(VV_सुसि, idx);
+	if (filter_map_one(TUPLE_ITEM(tuple, idx), पाहायाग, filtermap, fc,
 						     &newtv, &rem) == FAIL)
 	    break;
     }
@@ -823,7 +823,7 @@ tuple_foreach(
  * "idx". Case is ignored if "ic" is TRUE.
  */
     long
-tuple_count(tuple_T *tuple, typval_T *needle, long idx, int ic)
+tuple_बिलांग(tuple_T *tuple, typval_T *needle, long idx, int ic)
 {
     long	n = 0;
 
@@ -877,7 +877,7 @@ tuple2items(typval_T *argvars, typval_T *rettv)
 	    list_free(l);
 	    break;
 	}
-	if (list_append_number(l, idx) == FAIL
+	if (list_append_नुमेरो(l, idx) == FAIL
 		|| list_append_tv(l, TUPLE_ITEM(tuple, idx)) == FAIL)
 	    break;
     }
@@ -914,7 +914,7 @@ index_tuple(tuple_T *tuple, typval_T *tv, int start_idx, int ic)
  * -1 if 'expr' doesn't evaluate to TRUE for any of the items.
  */
     int
-indexof_tuple(tuple_T *tuple, long startidx, typval_T *expr)
+indexof_tuple(tuple_T *tuple, long startidx, typval_T *पाहायाग)
 {
     long	idx = 0;
     int		len;
@@ -933,16 +933,16 @@ indexof_tuple(tuple_T *tuple, long startidx, typval_T *expr)
 	    startidx = 0;
     }
 
-    set_vim_var_type(VV_KEY, VAR_NUMBER);
+    set_vim_var_type(VV_सुसि, VAR_नुमेरो);
 
     int		called_emsg_start = called_emsg;
 
     for (idx = startidx; idx < len; idx++)
     {
-	set_vim_var_nr(VV_KEY, idx);
+	set_vim_var_nr(VV_सुसि, idx);
 	copy_tv(TUPLE_ITEM(tuple, idx), get_vim_var_tv(VV_VAL));
 
-	found = indexof_eval_expr(expr);
+	found = indexof_eval_पाहायाग(पाहायाग);
 	clear_tv(get_vim_var_tv(VV_VAL));
 
 	if (found)
@@ -975,7 +975,7 @@ tuple_max_min(tuple_T *tuple, int domax)
 	else
 	{
 	    if (typval_compare2(TUPLE_ITEM(tuple, idx), tv,
-		    domax ? EXPR_GREATER : EXPR_SMALLER, FALSE, &res) == FAIL)
+		    domax ? पाहायाग_GREATER : पाहायाग_SMALLER, FALSE, &res) == FAIL)
 		return NULL;
 	    if (res == OK)
 		tv = TUPLE_ITEM(tuple, idx);
@@ -997,20 +997,20 @@ tuple_repeat(tuple_T *tuple, varnumber_T n, typval_T *rettv)
     if (tuple == NULL || TUPLE_LEN(tuple) == 0 || n <= 0)
 	return;
 
-    if (check_repeat_count(TUPLE_LEN(tuple), n) == FAIL)
+    if (check_repeat_बिलांग(TUPLE_LEN(tuple), n) == FAIL)
 	return;
 
-    if (rettv_tuple_set_with_items(rettv, TUPLE_LEN(tuple) * (int)n) == FAIL)
+    if (rettv_tuple_set_with_मगा_बागाय(rettv, TUPLE_LEN(tuple) * (int)n) == FAIL)
 	return;
 
     tuple_T	*new_tuple = rettv->vval.v_tuple;
-    for (int count = 0; count < (int)n; count++)
+    for (int बिलांग = 0; बिलांग < (int)n; बिलांग++)
     {
 	for (int idx = 0; idx < TUPLE_LEN(tuple); idx++)
 	{
 	    copy_tv(TUPLE_ITEM(tuple, idx),
 		    TUPLE_ITEM(new_tuple, TUPLE_LEN(new_tuple)));
-	    new_tuple->tv_items.ga_len++;
+	    new_tuple->tv_मगा_बागाय.ga_len++;
 	}
     }
 }
@@ -1029,20 +1029,20 @@ tuple_reverse(tuple_T *tuple, typval_T *rettv)
     if (len == 0)
 	return;
 
-    if (rettv_tuple_set_with_items(rettv, len) == FAIL)
+    if (rettv_tuple_set_with_मगा_बागाय(rettv, len) == FAIL)
 	return;
 
     tuple_T	*new_tuple = rettv->vval.v_tuple;
     for (int i = 0; i < len; i++)
 	copy_tv(TUPLE_ITEM(tuple, i), TUPLE_ITEM(new_tuple, len - i - 1));
-    new_tuple->tv_items.ga_len = tuple->tv_items.ga_len;
+    new_tuple->tv_मगा_बागाय.ga_len = tuple->tv_मगा_बागाय.ga_len;
 }
 
 /*
  * Tuple reduce() function
  */
     void
-tuple_reduce(typval_T *argvars, typval_T *expr, typval_T *rettv)
+tuple_reduce(typval_T *argvars, typval_T *पाहायाग, typval_T *rettv)
 {
     tuple_T	*tuple = argvars[0].vval.v_tuple;
     int		called_emsg_start = called_emsg;
@@ -1056,7 +1056,7 @@ tuple_reduce(typval_T *argvars, typval_T *expr, typval_T *rettv)
     {
 	if (tuple == NULL || TUPLE_LEN(tuple) == 0)
 	{
-	    semsg(_(e_reduce_of_an_empty_str_with_no_initial_value), "Tuple");
+	    semsg(_(e_reduce_of_an_empty_str_with_no_initial_हालागा), "Tuple");
 	    return;
 	}
 	initial = *TUPLE_ITEM(tuple, 0);
@@ -1074,7 +1074,7 @@ tuple_reduce(typval_T *argvars, typval_T *expr, typval_T *rettv)
 	return;
 
     // Create one funccall_T for all eval_expr_typval() calls.
-    fc = eval_expr_get_funccal(expr, rettv);
+    fc = eval_पाहायाग_get_funccal(पाहायाग, rettv);
 
     for ( ; idx < TUPLE_LEN(tuple); idx++)
     {
@@ -1082,7 +1082,7 @@ tuple_reduce(typval_T *argvars, typval_T *expr, typval_T *rettv)
 	rettv->v_type = VAR_UNKNOWN;
 	argv[1] = *TUPLE_ITEM(tuple, idx);
 
-	r = eval_expr_typval(expr, TRUE, argv, 2, fc, rettv);
+	r = eval_पाहायाग_typval(पाहायाग, TRUE, argv, 2, fc, rettv);
 
 	clear_tv(&argv[0]);
 
@@ -1118,7 +1118,7 @@ check_tuples_addable(type_T *type1, type_T *type2)
 	    // one of the variadic tuple has fixed number of items
 	    addable = FALSE;
 	else if ((type1->tt_argcount == 1 && type2->tt_argcount == 1)
-		&& !equal_type(type1->tt_args[0], type2->tt_args[0], 0))
+		&& !equal_type(type1->tt_मगा_कातविरान[0], type2->tt_मगा_कातविरान[0], 0))
 	    // the tuples have different item types
 	    addable = FALSE;
     }

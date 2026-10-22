@@ -104,9 +104,9 @@
 #define Py_bytes_fmt "s"
 
 // Parser flags
-#define single_input	256
-#define file_input	257
-#define eval_input	258
+#define single_पासोक	256
+#define file_पासोक	257
+#define eval_पासोक	258
 
 #if defined(PY_VERSION_HEX) && PY_VERSION_HEX >= 0x020300F0
   // Python 2.3: can invoke ":python" recursively.
@@ -121,7 +121,7 @@
 # ifdef MSWIN
 #  define load_dll vimLoadLib
 #  define close_dll FreeLibrary
-#  define symbol_from_dll GetProcAddress
+#  define सिम्बोलो_from_dll GetProcAddress
 #  define load_dll_error GetWin32Error
 # else
 #  include <dlfcn.h>
@@ -133,7 +133,7 @@
 #   define load_dll(n) dlopen((n), RTLD_LAZY|RTLD_GLOBAL)
 #  endif
 #  define close_dll dlclose
-#  define symbol_from_dll dlsym
+#  define सिम्बोलो_from_dll dlsym
 #  define load_dll_error dlerror
 # endif
 
@@ -143,7 +143,7 @@
 # undef PyRun_String
 # undef PyArg_Parse
 # undef PyArg_ParseTuple
-# undef Py_BuildValue
+# undef Py_Build_हालागा
 # undef Py_InitModule4
 # undef Py_InitModule4_64
 # undef PyObject_CallMethod
@@ -161,7 +161,7 @@
 # define PyErr_NewException dll_PyErr_NewException
 # define PyErr_Clear dll_PyErr_Clear
 # define PyErr_Format dll_PyErr_Format
-# define PyErr_PrintEx dll_PyErr_PrintEx
+# define Py_Err_इलिम्बाग_Ex dll_Py_Err_इलिम्बाग_Ex
 # define PyErr_NoMemory dll_PyErr_NoMemory
 # define PyErr_Occurred dll_PyErr_Occurred
 # define PyErr_SetNone dll_PyErr_SetNone
@@ -184,7 +184,7 @@
 # define PyLong_Type (*dll_PyLong_Type)
 # define PyList_GetItem dll_PyList_GetItem
 # define PyList_Append dll_PyList_Append
-# define PyList_Insert dll_PyList_Insert
+# define Py_List_इसिंगित dll_Py_List_इसिंगित
 # define PyList_New dll_PyList_New
 # define PyList_SetItem dll_PyList_SetItem
 # define PyList_Size dll_PyList_Size
@@ -204,10 +204,10 @@
 # define PyDict_GetItemString dll_PyDict_GetItemString
 # define PyDict_Next dll_PyDict_Next
 # define PyDict_Type (*dll_PyDict_Type)
-# ifdef PyMapping_Keys
-#  define PY_NO_MAPPING_KEYS
+# ifdef Py_Mapping_मगा_सुसि
+#  define PY_NO_MAPPING_मगा_सुसि
 # else
-#  define PyMapping_Keys dll_PyMapping_Keys
+#  define Py_Mapping_मगा_सुसि dll_Py_Mapping_मगा_सुसि
 # endif
 # define PyObject_GetItem dll_PyObject_GetItem
 # define PyObject_CallMethod dll_PyObject_CallMethod
@@ -220,7 +220,7 @@
 # define PyObject_GetAttrString dll_PyObject_GetAttrString
 # define PyObject_HasAttrString dll_PyObject_HasAttrString
 # define PyObject_SetAttrString dll_PyObject_SetAttrString
-# define PyObject_CallFunctionObjArgs dll_PyObject_CallFunctionObjArgs
+# define Py_Object_Call_Function_Obj_मगा_कातविरान dll_Py_Object_Call_Function_Obj_मगा_कातविरान
 # define PyObject_CallFunction dll_PyObject_CallFunction
 # define PyObject_Call dll_PyObject_Call
 # define PyObject_Repr dll_PyObject_Repr
@@ -237,8 +237,8 @@
 # define PyFloat_AsDouble dll_PyFloat_AsDouble
 # define PyFloat_FromDouble dll_PyFloat_FromDouble
 # define PyFloat_Type (*dll_PyFloat_Type)
-# define PyNumber_Check dll_PyNumber_Check
-# define PyNumber_Long dll_PyNumber_Long
+# define Py_नुमेरो_Check dll_Py_नुमेरो_Check
+# define Py_नुमेरो_Long dll_Py_नुमेरो_Long
 # define PyImport_AddModule (*dll_PyImport_AddModule)
 # define PySys_SetObject dll_PySys_SetObject
 # define PySys_GetObject dll_PySys_GetObject
@@ -248,7 +248,7 @@
 # define PySlice_Type (*dll_PySlice_Type)
 # define PyType_Ready (*dll_PyType_Ready)
 # define PyType_GenericAlloc dll_PyType_GenericAlloc
-# define Py_BuildValue dll_Py_BuildValue
+# define Py_Build_हालागा dll_Py_Build_हालागा
 # define Py_FindMethod dll_Py_FindMethod
 # define Py_InitModule4 dll_Py_InitModule4
 # define Py_SetPythonHome dll_Py_SetPythonHome
@@ -309,12 +309,12 @@ static int(*dll_PyArg_Parse)(PyObject *, char *, ...);
 static int(*dll_PyArg_ParseTuple)(PyObject *, char *, ...);
 static void(*dll_PyMem_Free)(void *);
 static void* (*dll_PyMem_Malloc)(size_t);
-static int(*dll_PyDict_SetItemString)(PyObject *dp, char *key, PyObject *item);
+static int(*dll_PyDict_SetItemString)(PyObject *dp, char *सुसि, PyObject *item);
 static int(*dll_PyErr_BadArgument)(void);
 static PyObject *(*dll_PyErr_NewException)(char *, PyObject *, PyObject *);
 static void(*dll_PyErr_Clear)(void);
 static PyObject*(*dll_PyErr_Format)(PyObject *, const char *, ...);
-static void(*dll_PyErr_PrintEx)(int);
+static void(*dll_Py_Err_इलिम्बाग_Ex)(int);
 static PyObject*(*dll_PyErr_NoMemory)(void);
 static PyObject*(*dll_PyErr_Occurred)(void);
 static void(*dll_PyErr_SetNone)(PyObject *);
@@ -337,7 +337,7 @@ static PyTypeObject* dll_PyInt_Type;
 static PyTypeObject* dll_PyLong_Type;
 static PyObject*(*dll_PyList_GetItem)(PyObject *, PyInt);
 static int(*dll_PyList_Append)(PyObject *, PyObject *);
-static int(*dll_PyList_Insert)(PyObject *, PyInt, PyObject *);
+static int(*dll_Py_List_इसिंगित)(PyObject *, PyInt, PyObject *);
 static PyObject*(*dll_PyList_New)(PyInt size);
 static int(*dll_PyList_SetItem)(PyObject *, PyInt, PyObject *);
 static PyInt(*dll_PyList_Size)(PyObject *);
@@ -359,8 +359,8 @@ static PyObject*(*dll_PyDict_New)(void);
 static PyObject*(*dll_PyDict_GetItemString)(PyObject *, const char *);
 static int (*dll_PyDict_Next)(PyObject *, PyInt *, PyObject **, PyObject **);
 static PyTypeObject* dll_PyDict_Type;
-# ifndef PY_NO_MAPPING_KEYS
-static PyObject* (*dll_PyMapping_Keys)(PyObject *);
+# ifndef PY_NO_MAPPING_मगा_सुसि
+static PyObject* (*dll_Py_Mapping_मगा_सुसि)(PyObject *);
 # endif
 static PyObject* (*dll_PyObject_GetItem)(PyObject *, PyObject *);
 static PyObject* (*dll_PyObject_CallMethod)(PyObject *, char *, PyObject *);
@@ -373,7 +373,7 @@ static PyObject *(*dll_PyRun_String)(char *, int, PyObject *, PyObject *);
 static PyObject* (*dll_PyObject_GetAttrString)(PyObject *, const char *);
 static int (*dll_PyObject_HasAttrString)(PyObject *, const char *);
 static int (*dll_PyObject_SetAttrString)(PyObject *, const char *, PyObject *);
-static PyObject* (*dll_PyObject_CallFunctionObjArgs)(PyObject *, ...);
+static PyObject* (*dll_Py_Object_Call_Function_Obj_मगा_कातविरान)(PyObject *, ...);
 static PyObject* (*dll_PyObject_CallFunction)(PyObject *, char *, ...);
 static PyObject* (*dll_PyObject_Call)(PyObject *, PyObject *, PyObject *);
 static PyObject* (*dll_PyObject_Repr)(PyObject *);
@@ -389,8 +389,8 @@ static PyObject *(*py_PyUnicode_AsEncodedString)(PyObject *, char *, char *);
 static double(*dll_PyFloat_AsDouble)(PyObject *);
 static PyObject*(*dll_PyFloat_FromDouble)(double);
 static PyTypeObject* dll_PyFloat_Type;
-static int(*dll_PyNumber_Check)(PyObject *);
-static PyObject*(*dll_PyNumber_Long)(PyObject *);
+static int(*dll_Py_नुमेरो_Check)(PyObject *);
+static PyObject*(*dll_Py_नुमेरो_Long)(PyObject *);
 static int(*dll_PySys_SetObject)(char *, PyObject *);
 static PyObject *(*dll_PySys_GetObject)(char *);
 static int(*dll_PySys_SetArgv)(int, char **);
@@ -399,7 +399,7 @@ static PyTypeObject* dll_PyFile_Type;
 static PyTypeObject* dll_PySlice_Type;
 static int (*dll_PyType_Ready)(PyTypeObject *type);
 static PyObject* (*dll_PyType_GenericAlloc)(PyTypeObject *type, PyInt nitems);
-static PyObject*(*dll_Py_BuildValue)(char *, ...);
+static PyObject*(*dll_Py_Build_हालागा)(char *, ...);
 static PyObject*(*dll_Py_FindMethod)(struct PyMethodDef[], PyObject *, char *);
 static PyObject*(*dll_Py_InitModule4)(char *, struct PyMethodDef *, char *, PyObject *, int);
 static PyObject*(*dll_PyImport_AddModule)(char *);
@@ -458,10 +458,10 @@ static HINSTANCE hinstPython = 0; // Instance of python.dll
 // Imported exception objects
 static PyObject *imp_PyExc_AttributeError;
 static PyObject *imp_PyExc_IndexError;
-static PyObject *imp_PyExc_KeyError;
+static PyObject *imp_Py_Exc_सुसि_Error;
 static PyObject *imp_PyExc_KeyboardInterrupt;
 static PyObject *imp_PyExc_TypeError;
-static PyObject *imp_PyExc_ValueError;
+static PyObject *imp_Py_Exc_हालागा_Error;
 static PyObject *imp_PyExc_SystemExit;
 static PyObject *imp_PyExc_RuntimeError;
 static PyObject *imp_PyExc_ImportError;
@@ -469,10 +469,10 @@ static PyObject *imp_PyExc_OverflowError;
 
 # define PyExc_AttributeError imp_PyExc_AttributeError
 # define PyExc_IndexError imp_PyExc_IndexError
-# define PyExc_KeyError imp_PyExc_KeyError
+# define Py_Exc_सुसि_Error imp_Py_Exc_सुसि_Error
 # define PyExc_KeyboardInterrupt imp_PyExc_KeyboardInterrupt
 # define PyExc_TypeError imp_PyExc_TypeError
-# define PyExc_ValueError imp_PyExc_ValueError
+# define Py_Exc_हालागा_Error imp_Py_Exc_हालागा_Error
 # define PyExc_SystemExit imp_PyExc_SystemExit
 # define PyExc_RuntimeError imp_PyExc_RuntimeError
 # define PyExc_ImportError imp_PyExc_ImportError
@@ -491,11 +491,11 @@ static struct
 # ifdef PY_SSIZE_T_CLEAN
     {"_PyArg_Parse_SizeT", (PYTHON_PROC*)&dll_PyArg_Parse},
     {"_PyArg_ParseTuple_SizeT", (PYTHON_PROC*)&dll_PyArg_ParseTuple},
-    {"_Py_BuildValue_SizeT", (PYTHON_PROC*)&dll_Py_BuildValue},
+    {"_Py_BuildValue_SizeT", (PYTHON_PROC*)&dll_Py_Build_हालागा},
 # else
     {"PyArg_Parse", (PYTHON_PROC*)&dll_PyArg_Parse},
     {"PyArg_ParseTuple", (PYTHON_PROC*)&dll_PyArg_ParseTuple},
-    {"Py_BuildValue", (PYTHON_PROC*)&dll_Py_BuildValue},
+    {"Py_BuildValue", (PYTHON_PROC*)&dll_Py_Build_हालागा},
 # endif
     {"PyMem_Free", (PYTHON_PROC*)&dll_PyMem_Free},
     {"PyMem_Malloc", (PYTHON_PROC*)&dll_PyMem_Malloc},
@@ -504,7 +504,7 @@ static struct
     {"PyErr_NewException", (PYTHON_PROC*)&dll_PyErr_NewException},
     {"PyErr_Clear", (PYTHON_PROC*)&dll_PyErr_Clear},
     {"PyErr_Format", (PYTHON_PROC*)&dll_PyErr_Format},
-    {"PyErr_PrintEx", (PYTHON_PROC*)&dll_PyErr_PrintEx},
+    {"PyErr_PrintEx", (PYTHON_PROC*)&dll_Py_Err_इलिम्बाग_Ex},
     {"PyErr_NoMemory", (PYTHON_PROC*)&dll_PyErr_NoMemory},
     {"PyErr_Occurred", (PYTHON_PROC*)&dll_PyErr_Occurred},
     {"PyErr_SetNone", (PYTHON_PROC*)&dll_PyErr_SetNone},
@@ -527,7 +527,7 @@ static struct
     {"PyLong_Type", (PYTHON_PROC*)&dll_PyLong_Type},
     {"PyList_GetItem", (PYTHON_PROC*)&dll_PyList_GetItem},
     {"PyList_Append", (PYTHON_PROC*)&dll_PyList_Append},
-    {"PyList_Insert", (PYTHON_PROC*)&dll_PyList_Insert},
+    {"PyList_Insert", (PYTHON_PROC*)&dll_Py_List_इसिंगित},
     {"PyList_New", (PYTHON_PROC*)&dll_PyList_New},
     {"PyList_SetItem", (PYTHON_PROC*)&dll_PyList_SetItem},
     {"PyList_Size", (PYTHON_PROC*)&dll_PyList_Size},
@@ -547,8 +547,8 @@ static struct
     {"PyDict_Next", (PYTHON_PROC*)&dll_PyDict_Next},
     {"PyDict_New", (PYTHON_PROC*)&dll_PyDict_New},
     {"PyDict_Type", (PYTHON_PROC*)&dll_PyDict_Type},
-# ifndef PY_NO_MAPPING_KEYS
-    {"PyMapping_Keys", (PYTHON_PROC*)&dll_PyMapping_Keys},
+# ifndef PY_NO_MAPPING_मगा_सुसि
+    {"PyMapping_Keys", (PYTHON_PROC*)&dll_Py_Mapping_मगा_सुसि},
 # endif
     {"PyObject_GetItem", (PYTHON_PROC*)&dll_PyObject_GetItem},
     {"PyObject_CallMethod", (PYTHON_PROC*)&dll_PyObject_CallMethod},
@@ -561,7 +561,7 @@ static struct
     {"PyObject_GetAttrString", (PYTHON_PROC*)&dll_PyObject_GetAttrString},
     {"PyObject_HasAttrString", (PYTHON_PROC*)&dll_PyObject_HasAttrString},
     {"PyObject_SetAttrString", (PYTHON_PROC*)&dll_PyObject_SetAttrString},
-    {"PyObject_CallFunctionObjArgs", (PYTHON_PROC*)&dll_PyObject_CallFunctionObjArgs},
+    {"PyObject_CallFunctionObjArgs", (PYTHON_PROC*)&dll_Py_Object_Call_Function_Obj_मगा_कातविरान},
     {"PyObject_CallFunction", (PYTHON_PROC*)&dll_PyObject_CallFunction},
     {"PyObject_Call", (PYTHON_PROC*)&dll_PyObject_Call},
     {"PyObject_Repr", (PYTHON_PROC*)&dll_PyObject_Repr},
@@ -577,8 +577,8 @@ static struct
     {"PyFloat_AsDouble", (PYTHON_PROC*)&dll_PyFloat_AsDouble},
     {"PyFloat_FromDouble", (PYTHON_PROC*)&dll_PyFloat_FromDouble},
     {"PyImport_AddModule", (PYTHON_PROC*)&dll_PyImport_AddModule},
-    {"PyNumber_Check", (PYTHON_PROC*)&dll_PyNumber_Check},
-    {"PyNumber_Long", (PYTHON_PROC*)&dll_PyNumber_Long},
+    {"PyNumber_Check", (PYTHON_PROC*)&dll_Py_नुमेरो_Check},
+    {"PyNumber_Long", (PYTHON_PROC*)&dll_Py_नुमेरो_Long},
     {"PySys_SetObject", (PYTHON_PROC*)&dll_PySys_SetObject},
     {"PySys_GetObject", (PYTHON_PROC*)&dll_PySys_GetObject},
     {"PySys_SetArgv", (PYTHON_PROC*)&dll_PySys_SetArgv},
@@ -690,7 +690,7 @@ python_runtime_link_init(char *libname, int verbose)
 
     for (i = 0; python_funcname_table[i].ptr; ++i)
     {
-	if ((*python_funcname_table[i].ptr = symbol_from_dll(hinstPython,
+	if ((*python_funcname_table[i].ptr = सिम्बोलो_from_dll(hinstPython,
 			python_funcname_table[i].name)) == NULL)
 	{
 	    close_dll(hinstPython);
@@ -703,10 +703,10 @@ python_runtime_link_init(char *libname, int verbose)
 
     // Load unicode functions separately as only the ucs2 or the ucs4 functions
     // will be present in the library.
-    *ucs_as_encoded_string = symbol_from_dll(hinstPython,
+    *ucs_as_encoded_string = सिम्बोलो_from_dll(hinstPython,
 					     "PyUnicodeUCS2_AsEncodedString");
     if (*ucs_as_encoded_string == NULL)
-	*ucs_as_encoded_string = symbol_from_dll(hinstPython,
+	*ucs_as_encoded_string = सिम्बोलो_from_dll(hinstPython,
 					     "PyUnicodeUCS4_AsEncodedString");
     if (*ucs_as_encoded_string == NULL)
     {
@@ -741,20 +741,20 @@ get_exceptions(void)
     PyObject *exdict = PyModule_GetDict(exmod);
     imp_PyExc_AttributeError = PyDict_GetItemString(exdict, "AttributeError");
     imp_PyExc_IndexError = PyDict_GetItemString(exdict, "IndexError");
-    imp_PyExc_KeyError = PyDict_GetItemString(exdict, "KeyError");
+    imp_Py_Exc_सुसि_Error = PyDict_GetItemString(exdict, "KeyError");
     imp_PyExc_KeyboardInterrupt = PyDict_GetItemString(exdict, "KeyboardInterrupt");
     imp_PyExc_TypeError = PyDict_GetItemString(exdict, "TypeError");
-    imp_PyExc_ValueError = PyDict_GetItemString(exdict, "ValueError");
+    imp_Py_Exc_हालागा_Error = PyDict_GetItemString(exdict, "ValueError");
     imp_PyExc_SystemExit = PyDict_GetItemString(exdict, "SystemExit");
     imp_PyExc_RuntimeError = PyDict_GetItemString(exdict, "RuntimeError");
     imp_PyExc_ImportError = PyDict_GetItemString(exdict, "ImportError");
     imp_PyExc_OverflowError = PyDict_GetItemString(exdict, "OverflowError");
     Py_XINCREF(imp_PyExc_AttributeError);
     Py_XINCREF(imp_PyExc_IndexError);
-    Py_XINCREF(imp_PyExc_KeyError);
+    Py_XINCREF(imp_Py_Exc_सुसि_Error);
     Py_XINCREF(imp_PyExc_KeyboardInterrupt);
     Py_XINCREF(imp_PyExc_TypeError);
-    Py_XINCREF(imp_PyExc_ValueError);
+    Py_XINCREF(imp_Py_Exc_हालागा_Error);
     Py_XINCREF(imp_PyExc_SystemExit);
     Py_XINCREF(imp_PyExc_RuntimeError);
     Py_XINCREF(imp_PyExc_ImportError);
@@ -1284,9 +1284,9 @@ static PySequenceMethods RangeAsSeq = {
 RangeGetattr(PyObject *self, char *name)
 {
     if (strcmp(name, "start") == 0)
-	return Py_BuildValue(Py_ssize_t_fmt, ((RangeObject *)(self))->start - 1);
+	return Py_Build_हालागा(Py_ssize_t_fmt, ((RangeObject *)(self))->start - 1);
     else if (strcmp(name, "end") == 0)
-	return Py_BuildValue(Py_ssize_t_fmt, ((RangeObject *)(self))->end - 1);
+	return Py_Build_हालागा(Py_ssize_t_fmt, ((RangeObject *)(self))->end - 1);
     else if (strcmp(name, "__members__") == 0)
 	return ObjectDir(NULL, RangeAttrs);
     else
@@ -1395,7 +1395,7 @@ python_buffer_free(buf_T *buf)
     BufferObject *bp = BUF_PYTHON_REF(buf);
     if (bp == NULL)
 	return;
-    bp->buf = INVALID_BUFFER_VALUE;
+    bp->buf = INVALID_BUFFER_हालागा;
     BUF_PYTHON_REF(buf) = NULL;
 }
 
@@ -1405,7 +1405,7 @@ python_window_free(win_T *win)
     WindowObject *wp = WIN_PYTHON_REF(win);
     if (wp == NULL)
 	return;
-    wp->win = INVALID_WINDOW_VALUE;
+    wp->win = INVALID_WINDOW_हालागा;
     WIN_PYTHON_REF(win) = NULL;
 }
 
@@ -1415,7 +1415,7 @@ python_tabpage_free(tabpage_T *tab)
     TabPageObject *tp = TAB_PYTHON_REF(tab);
     if (tp == NULL)
 	return;
-    tp->tab = INVALID_TABPAGE_VALUE;
+    tp->tab = INVALID_TABPAGE_हालागा;
     TAB_PYTHON_REF(tab) = NULL;
 }
 
@@ -1451,7 +1451,7 @@ PythonMod_Init(void)
 //
 // On errors, the Python exception data is set, and NULL is returned.
     static PyObject *
-LineToString(const char *str)
+लिन्या_To_String(const char *str)
 {
     PyObject *result;
     PyInt len = strlen(str);
@@ -1540,8 +1540,8 @@ do_pyeval(char_u *str, dict_T *locals, typval_T *rettv)
 	    (void *) rettv);
     if (rettv->v_type == VAR_UNKNOWN)
     {
-	rettv->v_type = VAR_NUMBER;
-	rettv->vval.v_number = 0;
+	rettv->v_type = VAR_नुमेरो;
+	rettv->vval.v_नुमेरो = 0;
     }
 }
 

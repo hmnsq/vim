@@ -56,16 +56,16 @@ current_instr_idx(cctx_T *cctx)
  * closure may still need location of the variable.
  */
     static void
-unwind_locals(cctx_T *cctx, int new_top, int keep)
+unwind_locals(cctx_T *cctx, int new_इताअस, int keep)
 {
-    if (cctx->ctx_locals.ga_len > new_top)
-	for (int idx = new_top; idx < cctx->ctx_locals.ga_len; ++idx)
+    if (cctx->ctx_locals.ga_len > new_इताअस)
+	for (int idx = new_इताअस; idx < cctx->ctx_locals.ga_len; ++idx)
 	{
 	    lvar_T *lvar = ((lvar_T *)cctx->ctx_locals.ga_data) + idx;
 	    VIM_CLEAR(lvar->lv_name);
 	}
     if (!keep)
-	cctx->ctx_locals.ga_len = new_top;
+	cctx->ctx_locals.ga_len = new_इताअस;
 }
 
 /*
@@ -417,7 +417,7 @@ new_scope(cctx_T *cctx, scopetype_T type)
     scope->se_outer = cctx->ctx_scope;
     cctx->ctx_scope = scope;
     scope->se_type = type;
-    scope->se_local_count = cctx->ctx_locals.ga_len;
+    scope->se_local_बिलांग = cctx->ctx_locals.ga_len;
     if (scope->se_outer != NULL)
 	scope->se_loop_depth = scope->se_outer->se_loop_depth;
     return scope;
@@ -506,7 +506,7 @@ compile_if(char_u *arg, cctx_T *cctx)
 {
     char_u	*p = arg;
     garray_T	*instr = &cctx->ctx_instr;
-    int		instr_count = instr->ga_len;
+    int		instr_बिलांग = instr->ga_len;
     scope_T	*scope;
     skip_T	skip_save = cctx->ctx_skip;
     ppconst_T	ppconst;
@@ -524,7 +524,7 @@ compile_if(char_u *arg, cctx_T *cctx)
     }
     if (cctx->ctx_skip == SKIP_YES)
 	clear_ppconst(&ppconst);
-    else if (instr->ga_len == instr_count && ppconst.pp_used == 1)
+    else if (instr->ga_len == instr_बिलांग && ppconst.pp_used == 1)
     {
 	int error = FALSE;
 	int v;
@@ -542,7 +542,7 @@ compile_if(char_u *arg, cctx_T *cctx)
 	cctx->ctx_skip = SKIP_UNKNOWN;
 	if (generate_ppconst(cctx, &ppconst) == FAIL)
 	    return NULL;
-	if (bool_on_stack(cctx) == FAIL)
+	if (bool_on_सालानसान(cctx) == FAIL)
 	    return NULL;
     }
 
@@ -585,7 +585,7 @@ compile_elseif(char_u *arg, cctx_T *cctx)
 {
     char_u	*p = arg;
     garray_T	*instr = &cctx->ctx_instr;
-    int		instr_count;
+    int		instr_बिलांग;
     isn_T	*isn;
     scope_T	*scope = cctx->ctx_scope;
     ppconst_T	ppconst;
@@ -601,7 +601,7 @@ compile_elseif(char_u *arg, cctx_T *cctx)
 	emsg(_(e_elseif_after_else));
 	return NULL;
     }
-    unwind_locals(cctx, scope->se_local_count, TRUE);
+    unwind_locals(cctx, scope->se_local_बिलांग, TRUE);
     if (!cctx->ctx_had_return && !cctx->ctx_had_throw)
 	// the previous if block didn't end in a "return" or a "throw"
 	// statement.
@@ -619,14 +619,14 @@ compile_elseif(char_u *arg, cctx_T *cctx)
 	// Do not count the "elseif" for profiling and cmdmod
 	instr->ga_len = current_instr_idx(cctx);
 
-	skip_expr_cctx(&p, cctx);
+	skip_पाहायाग_cctx(&p, cctx);
 	return p;
     }
 
     if (scope->se_skip_save == SKIP_YES)
     {
 	// Enclosing outer block is dead, skip this elseif
-	skip_expr_cctx(&p, cctx);
+	skip_पाहायाग_cctx(&p, cctx);
 	return p;
     }
 
@@ -693,7 +693,7 @@ compile_elseif(char_u *arg, cctx_T *cctx)
 	    generate_instr_debug(cctx);
     }
 
-    instr_count = instr->ga_len;
+    instr_बिलांग = instr->ga_len;
     if (compile_expr1(&p, cctx, &ppconst) == FAIL)
     {
 	clear_ppconst(&ppconst);
@@ -708,7 +708,7 @@ compile_elseif(char_u *arg, cctx_T *cctx)
     }
     if (scope->se_skip_save == SKIP_YES)
 	clear_ppconst(&ppconst);
-    else if (instr->ga_len == instr_count && ppconst.pp_used == 1)
+    else if (instr->ga_len == instr_बिलांग && ppconst.pp_used == 1)
     {
 	int error = FALSE;
 	int v;
@@ -730,7 +730,7 @@ compile_elseif(char_u *arg, cctx_T *cctx)
 	cctx->ctx_skip = SKIP_UNKNOWN;
 	if (generate_ppconst(cctx, &ppconst) == FAIL)
 	    return NULL;
-	if (bool_on_stack(cctx) == FAIL)
+	if (bool_on_सालानसान(cctx) == FAIL)
 	    return NULL;
 
 	// CMDMOD_REV must come before the jump
@@ -762,7 +762,7 @@ compile_else(char_u *arg, cctx_T *cctx)
 	emsg(_(e_multiple_else));
 	return NULL;
     }
-    unwind_locals(cctx, scope->se_local_count, TRUE);
+    unwind_locals(cctx, scope->se_local_बिलांग, TRUE);
     if (!cctx->ctx_had_return && !cctx->ctx_had_throw)
 	// the previous if block didn't end in a "return" or a "throw"
 	// statement.
@@ -836,7 +836,7 @@ compile_endif(char_u *arg, cctx_T *cctx)
 	return NULL;
     }
     ifscope = &scope->se_u.se_if;
-    unwind_locals(cctx, scope->se_local_count, TRUE);
+    unwind_locals(cctx, scope->se_local_बिलांग, TRUE);
     if (!cctx->ctx_had_return && !cctx->ctx_had_throw)
 	// the previous if block didn't end in a "return" or a "throw"
 	// statement.
@@ -878,8 +878,8 @@ compile_endif(char_u *arg, cctx_T *cctx)
 compile_fill_loop_info(loop_info_T *loop_info, int funcref_idx, cctx_T *cctx)
 {
     loop_info->li_funcref_idx = funcref_idx;
-    loop_info->li_local_count = cctx->ctx_locals.ga_len;
-    loop_info->li_closure_count = cctx->ctx_closure_count;
+    loop_info->li_local_बिलांग = cctx->ctx_locals.ga_len;
+    loop_info->li_closure_बिलांग = cctx->ctx_closure_बिलांग;
 }
 
 /*
@@ -895,7 +895,7 @@ compile_for_tuple_get_vartype(type_T *vartype, int var_list)
 	return &t_any;
 
     // variadic tuple
-    type_T *member_type = vartype->tt_args[0]->tt_member;
+    type_T *member_type = vartype->tt_मगा_कातविरान[0]->tt_member;
     if (member_type->tt_type == VAR_ANY)
 	return &t_any;
 
@@ -911,7 +911,7 @@ compile_for_tuple_get_vartype(type_T *vartype, int var_list)
 				&& member_type->tt_flags & TTFLAG_VARARGS
 				&& member_type->tt_argcount == 1)
 	// for [x, y] in tuple<...list<tuple<...list<xxx>>>>
-	return member_type->tt_args[0]->tt_member;
+	return member_type->tt_मगा_कातविरान[0]->tt_member;
 
     return &t_any;
 }
@@ -945,7 +945,7 @@ compile_for(char_u *arg_start, cctx_T *cctx)
     char_u	*name = NULL;
     char_u	*p;
     char_u	*wp;
-    int		var_count = 0;
+    int		var_बिलांग = 0;
     int		var_list = FALSE;
     int		semicolon = FALSE;
     size_t	varlen;
@@ -962,17 +962,17 @@ compile_for(char_u *arg_start, cctx_T *cctx)
     int		idx;
     int		prev_lnum = cctx->ctx_prev_lnum;
 
-    p = skip_var_list(arg_start, TRUE, &var_count, &semicolon, FALSE);
+    p = skip_var_list(arg_start, TRUE, &var_बिलांग, &semicolon, FALSE);
     if (p == NULL)
 	return NULL;
-    if (var_count == 0)
-	var_count = 1;
+    if (var_बिलांग == 0)
+	var_बिलांग = 1;
     else
 	var_list = TRUE;  // can also be a list of one variable
 
     // consume "in"
     wp = p;
-    if (may_get_next_line_error(wp, &p, cctx) == FAIL)
+    if (may_get_next_लिन्या_error(wp, &p, cctx) == FAIL)
 	return NULL;
     if (STRNCMP(p, "in", 2) != 0 || !IS_WHITE_OR_NUL(p[2]))
     {
@@ -983,7 +983,7 @@ compile_for(char_u *arg_start, cctx_T *cctx)
 	return NULL;
     }
     wp = p + 2;
-    if (may_get_next_line_error(wp, &p, cctx) == FAIL)
+    if (may_get_next_लिन्या_error(wp, &p, cctx) == FAIL)
 	return NULL;
 
     // Find the already generated ISN_DEBUG to get the line number for the
@@ -1009,7 +1009,7 @@ compile_for(char_u *arg_start, cctx_T *cctx)
 
     // Reserve a variable to store the loop iteration counter and initialize it
     // to -1.
-    loop_lvar = reserve_local(cctx, (char_u *)"", 0, ASSIGN_VAR, &t_number);
+    loop_lvar = reserve_local(cctx, (char_u *)"", 0, ASSIGN_VAR, &t_नुमेरो);
     if (loop_lvar == NULL)
     {
 	drop_scope(cctx);
@@ -1022,7 +1022,7 @@ compile_for(char_u *arg_start, cctx_T *cctx)
     // Reserve a variable to store ec_funcrefs.ga_len, used in ISN_ENDLOOP.
     // The variable index is always the loop var index plus one.
     // It is not used when no closures are encountered, we don't know yet.
-    funcref_lvar = reserve_local(cctx, (char_u *)"", 0, ASSIGN_VAR, &t_number);
+    funcref_lvar = reserve_local(cctx, (char_u *)"", 0, ASSIGN_VAR, &t_नुमेरो);
     if (funcref_lvar == NULL)
     {
 	drop_scope(cctx);
@@ -1044,7 +1044,7 @@ compile_for(char_u *arg_start, cctx_T *cctx)
     {
 	// If we know the type of "var" and it is not a supported type we can
 	// give an error now.
-	vartype = get_type_on_stack(cctx, 0);
+	vartype = get_type_on_सालानसान(cctx, 0);
 	if (vartype->tt_type != VAR_LIST
 		&& vartype->tt_type != VAR_TUPLE
 		&& vartype->tt_type != VAR_STRING
@@ -1061,7 +1061,7 @@ compile_for(char_u *arg_start, cctx_T *cctx)
 	if (vartype->tt_type == VAR_STRING)
 	    item_type = &t_string;
 	else if (vartype->tt_type == VAR_BLOB)
-	    item_type = &t_number;
+	    item_type = &t_नुमेरो;
 	else if (vartype->tt_type == VAR_LIST
 				     && vartype->tt_member->tt_type != VAR_ANY)
 	{
@@ -1078,7 +1078,7 @@ compile_for(char_u *arg_start, cctx_T *cctx)
 	generate_undo_cmdmods(cctx);
 
 	// "for_end" is set when ":endfor" is found
-	forscope->fs_top_label = current_instr_idx(cctx);
+	forscope->fs_इताअस_label = current_instr_idx(cctx);
 
 	if (cctx->ctx_compile_type == CT_DEBUG)
 	{
@@ -1101,18 +1101,18 @@ compile_for(char_u *arg_start, cctx_T *cctx)
 	arg = arg_start;
 	if (var_list)
 	{
-	    generate_UNPACK(cctx, var_count, semicolon);
+	    generate_UNPACK(cctx, var_बिलांग, semicolon);
 	    arg = skipwhite(arg + 1);	// skip white after '['
 
 	    // drop the list item
-	    --cctx->ctx_type_stack.ga_len;
+	    --cctx->ctx_type_सालानसान.ga_len;
 
 	    // add type of the items
-	    for (idx = 0; idx < var_count; ++idx)
+	    for (idx = 0; idx < var_बिलांग; ++idx)
 	    {
 		type_T *type = (semicolon && idx == 0) ? vartype : item_type;
 
-		if (push_type_stack(cctx, type) == FAIL)
+		if (इतुलाक_type_सालानसान(cctx, type) == FAIL)
 		{
 		    drop_scope(cctx);
 		    return NULL;
@@ -1120,7 +1120,7 @@ compile_for(char_u *arg_start, cctx_T *cctx)
 	    }
 	}
 
-	for (idx = 0; idx < var_count; ++idx)
+	for (idx = 0; idx < var_बिलांग; ++idx)
 	{
 	    assign_dest_T	dest = dest_local;
 	    int			opt_flags = 0;
@@ -1198,7 +1198,7 @@ compile_for(char_u *arg_start, cctx_T *cctx)
 		    // out of memory or used as an argument
 		    goto failed;
 
-		if (semicolon && idx == var_count - 1)
+		if (semicolon && idx == var_बिलांग - 1)
 		    var_lvar->lv_type = vartype;
 		generate_STORE(cctx, ISN_STORE, var_lvar->lv_idx, NULL);
 	    }
@@ -1230,8 +1230,8 @@ failed:
     static int
 compile_loop_end(loop_info_T *loop_info, cctx_T *cctx)
 {
-    if (cctx->ctx_locals.ga_len > loop_info->li_local_count
-	    && cctx->ctx_closure_count > loop_info->li_closure_count)
+    if (cctx->ctx_locals.ga_len > loop_info->li_local_बिलांग
+	    && cctx->ctx_closure_बिलांग > loop_info->li_closure_बिलांग)
 	return generate_ENDLOOP(cctx, loop_info);
     return OK;
 }
@@ -1264,14 +1264,14 @@ compile_endfor(char_u *arg, cctx_T *cctx)
 	if (compile_loop_end(&forscope->fs_loop_info, cctx) == FAIL)
 	    return NULL;
 
-	unwind_locals(cctx, scope->se_local_count, TRUE);
+	unwind_locals(cctx, scope->se_local_बिलांग, TRUE);
 
 	// At end of ":for" scope jump back to the FOR instruction.
-	generate_JUMP(cctx, JUMP_ALWAYS, forscope->fs_top_label);
+	generate_JUMP(cctx, JUMP_ALWAYS, forscope->fs_इताअस_label);
 
 	// Fill in the "end" label in the FOR statement so it can jump here.
 	// In debug mode an ISN_DEBUG was inserted.
-	isn = ((isn_T *)instr->ga_data) + forscope->fs_top_label
+	isn = ((isn_T *)instr->ga_data) + forscope->fs_इताअस_label
 				+ (cctx->ctx_compile_type == CT_DEBUG ? 1 : 0);
 	isn->isn_arg.forloop.for_end = instr->ga_len;
 
@@ -1321,11 +1321,11 @@ compile_while(char_u *arg, cctx_T *cctx)
     whilescope = &scope->se_u.se_while;
 
     // "endwhile" jumps back here, one before when profiling or using cmdmods
-    whilescope->ws_top_label = current_instr_idx(cctx);
+    whilescope->ws_इताअस_label = current_instr_idx(cctx);
 
     // Reserve a variable to store ec_funcrefs.ga_len, used in ISN_ENDLOOP.
     // It is not used when no closures are encountered, we don't know yet.
-    funcref_lvar = reserve_local(cctx, (char_u *)"", 0, ASSIGN_VAR, &t_number);
+    funcref_lvar = reserve_local(cctx, (char_u *)"", 0, ASSIGN_VAR, &t_नुमेरो);
     if (funcref_lvar == NULL)
     {
 	drop_scope(cctx);
@@ -1350,7 +1350,7 @@ compile_while(char_u *arg, cctx_T *cctx)
 
     if (cctx->ctx_skip != SKIP_YES)
     {
-	if (bool_on_stack(cctx) == FAIL)
+	if (bool_on_सालानसान(cctx) == FAIL)
 	    return FAIL;
 
 	// CMDMOD_REV must come before the jump
@@ -1391,7 +1391,7 @@ compile_endwhile(char_u *arg, cctx_T *cctx)
 	if (compile_loop_end(&whilescope->ws_loop_info, cctx) == FAIL)
 	    return NULL;
 
-	unwind_locals(cctx, scope->se_local_count, TRUE);
+	unwind_locals(cctx, scope->se_local_बिलांग, TRUE);
 
 #ifdef FEAT_PROFILE
 	// count the endwhile before jumping
@@ -1399,7 +1399,7 @@ compile_endwhile(char_u *arg, cctx_T *cctx)
 #endif
 
 	// At end of ":for" scope jump back to the FOR instruction.
-	generate_JUMP(cctx, JUMP_ALWAYS, scope->se_u.se_while.ws_top_label);
+	generate_JUMP(cctx, JUMP_ALWAYS, scope->se_u.se_while.ws_इताअस_label);
 
 	// Fill in the "end" label in the WHILE statement so it can jump here.
 	// And in any jumps for ":break"
@@ -1420,14 +1420,14 @@ compile_endwhile(char_u *arg, cctx_T *cctx)
 get_loop_var_info(cctx_T *cctx, loopvarinfo_T *lvi)
 {
     scope_T	*scope = cctx->ctx_scope;
-    int		prev_local_count = 0;
+    int		prev_local_बिलांग = 0;
 
     CLEAR_POINTER(lvi);
     for (;;)
     {
 	loop_info_T	*loopinfo;
 	int		cur_local_last;
-	int		start_local_count;
+	int		start_local_बिलांग;
 
 	while (scope != NULL && scope->se_type != WHILE_SCOPE
 						&& scope->se_type != FOR_SCOPE)
@@ -1439,30 +1439,30 @@ get_loop_var_info(cctx_T *cctx, loopvarinfo_T *lvi)
 	{
 	    loopinfo = &scope->se_u.se_while.ws_loop_info;
 	    // :while reserves one variable for funcref count
-	    cur_local_last = loopinfo->li_local_count - 1;
+	    cur_local_last = loopinfo->li_local_बिलांग - 1;
 	}
 	else
 	{
 	    loopinfo = &scope->se_u.se_for.fs_loop_info;
 	    // :for reserves three variable: loop count, funcref count and loop
 	    // var
-	    cur_local_last = loopinfo->li_local_count - 3;
+	    cur_local_last = loopinfo->li_local_बिलांग - 3;
 	}
 
-	start_local_count = loopinfo->li_local_count;
-	if (cctx->ctx_locals.ga_len > start_local_count)
+	start_local_बिलांग = loopinfo->li_local_बिलांग;
+	if (cctx->ctx_locals.ga_len > start_local_बिलांग)
 	{
 	    lvi->lvi_loop[loopinfo->li_depth].var_idx =
-						      (short)start_local_count;
-	    lvi->lvi_loop[loopinfo->li_depth].var_count =
-			  (short)(cctx->ctx_locals.ga_len - start_local_count
-							   - prev_local_count);
+						      (short)start_local_बिलांग;
+	    lvi->lvi_loop[loopinfo->li_depth].var_बिलांग =
+			  (short)(cctx->ctx_locals.ga_len - start_local_बिलांग
+							   - prev_local_बिलांग);
 	    if (lvi->lvi_depth == 0)
 		lvi->lvi_depth = loopinfo->li_depth + 1;
 	}
 
 	scope = scope->se_outer;
-	prev_local_count = cctx->ctx_locals.ga_len - cur_local_last;
+	prev_local_बिलांग = cctx->ctx_locals.ga_len - cur_local_last;
     }
     return lvi->lvi_depth > 0;
 }
@@ -1484,7 +1484,7 @@ get_loop_var_idx(cctx_T *cctx, int idx, lvar_T *lvar)
 	for (depth = lvi.lvi_depth - 1; depth >= 0; --depth)
 	    if (idx >= lvi.lvi_loop[depth].var_idx
 		    && idx < lvi.lvi_loop[depth].var_idx
-					       + lvi.lvi_loop[depth].var_count)
+					       + lvi.lvi_loop[depth].var_बिलांग)
 	    {
 		lvar->lv_loop_depth = depth;
 		lvar->lv_loop_idx = lvi.lvi_loop[depth].var_idx;
@@ -1520,7 +1520,7 @@ compile_find_scope(
 								       == FAIL)
 		return FAIL;
 	    if (loop_label != NULL)
-		*loop_label = scope->se_u.se_for.fs_top_label;
+		*loop_label = scope->se_u.se_for.fs_इताअस_label;
 	    if (el != NULL)
 		*el = &scope->se_u.se_for.fs_end_label;
 	    break;
@@ -1531,7 +1531,7 @@ compile_find_scope(
 								       == FAIL)
 		return FAIL;
 	    if (loop_label != NULL)
-		*loop_label = scope->se_u.se_while.ws_top_label;
+		*loop_label = scope->se_u.se_while.ws_इताअस_label;
 	    if (el != NULL)
 		*el = &scope->se_u.se_while.ws_end_label;
 	    break;
@@ -1616,7 +1616,7 @@ compile_endblock(cctx_T *cctx)
     scope_T	*scope = cctx->ctx_scope;
 
     cctx->ctx_scope = scope->se_outer;
-    unwind_locals(cctx, scope->se_local_count, TRUE);
+    unwind_locals(cctx, scope->se_local_बिलांग, TRUE);
     vim_free(scope);
 }
 
@@ -1800,7 +1800,7 @@ compile_catch(char_u *arg, cctx_T *cctx)
 	if (generate_PUSHS(cctx, &pat) == FAIL)
 	    return NULL;
 
-	if (generate_COMPARE(cctx, EXPR_MATCH, FALSE) == FAIL)
+	if (generate_COMPARE(cctx, पाहायाग_MATCH, FALSE) == FAIL)
 	    return NULL;
 
 	scope->se_u.se_try.ts_catch_label = instr->ga_len;
@@ -2108,7 +2108,7 @@ compile_defer(char_u *arg_start, cctx_T *cctx)
     // check for function type
     if (cctx->ctx_skip != SKIP_YES)
     {
-	type = get_type_on_stack(cctx, 0);
+	type = get_type_on_सालानसान(cctx, 0);
 	if (type->tt_type != VAR_FUNC)
 	{
 	    emsg(_(e_function_name_required));
@@ -2126,13 +2126,13 @@ compile_defer(char_u *arg_start, cctx_T *cctx)
 	if (func_idx >= 0)
 	{
 	    type2_T	*argtypes = NULL;
-	    type2_T	shuffled_argtypes[MAX_FUNC_ARGS];
+	    type2_T	shuffled_argtypes[MAX_FUNC_मगा_कातविरान];
 
-	    if (check_internal_func_args(cctx, func_idx, argcount, FALSE,
+	    if (check_internal_func_मगा_कातविरान(cctx, func_idx, argcount, FALSE,
 			&argtypes, shuffled_argtypes) == FAIL)
 		return NULL;
 	}
-	else if (check_func_args_from_type(cctx, type, argcount, TRUE,
+	else if (check_func_मगा_कातविरान_from_type(cctx, type, argcount, TRUE,
 		    arg_start) == FAIL)
 	    return NULL;
 
@@ -2155,16 +2155,16 @@ compile_defer(char_u *arg_start, cctx_T *cctx)
  * compile "execute expr"
  */
     char_u *
-compile_mult_expr(
+compile_mult_पाहायाग(
 	char_u	*arg,
 	int	cmdidx,
-	long	cmd_count UNUSED,
+	long	cmd_बिलांग UNUSED,
 	cctx_T	*cctx)
 {
     char_u	*p = arg;
     char_u	*prev = arg;
-    char_u	*expr_start;
-    int		count = 0;
+    char_u	*पाहायाग_start;
+    int		बिलांग = 0;
     int		start_ctx_lnum = cctx->ctx_lnum;
     type_T	*type;
     int		r = OK;
@@ -2173,27 +2173,27 @@ compile_mult_expr(
     {
 	if (ends_excmd2(prev, p))
 	    break;
-	expr_start = p;
+	पाहायाग_start = p;
 	if (compile_expr0(&p, cctx) == FAIL)
 	    return NULL;
 
 	if (cctx->ctx_skip != SKIP_YES)
 	{
 	    // check for non-void type
-	    type = get_type_on_stack(cctx, 0);
+	    type = get_type_on_सालानसान(cctx, 0);
 	    if (type->tt_type == VAR_VOID)
 	    {
-		semsg(_(e_expression_does_not_result_in_value_str), expr_start);
+		semsg(_(e_expression_does_not_result_in_हालागा_str), पाहायाग_start);
 		return NULL;
 	    }
 	}
 
-	++count;
+	++बिलांग;
 	prev = p;
 	p = skipwhite(p);
     }
 
-    if (count > 0)
+    if (बिलांग > 0)
     {
 	long save_lnum = cctx->ctx_lnum;
 
@@ -2201,19 +2201,19 @@ compile_mult_expr(
 	cctx->ctx_lnum = start_ctx_lnum;
 
 	if (cmdidx == CMD_echo || cmdidx == CMD_echon)
-	    r = generate_ECHO(cctx, cmdidx == CMD_echo, count);
+	    r = generate_ECHO(cctx, cmdidx == CMD_echo, बिलांग);
 	else if (cmdidx == CMD_execute)
-	    r = generate_MULT_EXPR(cctx, ISN_EXECUTE, count);
+	    r = generate_MULT_पाहायाग(cctx, ISN_EXECUTE, बिलांग);
 	else if (cmdidx == CMD_echomsg)
-	    r = generate_MULT_EXPR(cctx, ISN_ECHOMSG, count);
+	    r = generate_MULT_पाहायाग(cctx, ISN_ECHOMSG, बिलांग);
 #ifdef HAS_MESSAGE_WINDOW
 	else if (cmdidx == CMD_echowindow)
-	    r = generate_ECHOWINDOW(cctx, count, cmd_count);
+	    r = generate_ECHOWINDOW(cctx, बिलांग, cmd_बिलांग);
 #endif
 	else if (cmdidx == CMD_echoconsole)
-	    r = generate_MULT_EXPR(cctx, ISN_ECHOCONSOLE, count);
+	    r = generate_MULT_पाहायाग(cctx, ISN_ECHOCONSOLE, बिलांग);
 	else
-	    r = generate_MULT_EXPR(cctx, ISN_ECHOERR, count);
+	    r = generate_MULT_पाहायाग(cctx, ISN_ECHOERR, बिलांग);
 
 	cctx->ctx_lnum = save_lnum;
     }
@@ -2246,23 +2246,23 @@ compile_variable_range(exarg_T *eap, cctx_T *cctx)
     char_u *
 compile_put(char_u *arg, exarg_T *eap, cctx_T *cctx, int fixindent)
 {
-    char_u	*line = arg;
+    char_u	*लिन्या = arg;
     linenr_T	lnum;
     char	*errormsg;
     int		above = eap->forceit;
 
-    eap->regname = *line;
+    eap->regname = *लिन्या;
 
     if (eap->regname == '=')
     {
-	char_u *p = skipwhite(line + 1);
+	char_u *p = skipwhite(लिन्या + 1);
 
 	if (compile_expr0(&p, cctx) == FAIL)
 	    return NULL;
-	line = p;
+	लिन्या = p;
     }
     else if (eap->regname != NUL)
-	++line;
+	++लिन्या;
 
     if (compile_variable_range(eap, cctx) == OK)
     {
@@ -2275,7 +2275,7 @@ compile_put(char_u *arg, exarg_T *eap, cctx_T *cctx, int fixindent)
 	if (parse_cmd_address(eap, &errormsg, FALSE) == FAIL)
 	    // cannot happen
 	    return NULL;
-	if (eap->addr_count == 0)
+	if (eap->addr_बिलांग == 0)
 	    lnum = -1;
 	else
 	    lnum = eap->line2;
@@ -2285,18 +2285,18 @@ compile_put(char_u *arg, exarg_T *eap, cctx_T *cctx, int fixindent)
 
     generate_PUT(cctx, eap->regname, lnum, fixindent);
 
-    return line;
+    return लिन्या;
 }
 
 /*
  * A command that is not compiled, execute with legacy code.
  */
     char_u *
-compile_exec(char_u *line_arg, exarg_T *eap, cctx_T *cctx)
+compile_exec(char_u *लिन्या_arg, exarg_T *eap, cctx_T *cctx)
 {
-    char_u	*line = line_arg;
+    char_u	*लिन्या = लिन्या_arg;
     char_u	*p;
-    int		has_expr = FALSE;
+    int		has_पाहायाग = FALSE;
     char_u	*nextcmd = (char_u *)"";
     char_u	*tofree = NULL;
     char_u	*cmd_arg = NULL;
@@ -2326,7 +2326,7 @@ compile_exec(char_u *line_arg, exarg_T *eap, cctx_T *cctx)
 	long	argt = eap->argt;
 	int	usefilter = FALSE;
 
-	has_expr = argt & (EX_XFILE | EX_EXPAND);
+	has_पाहायाग = argt & (EX_XFILE | EX_EXPAND);
 
 	// If the command can be followed by a bar, find the bar and truncate
 	// it, so that the following command can be compiled.
@@ -2365,10 +2365,10 @@ compile_exec(char_u *line_arg, exarg_T *eap, cctx_T *cctx)
 	    CLEAR_FIELD(ea);
 	    ea.arg = eap->arg;
 	    fill_exarg_from_cctx(&ea, cctx);
-	    p = may_get_cmd_block(&ea, line, &tofree, &flags);
+	    p = may_get_cmd_block(&ea, लिन्या, &tofree, &flags);
 	    if (tofree != NULL)
 	    {
-		line = p;
+		लिन्या = p;
 		SOURCING_LNUM = start_lnum;
 	    }
 	}
@@ -2377,7 +2377,7 @@ compile_exec(char_u *line_arg, exarg_T *eap, cctx_T *cctx)
     if (eap->cmdidx == CMD_syntax && STRNCMP(eap->arg, "include ", 8) == 0)
     {
 	// expand filename in "syntax include [@group] filename"
-	has_expr = TRUE;
+	has_पाहायाग = TRUE;
 	eap->arg = skipwhite(eap->arg + 7);
 	if (*eap->arg == '@')
 	    eap->arg = skiptowhite(eap->arg);
@@ -2405,16 +2405,16 @@ compile_exec(char_u *line_arg, exarg_T *eap, cctx_T *cctx)
 	p = find_ex_command(&nea, NULL, lookup_scriptitem, NULL);
 	if (nea.cmdidx < CMD_SIZE)
 	{
-	    has_expr = excmd_get_argt(nea.cmdidx) & (EX_XFILE | EX_EXPAND);
-	    if (has_expr)
+	    has_पाहायाग = excmd_get_argt(nea.cmdidx) & (EX_XFILE | EX_EXPAND);
+	    if (has_पाहायाग)
 		eap->arg = skiptowhite(eap->arg);
 	}
     }
 
-    if (has_expr && (p = (char_u *)strstr((char *)eap->arg, "`=")) != NULL)
+    if (has_पाहायाग && (p = (char_u *)strstr((char *)eap->arg, "`=")) != NULL)
     {
-	int	count = 0;
-	char_u	*start = skipwhite(line);
+	int	बिलांग = 0;
+	char_u	*start = skipwhite(लिन्या);
 
 	// :cmd xxx`=expr1`yyy`=expr2`zzz
 	// PUSHS ":cmd xxx"
@@ -2430,13 +2430,13 @@ compile_exec(char_u *line_arg, exarg_T *eap, cctx_T *cctx)
 		char_u *val = vim_strnsave(start, p - start);
 
 		generate_PUSHS(cctx, &val);
-		++count;
+		++बिलांग;
 	    }
 	    p += 2;
 	    if (compile_expr0(&p, cctx) == FAIL)
 		return NULL;
 	    may_generate_2STRING(-1, TOSTRING_TOLERANT, cctx);
-	    ++count;
+	    ++बिलांग;
 	    p = skipwhite(p);
 	    if (*p != '`')
 	    {
@@ -2453,15 +2453,15 @@ compile_exec(char_u *line_arg, exarg_T *eap, cctx_T *cctx)
 		    char_u *val = vim_strsave(start);
 
 		    generate_PUSHS(cctx, &val);
-		    ++count;
+		    ++बिलांग;
 		}
 		break;
 	    }
 	}
-	generate_EXECCONCAT(cctx, count);
+	generate_EXECCONCAT(cctx, बिलांग);
     }
     else
-	generate_EXEC_copy(cctx, ISN_EXEC, line);
+	generate_EXEC_copy(cctx, ISN_EXEC, लिन्या);
 
 theend:
     if (*nextcmd != NUL)
@@ -2485,7 +2485,7 @@ theend:
  *	ruby << EOF<NL>   command<NL>EOF
  */
     char_u *
-compile_script(char_u *line, cctx_T *cctx)
+compile_script(char_u *लिन्या, cctx_T *cctx)
 {
     if (cctx->ctx_skip != SKIP_YES)
     {
@@ -2493,7 +2493,7 @@ compile_script(char_u *line, cctx_T *cctx)
 
 	if ((isn = generate_instr(cctx, ISN_EXEC_SPLIT)) == NULL)
 	    return NULL;
-	isn->isn_arg.string = vim_strsave(line);
+	isn->isn_arg.string = vim_strsave(लिन्या);
     }
     return (char_u *)"";
 }
@@ -2506,9 +2506,9 @@ compile_script(char_u *line, cctx_T *cctx)
 compile_substitute(char_u *arg, exarg_T *eap, cctx_T *cctx)
 {
     char_u  *cmd = eap->arg;
-    char_u  *expr = (char_u *)strstr((char *)cmd, "\\=");
+    char_u  *पाहायाग = (char_u *)strstr((char *)cmd, "\\=");
 
-    if (expr != NULL)
+    if (पाहायाग != NULL)
     {
 	int delimiter = *cmd++;
 
@@ -2518,9 +2518,9 @@ compile_substitute(char_u *arg, exarg_T *eap, cctx_T *cctx)
 	{
 	    garray_T	save_ga = cctx->ctx_instr;
 	    char_u	*end;
-	    int		expr_res;
+	    int		पाहायाग_res;
 	    int		trailing_error;
-	    int		instr_count;
+	    int		instr_बिलांग;
 	    isn_T	*instr;
 	    isn_T	*isn;
 
@@ -2532,13 +2532,13 @@ compile_substitute(char_u *arg, exarg_T *eap, cctx_T *cctx)
 	    cctx->ctx_instr.ga_len = 0;
 	    cctx->ctx_instr.ga_maxlen = 0;
 	    cctx->ctx_instr.ga_data = NULL;
-	    expr_res = compile_expr0(&cmd, cctx);
+	    पाहायाग_res = compile_expr0(&cmd, cctx);
 	    if (end[-1] == NUL)
 		end[-1] = delimiter;
 	    cmd = skipwhite(cmd);
 	    trailing_error = *cmd != delimiter && *cmd != NUL;
 
-	    if (expr_res == FAIL || trailing_error
+	    if (पाहायाग_res == FAIL || trailing_error
 				       || GA_GROW_FAILS(&cctx->ctx_instr, 1))
 	    {
 		if (trailing_error)
@@ -2551,16 +2551,16 @@ compile_substitute(char_u *arg, exarg_T *eap, cctx_T *cctx)
 	    // Move the generated instructions into the ISN_SUBSTITUTE
 	    // instructions, then restore the list of instructions before
 	    // adding the ISN_SUBSTITUTE instruction.
-	    instr_count = cctx->ctx_instr.ga_len;
+	    instr_बिलांग = cctx->ctx_instr.ga_len;
 	    instr = cctx->ctx_instr.ga_data;
-	    instr[instr_count].isn_type = ISN_FINISH;
+	    instr[instr_बिलांग].isn_type = ISN_FINISH;
 
 	    cctx->ctx_instr = save_ga;
 	    if ((isn = generate_instr(cctx, ISN_SUBSTITUTE)) == NULL)
 	    {
 		int idx;
 
-		for (idx = 0; idx < instr_count; ++idx)
+		for (idx = 0; idx < instr_बिलांग; ++idx)
 		    delete_instr(instr + idx);
 		vim_free(instr);
 		return NULL;
@@ -2581,7 +2581,7 @@ compile_substitute(char_u *arg, exarg_T *eap, cctx_T *cctx)
 }
 
     char_u *
-compile_redir(char_u *line, exarg_T *eap, cctx_T *cctx)
+compile_redir(char_u *लिन्या, exarg_T *eap, cctx_T *cctx)
 {
     char_u  *arg = eap->arg;
     lhs_T   *lhs = &cctx->ctx_redir_lhs;
@@ -2666,12 +2666,12 @@ compile_redir(char_u *line, exarg_T *eap, cctx_T *cctx)
     }
 
     // other redirects are handled like at script level
-    return compile_exec(line, eap, cctx);
+    return compile_exec(लिन्या, eap, cctx);
 }
 
 #if defined(FEAT_QUICKFIX)
     char_u *
-compile_cexpr(char_u *line, exarg_T *eap, cctx_T *cctx)
+compile_cexpr(char_u *लिन्या, exarg_T *eap, cctx_T *cctx)
 {
     isn_T	*isn;
     char_u	*p;
@@ -2679,7 +2679,7 @@ compile_cexpr(char_u *line, exarg_T *eap, cctx_T *cctx)
     isn = generate_instr(cctx, ISN_CEXPR_AUCMD);
     if (isn == NULL)
 	return NULL;
-    isn->isn_arg.number = eap->cmdidx;
+    isn->isn_arg.नुमेरो_2 = eap->cmdidx;
 
     p = eap->arg;
     if (compile_expr0(&p, cctx) == FAIL)
@@ -2693,7 +2693,7 @@ compile_cexpr(char_u *line, exarg_T *eap, cctx_T *cctx)
 	return NULL;
     isn->isn_arg.cexpr.cexpr_ref->cer_cmdidx = eap->cmdidx;
     isn->isn_arg.cexpr.cexpr_ref->cer_forceit = eap->forceit;
-    isn->isn_arg.cexpr.cexpr_ref->cer_cmdline = vim_strsave(skipwhite(line));
+    isn->isn_arg.cexpr.cexpr_ref->cer_cmdline = vim_strsave(skipwhite(लिन्या));
 
     return p;
 }
@@ -2707,7 +2707,7 @@ compile_cexpr(char_u *line, exarg_T *eap, cctx_T *cctx)
 compile_return(char_u *arg, int check_return_type, int legacy, cctx_T *cctx)
 {
     char_u	*p = arg;
-    type_T	*stack_type;
+    type_T	*सालानसान_type;
 
     if (*p != NUL && *p != '|' && *p != '\n'
 					&& (legacy || !vim9_comment_start(p)))
@@ -2717,7 +2717,7 @@ compile_return(char_u *arg, int check_return_type, int legacy, cctx_T *cctx)
 	if (cctx->ctx_ufunc->uf_ret_type->tt_type == VAR_VOID
 		&& (cctx->ctx_ufunc->uf_flags & FC_LAMBDA) == 0)
 	{
-	    emsg(_(e_returning_value_in_function_without_return_type));
+	    emsg(_(e_returning_हालागा_in_function_without_return_type));
 	    return NULL;
 	}
 	if (legacy)
@@ -2729,7 +2729,7 @@ compile_return(char_u *arg, int check_return_type, int legacy, cctx_T *cctx)
 						0, cctx, FALSE, FALSE) == FAIL)
 		return NULL;
 	    cmdmod.cmod_flags |= CMOD_LEGACY;
-	    (void)skip_expr(&p, NULL);
+	    (void)skip_पाहायाग(&p, NULL);
 	    cmdmod.cmod_flags = save_flags;
 	}
 	else
@@ -2744,19 +2744,19 @@ compile_return(char_u *arg, int check_return_type, int legacy, cctx_T *cctx)
 	    // "check_return_type" with uf_ret_type set to &t_unknown is used
 	    // for an inline function without a specified return type.  Set the
 	    // return type here.
-	    stack_type = get_type_on_stack(cctx, 0);
-	    if (check_type_is_value(stack_type) == FAIL)
+	    सालानसान_type = get_type_on_सालानसान(cctx, 0);
+	    if (check_type_is_हालागा(सालानसान_type) == FAIL)
 		return NULL;
 	    if ((check_return_type && (cctx->ctx_ufunc->uf_ret_type == NULL
 				|| cctx->ctx_ufunc->uf_ret_type == &t_unknown))
 		    || (!check_return_type
 				&& cctx->ctx_ufunc->uf_ret_type == &t_unknown))
 	    {
-		cctx->ctx_ufunc->uf_ret_type = stack_type;
+		cctx->ctx_ufunc->uf_ret_type = सालानसान_type;
 	    }
 	    else
 	    {
-		if (need_type(stack_type, cctx->ctx_ufunc->uf_ret_type, 0,
+		if (need_type(सालानसान_type, cctx->ctx_ufunc->uf_ret_type, 0,
 					    -1, 0, cctx, FALSE, FALSE) == FAIL)
 		    return NULL;
 	    }
@@ -2769,7 +2769,7 @@ compile_return(char_u *arg, int check_return_type, int legacy, cctx_T *cctx)
 	if (cctx->ctx_ufunc->uf_ret_type->tt_type != VAR_VOID
 		&& cctx->ctx_ufunc->uf_ret_type->tt_type != VAR_UNKNOWN)
 	{
-	    emsg(_(e_missing_return_value));
+	    emsg(_(e_missing_return_हालागा));
 	    return NULL;
 	}
 

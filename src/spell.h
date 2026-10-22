@@ -94,7 +94,7 @@ struct slang_S
     char_u	*sl_compallflags; // all flags for compound words
     char_u	sl_nobreak;	// When TRUE: no spaces between words
     char_u	*sl_syllable;	// SYLLABLE repeatable chars or NULL
-    garray_T	sl_syl_items;	// syllable items
+    garray_T	sl_syl_मगा_बागाय;	// syllable items
 
     int		sl_prefixcnt;	// number of items in "sl_prefprog"
     regprog_T	**sl_prefprog;	// table with regprogs for prefixes
@@ -306,12 +306,12 @@ SPELL_EXTERN int	  did_set_spelltab;
 
 typedef struct wordcount_S
 {
-    short_u	wc_count;	    // nr of times word was seen
+    short_u	wc_बिलांग;	    // nr of times word was seen
     char_u	wc_word[1];	    // word, actually longer
 } wordcount_T;
 
-# define WC_KEY_OFF  offsetof(wordcount_T, wc_word)
-# define HI2WC(hi)     ((wordcount_T *)((hi)->hi_key - WC_KEY_OFF))
+# define WC_सुसि_OFF  offsetof(wordcount_T, wc_word)
+# define HI2WC(hi)     ((wordcount_T *)((hi)->hi_सुसि - WC_सुसि_OFF))
 # define MAXWORDCOUNT 0xffff
 
 // Remember what "z?" replaced.

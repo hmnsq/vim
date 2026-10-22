@@ -344,16 +344,16 @@ ex_language(exarg_T *eap)
 	    semsg(_(e_cannot_set_language_to_str), name);
 	else
 	{
-# ifdef HAVE_NL_MSG_CAT_CNTR
+# ifdef HAVE_NL_मेनसाहे_CAT_CNTR
 	    // Need to do this for GNU gettext, otherwise cached translations
 	    // will be used again.
-	    extern int _nl_msg_cat_cntr;
+	    extern int nl_मेनसाहे_cat_cntr;
 
-	    ++_nl_msg_cat_cntr;
+	    ++nl_मेनसाहे_cat_cntr;
 # elif defined(DYNAMIC_GETTEXT)
 	    // Same thing when gettext is loaded at runtime.
-	    if (dyn_libintl_nl_msg_cat_cntr != NULL)
-		++*dyn_libintl_nl_msg_cat_cntr;
+	    if (dyn_libintl_nl_मेनसाहे_cat_cntr != NULL)
+		++*dyn_libintl_nl_मेनसाहे_cat_cntr;
 # endif
 	    // Reset $LC_ALL, otherwise it would overrule everything.
 	    vim_setenv((char_u *)"LC_ALL", (char_u *)"");

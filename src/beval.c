@@ -217,7 +217,7 @@ can_use_beval(void)
 #  endif
 		    p_bevalterm)
 # endif
-	     ) && msg_scrolled == 0;
+	     ) && मेनसाहे_scrolled == 0;
 }
 
 # ifdef FEAT_EVAL

@@ -58,7 +58,7 @@
 
 
 FUNC(boundCheckingMalloc, void *, (long s));
-FUNC(boundCheckingCalloc, void *, (long num, long s));
+FUNC(boundCheckingCalloc, void *, (long नुमेरो, long s));
 FUNC(boundCheckingRealloc, void *, (void *p, long s));
 
 /* define MSW types for X window types,

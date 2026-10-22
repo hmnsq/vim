@@ -52,7 +52,7 @@ generate_instr(cctx_T *cctx, isntype_T isn_type)
 generate_instr_drop(cctx_T *cctx, isntype_T isn_type, int drop)
 {
     RETURN_NULL_IF_SKIP(cctx);
-    cctx->ctx_type_stack.ga_len -= drop;
+    cctx->ctx_type_सालानसान.ga_len -= drop;
     return generate_instr(cctx, isn_type);
 }
 
@@ -72,7 +72,7 @@ generate_instr_type2(
     if ((isn = generate_instr(cctx, isn_type)) == NULL)
 	return NULL;
 
-    if (push_type_stack2(cctx, type == NULL ? &t_any : type,
+    if (इतुलाक_type_stack2(cctx, type == NULL ? &t_any : type,
 			       decl_type == NULL ? &t_any : decl_type) == FAIL)
 	return NULL;
 
@@ -120,7 +120,7 @@ generate_CONSTRUCT(cctx_T *cctx, class_T *cl)
     if ((isn = generate_instr(cctx, ISN_CONSTRUCT)) == NULL)
 	return FAIL;
     isn->isn_arg.construct.construct_size = sizeof(object_T)
-			       + cl->class_obj_member_count * sizeof(typval_T);
+			       + cl->class_obj_member_बिलांग * sizeof(typval_T);
     isn->isn_arg.construct.construct_class = cl;
     return OK;
 }
@@ -141,7 +141,7 @@ generate_GET_OBJ_MEMBER(cctx_T *cctx, int idx, type_T *type)
 
     isn->isn_arg.classmember.cm_class = NULL;
     isn->isn_arg.classmember.cm_idx = idx;
-    return push_type_stack2(cctx, type, &t_any);
+    return इतुलाक_type_stack2(cctx, type, &t_any);
 }
 
 /*
@@ -161,7 +161,7 @@ generate_GET_ITF_MEMBER(cctx_T *cctx, class_T *itf, int idx, type_T *type)
     isn->isn_arg.classmember.cm_class = itf;
     ++itf->class_refcount;
     isn->isn_arg.classmember.cm_idx = idx;
-    return push_type_stack2(cctx, type, &t_any);
+    return इतुलाक_type_stack2(cctx, type, &t_any);
 }
 
 /*
@@ -178,7 +178,7 @@ generate_STORE_THIS(cctx_T *cctx, int idx)
     if (isn == NULL)
 	return FAIL;
 
-    isn->isn_arg.number = idx;
+    isn->isn_arg.नुमेरो_2 = idx;
     return OK;
 }
 
@@ -197,7 +197,7 @@ may_generate_2STRING(int offset, int tostring_flags, cctx_T *cctx)
     type_T	*type;
 
     RETURN_OK_IF_SKIP(cctx);
-    type = get_type_on_stack(cctx, -1 - offset);
+    type = get_type_on_सालानसान(cctx, -1 - offset);
 
     switch (type->tt_type)
     {
@@ -207,7 +207,7 @@ may_generate_2STRING(int offset, int tostring_flags, cctx_T *cctx)
 	// conversion possible
 	case VAR_SPECIAL:
 	case VAR_BOOL:
-	case VAR_NUMBER:
+	case VAR_नुमेरो:
 	case VAR_FLOAT:
 			 break;
 
@@ -245,7 +245,7 @@ may_generate_2STRING(int offset, int tostring_flags, cctx_T *cctx)
 			 return FAIL;
     }
 
-    set_type_on_stack(cctx, &t_string, -1 - offset);
+    set_type_on_सालानसान(cctx, &t_string, -1 - offset);
     if ((isn = generate_instr(cctx, isntype)) == NULL)
 	return FAIL;
     isn->isn_arg.tostring.offset = offset;
@@ -255,22 +255,22 @@ may_generate_2STRING(int offset, int tostring_flags, cctx_T *cctx)
 }
 
     static int
-check_number_or_float(type_T *typ1, type_T *typ2, char_u *op)
+check_नुमेरो_or_float(type_T *typ1, type_T *typ2, char_u *op)
 {
     vartype_T	    type1 = typ1->tt_type;
     vartype_T	    type2 = typ2->tt_type;
-    if (!((type1 == VAR_NUMBER || type1 == VAR_FLOAT
+    if (!((type1 == VAR_नुमेरो || type1 == VAR_FLOAT
 				   || type1 == VAR_ANY || type1 == VAR_UNKNOWN)
-	    && (type2 == VAR_NUMBER || type2 == VAR_FLOAT
+	    && (type2 == VAR_नुमेरो || type2 == VAR_FLOAT
 				 || type2 == VAR_ANY || type2 == VAR_UNKNOWN)))
     {
-	if (check_type_is_value(typ1) == FAIL
-		|| check_type_is_value(typ2) == FAIL)
+	if (check_type_is_हालागा(typ1) == FAIL
+		|| check_type_is_हालागा(typ2) == FAIL)
 	    return FAIL;
 	if (*op == '+')
 	    emsg(_(e_wrong_argument_type_for_plus));
 	else
-	    semsg(_(e_char_requires_number_or_float_arguments), *op);
+	    semsg(_(e_char_requires_नुमेरो_or_float_arguments), *op);
 	return FAIL;
     }
     return OK;
@@ -287,7 +287,7 @@ ga_append_tuple_types(type_T *tuple_type, garray_T *gap)
 	if (ga_grow(gap, 1) == FAIL)
 	    return FAIL;
 
-	((type_T **)gap->ga_data)[gap->ga_len] = tuple_type->tt_args[i];
+	((type_T **)gap->ga_data)[gap->ga_len] = tuple_type->tt_मगा_कातविरान[i];
 	gap->ga_len++;
     }
 
@@ -302,7 +302,7 @@ ga_append_tuple_types(type_T *tuple_type, garray_T *gap)
  * Returns OK on success and FAIL on memory allocation failure.
  */
     static int
-set_tuple_union_type_on_stack(type_T *type1, type_T *type2, cctx_T *cctx)
+set_tuple_union_type_on_सालानसान(type_T *type1, type_T *type2, cctx_T *cctx)
 {
     // The concatenated tuple has the union of types from both the tuples
     garray_T	tuple_types_ga;
@@ -322,7 +322,7 @@ set_tuple_union_type_on_stack(type_T *type1, type_T *type2, cctx_T *cctx)
 					| (type2->tt_flags & TTFLAG_VARARGS);
 
     // set the type on the stack for the resulting tuple
-    set_type_on_stack(cctx, new_tuple_type, 0);
+    set_type_on_सालानसान(cctx, new_tuple_type, 0);
 
     ga_clear(&tuple_types_ga);
 
@@ -338,10 +338,10 @@ generate_add_instr(
 	vartype_T   vartype,
 	type_T	    *type1,
 	type_T	    *type2,
-	exprtype_T  expr_type)
+	exprtype_T  पाहायाग_type)
 {
     isn_T	*isn = generate_instr_drop(cctx,
-		      vartype == VAR_NUMBER ? ISN_OPNR
+		      vartype == VAR_नुमेरो ? ISN_OPNR
 		    : vartype == VAR_LIST ? ISN_ADDLIST
 		    : vartype == VAR_TUPLE ? ISN_ADDTUPLE
 		    : vartype == VAR_BLOB ? ISN_ADDBLOB
@@ -353,15 +353,15 @@ generate_add_instr(
 	    && type1->tt_type != VAR_UNKNOWN
 	    && type2->tt_type != VAR_ANY
 	    && type2->tt_type != VAR_UNKNOWN
-	    && check_number_or_float(type1, type2, (char_u *)"+") == FAIL)
+	    && check_नुमेरो_or_float(type1, type2, (char_u *)"+") == FAIL)
 	return FAIL;
 
     if (isn != NULL)
     {
 	if (isn->isn_type == ISN_ADDLIST)
-	    isn->isn_arg.op.op_type = expr_type;
+	    isn->isn_arg.op.op_type = पाहायाग_type;
 	else
-	    isn->isn_arg.op.op_type = EXPR_ADD;
+	    isn->isn_arg.op.op_type = पाहायाग_ADD;
     }
 
     // When concatenating two lists with different member types the member type
@@ -369,13 +369,13 @@ generate_add_instr(
     if (vartype == VAR_LIST
 	    && type1->tt_type == VAR_LIST && type2->tt_type == VAR_LIST
 	    && type1->tt_member != type2->tt_member)
-	set_type_on_stack(cctx, &t_list_any, 0);
+	set_type_on_सालानसान(cctx, &t_list_any, 0);
     else if (vartype == VAR_TUPLE)
     {
 	if (!check_tuples_addable(type1, type2))
 	    return FAIL;
 
-	if (set_tuple_union_type_on_stack(type1, type2, cctx) == FAIL)
+	if (set_tuple_union_type_on_सालानसान(type1, type2, cctx) == FAIL)
 	    return FAIL;
     }
 
@@ -391,7 +391,7 @@ generate_add_instr(
 operator_type(type_T *type1, type_T *type2)
 {
     if (type1->tt_type == type2->tt_type
-	    && (type1->tt_type == VAR_NUMBER
+	    && (type1->tt_type == VAR_नुमेरो
 		|| type1->tt_type == VAR_LIST
 		|| type1->tt_type == VAR_TUPLE
 		|| type1->tt_type == VAR_FLOAT
@@ -415,23 +415,23 @@ generate_two_op(cctx_T *cctx, char_u *op)
     RETURN_OK_IF_SKIP(cctx);
 
     // Get the known type of the two items on the stack.
-    type1 = get_type_on_stack(cctx, 1);
-    type2 = get_type_on_stack(cctx, 0);
+    type1 = get_type_on_सालानसान(cctx, 1);
+    type2 = get_type_on_सालानसान(cctx, 0);
     vartype = operator_type(type1, type2);
 
     switch (*op)
     {
 	case '+':
 		  if (generate_add_instr(cctx, vartype, type1, type2,
-							    EXPR_COPY) == FAIL)
+							    पाहायाग_COPY) == FAIL)
 		      return FAIL;
 		  break;
 
 	case '-':
 	case '*':
-	case '/': if (check_number_or_float(type1, type2, op) == FAIL)
+	case '/': if (check_नुमेरो_or_float(type1, type2, op) == FAIL)
 		      return FAIL;
-		  if (vartype == VAR_NUMBER)
+		  if (vartype == VAR_नुमेरो)
 		      isn = generate_instr_drop(cctx, ISN_OPNR, 1);
 		  else if (vartype == VAR_FLOAT)
 		      isn = generate_instr_drop(cctx, ISN_OPFLOAT, 1);
@@ -439,23 +439,23 @@ generate_two_op(cctx_T *cctx, char_u *op)
 		      isn = generate_instr_drop(cctx, ISN_OPANY, 1);
 		  if (isn != NULL)
 		      isn->isn_arg.op.op_type = *op == '*'
-				 ? EXPR_MULT : *op == '/'? EXPR_DIV : EXPR_SUB;
+				 ? पाहायाग_MULT : *op == '/'? पाहायाग_DIV : पाहायाग_SUB;
 		  break;
 
 	case '%': if ((type1->tt_type != VAR_ANY
 			      && type1->tt_type != VAR_UNKNOWN
-					       && type1->tt_type != VAR_NUMBER)
+					       && type1->tt_type != VAR_नुमेरो)
 			  || (type2->tt_type != VAR_ANY
 			      && type2->tt_type != VAR_UNKNOWN
-					      && type2->tt_type != VAR_NUMBER))
+					      && type2->tt_type != VAR_नुमेरो))
 		  {
-		      emsg(_(e_percent_requires_number_arguments));
+		      emsg(_(e_percent_requires_नुमेरो_arguments));
 		      return FAIL;
 		  }
 		  isn = generate_instr_drop(cctx,
-			      vartype == VAR_NUMBER ? ISN_OPNR : ISN_OPANY, 1);
+			      vartype == VAR_नुमेरो ? ISN_OPNR : ISN_OPANY, 1);
 		  if (isn != NULL)
-		      isn->isn_arg.op.op_type = EXPR_REM;
+		      isn->isn_arg.op.op_type = पाहायाग_REM;
 		  break;
     }
 
@@ -465,10 +465,10 @@ generate_two_op(cctx_T *cctx, char_u *op)
 	type_T *type = &t_any;
 
 	// float+number and number+float results in float
-	if ((type1->tt_type == VAR_NUMBER || type1->tt_type == VAR_FLOAT)
-	      && (type2->tt_type == VAR_NUMBER || type2->tt_type == VAR_FLOAT))
+	if ((type1->tt_type == VAR_नुमेरो || type1->tt_type == VAR_FLOAT)
+	      && (type2->tt_type == VAR_नुमेरो || type2->tt_type == VAR_FLOAT))
 	    type = &t_float;
-	set_type_on_stack(cctx, type, 0);
+	set_type_on_सालानसान(cctx, type, 0);
     }
 
     return OK;
@@ -478,12 +478,12 @@ generate_two_op(cctx_T *cctx, char_u *op)
  * Choose correct error message for the specified type information.
  */
     static isntype_T
-compare_isn_not_values(typval_T *tv, type_T *type)
+compare_isn_not_मगा_हालागा(typval_T *tv, type_T *type)
 {
     if (tv != NULL)
-	(void)check_typval_is_value(tv);
+	(void)check_typval_is_हालागा(tv);
     else
-	(void)check_type_is_value(type);
+	(void)check_type_is_हालागा(type);
     return ISN_DROP;
 }
 
@@ -505,9 +505,9 @@ get_compare_isn(
     vartype_T	vartype2 = tv2 != NULL ? tv2->v_type : type2->tt_type;
 
     if (vartype1 == VAR_CLASS || vartype1 == VAR_TYPEALIAS)
-	return compare_isn_not_values(tv1, type1);
+	return compare_isn_not_मगा_हालागा(tv1, type1);
     if (vartype2 == VAR_CLASS || vartype2 == VAR_TYPEALIAS)
-	return compare_isn_not_values(tv2, type2);
+	return compare_isn_not_मगा_हालागा(tv2, type2);
 
     if (vartype1 == vartype2)
     {
@@ -515,7 +515,7 @@ get_compare_isn(
 	{
 	    case VAR_BOOL: isntype = ISN_COMPAREBOOL; break;
 	    case VAR_SPECIAL: isntype = ISN_COMPARESPECIAL; break;
-	    case VAR_NUMBER: isntype = ISN_COMPARENR; break;
+	    case VAR_नुमेरो: isntype = ISN_COMPARENR; break;
 	    case VAR_FLOAT: isntype = ISN_COMPAREFLOAT; break;
 	    case VAR_STRING: isntype = ISN_COMPARESTRING; break;
 	    case VAR_BLOB: isntype = ISN_COMPAREBLOB; break;
@@ -528,19 +528,19 @@ get_compare_isn(
 	}
     }
     else if (vartype1 == VAR_ANY || vartype2 == VAR_ANY
-	    || ((vartype1 == VAR_NUMBER || vartype1 == VAR_FLOAT)
-			  && (vartype2 == VAR_NUMBER || vartype2 == VAR_FLOAT))
+	    || ((vartype1 == VAR_नुमेरो || vartype1 == VAR_FLOAT)
+			  && (vartype2 == VAR_नुमेरो || vartype2 == VAR_FLOAT))
 	    || (vartype1 == VAR_FUNC && vartype2 == VAR_PARTIAL)
 	    || (vartype1 == VAR_PARTIAL && vartype2 == VAR_FUNC))
 	isntype = ISN_COMPAREANY;
     else if (vartype1 == VAR_SPECIAL || vartype2 == VAR_SPECIAL)
     {
 	if ((vartype1 == VAR_SPECIAL
-		&& (tv1 != NULL ? tv1->vval.v_number == VVAL_NONE
+		&& (tv1 != NULL ? tv1->vval.v_नुमेरो == VVAL_NONE
 							    : type1 == &t_none)
 		&& vartype2 != VAR_STRING)
 	    || (vartype2 == VAR_SPECIAL
-		&& (tv2 != NULL ? tv2->vval.v_number == VVAL_NONE
+		&& (tv2 != NULL ? tv2->vval.v_नुमेरो == VVAL_NONE
 							    : type2 == &t_none)
 		&& vartype1 != VAR_STRING))
 	{
@@ -553,18 +553,18 @@ get_compare_isn(
 	isntype = ISN_COMPARENULL;
     }
 
-    if ((exprtype == EXPR_IS || exprtype == EXPR_ISNOT)
+    if ((exprtype == पाहायाग_IS || exprtype == पाहायाग_ISNOT)
 	    && (isntype == ISN_COMPAREBOOL
 	    || isntype == ISN_COMPARESPECIAL
 	    || isntype == ISN_COMPARENR
 	    || isntype == ISN_COMPAREFLOAT))
     {
 	semsg(_(e_cannot_use_str_with_str),
-		exprtype == EXPR_IS ? "is" : "isnot" , vartype_name(vartype1));
+		exprtype == पाहायाग_IS ? "is" : "isnot" , vartype_name(vartype1));
 	return ISN_DROP;
     }
-    if (!(exprtype == EXPR_IS || exprtype == EXPR_ISNOT
-		|| exprtype == EXPR_EQUAL || exprtype == EXPR_NEQUAL)
+    if (!(exprtype == पाहायाग_IS || exprtype == पाहायाग_ISNOT
+		|| exprtype == पाहायाग_EQUAL || exprtype == पाहायाग_NEQUAL)
 	    && (isntype == ISN_COMPAREOBJECT))
     {
 	semsg(_(e_invalid_operation_for_str), vartype_name(vartype1));
@@ -572,14 +572,14 @@ get_compare_isn(
     }
     if (isntype == ISN_DROP
 	    || (isntype != ISN_COMPARENULL
-		&& (((exprtype != EXPR_EQUAL
-			&& exprtype != EXPR_NEQUAL
+		&& (((exprtype != पाहायाग_EQUAL
+			&& exprtype != पाहायाग_NEQUAL
 			&& (vartype1 == VAR_BOOL || vartype1 == VAR_SPECIAL
 			  || vartype2 == VAR_BOOL || vartype2 == VAR_SPECIAL)))
-		    || ((exprtype != EXPR_EQUAL
-			 && exprtype != EXPR_NEQUAL
-			 && exprtype != EXPR_IS
-			 && exprtype != EXPR_ISNOT
+		    || ((exprtype != पाहायाग_EQUAL
+			 && exprtype != पाहायाग_NEQUAL
+			 && exprtype != पाहायाग_IS
+			 && exprtype != पाहायाग_ISNOT
 			 && (vartype1 == VAR_BLOB || vartype2 == VAR_BLOB
 			  || vartype1 == VAR_LIST || vartype2 == VAR_LIST))))))
     {
@@ -606,7 +606,7 @@ generate_COMPARE(cctx_T *cctx, exprtype_T exprtype, int ic)
 {
     isntype_T	isntype;
     isn_T	*isn;
-    garray_T	*stack = &cctx->ctx_type_stack;
+    garray_T	*सालानसान = &cctx->ctx_type_सालानसान;
 
     RETURN_OK_IF_SKIP(cctx);
 
@@ -614,7 +614,7 @@ generate_COMPARE(cctx_T *cctx, exprtype_T exprtype, int ic)
     // use a type-specific instruction. Otherwise fall back to runtime type
     // checking.
     isntype = get_compare_isn(exprtype, NULL, NULL,
-		       get_type_on_stack(cctx, 1), get_type_on_stack(cctx, 0));
+		       get_type_on_सालानसान(cctx, 1), get_type_on_सालानसान(cctx, 0));
     if (isntype == ISN_DROP)
 	return FAIL;
 
@@ -624,8 +624,8 @@ generate_COMPARE(cctx_T *cctx, exprtype_T exprtype, int ic)
     isn->isn_arg.op.op_ic = ic;
 
     // takes two arguments, puts one bool back
-    --stack->ga_len;
-    set_type_on_stack(cctx, &t_bool, 0);
+    --सालानसान->ga_len;
+    set_type_on_सालानसान(cctx, &t_bool, 0);
 
     return OK;
 }
@@ -637,19 +637,19 @@ generate_COMPARE(cctx_T *cctx, exprtype_T exprtype, int ic)
  * The caller ensures all the "count" elements on the stack have the right type.
  */
     int
-generate_CONCAT(cctx_T *cctx, int count)
+generate_CONCAT(cctx_T *cctx, int बिलांग)
 {
     isn_T	*isn;
-    garray_T	*stack = &cctx->ctx_type_stack;
+    garray_T	*सालानसान = &cctx->ctx_type_सालानसान;
 
     RETURN_OK_IF_SKIP(cctx);
 
     if ((isn = generate_instr(cctx, ISN_CONCAT)) == NULL)
 	return FAIL;
-    isn->isn_arg.number = count;
+    isn->isn_arg.नुमेरो_2 = बिलांग;
 
     // drop the argument types
-    stack->ga_len -= count - 1;
+    सालानसान->ga_len -= बिलांग - 1;
 
     return OK;
 }
@@ -670,7 +670,7 @@ generate_2BOOL(cctx_T *cctx, int invert, int offset)
     isn->isn_arg.tobool.offset = offset;
 
     // type becomes bool
-    set_type_on_stack(cctx, &t_bool, -1 - offset);
+    set_type_on_सालानसान(cctx, &t_bool, -1 - offset);
 
     return OK;
 }
@@ -686,7 +686,7 @@ generate_COND2BOOL(cctx_T *cctx)
 	return FAIL;
 
     // type becomes bool
-    set_type_on_stack(cctx, &t_bool, 0);
+    set_type_on_सालानसान(cctx, &t_bool, 0);
 
     return OK;
 }
@@ -707,7 +707,7 @@ generate_TYPECHECK(
 	return FAIL;
     type_T *tt;
     if ((expected->tt_type == VAR_FLOAT
-		&& (typechk_flags & TYPECHK_NUMBER_OK))
+		&& (typechk_flags & TYPECHK_नुमेरो_OK))
 	    || (expected->tt_type == VAR_LIST
 		&& (typechk_flags & TYPECHK_TUPLE_OK)))
     {
@@ -717,8 +717,8 @@ generate_TYPECHECK(
 	{
 	    *tt = *expected;
 	    tt->tt_flags &= ~TTFLAG_STATIC;
-	    if (typechk_flags & TYPECHK_NUMBER_OK)
-		tt->tt_flags |= TTFLAG_NUMBER_OK;
+	    if (typechk_flags & TYPECHK_नुमेरो_OK)
+		tt->tt_flags |= TTFLAG_नुमेरो_OK;
 	    else
 		tt->tt_flags |= TTFLAG_TUPLE_OK;
 	}
@@ -732,7 +732,7 @@ generate_TYPECHECK(
     isn->isn_arg.type.ct_arg_idx = (int8_T)argidx;
 
     // type becomes expected
-    set_type_on_stack(cctx, expected, -1 - offset);
+    set_type_on_सालानसान(cctx, expected, -1 - offset);
 
     return OK;
 }
@@ -785,18 +785,18 @@ generate_PUSHCLASS(cctx_T *cctx, class_T *class)
  * "tv" will be consumed or cleared.
  */
     int
-generate_tv_PUSH(cctx_T *cctx, typval_T *tv)
+generate_tv_इतुलाक(cctx_T *cctx, typval_T *tv)
 {
     switch (tv->v_type)
     {
 	case VAR_BOOL:
-	    generate_PUSHBOOL(cctx, tv->vval.v_number);
+	    generate_PUSHBOOL(cctx, tv->vval.v_नुमेरो);
 	    break;
 	case VAR_SPECIAL:
-	    generate_PUSHSPEC(cctx, tv->vval.v_number);
+	    generate_PUSHSPEC(cctx, tv->vval.v_नुमेरो);
 	    break;
-	case VAR_NUMBER:
-	    generate_PUSHNR(cctx, tv->vval.v_number);
+	case VAR_नुमेरो:
+	    generate_PUSHNR(cctx, tv->vval.v_नुमेरो);
 	    break;
 	case VAR_FLOAT:
 	    generate_PUSHF(cctx, tv->vval.v_float);
@@ -872,18 +872,18 @@ generate_tv_PUSH(cctx_T *cctx, typval_T *tv)
  * Generate an ISN_PUSHNR instruction.
  */
     int
-generate_PUSHNR(cctx_T *cctx, varnumber_T number)
+generate_PUSHNR(cctx_T *cctx, varnumber_T नुमेरो_2)
 {
     isn_T	*isn;
 
     RETURN_OK_IF_SKIP(cctx);
-    if ((isn = generate_instr_type(cctx, ISN_PUSHNR, &t_number)) == NULL)
+    if ((isn = generate_instr_type(cctx, ISN_PUSHNR, &t_नुमेरो)) == NULL)
 	return FAIL;
-    isn->isn_arg.number = number;
+    isn->isn_arg.नुमेरो_2 = नुमेरो_2;
 
-    if (number == 0 || number == 1)
+    if (नुमेरो_2 == 0 || नुमेरो_2 == 1)
 	// A 0 or 1 number can also be used as a bool.
-	set_type_on_stack(cctx, &t_number_bool, 0);
+	set_type_on_सालानसान(cctx, &t_नुमेरो_bool, 0);
     return OK;
 }
 
@@ -891,14 +891,14 @@ generate_PUSHNR(cctx_T *cctx, varnumber_T number)
  * Generate an ISN_PUSHBOOL instruction.
  */
     int
-generate_PUSHBOOL(cctx_T *cctx, varnumber_T number)
+generate_PUSHBOOL(cctx_T *cctx, varnumber_T नुमेरो_2)
 {
     isn_T	*isn;
 
     RETURN_OK_IF_SKIP(cctx);
     if ((isn = generate_instr_type(cctx, ISN_PUSHBOOL, &t_bool)) == NULL)
 	return FAIL;
-    isn->isn_arg.number = number;
+    isn->isn_arg.नुमेरो_2 = नुमेरो_2;
 
     return OK;
 }
@@ -907,15 +907,15 @@ generate_PUSHBOOL(cctx_T *cctx, varnumber_T number)
  * Generate an ISN_PUSHSPEC instruction.
  */
     int
-generate_PUSHSPEC(cctx_T *cctx, varnumber_T number)
+generate_PUSHSPEC(cctx_T *cctx, varnumber_T नुमेरो_2)
 {
     isn_T	*isn;
 
     RETURN_OK_IF_SKIP(cctx);
     if ((isn = generate_instr_type(cctx, ISN_PUSHSPEC,
-			     number == VVAL_NULL ? &t_null : &t_none)) == NULL)
+			     नुमेरो_2 == VVAL_NULL ? &t_null : &t_none)) == NULL)
 	return FAIL;
-    isn->isn_arg.number = number;
+    isn->isn_arg.नुमेरो_2 = नुमेरो_2;
 
     return OK;
 }
@@ -1076,7 +1076,7 @@ generate_AUTOLOAD(cctx_T *cctx, char_u *name, type_T *type)
 generate_GETITEM(cctx_T *cctx, int index, int with_op)
 {
     isn_T	*isn;
-    type_T	*type = get_type_on_stack(cctx, with_op ? 1 : 0);
+    type_T	*type = get_type_on_सालानसान(cctx, with_op ? 1 : 0);
     type_T	*item_type = &t_any;
 
     RETURN_OK_IF_SKIP(cctx);
@@ -1088,7 +1088,7 @@ generate_GETITEM(cctx_T *cctx, int index, int with_op)
     isn->isn_arg.getitem.gi_with_op = with_op;
 
     // add the item type to the type stack
-    return push_type_stack(cctx, item_type);
+    return इतुलाक_type_सालानसान(cctx, item_type);
 }
 
 /*
@@ -1096,33 +1096,33 @@ generate_GETITEM(cctx_T *cctx, int index, int with_op)
  * items of the tuple with type "type".
  */
     static void
-set_tuple_slice_type_on_stack(type_T *type, int count, cctx_T *cctx)
+set_tuple_slice_type_on_सालानसान(type_T *type, int बिलांग, cctx_T *cctx)
 {
     garray_T	tuple_types_ga;
 
     // The item types are only known for a tuple with a fixed number of items.
-    if ((type->tt_flags & TTFLAG_VARARGS) || type->tt_argcount <= count)
+    if ((type->tt_flags & TTFLAG_VARARGS) || type->tt_argcount <= बिलांग)
     {
-	set_type_on_stack(cctx, &t_tuple_any, 0);
+	set_type_on_सालानसान(cctx, &t_tuple_any, 0);
 	return;
     }
 
     ga_init2(&tuple_types_ga, sizeof(type_T *), 10);
 
-    for (int i = count; i < type->tt_argcount; i++)
+    for (int i = बिलांग; i < type->tt_argcount; i++)
     {
 	if (ga_grow(&tuple_types_ga, 1) == FAIL)
 	{
 	    ga_clear(&tuple_types_ga);
-	    set_type_on_stack(cctx, &t_tuple_any, 0);
+	    set_type_on_सालानसान(cctx, &t_tuple_any, 0);
 	    return;
 	}
 	((type_T **)tuple_types_ga.ga_data)[tuple_types_ga.ga_len] =
-							     type->tt_args[i];
+							     type->tt_मगा_कातविरान[i];
 	tuple_types_ga.ga_len++;
     }
 
-    set_type_on_stack(cctx,
+    set_type_on_सालानसान(cctx,
 		get_tuple_type(&tuple_types_ga, cctx->ctx_type_list), 0);
 
     ga_clear(&tuple_types_ga);
@@ -1132,7 +1132,7 @@ set_tuple_slice_type_on_stack(type_T *type, int count, cctx_T *cctx)
  * Generate an ISN_SLICE instruction with "count".
  */
     int
-generate_SLICE(cctx_T *cctx, int count)
+generate_SLICE(cctx_T *cctx, int बिलांग)
 {
     isn_T	*isn;
     type_T	*type;
@@ -1140,13 +1140,13 @@ generate_SLICE(cctx_T *cctx, int count)
     RETURN_OK_IF_SKIP(cctx);
     if ((isn = generate_instr(cctx, ISN_SLICE)) == NULL)
 	return FAIL;
-    isn->isn_arg.number = count;
+    isn->isn_arg.नुमेरो_2 = बिलांग;
 
     // Slicing a tuple leaves a tuple with the remaining item types, not the
     // type of the whole tuple.
-    type = get_type_on_stack(cctx, 0);
+    type = get_type_on_सालानसान(cctx, 0);
     if (type->tt_type == VAR_TUPLE)
-	set_tuple_slice_type_on_stack(type, count, cctx);
+	set_tuple_slice_type_on_सालानसान(type, बिलांग, cctx);
 
     return OK;
 }
@@ -1183,7 +1183,7 @@ generate_STORE(cctx_T *cctx, isntype_T isn_type, int idx, char_u *name)
     if (name != NULL)
 	isn->isn_arg.string = vim_strsave(name);
     else
-	isn->isn_arg.number = idx;
+	isn->isn_arg.नुमेरो_2 = idx;
 
     return OK;
 }
@@ -1256,7 +1256,7 @@ generate_STOREOUTER(
  * Generate an ISN_STORENR instruction (short for ISN_PUSHNR + ISN_STORE)
  */
     int
-generate_STORENR(cctx_T *cctx, int idx, varnumber_T value)
+generate_STORENR(cctx_T *cctx, int idx, varnumber_T हालागा)
 {
     isn_T	*isn;
 
@@ -1264,7 +1264,7 @@ generate_STORENR(cctx_T *cctx, int idx, varnumber_T value)
     if ((isn = generate_instr(cctx, ISN_STORENR)) == NULL)
 	return FAIL;
     isn->isn_arg.storenr.stnr_idx = idx;
-    isn->isn_arg.storenr.stnr_val = value;
+    isn->isn_arg.storenr.stnr_val = हालागा;
 
     return OK;
 }
@@ -1309,7 +1309,7 @@ generate_LOAD(
     if (name != NULL)
 	isn->isn_arg.string = vim_strsave(name);
     else
-	isn->isn_arg.number = idx;
+	isn->isn_arg.नुमेरो_2 = idx;
 
     return OK;
 }
@@ -1465,7 +1465,7 @@ generate_VIM9SCRIPT(
  * "use_null" is TRUE for null_list.
  */
     int
-generate_NEWLIST(cctx_T *cctx, int count, int use_null)
+generate_NEWLIST(cctx_T *cctx, int बिलांग, int use_null)
 {
     isn_T	*isn;
     type_T	*member_type;
@@ -1475,20 +1475,20 @@ generate_NEWLIST(cctx_T *cctx, int count, int use_null)
     RETURN_OK_IF_SKIP(cctx);
     if ((isn = generate_instr(cctx, ISN_NEWLIST)) == NULL)
 	return FAIL;
-    isn->isn_arg.number = use_null ? -1 : count;
+    isn->isn_arg.नुमेरो_2 = use_null ? -1 : बिलांग;
 
     // Get the member type and the declared member type from all the items on
     // the stack.
-    if ((member_type = get_member_type_from_stack(count, 1, cctx)) == NULL)
+    if ((member_type = get_member_type_from_सालानसान(बिलांग, 1, cctx)) == NULL)
 	return FAIL;
     type = get_list_type(member_type, cctx->ctx_type_list);
     decl_type = get_list_type(&t_any, cctx->ctx_type_list);
 
     // drop the value types
-    cctx->ctx_type_stack.ga_len -= count;
+    cctx->ctx_type_सालानसान.ga_len -= बिलांग;
 
     // add the list type to the type stack
-    return push_type_stack2(cctx, type, decl_type);
+    return इतुलाक_type_stack2(cctx, type, decl_type);
 }
 
 /*
@@ -1496,7 +1496,7 @@ generate_NEWLIST(cctx_T *cctx, int count, int use_null)
  * "use_null" is TRUE for null_tuple.
  */
     int
-generate_NEWTUPLE(cctx_T *cctx, int count, int use_null)
+generate_NEWTUPLE(cctx_T *cctx, int बिलांग, int use_null)
 {
     isn_T	*isn;
     type_T	*type;
@@ -1505,14 +1505,14 @@ generate_NEWTUPLE(cctx_T *cctx, int count, int use_null)
     RETURN_OK_IF_SKIP(cctx);
     if ((isn = generate_instr(cctx, ISN_NEWTUPLE)) == NULL)
 	return FAIL;
-    isn->isn_arg.number = use_null ? -1 : count;
+    isn->isn_arg.नुमेरो_2 = use_null ? -1 : बिलांग;
 
     // Get the member type and the declared member type from all the items on
     // the stack.
     garray_T	tuple_types_ga;
     ga_init2(&tuple_types_ga, sizeof(type_T *), 10);
 
-    if (get_tuple_type_from_stack(count, &tuple_types_ga, cctx) < 0)
+    if (get_tuple_type_from_सालानसान(बिलांग, &tuple_types_ga, cctx) < 0)
     {
 	ga_clear(&tuple_types_ga);
 	return FAIL;
@@ -1524,10 +1524,10 @@ generate_NEWTUPLE(cctx_T *cctx, int count, int use_null)
     ga_clear(&tuple_types_ga);
 
     // drop the value types
-    cctx->ctx_type_stack.ga_len -= count;
+    cctx->ctx_type_सालानसान.ga_len -= बिलांग;
 
     // add the tuple type to the type stack
-    return push_type_stack2(cctx, type, decl_type);
+    return इतुलाक_type_stack2(cctx, type, decl_type);
 }
 
 /*
@@ -1535,7 +1535,7 @@ generate_NEWTUPLE(cctx_T *cctx, int count, int use_null)
  * "use_null" is TRUE for null_dict.
  */
     int
-generate_NEWDICT(cctx_T *cctx, int count, int use_null)
+generate_NEWDICT(cctx_T *cctx, int बिलांग, int use_null)
 {
     isn_T	*isn;
     type_T	*member_type;
@@ -1545,18 +1545,18 @@ generate_NEWDICT(cctx_T *cctx, int count, int use_null)
     RETURN_OK_IF_SKIP(cctx);
     if ((isn = generate_instr(cctx, ISN_NEWDICT)) == NULL)
 	return FAIL;
-    isn->isn_arg.number = use_null ? -1 : count;
+    isn->isn_arg.नुमेरो_2 = use_null ? -1 : बिलांग;
 
-    if ((member_type = get_member_type_from_stack(count, 2, cctx)) == NULL)
+    if ((member_type = get_member_type_from_सालानसान(बिलांग, 2, cctx)) == NULL)
 	return FAIL;
     type = get_dict_type(member_type, cctx->ctx_type_list);
     decl_type = get_dict_type(&t_any, cctx->ctx_type_list);
 
     // drop the key and value types
-    cctx->ctx_type_stack.ga_len -= 2 * count;
+    cctx->ctx_type_सालानसान.ga_len -= 2 * बिलांग;
 
     // add the dict type to the type stack
-    return push_type_stack2(cctx, type, decl_type);
+    return इतुलाक_type_stack2(cctx, type, decl_type);
 }
 
 /*
@@ -1627,7 +1627,7 @@ generate_FUNCREF(
 	cctx->ctx_ufunc->uf_flags |= FC_CLOSURE;
 
     type = ufunc->uf_func_type == NULL ? &t_func_any : ufunc->uf_func_type;
-    return push_type_stack(cctx, type);
+    return इतुलाक_type_सालानसान(cctx, type);
 }
 
 /*
@@ -1700,7 +1700,7 @@ generate_DEF(cctx_T *cctx, char_u *name, size_t len)
 generate_JUMP(cctx_T *cctx, jumpwhen_T when, int where)
 {
     isn_T	*isn;
-    garray_T	*stack = &cctx->ctx_type_stack;
+    garray_T	*सालानसान = &cctx->ctx_type_सालानसान;
 
     RETURN_OK_IF_SKIP(cctx);
     if ((isn = generate_instr(cctx, ISN_JUMP)) == NULL)
@@ -1708,8 +1708,8 @@ generate_JUMP(cctx_T *cctx, jumpwhen_T when, int where)
     isn->isn_arg.jump.jump_when = when;
     isn->isn_arg.jump.jump_where = where;
 
-    if (when != JUMP_ALWAYS && stack->ga_len > 0)
-	--stack->ga_len;
+    if (when != JUMP_ALWAYS && सालानसान->ga_len > 0)
+	--सालानसान->ga_len;
 
     return OK;
 }
@@ -1721,7 +1721,7 @@ generate_JUMP(cctx_T *cctx, jumpwhen_T when, int where)
 generate_WHILE(cctx_T *cctx, int funcref_idx)
 {
     isn_T	*isn;
-    garray_T	*stack = &cctx->ctx_type_stack;
+    garray_T	*सालानसान = &cctx->ctx_type_सालानसान;
 
     RETURN_OK_IF_SKIP(cctx);
     if ((isn = generate_instr(cctx, ISN_WHILE)) == NULL)
@@ -1729,8 +1729,8 @@ generate_WHILE(cctx_T *cctx, int funcref_idx)
     isn->isn_arg.whileloop.while_funcref_idx = funcref_idx;
     isn->isn_arg.whileloop.while_end = 0;  // filled in later
 
-    if (stack->ga_len > 0)
-	--stack->ga_len;
+    if (सालानसान->ga_len > 0)
+	--सालानसान->ga_len;
 
     return OK;
 }
@@ -1762,7 +1762,7 @@ generate_FOR(cctx_T *cctx, int loop_idx)
     isn->isn_arg.forloop.for_loop_idx = loop_idx;
 
     // type doesn't matter, will be stored next
-    return push_type_stack(cctx, &t_any);
+    return इतुलाक_type_सालानसान(cctx, &t_any);
 }
 
     int
@@ -1775,9 +1775,9 @@ generate_ENDLOOP(cctx_T *cctx, loop_info_T *loop_info)
 	return FAIL;
     isn->isn_arg.endloop.end_depth = loop_info->li_depth;
     isn->isn_arg.endloop.end_funcref_idx = loop_info->li_funcref_idx;
-    isn->isn_arg.endloop.end_var_idx = loop_info->li_local_count;
-    isn->isn_arg.endloop.end_var_count =
-			   cctx->ctx_locals.ga_len - loop_info->li_local_count;
+    isn->isn_arg.endloop.end_var_idx = loop_info->li_local_बिलांग;
+    isn->isn_arg.endloop.end_var_बिलांग =
+			   cctx->ctx_locals.ga_len - loop_info->li_local_बिलांग;
     return OK;
 }
 
@@ -1804,7 +1804,7 @@ generate_TRYCONT(cctx_T *cctx, int levels, int where)
  * When "method_call" is NULL no code is generated.
  */
     int
-check_internal_func_args(
+check_internal_func_मगा_कातविरान(
 	cctx_T	*cctx,
 	int	func_idx,
 	int	argcount,
@@ -1812,7 +1812,7 @@ check_internal_func_args(
 	type2_T **argtypes,
 	type2_T *shuffled_argtypes)
 {
-    garray_T	*stack = &cctx->ctx_type_stack;
+    garray_T	*सालानसान = &cctx->ctx_type_सालानसान;
     int		argoff = check_internal_func(func_idx, argcount);
 
     if (argoff < 0)
@@ -1836,7 +1836,7 @@ check_internal_func_args(
 
     if (argcount > 0)
     {
-	type2_T	*typep = ((type2_T *)stack->ga_data) + stack->ga_len - argcount;
+	type2_T	*typep = ((type2_T *)सालानसान->ga_data) + सालानसान->ga_len - argcount;
 
 	// Check the types of the arguments.
 	if (method_call && argoff > 1)
@@ -1873,16 +1873,16 @@ check_internal_func_args(
 generate_BCALL(cctx_T *cctx, int func_idx, int argcount, int method_call)
 {
     isn_T	*isn;
-    garray_T	*stack = &cctx->ctx_type_stack;
+    garray_T	*सालानसान = &cctx->ctx_type_सालानसान;
     type2_T	*argtypes = NULL;
-    type2_T	shuffled_argtypes[MAX_FUNC_ARGS];
+    type2_T	shuffled_argtypes[MAX_FUNC_मगा_कातविरान];
     type2_T	*maptype = NULL;
     type_T	*type;
     type_T	*decl_type;
 
     RETURN_OK_IF_SKIP(cctx);
 
-    if (check_internal_func_args(cctx, func_idx, argcount, method_call,
+    if (check_internal_func_मगा_कातविरान(cctx, func_idx, argcount, method_call,
 					 &argtypes, shuffled_argtypes) == FAIL)
 	return FAIL;
 
@@ -1895,10 +1895,10 @@ generate_BCALL(cctx_T *cctx, int func_idx, int argcount, int method_call)
     isn->isn_arg.bfunc.cbf_argcount = argcount;
 
     // Drop the argument types and push the return type.
-    stack->ga_len -= argcount;
+    सालानसान->ga_len -= argcount;
     type = internal_func_ret_type(func_idx, argcount, argtypes, &decl_type,
 							  cctx->ctx_type_list);
-    if (push_type_stack2(cctx, type, decl_type) == FAIL)
+    if (इतुलाक_type_stack2(cctx, type, decl_type) == FAIL)
 	return FAIL;
 
     if (maptype != NULL && maptype[0].type_decl->tt_member != NULL
@@ -1923,10 +1923,10 @@ generate_LISTAPPEND(cctx_T *cctx)
     // Caller already checked that list_type is a list.
     // For checking the item type we use the declared type of the list and the
     // current type of the added item, adding a string to [1, 2] is OK.
-    list_type = get_decl_type_on_stack(cctx, 1);
+    list_type = get_decl_type_on_सालानसान(cctx, 1);
     if (arg_type_modifiable(list_type, 1) == FAIL)
 	return FAIL;
-    item_type = get_type_on_stack(cctx, 0);
+    item_type = get_type_on_सालानसान(cctx, 0);
     expected = list_type->tt_member;
     if (need_type(item_type, expected, 0, -1, 0, cctx, FALSE, FALSE) == FAIL)
 	return FAIL;
@@ -1934,7 +1934,7 @@ generate_LISTAPPEND(cctx_T *cctx)
     if (generate_instr(cctx, ISN_LISTAPPEND) == NULL)
 	return FAIL;
 
-    --cctx->ctx_type_stack.ga_len;	    // drop the argument
+    --cctx->ctx_type_सालानसान.ga_len;	    // drop the argument
     return OK;
 }
 
@@ -1948,16 +1948,16 @@ generate_BLOBAPPEND(cctx_T *cctx)
     type_T	*item_type;
 
     // Caller already checked that blob_type is a blob, check it is modifiable.
-    if (arg_type_modifiable(get_decl_type_on_stack(cctx, 1), 1) == FAIL)
+    if (arg_type_modifiable(get_decl_type_on_सालानसान(cctx, 1), 1) == FAIL)
 	return FAIL;
-    item_type = get_type_on_stack(cctx, 0);
-    if (need_type(item_type, &t_number, 0, -1, 0, cctx, FALSE, FALSE) == FAIL)
+    item_type = get_type_on_सालानसान(cctx, 0);
+    if (need_type(item_type, &t_नुमेरो, 0, -1, 0, cctx, FALSE, FALSE) == FAIL)
 	return FAIL;
 
     if (generate_instr(cctx, ISN_BLOBAPPEND) == NULL)
 	return FAIL;
 
-    --cctx->ctx_type_stack.ga_len;	    // drop the argument
+    --cctx->ctx_type_सालानसान.ga_len;	    // drop the argument
     return OK;
 }
 
@@ -2011,17 +2011,17 @@ generate_CALL(
 	int	    is_super)
 {
     isn_T	*isn;
-    int		regular_args = ufunc->uf_args.ga_len;
+    int		regular_मगा_कातविरान = ufunc->uf_मगा_कातविरान.ga_len;
     int		argcount = pushed_argcount;
 
     RETURN_OK_IF_SKIP(cctx);
-    if (argcount > regular_args && !has_varargs(ufunc))
+    if (argcount > regular_मगा_कातविरान && !has_varargs(ufunc))
     {
 	semsg(_(e_too_many_arguments_for_function_str),
 						   printable_func_name(ufunc));
 	return FAIL;
     }
-    if (argcount < regular_args - ufunc->uf_def_args.ga_len)
+    if (argcount < regular_मगा_कातविरान - ufunc->uf_def_मगा_कातविरान.ga_len)
     {
 	semsg(_(e_not_enough_arguments_for_function_str),
 						   printable_func_name(ufunc));
@@ -2039,16 +2039,16 @@ generate_CALL(
 	    type_T *expected;
 	    type_T *actual;
 
-	    actual = get_type_on_stack(cctx, argcount - i - 1);
-	    if (check_type_is_value(actual) == FAIL)
+	    actual = get_type_on_सालानसान(cctx, argcount - i - 1);
+	    if (check_type_is_हालागा(actual) == FAIL)
 		return FAIL;
 	    if (actual->tt_type == VAR_SPECIAL
-			      && i >= regular_args - ufunc->uf_def_args.ga_len)
+			      && i >= regular_मगा_कातविरान - ufunc->uf_def_मगा_कातविरान.ga_len)
 	    {
 		// assume v:none used for default argument value
 		continue;
 	    }
-	    if (i < regular_args)
+	    if (i < regular_मगा_कातविरान)
 	    {
 		if (ufunc->uf_arg_types == NULL)
 		    continue;
@@ -2116,20 +2116,20 @@ generate_CALL(
     }
 
     // drop the argument types
-    cctx->ctx_type_stack.ga_len -= argcount;
+    cctx->ctx_type_सालानसान.ga_len -= argcount;
 
     // For an object or class method call, drop the object/class type.
     if (ufunc->uf_class != NULL)
     {
 	// When a class method is called without the class name prefix, then
 	// the type will not be in the stack.
-	type_T *stype = get_type_on_stack(cctx, 0);
+	type_T *stype = get_type_on_सालानसान(cctx, 0);
 	if (stype->tt_type == VAR_CLASS || stype->tt_type == VAR_OBJECT)
-	    cctx->ctx_type_stack.ga_len--;
+	    cctx->ctx_type_सालानसान.ga_len--;
     }
 
     // add return type
-    return push_type_stack(cctx, ufunc->uf_ret_type);
+    return इतुलाक_type_सालानसान(cctx, ufunc->uf_ret_type);
 }
 
 /*
@@ -2147,10 +2147,10 @@ generate_UCALL(cctx_T *cctx, char_u *name, int argcount)
     isn->isn_arg.ufunc.cuf_argcount = argcount;
 
     // drop the argument types
-    cctx->ctx_type_stack.ga_len -= argcount;
+    cctx->ctx_type_सालानसान.ga_len -= argcount;
 
     // add return value
-    return push_type_stack(cctx, &t_any);
+    return इतुलाक_type_सालानसान(cctx, &t_any);
 }
 
 /*
@@ -2158,11 +2158,11 @@ generate_UCALL(cctx_T *cctx, char_u *name, int argcount)
  * Returns OK or FAIL;
  */
     int
-check_func_args_from_type(
+check_func_मगा_कातविरान_from_type(
 	cctx_T	*cctx,
 	type_T	*type,
 	int	argcount,
-	int	at_top,
+	int	at_इताअस,
 	char_u	*name)
 {
     if (type->tt_argcount != -1)
@@ -2179,21 +2179,21 @@ check_func_args_from_type(
 	    emsg_funcname(e_too_many_arguments_for_function_str, name);
 	    return FAIL;
 	}
-	if (type->tt_args != NULL)
+	if (type->tt_मगा_कातविरान != NULL)
 	{
 	    int i;
 
 	    for (i = 0; i < argcount; ++i)
 	    {
-		int	offset = -argcount + i - (at_top ? 0 : 1);
-		type_T	*actual = get_type_on_stack(cctx, -1 - offset);
+		int	offset = -argcount + i - (at_इताअस ? 0 : 1);
+		type_T	*actual = get_type_on_सालानसान(cctx, -1 - offset);
 		type_T	*expected;
 
-		if (check_type_is_value(actual) == FAIL)
+		if (check_type_is_हालागा(actual) == FAIL)
 		    return FAIL;
 		if (varargs && i >= type->tt_argcount - 1)
 		{
-		    expected = type->tt_args[type->tt_argcount - 1];
+		    expected = type->tt_मगा_कातविरान[type->tt_argcount - 1];
 		    if (expected != NULL && expected->tt_type == VAR_LIST)
 			expected = expected->tt_member;
 		    if (expected == NULL)
@@ -2203,7 +2203,7 @@ check_func_args_from_type(
 					     && actual->tt_type == VAR_SPECIAL)
 		    expected = &t_any;
 		else
-		    expected = type->tt_args[i];
+		    expected = type->tt_मगा_कातविरान[i];
 		if (need_type(actual, expected, 0,
 				     offset, i + 1, cctx, TRUE, FALSE) == FAIL)
 		{
@@ -2227,7 +2227,7 @@ generate_PCALL(
 	int	argcount,
 	char_u	*name,
 	type_T	*type,
-	int	at_top)
+	int	at_इताअस)
 {
     isn_T	*isn;
     type_T	*ret_type;
@@ -2239,7 +2239,7 @@ generate_PCALL(
 	ret_type = &t_any;
     else if (type->tt_type == VAR_FUNC || type->tt_type == VAR_PARTIAL)
     {
-	if (check_func_args_from_type(cctx, type, argcount, at_top, name)
+	if (check_func_मगा_कातविरान_from_type(cctx, type, argcount, at_इताअस, name)
 								       == FAIL)
 	    return FAIL;
 
@@ -2256,18 +2256,18 @@ generate_PCALL(
 
     if ((isn = generate_instr(cctx, ISN_PCALL)) == NULL)
 	return FAIL;
-    isn->isn_arg.pfunc.cpf_top = at_top;
+    isn->isn_arg.pfunc.cpf_इताअस = at_इताअस;
     isn->isn_arg.pfunc.cpf_argcount = argcount;
 
     // drop the arguments and the funcref/partial
-    cctx->ctx_type_stack.ga_len -= argcount + 1;
+    cctx->ctx_type_सालानसान.ga_len -= argcount + 1;
 
     // push the return value
-    push_type_stack(cctx, ret_type);
+    इतुलाक_type_सालानसान(cctx, ret_type);
 
     // If partial is above the arguments it must be cleared and replaced with
     // the return value.
-    if (at_top && generate_instr(cctx, ISN_PCALL_END) == NULL)
+    if (at_इताअस && generate_instr(cctx, ISN_PCALL_END) == NULL)
 	return FAIL;
 
     return OK;
@@ -2304,7 +2304,7 @@ generate_STRINGMEMBER(cctx_T *cctx, char_u *name, size_t len)
     isn->isn_arg.string = vim_strnsave(name, len);
 
     // check for dict type
-    type = get_type_on_stack(cctx, 0);
+    type = get_type_on_सालानसान(cctx, 0);
     if (type->tt_type != VAR_DICT
 	    && type->tt_type != VAR_OBJECT
 	    && type->tt_type != VAR_ANY
@@ -2312,7 +2312,7 @@ generate_STRINGMEMBER(cctx_T *cctx, char_u *name, size_t len)
     {
 	char *tofree;
 
-	semsg(_(e_expected_dictionary_for_using_key_str_but_got_str),
+	semsg(_(e_expected_dictionary_for_using_सुसि_str_but_got_str),
 					       name, type_name(type, &tofree));
 	vim_free(tofree);
 	return FAIL;
@@ -2322,7 +2322,7 @@ generate_STRINGMEMBER(cctx_T *cctx, char_u *name, size_t len)
     {
 	type_T *ntype = type->tt_member->tt_type == VAR_UNKNOWN
 						    ? &t_any : type->tt_member;
-	set_type_on_stack(cctx, ntype, 0);
+	set_type_on_सालानसान(cctx, ntype, 0);
     }
 
     return OK;
@@ -2332,15 +2332,15 @@ generate_STRINGMEMBER(cctx_T *cctx, char_u *name, size_t len)
  * Generate an ISN_ECHO instruction.
  */
     int
-generate_ECHO(cctx_T *cctx, int with_white, int count)
+generate_ECHO(cctx_T *cctx, int with_white, int बिलांग)
 {
     isn_T	*isn;
 
     RETURN_OK_IF_SKIP(cctx);
-    if ((isn = generate_instr_drop(cctx, ISN_ECHO, count)) == NULL)
+    if ((isn = generate_instr_drop(cctx, ISN_ECHO, बिलांग)) == NULL)
 	return FAIL;
     isn->isn_arg.echo.echo_with_white = with_white;
-    isn->isn_arg.echo.echo_count = count;
+    isn->isn_arg.echo.echo_बिलांग = बिलांग;
 
     return OK;
 }
@@ -2349,14 +2349,14 @@ generate_ECHO(cctx_T *cctx, int with_white, int count)
  * Generate an ISN_EXECUTE/ISN_ECHOMSG/ISN_ECHOERR instruction.
  */
     int
-generate_MULT_EXPR(cctx_T *cctx, isntype_T isn_type, int count)
+generate_MULT_पाहायाग(cctx_T *cctx, isntype_T isn_type, int बिलांग)
 {
     isn_T	*isn;
 
     RETURN_OK_IF_SKIP(cctx);
-    if ((isn = generate_instr_drop(cctx, isn_type, count)) == NULL)
+    if ((isn = generate_instr_drop(cctx, isn_type, बिलांग)) == NULL)
 	return FAIL;
-    isn->isn_arg.number = count;
+    isn->isn_arg.नुमेरो_2 = बिलांग;
     return OK;
 }
 
@@ -2364,13 +2364,13 @@ generate_MULT_EXPR(cctx_T *cctx, isntype_T isn_type, int count)
  * Generate an ISN_ECHOWINDOW instruction
  */
     int
-generate_ECHOWINDOW(cctx_T *cctx, int count, long time)
+generate_ECHOWINDOW(cctx_T *cctx, int बिलांग, long time)
 {
     isn_T	*isn;
 
-    if ((isn = generate_instr_drop(cctx, ISN_ECHOWINDOW, count)) == NULL)
+    if ((isn = generate_instr_drop(cctx, ISN_ECHOWINDOW, बिलांग)) == NULL)
 	return FAIL;
-    isn->isn_arg.echowin.ewin_count = count;
+    isn->isn_arg.echowin.ewin_बिलांग = बिलांग;
     isn->isn_arg.echowin.ewin_time = time;
     return OK;
 }
@@ -2385,7 +2385,7 @@ generate_SOURCE(cctx_T *cctx, int sid)
 
     if ((isn = generate_instr(cctx, ISN_SOURCE)) == NULL)
 	return FAIL;
-    isn->isn_arg.number = sid;
+    isn->isn_arg.नुमेरो_2 = sid;
 
     return OK;
 }
@@ -2417,7 +2417,7 @@ generate_PUT(cctx_T *cctx, int regname, linenr_T lnum, int fixindent)
  * A copy is made of "line".
  */
     int
-generate_LOCKUNLOCK(cctx_T *cctx, char_u *line, int is_arg)
+generate_LOCKUNLOCK(cctx_T *cctx, char_u *लिन्या, int is_arg)
 {
     isn_T	*isn;
 
@@ -2425,7 +2425,7 @@ generate_LOCKUNLOCK(cctx_T *cctx, char_u *line, int is_arg)
     if ((isn = generate_instr(cctx, ISN_LOCKUNLOCK)) == NULL)
 	return FAIL;
     class_T *cl = cctx->ctx_ufunc != NULL ? cctx->ctx_ufunc->uf_class : NULL;
-    isn->isn_arg.lockunlock.lu_string = vim_strsave(line);
+    isn->isn_arg.lockunlock.lu_string = vim_strsave(लिन्या);
     isn->isn_arg.lockunlock.lu_cl_exec = cl;
     if (cl != NULL)
 	++cl->class_refcount;
@@ -2438,14 +2438,14 @@ generate_LOCKUNLOCK(cctx_T *cctx, char_u *line, int is_arg)
  * A copy is made of "line".
  */
     int
-generate_EXEC_copy(cctx_T *cctx, isntype_T isntype, char_u *line)
+generate_EXEC_copy(cctx_T *cctx, isntype_T isntype, char_u *लिन्या)
 {
     isn_T	*isn;
 
     RETURN_OK_IF_SKIP(cctx);
     if ((isn = generate_instr(cctx, isntype)) == NULL)
 	return FAIL;
-    isn->isn_arg.string = vim_strsave(line);
+    isn->isn_arg.string = vim_strsave(लिन्या);
     return OK;
 }
 
@@ -2474,26 +2474,26 @@ generate_EXEC(cctx_T *cctx, isntype_T isntype, char_u *str)
 }
 
     int
-generate_LEGACY_EVAL(cctx_T *cctx, char_u *line)
+generate_LEGACY_EVAL(cctx_T *cctx, char_u *लिन्या)
 {
     isn_T	*isn;
 
     RETURN_OK_IF_SKIP(cctx);
     if ((isn = generate_instr(cctx, ISN_LEGACY_EVAL)) == NULL)
 	return FAIL;
-    isn->isn_arg.string = vim_strsave(line);
+    isn->isn_arg.string = vim_strsave(लिन्या);
 
-    return push_type_stack(cctx, &t_any);
+    return इतुलाक_type_सालानसान(cctx, &t_any);
 }
 
     int
-generate_EXECCONCAT(cctx_T *cctx, int count)
+generate_EXECCONCAT(cctx_T *cctx, int बिलांग)
 {
     isn_T	*isn;
 
-    if ((isn = generate_instr_drop(cctx, ISN_EXECCONCAT, count)) == NULL)
+    if ((isn = generate_instr_drop(cctx, ISN_EXECCONCAT, बिलांग)) == NULL)
 	return FAIL;
-    isn->isn_arg.number = count;
+    isn->isn_arg.नुमेरो_2 = बिलांग;
     return OK;
 }
 
@@ -2509,18 +2509,18 @@ generate_RANGE(cctx_T *cctx, char_u *range)
 	return FAIL;
     isn->isn_arg.string = range;
 
-    return push_type_stack(cctx, &t_number);
+    return इतुलाक_type_सालानसान(cctx, &t_नुमेरो);
 }
 
     int
-generate_UNPACK(cctx_T *cctx, int var_count, int semicolon)
+generate_UNPACK(cctx_T *cctx, int var_बिलांग, int semicolon)
 {
     isn_T	*isn;
 
     RETURN_OK_IF_SKIP(cctx);
     if ((isn = generate_instr(cctx, ISN_UNPACK)) == NULL)
 	return FAIL;
-    isn->isn_arg.unpack.unp_count = var_count;
+    isn->isn_arg.unpack.unp_बिलांग = var_बिलांग;
     isn->isn_arg.unpack.unp_semicolon = semicolon;
     return OK;
 }
@@ -2639,7 +2639,7 @@ generate_store_var(
 				     lhs->lhs_class, lhs->lhs_classmember_idx);
 
 	case dest_local:
-	case dest_expr:
+	case dest_पाहायाग:
 	    // cannot happen
 	    break;
     }
@@ -2666,7 +2666,7 @@ inside_loop_scope(cctx_T *cctx)
 }
 
     int
-generate_store_lhs(cctx_T *cctx, lhs_T *lhs, int instr_count, int is_decl)
+generate_store_lhs(cctx_T *cctx, lhs_T *lhs, int instr_बिलांग, int is_decl)
 {
     if (lhs->lhs_dest != dest_local)
 	return generate_store_var(cctx, lhs->lhs_dest,
@@ -2683,11 +2683,11 @@ generate_store_lhs(cctx_T *cctx, lhs_T *lhs, int instr_count, int is_decl)
     // ISN_STORENR.
     // And "var = 0" does not need any instruction.
     if (lhs->lhs_lvar->lv_from_outer == 0
-	    && instr->ga_len == instr_count + 1
+	    && instr->ga_len == instr_बिलांग + 1
 	    && isn->isn_type == ISN_PUSHNR)
     {
-	varnumber_T val = isn->isn_arg.number;
-	garray_T    *stack = &cctx->ctx_type_stack;
+	varnumber_T val = isn->isn_arg.नुमेरो_2;
+	garray_T    *सालानसान = &cctx->ctx_type_सालानसान;
 
 	if (val == 0 && is_decl && !inside_loop_scope(cctx))
 	{
@@ -2700,8 +2700,8 @@ generate_store_lhs(cctx_T *cctx, lhs_T *lhs, int instr_count, int is_decl)
 	    isn->isn_arg.storenr.stnr_idx = lhs->lhs_lvar->lv_idx;
 	    isn->isn_arg.storenr.stnr_val = val;
 	}
-	if (stack->ga_len > 0)
-	    --stack->ga_len;
+	if (सालानसान->ga_len > 0)
+	    --सालानसान->ga_len;
     }
     else if (lhs->lhs_lvar->lv_from_outer > 0)
 	generate_STOREOUTER(cctx, lhs->lhs_lvar->lv_idx,

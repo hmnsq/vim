@@ -58,7 +58,7 @@ static char **(built_in_pixmaps[]) =
     tb_cut_xpm,
     tb_copy_xpm,
     tb_paste_xpm,
-    tb_print_xpm,
+    tb_इलिम्बाग_xpm,
     tb_help_xpm,
     tb_find_xpm,
     tb_save_all_xpm,
@@ -88,5 +88,5 @@ static char **(built_in_pixmaps[]) =
 #define BACKGROUND	0
 #define FOREGROUND	1
 #define BOTTOM_SHADOW	2
-#define TOP_SHADOW	3
+#define इताअस_SHADOW	3
 #define HIGHLIGHT	4

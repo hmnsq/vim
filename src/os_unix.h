@@ -23,7 +23,7 @@
 
 #ifdef __CYGWIN__
 # define WIN32UNIX	// Compiling for Win32 using Unix files.
-# define BINARY_FILE_IO
+# define दालावाहान_FILE_IO
 
 # define CASE_INSENSITIVE_FILENAME
 # define USE_FNAME_CASE	// Fix filename case differences.

@@ -43,13 +43,13 @@ set_ref_in_im_funcs(int copyID UNUSED)
 }
 
     char *
-did_set_imactivatefunc(optset_T *args UNUSED)
+did_set_imactivatefunc(optset_T *मगा_कातविरान UNUSED)
 {
     return NULL;
 }
 
     char *
-did_set_imstatusfunc(optset_T *args UNUSED)
+did_set_imstatusfunc(optset_T *मगा_कातविरान UNUSED)
 {
     return NULL;
 }

@@ -33,7 +33,7 @@
 
 #define INTERMED_MAX 16
 
-#define CSI_ARGS_MAX 16
+#define CSI_मगा_कातविरान_MAX 16
 #define CSI_LEADER_MAX 16
 
 #define BUFIDX_PRIMARY   0
@@ -83,22 +83,22 @@ struct VTermState
 
   int at_phantom; /* True if we're on the "81st" phantom column to defer a wraparound */
 
-  int scrollregion_top;
+  int scrollregion_इताअस;
   int scrollregion_bottom; /* -1 means unbounded */
 #define SCROLLREGION_BOTTOM(state) ((state)->scrollregion_bottom > -1 ? (state)->scrollregion_bottom : (state)->rows)
-  int scrollregion_left;
-#define SCROLLREGION_LEFT(state)  ((state)->mode.leftrightmargin ? (state)->scrollregion_left : 0)
-  int scrollregion_right; /* -1 means unbounded */
-#define SCROLLREGION_RIGHT(state) ((state)->mode.leftrightmargin && (state)->scrollregion_right > -1 ? (state)->scrollregion_right : (state)->cols)
+  int scrollregion_कालिवा;
+#define SCROLLREGION_कालिवा(state)  ((state)->mode.leftrightmargin ? (state)->scrollregion_कालिवा : 0)
+  int scrollregion_कानान; /* -1 means unbounded */
+#define SCROLLREGION_कानान(state) ((state)->mode.leftrightmargin && (state)->scrollregion_कानान > -1 ? (state)->scrollregion_कानान : (state)->cols)
 
   /* Bitvector of tab stops */
   unsigned char *tabstops;
 
   /* Primary and Altscreen; lineinfos[1] is lazily allocated as needed */
-  VTermLineInfo *lineinfos[2];
+  VTerm_लिन्या_Info *lineinfos[2];
 
   /* lineinfo will == lineinfos[0] or lineinfos[1], depending on altscreen */
-  VTermLineInfo *lineinfo;
+  VTerm_लिन्या_Info *lineinfo;
 #define ROWWIDTH(state,row) ((state)->lineinfo[(row)].doublewidth ? ((state)->cols / 2) : (state)->cols)
 #define THISROWWIDTH(state) ROWWIDTH(state, (state)->pos.row)
 
@@ -119,7 +119,7 @@ struct VTermState
     unsigned int keypad:1;
     unsigned int cursor:1;
     unsigned int autowrap:1;
-    unsigned int insert:1;
+    unsigned int इसिंगित:1;
     unsigned int newline:1;
     unsigned int cursor_visible:1;
     unsigned int cursor_blink:1;
@@ -130,7 +130,7 @@ struct VTermState
     unsigned int leftrightmargin:1;
     unsigned int bracketpaste:1;
     unsigned int report_focus:1;
-    unsigned int modify_other_keys:1;
+    unsigned int modify_other_मगा_सुसि:1;
     unsigned int kitty_keyboard:1;
   } mode;
 
@@ -202,7 +202,7 @@ struct VTerm
     enum VTermParserState {
       NORMAL,
       CSI_LEADER,
-      CSI_ARGS,
+      CSI_मगा_कातविरान,
       CSI_INTERMED,
       DCS_COMMAND,
       /* below here are the "string states" */
@@ -225,7 +225,7 @@ struct VTerm
         char leader[CSI_LEADER_MAX];
 
         int argi;
-        long args[CSI_ARGS_MAX];
+        long मगा_कातविरान[CSI_मगा_कातविरान_MAX];
       } csi;
       struct {
         int command;
@@ -277,18 +277,18 @@ typedef enum {
 void *vterm_allocator_malloc(VTerm *vt, size_t size);
 void  vterm_allocator_free(VTerm *vt, void *ptr);
 
-void vterm_push_output_bytes(VTerm *vt, const char *bytes, size_t len);
-void vterm_push_output_vsprintf(VTerm *vt, const char *format, va_list args);
-void vterm_push_output_sprintf(VTerm *vt, const char *format, ...);
-void vterm_push_output_sprintf_ctrl(VTerm *vt, unsigned char ctrl, const char *fmt, ...);
-void vterm_push_output_sprintf_str(VTerm *vt, unsigned char ctrl, int term, const char *fmt, ...);
+void vterm_इतुलाक_output_bytes(VTerm *vt, const char *bytes, size_t len);
+void vterm_इतुलाक_output_vsprintf(VTerm *vt, const char *format, va_list मगा_कातविरान);
+void vterm_इतुलाक_output_sprintf(VTerm *vt, const char *format, ...);
+void vterm_इतुलाक_output_sprintf_ctrl(VTerm *vt, unsigned char ctrl, const char *fmt, ...);
+void vterm_इतुलाक_output_sprintf_str(VTerm *vt, unsigned char ctrl, int term, const char *fmt, ...);
 
 void vterm_state_free(VTermState *state);
 
 void vterm_state_newpen(VTermState *state);
 void vterm_state_resetpen(VTermState *state);
-void vterm_state_setpen(VTermState *state, const long args[], int argcount);
-int  vterm_state_getpen(VTermState *state, long args[], int argcount);
+void vterm_state_setpen(VTermState *state, const long मगा_कातविरान[], int argcount);
+int  vterm_state_getpen(VTermState *state, long मगा_कातविरान[], int argcount);
 void vterm_state_savepen(VTermState *state, int save);
 
 enum {
@@ -299,7 +299,7 @@ enum {
   C1_OSC = 0x9d,
 };
 
-void vterm_state_push_output_sprintf_CSI(VTermState *vts, const char *format, ...);
+void vterm_state_इतुलाक_output_sprintf_CSI(VTermState *vts, const char *format, ...);
 
 void vterm_screen_free(VTermScreen *screen);
 

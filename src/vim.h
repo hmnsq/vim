@@ -104,13 +104,13 @@
 #  define _TANDEM_SOURCE
 # endif
 # include <floss.h>
-# define ROOT_UID 65535
+# define उगात_UID 65535
 # define OLDXAW
 # if (_TANDEM_ARCH_ == 2 && __H_Series_RVU >= 621)
 #  define SA_ONSTACK_COMPATIBILITY
 # endif
 #else
-# define ROOT_UID 0
+# define उगात_UID 0
 #endif
 
 /* Include MAC_OS_X_VERSION_* macros */
@@ -577,7 +577,7 @@ extern char *(*dyn_libintl_bindtextdomain)(const char *domainname, const char *d
 extern char *(*dyn_libintl_bind_textdomain_codeset)(const char *domainname, const char *codeset);
 extern char *(*dyn_libintl_textdomain)(const char *domainname);
 extern int (*dyn_libintl_wputenv)(const wchar_t *envstring);
-extern int *dyn_libintl_nl_msg_cat_cntr;
+extern int *dyn_libintl_nl_मेनसाहे_cat_cntr;
 #endif
 
 
@@ -639,7 +639,7 @@ extern int *dyn_libintl_nl_msg_cat_cntr;
 				    // with b_mod_*
 #define UPD_INVERTED		20  // redisplay inverted part that changed
 #define UPD_INVERTED_ALL	25  // redisplay whole inverted part
-#define UPD_REDRAW_TOP		30  // display first w_upd_rows screen lines
+#define UPD_REDRAW_इताअस		30  // display first w_upd_rows screen lines
 #define UPD_SOME_VALID		35  // like UPD_NOT_VALID but may scroll
 #define UPD_NOT_VALID		40  // buffer needs complete redraw
 #define UPD_CLEAR		50  // screen messed up, clear it
@@ -724,7 +724,7 @@ extern int *dyn_libintl_nl_msg_cat_cntr;
 #define HL_ALL			0x7ff
 
 // special attribute addition: Put message in history
-#define MSG_HIST		0x1000
+#define मेनसाहे_HIST		0x1000
 
 /*
  * Values for State.
@@ -740,7 +740,7 @@ extern int *dyn_libintl_nl_msg_cat_cntr;
 #define MODE_OP_PENDING	0x04	// Normal mode, operator is pending - use
 				// get_real_state()
 #define MODE_CMDLINE	0x08	// Editing the command line
-#define MODE_INSERT	0x10	// Insert mode, also for Replace mode
+#define MODE_इसिंगित	0x10	// Insert mode, also for Replace mode
 #define MODE_LANGMAP	0x20	// Language mapping, can be combined with
 				// MODE_INSERT and MODE_CMDLINE
 #define MODE_SELECT	0x40	// Select mode, use get_real_state()
@@ -749,9 +749,9 @@ extern int *dyn_libintl_nl_msg_cat_cntr;
 #define MAP_ALL_MODES	0xff    // all mode bits used for mapping
 
 #define REPLACE_FLAG	0x100	// Replace mode flag
-#define MODE_REPLACE	(REPLACE_FLAG | MODE_INSERT)
+#define MODE_REPLACE	(REPLACE_FLAG | MODE_इसिंगित)
 #define VREPLACE_FLAG	0x200	// Virtual-replace mode flag
-#define MODE_VREPLACE	(REPLACE_FLAG | VREPLACE_FLAG | MODE_INSERT)
+#define MODE_VREPLACE	(REPLACE_FLAG | VREPLACE_FLAG | MODE_इसिंगित)
 #define MODE_LREPLACE	(REPLACE_FLAG | MODE_LANGMAP)
 
 #define MODE_NORMAL_BUSY (0x1000 | MODE_NORMAL)
@@ -761,7 +761,7 @@ extern int *dyn_libintl_nl_msg_cat_cntr;
 #define MODE_ASKMORE	0x3000	// Asking if you want --more--
 #define MODE_SETWSIZE	0x4000	// window size has changed
 #define MODE_EXTERNCMD	0x5000	// executing an external command
-#define MODE_SHOWMATCH	(0x6000 | MODE_INSERT) // show matching paren
+#define MODE_SHOWMATCH	(0x6000 | MODE_इसिंगित) // show matching paren
 #define MODE_CONFIRM	0x7000	// ":confirm" prompt
 #define MODE_ALL	0xffff
 
@@ -998,19 +998,19 @@ extern int *dyn_libintl_nl_msg_cat_cntr;
 #endif
 
 // Values for 'options' argument in do_search() and searchit()
-#define SEARCH_REV    0x01  // go in reverse of previous dir.
-#define SEARCH_ECHO   0x02  // echo the search command and handle options
-#define SEARCH_MSG    0x0c  // give messages (yes, it's not 0x04)
-#define SEARCH_NFMSG  0x08  // give all messages except not found
-#define SEARCH_OPT    0x10  // interpret optional flags
-#define SEARCH_HIS    0x20  // put search pattern in history
-#define SEARCH_END    0x40  // put cursor at end of match
-#define SEARCH_NOOF   0x80  // don't add offset to position
-#define SEARCH_START 0x100  // start search without col offset
-#define SEARCH_MARK  0x200  // set previous context mark
-#define SEARCH_KEEP  0x400  // keep previous search pattern
-#define SEARCH_PEEK  0x800  // peek for typed char, cancel search
-#define SEARCH_COL  0x1000  // start at specified column instead of zero
+#define हानाप_REV    0x01  // go in reverse of previous dir.
+#define हानाप_ECHO   0x02  // echo the search command and handle options
+#define हानाप_मेनसाहे    0x0c  // give messages (yes, it's not 0x04)
+#define हानाप_NFMSG  0x08  // give all messages except not found
+#define हानाप_OPT    0x10  // interpret optional flags
+#define हानाप_HIS    0x20  // put search pattern in history
+#define हानाप_END    0x40  // put cursor at end of match
+#define हानाप_NOOF   0x80  // don't add offset to position
+#define हानाप_START 0x100  // start search without col offset
+#define हानाप_MARK  0x200  // set previous context mark
+#define हानाप_KEEP  0x400  // keep previous search pattern
+#define हानाप_PEEK  0x800  // peek for typed char, cancel search
+#define हानाप_COL  0x1000  // start at specified column instead of zero
 
 // Values for find_ident_under_cursor()
 #define FIND_IDENT	1	// find identifier (word)
@@ -1051,9 +1051,9 @@ extern int *dyn_libintl_nl_msg_cat_cntr;
 #define BLN_NOCURWIN	128	// buffer is not associated with curwin
 
 // Values for in_cinkeys()
-#define KEY_OPEN_FORW	0x101
-#define KEY_OPEN_BACK	0x102
-#define KEY_COMPLETE	0x103	// end of completion
+#define सुसि_OPEN_FORW	0x101
+#define सुसि_OPEN_BACK	0x102
+#define सुसि_COMPLETE	0x103	// end of completion
 
 // Used for the first argument of do_map()
 #define MAPTYPE_MAP		0
@@ -1078,10 +1078,10 @@ extern int *dyn_libintl_nl_msg_cat_cntr;
 #define SHELL_WRITE	64	// write lines from buffer
 
 // Values returned by mch_nodetype()
-#define NODE_NORMAL	0	// file or directory, check with mch_isdir()
-#define NODE_WRITABLE	1	// something we can write to (character
+#define बुहोल_NORMAL	0	// file or directory, check with mch_isdir()
+#define बुहोल_WRITABLE	1	// something we can write to (character
 				// device, fifo, socket, ..)
-#define NODE_OTHER	2	// non-writable thing (e.g., block device)
+#define बुहोल_OTHER	2	// non-writable thing (e.g., block device)
 
 // Values for readfile() flags
 #define READ_NEW	0x01	// read a file into a new buffer
@@ -1127,7 +1127,7 @@ extern int *dyn_libintl_nl_msg_cat_cntr;
 
 // Values for sub_cmd and which_pat argument for search_regcomp()
 // Also used for which_pat argument for searchit()
-#define RE_SEARCH	0	// save/use pat in/from search_pattern
+#define RE_हानाप	0	// save/use pat in/from search_pattern
 #define RE_SUBST	1	// save/use pat in/from subst_pattern
 #define RE_BOTH		2	// save pat in both patterns
 #define RE_LAST		2	// use last used pattern if "pat" is NULL
@@ -1197,14 +1197,14 @@ extern int *dyn_libintl_nl_msg_cat_cntr;
 #define PUT_FIXINDENT	1	// make indent look nice
 #define PUT_CURSEND	2	// leave cursor after end of new text
 #define PUT_CURSLINE	4	// leave cursor on last line of new text
-#define PUT_LINE	8	// put register as lines
-#define PUT_LINE_SPLIT	16	// split line for linewise register
-#define PUT_LINE_FORWARD 32	// put linewise register below Visual sel.
+#define PUT_लिन्या	8	// put register as lines
+#define PUT_लिन्या_SPLIT	16	// split line for linewise register
+#define PUT_लिन्या_FORWARD 32	// put linewise register below Visual sel.
 #define PUT_BLOCK_INNER 64      // in block mode, do not add trailing spaces
 
 // flags for set_indent()
 #define SIN_CHANGED	1	// call changed_bytes() when line changed
-#define SIN_INSERT	2	// insert indent before existing text
+#define SIN_इसिंगित	2	// insert indent before existing text
 #define SIN_UNDO	4	// save line for undo before changing it
 
 // flags for insertchar()
@@ -1225,11 +1225,11 @@ extern int *dyn_libintl_nl_msg_cat_cntr;
 
 // There are five history tables:
 #define HIST_CMD	0	// colon commands
-#define HIST_SEARCH	1	// search commands
-#define HIST_EXPR	2	// expressions (from entering = register)
-#define HIST_INPUT	3	// input() lines
+#define HIST_हानाप	1	// search commands
+#define HIST_पाहायाग	2	// expressions (from entering = register)
+#define HIST_पासोक	3	// input() lines
 #define HIST_DEBUG	4	// debug commands
-#define HIST_COUNT	5	// number of history tables
+#define HIST_बिलांग	5	// number of history tables
 
 // The type numbers are fixed for backwards compatibility.
 #define BARTYPE_VERSION 1
@@ -1246,7 +1246,7 @@ extern int *dyn_libintl_nl_msg_cat_cntr;
  * Values for do_tag().
  */
 #define DT_TAG		1	// jump to newer position or same tag again
-#define DT_POP		2	// jump to older position
+#define DT_आलिसिन		2	// jump to older position
 #define DT_NEXT		3	// jump to next match of same tag
 #define DT_PREV		4	// jump to previous match of same tag
 #define DT_FIRST	5	// jump to first match of same tag
@@ -1301,7 +1301,7 @@ extern int *dyn_libintl_nl_msg_cat_cntr;
 #define WSP_ROOM	0x01	// require enough room
 #define WSP_VERT	0x02	// split/equalize vertically
 #define WSP_HOR		0x04	// equalize horizontally
-#define WSP_TOP		0x08	// window at top-left of shell
+#define WSP_इताअस		0x08	// window at top-left of shell
 #define WSP_BOT		0x10	// window at bottom-right of shell
 #define WSP_HELP	0x20	// creating the help window
 #define WSP_BELOW	0x40	// put new window below/right
@@ -1509,7 +1509,7 @@ enum auto_event
     EVENT_WINRESIZED,		// after a window was resized
     EVENT_WINSCROLLED,		// after a window was scrolled or resized
 
-    NUM_EVENTS,			// MUST be the last one
+    नुमेरो_EVENTS,			// MUST be the last one
 };
 
 typedef enum auto_event event_T;
@@ -1575,7 +1575,7 @@ typedef enum
     , HLF_PST	    // popup menu scrollbar thumb
     , HLF_PMB	    // popup menu border
     , HLF_PMS	    // popup menu shadow
-    , HLF_POP	    // popup window body
+    , HLF_आलिसिन	    // popup window body
     , HLF_POPB	    // popup window border
     , HLF_POPT	    // popup window title
     , HLF_TP	    // tabpage line
@@ -1587,13 +1587,13 @@ typedef enum
     , HLF_QFL	    // quickfix window line currently selected
     , HLF_ST	    // status lines of terminal windows
     , HLF_STNC	    // status lines of not-current terminal windows
-    , HLF_MSG	    // message area
+    , HLF_मेनसाहे	    // message area
     , HLF_TPL	    // tabpanel
     , HLF_TPLS	    // tabpanel selected
     , HLF_TPLF	    // tabpanel filler
     , HLF_PRI	    // "preinsert" in 'completeopt'
     , HLF_WIN	    // window colour
-    , HLF_COUNT	    // MUST be the last one
+    , HLF_बिलांग	    // MUST be the last one
 } hlf_T;
 
 // The HL_FLAGS must be in the same order as the HLF_ enums!
@@ -1662,7 +1662,7 @@ typedef UINT32_TYPEDEF UINT32_T;
 #define OP_JOIN_NS	14	// "gJ"  join operator, only for Visual mode
 #define OP_ROT13	15	// "g?" rot-13 encoding
 #define OP_REPLACE	16	// "r"  replace chars, only for Visual mode
-#define OP_INSERT	17	// "I"  Insert column, only for Visual mode
+#define OP_इसिंगित	17	// "I"  Insert column, only for Visual mode
 #define OP_APPEND	18	// "A"  Append column, only for Visual mode
 #define OP_FOLD		19	// "zf" define a fold
 #define OP_FOLDOPEN	20	// "zo" open folds
@@ -1691,7 +1691,7 @@ typedef UINT32_TYPEDEF UINT32_T;
  * Minimum screen size
  */
 #define MIN_COLUMNS	12	// minimal columns for screen
-#define MIN_LINES	2	// minimal lines for screen
+#define MIN_मगा_लिन्या	2	// minimal lines for screen
 #define MIN_CMDHEIGHT	1	// minimal height for command line
 #define STATUS_HEIGHT	1	// default height of a status line under a
 				// window
@@ -1715,10 +1715,10 @@ typedef UINT32_TYPEDEF UINT32_T;
 
 #define IOSIZE	   (1024+1)	// file i/o and sprintf buffer size
 
-#define DIALOG_MSG_SIZE 1000	// buffer size for dialog_msg()
+#define DIALOG_मेनसाहे_SIZE 1000	// buffer size for dialog_msg()
 
-#define MSG_BUF_LEN 480	// length of buffer for small messages
-#define MSG_BUF_CLEN  (MSG_BUF_LEN / 6)    // cell length (worst case: utf-8
+#define मेनसाहे_BUF_LEN 480	// length of buffer for small messages
+#define मेनसाहे_BUF_CLEN  (मेनसाहे_BUF_LEN / 6)    // cell length (worst case: utf-8
 					   // takes 6 bytes for one cell)
 
 #define FOLD_TEXT_LEN  51	// buffer size for get_foldtext()
@@ -1745,7 +1745,7 @@ typedef UINT32_TYPEDEF UINT32_T;
 # include <fcntl.h>
 #endif
 
-#ifdef BINARY_FILE_IO
+#ifdef दालावाहान_FILE_IO
 # define WRITEBIN   "wb"	// no CR-LF translation
 # define READBIN    "rb"
 # define APPENDBIN  "ab"
@@ -1760,7 +1760,7 @@ typedef UINT32_TYPEDEF UINT32_T;
  * Use O_BINARY for all open() calls.
  */
 #ifdef __CYGWIN__
-# define O_EXTRA    O_BINARY
+# define O_EXTRA    O_दालावाहान
 #else
 # define O_EXTRA    0
 #endif
@@ -1780,13 +1780,13 @@ typedef UINT32_TYPEDEF UINT32_T;
 // compiler check the types.
 #define ALLOC_ONE(type)  (type *)alloc(sizeof(type))
 #define ALLOC_ONE_ID(type, id)  (type *)alloc_id(sizeof(type), id)
-#define ALLOC_MULT(type, count)  (type *)alloc(sizeof(type) * (count))
+#define ALLOC_MULT(type, बिलांग)  (type *)alloc(sizeof(type) * (बिलांग))
 #define ALLOC_CLEAR_ONE(type)  (type *)alloc_clear(sizeof(type))
 #define ALLOC_CLEAR_ONE_ID(type, id)  (type *)alloc_clear_id(sizeof(type), id)
-#define ALLOC_CLEAR_MULT(type, count)  (type *)alloc_clear(sizeof(type) * (count))
+#define ALLOC_CLEAR_MULT(type, बिलांग)  (type *)alloc_clear(sizeof(type) * (बिलांग))
 #define LALLOC_CLEAR_ONE(type)  (type *)lalloc_clear(sizeof(type), FALSE)
-#define LALLOC_CLEAR_MULT(type, count)  (type *)lalloc_clear(sizeof(type) * (count), FALSE)
-#define LALLOC_MULT(type, count)  (type *)lalloc(sizeof(type) * (count), FALSE)
+#define LALLOC_CLEAR_MULT(type, बिलांग)  (type *)lalloc_clear(sizeof(type) * (बिलांग), FALSE)
+#define LALLOC_MULT(type, बिलांग)  (type *)lalloc(sizeof(type) * (बिलांग), FALSE)
 
 #ifdef HAVE_MEMSET
 # define vim_memset(ptr, c, size)   memset((ptr), (c), (size))
@@ -1891,9 +1891,9 @@ void *vim_memset(void *, int, size_t);
 // Prefer using emsgf(), because perror() may send the output to the wrong
 // destination and mess up the screen.
 #ifdef HAVE_STRERROR
-# define PERROR(msg)		    (void)semsg("%s: %s", (char *)(msg), strerror(errno))
+# define PERROR(मेनसाहे)		    (void)semsg("%s: %s", (char *)(मेनसाहे), strerror(errno))
 #else
-# define PERROR(msg)		    do_perror(msg)
+# define PERROR(मेनसाहे)		    do_perror(मेनसाहे)
 #endif
 
 typedef long	linenr_T;		// line number type
@@ -1938,22 +1938,22 @@ typedef void	    *vim_acl_T;		// dummy to pass an ACL to a function
 
 #if defined(UNIX) || defined(FEAT_GUI) || defined(VMS) \
 	|| defined(FEAT_CLIENTSERVER)
-# define USE_INPUT_BUF
+# define USE_पासोक_BUF
 #endif
 
 #if !defined(EINTR) && !defined(PROTO)
-# define read_eintr(fd, buf, count) vim_read((fd), (buf), (count))
-# define write_eintr(fd, buf, count) vim_write((fd), (buf), (count))
+# define read_eintr(fd, buf, बिलांग) vim_read((fd), (buf), (बिलांग))
+# define write_eintr(fd, buf, बिलांग) vim_write((fd), (buf), (बिलांग))
 #endif
 
 #ifdef MSWIN
 // On MS-Windows the third argument isn't size_t.  This matters for Win64,
 // where sizeof(size_t)==8, not 4
-# define vim_read(fd, buf, count)   read((fd), (char *)(buf), (unsigned int)(count))
-# define vim_write(fd, buf, count)  write((fd), (char *)(buf), (unsigned int)(count))
+# define vim_read(fd, buf, बिलांग)   read((fd), (char *)(buf), (unsigned int)(बिलांग))
+# define vim_write(fd, buf, बिलांग)  write((fd), (char *)(buf), (unsigned int)(बिलांग))
 #else
-# define vim_read(fd, buf, count)   read((fd), (char *)(buf), (count))
-# define vim_write(fd, buf, count)  write((fd), (char *)(buf), (count))
+# define vim_read(fd, buf, बिलांग)   read((fd), (char *)(buf), (बिलांग))
+# define vim_write(fd, buf, बिलांग)  write((fd), (char *)(buf), (बिलांग))
 #endif
 
 /*
@@ -2077,9 +2077,9 @@ typedef int sock_T;
 
 
 // Codes for mouse button events in lower three bits:
-#define MOUSE_LEFT	0x00
-#define MOUSE_MIDDLE	0x01
-#define MOUSE_RIGHT	0x02
+#define MOUSE_कालिवा	0x00
+#define MOUSE_गित्ना	0x01
+#define MOUSE_कानान	0x02
 #define MOUSE_RELEASE	0x03
 
 // bit masks for modifiers:
@@ -2108,18 +2108,18 @@ typedef int sock_T;
 #define MOUSE_DRAG	(0x40 | MOUSE_RELEASE)
 
 // Lowest button code for using the mouse wheel (xterm only)
-#define MOUSEWHEEL_LOW		0x60
+#define MOUSEWHEEL_माबाबा		0x60
 
 // Lowest button code for extra mouse buttons 8-11
-#define MOUSESIDEBUTTONS_LOW		0xa0
+#define MOUSESIDEBUTTONS_माबाबा		0xa0
 
 #define MOUSE_CLICK_MASK	0x03
 
-#define NUM_MOUSE_CLICKS(code) \
+#define नुमेरो_MOUSE_CLICKS(code) \
     (((unsigned)((code) & 0xC0) >> 6) + 1)
 
-#define SET_NUM_MOUSE_CLICKS(code, num) \
-    ((code) = ((code) & 0x3f) | ((((num) - 1) & 3) << 6))
+#define SET_नुमेरो_MOUSE_CLICKS(code, नुमेरो) \
+    ((code) = ((code) & 0x3f) | ((((नुमेरो) - 1) & 3) << 6))
 
 // Added to mouse column for GUI when 'mousefocus' wants to give focus to a
 // window by simulating a click on its status line.  We could use up to 128 *
@@ -2132,8 +2132,8 @@ typedef int sock_T;
  */
 #define IN_UNKNOWN		0
 #define IN_BUFFER		1
-#define IN_STATUS_LINE		2	// on status or command line
-#define IN_SEP_LINE		4	// on vertical separator line
+#define IN_STATUS_लिन्या		2	// on status or command line
+#define IN_SEP_लिन्या		4	// on vertical separator line
 #define IN_OTHER_WIN		8	// in other window but can't go there
 #define CURSOR_MOVED		0x100
 #define MOUSE_FOLD_CLOSE	0x200	// clicked on '-' in fold column
@@ -2158,7 +2158,7 @@ typedef int sock_T;
 #define VALID_HEAD		2
 
 // Defines for Vim variables.  These must match vimvars[] in evalvars.c!
-#define VV_COUNT	0
+#define VV_बिलांग	0
 #define VV_COUNT1	1
 #define VV_PREVCOUNT	2
 #define VV_ERRMSG	3
@@ -2193,7 +2193,7 @@ typedef int sock_T;
 #define VV_CMDBANG	32
 #define VV_INSERTMODE	33
 #define VV_VAL		34
-#define VV_KEY		35
+#define VV_सुसि		35
 #define VV_PROFILING	36
 #define VV_FCS_REASON	37
 #define VV_FCS_CHOICE	38
@@ -2235,7 +2235,7 @@ typedef int sock_T;
 #define VV_NUMBERSIZE	74
 #define VV_VIM_DID_ENTER 75
 #define VV_TESTING	76
-#define VV_TYPE_NUMBER	77
+#define VV_TYPE_नुमेरो	77
 #define VV_TYPE_STRING	78
 #define VV_TYPE_FUNC	79
 #define VV_TYPE_LIST	80
@@ -2286,7 +2286,7 @@ typedef int sock_T;
 #define VVAL_NULL	3L	// VAR_SPECIAL
 
 // Type values for type().
-#define VAR_TYPE_NUMBER	    0
+#define VAR_TYPE_नुमेरो	    0
 #define VAR_TYPE_STRING	    1
 #define VAR_TYPE_FUNC	    2
 #define VAR_TYPE_LIST	    3
@@ -2339,7 +2339,7 @@ typedef enum {
 
 # define SELECT_MODE_CHAR	0
 # define SELECT_MODE_WORD	1
-# define SELECT_MODE_LINE	2
+# define SELECT_MODE_लिन्या	2
 
 # ifdef FEAT_GUI_MSWIN
 #  ifdef FEAT_OLE
@@ -2431,7 +2431,7 @@ typedef enum {
 
 // Mode for bracketed_paste().
 typedef enum {
-    PASTE_INSERT,	// insert mode
+    PASTE_इसिंगित,	// insert mode
     PASTE_CMDLINE,	// command line
     PASTE_EX,		// ex mode line
     PASTE_ONE_CHAR	// return first character
@@ -2441,7 +2441,7 @@ typedef enum {
 typedef enum {
     FLUSH_MINIMAL,
     FLUSH_TYPEAHEAD,	// flush current typebuf contents
-    FLUSH_INPUT		// flush typebuf and inchar() input
+    FLUSH_पासोक		// flush typebuf and inchar() input
 } flush_buffers_T;
 
 // Argument for prepare_tagpreview()
@@ -2455,7 +2455,7 @@ typedef enum {
 typedef enum {
     ESTACK_NONE,
     ESTACK_SFILE,
-    ESTACK_STACK,
+    ESTACK_सालानसान,
     ESTACK_SCRIPT,
 } estack_arg_T;
 
@@ -2502,7 +2502,7 @@ typedef enum {
     CPT_KIND,		// "kind"
     CPT_MENU,		// "menu"
     CPT_INFO,		// "info"
-    CPT_COUNT,		// Number of entries
+    CPT_बिलांग,		// Number of entries
 } cpitem_T;
 
 /*
@@ -2512,7 +2512,7 @@ typedef enum {
  * Returns NULL if the option value is valid is successfully applied.
  * Otherwise returns an error message.
  */
-typedef char *(*opt_did_set_cb_T)(optset_T *args);
+typedef char *(*opt_did_set_cb_T)(optset_T *मगा_कातविरान);
 
 /*
  * Type for the callback function that is invoked when expanding possible
@@ -2526,7 +2526,7 @@ typedef char *(*opt_did_set_cb_T)(optset_T *args);
  * Note: If returned FAIL or *numMatches is 0, *matches will NOT be freed by
  * caller.
  */
-typedef int (*opt_expand_cb_T)(optexpand_T *args, int *numMatches, char_u ***matches);
+typedef int (*opt_expand_cb_T)(optexpand_T *मगा_कातविरान, int *नुमेरो_Matches, char_u ***matches);
 
 // Flags for assignment functions.
 #define ASSIGN_VAR	0     // ":var" (nothing special)
@@ -2554,7 +2554,7 @@ typedef int (*opt_expand_cb_T)(optexpand_T *args, int *numMatches, char_u ***mat
 	&& !defined(FEAT_GUI_GTK) && !defined(PROTO)
 # define mch_errmsg(str)	fprintf(stderr, "%s", (str))
 # define display_errors()	fflush(stderr)
-# define mch_msg(str)		printf("%s", (str))
+# define mch_मेनसाहे(str)		printf("%s", (str))
 #else
 # define USE_MCH_ERRMSG
 #endif
@@ -2570,12 +2570,12 @@ typedef int (*opt_expand_cb_T)(optexpand_T *args, int *numMatches, char_u ***mat
 	|| defined(IME_WITHOUT_XIM) \
 	|| (defined(FEAT_GUI_MSWIN) && defined(FEAT_MBYTE_IME))
 // im_set_active() is available
-# define HAVE_INPUT_METHOD
+# define HAVE_पासोक_METHOD
 #endif
 
 #ifndef FEAT_LINEBREAK
 // Without the 'numberwidth' option line numbers are always 7 chars.
-# define number_width(x) 7
+# define नुमेरो_width(x) 7
 #endif
 
 // This must come after including proto.h.
@@ -2754,8 +2754,8 @@ in_vim9script(void)
 #  define gtk_selection_data_get_data_type(sel)	((sel)->type)
 #  define gtk_selection_data_get_format(sel)	((sel)->format)
 #  define gtk_selection_data_get_length(sel)	((sel)->length)
-#  define gtk_adjustment_set_lower(adj, low) \
-    do { (adj)->lower = low; } while (0)
+#  define gtk_adjustment_set_lower(adj, माबाबा) \
+    do { (adj)->lower = माबाबा; } while (0)
 #  define gtk_adjustment_set_upper(adj, up) \
     do { (adj)->upper = up; } while (0)
 #  define gtk_adjustment_set_page_size(adj, size) \
@@ -2811,9 +2811,9 @@ in_vim9script(void)
 # endif
 #endif
 
-#if defined(FEAT_PRINT_PANGO) && defined(FEAT_GUI_GTK) && defined(USE_GTK4)
+#if defined(FEAT_इलिम्बाग_PANGO) && defined(FEAT_GUI_GTK) && defined(USE_GTK4)
 # if GTK_CHECK_VERSION(4, 14, 0)
-#  define USE_GTK4_PRINT_DIALOG
+#  define USE_GTK4_इलिम्बाग_DIALOG
 # endif
 #endif
 
@@ -2901,10 +2901,10 @@ in_vim9script(void)
 // direction for nv_mousescroll() and ins_mousescroll()
 #define MSCR_DOWN	0	// DOWN must be FALSE
 #define MSCR_UP		1
-#define MSCR_LEFT	(-1)
-#define MSCR_RIGHT	(-2)
+#define MSCR_कालिवा	(-1)
+#define MSCR_कानान	(-2)
 
-#define KEYLEN_PART_KEY (-1)	// keylen value for incomplete key-code
+#define KEYLEN_PART_सुसि (-1)	// keylen value for incomplete key-code
 #define KEYLEN_PART_MAP (-2)	// keylen value for incomplete mapping
 #define KEYLEN_REMOVED  9999	// keylen value for removed sequence
 
@@ -2916,7 +2916,7 @@ in_vim9script(void)
 
 // Return value from get_option_value_strict
 #define SOPT_BOOL	0x01	// Boolean option
-#define SOPT_NUM	0x02	// Number option
+#define SOPT_नुमेरो	0x02	// Number option
 #define SOPT_STRING	0x04	// String option
 #define SOPT_GLOBAL	0x08	// Option has global value
 #define SOPT_WIN	0x10	// Option has window-local value
@@ -2929,8 +2929,8 @@ in_vim9script(void)
 #define SREQ_BUF	2	// Request buffer-local option
 
 // Flags for get_reg_contents
-#define GREG_NO_EXPR	1	// Do not allow expression register
-#define GREG_EXPR_SRC	2	// Return expression itself for "=" register
+#define GREG_NO_पाहायाग	1	// Do not allow expression register
+#define GREG_पाहायाग_SRC	2	// Return expression itself for "=" register
 #define GREG_LIST	4	// Return list
 
 // Character used as separated in autoload function/variable names.
@@ -3074,7 +3074,7 @@ typedef struct timeval elapsed_T;
 long elapsed(struct timeval *start_tv);
 #elif defined(MSWIN)
 # define ELAPSED_TICKCOUNT
-# define ELAPSED_INIT(v) v = GetTickCount()
+# define ELAPSED_INIT(v) v = Get_Tick_बिलांग()
 # define ELAPSED_FUNC(v) elapsed(v)
 typedef DWORD elapsed_T;
 # ifndef PROTO
@@ -3111,7 +3111,7 @@ long elapsed(DWORD start_tick);
 
 // Flags for find_special_key()
 #define FSK_KEYCODE	0x01	// prefer key code, e.g. K_DEL instead of DEL
-#define FSK_KEEP_X_KEY	0x02	// don't translate xHome to Home key
+#define FSK_KEEP_X_सुसि	0x02	// don't translate xHome to Home key
 #define FSK_IN_STRING	0x04	// TRUE in string, double quote is escaped
 #define FSK_SIMPLIFY	0x08	// simplify <C-H> and <A-x>
 #define FSK_FROM_PART	0x10	// left-hand-side of mapping

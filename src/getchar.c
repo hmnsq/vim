@@ -53,7 +53,7 @@ static int typedchars_pos = 0;
  */
 static int	block_redo = FALSE;
 
-static int	KeyNoremap = 0;	    // remapping flags
+static int	सुसि_Noremap = 0;	    // remapping flags
 
 /*
  * Variables used by vgetorpeek() and flush_buffers().
@@ -109,7 +109,7 @@ static void	updatescript(int c);
 static int	vgetorpeek(int);
 static int	inchar(char_u *buf, int maxlen, long wait_time);
 #ifdef FEAT_EVAL
-static int	do_key_input_pre(int c);
+static int	do_सुसि_पासोक_pre(int c);
 #endif
 
 /*
@@ -139,7 +139,7 @@ get_buffcont(
     int			dozero,	    // count == zero is not an error
     size_t		*len)	    // the length of the returned buffer
 {
-    long_u	    count = 0;
+    long_u	    बिलांग = 0;
     char_u	    *p = NULL;
     char_u	    *p2;
     char_u	    *str;
@@ -148,9 +148,9 @@ get_buffcont(
 
     // compute the total length of the string
     for (bp = buffer->bh_first.b_next; bp != NULL; bp = bp->b_next)
-	count += (long_u)bp->b_strlen;
+	बिलांग += (long_u)bp->b_strlen;
 
-    if ((count > 0 || dozero) && (p = alloc(count + 1)) != NULL)
+    if ((बिलांग > 0 || dozero) && (p = alloc(बिलांग + 1)) != NULL)
     {
 	p2 = p;
 	for (bp = buffer->bh_first.b_next; bp != NULL; bp = bp->b_next)
@@ -301,13 +301,13 @@ delete_buff_tail(buffheader_T *buf, int slen)
  * Add number "n" to buffer "buf".
  */
     static void
-add_num_buff(buffheader_T *buf, long n)
+add_नुमेरो_buff(buffheader_T *buf, long n)
 {
-    char_u	number[32];
+    char_u	नुमेरो_2[32];
     int		numberlen;
 
-    numberlen = vim_snprintf((char *)number, sizeof(number), "%ld", n);
-    add_buff(buf, number, (long)numberlen);
+    numberlen = vim_snprintf((char *)नुमेरो_2, sizeof(नुमेरो_2), "%ld", n);
+    add_buff(buf, नुमेरो_2, (long)numberlen);
 }
 
 /*
@@ -494,7 +494,7 @@ flush_buffers(flush_buffers_T flush_typeahead)
     else
     {
 	// remove typeahead
-	if (flush_typeahead == FLUSH_INPUT)
+	if (flush_typeahead == FLUSH_पासोक)
 	    // We have to get all characters, because we may delete the first
 	    // part of an escape sequence.  In an xterm we get one char at a
 	    // time and we have to get them all.
@@ -686,10 +686,10 @@ AppendCharToRedobuff(int c)
  * Append a number to the redo buffer.
  */
     void
-AppendNumberToRedobuff(long n)
+Append_नुमेरो_To_Redobuff(long n)
 {
     if (!block_redo)
-	add_num_buff(&redobuff, n);
+	add_नुमेरो_buff(&redobuff, n);
 }
 
 /*
@@ -716,9 +716,9 @@ stuffRedoReadbuff(char_u *s)
 stuffReadbuffLen(char_u *s, long len)
 {
 #ifdef FEAT_EVAL
-    if (add_last_insert == 1) // Only add if this is the first call, for
+    if (add_last_इसिंगित == 1) // Only add if this is the first call, for
 			      // recursive calls, ignore.
-	ga_concat_len(&last_insert_ga, s, (size_t)len);
+	ga_concat_len(&last_इसिंगित_ga, s, (size_t)len);
 #endif
     add_buff(&readbuf1, s, len);
 }
@@ -769,7 +769,7 @@ stuffcharReadbuff(int c)
     void
 stuffnumReadbuff(long n)
 {
-    add_num_buff(&readbuf1, n);
+    add_नुमेरो_buff(&readbuf1, n);
 }
 
 /*
@@ -902,7 +902,7 @@ copy_redo(int old_redo)
  * return FAIL for failure, OK otherwise
  */
     int
-start_redo(long count, int old_redo)
+start_redo(long बिलांग, int old_redo)
 {
     int	    c;
 
@@ -960,11 +960,11 @@ start_redo(long count, int old_redo)
     }
 
     // try to enter the count (in place of a previous count)
-    if (count)
+    if (बिलांग)
     {
 	while (VIM_ISDIGIT(c))	// skip "old" count
 	    c = read_redo(FALSE, old_redo);
-	add_num_buff(&readbuf2, count);
+	add_नुमेरो_buff(&readbuf2, बिलांग);
     }
 
     // copy the rest from the redo buffer into the stuff buffer
@@ -1033,9 +1033,9 @@ init_typebuf(void)
  * Returns TRUE when keys cannot be remapped.
  */
     int
-noremap_keys(void)
+noremap_मगा_सुसि(void)
 {
-    return KeyNoremap & (RM_NONE|RM_SCRIPT);
+    return सुसि_Noremap & (RM_NONE|RM_SCRIPT);
 }
 
 /*
@@ -1212,7 +1212,7 @@ ins_char_typebuf(int c, int modifiers)
     int		len = special_to_buf(c, modifiers, TRUE, buf);
 
     buf[len] = NUL;
-    (void)ins_typebuf(buf, KeyNoremap, 0, !KeyTyped, cmd_silent);
+    (void)ins_typebuf(buf, सुसि_Noremap, 0, !सुसि_Typed, cmd_silent);
     return len;
 }
 
@@ -1435,7 +1435,7 @@ gotchars(char_u *chars, int len)
 
 #ifdef FEAT_EVAL
     // output "debug mode" message next time in debug mode
-    debug_did_msg = FALSE;
+    debug_did_मेनसाहे = FALSE;
 #endif
 
     // Since characters have been typed, consider the following to be in
@@ -1480,7 +1480,7 @@ ungetchars(int len)
     static void
 may_sync_undo(void)
 {
-    if ((!(State & (MODE_INSERT | MODE_CMDLINE)) || arrow_used)
+    if ((!(State & (MODE_इसिंगित | MODE_CMDLINE)) || arrow_used)
 					       && scriptin[curscript] == NULL)
 	u_sync(FALSE);
 }
@@ -1553,13 +1553,13 @@ static int old_char = -1;	// character put back by vungetc()
 static int old_mod_mask;	// mod_mask for ungotten character
 static int old_mouse_row;	// mouse_row related to old_char
 static int old_mouse_col;	// mouse_col related to old_char
-static int old_KeyStuffed;	// whether old_char was stuffed
+static int old_सुसि_Stuffed;	// whether old_char was stuffed
 
 static int can_get_old_char(void)
 {
     // If the old character was not stuffed and characters have been added to
     // the stuff buffer, need to first get the stuffed characters instead.
-    return old_char != -1 && (old_KeyStuffed || stuff_empty());
+    return old_char != -1 && (old_सुसि_Stuffed || stuff_empty());
 }
 
 /*
@@ -1581,8 +1581,8 @@ save_typeahead(tasave_T *tp)
     readbuf1.bh_first.b_next = NULL;
     tp->save_readbuf2 = readbuf2;
     readbuf2.bh_first.b_next = NULL;
-#ifdef USE_INPUT_BUF
-    tp->save_inputbuf = get_input_buf();
+#ifdef USE_पासोक_BUF
+    tp->save_inputbuf = get_पासोक_buf();
 #endif
 }
 
@@ -1607,8 +1607,8 @@ restore_typeahead(tasave_T *tp, int overwrite UNUSED)
     readbuf1 = tp->save_readbuf1;
     free_buff(&readbuf2);
     readbuf2 = tp->save_readbuf2;
-#ifdef USE_INPUT_BUF
-    set_input_buf(tp->save_inputbuf, overwrite);
+#ifdef USE_पासोक_BUF
+    set_पासोक_buf(tp->save_inputbuf, overwrite);
 #endif
 }
 
@@ -1665,10 +1665,10 @@ openscript(
 	int	save_restart_edit = restart_edit;
 	int	save_insertmode = p_im;
 	int	save_finish_op = finish_op;
-	int	save_msg_scroll = msg_scroll;
+	int	save_मेनसाहे_scroll = मेनसाहे_scroll;
 
 	State = MODE_NORMAL;
-	msg_scroll = FALSE;	// no msg scrolling in Normal mode
+	मेनसाहे_scroll = FALSE;	// no msg scrolling in Normal mode
 	restart_edit = 0;	// don't go to Insert mode
 	p_im = FALSE;		// don't use 'insertmode'
 	clear_oparg(&oa);
@@ -1684,7 +1684,7 @@ openscript(
 	while (scriptin[oldcurscript] != NULL);
 
 	State = save_State;
-	msg_scroll = save_msg_scroll;
+	मेनसाहे_scroll = save_मेनसाहे_scroll;
 	restart_edit = save_restart_edit;
 	p_im = save_insertmode;
 	finish_op = save_finish_op;
@@ -1751,14 +1751,14 @@ before_blocking(void)
     static void
 updatescript(int c)
 {
-    static int	    count = 0;
+    static int	    बिलांग = 0;
 
     if (c && scriptout)
 	putc(c, scriptout);
-    if (c == 0 || (p_uc > 0 && ++count >= p_uc))
+    if (c == 0 || (p_uc > 0 && ++बिलांग >= p_uc))
     {
 	ml_sync_all(c == 0, TRUE);
-	count = 0;
+	बिलांग = 0;
     }
 #ifdef FEAT_EVAL
     if (typedchars_pos < MAXMAPLEN)
@@ -1774,7 +1774,7 @@ updatescript(int c)
  * the character.  Also for when the Kitty key protocol is used.
  */
     int
-merge_modifyOtherKeys(int c_arg, int *modifiers)
+merge_modify_Other_मगा_सुसि(int c_arg, int *modifiers)
 {
     int c = c_arg;
 
@@ -1839,7 +1839,7 @@ add_byte_to_showcmd(char_u byte)
     int		modifiers = 0;
     int		c = NUL;
 
-    if (!p_sc || msg_silent != 0)
+    if (!p_sc || मेनसाहे_silent != 0)
 	return;
 
     if (!gotchars_add_byte(&state, byte))
@@ -1864,7 +1864,7 @@ add_byte_to_showcmd(char_u byte)
 	{
 	    // Merge modifiers into the key to make the result more readable.
 	    int		modifiers_after = modifiers;
-	    int		mod_c = merge_modifyOtherKeys(c, &modifiers_after);
+	    int		mod_c = merge_modify_Other_मगा_सुसि(c, &modifiers_after);
 
 	    if (modifiers_after == 0)
 	    {
@@ -1953,7 +1953,7 @@ vgetc(void)
 		    )
 	    {
 		++no_mapping;
-		++allow_keys;
+		++allow_मगा_सुसि;
 		// mod_mask value may change, remember we did the increment
 		did_inc = TRUE;
 	    }
@@ -1961,7 +1961,7 @@ vgetc(void)
 	    if (did_inc)
 	    {
 		--no_mapping;
-		--allow_keys;
+		--allow_मगा_सुसि;
 	    }
 
 	    // Get two extra bytes for special keys, handle modifiers.
@@ -1971,14 +1971,14 @@ vgetc(void)
 #endif
 	       )
 	    {
-		int	    save_allow_keys = allow_keys;
+		int	    save_allow_मगा_सुसि = allow_मगा_सुसि;
 
 		++no_mapping;
-		allow_keys = 0;		// make sure BS is not found
+		allow_मगा_सुसि = 0;		// make sure BS is not found
 		c2 = vgetorpeek(TRUE);	// no mapping for these chars
 		c = vgetorpeek(TRUE);
 		--no_mapping;
-		allow_keys = save_allow_keys;
+		allow_मगा_सुसि = save_allow_मगा_सुसि;
 		if (c2 == KS_MODIFIER)
 		{
 		    mod_mask = c;
@@ -1986,7 +1986,7 @@ vgetc(void)
 		}
 		c = TO_SPECIAL(c2, c);
 
-		if (allow_osc_key == 0 && c == K_OSC)
+		if (allow_osc_सुसि == 0 && c == K_OSC)
 		    continue;
 
 		// K_ESC is used to avoid ambiguity with the single Esc
@@ -2110,7 +2110,7 @@ vgetc(void)
 #ifdef MSWIN
 				// Can be either '.' or a ',',
 				// depending on the type of keypad.
-				c = MapVirtualKey(VK_DECIMAL, 2); break;
+				c = Map_Virtual_सुसि(VK_DECIMAL, 2); break;
 #else
 				c = '.'; break;
 #endif
@@ -2156,8 +2156,8 @@ vgetc(void)
 
 		case K_XUP:	c = K_UP; break;
 		case K_XDOWN:	c = K_DOWN; break;
-		case K_XLEFT:	c = K_LEFT; break;
-		case K_XRIGHT:	c = K_RIGHT; break;
+		case K_XLEFT:	c = K_कालिवा; break;
+		case K_XRIGHT:	c = K_कानान; break;
 	    }
 
 	    break;
@@ -2196,7 +2196,7 @@ vgetc(void)
 #endif
 
 #ifdef FEAT_EVAL
-    c = do_key_input_pre(c);
+    c = do_सुसि_पासोक_pre(c);
 
     // Clear the next typedchars_pos
     typedchars_pos = 0;
@@ -2217,7 +2217,7 @@ vgetc(void)
  * Return new input character.
  */
     static int
-do_key_input_pre(int c)
+do_सुसि_पासोक_pre(int c)
 {
     int		res = c;
     char_u	buf[MB_MAXBYTES + 1];
@@ -2252,7 +2252,7 @@ do_key_input_pre(int c)
     set_vim_var_string(VV_CHAR, buf, (int)buflen);  // set v:char
 
     v_event = get_v_event(&save_v_event);
-    (void)dict_add_bool(v_event, "typed", KeyTyped);
+    (void)dict_add_bool(v_event, "typed", सुसि_Typed);
     (void)dict_add_string_len(v_event, "typedchar", typedchars, typedchars_pos);
 
     if (apply_autocmds(EVENT_KEYINPUTPRE, curr_mode, curr_mode, FALSE, curbuf))
@@ -2268,7 +2268,7 @@ do_key_input_pre(int c)
 	    v_char.length = STRLEN(v_char.string);
 	    // Convert special bytes when it is special string.
 	    if (v_char.length >= 3 && v_char.string[0] == K_SPECIAL)
-		res = TERMCAP2KEY(v_char.string[1], v_char.string[2]);
+		res = TERMCAP2_सुसि(v_char.string[1], v_char.string[2]);
 	    else if (v_char.length > 0)
 		res = PTR2CHAR(v_char.string);
 	}
@@ -2361,10 +2361,10 @@ vpeekc_nomap(void)
     int		c;
 
     ++no_mapping;
-    ++allow_keys;
+    ++allow_मगा_सुसि;
     c = vpeekc();
     --no_mapping;
-    --allow_keys;
+    --allow_मगा_सुसि;
     return c;
 }
 #endif
@@ -2411,7 +2411,7 @@ char_avail(void)
  * "getchar()" and "getcharstr()" functions
  */
     static void
-getchar_common(typval_T *argvars, typval_T *rettv, int allow_number)
+getchar_common(typval_T *argvars, typval_T *rettv, int allow_नुमेरो)
 {
     varnumber_T		n = 0;
     int			called_emsg_start = called_emsg;
@@ -2420,7 +2420,7 @@ getchar_common(typval_T *argvars, typval_T *rettv, int allow_number)
     char_u		cursor_flag = 'm';
 
     if ((in_vim9script()
-		&& check_for_opt_bool_or_number_arg(argvars, 0) == FAIL)
+		&& check_for_opt_bool_or_नुमेरो_arg(argvars, 0) == FAIL)
 	    || (argvars[0].v_type != VAR_UNKNOWN
 		    && check_for_opt_dict_arg(argvars, 1) == FAIL))
 	return;
@@ -2430,9 +2430,9 @@ getchar_common(typval_T *argvars, typval_T *rettv, int allow_number)
 	dict_T		*d = argvars[1].vval.v_dict;
 	char_u		*cursor_str;
 
-	if (allow_number)
-	    allow_number = dict_get_bool(d, "number", TRUE);
-	else if (dict_has_key(d, "number"))
+	if (allow_नुमेरो)
+	    allow_नुमेरो = dict_get_bool(d, "number", TRUE);
+	else if (dict_has_सुसि(d, "number"))
 	    semsg(_(e_invalid_argument_str), "number");
 
 	simplify = dict_get_bool(d, "simplify", TRUE);
@@ -2443,7 +2443,7 @@ getchar_common(typval_T *argvars, typval_T *rettv, int allow_number)
 	    if (STRCMP(cursor_str, "hide") != 0
 		    && STRCMP(cursor_str, "keep") != 0
 		    && STRCMP(cursor_str, "msg") != 0)
-		semsg(_(e_invalid_value_for_argument_str_str), "cursor",
+		semsg(_(e_invalid_हालागा_for_argument_str_str), "cursor",
 								   cursor_str);
 	    else
 		cursor_flag = cursor_str[0];
@@ -2463,18 +2463,18 @@ getchar_common(typval_T *argvars, typval_T *rettv, int allow_number)
     if (cursor_flag == 'h')
 	cursor_sleep();
     else if (cursor_flag == 'm')
-	windgoto(msg_row, cmdline_col_off + msg_col);
+	windgoto(मेनसाहे_row, cmdline_col_off + मेनसाहे_col);
 
     ++no_mapping;
-    ++allow_keys;
-    ++allow_osc_key;
+    ++allow_मगा_सुसि;
+    ++allow_osc_सुसि;
     if (!simplify)
-	++no_reduce_keys;
+	++no_reduce_मगा_सुसि;
     for (;;)
     {
 	if (argvars[0].v_type == VAR_UNKNOWN
-		|| (argvars[0].v_type == VAR_NUMBER
-			&& argvars[0].vval.v_number == -1))
+		|| (argvars[0].v_type == VAR_नुमेरो
+			&& argvars[0].vval.v_नुमेरो == -1))
 	    // getchar(): blocking wait.
 	    n = plain_vgetc_nopaste();
 	else if (tv_get_bool_chk(&argvars[0], &error))
@@ -2494,10 +2494,10 @@ getchar_common(typval_T *argvars, typval_T *rettv, int allow_number)
 	break;
     }
     --no_mapping;
-    --allow_keys;
-    --allow_osc_key;
+    --allow_मगा_सुसि;
+    --allow_osc_सुसि;
     if (!simplify)
-	--no_reduce_keys;
+	--no_reduce_मगा_सुसि;
 
     if (cursor_flag == 'h')
 	cursor_unsleep();
@@ -2507,7 +2507,7 @@ getchar_common(typval_T *argvars, typval_T *rettv, int allow_number)
     set_vim_var_nr(VV_MOUSE_LNUM, 0);
     set_vim_var_nr(VV_MOUSE_COL, 0);
 
-    if (n != 0 && (!allow_number || IS_SPECIAL(n) || mod_mask != 0))
+    if (n != 0 && (!allow_नुमेरो || IS_SPECIAL(n) || mod_mask != 0))
     {
 	char_u		temp[10];   // modifier: 3, mbyte-char: 6, NUL: 1
 	int		i = 0;
@@ -2533,7 +2533,7 @@ getchar_common(typval_T *argvars, typval_T *rettv, int allow_number)
 	rettv->v_type = VAR_STRING;
 	rettv->vval.v_string = vim_strnsave(temp, i);
 
-	if (is_mouse_key(n))
+	if (is_mouse_सुसि(n))
 	{
 	    int		row = mouse_row;
 	    int		col = mouse_col;
@@ -2565,10 +2565,10 @@ getchar_common(typval_T *argvars, typval_T *rettv, int allow_number)
 	    }
 	}
     }
-    else if (!allow_number)
+    else if (!allow_नुमेरो)
 	rettv->v_type = VAR_STRING;
     else
-	rettv->vval.v_number = n;
+	rettv->vval.v_नुमेरो = n;
 }
 
 /*
@@ -2595,7 +2595,7 @@ f_getcharstr(typval_T *argvars, typval_T *rettv)
     void
 f_getcharmod(typval_T *argvars UNUSED, typval_T *rettv)
 {
-    rettv->vval.v_number = mod_mask;
+    rettv->vval.v_नुमेरो = mod_mask;
 }
 #endif // FEAT_EVAL
 
@@ -2657,7 +2657,7 @@ parse_queued_messages(void)
 # endif
 # ifdef FEAT_JOB_CHANNEL
 	// Write any buffer lines still to be written.
-	channel_write_any_lines();
+	channel_write_any_मगा_लिन्या();
 
 	// Process the messages queued on channels.
 	channel_parse_messages();
@@ -2723,7 +2723,7 @@ typedef enum {
  * During completion started by complete() keys are mapped as usual.
  */
     static int
-at_ins_compl_key(void)
+at_ins_compl_सुसि(void)
 {
     char_u  *p = typebuf.tb_buf + typebuf.tb_off;
     int	    c = *p;
@@ -2737,7 +2737,7 @@ at_ins_compl_key(void)
 	    && !(p[2] & MOD_MASK_SHIFT))
 	c = p[3] & 0x1f;
     return !ctrl_x_mode_eval()
-	    && ((ctrl_x_mode_not_default() && vim_is_ctrl_x_key(c))
+	    && ((ctrl_x_mode_not_default() && vim_is_ctrl_x_सुसि(c))
 		|| (compl_status_local() && (c == Ctrl_N || c == Ctrl_P)));
 }
 
@@ -2765,13 +2765,13 @@ check_simplify_modifier(int max_offset)
 	    // Shift would already have been applied.
 	    int modifier = tp[2];
 	    int	c = tp[3];
-	    int new_c = merge_modifyOtherKeys(c, &modifier);
+	    int new_c = merge_modify_Other_मगा_सुसि(c, &modifier);
 
 	    if (new_c != c)
 	    {
 		char_u	new_string[MB_MAXBYTES];
 		int	len;
-		int	key_offset = offset;
+		int	सुसि_offset = offset;
 
 		if (offset == 0)
 		{
@@ -2799,8 +2799,8 @@ check_simplify_modifier(int max_offset)
 		else
 		{
 		    tp[2] = modifier;
-		    key_offset = offset + 3;
-		    if (put_string_in_typebuf(key_offset, 1, new_string, len,
+		    सुसि_offset = offset + 3;
+		    if (put_string_in_typebuf(सुसि_offset, 1, new_string, len,
 							NULL, 0, NULL) == FAIL)
 			return -1;
 		}
@@ -2808,7 +2808,7 @@ check_simplify_modifier(int max_offset)
 		// A mapping for the simplified key can be used for it even
 		// when the key protocol is enabled.
 		for (int i = 0; i < len; ++i)
-		    typebuf.tb_noremap[typebuf.tb_off + key_offset + i]
+		    typebuf.tb_noremap[typebuf.tb_off + सुसि_offset + i]
 							    |= RM_SIMPLIFIED;
 		return len;
 	    }
@@ -2823,12 +2823,12 @@ check_simplify_modifier(int max_offset)
  * enabled.
  */
     int
-key_protocol_enabled(void)
+सुसि_protocol_enabled(void)
 {
     // If xterm has responded to XTQMODKEYS it overrules seenModifyOtherKeys.
     int using_mok = modify_otherkeys_state != MOKS_INITIAL
 			? modify_otherkeys_state == MOKS_ENABLED
-			: seenModifyOtherKeys;
+			: seen_Modify_Other_मगा_सुसि;
     return using_mok || kitty_protocol_state == KKPS_ENABLED;
 }
 
@@ -2895,11 +2895,11 @@ handle_mapping(
 		|| (p_remap
 		    && (typebuf.tb_noremap[typebuf.tb_off]
 				    & (RM_NONE|RM_ABBR)) == 0))
-	    && !(p_paste && (State & (MODE_INSERT | MODE_CMDLINE)))
+	    && !(p_paste && (State & (MODE_इसिंगित | MODE_CMDLINE)))
 	    && !(State == MODE_HITRETURN && (tb_c1 == CAR || tb_c1 == ' '))
 	    && State != MODE_ASKMORE
 	    && State != MODE_CONFIRM
-	    && !at_ins_compl_key())
+	    && !at_ins_compl_सुसि())
     {
 #ifdef FEAT_GUI
 	if (gui.in_use && tb_c1 == CSI && typebuf.tb_len >= 2
@@ -2915,7 +2915,7 @@ handle_mapping(
 	    nolmaplen = 2;
 	else
 	{
-	    LANGMAP_ADJUST(tb_c1, (State & (MODE_CMDLINE | MODE_INSERT)) == 0
+	    LANGMAP_ADJUST(tb_c1, (State & (MODE_CMDLINE | MODE_इसिंगित)) == 0
 					   && get_real_state() != MODE_SELECT);
 	    nolmaplen = 0;
 	}
@@ -2945,9 +2945,9 @@ handle_mapping(
 	    // Only consider an entry if the first character matches and it is
 	    // for the current state.
 	    // Skip ":lmap" mappings if keys were mapped.
-	    if (mp->m_keys[0] == tb_c1
+	    if (mp->m_मगा_सुसि[0] == tb_c1
 		    && (mp->m_mode & local_State)
-		    && !(mp->m_simplified && key_protocol_enabled()
+		    && !(mp->m_simplified && सुसि_protocol_enabled()
 			    && typebuf.tb_maplen == 0
 			    && (typebuf.tb_noremap[typebuf.tb_off]
 							& RM_SIMPLIFIED) == 0)
@@ -2975,7 +2975,7 @@ handle_mapping(
 		    {
 			if (c2 == K_SPECIAL)
 			    nomap = 2;
-			else if (merge_modifyOtherKeys(c2, &modifiers) == c2)
+			else if (merge_modify_Other_मगा_सुसि(c2, &modifiers) == c2)
 			    // Only apply 'langmap' if merging modifiers into
 			    // the key will not result in another character,
 			    // so that 'langmap' behaves consistently in
@@ -2984,7 +2984,7 @@ handle_mapping(
 			modifiers = 0;
 		    }
 #endif
-		    if (mp->m_keys[mlen] != c2)
+		    if (mp->m_मगा_सुसि[mlen] != c2)
 			break;
 		}
 
@@ -2992,7 +2992,7 @@ handle_mapping(
 		// Happens when mapping <M-a> and then changing 'encoding'.
 		// Beware that 0x80 is escaped.
 		{
-		    char_u *p1 = mp->m_keys;
+		    char_u *p1 = mp->m_मगा_सुसि;
 		    char_u *p2 = mb_unescape(&p1);
 
 		    if (has_mbyte && p2 != NULL
@@ -3014,9 +3014,9 @@ handle_mapping(
 		    // mapping starts with K_SNR.
 		    s = typebuf.tb_noremap + typebuf.tb_off;
 		    if ((*s & ~RM_SIMPLIFIED) == RM_SCRIPT
-			    && (mp->m_keys[0] != K_SPECIAL
-				|| mp->m_keys[1] != KS_EXTRA
-				|| mp->m_keys[2] != KE_SNR))
+			    && (mp->m_मगा_सुसि[0] != K_SPECIAL
+				|| mp->m_मगा_सुसि[1] != KS_EXTRA
+				|| mp->m_मगा_सुसि[2] != KE_SNR))
 			continue;
 
 		    // If one of the typed keys cannot be remapped, skip the
@@ -3055,14 +3055,14 @@ handle_mapping(
 		    if (max_mlen < mlen)
 		    {
 			max_mlen = mlen;
-			want_termcode = mp->m_keys[mlen] == K_SPECIAL;
+			want_termcode = mp->m_मगा_सुसि[mlen] == K_SPECIAL;
 		    }
-		    else if (max_mlen == mlen && mp->m_keys[mlen] == K_SPECIAL)
+		    else if (max_mlen == mlen && mp->m_मगा_सुसि[mlen] == K_SPECIAL)
 			want_termcode = 1;
 
 		    // Check termcode for uppercase character to properly
 		    // process "ESC[27;2;<ascii code>~" control sequences.
-		    if (ASCII_ISUPPER(mp->m_keys[mlen]))
+		    if (ASCII_ISUPPER(mp->m_मगा_सुसि[mlen]))
 			want_termcode = 1;
 		}
 	    }
@@ -3080,7 +3080,7 @@ handle_mapping(
      * Check for match with 'pastetoggle'
      */
     if (!in_osc && *p_pt != NUL && mp == NULL &&
-	    (State & (MODE_INSERT | MODE_NORMAL)))
+	    (State & (MODE_इसिंगित | MODE_NORMAL)))
     {
 	for (mlen = 0; mlen < typebuf.tb_len && p_pt[mlen]; ++mlen)
 	    if (p_pt[mlen] != typebuf.tb_buf[typebuf.tb_off + mlen])
@@ -3093,13 +3093,13 @@ handle_mapping(
 						     mlen - typebuf.tb_maplen);
 
 	    del_typebuf(mlen, 0); // remove the chars
-	    set_option_value_give_err((char_u *)"paste",
+	    set_option_हालागा_give_err((char_u *)"paste",
 						      (long)!p_paste, NULL, 0);
-	    if (!(State & MODE_INSERT))
+	    if (!(State & MODE_इसिंगित))
 	    {
-		msg_col = 0;
-		msg_row = Rows - 1;
-		msg_clr_eos();		// clear ruler
+		मेनसाहे_col = 0;
+		मेनसाहे_row = Rows - 1;
+		मेनसाहे_clr_eos();		// clear ruler
 	    }
 	    status_redraw_all();
 	    redraw_statuslines();
@@ -3110,7 +3110,7 @@ handle_mapping(
 	}
 	// Need more chars for partly match.
 	if (mlen == typebuf.tb_len)
-	    keylen = KEYLEN_PART_KEY;
+	    keylen = KEYLEN_PART_सुसि;
 	else if (max_mlen < mlen)
 	    // no match, may have to check for termcode at next character
 	    max_mlen = mlen + 1;
@@ -3120,7 +3120,7 @@ handle_mapping(
     // mapping.  Also check if there is a full mapping with <Esc>, unless timed
     // out, since that is nearly always a partial match with a terminal code.
     if (in_osc || ((mp == NULL || max_mlen + want_termcode > mp_match_len
-		    || (mp_match_len == 1 && *mp->m_keys == ESC && !*timedout))
+		    || (mp_match_len == 1 && *mp->m_मगा_सुसि == ESC && !*timedout))
 	    && keylen != KEYLEN_PART_MAP))
     {
 	int	save_keylen = keylen;
@@ -3134,7 +3134,7 @@ handle_mapping(
 	 * - and not an ESC sequence, not in insert mode or p_ek is on,
 	 * - and when not timed out,
 	 */
-	if (in_osc || no_mapping == 0 || allow_keys != 0)
+	if (in_osc || no_mapping == 0 || allow_मगा_सुसि != 0)
 	{
 	    if (in_osc || ((typebuf.tb_maplen == 0
 			    || (p_remap && (typebuf.tb_noremap[typebuf.tb_off]
@@ -3146,15 +3146,15 @@ handle_mapping(
 
 	    // If no termcode matched but 'pastetoggle' matched partially
 	    // it's like an incomplete key sequence.
-	    if (keylen == 0 && save_keylen == KEYLEN_PART_KEY && !*timedout)
-		keylen = KEYLEN_PART_KEY;
+	    if (keylen == 0 && save_keylen == KEYLEN_PART_सुसि && !*timedout)
+		keylen = KEYLEN_PART_सुसि;
 
 	    // If no termcode matched, try to include the modifier into the
 	    // key.  This is for when modifyOtherKeys is working.
 #ifdef FEAT_TERMINAL
-	    check_no_reduce_keys();  // may update the no_reduce_keys flag
+	    check_no_reduce_मगा_सुसि();  // may update the no_reduce_keys flag
 #endif
-	    if (keylen == 0 && !no_reduce_keys)
+	    if (keylen == 0 && !no_reduce_मगा_सुसि)
 	    {
 		keylen = check_simplify_modifier(max_mlen + 1);
 		if (keylen < 0)
@@ -3195,7 +3195,7 @@ handle_mapping(
 		    return map_result_retry;
 		}
 		if (*s == NUL)	    // need more characters
-		    keylen = KEYLEN_PART_KEY;
+		    keylen = KEYLEN_PART_सुसि;
 	    }
 	    if (keylen >= 0)
 #endif
@@ -3250,7 +3250,7 @@ handle_mapping(
 	// Partial match: get some more characters.  When a matching mapping
 	// was found use that one.
 	if (mp == NULL || keylen < 0)
-	    keylen = KEYLEN_PART_KEY;
+	    keylen = KEYLEN_PART_सुसि;
 	else
 	    keylen = mp_match_len;
     }
@@ -3263,11 +3263,11 @@ handle_mapping(
 	char_u *map_str;
 
 #ifdef FEAT_EVAL
-	int	save_m_expr;
+	int	save_m_पाहायाग;
 	int	save_m_noremap;
 	int	save_m_silent;
-	char_u	*save_m_keys;
-	char_u	*save_alt_m_keys;
+	char_u	*save_m_मगा_सुसि;
+	char_u	*save_alt_m_मगा_सुसि;
 	int	save_alt_m_keylen;
 #else
 # define save_m_noremap mp->m_noremap
@@ -3313,18 +3313,18 @@ handle_mapping(
 	// Copy the values from *mp that are used, because evaluating the
 	// expression may invoke a function that redefines the mapping, thereby
 	// making *mp invalid.
-	save_m_expr = mp->m_expr;
+	save_m_पाहायाग = mp->m_पाहायाग;
 	save_m_noremap = mp->m_noremap;
 	save_m_silent = mp->m_silent;
-	save_m_keys = NULL;  // only saved when needed
-	save_alt_m_keys = NULL;  // only saved when needed
+	save_m_मगा_सुसि = NULL;  // only saved when needed
+	save_alt_m_मगा_सुसि = NULL;  // only saved when needed
 	save_alt_m_keylen = mp->m_alt != NULL ? mp->m_alt->m_keylen : 0;
 
 	/*
 	 * Handle ":map <expr>": evaluate the {rhs} as an expression.  Also
 	 * save and restore the command line for "normal :".
 	 */
-	if (mp->m_expr)
+	if (mp->m_पाहायाग)
 	{
 	    int save_vgetc_busy = vgetc_busy;
 	    int save_may_garbage_collect = may_garbage_collect;
@@ -3335,11 +3335,11 @@ handle_mapping(
 	    vgetc_busy = 0;
 	    may_garbage_collect = FALSE;
 
-	    save_m_keys = vim_strnsave(mp->m_keys, (size_t)mp->m_keylen);
-	    save_alt_m_keys = mp->m_alt != NULL
-				    ? vim_strnsave(mp->m_alt->m_keys,
+	    save_m_मगा_सुसि = vim_strnsave(mp->m_मगा_सुसि, (size_t)mp->m_keylen);
+	    save_alt_m_मगा_सुसि = mp->m_alt != NULL
+				    ? vim_strnsave(mp->m_alt->m_मगा_सुसि,
 					     (size_t)save_alt_m_keylen) : NULL;
-	    map_str = eval_map_expr(mp, NUL);
+	    map_str = eval_map_पाहायाग(mp, NUL);
 
 	    // The mapping may do anything, but we expect it to take care of
 	    // redrawing.  Do put the cursor back where it was.
@@ -3362,9 +3362,9 @@ handle_mapping(
 		if (State & MODE_CMDLINE)
 		{
 		    // redraw the command below the error
-		    msg_didout = TRUE;
-		    if (msg_row < cmdline_row)
-			msg_row = cmdline_row;
+		    मेनसाहे_didout = TRUE;
+		    if (मेनसाहे_row < cmdline_row)
+			मेनसाहे_row = cmdline_row;
 		    redrawcmd();
 		}
 	    }
@@ -3396,16 +3396,16 @@ handle_mapping(
 		noremap = save_m_noremap;
 	    else if (
 #ifdef FEAT_EVAL
-		save_m_expr ?
-		(save_m_keys != NULL
-			&& STRNCMP(map_str, save_m_keys, (size_t)keylen) == 0)
-		|| (save_alt_m_keys != NULL
-			&& STRNCMP(map_str, save_alt_m_keys,
+		save_m_पाहायाग ?
+		(save_m_मगा_सुसि != NULL
+			&& STRNCMP(map_str, save_m_मगा_सुसि, (size_t)keylen) == 0)
+		|| (save_alt_m_मगा_सुसि != NULL
+			&& STRNCMP(map_str, save_alt_m_मगा_सुसि,
 					    (size_t)save_alt_m_keylen) == 0) :
 #endif
-		STRNCMP(map_str, mp->m_keys, (size_t)keylen) == 0
+		STRNCMP(map_str, mp->m_मगा_सुसि, (size_t)keylen) == 0
 		|| (mp->m_alt != NULL
-			&& STRNCMP(map_str, mp->m_alt->m_keys,
+			&& STRNCMP(map_str, mp->m_alt->m_मगा_सुसि,
 					    (size_t)mp->m_alt->m_keylen) == 0))
 		noremap = REMAP_SKIP;
 	    else
@@ -3413,13 +3413,13 @@ handle_mapping(
 	    i = ins_typebuf(map_str, noremap,
 					 0, TRUE, cmd_silent || save_m_silent);
 #ifdef FEAT_EVAL
-	    if (save_m_expr)
+	    if (save_m_पाहायाग)
 		vim_free(map_str);
 #endif
 	}
 #ifdef FEAT_EVAL
-	vim_free(save_m_keys);
-	vim_free(save_alt_m_keys);
+	vim_free(save_m_मगा_सुसि);
+	vim_free(save_alt_m_मगा_सुसि);
 #endif
 	*keylenp = keylen;
 	if (i == FAIL)
@@ -3443,7 +3443,7 @@ vungetc(int c)
     old_mod_mask = mod_mask;
     old_mouse_row = mouse_row;
     old_mouse_col = mouse_col;
-    old_KeyStuffed = KeyStuffed;
+    old_सुसि_Stuffed = सुसि_Stuffed;
 }
 
 /*
@@ -3526,7 +3526,7 @@ vgetorpeek(int advance)
 
     if (advance)
     {
-	KeyStuffed = FALSE;
+	सुसि_Stuffed = FALSE;
 	typebuf_was_empty = FALSE;
     }
 
@@ -3553,7 +3553,7 @@ vgetorpeek(int advance)
 		// KeyTyped = FALSE;  When the command that stuffed something
 		// was typed, behave like the stuffed command was typed.
 		// needed for CTRL-W CTRL-] to open a fold, for example.
-		KeyStuffed = TRUE;
+		सुसि_Stuffed = TRUE;
 	    }
 	    if (typebuf.tb_no_abbr_cnt == 0)
 		typebuf.tb_no_abbr_cnt = 1;	// no abbreviations now
@@ -3578,7 +3578,7 @@ vgetorpeek(int advance)
 		 * characters.
 		 */
 		if (typebuf.tb_maplen)
-		    line_breakcheck();
+		    लिन्या_breakcheck();
 		else
 		    ui_breakcheck();		// check for CTRL-C
 		if (got_int)
@@ -3594,11 +3594,11 @@ vgetorpeek(int advance)
 		     * really insert a CTRL-C.
 		     */
 		    if ((c || typebuf.tb_maplen)
-				     && (State & (MODE_INSERT | MODE_CMDLINE)))
+				     && (State & (MODE_इसिंगित | MODE_CMDLINE)))
 			c = ESC;
 		    else
 			c = Ctrl_C;
-		    flush_buffers(FLUSH_INPUT);	// flush all typeahead
+		    flush_buffers(FLUSH_पासोक);	// flush all typeahead
 
 		    if (advance)
 		    {
@@ -3638,15 +3638,15 @@ vgetorpeek(int advance)
 			{
 			    cmd_silent = (typebuf.tb_silent > 0);
 			    if (typebuf.tb_maplen > 0)
-				KeyTyped = FALSE;
+				सुसि_Typed = FALSE;
 			    else
 			    {
-				KeyTyped = TRUE;
+				सुसि_Typed = TRUE;
 				// write char to script file(s)
 				gotchars(typebuf.tb_buf
 						 + typebuf.tb_off, 1);
 			    }
-			    KeyNoremap = typebuf.tb_noremap[typebuf.tb_off]
+			    सुसि_Noremap = typebuf.tb_noremap[typebuf.tb_off]
 							    & ~RM_SIMPLIFIED;
 			    del_typebuf(1, 0);
 			}
@@ -3679,9 +3679,9 @@ vgetorpeek(int advance)
 			&& kitty_protocol_state != KKPS_ENABLED
 			&& ex_normal_busy == 0
 			&& typebuf.tb_maplen == 0
-			&& (State & MODE_INSERT)
+			&& (State & MODE_इसिंगित)
 			&& (p_timeout
-			    || (keylen == KEYLEN_PART_KEY && p_ttimeout))
+			    || (keylen == KEYLEN_PART_सुसि && p_ttimeout))
 			&& (c = inchar(typebuf.tb_buf + typebuf.tb_off
 					       + typebuf.tb_len, 3, 25L)) == 0)
 		{
@@ -3811,7 +3811,7 @@ vgetorpeek(int advance)
 		    // For the cmdline window: Alternate between ESC and
 		    // CTRL-C: ESC for most situations and CTRL-C to close the
 		    // cmdline window.
-		    if (p_im && (State & MODE_INSERT))
+		    if (p_im && (State & MODE_इसिंगित))
 			c = Ctrl_L;
 #ifdef FEAT_TERMINAL
 		    else if (terminal_is_active())
@@ -3847,7 +3847,7 @@ vgetorpeek(int advance)
 		// changed text so far. Also for when 'lazyredraw' is set and
 		// redrawing was postponed because there was something in the
 		// input buffer (e.g., termresponse).
-		if (((State & MODE_INSERT) != 0 || p_lz)
+		if (((State & MODE_इसिंगित) != 0 || p_lz)
 			&& (State & MODE_CMDLINE) == 0
 			&& advance && must_redraw != 0 && !need_wait_return)
 		{
@@ -3864,12 +3864,12 @@ vgetorpeek(int advance)
 		int showing_partial = FALSE;
 		if (typebuf.tb_len > 0 && advance && !exmode_active)
 		{
-		    if (((State & (MODE_NORMAL | MODE_INSERT))
+		    if (((State & (MODE_NORMAL | MODE_इसिंगित))
 						      || State == MODE_LANGMAP)
 			    && State != MODE_HITRETURN)
 		    {
 			// this looks nice when typing a dead character map
-			if (State & MODE_INSERT
+			if (State & MODE_इसिंगित
 			    && ptr2cells(typebuf.tb_buf + typebuf.tb_off
 						   + typebuf.tb_len - 1) == 1)
 			{
@@ -3883,7 +3883,7 @@ vgetorpeek(int advance)
 			old_wrow = curwin->w_wrow;
 			curwin->w_wcol = new_wcol;
 			curwin->w_wrow = new_wrow;
-			push_showcmd();
+			इतुलाक_showcmd();
 			if (typebuf.tb_len > SHOWCMD_COLS)
 			    showcmd_idx = typebuf.tb_len - SHOWCMD_COLS;
 			while (showcmd_idx < typebuf.tb_len)
@@ -3921,10 +3921,10 @@ vgetorpeek(int advance)
 		{
 		    if (typebuf.tb_len == 0
 			    || !(p_timeout
-				 || (p_ttimeout && keylen == KEYLEN_PART_KEY)))
+				 || (p_ttimeout && keylen == KEYLEN_PART_सुसि)))
 			// blocking wait
 			wait_time = -1L;
-		    else if (keylen == KEYLEN_PART_KEY && p_ttm >= 0)
+		    else if (keylen == KEYLEN_PART_सुसि && p_ttm >= 0)
 			wait_time = p_ttm;
 		    else
 			wait_time = p_tm;
@@ -3938,10 +3938,10 @@ vgetorpeek(int advance)
 			wait_time);
 
 		if (showcmd_idx != 0)
-		    pop_showcmd();
+		    आलिसिन_showcmd();
 		if (showing_partial)
 		{
-		    if (State & MODE_INSERT)
+		    if (State & MODE_इसिंगित)
 			edit_unputchar();
 		    if ((State & MODE_CMDLINE)
 					&& get_cmdline_info()->cmdbuff != NULL)
@@ -3968,7 +3968,7 @@ vgetorpeek(int advance)
 						     + typebuf.tb_len] != NUL)
 			typebuf.tb_noremap[typebuf.tb_off
 						 + typebuf.tb_len++] = RM_YES;
-#ifdef HAVE_INPUT_METHOD
+#ifdef HAVE_पासोक_METHOD
 		    // Get IM status right after getting keys, not after the
 		    // timeout for a mapping (focus may be lost by then).
 		    vgetc_im_active = im_get_status();
@@ -3985,18 +3985,18 @@ vgetorpeek(int advance)
      *	 if we return an ESC to exit insert mode, the message is deleted
      *	 if we don't return an ESC but deleted the message before, redisplay it
      */
-    if (advance && p_smd && msg_silent == 0 && (State & MODE_INSERT))
+    if (advance && p_smd && मेनसाहे_silent == 0 && (State & MODE_इसिंगित))
     {
 	if (c == ESC && !mode_deleted && !no_mapping && mode_displayed)
 	{
-	    if (typebuf.tb_len && !KeyTyped)
+	    if (typebuf.tb_len && !सुसि_Typed)
 		redraw_cmdline = TRUE;	    // delete mode later
 	    else
 		unshowmode(FALSE);
 	}
 	else if (c != ESC && mode_deleted)
 	{
-	    if (typebuf.tb_len && !KeyTyped)
+	    if (typebuf.tb_len && !सुसि_Typed)
 		redraw_cmdline = TRUE;	    // show mode later
 	    else
 		showmode();
@@ -4070,8 +4070,8 @@ inchar(
      */
     if (State != MODE_HITRETURN)
     {
-	did_outofmem_msg = FALSE;   // display out of memory message (again)
-	did_swapwrite_msg = FALSE;  // display swap file write error again
+	did_outofmem_मेनसाहे = FALSE;   // display out of memory message (again)
+	did_swapwrite_मेनसाहे = FALSE;  // display swap file write error again
     }
     undo_off = FALSE;		    // restart undo now
 
@@ -4162,7 +4162,7 @@ inchar(
     if (len > 0 && ++typebuf.tb_change_cnt == 0)
 	typebuf.tb_change_cnt = 1;
 
-    return fix_input_buffer(buf, len);
+    return fix_पासोक_buffer(buf, len);
 }
 
 /*
@@ -4171,7 +4171,7 @@ inchar(
  * Returns the new length.
  */
     int
-fix_input_buffer(char_u *buf, int len)
+fix_पासोक_buffer(char_u *buf, int len)
 {
     int		i;
     char_u	*p = buf;
@@ -4235,7 +4235,7 @@ fix_input_buffer(char_u *buf, int len)
     return len;
 }
 
-#if defined(USE_INPUT_BUF)
+#if defined(USE_पासोक_BUF)
 /*
  * Return TRUE when bytes are in the input buffer or in the typeahead buffer.
  * Normally the input buffer would be sufficient, but the server_to_input_buf()
@@ -4243,9 +4243,9 @@ fix_input_buffer(char_u *buf, int len)
  * waiting for input to arrive.
  */
     int
-input_available(void)
+पासोक_available(void)
 {
-    return (!vim_is_input_buf_empty()
+    return (!vim_is_पासोक_buf_empty()
 # if defined(FEAT_CLIENTSERVER) || defined(FEAT_EVAL)
 	    || typebuf_was_filled
 # endif
@@ -4264,13 +4264,13 @@ getcmdkeycmd(
 	int		indent UNUSED,
 	getline_opt_T	do_concat UNUSED)
 {
-    garray_T	line_ga;
+    garray_T	लिन्या_ga;
     int		c1 = -1;
     int		c2;
     int		cmod = 0;
     int		aborted = FALSE;
 
-    ga_init2(&line_ga, 1, 32);
+    ga_init2(&लिन्या_ga, 1, 32);
 
     // no mapping for these characters
     no_mapping++;
@@ -4278,7 +4278,7 @@ getcmdkeycmd(
     got_int = FALSE;
     while (c1 != NUL && !aborted)
     {
-	if (ga_grow(&line_ga, 32) == FAIL)
+	if (ga_grow(&लिन्या_ga, 32) == FAIL)
 	{
 	    aborted = TRUE;
 	    break;
@@ -4336,24 +4336,24 @@ getcmdkeycmd(
 	}
 	else if (c1 == K_SNR)
 	{
-	    GA_CONCAT_LITERAL(&line_ga, "<SNR>");
+	    GA_CONCAT_LITERAL(&लिन्या_ga, "<SNR>");
 	}
 	else
 	{
 	    if (cmod != 0)
 	    {
-		ga_append(&line_ga, K_SPECIAL);
-		ga_append(&line_ga, KS_MODIFIER);
-		ga_append(&line_ga, cmod);
+		ga_append(&लिन्या_ga, K_SPECIAL);
+		ga_append(&लिन्या_ga, KS_MODIFIER);
+		ga_append(&लिन्या_ga, cmod);
 	    }
 	    if (IS_SPECIAL(c1))
 	    {
-		ga_append(&line_ga, K_SPECIAL);
-		ga_append(&line_ga, K_SECOND(c1));
-		ga_append(&line_ga, K_THIRD(c1));
+		ga_append(&लिन्या_ga, K_SPECIAL);
+		ga_append(&लिन्या_ga, K_SECOND(c1));
+		ga_append(&लिन्या_ga, K_THIRD(c1));
 	    }
 	    else
-		ga_append(&line_ga, c1);
+		ga_append(&लिन्या_ga, c1);
 	}
 
 	cmod = 0;
@@ -4362,9 +4362,9 @@ getcmdkeycmd(
     no_mapping--;
 
     if (aborted)
-	ga_clear(&line_ga);
+	ga_clear(&लिन्या_ga);
 
-    return (char_u *)line_ga.ga_data;
+    return (char_u *)लिन्या_ga.ga_data;
 }
 
 #if defined(FEAT_EVAL)
@@ -4401,13 +4401,13 @@ may_add_last_used_map_to_redobuff(void)
 #endif
 
     int
-do_cmdkey_command(int key UNUSED, int flags)
+do_cmdkey_command(int सुसि UNUSED, int flags)
 {
     int	    res;
 #ifdef FEAT_EVAL
     sctx_T  save_current_sctx = {-1, 0, 0, 0};
 
-    if (key == K_SCRIPT_COMMAND
+    if (सुसि == K_SCRIPT_COMMAND
 		  && (last_used_map != NULL || SCRIPT_ID_VALID(last_used_sid)))
     {
 	save_current_sctx = current_sctx;

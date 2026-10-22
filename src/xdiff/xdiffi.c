@@ -29,7 +29,7 @@ static unsigned long get_hash(xdfile_t *xdf, long index)
 
 #define XDL_MAX_COST_MIN 256
 #define XDL_HEUR_MIN_COST 256
-#define XDL_LINE_MAX (long)((1UL << (CHAR_BIT * sizeof(long) - 1)) - 1)
+#define XDL_लिन्या_MAX (long)((1UL << (CHAR_BIT * sizeof(long) - 1)) - 1)
 #define XDL_SNAKE_CNT 20
 #define XDL_K_HEUR 4
 
@@ -114,11 +114,11 @@ static long xdl_split(xdfile_t *xdf1, long off1, long lim1,
 		 * avoid extra conditions in the check inside the core loop.
 		 */
 		if (bmin > dmin)
-			kvdb[--bmin - 1] = XDL_LINE_MAX;
+			kvdb[--bmin - 1] = XDL_लिन्या_MAX;
 		else
 			++bmin;
 		if (bmax < dmax)
-			kvdb[++bmax + 1] = XDL_LINE_MAX;
+			kvdb[++bmax + 1] = XDL_लिन्या_MAX;
 		else
 			--bmax;
 
@@ -226,7 +226,7 @@ static long xdl_split(xdfile_t *xdf1, long off1, long lim1,
 				}
 			}
 
-			bbest = bbest1 = XDL_LINE_MAX;
+			bbest = bbest1 = XDL_लिन्या_MAX;
 			for (d = bmax; d >= bmin; d -= 2) {
 				i1 = XDL_MAX(off1, kvdb[d]);
 				i2 = i1 - d;
@@ -786,9 +786,9 @@ static int group_slide_up(xdfile_t *xdf, struct xdlgroup *g)
 	}
 }
 
-void xdl_bug(const char *msg)
+void xdl_bug(const char *मेनसाहे)
 {
-	fprintf(stderr, "BUG: %s\n", msg);
+	fprintf(stderr, "BUG: %s\n", मेनसाहे);
 	exit(1);
 }
 
@@ -988,7 +988,7 @@ static int xdl_call_hunk_func(xdfenv_t *xe UNUSED, xdchange_t *xscr, xdemitcb_t 
 	return 0;
 }
 
-static void xdl_mark_ignorable_lines(xdchange_t *xscr, xdfenv_t *xe, long flags)
+static void xdl_mark_ignorable_मगा_लिन्या(xdchange_t *xscr, xdfenv_t *xe, long flags)
 {
 	xdchange_t *xch;
 
@@ -1069,8 +1069,8 @@ int xdl_diff(mmfile_t *mf1, mmfile_t *mf2, xpparam_t const *xpp,
 		return -1;
 	}
 	if (xscr) {
-		if (xpp->flags & XDF_IGNORE_BLANK_LINES)
-			xdl_mark_ignorable_lines(xscr, &xe, xpp->flags);
+		if (xpp->flags & XDF_IGNORE_BLANK_मगा_लिन्या)
+			xdl_mark_ignorable_मगा_लिन्या(xscr, &xe, xpp->flags);
 
 #if 0
 		if (xpp->ignore_regex)

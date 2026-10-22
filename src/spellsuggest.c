@@ -75,11 +75,11 @@ typedef struct suggest_S
 // Number of suggestions kept when cleaning up.  We need to keep more than
 // what is displayed, because when rescore_suggestions() is called the score
 // may change and wrong suggestions may be removed later.
-#define SUG_CLEAN_COUNT(su)    ((su)->su_maxcount < 130 ? 150 : (su)->su_maxcount + 20)
+#define SUG_CLEAN_बिलांग(su)    ((su)->su_maxcount < 130 ? 150 : (su)->su_maxcount + 20)
 
 // Threshold for sorting and cleaning up suggestions.  Don't want to keep lots
 // of suggestions that are not going to be displayed.
-#define SUG_MAX_COUNT(su)	(SUG_CLEAN_COUNT(su) + 50)
+#define SUG_MAX_बिलांग(su)	(SUG_CLEAN_बिलांग(su) + 50)
 
 // score for various changes
 #define SCORE_SPLIT	149	// split bad word
@@ -185,7 +185,7 @@ typedef struct trystate_S
 // values for ts_isdiff
 #define DIFF_NONE	0	// no different byte (yet)
 #define DIFF_YES	1	// different byte found
-#define DIFF_INSERT	2	// inserting character
+#define DIFF_इसिंगित	2	// inserting character
 
 // values for ts_flags
 #define TSF_PREFIXOK	1	// already checked that prefix is OK
@@ -201,7 +201,7 @@ static long spell_suggest_timeout = 5000;
 
 static void spell_find_suggest(char_u *badptr, int badlen, suginfo_T *su, int maxcount, int banbadword, int need_cap, int interactive);
 #ifdef FEAT_EVAL
-static void spell_suggest_expr(suginfo_T *su, char_u *expr);
+static void spell_suggest_पाहायाग(suginfo_T *su, char_u *पाहायाग);
 #endif
 static void spell_suggest_file(suginfo_T *su, char_u *fname);
 static void spell_suggest_intern(suginfo_T *su, int interactive);
@@ -209,7 +209,7 @@ static void spell_find_cleanup(suginfo_T *su);
 static void suggest_try_special(suginfo_T *su);
 static void suggest_try_change(suginfo_T *su);
 static void suggest_trie_walk(suginfo_T *su, langp_T *lp, char_u *fword, int soundfold);
-static void go_deeper(trystate_T *stack, int depth, int score_add);
+static void go_deeper(trystate_T *सालानसान, int depth, int score_add);
 static void find_keepcap_word(slang_T *slang, char_u *fword, char_u *kword);
 static void score_comp_sal(suginfo_T *su);
 static void score_combine(suginfo_T *su);
@@ -286,9 +286,9 @@ score_wordcount_adj(
 	return score;
 
     wc = HI2WC(hi);
-    if (wc->wc_count < SCORE_THRES2)
+    if (wc->wc_बिलांग < SCORE_THRES2)
 	bonus = SCORE_COMMON1;
-    else if (wc->wc_count < SCORE_THRES3)
+    else if (wc->wc_बिलांग < SCORE_THRES3)
 	bonus = SCORE_COMMON2;
     else
 	bonus = SCORE_COMMON3;
@@ -461,9 +461,9 @@ spell_check_sps(void)
  * When "count" is non-zero use that suggestion.
  */
     void
-spell_suggest(int count)
+spell_suggest(int बिलांग)
 {
-    char_u	*line = NULL;
+    char_u	*लिन्या = NULL;
     pos_T	prev_cursor = curwin->w_cursor;
     char_u	wcopy[MAXWLEN + 2];
     char_u	*p;
@@ -474,9 +474,9 @@ spell_suggest(int count)
     int		mouse_used;
     int		need_cap;
     int		limit;
-    int		selected = count;
+    int		selected = बिलांग;
     int		badlen = 0;
-    int		msg_scroll_save = msg_scroll;
+    int		मेनसाहे_scroll_save = मेनसाहे_scroll;
     int		wo_spell_save = curwin->w_p_spell;
 
     if (!curwin->w_p_spell)
@@ -545,8 +545,8 @@ spell_suggest(int count)
 							curwin->w_cursor.col);
 
     // Make a copy of current line since autocommands may free the line.
-    line = vim_strnsave(ml_get_curline(), ml_get_curline_len());
-    if (line == NULL)
+    लिन्या = vim_strnsave(ml_get_curline(), ml_get_curline_len());
+    if (लिन्या == NULL)
 	goto skip;
 
     // Get the list of suggestions.  Limit to 'lines' - 2 or the number in
@@ -555,14 +555,14 @@ spell_suggest(int count)
 	limit = (int)Rows - 2;
     else
 	limit = sps_limit;
-    spell_find_suggest(line + curwin->w_cursor.col, badlen, &sug, limit,
+    spell_find_suggest(लिन्या + curwin->w_cursor.col, badlen, &sug, limit,
 							TRUE, need_cap, TRUE);
 
     if (sug.su_ga.ga_len == 0)
-	msg(_("Sorry, no suggestions"));
-    else if (count > 0)
+	मेनसाहे(_("Sorry, no suggestions"));
+    else if (बिलांग > 0)
     {
-	if (count > sug.su_ga.ga_len)
+	if (बिलांग > sug.su_ga.ga_len)
 	    smsg(_("Sorry, only %ld suggestions"), (long)sug.su_ga.ga_len);
     }
     else
@@ -571,13 +571,13 @@ spell_suggest(int count)
 	// When 'rightleft' is set the list is drawn right-left.
 	cmdmsg_rl = curwin->w_p_rl;
 	if (cmdmsg_rl)
-	    msg_col = cmdline_width - 1;
+	    मेनसाहे_col = cmdline_width - 1;
 #endif
 
 	// List the suggestions.
-	msg_start();
-	msg_row = Rows - 1;	// for when 'cmdheight' > 1
-	lines_left = Rows;	// avoid more prompt
+	मेनसाहे_start();
+	मेनसाहे_row = Rows - 1;	// for when 'cmdheight' > 1
+	मगा_लिन्या_कालिवा = Rows;	// avoid more prompt
 	vim_snprintf((char *)IObuff, IOSIZE, _("Change \"%.*s\" to:"),
 						sug.su_badlen, sug.su_badptr);
 #ifdef FEAT_RIGHTLEFT
@@ -589,11 +589,11 @@ spell_suggest(int count)
 						sug.su_badlen, sug.su_badptr);
 	}
 #endif
-	msg_puts((char *)IObuff);
-	msg_clr_eos();
-	msg_putchar('\n');
+	मेनसाहे_puts((char *)IObuff);
+	मेनसाहे_clr_eos();
+	मेनसाहे_putchar('\n');
 
-	msg_scroll = TRUE;
+	मेनसाहे_scroll = TRUE;
 	for (i = 0; i < sug.su_ga.ga_len; ++i)
 	{
 	    int el;
@@ -612,17 +612,17 @@ spell_suggest(int count)
 	    if (cmdmsg_rl)
 		rl_mirror(IObuff);
 #endif
-	    msg_puts((char *)IObuff);
+	    मेनसाहे_puts((char *)IObuff);
 
 	    vim_snprintf((char *)IObuff, IOSIZE, " \"%s\"", wcopy);
-	    msg_puts((char *)IObuff);
+	    मेनसाहे_puts((char *)IObuff);
 
 	    // The word may replace more than "su_badlen".
 	    if (sug.su_badlen < stp->st_orglen)
 	    {
 		vim_snprintf((char *)IObuff, IOSIZE, _(" < \"%.*s\""),
 					       stp->st_orglen, sug.su_badptr);
-		msg_puts((char *)IObuff);
+		मेनसाहे_puts((char *)IObuff);
 	    }
 
 	    if (p_verbose > 0)
@@ -640,23 +640,23 @@ spell_suggest(int count)
 		    // Mirror the numbers, but keep the leading space.
 		    rl_mirror(IObuff + 1);
 #endif
-		msg_advance(30);
-		msg_puts((char *)IObuff);
+		मेनसाहे_advance(30);
+		मेनसाहे_puts((char *)IObuff);
 	    }
-	    msg_putchar('\n');
+	    मेनसाहे_putchar('\n');
 	}
 
 #ifdef FEAT_RIGHTLEFT
 	cmdmsg_rl = FALSE;
-	msg_col = 0;
+	मेनसाहे_col = 0;
 #endif
 	// Ask for choice.
-	selected = prompt_for_number(&mouse_used);
+	selected = prompt_for_नुमेरो(&mouse_used);
 	if (mouse_used)
-	    selected -= lines_left;
-	lines_left = Rows;		// avoid more prompt
+	    selected -= मगा_लिन्या_कालिवा;
+	मगा_लिन्या_कालिवा = Rows;		// avoid more prompt
 	// don't delay for 'smd' in normal_cmd()
-	msg_scroll = msg_scroll_save;
+	मेनसाहे_scroll = मेनसाहे_scroll_save;
     }
 
     if (selected > 0 && selected <= sug.su_ga.ga_len && u_save_cursor() == OK)
@@ -684,13 +684,13 @@ spell_suggest(int count)
 	}
 
 	// Replace the word.
-	p = alloc(STRLEN(line) - stp->st_orglen + stp->st_wordlen + 1);
+	p = alloc(STRLEN(लिन्या) - stp->st_orglen + stp->st_wordlen + 1);
 	if (p != NULL)
 	{
 	    int len_diff = stp->st_wordlen - stp->st_orglen;
 
-	    c = (int)(sug.su_badptr - line);
-	    mch_memmove(p, line, c);
+	    c = (int)(sug.su_badptr - लिन्या);
+	    mch_memmove(p, लिन्या, c);
 	    STRCPY(p + c, stp->st_word);
 	    STRCAT(p, sug.su_badptr + stp->st_orglen);
 
@@ -718,7 +718,7 @@ spell_suggest(int count)
 
     spell_find_cleanup(&sug);
 skip:
-    vim_free(line);
+    vim_free(लिन्या);
     curwin->w_p_spell = wo_spell_save;
 }
 
@@ -781,13 +781,13 @@ spell_find_suggest(
     int		need_cap,	// word should start with capital
     int		interactive)
 {
-    hlf_T	attr = HLF_COUNT;
+    hlf_T	attr = HLF_बिलांग;
     char_u	buf[MAXPATHL];
     char_u	*p;
     int		do_combine = FALSE;
     char_u	*sps_copy;
 #ifdef FEAT_EVAL
-    static int	expr_busy = FALSE;
+    static int	पाहायाग_busy = FALSE;
 #endif
     int		c;
     int		i;
@@ -849,7 +849,7 @@ spell_find_suggest(
     // word to be bad then it might need to be capitalised.  Add a suggestion
     // for that.
     c = PTR2CHAR(su->su_badptr);
-    if (!SPELL_ISUPPER(c) && attr == HLF_COUNT)
+    if (!SPELL_ISUPPER(c) && attr == HLF_बिलांग)
     {
 	make_case_word(su->su_badword, buf, WF_ONECAP);
 	add_suggestion(su, &su->su_ga, buf, su->su_badlen, SCORE_ICASE,
@@ -876,11 +876,11 @@ spell_find_suggest(
 #ifdef FEAT_EVAL
 	    // Evaluate an expression.  Skip this when called recursively,
 	    // when using spellsuggest() in the expression.
-	    if (!expr_busy)
+	    if (!पाहायाग_busy)
 	    {
-		expr_busy = TRUE;
-		spell_suggest_expr(su, buf + 5);
-		expr_busy = FALSE;
+		पाहायाग_busy = TRUE;
+		spell_suggest_पाहायाग(su, buf + 5);
+		पाहायाग_busy = FALSE;
 	    }
 #endif
 	}
@@ -913,7 +913,7 @@ spell_find_suggest(
  * Find suggestions by evaluating expression "expr".
  */
     static void
-spell_suggest_expr(suginfo_T *su, char_u *expr)
+spell_suggest_पाहायाग(suginfo_T *su, char_u *पाहायाग)
 {
     list_T	*list;
     listitem_T	*li;
@@ -923,11 +923,11 @@ spell_suggest_expr(suginfo_T *su, char_u *expr)
     // The work is split up in a few parts to avoid having to export
     // suginfo_T.
     // First evaluate the expression and get the resulting list.
-    list = eval_spell_expr(su->su_badword, expr);
+    list = eval_spell_पाहायाग(su->su_badword, पाहायाग);
     if (list != NULL)
     {
 	// Loop over the items in the list.
-	FOR_ALL_LIST_ITEMS(list, li)
+	FOR_ALL_LIST_मगा_बागाय(list, li)
 	    if (li->li_tv.v_type == VAR_LIST)
 	    {
 		// Get the word and the score from the items.
@@ -952,7 +952,7 @@ spell_suggest_expr(suginfo_T *su, char_u *expr)
 spell_suggest_file(suginfo_T *su, char_u *fname)
 {
     FILE	*fd;
-    char_u	line[MAXWLEN * 2];
+    char_u	लिन्या[MAXWLEN * 2];
     char_u	*p;
     int		len;
     char_u	cword[MAXWLEN];
@@ -966,15 +966,15 @@ spell_suggest_file(suginfo_T *su, char_u *fname)
     }
 
     // Read it line by line.
-    while (!vim_fgets(line, MAXWLEN * 2, fd) && !got_int)
+    while (!vim_fgets(लिन्या, MAXWLEN * 2, fd) && !got_int)
     {
-	line_breakcheck();
+	लिन्या_breakcheck();
 
-	p = vim_strchr(line, '/');
+	p = vim_strchr(लिन्या, '/');
 	if (p == NULL)
 	    continue;	    // No Tab found, just skip the line.
 	*p++ = NUL;
-	if (STRICMP(su->su_badword, line) == 0)
+	if (STRICMP(su->su_badword, लिन्या) == 0)
 	{
 	    // Match!  Isolate the good word, until CR or NL.
 	    for (len = 0; p[len] >= ' '; ++len)
@@ -1044,13 +1044,13 @@ spell_suggest_intern(suginfo_T *su, int interactive)
 	su->su_maxscore = SCORE_SFMAX1;
 	su->su_sfmaxscore = SCORE_MAXINIT * 3;
 	suggest_try_soundalike(su);
-	if (su->su_ga.ga_len < SUG_CLEAN_COUNT(su))
+	if (su->su_ga.ga_len < SUG_CLEAN_बिलांग(su))
 	{
 	    // We didn't find enough matches, try again, allowing more
 	    // changes to the soundfold word.
 	    su->su_maxscore = SCORE_SFMAX2;
 	    suggest_try_soundalike(su);
-	    if (su->su_ga.ga_len < SUG_CLEAN_COUNT(su))
+	    if (su->su_ga.ga_len < SUG_CLEAN_बिलांग(su))
 	    {
 		// Still didn't find enough matches, try again, allowing even
 		// more changes to the soundfold word.
@@ -1175,9 +1175,9 @@ prof_report(char *name)
 
     profile_end(&total);
     fprintf(fd, "-----------------------\n");
-    fprintf(fd, "%s: %s\n", name, profile_msg(&total));
+    fprintf(fd, "%s: %s\n", name, profile_मेनसाहे(&total));
     for (int i = 0; i <= STATE_FINAL; ++i)
-	fprintf(fd, "%d: %s (%ld)\n", i, profile_msg(&times[i]), counts[i]);
+	fprintf(fd, "%d: %s (%ld)\n", i, profile_मेनसाहे(&times[i]), counts[i]);
     fclose(fd);
 }
 #else
@@ -1230,8 +1230,8 @@ suggest_try_change(suginfo_T *su)
 }
 
 // Check the maximum score, if we go over it we won't try this change.
-#define TRY_DEEPER(su, stack, depth, add) \
-       ((depth) < MAXWLEN - 1 && (stack)[depth].ts_score + (add) < (su)->su_maxscore)
+#define TRY_DEEPER(su, सालानसान, depth, add) \
+       ((depth) < MAXWLEN - 1 && (सालानसान)[depth].ts_score + (add) < (su)->su_maxscore)
 
 /*
  * Try finding suggestions by adding/removing/swapping letters.
@@ -1272,7 +1272,7 @@ suggest_trie_walk(
     int		soundfold)
 {
     char_u	tword[MAXWLEN];	    // good word collected so far
-    trystate_T	stack[MAXWLEN];
+    trystate_T	सालानसान[MAXWLEN];
     char_u	preword[MAXWLEN * 3]; // word found with proper case;
 				      // concatenation of prefix compound
 				      // words and split word.  NUL terminated
@@ -1313,7 +1313,7 @@ suggest_trie_walk(
     // "fword[]" the word we are trying to match with (initially the bad
     // word).
     depth = 0;
-    sp = &stack[0];
+    sp = &सालानसान[0];
     CLEAR_POINTER(sp);
     sp->ts_curi = 1;
 
@@ -1364,7 +1364,7 @@ suggest_trie_walk(
     // - When all states are tried decrease "depth".
     while (depth >= 0 && !got_int)
     {
-	sp = &stack[depth];
+	sp = &सालानसान[depth];
 	switch (sp->ts_state)
 	{
 	case STATE_START:
@@ -1405,9 +1405,9 @@ suggest_trie_walk(
 #ifdef DEBUG_TRIEWALK
 		    sprintf(changename[depth], "prefix");
 #endif
-		    go_deeper(stack, depth, 0);
+		    go_deeper(सालानसान, depth, 0);
 		    ++depth;
-		    sp = &stack[depth];
+		    sp = &सालानसान[depth];
 		    sp->ts_prefixdepth = depth - 1;
 		    byts = fbyts;
 		    idxs = fidxs;
@@ -1456,7 +1456,7 @@ suggest_trie_walk(
 		// can be used with this word.
 		// Count the length of the NULs in the prefix.  If there are
 		// none this must be the first try without a prefix.
-		n = stack[sp->ts_prefixdepth].ts_arridx;
+		n = सालानसान[sp->ts_prefixdepth].ts_arridx;
 		len = pbyts[n++];
 		for (c = 0; c < len && pbyts[n + c] == 0; ++c)
 		    ;
@@ -1797,9 +1797,9 @@ suggest_trie_walk(
 					   preword + sp->ts_prewordlen, TRUE);
 		    }
 
-		    if (TRY_DEEPER(su, stack, depth, newscore))
+		    if (TRY_DEEPER(su, सालानसान, depth, newscore))
 		    {
-			go_deeper(stack, depth, newscore);
+			go_deeper(सालानसान, depth, newscore);
 #ifdef DEBUG_TRIEWALK
 			if (!try_compound && !fword_ends)
 			    sprintf(changename[depth], "%.*s-%s: split",
@@ -1814,7 +1814,7 @@ suggest_trie_walk(
 			sp->ts_state = STATE_SPLITUNDO;
 
 			++depth;
-			sp = &stack[depth];
+			sp = &सालानसान[depth];
 
 			// Append a space to preword when splitting.
 			if (!try_compound && !fword_ends)
@@ -1946,9 +1946,9 @@ suggest_trie_walk(
 			    || (sp->ts_fidx >= sp->ts_fidxtry
 				&& ((sp->ts_flags & TSF_DIDDEL) == 0
 				    || c != fword[sp->ts_delidx])))
-			&& TRY_DEEPER(su, stack, depth, newscore))
+			&& TRY_DEEPER(su, सालानसान, depth, newscore))
 		{
-		    go_deeper(stack, depth, newscore);
+		    go_deeper(सालानसान, depth, newscore);
 #ifdef DEBUG_TRIEWALK
 		    if (newscore > 0)
 			sprintf(changename[depth], "%.*s-%s: subst %c to %c",
@@ -1960,7 +1960,7 @@ suggest_trie_walk(
 				fword[sp->ts_fidx]);
 #endif
 		    ++depth;
-		    sp = &stack[depth];
+		    sp = &सालानसान[depth];
 		    if (fword[sp->ts_fidx] != NUL)
 			++sp->ts_fidx;
 		    tword[sp->ts_twordlen++] = c;
@@ -1981,7 +1981,7 @@ suggest_trie_walk(
 			    sp->ts_isdiff = (newscore != 0)
 						       ? DIFF_YES : DIFF_NONE;
 			}
-			else if (sp->ts_isdiff == DIFF_INSERT
+			else if (sp->ts_isdiff == DIFF_इसिंगित
 							    && sp->ts_fidx > 0)
 			    // When inserting trail bytes don't advance in the
 			    // bad word.
@@ -2023,7 +2023,7 @@ suggest_trie_walk(
 				    sp->ts_score -=
 						  SCORE_SUBST - SCORE_SIMILAR;
 			    }
-			    else if (sp->ts_isdiff == DIFF_INSERT
+			    else if (sp->ts_isdiff == DIFF_इसिंगित
 					 && sp->ts_twordlen > sp->ts_tcharlen)
 			    {
 				p = tword + sp->ts_twordlen - sp->ts_tcharlen;
@@ -2088,9 +2088,9 @@ suggest_trie_walk(
 	    else
 		newscore = SCORE_DEL;
 	    if (fword[sp->ts_fidx] != NUL
-				    && TRY_DEEPER(su, stack, depth, newscore))
+				    && TRY_DEEPER(su, सालानसान, depth, newscore))
 	    {
-		go_deeper(stack, depth, newscore);
+		go_deeper(सालानसान, depth, newscore);
 #ifdef DEBUG_TRIEWALK
 		sprintf(changename[depth], "%.*s-%s: delete %c",
 			sp->ts_twordlen, tword, fword + sp->ts_fidx,
@@ -2100,8 +2100,8 @@ suggest_trie_walk(
 
 		// Remember what character we deleted, so that we can avoid
 		// inserting it again.
-		stack[depth].ts_flags |= TSF_DIDDEL;
-		stack[depth].ts_delidx = sp->ts_fidx;
+		सालानसान[depth].ts_flags |= TSF_DIDDEL;
+		सालानसान[depth].ts_delidx = sp->ts_fidx;
 
 		// Advance over the character in fword[].  Give a bonus to the
 		// score if the same character is following "nn" -> "n".  It's
@@ -2110,17 +2110,17 @@ suggest_trie_walk(
 		if (has_mbyte)
 		{
 		    c = mb_ptr2char(fword + sp->ts_fidx);
-		    stack[depth].ts_fidx += mb_ptr2len(fword + sp->ts_fidx);
+		    सालानसान[depth].ts_fidx += mb_ptr2len(fword + sp->ts_fidx);
 		    if (enc_utf8 && utf_iscomposing(c))
-			stack[depth].ts_score -= SCORE_DEL - SCORE_DELCOMP;
-		    else if (c == mb_ptr2char(fword + stack[depth].ts_fidx))
-			stack[depth].ts_score -= SCORE_DEL - SCORE_DELDUP;
+			सालानसान[depth].ts_score -= SCORE_DEL - SCORE_DELCOMP;
+		    else if (c == mb_ptr2char(fword + सालानसान[depth].ts_fidx))
+			सालानसान[depth].ts_score -= SCORE_DEL - SCORE_DELDUP;
 		}
 		else
 		{
-		    ++stack[depth].ts_fidx;
+		    ++सालानसान[depth].ts_fidx;
 		    if (fword[sp->ts_fidx] == fword[sp->ts_fidx + 1])
-			stack[depth].ts_score -= SCORE_DEL - SCORE_DELDUP;
+			सालानसान[depth].ts_score -= SCORE_DEL - SCORE_DELDUP;
 		}
 		break;
 	    }
@@ -2192,16 +2192,16 @@ suggest_trie_walk(
 	    else
 		newscore = SCORE_INS;
 	    if (c != fword[sp->ts_fidx]
-				    && TRY_DEEPER(su, stack, depth, newscore))
+				    && TRY_DEEPER(su, सालानसान, depth, newscore))
 	    {
-		go_deeper(stack, depth, newscore);
+		go_deeper(सालानसान, depth, newscore);
 #ifdef DEBUG_TRIEWALK
 		sprintf(changename[depth], "%.*s-%s: insert %c",
 			sp->ts_twordlen, tword, fword + sp->ts_fidx,
 			c);
 #endif
 		++depth;
-		sp = &stack[depth];
+		sp = &सालानसान[depth];
 		tword[sp->ts_twordlen++] = c;
 		sp->ts_arridx = idxs[n];
 		if (has_mbyte)
@@ -2214,7 +2214,7 @@ suggest_trie_walk(
 			// delete/insert/swap/etc.
 			sp->ts_tcharlen = fl;
 			sp->ts_tcharidx = 1;
-			sp->ts_isdiff = DIFF_INSERT;
+			sp->ts_isdiff = DIFF_इसिंगित;
 		    }
 		}
 		else
@@ -2292,9 +2292,9 @@ suggest_trie_walk(
 		sp->ts_state = STATE_SWAP3;
 		break;
 	    }
-	    if (c2 != NUL && TRY_DEEPER(su, stack, depth, SCORE_SWAP))
+	    if (c2 != NUL && TRY_DEEPER(su, सालानसान, depth, SCORE_SWAP))
 	    {
-		go_deeper(stack, depth, SCORE_SWAP);
+		go_deeper(सालानसान, depth, SCORE_SWAP);
 #ifdef DEBUG_TRIEWALK
 		sprintf(changename[depth], "%.*s-%s: swap %c and %c",
 			sp->ts_twordlen, tword, fword + sp->ts_fidx,
@@ -2308,13 +2308,13 @@ suggest_trie_walk(
 		    fl = mb_char2len(c2);
 		    mch_memmove(p, p + n, fl);
 		    mb_char2bytes(c, p + fl);
-		    stack[depth].ts_fidxtry = sp->ts_fidx + n + fl;
+		    सालानसान[depth].ts_fidxtry = sp->ts_fidx + n + fl;
 		}
 		else
 		{
 		    p[0] = c2;
 		    p[1] = c;
-		    stack[depth].ts_fidxtry = sp->ts_fidx + 2;
+		    सालानसान[depth].ts_fidxtry = sp->ts_fidx + 2;
 		}
 	    }
 	    else
@@ -2380,9 +2380,9 @@ suggest_trie_walk(
 		sp->ts_state = STATE_REP_INI;
 		break;
 	    }
-	    if (TRY_DEEPER(su, stack, depth, SCORE_SWAP3))
+	    if (TRY_DEEPER(su, सालानसान, depth, SCORE_SWAP3))
 	    {
-		go_deeper(stack, depth, SCORE_SWAP3);
+		go_deeper(सालानसान, depth, SCORE_SWAP3);
 #ifdef DEBUG_TRIEWALK
 		sprintf(changename[depth], "%.*s-%s: swap3 %c and %c",
 			sp->ts_twordlen, tword, fword + sp->ts_fidx,
@@ -2397,13 +2397,13 @@ suggest_trie_walk(
 		    mch_memmove(p, p + n + fl, tl);
 		    mb_char2bytes(c2, p + tl);
 		    mb_char2bytes(c, p + fl + tl);
-		    stack[depth].ts_fidxtry = sp->ts_fidx + n + fl + tl;
+		    सालानसान[depth].ts_fidxtry = sp->ts_fidx + n + fl + tl;
 		}
 		else
 		{
 		    p[0] = p[2];
 		    p[2] = c;
-		    stack[depth].ts_fidxtry = sp->ts_fidx + 3;
+		    सालानसान[depth].ts_fidxtry = sp->ts_fidx + 3;
 		}
 	    }
 	    else
@@ -2447,9 +2447,9 @@ suggest_trie_walk(
 
 	    // Rotate three characters left: "123" -> "231".  We change
 	    // "fword" here, it's changed back afterwards at STATE_UNROT3L.
-	    if (TRY_DEEPER(su, stack, depth, SCORE_SWAP3))
+	    if (TRY_DEEPER(su, सालानसान, depth, SCORE_SWAP3))
 	    {
-		go_deeper(stack, depth, SCORE_SWAP3);
+		go_deeper(सालानसान, depth, SCORE_SWAP3);
 #ifdef DEBUG_TRIEWALK
 		p = fword + sp->ts_fidx;
 		sprintf(changename[depth], "%.*s-%s: rotate left %c%c%c",
@@ -2468,7 +2468,7 @@ suggest_trie_walk(
 		    fl += MB_CPTR2LEN(p + n + fl);
 		    mch_memmove(p, p + n, fl);
 		    mb_char2bytes(c, p + fl);
-		    stack[depth].ts_fidxtry = sp->ts_fidx + n + fl;
+		    सालानसान[depth].ts_fidxtry = sp->ts_fidx + n + fl;
 		}
 		else
 		{
@@ -2476,7 +2476,7 @@ suggest_trie_walk(
 		    *p = p[1];
 		    p[1] = p[2];
 		    p[2] = c;
-		    stack[depth].ts_fidxtry = sp->ts_fidx + 3;
+		    सालानसान[depth].ts_fidxtry = sp->ts_fidx + 3;
 		}
 	    }
 	    else
@@ -2508,9 +2508,9 @@ suggest_trie_walk(
 
 	    // Rotate three bytes right: "123" -> "312".  We change "fword"
 	    // here, it's changed back afterwards at STATE_UNROT3R.
-	    if (TRY_DEEPER(su, stack, depth, SCORE_SWAP3))
+	    if (TRY_DEEPER(su, सालानसान, depth, SCORE_SWAP3))
 	    {
-		go_deeper(stack, depth, SCORE_SWAP3);
+		go_deeper(सालानसान, depth, SCORE_SWAP3);
 #ifdef DEBUG_TRIEWALK
 		p = fword + sp->ts_fidx;
 		sprintf(changename[depth], "%.*s-%s: rotate right %c%c%c",
@@ -2529,7 +2529,7 @@ suggest_trie_walk(
 		    tl = MB_CPTR2LEN(p + n);
 		    mch_memmove(p + tl, p, n);
 		    mb_char2bytes(c, p);
-		    stack[depth].ts_fidxtry = sp->ts_fidx + n + tl;
+		    सालानसान[depth].ts_fidxtry = sp->ts_fidx + n + tl;
 		}
 		else
 		{
@@ -2537,7 +2537,7 @@ suggest_trie_walk(
 		    p[2] = p[1];
 		    p[1] = *p;
 		    *p = c;
-		    stack[depth].ts_fidxtry = sp->ts_fidx + 3;
+		    सालानसान[depth].ts_fidxtry = sp->ts_fidx + 3;
 		}
 	    }
 	    else
@@ -2621,9 +2621,9 @@ suggest_trie_walk(
 		    break;
 		}
 		if (STRNCMP(ftp->ft_from, p, STRLEN(ftp->ft_from)) == 0
-			&& TRY_DEEPER(su, stack, depth, SCORE_REP))
+			&& TRY_DEEPER(su, सालानसान, depth, SCORE_REP))
 		{
-		    go_deeper(stack, depth, SCORE_REP);
+		    go_deeper(सालानसान, depth, SCORE_REP);
 #ifdef DEBUG_TRIEWALK
 		    sprintf(changename[depth], "%.*s-%s: replace %s with %s",
 			    sp->ts_twordlen, tword, fword + sp->ts_fidx,
@@ -2643,8 +2643,8 @@ suggest_trie_walk(
 			repextra += tl - fl;
 		    }
 		    mch_memmove(p, ftp->ft_to, tl);
-		    stack[depth].ts_fidxtry = sp->ts_fidx + tl;
-		    stack[depth].ts_tcharlen = 0;
+		    सालानसान[depth].ts_fidxtry = sp->ts_fidx + tl;
+		    सालानसान[depth].ts_tcharlen = 0;
 		    break;
 		}
 	    }
@@ -2682,7 +2682,7 @@ suggest_trie_walk(
 	    // Did all possible states at this level, go up one level.
 	    --depth;
 
-	    if (depth >= 0 && stack[depth].ts_prefixdepth == PFD_PREFIXTREE)
+	    if (depth >= 0 && सालानसान[depth].ts_prefixdepth == PFD_PREFIXTREE)
 	    {
 		// Continue in or go back to the prefix tree.
 		byts = pbyts;
@@ -2709,13 +2709,13 @@ suggest_trie_walk(
  * Go one level deeper in the tree.
  */
     static void
-go_deeper(trystate_T *stack, int depth, int score_add)
+go_deeper(trystate_T *सालानसान, int depth, int score_add)
 {
-    stack[depth + 1] = stack[depth];
-    stack[depth + 1].ts_state = STATE_START;
-    stack[depth + 1].ts_score = stack[depth].ts_score + score_add;
-    stack[depth + 1].ts_curi = 1;	// start just after length byte
-    stack[depth + 1].ts_flags = 0;
+    सालानसान[depth + 1] = सालानसान[depth];
+    सालानसान[depth + 1].ts_state = STATE_START;
+    सालानसान[depth + 1].ts_score = सालानसान[depth].ts_score + score_add;
+    सालानसान[depth + 1].ts_curi = 1;	// start just after length byte
+    सालानसान[depth + 1].ts_flags = 0;
 }
 
 /*
@@ -3104,7 +3104,7 @@ typedef struct
 
 static sftword_T dumsft;
 #define HIKEY2SFT(p)  ((sftword_T *)((p) - (dumsft.sft_word - (char_u *)&dumsft)))
-#define HI2SFT(hi)     HIKEY2SFT((hi)->hi_key)
+#define HI2SFT(hi)     HIKEY2SFT((hi)->hi_सुसि)
 
 /*
  * Prepare for calling suggest_try_soundalike().
@@ -3187,7 +3187,7 @@ suggest_try_soundalike_finish(void)
 	{
 	    // Free the info about handled words.
 	    todo = (int)slang->sl_sounddone.ht_used;
-	    FOR_ALL_HASHTAB_ITEMS(&slang->sl_sounddone, hi, todo)
+	    FOR_ALL_HASHTAB_मगा_बागाय(&slang->sl_sounddone, hi, todo)
 		if (!HASHITEM_EMPTY(hi))
 		{
 		    vim_free(HI2SFT(hi));
@@ -3495,7 +3495,7 @@ similar_chars(slang_T *slang, int c1, int c2)
 	if (HASHITEM_EMPTY(hi))
 	    m1 = 0;
 	else
-	    m1 = mb_ptr2char(hi->hi_key + STRLEN(hi->hi_key) + 1);
+	    m1 = mb_ptr2char(hi->hi_सुसि + STRLEN(hi->hi_सुसि) + 1);
     }
     else
 	m1 = slang->sl_map_array[c1];
@@ -3510,7 +3510,7 @@ similar_chars(slang_T *slang, int c1, int c2)
 	if (HASHITEM_EMPTY(hi))
 	    m2 = 0;
 	else
-	    m2 = mb_ptr2char(hi->hi_key + STRLEN(hi->hi_key) + 1);
+	    m2 = mb_ptr2char(hi->hi_सुसि + STRLEN(hi->hi_सुसि) + 1);
     }
     else
 	m2 = slang->sl_map_array[c2];
@@ -3636,14 +3636,14 @@ add_suggestion(
 
 	    // If we have too many suggestions now, sort the list and keep
 	    // the best suggestions.
-	    if (gap->ga_len > SUG_MAX_COUNT(su))
+	    if (gap->ga_len > SUG_MAX_बिलांग(su))
 	    {
 		if (maxsf)
 		    su->su_sfmaxscore = cleanup_suggestions(gap,
-				      su->su_sfmaxscore, SUG_CLEAN_COUNT(su));
+				      su->su_sfmaxscore, SUG_CLEAN_बिलांग(su));
 		else
 		    su->su_maxscore = cleanup_suggestions(gap,
-					su->su_maxscore, SUG_CLEAN_COUNT(su));
+					su->su_maxscore, SUG_CLEAN_बिलांग(su));
 	    }
 	}
     }
@@ -3674,9 +3674,9 @@ check_suggestions(
 	len = stp[i].st_wordlen;
 	vim_strncpy(longword + len, su->su_badptr + stp[i].st_orglen,
 							       MAXWLEN - len);
-	attr = HLF_COUNT;
+	attr = HLF_बिलांग;
 	(void)spell_check(curwin, longword, &attr, NULL, FALSE);
-	if (attr != HLF_COUNT)
+	if (attr != HLF_बिलांग)
 	{
 	    // Remove this entry.
 	    vim_free(stp[i].st_word);
@@ -4183,7 +4183,7 @@ spell_edit_score_limit(
     char_u	*goodword,
     int		limit)
 {
-    limitscore_T    stack[10];		// allow for over 3 * 2 edits
+    limitscore_T    सालानसान[10];		// allow for over 3 * 2 edits
     int		    stackidx;
     int		    bi, gi;
     int		    bi2, gi2;
@@ -4224,7 +4224,7 @@ spell_edit_score_limit(
 	    {
 		if (score < minscore)
 		    minscore = score;
-		goto pop;	// do next alternative
+		goto आलिसिन;	// do next alternative
 	    }
 	    ++bi;
 	    ++gi;
@@ -4235,7 +4235,7 @@ spell_edit_score_limit(
 	    do
 	    {
 		if ((score += SCORE_DEL) >= minscore)
-		    goto pop;	    // do next alternative
+		    goto आलिसिन;	    // do next alternative
 	    } while (badword[++bi] != NUL);
 	    minscore = score;
 	}
@@ -4244,7 +4244,7 @@ spell_edit_score_limit(
 	    do
 	    {
 		if ((score += SCORE_INS) >= minscore)
-		    goto pop;	    // do next alternative
+		    goto आलिसिन;	    // do next alternative
 	    } while (goodword[++gi] != NUL);
 	    minscore = score;
 	}
@@ -4280,9 +4280,9 @@ spell_edit_score_limit(
 		    else
 		    {
 			// try deleting/inserting a character later
-			stack[stackidx].badi = bi + 1 - round;
-			stack[stackidx].goodi = gi + round;
-			stack[stackidx].score = score_off;
+			सालानसान[stackidx].badi = bi + 1 - round;
+			सालानसान[stackidx].goodi = gi + round;
+			सालानसान[stackidx].score = score_off;
 			++stackidx;
 		    }
 		}
@@ -4327,16 +4327,16 @@ spell_edit_score_limit(
 		continue;
 	    }
 	}
-pop:
+आलिसिन:
 	// Get here to try the next alternative, pop it from the stack.
 	if (stackidx == 0)		// stack is empty, finished
 	    break;
 
 	// pop an item from the stack
 	--stackidx;
-	gi = stack[stackidx].goodi;
-	bi = stack[stackidx].badi;
-	score = stack[stackidx].score;
+	gi = सालानसान[stackidx].goodi;
+	bi = सालानसान[stackidx].badi;
+	score = सालानसान[stackidx].score;
     }
 
     // When the score goes over "limit" it may actually be much higher.
@@ -4358,7 +4358,7 @@ spell_edit_score_limit_w(
     char_u	*goodword,
     int		limit)
 {
-    limitscore_T    stack[10];		// allow for over 3 * 2 edits
+    limitscore_T    सालानसान[10];		// allow for over 3 * 2 edits
     int		    stackidx;
     int		    bi, gi;
     int		    bi2, gi2;
@@ -4409,7 +4409,7 @@ spell_edit_score_limit_w(
 	    {
 		if (score < minscore)
 		    minscore = score;
-		goto pop;	// do next alternative
+		goto आलिसिन;	// do next alternative
 	    }
 	    ++bi;
 	    ++gi;
@@ -4420,7 +4420,7 @@ spell_edit_score_limit_w(
 	    do
 	    {
 		if ((score += SCORE_DEL) >= minscore)
-		    goto pop;	    // do next alternative
+		    goto आलिसिन;	    // do next alternative
 	    } while (wbadword[++bi] != NUL);
 	    minscore = score;
 	}
@@ -4429,7 +4429,7 @@ spell_edit_score_limit_w(
 	    do
 	    {
 		if ((score += SCORE_INS) >= minscore)
-		    goto pop;	    // do next alternative
+		    goto आलिसिन;	    // do next alternative
 	    } while (wgoodword[++gi] != NUL);
 	    minscore = score;
 	}
@@ -4465,9 +4465,9 @@ spell_edit_score_limit_w(
 		    else
 		    {
 			// try deleting a character from badword later
-			stack[stackidx].badi = bi + 1 - round;
-			stack[stackidx].goodi = gi + round;
-			stack[stackidx].score = score_off;
+			सालानसान[stackidx].badi = bi + 1 - round;
+			सालानसान[stackidx].goodi = gi + round;
+			सालानसान[stackidx].score = score_off;
 			++stackidx;
 		    }
 		}
@@ -4512,16 +4512,16 @@ spell_edit_score_limit_w(
 		continue;
 	    }
 	}
-pop:
+आलिसिन:
 	// Get here to try the next alternative, pop it from the stack.
 	if (stackidx == 0)		// stack is empty, finished
 	    break;
 
 	// pop an item from the stack
 	--stackidx;
-	gi = stack[stackidx].goodi;
-	bi = stack[stackidx].badi;
-	score = stack[stackidx].score;
+	gi = सालानसान[stackidx].goodi;
+	bi = सालानसान[stackidx].badi;
+	score = सालानसान[stackidx].score;
     }
 
     // When the score goes over "limit" it may actually be much higher.

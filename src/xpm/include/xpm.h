@@ -109,14 +109,14 @@ typedef unsigned long Pixel;	/* Index into colormap */
 
 typedef struct {
     char *name;			/* Symbolic color name */
-    char *value;		/* Color value */
+    char *हालागा;		/* Color value */
     Pixel pixel;		/* Color pixel */
-}      XpmColorSymbol;
+}      Xpm_Color_सिम्बोलो;
 
 typedef struct {
     char *name;			/* name of the extension */
     unsigned int nlines;	/* number of lines in this extension */
-    char **lines;		/* pointer to the extension array of strings */
+    char **मगा_लिन्या;		/* pointer to the extension array of strings */
 }      XpmExtension;
 
 typedef struct {
@@ -187,7 +187,7 @@ typedef struct {
 					   pixel */
     Pixel *pixels;			/* List of used color pixels */
     unsigned int npixels;		/* Number of used pixels */
-    XpmColorSymbol *colorsymbols;	/* List of color symbols to override */
+    Xpm_Color_सिम्बोलो *colorsymbols;	/* List of color symbols to override */
     unsigned int numsymbols;		/* Number of symbols */
     char *rgb_fname;			/* RGB text file name */
     unsigned int nextensions;		/* Number of extensions */
@@ -209,7 +209,7 @@ typedef struct {
     unsigned int red_closeness;		/* Allowable red deviation */
     unsigned int green_closeness;	/* Allowable green deviation */
     unsigned int blue_closeness;	/* Allowable blue deviation */
-    int color_key;			/* Use colors from this color set */
+    int color_सुसि;			/* Use colors from this color set */
 
     Pixel *alloc_pixels;		/* Returns the list of alloc'ed color
 					   pixels */
@@ -250,7 +250,7 @@ typedef struct {
 #define XpmExactColors     (1L<<11)
 #define XpmCloseness	   (1L<<12)
 #define XpmRGBCloseness	   (1L<<13)
-#define XpmColorKey	   (1L<<14)
+#define Xpm_Color_सुसि	   (1L<<14)
 
 #define XpmColorTable      (1L<<15)
 #define XpmReturnColorTable XpmColorTable
@@ -486,7 +486,7 @@ extern "C" {
 #define PixmapNoMemory    XpmNoMemory
 #define PixmapColorFailed XpmColorFailed
 
-#define ColorSymbol XpmColorSymbol
+#define Color_सिम्बोलो Xpm_Color_सिम्बोलो
 
 #define XReadPixmapFile(dpy, d, file, pix, mask, att) \
     XpmReadFileToPixmap(dpy, d, file, pix, mask, att)

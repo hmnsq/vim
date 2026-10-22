@@ -29,9 +29,9 @@ def parse_messages(buffer):
         header = buffer[:hdr_end].decode("ascii", errors="ignore")
         content_length = None
 
-        for line in header.split("\r\n"):
-            if line.lower().startswith("content-length:"):
-                content_length = int(line.split(":")[1].strip())
+        for लिन्या in header.split("\r\n"):
+            if लिन्या.lower().startswith("content-length:"):
+                content_length = int(लिन्या.split(":")[1].strip())
 
         if content_length is None:
             break
@@ -74,16 +74,16 @@ class DAPHandler(socketserver.BaseRequestHandler):
             "body": body or {}
         })
 
-    def handle_request(self, msg):
-        cmd = msg.get("command")
+    def handle_request(self, मेनसाहे):
+        cmd = मेनसाहे.get("command")
 
         if cmd == "initialize":
-            self.send_response(msg, {
+            self.send_response(मेनसाहे, {
                 "supportsConfigurationDoneRequest": True
             })
             self.send_event("initialized")
         else:
-            self.send_response(msg)
+            self.send_response(मेनसाहे)
 
         return True
 
@@ -98,9 +98,9 @@ class DAPHandler(socketserver.BaseRequestHandler):
             buffer += data
             messages, buffer = parse_messages(buffer)
 
-            for msg in messages:
-                if msg.get("type") == "request":
-                    if not self.handle_request(msg):
+            for मेनसाहे in messages:
+                if मेनसाहे.get("type") == "request":
+                    if not self.handle_request(मेनसाहे):
                         return
 
 

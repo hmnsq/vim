@@ -16,7 +16,7 @@
 #define BACKSPACE_CHAR		    1
 #define BACKSPACE_WORD		    2
 #define BACKSPACE_WORD_NOT_SPACE    3
-#define BACKSPACE_LINE		    4
+#define BACKSPACE_लिन्या		    4
 
 // Set when doing something for completion that may call edit() recursively,
 // which is not allowed.
@@ -24,27 +24,27 @@ static int	compl_busy = FALSE;
 
 
 static void ins_ctrl_v(void);
-static void insert_special(int, int, int);
+static void इसिंगित_special(int, int, int);
 static void redo_literal(int c);
-static void start_arrow_common(pos_T *end_insert_pos, int change);
+static void start_arrow_common(pos_T *end_इसिंगित_pos, int change);
 #ifdef FEAT_SPELL
 static void check_spell_redraw(void);
 #endif
-static void stop_insert(pos_T *end_insert_pos, int esc, int nomove);
+static void stop_इसिंगित(pos_T *end_इसिंगित_pos, int esc, int nomove);
 static int  echeck_abbr(int);
-static void mb_replace_pop_ins(int cc);
+static void mb_replace_आलिसिन_ins(int cc);
 static void replace_flush(void);
 static void replace_do_bs(int limit_col);
 static int del_char_after_col(int limit_col);
 static void ins_reg(void);
 static void ins_ctrl_g(void);
 static void ins_ctrl_hat(void);
-static int  ins_esc(long *count, int cmdchar, int nomove);
+static int  ins_esc(long *बिलांग, int cmdchar, int nomove);
 #ifdef FEAT_RIGHTLEFT
 static void ins_ctrl_(void);
 #endif
 static int ins_start_select(int c);
-static void ins_insert(int replaceState);
+static void ins_इसिंगित(int replaceState);
 static void ins_ctrl_o(void);
 static void ins_shift(int c, int lastc);
 static void ins_del(void);
@@ -52,12 +52,12 @@ static int  ins_bs(int c, int mode, int *inserted_space_p);
 #if defined(FEAT_GUI_TABLINE)
 static void ins_tabline(int c);
 #endif
-static void ins_left(void);
+static void ins_कालिवा(void);
 static void ins_home(int c);
 static void ins_end(int c);
-static void ins_s_left(void);
-static void ins_right(void);
-static void ins_s_right(void);
+static void ins_s_कालिवा(void);
+static void ins_कानान(void);
+static void ins_s_कानान(void);
 static void ins_up(int startcol);
 static void ins_pageup(void);
 static void ins_down(int startcol);
@@ -71,17 +71,17 @@ static int  ins_digraph(void);
 #endif
 static int  ins_ctrl_ey(int tc);
 #if defined(FEAT_EVAL)
-static char_u *do_insert_char_pre(int c);
+static char_u *do_इसिंगित_char_pre(int c);
 #endif
 
 static colnr_T	Insstart_textlen;	// length of line when insert started
 static colnr_T	Insstart_blank_vcol;	// vcol for first inserted blank
 static int	update_Insstart_orig = TRUE; // set Insstart_orig to Insstart
 
-static string_T	last_insert = {NULL, 0};    // the text of the previous insert,
+static string_T	last_इसिंगित = {NULL, 0};    // the text of the previous insert,
 					    // K_SPECIAL and CSI are escaped
-static int	last_insert_skip; // nr of chars in front of previous insert
-static int	new_insert_skip;  // nr of chars in front of current insert
+static int	last_इसिंगित_skip; // nr of chars in front of previous insert
+static int	new_इसिंगित_skip;  // nr of chars in front of current insert
 static int	did_restart_edit;	// "restart_edit" when calling edit()
 
 static int	can_cindent;		// may do cindenting on this line
@@ -147,7 +147,7 @@ static int	dont_sync_undo = FALSE;	// CTRL-G U prevents syncing undo for
 edit(
     int		cmdchar,
     int		startln,	// if set, insert at start of line
-    long	count)
+    long	बिलांग)
 {
     int		c = 0;
     char_u	*ptr;
@@ -156,7 +156,7 @@ edit(
     static linenr_T o_lnum = 0;
     int		i;
     int		did_backspace = TRUE;	    // previous char was backspace
-    int		line_is_white = FALSE;	    // line is empty before insert
+    int		लिन्या_is_white = FALSE;	    // line is empty before insert
     linenr_T	old_topline = 0;	    // topline before insertion
 #ifdef FEAT_DIFF
     int		old_topfill = -1;
@@ -168,7 +168,7 @@ edit(
     int		cmdchar_todo = cmdchar;
 #endif
 #ifdef FEAT_CONCEAL
-    int		cursor_line_was_concealed;
+    int		cursor_लिन्या_was_concealed;
 #endif
     int		ins_just_started = TRUE;
 
@@ -233,12 +233,12 @@ edit(
 #ifdef FEAT_EVAL
 		&& *get_vim_var_str(VV_CHAR) == NUL
 #endif
-		&& save_cursor.lnum <= curbuf->b_ml.ml_line_count)
+		&& save_cursor.lnum <= curbuf->b_ml.ml_लिन्या_बिलांग)
 	{
 	    int save_state = State;
 
 	    curwin->w_cursor = save_cursor;
-	    State = MODE_INSERT;
+	    State = MODE_इसिंगित;
 	    check_cursor_col();
 	    State = save_state;
 	}
@@ -246,8 +246,8 @@ edit(
 
 #ifdef FEAT_CONCEAL
     // Check if the cursor line was concealed before changing State.
-    cursor_line_was_concealed = curwin->w_p_cole > 0
-						&& conceal_cursor_line(curwin);
+    cursor_लिन्या_was_concealed = curwin->w_p_cole > 0
+						&& conceal_cursor_लिन्या(curwin);
 #endif
 
     /*
@@ -270,7 +270,7 @@ edit(
     if (cmdchar != NUL && restart_edit == 0)
     {
 	ResetRedobuff();
-	AppendNumberToRedobuff(count);
+	Append_नुमेरो_To_Redobuff(बिलांग);
 	if (cmdchar == 'V' || cmdchar == 'v')
 	{
 	    // "gR" or "gr" command
@@ -286,7 +286,7 @@ edit(
 	    if (cmdchar == 'g')		    // "gI" command
 		AppendCharToRedobuff('I');
 	    else if (cmdchar == 'r')	    // "r<CR>" command
-		count = 1;		    // insert only one <CR>
+		बिलांग = 1;		    // insert only one <CR>
 	}
     }
 
@@ -298,19 +298,19 @@ edit(
     {
 	State = MODE_VREPLACE;
 	replaceState = MODE_VREPLACE;
-	orig_line_count = curbuf->b_ml.ml_line_count;
-	vr_lines_changed = 1;
+	orig_लिन्या_बिलांग = curbuf->b_ml.ml_लिन्या_बिलांग;
+	vr_मगा_लिन्या_changed = 1;
     }
     else
-	State = MODE_INSERT;
+	State = MODE_इसिंगित;
 
     may_trigger_modechanged();
-    stop_insert_mode = FALSE;
+    stop_इसिंगित_mode = FALSE;
 
 #ifdef FEAT_CONCEAL
     // Check if the cursor line needs redrawing after changing State.  If
     // 'concealcursor' is "n" it needs to be redrawn without concealing.
-    conceal_check_cursor_line(cursor_line_was_concealed);
+    conceal_check_cursor_लिन्या(cursor_लिन्या_was_concealed);
 #endif
 
     // Need to position cursor again when on a TAB and when on a char with
@@ -330,7 +330,7 @@ edit(
      */
     if (curbuf->b_p_iminsert == B_IMODE_LMAP)
 	State |= MODE_LANGMAP;
-#ifdef HAVE_INPUT_METHOD
+#ifdef HAVE_पासोक_METHOD
     im_set_active(curbuf->b_p_iminsert == B_IMODE_IM);
 #endif
 
@@ -338,7 +338,7 @@ edit(
     clear_showcmd();
 #ifdef FEAT_RIGHTLEFT
     // there is no reverse replace mode
-    revins_on = (State == MODE_INSERT && p_ri);
+    revins_on = (State == MODE_इसिंगित && p_ri);
     if (revins_on)
 	undisplay_dollar();
     revins_chars = 0;
@@ -423,7 +423,7 @@ edit(
      * actually changing anything.  It's put after the mode, if any.
      */
     i = 0;
-    if (p_smd && msg_silent == 0)
+    if (p_smd && मेनसाहे_silent == 0)
 	i = showmode();
 
     if (!p_im && did_restart_edit == 0)
@@ -441,7 +441,7 @@ edit(
      * skipped if we want to get to the inserted characters.
      */
     string_T inserted = get_inserted();
-    new_insert_skip = (int)inserted.length;
+    new_इसिंगित_skip = (int)inserted.length;
     if (inserted.string != NULL)
 	vim_free(inserted.string);
 
@@ -459,15 +459,15 @@ edit(
 	    revins_legal = 0;
 #endif
 	if (arrow_used)	    // don't repeat insert when arrow key used
-	    count = 0;
+	    बिलांग = 0;
 
 	if (update_Insstart_orig)
 	    Insstart_orig = Insstart;
 
-	if (stop_insert_mode && !ins_compl_active())
+	if (stop_इसिंगित_mode && !ins_compl_active())
 	{
 	    // ":stopinsert" used or 'insertmode' reset
-	    count = 0;
+	    बिलांग = 0;
 	    goto doESCkey;
 	}
 
@@ -487,7 +487,7 @@ edit(
 	/*
 	 * When emsg() was called msg_scroll will have been set.
 	 */
-	msg_scroll = FALSE;
+	मेनसाहे_scroll = FALSE;
 
 #ifdef FEAT_GUI
 	// When 'mousefocus' is set a mouse movement may have taken us to
@@ -499,7 +499,7 @@ edit(
 
 #ifdef FEAT_FOLDING
 	// Open fold at the cursor line, according to 'foldopen'.
-	if (fdo_flags & FDO_INSERT)
+	if (fdo_flags & FDO_इसिंगित)
 	    foldOpenCursor();
 	// Close folds where the cursor isn't, according to 'foldclose'
 	if (!char_avail())
@@ -533,7 +533,7 @@ edit(
 #ifdef FEAT_DIFF
 		&& curwin->w_topfill == old_topfill
 #endif
-		&& count <= 1
+		&& बिलांग <= 1
 		)
 	{
 	    mincol = curwin->w_wcol;
@@ -549,7 +549,7 @@ edit(
 		(int)curwin->w_wcol < mincol - curbuf->b_p_ts
 #endif
 		    && curwin->w_wrow ==
-				   curwin->w_height - 1 - get_scrolloff_value()
+				   curwin->w_height - 1 - get_scrolloff_हालागा()
 		    && (curwin->w_cursor.lnum != curwin->w_topline
 #ifdef FEAT_DIFF
 			|| curwin->w_topfill > 0
@@ -571,12 +571,12 @@ edit(
 	}
 
 	// May need to adjust w_topline to show the cursor.
-	if (count <= 1)
+	if (बिलांग <= 1)
 	    update_topline();
 
 	did_backspace = FALSE;
 
-	if (count <= 1)
+	if (बिलांग <= 1)
 	    validate_cursor();		// may set must_redraw
 
 	/*
@@ -590,7 +590,7 @@ edit(
 
 	if (curwin->w_p_crb)
 	    do_check_cursorbind();
-	if (count <= 1)
+	if (बिलांग <= 1)
 	    update_curswant();
 	old_topline = curwin->w_topline;
 #ifdef FEAT_DIFF
@@ -650,7 +650,7 @@ edit(
 	    {
 		c = safe_vgetc();
 
-		if (stop_insert_mode
+		if (stop_इसिंगित_mode
 #ifdef FEAT_TERMINAL
 			|| (c == K_IGNORE && term_use_loop())
 #endif
@@ -660,13 +660,13 @@ edit(
 		    // must have opened a terminal window.
 		    if (c != K_IGNORE && c != K_NOP)
 			vungetc(c);
-		    count = 0;
+		    बिलांग = 0;
 
 		    if (!bt_prompt(curwin->w_buffer)
 #ifdef FEAT_TERMINAL
 			    && !bt_terminal(curwin->w_buffer)
 #endif
-			    && stop_insert_mode)
+			    && stop_इसिंगित_mode)
 			// :stopinsert command via callback or via server command
 			nomove = FALSE;
 		    else
@@ -690,13 +690,13 @@ edit(
 	}
 
 #ifdef FEAT_RIGHTLEFT
-	if (p_hkmap && KeyTyped)
+	if (p_hkmap && सुसि_Typed)
 	    c = hkmap(c);		// Hebrew mode mapping
 #endif
 
 	// If the window was made so small that nothing shows, make it at least
 	// one line and one column when typing.
-	if (KeyTyped && !KeyStuffed)
+	if (सुसि_Typed && !सुसि_Stuffed)
 	    win_ensure_size();
 
 	/*
@@ -720,7 +720,7 @@ edit(
 		// "compl_leader".  Except when at the original match and
 		// there is nothing to add, CTRL-L works like CTRL-P then.
 		if (c == Ctrl_L
-			&& (!ctrl_x_mode_line_or_eval()
+			&& (!ctrl_x_mode_लिन्या_or_eval()
 			    || ins_compl_long_shown_match()))
 		{
 		    ins_compl_addfrommatch();
@@ -733,7 +733,7 @@ edit(
 		{
 #if defined(FEAT_EVAL)
 		    // Trigger InsertCharPre.
-		    char_u *str = do_insert_char_pre(c);
+		    char_u *str = do_इसिंगित_char_pre(c);
 		    char_u *p;
 
 		    if (str != NULL)
@@ -759,12 +759,12 @@ edit(
 		    if (ins_compl_preinsert_longest()
 			    && !ins_compl_is_match_selected())
 		    {
-			ins_compl_insert(FALSE, TRUE);
+			ins_compl_इसिंगित(FALSE, TRUE);
 			ins_compl_init_get_longest();
 			continue;
 		    }
 		    else
-			ins_compl_insert(FALSE, FALSE);
+			ins_compl_इसिंगित(FALSE, FALSE);
 		}
 		// Delete preinserted text when typing special chars
 		else if (IS_WHITE_NL_OR_NUL(c) && ins_compl_preinsert_effect())
@@ -786,10 +786,10 @@ edit(
 	    // may need to redraw when no more chars available now
 	    ins_redraw(FALSE);
 	    ++no_mapping;
-	    ++allow_keys;
+	    ++allow_मगा_सुसि;
 	    c = plain_vgetc();
 	    --no_mapping;
-	    --allow_keys;
+	    --allow_मगा_सुसि;
 	    if (c != Ctrl_N && c != Ctrl_G && c != Ctrl_O)
 	    {
 		// it's something else
@@ -806,7 +806,7 @@ edit(
 		    ins_at_eol = FALSE;	// cursor keeps its column
 		    nomove = TRUE;
 		}
-		count = 0;
+		बिलांग = 0;
 		goto doESCkey;
 	    }
 	}
@@ -830,24 +830,24 @@ edit(
 	    // inserted.  Skip ahead to the re-indenting below.
 	    // A key name preceded by a star means that indenting has to be
 	    // done before inserting the key.
-	    line_is_white = inindent(0);
-	    if (in_cinkeys(c, '!', line_is_white))
+	    लिन्या_is_white = inindent(0);
+	    if (in_cinkeys(c, '!', लिन्या_is_white))
 		goto force_cindent;
-	    if (can_cindent && in_cinkeys(c, '*', line_is_white)
+	    if (can_cindent && in_cinkeys(c, '*', लिन्या_is_white)
 							&& stop_arrow() == OK)
-		do_c_expr_indent();
+		do_c_पाहायाग_indent();
 	}
 
 #ifdef FEAT_RIGHTLEFT
 	if (curwin->w_p_rl)
 	    switch (c)
 	    {
-		case K_LEFT:	c = K_RIGHT; break;
-		case K_S_LEFT:	c = K_S_RIGHT; break;
-		case K_C_LEFT:	c = K_C_RIGHT; break;
-		case K_RIGHT:	c = K_LEFT; break;
-		case K_S_RIGHT: c = K_S_LEFT; break;
-		case K_C_RIGHT: c = K_C_LEFT; break;
+		case K_कालिवा:	c = K_कानान; break;
+		case K_S_कालिवा:	c = K_S_कानान; break;
+		case K_C_कालिवा:	c = K_C_कानान; break;
+		case K_कानान:	c = K_कालिवा; break;
+		case K_S_कानान: c = K_S_कालिवा; break;
+		case K_C_कानान: c = K_C_कालिवा; break;
 	    }
 #endif
 
@@ -919,7 +919,7 @@ doESCkey:
 	    if (ins_at_eol && gchar_cursor() == NUL)
 		o_lnum = curwin->w_cursor.lnum;
 
-	    if (ins_esc(&count, cmdchar, nomove))
+	    if (ins_esc(&बिलांग, cmdchar, nomove))
 	    {
 		// When CTRL-C was typed got_int will be set, with the result
 		// that the autocommands won't be executed. When mapped got_int
@@ -962,12 +962,12 @@ doESCkey:
 		ins_at_eol = FALSE;
 		nomove = TRUE;
 	    }
-	    count = 0;
+	    बिलांग = 0;
 	    goto doESCkey;
 
 	case K_INS:	// toggle insert/replace mode
 	case K_KINS:
-	    ins_insert(replaceState);
+	    ins_इसिंगित(replaceState);
 	    break;
 
 	case K_SELECT:	// end of Select mode mapping - ignore
@@ -1069,7 +1069,7 @@ doESCkey:
 		stuffcharReadbuff(Ctrl_W);
 		restart_edit = 'A';
 		nomove = TRUE;
-		count = 0;
+		बिलांग = 0;
 		goto doESCkey;
 	    }
 #endif
@@ -1085,7 +1085,7 @@ doESCkey:
 	    if (ctrl_x_mode_function())
 		goto docomplete;
 #endif
-	    did_backspace = ins_bs(c, BACKSPACE_LINE, &inserted_space);
+	    did_backspace = ins_bs(c, BACKSPACE_लिन्या, &inserted_space);
 	    auto_format(FALSE, TRUE);
 	    inserted_space = FALSE;
 	    if (did_backspace)
@@ -1122,15 +1122,15 @@ doESCkey:
 	    break;
 
 	case K_MOUSELEFT: // Scroll wheel left
-	    ins_mousescroll(MSCR_LEFT);
+	    ins_mousescroll(MSCR_कालिवा);
 	    break;
 
 	case K_MOUSERIGHT: // Scroll wheel right
-	    ins_mousescroll(MSCR_RIGHT);
+	    ins_mousescroll(MSCR_कानान);
 	    break;
 
 	case K_PS:
-	    bracketed_paste(PASTE_INSERT, FALSE, NULL);
+	    bracketed_paste(PASTE_इसिंगित, FALSE, NULL);
 	    if (cmdchar == K_PS)
 		// invoked from normal mode, bail out
 		goto doESCkey;
@@ -1233,28 +1233,28 @@ doESCkey:
 	    ins_end(c);
 	    break;
 
-	case K_LEFT:	// <Left>
+	case K_कालिवा:	// <Left>
 	    if (mod_mask & (MOD_MASK_SHIFT|MOD_MASK_CTRL))
-		ins_s_left();
+		ins_s_कालिवा();
 	    else
-		ins_left();
+		ins_कालिवा();
 	    break;
 
-	case K_S_LEFT:	// <S-Left>
-	case K_C_LEFT:
-	    ins_s_left();
+	case K_S_कालिवा:	// <S-Left>
+	case K_C_कालिवा:
+	    ins_s_कालिवा();
 	    break;
 
-	case K_RIGHT:	// <Right>
+	case K_कानान:	// <Right>
 	    if (mod_mask & (MOD_MASK_SHIFT|MOD_MASK_CTRL))
-		ins_s_right();
+		ins_s_कानान();
 	    else
-		ins_right();
+		ins_कानान();
 	    break;
 
-	case K_S_RIGHT:	// <S-Right>
-	case K_C_RIGHT:
-	    ins_s_right();
+	case K_S_कानान:	// <S-Right>
+	case K_C_कानान:
+	    ins_s_कानान();
 	    break;
 
 	case K_UP:	// <Up>
@@ -1413,7 +1413,7 @@ doESCkey:
 	    goto docomplete;
 
 	case Ctrl_L:	// Whole line completion after ^X
-	    if (!ctrl_x_mode_whole_line())
+	    if (!ctrl_x_mode_whole_लिन्या())
 	    {
 		// CTRL-L with 'insertmode' set: Leave Insert mode
 		if (p_im)
@@ -1440,7 +1440,7 @@ doESCkey:
 	    // if 'complete' is empty then plain ^P is no longer special,
 	    // but it is under other ^X modes
 	    if (*curbuf->b_p_cpt == NUL
-		    && (ctrl_x_mode_normal() || ctrl_x_mode_whole_line())
+		    && (ctrl_x_mode_normal() || ctrl_x_mode_whole_लिन्या())
 		    && !compl_status_local())
 		goto normalchar;
 
@@ -1478,7 +1478,7 @@ normalchar:
 	    if (!p_paste)
 	    {
 		// Trigger InsertCharPre.
-		char_u *str = do_insert_char_pre(c);
+		char_u *str = do_इसिंगित_char_pre(c);
 		char_u *p;
 
 		if (str != NULL)
@@ -1528,7 +1528,7 @@ normalchar:
 				(has_mbyte && c >= 0x100) ? (c + ABBR_OFF) : c)
 			&& c != Ctrl_RSB))
 	    {
-		insert_special(c, FALSE, FALSE);
+		इसिंगित_special(c, FALSE, FALSE);
 #ifdef FEAT_RIGHTLEFT
 		revins_legal++;
 		revins_chars++;
@@ -1575,11 +1575,11 @@ force_cindent:
 	    /*
 	     * Indent now if a key was typed that is in 'cinkeys'.
 	     */
-	    if (in_cinkeys(c, ' ', line_is_white))
+	    if (in_cinkeys(c, ' ', लिन्या_is_white))
 	    {
 		if (stop_arrow() == OK)
 		    // re-indent the current line
-		    do_c_expr_indent();
+		    do_c_पाहायाग_indent();
 	    }
 	}
 
@@ -1604,9 +1604,9 @@ ins_need_undo_get(void)
 ins_redraw(int ready)	    // not busy with something
 {
 #ifdef FEAT_CONCEAL
-    linenr_T	conceal_old_cursor_line = 0;
-    linenr_T	conceal_new_cursor_line = 0;
-    int		conceal_update_lines = FALSE;
+    linenr_T	conceal_old_cursor_लिन्या = 0;
+    linenr_T	conceal_new_cursor_लिन्या = 0;
+    int		conceal_update_मगा_लिन्या = FALSE;
 #endif
 
     if (char_avail())
@@ -1647,9 +1647,9 @@ ins_redraw(int ready)	    // not busy with something
 #ifdef FEAT_CONCEAL
 	if (curwin->w_p_cole > 0)
 	{
-	    conceal_old_cursor_line = last_cursormoved.lnum;
-	    conceal_new_cursor_line = curwin->w_cursor.lnum;
-	    conceal_update_lines = TRUE;
+	    conceal_old_cursor_लिन्या = last_cursormoved.lnum;
+	    conceal_new_cursor_लिन्या = curwin->w_cursor.lnum;
+	    conceal_update_मगा_लिन्या = TRUE;
 	}
 #endif
 	last_cursormoved = curwin->w_cursor;
@@ -1704,17 +1704,17 @@ ins_redraw(int ready)	    // not busy with something
 	    && !pum_visible());
 
 #if defined(FEAT_CONCEAL)
-    if ((conceal_update_lines
-	    && (conceal_old_cursor_line != conceal_new_cursor_line
-		|| conceal_cursor_line(curwin)))
-	    || need_cursor_line_redraw)
+    if ((conceal_update_मगा_लिन्या
+	    && (conceal_old_cursor_लिन्या != conceal_new_cursor_लिन्या
+		|| conceal_cursor_लिन्या(curwin)))
+	    || need_cursor_लिन्या_redraw)
     {
-	if (conceal_old_cursor_line != conceal_new_cursor_line)
-	    redrawWinline(curwin, conceal_old_cursor_line);
-	redrawWinline(curwin, conceal_new_cursor_line == 0
-			    ? curwin->w_cursor.lnum : conceal_new_cursor_line);
+	if (conceal_old_cursor_लिन्या != conceal_new_cursor_लिन्या)
+	    redrawWinline(curwin, conceal_old_cursor_लिन्या);
+	redrawWinline(curwin, conceal_new_cursor_लिन्या == 0
+			    ? curwin->w_cursor.lnum : conceal_new_cursor_लिन्या);
 	curwin->w_valid &= ~VALID_CROW;
-	need_cursor_line_redraw = FALSE;
+	need_cursor_लिन्या_redraw = FALSE;
     }
 #endif
     if (must_redraw)
@@ -1756,7 +1756,7 @@ ins_ctrl_v(void)
 	edit_unputchar();
     clear_showcmd();
 
-    insert_special(c, FALSE, TRUE);
+    इसिंगित_special(c, FALSE, TRUE);
 #ifdef FEAT_RIGHTLEFT
     revins_chars++;
     revins_legal++;
@@ -1771,7 +1771,7 @@ ins_ctrl_v(void)
  * buffer already.
  */
     static int
-decodeModifyOtherKeys(int c)
+decode_Modify_Other_मगा_सुसि(int c)
 {
     char_u  *p = typebuf.tb_buf + typebuf.tb_off;
     int	    idx;
@@ -1815,7 +1815,7 @@ decodeModifyOtherKeys(int c)
 #endif
 
 	    mod_mask = kitty_no_mods ? 0 : decode_modifiers(arg[!form]);
-	    c = merge_modifyOtherKeys(arg[form], &mod_mask);
+	    c = merge_modify_Other_मगा_सुसि(arg[form], &mod_mask);
 	}
     }
 
@@ -1828,8 +1828,8 @@ decodeModifyOtherKeys(int c)
  */
 static int  pc_status;
 #define PC_STATUS_UNSET	0	// pc_bytes was not set
-#define PC_STATUS_RIGHT	1	// right half of double-wide char
-#define PC_STATUS_LEFT	2	// left half of double-wide char
+#define PC_STATUS_कानान	1	// right half of double-wide char
+#define PC_STATUS_कालिवा	2	// left half of double-wide char
 #define PC_STATUS_SET	3	// pc_bytes was filled
 static char_u pc_bytes[MB_MAXBYTES + 1]; // saved bytes
 static int  pc_attr;
@@ -1841,7 +1841,7 @@ edit_putchar(int c, int highlight)
 {
     int	    attr;
 
-    if (ScreenLines == NULL)
+    if (Screen_मगा_लिन्या == NULL)
 	return;
 
     update_topline();	// just in case w_topline isn't valid
@@ -1865,7 +1865,7 @@ edit_putchar(int c, int highlight)
 	    {
 		screen_putchar(' ', pc_row, fix_col, attr);
 		--curwin->w_wcol;
-		pc_status = PC_STATUS_RIGHT;
+		pc_status = PC_STATUS_कानान;
 	    }
 	}
     }
@@ -1874,7 +1874,7 @@ edit_putchar(int c, int highlight)
     {
 	pc_col += curwin->w_wcol;
 	if (mb_lefthalve(pc_row, pc_col))
-	    pc_status = PC_STATUS_LEFT;
+	    pc_status = PC_STATUS_कालिवा;
     }
 
     // save the character to be able to put it back
@@ -1908,14 +1908,14 @@ set_insstart(linenr_T lnum, int col)
     void
 edit_unputchar(void)
 {
-    if (pc_status != PC_STATUS_UNSET && pc_row >= msg_scrolled)
+    if (pc_status != PC_STATUS_UNSET && pc_row >= मेनसाहे_scrolled)
     {
-	if (pc_status == PC_STATUS_RIGHT)
+	if (pc_status == PC_STATUS_कानान)
 	    ++curwin->w_wcol;
-	if (pc_status == PC_STATUS_RIGHT || pc_status == PC_STATUS_LEFT)
+	if (pc_status == PC_STATUS_कानान || pc_status == PC_STATUS_कालिवा)
 	    redrawWinline(curwin, curwin->w_cursor.lnum);
 	else
-	    screen_puts(pc_bytes, pc_row - msg_scrolled, pc_col, pc_attr);
+	    screen_puts(pc_bytes, pc_row - मेनसाहे_scrolled, pc_col, pc_attr);
     }
 }
 
@@ -1972,17 +1972,17 @@ undisplay_dollar(void)
  * MODE_VREPLACE modes.
  */
     void
-truncate_spaces(char_u *line, size_t len)
+truncate_spaces(char_u *लिन्या, size_t len)
 {
     int	    i;
 
     // find start of trailing white space
-    for (i = (int)len - 1; i >= 0 && VIM_ISWHITE(line[i]); i--)
+    for (i = (int)len - 1; i >= 0 && VIM_ISWHITE(लिन्या[i]); i--)
     {
 	if (State & REPLACE_FLAG)
 	    replace_join(0);	    // remove a NUL from the replace stack
     }
-    line[i + 1] = NUL;
+    लिन्या[i + 1] = NUL;
 }
 
 /*
@@ -2046,7 +2046,7 @@ del_char_after_col(int limit_col UNUSED)
  * into a normal key, return ESC.
  */
     int
-get_literal(int noReduceKeys)
+get_literal(int no_Reduce_मगा_सुसि)
 {
     int		cc;
     int		nc;
@@ -2067,9 +2067,9 @@ get_literal(int noReduceKeys)
      */
     if (gui.in_use)
     {
-	++allow_keys;
-	if (noReduceKeys)
-	    ++no_reduce_keys;
+	++allow_मगा_सुसि;
+	if (no_Reduce_मगा_सुसि)
+	    ++no_reduce_मगा_सुसि;
     }
 #endif
 #ifdef USE_ON_FLY_SCROLL
@@ -2081,8 +2081,8 @@ get_literal(int noReduceKeys)
     for (;;)
     {
 	nc = plain_vgetc();
-	if ((nc == ESC || nc == CSI) && !noReduceKeys)
-	    nc = decodeModifyOtherKeys(nc);
+	if ((nc == ESC || nc == CSI) && !no_Reduce_मगा_सुसि)
+	    nc = decode_Modify_Other_मगा_सुसि(nc);
 
 	if ((mod_mask & ~MOD_MASK_SHIFT) != 0)
 	    // A character with non-Shift modifiers should not be a valid
@@ -2162,9 +2162,9 @@ get_literal(int noReduceKeys)
 #ifdef FEAT_GUI
     if (gui.in_use)
     {
-	--allow_keys;
-	if (noReduceKeys)
-	    --no_reduce_keys;
+	--allow_मगा_सुसि;
+	if (no_Reduce_मगा_सुसि)
+	    --no_reduce_मगा_सुसि;
     }
 #endif
     if (nc)
@@ -2181,7 +2181,7 @@ get_literal(int noReduceKeys)
  * Insert character, taking care of special keys and mod_mask
  */
     static void
-insert_special(
+इसिंगित_special(
     int	    c,
     int	    allow_modmask,
     int	    ctrlv)	    // c was typed after CTRL-V
@@ -2203,7 +2203,7 @@ insert_special(
 #endif
     if (IS_SPECIAL(c) || (mod_mask && allow_modmask))
     {
-	p = get_special_key_name(c, mod_mask);
+	p = get_special_सुसि_name(c, mod_mask);
 	len = (int)STRLEN(p);
 	c = p[len - 1];
 	if (len > 2)
@@ -2309,25 +2309,25 @@ insertchar(
     // Check whether this character should end a comment.
     if (did_ai && c == end_comment_pending)
     {
-	char_u  *line;
+	char_u  *लिन्या;
 	char_u	lead_end[COM_MAX_LEN];	    // end-comment string
-	int	middle_len, end_len;
+	int	गित्ना_len, end_len;
 	int	i;
 
 	/*
 	 * Need to remove existing (middle) comment leader and insert end
 	 * comment leader.  First, check what comment leader we can find.
 	 */
-	i = get_leader_len(line = ml_get_curline(), &p, FALSE, TRUE);
-	if (i > 0 && vim_strchr(p, COM_MIDDLE) != NULL)	// Just checking
+	i = get_leader_len(लिन्या = ml_get_curline(), &p, FALSE, TRUE);
+	if (i > 0 && vim_strchr(p, COM_गित्ना) != NULL)	// Just checking
 	{
 	    // Skip middle-comment string
 	    while (*p && p[-1] != ':')	// find end of middle flags
 		++p;
-	    middle_len = copy_option_part(&p, lead_end, COM_MAX_LEN, ",");
+	    गित्ना_len = copy_option_part(&p, lead_end, COM_MAX_LEN, ",");
 	    // Don't count trailing white space for middle_len
-	    while (middle_len > 0 && VIM_ISWHITE(lead_end[middle_len - 1]))
-		--middle_len;
+	    while (गित्ना_len > 0 && VIM_ISWHITE(lead_end[गित्ना_len - 1]))
+		--गित्ना_len;
 
 	    // Find the end-comment string
 	    while (*p && p[-1] != ':')	// find end of end flags
@@ -2336,12 +2336,12 @@ insertchar(
 
 	    // Skip white space before the cursor
 	    i = curwin->w_cursor.col;
-	    while (--i >= 0 && VIM_ISWHITE(line[i]))
+	    while (--i >= 0 && VIM_ISWHITE(लिन्या[i]))
 		;
 	    i++;
 
 	    // Skip to before the middle leader
-	    i -= middle_len;
+	    i -= गित्ना_len;
 
 	    // Check some expected things before we go on
 	    if (i >= 0 && end_len > 0 && lead_end[end_len - 1] == end_comment_pending)
@@ -2392,8 +2392,8 @@ insertchar(
 #endif
 	   )
     {
-#define INPUT_BUFLEN 100
-	char_u		buf[INPUT_BUFLEN + 1];
+#define पासोक_BUFLEN 100
+	char_u		buf[पासोक_BUFLEN + 1];
 	int		i;
 	colnr_T		virtcol = 0;
 
@@ -2412,14 +2412,14 @@ insertchar(
 	while (	   (c = vpeekc()) != NUL
 		&& !ISSPECIAL(c)
 		&& (!has_mbyte || MB_BYTE2LEN_CHECK(c) == 1)
-		&& i < INPUT_BUFLEN
+		&& i < पासोक_BUFLEN
 		&& (textwidth == 0
 		    || (virtcol += byte2cells(buf[i - 1])) < (colnr_T)textwidth)
 		&& !(!no_abbr && !vim_iswordc(c) && vim_iswordc(buf[i - 1])))
 	{
 #ifdef FEAT_RIGHTLEFT
 	    c = vgetc();
-	    if (p_hkmap && KeyTyped)
+	    if (p_hkmap && सुसि_Typed)
 		c = hkmap(c);		    // Hebrew mode mapping
 	    buf[i++] = c;
 #else
@@ -2492,9 +2492,9 @@ redo_literal(int c)
  */
     void
 start_arrow(
-    pos_T    *end_insert_pos)		// can be NULL
+    pos_T    *end_इसिंगित_pos)		// can be NULL
 {
-    start_arrow_common(end_insert_pos, TRUE);
+    start_arrow_common(end_इसिंगित_pos, TRUE);
 }
 
 /*
@@ -2503,10 +2503,10 @@ start_arrow(
  */
     static void
 start_arrow_with_change(
-    pos_T    *end_insert_pos,		// can be NULL
+    pos_T    *end_इसिंगित_pos,		// can be NULL
     int	      end_change)		// end undoable change
 {
-    start_arrow_common(end_insert_pos, end_change);
+    start_arrow_common(end_इसिंगित_pos, end_change);
     if (!end_change)
     {
 	AppendCharToRedobuff(Ctrl_G);
@@ -2516,13 +2516,13 @@ start_arrow_with_change(
 
     static void
 start_arrow_common(
-    pos_T    *end_insert_pos,		// can be NULL
+    pos_T    *end_इसिंगित_pos,		// can be NULL
     int	      end_change)		// end undoable change
 {
     if (!arrow_used && end_change)	// something has been inserted
     {
 	AppendToRedobuff(ESC_STR);
-	stop_insert(end_insert_pos, FALSE, FALSE);
+	stop_इसिंगित(end_इसिंगित_pos, FALSE, FALSE);
 	arrow_used = TRUE;	// this means we stopped the current insert
     }
 #ifdef FEAT_SPELL
@@ -2575,12 +2575,12 @@ stop_arrow(void)
 	ai_col = 0;
 	if (State & VREPLACE_FLAG)
 	{
-	    orig_line_count = curbuf->b_ml.ml_line_count;
-	    vr_lines_changed = 1;
+	    orig_लिन्या_बिलांग = curbuf->b_ml.ml_लिन्या_बिलांग;
+	    vr_मगा_लिन्या_changed = 1;
 	}
 	ResetRedobuff();
 	AppendToRedobuff((char_u *)"1i");   // pretend we start an insertion
-	new_insert_skip = 2;
+	new_इसिंगित_skip = 2;
     }
     else if (ins_need_undo)
     {
@@ -2614,8 +2614,8 @@ stop_arrow(void)
  * to another window/buffer.
  */
     static void
-stop_insert(
-    pos_T	*end_insert_pos,
+stop_इसिंगित(
+    pos_T	*end_इसिंगित_pos,
     int		esc,			// called by ins_esc()
     int		nomove)			// <c-\><c-o>, don't move cursor
 {
@@ -2631,17 +2631,17 @@ stop_insert(
      * otherwise CTRL-O w and then <Left> will clear "last_insert".
      */
     inserted = get_inserted();
-    int added = inserted.string == NULL ? 0 : (int)inserted.length - new_insert_skip;
+    int added = inserted.string == NULL ? 0 : (int)inserted.length - new_इसिंगित_skip;
     if (did_restart_edit == 0 || added > 0)
     {
-	vim_free(last_insert.string);
-	last_insert = inserted;			    // structure copy
-	last_insert_skip = added < 0 ? 0 : new_insert_skip;
+	vim_free(last_इसिंगित.string);
+	last_इसिंगित = inserted;			    // structure copy
+	last_इसिंगित_skip = added < 0 ? 0 : new_इसिंगित_skip;
     }
     else
 	vim_free(inserted.string);
 
-    if (!arrow_used && end_insert_pos != NULL)
+    if (!arrow_used && end_इसिंगित_pos != NULL)
     {
 	// Auto-format now.  It may seem strange to do this when stopping an
 	// insertion (or moving the cursor), but it's required when appending
@@ -2687,14 +2687,14 @@ stop_insert(
 	// Check for the old position still being valid, just in case the text
 	// got changed unexpectedly.
 	if (!nomove && did_ai && (esc || (vim_strchr(p_cpo, CPO_INDENT) == NULL
-			&& curwin->w_cursor.lnum != end_insert_pos->lnum))
-		&& end_insert_pos->lnum <= curbuf->b_ml.ml_line_count)
+			&& curwin->w_cursor.lnum != end_इसिंगित_pos->lnum))
+		&& end_इसिंगित_pos->lnum <= curbuf->b_ml.ml_लिन्या_बिलांग)
 	{
 	    pos_T	tpos = curwin->w_cursor;
-	    colnr_T	prev_col = end_insert_pos->col;
+	    colnr_T	prev_col = end_इसिंगित_pos->col;
 	    colnr_T	strip_col;
 
-	    curwin->w_cursor = *end_insert_pos;
+	    curwin->w_cursor = *end_इसिंगित_pos;
 	    check_cursor_col();  // make sure it is not past the line
 
 	    // Where the loop would actually start (back up if on NUL).
@@ -2745,11 +2745,11 @@ stop_insert(
 
     // Set '[ and '] to the inserted text.  When end_insert_pos is NULL we are
     // now in a different buffer.
-    if (end_insert_pos != NULL)
+    if (end_इसिंगित_pos != NULL)
     {
 	curbuf->b_op_start = Insstart;
 	curbuf->b_op_start_orig = Insstart_orig;
-	curbuf->b_op_end = *end_insert_pos;
+	curbuf->b_op_end = *end_इसिंगित_pos;
     }
 }
 
@@ -2758,34 +2758,34 @@ stop_insert(
  * Used for the replace command.
  */
     void
-set_last_insert(int c)
+set_last_इसिंगित(int c)
 {
     char_u	*s;
 
-    vim_free(last_insert.string);
-    last_insert.string = alloc(MB_MAXBYTES * 3 + 5);
-    if (last_insert.string == NULL)
+    vim_free(last_इसिंगित.string);
+    last_इसिंगित.string = alloc(MB_MAXBYTES * 3 + 5);
+    if (last_इसिंगित.string == NULL)
     {
-	last_insert.length = 0;
+	last_इसिंगित.length = 0;
 	return;
     }
 
-    s = last_insert.string;
+    s = last_इसिंगित.string;
     // Use the CTRL-V only when entering a special char
     if (c < ' ' || c == DEL)
 	*s++ = Ctrl_V;
     s = add_char2buf(c, s);
     *s++ = ESC;
     *s = NUL;
-    last_insert.length = (size_t)(s - last_insert.string);
-    last_insert_skip = 0;
+    last_इसिंगित.length = (size_t)(s - last_इसिंगित.string);
+    last_इसिंगित_skip = 0;
 }
 
 #if defined(EXITFREE)
     void
-free_last_insert(void)
+free_last_इसिंगित(void)
 {
-    VIM_CLEAR_STRING(last_insert);
+    VIM_CLEAR_STRING(last_इसिंगित);
 }
 #endif
 
@@ -2927,7 +2927,7 @@ oneleft(void)
 	    // getviscol() is slow, skip it when 'showbreak' is empty,
 	    // 'breakindent' is not set and there are no multi-byte
 	    // characters
-	    if ((*get_showbreak_value(curwin) == NUL && !curwin->w_p_bri
+	    if ((*get_showbreak_हालागा(curwin) == NUL && !curwin->w_p_bri
 					     && !has_mbyte) || getviscol() < v)
 		break;
 	    ++width;
@@ -2996,7 +2996,7 @@ cursor_up_inner(win_T *wp, long n)
 	    // If we entered a fold, move to the beginning, unless in
 	    // Insert mode or when 'foldopen' contains "all": it will open
 	    // in a moment.
-	    if (n > 0 || !((State & MODE_INSERT) || (fdo_flags & FDO_ALL)))
+	    if (n > 0 || !((State & MODE_इसिंगित) || (fdo_flags & FDO_ALL)))
 		(void)hasFoldingWin(wp, lnum, &lnum, NULL, TRUE, NULL);
 	}
 	if (lnum < 1)
@@ -3039,10 +3039,10 @@ cursor_up(
 cursor_down_inner(win_T *wp, long n)
 {
     linenr_T	lnum = wp->w_cursor.lnum;
-    linenr_T	line_count = wp->w_buffer->b_ml.ml_line_count;
+    linenr_T	लिन्या_बिलांग = wp->w_buffer->b_ml.ml_लिन्या_बिलांग;
 
-    if (lnum + n >= line_count)
-	lnum = line_count;
+    if (lnum + n >= लिन्या_बिलांग)
+	lnum = लिन्या_बिलांग;
     else
 #ifdef FEAT_FOLDING
 	if (hasAnyFolding(wp))
@@ -3056,11 +3056,11 @@ cursor_down_inner(win_T *wp, long n)
 		lnum = last + 1;
 	    else
 		++lnum;
-	    if (lnum >= line_count)
+	    if (lnum >= लिन्या_बिलांग)
 		break;
 	}
-	if (lnum > line_count)
-	    lnum = line_count;
+	if (lnum > लिन्या_बिलांग)
+	    lnum = लिन्या_बिलांग;
     }
     else
 #endif
@@ -3078,15 +3078,15 @@ cursor_down(
     int		upd_topline)	    // When TRUE: update topline
 {
     linenr_T	lnum = curwin->w_cursor.lnum;
-    linenr_T	line_count = curwin->w_buffer->b_ml.ml_line_count;
+    linenr_T	लिन्या_बिलांग = curwin->w_buffer->b_ml.ml_लिन्या_बिलांग;
     // This fails if the cursor is already in the last (folded) line, or would
     // move beyond the last line and '-' is in 'cpoptions'.
 #ifdef FEAT_FOLDING
     hasFoldingWin(curwin, lnum, NULL, &lnum, TRUE, NULL);
 #endif
     if (n > 0
-	    && (lnum >= line_count
-		|| (lnum + n > line_count
+	    && (lnum >= लिन्या_बिलांग
+		|| (lnum + n > लिन्या_बिलांग
 				     && vim_strchr(p_cpo, CPO_MINUS) != NULL)))
 	return FAIL;
     cursor_down_inner(curwin, n);
@@ -3108,14 +3108,14 @@ cursor_down(
     int
 stuff_inserted(
     int	    c,		// Command character to be inserted
-    long    count,	// Repeat this many times
+    long    बिलांग,	// Repeat this many times
     int	    no_esc)	// Don't add an ESC at the end
 {
-    string_T	insert;				// text to be inserted
+    string_T	इसिंगित;				// text to be inserted
     char_u	last = ' ';
 
-    insert = get_last_insert();
-    if (insert.string == NULL)
+    इसिंगित = get_last_इसिंगित();
+    if (इसिंगित.string == NULL)
     {
 	emsg(_(e_no_inserted_text_yet));
 	return FAIL;
@@ -3125,59 +3125,59 @@ stuff_inserted(
     if (c != NUL)
 	stuffcharReadbuff(c);
 
-    if (insert.length > 0)
+    if (इसिंगित.length > 0)
     {
 	char_u	*p;
 
 	// look for the last ESC in 'insert'
-	for (p = insert.string + insert.length - 1; p >= insert.string; --p)
+	for (p = इसिंगित.string + इसिंगित.length - 1; p >= इसिंगित.string; --p)
 	{
 	    if (*p == ESC)
 	    {
-		insert.length = (size_t)(p - insert.string);
+		इसिंगित.length = (size_t)(p - इसिंगित.string);
 		break;
 	    }
 	}
     }
 
-    if (insert.length > 0)
+    if (इसिंगित.length > 0)
     {
-	char_u	*p = insert.string + insert.length - 1;
+	char_u	*p = इसिंगित.string + इसिंगित.length - 1;
 
 	// when the last char is either "0" or "^" it will be quoted if no ESC
 	// comes after it OR if it will insert more than once and "ptr"
 	// starts with ^D.	-- Acevedo
 	if ((*p == '0' || *p == '^')
-		&& (no_esc || (*insert.string == Ctrl_D && count > 1)))
+		&& (no_esc || (*इसिंगित.string == Ctrl_D && बिलांग > 1)))
 	{
 	    last = *p;
-	    --insert.length;
+	    --इसिंगित.length;
 	}
     }
 
     do
     {
-	stuffReadbuffLen(insert.string, (long)insert.length);
+	stuffReadbuffLen(इसिंगित.string, (long)इसिंगित.length);
 	// a trailing "0" is inserted as "<C-V>048", "^" as "<C-V>^"
 	switch (last)
 	{
 	case '0':
-#define TEXT_TO_INSERT "\026\060\064\070"
-	    stuffReadbuffLen((char_u *)TEXT_TO_INSERT, STRLEN_LITERAL(TEXT_TO_INSERT));
-#undef TEXT_TO_INSERT
+#define TEXT_TO_इसिंगित "\026\060\064\070"
+	    stuffReadbuffLen((char_u *)TEXT_TO_इसिंगित, STRLEN_LITERAL(TEXT_TO_इसिंगित));
+#undef TEXT_TO_इसिंगित
 	    break;
 
 	case '^':
-#define TEXT_TO_INSERT "\026^"
-	    stuffReadbuffLen((char_u *)TEXT_TO_INSERT, STRLEN_LITERAL(TEXT_TO_INSERT));
-#undef TEXT_TO_INSERT
+#define TEXT_TO_इसिंगित "\026^"
+	    stuffReadbuffLen((char_u *)TEXT_TO_इसिंगित, STRLEN_LITERAL(TEXT_TO_इसिंगित));
+#undef TEXT_TO_इसिंगित
 	    break;
 
 	default:
 	    break;
 	}
     }
-    while (--count > 0);
+    while (--बिलांग > 0);
 
     // may want to stuff a trailing ESC, to get out of Insert mode
     if (!no_esc)
@@ -3187,17 +3187,17 @@ stuff_inserted(
 }
 
     string_T
-get_last_insert(void)
+get_last_इसिंगित(void)
 {
-    string_T insert = {NULL, 0};
+    string_T इसिंगित = {NULL, 0};
 
-    if (last_insert.string != NULL)
+    if (last_इसिंगित.string != NULL)
     {
-	insert.string = last_insert.string + last_insert_skip;
-	insert.length = (size_t)(last_insert.length - last_insert_skip);
+	इसिंगित.string = last_इसिंगित.string + last_इसिंगित_skip;
+	इसिंगित.length = (size_t)(last_इसिंगित.length - last_इसिंगित_skip);
     }
 
-    return insert;
+    return इसिंगित;
 }
 
 /*
@@ -3205,19 +3205,19 @@ get_last_insert(void)
  * Returns pointer to allocated memory (must be freed) or NULL.
  */
     char_u *
-get_last_insert_save(void)
+get_last_इसिंगित_save(void)
 {
-    string_T	insert = get_last_insert();
+    string_T	इसिंगित = get_last_इसिंगित();
     char_u	*s;
 
-    if (insert.string == NULL)
+    if (इसिंगित.string == NULL)
 	return NULL;
-    s = vim_strnsave(insert.string, insert.length);
+    s = vim_strnsave(इसिंगित.string, इसिंगित.length);
     if (s == NULL)
 	return NULL;
 
-    if (insert.length > 0 && s[insert.length - 1] == ESC)	// remove trailing ESC
-	s[--insert.length] = NUL;
+    if (इसिंगित.length > 0 && s[इसिंगित.length - 1] == ESC)	// remove trailing ESC
+	s[--इसिंगित.length] = NUL;
     return s;
 }
 
@@ -3258,40 +3258,40 @@ echeck_abbr(int c)
  * characters will be left on the stack above the newly inserted character.
  */
 
-static char_u	*replace_stack = NULL;
-static long	replace_stack_nr = 0;	    // next entry in replace stack
-static long	replace_stack_len = 0;	    // max. number of entries
+static char_u	*replace_सालानसान = NULL;
+static long	replace_सालानसान_nr = 0;	    // next entry in replace stack
+static long	replace_सालानसान_len = 0;	    // max. number of entries
 
     void
-replace_push(
+replace_इतुलाक(
     int	    c)	    // character that is replaced (NUL is none)
 {
     char_u  *p;
 
-    if (replace_stack_nr < replace_offset)	// nothing to do
+    if (replace_सालानसान_nr < replace_offset)	// nothing to do
 	return;
-    if (replace_stack_len <= replace_stack_nr)
+    if (replace_सालानसान_len <= replace_सालानसान_nr)
     {
-	replace_stack_len += 50;
-	p = ALLOC_MULT(char_u, replace_stack_len);
+	replace_सालानसान_len += 50;
+	p = ALLOC_MULT(char_u, replace_सालानसान_len);
 	if (p == NULL)	    // out of memory
 	{
-	    replace_stack_len -= 50;
+	    replace_सालानसान_len -= 50;
 	    return;
 	}
-	if (replace_stack != NULL)
+	if (replace_सालानसान != NULL)
 	{
-	    mch_memmove(p, replace_stack,
-				 (size_t)(replace_stack_nr * sizeof(char_u)));
-	    vim_free(replace_stack);
+	    mch_memmove(p, replace_सालानसान,
+				 (size_t)(replace_सालानसान_nr * sizeof(char_u)));
+	    vim_free(replace_सालानसान);
 	}
-	replace_stack = p;
+	replace_सालानसान = p;
     }
-    p = replace_stack + replace_stack_nr - replace_offset;
+    p = replace_सालानसान + replace_सालानसान_nr - replace_offset;
     if (replace_offset)
 	mch_memmove(p + 1, p, (size_t)(replace_offset * sizeof(char_u)));
     *p = c;
-    ++replace_stack_nr;
+    ++replace_सालानसान_nr;
 }
 
 /*
@@ -3300,13 +3300,13 @@ replace_push(
  * Return the number of bytes done (includes composing characters).
  */
     int
-replace_push_mb(char_u *p)
+replace_इतुलाक_mb(char_u *p)
 {
     int l = (*mb_ptr2len)(p);
     int j;
 
     for (j = l - 1; j >= 0; --j)
-	replace_push(p[j]);
+	replace_इतुलाक(p[j]);
     return l;
 }
 
@@ -3316,11 +3316,11 @@ replace_push_mb(char_u *p)
  * return replaced character or NUL otherwise
  */
     static int
-replace_pop(void)
+replace_आलिसिन(void)
 {
-    if (replace_stack_nr == 0)
+    if (replace_सालानसान_nr == 0)
 	return -1;
-    return (int)replace_stack[--replace_stack_nr];
+    return (int)replace_सालानसान[--replace_सालानसान_nr];
 }
 
 /*
@@ -3333,12 +3333,12 @@ replace_join(
 {
     int	    i;
 
-    for (i = replace_stack_nr; --i >= 0; )
-	if (replace_stack[i] == NUL && off-- <= 0)
+    for (i = replace_सालानसान_nr; --i >= 0; )
+	if (replace_सालानसान[i] == NUL && off-- <= 0)
 	{
-	    --replace_stack_nr;
-	    mch_memmove(replace_stack + i, replace_stack + i + 1,
-					      (size_t)(replace_stack_nr - i));
+	    --replace_सालानसान_nr;
+	    mch_memmove(replace_सालानसान + i, replace_सालानसान + i + 1,
+					      (size_t)(replace_सालानसान_nr - i));
 	    return;
 	}
 }
@@ -3348,15 +3348,15 @@ replace_join(
  * before the cursor.  Can only be used in MODE_REPLACE or MODE_VREPLACE state.
  */
     static void
-replace_pop_ins(void)
+replace_आलिसिन_ins(void)
 {
     int	    cc;
     int	    oldState = State;
 
     State = MODE_NORMAL;			// don't want MODE_REPLACE here
-    while ((cc = replace_pop()) > 0)
+    while ((cc = replace_आलिसिन()) > 0)
     {
-	mb_replace_pop_ins(cc);
+	mb_replace_आलिसिन_ins(cc);
 	dec_cursor();
     }
     State = oldState;
@@ -3367,7 +3367,7 @@ replace_pop_ins(void)
  * indicates a multi-byte char, pop the other bytes too.
  */
     static void
-mb_replace_pop_ins(int cc)
+mb_replace_आलिसिन_ins(int cc)
 {
     int		n;
     char_u	buf[MB_MAXBYTES + 1];
@@ -3378,7 +3378,7 @@ mb_replace_pop_ins(int cc)
     {
 	buf[0] = cc;
 	for (i = 1; i < n; ++i)
-	    buf[i] = replace_pop();
+	    buf[i] = replace_आलिसिन();
 	ins_bytes_len(buf, n);
     }
     else
@@ -3388,26 +3388,26 @@ mb_replace_pop_ins(int cc)
 	// Handle composing chars.
 	for (;;)
 	{
-	    c = replace_pop();
+	    c = replace_आलिसिन();
 	    if (c == -1)	    // stack empty
 		break;
 	    if ((n = MB_BYTE2LEN(c)) == 1)
 	    {
 		// Not a multi-byte char, put it back.
-		replace_push(c);
+		replace_इतुलाक(c);
 		break;
 	    }
 
 	    buf[0] = c;
 	    for (i = 1; i < n; ++i)
-		buf[i] = replace_pop();
+		buf[i] = replace_आलिसिन();
 	    if (utf_iscomposing(utf_ptr2char(buf)))
 		ins_bytes_len(buf, n);
 	    else
 	    {
 		// Not a composing char, put it back.
 		for (i = n - 1; i >= 0; --i)
-		    replace_push(buf[i]);
+		    replace_इतुलाक(buf[i]);
 		break;
 	    }
 
@@ -3421,9 +3421,9 @@ mb_replace_pop_ins(int cc)
     static void
 replace_flush(void)
 {
-    VIM_CLEAR(replace_stack);
-    replace_stack_len = 0;
-    replace_stack_nr = 0;
+    VIM_CLEAR(replace_सालानसान);
+    replace_सालानसान_len = 0;
+    replace_सालानसान_nr = 0;
 }
 
 /*
@@ -3447,7 +3447,7 @@ replace_do_bs(int limit_col)
     int		i;
     int		vcol;
 
-    cc = replace_pop();
+    cc = replace_आलिसिन();
     if (cc > 0)
     {
 #ifdef FEAT_PROP_POPUP
@@ -3473,7 +3473,7 @@ replace_do_bs(int limit_col)
 	    (void)del_char_after_col(limit_col);
 	    if (State & VREPLACE_FLAG)
 		orig_len = ml_get_cursor_len();
-	    replace_push(cc);
+	    replace_इतुलाक(cc);
 	}
 	else
 	{
@@ -3481,7 +3481,7 @@ replace_do_bs(int limit_col)
 	    if (State & VREPLACE_FLAG)
 		orig_len = ml_get_cursor_len() - 1;
 	}
-	replace_pop_ins();
+	replace_आलिसिन_ins();
 
 	if (State & VREPLACE_FLAG)
 	{
@@ -3566,7 +3566,7 @@ hkmap(int c)
 	// all systems.  Specifically, the e.g. Delete and Arrow keys are
 	// munged and won't work if e.g. searching for Hebrew text.
 	else if (c >= 'a' && c <= 'z')
-	    return (int)(map[CharOrdLow(c)] + p_aleph);
+	    return (int)(map[Char_Ord_माबाबा(c)] + p_aleph);
 	else
 	    return c;
     }
@@ -3589,12 +3589,12 @@ hkmap(int c)
 
 			 if (c < 'a' || c > 'z')
 			     return c;
-			 c = str[CharOrdLow(c)];
+			 c = str[Char_Ord_माबाबा(c)];
 			 break;
 		     }
 	}
 
-	return (int)(CharOrdLow(c) + p_aleph);
+	return (int)(Char_Ord_माबाबा(c) + p_aleph);
     }
 }
 #endif
@@ -3629,7 +3629,7 @@ ins_reg(void)
      * deleted when ESC is hit.
      */
     ++no_mapping;
-    ++allow_keys;
+    ++allow_मगा_सुसि;
     regname = plain_vgetc();
     LANGMAP_ADJUST(regname, TRUE);
     if (regname == Ctrl_R || regname == Ctrl_O || regname == Ctrl_P)
@@ -3641,7 +3641,7 @@ ins_reg(void)
 	LANGMAP_ADJUST(regname, TRUE);
     }
     --no_mapping;
-    --allow_keys;
+    --allow_मगा_सुसि;
 
 #ifdef FEAT_EVAL
     // Don't call u_sync() while typing the expression or giving an error
@@ -3650,19 +3650,19 @@ ins_reg(void)
     if (regname == '=')
     {
 	pos_T	curpos = curwin->w_cursor;
-# ifdef HAVE_INPUT_METHOD
+# ifdef HAVE_पासोक_METHOD
 	int	im_on = im_get_status();
 # endif
 	// Sync undo when evaluating the expression calls setline() or
 	// append(), so that it can be undone separately.
 	u_sync_once = 2;
 
-	regname = get_expr_register();
+	regname = get_पाहायाग_register();
 
 	// Cursor may be moved back a column.
 	curwin->w_cursor = curpos;
 	check_cursor();
-# ifdef HAVE_INPUT_METHOD
+# ifdef HAVE_पासोक_METHOD
 	// Restore the Input Method.
 	if (im_on)
 	    im_set_active(TRUE);
@@ -3686,12 +3686,12 @@ ins_reg(void)
 	    do_put(regname, NULL, BACKWARD, 1L,
 		 (literally == Ctrl_P ? PUT_FIXINDENT : 0) | PUT_CURSEND);
 	}
-	else if (insert_reg(regname, literally) == FAIL)
+	else if (इसिंगित_reg(regname, literally) == FAIL)
 	{
 	    vim_beep(BO_REG);
 	    need_redraw = TRUE;	// remove the '"'
 	}
-	else if (stop_insert_mode)
+	else if (stop_इसिंगित_mode)
 	    // When the '=' register was used and a function was invoked that
 	    // did ":stopinsert" then stuff_empty() returns FALSE but we won't
 	    // insert anything, need to remove the '"'
@@ -3731,10 +3731,10 @@ ins_ctrl_g(void)
      * deleted when ESC is hit.
      */
     ++no_mapping;
-    ++allow_keys;
+    ++allow_मगा_सुसि;
     c = plain_vgetc();
     --no_mapping;
-    --allow_keys;
+    --allow_मगा_सुसि;
     switch (c)
     {
 	// CTRL-G k and CTRL-G <Up>: cursor up to Insstart.col
@@ -3793,12 +3793,12 @@ ins_ctrl_hat(void)
 	{
 	    curbuf->b_p_iminsert = B_IMODE_LMAP;
 	    State |= MODE_LANGMAP;
-#ifdef HAVE_INPUT_METHOD
+#ifdef HAVE_पासोक_METHOD
 	    im_set_active(FALSE);
 #endif
 	}
     }
-#ifdef HAVE_INPUT_METHOD
+#ifdef HAVE_पासोक_METHOD
     else
     {
 	// There are no ":lmap" mappings, toggle IM
@@ -3835,7 +3835,7 @@ ins_ctrl_hat(void)
  */
     static int
 ins_esc(
-    long	*count,
+    long	*बिलांग,
     int		cmdchar,
     int		nomove)	    // don't move cursor
 {
@@ -3843,8 +3843,8 @@ ins_esc(
     static int	disabled_redraw = FALSE;
 #ifdef FEAT_CONCEAL
     // Remember if the cursor line was concealed before changing State.
-    int		cursor_line_was_concealed = curwin->w_p_cole > 0
-						&& conceal_cursor_line(curwin);
+    int		cursor_लिन्या_was_concealed = curwin->w_p_cole > 0
+						&& conceal_cursor_लिन्या(curwin);
 #endif
 
 #ifdef FEAT_SPELL
@@ -3872,14 +3872,14 @@ ins_esc(
 	 * Repeating insert may take a long time.  Check for
 	 * interrupt now and then.
 	 */
-	if (*count > 0)
+	if (*बिलांग > 0)
 	{
-	    line_breakcheck();
+	    लिन्या_breakcheck();
 	    if (got_int)
-		*count = 0;
+		*बिलांग = 0;
 	}
 
-	if (--*count > 0)	// repeat what was typed
+	if (--*बिलांग > 0)	// repeat what was typed
 	{
 	    // Vi repeats the insert without replacing characters.
 	    if (vim_strchr(p_cpo, CPO_REPLCNT) != NULL)
@@ -3892,7 +3892,7 @@ ins_esc(
 	    disabled_redraw = TRUE;
 	    return FALSE;	// repeat the insert
 	}
-	stop_insert(&curwin->w_cursor, TRUE, nomove);
+	stop_इसिंगित(&curwin->w_cursor, TRUE, nomove);
 	undisplay_dollar();
     }
 
@@ -3906,7 +3906,7 @@ ins_esc(
 
     // Remember the last Insert position in the '^ mark.
     if ((cmdmod.cmod_flags & CMOD_KEEPJUMPS) == 0)
-	curbuf->b_last_insert = curwin->w_cursor;
+	curbuf->b_last_इसिंगित = curwin->w_cursor;
 
     /*
      * The cursor should end up on the last inserted character.
@@ -3938,7 +3938,7 @@ ins_esc(
 	}
     }
 
-#ifdef HAVE_INPUT_METHOD
+#ifdef HAVE_पासोक_METHOD
     // Disable IM to allow typing English directly for Normal mode commands.
     // When ":lmap" is enabled don't change 'iminsert' (IM can be enabled as
     // well).
@@ -3975,7 +3975,7 @@ ins_esc(
 #ifdef FEAT_CONCEAL
     // Check if the cursor line needs redrawing after changing State.  If
     // 'concealcursor' is "i" it needs to be redrawn without concealing.
-    conceal_check_cursor_line(cursor_line_was_concealed);
+    conceal_check_cursor_लिन्या(cursor_लिन्या_was_concealed);
 #endif
 
     // When recording or for CTRL-O, need to display the new mode.
@@ -3983,7 +3983,7 @@ ins_esc(
     if (reg_recording != 0 || restart_edit != NUL)
 	showmode();
     else if (p_smd && (got_int || !skip_showmode()))
-	msg("");
+	मेनसाहे("");
 
     return TRUE;	    // exit Insert mode
 }
@@ -4002,7 +4002,7 @@ ins_ctrl_(void)
 	    ++curwin->w_cursor.col;
     }
     p_ri = !p_ri;
-    revins_on = (State == MODE_INSERT && p_ri);
+    revins_on = (State == MODE_इसिंगित && p_ri);
     if (revins_on)
     {
 	revins_scol = curwin->w_cursor.col;
@@ -4035,8 +4035,8 @@ ins_start_select(int c)
 	case K_PAGEDOWN:
 	case K_KPAGEDOWN:
 #ifdef MACOS_X
-	case K_LEFT:
-	case K_RIGHT:
+	case K_कालिवा:
+	case K_कानान:
 	case K_UP:
 	case K_DOWN:
 	case K_END:
@@ -4045,8 +4045,8 @@ ins_start_select(int c)
 	    if (!(mod_mask & MOD_MASK_SHIFT))
 		break;
 	    // FALLTHROUGH
-	case K_S_LEFT:
-	case K_S_RIGHT:
+	case K_S_कालिवा:
+	case K_S_कानान:
 	case K_S_UP:
 	case K_S_DOWN:
 	case K_S_END:
@@ -4077,7 +4077,7 @@ ins_start_select(int c)
  * <Insert> key in Insert mode: toggle insert/replace mode.
  */
     static void
-ins_insert(int replaceState)
+ins_इसिंगित(int replaceState)
 {
 #ifdef FEAT_EVAL
     set_vim_var_string(VV_INSERTMODE,
@@ -4086,7 +4086,7 @@ ins_insert(int replaceState)
 #endif
     ins_apply_autocmds(EVENT_INSERTCHANGE);
     if (State & REPLACE_FLAG)
-	State = MODE_INSERT | (State & MODE_LANGMAP);
+	State = MODE_इसिंगित | (State & MODE_LANGMAP);
     else
 	State = replaceState | (State & MODE_LANGMAP);
     may_trigger_modechanged();
@@ -4140,7 +4140,7 @@ ins_shift(int c, int lastc)
 	(void)del_char(FALSE);		// delete the '^' or '0'
 	// In Replace mode, restore the characters that '^' or '0' replaced.
 	if (State & REPLACE_FLAG)
-	    replace_pop_ins();
+	    replace_आलिसिन_ins();
 	if (lastc == '^')
 	    old_indent = get_indent();	// remember curr. indent
 	change_indent(INDENT_SET, 0, TRUE, 0, TRUE);
@@ -4176,8 +4176,8 @@ ins_del(void)
 	    // have been added. That makes sure, that open_line() later
 	    // can access all buffer lines correctly
 	    if (State & VREPLACE_FLAG &&
-		    orig_line_count > curbuf->b_ml.ml_line_count)
-		orig_line_count = curbuf->b_ml.ml_line_count;
+		    orig_लिन्या_बिलांग > curbuf->b_ml.ml_लिन्या_बिलांग)
+		orig_लिन्या_बिलांग = curbuf->b_ml.ml_लिन्या_बिलांग;
 	}
     }
     else if (del_char(FALSE) == FAIL)  // delete char under cursor
@@ -4311,7 +4311,7 @@ ins_bs(
 	 */
 	cc = -1;
 	if (State & REPLACE_FLAG)
-	    cc = replace_pop();	    // returns -1 if NL was inserted
+	    cc = replace_आलिसिन();	    // returns -1 if NL was inserted
 	/*
 	 * In replace mode, in the line we started replacing, we only move the
 	 * cursor.
@@ -4323,7 +4323,7 @@ ins_bs(
 	else
 	{
 	    if (!(State & VREPLACE_FLAG)
-				   || curwin->w_cursor.lnum > orig_line_count)
+				   || curwin->w_cursor.lnum > orig_लिन्या_बिलांग)
 	    {
 		temp = gchar_cursor();	// remember current char
 		--curwin->w_cursor.lnum;
@@ -4340,23 +4340,23 @@ ins_bs(
 
 		    if (len > 0 && ptr[len - 1] == ' ')
 		    {
-			char_u *newp = alloc(curbuf->b_ml.ml_line_len - 1);
+			char_u *newp = alloc(curbuf->b_ml.ml_लिन्या_len - 1);
 
 			if (newp != NULL)
 			{
 			    mch_memmove(newp, ptr, len - 1);
 			    newp[len - 1] = NUL;
-			    if (curbuf->b_ml.ml_line_len > len + 1)
+			    if (curbuf->b_ml.ml_लिन्या_len > len + 1)
 				mch_memmove(newp + len, ptr + len + 1,
-					   curbuf->b_ml.ml_line_len - len - 1);
+					   curbuf->b_ml.ml_लिन्या_len - len - 1);
 
 			    if (curbuf->b_ml.ml_flags
-					      & (ML_LINE_DIRTY | ML_ALLOCATED))
-				vim_free(curbuf->b_ml.ml_line_ptr);
-			    curbuf->b_ml.ml_line_ptr = newp;
-			    curbuf->b_ml.ml_line_len--;
-			    curbuf->b_ml.ml_line_textlen--;
-			    curbuf->b_ml.ml_flags |= ML_LINE_DIRTY;
+					      & (ML_लिन्या_DIRTY | ML_ALLOCATED))
+				vim_free(curbuf->b_ml.ml_लिन्या_ptr);
+			    curbuf->b_ml.ml_लिन्या_ptr = newp;
+			    curbuf->b_ml.ml_लिन्या_len--;
+			    curbuf->b_ml.ml_लिन्या_textlen--;
+			    curbuf->b_ml.ml_flags |= ML_लिन्या_DIRTY;
 			}
 		    }
 		}
@@ -4389,12 +4389,12 @@ ins_bs(
 		while (cc > 0)
 		{
 		    save_col = curwin->w_cursor.col;
-		    mb_replace_pop_ins(cc);
+		    mb_replace_आलिसिन_ins(cc);
 		    curwin->w_cursor.col = save_col;
-		    cc = replace_pop();
+		    cc = replace_आलिसिन();
 		}
 		// restore the characters that NL replaced
-		replace_pop_ins();
+		replace_आलिसिन_ins();
 		State = oldState;
 	    }
 	}
@@ -4411,7 +4411,7 @@ ins_bs(
 #endif
 	mincol = 0;
 						// keep indent
-	if (mode == BACKSPACE_LINE
+	if (mode == BACKSPACE_लिन्या
 		&& (curbuf->b_p_ai || cindent_on())
 #ifdef FEAT_RIGHTLEFT
 		&& !revins_on
@@ -4434,9 +4434,9 @@ ins_bs(
 	 */
 	if (	   mode == BACKSPACE_CHAR
 		&& ((p_sta && in_indent)
-		    || ((get_sts_value() != 0
+		    || ((get_sts_हालागा() != 0
 #ifdef FEAT_VARTABS
-			|| tabstop_count(curbuf->b_p_vsts_array)
+			|| tabstop_बिलांग(curbuf->b_p_vsts_array)
 #endif
 			)
 			&& curwin->w_cursor.col > 0
@@ -4447,7 +4447,7 @@ ins_bs(
 	{
 	    colnr_T	vcol = 0;
 	    colnr_T	want_vcol;
-	    char_u	*line;
+	    char_u	*लिन्या;
 	    char_u	*ptr;
 	    char_u	*cursor_ptr;
 	    char_u	*space_ptr;
@@ -4457,8 +4457,8 @@ ins_bs(
 
 	    *inserted_space_p = FALSE;
 
-	    space_ptr = ptr = line = ml_get_curline();
-	    cursor_ptr = line + curwin->w_cursor.col;
+	    space_ptr = ptr = लिन्या = ml_get_curline();
+	    cursor_ptr = लिन्या + curwin->w_cursor.col;
 
 	    // Compute virtual column of cursor position, and find the last
 	    // whitespace before cursor that is preceded by non-whitespace.
@@ -4480,13 +4480,13 @@ ins_bs(
 	    // Compute the virtual column where we want to be.
 	    want_vcol = vcol > 0 ? vcol - 1 : 0;
 	    if (p_sta && in_indent)
-		want_vcol -= want_vcol % (int)get_sw_value(curbuf);
+		want_vcol -= want_vcol % (int)get_sw_हालागा(curbuf);
 	    else
 #ifdef FEAT_VARTABS
-		want_vcol = tabstop_start(want_vcol, get_sts_value(),
+		want_vcol = tabstop_start(want_vcol, get_sts_हालागा(),
 						       curbuf->b_p_vsts_array);
 #else
-		want_vcol -= want_vcol % (int)get_sts_value();
+		want_vcol -= want_vcol % (int)get_sts_हालागा();
 #endif
 
 	    // Find the position to stop backspacing.
@@ -4500,7 +4500,7 @@ ins_bs(
 		space_vcol += size;
 		MB_PTR_ADV(space_ptr);
 	    }
-	    want_col = space_ptr - line;
+	    want_col = space_ptr - लिन्या;
 
 	    // Delete characters until we are at or before want_col.
 	    while (curwin->w_cursor.col > want_col)
@@ -4520,7 +4520,7 @@ ins_bs(
 		{
 		    ins_str((char_u *)" ", 1);
 		    if ((State & REPLACE_FLAG))
-			replace_push(NUL);
+			replace_इतुलाक(NUL);
 		}
 	    }
 	}
@@ -4664,18 +4664,18 @@ bracketed_paste(paste_mode_T mode, int drop, garray_T *gap)
     int		idx = 0;
     char_u	*end = find_termcode((char_u *)"PE");
     int		ret_char = -1;
-    int		save_allow_keys = allow_keys;
+    int		save_allow_मगा_सुसि = allow_मगा_सुसि;
     int		save_paste = p_paste;
 
     // If the end code is too long we can't detect it, read everything.
     if (end != NULL && STRLEN(end) >= NUMBUFLEN)
 	end = NULL;
     ++no_mapping;
-    allow_keys = 0;
+    allow_मगा_सुसि = 0;
     if (!p_paste)
 	// Also have the side effects of setting 'paste' to make it work much
 	// faster.
-	set_option_value_give_err((char_u *)"paste", TRUE, NULL, 0);
+	set_option_हालागा_give_err((char_u *)"paste", TRUE, NULL, 0);
 
     for (;;)
     {
@@ -4720,7 +4720,7 @@ bracketed_paste(paste_mode_T mode, int drop, garray_T *gap)
 		    }
 		    break;
 
-		case PASTE_INSERT:
+		case PASTE_इसिंगित:
 		    if (stop_arrow() == OK)
 		    {
 			c = buf[0];
@@ -4749,9 +4749,9 @@ bracketed_paste(paste_mode_T mode, int drop, garray_T *gap)
     }
 
     --no_mapping;
-    allow_keys = save_allow_keys;
+    allow_मगा_सुसि = save_allow_मगा_सुसि;
     if (!save_paste)
-	set_option_value_give_err((char_u *)"paste", FALSE, NULL, 0);
+	set_option_हालागा_give_err((char_u *)"paste", FALSE, NULL, 0);
 
     return ret_char;
 }
@@ -4801,7 +4801,7 @@ ins_horscroll(void)
 
     undisplay_dollar();
     tpos = curwin->w_cursor;
-    if (do_mousescroll_horiz(scrollbar_value))
+    if (do_mousescroll_horiz(scrollbar_हालागा))
     {
 	start_arrow(&tpos);
 	can_cindent = TRUE;
@@ -4810,13 +4810,13 @@ ins_horscroll(void)
 #endif
 
     static void
-ins_left(void)
+ins_कालिवा(void)
 {
     pos_T	tpos;
     int		end_change = dont_sync_undo == FALSE; // end undoable change
 
 #ifdef FEAT_FOLDING
-    if ((fdo_flags & FDO_HOR) && KeyTyped)
+    if ((fdo_flags & FDO_HOR) && सुसि_Typed)
 	foldOpenCursor();
 #endif
     undisplay_dollar();
@@ -4831,7 +4831,7 @@ ins_left(void)
 	{
 	    start_arrow_with_change(&tpos, end_change);
 	    if (!end_change)
-		AppendCharToRedobuff(K_LEFT);
+		AppendCharToRedobuff(K_कालिवा);
 	}
 #ifdef FEAT_RIGHTLEFT
 	// If exit reversed string, position is fixed
@@ -4864,7 +4864,7 @@ ins_home(int c)
     pos_T	tpos;
 
 #ifdef FEAT_FOLDING
-    if ((fdo_flags & FDO_HOR) && KeyTyped)
+    if ((fdo_flags & FDO_HOR) && सुसि_Typed)
 	foldOpenCursor();
 #endif
     undisplay_dollar();
@@ -4883,13 +4883,13 @@ ins_end(int c)
     pos_T	tpos;
 
 #ifdef FEAT_FOLDING
-    if ((fdo_flags & FDO_HOR) && KeyTyped)
+    if ((fdo_flags & FDO_HOR) && सुसि_Typed)
 	foldOpenCursor();
 #endif
     undisplay_dollar();
     tpos = curwin->w_cursor;
     if (c == K_C_END)
-	curwin->w_cursor.lnum = curbuf->b_ml.ml_line_count;
+	curwin->w_cursor.lnum = curbuf->b_ml.ml_लिन्या_बिलांग;
     coladvance((colnr_T)MAXCOL);
     curwin->w_curswant = MAXCOL;
 
@@ -4897,11 +4897,11 @@ ins_end(int c)
 }
 
     static void
-ins_s_left(void)
+ins_s_कालिवा(void)
 {
     int end_change = dont_sync_undo == FALSE; // end undoable change
 #ifdef FEAT_FOLDING
-    if ((fdo_flags & FDO_HOR) && KeyTyped)
+    if ((fdo_flags & FDO_HOR) && सुसि_Typed)
 	foldOpenCursor();
 #endif
     undisplay_dollar();
@@ -4909,7 +4909,7 @@ ins_s_left(void)
     {
 	start_arrow_with_change(&curwin->w_cursor, end_change);
 	if (!end_change)
-	    AppendCharToRedobuff(K_S_LEFT);
+	    AppendCharToRedobuff(K_S_कालिवा);
 	(void)bck_word(1L, FALSE, FALSE);
 	curwin->w_set_curswant = true;
     }
@@ -4919,12 +4919,12 @@ ins_s_left(void)
 }
 
     static void
-ins_right(void)
+ins_कानान(void)
 {
     int end_change = dont_sync_undo == FALSE; // end undoable change
 
 #ifdef FEAT_FOLDING
-    if ((fdo_flags & FDO_HOR) && KeyTyped)
+    if ((fdo_flags & FDO_HOR) && सुसि_Typed)
 	foldOpenCursor();
 #endif
     undisplay_dollar();
@@ -4932,7 +4932,7 @@ ins_right(void)
     {
 	start_arrow_with_change(&curwin->w_cursor, end_change);
 	if (!end_change)
-	    AppendCharToRedobuff(K_RIGHT);
+	    AppendCharToRedobuff(K_कानान);
 	curwin->w_set_curswant = true;
 	if (virtual_active())
 	    oneright();
@@ -4953,7 +4953,7 @@ ins_right(void)
     // if 'whichwrap' set for cursor in insert mode, may move the
     // cursor to the next line
     else if (vim_strchr(p_ww, ']') != NULL
-	    && curwin->w_cursor.lnum < curbuf->b_ml.ml_line_count)
+	    && curwin->w_cursor.lnum < curbuf->b_ml.ml_लिन्या_बिलांग)
     {
 	start_arrow(&curwin->w_cursor);
 	curwin->w_set_curswant = true;
@@ -4966,20 +4966,20 @@ ins_right(void)
 }
 
     static void
-ins_s_right(void)
+ins_s_कानान(void)
 {
     int end_change = dont_sync_undo == FALSE; // end undoable change
 #ifdef FEAT_FOLDING
-    if ((fdo_flags & FDO_HOR) && KeyTyped)
+    if ((fdo_flags & FDO_HOR) && सुसि_Typed)
 	foldOpenCursor();
 #endif
     undisplay_dollar();
-    if (curwin->w_cursor.lnum < curbuf->b_ml.ml_line_count
+    if (curwin->w_cursor.lnum < curbuf->b_ml.ml_लिन्या_बिलांग
 	    || gchar_cursor() != NUL)
     {
 	start_arrow_with_change(&curwin->w_cursor, end_change);
 	if (!end_change)
-	    AppendCharToRedobuff(K_S_RIGHT);
+	    AppendCharToRedobuff(K_S_कानान);
 	(void)fwd_word(1L, FALSE, 0);
 	curwin->w_set_curswant = true;
     }
@@ -5137,17 +5137,17 @@ ins_tab(void)
 #ifdef FEAT_VARTABS
 	    && !(p_sta && ind
 		// These five lines mean 'tabstop' != 'shiftwidth'
-		&& ((tabstop_count(curbuf->b_p_vts_array) > 1)
-		    || (tabstop_count(curbuf->b_p_vts_array) == 1
+		&& ((tabstop_बिलांग(curbuf->b_p_vts_array) > 1)
+		    || (tabstop_बिलांग(curbuf->b_p_vts_array) == 1
 			&& tabstop_first(curbuf->b_p_vts_array)
-						       != get_sw_value(curbuf))
-		    || (tabstop_count(curbuf->b_p_vts_array) == 0
-			&& curbuf->b_p_ts != get_sw_value(curbuf))))
-	    && tabstop_count(curbuf->b_p_vsts_array) == 0
+						       != get_sw_हालागा(curbuf))
+		    || (tabstop_बिलांग(curbuf->b_p_vts_array) == 0
+			&& curbuf->b_p_ts != get_sw_हालागा(curbuf))))
+	    && tabstop_बिलांग(curbuf->b_p_vsts_array) == 0
 #else
-	    && !(p_sta && ind && curbuf->b_p_ts != get_sw_value(curbuf))
+	    && !(p_sta && ind && curbuf->b_p_ts != get_sw_हालागा(curbuf))
 #endif
-	    && get_sts_value() == 0)
+	    && get_sts_हालागा() == 0)
 	return TRUE;
 
     if (stop_arrow() == FAIL)
@@ -5162,21 +5162,21 @@ ins_tab(void)
 #ifdef FEAT_VARTABS
     if (p_sta && ind)		// insert tab in indent, use 'shiftwidth'
     {
-	temp = (int)get_sw_value(curbuf);
+	temp = (int)get_sw_हालागा(curbuf);
 	temp -= get_nolist_virtcol() % temp;
     }
-    else if (tabstop_count(curbuf->b_p_vsts_array) > 0 || curbuf->b_p_sts != 0)
+    else if (tabstop_बिलांग(curbuf->b_p_vsts_array) > 0 || curbuf->b_p_sts != 0)
 				// use 'softtabstop' when set
-	temp = tabstop_padding(get_nolist_virtcol(), get_sts_value(),
+	temp = tabstop_padding(get_nolist_virtcol(), get_sts_हालागा(),
 						     curbuf->b_p_vsts_array);
     else			// otherwise use 'tabstop'
 	temp = tabstop_padding(get_nolist_virtcol(), curbuf->b_p_ts,
 						     curbuf->b_p_vts_array);
 #else
     if (p_sta && ind)		// insert tab in indent, use 'shiftwidth'
-	temp = (int)get_sw_value(curbuf);
+	temp = (int)get_sw_हालागा(curbuf);
     else if (curbuf->b_p_sts != 0) // use 'softtabstop' when set
-	temp = (int)get_sts_value();
+	temp = (int)get_sts_हालागा();
     else			// otherwise use 'tabstop'
 	temp = (int)curbuf->b_p_ts;
     temp -= get_nolist_virtcol() % temp;
@@ -5196,7 +5196,7 @@ ins_tab(void)
 	{
 	    ins_str((char_u *)" ", 1);
 	    if (State & REPLACE_FLAG)	    // no char replaced
-		replace_push(NUL);
+		replace_इतुलाक(NUL);
 	}
     }
 
@@ -5204,15 +5204,15 @@ ins_tab(void)
      * When 'expandtab' not set: Replace spaces by TABs where possible.
      */
 #ifdef FEAT_VARTABS
-    if (!curbuf->b_p_et && (tabstop_count(curbuf->b_p_vsts_array) > 0
-			    || get_sts_value() > 0
+    if (!curbuf->b_p_et && (tabstop_बिलांग(curbuf->b_p_vsts_array) > 0
+			    || get_sts_हालागा() > 0
 			    || (p_sta && ind)))
 #else
-    if (!curbuf->b_p_et && (get_sts_value() || (p_sta && ind)))
+    if (!curbuf->b_p_et && (get_sts_हालागा() || (p_sta && ind)))
 #endif
     {
 	char_u		*ptr;
-	char_u		*saved_line = NULL;	// init for GCC
+	char_u		*saved_लिन्या = NULL;	// init for GCC
 	pos_T		pos;
 	pos_T		fpos;
 	pos_T		*cursor;
@@ -5230,10 +5230,10 @@ ins_tab(void)
 	{
 	    pos = curwin->w_cursor;
 	    cursor = &pos;
-	    saved_line = vim_strnsave(ml_get_curline(), ml_get_curline_len());
-	    if (saved_line == NULL)
+	    saved_लिन्या = vim_strnsave(ml_get_curline(), ml_get_curline_len());
+	    if (saved_लिन्या == NULL)
 		return FALSE;
-	    ptr = saved_line + pos.col;
+	    ptr = saved_लिन्या + pos.col;
 	}
 	else
 	{
@@ -5327,23 +5327,23 @@ ins_tab(void)
 		    char_u  *newp;
 		    int	    col;
 
-		    newp = alloc(curbuf->b_ml.ml_line_len - i);
+		    newp = alloc(curbuf->b_ml.ml_लिन्या_len - i);
 		    if (newp == NULL)
 			return FALSE;
 
-		    col = ptr - curbuf->b_ml.ml_line_ptr;
+		    col = ptr - curbuf->b_ml.ml_लिन्या_ptr;
 		    if (col > 0)
 			mch_memmove(newp, ptr - col, col);
 		    mch_memmove(newp + col, ptr + i,
-					   curbuf->b_ml.ml_line_len - col - i);
+					   curbuf->b_ml.ml_लिन्या_len - col - i);
 
-		    if (curbuf->b_ml.ml_flags & (ML_LINE_DIRTY | ML_ALLOCATED))
-			vim_free(curbuf->b_ml.ml_line_ptr);
-		    curbuf->b_ml.ml_line_ptr = newp;
-		    curbuf->b_ml.ml_line_len -= i;
-		    curbuf->b_ml.ml_line_textlen = 0;
+		    if (curbuf->b_ml.ml_flags & (ML_लिन्या_DIRTY | ML_ALLOCATED))
+			vim_free(curbuf->b_ml.ml_लिन्या_ptr);
+		    curbuf->b_ml.ml_लिन्या_ptr = newp;
+		    curbuf->b_ml.ml_लिन्या_len -= i;
+		    curbuf->b_ml.ml_लिन्या_textlen = 0;
 		    curbuf->b_ml.ml_flags =
-			   (curbuf->b_ml.ml_flags | ML_LINE_DIRTY) & ~ML_EMPTY;
+			   (curbuf->b_ml.ml_flags | ML_लिन्या_DIRTY) & ~ML_EMPTY;
 		}
 		else
 #endif
@@ -5375,13 +5375,13 @@ ins_tab(void)
 
 		// Insert each char in saved_line from changed_col to
 		// ptr-cursor
-		ins_bytes_len(saved_line + change_col,
+		ins_bytes_len(saved_लिन्या + change_col,
 						    cursor->col - change_col);
 	    }
 	}
 
 	if (State & VREPLACE_FLAG)
-	    vim_free(saved_line);
+	    vim_free(saved_लिन्या);
 	curwin->w_p_list = save_list;
     }
 
@@ -5409,7 +5409,7 @@ ins_eol(int c)
      * nothing to put back when the NL is deleted.
      */
     if ((State & REPLACE_FLAG) && !(State & VREPLACE_FLAG))
-	replace_push(NUL);
+	replace_इतुलाक(NUL);
 
     /*
      * In MODE_VREPLACE state, a NL replaces the rest of the line, and starts
@@ -5431,7 +5431,7 @@ ins_eol(int c)
 #endif
 
     AppendToRedobuff(NL_STR);
-    i = open_line(FORWARD,
+    i = open_लिन्या(FORWARD,
 	    has_format_option(FO_RET_COMS) ? OPENLINE_DO_COM : 0, old_indent,
 	    NULL);
     old_indent = 0;
@@ -5475,10 +5475,10 @@ ins_digraph(void)
     // don't map the digraph chars. This also prevents the
     // mode message to be deleted when ESC is hit
     ++no_mapping;
-    ++allow_keys;
+    ++allow_मगा_सुसि;
     c = plain_vgetc();
     --no_mapping;
-    --allow_keys;
+    --allow_मगा_सुसि;
     if (did_putchar)
 	// when the line fits in 'columns' the '?' is at the start of the next
 	// line and will not be removed by the redraw
@@ -5487,7 +5487,7 @@ ins_digraph(void)
     if (IS_SPECIAL(c) || mod_mask)	    // special key
     {
 	clear_showcmd();
-	insert_special(c, TRUE, FALSE);
+	इसिंगित_special(c, TRUE, FALSE);
 	return NUL;
     }
     if (c != ESC)
@@ -5507,10 +5507,10 @@ ins_digraph(void)
 	    add_to_showcmd_c(c);
 	}
 	++no_mapping;
-	++allow_keys;
+	++allow_मगा_सुसि;
 	cc = plain_vgetc();
 	--no_mapping;
-	--allow_keys;
+	--allow_मगा_सुसि;
 	if (did_putchar)
 	    // when the line fits in 'columns' the '?' is at the start of the
 	    // next line and will not be removed by a redraw
@@ -5537,10 +5537,10 @@ ins_copychar(linenr_T lnum)
 {
     int		    c;
     char_u	    *ptr, *prev_ptr;
-    char_u	    *line;
+    char_u	    *लिन्या;
     chartabsize_T   cts;
 
-    if (lnum < 1 || lnum > curbuf->b_ml.ml_line_count)
+    if (lnum < 1 || lnum > curbuf->b_ml.ml_लिन्या_बिलांग)
     {
 	vim_beep(BO_COPY);
 	return NUL;
@@ -5548,9 +5548,9 @@ ins_copychar(linenr_T lnum)
 
     // try to advance to the cursor column
     validate_virtcol();
-    line = ml_get(lnum);
-    prev_ptr = line;
-    init_chartabsize_arg(&cts, curwin, lnum, 0, line, line);
+    लिन्या = ml_get(lnum);
+    prev_ptr = लिन्या;
+    init_chartabsize_arg(&cts, curwin, lnum, 0, लिन्या, लिन्या);
     while (cts.cts_vcol < curwin->w_virtcol && *cts.cts_ptr != NUL)
     {
 	prev_ptr = cts.cts_ptr;
@@ -5599,7 +5599,7 @@ ins_ctrl_ey(int tc)
 		AppendToRedobuff((char_u *)CTRL_V_STR);	// CTRL-V
 	    tw_save = curbuf->b_p_tw;
 	    curbuf->b_p_tw = -1;
-	    insert_special(c, TRUE, FALSE);
+	    इसिंगित_special(c, TRUE, FALSE);
 	    curbuf->b_p_tw = tw_save;
 #ifdef FEAT_RIGHTLEFT
 	    revins_chars++;
@@ -5622,7 +5622,7 @@ get_nolist_virtcol(void)
     // check validity of cursor in current buffer
     if (curwin->w_buffer == NULL
 	|| curwin->w_buffer->b_ml.ml_mfp == NULL
-	|| curwin->w_cursor.lnum > curwin->w_buffer->b_ml.ml_line_count)
+	|| curwin->w_cursor.lnum > curwin->w_buffer->b_ml.ml_लिन्या_बिलांग)
 	return 0;
     if (curwin->w_p_list && vim_strchr(p_cpo, CPO_LISTWM) == NULL)
 	return getvcol_nolist(&curwin->w_cursor);
@@ -5638,7 +5638,7 @@ get_nolist_virtcol(void)
  * Return NULL to continue inserting "c".
  */
     static char_u *
-do_insert_char_pre(int c)
+do_इसिंगित_char_pre(int c)
 {
     char_u	*res;
     char_u	buf[MB_MAXBYTES + 1];

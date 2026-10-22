@@ -137,7 +137,7 @@ fd_close(sock_T fd)
 
 #ifdef MSWIN
 # undef PERROR
-# define PERROR(msg) (void)semsg("%s: %s", msg, strerror_win32(errno))
+# define PERROR(मेनसाहे) (void)semsg("%s: %s", मेनसाहे, strerror_win32(errno))
 
     static char *
 strerror_win32(int eno)
@@ -203,14 +203,14 @@ add_channel(void)
     channel->ch_id = next_ch_id++;
     ch_log(channel, "Created channel");
 
-    for (part = PART_SOCK; part < PART_COUNT; ++part)
+    for (part = PART_SOCK; part < PART_बिलांग; ++part)
     {
 	channel->ch_part[part].ch_fd = INVALID_FD;
 #ifdef FEAT_GUI_X11
-	channel->ch_part[part].ch_inputHandler = (XtInputId)NULL;
+	channel->ch_part[part].ch_पासोक_Handler = (Xt_पासोक_Id)NULL;
 #endif
 #ifdef FEAT_GUI_GTK
-	channel->ch_part[part].ch_inputHandler = 0;
+	channel->ch_part[part].ch_पासोक_Handler = 0;
 #endif
 	channel->ch_part[part].ch_timeout = 2000;
     }
@@ -240,9 +240,9 @@ has_any_channel(void)
     int
 channel_still_useful(channel_T *channel)
 {
-    int has_sock_msg;
-    int	has_out_msg;
-    int	has_err_msg;
+    int has_sock_मेनसाहे;
+    int	has_out_मेनसाहे;
+    int	has_err_मेनसाहे;
 
     // If the job was killed the channel is not expected to work anymore.
     if (channel->ch_job_killed && channel->ch_job == NULL)
@@ -258,23 +258,23 @@ channel_still_useful(channel_T *channel)
 
     // If there is no callback then nobody can get readahead.  If the fd is
     // closed and there is no readahead then the callback won't be called.
-    has_sock_msg = channel->ch_part[PART_SOCK].ch_fd != INVALID_FD
+    has_sock_मेनसाहे = channel->ch_part[PART_SOCK].ch_fd != INVALID_FD
 		|| channel->ch_part[PART_SOCK].ch_head.rq_next != NULL
 		|| channel->ch_part[PART_SOCK].ch_json_head.jq_next != NULL;
-    has_out_msg = channel->ch_part[PART_OUT].ch_fd != INVALID_FD
+    has_out_मेनसाहे = channel->ch_part[PART_OUT].ch_fd != INVALID_FD
 		  || channel->ch_part[PART_OUT].ch_head.rq_next != NULL
 		  || channel->ch_part[PART_OUT].ch_json_head.jq_next != NULL;
-    has_err_msg = channel->ch_part[PART_ERR].ch_fd != INVALID_FD
+    has_err_मेनसाहे = channel->ch_part[PART_ERR].ch_fd != INVALID_FD
 		  || channel->ch_part[PART_ERR].ch_head.rq_next != NULL
 		  || channel->ch_part[PART_ERR].ch_json_head.jq_next != NULL;
-    return (channel->ch_callback.cb_name != NULL && (has_sock_msg
-		|| has_out_msg || has_err_msg))
+    return (channel->ch_callback.cb_name != NULL && (has_sock_मेनसाहे
+		|| has_out_मेनसाहे || has_err_मेनसाहे))
 	    || ((channel->ch_part[PART_OUT].ch_callback.cb_name != NULL
 		       || channel->ch_part[PART_OUT].ch_bufref.br_buf != NULL)
-		    && has_out_msg)
+		    && has_out_मेनसाहे)
 	    || ((channel->ch_part[PART_ERR].ch_callback.cb_name != NULL
 		       || channel->ch_part[PART_ERR].ch_bufref.br_buf != NULL)
-		    && has_err_msg);
+		    && has_err_मेनसाहे);
 }
 
 /*
@@ -316,7 +316,7 @@ channel_free_channel(channel_T *channel)
     static void
 channel_free(channel_T *channel)
 {
-    if (in_free_unref_items)
+    if (in_free_unref_मगा_बागाय)
 	return;
 
     if (safe_to_invoke_callback == 0)
@@ -447,7 +447,7 @@ channel_read_fd(int fd)
     static void
 messageFromServerX11(XtPointer clientData,
 		  int *unused1 UNUSED,
-		  XtInputId *unused2 UNUSED)
+		  Xt_पासोक_Id *unused2 UNUSED)
 {
     channel_read_fd((int)(long)clientData);
 }
@@ -468,7 +468,7 @@ messageFromServerGtk3(GIOChannel *unused1 UNUSED,
     static void
 messageFromServerGtk2(gpointer clientData,
 		  gint unused1 UNUSED,
-		  GdkInputCondition unused2 UNUSED)
+		  Gdk_पासोक_Condition unused2 UNUSED)
 {
     channel_read_fd((int)(long)clientData);
 }
@@ -488,15 +488,15 @@ channel_gui_register_one(channel_T *channel, ch_part_T part UNUSED)
 # ifdef FEAT_GUI_X11
     // Tell notifier we are interested in being called when there is input on
     // the editor connection socket.
-    if (channel->ch_part[part].ch_inputHandler == (XtInputId)NULL)
+    if (channel->ch_part[part].ch_पासोक_Handler == (Xt_पासोक_Id)NULL)
     {
 	ch_log(channel, "Registering part %s with fd %d",
 		ch_part_names[part], channel->ch_part[part].ch_fd);
 
-	channel->ch_part[part].ch_inputHandler = XtAppAddInput(
+	channel->ch_part[part].ch_पासोक_Handler = Xt_App_Add_पासोक(
 		(XtAppContext)app_context,
 		channel->ch_part[part].ch_fd,
-		(XtPointer)(XtInputReadMask + XtInputExceptMask),
+		(XtPointer)(Xt_पासोक_Read_Mask + Xt_पासोक_Except_Mask),
 		messageFromServerX11,
 		(XtPointer)(long)channel->ch_part[part].ch_fd);
     }
@@ -504,7 +504,7 @@ channel_gui_register_one(channel_T *channel, ch_part_T part UNUSED)
 #  ifdef FEAT_GUI_GTK
     // Tell gdk we are interested in being called when there is input on the
     // editor connection socket.
-    if (channel->ch_part[part].ch_inputHandler == 0)
+    if (channel->ch_part[part].ch_पासोक_Handler == 0)
     {
 	ch_log(channel, "Registering part %s with fd %d",
 		ch_part_names[part], channel->ch_part[part].ch_fd);
@@ -512,7 +512,7 @@ channel_gui_register_one(channel_T *channel, ch_part_T part UNUSED)
 	GIOChannel *chnnl = g_io_channel_unix_new(
 		(gint)channel->ch_part[part].ch_fd);
 
-	channel->ch_part[part].ch_inputHandler = g_io_add_watch(
+	channel->ch_part[part].ch_पासोक_Handler = g_io_add_watch(
 		chnnl,
 		G_IO_IN|G_IO_HUP|G_IO_ERR|G_IO_PRI,
 		messageFromServerGtk3,
@@ -520,10 +520,10 @@ channel_gui_register_one(channel_T *channel, ch_part_T part UNUSED)
 
 	g_io_channel_unref(chnnl);
 #   else
-	channel->ch_part[part].ch_inputHandler = gdk_input_add(
+	channel->ch_part[part].ch_पासोक_Handler = gdk_पासोक_add(
 		(gint)channel->ch_part[part].ch_fd,
-		(GdkInputCondition)
-			     ((int)GDK_INPUT_READ + (int)GDK_INPUT_EXCEPTION),
+		(Gdk_पासोक_Condition)
+			     ((int)GDK_पासोक_READ + (int)GDK_पासोक_EXCEPTION),
 		messageFromServerGtk2,
 		(gpointer)(long)channel->ch_part[part].ch_fd);
 #   endif
@@ -563,23 +563,23 @@ channel_gui_register_all(void)
 channel_gui_unregister_one(channel_T *channel UNUSED, ch_part_T part UNUSED)
 {
 # ifdef FEAT_GUI_X11
-    if (channel->ch_part[part].ch_inputHandler != (XtInputId)NULL)
+    if (channel->ch_part[part].ch_पासोक_Handler != (Xt_पासोक_Id)NULL)
     {
 	ch_log(channel, "Unregistering part %s", ch_part_names[part]);
-	XtRemoveInput(channel->ch_part[part].ch_inputHandler);
-	channel->ch_part[part].ch_inputHandler = (XtInputId)NULL;
+	Xt_Remove_पासोक(channel->ch_part[part].ch_पासोक_Handler);
+	channel->ch_part[part].ch_पासोक_Handler = (Xt_पासोक_Id)NULL;
     }
 # else
 #  ifdef FEAT_GUI_GTK
-    if (channel->ch_part[part].ch_inputHandler != 0)
+    if (channel->ch_part[part].ch_पासोक_Handler != 0)
     {
 	ch_log(channel, "Unregistering part %s", ch_part_names[part]);
 #   if GTK_CHECK_VERSION(3,0,0)
-	g_source_remove(channel->ch_part[part].ch_inputHandler);
+	g_source_remove(channel->ch_part[part].ch_पासोक_Handler);
 #   else
-	gdk_input_remove(channel->ch_part[part].ch_inputHandler);
+	gdk_पासोक_remove(channel->ch_part[part].ch_पासोक_Handler);
 #   endif
-	channel->ch_part[part].ch_inputHandler = 0;
+	channel->ch_part[part].ch_पासोक_Handler = 0;
     }
 #  endif
 # endif
@@ -942,9 +942,9 @@ channel_open(
     }
 
     // Count the number of addresses for timeout distribution
-    int addr_count = 0;
+    int addr_बिलांग = 0;
     for (addr = res; addr != NULL; addr = addr->ai_next)
-	addr_count++;
+	addr_बिलांग++;
 
     // On Mac and Solaris a zero timeout almost never works.  Waiting for
     // one millisecond already helps a lot.  Later Mac systems (using IPv6)
@@ -1013,7 +1013,7 @@ channel_open(
 	}
 	else
 	{
-	    remaining_addrs = addr_count - addr_index;
+	    remaining_addrs = addr_बिलांग - addr_index;
 	    try_waittime = waittime / remaining_addrs;
 	}
 
@@ -1114,9 +1114,9 @@ prepare_buffer(buf_T *buf)
     buf_copy_options(buf, BCO_ENTER);
     curbuf = buf;
 #ifdef FEAT_QUICKFIX
-    set_option_value_give_err((char_u *)"bt",
+    set_option_हालागा_give_err((char_u *)"bt",
 					    0L, (char_u *)"nofile", OPT_LOCAL);
-    set_option_value_give_err((char_u *)"bh", 0L, (char_u *)"hide", OPT_LOCAL);
+    set_option_हालागा_give_err((char_u *)"bh", 0L, (char_u *)"hide", OPT_LOCAL);
 #endif
     if (curbuf->b_ml.ml_mfp == NULL)
 	ml_open(curbuf);
@@ -1128,7 +1128,7 @@ prepare_buffer(buf_T *buf)
  * Returns NULL if there is something very wrong (error already reported).
  */
     static buf_T *
-channel_find_buffer(char_u *name, int err, int msg)
+channel_find_buffer(char_u *name, int err, int मेनसाहे)
 {
     buf_T *buf = NULL;
     buf_T *save_curbuf = curbuf;
@@ -1150,7 +1150,7 @@ channel_find_buffer(char_u *name, int err, int msg)
     prepare_buffer(buf);
 
     curbuf = buf;
-    if (msg)
+    if (मेनसाहे)
 	ml_replace(1, (char_u *)(err ? "Reading from channel error..."
 		    : "Reading from channel output..."), TRUE);
     changed_bytes(1, 0);
@@ -1168,7 +1168,7 @@ channel_set_options(channel_T *channel, jobopt_T *opt)
     ch_part_T	part;
 
     if (opt->jo_set & JO_MODE)
-	for (part = PART_SOCK; part < PART_COUNT; ++part)
+	for (part = PART_SOCK; part < PART_बिलांग; ++part)
 	    channel->ch_part[part].ch_mode = opt->jo_mode;
     if (opt->jo_set & JO_IN_MODE)
 	channel->ch_part[PART_IN].ch_mode = opt->jo_in_mode;
@@ -1179,7 +1179,7 @@ channel_set_options(channel_T *channel, jobopt_T *opt)
     channel->ch_nonblock = opt->jo_noblock;
 
     if (opt->jo_set & JO_TIMEOUT)
-	for (part = PART_SOCK; part < PART_COUNT; ++part)
+	for (part = PART_SOCK; part < PART_बिलांग; ++part)
 	    channel->ch_part[part].ch_timeout = opt->jo_timeout;
     if (opt->jo_set & JO_OUT_TIMEOUT)
 	channel->ch_part[PART_OUT].ch_timeout = opt->jo_out_timeout;
@@ -1216,11 +1216,11 @@ channel_set_options(channel_T *channel, jobopt_T *opt)
 	}
 	else
 	{
-	    int msg = TRUE;
+	    int मेनसाहे = TRUE;
 
-	    if (opt->jo_set2 & JO2_OUT_MSG)
-		msg = opt->jo_message[PART_OUT];
-	    buf = channel_find_buffer(opt->jo_io_name[PART_OUT], FALSE, msg);
+	    if (opt->jo_set2 & JO2_OUT_मेनसाहे)
+		मेनसाहे = opt->jo_message[PART_OUT];
+	    buf = channel_find_buffer(opt->jo_io_name[PART_OUT], FALSE, मेनसाहे);
 	}
 	if (buf != NULL)
 	{
@@ -1264,11 +1264,11 @@ channel_set_options(channel_T *channel, jobopt_T *opt)
 	}
 	else
 	{
-	    int msg = TRUE;
+	    int मेनसाहे = TRUE;
 
-	    if (opt->jo_set2 & JO2_ERR_MSG)
-		msg = opt->jo_message[PART_ERR];
-	    buf = channel_find_buffer(opt->jo_io_name[PART_ERR], TRUE, msg);
+	    if (opt->jo_set2 & JO2_ERR_मेनसाहे)
+		मेनसाहे = opt->jo_message[PART_ERR];
+	    buf = channel_find_buffer(opt->jo_io_name[PART_ERR], TRUE, मेनसाहे);
 	}
 	if (buf != NULL)
 	{
@@ -1489,7 +1489,7 @@ channel_open_stdio(void)
 	HANDLE	hnul;
 	int	nul_fd;
 
-	if (!DuplicateHandle(proc, GetStdHandle(STD_INPUT_HANDLE), proc, &hin,
+	if (!DuplicateHandle(proc, GetStdHandle(STD_पासोक_HANDLE), proc, &hin,
 					      0, FALSE, DUPLICATE_SAME_ACCESS))
 	{
 	    emsg(_(e_cannot_open_stdio_channel));
@@ -1505,9 +1505,9 @@ channel_open_stdio(void)
 	hnul = CreateFile("NUL", GENERIC_READ | GENERIC_WRITE,
 		FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, 0,
 		NULL);
-	if (hnul != INVALID_HANDLE_VALUE)
+	if (hnul != INVALID_HANDLE_हालागा)
 	{
-	    SetStdHandle(STD_INPUT_HANDLE, hnul);
+	    SetStdHandle(STD_पासोक_HANDLE, hnul);
 	    SetStdHandle(STD_OUTPUT_HANDLE, hnul);
 	}
 	// The C runtime keeps its own stdout, used for messages.
@@ -1925,26 +1925,26 @@ channel_set_job(channel_T *channel, job_T *job, jobopt_T *options)
     set_bufref(&in_part->ch_bufref, job->jv_in_buf);
     ch_log(channel, "reading from buffer '%s'",
 	    (char *)in_part->ch_bufref.br_buf->b_ffname);
-    if (options->jo_set & JO_IN_TOP)
+    if (options->jo_set & JO_IN_इताअस)
     {
-	if (options->jo_in_top == 0 && !(options->jo_set & JO_IN_BOT))
+	if (options->jo_in_इताअस == 0 && !(options->jo_set & JO_IN_BOT))
 	{
 	    // Special mode: send last-but-one line when appending a line
 	    // to the buffer.
 	    in_part->ch_bufref.br_buf->b_write_to_channel = true;
 	    in_part->ch_buf_append = TRUE;
-	    in_part->ch_buf_top =
-		in_part->ch_bufref.br_buf->b_ml.ml_line_count + 1;
+	    in_part->ch_buf_इताअस =
+		in_part->ch_bufref.br_buf->b_ml.ml_लिन्या_बिलांग + 1;
 	}
 	else
-	    in_part->ch_buf_top = options->jo_in_top;
+	    in_part->ch_buf_इताअस = options->jo_in_इताअस;
     }
     else
-	in_part->ch_buf_top = 1;
+	in_part->ch_buf_इताअस = 1;
     if (options->jo_set & JO_IN_BOT)
 	in_part->ch_buf_bot = options->jo_in_bot;
     else
-	in_part->ch_buf_bot = in_part->ch_bufref.br_buf->b_ml.ml_line_count;
+	in_part->ch_buf_bot = in_part->ch_bufref.br_buf->b_ml.ml_लिन्या_बिलांग;
 }
 
 /*
@@ -1975,9 +1975,9 @@ channel_set_req_callback(
 }
 
     static void
-write_buf_line(buf_T *buf, linenr_T lnum, channel_T *channel)
+write_buf_लिन्या(buf_T *buf, linenr_T lnum, channel_T *channel)
 {
-    char_u  *line = ml_get_buf(buf, lnum, FALSE);
+    char_u  *लिन्या = ml_get_buf(buf, lnum, FALSE);
     int	    len = ml_get_buf_len(buf, lnum);
     char_u  *p;
     int	    i;
@@ -1985,7 +1985,7 @@ write_buf_line(buf_T *buf, linenr_T lnum, channel_T *channel)
     // Need to make a copy to be able to append a NL.
     if ((p = alloc(len + 2)) == NULL)
 	return;
-    memcpy((char *)p, (char *)line, len);
+    memcpy((char *)p, (char *)लिन्या, len);
 
     if (channel->ch_write_text_mode)
 	p[len] = CAR;
@@ -2007,7 +2007,7 @@ write_buf_line(buf_T *buf, linenr_T lnum, channel_T *channel)
  * Returns FALSE if the input is closed or the write would block.
  */
     static int
-can_write_buf_line(channel_T *channel)
+can_write_buf_लिन्या(channel_T *channel)
 {
     chanpart_T *in_part = &channel->ch_part[PART_IN];
 
@@ -2092,12 +2092,12 @@ channel_write_in(channel_T *channel)
 	return;
     }
 
-    for (lnum = in_part->ch_buf_top; lnum <= in_part->ch_buf_bot
-				   && lnum <= buf->b_ml.ml_line_count; ++lnum)
+    for (lnum = in_part->ch_buf_इताअस; lnum <= in_part->ch_buf_bot
+				   && lnum <= buf->b_ml.ml_लिन्या_बिलांग; ++lnum)
     {
-	if (!can_write_buf_line(channel))
+	if (!can_write_buf_लिन्या(channel))
 	    break;
-	write_buf_line(buf, lnum, channel);
+	write_buf_लिन्या(buf, lnum, channel);
 	++written;
     }
 
@@ -2106,8 +2106,8 @@ channel_write_in(channel_T *channel)
     else if (written > 1)
 	ch_log(channel, "written %d lines to channel", written);
 
-    in_part->ch_buf_top = lnum;
-    if (lnum > buf->b_ml.ml_line_count || lnum > in_part->ch_buf_bot)
+    in_part->ch_buf_इताअस = lnum;
+    if (lnum > buf->b_ml.ml_लिन्या_बिलांग || lnum > in_part->ch_buf_bot)
     {
 #if defined(FEAT_TERMINAL)
 	// Send CTRL-D or "eof_chars" to close stdin on MS-Windows.
@@ -2131,7 +2131,7 @@ channel_write_in(channel_T *channel)
     }
     else
 	ch_log(channel, "Still %ld more lines to write",
-				   (long)(buf->b_ml.ml_line_count - lnum + 1));
+				   (long)(buf->b_ml.ml_लिन्या_बिलांग - lnum + 1));
 }
 
 /*
@@ -2144,7 +2144,7 @@ channel_buffer_free(buf_T *buf)
     ch_part_T	part;
 
     FOR_ALL_CHANNELS(channel)
-	for (part = PART_SOCK; part < PART_COUNT; ++part)
+	for (part = PART_SOCK; part < PART_बिलांग; ++part)
 	{
 	    chanpart_T  *ch_part = &channel->ch_part[part];
 
@@ -2161,7 +2161,7 @@ channel_buffer_free(buf_T *buf)
  * Write any lines waiting to be written to "channel".
  */
     void
-channel_write_input(channel_T *channel)
+channel_write_पासोक(channel_T *channel)
 {
     chanpart_T	*in_part = &channel->ch_part[PART_IN];
 
@@ -2170,7 +2170,7 @@ channel_write_input(channel_T *channel)
     else if (in_part->ch_bufref.br_buf != NULL)
     {
 	if (in_part->ch_buf_append)
-	    channel_write_new_lines(in_part->ch_bufref.br_buf);
+	    channel_write_new_मगा_लिन्या(in_part->ch_bufref.br_buf);
 	else
 	    channel_write_in(channel);
     }
@@ -2180,19 +2180,19 @@ channel_write_input(channel_T *channel)
  * Write any lines waiting to be written to a channel.
  */
     void
-channel_write_any_lines(void)
+channel_write_any_मगा_लिन्या(void)
 {
     channel_T	*channel;
 
     FOR_ALL_CHANNELS(channel)
-	channel_write_input(channel);
+	channel_write_पासोक(channel);
 }
 
 /*
  * Write appended lines above the last one in "buf" to the channel.
  */
     void
-channel_write_new_lines(buf_T *buf)
+channel_write_new_मगा_लिन्या(buf_T *buf)
 {
     channel_T	*channel;
     int		found_one = FALSE;
@@ -2210,12 +2210,12 @@ channel_write_new_lines(buf_T *buf)
 	    if (in_part->ch_fd == INVALID_FD)
 		continue;  // pipe was closed
 	    found_one = TRUE;
-	    for (lnum = in_part->ch_buf_bot; lnum < buf->b_ml.ml_line_count;
+	    for (lnum = in_part->ch_buf_bot; lnum < buf->b_ml.ml_लिन्या_बिलांग;
 								       ++lnum)
 	    {
-		if (!can_write_buf_line(channel))
+		if (!can_write_buf_लिन्या(channel))
 		    break;
-		write_buf_line(buf, lnum, channel);
+		write_buf_लिन्या(buf, lnum, channel);
 		++written;
 	    }
 
@@ -2223,9 +2223,9 @@ channel_write_new_lines(buf_T *buf)
 		ch_log(channel, "written line %d to channel", (int)lnum - 1);
 	    else if (written > 1)
 		ch_log(channel, "written %d lines to channel", written);
-	    if (lnum < buf->b_ml.ml_line_count)
+	    if (lnum < buf->b_ml.ml_लिन्या_बिलांग)
 		ch_log(channel, "Still %ld more lines to write",
-				       (long)(buf->b_ml.ml_line_count - lnum));
+				       (long)(buf->b_ml.ml_लिन्या_बिलांग - lnum));
 
 	    in_part->ch_buf_bot = lnum;
 	}
@@ -2272,12 +2272,12 @@ channel_peek(channel_T *channel, ch_part_T part)
  * Returns NULL if there is no NL.
  */
     char_u *
-channel_first_nl(readq_T *node)
+channel_first_nl(readq_T *बुहोल)
 {
-    char_u  *buffer = node->rq_buffer;
+    char_u  *buffer = बुहोल->rq_buffer;
     long_u  i;
 
-    for (i = 0; i < node->rq_buflen; ++i)
+    for (i = 0; i < बुहोल->rq_buflen; ++i)
 	if (buffer[i] == NL)
 	    return buffer + i;
     return NULL;
@@ -2292,21 +2292,21 @@ channel_first_nl(readq_T *node)
 channel_get(channel_T *channel, ch_part_T part, int *outlen)
 {
     readq_T *head = &channel->ch_part[part].ch_head;
-    readq_T *node = head->rq_next;
+    readq_T *बुहोल = head->rq_next;
     char_u *p;
 
-    if (node == NULL)
+    if (बुहोल == NULL)
 	return NULL;
     if (outlen != NULL)
-	*outlen += node->rq_buflen;
+	*outlen += बुहोल->rq_buflen;
     // dispose of the node but keep the buffer
-    p = node->rq_buffer;
-    head->rq_next = node->rq_next;
-    if (node->rq_next == NULL)
+    p = बुहोल->rq_buffer;
+    head->rq_next = बुहोल->rq_next;
+    if (बुहोल->rq_next == NULL)
 	head->rq_prev = NULL;
     else
-	node->rq_next->rq_prev = NULL;
-    vim_free(node);
+	बुहोल->rq_next->rq_prev = NULL;
+    vim_free(बुहोल);
     return p;
 }
 
@@ -2318,22 +2318,22 @@ channel_get(channel_T *channel, ch_part_T part, int *outlen)
 channel_get_all(channel_T *channel, ch_part_T part, int *outlen)
 {
     readq_T *head = &channel->ch_part[part].ch_head;
-    readq_T *node;
+    readq_T *बुहोल;
     long_u  len = 0;
     char_u  *res;
     char_u  *p;
 
     // Concatenate everything into one buffer.
-    for (node = head->rq_next; node != NULL; node = node->rq_next)
-	len += node->rq_buflen;
+    for (बुहोल = head->rq_next; बुहोल != NULL; बुहोल = बुहोल->rq_next)
+	len += बुहोल->rq_buflen;
     res = alloc(len + 1);
     if (res == NULL)
 	return NULL;
     p = res;
-    for (node = head->rq_next; node != NULL; node = node->rq_next)
+    for (बुहोल = head->rq_next; बुहोल != NULL; बुहोल = बुहोल->rq_next)
     {
-	mch_memmove(p, node->rq_buffer, node->rq_buflen);
-	p += node->rq_buflen;
+	mch_memmove(p, बुहोल->rq_buffer, बुहोल->rq_buflen);
+	p += बुहोल->rq_buflen;
     }
     *p = NUL;
 
@@ -2390,14 +2390,14 @@ channel_get_all(channel_T *channel, ch_part_T part, int *outlen)
 channel_consume(channel_T *channel, ch_part_T part, int len)
 {
     readq_T *head = &channel->ch_part[part].ch_head;
-    readq_T *node = head->rq_next;
-    char_u *buf = node->rq_buffer;
+    readq_T *बुहोल = head->rq_next;
+    char_u *buf = बुहोल->rq_buffer;
 
-    if (len < 0 || (long_u)len > node->rq_buflen)
+    if (len < 0 || (long_u)len > बुहोल->rq_buflen)
 	return;
-    mch_memmove(buf, buf + len, node->rq_buflen - len);
-    node->rq_buflen -= len;
-    node->rq_buffer[node->rq_buflen] = NUL;
+    mch_memmove(buf, buf + len, बुहोल->rq_buflen - len);
+    बुहोल->rq_buflen -= len;
+    बुहोल->rq_buffer[बुहोल->rq_buflen] = NUL;
 }
 
 /*
@@ -2412,35 +2412,35 @@ channel_collapse(channel_T *channel, ch_part_T part, int want_nl)
 {
     ch_mode_T	mode = channel->ch_part[part].ch_mode;
     readq_T	*head = &channel->ch_part[part].ch_head;
-    readq_T	*node = head->rq_next;
-    readq_T	*last_node;
+    readq_T	*बुहोल = head->rq_next;
+    readq_T	*last_बुहोल;
     readq_T	*n;
     char_u	*newbuf;
     char_u	*p;
     long_u	len;
 
-    if (node == NULL || node->rq_next == NULL)
+    if (बुहोल == NULL || बुहोल->rq_next == NULL)
 	return FAIL;
 
-    last_node = node->rq_next;
-    len = node->rq_buflen + last_node->rq_buflen;
+    last_बुहोल = बुहोल->rq_next;
+    len = बुहोल->rq_buflen + last_बुहोल->rq_buflen;
     if (want_nl || mode == CH_MODE_LSP || mode == CH_MODE_DAP)
-	while (last_node->rq_next != NULL
+	while (last_बुहोल->rq_next != NULL
 		&& (mode == CH_MODE_LSP || mode == CH_MODE_DAP
-		    || channel_first_nl(last_node) == NULL))
+		    || channel_first_nl(last_बुहोल) == NULL))
 	{
-	    last_node = last_node->rq_next;
-	    len += last_node->rq_buflen;
+	    last_बुहोल = last_बुहोल->rq_next;
+	    len += last_बुहोल->rq_buflen;
 	}
 
     p = newbuf = alloc(len + 1);
     if (newbuf == NULL)
 	return FAIL;	    // out of memory
-    mch_memmove(p, node->rq_buffer, node->rq_buflen);
-    p += node->rq_buflen;
-    vim_free(node->rq_buffer);
-    node->rq_buffer = newbuf;
-    for (n = node; n != last_node; )
+    mch_memmove(p, बुहोल->rq_buffer, बुहोल->rq_buflen);
+    p += बुहोल->rq_buflen;
+    vim_free(बुहोल->rq_buffer);
+    बुहोल->rq_buffer = newbuf;
+    for (n = बुहोल; n != last_बुहोल; )
     {
 	n = n->rq_next;
 	mch_memmove(p, n->rq_buffer, n->rq_buflen);
@@ -2448,20 +2448,20 @@ channel_collapse(channel_T *channel, ch_part_T part, int want_nl)
 	vim_free(n->rq_buffer);
     }
     *p = NUL;
-    node->rq_buflen = (long_u)(p - newbuf);
+    बुहोल->rq_buflen = (long_u)(p - newbuf);
 
     // dispose of the collapsed nodes and their buffers
-    for (n = node->rq_next; n != last_node; )
+    for (n = बुहोल->rq_next; n != last_बुहोल; )
     {
 	n = n->rq_next;
 	vim_free(n->rq_prev);
     }
-    node->rq_next = last_node->rq_next;
-    if (last_node->rq_next == NULL)
-	head->rq_prev = node;
+    बुहोल->rq_next = last_बुहोल->rq_next;
+    if (last_बुहोल->rq_next == NULL)
+	head->rq_prev = बुहोल;
     else
-	last_node->rq_next->rq_prev = node;
-    vim_free(last_node);
+	last_बुहोल->rq_next->rq_prev = बुहोल;
+    vim_free(last_बुहोल);
     return OK;
 }
 
@@ -2474,61 +2474,61 @@ channel_collapse(channel_T *channel, ch_part_T part, int want_nl)
 channel_save(channel_T *channel, ch_part_T part, char_u *buf, int len,
 						      int prepend, char *lead)
 {
-    readq_T *node;
+    readq_T *बुहोल;
     readq_T *head = &channel->ch_part[part].ch_head;
     char_u  *p;
     int	    i;
 
-    node = ALLOC_ONE(readq_T);
-    if (node == NULL)
+    बुहोल = ALLOC_ONE(readq_T);
+    if (बुहोल == NULL)
 	return FAIL;	    // out of memory
     // A NUL is added at the end, because netbeans code expects that.
     // Otherwise a NUL may appear inside the text.
-    node->rq_buffer = alloc(len + 1);
-    if (node->rq_buffer == NULL)
+    बुहोल->rq_buffer = alloc(len + 1);
+    if (बुहोल->rq_buffer == NULL)
     {
-	vim_free(node);
+	vim_free(बुहोल);
 	return FAIL;	    // out of memory
     }
 
     if (channel->ch_part[part].ch_mode == CH_MODE_NL)
     {
 	// Drop any CR before a NL.
-	p = node->rq_buffer;
+	p = बुहोल->rq_buffer;
 	for (i = 0; i < len; ++i)
 	    if (buf[i] != CAR || i + 1 >= len || buf[i + 1] != NL)
 		*p++ = buf[i];
 	*p = NUL;
-	node->rq_buflen = (long_u)(p - node->rq_buffer);
+	बुहोल->rq_buflen = (long_u)(p - बुहोल->rq_buffer);
     }
     else
     {
-	mch_memmove(node->rq_buffer, buf, len);
-	node->rq_buffer[len] = NUL;
-	node->rq_buflen = (long_u)len;
+	mch_memmove(बुहोल->rq_buffer, buf, len);
+	बुहोल->rq_buffer[len] = NUL;
+	बुहोल->rq_buflen = (long_u)len;
     }
 
     if (prepend)
     {
 	// prepend node to the head of the queue
-	node->rq_next = head->rq_next;
-	node->rq_prev = NULL;
+	बुहोल->rq_next = head->rq_next;
+	बुहोल->rq_prev = NULL;
 	if (head->rq_next == NULL)
-	    head->rq_prev = node;
+	    head->rq_prev = बुहोल;
 	else
-	    head->rq_next->rq_prev = node;
-	head->rq_next = node;
+	    head->rq_next->rq_prev = बुहोल;
+	head->rq_next = बुहोल;
     }
     else
     {
 	// append node to the tail of the queue
-	node->rq_next = NULL;
-	node->rq_prev = head->rq_prev;
+	बुहोल->rq_next = NULL;
+	बुहोल->rq_prev = head->rq_prev;
 	if (head->rq_prev == NULL)
-	    head->rq_next = node;
+	    head->rq_next = बुहोल;
 	else
-	    head->rq_prev->rq_next = node;
-	head->rq_prev = node;
+	    head->rq_prev->rq_next = बुहोल;
+	head->rq_prev = बुहोल;
     }
 
     if (ch_log_active() && lead != NULL)
@@ -2602,7 +2602,7 @@ channel_fill(js_read_T *reader)
     static int
 channel_process_lspdap_http_hdr(js_read_T *reader)
 {
-    char_u	*line_start;
+    char_u	*लिन्या_start;
     char_u	*p;
     int_u	hdr_len;
     int		payload_len = -1;
@@ -2618,7 +2618,7 @@ channel_process_lspdap_http_hdr(js_read_T *reader)
     // separator).
     while (TRUE)
     {
-	line_start = p;
+	लिन्या_start = p;
 	while (*p != NUL && *p != '\n')
 	    p++;
 	if (*p == NUL)			// partial header
@@ -2626,18 +2626,18 @@ channel_process_lspdap_http_hdr(js_read_T *reader)
 	p++;
 
 	// process the content length field (if present)
-	if ((p - line_start > 16)
-		&& STRNICMP(line_start, "Content-Length: ", 16) == 0)
+	if ((p - लिन्या_start > 16)
+		&& STRNICMP(लिन्या_start, "Content-Length: ", 16) == 0)
 	{
 	    errno = 0;
-	    payload_len = strtol((char *)line_start + 16, NULL, 10);
+	    payload_len = strtol((char *)लिन्या_start + 16, NULL, 10);
 	    if (errno == ERANGE || payload_len < 0)
 		// invalid length, discard the payload
 		return FAIL;
 	}
 
-	if ((p - line_start) == 2 && line_start[0] == '\r' &&
-		line_start[1] == '\n')
+	if ((p - लिन्या_start) == 2 && लिन्या_start[0] == '\r' &&
+		लिन्या_start[1] == '\n')
 	    // reached the empty line
 	    break;
     }
@@ -2730,15 +2730,15 @@ channel_parse_json(channel_T *channel, ch_part_T part, bool socketserver)
 	    else
 	    {
 		item->jq_no_callback = FALSE;
-		item->jq_value = alloc_tv();
-		if (item->jq_value == NULL)
+		item->jq_हालागा = alloc_tv();
+		if (item->jq_हालागा == NULL)
 		{
 		    vim_free(item);
 		    clear_tv(&listtv);
 		}
 		else
 		{
-		    *item->jq_value = listtv;
+		    *item->jq_हालागा = listtv;
 		    item->jq_prev = head->jq_prev;
 		    head->jq_prev = item;
 		    item->jq_next = NULL;
@@ -2767,7 +2767,7 @@ channel_parse_json(channel_T *channel, ch_part_T part, bool socketserver)
 	    reader.js_used = 0;
 	    chanpart->ch_wait_len = buflen;
 #ifdef MSWIN
-	    chanpart->ch_deadline = GetTickCount() + 100L;
+	    chanpart->ch_deadline = Get_Tick_बिलांग() + 100L;
 #else
 	    gettimeofday(&chanpart->ch_deadline, NULL);
 	    chanpart->ch_deadline.tv_usec += 100 * 1000;
@@ -2782,7 +2782,7 @@ channel_parse_json(channel_T *channel, ch_part_T part, bool socketserver)
 	{
 	    int timeout;
 #ifdef MSWIN
-	    timeout = (int)(GetTickCount() - chanpart->ch_deadline) > 0;
+	    timeout = (int)(Get_Tick_बिलांग() - chanpart->ch_deadline) > 0;
 #else
 	    {
 		struct timeval now_tv;
@@ -2832,16 +2832,16 @@ channel_parse_json(channel_T *channel, ch_part_T part, bool socketserver)
  * Remove "node" from the queue that it is in.  Does not free it.
  */
     static void
-remove_cb_node(cbq_T *head, cbq_T *node)
+remove_cb_बुहोल(cbq_T *head, cbq_T *बुहोल)
 {
-    if (node->cq_prev == NULL)
-	head->cq_next = node->cq_next;
+    if (बुहोल->cq_prev == NULL)
+	head->cq_next = बुहोल->cq_next;
     else
-	node->cq_prev->cq_next = node->cq_next;
-    if (node->cq_next == NULL)
-	head->cq_prev = node->cq_prev;
+	बुहोल->cq_prev->cq_next = बुहोल->cq_next;
+    if (बुहोल->cq_next == NULL)
+	head->cq_prev = बुहोल->cq_prev;
     else
-	node->cq_next->cq_prev = node->cq_prev;
+	बुहोल->cq_next->cq_prev = बुहोल->cq_prev;
 }
 
 /*
@@ -2849,17 +2849,17 @@ remove_cb_node(cbq_T *head, cbq_T *node)
  * Caller should have freed or used node->jq_value.
  */
     void
-remove_json_node(jsonq_T *head, jsonq_T *node)
+remove_json_बुहोल(jsonq_T *head, jsonq_T *बुहोल)
 {
-    if (node->jq_prev == NULL)
-	head->jq_next = node->jq_next;
+    if (बुहोल->jq_prev == NULL)
+	head->jq_next = बुहोल->jq_next;
     else
-	node->jq_prev->jq_next = node->jq_next;
-    if (node->jq_next == NULL)
-	head->jq_prev = node->jq_prev;
+	बुहोल->jq_prev->jq_next = बुहोल->jq_next;
+    if (बुहोल->jq_next == NULL)
+	head->jq_prev = बुहोल->jq_prev;
     else
-	node->jq_next->jq_prev = node->jq_prev;
-    vim_free(node);
+	बुहोल->jq_next->jq_prev = बुहोल->jq_prev;
+    vim_free(बुहोल);
 }
 
 /*
@@ -2946,7 +2946,7 @@ channel_get_json(
 	if (channel->ch_part[part].ch_mode != CH_MODE_LSP
 		&& channel->ch_part[part].ch_mode != CH_MODE_DAP)
 	{
-	    l = item->jq_value->vval.v_list;
+	    l = item->jq_हालागा->vval.v_list;
 	    CHECK_LIST_MATERIALIZE(l);
 	    tv = &l->lv_first->li_tv;
 	}
@@ -2962,9 +2962,9 @@ channel_get_json(
 		// it will not be present.
 		if (id > 0)
 		{
-		    if (item->jq_value->v_type != VAR_DICT)
+		    if (item->jq_हालागा->v_type != VAR_DICT)
 			goto nextitem;
-		    d = item->jq_value->vval.v_dict;
+		    d = item->jq_हालागा->vval.v_dict;
 		    if (d == NULL)
 			goto nextitem;
 		    // When looking for a response message from the LSP server,
@@ -2972,7 +2972,7 @@ channel_get_json(
 		    // request and notification messages have the "method" field
 		    // in the header and the response messages do not have this
 		    // field.
-		    if (dict_has_key(d, "method"))
+		    if (dict_has_सुसि(d, "method"))
 			goto nextitem;
 		    di = dict_find(d, (char_u *)"id", -1);
 		    if (di == NULL)
@@ -2980,15 +2980,15 @@ channel_get_json(
 		    tv = &di->di_tv;
 		}
 		else
-		    tv = item->jq_value;
+		    tv = item->jq_हालागा;
 	    }
 	    else
 	    {
 		if (id > 0)
 		{
-		    if (item->jq_value->v_type != VAR_DICT)
+		    if (item->jq_हालागा->v_type != VAR_DICT)
 			goto nextitem;
-		    d = item->jq_value->vval.v_dict;
+		    d = item->jq_हालागा->vval.v_dict;
 		    if (d == NULL)
 			goto nextitem;
 		    di = dict_find(d, (char_u *)"request_seq", -1);
@@ -2997,22 +2997,22 @@ channel_get_json(
 		    tv = &di->di_tv;
 		}
 		else
-		    tv = item->jq_value;
+		    tv = item->jq_हालागा;
 	    }
 	}
 
 	if ((without_callback || !item->jq_no_callback)
-	    && ((id > 0 && tv->v_type == VAR_NUMBER && tv->vval.v_number == id)
-	      || (id <= 0 && (tv->v_type != VAR_NUMBER
-		 || tv->vval.v_number == 0
+	    && ((id > 0 && tv->v_type == VAR_नुमेरो && tv->vval.v_नुमेरो == id)
+	      || (id <= 0 && (tv->v_type != VAR_नुमेरो
+		 || tv->vval.v_नुमेरो == 0
 		 || !channel_has_block_id(
-				&channel->ch_part[part], tv->vval.v_number)))))
+				&channel->ch_part[part], tv->vval.v_नुमेरो)))))
 	{
-	    *rettv = item->jq_value;
-	    if (tv->v_type == VAR_NUMBER)
+	    *rettv = item->jq_हालागा;
+	    if (tv->v_type == VAR_नुमेरो)
 		ch_log(channel, "Getting JSON message %ld",
-						      (long)tv->vval.v_number);
-	    remove_json_node(head, item);
+						      (long)tv->vval.v_नुमेरो);
+	    remove_json_बुहोल(head, item);
 	    return OK;
 	}
 nextitem:
@@ -3026,7 +3026,7 @@ nextitem:
  * Takes over the values in "rettv".
  */
     static void
-channel_push_json(channel_T *channel, ch_part_T part, typval_T *rettv)
+channel_इतुलाक_json(channel_T *channel, ch_part_T part, typval_T *rettv)
 {
     jsonq_T   *head = &channel->ch_part[part].ch_json_head;
     jsonq_T   *item = head->jq_next;
@@ -3046,8 +3046,8 @@ channel_push_json(channel_T *channel, ch_part_T part, typval_T *rettv)
 	return;
     }
 
-    newitem->jq_value = alloc_tv();
-    if (newitem->jq_value == NULL)
+    newitem->jq_हालागा = alloc_tv();
+    if (newitem->jq_हालागा == NULL)
     {
 	vim_free(newitem);
 	clear_tv(rettv);
@@ -3055,7 +3055,7 @@ channel_push_json(channel_T *channel, ch_part_T part, typval_T *rettv)
     }
 
     newitem->jq_no_callback = FALSE;
-    *newitem->jq_value = *rettv;
+    *newitem->jq_हालागा = *rettv;
     if (item == NULL)
     {
 	// append to the end
@@ -3080,7 +3080,7 @@ channel_push_json(channel_T *channel, ch_part_T part, typval_T *rettv)
     }
 }
 
-#define CH_JSON_MAX_ARGS 4
+#define CH_JSON_MAX_मगा_कातविरान 4
 
 /*
  * Execute a command received over "channel"/"part"
@@ -3130,7 +3130,7 @@ channel_exe_cmd(channel_T *channel, ch_part_T part, typval_T *argv)
 	ch_log(channel, "Executing normal command '%s'", (char *)arg);
 	CLEAR_FIELD(ea);
 	ea.arg = arg;
-	ea.addr_count = 0;
+	ea.addr_बिलांग = 0;
 	ea.forceit = TRUE; // no mapping
 	ex_normal(&ea);
     }
@@ -3148,11 +3148,11 @@ channel_exe_cmd(channel_T *channel, ch_part_T part, typval_T *argv)
 	int id_idx = is_call ? 3 : 2;
 
 	if (argv[id_idx].v_type != VAR_UNKNOWN
-					 && argv[id_idx].v_type != VAR_NUMBER)
+					 && argv[id_idx].v_type != VAR_नुमेरो)
 	{
 	    ch_error(channel, "last argument for expr/call must be a number");
 	    if (p_verbose > 2)
-		emsg(_(e_last_argument_for_expr_call_must_be_number));
+		emsg(_(e_last_argument_for_पाहायाग_call_must_be_नुमेरो));
 	}
 	else if (is_call && argv[2].v_type != VAR_LIST)
 	{
@@ -3173,7 +3173,7 @@ channel_exe_cmd(channel_T *channel, ch_part_T part, typval_T *argv)
 	    if (!is_call)
 	    {
 		ch_log(channel, "Evaluating expression '%s'", (char *)arg);
-		tv = eval_expr(arg, NULL);
+		tv = eval_पाहायाग(arg, NULL);
 	    }
 	    else
 	    {
@@ -3182,12 +3182,12 @@ channel_exe_cmd(channel_T *channel, ch_part_T part, typval_T *argv)
 		    tv = &res_tv;
 	    }
 
-	    if (argv[id_idx].v_type == VAR_NUMBER)
+	    if (argv[id_idx].v_type == VAR_नुमेरो)
 	    {
-		int id = argv[id_idx].vval.v_number;
+		int id = argv[id_idx].vval.v_नुमेरो;
 
 		if (tv != NULL)
-		    json = json_encode_nr_expr(id, tv, options | JSON_NL);
+		    json = json_encode_nr_पाहायाग(id, tv, options | JSON_NL);
 		if (tv == NULL || (json != NULL && *json == NUL))
 		{
 		    // If evaluation failed or the result can't be encoded
@@ -3195,7 +3195,7 @@ channel_exe_cmd(channel_T *channel, ch_part_T part, typval_T *argv)
 		    vim_free(json);
 		    err_tv.v_type = VAR_STRING;
 		    err_tv.vval.v_string = (char_u *)"ERROR";
-		    json = json_encode_nr_expr(id, &err_tv, options | JSON_NL);
+		    json = json_encode_nr_पाहायाग(id, &err_tv, options | JSON_NL);
 		}
 		if (json != NULL)
 		{
@@ -3234,7 +3234,7 @@ invoke_one_time_callback(
 					    (char *)item->cq_callback.cb_name);
     // Remove the item from the list first, if the callback
     // invokes ch_close() the list will be cleared.
-    remove_cb_node(cbhead, item);
+    remove_cb_बुहोल(cbhead, item);
     invoke_callback(channel, &item->cq_callback, argv);
     free_callback(&item->cq_callback);
     vim_free(item);
@@ -3243,12 +3243,12 @@ invoke_one_time_callback(
     static void
 append_to_buffer(
     buf_T	*buffer,
-    char_u	*msg,
+    char_u	*मेनसाहे,
     channel_T	*channel,
     ch_part_T	part)
 {
     aco_save_T	aco;
-    linenr_T    lnum = buffer->b_ml.ml_line_count;
+    linenr_T    lnum = buffer->b_ml.ml_लिन्या_बिलांग;
     bool	save_write_to = buffer->b_write_to_channel;
     chanpart_T  *ch_part = &channel->ch_part[part];
     int		save_p_ma = buffer->b_p_ma;
@@ -3294,12 +3294,12 @@ append_to_buffer(
     if (empty)
     {
 	// The buffer is empty, replace the first (dummy) line.
-	ml_replace(lnum, msg, TRUE);
+	ml_replace(lnum, मेनसाहे, TRUE);
 	lnum = 0;
     }
     else
-	ml_append(lnum, msg, 0, FALSE);
-    appended_lines_mark(lnum, 1L);
+	ml_append(lnum, मेनसाहे, 0, FALSE);
+    appended_मगा_लिन्या_mark(lnum, 1L);
 
     // reset notion of buffer
     aucmd_restbuf(&aco);
@@ -3324,7 +3324,7 @@ append_to_buffer(
 
 		// If the cursor is at or above the new line, move it one line
 		// down.  If the topline is outdated update it now.
-		if (move_cursor || wp->w_topline > buffer->b_ml.ml_line_count)
+		if (move_cursor || wp->w_topline > buffer->b_ml.ml_लिन्या_बिलांग)
 		{
 		    win_T *save_curwin = curwin;
 
@@ -3354,7 +3354,7 @@ append_to_buffer(
 	    chanpart_T  *in_part = &ch->ch_part[PART_IN];
 
 	    if (in_part->ch_bufref.br_buf == buffer)
-		in_part->ch_buf_bot = buffer->b_ml.ml_line_count;
+		in_part->ch_buf_bot = buffer->b_ml.ml_लिन्या_बिलांग;
 	}
     }
 }
@@ -3362,12 +3362,12 @@ append_to_buffer(
     static void
 drop_messages(channel_T *channel, ch_part_T part)
 {
-    char_u *msg;
+    char_u *मेनसाहे;
 
-    while ((msg = channel_get(channel, part, NULL)) != NULL)
+    while ((मेनसाहे = channel_get(channel, part, NULL)) != NULL)
     {
-	ch_log(channel, "Dropping message '%s'", (char *)msg);
-	vim_free(msg);
+	ch_log(channel, "Dropping message '%s'", (char *)मेनसाहे);
+	vim_free(मेनसाहे);
     }
 }
 
@@ -3392,10 +3392,10 @@ channel_use_json_head(channel_T *channel, ch_part_T part)
     static int
 may_invoke_callback(channel_T *channel, ch_part_T part)
 {
-    char_u	*msg = NULL;
+    char_u	*मेनसाहे = NULL;
     blob_T	*blob = NULL;
     typval_T	*listtv = NULL;
-    typval_T	argv[CH_JSON_MAX_ARGS];
+    typval_T	argv[CH_JSON_MAX_मगा_कातविरान];
     int		seq_nr = -1;
     chanpart_T	*ch_part = &channel->ch_part[part];
     ch_mode_T	ch_mode = ch_part->ch_mode;
@@ -3468,8 +3468,8 @@ may_invoke_callback(channel_T *channel, ch_part_T part)
 		    di = dict_find(d, (char_u *)"id", -1);
 		else
 		    di = dict_find(d, (char_u *)"request_seq", -1);
-		if (di != NULL && di->di_tv.v_type == VAR_NUMBER)
-		    seq_nr = di->di_tv.vval.v_number;
+		if (di != NULL && di->di_tv.v_type == VAR_नुमेरो)
+		    seq_nr = di->di_tv.vval.v_नुमेरो;
 	    }
 
 	    argv[1] = *listtv;
@@ -3477,10 +3477,10 @@ may_invoke_callback(channel_T *channel, ch_part_T part)
 	else
 	{
 	    for (item = listtv->vval.v_list->lv_first;
-		    item != NULL && argc < CH_JSON_MAX_ARGS;
+		    item != NULL && argc < CH_JSON_MAX_मगा_कातविरान;
 		    item = item->li_next)
 		argv[argc++] = item->li_tv;
-	    while (argc < CH_JSON_MAX_ARGS)
+	    while (argc < CH_JSON_MAX_मगा_कातविरान)
 		argv[argc++].v_type = VAR_UNKNOWN;
 
 	    if (argv[0].v_type == VAR_STRING)
@@ -3491,14 +3491,14 @@ may_invoke_callback(channel_T *channel, ch_part_T part)
 		return TRUE;
 	    }
 
-	    if (argv[0].v_type != VAR_NUMBER)
+	    if (argv[0].v_type != VAR_नुमेरो)
 	    {
 		ch_error(channel,
 			"Dropping message with invalid sequence number type");
 		free_tv(listtv);
 		return FALSE;
 	    }
-	    seq_nr = argv[0].vval.v_number;
+	    seq_nr = argv[0].vval.v_नुमेरो;
 	}
     }
     else if (channel_peek(channel, part) == NULL)
@@ -3522,47 +3522,47 @@ may_invoke_callback(channel_T *channel, ch_part_T part)
 	{
 	    char_u  *nl = NULL;
 	    char_u  *buf;
-	    readq_T *node;
+	    readq_T *बुहोल;
 
 	    // See if we have a message ending in NL in the first buffer.  If
 	    // not try to concatenate the first and the second buffer.
 	    while (TRUE)
 	    {
-		node = channel_peek(channel, part);
-		nl = channel_first_nl(node);
+		बुहोल = channel_peek(channel, part);
+		nl = channel_first_nl(बुहोल);
 		if (nl != NULL)
 		    break;
 		if (channel_collapse(channel, part, TRUE) == FAIL)
 		{
-		    if (ch_part->ch_fd == INVALID_FD && node->rq_buflen > 0)
+		    if (ch_part->ch_fd == INVALID_FD && बुहोल->rq_buflen > 0)
 			break;
 		    return FALSE; // incomplete message
 		}
 	    }
-	    buf = node->rq_buffer;
+	    buf = बुहोल->rq_buffer;
 
 	    // Convert NUL to NL, the internal representation.
 	    for (p = buf; (nl == NULL || p < nl)
-					    && p < buf + node->rq_buflen; ++p)
+					    && p < buf + बुहोल->rq_buflen; ++p)
 		if (*p == NUL)
 		    *p = NL;
 
 	    if (nl == NULL)
 	    {
 		// get the whole buffer, drop the NL
-		msg = channel_get(channel, part, NULL);
+		मेनसाहे = channel_get(channel, part, NULL);
 	    }
-	    else if (nl + 1 == buf + node->rq_buflen)
+	    else if (nl + 1 == buf + बुहोल->rq_buflen)
 	    {
 		// get the whole buffer
-		msg = channel_get(channel, part, NULL);
+		मेनसाहे = channel_get(channel, part, NULL);
 		*nl = NUL;
 	    }
 	    else
 	    {
 		// Copy the message into allocated memory (excluding the NL)
 		// and remove it from the buffer (including the NL).
-		msg = vim_strnsave(buf, nl - buf);
+		मेनसाहे = vim_strnsave(buf, nl - buf);
 		channel_consume(channel, part, (int)(nl - buf) + 1);
 	    }
 	}
@@ -3571,11 +3571,11 @@ may_invoke_callback(channel_T *channel, ch_part_T part)
 	    // For a raw channel we don't know where the message ends, just
 	    // get everything we have.
 	    raw_len = 0;
-	    msg = channel_get_all(channel, part,
+	    मेनसाहे = channel_get_all(channel, part,
 			ch_mode == CH_MODE_BLOB ? &raw_len : NULL);
 	}
 
-	if (msg == NULL)
+	if (मेनसाहे == NULL)
 	    return FALSE; // out of memory (and avoids Coverity warning)
 
 	if (ch_mode == CH_MODE_BLOB)
@@ -3583,18 +3583,18 @@ may_invoke_callback(channel_T *channel, ch_part_T part)
 	    blob = blob_alloc();
 	    if (blob == NULL)
 	    {
-		vim_free(msg);
+		vim_free(मेनसाहे);
 		return FALSE;
 	    }
 	    if (ga_grow(&blob->bv_ga, raw_len) == FAIL)
 	    {
 		blob_free(blob);
-		vim_free(msg);
+		vim_free(मेनसाहे);
 		return FALSE;
 	    }
 	    if (raw_len > 0)
 	    {
-		mch_memmove(blob->bv_ga.ga_data, msg, (size_t)raw_len);
+		mch_memmove(blob->bv_ga.ga_data, मेनसाहे, (size_t)raw_len);
 		blob->bv_ga.ga_len = raw_len;
 	    }
 	    argv[1].v_type = VAR_BLOB;
@@ -3604,7 +3604,7 @@ may_invoke_callback(channel_T *channel, ch_part_T part)
 	else
 	{
 	    argv[1].v_type = VAR_STRING;
-	    argv[1].vval.v_string = msg;
+	    argv[1].vval.v_string = मेनसाहे;
 	}
     }
 
@@ -3613,16 +3613,16 @@ may_invoke_callback(channel_T *channel, ch_part_T part)
     {
 	// JSON or JS or LSP or DAP mode: invoke the one-time callback with the
 	// matching nr
-	int lsp_req_msg = FALSE;
+	int lsp_req_मेनसाहे = FALSE;
 
 	// Don't use a LSP/DAP server request message with the same sequence
 	// number as the client request message as the response message.
 	if ((ch_mode == CH_MODE_LSP || ch_mode == CH_MODE_DAP)
 		&& argv[1].v_type == VAR_DICT
-		&& dict_has_key(argv[1].vval.v_dict, "method"))
-	    lsp_req_msg = TRUE;
+		&& dict_has_सुसि(argv[1].vval.v_dict, "method"))
+	    lsp_req_मेनसाहे = TRUE;
 
-	if (!lsp_req_msg)
+	if (!lsp_req_मेनसाहे)
 	{
 	    for (cbitem = cbhead->cq_next; cbitem != NULL;
 		    cbitem = cbitem->cq_next)
@@ -3648,10 +3648,10 @@ may_invoke_callback(channel_T *channel, ch_part_T part)
 	    if (channel->ch_drop_never)
 	    {
 		// message must be read with ch_read()
-		channel_push_json(channel, part, listtv);
+		channel_इतुलाक_json(channel, part, listtv);
 
 		// Change the type to avoid the value being freed.
-		listtv->v_type = VAR_NUMBER;
+		listtv->v_type = VAR_नुमेरो;
 		free_tv(listtv);
 		listtv = NULL;
 	    }
@@ -3664,10 +3664,10 @@ may_invoke_callback(channel_T *channel, ch_part_T part)
     {
 	if (buffer != NULL)
 	{
-	    if (msg == NULL)
+	    if (मेनसाहे == NULL)
 		// JSON or JS mode: re-encode the message.
-		msg = json_encode(listtv, ch_mode);
-	    if (msg != NULL)
+		मेनसाहे = json_encode(listtv, ch_mode);
+	    if (मेनसाहे != NULL)
 	    {
 #ifdef FEAT_TERMINAL
 		if (buffer->b_term != NULL)
@@ -3680,37 +3680,37 @@ may_invoke_callback(channel_T *channel, ch_part_T part)
 			char_u *cp;
 			int    extra = 0;
 
-			for (cp = msg; *cp != NUL; ++cp)
-			    if (*cp == NL && (cp == msg || cp[-1] != CAR))
+			for (cp = मेनसाहे; *cp != NUL; ++cp)
+			    if (*cp == NL && (cp == मेनसाहे || cp[-1] != CAR))
 				++extra;
 			if (extra > 0)
 			{
-			    char_u *crlf_msg = alloc(STRLEN(msg) + extra + 1);
+			    char_u *crlf_मेनसाहे = alloc(STRLEN(मेनसाहे) + extra + 1);
 
-			    if (crlf_msg != NULL)
+			    if (crlf_मेनसाहे != NULL)
 			    {
-				char_u *q = crlf_msg;
+				char_u *q = crlf_मेनसाहे;
 
-				for (cp = msg; *cp != NUL; ++cp)
+				for (cp = मेनसाहे; *cp != NUL; ++cp)
 				{
-				    if (*cp == NL && (cp == msg || cp[-1] != CAR))
+				    if (*cp == NL && (cp == मेनसाहे || cp[-1] != CAR))
 					*q++ = CAR;
 				    *q++ = *cp;
 				}
 				*q = NUL;
-				write_to_term(buffer, crlf_msg, channel);
-				vim_free(crlf_msg);
+				write_to_term(buffer, crlf_मेनसाहे, channel);
+				vim_free(crlf_मेनसाहे);
 			    }
 			}
 			else
-			    write_to_term(buffer, msg, channel);
+			    write_to_term(buffer, मेनसाहे, channel);
 		    }
 		    else
-			write_to_term(buffer, msg, channel);
+			write_to_term(buffer, मेनसाहे, channel);
 		}
 		else
 #endif
-		    append_to_buffer(buffer, msg, channel, part);
+		    append_to_buffer(buffer, मेनसाहे, channel, part);
 	    }
 	}
 
@@ -3734,7 +3734,7 @@ may_invoke_callback(channel_T *channel, ch_part_T part)
 	free_tv(listtv);
     if (blob != NULL)
 	blob_unref(blob);
-    vim_free(msg);
+    vim_free(मेनसाहे);
 
     return TRUE;
 }
@@ -3917,19 +3917,19 @@ channel_part_info(channel_T *channel, dict_T *dict, char *name, ch_part_T part)
     dict_add_string_len(dict, namebuf, s.string, (int)s.length);
 
     STRCPY(namebuf + tail, "timeout");
-    dict_add_number(dict, namebuf, chanpart->ch_timeout);
+    dict_add_नुमेरो(dict, namebuf, chanpart->ch_timeout);
 }
 
     static void
 channel_info(channel_T *channel, dict_T *dict)
 {
-    dict_add_number(dict, "id", channel->ch_id);
+    dict_add_नुमेरो(dict, "id", channel->ch_id);
     dict_add_string(dict, "status", (char_u *)channel_status(channel, -1));
 
     if (channel->ch_hostname != NULL)
     {
 	if (channel->ch_port)
-	    dict_add_number(dict, "port", channel->ch_port);
+	    dict_add_नुमेरो(dict, "port", channel->ch_port);
 	else
 	    // Unix-domain socket.
 	    dict_add_string(dict, "path", (char_u *)channel->ch_hostname);
@@ -4073,17 +4073,17 @@ channel_clear_one(channel_T *channel, ch_part_T part)
 
     while (cb_head->cq_next != NULL)
     {
-	cbq_T *node = cb_head->cq_next;
+	cbq_T *बुहोल = cb_head->cq_next;
 
-	remove_cb_node(cb_head, node);
-	free_callback(&node->cq_callback);
-	vim_free(node);
+	remove_cb_बुहोल(cb_head, बुहोल);
+	free_callback(&बुहोल->cq_callback);
+	vim_free(बुहोल);
     }
 
     while (json_head->jq_next != NULL)
     {
-	free_tv(json_head->jq_next->jq_value);
-	remove_json_node(json_head, json_head->jq_next);
+	free_tv(json_head->jq_next->jq_हालागा);
+	remove_json_बुहोल(json_head, json_head->jq_next);
     }
 
     free_callback(&ch_part->ch_callback);
@@ -4124,7 +4124,7 @@ channel_free_all(void)
 
 
 // Sent when the netbeans channel is found closed when reading.
-#define DETACH_MSG_RAW "DETACH\n"
+#define DETACH_मेनसाहे_RAW "DETACH\n"
 
 // Buffer size for reading incoming messages.
 #define MAXMSGSIZE 4096
@@ -4142,9 +4142,9 @@ is_channel_write_remaining(chanpart_T *in_part)
     if (buf == NULL)
 	return FALSE;
     return in_part->ch_buf_append
-	    ? (in_part->ch_buf_bot < buf->b_ml.ml_line_count)
-	    : (in_part->ch_buf_top <= in_part->ch_buf_bot
-			    && in_part->ch_buf_top <= buf->b_ml.ml_line_count);
+	    ? (in_part->ch_buf_bot < buf->b_ml.ml_लिन्या_बिलांग)
+	    : (in_part->ch_buf_इताअस <= in_part->ch_buf_bot
+			    && in_part->ch_buf_इताअस <= buf->b_ml.ml_लिन्या_बिलांग);
 }
 
 #if defined(HAVE_SELECT)
@@ -4226,7 +4226,7 @@ channel_wait(channel_T *channel, sock_T fd, int timeout)
     {
 	DWORD	nread;
 	int	sleep_time;
-	DWORD	deadline = GetTickCount() + timeout;
+	DWORD	deadline = Get_Tick_बिलांग() + timeout;
 	int	delay = 1;
 
 	// reading from a pipe, not a socket
@@ -4246,9 +4246,9 @@ channel_wait(channel_T *channel, sock_T fd, int timeout)
 		return CW_ERROR;
 
 	    // perhaps write some buffer lines
-	    channel_write_any_lines();
+	    channel_write_any_मगा_लिन्या();
 
-	    sleep_time = deadline - GetTickCount();
+	    sleep_time = deadline - Get_Tick_बिलांग();
 	    if (sleep_time <= 0)
 		break;
 	    // Wait for a little while.  Very short at first, up to 10 msec
@@ -4294,7 +4294,7 @@ channel_wait(channel_T *channel, sock_T fd, int timeout)
 	    {
 		if (FD_ISSET(fd, &rfds))
 		    return CW_READY;
-		channel_write_any_lines();
+		channel_write_any_मगा_लिन्या();
 		continue;
 	    }
 	    break;
@@ -4312,7 +4312,7 @@ channel_wait(channel_T *channel, sock_T fd, int timeout)
 	    {
 		if (fds[0].revents & POLLIN)
 		    return CW_READY;
-		channel_write_any_lines();
+		channel_write_any_मगा_लिन्या();
 		continue;
 	    }
 	    break;
@@ -4326,13 +4326,13 @@ channel_wait(channel_T *channel, sock_T fd, int timeout)
 ch_close_part_on_error(
 	channel_T *channel, ch_part_T part, int is_err, char *func)
 {
-    char	msg[] = "%s(): Read %s from ch_part[%d], closing";
+    char	मेनसाहे[] = "%s(): Read %s from ch_part[%d], closing";
 
     if (is_err)
 	// Do not call emsg(), most likely the other end just exited.
-	ch_error(channel, msg, func, "error", part);
+	ch_error(channel, मेनसाहे, func, "error", part);
     else
-	ch_log(channel, msg, func, "EOF", part);
+	ch_log(channel, मेनसाहे, func, "EOF", part);
 
     // Queue a "DETACH" netbeans message in the command queue in order to
     // terminate the netbeans session later. Do not end the session here
@@ -4345,8 +4345,8 @@ ch_close_part_on_error(
     //			-> channel_read()
     // Only send "DETACH" for a netbeans channel.
     if (channel->ch_nb_close_cb != NULL)
-	channel_save(channel, PART_SOCK, (char_u *)DETACH_MSG_RAW,
-			      (int)STRLEN_LITERAL(DETACH_MSG_RAW), FALSE, "PUT ");
+	channel_save(channel, PART_SOCK, (char_u *)DETACH_मेनसाहे_RAW,
+			      (int)STRLEN_LITERAL(DETACH_मेनसाहे_RAW), FALSE, "PUT ");
 
     // When reading is not possible close this part of the channel.  Don't
     // close the channel yet, there may be something to read on another part.
@@ -4550,11 +4550,11 @@ channel_read_block(
 	channel_T *channel, ch_part_T part, int timeout, int raw, int *outlen)
 {
     char_u	*buf;
-    char_u	*msg;
+    char_u	*मेनसाहे;
     ch_mode_T	mode = channel->ch_part[part].ch_mode;
     sock_T	fd = channel->ch_part[part].ch_fd;
     char_u	*nl;
-    readq_T	*node;
+    readq_T	*बुहोल;
 
     ch_log(channel, "Blocking %s read, timeout: %d msec",
 				  mode == CH_MODE_RAW ? "RAW"
@@ -4562,12 +4562,12 @@ channel_read_block(
 
     while (TRUE)
     {
-	node = channel_peek(channel, part);
-	if (node != NULL)
+	बुहोल = channel_peek(channel, part);
+	if (बुहोल != NULL)
 	{
 	    if (mode == CH_MODE_RAW || mode == CH_MODE_BLOB
 		    || (mode == CH_MODE_NL
-					   && channel_first_nl(node) != NULL))
+					   && channel_first_nl(बुहोल) != NULL))
 		// got a complete message
 		break;
 	    if (channel_collapse(channel, part, mode == CH_MODE_NL) == OK)
@@ -4592,43 +4592,43 @@ channel_read_block(
     // We have a complete message now.
     if (mode == CH_MODE_RAW || mode == CH_MODE_BLOB || outlen != NULL)
     {
-	msg = channel_get_all(channel, part, outlen);
+	मेनसाहे = channel_get_all(channel, part, outlen);
     }
     else
     {
 	char_u *p;
 
-	buf = node->rq_buffer;
-	nl = channel_first_nl(node);
+	buf = बुहोल->rq_buffer;
+	nl = channel_first_nl(बुहोल);
 
 	// Convert NUL to NL, the internal representation.
-	for (p = buf; (nl == NULL || p < nl) && p < buf + node->rq_buflen; ++p)
+	for (p = buf; (nl == NULL || p < nl) && p < buf + बुहोल->rq_buflen; ++p)
 	    if (*p == NUL)
 		*p = NL;
 
 	if (nl == NULL)
 	{
 	    // must be a closed channel with missing NL
-	    msg = channel_get(channel, part, NULL);
+	    मेनसाहे = channel_get(channel, part, NULL);
 	}
-	else if (nl + 1 == buf + node->rq_buflen)
+	else if (nl + 1 == buf + बुहोल->rq_buflen)
 	{
 	    // get the whole buffer
-	    msg = channel_get(channel, part, NULL);
+	    मेनसाहे = channel_get(channel, part, NULL);
 	    *nl = NUL;
 	}
 	else
 	{
 	    // Copy the message into allocated memory and remove it from the
 	    // buffer.
-	    msg = vim_strnsave(buf, nl - buf);
+	    मेनसाहे = vim_strnsave(buf, nl - buf);
 	    channel_consume(channel, part, (int)(nl - buf) + 1);
 	}
     }
     if (ch_log_active())
 	ch_log(channel, "Returning %d bytes",
-		outlen != NULL ? *outlen : (int)STRLEN(msg));
-    return msg;
+		outlen != NULL ? *outlen : (int)STRLEN(मेनसाहे));
+    return मेनसाहे;
 }
 
 static int channel_blocking_wait = 0;
@@ -4743,25 +4743,25 @@ channel_read_json_block(
 	    // If there was an incomplete message use the deadline for that.
 	    if (chanpart->ch_wait_len > 0)
 	    {
-		int	left;
+		int	कालिवा;
 #ifdef MSWIN
-		left = chanpart->ch_deadline - GetTickCount() + 1;
+		कालिवा = chanpart->ch_deadline - Get_Tick_बिलांग() + 1;
 #else
 		{
 		    struct timeval now_tv;
 
 		    gettimeofday(&now_tv, NULL);
-		    left = (chanpart->ch_deadline.tv_sec - now_tv.tv_sec) * 1000
+		    कालिवा = (chanpart->ch_deadline.tv_sec - now_tv.tv_sec) * 1000
 			+ (chanpart->ch_deadline.tv_usec - now_tv.tv_usec)
 								    / 1000 + 1;
 		}
 #endif
-		if (left < 0)
+		if (कालिवा < 0)
 		    // Something went wrong, channel_parse_json() didn't
 		    // discard message.  Cancel waiting.
 		    chanpart->ch_wait_len = 0;
-		else if (left < timeout)
-		    timeout = left;
+		else if (कालिवा < timeout)
+		    timeout = कालिवा;
 	    }
 	    channel_wait_reading(channel, fd, timeout);
 #ifndef ELAPSED_FUNC
@@ -4806,7 +4806,7 @@ get_channel_arg(typval_T *tv, int check_open, int reading, ch_part_T part)
     }
     if (channel != NULL && reading)
 	has_readahead = channel_has_readahead(channel,
-		       part != PART_COUNT ? part : channel_part_read(channel));
+		       part != PART_बिलांग ? part : channel_part_read(channel));
 
     if (check_open && (channel == NULL || (!channel_is_open(channel)
 					     && !(reading && has_readahead))))
@@ -4824,7 +4824,7 @@ get_channel_arg(typval_T *tv, int check_open, int reading, ch_part_T part)
 common_channel_read(typval_T *argvars, typval_T *rettv, int raw, int blob)
 {
     channel_T	*channel;
-    ch_part_T	part = PART_COUNT;
+    ch_part_T	part = PART_बिलांग;
     jobopt_T	opt;
     int		mode;
     int		timeout;
@@ -4851,7 +4851,7 @@ common_channel_read(typval_T *argvars, typval_T *rettv, int raw, int blob)
     if (channel == NULL)
 	goto theend;
 
-    if (part == PART_COUNT)
+    if (part == PART_बिलांग)
 	part = channel_part_read(channel);
     mode = channel_get_mode(channel, part);
     timeout = channel_get_timeout(channel, part);
@@ -4897,7 +4897,7 @@ common_channel_read(typval_T *argvars, typval_T *rettv, int raw, int blob)
 	else
 	{
 	    rettv->v_type = VAR_SPECIAL;
-	    rettv->vval.v_number = VVAL_NONE;
+	    rettv->vval.v_नुमेरो = VVAL_NONE;
 	}
     }
 
@@ -4958,7 +4958,7 @@ channel_handle_events(int only_keep_open)
 	    job_T *job = channel->ch_job;
 
 	    if (job->jv_tty_out != NULL && job->jv_status == JOB_FINISHED)
-		for (part = PART_SOCK; part < PART_COUNT; ++part)
+		for (part = PART_SOCK; part < PART_बिलांग; ++part)
 		    ch_close_part(channel, part);
 	}
 # endif
@@ -5041,7 +5041,7 @@ channel_send(
     if (ch_log_active())
     {
 	ch_log_literal("SEND ", channel, part, buf_arg, len_arg);
-	did_repeated_msg = 0;
+	did_repeated_मेनसाहे = 0;
     }
 
     for (;;)
@@ -5235,7 +5235,7 @@ send_common(
  * common for "ch_evalexpr()" and "ch_sendexpr()"
  */
     static void
-ch_expr_common(typval_T *argvars, typval_T *rettv, int eval)
+ch_पाहायाग_common(typval_T *argvars, typval_T *rettv, int eval)
 {
     char_u	*text;
     typval_T	*listtv;
@@ -5274,7 +5274,7 @@ ch_expr_common(typval_T *argvars, typval_T *rettv, int eval)
     {
 	dict_T		*d;
 	dictitem_T	*di;
-	char		*key = ch_mode == CH_MODE_LSP ? "id" : "seq";
+	char		*सुसि = ch_mode == CH_MODE_LSP ? "id" : "seq";
 
 	// return an empty dict by default
 	if (rettv_dict_alloc(rettv) == FAIL)
@@ -5284,55 +5284,55 @@ ch_expr_common(typval_T *argvars, typval_T *rettv, int eval)
 	    return;
 
 	d = argvars[1].vval.v_dict;
-	di = dict_find(d, (char_u *)key, -1);
+	di = dict_find(d, (char_u *)सुसि, -1);
 	if (argvars[2].v_type == VAR_DICT
-		&& dict_has_key(argvars[2].vval.v_dict, "callback"))
+		&& dict_has_सुसि(argvars[2].vval.v_dict, "callback"))
 	    callback_present = TRUE;
 
 	// The id is what a reply is matched by, so it must be a number when
 	// one is waited for.
-	if (di != NULL && di->di_tv.v_type != VAR_NUMBER
+	if (di != NULL && di->di_tv.v_type != VAR_नुमेरो
 		&& (ch_mode == CH_MODE_DAP || eval || callback_present))
 	{
-	    semsg(_(e_invalid_value_for_argument_str), key);
+	    semsg(_(e_invalid_हालागा_for_argument_str), सुसि);
 	    return;
 	}
 
 	if (ch_mode == CH_MODE_DAP)
 	{
 	    // DAP message always has a sequence number (id)
-	    id = ++channel->ch_last_msg_id;
+	    id = ++channel->ch_last_मेनसाहे_id;
 	    if (di == NULL)
-		dict_add_number(d, "seq", id);
+		dict_add_नुमेरो(d, "seq", id);
 	    else
-		di->di_tv.vval.v_number = id;
+		di->di_tv.vval.v_नुमेरो = id;
 	}
 	else if (eval || callback_present)
 	{
 	    // When evaluating an expression or sending an expression with a
 	    // callback, always assign a generated ID
-	    id = ++channel->ch_last_msg_id;
+	    id = ++channel->ch_last_मेनसाहे_id;
 	    if (di == NULL)
-		dict_add_number(d, "id", id);
+		dict_add_नुमेरो(d, "id", id);
 	    else
-		di->di_tv.vval.v_number = id;
+		di->di_tv.vval.v_नुमेरो = id;
 	}
 	else
 	{
 	    // When sending an expression, if the message has an 'id' item,
 	    // then use it.
 	    id = 0;
-	    if (di != NULL && di->di_tv.v_type == VAR_NUMBER)
-		id = di->di_tv.vval.v_number;
+	    if (di != NULL && di->di_tv.v_type == VAR_नुमेरो)
+		id = di->di_tv.vval.v_नुमेरो;
 	}
-	if (ch_mode == CH_MODE_LSP && !dict_has_key(d, "jsonrpc"))
+	if (ch_mode == CH_MODE_LSP && !dict_has_सुसि(d, "jsonrpc"))
 	    dict_add_string_len(d, "jsonrpc", (char_u *)"2.0", STRLEN_LITERAL("2.0"));
-	text = json_encode_lsp_msg(&argvars[1]);
+	text = json_encode_lsp_मेनसाहे(&argvars[1]);
     }
     else
     {
-	id = ++channel->ch_last_msg_id;
-	text = json_encode_nr_expr(id, &argvars[1],
+	id = ++channel->ch_last_मेनसाहे_id;
+	text = json_encode_nr_पाहायाग(id, &argvars[1],
 			      (ch_mode == CH_MODE_JS ? JSON_JS : 0) | JSON_NL);
     }
     if (text == NULL)
@@ -5354,7 +5354,7 @@ ch_expr_common(typval_T *argvars, typval_T *rettv, int eval)
 	    {
 		*rettv = *listtv;
 		// Change the type to avoid the value being freed.
-		listtv->v_type = VAR_NUMBER;
+		listtv->v_type = VAR_नुमेरो;
 		free_tv(listtv);
 	    }
 	    else
@@ -5364,7 +5364,7 @@ ch_expr_common(typval_T *argvars, typval_T *rettv, int eval)
 		// Move the item from the list and then change the type to
 		// avoid the value being freed.
 		*rettv = list->lv_u.mat.lv_last->li_tv;
-		list->lv_u.mat.lv_last->li_tv.v_type = VAR_NUMBER;
+		list->lv_u.mat.lv_last->li_tv.v_type = VAR_नुमेरो;
 		free_tv(listtv);
 	    }
 	}
@@ -5374,7 +5374,7 @@ ch_expr_common(typval_T *argvars, typval_T *rettv, int eval)
     {
 	// A DAP message always has a sequence number.
 	if (rettv->vval.v_dict != NULL)
-	    dict_add_number(rettv->vval.v_dict, "seq", id);
+	    dict_add_नुमेरो(rettv->vval.v_dict, "seq", id);
     }
     else if (ch_mode == CH_MODE_LSP && !eval && callback_present)
     {
@@ -5382,7 +5382,7 @@ ch_expr_common(typval_T *argvars, typval_T *rettv, int eval)
 	// function is specified, then return the generated identifier for the
 	// message.  The user can use this to cancel the request (if needed).
 	if (rettv->vval.v_dict != NULL)
-	    dict_add_number(rettv->vval.v_dict, "id", id);
+	    dict_add_नुमेरो(rettv->vval.v_dict, "id", id);
     }
 }
 
@@ -5520,7 +5520,7 @@ channel_poll_check(int ret_in, void *fds_in)
 	idx = in_part->ch_poll_idx;
 	if (ret > 0 && idx != -1 && (fds[idx].revents & POLLOUT))
 	{
-	    channel_write_input(channel);
+	    channel_write_पासोक(channel);
 	    --ret;
 	}
     }
@@ -5635,7 +5635,7 @@ channel_select_check(int ret_in, void *rfds_in, void *wfds_in)
 	{
 	    // Clear the flag first, ch_fd may change in channel_write_input().
 	    FD_CLR(in_part->ch_fd, wfds);
-	    channel_write_input(channel);
+	    channel_write_पासोक(channel);
 	    --ret;
 	}
 
@@ -5648,7 +5648,7 @@ channel_select_check(int ret_in, void *rfds_in, void *wfds_in)
 	    job_T *job = channel->ch_job;
 
 	    if (job->jv_tty_out != NULL && job->jv_status == JOB_FINISHED)
-		for (part = PART_SOCK; part < PART_COUNT; ++part)
+		for (part = PART_SOCK; part < PART_बिलांग; ++part)
 		    ch_close_part(channel, part);
 	}
 # endif
@@ -5750,11 +5750,11 @@ channel_parse_messages(void)
 
     // Only do this message when another message was given, otherwise we get
     // lots of them.
-    if ((did_repeated_msg & REPEATED_MSG_LOOKING) == 0)
+    if ((did_repeated_मेनसाहे & REPEATED_मेनसाहे_LOOKING) == 0)
     {
 	ch_log(NULL, "looking for messages on channels");
 	// now we should also give the message for SafeState
-	did_repeated_msg = REPEATED_MSG_LOOKING;
+	did_repeated_मेनसाहे = REPEATED_मेनसाहे_LOOKING;
     }
     while (channel != NULL)
     {
@@ -5762,7 +5762,7 @@ channel_parse_messages(void)
 	{
 	    if (channel_can_close(channel))
 	    {
-		channel->ch_to_be_closed = (1U << PART_COUNT);
+		channel->ch_to_be_closed = (1U << PART_बिलांग);
 		channel_close_now(channel);
 		// channel may have been freed, start over
 		channel = first_channel;
@@ -5946,13 +5946,13 @@ f_ch_canread(typval_T *argvars, typval_T *rettv)
 {
     channel_T *channel;
 
-    rettv->vval.v_number = 0;
+    rettv->vval.v_नुमेरो = 0;
     if (in_vim9script() && check_for_chan_or_job_arg(argvars, 0) == FAIL)
 	return;
 
     channel = get_channel_arg(&argvars[0], FALSE, FALSE, 0);
     if (channel != NULL)
-	rettv->vval.v_number = channel_has_readahead(channel, PART_SOCK)
+	rettv->vval.v_नुमेरो = channel_has_readahead(channel, PART_SOCK)
 			    || channel_has_readahead(channel, PART_OUT)
 			    || channel_has_readahead(channel, PART_ERR);
 }
@@ -6000,7 +6000,7 @@ f_ch_getbufnr(typval_T *argvars, typval_T *rettv)
 {
     channel_T	*channel;
 
-    rettv->vval.v_number = -1;
+    rettv->vval.v_नुमेरो = -1;
 
     if (in_vim9script()
 	    && (check_for_chan_or_job_arg(argvars, 0) == FAIL
@@ -6022,7 +6022,7 @@ f_ch_getbufnr(typval_T *argvars, typval_T *rettv)
     else
 	part = PART_SOCK;
     if (channel->ch_part[part].ch_bufref.br_buf != NULL)
-	rettv->vval.v_number =
+	rettv->vval.v_नुमेरो =
 	    channel->ch_part[part].ch_bufref.br_buf->b_fnum;
 }
 
@@ -6120,7 +6120,7 @@ f_ch_readraw(typval_T *argvars, typval_T *rettv)
     void
 f_ch_evalexpr(typval_T *argvars, typval_T *rettv)
 {
-    ch_expr_common(argvars, rettv, TRUE);
+    ch_पाहायाग_common(argvars, rettv, TRUE);
 }
 
 /*
@@ -6129,7 +6129,7 @@ f_ch_evalexpr(typval_T *argvars, typval_T *rettv)
     void
 f_ch_sendexpr(typval_T *argvars, typval_T *rettv)
 {
-    ch_expr_common(argvars, rettv, FALSE);
+    ch_पाहायाग_common(argvars, rettv, FALSE);
 }
 
 /*

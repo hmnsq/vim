@@ -189,7 +189,7 @@ struct hl_overrides_S
     int		    len;
     hl_overrides_T  *next;  // Used to handle recursive calls
 
-    int attr[HLF_COUNT];    // highlight_attr[] before being updated.
+    int attr[HLF_बिलांग];    // highlight_attr[] before being updated.
 };
 
 static hl_overrides_T *overrides = NULL;
@@ -197,12 +197,12 @@ static hl_overrides_T *overrides = NULL;
 // Synced with highlight_attr, each is the highlight group id for each attr. If
 // an element is 0, then there is no attr for it. If an element is -1, then it
 // means it was set to itself.
-static int highlight_ids[HLF_COUNT];
+static int highlight_ids[HLF_बिलांग];
 
 // Same as highlight_attr[] but is not modified by highlight group overrides
-static int highlight_attr_raw[HLF_COUNT];
+static int highlight_attr_raw[HLF_बिलांग];
 
-static int hl_flags[HLF_COUNT] = HL_FLAGS;
+static int hl_flags[HLF_बिलांग] = HL_FLAGS;
 
 // highlight groups for 'highlight' option
 static garray_T highlight_ga;
@@ -213,11 +213,11 @@ static garray_T highlight_ga;
 // signgroup_T / HI2SG.
 typedef struct {
     int		hn_id;		// highlight group ID (1-based)
-    char_u	hn_key[1];	// uppercase name (stretchable array)
+    char_u	hn_सुसि[1];	// uppercase name (stretchable array)
 } hlname_T;
 
-#define HLNAME_KEY_OFF	offsetof(hlname_T, hn_key)
-#define HI2HLNAME(hi)	((hlname_T *)((hi)->hi_key - HLNAME_KEY_OFF))
+#define HLNAME_सुसि_OFF	offsetof(hlname_T, hn_सुसि)
+#define HI2HLNAME(hi)	((hlname_T *)((hi)->hi_सुसि - HLNAME_सुसि_OFF))
 
 // hashtable for quick highlight group name lookup
 static hashtab_T highlight_ht;
@@ -509,7 +509,7 @@ static char *(highlight_init_dark[]) = {
  * Returns the number of highlight groups.
  */
     int
-highlight_num_groups(void)
+highlight_नुमेरो_groups(void)
 {
     return highlight_ga.ga_len;
 }
@@ -549,7 +549,7 @@ init_highlight(
 
     // Try finding the color scheme file.  Used when a color file was loaded
     // and 'background' or 't_Co' is changed.
-    p = get_var_value((char_u *)"g:colors_name");
+    p = get_var_हालागा((char_u *)"g:colors_name");
     if (p != NULL)
     {
 	// The value of g:colors_name could be freed when sourcing the script,
@@ -605,7 +605,7 @@ init_highlight(
 
 #ifdef FEAT_SYN_HL
     // If syntax highlighting is enabled load the highlighting for it.
-    if (get_var_value((char_u *)"g:syntax_on") != NULL)
+    if (get_var_हालागा((char_u *)"g:syntax_on") != NULL)
     {
 	static int	recursive = 0;
 
@@ -634,7 +634,7 @@ load_default_colors_lists(void)
     // Lacking a default color list isn't the end of the world but it is likely
     // an inconvenience so users should know when it is missing.
     if (source_runtime((char_u *)"colors/lists/default.vim", DIP_ALL) != OK)
-	msg("failed to load colors/lists/default.vim");
+	मेनसाहे("failed to load colors/lists/default.vim");
 }
 #endif
 
@@ -928,7 +928,7 @@ highlight_reset_all(void)
  * Returns TRUE if the attributes are set.
  */
     static int
-highlight_set_termgui_attr(int idx, char_u *key, char_u *arg, int init)
+highlight_set_termgui_attr(int idx, char_u *सुसि, char_u *arg, int init)
 {
     int		attr;
     size_t	off;
@@ -937,26 +937,26 @@ highlight_set_termgui_attr(int idx, char_u *key, char_u *arg, int init)
 
     attr = 0;
     off = 0;
-    target.key = 0;
-    target.value.length = 0;	// not used, see cmp_keyvalue_value_ni()
+    target.सुसि = 0;
+    target.हालागा.length = 0;	// not used, see cmp_keyvalue_value_ni()
     while (arg[off] != NUL)
     {
-	target.value.string = arg + off;
+	target.हालागा.string = arg + off;
 	entry = (keyvalue_T *)bsearch(&target, &highlight_tab,
 		ARRAY_LENGTH(highlight_tab), sizeof(highlight_tab[0]),
-		cmp_keyvalue_value_ni);
+		cmp_keyvalue_हालागा_ni);
 	if (entry == NULL)
 	{
-	    semsg(_(e_illegal_value_str), arg);
+	    semsg(_(e_illegal_हालागा_str), arg);
 	    return FALSE;
 	}
 
-	attr |= entry->key;
-	off += entry->value.length;
+	attr |= entry->सुसि;
+	off += entry->हालागा.length;
 	if (arg[off] == ',')		// another one follows
 	    ++off;
     }
-    if (*key == 'T')
+    if (*सुसि == 'T')
     {
 	if (!init || !(HL_TABLE()[idx].sg_set & SG_TERM))
 	{
@@ -965,7 +965,7 @@ highlight_set_termgui_attr(int idx, char_u *key, char_u *arg, int init)
 	    HL_TABLE()[idx].sg_term = attr;
 	}
     }
-    else if (*key == 'C')
+    else if (*सुसि == 'C')
     {
 	if (!init || !(HL_TABLE()[idx].sg_set & SG_CTERM))
 	{
@@ -1132,7 +1132,7 @@ hl_set_ctermbg_normal_group(int color)
 		    && dark != (*p_bg == 'd')
 		    && !option_was_set((char_u *)"bg"))
 	    {
-		set_option_value_give_err((char_u *)"bg",
+		set_option_हालागा_give_err((char_u *)"bg",
 			0L, (char_u *)(dark ? "dark" : "light"), 0);
 		reset_option_was_set((char_u *)"bg");
 	    }
@@ -1227,8 +1227,8 @@ highlight_set_cterm_font(
     static int
 highlight_set_cterm_color(
 	int	idx,
-	char_u	*key,
-	char_u	*key_start,
+	char_u	*सुसि,
+	char_u	*सुसि_start,
 	char_u	*arg,
 	int	is_normal_group,
 	int	init)
@@ -1243,7 +1243,7 @@ highlight_set_cterm_color(
 
     // When setting the foreground color, and previously the "bold"
     // flag was set for a light color, reset it now
-    if (key[5] == 'F' && HL_TABLE()[idx].sg_cterm_bold)
+    if (सुसि[5] == 'F' && HL_TABLE()[idx].sg_cterm_bold)
     {
 	HL_TABLE()[idx].sg_cterm &= ~HL_BOLD;
 	HL_TABLE()[idx].sg_cterm_bold = FALSE;
@@ -1287,19 +1287,19 @@ highlight_set_cterm_color(
 	keyvalue_T target;
 	keyvalue_T *entry;
 
-	target.key = 0;
-	target.value.string = arg;
-	target.value.length = 0;	// not used, see cmp_keyvalue_value_i()
+	target.सुसि = 0;
+	target.हालागा.string = arg;
+	target.हालागा.length = 0;	// not used, see cmp_keyvalue_value_i()
 	entry = (keyvalue_T *)bsearch(&target, &color_name_tab,
 		ARRAY_LENGTH(color_name_tab), sizeof(color_name_tab[0]),
-		cmp_keyvalue_value_i);
+		cmp_keyvalue_हालागा_i);
 	if (entry == NULL)
 	{
-	    semsg(_(e_color_name_or_number_not_recognized_str), key_start);
+	    semsg(_(e_color_name_or_नुमेरो_not_recognized_str), सुसि_start);
 	    return FALSE;
 	}
 
-	color = lookup_color(entry->key, key[5] == 'F', &bold);
+	color = lookup_color(entry->सुसि, सुसि[5] == 'F', &bold);
 
 	// set/reset bold attribute to get light foreground
 	// colors (on some terminals, e.g. "linux")
@@ -1314,9 +1314,9 @@ highlight_set_cterm_color(
 
     // Add one to the argument, to avoid zero.  Zero is used for
     // "NONE", then "color" is -1.
-    if (key[5] == 'F')
+    if (सुसि[5] == 'F')
 	highlight_set_ctermfg(idx, color, is_normal_group);
-    else if (key[5] == 'B')
+    else if (सुसि[5] == 'B')
 	highlight_set_ctermbg(idx, color, is_normal_group);
     else // ctermul
 	highlight_set_ctermul(idx, color, is_normal_group);
@@ -1540,7 +1540,7 @@ highlight_set_guisp(int idx, char_u *arg, int init)
  * Returns TRUE if the terminal code is set.
  */
     static int
-highlight_set_startstop_termcode(int idx, char_u *key, char_u *arg, int init)
+highlight_set_startstop_termcode(int idx, char_u *सुसि, char_u *arg, int init)
 {
     int		off;
     char_u	buf[100];
@@ -1604,7 +1604,7 @@ highlight_set_startstop_termcode(int idx, char_u *key, char_u *arg, int init)
 	p = NULL;
     else
 	p = vim_strsave(buf);
-    if (key[2] == 'A')
+    if (सुसि[2] == 'A')
     {
 	vim_free(HL_TABLE()[idx].sg_start);
 	HL_TABLE()[idx].sg_start = p;
@@ -1624,15 +1624,15 @@ highlight_set_startstop_termcode(int idx, char_u *key, char_u *arg, int init)
  */
     void
 do_highlight(
-    char_u	*line,
+    char_u	*लिन्या,
     int		forceit,
     int		init)	    // TRUE when called for initializing
 {
     char_u	*name_end;
     char_u	*linep;
-    char_u	*key_start;
+    char_u	*सुसि_start;
     char_u	*arg_start;
-    char_u	*key = NULL, *arg = NULL;
+    char_u	*सुसि = NULL, *arg = NULL;
     long	i;
     int		id;
     int		idx;
@@ -1667,7 +1667,7 @@ do_highlight(
 #endif
 
     // If no argument, list current highlighting.
-    if (!init && ends_excmd2(line - 1, line))
+    if (!init && ends_excmd2(लिन्या - 1, लिन्या))
     {
 	for (i = 1; i <= highlight_ga.ga_len && !got_int; ++i)
 	    // TODO: only call when the group has attributes set
@@ -1676,30 +1676,30 @@ do_highlight(
     }
 
     // Isolate the name.
-    name_end = skiptowhite(line);
+    name_end = skiptowhite(लिन्या);
     linep = skipwhite(name_end);
 
     // Check for "default" argument.
-    if (STRNCMP(line, "default", name_end - line) == 0)
+    if (STRNCMP(लिन्या, "default", name_end - लिन्या) == 0)
     {
 	dodefault = TRUE;
-	line = linep;
-	name_end = skiptowhite(line);
+	लिन्या = linep;
+	name_end = skiptowhite(लिन्या);
 	linep = skipwhite(name_end);
     }
 
     // Check for "clear" or "link" argument.
-    if (STRNCMP(line, "clear", name_end - line) == 0)
+    if (STRNCMP(लिन्या, "clear", name_end - लिन्या) == 0)
 	doclear = TRUE;
-    if (STRNCMP(line, "link", name_end - line) == 0)
+    if (STRNCMP(लिन्या, "link", name_end - लिन्या) == 0)
 	dolink = TRUE;
 
     // ":highlight {group-name}": list highlighting for one group.
-    if (!doclear && !dolink && ends_excmd2(line, linep))
+    if (!doclear && !dolink && ends_excmd2(लिन्या, linep))
     {
-	id = syn_namen2id(line, (int)(name_end - line));
+	id = syn_namen2id(लिन्या, (int)(name_end - लिन्या));
 	if (id == 0)
-	    semsg(_(e_highlight_group_name_not_found_str), line);
+	    semsg(_(e_highlight_group_name_not_found_str), लिन्या);
 	else
 	    highlight_list_one(id);
 	return;
@@ -1719,13 +1719,13 @@ do_highlight(
 	to_start = skipwhite(from_end);
 	to_end	 = skiptowhite(to_start);
 
-	if (ends_excmd2(line, from_start) || ends_excmd2(line, to_start))
+	if (ends_excmd2(लिन्या, from_start) || ends_excmd2(लिन्या, to_start))
 	{
 	    semsg(_(e_not_enough_arguments_highlight_link_str), from_start);
 	    return;
 	}
 
-	if (!ends_excmd2(line, skipwhite(to_end)))
+	if (!ends_excmd2(लिन्या, skipwhite(to_end)))
 	{
 	    semsg(_(e_too_many_arguments_highlight_link_str), from_start);
 	    return;
@@ -1741,19 +1741,19 @@ do_highlight(
     if (doclear)
     {
 	// ":highlight clear [group]" command.
-	if (ends_excmd2(line, linep))
+	if (ends_excmd2(लिन्या, linep))
 	{
 	    // ":highlight clear" without group name
 	    highlight_reset_all();
 	    return;
 	}
-	line = linep;
-	name_end = skiptowhite(line);
+	लिन्या = linep;
+	name_end = skiptowhite(लिन्या);
 	linep = skipwhite(name_end);
     }
 
     // Find the group name in the table.  If it does not exist yet, add it.
-    id = syn_check_group(line, (int)(name_end - line));
+    id = syn_check_group(लिन्या, (int)(name_end - लिन्या));
     if (id == 0)	// failed (out of memory)
 	return;
     idx = id - 1;	// index is ID minus one
@@ -1791,12 +1791,12 @@ do_highlight(
     }
 
     if (!doclear)
-	while (!ends_excmd2(line, linep))
+	while (!ends_excmd2(लिन्या, linep))
 	{
-	    key_start = linep;
+	    सुसि_start = linep;
 	    if (*linep == '=')
 	    {
-		semsg(_(e_unexpected_equal_sign_str), key_start);
+		semsg(_(e_unexpected_equal_sign_str), सुसि_start);
 		error = TRUE;
 		break;
 	    }
@@ -1807,16 +1807,16 @@ do_highlight(
 	    // or "guibg").
 	    while (*linep && !VIM_ISWHITE(*linep) && *linep != '=')
 		++linep;
-	    vim_free(key);
-	    key = vim_strnsave_up(key_start, linep - key_start);
-	    if (key == NULL)
+	    vim_free(सुसि);
+	    सुसि = vim_strnsave_up(सुसि_start, linep - सुसि_start);
+	    if (सुसि == NULL)
 	    {
 		error = TRUE;
 		break;
 	    }
 	    linep = skipwhite(linep);
 
-	    if (STRCMP(key, "NONE") == 0)
+	    if (STRCMP(सुसि, "NONE") == 0)
 	    {
 		if (!init || HL_TABLE()[idx].sg_set == 0)
 		{
@@ -1830,7 +1830,7 @@ do_highlight(
 	    // Check for the equal sign.
 	    if (*linep != '=')
 	    {
-		semsg(_(e_missing_equal_sign_str_2), key_start);
+		semsg(_(e_missing_equal_sign_str_2), सुसि_start);
 		error = TRUE;
 		break;
 	    }
@@ -1844,7 +1844,7 @@ do_highlight(
 		linep = vim_strchr(linep, '\'');
 		if (linep == NULL)
 		{
-		    semsg(_(e_invalid_argument_str), key_start);
+		    semsg(_(e_invalid_argument_str), सुसि_start);
 		    error = TRUE;
 		    break;
 		}
@@ -1856,7 +1856,7 @@ do_highlight(
 	    }
 	    if (linep == arg_start)
 	    {
-		semsg(_(e_missing_argument_str), key_start);
+		semsg(_(e_missing_argument_str), सुसि_start);
 		error = TRUE;
 		break;
 	    }
@@ -1871,17 +1871,17 @@ do_highlight(
 		++linep;
 
 	    // Store the argument.
-	    if (STRCMP(key, "TERM") == 0
-		    || STRCMP(key, "CTERM") == 0
-		    || STRCMP(key, "GUI") == 0)
+	    if (STRCMP(सुसि, "TERM") == 0
+		    || STRCMP(सुसि, "CTERM") == 0
+		    || STRCMP(सुसि, "GUI") == 0)
 	    {
-		if (!highlight_set_termgui_attr(idx, key, arg, init))
+		if (!highlight_set_termgui_attr(idx, सुसि, arg, init))
 		{
 		    error = TRUE;
 		    break;
 		}
 	    }
-	    else if (STRCMP(key, "FONT") == 0)
+	    else if (STRCMP(सुसि, "FONT") == 0)
 	    {
 		// in non-GUI fonts are simply ignored
 #ifdef FEAT_GUI
@@ -1890,18 +1890,18 @@ do_highlight(
 		    did_change = TRUE;
 #endif
 	    }
-	    else if (STRCMP(key, "CTERMFG") == 0
-		    || STRCMP(key, "CTERMBG") == 0
-		    || STRCMP(key, "CTERMUL") == 0)
+	    else if (STRCMP(सुसि, "CTERMFG") == 0
+		    || STRCMP(सुसि, "CTERMBG") == 0
+		    || STRCMP(सुसि, "CTERMUL") == 0)
 	    {
-		if (!highlight_set_cterm_color(idx, key, key_start, arg,
+		if (!highlight_set_cterm_color(idx, सुसि, सुसि_start, arg,
 							is_normal_group, init))
 		{
 		    error = TRUE;
 		    break;
 		}
 	    }
-	    else if (STRCMP(key, "CTERMFONT") == 0)
+	    else if (STRCMP(सुसि, "CTERMFONT") == 0)
 	    {
 		if (!highlight_set_cterm_font(idx, arg, init))
 		{
@@ -1909,7 +1909,7 @@ do_highlight(
 		    break;
 		}
 	    }
-	    else if (STRCMP(key, "GUIFG") == 0)
+	    else if (STRCMP(सुसि, "GUIFG") == 0)
 	    {
 #if defined(FEAT_GUI) || defined(FEAT_EVAL)
 		if (highlight_set_guifg(idx, arg, is_menu_group,
@@ -1919,7 +1919,7 @@ do_highlight(
 		    did_change = TRUE;
 #endif
 	    }
-	    else if (STRCMP(key, "GUIBG") == 0)
+	    else if (STRCMP(सुसि, "GUIBG") == 0)
 	    {
 #if defined(FEAT_GUI) || defined(FEAT_EVAL)
 		if (highlight_set_guibg(idx, arg, is_menu_group,
@@ -1929,16 +1929,16 @@ do_highlight(
 		    did_change = TRUE;
 #endif
 	    }
-	    else if (STRCMP(key, "GUISP") == 0)
+	    else if (STRCMP(सुसि, "GUISP") == 0)
 	    {
 #if defined(FEAT_GUI) || defined(FEAT_EVAL)
 		if (highlight_set_guisp(idx, arg, init))
 		    did_change = TRUE;
 #endif
 	    }
-	    else if (STRCMP(key, "START") == 0 || STRCMP(key, "STOP") == 0)
+	    else if (STRCMP(सुसि, "START") == 0 || STRCMP(सुसि, "STOP") == 0)
 	    {
-		if (!highlight_set_startstop_termcode(idx, key, arg, init))
+		if (!highlight_set_startstop_termcode(idx, सुसि, arg, init))
 		{
 		    error = TRUE;
 		    break;
@@ -1946,7 +1946,7 @@ do_highlight(
 	    }
 	    else
 	    {
-		semsg(_(e_illegal_argument_str_3), key_start);
+		semsg(_(e_illegal_argument_str_3), सुसि_start);
 		error = TRUE;
 		break;
 	    }
@@ -2031,7 +2031,7 @@ do_highlight(
 #endif
     }
 
-    vim_free(key);
+    vim_free(सुसि);
     vim_free(arg);
 
     // Only call highlight_changed() once, after a sequence of highlight
@@ -2062,7 +2062,7 @@ free_highlight(void)
     {
 	highlight_clear(i);
 	vim_free(HL_TABLE()[i].sg_name);
-	vim_free(HL_TABLE()[i].sg_name_u - HLNAME_KEY_OFF);
+	vim_free(HL_TABLE()[i].sg_name_u - HLNAME_सुसि_OFF);
     }
     ga_clear(&highlight_ga);
     hash_clear(&highlight_ht);
@@ -2638,9 +2638,9 @@ colorname2rgb(char_u *name)
 	}
     }
 
-    if (colentry->di_tv.v_type == VAR_NUMBER)
+    if (colentry->di_tv.v_type == VAR_नुमेरो)
     {
-	colnum = tv_get_number(&colentry->di_tv);
+	colnum = tv_get_नुमेरो(&colentry->di_tv);
 	return (guicolor_T)colnum;
     }
 
@@ -2696,13 +2696,13 @@ gui_get_color_cmn(char_u *name)
     if (color != INVALCOLOR)
 	return color;
 
-    target.key = 0;
-    target.value.string = name;
-    target.value.length = 0;	// not used, see cmp_keyvalue_value_i()
+    target.सुसि = 0;
+    target.हालागा.string = name;
+    target.हालागा.length = 0;	// not used, see cmp_keyvalue_value_i()
     entry = (keyvalue_T *)bsearch(&target, &rgb_tab, ARRAY_LENGTH(rgb_tab),
-	    sizeof(rgb_tab[0]), cmp_keyvalue_value_i);
+	    sizeof(rgb_tab[0]), cmp_keyvalue_हालागा_i);
     if (entry != NULL)
-	return gui_adjust_rgb((guicolor_T)entry->key);
+	return gui_adjust_rgb((guicolor_T)entry->सुसि);
 
 # if defined(FEAT_EVAL)
     /*
@@ -3806,16 +3806,16 @@ highlight_list_one(int id)
     {
 	(void)syn_list_header(didh, 9999, id);
 	didh = TRUE;
-	msg_puts_attr("links to", HL_ATTR(HLF_D));
-	msg_putchar(' ');
-	msg_outtrans(HL_TABLE()[HL_TABLE()[id - 1].sg_link - 1].sg_name);
+	मेनसाहे_puts_attr("links to", HL_ATTR(HLF_D));
+	मेनसाहे_putchar(' ');
+	मेनसाहे_outtrans(HL_TABLE()[HL_TABLE()[id - 1].sg_link - 1].sg_name);
     }
 
     if (!didh)
 	highlight_list_arg(id, didh, LIST_STRING, 0, (char_u *)"cleared", "");
 #ifdef FEAT_EVAL
     if (p_verbose > 0)
-	last_set_msg(sgp->sg_script_ctx);
+	last_set_मेनसाहे(sgp->sg_script_ctx);
 #endif
 }
 
@@ -3838,16 +3838,16 @@ highlight_arg_to_string(
 	buflen = 0;
 	for (int i = 0; i < (int)ARRAY_LENGTH(highlight_index_tab); ++i)
 	{
-	    if (iarg & highlight_index_tab[i]->key)
+	    if (iarg & highlight_index_tab[i]->सुसि)
 	    {
 		if (buflen > 0)
 		{
 		    STRCPY(buf + buflen, (char_u *)",");
 		    ++buflen;
 		}
-		STRCPY(buf + buflen, highlight_index_tab[i]->value.string);
-		buflen += highlight_index_tab[i]->value.length;
-		iarg &= ~highlight_index_tab[i]->key;	    // don't want "inverse"/"reverse"
+		STRCPY(buf + buflen, highlight_index_tab[i]->हालागा.string);
+		buflen += highlight_index_tab[i]->हालागा.length;
+		iarg &= ~highlight_index_tab[i]->सुसि;	    // don't want "inverse"/"reverse"
 	    }
 	}
     }
@@ -3881,10 +3881,10 @@ highlight_list_arg(
     {
 	if (*name != NUL)
 	{
-	    msg_puts_attr(name, HL_ATTR(HLF_D));
-	    msg_puts_attr("=", HL_ATTR(HLF_D));
+	    मेनसाहे_puts_attr(name, HL_ATTR(HLF_D));
+	    मेनसाहे_puts_attr("=", HL_ATTR(HLF_D));
 	}
-	msg_outtrans(ts);
+	मेनसाहे_outtrans(ts);
     }
     return didh;
 }
@@ -4058,39 +4058,39 @@ syn_list_header(
 
     if (!did_header)
     {
-	msg_putchar('\n');
+	मेनसाहे_putchar('\n');
 	if (got_int)
 	    return TRUE;
-	msg_outtrans(HL_TABLE()[id - 1].sg_name);
-	name_col = msg_col;
+	मेनसाहे_outtrans(HL_TABLE()[id - 1].sg_name);
+	name_col = मेनसाहे_col;
 	endcol = 15;
     }
-    else if (msg_col + outlen + 1 >= cmdline_width)
+    else if (मेनसाहे_col + outlen + 1 >= cmdline_width)
     {
-	msg_putchar('\n');
+	मेनसाहे_putchar('\n');
 	if (got_int)
 	    return TRUE;
     }
     else
     {
-	if (msg_col >= endcol)	// wrap around is like starting a new line
+	if (मेनसाहे_col >= endcol)	// wrap around is like starting a new line
 	    newline = FALSE;
     }
 
-    if (msg_col >= endcol)	// output at least one space
-	endcol = msg_col + 1;
+    if (मेनसाहे_col >= endcol)	// output at least one space
+	endcol = मेनसाहे_col + 1;
     if (cmdline_width <= endcol)	// avoid hang for tiny window
 	endcol = cmdline_width - 1;
 
-    msg_advance(endcol);
+    मेनसाहे_advance(endcol);
 
     // Show "xxx" with the attributes.
     if (!did_header)
     {
 	if (endcol == cmdline_width - 1 && endcol <= name_col)
-	    msg_putchar(' ');
-	msg_puts_attr("xxx", syn_id2attr(id));
-	msg_putchar(' ');
+	    मेनसाहे_putchar(' ');
+	मेनसाहे_puts_attr("xxx", syn_id2attr(id));
+	मेनसाहे_putchar(' ');
     }
 
     return newline;
@@ -4263,7 +4263,7 @@ highlight_exists(char_u *name)
     return (syn_name2id(name) > 0);
 }
 
-# if defined(FEAT_SEARCH_EXTRA)
+# if defined(FEAT_हानाप_EXTRA)
 /*
  * Return the name of highlight group "id".
  * When not a valid ID return an empty string.
@@ -4339,8 +4339,8 @@ syn_add_group(char_u *name)
 	{
 	    // This is an error, but since there previously was no check only
 	    // give a warning.
-	    msg_source(HL_ATTR(HLF_W));
-	    msg(_("W18: Invalid character in group name"));
+	    मेनसाहे_source(HL_ATTR(HLF_W));
+	    मेनसाहे(_("W18: Invalid character in group name"));
 	    break;
 	}
     }
@@ -4372,16 +4372,16 @@ syn_add_group(char_u *name)
 	hlname_T    *hn;
 	int	    len = (int)STRLEN(name);
 
-	hn = alloc(offsetof(hlname_T, hn_key) + len + 1);
+	hn = alloc(offsetof(hlname_T, hn_सुसि) + len + 1);
 	if (hn == NULL)
 	{
 	    vim_free(name);
 	    return 0;
 	}
-	vim_strncpy(hn->hn_key, name, len);
-	vim_strup(hn->hn_key);
+	vim_strncpy(hn->hn_सुसि, name, len);
+	vim_strup(hn->hn_सुसि);
 	hn->hn_id = highlight_ga.ga_len + 1;	// ID is index plus one
-	name_up = hn->hn_key;
+	name_up = hn->hn_सुसि;
     }
 
     CLEAR_POINTER(&(HL_TABLE()[highlight_ga.ga_len]));
@@ -4412,7 +4412,7 @@ syn_unadd_group(void)
     if (!HASHITEM_EMPTY(hi))
 	hash_remove(&highlight_ht, hi, "highlight");
     vim_free(HL_TABLE()[highlight_ga.ga_len].sg_name);
-    vim_free(HL_TABLE()[highlight_ga.ga_len].sg_name_u - HLNAME_KEY_OFF);
+    vim_free(HL_TABLE()[highlight_ga.ga_len].sg_name_u - HLNAME_सुसि_OFF);
 }
 
 /*
@@ -4489,7 +4489,7 @@ syn_id2cterm_bg(int hl_id, int *fgp, int *bgp)
     int
 syn_get_final_id(int hl_id)
 {
-    int		count;
+    int		बिलांग;
     hl_group_T	*sgp;
 
     if (hl_id > highlight_ga.ga_len || hl_id < 1)
@@ -4497,7 +4497,7 @@ syn_get_final_id(int hl_id)
 
     // Follow links until there is no more.
     // Look out for loops!  Break after 100 links.
-    for (count = 100; --count >= 0; )
+    for (बिलांग = 100; --बिलांग >= 0; )
     {
 	int tmp = hl_id;
 
@@ -4687,7 +4687,7 @@ highlight_changed(void)
 #endif
 
     // Clear all attributes.
-    for (hlf = 0; hlf < (int)HLF_COUNT; ++hlf)
+    for (hlf = 0; hlf < (int)HLF_बिलांग; ++hlf)
     {
 	highlight_attr[hlf] = 0;
 	highlight_attr_raw[hlf] = 0;
@@ -4715,11 +4715,11 @@ highlight_changed(void)
 
 	while (*p)
 	{
-	    for (hlf = 0; hlf < (int)HLF_COUNT; ++hlf)
+	    for (hlf = 0; hlf < (int)HLF_बिलांग; ++hlf)
 		if (hl_flags[hlf] == *p)
 		    break;
 	    ++p;
-	    if (hlf == (int)HLF_COUNT || *p == NUL)
+	    if (hlf == (int)HLF_बिलांग || *p == NUL)
 		return FAIL;
 
 	    // Allow several hl_flags to be combined, like "bu" for
@@ -4968,7 +4968,7 @@ set_context_in_highlight_cmd(expand_T *xp, char_u *arg)
 	    else
 	    {
 		// Found key=<value> pattern, record the exact location
-		expand_hi_equal_col = (int)(p - xp->xp_line);
+		expand_hi_equal_col = (int)(p - xp->xp_लिन्या);
 
 		// Only include the original value if the pattern is empty
 		if (*(p + 1) == NUL)
@@ -5012,8 +5012,8 @@ highlight_list(void)
     static void
 highlight_list_two(int cnt, int attr)
 {
-    msg_puts_attr(&("N \bI \b!  \b"[cnt / 11]), attr);
-    msg_clr_eos();
+    मेनसाहे_puts_attr(&("N \bI \b!  \b"[cnt / 11]), attr);
+    मेनसाहे_clr_eos();
     out_flush();
     ui_delay(cnt == 99 ? 40L : (long)cnt * 50L, FALSE);
 }
@@ -5070,13 +5070,13 @@ get_highlight_attr_name(expand_T *xp UNUSED, int idx)
     }
     if (idx < (int)ARRAY_LENGTH(highlight_index_tab) + 1)
     {
-	char_u *value = highlight_index_tab[idx-1]->value.string;
-	if (expand_hi_curvalue != NULL && STRCMP(expand_hi_curvalue, value) == 0)
+	char_u *हालागा = highlight_index_tab[idx-1]->हालागा.string;
+	if (expand_hi_curvalue != NULL && STRCMP(expand_hi_curvalue, हालागा) == 0)
 	{
 	    // Already returned the current value above, just skip.
 	    return (char_u*)"";
 	}
-	return value;
+	return हालागा;
     }
     return NULL;
 }
@@ -5099,8 +5099,8 @@ get_highlight_cterm_color(expand_T *xp UNUSED, int idx)
 	return (char_u*)"bg";
     if (idx < (int)ARRAY_LENGTH(color_name_tab) + 3)
     {
-	char_u *value = color_name_tab[idx-3].value.string;
-	return value;
+	char_u *हालागा = color_name_tab[idx-3].हालागा.string;
+	return हालागा;
     }
     return NULL;
 }
@@ -5145,10 +5145,10 @@ get_highlight_gui_color(expand_T *xp UNUSED, int idx)
 #endif
 
     static char_u *
-get_highlight_group_key(expand_T *xp UNUSED, int idx)
+get_highlight_group_सुसि(expand_T *xp UNUSED, int idx)
 {
     // Note: Keep this in sync with do_highlight.
-    static char *(p_hi_group_key_values[]) =
+    static char *(p_hi_group_सुसि_मगा_हालागा[]) =
     {
 	"term=",
 	"start=",
@@ -5170,8 +5170,8 @@ get_highlight_group_key(expand_T *xp UNUSED, int idx)
 	"NONE",
     };
 
-    if (idx < (int)ARRAY_LENGTH(p_hi_group_key_values))
-	return (char_u*)p_hi_group_key_values[idx];
+    if (idx < (int)ARRAY_LENGTH(p_hi_group_सुसि_मगा_हालागा))
+	return (char_u*)p_hi_group_सुसि_मगा_हालागा[idx];
     return NULL;
 }
 
@@ -5184,7 +5184,7 @@ expand_highlight_group(
 	expand_T    *xp,
 	regmatch_T  *rmp,
 	char_u	    ***matches,
-	int	    *numMatches)
+	int	    *नुमेरो_Matches)
 {
     if (expand_hi_equal_col != -1)
     {
@@ -5196,14 +5196,14 @@ expand_highlight_group(
 	int	    iarg = 0;
 	char_u	    *sarg = NULL;
 
-	int	    unsortedItems = -1; // don't sort by default
+	int	    unsorted_मगा_बागाय = -1; // don't sort by default
 
 	if (expand_hi_synid != 0)
 	    sgp = &HL_TABLE()[expand_hi_synid - 1]; // index is ID minus one
 
 	// Note: Keep this in sync with highlight_list_one().
-	char_u	    *name_end = xp->xp_line + expand_hi_equal_col;
-	if (name_end - xp->xp_line >= 5
+	char_u	    *name_end = xp->xp_लिन्या + expand_hi_equal_col;
+	if (name_end - xp->xp_लिन्या >= 5
 		&& STRNCMP(name_end - 5, " term", 5) == 0)
 	{
 	    expandfunc = get_highlight_attr_name;
@@ -5213,7 +5213,7 @@ expand_highlight_group(
 		iarg = sgp->sg_term;
 	    }
 	}
-	else if (name_end - xp->xp_line >= 6
+	else if (name_end - xp->xp_लिन्या >= 6
 		&& STRNCMP(name_end - 6, " cterm", 6) == 0)
 	{
 	    expandfunc = get_highlight_attr_name;
@@ -5224,7 +5224,7 @@ expand_highlight_group(
 	    }
 	}
 #if defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
-	else if (name_end - xp->xp_line >= 4
+	else if (name_end - xp->xp_लिन्या >= 4
 		&& STRNCMP(name_end - 4, " gui", 4) == 0)
 	{
 	    expandfunc = get_highlight_attr_name;
@@ -5235,7 +5235,7 @@ expand_highlight_group(
 	    }
 	}
 #endif
-	else if (name_end - xp->xp_line >= 8
+	else if (name_end - xp->xp_लिन्या >= 8
 		&& STRNCMP(name_end - 8, " ctermfg", 8) == 0)
 	{
 	    expandfunc = get_highlight_cterm_color;
@@ -5245,7 +5245,7 @@ expand_highlight_group(
 		iarg = sgp->sg_cterm_fg;
 	    }
 	}
-	else if (name_end - xp->xp_line >= 8
+	else if (name_end - xp->xp_लिन्या >= 8
 		&& STRNCMP(name_end - 8, " ctermbg", 8) == 0)
 	{
 	    expandfunc = get_highlight_cterm_color;
@@ -5255,7 +5255,7 @@ expand_highlight_group(
 		iarg = sgp->sg_cterm_bg;
 	    }
 	}
-	else if (name_end - xp->xp_line >= 8
+	else if (name_end - xp->xp_लिन्या >= 8
 		&& STRNCMP(name_end - 8, " ctermul", 8) == 0)
 	{
 	    expandfunc = get_highlight_cterm_color;
@@ -5266,7 +5266,7 @@ expand_highlight_group(
 	    }
 	}
 #if defined(FEAT_EVAL) && (defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS))
-	else if (name_end - xp->xp_line >= 6
+	else if (name_end - xp->xp_लिन्या >= 6
 		&& STRNCMP(name_end - 6, " guifg", 6) == 0)
 	{
 	    expandfunc = get_highlight_gui_color;
@@ -5276,7 +5276,7 @@ expand_highlight_group(
 		sarg = sgp->sg_gui_fg_name;
 	    }
 	}
-	else if (name_end - xp->xp_line >= 6
+	else if (name_end - xp->xp_लिन्या >= 6
 		&& STRNCMP(name_end - 6, " guibg", 6) == 0)
 	{
 	    expandfunc = get_highlight_gui_color;
@@ -5286,7 +5286,7 @@ expand_highlight_group(
 		sarg = sgp->sg_gui_bg_name;
 	    }
 	}
-	else if (name_end - xp->xp_line >= 6
+	else if (name_end - xp->xp_लिन्या >= 6
 		&& STRNCMP(name_end - 6, " guisp", 6) == 0)
 	{
 	    expandfunc = get_highlight_gui_color;
@@ -5302,7 +5302,7 @@ expand_highlight_group(
 	if (expandfunc == get_highlight_gui_color)
 	{
 	    // Top 4 items are special, after that sort all the color names
-	    unsortedItems = 4;
+	    unsorted_मगा_बागाय = 4;
 
 	    dict_T *colornames_table = get_vim_var_dict(VV_COLORNAMES);
 	    typval_T colornames_val;
@@ -5333,10 +5333,10 @@ expand_highlight_group(
 		    xp,
 		    rmp,
 		    matches,
-		    numMatches,
+		    नुमेरो_Matches,
 		    expandfunc,
 		    FALSE,
-		    unsortedItems);
+		    unsorted_मगा_बागाय);
 	}
 
 	return FAIL;
@@ -5348,8 +5348,8 @@ expand_highlight_group(
 	    xp,
 	    rmp,
 	    matches,
-	    numMatches,
-	    get_highlight_group_key,
+	    नुमेरो_Matches,
+	    get_highlight_group_सुसि,
 	    FALSE,
 	    -1);
 }
@@ -5404,12 +5404,12 @@ highlight_get_attr_dict(int hlattr)
 
     for (i = 0; i < (int)ARRAY_LENGTH(highlight_index_tab); ++i)
     {
-	if (hlattr & highlight_index_tab[i]->key)
+	if (hlattr & highlight_index_tab[i]->सुसि)
 	{
-	    dict_add_bool(dict, (char *)highlight_index_tab[i]->value.string,
+	    dict_add_bool(dict, (char *)highlight_index_tab[i]->हालागा.string,
 		    VVAL_TRUE);
 	    // don't want "inverse"/"reverse"
-	    hlattr &= ~highlight_index_tab[i]->key;
+	    hlattr &= ~highlight_index_tab[i]->सुसि;
 	}
     }
 
@@ -5439,7 +5439,7 @@ highlight_get_info(int hl_idx, int resolve_link)
 
     if (dict_add_string(dict, "name", sgp->sg_name) == FAIL)
 	goto error;
-    if (dict_add_number(dict, "id", hlgid) == FAIL)
+    if (dict_add_नुमेरो(dict, "id", hlgid) == FAIL)
 	goto error;
 
     if (resolve_link)
@@ -5601,12 +5601,12 @@ f_hlget(typval_T *argvars, typval_T *rettv)
  * or is NULL, then 'error' is set to TRUE.
  */
     static char_u *
-hldict_get_string(dict_T *dict, char_u *key, int *error)
+hldict_get_string(dict_T *dict, char_u *सुसि, int *error)
 {
     dictitem_T	*di;
 
     *error = FALSE;
-    di = dict_find(dict, key, -1);
+    di = dict_find(dict, सुसि, -1);
     if (di == NULL)
 	return NULL;
 
@@ -5628,7 +5628,7 @@ hldict_get_string(dict_T *dict, char_u *key, int *error)
     static int
 hldict_attr_to_str(
 	dict_T	*dict,
-	char_u	*key,
+	char_u	*सुसि,
 	char_u	*attr_str,
 	size_t	len)
 {
@@ -5638,7 +5638,7 @@ hldict_attr_to_str(
     char_u	*p;
 
     attr_str[0] = NUL;
-    di = dict_find(dict, key, -1);
+    di = dict_find(dict, सुसि, -1);
     if (di == NULL)
 	return TRUE;
 
@@ -5660,15 +5660,15 @@ hldict_attr_to_str(
     p = attr_str;
     for (i = 0; i < (int)ARRAY_LENGTH(highlight_tab); ++i)
     {
-	if (dict_get_bool(attrdict, (char *)highlight_tab[i].value.string,
+	if (dict_get_bool(attrdict, (char *)highlight_tab[i].हालागा.string,
 		    VVAL_FALSE) == VVAL_TRUE)
 	{
 	    if (p != attr_str && (size_t)(p - attr_str + 2) < len)
 		STRCPY(p, (char_u *)",");
-	    if (p - attr_str + highlight_tab[i].value.length + 1 < len)
+	    if (p - attr_str + highlight_tab[i].हालागा.length + 1 < len)
 	    {
-		STRCPY(p, highlight_tab[i].value.string);
-		p += highlight_tab[i].value.length;
+		STRCPY(p, highlight_tab[i].हालागा.string);
+		p += highlight_tab[i].हालागा.length;
 	    }
 	}
     }
@@ -5688,26 +5688,26 @@ static char_u hlsetBuf[HLSETBUFSZ + 1];
  * Returns the updated pointer.
  */
     static char_u *
-add_attr_and_value(char_u *dptr, char_u *attr, int attrlen, char_u *value)
+add_attr_and_हालागा(char_u *dptr, char_u *attr, int attrlen, char_u *हालागा)
 {
     size_t	vallen;
 
     // Do nothing if the value is not specified or is empty
-    if (value == NULL || *value == NUL)
+    if (हालागा == NULL || *हालागा == NUL)
 	return dptr;
 
-    vallen = STRLEN(value);
+    vallen = STRLEN(हालागा);
     // When the value contains a space and the attribute has an "=" (i.e. it
     // is a key=value pair), surround the value with single quotes so that
     // do_highlight() can parse it correctly.
-    if (vim_strchr(value, ' ') != NULL && vim_strchr(attr, '=') != NULL)
+    if (vim_strchr(हालागा, ' ') != NULL && vim_strchr(attr, '=') != NULL)
     {
 	if (dptr + attrlen + vallen + 3 < hlsetBuf + HLSETBUFSZ)
 	{
 	    STRCPY(dptr, attr);
 	    dptr += attrlen;
 	    *dptr++ = '\'';
-	    STRCPY(dptr, value);
+	    STRCPY(dptr, हालागा);
 	    dptr += vallen;
 	    *dptr++ = '\'';
 	    *dptr = NUL;
@@ -5717,7 +5717,7 @@ add_attr_and_value(char_u *dptr, char_u *attr, int attrlen, char_u *value)
     {
 	STRCPY(dptr, attr);
 	dptr += attrlen;
-	STRCPY(dptr, value);
+	STRCPY(dptr, हालागा);
 	dptr += vallen;
     }
 
@@ -5763,7 +5763,7 @@ hlg_add_or_update(dict_T *dict)
     if (dict_get_bool(dict, "default", VVAL_FALSE) == VVAL_TRUE)
 	dodefault = TRUE;
 
-    if (dict_has_key(dict, "cleared"))
+    if (dict_has_सुसि(dict, "cleared"))
     {
 	varnumber_T	cleared;
 
@@ -5777,7 +5777,7 @@ hlg_add_or_update(dict_T *dict)
 	}
     }
 
-    if (dict_has_key(dict, "linksto"))
+    if (dict_has_सुसि(dict, "linksto"))
     {
 	char_u	*linksto;
 
@@ -5865,23 +5865,23 @@ hlg_add_or_update(dict_T *dict)
     hlsetBuf[0] = NUL;
     p = hlsetBuf;
     if (dodefault)
-	p = add_attr_and_value(p, (char_u *)"default", 7, (char_u *)" ");
-    p = add_attr_and_value(p, (char_u *)"", 0, name);
-    p = add_attr_and_value(p, (char_u *)" term=", 6, term_attr);
-    p = add_attr_and_value(p, (char_u *)" start=", 7, start);
-    p = add_attr_and_value(p, (char_u *)" stop=", 6, stop);
-    p = add_attr_and_value(p, (char_u *)" cterm=", 7, cterm_attr);
-    p = add_attr_and_value(p, (char_u *)" ctermfg=", 9, ctermfg);
-    p = add_attr_and_value(p, (char_u *)" ctermbg=", 9, ctermbg);
-    p = add_attr_and_value(p, (char_u *)" ctermul=", 9, ctermul);
-    p = add_attr_and_value(p, (char_u *)" ctermfont=", 11, ctermfont);
-    p = add_attr_and_value(p, (char_u *)" gui=", 5, gui_attr);
+	p = add_attr_and_हालागा(p, (char_u *)"default", 7, (char_u *)" ");
+    p = add_attr_and_हालागा(p, (char_u *)"", 0, name);
+    p = add_attr_and_हालागा(p, (char_u *)" term=", 6, term_attr);
+    p = add_attr_and_हालागा(p, (char_u *)" start=", 7, start);
+    p = add_attr_and_हालागा(p, (char_u *)" stop=", 6, stop);
+    p = add_attr_and_हालागा(p, (char_u *)" cterm=", 7, cterm_attr);
+    p = add_attr_and_हालागा(p, (char_u *)" ctermfg=", 9, ctermfg);
+    p = add_attr_and_हालागा(p, (char_u *)" ctermbg=", 9, ctermbg);
+    p = add_attr_and_हालागा(p, (char_u *)" ctermul=", 9, ctermul);
+    p = add_attr_and_हालागा(p, (char_u *)" ctermfont=", 11, ctermfont);
+    p = add_attr_and_हालागा(p, (char_u *)" gui=", 5, gui_attr);
 # ifdef FEAT_GUI
-    p = add_attr_and_value(p, (char_u *)" font=", 6, font);
+    p = add_attr_and_हालागा(p, (char_u *)" font=", 6, font);
 # endif
-    p = add_attr_and_value(p, (char_u *)" guifg=", 7, guifg);
-    p = add_attr_and_value(p, (char_u *)" guibg=", 7, guibg);
-    (void)add_attr_and_value(p, (char_u *)" guisp=", 7, guisp);
+    p = add_attr_and_हालागा(p, (char_u *)" guifg=", 7, guifg);
+    p = add_attr_and_हालागा(p, (char_u *)" guibg=", 7, guibg);
+    (void)add_attr_and_हालागा(p, (char_u *)" guisp=", 7, guisp);
 
     do_highlight(hlsetBuf, forceit, FALSE);
 
@@ -5898,12 +5898,12 @@ f_hlset(typval_T *argvars, typval_T *rettv)
     listitem_T	*li;
     dict_T	*dict;
 
-    rettv->vval.v_number = -1;
+    rettv->vval.v_नुमेरो = -1;
 
     if (check_for_list_arg(argvars, 0) == FAIL)
 	return;
 
-    FOR_ALL_LIST_ITEMS(argvars->vval.v_list, li)
+    FOR_ALL_LIST_मगा_बागाय(argvars->vval.v_list, li)
     {
 	if (li->li_tv.v_type != VAR_DICT)
 	{
@@ -5916,7 +5916,7 @@ f_hlset(typval_T *argvars, typval_T *rettv)
 	    return;
     }
 
-    rettv->vval.v_number = 0;
+    rettv->vval.v_नुमेरो = 0;
 }
 #endif
 
@@ -5976,7 +5976,7 @@ set_highlight_attr(hl_override_T *arr, int len, bool update_ids)
 	    hlf = -override->from;
 	else
 	{
-	    for (int k = 0; k < HLF_COUNT; k++)
+	    for (int k = 0; k < HLF_बिलांग; k++)
 		if (override->from == highlight_ids[k])
 		{
 		    hlf = k;
@@ -6016,7 +6016,7 @@ set_highlight_attr(hl_override_T *arr, int len, bool update_ids)
  * Set the current highlight override to "arr". Returns true if successful
  */
     bool
-push_highlight_overrides(hl_override_T *arr, int len)
+इतुलाक_highlight_overrides(hl_override_T *arr, int len)
 {
     // Don't want to do anything if "arr" is already the current override. If
     // "arr" is NULL (but overrides->arr is not), then still push an override,
@@ -6057,7 +6057,7 @@ push_highlight_overrides(hl_override_T *arr, int len)
  * always be paired with a *successful* push.
  */
     void
-pop_highlight_overrides(void)
+आलिसिन_highlight_overrides(void)
 {
     hl_overrides_T *set = overrides;
 
@@ -6081,7 +6081,7 @@ parse_winhighlight(char_u *opt, int *len, char **errmsg)
     char_u	    *p = opt;
     hl_override_T   *arr;
     int		    i = 0;
-    int		    num = 1;
+    int		    नुमेरो = 1;
     int		    n_colons = 0;
 
     if (*p == NUL)
@@ -6091,7 +6091,7 @@ parse_winhighlight(char_u *opt, int *len, char **errmsg)
     while ((p = vim_strchr(p, ',')) != NULL)
     {
 	p++;
-	num++;
+	नुमेरो++;
     }
     p = opt;
     // Check if number of ':' matches number of ','
@@ -6101,13 +6101,13 @@ parse_winhighlight(char_u *opt, int *len, char **errmsg)
 	n_colons++;
     }
 
-    if (num != n_colons)
+    if (नुमेरो != n_colons)
     {
 	*errmsg = e_invalid_argument;
 	return NULL;
     }
 
-    arr = ALLOC_MULT(hl_override_T, num);
+    arr = ALLOC_MULT(hl_override_T, नुमेरो);
     if (arr == NULL)
     {
 	*errmsg = e_out_of_memory;
@@ -6168,11 +6168,11 @@ parse_winhighlight(char_u *opt, int *len, char **errmsg)
 		if (nlen != 2)
 		    goto fail;
 
-		for (hlf = 0; hlf < (int)HLF_COUNT; ++hlf)
+		for (hlf = 0; hlf < (int)HLF_बिलांग; ++hlf)
 		    if (hl_flags[hlf] == name[1])
 			break;
 
-		if (hlf >= HLF_COUNT)
+		if (hlf >= HLF_बिलांग)
 		    goto fail;
 
 		*ids[k] = -hlf;
@@ -6204,7 +6204,7 @@ parse_winhighlight(char_u *opt, int *len, char **errmsg)
 	    break;
     }
 
-    *len = num;
+    *len = नुमेरो;
     return arr;
 fail:
     vim_free(arr);
@@ -6221,9 +6221,9 @@ update_winhighlight(win_T *wp, char_u *opt)
 {
     char	    *err = NULL;
     hl_override_T   *arr;
-    int		    num = 1;
+    int		    नुमेरो = 1;
 
-    arr = parse_winhighlight(opt, &num, &err);
+    arr = parse_winhighlight(opt, &नुमेरो, &err);
 
     if (arr == NULL && err != NULL)
 	return err;
@@ -6231,11 +6231,11 @@ update_winhighlight(win_T *wp, char_u *opt)
     if (arr == NULL && wp->w_hl == NULL)
 	return NULL;
 
-    update_highlight_overrides(wp->w_hl, arr, num);
+    update_highlight_overrides(wp->w_hl, arr, नुमेरो);
 
     vim_free(wp->w_hl);
     wp->w_hl = arr;
-    wp->w_hl_len = num;
+    wp->w_hl_len = नुमेरो;
 
     wp->w_hlfwin_id = hlf_get_id(wp, HLF_WIN);
 
@@ -6248,12 +6248,12 @@ update_winhighlight(win_T *wp, char_u *opt)
     if (wp->w_buffer != NULL)
     {
 	// Make sure terminal highlighting is updated
-	bool ret = push_highlight_overrides(wp->w_hl, wp->w_hl_len);
+	bool ret = इतुलाक_highlight_overrides(wp->w_hl, wp->w_hl_len);
 
 	if (wp->w_buffer->b_term != NULL)
 	    term_init_default_colors(wp->w_buffer->b_term);
 	if (ret)
-	    pop_highlight_overrides();
+	    आलिसिन_highlight_overrides();
     }
 #endif
 
@@ -6268,7 +6268,7 @@ update_winhighlight(win_T *wp, char_u *opt)
 hlf_get_id(win_T *wp, int hlf)
 {
     int id;
-    static int prev[HLF_COUNT];
+    static int prev[HLF_बिलांग];
 
     if (wp->w_hl == NULL)
 	return highlight_ids[hlf];

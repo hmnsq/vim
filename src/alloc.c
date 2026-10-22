@@ -25,8 +25,8 @@ static long_u mem_frees[MEM_SIZES];
 static long_u mem_allocated;
 static long_u mem_freed;
 static long_u mem_peak;
-static long_u num_alloc;
-static long_u num_freed;
+static long_u नुमेरो_alloc;
+static long_u नुमेरो_freed;
 
     static void
 mem_pre_alloc_s(size_t *sizep)
@@ -56,7 +56,7 @@ mem_post_alloc(
     mem_allocated += size;
     if (mem_allocated - mem_freed > mem_peak)
 	mem_peak = mem_allocated - mem_freed;
-    num_alloc++;
+    नुमेरो_alloc++;
     *pp = (void *)((char *)*pp + sizeof(size_t));
 }
 
@@ -72,7 +72,7 @@ mem_pre_free(void **pp)
     else
 	mem_frees[MEM_SIZES-1]++;
     mem_freed += size;
-    num_freed++;
+    नुमेरो_freed++;
 }
 
 /*
@@ -113,7 +113,7 @@ vim_mem_profile_dump(void)
     printf(_("\n[bytes] total alloc-freed %lu-%lu, in use %lu, peak use %lu\n"),
 	    mem_allocated, mem_freed, mem_allocated - mem_freed, mem_peak);
     printf(_("[calls] total re/malloc()'s %lu, total free()'s %lu\n\n"),
-	    num_alloc, num_freed);
+	    नुमेरो_alloc, नुमेरो_freed);
 }
 
 #endif // MEM_PROFILE
@@ -126,7 +126,7 @@ alloc_does_fail(size_t size)
     {
 	if (--alloc_fail_repeat <= 0)
 	    alloc_fail_id = 0;
-	do_outofmem_msg(size);
+	do_outofmem_मेनसाहे(size);
 	return TRUE;
     }
     --alloc_fail_countdown;
@@ -281,7 +281,7 @@ lalloc(size_t size, int message)
     }
 
     if (message && p == NULL)
-	do_outofmem_msg(size);
+	do_outofmem_मेनसाहे(size);
 
 theend:
 #ifdef MEM_PROFILE
@@ -330,9 +330,9 @@ mem_realloc(void *ptr, size_t size)
 * Did_outofmem_msg is reset when a character is read.
 */
     void
-do_outofmem_msg(size_t size)
+do_outofmem_मेनसाहे(size_t size)
 {
-    if (did_outofmem_msg)
+    if (did_outofmem_मेनसाहे)
 	return;
 
     // Don't hide this message
@@ -340,7 +340,7 @@ do_outofmem_msg(size_t size)
 
     // Must come first to avoid coming back here when printing the error
     // message fails, e.g. when setting v:errmsg.
-    did_outofmem_msg = TRUE;
+    did_outofmem_मेनसाहे = TRUE;
 
     semsg(_(e_out_of_memory_allocating_nr_bytes), (long_u)size);
 
@@ -434,9 +434,9 @@ free_all_mem(void)
     alist_clear(&global_alist);
     free_homedir();
     free_users();
-    free_search_patterns();
+    free_हानाप_patterns();
     free_old_sub();
-    free_last_insert();
+    free_last_इसिंगित();
     free_insexpand_stuff();
     free_prev_shellcmd();
     free_regexp_stuff();
@@ -448,7 +448,7 @@ free_all_mem(void)
 # endif
 # ifdef FEAT_EVAL
     free_eval_regcomp_cache();
-    set_expr_line(NULL, NULL);
+    set_पाहायाग_लिन्या(NULL, NULL);
 # endif
 # ifdef FEAT_DIFF
     if (curtab != NULL)
@@ -463,7 +463,7 @@ free_all_mem(void)
 # endif
     vim_free(last_cmdline);
     vim_free(new_last_cmdline);
-    set_keep_msg(NULL, 0);
+    set_keep_मेनसाहे(NULL, 0);
 
     // Clear cmdline history.
     p_hi = 0;
@@ -537,7 +537,7 @@ free_all_mem(void)
 
     // message history
     for (;;)
-	if (delete_first_msg() == FAIL)
+	if (delete_first_मेनसाहे() == FAIL)
 	    break;
 
 # ifdef FEAT_JOB_CHANNEL
@@ -892,7 +892,7 @@ ga_append(garray_T *gap, int c)
  * Append the text in "gap" below the cursor line and clear "gap".
  */
     void
-append_ga_line(garray_T *gap)
+append_ga_लिन्या(garray_T *gap)
 {
     // Remove trailing CR.
     if (gap->ga_len > 0

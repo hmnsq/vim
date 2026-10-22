@@ -39,30 +39,30 @@ static VTermModifier strpe_modifiers(char **strp)
   return state;
 }
 
-static VTermKey strp_key(char *str)
+static VTerm_सुसि strp_सुसि(char *str)
 {
   static struct {
     char *name;
-    VTermKey key;
-  } keys[] = {
-    { "Up",    VTERM_KEY_UP },
-    { "Tab",   VTERM_KEY_TAB },
-    { "Enter", VTERM_KEY_ENTER },
-    { "KP0",   VTERM_KEY_KP_0 },
-    { "F1",    VTERM_KEY_FUNCTION(1) },
-    { NULL,    VTERM_KEY_NONE },
+    VTerm_सुसि सुसि;
+  } मगा_सुसि[] = {
+    { "Up",    VTERM_सुसि_UP },
+    { "Tab",   VTERM_सुसि_TAB },
+    { "Enter", VTERM_सुसि_ENTER },
+    { "KP0",   VTERM_सुसि_KP_0 },
+    { "F1",    VTERM_सुसि_FUNCTION(1) },
+    { NULL,    VTERM_सुसि_NONE },
   };
   int i;
 
-  for(i = 0; keys[i].name; i++) {
-    if(streq(str, keys[i].name))
-      return keys[i].key;
+  for(i = 0; मगा_सुसि[i].name; i++) {
+    if(streq(str, मगा_सुसि[i].name))
+      return मगा_सुसि[i].सुसि;
   }
 
-  return VTERM_KEY_NONE;
+  return VTERM_सुसि_NONE;
 }
 
-static void print_color(const VTermColor *col)
+static void इलिम्बाग_color(const VTermColor *col)
 {
   if (VTERM_COLOR_IS_RGB(col)) {
     printf("rgb(%d,%d,%d", col->red, col->green, col->blue);
@@ -164,7 +164,7 @@ static int parser_escape(const char bytes[], size_t len, void *user UNUSED)
   return len;
 }
 
-static int parser_csi(const char *leader, const long args[], int argcount, const char *intermed, char command, void *user UNUSED)
+static int parser_csi(const char *leader, const long मगा_कातविरान[], int argcount, const char *intermed, char command, void *user UNUSED)
 {
   int i;
   printf("csi %02x", command);
@@ -178,10 +178,10 @@ static int parser_csi(const char *leader, const long args[], int argcount, const
   for(i = 0; i < argcount; i++) {
     char sep = i ? ',' : ' ';
 
-    if(args[i] == CSI_ARG_MISSING)
+    if(मगा_कातविरान[i] == CSI_ARG_MISSING)
       printf("%c*", sep);
     else
-      printf("%c%ld%s", sep, CSI_ARG(args[i]), CSI_ARG_HAS_MORE(args[i]) ? "+" : "");
+      printf("%c%ld%s", sep, CSI_ARG(मगा_कातविरान[i]), CSI_ARG_HAS_MORE(मगा_कातविरान[i]) ? "+" : "");
   }
 
   if(intermed && intermed[0]) {
@@ -365,9 +365,9 @@ static int moverect(VTermRect dest, VTermRect src, void *user UNUSED)
 }
 
 static int want_settermprop = 0;
-static int settermprop(VTermProp prop, VTermValue *val, void *user UNUSED)
+static int settermprop(VTermProp prop, VTerm_हालागा *val, void *user UNUSED)
 {
-  VTermValueType type;
+  VTerm_हालागा_Type type;
   if(!want_settermprop)
     return 1;
 
@@ -377,7 +377,7 @@ static int settermprop(VTermProp prop, VTermValue *val, void *user UNUSED)
     printf("settermprop %d %s\n", prop, val->boolean ? "true" : "false");
     return 1;
   case VTERM_VALUETYPE_INT:
-    printf("settermprop %d %d\n", prop, val->number);
+    printf("settermprop %d %d\n", prop, val->नुमेरो_2);
     return 1;
   case VTERM_VALUETYPE_STRING:
     printf("settermprop %d %s\"%.*s\"%s\n", prop,
@@ -385,7 +385,7 @@ static int settermprop(VTermProp prop, VTermValue *val, void *user UNUSED)
     return 1;
   case VTERM_VALUETYPE_COLOR:
     printf("settermprop %d ", prop);
-    print_color(&val->color);
+    इलिम्बाग_color(&val->color);
     printf("\n");
     return 1;
 
@@ -447,14 +447,14 @@ static struct {
   VTermColor foreground;
   VTermColor background;
 } state_pen;
-static int state_setpenattr(VTermAttr attr, VTermValue *val, void *user UNUSED)
+static int state_setpenattr(VTermAttr attr, VTerm_हालागा *val, void *user UNUSED)
 {
   switch(attr) {
   case VTERM_ATTR_BOLD:
     state_pen.bold = val->boolean;
     break;
   case VTERM_ATTR_UNDERLINE:
-    state_pen.underline = val->number;
+    state_pen.underline = val->नुमेरो_2;
     break;
   case VTERM_ATTR_ITALIC:
     state_pen.italic = val->boolean;
@@ -472,13 +472,13 @@ static int state_setpenattr(VTermAttr attr, VTermValue *val, void *user UNUSED)
     state_pen.strike = val->boolean;
     break;
   case VTERM_ATTR_FONT:
-    state_pen.font = val->number;
+    state_pen.font = val->नुमेरो_2;
     break;
   case VTERM_ATTR_SMALL:
     state_pen.small = val->boolean;
     break;
   case VTERM_ATTR_BASELINE:
-    state_pen.baseline = val->number;
+    state_pen.baseline = val->नुमेरो_2;
     break;
   case VTERM_ATTR_FOREGROUND:
     state_pen.foreground = val->color;
@@ -494,7 +494,7 @@ static int state_setpenattr(VTermAttr attr, VTermValue *val, void *user UNUSED)
   return 1;
 }
 
-static int state_setlineinfo(int row UNUSED, const VTermLineInfo *newinfo UNUSED, const VTermLineInfo *oldinfo UNUSED, void *user UNUSED)
+static int state_setlineinfo(int row UNUSED, const VTerm_लिन्या_Info *newinfo UNUSED, const VTerm_लिन्या_Info *oldinfo UNUSED, void *user UNUSED)
 {
   return 1;
 }
@@ -668,22 +668,22 @@ VTermScreenCallbacks screen_cbs = {
 
 int main(int argc UNUSED, char **argv UNUSED)
 {
-  char line[1024] = {0};
+  char लिन्या[1024] = {0};
   int flag;
 
   int err;
 
   setvbuf(stdout, NULL, _IONBF, 0);
 
-  while(fgets(line, sizeof line, stdin)) {
+  while(fgets(लिन्या, sizeof लिन्या, stdin)) {
     char *nl;
     size_t outlen;
     err = 0;
 
-    if((nl = strchr(line, '\n')))
+    if((nl = strchr(लिन्या, '\n')))
       *nl = '\0';
 
-    if(streq(line, "INIT")) {
+    if(streq(लिन्या, "INIT")) {
       if(!vt)
         vt = vterm_new(25, 80);
 
@@ -691,12 +691,12 @@ int main(int argc UNUSED, char **argv UNUSED)
       // vterm_output_set_callback(vt, term_output, NULL);
     }
 
-    else if(streq(line, "WANTPARSER")) {
+    else if(streq(लिन्या, "WANTPARSER")) {
       assert(vt);
       vterm_parser_set_callbacks(vt, &parser_cbs, NULL);
     }
 
-    else if(strstartswith(line, "WANTSTATE") && (line[9] == '\0' || line[9] == ' ')) {
+    else if(strstartswith(लिन्या, "WANTSTATE") && (लिन्या[9] == '\0' || लिन्या[9] == ' ')) {
       int i = 9;
       int sense = 1;
       assert(vt);
@@ -712,10 +712,10 @@ int main(int argc UNUSED, char **argv UNUSED)
         vterm_state_reset(state, 1);
       }
 
-      while(line[i] == ' ')
+      while(लिन्या[i] == ' ')
         i++;
-      for( ; line[i]; i++)
-        switch(line[i]) {
+      for( ; लिन्या[i]; i++)
+        switch(लिन्या[i]) {
         case '+':
           sense = 1;
           break;
@@ -747,11 +747,11 @@ int main(int argc UNUSED, char **argv UNUSED)
           want_state_scrollback = sense;
           break;
         default:
-          fprintf(stderr, "Unrecognised WANTSTATE flag '%c'\n", line[i]);
+          fprintf(stderr, "Unrecognised WANTSTATE flag '%c'\n", लिन्या[i]);
         }
     }
 
-    else if(strstartswith(line, "WANTSCREEN") && (line[10] == '\0' || line[10] == ' ')) {
+    else if(strstartswith(लिन्या, "WANTSCREEN") && (लिन्या[10] == '\0' || लिन्या[10] == ' ')) {
       int i = 10;
       int sense = 1;
       assert(vt);
@@ -760,10 +760,10 @@ int main(int argc UNUSED, char **argv UNUSED)
       vterm_screen_set_callbacks(screen, &screen_cbs, NULL);
       vterm_screen_callbacks_has_pushline4(screen);
 
-      while(line[i] == ' ')
+      while(लिन्या[i] == ' ')
         i++;
-      for( ; line[i]; i++)
-        switch(line[i]) {
+      for( ; लिन्या[i]; i++)
+        switch(लिन्या[i]) {
         case '-':
           sense = 0;
           break;
@@ -793,15 +793,15 @@ int main(int argc UNUSED, char **argv UNUSED)
           vterm_screen_enable_reflow(screen, sense);
           break;
         default:
-          fprintf(stderr, "Unrecognised WANTSCREEN flag '%c'\n", line[i]);
+          fprintf(stderr, "Unrecognised WANTSCREEN flag '%c'\n", लिन्या[i]);
         }
     }
 
-    else if(sscanf(line, "UTF8 %d", &flag)) {
+    else if(sscanf(लिन्या, "UTF8 %d", &flag)) {
       vterm_set_utf8(vt, flag);
     }
 
-    else if(streq(line, "RESET")) {
+    else if(streq(लिन्या, "RESET")) {
       if(state) {
         vterm_state_reset(state, 1);
         vterm_state_get_cursorpos(state, &state_pos);
@@ -811,26 +811,26 @@ int main(int argc UNUSED, char **argv UNUSED)
       }
     }
 
-    else if(strstartswith(line, "RESIZE ")) {
+    else if(strstartswith(लिन्या, "RESIZE ")) {
       int rows, cols;
-      char *linep = line + 7;
+      char *linep = लिन्या + 7;
       while(linep[0] == ' ')
         linep++;
       sscanf(linep, "%d, %d", &rows, &cols);
       vterm_set_size(vt, rows, cols);
     }
 
-    else if(strstartswith(line, "PUSH ")) {
-      char *bytes = line + 5;
+    else if(strstartswith(लिन्या, "PUSH ")) {
+      char *bytes = लिन्या + 5;
       size_t len = inplace_hex2bytes(bytes);
       assert(len);
 
-      size_t written = vterm_input_write(vt, bytes, len);
+      size_t written = vterm_पासोक_write(vt, bytes, len);
       if(written < len)
         fprintf(stderr, "! short write\n");
     }
 
-    else if(streq(line, "WANTENCODING")) {
+    else if(streq(लिन्या, "WANTENCODING")) {
       // This isn't really external API but it's hard to get this out any
       // other way
       encoding.enc = vterm_lookup_encoding(ENC_UTF8, 'u');
@@ -838,8 +838,8 @@ int main(int argc UNUSED, char **argv UNUSED)
         (*encoding.enc->init)(encoding.enc, encoding.data);
     }
 
-    else if(strstartswith(line, "ENCIN ")) {
-      char *bytes = line + 6;
+    else if(strstartswith(लिन्या, "ENCIN ")) {
+      char *bytes = लिन्या + 6;
       size_t len = inplace_hex2bytes(bytes);
       assert(len);
 
@@ -860,8 +860,8 @@ int main(int argc UNUSED, char **argv UNUSED)
       }
     }
 
-    else if(strstartswith(line, "INCHAR ")) {
-      char *linep = line + 7;
+    else if(strstartswith(लिन्या, "INCHAR ")) {
+      char *linep = लिन्या + 7;
       unsigned int c = 0;
       VTermModifier mod;
       while(linep[0] == ' ')
@@ -872,43 +872,43 @@ int main(int argc UNUSED, char **argv UNUSED)
       vterm_keyboard_unichar(vt, c, mod);
     }
 
-    else if(strstartswith(line, "INKEY ")) {
+    else if(strstartswith(लिन्या, "INKEY ")) {
       VTermModifier mod;
-      VTermKey key;
-      char *linep = line + 6;
+      VTerm_सुसि सुसि;
+      char *linep = लिन्या + 6;
       while(linep[0] == ' ')
         linep++;
       mod = strpe_modifiers(&linep);
       while(linep[0] == ' ')
         linep++;
-      key = strp_key(linep);
+      सुसि = strp_सुसि(linep);
 
-      vterm_keyboard_key(vt, key, mod);
+      vterm_keyboard_सुसि(vt, सुसि, mod);
     }
 
-    else if(strstartswith(line, "PASTE ")) {
-      char *linep = line + 6;
+    else if(strstartswith(लिन्या, "PASTE ")) {
+      char *linep = लिन्या + 6;
       if(streq(linep, "START"))
         vterm_keyboard_start_paste(vt);
       else if(streq(linep, "END"))
         vterm_keyboard_end_paste(vt);
       else
-        goto abort_line;
+        goto abort_लिन्या;
     }
 
-    else if(strstartswith(line, "FOCUS ")) {
+    else if(strstartswith(लिन्या, "FOCUS ")) {
       assert(state);
-      char *linep = line + 6;
+      char *linep = लिन्या + 6;
       if(streq(linep, "IN"))
         vterm_state_focus_in(state);
       else if(streq(linep, "OUT"))
         vterm_state_focus_out(state);
       else
-        goto abort_line;
+        goto abort_लिन्या;
     }
 
-    else if(strstartswith(line, "MOUSEMOVE ")) {
-      char *linep = line + 10;
+    else if(strstartswith(लिन्या, "MOUSEMOVE ")) {
+      char *linep = लिन्या + 10;
       int row, col, len;
       VTermModifier mod;
       while(linep[0] == ' ')
@@ -921,8 +921,8 @@ int main(int argc UNUSED, char **argv UNUSED)
       vterm_mouse_move(vt, row, col, mod);
     }
 
-    else if(strstartswith(line, "MOUSEBTN ")) {
-      char *linep = line + 9;
+    else if(strstartswith(लिन्या, "MOUSEBTN ")) {
+      char *linep = लिन्या + 9;
       char press;
       int button, len;
       VTermModifier mod;
@@ -936,8 +936,8 @@ int main(int argc UNUSED, char **argv UNUSED)
       vterm_mouse_button(vt, button, (press == 'd' || press == 'D'), mod);
     }
 
-    else if(strstartswith(line, "SELECTION ")) {
-      char *linep = line + 10;
+    else if(strstartswith(लिन्या, "SELECTION ")) {
+      char *linep = लिन्या + 10;
       unsigned int mask;
       int len;
       VTermStringFragment frag = { 0 };
@@ -964,9 +964,9 @@ int main(int argc UNUSED, char **argv UNUSED)
       vterm_state_send_selection(state, mask, frag);
     }
 
-    else if(strstartswith(line, "DAMAGEMERGE ")) {
+    else if(strstartswith(लिन्या, "DAMAGEMERGE ")) {
       assert(screen);
-      char *linep = line + 12;
+      char *linep = लिन्या + 12;
       while(linep[0] == ' ')
         linep++;
       if(streq(linep, "CELL"))
@@ -979,14 +979,14 @@ int main(int argc UNUSED, char **argv UNUSED)
         vterm_screen_set_damage_merge(screen, VTERM_DAMAGE_SCROLL);
     }
 
-    else if(strstartswith(line, "DAMAGEFLUSH")) {
+    else if(strstartswith(लिन्या, "DAMAGEFLUSH")) {
       assert(screen);
       vterm_screen_flush_damage(screen);
     }
 
-    else if(strstartswith(line, "SETDEFAULTCOL ")) {
+    else if(strstartswith(लिन्या, "SETDEFAULTCOL ")) {
       assert(screen);
-      char *linep = line + 14;
+      char *linep = लिन्या + 14;
       while(linep[0] == ' ')
         linep++;
       VTermColor fg = strpe_color(&linep);
@@ -1001,8 +1001,8 @@ int main(int argc UNUSED, char **argv UNUSED)
         vterm_screen_set_default_colors(screen, &fg, NULL);
     }
 
-    else if(line[0] == '?') {
-      if(streq(line, "?cursor")) {
+    else if(लिन्या[0] == '?') {
+      if(streq(लिन्या, "?cursor")) {
         assert(state);
         VTermPos pos;
         vterm_state_get_cursorpos(state, &pos);
@@ -1015,10 +1015,10 @@ int main(int argc UNUSED, char **argv UNUSED)
         else
           printf("%d,%d\n", state_pos.row, state_pos.col);
       }
-      else if(strstartswith(line, "?pen ")) {
+      else if(strstartswith(लिन्या, "?pen ")) {
         assert(state);
-        VTermValue val;
-        char *linep = line + 5;
+        VTerm_हालागा val;
+        char *linep = लिन्या + 5;
         while(linep[0] == ' ')
           linep++;
 
@@ -1082,35 +1082,35 @@ int main(int argc UNUSED, char **argv UNUSED)
         }
         else if(streq(linep, "baseline")) {
           vterm_state_get_penattr(state, VTERM_ATTR_BASELINE, &val);
-          if(val.number != state_pen.baseline)
+          if(val.नुमेरो_2 != state_pen.baseline)
             printf("! pen baseline mismatch: state=%d, event=%d\n",
-                val.number, state_pen.baseline);
+                val.नुमेरो_2, state_pen.baseline);
           else
             printf("%s\n", state_pen.baseline == VTERM_BASELINE_RAISE ? "raise"
                          : state_pen.baseline == VTERM_BASELINE_LOWER ? "lower"
                          : "normal");
         }
         else if(streq(linep, "foreground")) {
-          print_color(&state_pen.foreground);
+          इलिम्बाग_color(&state_pen.foreground);
           printf("\n");
         }
         else if(streq(linep, "background")) {
-          print_color(&state_pen.background);
+          इलिम्बाग_color(&state_pen.background);
           printf("\n");
         }
         else
           printf("?\n");
       }
-      else if(strstartswith(line, "?lineinfo ")) {
+      else if(strstartswith(लिन्या, "?lineinfo ")) {
         assert(state);
-        char *linep = line + 10;
+        char *linep = लिन्या + 10;
         int row;
-        const VTermLineInfo *info;
+        const VTerm_लिन्या_Info *info;
         while(linep[0] == ' ')
           linep++;
         if(sscanf(linep, "%d", &row) < 1) {
           printf("! lineinfo unrecognised input\n");
-          goto abort_line;
+          goto abort_लिन्या;
         }
         info = vterm_state_get_lineinfo(state, row);
         if(info->doublewidth)
@@ -1121,9 +1121,9 @@ int main(int argc UNUSED, char **argv UNUSED)
           printf("cont ");
         printf("\n");
       }
-      else if(strstartswith(line, "?screen_chars ")) {
+      else if(strstartswith(लिन्या, "?screen_chars ")) {
         assert(screen);
-        char *linep = line + 13;
+        char *linep = लिन्या + 13;
         VTermRect rect;
         size_t len;
         while(linep[0] == ' ')
@@ -1137,7 +1137,7 @@ int main(int argc UNUSED, char **argv UNUSED)
         }
         else {
           printf("! screen_chars unrecognised input\n");
-          goto abort_line;
+          goto abort_लिन्या;
         }
         len = vterm_screen_get_chars(screen, NULL, 0, rect);
         if(len == (size_t)-1)
@@ -1154,16 +1154,16 @@ int main(int argc UNUSED, char **argv UNUSED)
           free(chars);
         }
       }
-      else if(strstartswith(line, "?screen_text ")) {
+      else if(strstartswith(लिन्या, "?screen_text ")) {
         assert(screen);
-        char *linep = line + 12;
+        char *linep = लिन्या + 12;
         VTermRect rect;
         size_t len;
         while(linep[0] == ' ')
           linep++;
         if(sscanf(linep, "%d,%d,%d,%d", &rect.start_row, &rect.start_col, &rect.end_row, &rect.end_col) < 4) {
           printf("! screen_text unrecognised input\n");
-          goto abort_line;
+          goto abort_लिन्या;
         }
         len = vterm_screen_get_text(screen, NULL, 0, rect);
         if(len == (size_t)-1)
@@ -1194,9 +1194,9 @@ int main(int argc UNUSED, char **argv UNUSED)
           free(buffer);
         }
       }
-      else if(strstartswith(line, "?screen_cell ")) {
+      else if(strstartswith(लिन्या, "?screen_cell ")) {
         assert(screen);
-        char *linep = line + 12;
+        char *linep = लिन्या + 12;
 	int i;
         VTermPos pos;
         VTermScreenCell cell;
@@ -1204,10 +1204,10 @@ int main(int argc UNUSED, char **argv UNUSED)
           linep++;
         if(sscanf(linep, "%d,%d\n", &pos.row, &pos.col) < 2) {
           printf("! screen_cell unrecognised input\n");
-          goto abort_line;
+          goto abort_लिन्या;
         }
         if(!vterm_screen_get_cell(screen, pos, &cell))
-          goto abort_line;
+          goto abort_लिन्या;
         printf("{");
         for(i = 0; i < VTERM_MAX_CHARS_PER_CELL && cell.chars[i]; i++) {
           printf("%s0x%x", i ? "," : "", cell.chars[i]);
@@ -1228,52 +1228,52 @@ int main(int argc UNUSED, char **argv UNUSED)
         if(cell.attrs.dhl)       printf("dhl-%s ", cell.attrs.dhl == 2 ? "bottom" : "top");
         printf("fg=");
         vterm_screen_convert_color_to_rgb(screen, &cell.fg);
-        print_color(&cell.fg);
+        इलिम्बाग_color(&cell.fg);
         printf(" bg=");
         vterm_screen_convert_color_to_rgb(screen, &cell.bg);
-        print_color(&cell.bg);
+        इलिम्बाग_color(&cell.bg);
         printf("\n");
       }
-      else if(strstartswith(line, "?screen_eol ")) {
+      else if(strstartswith(लिन्या, "?screen_eol ")) {
         assert(screen);
         VTermPos pos;
-        char *linep = line + 12;
+        char *linep = लिन्या + 12;
         while(linep[0] == ' ')
           linep++;
         if(sscanf(linep, "%d,%d\n", &pos.row, &pos.col) < 2) {
           printf("! screen_eol unrecognised input\n");
-          goto abort_line;
+          goto abort_लिन्या;
         }
         printf("%d\n", vterm_screen_is_eol(screen, pos));
       }
-      else if(strstartswith(line, "?screen_attrs_extent ")) {
+      else if(strstartswith(लिन्या, "?screen_attrs_extent ")) {
         assert(screen);
         VTermPos pos;
         VTermRect rect;
-        char *linep = line + 21;
+        char *linep = लिन्या + 21;
         while(linep[0] == ' ')
           linep++;
         if(sscanf(linep, "%d,%d\n", &pos.row, &pos.col) < 2) {
           printf("! screen_attrs_extent unrecognised input\n");
-          goto abort_line;
+          goto abort_लिन्या;
         }
 	rect.start_col = 0;
 	rect.end_col   = -1;
         if(!vterm_screen_get_attrs_extent(screen, &rect, pos, ~0)) {
           printf("! screen_attrs_extent failed\n");
-          goto abort_line;
+          goto abort_लिन्या;
         }
         printf("%d,%d-%d,%d\n", rect.start_row, rect.start_col, rect.end_row, rect.end_col);
       }
       else
         printf("?\n");
 
-      memset(line, 0, sizeof line);
+      memset(लिन्या, 0, sizeof लिन्या);
       continue;
     }
 
     else
-      abort_line: err = 1;
+      abort_लिन्या: err = 1;
 
     outlen = vterm_output_get_buffer_current(vt);
     if(outlen > 0) {

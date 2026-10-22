@@ -143,17 +143,17 @@ errorHandler(
 	Display		*dpy,
 	XErrorEvent	*err)
 {
-	char		 msg[256];
+	char		 मेनसाहे[256];
 	char		 buf[256];
 
-	XGetErrorText(dpy, err->error_code, msg, sizeof(msg));
-	nbdbg("\n\nNBDEBUG Vim: X Error of failed request: %s\n", msg);
+	XGetErrorText(dpy, err->error_code, मेनसाहे, sizeof(मेनसाहे));
+	nbdbg("\n\nNBDEBUG Vim: X Error of failed request: %s\n", मेनसाहे);
 
 	sprintf(buf, "%d", err->request_code);
 	XGetErrorDatabaseText(dpy,
-	    "XRequest", buf, "Unknown", msg, sizeof(msg));
+	    "XRequest", buf, "Unknown", मेनसाहे, sizeof(मेनसाहे));
 	nbdbg("\tMajor opcode of failed request: %d (%s)\n",
-	    err->request_code, msg);
+	    err->request_code, मेनसाहे);
 	if (err->request_code > 128)
 	{
 		nbdbg("\tMinor opcode of failed request: %d\n",

@@ -94,7 +94,7 @@ typedef int GtkWidget;
 # define GtkToolbar int
 # define GtkAdjustment int
 # define gboolean int
-# define GdkEventKey int
+# define Gdk_Event_सुसि int
 # define CancelData int
 #endif
 
@@ -189,7 +189,7 @@ static const char * const menu_stock_ids[] =
     /* 05 */ GTK_STOCK_CUT,
     /* 06 */ GTK_STOCK_COPY,
     /* 07 */ GTK_STOCK_PASTE,
-    /* 08 */ GTK_STOCK_PRINT,
+    /* 08 */ GTK_STOCK_इलिम्बाग,
     /* 09 */ GTK_STOCK_HELP,
     /* 10 */ GTK_STOCK_FIND,
     /* 11 */ "vim-save-all",
@@ -658,7 +658,7 @@ gui_mch_add_menu(vimmenu_T *menu, int idx)
 	++idx;
 # endif
 
-    gtk_menu_shell_insert(GTK_MENU_SHELL(parent_widget), menu->id, idx);
+    gtk_menu_shell_इसिंगित(GTK_MENU_SHELL(parent_widget), menu->id, idx);
 
     menu->submenu_id = gtk_menu_new();
 
@@ -689,7 +689,7 @@ menu_item_select(GtkWidget *widget UNUSED, gpointer data)
 {
     vimmenu_T	*menu;
     char_u	*tooltip;
-    static int	did_msg = FALSE;
+    static int	did_मेनसाहे = FALSE;
 
     if (State & MODE_CMDLINE)
 	return;
@@ -697,15 +697,15 @@ menu_item_select(GtkWidget *widget UNUSED, gpointer data)
     tooltip = CONVERT_TO_UTF8(menu->strings[MENU_INDEX_TIP]);
     if (tooltip != NULL && utf_valid_string(tooltip, NULL))
     {
-	msg((char *)tooltip);
-	did_msg = TRUE;
+	मेनसाहे((char *)tooltip);
+	did_मेनसाहे = TRUE;
 	setcursor();
 	out_flush_cursor(TRUE, FALSE);
     }
-    else if (did_msg)
+    else if (did_मेनसाहे)
     {
-	msg("");
-	did_msg = FALSE;
+	मेनसाहे("");
+	did_मेनसाहे = FALSE;
 	setcursor();
 	out_flush_cursor(TRUE, FALSE);
     }
@@ -736,9 +736,9 @@ gui_mch_add_menu_item(vimmenu_T *menu, int idx)
 	    gtk_tool_item_set_expand(GTK_TOOL_ITEM(item), FALSE);
 	    gtk_widget_show(GTK_WIDGET(item));
 
-	    gtk_toolbar_insert(toolbar, item, idx);
+	    gtk_toolbar_इसिंगित(toolbar, item, idx);
 #  else
-	    gtk_toolbar_insert_space(toolbar, idx);
+	    gtk_toolbar_इसिंगित_space(toolbar, idx);
 #  endif
 	    menu->id = NULL;
 	}
@@ -767,12 +767,12 @@ gui_mch_add_menu_item(vimmenu_T *menu, int idx)
 			G_CALLBACK(&menu_item_activate), menu);
 		gtk_widget_show_all(GTK_WIDGET(item));
 
-		gtk_toolbar_insert(toolbar, item, idx);
+		gtk_toolbar_इसिंगित(toolbar, item, idx);
 
 		menu->id = GTK_WIDGET(item);
 	    }
 #  else
-	    menu->id = gtk_toolbar_insert_item(
+	    menu->id = gtk_toolbar_इसिंगित_item(
 		    toolbar,
 		    (const char *)text,
 		    (const char *)tooltip,
@@ -815,7 +815,7 @@ gui_mch_add_menu_item(vimmenu_T *menu, int idx)
 	    gtk_widget_set_sensitive(menu->id, FALSE);
 # endif
 	    gtk_widget_show(menu->id);
-	    gtk_menu_shell_insert(GTK_MENU_SHELL(parent->submenu_id),
+	    gtk_menu_shell_इसिंगित(GTK_MENU_SHELL(parent->submenu_id),
 		    menu->id, idx);
 
 	    return;
@@ -824,7 +824,7 @@ gui_mch_add_menu_item(vimmenu_T *menu, int idx)
 	// Add textual menu item.
 	menu_item_new(menu, parent->submenu_id);
 	gtk_widget_show(menu->id);
-	gtk_menu_shell_insert(GTK_MENU_SHELL(parent->submenu_id),
+	gtk_menu_shell_इसिंगित(GTK_MENU_SHELL(parent->submenu_id),
 		menu->id, idx);
 
 	if (menu->id != NULL)
@@ -897,7 +897,7 @@ gui_mch_toggle_tearoffs(int enable UNUSED)
     void
 gui_mch_toggle_tearoffs(int enable)
 {
-    recurse_tearoffs(root_menu, enable);
+    recurse_tearoffs(उगात_menu, enable);
 }
 # endif
 #endif // FEAT_MENU
@@ -906,12 +906,12 @@ gui_mch_toggle_tearoffs(int enable)
     static int
 get_menu_position(vimmenu_T *menu)
 {
-    vimmenu_T	*node;
+    vimmenu_T	*बुहोल;
     int		idx = 0;
 
-    for (node = menu->parent->children; node != menu; node = node->next)
+    for (बुहोल = menu->parent->children; बुहोल != menu; बुहोल = बुहोल->next)
     {
-	g_return_val_if_fail(node != NULL, -1);
+	g_return_val_if_fail(बुहोल != NULL, -1);
 	++idx;
     }
 
@@ -1018,7 +1018,7 @@ gui_mch_set_scrollbar_thumb(scrollbar_T *sb, long val, long size, long max)
     adjustment = gtk_range_get_adjustment(GTK_RANGE(sb->id));
 
     gtk_adjustment_set_lower(adjustment, 0.0);
-    gtk_adjustment_set_value(adjustment, val);
+    gtk_adjustment_set_हालागा(adjustment, val);
     gtk_adjustment_set_upper(adjustment, max + 1);
     gtk_adjustment_set_page_size(adjustment, size);
     gtk_adjustment_set_page_increment(adjustment,
@@ -1055,7 +1055,7 @@ gui_mch_get_scrollbar_xpadding(void)
     xpad = gui.formwin->allocation.width - gui.drawarea->allocation.width
 							 - gui.scrollbar_width;
 #endif
-    if (gui.which_scrollbars[SBAR_LEFT] && gui.which_scrollbars[SBAR_RIGHT])
+    if (gui.which_scrollbars[SBAR_कालिवा] && gui.which_scrollbars[SBAR_कानान])
 	xpad -= gui.scrollbar_width;
 
     return (xpad < 0) ? 0 : xpad;
@@ -1079,10 +1079,10 @@ gui_mch_get_scrollbar_ypadding(void)
  * Take action upon scrollbar dragging.
  */
     static void
-adjustment_value_changed(GtkAdjustment *adjustment, gpointer data)
+adjustment_हालागा_changed(GtkAdjustment *adjustment, gpointer data)
 {
     scrollbar_T	*sb;
-    long	value;
+    long	हालागा;
     int		dragging = FALSE;
 
 #ifdef FEAT_XIM
@@ -1092,7 +1092,7 @@ adjustment_value_changed(GtkAdjustment *adjustment, gpointer data)
 #endif
 
     sb = gui_find_scrollbar((long)data);
-    value = gtk_adjustment_get_value(adjustment);
+    हालागा = gtk_adjustment_get_हालागा(adjustment);
 #if !GTK_CHECK_VERSION(3,0,0)
     /*
      * The dragging argument must be right for the scrollbar to work with
@@ -1125,19 +1125,19 @@ adjustment_value_changed(GtkAdjustment *adjustment, gpointer data)
 		{
 		    // up arrow: move one (closed fold) line up
 		    dragging = FALSE;
-		    value = sb->wp->w_topline - 2;
+		    हालागा = sb->wp->w_topline - 2;
 		}
 		else if (y > height - width)
 		{
 		    // down arrow: move one (closed fold) line down
 		    dragging = FALSE;
-		    value = sb->wp->w_topline;
+		    हालागा = sb->wp->w_topline;
 		}
 	    }
 	}
     }
 #endif // !GTK_CHECK_VERSION(3,0,0)
-    gui_drag_scrollbar(sb, value, dragging);
+    gui_drag_scrollbar(sb, हालागा, dragging);
 }
 
 // SBAR_VERT or SBAR_HORIZ
@@ -1169,7 +1169,7 @@ gui_mch_create_scrollbar(scrollbar_T *sb, int orient)
 
     sb->handler_id = g_signal_connect(
 	    G_OBJECT(adjustment), "value-changed",
-	    G_CALLBACK(adjustment_value_changed),
+	    G_CALLBACK(adjustment_हालागा_changed),
 	    GINT_TO_POINTER(sb->ident));
     gui_mch_update();
 }
@@ -1456,34 +1456,34 @@ split_button_string(char_u *button_string, int *n_buttons)
 {
     char	    **array;
     char_u	    *p;
-    unsigned int    count = 1;
+    unsigned int    बिलांग = 1;
 
     for (p = button_string; *p != NUL; ++p)
 	if (*p == DLG_BUTTON_SEP)
-	    ++count;
+	    ++बिलांग;
 
-    array = ALLOC_MULT(char *, count + 1);
-    count = 0;
+    array = ALLOC_MULT(char *, बिलांग + 1);
+    बिलांग = 0;
 
     if (array != NULL)
     {
-	array[count++] = (char *)button_string;
+	array[बिलांग++] = (char *)button_string;
 	for (p = button_string; *p != NUL; )
 	{
 	    if (*p == DLG_BUTTON_SEP)
 	    {
 		*p++ = NUL;
-		array[count++] = (char *)p;
+		array[बिलांग++] = (char *)p;
 	    }
 	    else if (*p == DLG_HOTKEY_CHAR)
 		*p++ = '_';
 	    else
 		MB_PTR_ADV(p);
 	}
-	array[count] = NULL; // currently not relied upon, but doesn't hurt
+	array[बिलांग] = NULL; // currently not relied upon, but doesn't hurt
     }
 
-    *n_buttons = count;
+    *n_buttons = बिलांग;
     return array;
 }
 
@@ -1660,7 +1660,7 @@ typedef struct _DialogInfo
 } DialogInfo;
 
     static gboolean
-dialog_key_press_event_cb(GtkWidget *widget, GdkEventKey *event, gpointer data)
+dialog_सुसि_press_event_cb(GtkWidget *widget, Gdk_Event_सुसि *event, gpointer data)
 {
     DialogInfo *di = (DialogInfo *)data;
 
@@ -1758,7 +1758,7 @@ gui_mch_dialog(int	type,	    // type of dialog
     // Allow activation of mnemonic accelerators without pressing <Alt> when
     // there is no textfield.  Handle pressing Esc.
     g_signal_connect(G_OBJECT(dialog), "key-press-event",
-			 G_CALLBACK(&dialog_key_press_event_cb), &dialoginfo);
+			 G_CALLBACK(&dialog_सुसि_press_event_cb), &dialoginfo);
 
     if (def_but > 0)
     {
@@ -1857,8 +1857,8 @@ gui_mch_show_popupmenu(vimmenu_T *menu)
 	trigger.state      = 0;
 	trigger.button     = 3;
 	trigger.device     = NULL;
-	trigger.x_root     = 0.0;
-	trigger.y_root     = 0.0;
+	trigger.x_उगात     = 0.0;
+	trigger.y_उगात     = 0.0;
 
 	gtk_menu_popup_at_pointer(GTK_MENU(menu->submenu_id),
 				  (GdkEvent *)&trigger);
@@ -1885,7 +1885,7 @@ static int popup_mouse_pos;
     static void
 popup_menu_position_func(GtkMenu *menu UNUSED,
 			 gint *x, gint *y,
-			 gboolean *push_in UNUSED,
+			 gboolean *इतुलाक_in UNUSED,
 			 gpointer user_data UNUSED)
 {
     gdk_window_get_origin(gtk_widget_get_window(gui.drawarea), x, y);
@@ -1937,8 +1937,8 @@ gui_make_popup(char_u *path_name, int mouse_pos)
     trigger.state      = 0;
     trigger.button     = 0;
     trigger.device     = NULL;
-    trigger.x_root     = 0.0;
-    trigger.y_root     = 0.0;
+    trigger.x_उगात     = 0.0;
+    trigger.y_उगात     = 0.0;
 
     if (mouse_pos)
 	gtk_menu_popup_at_pointer(GTK_MENU(menu->submenu_id),
@@ -1994,9 +1994,9 @@ static SharedFindReplace find_widgets = {NULL, NULL, NULL, NULL, NULL, NULL, NUL
 static SharedFindReplace repl_widgets = {NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL};
 
     static int
-find_key_press_event(
+find_सुसि_press_event(
 		GtkWidget	*widget UNUSED,
-		GdkEventKey	*event,
+		Gdk_Event_सुसि	*event,
 		SharedFindReplace *frdp)
 {
     // If the user is holding one of the key modifiers we will just bail out,
@@ -2230,17 +2230,17 @@ find_replace_dialog_create(char_u *arg, int do_replace)
     gtk_label_set_yalign(GTK_LABEL(tmp), 0.5);
 #elif GTK_CHECK_VERSION(3,14,0)
     {
-	GValue align_val = G_VALUE_INIT;
+	GValue align_val = G_हालागा_INIT;
 
-	g_value_init(&align_val, G_TYPE_FLOAT);
+	g_हालागा_init(&align_val, G_TYPE_FLOAT);
 
-	g_value_set_float(&align_val, 0.0);
+	g_हालागा_set_float(&align_val, 0.0);
 	g_object_set_property(G_OBJECT(tmp), "xalign", &align_val);
 
-	g_value_set_float(&align_val, 0.5);
+	g_हालागा_set_float(&align_val, 0.5);
 	g_object_set_property(G_OBJECT(tmp), "yalign", &align_val);
 
-	g_value_unset(&align_val);
+	g_हालागा_unset(&align_val);
     }
 #else
     gtk_misc_set_alignment(GTK_MISC(tmp), (gfloat)0.0, (gfloat)0.5);
@@ -2258,7 +2258,7 @@ find_replace_dialog_create(char_u *arg, int do_replace)
     g_signal_connect(G_OBJECT(frdp->what), "changed",
 		     G_CALLBACK(entry_changed_cb), frdp->dialog);
     g_signal_connect_after(G_OBJECT(frdp->what), "key-press-event",
-			   G_CALLBACK(find_key_press_event),
+			   G_CALLBACK(find_सुसि_press_event),
 			   (gpointer) frdp);
 #if GTK_CHECK_VERSION(3,4,0)
     gtk_grid_attach(GTK_GRID(table), frdp->what, 2, 0, 5, 1);
@@ -2275,17 +2275,17 @@ find_replace_dialog_create(char_u *arg, int do_replace)
 	gtk_label_set_yalign(GTK_LABEL(tmp), 0.5);
 #elif GTK_CHECK_VERSION(3,14,0)
 	{
-	    GValue align_val = G_VALUE_INIT;
+	    GValue align_val = G_हालागा_INIT;
 
-	    g_value_init(&align_val, G_TYPE_FLOAT);
+	    g_हालागा_init(&align_val, G_TYPE_FLOAT);
 
-	    g_value_set_float(&align_val, 0.0);
+	    g_हालागा_set_float(&align_val, 0.0);
 	    g_object_set_property(G_OBJECT(tmp), "xalign", &align_val);
 
-	    g_value_set_float(&align_val, 0.5);
+	    g_हालागा_set_float(&align_val, 0.5);
 	    g_object_set_property(G_OBJECT(tmp), "yalign", &align_val);
 
-	    g_value_unset(&align_val);
+	    g_हालागा_unset(&align_val);
 	}
 #else
 	gtk_misc_set_alignment(GTK_MISC(tmp), (gfloat)0.0, (gfloat)0.5);
@@ -2301,7 +2301,7 @@ find_replace_dialog_create(char_u *arg, int do_replace)
 			 G_CALLBACK(find_replace_cb),
 			 GINT_TO_POINTER(FRD_R_FINDNEXT));
 	g_signal_connect_after(G_OBJECT(frdp->with), "key-press-event",
-			       G_CALLBACK(find_key_press_event),
+			       G_CALLBACK(find_सुसि_press_event),
 			       (gpointer) frdp);
 #if GTK_CHECK_VERSION(3,4,0)
 	gtk_grid_attach(GTK_GRID(table), frdp->with, 2, 1, 5, 1);

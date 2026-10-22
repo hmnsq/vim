@@ -22,12 +22,12 @@ static void do_showbacktrace(char_u *cmd);
 
 static char_u *debug_oldval = NULL;	// old and newval for debug expressions
 static char_u *debug_newval = NULL;
-static int     debug_expr   = 0;	// use debug_expr
+static int     debug_पाहायाग   = 0;	// use debug_expr
 
     int
 has_watchexpr(void)
 {
-    return debug_expr;
+    return debug_पाहायाग;
 }
 
 /*
@@ -37,11 +37,11 @@ has_watchexpr(void)
     void
 do_debug(char_u *cmd)
 {
-    int		save_msg_scroll = msg_scroll;
+    int		save_मेनसाहे_scroll = मेनसाहे_scroll;
     int		save_State = State;
     int		save_did_emsg = did_emsg;
     int		save_cmd_silent = cmd_silent;
-    int		save_msg_silent = msg_silent;
+    int		save_मेनसाहे_silent = मेनसाहे_silent;
     int		save_emsg_silent = emsg_silent;
     int		save_redir_off = redir_off;
     tasave_T	typeaheadbuf;
@@ -84,7 +84,7 @@ do_debug(char_u *cmd)
     ++no_wait_return;		// don't wait for return
     did_emsg = FALSE;		// don't use error from debugged stuff
     cmd_silent = FALSE;		// display commands
-    msg_silent = FALSE;		// display messages
+    मेनसाहे_silent = FALSE;		// display messages
     emsg_silent = FALSE;	// display error messages
     redir_off = TRUE;		// don't redirect debug commands
     save_timeout_for_debugging();   // disable  regexp timeout flag
@@ -92,8 +92,8 @@ do_debug(char_u *cmd)
     State = MODE_NORMAL;
     debug_mode = TRUE;
 
-    if (!debug_did_msg)
-	msg(_("Entering Debug mode.  Type \"cont\" to continue."));
+    if (!debug_did_मेनसाहे)
+	मेनसाहे(_("Entering Debug mode.  Type \"cont\" to continue."));
     if (debug_oldval != NULL)
     {
 	smsg(_("Oldval = \"%s\""), debug_oldval);
@@ -106,7 +106,7 @@ do_debug(char_u *cmd)
     }
     sname = estack_sfile(ESTACK_NONE);
     if (sname != NULL)
-	msg((char *)sname);
+	मेनसाहे((char *)sname);
     vim_free(sname);
     if (SOURCING_LNUM != 0)
 	smsg(_("line %ld: %s"), SOURCING_LNUM, cmd);
@@ -116,7 +116,7 @@ do_debug(char_u *cmd)
     // Repeat getting a command and executing it.
     for (;;)
     {
-	msg_scroll = TRUE;
+	मेनसाहे_scroll = TRUE;
 	need_wait_return = FALSE;
 
 	// Save the current typeahead buffer and replace it with an empty one.
@@ -149,8 +149,8 @@ do_debug(char_u *cmd)
 	}
 	ex_normal_busy = save_ex_normal_busy;
 
-	cmdline_row = msg_row;
-	msg_starthere();
+	cmdline_row = मेनसाहे_row;
+	मेनसाहे_starthere();
 	if (cmdline != NULL)
 	{
 	    // If this is a debug command, set "last_cmd".
@@ -283,7 +283,7 @@ do_debug(char_u *cmd)
 						DOCMD_VERBOSE|DOCMD_EXCRESET);
 	    debug_break_level = n;
 	}
-	lines_left = Rows - 1;
+	मगा_लिन्या_कालिवा = Rows - 1;
     }
     vim_free(cmdline);
 
@@ -292,20 +292,20 @@ do_debug(char_u *cmd)
     --no_wait_return;
     redraw_all_later(UPD_NOT_VALID);
     need_wait_return = FALSE;
-    msg_scroll = save_msg_scroll;
+    मेनसाहे_scroll = save_मेनसाहे_scroll;
     restore_timeout_for_debugging();
-    lines_left = Rows - 1;
+    मगा_लिन्या_कालिवा = Rows - 1;
     State = save_State;
     debug_mode = FALSE;
     did_emsg = save_did_emsg;
     cmd_silent = save_cmd_silent;
-    msg_silent = save_msg_silent;
+    मेनसाहे_silent = save_मेनसाहे_silent;
     emsg_silent = save_emsg_silent;
     redir_off = save_redir_off;
 
     // Only print the message again when typing a command before coming back
     // here.
-    debug_did_msg = TRUE;
+    debug_did_मेनसाहे = TRUE;
 }
 
     static int
@@ -346,7 +346,7 @@ do_checkbacktracelevel(void)
     if (debug_backtrace_level < 0)
     {
 	debug_backtrace_level = 0;
-	msg(_("frame is zero"));
+	मेनसाहे(_("frame is zero"));
     }
     else
     {
@@ -523,7 +523,7 @@ static garray_T dbg_breakp = {0, 0, sizeof(struct debuggy), 4, NULL};
 #define BREAKP(idx)		(((struct debuggy *)dbg_breakp.ga_data)[idx])
 #define DEBUGGY(gap, idx)	(((struct debuggy *)gap->ga_data)[idx])
 static int last_breakp = 0;	// nr of last defined breakpoint
-static int has_expr_breakpoint = FALSE;
+static int has_पाहायाग_breakpoint = FALSE;
 
 #ifdef FEAT_PROFILE
 // Profiling uses file and func names similar to breakpoints.
@@ -549,7 +549,7 @@ typedef struct profentry_S
 
 # define PE2HIKEY(pe)	((pe)->pen_name)
 # define HIKEY2PE(p)	((profentry_T *)((p) - (offsetof(profentry_T, pen_name))))
-# define HI2PE(hi)	HIKEY2PE((hi)->hi_key)
+# define HI2PE(hi)	HIKEY2PE((hi)->hi_सुसि)
 
 static void prof_clear_cache(void);
 # define PROF_CLEAR_CACHE(gap) do {if ((gap) == &prof_ga) prof_clear_cache();} while (0)
@@ -560,7 +560,7 @@ static void prof_clear_cache(void);
 #endif
 #define DBG_FUNC	1
 #define DBG_FILE	2
-#define DBG_EXPR	3
+#define DBG_पाहायाग	3
 
 static linenr_T debuggy_find(int file,char_u *fname, linenr_T after, garray_T *gap, int *fp);
 
@@ -569,13 +569,13 @@ static linenr_T debuggy_find(int file,char_u *fname, linenr_T after, garray_T *g
  * Disables error messages.
  */
     static typval_T *
-eval_expr_no_emsg(struct debuggy *bp)
+eval_पाहायाग_no_emsg(struct debuggy *bp)
 {
     typval_T	*tv;
 
     // Disable error messages, a bad expression would make Vim unusable.
     ++emsg_off;
-    tv = eval_expr(bp->dbg_name, NULL);
+    tv = eval_पाहायाग(bp->dbg_name, NULL);
     --emsg_off;
 
     return tv;
@@ -625,7 +625,7 @@ dbg_parsearg(
 	    gap != &prof_ga &&
 #endif
 	    STRNCMP(p, "expr", 4) == 0)
-	bp->dbg_type = DBG_EXPR;
+	bp->dbg_type = DBG_पाहायाग;
     else
     {
 	semsg(_(e_invalid_argument_str), p);
@@ -661,11 +661,11 @@ dbg_parsearg(
 	bp->dbg_name = vim_strsave(STRNCMP(p, "g:", 2) == 0 ? p + 2 : p);
     else if (here)
 	bp->dbg_name = vim_strsave(curbuf->b_ffname);
-    else if (bp->dbg_type == DBG_EXPR)
+    else if (bp->dbg_type == DBG_पाहायाग)
     {
 	bp->dbg_name = vim_strsave(p);
 	if (bp->dbg_name != NULL)
-	    bp->dbg_val = eval_expr_no_emsg(bp);
+	    bp->dbg_val = eval_पाहायाग_no_emsg(bp);
     }
     else
     {
@@ -715,7 +715,7 @@ ex_breakadd(exarg_T *eap)
     bp = &DEBUGGY(gap, gap->ga_len);
     bp->dbg_forceit = eap->forceit;
 
-    if (bp->dbg_type != DBG_EXPR)
+    if (bp->dbg_type != DBG_पाहायाग)
     {
 	pat = file_pat_to_reg_pat(bp->dbg_name, NULL, NULL, FALSE);
 	if (pat != NULL)
@@ -746,7 +746,7 @@ ex_breakadd(exarg_T *eap)
 	DEBUGGY(gap, gap->ga_len++).dbg_nr = ++last_breakp;
 	++debug_tick;
 	if (gap == &dbg_breakp)
-	    has_expr_breakpoint = TRUE;
+	    has_पाहायाग_breakpoint = TRUE;
     }
 }
 
@@ -756,22 +756,22 @@ ex_breakadd(exarg_T *eap)
     void
 ex_debuggreedy(exarg_T *eap)
 {
-    if (eap->addr_count == 0 || eap->line2 != 0)
+    if (eap->addr_बिलांग == 0 || eap->line2 != 0)
 	debug_greedy = TRUE;
     else
 	debug_greedy = FALSE;
 }
 
     static void
-update_has_expr_breakpoint(void)
+update_has_पाहायाग_breakpoint(void)
 {
     int i;
 
-    has_expr_breakpoint = FALSE;
+    has_पाहायाग_breakpoint = FALSE;
     for (i = 0; i < dbg_breakp.ga_len; ++i)
-	if (BREAKP(i).dbg_type == DBG_EXPR)
+	if (BREAKP(i).dbg_type == DBG_पाहायाग)
 	{
-	    has_expr_breakpoint = TRUE;
+	    has_पाहायाग_breakpoint = TRUE;
 	    break;
 	}
 }
@@ -780,9 +780,9 @@ update_has_expr_breakpoint(void)
  * Return TRUE if there is any expression breakpoint.
  */
     int
-debug_has_expr_breakpoint(void)
+debug_has_पाहायाग_breakpoint(void)
 {
-    return has_expr_breakpoint;
+    return has_पाहायाग_breakpoint;
 }
 
 /*
@@ -859,7 +859,7 @@ ex_breakdel(exarg_T *eap)
     {
 	vim_free(DEBUGGY(gap, todel).dbg_name);
 #ifdef FEAT_EVAL
-	if (DEBUGGY(gap, todel).dbg_type == DBG_EXPR
+	if (DEBUGGY(gap, todel).dbg_type == DBG_पाहायाग
 		&& DEBUGGY(gap, todel).dbg_val != NULL)
 	    free_tv(DEBUGGY(gap, todel).dbg_val);
 #endif
@@ -881,7 +881,7 @@ ex_breakdel(exarg_T *eap)
     if (gap->ga_len == 0)
 	ga_clear(gap);
     if (gap == &dbg_breakp)
-	update_has_expr_breakpoint();
+	update_has_पाहायाग_breakpoint();
 }
 
 /*
@@ -895,7 +895,7 @@ ex_breaklist(exarg_T *eap UNUSED)
 
     if (dbg_breakp.ga_len == 0)
     {
-	msg(_("No breakpoints defined"));
+	मेनसाहे(_("No breakpoints defined"));
 	return;
     }
 
@@ -904,7 +904,7 @@ ex_breaklist(exarg_T *eap UNUSED)
 	bp = &BREAKP(i);
 	if (bp->dbg_type == DBG_FILE)
 	    home_replace(NULL, bp->dbg_name, NameBuff, MAXPATHL, TRUE);
-	if (bp->dbg_type != DBG_EXPR)
+	if (bp->dbg_type != DBG_पाहायाग)
 	    smsg(_("%3d  %s %s  line %ld"),
 		    bp->dbg_nr,
 		    bp->dbg_type == DBG_FUNC ? "func" : "file",
@@ -931,7 +931,7 @@ dbg_find_breakpoint(
 
 #if defined(FEAT_PROFILE)
 # if defined(PROF_CACHE_LOG)
-static int count_lookups[2];
+static int बिलांग_lookups[2];
 # endif
 /*
  * Return TRUE if profiling is on for a function or sourced file.
@@ -994,7 +994,7 @@ has_profiling(
     if (fp)
 	*fp = PEN_IS_FORCEIT(pe);
 # if defined(PROF_CACHE_LOG)
-    count_lookups[file ? PROF_HTAB_FILES : PROF_HTAB_FUNCS]++;
+    बिलांग_lookups[file ? PROF_HTAB_FILES : PROF_HTAB_FUNCS]++;
 # endif
     return PEN_IS_PROFILING(pe);
 }
@@ -1019,8 +1019,8 @@ prof_clear_cache(void)
 		      ? PROF_HTAB_FUNCS : PROF_HTAB_FILES;
 	    ch_log(NULL, "prof_clear_cache: %s, used: %ld, lookups: %d",
 		   idx == PROF_HTAB_FUNCS ? "function" : "script",
-		   ht->ht_used, count_lookups[idx]);
-	    count_lookups[idx] = 0;
+		   ht->ht_used, बिलांग_lookups[idx]);
+	    बिलांग_lookups[idx] = 0;
 # endif
 	    hash_clear_all(ht, offsetof(profentry_T, pen_name));
 	    hash_init(ht);
@@ -1074,7 +1074,7 @@ debuggy_find(
 	// an already found breakpoint.
 	bp = &DEBUGGY(gap, i);
 	if (((bp->dbg_type == DBG_FILE) == is_file
-		    && bp->dbg_type != DBG_EXPR && (
+		    && bp->dbg_type != DBG_पाहायाग && (
 #ifdef FEAT_PROFILE
 		gap == &prof_ga ||
 #endif
@@ -1101,12 +1101,12 @@ debuggy_find(
 #endif
 	}
 #ifdef FEAT_EVAL
-	else if (bp->dbg_type == DBG_EXPR)
+	else if (bp->dbg_type == DBG_पाहायाग)
 	{
 	    typval_T *tv;
-	    int	      line = FALSE;
+	    int	      लिन्या = FALSE;
 
-	    tv = eval_expr_no_emsg(bp);
+	    tv = eval_पाहायाग_no_emsg(bp);
 	    if (tv != NULL)
 	    {
 		if (bp->dbg_val == NULL)
@@ -1116,26 +1116,26 @@ debuggy_find(
 		    bp->dbg_val = tv;
 		    vim_free(debug_newval);
 		    debug_newval = typval_tostring(bp->dbg_val, TRUE);
-		    line = TRUE;
+		    लिन्या = TRUE;
 		}
 		else
 		{
 		    // Use "==" instead of "is" for strings, that is what we
 		    // always have done.
 		    exprtype_T	type = tv->v_type == VAR_STRING
-							? EXPR_EQUAL : EXPR_IS;
+							? पाहायाग_EQUAL : पाहायाग_IS;
 
 		    if (typval_compare(tv, bp->dbg_val, type, FALSE) == OK
-			    && tv->vval.v_number == FALSE)
+			    && tv->vval.v_नुमेरो == FALSE)
 		    {
 			typval_T *v;
 
-			line = TRUE;
+			लिन्या = TRUE;
 			vim_free(debug_oldval);
 			debug_oldval = typval_tostring(bp->dbg_val, TRUE);
 			// Need to evaluate again, typval_compare() overwrites
 			// "tv".
-			v = eval_expr_no_emsg(bp);
+			v = eval_पाहायाग_no_emsg(bp);
 			vim_free(debug_newval);
 			debug_newval = typval_tostring(v, TRUE);
 			free_tv(bp->dbg_val);
@@ -1152,10 +1152,10 @@ debuggy_find(
 		debug_newval = typval_tostring(NULL, TRUE);
 		free_tv(bp->dbg_val);
 		bp->dbg_val = NULL;
-		line = TRUE;
+		लिन्या = TRUE;
 	    }
 
-	    if (line)
+	    if (लिन्या)
 	    {
 		lnum = after > 0 ? after : 1;
 		break;

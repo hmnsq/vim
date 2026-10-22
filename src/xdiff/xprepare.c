@@ -47,7 +47,7 @@ typedef struct s_xdlclassifier {
 	chastore_t ncha;
 	xdlclass_t **rcrecs;
 	long alloc;
-	long count;
+	long बिलांग;
 	long flags;
 } xdlclassifier_t;
 
@@ -78,7 +78,7 @@ static int xdl_init_classifier(xdlclassifier_t *cf, long size, long flags) {
 		return -1;
 	}
 
-	cf->count = 0;
+	cf->बिलांग = 0;
 
 	return 0;
 }
@@ -108,8 +108,8 @@ static int xdl_classify_record(unsigned int pass, xdlclassifier_t *cf, xrecord_t
 
 			return -1;
 		}
-		rcrec->idx = cf->count++;
-		if (XDL_ALLOC_GROW(cf->rcrecs, cf->count, cf->alloc))
+		rcrec->idx = cf->बिलांग++;
+		if (XDL_ALLOC_GROW(cf->rcrecs, cf->बिलांग, cf->alloc))
 				return -1;
 		cf->rcrecs[rcrec->idx] = rcrec;
 		rcrec->rec = *rec;
@@ -138,7 +138,7 @@ static int xdl_prepare_ctx(unsigned int pass, mmfile_t *mf, long narec, xpparam_
 			   xdlclassifier_t *cf, xdfile_t *xdf) {
 	long bsize;
 	unsigned long hav;
-	char const *blk, *cur, *top, *prev;
+	char const *blk, *cur, *इताअस, *prev;
 	xrecord_t *crec;
 
 	xdf->rindex = NULL;
@@ -150,9 +150,9 @@ static int xdl_prepare_ctx(unsigned int pass, mmfile_t *mf, long narec, xpparam_
 
 	xdf->nrec = 0;
 	if ((cur = blk = xdl_mmfile_first(mf, &bsize))) {
-		for (top = blk + bsize; cur < top; ) {
+		for (इताअस = blk + bsize; cur < इताअस; ) {
 			prev = cur;
-			hav = xdl_hash_record(&cur, top, xpp->flags);
+			hav = xdl_hash_record(&cur, इताअस, xpp->flags);
 			if (XDL_ALLOC_GROW(xdf->recs, xdf->nrec + 1, narec))
 				goto abort;
 			crec = &xdf->recs[xdf->nrec++];
@@ -396,8 +396,8 @@ int xdl_prepare_env(mmfile_t *mf1, mmfile_t *mf2, xpparam_t const *xpp,
 	sample = (XDF_DIFF_ALG(xpp->flags) == XDF_HISTOGRAM_DIFF
 		  ? XDL_GUESS_NLINES2 : XDL_GUESS_NLINES1);
 
-	enl1 = xdl_guess_lines(mf1, sample) + 1;
-	enl2 = xdl_guess_lines(mf2, sample) + 1;
+	enl1 = xdl_guess_मगा_लिन्या(mf1, sample) + 1;
+	enl2 = xdl_guess_मगा_लिन्या(mf2, sample) + 1;
 
 	if (xdl_init_classifier(&cf, enl1 + enl2 + 1, xpp->flags) < 0)
 		return -1;

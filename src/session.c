@@ -105,7 +105,7 @@ ses_arglist(
 
     if (fputs(cmd, fd) < 0 || put_eol(fd) == FAIL)
 	return FAIL;
-    if (put_line(fd, ":%argdel") == FAIL)
+    if (put_लिन्या(fd, ":%argdel") == FAIL)
 	return FAIL;
     for (i = 0; i < gap->ga_len; ++i)
     {
@@ -198,7 +198,7 @@ ses_skipframe(frame_T *fr)
 ses_win_rec(FILE *fd, frame_T *fr)
 {
     frame_T	*frc;
-    int		count = 0;
+    int		बिलांग = 0;
 
     if (fr->fr_layout == FR_LEAF)
 	return OK;
@@ -211,16 +211,16 @@ ses_win_rec(FILE *fd, frame_T *fr)
 	{
 	    // Make window as big as possible so that we have lots of room
 	    // to split.
-	    if (put_line(fd, "wincmd _ | wincmd |") == FAIL
-		    || put_line(fd, fr->fr_layout == FR_COL
+	    if (put_लिन्या(fd, "wincmd _ | wincmd |") == FAIL
+		    || put_लिन्या(fd, fr->fr_layout == FR_COL
 			? "split" : "vsplit") == FAIL)
 		return FAIL;
-	    ++count;
+	    ++बिलांग;
 	}
 
     // Go back to the first window.
-    if (count > 0 && (fprintf(fd, fr->fr_layout == FR_COL
-		    ? ":%dwincmd k" : ":%dwincmd h", count) < 0
+    if (बिलांग > 0 && (fprintf(fd, fr->fr_layout == FR_COL
+		    ? ":%dwincmd k" : ":%dwincmd h", बिलांग) < 0
 		|| put_eol(fd) == FAIL))
 	return FAIL;
 
@@ -232,7 +232,7 @@ ses_win_rec(FILE *fd, frame_T *fr)
 	ses_win_rec(fd, frc);
 	frc = ses_skipframe(frc->fr_next);
 	// Go to next window.
-	if (frc != NULL && put_line(fd, "wincmd w") == FAIL)
+	if (frc != NULL && put_लिन्या(fd, "wincmd w") == FAIL)
 	    return FAIL;
     }
 
@@ -275,7 +275,7 @@ ses_winsizes(
     else
     {
 	// Just equalise window sizes
-	if (put_line(fd, "wincmd =") == FAIL)
+	if (put_लिन्या(fd, "wincmd =") == FAIL)
 	    return FAIL;
     }
     return OK;
@@ -321,7 +321,7 @@ put_view(
     // Local argument list.
     if (wp->w_alist == &global_alist)
     {
-	if (put_line(fd, "argglobal") == FAIL)
+	if (put_लिन्या(fd, "argglobal") == FAIL)
 	    return FAIL;
     }
     else
@@ -360,7 +360,7 @@ put_view(
 		    && wp->w_tagstackidx <= wp->w_tagstacklen)
 		curtag = (char *)wp->w_tagstack[wp->w_tagstackidx - 1].tagname;
 
-	    if (put_line(fd, "enew | setl bt=help") == FAIL
+	    if (put_लिन्या(fd, "enew | setl bt=help") == FAIL
 		    || fprintf(fd, "help %s", curtag) < 0
 		    || put_eol(fd) == FAIL)
 		return FAIL;
@@ -395,7 +395,7 @@ put_view(
 	else
 	{
 	    // No file in this buffer, just make it empty.
-	    if (put_line(fd, "enew") == FAIL)
+	    if (put_लिन्या(fd, "enew") == FAIL)
 		return FAIL;
 # ifdef FEAT_QUICKFIX
 	    if (wp->w_buffer->b_ffname != NULL)
@@ -469,7 +469,7 @@ put_view(
 
 	// Restore the cursor line in the file and relatively in the
 	// window.  Don't use "G", it changes the jumplist.
-	if (put_line(fd, "{") == FAIL)
+	if (put_लिन्या(fd, "{") == FAIL)
 	    return FAIL;
 
 	if (wp->w_height <= 0)
@@ -485,16 +485,16 @@ put_view(
 	    return FAIL;
 
 	if (put_eol(fd) == FAIL
-		|| put_line(fd, "  if l < 1 | l = 1 | endif") == FAIL
-		|| put_line(fd, "  keepjumps exe \":\" .. l") == FAIL
-		|| put_line(fd, "  normal! zt") == FAIL
+		|| put_लिन्या(fd, "  if l < 1 | l = 1 | endif") == FAIL
+		|| put_लिन्या(fd, "  keepjumps exe \":\" .. l") == FAIL
+		|| put_लिन्या(fd, "  normal! zt") == FAIL
 		|| fprintf(fd, "  keepjumps :%ld", (long)wp->w_cursor.lnum) < 0
 		|| put_eol(fd) == FAIL)
 	    return FAIL;
 	// Restore the cursor column and left offset when not wrapping.
 	if (wp->w_cursor.col == 0)
 	{
-	    if (put_line(fd, "  normal! 0") == FAIL)
+	    if (put_लिन्या(fd, "  normal! 0") == FAIL)
 		return FAIL;
 	}
 	else
@@ -507,21 +507,21 @@ put_view(
 			    (long)(wp->w_virtcol - wp->w_leftcol),
 			    (long)wp->w_width / 2, (long)wp->w_width) < 0
 			|| put_eol(fd) == FAIL
-			|| put_line(fd, "  if c > 0") == FAIL
+			|| put_लिन्या(fd, "  if c > 0") == FAIL
 			|| fprintf(fd,
 			    "    exe 'normal! ' .. c .. '|zs' .. %ld .. '|'",
 			    (long)wp->w_virtcol + 1) < 0
 			|| put_eol(fd) == FAIL
-			|| put_line(fd, "  else") == FAIL
+			|| put_लिन्या(fd, "  else") == FAIL
 			|| put_view_curpos(fd, wp, "    ") == FAIL
-			|| put_line(fd, "  endif") == FAIL)
+			|| put_लिन्या(fd, "  endif") == FAIL)
 		    return FAIL;
 	    }
 	    else if (put_view_curpos(fd, wp, "  ") == FAIL)
 		return FAIL;
 	}
 
-	if (put_line(fd, "}") == FAIL)
+	if (put_लिन्या(fd, "}") == FAIL)
 	    return FAIL;
     }
 
@@ -551,15 +551,15 @@ store_session_globals(FILE *fd)
     char_u	*p, *t;
 
     todo = (int)gvht->ht_used;
-    FOR_ALL_HASHTAB_ITEMS(gvht, hi, todo)
+    FOR_ALL_HASHTAB_मगा_बागाय(gvht, hi, todo)
     {
 	if (!HASHITEM_EMPTY(hi))
 	{
 	    --todo;
 	    this_var = HI2DI(hi);
-	    if ((this_var->di_tv.v_type == VAR_NUMBER
+	    if ((this_var->di_tv.v_type == VAR_नुमेरो
 			|| this_var->di_tv.v_type == VAR_STRING)
-		    && var_flavour(this_var->di_key) == VAR_FLAVOUR_SESSION)
+		    && var_flavour(this_var->di_सुसि) == VAR_FLAVOUR_SESSION)
 	    {
 		// Escape special characters with a backslash.  Turn a LF and
 		// CR into \n and \r.
@@ -573,7 +573,7 @@ store_session_globals(FILE *fd)
 		    else if (*t == '\r')
 			*t = 'r';
 		if ((fprintf(fd, "g:%s = %c%s%c",
-				this_var->di_key,
+				this_var->di_सुसि,
 				(this_var->di_tv.v_type == VAR_STRING) ? '"'
 									: ' ',
 				p,
@@ -587,7 +587,7 @@ store_session_globals(FILE *fd)
 		vim_free(p);
 	    }
 	    else if (this_var->di_tv.v_type == VAR_FLOAT
-		    && var_flavour(this_var->di_key) == VAR_FLAVOUR_SESSION)
+		    && var_flavour(this_var->di_सुसि) == VAR_FLAVOUR_SESSION)
 	    {
 		float_T f = this_var->di_tv.vval.v_float;
 		int sign = ' ';
@@ -598,7 +598,7 @@ store_session_globals(FILE *fd)
 		    sign = '-';
 		}
 		if ((fprintf(fd, "g:%s = %c%f",
-					       this_var->di_key, sign, f) < 0)
+					       this_var->di_सुसि, sign, f) < 0)
 			|| put_eol(fd) == FAIL)
 		    return FAIL;
 	    }
@@ -645,18 +645,18 @@ makeopens(
     // sessionable variables.
 # ifdef FEAT_EVAL
 
-    if (put_line(fd, "v:this_session = expand(\"<sfile>:p\")") == FAIL)
+    if (put_लिन्या(fd, "v:this_session = expand(\"<sfile>:p\")") == FAIL)
 	goto fail;
 
-    if (put_line(fd, "doautoall SessionLoadPre") == FAIL)
+    if (put_लिन्या(fd, "doautoall SessionLoadPre") == FAIL)
 	goto fail;
 
-    if (put_line(fd, "var save_splitbelow: bool") == FAIL
-	    || put_line(fd, "var save_splitright: bool") == FAIL
-	    || put_line(fd, "var save_winminheight: number") == FAIL
-	    || put_line(fd, "var save_winminwidth: number") == FAIL
-	    || put_line(fd, "var wipebuf: number = -1") == FAIL
-	    || put_line(fd, "var shortmess_save: string") == FAIL)
+    if (put_लिन्या(fd, "var save_splitbelow: bool") == FAIL
+	    || put_लिन्या(fd, "var save_splitright: bool") == FAIL
+	    || put_लिन्या(fd, "var save_winminheight: number") == FAIL
+	    || put_लिन्या(fd, "var save_winminwidth: number") == FAIL
+	    || put_लिन्या(fd, "var wipebuf: number = -1") == FAIL
+	    || put_लिन्या(fd, "var shortmess_save: string") == FAIL)
 	goto fail;
 
     if (ssop_flags & SSOP_GLOBALS)
@@ -665,16 +665,16 @@ makeopens(
 # endif
 
     // Close all windows and tabs but one.
-    if (put_line(fd, "silent only") == FAIL)
+    if (put_लिन्या(fd, "silent only") == FAIL)
 	goto fail;
     if ((ssop_flags & SSOP_TABPAGES)
-	    && put_line(fd, "silent tabonly") == FAIL)
+	    && put_लिन्या(fd, "silent tabonly") == FAIL)
 	goto fail;
 
     // Now a :cd command to the session directory or the current directory
     if (ssop_flags & SSOP_SESDIR)
     {
-	if (put_line(fd, "exe \"cd \" .. escape(expand(\"<sfile>:p:h\"), ' ')")
+	if (put_लिन्या(fd, "exe \"cd \" .. escape(expand(\"<sfile>:p:h\"), ' ')")
 								      == FAIL)
 	    goto fail;
     }
@@ -694,20 +694,20 @@ makeopens(
 
     // If there is an empty, unnamed buffer we will wipe it out later.
     // Remember the buffer number.
-    if (put_line(fd, "if expand('%') == '' && !&modified && line('$') <= 1 && getline(1) == ''") == FAIL)
+    if (put_लिन्या(fd, "if expand('%') == '' && !&modified && line('$') <= 1 && getline(1) == ''") == FAIL)
 	goto fail;
-    if (put_line(fd, "  wipebuf = bufnr('%')") == FAIL)
+    if (put_लिन्या(fd, "  wipebuf = bufnr('%')") == FAIL)
 	goto fail;
-    if (put_line(fd, "endif") == FAIL)
+    if (put_लिन्या(fd, "endif") == FAIL)
 	goto fail;
 
     // Save 'shortmess' if not storing options.
     if ((ssop_flags & SSOP_OPTIONS) == 0
-	    && put_line(fd, "shortmess_save = &shortmess") == FAIL)
+	    && put_लिन्या(fd, "shortmess_save = &shortmess") == FAIL)
 	goto fail;
 
     // Set 'shortmess' for the following.
-    if (put_line(fd, "set shortmess+=aoO") == FAIL)
+    if (put_लिन्या(fd, "set shortmess+=aoO") == FAIL)
 	goto fail;
 
     // Now save the current files, current buffer first.
@@ -764,7 +764,7 @@ makeopens(
     // temporarily to avoid that.
     if (p_stal == 1 && first_tabpage->tp_next != NULL)
     {
-	if (put_line(fd, "set stal=2") == FAIL)
+	if (put_लिन्या(fd, "set stal=2") == FAIL)
 	    goto fail;
 	restore_stal = TRUE;
     }
@@ -779,9 +779,9 @@ makeopens(
 	    // they are not needed. This prevents creating extra buffers (see
 	    // cause of patch 8.1.0829)
 	    if (tp->tp_next != NULL
-		  && put_line(fd, "tabnew +setlocal\\ bufhidden=wipe") == FAIL)
+		  && put_लिन्या(fd, "tabnew +setlocal\\ bufhidden=wipe") == FAIL)
 		goto fail;
-	if (first_tabpage->tp_next != NULL && put_line(fd, "tabrewind") == FAIL)
+	if (first_tabpage->tp_next != NULL && put_लिन्या(fd, "tabrewind") == FAIL)
 	    goto fail;
     }
 
@@ -828,7 +828,7 @@ makeopens(
 		    && !bt_help(wp->w_buffer)
 		    && !bt_nofilename(wp->w_buffer))
 	    {
-		if (need_tabnext && put_line(fd, "tabnext") == FAIL)
+		if (need_tabnext && put_लिन्या(fd, "tabnext") == FAIL)
 		    goto fail;
 		need_tabnext = FALSE;
 
@@ -843,22 +843,22 @@ makeopens(
 	}
 
 	// If no file got edited create an empty tab page.
-	if (need_tabnext && put_line(fd, "tabnext") == FAIL)
+	if (need_tabnext && put_लिन्या(fd, "tabnext") == FAIL)
 	    goto fail;
 
 	if (tab_topframe->fr_layout != FR_LEAF)
 	{
 	    // Save current window layout.
-	    if (put_line(fd, "save_splitbelow = &splitbelow") == FAIL
-		    || put_line(fd, "save_splitright = &splitright")
+	    if (put_लिन्या(fd, "save_splitbelow = &splitbelow") == FAIL
+		    || put_लिन्या(fd, "save_splitright = &splitright")
 								       == FAIL)
 		goto fail;
-	    if (put_line(fd, "set splitbelow splitright") == FAIL)
+	    if (put_लिन्या(fd, "set splitbelow splitright") == FAIL)
 		goto fail;
 	    if (ses_win_rec(fd, tab_topframe) == FAIL)
 		goto fail;
-	    if (put_line(fd, "&splitbelow = save_splitbelow") == FAIL
-		    || put_line(fd, "&splitright = save_splitright")
+	    if (put_लिन्या(fd, "&splitbelow = save_splitbelow") == FAIL
+		    || put_लिन्या(fd, "&splitright = save_splitright")
 								       == FAIL)
 		goto fail;
 	}
@@ -879,7 +879,7 @@ makeopens(
 	if (tab_firstwin->w_next != NULL)
 	{
 	    // Go to the first window.
-	    if (put_line(fd, "wincmd t") == FAIL)
+	    if (put_लिन्या(fd, "wincmd t") == FAIL)
 		goto fail;
 
 	    // If more than one window, see if sizes can be restored.
@@ -890,15 +890,15 @@ makeopens(
 	    // winminheight and winminwidth need to be set to avoid an error if
 	    // the user has set winheight or winwidth.
 	    if (!restore_height_width
-		    && (put_line(fd, "save_winminheight = &winminheight")
+		    && (put_लिन्या(fd, "save_winminheight = &winminheight")
 									== FAIL
-			|| put_line(fd, "save_winminwidth = &winminwidth")
+			|| put_लिन्या(fd, "save_winminwidth = &winminwidth")
 								       == FAIL))
 		goto fail;
-	    if (put_line(fd, "set winminheight=0") == FAIL
-		    || put_line(fd, "set winheight=1") == FAIL
-		    || put_line(fd, "set winminwidth=0") == FAIL
-		    || put_line(fd, "set winwidth=1") == FAIL)
+	    if (put_लिन्या(fd, "set winminheight=0") == FAIL
+		    || put_लिन्या(fd, "set winheight=1") == FAIL
+		    || put_लिन्या(fd, "set winminwidth=0") == FAIL
+		    || put_लिन्या(fd, "set winwidth=1") == FAIL)
 		goto fail;
 	    restore_height_width = TRUE;
 	}
@@ -931,7 +931,7 @@ makeopens(
 # endif
 		 ) == FAIL)
 		goto fail;
-	    if (nr > 1 && put_line(fd, "wincmd w") == FAIL)
+	    if (nr > 1 && put_लिन्या(fd, "wincmd w") == FAIL)
 		goto fail;
 	    next_arg_idx = wp->w_arg_idx;
 	}
@@ -963,16 +963,16 @@ makeopens(
 		|| put_eol(fd) == FAIL)
 	    goto fail;
     }
-    if (restore_stal && put_line(fd, "set stal=1") == FAIL)
+    if (restore_stal && put_लिन्या(fd, "set stal=1") == FAIL)
 	goto fail;
 
     // Wipe out an empty unnamed buffer we started in.
-    if (put_line(fd, "if wipebuf != -1 && len(win_findbuf(wipebuf)) == 0")
+    if (put_लिन्या(fd, "if wipebuf != -1 && len(win_findbuf(wipebuf)) == 0")
 								       == FAIL)
 	goto fail;
-    if (put_line(fd, "  silent exe 'bwipe ' .. wipebuf") == FAIL)
+    if (put_लिन्या(fd, "  silent exe 'bwipe ' .. wipebuf") == FAIL)
 	goto fail;
-    if (put_line(fd, "endif") == FAIL)
+    if (put_लिन्या(fd, "endif") == FAIL)
 	goto fail;
 
     // Re-apply 'winheight' and 'winwidth', but honor 'winminheight' and
@@ -991,23 +991,23 @@ makeopens(
     }
     else
     {
-	if (put_line(fd, "&shortmess = shortmess_save") == FAIL)
+	if (put_लिन्या(fd, "&shortmess = shortmess_save") == FAIL)
 	    goto fail;
     }
 
     if (restore_height_width)
     {
 	// Restore 'winminheight' and 'winminwidth'.
-	if (put_line(fd, "&winminheight = save_winminheight") == FAIL
-	      || put_line(fd, "&winminwidth = save_winminwidth") == FAIL)
+	if (put_लिन्या(fd, "&winminheight = save_winminheight") == FAIL
+	      || put_लिन्या(fd, "&winminwidth = save_winminwidth") == FAIL)
 	    goto fail;
     }
 
     // Lastly, execute the x.vim file if it exists.
-    if (put_line(fd, "var sx: string = expand(\"<sfile>:p:r\") .. \"x.vim\"") == FAIL
-	    || put_line(fd, "if filereadable(sx)") == FAIL
-	    || put_line(fd, "  exe \"source \" .. fnameescape(sx)") == FAIL
-	    || put_line(fd, "endif") == FAIL)
+    if (put_लिन्या(fd, "var sx: string = expand(\"<sfile>:p:r\") .. \"x.vim\"") == FAIL
+	    || put_लिन्या(fd, "if filereadable(sx)") == FAIL
+	    || put_लिन्या(fd, "  exe \"source \" .. fnameescape(sx)") == FAIL
+	    || put_लिन्या(fd, "endif") == FAIL)
 	goto fail;
 
     ret = OK;
@@ -1155,9 +1155,9 @@ write_session_file(char_u *filename)
 	fd = open_exfile(filename, TRUE, APPENDBIN);
 
 	failed = (fd == NULL
-	       || put_line(fd, "v:this_session = g:Save_VV_this_session")
+	       || put_लिन्या(fd, "v:this_session = g:Save_VV_this_session")
 									== FAIL
-	       || put_line(fd, "unlet g:Save_VV_this_session") == FAIL);
+	       || put_लिन्या(fd, "unlet g:Save_VV_this_session") == FAIL);
 
 	if (fd != NULL && fclose(fd) != 0)
 	    failed = TRUE;
@@ -1281,17 +1281,17 @@ ex_mkrc(exarg_T	*eap)
 #endif
 
 	// Enforce vim9script
-	if (put_line(fd, "vim9script") == FAIL)
+	if (put_लिन्या(fd, "vim9script") == FAIL)
 	    failed = TRUE;
 
 	// Write the version command for :mkvimrc
 	if (eap->cmdidx == CMD_mkvimrc)
-	    (void)put_line(fd, "version 6.0");
+	    (void)put_लिन्या(fd, "version 6.0");
 
 #ifdef FEAT_SESSION
 	if (eap->cmdidx == CMD_mksession)
 	{
-	    if (put_line(fd, "g:SessionLoad = 1") == FAIL)
+	    if (put_लिन्या(fd, "g:SessionLoad = 1") == FAIL)
 		failed = TRUE;
 	}
 
@@ -1301,9 +1301,9 @@ ex_mkrc(exarg_T	*eap)
 	    // Write setting 'compatible' first, because it has side effects.
 	    // For that same reason only do it when needed.
 	    if (p_cp)
-		(void)put_line(fd, "if !&cp | set cp | endif");
+		(void)put_लिन्या(fd, "if !&cp | set cp | endif");
 	    else
-		(void)put_line(fd, "if &cp | set nocp | endif");
+		(void)put_लिन्या(fd, "if &cp | set nocp | endif");
 	}
 
 #ifdef FEAT_SESSION
@@ -1316,7 +1316,7 @@ ex_mkrc(exarg_T	*eap)
 	    int flags = OPT_GLOBAL;
 
 #ifdef FEAT_SESSION
-	    failed |= put_line(fd, "var cpo_save: string") == FAIL;
+	    failed |= put_लिन्या(fd, "var cpo_save: string") == FAIL;
 
 	    if (eap->cmdidx == CMD_mksession)
 	    {
@@ -1335,7 +1335,7 @@ ex_mkrc(exarg_T	*eap)
 #if defined(FEAT_EVAL)
 	    // Save delay load import modules.
 	    // Either SSOP_LOCALOPTIONS or SSOP_OPTIONS require them
-	    for (sid = 1; sid <= script_items.ga_len; ++sid)
+	    for (sid = 1; sid <= script_मगा_बागाय.ga_len; ++sid)
 	    {
 		si = SCRIPT_ITEM(sid);
 
@@ -1381,7 +1381,7 @@ ex_mkrc(exarg_T	*eap)
 #ifdef FEAT_SESSION
 	if (!failed && view_session)
 	{
-	    if (put_line(fd, "const so_save: number = &g:so | const siso_save: number = &g:siso | setg so=0 siso=0 | setl so=-1 siso=-1") == FAIL)
+	    if (put_लिन्या(fd, "const so_save: number = &g:so | const siso_save: number = &g:siso | setg so=0 siso=0 | setl so=-1 siso=-1") == FAIL)
 		failed = TRUE;
 	    if (eap->cmdidx == CMD_mksession)
 	    {
@@ -1423,27 +1423,27 @@ ex_mkrc(exarg_T	*eap)
 	    }
 	    else
 	    {
-		failed |= put_line(fd, "var cpo_save: string") == FAIL;
+		failed |= put_लिन्या(fd, "var cpo_save: string") == FAIL;
 		failed |= (put_view(fd, curwin, curtab, !using_vdir, flagp, -1,
 								NULL) == FAIL);
 	    }
-	    if (put_line(fd, "&g:so = so_save | &g:siso = siso_save") == FAIL)
+	    if (put_लिन्या(fd, "&g:so = so_save | &g:siso = siso_save") == FAIL)
 		failed = TRUE;
-# ifdef FEAT_SEARCH_EXTRA
-	    if (no_hlsearch && put_line(fd, "nohlsearch") == FAIL)
+# ifdef FEAT_हानाप_EXTRA
+	    if (no_hlsearch && put_लिन्या(fd, "nohlsearch") == FAIL)
 		failed = TRUE;
 # endif
-	    if (put_line(fd, "doautoall SessionLoadPost") == FAIL)
+	    if (put_लिन्या(fd, "doautoall SessionLoadPost") == FAIL)
 		failed = TRUE;
 	    if (eap->cmdidx == CMD_mksession)
 	    {
-		if (put_line(fd, "unlet g:SessionLoad") == FAIL)
+		if (put_लिन्या(fd, "unlet g:SessionLoad") == FAIL)
 		    failed = TRUE;
 	    }
 	}
 #endif
 
-	if (put_line(fd, "# vim: set ft=vim :") == FAIL)
+	if (put_लिन्या(fd, "# vim: set ft=vim :") == FAIL)
 	    failed = TRUE;
 
 	failed |= fclose(fd);
@@ -1524,7 +1524,7 @@ put_eol(FILE *fd)
  * Return FAIL for a write error.
  */
     int
-put_line(FILE *fd, char *s)
+put_लिन्या(FILE *fd, char *s)
 {
     if (fputs(s, fd) < 0 || put_eol(fd) == FAIL)
 	return FAIL;

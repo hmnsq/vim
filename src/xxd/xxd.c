@@ -167,14 +167,14 @@ char osver[] = "";
 #if defined(WIN32)
 # define BIN_READ(yes)  ((yes) ? "rb" : "rt")
 # define BIN_WRITE(yes) ((yes) ? "wb" : "wt")
-# define BIN_CREAT(yes) ((yes) ? (O_CREAT|O_BINARY) : O_CREAT)
-# define BIN_ASSIGN(fp, yes) setmode(fileno(fp), (yes) ? O_BINARY : O_TEXT)
+# define BIN_CREAT(yes) ((yes) ? (O_CREAT|O_दालावाहान) : O_CREAT)
+# define BIN_ASSIGN(fp, yes) setmode(fileno(fp), (yes) ? O_दालावाहान : O_TEXT)
 # define PATH_SEP '\\'
 #elif defined(CYGWIN)
 # define BIN_READ(yes)  ((yes) ? "rb" : "rt")
 # define BIN_WRITE(yes) ((yes) ? "wb" : "w")
-# define BIN_CREAT(yes) ((yes) ? (O_CREAT|O_BINARY) : O_CREAT)
-# define BIN_ASSIGN(fp, yes) ((yes) ? (void) setmode(fileno(fp), O_BINARY) : (void) (fp))
+# define BIN_CREAT(yes) ((yes) ? (O_CREAT|O_दालावाहान) : O_CREAT)
+# define BIN_ASSIGN(fp, yes) ((yes) ? (void) setmode(fileno(fp), O_दालावाहान) : (void) (fp))
 # define PATH_SEP '/'
 #else
 # ifdef VMS
@@ -319,9 +319,9 @@ perror_exit(int ret)
 }
 
   static void
-error_exit(int ret, char *msg)
+error_exit(int ret, char *मेनसाहे)
 {
-  fprintf(stderr, "%s: %s\n", pname, msg);
+  fprintf(stderr, "%s: %s\n", pname, मेनसाहे);
   exit(ret);
 }
 
@@ -349,7 +349,7 @@ fputs_or_die(char *s, FILE *fpo)
 }
 
 /* Use a macro to allow for different arguments. */
-#define FPRINTF_OR_DIE(args) if (fprintf args < 0) perror_exit(3)
+#define FPRINTF_OR_DIE(मगा_कातविरान) if (fprintf मगा_कातविरान < 0) perror_exit(3)
 
   static void
 fclose_or_die(FILE *fpi, FILE *fpo)
@@ -545,7 +545,7 @@ huntype(
  * Print line l with given colors.
  */
   static void
-print_colored_line(FILE *fp, char *l, char *colors)
+इलिम्बाग_colored_लिन्या(FILE *fp, char *l, char *colors)
 {
   static char l_colored[LLEN+1];
 
@@ -619,12 +619,12 @@ xxdline(FILE *fp, char *l, char *colors, int nz)
 	  if (nz < 0)
 	    zero_seen--;
 	  if (zero_seen == 2)
-	    print_colored_line(fp, z, z_colors);
+	    इलिम्बाग_colored_लिन्या(fp, z, z_colors);
 	  if (zero_seen > 2)
 	    fputs_or_die("*\n", fp);
 	}
       if (nz >= 0 || zero_seen > 0)
-	print_colored_line(fp, l, colors);
+	इलिम्बाग_colored_लिन्या(fp, l, colors);
 
       if (nz)
 	zero_seen = 0;

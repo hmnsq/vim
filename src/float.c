@@ -29,7 +29,7 @@
     int
 string2float(
     char_u	*text,
-    float_T	*value,	    // result stored here
+    float_T	*हालागा,	    // result stored here
     int		skip_quotes)
 {
     char	*s = (char *)text;
@@ -38,17 +38,17 @@ string2float(
     // MS-Windows does not deal with "inf" and "nan" properly.
     if (STRNICMP(text, "inf", 3) == 0)
     {
-	*value = INFINITY;
+	*हालागा = INFINITY;
 	return 3;
     }
     if (STRNICMP(text, "-inf", 4) == 0)
     {
-	*value = -INFINITY;
+	*हालागा = -INFINITY;
 	return 4;
     }
     if (STRNICMP(text, "nan", 3) == 0)
     {
-	*value = NAN;
+	*हालागा = NAN;
 	return 3;
     }
     if (skip_quotes && vim_strchr((char_u *)s, '\'') != NULL)
@@ -71,12 +71,12 @@ string2float(
 	}
 	s = (char *)buf;
 	f = strtod(s, &s);
-	*value = f;
+	*हालागा = f;
 	return (int)((char_u *)s - buf) + quotes;
     }
 
     f = strtod(s, &s);
-    *value = f;
+    *हालागा = f;
     return (int)((char_u *)s - text);
 }
 
@@ -92,12 +92,12 @@ get_float_arg(typval_T *argvars, float_T *f)
 	*f = argvars[0].vval.v_float;
 	return OK;
     }
-    if (argvars[0].v_type == VAR_NUMBER)
+    if (argvars[0].v_type == VAR_नुमेरो)
     {
-	*f = (float_T)argvars[0].vval.v_number;
+	*f = (float_T)argvars[0].vval.v_नुमेरो;
 	return OK;
     }
-    emsg(_(e_number_or_float_required));
+    emsg(_(e_नुमेरो_or_float_required));
     return FAIL;
 }
 
@@ -120,13 +120,13 @@ f_abs(typval_T *argvars, typval_T *rettv)
 	varnumber_T	n;
 	int		error = FALSE;
 
-	n = tv_get_number_chk(&argvars[0], &error);
+	n = tv_get_नुमेरो_chk(&argvars[0], &error);
 	if (error)
-	    rettv->vval.v_number = -1;
+	    rettv->vval.v_नुमेरो = -1;
 	else if (n > 0)
-	    rettv->vval.v_number = n;
+	    rettv->vval.v_नुमेरो = n;
 	else
-	    rettv->vval.v_number = -n;
+	    rettv->vval.v_नुमेरो = -n;
     }
 }
 
@@ -292,11 +292,11 @@ f_float2nr(typval_T *argvars, typval_T *rettv)
 	return;
 
     if (f <= (float_T)-VARNUM_MAX + DBL_EPSILON)
-	rettv->vval.v_number = -VARNUM_MAX;
+	rettv->vval.v_नुमेरो = -VARNUM_MAX;
     else if (f >= (float_T)VARNUM_MAX - DBL_EPSILON)
-	rettv->vval.v_number = VARNUM_MAX;
+	rettv->vval.v_नुमेरो = VARNUM_MAX;
     else
-	rettv->vval.v_number = (varnumber_T)f;
+	rettv->vval.v_नुमेरो = (varnumber_T)f;
 }
 
 /*
@@ -349,7 +349,7 @@ f_isinf(typval_T *argvars, typval_T *rettv)
 	return;
 
     if (argvars[0].v_type == VAR_FLOAT && isinf(argvars[0].vval.v_float))
-	rettv->vval.v_number = argvars[0].vval.v_float > 0.0 ? 1 : -1;
+	rettv->vval.v_नुमेरो = argvars[0].vval.v_float > 0.0 ? 1 : -1;
 }
 
 /*
@@ -361,7 +361,7 @@ f_isnan(typval_T *argvars, typval_T *rettv)
     if (in_vim9script() && check_for_float_or_nr_arg(argvars, 0) == FAIL)
 	return;
 
-    rettv->vval.v_number = argvars[0].v_type == VAR_FLOAT
+    rettv->vval.v_नुमेरो = argvars[0].v_type == VAR_FLOAT
 					    && isnan(argvars[0].vval.v_float);
 }
 #endif

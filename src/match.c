@@ -13,9 +13,9 @@
 
 #include "vim.h"
 
-#if defined(FEAT_SEARCH_EXTRA)
+#if defined(FEAT_हानाप_EXTRA)
 
-# define SEARCH_HL_PRIORITY 0
+# define हानाप_HL_PRIORITY 0
 
 /*
  * Add match to the match list of window "wp".
@@ -92,7 +92,7 @@ match_add(
 	m->mit_pos_array = ALLOC_CLEAR_MULT(llpos_T, pos_list->lv_len);
 	if (m->mit_pos_array == NULL)
 	    goto fail;
-	m->mit_pos_count = pos_list->lv_len;
+	m->mit_pos_बिलांग = pos_list->lv_len;
     }
     m->mit_id = id;
     m->mit_priority = prio;
@@ -133,7 +133,7 @@ match_add(
 		subli = subl->lv_first;
 		if (subli == NULL)
 		    goto fail;
-		lnum = tv_get_number_chk(&subli->li_tv, &error);
+		lnum = tv_get_नुमेरो_chk(&subli->li_tv, &error);
 		if (error == TRUE)
 		    goto fail;
 		if (lnum == 0)
@@ -145,13 +145,13 @@ match_add(
 		subli = subli->li_next;
 		if (subli != NULL)
 		{
-		    col = tv_get_number_chk(&subli->li_tv, &error);
+		    col = tv_get_नुमेरो_chk(&subli->li_tv, &error);
 		    if (error == TRUE)
 			goto fail;
 		    subli = subli->li_next;
 		    if (subli != NULL)
 		    {
-			len = tv_get_number_chk(&subli->li_tv, &error);
+			len = tv_get_नुमेरो_chk(&subli->li_tv, &error);
 			if (error == TRUE)
 			    goto fail;
 		    }
@@ -159,20 +159,20 @@ match_add(
 		m->mit_pos_array[i].col = col;
 		m->mit_pos_array[i].len = len;
 	    }
-	    else if (li->li_tv.v_type == VAR_NUMBER)
+	    else if (li->li_tv.v_type == VAR_नुमेरो)
 	    {
-		if (li->li_tv.vval.v_number == 0)
+		if (li->li_tv.vval.v_नुमेरो == 0)
 		{
 		    --i;
 		    continue;
 		}
-		m->mit_pos_array[i].lnum = li->li_tv.vval.v_number;
+		m->mit_pos_array[i].lnum = li->li_tv.vval.v_नुमेरो;
 		m->mit_pos_array[i].col = 0;
 		m->mit_pos_array[i].len = 0;
 	    }
 	    else
 	    {
-		emsg(_(e_list_or_number_required));
+		emsg(_(e_list_or_नुमेरो_required));
 		goto fail;
 	    }
 	    if (toplnum == 0 || lnum < toplnum)
@@ -304,7 +304,7 @@ get_match(win_T *wp, int id)
  * Init for calling prepare_search_hl().
  */
     void
-init_search_hl(win_T *wp, match_T *search_hl)
+init_हानाप_hl(win_T *wp, match_T *हानाप_hl)
 {
     matchitem_T *cur;
 
@@ -324,11 +324,11 @@ init_search_hl(win_T *wp, match_T *search_hl)
 	cur = cur->mit_next;
     }
     // Must update this every time since highlight group override can change it.
-    search_hl->attr = HL_ATTR(HLF_L);
+    हानाप_hl->attr = HL_ATTR(HLF_L);
 
-    search_hl->buf = wp->w_buffer;
-    search_hl->lnum = 0;
-    search_hl->first_lnum = 0;
+    हानाप_hl->buf = wp->w_buffer;
+    हानाप_hl->lnum = 0;
+    हानाप_hl->first_lnum = 0;
     // time limit is set at the toplevel, for all windows
 }
 
@@ -337,7 +337,7 @@ init_search_hl(win_T *wp, match_T *search_hl)
  * Return zero otherwise.
  */
     static int
-next_search_hl_pos(
+next_हानाप_hl_pos(
     match_T	    *shl,	// points to a match
     linenr_T	    lnum,
     matchitem_T	    *match,	// match item with positions
@@ -346,7 +346,7 @@ next_search_hl_pos(
     int	    i;
     int	    found = -1;
 
-    for (i = match->mit_pos_cur; i < match->mit_pos_count; i++)
+    for (i = match->mit_pos_cur; i < match->mit_pos_बिलांग; i++)
     {
 	llpos_T	*pos = &match->mit_pos_array[i];
 
@@ -401,9 +401,9 @@ next_search_hl_pos(
  * Careful: Any pointers for buffer lines will become invalid.
  */
     static void
-next_search_hl(
+next_हानाप_hl(
     win_T	    *win,
-    match_T	    *search_hl,
+    match_T	    *हानाप_hl,
     match_T	    *shl,	// points to search_hl or a match
     linenr_T	    lnum,
     colnr_T	    mincol,	// minimal column for a match
@@ -416,7 +416,7 @@ next_search_hl(
     int		timed_out = FALSE;
 
     // for :{range}s/pat only highlight inside the range
-    if ((lnum < search_first_line || lnum > search_last_line) && cur == NULL)
+    if ((lnum < हानाप_first_लिन्या || lnum > हानाप_last_लिन्या) && cur == NULL)
     {
 	shl->lnum = 0;
 	return;
@@ -446,7 +446,7 @@ next_search_hl(
 	// 3. Vi compatible searching: continue at end of previous match.
 	if (shl->lnum == 0)
 	    matchcol = 0;
-	else if (vim_strchr(p_cpo, CPO_SEARCH) == NULL
+	else if (vim_strchr(p_cpo, CPO_हानाप) == NULL
 		|| (shl->rm.endpos[0].lnum == 0
 		    && shl->rm.endpos[0].col <= shl->rm.startpos[0].col))
 	{
@@ -473,7 +473,7 @@ next_search_hl(
 	{
 	    // Remember whether shl->rm is using a copy of the regprog in
 	    // cur->mit_match.
-	    int regprog_is_copy = (shl != search_hl && cur != NULL
+	    int regprog_is_copy = (shl != हानाप_hl && cur != NULL
 			  && shl == &cur->mit_hl
 			  && cur->mit_match.regprog == cur->mit_hl.rm.regprog);
 
@@ -486,7 +486,7 @@ next_search_hl(
 	    if (called_emsg > called_emsg_before || got_int || timed_out)
 	    {
 		// Error while handling regexp: stop using this regexp.
-		if (shl == search_hl)
+		if (shl == हानाप_hl)
 		{
 		    // don't free regprog in the match list, it's a copy
 		    vim_regfree(shl->rm.regprog);
@@ -499,7 +499,7 @@ next_search_hl(
 	    }
 	}
 	else if (cur != NULL)
-	    nmatched = next_search_hl_pos(shl, lnum, cur, matchcol);
+	    nmatched = next_हानाप_hl_pos(shl, lnum, cur, matchcol);
 	else
 	    nmatched = 0;
 	if (nmatched == 0)
@@ -522,7 +522,7 @@ next_search_hl(
  * Advance to the match in window "wp" line "lnum" or past it.
  */
     void
-prepare_search_hl(win_T *wp, match_T *search_hl, linenr_T lnum)
+prepare_हानाप_hl(win_T *wp, match_T *हानाप_hl, linenr_T lnum)
 {
     matchitem_T *cur;		// points to the match list
     match_T	*shl;		// points to search_hl or a match
@@ -541,7 +541,7 @@ prepare_search_hl(win_T *wp, match_T *search_hl, linenr_T lnum)
     {
 	if (shl_flag == FALSE)
 	{
-	    shl = search_hl;
+	    shl = हानाप_hl;
 	    shl_flag = TRUE;
 	}
 	else
@@ -569,8 +569,8 @@ prepare_search_hl(win_T *wp, match_T *search_hl, linenr_T lnum)
 	    while (shl->first_lnum < lnum && (shl->rm.regprog != NULL
 					  || (cur != NULL && pos_inprogress)))
 	    {
-		next_search_hl(wp, search_hl, shl, shl->first_lnum, (colnr_T)n,
-					       shl == search_hl ? NULL : cur);
+		next_हानाप_hl(wp, हानाप_hl, shl, shl->first_lnum, (colnr_T)n,
+					       shl == हानाप_hl ? NULL : cur);
 		pos_inprogress = cur == NULL || cur->mit_pos_cur == 0
 							      ? FALSE : TRUE;
 		if (shl->lnum != 0)
@@ -587,7 +587,7 @@ prepare_search_hl(win_T *wp, match_T *search_hl, linenr_T lnum)
 		}
 	    }
 	}
-	if (shl != search_hl && cur != NULL)
+	if (shl != हानाप_hl && cur != NULL)
 	    cur = cur->mit_next;
     }
 }
@@ -597,7 +597,7 @@ prepare_search_hl(win_T *wp, match_T *search_hl, linenr_T lnum)
  * position.
  */
     static void
-check_cur_search_hl(win_T *wp, match_T *shl)
+check_cur_हानाप_hl(win_T *wp, match_T *shl)
 {
     linenr_T linecount = shl->rm.endpos[0].lnum - shl->rm.startpos[0].lnum;
 
@@ -618,13 +618,13 @@ check_cur_search_hl(win_T *wp, match_T *shl)
  * current highlight attribute.
  */
     int
-prepare_search_hl_line(
+prepare_हानाप_hl_लिन्या(
 	win_T	    *wp,
 	linenr_T    lnum,
 	colnr_T	    mincol,
-	char_u	    **line,
-	match_T	    *search_hl,
-	int	    *search_attr)
+	char_u	    **लिन्या,
+	match_T	    *हानाप_hl,
+	int	    *हानाप_attr)
 {
     matchitem_T *cur;			// points to the match list
     match_T	*shl;			// points to search_hl or a match
@@ -641,7 +641,7 @@ prepare_search_hl_line(
     {
 	if (shl_flag == FALSE)
 	{
-	    shl = search_hl;
+	    shl = हानाप_hl;
 	    shl_flag = TRUE;
 	}
 	else
@@ -653,12 +653,12 @@ prepare_search_hl_line(
 	shl->has_cursor = FALSE;
 	if (cur != NULL)
 	    cur->mit_pos_cur = 0;
-	next_search_hl(wp, search_hl, shl, lnum, mincol,
-						shl == search_hl ? NULL : cur);
+	next_हानाप_hl(wp, हानाप_hl, shl, lnum, mincol,
+						shl == हानाप_hl ? NULL : cur);
 
 	// Need to get the line again, a multi-line regexp may have made it
 	// invalid.
-	*line = ml_get_buf(wp->w_buffer, lnum, FALSE);
+	*लिन्या = ml_get_buf(wp->w_buffer, lnum, FALSE);
 
 	if (shl->lnum != 0 && shl->lnum <= lnum)
 	{
@@ -673,25 +673,25 @@ prepare_search_hl_line(
 		shl->endcol = MAXCOL;
 
 	    // check if the cursor is in the match before changing the columns
-	    if (shl == search_hl)
-		check_cur_search_hl(wp, shl);
+	    if (shl == हानाप_hl)
+		check_cur_हानाप_hl(wp, shl);
 
 	    // Highlight one character for an empty match.
 	    if (shl->startcol == shl->endcol)
 	    {
-		if (has_mbyte && (*line)[shl->endcol] != NUL)
-		    shl->endcol += (*mb_ptr2len)((*line) + shl->endcol);
+		if (has_mbyte && (*लिन्या)[shl->endcol] != NUL)
+		    shl->endcol += (*mb_ptr2len)((*लिन्या) + shl->endcol);
 		else
 		    ++shl->endcol;
 	    }
 	    if ((long)shl->startcol < mincol)  // match at leftcol
 	    {
 		shl->attr_cur = shl->attr;
-		*search_attr = shl->attr;
+		*हानाप_attr = shl->attr;
 	    }
 	    area_highlighting = TRUE;
 	}
-	if (shl != search_hl && cur != NULL)
+	if (shl != हानाप_hl && cur != NULL)
 	    cur = cur->mit_next;
     }
     return area_highlighting;
@@ -708,15 +708,15 @@ prepare_search_hl_line(
  * Return the updated search_attr.
  */
     int
-update_search_hl(
+update_हानाप_hl(
 	win_T	    *wp,
 	linenr_T    lnum,
 	colnr_T	    col,
-	char_u	    **line,
-	match_T	    *search_hl,
+	char_u	    **लिन्या,
+	match_T	    *हानाप_hl,
 	int	    *has_match_conc UNUSED,
 	int	    *match_conc UNUSED,
-	int	    did_line_attr,
+	int	    did_लिन्या_attr,
 	int	    lcs_eol_one,
 	int	    *on_last_col)
 {
@@ -726,7 +726,7 @@ update_search_hl(
 				    // has been processed or not
     int		pos_inprogress;	    // marks that position match search is in
 				    // progress
-    int		search_attr = 0;
+    int		हानाप_attr = 0;
 
 
     // Do this for 'search_hl' and the match list (ordered by priority).
@@ -736,9 +736,9 @@ update_search_hl(
     {
 	if (shl_flag == FALSE
 		&& (cur == NULL
-			|| cur->mit_priority > SEARCH_HL_PRIORITY))
+			|| cur->mit_priority > हानाप_HL_PRIORITY))
 	{
-	    shl = search_hl;
+	    shl = हानाप_hl;
 	    shl_flag = TRUE;
 	}
 	else
@@ -752,7 +752,7 @@ update_search_hl(
 		    && col >= shl->startcol
 		    && col < shl->endcol)
 	    {
-		int next_col = col + mb_ptr2len(*line + col);
+		int next_col = col + mb_ptr2len(*लिन्या + col);
 
 		if (shl->endcol < next_col)
 		    shl->endcol = next_col;
@@ -761,7 +761,7 @@ update_search_hl(
 		// Match with the "Conceal" group results in hiding
 		// the match.
 		if (cur != NULL
-			&& shl != search_hl
+			&& shl != हानाप_hl
 			&& syn_name2id((char_u *)"Conceal") == cur->mit_hlg_id)
 		{
 		    *has_match_conc = col == shl->startcol ? 2 : 1;
@@ -772,24 +772,24 @@ update_search_hl(
 # endif
 		// Highlight the match were the cursor is using the CurSearch
 		// group.
-		if (shl == search_hl && shl->has_cursor)
+		if (shl == हानाप_hl && shl->has_cursor)
 		{
 		    shl->attr_cur = HL_ATTR(HLF_LC);
 		    if (shl->attr_cur != shl->attr)
-			search_hl_has_cursor_lnum = lnum;
+			हानाप_hl_has_cursor_lnum = lnum;
 		}
 
 	    }
 	    else if (col == shl->endcol)
 	    {
 		shl->attr_cur = 0;
-		next_search_hl(wp, search_hl, shl, lnum, col,
-					       shl == search_hl ? NULL : cur);
+		next_हानाप_hl(wp, हानाप_hl, shl, lnum, col,
+					       shl == हानाप_hl ? NULL : cur);
 		pos_inprogress = !(cur == NULL || cur->mit_pos_cur == 0);
 
 		// Need to get the line again, a multi-line regexp may have
 		// made it invalid.
-		*line = ml_get_buf(wp->w_buffer, lnum, FALSE);
+		*लिन्या = ml_get_buf(wp->w_buffer, lnum, FALSE);
 
 		if (shl->lnum == lnum)
 		{
@@ -800,8 +800,8 @@ update_search_hl(
 			shl->endcol = MAXCOL;
 
 		    // check if the cursor is in the match
-		    if (shl == search_hl)
-			check_cur_search_hl(wp, shl);
+		    if (shl == हानाप_hl)
+			check_cur_हानाप_hl(wp, shl);
 
 		    if (shl->startcol == shl->endcol)
 		    {
@@ -809,7 +809,7 @@ update_search_hl(
 			// it
 			if (has_mbyte)
 			{
-			    char_u *p = *line + shl->endcol;
+			    char_u *p = *लिन्या + shl->endcol;
 
 			    if (*p == NUL)
 				// consistent with non-mbyte
@@ -828,7 +828,7 @@ update_search_hl(
 	    }
 	    break;
 	}
-	if (shl != search_hl && cur != NULL)
+	if (shl != हानाप_hl && cur != NULL)
 	    cur = cur->mit_next;
     }
 
@@ -840,30 +840,30 @@ update_search_hl(
     {
 	if (shl_flag == FALSE
 		&& (cur == NULL ||
-			cur->mit_priority > SEARCH_HL_PRIORITY))
+			cur->mit_priority > हानाप_HL_PRIORITY))
 	{
-	    shl = search_hl;
+	    shl = हानाप_hl;
 	    shl_flag = TRUE;
 	}
 	else
 	    shl = &cur->mit_hl;
 	if (shl->attr_cur != 0)
 	{
-	    search_attr = shl->attr_cur;
+	    हानाप_attr = shl->attr_cur;
 	    *on_last_col = col + 1 >= shl->endcol;
 	}
-	if (shl != search_hl && cur != NULL)
+	if (shl != हानाप_hl && cur != NULL)
 	    cur = cur->mit_next;
     }
     // Only highlight one character after the last column.
-    if (*(*line + col) == NUL && (did_line_attr >= 1
+    if (*(*लिन्या + col) == NUL && (did_लिन्या_attr >= 1
 				       || (wp->w_p_list && lcs_eol_one == -1)))
-	search_attr = 0;
-    return search_attr;
+	हानाप_attr = 0;
+    return हानाप_attr;
 }
 
     int
-get_prevcol_hl_flag(win_T *wp, match_T *search_hl, long curcol)
+get_prevcol_hl_flag(win_T *wp, match_T *हानाप_hl, long curcol)
 {
     long	prevcol = curcol;
     int		prevcol_hl_flag = FALSE;
@@ -882,9 +882,9 @@ get_prevcol_hl_flag(win_T *wp, match_T *search_hl, long curcol)
     // Highlight a character after the end of the line if the match started
     // at the end of the line or when the match continues in the next line
     // (match includes the line break).
-    if (!search_hl->is_addpos && (prevcol == (long)search_hl->startcol
-		|| (prevcol > (long)search_hl->startcol
-					      && search_hl->endcol == MAXCOL)))
+    if (!हानाप_hl->is_addpos && (prevcol == (long)हानाप_hl->startcol
+		|| (prevcol > (long)हानाप_hl->startcol
+					      && हानाप_hl->endcol == MAXCOL)))
 	prevcol_hl_flag = TRUE;
     else
     {
@@ -909,7 +909,7 @@ get_prevcol_hl_flag(win_T *wp, match_T *search_hl, long curcol)
  * or match highlighting.
  */
     void
-get_search_match_hl(win_T *wp, match_T *search_hl, long col, int *char_attr)
+get_हानाप_match_hl(win_T *wp, match_T *हानाप_hl, long col, int *char_attr)
 {
     matchitem_T *cur;			// points to the match list
     match_T	*shl;			// points to search_hl or a match
@@ -922,18 +922,18 @@ get_search_match_hl(win_T *wp, match_T *search_hl, long col, int *char_attr)
     {
 	if (shl_flag == FALSE
 		&& ((cur != NULL
-			&& cur->mit_priority > SEARCH_HL_PRIORITY)
+			&& cur->mit_priority > हानाप_HL_PRIORITY)
 		    || cur == NULL))
 	{
-	    shl = search_hl;
+	    shl = हानाप_hl;
 	    shl_flag = TRUE;
 	}
 	else
 	    shl = &cur->mit_hl;
 	if (col - 1 == (long)shl->startcol
-		&& (shl == search_hl || !shl->is_addpos))
+		&& (shl == हानाप_hl || !shl->is_addpos))
 	    *char_attr = shl->attr;
-	if (shl != search_hl && cur != NULL)
+	if (shl != हानाप_hl && cur != NULL)
 	    cur = cur->mit_next;
     }
 }
@@ -941,7 +941,7 @@ get_search_match_hl(win_T *wp, match_T *search_hl, long col, int *char_attr)
 #endif // FEAT_SEARCH_EXTRA
 
 #if defined(FEAT_EVAL)
-# ifdef FEAT_SEARCH_EXTRA
+# ifdef FEAT_हानाप_EXTRA
     static int
 matchadd_dict_arg(typval_T *tv, char_u **conceal_char, win_T **win)
 {
@@ -953,7 +953,7 @@ matchadd_dict_arg(typval_T *tv, char_u **conceal_char, win_T **win)
 	return FAIL;
     }
 
-    if (dict_has_key(tv->vval.v_dict, "conceal"))
+    if (dict_has_सुसि(tv->vval.v_dict, "conceal"))
 	*conceal_char = dict_get_string(tv->vval.v_dict, "conceal", FALSE);
 
     if ((di = dict_find(tv->vval.v_dict, (char_u *)"window", -1)) == NULL)
@@ -962,7 +962,7 @@ matchadd_dict_arg(typval_T *tv, char_u **conceal_char, win_T **win)
     *win = find_win_by_nr_or_id(&di->di_tv);
     if (*win == NULL)
     {
-	emsg(_(e_invalid_window_number));
+	emsg(_(e_invalid_window_नुमेरो));
 	return FAIL;
     }
 
@@ -976,10 +976,10 @@ matchadd_dict_arg(typval_T *tv, char_u **conceal_char, win_T **win)
     void
 f_clearmatches(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
 {
-# ifdef FEAT_SEARCH_EXTRA
+# ifdef FEAT_हानाप_EXTRA
     win_T   *win;
 
-    if (in_vim9script() && check_for_opt_number_arg(argvars, 0) == FAIL)
+    if (in_vim9script() && check_for_opt_नुमेरो_arg(argvars, 0) == FAIL)
 	return;
 
     win = get_optional_window(argvars, 0);
@@ -994,13 +994,13 @@ f_clearmatches(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
     void
 f_getmatches(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
 {
-# ifdef FEAT_SEARCH_EXTRA
+# ifdef FEAT_हानाप_EXTRA
     dict_T	*dict;
     matchitem_T	*cur;
     int		i;
     win_T	*win;
 
-    if (in_vim9script() && check_for_opt_number_arg(argvars, 0) == FAIL)
+    if (in_vim9script() && check_for_opt_नुमेरो_arg(argvars, 0) == FAIL)
 	return;
 
     win = get_optional_window(argvars, 0);
@@ -1016,7 +1016,7 @@ f_getmatches(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
 	if (cur->mit_match.regprog == NULL)
 	{
 	    // match added with matchaddpos()
-	    for (i = 0; i < cur->mit_pos_count; ++i)
+	    for (i = 0; i < cur->mit_pos_बिलांग; ++i)
 	    {
 		llpos_T	*llpos;
 		char	buf[30];  // use 30 to avoid compiler warning
@@ -1028,11 +1028,11 @@ f_getmatches(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
 		l = list_alloc();
 		if (l == NULL)
 		    break;
-		list_append_number(l, (varnumber_T)llpos->lnum);
+		list_append_नुमेरो(l, (varnumber_T)llpos->lnum);
 		if (llpos->col > 0)
 		{
-		    list_append_number(l, (varnumber_T)llpos->col);
-		    list_append_number(l, (varnumber_T)llpos->len);
+		    list_append_नुमेरो(l, (varnumber_T)llpos->col);
+		    list_append_नुमेरो(l, (varnumber_T)llpos->len);
 		}
 		sprintf(buf, "pos%d", i + 1);
 		if (dict_add_list(dict, buf, l) == FAIL)
@@ -1044,8 +1044,8 @@ f_getmatches(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
 	    dict_add_string(dict, "pattern", cur->mit_pattern);
 	}
 	dict_add_string(dict, "group", syn_id2name(cur->mit_hlg_id));
-	dict_add_number(dict, "priority", (long)cur->mit_priority);
-	dict_add_number(dict, "id", (long)cur->mit_id);
+	dict_add_नुमेरो(dict, "priority", (long)cur->mit_priority);
+	dict_add_नुमेरो(dict, "id", (long)cur->mit_id);
 #  if defined(FEAT_CONCEAL)
 	if (cur->mit_conceal_char)
 	{
@@ -1070,18 +1070,18 @@ f_getmatches(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
     void
 f_setmatches(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
 {
-# ifdef FEAT_SEARCH_EXTRA
+# ifdef FEAT_हानाप_EXTRA
     list_T	*l;
     listitem_T	*li;
     dict_T	*d;
     list_T	*s = NULL;
     win_T	*win;
 
-    rettv->vval.v_number = -1;
+    rettv->vval.v_नुमेरो = -1;
 
     if (in_vim9script()
 	    && (check_for_list_arg(argvars, 0) == FAIL
-		|| check_for_opt_number_arg(argvars, 1) == FAIL))
+		|| check_for_opt_नुमेरो_arg(argvars, 1) == FAIL))
 	return;
 
     if (check_for_list_arg(argvars, 0) == FAIL)
@@ -1103,11 +1103,11 @@ f_setmatches(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
 		emsg(_(e_invalid_argument));
 		return;
 	    }
-	    if (!(dict_has_key(d, "group")
-			&& (dict_has_key(d, "pattern")
-			    || dict_has_key(d, "pos1"))
-			&& dict_has_key(d, "priority")
-			&& dict_has_key(d, "id")))
+	    if (!(dict_has_सुसि(d, "group")
+			&& (dict_has_सुसि(d, "pattern")
+			    || dict_has_सुसि(d, "pos1"))
+			&& dict_has_सुसि(d, "priority")
+			&& dict_has_सुसि(d, "id")))
 	    {
 		emsg(_(e_invalid_argument));
 		return;
@@ -1128,7 +1128,7 @@ f_setmatches(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
 	    char_u	*conceal;
 
 	    d = li->li_tv.vval.v_dict;
-	    if (!dict_has_key(d, "pattern"))
+	    if (!dict_has_सुसि(d, "pattern"))
 	    {
 		if (s == NULL)
 		{
@@ -1158,9 +1158,9 @@ f_setmatches(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
 	    }
 
 	    group = dict_get_string(d, "group", TRUE);
-	    priority = (int)dict_get_number(d, "priority");
-	    id = (int)dict_get_number(d, "id");
-	    conceal = dict_has_key(d, "conceal")
+	    priority = (int)dict_get_नुमेरो(d, "priority");
+	    id = (int)dict_get_नुमेरो(d, "id");
+	    conceal = dict_has_सुसि(d, "conceal")
 			      ? dict_get_string(d, "conceal", TRUE)
 			      : NULL;
 	    if (i == 0)
@@ -1180,7 +1180,7 @@ f_setmatches(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
 
 	    li = li->li_next;
 	}
-	rettv->vval.v_number = 0;
+	rettv->vval.v_नुमेरो = 0;
     }
 # endif
 }
@@ -1191,7 +1191,7 @@ f_setmatches(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
     void
 f_matchadd(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
 {
-# ifdef FEAT_SEARCH_EXTRA
+# ifdef FEAT_हानाप_EXTRA
     char_u	buf[NUMBUFLEN];
     char_u	*grp;		// group
     char_u	*pat;		// pattern
@@ -1201,14 +1201,14 @@ f_matchadd(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
     char_u	*conceal_char = NULL;
     win_T	*win = curwin;
 
-    rettv->vval.v_number = -1;
+    rettv->vval.v_नुमेरो = -1;
 
     if (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_string_arg(argvars, 1) == FAIL
-		|| check_for_opt_number_arg(argvars, 2) == FAIL
+		|| check_for_opt_नुमेरो_arg(argvars, 2) == FAIL
 		|| (argvars[2].v_type != VAR_UNKNOWN
-		    && (check_for_opt_number_arg(argvars, 3) == FAIL
+		    && (check_for_opt_नुमेरो_arg(argvars, 3) == FAIL
 			|| (argvars[3].v_type != VAR_UNKNOWN
 			    && check_for_opt_dict_arg(argvars, 4) == FAIL)))))
 	return;
@@ -1219,10 +1219,10 @@ f_matchadd(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
 	return;
     if (argvars[2].v_type != VAR_UNKNOWN)
     {
-	prio = (int)tv_get_number_chk(&argvars[2], &error);
+	prio = (int)tv_get_नुमेरो_chk(&argvars[2], &error);
 	if (argvars[3].v_type != VAR_UNKNOWN)
 	{
-	    id = (int)tv_get_number_chk(&argvars[3], &error);
+	    id = (int)tv_get_नुमेरो_chk(&argvars[3], &error);
 	    if (argvars[4].v_type != VAR_UNKNOWN
 		&& matchadd_dict_arg(&argvars[4], &conceal_char, &win) == FAIL)
 		return;
@@ -1236,7 +1236,7 @@ f_matchadd(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
 	return;
     }
 
-    rettv->vval.v_number = match_add(win, grp, pat, prio, id, NULL,
+    rettv->vval.v_नुमेरो = match_add(win, grp, pat, prio, id, NULL,
 								conceal_char);
 # endif
 }
@@ -1247,7 +1247,7 @@ f_matchadd(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
     void
 f_matchaddpos(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
 {
-# ifdef FEAT_SEARCH_EXTRA
+# ifdef FEAT_हानाप_EXTRA
     char_u	buf[NUMBUFLEN];
     char_u	*group;
     int		prio = 10;
@@ -1257,14 +1257,14 @@ f_matchaddpos(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
     char_u	*conceal_char = NULL;
     win_T	*win = curwin;
 
-    rettv->vval.v_number = -1;
+    rettv->vval.v_नुमेरो = -1;
 
     if (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_list_arg(argvars, 1) == FAIL
-		|| check_for_opt_number_arg(argvars, 2) == FAIL
+		|| check_for_opt_नुमेरो_arg(argvars, 2) == FAIL
 		|| (argvars[2].v_type != VAR_UNKNOWN
-		    && (check_for_opt_number_arg(argvars, 3) == FAIL
+		    && (check_for_opt_नुमेरो_arg(argvars, 3) == FAIL
 			|| (argvars[3].v_type != VAR_UNKNOWN
 			    && check_for_opt_dict_arg(argvars, 4) == FAIL)))))
 	return;
@@ -1284,10 +1284,10 @@ f_matchaddpos(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
 
     if (argvars[2].v_type != VAR_UNKNOWN)
     {
-	prio = (int)tv_get_number_chk(&argvars[2], &error);
+	prio = (int)tv_get_नुमेरो_chk(&argvars[2], &error);
 	if (argvars[3].v_type != VAR_UNKNOWN)
 	{
-	    id = (int)tv_get_number_chk(&argvars[3], &error);
+	    id = (int)tv_get_नुमेरो_chk(&argvars[3], &error);
 
 	    if (argvars[4].v_type != VAR_UNKNOWN
 		&& matchadd_dict_arg(&argvars[4], &conceal_char, &win) == FAIL)
@@ -1304,7 +1304,7 @@ f_matchaddpos(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
 	return;
     }
 
-    rettv->vval.v_number = match_add(win, group, NULL, prio, id, l,
+    rettv->vval.v_नुमेरो = match_add(win, group, NULL, prio, id, l,
 								conceal_char);
 # endif
 }
@@ -1318,14 +1318,14 @@ f_matcharg(typval_T *argvars UNUSED, typval_T *rettv)
     if (rettv_list_alloc(rettv) != OK)
 	return;
 
-# ifdef FEAT_SEARCH_EXTRA
+# ifdef FEAT_हानाप_EXTRA
     int	    id;
     matchitem_T *m;
 
-    if (in_vim9script() && check_for_number_arg(argvars, 0) == FAIL)
+    if (in_vim9script() && check_for_नुमेरो_arg(argvars, 0) == FAIL)
 	return;
 
-    id = (int)tv_get_number(&argvars[0]);
+    id = (int)tv_get_नुमेरो(&argvars[0]);
     if (id >= 1 && id <= 3)
     {
 	if ((m = get_match(curwin, id)) != NULL)
@@ -1349,25 +1349,25 @@ f_matcharg(typval_T *argvars UNUSED, typval_T *rettv)
     void
 f_matchdelete(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
 {
-# ifdef FEAT_SEARCH_EXTRA
+# ifdef FEAT_हानाप_EXTRA
     win_T   *win;
 
     if (in_vim9script()
-	    && (check_for_number_arg(argvars, 0) == FAIL
-		|| check_for_opt_number_arg(argvars, 1) == FAIL))
+	    && (check_for_नुमेरो_arg(argvars, 0) == FAIL
+		|| check_for_opt_नुमेरो_arg(argvars, 1) == FAIL))
 	return;
 
     win = get_optional_window(argvars, 1);
     if (win == NULL)
-	rettv->vval.v_number = -1;
+	rettv->vval.v_नुमेरो = -1;
     else
-	rettv->vval.v_number = match_delete(win,
-				       (int)tv_get_number(&argvars[0]), TRUE);
+	rettv->vval.v_नुमेरो = match_delete(win,
+				       (int)tv_get_नुमेरो(&argvars[0]), TRUE);
 # endif
 }
 #endif
 
-#if defined(FEAT_SEARCH_EXTRA)
+#if defined(FEAT_हानाप_EXTRA)
 /*
  * ":[N]match {group} {pattern}"
  * Sets nextcmd to the start of the next command, if any.  Also called when

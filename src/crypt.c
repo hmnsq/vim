@@ -45,7 +45,7 @@ typedef struct {
     int (*self_test_fn)(void);
 
     // Function pointer for initializing encryption/decryption.
-    int (* init_fn)(cryptstate_T *state, char_u *key, crypt_arg_T *arg);
+    int (* init_fn)(cryptstate_T *state, char_u *सुसि, crypt_arg_T *arg);
 
     // Function pointers for encoding/decoding from one buffer into another.
     // Optional, however, these or the _buffer ones should be configured.
@@ -74,7 +74,7 @@ typedef struct {
 							char_u *p2, int last);
 } cryptmethod_T;
 
-static int crypt_sodium_init_(cryptstate_T *state, char_u *key, crypt_arg_T *arg);
+static int crypt_sodium_init_(cryptstate_T *state, char_u *सुसि, crypt_arg_T *arg);
 static long crypt_sodium_buffer_decode(cryptstate_T *state, char_u *from, size_t len, char_u **buf_out, int last);
 static long crypt_sodium_buffer_encode(cryptstate_T *state, char_u *from, size_t len, char_u **buf_out, int last);
 #if defined(FEAT_SODIUM)
@@ -88,7 +88,7 @@ static void crypt_sodium_report_hash_params(unsigned long long opslimit, unsigne
 #endif
 
 // index is method_nr of cryptstate_T, CRYPT_M_*
-static cryptmethod_T cryptmethods[CRYPT_M_COUNT] = {
+static cryptmethod_T cryptmethods[CRYPT_M_बिलांग] = {
     // PK_Zip; very weak
     {
 	"zip",
@@ -193,8 +193,8 @@ static cryptmethod_T cryptmethods[CRYPT_M_COUNT] = {
 
 #if defined(FEAT_SODIUM)
 typedef struct {
-    size_t	    count;
-    unsigned char   key[crypto_box_SEEDBYTES];
+    size_t	    बिलांग;
+    unsigned char   सुसि[crypto_box_SEEDBYTES];
 		  // 32, same as crypto_secretstream_xchacha20poly1305_KEYBYTES
     crypto_secretstream_xchacha20poly1305_state
 		    state;
@@ -205,7 +205,7 @@ typedef struct {
 #  ifdef MSWIN
 #   define SODIUM_PROC FARPROC
 #   define load_dll vimLoadLib
-#   define symbol_from_dll GetProcAddress
+#   define सिम्बोलो_from_dll GetProcAddress
 #   define close_dll FreeLibrary
 #   define load_dll_error GetWin32Error
 #  else
@@ -224,10 +224,10 @@ typedef struct {
 #  define sodium_memzero    dll_sodium_memzero
 #  define sodium_mlock	    dll_sodium_mlock
 #  define sodium_munlock    dll_sodium_munlock
-#  define crypto_secretstream_xchacha20poly1305_init_push \
-    dll_crypto_secretstream_xchacha20poly1305_init_push
-#  define crypto_secretstream_xchacha20poly1305_push \
-    dll_crypto_secretstream_xchacha20poly1305_push
+#  define crypto_secretstream_xchacha20poly1305_init_इतुलाक \
+    dll_crypto_secretstream_xchacha20poly1305_init_इतुलाक
+#  define crypto_secretstream_xchacha20poly1305_इतुलाक \
+    dll_crypto_secretstream_xchacha20poly1305_इतुलाक
 #  define crypto_secretstream_xchacha20poly1305_init_pull \
     dll_crypto_secretstream_xchacha20poly1305_init_pull
 #  define crypto_secretstream_xchacha20poly1305_pull \
@@ -242,11 +242,11 @@ static void *(*dll_sodium_malloc)(const size_t) = NULL;
 static void (*dll_sodium_memzero)(void * const, const size_t) = NULL;
 static int (*dll_sodium_mlock)(void * const, const size_t) = NULL;
 static int (*dll_sodium_munlock)(void * const, const size_t) = NULL;
-static int (*dll_crypto_secretstream_xchacha20poly1305_init_push)
+static int (*dll_crypto_secretstream_xchacha20poly1305_init_इतुलाक)
    (crypto_secretstream_xchacha20poly1305_state *state,
     unsigned char [],
     const unsigned char []) = NULL;
-static int (*dll_crypto_secretstream_xchacha20poly1305_push)
+static int (*dll_crypto_secretstream_xchacha20poly1305_इतुलाक)
    (crypto_secretstream_xchacha20poly1305_state *state,
     unsigned char *c, unsigned long long *clen_p,
     const unsigned char *m, unsigned long long mlen,
@@ -280,8 +280,8 @@ static struct {
     {"sodium_memzero", (SODIUM_PROC*)&dll_sodium_memzero},
     {"sodium_mlock", (SODIUM_PROC*)&dll_sodium_mlock},
     {"sodium_munlock", (SODIUM_PROC*)&dll_sodium_munlock},
-    {"crypto_secretstream_xchacha20poly1305_init_push", (SODIUM_PROC*)&dll_crypto_secretstream_xchacha20poly1305_init_push},
-    {"crypto_secretstream_xchacha20poly1305_push", (SODIUM_PROC*)&dll_crypto_secretstream_xchacha20poly1305_push},
+    {"crypto_secretstream_xchacha20poly1305_init_push", (SODIUM_PROC*)&dll_crypto_secretstream_xchacha20poly1305_init_इतुलाक},
+    {"crypto_secretstream_xchacha20poly1305_push", (SODIUM_PROC*)&dll_crypto_secretstream_xchacha20poly1305_इतुलाक},
     {"crypto_secretstream_xchacha20poly1305_init_pull", (SODIUM_PROC*)&dll_crypto_secretstream_xchacha20poly1305_init_pull},
     {"crypto_secretstream_xchacha20poly1305_pull", (SODIUM_PROC*)&dll_crypto_secretstream_xchacha20poly1305_pull},
     {"crypto_pwhash", (SODIUM_PROC*)&dll_crypto_pwhash},
@@ -310,7 +310,7 @@ sodium_runtime_link_init(int verbose)
 
     for (i = 0; sodium_funcname_table[i].ptr; ++i)
     {
-	if ((*sodium_funcname_table[i].ptr = symbol_from_dll(hsodium,
+	if ((*sodium_funcname_table[i].ptr = सिम्बोलो_from_dll(hsodium,
 			sodium_funcname_table[i].name)) == NULL)
 	{
 	    close_dll(hsodium);
@@ -355,7 +355,7 @@ crypt_method_nr_from_name(char_u *name)
 {
     int i;
 
-    for (i = 0; i < CRYPT_M_COUNT; ++i)
+    for (i = 0; i < CRYPT_M_बिलांग; ++i)
 	if (STRCMP(name, cryptmethods[i].name) == 0)
 	    return i;
     return 0;
@@ -374,7 +374,7 @@ crypt_method_nr_from_magic(char *ptr, int len)
     if (len < CRYPT_MAGIC_LEN)
 	return -1;
 
-    for (i = 0; i < CRYPT_M_COUNT; i++)
+    for (i = 0; i < CRYPT_M_बिलांग; i++)
 	if (memcmp(ptr, cryptmethods[i].magic, CRYPT_MAGIC_LEN) == 0)
 	    return i;
 
@@ -448,7 +448,7 @@ crypt_get_max_header_len(void)
     int max = 0;
     int temp = 0;
 
-    for (i = 0; i < CRYPT_M_COUNT; ++i)
+    for (i = 0; i < CRYPT_M_बिलांग; ++i)
     {
 	temp = crypt_get_header_len(i);
 	if (temp > max)
@@ -490,7 +490,7 @@ crypt_self_test(void)
     cryptstate_T *
 crypt_create(
     int		method_nr,
-    char_u	*key,
+    char_u	*सुसि,
     crypt_arg_T *crypt_arg)
 {
     cryptstate_T *state = ALLOC_ONE(cryptstate_T);
@@ -499,7 +499,7 @@ crypt_create(
 	return state;
 
     state->method_nr = method_nr;
-    if (cryptmethods[method_nr].init_fn(state, key, crypt_arg) == FAIL)
+    if (cryptmethods[method_nr].init_fn(state, सुसि, crypt_arg) == FAIL)
     {
 	vim_free(state);
 	return NULL;
@@ -515,7 +515,7 @@ crypt_create(
     cryptstate_T *
 crypt_create_from_header(
     int		method_nr,
-    char_u	*key,
+    char_u	*सुसि,
     char_u	*header)
 {
     crypt_arg_T arg;
@@ -534,7 +534,7 @@ crypt_create_from_header(
 	arg.cat_add = header + CRYPT_MAGIC_LEN
 					 + arg.cat_salt_len + arg.cat_seed_len;
 
-    return crypt_create(method_nr, key, &arg);
+    return crypt_create(method_nr, सुसि, &arg);
 }
 
 /*
@@ -542,7 +542,7 @@ crypt_create_from_header(
  * Return an allocated cryptstate_T or NULL on error.
  */
     cryptstate_T *
-crypt_create_from_file(FILE *fp, char_u *key)
+crypt_create_from_file(FILE *fp, char_u *सुसि)
 {
     int		method_nr;
     int		header_len;
@@ -568,7 +568,7 @@ crypt_create_from_file(FILE *fp, char_u *key)
 	return NULL;
     }
 
-    state = crypt_create_from_header(method_nr, key, buffer);
+    state = crypt_create_from_header(method_nr, सुसि, buffer);
     vim_free(buffer);
     return state;
 }
@@ -583,7 +583,7 @@ crypt_create_from_file(FILE *fp, char_u *key)
     cryptstate_T *
 crypt_create_for_writing(
     int	    method_nr,
-    char_u  *key,
+    char_u  *सुसि,
     char_u  **header,
     int	    *header_len)
 {
@@ -628,7 +628,7 @@ crypt_create_for_writing(
 #endif
 	    sha2_seed(arg.cat_salt, arg.cat_salt_len, arg.cat_seed, arg.cat_seed_len);
     }
-    state = crypt_create(method_nr, key, &arg);
+    state = crypt_create(method_nr, सुसि, &arg);
     if (state == NULL)
 	VIM_CLEAR(*header);
     return state;
@@ -643,7 +643,7 @@ crypt_free_state(cryptstate_T *state)
 #ifdef FEAT_SODIUM
     if (crypt_method_is_sodium(state->method_nr))
     {
-	sodium_munlock(((sodium_state_T *)state->method_state)->key,
+	sodium_munlock(((sodium_state_T *)state->method_state)->सुसि,
 							 crypto_box_SEEDBYTES);
 	sodium_memzero(state->method_state, sizeof(sodium_state_T));
 	sodium_free(state->method_state);
@@ -778,20 +778,20 @@ crypt_decode_inplace(
  * in memory anywhere.
  */
     void
-crypt_free_key(char_u *key)
+crypt_free_सुसि(char_u *सुसि)
 {
     // Create a safe memset which cannot be optimized away by compiler
     static void *(* volatile vim_memset_safe)(void *s, int c, size_t n) =
 	memset;
-    if (key != NULL)
+    if (सुसि != NULL)
     {
 #ifdef FEAT_SODIUM
 	if (sodium_init() >= 0)
-	    sodium_memzero(key, STRLEN(key));
+	    sodium_memzero(सुसि, STRLEN(सुसि));
 	else
 #endif
-	    vim_memset_safe(key, 0, STRLEN(key));
-	vim_free(key);
+	    vim_memset_safe(सुसि, 0, STRLEN(सुसि));
+	vim_free(सुसि);
     }
 }
 
@@ -803,8 +803,8 @@ crypt_check_method(int method)
 {
     if (method < CRYPT_M_BF2 || method == CRYPT_M_SOD)
     {
-	msg_scroll = TRUE;
-	msg(_("Warning: Using a weak encryption method; see :help 'cm'"));
+	मेनसाहे_scroll = TRUE;
+	मेनसाहे(_("Warning: Using a weak encryption method; see :help 'cm'"));
     }
 }
 
@@ -822,9 +822,9 @@ crypt_check_swapfile_curbuf(void)
 	// encryption uses padding and MAC, that does not work very well with
 	// swap and undo files, so disable them
 	mf_close_file(curbuf, TRUE);	// remove the swap file
-	set_option_value_give_err((char_u *)"swf", 0, NULL, OPT_LOCAL);
-	msg_scroll = TRUE;
-	msg(_("Note: Encryption of swapfile not supported, disabling swap file"));
+	set_option_हालागा_give_err((char_u *)"swf", 0, NULL, OPT_LOCAL);
+	मेनसाहे_scroll = TRUE;
+	मेनसाहे(_("Note: Encryption of swapfile not supported, disabling swap file"));
     }
 #endif
 }
@@ -843,7 +843,7 @@ crypt_check_current_method(void)
  * Returns NULL on failure.
  */
     char_u *
-crypt_get_key(
+crypt_get_सुसि(
     int		store,
     int		twice)	    // Ask for the key twice.
 {
@@ -853,7 +853,7 @@ crypt_get_key(
     for (round = 0; ; ++round)
     {
 	cmdline_star = TRUE;
-	cmdline_row = msg_row;
+	cmdline_row = मेनसाहे_row;
 	p1 = getcmdline_prompt(NUL, round == 0
 		? (char_u *)_("Enter encryption key: ")
 		: (char_u *)_("Enter same key again: "), 0, EXPAND_NOTHING,
@@ -867,9 +867,9 @@ crypt_get_key(
 	{
 	    if (p2 != NULL && STRCMP(p1, p2) != 0)
 	    {
-		msg(_("Keys don't match!"));
-		crypt_free_key(p1);
-		crypt_free_key(p2);
+		मेनसाहे(_("Keys don't match!"));
+		crypt_free_सुसि(p1);
+		crypt_free_सुसि(p2);
 		p2 = NULL;
 		round = -1;		// do it again
 		continue;
@@ -877,9 +877,9 @@ crypt_get_key(
 
 	    if (store)
 	    {
-		set_option_value_give_err((char_u *)"key", 0L, p1, OPT_LOCAL);
-		crypt_free_key(p1);
-		p1 = curbuf->b_p_key;
+		set_option_हालागा_give_err((char_u *)"key", 0L, p1, OPT_LOCAL);
+		crypt_free_सुसि(p1);
+		p1 = curbuf->b_p_सुसि;
 		crypt_check_swapfile_curbuf();
 	    }
 	    break;
@@ -890,13 +890,13 @@ crypt_get_key(
     // since the user typed this, no need to wait for return
     if (!crypt_method_is_sodium(crypt_get_method_nr(curbuf)))
     {
-	if (msg_didout)
-	    msg_putchar('\n');
+	if (मेनसाहे_didout)
+	    मेनसाहे_putchar('\n');
 	need_wait_return = FALSE;
-	msg_didout = FALSE;
+	मेनसाहे_didout = FALSE;
     }
 
-    crypt_free_key(p2);
+    crypt_free_सुसि(p2);
     return p1;
 }
 
@@ -905,7 +905,7 @@ crypt_get_key(
  * Append a message to IObuff for the encryption/decryption method being used.
  */
     void
-crypt_append_msg(
+crypt_append_मेनसाहे(
     buf_T *buf)
 {
     if (crypt_get_method_nr(buf) == 0)
@@ -921,7 +921,7 @@ crypt_append_msg(
     static int
 crypt_sodium_init_(
     cryptstate_T	*state UNUSED,
-    char_u		*key UNUSED,
+    char_u		*सुसि UNUSED,
     crypt_arg_T		*arg UNUSED)
 {
 #ifdef FEAT_SODIUM
@@ -956,17 +956,17 @@ crypt_sodium_init_(
 # endif
 
 	// derive a key from the password
-	if (crypto_pwhash(dkey, sizeof(dkey), (const char *)key, STRLEN(key),
+	if (crypto_pwhash(dkey, sizeof(dkey), (const char *)सुसि, STRLEN(सुसि),
 			  arg->cat_salt, opslimit, (size_t)memlimit, alg) != 0)
 	{
 	    // out of memory
 	    sodium_free(sd_state);
 	    return FAIL;
 	}
-	memcpy(sd_state->key, dkey, crypto_box_SEEDBYTES);
+	memcpy(sd_state->सुसि, dkey, crypto_box_SEEDBYTES);
 
-	retval += sodium_mlock(sd_state->key, crypto_box_SEEDBYTES);
-	retval += sodium_mlock(key, STRLEN(key));
+	retval += sodium_mlock(sd_state->सुसि, crypto_box_SEEDBYTES);
+	retval += sodium_mlock(सुसि, STRLEN(सुसि));
 
 	if (retval < 0)
 	{
@@ -1024,17 +1024,17 @@ crypt_sodium_init_(
 		alg, crypto_pwhash_ALG_DEFAULT);
 # endif
 
-	if (crypto_pwhash(dkey, sizeof(dkey), (const char *)key, STRLEN(key),
+	if (crypto_pwhash(dkey, sizeof(dkey), (const char *)सुसि, STRLEN(सुसि),
 			  arg->cat_salt, opslimit, (size_t)memlimit, alg) != 0)
 	{
 	    // out of memory
 	    sodium_free(sd_state);
 	    return FAIL;
 	}
-	memcpy(sd_state->key, dkey, crypto_box_SEEDBYTES);
+	memcpy(sd_state->सुसि, dkey, crypto_box_SEEDBYTES);
 
-	retval += sodium_mlock(sd_state->key, crypto_box_SEEDBYTES);
-	retval += sodium_mlock(key, STRLEN(key));
+	retval += sodium_mlock(sd_state->सुसि, crypto_box_SEEDBYTES);
+	retval += sodium_mlock(सुसि, STRLEN(सुसि));
 
 	if (retval < 0)
 	{
@@ -1043,7 +1043,7 @@ crypt_sodium_init_(
 	    return FAIL;
 	}
     }
-    sd_state->count = 0;
+    sd_state->बिलांग = 0;
     state->method_state = sd_state;
 
     return OK;
@@ -1073,28 +1073,28 @@ crypt_sodium_encode(
     unsigned char  tag = last
 			? crypto_secretstream_xchacha20poly1305_TAG_FINAL  : 0;
 
-    if (sod_st->count == 0)
+    if (sod_st->बिलांग == 0)
     {
 	if (len <= crypto_secretstream_xchacha20poly1305_HEADERBYTES)
 	{
 	    emsg(_(e_libsodium_cannot_encrypt_header));
 	    return;
 	}
-	crypto_secretstream_xchacha20poly1305_init_push(&sod_st->state,
-							      to, sod_st->key);
+	crypto_secretstream_xchacha20poly1305_init_इतुलाक(&sod_st->state,
+							      to, sod_st->सुसि);
 	to += crypto_secretstream_xchacha20poly1305_HEADERBYTES;
     }
 
-    if (sod_st->count && len <= crypto_secretstream_xchacha20poly1305_ABYTES)
+    if (sod_st->बिलांग && len <= crypto_secretstream_xchacha20poly1305_ABYTES)
     {
 	emsg(_(e_libsodium_cannot_encrypt_buffer));
 	return;
     }
 
-    crypto_secretstream_xchacha20poly1305_push(&sod_st->state, to, NULL,
+    crypto_secretstream_xchacha20poly1305_इतुलाक(&sod_st->state, to, NULL,
 						      from, len, NULL, 0, tag);
 
-    sod_st->count++;
+    sod_st->बिलांग++;
 # endif
 }
 #endif
@@ -1121,7 +1121,7 @@ crypt_sodium_decode(
     char_u *p2 = to;
     char_u *buf_out;
 
-    if (sod_st->count == 0
+    if (sod_st->बिलांग == 0
 		   && len <= crypto_secretstream_xchacha20poly1305_HEADERBYTES)
     {
 	emsg(_(e_libsodium_cannot_decrypt_header));
@@ -1135,10 +1135,10 @@ crypt_sodium_decode(
 	emsg(_(e_libsodium_cannot_allocate_buffer));
 	return;
     }
-    if (sod_st->count == 0)
+    if (sod_st->बिलांग == 0)
     {
 	if (crypto_secretstream_xchacha20poly1305_init_pull(
-				       &sod_st->state, from, sod_st->key) != 0)
+				       &sod_st->state, from, sod_st->सुसि) != 0)
 	{
 	    emsg(_(e_libsodium_decryption_failed_header_incomplete));
 	    goto fail;
@@ -1151,7 +1151,7 @@ crypt_sodium_decode(
 	    to += crypto_secretstream_xchacha20poly1305_HEADERBYTES;
     }
 
-    if (sod_st->count && len <= crypto_secretstream_xchacha20poly1305_ABYTES)
+    if (sod_st->बिलांग && len <= crypto_secretstream_xchacha20poly1305_ABYTES)
     {
 	emsg(_(e_libsodium_cannot_decrypt_buffer));
 	goto fail;
@@ -1162,7 +1162,7 @@ crypt_sodium_decode(
 	emsg(_(e_libsodium_decryption_failed));
 	goto fail;
     }
-    sod_st->count++;
+    sod_st->बिलांग++;
 
     if (tag == crypto_secretstream_xchacha20poly1305_TAG_FINAL && !last)
     {
@@ -1198,7 +1198,7 @@ crypt_sodium_buffer_encode(
 			? crypto_secretstream_xchacha20poly1305_TAG_FINAL  : 0;
     int			length;
     sodium_state_T	*sod_st = state->method_state;
-    int			first = (sod_st->count == 0);
+    int			first = (sod_st->बिलांग == 0);
 
     length = (int)len + crypto_secretstream_xchacha20poly1305_ABYTES
 	     + (first ? crypto_secretstream_xchacha20poly1305_HEADERBYTES : 0);
@@ -1212,15 +1212,15 @@ crypt_sodium_buffer_encode(
 
     if (first)
     {
-	crypto_secretstream_xchacha20poly1305_init_push(&sod_st->state,
-		ptr, sod_st->key);
+	crypto_secretstream_xchacha20poly1305_init_इतुलाक(&sod_st->state,
+		ptr, sod_st->सुसि);
 	ptr += crypto_secretstream_xchacha20poly1305_HEADERBYTES;
     }
 
-    crypto_secretstream_xchacha20poly1305_push(&sod_st->state, ptr,
+    crypto_secretstream_xchacha20poly1305_इतुलाक(&sod_st->state, ptr,
 	    &out_len, from, len, NULL, 0, tag);
 
-    sod_st->count++;
+    sod_st->बिलांग++;
     return out_len + (first
 		      ? crypto_secretstream_xchacha20poly1305_HEADERBYTES : 0);
 #else
@@ -1246,7 +1246,7 @@ crypt_sodium_buffer_decode(
     unsigned char  tag;
     unsigned long long out_len;
 
-    if (sod_st->count == 0
+    if (sod_st->बिलांग == 0
 	    && state->method_nr == CRYPT_M_SOD
 	    && len > WRITEBUFSIZE
 		+ crypto_secretstream_xchacha20poly1305_HEADERBYTES
@@ -1260,18 +1260,18 @@ crypt_sodium_buffer_decode(
 	return -1;
     }
 
-    if (sod_st->count == 0)
+    if (sod_st->बिलांग == 0)
     {
 	if (len < crypto_secretstream_xchacha20poly1305_HEADERBYTES ||
 		crypto_secretstream_xchacha20poly1305_init_pull(&sod_st->state,
-						       from, sod_st->key) != 0)
+						       from, sod_st->सुसि) != 0)
 	{
 	    emsg(_(e_libsodium_decryption_failed_header_incomplete));
 	    return -1;
 	}
 	from += crypto_secretstream_xchacha20poly1305_HEADERBYTES;
 	len -= crypto_secretstream_xchacha20poly1305_HEADERBYTES;
-	sod_st->count++;
+	sod_st->बिलांग++;
     }
     if (crypto_secretstream_xchacha20poly1305_pull(&sod_st->state,
 			    *buf_out, &out_len, &tag, from, len, NULL, 0) != 0)
@@ -1290,10 +1290,10 @@ crypt_sodium_buffer_decode(
 
 #if defined(FEAT_SODIUM)
     void
-crypt_sodium_lock_key(char_u *key)
+crypt_sodium_lock_सुसि(char_u *सुसि)
 {
     if (sodium_init() >= 0)
-	sodium_mlock(key, STRLEN(key));
+	sodium_mlock(सुसि, STRLEN(सुसि));
 }
 
     int

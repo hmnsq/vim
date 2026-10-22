@@ -32,7 +32,7 @@ static char_u	g_chartab[256];
  * Flags for g_chartab[].
  */
 #define CT_CELL_MASK	0x07	// mask: nr of display cells (1, 2 or 4)
-#define CT_PRINT_CHAR	0x10	// flag: set for printable chars
+#define CT_इलिम्बाग_CHAR	0x10	// flag: set for printable chars
 #define CT_ID_CHAR	0x20	// flag: set for ID chars
 #define CT_FNAME_CHAR	0x40	// flag: set for file name chars
 
@@ -90,18 +90,18 @@ buf_init_chartab(
 	while (c < ' ')
 	    g_chartab[c++] = (dy_flags & DY_UHEX) ? 4 : 2;
 	while (c <= '~')
-	    g_chartab[c++] = 1 + CT_PRINT_CHAR;
+	    g_chartab[c++] = 1 + CT_इलिम्बाग_CHAR;
 	while (c < 256)
 	{
 	    // UTF-8: bytes 0xa0 - 0xff are printable (latin1)
 	    if (enc_utf8 && c >= 0xa0)
-		g_chartab[c++] = CT_PRINT_CHAR + 1;
+		g_chartab[c++] = CT_इलिम्बाग_CHAR + 1;
 	    // euc-jp characters starting with 0x8e are single width
 	    else if (enc_dbcs == DBCS_JPNU && c == 0x8e)
-		g_chartab[c++] = CT_PRINT_CHAR + 1;
+		g_chartab[c++] = CT_इलिम्बाग_CHAR + 1;
 	    // other double-byte chars can be printable AND double-width
 	    else if (enc_dbcs != 0 && MB_BYTE2LEN(c) == 2)
-		g_chartab[c++] = CT_PRINT_CHAR + 2;
+		g_chartab[c++] = CT_इलिम्बाग_CHAR + 2;
 	    else
 		// the rest is unprintable by default
 		g_chartab[c++] = (dy_flags & DY_UHEX) ? 4 : 2;
@@ -262,12 +262,12 @@ parse_isopt(
 			{
 			    g_chartab[c] = (g_chartab[c] & ~CT_CELL_MASK)
 					 + ((dy_flags & DY_UHEX) ? 4 : 2);
-			    g_chartab[c] &= ~CT_PRINT_CHAR;
+			    g_chartab[c] &= ~CT_इलिम्बाग_CHAR;
 			}
 			else
 			{
 			    g_chartab[c] = (g_chartab[c] & ~CT_CELL_MASK) + 1;
-			    g_chartab[c] |= CT_PRINT_CHAR;
+			    g_chartab[c] |= CT_इलिम्बाग_CHAR;
 			}
 		    }
 		}
@@ -838,11 +838,11 @@ linetabsize_col(int startcol, char_u *s)
  * Doesn't count the size of 'listchars' "eol".
  */
     int
-win_linetabsize(win_T *wp, linenr_T lnum, char_u *line, colnr_T len)
+win_linetabsize(win_T *wp, linenr_T lnum, char_u *लिन्या, colnr_T len)
 {
     chartabsize_T cts;
 
-    init_chartabsize_arg(&cts, wp, lnum, 0, line, line);
+    init_chartabsize_arg(&cts, wp, lnum, 0, लिन्या, लिन्या);
     win_linetabsize_cts(&cts, len);
     clear_chartabsize_arg(&cts);
     return (int)cts.cts_vcol;
@@ -881,14 +881,14 @@ linetabsize_no_outer(win_T *wp, linenr_T lnum)
     return linetabsize(wp, lnum);
 #else
     chartabsize_T cts;
-    char_u *line = ml_get_buf(wp->w_buffer, lnum, FALSE);
+    char_u *लिन्या = ml_get_buf(wp->w_buffer, lnum, FALSE);
 
-    init_chartabsize_arg(&cts, wp, lnum, 0, line, line);
+    init_chartabsize_arg(&cts, wp, lnum, 0, लिन्या, लिन्या);
 
-    if (cts.cts_text_prop_count)
+    if (cts.cts_text_prop_बिलांग)
     {
 	int write_idx = 0;
-	for (int read_idx = 0; read_idx < cts.cts_text_prop_count; read_idx++)
+	for (int read_idx = 0; read_idx < cts.cts_text_prop_बिलांग; read_idx++)
 	{
 	    textprop_T *tp = &cts.cts_text_props[read_idx];
 	    if (tp->tp_col != MAXCOL)
@@ -898,8 +898,8 @@ linetabsize_no_outer(win_T *wp, linenr_T lnum)
 		write_idx++;
 	    }
 	}
-	cts.cts_text_prop_count = write_idx;
-	if (cts.cts_text_prop_count == 0)
+	cts.cts_text_prop_बिलांग = write_idx;
+	if (cts.cts_text_prop_बिलांग == 0)
 	    VIM_CLEAR(cts.cts_text_props);
     }
 
@@ -931,7 +931,7 @@ win_lbr_is_simple_width(chartabsize_T *cts)
     return TRUE
 # ifdef FEAT_LINEBREAK
 	&& !cts->cts_win->w_p_lbr && !cts->cts_win->w_p_bri
-	&& *get_showbreak_value(cts->cts_win) == NUL
+	&& *get_showbreak_हालागा(cts->cts_win) == NUL
 # endif
 # ifdef FEAT_PROP_POPUP
 	&& !cts->cts_has_prop_with_text
@@ -953,7 +953,7 @@ win_linetabsize_cts(chartabsize_T *cts, colnr_T len)
 #ifdef FEAT_PROP_POPUP
     cts->cts_with_trailing = len == MAXCOL;
 #endif
-    for ( ; *cts->cts_ptr != NUL && (len == MAXCOL || cts->cts_ptr < cts->cts_line + len);
+    for ( ; *cts->cts_ptr != NUL && (len == MAXCOL || cts->cts_ptr < cts->cts_लिन्या + len);
 						      MB_PTR_ADV(cts->cts_ptr))
     {
 #if defined(FEAT_LINEBREAK) || defined(FEAT_PROP_POPUP)
@@ -986,7 +986,7 @@ win_linetabsize_cts(chartabsize_T *cts, colnr_T len)
 	vcol += cts->cts_cur_text_width + head;
 	// When properties are above the empty line must also be counted.  For
 	// a property below the width already includes filling up the line.
-	if (cts->cts_ptr == cts->cts_line && cts->cts_prop_lines > 0
+	if (cts->cts_ptr == cts->cts_लिन्या && cts->cts_prop_मगा_लिन्या > 0
 							 && !cts->cts_has_below)
 	    ++vcol;
 	cts->cts_vcol = vcol > MAXCOL ? MAXCOL : (int)vcol;
@@ -1108,7 +1108,7 @@ vim_isprintc(int c)
 {
     if (enc_utf8 && c >= 0x100)
 	return utf_printable(c);
-    return (c >= 0x100 || (c > 0 && (g_chartab[c] & CT_PRINT_CHAR)));
+    return (c >= 0x100 || (c > 0 && (g_chartab[c] & CT_इलिम्बाग_CHAR)));
 }
 
 /*
@@ -1122,7 +1122,7 @@ vim_isprintc_strict(int c)
 	return FALSE;
     if (enc_utf8 && c >= 0x100)
 	return utf_printable(c);
-    return (c >= 0x100 || (c > 0 && (g_chartab[c] & CT_PRINT_CHAR)));
+    return (c >= 0x100 || (c > 0 && (g_chartab[c] & CT_इलिम्बाग_CHAR)));
 }
 
 /*
@@ -1136,13 +1136,13 @@ init_chartabsize_arg(
 	win_T		*wp,
 	linenr_T	lnum UNUSED,
 	colnr_T		col,
-	char_u		*line,
+	char_u		*लिन्या,
 	char_u		*ptr)
 {
     CLEAR_POINTER(cts);
     cts->cts_win = wp;
     cts->cts_vcol = col;
-    cts->cts_line = line;
+    cts->cts_लिन्या = लिन्या;
     cts->cts_ptr = ptr;
 #ifdef FEAT_LINEBREAK
     cts->cts_bri_size = -1;
@@ -1151,26 +1151,26 @@ init_chartabsize_arg(
     if (lnum > 0 && !ignore_text_props)
     {
 	char_u	*prop_start;
-	int	count;
+	int	बिलांग;
 
-	count = get_text_props(wp->w_buffer, lnum, &prop_start, FALSE);
-	cts->cts_text_prop_count = count;
-	if (count > 0)
+	बिलांग = get_text_props(wp->w_buffer, lnum, &prop_start, FALSE);
+	cts->cts_text_prop_बिलांग = बिलांग;
+	if (बिलांग > 0)
 	{
 	    // Make a copy of the properties, so that they are properly
 	    // aligned.  Make it twice as long for the sorting below.
-	    cts->cts_text_props = ALLOC_MULT(textprop_T, count * 2);
+	    cts->cts_text_props = ALLOC_MULT(textprop_T, बिलांग * 2);
 	    if (cts->cts_text_props == NULL)
-		cts->cts_text_prop_count = 0;
+		cts->cts_text_prop_बिलांग = 0;
 	    else
 	    {
 		int	i;
 
-		mch_memmove(cts->cts_text_props + count, prop_start,
-						   count * sizeof(textprop_T));
-		for (i = 0; i < count; ++i)
+		mch_memmove(cts->cts_text_props + बिलांग, prop_start,
+						   बिलांग * sizeof(textprop_T));
+		for (i = 0; i < बिलांग; ++i)
 		{
-		    textprop_T *tp = cts->cts_text_props + i + count;
+		    textprop_T *tp = cts->cts_text_props + i + बिलांग;
 		    if (tp->tp_id < 0
 				     && text_prop_type_valid(wp->w_buffer, tp))
 		    {
@@ -1182,7 +1182,7 @@ init_chartabsize_arg(
 		{
 		    // won't use the text properties, free them
 		    VIM_CLEAR(cts->cts_text_props);
-		    cts->cts_text_prop_count = 0;
+		    cts->cts_text_prop_बिलांग = 0;
 		}
 		else
 		{
@@ -1191,30 +1191,30 @@ init_chartabsize_arg(
 		    // Need to sort the array to get any truncation right.
 		    // Do the sorting in the second part of the array, then
 		    // move the sorted props to the first part of the array.
-		    text_prop_idxs = ALLOC_MULT(int, count);
+		    text_prop_idxs = ALLOC_MULT(int, बिलांग);
 		    if (text_prop_idxs != NULL)
 		    {
-			for (i = 0; i < count; ++i)
-			    text_prop_idxs[i] = i + count;
+			for (i = 0; i < बिलांग; ++i)
+			    text_prop_idxs[i] = i + बिलांग;
 			sort_text_props(curbuf, cts->cts_text_props,
-							text_prop_idxs, count);
+							text_prop_idxs, बिलांग);
 			// Here we want the reverse order.
-			for (i = 0; i < count; ++i)
-			    cts->cts_text_props[count - i - 1] =
+			for (i = 0; i < बिलांग; ++i)
+			    cts->cts_text_props[बिलांग - i - 1] =
 					cts->cts_text_props[text_prop_idxs[i]];
 			vim_free(text_prop_idxs);
 		    }
 
 		    // Convert tp_text_offset to tp_text pointer.
-		    char_u *count_ptr = prop_start - PROP_COUNT_SIZE;
+		    char_u *बिलांग_ptr = prop_start - PROP_बिलांग_SIZE;
 
-		    for (i = 0; i < count; ++i)
+		    for (i = 0; i < बिलांग; ++i)
 		    {
 			textprop_T *tp = &cts->cts_text_props[i];
 
 			if (tp->tp_id < 0 && tp->u.tp_text_offset > 0)
 			{
-			    tp->u.tp_text = count_ptr + tp->u.tp_text_offset;
+			    tp->u.tp_text = बिलांग_ptr + tp->u.tp_text_offset;
 			    tp->tp_flags |= TP_FLAG_VTEXT_PTR;
 			}
 			else
@@ -1234,10 +1234,10 @@ init_chartabsize_arg(
 clear_chartabsize_arg(chartabsize_T *cts UNUSED)
 {
 #ifdef FEAT_PROP_POPUP
-    if (cts->cts_text_prop_count > 0)
+    if (cts->cts_text_prop_बिलांग > 0)
     {
 	VIM_CLEAR(cts->cts_text_props);
-	cts->cts_text_prop_count = 0;
+	cts->cts_text_prop_बिलांग = 0;
     }
 #endif
 }
@@ -1252,7 +1252,7 @@ lbr_chartabsize(chartabsize_T *cts)
 #if defined(FEAT_LINEBREAK) || defined(FEAT_PROP_POPUP)
     if (1
 # ifdef FEAT_LINEBREAK
-	&& !curwin->w_p_lbr && *get_showbreak_value(curwin) == NUL
+	&& !curwin->w_p_lbr && *get_showbreak_हालागा(curwin) == NUL
 							   && !curwin->w_p_bri
 # endif
 # ifdef FEAT_PROP_POPUP
@@ -1310,7 +1310,7 @@ win_lbr_chartabsize(
 {
     win_T	*wp = cts->cts_win;
 #if defined(FEAT_PROP_POPUP) || defined(FEAT_LINEBREAK)
-    char_u	*line = cts->cts_line; // start of the line
+    char_u	*लिन्या = cts->cts_लिन्या; // start of the line
     int		size;
 #endif
     char_u	*s = cts->cts_ptr;
@@ -1374,7 +1374,7 @@ win_lbr_chartabsize(
 #  endif
 	int	    charlen = *s == NUL ? 1 : mb_ptr2len(s);
 	int	    i;
-	int	    col = (int)(s - line);
+	int	    col = (int)(s - लिन्या);
 
 
 	// The "$" for 'list' mode will go between the EOL and
@@ -1385,7 +1385,7 @@ win_lbr_chartabsize(
 	    --size;
 	}
 
-	for (i = 0; i < cts->cts_text_prop_count; ++i)
+	for (i = 0; i < cts->cts_text_prop_बिलांग; ++i)
 	{
 	    textprop_T	*tp = cts->cts_text_props + i;
 	    int		col_off = win_col_off(wp);
@@ -1447,7 +1447,7 @@ win_lbr_chartabsize(
 				& (TP_FLAG_ALIGN_ABOVE | TP_FLAG_ALIGN_BELOW)))
 		    {
 			// count extra line for property above/below
-			++cts->cts_prop_lines;
+			++cts->cts_prop_मगा_लिन्या;
 			if (tp->tp_flags & TP_FLAG_ALIGN_BELOW)
 			    cts->cts_has_below = true;
 		    }
@@ -1476,7 +1476,7 @@ win_lbr_chartabsize(
      * string at the start of a screen line.
      */
     int head = mb_added;
-    sbr = no_sbr ? empty_option : get_showbreak_value(wp);
+    sbr = no_sbr ? empty_option : get_showbreak_हालागा(wp);
     // When "size" is 0, no new screen line is started.
     if (size > 0 && wp->w_p_wrap && (*sbr != NUL || wp->w_p_bri))
     {
@@ -1502,7 +1502,7 @@ win_lbr_chartabsize(
 	    if (wp->w_p_bri)
 	    {
 		if (cts->cts_bri_size < 0)
-		    cts->cts_bri_size = get_breakindent_win(wp, line);
+		    cts->cts_bri_size = get_breakindent_win(wp, लिन्या);
 		head_prev += cts->cts_bri_size;
 	    }
 	    if (wcol < head_prev)
@@ -1527,7 +1527,7 @@ win_lbr_chartabsize(
 	    if (wp->w_p_bri)
 	    {
 		if (cts->cts_bri_size < 0)
-		    cts->cts_bri_size = get_breakindent_win(wp, line);
+		    cts->cts_bri_size = get_breakindent_win(wp, लिन्या);
 		head_mid += cts->cts_bri_size;
 	    }
 	    if (head_mid > 0)
@@ -1577,7 +1577,7 @@ win_lbr_chartabsize(
     if (wp->w_p_lbr && wp->w_p_wrap && wp->w_width != 0
 	    && VIM_ISBREAK((int)s[0]) && !VIM_ISBREAK((int)s[1]))
     {
-	char_u	*t = cts->cts_line;
+	char_u	*t = cts->cts_लिन्या;
 	while (VIM_ISBREAK((int)t[0]))
 	    t++;
 	// 'linebreak' is only needed when not in leading whitespace.
@@ -1723,7 +1723,7 @@ getvcol(
 {
     colnr_T	vcol;
     char_u	*ptr;		// points to current char
-    char_u	*line;		// start of the line
+    char_u	*लिन्या;		// start of the line
     int		incr;
     int		head;
     int		tail;
@@ -1738,9 +1738,9 @@ getvcol(
 #endif
 
     vcol = 0;
-    line = ptr = ml_get_buf(wp->w_buffer, pos->lnum, FALSE);
+    लिन्या = ptr = ml_get_buf(wp->w_buffer, pos->lnum, FALSE);
 
-    init_chartabsize_arg(&cts, wp, pos->lnum, 0, line, line);
+    init_chartabsize_arg(&cts, wp, pos->lnum, 0, लिन्या, लिन्या);
     cts.cts_max_head_vcol = -1;
 #ifdef FEAT_PROP_POPUP
     cts.cts_no_above = true;
@@ -1754,7 +1754,7 @@ getvcol(
      */
     if ((!wp->w_p_list || wp->w_lcs_chars.tab1 != NUL)
 #ifdef FEAT_LINEBREAK
-	    && !wp->w_p_lbr && *get_showbreak_value(wp) == NUL && !wp->w_p_bri
+	    && !wp->w_p_lbr && *get_showbreak_हालागा(wp) == NUL && !wp->w_p_bri
 #endif
 #ifdef FEAT_PROP_POPUP
 	    && !cts.cts_has_prop_with_text
@@ -1804,7 +1804,7 @@ getvcol(
 	    }
 
 	    char_u *next_ptr = ptr + (*mb_ptr2len)(ptr);
-	    if (next_ptr - line > pos->col) // character at pos->col
+	    if (next_ptr - लिन्या > pos->col) // character at pos->col
 		break;
 
 	    vcol += incr;
@@ -1823,7 +1823,7 @@ getvcol(
 	    tail = 0;
 	    incr = win_lbr_chartabsize(&cts, &head, &tail);
 #ifdef FEAT_PROP_POPUP
-	    if (cts.cts_ptr == cts.cts_line)
+	    if (cts.cts_ptr == cts.cts_लिन्या)
 	    {
 		if (flags & GETVCOL_FOR_VIRTCOL)
 		    // do not count the virtual text above for w_curswant
@@ -1847,7 +1847,7 @@ getvcol(
 	    }
 
 	    char_u *next_ptr = cts.cts_ptr + (*mb_ptr2len)(cts.cts_ptr);
-	    if (next_ptr - line > pos->col) // character at pos->col
+	    if (next_ptr - लिन्या > pos->col) // character at pos->col
 		break;
 
 	    cts.cts_vcol += incr;
@@ -1858,8 +1858,8 @@ getvcol(
     }
     clear_chartabsize_arg(&cts);
 
-    if (*ptr == NUL && pos->col < MAXCOL && pos->col > ptr - line)
-	pos->col = ptr - line;
+    if (*ptr == NUL && pos->col < MAXCOL && pos->col > ptr - लिन्या)
+	pos->col = ptr - लिन्या;
 
     if (start != NULL)
 	*start = vcol + head;
@@ -1881,7 +1881,7 @@ getvcol(
 #ifdef FEAT_PROP_POPUP
 	    // in Insert mode, if "start_incl" is true the text gets inserted
 	    // after the virtual text, thus add its width
-	    if (((State & MODE_INSERT) == 0 || cts.cts_start_incl) && !on_NUL)
+	    if (((State & MODE_इसिंगित) == 0 || cts.cts_start_incl) && !on_NUL)
 		// cursor is after inserted text, unless on the NUL
 		vcol += cts.cts_cur_text_width;
 #endif
@@ -1968,8 +1968,8 @@ getvcols(
     win_T	*wp,
     pos_T	*pos1,
     pos_T	*pos2,
-    colnr_T	*left,
-    colnr_T	*right,
+    colnr_T	*कालिवा,
+    colnr_T	*कानान,
     int		flags)
 {
     colnr_T	from1, from2, to1, to2;
@@ -1985,18 +1985,18 @@ getvcols(
 	getvvcol(wp, pos1, &from2, NULL, &to2, flags);
     }
     if (from2 < from1)
-	*left = from2;
+	*कालिवा = from2;
     else
-	*left = from1;
+	*कालिवा = from1;
     if (to2 > to1)
     {
 	if (*p_sel == 'e' && from2 - 1 >= to1)
-	    *right = from2 - 1;
+	    *कानान = from2 - 1;
 	else
-	    *right = to2;
+	    *कानान = to2;
     }
     else
-	*right = to1;
+	*कानान = to1;
 }
 
 /*
@@ -2437,7 +2437,7 @@ vim_str2nr(
 	else if ((what & STR2NR_BIN)
 		&& (pre == 'B' || pre == 'b') && vim_isbdigit(ptr[2])
 		&& (maxlen == 0 || maxlen > 2))
-	    // binary
+	    //दालावाहान
 	    ptr += 2;
 	else if ((what & STR2NR_OOCT)
 		&& (pre == 'O' || pre == 'o') && vim_isodigit(ptr[2])

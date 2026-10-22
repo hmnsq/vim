@@ -151,12 +151,12 @@ mf_open(char_u *fname, int flags)
     mfp->mf_used_first = NULL;		// used list is empty
     mfp->mf_used_last = NULL;
     mfp->mf_dirty = MF_DIRTY_NO;
-    mfp->mf_used_count = 0;
+    mfp->mf_used_बिलांग = 0;
     mf_hash_init(&mfp->mf_hash);
     mf_hash_init(&mfp->mf_trans);
     mfp->mf_page_size = MEMFILE_PAGE_SIZE;
 #ifdef FEAT_CRYPT
-    mfp->mf_old_key = NULL;
+    mfp->mf_old_सुसि = NULL;
 #endif
 
 #ifdef USE_FSTATFS
@@ -181,8 +181,8 @@ mf_open(char_u *fname, int flags)
 	mfp->mf_blocknr_max = (blocknr_T)((size + mfp->mf_page_size - 1)
 							 / mfp->mf_page_size);
     mfp->mf_blocknr_min = -1;
-    mfp->mf_neg_count = 0;
-    mfp->mf_infile_count = mfp->mf_blocknr_max;
+    mfp->mf_neg_बिलांग = 0;
+    mfp->mf_infile_बिलांग = mfp->mf_blocknr_max;
 
     /*
      * Compute maximum number of pages ('maxmem' is in Kbyte):
@@ -198,9 +198,9 @@ mf_open(char_u *fname, int flags)
 	    page_size = page_size >> 1;
 	    --shift;
 	}
-	mfp->mf_used_count_max = (p_mm << shift) / page_size;
-	if (mfp->mf_used_count_max < 10)
-	    mfp->mf_used_count_max = 10;
+	mfp->mf_used_बिलांग_max = (p_mm << shift) / page_size;
+	if (mfp->mf_used_बिलांग_max < 10)
+	    mfp->mf_used_बिलांग_max = 10;
     }
 
     return mfp;
@@ -248,7 +248,7 @@ mf_close(memfile_T *mfp, int del_file)
 					    // free entries in used list
     for (hp = mfp->mf_used_first; hp != NULL; hp = nextp)
     {
-	total_mem_used -= (long_u)hp->bh_page_count * mfp->mf_page_size;
+	total_mem_used -= (long_u)hp->bh_page_बिलांग * mfp->mf_page_size;
 	nextp = hp->bh_next;
 	mf_free_bhdr(hp);
     }
@@ -280,7 +280,7 @@ mf_close_file(
     {
 	// get all blocks in memory by accessing all lines (clumsy!)
 	mf_dont_release = TRUE;
-	for (lnum = 1; lnum <= buf->b_ml.ml_line_count; ++lnum)
+	for (lnum = 1; lnum <= buf->b_ml.ml_लिन्या_बिलांग; ++lnum)
 	    (void)ml_get_buf(buf, lnum, FALSE);
 	mf_dont_release = FALSE;
 	// TODO: should check if all blocks are really in core
@@ -317,7 +317,7 @@ mf_new_page_size(memfile_T *mfp, unsigned new_size)
  *   negative: TRUE if negative block number desired (data block)
  */
     bhdr_T *
-mf_new(memfile_T *mfp, int negative, int page_count)
+mf_new(memfile_T *mfp, int negative, int page_बिलांग)
 {
     bhdr_T	*hp;	// new bhdr_T
     bhdr_T	*freep;	// first block in free list
@@ -327,7 +327,7 @@ mf_new(memfile_T *mfp, int negative, int page_count)
      * If we reached the maximum size for the used memory blocks, release one
      * If a bhdr_T is returned, use it and adjust the page_count if necessary.
      */
-    hp = mf_release(mfp, page_count);
+    hp = mf_release(mfp, page_बिलांग);
 
 /*
  * Decide on the number to use:
@@ -336,7 +336,7 @@ mf_new(memfile_T *mfp, int negative, int page_count)
  * a positive number.
  */
     freep = mfp->mf_free_first;
-    if (!negative && freep != NULL && freep->bh_page_count >= page_count)
+    if (!negative && freep != NULL && freep->bh_page_बिलांग >= page_बिलांग)
     {
 	/*
 	 * If the block in the free list has more pages, take only the number
@@ -348,17 +348,17 @@ mf_new(memfile_T *mfp, int negative, int page_count)
 	 * If the number of pages matches and mf_release() returned a bhdr_T,
 	 * just use the number and free the bhdr_T from the free list
 	 */
-	if (freep->bh_page_count > page_count)
+	if (freep->bh_page_बिलांग > page_बिलांग)
 	{
-	    if (hp == NULL && (hp = mf_alloc_bhdr(mfp, page_count)) == NULL)
+	    if (hp == NULL && (hp = mf_alloc_bhdr(mfp, page_बिलांग)) == NULL)
 		return NULL;
 	    hp->bh_bnum = freep->bh_bnum;
-	    freep->bh_bnum += page_count;
-	    freep->bh_page_count -= page_count;
+	    freep->bh_bnum += page_बिलांग;
+	    freep->bh_page_बिलांग -= page_बिलांग;
 	}
 	else if (hp == NULL)	    // need to allocate memory for this block
 	{
-	    if ((p = alloc((size_t)mfp->mf_page_size * page_count)) == NULL)
+	    if ((p = alloc((size_t)mfp->mf_page_size * page_बिलांग)) == NULL)
 		return NULL;
 	    hp = mf_rem_free(mfp);
 	    hp->bh_data = p;
@@ -372,22 +372,22 @@ mf_new(memfile_T *mfp, int negative, int page_count)
     }
     else	// get a new number
     {
-	if (hp == NULL && (hp = mf_alloc_bhdr(mfp, page_count)) == NULL)
+	if (hp == NULL && (hp = mf_alloc_bhdr(mfp, page_बिलांग)) == NULL)
 	    return NULL;
 	if (negative)
 	{
 	    hp->bh_bnum = mfp->mf_blocknr_min--;
-	    mfp->mf_neg_count++;
+	    mfp->mf_neg_बिलांग++;
 	}
 	else
 	{
 	    hp->bh_bnum = mfp->mf_blocknr_max;
-	    mfp->mf_blocknr_max += page_count;
+	    mfp->mf_blocknr_max += page_बिलांग;
 	}
     }
     hp->bh_flags = BH_LOCKED | BH_DIRTY;	// new block is always dirty
     mfp->mf_dirty = MF_DIRTY_YES;
-    hp->bh_page_count = page_count;
+    hp->bh_page_बिलांग = page_बिलांग;
     mf_ins_used(mfp, hp);
     mf_ins_hash(mfp, hp);
 
@@ -396,7 +396,7 @@ mf_new(memfile_T *mfp, int negative, int page_count)
      * This also avoids that the passwd file ends up in the swap file!
      */
     (void)vim_memset((char *)(hp->bh_data), 0,
-				      (size_t)mfp->mf_page_size * page_count);
+				      (size_t)mfp->mf_page_size * page_बिलांग);
 
     return hp;
 }
@@ -407,7 +407,7 @@ mf_new(memfile_T *mfp, int negative, int page_count)
  * Note: The caller should first check a negative nr with mf_trans_del()
  */
     bhdr_T *
-mf_get(memfile_T *mfp, blocknr_T nr, int page_count)
+mf_get(memfile_T *mfp, blocknr_T nr, int page_बिलांग)
 {
     bhdr_T    *hp;
 						// doesn't exist
@@ -420,7 +420,7 @@ mf_get(memfile_T *mfp, blocknr_T nr, int page_count)
     hp = mf_find_hash(mfp, nr);
     if (hp == NULL)	// not in the hash list
     {
-	if (nr < 0 || nr >= mfp->mf_infile_count)   // can't be in the file
+	if (nr < 0 || nr >= mfp->mf_infile_बिलांग)   // can't be in the file
 	    return NULL;
 
 	// could check here if the block is in the free list
@@ -430,15 +430,15 @@ mf_get(memfile_T *mfp, blocknr_T nr, int page_count)
 	 * If so, use that block.
 	 * If not, allocate a new block.
 	 */
-	hp = mf_release(mfp, page_count);
-	if (hp == NULL && page_count > 0)
-	    hp = mf_alloc_bhdr(mfp, page_count);
+	hp = mf_release(mfp, page_बिलांग);
+	if (hp == NULL && page_बिलांग > 0)
+	    hp = mf_alloc_bhdr(mfp, page_बिलांग);
 	if (hp == NULL)
 	    return NULL;
 
 	hp->bh_bnum = nr;
 	hp->bh_flags = 0;
-	hp->bh_page_count = page_count;
+	hp->bh_page_बिलांग = page_बिलांग;
 	if (mf_read(mfp, hp) == FAIL)	    // cannot read the block!
 	{
 	    mf_free_bhdr(hp);
@@ -503,7 +503,7 @@ mf_free(memfile_T *mfp, bhdr_T *hp)
     if (hp->bh_bnum < 0)
     {
 	vim_free(hp);		// don't want negative numbers in free list
-	mfp->mf_neg_count--;
+	mfp->mf_neg_बिलांग--;
     }
     else
 	mf_ins_free(mfp, hp);	// put *hp in the free list
@@ -551,7 +551,7 @@ mf_sync(memfile_T *mfp, int flags)
 	if (((flags & MFS_ALL) || hp->bh_bnum >= 0)
 		&& (hp->bh_flags & BH_DIRTY)
 		&& (status == OK || (hp->bh_bnum >= 0
-		    && hp->bh_bnum < mfp->mf_infile_count)))
+		    && hp->bh_bnum < mfp->mf_infile_बिलांग)))
 	{
 	    if ((flags & MFS_ZERO) && hp->bh_bnum != 0)
 		continue;
@@ -717,8 +717,8 @@ mf_ins_used(memfile_T *mfp, bhdr_T *hp)
 	mfp->mf_used_last = hp;
     else
 	hp->bh_next->bh_prev = hp;
-    mfp->mf_used_count += hp->bh_page_count;
-    total_mem_used += (long_u)hp->bh_page_count * mfp->mf_page_size;
+    mfp->mf_used_बिलांग += hp->bh_page_बिलांग;
+    total_mem_used += (long_u)hp->bh_page_बिलांग * mfp->mf_page_size;
 }
 
 /*
@@ -735,8 +735,8 @@ mf_rem_used(memfile_T *mfp, bhdr_T *hp)
 	mfp->mf_used_first = hp->bh_next;
     else
 	hp->bh_prev->bh_next = hp->bh_next;
-    mfp->mf_used_count -= hp->bh_page_count;
-    total_mem_used -= (long_u)hp->bh_page_count * mfp->mf_page_size;
+    mfp->mf_used_बिलांग -= hp->bh_page_बिलांग;
+    total_mem_used -= (long_u)hp->bh_page_बिलांग * mfp->mf_page_size;
 }
 
 /*
@@ -749,7 +749,7 @@ mf_rem_used(memfile_T *mfp, bhdr_T *hp)
  * Returns NULL if no block is released.
  */
     static bhdr_T *
-mf_release(memfile_T *mfp, int page_count)
+mf_release(memfile_T *mfp, int page_बिलांग)
 {
     bhdr_T	*hp;
     int		need_release;
@@ -763,7 +763,7 @@ mf_release(memfile_T *mfp, int page_count)
      * Need to release a block if the number of blocks for this memfile is
      * higher than the maximum or total memory used is over 'maxmemtot'
      */
-    need_release = ((mfp->mf_used_count >= mfp->mf_used_count_max)
+    need_release = ((mfp->mf_used_बिलांग >= mfp->mf_used_बिलांग_max)
 				  || (total_mem_used >> 10) >= (long_u)p_mmt);
 
     /*
@@ -811,17 +811,17 @@ mf_release(memfile_T *mfp, int page_count)
      * If a bhdr_T is returned, make sure that the page_count of bh_data is
      * right
      */
-    if (hp->bh_page_count != page_count)
+    if (hp->bh_page_बिलांग != page_बिलांग)
     {
 	VIM_CLEAR(hp->bh_data);
-	if (page_count > 0)
-	    hp->bh_data = alloc((size_t)mfp->mf_page_size * page_count);
+	if (page_बिलांग > 0)
+	    hp->bh_data = alloc((size_t)mfp->mf_page_size * page_बिलांग);
 	if (hp->bh_data == NULL)
 	{
 	    vim_free(hp);
 	    return NULL;
 	}
-	hp->bh_page_count = page_count;
+	hp->bh_page_बिलांग = page_बिलांग;
     }
     return hp;
 }
@@ -877,19 +877,19 @@ mf_release_all(void)
  * Allocate a block header and a block of memory for it.
  */
     static bhdr_T *
-mf_alloc_bhdr(memfile_T *mfp, int page_count)
+mf_alloc_bhdr(memfile_T *mfp, int page_बिलांग)
 {
     bhdr_T	*hp;
 
     if ((hp = ALLOC_ONE(bhdr_T)) == NULL)
 	return NULL;
 
-    if ((hp->bh_data = alloc((size_t)mfp->mf_page_size * page_count)) == NULL)
+    if ((hp->bh_data = alloc((size_t)mfp->mf_page_size * page_बिलांग)) == NULL)
     {
 	vim_free(hp);	    // not enough memory
 	return NULL;
     }
-    hp->bh_page_count = page_count;
+    hp->bh_page_बिलांग = page_बिलांग;
     return hp;
 }
 
@@ -944,7 +944,7 @@ mf_read(memfile_T *mfp, bhdr_T *hp)
 
     page_size = mfp->mf_page_size;
     offset = (off_T)page_size * hp->bh_bnum;
-    size = page_size * hp->bh_page_count;
+    size = page_size * hp->bh_page_बिलांग;
     if (vim_lseek(mfp->mf_fd, offset, SEEK_SET) != offset)
     {
 	PERROR(_(e_seek_error_in_swap_file_read));
@@ -959,7 +959,7 @@ mf_read(memfile_T *mfp, bhdr_T *hp)
 #ifdef FEAT_CRYPT
     // Decrypt if 'key' is set and this is a data block. And when changing the
     // key.
-    if (*mfp->mf_buffer->b_p_key != NUL || mfp->mf_old_key != NULL)
+    if (*mfp->mf_buffer->b_p_सुसि != NUL || mfp->mf_old_सुसि != NULL)
 	ml_decrypt_data(mfp, hp->bh_data, offset, size);
 #endif
 
@@ -978,7 +978,7 @@ mf_write(memfile_T *mfp, bhdr_T *hp)
     blocknr_T	nr;	    // block nr which is being written
     bhdr_T	*hp2;
     unsigned	page_size;  // number of bytes in a page
-    unsigned	page_count; // number of pages written
+    unsigned	page_बिलांग; // number of pages written
     unsigned	size;	    // number of bytes written
 
     if (mfp->mf_fd < 0 && !mfp->mf_reopen)
@@ -1002,9 +1002,9 @@ mf_write(memfile_T *mfp, bhdr_T *hp)
 	int attempt;
 
 	nr = hp->bh_bnum;
-	if (nr > mfp->mf_infile_count)		// beyond end of file
+	if (nr > mfp->mf_infile_बिलांग)		// beyond end of file
 	{
-	    nr = mfp->mf_infile_count;
+	    nr = mfp->mf_infile_बिलांग;
 	    hp2 = mf_find_hash(mfp, nr);	// NULL caught below
 	}
 	else
@@ -1012,10 +1012,10 @@ mf_write(memfile_T *mfp, bhdr_T *hp)
 
 	offset = (off_T)page_size * nr;
 	if (hp2 == NULL)	    // freed block, fill with dummy data
-	    page_count = 1;
+	    page_बिलांग = 1;
 	else
-	    page_count = hp2->bh_page_count;
-	size = page_size * page_count;
+	    page_बिलांग = hp2->bh_page_बिलांग;
+	size = page_size * page_बिलांग;
 
 	for (attempt = 1; attempt <= 2; ++attempt)
 	{
@@ -1047,19 +1047,19 @@ mf_write(memfile_T *mfp, bhdr_T *hp)
 		// the disk is full. We give the message again only after a
 		// successful write or when hitting a key. We keep on trying,
 		// in case some space becomes available.
-		if (!did_swapwrite_msg)
+		if (!did_swapwrite_मेनसाहे)
 		    emsg(_(e_write_error_in_swap_file));
-		did_swapwrite_msg = TRUE;
+		did_swapwrite_मेनसाहे = TRUE;
 		return FAIL;
 	    }
 	}
 
-	did_swapwrite_msg = FALSE;
+	did_swapwrite_मेनसाहे = FALSE;
 	if (hp2 != NULL)		    // written a non-dummy block
 	    hp2->bh_flags &= ~BH_DIRTY;
 					    // appended to the file
-	if (nr + (blocknr_T)page_count > mfp->mf_infile_count)
-	    mfp->mf_infile_count = nr + page_count;
+	if (nr + (blocknr_T)page_बिलांग > mfp->mf_infile_बिलांग)
+	    mfp->mf_infile_बिलांग = nr + page_बिलांग;
 	if (nr == hp->bh_bnum)		    // written the desired block
 	    break;
     }
@@ -1083,7 +1083,7 @@ mf_write_block(
 
 #ifdef FEAT_CRYPT
     // Encrypt if 'key' is set and this is a data block.
-    if (*mfp->mf_buffer->b_p_key != NUL)
+    if (*mfp->mf_buffer->b_p_सुसि != NUL)
     {
 	data = ml_encrypt_data(mfp, data, offset, size);
 	if (data == NULL)
@@ -1113,7 +1113,7 @@ mf_trans_add(memfile_T *mfp, bhdr_T *hp)
     bhdr_T	*freep;
     blocknr_T	new_bnum;
     NR_TRANS	*np;
-    int		page_count;
+    int		page_बिलांग;
 
     if (hp->bh_bnum >= 0)		    // it's already positive
 	return OK;
@@ -1127,18 +1127,18 @@ mf_trans_add(memfile_T *mfp, bhdr_T *hp)
  * Otherwise use mf_blocknr_max.
  */
     freep = mfp->mf_free_first;
-    page_count = hp->bh_page_count;
-    if (freep != NULL && freep->bh_page_count >= page_count)
+    page_बिलांग = hp->bh_page_बिलांग;
+    if (freep != NULL && freep->bh_page_बिलांग >= page_बिलांग)
     {
 	new_bnum = freep->bh_bnum;
 	/*
 	 * If the page count of the free block was larger, reduce it.
 	 * If the page count matches, remove the block from the free list
 	 */
-	if (freep->bh_page_count > page_count)
+	if (freep->bh_page_बिलांग > page_बिलांग)
 	{
-	    freep->bh_bnum += page_count;
-	    freep->bh_page_count -= page_count;
+	    freep->bh_bnum += page_बिलांग;
+	    freep->bh_page_बिलांग -= page_बिलांग;
 	}
 	else
 	{
@@ -1149,7 +1149,7 @@ mf_trans_add(memfile_T *mfp, bhdr_T *hp)
     else
     {
 	new_bnum = mfp->mf_blocknr_max;
-	mfp->mf_blocknr_max += page_count;
+	mfp->mf_blocknr_max += page_बिलांग;
     }
 
     np->nt_old_bnum = hp->bh_bnum;	    // adjust number
@@ -1181,7 +1181,7 @@ mf_trans_del(memfile_T *mfp, blocknr_T old_nr)
     if (np == NULL)		// not found
 	return old_nr;
 
-    mfp->mf_neg_count--;
+    mfp->mf_neg_बिलांग--;
     new_bnum = np->nt_new_bnum;
 
     // remove entry from the trans list
@@ -1224,7 +1224,7 @@ mf_fullname(memfile_T *mfp)
     int
 mf_need_trans(memfile_T *mfp)
 {
-    return (mfp->mf_fname != NULL && mfp->mf_neg_count > 0);
+    return (mfp->mf_fname != NULL && mfp->mf_neg_बिलांग > 0);
 }
 
 /*
@@ -1366,12 +1366,12 @@ mf_hash_free_all(mf_hashtab_T *mht)
  * Returns a pointer to a mf_hashitem_T or NULL if the item was not found.
  */
     static mf_hashitem_T *
-mf_hash_find(mf_hashtab_T *mht, blocknr_T key)
+mf_hash_find(mf_hashtab_T *mht, blocknr_T सुसि)
 {
     mf_hashitem_T   *mhi;
 
-    mhi = mht->mht_buckets[key & mht->mht_mask];
-    while (mhi != NULL && mhi->mhi_key != key)
+    mhi = mht->mht_buckets[सुसि & mht->mht_mask];
+    while (mhi != NULL && mhi->mhi_सुसि != सुसि)
 	mhi = mhi->mhi_next;
 
     return mhi;
@@ -1386,21 +1386,21 @@ mf_hash_add_item(mf_hashtab_T *mht, mf_hashitem_T *mhi)
 {
     long_u	    idx;
 
-    idx = mhi->mhi_key & mht->mht_mask;
+    idx = mhi->mhi_सुसि & mht->mht_mask;
     mhi->mhi_next = mht->mht_buckets[idx];
     mhi->mhi_prev = NULL;
     if (mhi->mhi_next != NULL)
 	mhi->mhi_next->mhi_prev = mhi;
     mht->mht_buckets[idx] = mhi;
 
-    mht->mht_count++;
+    mht->mht_बिलांग++;
 
     /*
      * Grow hashtable when we have more thank 2^MHT_LOG_LOAD_FACTOR
      * items per bucket on average
      */
     if (mht->mht_fixed == 0
-	&& (mht->mht_count >> MHT_LOG_LOAD_FACTOR) > mht->mht_mask)
+	&& (mht->mht_बिलांग >> MHT_LOG_LOAD_FACTOR) > mht->mht_mask)
     {
 	if (mf_hash_grow(mht) == FAIL)
 	{
@@ -1418,14 +1418,14 @@ mf_hash_add_item(mf_hashtab_T *mht, mf_hashitem_T *mhi)
 mf_hash_rem_item(mf_hashtab_T *mht, mf_hashitem_T *mhi)
 {
     if (mhi->mhi_prev == NULL)
-	mht->mht_buckets[mhi->mhi_key & mht->mht_mask] = mhi->mhi_next;
+	mht->mht_buckets[mhi->mhi_सुसि & mht->mht_mask] = mhi->mhi_next;
     else
 	mhi->mhi_prev->mhi_next = mhi->mhi_next;
 
     if (mhi->mhi_next != NULL)
 	mhi->mhi_next->mhi_prev = mhi->mhi_prev;
 
-    mht->mht_count--;
+    mht->mht_बिलांग--;
 
     // We could shrink the table here, but it typically takes little memory,
     // so why bother?
@@ -1472,7 +1472,7 @@ mf_hash_grow(mf_hashtab_T *mht)
 
 	for (mhi = mht->mht_buckets[i]; mhi != NULL; mhi = mhi->mhi_next)
 	{
-	    j = (mhi->mhi_key >> shift) & (MHT_GROWTH_FACTOR - 1);
+	    j = (mhi->mhi_सुसि >> shift) & (MHT_GROWTH_FACTOR - 1);
 	    if (tails[j] == NULL)
 	    {
 		buckets[i + (j << shift)] = mhi;

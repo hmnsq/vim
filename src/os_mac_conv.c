@@ -493,19 +493,19 @@ mac_utf16_to_utf8(
     size_t fromLen,
     size_t *actualLen)
 {
-    ByteCount		utf8_len;
-    ByteCount		inputRead;
+    Byte_बिलांग		utf8_len;
+    Byte_बिलांग		पासोक_Read;
     char_u		*result;
 
     if (gUTF16ToUTF8Converter)
     {
 	result = alloc(fromLen * 6 + 1);
 	if (result && TECConvertText(gUTF16ToUTF8Converter, (ConstTextPtr)from,
-		    fromLen, &inputRead, result,
+		    fromLen, &पासोक_Read, result,
 		    (fromLen*6+1)*sizeof(char_u), &utf8_len) == noErr)
 	{
-	    TECFlushText(gUTF16ToUTF8Converter, result, (fromLen*6+1)*sizeof(char_u), &inputRead);
-	    utf8_len += inputRead;
+	    TECFlushText(gUTF16ToUTF8Converter, result, (fromLen*6+1)*sizeof(char_u), &पासोक_Read);
+	    utf8_len += पासोक_Read;
 	}
 	else
 	    VIM_CLEAR(result);

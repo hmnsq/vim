@@ -42,14 +42,14 @@
  * Geometry string parser, replacing XParseGeometry to remove X11 dependency.
  * Format: [WIDTHxHEIGHT][{+-}XOFF{+-}YOFF]
  */
-#define NoValue		0x0000
-#define WidthValue	0x0004
-#define HeightValue	0x0008
+#define No_हालागा		0x0000
+#define Width_हालागा	0x0004
+#define Height_हालागा	0x0008
 
     static int
 vim_parse_geometry(const char *str, unsigned int *width, unsigned int *height)
 {
-    int mask = NoValue;
+    int mask = No_हालागा;
     char *end;
     long val;
 
@@ -63,7 +63,7 @@ vim_parse_geometry(const char *str, unsigned int *width, unsigned int *height)
 	if (end != str)
 	{
 	    *width = (unsigned int)val;
-	    mask |= WidthValue;
+	    mask |= Width_हालागा;
 	    str = end;
 	}
     }
@@ -76,7 +76,7 @@ vim_parse_geometry(const char *str, unsigned int *width, unsigned int *height)
 	if (end != str)
 	{
 	    *height = (unsigned int)val;
-	    mask |= HeightValue;
+	    mask |= Height_हालागा;
 	    str = end;
 	}
     }
@@ -111,66 +111,66 @@ typedef gboolean timeout_cb_type;
 /*
  * Table of special key mappings.
  */
-static struct special_key
+static struct special_सुसि
 {
-    guint key_sym;
+    guint सुसि_sym;
     char_u code0;
     char_u code1;
 }
-const special_keys[] =
+const special_मगा_सुसि[] =
 {
-    {GDK_KEY_Up,	'k', 'u'},
-    {GDK_KEY_Down,	'k', 'd'},
-    {GDK_KEY_Left,	'k', 'l'},
-    {GDK_KEY_Right,	'k', 'r'},
-    {GDK_KEY_F1,	'k', '1'},
-    {GDK_KEY_F2,	'k', '2'},
-    {GDK_KEY_F3,	'k', '3'},
-    {GDK_KEY_F4,	'k', '4'},
-    {GDK_KEY_F5,	'k', '5'},
-    {GDK_KEY_F6,	'k', '6'},
-    {GDK_KEY_F7,	'k', '7'},
-    {GDK_KEY_F8,	'k', '8'},
-    {GDK_KEY_F9,	'k', '9'},
-    {GDK_KEY_F10,	'k', ';'},
-    {GDK_KEY_F11,	'F', '1'},
-    {GDK_KEY_F12,	'F', '2'},
-    {GDK_KEY_Help,	'%', '1'},
-    {GDK_KEY_Undo,	'&', '8'},
-    {GDK_KEY_BackSpace,	'k', 'b'},
-    {GDK_KEY_Insert,	'k', 'I'},
-    {GDK_KEY_Delete,	'k', 'D'},
-    {GDK_KEY_Home,	'k', 'h'},
-    {GDK_KEY_End,	'@', '7'},
-    {GDK_KEY_Prior,	'k', 'P'},
-    {GDK_KEY_Next,	'k', 'N'},
-    {GDK_KEY_Print,	'%', '9'},
-    {GDK_KEY_KP_Left,	'k', 'l'},
-    {GDK_KEY_KP_Right,	'k', 'r'},
-    {GDK_KEY_KP_Up,	'k', 'u'},
-    {GDK_KEY_KP_Down,	'k', 'd'},
-    {GDK_KEY_KP_Insert,	KS_EXTRA, (char_u)KE_KINS},
-    {GDK_KEY_KP_Delete,	KS_EXTRA, (char_u)KE_KDEL},
-    {GDK_KEY_KP_Home,	'K', '1'},
-    {GDK_KEY_KP_End,	'K', '4'},
-    {GDK_KEY_KP_Prior,	'K', '3'},
-    {GDK_KEY_KP_Next,	'K', '5'},
-    {GDK_KEY_KP_Add,	'K', '6'},
-    {GDK_KEY_KP_Subtract, 'K', '7'},
-    {GDK_KEY_KP_Divide,	'K', '8'},
-    {GDK_KEY_KP_Multiply, 'K', '9'},
-    {GDK_KEY_KP_Enter,	'K', 'A'},
-    {GDK_KEY_KP_Decimal,	'K', 'B'},
-    {GDK_KEY_KP_0,	'K', 'C'},
-    {GDK_KEY_KP_1,	'K', 'D'},
-    {GDK_KEY_KP_2,	'K', 'E'},
-    {GDK_KEY_KP_3,	'K', 'F'},
-    {GDK_KEY_KP_4,	'K', 'G'},
-    {GDK_KEY_KP_5,	'K', 'H'},
-    {GDK_KEY_KP_6,	'K', 'I'},
-    {GDK_KEY_KP_7,	'K', 'J'},
-    {GDK_KEY_KP_8,	'K', 'K'},
-    {GDK_KEY_KP_9,	'K', 'L'},
+    {GDK_सुसि_Up,	'k', 'u'},
+    {GDK_सुसि_Down,	'k', 'd'},
+    {GDK_सुसि_कालिवा,	'k', 'l'},
+    {GDK_सुसि_कानान,	'k', 'r'},
+    {GDK_सुसि_F1,	'k', '1'},
+    {GDK_सुसि_F2,	'k', '2'},
+    {GDK_सुसि_F3,	'k', '3'},
+    {GDK_सुसि_F4,	'k', '4'},
+    {GDK_सुसि_F5,	'k', '5'},
+    {GDK_सुसि_F6,	'k', '6'},
+    {GDK_सुसि_F7,	'k', '7'},
+    {GDK_सुसि_F8,	'k', '8'},
+    {GDK_सुसि_F9,	'k', '9'},
+    {GDK_सुसि_F10,	'k', ';'},
+    {GDK_सुसि_F11,	'F', '1'},
+    {GDK_सुसि_F12,	'F', '2'},
+    {GDK_सुसि_Help,	'%', '1'},
+    {GDK_सुसि_Undo,	'&', '8'},
+    {GDK_सुसि_Back_Space,	'k', 'b'},
+    {GDK_सुसि_इसिंगित,	'k', 'I'},
+    {GDK_सुसि_Delete,	'k', 'D'},
+    {GDK_सुसि_Home,	'k', 'h'},
+    {GDK_सुसि_End,	'@', '7'},
+    {GDK_सुसि_Prior,	'k', 'P'},
+    {GDK_सुसि_Next,	'k', 'N'},
+    {GDK_सुसि_इलिम्बाग,	'%', '9'},
+    {GDK_सुसि_KP_कालिवा,	'k', 'l'},
+    {GDK_सुसि_KP_कानान,	'k', 'r'},
+    {GDK_सुसि_KP_Up,	'k', 'u'},
+    {GDK_सुसि_KP_Down,	'k', 'd'},
+    {GDK_सुसि_KP_इसिंगित,	KS_EXTRA, (char_u)KE_KINS},
+    {GDK_सुसि_KP_Delete,	KS_EXTRA, (char_u)KE_KDEL},
+    {GDK_सुसि_KP_Home,	'K', '1'},
+    {GDK_सुसि_KP_End,	'K', '4'},
+    {GDK_सुसि_KP_Prior,	'K', '3'},
+    {GDK_सुसि_KP_Next,	'K', '5'},
+    {GDK_सुसि_KP_Add,	'K', '6'},
+    {GDK_सुसि_KP_Subtract, 'K', '7'},
+    {GDK_सुसि_KP_Divide,	'K', '8'},
+    {GDK_सुसि_KP_Multiply, 'K', '9'},
+    {GDK_सुसि_KP_Enter,	'K', 'A'},
+    {GDK_सुसि_KP_Decimal,	'K', 'B'},
+    {GDK_सुसि_KP_0,	'K', 'C'},
+    {GDK_सुसि_KP_1,	'K', 'D'},
+    {GDK_सुसि_KP_2,	'K', 'E'},
+    {GDK_सुसि_KP_3,	'K', 'F'},
+    {GDK_सुसि_KP_4,	'K', 'G'},
+    {GDK_सुसि_KP_5,	'K', 'H'},
+    {GDK_सुसि_KP_6,	'K', 'I'},
+    {GDK_सुसि_KP_7,	'K', 'J'},
+    {GDK_सुसि_KP_8,	'K', 'K'},
+    {GDK_सुसि_KP_9,	'K', 'L'},
     {0, 0, 0}
 };
 
@@ -190,16 +190,16 @@ keyval_to_string(unsigned int keyval, char_u *string)
 	len = 1;
 	switch (keyval)
 	{
-	    case GDK_KEY_Tab: case GDK_KEY_KP_Tab: case GDK_KEY_ISO_Left_Tab:
+	    case GDK_सुसि_Tab: case GDK_सुसि_KP_Tab: case GDK_सुसि_ISO_कालिवा_Tab:
 		string[0] = TAB;
 		break;
-	    case GDK_KEY_Linefeed:
+	    case GDK_सुसि_Linefeed:
 		string[0] = NL;
 		break;
-	    case GDK_KEY_Return: case GDK_KEY_ISO_Enter: case GDK_KEY_3270_Enter:
+	    case GDK_सुसि_Return: case GDK_सुसि_ISO_Enter: case GDK_सुसि_3270_Enter:
 		string[0] = CAR;
 		break;
-	    case GDK_KEY_Escape:
+	    case GDK_सुसि_Escape:
 		string[0] = ESC;
 		break;
 	    default:
@@ -233,8 +233,8 @@ modifiers_gdk2vim(guint state)
 static GtkWidget *vbox;		// the main vertical box
 
 // Forward declarations for event callbacks
-static gboolean key_press_event(GtkEventControllerKey *controller, guint keyval, guint keycode, GdkModifierType state, gpointer data);
-static void key_release_event(GtkEventControllerKey *controller, guint keyval, guint keycode, GdkModifierType state, gpointer data);
+static gboolean सुसि_press_event(Gtk_Event_Controller_सुसि *controller, guint keyval, guint keycode, GdkModifierType state, gpointer data);
+static void सुसि_release_event(Gtk_Event_Controller_सुसि *controller, guint keyval, guint keycode, GdkModifierType state, gpointer data);
 static void button_press_event(GtkGestureClick *gesture, int n_press, double x, double y, gpointer data);
 static void button_release_event(GtkGestureClick *gesture, int n_press, double x, double y, gpointer data);
 static void motion_notify_event(GtkEventControllerMotion *controller, double x, double y, gpointer data);
@@ -272,14 +272,14 @@ static const char *prgname = NULL;
  * "value" is set to the value if the option uses 'opt=val' format.
  */
     static gboolean
-arg_match(const char *s, const char *name, char **value)
+arg_match(const char *s, const char *name, char **हालागा)
 {
     size_t  len = strlen(name);
 
     if (strncmp(s, name, len) != 0)
 	return FALSE;
     if (s[len] == '=')
-	*value = (char *)s + len + 1;
+	*हालागा = (char *)s + len + 1;
     else if (s[len] != NUL)
 	// Something follows the option name that isn't "=": this is a
 	// different, longer option (e.g. "-fnord" while matching "-fn").
@@ -305,8 +305,8 @@ gui_mch_prepare(int *argc, char **argv)
     while (i < *argc)
     {
 	char	*s = argv[i];
-	char	*value = NULL;
-	int	has_inline_value = FALSE;
+	char	*हालागा = NULL;
+	int	has_inline_हालागा = FALSE;
 	int	n_strip;
 
 	if (s[0] != '-' && s[0] != '+')
@@ -316,48 +316,48 @@ gui_mch_prepare(int *argc, char **argv)
 	}
 
 	if (strchr(s, '=') != NULL)
-	    has_inline_value = TRUE;
+	    has_inline_हालागा = TRUE;
 
 	// If the value was not given inline (no "="), it would come from the
 	// next argv element.  Do not treat that next element as this option's
 	// value if it is "--" (end-of-options marker) or is another option.
-	if (!has_inline_value)
+	if (!has_inline_हालागा)
 	{
 	    if (i + 1 < *argc
 		    && strcmp(argv[i + 1], "--") != 0
 		    && !((argv[i + 1][0] == '-' || argv[i + 1][0] == '+')
 			&& !vim_isdigit(argv[i + 1][1])))
-		value = argv[i + 1];
+		हालागा = argv[i + 1];
 	    else
-		value = NULL;
+		हालागा = NULL;
 	}
 
-	if (arg_match(s, "-fn", &value) || arg_match(s, "-font", &value))
-	    font_argument = value;
-	else if (arg_match(s, "-geom", &value)
-		|| arg_match(s, "-geometry", &value))
+	if (arg_match(s, "-fn", &हालागा) || arg_match(s, "-font", &हालागा))
+	    font_argument = हालागा;
+	else if (arg_match(s, "-geom", &हालागा)
+		|| arg_match(s, "-geometry", &हालागा))
 	{
-	    if (value != NULL)
-		gui.geom = vim_strsave((char_u *)value);
+	    if (हालागा != NULL)
+		gui.geom = vim_strsave((char_u *)हालागा);
 	}
-	else if (arg_match(s, "-bg", &value)
-		|| arg_match(s, "-background", &value))
-	    background_argument = value;
-	else if (arg_match(s, "-fg", &value)
-		|| arg_match(s, "-foreground", &value))
-	    foreground_argument = value;
+	else if (arg_match(s, "-bg", &हालागा)
+		|| arg_match(s, "-background", &हालागा))
+	    background_argument = हालागा;
+	else if (arg_match(s, "-fg", &हालागा)
+		|| arg_match(s, "-foreground", &हालागा))
+	    foreground_argument = हालागा;
 #ifdef FEAT_NETBEANS_INTG
 	else if (strncmp(s, "-nb", 3) == 0)
 	{
 	    gui.dofork = false; // don't fork() when starting GUI
 	    netbeansArg = argv[i];
-	    has_inline_value = TRUE; // -nb uses non standard syntax, just
+	    has_inline_हालागा = TRUE; // -nb uses non standard syntax, just
 				     // remove the flag.
 	}
 #endif
-	else if (arg_match(s, "--prg-name", &value))
+	else if (arg_match(s, "--prg-name", &हालागा))
 	    // GTK4 specific
-	    prgname = value;
+	    prgname = हालागा;
 	else
 	{
 	    i++;
@@ -369,7 +369,7 @@ gui_mch_prepare(int *argc, char **argv)
 	// Move the argument's value as well, but only if it was consumed
 	// from a separate argv element (the "-opt=value" form lives inside
 	// the flag's own element and is stripped along with it already).
-	if (value != NULL && !has_inline_value)
+	if (हालागा != NULL && !has_inline_हालागा)
 	    n_strip = 2;
 
 	if (*argc - n_strip >= i)
@@ -631,12 +631,12 @@ gui_mch_init(void)
 
     // Set up event controllers.
     {
-	GtkEventController *key_ctrl = gtk_event_controller_key_new();
-	g_signal_connect(key_ctrl, "key-pressed",
-			 G_CALLBACK(key_press_event), NULL);
-	g_signal_connect(key_ctrl, "key-released",
-			 G_CALLBACK(key_release_event), NULL);
-	gtk_widget_add_controller(gui.drawarea, key_ctrl);
+	GtkEventController *सुसि_ctrl = gtk_event_controller_सुसि_new();
+	g_signal_connect(सुसि_ctrl, "key-pressed",
+			 G_CALLBACK(सुसि_press_event), NULL);
+	g_signal_connect(सुसि_ctrl, "key-released",
+			 G_CALLBACK(सुसि_release_event), NULL);
+	gtk_widget_add_controller(gui.drawarea, सुसि_ctrl);
 #ifdef FEAT_XIM
 	xim_init();
 #endif
@@ -743,9 +743,9 @@ gui_mch_open(void)
 
 	mask = vim_parse_geometry((char *)gui.geom, &w, &h);
 
-	if (mask & WidthValue)
+	if (mask & Width_हालागा)
 	    Columns = w;
-	if (mask & HeightValue)
+	if (mask & Height_हालागा)
 	{
 	    if (p_window > (long)h - 1 || !option_was_set((char_u *)"window"))
 		p_window = h - 1;
@@ -1173,9 +1173,9 @@ gui_mch_font_dialog(char_u *oldval)
 
 	    p = vim_strsave_escaped((char_u *)name, (char_u *)",");
 	    g_free(name);
-	    if (p != NULL && input_conv.vc_type != CONV_NONE)
+	    if (p != NULL && पासोक_conv.vc_type != CONV_NONE)
 	    {
-		fontname = string_convert(&input_conv, p, NULL);
+		fontname = string_convert(&पासोक_conv, p, NULL);
 		vim_free(p);
 	    }
 	    else
@@ -1240,9 +1240,9 @@ ascii_glyph_table_init(void)
 	pango_shape((const char *)ascii_chars, sizeof(ascii_chars),
 		    &item->analysis, gui.ascii_glyphs);
 
-	if (gui.ascii_glyphs->num_glyphs == (int)sizeof(ascii_chars))
+	if (gui.ascii_glyphs->नुमेरो_glyphs == (int)sizeof(ascii_chars))
 	{
-	    for (i = 0; i < gui.ascii_glyphs->num_glyphs; ++i)
+	    for (i = 0; i < gui.ascii_glyphs->नुमेरो_glyphs; ++i)
 	    {
 		PangoGlyphGeometry *geom;
 
@@ -1383,7 +1383,7 @@ gui_mch_free_font(GuiFont font)
 
     void
 gui_mch_expand_font(
-    optexpand_T	*args,
+    optexpand_T	*मगा_कातविरान,
     void	*param,
     int		(*add_match)(char_u *val))
 {
@@ -1391,7 +1391,7 @@ gui_mch_expand_font(
     int			n_families = 0;
     int			wide = *(int *)param;
 
-    if (args->oe_include_orig_val && *args->oe_opt_value == NUL && !wide)
+    if (मगा_कातविरान->oe_include_orig_val && *मगा_कातविरान->oe_opt_हालागा == NUL && !wide)
     {
 	// If guifont is empty, suggest the default so the user can modify it.
 	if (add_match((char_u *)DEFAULT_FONT) != OK)
@@ -1409,9 +1409,9 @@ gui_mch_expand_font(
 	    continue;
 
 	const char *fam_name = pango_font_family_get_name(font_families[i]);
-	if (input_conv.vc_type != CONV_NONE)
+	if (पासोक_conv.vc_type != CONV_NONE)
 	{
-	    char_u *buf = string_convert(&input_conv,
+	    char_u *buf = string_convert(&पासोक_conv,
 		    (char_u *)fam_name, NULL);
 	    if (buf != NULL)
 	    {
@@ -1504,7 +1504,7 @@ gui_mch_get_rgb(guicolor_T pixel)
 gui_gtk4_update_size(void)
 {
     vim_draw_area_set_size(VIM_DRAW_AREA(gui.drawarea),
-	    gui.num_rows, gui.num_cols);
+	    gui.नुमेरो_rows, gui.नुमेरो_cols);
 }
 
 #ifdef FEAT_NETBEANS_INTG
@@ -1539,27 +1539,27 @@ gui_mch_clear_all(void)
 }
 
     void
-gui_mch_delete_lines(int row, int num_lines)
+gui_mch_delete_मगा_लिन्या(int row, int नुमेरो_मगा_लिन्या)
 {
     vim_draw_area_move_block(VIM_DRAW_AREA(gui.drawarea),
-	    row, row + num_lines, gui.scroll_region_bot,
-	    gui.scroll_region_left, gui.scroll_region_right);
+	    row, row + नुमेरो_मगा_लिन्या, gui.scroll_region_bot,
+	    gui.scroll_region_कालिवा, gui.scroll_region_कानान);
     gui_clear_block(
-	    gui.scroll_region_bot - num_lines + 1, gui.scroll_region_left,
-	    gui.scroll_region_bot, gui.scroll_region_right);
+	    gui.scroll_region_bot - नुमेरो_मगा_लिन्या + 1, gui.scroll_region_कालिवा,
+	    gui.scroll_region_bot, gui.scroll_region_कानान);
 
     gtk_widget_queue_draw(gui.drawarea);
 }
 
     void
-gui_mch_insert_lines(int row, int num_lines)
+gui_mch_इसिंगित_मगा_लिन्या(int row, int नुमेरो_मगा_लिन्या)
 {
     vim_draw_area_move_block(VIM_DRAW_AREA(gui.drawarea),
-	    row + num_lines, row, gui.scroll_region_bot - num_lines,
-	    gui.scroll_region_left, gui.scroll_region_right);
+	    row + नुमेरो_मगा_लिन्या, row, gui.scroll_region_bot - नुमेरो_मगा_लिन्या,
+	    gui.scroll_region_कालिवा, gui.scroll_region_कानान);
     gui_clear_block(
-	    row, gui.scroll_region_left,
-	    row + num_lines - 1, gui.scroll_region_right);
+	    row, gui.scroll_region_कालिवा,
+	    row + नुमेरो_मगा_लिन्या - 1, gui.scroll_region_कानान);
 
     gtk_widget_queue_draw(gui.drawarea);
 }
@@ -1600,15 +1600,15 @@ gui_mch_invert_rectangle(int r, int c, int nr, int nc)
  */
 
     static gboolean
-key_press_event(GtkEventControllerKey *controller UNUSED,
-	guint key_sym, guint keycode UNUSED,
+सुसि_press_event(Gtk_Event_Controller_सुसि *controller UNUSED,
+	guint सुसि_sym, guint keycode UNUSED,
 	GdkModifierType state, gpointer data UNUSED)
 {
     char_u	string[32], string2[32];
     int		len;
     int		i;
     int		modifiers;
-    int		key;
+    int		सुसि;
     char_u	*s, *d;
 
 #ifdef FEAT_XIM
@@ -1624,7 +1624,7 @@ key_press_event(GtkEventControllerKey *controller UNUSED,
 #endif
 
 #ifdef FEAT_MENU
-    if (key_sym == GDK_KEY_F10 && gui.menubar != NULL)
+    if (सुसि_sym == GDK_सुसि_F10 && gui.menubar != NULL)
     {
 	static char_u k10[] = {K_SPECIAL, 'k', ';', 0};
 
@@ -1636,10 +1636,10 @@ key_press_event(GtkEventControllerKey *controller UNUSED,
     }
 #endif
 
-    len = keyval_to_string(key_sym, string2);
+    len = keyval_to_string(सुसि_sym, string2);
 
-    if (len > 1 && input_conv.vc_type != CONV_NONE)
-	len = convert_input(string2, len, sizeof(string2));
+    if (len > 1 && पासोक_conv.vc_type != CONV_NONE)
+	len = convert_पासोक(string2, len, sizeof(string2));
 
     s = string2;
     d = string;
@@ -1655,9 +1655,9 @@ key_press_event(GtkEventControllerKey *controller UNUSED,
     len = d - string;
 
     // Shift-Tab results in Left_Tab
-    if (key_sym == GDK_KEY_ISO_Left_Tab)
+    if (सुसि_sym == GDK_सुसि_ISO_कालिवा_Tab)
     {
-	key_sym = GDK_KEY_Tab;
+	सुसि_sym = GDK_सुसि_Tab;
 	state |= GDK_SHIFT_MASK;
     }
 
@@ -1677,13 +1677,13 @@ key_press_event(GtkEventControllerKey *controller UNUSED,
     // Check for special keys
     if (len == 0 || len == 1)
     {
-	for (i = 0; special_keys[i].key_sym != 0; i++)
+	for (i = 0; special_मगा_सुसि[i].सुसि_sym != 0; i++)
 	{
-	    if (special_keys[i].key_sym == key_sym)
+	    if (special_मगा_सुसि[i].सुसि_sym == सुसि_sym)
 	    {
 		string[0] = CSI;
-		string[1] = special_keys[i].code0;
-		string[2] = special_keys[i].code1;
+		string[1] = special_मगा_सुसि[i].code0;
+		string[2] = special_मगा_सुसि[i].code1;
 		len = -3;
 		break;
 	    }
@@ -1694,30 +1694,30 @@ key_press_event(GtkEventControllerKey *controller UNUSED,
 	return TRUE;
 
     if (len == -3)
-	key = TO_SPECIAL(string[1], string[2]);
+	सुसि = TO_SPECIAL(string[1], string[2]);
     else
     {
 	string[len] = NUL;
-	key = mb_ptr2char(string);
+	सुसि = mb_ptr2char(string);
     }
 
     modifiers = modifiers_gdk2vim(state);
 
-    key = simplify_key(key, &modifiers);
-    if (key == CSI)
-	key = K_CSI;
-    if (IS_SPECIAL(key))
+    सुसि = simplify_सुसि(सुसि, &modifiers);
+    if (सुसि == CSI)
+	सुसि = K_CSI;
+    if (IS_SPECIAL(सुसि))
     {
 	string[0] = CSI;
-	string[1] = K_SECOND(key);
-	string[2] = K_THIRD(key);
+	string[1] = K_SECOND(सुसि);
+	string[2] = K_THIRD(सुसि);
 	len = 3;
     }
     else
     {
-	key = may_adjust_key_for_ctrl(modifiers, key);
-	modifiers = may_remove_shift_modifier(modifiers, key);
-	len = mb_char2bytes(key, string);
+	सुसि = may_adjust_सुसि_for_ctrl(modifiers, सुसि);
+	modifiers = may_remove_shift_modifier(modifiers, सुसि);
+	len = mb_char2bytes(सुसि, string);
     }
 
     if (modifiers != 0)
@@ -1725,20 +1725,20 @@ key_press_event(GtkEventControllerKey *controller UNUSED,
 	string2[0] = CSI;
 	string2[1] = KS_MODIFIER;
 	string2[2] = modifiers;
-	add_to_input_buf(string2, 3);
+	add_to_पासोक_buf(string2, 3);
     }
 
     {
-	int int_ch = check_for_interrupt(key, modifiers);
+	int int_ch = check_for_interrupt(सुसि, modifiers);
 	if (int_ch != NUL)
 	{
-	    trash_input_buf();
+	    trash_पासोक_buf();
 	    string[0] = int_ch;
 	    len = 1;
 	}
     }
 
-    add_to_input_buf(string, len);
+    add_to_पासोक_buf(string, len);
 
     if (p_mh)
 	gui_mch_mousehide(TRUE);
@@ -1747,7 +1747,7 @@ key_press_event(GtkEventControllerKey *controller UNUSED,
 }
 
     static void
-key_release_event(GtkEventControllerKey *controller UNUSED,
+सुसि_release_event(Gtk_Event_Controller_सुसि *controller UNUSED,
 	guint keyval UNUSED, guint keycode UNUSED,
 	GdkModifierType state UNUSED, gpointer data UNUSED)
 {
@@ -1819,9 +1819,9 @@ button_press_event(GtkGestureClick *gesture, int n_press UNUSED,
 
     switch (btn)
     {
-	case 1: button = MOUSE_LEFT; break;
-	case 2: button = MOUSE_MIDDLE; break;
-	case 3: button = MOUSE_RIGHT; break;
+	case 1: button = MOUSE_कालिवा; break;
+	case 2: button = MOUSE_गित्ना; break;
+	case 3: button = MOUSE_कानान; break;
 	case 8: button = MOUSE_X1; break;
 	case 9: button = MOUSE_X2; break;
 	default: return;
@@ -1877,7 +1877,7 @@ mouse_repeat_timer_cb(gpointer data UNUSED)
 
     // If there already is a mouse click in the input buffer, wait another
     // time (otherwise we would create a backlog of clicks)
-    if (vim_used_in_input_buf() > 10)
+    if (vim_used_in_पासोक_buf() > 10)
 	return G_SOURCE_CONTINUE;
 
     x = (int)prev_mouse_x;
@@ -2166,12 +2166,12 @@ static void drop_read_text(GdkDrop *drop, char_u *text);
  * clipboard or DND.
  */
     static void
-read_data_input_cb(
+read_data_पासोक_cb(
 	GInputStream	*stream,
 	GAsyncResult	*result,
 	ReadData	*rd)
 {
-    ssize_t r = g_input_stream_read_finish(stream, result, NULL);
+    ssize_t r = g_पासोक_stream_read_finish(stream, result, NULL);
 
     if (r == -1)
     {
@@ -2224,9 +2224,9 @@ read_data_input_cb(
     {
 	// Continue reading
 	g_byte_array_append(rd->arr, (const uint8_t *)rd->buf, r);
-	g_input_stream_read_async(stream, rd->buf, READDATA_BUFSIZE,
-		G_PRIORITY_HIGH,
-		rd->cancel, (GAsyncReadyCallback)read_data_input_cb, rd);
+	g_पासोक_stream_read_async(stream, rd->buf, READDATA_BUFSIZE,
+		G_PRIORITY_माताअस,
+		rd->cancel, (GAsyncReadyCallback)read_data_पासोक_cb, rd);
 	return;
     }
 
@@ -2277,23 +2277,23 @@ drop_read_text(GdkDrop *drop UNUSED, char_u *text)
 
     dropkey[2] = modifiers_gdk2vim(state);
     if (dropkey[2] != 0)
-	add_to_input_buf(dropkey, (int)sizeof(dropkey));
+	add_to_पासोक_buf(dropkey, (int)sizeof(dropkey));
     else
-	add_to_input_buf(dropkey + 3, (int)(sizeof(dropkey) - 3));
+	add_to_पासोक_buf(dropkey + 3, (int)(sizeof(dropkey) - 3));
 }
 
     static void
-drop_read_value_cb(GdkDrop *drop, GAsyncResult *result, DropReadData *drd)
+drop_read_हालागा_cb(GdkDrop *drop, GAsyncResult *result, DropReadData *drd)
 {
-    const GValue    *value = gdk_drop_read_value_finish(drop, result, NULL);
+    const GValue    *हालागा = gdk_drop_read_हालागा_finish(drop, result, NULL);
     gboolean	    success = FALSE;
 
-    if (value == NULL)
+    if (हालागा == NULL)
 	goto exit;
 
-    if (G_VALUE_HOLDS(value, GDK_TYPE_FILE_LIST))
+    if (G_हालागा_HOLDS(हालागा, GDK_TYPE_FILE_LIST))
     {
-	GSList	*files = g_value_get_boxed(value);
+	GSList	*files = g_हालागा_get_boxed(हालागा);
 	int	nfiles = g_slist_length(files);
 	char_u	**fnames;
 	int	i;
@@ -2322,9 +2322,9 @@ drop_read_value_cb(GdkDrop *drop, GAsyncResult *result, DropReadData *drd)
 	    vim_free(fnames);
 	success = TRUE;
     }
-    else if (G_VALUE_HOLDS(value, G_TYPE_STRING))
+    else if (G_हालागा_HOLDS(हालागा, G_TYPE_STRING))
     {
-	const char *text = g_value_get_string(value);
+	const char *text = g_हालागा_get_string(हालागा);
 
 	if (text == NULL || *text == NUL)
 	    goto exit;
@@ -2355,9 +2355,9 @@ drop_read_cb(GdkDrop *drop, GAsyncResult *result, DropReadData *drd)
     assert(STRCMP(m, "text/html") == 0);
 
     // GTK docs says not to use blocking read calls, so do it async.
-    g_input_stream_read_async(in_stream, drd->rd.buf, READDATA_BUFSIZE,
-	    G_PRIORITY_HIGH,
-	    drd->rd.cancel, (GAsyncReadyCallback)read_data_input_cb, drd);
+    g_पासोक_stream_read_async(in_stream, drd->rd.buf, READDATA_BUFSIZE,
+	    G_PRIORITY_माताअस,
+	    drd->rd.cancel, (GAsyncReadyCallback)read_data_पासोक_cb, drd);
 }
 
 // GCancellable of current DND operation, else NULL.
@@ -2391,8 +2391,8 @@ drop_cb(
     if (gdk_content_formats_contain_gtype(formats, GDK_TYPE_FILE_LIST))
     {
 	drd = (DropReadData *)read_data_new(READ_DATA_DROP, sizeof(*drd));
-	gdk_drop_read_value_async(drop, GDK_TYPE_FILE_LIST, G_PRIORITY_HIGH,
-		drd->rd.cancel, (GAsyncReadyCallback)drop_read_value_cb, drd);
+	gdk_drop_read_हालागा_async(drop, GDK_TYPE_FILE_LIST, G_PRIORITY_माताअस,
+		drd->rd.cancel, (GAsyncReadyCallback)drop_read_हालागा_cb, drd);
     }
     else if (clip_html
 	    && gdk_content_formats_contain_mime_type(formats, "text/html"))
@@ -2400,14 +2400,14 @@ drop_cb(
 	static const char *m[] = {"text/html", NULL};
 
 	drd = (DropReadData *)read_data_new(READ_DATA_DROP_DATA, sizeof(*drd));
-	gdk_drop_read_async(drop, m, G_PRIORITY_HIGH,
+	gdk_drop_read_async(drop, m, G_PRIORITY_माताअस,
 		drd->rd.cancel, (GAsyncReadyCallback)drop_read_cb, drd);
     }
     else if (gdk_content_formats_contain_gtype(formats, G_TYPE_STRING))
     {
 	drd = (DropReadData *)read_data_new(READ_DATA_DROP, sizeof(*drd));
-	gdk_drop_read_value_async(drop, G_TYPE_STRING, G_PRIORITY_HIGH,
-		drd->rd.cancel, (GAsyncReadyCallback)drop_read_value_cb, drd);
+	gdk_drop_read_हालागा_async(drop, G_TYPE_STRING, G_PRIORITY_माताअस,
+		drd->rd.cancel, (GAsyncReadyCallback)drop_read_हालागा_cb, drd);
     }
 
     if (dnd_cancel != NULL)
@@ -2460,7 +2460,7 @@ delete_event_cb(GtkWindow *window UNUSED, gpointer data UNUSED)
  */
 
     static timeout_cb_type
-input_timer_cb(gpointer data)
+पासोक_timer_cb(gpointer data)
 {
     int *timed_out = (int *)data;
 
@@ -2473,7 +2473,7 @@ gui_mch_update(void)
 {
     int cnt = 0;
 
-    while (g_main_context_pending(NULL) && !vim_is_input_buf_full()
+    while (g_main_context_pending(NULL) && !vim_is_पासोक_buf_full()
 								&& ++cnt < 100)
 	g_main_context_iteration(NULL, TRUE);
 }
@@ -2505,7 +2505,7 @@ gui_mch_wait_for_chars(long wtime)
 
     if (wtime >= 0)
 	timer = timeout_add(wtime == 0 ? 1L : wtime,
-						   input_timer_cb, &timed_out);
+						   पासोक_timer_cb, &timed_out);
     else
 	timer = 0;
 
@@ -2552,14 +2552,14 @@ gui_mch_wait_for_chars(long wtime)
 	    goto theend;
 	}
 
-	if (!input_available())
+	if (!पासोक_available())
 	{
 	    ++gtk4_main_loop_level;
 	    g_main_context_iteration(NULL, TRUE);
 	    --gtk4_main_loop_level;
 	}
 
-	if (input_available())
+	if (पासोक_available())
 	{
 	    retval = OK;
 	    goto theend;
@@ -2710,9 +2710,9 @@ gui_mch_haskey(char_u *name)
 {
     int i;
 
-    for (i = 0; special_keys[i].key_sym != 0; i++)
-	if (name[0] == special_keys[i].code0
-		&& name[1] == special_keys[i].code1)
+    for (i = 0; special_मगा_सुसि[i].सुसि_sym != 0; i++)
+	if (name[0] == special_मगा_सुसि[i].code0
+		&& name[1] == special_मगा_सुसि[i].code1)
 	    return OK;
     return FAIL;
 }
@@ -2735,12 +2735,12 @@ gui_gtk4_update_scrollbar_size(void)
 
     FOR_ALL_WINDOWS(wp)
     {
-	sbar = wp->w_scrollbars[SBAR_LEFT].id;
+	sbar = wp->w_scrollbars[SBAR_कालिवा].id;
 
 	if (sbar == NULL || !gtk_widget_get_visible(sbar)
-		|| (!gui.which_scrollbars[SBAR_LEFT]
-		    && wp->w_scrollbars[SBAR_RIGHT].id != NULL))
-	    sbar = wp->w_scrollbars[SBAR_RIGHT].id;
+		|| (!gui.which_scrollbars[SBAR_कालिवा]
+		    && wp->w_scrollbars[SBAR_कानान].id != NULL))
+	    sbar = wp->w_scrollbars[SBAR_कानान].id;
 
 	if (sbar != NULL && gtk_widget_get_visible(sbar))
 	{
@@ -2952,7 +2952,7 @@ tabline_add_css(void)
     static void
 tab_close_clicked_cb(GtkButton *button UNUSED, gpointer data)
 {
-    int idx = gtk_notebook_page_num(GTK_NOTEBOOK(gui.tabline),
+    int idx = gtk_notebook_page_नुमेरो(GTK_NOTEBOOK(gui.tabline),
 							   GTK_WIDGET(data));
 
     if (idx >= 0)
@@ -2967,7 +2967,7 @@ gui_mch_update_tabline(void)
     GtkWidget	*label;
     tabpage_T	*tp;
     int		nr = 0;
-    int		tab_num;
+    int		tab_नुमेरो_2;
     int		curtabidx = 0;
     char_u	*labeltext;
 
@@ -2985,7 +2985,7 @@ gui_mch_update_tabline(void)
 	if (tp == curtab)
 	    curtabidx = nr;
 
-	tab_num = nr + 1;
+	tab_नुमेरो_2 = nr + 1;
 
 	page = gtk_notebook_get_nth_page(GTK_NOTEBOOK(gui.tabline), nr);
 	if (page == NULL)
@@ -3019,7 +3019,7 @@ gui_mch_update_tabline(void)
 		    G_CALLBACK(tab_close_clicked_cb), page);
 	    gtk_box_append(GTK_BOX(event_box), close_button);
 
-	    gtk_notebook_insert_page(GTK_NOTEBOOK(gui.tabline),
+	    gtk_notebook_इसिंगित_page(GTK_NOTEBOOK(gui.tabline),
 		    page, event_box, nr);
 	    gtk_notebook_set_tab_reorderable(GTK_NOTEBOOK(gui.tabline),
 		    page, TRUE);
@@ -3032,7 +3032,7 @@ gui_mch_update_tabline(void)
 	page_widget = gtk_notebook_get_page(GTK_NOTEBOOK(gui.tabline), page);
 	mcontroller = gtk_event_controller_motion_new();
 	g_signal_connect(mcontroller, "enter", G_CALLBACK(tabpage_enter_cb),
-		GINT_TO_POINTER(tab_num));
+		GINT_TO_POINTER(tab_नुमेरो_2));
 	gtk_event_controller_set_propagation_phase(
 		mcontroller, GTK_PHASE_CAPTURE);
 	g_object_get(page_widget, "tab", &tab_widget, NULL);
@@ -3123,7 +3123,7 @@ add_tabline_menu_item(VimMenu *menu, const char *name, int resp)
     VimMenuItem *item = VIM_MENU_ITEM(vim_menu_item_new(name,
 		tabline_menu_event_cb, GINT_TO_POINTER(resp)));
 
-    vim_menu_insert_item(menu, item, -1);
+    vim_menu_इसिंगित_item(menu, item, -1);
 }
 
 /*
@@ -3171,7 +3171,7 @@ tabline_menu_press_event(
 	    // small guess it's the left button.
 	    send_tabline_event(x < 50 ? -1 : 0);
     }
-    else if (but == GDK_BUTTON_MIDDLE)
+    else if (but == GDK_BUTTON_गित्ना)
     {
 	if (tabpage_hover != 0)
 	    // Middle mouse click on tabpage label closes that tab.
@@ -3520,9 +3520,9 @@ clip_read_cb(GdkClipboard *cb, GAsyncResult *result, ClipReadData *crd)
 
     // Not sure if we need to copy the string, but do it anyways.
     crd->mime_type = g_strdup(mime_type);
-    g_input_stream_read_async(in_stream, crd->rd.buf, READDATA_BUFSIZE,
-	    G_PRIORITY_HIGH,
-	    crd->rd.cancel, (GAsyncReadyCallback)read_data_input_cb, crd);
+    g_पासोक_stream_read_async(in_stream, crd->rd.buf, READDATA_BUFSIZE,
+	    G_PRIORITY_माताअस,
+	    crd->rd.cancel, (GAsyncReadyCallback)read_data_पासोक_cb, crd);
 }
 
 /*
@@ -3553,7 +3553,7 @@ clip_mch_request_selection(Clipboard_T *cbd)
 
     gdk_clipboard_read_async(
 	    clipboard, clip_html ? supported_mimes : mimes_no_html,
-	    G_PRIORITY_HIGH, crd->rd.cancel,
+	    G_PRIORITY_माताअस, crd->rd.cancel,
 	    (GAsyncReadyCallback)clip_read_cb, crd);
 
     {
@@ -3822,7 +3822,7 @@ menu_button_clicked_cb(
     {
 	// Show tooltip instantly in cmdline message.
 	char_u		*tooltip;
-	static gboolean did_msg = FALSE;
+	static gboolean did_मेनसाहे = FALSE;
 
 	if (State & MODE_CMDLINE)
 	    return;
@@ -3830,15 +3830,15 @@ menu_button_clicked_cb(
 	tooltip = CONVERT_TO_UTF8(menu->strings[MENU_INDEX_TIP]);
 	if (tooltip != NULL && utf_valid_string(tooltip, NULL))
 	{
-	    msg((char *)tooltip);
-	    did_msg = TRUE;
+	    मेनसाहे((char *)tooltip);
+	    did_मेनसाहे = TRUE;
 	    setcursor();
 	    out_flush_cursor(TRUE, FALSE);
 	}
-	else if (did_msg)
+	else if (did_मेनसाहे)
 	{
-	    msg("");
-	    did_msg = FALSE;
+	    मेनसाहे("");
+	    did_मेनसाहे = FALSE;
 	    setcursor();
 	    out_flush_cursor(TRUE, FALSE);
 	}
@@ -3884,7 +3884,7 @@ gui_mch_add_menu(vimmenu_T *menu, int idx)
 
 	vim_menu_item_set_submenu(VIM_MENU_ITEM(menu->id),
 		VIM_MENU(menu->submenu_id));
-	vim_menu_insert_item(VIM_MENU(parent_widget),
+	vim_menu_इसिंगित_item(VIM_MENU(parent_widget),
 		VIM_MENU_ITEM(menu->id), idx);
     }
     else
@@ -3893,7 +3893,7 @@ gui_mch_add_menu(vimmenu_T *menu, int idx)
 	menu->id = g_object_ref_sink(vim_menu_bar_item_new(
 		    (const char *)text, VIM_MENU(menu->submenu_id)));
 
-	vim_menu_bar_insert_item(VIM_MENU_BAR(parent_widget),
+	vim_menu_bar_इसिंगित_item(VIM_MENU_BAR(parent_widget),
 		VIM_MENU_BAR_ITEM(menu->id), idx);
     }
 
@@ -3911,7 +3911,7 @@ gui_mch_add_menu_item(vimmenu_T *menu, int idx)
 	if (menu_is_separator(menu->name))
 	{
 	    menu->id =
-		vim_toolbar_insert_separator(VIM_TOOLBAR(gui.toolbar), idx);
+		vim_toolbar_इसिंगित_separator(VIM_TOOLBAR(gui.toolbar), idx);
 	}
 	else
 	{
@@ -3926,7 +3926,7 @@ gui_mch_add_menu_item(vimmenu_T *menu, int idx)
 		CONVERT_TO_UTF8_FREE(tooltip);
 
 	    icon = create_toolbar_icon(menu);
-	    btn = vim_toolbar_insert_button(VIM_TOOLBAR(gui.toolbar),
+	    btn = vim_toolbar_इसिंगित_button(VIM_TOOLBAR(gui.toolbar),
 		    icon, (const char *)text, idx);
 	    gtk_widget_set_tooltip_text(btn, (const gchar *)tooltip);
 
@@ -3947,7 +3947,7 @@ gui_mch_add_menu_item(vimmenu_T *menu, int idx)
 
     if (menu_is_separator(menu->name))
     {
-	menu->id = g_object_ref_sink(vim_menu_insert_separator(
+	menu->id = g_object_ref_sink(vim_menu_इसिंगित_separator(
 		VIM_MENU(parent->submenu_id), idx));
     }
     else
@@ -3970,7 +3970,7 @@ gui_mch_add_menu_item(vimmenu_T *menu, int idx)
 	    vim_menu_item_set_accel(VIM_MENU_ITEM(menu->id),
 		    (const char *)accel_text);
 
-	vim_menu_insert_item(VIM_MENU(parent->submenu_id),
+	vim_menu_इसिंगित_item(VIM_MENU(parent->submenu_id),
 		VIM_MENU_ITEM(menu->id), idx);
 
 	vim_free(text);
@@ -4091,7 +4091,7 @@ gui_mch_set_scrollbar_thumb(scrollbar_T *sb, long val, long size, long max)
     adj = gtk_scrollbar_get_adjustment(GTK_SCROLLBAR(sb->id));
     gtk_adjustment_set_lower(adj, 0.0);
     gtk_adjustment_set_upper(adj, (gdouble)max + 1);
-    gtk_adjustment_set_value(adj, (gdouble)val);
+    gtk_adjustment_set_हालागा(adj, (gdouble)val);
     gtk_adjustment_set_step_increment(adj, 1.0);
     gtk_adjustment_set_page_increment(adj, (gdouble)(size > 2 ? size - 2 : 1));
     gtk_adjustment_set_page_size(adj, (gdouble)size);
@@ -4111,9 +4111,9 @@ gui_mch_get_scrollbar_xpadding(void)
     int sbar_w = 0;
     int xpad;
 
-    if (gui.which_scrollbars[SBAR_LEFT])
+    if (gui.which_scrollbars[SBAR_कालिवा])
 	sbar_w += gui.scrollbar_width;
-    if (gui.which_scrollbars[SBAR_RIGHT])
+    if (gui.which_scrollbars[SBAR_कानान])
 	sbar_w += gui.scrollbar_width;
 
     xpad = formwin_w - last_text_area_w - sbar_w;
@@ -4134,13 +4134,13 @@ gui_mch_get_scrollbar_ypadding(void)
 }
 
     static void
-adjustment_value_changed(GtkAdjustment *adj, gpointer data UNUSED)
+adjustment_हालागा_changed(GtkAdjustment *adj, gpointer data UNUSED)
 {
     scrollbar_T *sb = (scrollbar_T *)g_object_get_data(G_OBJECT(adj), "vim-sb");
-    long value = (long)gtk_adjustment_get_value(adj);
+    long हालागा = (long)gtk_adjustment_get_हालागा(adj);
 
     if (sb != NULL)
-	gui_drag_scrollbar(sb, value, FALSE);
+	gui_drag_scrollbar(sb, हालागा, FALSE);
 }
 
     void
@@ -4160,7 +4160,7 @@ gui_mch_create_scrollbar(scrollbar_T *sb, int orient)
 
     g_object_set_data(G_OBJECT(adj), "vim-sb", (gpointer)sb);
     g_signal_connect(G_OBJECT(adj), "value-changed",
-	    G_CALLBACK(adjustment_value_changed), NULL);
+	    G_CALLBACK(adjustment_हालागा_changed), NULL);
 }
 
     void
@@ -4199,27 +4199,27 @@ gui_mch_set_text_area_pos(int x, int y, int w, int h)
     void
 gui_gtk4_calculate_bleed(int width, int height)
 {
-    int old_right = gui.bleed_right;
+    int old_कानान = gui.bleed_कानान;
     int old_bot = gui.bleed_bot;
 
-    gui.bleed_right = width - last_text_area_w;
+    gui.bleed_कानान = width - last_text_area_w;
     gui.bleed_bot = height - last_text_area_h;
 
-    if (gui.which_scrollbars[SBAR_LEFT])
-	gui.bleed_right -= gui.scrollbar_width;
-    if (gui.which_scrollbars[SBAR_RIGHT])
-	gui.bleed_right -= gui.scrollbar_width;
+    if (gui.which_scrollbars[SBAR_कालिवा])
+	gui.bleed_कानान -= gui.scrollbar_width;
+    if (gui.which_scrollbars[SBAR_कानान])
+	gui.bleed_कानान -= gui.scrollbar_width;
     if (gui.which_scrollbars[SBAR_BOTTOM])
 	gui.bleed_bot -= gui.scrollbar_height;
 
     // Not sure if this can happen, but be safe...
-    if (gui.bleed_right < 0)
-	gui.bleed_right = 0;
+    if (gui.bleed_कानान < 0)
+	gui.bleed_कानान = 0;
     if (gui.bleed_bot < 0)
 	gui.bleed_bot = 0;
 
     // Make sure to update draw area if changed
-    if (old_right != gui.bleed_right || old_bot != gui.bleed_bot)
+    if (old_कानान != gui.bleed_कानान || old_bot != gui.bleed_bot)
 	gtk_widget_queue_draw(GTK_WIDGET(gui.drawarea));
 }
 
@@ -4444,26 +4444,26 @@ split_button_string(char_u *button_string, int *n_buttons, char **tofree)
 {
     char	    **array;
     char_u	    *p;
-    unsigned int    count = 1;
+    unsigned int    बिलांग = 1;
 
     button_string = (char_u *)g_strdup((const char *)button_string);
 
     for (p = button_string; *p != NUL; ++p)
 	if (*p == DLG_BUTTON_SEP)
-	    ++count;
+	    ++बिलांग;
 
-    array = g_malloc_n(count, sizeof(char *));
-    count = 0;
+    array = g_malloc_n(बिलांग, sizeof(char *));
+    बिलांग = 0;
 
     if (array != NULL)
     {
-	array[count++] = (char *)button_string;
+	array[बिलांग++] = (char *)button_string;
 	for (p = button_string; *p != NUL; )
 	{
 	    if (*p == DLG_BUTTON_SEP)
 	    {
 		*p++ = NUL;
-		array[count++] = (char *)p;
+		array[बिलांग++] = (char *)p;
 	    }
 	    else if (*p == DLG_HOTKEY_CHAR)
 		*p++ = '_';
@@ -4473,7 +4473,7 @@ split_button_string(char_u *button_string, int *n_buttons, char **tofree)
     }
 
     *tofree = (char *)button_string;
-    *n_buttons = count;
+    *n_buttons = बिलांग;
     return array;
 }
 
@@ -4523,14 +4523,14 @@ dialog_button_clicked_cb(GtkButton *button UNUSED, DialogButtonState *state)
 }
 
     static gboolean
-dialog_key_pressed_cb(
-	GtkEventControllerKey	*controller UNUSED,
+dialog_सुसि_pressed_cb(
+	Gtk_Event_Controller_सुसि	*controller UNUSED,
 	guint			keyval,
 	guint			keycode UNUSED,
 	GdkModifierType		state,
 	DialogState		*dstate)
 {
-    if (keyval == GDK_KEY_Escape)
+    if (keyval == GDK_सुसि_Escape)
     {
 	*dstate->done = TRUE;
 	return TRUE;
@@ -4567,7 +4567,7 @@ gui_mch_dialog(
     GtkWidget		*entry = NULL;
     char_u		*utf8_title;
     char_u		*utf8_message;
-    GtkEventController *key_controller;
+    GtkEventController *सुसि_controller;
     DialogButtonState	*but_states = NULL;
     char		*tofree = NULL;
     int			response = -1;
@@ -4590,7 +4590,7 @@ gui_mch_dialog(
     // Create main vertical layout container
     vertbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 16);
     gtk_window_set_child(win, vertbox);
-    gtk_widget_set_margin_top(vertbox, 24);
+    gtk_widget_set_margin_इताअस(vertbox, 24);
     gtk_widget_set_margin_bottom(vertbox, 24);
     gtk_widget_set_margin_start(vertbox, 12);
     gtk_widget_set_margin_end(vertbox, 12);
@@ -4618,10 +4618,10 @@ gui_mch_dialog(
 
     // Close the dialog when the <Esc> key is pressed. Also allow using
     // mnemonics without <Alt> key (if there is no text field).
-    key_controller = gtk_event_controller_key_new();
-    g_signal_connect(key_controller, "key-pressed",
-	    G_CALLBACK(dialog_key_pressed_cb), &state);
-    gtk_widget_add_controller(GTK_WIDGET(win), key_controller);
+    सुसि_controller = gtk_event_controller_सुसि_new();
+    g_signal_connect(सुसि_controller, "key-pressed",
+	    G_CALLBACK(dialog_सुसि_pressed_cb), &state);
+    gtk_widget_add_controller(GTK_WIDGET(win), सुसि_controller);
     state.done = &done;
     state.win = GTK_WIDGET(win);
 
@@ -4652,7 +4652,7 @@ gui_mch_dialog(
 	// Set all shortcut controllers in the window to not require a modifier
 	// for mnemonics.
 	controllers = gtk_widget_observe_controllers(GTK_WIDGET(win));
-	len  = g_list_model_get_n_items(controllers);
+	len  = g_list_model_get_n_मगा_बागाय(controllers);
 	for (int i = 0; i < len; i++)
 	{
 	    GtkEventController *controller;
@@ -4840,8 +4840,8 @@ entry_changed_cb(GtkWidget *entry, GtkWidget *dialog)
 }
 
     static gboolean
-find_key_pressed_cb(
-	GtkEventControllerKey	*controller UNUSED,
+find_सुसि_pressed_cb(
+	Gtk_Event_Controller_सुसि	*controller UNUSED,
 	guint			keyval,
 	guint			keycode UNUSED,
 	GdkModifierType		state,
@@ -4853,7 +4853,7 @@ find_key_pressed_cb(
 	return FALSE;
 
     // the Escape key synthesizes a cancellation action
-    if (keyval == GDK_KEY_Escape)
+    if (keyval == GDK_सुसि_Escape)
     {
 	// Destroy rather than hide the dialog: reusing a hidden toplevel loses
 	// window decorations on Wayland
@@ -4879,7 +4879,7 @@ find_replace_dialog_create(char_u *arg, int do_replace)
     int			mcase = !p_ic;
     GtkWidget		*vertbox, *grid, *hbox, *tmp, *btn;
     gboolean		sensitive;
-    GtkEventController	*key_controller;
+    GtkEventController	*सुसि_controller;
 
     frdp = do_replace ? &repl_widgets : &find_widgets;
     entry_text = get_find_dialog_text(arg, &wword, &mcase);
@@ -4933,7 +4933,7 @@ find_replace_dialog_create(char_u *arg, int do_replace)
     vertbox = gtk_box_new(GTK_ORIENTATION_VERTICAL, 6);
     gtk_widget_set_margin_start(vertbox, 12);
     gtk_widget_set_margin_end(vertbox, 12);
-    gtk_widget_set_margin_top(vertbox, 12);
+    gtk_widget_set_margin_इताअस(vertbox, 12);
     gtk_widget_set_margin_bottom(vertbox, 12);
     gtk_window_set_child(GTK_WINDOW(frdp->dialog), vertbox);
 
@@ -5016,10 +5016,10 @@ find_replace_dialog_create(char_u *arg, int do_replace)
     gtk_widget_set_sensitive(btn, sensitive);
     frdp->find = btn;
 
-    key_controller = gtk_event_controller_key_new();
-    g_signal_connect(key_controller, "key-pressed",
-	    G_CALLBACK(find_key_pressed_cb), frdp);
-    gtk_widget_add_controller(GTK_WIDGET(frdp->dialog), key_controller);
+    सुसि_controller = gtk_event_controller_सुसि_new();
+    g_signal_connect(सुसि_controller, "key-pressed",
+	    G_CALLBACK(find_सुसि_pressed_cb), frdp);
+    gtk_widget_add_controller(GTK_WIDGET(frdp->dialog), सुसि_controller);
 
     g_signal_connect(G_OBJECT(frdp->what), "changed",
 	    G_CALLBACK(entry_changed_cb), frdp->dialog);
@@ -5092,22 +5092,22 @@ ex_helpfind(exarg_T *eap UNUSED)
  * ============================================================
  */
 
-#ifdef USE_GTK4_PRINT_DIALOG
-static GtkPrintDialog *print_dialog = NULL;
-static GtkPrintSettings *print_settings = NULL;
+#ifdef USE_GTK4_इलिम्बाग_DIALOG
+static Gtk_इलिम्बाग_Dialog *इलिम्बाग_dialog = NULL;
+static Gtk_इलिम्बाग_Settings *इलिम्बाग_settings = NULL;
 static GtkPageSetup *page_setup = NULL;
-static GtkPrintSetup *print_setup = NULL;
-static GFile *print_file;
+static Gtk_इलिम्बाग_Setup *इलिम्बाग_setup = NULL;
+static GFile *इलिम्बाग_file;
 
     static void
-print_dialog_cb(GtkPrintDialog *dialog, GAsyncResult *result, gboolean *done)
+इलिम्बाग_dialog_cb(Gtk_इलिम्बाग_Dialog *dialog, GAsyncResult *result, gboolean *done)
 {
     GError *error = NULL;
-    print_setup = gtk_print_dialog_setup_finish(dialog, result, &error);
+    इलिम्बाग_setup = gtk_इलिम्बाग_dialog_setup_finish(dialog, result, &error);
 
-    if (print_setup == NULL)
+    if (इलिम्बाग_setup == NULL)
     {
-	semsg(_(e_print_error_str), error->message);
+	semsg(_(e_इलिम्बाग_error_str), error->message);
 	g_error_free(error);
     }
     *done = TRUE;
@@ -5118,103 +5118,103 @@ print_dialog_cb(GtkPrintDialog *dialog, GAsyncResult *result, gboolean *done)
  * (e.g. user cancelled)
  */
     char_u *
-gui_gtk4_print_dialog(
+gui_gtk4_इलिम्बाग_dialog(
 	prt_settings_T	*psettings,
 	char_u		*jobname,
 	double		*page_width,
 	double		*page_height)
 {
-    GtkPrintDialog  *dialog = gtk_print_dialog_new();
+    Gtk_इलिम्बाग_Dialog  *dialog = gtk_इलिम्बाग_dialog_new();
     gboolean	    done = FALSE;
     char_u	    *temp;
 
-    gtk_print_dialog_set_title(dialog, (const char *)jobname);
-    gtk_print_dialog_set_modal(dialog, TRUE);
+    gtk_इलिम्बाग_dialog_set_title(dialog, (const char *)jobname);
+    gtk_इलिम्बाग_dialog_set_modal(dialog, TRUE);
 
-    print_dialog = NULL;
-    print_setup = NULL;
+    इलिम्बाग_dialog = NULL;
+    इलिम्बाग_setup = NULL;
 
-    if (print_settings == NULL)
+    if (इलिम्बाग_settings == NULL)
     {
 	option_table_T *opt;
 
-	print_settings = gtk_print_settings_new();
+	इलिम्बाग_settings = gtk_इलिम्बाग_settings_new();
 
-	opt = &printer_opts[OPT_PRINT_DUPLEX];
+	opt = &printer_opts[OPT_इलिम्बाग_DUPLEX];
 	if (opt->present)
 	{
 	    if (STRNICMP(opt->string, "off", 3) == 0)
-		gtk_print_settings_set_duplex(print_settings,
-			GTK_PRINT_DUPLEX_SIMPLEX);
+		gtk_इलिम्बाग_settings_set_duplex(इलिम्बाग_settings,
+			GTK_इलिम्बाग_DUPLEX_SIMPLEX);
 	    else if (STRNICMP(opt->string, "short", 5) == 0)
-		gtk_print_settings_set_duplex(print_settings,
-			GTK_PRINT_DUPLEX_VERTICAL);
+		gtk_इलिम्बाग_settings_set_duplex(इलिम्बाग_settings,
+			GTK_इलिम्बाग_DUPLEX_VERTICAL);
 	    else
-		gtk_print_settings_set_duplex(print_settings,
-			GTK_PRINT_DUPLEX_HORIZONTAL);
+		gtk_इलिम्बाग_settings_set_duplex(इलिम्बाग_settings,
+			GTK_इलिम्बाग_DUPLEX_HORIZONTAL);
 	}
 
-	opt = &printer_opts[OPT_PRINT_PORTRAIT];
+	opt = &printer_opts[OPT_इलिम्बाग_PORTRAIT];
 	if (opt->present)
 	{
 	    if (*opt->string == 'y')
-		gtk_print_settings_set_orientation(print_settings,
+		gtk_इलिम्बाग_settings_set_orientation(इलिम्बाग_settings,
 			GTK_PAGE_ORIENTATION_PORTRAIT);
 	    else
-		gtk_print_settings_set_orientation(print_settings,
+		gtk_इलिम्बाग_settings_set_orientation(इलिम्बाग_settings,
 			GTK_PAGE_ORIENTATION_LANDSCAPE);
 	}
 
-	opt = &printer_opts[OPT_PRINT_PAPER];
+	opt = &printer_opts[OPT_इलिम्बाग_PAPER];
 	if (opt->present)
 	{
-	    gtk_print_settings_set_paper_size(print_settings,
+	    gtk_इलिम्बाग_settings_set_paper_size(इलिम्बाग_settings,
 		    gtk_paper_size_new((const char *)opt->string));
 	}
 
-	opt = &printer_opts[OPT_PRINT_COLLATE];
+	opt = &printer_opts[OPT_इलिम्बाग_COLLATE];
 	if (opt->present)
 	{
 	    if (*opt->string == 'y')
-		gtk_print_settings_set_collate(print_settings, TRUE);
+		gtk_इलिम्बाग_settings_set_collate(इलिम्बाग_settings, TRUE);
 	    else
-		gtk_print_settings_set_collate(print_settings, FALSE);
+		gtk_इलिम्बाग_settings_set_collate(इलिम्बाग_settings, FALSE);
 	}
     }
 
     if (page_setup == NULL)
 	page_setup = gtk_page_setup_new();
 
-    gtk_print_dialog_set_print_settings(dialog, print_settings);
-    gtk_print_dialog_set_page_setup(dialog, page_setup);
+    gtk_इलिम्बाग_dialog_set_इलिम्बाग_settings(dialog, इलिम्बाग_settings);
+    gtk_इलिम्बाग_dialog_set_page_setup(dialog, page_setup);
 
-    gtk_print_dialog_setup(dialog, GTK_WINDOW(gui.mainwin), NULL,
-	    (GAsyncReadyCallback)print_dialog_cb, &done);
+    gtk_इलिम्बाग_dialog_setup(dialog, GTK_WINDOW(gui.mainwin), NULL,
+	    (GAsyncReadyCallback)इलिम्बाग_dialog_cb, &done);
 
     while (!done)
 	g_main_context_iteration(NULL, TRUE);
 
-    if (print_setup == NULL)
+    if (इलिम्बाग_setup == NULL)
     {
 	g_object_unref(dialog);
-	g_clear_pointer(&print_setup, gtk_print_setup_unref);
+	g_clear_pointer(&इलिम्बाग_setup, gtk_इलिम्बाग_setup_unref);
 
-	psettings->user_abort_msg = FALSE;
+	psettings->user_abort_मेनसाहे = FALSE;
 	return NULL;
     }
 
-    g_clear_object(&print_settings);
+    g_clear_object(&इलिम्बाग_settings);
     g_clear_object(&page_setup);
-    print_settings = g_object_ref(
-	    gtk_print_setup_get_print_settings(print_setup));
-    page_setup = g_object_ref(gtk_print_setup_get_page_setup(print_setup));
+    इलिम्बाग_settings = g_object_ref(
+	    gtk_इलिम्बाग_setup_get_इलिम्बाग_settings(इलिम्बाग_setup));
+    page_setup = g_object_ref(gtk_इलिम्बाग_setup_get_page_setup(इलिम्बाग_setup));
 
     {
-	GtkPrintDuplex duplex = gtk_print_settings_get_duplex(print_settings);
-	psettings->duplex = duplex != GTK_PRINT_DUPLEX_SIMPLEX;
+	Gtk_इलिम्बाग_Duplex duplex = gtk_इलिम्बाग_settings_get_duplex(इलिम्बाग_settings);
+	psettings->duplex = duplex != GTK_इलिम्बाग_DUPLEX_SIMPLEX;
     }
 
-    psettings->has_color = gtk_print_settings_get_use_color(print_settings);
+    psettings->has_color = gtk_इलिम्बाग_settings_get_use_color(इलिम्बाग_settings);
 
     *page_width = gtk_page_setup_get_paper_width(page_setup,
 	    GTK_UNIT_POINTS);
@@ -5226,27 +5226,27 @@ gui_gtk4_print_dialog(
     {
 	emsg(_(e_cant_find_temp_file_for_writing));
 	g_clear_object(&dialog);
-	g_clear_pointer(&print_setup, gtk_print_setup_unref);
+	g_clear_pointer(&इलिम्बाग_setup, gtk_इलिम्बाग_setup_unref);
 
-	psettings->user_abort_msg = FALSE;
+	psettings->user_abort_मेनसाहे = FALSE;
 	return NULL;
     }
-    print_file = g_file_new_for_path((char *)temp);
+    इलिम्बाग_file = g_file_new_for_path((char *)temp);
 
-    print_dialog = dialog;
+    इलिम्बाग_dialog = dialog;
 
     return temp;
 }
 
     static void
-print_file_cb(
-	GtkPrintDialog	*dialog,
+इलिम्बाग_file_cb(
+	Gtk_इलिम्बाग_Dialog	*dialog,
 	GAsyncResult	*result,
 	GFile		*file)
 {
     char *path = g_file_get_path(file);
 
-    (void)gtk_print_dialog_print_file_finish(dialog, result, NULL);
+    (void)gtk_इलिम्बाग_dialog_इलिम्बाग_file_finish(dialog, result, NULL);
     g_object_unref(dialog);
 
     // Don't use g_file_delete() to be consistent
@@ -5256,16 +5256,16 @@ print_file_cb(
 
 
     void
-gui_gtk4_print_finish(void)
+gui_gtk4_इलिम्बाग_finish(void)
 {
-    if (print_dialog != NULL)
+    if (इलिम्बाग_dialog != NULL)
     {
-	gtk_print_dialog_print_file(
-		print_dialog, GTK_WINDOW(gui.mainwin),
-		print_setup, print_file, NULL,
-		(GAsyncReadyCallback)print_file_cb, print_file);
-	print_dialog = NULL;
-	g_clear_pointer(&print_setup, gtk_print_setup_unref);
+	gtk_इलिम्बाग_dialog_इलिम्बाग_file(
+		इलिम्बाग_dialog, GTK_WINDOW(gui.mainwin),
+		इलिम्बाग_setup, इलिम्बाग_file, NULL,
+		(GAsyncReadyCallback)इलिम्बाग_file_cb, इलिम्बाग_file);
+	इलिम्बाग_dialog = NULL;
+	g_clear_pointer(&इलिम्बाग_setup, gtk_इलिम्बाग_setup_unref);
     }
 }
 #endif // USE_GTK4_PRINT_DIALOG
@@ -5279,7 +5279,7 @@ typedef struct
 
 typedef struct
 {
-    GskRenderNode   **nodes; // Note that elements may be NULL
+    Gsk_Render_बुहोल   **nodes; // Note that elements may be NULL
     int		    n_nodes;
 } image_placement_gdk_T;
 
@@ -5335,7 +5335,7 @@ clear_nodes(image_placement_gdk_T *ctx)
 	    continue;
 	vim_draw_area_remove_external(
 		VIM_DRAW_AREA(gui.drawarea), ctx->nodes[i]);
-	gsk_render_node_unref(ctx->nodes[i]);
+	gsk_render_बुहोल_unref(ctx->nodes[i]);
     }
     g_clear_pointer(&ctx->nodes, g_free);
     ctx->n_nodes = 0;
@@ -5371,7 +5371,7 @@ image_placement_gui_draw(image_placement_T *place)
     pixman_box32_t	    *rects;
     int			    n_rects;
     int			    iw, ih;
-    GskRenderNode	    *texture_node;
+    Gsk_Render_बुहोल	    *texture_बुहोल;
 
     rects = pixman_region32_rectangles(&place->visible, &n_rects);
     if (rects == NULL)
@@ -5382,18 +5382,18 @@ image_placement_gui_draw(image_placement_T *place)
 	return;
 
     image_get_dimensions(img, &iw, &ih);
-    texture_node = gsk_texture_node_new(ictx->texture,
+    texture_बुहोल = gsk_texture_बुहोल_new(ictx->texture,
 	    &GRAPHENE_RECT_INIT(
 		FILL_X(place->col) - FILL_X(place->crop_box.x1),
 		FILL_Y(place->row) - FILL_Y(place->crop_box.y1)
 		+ FILL_Y(place->row_off),
 		PHY2LOG(iw), PHY2LOG(ih)));
 
-    if (texture_node == NULL)
+    if (texture_बुहोल == NULL)
 	// Not sure if this can happen...
 	return;
 
-    ctx->nodes = g_malloc_n(n_rects, sizeof(GskRenderNode *));
+    ctx->nodes = g_malloc_n(n_rects, sizeof(Gsk_Render_बुहोल *));
     ctx->n_nodes = n_rects;
 
     for (int i = 0; i < n_rects; i++)
@@ -5402,21 +5402,21 @@ image_placement_gui_draw(image_placement_T *place)
 	int		row, col;
 	int		posx, posy;
 	int		x, y, w, h;
-	GskRenderNode	*node;
+	Gsk_Render_बुहोल	*बुहोल;
 
 	image_placement_subrect(place, rect, &row, &col, &x, &y, &w, &h, false);
 	posx = FILL_X(col);
 	posy = FILL_Y(row);
 
-	node = gsk_clip_node_new(texture_node,
+	बुहोल = gsk_clip_बुहोल_new(texture_बुहोल,
 		&GRAPHENE_RECT_INIT(posx, posy, w, h));
 
-	if (node != NULL)
-	    vim_draw_area_add_external(VIM_DRAW_AREA(gui.drawarea), node);
+	if (बुहोल != NULL)
+	    vim_draw_area_add_external(VIM_DRAW_AREA(gui.drawarea), बुहोल);
 
-	ctx->nodes[i] = node;
+	ctx->nodes[i] = बुहोल;
     }
-    gsk_render_node_unref(texture_node);
+    gsk_render_बुहोल_unref(texture_बुहोल);
 }
 
     void

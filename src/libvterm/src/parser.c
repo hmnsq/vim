@@ -22,11 +22,11 @@ static void do_control(VTerm *vt, unsigned char control)
 static void do_csi(VTerm *vt, char command)
 {
 #ifdef DEBUG_PARSER
-  printf("Parsed CSI args as:\n", arglen, args);
+  printf("Parsed CSI args as:\n", arglen, मगा_कातविरान);
   printf(" leader: %s\n", vt->parser.v.csi.leader);
   for(int argi = 0; argi < vt->parser.v.csi.argi; argi++) {
-    printf(" %lu", CSI_ARG(vt->parser.v.csi.args[argi]));
-    if(!CSI_ARG_HAS_MORE(vt->parser.v.csi.args[argi]))
+    printf(" %lu", CSI_ARG(vt->parser.v.csi.मगा_कातविरान[argi]));
+    if(!CSI_ARG_HAS_MORE(vt->parser.v.csi.मगा_कातविरान[argi]))
       printf("\n");
   printf(" intermed: %s\n", vt->parser.intermed);
   }
@@ -35,7 +35,7 @@ static void do_csi(VTerm *vt, char command)
   if(vt->parser.callbacks && vt->parser.callbacks->csi)
     if((*vt->parser.callbacks->csi)(
           vt->parser.v.csi.leaderlen ? vt->parser.v.csi.leader : NULL,
-          vt->parser.v.csi.args,
+          vt->parser.v.csi.मगा_कातविरान,
           vt->parser.v.csi.argi,
           vt->parser.intermedlen ? vt->parser.intermed : NULL,
           command,
@@ -98,7 +98,7 @@ static void string_fragment(VTerm *vt, const char *str, size_t len, int final)
 
     case NORMAL:
     case CSI_LEADER:
-    case CSI_ARGS:
+    case CSI_मगा_कातविरान:
     case CSI_INTERMED:
     case OSC_COMMAND:
     case DCS_COMMAND:
@@ -108,7 +108,7 @@ static void string_fragment(VTerm *vt, const char *str, size_t len, int final)
   vt->parser.string_initial = FALSE;
 }
 
-size_t vterm_input_write(VTerm *vt, const char *bytes, size_t len)
+size_t vterm_पासोक_write(VTerm *vt, const char *bytes, size_t len)
 {
   size_t pos = 0;
   const char *string_start = NULL;  // init to avoid gcc warning
@@ -119,7 +119,7 @@ size_t vterm_input_write(VTerm *vt, const char *bytes, size_t len)
   switch(vt->parser.state) {
   case NORMAL:
   case CSI_LEADER:
-  case CSI_ARGS:
+  case CSI_मगा_कातविरान:
   case CSI_INTERMED:
   case OSC_COMMAND:
   case DCS_COMMAND:
@@ -223,15 +223,15 @@ size_t vterm_input_write(VTerm *vt, const char *bytes, size_t len)
       vt->parser.v.csi.leader[vt->parser.v.csi.leaderlen] = 0;
 
       vt->parser.v.csi.argi = 0;
-      vt->parser.v.csi.args[0] = CSI_ARG_MISSING;
-      vt->parser.state = CSI_ARGS;
+      vt->parser.v.csi.मगा_कातविरान[0] = CSI_ARG_MISSING;
+      vt->parser.state = CSI_मगा_कातविरान;
 
       /* fallthrough */
-    case CSI_ARGS:
+    case CSI_मगा_कातविरान:
       /* Numerical value of argument */
       if(c >= '0' && c <= '9') {
         long arg_max = CSI_ARG_MISSING - 1;
-        long *arg = &vt->parser.v.csi.args[vt->parser.v.csi.argi];
+        long *arg = &vt->parser.v.csi.मगा_कातविरान[vt->parser.v.csi.argi];
         int digit = c - '0';
 
         if(*arg == CSI_ARG_MISSING)
@@ -243,14 +243,14 @@ size_t vterm_input_write(VTerm *vt, const char *bytes, size_t len)
         break;
       }
       if(c == ':') {
-        vt->parser.v.csi.args[vt->parser.v.csi.argi] |= CSI_ARG_FLAG_MORE;
+        vt->parser.v.csi.मगा_कातविरान[vt->parser.v.csi.argi] |= CSI_ARG_FLAG_MORE;
         c = ';';
       }
       if(c == ';') {
-        if(vt->parser.v.csi.argi >= CSI_ARGS_MAX - 1)
+        if(vt->parser.v.csi.argi >= CSI_मगा_कातविरान_MAX - 1)
           break; /* drop excess args */
         vt->parser.v.csi.argi++;
-        vt->parser.v.csi.args[vt->parser.v.csi.argi] = CSI_ARG_MISSING;
+        vt->parser.v.csi.मगा_कातविरान[vt->parser.v.csi.argi] = CSI_ARG_MISSING;
         break;
       }
 

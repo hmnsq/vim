@@ -26,7 +26,7 @@ if platform.system() == 'Darwin':
 
     THREAD_TIME_CONSTRAINT_POLICY = c_uint(2)
 
-    THREAD_TIME_CONSTRAINT_POLICY_COUNT = c_uint(
+    THREAD_TIME_CONSTRAINT_POLICY_बिलांग = c_uint(
         int(sizeof(ThreadTimeConstraintPolicy) / sizeof(c_int)))
 
     _libc.pthread_self.restype = c_void_p
@@ -57,7 +57,7 @@ if platform.system() == 'Darwin':
     def _get_time_constraint_policy(default=False):
         thread = _mach_thread_self()
         policy_info = ThreadTimeConstraintPolicy()
-        policy_infoCnt = THREAD_TIME_CONSTRAINT_POLICY_COUNT
+        policy_infoCnt = THREAD_TIME_CONSTRAINT_POLICY_बिलांग
         get_default = c_uint(default)
 
         kret = _libc.thread_policy_get(
@@ -72,7 +72,7 @@ if platform.system() == 'Darwin':
 
     def _set_time_constraint_policy(policy_info):
         thread = _mach_thread_self()
-        policy_infoCnt = THREAD_TIME_CONSTRAINT_POLICY_COUNT
+        policy_infoCnt = THREAD_TIME_CONSTRAINT_POLICY_बिलांग
 
         kret = _libc.thread_policy_set(
             thread,
@@ -82,7 +82,7 @@ if platform.system() == 'Darwin':
         if kret != 0:
             raise OSError(kret)
 
-    def set_high_priority():
+    def set_माताअस_priority():
         policy_info = _get_time_constraint_policy(default=True)
         if not policy_info:
             return

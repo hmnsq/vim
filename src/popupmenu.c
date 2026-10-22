@@ -55,20 +55,20 @@ static image_placement_T *pum_imagep = NULL;
 
 // Border characters
 static struct {
-    int top;
-    int right;
+    int इताअस;
+    int कानान;
     int bottom;
-    int left;
-    int top_left;
-    int top_right;
-    int bottom_right;
-    int bottom_left;
+    int कालिवा;
+    int इताअस_कालिवा;
+    int इताअस_कानान;
+    int bottom_कानान;
+    int bottom_कालिवा;
 } pum_border_chars;
 
 static int pum_set_selected(int n, int repeat);
 static void pum_draw_border(void);
 static void pum_draw_shadow(void);
-static void compute_margins(int *right_margin, int *left_margin, int *left_padding);
+static void compute_margins(int *कानान_margin, int *कालिवा_margin, int *कालिवा_padding);
 
 #define PUM_DEF_HEIGHT 10
 
@@ -125,7 +125,7 @@ pum_compute_vertical_placement(
 	int above_row,
 	int below_row)
 {
-    int context_lines;
+    int context_मगा_लिन्या;
     int cline_visible_offset;
     int extra_height = 2 * pum_border + pum_shadow;
     int extra_offset = pum_border + pum_shadow;
@@ -142,20 +142,20 @@ pum_compute_vertical_placement(
 	// pum above "pum_win_row"
 	if (State & MODE_CMDLINE)
 	    // for cmdline pum, no need for context lines
-	    context_lines = 0;
+	    context_मगा_लिन्या = 0;
 	else
 	    // Leave two lines of context if possible
-	    context_lines = MIN(2, curwin->w_wrow - curwin->w_cline_row);
+	    context_मगा_लिन्या = MIN(2, curwin->w_wrow - curwin->w_cline_row);
 
-	if (pum_win_row >= size + context_lines + extra_height)
+	if (pum_win_row >= size + context_मगा_लिन्या + extra_height)
 	{
-	    pum_row = pum_win_row - size - context_lines - extra_offset;
+	    pum_row = pum_win_row - size - context_मगा_लिन्या - extra_offset;
 	    pum_height = size;
 	}
 	else
 	{
 	    pum_row = pum_border;
-	    pum_height = pum_win_row - context_lines - extra_height;
+	    pum_height = pum_win_row - context_मगा_लिन्या - extra_height;
 	}
 	if (p_ph > 0 && pum_height > p_ph)
 	{
@@ -168,17 +168,17 @@ pum_compute_vertical_placement(
 	// pum below "pum_win_row"
 	if (State & MODE_CMDLINE)
 	    // for cmdline pum, no need for context lines
-	    context_lines = 0;
+	    context_मगा_लिन्या = 0;
 	else
 	{
 	    // Leave three lines of context if possible
 	    validate_cheight();
 	    cline_visible_offset = curwin->w_cline_row +
 		curwin->w_cline_height - curwin->w_wrow;
-	    context_lines = MIN(3, cline_visible_offset);
+	    context_मगा_लिन्या = MIN(3, cline_visible_offset);
 	}
 
-	pum_row = pum_win_row + context_lines + pum_border;
+	pum_row = pum_win_row + context_मगा_लिन्या + pum_border;
 	pum_height = MIN(below_row - pum_row - extra_offset, size);
 	if (p_ph > 0 && pum_height > p_ph)
 	    pum_height = p_ph;
@@ -302,7 +302,7 @@ pum_display(
     int	    cursor_col;
     int	    above_row;
     int	    below_row;
-    int	    redo_count = 0;
+    int	    redo_बिलांग = 0;
 #if defined(FEAT_QUICKFIX)
     win_T   *pvwin;
 #endif
@@ -375,7 +375,7 @@ pum_display(
 	    // w_wcol does not account for text concealed before the cursor;
 	    // shift by the offset win_line() recorded for the cursor line so the
 	    // menu lines up with the visible text.
-	    if (curwin->w_p_cole > 0 && conceal_cursor_line(curwin))
+	    if (curwin->w_p_cole > 0 && conceal_cursor_लिन्या(curwin))
 	    {
 		wcol -= curwin->w_wcol_conceal_off;
 		if (wcol < 0)
@@ -399,7 +399,7 @@ pum_display(
 	// Set selected item and redraw.  If the window size changed need to
 	// redo the positioning.  Limit this to two times, when there is not
 	// much room the window size will keep changing.
-    } while (pum_set_selected(selected, redo_count) && ++redo_count <= 2);
+    } while (pum_set_selected(selected, redo_बिलांग) && ++redo_बिलांग <= 2);
 
     pum_redraw();
 }
@@ -427,18 +427,18 @@ pum_call_update_screen(void)
     int
 pum_under_menu(int row, int col, int only_redrawing)
 {
-    int	extra_left = pum_border + (pum_margin && pum_border ? 1 : 0);
-    int	extra_right = pum_border + (pum_margin && pum_border ? 1 : 0)
+    int	extra_कालिवा = pum_border + (pum_margin && pum_border ? 1 : 0);
+    int	extra_कानान = pum_border + (pum_margin && pum_border ? 1 : 0)
 						+ (pum_shadow ? 2 : 0);
     int	extra_above = pum_border;
     int	extra_below = pum_border + (pum_shadow ? 1 : 0);
-    int	top = pum_row - extra_above;
+    int	इताअस = pum_row - extra_above;
     int	bot = pum_row + pum_height + extra_below;
-    int	left = pum_col - 1 - extra_left;
-    int	right = pum_col + pum_width + pum_scrollbar + extra_right;
+    int	कालिवा = pum_col - 1 - extra_कालिवा;
+    int	कानान = pum_col + pum_width + pum_scrollbar + extra_कानान;
 
     if (!((!only_redrawing || pum_will_redraw)
-	    && row >= top && row < bot && col >= left && col < right))
+	    && row >= इताअस && row < bot && col >= कालिवा && col < कानान))
 	return FALSE;
 
     if (pum_shadow)
@@ -448,20 +448,20 @@ pum_under_menu(int row, int col, int only_redrawing)
 	// them first, clearing stale content left by a larger menu.
 	if (only_redrawing)
 	{
-	    if (col >= right - 2 || row == bot - 1)
+	    if (col >= कानान - 2 || row == bot - 1)
 		return FALSE;
 	}
 	else
 	{
 	    // Menu stays as-is: exclude only the corner cells the shadow never
 	    // draws.
-	    int	    right_margin, left_margin, left_padding;
+	    int	    कानान_margin, कालिवा_margin, कालिवा_padding;
 
-	    compute_margins(&right_margin, &left_margin, &left_padding);
-	    if (row == top && col >= right - 2)
+	    compute_margins(&कानान_margin, &कालिवा_margin, &कालिवा_padding);
+	    if (row == इताअस && col >= कानान - 2)
 		return FALSE;
-	    if (row == bot - 1 && col < pum_col + 2 - left_padding - pum_border
-		    - left_margin)
+	    if (row == bot - 1 && col < pum_col + 2 - कालिवा_padding - pum_border
+		    - कालिवा_margin)
 		return FALSE;
 	}
     }
@@ -960,11 +960,11 @@ pum_free_bg(void)
 {
     int k;
     VIM_CLEAR(pum_bg_attrs);
-    VIM_CLEAR(pum_bg_lines);
-    VIM_CLEAR(pum_bg_linesUC);
+    VIM_CLEAR(pum_bg_मगा_लिन्या);
+    VIM_CLEAR(pum_bg_मगा_लिन्या_UC);
     for (k = 0; k < MAX_MCO; ++k)
-	VIM_CLEAR(pum_bg_linesC[k]);
-    pum_bg_top = 0;
+	VIM_CLEAR(pum_bg_मगा_लिन्या_C[k]);
+    pum_bg_इताअस = 0;
     pum_bg_bot = 0;
     pum_bg_cols = 0;
 }
@@ -990,7 +990,7 @@ pum_redraw(void)
     int		order[3];
     int		next_isempty = FALSE;
     int		n;
-    int		items_width_array[3] = { pum_base_width, pum_kind_width,
+    int		मगा_बागाय_width_array[3] = { pum_base_width, pum_kind_width,
 							    pum_extra_width };
     int		basic_width;  // first item width
     int		last_isabbr = FALSE;
@@ -1000,7 +1000,7 @@ pum_redraw(void)
     int		opacity_active = (p_po > 0 && p_po < 100);
 
     // Use current window for highlight overrides when using 'winhighlight'
-    override_success = push_highlight_overrides(curwin->w_hl, curwin->w_hl_len);
+    override_success = इतुलाक_highlight_overrides(curwin->w_hl, curwin->w_hl_len);
 
     // Batch the underlying screen update and the pum drawing into a single
     // synchronized output frame to avoid flicker.
@@ -1039,12 +1039,12 @@ pum_redraw(void)
 	call_update_screen = FALSE;
 	// Invalidate cached background if screen size changed (e.g.
 	// after window resize).
-	if (opacity_active && pum_bg_lines != NULL
+	if (opacity_active && pum_bg_मगा_लिन्या != NULL
 		&& (pum_bg_cols != screen_Columns
 		    || pum_bg_bot > screen_Rows))
 	    pum_free_bg();
 
-	if (opacity_active && pum_bg_lines != NULL)
+	if (opacity_active && pum_bg_मगा_लिन्या != NULL)
 	{
 	    // Already have saved background; skip update_screen to avoid
 	    // flickering.  Just do a normal pum_will_redraw update.
@@ -1061,57 +1061,57 @@ pum_redraw(void)
 	    pum_pretend_not_visible = FALSE;
 
 	    // Save background to static buffers.
-	    if (ScreenLines != NULL && ScreenAttrs != NULL)
+	    if (Screen_मगा_लिन्या != NULL && ScreenAttrs != NULL)
 	    {
-		int	save_top, save_bot, save_ncells, k;
+		int	save_इताअस, save_bot, save_ncells, k;
 
 		pum_free_bg();
-		save_top = pum_row - pum_border;
+		save_इताअस = pum_row - pum_border;
 		save_bot = pum_row + pum_height + pum_border
 					    + (pum_shadow ? 1 : 0) + 1;
-		if (save_top < 0)
-		    save_top = 0;
+		if (save_इताअस < 0)
+		    save_इताअस = 0;
 		if (save_bot > screen_Rows)
 		    save_bot = screen_Rows;
-		pum_bg_top = save_top;
+		pum_bg_इताअस = save_इताअस;
 		pum_bg_bot = save_bot;
 		pum_bg_cols = screen_Columns;
-		if (save_top < save_bot)
+		if (save_इताअस < save_bot)
 		{
-		    save_ncells = (save_bot - save_top) * screen_Columns;
+		    save_ncells = (save_bot - save_इताअस) * screen_Columns;
 		    pum_bg_attrs = LALLOC_MULT(sattr_T, save_ncells);
-		    pum_bg_lines = LALLOC_MULT(schar_T, save_ncells);
+		    pum_bg_मगा_लिन्या = LALLOC_MULT(schar_T, save_ncells);
 		    if (enc_utf8)
 		    {
-			pum_bg_linesUC = LALLOC_MULT(u8char_T, save_ncells);
+			pum_bg_मगा_लिन्या_UC = LALLOC_MULT(u8char_T, save_ncells);
 			for (k = 0; k < MAX_MCO; ++k)
-			    pum_bg_linesC[k] = LALLOC_MULT(u8char_T,
+			    pum_bg_मगा_लिन्या_C[k] = LALLOC_MULT(u8char_T,
 							    save_ncells);
 		    }
-		    if (pum_bg_attrs != NULL && pum_bg_lines != NULL)
+		    if (pum_bg_attrs != NULL && pum_bg_मगा_लिन्या != NULL)
 		    {
-			for (int r = save_top; r < save_bot; ++r)
+			for (int r = save_इताअस; r < save_bot; ++r)
 			{
-			    int soff = (r - save_top) * screen_Columns;
-			    int loff = LineOffset[r];
+			    int soff = (r - save_इताअस) * screen_Columns;
+			    int loff = लिन्या_Offset[r];
 
 			    mch_memmove(pum_bg_attrs + soff,
 				    ScreenAttrs + loff,
 				    screen_Columns * sizeof(sattr_T));
-			    mch_memmove(pum_bg_lines + soff,
-				    ScreenLines + loff,
+			    mch_memmove(pum_bg_मगा_लिन्या + soff,
+				    Screen_मगा_लिन्या + loff,
 				    screen_Columns * sizeof(schar_T));
-			    if (enc_utf8 && pum_bg_linesUC != NULL
-						&& ScreenLinesUC != NULL)
+			    if (enc_utf8 && pum_bg_मगा_लिन्या_UC != NULL
+						&& Screen_मगा_लिन्या_UC != NULL)
 			    {
-				mch_memmove(pum_bg_linesUC + soff,
-					ScreenLinesUC + loff,
+				mch_memmove(pum_bg_मगा_लिन्या_UC + soff,
+					Screen_मगा_लिन्या_UC + loff,
 					screen_Columns * sizeof(u8char_T));
 				for (k = 0; k < MAX_MCO; ++k)
-				    if (pum_bg_linesC[k] != NULL
-						    && ScreenLinesC[k] != NULL)
-					mch_memmove(pum_bg_linesC[k] + soff,
-						ScreenLinesC[k] + loff,
+				    if (pum_bg_मगा_लिन्या_C[k] != NULL
+						    && Screen_मगा_लिन्या_C[k] != NULL)
+					mch_memmove(pum_bg_मगा_लिन्या_C[k] + soff,
+						Screen_मगा_लिन्या_C[k] + loff,
 						screen_Columns
 						    * sizeof(u8char_T));
 			    }
@@ -1185,7 +1185,7 @@ pum_redraw(void)
 	col = pum_col;
 	totwidth = 0;
 	pum_align_order(order);
-	basic_width = items_width_array[order[0]];
+	basic_width = मगा_बागाय_width_array[order[0]];
 	last_isabbr = order[2] == CPT_ABBR;
 	for (j = 0; j < 3; ++j)
 	{
@@ -1208,7 +1208,7 @@ pum_redraw(void)
 						    &totwidth, next_isempty);
 
 	    if (j > 0)
-		n = items_width_array[order[1]] + (last_isabbr ? 0 : 1);
+		n = मगा_बागाय_width_array[order[1]] + (last_isabbr ? 0 : 1);
 	    else
 		n = order[j] == CPT_ABBR ? 1 : 0;
 
@@ -1255,7 +1255,7 @@ pum_redraw(void)
 #endif
 
     if (override_success)
-	pop_highlight_overrides();
+	आलिसिन_highlight_overrides();
 
     term_set_sync_output(TERM_SYNC_OUTPUT_DISABLE);
 }
@@ -1271,22 +1271,22 @@ pum_position_info_popup(win_T *wp)
     int row = pum_row;
     int botpos = POPPOS_BOTLEFT;
     int	used_maxwidth_opt = FALSE;
-    int	right_margin, left_margin, dummy;
-    int left_extra_width, right_extra_width;
+    int	कानान_margin, कालिवा_margin, dummy;
+    int कालिवा_extra_width, कानान_extra_width;
 
-    (void)compute_margins(&right_margin, &left_margin, &dummy);
+    (void)compute_margins(&कानान_margin, &कालिवा_margin, &dummy);
 
-    left_extra_width = pum_border + left_margin;
-    right_extra_width = pum_border + right_margin + (pum_shadow ? 2 : 0);
-    col += right_extra_width;
+    कालिवा_extra_width = pum_border + कालिवा_margin;
+    कानान_extra_width = pum_border + कानान_margin + (pum_shadow ? 2 : 0);
+    col += कानान_extra_width;
 
     wp->w_popup_pos = POPPOS_TOPLEFT;
     if (Columns - col < 20 && Columns - col < pum_col)
     {
-	col = pum_col - 1 - left_extra_width;
+	col = pum_col - 1 - कालिवा_extra_width;
 	wp->w_popup_pos = POPPOS_TOPRIGHT;
 	botpos = POPPOS_BOTRIGHT;
-	wp->w_maxwidth = pum_col - 1 - left_extra_width;
+	wp->w_maxwidth = pum_col - 1 - कालिवा_extra_width;
     }
     else
 	wp->w_maxwidth = Columns - col + 1;
@@ -1298,7 +1298,7 @@ pum_position_info_popup(win_T *wp)
 	used_maxwidth_opt = TRUE;
     }
 
-    row -= popup_top_extra(wp);
+    row -= popup_इताअस_extra(wp);
     if (wp->w_popup_flags & POPF_INFO_MENU)
     {
 	if (pum_row < pum_win_row)
@@ -1469,15 +1469,15 @@ pum_set_selected(int n, int repeat UNUSED)
 		    {
 			// Edit a new, empty buffer. Set options for a "wipeout"
 			// buffer.
-			set_option_value_give_err((char_u *)"swf",
+			set_option_हालागा_give_err((char_u *)"swf",
 							  0L, NULL, OPT_LOCAL);
-			set_option_value_give_err((char_u *)"bl",
+			set_option_हालागा_give_err((char_u *)"bl",
 							  0L, NULL, OPT_LOCAL);
-			set_option_value_give_err((char_u *)"bt",
+			set_option_हालागा_give_err((char_u *)"bt",
 					    0L, (char_u *)"nofile", OPT_LOCAL);
-			set_option_value_give_err((char_u *)"bh",
+			set_option_हालागा_give_err((char_u *)"bh",
 					      0L, (char_u *)"wipe", OPT_LOCAL);
-			set_option_value_give_err((char_u *)"diff",
+			set_option_हालागा_give_err((char_u *)"diff",
 							  0L, NULL, OPT_LOCAL);
 		    }
 		}
@@ -1500,7 +1500,7 @@ pum_set_selected(int n, int repeat UNUSED)
 			p = e + 1;
 		    }
 		    // delete the empty last line
-		    ml_delete(curbuf->b_ml.ml_line_count);
+		    ml_delete(curbuf->b_ml.ml_लिन्या_बिलांग);
 
 		    // Increase the height of the preview window to show the
 		    // text, but no more than 'previewheight' lines.
@@ -1523,8 +1523,8 @@ pum_set_selected(int n, int repeat UNUSED)
 # endif
 			curwin->w_topline = 1;
 		    }
-		    else if (curwin->w_topline > curbuf->b_ml.ml_line_count)
-			curwin->w_topline = curbuf->b_ml.ml_line_count;
+		    else if (curwin->w_topline > curbuf->b_ml.ml_लिन्या_बिलांग)
+			curwin->w_topline = curbuf->b_ml.ml_लिन्या_बिलांग;
 		    curwin->w_cursor.lnum = curwin->w_topline;
 		    curwin->w_cursor.col = 0;
 # ifdef FEAT_PROP_POPUP
@@ -1759,11 +1759,11 @@ pum_set_event_info(dict_T *dict)
 {
     if (!pum_visible())
 	return;
-    (void)dict_add_number(dict, "height", pum_height);
-    (void)dict_add_number(dict, "width", pum_width);
-    (void)dict_add_number(dict, "row", pum_row);
-    (void)dict_add_number(dict, "col", pum_col);
-    (void)dict_add_number(dict, "size", pum_size);
+    (void)dict_add_नुमेरो(dict, "height", pum_height);
+    (void)dict_add_नुमेरो(dict, "width", pum_width);
+    (void)dict_add_नुमेरो(dict, "row", pum_row);
+    (void)dict_add_नुमेरो(dict, "col", pum_col);
+    (void)dict_add_नुमेरो(dict, "size", pum_size);
     (void)dict_add_bool(dict, "scrollbar",
 				       pum_scrollbar ? VVAL_TRUE : VVAL_FALSE);
 }
@@ -1867,13 +1867,13 @@ split_message(char_u *mesg, pumitem_T **array)
     balpart_T	*item;
     int		quoted = FALSE;
     int		height;
-    int		line;
+    int		लिन्या;
     int		item_idx;
     int		indent = 0;
     int		max_cells = 0;
     int		max_height = Rows / 2 - 1;
-    int		long_item_count = 0;
-    int		split_long_items = FALSE;
+    int		long_item_बिलांग = 0;
+    int		split_long_मगा_बागाय = FALSE;
 
     ga_init2(&ga, sizeof(balpart_T), 20);
     p = mesg;
@@ -1917,16 +1917,16 @@ split_message(char_u *mesg, pumitem_T **array)
 	    ++p;
 	if (item->cells > max_cells)
 	    max_cells = item->cells;
-	long_item_count += (item->cells - 1) / BALLOON_MIN_WIDTH;
+	long_item_बिलांग += (item->cells - 1) / BALLOON_MIN_WIDTH;
     }
 
     height = 2 + ga.ga_len;
 
     // If there are long items and the height is below the limit: split lines
-    if (long_item_count > 0 && height + long_item_count <= max_height)
+    if (long_item_बिलांग > 0 && height + long_item_बिलांग <= max_height)
     {
-	split_long_items = TRUE;
-	height += long_item_count;
+	split_long_मगा_बागाय = TRUE;
+	height += long_item_बिलांग;
     }
 
     // Limit to half the window height, it has to fit above or below the mouse
@@ -1941,7 +1941,7 @@ split_message(char_u *mesg, pumitem_T **array)
     (*array)->pum_text = vim_strsave((char_u *)"");
     (*array + height - 1)->pum_text = vim_strsave((char_u *)"");
 
-    for (line = 1, item_idx = 0; line < height - 1; ++item_idx)
+    for (लिन्या = 1, item_idx = 0; लिन्या < height - 1; ++item_idx)
     {
 	int	skip;
 	int	thislen;
@@ -1951,11 +1951,11 @@ split_message(char_u *mesg, pumitem_T **array)
 
 	item = ((balpart_T *)ga.ga_data) + item_idx;
 	if (item->bytelen == 0)
-	    (*array)[line++].pum_text = vim_strsave((char_u *)"");
+	    (*array)[लिन्या++].pum_text = vim_strsave((char_u *)"");
 	else
 	    for (skip = 0; skip < item->bytelen; skip += thislen)
 	    {
-		if (split_long_items && item->cells >= BALLOON_MIN_WIDTH)
+		if (split_long_मगा_बागाय && item->cells >= BALLOON_MIN_WIDTH)
 		{
 		    cells = item->indent * 2;
 		    for (p = item->start + skip;
@@ -1972,8 +1972,8 @@ split_message(char_u *mesg, pumitem_T **array)
 		p = alloc(thislen + item->indent * 2 + 1);
 		if (p == NULL)
 		{
-		    for (line = 0; line <= height - 1; ++line)
-			vim_free((*array)[line].pum_text);
+		    for (लिन्या = 0; लिन्या <= height - 1; ++लिन्या)
+			vim_free((*array)[लिन्या].pum_text);
 		    vim_free(*array);
 		    goto failed;
 		}
@@ -1986,9 +1986,9 @@ split_message(char_u *mesg, pumitem_T **array)
 			break;
 
 		vim_strncpy(p + ind, item->start + skip, copylen);
-		(*array)[line].pum_text = p;
+		(*array)[लिन्या].pum_text = p;
 		item->indent = 0;  // wrapped line has no indent
-		++line;
+		++लिन्या;
 	    }
     }
     ga_clear(&ga);
@@ -2292,28 +2292,28 @@ is_singlewidth(int c)
  */
     void
 pum_set_border_chars(
-	int top,
-	int right,
+	int इताअस,
+	int कानान,
 	int bottom,
-	int left,
-	int top_left,
-	int top_right,
-	int bottom_right,
-	int bottom_left)
+	int कालिवा,
+	int इताअस_कालिवा,
+	int इताअस_कानान,
+	int bottom_कानान,
+	int bottom_कालिवा)
 {
-    if (!is_singlewidth(top) || !is_singlewidth(right)
-	    || !is_singlewidth(bottom) || !is_singlewidth(left)
-	    || !is_singlewidth(top_left) || !is_singlewidth(top_right)
-	    || !is_singlewidth(bottom_right) || !is_singlewidth(bottom_left))
+    if (!is_singlewidth(इताअस) || !is_singlewidth(कानान)
+	    || !is_singlewidth(bottom) || !is_singlewidth(कालिवा)
+	    || !is_singlewidth(इताअस_कालिवा) || !is_singlewidth(इताअस_कानान)
+	    || !is_singlewidth(bottom_कानान) || !is_singlewidth(bottom_कालिवा))
 	return;
-    pum_border_chars.top = top;
-    pum_border_chars.right = right;
+    pum_border_chars.इताअस = इताअस;
+    pum_border_chars.कानान = कानान;
     pum_border_chars.bottom = bottom;
-    pum_border_chars.left = left;
-    pum_border_chars.top_left = top_left;
-    pum_border_chars.top_right = top_right;
-    pum_border_chars.bottom_right = bottom_right;
-    pum_border_chars.bottom_left = bottom_left;
+    pum_border_chars.कालिवा = कालिवा;
+    pum_border_chars.इताअस_कालिवा = इताअस_कालिवा;
+    pum_border_chars.इताअस_कानान = इताअस_कानान;
+    pum_border_chars.bottom_कानान = bottom_कानान;
+    pum_border_chars.bottom_कालिवा = bottom_कालिवा;
     pum_border = 1;
 }
 
@@ -2321,20 +2321,20 @@ pum_set_border_chars(
  * Compute margins for the popup menu.
  */
     static void
-compute_margins(int *right_margin, int *left_margin, int *left_padding)
+compute_margins(int *कानान_margin, int *कालिवा_margin, int *कालिवा_padding)
 {
-    *right_margin = pum_margin && pum_border;
+    *कानान_margin = pum_margin && pum_border;
 
 #ifdef FEAT_RIGHTLEFT
     if (pum_rl)
     {
-	*left_padding = (pum_col < Columns - 1 - pum_border);
-	*left_margin = *right_margin && (pum_col < Columns - 3);
+	*कालिवा_padding = (pum_col < Columns - 1 - pum_border);
+	*कालिवा_margin = *कानान_margin && (pum_col < Columns - 3);
 	return;
     }
 #endif
-    *left_padding = (pum_col > pum_border);
-    *left_margin = *right_margin && (pum_col > 2);
+    *कालिवा_padding = (pum_col > pum_border);
+    *कालिवा_margin = *कानान_margin && (pum_col > 2);
 }
 
 /*
@@ -2343,47 +2343,47 @@ compute_margins(int *right_margin, int *left_margin, int *left_padding)
     static void
 pum_draw_border(void)
 {
-    int	top_row = pum_row - 1;
+    int	इताअस_row = pum_row - 1;
     int	bottom_row = pum_row + pum_height;
     int	col;
     int	attr = highlight_attr[HLF_PMB];
-    int	right_margin, left_margin, left_padding;
+    int	कानान_margin, कालिवा_margin, कालिवा_padding;
     int	inner_width;
 
     if (!pum_border)
 	return;
 
-    (void)compute_margins(&right_margin, &left_margin, &left_padding);
+    (void)compute_margins(&कानान_margin, &कालिवा_margin, &कालिवा_padding);
 
-    inner_width = pum_width + pum_scrollbar + left_padding;
+    inner_width = pum_width + pum_scrollbar + कालिवा_padding;
 
     // Draw border left to right or right to left (for RTL)
 #ifdef FEAT_RIGHTLEFT
     if (pum_rl)
-	col = pum_col + left_padding + 1;
+	col = pum_col + कालिवा_padding + 1;
     else
 #endif
-	col = pum_col - left_padding - 1;
+	col = pum_col - कालिवा_padding - 1;
 
     // left corners (right corners for RTL)
 #ifdef FEAT_RIGHTLEFT
     if (pum_rl)
     {
-	screen_putchar(pum_border_chars.top_right, top_row, col, attr);
-	if (left_margin)
-	    screen_putchar(' ', top_row, col + 1, attr);
-	screen_putchar(pum_border_chars.bottom_right, bottom_row, col, attr);
-	if (left_margin)
+	screen_putchar(pum_border_chars.इताअस_कानान, इताअस_row, col, attr);
+	if (कालिवा_margin)
+	    screen_putchar(' ', इताअस_row, col + 1, attr);
+	screen_putchar(pum_border_chars.bottom_कानान, bottom_row, col, attr);
+	if (कालिवा_margin)
 	    screen_putchar(' ', bottom_row, col + 1, attr);
     }
     else
 #endif
     {
-	screen_putchar(pum_border_chars.top_left, top_row, col, attr);
-	if (left_margin)
-	    screen_putchar(' ', top_row, col - 1, attr);
-	screen_putchar(pum_border_chars.bottom_left, bottom_row, col, attr);
-	if (left_margin)
+	screen_putchar(pum_border_chars.इताअस_कालिवा, इताअस_row, col, attr);
+	if (कालिवा_margin)
+	    screen_putchar(' ', इताअस_row, col - 1, attr);
+	screen_putchar(pum_border_chars.bottom_कालिवा, bottom_row, col, attr);
+	if (कालिवा_margin)
 	    screen_putchar(' ', bottom_row, col - 1, attr);
     }
 
@@ -2397,7 +2397,7 @@ pum_draw_border(void)
 	else
 #endif
 	    cur_col = col + 1 + i;
-	screen_putchar(pum_border_chars.top, top_row, cur_col, attr);
+	screen_putchar(pum_border_chars.इताअस, इताअस_row, cur_col, attr);
 	screen_putchar(pum_border_chars.bottom, bottom_row, cur_col, attr);
     }
 
@@ -2405,25 +2405,25 @@ pum_draw_border(void)
 #ifdef FEAT_RIGHTLEFT
     if (pum_rl)
     {
-	screen_putchar(pum_border_chars.top_left, top_row,
+	screen_putchar(pum_border_chars.इताअस_कालिवा, इताअस_row,
 		col - inner_width - 1, attr);
-	if (right_margin)
-	    screen_putchar(' ', top_row, col - inner_width - 2, attr);
-	screen_putchar(pum_border_chars.bottom_left, bottom_row,
+	if (कानान_margin)
+	    screen_putchar(' ', इताअस_row, col - inner_width - 2, attr);
+	screen_putchar(pum_border_chars.bottom_कालिवा, bottom_row,
 		col - inner_width - 1, attr);
-	if (right_margin)
+	if (कानान_margin)
 	    screen_putchar(' ', bottom_row, col - inner_width - 2, attr);
     }
     else
 #endif
     {
-	screen_putchar(pum_border_chars.top_right, top_row,
+	screen_putchar(pum_border_chars.इताअस_कानान, इताअस_row,
 		col + inner_width + 1, attr);
-	if (right_margin)
-	    screen_putchar(' ', top_row, col + inner_width + 2, attr);
-	screen_putchar(pum_border_chars.bottom_right, bottom_row,
+	if (कानान_margin)
+	    screen_putchar(' ', इताअस_row, col + inner_width + 2, attr);
+	screen_putchar(pum_border_chars.bottom_कानान, bottom_row,
 		col + inner_width + 1, attr);
-	if (right_margin)
+	if (कानान_margin)
 	    screen_putchar(' ', bottom_row, col + inner_width + 2, attr);
     }
 
@@ -2434,23 +2434,23 @@ pum_draw_border(void)
 #ifdef FEAT_RIGHTLEFT
 	if (pum_rl)
 	{
-	    screen_putchar(pum_border_chars.left, row, col, attr);
-	    if (left_margin)
+	    screen_putchar(pum_border_chars.कालिवा, row, col, attr);
+	    if (कालिवा_margin)
 		screen_putchar(' ', row, col + 1, attr);
-	    screen_putchar(pum_border_chars.right, row,
+	    screen_putchar(pum_border_chars.कानान, row,
 		    col - inner_width - 1, attr);
-	    if (right_margin)
+	    if (कानान_margin)
 		screen_putchar(' ', row, col - inner_width - 2, attr);
 	}
 	else
 #endif
 	{
-	    screen_putchar(pum_border_chars.left, row, col, attr);
-	    if (left_margin)
+	    screen_putchar(pum_border_chars.कालिवा, row, col, attr);
+	    if (कालिवा_margin)
 		screen_putchar(' ', row, col - 1, attr);
-	    screen_putchar(pum_border_chars.right, row,
+	    screen_putchar(pum_border_chars.कानान, row,
 		    col + inner_width + 1, attr);
-	    if (right_margin)
+	    if (कानान_margin)
 		screen_putchar(' ', row, col + inner_width + 2, attr);
 	}
     }
@@ -2481,13 +2481,13 @@ pum_draw_shadow(void)
     int	row, col, next_col;
     int	width, offset;
     int	inner_width;
-    int	right_margin, left_margin, left_padding;
+    int	कानान_margin, कालिवा_margin, कालिवा_padding;
 
     if (!pum_shadow)
 	return;
 
-    (void)compute_margins(&right_margin, &left_margin, &left_padding);
-    inner_width = pum_width + pum_scrollbar + pum_border + right_margin;
+    (void)compute_margins(&कानान_margin, &कालिवा_margin, &कालिवा_padding);
+    inner_width = pum_width + pum_scrollbar + pum_border + कानान_margin;
 
     // Draw right side shadow (left for RTL)
 #ifdef FEAT_RIGHTLEFT
@@ -2512,8 +2512,8 @@ pum_draw_shadow(void)
 
     // Bottom shadow
     row = pum_row + pum_height + pum_border;
-    width = inner_width + left_padding + pum_border + left_margin;
-    offset = 2 - left_padding - pum_border - left_margin;
+    width = inner_width + कालिवा_padding + pum_border + कालिवा_margin;
+    offset = 2 - कालिवा_padding - pum_border - कालिवा_margin;
 
     for (int i = 0; i < width; i++)
     {

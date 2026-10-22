@@ -134,26 +134,26 @@ static int is_func_rec(xdfile_t *xdf, xdemitconf_t const *xecfg, long ri)
 }
 #endif
 
-struct func_line {
+struct func_लिन्या {
 	long len;
 	char buf[80];
 };
 
 #if 0
-static long get_func_line(xdfenv_t *xe, xdemitconf_t const *xecfg,
-			  struct func_line *func_line, long start, long limit)
+static long get_func_लिन्या(xdfenv_t *xe, xdemitconf_t const *xecfg,
+			  struct func_लिन्या *func_लिन्या, long start, long limit)
 {
 	long l, size, step = (start > limit) ? -1 : 1;
 	char *buf, dummy[1];
 
-	buf = func_line ? func_line->buf : dummy;
-	size = func_line ? sizeof(func_line->buf) : sizeof(dummy);
+	buf = func_लिन्या ? func_लिन्या->buf : dummy;
+	size = func_लिन्या ? sizeof(func_लिन्या->buf) : sizeof(dummy);
 
 	for (l = start; l != limit && 0 <= l && l < xe->xdf1.nrec; l += step) {
 		long len = match_func_rec(&xe->xdf1, xecfg, l, buf, size);
 		if (len >= 0) {
-			if (func_line)
-				func_line->len = len;
+			if (func_लिन्या)
+				func_लिन्या->len = len;
 			return l;
 		}
 	}
@@ -180,9 +180,9 @@ int xdl_emit_diff(xdfenv_t *xe, xdchange_t *xscr, xdemitcb_t *ecb,
 #if 0
 	long funclineprev = -1;
 #endif
-	struct func_line func_line;
+	struct func_लिन्या func_लिन्या;
 
-	func_line.len = 0;
+	func_लिन्या.len = 0;
 
 	for (xch = xscr; xch; xch = xche->next) {
 		xche = xdl_get_hunk(&xch, xecfg);
@@ -217,7 +217,7 @@ int xdl_emit_diff(xdfenv_t *xe, xdchange_t *xscr, xdemitcb_t *ecb,
 				i1 = xe->xdf1.nrec - 1;
 			}
 
-			fs1 = get_func_line(xe, xecfg, NULL, i1, -1);
+			fs1 = get_func_लिन्या(xe, xecfg, NULL, i1, -1);
 			while (fs1 > 0 && !is_empty_rec(&xe->xdf1, fs1 - 1) &&
 			       !is_func_rec(&xe->xdf1, xecfg, fs1 - 1))
 				fs1--;
@@ -255,7 +255,7 @@ int xdl_emit_diff(xdfenv_t *xe, xdchange_t *xscr, xdemitcb_t *ecb,
 
 #if 0
 		if (xecfg->flags & XDL_EMIT_FUNCCONTEXT) {
-			long fe1 = get_func_line(xe, xecfg, NULL,
+			long fe1 = get_func_लिन्या(xe, xecfg, NULL,
 						 xche->i1 + xche->chg1,
 						 xe->xdf1.nrec);
 			while (fe1 > 0 && is_empty_rec(&xe->xdf1, fe1 - 1))
@@ -276,7 +276,7 @@ int xdl_emit_diff(xdfenv_t *xe, xdchange_t *xscr, xdemitcb_t *ecb,
 				long l = XDL_MIN(xche->next->i1,
 						 xe->xdf1.nrec - 1);
 				if (l - xecfg->ctxlen <= e1 ||
-				    get_func_line(xe, xecfg, NULL, l, e1) < 0) {
+				    get_func_लिन्या(xe, xecfg, NULL, l, e1) < 0) {
 					xche = xche->next;
 					goto post_context_calculation;
 				}
@@ -290,14 +290,14 @@ int xdl_emit_diff(xdfenv_t *xe, xdchange_t *xscr, xdemitcb_t *ecb,
 
 #if 0
 		if (xecfg->flags & XDL_EMIT_FUNCNAMES) {
-			get_func_line(xe, xecfg, &func_line,
+			get_func_लिन्या(xe, xecfg, &func_लिन्या,
 				      s1 - 1, funclineprev);
 			funclineprev = s1 - 1;
 		}
 #endif
 		if (!(xecfg->flags & XDL_EMIT_NO_HUNK_HDR) &&
 		    xdl_emit_hunk_hdr(s1 + 1, e1 - s1, s2 + 1, e2 - s2,
-				      func_line.buf, func_line.len, ecb) < 0)
+				      func_लिन्या.buf, func_लिन्या.len, ecb) < 0)
 			return -1;
 
 		/*

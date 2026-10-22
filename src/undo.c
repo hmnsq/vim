@@ -103,7 +103,7 @@ typedef struct {
 static void u_unch_branch(u_header_T *uhp);
 static u_entry_T *u_get_headentry(void);
 static void u_getbot(void);
-static void u_doit(int count);
+static void u_doit(int बिलांग);
 static void u_undoredo(int undo);
 static void u_undo_end(int did_undo, int absolute);
 static void u_freeheader(buf_T *buf, u_header_T *uhp, u_header_T **uhpp);
@@ -125,7 +125,7 @@ static void unserialize_visualinfo(bufinfo_T *bi, visualinfo_T *info);
 static void u_saveline(linenr_T lnum);
 static void u_blockfree(buf_T *buf);
 
-#define U_ALLOC_LINE(size) lalloc(size, FALSE)
+#define U_ALLOC_लिन्या(size) lalloc(size, FALSE)
 
 // used in undo_end() to report number of added and deleted lines
 static long	u_newcount, u_oldcount;
@@ -145,10 +145,10 @@ static int	lastmark = 0;
  */
 static int seen_b_u_curhead;
 static int seen_b_u_newhead;
-static int header_count;
+static int header_बिलांग;
 
     static void
-u_check_tree(u_header_T *uhp,
+u_check_पुनो(u_header_T *uhp,
 	u_header_T *exp_uh_next,
 	u_header_T *exp_uh_alt_prev)
 {
@@ -156,7 +156,7 @@ u_check_tree(u_header_T *uhp,
 
     if (uhp == NULL)
 	return;
-    ++header_count;
+    ++header_बिलांग;
     if (uhp == curbuf->b_u_curhead && ++seen_b_u_curhead > 1)
     {
 	emsg("b_u_curhead found twice (looping?)");
@@ -197,10 +197,10 @@ u_check_tree(u_header_T *uhp,
 	}
 
 	// Check the next alt tree.
-	u_check_tree(uhp->uh_alt_next.ptr, uhp->uh_next.ptr, uhp);
+	u_check_पुनो(uhp->uh_alt_next.ptr, uhp->uh_next.ptr, uhp);
 
 	// Check the next header in this branch.
-	u_check_tree(uhp->uh_prev.ptr, uhp, NULL);
+	u_check_पुनो(uhp->uh_prev.ptr, uhp, NULL);
     }
 }
 
@@ -209,20 +209,20 @@ u_check(int newhead_may_be_NULL)
 {
     seen_b_u_newhead = 0;
     seen_b_u_curhead = 0;
-    header_count = 0;
+    header_बिलांग = 0;
 
-    u_check_tree(curbuf->b_u_oldhead, NULL, NULL);
+    u_check_पुनो(curbuf->b_u_oldhead, NULL, NULL);
 
     if (seen_b_u_newhead == 0 && curbuf->b_u_oldhead != NULL
 	    && !(newhead_may_be_NULL && curbuf->b_u_newhead == NULL))
 	semsg("b_u_newhead invalid: 0x%x", curbuf->b_u_newhead);
     if (curbuf->b_u_curhead != NULL && seen_b_u_curhead == 0)
 	semsg("b_u_curhead invalid: 0x%x", curbuf->b_u_curhead);
-    if (header_count != curbuf->b_u_numhead)
+    if (header_बिलांग != curbuf->b_u_numhead)
     {
 	emsg("b_u_numhead invalid");
 	smsg("expected: %ld, actual: %ld",
-			       (long)header_count, (long)curbuf->b_u_numhead);
+			       (long)header_बिलांग, (long)curbuf->b_u_numhead);
     }
 }
 #endif
@@ -246,18 +246,18 @@ u_save_cursor(void)
  * Returns FAIL when lines could not be saved, OK otherwise.
  */
     int
-u_save(linenr_T top, linenr_T bot)
+u_save(linenr_T इताअस, linenr_T bot)
 {
     if (undo_off)
 	return OK;
 
-    if (top >= bot || bot > curbuf->b_ml.ml_line_count + 1)
+    if (इताअस >= bot || bot > curbuf->b_ml.ml_लिन्या_बिलांग + 1)
 	return FAIL;	// rely on caller to give an error message
 
-    if (top + 2 == bot)
-	u_saveline((linenr_T)(top + 1));
+    if (इताअस + 2 == bot)
+	u_saveline((linenr_T)(इताअस + 1));
 
-    return (u_savecommon(top, bot, (linenr_T)0, FALSE));
+    return (u_savecommon(इताअस, bot, (linenr_T)0, FALSE));
 }
 
 /*
@@ -304,7 +304,7 @@ u_savedel(linenr_T lnum, long nlines)
 	return OK;
 
     return (u_savecommon(lnum - 1, lnum + nlines,
-		     nlines == curbuf->b_ml.ml_line_count ? 2 : lnum, FALSE));
+		     nlines == curbuf->b_ml.ml_लिन्या_बिलांग ? 2 : lnum, FALSE));
 }
 
 /*
@@ -357,24 +357,24 @@ get_undolevel(void)
  * Returns FAIL when out of memory.
  */
     static int
-u_save_line(undoline_T *ul, linenr_T lnum)
+u_save_लिन्या(undoline_T *ul, linenr_T lnum)
 {
-    char_u *line = ml_get(lnum);
+    char_u *लिन्या = ml_get(lnum);
 
     ul->ul_textlen = ml_get_len(lnum);
-    if (curbuf->b_ml.ml_line_len == 0)
+    if (curbuf->b_ml.ml_लिन्या_len == 0)
     {
 	ul->ul_len = 1;
-	ul->ul_line = vim_strsave((char_u *)"");
+	ul->ul_लिन्या = vim_strsave((char_u *)"");
     }
     else
     {
 	// This uses the length in the memline, thus text properties are
 	// included.
-	ul->ul_len = curbuf->b_ml.ml_line_len;
-	ul->ul_line = vim_memsave(line, ul->ul_len);
+	ul->ul_len = curbuf->b_ml.ml_लिन्या_len;
+	ul->ul_लिन्या = vim_memsave(लिन्या, ul->ul_len);
     }
-    return ul->ul_line == NULL ? FAIL : OK;
+    return ul->ul_लिन्या == NULL ? FAIL : OK;
 }
 
 #ifdef FEAT_PROP_POPUP
@@ -411,7 +411,7 @@ has_prop_w_flags(linenr_T lnum, int flags)
  */
     int
 u_savecommon(
-    linenr_T	top,
+    linenr_T	इताअस,
     linenr_T	bot,
     linenr_T	newbot,
     int		reload)
@@ -438,7 +438,7 @@ u_savecommon(
 	 */
 	if (netbeans_active())
 	{
-	    if (netbeans_is_guarded(top, bot))
+	    if (netbeans_is_guarded(इताअस, bot))
 	    {
 		emsg(_(e_region_is_guarded_cannot_modify));
 		return FAIL;
@@ -462,11 +462,11 @@ u_savecommon(
 	 * (e.g., obtained from a source control system).
 	 */
 	change_warning(0);
-	if (bot > curbuf->b_ml.ml_line_count + 1)
+	if (bot > curbuf->b_ml.ml_लिन्या_बिलांग + 1)
 	{
 	    // This happens when the FileChangedRO autocommand changes the
 	    // file in a way it becomes shorter.
-	    emsg(_(e_line_count_changed_unexpectedly));
+	    emsg(_(e_लिन्या_बिलांग_changed_unexpectedly));
 	    return FAIL;
 	}
     }
@@ -478,11 +478,11 @@ u_savecommon(
 #ifdef FEAT_PROP_POPUP
     // Include the line above if a text property continues from it.
     // Include the line below if a text property continues to it.
-    if (bot - top > 1)
+    if (bot - इताअस > 1)
     {
-	if (top > 0 && has_prop_w_flags(top + 1, TP_FLAG_CONT_PREV))
-	    --top;
-	if (bot <= curbuf->b_ml.ml_line_count
+	if (इताअस > 0 && has_prop_w_flags(इताअस + 1, TP_FLAG_CONT_PREV))
+	    --इताअस;
+	if (bot <= curbuf->b_ml.ml_लिन्या_बिलांग
 			       && has_prop_w_flags(bot - 1, TP_FLAG_CONT_NEXT))
 	{
 	    ++bot;
@@ -492,7 +492,7 @@ u_savecommon(
     }
 #endif
 
-    size = bot - top - 1;
+    size = bot - इताअस - 1;
 
     /*
      * If curbuf->b_u_synced is true make a new header.
@@ -508,7 +508,7 @@ u_savecommon(
 	     * Make a new header entry.  Do this first so that we don't mess
 	     * up the undo info when out of memory.
 	     */
-	    uhp = U_ALLOC_LINE(sizeof(u_header_T));
+	    uhp = U_ALLOC_लिन्या(sizeof(u_header_T));
 	    if (uhp == NULL)
 		goto nomem;
 #ifdef U_DEBUG
@@ -634,18 +634,18 @@ u_savecommon(
 		// If lines have been inserted/deleted we give up.
 		// Also when the line was included in a multi-line save.
 		if ((curbuf->b_u_newhead->uh_getbot_entry != uep
-			    ? (uep->ue_top + uep->ue_size + 1
+			    ? (uep->ue_इताअस + uep->ue_size + 1
 				!= (uep->ue_bot == 0
-				    ? curbuf->b_ml.ml_line_count + 1
+				    ? curbuf->b_ml.ml_लिन्या_बिलांग + 1
 				    : uep->ue_bot))
-			    : uep->ue_lcount != curbuf->b_ml.ml_line_count)
+			    : uep->ue_lcount != curbuf->b_ml.ml_लिन्या_बिलांग)
 			|| (uep->ue_size > 1
-			    && top >= uep->ue_top
-			    && top + 2 <= uep->ue_top + uep->ue_size + 1))
+			    && इताअस >= uep->ue_इताअस
+			    && इताअस + 2 <= uep->ue_इताअस + uep->ue_size + 1))
 		    break;
 
 		// If it's the same line we can skip saving it again.
-		if (uep->ue_size == 1 && uep->ue_top == top)
+		if (uep->ue_size == 1 && uep->ue_इताअस == इताअस)
 		{
 		    if (i > 0)
 		    {
@@ -669,11 +669,11 @@ u_savecommon(
 		    // The executed command may change the line count.
 		    if (newbot != 0)
 			uep->ue_bot = newbot;
-		    else if (bot > curbuf->b_ml.ml_line_count)
+		    else if (bot > curbuf->b_ml.ml_लिन्या_बिलांग)
 			uep->ue_bot = 0;
 		    else
 		    {
-			uep->ue_lcount = curbuf->b_ml.ml_line_count;
+			uep->ue_lcount = curbuf->b_ml.ml_लिन्या_बिलांग;
 			curbuf->b_u_newhead->uh_getbot_entry = uep;
 		    }
 		    return OK;
@@ -690,7 +690,7 @@ u_savecommon(
     /*
      * add lines in front of entry list
      */
-    uep = U_ALLOC_LINE(sizeof(u_entry_T));
+    uep = U_ALLOC_लिन्या(sizeof(u_entry_T));
     if (uep == NULL)
 	goto nomem;
     CLEAR_POINTER(uep);
@@ -699,29 +699,29 @@ u_savecommon(
 #endif
 
     uep->ue_size = size;
-    uep->ue_top = top;
+    uep->ue_इताअस = इताअस;
     if (newbot != 0)
 	uep->ue_bot = newbot;
     /*
      * Use 0 for ue_bot if bot is below last line.
      * Otherwise we have to compute ue_bot later.
      */
-    else if (bot > curbuf->b_ml.ml_line_count)
+    else if (bot > curbuf->b_ml.ml_लिन्या_बिलांग)
 	uep->ue_bot = 0;
     else
     {
-	uep->ue_lcount = curbuf->b_ml.ml_line_count;
+	uep->ue_lcount = curbuf->b_ml.ml_लिन्या_बिलांग;
 	curbuf->b_u_newhead->uh_getbot_entry = uep;
     }
 
     if (size > 0)
     {
-	if ((uep->ue_array = U_ALLOC_LINE(sizeof(undoline_T) * size)) == NULL)
+	if ((uep->ue_array = U_ALLOC_लिन्या(sizeof(undoline_T) * size)) == NULL)
 	{
 	    u_freeentry(uep, 0L);
 	    goto nomem;
 	}
-	for (i = 0, lnum = top + 1; i < size; ++i)
+	for (i = 0, lnum = इताअस + 1; i < size; ++i)
 	{
 	    fast_breakcheck();
 	    if (got_int)
@@ -729,7 +729,7 @@ u_savecommon(
 		u_freeentry(uep, i);
 		return FAIL;
 	    }
-	    if (u_save_line(&uep->ue_array[i], lnum++) == FAIL)
+	    if (u_save_लिन्या(&uep->ue_array[i], lnum++) == FAIL)
 	    {
 		u_freeentry(uep, i);
 		goto nomem;
@@ -749,14 +749,14 @@ u_savecommon(
     return OK;
 
 nomem:
-    msg_silent = 0;	// must display the prompt
+    मेनसाहे_silent = 0;	// must display the prompt
     if (ask_yesno((char_u *)_("No undo possible; continue anyway"), TRUE)
 								       == 'y')
     {
 	undo_off = TRUE;	    // will be reset when character typed
 	return OK;
     }
-    do_outofmem_msg((long_u)0);
+    do_outofmem_मेनसाहे((long_u)0);
     return FAIL;
 }
 
@@ -787,7 +787,7 @@ u_compute_hash(char_u *hash)
     linenr_T		lnum;
 
     sha256_start(&ctx);
-    for (lnum = 1; lnum <= curbuf->b_ml.ml_line_count; ++lnum)
+    for (lnum = 1; lnum <= curbuf->b_ml.ml_लिन्या_बिलांग; ++lnum)
 	sha256_update(&ctx, ml_get(lnum), (UINT32_T)(ml_get_len(lnum) + 1));
     sha256_finish(&ctx, hash);
 }
@@ -1196,7 +1196,7 @@ serialize_header(bufinfo_T *bi, char_u *hash)
     // If the buffer is encrypted then all text bytes following will be
     // encrypted.  Numbers and other info is not crypted.
 # ifdef FEAT_CRYPT
-    if (*buf->b_p_key != NUL)
+    if (*buf->b_p_सुसि != NUL)
     {
 	char_u *header;
 	int    header_len;
@@ -1204,7 +1204,7 @@ serialize_header(bufinfo_T *bi, char_u *hash)
 
 	undo_write_bytes(bi, (long_u)UF_VERSION_CRYPT, 2);
 	bi->bi_state = crypt_create_for_writing(crypt_get_method_nr(buf),
-					  buf->b_p_key, &header, &header_len);
+					  buf->b_p_सुसि, &header, &header_len);
 	if (bi->bi_state == NULL)
 	    return FAIL;
 	len = (long)fwrite(header, (size_t)header_len, (size_t)1, fp);
@@ -1239,13 +1239,13 @@ serialize_header(bufinfo_T *bi, char_u *hash)
 	return FAIL;
 
     // buffer-specific data
-    undo_write_bytes(bi, (long_u)buf->b_ml.ml_line_count, 4);
-    undo_write_bytes(bi, (long_u)buf->b_u_line_ptr.ul_textlen, 4);
-    if (buf->b_u_line_ptr.ul_textlen > 0 && fwrite_crypt(bi, buf->b_u_line_ptr.ul_line,
-			(size_t)buf->b_u_line_ptr.ul_textlen) == FAIL)
+    undo_write_bytes(bi, (long_u)buf->b_ml.ml_लिन्या_बिलांग, 4);
+    undo_write_bytes(bi, (long_u)buf->b_u_लिन्या_ptr.ul_textlen, 4);
+    if (buf->b_u_लिन्या_ptr.ul_textlen > 0 && fwrite_crypt(bi, buf->b_u_लिन्या_ptr.ul_लिन्या,
+			(size_t)buf->b_u_लिन्या_ptr.ul_textlen) == FAIL)
 	return FAIL;
-    undo_write_bytes(bi, (long_u)buf->b_u_line_lnum, 4);
-    undo_write_bytes(bi, (long_u)buf->b_u_line_colnr, 4);
+    undo_write_bytes(bi, (long_u)buf->b_u_लिन्या_lnum, 4);
+    undo_write_bytes(bi, (long_u)buf->b_u_लिन्या_colnr, 4);
 
     // Undo structures header data
     put_header_ptr(bi, buf->b_u_oldhead);
@@ -1320,7 +1320,7 @@ unserialize_uhp(bufinfo_T *bi, char_u *file_name)
     int		c;
     int		error;
 
-    uhp = U_ALLOC_LINE(sizeof(u_header_T));
+    uhp = U_ALLOC_लिन्या(sizeof(u_header_T));
     if (uhp == NULL)
 	return NULL;
     CLEAR_POINTER(uhp);
@@ -1410,7 +1410,7 @@ serialize_uep(
 {
     int		i;
 
-    undo_write_bytes(bi, (long_u)uep->ue_top, 4);
+    undo_write_bytes(bi, (long_u)uep->ue_इताअस, 4);
     undo_write_bytes(bi, (long_u)uep->ue_bot, 4);
     undo_write_bytes(bi, (long_u)uep->ue_lcount, 4);
     undo_write_bytes(bi, (long_u)uep->ue_size, 4);
@@ -1421,7 +1421,7 @@ serialize_uep(
 	if (undo_write_bytes(bi, (long_u)uep->ue_array[i].ul_textlen, 4) == FAIL)
 	    return FAIL;
 	if (uep->ue_array[i].ul_textlen > 0
-		&& fwrite_crypt(bi, uep->ue_array[i].ul_line, uep->ue_array[i].ul_textlen) == FAIL)
+		&& fwrite_crypt(bi, uep->ue_array[i].ul_लिन्या, uep->ue_array[i].ul_textlen) == FAIL)
 	    return FAIL;
     }
     return OK;
@@ -1433,24 +1433,24 @@ unserialize_uep(bufinfo_T *bi, int *error, char_u *file_name)
     int		i;
     u_entry_T	*uep;
     undoline_T	*array = NULL;
-    char_u	*line;
-    int		line_len;
+    char_u	*लिन्या;
+    int		लिन्या_len;
 
-    uep = U_ALLOC_LINE(sizeof(u_entry_T));
+    uep = U_ALLOC_लिन्या(sizeof(u_entry_T));
     if (uep == NULL)
 	return NULL;
     CLEAR_POINTER(uep);
 # ifdef U_DEBUG
     uep->ue_magic = UE_MAGIC;
 # endif
-    uep->ue_top = undo_read_4c(bi);
+    uep->ue_इताअस = undo_read_4c(bi);
     uep->ue_bot = undo_read_4c(bi);
     uep->ue_lcount = undo_read_4c(bi);
     uep->ue_size = undo_read_4c(bi);
     if (uep->ue_size > 0)
     {
 	if (uep->ue_size < LONG_MAX / (long)sizeof(undoline_T))
-	    array = U_ALLOC_LINE(sizeof(undoline_T) * uep->ue_size);
+	    array = U_ALLOC_लिन्या(sizeof(undoline_T) * uep->ue_size);
 	if (array == NULL)
 	{
 	    *error = TRUE;
@@ -1462,22 +1462,22 @@ unserialize_uep(bufinfo_T *bi, int *error, char_u *file_name)
 
     for (i = 0; i < uep->ue_size; ++i)
     {
-	line_len = undo_read_4c(bi);
-	if (line_len >= 0)
-	    line = read_string_decrypt(bi, line_len);
+	लिन्या_len = undo_read_4c(bi);
+	if (लिन्या_len >= 0)
+	    लिन्या = read_string_decrypt(bi, लिन्या_len);
 	else
 	{
-	    line = NULL;
+	    लिन्या = NULL;
 	    corruption_error("line length", file_name);
 	}
-	if (line == NULL)
+	if (लिन्या == NULL)
 	{
 	    *error = TRUE;
 	    return uep;
 	}
-	array[i].ul_line = line;
-	array[i].ul_len = line_len + 1;
-	array[i].ul_textlen = line_len;
+	array[i].ul_लिन्या = लिन्या;
+	array[i].ul_len = लिन्या_len + 1;
+	array[i].ul_textlen = लिन्या_len;
     }
     return uep;
 }
@@ -1662,10 +1662,10 @@ u_write_undo(
 
     // If there is no undo information at all, quit here after deleting any
     // existing undo file.
-    if (buf->b_u_numhead == 0 && buf->b_u_line_ptr.ul_line == NULL)
+    if (buf->b_u_numhead == 0 && buf->b_u_लिन्या_ptr.ul_लिन्या == NULL)
     {
 	if (p_verbose > 0)
-	    verb_msg(_("Skipping undo file write, nothing to undo"));
+	    verb_मेनसाहे(_("Skipping undo file write, nothing to undo"));
 	goto theend;
     }
 
@@ -1834,10 +1834,10 @@ uhp_seq_cmp(const void *v1, const void *v2)
  * Return the table index of the header or -1 when not found.
  */
     static long
-uhp_table_find(u_header_T **uhp_table, long num_head, long seq)
+uhp_table_find(u_header_T **uhp_table, long नुमेरो_head, long seq)
 {
     long    lo = 0;
-    long    hi = num_head - 1;
+    long    hi = नुमेरो_head - 1;
 
     while (lo <= hi)
     {
@@ -1866,16 +1866,16 @@ u_read_undo(char_u *name, char_u *hash, char_u *orig_name UNUSED)
     char_u	*file_name;
     FILE	*fp;
     long	version, str_len;
-    undoline_T	line_ptr;
-    linenr_T	line_lnum;
-    colnr_T	line_colnr;
-    linenr_T	line_count;
-    long	num_head = 0;
+    undoline_T	लिन्या_ptr;
+    linenr_T	लिन्या_lnum;
+    colnr_T	लिन्या_colnr;
+    linenr_T	लिन्या_बिलांग;
+    long	नुमेरो_head = 0;
     long	old_header_seq, new_header_seq, cur_header_seq;
     long	seq_last, seq_cur;
     long	last_save_nr = 0;
     long	old_idx = -1, new_idx = -1, cur_idx = -1;
-    long	num_read_uhps = 0;
+    long	नुमेरो_read_uhps = 0;
     time_t	seq_time;
     long	i;
     int		c;
@@ -1893,9 +1893,9 @@ u_read_undo(char_u *name, char_u *hash, char_u *orig_name UNUSED)
     bufinfo_T	bi;
 
     CLEAR_FIELD(bi);
-    line_ptr.ul_len = 0;
-    line_ptr.ul_textlen = 0;
-    line_ptr.ul_line = NULL;
+    लिन्या_ptr.ul_len = 0;
+    लिन्या_ptr.ul_textlen = 0;
+    लिन्या_ptr.ul_लिन्या = NULL;
 
     if (name == NULL)
     {
@@ -1956,13 +1956,13 @@ u_read_undo(char_u *name, char_u *hash, char_u *orig_name UNUSED)
     if (version == UF_VERSION_CRYPT)
     {
 # ifdef FEAT_CRYPT
-	if (*curbuf->b_p_key == NUL)
+	if (*curbuf->b_p_सुसि == NUL)
 	{
 	    semsg(_(e_non_encrypted_file_has_encrypted_undo_file_str),
 								    file_name);
 	    goto error;
 	}
-	bi.bi_state = crypt_create_from_file(fp, curbuf->b_p_key);
+	bi.bi_state = crypt_create_from_file(fp, curbuf->b_p_सुसि);
 	if (bi.bi_state == NULL)
 	{
 	    semsg(_(e_undo_file_decryption_failed), file_name);
@@ -1996,9 +1996,9 @@ u_read_undo(char_u *name, char_u *hash, char_u *orig_name UNUSED)
 	corruption_error("hash", file_name);
 	goto error;
     }
-    line_count = (linenr_T)undo_read_4c(&bi);
+    लिन्या_बिलांग = (linenr_T)undo_read_4c(&bi);
     if (memcmp(hash, read_hash, UNDO_HASH_SIZE) != 0
-				  || line_count != curbuf->b_ml.ml_line_count)
+				  || लिन्या_बिलांग != curbuf->b_ml.ml_लिन्या_बिलांग)
     {
 	if (p_verbose > 0 || name != NULL)
 	{
@@ -2018,13 +2018,13 @@ u_read_undo(char_u *name, char_u *hash, char_u *orig_name UNUSED)
 	goto error;
     if (str_len > 0)
     {
-	line_ptr.ul_line = read_string_decrypt(&bi, str_len);
-	line_ptr.ul_len = str_len + 1;
-	line_ptr.ul_textlen = str_len;
+	लिन्या_ptr.ul_लिन्या = read_string_decrypt(&bi, str_len);
+	लिन्या_ptr.ul_len = str_len + 1;
+	लिन्या_ptr.ul_textlen = str_len;
     }
-    line_lnum = (linenr_T)undo_read_4c(&bi);
-    line_colnr = (colnr_T)undo_read_4c(&bi);
-    if (line_lnum < 0 || line_colnr < 0)
+    लिन्या_lnum = (linenr_T)undo_read_4c(&bi);
+    लिन्या_colnr = (colnr_T)undo_read_4c(&bi);
+    if (लिन्या_lnum < 0 || लिन्या_colnr < 0)
     {
 	corruption_error("line lnum/col", file_name);
 	goto error;
@@ -2034,7 +2034,7 @@ u_read_undo(char_u *name, char_u *hash, char_u *orig_name UNUSED)
     old_header_seq = undo_read_4c(&bi);
     new_header_seq = undo_read_4c(&bi);
     cur_header_seq = undo_read_4c(&bi);
-    num_head = undo_read_4c(&bi);
+    नुमेरो_head = undo_read_4c(&bi);
     seq_last = undo_read_4c(&bi);
     seq_cur = undo_read_4c(&bi);
     seq_time = undo_read_time(&bi);
@@ -2064,17 +2064,17 @@ u_read_undo(char_u *name, char_u *hash, char_u *orig_name UNUSED)
     // until we insert them into curbuf. The table remains sorted by the
     // sequence numbers of the headers.
     // When there are no headers uhp_table is NULL.
-    if (num_head > 0)
+    if (नुमेरो_head > 0)
     {
-	if (num_head < LONG_MAX / (long)sizeof(u_header_T *))
-	    uhp_table = U_ALLOC_LINE(num_head * sizeof(u_header_T *));
+	if (नुमेरो_head < LONG_MAX / (long)sizeof(u_header_T *))
+	    uhp_table = U_ALLOC_लिन्या(नुमेरो_head * sizeof(u_header_T *));
 	if (uhp_table == NULL)
 	    goto error;
     }
 
     while ((c = undo_read_2c(&bi)) == UF_HEADER_MAGIC)
     {
-	if (num_read_uhps >= num_head)
+	if (नुमेरो_read_uhps >= नुमेरो_head)
 	{
 	    corruption_error("num_head too small", file_name);
 	    goto error;
@@ -2083,10 +2083,10 @@ u_read_undo(char_u *name, char_u *hash, char_u *orig_name UNUSED)
 	uhp = unserialize_uhp(&bi, file_name);
 	if (uhp == NULL)
 	    goto error;
-	uhp_table[num_read_uhps++] = uhp;
+	uhp_table[नुमेरो_read_uhps++] = uhp;
     }
 
-    if (num_read_uhps != num_head)
+    if (नुमेरो_read_uhps != नुमेरो_head)
     {
 	corruption_error("num_head", file_name);
 	goto error;
@@ -2098,7 +2098,7 @@ u_read_undo(char_u *name, char_u *hash, char_u *orig_name UNUSED)
     }
 
 # ifdef U_DEBUG
-    uhp_table_used = alloc_clear(sizeof(int) * num_head + 1);
+    uhp_table_used = alloc_clear(sizeof(int) * नुमेरो_head + 1);
 #  define SET_FLAG(j) ++uhp_table_used[j]
 # else
 #  define SET_FLAG(j)
@@ -2108,11 +2108,11 @@ u_read_undo(char_u *name, char_u *hash, char_u *orig_name UNUSED)
     // sequence numbers of the headers it links to; resolve those into
     // pointers.  Every entry is non-NULL: a header that failed to
     // unserialize or a count mismatch was an error above.
-    if (num_head > 0)
-	qsort(uhp_table, (size_t)num_head, sizeof(u_header_T *), uhp_seq_cmp);
+    if (नुमेरो_head > 0)
+	qsort(uhp_table, (size_t)नुमेरो_head, sizeof(u_header_T *), uhp_seq_cmp);
 
     // In the sorted table two headers with the same uh_seq are neighbours.
-    for (i = 0; i < num_head - 1; i++)
+    for (i = 0; i < नुमेरो_head - 1; i++)
     {
 	if (uhp_table[i]->uh_seq == uhp_table[i + 1]->uh_seq)
 	{
@@ -2127,7 +2127,7 @@ u_read_undo(char_u *name, char_u *hash, char_u *orig_name UNUSED)
     // header "hidx", resolves to NULL.
 # define SWIZZLE_SEQ(link, hidx) \
     do { \
-	long fidx = uhp_table_find(uhp_table, num_head, (link).seq); \
+	long fidx = uhp_table_find(uhp_table, नुमेरो_head, (link).seq); \
 	\
 	if (fidx >= 0 && fidx != (hidx)) \
 	{ \
@@ -2138,7 +2138,7 @@ u_read_undo(char_u *name, char_u *hash, char_u *orig_name UNUSED)
 	    (link).ptr = NULL; \
     } while (0)
 
-    for (i = 0; i < num_head; i++)
+    for (i = 0; i < नुमेरो_head; i++)
     {
 	uhp = uhp_table[i];
 	SWIZZLE_SEQ(uhp->uh_next, i);
@@ -2169,10 +2169,10 @@ u_read_undo(char_u *name, char_u *hash, char_u *orig_name UNUSED)
     curbuf->b_u_oldhead = old_idx < 0 ? NULL : uhp_table[old_idx];
     curbuf->b_u_newhead = new_idx < 0 ? NULL : uhp_table[new_idx];
     curbuf->b_u_curhead = cur_idx < 0 ? NULL : uhp_table[cur_idx];
-    curbuf->b_u_line_ptr = line_ptr;
-    curbuf->b_u_line_lnum = line_lnum;
-    curbuf->b_u_line_colnr = line_colnr;
-    curbuf->b_u_numhead = num_head;
+    curbuf->b_u_लिन्या_ptr = लिन्या_ptr;
+    curbuf->b_u_लिन्या_lnum = लिन्या_lnum;
+    curbuf->b_u_लिन्या_colnr = लिन्या_colnr;
+    curbuf->b_u_numhead = नुमेरो_head;
     curbuf->b_u_seq_last = seq_last;
     curbuf->b_u_seq_cur = seq_cur;
     curbuf->b_u_time_cur = seq_time;
@@ -2183,7 +2183,7 @@ u_read_undo(char_u *name, char_u *hash, char_u *orig_name UNUSED)
     vim_free(uhp_table);
 
 # ifdef U_DEBUG
-    for (i = 0; i < num_head; ++i)
+    for (i = 0; i < नुमेरो_head; ++i)
 	if (uhp_table_used[i] == 0)
 	    semsg("uhp_table entry %ld not used, leaking memory", i);
     vim_free(uhp_table_used);
@@ -2195,10 +2195,10 @@ u_read_undo(char_u *name, char_u *hash, char_u *orig_name UNUSED)
     goto theend;
 
 error:
-    vim_free(line_ptr.ul_line);
+    vim_free(लिन्या_ptr.ul_लिन्या);
     if (uhp_table != NULL)
     {
-	for (i = 0; i < num_read_uhps; i++)
+	for (i = 0; i < नुमेरो_read_uhps; i++)
 	    if (uhp_table[i] != NULL)
 		u_free_uhp(uhp_table[i]);
 	vim_free(uhp_table);
@@ -2225,7 +2225,7 @@ theend:
  * If 'cpoptions' does not contain 'u': Always undo.
  */
     void
-u_undo(int count)
+u_undo(int बिलांग)
 {
     /*
      * If we get an undo command while executing a macro, we behave like the
@@ -2235,14 +2235,14 @@ u_undo(int count)
     if (!curbuf->b_u_synced)
     {
 	u_sync(TRUE);
-	count = 1;
+	बिलांग = 1;
     }
 
     if (vim_strchr(p_cpo, CPO_UNDO) == NULL)
 	undo_undoes = TRUE;
     else
 	undo_undoes = !undo_undoes;
-    u_doit(count);
+    u_doit(बिलांग);
 }
 
 /*
@@ -2250,11 +2250,11 @@ u_undo(int count)
  * If 'cpoptions' does not contain 'u': Always redo.
  */
     void
-u_redo(int count)
+u_redo(int बिलांग)
 {
     if (vim_strchr(p_cpo, CPO_UNDO) == NULL)
 	undo_undoes = FALSE;
-    u_doit(count);
+    u_doit(बिलांग);
 }
 
 /*
@@ -2263,7 +2263,7 @@ u_redo(int count)
     static void
 u_doit(int startcount)
 {
-    int count = startcount;
+    int बिलांग = startcount;
 
     if (!undo_allowed())
 	return;
@@ -2272,7 +2272,7 @@ u_doit(int startcount)
     u_oldcount = 0;
     if (curbuf->b_ml.ml_flags & ML_EMPTY)
 	u_oldcount = -1;
-    while (count--)
+    while (बिलांग--)
     {
 	// Do the change warning now, so that it triggers FileChangedRO when
 	// needed.  This may cause the file to be reloaded, that must happen
@@ -2293,10 +2293,10 @@ u_doit(int startcount)
 		// stick curbuf->b_u_curhead at end
 		curbuf->b_u_curhead = curbuf->b_u_oldhead;
 		beep_flush();
-		if (count == startcount - 1)
+		if (बिलांग == startcount - 1)
 		{
 		    if (!shortmess(SHM_UNDO))
-			msg(_("Already at oldest change"));
+			मेनसाहे(_("Already at oldest change"));
 		    return;
 		}
 		break;
@@ -2309,10 +2309,10 @@ u_doit(int startcount)
 	    if (curbuf->b_u_curhead == NULL || get_undolevel() <= 0)
 	    {
 		beep_flush();	// nothing to redo
-		if (count == startcount - 1)
+		if (बिलांग == startcount - 1)
 		{
 		    if (!shortmess(SHM_UNDO))
-			msg(_("Already at newest change"));
+			मेनसाहे(_("Already at newest change"));
 		    return;
 		}
 		break;
@@ -2363,7 +2363,7 @@ undo_time(
 
     if (text_locked())
     {
-	text_locked_msg();
+	text_locked_मेनसाहे();
 	return;
     }
 
@@ -2559,7 +2559,7 @@ undo_time(
 
 	if (absolute)
 	{
-	    semsg(_(e_undo_number_nr_not_found), step);
+	    semsg(_(e_undo_नुमेरो_nr_not_found), step);
 	    return;
 	}
 
@@ -2568,9 +2568,9 @@ undo_time(
 	    if (!shortmess(SHM_UNDO))
 	    {
 		if (step < 0)
-		    msg(_("Already at oldest change"));
+		    मेनसाहे(_("Already at oldest change"));
 		else
-		    msg(_("Already at newest change"));
+		    मेनसाहे(_("Already at newest change"));
 	    }
 	    return;
 	}
@@ -2707,7 +2707,7 @@ u_undoredo(int undo)
     undoline_T	*newarray = NULL;
     linenr_T	oldsize;
     linenr_T	newsize;
-    linenr_T	top, bot;
+    linenr_T	इताअस, bot;
     linenr_T	lnum;
     linenr_T	newlnum = MAXLNUM;
     pos_T	new_curpos = curwin->w_cursor;
@@ -2738,27 +2738,27 @@ u_undoredo(int undo)
      */
     mch_memmove(namedm, curbuf->b_namedm, sizeof(pos_T) * NMARKS);
     visualinfo = curbuf->b_visual;
-    curbuf->b_op_start.lnum = curbuf->b_ml.ml_line_count;
+    curbuf->b_op_start.lnum = curbuf->b_ml.ml_लिन्या_बिलांग;
     curbuf->b_op_start.col = 0;
     curbuf->b_op_end.lnum = 0;
     curbuf->b_op_end.col = 0;
 
     for (uep = curhead->uh_entry; uep != NULL; uep = nuep)
     {
-	top = uep->ue_top;
+	इताअस = uep->ue_इताअस;
 	bot = uep->ue_bot;
 	if (bot == 0)
-	    bot = curbuf->b_ml.ml_line_count + 1;
-	if (top > curbuf->b_ml.ml_line_count || top >= bot
-				      || bot > curbuf->b_ml.ml_line_count + 1)
+	    bot = curbuf->b_ml.ml_लिन्या_बिलांग + 1;
+	if (इताअस > curbuf->b_ml.ml_लिन्या_बिलांग || इताअस >= bot
+				      || bot > curbuf->b_ml.ml_लिन्या_बिलांग + 1)
 	{
 	    unblock_autocmds();
-	    iemsg(e_u_undo_line_numbers_wrong);
+	    iemsg(e_u_undo_लिन्या_numbers_wrong);
 	    changed();		// don't want UNCHANGED now
 	    return;
 	}
 
-	oldsize = bot - top - 1;    // number of lines before undo
+	oldsize = bot - इताअस - 1;    // number of lines before undo
 	newsize = uep->ue_size;	    // number of lines after undo
 
 	// Decide about the cursor position, depending on what text changed.
@@ -2768,7 +2768,7 @@ u_undoredo(int undo)
 	    // the remembered position.  Makes "gwap" put the cursor back
 	    // where it was.
 	    lnum = curhead->uh_cursor.lnum;
-	    if (lnum >= top && lnum <= top + newsize + 1)
+	    if (lnum >= इताअस && lnum <= इताअस + newsize + 1)
 	    {
 		new_curpos = curhead->uh_cursor;
 
@@ -2776,28 +2776,28 @@ u_undoredo(int undo)
 		// position.
 		newlnum = -1;
 	    }
-	    else if (top < newlnum)
+	    else if (इताअस < newlnum)
 	    {
 		// Use the first line that actually changed.  Avoids that
 		// undoing auto-formatting puts the cursor in the previous
 		// line.
 		for (i = 0; i < newsize && i < oldsize; ++i)
 		{
-		    char_u *p = ml_get(top + 1 + i);
+		    char_u *p = ml_get(इताअस + 1 + i);
 
-		    if (curbuf->b_ml.ml_line_len != uep->ue_array[i].ul_len
-			    || memcmp(uep->ue_array[i].ul_line, p,
-						curbuf->b_ml.ml_line_len) != 0)
+		    if (curbuf->b_ml.ml_लिन्या_len != uep->ue_array[i].ul_len
+			    || memcmp(uep->ue_array[i].ul_लिन्या, p,
+						curbuf->b_ml.ml_लिन्या_len) != 0)
 			break;
 		}
 		if (i == newsize && newlnum == MAXLNUM && uep->ue_next == NULL)
 		{
-		    newlnum = top;
+		    newlnum = इताअस;
 		    new_curpos.lnum = newlnum + 1;
 		}
 		else if (i < newsize)
 		{
-		    newlnum = top + i;
+		    newlnum = इताअस + i;
 		    new_curpos.lnum = newlnum + 1;
 		}
 	    }
@@ -2810,9 +2810,9 @@ u_undoredo(int undo)
 	 */
 	if (oldsize > 0)
 	{
-	    if ((newarray = U_ALLOC_LINE(sizeof(undoline_T) * oldsize)) == NULL)
+	    if ((newarray = U_ALLOC_लिन्या(sizeof(undoline_T) * oldsize)) == NULL)
 	    {
-		do_outofmem_msg((long_u)(sizeof(undoline_T) * oldsize));
+		do_outofmem_मेनसाहे((long_u)(sizeof(undoline_T) * oldsize));
 
 		// We have messed up the entry list, repair is impossible.
 		// we have to free the rest of the list.
@@ -2828,11 +2828,11 @@ u_undoredo(int undo)
 	    for (lnum = bot - 1, i = oldsize; --i >= 0; --lnum)
 	    {
 		// what can we do when we run out of memory?
-		if (u_save_line(&newarray[i], lnum) == FAIL)
-		    do_outofmem_msg((long_u)0);
+		if (u_save_लिन्या(&newarray[i], lnum) == FAIL)
+		    do_outofmem_मेनसाहे((long_u)0);
 		// remember we deleted the last line in the buffer, and a
 		// dummy empty line will be inserted
-		if (curbuf->b_ml.ml_line_count == 1)
+		if (curbuf->b_ml.ml_लिन्या_बिलांग == 1)
 		    empty_buffer = TRUE;
 		ml_delete_flags(lnum, ML_DEL_UNDO);
 	    }
@@ -2848,17 +2848,17 @@ u_undoredo(int undo)
 	 */
 	if (newsize)
 	{
-	    for (lnum = top, i = 0; i < newsize; ++i, ++lnum)
+	    for (lnum = इताअस, i = 0; i < newsize; ++i, ++lnum)
 	    {
 		// If the file is empty, there is an empty line 1 that we
 		// should get rid of, by replacing it with the new line.
 		if (empty_buffer && lnum == 0)
-		    ml_replace_len((linenr_T)1, uep->ue_array[i].ul_line,
+		    ml_replace_len((linenr_T)1, uep->ue_array[i].ul_लिन्या,
 					  uep->ue_array[i].ul_len, TRUE, TRUE);
 		else
-		    ml_append_flags(lnum, uep->ue_array[i].ul_line,
+		    ml_append_flags(lnum, uep->ue_array[i].ul_लिन्या,
 			     (colnr_T)uep->ue_array[i].ul_len, ML_APPEND_UNDO);
-		vim_free(uep->ue_array[i].ul_line);
+		vim_free(uep->ue_array[i].ul_लिन्या);
 	    }
 	    vim_free((char_u *)uep->ue_array);
 	}
@@ -2868,53 +2868,53 @@ u_undoredo(int undo)
 	// restored lines after they were saved.  What was cleared on the lines
 	// around them the last time is given back first, so that undoing and
 	// redoing again joins what it split.
-	restore_props_for_undo(curbuf, top, &uep->ue_props, UNDOPROP_ABOVE);
-	restore_props_for_undo(curbuf, top + newsize + 1, &uep->ue_props,
+	restore_props_for_undo(curbuf, इताअस, &uep->ue_props, UNDOPROP_ABOVE);
+	restore_props_for_undo(curbuf, इताअस + newsize + 1, &uep->ue_props,
 								UNDOPROP_BELOW);
 	ga_clear(&uep->ue_props);
-	adjust_props_for_undo(curbuf, top, &uep->ue_props, UNDOPROP_ABOVE,
+	adjust_props_for_undo(curbuf, इताअस, &uep->ue_props, UNDOPROP_ABOVE,
 			      newsize > 0 ? UNDOPROP_NONE : UNDOPROP_BELOW);
 	if (newsize > 0)
-	    adjust_props_for_undo(curbuf, top + newsize, &uep->ue_props,
+	    adjust_props_for_undo(curbuf, इताअस + newsize, &uep->ue_props,
 						  UNDOPROP_NONE, UNDOPROP_BELOW);
 #endif
 
 	// adjust marks
 	if (oldsize != newsize)
 	{
-	    mark_adjust(top + 1, top + oldsize, (long)MAXLNUM,
+	    mark_adjust(इताअस + 1, इताअस + oldsize, (long)MAXLNUM,
 					       (long)newsize - (long)oldsize);
-	    if (curbuf->b_op_start.lnum > top + oldsize)
+	    if (curbuf->b_op_start.lnum > इताअस + oldsize)
 		curbuf->b_op_start.lnum += newsize - oldsize;
-	    if (curbuf->b_op_end.lnum > top + oldsize)
+	    if (curbuf->b_op_end.lnum > इताअस + oldsize)
 		curbuf->b_op_end.lnum += newsize - oldsize;
 	}
 	if (oldsize > 0 || newsize > 0)
 	{
-	    changed_lines(top + 1, 0, bot, newsize - oldsize);
+	    changed_मगा_लिन्या(इताअस + 1, 0, bot, newsize - oldsize);
 #ifdef FEAT_SPELL
 	    // When text has been changed, possibly the start of the next line
 	    // may have SpellCap that should be removed or it needs to be
 	    // displayed.  Schedule the next line for redrawing just in case.
-	    if (spell_check_window(curwin) && bot <= curbuf->b_ml.ml_line_count)
+	    if (spell_check_window(curwin) && bot <= curbuf->b_ml.ml_लिन्या_बिलांग)
 		redrawWinline(curwin, bot);
 #endif
 	}
 
 	// Set the '[ mark.
-	if (top + 1 < curbuf->b_op_start.lnum)
-	    curbuf->b_op_start.lnum = top + 1;
+	if (इताअस + 1 < curbuf->b_op_start.lnum)
+	    curbuf->b_op_start.lnum = इताअस + 1;
 	// Set the '] mark.
-	if (newsize == 0 && top + 1 > curbuf->b_op_end.lnum)
-	    curbuf->b_op_end.lnum = top + 1;
-	else if (top + newsize > curbuf->b_op_end.lnum)
-	    curbuf->b_op_end.lnum = top + newsize;
+	if (newsize == 0 && इताअस + 1 > curbuf->b_op_end.lnum)
+	    curbuf->b_op_end.lnum = इताअस + 1;
+	else if (इताअस + newsize > curbuf->b_op_end.lnum)
+	    curbuf->b_op_end.lnum = इताअस + newsize;
 
 	u_newcount += newsize;
 	u_oldcount += oldsize;
 	uep->ue_size = oldsize;
 	uep->ue_array = newarray;
-	uep->ue_bot = top + newsize + 1;
+	uep->ue_bot = इताअस + newsize + 1;
 
 	/*
 	 * insert this entry in front of the new entry list
@@ -2925,10 +2925,10 @@ u_undoredo(int undo)
     }
 
     // Ensure the '[ and '] marks are within bounds.
-    if (curbuf->b_op_start.lnum > curbuf->b_ml.ml_line_count)
-	 curbuf->b_op_start.lnum = curbuf->b_ml.ml_line_count;
-    if (curbuf->b_op_end.lnum > curbuf->b_ml.ml_line_count)
-	 curbuf->b_op_end.lnum = curbuf->b_ml.ml_line_count;
+    if (curbuf->b_op_start.lnum > curbuf->b_ml.ml_लिन्या_बिलांग)
+	 curbuf->b_op_start.lnum = curbuf->b_ml.ml_लिन्या_बिलांग;
+    if (curbuf->b_op_end.lnum > curbuf->b_ml.ml_लिन्या_बिलांग)
+	 curbuf->b_op_end.lnum = curbuf->b_ml.ml_लिन्या_बिलांग;
 
     // Set the cursor to the desired position.  Check that the line is valid.
     curwin->w_cursor = new_curpos;
@@ -2973,7 +2973,7 @@ u_undoredo(int undo)
     if (curhead->uh_cursor.lnum + 1 == curwin->w_cursor.lnum
 						 && curwin->w_cursor.lnum > 1)
 	--curwin->w_cursor.lnum;
-    if (curwin->w_cursor.lnum <= curbuf->b_ml.ml_line_count)
+    if (curwin->w_cursor.lnum <= curbuf->b_ml.ml_लिन्या_बिलांग)
     {
 	if (curhead->uh_cursor.lnum == curwin->w_cursor.lnum)
 	{
@@ -3045,7 +3045,7 @@ u_undo_end(
     char_u	msgbuf[80];
 
 #ifdef FEAT_FOLDING
-    if ((fdo_flags & FDO_UNDO) && KeyTyped)
+    if ((fdo_flags & FDO_UNDO) && सुसि_Typed)
 	foldOpenCursor();
 #endif
 
@@ -3228,24 +3228,24 @@ ex_undolist(exarg_T *eap UNUSED)
     }
 
     if (ga.ga_len == 0)
-	msg(_("Nothing to undo"));
+	मेनसाहे(_("Nothing to undo"));
     else
     {
 	int		i;
 
 	sort_strings((char_u **)ga.ga_data, ga.ga_len);
 
-	msg_start();
-	msg_puts_attr(_("number changes  when               saved"),
+	मेनसाहे_start();
+	मेनसाहे_puts_attr(_("number changes  when               saved"),
 							      HL_ATTR(HLF_T));
 	for (i = 0; i < ga.ga_len && !got_int; ++i)
 	{
-	    msg_putchar('\n');
+	    मेनसाहे_putchar('\n');
 	    if (got_int)
 		break;
-	    msg_puts(((char **)ga.ga_data)[i]);
+	    मेनसाहे_puts(((char **)ga.ga_data)[i]);
 	}
-	msg_end();
+	मेनसाहे_end();
 
 	ga_clear_strings(&ga);
     }
@@ -3300,23 +3300,23 @@ u_find_first_changed(void)
 
     // Check that the last undo block was for the whole file.
     uep = uhp->uh_entry;
-    if (uep->ue_top != 0 || uep->ue_bot != 0)
+    if (uep->ue_इताअस != 0 || uep->ue_bot != 0)
 	return;
 
-    for (lnum = 1; lnum < curbuf->b_ml.ml_line_count
+    for (lnum = 1; lnum < curbuf->b_ml.ml_लिन्या_बिलांग
 					      && lnum <= uep->ue_size; ++lnum)
     {
 	char_u *p = ml_get_buf(curbuf, lnum, FALSE);
 
-	if (uep->ue_array[lnum - 1].ul_len != curbuf->b_ml.ml_line_len
-		|| memcmp(p, uep->ue_array[lnum - 1].ul_line, uep->ue_array[lnum - 1].ul_len) != 0)
+	if (uep->ue_array[lnum - 1].ul_len != curbuf->b_ml.ml_लिन्या_len
+		|| memcmp(p, uep->ue_array[lnum - 1].ul_लिन्या, uep->ue_array[lnum - 1].ul_len) != 0)
 	{
 	    CLEAR_POS(&(uhp->uh_cursor));
 	    uhp->uh_cursor.lnum = lnum;
 	    return;
 	}
     }
-    if (curbuf->b_ml.ml_line_count != uep->ue_size)
+    if (curbuf->b_ml.ml_लिन्या_बिलांग != uep->ue_size)
     {
 	// lines added or deleted at the end, put the cursor there
 	CLEAR_POS(&(uhp->uh_cursor));
@@ -3394,12 +3394,12 @@ u_getbot(void)
 	 * inserted (0 - deleted) since calling u_save. This is equal to the
 	 * old line count subtracted from the current line count.
 	 */
-	extra = curbuf->b_ml.ml_line_count - uep->ue_lcount;
-	uep->ue_bot = uep->ue_top + uep->ue_size + 1 + extra;
-	if (uep->ue_bot < 1 || uep->ue_bot > curbuf->b_ml.ml_line_count)
+	extra = curbuf->b_ml.ml_लिन्या_बिलांग - uep->ue_lcount;
+	uep->ue_bot = uep->ue_इताअस + uep->ue_size + 1 + extra;
+	if (uep->ue_bot < 1 || uep->ue_bot > curbuf->b_ml.ml_लिन्या_बिलांग)
 	{
-	    iemsg(e_undo_line_missing);
-	    uep->ue_bot = uep->ue_top + 1;  // assume all lines deleted, will
+	    iemsg(e_undo_लिन्या_missing);
+	    uep->ue_bot = uep->ue_इताअस + 1;  // assume all lines deleted, will
 					    // get all the old lines back
 					    // without deleting the current
 					    // ones
@@ -3520,7 +3520,7 @@ u_freeentries(
 u_freeentry(u_entry_T *uep, long n)
 {
     while (n > 0)
-	vim_free(uep->ue_array[--n].ul_line);
+	vim_free(uep->ue_array[--n].ul_लिन्या);
     vim_free((char_u *)uep->ue_array);
 #ifdef FEAT_PROP_POPUP
     ga_clear(&uep->ue_props);
@@ -3540,10 +3540,10 @@ u_clearall(buf_T *buf)
     buf->b_u_newhead = buf->b_u_oldhead = buf->b_u_curhead = NULL;
     buf->b_u_synced = true;
     buf->b_u_numhead = 0;
-    buf->b_u_line_ptr.ul_line = NULL;
-    buf->b_u_line_ptr.ul_len = 0;
-    buf->b_u_line_ptr.ul_textlen = 0;
-    buf->b_u_line_lnum = 0;
+    buf->b_u_लिन्या_ptr.ul_लिन्या = NULL;
+    buf->b_u_लिन्या_ptr.ul_len = 0;
+    buf->b_u_लिन्या_ptr.ul_textlen = 0;
+    buf->b_u_लिन्या_lnum = 0;
 }
 
 /*
@@ -3554,7 +3554,7 @@ u_blockfree(buf_T *buf)
 {
     while (buf->b_u_oldhead != NULL)
 	u_freeheader(buf, buf->b_u_oldhead, NULL);
-    vim_free(buf->b_u_line_ptr.ul_line);
+    vim_free(buf->b_u_लिन्या_ptr.ul_लिन्या);
 }
 
 /*
@@ -3576,18 +3576,18 @@ u_clearallandblockfree(buf_T *buf)
     static void
 u_saveline(linenr_T lnum)
 {
-    if (lnum == curbuf->b_u_line_lnum)	    // line is already saved
+    if (lnum == curbuf->b_u_लिन्या_lnum)	    // line is already saved
 	return;
-    if (lnum < 1 || lnum > curbuf->b_ml.ml_line_count) // should never happen
+    if (lnum < 1 || lnum > curbuf->b_ml.ml_लिन्या_बिलांग) // should never happen
 	return;
     u_clearline();
-    curbuf->b_u_line_lnum = lnum;
+    curbuf->b_u_लिन्या_lnum = lnum;
     if (curwin->w_cursor.lnum == lnum)
-	curbuf->b_u_line_colnr = curwin->w_cursor.col;
+	curbuf->b_u_लिन्या_colnr = curwin->w_cursor.col;
     else
-	curbuf->b_u_line_colnr = 0;
-    if (u_save_line(&curbuf->b_u_line_ptr, lnum) == FAIL)
-	do_outofmem_msg((long_u)0);
+	curbuf->b_u_लिन्या_colnr = 0;
+    if (u_save_लिन्या(&curbuf->b_u_लिन्या_ptr, lnum) == FAIL)
+	do_outofmem_मेनसाहे((long_u)0);
 }
 
 /*
@@ -3597,13 +3597,13 @@ u_saveline(linenr_T lnum)
     void
 u_clearline(void)
 {
-    if (curbuf->b_u_line_ptr.ul_line == NULL)
+    if (curbuf->b_u_लिन्या_ptr.ul_लिन्या == NULL)
 	return;
 
-    VIM_CLEAR(curbuf->b_u_line_ptr.ul_line);
-    curbuf->b_u_line_ptr.ul_len = 0;
-    curbuf->b_u_line_ptr.ul_textlen = 0;
-    curbuf->b_u_line_lnum = 0;
+    VIM_CLEAR(curbuf->b_u_लिन्या_ptr.ul_लिन्या);
+    curbuf->b_u_लिन्या_ptr.ul_len = 0;
+    curbuf->b_u_लिन्या_ptr.ul_textlen = 0;
+    curbuf->b_u_लिन्या_lnum = 0;
 }
 
 /*
@@ -3621,32 +3621,32 @@ u_undoline(void)
     if (undo_off)
 	return;
 
-    if (curbuf->b_u_line_ptr.ul_line == NULL
-			|| curbuf->b_u_line_lnum > curbuf->b_ml.ml_line_count)
+    if (curbuf->b_u_लिन्या_ptr.ul_लिन्या == NULL
+			|| curbuf->b_u_लिन्या_lnum > curbuf->b_ml.ml_लिन्या_बिलांग)
     {
 	beep_flush();
 	return;
     }
 
     // first save the line for the 'u' command
-    if (u_savecommon(curbuf->b_u_line_lnum - 1,
-		       curbuf->b_u_line_lnum + 1, (linenr_T)0, FALSE) == FAIL)
+    if (u_savecommon(curbuf->b_u_लिन्या_lnum - 1,
+		       curbuf->b_u_लिन्या_lnum + 1, (linenr_T)0, FALSE) == FAIL)
 	return;
-    if (u_save_line(&oldp, curbuf->b_u_line_lnum) == FAIL)
+    if (u_save_लिन्या(&oldp, curbuf->b_u_लिन्या_lnum) == FAIL)
     {
-	do_outofmem_msg((long_u)0);
+	do_outofmem_मेनसाहे((long_u)0);
 	return;
     }
-    ml_replace_len(curbuf->b_u_line_lnum, curbuf->b_u_line_ptr.ul_line,
-				     curbuf->b_u_line_ptr.ul_len, TRUE, FALSE);
-    changed_bytes(curbuf->b_u_line_lnum, 0);
-    curbuf->b_u_line_ptr = oldp;
+    ml_replace_len(curbuf->b_u_लिन्या_lnum, curbuf->b_u_लिन्या_ptr.ul_लिन्या,
+				     curbuf->b_u_लिन्या_ptr.ul_len, TRUE, FALSE);
+    changed_bytes(curbuf->b_u_लिन्या_lnum, 0);
+    curbuf->b_u_लिन्या_ptr = oldp;
 
-    t = curbuf->b_u_line_colnr;
-    if (curwin->w_cursor.lnum == curbuf->b_u_line_lnum)
-	curbuf->b_u_line_colnr = curwin->w_cursor.col;
+    t = curbuf->b_u_लिन्या_colnr;
+    if (curwin->w_cursor.lnum == curbuf->b_u_लिन्या_lnum)
+	curbuf->b_u_लिन्या_colnr = curwin->w_cursor.col;
     curwin->w_cursor.col = t;
-    curwin->w_cursor.lnum = curbuf->b_u_line_lnum;
+    curwin->w_cursor.lnum = curbuf->b_u_लिन्या_lnum;
     check_cursor_col();
 }
 
@@ -3706,7 +3706,7 @@ curbufIsChanged(void)
  * Recursive.
  */
     static void
-u_eval_tree(buf_T *buf, u_header_T *first_uhp, list_T *list)
+u_eval_पुनो(buf_T *buf, u_header_T *first_uhp, list_T *list)
 {
     u_header_T  *uhp = first_uhp;
     dict_T	*dict;
@@ -3716,14 +3716,14 @@ u_eval_tree(buf_T *buf, u_header_T *first_uhp, list_T *list)
 	dict = dict_alloc();
 	if (dict == NULL)
 	    return;
-	dict_add_number(dict, "seq", uhp->uh_seq);
-	dict_add_number(dict, "time", (long)uhp->uh_time);
+	dict_add_नुमेरो(dict, "seq", uhp->uh_seq);
+	dict_add_नुमेरो(dict, "time", (long)uhp->uh_time);
 	if (uhp == buf->b_u_newhead)
-	    dict_add_number(dict, "newhead", 1);
+	    dict_add_नुमेरो(dict, "newhead", 1);
 	if (uhp == buf->b_u_curhead)
-	    dict_add_number(dict, "curhead", 1);
+	    dict_add_नुमेरो(dict, "curhead", 1);
 	if (uhp->uh_save_nr > 0)
-	    dict_add_number(dict, "save", uhp->uh_save_nr);
+	    dict_add_नुमेरो(dict, "save", uhp->uh_save_nr);
 
 	if (uhp->uh_alt_next.ptr != NULL)
 	{
@@ -3732,7 +3732,7 @@ u_eval_tree(buf_T *buf, u_header_T *first_uhp, list_T *list)
 	    if (alt_list != NULL)
 	    {
 		// Recursive call to add alternate undo tree.
-		u_eval_tree(buf, uhp->uh_alt_next.ptr, alt_list);
+		u_eval_पुनो(buf, uhp->uh_alt_next.ptr, alt_list);
 		dict_add_list(dict, "alt", alt_list);
 	    }
 	}
@@ -3793,7 +3793,7 @@ u_undofile_reset_and_delete(buf_T *buf)
 	vim_free(file_name);
     }
 
-    set_option_value_give_err((char_u *)"undofile", 0L, NULL, OPT_LOCAL);
+    set_option_हालागा_give_err((char_u *)"undofile", 0L, NULL, OPT_LOCAL);
 }
 # endif
 
@@ -3816,17 +3816,17 @@ f_undotree(typval_T *argvars, typval_T *rettv)
 
     dict_T *dict = rettv->vval.v_dict;
 
-    dict_add_number(dict, "synced", (long)buf->b_u_synced);
-    dict_add_number(dict, "seq_last", buf->b_u_seq_last);
-    dict_add_number(dict, "save_last", buf->b_u_save_nr_last);
-    dict_add_number(dict, "seq_cur", buf->b_u_seq_cur);
-    dict_add_number(dict, "time_cur", (long)buf->b_u_time_cur);
-    dict_add_number(dict, "save_cur", buf->b_u_save_nr_cur);
+    dict_add_नुमेरो(dict, "synced", (long)buf->b_u_synced);
+    dict_add_नुमेरो(dict, "seq_last", buf->b_u_seq_last);
+    dict_add_नुमेरो(dict, "save_last", buf->b_u_save_nr_last);
+    dict_add_नुमेरो(dict, "seq_cur", buf->b_u_seq_cur);
+    dict_add_नुमेरो(dict, "time_cur", (long)buf->b_u_time_cur);
+    dict_add_नुमेरो(dict, "save_cur", buf->b_u_save_nr_cur);
 
     list_T *list = list_alloc();
     if (list != NULL)
     {
-	u_eval_tree(buf, buf->b_u_oldhead, list);
+	u_eval_पुनो(buf, buf->b_u_oldhead, list);
 	dict_add_list(dict, "entries", list);
     }
 }

@@ -119,7 +119,7 @@ ex_vim9script(exarg_T *eap UNUSED)
     if (STRCMP(p_cpo, CPO_VIM) != 0)
     {
 	si->sn_save_cpo = vim_strsave(p_cpo);
-	set_option_value_give_err((char_u *)"cpo",
+	set_option_हालागा_give_err((char_u *)"cpo",
 					 0L, (char_u *)CPO_VIM, OPT_NO_REDRAW);
     }
 #else
@@ -140,7 +140,7 @@ not_in_vim9(exarg_T *eap, bool silent)
 	switch (eap->cmdidx)
 	{
 	    case CMD_k:
-		if (eap->addr_count > 0)
+		if (eap->addr_बिलांग > 0)
 		{
 		    if (!silent)
 			emsg(_(e_no_range_allowed));
@@ -149,7 +149,7 @@ not_in_vim9(exarg_T *eap, bool silent)
 		// FALLTHROUGH
 	    case CMD_append:
 	    case CMD_change:
-	    case CMD_insert:
+	    case CMD_इसिंगित:
 	    case CMD_open:
 	    case CMD_t:
 	    case CMD_xit:
@@ -266,7 +266,7 @@ free_all_script_vars(scriptitem_T *si)
 
     hash_lock(ht);
     todo = (int)ht->ht_used;
-    FOR_ALL_HASHTAB_ITEMS(ht, hi, todo)
+    FOR_ALL_HASHTAB_मगा_बागाय(ht, hi, todo)
     {
 	if (!HASHITEM_EMPTY(hi))
 	{
@@ -401,7 +401,7 @@ handle_import(
     char_u	*nextarg;
     int		is_autoload = FALSE;
     int		getnext;
-    char_u	*expr_end;
+    char_u	*पाहायाग_end;
     int		ret = FAIL;
     char_u	*as_name = NULL;
     typval_T	tv;
@@ -419,7 +419,7 @@ handle_import(
 
     // The name of the file can be an expression, which must evaluate to a
     // string.
-    ret = eval0_retarg(arg, &tv, NULL, evalarg, &expr_end);
+    ret = eval0_retarg(arg, &tv, NULL, evalarg, &पाहायाग_end);
     if (ret == FAIL)
 	goto erret;
     if (tv.v_type != VAR_STRING
@@ -543,13 +543,13 @@ handle_import(
     }
 
     // Allow for the "as Name" to be in the next line.
-    nextarg = eval_next_non_blank(expr_end, evalarg, &getnext);
+    nextarg = eval_next_non_blank(पाहायाग_end, evalarg, &getnext);
     if (STRNCMP("as", nextarg, 2) == 0 && IS_WHITE_OR_NUL(nextarg[2]))
     {
 	char_u *p;
 
 	if (getnext)
-	    arg = eval_next_line(expr_end, evalarg);
+	    arg = eval_next_लिन्या(पाहायाग_end, evalarg);
 	else
 	    arg = nextarg;
 
@@ -573,9 +573,9 @@ handle_import(
 	char_u *p = gettail(tv.vval.v_string);
 	char_u *end = (char_u *)strstr((char *)p, ".vim");
 
-	if (!ends_excmd2(arg_start, expr_end))
+	if (!ends_excmd2(arg_start, पाहायाग_end))
 	{
-	    semsg(_(e_trailing_characters_str), expr_end);
+	    semsg(_(e_trailing_characters_str), पाहायाग_end);
 	    goto erret;
 	}
 	if (end == NULL || end[4] != NUL)
@@ -794,9 +794,9 @@ vim9_declare_scriptvar(exarg_T *eap, char_u *arg)
     if (eap->cmdidx == CMD_final || eap->cmdidx == CMD_const)
     {
 	if (eap->cmdidx == CMD_final)
-	    emsg(_(e_final_requires_a_value));
+	    emsg(_(e_final_requires_a_हालागा));
 	else
-	    emsg(_(e_const_requires_a_value));
+	    emsg(_(e_const_requires_a_हालागा));
 	return arg + STRLEN(arg);
     }
 
@@ -838,7 +838,7 @@ vim9_declare_scriptvar(exarg_T *eap, char_u *arg)
     CLEAR_FIELD(init_tv);
     if (type->tt_type == VAR_ANY)
 	// A variable of type "any" is not possible, just use zero instead
-	init_tv.v_type = VAR_NUMBER;
+	init_tv.v_type = VAR_नुमेरो;
     else
 	init_tv.v_type = type->tt_type;
     set_var_const(name, 0, type, &init_tv, FALSE, ASSIGN_INIT, 0);
@@ -912,7 +912,7 @@ update_vim9_script_var(
 	    // svar_T and create a new sallvar_T.
 	    sv = ((svar_T *)si->sn_var_vals.ga_data) + si->sn_var_vals.ga_len;
 	    newsav = (sallvar_T *)alloc_clear(
-			      offsetof(sallvar_T, sav_key) + STRLEN(name) + 1);
+			      offsetof(sallvar_T, sav_सुसि) + STRLEN(name) + 1);
 	    if (newsav == NULL)
 		return;
 
@@ -925,14 +925,14 @@ update_vim9_script_var(
 	    newsav->sav_var_vals_idx = si->sn_var_vals.ga_len;
 	    ++si->sn_var_vals.ga_len;
 	    // a pointer to the first char avoids a FORTIFY_SOURCE problem
-	    STRCPY(&newsav->sav_key[0], name);
-	    sv->sv_name = newsav->sav_key;
+	    STRCPY(&newsav->sav_सुसि[0], name);
+	    sv->sv_name = newsav->sav_सुसि;
 	    newsav->sav_di = di;
 	    newsav->sav_block_id = si->sn_current_block_id;
 
 	    if (HASHITEM_EMPTY(hi))
 		// new variable name
-		hash_add(&si->sn_all_vars.dv_hashtab, newsav->sav_key,
+		hash_add(&si->sn_all_vars.dv_hashtab, newsav->sav_सुसि,
 							       "add variable");
 	    else if (sav != NULL)
 		// existing name in a new block, append to the list
@@ -1075,7 +1075,7 @@ find_typval_in_script(typval_T *dest, scid_T sid, int must_find)
     int
 check_script_var_type(
 	svar_T	    *sv,
-	typval_T    *value,
+	typval_T    *हालागा,
 	char_u	    *name,
 	where_T	    where)
 {
@@ -1086,15 +1086,15 @@ check_script_var_type(
 	semsg(_(e_cannot_change_readonly_variable_str), name);
 	return FAIL;
     }
-    ret = check_typval_type(sv->sv_type, value, where);
-    if (ret == OK && need_convert_to_bool(sv->sv_type, value))
+    ret = check_typval_type(sv->sv_type, हालागा, where);
+    if (ret == OK && need_convert_to_bool(sv->sv_type, हालागा))
     {
-	int	val = tv2bool(value);
+	int	val = tv2bool(हालागा);
 
-	clear_tv(value);
-	value->v_type = VAR_BOOL;
-	value->v_lock = 0;
-	value->vval.v_number = val ? VVAL_TRUE : VVAL_FALSE;
+	clear_tv(हालागा);
+	हालागा->v_type = VAR_BOOL;
+	हालागा->v_lock = 0;
+	हालागा->vval.v_नुमेरो = val ? VVAL_TRUE : VVAL_FALSE;
     }
     return ret;
 }

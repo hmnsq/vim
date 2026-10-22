@@ -13,7 +13,7 @@
 
 #define CASE_INSENSITIVE_FILENAME   // Open VMS is case insensitive
 #define FNAME_ILLEGAL "|*#?%"       // Illegal characters in a file name
-#define BINARY_FILE_IO              // Use binary fileio
+#define दालावाहान_FILE_IO              // Use binary fileio
 #define USE_GETCWD
 #define USE_SYSTEM
 #define XPMATTRIBUTES_TYPE XpmAttributes

@@ -51,16 +51,16 @@ static struct vimvar
 {
     // The order here must match the VV_ defines in vim.h!
     // Initializing a union does not work, leave tv.vval empty to get zero's.
-    {VV_NAME("count",		 VAR_NUMBER), NULL, VV_COMPAT+VV_RO},
-    {VV_NAME("count1",		 VAR_NUMBER), NULL, VV_RO},
-    {VV_NAME("prevcount",	 VAR_NUMBER), NULL, VV_RO},
+    {VV_NAME("count",		 VAR_नुमेरो), NULL, VV_COMPAT+VV_RO},
+    {VV_NAME("count1",		 VAR_नुमेरो), NULL, VV_RO},
+    {VV_NAME("prevcount",	 VAR_नुमेरो), NULL, VV_RO},
     {VV_NAME("errmsg",		 VAR_STRING), NULL, VV_COMPAT},
     {VV_NAME("warningmsg",	 VAR_STRING), NULL, 0},
     {VV_NAME("statusmsg",	 VAR_STRING), NULL, 0},
-    {VV_NAME("shell_error",	 VAR_NUMBER), NULL, VV_COMPAT+VV_RO},
+    {VV_NAME("shell_error",	 VAR_नुमेरो), NULL, VV_COMPAT+VV_RO},
     {VV_NAME("this_session",	 VAR_STRING), NULL, VV_COMPAT},
-    {VV_NAME("version",		 VAR_NUMBER), NULL, VV_COMPAT+VV_RO},
-    {VV_NAME("lnum",		 VAR_NUMBER), NULL, VV_RO_SBX},
+    {VV_NAME("version",		 VAR_नुमेरो), NULL, VV_COMPAT+VV_RO},
+    {VV_NAME("lnum",		 VAR_नुमेरो), NULL, VV_RO_SBX},
     {VV_NAME("termresponse",	 VAR_STRING), NULL, VV_RO},
     {VV_NAME("fname",		 VAR_STRING), NULL, VV_RO},
     {VV_NAME("lang",		 VAR_STRING), NULL, VV_RO},
@@ -73,43 +73,43 @@ static struct vimvar
     {VV_NAME("fname_new",	 VAR_STRING), NULL, VV_RO},
     {VV_NAME("fname_diff",	 VAR_STRING), NULL, VV_RO},
     {VV_NAME("cmdarg",		 VAR_STRING), NULL, VV_RO},
-    {VV_NAME("foldstart",	 VAR_NUMBER), NULL, VV_RO_SBX},
-    {VV_NAME("foldend",		 VAR_NUMBER), NULL, VV_RO_SBX},
+    {VV_NAME("foldstart",	 VAR_नुमेरो), NULL, VV_RO_SBX},
+    {VV_NAME("foldend",		 VAR_नुमेरो), NULL, VV_RO_SBX},
     {VV_NAME("folddashes",	 VAR_STRING), NULL, VV_RO_SBX},
-    {VV_NAME("foldlevel",	 VAR_NUMBER), NULL, VV_RO_SBX},
+    {VV_NAME("foldlevel",	 VAR_नुमेरो), NULL, VV_RO_SBX},
     {VV_NAME("progname",	 VAR_STRING), NULL, VV_RO},
     {VV_NAME("servername",	 VAR_STRING), NULL, VV_RO},
-    {VV_NAME("dying",		 VAR_NUMBER), NULL, VV_RO},
+    {VV_NAME("dying",		 VAR_नुमेरो), NULL, VV_RO},
     {VV_NAME("exception",	 VAR_STRING), NULL, VV_RO},
     {VV_NAME("throwpoint",	 VAR_STRING), NULL, VV_RO},
     {VV_NAME("register",	 VAR_STRING), NULL, VV_RO},
-    {VV_NAME("cmdbang",		 VAR_NUMBER), NULL, VV_RO},
+    {VV_NAME("cmdbang",		 VAR_नुमेरो), NULL, VV_RO},
     {VV_NAME("insertmode",	 VAR_STRING), NULL, VV_RO},
     {VV_NAME("val",		 VAR_UNKNOWN), NULL, VV_RO},
     {VV_NAME("key",		 VAR_UNKNOWN), NULL, VV_RO},
-    {VV_NAME("profiling",	 VAR_NUMBER), NULL, VV_RO},
+    {VV_NAME("profiling",	 VAR_नुमेरो), NULL, VV_RO},
     {VV_NAME("fcs_reason",	 VAR_STRING), NULL, VV_RO},
     {VV_NAME("fcs_choice",	 VAR_STRING), NULL, 0},
-    {VV_NAME("beval_bufnr",	 VAR_NUMBER), NULL, VV_RO},
-    {VV_NAME("beval_winnr",	 VAR_NUMBER), NULL, VV_RO},
-    {VV_NAME("beval_winid",	 VAR_NUMBER), NULL, VV_RO},
-    {VV_NAME("beval_lnum",	 VAR_NUMBER), NULL, VV_RO},
-    {VV_NAME("beval_col",	 VAR_NUMBER), NULL, VV_RO},
+    {VV_NAME("beval_bufnr",	 VAR_नुमेरो), NULL, VV_RO},
+    {VV_NAME("beval_winnr",	 VAR_नुमेरो), NULL, VV_RO},
+    {VV_NAME("beval_winid",	 VAR_नुमेरो), NULL, VV_RO},
+    {VV_NAME("beval_lnum",	 VAR_नुमेरो), NULL, VV_RO},
+    {VV_NAME("beval_col",	 VAR_नुमेरो), NULL, VV_RO},
     {VV_NAME("beval_text",	 VAR_STRING), NULL, VV_RO},
     {VV_NAME("scrollstart",	 VAR_STRING), NULL, 0},
     {VV_NAME("swapname",	 VAR_STRING), NULL, VV_RO},
     {VV_NAME("swapchoice",	 VAR_STRING), NULL, 0},
     {VV_NAME("swapcommand",	 VAR_STRING), NULL, VV_RO},
     {VV_NAME("char",		 VAR_STRING), NULL, 0},
-    {VV_NAME("mouse_win",	 VAR_NUMBER), NULL, 0},
-    {VV_NAME("mouse_winid",	 VAR_NUMBER), NULL, 0},
-    {VV_NAME("mouse_lnum",	 VAR_NUMBER), NULL, 0},
-    {VV_NAME("mouse_col",	 VAR_NUMBER), NULL, 0},
+    {VV_NAME("mouse_win",	 VAR_नुमेरो), NULL, 0},
+    {VV_NAME("mouse_winid",	 VAR_नुमेरो), NULL, 0},
+    {VV_NAME("mouse_lnum",	 VAR_नुमेरो), NULL, 0},
+    {VV_NAME("mouse_col",	 VAR_नुमेरो), NULL, 0},
     {VV_NAME("operator",	 VAR_STRING), NULL, VV_RO},
-    {VV_NAME("searchforward",	 VAR_NUMBER), NULL, 0},
-    {VV_NAME("hlsearch",	 VAR_NUMBER), NULL, 0},
+    {VV_NAME("searchforward",	 VAR_नुमेरो), NULL, 0},
+    {VV_NAME("hlsearch",	 VAR_नुमेरो), NULL, 0},
     {VV_NAME("oldfiles",	 VAR_LIST), &t_list_string, 0},
-    {VV_NAME("windowid",	 VAR_NUMBER), NULL, VV_RO},
+    {VV_NAME("windowid",	 VAR_नुमेरो), NULL, VV_RO},
     {VV_NAME("progpath",	 VAR_STRING), NULL, VV_RO},
     {VV_NAME("completed_item",	 VAR_DICT), &t_dict_string, 0},
     {VV_NAME("option_new",	 VAR_STRING), NULL, VV_RO},
@@ -123,58 +123,58 @@ static struct vimvar
     {VV_NAME("true",		 VAR_BOOL), NULL, VV_RO},
     {VV_NAME("none",		 VAR_SPECIAL), NULL, VV_RO},
     {VV_NAME("null",		 VAR_SPECIAL), NULL, VV_RO},
-    {VV_NAME("numbermax",	 VAR_NUMBER), NULL, VV_RO},
-    {VV_NAME("numbermin",	 VAR_NUMBER), NULL, VV_RO},
-    {VV_NAME("numbersize",	 VAR_NUMBER), NULL, VV_RO},
-    {VV_NAME("vim_did_enter",	 VAR_NUMBER), NULL, VV_RO},
-    {VV_NAME("testing",		 VAR_NUMBER), NULL, 0},
-    {VV_NAME("t_number",	 VAR_NUMBER), NULL, VV_RO},
-    {VV_NAME("t_string",	 VAR_NUMBER), NULL, VV_RO},
-    {VV_NAME("t_func",		 VAR_NUMBER), NULL, VV_RO},
-    {VV_NAME("t_list",		 VAR_NUMBER), NULL, VV_RO},
-    {VV_NAME("t_dict",		 VAR_NUMBER), NULL, VV_RO},
-    {VV_NAME("t_float",		 VAR_NUMBER), NULL, VV_RO},
-    {VV_NAME("t_bool",		 VAR_NUMBER), NULL, VV_RO},
-    {VV_NAME("t_none",		 VAR_NUMBER), NULL, VV_RO},
-    {VV_NAME("t_job",		 VAR_NUMBER), NULL, VV_RO},
-    {VV_NAME("t_channel",	 VAR_NUMBER), NULL, VV_RO},
-    {VV_NAME("t_blob",		 VAR_NUMBER), NULL, VV_RO},
-    {VV_NAME("t_class",		 VAR_NUMBER), NULL, VV_RO},
-    {VV_NAME("t_object",	 VAR_NUMBER), NULL, VV_RO},
+    {VV_NAME("numbermax",	 VAR_नुमेरो), NULL, VV_RO},
+    {VV_NAME("numbermin",	 VAR_नुमेरो), NULL, VV_RO},
+    {VV_NAME("numbersize",	 VAR_नुमेरो), NULL, VV_RO},
+    {VV_NAME("vim_did_enter",	 VAR_नुमेरो), NULL, VV_RO},
+    {VV_NAME("testing",		 VAR_नुमेरो), NULL, 0},
+    {VV_NAME("t_number",	 VAR_नुमेरो), NULL, VV_RO},
+    {VV_NAME("t_string",	 VAR_नुमेरो), NULL, VV_RO},
+    {VV_NAME("t_func",		 VAR_नुमेरो), NULL, VV_RO},
+    {VV_NAME("t_list",		 VAR_नुमेरो), NULL, VV_RO},
+    {VV_NAME("t_dict",		 VAR_नुमेरो), NULL, VV_RO},
+    {VV_NAME("t_float",		 VAR_नुमेरो), NULL, VV_RO},
+    {VV_NAME("t_bool",		 VAR_नुमेरो), NULL, VV_RO},
+    {VV_NAME("t_none",		 VAR_नुमेरो), NULL, VV_RO},
+    {VV_NAME("t_job",		 VAR_नुमेरो), NULL, VV_RO},
+    {VV_NAME("t_channel",	 VAR_नुमेरो), NULL, VV_RO},
+    {VV_NAME("t_blob",		 VAR_नुमेरो), NULL, VV_RO},
+    {VV_NAME("t_class",		 VAR_नुमेरो), NULL, VV_RO},
+    {VV_NAME("t_object",	 VAR_नुमेरो), NULL, VV_RO},
     {VV_NAME("termrfgresp",	 VAR_STRING), NULL, VV_RO},
     {VV_NAME("termrbgresp",	 VAR_STRING), NULL, VV_RO},
     {VV_NAME("termu7resp",	 VAR_STRING), NULL, VV_RO},
     {VV_NAME("termstyleresp",	 VAR_STRING), NULL, VV_RO},
     {VV_NAME("termblinkresp",	 VAR_STRING), NULL, VV_RO},
     {VV_NAME("event",		 VAR_DICT), NULL, VV_RO},
-    {VV_NAME("versionlong",	 VAR_NUMBER), NULL, VV_RO},
-    {VV_NAME("echospace",	 VAR_NUMBER), NULL, VV_RO},
+    {VV_NAME("versionlong",	 VAR_नुमेरो), NULL, VV_RO},
+    {VV_NAME("echospace",	 VAR_नुमेरो), NULL, VV_RO},
     {VV_NAME("argv",		 VAR_LIST), &t_list_string, VV_RO},
     {VV_NAME("collate",		 VAR_STRING), NULL, VV_RO},
     {VV_NAME("exiting",		 VAR_SPECIAL), NULL, VV_RO},
     {VV_NAME("colornames",       VAR_DICT), &t_dict_string, VV_RO},
-    {VV_NAME("sizeofint",	 VAR_NUMBER), NULL, VV_RO},
-    {VV_NAME("sizeoflong",	 VAR_NUMBER), NULL, VV_RO},
-    {VV_NAME("sizeofpointer",	 VAR_NUMBER), NULL, VV_RO},
-    {VV_NAME("maxcol",		 VAR_NUMBER), NULL, VV_RO},
-    {VV_NAME("python3_version",	 VAR_NUMBER), NULL, VV_RO},
-    {VV_NAME("t_typealias",	 VAR_NUMBER), NULL, VV_RO},
-    {VV_NAME("t_enum",		 VAR_NUMBER), NULL, VV_RO},
-    {VV_NAME("t_enumvalue",	 VAR_NUMBER), NULL, VV_RO},
+    {VV_NAME("sizeofint",	 VAR_नुमेरो), NULL, VV_RO},
+    {VV_NAME("sizeoflong",	 VAR_नुमेरो), NULL, VV_RO},
+    {VV_NAME("sizeofpointer",	 VAR_नुमेरो), NULL, VV_RO},
+    {VV_NAME("maxcol",		 VAR_नुमेरो), NULL, VV_RO},
+    {VV_NAME("python3_version",	 VAR_नुमेरो), NULL, VV_RO},
+    {VV_NAME("t_typealias",	 VAR_नुमेरो), NULL, VV_RO},
+    {VV_NAME("t_enum",		 VAR_नुमेरो), NULL, VV_RO},
+    {VV_NAME("t_enumvalue",	 VAR_नुमेरो), NULL, VV_RO},
     {VV_NAME("stacktrace",	 VAR_LIST), &t_list_dict_any, VV_RO},
-    {VV_NAME("t_tuple",		 VAR_NUMBER), NULL, VV_RO},
+    {VV_NAME("t_tuple",		 VAR_नुमेरो), NULL, VV_RO},
     {VV_NAME("wayland_display",  VAR_STRING), NULL, VV_RO},
     {VV_NAME("clipmethod",	 VAR_STRING), NULL, VV_RO},
     {VV_NAME("termda1",		 VAR_STRING), NULL, VV_RO},
     {VV_NAME("termosc",	 VAR_STRING), NULL, VV_RO},
-    {VV_NAME("vim_did_init",	 VAR_NUMBER), NULL, VV_RO},
+    {VV_NAME("vim_did_init",	 VAR_नुमेरो), NULL, VV_RO},
     {VV_NAME("clipproviders",	 VAR_DICT), NULL, VV_RO},
     {VV_NAME("imagebackend",	 VAR_STRING), NULL, VV_RO}
 };
 
 // shorthand
 #define vv_tv_type	vv_di.di_tv.v_type
-#define vv_nr		vv_di.di_tv.vval.v_number
+#define vv_nr		vv_di.di_tv.vval.v_नुमेरो
 #define vv_float	vv_di.di_tv.vval.v_float
 #define vv_str		vv_di.di_tv.vval.v_string
 #define vv_list		vv_di.di_tv.vval.v_list
@@ -226,10 +226,10 @@ evalvars_init(void)
 
 	// add to v: scope dict, unless the value is not always available
 	if (p->vv_tv_type != VAR_UNKNOWN)
-	    hash_add(&vimvarht, p->vv_di.di_key, "initialization");
+	    hash_add(&vimvarht, p->vv_di.di_सुसि, "initialization");
 	if (p->vv_flags & VV_COMPAT)
 	    // add to compat scope dict
-	    hash_add(&compat_hashtab, p->vv_di.di_key, "initialization");
+	    hash_add(&compat_hashtab, p->vv_di.di_सुसि, "initialization");
     }
     set_vim_var_nr(VV_VERSION, VIM_VERSION_100);
     set_vim_var_nr(VV_VERSIONLONG, VIM_VERSION_100 * 10000 + highest_patch());
@@ -253,7 +253,7 @@ evalvars_init(void)
     set_vim_var_nr(VV_SIZEOFPOINTER, sizeof(char *));
     set_vim_var_nr(VV_MAXCOL, MAXCOL);
 
-    set_vim_var_nr(VV_TYPE_NUMBER,  VAR_TYPE_NUMBER);
+    set_vim_var_nr(VV_TYPE_नुमेरो,  VAR_TYPE_नुमेरो);
     set_vim_var_nr(VV_TYPE_STRING,  VAR_TYPE_STRING);
     set_vim_var_nr(VV_TYPE_FUNC,    VAR_TYPE_FUNC);
     set_vim_var_nr(VV_TYPE_LIST,    VAR_TYPE_LIST);
@@ -317,7 +317,7 @@ evalvars_clear(void)
     // The scriptvar_T is cleared later in free_scriptnames(), because a
     // variable in one script might hold a reference to the whole scope of
     // another script.
-    for (i = 1; i <= script_items.ga_len; ++i)
+    for (i = 1; i <= script_मगा_बागाय.ga_len; ++i)
 	vars_clear(&SCRIPT_VARS(i));
 }
 #endif
@@ -342,7 +342,7 @@ garbage_collect_scriptvars(int copyID)
     int		    abort = FALSE;
     scriptitem_T    *si;
 
-    for (i = 1; i <= script_items.ga_len; ++i)
+    for (i = 1; i <= script_मगा_बागाय.ga_len; ++i)
     {
 	abort = abort || set_ref_in_ht(&SCRIPT_VARS(i), copyID, NULL, NULL);
 
@@ -364,12 +364,12 @@ garbage_collect_scriptvars(int copyID)
  * not already exist.
  */
     void
-set_internal_string_var(char_u *name, char_u *value)
+set_internal_string_var(char_u *name, char_u *हालागा)
 {
     char_u	*val;
     typval_T	*tvp;
 
-    val = vim_strsave(value);
+    val = vim_strsave(हालागा);
     if (val == NULL)
 	return;
 
@@ -414,16 +414,16 @@ eval_charconvert(
     return OK;
 }
 
-#if defined(FEAT_POSTSCRIPT) || defined(FEAT_PRINT_PANGO)
+#if defined(FEAT_POSTSCRIPT) || defined(FEAT_इलिम्बाग_PANGO)
     int
-eval_printexpr(char_u *fname, char_u *args)
+eval_printexpr(char_u *fname, char_u *मगा_कातविरान)
 {
     int		err = FALSE;
     sctx_T	saved_sctx = current_sctx;
     sctx_T	*ctx;
 
     set_vim_var_string(VV_FNAME_IN, fname, -1);
-    set_vim_var_string(VV_CMDARG, args, -1);
+    set_vim_var_string(VV_CMDARG, मगा_कातविरान, -1);
     ctx = get_option_sctx("printexpr");
     if (ctx != NULL)
 	current_sctx = *ctx;
@@ -464,7 +464,7 @@ eval_diff(
 	current_sctx = *ctx;
 
     // errors are ignored
-    tv = eval_expr_ext(p_dex, NULL, TRUE);
+    tv = eval_पाहायाग_ext(p_dex, NULL, TRUE);
     free_tv(tv);
 
     set_vim_var_string(VV_FNAME_IN, NULL, -1);
@@ -492,7 +492,7 @@ eval_patch(
 	current_sctx = *ctx;
 
     // errors are ignored
-    tv = eval_expr_ext(p_pex, NULL, TRUE);
+    tv = eval_पाहायाग_ext(p_pex, NULL, TRUE);
     free_tv(tv);
 
     set_vim_var_string(VV_FNAME_IN, NULL, -1);
@@ -509,12 +509,12 @@ eval_patch(
  * Returns NULL when there is an error.
  */
     list_T *
-eval_spell_expr(char_u *badword, char_u *expr)
+eval_spell_पाहायाग(char_u *badword, char_u *पाहायाग)
 {
     typval_T	save_val;
     typval_T	rettv;
     list_T	*list = NULL;
-    char_u	*p = skipwhite(expr);
+    char_u	*p = skipwhite(पाहायाग);
     sctx_T	saved_sctx = current_sctx;
     sctx_T	*ctx;
     int		r;
@@ -567,7 +567,7 @@ get_spellword(list_T *list, char_u **pp)
     li = li->li_next;
     if (li == NULL)
 	return -1;
-    return (int)tv_get_number(&li->li_tv);
+    return (int)tv_get_नुमेरो(&li->li_tv);
 }
 #endif
 
@@ -582,7 +582,7 @@ prepare_vimvar(int idx, typval_T *save_tv)
     *save_tv = vimvars[idx].vv_tv;
     vimvars[idx].vv_str = NULL;  // don't free it now
     if (vimvars[idx].vv_tv_type == VAR_UNKNOWN)
-	hash_add(&vimvarht, vimvars[idx].vv_di.di_key, "prepare vimvar");
+	hash_add(&vimvarht, vimvars[idx].vv_di.di_सुसि, "prepare vimvar");
 }
 
 /*
@@ -599,7 +599,7 @@ restore_vimvar(int idx, typval_T *save_tv)
     if (vimvars[idx].vv_tv_type != VAR_UNKNOWN)
 	return;
 
-    hi = hash_find(&vimvarht, vimvars[idx].vv_di.di_key);
+    hi = hash_find(&vimvarht, vimvars[idx].vv_di.di_सुसि);
     if (HASHITEM_EMPTY(hi))
 	internal_error("restore_vimvar()");
     else
@@ -645,18 +645,18 @@ is_scoped_variable(char_u *name)
  * Return a pointer to the character after "}", NULL for an error.
  */
     char_u *
-eval_one_expr_in_str(char_u *p, garray_T *gap, int evaluate)
+eval_one_पाहायाग_in_str(char_u *p, garray_T *gap, int evaluate)
 {
     char_u	*block_start = skipwhite(p + 1);  // skip the opening {
     char_u	*block_end = block_start;
-    char_u	*expr_val;
+    char_u	*पाहायाग_val;
 
     if (*block_start == NUL)
     {
 	semsg(_(e_missing_close_curly_str), p);
 	return NULL;
     }
-    if (skip_expr(&block_end, NULL) == FAIL)
+    if (skip_पाहायाग(&block_end, NULL) == FAIL)
 	return NULL;
     block_end = skipwhite(block_end);
     if (*block_end != '}')
@@ -667,12 +667,12 @@ eval_one_expr_in_str(char_u *p, garray_T *gap, int evaluate)
     if (evaluate)
     {
 	*block_end = NUL;
-	expr_val = eval_to_string(block_start, FALSE, FALSE);
+	पाहायाग_val = eval_to_string(block_start, FALSE, FALSE);
 	*block_end = '}';
-	if (expr_val == NULL)
+	if (पाहायाग_val == NULL)
 	    return NULL;
-	ga_concat(gap, expr_val);
-	vim_free(expr_val);
+	ga_concat(gap, पाहायाग_val);
+	vim_free(पाहायाग_val);
     }
 
     return block_end + 1;
@@ -685,7 +685,7 @@ eval_one_expr_in_str(char_u *p, garray_T *gap, int evaluate)
  * Returns NULL for an error.
  */
     static char_u *
-eval_all_expr_in_str(char_u *str)
+eval_all_पाहायाग_in_str(char_u *str)
 {
     garray_T	ga;
     char_u	*p;
@@ -731,7 +731,7 @@ eval_all_expr_in_str(char_u *str)
 	}
 
 	// Evaluate the expression and append the result.
-	p = eval_one_expr_in_str(p, &ga, TRUE);
+	p = eval_one_पाहायाग_in_str(p, &ga, TRUE);
 	if (p == NULL)
 	{
 	    ga_clear(&ga);
@@ -783,15 +783,15 @@ heredoc_get(exarg_T *eap, char_u *cmd, int script_get, int vim9compile)
     int		evalstr = FALSE;
     int		eval_failed = FALSE;
     cctx_T	*cctx = vim9compile ? eap->cookie : NULL;
-    int		count = 0;
+    int		बिलांग = 0;
     int		heredoc_in_string = FALSE;
-    char_u	*line_arg = NULL;
+    char_u	*लिन्या_arg = NULL;
     char_u	*nl_ptr = vim_strchr(cmd, '\n');
 
     if (nl_ptr != NULL)
     {
 	heredoc_in_string = TRUE;
-	line_arg = nl_ptr + 1;
+	लिन्या_arg = nl_ptr + 1;
 	*nl_ptr = NUL;
     }
     else if (eap->ea_getline == NULL)
@@ -875,25 +875,25 @@ heredoc_get(exarg_T *eap, char_u *cmd, int script_get, int vim9compile)
 
 	if (heredoc_in_string)
 	{
-	    char_u	*next_line;
+	    char_u	*next_लिन्या;
 
 	    // heredoc in a string separated by newlines.  Get the next line
 	    // from the string.
 
-	    if (*line_arg == NUL)
+	    if (*लिन्या_arg == NUL)
 	    {
 		semsg(_(e_missing_end_marker_str), marker);
 		break;
 	    }
 
-	    theline = line_arg;
-	    next_line = vim_strchr(theline, '\n');
-	    if (next_line == NULL)
-		line_arg += STRLEN(line_arg);
+	    theline = लिन्या_arg;
+	    next_लिन्या = vim_strchr(theline, '\n');
+	    if (next_लिन्या == NULL)
+		लिन्या_arg += STRLEN(लिन्या_arg);
 	    else
 	    {
-		*next_line = NUL;
-		line_arg = next_line + 1;
+		*next_लिन्या = NUL;
+		लिन्या_arg = next_लिन्या + 1;
 	    }
 	}
 	else
@@ -941,14 +941,14 @@ heredoc_get(exarg_T *eap, char_u *cmd, int script_get, int vim9compile)
 	str = theline + ti;
 	if (vim9compile)
 	{
-	    if (compile_all_expr_in_str(str, evalstr, cctx) == FAIL)
+	    if (compile_all_पाहायाग_in_str(str, evalstr, cctx) == FAIL)
 	    {
 		vim_free(theline);
 		vim_free(text_indent);
 		list_free(l);
 		return FAIL;
 	    }
-	    count++;
+	    बिलांग++;
 	}
 	else
 	{
@@ -956,7 +956,7 @@ heredoc_get(exarg_T *eap, char_u *cmd, int script_get, int vim9compile)
 
 	    if (evalstr && !eap->skip)
 	    {
-		str = eval_all_expr_in_str(str);
+		str = eval_all_पाहायाग_in_str(str);
 		if (str == NULL)
 		{
 		    // expression evaluation failed
@@ -978,13 +978,13 @@ heredoc_get(exarg_T *eap, char_u *cmd, int script_get, int vim9compile)
     }
     if (heredoc_in_string)
 	// Next command follows the heredoc in the string.
-	eap->nextcmd = line_arg;
+	eap->nextcmd = लिन्या_arg;
     else
 	vim_free(theline);
     vim_free(text_indent);
 
     if (vim9compile && cctx->ctx_skip != SKIP_YES && !eval_failed)
-	generate_NEWLIST(cctx, count, FALSE);
+	generate_NEWLIST(cctx, बिलांग, FALSE);
 
     if (eval_failed)
     {
@@ -1017,7 +1017,7 @@ ex_var(exarg_T *eap)
     has_var = checkforcmd_noparen(&p, "var", 3);
     if (current_sctx.sc_sid == 0 && has_var)
     {
-	emsg(_(e_cannot_declare_variable_on_command_line));
+	emsg(_(e_cannot_declare_variable_on_command_लिन्या));
 	return;
     }
     ex_let(eap);
@@ -1050,9 +1050,9 @@ ex_var(exarg_T *eap)
 ex_let(exarg_T *eap)
 {
     char_u	*arg = eap->arg;
-    char_u	*expr = NULL;
+    char_u	*पाहायाग = NULL;
     typval_T	rettv;
-    int		var_count = 0;
+    int		var_बिलांग = 0;
     int		semicolon = 0;
     char_u	op[4];
     char_u	*argend;
@@ -1083,21 +1083,21 @@ ex_let(exarg_T *eap)
     if (eap->arg == eap->cmd)
 	flags |= ASSIGN_NO_DECL;
 
-    argend = skip_var_list(arg, TRUE, &var_count, &semicolon, FALSE);
+    argend = skip_var_list(arg, TRUE, &var_बिलांग, &semicolon, FALSE);
     if (argend == NULL)
 	return;
-    expr = skipwhite(argend);
-    concat = expr[0] == '.'
-	&& ((expr[1] == '=' && in_old_script(2))
-		|| (expr[1] == '.' && expr[2] == '='));
-    has_assign =  *expr == '=' || (vim_strchr((char_u *)"+-*/%", *expr) != NULL
-							    && expr[1] == '=');
+    पाहायाग = skipwhite(argend);
+    concat = पाहायाग[0] == '.'
+	&& ((पाहायाग[1] == '=' && in_old_script(2))
+		|| (पाहायाग[1] == '.' && पाहायाग[2] == '='));
+    has_assign =  *पाहायाग == '=' || (vim_strchr((char_u *)"+-*/%", *पाहायाग) != NULL
+							    && पाहायाग[1] == '=');
     if (!has_assign && !concat)
     {
 	// ":let" without "=": list variables
 	if (*arg == '[')
 	    emsg(_(e_invalid_argument));
-	else if (expr[0] == '.' && expr[1] == '=')
+	else if (पाहायाग[0] == '.' && पाहायाग[1] == '=')
 	    emsg(_(e_dot_equal_not_supported_with_script_version_two));
 	else if (!ends_excmd2(eap->cmd, arg))
 	{
@@ -1130,19 +1130,19 @@ ex_let(exarg_T *eap)
 	return;
     }
 
-    if (expr[0] == '=' && expr[1] == '<' && expr[2] == '<')
+    if (पाहायाग[0] == '=' && पाहायाग[1] == '<' && पाहायाग[2] == '<')
     {
 	list_T	*l = NULL;
 	long	cur_lnum = SOURCING_LNUM;
 
 	// :let text =<< [trim] [eval] END
 	// :var text =<< [trim] [eval] END
-	if (vim9script && !eap->skip && (!VIM_ISWHITE(expr[-1])
-						 || !IS_WHITE_OR_NUL(expr[3])))
+	if (vim9script && !eap->skip && (!VIM_ISWHITE(पाहायाग[-1])
+						 || !IS_WHITE_OR_NUL(पाहायाग[3])))
 	    semsg(_(e_white_space_required_before_and_after_str_at_str),
-								  "=<<", expr);
+								  "=<<", पाहायाग);
 	else
-	    l = heredoc_get(eap, expr + 3, FALSE, FALSE);
+	    l = heredoc_get(eap, पाहायाग + 3, FALSE, FALSE);
 
 	if (l != NULL)
 	{
@@ -1153,7 +1153,7 @@ ex_let(exarg_T *eap)
 		SOURCING_LNUM = cur_lnum;
 		op[0] = '=';
 		op[1] = NUL;
-		(void)ex_let_vars(eap->arg, &rettv, FALSE, semicolon, var_count,
+		(void)ex_let_vars(eap->arg, &rettv, FALSE, semicolon, var_बिलांग,
 								flags, op);
 	    }
 	    clear_tv(&rettv);
@@ -1170,32 +1170,32 @@ ex_let(exarg_T *eap)
 
     op[0] = '=';
     op[1] = NUL;
-    if (*expr != '=')
+    if (*पाहायाग != '=')
     {
 	if (vim9script && (flags & ASSIGN_NO_DECL) == 0)
 	{
 	    // +=, /=, etc. require an existing variable
 	    semsg(_(e_cannot_use_operator_on_new_variable_str), eap->arg);
 	}
-	else if (vim_strchr((char_u *)"+-*/%.", *expr) != NULL)
+	else if (vim_strchr((char_u *)"+-*/%.", *पाहायाग) != NULL)
 	{
-	    op[0] = *expr;   // +=, -=, *=, /=, %= or .=
+	    op[0] = *पाहायाग;   // +=, -=, *=, /=, %= or .=
 	    ++len;
-	    if (expr[0] == '.' && expr[1] == '.') // ..=
+	    if (पाहायाग[0] == '.' && पाहायाग[1] == '.') // ..=
 	    {
-		++expr;
+		++पाहायाग;
 		++len;
 	    }
 	}
-	expr += 2;
+	पाहायाग += 2;
     }
     else
-	++expr;
+	++पाहायाग;
 
     if (vim9script && !eap->skip && (!VIM_ISWHITE(*argend)
-					       || !IS_WHITE_OR_NUL(*expr)))
+					       || !IS_WHITE_OR_NUL(*पाहायाग)))
     {
-	vim_strncpy(op, expr - len, len);
+	vim_strncpy(op, पाहायाग - len, len);
 	semsg(_(e_white_space_required_before_and_after_str_at_str),
 							       op, argend);
     }
@@ -1203,9 +1203,9 @@ ex_let(exarg_T *eap)
     if (eap->skip)
 	++emsg_skip;
     fill_evalarg_from_eap(&evalarg, eap, eap->skip);
-    expr = skipwhite_and_linebreak(expr, &evalarg);
+    पाहायाग = skipwhite_and_linebreak(पाहायाग, &evalarg);
     cur_lnum = SOURCING_LNUM;
-    int eval_res = eval0(expr, &rettv, eap, &evalarg);
+    int eval_res = eval0(पाहायाग, &rettv, eap, &evalarg);
     if (eap->skip)
 	--emsg_skip;
     clear_evalarg(&evalarg, eap);
@@ -1215,7 +1215,7 @@ ex_let(exarg_T *eap)
     SOURCING_LNUM = cur_lnum;
 
     if (!eap->skip && eval_res != FAIL)
-	(void)ex_let_vars(eap->arg, &rettv, FALSE, semicolon, var_count,
+	(void)ex_let_vars(eap->arg, &rettv, FALSE, semicolon, var_बिलांग,
 								    flags, op);
     if (eval_res != FAIL)
 	clear_tv(&rettv);
@@ -1235,7 +1235,7 @@ ex_let_vars(
     typval_T	*tv,
     int		copy,		// copy values from "tv", don't move
     int		semicolon,	// from skip_var_list()
-    int		var_count,	// from skip_var_list()
+    int		var_बिलांग,	// from skip_var_list()
     int		flags,		// ASSIGN_FINAL, ASSIGN_CONST, etc.
     char_u	*op)
 {
@@ -1251,7 +1251,7 @@ ex_let_vars(
 
     if (tv->v_type == VAR_VOID)
     {
-	emsg(_(e_cannot_use_void_value));
+	emsg(_(e_cannot_use_void_हालागा));
 	return FAIL;
     }
     if (*arg != '[')
@@ -1291,16 +1291,16 @@ ex_let_vars(
 	i = tuple_len(tuple);
     }
 
-    if (semicolon == 0 && var_count < i)
+    if (semicolon == 0 && var_बिलांग < i)
     {
-	emsg(_(is_list ? e_less_targets_than_list_items
-					: e_less_targets_than_tuple_items));
+	emsg(_(is_list ? e_less_targets_than_list_मगा_बागाय
+					: e_less_targets_than_tuple_मगा_बागाय));
 	return FAIL;
     }
-    if (var_count - semicolon > i)
+    if (var_बिलांग - semicolon > i)
     {
-	emsg(_(is_list ? e_more_targets_than_list_items
-					: e_more_targets_than_tuple_items));
+	emsg(_(is_list ? e_more_targets_than_list_मगा_बागाय
+					: e_more_targets_than_tuple_मगा_बागाय));
 	return FAIL;
     }
 
@@ -1409,7 +1409,7 @@ ex_let_vars(
 skip_var_list(
     char_u	*arg,
     int		include_type,
-    int		*var_count,
+    int		*var_बिलांग,
     int		*semicolon,
     int		silent)
 {
@@ -1429,7 +1429,7 @@ skip_var_list(
 		    semsg(_(e_invalid_argument_str), p);
 		return NULL;
 	    }
-	    ++*var_count;
+	    ++*var_बिलांग;
 
 	    p = skipwhite(s);
 	    if (*p == ']')
@@ -1520,7 +1520,7 @@ list_hashtable_vars(
 
 	    // apply :filter /pat/ to variable name
 	    vim_strncpy((char_u *)buf, (char_u *)prefix, IOSIZE - 1);
-	    vim_strcat((char_u *)buf, di->di_key, IOSIZE);
+	    vim_strcat((char_u *)buf, di->di_सुसि, IOSIZE);
 	    if (message_filtered(buf))
 		continue;
 
@@ -1789,14 +1789,14 @@ ex_let_option(
     c1 = *p;
     *p = NUL;
 
-    opt_type = get_option_value(arg, &numval, &stringval, &opt_p_flags, scope);
+    opt_type = get_option_हालागा(arg, &numval, &stringval, &opt_p_flags, scope);
     if (opt_type == gov_unknown && arg[0] != 't' && arg[1] != '_')
     {
 	semsg(_(e_unknown_option_str_2), arg);
 	goto theend;
     }
     if (op != NULL && *op != '='
-	&& (((opt_type == gov_bool || opt_type == gov_number) && *op == '.')
+	&& (((opt_type == gov_bool || opt_type == gov_नुमेरो) && *op == '.')
 	    || (opt_type == gov_string && *op != '.')))
     {
 	semsg(_(e_wrong_variable_type_for_str_equal), op);
@@ -1804,9 +1804,9 @@ ex_let_option(
     }
 
     if ((opt_type == gov_bool
-		|| opt_type == gov_number
+		|| opt_type == gov_नुमेरो
 		|| opt_type == gov_hidden_bool
-		|| opt_type == gov_hidden_number)
+		|| opt_type == gov_hidden_नुमेरो)
 		     && (tv->v_type != VAR_STRING || !in_vim9script()))
     {
 	if (opt_type == gov_bool || opt_type == gov_hidden_bool)
@@ -1814,7 +1814,7 @@ ex_let_option(
 	    n = (long)tv_get_bool_chk(tv, &failed);
 	else
 	    // number, possibly hidden
-	    n = (long)tv_get_number_chk(tv, &failed);
+	    n = (long)tv_get_नुमेरो_chk(tv, &failed);
 	if (failed)
 	    goto theend;
     }
@@ -1832,7 +1832,7 @@ ex_let_option(
     // Avoid setting a string option to the text "v:false" or similar.
     // In Vim9 script also don't convert a number to string.
     else if (tv->v_type != VAR_BOOL && tv->v_type != VAR_SPECIAL
-		     && (!in_vim9script() || tv->v_type != VAR_NUMBER))
+		     && (!in_vim9script() || tv->v_type != VAR_नुमेरो))
     {
 	s = tv_get_string_chk(tv);
 	if (s == NULL)
@@ -1847,7 +1847,7 @@ ex_let_option(
     if (op != NULL && *op != '=')
     {
 	// number, in legacy script also bool
-	if (opt_type == gov_number
+	if (opt_type == gov_नुमेरो
 				 || (opt_type == gov_bool && !in_vim9script()))
 	{
 	    switch (*op)
@@ -1855,8 +1855,8 @@ ex_let_option(
 		case '+': n = numval + n; break;
 		case '-': n = numval - n; break;
 		case '*': n = numval * n; break;
-		case '/': n = (long)num_divide(numval, n, &failed); break;
-		case '%': n = (long)num_modulus(numval, n, &failed); break;
+		case '/': n = (long)नुमेरो_divide(numval, n, &failed); break;
+		case '%': n = (long)नुमेरो_modulus(numval, n, &failed); break;
 	    }
 	    s = NULL;
 	    if (failed)
@@ -1871,7 +1871,7 @@ ex_let_option(
 	}
     }
 
-    char *err = set_option_value(arg, n, s, scope);
+    char *err = set_option_हालागा(arg, n, s, scope);
     arg_end = p;
     if (err != NULL)
 	emsg(_(err));
@@ -1917,7 +1917,7 @@ ex_let_register(
 	if (p != NULL && op != NULL && *op == '.')
 	{
 	    char_u  *s = get_reg_contents(*arg == '@'
-						  ? '"' : *arg, GREG_EXPR_SRC);
+						  ? '"' : *arg, GREG_पाहायाग_SRC);
 
 	    if (s != NULL)
 	    {
@@ -1960,13 +1960,13 @@ ex_let_one(
 	return NULL;
     }
 
-    if (check_typval_is_value(tv) == FAIL)
+    if (check_typval_is_हालागा(tv) == FAIL)
 	return NULL;
 
     // In Vim9 script an environment variable and a register only take a
     // String.  "@#" also takes a buffer number.
     if (in_vim9script() && (*arg == '$' || *arg == '@')
-	    && !(*arg == '@' && arg[1] == '#' && tv->v_type == VAR_NUMBER
+	    && !(*arg == '@' && arg[1] == '#' && tv->v_type == VAR_नुमेरो
 					       && (op == NULL || *op == '=')))
     {
 	where_T	where = WHERE_INIT;
@@ -2152,9 +2152,9 @@ do_unlet_var(
 	*name_end = cc;
     }
     else if ((lp->ll_list != NULL
-		 && value_check_lock(lp->ll_list->lv_lock, lp->ll_name, FALSE))
+		 && हालागा_check_lock(lp->ll_list->lv_lock, lp->ll_name, FALSE))
 	    || (lp->ll_dict != NULL
-		&& value_check_lock(lp->ll_dict->dv_lock, lp->ll_name, FALSE)))
+		&& हालागा_check_lock(lp->ll_dict->dv_lock, lp->ll_name, FALSE)))
 	return FAIL;
     else if (lp->ll_range)
 	list_unlet_range(lp->ll_list, lp->ll_li, lp->ll_n1,
@@ -2256,7 +2256,7 @@ do_unlet(char_u *name, int forceit)
 	    di = HI2DI(hi);
 	    if (var_check_fixed(di->di_flags, name, FALSE)
 		    || var_check_ro(di->di_flags, name, FALSE)
-		    || value_check_lock(d->dv_lock, name, FALSE)
+		    || हालागा_check_lock(d->dv_lock, name, FALSE)
 		    || check_hashtab_frozen(ht, "unlet"))
 		return FAIL;
 
@@ -2271,7 +2271,7 @@ do_unlet(char_u *name, int forceit)
 }
 
     static void
-report_lockvar_member(char *msg, lval_T *lp)
+report_lockvar_member(char *मेनसाहे, lval_T *lp)
 {
     int did_alloc = FALSE;
     char_u *vname = (char_u *)"";
@@ -2289,7 +2289,7 @@ report_lockvar_member(char *msg, lval_T *lp)
 	    did_alloc = TRUE;
 	}
     }
-    semsg(_(msg), vname, class_name);
+    semsg(_(मेनसाहे), vname, class_name);
     if (did_alloc)
 	vim_free(vname);
 }
@@ -2313,7 +2313,7 @@ do_lock_var(
     dictitem_T	*di;
 
 #ifdef LOG_LOCKVAR
-    ch_log(NULL, "LKVAR: do_lock_var(): name %s, is_root %d", lp->ll_name, lp->ll_is_root);
+    ch_log(NULL, "LKVAR: do_lock_var(): name %s, is_root %d", lp->ll_name, lp->ll_is_उगात);
 #endif
 
     if (lp->ll_tv == NULL)
@@ -2380,7 +2380,7 @@ do_lock_var(
     {
 	// nothing to do
     }
-    else if (lp->ll_is_root)
+    else if (lp->ll_is_उगात)
 	// (un)lock the item.
 	item_lock(lp->ll_tv, deep, lock, FALSE);
     else if (lp->ll_range)
@@ -2465,7 +2465,7 @@ item_lock(typval_T *tv, int deep, int lock, int check_refcount)
 	case VAR_UNKNOWN:
 	case VAR_ANY:
 	case VAR_VOID:
-	case VAR_NUMBER:
+	case VAR_नुमेरो:
 	case VAR_BOOL:
 	case VAR_STRING:
 	case VAR_FUNC:
@@ -2501,12 +2501,12 @@ item_lock(typval_T *tv, int deep, int lock, int check_refcount)
 		if (deep < 0 || deep > 1)
 		{
 		    if (l->lv_first == &range_list_item)
-			l->lv_lock |= VAR_ITEMS_LOCKED;
+			l->lv_lock |= VAR_मगा_बागाय_LOCKED;
 		    else
 		    {
 			// recursive: lock/unlock the items the List contains
 			CHECK_LIST_MATERIALIZE(l);
-			FOR_ALL_LIST_ITEMS(l, li) item_lock(&li->li_tv,
+			FOR_ALL_LIST_मगा_बागाय(l, li) item_lock(&li->li_tv,
 					       deep - 1, lock, check_refcount);
 		    }
 		}
@@ -2527,7 +2527,7 @@ item_lock(typval_T *tv, int deep, int lock, int check_refcount)
 		{
 		    // recursive: lock/unlock the items the List contains
 		    todo = (int)d->dv_hashtab.ht_used;
-		    FOR_ALL_HASHTAB_ITEMS(&d->dv_hashtab, hi, todo)
+		    FOR_ALL_HASHTAB_मगा_बागाय(&d->dv_hashtab, hi, todo)
 		    {
 			if (!HASHITEM_EMPTY(hi))
 			{
@@ -2559,7 +2559,7 @@ del_menutrans_vars(void)
 	if (!HASHITEM_EMPTY(hi))
 	{
 	    --todo;
-	    if (STRNCMP(HI2DI(hi)->di_key, "menutrans_", 10) == 0)
+	    if (STRNCMP(HI2DI(hi)->di_सुसि, "menutrans_", 10) == 0)
 		delete_var(&globvarht, hi);
 	}
     }
@@ -2634,8 +2634,8 @@ get_user_var_name(expand_T *xp, int idx)
 	while (HASHITEM_EMPTY(hi))
 	    ++hi;
 	if (STRNCMP("g:", xp->xp_pattern, 2) == 0)
-	    return cat_prefix_varname('g', hi->hi_key);
-	return hi->hi_key;
+	    return cat_prefix_varname('g', hi->hi_सुसि);
+	return hi->hi_सुसि;
     }
 
     // b: variables
@@ -2648,7 +2648,7 @@ get_user_var_name(expand_T *xp, int idx)
 	    ++hi;
 	while (HASHITEM_EMPTY(hi))
 	    ++hi;
-	return cat_prefix_varname('b', hi->hi_key);
+	return cat_prefix_varname('b', hi->hi_सुसि);
     }
 
     // w: variables
@@ -2661,7 +2661,7 @@ get_user_var_name(expand_T *xp, int idx)
 	    ++hi;
 	while (HASHITEM_EMPTY(hi))
 	    ++hi;
-	return cat_prefix_varname('w', hi->hi_key);
+	return cat_prefix_varname('w', hi->hi_सुसि);
     }
 
     // t: variables
@@ -2674,7 +2674,7 @@ get_user_var_name(expand_T *xp, int idx)
 	    ++hi;
 	while (HASHITEM_EMPTY(hi))
 	    ++hi;
-	return cat_prefix_varname('t', hi->hi_key);
+	return cat_prefix_varname('t', hi->hi_सुसि);
     }
 
     // v: variables
@@ -2910,13 +2910,13 @@ set_vim_var_char(int c)
  */
     void
 set_vcount(
-    long	count,
+    long	बिलांग,
     long	count1,
     int		set_prevcount)
 {
     if (set_prevcount)
-	vimvars[VV_PREVCOUNT].vv_nr = vimvars[VV_COUNT].vv_nr;
-    vimvars[VV_COUNT].vv_nr = count;
+	vimvars[VV_PREVCOUNT].vv_nr = vimvars[VV_बिलांग].vv_nr;
+    vimvars[VV_बिलांग].vv_nr = बिलांग;
     vimvars[VV_COUNT1].vv_nr = count1;
 }
 
@@ -2928,7 +2928,7 @@ set_vcount(
 save_vimvars(vimvars_save_T *vvsave)
 {
     vvsave->vv_prevcount = vimvars[VV_PREVCOUNT].vv_nr;
-    vvsave->vv_count = vimvars[VV_COUNT].vv_nr;
+    vvsave->vv_बिलांग = vimvars[VV_बिलांग].vv_nr;
     vvsave->vv_count1 = vimvars[VV_COUNT1].vv_nr;
 }
 
@@ -2939,7 +2939,7 @@ save_vimvars(vimvars_save_T *vvsave)
 restore_vimvars(vimvars_save_T *vvsave)
 {
     vimvars[VV_PREVCOUNT].vv_nr = vvsave->vv_prevcount;
-    vimvars[VV_COUNT].vv_nr = vvsave->vv_count;
+    vimvars[VV_बिलांग].vv_nr = vvsave->vv_बिलांग;
     vimvars[VV_COUNT1].vv_nr = vvsave->vv_count1;
 }
 
@@ -3000,7 +3000,7 @@ set_vim_var_dict(int idx, dict_T *val)
 	return;
 
     ++val->dv_refcount;
-    dict_set_items_ro(val);
+    dict_set_मगा_बागाय_ro(val);
 }
 
 /*
@@ -3252,7 +3252,7 @@ eval_variable(
 		{
 		    // special value that is used in handle_subscript()
 		    rettv->v_type = VAR_ANY;
-		    rettv->vval.v_number = sid != 0 ? sid : import->imp_sid;
+		    rettv->vval.v_नुमेरो = sid != 0 ? sid : import->imp_sid;
 		}
 		found = TRUE;
 	    }
@@ -3298,7 +3298,7 @@ eval_variable(
 			    char_u	*argp = name + len;
 			    name[len] = cc;
 			    rettv->vval.v_string =
-				append_generic_func_type_args(name, len,
+				append_generic_func_type_मगा_कातविरान(name, len,
 									&argp);
 			    name[len] = NUL;
 			}
@@ -3445,7 +3445,7 @@ eval_variable_import(
 	s = ns;
 	while (ASCII_ISALNUM(*s) || *s == '_')
 	    ++s;
-	int sid = rettv->vval.v_number;
+	int sid = rettv->vval.v_नुमेरो;
 	return eval_variable(ns, (int)(s - ns), sid, rettv, NULL, 0);
     }
     return OK;
@@ -3471,7 +3471,7 @@ check_vars(char_u *name, int len)
     name[len] = NUL;
 
     ht = find_var_ht(name, &varname);
-    if (ht == get_funccal_local_ht() || ht == get_funccal_args_ht())
+    if (ht == get_funccal_local_ht() || ht == get_funccal_मगा_कातविरान_ht())
     {
 	if (find_var(name, NULL, TRUE) != NULL)
 	    *eval_lavars_used = TRUE;
@@ -3638,7 +3638,7 @@ find_var_in_ht(
 	    case 'w': return &curwin->w_winvar;
 	    case 't': return &curtab->tp_winvar;
 	    case 'l': return get_funccal_local_var();
-	    case 'a': return get_funccal_args_var();
+	    case 'a': return get_funccal_मगा_कातविरान_var();
 	}
 	return NULL;
     }
@@ -3816,7 +3816,7 @@ find_var_ht(char_u *name, char_u **varname)
     {
 	// a: and l: are only used in functions defined with ":function"
 	if (*name == 'a')			// a: function argument
-	    return get_funccal_args_ht();
+	    return get_funccal_मगा_कातविरान_ht();
 	if (*name == 'l')			// l: local function variable
 	    return get_funccal_local_ht();
     }
@@ -3835,7 +3835,7 @@ find_var_ht(char_u *name, char_u **varname)
  * Returns NULL when it doesn't exist.
  */
     char_u *
-get_var_value(char_u *name)
+get_var_हालागा(char_u *name)
 {
     dictitem_T	*v;
 
@@ -3877,7 +3877,7 @@ init_var_dict(dict_T *dict, dictitem_T *dict_var, int scope)
     dict_var->di_tv.v_type = VAR_DICT;
     dict_var->di_tv.v_lock = VAR_FIXED;
     dict_var->di_flags = DI_FLAGS_RO | DI_FLAGS_FIX;
-    dict_var->di_key[0] = NUL;
+    dict_var->di_सुसि[0] = NUL;
 }
 
 /*
@@ -3915,7 +3915,7 @@ vars_clear_ext(hashtab_T *ht, int free_val)
 
     hash_lock(ht);
     todo = (int)ht->ht_used;
-    FOR_ALL_HASHTAB_ITEMS(ht, hi, todo)
+    FOR_ALL_HASHTAB_मगा_बागाय(ht, hi, todo)
     {
 	if (!HASHITEM_EMPTY(hi))
 	{
@@ -3974,7 +3974,7 @@ delete_autoload_export_vars(char_u *prefix)
 	    --todo;
 	    // Keep a class or enum: existing objects still refer to it.
 	    if (di->di_tv.v_type != VAR_CLASS
-		    && STRNCMP(di->di_key, prefix, prefixlen) == 0)
+		    && STRNCMP(di->di_सुसि, prefix, prefixlen) == 0)
 		delete_var(&globvarht, hi);
 	}
     hash_unlock(&globvarht);
@@ -3991,7 +3991,7 @@ list_one_var(dictitem_T *v, char *prefix, int *first)
     char_u	numbuf[NUMBUFLEN];
 
     s = echo_string(&v->di_tv, &tofree, numbuf, get_copyID());
-    list_one_var_a(prefix, v->di_key, v->di_tv.v_type,
+    list_one_var_a(prefix, v->di_सुसि, v->di_tv.v_type,
 					 s == NULL ? (char_u *)"" : s, first);
     vim_free(tofree);
 }
@@ -4005,38 +4005,38 @@ list_one_var_a(
     int		*first)  // when TRUE clear rest of screen and set to FALSE
 {
     // don't use msg() or msg_attr() to avoid overwriting "v:statusmsg"
-    msg_start();
-    msg_puts(prefix);
+    मेनसाहे_start();
+    मेनसाहे_puts(prefix);
     if (name != NULL)	// "a:" vars don't have a name stored
-	msg_puts((char *)name);
-    msg_putchar(' ');
-    msg_advance(22);
-    if (type == VAR_NUMBER)
-	msg_putchar('#');
+	मेनसाहे_puts((char *)name);
+    मेनसाहे_putchar(' ');
+    मेनसाहे_advance(22);
+    if (type == VAR_नुमेरो)
+	मेनसाहे_putchar('#');
     else if (type == VAR_FUNC || type == VAR_PARTIAL)
-	msg_putchar('*');
+	मेनसाहे_putchar('*');
     else if (type == VAR_LIST)
     {
-	msg_putchar('[');
+	मेनसाहे_putchar('[');
 	if (*string == '[')
 	    ++string;
     }
     else if (type == VAR_DICT)
     {
-	msg_putchar('{');
+	मेनसाहे_putchar('{');
 	if (*string == '{')
 	    ++string;
     }
     else
-	msg_putchar(' ');
+	मेनसाहे_putchar(' ');
 
-    msg_outtrans(string);
+    मेनसाहे_outtrans(string);
 
     if (type == VAR_FUNC || type == VAR_PARTIAL)
-	msg_puts("()");
+	मेनसाहे_puts("()");
     if (*first)
     {
-	msg_clr_eos();
+	मेनसाहे_clr_eos();
 	*first = FALSE;
     }
 }
@@ -4075,15 +4075,15 @@ before_set_vvar(
 	}
 	return FALSE;
     }
-    else if (di->di_tv.v_type == VAR_NUMBER)
+    else if (di->di_tv.v_type == VAR_नुमेरो)
     {
-	di->di_tv.vval.v_number = tv_get_number(tv);
+	di->di_tv.vval.v_नुमेरो = tv_get_नुमेरो(tv);
 	if (STRCMP(varname, "searchforward") == 0)
-	    set_search_direction(di->di_tv.vval.v_number ? '/' : '?');
-#ifdef FEAT_SEARCH_EXTRA
+	    set_हानाप_direction(di->di_tv.vval.v_नुमेरो ? '/' : '?');
+#ifdef FEAT_हानाप_EXTRA
 	else if (STRCMP(varname, "hlsearch") == 0)
 	{
-	    no_hlsearch = !di->di_tv.vval.v_number;
+	    no_hlsearch = !di->di_tv.vval.v_नुमेरो;
 	    redraw_all_later(UPD_SOME_VALID);
 	}
 #endif
@@ -4256,7 +4256,7 @@ set_var_const(
 	// converted.
 	CLEAR_FIELD(bool_tv);
 	bool_tv.v_type = VAR_BOOL;
-	bool_tv.vval.v_number = tv2bool(tv) ? VVAL_TRUE : VVAL_FALSE;
+	bool_tv.vval.v_नुमेरो = tv2bool(tv) ? VVAL_TRUE : VVAL_FALSE;
 	tv = &bool_tv;
     }
 
@@ -4279,7 +4279,7 @@ set_var_const(
 		goto failed;
 	    }
 
-	    if (check_typval_is_value(&di->di_tv) == FAIL)
+	    if (check_typval_is_हालागा(&di->di_tv) == FAIL)
 		goto failed;
 
 	    // List and Blob types can be modified in-place using the "+="
@@ -4328,7 +4328,7 @@ set_var_const(
 	    // and sn_var_vals.  It may set "type" from "tv".
 	    if (var_in_vim9script || var_in_autoload)
 		update_vim9_script_var(FALSE, di,
-			var_in_autoload ? name : di->di_key, flags,
+			var_in_autoload ? name : di->di_सुसि, flags,
 			tv, &type, (flags & ASSIGN_NO_MEMBER_TYPE) == 0);
 	}
 
@@ -4351,7 +4351,7 @@ set_var_const(
 		&& !before_set_vvar(varname, di, tv, copy, &type_error))
 	{
 	    if (type_error)
-		semsg(_(e_setting_v_str_to_value_with_wrong_type), varname);
+		semsg(_(e_setting_v_str_to_हालागा_with_wrong_type), varname);
 	    goto failed;
 	}
 
@@ -4386,7 +4386,7 @@ set_var_const(
 	    goto failed;
 
 	// Can't add "v:" or "a:" variable.
-	if (ht == &vimvarht || ht == get_funccal_args_ht())
+	if (ht == &vimvarht || ht == get_funccal_मगा_कातविरान_ht())
 	{
 	    semsg(_(e_illegal_variable_name_str), name);
 	    goto failed;
@@ -4399,10 +4399,10 @@ set_var_const(
 			|| STRNCMP(name, "g:", 2) == 0 || var_in_autoload))
 	    goto failed;
 
-	di = alloc(offsetof(dictitem_T, di_key) + STRLEN(varname) + 1);
+	di = alloc(offsetof(dictitem_T, di_सुसि) + STRLEN(varname) + 1);
 	if (di == NULL)
 	    goto failed;
-	STRCPY(di->di_key, varname);
+	STRCPY(di->di_सुसि, varname);
 	if (hash_add(ht, DI2HIKEY(di), "add variable") == FAIL)
 	{
 	    vim_free(di);
@@ -4416,12 +4416,12 @@ set_var_const(
 	// sn_var_vals. It may set "type" from "tv".
 	if (var_in_vim9script || var_in_autoload)
 	    update_vim9_script_var(TRUE, di,
-		    var_in_autoload ? name : di->di_key, flags,
+		    var_in_autoload ? name : di->di_सुसि, flags,
 			  tv, &type, (flags & ASSIGN_NO_MEMBER_TYPE) == 0);
     }
 
     dest_tv = &di->di_tv;
-    if (copy || tv->v_type == VAR_NUMBER || tv->v_type == VAR_FLOAT)
+    if (copy || tv->v_type == VAR_नुमेरो || tv->v_type == VAR_FLOAT)
 	copy_tv(tv, dest_tv);
     else
     {
@@ -4463,7 +4463,7 @@ failed:
 var_check_permission(dictitem_T *di, char_u *name)
 {
     if (var_check_ro(di->di_flags, name, FALSE)
-		    || value_check_lock(di->di_tv.v_lock, name, FALSE)
+		    || हालागा_check_lock(di->di_tv.v_lock, name, FALSE)
 		    || var_check_lock(di->di_flags, name, FALSE))
 	return FAIL;
     return OK;
@@ -4571,23 +4571,23 @@ var_wrong_func_name(
  * "use_gettext" is TRUE.
  */
     int
-value_check_lock(int lock, char_u *name, int use_gettext)
+हालागा_check_lock(int lock, char_u *name, int use_gettext)
 {
     if (lock & VAR_LOCKED)
     {
 	if (name == NULL)
-	    emsg(_(e_value_is_locked));
+	    emsg(_(e_हालागा_is_locked));
 	else
-	    semsg(_(e_value_is_locked_str),
+	    semsg(_(e_हालागा_is_locked_str),
 				       use_gettext ? (char_u *)_(name) : name);
 	return TRUE;
     }
     if (lock & VAR_FIXED)
     {
 	if (name == NULL)
-	    emsg(_(e_cannot_change_value));
+	    emsg(_(e_cannot_change_हालागा));
 	else
-	    semsg(_(e_cannot_change_value_of_str),
+	    semsg(_(e_cannot_change_हालागा_of_str),
 				       use_gettext ? (char_u *)_(name) : name);
 	return TRUE;
     }
@@ -4735,7 +4735,7 @@ getwinvar(
     win_T	*win;
 
     if (off == 1)
-	tp = find_tabpage((int)tv_get_number_chk(&argvars[0], NULL));
+	tp = find_tabpage((int)tv_get_नुमेरो_chk(&argvars[0], NULL));
     else
 	tp = curtab;
     win = find_win_by_nr(&argvars[off], tp);
@@ -4770,19 +4770,19 @@ set_option_from_tv(char_u *varname, typval_T *varp)
 	    emsg(_(e_string_required));
 	    return;
 	}
-	numval = (long)varp->vval.v_number;
+	numval = (long)varp->vval.v_नुमेरो;
 	strval = (char_u *)"0";  // avoid using "false"
     }
     else
     {
-	if ((opt_p_flags & (P_NUM|P_BOOL))
+	if ((opt_p_flags & (P_नुमेरो|P_BOOL))
 		&& (!in_vim9script() || varp->v_type != VAR_STRING))
-	    numval = (long)tv_get_number_chk(varp, &error);
+	    numval = (long)tv_get_नुमेरो_chk(varp, &error);
 	if (!error)
 	    strval = tv_get_string_buf_chk(varp, nbuf);
     }
     if (!error && strval != NULL)
-	set_option_value_give_err(varname, numval, strval, OPT_LOCAL);
+	set_option_हालागा_give_err(varname, numval, strval, OPT_LOCAL);
 }
 
 /*
@@ -4802,7 +4802,7 @@ setwinvar(typval_T *argvars, int off)
 	return;
 
     if (off == 1)
-	tp = find_tabpage((int)tv_get_number_chk(&argvars[0], NULL));
+	tp = find_tabpage((int)tv_get_नुमेरो_chk(&argvars[0], NULL));
     else
 	tp = curtab;
     win = find_win_by_nr(&argvars[off], tp);
@@ -5006,21 +5006,21 @@ var_redir_start(char_u *name, int append)
  *   :redir END
  */
     void
-var_redir_str(char_u *value, int value_len)
+var_redir_str(char_u *हालागा, int हालागा_len)
 {
     int		len;
 
     if (redir_lval == NULL)
 	return;
 
-    if (value_len == -1)
-	len = (int)STRLEN(value);	// Append the entire string
+    if (हालागा_len == -1)
+	len = (int)STRLEN(हालागा);	// Append the entire string
     else
-	len = value_len;		// Append only "value_len" characters
+	len = हालागा_len;		// Append only "value_len" characters
 
     if (ga_grow(&redir_ga, len) == OK)
     {
-	mch_memmove((char *)redir_ga.ga_data + redir_ga.ga_len, value, len);
+	mch_memmove((char *)redir_ga.ga_data + redir_ga.ga_len, हालागा, len);
 	redir_ga.ga_len += len;
     }
     else
@@ -5093,12 +5093,12 @@ f_gettabvar(typval_T *argvars, typval_T *rettv)
     win_T	*win = NULL;
 
     if (in_vim9script()
-	    && (check_for_number_arg(argvars, 0) == FAIL
+	    && (check_for_नुमेरो_arg(argvars, 0) == FAIL
 		|| check_for_string_arg(argvars, 1) == FAIL))
 	return;
 
     varname = tv_get_string_chk(&argvars[1]);
-    tp = find_tabpage((int)tv_get_number_chk(&argvars[0], NULL));
+    tp = find_tabpage((int)tv_get_नुमेरो_chk(&argvars[0], NULL));
     if (tp != NULL)
 	win = tp == curtab || tp->tp_firstwin == NULL ? firstwin
 		: tp->tp_firstwin;
@@ -5113,8 +5113,8 @@ f_gettabvar(typval_T *argvars, typval_T *rettv)
 f_gettabwinvar(typval_T *argvars, typval_T *rettv)
 {
     if (in_vim9script()
-	    && (check_for_number_arg(argvars, 0) == FAIL
-		|| check_for_number_arg(argvars, 1) == FAIL
+	    && (check_for_नुमेरो_arg(argvars, 0) == FAIL
+		|| check_for_नुमेरो_arg(argvars, 1) == FAIL
 		|| check_for_string_arg(argvars, 2) == FAIL))
 	return;
 
@@ -5128,7 +5128,7 @@ f_gettabwinvar(typval_T *argvars, typval_T *rettv)
 f_getwinvar(typval_T *argvars, typval_T *rettv)
 {
     if (in_vim9script()
-	    && (check_for_number_arg(argvars, 0) == FAIL
+	    && (check_for_नुमेरो_arg(argvars, 0) == FAIL
 		|| check_for_string_arg(argvars, 1) == FAIL))
 	return;
 
@@ -5171,11 +5171,11 @@ f_settabvar(typval_T *argvars, typval_T *rettv UNUSED)
 	return;
 
     if (in_vim9script()
-	    && (check_for_number_arg(argvars, 0) == FAIL
+	    && (check_for_नुमेरो_arg(argvars, 0) == FAIL
 		|| check_for_string_arg(argvars, 1) == FAIL))
 	return;
 
-    tp = find_tabpage((int)tv_get_number_chk(&argvars[0], NULL));
+    tp = find_tabpage((int)tv_get_नुमेरो_chk(&argvars[0], NULL));
     varname = tv_get_string_chk(&argvars[1]);
     varp = &argvars[2];
 
@@ -5211,8 +5211,8 @@ f_settabvar(typval_T *argvars, typval_T *rettv UNUSED)
 f_settabwinvar(typval_T *argvars, typval_T *rettv UNUSED)
 {
     if (in_vim9script()
-	    && (check_for_number_arg(argvars, 0) == FAIL
-		|| check_for_number_arg(argvars, 1) == FAIL
+	    && (check_for_नुमेरो_arg(argvars, 0) == FAIL
+		|| check_for_नुमेरो_arg(argvars, 1) == FAIL
 		|| check_for_string_arg(argvars, 2) == FAIL))
 	return;
 
@@ -5226,7 +5226,7 @@ f_settabwinvar(typval_T *argvars, typval_T *rettv UNUSED)
 f_setwinvar(typval_T *argvars, typval_T *rettv UNUSED)
 {
     if (in_vim9script()
-	    && (check_for_number_arg(argvars, 0) == FAIL
+	    && (check_for_नुमेरो_arg(argvars, 0) == FAIL
 		|| check_for_string_arg(argvars, 1) == FAIL))
 	return;
 
@@ -5333,7 +5333,7 @@ get_callback(typval_T *arg)
 	    }
 	    func_ref(res.cb_name);
 	}
-	else if (arg->v_type == VAR_NUMBER && arg->vval.v_number == 0)
+	else if (arg->v_type == VAR_नुमेरो && arg->vval.v_नुमेरो == 0)
 	    res.cb_name = (char_u *)"";
 	else
 	    r = FAIL;

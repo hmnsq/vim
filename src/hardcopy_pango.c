@@ -18,7 +18,7 @@
 #include "vim.h"
 #include "version.h"
 
-#ifdef FEAT_PRINT_PANGO
+#ifdef FEAT_इलिम्बाग_PANGO
 
 #include "hardcopy.h"
 
@@ -27,13 +27,13 @@
 #include <pango/pango.h>
 #include <pango/pangocairo.h>
 
-#define PRINT_DPI 72.0
+#define इलिम्बाग_DPI 72.0
 
 #define PRT_DRAW_BOLD 1
 #define PRT_DRAW_ITALIC 2
 #define PRT_DRAW_UNDERLINE 4
 
-#define GET_Y(l) (pctx.top_margin + (l) * pctx.char_height)
+#define GET_Y(l) (pctx.इताअस_margin + (l) * pctx.char_height)
 #define GET_TEXT_Y(l) (GET_Y(l) + pctx.char_ascent)
 
 typedef enum
@@ -68,34 +68,34 @@ static struct
     double char_width;
     double char_ascent;
     double char_height;
-    double line_spacing;
+    double लिन्या_spacing;
     double ul_pos;
     double ul_thickness;
 
     double page_width;
     double page_height;
 
-    double left_margin;
-    double right_margin;
-    double top_margin;
+    double कालिवा_margin;
+    double कानान_margin;
+    double इताअस_margin;
     double bottom_margin;
 
-    double number_width;
+    double नुमेरो_width;
 
     // Current position to draw from
     double cur_x;
-    int cur_line;
+    int cur_लिन्या;
     long_u cur_fg;
     long_u cur_bg;
 
     char_u draw_flags;
 
-#ifdef USE_GTK4_PRINT_DIALOG
+#ifdef USE_GTK4_इलिम्बाग_DIALOG
     bool dialog;
 #endif
 } pctx;
 
-static const char *print_formats[] = {
+static const char *इलिम्बाग_formats[] = {
     [PRT_FORMAT_PS] = "postscript",
     [PRT_FORMAT_PDF] = "pdf",
 };
@@ -105,7 +105,7 @@ static const char *print_formats[] = {
  * (width or height).
  */
     static double
-to_device_units(int idx, double physsize, int def_number)
+to_device_units(int idx, double physsize, int def_नुमेरो)
 {
     float	ret;
     int		u;
@@ -115,18 +115,18 @@ to_device_units(int idx, double physsize, int def_number)
     if (u == PRT_UNIT_NONE)
     {
 	u = PRT_UNIT_PERC;
-	nr = def_number;
+	nr = def_नुमेरो;
     }
     else
-	nr = printer_opts[idx].number;
+	nr = printer_opts[idx].नुमेरो_2;
 
     switch (u)
     {
 	case PRT_UNIT_INCH:
-	    ret = (nr * PRINT_DPI);
+	    ret = (nr * इलिम्बाग_DPI);
 	    break;
 	case PRT_UNIT_MM:
-	    ret = (nr * PRINT_DPI) / 25.4;
+	    ret = (nr * इलिम्बाग_DPI) / 25.4;
 	    break;
 	case PRT_UNIT_POINT:
 	    ret = (double)nr;
@@ -147,16 +147,16 @@ to_device_units(int idx, double physsize, int def_number)
 get_page_margins(
 	double	width,
 	double	height,
-	double	*left,
-	double	*right,
-	double	*top,
+	double	*कालिवा,
+	double	*कानान,
+	double	*इताअस,
 	double	*bottom)
 {
-    *left = to_device_units(OPT_PRINT_LEFT, width, 10);
-    *right = width - to_device_units(OPT_PRINT_RIGHT, width, 5);
+    *कालिवा = to_device_units(OPT_इलिम्बाग_कालिवा, width, 10);
+    *कानान = width - to_device_units(OPT_इलिम्बाग_कानान, width, 5);
 
-    *top = to_device_units(OPT_PRINT_TOP, height, 5);
-    *bottom = height - to_device_units(OPT_PRINT_BOT, height, 5);
+    *इताअस = to_device_units(OPT_इलिम्बाग_इताअस, height, 5);
+    *bottom = height - to_device_units(OPT_इलिम्बाग_BOT, height, 5);
 }
 
 /*
@@ -165,15 +165,15 @@ get_page_margins(
     static int
 get_cpl(void)
 {
-    if (prt_use_number())
+    if (prt_use_नुमेरो())
     {
-	pctx.number_width = PRINT_NUMBER_WIDTH * pctx.char_width;
-	pctx.left_margin += pctx.number_width;
+	pctx.नुमेरो_width = इलिम्बाग_नुमेरो_WIDTH * pctx.char_width;
+	pctx.कालिवा_margin += pctx.नुमेरो_width;
     }
     else
-	pctx.number_width = 0.0;
+	pctx.नुमेरो_width = 0.0;
 
-    return (int)((pctx.right_margin - pctx.left_margin) / pctx.char_width);
+    return (int)((pctx.कानान_margin - pctx.कालिवा_margin) / pctx.char_width);
 }
 
 /*
@@ -185,10 +185,10 @@ get_lpp(void)
     int lpp;
 
     // Calculate lpp
-    lpp = (int)((pctx.bottom_margin - pctx.top_margin) / pctx.char_height);
+    lpp = (int)((pctx.bottom_margin - pctx.इताअस_margin) / pctx.char_height);
 
     // Adjust top margin if there is a header
-    pctx.top_margin += pctx.char_height * prt_header_height();
+    pctx.इताअस_margin += pctx.char_height * prt_header_height();
 
     return lpp - prt_header_height();
 }
@@ -219,7 +219,7 @@ get_font(char_u *name)
 }
 
     int
-mch_print_init(
+mch_इलिम्बाग_init(
 	prt_settings_T  *psettings,
 	char_u		*jobname,
 	int		forceit UNUSED)
@@ -229,12 +229,12 @@ mch_print_init(
     bool	portrait;
     int		media;
     char_u	*filename = NULL;
-#ifdef USE_GTK4_PRINT_DIALOG
+#ifdef USE_GTK4_इलिम्बाग_DIALOG
     bool	dialog = false;
 
     if (gui.in_use && !forceit && psettings->outfile == NULL)
     {
-	filename = gui_gtk4_print_dialog(psettings, jobname,
+	filename = gui_gtk4_इलिम्बाग_dialog(psettings, jobname,
 		&pctx.page_width, &pctx.page_height);
 
 	if (filename == NULL)
@@ -247,18 +247,18 @@ mch_print_init(
 
     // Let GTK handle stuff when using dialog. Not sure if our postscript DSC
     // comments can interfere with dialog settings, but don't add them...
-#ifdef USE_GTK4_PRINT_DIALOG
+#ifdef USE_GTK4_इलिम्बाग_DIALOG
     if (!dialog)
 #endif
     {
 	// Get paper type to use
-	portrait = (!printer_opts[OPT_PRINT_PORTRAIT].present ||
-		TOLOWER_ASC(printer_opts[OPT_PRINT_PORTRAIT].string[0]) == 'y');
+	portrait = (!printer_opts[OPT_इलिम्बाग_PORTRAIT].present ||
+		TOLOWER_ASC(printer_opts[OPT_इलिम्बाग_PORTRAIT].string[0]) == 'y');
 	pctx.portrait = portrait;
-	if (printer_opts[OPT_PRINT_PAPER].present)
+	if (printer_opts[OPT_इलिम्बाग_PAPER].present)
 	{
-	    paper_name = printer_opts[OPT_PRINT_PAPER].string;
-	    paper_strlen = printer_opts[OPT_PRINT_PAPER].strlen;
+	    paper_name = printer_opts[OPT_इलिम्बाग_PAPER].string;
+	    paper_strlen = printer_opts[OPT_इलिम्बाग_PAPER].strlen;
 	}
 	else
 	{
@@ -287,12 +287,12 @@ mch_print_init(
 	    pctx.page_height = prt_mediasize[media].width;
 	}
 
-	if (printer_opts[OPT_PRINT_FORMAT].present)
+	if (printer_opts[OPT_इलिम्बाग_FORMAT].present)
 	{
-	    for (int i = 0; i < (int)ARRAY_LENGTH(print_formats); i++)
-		if (STRNCMP(printer_opts[OPT_PRINT_FORMAT].string,
-			    print_formats[i],
-			    printer_opts[OPT_PRINT_FORMAT].strlen) == 0)
+	    for (int i = 0; i < (int)ARRAY_LENGTH(इलिम्बाग_formats); i++)
+		if (STRNCMP(printer_opts[OPT_इलिम्बाग_FORMAT].string,
+			    इलिम्बाग_formats[i],
+			    printer_opts[OPT_इलिम्बाग_FORMAT].strlen) == 0)
 		{
 		    pctx.format = i;
 		    break;
@@ -301,7 +301,7 @@ mch_print_init(
     }
     psettings->user_abort = FALSE;
 
-#ifdef USE_GTK4_PRINT_DIALOG
+#ifdef USE_GTK4_इलिम्बाग_DIALOG
     if (dialog)
 	// Always use PDF for dialog
 	pctx.format = PRT_FORMAT_PDF;
@@ -336,7 +336,7 @@ mch_print_init(
     if (cairo_surface_status(pctx.surface) != CAIRO_STATUS_SUCCESS)
     {
 	emsg(_(e_cant_open_postscript_output_file));
-	mch_print_cleanup();
+	mch_इलिम्बाग_cleanup();
 	return FAIL;
     }
 
@@ -346,7 +346,7 @@ mch_print_init(
 
     if (pctx.font == NULL)
     {
-	mch_print_cleanup();
+	mch_इलिम्बाग_cleanup();
 	return FAIL;
     }
 
@@ -377,7 +377,7 @@ mch_print_init(
 	pctx.char_ascent = (double)ascent / PANGO_SCALE;
 	pctx.char_height = (double)(ascent + descent) / PANGO_SCALE;
 
-	pctx.line_spacing = (double)
+	pctx.लिन्या_spacing = (double)
 	    (pango_font_metrics_get_height(metrics) - (ascent + descent))
 	    / PANGO_SCALE;
 
@@ -394,21 +394,21 @@ mch_print_init(
 
     // Calculate margins
     {
-	double  left;
-	double	right;
-	double	top;
+	double  कालिवा;
+	double	कानान;
+	double	इताअस;
 	double	bottom;
 
-	get_page_margins(pctx.page_width, pctx.page_height, &left, &right, &top,
+	get_page_margins(pctx.page_width, pctx.page_height, &कालिवा, &कानान, &इताअस,
 		&bottom);
-	pctx.left_margin = left;
-	pctx.right_margin = right;
-	pctx.top_margin = top;
+	pctx.कालिवा_margin = कालिवा;
+	pctx.कानान_margin = कानान;
+	pctx.इताअस_margin = इताअस;
 	pctx.bottom_margin = bottom;
     }
 
-    psettings->chars_per_line = get_cpl();
-    psettings->lines_per_page = get_lpp();
+    psettings->chars_per_लिन्या = get_cpl();
+    psettings->मगा_लिन्या_per_page = get_lpp();
 
     // Postscript handles collating pages, don't let Vim handle it. This means
     // we don't need to worry about the "jobsplit" value in 'printoptions'
@@ -417,30 +417,30 @@ mch_print_init(
 
     psettings->jobname = jobname;
 
-#ifdef USE_GTK4_PRINT_DIALOG
+#ifdef USE_GTK4_इलिम्बाग_DIALOG
     if (!dialog)
 #endif
     {
-	pctx.collate = (!printer_opts[OPT_PRINT_COLLATE].present ||
-		TOLOWER_ASC(printer_opts[OPT_PRINT_COLLATE].string[0]) == 'y');
+	pctx.collate = (!printer_opts[OPT_इलिम्बाग_COLLATE].present ||
+		TOLOWER_ASC(printer_opts[OPT_इलिम्बाग_COLLATE].string[0]) == 'y');
 
 	pctx.duplex = TRUE;
 	pctx.tumble = FALSE;
 	psettings->duplex = TRUE;
-	if (printer_opts[OPT_PRINT_DUPLEX].present)
+	if (printer_opts[OPT_इलिम्बाग_DUPLEX].present)
 	{
-	    if (STRNICMP(printer_opts[OPT_PRINT_DUPLEX].string, "off", 3) == 0)
+	    if (STRNICMP(printer_opts[OPT_इलिम्बाग_DUPLEX].string, "off", 3) == 0)
 	    {
 		pctx.duplex = FALSE;
 		psettings->duplex = 0;
 	    }
-	    else if (STRNICMP(printer_opts[OPT_PRINT_DUPLEX].string, "short",
+	    else if (STRNICMP(printer_opts[OPT_इलिम्बाग_DUPLEX].string, "short",
 			5) == 0)
 		pctx.tumble = TRUE;
 	}
     }
 
-#ifdef USE_GTK4_PRINT_DIALOG
+#ifdef USE_GTK4_इलिम्बाग_DIALOG
     pctx.dialog = dialog;
 #endif
 
@@ -482,15 +482,15 @@ exit:
 }
 
     int
-mch_print_begin(prt_settings_T *psettings)
+mch_इलिम्बाग_begin(prt_settings_T *psettings)
 {
     char user[256];
 
     pctx.cur_x = 0.0;
-    pctx.cur_line = 0;
+    pctx.cur_लिन्या = 0;
     pctx.draw_flags = 0;
 
-#ifdef USE_GTK4_PRINT_DIALOG
+#ifdef USE_GTK4_इलिम्बाग_DIALOG
     if (pctx.dialog)
 	return TRUE;
 #endif
@@ -551,32 +551,32 @@ mch_print_begin(prt_settings_T *psettings)
 }
 
     void
-mch_print_end(prt_settings_T *psettings)
+mch_इलिम्बाग_end(prt_settings_T *psettings)
 {
     // Make sure surface flushes to file or stream
     cairo_surface_finish(pctx.surface);
 
     if (psettings->outfile == NULL && !got_int && !psettings->user_abort
 	    && pctx.filename != NULL
-#ifdef USE_GTK4_PRINT_DIALOG
+#ifdef USE_GTK4_इलिम्बाग_DIALOG
 	    && !pctx.dialog
 #endif
        )
     {
-	msg(_("Sending to printer..."));
+	मेनसाहे(_("Sending to printer..."));
 
 	// Not printing to a file: use 'printexpr' to print the file.
 	if (eval_printexpr(pctx.filename, psettings->arguments) == FAIL)
-	    emsg(_(e_failed_to_print_postscript_file));
+	    emsg(_(e_failed_to_इलिम्बाग_postscript_file));
 	else
-	    msg(_("Print job sent."));
+	    मेनसाहे(_("Print job sent."));
     }
 
-    mch_print_cleanup();
+    mch_इलिम्बाग_cleanup();
 }
 
     int
-mch_print_end_page(void)
+mch_इलिम्बाग_end_page(void)
 {
     cairo_show_page(pctx.cr);
     return TRUE;
@@ -587,26 +587,26 @@ mch_print_end_page(void)
  * every page.
  */
     int
-mch_print_begin_page(char_u *str UNUSED)
+mch_इलिम्बाग_begin_page(char_u *str UNUSED)
 {
     return TRUE;
 }
 
     int
-mch_print_blank_page(void)
+mch_इलिम्बाग_blank_page(void)
 {
-    mch_print_end_page();
+    mch_इलिम्बाग_end_page();
     return TRUE;
 }
 
     void
-mch_print_start_line(int margin, int page_line)
+mch_इलिम्बाग_start_लिन्या(int margin, int page_लिन्या)
 {
-    pctx.cur_x = pctx.left_margin;
+    pctx.cur_x = pctx.कालिवा_margin;
     if (margin)
-	pctx.cur_x -= pctx.number_width;
+	pctx.cur_x -= pctx.नुमेरो_width;
 
-    pctx.cur_line = page_line;
+    pctx.cur_लिन्या = page_लिन्या;
 }
 
     static void
@@ -622,7 +622,7 @@ long_to_rgb(long_u c, double *r, double *g, double *b)
  * positioning and sizing ourselves.
  */
     int
-mch_print_text_out(char_u *textp, int len)
+mch_इलिम्बाग_text_out(char_u *textp, int len)
 {
     PangoAttrList	*attr_list;
     GList		*item_list;
@@ -643,24 +643,24 @@ mch_print_text_out(char_u *textp, int len)
 
     attr_list = pango_attr_list_new();
 
-#define INSERT_PANGO_ATTR(Attribute, AttrList, Start, End)  \
+#define इसिंगित_PANGO_ATTR(Attribute, AttrList, Start, End)  \
     G_STMT_START{					    \
 	PangoAttribute *tmp_attr_;			    \
 	tmp_attr_ = (Attribute);			    \
 	tmp_attr_->start_index = (Start);		    \
 	tmp_attr_->end_index = (End);			    \
-	pango_attr_list_insert((AttrList), tmp_attr_);	    \
+	pango_attr_list_इसिंगित((AttrList), tmp_attr_);	    \
     }G_STMT_END
 
     // Underline attribute does not work with pango_itemize().
     if ((pctx.draw_flags & PRT_DRAW_BOLD))
-	INSERT_PANGO_ATTR(pango_attr_weight_new(PANGO_WEIGHT_BOLD),
+	इसिंगित_PANGO_ATTR(pango_attr_weight_new(PANGO_WEIGHT_BOLD),
 		attr_list, 0, len);
     if (pctx.draw_flags & PRT_DRAW_ITALIC)
-	INSERT_PANGO_ATTR(pango_attr_style_new(PANGO_STYLE_ITALIC),
+	इसिंगित_PANGO_ATTR(pango_attr_style_new(PANGO_STYLE_ITALIC),
 		attr_list, 0, len);
 
-#undef INSERT_PANGO_ATTR
+#undef इसिंगित_PANGO_ATTR
 
     item_list = pango_itemize(pctx.text_context,
 	    (const char *)str, 0, len, attr_list, NULL);
@@ -693,14 +693,14 @@ mch_print_text_out(char_u *textp, int len)
 	    long_to_rgb(pctx.cur_bg, &r, &g, &b);
 	    cairo_set_source_rgb(pctx.cr, r, g, b);
 	    cairo_rectangle(pctx.cr, pctx.cur_x + width,
-		    GET_Y(pctx.cur_line) - pctx.line_spacing, o, pctx.char_height);
+		    GET_Y(pctx.cur_लिन्या) - pctx.लिन्या_spacing, o, pctx.char_height);
 	    cairo_fill(pctx.cr);
 	}
 
 	// Draw actual text
 	long_to_rgb(pctx.cur_fg, &r, &g, &b);
 	cairo_set_source_rgb(pctx.cr, r, g, b);
-	cairo_move_to(pctx.cr, pctx.cur_x + width, GET_TEXT_Y(pctx.cur_line));
+	cairo_move_to(pctx.cr, pctx.cur_x + width, GET_TEXT_Y(pctx.cur_लिन्या));
 	pango_cairo_show_glyph_string(pctx.cr, item->analysis.font, glyphs);
 
 	pango_item_free(item);
@@ -710,13 +710,13 @@ mch_print_text_out(char_u *textp, int len)
     // Draw underline if needed
     if (pctx.draw_flags & PRT_DRAW_UNDERLINE)
     {
-	double y = GET_TEXT_Y(pctx.cur_line) - pctx.ul_pos;
+	double y = GET_TEXT_Y(pctx.cur_लिन्या) - pctx.ul_pos;
 
 	long_to_rgb(pctx.cur_fg, &r, &g, &b);
 	cairo_set_source_rgb(pctx.cr, r, g, b);
-	cairo_set_line_width(pctx.cr, pctx.ul_thickness);
+	cairo_set_लिन्या_width(pctx.cr, pctx.ul_thickness);
 	cairo_move_to(pctx.cr, pctx.cur_x, y);
-	cairo_line_to(pctx.cr, pctx.cur_x + width, y);
+	cairo_लिन्या_to(pctx.cr, pctx.cur_x + width, y);
 	cairo_stroke(pctx.cr);
     }
 
@@ -730,12 +730,12 @@ mch_print_text_out(char_u *textp, int len)
 	vim_free(str);
 
     // Use epsilon when comparing floating point
-    return (next_x > pctx.right_margin) &&
-	((next_x - pctx.right_margin) > (pctx.right_margin * 1e-5));
+    return (next_x > pctx.कानान_margin) &&
+	((next_x - pctx.कानान_margin) > (pctx.कानान_margin * 1e-5));
 }
 
     void
-mch_print_set_font(int bold, int italic, int underline)
+mch_इलिम्बाग_set_font(int bold, int italic, int underline)
 {
     pctx.draw_flags = 0;
 
@@ -748,13 +748,13 @@ mch_print_set_font(int bold, int italic, int underline)
 }
 
     void
-mch_print_set_bg(long_u bgcol)
+mch_इलिम्बाग_set_bg(long_u bgcol)
 {
     pctx.cur_bg = bgcol;
 }
 
     void
-mch_print_set_fg(long_u fgcol)
+mch_इलिम्बाग_set_fg(long_u fgcol)
 {
     // Probably can just call cairo_set_source_rgba() here but defer it later to
     // be consistent with bg color.
@@ -762,17 +762,17 @@ mch_print_set_fg(long_u fgcol)
 }
 
     void
-mch_print_cleanup(void)
+mch_इलिम्बाग_cleanup(void)
 {
     g_clear_pointer(&pctx.cr, cairo_destroy);
     g_clear_pointer(&pctx.surface, cairo_surface_destroy);
     g_clear_object(&pctx.text_context);
     g_clear_pointer(&pctx.font, pango_font_description_free);
 
-#ifdef USE_GTK4_PRINT_DIALOG
+#ifdef USE_GTK4_इलिम्बाग_DIALOG
     // If using dialog, defer the temp file deletion later
     if (pctx.dialog)
-	gui_gtk4_print_finish();
+	gui_gtk4_इलिम्बाग_finish();
 #endif
 
     g_clear_pointer(&pctx.filename, vim_free);

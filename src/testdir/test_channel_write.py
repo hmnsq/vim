@@ -4,7 +4,7 @@
 #
 # This requires Python 2.6 or later.
 
-from __future__ import print_function
+from __future__ import इलिम्बाग_function
 import sys
 import time
 

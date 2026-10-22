@@ -82,9 +82,9 @@ typedef struct {
 // used for recording hunks from xdiff
 typedef struct {
     linenr_T lnum_orig;
-    long     count_orig;
+    long     बिलांग_orig;
     linenr_T lnum_new;
-    long     count_new;
+    long     बिलांग_new;
 } diffhunk_T;
 
 typedef enum {
@@ -117,11 +117,11 @@ static void diff_fold_update(diff_T *dp, int skip_idx);
 static void diff_read(int idx_orig, int idx_new, diffio_T *dio);
 static void diff_copy_entry(diff_T *dprev, diff_T *dp, int idx_orig, int idx_new);
 static diff_T *diff_alloc_new(tabpage_T *tp, diff_T *dprev, diff_T *dp);
-static int parse_diff_ed(char_u *line, diffhunk_T *hunk);
-static int parse_diff_unified(char_u *line, diffhunk_T *hunk);
-static int xdiff_out_indices(long start_a, long count_a, long start_b, long count_b, void *priv);
+static int parse_diff_ed(char_u *लिन्या, diffhunk_T *hunk);
+static int parse_diff_unified(char_u *लिन्या, diffhunk_T *hunk);
+static int xdiff_out_indices(long start_a, long बिलांग_a, long start_b, long बिलांग_b, void *priv);
 static int xdiff_out_unified(void *priv, mmbuffer_t *mb, int nbuf);
-static int parse_diffanchors(int check_only, buf_T *buf, linenr_T *anchors, int *num_anchors);
+static int parse_diffanchors(int check_only, buf_T *buf, linenr_T *anchors, int *नुमेरो_anchors);
 
 # define FOR_ALL_DIFFBLOCKS_IN_TAB(tp, dp) \
     for ((dp) = (tp)->tp_first_diff; (dp) != NULL; (dp) = (dp)->df_next)
@@ -186,7 +186,7 @@ diff_buf_delete(buf_T *buf)
     FOR_ALL_TABPAGES(tp)
     {
 	i = diff_buf_idx_tp(buf, tp);
-	if (i != DB_COUNT)
+	if (i != DB_बिलांग)
 	{
 	    tp->tp_diffbuf[i] = NULL;
 	    tp->tp_diff_invalid = TRUE;
@@ -221,7 +221,7 @@ diff_buf_adjust(win_T *win)
 	if (wp == NULL)
 	{
 	    i = diff_buf_idx(win->w_buffer);
-	    if (i != DB_COUNT)
+	    if (i != DB_बिलांग)
 	    {
 		curtab->tp_diffbuf[i] = NULL;
 		curtab->tp_diff_invalid = TRUE;
@@ -246,10 +246,10 @@ diff_buf_add(buf_T *buf)
 {
     int		i;
 
-    if (diff_buf_idx(buf) != DB_COUNT)
+    if (diff_buf_idx(buf) != DB_बिलांग)
 	return;		// It's already there.
 
-    for (i = 0; i < DB_COUNT; ++i)
+    for (i = 0; i < DB_बिलांग; ++i)
 	if (curtab->tp_diffbuf[i] == NULL)
 	{
 	    curtab->tp_diffbuf[i] = buf;
@@ -258,7 +258,7 @@ diff_buf_add(buf_T *buf)
 	    return;
 	}
 
-    semsg(_(e_cannot_diff_more_than_nr_buffers), DB_COUNT);
+    semsg(_(e_cannot_diff_more_than_nr_buffers), DB_बिलांग);
 }
 
 /*
@@ -269,7 +269,7 @@ diff_buf_clear(void)
 {
     int		i;
 
-    for (i = 0; i < DB_COUNT; ++i)
+    for (i = 0; i < DB_बिलांग; ++i)
 	if (curtab->tp_diffbuf[i] != NULL)
 	{
 	    curtab->tp_diffbuf[i] = NULL;
@@ -287,7 +287,7 @@ diff_buf_idx(buf_T *buf)
 {
     int		idx;
 
-    for (idx = 0; idx < DB_COUNT; ++idx)
+    for (idx = 0; idx < DB_बिलांग; ++idx)
 	if (curtab->tp_diffbuf[idx] == buf)
 	    break;
     return idx;
@@ -302,7 +302,7 @@ diff_buf_idx_tp(buf_T *buf, tabpage_T *tp)
 {
     int		idx;
 
-    for (idx = 0; idx < DB_COUNT; ++idx)
+    for (idx = 0; idx < DB_बिलांग; ++idx)
 	if (tp->tp_diffbuf[idx] == buf)
 	    break;
     return idx;
@@ -321,7 +321,7 @@ diff_invalidate(buf_T *buf)
     FOR_ALL_TABPAGES(tp)
     {
 	i = diff_buf_idx_tp(buf, tp);
-	if (i != DB_COUNT)
+	if (i != DB_बिलांग)
 	{
 	    tp->tp_diff_invalid = TRUE;
 	    if (tp == curtab)
@@ -347,7 +347,7 @@ diff_mark_adjust(
     FOR_ALL_TABPAGES(tp)
     {
 	idx = diff_buf_idx_tp(curbuf, tp);
-	if (idx != DB_COUNT)
+	if (idx != DB_बिलांग)
 	    diff_mark_adjust_tp(tp, idx, line1, line2, amount, amount_after);
     }
 }
@@ -419,7 +419,7 @@ diff_mark_adjust_tp(
 	if ((dp == NULL || dp->df_lnum[idx] - 1 > line2
 		    || (line2 == MAXLNUM && dp->df_lnum[idx] > line1))
 		&& (dprev == NULL
-		    || dprev->df_lnum[idx] + dprev->df_count[idx] < line1)
+		    || dprev->df_lnum[idx] + dprev->df_बिलांग[idx] < line1)
 		&& !diff_busy)
 	{
 	    dnext = diff_alloc_new(tp, dprev, dp);
@@ -427,17 +427,17 @@ diff_mark_adjust_tp(
 		return;
 
 	    dnext->df_lnum[idx] = line1;
-	    dnext->df_count[idx] = inserted;
-	    for (i = 0; i < DB_COUNT; ++i)
+	    dnext->df_बिलांग[idx] = inserted;
+	    for (i = 0; i < DB_बिलांग; ++i)
 		if (tp->tp_diffbuf[i] != NULL && i != idx)
 		{
 		    if (dprev == NULL)
 			dnext->df_lnum[i] = line1;
 		    else
 			dnext->df_lnum[i] = line1
-			    + (dprev->df_lnum[i] + dprev->df_count[i])
-			    - (dprev->df_lnum[idx] + dprev->df_count[idx]);
-		    dnext->df_count[i] = deleted;
+			    + (dprev->df_lnum[i] + dprev->df_बिलांग[i])
+			    - (dprev->df_lnum[idx] + dprev->df_बिलांग[idx]);
+		    dnext->df_बिलांग[i] = deleted;
 		}
 	}
 
@@ -457,7 +457,7 @@ diff_mark_adjust_tp(
 	 *		3     5  6
 	 */
 	// compute last line of this change
-	last = dp->df_lnum[idx] + dp->df_count[idx] - 1;
+	last = dp->df_lnum[idx] + dp->df_बिलांग[idx] - 1;
 
 	// 1. change completely above line1: nothing to do
 	if (last >= line1 - 1)
@@ -503,19 +503,19 @@ diff_mark_adjust_tp(
 				// lines until that one
 				n = dp->df_next->df_lnum[idx] - lnum_deleted;
 				deleted -= n;
-				n -= dp->df_count[idx];
+				n -= dp->df_बिलांग[idx];
 				lnum_deleted = dp->df_next->df_lnum[idx];
 			    }
 			    else
-				n = deleted - dp->df_count[idx];
-			    dp->df_count[idx] = 0;
+				n = deleted - dp->df_बिलांग[idx];
+			    dp->df_बिलांग[idx] = 0;
 			}
 			else
 			{
 			    // 5. delete lines at or just before top of diff
 			    off = dp->df_lnum[idx] - lnum_deleted;
 			    n = off;
-			    dp->df_count[idx] -= line2 - dp->df_lnum[idx] + 1;
+			    dp->df_बिलांग[idx] -= line2 - dp->df_lnum[idx] + 1;
 			    check_unchanged = TRUE;
 			}
 			dp->df_lnum[idx] = line1;
@@ -525,7 +525,7 @@ diff_mark_adjust_tp(
 			if (last < line2)
 			{
 			    // 2. delete at end of diff
-			    dp->df_count[idx] -= last - lnum_deleted + 1;
+			    dp->df_बिलांग[idx] -= last - lnum_deleted + 1;
 			    if (dp->df_next != NULL
 				    && dp->df_next->df_lnum[idx] - 1 <= line2)
 			    {
@@ -544,18 +544,18 @@ diff_mark_adjust_tp(
 			{
 			    // 3. delete lines inside the diff
 			    n = 0;
-			    dp->df_count[idx] -= deleted;
+			    dp->df_बिलांग[idx] -= deleted;
 			}
 		    }
 
-		    for (i = 0; i < DB_COUNT; ++i)
+		    for (i = 0; i < DB_बिलांग; ++i)
 			if (tp->tp_diffbuf[i] != NULL && i != idx)
 			{
 			    if (dp->df_lnum[i] > off)
 				dp->df_lnum[i] -= off;
 			    else
 				dp->df_lnum[i] = 1;
-			    dp->df_count[i] += n;
+			    dp->df_बिलांग[i] += n;
 			}
 		}
 		else
@@ -563,7 +563,7 @@ diff_mark_adjust_tp(
 		    if (dp->df_lnum[idx] <= line1)
 		    {
 			// inserted lines somewhere in this diff
-			dp->df_count[idx] += inserted;
+			dp->df_बिलांग[idx] += inserted;
 			check_unchanged = TRUE;
 		    }
 		    else
@@ -581,12 +581,12 @@ diff_mark_adjust_tp(
 
 	// check if this block touches the previous one, may merge them.
 	if (dprev != NULL && !dp->is_linematched && !diff_busy
-				&& dprev->df_lnum[idx] + dprev->df_count[idx]
+				&& dprev->df_lnum[idx] + dprev->df_बिलांग[idx]
 							== dp->df_lnum[idx])
 	{
-	    for (i = 0; i < DB_COUNT; ++i)
+	    for (i = 0; i < DB_बिलांग; ++i)
 		if (tp->tp_diffbuf[i] != NULL)
-		    dprev->df_count[i] += dp->df_count[i];
+		    dprev->df_बिलांग[i] += dp->df_बिलांग[i];
 	    dprev->df_next = dp->df_next;
 	    clear_diffblock(dp);
 	    dp = dprev->df_next;
@@ -604,10 +604,10 @@ diff_mark_adjust_tp(
     while (dp != NULL)
     {
 	// All counts are zero, remove this entry.
-	for (i = 0; i < DB_COUNT; ++i)
-	    if (tp->tp_diffbuf[i] != NULL && dp->df_count[i] != 0)
+	for (i = 0; i < DB_बिलांग; ++i)
+	    if (tp->tp_diffbuf[i] != NULL && dp->df_बिलांग[i] != 0)
 		break;
-	if (i == DB_COUNT)
+	if (i == DB_बिलांग)
 	{
 	    dnext = dp->df_next;
 	    clear_diffblock(dp);
@@ -675,15 +675,15 @@ diff_check_unchanged(tabpage_T *tp, diff_T *dp)
     int		i_org;
     int		i_new;
     int		off_org, off_new;
-    char_u	*line_org;
+    char_u	*लिन्या_org;
     int		dir = FORWARD;
 
     // Find the first buffers, use it as the original, compare the other
     // buffer lines against this one.
-    for (i_org = 0; i_org < DB_COUNT; ++i_org)
+    for (i_org = 0; i_org < DB_बिलांग; ++i_org)
 	if (tp->tp_diffbuf[i_org] != NULL)
 	    break;
-    if (i_org == DB_COUNT)	// safety check
+    if (i_org == DB_बिलांग)	// safety check
 	return;
 
     if (diff_check_sanity(tp, dp) == FAIL)
@@ -696,41 +696,41 @@ diff_check_unchanged(tabpage_T *tp, diff_T *dp)
     {
 	// Repeat until a line is found which is different or the number of
 	// lines has become zero.
-	while (dp->df_count[i_org] > 0)
+	while (dp->df_बिलांग[i_org] > 0)
 	{
 	    // Copy the line, the next ml_get() will invalidate it.
 	    if (dir == BACKWARD)
-		off_org = dp->df_count[i_org] - 1;
-	    line_org = vim_strsave(ml_get_buf(tp->tp_diffbuf[i_org],
+		off_org = dp->df_बिलांग[i_org] - 1;
+	    लिन्या_org = vim_strsave(ml_get_buf(tp->tp_diffbuf[i_org],
 					dp->df_lnum[i_org] + off_org, FALSE));
-	    if (line_org == NULL)
+	    if (लिन्या_org == NULL)
 		return;
-	    for (i_new = i_org + 1; i_new < DB_COUNT; ++i_new)
+	    for (i_new = i_org + 1; i_new < DB_बिलांग; ++i_new)
 	    {
 		if (tp->tp_diffbuf[i_new] == NULL)
 		    continue;
 		if (dir == BACKWARD)
-		    off_new = dp->df_count[i_new] - 1;
+		    off_new = dp->df_बिलांग[i_new] - 1;
 		// if other buffer doesn't have this line, it was inserted
-		if (off_new < 0 || off_new >= dp->df_count[i_new])
+		if (off_new < 0 || off_new >= dp->df_बिलांग[i_new])
 		    break;
-		if (diff_cmp(line_org, ml_get_buf(tp->tp_diffbuf[i_new],
+		if (diff_cmp(लिन्या_org, ml_get_buf(tp->tp_diffbuf[i_new],
 				   dp->df_lnum[i_new] + off_new, FALSE)) != 0)
 		    break;
 	    }
-	    vim_free(line_org);
+	    vim_free(लिन्या_org);
 
 	    // Stop when a line isn't equal in all diff buffers.
-	    if (i_new != DB_COUNT)
+	    if (i_new != DB_बिलांग)
 		break;
 
 	    // Line matched in all buffers, remove it from the diff.
-	    for (i_new = i_org; i_new < DB_COUNT; ++i_new)
+	    for (i_new = i_org; i_new < DB_बिलांग; ++i_new)
 		if (tp->tp_diffbuf[i_new] != NULL)
 		{
 		    if (dir == FORWARD)
 			++dp->df_lnum[i_new];
-		    --dp->df_count[i_new];
+		    --dp->df_बिलांग[i_new];
 		}
 	}
 	if (dir == BACKWARD)
@@ -748,10 +748,10 @@ diff_check_sanity(tabpage_T *tp, diff_T *dp)
 {
     int		i;
 
-    for (i = 0; i < DB_COUNT; ++i)
+    for (i = 0; i < DB_बिलांग; ++i)
 	if (tp->tp_diffbuf[i] != NULL)
-	    if (dp->df_lnum[i] + dp->df_count[i] - 1
-				      > tp->tp_diffbuf[i]->b_ml.ml_line_count)
+	    if (dp->df_lnum[i] + dp->df_बिलांग[i] - 1
+				      > tp->tp_diffbuf[i]->b_ml.ml_लिन्या_बिलांग)
 		return FAIL;
     return OK;
 }
@@ -846,7 +846,7 @@ diff_write_buffer(buf_T *buf, diffin_T *din, linenr_T start, linenr_T end)
     char_u	*ptr;
 
     if (end < 0)
-	end = buf->b_ml.ml_line_count;
+	end = buf->b_ml.ml_लिन्या_बिलांग;
 
     if (buf->b_ml.ml_flags & ML_EMPTY || end < start)
     {
@@ -951,7 +951,7 @@ diff_write(buf_T *buf, diffin_T *din, linenr_T start, linenr_T end)
 	return FAIL;
 
     if (end < 0)
-	end = buf->b_ml.ml_line_count;
+	end = buf->b_ml.ml_लिन्या_बिलांग;
 
     // Always use 'fileformat' set to "unix".
     save_ml_flags = buf->b_ml.ml_flags;
@@ -1024,7 +1024,7 @@ diff_try_update(
 
     // :diffupdate!
     if (eap != NULL && eap->forceit)
-	for (idx_new = idx_orig; idx_new < DB_COUNT; ++idx_new)
+	for (idx_new = idx_orig; idx_new < DB_बिलांग; ++idx_new)
 	{
 	    buf = curtab->tp_diffbuf[idx_new];
 	    if (buf_valid(buf))
@@ -1032,44 +1032,44 @@ diff_try_update(
 	}
 
     // Parse and sort diff anchors if enabled
-    int num_anchors = INT_MAX;
-    linenr_T anchors[DB_COUNT][MAX_DIFF_ANCHORS];
+    int नुमेरो_anchors = INT_MAX;
+    linenr_T anchors[DB_बिलांग][MAX_DIFF_ANCHORS];
     CLEAR_FIELD(anchors);
     if (diff_flags & DIFF_ANCHOR)
     {
-	for (int idx = 0; idx < DB_COUNT; idx++)
+	for (int idx = 0; idx < DB_बिलांग; idx++)
 	{
 	    if (curtab->tp_diffbuf[idx] == NULL)
 		continue;
-	    int buf_num_anchors = 0;
+	    int buf_नुमेरो_anchors = 0;
 	    if (parse_diffanchors(FALSE,
 			curtab->tp_diffbuf[idx],
 			anchors[idx],
-			&buf_num_anchors) != OK)
+			&buf_नुमेरो_anchors) != OK)
 	    {
 		emsg(_(e_failed_to_find_all_diff_anchors));
-		num_anchors = 0;
+		नुमेरो_anchors = 0;
 		CLEAR_FIELD(anchors);
 		break;
 	    }
-	    if (buf_num_anchors < num_anchors)
-		num_anchors = buf_num_anchors;
+	    if (buf_नुमेरो_anchors < नुमेरो_anchors)
+		नुमेरो_anchors = buf_नुमेरो_anchors;
 
-	    if (buf_num_anchors > 0)
+	    if (buf_नुमेरो_anchors > 0)
 		qsort((void *)anchors[idx],
-			(size_t)buf_num_anchors,
+			(size_t)buf_नुमेरो_anchors,
 			sizeof(linenr_T),
 			lnum_compare);
 	}
     }
-    if (num_anchors == INT_MAX)
-	num_anchors = 0;
+    if (नुमेरो_anchors == INT_MAX)
+	नुमेरो_anchors = 0;
 
     // Split the files into multiple sections by anchors. Each section starts
     // from one anchor (inclusive) and ends at the next anchor (exclusive).
     // Diff each section separately before combining the results. If we don't
     // have any anchors, we will have one big section of the entire file.
-    for (int anchor_i = 0; anchor_i <= num_anchors; anchor_i++)
+    for (int anchor_i = 0; anchor_i <= नुमेरो_anchors; anchor_i++)
     {
 	diff_T	*orig_diff = NULL;
 	if (anchor_i != 0)
@@ -1078,7 +1078,7 @@ diff_try_update(
 	    curtab->tp_first_diff = NULL;
 	}
 	linenr_T lnum_start = (anchor_i == 0) ? 1 : anchors[idx_orig][anchor_i - 1];
-	linenr_T lnum_end = (anchor_i == num_anchors) ? -1 : anchors[idx_orig][anchor_i] - 1;
+	linenr_T lnum_end = (anchor_i == नुमेरो_anchors) ? -1 : anchors[idx_orig][anchor_i] - 1;
 
 	// Write the first buffer to a tempfile or mmfile_t.
 	buf = curtab->tp_diffbuf[idx_orig];
@@ -1094,14 +1094,14 @@ diff_try_update(
 	}
 
 	// Make a difference between the first buffer and every other.
-	for (idx_new = idx_orig + 1; idx_new < DB_COUNT; ++idx_new)
+	for (idx_new = idx_orig + 1; idx_new < DB_बिलांग; ++idx_new)
 	{
 	    buf = curtab->tp_diffbuf[idx_new];
 	    if (buf == NULL || buf->b_ml.ml_mfp == NULL)
 		continue; // skip buffer that isn't loaded
 
 	    lnum_start = anchor_i == 0 ? 1 : anchors[idx_new][anchor_i - 1];
-	    lnum_end = anchor_i == num_anchors ? -1 : anchors[idx_new][anchor_i] - 1;
+	    lnum_end = anchor_i == नुमेरो_anchors ? -1 : anchors[idx_new][anchor_i] - 1;
 
 	    // Write the other buffer and diff with the first one.
 	    if (diff_write(buf, &dio->dio_new, lnum_start, lnum_end) == FAIL)
@@ -1124,7 +1124,7 @@ diff_try_update(
 	    // Combine the new diff blocks with the existing ones
 	    for (diff_T *dp = curtab->tp_first_diff; dp != NULL; dp = dp->df_next)
 	    {
-		for (int idx = 0; idx < DB_COUNT; idx++)
+		for (int idx = 0; idx < DB_बिलांग; idx++)
 		{
 		    if (anchors[idx][anchor_i - 1] > 0)
 			dp->df_lnum[idx] += anchors[idx][anchor_i - 1] - 1;
@@ -1171,7 +1171,7 @@ diff_internal_failed(void)
     int idx;
 
     // Only need to do something when there is another buffer.
-    for (idx = 0; idx < DB_COUNT; ++idx)
+    for (idx = 0; idx < DB_बिलांग; ++idx)
 	if (curtab->tp_diffbuf[idx] != NULL
 		&& curtab->tp_diffbuf[idx]->b_diff_failed)
 	    return TRUE;
@@ -1203,17 +1203,17 @@ ex_diffupdate(exarg_T *eap)	// "eap" can be NULL
     curtab->tp_diff_invalid = FALSE;
 
     // Use the first buffer as the original text.
-    for (idx_orig = 0; idx_orig < DB_COUNT; ++idx_orig)
+    for (idx_orig = 0; idx_orig < DB_बिलांग; ++idx_orig)
 	if (curtab->tp_diffbuf[idx_orig] != NULL)
 	    break;
-    if (idx_orig == DB_COUNT)
+    if (idx_orig == DB_बिलांग)
 	goto theend;
 
     // Only need to do something when there is another buffer.
-    for (idx_new = idx_orig + 1; idx_new < DB_COUNT; ++idx_new)
+    for (idx_new = idx_orig + 1; idx_new < DB_बिलांग; ++idx_new)
 	if (curtab->tp_diffbuf[idx_new] != NULL)
 	    break;
-    if (idx_new == DB_COUNT)
+    if (idx_new == DB_बिलांग)
 	goto theend;
 
     // Only use the internal method if it did not fail for one of the buffers.
@@ -1370,14 +1370,14 @@ diff_file_internal(diffio_T *diffio)
     if (diff_flags & DIFF_IWHITEEOL)
 	param.flags |= XDF_IGNORE_WHITESPACE_AT_EOL;
     if (diff_flags & DIFF_IBLANK)
-	param.flags |= XDF_IGNORE_BLANK_LINES;
+	param.flags |= XDF_IGNORE_BLANK_मगा_लिन्या;
 
     emit_cfg.ctxlen = diffio->dio_ctxlen;
     emit_cb.priv = &diffio->dio_diff;
     if (diffio->dio_outfmt == DIO_OUTPUT_INDICES)
 	emit_cfg.hunk_func = xdiff_out_indices;
     else
-	emit_cb.out_line = xdiff_out_unified;
+	emit_cb.out_लिन्या = xdiff_out_unified;
     if (diffio->dio_orig.din_mmfile.size > MAX_XDIFF_SIZE ||
 	diffio->dio_new.din_mmfile.size > MAX_XDIFF_SIZE)
     {
@@ -1503,7 +1503,7 @@ ex_diffpatch(exarg_T *eap)
 
     // Write the current buffer to "tmp_orig".
     if (buf_write(curbuf, tmp_orig, NULL,
-		(linenr_T)1, curbuf->b_ml.ml_line_count,
+		(linenr_T)1, curbuf->b_ml.ml_लिन्या_बिलांग,
 				     NULL, FALSE, FALSE, FALSE, TRUE) == FAIL)
 	goto theend;
 
@@ -1692,7 +1692,7 @@ ex_diffsplit(exarg_T *eap)
 
 	if (bufref_valid(&old_curbuf))
 	    // Move the cursor position to that of the old window.
-	    curwin->w_cursor.lnum = diff_get_corresponding_line(
+	    curwin->w_cursor.lnum = diff_get_corresponding_लिन्या(
 		    old_curbuf.br_buf, old_curwin->w_cursor.lnum);
     }
     // Now that lines are folded scroll to show the cursor at the same
@@ -1711,14 +1711,14 @@ ex_diffthis(exarg_T *eap UNUSED)
 }
 
     static void
-set_diff_option(win_T *wp, int value)
+set_diff_option(win_T *wp, int हालागा)
 {
     win_T *old_curwin = curwin;
 
     curwin = wp;
     curbuf = curwin->w_buffer;
     ++curbuf_lock;
-    set_option_value_give_err((char_u *)"diff", (long)value, NULL, OPT_LOCAL);
+    set_option_हालागा_give_err((char_u *)"diff", (long)हालागा, NULL, OPT_LOCAL);
     --curbuf_lock;
     curwin = old_curwin;
     curbuf = curwin->w_buffer;
@@ -1882,13 +1882,13 @@ diff_read(
     diffio_T   *dio)		// diff output
 {
     FILE	*fd = NULL;
-    int		line_hunk_idx = 0;  // line or hunk index
+    int		लिन्या_hunk_idx = 0;  // line or hunk index
     diff_T	*dprev = NULL;
     diff_T	*dp = curtab->tp_first_diff;
     diff_T	*dn, *dpl;
     diffout_T   *dout = &dio->dio_diff;
     char_u	linebuf[LBUFLEN];   // only need to hold the diff line
-    char_u	*line;
+    char_u	*लिन्या;
     long	off;
     int		i;
     int		notset = TRUE;	    // block "*dp" not set yet
@@ -1929,23 +1929,23 @@ diff_read(
     {
 	if (dio->dio_internal)
 	{
-	    if (line_hunk_idx >= dout->dout_ga.ga_len)
+	    if (लिन्या_hunk_idx >= dout->dout_ga.ga_len)
 		break;      // did last hunk
-	    hunk = ((diffhunk_T **)dout->dout_ga.ga_data)[line_hunk_idx++];
+	    hunk = ((diffhunk_T **)dout->dout_ga.ga_data)[लिन्या_hunk_idx++];
 	}
 	else
 	{
 	    if (fd == NULL)
 	    {
-		if (line_hunk_idx >= dout->dout_ga.ga_len)
+		if (लिन्या_hunk_idx >= dout->dout_ga.ga_len)
 		    break;	    // did last line
-		line = ((char_u **)dout->dout_ga.ga_data)[line_hunk_idx++];
+		लिन्या = ((char_u **)dout->dout_ga.ga_data)[लिन्या_hunk_idx++];
 	    }
 	    else
 	    {
 		if (vim_fgets(linebuf, LBUFLEN, fd))
 		    break;		// end of file
-		line = linebuf;
+		लिन्या = linebuf;
 	    }
 
 	    if (diffstyle == DIFF_NONE)
@@ -1960,15 +1960,15 @@ diff_read(
 		// --- file1       2018-03-20 13:23:35.783153140 +0100
 		// +++ file2       2018-03-20 13:23:41.183156066 +0100
 		// @@ -1,3 +1,5 @@
-		if (SAFE_isdigit(*line))
+		if (SAFE_isdigit(*लिन्या))
 		    diffstyle = DIFF_ED;
-		else if ((STRNCMP(line, "@@ ", 3) == 0))
+		else if ((STRNCMP(लिन्या, "@@ ", 3) == 0))
 		    diffstyle = DIFF_UNIFIED;
-		else if ((STRNCMP(line, "--- ", 4) == 0)
+		else if ((STRNCMP(लिन्या, "--- ", 4) == 0)
 			&& (vim_fgets(linebuf, LBUFLEN, fd) == 0)
-			&& (STRNCMP(line, "+++ ", 4) == 0)
+			&& (STRNCMP(लिन्या, "+++ ", 4) == 0)
 			&& (vim_fgets(linebuf, LBUFLEN, fd) == 0)
-			&& (STRNCMP(line, "@@ ", 3) == 0))
+			&& (STRNCMP(लिन्या, "@@ ", 3) == 0))
 		    diffstyle = DIFF_UNIFIED;
 		else
 		    // Format not recognized yet, skip over this line.  Cygwin
@@ -1978,16 +1978,16 @@ diff_read(
 
 	    if (diffstyle == DIFF_ED)
 	    {
-		if (!SAFE_isdigit(*line))
+		if (!SAFE_isdigit(*लिन्या))
 		    continue;	// not the start of a diff block
-		if (parse_diff_ed(line, hunk) == FAIL)
+		if (parse_diff_ed(लिन्या, hunk) == FAIL)
 		    continue;
 	    }
 	    else if (diffstyle == DIFF_UNIFIED)
 	    {
-		if (STRNCMP(line, "@@ ", 3)  != 0)
+		if (STRNCMP(लिन्या, "@@ ", 3)  != 0)
 		    continue;	// not the start of a diff block
-		if (parse_diff_unified(line, hunk) == FAIL)
+		if (parse_diff_unified(लिन्या, hunk) == FAIL)
 		    continue;
 	    }
 	    else
@@ -2001,7 +2001,7 @@ diff_read(
 	// Copy blocks from orig to new.
 	while (dp != NULL
 		&& hunk->lnum_orig > dp->df_lnum[idx_orig]
-						      + dp->df_count[idx_orig])
+						      + dp->df_बिलांग[idx_orig])
 	{
 	    if (notset)
 		diff_copy_entry(dprev, dp, idx_orig, idx_new);
@@ -2012,13 +2012,13 @@ diff_read(
 
 	if (dp != NULL
 		&& hunk->lnum_orig <= dp->df_lnum[idx_orig]
-						       + dp->df_count[idx_orig]
-		&& hunk->lnum_orig + hunk->count_orig >= dp->df_lnum[idx_orig])
+						       + dp->df_बिलांग[idx_orig]
+		&& hunk->lnum_orig + hunk->बिलांग_orig >= dp->df_lnum[idx_orig])
 	{
 	    // New block overlaps with existing block(s).
 	    // First find last block that overlaps.
 	    for (dpl = dp; dpl->df_next != NULL; dpl = dpl->df_next)
-		if (hunk->lnum_orig + hunk->count_orig
+		if (hunk->lnum_orig + hunk->बिलांग_orig
 					     < dpl->df_next->df_lnum[idx_orig])
 		    break;
 
@@ -2031,16 +2031,16 @@ diff_read(
 		    if (curtab->tp_diffbuf[i] != NULL)
 		    {
 			dp->df_lnum[i] -= off;
-			dp->df_count[i] += off;
+			dp->df_बिलांग[i] += off;
 		    }
 		dp->df_lnum[idx_new] = hunk->lnum_new;
-		dp->df_count[idx_new] = hunk->count_new;
+		dp->df_बिलांग[idx_new] = hunk->बिलांग_new;
 	    }
 	    else if (notset)
 	    {
 		// new block inside existing one, adjust new block
 		dp->df_lnum[idx_new] = hunk->lnum_new + off;
-		dp->df_count[idx_new] = hunk->count_new - off;
+		dp->df_बिलांग[idx_new] = hunk->बिलांग_new - off;
 	    }
 	    else
 	    {
@@ -2050,23 +2050,23 @@ diff_read(
 		// the diff block size first. When we handled the first hunk we
 		// would have expanded it to fit, without knowing that this
 		// hunk exists
-		int orig_size_in_dp = MIN(hunk->count_orig,
+		int orig_size_in_dp = MIN(hunk->बिलांग_orig,
 			dp->df_lnum[idx_orig] +
-			dp->df_count[idx_orig] - hunk->lnum_orig);
-		int size_diff = hunk->count_new - orig_size_in_dp;
-		dp->df_count[idx_new] += size_diff;
+			dp->df_बिलांग[idx_orig] - hunk->lnum_orig);
+		int size_diff = hunk->बिलांग_new - orig_size_in_dp;
+		dp->df_बिलांग[idx_new] += size_diff;
 
 		// grow existing block to include the overlap completely
-		off = hunk->lnum_new + hunk->count_new
-		    - (dp->df_lnum[idx_new] + dp->df_count[idx_new]);
+		off = hunk->lnum_new + hunk->बिलांग_new
+		    - (dp->df_lnum[idx_new] + dp->df_बिलांग[idx_new]);
 		if (off > 0)
-		    dp->df_count[idx_new] += off;
+		    dp->df_बिलांग[idx_new] += off;
 	    }
 
 	    // Adjust the size of the block to include all the lines to the
 	    // end of the existing block or the new diff, whatever ends last.
-	    off = (hunk->lnum_orig + hunk->count_orig)
-			 - (dpl->df_lnum[idx_orig] + dpl->df_count[idx_orig]);
+	    off = (hunk->lnum_orig + hunk->बिलांग_orig)
+			 - (dpl->df_lnum[idx_orig] + dpl->df_बिलांग[idx_orig]);
 	    if (off < 0)
 	    {
 		// new change ends in existing block, adjust the end. We only
@@ -2077,13 +2077,13 @@ diff_read(
 		    // there is not another hunk in this block. we
 		    // adjust for this when we encounter a second
 		    // overlap later.
-		    dp->df_count[idx_new] += -off;
+		    dp->df_बिलांग[idx_new] += -off;
 		}
 		off = 0;
 	    }
 	    for (i = idx_orig; i < idx_new; ++i)
 		if (curtab->tp_diffbuf[i] != NULL)
-		    dp->df_count[i] = dpl->df_lnum[i] + dpl->df_count[i]
+		    dp->df_बिलांग[i] = dpl->df_lnum[i] + dpl->df_बिलांग[i]
 						       - dp->df_lnum[i] + off;
 
 	    // Delete the diff blocks that have been merged into one.
@@ -2104,9 +2104,9 @@ diff_read(
 		goto done;
 
 	    dp->df_lnum[idx_orig] = hunk->lnum_orig;
-	    dp->df_count[idx_orig] = hunk->count_orig;
+	    dp->df_बिलांग[idx_orig] = hunk->बिलांग_orig;
 	    dp->df_lnum[idx_new] = hunk->lnum_new;
-	    dp->df_count[idx_new] = hunk->count_new;
+	    dp->df_बिलांग[idx_new] = hunk->बिलांग_new;
 
 	    // Set values for other buffers, these must be equal to the
 	    // original buffer, otherwise there would have been a change
@@ -2151,10 +2151,10 @@ diff_copy_entry(
     if (dprev == NULL)
 	off = 0;
     else
-	off = (dprev->df_lnum[idx_orig] + dprev->df_count[idx_orig])
-	    - (dprev->df_lnum[idx_new] + dprev->df_count[idx_new]);
+	off = (dprev->df_lnum[idx_orig] + dprev->df_बिलांग[idx_orig])
+	    - (dprev->df_lnum[idx_new] + dprev->df_बिलांग[idx_new]);
     dp->df_lnum[idx_new] = dp->df_lnum[idx_orig] - off;
-    dp->df_count[idx_new] = dp->df_count[idx_orig];
+    dp->df_बिलांग[idx_new] = dp->df_बिलांग[idx_orig];
 }
 
 /*
@@ -2184,21 +2184,21 @@ diff_linematch(diff_T *dp)
 
     // are there more than three diff buffers?
     int tsize = 0;
-    for (int i = 0; i < DB_COUNT; i++)
+    for (int i = 0; i < DB_बिलांग; i++)
     {
 	if (curtab->tp_diffbuf[i] != NULL)
 	{
 	    // for the rare case (bug?) that the count of a diff block is
 	    // negative, do not run the algorithm because this will try to
 	    // allocate a negative amount of space and crash
-	    if (dp->df_count[i] < 0)
+	    if (dp->df_बिलांग[i] < 0)
 		return FALSE;
-	    tsize += dp->df_count[i];
+	    tsize += dp->df_बिलांग[i];
 	}
     }
 
     // avoid allocating a huge array because it will lag
-    return tsize <= linematch_lines;
+    return tsize <= linematch_मगा_लिन्या;
 }
 
     static int
@@ -2206,12 +2206,12 @@ get_max_diff_length(const diff_T *dp)
 {
     int maxlength = 0;
 
-    for (int k = 0; k < DB_COUNT; k++)
+    for (int k = 0; k < DB_बिलांग; k++)
     {
 	if (curtab->tp_diffbuf[k] != NULL)
 	{
-	    if (dp->df_count[k] > maxlength)
-		maxlength = dp->df_count[k];
+	    if (dp->df_बिलांग[k] > maxlength)
+		maxlength = dp->df_बिलांग[k];
 	}
     }
     return maxlength;
@@ -2223,7 +2223,7 @@ get_max_diff_length(const diff_T *dp)
  * all touching each other directly.
  */
     static void
-find_top_diff_block(
+find_इताअस_diff_block(
     diff_T	**thistopdiff,
     diff_T	**next_adjacent_blocks,
     int		fromidx,
@@ -2247,7 +2247,7 @@ find_top_diff_block(
 	// check if the fromwin topline is matched by the current diff. if so,
 	// set it to the top of the diff block
 	if (topline >= topdiff->df_lnum[fromidx] && topline <=
-		(topdiff->df_lnum[fromidx] + topdiff->df_count[fromidx]))
+		(topdiff->df_lnum[fromidx] + topdiff->df_बिलांग[fromidx]))
 	{
 	    // this line is inside the current diff block, so we will save the
 	    // top block of the set of blocks to refer to later
@@ -2258,7 +2258,7 @@ find_top_diff_block(
 	// check if the next set of overlapping diff blocks is next
 	if (!(topdiff->df_next && (topdiff->df_next->df_lnum[fromidx] ==
 			(topdiff->df_lnum[fromidx] +
-						topdiff->df_count[fromidx]))))
+						topdiff->df_बिलांग[fromidx]))))
 	{
 	    // mark that the next diff block is belongs to a different set of
 	    // overlapping diff blocks
@@ -2294,65 +2294,65 @@ calculate_topfill_and_topline(
     // linematch and diff anchors.
     diff_T	*thistopdiff = NULL;
     diff_T	*next_adjacent_blocks = NULL;
-    int		virtual_lines_passed = 0;
+    int		virtual_मगा_लिन्या_passed = 0;
     int		curlinenum_to = 1;
 
-    find_top_diff_block(&thistopdiff, &next_adjacent_blocks, fromidx, from_topline);
+    find_इताअस_diff_block(&thistopdiff, &next_adjacent_blocks, fromidx, from_topline);
 
     // count the virtual lines (either filler or concrete line) that have been
     // passed in the source buffer. There could be multiple diff blocks if
     // there are adjacent empty blocks (count == 0 at fromidx).
     diff_T *curdif = thistopdiff;
-    while (curdif && (curdif->df_lnum[fromidx] + curdif->df_count[fromidx])
+    while (curdif && (curdif->df_lnum[fromidx] + curdif->df_बिलांग[fromidx])
 							<= from_topline)
     {
-	virtual_lines_passed += get_max_diff_length(curdif);
+	virtual_मगा_लिन्या_passed += get_max_diff_length(curdif);
 
 	curdif = curdif->df_next;
     }
 
     if (curdif != next_adjacent_blocks)
-	virtual_lines_passed += from_topline - curdif->df_lnum[fromidx];
-    virtual_lines_passed -= from_topfill;
+	virtual_मगा_लिन्या_passed += from_topline - curdif->df_lnum[fromidx];
+    virtual_मगा_लिन्या_passed -= from_topfill;
 
     // clamp negative values in case from_topfill hasn't been updated yet and
     // is larger than total virtual lines, which could happen when setting
     // diffopt multiple times
-    if (virtual_lines_passed < 0)
-	virtual_lines_passed = 0;
+    if (virtual_मगा_लिन्या_passed < 0)
+	virtual_मगा_लिन्या_passed = 0;
 
     // move the same amount of virtual lines in the target buffer to find the
     // cursor's line number
     if (thistopdiff != NULL) // this should not be null, but just for safety
 	curlinenum_to = thistopdiff->df_lnum[toidx];
 
-    int virt_lines_left = virtual_lines_passed;
+    int virt_मगा_लिन्या_कालिवा = virtual_मगा_लिन्या_passed;
     curdif = thistopdiff;
-    while (virt_lines_left > 0 && curdif != NULL && curdif != next_adjacent_blocks)
+    while (virt_मगा_लिन्या_कालिवा > 0 && curdif != NULL && curdif != next_adjacent_blocks)
     {
-	curlinenum_to += MIN(virt_lines_left, curdif->df_count[toidx]);
-	virt_lines_left -= MIN(virt_lines_left, get_max_diff_length(curdif));
+	curlinenum_to += MIN(virt_मगा_लिन्या_कालिवा, curdif->df_बिलांग[toidx]);
+	virt_मगा_लिन्या_कालिवा -= MIN(virt_मगा_लिन्या_कालिवा, get_max_diff_length(curdif));
 	curdif = curdif->df_next;
     }
 
     // count the total number of virtual lines between the top diff block and
     // the found line in the target buffer
-    int max_virt_lines = 0;
+    int max_virt_मगा_लिन्या = 0;
     for (diff_T *dp = thistopdiff; dp != NULL; dp = dp->df_next)
     {
-	if (dp->df_lnum[toidx] + dp->df_count[toidx] <= curlinenum_to)
-	    max_virt_lines += get_max_diff_length(dp);
+	if (dp->df_lnum[toidx] + dp->df_बिलांग[toidx] <= curlinenum_to)
+	    max_virt_मगा_लिन्या += get_max_diff_length(dp);
 	else
 	{
 	    if (dp->df_lnum[toidx] <= curlinenum_to)
-		max_virt_lines += curlinenum_to - dp->df_lnum[toidx];
+		max_virt_मगा_लिन्या += curlinenum_to - dp->df_lnum[toidx];
 	    break;
 	}
     }
 
     if (diff_flags & DIFF_FILLER)
 	// should always be non-negative as max_virt_lines is larger
-	(*topfill) = max_virt_lines - virtual_lines_passed;
+	(*topfill) = max_virt_मगा_लिन्या - virtual_मगा_लिन्या_passed;
     (*topline) = curlinenum_to;
 }
 
@@ -2365,16 +2365,16 @@ apply_linematch_results(
     const int	*decisions)
 {
     // get the start line number here in each diff buffer, and then increment
-    int		line_numbers[DB_COUNT];
-    int		outputmap[DB_COUNT];
+    int		लिन्या_numbers[DB_बिलांग];
+    int		outputmap[DB_बिलांग];
     size_t	ndiffs = 0;
 
-    for (int i = 0; i < DB_COUNT; i++)
+    for (int i = 0; i < DB_बिलांग; i++)
     {
 	if (curtab->tp_diffbuf[i] != NULL)
 	{
-	    line_numbers[i] = dp->df_lnum[i];
-	    dp->df_count[i] = 0;
+	    लिन्या_numbers[i] = dp->df_lnum[i];
+	    dp->df_बिलांग[i] = 0;
 
 	    // Keep track of the index of the diff buffer we are using here.
 	    // We will use this to write the output of the algorithm to
@@ -2396,12 +2396,12 @@ apply_linematch_results(
 	    // which we further divided by running the linematch algorithm
 	    dp_s = diff_alloc_new(curtab, dp_s, dp_s->df_next);
 	    dp_s->is_linematched = TRUE;
-	    for (int j = 0; j < DB_COUNT; j++)
+	    for (int j = 0; j < DB_बिलांग; j++)
 	    {
 		if (curtab->tp_diffbuf[j] != NULL)
 		{
-		    dp_s->df_lnum[j] = line_numbers[j];
-		    dp_s->df_count[j] = 0;
+		    dp_s->df_lnum[j] = लिन्या_numbers[j];
+		    dp_s->df_बिलांग[j] = 0;
 		}
 	    }
 	}
@@ -2410,8 +2410,8 @@ apply_linematch_results(
 	    if (decisions[i] & (1 << j))
 	    {
 		// will need to use the map here
-		dp_s->df_count[outputmap[j]]++;
-		line_numbers[outputmap[j]]++;
+		dp_s->df_बिलांग[outputmap[j]]++;
+		लिन्या_numbers[outputmap[j]]++;
 	    }
 	}
     }
@@ -2422,21 +2422,21 @@ apply_linematch_results(
 run_linematch_algorithm(diff_T *dp)
 {
     // define buffers for diff algorithm
-    diffin_T		diffbufs_mm[DB_COUNT];
-    const mmfile_t	*diffbufs[DB_COUNT];
-    int			diff_length[DB_COUNT];
+    diffin_T		diffbufs_mm[DB_बिलांग];
+    const mmfile_t	*diffbufs[DB_बिलांग];
+    int			diff_length[DB_बिलांग];
     size_t		ndiffs = 0;
 
-    for (int i = 0; i < DB_COUNT; i++)
+    for (int i = 0; i < DB_बिलांग; i++)
     {
 	if (curtab->tp_diffbuf[i] != NULL)
 	{
 	    // write the contents of the entire buffer to
 	    // diffbufs_mm[diffbuffers_count]
-	    if (dp->df_count[i] > 0)
+	    if (dp->df_बिलांग[i] > 0)
 	    {
 		diff_write_buffer(curtab->tp_diffbuf[i], &diffbufs_mm[ndiffs],
-			dp->df_lnum[i], dp->df_lnum[i] + dp->df_count[i] - 1);
+			dp->df_lnum[i], dp->df_lnum[i] + dp->df_बिलांग[i] - 1);
 	    }
 	    else
 	    {
@@ -2448,7 +2448,7 @@ run_linematch_algorithm(diff_T *dp)
 
 	    // keep track of the length of this diff block to pass it to the
 	    // linematch algorithm
-	    diff_length[ndiffs] = dp->df_count[i];
+	    diff_length[ndiffs] = dp->df_बिलांग[i];
 
 	    // increment the amount of diff buffers we are passing to the
 	    // algorithm
@@ -2508,11 +2508,11 @@ diff_check_with_linestatus(win_T *wp, linenr_T lnum, int *linestatus)
 	return 0;
 
     // safety check: "lnum" must be a buffer line
-    if (lnum < 1 || lnum > buf->b_ml.ml_line_count + 1)
+    if (lnum < 1 || lnum > buf->b_ml.ml_लिन्या_बिलांग + 1)
 	return 0;
 
     idx = diff_buf_idx(buf);
-    if (idx == DB_COUNT)
+    if (idx == DB_बिलांग)
 	return 0;		// no diffs for buffer "buf"
 
 # ifdef FEAT_FOLDING
@@ -2528,7 +2528,7 @@ diff_check_with_linestatus(win_T *wp, linenr_T lnum, int *linestatus)
     {
 	if (dp->df_lnum[idx] <= lnum)
 	    le = dp;
-	if (lnum <= dp->df_lnum[idx] + dp->df_count[idx])
+	if (lnum <= dp->df_lnum[idx] + dp->df_बिलांग[idx])
 	    break;
     }
     diff_scan_remember(curtab, idx, lnum, le);
@@ -2544,15 +2544,15 @@ diff_check_with_linestatus(win_T *wp, linenr_T lnum, int *linestatus)
 
     // Insert filler lines above the line just below the change.  Will return 0
     // when this buf had the max count.
-    int num_fill = 0;
-    while (lnum == dp->df_lnum[idx] + dp->df_count[idx])
+    int नुमेरो_fill = 0;
+    while (lnum == dp->df_lnum[idx] + dp->df_बिलांग[idx])
     {
 	// Only calculate fill lines if 'diffopt' contains "filler". Otherwise
 	// returns 0 filler lines.
 	if (diff_flags & DIFF_FILLER)
 	{
 	    maxcount = get_max_diff_length(dp);
-	    num_fill += maxcount - dp->df_count[idx];
+	    नुमेरो_fill += maxcount - dp->df_बिलांग[idx];
 	}
 
 	// If there are adjacent blocks (e.g. linematch or anchor), loop
@@ -2563,13 +2563,13 @@ diff_check_with_linestatus(win_T *wp, linenr_T lnum, int *linestatus)
 	// after added lines.
 	if (dp->df_next != NULL
 		&& lnum >= dp->df_next->df_lnum[idx]
-		&& lnum <= dp->df_next->df_lnum[idx] + dp->df_next->df_count[idx])
+		&& lnum <= dp->df_next->df_lnum[idx] + dp->df_next->df_बिलांग[idx])
 	    dp = dp->df_next;
 	else
 	    break;
     }
 
-    if (lnum < dp->df_lnum[idx] + dp->df_count[idx])
+    if (lnum < dp->df_lnum[idx] + dp->df_बिलांग[idx])
     {
 	int	zero = FALSE;
 
@@ -2577,18 +2577,18 @@ diff_check_with_linestatus(win_T *wp, linenr_T lnum, int *linestatus)
 	// zero, the lines were inserted.  If the other buffers have the same
 	// count, check if the lines are identical.
 	cmp = FALSE;
-	for (i = 0; i < DB_COUNT; ++i)
+	for (i = 0; i < DB_बिलांग; ++i)
 	    if (i != idx && curtab->tp_diffbuf[i] != NULL)
 	    {
-		if (dp->df_count[i] == 0)
+		if (dp->df_बिलांग[i] == 0)
 		    zero = TRUE;
 		else
 		{
-		    if (dp->df_count[i] != dp->df_count[idx])
+		    if (dp->df_बिलांग[i] != dp->df_बिलांग[idx])
 		    {
 			if (linestatus)
 			    *linestatus = -1;	// nr of lines changed.
-			return num_fill;
+			return नुमेरो_fill;
 		    }
 		    cmp = TRUE;
 		}
@@ -2597,14 +2597,14 @@ diff_check_with_linestatus(win_T *wp, linenr_T lnum, int *linestatus)
 	{
 	    // Compare all lines.  If they are equal the lines were inserted
 	    // in some buffers, deleted in others, but not changed.
-	    for (i = 0; i < DB_COUNT; ++i)
+	    for (i = 0; i < DB_बिलांग; ++i)
 		if (i != idx && curtab->tp_diffbuf[i] != NULL
-						      && dp->df_count[i] != 0)
+						      && dp->df_बिलांग[i] != 0)
 		    if (!diff_equal_entry(dp, idx, i))
 		    {
 			if (linestatus)
 			    *linestatus = -1;
-			return num_fill;
+			return नुमेरो_fill;
 		    }
 	}
 	// If there is no buffer with zero lines then there is no difference
@@ -2613,12 +2613,12 @@ diff_check_with_linestatus(win_T *wp, linenr_T lnum, int *linestatus)
 	// updating the window.  Just report the text as unchanged.  Other
 	// windows might still show the change though.
 	if (zero == FALSE)
-	    return num_fill;
+	    return नुमेरो_fill;
 	if (linestatus)
 	    *linestatus = -2;
-	return num_fill;
+	return नुमेरो_fill;
     }
-    return num_fill;
+    return नुमेरो_fill;
 }
 
 /*
@@ -2628,22 +2628,22 @@ diff_check_with_linestatus(win_T *wp, linenr_T lnum, int *linestatus)
 diff_equal_entry(diff_T *dp, int idx1, int idx2)
 {
     int		i;
-    char_u	*line;
+    char_u	*लिन्या;
     int		cmp;
 
-    if (dp->df_count[idx1] != dp->df_count[idx2])
+    if (dp->df_बिलांग[idx1] != dp->df_बिलांग[idx2])
 	return FALSE;
     if (diff_check_sanity(curtab, dp) == FAIL)
 	return FALSE;
-    for (i = 0; i < dp->df_count[idx1]; ++i)
+    for (i = 0; i < dp->df_बिलांग[idx1]; ++i)
     {
-	line = vim_strsave(ml_get_buf(curtab->tp_diffbuf[idx1],
+	लिन्या = vim_strsave(ml_get_buf(curtab->tp_diffbuf[idx1],
 					       dp->df_lnum[idx1] + i, FALSE));
-	if (line == NULL)
+	if (लिन्या == NULL)
 	    return FALSE;
-	cmp = diff_cmp(line, ml_get_buf(curtab->tp_diffbuf[idx2],
+	cmp = diff_cmp(लिन्या, ml_get_buf(curtab->tp_diffbuf[idx2],
 					       dp->df_lnum[idx2] + i, FALSE));
-	vim_free(line);
+	vim_free(लिन्या);
 	if (cmp != 0)
 	    return FALSE;
     }
@@ -2763,7 +2763,7 @@ diff_set_topline(win_T *fromwin, win_T *towin)
     diff_T	*dp;
 
     fromidx = diff_buf_idx(frombuf);
-    if (fromidx == DB_COUNT)
+    if (fromidx == DB_बिलांग)
 	return;		// safety check
 
     if (curtab->tp_diff_invalid)
@@ -2774,20 +2774,20 @@ diff_set_topline(win_T *fromwin, win_T *towin)
 
     // search for a change that includes "lnum" in the list of diffblocks.
     FOR_ALL_DIFFBLOCKS_IN_TAB(curtab, dp)
-	if (lnum <= dp->df_lnum[fromidx] + dp->df_count[fromidx])
+	if (lnum <= dp->df_lnum[fromidx] + dp->df_बिलांग[fromidx])
 	    break;
     if (dp == NULL)
     {
 	// After last change, compute topline relative to end of file; no
 	// filler lines.
-	towin->w_topline = towin->w_buffer->b_ml.ml_line_count
-				       - (frombuf->b_ml.ml_line_count - lnum);
+	towin->w_topline = towin->w_buffer->b_ml.ml_लिन्या_बिलांग
+				       - (frombuf->b_ml.ml_लिन्या_बिलांग - lnum);
     }
     else
     {
 	// Find index for "towin".
 	toidx = diff_buf_idx(towin->w_buffer);
-	if (toidx == DB_COUNT)
+	if (toidx == DB_बिलांग)
 	    return;		// safety check
 
 	towin->w_topline = lnum + (dp->df_lnum[toidx] - dp->df_lnum[fromidx]);
@@ -2803,9 +2803,9 @@ diff_set_topline(win_T *fromwin, win_T *towin)
 
     // safety check (if diff info gets outdated strange things may happen)
     towin->w_botfill = false;
-    if (towin->w_topline > towin->w_buffer->b_ml.ml_line_count)
+    if (towin->w_topline > towin->w_buffer->b_ml.ml_लिन्या_बिलांग)
     {
-	towin->w_topline = towin->w_buffer->b_ml.ml_line_count;
+	towin->w_topline = towin->w_buffer->b_ml.ml_लिन्या_बिलांग;
 	towin->w_botfill = true;
     }
     if (towin->w_topline < 1)
@@ -2816,7 +2816,7 @@ diff_set_topline(win_T *fromwin, win_T *towin)
 
     // When w_topline changes need to recompute w_botline and cursor position
     invalidate_botline_win(towin);
-    changed_line_abv_curs_win(towin);
+    changed_लिन्या_abv_curs_win(towin);
 
     check_topfill(towin, FALSE);
 # ifdef FEAT_FOLDING
@@ -2834,7 +2834,7 @@ parse_diffanchors(
     int		check_only,
     buf_T	*buf,
     linenr_T	*anchors,
-    int		*num_anchors)
+    int		*नुमेरो_anchors)
 {
     int i;
     char_u *dia = (*buf->b_p_dia == NUL) ? p_dia : buf->b_p_dia;
@@ -2870,7 +2870,7 @@ parse_diffanchors(
 
 	curbuf = buf;
 	curwin = bufwin;
-	linenr_T lnum = get_address(NULL, &dia, ADDR_LINES, check_only, TRUE, FALSE, 1);
+	linenr_T lnum = get_address(NULL, &dia, ADDR_मगा_लिन्या, check_only, TRUE, FALSE, 1);
 	curbuf = orig_curbuf;
 	curwin = orig_curwin;
 
@@ -2880,7 +2880,7 @@ parse_diffanchors(
 	    return FAIL;
 
 	if (!check_only
-		&& (lnum == MAXLNUM || lnum <= 0 || lnum > buf->b_ml.ml_line_count + 1))
+		&& (lnum == MAXLNUM || lnum <= 0 || lnum > buf->b_ml.ml_लिन्या_बिलांग + 1))
 	{
 	    emsg(_(e_invalid_range));
 	    return FAIL;
@@ -2897,8 +2897,8 @@ parse_diffanchors(
 	semsg(_(e_cannot_have_more_than_nr_diff_anchors), MAX_DIFF_ANCHORS);
 	return FAIL;
     }
-    if (num_anchors != NULL)
-	*num_anchors = i;
+    if (नुमेरो_anchors != NULL)
+	*नुमेरो_anchors = i;
     return OK;
 }
 
@@ -2918,7 +2918,7 @@ diffanchors_changed(int buflocal)
 		tp->tp_diff_invalid = TRUE;
 	    else
 	    {
-		for (int idx = 0; idx < DB_COUNT; ++idx)
+		for (int idx = 0; idx < DB_बिलांग; ++idx)
 		    if (tp->tp_diffbuf[idx] == curbuf)
 		    {
 			tp->tp_diff_invalid = TRUE;
@@ -2938,7 +2938,7 @@ diffopt_changed(void)
 {
     char_u	*p;
     int		diff_context_new = 6;
-    int		linematch_lines_new = 0;
+    int		linematch_मगा_लिन्या_new = 0;
     int		diff_flags_new = 0;
     int		diff_foldcolumn_new = 2;
     long	diff_algorithm_new = 0;
@@ -3090,7 +3090,7 @@ diffopt_changed(void)
 	else if (STRNCMP(p, "linematch:", 10) == 0 && VIM_ISDIGIT(p[10]))
 	{
 	    p += 10;
-	    linematch_lines_new = getdigits(&p);
+	    linematch_मगा_लिन्या_new = getdigits(&p);
 	    diff_flags_new |= DIFF_LINEMATCH;
 
 	    // linematch does not make sense without filler set
@@ -3117,7 +3117,7 @@ diffopt_changed(void)
 
     diff_flags = diff_flags_new;
     diff_context = diff_context_new == 0 ? 1 : diff_context_new;
-    linematch_lines = linematch_lines_new;
+    linematch_मगा_लिन्या = linematch_मगा_लिन्या_new;
     diff_foldcolumn = diff_foldcolumn_new;
     diff_algorithm = diff_algorithm_new;
 
@@ -3162,7 +3162,7 @@ diffopt_closeoff(void)
  * mode without waiting for global diff update later.
  */
     void
-diff_update_line(linenr_T lnum)
+diff_update_लिन्या(linenr_T lnum)
 {
     int		idx;
     diff_T	*dp;
@@ -3172,10 +3172,10 @@ diff_update_line(linenr_T lnum)
 	return;
 
     idx = diff_buf_idx(curbuf);
-    if (idx == DB_COUNT)
+    if (idx == DB_बिलांग)
 	return;
     FOR_ALL_DIFFBLOCKS_IN_TAB(curtab, dp)
-	if (lnum <= dp->df_lnum[idx] + dp->df_count[idx])
+	if (lnum <= dp->df_lnum[idx] + dp->df_बिलांग[idx])
 	    break;
 
     // clear the inline change cache as it's invalid
@@ -3220,7 +3220,7 @@ diff_change_parse(
     // to tell whether lines are additions we check whether all the other diff
     // lines are identical (in diff_check_with_linestatus). If so, we mark them
     // as add. We don't do that for inline diff here for simplicity.
-    for (int i = 0; i < DB_COUNT; i++)
+    for (int i = 0; i < DB_बिलांग; i++)
     {
 	if (i == diffline->bufidx)
 	    continue;
@@ -3252,8 +3252,8 @@ diff_find_change_simple(
     int		*startp,	// first char of the change
     int		*endp)		// last char of the change
 {
-    char_u	*line_org;
-    char_u	*line_new;
+    char_u	*लिन्या_org;
+    char_u	*लिन्या_new;
     int		i;
     int		si_org, si_new;
     int		ei_org, ei_new;
@@ -3265,48 +3265,48 @@ diff_find_change_simple(
     if (diff_flags & DIFF_INLINE_NONE)
     {
 	// We only care about the return value, not the actual string comparisons.
-	line_org = NULL;
+	लिन्या_org = NULL;
     }
     else
     {
 	// Make a copy of the line, the next ml_get() will invalidate it.
-	line_org = vim_strsave(ml_get_buf(wp->w_buffer, lnum, FALSE));
-	if (line_org == NULL)
+	लिन्या_org = vim_strsave(ml_get_buf(wp->w_buffer, lnum, FALSE));
+	if (लिन्या_org == NULL)
 	    return FALSE;
     }
 
     off = lnum - dp->df_lnum[idx];
 
-    for (i = 0; i < DB_COUNT; ++i)
+    for (i = 0; i < DB_बिलांग; ++i)
 	if (curtab->tp_diffbuf[i] != NULL && i != idx)
 	{
 	    // Skip lines that are not in the other change (filler lines).
-	    if (off >= dp->df_count[i])
+	    if (off >= dp->df_बिलांग[i])
 		continue;
 	    added = FALSE;
 	    if (diff_flags & DIFF_INLINE_NONE)
 		break; // early terminate as we only care about the return value
 
-	    line_new = ml_get_buf(curtab->tp_diffbuf[i],
+	    लिन्या_new = ml_get_buf(curtab->tp_diffbuf[i],
 						 dp->df_lnum[i] + off, FALSE);
 
 	    // Search for start of difference
 	    si_org = si_new = 0;
-	    while (line_org[si_org] != NUL)
+	    while (लिन्या_org[si_org] != NUL)
 	    {
 		if (((diff_flags & DIFF_IWHITE)
-			    && VIM_ISWHITE(line_org[si_org])
-					      && VIM_ISWHITE(line_new[si_new]))
+			    && VIM_ISWHITE(लिन्या_org[si_org])
+					      && VIM_ISWHITE(लिन्या_new[si_new]))
 			|| ((diff_flags & DIFF_IWHITEALL)
-			    && (VIM_ISWHITE(line_org[si_org])
-					    || VIM_ISWHITE(line_new[si_new]))))
+			    && (VIM_ISWHITE(लिन्या_org[si_org])
+					    || VIM_ISWHITE(लिन्या_new[si_new]))))
 		{
-		    si_org = (int)(skipwhite(line_org + si_org) - line_org);
-		    si_new = (int)(skipwhite(line_new + si_new) - line_new);
+		    si_org = (int)(skipwhite(लिन्या_org + si_org) - लिन्या_org);
+		    si_new = (int)(skipwhite(लिन्या_new + si_new) - लिन्या_new);
 		}
 		else
 		{
-		    if (!diff_equal_char(line_org + si_org, line_new + si_new,
+		    if (!diff_equal_char(लिन्या_org + si_org, लिन्या_new + si_new,
 									   &l))
 			break;
 		    si_org += l;
@@ -3317,40 +3317,40 @@ diff_find_change_simple(
 	    {
 		// Move back to first byte of character in both lines (may
 		// have "nn^" in line_org and "n^ in line_new).
-		si_org -= (*mb_head_off)(line_org, line_org + si_org);
-		si_new -= (*mb_head_off)(line_new, line_new + si_new);
+		si_org -= (*mb_head_off)(लिन्या_org, लिन्या_org + si_org);
+		si_new -= (*mb_head_off)(लिन्या_new, लिन्या_new + si_new);
 	    }
 	    if (*startp > si_org)
 		*startp = si_org;
 
 	    // Search for end of difference, if any.
-	    if (line_org[si_org] != NUL || line_new[si_new] != NUL)
+	    if (लिन्या_org[si_org] != NUL || लिन्या_new[si_new] != NUL)
 	    {
-		ei_org = (int)STRLEN(line_org);
-		ei_new = (int)STRLEN(line_new);
+		ei_org = (int)STRLEN(लिन्या_org);
+		ei_new = (int)STRLEN(लिन्या_new);
 		while (ei_org >= *startp && ei_new >= si_new
 						&& ei_org >= 0 && ei_new >= 0)
 		{
 		    if (((diff_flags & DIFF_IWHITE)
-				&& VIM_ISWHITE(line_org[ei_org])
-					      && VIM_ISWHITE(line_new[ei_new]))
+				&& VIM_ISWHITE(लिन्या_org[ei_org])
+					      && VIM_ISWHITE(लिन्या_new[ei_new]))
 			    || ((diff_flags & DIFF_IWHITEALL)
-				&& (VIM_ISWHITE(line_org[ei_org])
-					    || VIM_ISWHITE(line_new[ei_new]))))
+				&& (VIM_ISWHITE(लिन्या_org[ei_org])
+					    || VIM_ISWHITE(लिन्या_new[ei_new]))))
 		    {
 			while (ei_org >= *startp
-					     && VIM_ISWHITE(line_org[ei_org]))
+					     && VIM_ISWHITE(लिन्या_org[ei_org]))
 			    --ei_org;
 			while (ei_new >= si_new
-					     && VIM_ISWHITE(line_new[ei_new]))
+					     && VIM_ISWHITE(लिन्या_new[ei_new]))
 			    --ei_new;
 		    }
 		    else
 		    {
-			p1 = line_org + ei_org;
-			p2 = line_new + ei_new;
-			p1 -= (*mb_head_off)(line_org, p1);
-			p2 -= (*mb_head_off)(line_new, p2);
+			p1 = लिन्या_org + ei_org;
+			p2 = लिन्या_new + ei_new;
+			p1 -= (*mb_head_off)(लिन्या_org, p1);
+			p2 -= (*mb_head_off)(लिन्या_new, p2);
 			if (!diff_equal_char(p1, p2, &l))
 			    break;
 			ei_org -= l;
@@ -3362,7 +3362,7 @@ diff_find_change_simple(
 	    }
 	}
 
-    vim_free(line_org);
+    vim_free(लिन्या_org);
     return added;
 }
 
@@ -3373,7 +3373,7 @@ diff_find_change_simple(
 typedef struct
 {
     long byte_start;
-    long num_bytes;
+    long नुमेरो_bytes;
     int lineoff;
 } linemap_entry_T;
 
@@ -3401,7 +3401,7 @@ diff_refine_inline_char_highlight(diff_T *dp_orig, garray_T *linemap, int idx1)
 	{
 	    // Only use first buffer to calculate the gap because the gap is
 	    // unchanged text, which would be the same in all buffers.
-	    if (dp->df_lnum[idx1] + dp->df_count[idx1] - 1 >= linemap[idx1].ga_len
+	    if (dp->df_lnum[idx1] + dp->df_बिलांग[idx1] - 1 >= linemap[idx1].ga_len
 		    || dp->df_next->df_lnum[idx1] - 1 >= linemap[idx1].ga_len)
 	    {
 		dp = dp->df_next;
@@ -3409,7 +3409,7 @@ diff_refine_inline_char_highlight(diff_T *dp_orig, garray_T *linemap, int idx1)
 	    }
 
 	    // If the gap occurs over different lines, don't consider it
-	    linemap_entry_T *entry1 = &((linemap_entry_T*)linemap[idx1].ga_data)[dp->df_lnum[idx1] + dp->df_count[idx1] - 1];
+	    linemap_entry_T *entry1 = &((linemap_entry_T*)linemap[idx1].ga_data)[dp->df_lnum[idx1] + dp->df_बिलांग[idx1] - 1];
 	    linemap_entry_T *entry2 = &((linemap_entry_T*)linemap[idx1].ga_data)[dp->df_next->df_lnum[idx1] - 1];
 	    if (entry1->lineoff != entry2->lineoff)
 	    {
@@ -3417,22 +3417,22 @@ diff_refine_inline_char_highlight(diff_T *dp_orig, garray_T *linemap, int idx1)
 		continue;
 	    }
 
-	    linenr_T gap = dp->df_next->df_lnum[idx1] - (dp->df_lnum[idx1] + dp->df_count[idx1]);
+	    linenr_T gap = dp->df_next->df_lnum[idx1] - (dp->df_lnum[idx1] + dp->df_बिलांग[idx1]);
 	    if (gap <= 3)
 	    {
-		linenr_T max_df_count = 0;
-		for (int i = 0; i < DB_COUNT; i++)
-		    max_df_count = MAX(max_df_count, dp->df_count[i] + dp->df_next->df_count[i]);
+		linenr_T max_df_बिलांग = 0;
+		for (int i = 0; i < DB_बिलांग; i++)
+		    max_df_बिलांग = MAX(max_df_बिलांग, dp->df_बिलांग[i] + dp->df_next->df_बिलांग[i]);
 
-		if (max_df_count >= gap * 4)
+		if (max_df_बिलांग >= gap * 4)
 		{
 		    // Merge current block with the next one. Don't advance the
 		    // pointer so we try the same merged block against the next
 		    // one.
-		    for (int i = 0; i < DB_COUNT; i++)
+		    for (int i = 0; i < DB_बिलांग; i++)
 		    {
-			dp->df_count[i] = dp->df_next->df_lnum[i]
-			    + dp->df_next->df_count[i] - dp->df_lnum[i];
+			dp->df_बिलांग[i] = dp->df_next->df_lnum[i]
+			    + dp->df_next->df_बिलांग[i] - dp->df_lnum[i];
 		    }
 		    diff_T *dp_next = dp->df_next;
 		    dp->df_next = dp_next->df_next;
@@ -3468,7 +3468,7 @@ diff_refine_inline_word_highlight(diff_T *dp_orig, garray_T *linemap, int idx1,
 	    // Index of the last line of this block and of the first line of the
 	    // next one.  When this block is empty, which happens for inserted
 	    // lines, it has no last line and "idx_entry1" is negative.
-	    linenr_T	idx_entry1 = dp->df_lnum[idx1] + dp->df_count[idx1] - 2;
+	    linenr_T	idx_entry1 = dp->df_lnum[idx1] + dp->df_बिलांग[idx1] - 2;
 	    linenr_T	idx_entry2 = dp->df_next->df_lnum[idx1] - 1;
 
 	    // Only merge blocks on the same line
@@ -3492,7 +3492,7 @@ diff_refine_inline_word_highlight(diff_T *dp_orig, garray_T *linemap, int idx1,
 	    }
 
 	    // Calculate the gap between blocks
-	    int gap_start = entry1->byte_start + entry1->num_bytes;
+	    int gap_start = entry1->byte_start + entry1->नुमेरो_bytes;
 	    int gap_end = entry2->byte_start;
 	    int gap_size = gap_end - gap_start;
 
@@ -3507,9 +3507,9 @@ diff_refine_inline_word_highlight(diff_T *dp_orig, garray_T *linemap, int idx1,
 	    }
 
 	    // Get the text between the two blocks
-	    char_u *line = ml_get_buf(curtab->tp_diffbuf[idx1],
+	    char_u *लिन्या = ml_get_buf(curtab->tp_diffbuf[idx1],
 		    start_lnum + entry1->lineoff, FALSE);
-	    char_u *gap_text = line + gap_start;
+	    char_u *gap_text = लिन्या + gap_start;
 
 	    // Check if gap contains only whitespace and/or punctuation
 	    bool only_non_word = true;
@@ -3532,25 +3532,25 @@ diff_refine_inline_word_highlight(diff_T *dp_orig, garray_T *linemap, int idx1,
 	    if (has_content && only_non_word)
 	    {
 		long total_change_bytes = 0;
-		for (int i = 0; i < DB_COUNT; i++)
+		for (int i = 0; i < DB_बिलांग; i++)
 		{
 		    if (curtab->tp_diffbuf[i] != NULL)
 		    {
 			// count bytes in the first block
-			for (int k = 0; k < dp->df_count[i]; k++)
+			for (int k = 0; k < dp->df_बिलांग[i]; k++)
 			{
 			    int idx = dp->df_lnum[i] + k - 1;
 			    if (idx < linemap[i].ga_len)
 				total_change_bytes +=
-				    ((linemap_entry_T *)linemap[i].ga_data)[idx].num_bytes;
+				    ((linemap_entry_T *)linemap[i].ga_data)[idx].नुमेरो_bytes;
 			}
 			// count bytes in the next block
-			for (int k = 0; k < dp->df_next->df_count[i]; k++)
+			for (int k = 0; k < dp->df_next->df_बिलांग[i]; k++)
 			{
 			    int idx = dp->df_next->df_lnum[i] + k - 1;
 			    if (idx < linemap[i].ga_len)
 				total_change_bytes +=
-				    ((linemap_entry_T *)linemap[i].ga_data)[idx].num_bytes;
+				    ((linemap_entry_T *)linemap[i].ga_data)[idx].नुमेरो_bytes;
 			}
 		    }
 		}
@@ -3558,12 +3558,12 @@ diff_refine_inline_word_highlight(diff_T *dp_orig, garray_T *linemap, int idx1,
 		if (total_change_bytes >= gap_size * 2)
 		{
 		    // Merge the blocks by extending the first block to include the next
-		    for (int i = 0; i < DB_COUNT; i++)
+		    for (int i = 0; i < DB_बिलांग; i++)
 		    {
 			if (curtab->tp_diffbuf[i] != NULL)
 			{
-			    dp->df_count[i] = dp->df_next->df_lnum[i]
-				+ dp->df_next->df_count[i] - dp->df_lnum[i];
+			    dp->df_बिलांग[i] = dp->df_next->df_lnum[i]
+				+ dp->df_next->df_बिलांग[i] - dp->df_lnum[i];
 			}
 		    }
 
@@ -3592,7 +3592,7 @@ diff_find_change_inline_diff(
     diff_T	*dp)
 {
     diffio_T	dio;
-    garray_T	linemap[DB_COUNT];
+    garray_T	linemap[DB_बिलांग];
     garray_T	file1_str;
     garray_T	file2_str;
     int		file1_idx = -1;
@@ -3615,7 +3615,7 @@ diff_find_change_inline_diff(
 
     // diff_read() also uses curtab->tp_diffbuf to determine what's an active
     // buffer
-    buf_T	*(orig_diffbuf[DB_COUNT]);
+    buf_T	*(orig_diffbuf[DB_बिलांग]);
     memcpy(orig_diffbuf, curtab->tp_diffbuf, sizeof(orig_diffbuf));
 
     // Buffers to populate mmfile 1/2 that would be passed to xdiff as memory
@@ -3627,10 +3627,10 @@ diff_find_change_inline_diff(
     // Line map to map from generated mmfiles' line numbers back to original
     // diff blocks' locations. Need this even for char diff because not all
     // characters are 1-byte long / ASCII.
-    for (int i = 0; i < DB_COUNT; i++)
+    for (int i = 0; i < DB_बिलांग; i++)
 	ga_init2(&linemap[i], sizeof(linemap_entry_T), 128);
 
-    for (int i = 0; i < DB_COUNT; i++)
+    for (int i = 0; i < DB_बिलांग; i++)
     {
 	dio.dio_diff.dout_ga.ga_len = 0;
 
@@ -3638,7 +3638,7 @@ diff_find_change_inline_diff(
 	if (buf == NULL || buf->b_ml.ml_mfp == NULL)
 	    continue; // skip buffer that isn't loaded
 
-	if (dp->df_count[i] == 0)
+	if (dp->df_बिलांग[i] == 0)
 	{
 	    // skip buffers that don't have any texts in this block so we don't
 	    // end up marking the entire block as modified in multi-buffer diff
@@ -3656,7 +3656,7 @@ diff_find_change_inline_diff(
 
 	// Split each line into chars/words and populate fake file buffer as
 	// newline-delimited tokens as that's what xdiff requires.
-	for (int off = 0; off < dp->df_count[i]; off++)
+	for (int off = 0; off < dp->df_बिलांग[i]; off++)
 	{
 	    char_u *curline = ml_get_buf(curtab->tp_diffbuf[i],
 		    dp->df_lnum[i] + off, FALSE);
@@ -3765,7 +3765,7 @@ diff_find_change_inline_diff(
 		    linemap_entry_T linemap_entry;
 		    linemap_entry.lineoff = off;
 		    linemap_entry.byte_start = s - curline;
-		    linemap_entry.num_bytes = char_len;
+		    linemap_entry.नुमेरो_bytes = char_len;
 		    if (ga_grow(&linemap[i], 1) != OK)
 			goto done;
 		    ((linemap_entry_T*)(linemap[i].ga_data))[linemap[i].ga_len]
@@ -3777,7 +3777,7 @@ diff_find_change_inline_diff(
 		    // Still inside a keyword. Just increment byte count but
 		    // don't make a new entry.
 		    // linemap always has at least one entry here
-		    ((linemap_entry_T*)linemap[i].ga_data)[linemap[i].ga_len-1].num_bytes
+		    ((linemap_entry_T*)linemap[i].ga_data)[linemap[i].ga_len-1].नुमेरो_bytes
 			+= char_len;
 		}
 
@@ -3814,7 +3814,7 @@ diff_find_change_inline_diff(
 		linemap_entry_T linemap_entry;
 		linemap_entry.lineoff = off;
 		linemap_entry.byte_start = s - curline;
-		linemap_entry.num_bytes = sizeof(NL);
+		linemap_entry.नुमेरो_bytes = sizeof(NL);
 		if (ga_grow(&linemap[i], 1) != OK)
 		    goto done;
 		((linemap_entry_T*)(linemap[i].ga_data))[linemap[i].ga_len]
@@ -3858,12 +3858,12 @@ diff_find_change_inline_diff(
     {
 	diffline_change_T change;
 	CLEAR_FIELD(change);
-	for (int i = 0; i < DB_COUNT; i++)
+	for (int i = 0; i < DB_बिलांग; i++)
 	{
 	    if (new_diff->df_lnum[i] <= 0) // should never be < 0. Checking just for safety.
 		continue;
 	    linenr_T diff_lnum = new_diff->df_lnum[i] - 1; // use zero-index
-	    linenr_T diff_lnum_end = diff_lnum + new_diff->df_count[i];
+	    linenr_T diff_lnum_end = diff_lnum + new_diff->df_बिलांग[i];
 
 	    if (diff_lnum >= linemap[i].ga_len)
 	    {
@@ -3889,7 +3889,7 @@ diff_find_change_inline_diff(
 	    else
 	    {
 		change.dc_end[i] = ((linemap_entry_T*)linemap[i].ga_data)[diff_lnum_end-1].byte_start +
-		    ((linemap_entry_T*)linemap[i].ga_data)[diff_lnum_end-1].num_bytes;
+		    ((linemap_entry_T*)linemap[i].ga_data)[diff_lnum_end-1].नुमेरो_bytes;
 		change.dc_end_lnum_off[i] = ((linemap_entry_T*)linemap[i].ga_data)[diff_lnum_end-1].lineoff;
 	    }
 	}
@@ -3916,7 +3916,7 @@ done:
     // No need to clear dio.dio_orig/dio_new because they were referencing
     // strings that are now cleared.
     clear_diffout(&dio.dio_diff);
-    for (int i = 0; i < DB_COUNT; i++)
+    for (int i = 0; i < DB_बिलांग; i++)
 	ga_clear(&linemap[i]);
 }
 
@@ -3935,12 +3935,12 @@ diff_find_change(
     int		off;
 
     idx = diff_buf_idx(wp->w_buffer);
-    if (idx == DB_COUNT)	// cannot happen
+    if (idx == DB_बिलांग)	// cannot happen
 	return FALSE;
 
     // search for a change that includes "lnum" in the list of diffblocks.
     FOR_ALL_DIFFBLOCKS_IN_TAB(curtab, dp)
-	if (lnum < dp->df_lnum[idx] + dp->df_count[idx])
+	if (lnum < dp->df_lnum[idx] + dp->df_बिलांग[idx])
 	    break;
     if (dp == NULL || diff_check_sanity(curtab, dp) == FAIL)
 	return FALSE;
@@ -3966,7 +3966,7 @@ diff_find_change(
 	// allocate memory.
 	CLEAR_FIELD(simple_diffline_change);
 	diffline->changes = &simple_diffline_change;
-	diffline->num_changes = 1;
+	diffline->नुमेरो_changes = 1;
 	diffline->bufidx = idx;
 	diffline->lineoff = lnum - dp->df_lnum[idx];
 
@@ -3988,7 +3988,7 @@ diff_find_change(
     // optimize this to use binary search, but there should usually be a
     // limited number of inline changes per diff block, and limited number of
     // diff blocks shown on screen, so it is not necessary.
-    int num_changes = 0;
+    int नुमेरो_changes = 0;
     int change_idx = 0;
     diffline->changes = NULL;
     for (change_idx = 0; change_idx < changes->ga_len; change_idx++)
@@ -4000,9 +4000,9 @@ diff_find_change(
 	    break;
 	if (diffline->changes == NULL)
 	    diffline->changes = change;
-	num_changes++;
+	नुमेरो_changes++;
     }
-    diffline->num_changes = num_changes;
+    diffline->नुमेरो_changes = नुमेरो_changes;
     diffline->bufidx = idx;
     diffline->lineoff = off;
 
@@ -4011,10 +4011,10 @@ diff_find_change(
     // considering this to be an addition past their last line. Other scenarios
     // will be considered a changed line instead.
     int added = FALSE;
-    if (num_changes == 1 && change_idx == dp->df_changes.ga_len)
+    if (नुमेरो_changes == 1 && change_idx == dp->df_changes.ga_len)
     {
 	added = TRUE;
-	for (int i = 0; i < DB_COUNT; i++)
+	for (int i = 0; i < DB_बिलांग; i++)
 	{
 	    if (idx == i)
 		continue;
@@ -4049,7 +4049,7 @@ diff_infold(win_T *wp, linenr_T lnum)
     if (!wp->w_p_diff)
 	return FALSE;
 
-    for (i = 0; i < DB_COUNT; ++i)
+    for (i = 0; i < DB_बिलांग; ++i)
     {
 	if (curtab->tp_diffbuf[i] == wp->w_buffer)
 	    idx = i;
@@ -4079,7 +4079,7 @@ diff_infold(win_T *wp, linenr_T lnum)
 	if (dp->df_lnum[idx] - diff_context > lnum)
 	    break;
 	// If this change ends before the line we have a match.
-	if (dp->df_lnum[idx] + dp->df_count[idx] + diff_context > lnum)
+	if (dp->df_lnum[idx] + dp->df_बिलांग[idx] + diff_context > lnum)
 	{
 	    result = FALSE;
 	    break;
@@ -4094,7 +4094,7 @@ diff_infold(win_T *wp, linenr_T lnum)
  * "dp" and "do" commands.
  */
     void
-nv_diffgetput(int put, long count)
+nv_diffgetput(int put, long बिलांग)
 {
     exarg_T	ea;
     char_u	buf[30];
@@ -4106,18 +4106,18 @@ nv_diffgetput(int put, long count)
 	return;
     }
 # endif
-    if (count == 0)
+    if (बिलांग == 0)
 	ea.arg = (char_u *)"";
     else
     {
-	vim_snprintf((char *)buf, 30, "%ld", count);
+	vim_snprintf((char *)buf, 30, "%ld", बिलांग);
 	ea.arg = buf;
     }
     if (put)
 	ea.cmdidx = CMD_diffput;
     else
 	ea.cmdidx = CMD_diffget;
-    ea.addr_count = 0;
+    ea.addr_बिलांग = 0;
     ea.line1 = curwin->w_cursor.lnum;
     ea.line2 = curwin->w_cursor.lnum;
     ex_diffgetput(&ea);
@@ -4145,7 +4145,7 @@ valid_diff(diff_T *diff)
 ex_diffgetput(exarg_T *eap)
 {
     linenr_T	lnum;
-    int		count;
+    int		बिलांग;
     linenr_T	off = 0;
     diff_T	*dp;
     diff_T	*dprev;
@@ -4160,13 +4160,13 @@ ex_diffgetput(exarg_T *eap)
     aco_save_T	aco;
     buf_T	*buf;
     int		start_skip, end_skip;
-    int		new_count;
+    int		new_बिलांग;
     int		buf_empty;
     int		found_not_ma = FALSE;
 
     // Find the current buffer in the list of diff buffers.
     idx_cur = diff_buf_idx(curbuf);
-    if (idx_cur == DB_COUNT)
+    if (idx_cur == DB_बिलांग)
     {
 	emsg(_(e_current_buffer_is_not_in_diff_mode));
 	return;
@@ -4175,7 +4175,7 @@ ex_diffgetput(exarg_T *eap)
     if (*eap->arg == NUL)
     {
 	// No argument: Find the other buffer in the list of diff buffers.
-	for (idx_other = 0; idx_other < DB_COUNT; ++idx_other)
+	for (idx_other = 0; idx_other < DB_बिलांग; ++idx_other)
 	    if (curtab->tp_diffbuf[idx_other] != curbuf
 		    && curtab->tp_diffbuf[idx_other] != NULL)
 	    {
@@ -4184,7 +4184,7 @@ ex_diffgetput(exarg_T *eap)
 		    break;
 		found_not_ma = TRUE;
 	    }
-	if (idx_other == DB_COUNT)
+	if (idx_other == DB_बिलांग)
 	{
 	    if (found_not_ma)
 		emsg(_(e_no_other_buffer_in_diff_mode_is_modifiable));
@@ -4194,7 +4194,7 @@ ex_diffgetput(exarg_T *eap)
 	}
 
 	// Check that there isn't a third buffer in the list
-	for (i = idx_other + 1; i < DB_COUNT; ++i)
+	for (i = idx_other + 1; i < DB_बिलांग; ++i)
 	    if (curtab->tp_diffbuf[i] != curbuf
 		    && curtab->tp_diffbuf[i] != NULL
 		    && (eap->cmdidx != CMD_diffput || curtab->tp_diffbuf[i]->b_p_ma))
@@ -4228,7 +4228,7 @@ ex_diffgetput(exarg_T *eap)
 	if (buf == curbuf)
 	    return;		// nothing to do
 	idx_other = diff_buf_idx(buf);
-	if (idx_other == DB_COUNT)
+	if (idx_other == DB_बिलांग)
 	{
 	    semsg(_(e_buffer_str_is_not_in_diff_mode), eap->arg);
 	    return;
@@ -4238,12 +4238,12 @@ ex_diffgetput(exarg_T *eap)
     diff_busy = TRUE;
 
     // When no range given include the line above or below the cursor.
-    if (eap->addr_count == 0)
+    if (eap->addr_बिलांग == 0)
     {
 	// Make it possible that ":diffget" on the last line gets line below
 	// the cursor line when there is no difference above the cursor.
 	int linestatus = 0;
-	if (eap->line1 == curbuf->b_ml.ml_line_count
+	if (eap->line1 == curbuf->b_ml.ml_लिन्या_बिलांग
 		&& (diff_check_with_linestatus(curwin, eap->line1, &linestatus) == 0
 		    && linestatus == 0)
 		&& (eap->line1 == 1 ||
@@ -4289,7 +4289,7 @@ ex_diffgetput(exarg_T *eap)
     dprev = NULL;
     for (dp = curtab->tp_first_diff; dp != NULL; )
     {
-	if (!eap->addr_count)
+	if (!eap->addr_बिलांग)
 	{
 	    // Handle the case with adjacent diff blocks (e.g. using linematch
 	    // or anchors) at/above the cursor. Since a range wasn't specified,
@@ -4297,7 +4297,7 @@ ex_diffgetput(exarg_T *eap)
 	    // the vicinity.
 	    while (dp->df_next
 		    && dp->df_next->df_lnum[idx_cur] == dp->df_lnum[idx_cur] +
-							dp->df_count[idx_cur]
+							dp->df_बिलांग[idx_cur]
 		    && dp->df_next->df_lnum[idx_cur] == eap->line1 + off + 1)
 	    {
 		dprev = dp;
@@ -4309,53 +4309,53 @@ ex_diffgetput(exarg_T *eap)
 
 	dfree = NULL;
 	lnum = dp->df_lnum[idx_to];
-	count = dp->df_count[idx_to];
+	बिलांग = dp->df_बिलांग[idx_to];
 	// The empty line of an empty buffer is deleted below, include it in
 	// the undo information, otherwise undo leaves a line behind.
-	linenr_T undo_bot = lnum + count + (count == 0 && BUFEMPTY() ? 1 : 0);
+	linenr_T undo_bot = lnum + बिलांग + (बिलांग == 0 && BUFEMPTY() ? 1 : 0);
 
-	if (dp->df_lnum[idx_cur] + dp->df_count[idx_cur] > eap->line1 + off
+	if (dp->df_lnum[idx_cur] + dp->df_बिलांग[idx_cur] > eap->line1 + off
 		&& u_save(lnum - 1, undo_bot) != FAIL)
 	{
 	    // Inside the specified range and saving for undo worked.
 	    start_skip = 0;
 	    end_skip = 0;
-	    if (eap->addr_count > 0)
+	    if (eap->addr_बिलांग > 0)
 	    {
 		// A range was specified: check if lines need to be skipped.
 		start_skip = eap->line1 + off - dp->df_lnum[idx_cur];
 		if (start_skip > 0)
 		{
 		    // range starts below start of current diff block
-		    if (start_skip > count)
+		    if (start_skip > बिलांग)
 		    {
-			lnum += count;
-			count = 0;
+			lnum += बिलांग;
+			बिलांग = 0;
 		    }
 		    else
 		    {
-			count -= start_skip;
+			बिलांग -= start_skip;
 			lnum += start_skip;
 		    }
 		}
 		else
 		    start_skip = 0;
 
-		end_skip = dp->df_lnum[idx_cur] + dp->df_count[idx_cur] - 1
+		end_skip = dp->df_lnum[idx_cur] + dp->df_बिलांग[idx_cur] - 1
 							 - (eap->line2 + off);
 		if (end_skip > 0)
 		{
 		    // range ends above end of current/from diff block
 		    if (idx_cur == idx_from)	// :diffput
 		    {
-			i = dp->df_count[idx_cur] - start_skip - end_skip;
-			if (count > i)
-			    count = i;
+			i = dp->df_बिलांग[idx_cur] - start_skip - end_skip;
+			if (बिलांग > i)
+			    बिलांग = i;
 		    }
 		    else			// :diffget
 		    {
-			count -= end_skip;
-			end_skip = dp->df_count[idx_from] - start_skip - count;
+			बिलांग -= end_skip;
+			end_skip = dp->df_बिलांग[idx_from] - start_skip - बिलांग;
 			if (end_skip < 0)
 			    end_skip = 0;
 		    }
@@ -4366,19 +4366,19 @@ ex_diffgetput(exarg_T *eap)
 
 	    buf_empty = BUFEMPTY();
 	    added = 0;
-	    for (i = 0; i < count; ++i)
+	    for (i = 0; i < बिलांग; ++i)
 	    {
 		// remember deleting the last line of the buffer
-		buf_empty = curbuf->b_ml.ml_line_count == 1;
+		buf_empty = curbuf->b_ml.ml_लिन्या_बिलांग == 1;
 		if (ml_delete(lnum) == OK)
 		    --added;
 	    }
-	    for (i = 0; i < dp->df_count[idx_from] - start_skip - end_skip; ++i)
+	    for (i = 0; i < dp->df_बिलांग[idx_from] - start_skip - end_skip; ++i)
 	    {
 		linenr_T nr;
 
 		nr = dp->df_lnum[idx_from] + start_skip + i;
-		if (nr > curtab->tp_diffbuf[idx_from]->b_ml.ml_line_count)
+		if (nr > curtab->tp_diffbuf[idx_from]->b_ml.ml_लिन्या_बिलांग)
 		    break;
 		p = vim_strsave(ml_get_buf(curtab->tp_diffbuf[idx_from],
 								  nr, FALSE));
@@ -4387,7 +4387,7 @@ ex_diffgetput(exarg_T *eap)
 		    ml_append(lnum + i - 1, p, 0, FALSE);
 		    vim_free(p);
 		    ++added;
-		    if (buf_empty && curbuf->b_ml.ml_line_count == 2)
+		    if (buf_empty && curbuf->b_ml.ml_लिन्या_बिलांग == 2)
 		    {
 			// Added the first line into an empty buffer, need to
 			// delete the dummy empty line.
@@ -4396,19 +4396,19 @@ ex_diffgetput(exarg_T *eap)
 		    }
 		}
 	    }
-	    new_count = dp->df_count[idx_to] + added;
-	    dp->df_count[idx_to] = new_count;
+	    new_बिलांग = dp->df_बिलांग[idx_to] + added;
+	    dp->df_बिलांग[idx_to] = new_बिलांग;
 
 	    if (start_skip == 0 && end_skip == 0)
 	    {
 		// Check if there are any other buffers and if the diff is
 		// equal in them.
-		for (i = 0; i < DB_COUNT; ++i)
+		for (i = 0; i < DB_बिलांग; ++i)
 		    if (curtab->tp_diffbuf[i] != NULL && i != idx_from
 								&& i != idx_to
 			    && !diff_equal_entry(dp, idx_from, i))
 			break;
-		if (i == DB_COUNT)
+		if (i == DB_बिलांग)
 		{
 		    // delete the diff entry, the buffers are now equal here
 		    dfree = dp;
@@ -4423,24 +4423,24 @@ ex_diffgetput(exarg_T *eap)
 	    if (added != 0)
 	    {
 		// Adjust marks.  This will change the following entries!
-		mark_adjust(lnum, lnum + count - 1, (long)MAXLNUM, (long)added);
+		mark_adjust(lnum, lnum + बिलांग - 1, (long)MAXLNUM, (long)added);
 		if (curwin->w_cursor.lnum >= lnum)
 		{
 		    // Adjust the cursor position if it's in/after the changed
 		    // lines.
-		    if (curwin->w_cursor.lnum >= lnum + count)
+		    if (curwin->w_cursor.lnum >= lnum + बिलांग)
 		    {
 			curwin->w_cursor.lnum += added;
 			// When the buffer was previously empty, the cursor may
 			// now be beyond the last line, so clamp cursor lnum.
 			curwin->w_cursor.lnum = MIN(curwin->w_cursor.lnum,
-						curbuf->b_ml.ml_line_count);
+						curbuf->b_ml.ml_लिन्या_बिलांग);
 		    }
 		    else if (added < 0)
 			curwin->w_cursor.lnum = lnum;
 		}
 	    }
-	    changed_lines(lnum, 0, lnum + count, (long)added);
+	    changed_मगा_लिन्या(lnum, 0, lnum + बिलांग, (long)added);
 
 	    if (dfree != NULL)
 	    {
@@ -4458,7 +4458,7 @@ ex_diffgetput(exarg_T *eap)
 
 	    if (dfree == NULL)
 		// mark_adjust() may have changed the count in a wrong way
-		dp->df_count[idx_to] = new_count;
+		dp->df_बिलांग[idx_to] = new_बिलांग;
 
 	    // When changing the current buffer, keep track of line numbers
 	    if (idx_cur == idx_to)
@@ -4479,7 +4479,7 @@ ex_diffgetput(exarg_T *eap)
 	// Syncing undo only works for the current buffer, but we change
 	// another buffer.  Sync undo if the command was typed.  This isn't
 	// 100% right when ":diffput" is used in a function or mapping.
-	if (KeyTyped)
+	if (सुसि_Typed)
 	    u_sync(FALSE);
 	aucmd_restbuf(&aco);
     }
@@ -4493,7 +4493,7 @@ theend:
     // position.  When there were filler lines the topline has become
     // invalid.
     check_cursor();
-    changed_line_abv_curs();
+    changed_लिन्या_abv_curs();
 
 # ifdef FEAT_FOLDING
     // If all diffs are gone, update folds in all diff windows.
@@ -4533,10 +4533,10 @@ diff_fold_update(diff_T *dp, int skip_idx)
     win_T	*wp;
 
     FOR_ALL_WINDOWS(wp)
-	for (i = 0; i < DB_COUNT; ++i)
+	for (i = 0; i < DB_बिलांग; ++i)
 	    if (curtab->tp_diffbuf[i] == wp->w_buffer && i != skip_idx)
 		foldUpdate(wp, dp->df_lnum[i],
-					    dp->df_lnum[i] + dp->df_count[i]);
+					    dp->df_lnum[i] + dp->df_बिलांग[i]);
 }
 # endif
 
@@ -4549,7 +4549,7 @@ diff_mode_buf(buf_T *buf)
     tabpage_T	*tp;
 
     FOR_ALL_TABPAGES(tp)
-	if (diff_buf_idx_tp(buf, tp) != DB_COUNT)
+	if (diff_buf_idx_tp(buf, tp) != DB_बिलांग)
 	    return TRUE;
     return FALSE;
 }
@@ -4559,14 +4559,14 @@ diff_mode_buf(buf_T *buf)
  * Return FAIL if there isn't such a diff block.
  */
     int
-diff_move_to(int dir, long count)
+diff_move_to(int dir, long बिलांग)
 {
     int		idx;
     linenr_T	lnum = curwin->w_cursor.lnum;
     diff_T	*dp;
 
     idx = diff_buf_idx(curbuf);
-    if (idx == DB_COUNT || curtab->tp_first_diff == NULL)
+    if (idx == DB_बिलांग || curtab->tp_first_diff == NULL)
 	return FAIL;
 
     if (curtab->tp_diff_invalid)
@@ -4575,7 +4575,7 @@ diff_move_to(int dir, long count)
     if (curtab->tp_first_diff == NULL)		// no diffs today
 	return FAIL;
 
-    while (--count >= 0)
+    while (--बिलांग >= 0)
     {
 	// Check if already before first diff.
 	if (dir == BACKWARD && lnum <= curtab->tp_first_diff->df_lnum[idx])
@@ -4597,8 +4597,8 @@ diff_move_to(int dir, long count)
     }
 
     // don't end up past the end of the file
-    if (lnum > curbuf->b_ml.ml_line_count)
-	lnum = curbuf->b_ml.ml_line_count;
+    if (lnum > curbuf->b_ml.ml_लिन्या_बिलांग)
+	lnum = curbuf->b_ml.ml_लिन्या_बिलांग;
 
     // When the cursor didn't move at all we fail.
     if (lnum == curwin->w_cursor.lnum)
@@ -4616,7 +4616,7 @@ diff_move_to(int dir, long count)
  * "buf1" in diff mode.
  */
     static linenr_T
-diff_get_corresponding_line_int(
+diff_get_corresponding_लिन्या_int(
     buf_T	*buf1,
     linenr_T	lnum1)
 {
@@ -4627,7 +4627,7 @@ diff_get_corresponding_line_int(
 
     idx1 = diff_buf_idx(buf1);
     idx2 = diff_buf_idx(curbuf);
-    if (idx1 == DB_COUNT || idx2 == DB_COUNT || curtab->tp_first_diff == NULL)
+    if (idx1 == DB_बिलांग || idx2 == DB_बिलांग || curtab->tp_first_diff == NULL)
 	return lnum1;
 
     if (curtab->tp_diff_invalid)
@@ -4640,19 +4640,19 @@ diff_get_corresponding_line_int(
     {
 	if (dp->df_lnum[idx1] > lnum1)
 	    return lnum1 - baseline;
-	if ((dp->df_lnum[idx1] + dp->df_count[idx1]) > lnum1)
+	if ((dp->df_lnum[idx1] + dp->df_बिलांग[idx1]) > lnum1)
 	{
 	    // Inside the diffblock
 	    baseline = lnum1 - dp->df_lnum[idx1];
-	    if (baseline > dp->df_count[idx2])
-		baseline = dp->df_count[idx2];
+	    if (baseline > dp->df_बिलांग[idx2])
+		baseline = dp->df_बिलांग[idx2];
 
 	    return dp->df_lnum[idx2] + baseline;
 	}
 	if (    (dp->df_lnum[idx1] == lnum1)
-	     && (dp->df_count[idx1] == 0)
+	     && (dp->df_बिलांग[idx1] == 0)
 	     && (dp->df_lnum[idx2] <= curwin->w_cursor.lnum)
-	     && ((dp->df_lnum[idx2] + dp->df_count[idx2])
+	     && ((dp->df_lnum[idx2] + dp->df_बिलांग[idx2])
 						      > curwin->w_cursor.lnum))
 	    /*
 	     * Special case: if the cursor is just after a zero-count
@@ -4662,8 +4662,8 @@ diff_get_corresponding_line_int(
 	     * as expected.
 	     */
 	    return curwin->w_cursor.lnum;
-	baseline = (dp->df_lnum[idx1] + dp->df_count[idx1])
-				   - (dp->df_lnum[idx2] + dp->df_count[idx2]);
+	baseline = (dp->df_lnum[idx1] + dp->df_बिलांग[idx1])
+				   - (dp->df_lnum[idx2] + dp->df_बिलांग[idx2]);
     }
 
     // If we get here then the cursor is after the last diff
@@ -4675,13 +4675,13 @@ diff_get_corresponding_line_int(
  * "buf1" in diff mode.  Checks the line number to be valid.
  */
     linenr_T
-diff_get_corresponding_line(buf_T *buf1, linenr_T lnum1)
+diff_get_corresponding_लिन्या(buf_T *buf1, linenr_T lnum1)
 {
-    linenr_T lnum = diff_get_corresponding_line_int(buf1, lnum1);
+    linenr_T lnum = diff_get_corresponding_लिन्या_int(buf1, lnum1);
 
     // don't end up past the end of the file
-    if (lnum > curbuf->b_ml.ml_line_count)
-	return curbuf->b_ml.ml_line_count;
+    if (lnum > curbuf->b_ml.ml_लिन्या_बिलांग)
+	return curbuf->b_ml.ml_लिन्या_बिलांग;
     return lnum;
 }
 
@@ -4698,7 +4698,7 @@ diff_lnum_win(linenr_T lnum, win_T *wp)
     linenr_T	n;
 
     idx = diff_buf_idx(curbuf);
-    if (idx == DB_COUNT)		// safety check
+    if (idx == DB_बिलांग)		// safety check
 	return (linenr_T)0;
 
     if (curtab->tp_diff_invalid)
@@ -4706,22 +4706,22 @@ diff_lnum_win(linenr_T lnum, win_T *wp)
 
     // search for a change that includes "lnum" in the list of diffblocks.
     FOR_ALL_DIFFBLOCKS_IN_TAB(curtab, dp)
-	if (lnum <= dp->df_lnum[idx] + dp->df_count[idx])
+	if (lnum <= dp->df_lnum[idx] + dp->df_बिलांग[idx])
 	    break;
 
     // When after the last change, compute relative to the last line number.
     if (dp == NULL)
-	return wp->w_buffer->b_ml.ml_line_count
-					- (curbuf->b_ml.ml_line_count - lnum);
+	return wp->w_buffer->b_ml.ml_लिन्या_बिलांग
+					- (curbuf->b_ml.ml_लिन्या_बिलांग - lnum);
 
     // Find index for "wp".
     i = diff_buf_idx(wp->w_buffer);
-    if (i == DB_COUNT)			// safety check
+    if (i == DB_बिलांग)			// safety check
 	return (linenr_T)0;
 
     n = lnum + (dp->df_lnum[i] - dp->df_lnum[idx]);
-    if (n > dp->df_lnum[i] + dp->df_count[i])
-	n = dp->df_lnum[i] + dp->df_count[i];
+    if (n > dp->df_lnum[i] + dp->df_बिलांग[i])
+	n = dp->df_lnum[i] + dp->df_बिलांग[i];
     return n;
 }
 
@@ -4731,7 +4731,7 @@ diff_lnum_win(linenr_T lnum, win_T *wp)
  */
     static int
 parse_diff_ed(
-	char_u	    *line,
+	char_u	    *लिन्या,
 	diffhunk_T  *hunk)
 {
     char_u *p;
@@ -4742,7 +4742,7 @@ parse_diff_ed(
     // change: {first}[,{last}]c{first}[,{last}]
     // append: {first}a{first}[,{last}]
     // delete: {first}[,{last}]d{first}
-    p = line;
+    p = लिन्या;
     f1 = getdigits(&p);
     if (*p == ',')
     {
@@ -4768,22 +4768,22 @@ parse_diff_ed(
     if (difftype == 'a')
     {
 	hunk->lnum_orig = f1 + 1;
-	hunk->count_orig = 0;
+	hunk->बिलांग_orig = 0;
     }
     else
     {
 	hunk->lnum_orig = f1;
-	hunk->count_orig = l1 - f1 + 1;
+	hunk->बिलांग_orig = l1 - f1 + 1;
     }
     if (difftype == 'd')
     {
 	hunk->lnum_new = f2 + 1;
-	hunk->count_new = 0;
+	hunk->बिलांग_new = 0;
     }
     else
     {
 	hunk->lnum_new = f2;
-	hunk->count_new = l2 - f2 + 1;
+	hunk->बिलांग_new = l2 - f2 + 1;
     }
     return OK;
 }
@@ -4794,7 +4794,7 @@ parse_diff_ed(
  */
     static int
 parse_diff_unified(
-	char_u	    *line,
+	char_u	    *लिन्या,
 	diffhunk_T  *hunk)
 {
     char_u *p;
@@ -4802,7 +4802,7 @@ parse_diff_unified(
 
     // Parse unified diff hunk header:
     // @@ -oldline,oldcount +newline,newcount @@
-    p = line;
+    p = लिन्या;
     if (*p++ == '@' && *p++ == '@' && *p++ == ' ' && *p++ == '-')
     {
 	oldline = getdigits(&p);
@@ -4835,9 +4835,9 @@ parse_diff_unified(
 	    newline = 1;
 
 	hunk->lnum_orig = oldline;
-	hunk->count_orig = oldcount;
+	hunk->बिलांग_orig = oldcount;
 	hunk->lnum_new = newline;
-	hunk->count_new = newcount;
+	hunk->बिलांग_new = newcount;
 
 	return OK;
     }
@@ -4852,9 +4852,9 @@ parse_diff_unified(
     static int
 xdiff_out_indices(
 	long start_a,
-	long count_a,
+	long बिलांग_a,
 	long start_b,
-	long count_b,
+	long बिलांग_b,
 	void *priv)
 {
     diffout_T	*dout = (diffout_T *)priv;
@@ -4870,9 +4870,9 @@ xdiff_out_indices(
     }
 
     p->lnum_orig  = start_a + 1;
-    p->count_orig = count_a;
+    p->बिलांग_orig = बिलांग_a;
     p->lnum_new   = start_b + 1;
-    p->count_new  = count_b;
+    p->बिलांग_new  = बिलांग_b;
     ((diffhunk_T **)dout->dout_ga.ga_data)[dout->dout_ga.ga_len++] = p;
     return 0;
 }
@@ -4910,7 +4910,7 @@ f_diff_filler(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
     if (in_vim9script() && check_for_lnum_arg(argvars, 0) == FAIL)
 	return;
 
-    rettv->vval.v_number = diff_check_fill(curwin, tv_get_lnum(argvars));
+    rettv->vval.v_नुमेरो = diff_check_fill(curwin, tv_get_lnum(argvars));
 # endif
 }
 
@@ -4937,7 +4937,7 @@ f_diff_hlID(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
 
     if (in_vim9script()
 	    && (check_for_lnum_arg(argvars,0) == FAIL
-		|| check_for_number_arg(argvars, 1) == FAIL))
+		|| check_for_नुमेरो_arg(argvars, 1) == FAIL))
 	return;
 
     if (diff_flags & ALL_INLINE_DIFF)
@@ -4971,7 +4971,7 @@ f_diff_hlID(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
 		else
 		{
 		    hlID = HLF_CHD;	// changed line
-		    if (diffline.num_changes > 0 && cache_results)
+		    if (diffline.नुमेरो_changes > 0 && cache_results)
 		    {
 			change_start = diffline.changes[0].dc_start[diffline.bufidx];
 			change_end = diffline.changes[0].dc_end[diffline.bufidx];
@@ -4995,7 +4995,7 @@ f_diff_hlID(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
 
     if (hlID == HLF_CHD || hlID == HLF_TXD)
     {
-	col = tv_get_number(&argvars[1]) - 1; // ignore type error in {col}
+	col = tv_get_नुमेरो(&argvars[1]) - 1; // ignore type error in {col}
 	if (cache_results)
 	{
 	    if (col >= change_start && col < change_end)
@@ -5006,7 +5006,7 @@ f_diff_hlID(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
 	else
 	{
 	    hlID = HLF_CHD;
-	    for (int i = 0; i < diffline.num_changes; i++)
+	    for (int i = 0; i < diffline.नुमेरो_changes; i++)
 	    {
 		int added = diff_change_parse(&diffline, &diffline.changes[i],
 			&change_start, &change_end);
@@ -5021,7 +5021,7 @@ f_diff_hlID(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
 	    }
 	}
     }
-    rettv->vval.v_number = hlID == (hlf_T)0 ? 0 : (int)hlID;
+    rettv->vval.v_नुमेरो = hlID == (hlf_T)0 ? 0 : (int)hlID;
 # endif
 }
 
@@ -5067,7 +5067,7 @@ parse_diff_optarg(
 	}
     }
 
-    *diff_ctxlen = dict_get_number_def(d, "context", 0);
+    *diff_ctxlen = dict_get_नुमेरो_def(d, "context", 0);
     if (*diff_ctxlen < 0)
 	*diff_ctxlen = 0;
 
@@ -5100,7 +5100,7 @@ list_to_diffin(list_T *l, diffin_T *din, int icase)
 
     ga_init2(&ga, 1, 2048);
 
-    FOR_ALL_LIST_ITEMS(l, li)
+    FOR_ALL_LIST_मगा_बागाय(l, li)
     {
 	str = tv_get_string(&li->li_tv);
 	if (icase)
@@ -5131,10 +5131,10 @@ get_diff_hunk_indices(diffhunk_T *hunk)
     if (hunk_dict == NULL)
 	return NULL;
 
-    dict_add_number(hunk_dict, "from_idx", hunk->lnum_orig - 1);
-    dict_add_number(hunk_dict, "from_count", hunk->count_orig);
-    dict_add_number(hunk_dict, "to_idx", hunk->lnum_new  - 1);
-    dict_add_number(hunk_dict, "to_count", hunk->count_new);
+    dict_add_नुमेरो(hunk_dict, "from_idx", hunk->lnum_orig - 1);
+    dict_add_नुमेरो(hunk_dict, "from_count", hunk->बिलांग_orig);
+    dict_add_नुमेरो(hunk_dict, "to_idx", hunk->lnum_new  - 1);
+    dict_add_नुमेरो(hunk_dict, "to_count", hunk->बिलांग_new);
 
     return hunk_dict;
 }

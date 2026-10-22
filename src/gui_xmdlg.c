@@ -68,7 +68,7 @@ add_cancel_action(Widget shell, XtCallbackProc close_callback, void *arg)
     Display *display = XtDisplay(shell);
 
     // deactivate the built-in delete response of killing the application
-    XtVaSetValues(shell, XmNdeleteResponse, XmDO_NOTHING, NULL);
+    Xt_Va_Set_मगा_हालागा(shell, XmNdeleteResponse, XmDO_NOTHING, NULL);
 
     // add a delete window protocol callback instead
     if (!dw_atom)
@@ -105,7 +105,7 @@ typedef struct _SharedFontSelData
     Widget	name;
     Widget	sample;
     char	**names;	// font name array of arrays
-    int		num;		// number of font names
+    int		नुमेरो;		// number of font names
     String	sel[NONE];	// selection category
     Boolean	in_pixels;	// toggle state - size in pixels
     char	*font_name;	// current font name
@@ -121,10 +121,10 @@ typedef struct _SharedFontSelData
 fn(SharedFontSelData *data, int i)
 {
     // Assertion checks:
-    if (data->num < 0)
+    if (data->नुमेरो < 0)
 	abort();
-    if (i >= data->num)
-	i = data->num - 1;
+    if (i >= data->नुमेरो)
+	i = data->नुमेरो - 1;
     if (i < 0)
 	i = 0;
 
@@ -270,16 +270,16 @@ encoding_part(char *font, char *buf)
  * Inserts a string into correct sorted position in a list.
  */
     static void
-add_to_list(char **buf, char *item, int *count)
+add_to_list(char **buf, char *item, int *बिलांग)
 {
     int	i;
     int j;
 
-    if (*count == MAX_ENTRIES_IN_LIST)
+    if (*बिलांग == MAX_ENTRIES_IN_LIST)
 	return;
 
     // avoid duplication
-    for (i = 0; i < *count; ++i)
+    for (i = 0; i < *बिलांग; ++i)
     {
 	if (!strcmp(buf[i], item))
 	    return;
@@ -289,16 +289,16 @@ add_to_list(char **buf, char *item, int *count)
     if (!strcmp(item, wild))
 	i = 0;
     else
-	for (i = 0; i < *count; ++i)
+	for (i = 0; i < *बिलांग; ++i)
 	    if (strcmp(buf[i], item) > 0 && strcmp(buf[i], wild))
 		break;
 
     // now insert the item
-    for (j = *count; j > i; --j)
+    for (j = *बिलांग; j > i; --j)
 	buf[j] = buf[j-1];
     buf[i] = XtNewString(item);
 
-    ++(*count);
+    ++(*बिलांग);
 }
 
 /*
@@ -363,26 +363,26 @@ static void encoding_callback(Widget w, SharedFontSelData *data,
 fill_lists(enum ListSpecifier fix, SharedFontSelData *data)
 {
     char	*list[NONE][MAX_ENTRIES_IN_LIST];
-    int		count[NONE];
+    int		बिलांग[NONE];
     char	buf[TEMP_BUF_SIZE];
-    XmString	items[MAX_ENTRIES_IN_LIST];
+    XmString	मगा_बागाय[MAX_ENTRIES_IN_LIST];
     int		i;
     int		idx;
 
     for (idx = (int)ENCODING; idx < (int)NONE; ++idx)
-	count[idx] = 0;
+	बिलांग[idx] = 0;
 
     // First we insert the wild char into every single list.
     if (fix != ENCODING)
-	add_to_list(list[ENCODING], wild, &count[ENCODING]);
+	add_to_list(list[ENCODING], wild, &बिलांग[ENCODING]);
     if (fix != NAME)
-	add_to_list(list[NAME], wild, &count[NAME]);
+	add_to_list(list[NAME], wild, &बिलांग[NAME]);
     if (fix != STYLE)
-	add_to_list(list[STYLE], wild, &count[STYLE]);
+	add_to_list(list[STYLE], wild, &बिलांग[STYLE]);
     if (fix != SIZE)
-	add_to_list(list[SIZE], wild, &count[SIZE]);
+	add_to_list(list[SIZE], wild, &बिलांग[SIZE]);
 
-    for (i = 0; i < data->num && i < MAX_ENTRIES_IN_LIST; i++)
+    for (i = 0; i < data->नुमेरो && i < MAX_ENTRIES_IN_LIST; i++)
     {
 	if (proportional(fn(data, i)))
 	    continue;
@@ -393,7 +393,7 @@ fill_lists(enum ListSpecifier fix, SharedFontSelData *data)
 		&& match(data, SIZE, i))
 	{
 	    encoding_part(fn(data, i), buf);
-	    add_to_list(list[ENCODING], buf, &count[ENCODING]);
+	    add_to_list(list[ENCODING], buf, &बिलांग[ENCODING]);
 	}
 
 	if (fix != NAME
@@ -402,7 +402,7 @@ fill_lists(enum ListSpecifier fix, SharedFontSelData *data)
 		&& match(data, SIZE, i))
 	{
 	    name_part(fn(data, i), buf);
-	    add_to_list(list[NAME], buf, &count[NAME]);
+	    add_to_list(list[NAME], buf, &बिलांग[NAME]);
 	}
 
 	if (fix != STYLE
@@ -411,7 +411,7 @@ fill_lists(enum ListSpecifier fix, SharedFontSelData *data)
 		&& match(data, SIZE, i))
 	{
 	    style_part(fn(data, i), buf);
-	    add_to_list(list[STYLE], buf, &count[STYLE]);
+	    add_to_list(list[STYLE], buf, &बिलांग[STYLE]);
 	}
 
 	if (fix != SIZE
@@ -420,7 +420,7 @@ fill_lists(enum ListSpecifier fix, SharedFontSelData *data)
 		&& match(data, STYLE, i))
 	{
 	    size_part(fn(data, i), buf, data->in_pixels);
-	    add_to_list(list[SIZE], buf, &count[SIZE]);
+	    add_to_list(list[SIZE], buf, &बिलांग[SIZE]);
 	}
     }
 
@@ -430,27 +430,27 @@ fill_lists(enum ListSpecifier fix, SharedFontSelData *data)
 
     if (fix != ENCODING)
     {
-	Cardinal n_items;
+	Cardinal n_मगा_बागाय;
 	WidgetList children;
 	Widget selected_button = 0;
 
 	// Get and update the current button list.
-	XtVaGetValues(data->encoding_pulldown,
+	Xt_Va_Get_मगा_हालागा(data->encoding_pulldown,
 		XmNchildren, &children,
-		XmNnumChildren, &n_items,
+		XmNnumChildren, &n_मगा_बागाय,
 		NULL);
 
-	for (i = 0; i < count[ENCODING]; ++i)
+	for (i = 0; i < बिलांग[ENCODING]; ++i)
 	{
 	    Widget button;
 
-	    items[i] = XmStringCreateLocalized(list[ENCODING][i]);
+	    मगा_बागाय[i] = XmStringCreateLocalized(list[ENCODING][i]);
 
-	    if (i < (int)n_items)
+	    if (i < (int)n_मगा_बागाय)
 	    {
 		// recycle old button
-		XtVaSetValues(children[i],
-			XmNlabelString, items[i],
+		Xt_Va_Set_मगा_हालागा(children[i],
+			XmNlabelString, मगा_बागाय[i],
 			XmNuserData, i,
 			NULL);
 		button = children[i];
@@ -459,9 +459,9 @@ fill_lists(enum ListSpecifier fix, SharedFontSelData *data)
 	    {
 		// create a new button
 		button = XtVaCreateManagedWidget("button",
-			xmPushButtonGadgetClass,
+			xm_इतुलाक_Button_Gadget_Class,
 			data->encoding_pulldown,
-			XmNlabelString, items[i],
+			XmNlabelString, मगा_बागाय[i],
 			XmNuserData, i,
 			NULL);
 		XtAddCallback(button, XmNactivateCallback,
@@ -478,7 +478,7 @@ fill_lists(enum ListSpecifier fix, SharedFontSelData *data)
 	}
 
 	// Destroy all the outstanding menu items.
-	for (i = count[ENCODING]; i < (int)n_items; ++i)
+	for (i = बिलांग[ENCODING]; i < (int)n_मगा_बागाय; ++i)
 	{
 	    XtUnmanageChild(children[i]);
 	    XtDestroyWidget(children[i]);
@@ -487,13 +487,13 @@ fill_lists(enum ListSpecifier fix, SharedFontSelData *data)
 	// Preserve the current selection visually.
 	if (selected_button)
 	{
-	    XtVaSetValues(data->encoding_menu,
+	    Xt_Va_Set_मगा_हालागा(data->encoding_menu,
 		    XmNmenuHistory, selected_button,
 		    NULL);
 	}
 
-	for (i = 0; i < count[ENCODING]; ++i)
-	    XmStringFree(items[i]);
+	for (i = 0; i < बिलांग[ENCODING]; ++i)
+	    XmStringFree(मगा_बागाय[i]);
     }
 
     /*
@@ -521,22 +521,22 @@ fill_lists(enum ListSpecifier fix, SharedFontSelData *data)
 		w = (Widget)0;	// for lint
 	}
 
-	for (i = 0; i < count[idx]; ++i)
+	for (i = 0; i < बिलांग[idx]; ++i)
 	{
-	    items[i] = XmStringCreateLocalized(list[idx][i]);
+	    मगा_बागाय[i] = XmStringCreateLocalized(list[idx][i]);
 	    XtFree(list[idx][i]);
 	}
-	XmListDeleteAllItems(w);
-	XmListAddItems(w, items, count[idx], 1);
+	Xm_List_Delete_All_मगा_बागाय(w);
+	Xm_List_Add_मगा_बागाय(w, मगा_बागाय, बिलांग[idx], 1);
 	if (data->sel[idx])
 	{
-	    XmStringFree(items[0]);
-	    items[0] = XmStringCreateLocalized(data->sel[idx]);
-	    XmListSelectItem(w, items[0], False);
-	    XmListSetBottomItem(w, items[0]);
+	    XmStringFree(मगा_बागाय[0]);
+	    मगा_बागाय[0] = XmStringCreateLocalized(data->sel[idx]);
+	    XmListSelectItem(w, मगा_बागाय[0], False);
+	    XmListSetBottomItem(w, मगा_बागाय[0]);
 	}
-	for (i = 0; i < count[idx]; ++i)
-	    XmStringFree(items[i]);
+	for (i = 0; i < बिलांग[idx]; ++i)
+	    XmStringFree(मगा_बागाय[i]);
     }
 }
 
@@ -549,12 +549,12 @@ stoggle_callback(Widget w UNUSED,
     char	newSize[TEMP_BUF_SIZE];
     XmString	str;
 
-    if (call_data->reason != (int)XmCR_VALUE_CHANGED)
+    if (call_data->reason != (int)Xm_CR_हालागा_CHANGED)
 	return;
 
     do_sel = (data->sel[SIZE] != NULL) && strcmp(data->sel[SIZE], wild);
 
-    for (i = 0; do_sel && (i < data->num); i++)
+    for (i = 0; do_sel && (i < data->नुमेरो); i++)
 	if (match(data, ENCODING, i)
 		&& match(data, NAME, i)
 		&& match(data, STYLE, i)
@@ -586,7 +586,7 @@ stoggle_callback(Widget w UNUSED,
     static void
 display_sample(SharedFontSelData *data)
 {
-    Arg		    args[2];
+    Arg		    मगा_कातविरान[2];
     int		    n;
     XFontStruct	*   font;
     XmFontList	    font_list;
@@ -599,10 +599,10 @@ display_sample(SharedFontSelData *data)
 
     n = 0;
     str = XmStringCreateLocalized("AaBbZzYy 0123456789");
-    XtSetArg(args[n], XmNlabelString, str); n++;
-    XtSetArg(args[n], XmNfontList, font_list); n++;
+    XtSetArg(मगा_कातविरान[n], XmNlabelString, str); n++;
+    XtSetArg(मगा_कातविरान[n], XmNfontList, font_list); n++;
 
-    XtSetValues(data->sample, args, n);
+    Xt_Set_मगा_हालागा(data->sample, मगा_कातविरान, n);
     XmStringFree(str);
 
     if (data->old)
@@ -663,7 +663,7 @@ do_choice(Widget w,
 	    XtFree(data->font_name);
 	data->font_name = NULL;
 
-	for (i = 0; i < data->num; i++)
+	for (i = 0; i < data->नुमेरो; i++)
 	{
 	    if (match(data, ENCODING, i)
 		    && match(data, NAME, i)
@@ -692,15 +692,15 @@ do_choice(Widget w,
     {
 	int	    n;
 	XmString    str;
-	Arg	    args[4];
-	char	    *nomatch_msg = _("no specific match");
+	Arg	    मगा_कातविरान[4];
+	char	    *nomatch_मेनसाहे = _("no specific match");
 
 	n = 0;
-	str = XmStringCreateLocalized(nomatch_msg);
-	XtSetArg(args[n], XmNlabelString, str); ++n;
-	XtSetValues(data->sample, args, n);
+	str = XmStringCreateLocalized(nomatch_मेनसाहे);
+	XtSetArg(मगा_कातविरान[n], XmNlabelString, str); ++n;
+	Xt_Set_मगा_हालागा(data->sample, मगा_कातविरान, n);
 	apply_fontlist(data->sample);
-	XmTextSetString(data->name, nomatch_msg);
+	XmTextSetString(data->name, nomatch_मेनसाहे);
 	XmStringFree(str);
 
 	return False;
@@ -715,7 +715,7 @@ encoding_callback(Widget w,
     XmString str;
     XmListCallbackStruct fake_data;
 
-    XtVaGetValues(w, XmNlabelString, &str, NULL);
+    Xt_Va_Get_मगा_हालागा(w, XmNlabelString, &str, NULL);
 
     if (!str)
 	return;
@@ -779,7 +779,7 @@ cancel_callback(Widget w UNUSED,
 	XtFree(data->font_name);
     data->font_name = NULL;
 
-    data->num = 0;
+    data->नुमेरो = 0;
     XFreeFontNames(data->names);
     data->names = NULL;
     data->exit = True;
@@ -788,7 +788,7 @@ cancel_callback(Widget w UNUSED,
     static void
 ok_callback(Widget w UNUSED,
 	SharedFontSelData *data,
-	XmPushButtonCallbackStruct *call_data UNUSED)
+	Xm_इतुलाक_Button_Callback_Struct *call_data UNUSED)
 {
     char    *pattern;
     char    **name;
@@ -835,7 +835,7 @@ ok_callback(Widget w UNUSED,
 
 	XFreeFontNames(name);
 
-	data->num = 0;
+	data->नुमेरो = 0;
 	XFreeFontNames(data->names);
 	data->names = NULL;
 	data->exit = True;
@@ -860,7 +860,7 @@ gui_xm_select_font(char_u *current)
     Widget		name;
     Widget		disp_frame;
     Widget		frame;
-    Arg			args[64];
+    Arg			मगा_कातविरान[64];
     int			n;
     XmString		str;
     char		big_font[MAX_FONT_NAME_LEN];
@@ -870,7 +870,7 @@ gui_xm_select_font(char_u *current)
 
     parent = vimShell;
     data->names = XListFonts(XtDisplay(parent), "-*-*-*-*-*-*-*-*-*-*-*-*-*-*",
-						       MAX_FONTS, &data->num);
+						       MAX_FONTS, &data->नुमेरो);
 
     /*
      * Find the name of the biggest font less than the given limit
@@ -885,7 +885,7 @@ gui_xm_select_font(char_u *current)
 	int	size;
 	char	buf[128];
 
-	for (i = 0, max = 0; i < data->num; i++)
+	for (i = 0, max = 0; i < data->नुमेरो; i++)
 	{
 	    get_part(fn(data, i), 7, buf);
 	    size = atoi(buf);
@@ -925,7 +925,7 @@ gui_xm_select_font(char_u *current)
 	    NULL);
 
     data->ok = XtVaCreateManagedWidget(_("OK"),
-	    xmPushButtonGadgetClass, sub_form,
+	    xm_इतुलाक_Button_Gadget_Class, sub_form,
 	    XmNleftAttachment, XmATTACH_FORM,
 	    XmNrightAttachment, XmATTACH_FORM,
 	    XmNtopAttachment, XmATTACH_FORM,
@@ -934,7 +934,7 @@ gui_xm_select_font(char_u *current)
     apply_fontlist(data->ok);
 
     data->cancel = XtVaCreateManagedWidget(_("Cancel"),
-	    xmPushButtonGadgetClass, sub_form,
+	    xm_इतुलाक_Button_Gadget_Class, sub_form,
 	    XmNrightAttachment, XmATTACH_FORM,
 	    XmNleftAttachment, XmATTACH_FORM,
 	    XmNtopAttachment, XmATTACH_WIDGET,
@@ -946,13 +946,13 @@ gui_xm_select_font(char_u *current)
 
     // Create the separator for beauty.
     n = 0;
-    XtSetArg(args[n], XmNorientation, XmVERTICAL); n++;
-    XtSetArg(args[n], XmNbottomAttachment, XmATTACH_FORM); n++;
-    XtSetArg(args[n], XmNtopAttachment, XmATTACH_FORM); n++;
-    XtSetArg(args[n], XmNrightAttachment, XmATTACH_WIDGET); n++;
-    XtSetArg(args[n], XmNrightWidget, sub_form); n++;
-    XtSetArg(args[n], XmNrightOffset, 4); n++;
-    separator = XmCreateSeparatorGadget(form, "separator", args, n);
+    XtSetArg(मगा_कातविरान[n], XmNorientation, XmVERTICAL); n++;
+    XtSetArg(मगा_कातविरान[n], XmNbottomAttachment, XmATTACH_FORM); n++;
+    XtSetArg(मगा_कातविरान[n], XmNtopAttachment, XmATTACH_FORM); n++;
+    XtSetArg(मगा_कातविरान[n], XmNrightAttachment, XmATTACH_WIDGET); n++;
+    XtSetArg(मगा_कातविरान[n], XmNrightWidget, sub_form); n++;
+    XtSetArg(मगा_कातविरान[n], XmNrightOffset, 4); n++;
+    separator = XmCreateSeparatorGadget(form, "separator", मगा_कातविरान, n);
     XtManageChild(separator);
 
     // Create font name text widget and the corresponding label.
@@ -966,7 +966,7 @@ gui_xm_select_font(char_u *current)
 	    XmNrightWidget, separator,
 	    XmNrightOffset, 4,
 	    XmNeditable, False,
-	    XmNeditMode, XmSINGLE_LINE_EDIT,
+	    XmNeditMode, Xm_SINGLE_लिन्या_EDIT,
 	    XmNmaxLength, MAX_FONT_NAME_LEN,
 	    XmNcolumns, 60,
 	    NULL);
@@ -1031,17 +1031,17 @@ gui_xm_select_font(char_u *current)
 						 "encodingPulldown", NULL, 0);
     str = XmStringCreateLocalized(_("Encoding:"));
     n = 0;
-    XtSetArg(args[n], XmNsubMenuId, data->encoding_pulldown); ++n;
-    XtSetArg(args[n], XmNlabelString, str); ++n;
-    XtSetArg(args[n], XmNleftAttachment, XmATTACH_FORM); ++n;
-    XtSetArg(args[n], XmNleftOffset, 4); ++n;
-    XtSetArg(args[n], XmNbottomAttachment, XmATTACH_WIDGET); ++n;
-    XtSetArg(args[n], XmNbottomWidget, size_toggle); ++n;
-    XtSetArg(args[n], XmNbottomOffset, 4); ++n;
-    XtSetArg(args[n], XmNrightAttachment, XmATTACH_WIDGET); ++n;
-    XtSetArg(args[n], XmNrightWidget, separator); ++n;
-    XtSetArg(args[n], XmNrightOffset, 4); ++n;
-    data->encoding_menu = XmCreateOptionMenu(form, "encodingMenu", args, n);
+    XtSetArg(मगा_कातविरान[n], XmNsubMenuId, data->encoding_pulldown); ++n;
+    XtSetArg(मगा_कातविरान[n], XmNlabelString, str); ++n;
+    XtSetArg(मगा_कातविरान[n], XmNleftAttachment, XmATTACH_FORM); ++n;
+    XtSetArg(मगा_कातविरान[n], XmNleftOffset, 4); ++n;
+    XtSetArg(मगा_कातविरान[n], XmNbottomAttachment, XmATTACH_WIDGET); ++n;
+    XtSetArg(मगा_कातविरान[n], XmNbottomWidget, size_toggle); ++n;
+    XtSetArg(मगा_कातविरान[n], XmNbottomOffset, 4); ++n;
+    XtSetArg(मगा_कातविरान[n], XmNrightAttachment, XmATTACH_WIDGET); ++n;
+    XtSetArg(मगा_कातविरान[n], XmNrightWidget, separator); ++n;
+    XtSetArg(मगा_कातविरान[n], XmNrightOffset, 4); ++n;
+    data->encoding_menu = XmCreateOptionMenu(form, "encodingMenu", मगा_कातविरान, n);
     XmStringFree(str);
     XmAddTabGroup(data->encoding_menu);
 
@@ -1086,15 +1086,15 @@ gui_xm_select_font(char_u *current)
     apply_fontlist(name);
 
     n = 0;
-    XtSetArg(args[n], XmNvisibleItemCount, 8); ++n;
-    XtSetArg(args[n], XmNresizable, True); ++n;
-    XtSetArg(args[n], XmNlistSizePolicy, XmCONSTANT); ++n;
-    XtSetArg(args[n], XmNvisualPolicy, XmVARIABLE); ++n;
+    XtSetArg(मगा_कातविरान[n], Xm_Nvisible_Item_बिलांग, 8); ++n;
+    XtSetArg(मगा_कातविरान[n], XmNresizable, True); ++n;
+    XtSetArg(मगा_कातविरान[n], XmNlistSizePolicy, XmCONSTANT); ++n;
+    XtSetArg(मगा_कातविरान[n], XmNvisualPolicy, XmVARIABLE); ++n;
 #ifdef LESSTIF_VERSION
-    XtSetArg(args[n], XmNscrollBarDisplayPolicy, XmSTATIC); ++n;
+    XtSetArg(मगा_कातविरान[n], XmNscrollBarDisplayPolicy, XmSTATIC); ++n;
 #endif
-    data->list[NAME] = XmCreateScrolledList(frame, "fontList", args, n);
-    XtVaSetValues(name, XmNuserData, data->list[NAME], NULL);
+    data->list[NAME] = XmCreateScrolledList(frame, "fontList", मगा_कातविरान, n);
+    Xt_Va_Set_मगा_हालागा(name, XmNuserData, data->list[NAME], NULL);
 
     // style list
     frame = XtVaCreateManagedWidget("frame", xmFrameWidgetClass, sub_form,
@@ -1119,15 +1119,15 @@ gui_xm_select_font(char_u *current)
     apply_fontlist(name);
 
     n = 0;
-    XtSetArg(args[n], XmNvisibleItemCount, 8); ++n;
-    XtSetArg(args[n], XmNresizable, True); ++n;
-    XtSetArg(args[n], XmNlistSizePolicy, XmCONSTANT); ++n;
-    XtSetArg(args[n], XmNvisualPolicy, XmVARIABLE); ++n;
+    XtSetArg(मगा_कातविरान[n], Xm_Nvisible_Item_बिलांग, 8); ++n;
+    XtSetArg(मगा_कातविरान[n], XmNresizable, True); ++n;
+    XtSetArg(मगा_कातविरान[n], XmNlistSizePolicy, XmCONSTANT); ++n;
+    XtSetArg(मगा_कातविरान[n], XmNvisualPolicy, XmVARIABLE); ++n;
 #ifdef LESSTIF_VERSION
-    XtSetArg(args[n], XmNscrollBarDisplayPolicy, XmSTATIC); ++n;
+    XtSetArg(मगा_कातविरान[n], XmNscrollBarDisplayPolicy, XmSTATIC); ++n;
 #endif
-    data->list[STYLE] = XmCreateScrolledList(frame, "styleList", args, n);
-    XtVaSetValues(name, XmNuserData, data->list[STYLE], NULL);
+    data->list[STYLE] = XmCreateScrolledList(frame, "styleList", मगा_कातविरान, n);
+    Xt_Va_Set_मगा_हालागा(name, XmNuserData, data->list[STYLE], NULL);
 
     // size list
     frame = XtVaCreateManagedWidget("frame", xmFrameWidgetClass, sub_form,
@@ -1151,18 +1151,18 @@ gui_xm_select_font(char_u *current)
     apply_fontlist(name);
 
     n = 0;
-    XtSetArg(args[n], XmNvisibleItemCount, 8); ++n;
-    XtSetArg(args[n], XmNresizable, True); ++n;
-    XtSetArg(args[n], XmNlistSizePolicy, XmCONSTANT); ++n;
-    XtSetArg(args[n], XmNvisualPolicy, XmVARIABLE); ++n;
+    XtSetArg(मगा_कातविरान[n], Xm_Nvisible_Item_बिलांग, 8); ++n;
+    XtSetArg(मगा_कातविरान[n], XmNresizable, True); ++n;
+    XtSetArg(मगा_कातविरान[n], XmNlistSizePolicy, XmCONSTANT); ++n;
+    XtSetArg(मगा_कातविरान[n], XmNvisualPolicy, XmVARIABLE); ++n;
 #ifdef LESSTIF_VERSION
-    XtSetArg(args[n], XmNscrollBarDisplayPolicy, XmSTATIC); ++n;
+    XtSetArg(मगा_कातविरान[n], XmNscrollBarDisplayPolicy, XmSTATIC); ++n;
 #endif
-    data->list[SIZE] = XmCreateScrolledList(frame, "sizeList", args, n);
-    XtVaSetValues(name, XmNuserData, data->list[SIZE], NULL);
+    data->list[SIZE] = XmCreateScrolledList(frame, "sizeList", मगा_कातविरान, n);
+    Xt_Va_Set_मगा_हालागा(name, XmNuserData, data->list[SIZE], NULL);
 
     // update form widgets cancel button
-    XtVaSetValues(form, XmNcancelButton, data->cancel, NULL);
+    Xt_Va_Set_मगा_हालागा(form, XmNcancelButton, data->cancel, NULL);
 
     XtAddCallback(size_toggle, XmNvalueChangedCallback,
 	    (XtCallbackProc)stoggle_callback, (XtPointer)data);
@@ -1264,7 +1264,7 @@ gui_xm_select_font(char_u *current)
     // modal event loop
     while (!data->exit)
 	XtAppProcessEvent(XtWidgetToApplicationContext(data->dialog),
-							(XtInputMask)XtIMAll);
+							(Xt_पासोक_Mask)XtIMAll);
 
     if (data->old)
     {

@@ -70,7 +70,7 @@ static TT_MODE	orgmode;
 static short	iochan;			// TTY I/O channel
 static short	iosb[4];		// IO status block
 
-static int vms_match_num = 0;
+static int vms_match_नुमेरो = 0;
 static int vms_match_free = 0;
 static char_u **vms_fmatch = NULL;
 static char *Fspec_Rms;		       // rms file spec, passed implicitly between routines
@@ -259,7 +259,7 @@ mch_getenv(char_u *lognam)
  *	mch_setenv	VMS version of setenv()
  */
     int
-mch_setenv(char *var, char *value, int x)
+mch_setenv(char *var, char *हालागा, int x)
 {
     int		res, dum;
     long	attrib = 0L;
@@ -269,8 +269,8 @@ mch_setenv(char *var, char *value, int x)
 
     vul_desc(&tabnam, "LNM$JOB");
     vul_desc(&lognam, var);
-    vul_item(&itmlst.equ, value ? strlen(value) : 0, value ? LNM$_STRING : 0,
-	    value, &dum);
+    vul_item(&itmlst.equ, हालागा ? strlen(हालागा) : 0, हालागा ? LNM$_STRING : 0,
+	    हालागा, &dum);
     itmlst.nul	= 0;
     res = sys$crelnm(&attrib, &tabnam, &lognam, &acmode, &itmlst);
     return((res == 1) ? 0 : -1);
@@ -380,7 +380,7 @@ vms_wproc(char *name, int val)
 	return 1;
 
     // accept all DECC$K_FILE and DECC$K_DIRECTORY
-    if (vms_match_num == 0)
+    if (vms_match_नुमेरो == 0)
     {
 	// first time through, setup some things
 	if (NULL == vms_fmatch)
@@ -403,7 +403,7 @@ vms_wproc(char *name, int val)
     name=vms_tolower(name);
 
     // if name already exists, don't add it
-    for (i = 0; i<vms_match_num; i++)
+    for (i = 0; i<vms_match_नुमेरो; i++)
     {
 	if (0 == STRCMP((char_u *)name,vms_fmatch[i]))
 	    return 1;
@@ -423,9 +423,9 @@ vms_wproc(char *name, int val)
 	}
 	vms_match_free = EXPL_ALLOC_INC;
     }
-    vms_fmatch[vms_match_num] = vim_strsave((char_u *)name);
+    vms_fmatch[vms_match_नुमेरो] = vim_strsave((char_u *)name);
 
-    ++vms_match_num;
+    ++vms_match_नुमेरो;
     return 1;
 }
 
@@ -444,9 +444,9 @@ vms_wproc(char *name, int val)
  */
     int
 mch_expand_wildcards(
-    int		num_pat,
+    int		नुमेरो_pat,
     char_u	**pat,
-    int		*num_file,
+    int		*नुमेरो_file,
     char_u	***file,
     int		flags)
 {
@@ -456,16 +456,16 @@ mch_expand_wildcards(
     int		dir;
     int files_alloced, files_free;
 
-    *num_file = 0;			// default: no files found
+    *नुमेरो_file = 0;			// default: no files found
     files_alloced = EXPL_ALLOC_INC;
     files_free = EXPL_ALLOC_INC;
     *file = ALLOC_MULT(char_u *, files_alloced);
     if (*file == NULL)
     {
-	*num_file = 0;
+	*नुमेरो_file = 0;
 	return FAIL;
     }
-    for (i = 0; i < num_pat; i++)
+    for (i = 0; i < नुमेरो_pat; i++)
     {
 	// expand environment var or home dir
 	if (vim_strchr(pat[i],'$') || vim_strchr(pat[i],'~'))
@@ -473,7 +473,7 @@ mch_expand_wildcards(
 	else
 	    STRCPY(buf,pat[i]);
 
-	vms_match_num = 0; // reset collection counter
+	vms_match_नुमेरो = 0; // reset collection counter
 	result = decc$translate_vms(vms_fixfilename(buf));
 	if ( (int) result == 0 || (int) result == -1  )
 	{
@@ -484,7 +484,7 @@ mch_expand_wildcards(
 	    cnt = decc$to_vms(result, vms_wproc, 1 /*allow wild*/ , (flags & EW_DIR ? 0:1 ) /*allow directory*/) ;
 	}
 	if (cnt > 0)
-	    cnt = vms_match_num;
+	    cnt = vms_match_नुमेरो;
 
 	if (cnt < 1)
 	    continue;
@@ -516,13 +516,13 @@ mch_expand_wildcards(
 		{
 		    vim_free(old_file);
 		    *file = (char_u **)"";
-		    *num_file = 0;
+		    *नुमेरो_file = 0;
 		    return(FAIL);
 		}
 		files_free = EXPL_ALLOC_INC;
 	    }
 
-	    (*file)[*num_file++] = vms_fmatch[i];
+	    (*file)[*नुमेरो_file++] = vms_fmatch[i];
 	}
     }
     return OK;
@@ -534,7 +534,7 @@ mch_expandpath(garray_T *gap, char_u *path, int flags)
     int		i,cnt = 0;
     char       *result;
 
-    vms_match_num = 0;
+    vms_match_नुमेरो = 0;
     // the result from the decc$translate_vms needs to be handled
     // otherwise it might create ACCVIO error in decc$to_vms
     result = decc$translate_vms(vms_fixfilename(path));
@@ -547,7 +547,7 @@ mch_expandpath(garray_T *gap, char_u *path, int flags)
 	cnt = decc$to_vms(result, vms_wproc, 1 /*allow_wild*/, (flags & EW_DIR ? 0:1 ) /*allow directory*/);
     }
     if (cnt > 0)
-	cnt = vms_match_num;
+	cnt = vms_match_नुमेरो;
     for (i = 0; i < cnt; i++)
     {
 	if (mch_getperm(vms_fmatch[i]) >= 0) // add existing file
@@ -932,7 +932,7 @@ RealWaitForChar(
 typedef struct
    {
    char *name;
-   int value;
+   int हालागा;
    } decc_feat_t;
 
 int vms_init_done = -1;
@@ -986,9 +986,9 @@ vms_init(void)
     vms_init_done = 1;
 
     int feat_index;
-    int feat_value;
-    int feat_value_max;
-    int feat_value_min;
+    int feat_हालागा;
+    int feat_हालागा_max;
+    int feat_हालागा_min;
     int i;
     int sts;
 
@@ -1000,20 +1000,20 @@ vms_init(void)
 	if (feat_index >= 0)
 	{
 	    // Valid item.  Collect its properties
-	    feat_value = decc$feature_get_value(feat_index, 1);
-	    feat_value_min = decc$feature_get_value(feat_index, 2);
-	    feat_value_max = decc$feature_get_value(feat_index, 3);
+	    feat_हालागा = decc$feature_get_हालागा(feat_index, 1);
+	    feat_हालागा_min = decc$feature_get_हालागा(feat_index, 2);
+	    feat_हालागा_max = decc$feature_get_हालागा(feat_index, 3);
 
-	    if ((decc_feat_array[i].value >= feat_value_min) && (decc_feat_array[i].value <= feat_value_max))
+	    if ((decc_feat_array[i].हालागा >= feat_हालागा_min) && (decc_feat_array[i].हालागा <= feat_हालागा_max))
 	    {
 		// Valid value.  Set it if necessary
-		if (feat_value != decc_feat_array[i].value)
-		    sts = decc$feature_set_value(feat_index, 1, decc_feat_array[i].value);
+		if (feat_हालागा != decc_feat_array[i].हालागा)
+		    sts = decc$feature_set_हालागा(feat_index, 1, decc_feat_array[i].हालागा);
 	    }
 	    else
 		// Invalid DECC feature value
 		printf("INVALID DECC FEATURE VALUE, %d: %d <= %s <= %d.\n",
-			feat_value, feat_value_min, decc_feat_array[i].name, feat_value_max);
+			feat_हालागा, feat_हालागा_min, decc_feat_array[i].name, feat_हालागा_max);
 	}
 	else
 	    // Invalid DECC feature name

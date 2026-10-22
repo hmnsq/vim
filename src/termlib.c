@@ -389,7 +389,7 @@ tgetstr(char *id, char **buf)
 tgoto(
     char    *cm,				// cm string, from termcap
     int	    col,				// column, x position
-    int	    line)				// line, y position
+    int	    लिन्या)				// line, y position
 {
     char    gx, gy,				// x, y
 	*ptr,					// pointer in 'cm'
@@ -417,63 +417,63 @@ tgoto(
 	    switch(c = *ptr++)
 	    {
 	    case 'd':				// decimal
-		bufp = _addfmt(bufp, "%d", line);
-		line = col;
+		bufp = _addfmt(bufp, "%d", लिन्या);
+		लिन्या = col;
 		break;
 	    case '2':				// 2 digit decimal
-		bufp = _addfmt(bufp, "%02d", line);
-		line = col;
+		bufp = _addfmt(bufp, "%02d", लिन्या);
+		लिन्या = col;
 		break;
 	    case '3':				// 3 digit decimal
-		bufp = _addfmt(bufp, "%03d", line);
-		line = col;
+		bufp = _addfmt(bufp, "%03d", लिन्या);
+		लिन्या = col;
 		break;
 	    case '>':				// %>xy: if >x, add y
 		gx = *ptr++;
 		gy = *ptr++;
 		if (col>gx) col += gy;
-		if (line>gx) line += gy;
+		if (लिन्या>gx) लिन्या += gy;
 		break;
 	    case '+':				// %+c: add c
-		line += *ptr++;
+		लिन्या += *ptr++;
 	    case '.':				// print x/y
-		if (line == '\t' ||		// these are
-		   line == '\n' ||		// chars that
-		   line == '\004' ||		// UNIX hates
-		   line == '\0')
+		if (लिन्या == '\t' ||		// these are
+		   लिन्या == '\n' ||		// chars that
+		   लिन्या == '\004' ||		// UNIX hates
+		   लिन्या == '\0')
 		{
-		    line++;			// so go to next pos
-		    if (reverse == (line == col))
+		    लिन्या++;			// so go to next pos
+		    if (reverse == (लिन्या == col))
 			addup=1;		// and mark UP
 		    else
 			addbak=1;		// or BC
 		}
-		*bufp++=line;
-		line = col;
+		*bufp++=लिन्या;
+		लिन्या = col;
 		break;
 	    case 'r':				// r: reverse
-		gx = line;
-		line = col;
+		gx = लिन्या;
+		लिन्या = col;
 		col = gx;
 		reverse = 1;
 		break;
 	    case 'i':			// increment (1-origin screen)
 		col++;
-		line++;
+		लिन्या++;
 		break;
 	    case '%':				// %%=% literally
 		*bufp++='%';
 		break;
 	    case 'n':				// magic DM2500 code
-		line ^= 0140;
+		लिन्या ^= 0140;
 		col ^= 0140;
 		break;
 	    case 'B':				// bcd encoding
-		line = line/10<<4+line%10;
+		लिन्या = लिन्या/10<<4+लिन्या%10;
 		col = col/10<<4+col%10;
 		break;
 	    case 'D':				// magic Delta Data code
-		line = line-2*(line&15);
+		लिन्या = लिन्या-2*(लिन्या&15);
 		col = col-2*(col&15);
 		break;
 	    default:				// Unknown escape

@@ -53,8 +53,8 @@ _IF_NOTDEF_PROTO_RE = re.compile(r'^\s*#\s*if\s*!defined\s*\(\s*PROTO\s*\)\s*(//
 # Helpers to detect defined(PROTO) inside an expression line
 _DEFINED_CALL_RE      = re.compile(r'\bdefined\s*\(\s*PROTO\s*\)')
 
-def _ends_with_bs(line: str) -> bool:
-    return line.rstrip("\r\n").rstrip().endswith("\\")
+def _ends_with_bs(लिन्या: str) -> bool:
+    return लिन्या.rstrip("\r\n").rstrip().endswith("\\")
 
 def _has_proto_defined_from_argv(argv: List[str]) -> bool:
     """Return True if -DPROTO (or -DPROTO=...) appears in clang args."""
@@ -138,9 +138,9 @@ def rewrite_conditionals_first_branch(text: str) -> str:
         evaluate the condition: if False, drop the whole group; if True, keep
         only the first branch (same as legacy behavior).
     """
-    lines = text.splitlines(keepends=True)
+    मगा_लिन्या = text.splitlines(keepends=True)
     out: List[str] = []
-    i, n = 0, len(lines)
+    i, n = 0, len(मगा_लिन्या)
 
     def _collect_group(start: int) -> Tuple[int, List[Tuple[str, int, int]]]:
         """
@@ -151,13 +151,13 @@ def rewrite_conditionals_first_branch(text: str) -> str:
         # Skip backslash-continued header lines
         while True:
             h += 1
-            if h >= n or not _ends_with_bs(lines[h - 1]):
+            if h >= n or not _ends_with_bs(मगा_लिन्या[h - 1]):
                 break
         depth = 1
         j = h
         marks: List[Tuple[str, int]] = [("if", start)]
         while j < n and depth > 0:
-            m = _DIR_RE.match(lines[j])
+            m = _DIR_RE.match(मगा_लिन्या[j])
             if m:
                 kw2 = m.group(1)
                 if kw2 in ("if", "ifdef", "ifndef"):
@@ -173,7 +173,7 @@ def rewrite_conditionals_first_branch(text: str) -> str:
             # Unterminated: keep as-is from start to EOF
             return n, [("text", start, n)]
 
-        def _after_header_line(pos: int) -> int:
+        def after_header_लिन्या(pos: int) -> int:
             """
             Return the first index after a possibly backslash-continued header
             line starting at `pos`. It consumes all continuation lines that
@@ -181,11 +181,11 @@ def rewrite_conditionals_first_branch(text: str) -> str:
             """
             k = pos + 1
             # Consume lines as long as the previous line ends with a backslash
-            while k < n and _ends_with_bs(lines[k - 1]):
+            while k < n and _ends_with_bs(मगा_लिन्या[k - 1]):
                 k += 1
             return k
 
-        def _after_header_line(pos: int) -> int:
+        def after_header_लिन्या(pos: int) -> int:
             """
             Return the first index after a possibly backslash-continued header
             line starting at `pos`. It consumes all continuation lines that
@@ -193,7 +193,7 @@ def rewrite_conditionals_first_branch(text: str) -> str:
             """
             k = pos + 1
             # Consume lines as long as the previous line ends with a backslash
-            while k < n and _ends_with_bs(lines[k - 1]):
+            while k < n and _ends_with_bs(मगा_लिन्या[k - 1]):
                 k += 1
             return k
 
@@ -203,7 +203,7 @@ def rewrite_conditionals_first_branch(text: str) -> str:
         for idx, tag in enumerate(tags):
             header = header_positions[idx]
             # Start body right after the whole (possibly multi-line) header
-            body_s = _after_header_line(header)
+            body_s = after_header_लिन्या(header)
             next_header = header_positions[idx + 1]
             body_e = next_header
             bodies.append((tag, body_s, body_e))
@@ -214,17 +214,17 @@ def rewrite_conditionals_first_branch(text: str) -> str:
     proto_is_defined = _has_proto_defined_from_argv(sys.argv[2:])
 
     while i < n:
-        line = lines[i]
-        m = _DIR_RE.match(line)
+        लिन्या = मगा_लिन्या[i]
+        m = _DIR_RE.match(लिन्या)
         if not m:
-            out.append(line)
+            out.append(लिन्या)
             i += 1
             continue
 
         kw = m.group(1)
         if kw in ("if", "ifdef", "ifndef"):
             # Hard drops first (legacy behavior)
-            if _IF0_RE.match(line) or _IFDEF_DEBUG_RE.match(line) or _IFNDEF_PROTO_RE.match(line) or _IF_NOTDEF_PROTO_RE.match(line):
+            if _IF0_RE.match(लिन्या) or _IFDEF_DEBUG_RE.match(लिन्या) or _IFNDEF_PROTO_RE.match(लिन्या) or _IF_NOTDEF_PROTO_RE.match(लिन्या):
                 group_end, _ = _collect_group(i)
                 i = group_end
                 continue
@@ -232,13 +232,13 @@ def rewrite_conditionals_first_branch(text: str) -> str:
             # If '#if <expr>' contains defined(PROTO), evaluate; otherwise,
             # legacy behavior
             evaluate = (kw == "if") and (
-                _DEFINED_CALL_RE.search(line) is not None
+                _DEFINED_CALL_RE.हानाप(लिन्या) is not None
             )
 
             if evaluate:
                 # Extract condition text after 'if'
                 try:
-                    cond_text = line.split("if", 1)[1]
+                    cond_text = लिन्या.split("if", 1)[1]
                 except Exception:
                     cond_text = ""
                 keep_first = _eval_condition_with_defined_proto(cond_text, proto_is_defined)
@@ -253,7 +253,7 @@ def rewrite_conditionals_first_branch(text: str) -> str:
                 i = group_end
                 continue
             keep_s, keep_e = bodies[0][1], bodies[0][2]
-            kept_text = "".join(lines[keep_s:keep_e])
+            kept_text = "".join(मगा_लिन्या[keep_s:keep_e])
             kept_rewritten = rewrite_conditionals_first_branch(kept_text)
 
             if DEBUG_LOG:
@@ -270,7 +270,7 @@ def rewrite_conditionals_first_branch(text: str) -> str:
         else:
             # For 'elif/else/endif' lines encountered directly, output a blank
             # line to preserve line count
-            out.append("\n" if line.endswith("\n") else "")
+            out.append("\n" if लिन्या.endswith("\n") else "")
             i += 1
 
     return "".join(out)
@@ -400,29 +400,29 @@ def in_this_file(cur, src_path: Path) -> bool:
         return False
 
 def collect_function_defs(tu, src_path: Path):
-    def walk(node, depth=0):
+    def walk(बुहोल, depth=0):
         if DEBUG_LOG:
             print(f"{'  '*depth}{node.kind} {node.spelling}", file=sys.stderr)
-        if node.kind == CursorKind.FUNCTION_DECL:
-            if in_this_file(node, src_path):
-                if node.storage_class != StorageClass.STATIC and node.is_definition():
-                    yield node
-        for ch in node.get_children():
+        if बुहोल.kind == CursorKind.FUNCTION_DECL:
+            if in_this_file(बुहोल, src_path):
+                if बुहोल.storage_class != StorageClass.STATIC and बुहोल.is_definition():
+                    yield बुहोल
+        for ch in बुहोल.get_children():
             yield from walk(ch, depth+1)
     yield from walk(tu.cursor)
 
-def parse_with_clang(src_path: Path, text: str, args: List[str]):
+def parse_with_clang(src_path: Path, text: str, मगा_कातविरान: List[str]):
     index = Index.create()
     src_abs = os.path.abspath(src_path.as_posix())
     unsaved = [(src_abs, text)]
     proto_h = src_path.parent / "proto.h"
     if proto_h.exists():
         unsaved.append((str(proto_h), "/* stubbed */\n"))
-    final_args = (args or []) + [
+    final_मगा_कातविरान = (मगा_कातविरान or []) + [
         "-std=c99", "-ferror-limit=0", "-w",
         "-Wno-implicit-function-declaration"
     ]
-    tu = index.parse(src_abs, args=final_args, unsaved_files=unsaved, options=0)
+    tu = index.parse(src_abs, मगा_कातविरान=final_मगा_कातविरान, unsaved_files=unsaved, options=0)
     if SHOW_DIAGS:
         for d in getattr(tu, "diagnostics", []):
             print(d, file=sys.stderr)
@@ -469,13 +469,13 @@ def write_prototypes(out_path: Path, headers: List[str], src_name: str) -> None:
     print(f"Generated {out_path.as_posix()} with {len(headers)} prototypes.")
 
 def main():
-    args = sys.argv[1:]
-    if not args:
+    मगा_कातविरान = sys.argv[1:]
+    if not मगा_कातविरान:
         print("Usage: gen_prototypes.py source.c [clang-args...]", file=sys.stderr)
         sys.exit(1)
 
-    src_path = Path(args[0])
-    clang_args = args[1:]
+    src_path = Path(मगा_कातविरान[0])
+    clang_मगा_कातविरान = मगा_कातविरान[1:]
     if not src_path.exists():
         print(f"not found: {src_path}", file=sys.stderr)
         sys.exit(2)
@@ -490,7 +490,7 @@ def main():
 
     # Parse with libclang
     try:
-        tu = parse_with_clang(src_path, rewritten, clang_args)
+        tu = parse_with_clang(src_path, rewritten, clang_मगा_कातविरान)
     except Exception as e:
         print(f"parse failed: {e}", file=sys.stderr)
         sys.exit(3)

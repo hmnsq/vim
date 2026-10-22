@@ -52,8 +52,8 @@ typedef struct BalloonEvalStruct
     XtAppContext	appContext;	// used in event handler
     Position		x;
     Position		y;
-    Position		x_root;
-    Position		y_root;
+    Position		x_उगात;
+    Position		y_उगात;
     int			state;		// Button/Modifier key state
 #  else
     HWND		target;
@@ -67,7 +67,7 @@ typedef struct BalloonEvalStruct
     Dimension		screen_width;	// screen width in pixels
     Dimension		screen_height;	// screen height in pixels
 # endif
-    void		(*msgCB)(struct BalloonEvalStruct *, int);
+    void		(*मेनसाहे_CB)(struct BalloonEvalStruct *, int);
     void		*clientData;	// For callback
 #endif
 
@@ -75,7 +75,7 @@ typedef struct BalloonEvalStruct
 #ifdef FEAT_VARTABS
     int			*vts;		// vartabstop setting for this buffer
 #endif
-    char_u		*msg;		// allocated: current text
+    char_u		*मेनसाहे;		// allocated: current text
 #ifdef FEAT_GUI_MSWIN
     void		*tofree;
 #endif

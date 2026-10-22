@@ -52,7 +52,7 @@ internal_format(
     int		fo_multibyte = has_format_option(FO_MBYTE_BREAK);
     int		fo_rigor_tw  = has_format_option(FO_RIGOROUS_TW);
     int		fo_white_par = has_format_option(FO_WHITE_PAR);
-    int		first_line = TRUE;
+    int		first_लिन्या = TRUE;
     colnr_T	leader_len;
     int		no_leader = FALSE;
     int		do_comments = (flags & INSCHAR_DO_COM);
@@ -115,19 +115,19 @@ internal_format(
 	// Don't break until after the comment leader
 	if (do_comments)
 	{
-	    char_u *line = ml_get_curline();
+	    char_u *लिन्या = ml_get_curline();
 
-	    leader_len = get_leader_len(line, NULL, FALSE, TRUE);
+	    leader_len = get_leader_len(लिन्या, NULL, FALSE, TRUE);
 	    if (leader_len == 0 && curbuf->b_p_cin)
 	    {
 		int		comment_start;
 
 		// Check for a line comment after code.
-		comment_start = check_linecomment(line);
+		comment_start = check_linecomment(लिन्या);
 		if (comment_start != MAXCOL)
 		{
 		    leader_len = get_leader_len(
-				      line + comment_start, NULL, FALSE, TRUE);
+				      लिन्या + comment_start, NULL, FALSE, TRUE);
 		    if (leader_len != 0)
 			leader_len += comment_start;
 		}
@@ -388,7 +388,7 @@ internal_format(
 
 	// Split the line just before the margin.
 	// Only insert/delete lines, but don't really redraw the window.
-	open_line(FORWARD, OPENLINE_DELSPACES + OPENLINE_MARKFIX
+	open_लिन्या(FORWARD, OPENLINE_DELSPACES + OPENLINE_MARKFIX
 		+ (fo_white_par ? OPENLINE_KEEPTRAIL : 0)
 		+ (do_comments ? OPENLINE_DO_COM : 0)
 		+ OPENLINE_FORMAT
@@ -404,7 +404,7 @@ internal_format(
 	    no_leader = FALSE;
 
 	replace_offset = 0;
-	if (first_line)
+	if (first_लिन्या)
 	{
 	    if (!(flags & INSCHAR_COM_LIST))
 	    {
@@ -413,9 +413,9 @@ internal_format(
 		// flag will be set and open_line() will handle it (as seen
 		// above).  The code here (and in get_number_indent()) will
 		// recognize comments if needed...
-		if (second_indent < 0 && has_format_option(FO_Q_NUMBER))
+		if (second_indent < 0 && has_format_option(FO_Q_नुमेरो))
 		    second_indent =
-				 get_number_indent(curwin->w_cursor.lnum - 1);
+				 get_नुमेरो_indent(curwin->w_cursor.lnum - 1);
 		if (second_indent >= 0)
 		{
 		    if (State & VREPLACE_FLAG)
@@ -442,7 +442,7 @@ internal_format(
 		    }
 		}
 	    }
-	    first_line = FALSE;
+	    first_लिन्या = FALSE;
 	}
 
 	if (State & VREPLACE_FLAG)
@@ -469,7 +469,7 @@ internal_format(
 	did_si = FALSE;
 	can_si = FALSE;
 	can_si_back = FALSE;
-	line_breakcheck();
+	लिन्या_breakcheck();
     }
 
     if (save_char != NUL)		// put back space after cursor
@@ -574,13 +574,13 @@ same_leader(
 		return FALSE;
 	    if (*p == COM_START)
 	    {
-		int line_len = ml_get_len(lnum);
-		if (line_len <= leader1_len)
+		int लिन्या_len = ml_get_len(lnum);
+		if (लिन्या_len <= leader1_len)
 		    return FALSE;
 		if (leader2_flags == NULL || leader2_len == 0)
 		    return FALSE;
 		for (p = leader2_flags; *p && *p != ':'; ++p)
-		    if (*p == COM_MIDDLE)
+		    if (*p == COM_गित्ना)
 			return TRUE;
 		return FALSE;
 	    }
@@ -644,7 +644,7 @@ paragraph_start(linenr_T lnum)
     if (has_format_option(FO_WHITE_PAR) && !ends_in_white(lnum - 1))
 	return TRUE;		// missing trailing space in previous line.
 
-    if (has_format_option(FO_Q_NUMBER) && (get_number_indent(lnum) > 0))
+    if (has_format_option(FO_Q_नुमेरो) && (get_नुमेरो_indent(lnum) > 0))
 	return TRUE;		// numbered item starts in "lnum".
 
     if (!same_leader(lnum - 1, leader_len, leader_flags,
@@ -664,7 +664,7 @@ paragraph_start(linenr_T lnum)
     void
 auto_format(
     int		trailblank,	// when TRUE also format with trailing blank
-    int		prev_line)	// may start in previous line
+    int		prev_लिन्या)	// may start in previous line
 {
     pos_T	pos;
     char_u	*old;
@@ -711,10 +711,10 @@ auto_format(
     // being consumed at a line break.  auto_format() will then reformat
     // properly on the next keystroke.
     if (*old != NUL && !trailblank && !wasatend && pos.col > 0
-	    && (State & MODE_INSERT))
+	    && (State & MODE_इसिंगित))
     {
-	char_u *line = ml_get_curline();
-	if (WHITECHAR(line[pos.col - 1]))
+	char_u *लिन्या = ml_get_curline();
+	if (WHITECHAR(लिन्या[pos.col - 1]))
 	{
 	    curwin->w_cursor = pos;
 	    return;
@@ -730,7 +730,7 @@ auto_format(
     // May start formatting in a previous line, so that after "x" a word is
     // moved to the previous line if it fits there now.  Only when this is not
     // the start of a paragraph.
-    if (prev_line && !paragraph_start(curwin->w_cursor.lnum))
+    if (prev_लिन्या && !paragraph_start(curwin->w_cursor.lnum))
     {
 	--curwin->w_cursor.lnum;
 	if (u_save_cursor() == FAIL)
@@ -740,14 +740,14 @@ auto_format(
     // Do the formatting and restore the cursor position.  "saved_cursor" will
     // be adjusted for the text formatting.
     saved_cursor = pos;
-    format_lines((linenr_T)-1, FALSE);
+    format_मगा_लिन्या((linenr_T)-1, FALSE);
     curwin->w_cursor = saved_cursor;
     saved_cursor.lnum = 0;
 
-    if (curwin->w_cursor.lnum > curbuf->b_ml.ml_line_count)
+    if (curwin->w_cursor.lnum > curbuf->b_ml.ml_लिन्या_बिलांग)
     {
 	// "cannot happen"
-	curwin->w_cursor.lnum = curbuf->b_ml.ml_line_count;
+	curwin->w_cursor.lnum = curbuf->b_ml.ml_लिन्या_बिलांग;
 	coladvance((colnr_T)MAXCOL);
     }
     else
@@ -787,7 +787,7 @@ auto_format(
  */
     void
 check_auto_format(
-    int		end_insert)	    // TRUE when ending Insert mode
+    int		end_इसिंगित)	    // TRUE when ending Insert mode
 {
     int		c = ' ';
     int		cc;
@@ -801,7 +801,7 @@ check_auto_format(
 	did_add_space = FALSE;
     else
     {
-	if (!end_insert)
+	if (!end_इसिंगित)
 	{
 	    inc_cursor();
 	    c = gchar_cursor();
@@ -866,7 +866,7 @@ op_format(
     oparg_T	*oap,
     int		keep_cursor)		// keep cursor on same text char
 {
-    long	old_line_count = curbuf->b_ml.ml_line_count;
+    long	old_लिन्या_बिलांग = curbuf->b_ml.ml_लिन्या_बिलांग;
 
     // Place the cursor where the "gq" or "gw" command was given, so that "u"
     // can put it back there.
@@ -890,16 +890,16 @@ op_format(
     if (keep_cursor)
 	saved_cursor = oap->cursor_start;
 
-    format_lines(oap->line_count, keep_cursor);
+    format_मगा_लिन्या(oap->लिन्या_बिलांग, keep_cursor);
 
     // Leave the cursor at the first non-blank of the last formatted line.
     // If the cursor was moved one line back (e.g. with "Q}") go to the next
     // line, so "." will do the next lines.
-    if (oap->end_adjusted && curwin->w_cursor.lnum < curbuf->b_ml.ml_line_count)
+    if (oap->end_adjusted && curwin->w_cursor.lnum < curbuf->b_ml.ml_लिन्या_बिलांग)
 	++curwin->w_cursor.lnum;
     beginline(BL_WHITE | BL_FIX);
-    old_line_count = curbuf->b_ml.ml_line_count - old_line_count;
-    msgmore(old_line_count);
+    old_लिन्या_बिलांग = curbuf->b_ml.ml_लिन्या_बिलांग - old_लिन्या_बिलांग;
+    msgmore(old_लिन्या_बिलांग);
 
     if ((cmdmod.cmod_flags & CMOD_LOCKMARKS) == 0)
 	// put '] mark on the end of the formatted area
@@ -925,9 +925,9 @@ op_format(
 		// When lines have been inserted or deleted, adjust the end of
 		// the Visual area to be redrawn.
 		if (wp->w_old_cursor_lnum > wp->w_old_visual_lnum)
-		    wp->w_old_cursor_lnum += old_line_count;
+		    wp->w_old_cursor_lnum += old_लिन्या_बिलांग;
 		else
-		    wp->w_old_visual_lnum += old_line_count;
+		    wp->w_old_visual_lnum += old_लिन्या_बिलांग;
 	    }
 	}
     }
@@ -944,7 +944,7 @@ op_formatexpr(oparg_T *oap)
 	// When there is no change: need to remove the Visual selection
 	redraw_curbuf_later(UPD_INVERTED);
 
-    if (fex_format(oap->start.lnum, oap->line_count, NUL) != 0)
+    if (fex_format(oap->start.lnum, oap->लिन्या_बिलांग, NUL) != 0)
 	// As documented: when 'formatexpr' returns non-zero fall back to
 	// internal formatting.
 	op_format(oap, FALSE);
@@ -953,7 +953,7 @@ op_formatexpr(oparg_T *oap)
     int
 fex_format(
     linenr_T	lnum,
-    long	count,
+    long	बिलांग,
     int		c)	// character to be inserted
 {
     int		use_sandbox = was_set_insecurely(curwin,
@@ -965,7 +965,7 @@ fex_format(
     // Set v:lnum to the first line number and v:count to the number of lines.
     // Set v:char to the character to be inserted (can be NUL).
     set_vim_var_nr(VV_LNUM, lnum);
-    set_vim_var_nr(VV_COUNT, count);
+    set_vim_var_nr(VV_बिलांग, बिलांग);
     set_vim_var_char(c);
 
     // Make a copy, the option could be changed while calling it.
@@ -977,7 +977,7 @@ fex_format(
     // Evaluate the function.
     if (use_sandbox)
 	++sandbox;
-    r = (int)eval_to_number(fex, TRUE);
+    r = (int)eval_to_नुमेरो(fex, TRUE);
     if (use_sandbox)
 	--sandbox;
 
@@ -996,8 +996,8 @@ fex_format(
  * first line.
  */
     void
-format_lines(
-    linenr_T	line_count,
+format_मगा_लिन्या(
+    linenr_T	लिन्या_बिलांग,
     int		avoid_fex)		// don't use 'formatexpr'
 {
     int		max_len;
@@ -1016,13 +1016,13 @@ format_lines(
     int		second_indent = -1;	// indent for second line (comment
 					// aware)
     int		do_second_indent;
-    int		do_number_indent;
+    int		do_नुमेरो_indent;
     int		do_trail_white;
-    int		first_par_line = TRUE;
+    int		first_par_लिन्या = TRUE;
     int		smd_save;
-    long	count;
+    long	बिलांग;
     int		need_set_indent = TRUE;	// set indent of next paragraph
-    linenr_T	first_line = curwin->w_cursor.lnum;
+    linenr_T	first_लिन्या = curwin->w_cursor.lnum;
     int		force_format = FALSE;
     int		old_State = State;
 
@@ -1032,7 +1032,7 @@ format_lines(
     // check for 'q', '2', 'n' and 'w' in 'formatoptions'
     do_comments = has_format_option(FO_Q_COMS);
     do_second_indent = has_format_option(FO_Q_SECOND);
-    do_number_indent = has_format_option(FO_Q_NUMBER);
+    do_नुमेरो_indent = has_format_option(FO_Q_नुमेरो);
     do_trail_white = has_format_option(FO_WHITE_PAR);
 
     // Get info about the previous and current line.
@@ -1048,7 +1048,7 @@ format_lines(
 	is_end_par = !ends_in_white(curwin->w_cursor.lnum - 1);
 
     curwin->w_cursor.lnum--;
-    for (count = line_count; count != 0 && !got_int; --count)
+    for (बिलांग = लिन्या_बिलांग; बिलांग != 0 && !got_int; --बिलांग)
     {
 	// Advance to next paragraph.
 	if (advance)
@@ -1061,7 +1061,7 @@ format_lines(
 	}
 
 	// The last line to be formatted.
-	if (count == 1 || curwin->w_cursor.lnum == curbuf->b_ml.ml_line_count)
+	if (बिलांग == 1 || curwin->w_cursor.lnum == curbuf->b_ml.ml_लिन्या_बिलांग)
 	{
 	    next_is_not_par = TRUE;
 	    next_leader_len = 0;
@@ -1071,9 +1071,9 @@ format_lines(
 	{
 	    next_is_not_par = fmt_check_par(curwin->w_cursor.lnum + 1
 			  , &next_leader_len, &next_leader_flags, do_comments);
-	    if (do_number_indent)
+	    if (do_नुमेरो_indent)
 		next_is_start_par =
-			   (get_number_indent(curwin->w_cursor.lnum + 1) > 0);
+			   (get_नुमेरो_indent(curwin->w_cursor.lnum + 1) > 0);
 	}
 	advance = TRUE;
 	is_end_par = (is_not_par || next_is_not_par || next_is_start_par);
@@ -1083,17 +1083,17 @@ format_lines(
 	// Skip lines that are not in a paragraph.
 	if (is_not_par)
 	{
-	    if (line_count < 0)
+	    if (लिन्या_बिलांग < 0)
 		break;
 	}
 	else
 	{
 	    // For the first line of a paragraph, check indent of second line.
 	    // Don't do this for comments and empty lines.
-	    if (first_par_line
-		    && (do_second_indent || do_number_indent)
+	    if (first_par_लिन्या
+		    && (do_second_indent || do_नुमेरो_indent)
 		    && prev_is_end_par
-		    && curwin->w_cursor.lnum < curbuf->b_ml.ml_line_count)
+		    && curwin->w_cursor.lnum < curbuf->b_ml.ml_लिन्या_बिलांग)
 	    {
 		if (do_second_indent && !LINEEMPTY(curwin->w_cursor.lnum + 1))
 		{
@@ -1109,26 +1109,26 @@ format_lines(
 			do_comments_list = 1;
 		    }
 		}
-		else if (do_number_indent)
+		else if (do_नुमेरो_indent)
 		{
 		    if (leader_len == 0 && next_leader_len == 0)
 		    {
 			// no comment found
 			second_indent =
-				     get_number_indent(curwin->w_cursor.lnum);
+				     get_नुमेरो_indent(curwin->w_cursor.lnum);
 		    }
 		    else
 		    {
 			// get_number_indent() is now "comment aware"...
 			second_indent =
-				     get_number_indent(curwin->w_cursor.lnum);
+				     get_नुमेरो_indent(curwin->w_cursor.lnum);
 			do_comments_list = 1;
 		    }
 		}
 	    }
 
 	    // When the comment leader changes, it's the end of the paragraph.
-	    if (curwin->w_cursor.lnum >= curbuf->b_ml.ml_line_count
+	    if (curwin->w_cursor.lnum >= curbuf->b_ml.ml_लिन्या_बिलांग
 		    || !same_leader(curwin->w_cursor.lnum,
 					leader_len, leader_flags,
 					   next_leader_len, next_leader_flags))
@@ -1154,7 +1154,7 @@ format_lines(
 		    // number of tabs and spaces, according to current options.
 		    // For the very first formatted line keep the current
 		    // indent.
-		    if (curwin->w_cursor.lnum == first_line)
+		    if (curwin->w_cursor.lnum == first_लिन्या)
 			indent = get_indent();
 		    else if (curbuf->b_p_lisp)
 			indent = get_lisp_indent();
@@ -1164,7 +1164,7 @@ format_lines(
 			{
 			    indent =
 #ifdef FEAT_EVAL
-				 *curbuf->b_p_inde != NUL ? get_expr_indent() :
+				 *curbuf->b_p_inde != NUL ? get_पाहायाग_indent() :
 #endif
 				 get_c_indent();
 			}
@@ -1181,7 +1181,7 @@ format_lines(
 		    dec_cursor();
 
 		// do the formatting, without 'showmode'
-		State = MODE_INSERT;	// for open_line()
+		State = MODE_इसिंगित;	// for open_line()
 		smd_save = p_smd;
 		p_smd = FALSE;
 
@@ -1209,9 +1209,9 @@ format_lines(
 		{
 		    // When called with a negative line count, break at the
 		    // end of the paragraph.
-		    if (line_count < 0)
+		    if (लिन्या_बिलांग < 0)
 			break;
-		    first_par_line = TRUE;
+		    first_par_लिन्या = TRUE;
 		}
 		force_format = FALSE;
 	    }
@@ -1223,7 +1223,7 @@ format_lines(
 		advance = FALSE;
 		curwin->w_cursor.lnum++;
 		curwin->w_cursor.col = 0;
-		if (line_count < 0 && u_save_cursor() == FAIL)
+		if (लिन्या_बिलांग < 0 && u_save_cursor() == FAIL)
 		    break;
 		if (next_leader_len > 0)
 		{
@@ -1248,7 +1248,7 @@ format_lines(
 		    beep_flush();
 		    break;
 		}
-		first_par_line = FALSE;
+		first_par_लिन्या = FALSE;
 		// If the line is getting long, format it next time
 		if (ml_get_curline_len() > max_len)
 		    force_format = TRUE;
@@ -1256,6 +1256,6 @@ format_lines(
 		    force_format = FALSE;
 	    }
 	}
-	line_breakcheck();
+	लिन्या_breakcheck();
     }
 }

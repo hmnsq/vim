@@ -39,7 +39,7 @@ extern "C" {
 			      XDF_IGNORE_WHITESPACE_AT_EOL | \
 			      XDF_IGNORE_CR_AT_EOL)
 
-#define XDF_IGNORE_BLANK_LINES (1 << 7)
+#define XDF_IGNORE_BLANK_मगा_लिन्या (1 << 7)
 
 #define XDF_PATIENCE_DIFF (1 << 14)
 #define XDF_HISTOGRAM_DIFF (1 << 15)
@@ -98,13 +98,13 @@ typedef struct s_xdemitcb {
 			long old_begin, long old_nr,
 			long new_begin, long new_nr,
 			const char *func, long funclen);
-	int (*out_line)(void *, mmbuffer_t *, int);
+	int (*out_लिन्या)(void *, mmbuffer_t *, int);
 } xdemitcb_t;
 
-typedef long (*find_func_t)(const char *line, long line_len, char *buffer, long buffer_size, void *priv);
+typedef long (*find_func_t)(const char *लिन्या, long लिन्या_len, char *buffer, long buffer_size, void *priv);
 
-typedef int (*xdl_emit_hunk_consume_func_t)(long start_a, long count_a,
-					    long start_b, long count_b,
+typedef int (*xdl_emit_hunk_consume_func_t)(long start_a, long बिलांग_a,
+					    long start_b, long बिलांग_b,
 					    void *cb_data);
 
 typedef struct s_xdemitconf {

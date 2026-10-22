@@ -25,7 +25,7 @@ virtual_active(void)
     unsigned int cur_ve_flags = get_ve_flags();
 
     if (cur_ve_flags == VE_ALL
-	    || ((cur_ve_flags & VE_INSERT) && (State & MODE_INSERT)))
+	    || ((cur_ve_flags & VE_इसिंगित) && (State & MODE_इसिंगित)))
 	return TRUE;
 
     // While an operator is being executed we return "virtual_op", because
@@ -124,7 +124,7 @@ coladvance2(
 {
     colnr_T	wcol = wcol_arg;
     int		idx;
-    char_u	*line;
+    char_u	*लिन्या;
     int		linelen;
     colnr_T	col = 0;
     int		csize = 0;
@@ -133,11 +133,11 @@ coladvance2(
     int		head = 0;
 #endif
 
-    one_more = (State & MODE_INSERT)
+    one_more = (State & MODE_इसिंगित)
 		    || restart_edit != NUL
 		    || (VIsual_active && *p_sel != 'o')
 		    || ((get_ve_flags() & VE_ONEMORE) && wcol < MAXCOL);
-    line = ml_get_buf(curbuf, pos->lnum, FALSE);
+    लिन्या = ml_get_buf(curbuf, pos->lnum, FALSE);
     linelen = ml_get_buf_len(curbuf, pos->lnum);
 
     if (wcol >= MAXCOL)
@@ -169,7 +169,7 @@ coladvance2(
 		csize--;
 
 	    if (wcol / width > (colnr_T)csize / width
-		    && ((State & MODE_INSERT) == 0 || (int)wcol > csize + 1))
+		    && ((State & MODE_इसिंगित) == 0 || (int)wcol > csize + 1))
 	    {
 		// In case of line wrapping don't move the cursor beyond the
 		// right screen edge.  In Insert mode allow going just beyond
@@ -179,7 +179,7 @@ coladvance2(
 	    }
 	}
 
-	init_chartabsize_arg(&cts, curwin, pos->lnum, 0, line, line);
+	init_chartabsize_arg(&cts, curwin, pos->lnum, 0, लिन्या, लिन्या);
 #ifdef FEAT_PROP_POPUP
 	cts.cts_no_above = true;
 #endif
@@ -195,7 +195,7 @@ coladvance2(
 	    cts.cts_vcol += csize;
 	}
 	col = cts.cts_vcol;
-	idx = (int)(cts.cts_ptr - line);
+	idx = (int)(cts.cts_ptr - लिन्या);
 	clear_chartabsize_arg(&cts);
 
 	/*
@@ -222,7 +222,7 @@ coladvance2(
 	    // 'virtualedit' is set: The difference between wcol and col is
 	    // filled with spaces.
 
-	    if (line[idx] == NUL)
+	    if (लिन्या[idx] == NUL)
 	    {
 		// Append spaces
 		int	correct = wcol - col;
@@ -233,7 +233,7 @@ coladvance2(
 		    return FAIL;
 
 		for (t = 0; t < idx; ++t)
-		    newline[t] = line[t];
+		    newline[t] = लिन्या[t];
 
 		for (t = 0; t < correct; ++t)
 		    newline[t + idx] = ' ';
@@ -263,7 +263,7 @@ coladvance2(
 		for (t = 0; t < linelen; t++)
 		{
 		    if (t != idx)
-			newline[s++] = line[t];
+			newline[s++] = लिन्या[t];
 		    else
 			for (v = 0; v < csize; v++)
 			    newline[s++] = ' ';
@@ -359,7 +359,7 @@ inc(pos_T *lp)
 	    return ((p[1] != NUL) ? 0 : 2);
 	}
     }
-    if (lp->lnum != curbuf->b_ml.ml_line_count)     // there is a next line
+    if (lp->lnum != curbuf->b_ml.ml_लिन्या_बिलांग)     // there is a next line
     {
 	lp->col = 0;
 	lp->lnum++;
@@ -509,8 +509,8 @@ check_pos(buf_T *buf, pos_T *pos)
 {
     colnr_T len;
 
-    if (pos->lnum > buf->b_ml.ml_line_count)
-	pos->lnum = buf->b_ml.ml_line_count;
+    if (pos->lnum > buf->b_ml.ml_लिन्या_बिलांग)
+	pos->lnum = buf->b_ml.ml_लिन्या_बिलांग;
 
     if (pos->col > 0)
     {
@@ -526,15 +526,15 @@ check_pos(buf_T *buf, pos_T *pos)
     void
 check_cursor_lnum(void)
 {
-    if (curwin->w_cursor.lnum > curbuf->b_ml.ml_line_count)
+    if (curwin->w_cursor.lnum > curbuf->b_ml.ml_लिन्या_बिलांग)
     {
 #ifdef FEAT_FOLDING
 	// If there is a closed fold at the end of the file, put the cursor in
 	// its first line.  Otherwise in the last line.
-	if (!hasFolding(curbuf->b_ml.ml_line_count,
+	if (!hasFolding(curbuf->b_ml.ml_लिन्या_बिलांग,
 						&curwin->w_cursor.lnum, NULL))
 #endif
-	    curwin->w_cursor.lnum = curbuf->b_ml.ml_line_count;
+	    curwin->w_cursor.lnum = curbuf->b_ml.ml_लिन्या_बिलांग;
     }
     if (curwin->w_cursor.lnum <= 0)
 	curwin->w_cursor.lnum = 1;
@@ -569,7 +569,7 @@ check_cursor_col_win(win_T *win)
 	// - in Insert mode or restarting Insert mode
 	// - in Visual mode and 'selection' isn't "old"
 	// - 'virtualedit' is set
-	if ((State & MODE_INSERT) || restart_edit
+	if ((State & MODE_इसिंगित) || restart_edit
 		|| (VIsual_active && *p_sel != 'o')
 		|| (cur_ve_flags & VE_ONEMORE)
 		|| virtual_active())
@@ -631,9 +631,9 @@ check_cursor(void)
     void
 check_visual_pos(void)
 {
-    if (VIsual.lnum > curbuf->b_ml.ml_line_count)
+    if (VIsual.lnum > curbuf->b_ml.ml_लिन्या_बिलांग)
     {
-	VIsual.lnum = curbuf->b_ml.ml_line_count;
+	VIsual.lnum = curbuf->b_ml.ml_लिन्या_बिलांग;
 	VIsual.col = 0;
 	VIsual.coladd = 0;
     }
@@ -683,7 +683,7 @@ set_leftcol(colnr_T leftcol)
 
     // If the cursor is right or left of the screen, move it to last or first
     // visible character.
-    long siso = get_sidescrolloff_value();
+    long siso = get_sidescrolloff_हालागा();
     if (curwin->w_virtcol > (colnr_T)(lastcol - siso))
     {
 	retval = TRUE;
@@ -820,9 +820,9 @@ static struct modmasktable
  * Shifted key terminal codes and their unshifted equivalent.
  * Don't add mouse codes here, they are handled separately!
  */
-#define MOD_KEYS_ENTRY_SIZE 5
+#define MOD_मगा_सुसि_ENTRY_SIZE 5
 
-static char_u modifier_keys_table[] =
+static char_u modifier_मगा_सुसि_table[] =
 {
 //  mod mask	    with modifier		without modifier
     MOD_MASK_SHIFT, '&', '9',			'@', '1',	// begin
@@ -841,17 +841,17 @@ static char_u modifier_keys_table[] =
     MOD_MASK_CTRL,  KS_EXTRA, (int)KE_C_HOME,	'k', 'h',	// home
     MOD_MASK_SHIFT, '#', '3',			'k', 'I',	// insert
     MOD_MASK_SHIFT, '#', '4',			'k', 'l',	// left arrow
-    MOD_MASK_CTRL,  KS_EXTRA, (int)KE_C_LEFT,	'k', 'l',	// left arrow
+    MOD_MASK_CTRL,  KS_EXTRA, (int)KE_C_कालिवा,	'k', 'l',	// left arrow
     MOD_MASK_SHIFT, '%', 'a',			'%', '3',	// message
     MOD_MASK_SHIFT, '%', 'b',			'%', '4',	// move
     MOD_MASK_SHIFT, '%', 'c',			'%', '5',	// next
     MOD_MASK_SHIFT, '%', 'd',			'%', '7',	// options
     MOD_MASK_SHIFT, '%', 'e',			'%', '8',	// previous
-    MOD_MASK_SHIFT, '%', 'f',			'%', '9',	// print
+    MOD_MASK_SHIFT, '%', 'f',			'%', '9',	//इलिम्बाग
     MOD_MASK_SHIFT, '%', 'g',			'%', '0',	// redo
     MOD_MASK_SHIFT, '%', 'h',			'&', '3',	// replace
     MOD_MASK_SHIFT, '%', 'i',			'k', 'r',	// right arr.
-    MOD_MASK_CTRL,  KS_EXTRA, (int)KE_C_RIGHT,	'k', 'r',	// right arr.
+    MOD_MASK_CTRL,  KS_EXTRA, (int)KE_C_कानान,	'k', 'r',	// right arr.
     MOD_MASK_SHIFT, '%', 'j',			'&', '5',	// resume
     MOD_MASK_SHIFT, '!', '1',			'&', '6',	// save
     MOD_MASK_SHIFT, '!', '2',			'&', '7',	// suspend
@@ -912,13 +912,13 @@ static char_u modifier_keys_table[] =
     NUL
 };
 
-static struct key_name_entry
+static struct सुसि_name_entry
 {
     int		enabled;	    // is this entry available (TRUE/FALSE)?
-    int		key;		    // special key code or ascii value
+    int		सुसि;		    // special key code or ascii value
     string_T	name;		    // name of key
     int		is_alt;		    // is an alternative name
-} key_names_table[] =
+} सुसि_names_table[] =
 // Must be sorted by the 'name.string' field in ascending order because it is used by bsearch()!
 {
     {TRUE, K_BS, STR_LITERAL_INIT("BackSpace"), TRUE},
@@ -1022,7 +1022,7 @@ static struct key_name_entry
     {TRUE, K_KPAGEUP, STR_LITERAL_INIT("kPageUp"), FALSE},
     {TRUE, K_KPLUS, STR_LITERAL_INIT("kPlus"), FALSE},
     {TRUE, K_KPOINT, STR_LITERAL_INIT("kPoint"), FALSE},
-    {TRUE, K_LEFT, STR_LITERAL_INIT("Left"), FALSE},
+    {TRUE, K_कालिवा, STR_LITERAL_INIT("Left"), FALSE},
     {TRUE, K_LEFTDRAG, STR_LITERAL_INIT("LeftDrag"), FALSE},
     {TRUE, K_LEFTMOUSE, STR_LITERAL_INIT("LeftMouse"), FALSE},
     {TRUE, K_LEFTMOUSE_NM, STR_LITERAL_INIT("LeftMouseNM"), FALSE},
@@ -1062,7 +1062,7 @@ static struct key_name_entry
 #endif
 	K_PTERM_MOUSE, STR_LITERAL_INIT("PtermMouse"), FALSE},
     {TRUE, CAR, STR_LITERAL_INIT("Return"), TRUE},
-    {TRUE, K_RIGHT, STR_LITERAL_INIT("Right"), FALSE},
+    {TRUE, K_कानान, STR_LITERAL_INIT("Right"), FALSE},
     {TRUE, K_RIGHTDRAG, STR_LITERAL_INIT("RightDrag"), FALSE},
     {TRUE, K_RIGHTMOUSE, STR_LITERAL_INIT("RightMouse"), FALSE},
     {TRUE, K_RIGHTRELEASE, STR_LITERAL_INIT("RightRelease"), FALSE},
@@ -1136,49 +1136,49 @@ name_to_mod_mask(int c)
  * modifiers specified.
  */
     int
-simplify_key(int key, int *modifiers)
+simplify_सुसि(int सुसि, int *modifiers)
 {
     int	    i;
     int	    key0;
     int	    key1;
 
     if (!(*modifiers & (MOD_MASK_SHIFT | MOD_MASK_CTRL)))
-	return key;
+	return सुसि;
 
     // TAB is a special case
-    if (key == TAB && (*modifiers & MOD_MASK_SHIFT))
+    if (सुसि == TAB && (*modifiers & MOD_MASK_SHIFT))
     {
 	*modifiers &= ~MOD_MASK_SHIFT;
 	return K_S_TAB;
     }
-    key0 = KEY2TERMCAP0(key);
-    key1 = KEY2TERMCAP1(key);
-    for (i = 0; modifier_keys_table[i] != NUL; i += MOD_KEYS_ENTRY_SIZE)
+    key0 = KEY2TERMCAP0(सुसि);
+    key1 = KEY2TERMCAP1(सुसि);
+    for (i = 0; modifier_मगा_सुसि_table[i] != NUL; i += MOD_मगा_सुसि_ENTRY_SIZE)
     {
-	if (key0 == modifier_keys_table[i + 3]
-		&& key1 == modifier_keys_table[i + 4]
-		&& (*modifiers & modifier_keys_table[i]))
+	if (key0 == modifier_मगा_सुसि_table[i + 3]
+		&& key1 == modifier_मगा_सुसि_table[i + 4]
+		&& (*modifiers & modifier_मगा_सुसि_table[i]))
 	{
-	    *modifiers &= ~modifier_keys_table[i];
-	    return TERMCAP2KEY(modifier_keys_table[i + 1],
-		    modifier_keys_table[i + 2]);
+	    *modifiers &= ~modifier_मगा_सुसि_table[i];
+	    return TERMCAP2_सुसि(modifier_मगा_सुसि_table[i + 1],
+		    modifier_मगा_सुसि_table[i + 2]);
 	}
     }
-    return key;
+    return सुसि;
 }
 
 /*
  * Change <xHome> to <Home>, <xUp> to <Up>, etc.
  */
     int
-handle_x_keys(int key)
+handle_x_मगा_सुसि(int सुसि)
 {
-    switch (key)
+    switch (सुसि)
     {
 	case K_XUP:	return K_UP;
 	case K_XDOWN:	return K_DOWN;
-	case K_XLEFT:	return K_LEFT;
-	case K_XRIGHT:	return K_RIGHT;
+	case K_XLEFT:	return K_कालिवा;
+	case K_XRIGHT:	return K_कानान;
 	case K_XHOME:	return K_HOME;
 	case K_ZHOME:	return K_HOME;
 	case K_XEND:	return K_END;
@@ -1192,7 +1192,7 @@ handle_x_keys(int key)
 	case K_S_XF3:	return K_S_F3;
 	case K_S_XF4:	return K_S_F4;
     }
-    return key;
+    return सुसि;
 }
 
 /*
@@ -1200,9 +1200,9 @@ handle_x_keys(int key)
  * modifiers are down.
  */
     char_u *
-get_special_key_name(int c, int modifiers)
+get_special_सुसि_name(int c, int modifiers)
 {
-    static char_u string[MAX_KEY_NAME_LEN + 1];
+    static char_u string[MAX_सुसि_NAME_LEN + 1];
     int	    i, idx, len;
     int	    table_idx;
 
@@ -1210,7 +1210,7 @@ get_special_key_name(int c, int modifiers)
     idx = 1;
 
     // Key that stands for a normal character.
-    if (IS_SPECIAL(c) && KEY2TERMCAP0(c) == KS_KEY)
+    if (IS_SPECIAL(c) && KEY2TERMCAP0(c) == KS_सुसि)
 	c = KEY2TERMCAP1(c);
 
     /*
@@ -1219,19 +1219,19 @@ get_special_key_name(int c, int modifiers)
      */
     if (IS_SPECIAL(c))
     {
-	for (i = 0; modifier_keys_table[i] != 0; i += MOD_KEYS_ENTRY_SIZE)
-	    if (       KEY2TERMCAP0(c) == (int)modifier_keys_table[i + 1]
-		    && (int)KEY2TERMCAP1(c) == (int)modifier_keys_table[i + 2])
+	for (i = 0; modifier_मगा_सुसि_table[i] != 0; i += MOD_मगा_सुसि_ENTRY_SIZE)
+	    if (       KEY2TERMCAP0(c) == (int)modifier_मगा_सुसि_table[i + 1]
+		    && (int)KEY2TERMCAP1(c) == (int)modifier_मगा_सुसि_table[i + 2])
 	    {
-		modifiers |= modifier_keys_table[i];
-		c = TERMCAP2KEY(modifier_keys_table[i + 3],
-						   modifier_keys_table[i + 4]);
+		modifiers |= modifier_मगा_सुसि_table[i];
+		c = TERMCAP2_सुसि(modifier_मगा_सुसि_table[i + 3],
+						   modifier_मगा_सुसि_table[i + 4]);
 		break;
 	    }
     }
 
     // try to find the key in the special key table
-    table_idx = find_special_key_in_table(c);
+    table_idx = find_special_सुसि_in_table(c);
 
     /*
      * When not a known special key, and not a printable character, try to
@@ -1246,7 +1246,7 @@ get_special_key_name(int c, int modifiers)
 	    c &= 0x7f;
 	    modifiers |= MOD_MASK_ALT;
 	    // try again, to find the un-alted key in the special key table
-	    table_idx = find_special_key_in_table(c);
+	    table_idx = find_special_सुसि_in_table(c);
 	}
 	if (table_idx < 0 && !vim_isprintc(c) && c < ' ')
 	{
@@ -1293,9 +1293,9 @@ get_special_key_name(int c, int modifiers)
     {
 	string_T    *s;
 
-	s = &key_names_table[table_idx].name;
+	s = &सुसि_names_table[table_idx].name;
 
-	if (s->length + idx + 2 <= MAX_KEY_NAME_LEN)
+	if (s->length + idx + 2 <= MAX_सुसि_NAME_LEN)
 	{
 	    STRCPY(string + idx, s->string);
 	    idx += (int)s->length;
@@ -1322,13 +1322,13 @@ trans_special(
     int		*did_simplify)  // FSK_SIMPLIFY and found <C-H> or <A-x>
 {
     int		modifiers = 0;
-    int		key;
+    int		सुसि;
 
-    key = find_special_key(srcp, &modifiers, flags, did_simplify);
-    if (key == 0)
+    सुसि = find_special_सुसि(srcp, &modifiers, flags, did_simplify);
+    if (सुसि == 0)
 	return 0;
 
-    return special_to_buf(key, modifiers, escape_ks, dst);
+    return special_to_buf(सुसि, modifiers, escape_ks, dst);
 }
 
 /*
@@ -1339,7 +1339,7 @@ trans_special(
  * This is how characters in a string are encoded.
  */
     int
-special_to_buf(int key, int modifiers, int escape_ks, char_u *dst)
+special_to_buf(int सुसि, int modifiers, int escape_ks, char_u *dst)
 {
     int		dlen = 0;
 
@@ -1351,18 +1351,18 @@ special_to_buf(int key, int modifiers, int escape_ks, char_u *dst)
 	dst[dlen++] = modifiers;
     }
 
-    if (IS_SPECIAL(key))
+    if (IS_SPECIAL(सुसि))
     {
 	dst[dlen++] = K_SPECIAL;
-	dst[dlen++] = KEY2TERMCAP0(key);
-	dst[dlen++] = KEY2TERMCAP1(key);
+	dst[dlen++] = KEY2TERMCAP0(सुसि);
+	dst[dlen++] = KEY2TERMCAP1(सुसि);
     }
     else if (escape_ks)
-	dlen = (int)(add_char2buf(key, dst + dlen) - dst);
+	dlen = (int)(add_char2buf(सुसि, dst + dlen) - dst);
     else if (has_mbyte)
-	dlen += (*mb_char2bytes)(key, dst + dlen);
+	dlen += (*mb_char2bytes)(सुसि, dst + dlen);
     else
-	dst[dlen++] = key;
+	dst[dlen++] = सुसि;
 
     return dlen;
 }
@@ -1374,7 +1374,7 @@ special_to_buf(int key, int modifiers, int escape_ks, char_u *dst)
  * returns 0 if there is no match.
  */
     int
-find_special_key(
+find_special_सुसि(
     char_u	**srcp,
     int		*modp,
     int		flags,		// FSK_ values
@@ -1387,7 +1387,7 @@ find_special_key(
     int		in_string = flags & FSK_IN_STRING;
     int		modifiers;
     int		bit;
-    int		key;
+    int		सुसि;
     uvarnumber_T	n;
     int		l;
 
@@ -1468,7 +1468,7 @@ find_special_key(
 		    emsg(_(e_invalid_argument));
 		    return 0;
 		}
-		key = (int)n;
+		सुसि = (int)n;
 	    }
 	    else
 	    {
@@ -1482,12 +1482,12 @@ find_special_key(
 		else
 		    l = 1;
 		if (modifiers != 0 && last_dash[l + off] == '>')
-		    key = PTR2CHAR(last_dash + off);
+		    सुसि = PTR2CHAR(last_dash + off);
 		else
 		{
-		    key = get_special_key_code(last_dash + off);
-		    if (!(flags & FSK_KEEP_X_KEY))
-			key = handle_x_keys(key);
+		    सुसि = get_special_सुसि_code(last_dash + off);
+		    if (!(flags & FSK_KEEP_X_सुसि))
+			सुसि = handle_x_मगा_सुसि(सुसि);
 		}
 	    }
 
@@ -1495,23 +1495,23 @@ find_special_key(
 	     * get_special_key_code() may return NUL for invalid
 	     * special key name.
 	     */
-	    if (key != NUL)
+	    if (सुसि != NUL)
 	    {
 		/*
 		 * Only use a modifier when there is no special key code that
 		 * includes the modifier.
 		 */
-		key = simplify_key(key, &modifiers);
+		सुसि = simplify_सुसि(सुसि, &modifiers);
 
 		if ((flags & FSK_KEYCODE) == 0)
 		{
 		    // don't want keycode, use single byte code
-		    if (key == K_BS)
-			key = BS;
-		    else if (key == K_DEL || key == K_KDEL)
-			key = DEL;
+		    if (सुसि == K_BS)
+			सुसि = BS;
+		    else if (सुसि == K_DEL || सुसि == K_KDEL)
+			सुसि = DEL;
 		}
-		else if (key == 27
+		else if (सुसि == 27
 			&& (flags & FSK_FROM_PART) != 0
 			&& (kitty_protocol_state == KKPS_ENABLED
 			    || kitty_protocol_state == KKPS_DISABLED))
@@ -1526,17 +1526,17 @@ find_special_key(
 			    *did_simplify = TRUE;
 		    }
 		    else
-			key = K_ESC;
+			सुसि = K_ESC;
 		}
 
 		// Normal Key with modifier: Try to make a single byte code.
-		if (!IS_SPECIAL(key))
-		    key = extract_modifiers(key, &modifiers,
+		if (!IS_SPECIAL(सुसि))
+		    सुसि = extract_modifiers(सुसि, &modifiers,
 					   flags & FSK_SIMPLIFY, did_simplify);
 
 		*modp = modifiers;
 		*srcp = end_of_name;
-		return key;
+		return सुसि;
 	    }
 	}
     }
@@ -1555,32 +1555,32 @@ find_special_key(
  * Returns the possibly adjusted key.
  */
     int
-may_adjust_key_for_ctrl(int modifiers, int key)
+may_adjust_सुसि_for_ctrl(int modifiers, int सुसि)
 {
     if ((modifiers & MOD_MASK_CTRL) == 0)
-	return key;
+	return सुसि;
 
-    if (ASCII_ISALPHA(key))
+    if (ASCII_ISALPHA(सुसि))
     {
 #ifdef FEAT_TERMINAL
-	check_no_reduce_keys();  // may update the no_reduce_keys flag
+	check_no_reduce_मगा_सुसि();  // may update the no_reduce_keys flag
 #endif
-	return no_reduce_keys == 0 ? TOUPPER_ASC(key) : key;
+	return no_reduce_मगा_सुसि == 0 ? TOUPPER_ASC(सुसि) : सुसि;
     }
-    if (key == '2')
+    if (सुसि == '2')
 	return '@';
-    if (key == '6')
+    if (सुसि == '6')
 	return '^';
-    if (key == '-')
+    if (सुसि == '-')
 	return '_';
 
     // On a Belgian keyboard AltGr $ is ']', on other keyboards '$' can only be
     // obtained with Shift.  Assume that '$' without shift implies a Belgian
     // keyboard, where CTRL-$ means CTRL-].
-    if (key == '$' && (modifiers & MOD_MASK_SHIFT) == 0)
+    if (सुसि == '$' && (modifiers & MOD_MASK_SHIFT) == 0)
 	return ']';
 
-    return key;
+    return सुसि;
 }
 
 /*
@@ -1592,7 +1592,7 @@ may_adjust_key_for_ctrl(int modifiers, int key)
  * Digits are included because with AZERTY the Shift key is used to get them.
  */
     int
-may_remove_shift_modifier(int modifiers, int key)
+may_remove_shift_modifier(int modifiers, int सुसि)
 {
     if ((modifiers == MOD_MASK_SHIFT
 		|| modifiers == (MOD_MASK_SHIFT | MOD_MASK_ALT)
@@ -1600,15 +1600,15 @@ may_remove_shift_modifier(int modifiers, int key)
 		|| modifiers == (MOD_MASK_SHIFT | MOD_MASK_CMD)
 #endif
 		|| modifiers == (MOD_MASK_SHIFT | MOD_MASK_META))
-	    && ((key >= '!' && key <= '/')
-		|| (key >= ':' && key <= 'Z')
-		|| vim_isdigit(key)
-		|| (key >= '[' && key <= '`')
-		|| (key >= '{' && key <= '~')))
+	    && ((सुसि >= '!' && सुसि <= '/')
+		|| (सुसि >= ':' && सुसि <= 'Z')
+		|| vim_isdigit(सुसि)
+		|| (सुसि >= '[' && सुसि <= '`')
+		|| (सुसि >= '{' && सुसि <= '~')))
 	return modifiers & ~MOD_MASK_SHIFT;
 
     if (modifiers == (MOD_MASK_SHIFT | MOD_MASK_CTRL)
-		&& (key == '{' || key == '}' || key == '|'))
+		&& (सुसि == '{' || सुसि == '}' || सुसि == '|'))
 	return modifiers & ~MOD_MASK_SHIFT;
 
     return modifiers;
@@ -1622,7 +1622,7 @@ may_remove_shift_modifier(int modifiers, int key)
  * "did_simplify" when it's not NULL.
  */
     int
-extract_modifiers(int key, int *modp, int simplify, int *did_simplify)
+extract_modifiers(int सुसि, int *modp, int simplify, int *did_simplify)
 {
     int	modifiers = *modp;
 
@@ -1630,9 +1630,9 @@ extract_modifiers(int key, int *modp, int simplify, int *did_simplify)
     // Command-key really special, no fancynest
     if (!(modifiers & MOD_MASK_CMD))
 #endif
-    if ((modifiers & MOD_MASK_SHIFT) && ASCII_ISALPHA(key))
+    if ((modifiers & MOD_MASK_SHIFT) && ASCII_ISALPHA(सुसि))
     {
-	key = TOUPPER_ASC(key);
+	सुसि = TOUPPER_ASC(सुसि);
 	// With <C-S-a> we keep the shift modifier.
 	// With <S-a>, <A-S-a> and <S-A> we don't keep the shift modifier.
 	if (simplify || modifiers == MOD_MASK_SHIFT
@@ -1642,17 +1642,17 @@ extract_modifiers(int key, int *modp, int simplify, int *did_simplify)
     }
 
     // <C-H> and <C-h> mean the same thing, always use "H"
-    if ((modifiers & MOD_MASK_CTRL) && ASCII_ISALPHA(key))
-	key = TOUPPER_ASC(key);
+    if ((modifiers & MOD_MASK_CTRL) && ASCII_ISALPHA(सुसि))
+	सुसि = TOUPPER_ASC(सुसि);
 
     if (simplify && (modifiers & MOD_MASK_CTRL)
-	    && ((key >= '?' && key <= '_') || ASCII_ISALPHA(key)))
+	    && ((सुसि >= '?' && सुसि <= '_') || ASCII_ISALPHA(सुसि)))
     {
-	key = Ctrl_chr(key);
+	सुसि = Ctrl_chr(सुसि);
 	modifiers &= ~MOD_MASK_CTRL;
 	// <C-@> is <Nul>
-	if (key == NUL)
-	    key = K_ZERO;
+	if (सुसि == NUL)
+	    सुसि = K_ZERO;
 	if (did_simplify != NULL)
 	    *did_simplify = TRUE;
     }
@@ -1661,17 +1661,17 @@ extract_modifiers(int key, int *modp, int simplify, int *did_simplify)
     // Command-key really special, no fancynest
     if (!(modifiers & MOD_MASK_CMD))
 #endif
-    if (simplify && (modifiers & MOD_MASK_ALT) && key < 0x80
+    if (simplify && (modifiers & MOD_MASK_ALT) && सुसि < 0x80
 	    && !enc_dbcs)		// avoid creating a lead byte
     {
-	key |= 0x80;
+	सुसि |= 0x80;
 	modifiers &= ~MOD_MASK_ALT;	// remove the META modifier
 	if (did_simplify != NULL)
 	    *did_simplify = TRUE;
     }
 
     *modp = modifiers;
-    return key;
+    return सुसि;
 }
 
 /*
@@ -1679,13 +1679,13 @@ extract_modifiers(int key, int *modp, int simplify, int *did_simplify)
  * Return the index when found, -1 when not found.
  */
     int
-find_special_key_in_table(int c)
+find_special_सुसि_in_table(int c)
 {
     int	    i;
 
-    for (i = 0; i < (int)ARRAY_LENGTH(key_names_table); i++)
-	if (c == key_names_table[i].key && !key_names_table[i].is_alt)
-	    return key_names_table[i].enabled ? i : -1;
+    for (i = 0; i < (int)ARRAY_LENGTH(सुसि_names_table); i++)
+	if (c == सुसि_names_table[i].सुसि && !सुसि_names_table[i].is_alt)
+	    return सुसि_names_table[i].enabled ? i : -1;
 
     return -1;
 }
@@ -1701,10 +1701,10 @@ find_special_key_in_table(int c)
  * These characters are identified by vim_isNormalIDc().
  */
     static int
-cmp_key_name_entry(const void *a, const void *b)
+cmp_सुसि_name_entry(const void *a, const void *b)
 {
-    char_u  *p1 = ((struct key_name_entry *)a)->name.string;
-    char_u  *p2 = ((struct key_name_entry *)b)->name.string;
+    char_u  *p1 = ((struct सुसि_name_entry *)a)->name.string;
+    char_u  *p2 = ((struct सुसि_name_entry *)b)->name.string;
     int	    result = 0;
 
     if (p1 == p2)
@@ -1742,7 +1742,7 @@ cmp_key_name_entry(const void *a, const void *b)
  * Return the key code, or 0 if not found.
  */
     int
-get_special_key_code(char_u *name)
+get_special_सुसि_code(char_u *name)
 {
     /*
      * If it's <t_xx> we get the code for xx from the termcap
@@ -1755,30 +1755,30 @@ get_special_key_code(char_u *name)
 	string[1] = name[3];
 	string[2] = NUL;
 	if (add_termcap_entry(string, FALSE) == OK)
-	    return TERMCAP2KEY(name[2], name[3]);
+	    return TERMCAP2_सुसि(name[2], name[3]);
     }
     else
     {
-	struct key_name_entry	target;
-	struct key_name_entry	*entry;
+	struct सुसि_name_entry	target;
+	struct सुसि_name_entry	*entry;
 
 	target.enabled = TRUE;
-	target.key = 0;
+	target.सुसि = 0;
 	target.name.string = name;
 	target.name.length = 0;
 
-	entry = (struct key_name_entry *)bsearch(
+	entry = (struct सुसि_name_entry *)bsearch(
 	    &target,
-	    &key_names_table,
-	    ARRAY_LENGTH(key_names_table),
-	    sizeof(key_names_table[0]),
-	    cmp_key_name_entry);
+	    &सुसि_names_table,
+	    ARRAY_LENGTH(सुसि_names_table),
+	    sizeof(सुसि_names_table[0]),
+	    cmp_सुसि_name_entry);
 	if (entry != NULL && entry->enabled)
 	{
-	    int key = entry->key;
+	    int सुसि = entry->सुसि;
 	    // Both TAB and K_TAB have name "Tab", and it's unspecified which
 	    // one bsearch() will return.  TAB is the expected one.
-	    return key == K_TAB ? TAB : key;
+	    return सुसि == K_TAB ? TAB : सुसि;
 	}
     }
 
@@ -1786,12 +1786,12 @@ get_special_key_code(char_u *name)
 }
 
     char_u *
-get_key_name(int i)
+get_सुसि_name(int i)
 {
-    if (i < 0 || i >= (int)ARRAY_LENGTH(key_names_table))
+    if (i < 0 || i >= (int)ARRAY_LENGTH(सुसि_names_table))
 	return NULL;
 
-    return key_names_table[i].name.string;
+    return सुसि_names_table[i].name.string;
 }
 
 /*
@@ -1905,7 +1905,7 @@ call_shell(char_u *cmd, int opt)
     {
 	verbose_enter();
 	smsg(_("Calling shell to execute: \"%s\""), cmd == NULL ? p_sh : cmd);
-	msg_putchar_attr('\n', 0);
+	मेनसाहे_putchar_attr('\n', 0);
 	cursor_on();
 	verbose_leave();
     }
@@ -2113,7 +2113,7 @@ vim_stat(const char *name, stat_T *stp)
  * Handling of cursor and mouse pointer shapes in various modes.
  */
 
-cursorentry_T shape_table[SHAPE_IDX_COUNT] =
+cursorentry_T shape_table[SHAPE_IDX_बिलांग] =
 {
     // The values will be filled in from the 'guicursor' and 'mouseshape'
     // defaults when Vim starts.
@@ -2163,7 +2163,7 @@ static string_T mshape_names[] =
     {NULL, 0}
 };
 
-#  define MSHAPE_NAMES_COUNT  (ARRAY_LENGTH(mshape_names) - 1)
+#  define MSHAPE_NAMES_बिलांग  (ARRAY_LENGTH(mshape_names) - 1)
 # endif
 
 /*
@@ -2226,14 +2226,14 @@ parse_shape_opt(int what)
 		    else
 			len = 2;
 		    if (len == 1 && TOLOWER_ASC(modep[0]) == 'a')
-			all_idx = SHAPE_IDX_COUNT - 1;
+			all_idx = SHAPE_IDX_बिलांग - 1;
 		    else
 		    {
-			for (idx = 0; idx < SHAPE_IDX_COUNT; ++idx)
+			for (idx = 0; idx < SHAPE_IDX_बिलांग; ++idx)
 			    if (STRNICMP(modep, shape_table[idx].name, len)
 									 == 0)
 				break;
-			if (idx == SHAPE_IDX_COUNT
+			if (idx == SHAPE_IDX_बिलांग
 				   || (shape_table[idx].used_for & what) == 0)
 			    return e_illegal_mode;
 			if (len == 2 && modep[0] == 'v' && modep[1] == 'e')
@@ -2431,9 +2431,9 @@ get_shape_idx(int mouse)
 #   endif
 	return SHAPE_IDX_MORE;
     }
-    if (mouse && drag_status_line)
+    if (mouse && drag_status_लिन्या)
 	return SHAPE_IDX_SDRAG;
-    if (mouse && drag_sep_line)
+    if (mouse && drag_sep_लिन्या)
 	return SHAPE_IDX_VDRAG;
 #  endif
     if (!mouse && State == MODE_SHOWMATCH)
@@ -2442,7 +2442,7 @@ get_shape_idx(int mouse)
 	return SHAPE_IDX_R;
     if (State & REPLACE_FLAG)
 	return SHAPE_IDX_R;
-    if (State & MODE_INSERT)
+    if (State & MODE_इसिंगित)
 	return SHAPE_IDX_I;
     if (State & MODE_CMDLINE)
     {
@@ -2530,7 +2530,7 @@ f_getmouseshape(typval_T *argvars UNUSED, typval_T *rettv)
     rettv->vval.v_string = NULL;
 # if defined(FEAT_MOUSESHAPE)
     if (current_mouse_shape >= 0
-			      && current_mouse_shape < (int)MSHAPE_NAMES_COUNT)
+			      && current_mouse_shape < (int)MSHAPE_NAMES_बिलांग)
 	rettv->vval.v_string = vim_strnsave(
 				  mshape_names[current_mouse_shape].string,
 				  mshape_names[current_mouse_shape].length);
@@ -2550,12 +2550,12 @@ vim_chdir(char_u *new_dir)
     char_u	*dir_name;
     int		r;
     char_u	*file_to_find = NULL;
-    char	*search_ctx = NULL;
+    char	*हानाप_ctx = NULL;
 
     dir_name = find_directory_in_path(new_dir, (int)STRLEN(new_dir),
-		     FNAME_MESS, curbuf->b_ffname, &file_to_find, &search_ctx);
+		     FNAME_MESS, curbuf->b_ffname, &file_to_find, &हानाप_ctx);
     vim_free(file_to_find);
-    vim_findfile_cleanup(search_ctx);
+    vim_findfile_cleanup(हानाप_ctx);
     if (dir_name == NULL)
 	return -1;
     r = mch_chdir((char *)dir_name);
@@ -2603,7 +2603,7 @@ free_username(void)
     void
 qsort(
     void	*base,
-    size_t	elm_count,
+    size_t	elm_बिलांग,
     size_t	elm_size,
     int (*cmp)(const void *, const void *))
 {
@@ -2617,8 +2617,8 @@ qsort(
     if (buf == NULL)
 	return;
 
-    for (gap = elm_count / 2; gap > 0; gap /= 2)
-	for (i = gap; i < elm_count; ++i)
+    for (gap = elm_बिलांग / 2; gap > 0; gap /= 2)
+	for (i = gap; i < elm_बिलांग; ++i)
 	    for (j = i - gap; j >= 0; j -= gap)
 	    {
 		// Compare the elements.
@@ -2970,7 +2970,7 @@ elapsed(struct timeval *start_tv)
     long
 elapsed(DWORD start_tick)
 {
-    DWORD	now = GetTickCount();
+    DWORD	now = Get_Tick_बिलांग();
 
     return (long)now - (long)start_tick;
 }
@@ -3105,7 +3105,7 @@ build_argv_from_list(list_T *l, char ***argv, int *argc)
     if (*argv == NULL)
 	return FAIL;
     *argc = 0;
-    FOR_ALL_LIST_ITEMS(l, li)
+    FOR_ALL_LIST_मगा_बागाय(l, li)
     {
 	s = tv_get_string_chk(&li->li_tv);
 	if (s == NULL)
@@ -3146,46 +3146,46 @@ get_special_pty_type(void)
 
 // compare two keyvalue_T structs by case sensitive value
     int
-cmp_keyvalue_value(const void *a, const void *b)
+cmp_keyvalue_हालागा(const void *a, const void *b)
 {
     keyvalue_T *kv1 = (keyvalue_T *)a;
     keyvalue_T *kv2 = (keyvalue_T *)b;
 
-    return STRCMP(kv1->value.string, kv2->value.string);
+    return STRCMP(kv1->हालागा.string, kv2->हालागा.string);
 }
 
 // compare two keyvalue_T structs by value with length
     int
-cmp_keyvalue_value_n(const void *a, const void *b)
+cmp_keyvalue_हालागा_n(const void *a, const void *b)
 {
     keyvalue_T *kv1 = (keyvalue_T *)a;
     keyvalue_T *kv2 = (keyvalue_T *)b;
 
-    return STRNCMP(kv1->value.string, kv2->value.string, MAX(kv1->value.length,
-		kv2->value.length));
+    return STRNCMP(kv1->हालागा.string, kv2->हालागा.string, MAX(kv1->हालागा.length,
+		kv2->हालागा.length));
 }
 
 // compare two keyvalue_T structs by case insensitive value
     int
-cmp_keyvalue_value_i(const void *a, const void *b)
+cmp_keyvalue_हालागा_i(const void *a, const void *b)
 {
     keyvalue_T *kv1 = (keyvalue_T *)a;
     keyvalue_T *kv2 = (keyvalue_T *)b;
 
-    return STRICMP(kv1->value.string, kv2->value.string);
+    return STRICMP(kv1->हालागा.string, kv2->हालागा.string);
 }
 
 // compare two keyvalue_T structs by case insensitive ASCII value
 // with value.length
     int
-cmp_keyvalue_value_ni(const void *a, const void *b)
+cmp_keyvalue_हालागा_ni(const void *a, const void *b)
 {
     keyvalue_T *kv1 = (keyvalue_T *)a;
     keyvalue_T *kv2 = (keyvalue_T *)b;
 
-    return vim_strnicmp_asc((char *)kv1->value.string,
-	    (char *)kv2->value.string, MAX(kv1->value.length,
-		    kv2->value.length));
+    return vim_strnicmp_asc((char *)kv1->हालागा.string,
+	    (char *)kv2->हालागा.string, MAX(kv1->हालागा.length,
+		    kv2->हालागा.length));
 }
 
 /*
@@ -3226,22 +3226,22 @@ mergesort_list(
 	while (curr)
 	{
 	    // Split two runs
-	    void    *left = curr;
-	    void    *right = left;
+	    void    *कालिवा = curr;
+	    void    *कानान = कालिवा;
 	    int	    i;
-	    for (i = 0; i < size && right; ++i)
-		right = get_next(right);
+	    for (i = 0; i < size && कानान; ++i)
+		कानान = get_next(कानान);
 
-	    void    *next = right;
+	    void    *next = कानान;
 	    for (i = 0; i < size && next; ++i)
 		next = get_next(next);
 
 	    // Break links
-	    void    *l_end = right ? get_prev(right) : NULL;
+	    void    *l_end = कानान ? get_prev(कानान) : NULL;
 	    if (l_end)
 		set_next(l_end, NULL);
-	    if (right)
-		set_prev(right, NULL);
+	    if (कानान)
+		set_prev(कानान, NULL);
 
 	    void    *r_end = next ? get_prev(next) : NULL;
 	    if (r_end)
@@ -3253,28 +3253,28 @@ mergesort_list(
 	    void    *merged = NULL;
 	    void    *merged_tail = NULL;
 
-	    while (left || right)
+	    while (कालिवा || कानान)
 	    {
 		void	*chosen = NULL;
-		if (!left)
+		if (!कालिवा)
 		{
-		    chosen = right;
-		    right = get_next(right);
+		    chosen = कानान;
+		    कानान = get_next(कानान);
 		}
-		else if (!right)
+		else if (!कानान)
 		{
-		    chosen = left;
-		    left = get_next(left);
+		    chosen = कालिवा;
+		    कालिवा = get_next(कालिवा);
 		}
-		else if (compare(left, right) <= 0)
+		else if (compare(कालिवा, कानान) <= 0)
 		{
-		    chosen = left;
-		    left = get_next(left);
+		    chosen = कालिवा;
+		    कालिवा = get_next(कालिवा);
 		}
 		else
 		{
-		    chosen = right;
-		    right = get_next(right);
+		    chosen = कानान;
+		    कानान = get_next(कानान);
 		}
 
 		if (merged_tail)

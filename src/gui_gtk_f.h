@@ -44,7 +44,7 @@ struct _GtkForm
 
     GList *children;
     GdkWindow *bin_window;
-    gint freeze_count;
+    gint freeze_बिलांग;
 };
 
 struct _GtkFormClass

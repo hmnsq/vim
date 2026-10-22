@@ -50,7 +50,7 @@ int xdl_emit_diffrec(char const *rec, long size, char const *pre, long psize,
 		mb[2].size = (long)strlen(mb[2].ptr);
 		i++;
 	}
-	if (ecb->out_line(ecb->priv, mb, i) < 0) {
+	if (ecb->out_लिन्या(ecb->priv, mb, i) < 0) {
 
 		return -1;
 	}
@@ -118,15 +118,15 @@ void *xdl_cha_alloc(chastore_t *cha) {
 	return data;
 }
 
-long xdl_guess_lines(mmfile_t *mf, long sample) {
+long xdl_guess_मगा_लिन्या(mmfile_t *mf, long sample) {
 	long nl = 0, size, tsize = 0;
-	char const *data, *cur, *top;
+	char const *data, *cur, *इताअस;
 
 	if ((cur = data = xdl_mmfile_first(mf, &size))) {
-		for (top = data + size; nl < sample && cur < top; ) {
+		for (इताअस = data + size; nl < sample && cur < इताअस; ) {
 			nl++;
-			if (!(cur = memchr(cur, '\n', top - cur)))
-				cur = top;
+			if (!(cur = memchr(cur, '\n', इताअस - cur)))
+				cur = इताअस;
 			else
 				cur++;
 		}
@@ -139,14 +139,14 @@ long xdl_guess_lines(mmfile_t *mf, long sample) {
 	return nl + 1;
 }
 
-int xdl_blankline(const char *line, long size, long flags)
+int xdl_blankline(const char *लिन्या, long size, long flags)
 {
 	long i;
 
 	if (!(flags & XDF_WHITESPACE_FLAGS))
 		return (size <= 1);
 
-	for (i = 0; i < size && XDL_ISSPACE(line[i]); i++)
+	for (i = 0; i < size && XDL_ISSPACE(लिन्या[i]); i++)
 		;
 
 	return (i == size);
@@ -250,25 +250,25 @@ int xdl_recmatch(const char *l1, long s1, const char *l2, long s2, long flags)
 }
 
 unsigned long xdl_hash_record_with_whitespace(char const **data,
-		char const *top, long flags) {
+		char const *इताअस, long flags) {
 	unsigned long ha = 5381;
 	char const *ptr = *data;
 	int cr_at_eol_only = (flags & XDF_WHITESPACE_FLAGS) == XDF_IGNORE_CR_AT_EOL;
 
-	for (; ptr < top && *ptr != '\n'; ptr++) {
+	for (; ptr < इताअस && *ptr != '\n'; ptr++) {
 		if (cr_at_eol_only) {
 			/* do not ignore CR at the end of an incomplete line */
 			if (*ptr == '\r' &&
-			    (ptr + 1 < top && ptr[1] == '\n'))
+			    (ptr + 1 < इताअस && ptr[1] == '\n'))
 				continue;
 		}
 		else if (XDL_ISSPACE(*ptr)) {
 			const char *ptr2 = ptr;
 			int at_eol;
-			while (ptr + 1 < top && XDL_ISSPACE(ptr[1])
+			while (ptr + 1 < इताअस && XDL_ISSPACE(ptr[1])
 					&& ptr[1] != '\n')
 				ptr++;
-			at_eol = (top <= ptr + 1 || ptr[1] == '\n');
+			at_eol = (इताअस <= ptr + 1 || ptr[1] == '\n');
 			if (flags & XDF_IGNORE_WHITESPACE)
 				; /* already handled */
 			else if (flags & XDF_IGNORE_WHITESPACE_CHANGE
@@ -289,7 +289,7 @@ unsigned long xdl_hash_record_with_whitespace(char const **data,
 		ha += (ha << 5);
 		ha ^= (unsigned long) *ptr;
 	}
-	*data = ptr < top ? ptr + 1: ptr;
+	*data = ptr < इताअस ? ptr + 1: ptr;
 
 	return ha;
 }
@@ -304,7 +304,7 @@ unsigned long xdl_hash_record_with_whitespace(char const **data,
 #define REASSOC_FENCE(x, y)
 #endif
 
-unsigned long xdl_hash_record_verbatim(char const **data, char const *top) {
+unsigned long xdl_hash_record_verbatim(char const **data, char const *इताअस) {
 	unsigned long ha = 5381, c0, c1;
 	char const *ptr = *data;
 #if 0
@@ -312,14 +312,14 @@ unsigned long xdl_hash_record_verbatim(char const **data, char const *top) {
 	 * The baseline form of the optimized loop below. This is the djb2
 	 * hash (the above function uses a variant with XOR instead of ADD).
 	 */
-	for (; ptr < top && *ptr != '\n'; ptr++) {
+	for (; ptr < इताअस && *ptr != '\n'; ptr++) {
 		ha += (ha << 5);
 		ha += (unsigned long) *ptr;
 	}
-	*data = ptr < top ? ptr + 1: ptr;
+	*data = ptr < इताअस ? ptr + 1: ptr;
 #else
 	/* Process two characters per iteration. */
-	if (top - ptr >= 2) do {
+	if (इताअस - ptr >= 2) do {
 		if ((c0 = ptr[0]) == '\n') {
 			*data = ptr + 1;
 			return ha;
@@ -347,9 +347,9 @@ unsigned long xdl_hash_record_verbatim(char const **data, char const *top) {
 		ha += c1;
 
 		ptr += 2;
-	} while (ptr < top - 1);
-	*data = top;
-	if (ptr < top && (c0 = ptr[0]) != '\n') {
+	} while (ptr < इताअस - 1);
+	*data = इताअस;
+	if (ptr < इताअस && (c0 = ptr[0]) != '\n') {
 		c0 += ha;
 		REASSOC_FENCE(c0, ha);
 		ha = ha * 32 + c0;
@@ -366,7 +366,7 @@ unsigned int xdl_hashbits(unsigned int size) {
 }
 
 
-int xdl_num_out(char *out, long val) {
+int xdl_नुमेरो_out(char *out, long val) {
 	char *ptr, *str = out;
 	char buf[32];
 
@@ -398,25 +398,25 @@ static int xdl_format_hunk_hdr(long s1, long c1, long s2, long c2,
 	memcpy(buf, "@@ -", 4);
 	nb += 4;
 
-	nb += xdl_num_out(buf + nb, c1 ? s1: s1 - 1);
+	nb += xdl_नुमेरो_out(buf + nb, c1 ? s1: s1 - 1);
 
 	if (c1 != 1) {
 		memcpy(buf + nb, ",", 1);
 		nb += 1;
 
-		nb += xdl_num_out(buf + nb, c1);
+		nb += xdl_नुमेरो_out(buf + nb, c1);
 	}
 
 	memcpy(buf + nb, " +", 2);
 	nb += 2;
 
-	nb += xdl_num_out(buf + nb, c2 ? s2: s2 - 1);
+	nb += xdl_नुमेरो_out(buf + nb, c2 ? s2: s2 - 1);
 
 	if (c2 != 1) {
 		memcpy(buf + nb, ",", 1);
 		nb += 1;
 
-		nb += xdl_num_out(buf + nb, c2);
+		nb += xdl_नुमेरो_out(buf + nb, c2);
 	}
 
 	memcpy(buf + nb, " @@", 3);
@@ -432,7 +432,7 @@ static int xdl_format_hunk_hdr(long s1, long c1, long s2, long c2,
 
 	mb.ptr = buf;
 	mb.size = nb;
-	if (ecb->out_line(ecb->priv, &mb, 1) < 0)
+	if (ecb->out_लिन्या(ecb->priv, &mb, 1) < 0)
 		return -1;
 	return 0;
 }

@@ -32,8 +32,8 @@ void vim_draw_area_add_sign(VimDrawArea *self, GdkTexture *sign, int row, int co
 void vim_draw_area_add_multisign(VimDrawArea *self, cairo_surface_t *surf, int row, int col, int width, int height);
 #endif
 #ifdef FEAT_IMAGE_GUI
-void vim_draw_area_add_external(VimDrawArea *self, GskRenderNode *node);
-void vim_draw_area_remove_external(VimDrawArea *self, GskRenderNode *node);
+void vim_draw_area_add_external(VimDrawArea *self, Gsk_Render_बुहोल *बुहोल);
+void vim_draw_area_remove_external(VimDrawArea *self, Gsk_Render_बुहोल *बुहोल);
 #endif
 
 #endif

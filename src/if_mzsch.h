@@ -22,7 +22,7 @@
 
 #if MZSCHEME_VERSION_MAJOR >= 299
 # define SCHEME_STRINGP(obj) (SCHEME_BYTE_STRINGP(obj) || SCHEME_CHAR_STRINGP(obj))
-# define BYTE_STRING_VALUE(obj) ((char_u *)SCHEME_BYTE_STR_VAL(obj))
+# define BYTE_STRING_हालागा(obj) ((char_u *)SCHEME_BYTE_STR_VAL(obj))
 #else
 // macros for compatibility with older versions
 # define scheme_current_config() scheme_config
@@ -36,7 +36,7 @@
 # endif
 
 # define SCHEME_BYTE_STRLEN_VAL SCHEME_STRLEN_VAL
-# define BYTE_STRING_VALUE(obj) ((char_u *)SCHEME_STR_VAL(obj))
+# define BYTE_STRING_हालागा(obj) ((char_u *)SCHEME_STR_VAL(obj))
 # define scheme_byte_string_to_char_string(obj) (obj)
 # define SCHEME_BYTE_STRINGP SCHEME_STRINGP
 #endif

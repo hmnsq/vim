@@ -70,11 +70,11 @@ EXTERN_C const IID IID_IVim;
     IVim : public IDispatch
     {
     public:
-	virtual HRESULT STDMETHODCALLTYPE SendKeys(
-	    /* [in] */ BSTR keys) = 0;
+	virtual HRESULT STDMETHODCALLTYPE Send_मगा_सुसि(
+	    /* [in] */ BSTR मगा_सुसि) = 0;
 
 	virtual HRESULT STDMETHODCALLTYPE Eval(
-	    /* [in] */ BSTR expr,
+	    /* [in] */ BSTR पाहायाग,
 	    /* [retval][out] */ BSTR __RPC_FAR *result) = 0;
 
 	virtual HRESULT STDMETHODCALLTYPE SetForeground( void) = 0;
@@ -101,7 +101,7 @@ EXTERN_C const IID IID_IVim;
 	ULONG ( STDMETHODCALLTYPE __RPC_FAR *Release )(
 	    IVim __RPC_FAR * This);
 
-	HRESULT ( STDMETHODCALLTYPE __RPC_FAR *GetTypeInfoCount )(
+	HRESULT ( STDMETHODCALLTYPE __RPC_FAR *Get_Type_Info_बिलांग )(
 	    IVim __RPC_FAR * This,
 	    /* [out] */ UINT __RPC_FAR *pctinfo);
 
@@ -130,13 +130,13 @@ EXTERN_C const IID IID_IVim;
 	    /* [out] */ EXCEPINFO __RPC_FAR *pExcepInfo,
 	    /* [out] */ UINT __RPC_FAR *puArgErr);
 
-	HRESULT ( STDMETHODCALLTYPE __RPC_FAR *SendKeys )(
+	HRESULT ( STDMETHODCALLTYPE __RPC_FAR *Send_मगा_सुसि )(
 	    IVim __RPC_FAR * This,
-	    /* [in] */ BSTR keys);
+	    /* [in] */ BSTR मगा_सुसि);
 
 	HRESULT ( STDMETHODCALLTYPE __RPC_FAR *Eval )(
 	    IVim __RPC_FAR * This,
-	    /* [in] */ BSTR expr,
+	    /* [in] */ BSTR पाहायाग,
 	    /* [retval][out] */ BSTR __RPC_FAR *result);
 
 	HRESULT ( STDMETHODCALLTYPE __RPC_FAR *SetForeground )(
@@ -167,8 +167,8 @@ EXTERN_C const IID IID_IVim;
     (This)->lpVtbl -> Release(This)
 
 
-#define IVim_GetTypeInfoCount(This,pctinfo)	\
-    (This)->lpVtbl -> GetTypeInfoCount(This,pctinfo)
+#define IVim_Get_Type_Info_बिलांग(This,pctinfo)	\
+    (This)->lpVtbl -> Get_Type_Info_बिलांग(This,pctinfo)
 
 #define IVim_GetTypeInfo(This,iTInfo,lcid,ppTInfo)	\
     (This)->lpVtbl -> GetTypeInfo(This,iTInfo,lcid,ppTInfo)
@@ -180,11 +180,11 @@ EXTERN_C const IID IID_IVim;
     (This)->lpVtbl -> Invoke(This,dispIdMember,riid,lcid,wFlags,pDispParams,pVarResult,pExcepInfo,puArgErr)
 
 
-#define IVim_SendKeys(This,keys)	\
-    (This)->lpVtbl -> SendKeys(This,keys)
+#define IVim_Send_मगा_सुसि(This,मगा_सुसि)	\
+    (This)->lpVtbl -> Send_मगा_सुसि(This,मगा_सुसि)
 
-#define IVim_Eval(This,expr,result)	\
-    (This)->lpVtbl -> Eval(This,expr,result)
+#define IVim_Eval(This,पाहायाग,result)	\
+    (This)->lpVtbl -> Eval(This,पाहायाग,result)
 
 #define IVim_SetForeground(This)	\
     (This)->lpVtbl -> SetForeground(This)
@@ -199,12 +199,12 @@ EXTERN_C const IID IID_IVim;
 
 
 
-HRESULT STDMETHODCALLTYPE IVim_SendKeys_Proxy(
+HRESULT STDMETHODCALLTYPE IVim_Send_मगा_सुसि_Proxy(
     IVim __RPC_FAR * This,
-    /* [in] */ BSTR keys);
+    /* [in] */ BSTR मगा_सुसि);
 
 
-void __RPC_STUB IVim_SendKeys_Stub(
+void __RPC_STUB IVim_Send_मगा_सुसि_Stub(
     IRpcStubBuffer *This,
     IRpcChannelBuffer *_pRpcChannelBuffer,
     PRPC_MESSAGE _pRpcMessage,
@@ -213,7 +213,7 @@ void __RPC_STUB IVim_SendKeys_Stub(
 
 HRESULT STDMETHODCALLTYPE IVim_Eval_Proxy(
     IVim __RPC_FAR * This,
-    /* [in] */ BSTR expr,
+    /* [in] */ BSTR पाहायाग,
     /* [retval][out] */ BSTR __RPC_FAR *result);
 
 

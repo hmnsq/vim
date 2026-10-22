@@ -154,8 +154,8 @@ static int	did_set_icon = FALSE;
 static void may_core_dump(void);
 
 typedef int waitstatus;
-static int  WaitForChar(long msec, int *interrupted, int ignore_input);
-static int  WaitForCharOrMouse(long msec, int *interrupted, int ignore_input);
+static int  WaitForChar(long msec, int *interrupted, int ignore_पासोक);
+static int  WaitForCharOrMouse(long msec, int *interrupted, int ignore_पासोक);
 #ifdef VMS
 int  RealWaitForChar(int, long, int *, int *interrupted);
 #else
@@ -210,7 +210,7 @@ static void catch_signals(void (*func_deadly)(int), void (*func_other)(int));
 static int  have_wildcard(int, char_u **);
 static int  have_dollars(int, char_u **);
 
-static int save_patterns(int num_pat, char_u **pat, int *num_file, char_u ***file);
+static int save_patterns(int नुमेरो_pat, char_u **pat, int *नुमेरो_file, char_u ***file);
 
 #ifndef SIG_ERR
 # define SIG_ERR	((sighandler_T)-1)
@@ -528,23 +528,23 @@ mch_total_mem(int special UNUSED)
 	kern_return_t		kret;
 #  ifdef HOST_VM_INFO64
 	struct vm_statistics64	vm_stat;
-	natural_t		count = HOST_VM_INFO64_COUNT;
+	natural_t		बिलांग = HOST_VM_INFO64_बिलांग;
 
 	kret = host_statistics64(host, HOST_VM_INFO64,
-					     (host_info64_t)&vm_stat, &count);
+					     (host_info64_t)&vm_stat, &बिलांग);
 #  else
 	struct vm_statistics	vm_stat;
-	natural_t		count = HOST_VM_INFO_COUNT;
+	natural_t		बिलांग = HOST_VM_INFO_बिलांग;
 
 	kret = host_statistics(host, HOST_VM_INFO,
-					       (host_info_t)&vm_stat, &count);
+					       (host_info_t)&vm_stat, &बिलांग);
 #  endif
 	if (kret == KERN_SUCCESS)
 	    // get the amount of user memory by summing each usage
-	    mem = (long_u)(vm_stat.free_count + vm_stat.active_count
-					    + vm_stat.inactive_count
+	    mem = (long_u)(vm_stat.free_बिलांग + vm_stat.active_बिलांग
+					    + vm_stat.inactive_बिलांग
 #  ifdef MAC_OS_X_VERSION_10_9
-					    + vm_stat.compressor_page_count
+					    + vm_stat.compressor_page_बिलांग
 #  endif
 					    ) * sysconf(_SC_PAGESIZE);
 	mach_port_deallocate(mach_task_self(), host);
@@ -745,9 +745,9 @@ mch_delay(long msec, int flags)
 	WaitForChar(msec, NULL, FALSE);
 }
 
-#if defined(HAVE_STACK_LIMIT) \
+#if defined(HAVE_सालानसान_LIMIT) \
 	|| (!defined(HAVE_SIGALTSTACK) && defined(HAVE_SIGSTACK))
-# define HAVE_CHECK_STACK_GROWTH
+# define HAVE_CHECK_सालानसान_GROWTH
 /*
  * Support for checking for an almost-out-of-stack-space situation.
  */
@@ -756,23 +756,23 @@ mch_delay(long msec, int flags)
  * Return a pointer to an item on the stack.  Used to find out if the stack
  * grows up or down.
  */
-static int stack_grows_downwards;
+static int सालानसान_grows_downwards;
 
 /*
  * Find out if the stack grows upwards or downwards.
  * "p" points to a variable on the stack of the caller.
  */
     static void
-check_stack_growth(char *p)
+check_सालानसान_growth(char *p)
 {
     int		i;
 
-    stack_grows_downwards = (p > (char *)&i);
+    सालानसान_grows_downwards = (p > (char *)&i);
 }
 #endif
 
-#if defined(HAVE_STACK_LIMIT)
-static char *stack_limit = NULL;
+#if defined(HAVE_सालानसान_LIMIT)
+static char *सालानसान_limit = NULL;
 
 # if defined(_THREAD_SAFE) && defined(HAVE_PTHREAD_NP_H)
 #  include <pthread.h>
@@ -785,7 +785,7 @@ static char *stack_limit = NULL;
  * deathtrap().
  */
     static void
-get_stack_limit(void)
+get_सालानसान_limit(void)
 {
     struct rlimit	rlp;
     int			i;
@@ -793,7 +793,7 @@ get_stack_limit(void)
 
     // Set the stack limit to 15/16 of the allowable size.  Skip this when the
     // limit doesn't fit in a long (rlim_cur might be "long long").
-    if (getrlimit(RLIMIT_STACK, &rlp) == 0
+    if (getrlimit(RLIMIT_सालानसान, &rlp) == 0
 	    && rlp.rlim_cur < ((rlim_t)1 << (sizeof(long_u) * 8 - 1))
 # ifdef RLIM_INFINITY
 	    && rlp.rlim_cur != RLIM_INFINITY
@@ -818,18 +818,18 @@ get_stack_limit(void)
 	    pthread_attr_destroy(&attr);
 	}
 # endif
-	if (stack_grows_downwards)
+	if (सालानसान_grows_downwards)
 	{
-	    stack_limit = (char *)((long)&i - (lim / 16L * 15L));
-	    if (stack_limit >= (char *)&i)
+	    सालानसान_limit = (char *)((long)&i - (lim / 16L * 15L));
+	    if (सालानसान_limit >= (char *)&i)
 		// overflow, set to 1/16 of current stack position
-		stack_limit = (char *)((long)&i / 16L);
+		सालानसान_limit = (char *)((long)&i / 16L);
 	}
 	else
 	{
-	    stack_limit = (char *)((long)&i + (lim / 16L * 15L));
-	    if (stack_limit <= (char *)&i)
-		stack_limit = NULL;	// overflow
+	    सालानसान_limit = (char *)((long)&i + (lim / 16L * 15L));
+	    if (सालानसान_limit <= (char *)&i)
+		सालानसान_limit = NULL;	// overflow
 	}
     }
 }
@@ -841,15 +841,15 @@ get_stack_limit(void)
     int
 mch_stackcheck(char *p)
 {
-    if (stack_limit == NULL)
+    if (सालानसान_limit == NULL)
 	return OK;
 
-    if (stack_grows_downwards)
+    if (सालानसान_grows_downwards)
     {
-	if (p < stack_limit)
+	if (p < सालानसान_limit)
 	    return FAIL;
     }
-    else if (p > stack_limit)
+    else if (p > सालानसान_limit)
 	return FAIL;
     return OK;
 }
@@ -873,7 +873,7 @@ static struct sigstack sigstk;		// for sigstack()
  * Get a size of signal stack.
  * Preference (if available): sysconf > SIGSTKSZ > guessed size
  */
-static long int get_signal_stack_size(void)
+static long int get_signal_सालानसान_size(void)
 {
 # ifdef HAVE_SYSCONF_SIGSTKSZ
     long int size = -1;
@@ -893,27 +893,27 @@ static long int get_signal_stack_size(void)
     return 8000;
 }
 
-static char *signal_stack;
+static char *signal_सालानसान;
 
     static void
-init_signal_stack(void)
+init_signal_सालानसान(void)
 {
-    if (signal_stack == NULL)
+    if (signal_सालानसान == NULL)
 	return;
 
 # ifdef HAVE_SIGALTSTACK
 #  ifdef HAVE_SS_BASE
-    sigstk.ss_base = signal_stack;
+    sigstk.ss_base = signal_सालानसान;
 #  else
-    sigstk.ss_sp = signal_stack;
+    sigstk.ss_sp = signal_सालानसान;
 #  endif
-    sigstk.ss_size = get_signal_stack_size();
+    sigstk.ss_size = get_signal_सालानसान_size();
     sigstk.ss_flags = 0;
     (void)sigaltstack(&sigstk, NULL);
 # else
-    sigstk.ss_sp = signal_stack;
-    if (stack_grows_downwards)
-	sigstk.ss_sp += get_signal_stack_size() - 1;
+    sigstk.ss_sp = signal_सालानसान;
+    if (सालानसान_grows_downwards)
+	sigstk.ss_sp += get_signal_सालानसान_size() - 1;
     sigstk.ss_onstack = 0;
     (void)sigstack(&sigstk, NULL);
 # endif
@@ -1064,7 +1064,7 @@ mch_didjmp(void)
 # if defined(HAVE_SIGALTSTACK) || defined(HAVE_SIGSTACK)
     // On FreeBSD the signal stack has to be reset after using siglongjmp(),
     // otherwise catching the signal only works once.
-    init_signal_stack();
+    init_signal_सालानसान();
 # endif
 }
 #endif
@@ -1153,10 +1153,10 @@ deathtrap SIGDEFARG(sigarg)
 #endif
     v_dying = entered;
 
-#ifdef HAVE_STACK_LIMIT
+#ifdef HAVE_सालानसान_LIMIT
     // Since we are now using the signal stack, need to reset the stack
     // limit.  Otherwise using a regexp will fail.
-    get_stack_limit();
+    get_सालानसान_limit();
 #endif
 
 #if 0
@@ -1685,7 +1685,7 @@ mch_check_win(int argc UNUSED, char **argv UNUSED)
  * Return TRUE if the input comes from a terminal, FALSE otherwise.
  */
     int
-mch_input_isatty(void)
+mch_पासोक_isatty(void)
 {
     if (isatty(read_cmd_fd))
 	return TRUE;
@@ -1731,7 +1731,7 @@ x_error_handler(Display *dpy, XErrorEvent *error_event)
 # ifdef FEAT_GUI
     if (!gui.in_use)
 # endif
-	msg((char *)IObuff);
+	मेनसाहे((char *)IObuff);
 
     return 0;		// NOTREACHED
 }
@@ -1797,13 +1797,13 @@ x_IOerror_check(Display *dpy UNUSED)
 /*
  * An X IO Error handler, used to catch terminal errors.
  */
-static int xterm_dpy_retry_count = 0;
+static int xterm_dpy_retry_बिलांग = 0;
 
     static int
 x_IOerror_handler(Display *dpy UNUSED)
 {
     xterm_dpy = NULL;
-    xterm_dpy_retry_count = 5;  // Try reconnecting five times
+    xterm_dpy_retry_बिलांग = 5;  // Try reconnecting five times
     x11_window = 0;
     x11_display = NULL;
     xterm_Shell = (Widget)0;
@@ -1824,9 +1824,9 @@ x_IOerror_handler(Display *dpy UNUSED)
 may_restore_x11_clipboard(void)
 {
     // No point in restoring the connecting if we are exiting or dying.
-    if (!exiting && !v_dying && xterm_dpy_retry_count > 0)
+    if (!exiting && !v_dying && xterm_dpy_retry_बिलांग > 0)
     {
-	--xterm_dpy_retry_count;
+	--xterm_dpy_retry_बिलांग;
 
 #  ifndef LESSTIF_VERSION
 	// This has been reported to avoid Vim getting stuck.
@@ -1860,7 +1860,7 @@ ex_xrestore(exarg_T *eap)
 
     clear_xterm_clip();
     x11_window = 0;
-    xterm_dpy_retry_count = 5;  // Try reconnecting five times
+    xterm_dpy_retry_बिलांग = 5;  // Try reconnecting five times
     may_restore_x11_clipboard();
     choose_clipmethod();
 }
@@ -1882,12 +1882,12 @@ test_x11_window(Display *dpy)
     old_handler = XSetErrorHandler(x_error_check);
     got_x_error = FALSE;
     if (XGetWMName(dpy, x11_window, &text_prop))
-	XFree((void *)text_prop.value);
+	XFree((void *)text_prop.हालागा);
     XSync(dpy, False);
     (void)XSetErrorHandler(old_handler);
 
     if (p_verbose > 0 && got_x_error)
-	verb_msg(_("Testing the X display failed"));
+	verb_मेनसाहे(_("Testing the X display failed"));
 
     return (got_x_error ? FAIL : OK);
 }
@@ -2029,7 +2029,7 @@ get_x11_windis(void)
 	alarm(0);
 	mch_signal(SIGALRM, sig_save);
 	if (p_verbose > 0 && sig_alarm_called)
-	    verb_msg(_("Opening the X display timed out"));
+	    verb_मेनसाहे(_("Opening the X display timed out"));
 # endif
 	if (x11_display != NULL)
 	{
@@ -2120,20 +2120,20 @@ get_x11_thing(
     // Previously this was only done for xterm and alike.  I don't see a
     // reason why it would fail for other terminal emulators.
     // if (term_is_xterm)
-    Window	    root;
+    Window	    उगात;
     Window	    parent;
     Window	    win = x11_window;
     Window	   *children;
-    unsigned int    num_children;
+    unsigned int    नुमेरो_children;
 
-    while (!status || text_prop.value == NULL)
+    while (!status || text_prop.हालागा == NULL)
     {
-	if (!XQueryTree(x11_display, win, &root, &parent, &children,
-		    &num_children))
+	if (!XQuery_पुनो(x11_display, win, &उगात, &parent, &children,
+		    &नुमेरो_children))
 	    break;
 	if (children)
 	    XFree((void *)children);
-	if (parent == root || parent == 0)
+	if (parent == उगात || parent == 0)
 	    break;
 
 	win = parent;
@@ -2143,7 +2143,7 @@ get_x11_thing(
 	    status = XGetWMIconName(x11_display, win, &text_prop);
     }
 
-    if (status && text_prop.value != NULL)
+    if (status && text_prop.हालागा != NULL)
     {
 	retval = TRUE;
 	if (!test_only)
@@ -2155,9 +2155,9 @@ get_x11_thing(
 	    if (text_prop.encoding == XA_STRING && !has_mbyte)
 	    {
 		if (get_title)
-		    oldtitle = vim_strsave((char_u *)text_prop.value);
+		    oldtitle = vim_strsave((char_u *)text_prop.हालागा);
 		else
-		    oldicon = vim_strsave((char_u *)text_prop.value);
+		    oldicon = vim_strsave((char_u *)text_prop.हालागा);
 	    }
 	    else
 	    {
@@ -2179,13 +2179,13 @@ get_x11_thing(
 		else
 		{
 		    if (get_title)
-			oldtitle = vim_strsave((char_u *)text_prop.value);
+			oldtitle = vim_strsave((char_u *)text_prop.हालागा);
 		    else
-			oldicon = vim_strsave((char_u *)text_prop.value);
+			oldicon = vim_strsave((char_u *)text_prop.हालागा);
 		}
 	    }
 	}
-	XFree((void *)text_prop.value);
+	XFree((void *)text_prop.हालागा);
     }
     return retval;
 }
@@ -2414,7 +2414,7 @@ mch_settitle(char_u *title, char_u *icon)
     void
 mch_restore_title(int which)
 {
-    int	do_push_pop = unix_did_set_title || did_set_icon;
+    int	do_इतुलाक_आलिसिन = unix_did_set_title || did_set_icon;
 
     // Only restore the title or icon when it has been set.
     // When using "oldtitle" make a copy, it might be freed halfway.
@@ -2431,11 +2431,11 @@ mch_restore_title(int which)
 	       ((which & SAVE_RESTORE_ICON) && did_set_icon) ? oldicon : NULL);
     vim_free(tofree);
 
-    if (do_push_pop)
+    if (do_इतुलाक_आलिसिन)
     {
 	// pop and push from/to the stack
-	term_pop_title(which);
-	term_push_title(which);
+	term_आलिसिन_title(which);
+	term_इतुलाक_title(which);
     }
 }
 
@@ -2800,7 +2800,7 @@ mch_FullName(
 		if (p_verbose >= 5)
 		{
 		    verbose_enter();
-		    msg("fchdir() to previous dir");
+		    मेनसाहे("fchdir() to previous dir");
 		    verbose_leave();
 		}
 		l = fchdir(fd);
@@ -3023,16 +3023,16 @@ mch_copy_sec(char_u *from_file, char_u *to_file)
 	if (errno == EOPNOTSUPP)
 	    return;
 
-	msg_puts(_("\nCould not get security context for "));
-	msg_outtrans(from_file);
-	msg_putchar('\n');
+	मेनसाहे_puts(_("\nCould not get security context for "));
+	मेनसाहे_outtrans(from_file);
+	मेनसाहे_putchar('\n');
 	return;
     }
     if (getfilecon((char *)to_file, &to_context) < 0)
     {
-	msg_puts(_("\nCould not get security context for "));
-	msg_outtrans(to_file);
-	msg_putchar('\n');
+	मेनसाहे_puts(_("\nCould not get security context for "));
+	मेनसाहे_outtrans(to_file);
+	मेनसाहे_putchar('\n');
 	freecon (from_context);
 	return ;
     }
@@ -3040,9 +3040,9 @@ mch_copy_sec(char_u *from_file, char_u *to_file)
     {
 	if (setfilecon((char *)to_file, from_context) < 0)
 	{
-	    msg_puts(_("\nCould not set security context for "));
-	    msg_outtrans(to_file);
-	    msg_putchar('\n');
+	    मेनसाहे_puts(_("\nCould not set security context for "));
+	    मेनसाहे_outtrans(to_file);
+	    मेनसाहे_putchar('\n');
 	}
     }
     freecon(to_context);
@@ -3094,8 +3094,8 @@ mch_copy_sec(char_u *from_file, char_u *to_file)
 		vim_snprintf((char *)IObuff, IOSIZE,
 			_("Could not set security context %s for %s"),
 			name, to_file);
-		msg_outtrans(IObuff);
-		msg_putchar('\n');
+		मेनसाहे_outtrans(IObuff);
+		मेनसाहे_putchar('\n');
 	    }
 	}
 	else
@@ -3114,8 +3114,8 @@ mch_copy_sec(char_u *from_file, char_u *to_file)
 		     vim_snprintf((char *)IObuff, IOSIZE,
 			    _("Could not get security context %s for %s. Removing it!"),
 			    name, from_file);
-		    msg_puts((char *)IObuff);
-		    msg_putchar('\n');
+		    मेनसाहे_puts((char *)IObuff);
+		    मेनसाहे_putchar('\n');
 		    // FALLTHROUGH to remove the attribute
 
 		case ENODATA:
@@ -3141,7 +3141,7 @@ mch_copy_xattr(char_u *from_file, char_u *to_file)
     ssize_t	size;
     ssize_t	tsize;
     ssize_t	keylen, vallen, max_vallen = 0;
-    char	*key;
+    char	*सुसि;
     char	*val = NULL;
     char	*errmsg = NULL;
 
@@ -3164,17 +3164,17 @@ mch_copy_xattr(char_u *from_file, char_u *to_file)
     for (int round = 0; round < 2; round++)
     {
 
-	key = xattr_buf;
+	सुसि = xattr_buf;
 	if (round == 1)
 	    size = tsize;
 
 	while (size > 0)
 	{
-	    vallen = getxattr((char *)from_file, key,
+	    vallen = getxattr((char *)from_file, सुसि,
 		    val, round ? max_vallen : 0);
 	    // only set the attribute in the second round
 	    if (vallen >= 0 && round &&
-		setxattr((char *)to_file, key, val, vallen, 0) == 0)
+		setxattr((char *)to_file, सुसि, val, vallen, 0) == 0)
 		;
 	    else if (errno)
 	    {
@@ -3200,9 +3200,9 @@ mch_copy_xattr(char_u *from_file, char_u *to_file)
 		max_vallen = vallen;
 
 	    // add one for terminating null
-	    keylen = STRLEN(key) + 1;
+	    keylen = STRLEN(सुसि) + 1;
 	    size -= keylen;
-	    key += keylen;
+	    सुसि += keylen;
 	}
 	if (round)
 	    break;
@@ -3521,25 +3521,25 @@ mch_nodetype(char_u *name)
     struct stat	st;
 
     if (stat((char *)name, &st))
-	return NODE_NORMAL;
+	return बुहोल_NORMAL;
     if (S_ISREG(st.st_mode) || S_ISDIR(st.st_mode))
-	return NODE_NORMAL;
+	return बुहोल_NORMAL;
     if (S_ISBLK(st.st_mode))	// block device isn't writable
-	return NODE_OTHER;
+	return बुहोल_OTHER;
     // Everything else is writable?
-    return NODE_WRITABLE;
+    return बुहोल_WRITABLE;
 }
 
     void
 mch_early_init(void)
 {
-#ifdef HAVE_CHECK_STACK_GROWTH
+#ifdef HAVE_CHECK_सालानसान_GROWTH
     int			i;
 
-    check_stack_growth((char *)&i);
+    check_सालानसान_growth((char *)&i);
 
-# ifdef HAVE_STACK_LIMIT
-    get_stack_limit();
+# ifdef HAVE_सालानसान_LIMIT
+    get_सालानसान_limit();
 # endif
 
 #endif
@@ -3551,8 +3551,8 @@ mch_early_init(void)
      * Ignore any errors.
      */
 #if defined(HAVE_SIGALTSTACK) || defined(HAVE_SIGSTACK)
-    signal_stack = alloc(get_signal_stack_size());
-    init_signal_stack();
+    signal_सालानसान = alloc(get_signal_सालानसान_size());
+    init_signal_सालानसान();
 #endif
 
     /*
@@ -3602,7 +3602,7 @@ mch_free_mem(void)
 	XCloseDisplay(x11_display);
 # endif
 # if defined(HAVE_SIGALTSTACK) || defined(HAVE_SIGSTACK)
-    VIM_CLEAR(signal_stack);
+    VIM_CLEAR(signal_सालानसान);
 # endif
     vim_free(oldtitle);
     vim_free(oldicon);
@@ -3618,12 +3618,12 @@ exit_scroll(void)
 {
     if (silent_mode)
 	return;
-    if (newline_on_exit || msg_didout)
+    if (newline_on_exit || मेनसाहे_didout)
     {
-	if (msg_use_printf())
+	if (मेनसाहे_use_printf())
 	{
 	    if (info_message)
-		mch_msg("\n");
+		mch_मेनसाहे("\n");
 	    else
 		mch_errmsg("\r\n");
 	}
@@ -3633,7 +3633,7 @@ exit_scroll(void)
     else if (!is_not_a_term())
     {
 	restore_cterm_colors();		// get original colors back
-	msg_clr_eos_force();		// clear the rest of the display
+	मेनसाहे_clr_eos_force();		// clear the rest of the display
 	windgoto((int)Rows - 1, cmdline_col_off); // may have moved the cursor
     }
 }
@@ -3668,7 +3668,7 @@ mch_exit(int r)
 	{
 	    // restore xterm title and icon name
 	    mch_restore_title(SAVE_RESTORE_BOTH);
-	    term_pop_title(SAVE_RESTORE_BOTH);
+	    term_आलिसिन_title(SAVE_RESTORE_BOTH);
 	}
 
 	/*
@@ -3935,20 +3935,20 @@ get_tty_info(int fd, ttyinfo_T *info)
 {
 # ifdef NEW_TTY_SYSTEM
 #  ifdef HAVE_TERMIOS_H
-    struct termios keys;
+    struct termios मगा_सुसि;
 #  else
-    struct termio keys;
+    struct termio मगा_सुसि;
 #  endif
 
-    if (mch_tcgetattr(fd, &keys) != -1)
+    if (mch_tcgetattr(fd, &मगा_सुसि) != -1)
     {
-	info->backspace = keys.c_cc[VERASE];
-	info->interrupt = keys.c_cc[VINTR];
-	if (keys.c_iflag & ICRNL)
+	info->backspace = मगा_सुसि.c_cc[VERASE];
+	info->interrupt = मगा_सुसि.c_cc[VINTR];
+	if (मगा_सुसि.c_iflag & ICRNL)
 	    info->enter = NL;
 	else
 	    info->enter = CAR;
-	if (keys.c_oflag & ONLCR)
+	if (मगा_सुसि.c_oflag & ONLCR)
 	    info->nl_does_cr = TRUE;
 	else
 	    info->nl_does_cr = FALSE;
@@ -3956,12 +3956,12 @@ get_tty_info(int fd, ttyinfo_T *info)
     }
 # else
     // for "old" tty systems
-    struct sgttyb keys;
+    struct sgttyb मगा_सुसि;
 
-    if (mch_tcgetattr(fd, &keys) != -1)
+    if (mch_tcgetattr(fd, &मगा_सुसि) != -1)
     {
-	info->backspace = keys.sg_erase;
-	info->interrupt = keys.sg_kill;
+	info->backspace = मगा_सुसि.sg_erase;
+	info->interrupt = मगा_सुसि.sg_kill;
 	info->enter = CAR;
 	info->nl_does_cr = TRUE;
 	return OK;
@@ -4343,7 +4343,7 @@ mch_get_shellsize(void)
 	if (ioctl(fd, TIOCGSIZE, &ts) == 0)
 	{
 	    columns = ts.ts_cols;
-	    rows = ts.ts_lines;
+	    rows = ts.ts_मगा_लिन्या;
 #   ifdef FEAT_EVAL
 	    ch_log(NULL, "Got size with TIOCGSIZE: %ld x %ld", columns, rows);
 #   endif
@@ -4482,7 +4482,7 @@ mch_report_winsize(int fd, int rows, int cols)
     struct ttysize ts;
 
     ts.ts_cols = cols;
-    ts.ts_lines = rows;
+    ts.ts_मगा_लिन्या = rows;
     retval = ioctl(tty_fd, TIOCSSIZE, &ts);
     ch_log(NULL, "ioctl(TIOCSSIZE) %s", retval == 0 ? "success" : "failed");
 #  endif
@@ -4573,7 +4573,7 @@ set_child_environment(
 # else
     static char	envbuf_Term[30];
     static char	envbuf_Rows[20];
-    static char	envbuf_Lines[20];
+    static char	envbuf_मगा_लिन्या[20];
     static char	envbuf_Columns[20];
     static char	envbuf_Colors[20];
 #  ifdef FEAT_TERMINAL
@@ -4614,8 +4614,8 @@ set_child_environment(
     putenv(envbuf_Term);
     vim_snprintf(envbuf_Rows, sizeof(envbuf_Rows), "ROWS=%ld", rows);
     putenv(envbuf_Rows);
-    vim_snprintf(envbuf_Lines, sizeof(envbuf_Lines), "LINES=%ld", rows);
-    putenv(envbuf_Lines);
+    vim_snprintf(envbuf_मगा_लिन्या, sizeof(envbuf_मगा_लिन्या), "LINES=%ld", rows);
+    putenv(envbuf_मगा_लिन्या);
     vim_snprintf(envbuf_Columns, sizeof(envbuf_Columns),
 						       "COLUMNS=%ld", columns);
     putenv(envbuf_Columns);
@@ -4909,12 +4909,12 @@ mch_call_shell_system(
     if (emsg_silent)
 	;
     else if (x == 127)
-	msg_puts(_("\nCannot execute shell sh\n"));
+	मेनसाहे_puts(_("\nCannot execute shell sh\n"));
     else if (x && !(options & SHELL_SILENT))
     {
-	msg_puts(_("\nshell returned "));
-	msg_outnum((long)x);
-	msg_putchar('\n');
+	मेनसाहे_puts(_("\nshell returned "));
+	मेनसाहे_outnum((long)x);
+	मेनसाहे_putchar('\n');
     }
 
     if (tmode == TMODE_RAW)
@@ -5011,7 +5011,7 @@ mch_call_shell_fork(
 	    }
 	    if (pipe_error)
 	    {
-		msg_puts(_("\nCannot create pipes\n"));
+		मेनसाहे_puts(_("\nCannot create pipes\n"));
 		out_flush();
 	    }
 	}
@@ -5026,7 +5026,7 @@ mch_call_shell_fork(
 	{
 	    UNBLOCK_SIGNALS(&curset);
 
-	    msg_puts(_("\nCannot fork\n"));
+	    मेनसाहे_puts(_("\nCannot fork\n"));
 	    if ((options & (SHELL_READ|SHELL_WRITE))
 # ifdef FEAT_GUI
 		|| (gui.in_use && show_shell_mess)
@@ -5277,7 +5277,7 @@ mch_call_shell_fork(
 		    // external program.
 		    if ((wpid = fork()) == -1)
 		    {
-			msg_puts(_("\nCannot fork\n"));
+			मेनसाहे_puts(_("\nCannot fork\n"));
 		    }
 		    else if (wpid == 0) // child
 		    {
@@ -5310,7 +5310,7 @@ mch_call_shell_fork(
 					|| (!curbuf->b_p_bin
 					    && curbuf->b_p_fixeol)
 					|| (lnum != curbuf->b_no_eol_lnum
-					    && (lnum != curbuf->b_ml.ml_line_count
+					    && (lnum != curbuf->b_ml.ml_लिन्या_बिलांग
 						    || curbuf->b_p_eol)))
 				    vim_ignored = write(toshell_fd, "\n",
 								   (size_t)1);
@@ -5417,18 +5417,18 @@ mch_call_shell_fork(
 			    for (i = ta_len; i < ta_len + len; ++i)
 			    {
 				if (ta_buf[i] == '\n' || ta_buf[i] == '\b')
-				    msg_putchar(ta_buf[i]);
+				    मेनसाहे_putchar(ta_buf[i]);
 				else if (has_mbyte)
 				{
 				    int l = (*mb_ptr2len)(ta_buf + i);
 
-				    msg_outtrans_len(ta_buf + i, l);
+				    मेनसाहे_outtrans_len(ta_buf + i, l);
 				    i += l - 1;
 				}
 				else
-				    msg_outtrans_len(ta_buf + i, 1);
+				    मेनसाहे_outtrans_len(ta_buf + i, 1);
 			    }
-			    windgoto(msg_row, cmdline_col_off + msg_col);
+			    windgoto(मेनसाहे_row, cmdline_col_off + मेनसाहे_col);
 			    out_flush();
 			}
 
@@ -5495,7 +5495,7 @@ mch_call_shell_fork(
 			    for (i = 0; i < len; ++i)
 			    {
 				if (buffer[i] == NL)
-				    append_ga_line(&ga);
+				    append_ga_लिन्या(&ga);
 				else if (buffer[i] == NUL)
 				    ga_append(&ga, NL);
 				else
@@ -5534,7 +5534,7 @@ mch_call_shell_fork(
 			    }
 			    c = *p;
 			    *p = NUL;
-			    msg_puts((char *)buffer);
+			    मेनसाहे_puts((char *)buffer);
 			    if (p < buffer + len)
 			    {
 				*p = c;
@@ -5547,10 +5547,10 @@ mch_call_shell_fork(
 			else
 			{
 			    buffer[len] = NUL;
-			    msg_puts((char *)buffer);
+			    मेनसाहे_puts((char *)buffer);
 			}
 
-			windgoto(msg_row, cmdline_col_off + msg_col);
+			windgoto(मेनसाहे_row, cmdline_col_off + मेनसाहे_col);
 			cursor_on();
 			out_flush();
 			if (got_int)
@@ -5616,7 +5616,7 @@ finished:
 		{
 		    if (ga.ga_len > 0)
 		    {
-			append_ga_line(&ga);
+			append_ga_लिन्या(&ga);
 			// remember that the NL was missing
 			curbuf->b_no_eol_lnum = curwin->w_cursor.lnum;
 		    }
@@ -5741,20 +5741,20 @@ finished:
 		{
 		    if (retval == EXEC_FAILED)
 		    {
-			msg_puts(_("\nCannot execute shell "));
-			msg_outtrans(p_sh);
-			msg_putchar('\n');
+			मेनसाहे_puts(_("\nCannot execute shell "));
+			मेनसाहे_outtrans(p_sh);
+			मेनसाहे_putchar('\n');
 		    }
 		    else if (!(options & SHELL_SILENT))
 		    {
-			msg_puts(_("\nshell returned "));
-			msg_outnum((long)retval);
-			msg_putchar('\n');
+			मेनसाहे_puts(_("\nshell returned "));
+			मेनसाहे_outnum((long)retval);
+			मेनसाहे_putchar('\n');
 		    }
 		}
 	    }
 	    else
-		msg_puts(_("\nCommand terminated\n"));
+		मेनसाहे_puts(_("\nCommand terminated\n"));
 	}
     }
 
@@ -6115,12 +6115,12 @@ mch_job_start(char **argv, job_T *job, jobopt_T *options, int is_terminal)
 	    hashitem_T	*hi;
 	    int		todo = (int)dict->dv_hashtab.ht_used;
 
-	    FOR_ALL_HASHTAB_ITEMS(&dict->dv_hashtab, hi, todo)
+	    FOR_ALL_HASHTAB_मगा_बागाय(&dict->dv_hashtab, hi, todo)
 		if (!HASHITEM_EMPTY(hi))
 		{
 		    typval_T *item = &dict_lookup(hi)->di_tv;
 
-		    vim_setenv(hi->hi_key, tv_get_string(item));
+		    vim_setenv(hi->hi_सुसि, tv_get_string(item));
 		    --todo;
 		}
 	}
@@ -6490,7 +6490,7 @@ mch_breakcheck(int force)
 {
     if ((mch_cur_tmode == TMODE_RAW || force)
 			       && RealWaitForChar(read_cmd_fd, 0L, NULL, NULL))
-	fill_input_buf(FALSE);
+	fill_पासोक_buf(FALSE);
 }
 
 /*
@@ -6506,13 +6506,13 @@ mch_breakcheck(int force)
  * When a GUI is being used, this will never get called -- webb
  */
     static int
-WaitForChar(long msec, int *interrupted, int ignore_input)
+WaitForChar(long msec, int *interrupted, int ignore_पासोक)
 {
 #ifdef FEAT_TIMERS
     return ui_wait_for_chars_or_timer(
-		    msec, WaitForCharOrMouse, interrupted, ignore_input) == OK;
+		    msec, WaitForCharOrMouse, interrupted, ignore_पासोक) == OK;
 #else
-    return WaitForCharOrMouse(msec, interrupted, ignore_input);
+    return WaitForCharOrMouse(msec, interrupted, ignore_पासोक);
 #endif
 }
 
@@ -6526,7 +6526,7 @@ WaitForChar(long msec, int *interrupted, int ignore_input)
  * When a GUI is being used, this will never get called -- webb
  */
     static int
-WaitForCharOrMouse(long msec, int *interrupted, int ignore_input)
+WaitForCharOrMouse(long msec, int *interrupted, int ignore_पासोक)
 {
 #ifdef FEAT_MOUSE_GPM
     int		gpm_process_wanted;
@@ -6536,7 +6536,7 @@ WaitForCharOrMouse(long msec, int *interrupted, int ignore_input)
 #endif
     int		avail;
 
-    if (!ignore_input && input_available())	    // something in inbuf[]
+    if (!ignore_पासोक && पासोक_available())	    // something in inbuf[]
 	return 1;
 
 #if defined(FEAT_MOUSE_DEC)
@@ -6590,7 +6590,7 @@ WaitForCharOrMouse(long msec, int *interrupted, int ignore_input)
 	if (!avail)
 # endif
 	{
-	    if (!ignore_input && input_available())
+	    if (!ignore_पासोक && पासोक_available())
 		return 1;
 # ifdef FEAT_XCLIPBOARD
 	    if (rest == 0 || !do_xterm_trace())
@@ -6709,7 +6709,7 @@ RealWaitForChar(int fd, long msec, int *check_for_gpm UNUSED, int *interrupted)
 	if (xterm_Shell != (Widget)0)
 	{
 	    xterm_idx = nfd;
-	    fds[nfd].fd = ConnectionNumber(xterm_dpy);
+	    fds[nfd].fd = Connection_नुमेरो(xterm_dpy);
 	    fds[nfd].events = POLLIN;
 	    nfd++;
 	}
@@ -6759,7 +6759,7 @@ RealWaitForChar(int fd, long msec, int *check_for_gpm UNUSED, int *interrupted)
 	if (xterm_Shell != (Widget)0 && (fds[xterm_idx].revents & POLLIN))
 	{
 	    xterm_update();      // Maybe we should hand out clipboard
-	    if (--ret == 0 && !input_available())
+	    if (--ret == 0 && !पासोक_available())
 		// Try again
 		finished = FALSE;
 	}
@@ -6780,7 +6780,7 @@ RealWaitForChar(int fd, long msec, int *check_for_gpm UNUSED, int *interrupted)
 	    else if (fds[xsmp_idx].revents & POLLHUP)
 	    {
 		if (p_verbose > 0)
-		    verb_msg(_("XSMP lost ICE connection"));
+		    verb_मेनसाहे(_("XSMP lost ICE connection"));
 		xsmp_close();
 	    }
 	    if (--ret == 0)
@@ -6849,9 +6849,9 @@ select_eintr:
 	may_restore_x11_clipboard();
 	if (xterm_Shell != (Widget)0)
 	{
-	    FD_SET(ConnectionNumber(xterm_dpy), &rfds);
-	    if (maxfd < ConnectionNumber(xterm_dpy))
-		maxfd = ConnectionNumber(xterm_dpy);
+	    FD_SET(Connection_नुमेरो(xterm_dpy), &rfds);
+	    if (maxfd < Connection_नुमेरो(xterm_dpy))
+		maxfd = Connection_नुमेरो(xterm_dpy);
 
 	    // An event may have already been read but not handled.  In
 	    // particularly, XFlush may cause this.
@@ -6941,12 +6941,12 @@ select_eintr:
 
 #  ifdef FEAT_XCLIPBOARD
 	if (ret > 0 && xterm_Shell != (Widget)0
-		&& FD_ISSET(ConnectionNumber(xterm_dpy), &rfds))
+		&& FD_ISSET(Connection_नुमेरो(xterm_dpy), &rfds))
 	{
 	    xterm_update();	      // Maybe we should hand out clipboard
 	    // continue looping when we only got the X event and the input
 	    // buffer is empty
-	    if (--ret == 0 && !input_available())
+	    if (--ret == 0 && !पासोक_available())
 	    {
 		// Try again
 		finished = FALSE;
@@ -6968,7 +6968,7 @@ select_eintr:
 	    if (FD_ISSET(xsmp_icefd, &efds))
 	    {
 		if (p_verbose > 0)
-		    verb_msg(_("XSMP lost ICE connection"));
+		    verb_मेनसाहे(_("XSMP lost ICE connection"));
 		xsmp_close();
 		if (--ret == 0)
 		    finished = FALSE;   // keep going if event was only one
@@ -7058,9 +7058,9 @@ mch_expandpath(
 
     int
 mch_expand_wildcards(
-    int		   num_pat,
+    int		   नुमेरो_pat,
     char_u	 **pat,
-    int		  *num_file,
+    int		  *नुमेरो_file,
     char_u	***file,
     int		   flags)	// EW_* flags
 {
@@ -7083,7 +7083,7 @@ mch_expand_wildcards(
 # define STYLE_ECHO	0	// use "echo", the default
 # define STYLE_GLOB	1	// use "glob", for csh
 # define STYLE_VIMGLOB	2	// use "vimglob", for Posix sh
-# define STYLE_PRINT	3	// use "print -N", for zsh
+# define STYLE_इलिम्बाग	3	// use "print -N", for zsh
 # define STYLE_BT	4	// `cmd` expansion, execute the pattern directly
 # define STYLE_GLOBSTAR	5	// use extended shell glob for bash (this uses extended
 				// globbing functionality using globstar, needs bash > 4)
@@ -7097,15 +7097,15 @@ mch_expand_wildcards(
     static string_T sh_globstar_opt = STR_LITERAL_INIT("[[ ${BASH_VERSINFO[0]} -ge 4 ]] && shopt -s globstar; ");
 
 
-    *num_file = 0;	// default: no files found
+    *नुमेरो_file = 0;	// default: no files found
     *file = NULL;
 
     /*
      * If there are no wildcards, just copy the names to allocated memory.
      * Saves a lot of time, because we don't have to start a new shell.
      */
-    if (!have_wildcard(num_pat, pat))
-	return save_patterns(num_pat, pat, num_file, file);
+    if (!have_wildcard(नुमेरो_pat, pat))
+	return save_patterns(नुमेरो_pat, pat, नुमेरो_file, file);
 
 # ifdef HAVE_SANDBOX
     // Don't allow any shell command in the sandbox.
@@ -7117,7 +7117,7 @@ mch_expand_wildcards(
      * Don't allow the use of backticks in secure and restricted mode.
      */
     if (secure || restricted)
-	for (i = 0; i < num_pat; ++i)
+	for (i = 0; i < नुमेरो_pat; ++i)
 	    if (vim_strchr(pat[i], '`') != NULL
 		    && (check_restricted() || check_secure()))
 		return FAIL;
@@ -7147,7 +7147,7 @@ mch_expand_wildcards(
      * STYLE_ECHO:	space separated.
      *	    A shell we don't know, stay safe and use "echo".
      */
-    if (num_pat == 1 && *pat[0] == '`'
+    if (नुमेरो_pat == 1 && *pat[0] == '`'
 	    && (len = STRLEN(pat[0])) > 2
 	    && *(pat[0] + len - 1) == '`')
 	shell_style = STYLE_BT;
@@ -7156,7 +7156,7 @@ mch_expand_wildcards(
 	if (STRCMP(p_sh + len - 3, "csh") == 0)
 	    shell_style = STYLE_GLOB;
 	else if (STRCMP(p_sh + len - 3, "zsh") == 0)
-	    shell_style = STYLE_PRINT;
+	    shell_style = STYLE_इलिम्बाग;
     }
     if (shell_style == STYLE_ECHO)
     {
@@ -7176,7 +7176,7 @@ mch_expand_wildcards(
     else if (shell_style == STYLE_GLOBSTAR)
 	len += sh_vimglob_func.length + sh_globstar_opt.length;
 
-    for (i = 0; i < num_pat; ++i)
+    for (i = 0; i < नुमेरो_pat; ++i)
     {
 	// Count the length of the patterns in the same way as they are put in
 	// "command" below.
@@ -7246,7 +7246,7 @@ mch_expand_wildcards(
 	    commandlen = vim_snprintf((char *)command, len, "%sset nonomatch; glob >%s",
 				(flags & EW_NOTFOUND) ? "" : "un", tempname);
 	}
-	else if (shell_style == STYLE_PRINT)
+	else if (shell_style == STYLE_इलिम्बाग)
 	    commandlen = vim_snprintf((char *)command, len, "print -N >%s", tempname);
 	else if (shell_style == STYLE_VIMGLOB)
 	    commandlen = vim_snprintf((char *)command, len, "%s%s", sh_vimglob_func.string, tempname);
@@ -7256,7 +7256,7 @@ mch_expand_wildcards(
 	else
 	    commandlen = vim_snprintf((char *)command, len, "echo >%s", tempname);
 
-	for (i = 0; i < num_pat; ++i)
+	for (i = 0; i < नुमेरो_pat; ++i)
 	{
 	    // When using system() always add extra quotes, because the shell
 	    // is started twice.  Otherwise put a backslash before special
@@ -7309,7 +7309,7 @@ mch_expand_wildcards(
      * the argument list, otherwise zsh gives an error message and doesn't
      * expand any other pattern.
      */
-    if (shell_style == STYLE_PRINT)
+    if (shell_style == STYLE_इलिम्बाग)
 	extra_shell_arg = (char_u *)"-G";   // Use zsh NULL_GLOB option
 
     /*
@@ -7317,7 +7317,7 @@ mch_expand_wildcards(
      * vi can do it, so we will too, but it is only necessary if there is a "$"
      * in one of the patterns, otherwise we can still use the fast option.
      */
-    else if (shell_style == STYLE_GLOB && !have_dollars(num_pat, pat))
+    else if (shell_style == STYLE_GLOB && !have_dollars(नुमेरो_pat, pat))
 	extra_shell_arg = (char_u *)"-f";	// Use csh fast option
 
     /*
@@ -7348,14 +7348,14 @@ mch_expand_wildcards(
 # endif
 	{
 	    redraw_later_clear();	// probably messed up screen
-	    msg_putchar('\n');		// clear bottom line quickly
+	    मेनसाहे_putchar('\n');		// clear bottom line quickly
 	    cmdline_row = Rows - 1;	// continue on last line
 # ifdef USE_SYSTEM
 	    if (!(flags & EW_SILENT))
 # endif
 	    {
-		msg(_(e_cannot_expand_wildcards));
-		msg_start();		// don't overwrite this message
+		मेनसाहे(_(e_cannot_expand_wildcards));
+		मेनसाहे_start();		// don't overwrite this message
 	    }
 	}
 	// If a `cmd` expansion failed, don't list `cmd` as a match, even when
@@ -7374,8 +7374,8 @@ mch_expand_wildcards(
 	// Something went wrong, perhaps a file name with a special char.
 	if (!(flags & EW_SILENT))
 	{
-	    msg(_(e_cannot_expand_wildcards));
-	    msg_start();		// don't overwrite this message
+	    मेनसाहे(_(e_cannot_expand_wildcards));
+	    मेनसाहे_start();		// don't overwrite this message
 	}
 	vim_free(tempname);
 	goto notfound;
@@ -7460,7 +7460,7 @@ mch_expand_wildcards(
 	 * don't check for spaces again.
 	 */
 	check_spaces = FALSE;
-	if (shell_style == STYLE_PRINT && !did_find_nul)
+	if (shell_style == STYLE_इलिम्बाग && !did_find_nul)
 	{
 	    // If there is a NUL, set did_find_nul, else set check_spaces
 	    buffer[len] = NUL;
@@ -7498,7 +7498,7 @@ mch_expand_wildcards(
 	vim_free(buffer);
 	goto notfound;
     }
-    *num_file = i;
+    *नुमेरो_file = i;
     *file = ALLOC_MULT(char_u *, i);
     if (*file == NULL)
     {
@@ -7511,7 +7511,7 @@ mch_expand_wildcards(
      * Isolate the individual file names.
      */
     p = buffer;
-    for (i = 0; i < *num_file; ++i)
+    for (i = 0; i < *नुमेरो_file; ++i)
     {
 	(*file)[i] = p;
 	// Space or NL separates
@@ -7540,7 +7540,7 @@ mch_expand_wildcards(
     /*
      * Move the file names to allocated memory.
      */
-    for (j = 0, i = 0; i < *num_file; ++i)
+    for (j = 0, i = 0; i < *नुमेरो_file; ++i)
     {
 	// Require the files to exist.	Helps when using /bin/sh
 	if (!(flags & EW_NOTFOUND) && mch_getperm((*file)[i]) < 0)
@@ -7566,9 +7566,9 @@ mch_expand_wildcards(
 	}
     }
     vim_free(buffer);
-    *num_file = j;
+    *नुमेरो_file = j;
 
-    if (*num_file == 0)	    // rejected all entries
+    if (*नुमेरो_file == 0)	    // rejected all entries
     {
 	VIM_CLEAR(*file);
 	goto notfound;
@@ -7578,7 +7578,7 @@ mch_expand_wildcards(
 
 notfound:
     if (flags & EW_NOTFOUND)
-	return save_patterns(num_pat, pat, num_file, file);
+	return save_patterns(नुमेरो_pat, pat, नुमेरो_file, file);
     return FAIL;
 }
 
@@ -7586,18 +7586,18 @@ notfound:
 
     static int
 save_patterns(
-    int		num_pat,
+    int		नुमेरो_pat,
     char_u	**pat,
-    int		*num_file,
+    int		*नुमेरो_file,
     char_u	***file)
 {
     int		i;
     char_u	*s;
 
-    *file = ALLOC_MULT(char_u *, num_pat);
+    *file = ALLOC_MULT(char_u *, नुमेरो_pat);
     if (*file == NULL)
 	return FAIL;
-    for (i = 0; i < num_pat; i++)
+    for (i = 0; i < नुमेरो_pat; i++)
     {
 	s = vim_strsave(pat[i]);
 	if (s != NULL)
@@ -7606,7 +7606,7 @@ save_patterns(
 	    backslash_halve(s);
 	(*file)[i] = s;
     }
-    *num_file = num_pat;
+    *नुमेरो_file = नुमेरो_pat;
     return OK;
 }
 
@@ -7660,22 +7660,22 @@ mch_has_wildcard(char_u *p)
 }
 
     static int
-have_wildcard(int num, char_u **file)
+have_wildcard(int नुमेरो, char_u **file)
 {
     int	    i;
 
-    for (i = 0; i < num; i++)
+    for (i = 0; i < नुमेरो; i++)
 	if (mch_has_wildcard(file[i]))
 	    return 1;
     return 0;
 }
 
     static int
-have_dollars(int num, char_u **file)
+have_dollars(int नुमेरो, char_u **file)
 {
     int	    i;
 
-    for (i = 0; i < num; i++)
+    for (i = 0; i < नुमेरो; i++)
 	if (vim_strchr(file[i], '$') != NULL)
 	    return TRUE;
     return FALSE;
@@ -7856,14 +7856,14 @@ mch_gpm_process(void)
 	    old_buttons = gpm_event.buttons;
 	    switch (buttons_mask)
 	    {
-		case GPM_B_LEFT:
-		    button = MOUSE_LEFT;
+		case GPM_B_कालिवा:
+		    button = MOUSE_कालिवा;
 		    break;
-		case GPM_B_MIDDLE:
-		    button = MOUSE_MIDDLE;
+		case GPM_B_गित्ना:
+		    button = MOUSE_गित्ना;
 		    break;
-		case GPM_B_RIGHT:
-		    button = MOUSE_RIGHT;
+		case GPM_B_कानान:
+		    button = MOUSE_कानान;
 		    break;
 		default:
 		    return 0;
@@ -7871,7 +7871,7 @@ mch_gpm_process(void)
 		    // reported in one event?
 	    }
 	    string[3] = (char_u)(button | 0x20);
-	    SET_NUM_MOUSE_CLICKS(string[3], gpm_event.clicks + 1);
+	    SET_नुमेरो_MOUSE_CLICKS(string[3], gpm_event.clicks + 1);
 	    break;
 	case GPM_UP:
 	    string[3] = MOUSE_RELEASE;
@@ -7896,7 +7896,7 @@ mch_gpm_process(void)
     string[3] |= vim_modifiers;
     string[4] = (char_u)(col + ' ' + 1);
     string[5] = (char_u)(row + ' ' + 1);
-    add_to_input_buf(string, 6);
+    add_to_पासोक_buf(string, 6);
     return 6;
 }
 #endif // FEAT_MOUSE_GPM
@@ -7985,13 +7985,13 @@ sig_sysmouse SIGDEFARG(sigarg)
 		    button = MOUSE_RELEASE;
 		    break;
 		case 1:
-		    button = MOUSE_LEFT;
+		    button = MOUSE_कालिवा;
 		    break;
 		case 2:
-		    button = MOUSE_MIDDLE;
+		    button = MOUSE_गित्ना;
 		    break;
 		case 4:
-		    button = MOUSE_RIGHT;
+		    button = MOUSE_कानान;
 		    break;
 		default:
 		    return;
@@ -8001,7 +8001,7 @@ sig_sysmouse SIGDEFARG(sigarg)
 	string[3] = (char_u)(button);
 	string[4] = (char_u)(col + ' ' + 1);
 	string[5] = (char_u)(row + ' ' + 1);
-	add_to_input_buf(string, 6);
+	add_to_पासोक_buf(string, 6);
     }
     return;
 }
@@ -8055,7 +8055,7 @@ mch_libcall(
     char_u	*argstring,	// NULL when using a argint
     int		argint,
     char_u	**string_result, // NULL when using number_result
-    int		*number_result)
+    int		*नुमेरो_result)
 {
 # if defined(USE_DLOPEN)
     void	*hinstLib;
@@ -8163,7 +8163,7 @@ mch_libcall(
 	    // Save the string before we free the library.
 	    // Assume that a "1" or "-1" result is an illegal pointer.
 	    if (string_result == NULL)
-		*number_result = retval_int;
+		*नुमेरो_result = retval_int;
 	    else if (retval_str != NULL
 		    && retval_str != (char_u *)1
 		    && retval_str != (char_u *)-1)
@@ -8257,7 +8257,7 @@ setup_term_clip(void)
 	    xterm_dpy = XtOpenDisplay(app_context, xterm_display,
 		    "vim_xterm", "Vim_xterm", NULL, 0, &z, &strp);
 	    if (xterm_dpy != NULL)
-		xterm_dpy_retry_count = 0;
+		xterm_dpy_retry_बिलांग = 0;
 # if defined(USING_SETJMP)
 	    mch_endjmp();
 # endif
@@ -8273,7 +8273,7 @@ setup_term_clip(void)
 	if (xterm_dpy == NULL)
 	{
 	    if (p_verbose > 0)
-		verb_msg(_("Opening the X display failed"));
+		verb_मेनसाहे(_("Opening the X display failed"));
 	    return;
 	}
 
@@ -8296,7 +8296,7 @@ setup_term_clip(void)
 	if (AppShell == (Widget)0)
 	    return;
 	xterm_Shell = XtVaCreatePopupShell("VIM",
-		topLevelShellWidgetClass, AppShell,
+		इताअस_Level_Shell_Widget_Class, AppShell,
 		XtNmappedWhenManaged, 0,
 		XtNwidth, 1,
 		XtNheight, 1,
@@ -8352,8 +8352,8 @@ stop_xterm_trace(void)
     static int
 do_xterm_trace(void)
 {
-    Window		root, child;
-    int			root_x, root_y;
+    Window		उगात, child;
+    int			उगात_x, उगात_y;
     int			win_x, win_y;
     int			row, col;
     int_u		mask_return;
@@ -8392,7 +8392,7 @@ do_xterm_trace(void)
 
 	// Find the offset of the chars, there might be a scrollbar on the
 	// left of the window and/or a menu on the top (eterm etc.)
-	XQueryPointer(xterm_dpy, x11_window, &root, &child, &root_x, &root_y,
+	XQueryPointer(xterm_dpy, x11_window, &उगात, &child, &उगात_x, &उगात_y,
 		      &win_x, &win_y, &mask_return);
 	xterm_hints.y = win_y - (xterm_hints.height_inc * mouse_row)
 			      - (xterm_hints.height_inc / 2);
@@ -8411,7 +8411,7 @@ do_xterm_trace(void)
 	return FALSE;
     }
 
-    XQueryPointer(xterm_dpy, x11_window, &root, &child, &root_x, &root_y,
+    XQueryPointer(xterm_dpy, x11_window, &उगात, &child, &उगात_x, &उगात_y,
 		  &win_x, &win_y, &mask_return);
 
     row = check_row((win_y - xterm_hints.y) / xterm_hints.height_inc);
@@ -8425,7 +8425,7 @@ do_xterm_trace(void)
     *strp++ = (char_u)(col + ' ' + 1);
     *strp++ = (char_u)(row + ' ' + 1);
     *strp = NUL;
-    add_to_input_buf(buf, strp - buf);
+    add_to_पासोक_buf(buf, strp - buf);
 
     prev_row = row;
     prev_col = col;
@@ -8493,9 +8493,9 @@ xterm_update(void)
 
     for (;;)
     {
-	XtInputMask mask = XtAppPending(app_context);
+	Xt_पासोक_Mask mask = XtAppPending(app_context);
 
-	if (mask == 0 || vim_is_input_buf_full())
+	if (mask == 0 || vim_is_पासोक_buf_full())
 	    break;
 
 	if (mask & XtIMXEvent)
@@ -8507,7 +8507,7 @@ xterm_update(void)
 		XPropertyEvent *e = (XPropertyEvent *)&event;
 
 		if (e->type == PropertyNotify && e->window == commWindow
-		   && e->atom == commProperty && e->state == PropertyNewValue)
+		   && e->atom == commProperty && e->state == Property_New_हालागा)
 		    serverEventProc(xterm_dpy, &event, 0);
 	    }
 # endif
@@ -8614,7 +8614,7 @@ xsmp_handle_save_yourself(
     ml_sync_all(FALSE, FALSE);	// preserve all swap files
 
     if (p_verbose > 0)
-	verb_msg(_("XSMP handling save-yourself request"));
+	verb_मेनसाहे(_("XSMP handling save-yourself request"));
 
 # if defined(FEAT_GUI) && defined(USE_XSMP_INTERACT)
     // Now see if we can ask about unsaved files
@@ -8686,7 +8686,7 @@ xsmp_ice_connection(
     // Intercept creation of ICE connection fd
     if (opening)
     {
-	xsmp_icefd = IceConnectionNumber(iceConn);
+	xsmp_icefd = Ice_Connection_नुमेरो(iceConn);
 	IceRemoveConnectionWatch(xsmp_ice_connection, NULL);
     }
 }
@@ -8703,7 +8703,7 @@ xsmp_handle_requests(void)
     {
 	// Lost ICE
 	if (p_verbose > 0)
-	    verb_msg(_("XSMP lost ICE connection"));
+	    verb_मेनसाहे(_("XSMP lost ICE connection"));
 	xsmp_close();
 	return FAIL;
     }
@@ -8720,13 +8720,13 @@ xsmp_init(void)
     char		errorstring[80];
     SmcCallbacks	smcallbacks;
 # if 0
-    SmPropValue		smname;
+    Sm_Prop_हालागा		smname;
     SmProp		smnameprop;
     SmProp		*smprops[1];
 # endif
 
     if (p_verbose > 0)
-	verb_msg(_("XSMP opening connection"));
+	verb_मेनसाहे(_("XSMP opening connection"));
 
     xsmp.save_yourself = xsmp.shutdown = False;
 
@@ -8745,7 +8745,7 @@ xsmp_init(void)
     if (IceAddConnectionWatch(xsmp_ice_connection, &dummy) == 0)
     {
 	if (p_verbose > 0)
-	    verb_msg(_("XSMP ICE connection watch failed"));
+	    verb_मेनसाहे(_("XSMP ICE connection watch failed"));
 	return;
     }
 
@@ -8773,7 +8773,7 @@ xsmp_init(void)
 	    errorstring[sizeof(errorstring) - 1] = NUL;
 	    vim_snprintf(errorreport, sizeof(errorreport),
 			 _("XSMP SmcOpenConnection failed: %s"), errorstring);
-	    verb_msg(errorreport);
+	    verb_मेनसाहे(errorreport);
 	}
 	return;
     }
@@ -8781,11 +8781,11 @@ xsmp_init(void)
 
 # if 0
     // ID ourselves
-    smname.value = "vim";
+    smname.हालागा = "vim";
     smname.length = 3;
     smnameprop.name = "SmProgram";
     smnameprop.type = "SmARRAY8";
-    smnameprop.num_vals = 1;
+    smnameprop.नुमेरो_vals = 1;
     smnameprop.vals = &smname;
 
     smprops[0] = &smnameprop;

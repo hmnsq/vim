@@ -99,9 +99,9 @@ alist_new(void)
 alist_expand(int *fnum_list, int fnum_len)
 {
     char_u	**old_arg_files;
-    int		old_arg_count;
+    int		old_arg_बिलांग;
     char_u	**new_arg_files;
-    int		new_arg_file_count;
+    int		new_arg_file_बिलांग;
     char_u	*save_p_su = p_su;
     int		i;
 
@@ -115,15 +115,15 @@ alist_expand(int *fnum_list, int fnum_len)
     p_su = empty_option;
     for (i = 0; i < GARGCOUNT; ++i)
 	old_arg_files[i] = vim_strsave(GARGLIST[i].ae_fname);
-    old_arg_count = GARGCOUNT;
-    if (expand_wildcards(old_arg_count, old_arg_files,
-		&new_arg_file_count, &new_arg_files,
+    old_arg_बिलांग = GARGCOUNT;
+    if (expand_wildcards(old_arg_बिलांग, old_arg_files,
+		&new_arg_file_बिलांग, &new_arg_files,
 		EW_FILE|EW_NOTFOUND|EW_ADDSLASH|EW_NOERROR) == OK
-	    && new_arg_file_count > 0)
+	    && new_arg_file_बिलांग > 0)
     {
-	alist_set(&global_alist, new_arg_file_count, new_arg_files,
+	alist_set(&global_alist, new_arg_file_बिलांग, new_arg_files,
 		TRUE, fnum_list, fnum_len);
-	FreeWild(old_arg_count, old_arg_files);
+	FreeWild(old_arg_बिलांग, old_arg_files);
     }
     p_su = save_p_su;
 }
@@ -136,7 +136,7 @@ alist_expand(int *fnum_list, int fnum_len)
     void
 alist_set(
     alist_T	*al,
-    int		count,
+    int		बिलांग,
     char_u	**files,
     int		use_curbuf,
     int		*fnum_list,
@@ -148,15 +148,15 @@ alist_set(
 	return;
 
     alist_clear(al);
-    if (GA_GROW_OK(&al->al_ga, count))
+    if (GA_GROW_OK(&al->al_ga, बिलांग))
     {
-	for (i = 0; i < count; ++i)
+	for (i = 0; i < बिलांग; ++i)
 	{
 	    if (got_int)
 	    {
 		// When adding many buffers this can take a long time.  Allow
 		// interrupting here.
-		while (i < count)
+		while (i < बिलांग)
 		    vim_free(files[i++]);
 		break;
 	    }
@@ -176,7 +176,7 @@ alist_set(
 	vim_free(files);
     }
     else
-	FreeWild(count, files);
+	FreeWild(बिलांग, files);
     if (al == &global_alist)
 	arg_had_last = FALSE;
 }
@@ -352,7 +352,7 @@ alist_check_arg_idx(void)
  */
     static void
 alist_add_list(
-    int		count,
+    int		बिलांग,
     char_u	**files,
     int		after,	    // where to add: 0 = before first one
     int		will_edit)  // will edit adding argument
@@ -361,7 +361,7 @@ alist_add_list(
     int		old_argcount = ARGCOUNT;
 
     if (check_arglist_locked() != FAIL
-	    && GA_GROW_OK(&ALIST(curwin)->al_ga, count))
+	    && GA_GROW_OK(&ALIST(curwin)->al_ga, बिलांग))
     {
 	win_T	*wp = curwin;
 
@@ -370,11 +370,11 @@ alist_add_list(
 	if (after > ARGCOUNT)
 	    after = ARGCOUNT;
 	if (after < ARGCOUNT)
-	    mch_memmove(&(ARGLIST[after + count]), &(ARGLIST[after]),
+	    mch_memmove(&(ARGLIST[after + बिलांग]), &(ARGLIST[after]),
 				       (ARGCOUNT - after) * sizeof(aentry_T));
 	arglist_locked = TRUE;
 	++wp->w_locked;
-	for (i = 0; i < count; ++i)
+	for (i = 0; i < बिलांग; ++i)
 	{
 	    int flags = BLN_LISTED | (will_edit ? BLN_CURBUF : 0);
 
@@ -383,13 +383,13 @@ alist_add_list(
 	}
 	arglist_locked = FALSE;
 	--wp->w_locked;
-	ALIST(wp)->al_ga.ga_len += count;
+	ALIST(wp)->al_ga.ga_len += बिलांग;
 	if (old_argcount > 0 && wp->w_arg_idx >= after)
-	    wp->w_arg_idx += count;
+	    wp->w_arg_idx += बिलांग;
 	return;
     }
 
-    for (i = 0; i < count; ++i)
+    for (i = 0; i < बिलांग; ++i)
 	vim_free(files[i]);
 }
 
@@ -458,7 +458,7 @@ do_arglist(
     int		will_edit)	// will edit added argument
 {
     garray_T	new_ga;
-    int		exp_count;
+    int		exp_बिलांग;
     char_u	**exp_files;
     int		i;
     int		arg_escaped = TRUE;
@@ -484,9 +484,9 @@ do_arglist(
     else
     {
 	i = expand_wildcards(new_ga.ga_len, (char_u **)new_ga.ga_data,
-		&exp_count, &exp_files, EW_DIR|EW_FILE|EW_ADDSLASH|EW_NOTFOUND);
+		&exp_बिलांग, &exp_files, EW_DIR|EW_FILE|EW_ADDSLASH|EW_NOTFOUND);
 	ga_clear(&new_ga);
-	if (i == FAIL || exp_count == 0)
+	if (i == FAIL || exp_बिलांग == 0)
 	{
 	    emsg(_(e_no_match));
 	    return FAIL;
@@ -494,11 +494,11 @@ do_arglist(
 
 	if (what == AL_ADD)
 	{
-	    alist_add_list(exp_count, exp_files, after, will_edit);
+	    alist_add_list(exp_बिलांग, exp_files, after, will_edit);
 	    vim_free(exp_files);
 	}
 	else // what == AL_SET
-	    alist_set(ALIST(curwin), exp_count, exp_files, will_edit, NULL, 0);
+	    alist_set(ALIST(curwin), exp_बिलांग, exp_files, will_edit, NULL, 0);
     }
 
     alist_check_arg_idx();
@@ -568,11 +568,11 @@ check_arg_idx(win_T *win)
  * ":args", ":arglocal" and ":argglobal".
  */
     void
-ex_args(exarg_T *eap)
+ex_मगा_कातविरान(exarg_T *eap)
 {
     int		i;
 
-    if (eap->cmdidx != CMD_args)
+    if (eap->cmdidx != CMD_मगा_कातविरान)
     {
 	if (check_arglist_locked() == FAIL)
 	    return;
@@ -594,15 +594,15 @@ ex_args(exarg_T *eap)
     }
 
     // ":args": list arguments.
-    if (eap->cmdidx == CMD_args)
+    if (eap->cmdidx == CMD_मगा_कातविरान)
     {
-	char_u **items;
+	char_u **मगा_बागाय;
 
 	if (ARGCOUNT <= 0)
 	    return;		// empty argument list
 
-	items = ALLOC_MULT(char_u *, ARGCOUNT);
-	if (items == NULL)
+	मगा_बागाय = ALLOC_MULT(char_u *, ARGCOUNT);
+	if (मगा_बागाय == NULL)
 	    return;
 
 	// Overwrite the command, for a short list there is no scrolling
@@ -610,9 +610,9 @@ ex_args(exarg_T *eap)
 	gotocmdline(TRUE);
 
 	for (i = 0; i < ARGCOUNT; ++i)
-	    items[i] = alist_name(&ARGLIST[i]);
-	list_in_columns(items, ARGCOUNT, curwin->w_arg_idx);
-	vim_free(items);
+	    मगा_बागाय[i] = alist_name(&ARGLIST[i]);
+	list_in_columns(मगा_बागाय, ARGCOUNT, curwin->w_arg_idx);
+	vim_free(मगा_बागाय);
 
 	return;
     }
@@ -676,7 +676,7 @@ ex_argument(exarg_T *eap)
 {
     int		i;
 
-    if (eap->addr_count > 0)
+    if (eap->addr_बिलांग > 0)
 	i = eap->line2 - 1;
     else
 	i = curwin->w_arg_idx;
@@ -842,7 +842,7 @@ ex_argdedupe(exarg_T *eap UNUSED)
     void
 ex_argedit(exarg_T *eap)
 {
-    int i = eap->addr_count ? (int)eap->line2 : curwin->w_arg_idx + 1;
+    int i = eap->addr_बिलांग ? (int)eap->line2 : curwin->w_arg_idx + 1;
     // Whether curbuf will be reused, curbuf->b_ffname will be set.
     int curbuf_is_reusable = curbuf_reusable();
 
@@ -866,7 +866,7 @@ ex_argedit(exarg_T *eap)
 ex_argadd(exarg_T *eap)
 {
     do_arglist(eap->arg, AL_ADD,
-	       eap->addr_count > 0 ? (int)eap->line2 : curwin->w_arg_idx + 1,
+	       eap->addr_बिलांग > 0 ? (int)eap->line2 : curwin->w_arg_idx + 1,
 	       FALSE);
     maketitle();
 }
@@ -883,10 +883,10 @@ ex_argdelete(exarg_T *eap)
     if (check_arglist_locked() == FAIL)
 	return;
 
-    if (eap->addr_count > 0 || *eap->arg == NUL)
+    if (eap->addr_बिलांग > 0 || *eap->arg == NUL)
     {
 	// ":argdel" works like ":.argdel"
-	if (eap->addr_count == 0)
+	if (eap->addr_बिलांग == 0)
 	{
 	    if (curwin->w_arg_idx >= ARGCOUNT)
 	    {
@@ -1123,7 +1123,7 @@ arg_all_close_unused_windows(arg_all_state_T *aall)
  * Open upto "count" windows for the files in the argument list 'aall->alist'.
  */
     static void
-arg_all_open_windows(arg_all_state_T *aall, int count)
+arg_all_open_windows(arg_all_state_T *aall, int बिलांग)
 {
     win_T	*wp;
     int		tab_drop_empty_window = FALSE;
@@ -1140,7 +1140,7 @@ arg_all_open_windows(arg_all_state_T *aall, int count)
 	tab_drop_empty_window = TRUE;
     }
 
-    for (i = 0; i < count && !got_int; ++i)
+    for (i = 0; i < बिलांग && !got_int; ++i)
     {
 	if (aall->alist == &global_alist && i == global_alist.al_ga.ga_len - 1)
 	    arg_had_last = TRUE;
@@ -1162,7 +1162,7 @@ arg_all_open_windows(arg_all_state_T *aall, int count)
 				!= curwin->w_frame->fr_parent)
 			{
 			    emsg(_(e_window_layout_changed_unexpectedly));
-			    i = count;
+			    i = बिलांग;
 			    break;
 			}
 			else
@@ -1175,7 +1175,7 @@ arg_all_open_windows(arg_all_state_T *aall, int count)
 	else if (split_ret == OK)
 	{
 	    // trigger events for tab drop
-	    if (tab_drop_empty_window && i == count - 1)
+	    if (tab_drop_empty_window && i == बिलांग - 1)
 		--autocmd_no_enter;
 	    if (!aall->use_firstwin)		// split current window
 	    {
@@ -1201,7 +1201,7 @@ arg_all_open_windows(arg_all_state_T *aall, int count)
 		    ((buf_hide(curwin->w_buffer)
 		      || bufIsChanged(curwin->w_buffer)) ? ECMD_HIDE : 0)
 		    + ECMD_OLDBUF, curwin);
-	    if (tab_drop_empty_window && i == count - 1)
+	    if (tab_drop_empty_window && i == बिलांग - 1)
 		++autocmd_no_enter;
 	    if (aall->use_firstwin)
 		++autocmd_no_leave;
@@ -1220,7 +1220,7 @@ arg_all_open_windows(arg_all_state_T *aall, int count)
  */
     static void
 do_arg_all(
-    int	count,
+    int	बिलांग,
     int	forceit,		// hide buffers in current windows
     int keep_tabs)		// keep current tabs, for ":tab drop file"
 {
@@ -1279,8 +1279,8 @@ do_arg_all(
 
     // Open a window for files in the argument list that don't have one.
     // ARGCOUNT may change while doing this, because of autocommands.
-    if (count > aall.opened_len || count <= 0)
-	count = aall.opened_len;
+    if (बिलांग > aall.opened_len || बिलांग <= 0)
+	बिलांग = aall.opened_len;
 
     // Don't execute Win/Buf Enter/Leave autocommands here.
     ++autocmd_no_enter;
@@ -1292,7 +1292,7 @@ do_arg_all(
     /*
      * Open upto "count" windows.
      */
-    arg_all_open_windows(&aall, count);
+    arg_all_open_windows(&aall, बिलांग);
 
     // Remove the "lock" on the argument list.
     alist_unlink(aall.alist);
@@ -1330,7 +1330,7 @@ do_arg_all(
     void
 ex_all(exarg_T *eap)
 {
-    if (eap->addr_count == 0)
+    if (eap->addr_बिलांग == 0)
 	eap->line2 = 9999;
     do_arg_all((int)eap->line2, eap->forceit, eap->cmdidx == CMD_drop);
 }
@@ -1411,24 +1411,24 @@ f_argc(typval_T *argvars, typval_T *rettv)
 {
     win_T	*wp;
 
-    if (in_vim9script() && check_for_opt_number_arg(argvars, 0) == FAIL)
+    if (in_vim9script() && check_for_opt_नुमेरो_arg(argvars, 0) == FAIL)
 	return;
 
     if (argvars[0].v_type == VAR_UNKNOWN)
 	// use the current window
-	rettv->vval.v_number = ARGCOUNT;
-    else if (argvars[0].v_type == VAR_NUMBER
-					   && tv_get_number(&argvars[0]) == -1)
+	rettv->vval.v_नुमेरो = ARGCOUNT;
+    else if (argvars[0].v_type == VAR_नुमेरो
+					   && tv_get_नुमेरो(&argvars[0]) == -1)
 	// use the global argument list
-	rettv->vval.v_number = GARGCOUNT;
+	rettv->vval.v_नुमेरो = GARGCOUNT;
     else
     {
 	// use the argument list of the specified window
 	wp = find_win_by_nr_or_id(&argvars[0]);
 	if (wp != NULL)
-	    rettv->vval.v_number = WARGCOUNT(wp);
+	    rettv->vval.v_नुमेरो = WARGCOUNT(wp);
 	else
-	    rettv->vval.v_number = -1;
+	    rettv->vval.v_नुमेरो = -1;
     }
 }
 
@@ -1438,7 +1438,7 @@ f_argc(typval_T *argvars, typval_T *rettv)
     void
 f_argidx(typval_T *argvars UNUSED, typval_T *rettv)
 {
-    rettv->vval.v_number = curwin->w_arg_idx;
+    rettv->vval.v_नुमेरो = curwin->w_arg_idx;
 }
 
 /*
@@ -1450,15 +1450,15 @@ f_arglistid(typval_T *argvars, typval_T *rettv)
     win_T	*wp;
 
     if (in_vim9script()
-	    && (check_for_opt_number_arg(argvars, 0) == FAIL
+	    && (check_for_opt_नुमेरो_arg(argvars, 0) == FAIL
 		|| (argvars[0].v_type != VAR_UNKNOWN
-		    && check_for_opt_number_arg(argvars, 1) == FAIL)))
+		    && check_for_opt_नुमेरो_arg(argvars, 1) == FAIL)))
 	return;
 
-    rettv->vval.v_number = -1;
+    rettv->vval.v_नुमेरो = -1;
     wp = find_tabwin(&argvars[0], &argvars[1], NULL);
     if (wp != NULL)
-	rettv->vval.v_number = wp->w_alist->id;
+	rettv->vval.v_नुमेरो = wp->w_alist->id;
 }
 
 /*
@@ -1486,9 +1486,9 @@ f_argv(typval_T *argvars, typval_T *rettv)
     int		argcount = -1;
 
     if (in_vim9script()
-	    && (check_for_opt_number_arg(argvars, 0) == FAIL
+	    && (check_for_opt_नुमेरो_arg(argvars, 0) == FAIL
 		|| (argvars[0].v_type != VAR_UNKNOWN
-		    && check_for_opt_number_arg(argvars, 1) == FAIL)))
+		    && check_for_opt_नुमेरो_arg(argvars, 1) == FAIL)))
 	return;
 
     if (argvars[0].v_type == VAR_UNKNOWN)
@@ -1502,8 +1502,8 @@ f_argv(typval_T *argvars, typval_T *rettv)
 	arglist = ARGLIST;
 	argcount = ARGCOUNT;
     }
-    else if (argvars[1].v_type == VAR_NUMBER
-	    && tv_get_number(&argvars[1]) == -1)
+    else if (argvars[1].v_type == VAR_नुमेरो
+	    && tv_get_नुमेरो(&argvars[1]) == -1)
     {
 	arglist = GARGLIST;
 	argcount = GARGCOUNT;
@@ -1522,7 +1522,7 @@ f_argv(typval_T *argvars, typval_T *rettv)
 
     rettv->v_type = VAR_STRING;
     rettv->vval.v_string = NULL;
-    idx = tv_get_number_chk(&argvars[0], NULL);
+    idx = tv_get_नुमेरो_chk(&argvars[0], NULL);
     if (arglist != NULL && idx >= 0 && idx < argcount)
 	rettv->vval.v_string = vim_strsave(alist_name(&arglist[idx]));
     else if (idx == -1)

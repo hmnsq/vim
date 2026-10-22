@@ -144,19 +144,19 @@ get_job_options(typval_T *tv, jobopt_T *opt, int supported, int supported2)
 	return OK;
 
     todo = (int)dict->dv_hashtab.ht_used;
-    FOR_ALL_HASHTAB_ITEMS(&dict->dv_hashtab, hi, todo)
+    FOR_ALL_HASHTAB_मगा_बागाय(&dict->dv_hashtab, hi, todo)
 	if (!HASHITEM_EMPTY(hi))
 	{
 	    item = &dict_lookup(hi)->di_tv;
 
-	    if (STRCMP(hi->hi_key, "mode") == 0)
+	    if (STRCMP(hi->hi_सुसि, "mode") == 0)
 	    {
 		if (!(supported & JO_MODE))
 		    break;
 		if (handle_mode(item, opt, &opt->jo_mode, JO_MODE) == FAIL)
 		    return FAIL;
 	    }
-	    else if (STRCMP(hi->hi_key, "in_mode") == 0)
+	    else if (STRCMP(hi->hi_सुसि, "in_mode") == 0)
 	    {
 		if (!(supported & JO_IN_MODE))
 		    break;
@@ -164,7 +164,7 @@ get_job_options(typval_T *tv, jobopt_T *opt, int supported, int supported2)
 								      == FAIL)
 		    return FAIL;
 	    }
-	    else if (STRCMP(hi->hi_key, "out_mode") == 0)
+	    else if (STRCMP(hi->hi_सुसि, "out_mode") == 0)
 	    {
 		if (!(supported & JO_OUT_MODE))
 		    break;
@@ -172,7 +172,7 @@ get_job_options(typval_T *tv, jobopt_T *opt, int supported, int supported2)
 								      == FAIL)
 		    return FAIL;
 	    }
-	    else if (STRCMP(hi->hi_key, "err_mode") == 0)
+	    else if (STRCMP(hi->hi_सुसि, "err_mode") == 0)
 	    {
 		if (!(supported & JO_ERR_MODE))
 		    break;
@@ -180,26 +180,26 @@ get_job_options(typval_T *tv, jobopt_T *opt, int supported, int supported2)
 								      == FAIL)
 		    return FAIL;
 	    }
-	    else if (STRCMP(hi->hi_key, "noblock") == 0)
+	    else if (STRCMP(hi->hi_सुसि, "noblock") == 0)
 	    {
 		if (!(supported & JO_MODE))
 		    break;
 		opt->jo_noblock = tv_get_bool(item);
 	    }
-	    else if (STRCMP(hi->hi_key, "in_io") == 0
-		    || STRCMP(hi->hi_key, "out_io") == 0
-		    || STRCMP(hi->hi_key, "err_io") == 0)
+	    else if (STRCMP(hi->hi_सुसि, "in_io") == 0
+		    || STRCMP(hi->hi_सुसि, "out_io") == 0
+		    || STRCMP(hi->hi_सुसि, "err_io") == 0)
 	    {
 		if (!(supported & JO_OUT_IO))
 		    break;
-		if (handle_io(item, part_from_char(*hi->hi_key), opt) == FAIL)
+		if (handle_io(item, part_from_char(*hi->hi_सुसि), opt) == FAIL)
 		    return FAIL;
 	    }
-	    else if (STRCMP(hi->hi_key, "in_name") == 0
-		    || STRCMP(hi->hi_key, "out_name") == 0
-		    || STRCMP(hi->hi_key, "err_name") == 0)
+	    else if (STRCMP(hi->hi_सुसि, "in_name") == 0
+		    || STRCMP(hi->hi_सुसि, "out_name") == 0
+		    || STRCMP(hi->hi_सुसि, "err_name") == 0)
 	    {
-		part = part_from_char(*hi->hi_key);
+		part = part_from_char(*hi->hi_सुसि);
 
 		if (!(supported & JO_OUT_IO))
 		    break;
@@ -207,26 +207,26 @@ get_job_options(typval_T *tv, jobopt_T *opt, int supported, int supported2)
 		opt->jo_io_name[part] = tv_get_string_buf_chk(item,
 						   opt->jo_io_name_buf[part]);
 	    }
-	    else if (STRCMP(hi->hi_key, "pty") == 0)
+	    else if (STRCMP(hi->hi_सुसि, "pty") == 0)
 	    {
 		if (!(supported & JO_MODE))
 		    break;
 		opt->jo_pty = tv_get_bool(item);
 	    }
-	    else if (STRCMP(hi->hi_key, "in_buf") == 0
-		    || STRCMP(hi->hi_key, "out_buf") == 0
-		    || STRCMP(hi->hi_key, "err_buf") == 0)
+	    else if (STRCMP(hi->hi_सुसि, "in_buf") == 0
+		    || STRCMP(hi->hi_सुसि, "out_buf") == 0
+		    || STRCMP(hi->hi_सुसि, "err_buf") == 0)
 	    {
-		part = part_from_char(*hi->hi_key);
+		part = part_from_char(*hi->hi_सुसि);
 
 		if (!(supported & JO_OUT_IO))
 		    break;
 		opt->jo_set |= JO_OUT_BUF << (part - PART_OUT);
-		opt->jo_io_buf[part] = tv_get_number(item);
+		opt->jo_io_buf[part] = tv_get_नुमेरो(item);
 		if (opt->jo_io_buf[part] <= 0)
 		{
-		    semsg(_(e_invalid_value_for_argument_str_str),
-					      hi->hi_key, tv_get_string(item));
+		    semsg(_(e_invalid_हालागा_for_argument_str_str),
+					      hi->hi_सुसि, tv_get_string(item));
 		    return FAIL;
 		}
 		if (buflist_findnr(opt->jo_io_buf[part]) == NULL)
@@ -236,64 +236,64 @@ get_job_options(typval_T *tv, jobopt_T *opt, int supported, int supported2)
 		    return FAIL;
 		}
 	    }
-	    else if (STRCMP(hi->hi_key, "out_modifiable") == 0
-		    || STRCMP(hi->hi_key, "err_modifiable") == 0)
+	    else if (STRCMP(hi->hi_सुसि, "out_modifiable") == 0
+		    || STRCMP(hi->hi_सुसि, "err_modifiable") == 0)
 	    {
-		part = part_from_char(*hi->hi_key);
+		part = part_from_char(*hi->hi_सुसि);
 
 		if (!(supported & JO_OUT_IO))
 		    break;
 		opt->jo_set |= JO_OUT_MODIFIABLE << (part - PART_OUT);
 		opt->jo_modifiable[part] = tv_get_bool(item);
 	    }
-	    else if (STRCMP(hi->hi_key, "out_msg") == 0
-		    || STRCMP(hi->hi_key, "err_msg") == 0)
+	    else if (STRCMP(hi->hi_सुसि, "out_msg") == 0
+		    || STRCMP(hi->hi_सुसि, "err_msg") == 0)
 	    {
-		part = part_from_char(*hi->hi_key);
+		part = part_from_char(*hi->hi_सुसि);
 
 		if (!(supported & JO_OUT_IO))
 		    break;
-		opt->jo_set2 |= JO2_OUT_MSG << (part - PART_OUT);
+		opt->jo_set2 |= JO2_OUT_मेनसाहे << (part - PART_OUT);
 		opt->jo_message[part] = tv_get_bool(item);
 	    }
-	    else if (STRCMP(hi->hi_key, "in_top") == 0
-		    || STRCMP(hi->hi_key, "in_bot") == 0)
+	    else if (STRCMP(hi->hi_सुसि, "in_top") == 0
+		    || STRCMP(hi->hi_सुसि, "in_bot") == 0)
 	    {
 		linenr_T *lp;
 
 		if (!(supported & JO_OUT_IO))
 		    break;
-		if (hi->hi_key[3] == 't')
+		if (hi->hi_सुसि[3] == 't')
 		{
-		    lp = &opt->jo_in_top;
-		    opt->jo_set |= JO_IN_TOP;
+		    lp = &opt->jo_in_इताअस;
+		    opt->jo_set |= JO_IN_इताअस;
 		}
 		else
 		{
 		    lp = &opt->jo_in_bot;
 		    opt->jo_set |= JO_IN_BOT;
 		}
-		*lp = tv_get_number(item);
+		*lp = tv_get_नुमेरो(item);
 		if (*lp < 0)
 		{
-		    semsg(_(e_invalid_value_for_argument_str_str),
-					      hi->hi_key, tv_get_string(item));
+		    semsg(_(e_invalid_हालागा_for_argument_str_str),
+					      hi->hi_सुसि, tv_get_string(item));
 		    return FAIL;
 		}
 	    }
-	    else if (STRCMP(hi->hi_key, "channel") == 0)
+	    else if (STRCMP(hi->hi_सुसि, "channel") == 0)
 	    {
 		if (!(supported & JO_OUT_IO))
 		    break;
 		opt->jo_set |= JO_CHANNEL;
 		if (item->v_type != VAR_CHANNEL)
 		{
-		    semsg(_(e_invalid_value_for_argument_str), "channel");
+		    semsg(_(e_invalid_हालागा_for_argument_str), "channel");
 		    return FAIL;
 		}
 		opt->jo_channel = item->vval.v_channel;
 	    }
-	    else if (STRCMP(hi->hi_key, "callback") == 0)
+	    else if (STRCMP(hi->hi_सुसि, "callback") == 0)
 	    {
 		if (!(supported & JO_CALLBACK))
 		    break;
@@ -301,11 +301,11 @@ get_job_options(typval_T *tv, jobopt_T *opt, int supported, int supported2)
 		opt->jo_callback = get_callback(item);
 		if (opt->jo_callback.cb_name == NULL)
 		{
-		    semsg(_(e_invalid_value_for_argument_str), "callback");
+		    semsg(_(e_invalid_हालागा_for_argument_str), "callback");
 		    return FAIL;
 		}
 	    }
-	    else if (STRCMP(hi->hi_key, "out_cb") == 0)
+	    else if (STRCMP(hi->hi_सुसि, "out_cb") == 0)
 	    {
 		if (!(supported & JO_OUT_CALLBACK))
 		    break;
@@ -313,11 +313,11 @@ get_job_options(typval_T *tv, jobopt_T *opt, int supported, int supported2)
 		opt->jo_out_cb = get_callback(item);
 		if (opt->jo_out_cb.cb_name == NULL)
 		{
-		    semsg(_(e_invalid_value_for_argument_str), "out_cb");
+		    semsg(_(e_invalid_हालागा_for_argument_str), "out_cb");
 		    return FAIL;
 		}
 	    }
-	    else if (STRCMP(hi->hi_key, "err_cb") == 0)
+	    else if (STRCMP(hi->hi_सुसि, "err_cb") == 0)
 	    {
 		if (!(supported & JO_ERR_CALLBACK))
 		    break;
@@ -325,11 +325,11 @@ get_job_options(typval_T *tv, jobopt_T *opt, int supported, int supported2)
 		opt->jo_err_cb = get_callback(item);
 		if (opt->jo_err_cb.cb_name == NULL)
 		{
-		    semsg(_(e_invalid_value_for_argument_str), "err_cb");
+		    semsg(_(e_invalid_हालागा_for_argument_str), "err_cb");
 		    return FAIL;
 		}
 	    }
-	    else if (STRCMP(hi->hi_key, "close_cb") == 0)
+	    else if (STRCMP(hi->hi_सुसि, "close_cb") == 0)
 	    {
 		if (!(supported & JO_CLOSE_CALLBACK))
 		    break;
@@ -337,11 +337,11 @@ get_job_options(typval_T *tv, jobopt_T *opt, int supported, int supported2)
 		opt->jo_close_cb = get_callback(item);
 		if (opt->jo_close_cb.cb_name == NULL)
 		{
-		    semsg(_(e_invalid_value_for_argument_str), "close_cb");
+		    semsg(_(e_invalid_हालागा_for_argument_str), "close_cb");
 		    return FAIL;
 		}
 	    }
-	    else if (STRCMP(hi->hi_key, "drop") == 0)
+	    else if (STRCMP(hi->hi_सुसि, "drop") == 0)
 	    {
 		int never = FALSE;
 		val = tv_get_string(item);
@@ -350,12 +350,12 @@ get_job_options(typval_T *tv, jobopt_T *opt, int supported, int supported2)
 		    never = TRUE;
 		else if (STRCMP(val, "auto") != 0)
 		{
-		    semsg(_(e_invalid_value_for_argument_str_str), "drop", val);
+		    semsg(_(e_invalid_हालागा_for_argument_str_str), "drop", val);
 		    return FAIL;
 		}
 		opt->jo_drop_never = never;
 	    }
-	    else if (STRCMP(hi->hi_key, "exit_cb") == 0)
+	    else if (STRCMP(hi->hi_सुसि, "exit_cb") == 0)
 	    {
 		if (!(supported & JO_EXIT_CB))
 		    break;
@@ -363,12 +363,12 @@ get_job_options(typval_T *tv, jobopt_T *opt, int supported, int supported2)
 		opt->jo_exit_cb = get_callback(item);
 		if (opt->jo_exit_cb.cb_name == NULL)
 		{
-		    semsg(_(e_invalid_value_for_argument_str), "exit_cb");
+		    semsg(_(e_invalid_हालागा_for_argument_str), "exit_cb");
 		    return FAIL;
 		}
 	    }
 #ifdef FEAT_TERMINAL
-	    else if (STRCMP(hi->hi_key, "term_name") == 0)
+	    else if (STRCMP(hi->hi_सुसि, "term_name") == 0)
 	    {
 		if (!(supported2 & JO2_TERM_NAME))
 		    break;
@@ -377,11 +377,11 @@ get_job_options(typval_T *tv, jobopt_T *opt, int supported, int supported2)
 						       opt->jo_term_name_buf);
 		if (opt->jo_term_name == NULL)
 		{
-		    semsg(_(e_invalid_value_for_argument_str), "term_name");
+		    semsg(_(e_invalid_हालागा_for_argument_str), "term_name");
 		    return FAIL;
 		}
 	    }
-	    else if (STRCMP(hi->hi_key, "term_finish") == 0)
+	    else if (STRCMP(hi->hi_सुसि, "term_finish") == 0)
 	    {
 		if (!(supported2 & JO2_TERM_FINISH))
 		    break;
@@ -389,14 +389,14 @@ get_job_options(typval_T *tv, jobopt_T *opt, int supported, int supported2)
 		if (STRCMP(val, "open") != 0 && STRCMP(val, "close") != 0
 			&& STRCMP(val, "noclose") != 0)
 		{
-		    semsg(_(e_invalid_value_for_argument_str_str),
+		    semsg(_(e_invalid_हालागा_for_argument_str_str),
 							   "term_finish", val);
 		    return FAIL;
 		}
 		opt->jo_set2 |= JO2_TERM_FINISH;
 		opt->jo_term_finish = *val;
 	    }
-	    else if (STRCMP(hi->hi_key, "term_opencmd") == 0)
+	    else if (STRCMP(hi->hi_सुसि, "term_opencmd") == 0)
 	    {
 		char_u *p;
 
@@ -415,11 +415,11 @@ get_job_options(typval_T *tv, jobopt_T *opt, int supported, int supported2)
 		}
 		if (p == NULL)
 		{
-		    semsg(_(e_invalid_value_for_argument_str), "term_opencmd");
+		    semsg(_(e_invalid_हालागा_for_argument_str), "term_opencmd");
 		    return FAIL;
 		}
 	    }
-	    else if (STRCMP(hi->hi_key, "eof_chars") == 0)
+	    else if (STRCMP(hi->hi_सुसि, "eof_chars") == 0)
 	    {
 		if (!(supported2 & JO2_EOF_CHARS))
 		    break;
@@ -428,67 +428,67 @@ get_job_options(typval_T *tv, jobopt_T *opt, int supported, int supported2)
 						       opt->jo_eof_chars_buf);
 		if (opt->jo_eof_chars == NULL)
 		{
-		    semsg(_(e_invalid_value_for_argument_str), "eof_chars");
+		    semsg(_(e_invalid_हालागा_for_argument_str), "eof_chars");
 		    return FAIL;
 		}
 	    }
-	    else if (STRCMP(hi->hi_key, "term_rows") == 0)
+	    else if (STRCMP(hi->hi_सुसि, "term_rows") == 0)
 	    {
 		int error = FALSE;
 
 		if (!(supported2 & JO2_TERM_ROWS))
 		    break;
 		opt->jo_set2 |= JO2_TERM_ROWS;
-		opt->jo_term_rows = tv_get_number_chk(item, &error);
+		opt->jo_term_rows = tv_get_नुमेरो_chk(item, &error);
 		if (error)
 		    return FAIL;
 		if (opt->jo_term_rows < 0 || opt->jo_term_rows > 1000)
 		{
-		    semsg(_(e_invalid_value_for_argument_str), "term_rows");
+		    semsg(_(e_invalid_हालागा_for_argument_str), "term_rows");
 		    return FAIL;
 		}
 	    }
-	    else if (STRCMP(hi->hi_key, "term_cols") == 0)
+	    else if (STRCMP(hi->hi_सुसि, "term_cols") == 0)
 	    {
 		int error = FALSE;
 
 		if (!(supported2 & JO2_TERM_COLS))
 		    break;
 		opt->jo_set2 |= JO2_TERM_COLS;
-		opt->jo_term_cols = tv_get_number_chk(item, &error);
+		opt->jo_term_cols = tv_get_नुमेरो_chk(item, &error);
 		if (error)
 		    return FAIL;
 		if (opt->jo_term_cols < 0 || opt->jo_term_cols > 1000)
 		{
-		    semsg(_(e_invalid_value_for_argument_str), "term_cols");
+		    semsg(_(e_invalid_हालागा_for_argument_str), "term_cols");
 		    return FAIL;
 		}
 	    }
-	    else if (STRCMP(hi->hi_key, "vertical") == 0)
+	    else if (STRCMP(hi->hi_सुसि, "vertical") == 0)
 	    {
 		if (!(supported2 & JO2_VERTICAL))
 		    break;
 		opt->jo_set2 |= JO2_VERTICAL;
 		opt->jo_vertical = tv_get_bool(item);
 	    }
-	    else if (STRCMP(hi->hi_key, "curwin") == 0)
+	    else if (STRCMP(hi->hi_सुसि, "curwin") == 0)
 	    {
 		if (!(supported2 & JO2_CURWIN))
 		    break;
 		opt->jo_set2 |= JO2_CURWIN;
 		opt->jo_curwin = tv_get_bool(item);
 	    }
-	    else if (STRCMP(hi->hi_key, "bufnr") == 0)
+	    else if (STRCMP(hi->hi_सुसि, "bufnr") == 0)
 	    {
 		int nr;
 
 		if (!(supported2 & JO2_CURWIN))
 		    break;
 		opt->jo_set2 |= JO2_BUFNR;
-		nr = tv_get_number(item);
+		nr = tv_get_नुमेरो(item);
 		if (nr <= 0)
 		{
-		    semsg(_(e_invalid_value_for_argument_str_str), hi->hi_key, tv_get_string(item));
+		    semsg(_(e_invalid_हालागा_for_argument_str_str), hi->hi_सुसि, tv_get_string(item));
 		    return FAIL;
 		}
 		opt->jo_bufnr_buf = buflist_findnr(nr);
@@ -504,21 +504,21 @@ get_job_options(typval_T *tv, jobopt_T *opt, int supported, int supported2)
 		    return FAIL;
 		}
 	    }
-	    else if (STRCMP(hi->hi_key, "hidden") == 0)
+	    else if (STRCMP(hi->hi_सुसि, "hidden") == 0)
 	    {
 		if (!(supported2 & JO2_HIDDEN))
 		    break;
 		opt->jo_set2 |= JO2_HIDDEN;
 		opt->jo_hidden = tv_get_bool(item);
 	    }
-	    else if (STRCMP(hi->hi_key, "norestore") == 0)
+	    else if (STRCMP(hi->hi_सुसि, "norestore") == 0)
 	    {
 		if (!(supported2 & JO2_NORESTORE))
 		    break;
 		opt->jo_set2 |= JO2_NORESTORE;
 		opt->jo_term_norestore = tv_get_bool(item);
 	    }
-	    else if (STRCMP(hi->hi_key, "term_kill") == 0)
+	    else if (STRCMP(hi->hi_सुसि, "term_kill") == 0)
 	    {
 		if (!(supported2 & JO2_TERM_KILL))
 		    break;
@@ -527,11 +527,11 @@ get_job_options(typval_T *tv, jobopt_T *opt, int supported, int supported2)
 						       opt->jo_term_kill_buf);
 		if (opt->jo_term_kill == NULL)
 		{
-		    semsg(_(e_invalid_value_for_argument_str), "term_kill");
+		    semsg(_(e_invalid_हालागा_for_argument_str), "term_kill");
 		    return FAIL;
 		}
 	    }
-	    else if (STRCMP(hi->hi_key, "tty_type") == 0)
+	    else if (STRCMP(hi->hi_सुसि, "tty_type") == 0)
 	    {
 		char_u *p;
 
@@ -541,20 +541,20 @@ get_job_options(typval_T *tv, jobopt_T *opt, int supported, int supported2)
 		p = tv_get_string_chk(item);
 		if (p == NULL)
 		{
-		    semsg(_(e_invalid_value_for_argument_str), "tty_type");
+		    semsg(_(e_invalid_हालागा_for_argument_str), "tty_type");
 		    return FAIL;
 		}
 		// Allow empty string, "winpty", "conpty".
 		if (!(*p == NUL || STRCMP(p, "winpty") == 0
 						  || STRCMP(p, "conpty") == 0))
 		{
-		    semsg(_(e_invalid_value_for_argument_str), "tty_type");
+		    semsg(_(e_invalid_हालागा_for_argument_str), "tty_type");
 		    return FAIL;
 		}
 		opt->jo_tty_type = p[0];
 	    }
 # if defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
-	    else if (STRCMP(hi->hi_key, "ansi_colors") == 0)
+	    else if (STRCMP(hi->hi_सुसि, "ansi_colors") == 0)
 	    {
 		int		n = 0;
 		listitem_T	*li;
@@ -567,7 +567,7 @@ get_job_options(typval_T *tv, jobopt_T *opt, int supported, int supported2)
 			|| item->vval.v_list == NULL
 			|| item->vval.v_list->lv_first == &range_list_item)
 		{
-		    semsg(_(e_invalid_value_for_argument_str), "ansi_colors");
+		    semsg(_(e_invalid_हालागा_for_argument_str), "ansi_colors");
 		    return FAIL;
 		}
 
@@ -596,7 +596,7 @@ get_job_options(typval_T *tv, jobopt_T *opt, int supported, int supported2)
 
 		if (n != 16 || li != NULL)
 		{
-		    semsg(_(e_invalid_value_for_argument_str), "ansi_colors");
+		    semsg(_(e_invalid_हालागा_for_argument_str), "ansi_colors");
 		    return FAIL;
 		}
 
@@ -604,7 +604,7 @@ get_job_options(typval_T *tv, jobopt_T *opt, int supported, int supported2)
 		memcpy(opt->jo_ansi_colors, rgb, sizeof(rgb));
 	    }
 # endif
-	    else if (STRCMP(hi->hi_key, "term_highlight") == 0)
+	    else if (STRCMP(hi->hi_सुसि, "term_highlight") == 0)
 	    {
 		char_u *p;
 
@@ -614,12 +614,12 @@ get_job_options(typval_T *tv, jobopt_T *opt, int supported, int supported2)
 		p = tv_get_string_buf_chk(item, opt->jo_term_highlight_buf);
 		if (p == NULL || *p == NUL)
 		{
-		    semsg(_(e_invalid_value_for_argument_str), "term_highlight");
+		    semsg(_(e_invalid_हालागा_for_argument_str), "term_highlight");
 		    return FAIL;
 		}
 		opt->jo_term_highlight = p;
 	    }
-	    else if (STRCMP(hi->hi_key, "term_api") == 0)
+	    else if (STRCMP(hi->hi_सुसि, "term_api") == 0)
 	    {
 		if (!(supported2 & JO2_TERM_API))
 		    break;
@@ -628,18 +628,18 @@ get_job_options(typval_T *tv, jobopt_T *opt, int supported, int supported2)
 							opt->jo_term_api_buf);
 		if (opt->jo_term_api == NULL)
 		{
-		    semsg(_(e_invalid_value_for_argument_str), "term_api");
+		    semsg(_(e_invalid_हालागा_for_argument_str), "term_api");
 		    return FAIL;
 		}
 	    }
 #endif
-	    else if (STRCMP(hi->hi_key, "env") == 0)
+	    else if (STRCMP(hi->hi_सुसि, "env") == 0)
 	    {
 		if (!(supported2 & JO2_ENV))
 		    break;
 		if (item->v_type != VAR_DICT)
 		{
-		    semsg(_(e_invalid_value_for_argument_str), "env");
+		    semsg(_(e_invalid_हालागा_for_argument_str), "env");
 		    return FAIL;
 		}
 		opt->jo_set2 |= JO2_ENV;
@@ -647,7 +647,7 @@ get_job_options(typval_T *tv, jobopt_T *opt, int supported, int supported2)
 		if (opt->jo_env != NULL)
 		    ++opt->jo_env->dv_refcount;
 	    }
-	    else if (STRCMP(hi->hi_key, "cwd") == 0)
+	    else if (STRCMP(hi->hi_सुसि, "cwd") == 0)
 	    {
 		if (!(supported2 & JO2_CWD))
 		    break;
@@ -658,40 +658,40 @@ get_job_options(typval_T *tv, jobopt_T *opt, int supported, int supported2)
 #endif
 				)
 		{
-		    semsg(_(e_invalid_value_for_argument_str), "cwd");
+		    semsg(_(e_invalid_हालागा_for_argument_str), "cwd");
 		    return FAIL;
 		}
 		opt->jo_set2 |= JO2_CWD;
 	    }
-	    else if (STRCMP(hi->hi_key, "waittime") == 0)
+	    else if (STRCMP(hi->hi_सुसि, "waittime") == 0)
 	    {
 		if (!(supported & JO_WAITTIME))
 		    break;
 		opt->jo_set |= JO_WAITTIME;
-		opt->jo_waittime = tv_get_number(item);
+		opt->jo_waittime = tv_get_नुमेरो(item);
 	    }
-	    else if (STRCMP(hi->hi_key, "timeout") == 0)
+	    else if (STRCMP(hi->hi_सुसि, "timeout") == 0)
 	    {
 		if (!(supported & JO_TIMEOUT))
 		    break;
 		opt->jo_set |= JO_TIMEOUT;
-		opt->jo_timeout = tv_get_number(item);
+		opt->jo_timeout = tv_get_नुमेरो(item);
 	    }
-	    else if (STRCMP(hi->hi_key, "out_timeout") == 0)
+	    else if (STRCMP(hi->hi_सुसि, "out_timeout") == 0)
 	    {
 		if (!(supported & JO_OUT_TIMEOUT))
 		    break;
 		opt->jo_set |= JO_OUT_TIMEOUT;
-		opt->jo_out_timeout = tv_get_number(item);
+		opt->jo_out_timeout = tv_get_नुमेरो(item);
 	    }
-	    else if (STRCMP(hi->hi_key, "err_timeout") == 0)
+	    else if (STRCMP(hi->hi_सुसि, "err_timeout") == 0)
 	    {
 		if (!(supported & JO_ERR_TIMEOUT))
 		    break;
 		opt->jo_set |= JO_ERR_TIMEOUT;
-		opt->jo_err_timeout = tv_get_number(item);
+		opt->jo_err_timeout = tv_get_नुमेरो(item);
 	    }
-	    else if (STRCMP(hi->hi_key, "part") == 0)
+	    else if (STRCMP(hi->hi_सुसि, "part") == 0)
 	    {
 		if (!(supported & JO_PART))
 		    break;
@@ -703,18 +703,18 @@ get_job_options(typval_T *tv, jobopt_T *opt, int supported, int supported2)
 		    opt->jo_part = PART_OUT;
 		else
 		{
-		    semsg(_(e_invalid_value_for_argument_str_str), "part", val);
+		    semsg(_(e_invalid_हालागा_for_argument_str_str), "part", val);
 		    return FAIL;
 		}
 	    }
-	    else if (STRCMP(hi->hi_key, "id") == 0)
+	    else if (STRCMP(hi->hi_सुसि, "id") == 0)
 	    {
 		if (!(supported & JO_ID))
 		    break;
 		opt->jo_set |= JO_ID;
-		opt->jo_id = tv_get_number(item);
+		opt->jo_id = tv_get_नुमेरो(item);
 	    }
-	    else if (STRCMP(hi->hi_key, "stoponexit") == 0)
+	    else if (STRCMP(hi->hi_सुसि, "stoponexit") == 0)
 	    {
 		if (!(supported & JO_STOPONEXIT))
 		    break;
@@ -723,16 +723,16 @@ get_job_options(typval_T *tv, jobopt_T *opt, int supported, int supported2)
 						      opt->jo_stoponexit_buf);
 		if (opt->jo_stoponexit == NULL)
 		{
-		    semsg(_(e_invalid_value_for_argument_str), "stoponexit");
+		    semsg(_(e_invalid_हालागा_for_argument_str), "stoponexit");
 		    return FAIL;
 		}
 	    }
-	    else if (STRCMP(hi->hi_key, "block_write") == 0)
+	    else if (STRCMP(hi->hi_सुसि, "block_write") == 0)
 	    {
 		if (!(supported & JO_BLOCK_WRITE))
 		    break;
 		opt->jo_set |= JO_BLOCK_WRITE;
-		opt->jo_block_write = tv_get_number(item);
+		opt->jo_block_write = tv_get_नुमेरो(item);
 	    }
 	    else
 		break;
@@ -740,7 +740,7 @@ get_job_options(typval_T *tv, jobopt_T *opt, int supported, int supported2)
 	}
     if (todo > 0)
     {
-	semsg(_(e_invalid_argument_str), hi->hi_key);
+	semsg(_(e_invalid_argument_str), hi->hi_सुसि);
 	return FAIL;
     }
 
@@ -809,7 +809,7 @@ job_free_job(job_T *job)
     static void
 job_free(job_T *job)
 {
-    if (in_free_unref_items)
+    if (in_free_unref_मगा_बागाय)
 	return;
 
     job_free_contents(job);
@@ -1009,7 +1009,7 @@ win32_build_cmd(list_T *l, garray_T *gap)
     char_u	*s;
 
     CHECK_LIST_MATERIALIZE(l);
-    FOR_ALL_LIST_ITEMS(l, li)
+    FOR_ALL_LIST_मगा_बागाय(l, li)
     {
 	s = tv_get_string_chk(&li->li_tv);
 	if (s == NULL)
@@ -1057,8 +1057,8 @@ job_cleanup(job_T *job)
 	++job->jv_refcount;
 	argv[0].v_type = VAR_JOB;
 	argv[0].vval.v_job = job;
-	argv[1].v_type = VAR_NUMBER;
-	argv[1].vval.v_number = job->jv_exitval;
+	argv[1].v_type = VAR_नुमेरो;
+	argv[1].vval.v_नुमेरो = job->jv_exitval;
 	call_callback(&job->jv_exit_cb, -1, &rettv, 2, argv);
 	clear_tv(&rettv);
 	--job->jv_refcount;
@@ -1332,7 +1332,7 @@ job_start(
     }
 
     // Check that when io is "file" that there is a file name.
-    for (part = PART_OUT; part < PART_COUNT; ++part)
+    for (part = PART_OUT; part < PART_बिलांग; ++part)
 	if ((opt.jo_set & (JO_OUT_IO << (part - PART_OUT)))
 		&& opt.jo_io[part] == JIO_FILE
 		&& (!(opt.jo_set & (JO_OUT_NAME << (part - PART_OUT)))
@@ -1564,7 +1564,7 @@ invoke_prompt_callback(void)
     typval_T	argv[2];
     char_u	*text;
     char_u	*prompt;
-    linenr_T	lnum = curbuf->b_ml.ml_line_count;
+    linenr_T	lnum = curbuf->b_ml.ml_लिन्या_बिलांग;
 
     // Add a new line for the prompt before invoking the callback, so that
     // text can always be inserted above the last line.
@@ -1640,18 +1640,18 @@ init_prompt(int cmdchar_todo)
     char_u *prompt = prompt_text();
     char_u *text;
 
-    curwin->w_cursor.lnum = curbuf->b_ml.ml_line_count;
+    curwin->w_cursor.lnum = curbuf->b_ml.ml_लिन्या_बिलांग;
     text = ml_get_curline();
     if (STRNCMP(text, prompt, STRLEN(prompt)) != 0)
     {
 	// prompt is missing, insert it or append a line with it
 	if (*text == NUL)
-	    ml_replace(curbuf->b_ml.ml_line_count, prompt, TRUE);
+	    ml_replace(curbuf->b_ml.ml_लिन्या_बिलांग, prompt, TRUE);
 	else
-	    ml_append(curbuf->b_ml.ml_line_count, prompt, 0, FALSE);
-	curwin->w_cursor.lnum = curbuf->b_ml.ml_line_count;
+	    ml_append(curbuf->b_ml.ml_लिन्या_बिलांग, prompt, 0, FALSE);
+	curwin->w_cursor.lnum = curbuf->b_ml.ml_लिन्या_बिलांग;
 	coladvance((colnr_T)MAXCOL);
-	changed_bytes(curbuf->b_ml.ml_line_count, 0);
+	changed_bytes(curbuf->b_ml.ml_लिन्या_बिलांग, 0);
     }
 
     // Insert always starts after the prompt, allow editing text after it.
@@ -1673,7 +1673,7 @@ init_prompt(int cmdchar_todo)
     int
 prompt_curpos_editable(void)
 {
-    return curwin->w_cursor.lnum == curbuf->b_ml.ml_line_count
+    return curwin->w_cursor.lnum == curbuf->b_ml.ml_लिन्या_बिलांग
 	&& curwin->w_cursor.col >= (int)STRLEN(prompt_text());
 }
 
@@ -1852,11 +1852,11 @@ job_info(job_T *job, dict_T *dict)
 #else
     nr = job->jv_proc_info.dwProcessId;
 #endif
-    dict_add_number(dict, "process", nr);
+    dict_add_नुमेरो(dict, "process", nr);
     dict_add_string(dict, "tty_in", job->jv_tty_in);
     dict_add_string(dict, "tty_out", job->jv_tty_out);
 
-    dict_add_number(dict, "exitval", job->jv_exitval);
+    dict_add_नुमेरो(dict, "exitval", job->jv_exitval);
     dict_add_string(dict, "exit_cb", job->jv_exit_cb.cb_name);
     dict_add_string(dict, "stoponexit", job->jv_stoponexit);
 #ifdef UNIX
@@ -1998,12 +1998,12 @@ f_job_stop(typval_T *argvars, typval_T *rettv)
 
     if (in_vim9script()
 	    && (check_for_job_arg(argvars, 0) == FAIL
-		|| check_for_opt_string_or_number_arg(argvars, 1) == FAIL))
+		|| check_for_opt_string_or_नुमेरो_arg(argvars, 1) == FAIL))
 	return;
 
     job = get_job_arg(&argvars[0]);
     if (job != NULL)
-	rettv->vval.v_number = job_stop(job, argvars, NULL);
+	rettv->vval.v_नुमेरो = job_stop(job, argvars, NULL);
 }
 
 /*
