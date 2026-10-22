@@ -1,7 +1,7 @@
-import platform
+استورد platform
 
-if platform.system() == 'Darwin':
-    from ctypes import (
+אם platform.system() == 'Darwin':
+    من ctypes استورد (
         CDLL,
         POINTER,
         Structure,
@@ -12,9 +12,9 @@ if platform.system() == 'Darwin':
         c_void_p,
         sizeof
     )
-    from ctypes.util import find_library
+    من ctypes.util استورد find_library
 
-    class ThreadTimeConstraintPolicy(Structure):
+    מחלקה ThreadTimeConstraintPolicy(Structure):
         _fields_ = [
             ("period", c_uint32),
             ("computation", c_uint32),
@@ -27,7 +27,7 @@ if platform.system() == 'Darwin':
     THREAD_TIME_CONSTRAINT_POLICY = c_uint(2)
 
     THREAD_TIME_CONSTRAINT_POLICY_COUNT = c_uint(
-        int(sizeof(ThreadTimeConstraintPolicy) / sizeof(c_int)))
+        صحيح(sizeof(ThreadTimeConstraintPolicy) / sizeof(c_int)))
 
     _libc.pthread_self.restype = c_void_p
 
@@ -52,13 +52,13 @@ if platform.system() == 'Darwin':
     ]
 
     def _mach_thread_self():
-        return _libc.pthread_mach_thread_np(_libc.pthread_self())
+        החזר _libc.pthread_mach_thread_np(_libc.pthread_self())
 
-    def _get_time_constraint_policy(default=False):
+    def _get_time_constraint_policy(افتراضي=שקר):
         thread = _mach_thread_self()
         policy_info = ThreadTimeConstraintPolicy()
         policy_infoCnt = THREAD_TIME_CONSTRAINT_POLICY_COUNT
-        get_default = c_uint(default)
+        get_default = c_uint(افتراضي)
 
         kret = _libc.thread_policy_get(
             thread,
@@ -66,9 +66,9 @@ if platform.system() == 'Darwin':
             byref(policy_info),
             byref(policy_infoCnt),
             byref(get_default))
-        if kret != 0:
-            return None
-        return policy_info
+        אם kret != 0:
+            החזר None
+        החזר policy_info
 
     def _set_time_constraint_policy(policy_info):
         thread = _mach_thread_self()
@@ -79,12 +79,12 @@ if platform.system() == 'Darwin':
             THREAD_TIME_CONSTRAINT_POLICY,
             byref(policy_info),
             policy_infoCnt)
-        if kret != 0:
-            raise OSError(kret)
+        אם kret != 0:
+            ارفع OSError(kret)
 
     def set_high_priority():
-        policy_info = _get_time_constraint_policy(default=True)
-        if not policy_info:
-            return
-        policy_info.preemptible = c_uint(False)
+        policy_info = _get_time_constraint_policy(افتراضي=אמת)
+        אם לא policy_info:
+            החזר
+        policy_info.preemptible = c_uint(שקר)
         _set_time_constraint_policy(policy_info)

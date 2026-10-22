@@ -76,8 +76,8 @@
 
 // INTRINSIC.H omits proto if XtFree is defined
 // VMS_BEGIN_C_PLUS_PLUS
-extern void XtFree(char*);
-extern void XTFREE(char*);
+خارجي فراغ XtFree(حرف*);
+خارجي فراغ XTFREE(حرف*);
 // VMS_END_C_PLUS_PLUS
 
 #define _XRegisterFilterByType _XREGISTERFILTERBYTYPE
@@ -723,7 +723,7 @@ extern void XTFREE(char*);
 // R5 or earlier
 #define _XtRegisterWindow _XTREGISTERWINDOW
 #define _XtUnregisterWindow _XTUNREGISTERWINDOW
-#else
+#אחרת
 // R6 or later
 #define XtRegisterDrawable XTREGISTERDRAWABLE
 #define XtUnregisterDrawable XTUNREGISTERDRAWABLE

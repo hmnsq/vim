@@ -10,83 +10,83 @@
  * Implements starting jobs and controlling them.
  */
 
-#include "vim.h"
+#ضمن "vim.h"
 
-#if defined(FEAT_JOB_CHANNEL)
+#אם defined(FEAT_JOB_CHANNEL)
 
 #define FOR_ALL_JOBS(job) \
-    for ((job) = first_job; (job) != NULL; (job) = (job)->jv_next)
+    עבור ((job) = first_job; (job) != عدم; (job) = (job)->jv_next)
 
-    static int
-handle_mode(typval_T *item, jobopt_T *opt, ch_mode_T *modep, int jo)
+    ساكن صحيح
+handle_mode(typval_T *item, jobopt_T *opt, ch_mode_T *modep, صحيح jo)
 {
     char_u	*val = tv_get_string(item);
 
     opt->jo_set |= jo;
-    if (STRCMP(val, "nl") == 0)
+    אם (STRCMP(val, "nl") == 0)
 	*modep = CH_MODE_NL;
-    else if (STRCMP(val, "raw") == 0)
+    אחרת אם (STRCMP(val, "raw") == 0)
 	*modep = CH_MODE_RAW;
-    else if (STRCMP(val, "blob") == 0)
+    אחרת אם (STRCMP(val, "blob") == 0)
 	*modep = CH_MODE_BLOB;
-    else if (STRCMP(val, "js") == 0)
+    אחרת אם (STRCMP(val, "js") == 0)
 	*modep = CH_MODE_JS;
-    else if (STRCMP(val, "json") == 0)
+    אחרת אם (STRCMP(val, "json") == 0)
 	*modep = CH_MODE_JSON;
-    else if (STRCMP(val, "lsp") == 0)
+    אחרת אם (STRCMP(val, "lsp") == 0)
 	*modep = CH_MODE_LSP;
-    else if (STRCMP(val, "dap") == 0)
+    אחרת אם (STRCMP(val, "dap") == 0)
 	*modep = CH_MODE_DAP;
-    else
+    אחרת
     {
 	semsg(_(e_invalid_argument_str), val);
-	return FAIL;
+	החזר FAIL;
     }
-    return OK;
+    החזר OK;
 }
 
-    static int
+    ساكن صحيح
 handle_io(typval_T *item, ch_part_T part, jobopt_T *opt)
 {
     char_u	*val = tv_get_string(item);
 
     opt->jo_set |= JO_OUT_IO << (part - PART_OUT);
-    if (STRCMP(val, "null") == 0)
+    אם (STRCMP(val, "null") == 0)
 	opt->jo_io[part] = JIO_NULL;
-    else if (STRCMP(val, "pipe") == 0)
+    אחרת אם (STRCMP(val, "pipe") == 0)
 	opt->jo_io[part] = JIO_PIPE;
-    else if (STRCMP(val, "file") == 0)
+    אחרת אם (STRCMP(val, "file") == 0)
 	opt->jo_io[part] = JIO_FILE;
-    else if (STRCMP(val, "buffer") == 0)
+    אחרת אם (STRCMP(val, "buffer") == 0)
 	opt->jo_io[part] = JIO_BUFFER;
-    else if (STRCMP(val, "out") == 0 && part == PART_ERR)
+    אחרת אם (STRCMP(val, "out") == 0 && part == PART_ERR)
 	opt->jo_io[part] = JIO_OUT;
-    else
+    אחרת
     {
 	semsg(_(e_invalid_argument_str), val);
-	return FAIL;
+	החזר FAIL;
     }
-    return OK;
+    החזר OK;
 }
 
 /*
  * Clear a jobopt_T before using it.
  */
-    void
+    فراغ
 clear_job_options(jobopt_T *opt)
 {
     CLEAR_POINTER(opt);
 }
 
-    static void
+    ساكن فراغ
 unref_job_callback(callback_T *cb)
 {
-    if (cb->cb_partial != NULL)
+    אם (cb->cb_partial != عدم)
 	partial_unref(cb->cb_partial);
-    else if (cb->cb_name != NULL)
+    אחרת אם (cb->cb_name != عدم)
     {
 	func_unref(cb->cb_name);
-	if (cb->cb_free_name)
+	אם (cb->cb_free_name)
 	    vim_free(cb->cb_name);
     }
 }
@@ -94,7 +94,7 @@ unref_job_callback(callback_T *cb)
 /*
  * Free any members of a jobopt_T.
  */
-    void
+    فراغ
 free_job_options(jobopt_T *opt)
 {
     unref_job_callback(&opt->jo_callback);
@@ -103,17 +103,17 @@ free_job_options(jobopt_T *opt)
     unref_job_callback(&opt->jo_close_cb);
     unref_job_callback(&opt->jo_exit_cb);
 
-    if (opt->jo_env != NULL)
+    אם (opt->jo_env != عدم)
 	dict_unref(opt->jo_env);
 }
 
 /*
  * Get the PART_ number from the first character of an option name.
  */
-    static int
-part_from_char(int c)
+    ساكن صحيح
+part_from_char(صحيح c)
 {
-    return c == 'i' ? PART_IN : c == 'o' ? PART_OUT: PART_ERR;
+    החזר c == 'i' ? PART_IN : c == 'o' ? PART_OUT: PART_ERR;
 }
 
 /*
@@ -122,647 +122,647 @@ part_from_char(int c)
  * Only accept JO_ options in "supported" and JO2_ options in "supported2".
  * If an option value is invalid return FAIL.
  */
-    int
-get_job_options(typval_T *tv, jobopt_T *opt, int supported, int supported2)
+    صحيح
+get_job_options(typval_T *tv, jobopt_T *opt, صحيح supported, صحيح supported2)
 {
     typval_T	*item;
     char_u	*val;
     dict_T	*dict;
-    int		todo;
+    صحيح		todo;
     hashitem_T	*hi;
     ch_part_T	part;
 
-    if (tv->v_type == VAR_UNKNOWN)
-	return OK;
-    if (tv->v_type != VAR_DICT)
+    אם (tv->v_type == VAR_UNKNOWN)
+	החזר OK;
+    אם (tv->v_type != VAR_DICT)
     {
 	emsg(_(e_dictionary_required));
-	return FAIL;
+	החזר FAIL;
     }
     dict = tv->vval.v_dict;
-    if (dict == NULL)
-	return OK;
+    אם (dict == عدم)
+	החזר OK;
 
-    todo = (int)dict->dv_hashtab.ht_used;
+    todo = (صحيح)dict->dv_hashtab.ht_used;
     FOR_ALL_HASHTAB_ITEMS(&dict->dv_hashtab, hi, todo)
-	if (!HASHITEM_EMPTY(hi))
+	אם (!HASHITEM_EMPTY(hi))
 	{
 	    item = &dict_lookup(hi)->di_tv;
 
-	    if (STRCMP(hi->hi_key, "mode") == 0)
+	    אם (STRCMP(hi->hi_key, "mode") == 0)
 	    {
-		if (!(supported & JO_MODE))
-		    break;
-		if (handle_mode(item, opt, &opt->jo_mode, JO_MODE) == FAIL)
-		    return FAIL;
+		אם (!(supported & JO_MODE))
+		    اكسر;
+		אם (handle_mode(item, opt, &opt->jo_mode, JO_MODE) == FAIL)
+		    החזר FAIL;
 	    }
-	    else if (STRCMP(hi->hi_key, "in_mode") == 0)
+	    אחרת אם (STRCMP(hi->hi_key, "in_mode") == 0)
 	    {
-		if (!(supported & JO_IN_MODE))
-		    break;
-		if (handle_mode(item, opt, &opt->jo_in_mode, JO_IN_MODE)
+		אם (!(supported & JO_IN_MODE))
+		    اكسر;
+		אם (handle_mode(item, opt, &opt->jo_in_mode, JO_IN_MODE)
 								      == FAIL)
-		    return FAIL;
+		    החזר FAIL;
 	    }
-	    else if (STRCMP(hi->hi_key, "out_mode") == 0)
+	    אחרת אם (STRCMP(hi->hi_key, "out_mode") == 0)
 	    {
-		if (!(supported & JO_OUT_MODE))
-		    break;
-		if (handle_mode(item, opt, &opt->jo_out_mode, JO_OUT_MODE)
+		אם (!(supported & JO_OUT_MODE))
+		    اكسر;
+		אם (handle_mode(item, opt, &opt->jo_out_mode, JO_OUT_MODE)
 								      == FAIL)
-		    return FAIL;
+		    החזר FAIL;
 	    }
-	    else if (STRCMP(hi->hi_key, "err_mode") == 0)
+	    אחרת אם (STRCMP(hi->hi_key, "err_mode") == 0)
 	    {
-		if (!(supported & JO_ERR_MODE))
-		    break;
-		if (handle_mode(item, opt, &opt->jo_err_mode, JO_ERR_MODE)
+		אם (!(supported & JO_ERR_MODE))
+		    اكسر;
+		אם (handle_mode(item, opt, &opt->jo_err_mode, JO_ERR_MODE)
 								      == FAIL)
-		    return FAIL;
+		    החזר FAIL;
 	    }
-	    else if (STRCMP(hi->hi_key, "noblock") == 0)
+	    אחרת אם (STRCMP(hi->hi_key, "noblock") == 0)
 	    {
-		if (!(supported & JO_MODE))
-		    break;
+		אם (!(supported & JO_MODE))
+		    اكسر;
 		opt->jo_noblock = tv_get_bool(item);
 	    }
-	    else if (STRCMP(hi->hi_key, "in_io") == 0
+	    אחרת אם (STRCMP(hi->hi_key, "in_io") == 0
 		    || STRCMP(hi->hi_key, "out_io") == 0
 		    || STRCMP(hi->hi_key, "err_io") == 0)
 	    {
-		if (!(supported & JO_OUT_IO))
-		    break;
-		if (handle_io(item, part_from_char(*hi->hi_key), opt) == FAIL)
-		    return FAIL;
+		אם (!(supported & JO_OUT_IO))
+		    اكسر;
+		אם (handle_io(item, part_from_char(*hi->hi_key), opt) == FAIL)
+		    החזר FAIL;
 	    }
-	    else if (STRCMP(hi->hi_key, "in_name") == 0
+	    אחרת אם (STRCMP(hi->hi_key, "in_name") == 0
 		    || STRCMP(hi->hi_key, "out_name") == 0
 		    || STRCMP(hi->hi_key, "err_name") == 0)
 	    {
 		part = part_from_char(*hi->hi_key);
 
-		if (!(supported & JO_OUT_IO))
-		    break;
+		אם (!(supported & JO_OUT_IO))
+		    اكسر;
 		opt->jo_set |= JO_OUT_NAME << (part - PART_OUT);
 		opt->jo_io_name[part] = tv_get_string_buf_chk(item,
 						   opt->jo_io_name_buf[part]);
 	    }
-	    else if (STRCMP(hi->hi_key, "pty") == 0)
+	    אחרת אם (STRCMP(hi->hi_key, "pty") == 0)
 	    {
-		if (!(supported & JO_MODE))
-		    break;
+		אם (!(supported & JO_MODE))
+		    اكسر;
 		opt->jo_pty = tv_get_bool(item);
 	    }
-	    else if (STRCMP(hi->hi_key, "in_buf") == 0
+	    אחרת אם (STRCMP(hi->hi_key, "in_buf") == 0
 		    || STRCMP(hi->hi_key, "out_buf") == 0
 		    || STRCMP(hi->hi_key, "err_buf") == 0)
 	    {
 		part = part_from_char(*hi->hi_key);
 
-		if (!(supported & JO_OUT_IO))
-		    break;
+		אם (!(supported & JO_OUT_IO))
+		    اكسر;
 		opt->jo_set |= JO_OUT_BUF << (part - PART_OUT);
 		opt->jo_io_buf[part] = tv_get_number(item);
-		if (opt->jo_io_buf[part] <= 0)
+		אם (opt->jo_io_buf[part] <= 0)
 		{
 		    semsg(_(e_invalid_value_for_argument_str_str),
 					      hi->hi_key, tv_get_string(item));
-		    return FAIL;
+		    החזר FAIL;
 		}
-		if (buflist_findnr(opt->jo_io_buf[part]) == NULL)
+		אם (buflist_findnr(opt->jo_io_buf[part]) == عدم)
 		{
 		    semsg(_(e_buffer_nr_does_not_exist),
 						   (long)opt->jo_io_buf[part]);
-		    return FAIL;
+		    החזר FAIL;
 		}
 	    }
-	    else if (STRCMP(hi->hi_key, "out_modifiable") == 0
+	    אחרת אם (STRCMP(hi->hi_key, "out_modifiable") == 0
 		    || STRCMP(hi->hi_key, "err_modifiable") == 0)
 	    {
 		part = part_from_char(*hi->hi_key);
 
-		if (!(supported & JO_OUT_IO))
-		    break;
+		אם (!(supported & JO_OUT_IO))
+		    اكسر;
 		opt->jo_set |= JO_OUT_MODIFIABLE << (part - PART_OUT);
 		opt->jo_modifiable[part] = tv_get_bool(item);
 	    }
-	    else if (STRCMP(hi->hi_key, "out_msg") == 0
+	    אחרת אם (STRCMP(hi->hi_key, "out_msg") == 0
 		    || STRCMP(hi->hi_key, "err_msg") == 0)
 	    {
 		part = part_from_char(*hi->hi_key);
 
-		if (!(supported & JO_OUT_IO))
-		    break;
+		אם (!(supported & JO_OUT_IO))
+		    اكسر;
 		opt->jo_set2 |= JO2_OUT_MSG << (part - PART_OUT);
 		opt->jo_message[part] = tv_get_bool(item);
 	    }
-	    else if (STRCMP(hi->hi_key, "in_top") == 0
+	    אחרת אם (STRCMP(hi->hi_key, "in_top") == 0
 		    || STRCMP(hi->hi_key, "in_bot") == 0)
 	    {
 		linenr_T *lp;
 
-		if (!(supported & JO_OUT_IO))
-		    break;
-		if (hi->hi_key[3] == 't')
+		אם (!(supported & JO_OUT_IO))
+		    اكسر;
+		אם (hi->hi_key[3] == 't')
 		{
 		    lp = &opt->jo_in_top;
 		    opt->jo_set |= JO_IN_TOP;
 		}
-		else
+		אחרת
 		{
 		    lp = &opt->jo_in_bot;
 		    opt->jo_set |= JO_IN_BOT;
 		}
 		*lp = tv_get_number(item);
-		if (*lp < 0)
+		אם (*lp < 0)
 		{
 		    semsg(_(e_invalid_value_for_argument_str_str),
 					      hi->hi_key, tv_get_string(item));
-		    return FAIL;
+		    החזר FAIL;
 		}
 	    }
-	    else if (STRCMP(hi->hi_key, "channel") == 0)
+	    אחרת אם (STRCMP(hi->hi_key, "channel") == 0)
 	    {
-		if (!(supported & JO_OUT_IO))
-		    break;
+		אם (!(supported & JO_OUT_IO))
+		    اكسر;
 		opt->jo_set |= JO_CHANNEL;
-		if (item->v_type != VAR_CHANNEL)
+		אם (item->v_type != VAR_CHANNEL)
 		{
 		    semsg(_(e_invalid_value_for_argument_str), "channel");
-		    return FAIL;
+		    החזר FAIL;
 		}
 		opt->jo_channel = item->vval.v_channel;
 	    }
-	    else if (STRCMP(hi->hi_key, "callback") == 0)
+	    אחרת אם (STRCMP(hi->hi_key, "callback") == 0)
 	    {
-		if (!(supported & JO_CALLBACK))
-		    break;
+		אם (!(supported & JO_CALLBACK))
+		    اكسر;
 		opt->jo_set |= JO_CALLBACK;
 		opt->jo_callback = get_callback(item);
-		if (opt->jo_callback.cb_name == NULL)
+		אם (opt->jo_callback.cb_name == عدم)
 		{
 		    semsg(_(e_invalid_value_for_argument_str), "callback");
-		    return FAIL;
+		    החזר FAIL;
 		}
 	    }
-	    else if (STRCMP(hi->hi_key, "out_cb") == 0)
+	    אחרת אם (STRCMP(hi->hi_key, "out_cb") == 0)
 	    {
-		if (!(supported & JO_OUT_CALLBACK))
-		    break;
+		אם (!(supported & JO_OUT_CALLBACK))
+		    اكسر;
 		opt->jo_set |= JO_OUT_CALLBACK;
 		opt->jo_out_cb = get_callback(item);
-		if (opt->jo_out_cb.cb_name == NULL)
+		אם (opt->jo_out_cb.cb_name == عدم)
 		{
 		    semsg(_(e_invalid_value_for_argument_str), "out_cb");
-		    return FAIL;
+		    החזר FAIL;
 		}
 	    }
-	    else if (STRCMP(hi->hi_key, "err_cb") == 0)
+	    אחרת אם (STRCMP(hi->hi_key, "err_cb") == 0)
 	    {
-		if (!(supported & JO_ERR_CALLBACK))
-		    break;
+		אם (!(supported & JO_ERR_CALLBACK))
+		    اكسر;
 		opt->jo_set |= JO_ERR_CALLBACK;
 		opt->jo_err_cb = get_callback(item);
-		if (opt->jo_err_cb.cb_name == NULL)
+		אם (opt->jo_err_cb.cb_name == عدم)
 		{
 		    semsg(_(e_invalid_value_for_argument_str), "err_cb");
-		    return FAIL;
+		    החזר FAIL;
 		}
 	    }
-	    else if (STRCMP(hi->hi_key, "close_cb") == 0)
+	    אחרת אם (STRCMP(hi->hi_key, "close_cb") == 0)
 	    {
-		if (!(supported & JO_CLOSE_CALLBACK))
-		    break;
+		אם (!(supported & JO_CLOSE_CALLBACK))
+		    اكسر;
 		opt->jo_set |= JO_CLOSE_CALLBACK;
 		opt->jo_close_cb = get_callback(item);
-		if (opt->jo_close_cb.cb_name == NULL)
+		אם (opt->jo_close_cb.cb_name == عدم)
 		{
 		    semsg(_(e_invalid_value_for_argument_str), "close_cb");
-		    return FAIL;
+		    החזר FAIL;
 		}
 	    }
-	    else if (STRCMP(hi->hi_key, "drop") == 0)
+	    אחרת אם (STRCMP(hi->hi_key, "drop") == 0)
 	    {
-		int never = FALSE;
+		صحيح never = FALSE;
 		val = tv_get_string(item);
 
-		if (STRCMP(val, "never") == 0)
+		אם (STRCMP(val, "never") == 0)
 		    never = TRUE;
-		else if (STRCMP(val, "auto") != 0)
+		אחרת אם (STRCMP(val, "auto") != 0)
 		{
 		    semsg(_(e_invalid_value_for_argument_str_str), "drop", val);
-		    return FAIL;
+		    החזר FAIL;
 		}
 		opt->jo_drop_never = never;
 	    }
-	    else if (STRCMP(hi->hi_key, "exit_cb") == 0)
+	    אחרת אם (STRCMP(hi->hi_key, "exit_cb") == 0)
 	    {
-		if (!(supported & JO_EXIT_CB))
-		    break;
+		אם (!(supported & JO_EXIT_CB))
+		    اكسر;
 		opt->jo_set |= JO_EXIT_CB;
 		opt->jo_exit_cb = get_callback(item);
-		if (opt->jo_exit_cb.cb_name == NULL)
+		אם (opt->jo_exit_cb.cb_name == عدم)
 		{
 		    semsg(_(e_invalid_value_for_argument_str), "exit_cb");
-		    return FAIL;
+		    החזר FAIL;
 		}
 	    }
 #ifdef FEAT_TERMINAL
-	    else if (STRCMP(hi->hi_key, "term_name") == 0)
+	    אחרת אם (STRCMP(hi->hi_key, "term_name") == 0)
 	    {
-		if (!(supported2 & JO2_TERM_NAME))
-		    break;
+		אם (!(supported2 & JO2_TERM_NAME))
+		    اكسر;
 		opt->jo_set2 |= JO2_TERM_NAME;
 		opt->jo_term_name = tv_get_string_buf_chk(item,
 						       opt->jo_term_name_buf);
-		if (opt->jo_term_name == NULL)
+		אם (opt->jo_term_name == عدم)
 		{
 		    semsg(_(e_invalid_value_for_argument_str), "term_name");
-		    return FAIL;
+		    החזר FAIL;
 		}
 	    }
-	    else if (STRCMP(hi->hi_key, "term_finish") == 0)
+	    אחרת אם (STRCMP(hi->hi_key, "term_finish") == 0)
 	    {
-		if (!(supported2 & JO2_TERM_FINISH))
-		    break;
+		אם (!(supported2 & JO2_TERM_FINISH))
+		    اكسر;
 		val = tv_get_string(item);
-		if (STRCMP(val, "open") != 0 && STRCMP(val, "close") != 0
+		אם (STRCMP(val, "open") != 0 && STRCMP(val, "close") != 0
 			&& STRCMP(val, "noclose") != 0)
 		{
 		    semsg(_(e_invalid_value_for_argument_str_str),
 							   "term_finish", val);
-		    return FAIL;
+		    החזר FAIL;
 		}
 		opt->jo_set2 |= JO2_TERM_FINISH;
 		opt->jo_term_finish = *val;
 	    }
-	    else if (STRCMP(hi->hi_key, "term_opencmd") == 0)
+	    אחרת אם (STRCMP(hi->hi_key, "term_opencmd") == 0)
 	    {
 		char_u *p;
 
-		if (!(supported2 & JO2_TERM_OPENCMD))
-		    break;
+		אם (!(supported2 & JO2_TERM_OPENCMD))
+		    اكسر;
 		opt->jo_set2 |= JO2_TERM_OPENCMD;
 		p = opt->jo_term_opencmd = tv_get_string_buf_chk(item,
 						    opt->jo_term_opencmd_buf);
-		if (p != NULL)
+		אם (p != عدم)
 		{
 		    // Must have %d and no other %.
 		    p = vim_strchr(p, '%');
-		    if (p != NULL && (p[1] != 'd'
-					    || vim_strchr(p + 2, '%') != NULL))
-			p = NULL;
+		    אם (p != عدم && (p[1] != 'd'
+					    || vim_strchr(p + 2, '%') != عدم))
+			p = عدم;
 		}
-		if (p == NULL)
+		אם (p == عدم)
 		{
 		    semsg(_(e_invalid_value_for_argument_str), "term_opencmd");
-		    return FAIL;
+		    החזר FAIL;
 		}
 	    }
-	    else if (STRCMP(hi->hi_key, "eof_chars") == 0)
+	    אחרת אם (STRCMP(hi->hi_key, "eof_chars") == 0)
 	    {
-		if (!(supported2 & JO2_EOF_CHARS))
-		    break;
+		אם (!(supported2 & JO2_EOF_CHARS))
+		    اكسر;
 		opt->jo_set2 |= JO2_EOF_CHARS;
 		opt->jo_eof_chars = tv_get_string_buf_chk(item,
 						       opt->jo_eof_chars_buf);
-		if (opt->jo_eof_chars == NULL)
+		אם (opt->jo_eof_chars == عدم)
 		{
 		    semsg(_(e_invalid_value_for_argument_str), "eof_chars");
-		    return FAIL;
+		    החזר FAIL;
 		}
 	    }
-	    else if (STRCMP(hi->hi_key, "term_rows") == 0)
+	    אחרת אם (STRCMP(hi->hi_key, "term_rows") == 0)
 	    {
-		int error = FALSE;
+		صحيح error = FALSE;
 
-		if (!(supported2 & JO2_TERM_ROWS))
-		    break;
+		אם (!(supported2 & JO2_TERM_ROWS))
+		    اكسر;
 		opt->jo_set2 |= JO2_TERM_ROWS;
 		opt->jo_term_rows = tv_get_number_chk(item, &error);
-		if (error)
-		    return FAIL;
-		if (opt->jo_term_rows < 0 || opt->jo_term_rows > 1000)
+		אם (error)
+		    החזר FAIL;
+		אם (opt->jo_term_rows < 0 || opt->jo_term_rows > 1000)
 		{
 		    semsg(_(e_invalid_value_for_argument_str), "term_rows");
-		    return FAIL;
+		    החזר FAIL;
 		}
 	    }
-	    else if (STRCMP(hi->hi_key, "term_cols") == 0)
+	    אחרת אם (STRCMP(hi->hi_key, "term_cols") == 0)
 	    {
-		int error = FALSE;
+		صحيح error = FALSE;
 
-		if (!(supported2 & JO2_TERM_COLS))
-		    break;
+		אם (!(supported2 & JO2_TERM_COLS))
+		    اكسر;
 		opt->jo_set2 |= JO2_TERM_COLS;
 		opt->jo_term_cols = tv_get_number_chk(item, &error);
-		if (error)
-		    return FAIL;
-		if (opt->jo_term_cols < 0 || opt->jo_term_cols > 1000)
+		אם (error)
+		    החזר FAIL;
+		אם (opt->jo_term_cols < 0 || opt->jo_term_cols > 1000)
 		{
 		    semsg(_(e_invalid_value_for_argument_str), "term_cols");
-		    return FAIL;
+		    החזר FAIL;
 		}
 	    }
-	    else if (STRCMP(hi->hi_key, "vertical") == 0)
+	    אחרת אם (STRCMP(hi->hi_key, "vertical") == 0)
 	    {
-		if (!(supported2 & JO2_VERTICAL))
-		    break;
+		אם (!(supported2 & JO2_VERTICAL))
+		    اكسر;
 		opt->jo_set2 |= JO2_VERTICAL;
 		opt->jo_vertical = tv_get_bool(item);
 	    }
-	    else if (STRCMP(hi->hi_key, "curwin") == 0)
+	    אחרת אם (STRCMP(hi->hi_key, "curwin") == 0)
 	    {
-		if (!(supported2 & JO2_CURWIN))
-		    break;
+		אם (!(supported2 & JO2_CURWIN))
+		    اكسر;
 		opt->jo_set2 |= JO2_CURWIN;
 		opt->jo_curwin = tv_get_bool(item);
 	    }
-	    else if (STRCMP(hi->hi_key, "bufnr") == 0)
+	    אחרת אם (STRCMP(hi->hi_key, "bufnr") == 0)
 	    {
-		int nr;
+		صحيح nr;
 
-		if (!(supported2 & JO2_CURWIN))
-		    break;
+		אם (!(supported2 & JO2_CURWIN))
+		    اكسر;
 		opt->jo_set2 |= JO2_BUFNR;
 		nr = tv_get_number(item);
-		if (nr <= 0)
+		אם (nr <= 0)
 		{
 		    semsg(_(e_invalid_value_for_argument_str_str), hi->hi_key, tv_get_string(item));
-		    return FAIL;
+		    החזר FAIL;
 		}
 		opt->jo_bufnr_buf = buflist_findnr(nr);
-		if (opt->jo_bufnr_buf == NULL)
+		אם (opt->jo_bufnr_buf == عدم)
 		{
 		    semsg(_(e_buffer_nr_does_not_exist), (long)nr);
-		    return FAIL;
+		    החזר FAIL;
 		}
-		if (opt->jo_bufnr_buf->b_nwindows == 0
-			|| opt->jo_bufnr_buf->b_term == NULL)
+		אם (opt->jo_bufnr_buf->b_nwindows == 0
+			|| opt->jo_bufnr_buf->b_term == عدم)
 		{
 		    semsg(_(e_invalid_argument_str), "bufnr");
-		    return FAIL;
+		    החזר FAIL;
 		}
 	    }
-	    else if (STRCMP(hi->hi_key, "hidden") == 0)
+	    אחרת אם (STRCMP(hi->hi_key, "hidden") == 0)
 	    {
-		if (!(supported2 & JO2_HIDDEN))
-		    break;
+		אם (!(supported2 & JO2_HIDDEN))
+		    اكسر;
 		opt->jo_set2 |= JO2_HIDDEN;
 		opt->jo_hidden = tv_get_bool(item);
 	    }
-	    else if (STRCMP(hi->hi_key, "norestore") == 0)
+	    אחרת אם (STRCMP(hi->hi_key, "norestore") == 0)
 	    {
-		if (!(supported2 & JO2_NORESTORE))
-		    break;
+		אם (!(supported2 & JO2_NORESTORE))
+		    اكسر;
 		opt->jo_set2 |= JO2_NORESTORE;
 		opt->jo_term_norestore = tv_get_bool(item);
 	    }
-	    else if (STRCMP(hi->hi_key, "term_kill") == 0)
+	    אחרת אם (STRCMP(hi->hi_key, "term_kill") == 0)
 	    {
-		if (!(supported2 & JO2_TERM_KILL))
-		    break;
+		אם (!(supported2 & JO2_TERM_KILL))
+		    اكسر;
 		opt->jo_set2 |= JO2_TERM_KILL;
 		opt->jo_term_kill = tv_get_string_buf_chk(item,
 						       opt->jo_term_kill_buf);
-		if (opt->jo_term_kill == NULL)
+		אם (opt->jo_term_kill == عدم)
 		{
 		    semsg(_(e_invalid_value_for_argument_str), "term_kill");
-		    return FAIL;
+		    החזר FAIL;
 		}
 	    }
-	    else if (STRCMP(hi->hi_key, "tty_type") == 0)
+	    אחרת אם (STRCMP(hi->hi_key, "tty_type") == 0)
 	    {
 		char_u *p;
 
-		if (!(supported2 & JO2_TTY_TYPE))
-		    break;
+		אם (!(supported2 & JO2_TTY_TYPE))
+		    اكسر;
 		opt->jo_set2 |= JO2_TTY_TYPE;
 		p = tv_get_string_chk(item);
-		if (p == NULL)
+		אם (p == عدم)
 		{
 		    semsg(_(e_invalid_value_for_argument_str), "tty_type");
-		    return FAIL;
+		    החזר FAIL;
 		}
 		// Allow empty string, "winpty", "conpty".
-		if (!(*p == NUL || STRCMP(p, "winpty") == 0
+		אם (!(*p == NUL || STRCMP(p, "winpty") == 0
 						  || STRCMP(p, "conpty") == 0))
 		{
 		    semsg(_(e_invalid_value_for_argument_str), "tty_type");
-		    return FAIL;
+		    החזר FAIL;
 		}
 		opt->jo_tty_type = p[0];
 	    }
-# if defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
-	    else if (STRCMP(hi->hi_key, "ansi_colors") == 0)
+# אם defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
+	    אחרת אם (STRCMP(hi->hi_key, "ansi_colors") == 0)
 	    {
-		int		n = 0;
+		صحيح		n = 0;
 		listitem_T	*li;
 		long_u		rgb[16];
 
-		if (!(supported2 & JO2_ANSI_COLORS))
-		    break;
+		אם (!(supported2 & JO2_ANSI_COLORS))
+		    اكسر;
 
-		if (item == NULL || item->v_type != VAR_LIST
-			|| item->vval.v_list == NULL
+		אם (item == عدم || item->v_type != VAR_LIST
+			|| item->vval.v_list == عدم
 			|| item->vval.v_list->lv_first == &range_list_item)
 		{
 		    semsg(_(e_invalid_value_for_argument_str), "ansi_colors");
-		    return FAIL;
+		    החזר FAIL;
 		}
 
 		li = item->vval.v_list->lv_first;
-		for (; li != NULL && n < 16; li = li->li_next, n++)
+		עבור (; li != عدم && n < 16; li = li->li_next, n++)
 		{
 		    char_u	*color_name;
 		    guicolor_T	guicolor;
-		    int		called_emsg_before = called_emsg;
+		    صحيح		called_emsg_before = called_emsg;
 
 		    color_name = tv_get_string_chk(&li->li_tv);
-		    if (color_name == NULL)
-			return FAIL;
+		    אם (color_name == عدم)
+			החזר FAIL;
 
 		    guicolor = GUI_GET_COLOR(color_name);
-		    if (guicolor == INVALCOLOR)
+		    אם (guicolor == INVALCOLOR)
 		    {
-			if (called_emsg_before == called_emsg)
+			אם (called_emsg_before == called_emsg)
 			    // may not get the error if the GUI didn't start
 			    semsg(_(e_cannot_allocate_color_str), color_name);
-			return FAIL;
+			החזר FAIL;
 		    }
 
 		    rgb[n] = GUI_MCH_GET_RGB(guicolor);
 		}
 
-		if (n != 16 || li != NULL)
+		אם (n != 16 || li != عدم)
 		{
 		    semsg(_(e_invalid_value_for_argument_str), "ansi_colors");
-		    return FAIL;
+		    החזר FAIL;
 		}
 
 		opt->jo_set2 |= JO2_ANSI_COLORS;
-		memcpy(opt->jo_ansi_colors, rgb, sizeof(rgb));
+		memcpy(opt->jo_ansi_colors, rgb, حجم(rgb));
 	    }
 # endif
-	    else if (STRCMP(hi->hi_key, "term_highlight") == 0)
+	    אחרת אם (STRCMP(hi->hi_key, "term_highlight") == 0)
 	    {
 		char_u *p;
 
-		if (!(supported2 & JO2_TERM_HIGHLIGHT))
-		    break;
+		אם (!(supported2 & JO2_TERM_HIGHLIGHT))
+		    اكسر;
 		opt->jo_set2 |= JO2_TERM_HIGHLIGHT;
 		p = tv_get_string_buf_chk(item, opt->jo_term_highlight_buf);
-		if (p == NULL || *p == NUL)
+		אם (p == عدم || *p == NUL)
 		{
 		    semsg(_(e_invalid_value_for_argument_str), "term_highlight");
-		    return FAIL;
+		    החזר FAIL;
 		}
 		opt->jo_term_highlight = p;
 	    }
-	    else if (STRCMP(hi->hi_key, "term_api") == 0)
+	    אחרת אם (STRCMP(hi->hi_key, "term_api") == 0)
 	    {
-		if (!(supported2 & JO2_TERM_API))
-		    break;
+		אם (!(supported2 & JO2_TERM_API))
+		    اكسر;
 		opt->jo_set2 |= JO2_TERM_API;
 		opt->jo_term_api = tv_get_string_buf_chk(item,
 							opt->jo_term_api_buf);
-		if (opt->jo_term_api == NULL)
+		אם (opt->jo_term_api == عدم)
 		{
 		    semsg(_(e_invalid_value_for_argument_str), "term_api");
-		    return FAIL;
+		    החזר FAIL;
 		}
 	    }
 #endif
-	    else if (STRCMP(hi->hi_key, "env") == 0)
+	    אחרת אם (STRCMP(hi->hi_key, "env") == 0)
 	    {
-		if (!(supported2 & JO2_ENV))
-		    break;
-		if (item->v_type != VAR_DICT)
+		אם (!(supported2 & JO2_ENV))
+		    اكسر;
+		אם (item->v_type != VAR_DICT)
 		{
 		    semsg(_(e_invalid_value_for_argument_str), "env");
-		    return FAIL;
+		    החזר FAIL;
 		}
 		opt->jo_set2 |= JO2_ENV;
 		opt->jo_env = item->vval.v_dict;
-		if (opt->jo_env != NULL)
+		אם (opt->jo_env != عدم)
 		    ++opt->jo_env->dv_refcount;
 	    }
-	    else if (STRCMP(hi->hi_key, "cwd") == 0)
+	    אחרת אם (STRCMP(hi->hi_key, "cwd") == 0)
 	    {
-		if (!(supported2 & JO2_CWD))
-		    break;
+		אם (!(supported2 & JO2_CWD))
+		    اكسر;
 		opt->jo_cwd = tv_get_string_buf_chk(item, opt->jo_cwd_buf);
-		if (opt->jo_cwd == NULL || !mch_isdir(opt->jo_cwd)
+		אם (opt->jo_cwd == عدم || !mch_isdir(opt->jo_cwd)
 #ifndef MSWIN  // Win32 directories don't have the concept of "executable"
-				|| mch_access((char *)opt->jo_cwd, X_OK) != 0
+				|| mch_access((حرف *)opt->jo_cwd, X_OK) != 0
 #endif
 				)
 		{
 		    semsg(_(e_invalid_value_for_argument_str), "cwd");
-		    return FAIL;
+		    החזר FAIL;
 		}
 		opt->jo_set2 |= JO2_CWD;
 	    }
-	    else if (STRCMP(hi->hi_key, "waittime") == 0)
+	    אחרת אם (STRCMP(hi->hi_key, "waittime") == 0)
 	    {
-		if (!(supported & JO_WAITTIME))
-		    break;
+		אם (!(supported & JO_WAITTIME))
+		    اكسر;
 		opt->jo_set |= JO_WAITTIME;
 		opt->jo_waittime = tv_get_number(item);
 	    }
-	    else if (STRCMP(hi->hi_key, "timeout") == 0)
+	    אחרת אם (STRCMP(hi->hi_key, "timeout") == 0)
 	    {
-		if (!(supported & JO_TIMEOUT))
-		    break;
+		אם (!(supported & JO_TIMEOUT))
+		    اكسر;
 		opt->jo_set |= JO_TIMEOUT;
 		opt->jo_timeout = tv_get_number(item);
 	    }
-	    else if (STRCMP(hi->hi_key, "out_timeout") == 0)
+	    אחרת אם (STRCMP(hi->hi_key, "out_timeout") == 0)
 	    {
-		if (!(supported & JO_OUT_TIMEOUT))
-		    break;
+		אם (!(supported & JO_OUT_TIMEOUT))
+		    اكسر;
 		opt->jo_set |= JO_OUT_TIMEOUT;
 		opt->jo_out_timeout = tv_get_number(item);
 	    }
-	    else if (STRCMP(hi->hi_key, "err_timeout") == 0)
+	    אחרת אם (STRCMP(hi->hi_key, "err_timeout") == 0)
 	    {
-		if (!(supported & JO_ERR_TIMEOUT))
-		    break;
+		אם (!(supported & JO_ERR_TIMEOUT))
+		    اكسر;
 		opt->jo_set |= JO_ERR_TIMEOUT;
 		opt->jo_err_timeout = tv_get_number(item);
 	    }
-	    else if (STRCMP(hi->hi_key, "part") == 0)
+	    אחרת אם (STRCMP(hi->hi_key, "part") == 0)
 	    {
-		if (!(supported & JO_PART))
-		    break;
+		אם (!(supported & JO_PART))
+		    اكسر;
 		opt->jo_set |= JO_PART;
 		val = tv_get_string(item);
-		if (STRCMP(val, "err") == 0)
+		אם (STRCMP(val, "err") == 0)
 		    opt->jo_part = PART_ERR;
-		else if (STRCMP(val, "out") == 0)
+		אחרת אם (STRCMP(val, "out") == 0)
 		    opt->jo_part = PART_OUT;
-		else
+		אחרת
 		{
 		    semsg(_(e_invalid_value_for_argument_str_str), "part", val);
-		    return FAIL;
+		    החזר FAIL;
 		}
 	    }
-	    else if (STRCMP(hi->hi_key, "id") == 0)
+	    אחרת אם (STRCMP(hi->hi_key, "id") == 0)
 	    {
-		if (!(supported & JO_ID))
-		    break;
+		אם (!(supported & JO_ID))
+		    اكسر;
 		opt->jo_set |= JO_ID;
 		opt->jo_id = tv_get_number(item);
 	    }
-	    else if (STRCMP(hi->hi_key, "stoponexit") == 0)
+	    אחרת אם (STRCMP(hi->hi_key, "stoponexit") == 0)
 	    {
-		if (!(supported & JO_STOPONEXIT))
-		    break;
+		אם (!(supported & JO_STOPONEXIT))
+		    اكسر;
 		opt->jo_set |= JO_STOPONEXIT;
 		opt->jo_stoponexit = tv_get_string_buf_chk(item,
 						      opt->jo_stoponexit_buf);
-		if (opt->jo_stoponexit == NULL)
+		אם (opt->jo_stoponexit == عدم)
 		{
 		    semsg(_(e_invalid_value_for_argument_str), "stoponexit");
-		    return FAIL;
+		    החזר FAIL;
 		}
 	    }
-	    else if (STRCMP(hi->hi_key, "block_write") == 0)
+	    אחרת אם (STRCMP(hi->hi_key, "block_write") == 0)
 	    {
-		if (!(supported & JO_BLOCK_WRITE))
-		    break;
+		אם (!(supported & JO_BLOCK_WRITE))
+		    اكسر;
 		opt->jo_set |= JO_BLOCK_WRITE;
 		opt->jo_block_write = tv_get_number(item);
 	    }
-	    else
-		break;
+	    אחרת
+		اكسر;
 	    --todo;
 	}
-    if (todo > 0)
+    אם (todo > 0)
     {
 	semsg(_(e_invalid_argument_str), hi->hi_key);
-	return FAIL;
+	החזר FAIL;
     }
 
-    return OK;
+    החזר OK;
 }
 
-static job_T *first_job = NULL;
+ساكن job_T *first_job = عدم;
 
-    static void
+    ساكن فراغ
 job_free_contents(job_T *job)
 {
-    int		i;
+    صحيح		i;
 
     ch_log(job->jv_channel, "Freeing job");
-    if (job->jv_channel != NULL)
+    אם (job->jv_channel != عدم)
     {
 	// The link from the channel to the job doesn't count as a reference,
 	// thus don't decrement the refcount of the job.  The reference from
 	// the job to the channel does count the reference, decrement it and
 	// NULL the reference.  We don't set ch_job_killed, unreferencing the
 	// job doesn't mean it stops running.
-	job->jv_channel->ch_job = NULL;
+	job->jv_channel->ch_job = عدم;
 	channel_unref(job->jv_channel);
     }
     mch_clear_job(job);
@@ -777,9 +777,9 @@ job_free_contents(job_T *job)
     vim_free(job->jv_tty_type);
 #endif
     free_callback(&job->jv_exit_cb);
-    if (job->jv_argv != NULL)
+    אם (job->jv_argv != عدم)
     {
-	for (i = 0; job->jv_argv[i] != NULL; i++)
+	עבור (i = 0; job->jv_argv[i] != عدم; i++)
 	    vim_free(job->jv_argv[i]);
 	vim_free(job->jv_argv);
     }
@@ -788,40 +788,40 @@ job_free_contents(job_T *job)
 /*
  * Remove "job" from the list of jobs.
  */
-    static void
+    ساكن فراغ
 job_unlink(job_T *job)
 {
-    if (job->jv_next != NULL)
+    אם (job->jv_next != عدم)
 	job->jv_next->jv_prev = job->jv_prev;
-    if (job->jv_prev == NULL)
+    אם (job->jv_prev == عدم)
 	first_job = job->jv_next;
-    else
+    אחרת
 	job->jv_prev->jv_next = job->jv_next;
 }
 
-    static void
+    ساكن فراغ
 job_free_job(job_T *job)
 {
     job_unlink(job);
     vim_free(job);
 }
 
-    static void
+    ساكن فراغ
 job_free(job_T *job)
 {
-    if (in_free_unref_items)
-	return;
+    אם (in_free_unref_items)
+	החזר;
 
     job_free_contents(job);
     job_free_job(job);
 }
 
-static job_T *jobs_to_free = NULL;
+ساكن job_T *jobs_to_free = عدم;
 
 /*
  * Put "job" in a list to be freed later, when it's no longer referenced.
  */
-    static void
+    ساكن فراغ
 job_free_later(job_T *job)
 {
     job_unlink(job);
@@ -829,12 +829,12 @@ job_free_later(job_T *job)
     jobs_to_free = job;
 }
 
-    static void
-free_jobs_to_free_later(void)
+    ساكن فراغ
+free_jobs_to_free_later(فراغ)
 {
     job_T *job;
 
-    while (jobs_to_free != NULL)
+    כלעוד (jobs_to_free != عدم)
     {
 	job = jobs_to_free;
 	jobs_to_free = job->jv_next;
@@ -843,11 +843,11 @@ free_jobs_to_free_later(void)
     }
 }
 
-#if defined(EXITFREE)
-    void
-job_free_all(void)
+#אם defined(EXITFREE)
+    فراغ
+job_free_all(فراغ)
 {
-    while (first_job != NULL)
+    כלעוד (first_job != عدم)
 	job_free(first_job);
     free_jobs_to_free_later();
 
@@ -860,29 +860,29 @@ job_free_all(void)
 /*
  * Return TRUE if we need to check if the process of "job" has ended.
  */
-    static int
+    ساكن صحيح
 job_need_end_check(job_T *job)
 {
-    return job->jv_status == JOB_STARTED
-	    && (job->jv_stoponexit != NULL || job->jv_exit_cb.cb_name != NULL);
+    החזר job->jv_status == JOB_STARTED
+	    && (job->jv_stoponexit != عدم || job->jv_exit_cb.cb_name != عدم);
 }
 
 /*
  * Return TRUE if the channel of "job" is still useful.
  */
-    static int
+    ساكن صحيح
 job_channel_still_useful(job_T *job)
 {
-    return job->jv_channel != NULL && channel_still_useful(job->jv_channel);
+    החזר job->jv_channel != عدم && channel_still_useful(job->jv_channel);
 }
 
 /*
  * Return TRUE if the channel of "job" is closeable.
  */
-    static int
+    ساكن صحيح
 job_channel_can_close(job_T *job)
 {
-    return job->jv_channel != NULL && channel_can_close(job->jv_channel);
+    החזר job->jv_channel != عدم && channel_can_close(job->jv_channel);
 }
 
 /*
@@ -890,111 +890,111 @@ job_channel_can_close(job_T *job)
  * it has not ended yet and there is a "stoponexit" flag, an exit callback
  * or when the associated channel will do something with the job output.
  */
-    static int
+    ساكن صحيح
 job_still_useful(job_T *job)
 {
-    return job_need_end_check(job) || job_channel_still_useful(job);
+    החזר job_need_end_check(job) || job_channel_still_useful(job);
 }
 
-#if defined(GUI_MAY_FORK) || defined(GUI_MAY_SPAWN)
+#אם defined(GUI_MAY_FORK) || defined(GUI_MAY_SPAWN)
 /*
  * Return TRUE when there is any running job that we care about.
  */
-    int
-job_any_running(void)
+    صحيح
+job_any_running(فراغ)
 {
     job_T	*job;
 
     FOR_ALL_JOBS(job)
-	if (job_still_useful(job))
+	אם (job_still_useful(job))
 	{
-	    ch_log(NULL, "GUI not forking because a job is running");
-	    return TRUE;
+	    ch_log(عدم, "GUI not forking because a job is running");
+	    החזר TRUE;
 	}
-    return FALSE;
+    החזר FALSE;
 }
 #endif
 
 // Unix uses argv[] for the command, other systems use a string.
-#if defined(UNIX)
+#אם defined(UNIX)
 # define USE_ARGV
 #endif
 
-#if !defined(USE_ARGV)
+#אם !defined(USE_ARGV)
 /*
  * Escape one argument for an external command.
  * Returns the escaped string in allocated memory.  NULL when out of memory.
  */
-    static char_u *
+    ساكن char_u *
 win32_escape_arg(char_u *arg)
 {
-    int		slen, dlen;
-    int		escaping = 0;
-    int		i;
+    صحيح		slen, dlen;
+    صحيح		escaping = 0;
+    صحيح		i;
     char_u	*s, *d;
     char_u	*escaped_arg;
-    int		has_spaces = FALSE;
+    صحيح		has_spaces = FALSE;
 
     // First count the number of extra bytes required.
-    slen = (int)STRLEN(arg);
+    slen = (صحيح)STRLEN(arg);
     dlen = slen;
-    for (s = arg; *s != NUL; MB_PTR_ADV(s))
+    עבור (s = arg; *s != NUL; MB_PTR_ADV(s))
     {
-	if (*s == '"' || *s == '\\')
+	אם (*s == '"' || *s == '\\')
 	    ++dlen;
-	if (*s == ' ' || *s == '\t')
+	אם (*s == ' ' || *s == '\t')
 	    has_spaces = TRUE;
     }
 
-    if (has_spaces)
+    אם (has_spaces)
 	dlen += 2;
 
-    if (dlen == slen)
-	return vim_strsave(arg);
+    אם (dlen == slen)
+	החזר vim_strsave(arg);
 
     // Allocate memory for the result and fill it.
     escaped_arg = alloc(dlen + 1);
-    if (escaped_arg == NULL)
-	return NULL;
+    אם (escaped_arg == عدم)
+	החזר عدم;
     memset(escaped_arg, 0, dlen+1);
 
     d = escaped_arg;
 
-    if (has_spaces)
+    אם (has_spaces)
 	*d++ = '"';
 
-    for (s = arg; *s != NUL;)
+    עבור (s = arg; *s != NUL;)
     {
-	switch (*s)
+	بدل (*s)
 	{
-	    case '"':
-		for (i = 0; i < escaping; i++)
+	    حالة '"':
+		עבור (i = 0; i < escaping; i++)
 		    *d++ = '\\';
 		escaping = 0;
 		*d++ = '\\';
 		*d++ = *s++;
-		break;
-	    case '\\':
+		اكسر;
+	    حالة '\\':
 		escaping++;
 		*d++ = *s++;
-		break;
-	    default:
+		اكسر;
+	    افتراضي:
 		escaping = 0;
 		MB_COPY_CHAR(s, d);
-		break;
+		اكسر;
 	}
     }
 
     // add terminating quote and finish with a NUL
-    if (has_spaces)
+    אם (has_spaces)
     {
-	for (i = 0; i < escaping; i++)
+	עבור (i = 0; i < escaping; i++)
 	    *d++ = '\\';
 	*d++ = '"';
     }
     *d = NUL;
 
-    return escaped_arg;
+    החזר escaped_arg;
 }
 
 /*
@@ -1002,7 +1002,7 @@ win32_escape_arg(char_u *arg)
  * The result is put in gap->ga_data.
  * Returns FAIL when out of memory.
  */
-    int
+    صحيح
 win32_build_cmd(list_T *l, garray_T *gap)
 {
     listitem_T  *li;
@@ -1012,17 +1012,17 @@ win32_build_cmd(list_T *l, garray_T *gap)
     FOR_ALL_LIST_ITEMS(l, li)
     {
 	s = tv_get_string_chk(&li->li_tv);
-	if (s == NULL)
-	    return FAIL;
+	אם (s == عدم)
+	    החזר FAIL;
 	s = win32_escape_arg(s);
-	if (s == NULL)
-	    return FAIL;
+	אם (s == عدم)
+	    החזר FAIL;
 	ga_concat(gap, s);
 	vim_free(s);
-	if (li->li_next != NULL)
+	אם (li->li_next != عدم)
 	    ga_append(gap, ' ');
     }
-    return OK;
+    החזר OK;
 }
 #endif
 
@@ -1033,20 +1033,20 @@ win32_build_cmd(list_T *l, garray_T *gap)
  * If the job is no longer used it will be removed from the list of jobs, and
  * deleted a bit later.
  */
-    void
+    فراغ
 job_cleanup(job_T *job)
 {
-    if (job->jv_status != JOB_ENDED)
-	return;
+    אם (job->jv_status != JOB_ENDED)
+	החזר;
 
     // Ready to cleanup the job.
     job->jv_status = JOB_FINISHED;
 
     // When only channel-in is kept open, close explicitly.
-    if (job->jv_channel != NULL)
+    אם (job->jv_channel != عدم)
 	ch_close_part(job->jv_channel, PART_IN);
 
-    if (job->jv_exit_cb.cb_name != NULL)
+    אם (job->jv_exit_cb.cb_name != عدم)
     {
 	typval_T	argv[3];
 	typval_T	rettv;
@@ -1065,12 +1065,12 @@ job_cleanup(job_T *job)
 	channel_need_redraw = TRUE;
     }
 
-    if (job->jv_channel != NULL && job->jv_channel->ch_anonymous_pipe)
+    אם (job->jv_channel != عدم && job->jv_channel->ch_anonymous_pipe)
 	job->jv_channel->ch_killing = TRUE;
 
     // Do not free the job in case the close callback of the associated channel
     // isn't invoked yet and may get information by job_info().
-    if (job->jv_refcount == 0 && !job_channel_still_useful(job))
+    אם (job->jv_refcount == 0 && !job_channel_still_useful(job))
 	// The job was already unreferenced and the associated channel was
 	// detached, now that it ended it can be freed. However, a caller might
 	// still use it, thus free it a bit later.
@@ -1080,62 +1080,62 @@ job_cleanup(job_T *job)
 /*
  * Mark references in jobs that are still useful.
  */
-    int
-set_ref_in_job(int copyID)
+    صحيح
+set_ref_in_job(صحيح copyID)
 {
-    int		abort = FALSE;
+    صحيح		abort = FALSE;
     job_T	*job;
     typval_T	tv;
 
-    for (job = first_job; !abort && job != NULL; job = job->jv_next)
-	if (job_still_useful(job))
+    עבור (job = first_job; !abort && job != عدم; job = job->jv_next)
+	אם (job_still_useful(job))
 	{
 	    tv.v_type = VAR_JOB;
 	    tv.vval.v_job = job;
-	    abort = abort || set_ref_in_item(&tv, copyID, NULL, NULL, NULL);
+	    abort = abort || set_ref_in_item(&tv, copyID, عدم, عدم, عدم);
 	}
-    return abort;
+    החזר abort;
 }
 
 /*
  * Dereference "job".  Note that after this "job" may have been freed.
  */
-    void
+    فراغ
 job_unref(job_T *job)
 {
-    if (job == NULL || --job->jv_refcount > 0)
-	return;
+    אם (job == عدم || --job->jv_refcount > 0)
+	החזר;
 
     // Do not free the job if there is a channel where the close callback
     // may get the job info.
-    if (job_channel_still_useful(job))
-	return;
+    אם (job_channel_still_useful(job))
+	החזר;
 
     // Do not free the job when it has not ended yet and there is a
     // "stoponexit" flag or an exit callback.
-    if (!job_need_end_check(job))
+    אם (!job_need_end_check(job))
     {
 	job_free(job);
     }
-    else if (job->jv_channel != NULL)
+    אחרת אם (job->jv_channel != عدم)
     {
 	// Do remove the link to the channel, otherwise it hangs
 	// around until Vim exits. See job_free() for refcount.
 	ch_log(job->jv_channel, "detaching channel from job");
-	job->jv_channel->ch_job = NULL;
+	job->jv_channel->ch_job = عدم;
 	channel_unref(job->jv_channel);
-	job->jv_channel = NULL;
+	job->jv_channel = عدم;
     }
 }
 
-    int
-free_unused_jobs_contents(int copyID, int mask)
+    صحيح
+free_unused_jobs_contents(صحيح copyID, صحيح mask)
 {
-    int		did_free = FALSE;
+    صحيح		did_free = FALSE;
     job_T	*job;
 
     FOR_ALL_JOBS(job)
-	if ((job->jv_copyID & mask) != (copyID & mask)
+	אם ((job->jv_copyID & mask) != (copyID & mask)
 						    && !job_still_useful(job))
 	{
 	    // Free the channel and ordinary items it contains, but don't
@@ -1143,19 +1143,19 @@ free_unused_jobs_contents(int copyID, int mask)
 	    job_free_contents(job);
 	    did_free = TRUE;
 	}
-    return did_free;
+    החזר did_free;
 }
 
-    void
-free_unused_jobs(int copyID, int mask)
+    فراغ
+free_unused_jobs(صحيح copyID, صحيح mask)
 {
     job_T	*job;
     job_T	*job_next;
 
-    for (job = first_job; job != NULL; job = job_next)
+    עבור (job = first_job; job != عدم; job = job_next)
     {
 	job_next = job->jv_next;
-	if ((job->jv_copyID & mask) != (copyID & mask)
+	אם ((job->jv_copyID & mask) != (copyID & mask)
 						    && !job_still_useful(job))
 	{
 	    // Free the job struct itself.
@@ -1168,46 +1168,46 @@ free_unused_jobs(int copyID, int mask)
  * Allocate a job.  Sets the refcount to one and sets options default.
  */
     job_T *
-job_alloc(void)
+job_alloc(فراغ)
 {
     job_T *job;
 
     job = ALLOC_CLEAR_ONE(job_T);
-    if (job == NULL)
-	return NULL;
+    אם (job == عدم)
+	החזר عدم;
 
     job->jv_refcount = 1;
     job->jv_stoponexit = vim_strsave((char_u *)"term");
 
-    if (first_job != NULL)
+    אם (first_job != عدم)
     {
 	first_job->jv_prev = job;
 	job->jv_next = first_job;
     }
     first_job = job;
-    return job;
+    החזר job;
 }
 
-    void
+    فراغ
 job_set_options(job_T *job, jobopt_T *opt)
 {
-    if (opt->jo_set & JO_STOPONEXIT)
+    אם (opt->jo_set & JO_STOPONEXIT)
     {
 	vim_free(job->jv_stoponexit);
-	if (opt->jo_stoponexit == NULL || *opt->jo_stoponexit == NUL)
-	    job->jv_stoponexit = NULL;
-	else
+	אם (opt->jo_stoponexit == عدم || *opt->jo_stoponexit == NUL)
+	    job->jv_stoponexit = عدم;
+	אחרת
 	    job->jv_stoponexit = vim_strsave(opt->jo_stoponexit);
     }
-    if (opt->jo_set & JO_EXIT_CB)
+    אם (opt->jo_set & JO_EXIT_CB)
     {
 	free_callback(&job->jv_exit_cb);
-	if (opt->jo_exit_cb.cb_name == NULL || *opt->jo_exit_cb.cb_name == NUL)
+	אם (opt->jo_exit_cb.cb_name == عدم || *opt->jo_exit_cb.cb_name == NUL)
 	{
-	    job->jv_exit_cb.cb_name = NULL;
-	    job->jv_exit_cb.cb_partial = NULL;
+	    job->jv_exit_cb.cb_name = عدم;
+	    job->jv_exit_cb.cb_partial = عدم;
 	}
-	else
+	אחרת
 	    copy_callback(&job->jv_exit_cb, &opt->jo_exit_cb);
     }
 }
@@ -1215,13 +1215,13 @@ job_set_options(job_T *job, jobopt_T *opt)
 /*
  * Called when Vim is exiting: kill all jobs that have the "stoponexit" flag.
  */
-    void
-job_stop_on_exit(void)
+    فراغ
+job_stop_on_exit(فراغ)
 {
     job_T	*job;
 
     FOR_ALL_JOBS(job)
-	if (job->jv_status == JOB_STARTED && job->jv_stoponexit != NULL)
+	אם (job->jv_status == JOB_STARTED && job->jv_stoponexit != عدم)
 	    mch_signal_job(job, job->jv_stoponexit);
 }
 
@@ -1229,19 +1229,19 @@ job_stop_on_exit(void)
  * Return TRUE when there is any job that has an exit callback and might exit,
  * which means job_check_ended() should be called more often.
  */
-    int
-has_pending_job(void)
+    صحيح
+has_pending_job(فراغ)
 {
     job_T	    *job;
 
     FOR_ALL_JOBS(job)
 	// Only should check if the channel has been closed, if the channel is
 	// open the job won't exit.
-	if ((job->jv_status == JOB_STARTED && !job_channel_still_useful(job))
+	אם ((job->jv_status == JOB_STARTED && !job_channel_still_useful(job))
 		    || (job->jv_status == JOB_FINISHED
 					      && job_channel_can_close(job)))
-	    return TRUE;
-    return FALSE;
+	    החזר TRUE;
+    החזר FALSE;
 }
 
 #define MAX_CHECK_ENDED 8
@@ -1250,24 +1250,24 @@ has_pending_job(void)
  * Called once in a while: check if any jobs that seem useful have ended.
  * Returns TRUE if a job did end.
  */
-    int
-job_check_ended(void)
+    صحيح
+job_check_ended(فراغ)
 {
-    int		i;
-    int		did_end = FALSE;
+    صحيح		i;
+    صحيح		did_end = FALSE;
 
     // be quick if there are no jobs to check
-    if (first_job == NULL)
-	return did_end;
+    אם (first_job == عدم)
+	החזר did_end;
 
-    for (i = 0; i < MAX_CHECK_ENDED; ++i)
+    עבור (i = 0; i < MAX_CHECK_ENDED; ++i)
     {
 	// NOTE: mch_detect_ended_job() must only return a job of which the
 	// status was just set to JOB_ENDED.
 	job_T	*job = mch_detect_ended_job(first_job);
 
-	if (job == NULL)
-	    break;
+	אם (job == عدم)
+	    اكسر;
 	did_end = TRUE;
 	job_cleanup(job); // may add "job" to jobs_to_free
     }
@@ -1275,12 +1275,12 @@ job_check_ended(void)
     // Actually free jobs that were cleaned up.
     free_jobs_to_free_later();
 
-    if (channel_need_redraw)
+    אם (channel_need_redraw)
     {
 	channel_need_redraw = FALSE;
 	redraw_after_callback(TRUE, FALSE);
     }
-    return did_end;
+    החזר did_end;
 }
 
 /*
@@ -1293,15 +1293,15 @@ job_check_ended(void)
     job_T *
 job_start(
 	typval_T    *argvars,
-	char	    **argv_arg UNUSED,
+	حرف	    **argv_arg UNUSED,
 	jobopt_T    *opt_arg,
 	job_T	    **term_job)
 {
     job_T	*job;
-    char_u	*cmd = NULL;
-    char	**argv = NULL;
-    int		argc = 0;
-    int		i;
+    char_u	*cmd = عدم;
+    حرف	**argv = عدم;
+    صحيح		argc = 0;
+    صحيح		i;
 #ifndef USE_ARGV
     garray_T	ga;
 #endif
@@ -1309,73 +1309,73 @@ job_start(
     ch_part_T	part;
 
     job = job_alloc();
-    if (job == NULL)
-	return NULL;
+    אם (job == عدم)
+	החזר عدم;
 
     job->jv_status = JOB_FAILED;
 #ifndef USE_ARGV
-    ga_init2(&ga, sizeof(char*), 20);
+    ga_init2(&ga, حجم(حرف*), 20);
 #endif
 
-    if (opt_arg != NULL)
+    אם (opt_arg != عدم)
 	opt = *opt_arg;
-    else
+    אחרת
     {
 	// Default mode is NL.
 	clear_job_options(&opt);
 	opt.jo_mode = CH_MODE_NL;
-	if (get_job_options(&argvars[1], &opt,
+	אם (get_job_options(&argvars[1], &opt,
 		    JO_MODE_ALL + JO_CB_ALL + JO_TIMEOUT_ALL + JO_STOPONEXIT
 			 + JO_EXIT_CB + JO_OUT_IO + JO_BLOCK_WRITE,
 		     JO2_ENV + JO2_CWD) == FAIL)
-	    goto theend;
+	    اذهب theend;
     }
 
     // Check that when io is "file" that there is a file name.
-    for (part = PART_OUT; part < PART_COUNT; ++part)
-	if ((opt.jo_set & (JO_OUT_IO << (part - PART_OUT)))
+    עבור (part = PART_OUT; part < PART_COUNT; ++part)
+	אם ((opt.jo_set & (JO_OUT_IO << (part - PART_OUT)))
 		&& opt.jo_io[part] == JIO_FILE
 		&& (!(opt.jo_set & (JO_OUT_NAME << (part - PART_OUT)))
 		    || *opt.jo_io_name[part] == NUL))
 	{
 	    emsg(_(e_io_file_requires_name_to_be_set));
-	    goto theend;
+	    اذهب theend;
 	}
 
-    if ((opt.jo_set & JO_IN_IO) && opt.jo_io[PART_IN] == JIO_BUFFER)
+    אם ((opt.jo_set & JO_IN_IO) && opt.jo_io[PART_IN] == JIO_BUFFER)
     {
-	buf_T *buf = NULL;
+	buf_T *buf = عدم;
 
 	// check that we can find the buffer before starting the job
-	if (opt.jo_set & JO_IN_BUF)
+	אם (opt.jo_set & JO_IN_BUF)
 	{
 	    buf = buflist_findnr(opt.jo_io_buf[PART_IN]);
-	    if (buf == NULL)
+	    אם (buf == عدم)
 		semsg(_(e_buffer_nr_does_not_exist),
 						 (long)opt.jo_io_buf[PART_IN]);
 	}
-	else if (!(opt.jo_set & JO_IN_NAME))
+	אחרת אם (!(opt.jo_set & JO_IN_NAME))
 	{
 	    emsg(_(e_in_io_buffer_requires_in_buf_or_in_name_to_be_set));
 	}
-	else
+	אחרת
 	    buf = buflist_find_by_name(opt.jo_io_name[PART_IN], FALSE);
-	if (buf == NULL)
-	    goto theend;
-	if (buf->b_ml.ml_mfp == NULL)
+	אם (buf == عدم)
+	    اذهب theend;
+	אם (buf->b_ml.ml_mfp == عدم)
 	{
 	    char_u	numbuf[NUMBUFLEN];
 	    char_u	*s;
 
-	    if (opt.jo_set & JO_IN_BUF)
+	    אם (opt.jo_set & JO_IN_BUF)
 	    {
-		sprintf((char *)numbuf, "%d", opt.jo_io_buf[PART_IN]);
+		sprintf((حرف *)numbuf, "%d", opt.jo_io_buf[PART_IN]);
 		s = numbuf;
 	    }
-	    else
+	    אחרת
 		s = opt.jo_io_name[PART_IN];
 	    semsg(_(e_buffer_must_be_loaded_str), s);
-	    goto theend;
+	    اذهب theend;
 	}
 	job->jv_in_buf = buf;
     }
@@ -1383,61 +1383,61 @@ job_start(
     job_set_options(job, &opt);
 
 #ifdef USE_ARGV
-    if (argv_arg != NULL)
+    אם (argv_arg != عدم)
     {
 	// Make a copy of argv_arg for job->jv_argv.
-	for (i = 0; argv_arg[i] != NULL; i++)
+	עבור (i = 0; argv_arg[i] != عدم; i++)
 	    argc++;
-	argv = ALLOC_MULT(char *, argc + 1);
-	if (argv == NULL)
-	    goto theend;
-	for (i = 0; i < argc; i++)
-	    argv[i] = (char *)vim_strsave((char_u *)argv_arg[i]);
-	argv[argc] = NULL;
+	argv = ALLOC_MULT(حرف *, argc + 1);
+	אם (argv == عدم)
+	    اذهب theend;
+	עבור (i = 0; i < argc; i++)
+	    argv[i] = (حرف *)vim_strsave((char_u *)argv_arg[i]);
+	argv[argc] = عدم;
     }
-    else
+    אחרת
 #endif
-    if (argvars[0].v_type == VAR_STRING)
+    אם (argvars[0].v_type == VAR_STRING)
     {
 	// Command is a string.
 	cmd = argvars[0].vval.v_string;
-	if (cmd == NULL || *skipwhite(cmd) == NUL)
+	אם (cmd == عدم || *skipwhite(cmd) == NUL)
 	{
 	    emsg(_(e_invalid_argument));
-	    goto theend;
+	    اذهب theend;
 	}
 
-	if (build_argv_from_string(cmd, &argv, &argc) == FAIL)
-	    goto theend;
+	אם (build_argv_from_string(cmd, &argv, &argc) == FAIL)
+	    اذهب theend;
     }
-    else if (argvars[0].v_type != VAR_LIST
-	    || argvars[0].vval.v_list == NULL
+    אחרת אם (argvars[0].v_type != VAR_LIST
+	    || argvars[0].vval.v_list == عدم
 	    || argvars[0].vval.v_list->lv_len < 1)
     {
 	emsg(_(e_invalid_argument));
-	goto theend;
+	اذهب theend;
     }
-    else
+    אחרת
     {
 	list_T *l = argvars[0].vval.v_list;
 
-	if (build_argv_from_list(l, &argv, &argc) == FAIL)
-	    goto theend;
+	אם (build_argv_from_list(l, &argv, &argc) == FAIL)
+	    اذهب theend;
 
 	// Empty command is invalid.
-	if (argc == 0 || *skipwhite((char_u *)argv[0]) == NUL)
+	אם (argc == 0 || *skipwhite((char_u *)argv[0]) == NUL)
 	{
 	    emsg(_(e_invalid_argument));
-	    goto theend;
+	    اذهب theend;
 	}
 #ifndef USE_ARGV
-	if (win32_build_cmd(l, &ga) == FAIL)
-	    goto theend;
+	אם (win32_build_cmd(l, &ga) == FAIL)
+	    اذهب theend;
 	cmd = ga.ga_data;
-	if (cmd == NULL || *skipwhite(cmd) == NUL)
+	אם (cmd == عدم || *skipwhite(cmd) == NUL)
 	{
 	    emsg(_(e_invalid_argument));
-	    goto theend;
+	    اذهب theend;
 	}
 #endif
     }
@@ -1445,70 +1445,70 @@ job_start(
     // Save the command used to start the job.
     job->jv_argv = argv;
 
-    if (term_job != NULL)
+    אם (term_job != عدم)
 	*term_job = job;
 
 #ifdef USE_ARGV
-    if (ch_log_active())
+    אם (ch_log_active())
     {
 	garray_T    ga;
 
-	ga_init2(&ga, sizeof(char), 200);
-	for (i = 0; i < argc; ++i)
+	ga_init2(&ga, حجم(حرف), 200);
+	עבור (i = 0; i < argc; ++i)
 	{
-	    if (i > 0)
+	    אם (i > 0)
 		GA_CONCAT_LITERAL(&ga, "  ");
 	    ga_concat(&ga, (char_u *)argv[i]);
 	}
 	ga_append(&ga, NUL);
-	ch_log(NULL, "Starting job: %s", (char *)ga.ga_data);
+	ch_log(عدم, "Starting job: %s", (حرف *)ga.ga_data);
 	ga_clear(&ga);
     }
-    mch_job_start(argv, job, &opt, term_job != NULL);
-#else
-    ch_log(NULL, "Starting job: %s", (char *)cmd);
-    mch_job_start((char *)cmd, job, &opt);
+    mch_job_start(argv, job, &opt, term_job != عدم);
+#אחרת
+    ch_log(عدم, "Starting job: %s", (حرف *)cmd);
+    mch_job_start((حرف *)cmd, job, &opt);
 #endif
 
     // If the channel is reading from a buffer, write lines now.
-    if (job->jv_channel != NULL)
+    אם (job->jv_channel != عدم)
 	channel_write_in(job->jv_channel);
 
 theend:
 #ifndef USE_ARGV
     vim_free(ga.ga_data);
 #endif
-    if (argv != NULL && argv != job->jv_argv)
+    אם (argv != عدم && argv != job->jv_argv)
     {
-	for (i = 0; argv[i] != NULL; i++)
+	עבור (i = 0; argv[i] != عدم; i++)
 	    vim_free(argv[i]);
 	vim_free(argv);
     }
     free_job_options(&opt);
-    return job;
+    החזר job;
 }
 
 /*
  * Get the status of "job" and invoke the exit callback when needed.
  * The returned string is not allocated.
  */
-    char *
+    حرف *
 job_status(job_T *job)
 {
-    char	*result;
+    حرف	*result;
 
-    if (job->jv_status >= JOB_ENDED)
+    אם (job->jv_status >= JOB_ENDED)
 	// No need to check, dead is dead.
 	result = "dead";
-    else if (job->jv_status == JOB_FAILED)
+    אחרת אם (job->jv_status == JOB_FAILED)
 	result = "fail";
-    else
+    אחרת
     {
 	result = mch_job_status(job);
-	if (job->jv_status == JOB_ENDED)
+	אם (job->jv_status == JOB_ENDED)
 	    job_cleanup(job);
     }
-    return result;
+    החזר result;
 }
 
 /*
@@ -1516,49 +1516,49 @@ job_status(job_T *job)
  * When "type" is not NULL use this for the type.
  * Otherwise use argvars[1] for the type.
  */
-    int
-job_stop(job_T *job, typval_T *argvars, char *type)
+    صحيح
+job_stop(job_T *job, typval_T *argvars, حرف *type)
 {
     char_u *arg;
 
-    if (type != NULL)
+    אם (type != عدم)
 	arg = (char_u *)type;
-    else if (argvars[1].v_type == VAR_UNKNOWN)
+    אחרת אם (argvars[1].v_type == VAR_UNKNOWN)
 	arg = (char_u *)"";
-    else
+    אחרת
     {
 	arg = tv_get_string_chk(&argvars[1]);
-	if (arg == NULL)
+	אם (arg == عدم)
 	{
 	    emsg(_(e_invalid_argument));
-	    return 0;
+	    החזר 0;
 	}
     }
-    if (job->jv_status == JOB_FAILED)
+    אם (job->jv_status == JOB_FAILED)
     {
 	ch_log(job->jv_channel, "Job failed to start, job_stop() skipped");
-	return 0;
+	החזר 0;
     }
-    if (job->jv_status == JOB_ENDED)
+    אם (job->jv_status == JOB_ENDED)
     {
 	ch_log(job->jv_channel, "Job has already ended, job_stop() skipped");
-	return 0;
+	החזר 0;
     }
-    ch_log(job->jv_channel, "Stopping job with '%s'", (char *)arg);
-    if (mch_signal_job(job, arg) == FAIL)
-	return 0;
+    ch_log(job->jv_channel, "Stopping job with '%s'", (حرف *)arg);
+    אם (mch_signal_job(job, arg) == FAIL)
+	החזר 0;
 
     // Assume that only "kill" will kill the job.
-    if (job->jv_channel != NULL && STRCMP(arg, "kill") == 0)
+    אם (job->jv_channel != عدم && STRCMP(arg, "kill") == 0)
 	job->jv_channel->ch_job_killed = TRUE;
 
     // We don't try freeing the job, obviously the caller still has a
     // reference to it.
-    return 1;
+    החזר 1;
 }
 
-    void
-invoke_prompt_callback(void)
+    فراغ
+invoke_prompt_callback(فراغ)
 {
     typval_T	rettv;
     typval_T	argv[2];
@@ -1572,12 +1572,12 @@ invoke_prompt_callback(void)
     curwin->w_cursor.lnum = lnum + 1;
     curwin->w_cursor.col = 0;
 
-    if (curbuf->b_prompt_callback.cb_name == NULL
+    אם (curbuf->b_prompt_callback.cb_name == عدم
 	    || *curbuf->b_prompt_callback.cb_name == NUL)
-	return;
+	החזר;
     text = ml_get(lnum);
     prompt = prompt_text();
-    if (STRLEN(text) >= STRLEN(prompt))
+    אם (STRLEN(text) >= STRLEN(prompt))
 	text += STRLEN(prompt);
     argv[0].v_type = VAR_STRING;
     argv[0].vval.v_string = vim_strsave(text);
@@ -1591,42 +1591,42 @@ invoke_prompt_callback(void)
 /*
  * Return TRUE when the interrupt callback was invoked.
  */
-    int
-invoke_prompt_interrupt(void)
+    صحيح
+invoke_prompt_interrupt(فراغ)
 {
     typval_T	rettv;
     typval_T	argv[1];
-    int		ret;
+    صحيح		ret;
 
-    if (curbuf->b_prompt_interrupt.cb_name == NULL
+    אם (curbuf->b_prompt_interrupt.cb_name == عدم
 	    || *curbuf->b_prompt_interrupt.cb_name == NUL)
-	return FALSE;
+	החזר FALSE;
     argv[0].v_type = VAR_UNKNOWN;
 
     got_int = FALSE; // don't skip executing commands
     ret = call_callback(&curbuf->b_prompt_interrupt, -1, &rettv, 0, argv);
     clear_tv(&rettv);
-    return ret == FAIL ? FALSE : TRUE;
+    החזר ret == FAIL ? FALSE : TRUE;
 }
 
 /*
  * Return the effective prompt for the specified buffer.
  */
-    static char_u *
+    ساكن char_u *
 buf_prompt_text(buf_T* buf)
 {
-    if (buf->b_prompt_text == NULL)
-	return (char_u *)"% ";
-    return buf->b_prompt_text;
+    אם (buf->b_prompt_text == عدم)
+	החזר (char_u *)"% ";
+    החזר buf->b_prompt_text;
 }
 
 /*
  * Return the effective prompt for the current buffer.
  */
     char_u *
-prompt_text(void)
+prompt_text(فراغ)
 {
-    return buf_prompt_text(curbuf);
+    החזר buf_prompt_text(curbuf);
 }
 
 
@@ -1634,20 +1634,20 @@ prompt_text(void)
  * Prepare for prompt mode: Make sure the last line has the prompt text.
  * Move the cursor to this line.
  */
-    void
-init_prompt(int cmdchar_todo)
+    فراغ
+init_prompt(صحيح cmdchar_todo)
 {
     char_u *prompt = prompt_text();
     char_u *text;
 
     curwin->w_cursor.lnum = curbuf->b_ml.ml_line_count;
     text = ml_get_curline();
-    if (STRNCMP(text, prompt, STRLEN(prompt)) != 0)
+    אם (STRNCMP(text, prompt, STRLEN(prompt)) != 0)
     {
 	// prompt is missing, insert it or append a line with it
-	if (*text == NUL)
+	אם (*text == NUL)
 	    ml_replace(curbuf->b_ml.ml_line_count, prompt, TRUE);
-	else
+	אחרת
 	    ml_append(curbuf->b_ml.ml_line_count, prompt, 0, FALSE);
 	curwin->w_cursor.lnum = curbuf->b_ml.ml_line_count;
 	coladvance((colnr_T)MAXCOL);
@@ -1655,14 +1655,14 @@ init_prompt(int cmdchar_todo)
     }
 
     // Insert always starts after the prompt, allow editing text after it.
-    if (Insstart_orig.lnum != curwin->w_cursor.lnum
-				   || Insstart_orig.col != (int)STRLEN(prompt))
-	set_insstart(curwin->w_cursor.lnum, (int)STRLEN(prompt));
+    אם (Insstart_orig.lnum != curwin->w_cursor.lnum
+				   || Insstart_orig.col != (صحيح)STRLEN(prompt))
+	set_insstart(curwin->w_cursor.lnum, (صحيح)STRLEN(prompt));
 
-    if (cmdchar_todo == 'A')
+    אם (cmdchar_todo == 'A')
 	coladvance((colnr_T)MAXCOL);
-    if (curwin->w_cursor.col < (int)STRLEN(prompt))
-	curwin->w_cursor.col = (int)STRLEN(prompt);
+    אם (curwin->w_cursor.col < (صحيح)STRLEN(prompt))
+	curwin->w_cursor.col = (صحيح)STRLEN(prompt);
     // Make sure the cursor is in a valid position.
     check_cursor();
 }
@@ -1670,35 +1670,35 @@ init_prompt(int cmdchar_todo)
 /*
  * Return TRUE if the cursor is in the editable position of the prompt line.
  */
-    int
-prompt_curpos_editable(void)
+    صحيح
+prompt_curpos_editable(فراغ)
 {
-    return curwin->w_cursor.lnum == curbuf->b_ml.ml_line_count
-	&& curwin->w_cursor.col >= (int)STRLEN(prompt_text());
+    החזר curwin->w_cursor.lnum == curbuf->b_ml.ml_line_count
+	&& curwin->w_cursor.col >= (صحيح)STRLEN(prompt_text());
 }
 
 /*
  * "prompt_setcallback({buffer}, {callback})" function
  */
-    void
+    فراغ
 f_prompt_setcallback(typval_T *argvars, typval_T *rettv UNUSED)
 {
     buf_T	*buf;
     callback_T	callback;
 
-    if (check_secure())
-	return;
+    אם (check_secure())
+	החזר;
 
-    if (in_vim9script() && check_for_buffer_arg(argvars, 0) == FAIL)
-	return;
+    אם (in_vim9script() && check_for_buffer_arg(argvars, 0) == FAIL)
+	החזר;
 
     buf = tv_get_buf(&argvars[0], FALSE);
-    if (buf == NULL)
-	return;
+    אם (buf == عدم)
+	החזר;
 
     callback = get_callback(&argvars[1]);
-    if (callback.cb_name == NULL)
-	return;
+    אם (callback.cb_name == عدم)
+	החזר;
 
     free_callback(&buf->b_prompt_callback);
     set_callback(&buf->b_prompt_callback, &callback);
@@ -1707,25 +1707,25 @@ f_prompt_setcallback(typval_T *argvars, typval_T *rettv UNUSED)
 /*
  * "prompt_setinterrupt({buffer}, {callback})" function
  */
-    void
+    فراغ
 f_prompt_setinterrupt(typval_T *argvars, typval_T *rettv UNUSED)
 {
     buf_T	*buf;
     callback_T	callback;
 
-    if (check_secure())
-	return;
+    אם (check_secure())
+	החזר;
 
-    if (in_vim9script() && check_for_buffer_arg(argvars, 0) == FAIL)
-	return;
+    אם (in_vim9script() && check_for_buffer_arg(argvars, 0) == FAIL)
+	החזר;
 
     buf = tv_get_buf(&argvars[0], FALSE);
-    if (buf == NULL)
-	return;
+    אם (buf == عدم)
+	החזר;
 
     callback = get_callback(&argvars[1]);
-    if (callback.cb_name == NULL)
-	return;
+    אם (callback.cb_name == عدم)
+	החזר;
 
     free_callback(&buf->b_prompt_interrupt);
     set_callback(&buf->b_prompt_interrupt, &callback);
@@ -1735,24 +1735,24 @@ f_prompt_setinterrupt(typval_T *argvars, typval_T *rettv UNUSED)
 /*
  * "prompt_getprompt({buffer})" function
  */
-    void
+    فراغ
 f_prompt_getprompt(typval_T *argvars, typval_T *rettv)
 {
     buf_T	*buf;
 
     // return an empty string by default, e.g. it's not a prompt buffer
     rettv->v_type = VAR_STRING;
-    rettv->vval.v_string = NULL;
+    rettv->vval.v_string = عدم;
 
-    if (in_vim9script() && check_for_buffer_arg(argvars, 0) == FAIL)
-	return;
+    אם (in_vim9script() && check_for_buffer_arg(argvars, 0) == FAIL)
+	החזר;
 
     buf = tv_get_buf_from_arg(&argvars[0]);
-    if (buf == NULL)
-	return;
+    אם (buf == عدم)
+	החזר;
 
-    if (!bt_prompt(buf))
-	return;
+    אם (!bt_prompt(buf))
+	החזר;
 
     rettv->vval.v_string = vim_strsave(buf_prompt_text(buf));
 }
@@ -1760,22 +1760,22 @@ f_prompt_getprompt(typval_T *argvars, typval_T *rettv)
 /*
  * "prompt_setprompt({buffer}, {text})" function
  */
-    void
+    فراغ
 f_prompt_setprompt(typval_T *argvars, typval_T *rettv UNUSED)
 {
     buf_T	*buf;
     char_u	*text;
 
-    if (in_vim9script()
+    אם (in_vim9script()
 	    && (check_for_buffer_arg(argvars, 0) == FAIL
 		|| check_for_string_arg(argvars, 1) == FAIL))
-	return;
+	החזר;
 
-    if (check_secure())
-	return;
+    אם (check_secure())
+	החזר;
     buf = tv_get_buf(&argvars[0], FALSE);
-    if (buf == NULL)
-	return;
+    אם (buf == عدم)
+	החזר;
 
     text = tv_get_string(&argvars[1]);
     vim_free(buf->b_prompt_text);
@@ -1786,70 +1786,70 @@ f_prompt_setprompt(typval_T *argvars, typval_T *rettv UNUSED)
  * Get the job from the argument.
  * Returns NULL if the job is invalid.
  */
-    static job_T *
+    ساكن job_T *
 get_job_arg(typval_T *tv)
 {
     job_T *job;
 
-    if (tv->v_type != VAR_JOB)
+    אם (tv->v_type != VAR_JOB)
     {
 	semsg(_(e_invalid_argument_str), tv_get_string(tv));
-	return NULL;
+	החזר عدم;
     }
     job = tv->vval.v_job;
 
-    if (job == NULL)
+    אם (job == عدم)
 	emsg(_(e_not_valid_job));
-    return job;
+    החזר job;
 }
 
 /*
  * "job_getchannel()" function
  */
-    void
+    فراغ
 f_job_getchannel(typval_T *argvars, typval_T *rettv)
 {
     job_T	*job;
 
-    if (in_vim9script() && check_for_job_arg(argvars, 0) == FAIL)
-	return;
+    אם (in_vim9script() && check_for_job_arg(argvars, 0) == FAIL)
+	החזר;
 
     job = get_job_arg(&argvars[0]);
-    if (job == NULL)
-	return;
+    אם (job == عدم)
+	החזר;
 
     rettv->v_type = VAR_CHANNEL;
     rettv->vval.v_channel = job->jv_channel;
-    if (job->jv_channel != NULL)
+    אם (job->jv_channel != عدم)
 	++job->jv_channel->ch_refcount;
 }
 
 /*
  * Implementation of job_info().
  */
-    static void
+    ساكن فراغ
 job_info(job_T *job, dict_T *dict)
 {
     dictitem_T	*item;
     varnumber_T	nr;
     list_T	*l;
-    int		i;
+    صحيح		i;
 
     dict_add_string(dict, "status", (char_u *)job_status(job));
 
     item = dictitem_alloc((char_u *)"channel");
-    if (item == NULL)
-	return;
+    אם (item == عدم)
+	החזר;
     item->di_tv.v_type = VAR_CHANNEL;
     item->di_tv.vval.v_channel = job->jv_channel;
-    if (job->jv_channel != NULL)
+    אם (job->jv_channel != عدم)
 	++job->jv_channel->ch_refcount;
-    if (dict_add(dict, item) == FAIL)
+    אם (dict_add(dict, item) == FAIL)
 	dictitem_free(item);
 
 #ifdef UNIX
     nr = job->jv_pid;
-#else
+#אחרת
     nr = job->jv_proc_info.dwProcessId;
 #endif
     dict_add_number(dict, "process", nr);
@@ -1867,23 +1867,23 @@ job_info(job_T *job, dict_T *dict)
 #endif
 
     l = list_alloc();
-    if (l == NULL)
-	return;
+    אם (l == عدم)
+	החזר;
 
-    if (dict_add_list(dict, "cmd", l) == FAIL)
+    אם (dict_add_list(dict, "cmd", l) == FAIL)
     {
 	list_unref(l);
-	return;
+	החזר;
     }
-    if (job->jv_argv != NULL)
-	for (i = 0; job->jv_argv[i] != NULL; i++)
+    אם (job->jv_argv != عدم)
+	עבור (i = 0; job->jv_argv[i] != عدم; i++)
 	    list_append_string(l, (char_u *)job->jv_argv[i], -1);
 }
 
 /*
  * Implementation of job_info() to return info for all jobs.
  */
-    static void
+    ساكن فراغ
 job_info_all(list_T *l)
 {
     job_T	*job;
@@ -1894,51 +1894,51 @@ job_info_all(list_T *l)
 	tv.v_type = VAR_JOB;
 	tv.vval.v_job = job;
 
-	if (list_append_tv(l, &tv) != OK)
-	    return;
+	אם (list_append_tv(l, &tv) != OK)
+	    החזר;
     }
 }
 
 /*
  * "job_info()" function
  */
-    void
+    فراغ
 f_job_info(typval_T *argvars, typval_T *rettv)
 {
-    if (in_vim9script() && check_for_opt_job_arg(argvars, 0) == FAIL)
-	return;
+    אם (in_vim9script() && check_for_opt_job_arg(argvars, 0) == FAIL)
+	החזר;
 
-    if (argvars[0].v_type != VAR_UNKNOWN)
+    אם (argvars[0].v_type != VAR_UNKNOWN)
     {
 	job_T	*job;
 
 	job = get_job_arg(&argvars[0]);
-	if (job != NULL && rettv_dict_alloc(rettv) == OK)
+	אם (job != عدم && rettv_dict_alloc(rettv) == OK)
 	    job_info(job, rettv->vval.v_dict);
     }
-    else if (rettv_list_alloc(rettv) == OK)
+    אחרת אם (rettv_list_alloc(rettv) == OK)
 	job_info_all(rettv->vval.v_list);
 }
 
 /*
  * "job_setoptions()" function
  */
-    void
+    فراغ
 f_job_setoptions(typval_T *argvars, typval_T *rettv UNUSED)
 {
     job_T	*job;
     jobopt_T	opt;
 
-    if (in_vim9script()
+    אם (in_vim9script()
 	    && (check_for_job_arg(argvars, 0) == FAIL
 		|| check_for_dict_arg(argvars, 1) == FAIL))
-	return;
+	החזר;
 
     job = get_job_arg(&argvars[0]);
-    if (job == NULL)
-	return;
+    אם (job == عدم)
+	החזר;
     clear_job_options(&opt);
-    if (get_job_options(&argvars[1], &opt, JO_STOPONEXIT + JO_EXIT_CB, 0) == OK)
+    אם (get_job_options(&argvars[1], &opt, JO_STOPONEXIT + JO_EXIT_CB, 0) == OK)
 	job_set_options(job, &opt);
     free_job_options(&opt);
 }
@@ -1946,41 +1946,41 @@ f_job_setoptions(typval_T *argvars, typval_T *rettv UNUSED)
 /*
  * "job_start()" function
  */
-    void
+    فراغ
 f_job_start(typval_T *argvars, typval_T *rettv)
 {
     rettv->v_type = VAR_JOB;
-    if (check_restricted() || check_secure())
-	return;
+    אם (check_restricted() || check_secure())
+	החזר;
 
-    if (in_vim9script()
+    אם (in_vim9script()
 	    && (check_for_string_or_list_arg(argvars, 0) == FAIL
 		|| check_for_opt_dict_arg(argvars, 1) == FAIL))
-	return;
+	החזר;
 
-    rettv->vval.v_job = job_start(argvars, NULL, NULL, NULL);
+    rettv->vval.v_job = job_start(argvars, عدم, عدم, عدم);
 }
 
 /*
  * "job_status()" function
  */
-    void
+    فراغ
 f_job_status(typval_T *argvars, typval_T *rettv)
 {
-    if (in_vim9script() && check_for_job_arg(argvars, 0) == FAIL)
-	return;
+    אם (in_vim9script() && check_for_job_arg(argvars, 0) == FAIL)
+	החזר;
 
-    if (argvars[0].v_type == VAR_JOB && argvars[0].vval.v_job == NULL)
+    אם (argvars[0].v_type == VAR_JOB && argvars[0].vval.v_job == عدم)
     {
 	// A job that never started returns "fail".
 	rettv->v_type = VAR_STRING;
 	rettv->vval.v_string = vim_strsave((char_u *)"fail");
     }
-    else
+    אחרת
     {
 	job_T	*job = get_job_arg(&argvars[0]);
 
-	if (job != NULL)
+	אם (job != عدم)
 	{
 	    rettv->v_type = VAR_STRING;
 	    rettv->vval.v_string = vim_strsave((char_u *)job_status(job));
@@ -1991,19 +1991,19 @@ f_job_status(typval_T *argvars, typval_T *rettv)
 /*
  * "job_stop()" function
  */
-    void
+    فراغ
 f_job_stop(typval_T *argvars, typval_T *rettv)
 {
     job_T	*job;
 
-    if (in_vim9script()
+    אם (in_vim9script()
 	    && (check_for_job_arg(argvars, 0) == FAIL
 		|| check_for_opt_string_or_number_arg(argvars, 1) == FAIL))
-	return;
+	החזר;
 
     job = get_job_arg(&argvars[0]);
-    if (job != NULL)
-	rettv->vval.v_number = job_stop(job, argvars, NULL);
+    אם (job != عدم)
+	rettv->vval.v_number = job_stop(job, argvars, عدم);
 }
 
 /*
@@ -2014,29 +2014,29 @@ f_job_stop(typval_T *argvars, typval_T *rettv)
 job_to_string_buf(typval_T *varp, char_u *buf)
 {
     job_T *job = varp->vval.v_job;
-    char  *status;
+    حرف  *status;
 
-    if (job == NULL)
+    אם (job == عدم)
     {
-	vim_snprintf((char *)buf, NUMBUFLEN, "no process");
-	return buf;
+	vim_snprintf((حرف *)buf, NUMBUFLEN, "no process");
+	החזר buf;
     }
     status = job->jv_status == JOB_FAILED ? "fail"
 		    : job->jv_status >= JOB_ENDED ? "dead"
 		    : "run";
 #ifdef UNIX
-    vim_snprintf((char *)buf, NUMBUFLEN,
+    vim_snprintf((حرف *)buf, NUMBUFLEN,
 		"process %ld %s", (long)job->jv_pid, status);
-#elif defined(MSWIN)
-    vim_snprintf((char *)buf, NUMBUFLEN,
+#وإلاإذا defined(MSWIN)
+    vim_snprintf((حرف *)buf, NUMBUFLEN,
 		"process %ld %s",
 		(long)job->jv_proc_info.dwProcessId,
 		status);
-#else
+#אחרת
     // fall-back
-    vim_snprintf((char *)buf, NUMBUFLEN, "process ? %s", status);
+    vim_snprintf((حرف *)buf, NUMBUFLEN, "process ? %s", status);
 #endif
-    return buf;
+    החזר buf;
 }
 
 #endif // FEAT_JOB_CHANNEL

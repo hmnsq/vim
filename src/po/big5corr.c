@@ -18,37 +18,37 @@
  *
  */
 
-#include <stdio.h>
-#include <string.h>
+#ضمن <stdio.h>
+#ضمن <string.h>
 
-	int
-main(int argc, char **argv)
+	صحيح
+main(صحيح argc, حرف **argv)
 {
-	char buffer[BUFSIZ];
-	char *p;
+	حرف buffer[BUFSIZ];
+	حرف *p;
 
-	while (fgets(buffer, BUFSIZ, stdin) != NULL)
+	כלעוד (fgets(buffer, BUFSIZ, stdin) != عدم)
 	{
-		for (p = buffer; *p != 0; p++)
+		עבור (p = buffer; *p != 0; p++)
 		{
-			if (strncmp(p, "charset=utf-8", 13) == 0
+			אם (strncmp(p, "charset=utf-8", 13) == 0
 				|| strncmp(p, "charset=UTF-8", 13) == 0)
 			{
 				fputs("charset=BIG-5", stdout);
 				p += 12;
 			}
-			else if (strncmp(p, "# Original translations", 23) == 0)
+			אחרת אם (strncmp(p, "# Original translations", 23) == 0)
 			{
 				fputs("# Generated from zh_TW.UTF-8.po, DO NOT EDIT.", stdout);
-				while (p[1] != '\n')
+				כלעוד (p[1] != '\n')
 					++p;
 			}
-			else
+			אחרת
 			{
-				if (*(unsigned char *)p >= 0xA1)
+				אם (*(unsigned حرف *)p >= 0xA1)
 				{
 					putchar(*p++);
-					if (*p == '\\')
+					אם (*p == '\\')
 						putchar(*p);
 				}
 				putchar(*p);
