@@ -11,23 +11,23 @@
  * digraph.c: code for digraphs
  */
 
-#include "vim.h"
+#अन्तर्भाव "vim.h"
 
-#if defined(FEAT_DIGRAPHS)
+#जर defined(FEAT_DIGRAPHS)
 
-typedef int result_T;
+प्रकारव्याख्या पूर्णांक result_T;
 
-typedef struct digraph
+प्रकारव्याख्या संरचना digraph
 {
     char_u	char1;
     char_u	char2;
     result_T	result;
 } digr_T;
 
-static void printdigraph(digr_T *dp, result_T *previous);
+स्थिर शून्य printdigraph(digr_T *dp, result_T *previous);
 
 // digraphs added by the user
-static garray_T	user_digraphs = {0, 0, (int)sizeof(digr_T), 10, NULL};
+स्थिर garray_T	user_digraphs = {0, 0, (पूर्णांक)आकार(digr_T), 10, रिक्त};
 
 /*
  * digraphs for Unicode from RFC1345
@@ -36,7 +36,7 @@ static garray_T	user_digraphs = {0, 0, (int)sizeof(digr_T), 10, NULL};
  * Note: Characters marked with XX are not included literally, because some
  * compilers cannot handle them (Amiga SAS/C is the most picky one).
  */
-static digr_T digraphdefault[] = {
+स्थिर digr_T digraphdefault[] = {
 	{'N', 'U', 0x0a},	// LF for NUL
 	{'S', 'H', 0x01},
 	{'S', 'X', 0x02},
@@ -1441,26 +1441,26 @@ static digr_T digraphdefault[] = {
 /*
  * handle digraphs after typing a character
  */
-    int
-do_digraph(int c)
+    पूर्णांक
+do_digraph(पूर्णांक c)
 {
-    static int	backspaced;	// character before K_BS
-    static int	lastchar;	// last typed character
+    स्थिर पूर्णांक	backspaced;	// character before K_BS
+    स्थिर पूर्णांक	lastchar;	// last typed character
 
-    if (c == -1)		// init values
+    जर (c == -1)		// init values
     {
 	backspaced = -1;
     }
-    else if (p_dg)
+    अन्यथा जर (p_dg)
     {
-	if (backspaced >= 0)
+	जर (backspaced >= 0)
 	    c = digraph_get(backspaced, c, FALSE);
 	backspaced = -1;
-	if ((c == K_BS || c == Ctrl_H) && lastchar >= 0)
+	जर ((c == K_BS || c == Ctrl_H) && lastchar >= 0)
 	    backspaced = lastchar;
     }
     lastchar = c;
-    return c;
+    परत c;
 }
 
 /*
@@ -1468,16 +1468,16 @@ do_digraph(int c)
  * If not found return NULL.
  */
     char_u *
-get_digraph_for_char(int val_arg)
+get_digraph_for_char(पूर्णांक val_arg)
 {
-    int		val = val_arg;
-    int		i;
-    int		use_defaults;
+    पूर्णांक		val = val_arg;
+    पूर्णांक		i;
+    पूर्णांक		use_defaults;
     digr_T	*dp;
-    static      char_u      r[3];
+    स्थिर      char_u      r[3];
 
-# if defined(USE_UNICODE_DIGRAPHS)
-    if (!enc_utf8)
+# जर defined(USE_UNICODE_DIGRAPHS)
+    जर (!enc_utf8)
     {
 	char_u	    buf[6], *to;
 	vimconv_T   vc;
@@ -1485,40 +1485,40 @@ get_digraph_for_char(int val_arg)
 	// convert the character from 'encoding' to Unicode
 	i = mb_char2bytes(val, buf);
 	vc.vc_type = CONV_NONE;
-	if (convert_setup(&vc, p_enc, (char_u *)"utf-8") == OK)
+	जर (convert_setup(&vc, p_enc, (char_u *)"utf-8") == OK)
 	{
 	    vc.vc_fail = TRUE;
 	    to = string_convert(&vc, buf, &i);
-	    if (to != NULL)
+	    जर (to != रिक्त)
 	    {
 		val = utf_ptr2char(to);
 		vim_free(to);
 	    }
-	    (void)convert_setup(&vc, NULL, NULL);
+	    (शून्य)convert_setup(&vc, रिक्त, रिक्त);
 	}
     }
 # endif
 
-    for (use_defaults = 0; use_defaults <= 1; use_defaults++)
+    साठी (use_defaults = 0; use_defaults <= 1; use_defaults++)
     {
-	if (use_defaults == 0)
+	जर (use_defaults == 0)
 	    dp = (digr_T *)user_digraphs.ga_data;
-	else
+	अन्यथा
 	    dp = digraphdefault;
-	for (i = 0; use_defaults ? dp->char1 != NUL
+	साठी (i = 0; use_defaults ? dp->char1 != NUL
 					       : i < user_digraphs.ga_len; ++i)
 	{
-	    if (dp->result == val)
+	    जर (dp->result == val)
 	    {
 		r[0] = dp->char1;
 		r[1] = dp->char2;
 		r[2] = NUL;
-		return r;
+		परत r;
 	    }
 	    ++dp;
 	}
     }
-    return NULL;
+    परत रिक्त;
 }
 
 /*
@@ -1526,42 +1526,42 @@ get_digraph_for_char(int val_arg)
  * mode.
  * Returns composed character, or NUL when ESC was used.
  */
-    int
+    पूर्णांक
 get_digraph(
-    int		cmdline)	// TRUE when called from the cmdline
+    पूर्णांक		cmdline)	// TRUE when called from the cmdline
 {
-    int		c, cc;
+    पूर्णांक		c, cc;
 
     ++no_mapping;
-    ++allow_keys;
+    ++allow_किल्ल्या;
     c = plain_vgetc();
     --no_mapping;
-    --allow_keys;
+    --allow_किल्ल्या;
 
-    if (c == ESC)		// ESC cancels CTRL-K
-	return NUL;
+    जर (c == ESC)		// ESC cancels CTRL-K
+	परत NUL;
 
-    if (IS_SPECIAL(c))	// insert special key code
-	return c;
-    if (cmdline)
+    जर (IS_SPECIAL(c))	// insert special key code
+	परत c;
+    जर (cmdline)
     {
-	if (char2cells(c) == 1
-# if defined(FEAT_CRYPT) || defined(FEAT_EVAL)
+	जर (char2cells(c) == 1
+# जर defined(FEAT_CRYPT) || defined(FEAT_EVAL)
 		&& cmdline_star == 0
 # endif
 	   )
 	    putcmdline(c, TRUE);
     }
-    else
+    अन्यथा
 	add_to_showcmd(c);
     ++no_mapping;
-    ++allow_keys;
+    ++allow_किल्ल्या;
     cc = plain_vgetc();
     --no_mapping;
-    --allow_keys;
-    if (cc != ESC)	    // ESC cancels CTRL-K
-	return digraph_get(c, cc, TRUE);
-    return NUL;
+    --allow_किल्ल्या;
+    जर (cc != ESC)	    // ESC cancels CTRL-K
+	परत digraph_get(c, cc, TRUE);
+    परत NUL;
 }
 
 /*
@@ -1569,26 +1569,26 @@ get_digraph(
  * If no match, return "char2".
  * If "meta_char" is TRUE and "char1" is a space, return "char2" | 0x80.
  */
-    static int
-getexactdigraph(int char1, int char2, int meta_char)
+    स्थिर पूर्णांक
+getexactdigraph(पूर्णांक char1, पूर्णांक char2, पूर्णांक meta_char)
 {
-    int		i;
-    int		retval = 0;
+    पूर्णांक		i;
+    पूर्णांक		retval = 0;
     digr_T	*dp;
 
-    if (IS_SPECIAL(char1) || IS_SPECIAL(char2))
-	return char2;
+    जर (IS_SPECIAL(char1) || IS_SPECIAL(char2))
+	परत char2;
 
     /*
      * Search user digraphs first.
      */
     dp = (digr_T *)user_digraphs.ga_data;
-    for (i = 0; i < user_digraphs.ga_len; ++i)
+    साठी (i = 0; i < user_digraphs.ga_len; ++i)
     {
-	if ((int)dp->char1 == char1 && (int)dp->char2 == char2)
+	जर ((पूर्णांक)dp->char1 == char1 && (पूर्णांक)dp->char2 == char2)
 	{
 	    retval = dp->result;
-	    break;
+	    थांबा;
 	}
 	++dp;
     }
@@ -1596,21 +1596,21 @@ getexactdigraph(int char1, int char2, int meta_char)
     /*
      * Search default digraphs.
      */
-    if (retval == 0)
+    जर (retval == 0)
     {
 	dp = digraphdefault;
-	while (dp->char1 != 0)
+	पर्यंत (dp->char1 != 0)
 	{
-	    if ((int)dp->char1 == char1 && (int)dp->char2 == char2)
+	    जर ((पूर्णांक)dp->char1 == char1 && (पूर्णांक)dp->char2 == char2)
 	    {
 		retval = dp->result;
-		break;
+		थांबा;
 	    }
 	    ++dp;
 	}
     }
 # ifdef USE_UNICODE_DIGRAPHS
-    if (retval != 0 && !enc_utf8)
+    जर (retval != 0 && !enc_utf8)
     {
 	char_u	    buf[6], *to;
 	vimconv_T   vc;
@@ -1621,73 +1621,73 @@ getexactdigraph(int char1, int char2, int meta_char)
 	i = utf_char2bytes(retval, buf);
 	retval = 0;
 	vc.vc_type = CONV_NONE;
-	if (convert_setup(&vc, (char_u *)"utf-8", p_enc) == OK)
+	जर (convert_setup(&vc, (char_u *)"utf-8", p_enc) == OK)
 	{
 	    vc.vc_fail = TRUE;
 	    to = string_convert(&vc, buf, &i);
-	    if (to != NULL)
+	    जर (to != रिक्त)
 	    {
 		retval = (*mb_ptr2char)(to);
 		vim_free(to);
 	    }
-	    (void)convert_setup(&vc, NULL, NULL);
+	    (शून्य)convert_setup(&vc, रिक्त, रिक्त);
 	}
     }
 # endif
 
     // Ignore multi-byte characters when not in multi-byte mode.
-    if (!has_mbyte && retval > 0xff)
+    जर (!has_mbyte && retval > 0xff)
 	retval = 0;
 
-    if (retval == 0)		// digraph deleted or not found
+    जर (retval == 0)		// digraph deleted or not found
     {
-	if (char1 == ' ' && meta_char)	// <space> <char> --> meta-char
-	    return (char2 | 0x80);
-	return char2;
+	जर (char1 == ' ' && meta_char)	// <space> <char> --> meta-char
+	    परत (char2 | 0x80);
+	परत char2;
     }
-    return retval;
+    परत retval;
 }
 
 /*
  * Get digraph.
  * Allow for both char1-char2 and char2-char1
  */
-    int
-digraph_get(int char1, int char2, int meta_char)
+    पूर्णांक
+digraph_get(पूर्णांक char1, पूर्णांक char2, पूर्णांक meta_char)
 {
-    int	    retval;
+    पूर्णांक	    retval;
 
-    if (((retval = getexactdigraph(char1, char2, meta_char)) == char2)
+    जर (((retval = getexactdigraph(char1, char2, meta_char)) == char2)
 	    && (char1 != char2)
 	    && ((retval = getexactdigraph(char2, char1, meta_char)) == char1))
-	return char2;
-    return retval;
+	परत char2;
+    परत retval;
 }
 
 /*
  * Add a digraph to the digraph table.
  */
-    static void
-registerdigraph(int char1, int char2, int n)
+    स्थिर शून्य
+registerdigraph(पूर्णांक char1, पूर्णांक char2, पूर्णांक n)
 {
-    int		i;
+    पूर्णांक		i;
     digr_T	*dp;
 
     // If the digraph already exists, replace "result".
     dp = (digr_T *)user_digraphs.ga_data;
-    for (i = 0; i < user_digraphs.ga_len; ++i)
+    साठी (i = 0; i < user_digraphs.ga_len; ++i)
     {
-	if ((int)dp->char1 == char1 && (int)dp->char2 == char2)
+	जर ((पूर्णांक)dp->char1 == char1 && (पूर्णांक)dp->char2 == char2)
 	{
 	    dp->result = n;
-	    return;
+	    परत;
 	}
 	++dp;
     }
 
     // Add a new digraph to the table.
-    if (ga_grow(&user_digraphs, 1) == FAIL)
-	return;
+    जर (ga_grow(&user_digraphs, 1) == FAIL)
+	परत;
 
     dp = (digr_T *)user_digraphs.ga_data + user_digraphs.ga_len;
     dp->char1 = char1;
@@ -1701,24 +1701,24 @@ registerdigraph(int char1, int char2, int n)
  * If they are valid, returns TRUE; otherwise, give an error message and
  * returns FALSE.
  */
-    static int
-check_digraph_chars_valid(int char1, int char2)
+    स्थिर पूर्णांक
+check_digraph_chars_valid(पूर्णांक char1, पूर्णांक char2)
 {
-    if (char2 == 0)
+    जर (char2 == 0)
     {
-	char_u msg[MB_MAXBYTES + 1];
+	char_u संदेश[MB_MAXBYTES + 1];
 
-	msg[mb_char2bytes(char1, msg)] = NUL;
+	संदेश[mb_char2bytes(char1, संदेश)] = NUL;
 
-	semsg(_(e_digraph_must_be_just_two_characters_str), msg);
-	return FALSE;
+	semsg(_(e_digraph_must_be_just_two_characters_str), संदेश);
+	परत FALSE;
     }
-    if (char1 == ESC || char2 == ESC)
+    जर (char1 == ESC || char2 == ESC)
     {
 	emsg(_(e_escape_not_allowed_in_digraph));
-	return FALSE;
+	परत FALSE;
     }
-    return TRUE;
+    परत TRUE;
 }
 
 
@@ -1727,27 +1727,27 @@ check_digraph_chars_valid(int char1, int char2)
  * Add the digraphs in the argument to the digraph table.
  * format: {c1}{c2} char {c1}{c2} char ...
  */
-    void
+    शून्य
 putdigraph(char_u *str)
 {
-    int		char1, char2, n;
+    पूर्णांक		char1, char2, n;
 
-    while (*str != NUL)
+    पर्यंत (*str != NUL)
     {
 	str = skipwhite(str);
-	if (*str == NUL)
-	    return;
+	जर (*str == NUL)
+	    परत;
 	char1 = *str++;
 	char2 = *str++;
 
-	if (!check_digraph_chars_valid(char1, char2))
-	    return;
+	जर (!check_digraph_chars_valid(char1, char2))
+	    परत;
 
 	str = skipwhite(str);
-	if (!VIM_ISDIGIT(*str))
+	जर (!VIM_ISDIGIT(*str))
 	{
-	    emsg(_(e_number_expected));
-	    return;
+	    emsg(_(e_संख्या_expected));
+	    परत;
 	}
 	n = getdigits(&str);
 
@@ -1755,58 +1755,58 @@ putdigraph(char_u *str)
     }
 }
 
-# if defined(USE_UNICODE_DIGRAPHS)
-    static void
-digraph_header(char *msg)
+# जर defined(USE_UNICODE_DIGRAPHS)
+    स्थिर शून्य
+digraph_header(अक्षर *संदेश)
 {
-    if (msg_col > 0)
-	msg_putchar('\n');
-    msg_outtrans_attr((char_u *)msg, HL_ATTR(HLF_CM));
-    msg_putchar('\n');
+    जर (संदेश_col > 0)
+	संदेश_putchar('\n');
+    संदेश_outtrans_attr((char_u *)संदेश, HL_ATTR(HLF_CM));
+    संदेश_putchar('\n');
 }
 # endif
 
-    void
-listdigraphs(int use_headers)
+    शून्य
+listdigraphs(पूर्णांक use_headers)
 {
-    int		i;
+    पूर्णांक		i;
     digr_T	*dp;
     result_T	previous = 0;
 
-    msg_putchar('\n');
+    संदेश_putchar('\n');
 
     dp = digraphdefault;
-    while (dp->char1 != NUL && !got_int)
+    पर्यंत (dp->char1 != NUL && !got_int)
     {
-# if defined(USE_UNICODE_DIGRAPHS)
+# जर defined(USE_UNICODE_DIGRAPHS)
 	digr_T tmp;
 
 	// May need to convert the result to 'encoding'.
 	tmp.char1 = dp->char1;
 	tmp.char2 = dp->char2;
 	tmp.result = getexactdigraph(tmp.char1, tmp.char2, FALSE);
-	if (tmp.result != 0 && tmp.result != tmp.char2
+	जर (tmp.result != 0 && tmp.result != tmp.char2
 					  && (has_mbyte || tmp.result <= 255))
-	    printdigraph(&tmp, use_headers ? &previous : NULL);
-# else
+	    printdigraph(&tmp, use_headers ? &previous : रिक्त);
+# अन्यथा
 
-	if (getexactdigraph(dp->char1, dp->char2, FALSE) == dp->result
+	जर (getexactdigraph(dp->char1, dp->char2, FALSE) == dp->result
 		&& (has_mbyte || dp->result <= 255))
-	    printdigraph(dp, use_headers ? &previous : NULL);
+	    printdigraph(dp, use_headers ? &previous : रिक्त);
 # endif
 	++dp;
 	ui_breakcheck();
     }
 
     dp = (digr_T *)user_digraphs.ga_data;
-    for (i = 0; i < user_digraphs.ga_len && !got_int; ++i)
+    साठी (i = 0; i < user_digraphs.ga_len && !got_int; ++i)
     {
-# if defined(USE_UNICODE_DIGRAPHS)
-	if (previous >= 0 && use_headers)
+# जर defined(USE_UNICODE_DIGRAPHS)
+	जर (previous >= 0 && use_headers)
 	    digraph_header(_("Custom"));
 	previous = -1;
 # endif
-	printdigraph(dp, NULL);
+	printdigraph(dp, रिक्त);
 	ui_breakcheck();
 	++dp;
     }
@@ -1816,7 +1816,7 @@ listdigraphs(int use_headers)
     set_must_redraw(UPD_CLEAR);
 }
 
-    static void
+    स्थिर शून्य
 digraph_getlist_appendpair(digr_T *dp, list_T *l)
 {
     char_u	buf[30];
@@ -1826,21 +1826,21 @@ digraph_getlist_appendpair(digr_T *dp, list_T *l)
 
 
     li = listitem_alloc();
-    if (li == NULL)
-	return;
+    जर (li == रिक्त)
+	परत;
     list_append(l, li);
     li->li_tv.v_type = VAR_LIST;
     li->li_tv.v_lock = 0;
 
     l2 = list_alloc();
     li->li_tv.vval.v_list = l2;
-    if (l2 == NULL)
-	return;
+    जर (l2 == रिक्त)
+	परत;
     ++l2->lv_refcount;
 
     li2 = listitem_alloc();
-    if (li2 == NULL)
-	return;
+    जर (li2 == रिक्त)
+	परत;
     list_append(l2, li2);
     li2->li_tv.v_type = VAR_STRING;
     li2->li_tv.v_lock = 0;
@@ -1851,35 +1851,35 @@ digraph_getlist_appendpair(digr_T *dp, list_T *l)
     li2->li_tv.vval.v_string = vim_strsave(&buf[0]);
 
     li2 = listitem_alloc();
-    if (li2 == NULL)
-	return;
+    जर (li2 == रिक्त)
+	परत;
     list_append(l2, li2);
     li2->li_tv.v_type = VAR_STRING;
     li2->li_tv.v_lock = 0;
 
     p = buf;
-    if (has_mbyte)
+    जर (has_mbyte)
 	p += (*mb_char2bytes)(dp->result, p);
-    else
+    अन्यथा
 	*p++ = (char_u)dp->result;
     *p = NUL;
 
     li2->li_tv.vval.v_string = vim_strsave(buf);
 }
 
-    static void
-digraph_getlist_common(int list_all, typval_T *rettv)
+    स्थिर शून्य
+digraph_getlist_common(पूर्णांक list_all, typval_T *rettv)
 {
-    int		i;
+    पूर्णांक		i;
     digr_T	*dp;
 
-    if (rettv_list_alloc(rettv) == FAIL)
-	return;
+    जर (rettv_list_alloc(rettv) == FAIL)
+	परत;
 
-    if (list_all)
+    जर (list_all)
     {
 	dp = digraphdefault;
-	while (dp->char1 != NUL && !got_int)
+	पर्यंत (dp->char1 != NUL && !got_int)
 	{
 # ifdef USE_UNICODE_DIGRAPHS
 	    digr_T tmp;
@@ -1887,11 +1887,11 @@ digraph_getlist_common(int list_all, typval_T *rettv)
 	    tmp.char1 = dp->char1;
 	    tmp.char2 = dp->char2;
 	    tmp.result = getexactdigraph(tmp.char1, tmp.char2, FALSE);
-	    if (tmp.result != 0 && tmp.result != tmp.char2
+	    जर (tmp.result != 0 && tmp.result != tmp.char2
 					  && (has_mbyte || tmp.result <= 255))
 		digraph_getlist_appendpair(&tmp, rettv->vval.v_list);
-# else
-	    if (getexactdigraph(dp->char1, dp->char2, FALSE) == dp->result
+# अन्यथा
+	    जर (getexactdigraph(dp->char1, dp->char2, FALSE) == dp->result
 		    && (has_mbyte || dp->result <= 255))
 		digraph_getlist_appendpair(dp, rettv->vval.v_list);
 # endif
@@ -1900,16 +1900,16 @@ digraph_getlist_common(int list_all, typval_T *rettv)
     }
 
     dp = (digr_T *)user_digraphs.ga_data;
-    for (i = 0; i < user_digraphs.ga_len && !got_int; ++i)
+    साठी (i = 0; i < user_digraphs.ga_len && !got_int; ++i)
     {
 	digraph_getlist_appendpair(dp, rettv->vval.v_list);
 	++dp;
     }
 }
 
-static struct dg_header_entry {
-    int	    dg_start;
-    char    *dg_header;
+स्थिर संरचना dg_header_entry {
+    पूर्णांक	    dg_start;
+    अक्षर    *dg_header;
 } header_table[] = {
     {DG_START_LATIN, N_("Latin supplement")},
     {DG_START_GREEK, N_("Greek and Coptic")},
@@ -1937,70 +1937,70 @@ static struct dg_header_entry {
     {DG_START_KATAKANA, N_("Katakana")},
     {DG_START_BOPOMOFO, N_("Bopomofo")},
     {DG_START_OTHER3, N_("Other")},
-    {0xfffffff, NULL},
+    {0xfffffff, रिक्त},
 };
 
-    static void
+    स्थिर शून्य
 printdigraph(digr_T *dp, result_T *previous)
 {
     char_u	buf[30];
     char_u	*p;
 
-    int		list_width;
+    पूर्णांक		list_width;
 
-    if ((dy_flags & DY_UHEX) || has_mbyte)
+    जर ((dy_flags & DY_UHEX) || has_mbyte)
 	list_width = 13;
-    else
+    अन्यथा
 	list_width = 11;
 
-    if (dp->result == 0)
-	return;
+    जर (dp->result == 0)
+	परत;
 
-# if defined(USE_UNICODE_DIGRAPHS)
-    if (previous != NULL)
+# जर defined(USE_UNICODE_DIGRAPHS)
+    जर (previous != रिक्त)
     {
-	int i;
+	पूर्णांक i;
 
-	for (i = 0; header_table[i].dg_header != NULL; ++i)
-	    if (*previous < header_table[i].dg_start
+	साठी (i = 0; header_table[i].dg_header != रिक्त; ++i)
+	    जर (*previous < header_table[i].dg_start
 		    && dp->result >= header_table[i].dg_start
 		    && dp->result < header_table[i + 1].dg_start)
 	    {
 		digraph_header(_(header_table[i].dg_header));
-		break;
+		थांबा;
 	    }
 	*previous = dp->result;
     }
 # endif
-    if (msg_col > cmdline_width - list_width)
-	msg_putchar('\n');
-    if (msg_col)
-	while (msg_col % list_width != 0)
-	    msg_putchar(' ');
+    जर (संदेश_col > cmdline_width - list_width)
+	संदेश_putchar('\n');
+    जर (संदेश_col)
+	पर्यंत (संदेश_col % list_width != 0)
+	    संदेश_putchar(' ');
 
     p = buf;
     *p++ = dp->char1;
     *p++ = dp->char2;
     *p++ = ' ';
     *p = NUL;
-    msg_outtrans(buf);
+    संदेश_outtrans(buf);
     p = buf;
-    if (has_mbyte)
+    जर (has_mbyte)
     {
 	// add a space to draw a composing char on
-	if (enc_utf8 && utf_iscomposing(dp->result))
+	जर (enc_utf8 && utf_iscomposing(dp->result))
 	    *p++ = ' ';
 	p += (*mb_char2bytes)(dp->result, p);
     }
-    else
+    अन्यथा
 	*p++ = (char_u)dp->result;
     *p = NUL;
-    msg_outtrans_attr(buf, HL_ATTR(HLF_8));
+    संदेश_outtrans_attr(buf, HL_ATTR(HLF_8));
     p = buf;
-    if (char2cells(dp->result) == 1)
+    जर (char2cells(dp->result) == 1)
 	*p++ = ' ';
-    vim_snprintf((char *)p, sizeof(buf) - (p - buf), " %3d", dp->result);
-    msg_outtrans(buf);
+    vim_snprintf((अक्षर *)p, आकार(buf) - (p - buf), " %3d", dp->result);
+    संदेश_outtrans(buf);
 }
 
 # ifdef FEAT_EVAL
@@ -2008,103 +2008,103 @@ printdigraph(digr_T *dp, result_T *previous)
  * Get the two digraph characters from a typval.
  * Return OK or FAIL.
  */
-    static int
-get_digraph_chars(typval_T *arg, int *char1, int *char2)
+    स्थिर पूर्णांक
+get_digraph_chars(typval_T *arg, पूर्णांक *char1, पूर्णांक *char2)
 {
     char_u	buf_chars[NUMBUFLEN];
     char_u	*chars = tv_get_string_buf_chk(arg, buf_chars);
     char_u	*p = chars;
 
-    if (p != NULL)
+    जर (p != रिक्त)
     {
-	if (*p != NUL)
+	जर (*p != NUL)
 	{
 	    *char1 = mb_cptr2char_adv(&p);
-	    if (*p != NUL)
+	    जर (*p != NUL)
 	    {
 		*char2 = mb_cptr2char_adv(&p);
-		if (*p == NUL)
+		जर (*p == NUL)
 		{
-		    if (check_digraph_chars_valid(*char1, *char2))
-			return OK;
-		    return FAIL;
+		    जर (check_digraph_chars_valid(*char1, *char2))
+			परत OK;
+		    परत FAIL;
 		}
 	    }
 	}
     }
     semsg(_(e_digraph_must_be_just_two_characters_str), chars);
-    return FAIL;
+    परत FAIL;
 }
 
-    static int
+    स्थिर पूर्णांक
 digraph_set_common(typval_T *argchars, typval_T *argdigraph)
 {
-    int		char1, char2;
+    पूर्णांक		char1, char2;
     char_u	*digraph;
     char_u	*p;
     char_u	buf_digraph[NUMBUFLEN];
     varnumber_T n;
 
-    if (get_digraph_chars(argchars, &char1, &char2) == FAIL)
-	return FALSE;
+    जर (get_digraph_chars(argchars, &char1, &char2) == FAIL)
+	परत FALSE;
 
     digraph = tv_get_string_buf_chk(argdigraph, buf_digraph);
-    if (digraph == NULL)
-	return FALSE;
+    जर (digraph == रिक्त)
+	परत FALSE;
     p = digraph;
     n = mb_cptr2char_adv(&p);
-    if (*p != NUL)
+    जर (*p != NUL)
     {
 	semsg(_(e_digraph_argument_must_be_one_character_str), digraph);
-	return FALSE;
+	परत FALSE;
     }
 
-    registerdigraph(char1, char2, (int)n);
-    return TRUE;
+    registerdigraph(char1, char2, (पूर्णांक)n);
+    परत TRUE;
 }
 # endif
 
 #endif // FEAT_DIGRAPHS
 
-#if defined(FEAT_EVAL)
+#जर defined(FEAT_EVAL)
 /*
  * "digraph_get()" function
  */
-    void
+    शून्य
 f_digraph_get(typval_T *argvars, typval_T *rettv)
 {
 # ifdef FEAT_DIGRAPHS
-    int		code;
+    पूर्णांक		code;
     char_u	buf[NUMBUFLEN];
     char_u	*digraphs;
 
     rettv->v_type = VAR_STRING;
-    rettv->vval.v_string = NULL;  // Return empty string for failure
+    rettv->vval.v_string = रिक्त;  // Return empty string for failure
 
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    जर (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+	परत;
 
     digraphs = tv_get_string_chk(&argvars[0]);
 
-    if (digraphs == NULL)
-	return;
-    else if (STRLEN(digraphs) != 2)
+    जर (digraphs == रिक्त)
+	परत;
+    अन्यथा जर (STRLEN(digraphs) != 2)
     {
 	semsg(_(e_digraph_must_be_just_two_characters_str), digraphs);
-	return;
+	परत;
     }
     code = digraph_get(digraphs[0], digraphs[1], FALSE);
 
-    if (has_mbyte)
+    जर (has_mbyte)
 	buf[(*mb_char2bytes)(code, buf)] = NUL;
-    else
+    अन्यथा
     {
 	buf[0] = code;
 	buf[1] = NUL;
     }
 
     rettv->vval.v_string = vim_strsave(buf);
-# else
+# अन्यथा
     emsg(_(e_no_digraphs_version));
 # endif
 }
@@ -2112,18 +2112,18 @@ f_digraph_get(typval_T *argvars, typval_T *rettv)
 /*
  * "digraph_getlist()" function
  */
-    void
+    शून्य
 f_digraph_getlist(typval_T *argvars, typval_T *rettv)
 {
 # ifdef FEAT_DIGRAPHS
-    int     flag_list_all;
+    पूर्णांक     flag_list_all;
 
-    if (check_for_opt_bool_arg(argvars, 0) == FAIL)
-	return;
+    जर (check_for_opt_bool_arg(argvars, 0) == FAIL)
+	परत;
 
-    if (argvars[0].v_type == VAR_UNKNOWN)
+    जर (argvars[0].v_type == VAR_UNKNOWN)
 	flag_list_all = FALSE;
-    else
+    अन्यथा
     {
 	varnumber_T flag = tv_get_bool(&argvars[0]);
 
@@ -2131,7 +2131,7 @@ f_digraph_getlist(typval_T *argvars, typval_T *rettv)
     }
 
     digraph_getlist_common(flag_list_all, rettv);
-# else
+# अन्यथा
     emsg(_(e_no_digraphs_version));
 # endif
 }
@@ -2139,23 +2139,23 @@ f_digraph_getlist(typval_T *argvars, typval_T *rettv)
 /*
  * "digraph_set()" function
  */
-    void
+    शून्य
 f_digraph_set(typval_T *argvars, typval_T *rettv)
 {
 # ifdef FEAT_DIGRAPHS
     rettv->v_type = VAR_BOOL;
-    rettv->vval.v_number = VVAL_FALSE;
+    rettv->vval.v_संख्या = VVAL_FALSE;
 
-    if (in_vim9script()
+    जर (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_string_arg(argvars, 1) == FAIL))
-	return;
+	परत;
 
-    if (!digraph_set_common(&argvars[0], &argvars[1]))
-	return;
+    जर (!digraph_set_common(&argvars[0], &argvars[1]))
+	परत;
 
-    rettv->vval.v_number = VVAL_TRUE;
-# else
+    rettv->vval.v_संख्या = VVAL_TRUE;
+# अन्यथा
     emsg(_(e_no_digraphs_version));
 # endif
 }
@@ -2163,7 +2163,7 @@ f_digraph_set(typval_T *argvars, typval_T *rettv)
 /*
  * "digraph_setlist()" function
  */
-    void
+    शून्य
 f_digraph_setlist(typval_T * argvars, typval_T *rettv)
 {
 # ifdef FEAT_DIGRAPHS
@@ -2171,43 +2171,43 @@ f_digraph_setlist(typval_T * argvars, typval_T *rettv)
     listitem_T	*pli;
 
     rettv->v_type = VAR_BOOL;
-    rettv->vval.v_number = VVAL_FALSE;
+    rettv->vval.v_संख्या = VVAL_FALSE;
 
-    if (argvars[0].v_type != VAR_LIST)
+    जर (argvars[0].v_type != VAR_LIST)
     {
-	emsg(_(e_digraph_setlist_argument_must_be_list_of_lists_with_two_items));
-	return;
+	emsg(_(e_digraph_setlist_argument_must_be_list_of_lists_with_two_वस्तुसंच));
+	परत;
     }
 
     pl = argvars[0].vval.v_list;
-    if (pl == NULL)
+    जर (pl == रिक्त)
     {
 	// Empty list always results in success.
-	rettv->vval.v_number = VVAL_TRUE;
-	return;
+	rettv->vval.v_संख्या = VVAL_TRUE;
+	परत;
     }
 
-    FOR_ALL_LIST_ITEMS(pl, pli)
+    FOR_ALL_LIST_वस्तुसंच(pl, pli)
     {
-	if (pli->li_tv.v_type != VAR_LIST)
+	जर (pli->li_tv.v_type != VAR_LIST)
 	{
-	    emsg(_(e_digraph_setlist_argument_must_be_list_of_lists_with_two_items));
-	    return;
+	    emsg(_(e_digraph_setlist_argument_must_be_list_of_lists_with_two_वस्तुसंच));
+	    परत;
 	}
 
 	l = pli->li_tv.vval.v_list;
-	if (l == NULL || l->lv_len != 2)
+	जर (l == रिक्त || l->lv_len != 2)
 	{
-	    emsg(_(e_digraph_setlist_argument_must_be_list_of_lists_with_two_items));
-	    return;
+	    emsg(_(e_digraph_setlist_argument_must_be_list_of_lists_with_two_वस्तुसंच));
+	    परत;
 	}
 
-	if (!digraph_set_common(&l->lv_first->li_tv,
+	जर (!digraph_set_common(&l->lv_first->li_tv,
 						 &l->lv_first->li_next->li_tv))
-	    return;
+	    परत;
     }
-    rettv->vval.v_number = VVAL_TRUE;
-# else
+    rettv->vval.v_संख्या = VVAL_TRUE;
+# अन्यथा
     emsg(_(e_no_digraphs_version));
 # endif
 }
@@ -2215,10 +2215,10 @@ f_digraph_setlist(typval_T * argvars, typval_T *rettv)
 #endif // FEAT_EVAL
 
 
-#if defined(FEAT_KEYMAP)
+#जर defined(FEAT_KEYMAP)
 
 // structure used for b_kmap_ga.ga_data
-typedef struct
+प्रकारव्याख्या संरचना
 {
     char_u	*from;
     char_u	*to;
@@ -2226,7 +2226,7 @@ typedef struct
 
 # define KMAP_MAXLEN 20	    // maximum length of "from" or "to"
 
-static void keymap_unload(void);
+स्थिर शून्य keymap_unload(शून्य);
 
 /*
  * Set up key mapping tables for the 'keymap' option.
@@ -2234,77 +2234,77 @@ static void keymap_unload(void);
  * used when setting the option, not later when the value has already been
  * checked.
  */
-    char *
-keymap_init(void)
+    अक्षर *
+keymap_init(शून्य)
 {
     curbuf->b_kmap_state &= ~KEYMAP_INIT;
 
-    if (*curbuf->b_p_keymap == NUL)
+    जर (*curbuf->b_p_keymap == NUL)
     {
 	// Stop any active keymap and clear the table.  Also remove
 	// b:keymap_name, as no keymap is active now.
 	keymap_unload();
 	do_cmdline_cmd((char_u *)"unlet! b:keymap_name");
     }
-    else
+    अन्यथा
     {
 	char_u	*buf;
-	size_t  buflen;
+	माप_प्रकार  buflen;
 
 	// Source the keymap file.  It will contain a ":loadkeymap" command
 	// which will call ex_loadkeymap() below.
 	buflen = STRLEN(curbuf->b_p_keymap) + STRLEN(p_enc) + 14;
 	buf = alloc(buflen);
-	if (buf == NULL)
-	    return e_out_of_memory;
+	जर (buf == रिक्त)
+	    परत e_out_of_memory;
 
 	// try finding "keymap/'keymap'_'encoding'.vim"  in 'runtimepath'
-	vim_snprintf((char *)buf, buflen, "keymap/%s_%s.vim",
+	vim_snprintf((अक्षर *)buf, buflen, "keymap/%s_%s.vim",
 						   curbuf->b_p_keymap, p_enc);
-	if (source_runtime(buf, 0) == FAIL)
+	जर (source_runtime(buf, 0) == FAIL)
 	{
 	    // try finding "keymap/'keymap'.vim" in 'runtimepath'
-	    vim_snprintf((char *)buf, buflen, "keymap/%s.vim",
+	    vim_snprintf((अक्षर *)buf, buflen, "keymap/%s.vim",
 							  curbuf->b_p_keymap);
-	    if (source_runtime(buf, 0) == FAIL)
+	    जर (source_runtime(buf, 0) == FAIL)
 	    {
 		vim_free(buf);
-		return N_(e_keymap_file_not_found);
+		परत N_(e_keymap_file_not_found);
 	    }
 	}
 	vim_free(buf);
     }
 
-    return NULL;
+    परत रिक्त;
 }
 
 /*
  * ":loadkeymap" command: load the following lines as the keymap.
  */
-    void
+    शून्य
 ex_loadkeymap(exarg_T *eap)
 {
-    char_u	*line;
+    char_u	*ओळ;
     char_u	*p;
     char_u	*s;
     kmap_T	*kp;
 # define KMAP_LLEN   200	    // max length of "to" and "from" together
     char_u	buf[KMAP_LLEN + 11];
-    int		i;
+    पूर्णांक		i;
     char_u	*save_cpo = p_cpo;
 
-    if (!sourcing_a_script(eap))
+    जर (!sourcing_a_script(eap))
     {
 	emsg(_(e_using_loadkeymap_not_in_sourced_file));
-	return;
+	परत;
     }
 
-    if (eap->skip)
+    जर (eap->skip)
     {
 	// The rest of the script is the keymap, read it and throw it away.
-	while ((line = eap->ea_getline(0, eap->cookie, 0, TRUE)) != NULL)
-	    vim_free(line);
-	return;
+	पर्यंत ((ओळ = eap->ea_getline(0, eap->cookie, 0, TRUE)) != रिक्त)
+	    vim_free(ओळ);
+	परत;
     }
 
     /*
@@ -2313,7 +2313,7 @@ ex_loadkeymap(exarg_T *eap)
     keymap_unload();
 
     curbuf->b_kmap_state = 0;
-    ga_init2(&curbuf->b_kmap_ga, sizeof(kmap_T), 20);
+    ga_init2(&curbuf->b_kmap_ga, आकार(kmap_T), 20);
 
     // Set 'cpoptions' to "C" to avoid line continuation.
     p_cpo = (char_u *)"C";
@@ -2321,14 +2321,14 @@ ex_loadkeymap(exarg_T *eap)
     /*
      * Get each line of the sourced file, break at the end.
      */
-    for (;;)
+    साठी (;;)
     {
-	line = eap->ea_getline(0, eap->cookie, 0, TRUE);
-	if (line == NULL)
-	    break;
+	ओळ = eap->ea_getline(0, eap->cookie, 0, TRUE);
+	जर (ओळ == रिक्त)
+	    थांबा;
 
-	p = skipwhite(line);
-	if (*p != '"' && *p != NUL && ga_grow(&curbuf->b_kmap_ga, 1) == OK)
+	p = skipwhite(ओळ);
+	जर (*p != '"' && *p != NUL && ga_grow(&curbuf->b_kmap_ga, 1) == OK)
 	{
 	    kp = (kmap_T *)curbuf->b_kmap_ga.ga_data + curbuf->b_kmap_ga.ga_len;
 	    s = skiptowhite(p);
@@ -2337,30 +2337,30 @@ ex_loadkeymap(exarg_T *eap)
 	    s = skiptowhite(p);
 	    kp->to = vim_strnsave(p, s - p);
 
-	    if (kp->from == NULL || kp->to == NULL
+	    जर (kp->from == रिक्त || kp->to == रिक्त
 		    || STRLEN(kp->from) + STRLEN(kp->to) >= KMAP_LLEN
 		    || *kp->from == NUL || *kp->to == NUL)
 	    {
-		if (kp->to != NULL && *kp->to == NUL)
+		जर (kp->to != रिक्त && *kp->to == NUL)
 		    emsg(_(e_empty_keymap_entry));
 		vim_free(kp->from);
 		vim_free(kp->to);
 	    }
-	    else
+	    अन्यथा
 		++curbuf->b_kmap_ga.ga_len;
 	}
-	vim_free(line);
+	vim_free(ओळ);
     }
 
     /*
      * setup ":lnoremap" to map the keys
      */
-    for (i = 0; i < curbuf->b_kmap_ga.ga_len; ++i)
+    साठी (i = 0; i < curbuf->b_kmap_ga.ga_len; ++i)
     {
-	vim_snprintf((char *)buf, sizeof(buf), "<buffer> %s %s",
+	vim_snprintf((अक्षर *)buf, आकार(buf), "<buffer> %s %s",
 				((kmap_T *)curbuf->b_kmap_ga.ga_data)[i].from,
 				 ((kmap_T *)curbuf->b_kmap_ga.ga_data)[i].to);
-	(void)do_map(MAPTYPE_NOREMAP, buf, MODE_LANGMAP, FALSE);
+	(शून्य)do_map(MAPTYPE_NOREMAP, buf, MODE_LANGMAP, FALSE);
     }
 
     p_cpo = save_cpo;
@@ -2372,26 +2372,26 @@ ex_loadkeymap(exarg_T *eap)
 /*
  * Stop using 'keymap'.
  */
-    static void
-keymap_unload(void)
+    स्थिर शून्य
+keymap_unload(शून्य)
 {
     char_u	buf[KMAP_MAXLEN + 10];
-    int		i;
+    पूर्णांक		i;
     char_u	*save_cpo = p_cpo;
     kmap_T	*kp;
 
-    if (!(curbuf->b_kmap_state & KEYMAP_LOADED))
-	return;
+    जर (!(curbuf->b_kmap_state & KEYMAP_LOADED))
+	परत;
 
     // Set 'cpoptions' to "C" to avoid line continuation.
     p_cpo = (char_u *)"C";
 
     // clear the ":lmap"s
     kp = (kmap_T *)curbuf->b_kmap_ga.ga_data;
-    for (i = 0; i < curbuf->b_kmap_ga.ga_len; ++i)
+    साठी (i = 0; i < curbuf->b_kmap_ga.ga_len; ++i)
     {
-	vim_snprintf((char *)buf, sizeof(buf), "<buffer> %s", kp[i].from);
-	(void)do_map(MAPTYPE_UNMAP, buf, MODE_LANGMAP, FALSE);
+	vim_snprintf((अक्षर *)buf, आकार(buf), "<buffer> %s", kp[i].from);
+	(शून्य)do_map(MAPTYPE_UNMAP, buf, MODE_LANGMAP, FALSE);
     }
     keymap_clear(&curbuf->b_kmap_ga);
 
@@ -2402,13 +2402,13 @@ keymap_unload(void)
     status_redraw_curbuf();
 }
 
-    void
+    शून्य
 keymap_clear(garray_T *kmap)
 {
-    int	    i;
+    पूर्णांक	    i;
     kmap_T  *kp = (kmap_T *)kmap->ga_data;
 
-    for (i = 0; i < kmap->ga_len; ++i)
+    साठी (i = 0; i < kmap->ga_len; ++i)
     {
 	vim_free(kp[i].from);
 	vim_free(kp[i].to);

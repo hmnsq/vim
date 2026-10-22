@@ -11,39 +11,39 @@
  * sign.c: functions for managing signs
  */
 
-#include "vim.h"
+#अन्तर्भाव "vim.h"
 
-#if defined(FEAT_SIGNS)
+#जर defined(FEAT_SIGNS)
 
 /*
  * Struct to hold the sign properties.
  */
-typedef struct sign sign_T;
+प्रकारव्याख्या संरचना sign sign_T;
 
-struct sign
+संरचना sign
 {
     sign_T *sn_next; // next sign in list
-    int sn_typenr; // type number of sign
+    पूर्णांक sn_typenr; // type number of sign
     char_u *sn_name; // name of sign
     char_u *sn_icon; // name of pixmap
 # ifdef FEAT_SIGN_ICONS
-    void *sn_image; // icon image
+    शून्य *sn_image; // icon image
 # endif
     char_u *sn_text; // text used instead of pixmap
-    int sn_line_hl; // highlight ID for line
-    int sn_text_hl; // highlight ID for text
-    int sn_cul_hl; // highlight ID for text on current line when 'cursorline' is set
-    int sn_num_hl; // highlight ID for line number
-    int sn_priority; // default priority of this sign, -1 means SIGN_DEF_PRIO
+    पूर्णांक sn_ओळ_hl; // highlight ID for line
+    पूर्णांक sn_text_hl; // highlight ID for text
+    पूर्णांक sn_cul_hl; // highlight ID for text on current line when 'cursorline' is set
+    पूर्णांक sn_अंक_hl; // highlight ID for line number
+    पूर्णांक sn_priority; // default priority of this sign, -1 means SIGN_DEF_PRIO
 };
 
-static sign_T *first_sign = NULL;
-static int next_sign_typenr = 1;
+स्थिर sign_T *first_sign = रिक्त;
+स्थिर पूर्णांक next_sign_typenr = 1;
 
-static void sign_list_defined(sign_T *sp);
-static void sign_undefine(sign_T *sp, sign_T *sp_prev);
+स्थिर शून्य sign_list_defined(sign_T *sp);
+स्थिर शून्य sign_undefine(sign_T *sp, sign_T *sp_prev);
 
-static char *cmds[] = { "define",
+स्थिर अक्षर *cmds[] = { "define",
 # define SIGNCMD_DEFINE 0
                         "undefine",
 # define SIGNCMD_UNDEFINE 1
@@ -55,21 +55,21 @@ static char *cmds[] = { "define",
 # define SIGNCMD_UNPLACE 4
                         "jump",
 # define SIGNCMD_JUMP 5
-                        NULL
+                        रिक्त
 # define SIGNCMD_LAST 6
 };
 
 # define FOR_ALL_SIGNS(sp) \
-     for ((sp) = first_sign; (sp) != NULL; (sp) = (sp)->sn_next)
+     साठी ((sp) = first_sign; (sp) != रिक्त; (sp) = (sp)->sn_next)
 
-static hashtab_T sg_table; // sign group (signgroup_T) hashtable
-static int next_sign_id = 1; // next sign id in the global group
+स्थिर hashtab_T sg_table; // sign group (signgroup_T) hashtable
+स्थिर पूर्णांक next_sign_id = 1; // next sign id in the global group
 
 /*
  * Initialize data needed for managing signs
  */
-void
-init_signs(void)
+शून्य
+init_signs(शून्य)
 {
     hash_init(&sg_table); // sign group hash table
 }
@@ -78,49 +78,49 @@ init_signs(void)
  * A new sign in group 'groupname' is added. If the group is not present,
  * create it. Otherwise reference the group.
  */
-static signgroup_T *
+स्थिर signgroup_T *
 sign_group_ref(char_u *groupname)
 {
     hash_T hash = hash_hash(groupname);
     hashitem_T *hi = hash_lookup(&sg_table, groupname, hash);
-    signgroup_T *group = NULL;
+    signgroup_T *group = रिक्त;
 
-    if (HASHITEM_EMPTY(hi))
+    जर (HASHITEM_EMPTY(hi))
     {
         // new group
-        group = alloc(offsetof(signgroup_T, sg_name) + STRLEN(groupname) + 1);
-        if (group == NULL)
-            return NULL;
+        group = alloc(दुरत्व(signgroup_T, sg_name) + STRLEN(groupname) + 1);
+        जर (group == रिक्त)
+            परत रिक्त;
 
         STRCPY(group->sg_name, groupname);
         group->sg_refcount = 1;
         group->sg_next_sign_id = 1;
         hash_add_item(&sg_table, hi, group->sg_name, hash);
     }
-    else
+    अन्यथा
     {
         // existing group
         group = HI2SG(hi);
         group->sg_refcount++;
     }
 
-    return group;
+    परत group;
 }
 
 /*
  * A sign in group 'groupname' is removed. If all the signs in this group are
  * removed, then remove the group.
  */
-static void
+स्थिर शून्य
 sign_group_unref(char_u *groupname)
 {
     hashitem_T *hi = hash_find(&sg_table, groupname);
-    if (HASHITEM_EMPTY(hi))
-        return;
+    जर (HASHITEM_EMPTY(hi))
+        परत;
 
     signgroup_T *group = HI2SG(hi);
     group->sg_refcount--;
-    if (group->sg_refcount == 0)
+    जर (group->sg_refcount == 0)
     {
         // All the signs in this group are removed
         hash_remove(&sg_table, hi, "sign remove");
@@ -133,12 +133,12 @@ sign_group_unref(char_u *groupname)
  * A sign can either be in the global group (sign->se_group == NULL)
  * or in a named group. If 'group' is '*', then the sign is part of the group.
  */
-static int
+स्थिर पूर्णांक
 sign_in_group(sign_entry_T *sign, char_u *group)
 {
-    return ((group != NULL && STRCMP(group, "*") == 0) ||
-            (group == NULL && sign->se_group == NULL) ||
-            (group != NULL && sign->se_group != NULL &&
+    परत ((group != रिक्त && STRCMP(group, "*") == 0) ||
+            (group == रिक्त && sign->se_group == रिक्त) ||
+            (group != रिक्त && sign->se_group != रिक्त &&
              STRCMP(group, sign->se_group->sg_name) == 0));
 }
 
@@ -146,118 +146,118 @@ sign_in_group(sign_entry_T *sign, char_u *group)
  * Return TRUE if "sign" is to be displayed in window "wp".
  * If the group name starts with "PopUp" it only shows in a popup window.
  */
-static int
+स्थिर पूर्णांक
 sign_group_for_window(sign_entry_T *sign, win_T *wp)
 {
-    int for_popup = sign->se_group != NULL &&
+    पूर्णांक for_popup = sign->se_group != रिक्त &&
                     STRNCMP("PopUp", sign->se_group->sg_name, 5) == 0;
 
-    return WIN_IS_POPUP(wp) ? for_popup : !for_popup;
+    परत WIN_IS_POPUP(wp) ? for_popup : !for_popup;
 }
 
 /*
  * Get the next free sign identifier in the specified group
  */
-static int
+स्थिर पूर्णांक
 sign_group_get_next_signid(buf_T *buf, char_u *groupname)
 {
-    int id = 1;
-    signgroup_T *group = NULL;
-    sign_entry_T *sign = NULL;
+    पूर्णांक id = 1;
+    signgroup_T *group = रिक्त;
+    sign_entry_T *sign = रिक्त;
 
-    if (groupname != NULL)
+    जर (groupname != रिक्त)
     {
         hashitem_T *hi = hash_find(&sg_table, groupname);
-        if (HASHITEM_EMPTY(hi))
-            return id;
+        जर (HASHITEM_EMPTY(hi))
+            परत id;
         group = HI2SG(hi);
     }
 
     // Search for the next usable sign identifier
-    int found = FALSE;
-    while (!found)
+    पूर्णांक found = FALSE;
+    पर्यंत (!found)
     {
-        if (group == NULL)
+        जर (group == रिक्त)
             id = next_sign_id++; // global group
-        else
+        अन्यथा
             id = group->sg_next_sign_id++;
 
         // Check whether this sign is already placed in the buffer
         found = TRUE;
         FOR_ALL_SIGNS_IN_BUF(buf, sign)
         {
-            if (id == sign->se_id && sign_in_group(sign, groupname))
+            जर (id == sign->se_id && sign_in_group(sign, groupname))
             {
                 found = FALSE; // sign identifier is in use
-                break;
+                थांबा;
             }
         }
     }
 
-    return id;
+    परत id;
 }
 
 /*
  * Insert a new sign into the signlist for buffer 'buf' between the 'prev' and
  * 'next' signs.
  */
-static void
-insert_sign(buf_T *buf, // buffer to store sign in
+स्थिर शून्य
+घाला_sign(buf_T *buf, // buffer to store sign in
             sign_entry_T *prev, // previous sign entry
             sign_entry_T *next, // next sign entry
-            int id, // sign ID
+            पूर्णांक id, // sign ID
             char_u *group, // sign group; NULL for global group
-            int prio, // sign priority
+            पूर्णांक prio, // sign priority
             linenr_T lnum, // line number which gets the mark
-            int typenr) // typenr of sign we are adding
+            पूर्णांक typenr) // typenr of sign we are adding
 {
     sign_entry_T *newsign =
-        lalloc_id(sizeof(sign_entry_T), FALSE, aid_insert_sign);
-    if (newsign == NULL)
-        return;
+        lalloc_id(आकार(sign_entry_T), FALSE, aid_घाला_sign);
+    जर (newsign == रिक्त)
+        परत;
 
     newsign->se_id = id;
     newsign->se_lnum = lnum;
     newsign->se_typenr = typenr;
 
-    if (group != NULL)
+    जर (group != रिक्त)
     {
         newsign->se_group = sign_group_ref(group);
-        if (newsign->se_group == NULL)
+        जर (newsign->se_group == रिक्त)
         {
             vim_free(newsign);
-            return;
+            परत;
         }
     }
-    else
+    अन्यथा
     {
-        newsign->se_group = NULL;
+        newsign->se_group = रिक्त;
     }
 
     newsign->se_priority = prio;
     newsign->se_next = next;
     newsign->se_prev = prev;
-    if (next != NULL)
+    जर (next != रिक्त)
         next->se_prev = newsign;
 
-    if (prev == NULL)
+    जर (prev == रिक्त)
     {
         // When adding first sign need to redraw the windows to create the
         // column for signs.
-        if (buf->b_signlist == NULL)
+        जर (buf->b_signlist == रिक्त)
         {
             redraw_buf_later(buf, UPD_NOT_VALID);
-            changed_line_abv_curs();
+            changed_ओळ_abv_curs();
         }
 
         // first sign in signlist
         buf->b_signlist = newsign;
 # ifdef FEAT_NETBEANS_INTG
-        if (netbeans_active())
+        जर (netbeans_active())
             buf->b_has_sign_column = true;
 # endif
     }
-    else
+    अन्यथा
     {
         prev->se_next = newsign;
     }
@@ -270,71 +270,71 @@ insert_sign(buf_T *buf, // buffer to store sign in
 /*
  * Insert a new sign sorted by line number and sign priority.
  */
-static void
-insert_sign_by_lnum_prio(buf_T *buf, // buffer to store sign in
+स्थिर शून्य
+घाला_sign_by_lnum_prio(buf_T *buf, // buffer to store sign in
                          sign_entry_T *prev, // previous sign entry
-                         int id, // sign ID
+                         पूर्णांक id, // sign ID
                          char_u *group, // sign group; NULL for global group
-                         int prio, // sign priority
+                         पूर्णांक prio, // sign priority
                          linenr_T lnum, // line number which gets the mark
-                         int typenr) // typenr of sign we are adding
+                         पूर्णांक typenr) // typenr of sign we are adding
 {
     // keep signs sorted by lnum and by priority: insert new sign at
     // the proper position in the list for this lnum.
-    while (prev != NULL && prev->se_lnum == lnum && prev->se_priority <= prio)
+    पर्यंत (prev != रिक्त && prev->se_lnum == lnum && prev->se_priority <= prio)
         prev = prev->se_prev;
 
-    sign_entry_T *sign = (prev == NULL) ? buf->b_signlist : prev->se_next;
+    sign_entry_T *sign = (prev == रिक्त) ? buf->b_signlist : prev->se_next;
 
-    insert_sign(buf, prev, sign, id, group, prio, lnum, typenr);
+    घाला_sign(buf, prev, sign, id, group, prio, lnum, typenr);
 }
 
 /*
  * Lookup a sign by typenr. Returns NULL if sign is not found.
  */
-static sign_T *
-find_sign_by_typenr(int typenr)
+स्थिर sign_T *
+find_sign_by_typenr(पूर्णांक typenr)
 {
-    sign_T *sp = NULL;
+    sign_T *sp = रिक्त;
     FOR_ALL_SIGNS(sp)
-        if (sp->sn_typenr == typenr)
-            return sp;
-    return NULL;
+        जर (sp->sn_typenr == typenr)
+            परत sp;
+    परत रिक्त;
 }
 
 /*
  * Get the name of a sign by its typenr.
  */
-static char_u *
-sign_typenr2name(int typenr)
+स्थिर char_u *
+sign_typenr2name(पूर्णांक typenr)
 {
-    sign_T *sp = NULL;
+    sign_T *sp = रिक्त;
     FOR_ALL_SIGNS(sp)
-        if (sp->sn_typenr == typenr)
-            return sp->sn_name;
-    return (char_u *)_("[Deleted]");
+        जर (sp->sn_typenr == typenr)
+            परत sp->sn_name;
+    परत (char_u *)_("[Deleted]");
 }
 
 /*
  * Return information about a sign in a Dict
  */
-static dict_T *
+स्थिर dict_T *
 sign_get_info(sign_entry_T *sign)
 {
     dict_T *d = dict_alloc_id(aid_sign_getinfo);
-    if (d == NULL)
-        return NULL;
+    जर (d == रिक्त)
+        परत रिक्त;
 
-    dict_add_number(d, "id", sign->se_id);
-    if (sign->se_group == NULL)
+    dict_add_संख्या(d, "id", sign->se_id);
+    जर (sign->se_group == रिक्त)
         dict_add_string_len(d, "group", (char_u *)"", 0);
-    else
+    अन्यथा
         dict_add_string(d, "group", sign->se_group->sg_name);
-    dict_add_number(d, "lnum", sign->se_lnum);
+    dict_add_संख्या(d, "lnum", sign->se_lnum);
     dict_add_string(d, "name", sign_typenr2name(sign->se_typenr));
-    dict_add_number(d, "priority", sign->se_priority);
+    dict_add_संख्या(d, "priority", sign->se_priority);
 
-    return d;
+    परत d;
 }
 
 /*
@@ -342,69 +342,69 @@ sign_get_info(sign_entry_T *sign)
  * changing the priority of an already placed sign.  Assumes the signs in the
  * buffer are sorted by line number and priority.
  */
-static void
-sign_sort_by_prio_on_line(buf_T *buf, sign_entry_T *sign)
+स्थिर शून्य
+sign_sort_by_prio_on_ओळ(buf_T *buf, sign_entry_T *sign)
 {
     // If there is only one sign in the buffer or only one sign on the line or
     // the sign is already sorted by priority, then return.
-    if ((sign->se_prev == NULL || sign->se_prev->se_lnum != sign->se_lnum ||
+    जर ((sign->se_prev == रिक्त || sign->se_prev->se_lnum != sign->se_lnum ||
          sign->se_prev->se_priority > sign->se_priority) &&
-        (sign->se_next == NULL || sign->se_next->se_lnum != sign->se_lnum ||
+        (sign->se_next == रिक्त || sign->se_next->se_lnum != sign->se_lnum ||
          sign->se_next->se_priority < sign->se_priority))
-        return;
+        परत;
 
     // One or more signs on the same line as 'sign'
     // Find a sign after which 'sign' should be inserted
 
     // First search backward for a sign with higher priority on the same line
     sign_entry_T *p = sign;
-    while (p->se_prev != NULL && p->se_prev->se_lnum == sign->se_lnum &&
+    पर्यंत (p->se_prev != रिक्त && p->se_prev->se_lnum == sign->se_lnum &&
            p->se_prev->se_priority <= sign->se_priority)
         p = p->se_prev;
 
-    if (p == sign)
+    जर (p == sign)
     {
         // Sign not found. Search forward for a sign with priority just before
         // 'sign'.
         p = sign->se_next;
-        while (p->se_next != NULL && p->se_next->se_lnum == sign->se_lnum &&
+        पर्यंत (p->se_next != रिक्त && p->se_next->se_lnum == sign->se_lnum &&
                p->se_next->se_priority > sign->se_priority)
             p = p->se_next;
     }
 
     // Remove 'sign' from the list
-    if (buf->b_signlist == sign)
+    जर (buf->b_signlist == sign)
         buf->b_signlist = sign->se_next;
 
-    if (sign->se_prev != NULL)
+    जर (sign->se_prev != रिक्त)
         sign->se_prev->se_next = sign->se_next;
 
-    if (sign->se_next != NULL)
+    जर (sign->se_next != रिक्त)
         sign->se_next->se_prev = sign->se_prev;
 
-    sign->se_prev = NULL;
-    sign->se_next = NULL;
+    sign->se_prev = रिक्त;
+    sign->se_next = रिक्त;
 
     // Re-insert 'sign' at the right place
-    if (p->se_priority <= sign->se_priority)
+    जर (p->se_priority <= sign->se_priority)
     {
         // 'sign' has a higher priority and should be inserted before 'p'
         sign->se_prev = p->se_prev;
         sign->se_next = p;
         p->se_prev = sign;
-        if (sign->se_prev != NULL)
+        जर (sign->se_prev != रिक्त)
             sign->se_prev->se_next = sign;
 
-        if (buf->b_signlist == p)
+        जर (buf->b_signlist == p)
             buf->b_signlist = sign;
     }
-    else
+    अन्यथा
     {
         // 'sign' has a lower priority and should be inserted after 'p'
         sign->se_prev = p;
         sign->se_next = p->se_next;
         p->se_next = sign;
-        if (sign->se_next != NULL)
+        जर (sign->se_next != रिक्त)
             sign->se_next->se_prev = sign;
     }
 }
@@ -412,72 +412,72 @@ sign_sort_by_prio_on_line(buf_T *buf, sign_entry_T *sign)
 /*
  * Add the sign into the signlist. Find the right spot to do it though.
  */
-static void
+स्थिर शून्य
 buf_addsign(buf_T *buf, // buffer to store sign in
-            int id, // sign ID
+            पूर्णांक id, // sign ID
             char_u *groupname, // sign group
-            int prio, // sign priority
+            पूर्णांक prio, // sign priority
             linenr_T lnum, // line number which gets the mark
-            int typenr) // typenr of sign we are adding
+            पूर्णांक typenr) // typenr of sign we are adding
 {
-    sign_entry_T *sign = NULL; // a sign in the signlist
-    sign_entry_T *prev = NULL; // the previous sign
+    sign_entry_T *sign = रिक्त; // a sign in the signlist
+    sign_entry_T *prev = रिक्त; // the previous sign
 
     // The list is sorted by line number.  When the last inserted sign is on a
     // strictly earlier line, resume the search from there instead of the head;
     // this makes placing many signs on distinct, ascending lines close to
     // linear.  Signs on the same line fall back to a scan from the head.
-    if (buf->b_sign_finger != NULL && buf->b_sign_finger->se_lnum < lnum)
+    जर (buf->b_sign_finger != रिक्त && buf->b_sign_finger->se_lnum < lnum)
         prev = buf->b_sign_finger;
 
-    for (sign = (prev == NULL) ? buf->b_signlist : prev->se_next; sign != NULL;
+    साठी (sign = (prev == रिक्त) ? buf->b_signlist : prev->se_next; sign != रिक्त;
          sign = sign->se_next)
     {
-        if (lnum == sign->se_lnum && id == sign->se_id &&
+        जर (lnum == sign->se_lnum && id == sign->se_id &&
             sign_in_group(sign, groupname))
         {
             // Update an existing sign
             sign->se_typenr = typenr;
             sign->se_priority = prio;
-            sign_sort_by_prio_on_line(buf, sign);
-            return;
+            sign_sort_by_prio_on_ओळ(buf, sign);
+            परत;
         }
-        else if (lnum < sign->se_lnum)
+        अन्यथा जर (lnum < sign->se_lnum)
         {
-            insert_sign_by_lnum_prio(buf, prev, id, groupname, prio, lnum,
+            घाला_sign_by_lnum_prio(buf, prev, id, groupname, prio, lnum,
                                      typenr);
-            return;
+            परत;
         }
         prev = sign;
     }
 
-    insert_sign_by_lnum_prio(buf, prev, id, groupname, prio, lnum, typenr);
+    घाला_sign_by_lnum_prio(buf, prev, id, groupname, prio, lnum, typenr);
 }
 
 /*
  * For an existing, placed sign "markId" change the type to "typenr".
  * Returns the line number of the sign, or zero if the sign is not found.
  */
-static linenr_T
+स्थिर linenr_T
 buf_change_sign_type(buf_T *buf, // buffer to store sign in
-                     int markId, // sign ID
+                     पूर्णांक markId, // sign ID
                      char_u *group, // sign group
-                     int typenr, // typenr of sign we are adding
-                     int prio) // sign priority
+                     पूर्णांक typenr, // typenr of sign we are adding
+                     पूर्णांक prio) // sign priority
 {
-    sign_entry_T *sign = NULL; // a sign in the signlist
+    sign_entry_T *sign = रिक्त; // a sign in the signlist
     FOR_ALL_SIGNS_IN_BUF(buf, sign)
     {
-        if (sign->se_id == markId && sign_in_group(sign, group))
+        जर (sign->se_id == markId && sign_in_group(sign, group))
         {
             sign->se_typenr = typenr;
             sign->se_priority = prio;
-            sign_sort_by_prio_on_line(buf, sign);
-            return sign->se_lnum;
+            sign_sort_by_prio_on_ओळ(buf, sign);
+            परत sign->se_lnum;
         }
     }
 
-    return (linenr_T)0;
+    परत (linenr_T)0;
 }
 
 /*
@@ -485,21 +485,21 @@ buf_change_sign_type(buf_T *buf, // buffer to store sign in
  * 'buf'. Used when refreshing the screen. Returns TRUE if a sign is found on
  * 'lnum', FALSE otherwise.
  */
-int
+पूर्णांक
 buf_get_signattrs(win_T *wp, linenr_T lnum, sign_attrs_T *sattr)
 {
     CLEAR_POINTER(sattr);
 
     buf_T *buf = wp->w_buffer;
-    sign_entry_T *sign = NULL;
+    sign_entry_T *sign = रिक्त;
     FOR_ALL_SIGNS_IN_BUF(buf, sign)
     {
         // Signs are sorted by line number in the buffer. No need to check
         // for signs after the specified line number 'lnum'.
-        if (sign->se_lnum > lnum)
-            break;
+        जर (sign->se_lnum > lnum)
+            थांबा;
 
-        if (sign->se_lnum == lnum
+        जर (sign->se_lnum == lnum
 # ifdef FEAT_PROP_POPUP
             && sign_group_for_window(sign, wp)
 # endif
@@ -507,39 +507,39 @@ buf_get_signattrs(win_T *wp, linenr_T lnum, sign_attrs_T *sattr)
         {
             sattr->sat_typenr = sign->se_typenr;
             sign_T *sp = find_sign_by_typenr(sign->se_typenr);
-            if (sp == NULL)
-                return FALSE;
+            जर (sp == रिक्त)
+                परत FALSE;
 
 # ifdef FEAT_SIGN_ICONS
             sattr->sat_icon = sp->sn_image;
 # endif
             sattr->sat_text = sp->sn_text;
 
-            if (sattr->sat_text != NULL && sp->sn_text_hl > 0)
+            जर (sattr->sat_text != रिक्त && sp->sn_text_hl > 0)
                 sattr->sat_texthl = syn_id2attr(sp->sn_text_hl);
 
-            if (sp->sn_line_hl > 0)
-                sattr->sat_linehl = syn_id2attr(sp->sn_line_hl);
+            जर (sp->sn_ओळ_hl > 0)
+                sattr->sat_linehl = syn_id2attr(sp->sn_ओळ_hl);
 
-            if (sp->sn_cul_hl > 0)
+            जर (sp->sn_cul_hl > 0)
                 sattr->sat_culhl = syn_id2attr(sp->sn_cul_hl);
 
-            if (sp->sn_num_hl > 0)
-                sattr->sat_numhl = syn_id2attr(sp->sn_num_hl);
+            जर (sp->sn_अंक_hl > 0)
+                sattr->sat_numhl = syn_id2attr(sp->sn_अंक_hl);
 
             sattr->sat_priority = sign->se_priority;
 
             // If there is another sign next with the same priority, may
             // combine the text and the line highlighting.
-            if (sign->se_next != NULL &&
+            जर (sign->se_next != रिक्त &&
                 sign->se_next->se_priority == sign->se_priority &&
                 sign->se_next->se_lnum == sign->se_lnum)
             {
                 sign_T *next_sp = find_sign_by_typenr(sign->se_next->se_typenr);
-                if (next_sp == NULL)
-                    return FALSE;
+                जर (next_sp == रिक्त)
+                    परत FALSE;
 
-                if (sattr->sat_icon == NULL && sattr->sat_text == NULL)
+                जर (sattr->sat_icon == रिक्त && sattr->sat_text == रिक्त)
                 {
 # ifdef FEAT_SIGN_ICONS
                     sattr->sat_icon = next_sp->sn_image;
@@ -547,22 +547,22 @@ buf_get_signattrs(win_T *wp, linenr_T lnum, sign_attrs_T *sattr)
                     sattr->sat_text = next_sp->sn_text;
                 }
 
-                if (sp->sn_text_hl <= 0 && next_sp->sn_text_hl > 0)
+                जर (sp->sn_text_hl <= 0 && next_sp->sn_text_hl > 0)
                     sattr->sat_texthl = syn_id2attr(next_sp->sn_text_hl);
 
-                if (sp->sn_line_hl <= 0 && next_sp->sn_line_hl > 0)
-                    sattr->sat_linehl = syn_id2attr(next_sp->sn_line_hl);
+                जर (sp->sn_ओळ_hl <= 0 && next_sp->sn_ओळ_hl > 0)
+                    sattr->sat_linehl = syn_id2attr(next_sp->sn_ओळ_hl);
 
-                if (sp->sn_cul_hl <= 0 && next_sp->sn_cul_hl > 0)
+                जर (sp->sn_cul_hl <= 0 && next_sp->sn_cul_hl > 0)
                     sattr->sat_culhl = syn_id2attr(next_sp->sn_cul_hl);
 
-                if (sp->sn_num_hl <= 0 && next_sp->sn_num_hl > 0)
-                    sattr->sat_numhl = syn_id2attr(next_sp->sn_num_hl);
+                जर (sp->sn_अंक_hl <= 0 && next_sp->sn_अंक_hl > 0)
+                    sattr->sat_numhl = syn_id2attr(next_sp->sn_अंक_hl);
             }
-            return TRUE;
+            परत TRUE;
         }
     }
-    return FALSE;
+    परत FALSE;
 }
 
 /*
@@ -578,44 +578,44 @@ buf_get_signattrs(win_T *wp, linenr_T lnum, sign_attrs_T *sattr)
 linenr_T
 buf_delsign(buf_T *buf, // buffer sign is stored in
             linenr_T atlnum, // sign at this line, 0 - at any line
-            int id, // sign id
+            पूर्णांक id, // sign id
             char_u *group) // sign group
 {
-    buf->b_sign_finger = NULL; // a removal invalidates the insertion finger
+    buf->b_sign_finger = रिक्त; // a removal invalidates the insertion finger
     // pointer to pointer to current sign
     sign_entry_T **lastp = &buf->b_signlist;
-    sign_entry_T *next = NULL; // the next sign in a b_signlist
+    sign_entry_T *next = रिक्त; // the next sign in a b_signlist
     linenr_T lnum = 0; // line number whose sign was deleted
 
-    for (sign_entry_T *sign = buf->b_signlist; sign != NULL; sign = next)
+    साठी (sign_entry_T *sign = buf->b_signlist; sign != रिक्त; sign = next)
     {
         next = sign->se_next;
 
-        if ((id == 0 || sign->se_id == id) &&
+        जर ((id == 0 || sign->se_id == id) &&
             (atlnum == 0 || sign->se_lnum == atlnum) &&
             sign_in_group(sign, group))
         {
             *lastp = next;
-            if (next != NULL)
+            जर (next != रिक्त)
                 next->se_prev = sign->se_prev;
 
             lnum = sign->se_lnum;
 
-            if (sign->se_group != NULL)
+            जर (sign->se_group != रिक्त)
                 sign_group_unref(sign->se_group->sg_name);
 
             vim_free(sign);
-            redraw_buf_line_later(buf, lnum);
+            redraw_buf_ओळ_later(buf, lnum);
 
             // Check whether only one sign needs to be deleted
             // If deleting a sign with a specific identifier in a particular
             // group or deleting any sign at a particular line number, delete
             // only one sign.
-            if (group == NULL || (*group != '*' && id != 0) ||
+            जर (group == रिक्त || (*group != '*' && id != 0) ||
                 (*group == '*' && atlnum != 0))
-                break;
+                थांबा;
         }
-        else
+        अन्यथा
         {
             lastp = &sign->se_next;
         }
@@ -623,13 +623,13 @@ buf_delsign(buf_T *buf, // buffer sign is stored in
 
     // When deleting the last sign the cursor position may change, because the
     // sign columns no longer shows.  And the 'signcolumn' may be hidden.
-    if (buf->b_signlist == NULL)
+    जर (buf->b_signlist == रिक्त)
     {
         redraw_buf_later(buf, UPD_NOT_VALID);
-        changed_line_abv_curs();
+        changed_ओळ_abv_curs();
     }
 
-    return lnum;
+    परत lnum;
 }
 
 /*
@@ -637,104 +637,104 @@ buf_delsign(buf_T *buf, // buffer sign is stored in
  * the sign does not exist, return 0 as the line number. This will still let
  * the correct file get loaded.
  */
-int
+पूर्णांक
 buf_findsign(buf_T *buf, // buffer to store sign in
-             int id, // sign ID
+             पूर्णांक id, // sign ID
              char_u *group) // sign group
 {
-    sign_entry_T *sign = NULL; // a sign in the signlist
+    sign_entry_T *sign = रिक्त; // a sign in the signlist
     FOR_ALL_SIGNS_IN_BUF(buf, sign)
-        if (sign->se_id == id && sign_in_group(sign, group))
-            return sign->se_lnum;
+        जर (sign->se_id == id && sign_in_group(sign, group))
+            परत sign->se_lnum;
 
-    return 0;
+    परत 0;
 }
 
 /*
  * Return the sign at line 'lnum' in buffer 'buf'. Returns NULL if a sign is
  * not found at the line. If 'groupname' is NULL, searches in the global group.
  */
-static sign_entry_T *
-buf_getsign_at_line(buf_T *buf, // buffer whose sign we are searching for
+स्थिर sign_entry_T *
+buf_getsign_at_ओळ(buf_T *buf, // buffer whose sign we are searching for
                     linenr_T lnum, // line number of sign
                     char_u *groupname) // sign group name
 {
-    sign_entry_T *sign = NULL; // a sign in the signlist
+    sign_entry_T *sign = रिक्त; // a sign in the signlist
     FOR_ALL_SIGNS_IN_BUF(buf, sign)
     {
         // Signs are sorted by line number in the buffer. No need to check
         // for signs after the specified line number 'lnum'.
-        if (sign->se_lnum > lnum)
-            break;
+        जर (sign->se_lnum > lnum)
+            थांबा;
 
-        if (sign->se_lnum == lnum && sign_in_group(sign, groupname))
-            return sign;
+        जर (sign->se_lnum == lnum && sign_in_group(sign, groupname))
+            परत sign;
     }
 
-    return NULL;
+    परत रिक्त;
 }
 
 /*
  * Return the identifier of the sign at line number 'lnum' in buffer 'buf'.
  */
-int
+पूर्णांक
 buf_findsign_id(buf_T *buf, // buffer whose sign we are searching for
                 linenr_T lnum, // line number of sign
                 char_u *groupname) // sign group name
 {
     // a sign in the signlist
-    sign_entry_T *sign = buf_getsign_at_line(buf, lnum, groupname);
-    if (sign != NULL)
-        return sign->se_id;
+    sign_entry_T *sign = buf_getsign_at_ओळ(buf, lnum, groupname);
+    जर (sign != रिक्त)
+        परत sign->se_id;
 
-    return 0;
+    परत 0;
 }
 
-# if defined(FEAT_NETBEANS_INTG)
+# जर defined(FEAT_NETBEANS_INTG)
 /*
  * See if a given type of sign exists on a specific line.
  */
-int
+पूर्णांक
 buf_findsigntype_id(buf_T *buf, // buffer whose sign we are searching for
                     linenr_T lnum, // line number of sign
-                    int typenr) // sign type number
+                    पूर्णांक typenr) // sign type number
 {
-    sign_entry_T *sign = NULL; // a sign in the signlist
+    sign_entry_T *sign = रिक्त; // a sign in the signlist
     FOR_ALL_SIGNS_IN_BUF(buf, sign)
     {
         // Signs are sorted by line number in the buffer. No need to check
         // for signs after the specified line number 'lnum'.
-        if (sign->se_lnum > lnum)
-            break;
+        जर (sign->se_lnum > lnum)
+            थांबा;
 
-        if (sign->se_lnum == lnum && sign->se_typenr == typenr)
-            return sign->se_id;
+        जर (sign->se_lnum == lnum && sign->se_typenr == typenr)
+            परत sign->se_id;
     }
 
-    return 0;
+    परत 0;
 }
 
-#  if defined(FEAT_SIGN_ICONS)
+#  जर defined(FEAT_SIGN_ICONS)
 /*
  * Return the number of icons on the given line.
  */
-int
+पूर्णांक
 buf_signcount(buf_T *buf, linenr_T lnum)
 {
-    int count = 0;
-    sign_entry_T *sign = NULL; // a sign in the signlist
+    पूर्णांक मोजणी = 0;
+    sign_entry_T *sign = रिक्त; // a sign in the signlist
     FOR_ALL_SIGNS_IN_BUF(buf, sign)
     {
         // Signs are sorted by line number in the buffer. No need to check
         // for signs after the specified line number 'lnum'.
-        if (sign->se_lnum > lnum)
-            break;
+        जर (sign->se_lnum > lnum)
+            थांबा;
 
-        if (sign->se_lnum == lnum && sign_get_image(sign->se_typenr) != NULL)
-            count++;
+        जर (sign->se_lnum == lnum && sign_get_image(sign->se_typenr) != रिक्त)
+            मोजणी++;
     }
 
-    return count;
+    परत मोजणी;
 }
 #  endif // FEAT_SIGN_ICONS
 # endif // FEAT_NETBEANS_INTG
@@ -743,38 +743,38 @@ buf_signcount(buf_T *buf, linenr_T lnum)
  * Delete signs in group 'group' in buffer "buf". If 'group' is '*', then
  * delete all the signs.
  */
-void
+शून्य
 buf_delete_signs(buf_T *buf, char_u *group)
 {
-    buf->b_sign_finger = NULL; // a removal invalidates the insertion finger
+    buf->b_sign_finger = रिक्त; // a removal invalidates the insertion finger
     // When deleting the last sign need to redraw the windows to remove the
     // sign column. Not when curwin is NULL (this means we're exiting).
-    if (buf->b_signlist != NULL && curwin != NULL)
+    जर (buf->b_signlist != रिक्त && curwin != रिक्त)
     {
         redraw_buf_later(buf, UPD_NOT_VALID);
-        changed_line_abv_curs();
+        changed_ओळ_abv_curs();
     }
 
     // pointer to pointer to current sign
     sign_entry_T **lastp = &buf->b_signlist;
-    sign_entry_T *next = NULL;
+    sign_entry_T *next = रिक्त;
 
-    for (sign_entry_T *sign = buf->b_signlist; sign != NULL; sign = next)
+    साठी (sign_entry_T *sign = buf->b_signlist; sign != रिक्त; sign = next)
     {
         next = sign->se_next;
-        if (sign_in_group(sign, group))
+        जर (sign_in_group(sign, group))
         {
             *lastp = next;
 
-            if (next != NULL)
+            जर (next != रिक्त)
                 next->se_prev = sign->se_prev;
 
-            if (sign->se_group != NULL)
+            जर (sign->se_group != रिक्त)
                 sign_group_unref(sign->se_group->sg_name);
 
             vim_free(sign);
         }
-        else
+        अन्यथा
         {
             lastp = &sign->se_next;
         }
@@ -784,51 +784,51 @@ buf_delete_signs(buf_T *buf, char_u *group)
 /*
  * List placed signs for "rbuf".  If "rbuf" is NULL do it for all buffers.
  */
-static void
+स्थिर शून्य
 sign_list_placed(buf_T *rbuf, char_u *sign_group)
 {
-    char lbuf[MSG_BUF_LEN];
-    char group[MSG_BUF_LEN];
+    अक्षर lbuf[संदेश_BUF_LEN];
+    अक्षर group[संदेश_BUF_LEN];
 
-    msg_puts_title(_("\n--- Signs ---"));
-    msg_putchar('\n');
+    संदेश_puts_title(_("\n--- Signs ---"));
+    संदेश_putchar('\n');
 
-    buf_T *buf = (rbuf == NULL) ? firstbuf : rbuf;
-    while (buf != NULL && !got_int)
+    buf_T *buf = (rbuf == रिक्त) ? firstbuf : rbuf;
+    पर्यंत (buf != रिक्त && !got_int)
     {
-        if (buf->b_signlist != NULL)
+        जर (buf->b_signlist != रिक्त)
         {
-            vim_snprintf(lbuf, MSG_BUF_LEN, _("Signs for %s:"), buf->b_fname);
-            msg_puts_attr(lbuf, HL_ATTR(HLF_D));
-            msg_putchar('\n');
+            vim_snprintf(lbuf, संदेश_BUF_LEN, _("Signs for %s:"), buf->b_fname);
+            संदेश_puts_attr(lbuf, HL_ATTR(HLF_D));
+            संदेश_putchar('\n');
         }
 
-        sign_entry_T *sign = NULL;
+        sign_entry_T *sign = रिक्त;
         FOR_ALL_SIGNS_IN_BUF(buf, sign)
         {
-            if (got_int)
-                break;
+            जर (got_int)
+                थांबा;
 
-            if (!sign_in_group(sign, sign_group))
-                continue;
+            जर (!sign_in_group(sign, sign_group))
+                सुरूठेवा;
 
-            if (sign->se_group != NULL)
-                vim_snprintf(group, MSG_BUF_LEN, _("  group=%s"),
+            जर (sign->se_group != रिक्त)
+                vim_snprintf(group, संदेश_BUF_LEN, _("  group=%s"),
                              sign->se_group->sg_name);
-            else
+            अन्यथा
                 group[0] = '\0';
 
-            vim_snprintf(lbuf, MSG_BUF_LEN,
+            vim_snprintf(lbuf, संदेश_BUF_LEN,
                          _("    line=%ld  id=%d%s  name=%s  priority=%d"),
-                         (long)sign->se_lnum, sign->se_id, group,
+                         (दीर्घ)sign->se_lnum, sign->se_id, group,
                          sign_typenr2name(sign->se_typenr), sign->se_priority);
 
-            msg_puts(lbuf);
-            msg_putchar('\n');
+            संदेश_puts(lbuf);
+            संदेश_putchar('\n');
         }
 
-        if (rbuf != NULL)
-            break;
+        जर (rbuf != रिक्त)
+            थांबा;
 
         buf = buf->b_next;
     }
@@ -837,29 +837,29 @@ sign_list_placed(buf_T *rbuf, char_u *sign_group)
 /*
  * Adjust a placed sign for inserted/deleted lines.
  */
-void
+शून्य
 sign_mark_adjust(
     linenr_T    line1,
     linenr_T    line2,
-    long        amount,
-    long        amount_after)
+    दीर्घ        amount,
+    दीर्घ        amount_after)
 {
-    curbuf->b_sign_finger = NULL; // line changes may reorder, drop the finger
-    sign_entry_T *sign = NULL; // a sign in a b_signlist
+    curbuf->b_sign_finger = रिक्त; // line changes may reorder, drop the finger
+    sign_entry_T *sign = रिक्त; // a sign in a b_signlist
     FOR_ALL_SIGNS_IN_BUF(curbuf, sign)
     {
         // Ignore changes to lines after the sign
-        if (sign->se_lnum < line1)
-            continue;
+        जर (sign->se_lnum < line1)
+            सुरूठेवा;
 
         linenr_T new_lnum = sign->se_lnum;
 
-        if (sign->se_lnum <= line2)
+        जर (sign->se_lnum <= line2)
         {
-            if (amount != MAXLNUM)
+            जर (amount != MAXLNUM)
                 new_lnum += amount;
         }
-        else if (sign->se_lnum > line2)
+        अन्यथा जर (sign->se_lnum > line2)
         {
             // Lines inserted or deleted before the sign
             new_lnum += amount_after;
@@ -868,7 +868,7 @@ sign_mark_adjust(
         // If the new sign line number is past the last line in the buffer,
         // then don't adjust the line number. Otherwise, it will always be past
         // the last line and will not be visible.
-        if (new_lnum <= curbuf->b_ml.ml_line_count)
+        जर (new_lnum <= curbuf->b_ml.ml_ओळ_मोजणी)
             sign->se_lnum = new_lnum;
     }
 }
@@ -877,111 +877,111 @@ sign_mark_adjust(
  * Find index of a ":sign" subcmd from its name.
  * "*end_cmd" must be writable.
  */
-static int
+स्थिर पूर्णांक
 sign_cmd_idx(char_u *begin_cmd, // begin of sign subcmd
              char_u *end_cmd) // just after sign subcmd
 {
-    int idx = 0;
-    char save = *end_cmd;
+    पूर्णांक idx = 0;
+    अक्षर save = *end_cmd;
     *end_cmd = NUL;
 
-    while (cmds[idx] != NULL && STRCMP(begin_cmd, cmds[idx]) != 0)
+    पर्यंत (cmds[idx] != रिक्त && STRCMP(begin_cmd, cmds[idx]) != 0)
         ++idx;
 
     *end_cmd = save;
-    return idx;
+    परत idx;
 }
 
 /*
  * Find a sign by name. Also returns pointer to the previous sign.
  */
-static sign_T *
+स्थिर sign_T *
 sign_find(char_u *name, sign_T **sp_prev)
 {
-    if (sp_prev != NULL)
-        *sp_prev = NULL;
+    जर (sp_prev != रिक्त)
+        *sp_prev = रिक्त;
 
-    sign_T *sp = NULL;
+    sign_T *sp = रिक्त;
     FOR_ALL_SIGNS(sp)
     {
-        if (STRCMP(sp->sn_name, name) == 0)
-            break;
+        जर (STRCMP(sp->sn_name, name) == 0)
+            थांबा;
 
-        if (sp_prev != NULL)
+        जर (sp_prev != रिक्त)
             *sp_prev = sp;
     }
 
-    return sp;
+    परत sp;
 }
 
 /*
  * Allocate a new sign
  */
-static sign_T *
+स्थिर sign_T *
 alloc_new_sign(char_u *name)
 {
-    int start = next_sign_typenr;
+    पूर्णांक start = next_sign_typenr;
 
     // Allocate a new sign.
-    sign_T *sp = alloc_clear_id(sizeof(sign_T), aid_sign_define_by_name);
-    if (sp == NULL)
-        return NULL;
+    sign_T *sp = alloc_clear_id(आकार(sign_T), aid_sign_define_by_name);
+    जर (sp == रिक्त)
+        परत रिक्त;
 
     // Check that next_sign_typenr is not already being used.
     // This only happens after wrapping around.  Hopefully
     // another one got deleted and we can use its number.
     sign_T *lp = first_sign;
-    while (lp != NULL)
+    पर्यंत (lp != रिक्त)
     {
-        if (lp->sn_typenr == next_sign_typenr)
+        जर (lp->sn_typenr == next_sign_typenr)
         {
             ++next_sign_typenr;
 
-            if (next_sign_typenr == MAX_TYPENR)
+            जर (next_sign_typenr == MAX_TYPENR)
                 next_sign_typenr = 1;
 
-            if (next_sign_typenr == start)
+            जर (next_sign_typenr == start)
             {
                 vim_free(sp);
                 emsg(_(e_too_many_signs_defined));
-                return NULL;
+                परत रिक्त;
             }
 
             lp = first_sign; // start all over
-            continue;
+            सुरूठेवा;
         }
         lp = lp->sn_next;
     }
 
     sp->sn_typenr = next_sign_typenr;
 
-    if (++next_sign_typenr == MAX_TYPENR)
+    जर (++next_sign_typenr == MAX_TYPENR)
         next_sign_typenr = 1; // wrap around
 
     sp->sn_name = vim_strsave(name);
-    if (sp->sn_name == NULL) // out of memory
+    जर (sp->sn_name == रिक्त) // out of memory
     {
         vim_free(sp);
-        return NULL;
+        परत रिक्त;
     }
 
-    return sp;
+    परत sp;
 }
 
 /*
  * Initialize the icon information for a new sign
  */
-static void
+स्थिर शून्य
 sign_define_init_icon(sign_T *sp, char_u *icon)
 {
     vim_free(sp->sn_icon);
     sp->sn_icon = vim_strsave(icon);
     backslash_halve(sp->sn_icon);
 # ifdef FEAT_SIGN_ICONS
-    if (gui.in_use)
+    जर (gui.in_use)
     {
         out_flush();
-        if (sp->sn_image != NULL)
+        जर (sp->sn_image != रिक्त)
             gui_mch_destroy_sign(sp->sn_image);
         sp->sn_image = gui_mch_register_sign(sp->sn_icon);
     }
@@ -991,17 +991,17 @@ sign_define_init_icon(sign_T *sp, char_u *icon)
 /*
  * Initialize the text for a new sign
  */
-static int
+स्थिर पूर्णांक
 sign_define_init_text(sign_T *sp, char_u *text)
 {
-    char_u *s = NULL;
-    char_u *endp = text + (int)STRLEN(text);
-    int cells = 0;
+    char_u *s = रिक्त;
+    char_u *endp = text + (पूर्णांक)STRLEN(text);
+    पूर्णांक cells = 0;
 
     // Remove backslashes so that it is possible to use a space.
-    for (s = text; s + 1 < endp; ++s)
+    साठी (s = text; s + 1 < endp; ++s)
     {
-        if (*s == '\\')
+        जर (*s == '\\')
         {
             STRMOVE(s, s + 1);
             --endp;
@@ -1009,50 +1009,50 @@ sign_define_init_text(sign_T *sp, char_u *text)
     }
 
     // Count cells and check for non-printable chars
-    if (has_mbyte)
+    जर (has_mbyte)
     {
-        for (s = text; s < endp; s += (*mb_ptr2len)(s))
+        साठी (s = text; s < endp; s += (*mb_ptr2len)(s))
         {
-            if (!vim_isprintc((*mb_ptr2char)(s)))
-                break;
+            जर (!vim_isprintc((*mb_ptr2char)(s)))
+                थांबा;
 
             cells += (*mb_ptr2cells)(s);
         }
     }
-    else
+    अन्यथा
     {
-        for (s = text; s < endp; ++s)
+        साठी (s = text; s < endp; ++s)
         {
-            if (!vim_isprintc(*s))
-                break;
+            जर (!vim_isprintc(*s))
+                थांबा;
         }
-        cells = (int)(s - text);
+        cells = (पूर्णांक)(s - text);
     }
 
     // Currently sign text must be one or two display cells
-    if (s != endp || cells < 1 || cells > 2)
+    जर (s != endp || cells < 1 || cells > 2)
     {
         semsg(_(e_invalid_sign_text_str), text);
-        return FAIL;
+        परत FAIL;
     }
 
     vim_free(sp->sn_text);
     // Allocate one byte more if we need to pad up
     // with a space.
-    int len = (int)(endp - text + ((cells == 1) ? 1 : 0));
+    पूर्णांक len = (पूर्णांक)(endp - text + ((cells == 1) ? 1 : 0));
     sp->sn_text = vim_strnsave(text, len);
 
     // For single character sign text, pad with a space.
-    if (sp->sn_text != NULL && cells == 1)
+    जर (sp->sn_text != रिक्त && cells == 1)
         STRCPY(sp->sn_text + len - 1, " ");
 
-    return OK;
+    परत OK;
 }
 
 /*
  * Define a new sign or update an existing sign
  */
-int
+पूर्णांक
 sign_define_by_name(char_u *name,
                     char_u *icon,
                     char_u *linehl,
@@ -1060,132 +1060,132 @@ sign_define_by_name(char_u *name,
                     char_u *texthl,
                     char_u *culhl,
                     char_u *numhl,
-                    int prio)
+                    पूर्णांक prio)
 {
-    sign_T *sp_prev = NULL;
+    sign_T *sp_prev = रिक्त;
     sign_T *sp = sign_find(name, &sp_prev);
-    if (sp == NULL)
+    जर (sp == रिक्त)
     {
         sp = alloc_new_sign(name);
-        if (sp == NULL)
-            return FAIL;
+        जर (sp == रिक्त)
+            परत FAIL;
 
         // add the new sign to the list of signs
-        if (sp_prev == NULL)
+        जर (sp_prev == रिक्त)
             first_sign = sp;
-        else
+        अन्यथा
             sp_prev->sn_next = sp;
     }
-    else
+    अन्यथा
     {
-        win_T *wp = NULL;
+        win_T *wp = रिक्त;
         // Signs may already exist, a redraw is needed in windows with a
         // non-empty sign list.
         FOR_ALL_WINDOWS(wp)
         {
-            if (wp->w_buffer->b_signlist != NULL)
+            जर (wp->w_buffer->b_signlist != रिक्त)
                 redraw_buf_later(wp->w_buffer, UPD_NOT_VALID);
         }
     }
 
     // set values for a defined sign.
-    if (icon != NULL)
+    जर (icon != रिक्त)
         sign_define_init_icon(sp, icon);
 
-    if (text != NULL && (sign_define_init_text(sp, text) == FAIL))
-        return FAIL;
+    जर (text != रिक्त && (sign_define_init_text(sp, text) == FAIL))
+        परत FAIL;
 
     sp->sn_priority = prio;
 
-    if (linehl != NULL)
+    जर (linehl != रिक्त)
     {
-        if (*linehl == NUL)
-            sp->sn_line_hl = 0;
-        else
-            sp->sn_line_hl = syn_check_group(linehl, (int)STRLEN(linehl));
+        जर (*linehl == NUL)
+            sp->sn_ओळ_hl = 0;
+        अन्यथा
+            sp->sn_ओळ_hl = syn_check_group(linehl, (पूर्णांक)STRLEN(linehl));
     }
 
-    if (texthl != NULL)
+    जर (texthl != रिक्त)
     {
-        if (*texthl == NUL)
+        जर (*texthl == NUL)
             sp->sn_text_hl = 0;
-        else
-            sp->sn_text_hl = syn_check_group(texthl, (int)STRLEN(texthl));
+        अन्यथा
+            sp->sn_text_hl = syn_check_group(texthl, (पूर्णांक)STRLEN(texthl));
     }
 
-    if (culhl != NULL)
+    जर (culhl != रिक्त)
     {
-        if (*culhl == NUL)
+        जर (*culhl == NUL)
             sp->sn_cul_hl = 0;
-        else
-            sp->sn_cul_hl = syn_check_group(culhl, (int)STRLEN(culhl));
+        अन्यथा
+            sp->sn_cul_hl = syn_check_group(culhl, (पूर्णांक)STRLEN(culhl));
     }
 
-    if (numhl != NULL)
+    जर (numhl != रिक्त)
     {
-        if (*numhl == NUL)
-            sp->sn_num_hl = 0;
-        else
-            sp->sn_num_hl = syn_check_group(numhl, (int)STRLEN(numhl));
+        जर (*numhl == NUL)
+            sp->sn_अंक_hl = 0;
+        अन्यथा
+            sp->sn_अंक_hl = syn_check_group(numhl, (पूर्णांक)STRLEN(numhl));
     }
 
-    return OK;
+    परत OK;
 }
 
 /*
  * Return TRUE if sign "name" exists.
  */
-int
+पूर्णांक
 sign_exists_by_name(char_u *name)
 {
-    return sign_find(name, NULL) != NULL;
+    परत sign_find(name, रिक्त) != रिक्त;
 }
 
 /*
  * Free the sign specified by 'name'.
  */
-int
-sign_undefine_by_name(char_u *name, int give_error)
+पूर्णांक
+sign_undefine_by_name(char_u *name, पूर्णांक give_error)
 {
-    sign_T *sp_prev = NULL;
+    sign_T *sp_prev = रिक्त;
     sign_T *sp = sign_find(name, &sp_prev);
-    if (sp == NULL)
+    जर (sp == रिक्त)
     {
-        if (give_error)
+        जर (give_error)
             semsg(_(e_unknown_sign_str), name);
-        return FAIL;
+        परत FAIL;
     }
     sign_undefine(sp, sp_prev);
 
-    return OK;
+    परत OK;
 }
 
 /*
  * List the signs matching 'name'
  */
-static void
+स्थिर शून्य
 sign_list_by_name(char_u *name)
 {
-    sign_T *sp = sign_find(name, NULL);
-    if (sp != NULL)
+    sign_T *sp = sign_find(name, रिक्त);
+    जर (sp != रिक्त)
         sign_list_defined(sp);
-    else
+    अन्यथा
         semsg(_(e_unknown_sign_str), name);
 }
 
-static void
-may_force_numberwidth_recompute(buf_T *buf, int unplace)
+स्थिर शून्य
+may_force_numberwidth_recompute(buf_T *buf, पूर्णांक unplace)
 {
-# if defined(FEAT_LINEBREAK)
-    tabpage_T *tp = NULL;
-    win_T *wp = NULL;
+# जर defined(FEAT_LINEBREAK)
+    tabpage_T *tp = रिक्त;
+    win_T *wp = रिक्त;
 
     FOR_ALL_TAB_WINDOWS(tp, wp)
     {
-        if (wp->w_buffer == buf && (wp->w_p_nu || wp->w_p_rnu) &&
+        जर (wp->w_buffer == buf && (wp->w_p_nu || wp->w_p_rnu) &&
             (unplace || wp->w_nrwidth_width < 2) &&
             (*wp->w_p_scl == 'n' && *(wp->w_p_scl + 1) == 'u'))
-            wp->w_nrwidth_line_count = 0;
+            wp->w_nrwidth_ओळ_मोजणी = 0;
     }
 # endif
 }
@@ -1193,223 +1193,223 @@ may_force_numberwidth_recompute(buf_T *buf, int unplace)
 /*
  * Place a sign at the specified file location or update a sign.
  */
-int
-sign_place(int *sign_id,
+पूर्णांक
+sign_place(पूर्णांक *sign_id,
            char_u *sign_group,
            char_u *sign_name,
            buf_T *buf,
            linenr_T lnum,
-           int prio)
+           पूर्णांक prio)
 {
     // Check for reserved character '*' in group name
-    if (sign_group != NULL && (*sign_group == '*' || *sign_group == '\0'))
-        return FAIL;
+    जर (sign_group != रिक्त && (*sign_group == '*' || *sign_group == '\0'))
+        परत FAIL;
 
-    sign_T *sp = NULL;
+    sign_T *sp = रिक्त;
     FOR_ALL_SIGNS(sp)
     {
-        if (STRCMP(sp->sn_name, sign_name) == 0)
-            break;
+        जर (STRCMP(sp->sn_name, sign_name) == 0)
+            थांबा;
     }
 
-    if (sp == NULL)
+    जर (sp == रिक्त)
     {
         semsg(_(e_unknown_sign_str), sign_name);
-        return FAIL;
+        परत FAIL;
     }
 
-    if (*sign_id == 0)
+    जर (*sign_id == 0)
         *sign_id = sign_group_get_next_signid(buf, sign_group);
 
     // Use the default priority value for this sign.
-    if (prio == -1)
+    जर (prio == -1)
         prio = (sp->sn_priority != -1) ? sp->sn_priority : SIGN_DEF_PRIO;
 
-    if (lnum > 0)
+    जर (lnum > 0)
     {
         // ":sign place {id} line={lnum} name={name} file={fname}":
         // place a sign
         buf_addsign(buf, *sign_id, sign_group, prio, lnum, sp->sn_typenr);
     }
-    else
+    अन्यथा
     {
         // ":sign place {id} file={fname}": change sign type and/or priority
         lnum = buf_change_sign_type(buf, *sign_id, sign_group, sp->sn_typenr,
                                     prio);
     }
 
-    if (lnum > 0)
+    जर (lnum > 0)
     {
-        redraw_buf_line_later(buf, lnum);
+        redraw_buf_ओळ_later(buf, lnum);
 
         // When displaying signs in the 'number' column, if the width of the
         // number column is less than 2, then force recomputing the width.
         may_force_numberwidth_recompute(buf, FALSE);
     }
-    else
+    अन्यथा
     {
         semsg(_(e_not_possible_to_change_sign_str), sign_name);
-        return FAIL;
+        परत FAIL;
     }
 
-    return OK;
+    परत OK;
 }
 
 /*
  * Unplace the specified sign
  */
-static int
-sign_unplace(int sign_id, char_u *sign_group, buf_T *buf, linenr_T atlnum)
+स्थिर पूर्णांक
+sign_unplace(पूर्णांक sign_id, char_u *sign_group, buf_T *buf, linenr_T atlnum)
 {
-    if (buf->b_signlist == NULL) // No signs in the buffer
-        return OK;
+    जर (buf->b_signlist == रिक्त) // No signs in the buffer
+        परत OK;
 
-    if (sign_id == 0)
+    जर (sign_id == 0)
     {
         // Delete all the signs in the specified buffer
         redraw_buf_later(buf, UPD_NOT_VALID);
         buf_delete_signs(buf, sign_group);
     }
-    else
+    अन्यथा
     {
         // Delete only the specified signs
         linenr_T lnum = buf_delsign(buf, atlnum, sign_id, sign_group);
-        if (lnum == 0)
-            return FAIL;
+        जर (lnum == 0)
+            परत FAIL;
     }
 
     // When all the signs in a buffer are removed, force recomputing the
     // number column width (if enabled) in all the windows displaying the
     // buffer if 'signcolumn' is set to 'number' in that window.
-    if (buf->b_signlist == NULL)
+    जर (buf->b_signlist == रिक्त)
         may_force_numberwidth_recompute(buf, TRUE);
 
-    return OK;
+    परत OK;
 }
 
 /*
  * Unplace the sign at the current cursor line.
  */
-static void
+स्थिर शून्य
 sign_unplace_at_cursor(char_u *groupname)
 {
-    int id =
+    पूर्णांक id =
         buf_findsign_id(curwin->w_buffer, curwin->w_cursor.lnum, groupname);
 
-    if (id > 0)
+    जर (id > 0)
         sign_unplace(id, groupname, curwin->w_buffer, curwin->w_cursor.lnum);
-    else
-        emsg(_(e_missing_sign_number));
+    अन्यथा
+        emsg(_(e_missing_sign_संख्या));
 }
 
 /*
  * Jump to a sign.
  */
-static linenr_T
-sign_jump(int sign_id, char_u *sign_group, buf_T *buf)
+स्थिर linenr_T
+sign_jump(पूर्णांक sign_id, char_u *sign_group, buf_T *buf)
 {
     linenr_T lnum = buf_findsign(buf, sign_id, sign_group);
-    if (lnum <= 0)
+    जर (lnum <= 0)
     {
         semsg(_(e_invalid_sign_id_nr), sign_id);
-        return -1;
+        परत -1;
     }
 
     // goto a sign ...
-    if (buf_jump_open_win(buf) != NULL)
+    जर (buf_jump_open_win(buf) != रिक्त)
     { // ... in a current window
         curwin->w_cursor.lnum = lnum;
         check_cursor_lnum();
         beginline(BL_WHITE);
     }
-    else
+    अन्यथा
     { // ... not currently in a window
-        if (buf->b_fname == NULL)
+        जर (buf->b_fname == रिक्त)
         {
             emsg(_(e_cannot_jump_to_buffer_that_does_not_have_name));
-            return -1;
+            परत -1;
         }
         setpcmark();
-        if (do_ecmd(buf->b_fnum, NULL, NULL, NULL, lnum,
+        जर (do_ecmd(buf->b_fnum, रिक्त, रिक्त, रिक्त, lnum,
                     buf_hide(curbuf) ? ECMD_HIDE : 0, curwin) == FAIL)
-            return -1;
+            परत -1;
     }
 # ifdef FEAT_FOLDING
     foldOpenCursor();
 # endif
 
-    return lnum;
+    परत lnum;
 }
 
 /*
  * ":sign define {name} ..." command
  */
-static void
+स्थिर शून्य
 sign_define_cmd(char_u *sign_name, char_u *cmdline)
 {
-    char_u *arg = NULL;
+    char_u *arg = रिक्त;
     char_u *p = cmdline;
-    char_u *icon = NULL;
-    char_u *text = NULL;
-    char_u *linehl = NULL;
-    char_u *texthl = NULL;
-    char_u *culhl = NULL;
-    char_u *numhl = NULL;
-    int prio = -1;
-    int failed = FALSE;
+    char_u *icon = रिक्त;
+    char_u *text = रिक्त;
+    char_u *linehl = रिक्त;
+    char_u *texthl = रिक्त;
+    char_u *culhl = रिक्त;
+    char_u *numhl = रिक्त;
+    पूर्णांक prio = -1;
+    पूर्णांक failed = FALSE;
 
     // set values for a defined sign.
-    while (TRUE)
+    पर्यंत (TRUE)
     {
         arg = skipwhite(p);
-        if (*arg == NUL)
-            break;
+        जर (*arg == NUL)
+            थांबा;
 
         p = skiptowhite_esc(arg);
-        if (STRNCMP(arg, "icon=", 5) == 0)
+        जर (STRNCMP(arg, "icon=", 5) == 0)
         {
             arg += 5;
             icon = vim_strnsave(arg, p - arg);
         }
-        else if (STRNCMP(arg, "text=", 5) == 0)
+        अन्यथा जर (STRNCMP(arg, "text=", 5) == 0)
         {
             arg += 5;
             text = vim_strnsave(arg, p - arg);
         }
-        else if (STRNCMP(arg, "linehl=", 7) == 0)
+        अन्यथा जर (STRNCMP(arg, "linehl=", 7) == 0)
         {
             arg += 7;
             linehl = vim_strnsave(arg, p - arg);
         }
-        else if (STRNCMP(arg, "texthl=", 7) == 0)
+        अन्यथा जर (STRNCMP(arg, "texthl=", 7) == 0)
         {
             arg += 7;
             texthl = vim_strnsave(arg, p - arg);
         }
-        else if (STRNCMP(arg, "culhl=", 6) == 0)
+        अन्यथा जर (STRNCMP(arg, "culhl=", 6) == 0)
         {
             arg += 6;
             culhl = vim_strnsave(arg, p - arg);
         }
-        else if (STRNCMP(arg, "numhl=", 6) == 0)
+        अन्यथा जर (STRNCMP(arg, "numhl=", 6) == 0)
         {
             arg += 6;
             numhl = vim_strnsave(arg, p - arg);
         }
-        else if (STRNCMP(arg, "priority=", 9) == 0)
+        अन्यथा जर (STRNCMP(arg, "priority=", 9) == 0)
         {
             arg += 9;
-            prio = atoi((char *)arg);
+            prio = म_से_प((अक्षर *)arg);
         }
-        else
+        अन्यथा
         {
             semsg(_(e_invalid_argument_str), arg);
             failed = TRUE;
-            break;
+            थांबा;
         }
     }
 
-    if (!failed)
+    जर (!failed)
         sign_define_by_name(sign_name, icon, linehl, text, texthl, culhl, numhl,
                             prio);
 
@@ -1424,15 +1424,15 @@ sign_define_cmd(char_u *sign_name, char_u *cmdline)
 /*
  * ":sign place" command
  */
-static void
+स्थिर शून्य
 sign_place_cmd(buf_T *buf,
                linenr_T lnum,
                char_u *sign_name,
-               int id,
+               पूर्णांक id,
                char_u *group,
-               int prio)
+               पूर्णांक prio)
 {
-    if (id <= 0)
+    जर (id <= 0)
     {
         // List signs placed in a file/buffer
         //   :sign place file={fname}
@@ -1444,19 +1444,19 @@ sign_place_cmd(buf_T *buf,
         //   :sign place
         //   :sign place group={group}
         //   :sign place group=*
-        if (lnum >= 0 || sign_name != NULL || (group != NULL && *group == '\0'))
+        जर (lnum >= 0 || sign_name != रिक्त || (group != रिक्त && *group == '\0'))
             emsg(_(e_invalid_argument));
-        else
+        अन्यथा
             sign_list_placed(buf, group);
     }
-    else
+    अन्यथा
     {
         // Place a new sign
-        if (sign_name == NULL || buf == NULL ||
-            (group != NULL && *group == '\0'))
+        जर (sign_name == रिक्त || buf == रिक्त ||
+            (group != रिक्त && *group == '\0'))
         {
             emsg(_(e_invalid_argument));
-            return;
+            परत;
         }
 
         sign_place(&id, group, sign_name, buf, lnum, prio);
@@ -1466,22 +1466,22 @@ sign_place_cmd(buf_T *buf,
 /*
  * ":sign unplace" command
  */
-static void
+स्थिर शून्य
 sign_unplace_cmd(buf_T *buf,
                  linenr_T lnum,
                  char_u *sign_name,
-                 int id,
+                 पूर्णांक id,
                  char_u *group)
 {
-    if (lnum >= 0 || sign_name != NULL || (group != NULL && *group == '\0'))
+    जर (lnum >= 0 || sign_name != रिक्त || (group != रिक्त && *group == '\0'))
     {
         emsg(_(e_invalid_argument));
-        return;
+        परत;
     }
 
-    if (id == -2)
+    जर (id == -2)
     {
-        if (buf != NULL)
+        जर (buf != रिक्त)
         {
             // :sign unplace * file={fname}
             // :sign unplace * group={group} file={fname}
@@ -1491,21 +1491,21 @@ sign_unplace_cmd(buf_T *buf,
             // :sign unplace * group=* buffer={nr}
             sign_unplace(0, group, buf, 0);
         }
-        else
+        अन्यथा
         {
             // :sign unplace *
             // :sign unplace * group={group}
             // :sign unplace * group=*
             FOR_ALL_BUFFERS(buf)
             {
-                if (buf->b_signlist != NULL)
+                जर (buf->b_signlist != रिक्त)
                     buf_delete_signs(buf, group);
             }
         }
     }
-    else
+    अन्यथा
     {
-        if (buf != NULL)
+        जर (buf != रिक्त)
         {
             // :sign unplace {id} file={fname}
             // :sign unplace {id} group={group} file={fname}
@@ -1515,15 +1515,15 @@ sign_unplace_cmd(buf_T *buf,
             // :sign unplace {id} group=* buffer={nr}
             sign_unplace(id, group, buf, 0);
         }
-        else
+        अन्यथा
         {
-            if (id == -1)
+            जर (id == -1)
             {
                 // :sign unplace group={group}
                 // :sign unplace group=*
                 sign_unplace_at_cursor(group);
             }
-            else
+            अन्यथा
             {
                 // :sign unplace {id}
                 // :sign unplace {id} group={group}
@@ -1542,29 +1542,29 @@ sign_unplace_cmd(buf_T *buf,
  *   :sign jump {id} group={group} file={fname}
  *   :sign jump {id} group={group} buffer={nr}
  */
-static void
+स्थिर शून्य
 sign_jump_cmd(buf_T *buf,
               linenr_T lnum,
               char_u *sign_name,
-              int id,
+              पूर्णांक id,
               char_u *group)
 {
-    if (sign_name == NULL && group == NULL && id == -1)
+    जर (sign_name == रिक्त && group == रिक्त && id == -1)
     {
         emsg(_(e_argument_required));
-        return;
+        परत;
     }
 
-    if (buf == NULL || (group != NULL && *group == '\0') || lnum >= 0 ||
-        sign_name != NULL)
+    जर (buf == रिक्त || (group != रिक्त && *group == '\0') || lnum >= 0 ||
+        sign_name != रिक्त)
     {
         // File or buffer is not specified or an empty group is used
         // or a line number or a sign name is specified.
         emsg(_(e_invalid_argument));
-        return;
+        परत;
     }
 
-    (void)sign_jump(id, group, buf);
+    (शून्य)sign_jump(id, group, buf);
 }
 
 /*
@@ -1573,196 +1573,196 @@ sign_jump_cmd(buf_T *buf,
  * The supported arguments are: line={lnum} name={name} group={group}
  * priority={prio} and file={fname} or buffer={nr}.
  */
-static int
-parse_sign_cmd_args(int cmd,
+स्थिर पूर्णांक
+parse_sign_cmd_args(पूर्णांक cmd,
                     char_u *arg,
                     char_u **sign_name,
-                    int *signid,
+                    पूर्णांक *signid,
                     char_u **group,
-                    int *prio,
+                    पूर्णांक *prio,
                     buf_T **buf,
                     linenr_T *lnum)
 {
     char_u *arg1 = arg;
-    char_u *filename = NULL;
-    int lnum_arg = FALSE;
+    char_u *filename = रिक्त;
+    पूर्णांक lnum_arg = FALSE;
 
     // first arg could be placed sign id
-    if (VIM_ISDIGIT(*arg))
+    जर (VIM_ISDIGIT(*arg))
     {
         *signid = getdigits(&arg);
-        if (!VIM_ISWHITE(*arg) && *arg != NUL)
+        जर (!VIM_ISWHITE(*arg) && *arg != NUL)
         {
             *signid = -1;
             arg = arg1;
         }
-        else
+        अन्यथा
         {
             arg = skipwhite(arg);
         }
     }
 
-    while (*arg != NUL)
+    पर्यंत (*arg != NUL)
     {
-        if (STRNCMP(arg, "line=", 5) == 0)
+        जर (STRNCMP(arg, "line=", 5) == 0)
         {
             arg += 5;
-            *lnum = atoi((char *)arg);
+            *lnum = म_से_प((अक्षर *)arg);
             arg = skiptowhite(arg);
             lnum_arg = TRUE;
         }
-        else if (STRNCMP(arg, "*", 1) == 0 && cmd == SIGNCMD_UNPLACE)
+        अन्यथा जर (STRNCMP(arg, "*", 1) == 0 && cmd == SIGNCMD_UNPLACE)
         {
-            if (*signid != -1)
+            जर (*signid != -1)
             {
                 emsg(_(e_invalid_argument));
-                return FAIL;
+                परत FAIL;
             }
             *signid = -2;
             arg = skiptowhite(arg + 1);
         }
-        else if (STRNCMP(arg, "name=", 5) == 0)
+        अन्यथा जर (STRNCMP(arg, "name=", 5) == 0)
         {
             arg += 5;
             char_u *name = arg;
             arg = skiptowhite(arg);
-            if (*arg != NUL)
+            जर (*arg != NUL)
                 *arg++ = NUL;
 
-            while (name[0] == '0' && name[1] != NUL)
+            पर्यंत (name[0] == '0' && name[1] != NUL)
                 ++name;
 
             *sign_name = name;
         }
-        else if (STRNCMP(arg, "group=", 6) == 0)
+        अन्यथा जर (STRNCMP(arg, "group=", 6) == 0)
         {
             arg += 6;
             *group = arg;
             arg = skiptowhite(arg);
-            if (*arg != NUL)
+            जर (*arg != NUL)
                 *arg++ = NUL;
         }
-        else if (STRNCMP(arg, "priority=", 9) == 0)
+        अन्यथा जर (STRNCMP(arg, "priority=", 9) == 0)
         {
             arg += 9;
-            *prio = atoi((char *)arg);
+            *prio = म_से_प((अक्षर *)arg);
             arg = skiptowhite(arg);
         }
-        else if (STRNCMP(arg, "file=", 5) == 0)
+        अन्यथा जर (STRNCMP(arg, "file=", 5) == 0)
         {
             arg += 5;
             filename = arg;
             *buf = buflist_findname_exp(arg);
-            break;
+            थांबा;
         }
-        else if (STRNCMP(arg, "buffer=", 7) == 0)
+        अन्यथा जर (STRNCMP(arg, "buffer=", 7) == 0)
         {
             arg += 7;
             filename = arg;
-            *buf = buflist_findnr((int)getdigits(&arg));
+            *buf = buflist_findnr((पूर्णांक)getdigits(&arg));
 
-            if (*skipwhite(arg) != NUL)
+            जर (*skipwhite(arg) != NUL)
                 semsg(_(e_trailing_characters_str), arg);
 
-            break;
+            थांबा;
         }
-        else
+        अन्यथा
         {
             emsg(_(e_invalid_argument));
-            return FAIL;
+            परत FAIL;
         }
 
         arg = skipwhite(arg);
     }
 
-    if (filename != NULL && *buf == NULL)
+    जर (filename != रिक्त && *buf == रिक्त)
     {
         semsg(_(e_invalid_buffer_name_str), filename);
-        return FAIL;
+        परत FAIL;
     }
 
     // If the filename is not supplied for the sign place or the sign jump
     // command, then use the current buffer.
-    if (filename == NULL &&
+    जर (filename == रिक्त &&
         ((cmd == SIGNCMD_PLACE && lnum_arg) || cmd == SIGNCMD_JUMP))
         *buf = curwin->w_buffer;
 
-    return OK;
+    परत OK;
 }
 
 /*
  * ":sign" command
  */
-void
+शून्य
 ex_sign(exarg_T *eap)
 {
     char_u *arg = eap->arg;
 
     // Parse the subcommand.
     char_u *p = skiptowhite(arg);
-    int idx = sign_cmd_idx(arg, p);
-    if (idx == SIGNCMD_LAST)
+    पूर्णांक idx = sign_cmd_idx(arg, p);
+    जर (idx == SIGNCMD_LAST)
     {
         semsg(_(e_unknown_sign_command_str), arg);
-        return;
+        परत;
     }
     arg = skipwhite(p);
 
-    if (idx > SIGNCMD_LIST)
+    जर (idx > SIGNCMD_LIST)
     {
-        char_u *sign_name = NULL;
-        int id = -1;
-        char_u *group = NULL;
-        int prio = -1;
-        buf_T *buf = NULL;
+        char_u *sign_name = रिक्त;
+        पूर्णांक id = -1;
+        char_u *group = रिक्त;
+        पूर्णांक prio = -1;
+        buf_T *buf = रिक्त;
         linenr_T lnum = -1;
 
         // Parse command line arguments
-        if (parse_sign_cmd_args(idx, arg, &sign_name, &id, &group, &prio, &buf,
+        जर (parse_sign_cmd_args(idx, arg, &sign_name, &id, &group, &prio, &buf,
                                 &lnum) == FAIL)
-            return;
+            परत;
 
-        if (idx == SIGNCMD_PLACE)
+        जर (idx == SIGNCMD_PLACE)
             sign_place_cmd(buf, lnum, sign_name, id, group, prio);
-        else if (idx == SIGNCMD_UNPLACE)
+        अन्यथा जर (idx == SIGNCMD_UNPLACE)
             sign_unplace_cmd(buf, lnum, sign_name, id, group);
-        else if (idx == SIGNCMD_JUMP)
+        अन्यथा जर (idx == SIGNCMD_JUMP)
             sign_jump_cmd(buf, lnum, sign_name, id, group);
 
-        return;
+        परत;
     }
 
     // Define, undefine or list signs.
-    if (idx == SIGNCMD_LIST && *arg == NUL)
+    जर (idx == SIGNCMD_LIST && *arg == NUL)
     {
         // ":sign list": list all defined signs
-        for (sign_T *sp = first_sign; sp != NULL && !got_int; sp = sp->sn_next)
+        साठी (sign_T *sp = first_sign; sp != रिक्त && !got_int; sp = sp->sn_next)
             sign_list_defined(sp);
     }
-    else if (*arg == NUL)
+    अन्यथा जर (*arg == NUL)
     {
         emsg(_(e_missing_sign_name));
     }
-    else
+    अन्यथा
     {
 
         // Isolate the sign name.  If it's a number skip leading zeroes,
         // so that "099" and "99" are the same sign.  But keep "0".
         p = skiptowhite(arg);
-        if (*p != NUL)
+        जर (*p != NUL)
             *p++ = NUL;
 
-        while (arg[0] == '0' && arg[1] != NUL)
+        पर्यंत (arg[0] == '0' && arg[1] != NUL)
             ++arg;
 
         char_u *name = vim_strsave(arg);
 
-        if (idx == SIGNCMD_DEFINE)
+        जर (idx == SIGNCMD_DEFINE)
             sign_define_cmd(name, p);
-        else if (idx == SIGNCMD_LIST)
+        अन्यथा जर (idx == SIGNCMD_LIST)
             // ":sign list {name}"
             sign_list_by_name(name);
-        else
+        अन्यथा
             // ":sign undefine {name}"
             sign_undefine_by_name(name, TRUE);
 
@@ -1773,57 +1773,57 @@ ex_sign(exarg_T *eap)
 /*
  * Return information about a specified sign
  */
-static void
+स्थिर शून्य
 sign_getinfo(sign_T *sp, dict_T *retdict)
 {
     dict_add_string(retdict, "name", sp->sn_name);
 
-    if (sp->sn_icon != NULL)
+    जर (sp->sn_icon != रिक्त)
         dict_add_string(retdict, "icon", sp->sn_icon);
 
-    if (sp->sn_text != NULL)
+    जर (sp->sn_text != रिक्त)
         dict_add_string(retdict, "text", sp->sn_text);
 
-    if (sp->sn_priority > 0)
-        dict_add_number(retdict, "priority", sp->sn_priority);
+    जर (sp->sn_priority > 0)
+        dict_add_संख्या(retdict, "priority", sp->sn_priority);
 
-    if (sp->sn_line_hl > 0)
+    जर (sp->sn_ओळ_hl > 0)
     {
-        char_u *p = get_highlight_name_ext(NULL, sp->sn_line_hl - 1, FALSE);
-        if (p == NULL)
+        char_u *p = get_highlight_name_ext(रिक्त, sp->sn_ओळ_hl - 1, FALSE);
+        जर (p == रिक्त)
             dict_add_string_len(retdict, "linehl",
                 (char_u *)"NONE", STRLEN_LITERAL("NONE"));
-        else
+        अन्यथा
             dict_add_string(retdict, "linehl", p);
     }
 
-    if (sp->sn_text_hl > 0)
+    जर (sp->sn_text_hl > 0)
     {
-        char_u *p = get_highlight_name_ext(NULL, sp->sn_text_hl - 1, FALSE);
-        if (p == NULL)
+        char_u *p = get_highlight_name_ext(रिक्त, sp->sn_text_hl - 1, FALSE);
+        जर (p == रिक्त)
             dict_add_string_len(retdict, "texthl",
                 (char_u *)"NONE", STRLEN_LITERAL("NONE"));
-        else
+        अन्यथा
             dict_add_string(retdict, "texthl", p);
     }
 
-    if (sp->sn_cul_hl > 0)
+    जर (sp->sn_cul_hl > 0)
     {
-        char_u *p = get_highlight_name_ext(NULL, sp->sn_cul_hl - 1, FALSE);
-        if (p == NULL)
+        char_u *p = get_highlight_name_ext(रिक्त, sp->sn_cul_hl - 1, FALSE);
+        जर (p == रिक्त)
             dict_add_string_len(retdict, "culhl",
                 (char_u *)"NONE", STRLEN_LITERAL("NONE"));
-        else
+        अन्यथा
             dict_add_string(retdict, "culhl", p);
     }
 
-    if (sp->sn_num_hl > 0)
+    जर (sp->sn_अंक_hl > 0)
     {
-        char_u *p = get_highlight_name_ext(NULL, sp->sn_num_hl - 1, FALSE);
-        if (p == NULL)
+        char_u *p = get_highlight_name_ext(रिक्त, sp->sn_अंक_hl - 1, FALSE);
+        जर (p == रिक्त)
             dict_add_string_len(retdict, "numhl",
                 (char_u *)"NONE", STRLEN_LITERAL("NONE"));
-        else
+        अन्यथा
             dict_add_string(retdict, "numhl", p);
     }
 }
@@ -1832,48 +1832,48 @@ sign_getinfo(sign_T *sp, dict_T *retdict)
  * If 'name' is NULL, return a list of all the defined signs.
  * Otherwise, return information about the specified sign.
  */
-static void
+स्थिर शून्य
 sign_getlist(char_u *name, list_T *retlist)
 {
     sign_T *sp = first_sign;
 
-    if (name != NULL)
+    जर (name != रिक्त)
     {
-        sp = sign_find(name, NULL);
-        if (sp == NULL)
-            return;
+        sp = sign_find(name, रिक्त);
+        जर (sp == रिक्त)
+            परत;
     }
 
-    for (; sp != NULL && !got_int; sp = sp->sn_next)
+    साठी (; sp != रिक्त && !got_int; sp = sp->sn_next)
     {
         dict_T *dict = dict_alloc_id(aid_sign_getlist);
-        if (dict == NULL)
-            return;
+        जर (dict == रिक्त)
+            परत;
 
-        if (list_append_dict(retlist, dict) == FAIL)
+        जर (list_append_dict(retlist, dict) == FAIL)
         {
             dict_unref(dict);
-            return;
+            परत;
         }
 
         sign_getinfo(sp, dict);
 
-        if (name != NULL) // handle only the specified sign
-            break;
+        जर (name != रिक्त) // handle only the specified sign
+            थांबा;
     }
 }
 
 /*
  * Returns information about signs placed in a buffer as list of dicts.
  */
-void
+शून्य
 get_buffer_signs(buf_T *buf, list_T *l)
 {
-    sign_entry_T *sign = NULL;
+    sign_entry_T *sign = रिक्त;
     FOR_ALL_SIGNS_IN_BUF(buf, sign)
     {
         dict_T *d = sign_get_info(sign);
-        if (d != NULL && list_append_dict(l, d) == FAIL)
+        जर (d != रिक्त && list_append_dict(l, d) == FAIL)
             dict_unref(d);
     }
 }
@@ -1881,48 +1881,48 @@ get_buffer_signs(buf_T *buf, list_T *l)
 /*
  * Return information about all the signs placed in a buffer
  */
-static void
+स्थिर शून्य
 sign_get_placed_in_buf(buf_T *buf,
                        linenr_T lnum,
-                       int sign_id,
+                       पूर्णांक sign_id,
                        char_u *sign_group,
                        list_T *retlist)
 {
     dict_T *d = dict_alloc_id(aid_sign_getplaced_dict);
-    if (d == NULL)
-        return;
+    जर (d == रिक्त)
+        परत;
 
-    if (list_append_dict(retlist, d) == FAIL)
+    जर (list_append_dict(retlist, d) == FAIL)
     {
         dict_unref(d);
-        return;
+        परत;
     }
 
-    dict_add_number(d, "bufnr", (long)buf->b_fnum);
+    dict_add_संख्या(d, "bufnr", (दीर्घ)buf->b_fnum);
 
     list_T *l = list_alloc_id(aid_sign_getplaced_list);
-    if (l == NULL)
-        return;
+    जर (l == रिक्त)
+        परत;
 
-    if (dict_add_list(d, "signs", l) == FAIL)
+    जर (dict_add_list(d, "signs", l) == FAIL)
     {
         list_unref(l);
-        return;
+        परत;
     }
 
-    sign_entry_T *sign = NULL;
+    sign_entry_T *sign = रिक्त;
     FOR_ALL_SIGNS_IN_BUF(buf, sign)
     {
-        if (!sign_in_group(sign, sign_group))
-            continue;
+        जर (!sign_in_group(sign, sign_group))
+            सुरूठेवा;
 
-        if ((lnum == 0 && sign_id == 0) ||
+        जर ((lnum == 0 && sign_id == 0) ||
             (sign_id == 0 && lnum == sign->se_lnum) ||
             (lnum == 0 && sign_id == sign->se_id) ||
             (lnum == sign->se_lnum && sign_id == sign->se_id))
         {
             dict_T *sdict = sign_get_info(sign);
-            if (sdict != NULL && list_append_dict(l, sdict) == FAIL)
+            जर (sdict != रिक्त && list_append_dict(l, sdict) == FAIL)
                 dict_unref(sdict);
         }
     }
@@ -1933,39 +1933,39 @@ sign_get_placed_in_buf(buf_T *buf,
  * sign placed at the line number. If 'lnum' is zero, return all the signs
  * placed in 'buf'. If 'buf' is NULL, return signs placed in all the buffers.
  */
-static void
+स्थिर शून्य
 sign_get_placed(buf_T *buf,
                 linenr_T lnum,
-                int sign_id,
+                पूर्णांक sign_id,
                 char_u *sign_group,
                 list_T *retlist)
 {
-    if (buf != NULL)
+    जर (buf != रिक्त)
     {
         sign_get_placed_in_buf(buf, lnum, sign_id, sign_group, retlist);
     }
-    else
+    अन्यथा
     {
         FOR_ALL_BUFFERS(buf)
         {
-            if (buf->b_signlist != NULL)
+            जर (buf->b_signlist != रिक्त)
                 sign_get_placed_in_buf(buf, 0, sign_id, sign_group, retlist);
         }
     }
 }
 
-# if defined(FEAT_SIGN_ICONS)
+# जर defined(FEAT_SIGN_ICONS)
 /*
  * Allocate the icons.  Called when the GUI has started.  Allows defining
  * signs before it starts.
  */
-void
-sign_gui_started(void)
+शून्य
+sign_gui_started(शून्य)
 {
-    sign_T *sp = NULL;
+    sign_T *sp = रिक्त;
     FOR_ALL_SIGNS(sp)
     {
-        if (sp->sn_icon != NULL)
+        जर (sp->sn_icon != रिक्त)
             sp->sn_image = gui_mch_register_sign(sp->sn_icon);
     }
 }
@@ -1974,92 +1974,92 @@ sign_gui_started(void)
 /*
  * List one sign.
  */
-static void
+स्थिर शून्य
 sign_list_defined(sign_T *sp)
 {
-    char lbuf[MSG_BUF_LEN];
+    अक्षर lbuf[संदेश_BUF_LEN];
 
     smsg("sign %s", sp->sn_name);
 
-    if (sp->sn_icon != NULL)
+    जर (sp->sn_icon != रिक्त)
     {
-        msg_puts(" icon=");
-        msg_outtrans(sp->sn_icon);
+        संदेश_puts(" icon=");
+        संदेश_outtrans(sp->sn_icon);
 # ifdef FEAT_SIGN_ICONS
-        if (sp->sn_image == NULL)
-            msg_puts(_(" (NOT FOUND)"));
-# else
-        msg_puts(_(" (not supported)"));
+        जर (sp->sn_image == रिक्त)
+            संदेश_puts(_(" (NOT FOUND)"));
+# अन्यथा
+        संदेश_puts(_(" (not supported)"));
 # endif
     }
 
-    if (sp->sn_text != NULL)
+    जर (sp->sn_text != रिक्त)
     {
-        msg_puts(" text=");
-        msg_outtrans(sp->sn_text);
+        संदेश_puts(" text=");
+        संदेश_outtrans(sp->sn_text);
     }
 
-    if (sp->sn_priority > 0)
+    जर (sp->sn_priority > 0)
     {
-        vim_snprintf(lbuf, MSG_BUF_LEN, " priority=%d", sp->sn_priority);
-        msg_puts(lbuf);
+        vim_snprintf(lbuf, संदेश_BUF_LEN, " priority=%d", sp->sn_priority);
+        संदेश_puts(lbuf);
     }
 
-    if (sp->sn_line_hl > 0)
+    जर (sp->sn_ओळ_hl > 0)
     {
-        msg_puts(" linehl=");
+        संदेश_puts(" linehl=");
 
-        char_u *p = get_highlight_name_ext(NULL, sp->sn_line_hl - 1, FALSE);
-        if (p == NULL)
-            msg_puts("NONE");
-        else
-            msg_puts((char *)p);
+        char_u *p = get_highlight_name_ext(रिक्त, sp->sn_ओळ_hl - 1, FALSE);
+        जर (p == रिक्त)
+            संदेश_puts("NONE");
+        अन्यथा
+            संदेश_puts((अक्षर *)p);
     }
 
-    if (sp->sn_text_hl > 0)
+    जर (sp->sn_text_hl > 0)
     {
-        msg_puts(" texthl=");
+        संदेश_puts(" texthl=");
 
-        char_u *p = get_highlight_name_ext(NULL, sp->sn_text_hl - 1, FALSE);
-        if (p == NULL)
-            msg_puts("NONE");
-        else
-            msg_puts((char *)p);
+        char_u *p = get_highlight_name_ext(रिक्त, sp->sn_text_hl - 1, FALSE);
+        जर (p == रिक्त)
+            संदेश_puts("NONE");
+        अन्यथा
+            संदेश_puts((अक्षर *)p);
     }
 
-    if (sp->sn_cul_hl > 0)
+    जर (sp->sn_cul_hl > 0)
     {
-        msg_puts(" culhl=");
+        संदेश_puts(" culhl=");
 
-        char_u *p = get_highlight_name_ext(NULL, sp->sn_cul_hl - 1, FALSE);
-        if (p == NULL)
-            msg_puts("NONE");
-        else
-            msg_puts((char *)p);
+        char_u *p = get_highlight_name_ext(रिक्त, sp->sn_cul_hl - 1, FALSE);
+        जर (p == रिक्त)
+            संदेश_puts("NONE");
+        अन्यथा
+            संदेश_puts((अक्षर *)p);
     }
 
-    if (sp->sn_num_hl > 0)
+    जर (sp->sn_अंक_hl > 0)
     {
-        msg_puts(" numhl=");
+        संदेश_puts(" numhl=");
 
-        char_u *p = get_highlight_name_ext(NULL, sp->sn_num_hl - 1, FALSE);
-        if (p == NULL)
-            msg_puts("NONE");
-        else
-            msg_puts((char *)p);
+        char_u *p = get_highlight_name_ext(रिक्त, sp->sn_अंक_hl - 1, FALSE);
+        जर (p == रिक्त)
+            संदेश_puts("NONE");
+        अन्यथा
+            संदेश_puts((अक्षर *)p);
     }
 }
 
 /*
  * Undefine a sign and free its memory.
  */
-static void
+स्थिर शून्य
 sign_undefine(sign_T *sp, sign_T *sp_prev)
 {
     vim_free(sp->sn_name);
     vim_free(sp->sn_icon);
 # ifdef FEAT_SIGN_ICONS
-    if (sp->sn_image != NULL)
+    जर (sp->sn_image != रिक्त)
     {
         out_flush();
         gui_mch_destroy_sign(sp->sn_image);
@@ -2067,39 +2067,39 @@ sign_undefine(sign_T *sp, sign_T *sp_prev)
 # endif
     vim_free(sp->sn_text);
 
-    if (sp_prev == NULL)
+    जर (sp_prev == रिक्त)
         first_sign = sp->sn_next;
-    else
+    अन्यथा
         sp_prev->sn_next = sp->sn_next;
 
     vim_free(sp);
 }
 
-# if defined(FEAT_SIGN_ICONS)
-void *
-sign_get_image(int typenr) // the attribute which may have a sign
+# जर defined(FEAT_SIGN_ICONS)
+शून्य *
+sign_get_image(पूर्णांक typenr) // the attribute which may have a sign
 {
-    sign_T *sp = NULL;
+    sign_T *sp = रिक्त;
     FOR_ALL_SIGNS(sp)
     {
-        if (sp->sn_typenr == typenr)
-            return sp->sn_image;
+        जर (sp->sn_typenr == typenr)
+            परत sp->sn_image;
     }
-    return NULL;
+    परत रिक्त;
 }
 # endif
 
 /*
  * Undefine/free all signs.
  */
-void
-free_signs(void)
+शून्य
+free_signs(शून्य)
 {
-    while (first_sign != NULL)
-        sign_undefine(first_sign, NULL);
+    पर्यंत (first_sign != रिक्त)
+        sign_undefine(first_sign, रिक्त);
 }
 
-static enum
+स्थिर गणना
 {
     EXP_SUBCMD, // expand :sign sub-commands
     EXP_DEFINE, // expand :sign define {name} args
@@ -2113,45 +2113,45 @@ static enum
 /*
  * Return the n'th sign name (used for command line completion)
  */
-static char_u *
-get_nth_sign_name(int idx)
+स्थिर char_u *
+get_nth_sign_name(पूर्णांक idx)
 {
-    int current_idx = 0;
-    sign_T *sp = NULL;
+    पूर्णांक current_idx = 0;
+    sign_T *sp = रिक्त;
 
     // Complete with name of signs already defined
     FOR_ALL_SIGNS(sp)
     {
-        if (current_idx++ == idx)
-            return sp->sn_name;
+        जर (current_idx++ == idx)
+            परत sp->sn_name;
     }
-    return NULL;
+    परत रिक्त;
 }
 
 /*
  * Return the n'th sign group name (used for command line completion)
  */
-static char_u *
-get_nth_sign_group_name(int idx)
+स्थिर char_u *
+get_nth_sign_group_name(पूर्णांक idx)
 {
-    int current_idx = 0;
-    int todo = (int)sg_table.ht_used;
-    hashitem_T *hi = NULL;
+    पूर्णांक current_idx = 0;
+    पूर्णांक todo = (पूर्णांक)sg_table.ht_used;
+    hashitem_T *hi = रिक्त;
 
     // Complete with name of sign groups already defined
-    FOR_ALL_HASHTAB_ITEMS(&sg_table, hi, todo)
+    FOR_ALL_HASHTAB_वस्तुसंच(&sg_table, hi, todo)
     {
-        if (!HASHITEM_EMPTY(hi))
+        जर (!HASHITEM_EMPTY(hi))
         {
             --todo;
-            if (current_idx++ == idx)
+            जर (current_idx++ == idx)
             {
                 signgroup_T *group = HI2SG(hi);
-                return group->sg_name;
+                परत group->sg_name;
             }
         }
     }
-    return NULL;
+    परत रिक्त;
 }
 
 /*
@@ -2159,53 +2159,53 @@ get_nth_sign_group_name(int idx)
  * expansion.
  */
 char_u *
-get_sign_name(expand_T *xp UNUSED, int idx)
+get_sign_name(expand_T *xp UNUSED, पूर्णांक idx)
 {
-    switch (expand_what)
+    निवड (expand_what)
     {
-        case EXP_SUBCMD:
-            return (char_u *)cmds[idx];
-        case EXP_DEFINE:
+        स्थिती EXP_SUBCMD:
+            परत (char_u *)cmds[idx];
+        स्थिती EXP_DEFINE:
         {
-            char *define_arg[] = { "culhl=", "icon=",   "linehl=",   "numhl=",
-                                   "text=",  "texthl=", "priority=", NULL };
-            return (char_u *)define_arg[idx];
+            अक्षर *define_arg[] = { "culhl=", "icon=",   "linehl=",   "numhl=",
+                                   "text=",  "texthl=", "priority=", रिक्त };
+            परत (char_u *)define_arg[idx];
         }
-        case EXP_PLACE:
+        स्थिती EXP_PLACE:
         {
-            char *place_arg[] = { "line=", "name=",   "group=", "priority=",
-                                  "file=", "buffer=", NULL };
-            return (char_u *)place_arg[idx];
+            अक्षर *place_arg[] = { "line=", "name=",   "group=", "priority=",
+                                  "file=", "buffer=", रिक्त };
+            परत (char_u *)place_arg[idx];
         }
-        case EXP_LIST:
+        स्थिती EXP_LIST:
         {
-            char *list_arg[] = { "group=", "file=", "buffer=", NULL };
-            return (char_u *)list_arg[idx];
+            अक्षर *list_arg[] = { "group=", "file=", "buffer=", रिक्त };
+            परत (char_u *)list_arg[idx];
         }
-        case EXP_UNPLACE:
+        स्थिती EXP_UNPLACE:
         {
-            char *unplace_arg[] = { "group=", "file=", "buffer=", NULL };
-            return (char_u *)unplace_arg[idx];
+            अक्षर *unplace_arg[] = { "group=", "file=", "buffer=", रिक्त };
+            परत (char_u *)unplace_arg[idx];
         }
-        case EXP_SIGN_NAMES:
-            return get_nth_sign_name(idx);
-        case EXP_SIGN_GROUPS:
-            return get_nth_sign_group_name(idx);
-        default:
-            return NULL;
+        स्थिती EXP_SIGN_NAMES:
+            परत get_nth_sign_name(idx);
+        स्थिती EXP_SIGN_GROUPS:
+            परत get_nth_sign_group_name(idx);
+        पूर्वनिर्धारित:
+            परत रिक्त;
     }
 }
 
 /*
  * Handle command line completion for :sign command.
  */
-void
+शून्य
 set_context_in_sign_cmd(expand_T *xp, char_u *arg)
 {
     char_u *p;
     char_u *end_subcmd;
     char_u *last;
-    int cmd_idx;
+    पूर्णांक cmd_idx;
     char_u *begin_subcmd_args;
 
     // Default: expand subcommands.
@@ -2216,8 +2216,8 @@ set_context_in_sign_cmd(expand_T *xp, char_u *arg)
     end_subcmd = skiptowhite(arg);
     // expand subcmd name
     // :sign {subcmd}<CTRL-D>
-    if (*end_subcmd == NUL)
-        return;
+    जर (*end_subcmd == NUL)
+        परत;
 
     cmd_idx = sign_cmd_idx(arg, end_subcmd);
 
@@ -2234,88 +2234,88 @@ set_context_in_sign_cmd(expand_T *xp, char_u *arg)
 
     // Loop until reaching last argument.
     p = begin_subcmd_args;
-    do
+    करा
     {
         p = skipwhite(p);
         last = p;
         p = skiptowhite(p);
     }
-    while (*p != NUL);
+    पर्यंत (*p != NUL);
 
     p = vim_strchr(last, '=');
 
     // :sign define {name} {args}... {last}=
     //                               |     |
     //                            last     p
-    if (p == NULL)
+    जर (p == रिक्त)
     {
         // Expand last argument name (before equal sign).
         xp->xp_pattern = last;
-        switch (cmd_idx)
+        निवड (cmd_idx)
         {
-            case SIGNCMD_DEFINE:
+            स्थिती SIGNCMD_DEFINE:
                 expand_what = EXP_DEFINE;
-                break;
-            case SIGNCMD_PLACE:
+                थांबा;
+            स्थिती SIGNCMD_PLACE:
                 // List placed signs
-                if (VIM_ISDIGIT(*begin_subcmd_args))
+                जर (VIM_ISDIGIT(*begin_subcmd_args))
                     //   :sign place {id} {args}...
                     expand_what = EXP_PLACE;
-                else
+                अन्यथा
                     //   :sign place {args}...
                     expand_what = EXP_LIST;
-                break;
-            case SIGNCMD_LIST:
-            case SIGNCMD_UNDEFINE:
+                थांबा;
+            स्थिती SIGNCMD_LIST:
+            स्थिती SIGNCMD_UNDEFINE:
                 // :sign list <CTRL-D>
                 // :sign undefine <CTRL-D>
                 expand_what = EXP_SIGN_NAMES;
-                break;
-            case SIGNCMD_JUMP:
-            case SIGNCMD_UNPLACE:
+                थांबा;
+            स्थिती SIGNCMD_JUMP:
+            स्थिती SIGNCMD_UNPLACE:
                 expand_what = EXP_UNPLACE;
-                break;
-            default:
+                थांबा;
+            पूर्वनिर्धारित:
                 xp->xp_context = EXPAND_NOTHING;
         }
     }
-    else
+    अन्यथा
     {
         // Expand last argument value (after equal sign).
         xp->xp_pattern = p + 1;
-        switch (cmd_idx)
+        निवड (cmd_idx)
         {
-            case SIGNCMD_DEFINE:
-                if (STRNCMP(last, "texthl", 6) == 0 ||
+            स्थिती SIGNCMD_DEFINE:
+                जर (STRNCMP(last, "texthl", 6) == 0 ||
                     STRNCMP(last, "linehl", 6) == 0 ||
                     STRNCMP(last, "culhl", 5) == 0 ||
                     STRNCMP(last, "numhl", 5) == 0)
                     xp->xp_context = EXPAND_HIGHLIGHT;
-                else if (STRNCMP(last, "icon", 4) == 0)
+                अन्यथा जर (STRNCMP(last, "icon", 4) == 0)
                     xp->xp_context = EXPAND_FILES;
-                else
+                अन्यथा
                     xp->xp_context = EXPAND_NOTHING;
-                break;
-            case SIGNCMD_PLACE:
-                if (STRNCMP(last, "name", 4) == 0)
+                थांबा;
+            स्थिती SIGNCMD_PLACE:
+                जर (STRNCMP(last, "name", 4) == 0)
                     expand_what = EXP_SIGN_NAMES;
-                else if (STRNCMP(last, "group", 5) == 0)
+                अन्यथा जर (STRNCMP(last, "group", 5) == 0)
                     expand_what = EXP_SIGN_GROUPS;
-                else if (STRNCMP(last, "file", 4) == 0)
+                अन्यथा जर (STRNCMP(last, "file", 4) == 0)
                     xp->xp_context = EXPAND_BUFFERS;
-                else
+                अन्यथा
                     xp->xp_context = EXPAND_NOTHING;
-                break;
-            case SIGNCMD_UNPLACE:
-            case SIGNCMD_JUMP:
-                if (STRNCMP(last, "group", 5) == 0)
+                थांबा;
+            स्थिती SIGNCMD_UNPLACE:
+            स्थिती SIGNCMD_JUMP:
+                जर (STRNCMP(last, "group", 5) == 0)
                     expand_what = EXP_SIGN_GROUPS;
-                else if (STRNCMP(last, "file", 4) == 0)
+                अन्यथा जर (STRNCMP(last, "file", 4) == 0)
                     xp->xp_context = EXPAND_BUFFERS;
-                else
+                अन्यथा
                     xp->xp_context = EXPAND_NOTHING;
-                break;
-            default:
+                थांबा;
+            पूर्वनिर्धारित:
                 xp->xp_context = EXPAND_NOTHING;
         }
     }
@@ -2325,31 +2325,31 @@ set_context_in_sign_cmd(expand_T *xp, char_u *arg)
  * Define a sign using the attributes in 'dict'. Returns 0 on success and -1 on
  * failure.
  */
-static int
+स्थिर पूर्णांक
 sign_define_from_dict(char_u *name_arg, dict_T *dict)
 {
-    char_u *name = NULL;
-    char_u *icon = NULL;
-    char_u *linehl = NULL;
-    char_u *text = NULL;
-    char_u *texthl = NULL;
-    char_u *culhl = NULL;
-    char_u *numhl = NULL;
-    int prio = -1;
-    int retval = -1;
+    char_u *name = रिक्त;
+    char_u *icon = रिक्त;
+    char_u *linehl = रिक्त;
+    char_u *text = रिक्त;
+    char_u *texthl = रिक्त;
+    char_u *culhl = रिक्त;
+    char_u *numhl = रिक्त;
+    पूर्णांक prio = -1;
+    पूर्णांक retval = -1;
 
-    if (name_arg == NULL && dict == NULL)
-        return retval;
+    जर (name_arg == रिक्त && dict == रिक्त)
+        परत retval;
 
-    if (name_arg == NULL)
+    जर (name_arg == रिक्त)
         name = dict_get_string(dict, "name", TRUE);
-    else
+    अन्यथा
         name = vim_strsave(name_arg);
 
-    if (name == NULL || name[0] == NUL)
-        goto cleanup;
+    जर (name == रिक्त || name[0] == NUL)
+        जा cleanup;
 
-    if (dict != NULL)
+    जर (dict != रिक्त)
     {
         icon = dict_get_string(dict, "icon", TRUE);
         linehl = dict_get_string(dict, "linehl", TRUE);
@@ -2357,10 +2357,10 @@ sign_define_from_dict(char_u *name_arg, dict_T *dict)
         texthl = dict_get_string(dict, "texthl", TRUE);
         culhl = dict_get_string(dict, "culhl", TRUE);
         numhl = dict_get_string(dict, "numhl", TRUE);
-        prio = dict_get_number_def(dict, "priority", -1);
+        prio = dict_get_संख्या_def(dict, "priority", -1);
     }
 
-    if (sign_define_by_name(name, icon, linehl, text, texthl, culhl, numhl,
+    जर (sign_define_by_name(name, icon, linehl, text, texthl, culhl, numhl,
                             prio) == OK)
         retval = 0;
 
@@ -2373,78 +2373,78 @@ cleanup:
     vim_free(culhl);
     vim_free(numhl);
 
-    return retval;
+    परत retval;
 }
 
 /*
  * Define multiple signs using attributes from list 'l' and store the return
  * values in 'retlist'.
  */
-static void
+स्थिर शून्य
 sign_define_multiple(list_T *l, list_T *retlist)
 {
-    listitem_T *li = NULL;
-    FOR_ALL_LIST_ITEMS(l, li)
+    listitem_T *li = रिक्त;
+    FOR_ALL_LIST_वस्तुसंच(l, li)
     {
-        int retval = -1;
+        पूर्णांक retval = -1;
 
-        if (li->li_tv.v_type == VAR_DICT)
-            retval = sign_define_from_dict(NULL, li->li_tv.vval.v_dict);
-        else
+        जर (li->li_tv.v_type == VAR_DICT)
+            retval = sign_define_from_dict(रिक्त, li->li_tv.vval.v_dict);
+        अन्यथा
             emsg(_(e_dictionary_required));
 
-        list_append_number(retlist, retval);
+        list_append_संख्या(retlist, retval);
     }
 }
 
 /*
  * "sign_define()" function
  */
-void
+शून्य
 f_sign_define(typval_T *argvars, typval_T *rettv)
 {
-    if (in_vim9script() && (check_for_string_or_list_arg(argvars, 0) == FAIL ||
+    जर (in_vim9script() && (check_for_string_or_list_arg(argvars, 0) == FAIL ||
                             check_for_opt_dict_arg(argvars, 1) == FAIL))
-        return;
+        परत;
 
-    if (argvars[0].v_type == VAR_LIST && argvars[1].v_type == VAR_UNKNOWN)
+    जर (argvars[0].v_type == VAR_LIST && argvars[1].v_type == VAR_UNKNOWN)
     {
         // Define multiple signs
-        if (rettv_list_alloc(rettv) == FAIL)
-            return;
+        जर (rettv_list_alloc(rettv) == FAIL)
+            परत;
 
         sign_define_multiple(argvars[0].vval.v_list, rettv->vval.v_list);
-        return;
+        परत;
     }
 
     // Define a single sign
-    rettv->vval.v_number = -1;
+    rettv->vval.v_संख्या = -1;
 
     char_u *name = tv_get_string_chk(&argvars[0]);
-    if (name == NULL)
-        return;
+    जर (name == रिक्त)
+        परत;
 
-    if (check_for_opt_dict_arg(argvars, 1) == FAIL)
-        return;
+    जर (check_for_opt_dict_arg(argvars, 1) == FAIL)
+        परत;
 
-    rettv->vval.v_number = sign_define_from_dict(
-        name, argvars[1].v_type == VAR_DICT ? argvars[1].vval.v_dict : NULL);
+    rettv->vval.v_संख्या = sign_define_from_dict(
+        name, argvars[1].v_type == VAR_DICT ? argvars[1].vval.v_dict : रिक्त);
 }
 
 /*
  * "sign_getdefined()" function
  */
-void
+शून्य
 f_sign_getdefined(typval_T *argvars, typval_T *rettv)
 {
-    if (rettv_list_alloc_id(rettv, aid_sign_getdefined) == FAIL)
-        return;
+    जर (rettv_list_alloc_id(rettv, aid_sign_getdefined) == FAIL)
+        परत;
 
-    if (in_vim9script() && check_for_opt_string_arg(argvars, 0) == FAIL)
-        return;
+    जर (in_vim9script() && check_for_opt_string_arg(argvars, 0) == FAIL)
+        परत;
 
-    char_u *name = NULL;
-    if (argvars[0].v_type != VAR_UNKNOWN)
+    char_u *name = रिक्त;
+    जर (argvars[0].v_type != VAR_UNKNOWN)
         name = tv_get_string(&argvars[0]);
 
     sign_getlist(name, rettv->vval.v_list);
@@ -2453,65 +2453,65 @@ f_sign_getdefined(typval_T *argvars, typval_T *rettv)
 /*
  * "sign_getplaced()" function
  */
-void
+शून्य
 f_sign_getplaced(typval_T *argvars, typval_T *rettv)
 {
-    buf_T *buf = NULL;
+    buf_T *buf = रिक्त;
     linenr_T lnum = 0;
-    int sign_id = 0;
-    char_u *group = NULL;
+    पूर्णांक sign_id = 0;
+    char_u *group = रिक्त;
 
-    if (rettv_list_alloc_id(rettv, aid_sign_getplaced) == FAIL)
-        return;
+    जर (rettv_list_alloc_id(rettv, aid_sign_getplaced) == FAIL)
+        परत;
 
-    if (in_vim9script() && (check_for_opt_buffer_arg(argvars, 0) == FAIL ||
+    जर (in_vim9script() && (check_for_opt_buffer_arg(argvars, 0) == FAIL ||
                             (argvars[0].v_type != VAR_UNKNOWN &&
                              check_for_opt_dict_arg(argvars, 1) == FAIL)))
-        return;
+        परत;
 
-    if (argvars[0].v_type != VAR_UNKNOWN)
+    जर (argvars[0].v_type != VAR_UNKNOWN)
     {
         // get signs placed in the specified buffer
         buf = get_buf_arg(&argvars[0]);
-        if (buf == NULL)
-            return;
+        जर (buf == रिक्त)
+            परत;
 
-        if (argvars[1].v_type != VAR_UNKNOWN)
+        जर (argvars[1].v_type != VAR_UNKNOWN)
         {
-            if (check_for_nonnull_dict_arg(argvars, 1) == FAIL)
-                return;
+            जर (check_for_nonnull_dict_arg(argvars, 1) == FAIL)
+                परत;
 
-            dictitem_T *di = NULL;
+            dictitem_T *di = रिक्त;
             dict_T *dict = argvars[1].vval.v_dict;
 
-            if ((di = dict_find(dict, (char_u *)"lnum", -1)) != NULL)
+            जर ((di = dict_find(dict, (char_u *)"lnum", -1)) != रिक्त)
             {
                 // get signs placed at this line
-                int notanum = FALSE;
-                tv_get_number_chk(&di->di_tv, &notanum);
-                if (notanum)
-                    return;
+                पूर्णांक notanum = FALSE;
+                tv_get_संख्या_chk(&di->di_tv, &notanum);
+                जर (notanum)
+                    परत;
 
                 lnum = tv_get_lnum(&di->di_tv);
             }
 
-            if ((di = dict_find(dict, (char_u *)"id", -1)) != NULL)
+            जर ((di = dict_find(dict, (char_u *)"id", -1)) != रिक्त)
             {
                 // get sign placed with this identifier
-                int notanum = FALSE;
-                sign_id = (int)tv_get_number_chk(&di->di_tv, &notanum);
-                if (notanum)
-                    return;
+                पूर्णांक notanum = FALSE;
+                sign_id = (पूर्णांक)tv_get_संख्या_chk(&di->di_tv, &notanum);
+                जर (notanum)
+                    परत;
             }
 
-            if ((di = dict_find(dict, (char_u *)"group", -1)) != NULL)
+            जर ((di = dict_find(dict, (char_u *)"group", -1)) != रिक्त)
             {
                 group = tv_get_string_chk(&di->di_tv);
-                if (group == NULL)
-                    return;
+                जर (group == रिक्त)
+                    परत;
 
-                if (*group == '\0') // empty string means global group
-                    group = NULL;
+                जर (*group == '\0') // empty string means global group
+                    group = रिक्त;
             }
         }
     }
@@ -2522,51 +2522,51 @@ f_sign_getplaced(typval_T *argvars, typval_T *rettv)
 /*
  * "sign_jump()" function
  */
-void
+शून्य
 f_sign_jump(typval_T *argvars, typval_T *rettv)
 {
-    char_u *sign_group = NULL;
-    rettv->vval.v_number = -1;
+    char_u *sign_group = रिक्त;
+    rettv->vval.v_संख्या = -1;
 
-    if (in_vim9script() && (check_for_number_arg(argvars, 0) == FAIL ||
+    जर (in_vim9script() && (check_for_संख्या_arg(argvars, 0) == FAIL ||
                             check_for_string_arg(argvars, 1) == FAIL ||
                             check_for_buffer_arg(argvars, 2) == FAIL))
-        return;
+        परत;
 
-    int notanum = FALSE;
+    पूर्णांक notanum = FALSE;
     // Sign identifier
-    int sign_id = (int)tv_get_number_chk(&argvars[0], &notanum);
-    if (notanum)
-        return;
+    पूर्णांक sign_id = (पूर्णांक)tv_get_संख्या_chk(&argvars[0], &notanum);
+    जर (notanum)
+        परत;
 
-    if (sign_id <= 0)
+    जर (sign_id <= 0)
     {
         emsg(_(e_invalid_argument));
-        return;
+        परत;
     }
 
     // Sign group
     sign_group = tv_get_string_chk(&argvars[1]);
-    if (sign_group == NULL)
-        return;
+    जर (sign_group == रिक्त)
+        परत;
 
-    if (sign_group[0] == '\0')
+    जर (sign_group[0] == '\0')
     {
-        sign_group = NULL; // global sign group
+        sign_group = रिक्त; // global sign group
     }
-    else
+    अन्यथा
     {
         sign_group = vim_strsave(sign_group);
-        if (sign_group == NULL)
-            return;
+        जर (sign_group == रिक्त)
+            परत;
     }
 
     // Buffer to place the sign
     buf_T *buf = get_buf_arg(&argvars[2]);
-    if (buf == NULL)
-        goto cleanup;
+    जर (buf == रिक्त)
+        जा cleanup;
 
-    rettv->vval.v_number = sign_jump(sign_id, sign_group, buf);
+    rettv->vval.v_संख्या = sign_jump(sign_id, sign_group, buf);
 
 cleanup:
     vim_free(sign_group);
@@ -2576,253 +2576,253 @@ cleanup:
  * Place a new sign using the values specified in dict 'dict'. Returns the sign
  * identifier if successfully placed, otherwise returns 0.
  */
-static int
+स्थिर पूर्णांक
 sign_place_from_dict(typval_T *id_tv,
                      typval_T *group_tv,
                      typval_T *name_tv,
                      typval_T *buf_tv,
                      dict_T *dict)
 {
-    int sign_id = 0;
-    char_u *group = NULL;
-    char_u *sign_name = NULL;
-    buf_T *buf = NULL;
-    dictitem_T *di = NULL;
+    पूर्णांक sign_id = 0;
+    char_u *group = रिक्त;
+    char_u *sign_name = रिक्त;
+    buf_T *buf = रिक्त;
+    dictitem_T *di = रिक्त;
     linenr_T lnum = 0;
-    int prio = -1;
-    int ret_sign_id = -1;
+    पूर्णांक prio = -1;
+    पूर्णांक ret_sign_id = -1;
 
     // sign identifier
-    if (id_tv == NULL)
+    जर (id_tv == रिक्त)
     {
         di = dict_find(dict, (char_u *)"id", -1);
-        if (di != NULL)
+        जर (di != रिक्त)
             id_tv = &di->di_tv;
     }
 
-    if (id_tv == NULL)
+    जर (id_tv == रिक्त)
     {
         sign_id = 0;
     }
-    else
+    अन्यथा
     {
-        int notanum = FALSE;
-        sign_id = tv_get_number_chk(id_tv, &notanum);
+        पूर्णांक notanum = FALSE;
+        sign_id = tv_get_संख्या_chk(id_tv, &notanum);
 
-        if (notanum)
-            return -1;
+        जर (notanum)
+            परत -1;
 
-        if (sign_id < 0)
+        जर (sign_id < 0)
         {
             emsg(_(e_invalid_argument));
-            return -1;
+            परत -1;
         }
     }
 
     // sign group
-    if (group_tv == NULL)
+    जर (group_tv == रिक्त)
     {
         di = dict_find(dict, (char_u *)"group", -1);
-        if (di != NULL)
+        जर (di != रिक्त)
             group_tv = &di->di_tv;
     }
 
-    if (group_tv == NULL)
+    जर (group_tv == रिक्त)
     {
-        group = NULL; // global group
+        group = रिक्त; // global group
     }
-    else
+    अन्यथा
     {
         group = tv_get_string_chk(group_tv);
-        if (group == NULL)
-            goto cleanup;
+        जर (group == रिक्त)
+            जा cleanup;
 
-        if (group[0] == '\0') // global sign group
+        जर (group[0] == '\0') // global sign group
         {
-            group = NULL;
+            group = रिक्त;
         }
-        else
+        अन्यथा
         {
             group = vim_strsave(group);
-            if (group == NULL)
-                return -1;
+            जर (group == रिक्त)
+                परत -1;
         }
     }
 
     // sign name
-    if (name_tv == NULL)
+    जर (name_tv == रिक्त)
     {
         di = dict_find(dict, (char_u *)"name", -1);
-        if (di != NULL)
+        जर (di != रिक्त)
             name_tv = &di->di_tv;
     }
 
-    if (name_tv == NULL)
-        goto cleanup;
+    जर (name_tv == रिक्त)
+        जा cleanup;
 
     sign_name = tv_get_string_chk(name_tv);
-    if (sign_name == NULL)
-        goto cleanup;
+    जर (sign_name == रिक्त)
+        जा cleanup;
 
     // buffer to place the sign
-    if (buf_tv == NULL)
+    जर (buf_tv == रिक्त)
     {
         di = dict_find(dict, (char_u *)"buffer", -1);
-        if (di != NULL)
+        जर (di != रिक्त)
             buf_tv = &di->di_tv;
     }
 
-    if (buf_tv == NULL)
-        goto cleanup;
+    जर (buf_tv == रिक्त)
+        जा cleanup;
 
     buf = get_buf_arg(buf_tv);
-    if (buf == NULL)
-        goto cleanup;
+    जर (buf == रिक्त)
+        जा cleanup;
 
     // line number of the sign
     di = dict_find(dict, (char_u *)"lnum", -1);
-    if (di != NULL)
+    जर (di != रिक्त)
     {
         lnum = tv_get_lnum(&di->di_tv);
-        if (lnum <= 0)
+        जर (lnum <= 0)
         {
             emsg(_(e_invalid_argument));
-            goto cleanup;
+            जा cleanup;
         }
     }
 
     // sign priority
     di = dict_find(dict, (char_u *)"priority", -1);
-    if (di != NULL)
+    जर (di != रिक्त)
     {
-        int notanum = FALSE;
-        prio = (int)tv_get_number_chk(&di->di_tv, &notanum);
-        if (notanum)
-            goto cleanup;
+        पूर्णांक notanum = FALSE;
+        prio = (पूर्णांक)tv_get_संख्या_chk(&di->di_tv, &notanum);
+        जर (notanum)
+            जा cleanup;
     }
 
-    if (sign_place(&sign_id, group, sign_name, buf, lnum, prio) == OK)
+    जर (sign_place(&sign_id, group, sign_name, buf, lnum, prio) == OK)
         ret_sign_id = sign_id;
 
 cleanup:
     vim_free(group);
 
-    return ret_sign_id;
+    परत ret_sign_id;
 }
 
 /*
  * "sign_place()" function
  */
-void
+शून्य
 f_sign_place(typval_T *argvars, typval_T *rettv)
 {
-    dict_T *dict = NULL;
-    rettv->vval.v_number = -1;
+    dict_T *dict = रिक्त;
+    rettv->vval.v_संख्या = -1;
 
-    if (in_vim9script() && (check_for_number_arg(argvars, 0) == FAIL ||
+    जर (in_vim9script() && (check_for_संख्या_arg(argvars, 0) == FAIL ||
                             check_for_string_arg(argvars, 1) == FAIL ||
                             check_for_string_arg(argvars, 2) == FAIL ||
                             check_for_buffer_arg(argvars, 3) == FAIL ||
                             check_for_opt_dict_arg(argvars, 4) == FAIL))
-        return;
+        परत;
 
-    if (argvars[4].v_type != VAR_UNKNOWN)
+    जर (argvars[4].v_type != VAR_UNKNOWN)
     {
-        if (check_for_nonnull_dict_arg(argvars, 4) == FAIL)
-            return;
+        जर (check_for_nonnull_dict_arg(argvars, 4) == FAIL)
+            परत;
         dict = argvars[4].vval.v_dict;
     }
 
-    rettv->vval.v_number = sign_place_from_dict(&argvars[0], &argvars[1],
+    rettv->vval.v_संख्या = sign_place_from_dict(&argvars[0], &argvars[1],
                                                 &argvars[2], &argvars[3], dict);
 }
 
 /*
  * "sign_placelist()" function.  Place multiple signs.
  */
-void
+शून्य
 f_sign_placelist(typval_T *argvars, typval_T *rettv)
 {
-    if (rettv_list_alloc(rettv) == FAIL)
-        return;
+    जर (rettv_list_alloc(rettv) == FAIL)
+        परत;
 
-    if (in_vim9script() && check_for_list_arg(argvars, 0) == FAIL)
-        return;
+    जर (in_vim9script() && check_for_list_arg(argvars, 0) == FAIL)
+        परत;
 
-    if (check_for_list_arg(argvars, 0) == FAIL)
-        return;
+    जर (check_for_list_arg(argvars, 0) == FAIL)
+        परत;
 
     // Process the List of sign attributes
-    listitem_T *li = NULL;
-    FOR_ALL_LIST_ITEMS(argvars[0].vval.v_list, li)
+    listitem_T *li = रिक्त;
+    FOR_ALL_LIST_वस्तुसंच(argvars[0].vval.v_list, li)
     {
-        int sign_id = -1;
+        पूर्णांक sign_id = -1;
 
-        if (li->li_tv.v_type == VAR_DICT)
-            sign_id = sign_place_from_dict(NULL, NULL, NULL, NULL,
+        जर (li->li_tv.v_type == VAR_DICT)
+            sign_id = sign_place_from_dict(रिक्त, रिक्त, रिक्त, रिक्त,
                                            li->li_tv.vval.v_dict);
-        else
+        अन्यथा
             emsg(_(e_dictionary_required));
 
-        list_append_number(rettv->vval.v_list, sign_id);
+        list_append_संख्या(rettv->vval.v_list, sign_id);
     }
 }
 
 /*
  * Undefine multiple signs
  */
-static void
+स्थिर शून्य
 sign_undefine_multiple(list_T *l, list_T *retlist)
 {
-    listitem_T *li = NULL;
-    FOR_ALL_LIST_ITEMS(l, li)
+    listitem_T *li = रिक्त;
+    FOR_ALL_LIST_वस्तुसंच(l, li)
     {
-        int retval = -1;
+        पूर्णांक retval = -1;
         char_u *name = tv_get_string_chk(&li->li_tv);
-        if (name != NULL && (sign_undefine_by_name(name, TRUE) == OK))
+        जर (name != रिक्त && (sign_undefine_by_name(name, TRUE) == OK))
             retval = 0;
 
-        list_append_number(retlist, retval);
+        list_append_संख्या(retlist, retval);
     }
 }
 
 /*
  * "sign_undefine()" function
  */
-void
+शून्य
 f_sign_undefine(typval_T *argvars, typval_T *rettv)
 {
 
-    if (in_vim9script() && check_for_opt_string_or_list_arg(argvars, 0) == FAIL)
-        return;
+    जर (in_vim9script() && check_for_opt_string_or_list_arg(argvars, 0) == FAIL)
+        परत;
 
-    if (argvars[0].v_type == VAR_LIST && argvars[1].v_type == VAR_UNKNOWN)
+    जर (argvars[0].v_type == VAR_LIST && argvars[1].v_type == VAR_UNKNOWN)
     {
         // Undefine multiple signs
-        if (rettv_list_alloc(rettv) == FAIL)
-            return;
+        जर (rettv_list_alloc(rettv) == FAIL)
+            परत;
 
         sign_undefine_multiple(argvars[0].vval.v_list, rettv->vval.v_list);
-        return;
+        परत;
     }
 
-    rettv->vval.v_number = -1;
+    rettv->vval.v_संख्या = -1;
 
-    if (argvars[0].v_type == VAR_UNKNOWN)
+    जर (argvars[0].v_type == VAR_UNKNOWN)
     {
         // Free all the signs
         free_signs();
-        rettv->vval.v_number = 0;
+        rettv->vval.v_संख्या = 0;
     }
-    else
+    अन्यथा
     {
         // Free only the specified sign
         char_u *name = tv_get_string_chk(&argvars[0]);
-        if (name == NULL)
-            return;
+        जर (name == रिक्त)
+            परत;
 
-        if (sign_undefine_by_name(name, TRUE) == OK)
-            rettv->vval.v_number = 0;
+        जर (sign_undefine_by_name(name, TRUE) == OK)
+            rettv->vval.v_संख्या = 0;
     }
 }
 
@@ -2830,68 +2830,68 @@ f_sign_undefine(typval_T *argvars, typval_T *rettv)
  * Unplace the sign with attributes specified in 'dict'. Returns 0 on success
  * and -1 on failure.
  */
-static int
+स्थिर पूर्णांक
 sign_unplace_from_dict(typval_T *group_tv, dict_T *dict)
 {
-    int sign_id = 0;
-    buf_T *buf = NULL;
-    char_u *group = NULL;
-    int retval = -1;
+    पूर्णांक sign_id = 0;
+    buf_T *buf = रिक्त;
+    char_u *group = रिक्त;
+    पूर्णांक retval = -1;
 
     // sign group
-    group = (group_tv != NULL) ? tv_get_string(group_tv)
+    group = (group_tv != रिक्त) ? tv_get_string(group_tv)
                                : dict_get_string(dict, "group", FALSE);
 
-    if (group != NULL)
+    जर (group != रिक्त)
     {
-        if (group[0] == '\0') // global sign group
+        जर (group[0] == '\0') // global sign group
         {
-            group = NULL;
+            group = रिक्त;
         }
-        else
+        अन्यथा
         {
             group = vim_strsave(group);
-            if (group == NULL)
-                return retval;
+            जर (group == रिक्त)
+                परत retval;
         }
     }
 
-    if (dict != NULL)
+    जर (dict != रिक्त)
     {
         dictitem_T *di = dict_find(dict, (char_u *)"buffer", -1);
-        if (di != NULL)
+        जर (di != रिक्त)
         {
             buf = get_buf_arg(&di->di_tv);
-            if (buf == NULL)
-                goto cleanup;
+            जर (buf == रिक्त)
+                जा cleanup;
         }
 
-        if (dict_has_key(dict, "id"))
+        जर (dict_has_किल्ली(dict, "id"))
         {
-            sign_id = dict_get_number(dict, "id");
-            if (sign_id <= 0)
+            sign_id = dict_get_संख्या(dict, "id");
+            जर (sign_id <= 0)
             {
                 emsg(_(e_invalid_argument));
-                goto cleanup;
+                जा cleanup;
             }
         }
     }
 
-    if (buf == NULL)
+    जर (buf == रिक्त)
     {
         // Delete the sign in all the buffers
         retval = 0;
         FOR_ALL_BUFFERS(buf)
-            if (sign_unplace(sign_id, group, buf, 0) != OK)
+            जर (sign_unplace(sign_id, group, buf, 0) != OK)
                 retval = -1;
     }
-    else if (sign_unplace(sign_id, group, buf, 0) == OK)
+    अन्यथा जर (sign_unplace(sign_id, group, buf, 0) == OK)
         retval = 0;
 
 cleanup:
     vim_free(group);
 
-    return retval;
+    परत retval;
 }
 
 sign_entry_T *
@@ -2900,31 +2900,31 @@ get_first_valid_sign(win_T *wp)
     sign_entry_T *sign = wp->w_buffer->b_signlist;
 
 # ifdef FEAT_PROP_POPUP
-    while (sign != NULL && !sign_group_for_window(sign, wp))
+    पर्यंत (sign != रिक्त && !sign_group_for_window(sign, wp))
         sign = sign->se_next;
 # endif
-    return sign;
+    परत sign;
 }
 
 /*
  * Return TRUE when window "wp" has a column to draw signs in.
  */
-int
+पूर्णांक
 signcolumn_on(win_T *wp)
 {
     // If 'signcolumn' is set to 'number', signs are displayed in the 'number'
     // column (if present). Otherwise signs are to be displayed in the sign
     // column.
-    if (*wp->w_p_scl == 'n' && *(wp->w_p_scl + 1) == 'u')
-        return get_first_valid_sign(wp) != NULL && !wp->w_p_nu && !wp->w_p_rnu;
+    जर (*wp->w_p_scl == 'n' && *(wp->w_p_scl + 1) == 'u')
+        परत get_first_valid_sign(wp) != रिक्त && !wp->w_p_nu && !wp->w_p_rnu;
 
-    if (*wp->w_p_scl == 'n')
-        return FALSE;
+    जर (*wp->w_p_scl == 'n')
+        परत FALSE;
 
-    if (*wp->w_p_scl == 'y')
-        return TRUE;
+    जर (*wp->w_p_scl == 'y')
+        परत TRUE;
 
-    return (get_first_valid_sign(wp) != NULL
+    परत (get_first_valid_sign(wp) != रिक्त
 # ifdef FEAT_NETBEANS_INTG
             || wp->w_buffer->b_has_sign_column
 # endif
@@ -2934,48 +2934,48 @@ signcolumn_on(win_T *wp)
 /*
  * "sign_unplace()" function
  */
-void
+शून्य
 f_sign_unplace(typval_T *argvars, typval_T *rettv)
 {
-    dict_T *dict = NULL;
-    rettv->vval.v_number = -1;
+    dict_T *dict = रिक्त;
+    rettv->vval.v_संख्या = -1;
 
-    if ((check_for_string_arg(argvars, 0) == FAIL ||
+    जर ((check_for_string_arg(argvars, 0) == FAIL ||
          check_for_opt_dict_arg(argvars, 1) == FAIL))
-        return;
+        परत;
 
-    if (argvars[1].v_type != VAR_UNKNOWN)
+    जर (argvars[1].v_type != VAR_UNKNOWN)
         dict = argvars[1].vval.v_dict;
 
-    rettv->vval.v_number = sign_unplace_from_dict(&argvars[0], dict);
+    rettv->vval.v_संख्या = sign_unplace_from_dict(&argvars[0], dict);
 }
 
 /*
  * "sign_unplacelist()" function
  */
-void
+शून्य
 f_sign_unplacelist(typval_T *argvars, typval_T *rettv)
 {
-    if (rettv_list_alloc(rettv) == FAIL)
-        return;
+    जर (rettv_list_alloc(rettv) == FAIL)
+        परत;
 
-    if (in_vim9script() && check_for_list_arg(argvars, 0) == FAIL)
-        return;
+    जर (in_vim9script() && check_for_list_arg(argvars, 0) == FAIL)
+        परत;
 
-    if (check_for_list_arg(argvars, 0) == FAIL)
-        return;
+    जर (check_for_list_arg(argvars, 0) == FAIL)
+        परत;
 
-    listitem_T *li = NULL;
-    FOR_ALL_LIST_ITEMS(argvars[0].vval.v_list, li)
+    listitem_T *li = रिक्त;
+    FOR_ALL_LIST_वस्तुसंच(argvars[0].vval.v_list, li)
     {
-        int retval = -1;
+        पूर्णांक retval = -1;
 
-        if (li->li_tv.v_type == VAR_DICT)
-            retval = sign_unplace_from_dict(NULL, li->li_tv.vval.v_dict);
-        else
+        जर (li->li_tv.v_type == VAR_DICT)
+            retval = sign_unplace_from_dict(रिक्त, li->li_tv.vval.v_dict);
+        अन्यथा
             emsg(_(e_dictionary_required));
 
-        list_append_number(rettv->vval.v_list, retval);
+        list_append_संख्या(rettv->vval.v_list, retval);
     }
 }
 

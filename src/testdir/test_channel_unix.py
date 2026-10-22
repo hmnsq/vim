@@ -5,26 +5,26 @@
 #
 # This requires Python 2.6 or later.
 
-from __future__ import print_function
-from test_channel import ThreadedTCPServer, TestingRequestHandler, \
+तः __future__ आयात print_function
+तः test_channel आयात ThreadedTCPServer, TestingRequestHandler, \
     writePortInFile
-import socket
-import threading
-import os
+आयात socket
+आयात threading
+आयात os
 
-try:
+प्रयत्न:
     FileNotFoundError
-except NameError:
+अपवाद NameError:
     # Python 2
     FileNotFoundError = (IOError, OSError)
 
-if not hasattr(socket, "AF_UNIX"):
-    raise NotImplementedError("Unix sockets are not supported on this platform")
+जर नाही hasattr(socket, "AF_UNIX"):
+    उठवा NotImplementedError("Unix sockets are not supported on this platform")
 
-class ThreadedUnixServer(ThreadedTCPServer):
+वर्ग ThreadedUnixServer(ThreadedTCPServer):
     address_family = socket.AF_UNIX
 
-class ThreadedUnixRequestHandler(TestingRequestHandler):
+वर्ग ThreadedUnixRequestHandler(TestingRequestHandler):
     pass
 
 def main(path):
@@ -32,7 +32,7 @@ def main(path):
 
     # Start a thread with the server.  That thread will then start a new thread
     # for each connection.
-    server_thread = threading.Thread(target=server.serve_forever)
+    server_thread = threading.धागा(target=server.serve_forever)
     server_thread.start()
 
     # Signal the test harness we're ready, the port value has no meaning.
@@ -42,15 +42,15 @@ def main(path):
 
     # Main thread terminates, but the server continues running
     # until server.shutdown() is called.
-    try:
-        while server_thread.is_alive():
+    प्रयत्न:
+        पर्यंत server_thread.is_alive():
             server_thread.join(1)
-    except (KeyboardInterrupt, SystemExit):
+    अपवाद (KeyboardInterrupt, SystemExit):
         server.shutdown()
 
-if __name__ == "__main__":
-    try:
+जर __name__ == "__main__":
+    प्रयत्न:
         os.remove("Xtestsocket")
-    except FileNotFoundError:
+    अपवाद FileNotFoundError:
         pass
     main("Xtestsocket")

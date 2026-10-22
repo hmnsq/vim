@@ -20,36 +20,36 @@
  *
  */
 
-#if !defined(XDIFFI_H)
+#जर !defined(XDIFFI_H)
 #define XDIFFI_H
 
 
-typedef struct s_xdalgoenv {
-	long mxcost;
-	long snake_cnt;
-	long heur_min;
+प्रकारव्याख्या संरचना s_xdalgoenv {
+	दीर्घ mxcost;
+	दीर्घ snake_cnt;
+	दीर्घ heur_min;
 } xdalgoenv_t;
 
-typedef struct s_xdchange {
-	struct s_xdchange *next;
-	long i1, i2;
-	long chg1, chg2;
-	int ignore;
+प्रकारव्याख्या संरचना s_xdchange {
+	संरचना s_xdchange *next;
+	दीर्घ i1, i2;
+	दीर्घ chg1, chg2;
+	पूर्णांक ignore;
 } xdchange_t;
 
 
 
-int xdl_recs_cmp(xdfile_t *xdf1, long off1, long lim1,
-		 xdfile_t *xdf2, long off2, long lim2,
-		 long *kvdf, long *kvdb, int need_min, xdalgoenv_t *xenv);
-int xdl_do_diff(mmfile_t *mf1, mmfile_t *mf2, xpparam_t const *xpp,
+पूर्णांक xdl_recs_cmp(xdfile_t *xdf1, दीर्घ off1, दीर्घ lim1,
+		 xdfile_t *xdf2, दीर्घ off2, दीर्घ lim2,
+		 दीर्घ *kvdf, दीर्घ *kvdb, पूर्णांक need_min, xdalgoenv_t *xenv);
+पूर्णांक xdl_do_diff(mmfile_t *mf1, mmfile_t *mf2, xpparam_t स्थिरांक *xpp,
 		xdfenv_t *xe);
-int xdl_change_compact(xdfile_t *xdf, xdfile_t *xdfo, long flags);
-int xdl_build_script(xdfenv_t *xe, xdchange_t **xscr);
-void xdl_free_script(xdchange_t *xscr);
-int xdl_emit_diff(xdfenv_t *xe, xdchange_t *xscr, xdemitcb_t *ecb,
-		  xdemitconf_t const *xecfg);
-int xdl_do_patience_diff(xpparam_t const *xpp, xdfenv_t *env);
-int xdl_do_histogram_diff(xpparam_t const *xpp, xdfenv_t *env);
+पूर्णांक xdl_change_compact(xdfile_t *xdf, xdfile_t *xdfo, दीर्घ flags);
+पूर्णांक xdl_build_script(xdfenv_t *xe, xdchange_t **xscr);
+शून्य xdl_free_script(xdchange_t *xscr);
+पूर्णांक xdl_emit_diff(xdfenv_t *xe, xdchange_t *xscr, xdemitcb_t *ecb,
+		  xdemitconf_t स्थिरांक *xecfg);
+पूर्णांक xdl_do_patience_diff(xpparam_t स्थिरांक *xpp, xdfenv_t *env);
+पूर्णांक xdl_do_histogram_diff(xpparam_t स्थिरांक *xpp, xdfenv_t *env);
 
 #endif /* #if !defined(XDIFFI_H) */

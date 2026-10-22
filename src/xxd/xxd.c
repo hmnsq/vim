@@ -87,25 +87,25 @@
  */
 
 /* Visual Studio 2005 has 'deprecated' many of the standard CRT functions */
-#if _MSC_VER >= 1400
+#जर _MSC_VER >= 1400
 # define _CRT_SECURE_NO_DEPRECATE
 # define _CRT_NONSTDC_NO_DEPRECATE
 #endif
-#if !defined(CYGWIN) && defined(__CYGWIN__)
+#जर !defined(CYGWIN) && defined(__CYGWIN__)
 # define CYGWIN
 #endif
 
-#if (defined(__linux__) && !defined(__ANDROID__)) || defined(__CYGWIN__)
+#जर (defined(__linux__) && !defined(__ANDROID__)) || defined(__CYGWIN__)
 # define _XOPEN_SOURCE 700   /* for fdopen() */
 #endif
 
-#include <stdio.h>
+#अन्तर्भाव <stdio.h>
 #ifdef VAXC
 # include <file.h>
-#else
+#अन्यथा
 # include <fcntl.h>
 #endif
-#if defined(WIN32) || defined(CYGWIN)
+#जर defined(WIN32) || defined(CYGWIN)
 # include <io.h>	/* for setmode() */
 #endif
 #ifdef WIN32
@@ -114,11 +114,11 @@
 #ifdef UNIX
 # include <unistd.h>
 #endif
-#include <stdlib.h>
-#include <string.h>
-#include <ctype.h>
-#include <limits.h>
-#if __MWERKS__ && !defined(BEBOX)
+#अन्तर्भाव <stdlib.h>
+#अन्तर्भाव <string.h>
+#अन्तर्भाव <ctype.h>
+#अन्तर्भाव <limits.h>
+#जर __MWERKS__ && !defined(BEBOX)
 # include <unix.h>	/* for fdopen() on MAC */
 #endif
 
@@ -127,7 +127,7 @@
  *  in some GNU installations (e.g. SunOS 4.1.x).
  *  Darren Hiebert <darren@hmi.com> (sparc-sun-sunos4.1.3_U1/2.7.2.2)
  */
-#if defined(__GNUC__) && defined(__STDC__)
+#जर defined(__GNUC__) && defined(__STDC__)
 # ifndef __USE_FIXED_PROTOTYPES__
 #  define __USE_FIXED_PROTOTYPES__
 # endif
@@ -141,42 +141,42 @@
  * FILE is defined on OS 4.x, not on 5.x (Solaris).
  * if __SVR4 is defined (some Solaris versions), don't include this.
  */
-# if defined(sun) && defined(FILE) && !defined(__SVR4) && defined(__STDC__)
+# जर defined(sun) && defined(खाता) && !defined(__SVR4) && defined(__STDC__)
 #  define __P(a) a
 /* excerpt from my sun_stdlib.h */
-extern int fprintf __P((FILE *, char *, ...));
-extern int fputs   __P((char *, FILE *));
-extern int _flsbuf __P((unsigned char, FILE *));
-extern int _filbuf __P((FILE *));
-extern int fflush  __P((FILE *));
-extern int fclose  __P((FILE *));
-extern int fseek   __P((FILE *, long, int));
-extern int rewind  __P((FILE *));
+बाह्य पूर्णांक ख_लिखो __P((खाता *, अक्षर *, ...));
+बाह्य पूर्णांक ख_माला_दो   __P((अक्षर *, खाता *));
+बाह्य पूर्णांक _flsbuf __P((अचिन्हित अक्षर, खाता *));
+बाह्य पूर्णांक _filbuf __P((खाता *));
+बाह्य पूर्णांक ख_साफ  __P((खाता *));
+बाह्य पूर्णांक ख_बंद  __P((खाता *));
+बाह्य पूर्णांक ख_जाओ   __P((खाता *, दीर्घ, पूर्णांक));
+बाह्य पूर्णांक शुरुआत  __P((खाता *));
 
-extern void perror __P((char *));
+बाह्य शून्य लिखो_त्रुटि __P((अक्षर *));
 # endif
 #endif
 
-char version[] = "xxd 2026-06-16 by Juergen Weigert et al.";
+अक्षर version[] = "xxd 2026-06-16 by Juergen Weigert et al.";
 #ifdef WIN32
-char osver[] = " (Win32)";
-#else
-char osver[] = "";
+अक्षर osver[] = " (Win32)";
+#अन्यथा
+अक्षर osver[] = "";
 #endif
 
-#if defined(WIN32)
+#जर defined(WIN32)
 # define BIN_READ(yes)  ((yes) ? "rb" : "rt")
 # define BIN_WRITE(yes) ((yes) ? "wb" : "wt")
-# define BIN_CREAT(yes) ((yes) ? (O_CREAT|O_BINARY) : O_CREAT)
-# define BIN_ASSIGN(fp, yes) setmode(fileno(fp), (yes) ? O_BINARY : O_TEXT)
+# define BIN_CREAT(yes) ((yes) ? (O_CREAT|O_द्विमान) : O_CREAT)
+# define BIN_ASSIGN(fp, yes) setmode(fileno(fp), (yes) ? O_द्विमान : O_TEXT)
 # define PATH_SEP '\\'
-#elif defined(CYGWIN)
+#किंवाजर defined(CYGWIN)
 # define BIN_READ(yes)  ((yes) ? "rb" : "rt")
 # define BIN_WRITE(yes) ((yes) ? "wb" : "w")
-# define BIN_CREAT(yes) ((yes) ? (O_CREAT|O_BINARY) : O_CREAT)
-# define BIN_ASSIGN(fp, yes) ((yes) ? (void) setmode(fileno(fp), O_BINARY) : (void) (fp))
+# define BIN_CREAT(yes) ((yes) ? (O_CREAT|O_द्विमान) : O_CREAT)
+# define BIN_ASSIGN(fp, yes) ((yes) ? (शून्य) setmode(fileno(fp), O_द्विमान) : (शून्य) (fp))
 # define PATH_SEP '/'
-#else
+#अन्यथा
 # ifdef VMS
 #  define BIN_READ(dummy)  "r"
 #  define BIN_WRITE(dummy) "w"
@@ -184,7 +184,7 @@ char osver[] = "";
 #  define BIN_ASSIGN(fp, dummy) fp
 #  define PATH_SEP ']'
 #  define FILE_SEP '.'
-# else
+# अन्यथा
 #  define BIN_READ(dummy)  "r"
 #  define BIN_WRITE(dummy) "w"
 #  define BIN_CREAT(dummy) O_CREAT
@@ -194,22 +194,22 @@ char osver[] = "";
 #endif
 
 /* open has only to arguments on the Mac */
-#if __MWERKS__
-# define OPEN(name, mode, umask) open(name, mode)
-#else
-# define OPEN(name, mode, umask) open(name, mode, umask)
+#जर __MWERKS__
+# define OPEN(name, mode, umask) खोलो(name, mode)
+#अन्यथा
+# define OPEN(name, mode, umask) खोलो(name, mode, umask)
 #endif
 
 #ifdef AMIGA
-# define STRNCMP(s1, s2, l) strncmp(s1, s2, (size_t)l)
-#else
-# define STRNCMP(s1, s2, l) strncmp(s1, s2, l)
+# define STRNCMP(s1, s2, l) म_भेदन(s1, s2, (माप_प्रकार)l)
+#अन्यथा
+# define STRNCMP(s1, s2, l) म_भेदन(s1, s2, l)
 #endif
 
 #ifndef __P
-# if defined(__STDC__) || defined(WIN32)
+# जर defined(__STDC__) || defined(WIN32)
 #  define __P(a) a
-# else
+# अन्यथा
 #  define __P(a) ()
 # endif
 #endif
@@ -242,7 +242,7 @@ char osver[] = "";
     + COLS         /* ASCII dump */ \
     + 2)           /* "\n\0" */
 
-char hexxa[] = "0123456789abcdef0123456789ABCDEF", *hexx = hexxa;
+अक्षर hexxa[] = "0123456789abcdef0123456789ABCDEF", *hexx = hexxa;
 
 /* the different hextypes known by this program: */
 #define HEX_NORMAL         0x00 /* no flags set */
@@ -251,7 +251,7 @@ char hexxa[] = "0123456789abcdef0123456789ABCDEF", *hexx = hexxa;
 #define HEX_BITS           0x04 /* not hex a dump, but bits: 01111001 */
 #define HEX_LITTLEENDIAN   0x08
 
-#define CONDITIONAL_CAPITALIZE(c) (capitalize ? toupper((unsigned char)(c)) : (c))
+#define CONDITIONAL_CAPITALIZE(c) (capitalize ? बड़े((अचिन्हित अक्षर)(c)) : (c))
 
 #define COLOR_PROLOGUE(color) \
 l_colored[c++] = '\033'; \
@@ -273,14 +273,14 @@ l_colored[c++] = 'm';
 #define COLOR_BLUE '4'
 #define COLOR_WHITE '7'
 
-static char *pname;
+स्थिर अक्षर *pname;
 
-  static void
-exit_with_usage(void)
+  स्थिर शून्य
+exit_with_usage(शून्य)
 {
-  fprintf(stderr, "Usage:\n       %s [options] [infile [outfile]]\n", pname);
-  fprintf(stderr, "    or\n       %s -r [-s [-]offset] [-c cols] [-ps] [infile [outfile]]\n", pname);
-  fprintf(stderr, "Options:\n"
+  ख_लिखो(मानक_त्रुटि, "Usage:\n       %s [options] [infile [outfile]]\n", pname);
+  ख_लिखो(मानक_त्रुटि, "    or\n       %s -r [-s [-]offset] [-c cols] [-ps] [infile [outfile]]\n", pname);
+  ख_लिखो(मानक_त्रुटि, "Options:\n"
 		  "    -a          toggle autoskip: A single '*' replaces nul-lines. Default off.\n"
 		  "    -b          binary digit dump (incompatible with -ps). Default hex.\n"
 		  "    -C          capitalize variable names in C include file style (-i).\n"
@@ -298,65 +298,65 @@ exit_with_usage(void)
 		  "    -r          reverse operation: convert (or patch) hexdump into binary.\n"
 		  "    -r -s off   revert with <off> added to file positions found in hexdump.\n"
 		  "    -d          show offset in decimal instead of hex.\n");
-  fprintf(stderr, "    -s %sseek  start at <seek> bytes abs. %sinfile offset.\n",
+  ख_लिखो(मानक_त्रुटि, "    -s %sseek  start at <seek> bytes abs. %sinfile offset.\n",
 #ifdef TRY_SEEK
 	  "[+][-]", "(or +: rel.) ");
-#else
+#अन्यथा
 	  "", "");
 #endif
-  fprintf(stderr, "    -u          use upper case hex letters.\n"
+  ख_लिखो(मानक_त्रुटि, "    -u          use upper case hex letters.\n"
 		  "    -R when     colorize the output; <when> can be 'always', 'auto' or 'never'. Default: 'auto'.\n"
 		  "    -v          show version: \"%s%s\".\n", version, osver);
-  exit(1);
+  निकास(1);
 }
 
-  static void
-perror_exit(int ret)
+  स्थिर शून्य
+perror_exit(पूर्णांक ret)
 {
-  fprintf(stderr, "%s: ", pname);
-  perror(NULL);
-  exit(ret);
+  ख_लिखो(मानक_त्रुटि, "%s: ", pname);
+  लिखो_त्रुटि(रिक्त);
+  निकास(ret);
 }
 
-  static void
-error_exit(int ret, char *msg)
+  स्थिर शून्य
+error_exit(पूर्णांक ret, अक्षर *संदेश)
 {
-  fprintf(stderr, "%s: %s\n", pname, msg);
-  exit(ret);
+  ख_लिखो(मानक_त्रुटि, "%s: %s\n", pname, संदेश);
+  निकास(ret);
 }
 
-  static int
-getc_or_die(FILE *fpi)
+  स्थिर पूर्णांक
+getc_or_die(खाता *fpi)
 {
-  int c = getc(fpi);
-  if (c == EOF && ferror(fpi))
+  पूर्णांक c = अ_लो(fpi);
+  जर (c == खातापूर्ण && ख_त्रुटि(fpi))
     perror_exit(2);
-  return c;
+  परत c;
 }
 
-  static void
-putc_or_die(int c, FILE *fpo)
+  स्थिर शून्य
+putc_or_die(पूर्णांक c, खाता *fpo)
 {
-  if (putc(c, fpo) == EOF)
+  जर (अ_दो(c, fpo) == खातापूर्ण)
     perror_exit(3);
 }
 
-  static void
-fputs_or_die(char *s, FILE *fpo)
+  स्थिर शून्य
+fputs_or_die(अक्षर *s, खाता *fpo)
 {
-  if (fputs(s, fpo) == EOF)
+  जर (ख_माला_दो(s, fpo) == खातापूर्ण)
     perror_exit(3);
 }
 
 /* Use a macro to allow for different arguments. */
-#define FPRINTF_OR_DIE(args) if (fprintf args < 0) perror_exit(3)
+#define FPRINTF_OR_DIE(args) जर (ख_लिखो args < 0) perror_exit(3)
 
-  static void
-fclose_or_die(FILE *fpi, FILE *fpo)
+  स्थिर शून्य
+fclose_or_die(खाता *fpi, खाता *fpo)
 {
-  if (fclose(fpo) != 0)
+  जर (ख_बंद(fpo) != 0)
     perror_exit(3);
-  if (fclose(fpi) != 0)
+  जर (ख_बंद(fpi) != 0)
     perror_exit(2);
 }
 
@@ -364,10 +364,10 @@ fclose_or_die(FILE *fpi, FILE *fpo)
  * If "c" is a hex digit, return the value.
  * Otherwise return -1.
  */
-  static int
-parse_hex_digit(int c)
+  स्थिर पूर्णांक
+parse_hex_digit(पूर्णांक c)
 {
-  return (c >= '0' && c <= '9') ? c - '0'
+  परत (c >= '0' && c <= '9') ? c - '0'
 	: (c >= 'a' && c <= 'f') ? c - 'a' + 10
 	: (c >= 'A' && c <= 'F') ? c - 'A' + 10
 	: -1;
@@ -377,10 +377,10 @@ parse_hex_digit(int c)
  * If "c" is a bin digit, return the value.
  * Otherwise return -1.
  */
-  static int
-parse_bin_digit(int c)
+  स्थिर पूर्णांक
+parse_bin_digit(पूर्णांक c)
 {
-  return (c >= '0' && c <= '1') ? c - '0'
+  परत (c >= '0' && c <= '1') ? c - '0'
 	: -1;
 }
 
@@ -389,12 +389,12 @@ parse_bin_digit(int c)
  * Return the '\n' or EOF character.
  * When an error is encountered exit with an error message.
  */
-  static int
-skip_to_eol(FILE *fpi, int c)
+  स्थिर पूर्णांक
+skip_to_eol(खाता *fpi, पूर्णांक c)
 {
-  while (c != '\n' && c != EOF)
+  पर्यंत (c != '\n' && c != खातापूर्ण)
     c = getc_or_die(fpi);
-  return c;
+  परत c;
 }
 
 /*
@@ -404,169 +404,169 @@ skip_to_eol(FILE *fpi, int c)
  *
  * The name is historic and came from 'undo type opt h'.
  */
-  static int
+  स्थिर पूर्णांक
 huntype(
-  FILE *fpi,
-  FILE *fpo,
-  int cols,
-  int hextype,
-  long base_off)
+  खाता *fpi,
+  खाता *fpo,
+  पूर्णांक cols,
+  पूर्णांक hextype,
+  दीर्घ base_off)
 {
-  int c, ign_garb = 1, n1 = -1, n2 = 0, n3 = 0, p = cols, bt = 0, b = 0, bcnt = 0;
-  long have_off = 0, want_off = 0;
+  पूर्णांक c, ign_garb = 1, n1 = -1, n2 = 0, n3 = 0, p = cols, bt = 0, b = 0, bcnt = 0;
+  दीर्घ have_off = 0, want_off = 0;
 
-  rewind(fpi);
+  शुरुआत(fpi);
 
-  while ((c = getc(fpi)) != EOF)
+  पर्यंत ((c = अ_लो(fpi)) != खातापूर्ण)
     {
-      if (c == '\r')	/* Doze style input file? */
-	continue;
+      जर (c == '\r')	/* Doze style input file? */
+	सुरूठेवा;
 
       /* Allow multiple spaces.  This doesn't work when there is normal text
        * after the hex codes in the last line that looks like hex, thus only
        * use it for PostScript format. */
-      if (hextype == HEX_POSTSCRIPT && (c == ' ' || c == '\n' || c == '\t'))
-	continue;
+      जर (hextype == HEX_POSTSCRIPT && (c == ' ' || c == '\n' || c == '\t'))
+	सुरूठेवा;
 
-      if (hextype == HEX_NORMAL || hextype == HEX_POSTSCRIPT)
+      जर (hextype == HEX_NORMAL || hextype == HEX_POSTSCRIPT)
 	{
 	  n3 = n2;
 	  n2 = n1;
 
 	  n1 = parse_hex_digit(c);
-	  if (n1 == -1 && ign_garb)
-	    continue;
+	  जर (n1 == -1 && ign_garb)
+	    सुरूठेवा;
 	}
-      else /* HEX_BITS */
+      अन्यथा /* HEX_BITS */
 	{
 	  n1 = parse_hex_digit(c);
-	  if (n1 == -1 && ign_garb)
-	    continue;
+	  जर (n1 == -1 && ign_garb)
+	    सुरूठेवा;
 
 	  bt = parse_bin_digit(c);
-	  if (bt != -1)
+	  जर (bt != -1)
 	    {
 	      /* shift via unsigned to avoid signed overflow on bad input */
-	      b = (int)(((unsigned)b << 1) | (unsigned)bt);
+	      b = (पूर्णांक)(((अचिन्हित)b << 1) | (अचिन्हित)bt);
 	      ++bcnt;
 	    }
 	}
 
       ign_garb = 0;
 
-      if ((hextype != HEX_POSTSCRIPT) && (p >= cols))
+      जर ((hextype != HEX_POSTSCRIPT) && (p >= cols))
 	{
-	  if (hextype == HEX_NORMAL)
+	  जर (hextype == HEX_NORMAL)
 	    {
-	      if (n1 < 0)
+	      जर (n1 < 0)
 		{
 		  p = 0;
-		  continue;
+		  सुरूठेवा;
 		}
-	      want_off = (long)(((unsigned long)want_off << 4) | (unsigned)n1);
+	      want_off = (दीर्घ)(((अचिन्हित दीर्घ)want_off << 4) | (अचिन्हित)n1);
 	    }
-	  else /* HEX_BITS */
+	  अन्यथा /* HEX_BITS */
 	    {
-	      if (n1 < 0)
+	      जर (n1 < 0)
 		{
 		  p = 0;
 		  bcnt = 0;
-		  continue;
+		  सुरूठेवा;
 		}
-	      want_off = (long)(((unsigned long)want_off << 4) | (unsigned)n1);
+	      want_off = (दीर्घ)(((अचिन्हित दीर्घ)want_off << 4) | (अचिन्हित)n1);
 	    }
-	  continue;
+	  सुरूठेवा;
 	}
 
-      if (base_off + want_off != have_off)
+      जर (base_off + want_off != have_off)
 	{
-	  if (fflush(fpo) != 0)
+	  जर (ख_साफ(fpo) != 0)
 	    perror_exit(3);
 #ifdef TRY_SEEK
-	  if (fseek(fpo, base_off + want_off - have_off, SEEK_CUR) >= 0)
+	  जर (ख_जाओ(fpo, base_off + want_off - have_off, प्रस्तुत_से) >= 0)
 	    have_off = base_off + want_off;
 #endif
-	  if (base_off + want_off < have_off)
+	  जर (base_off + want_off < have_off)
 	    error_exit(5, "Sorry, cannot seek backwards.");
-	  for (; have_off < base_off + want_off; have_off++)
+	  साठी (; have_off < base_off + want_off; have_off++)
 	    putc_or_die(0, fpo);
 	}
 
-      if (hextype == HEX_NORMAL || hextype == HEX_POSTSCRIPT)
+      जर (hextype == HEX_NORMAL || hextype == HEX_POSTSCRIPT)
 	{
-	  if (n2 >= 0 && n1 >= 0)
+	  जर (n2 >= 0 && n1 >= 0)
 	    {
 	      putc_or_die((n2 << 4) | n1, fpo);
 	      have_off++;
 	      want_off++;
 	      n1 = -1;
-	      if (!hextype && (++p >= cols))
+	      जर (!hextype && (++p >= cols))
 	      /* skip the rest of the line as garbage */
 	      c = skip_to_eol(fpi, c);
 	    }
-	  else if (n1 < 0 && n2 < 0 && n3 < 0)
+	  अन्यथा जर (n1 < 0 && n2 < 0 && n3 < 0)
 	    /* already stumbled into garbage, skip line, wait and see */
 	    c = skip_to_eol(fpi, c);
 	}
-      else /* HEX_BITS */
+      अन्यथा /* HEX_BITS */
 	{
-	  if (bcnt == 8)
+	  जर (bcnt == 8)
 	    {
 	      putc_or_die(b, fpo);
 	      have_off++;
 	      want_off++;
 	      b = 0;
 	      bcnt = 0;
-	      if (++p >= cols)
+	      जर (++p >= cols)
 		/* skip the rest of the line as garbage */
 		 c = skip_to_eol(fpi, c);
 	    }
 	}
 
-      if (c == '\n')
+      जर (c == '\n')
 	{
-	  if (hextype == HEX_NORMAL || hextype == HEX_BITS)
+	  जर (hextype == HEX_NORMAL || hextype == HEX_BITS)
 	    want_off = 0;
 	  p = cols;
 	  ign_garb = 1;
 	}
     }
-  if (fflush(fpo) != 0)
+  जर (ख_साफ(fpo) != 0)
     perror_exit(3);
 #ifdef TRY_SEEK
-  fseek(fpo, 0L, SEEK_END);
+  ख_जाओ(fpo, 0L, अंत_से);
 #endif
   fclose_or_die(fpi, fpo);
-  return 0;
+  परत 0;
 }
 
 
 /*
  * Print line l with given colors.
  */
-  static void
-print_colored_line(FILE *fp, char *l, char *colors)
+  स्थिर शून्य
+print_colored_ओळ(खाता *fp, अक्षर *l, अक्षर *colors)
 {
-  static char l_colored[LLEN+1];
+  स्थिर अक्षर l_colored[LLEN+1];
 
-  if (colors)
+  जर (colors)
     {
-      int c = 0;
-      if (colors[0])
+      पूर्णांक c = 0;
+      जर (colors[0])
 	{
 	  COLOR_PROLOGUE(colors[0])
 	}
       l_colored[c++] = l[0];
-      int i;
-      for (i = 1; l[i]; i++)
+      पूर्णांक i;
+      साठी (i = 1; l[i]; i++)
 	{
-	  if (colors[i] != colors[i-1])
+	  जर (colors[i] != colors[i-1])
 	    {
-	      if (colors[i-1])
+	      जर (colors[i-1])
 		{
 		  COLOR_EPILOGUE
 		}
-	      if (colors[i])
+	      जर (colors[i])
 		{
 		  COLOR_PROLOGUE(colors[i])
 		}
@@ -574,7 +574,7 @@ print_colored_line(FILE *fp, char *l, char *colors)
 	  l_colored[c++] = l[i];
 	}
 
-      if (colors[i])
+      जर (colors[i])
 	{
 	  COLOR_EPILOGUE
 	}
@@ -582,7 +582,7 @@ print_colored_line(FILE *fp, char *l, char *colors)
 
       fputs_or_die(l_colored, fp);
     }
-  else
+  अन्यथा
     fputs_or_die(l, fp);
 }
 
@@ -598,47 +598,47 @@ print_colored_line(FILE *fp, char *l, char *colors)
  *
  * If nz is always positive, lines are never suppressed.
  */
-  static void
-xxdline(FILE *fp, char *l, char *colors, int nz)
+  स्थिर शून्य
+xxdline(खाता *fp, अक्षर *l, अक्षर *colors, पूर्णांक nz)
 {
-  static char z[LLEN_NO_COLOR+1];
-  static char z_colors[LLEN_NO_COLOR+1];
-  static signed char zero_seen = 0;
+  स्थिर अक्षर z[LLEN_NO_COLOR+1];
+  स्थिर अक्षर z_colors[LLEN_NO_COLOR+1];
+  स्थिर चिन्हित अक्षर zero_seen = 0;
 
-  if (!nz && zero_seen == 1)
+  जर (!nz && zero_seen == 1)
     {
-      strcpy(z, l);
-      if (colors)
-	  memcpy(z_colors, colors, strlen(z));
+      म_नकल(z, l);
+      जर (colors)
+	  स_नकल(z_colors, colors, म_माप(z));
     }
 
-  if (nz || !zero_seen++)
+  जर (nz || !zero_seen++)
     {
-      if (nz)
+      जर (nz)
 	{
-	  if (nz < 0)
+	  जर (nz < 0)
 	    zero_seen--;
-	  if (zero_seen == 2)
-	    print_colored_line(fp, z, z_colors);
-	  if (zero_seen > 2)
+	  जर (zero_seen == 2)
+	    print_colored_ओळ(fp, z, z_colors);
+	  जर (zero_seen > 2)
 	    fputs_or_die("*\n", fp);
 	}
-      if (nz >= 0 || zero_seen > 0)
-	print_colored_line(fp, l, colors);
+      जर (nz >= 0 || zero_seen > 0)
+	print_colored_ओळ(fp, l, colors);
 
-      if (nz)
+      जर (nz)
 	zero_seen = 0;
     }
 
   /* If zero_seen > 3, then its exact value doesn't matter, so long as it
    * remains >3 and incrementing it will not cause overflow. */
-  if (zero_seen >= 0x7F)
+  जर (zero_seen >= 0x7F)
     zero_seen = 4;
 }
 
 /* This is an EBCDIC to ASCII conversion table */
 /* from a proposed BTL standard April 16, 1979 */
-static unsigned char etoa64[] =
+स्थिर अचिन्हित अक्षर etoa64[] =
 {
     0040,0240,0241,0242,0243,0244,0245,0246,
     0247,0250,0325,0056,0074,0050,0053,0174,
@@ -666,524 +666,524 @@ static unsigned char etoa64[] =
     0070,0071,0372,0373,0374,0375,0376,0377
 };
 
-  static char
-get_color_char (int e, int ebcdic)
+  स्थिर अक्षर
+get_color_char (पूर्णांक e, पूर्णांक ebcdic)
 {
-  if (ebcdic)
+  जर (ebcdic)
     {
-      if ((e >= 75 && e <= 80) || (e >= 90 && e <= 97) ||
+      जर ((e >= 75 && e <= 80) || (e >= 90 && e <= 97) ||
 	  (e >= 107 && e <= 111) || (e >= 121 && e <= 127) ||
 	  (e >= 129 && e <= 137) || (e >= 145 && e <= 154) ||
 	  (e >= 162 && e <= 169) || (e >= 192 && e <= 201) ||
 	  (e >= 208 && e <= 217) || (e >= 226 && e <= 233) ||
 	  (e >= 240 && e <= 249) || (e == 189) || (e == 64) ||
 	  (e == 173) || (e == 224) )
-	return COLOR_GREEN;
+	परत COLOR_GREEN;
 
-      else if (e == 37 || e == 13 || e == 5)
-	return COLOR_YELLOW;
-      else if (e == 0)
-	return COLOR_WHITE;
-      else if (e == 255)
-	return COLOR_BLUE;
-      else
-	return COLOR_RED;
+      अन्यथा जर (e == 37 || e == 13 || e == 5)
+	परत COLOR_YELLOW;
+      अन्यथा जर (e == 0)
+	परत COLOR_WHITE;
+      अन्यथा जर (e == 255)
+	परत COLOR_BLUE;
+      अन्यथा
+	परत COLOR_RED;
     }
-  else  /* ASCII */
+  अन्यथा  /* ASCII */
     {
-#if defined(__MVS__) && __CHARSET_LIB == 0
-      if (e >= 64)
-	return COLOR_GREEN;
-#else
-      if (e > 31 && e < 127)
-	return COLOR_GREEN;
+#जर defined(__MVS__) && __CHARSET_LIB == 0
+      जर (e >= 64)
+	परत COLOR_GREEN;
+#अन्यथा
+      जर (e > 31 && e < 127)
+	परत COLOR_GREEN;
 #endif
 
-      else if (e == 9 || e == 10 || e == 13)
-	return COLOR_YELLOW;
-      else if (e == 0)
-	return COLOR_WHITE;
-      else if (e == 255)
-	return COLOR_BLUE;
-      else
-	return COLOR_RED;
+      अन्यथा जर (e == 9 || e == 10 || e == 13)
+	परत COLOR_YELLOW;
+      अन्यथा जर (e == 0)
+	परत COLOR_WHITE;
+      अन्यथा जर (e == 255)
+	परत COLOR_BLUE;
+      अन्यथा
+	परत COLOR_RED;
     }
-    return 0;
+    परत 0;
 }
 
-  static int
-enable_color(void)
+  स्थिर पूर्णांक
+enable_color(शून्य)
 {
 #ifdef WIN32
   DWORD   mode;
   HANDLE  out;
 
-  if (!isatty(1))
-    return 0;
+  जर (!isatty(1))
+    परत 0;
 
   out = GetStdHandle(STD_OUTPUT_HANDLE);
   GetConsoleMode(out, &mode);
   mode |= ENABLE_VIRTUAL_TERMINAL_PROCESSING;
-  return (int)SetConsoleMode(out, mode);
-#elif defined(UNIX)
-  char *term;
+  परत (पूर्णांक)SetConsoleMode(out, mode);
+#किंवाजर defined(UNIX)
+  अक्षर *term;
 
-  if (!isatty(STDOUT_FILENO))
-    return 0;
+  जर (!isatty(STDOUT_FILENO))
+    परत 0;
 
-  term = getenv("TERM");
-  if (term == NULL || *term == '\0' || !strcmp(term, "dumb"))
-    return 0;
+  term = दो_पर्या("TERM");
+  जर (term == रिक्त || *term == '\0' || !म_भेद(term, "dumb"))
+    परत 0;
 
-  return 1;
-#else
-  return 0;
+  परत 1;
+#अन्यथा
+  परत 0;
 #endif
 }
 
-  int
-main(int argc, char *argv[])
+  पूर्णांक
+main(पूर्णांक argc, अक्षर *argv[])
 {
-  FILE *fp, *fpo;
-  int c, e, p = 0, relseek = 1, negseek = 0, revert = 0, i, x;
-  int cols = 0, colsgiven = 0, nonzero = 0, autoskip = 0, hextype = HEX_NORMAL;
-  int capitalize = 0, decimal_offset = 0;
-  int ebcdic = 0;
-  int termination = 0;
-  int octspergrp = -1;	/* number of octets grouped in output */
-  int grplen;		/* total chars per octet group excluding colors */
-  long length = -1, n = 0, seekoff = 0;
-  unsigned long displayoff = 0;
-  static char l[LLEN_NO_COLOR+1];  /* static because it may be too big for stack */
-  static char colors[LLEN_NO_COLOR+1]; /* color array */
-  char *pp;
-  char *varname = NULL;
-  int addrlen = 9;
-  int color = 0;
-  int color_forced = 0;	/* set when -R always is used */
-  char *no_color;
-  char cur_color = 0;
+  खाता *fp, *fpo;
+  पूर्णांक c, e, p = 0, relseek = 1, negseek = 0, revert = 0, i, x;
+  पूर्णांक cols = 0, colsgiven = 0, nonzero = 0, autoskip = 0, hextype = HEX_NORMAL;
+  पूर्णांक capitalize = 0, decimal_offset = 0;
+  पूर्णांक ebcdic = 0;
+  पूर्णांक termination = 0;
+  पूर्णांक octspergrp = -1;	/* number of octets grouped in output */
+  पूर्णांक grplen;		/* total chars per octet group excluding colors */
+  दीर्घ length = -1, n = 0, seekoff = 0;
+  अचिन्हित दीर्घ displayoff = 0;
+  स्थिर अक्षर l[LLEN_NO_COLOR+1];  /* static because it may be too big for stack */
+  स्थिर अक्षर colors[LLEN_NO_COLOR+1]; /* color array */
+  अक्षर *pp;
+  अक्षर *varname = रिक्त;
+  पूर्णांक addrlen = 9;
+  पूर्णांक color = 0;
+  पूर्णांक color_forced = 0;	/* set when -R always is used */
+  अक्षर *no_color;
+  अक्षर cur_color = 0;
 
-  no_color = getenv("NO_COLOR");
-  if (no_color == NULL || no_color[0] == '\0')
+  no_color = दो_पर्या("NO_COLOR");
+  जर (no_color == रिक्त || no_color[0] == '\0')
     color = enable_color();
 
 #ifdef AMIGA
   /* This program doesn't work when started from the Workbench */
-  if (argc == 0)
-    exit(1);
+  जर (argc == 0)
+    निकास(1);
 #endif
 
   pname = argv[0];
-  for (pp = pname; *pp; )
-    if (*pp++ == PATH_SEP)
+  साठी (pp = pname; *pp; )
+    जर (*pp++ == PATH_SEP)
       pname = pp;
 #ifdef FILE_SEP
-  for (pp = pname; *pp; pp++)
-    if (*pp == FILE_SEP)
+  साठी (pp = pname; *pp; pp++)
+    जर (*pp == FILE_SEP)
       {
 	*pp = '\0';
-	break;
+	थांबा;
       }
 #endif
 
-  while (argc >= 2)
+  पर्यंत (argc >= 2)
     {
       pp = argv[1] + (!STRNCMP(argv[1], "--", 2) && argv[1][2]);
-	   if (!STRNCMP(pp, "-a", 2)) autoskip = 1 - autoskip;
-      else if (!STRNCMP(pp, "-b", 2)) hextype |= HEX_BITS;
-      else if (!STRNCMP(pp, "-e", 2)) hextype |= HEX_LITTLEENDIAN;
-      else if (!STRNCMP(pp, "-u", 2)) hexx = hexxa + 16;
-      else if (!STRNCMP(pp, "-p", 2)) hextype |= HEX_POSTSCRIPT;
-      else if (!STRNCMP(pp, "-i", 2)) hextype |= HEX_CINCLUDE;
-      else if (!STRNCMP(pp, "-C", 2)) capitalize = 1;
-      else if (!STRNCMP(pp, "-d", 2)) decimal_offset = 1;
-      else if (!STRNCMP(pp, "-r", 2)) revert++;
-      else if (!STRNCMP(pp, "-E", 2)) ebcdic++;
-      else if (!STRNCMP(pp, "-t", 2)) termination++;
-      else if (!STRNCMP(pp, "-v", 2))
+	   जर (!STRNCMP(pp, "-a", 2)) autoskip = 1 - autoskip;
+      अन्यथा जर (!STRNCMP(pp, "-b", 2)) hextype |= HEX_BITS;
+      अन्यथा जर (!STRNCMP(pp, "-e", 2)) hextype |= HEX_LITTLEENDIAN;
+      अन्यथा जर (!STRNCMP(pp, "-u", 2)) hexx = hexxa + 16;
+      अन्यथा जर (!STRNCMP(pp, "-p", 2)) hextype |= HEX_POSTSCRIPT;
+      अन्यथा जर (!STRNCMP(pp, "-i", 2)) hextype |= HEX_CINCLUDE;
+      अन्यथा जर (!STRNCMP(pp, "-C", 2)) capitalize = 1;
+      अन्यथा जर (!STRNCMP(pp, "-d", 2)) decimal_offset = 1;
+      अन्यथा जर (!STRNCMP(pp, "-r", 2)) revert++;
+      अन्यथा जर (!STRNCMP(pp, "-E", 2)) ebcdic++;
+      अन्यथा जर (!STRNCMP(pp, "-t", 2)) termination++;
+      अन्यथा जर (!STRNCMP(pp, "-v", 2))
 	{
-	  fprintf(stderr, "%s%s\n", version, osver);
-	  exit(0);
+	  ख_लिखो(मानक_त्रुटि, "%s%s\n", version, osver);
+	  निकास(0);
 	}
-      else if (!STRNCMP(pp, "-c", 2))
+      अन्यथा जर (!STRNCMP(pp, "-c", 2))
 	{
-	  if (pp[2] && !STRNCMP("apitalize", pp + 2, 9))
+	  जर (pp[2] && !STRNCMP("apitalize", pp + 2, 9))
 	    capitalize = 1;
-	  else if (pp[2] && STRNCMP("ols", pp + 2, 3))
+	  अन्यथा जर (pp[2] && STRNCMP("ols", pp + 2, 3))
 	    {
 	      colsgiven = 1;
-	      cols = (int)strtol(pp + 2, NULL, 0);
+	      cols = (पूर्णांक)म_से_दीर्घ(pp + 2, रिक्त, 0);
 	    }
-	  else
+	  अन्यथा
 	    {
-	      if (!argv[2])
+	      जर (!argv[2])
 		exit_with_usage();
 	      colsgiven = 1;
-	      cols = (int)strtol(argv[2], NULL, 0);
+	      cols = (पूर्णांक)म_से_दीर्घ(argv[2], रिक्त, 0);
 	      argv++;
 	      argc--;
 	    }
 	}
-      else if (!STRNCMP(pp, "-g", 2))
+      अन्यथा जर (!STRNCMP(pp, "-g", 2))
 	{
-	  if (pp[2] && STRNCMP("roup", pp + 2, 4))
-	    octspergrp = (int)strtol(pp + 2, NULL, 0);
-	  else
+	  जर (pp[2] && STRNCMP("roup", pp + 2, 4))
+	    octspergrp = (पूर्णांक)म_से_दीर्घ(pp + 2, रिक्त, 0);
+	  अन्यथा
 	    {
-	      if (!argv[2])
+	      जर (!argv[2])
 		exit_with_usage();
-	      octspergrp = (int)strtol(argv[2], NULL, 0);
+	      octspergrp = (पूर्णांक)म_से_दीर्घ(argv[2], रिक्त, 0);
 	      argv++;
 	      argc--;
 	    }
 	}
-      else if (!STRNCMP(pp, "-o", 2))
+      अन्यथा जर (!STRNCMP(pp, "-o", 2))
 	{
-	  int reloffset = 0;
-	  int negoffset = 0;
-	  if (pp[2] && STRNCMP("ffset", pp + 2, 5))
-	    displayoff = strtoul(pp + 2, NULL, 0);
-	  else
+	  पूर्णांक reloffset = 0;
+	  पूर्णांक negoffset = 0;
+	  जर (pp[2] && STRNCMP("ffset", pp + 2, 5))
+	    displayoff = म_से_अदीर्घ(pp + 2, रिक्त, 0);
+	  अन्यथा
 	    {
-	      if (!argv[2])
+	      जर (!argv[2])
 		exit_with_usage();
 
-	      if (argv[2][0] == '+')
+	      जर (argv[2][0] == '+')
 	       reloffset++;
-	     if (argv[2][reloffset] == '-')
+	     जर (argv[2][reloffset] == '-')
 	       negoffset++;
 
-	     if (negoffset)
-	       displayoff = ULONG_MAX - strtoul(argv[2] + reloffset+negoffset, NULL, 0) + 1;
-	     else
-	       displayoff = strtoul(argv[2] + reloffset+negoffset, NULL, 0);
+	     जर (negoffset)
+	       displayoff = अच_दीर्घ_उच्च - म_से_अदीर्घ(argv[2] + reloffset+negoffset, रिक्त, 0) + 1;
+	     अन्यथा
+	       displayoff = म_से_अदीर्घ(argv[2] + reloffset+negoffset, रिक्त, 0);
 
 	      argv++;
 	      argc--;
 	    }
 	}
-      else if (!STRNCMP(pp, "-s", 2))
+      अन्यथा जर (!STRNCMP(pp, "-s", 2))
 	{
 	  relseek = 0;
 	  negseek = 0;
-	  if (pp[2] && STRNCMP("kip", pp+2, 3) && STRNCMP("eek", pp+2, 3))
+	  जर (pp[2] && STRNCMP("kip", pp+2, 3) && STRNCMP("eek", pp+2, 3))
 	    {
 #ifdef TRY_SEEK
-	      if (pp[2] == '+')
+	      जर (pp[2] == '+')
 		relseek++;
-	      if (pp[2+relseek] == '-')
+	      जर (pp[2+relseek] == '-')
 		negseek++;
 #endif
-	      seekoff = strtol(pp + 2+relseek+negseek, (char **)NULL, 0);
+	      seekoff = म_से_दीर्घ(pp + 2+relseek+negseek, (अक्षर **)रिक्त, 0);
 	    }
-	  else
+	  अन्यथा
 	    {
-	      if (!argv[2])
+	      जर (!argv[2])
 		exit_with_usage();
 #ifdef TRY_SEEK
-	      if (argv[2][0] == '+')
+	      जर (argv[2][0] == '+')
 		relseek++;
-	      if (argv[2][relseek] == '-')
+	      जर (argv[2][relseek] == '-')
 		negseek++;
 #endif
-	      seekoff = strtol(argv[2] + relseek+negseek, (char **)NULL, 0);
+	      seekoff = म_से_दीर्घ(argv[2] + relseek+negseek, (अक्षर **)रिक्त, 0);
 	      argv++;
 	      argc--;
 	    }
 	}
-      else if (!STRNCMP(pp, "-l", 2))
+      अन्यथा जर (!STRNCMP(pp, "-l", 2))
 	{
-	  if (pp[2] && STRNCMP("en", pp + 2, 2))
-	    length = strtol(pp + 2, (char **)NULL, 0);
-	  else
+	  जर (pp[2] && STRNCMP("en", pp + 2, 2))
+	    length = म_से_दीर्घ(pp + 2, (अक्षर **)रिक्त, 0);
+	  अन्यथा
 	    {
-	      if (!argv[2])
+	      जर (!argv[2])
 		exit_with_usage();
-	      length = strtol(argv[2], (char **)NULL, 0);
+	      length = म_से_दीर्घ(argv[2], (अक्षर **)रिक्त, 0);
 	      argv++;
 	      argc--;
 	    }
 	}
-      else if (!STRNCMP(pp, "-n", 2))
+      अन्यथा जर (!STRNCMP(pp, "-n", 2))
 	{
-	  if (pp[2] && STRNCMP("ame", pp + 2, 3))
+	  जर (pp[2] && STRNCMP("ame", pp + 2, 3))
 	    varname = pp + 2;
-	  else
+	  अन्यथा
 	    {
-	      if (!argv[2])
+	      जर (!argv[2])
 		exit_with_usage();
 	      varname = argv[2];
 	      argv++;
 	      argc--;
 	    }
 	}
-      else if (!STRNCMP(pp, "-R", 2))
+      अन्यथा जर (!STRNCMP(pp, "-R", 2))
 	{
-	  char *pw = pp + 2;
-	  if (!pw[0])
+	  अक्षर *pw = pp + 2;
+	  जर (!pw[0])
 	    {
 	      pw = argv[2];
 	      argv++;
 	      argc--;
 	    }
-	  if (!pw)
+	  जर (!pw)
 	    exit_with_usage();
-	  if (!STRNCMP(pw, "always", 6))
+	  जर (!STRNCMP(pw, "always", 6))
 	    {
-	      (void)enable_color();
+	      (शून्य)enable_color();
 	      color = 1;
 	      color_forced = 1;
 	    }
-	  else if (!STRNCMP(pw, "never", 5))
+	  अन्यथा जर (!STRNCMP(pw, "never", 5))
 	    color = 0;
-	  else if (!STRNCMP(pw, "auto", 4))
+	  अन्यथा जर (!STRNCMP(pw, "auto", 4))
 	    color = enable_color();
-	  else
+	  अन्यथा
 	    exit_with_usage();
 	}
-      else if (!strcmp(argv[1], "--"))	/* end of options */
+      अन्यथा जर (!म_भेद(argv[1], "--"))	/* end of options */
 	{
 	  argv++;
 	  argc--;
-	  break;
+	  थांबा;
 	}
-      else if (pp[0] == '-' && pp[1])	/* unknown option */
+      अन्यथा जर (pp[0] == '-' && pp[1])	/* unknown option */
 	exit_with_usage();
-      else
-	break;				/* not an option */
+      अन्यथा
+	थांबा;				/* not an option */
 
       argv++;				/* advance to next argument */
       argc--;
     }
 
-  if (hextype != (HEX_CINCLUDE | HEX_BITS))
+  जर (hextype != (HEX_CINCLUDE | HEX_BITS))
     {
 	/* Allow at most one bit to be set in hextype */
-	if (hextype & (hextype - 1))
+	जर (hextype & (hextype - 1))
 	    error_exit(1, "only one of -b, -e, -u, -p, -i can be used");
     }
 
-  if (!colsgiven || (!cols && hextype != HEX_POSTSCRIPT))
-    switch (hextype)
+  जर (!colsgiven || (!cols && hextype != HEX_POSTSCRIPT))
+    निवड (hextype)
       {
-      case HEX_POSTSCRIPT:	cols = 30; break;
-      case HEX_CINCLUDE:	cols = 12; break;
-      case HEX_CINCLUDE | HEX_BITS:
-      case HEX_BITS:		cols = 6; break;
-      case HEX_NORMAL:
-      case HEX_LITTLEENDIAN:
-      default:			cols = 16; break;
+      स्थिती HEX_POSTSCRIPT:	cols = 30; थांबा;
+      स्थिती HEX_CINCLUDE:	cols = 12; थांबा;
+      स्थिती HEX_CINCLUDE | HEX_BITS:
+      स्थिती HEX_BITS:		cols = 6; थांबा;
+      स्थिती HEX_NORMAL:
+      स्थिती HEX_LITTLEENDIAN:
+      पूर्वनिर्धारित:			cols = 16; थांबा;
       }
 
-  if (octspergrp < 0)
-    switch (hextype)
+  जर (octspergrp < 0)
+    निवड (hextype)
       {
-      case HEX_CINCLUDE | HEX_BITS:
-      case HEX_BITS:		octspergrp = 1; break;
-      case HEX_NORMAL:		octspergrp = 2; break;
-      case HEX_LITTLEENDIAN:	octspergrp = 4; break;
-      case HEX_POSTSCRIPT:
-      case HEX_CINCLUDE:
-      default:			octspergrp = 0; break;
+      स्थिती HEX_CINCLUDE | HEX_BITS:
+      स्थिती HEX_BITS:		octspergrp = 1; थांबा;
+      स्थिती HEX_NORMAL:		octspergrp = 2; थांबा;
+      स्थिती HEX_LITTLEENDIAN:	octspergrp = 4; थांबा;
+      स्थिती HEX_POSTSCRIPT:
+      स्थिती HEX_CINCLUDE:
+      पूर्वनिर्धारित:			octspergrp = 0; थांबा;
       }
 
-  if ((hextype == HEX_POSTSCRIPT && cols < 0) ||
+  जर ((hextype == HEX_POSTSCRIPT && cols < 0) ||
       (hextype != HEX_POSTSCRIPT && cols < 1) ||
       ((hextype == HEX_NORMAL || hextype == HEX_BITS || hextype == HEX_LITTLEENDIAN)
 							    && (cols > COLS)))
     {
-      fprintf(stderr, "%s: invalid number of columns (max. %d).\n", pname, COLS);
-      exit(1);
+      ख_लिखो(मानक_त्रुटि, "%s: invalid number of columns (max. %d).\n", pname, COLS);
+      निकास(1);
     }
 
-  if (octspergrp < 1 || octspergrp > cols)
+  जर (octspergrp < 1 || octspergrp > cols)
     octspergrp = cols;
-  else if (hextype == HEX_LITTLEENDIAN && (octspergrp & (octspergrp-1)))
+  अन्यथा जर (hextype == HEX_LITTLEENDIAN && (octspergrp & (octspergrp-1)))
     error_exit(1, "number of octets per group must be a power of 2 with -e.");
 
-  if (argc > 3)
+  जर (argc > 3)
     exit_with_usage();
 
-  if (argc == 1 || (argv[1][0] == '-' && !argv[1][1]))
-    BIN_ASSIGN(fp = stdin, !revert);
-  else
+  जर (argc == 1 || (argv[1][0] == '-' && !argv[1][1]))
+    BIN_ASSIGN(fp = मानक_निवेश, !revert);
+  अन्यथा
     {
-      if ((fp = fopen(argv[1], BIN_READ(!revert))) == NULL)
+      जर ((fp = ख_खोलो(argv[1], BIN_READ(!revert))) == रिक्त)
 	{
-	  fprintf(stderr,"%s: ", pname);
-	  perror(argv[1]);
-	  return 2;
+	  ख_लिखो(मानक_त्रुटि,"%s: ", pname);
+	  लिखो_त्रुटि(argv[1]);
+	  परत 2;
 	}
     }
 
-  if (argc < 3 || (argv[2][0] == '-' && !argv[2][1]))
-    BIN_ASSIGN(fpo = stdout, revert);
-  else
+  जर (argc < 3 || (argv[2][0] == '-' && !argv[2][1]))
+    BIN_ASSIGN(fpo = मानक_निकास, revert);
+  अन्यथा
     {
-      int fd;
-      int mode = revert ? O_WRONLY : (O_TRUNC|O_WRONLY);
+      पूर्णांक fd;
+      पूर्णांक mode = revert ? O_WRONLY : (O_TRUNC|O_WRONLY);
 
-      if (((fd = OPEN(argv[2], mode | BIN_CREAT(revert), 0666)) < 0) ||
-	  (fpo = fdopen(fd, BIN_WRITE(revert))) == NULL)
+      जर (((fd = OPEN(argv[2], mode | BIN_CREAT(revert), 0666)) < 0) ||
+	  (fpo = fdopen(fd, BIN_WRITE(revert))) == रिक्त)
 	{
-	  fprintf(stderr, "%s: ", pname);
-	  perror(argv[2]);
-	  return 3;
+	  ख_लिखो(मानक_त्रुटि, "%s: ", pname);
+	  लिखो_त्रुटि(argv[2]);
+	  परत 3;
 	}
-      rewind(fpo);
+      शुरुआत(fpo);
 
       /* Disable auto color when writing to a file. */
-      if (!color_forced)
+      जर (!color_forced)
 	color = 0;
     }
 
-  if (revert)
-    switch (hextype)
+  जर (revert)
+    निवड (hextype)
       {
-      case HEX_NORMAL:
-      case HEX_POSTSCRIPT:
-      case HEX_BITS:
-	return huntype(fp, fpo, cols, hextype,
+      स्थिती HEX_NORMAL:
+      स्थिती HEX_POSTSCRIPT:
+      स्थिती HEX_BITS:
+	परत huntype(fp, fpo, cols, hextype,
 	  negseek ? -seekoff : seekoff);
-	break;
-      default:
+	थांबा;
+      पूर्वनिर्धारित:
 	error_exit(-1, "Sorry, cannot revert this type of hexdump");
       }
 
-  if (seekoff || negseek || !relseek)
+  जर (seekoff || negseek || !relseek)
     {
 #ifdef TRY_SEEK
-      if (relseek)
-	e = fseek(fp, negseek ? -seekoff : seekoff, SEEK_CUR);
-      else
-	e = fseek(fp, negseek ? -seekoff : seekoff,
-						negseek ? SEEK_END : SEEK_SET);
-      if (e < 0 && negseek)
+      जर (relseek)
+	e = ख_जाओ(fp, negseek ? -seekoff : seekoff, प्रस्तुत_से);
+      अन्यथा
+	e = ख_जाओ(fp, negseek ? -seekoff : seekoff,
+						negseek ? अंत_से : शुरू_से);
+      जर (e < 0 && negseek)
 	error_exit(4, "Sorry, cannot seek.");
-      if (e >= 0)
-	seekoff = ftell(fp);
-      else
+      जर (e >= 0)
+	seekoff = ख_बताओ(fp);
+      अन्यथा
 #endif
 	{
-	  long s = seekoff;
+	  दीर्घ s = seekoff;
 
-	  while (s--)
-	    if (getc_or_die(fp) == EOF)
+	  पर्यंत (s--)
+	    जर (getc_or_die(fp) == खातापूर्ण)
 	    {
 	      error_exit(4, "Sorry, cannot seek.");
 	    }
 	}
     }
 
-  if (hextype & HEX_CINCLUDE)
+  जर (hextype & HEX_CINCLUDE)
     {
       /* A user-set variable name overrides fp == stdin */
-      if (varname == NULL && fp != stdin)
+      जर (varname == रिक्त && fp != मानक_निवेश)
 	varname = argv[1];
 
-      if (varname != NULL)
+      जर (varname != रिक्त)
 	{
-	  FPRINTF_OR_DIE((fpo, "unsigned char %s", isdigit((unsigned char)varname[0]) ? "__" : ""));
-	  for (e = 0; (c = varname[e]) != 0; e++)
-	    putc_or_die(isalnum((unsigned char)c) ? CONDITIONAL_CAPITALIZE(c) : '_', fpo);
+	  FPRINTF_OR_DIE((fpo, "unsigned char %s", है_अंक((अचिन्हित अक्षर)varname[0]) ? "__" : ""));
+	  साठी (e = 0; (c = varname[e]) != 0; e++)
+	    putc_or_die(है_अक्षर_अंक((अचिन्हित अक्षर)c) ? CONDITIONAL_CAPITALIZE(c) : '_', fpo);
 	  fputs_or_die("[] = {\n", fpo);
 	}
 
       p = 0;
-      while ((length < 0 || p < length) && (((c = getc_or_die(fp)) != EOF) || termination))
+      पर्यंत ((length < 0 || p < length) && (((c = getc_or_die(fp)) != खातापूर्ण) || termination))
 	{
-	  if (c == EOF)
+	  जर (c == खातापूर्ण)
 	    {
 	      c = 0;
 	      termination = -1;
 	    }
-	  if (hextype & HEX_BITS)
+	  जर (hextype & HEX_BITS)
 	    {
-	      if (p == 0)
+	      जर (p == 0)
 		fputs_or_die("  ", fpo);
-	      else if (p % cols == 0)
+	      अन्यथा जर (p % cols == 0)
 		fputs_or_die(",\n  ", fpo);
-	      else
+	      अन्यथा
 		fputs_or_die(", ", fpo);
 
 	      FPRINTF_OR_DIE((fpo, "0b"));
-	      for (int j = 7; j >= 0; j--)
+	      साठी (पूर्णांक j = 7; j >= 0; j--)
 		putc_or_die((c & (1 << j)) ? '1' : '0', fpo);
 	      p++;
 	    }
-	  else
+	  अन्यथा
 	    {
 	      FPRINTF_OR_DIE((fpo, (hexx == hexxa) ? "%s0x%02x" : "%s0X%02X",
 		(p % cols) ? ", " : (!p ? "  " : ",\n  "), c));
 	      p++;
 	    }
-	  if (termination == -1)
+	  जर (termination == -1)
 	    {
 	      --p;
-	      break ;
+	      थांबा ;
 	    }
 	}
 
-      if (p)
+      जर (p)
 	fputs_or_die("\n", fpo);
 
-      if (varname != NULL)
+      जर (varname != रिक्त)
 	{
 	  fputs_or_die("};\n", fpo);
-	  FPRINTF_OR_DIE((fpo, "unsigned int %s", isdigit((unsigned char)varname[0]) ? "__" : ""));
-	  for (e = 0; (c = varname[e]) != 0; e++)
-	    putc_or_die(isalnum((unsigned char)c) ? CONDITIONAL_CAPITALIZE(c) : '_', fpo);
+	  FPRINTF_OR_DIE((fpo, "unsigned int %s", है_अंक((अचिन्हित अक्षर)varname[0]) ? "__" : ""));
+	  साठी (e = 0; (c = varname[e]) != 0; e++)
+	    putc_or_die(है_अक्षर_अंक((अचिन्हित अक्षर)c) ? CONDITIONAL_CAPITALIZE(c) : '_', fpo);
 	  FPRINTF_OR_DIE((fpo, "_%s = %d;\n", capitalize ? "LEN" : "len", p));
 	}
 
       fclose_or_die(fp, fpo);
-      return 0;
+      परत 0;
     }
 
-  if (hextype == HEX_POSTSCRIPT)
+  जर (hextype == HEX_POSTSCRIPT)
     {
       p = cols;
-      while ((length < 0 || n < length) && (e = getc_or_die(fp)) != EOF)
+      पर्यंत ((length < 0 || n < length) && (e = getc_or_die(fp)) != खातापूर्ण)
 	{
 	  putc_or_die(hexx[(e >> 4) & 0xf], fpo);
 	  putc_or_die(hexx[e & 0xf], fpo);
 	  n++;
-	  if (cols > 0 && !--p)
+	  जर (cols > 0 && !--p)
 	    {
 	      putc_or_die('\n', fpo);
 	      p = cols;
 	    }
 	}
-      if (cols == 0 || p < cols)
+      जर (cols == 0 || p < cols)
 	putc_or_die('\n', fpo);
       fclose_or_die(fp, fpo);
-      return 0;
+      परत 0;
     }
 
   /* hextype: HEX_NORMAL or HEX_BITS or HEX_LITTLEENDIAN */
 
-  if (hextype != HEX_BITS)
+  जर (hextype != HEX_BITS)
     {
       grplen = octspergrp + octspergrp + 1;	/* chars per octet group */
     }
-  else	/* hextype == HEX_BITS */
+  अन्यथा	/* hextype == HEX_BITS */
     grplen = 8 * octspergrp + 1;
 
-  while ((length < 0 || n < length) && (e = getc_or_die(fp)) != EOF)
+  पर्यंत ((length < 0 || n < length) && (e = getc_or_die(fp)) != खातापूर्ण)
     {
-      if (p == 0)
+      जर (p == 0)
 	{
-	  addrlen = sprintf(l, decimal_offset ? "%08lu:" : "%08lx:",
-				  ((unsigned long)(n + seekoff + displayoff)));
-	  for (c = addrlen; c < LLEN_NO_COLOR; l[c++] = ' ')
+	  addrlen = प्र_लिखो(l, decimal_offset ? "%08lu:" : "%08lx:",
+				  ((अचिन्हित दीर्घ)(n + seekoff + displayoff)));
+	  साठी (c = addrlen; c < LLEN_NO_COLOR; l[c++] = ' ')
 	    ;
 	}
       x = hextype == HEX_LITTLEENDIAN ? p ^ (octspergrp-1) : p;
       c = addrlen + 1 + (grplen * x) / octspergrp;
-      if (hextype == HEX_NORMAL || hextype == HEX_LITTLEENDIAN)
+      जर (hextype == HEX_NORMAL || hextype == HEX_LITTLEENDIAN)
 	{
-	  if (color)
+	  जर (color)
 	    {
 	      cur_color = get_color_char(e, ebcdic);
 	      colors[c] = cur_color;
@@ -1193,71 +1193,71 @@ main(int argc, char *argv[])
 	  l[c]   = hexx[(e >> 4) & 0xf];
 	  l[++c] = hexx[e & 0xf];
 	}
-      else /* hextype == HEX_BITS */
+      अन्यथा /* hextype == HEX_BITS */
 	{
-	  if (color)
+	  जर (color)
 	    cur_color = get_color_char(e, ebcdic);
 
-	  for (i = 7; i >= 0; i--)
+	  साठी (i = 7; i >= 0; i--)
 	    {
-	      if (color)
+	      जर (color)
 		colors[c] = cur_color;
 	      l[c++] = (e & (1 << i)) ? '1' : '0';
 	    }
 	}
-      if (e)
+      जर (e)
 	nonzero++;
       /* When changing this update definition of LLEN and LLEN_NO_COLOR above. */
-      if (hextype == HEX_LITTLEENDIAN)
+      जर (hextype == HEX_LITTLEENDIAN)
 	/* last group will be fully used, round up */
 	c = grplen * ((cols + octspergrp - 1) / octspergrp);
-      else
+      अन्यथा
 	c = (grplen * cols - 1) / octspergrp;
 
 
-      if (ebcdic)
+      जर (ebcdic)
 	e = (e < 64) ? '.' : etoa64[e-64];
 
-      if (hextype == HEX_LITTLEENDIAN)
+      जर (hextype == HEX_LITTLEENDIAN)
 	c -= 1;
 
       c += addrlen + 3 + p;
-      if (color)
+      जर (color)
 	  colors[c] = cur_color;
       l[c++] =
-#if defined(__MVS__) && __CHARSET_LIB == 0
+#जर defined(__MVS__) && __CHARSET_LIB == 0
 	  (e >= 64)
-#else
+#अन्यथा
 	  (e > 31 && e < 127)
 #endif
 	  ? e : '.';
       n++;
-      if (++p == cols)
+      जर (++p == cols)
 	{
 	  l[c++] = '\n';
 	  l[c] = '\0';
 
-	  xxdline(fpo, l, color ? colors : NULL, autoskip ? nonzero : 1);
-	  memset(colors, 0, c);
+	  xxdline(fpo, l, color ? colors : रिक्त, autoskip ? nonzero : 1);
+	  स_रखो(colors, 0, c);
 	  nonzero = 0;
 	  p = 0;
 	}
     }
-  if (p)
+  जर (p)
     {
       l[c++] = '\n';
       l[c] = '\0';
-      if (color)
+      जर (color)
 	{
 	  x = p;
-	  if (hextype == HEX_LITTLEENDIAN)
+	  जर (hextype == HEX_LITTLEENDIAN)
 	    {
-	      int fill = octspergrp - (p % octspergrp);
-	      if (fill == octspergrp) fill = 0;
+	      पूर्णांक fill = octspergrp - (p % octspergrp);
+	      जर (fill == octspergrp) fill = 0;
 
 	      c = addrlen + 1 + (grplen * (x - (octspergrp-fill))) / octspergrp;
 
-	      for (i = 0; i < fill;i++)
+	      साठी (i = 0; i < fill;i++)
 		{
 		  colors[c] = COLOR_RED;
 		  l[c++] = ' '; /* empty space */
@@ -1266,13 +1266,13 @@ main(int argc, char *argv[])
 		}
 	    }
 
-	  if (hextype != HEX_BITS)
+	  जर (hextype != HEX_BITS)
 	    {
 	      c = addrlen + 1 + (grplen * x) / octspergrp;
 	      c += cols - p;
 	      c += (cols - p) / octspergrp;
 
-	      for (i = cols - p; i > 0;i--)
+	      साठी (i = cols - p; i > 0;i--)
 		{
 		  colors[c] = COLOR_RED;
 		  l[c++] = ' '; /* empty space */
@@ -1280,14 +1280,14 @@ main(int argc, char *argv[])
 	    }
 	  xxdline(fpo, l, colors, 1);
 	}
-      else
-	xxdline(fpo, l, NULL, 1);
+      अन्यथा
+	xxdline(fpo, l, रिक्त, 1);
     }
-  else if (autoskip)
-    xxdline(fpo, l, color ? colors : NULL, -1);	/* last chance to flush out suppressed lines */
+  अन्यथा जर (autoskip)
+    xxdline(fpo, l, color ? colors : रिक्त, -1);	/* last chance to flush out suppressed lines */
 
   fclose_or_die(fp, fpo);
-  return 0;
+  परत 0;
 }
 
 /* vi:set ts=8 sw=4 sts=2 cino+={2 cino+=n-2 : */

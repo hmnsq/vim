@@ -26,9 +26,9 @@
  *   3. sixel_encode_view()     view -> sixel DCS byte sequence
  */
 
-#include "vim.h"
+#अन्तर्भाव "vim.h"
 
-#if defined(FEAT_IMAGE_SIXEL)
+#जर defined(FEAT_IMAGE_SIXEL)
 
 // Palette size cap (sixel allows up to 256 color registers; index 0 is
 // reserved as a transparent key, so usable colors are 1..MAX_COLORS).
@@ -38,27 +38,27 @@
  * Working buffer for one band (6 pixel rows). Allocated as
  * width * (palette_size+1) bytes; bit p (0..5) marks pixel at row offset p.
  */
-typedef struct
+प्रकारव्याख्या संरचना
 {
     char_u  *bits;	// bitmask buffer, width * paletteSize bytes
-    size_t   bits_len;	// allocated bytes in "bits"
-    int	    *seen;	// per-color "used in this band" flags
-    int	    *used;	// colors used in this band
-    int	    *xmin;	// leftmost x used by color in this band
-    int	    *xmax;	// rightmost x used by color in this band
-    int	     color_len;	// allocated length for per-color arrays
-    int	     seen_gen;	// generation counter to avoid memset
+    माप_प्रकार   bits_len;	// allocated bytes in "bits"
+    पूर्णांक	    *seen;	// per-color "used in this band" flags
+    पूर्णांक	    *used;	// colors used in this band
+    पूर्णांक	    *xmin;	// leftmost x used by color in this band
+    पूर्णांक	    *xmax;	// rightmost x used by color in this band
+    पूर्णांक	     color_len;	// allocated length for per-color arrays
+    पूर्णांक	     seen_gen;	// generation counter to avoid memset
 } sixel_band_T;
 
-typedef struct
+प्रकारव्याख्या संरचना
 {
-    unsigned int    *keys;	// hash keys for dynamic palette lookup
+    अचिन्हित पूर्णांक    *किल्ल्या;	// hash keys for dynamic palette lookup
     char_u	    *vals;	// hash values for dynamic palette lookup
-    int		     hash_cap;	// allocated slots in keys/vals
+    पूर्णांक		     hash_cap;	// allocated slots in keys/vals
     char_u	    *idx;	// width * height paletted image
-    size_t	     idx_len;	// allocated bytes in idx
+    माप_प्रकार	     idx_len;	// allocated bytes in idx
     char_u	    *pal;	// dynamic palette storage (RGB triples)
-    int		     pal_len;	// allocated bytes in pal
+    पूर्णांक		     pal_len;	// allocated bytes in pal
     sixel_band_T     band;	// reusable band scratch
 } sixel_state_T;
 
@@ -66,65 +66,65 @@ typedef struct
  * A fully quantized (8bpp) image: one palette index per pixel, tightly
  * packed (stride == width), plus the palette that goes with it.
  */
-typedef struct
+प्रकारव्याख्या संरचना
 {
     char_u  *idx; // Is width*height bytes, indices 1..npal (0 = transparent)
-    int      width;
-    int      height;
+    पूर्णांक      width;
+    पूर्णांक      height;
     char_u  *pal; // Is npal*3 bytes, RGB triples
-    int      npal;
+    पूर्णांक      npal;
 } sixel_image8_T;
 
 /*
  * A view into a sixel_image8_T: an offset + stride,
  */
-typedef struct
+प्रकारव्याख्या संरचना
 {
     char_u  *idx; // Points at (x0,y0) inside the parent buffer
-    int      stride; // Row length of the *parent* image, not this view
-    int      width;
-    int      height;
+    पूर्णांक      stride; // Row length of the *parent* image, not this view
+    पूर्णांक      width;
+    पूर्णांक      height;
     char_u  *pal;
-    int      npal;
+    पूर्णांक      npal;
 } sixel_view_T;
 
-typedef struct
+प्रकारव्याख्या संरचना
 {
     // These are offsets relative to the top left of the image.
-    int	    row_off;
-    int	    col_off;
+    पूर्णांक	    row_off;
+    पूर्णांक	    col_off;
     char_u  *seq[2]; // Header + body
 } sixel_chunk_T;
 
-typedef struct
+प्रकारव्याख्या संरचना
 {
     sixel_image8_T image8;
 } image_sixel_T;
 
-typedef struct
+प्रकारव्याख्या संरचना
 {
     pixman_region32_t	visible_region; // Region used for the previous redraw
     bool		visible_init;
     sixel_chunk_T	*chunks;    // Cached sixel sequence (stored as multiple
 				    // chunks).
-    int			n_chunks;
+    पूर्णांक			n_chunks;
 } image_placement_sixel_T;
 
-static char_u		sixel_fixed_palette[240 * 3];
-static char_u		sixel_rgb_cube_idx[256];
-static bool		sixel_fixed_tables_ready = false;
-static sixel_state_T	sixel_state;
-static bool		sent_decsdm = false;
+स्थिर char_u		sixel_fixed_palette[240 * 3];
+स्थिर char_u		sixel_rgb_cube_idx[256];
+स्थिर bool		sixel_fixed_tables_ready = false;
+स्थिर sixel_state_T	sixel_state;
+स्थिर bool		sent_decsdm = false;
 
 /*
  * Release all module-level allocations cached by the sixel encoder.
  */
-    void
-sixel_uninit(void)
+    शून्य
+sixel_uninit(शून्य)
 {
     sixel_band_T *band = &sixel_state.band;
 
-    VIM_CLEAR(sixel_state.keys);
+    VIM_CLEAR(sixel_state.किल्ल्या);
     VIM_CLEAR(sixel_state.vals);
     VIM_CLEAR(sixel_state.idx);
     VIM_CLEAR(sixel_state.pal);
@@ -145,152 +145,152 @@ sixel_uninit(void)
 /*
  * Initialize the shared fixed sixel palette and RGB->cube lookup table.
  */
-    static void
-sixel_init_fixed_tables(void)
+    स्थिर शून्य
+sixel_init_fixed_tables(शून्य)
 {
-    int	    r, g, b, gr, n;
+    पूर्णांक	    r, g, b, gr, n;
 
-    if (sixel_fixed_tables_ready)
-	return;
+    जर (sixel_fixed_tables_ready)
+	परत;
 
     n = 0;
-    for (r = 0; r < 6; r++)
-	for (g = 0; g < 6; g++)
-	    for (b = 0; b < 6; b++)
+    साठी (r = 0; r < 6; r++)
+	साठी (g = 0; g < 6; g++)
+	    साठी (b = 0; b < 6; b++)
 	    {
 		sixel_fixed_palette[n * 3]     = (char_u)(r * 51);
 		sixel_fixed_palette[n * 3 + 1] = (char_u)(g * 51);
 		sixel_fixed_palette[n * 3 + 2] = (char_u)(b * 51);
 		n++;
 	    }
-    for (gr = 0; gr < 24; gr++)
+    साठी (gr = 0; gr < 24; gr++)
     {
-	int v = 8 + gr * 10;
+	पूर्णांक v = 8 + gr * 10;
 
 	sixel_fixed_palette[n * 3]     = (char_u)v;
 	sixel_fixed_palette[n * 3 + 1] = (char_u)v;
 	sixel_fixed_palette[n * 3 + 2] = (char_u)v;
 	n++;
     }
-    for (n = 0; n < 256; n++)
+    साठी (n = 0; n < 256; n++)
     {
-	int idx = n / 43;
+	पूर्णांक idx = n / 43;
 
 	sixel_rgb_cube_idx[n] = (char_u)(idx > 5 ? 5 : idx);
     }
     sixel_fixed_tables_ready = true;
 }
 
-    static int
-sixel_ensure_hash_capacity(int max_colors, int *cap_out)
+    स्थिर पूर्णांक
+sixel_ensure_hash_capacity(पूर्णांक max_colors, पूर्णांक *cap_out)
 {
-    int cap = 1024;
+    पूर्णांक cap = 1024;
 
-    while (cap < max_colors * 4)
+    पर्यंत (cap < max_colors * 4)
 	cap <<= 1;
-    if (cap > sixel_state.hash_cap)
+    जर (cap > sixel_state.hash_cap)
     {
-	unsigned int	*keys;
+	अचिन्हित पूर्णांक	*किल्ल्या;
 	char_u		*vals;
 
-	keys = ALLOC_MULT(unsigned int, cap);
+	किल्ल्या = ALLOC_MULT(अचिन्हित पूर्णांक, cap);
 	vals = ALLOC_MULT(char_u, cap);
-	if (keys == NULL || vals == NULL)
+	जर (किल्ल्या == रिक्त || vals == रिक्त)
 	{
-	    vim_free(keys);
+	    vim_free(किल्ल्या);
 	    vim_free(vals);
-	    return FAIL;
+	    परत FAIL;
 	}
-	if (sixel_state.hash_cap > 0)
+	जर (sixel_state.hash_cap > 0)
 	{
-	    mch_memmove(keys, sixel_state.keys,
-		    (size_t)sixel_state.hash_cap * sizeof(*keys));
+	    mch_memmove(किल्ल्या, sixel_state.किल्ल्या,
+		    (माप_प्रकार)sixel_state.hash_cap * आकार(*किल्ल्या));
 	    mch_memmove(vals, sixel_state.vals,
-		    (size_t)sixel_state.hash_cap * sizeof(*vals));
+		    (माप_प्रकार)sixel_state.hash_cap * आकार(*vals));
 	}
-	vim_free(sixel_state.keys);
+	vim_free(sixel_state.किल्ल्या);
 	vim_free(sixel_state.vals);
-	sixel_state.keys = keys;
+	sixel_state.किल्ल्या = किल्ल्या;
 	sixel_state.vals = vals;
 	sixel_state.hash_cap = cap;
     }
-    vim_memset(sixel_state.keys, 0, (size_t)cap * sizeof(*sixel_state.keys));
+    vim_memset(sixel_state.किल्ल्या, 0, (माप_प्रकार)cap * आकार(*sixel_state.किल्ल्या));
     *cap_out = cap;
-    return OK;
+    परत OK;
 }
 
-    static int
-sixel_ensure_idx_capacity(size_t pixels)
+    स्थिर पूर्णांक
+sixel_ensure_idx_capacity(माप_प्रकार pixels)
 {
-    if (pixels > sixel_state.idx_len)
+    जर (pixels > sixel_state.idx_len)
     {
 	char_u *idx = vim_realloc(sixel_state.idx, pixels);
 
-	if (idx == NULL)
-	    return FAIL;
+	जर (idx == रिक्त)
+	    परत FAIL;
 	sixel_state.idx = idx;
 	sixel_state.idx_len = pixels;
     }
-    return OK;
+    परत OK;
 }
 
-    static int
-sixel_ensure_pal_capacity(int max_colors)
+    स्थिर पूर्णांक
+sixel_ensure_pal_capacity(पूर्णांक max_colors)
 {
-    int need = max_colors * 3;
+    पूर्णांक need = max_colors * 3;
 
-    if (need > sixel_state.pal_len)
+    जर (need > sixel_state.pal_len)
     {
-	char_u *pal = vim_realloc(sixel_state.pal, (size_t)need);
+	char_u *pal = vim_realloc(sixel_state.pal, (माप_प्रकार)need);
 
-	if (pal == NULL)
-	    return FAIL;
+	जर (pal == रिक्त)
+	    परत FAIL;
 	sixel_state.pal = pal;
 	sixel_state.pal_len = need;
     }
-    return OK;
+    परत OK;
 }
 
-    static int
-sixel_ensure_band_capacity(int width, int npal)
+    स्थिर पूर्णांक
+sixel_ensure_band_capacity(पूर्णांक width, पूर्णांक npal)
 {
-    size_t	    bits_need = (size_t)width * (npal + 1);
+    माप_प्रकार	    bits_need = (माप_प्रकार)width * (npal + 1);
     sixel_band_T    *band = &sixel_state.band;
 
-    if (bits_need > band->bits_len)
+    जर (bits_need > band->bits_len)
     {
 	char_u *bits = vim_realloc(band->bits, bits_need);
 
-	if (bits == NULL)
-	    return FAIL;
+	जर (bits == रिक्त)
+	    परत FAIL;
 	band->bits = bits;
 	band->bits_len = bits_need;
     }
-    if (npal + 1 > band->color_len)
+    जर (npal + 1 > band->color_len)
     {
-	int *seen = ALLOC_MULT(int, npal + 1);
-	int *used = ALLOC_MULT(int, npal + 1);
-	int *xmin = ALLOC_MULT(int, npal + 1);
-	int *xmax = ALLOC_MULT(int, npal + 1);
+	पूर्णांक *seen = ALLOC_MULT(पूर्णांक, npal + 1);
+	पूर्णांक *used = ALLOC_MULT(पूर्णांक, npal + 1);
+	पूर्णांक *xmin = ALLOC_MULT(पूर्णांक, npal + 1);
+	पूर्णांक *xmax = ALLOC_MULT(पूर्णांक, npal + 1);
 
-	if (seen == NULL || used == NULL || xmin == NULL || xmax == NULL)
+	जर (seen == रिक्त || used == रिक्त || xmin == रिक्त || xmax == रिक्त)
 	{
 	    vim_free(seen);
 	    vim_free(used);
 	    vim_free(xmin);
 	    vim_free(xmax);
-	    return FAIL;
+	    परत FAIL;
 	}
-	if (band->color_len > 0)
+	जर (band->color_len > 0)
 	{
 	    mch_memmove(seen, band->seen,
-		    (size_t)band->color_len * sizeof(*seen));
+		    (माप_प्रकार)band->color_len * आकार(*seen));
 	    mch_memmove(used, band->used,
-		    (size_t)band->color_len * sizeof(*used));
+		    (माप_प्रकार)band->color_len * आकार(*used));
 	    mch_memmove(xmin, band->xmin,
-		    (size_t)band->color_len * sizeof(*xmin));
+		    (माप_प्रकार)band->color_len * आकार(*xmin));
 	    mch_memmove(xmax, band->xmax,
-		    (size_t)band->color_len * sizeof(*xmax));
+		    (माप_प्रकार)band->color_len * आकार(*xmax));
 	}
 
 	// seen[] is checked against the band's generation counter; if the
@@ -299,12 +299,12 @@ sixel_ensure_band_capacity(int width, int npal)
 	// (and the matching slots in used/xmin/xmax for good measure) so the
 	// "first time this colour is touched" branch is always taken.
 	{
-	    size_t tail = (size_t)(npal + 1 - band->color_len);
+	    माप_प्रकार tail = (माप_प्रकार)(npal + 1 - band->color_len);
 
-	    vim_memset(seen + band->color_len, 0, tail * sizeof(*seen));
-	    vim_memset(used + band->color_len, 0, tail * sizeof(*used));
-	    vim_memset(xmin + band->color_len, 0, tail * sizeof(*xmin));
-	    vim_memset(xmax + band->color_len, 0, tail * sizeof(*xmax));
+	    vim_memset(seen + band->color_len, 0, tail * आकार(*seen));
+	    vim_memset(used + band->color_len, 0, tail * आकार(*used));
+	    vim_memset(xmin + band->color_len, 0, tail * आकार(*xmin));
+	    vim_memset(xmax + band->color_len, 0, tail * आकार(*xmax));
 	}
 	vim_free(band->seen);
 	vim_free(band->used);
@@ -316,7 +316,7 @@ sixel_ensure_band_capacity(int width, int npal)
 	band->xmax = xmax;
 	band->color_len = npal + 1;
     }
-    return OK;
+    परत OK;
 }
 
 /*
@@ -338,76 +338,76 @@ sixel_ensure_band_capacity(int width, int npal)
  * Returns OK on success, FAIL when colors exceed max_colors (caller may fall
  * back to a fixed palette) or on OOM.
  */
-    static int
+    स्थिर पूर्णांक
 rgb_to_paletted_fast(
 	char_u	*pixels,
-	int	 width,
-	int	 height,
+	पूर्णांक	 width,
+	पूर्णांक	 height,
 	bool	 has_alpha,
-	int	 max_colors,
+	पूर्णांक	 max_colors,
 	char_u **pal_out,
-	int	*npal_out,
+	पूर्णांक	*npal_out,
 	char_u **idx_out)
 {
-    int		     cap;
-    int		     mask;
-    int		     used = 0;
-    unsigned int    *keys;
+    पूर्णांक		     cap;
+    पूर्णांक		     mask;
+    पूर्णांक		     used = 0;
+    अचिन्हित पूर्णांक    *किल्ल्या;
     char_u	    *vals;
     char_u	    *idx;
     char_u	    *pal;
-    int		     i, n;
-    int		     bpp = has_alpha ? 4 : 3;
+    पूर्णांक		     i, n;
+    पूर्णांक		     bpp = has_alpha ? 4 : 3;
 
-    if (sixel_ensure_hash_capacity(max_colors, &cap) == FAIL
-	    || sixel_ensure_idx_capacity((size_t)width * height) == FAIL
+    जर (sixel_ensure_hash_capacity(max_colors, &cap) == FAIL
+	    || sixel_ensure_idx_capacity((माप_प्रकार)width * height) == FAIL
 	    || sixel_ensure_pal_capacity(max_colors) == FAIL)
-	return FAIL;
-    keys = sixel_state.keys;
+	परत FAIL;
+    किल्ल्या = sixel_state.किल्ल्या;
     vals = sixel_state.vals;
     idx = sixel_state.idx;
     pal = sixel_state.pal;
     mask = cap - 1;
 
     n = width * height;
-    for (i = 0; i < n; i++)
+    साठी (i = 0; i < n; i++)
     {
-	char_u		*p = pixels + (size_t)i * bpp;
-	unsigned int	 key;
-	unsigned int	 h;
-	int		 slot;
+	char_u		*p = pixels + (माप_प्रकार)i * bpp;
+	अचिन्हित पूर्णांक	 किल्ली;
+	अचिन्हित पूर्णांक	 h;
+	पूर्णांक		 slot;
 
-	if (has_alpha && p[3] < 128)
+	जर (has_alpha && p[3] < 128)
 	{
 	    idx[i] = 0;	    // transparent -- terminal leaves cell as-is
-	    continue;
+	    सुरूठेवा;
 	}
-	key = ((unsigned int)p[0] << 16)
-	    | ((unsigned int)p[1] << 8)
-	    | (unsigned int)p[2];
-	h = key * 2654435761u;
-	slot = (int)(h & mask);
+	किल्ली = ((अचिन्हित पूर्णांक)p[0] << 16)
+	    | ((अचिन्हित पूर्णांक)p[1] << 8)
+	    | (अचिन्हित पूर्णांक)p[2];
+	h = किल्ली * 2654435761u;
+	slot = (पूर्णांक)(h & mask);
 
-	for (;;)
+	साठी (;;)
 	{
-	    if (keys[slot] == 0)
+	    जर (किल्ल्या[slot] == 0)
 	    {
 		// new color
-		if (used >= max_colors)
-		    goto too_many;
-		keys[slot] = key + 1;
+		जर (used >= max_colors)
+		    जा too_many;
+		किल्ल्या[slot] = किल्ली + 1;
 		vals[slot] = (char_u)(used + 1);    // 1-based palette index
 		pal[used * 3]	  = p[0];
 		pal[used * 3 + 1] = p[1];
 		pal[used * 3 + 2] = p[2];
 		used++;
 		idx[i] = vals[slot];
-		break;
+		थांबा;
 	    }
-	    if (keys[slot] == key + 1)
+	    जर (किल्ल्या[slot] == किल्ली + 1)
 	    {
 		idx[i] = vals[slot];
-		break;
+		थांबा;
 	    }
 	    slot = (slot + 1) & mask;
 	}
@@ -415,10 +415,10 @@ rgb_to_paletted_fast(
     *pal_out = pal;
     *npal_out = used;
     *idx_out = idx;
-    return OK;
+    परत OK;
 
 too_many:
-    return FAIL;
+    परत FAIL;
 }
 
 /*
@@ -431,36 +431,36 @@ too_many:
  * leaving the cell's underlying terminal contents visible (transparency); see
  * rgb_to_paletted_fast() for why the cut is at half coverage.
  */
-    static int
+    स्थिर पूर्णांक
 rgb_to_paletted_fixed(
 	char_u	*pixels,
-	int	width,
-	int	height,
+	पूर्णांक	width,
+	पूर्णांक	height,
 	bool	has_alpha,
 	char_u	**pal_out,
-	int	*npal_out,
+	पूर्णांक	*npal_out,
 	char_u	**idx_out)
 {
     char_u  *idx;
-    int	     n;
-    int	     bpp = has_alpha ? 4 : 3;
+    पूर्णांक	     n;
+    पूर्णांक	     bpp = has_alpha ? 4 : 3;
 
-    if (sixel_ensure_idx_capacity((size_t)width * height) == FAIL)
-	return FAIL;
+    जर (sixel_ensure_idx_capacity((माप_प्रकार)width * height) == FAIL)
+	परत FAIL;
     idx = sixel_state.idx;
 
     sixel_init_fixed_tables();
 
     // map every pixel to the nearest cube cell
-    for (n = 0; n < width * height; n++)
+    साठी (n = 0; n < width * height; n++)
     {
-	char_u	*p = pixels + (size_t)n * bpp;
-	int	 ri, gi, bi;
+	char_u	*p = pixels + (माप_प्रकार)n * bpp;
+	पूर्णांक	 ri, gi, bi;
 
-	if (has_alpha && p[3] < 128)
+	जर (has_alpha && p[3] < 128)
 	{
 	    idx[n] = 0;
-	    continue;
+	    सुरूठेवा;
 	}
 	ri = sixel_rgb_cube_idx[p[0]];
 	gi = sixel_rgb_cube_idx[p[1]];
@@ -471,10 +471,10 @@ rgb_to_paletted_fixed(
     *pal_out = sixel_fixed_palette;
     *npal_out = 240;
     *idx_out = idx;
-    return OK;
+    परत OK;
 }
 
-    static void
+    स्थिर शून्य
 sixel_image8_clear(sixel_image8_T *simg)
 {
     vim_free(simg->idx);
@@ -485,35 +485,35 @@ sixel_image8_clear(sixel_image8_T *simg)
  * Quantize an RGB(A) image to an 8bpp paletted image. Returns OK on success,
  * FAIL on invalid input or OOM.
  */
-    static int
+    स्थिर पूर्णांक
 sixel_image_quantize(image_T *img, sixel_image8_T *out)
 {
-    char_u  *pal = NULL;
-    char_u  *idx = NULL;
-    int	     npal = 0;
+    char_u  *pal = रिक्त;
+    char_u  *idx = रिक्त;
+    पूर्णांक	     npal = 0;
 
-    if (rgb_to_paletted_fast(img->data, img->width, img->height,
+    जर (rgb_to_paletted_fast(img->data, img->width, img->height,
 		img->fmt == IMAGE_FORMAT_RGBA,
 		SIXEL_MAX_COLORS, &pal, &npal, &idx) == FAIL)
     {
-	if (rgb_to_paletted_fixed(img->data, img->width, img->height,
+	जर (rgb_to_paletted_fixed(img->data, img->width, img->height,
 		    img->fmt == IMAGE_FORMAT_RGBA,
 		    &pal, &npal, &idx) == FAIL)
-	    return FAIL;
+	    परत FAIL;
     }
 
-    out->idx = vim_memsave(idx, (size_t)img->width * img->height);
+    out->idx = vim_memsave(idx, (माप_प्रकार)img->width * img->height);
     out->width = img->width;
     out->height = img->height;
-    out->pal = vim_memsave(pal, (size_t)npal * 3);
+    out->pal = vim_memsave(pal, (माप_प्रकार)npal * 3);
     out->npal = npal;
 
-    if (out->pal == NULL || out->idx == NULL)
+    जर (out->pal == रिक्त || out->idx == रिक्त)
     {
 	sixel_image8_clear(out);
-	return FAIL;
+	परत FAIL;
     }
-    return OK;
+    परत OK;
 }
 
 /*
@@ -525,78 +525,78 @@ sixel_image_quantize(image_T *img, sixel_image8_T *out)
  * height==0), which sixel_encode_view() rejects. Returns OK on success and FAIL
  * on failure.
  */
-    static int
+    स्थिर पूर्णांक
 sixel_image8_crop(
 	sixel_image8_T	*src,
-	int		 x,
-	int		 y,
-	int		 w,
-	int		 h,
+	पूर्णांक		 x,
+	पूर्णांक		 y,
+	पूर्णांक		 w,
+	पूर्णांक		 h,
 	sixel_view_T	*out)
 {
-    int x0, y0, x1, y1;   // clamped rectangle, half-open [x0,x1) x [y0,y1)
+    पूर्णांक x0, y0, x1, y1;   // clamped rectangle, half-open [x0,x1) x [y0,y1)
 
-    if (src == NULL || out == NULL)
-	return FAIL;
+    जर (src == रिक्त || out == रिक्त)
+	परत FAIL;
 
     x0 = x < 0 ? 0 : x;
     y0 = y < 0 ? 0 : y;
     x1 = x + w;
     y1 = y + h;
-    if (x1 > src->width)
+    जर (x1 > src->width)
 	x1 = src->width;
-    if (y1 > src->height)
+    जर (y1 > src->height)
 	y1 = src->height;
-    if (x1 < x0)
+    जर (x1 < x0)
 	x1 = x0;
-    if (y1 < y0)
+    जर (y1 < y0)
 	y1 = y0;
 
-    if (x1 <= x0 || y1 <= y0)
-	return FAIL;
+    जर (x1 <= x0 || y1 <= y0)
+	परत FAIL;
 
     out->stride = src->width;
     out->idx    = (x1 > x0 && y1 > y0)
-	? src->idx + (size_t)y0 * src->width + x0
-	: NULL;
+	? src->idx + (माप_प्रकार)y0 * src->width + x0
+	: रिक्त;
     out->width  = x1 - x0;
     out->height = y1 - y0;
     out->pal    = src->pal;
     out->npal   = src->npal;
 
-    return OK;
+    परत OK;
 }
 
 /*
  * Emit a run of `cnt` identical sixel data bytes (ch in 0..63) into gap.
  * Uses RLE form `!N{c}` when it shortens the output.
  */
-    static int
-emit_run(garray_T *gap, char_u ch, int cnt)
+    स्थिर पूर्णांक
+emit_run(garray_T *gap, char_u ch, पूर्णांक cnt)
 {
     char_u  c = (char_u)(63 + ch);
 
-    while (cnt > 255)
+    पर्यंत (cnt > 255)
     {
-	if (ga_concat_bytes(gap, "!255", 4) == FAIL
+	जर (ga_concat_bytes(gap, "!255", 4) == FAIL
 		|| ga_append(gap, c) == FAIL)
-	    return FAIL;
+	    परत FAIL;
 	cnt -= 255;
     }
-    if (cnt <= 0)
-	return OK;
-    if (cnt <= 3)
+    जर (cnt <= 0)
+	परत OK;
+    जर (cnt <= 3)
     {
-	while (cnt-- > 0)
-	    if (ga_append(gap, c) == FAIL)
-		return FAIL;
-	return OK;
+	पर्यंत (cnt-- > 0)
+	    जर (ga_append(gap, c) == FAIL)
+		परत FAIL;
+	परत OK;
     }
-    if (ga_append(gap, '!') == FAIL
+    जर (ga_append(gap, '!') == FAIL
 	    || ga_concat_int(gap, cnt) == FAIL
 	    || ga_append(gap, c) == FAIL)
-	return FAIL;
-    return OK;
+	परत FAIL;
+    परत OK;
 }
 
 /*
@@ -608,7 +608,7 @@ emit_run(garray_T *gap, char_u ch, int cnt)
  * Note that check if each string is NULL! Probably can't happen but be safe.
  * Returns FAIL on failure.
  */
-    static int
+    स्थिर पूर्णांक
 sixel_encode_view(sixel_view_T *view, char_u *seq[2])
 {
     garray_T	    hdr;    // DCS introducer, raster attrs, used-color defs
@@ -616,9 +616,9 @@ sixel_encode_view(sixel_view_T *view, char_u *seq[2])
     sixel_band_T    *band_state = &sixel_state.band;
     char_u	    *idx;
     char_u	    *pal;
-    int		    npal;
-    int		    width, height;
-    int		    band, p, x, n;
+    पूर्णांक		    npal;
+    पूर्णांक		    width, height;
+    पूर्णांक		    band, p, x, n;
     bool	    defined[256];   // register already defined in header
 
     idx = view->idx;
@@ -627,9 +627,9 @@ sixel_encode_view(sixel_view_T *view, char_u *seq[2])
     width = view->width;
     height = view->height;
 
-    ga_init2(&hdr, sizeof(char_u), 256);
-    ga_init2(&body, sizeof(char_u), 4096);
-    vim_memset(defined, 0, sizeof(defined));
+    ga_init2(&hdr, आकार(char_u), 256);
+    ga_init2(&body, आकार(char_u), 4096);
+    vim_memset(defined, 0, आकार(defined));
 
     // DECSIXEL Introducer + Raster Attributes "1;1;W;H.
     // P2=1 means pixel positions left unspecified by any colour register
@@ -638,81 +638,81 @@ sixel_encode_view(sixel_view_T *view, char_u *seq[2])
     // alpha < 128 pixels are emitted as palette index 0 (which we never
     // write to the bitmask), so the terminal leaves the popup's underlying
     // cell colour visible there -- no flatten, no colour-match drift.
-    if (ga_concat_bytes(&hdr, "\033P0;1;8q\"1;1;", 13) == FAIL
+    जर (ga_concat_bytes(&hdr, "\033P0;1;8q\"1;1;", 13) == FAIL
 	    || ga_concat_int(&hdr, width) == FAIL
 	    || ga_append(&hdr, ';') == FAIL
 	    || ga_concat_int(&hdr, height) == FAIL)
-	goto fail;
+	जा fail;
 
     // bitmask buffer: (crop) width bytes per palette index, +1 for the
     // unused index 0.  Sized off the view's width, not the parent image's
     // width, so encoding a small crop out of a large quantized image only
     // needs scratch space proportional to the crop.
-    if (sixel_ensure_band_capacity(width, npal) == FAIL)
-	goto fail;
+    जर (sixel_ensure_band_capacity(width, npal) == FAIL)
+	जा fail;
 
-    for (band = 0; band < (height + 5) / 6; band++)
+    साठी (band = 0; band < (height + 5) / 6; band++)
     {
-	int gen;
-	int last_was_cr = 0;
-	int used_count = 0;
+	पूर्णांक gen;
+	पूर्णांक last_was_cr = 0;
+	पूर्णांक used_मोजणी = 0;
 
-	if (++band_state->seen_gen <= 0)
+	जर (++band_state->seen_gen <= 0)
 	{
-	    vim_memset(band_state->seen, 0, (npal + 1) * sizeof(int));
+	    vim_memset(band_state->seen, 0, (npal + 1) * आकार(पूर्णांक));
 	    band_state->seen_gen = 1;
 	}
 	gen = band_state->seen_gen;
 
-	if (band > 0 && ga_append(&body, '-') == FAIL)
-	    goto fail;
+	जर (band > 0 && ga_append(&body, '-') == FAIL)
+	    जा fail;
 
 	// Fill the bitmask for this band.
-	for (p = 0; p < 6; p++)
+	साठी (p = 0; p < 6; p++)
 	{
-	    int y = band * 6 + p;
+	    पूर्णांक y = band * 6 + p;
 	    char_u  rowmask = (char_u)(1 << p);
 	    char_u  *row;
 
-	    if (y >= height)
-		continue;
+	    जर (y >= height)
+		सुरूठेवा;
 	    // Use the *parent* stride to find the row -- "idx" already
 	    // points at the crop's top-left corner, so only the row-to-row
 	    // step needs to know about the parent's real width.
-	    row = idx + (size_t)y * view->stride;
-	    for (x = 0; x < width; x++)
+	    row = idx + (माप_प्रकार)y * view->stride;
+	    साठी (x = 0; x < width; x++)
 	    {
 		char_u  pix = row[x];
 
-		if (pix == 0)
-		    continue;
-		if (band_state->seen[pix] != gen)
+		जर (pix == 0)
+		    सुरूठेवा;
+		जर (band_state->seen[pix] != gen)
 		{
 		    band_state->seen[pix] = gen;
-		    band_state->used[used_count++] = pix;
+		    band_state->used[used_मोजणी++] = pix;
 		    band_state->xmin[pix] = x;
 		    band_state->xmax[pix] = x;
-		    vim_memset(band_state->bits + (size_t)pix * width, 0, width);
+		    vim_memset(band_state->bits + (माप_प्रकार)pix * width, 0, width);
 		}
-		else
+		अन्यथा
 		{
-		    if (x < band_state->xmin[pix])
+		    जर (x < band_state->xmin[pix])
 			band_state->xmin[pix] = x;
-		    if (x > band_state->xmax[pix])
+		    जर (x > band_state->xmax[pix])
 			band_state->xmax[pix] = x;
 		}
-		band_state->bits[(size_t)pix * width + x] |= rowmask;
+		band_state->bits[(माप_प्रकार)pix * width + x] |= rowmask;
 	    }
 	}
 
-	for (n = 0; n < used_count; n++)
+	साठी (n = 0; n < used_मोजणी; n++)
 	{
-	    int	     pix = band_state->used[n];
+	    पूर्णांक	     pix = band_state->used[n];
 	    char_u  *row;
 	    char_u   ch0;
-	    int	     cnt;
-	    int	     start = band_state->xmin[pix];
-	    int	     end = band_state->xmax[pix];
+	    पूर्णांक	     cnt;
+	    पूर्णांक	     start = band_state->xmin[pix];
+	    पूर्णांक	     end = band_state->xmax[pix];
 
 	    // First time this colour is used in the subrect: add its
 	    // definition "#N;2;R;G;B" (RGB scaled to 0..100) to the header.
@@ -722,14 +722,14 @@ sixel_encode_view(sixel_view_T *view, char_u *seq[2])
 	    // darker.  This matters when the popup blends RGBA alpha onto the
 	    // terminal background: truncation made the flattened bg visibly
 	    // darker than the surrounding terminal cells.
-	    if (!defined[pix])
+	    जर (!defined[pix])
 	    {
-		int r = (pal[(pix - 1) * 3]     * 100 + 127) / 255;
-		int g = (pal[(pix - 1) * 3 + 1] * 100 + 127) / 255;
-		int b = (pal[(pix - 1) * 3 + 2] * 100 + 127) / 255;
+		पूर्णांक r = (pal[(pix - 1) * 3]     * 100 + 127) / 255;
+		पूर्णांक g = (pal[(pix - 1) * 3 + 1] * 100 + 127) / 255;
+		पूर्णांक b = (pal[(pix - 1) * 3 + 2] * 100 + 127) / 255;
 
 		defined[pix] = true;
-		if (ga_append(&hdr, '#') == FAIL
+		जर (ga_append(&hdr, '#') == FAIL
 			|| ga_concat_int(&hdr, pix) == FAIL
 			|| ga_concat_bytes(&hdr, ";2;", 3) == FAIL
 			|| ga_concat_int(&hdr, r) == FAIL
@@ -737,69 +737,69 @@ sixel_encode_view(sixel_view_T *view, char_u *seq[2])
 			|| ga_concat_int(&hdr, g) == FAIL
 			|| ga_append(&hdr, ';') == FAIL
 			|| ga_concat_int(&hdr, b) == FAIL)
-		    goto fail;
+		    जा fail;
 	    }
 
-	    if (last_was_cr && ga_append(&body, '$') == FAIL)
-		goto fail;
-	    if (ga_append(&body, '#') == FAIL
+	    जर (last_was_cr && ga_append(&body, '$') == FAIL)
+		जा fail;
+	    जर (ga_append(&body, '#') == FAIL
 		    || ga_concat_int(&body, pix) == FAIL)
-		goto fail;
+		जा fail;
 
-	    row = band_state->bits + (size_t)pix * width;
-	    if (start > 0 && emit_run(&body, 0, start) == FAIL)
-		goto fail;
+	    row = band_state->bits + (माप_प्रकार)pix * width;
+	    जर (start > 0 && emit_run(&body, 0, start) == FAIL)
+		जा fail;
 	    ch0 = row[start];
 	    cnt = 1;
-	    for (x = start + 1; x <= end; x++)
+	    साठी (x = start + 1; x <= end; x++)
 	    {
 		char_u  ch = row[x];
 
-		if (ch == ch0)
+		जर (ch == ch0)
 		{
 		    cnt++;
-		    continue;
+		    सुरूठेवा;
 		}
-		if (emit_run(&body, ch0, cnt) == FAIL)
-		    goto fail;
+		जर (emit_run(&body, ch0, cnt) == FAIL)
+		    जा fail;
 		ch0 = ch;
 		cnt = 1;
 	    }
-	    if (emit_run(&body, ch0, cnt) == FAIL)
-		goto fail;
+	    जर (emit_run(&body, ch0, cnt) == FAIL)
+		जा fail;
 	    last_was_cr = 1;
 	}
     }
 
-    if (ga_append(&hdr, NUL) == FAIL
+    जर (ga_append(&hdr, NUL) == FAIL
 	    || ga_concat_bytes(&body, "\033\\", 3) == FAIL)
-	goto fail;
+	जा fail;
 
     seq[0] = (char_u *)hdr.ga_data;
     seq[1] = (char_u *)body.ga_data;
 
-    return OK;
+    परत OK;
 
 fail:
     ga_clear(&hdr);
     ga_clear(&body);
-    return FAIL;
+    परत FAIL;
 }
 
-    int
+    पूर्णांक
 image_sixel_init(image_T *img)
 {
     image_sixel_T *ctx;
 
     ctx = ALLOC_CLEAR_ONE(image_sixel_T);
-    if (ctx == NULL || sixel_image_quantize(img, &ctx->image8) == FAIL)
+    जर (ctx == रिक्त || sixel_image_quantize(img, &ctx->image8) == FAIL)
     {
 	vim_free(ctx);
-	return FAIL;
+	परत FAIL;
     }
 
-#if defined(FEAT_IMAGE_SIXEL) && defined(FEAT_TERMRESPONSE)
-    if (!sent_decsdm)
+#जर defined(FEAT_IMAGE_SIXEL) && defined(FEAT_TERMRESPONSE)
+    जर (!sent_decsdm)
     {
 	// Disable sixel scrolling using DECSDM
 	out_str((char_u *)"\033[?80l");
@@ -808,10 +808,10 @@ image_sixel_init(image_T *img)
 #endif
 
     img->backend_data = ctx;
-    return OK;
+    परत OK;
 }
 
-    void
+    शून्य
 image_sixel_uninit(image_T *img)
 {
     image_sixel_T *ctx = img->backend_data;
@@ -820,24 +820,24 @@ image_sixel_uninit(image_T *img)
     vim_free(img->backend_data);
 }
 
-    int
+    पूर्णांक
 image_placement_sixel_init(image_placement_T *place)
 {
     image_placement_sixel_T *ctx = ALLOC_CLEAR_ONE(image_placement_sixel_T);
 
-    if (ctx == NULL)
-	return FAIL;
+    जर (ctx == रिक्त)
+	परत FAIL;
     place->backend_data = ctx;
-    return OK;
+    परत OK;
 }
 
-    static void
+    स्थिर शून्य
 clear_chunks(image_placement_sixel_T *ctx)
 {
-    if (ctx->chunks == NULL)
-	return;
+    जर (ctx->chunks == रिक्त)
+	परत;
 
-    for (int i = 0; i < ctx->n_chunks; i++)
+    साठी (पूर्णांक i = 0; i < ctx->n_chunks; i++)
     {
 	vim_free(ctx->chunks[i].seq[0]);
 	vim_free(ctx->chunks[i].seq[1]);
@@ -846,18 +846,18 @@ clear_chunks(image_placement_sixel_T *ctx)
     ctx->n_chunks = 0;
 }
 
-    void
+    शून्य
 image_placement_sixel_uninit(image_placement_T *place)
 {
     image_placement_sixel_T *ctx = place->backend_data;
 
-    if (ctx->visible_init)
+    जर (ctx->visible_init)
 	pixman_region32_fini(&ctx->visible_region);
     clear_chunks(ctx);
     vim_free(ctx);
 }
 
-    void
+    शून्य
 image_placement_sixel_draw(image_placement_T *place)
 {
     image_T		    *img = place->img;
@@ -865,56 +865,56 @@ image_placement_sixel_draw(image_placement_T *place)
     image_placement_sixel_T *ctx = place->backend_data;
     sixel_view_T	    view;
     pixman_box32_t	    *rects;
-    int			    n_rects;
+    पूर्णांक			    n_rects;
 
     // Check if visible region is still the same, if so then use the cached
     // sixel sequences.
-    if (!(place->flags & IMAGEPF_FORCE) && ctx->visible_init
+    जर (!(place->flags & IMAGEPF_FORCE) && ctx->visible_init
 	    && pixman_region32_equal(&ctx->visible_region, &place->visible))
     {
-	for (int i = 0; i < pixman_region32_n_rects(&ctx->visible_region); i++)
+	साठी (पूर्णांक i = 0; i < pixman_region32_n_rects(&ctx->visible_region); i++)
 	{
 	    sixel_chunk_T *chunk = ctx->chunks + i;
 
 	    windgoto(place->row + place->row_off
 		    + chunk->row_off, place->col + chunk->col_off);
-	    if (chunk->seq[0] != NULL)
+	    जर (chunk->seq[0] != रिक्त)
 		out_str(chunk->seq[0]);
-	    if (chunk->seq[1] != NULL)
+	    जर (chunk->seq[1] != रिक्त)
 		out_str(chunk->seq[1]);
 	    screen_start();
 	}
-	return;
+	परत;
     }
 
     rects = pixman_region32_rectangles(&place->visible, &n_rects);
-    if (rects == NULL || n_rects == 0)
-	return;
+    जर (rects == रिक्त || n_rects == 0)
+	परत;
 
     clear_chunks(ctx);
     ctx->chunks = ALLOC_CLEAR_MULT(sixel_chunk_T, n_rects);
 
-    if (ctx->chunks == NULL)
-	return;
+    जर (ctx->chunks == रिक्त)
+	परत;
 
-    for (int i = 0; i < n_rects; i++)
+    साठी (पूर्णांक i = 0; i < n_rects; i++)
     {
 	pixman_box32_t	rect = rects[i];
-	int		row, col;
-	int		x, y, w, h;
+	पूर्णांक		row, col;
+	पूर्णांक		x, y, w, h;
 	sixel_chunk_T	*chunk = ctx->chunks + i;
 	char_u		*seq[2];
 
 	image_placement_subrect(place, rect, &row, &col, &x, &y, &w, &h, false);
 
-	if (sixel_image8_crop(&ictx->image8, x, y, w, h, &view) == FAIL
+	जर (sixel_image8_crop(&ictx->image8, x, y, w, h, &view) == FAIL
 		|| sixel_encode_view(&view, seq) == FAIL)
-	    continue;
+	    सुरूठेवा;
 
 	windgoto(row, col);
-	if (seq[0] != NULL)
+	जर (seq[0] != रिक्त)
 	    out_str(seq[0]);
-	if (seq[1] != NULL)
+	जर (seq[1] != रिक्त)
 	    out_str(seq[1]);
 	screen_start();
 
@@ -925,13 +925,13 @@ image_placement_sixel_draw(image_placement_T *place)
 	ctx->n_chunks++;
     }
 
-    if (ctx->visible_init)
+    जर (ctx->visible_init)
 	pixman_region32_clear(&ctx->visible_region);
     pixman_region32_copy(&ctx->visible_region, &place->visible);
     ctx->visible_init = true;
 }
 
-    void
+    शून्य
 image_placement_sixel_clear(image_placement_T *place UNUSED)
 {
 }

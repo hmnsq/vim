@@ -27,16 +27,16 @@
 
 #ifdef NBDEBUG
 
-#include "vim.h"
+#अन्तर्भाव "vim.h"
 
-FILE		*nb_debug = NULL;
+खाता		*nb_debug = रिक्त;
 u_int		 nb_dlevel = 0;		// nb_debug verbosity level
 
-void		 nbdb(char *, ...) ATTRIBUTE_FORMAT_PRINTF(1, 2);
+शून्य		 nbdb(अक्षर *, ...) ATTRIBUTE_FORMAT_PRINTF(1, 2);
 
-static int	 lookup(char *);
+स्थिर पूर्णांक	 lookup(अक्षर *);
 #ifdef USE_NB_ERRORHANDLER
-static int	 errorHandler(Display *, XErrorEvent *);
+स्थिर पूर्णांक	 errorHandler(Display *, XErrorEvent *);
 #endif
 
 /*
@@ -46,10 +46,10 @@ static int	 errorHandler(Display *, XErrorEvent *);
  *		    from a background process this is the only way to debug
  *		    startup problems.
  */
-	void
+	शून्य
 nbdebug_wait(
 	u_int		 wait_flags,	// tells what to do
-	char		*wait_var,	// wait environment variable
+	अक्षर		*wait_var,	// wait environment variable
 	u_int		 wait_secs)	// how many seconds to wait
 {
 
@@ -59,44 +59,44 @@ nbdebug_wait(
 #endif
 
 	// for debugging purposes only
-	if (wait_flags & WT_ENV && wait_var && getenv(wait_var) != NULL)
+	जर (wait_flags & WT_ENV && wait_var && दो_पर्या(wait_var) != रिक्त)
 	{
-		sleep(atoi(getenv(wait_var)));
+		sleep(म_से_प(दो_पर्या(wait_var)));
 	}
-	else if (wait_flags & WT_WAIT && lookup("~/.gvimwait"))
+	अन्यथा जर (wait_flags & WT_WAIT && lookup("~/.gvimwait"))
 	{
 		sleep(wait_secs > 0 && wait_secs < 120 ? wait_secs : 20);
 	}
-	else if (wait_flags & WT_STOP && lookup("~/.gvimstop"))
+	अन्यथा जर (wait_flags & WT_STOP && lookup("~/.gvimstop"))
 	{
-		int w = 1;
-		while (w)
+		पूर्णांक w = 1;
+		पर्यंत (w)
 		{
 			;
 		}
 	}
 }
 
-	void
+	शून्य
 nbdebug_log_init(
-	char		*log_var,	// env var with log file
-	char		*level_var)	// env var with nb_debug level
+	अक्षर		*log_var,	// env var with log file
+	अक्षर		*level_var)	// env var with nb_debug level
 {
-	char		*file;		// possible nb_debug output file
-	char		*cp;		// nb_dlevel pointer
+	अक्षर		*file;		// possible nb_debug output file
+	अक्षर		*cp;		// nb_dlevel pointer
 
-	if (log_var && (file = getenv(log_var)) != NULL)
+	जर (log_var && (file = दो_पर्या(log_var)) != रिक्त)
 	{
-		time_t now;
+		समय_प्रकार now;
 
-		nb_debug = fopen(file, "a");
-		time(&now);
-		fprintf(nb_debug, "%s", get_ctime(now, TRUE));
-		if (level_var && (cp = getenv(level_var)) != NULL)
+		nb_debug = ख_खोलो(file, "a");
+		समय(&now);
+		ख_लिखो(nb_debug, "%s", get_ctime(now, TRUE));
+		जर (level_var && (cp = दो_पर्या(level_var)) != रिक्त)
 		{
-			nb_dlevel = strtoul(cp, NULL, 0);
+			nb_dlevel = म_से_अदीर्घ(cp, रिक्त, 0);
 		}
-		else
+		अन्यथा
 		{
 			nb_dlevel = NB_TRACE;	// default level
 		}
@@ -107,60 +107,60 @@ nbdebug_log_init(
 
 }
 
-	void
-nbdbg(char *fmt, ...)
+	शून्य
+nbdbg(अक्षर *fmt, ...)
 {
-	va_list		 ap;
+	बहु_सूची		 ap;
 
-	if (nb_debug != NULL && nb_dlevel & NB_TRACE)
+	जर (nb_debug != रिक्त && nb_dlevel & NB_TRACE)
 	{
-		va_start(ap, fmt);
-		vfprintf(nb_debug, fmt, ap);
-		va_end(ap);
-		fflush(nb_debug);
+		बहु_शुरू(ap, fmt);
+		भख_लिखो(nb_debug, fmt, ap);
+		बहु_पूर्ण(ap);
+		ख_साफ(nb_debug);
 	}
 
 }
 
-	static int
-lookup(char *file)
+	स्थिर पूर्णांक
+lookup(अक्षर *file)
 {
-	char		 buf[BUFSIZ];
+	अक्षर		 buf[बफ_मान];
 
-	expand_env((char_u *) file, (char_u *) buf, BUFSIZ);
-	return
+	expand_env((char_u *) file, (char_u *) buf, बफ_मान);
+	परत
 #ifndef FEAT_GUI_MSWIN
 		(access(buf, F_OK) == 0);
-#else
+#अन्यथा
 		(access(buf, 0) == 0);
 #endif
 
 }
 
 #ifdef USE_NB_ERRORHANDLER
-	static int
+	स्थिर पूर्णांक
 errorHandler(
 	Display		*dpy,
 	XErrorEvent	*err)
 {
-	char		 msg[256];
-	char		 buf[256];
+	अक्षर		 संदेश[256];
+	अक्षर		 buf[256];
 
-	XGetErrorText(dpy, err->error_code, msg, sizeof(msg));
-	nbdbg("\n\nNBDEBUG Vim: X Error of failed request: %s\n", msg);
+	XGetErrorText(dpy, err->error_code, संदेश, आकार(संदेश));
+	nbdbg("\n\nNBDEBUG Vim: X Error of failed request: %s\n", संदेश);
 
-	sprintf(buf, "%d", err->request_code);
+	प्र_लिखो(buf, "%d", err->request_code);
 	XGetErrorDatabaseText(dpy,
-	    "XRequest", buf, "Unknown", msg, sizeof(msg));
+	    "XRequest", buf, "Unknown", संदेश, आकार(संदेश));
 	nbdbg("\tMajor opcode of failed request: %d (%s)\n",
-	    err->request_code, msg);
-	if (err->request_code > 128)
+	    err->request_code, संदेश);
+	जर (err->request_code > 128)
 	{
 		nbdbg("\tMinor opcode of failed request: %d\n",
 		    err->minor_code);
 	}
 
-	return 0;
+	परत 0;
 }
 #endif
 

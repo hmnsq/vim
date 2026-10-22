@@ -11,24 +11,24 @@
  * kword_test.c: Unittests for vim_iswordc() and vim_iswordp().
  */
 
-#undef NDEBUG
-#include <assert.h>
+#undef न_संशोधन
+#अन्तर्भाव <assert.h>
 
 // Must include main.c because it contains much more than just main()
 #define NO_VIM_MAIN
-#include "main.c"
+#अन्तर्भाव "main.c"
 
 // This file has to be included because the tested functions are static
-#include "charset.c"
+#अन्तर्भाव "charset.c"
 
 /*
  * Test the results of vim_iswordc() and vim_iswordp() are matched.
  */
-    static void
-test_isword_funcs_utf8(void)
+    स्थिर शून्य
+test_isword_funcs_utf8(शून्य)
 {
     buf_T buf;
-    int c;
+    पूर्णांक c;
 
     CLEAR_FIELD(buf);
     p_enc = (char_u *)"utf-8";
@@ -40,43 +40,43 @@ test_isword_funcs_utf8(void)
     curbuf = &buf;
     mb_init(); // calls init_chartab()
 
-    for (c = 0; c < 0x10000; ++c)
+    साठी (c = 0; c < 0x10000; ++c)
     {
 	char_u p[4] = {0};
-	int c1;
-	int retc;
-	int retp;
+	पूर्णांक c1;
+	पूर्णांक retc;
+	पूर्णांक retp;
 
 	utf_char2bytes(c, p);
 	c1 = utf_ptr2char(p);
-	if (c != c1)
+	जर (c != c1)
 	{
-	    fprintf(stderr, "Failed: ");
-	    fprintf(stderr,
+	    ख_लिखो(मानक_त्रुटि, "Failed: ");
+	    ख_लिखो(मानक_त्रुटि,
 		    "[c = %#04x, p = {%#02x, %#02x, %#02x}] ",
 		    c, p[0], p[1], p[2]);
-	    fprintf(stderr, "c != utf_ptr2char(p) (=%#04x)\n", c1);
-	    abort();
+	    ख_लिखो(मानक_त्रुटि, "c != utf_ptr2char(p) (=%#04x)\n", c1);
+	    पात();
 	}
 	retc = vim_iswordc_buf(c, &buf);
 	retp = vim_iswordp_buf(p, &buf);
-	if (retc != retp)
+	जर (retc != retp)
 	{
-	    fprintf(stderr, "Failed: ");
-	    fprintf(stderr,
+	    ख_लिखो(मानक_त्रुटि, "Failed: ");
+	    ख_लिखो(मानक_त्रुटि,
 		    "[c = %#04x, p = {%#02x, %#02x, %#02x}] ",
 		    c, p[0], p[1], p[2]);
-	    fprintf(stderr, "vim_iswordc(c) (=%d) != vim_iswordp(p) (=%d)\n",
+	    ख_लिखो(मानक_त्रुटि, "vim_iswordc(c) (=%d) != vim_iswordp(p) (=%d)\n",
 		    retc, retp);
-	    abort();
+	    पात();
 	}
     }
 }
 
-    int
-main(void)
+    पूर्णांक
+main(शून्य)
 {
     estack_init();
     test_isword_funcs_utf8();
-    return 0;
+    परत 0;
 }

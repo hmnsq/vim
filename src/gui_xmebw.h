@@ -51,10 +51,10 @@
  */
 #ifdef HAVE_XM_JOINSIDET_H
 # include <Xm/JoinSideT.h>
-#else
-# define XmLEFT	    1
-# define XmRIGHT    2
-# define XmTOP	    3
+#अन्यथा
+# define Xm_डावा	    1
+# define Xm_उजवा    2
+# define Xm_शीर्ष	    3
 # define XmBOTTOM   4
 #endif
 
@@ -63,10 +63,10 @@
 /*
  * Convenience creation function.
  */
-extern Widget XgCreateEPushButtonWidget(Widget, char *, ArgList, Cardinal);
+बाह्य Widget XgCreateEPushButtonWidget(Widget, अक्षर *, ArgList, Cardinal);
 
-extern WidgetClass xmEnhancedButtonWidgetClass;
-typedef struct _XmEnhancedButtonClassRec *XmEnhancedButtonWidgetClass;
-typedef struct _XmEnhancedButtonRec *XmEnhancedButtonWidget;
+बाह्य WidgetClass xmEnhancedButtonWidgetClass;
+प्रकारव्याख्या संरचना _XmEnhancedButtonClassRec *XmEnhancedButtonWidgetClass;
+प्रकारव्याख्या संरचना _XmEnhancedButtonRec *XmEnhancedButtonWidget;
 
 #endif

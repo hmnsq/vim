@@ -11,9 +11,9 @@
  * spellsuggest.c: functions for spelling suggestions
  */
 
-#include "vim.h"
+#अन्तर्भाव "vim.h"
 
-#if defined(FEAT_SPELL)
+#जर defined(FEAT_SPELL)
 
 /*
  * Use this to adjust the score after finding suggestions, based on the
@@ -37,16 +37,16 @@
 /*
  * Information used when looking for suggestions.
  */
-typedef struct suginfo_S
+प्रकारव्याख्या संरचना suginfo_S
 {
     garray_T	su_ga;		    // suggestions, contains "suggest_T"
-    int		su_maxcount;	    // max. number of suggestions displayed
-    int		su_maxscore;	    // maximum score for adding to su_ga
-    int		su_sfmaxscore;	    // idem, for when doing soundfold words
+    पूर्णांक		su_maxcount;	    // max. number of suggestions displayed
+    पूर्णांक		su_maxscore;	    // maximum score for adding to su_ga
+    पूर्णांक		su_sfmaxscore;	    // idem, for when doing soundfold words
     garray_T	su_sga;		    // like su_ga, sound-folded scoring
     char_u	*su_badptr;	    // start of bad word in line
-    int		su_badlen;	    // length of detected bad word in line
-    int		su_badflags;	    // caps flags for bad word
+    पूर्णांक		su_badlen;	    // length of detected bad word in line
+    पूर्णांक		su_badflags;	    // caps flags for bad word
     char_u	su_badword[MAXWLEN]; // bad word truncated at su_badlen
     char_u	su_fbadword[MAXWLEN]; // su_badword case-folded
     char_u	su_sal_badword[MAXWLEN]; // su_badword soundfolded
@@ -55,15 +55,15 @@ typedef struct suginfo_S
 } suginfo_T;
 
 // One word suggestion.  Used in "si_ga".
-typedef struct suggest_S
+प्रकारव्याख्या संरचना suggest_S
 {
     char_u	*st_word;	// suggested word, allocated string
-    int		st_wordlen;	// STRLEN(st_word)
-    int		st_orglen;	// length of replaced text
-    int		st_score;	// lower is better
-    int		st_altscore;	// used when st_score compares equal
-    int		st_salscore;	// st_score is for soundalike
-    int		st_had_bonus;	// bonus already included in score
+    पूर्णांक		st_wordlen;	// STRLEN(st_word)
+    पूर्णांक		st_orglen;	// length of replaced text
+    पूर्णांक		st_score;	// lower is better
+    पूर्णांक		st_altscore;	// used when st_score compares equal
+    पूर्णांक		st_salscore;	// st_score is for soundalike
+    पूर्णांक		st_had_bonus;	// bonus already included in score
     slang_T	*st_slang;	// language used for sound folding
 } suggest_T;
 
@@ -75,11 +75,11 @@ typedef struct suggest_S
 // Number of suggestions kept when cleaning up.  We need to keep more than
 // what is displayed, because when rescore_suggestions() is called the score
 // may change and wrong suggestions may be removed later.
-#define SUG_CLEAN_COUNT(su)    ((su)->su_maxcount < 130 ? 150 : (su)->su_maxcount + 20)
+#define SUG_CLEAN_मोजणी(su)    ((su)->su_maxcount < 130 ? 150 : (su)->su_maxcount + 20)
 
 // Threshold for sorting and cleaning up suggestions.  Don't want to keep lots
 // of suggestions that are not going to be displayed.
-#define SUG_MAX_COUNT(su)	(SUG_CLEAN_COUNT(su) + 50)
+#define SUG_MAX_मोजणी(su)	(SUG_CLEAN_मोजणी(su) + 50)
 
 // score for various changes
 #define SCORE_SPLIT	149	// split bad word
@@ -129,7 +129,7 @@ typedef struct suggest_S
 /*
  * For finding suggestions: At each node in the tree these states are tried:
  */
-typedef enum
+प्रकारव्याख्या गणना
 {
     STATE_START = 0,	// At start of node check for NUL bytes (goodword
 			// ends); if badword ends there is a match, otherwise
@@ -156,12 +156,12 @@ typedef enum
 /*
  * Struct to keep the state at each level in suggest_try_change().
  */
-typedef struct trystate_S
+प्रकारव्याख्या संरचना trystate_S
 {
     state_T	ts_state;	// state at this level, STATE_
-    int		ts_score;	// score
+    पूर्णांक		ts_score;	// score
     idx_T	ts_arridx;	// index in tree array, start of node
-    short	ts_curi;	// index in list of child nodes
+    लघु	ts_curi;	// index in list of child nodes
     char_u	ts_fidx;	// index in fword[], case-folded bad word
     char_u	ts_fidxtry;	// ts_fidx at which bytes may be changed
     char_u	ts_twordlen;	// valid length of tword[]
@@ -185,7 +185,7 @@ typedef struct trystate_S
 // values for ts_isdiff
 #define DIFF_NONE	0	// no different byte (yet)
 #define DIFF_YES	1	// different byte found
-#define DIFF_INSERT	2	// inserting character
+#define DIFF_घाला	2	// inserting character
 
 // values for ts_flags
 #define TSF_PREFIXOK	1	// already checked that prefix is OK
@@ -197,108 +197,108 @@ typedef struct trystate_S
 #define PFD_PREFIXTREE	0xfe	// walking through the prefix tree
 #define PFD_NOTSPECIAL	0xfd	// highest value that's not special
 
-static long spell_suggest_timeout = 5000;
+स्थिर दीर्घ spell_suggest_timeout = 5000;
 
-static void spell_find_suggest(char_u *badptr, int badlen, suginfo_T *su, int maxcount, int banbadword, int need_cap, int interactive);
+स्थिर शून्य spell_find_suggest(char_u *badptr, पूर्णांक badlen, suginfo_T *su, पूर्णांक maxcount, पूर्णांक banbadword, पूर्णांक need_cap, पूर्णांक interactive);
 #ifdef FEAT_EVAL
-static void spell_suggest_expr(suginfo_T *su, char_u *expr);
+स्थिर शून्य spell_suggest_अभिव्यक्ती(suginfo_T *su, char_u *अभिव्यक्ती);
 #endif
-static void spell_suggest_file(suginfo_T *su, char_u *fname);
-static void spell_suggest_intern(suginfo_T *su, int interactive);
-static void spell_find_cleanup(suginfo_T *su);
-static void suggest_try_special(suginfo_T *su);
-static void suggest_try_change(suginfo_T *su);
-static void suggest_trie_walk(suginfo_T *su, langp_T *lp, char_u *fword, int soundfold);
-static void go_deeper(trystate_T *stack, int depth, int score_add);
-static void find_keepcap_word(slang_T *slang, char_u *fword, char_u *kword);
-static void score_comp_sal(suginfo_T *su);
-static void score_combine(suginfo_T *su);
-static int stp_sal_score(suggest_T *stp, suginfo_T *su, slang_T *slang, char_u *badsound);
-static void suggest_try_soundalike_prep(void);
-static void suggest_try_soundalike(suginfo_T *su);
-static void suggest_try_soundalike_finish(void);
-static void add_sound_suggest(suginfo_T *su, char_u *goodword, int score, langp_T *lp);
-static int soundfold_find(slang_T *slang, char_u *word);
-static int similar_chars(slang_T *slang, int c1, int c2);
-static void add_suggestion(suginfo_T *su, garray_T *gap, char_u *goodword, int badlen, int score, int altscore, int had_bonus, slang_T *slang, int maxsf);
-static void check_suggestions(suginfo_T *su, garray_T *gap);
-static void add_banned(suginfo_T *su, char_u *word);
-static void rescore_suggestions(suginfo_T *su);
-static void rescore_one(suginfo_T *su, suggest_T *stp);
-static int cleanup_suggestions(garray_T *gap, int maxscore, int keep);
-static int soundalike_score(char_u *goodsound, char_u *badsound);
-static int spell_edit_score(slang_T *slang, char_u *badword, char_u *goodword);
-static int spell_edit_score_limit(slang_T *slang, char_u *badword, char_u *goodword, int limit);
-static int spell_edit_score_limit_w(slang_T *slang, char_u *badword, char_u *goodword, int limit);
+स्थिर शून्य spell_suggest_file(suginfo_T *su, char_u *fname);
+स्थिर शून्य spell_suggest_intern(suginfo_T *su, पूर्णांक interactive);
+स्थिर शून्य spell_find_cleanup(suginfo_T *su);
+स्थिर शून्य suggest_try_special(suginfo_T *su);
+स्थिर शून्य suggest_try_change(suginfo_T *su);
+स्थिर शून्य suggest_trie_walk(suginfo_T *su, langp_T *lp, char_u *fword, पूर्णांक soundfold);
+स्थिर शून्य go_deeper(trystate_T *चळत, पूर्णांक depth, पूर्णांक score_add);
+स्थिर शून्य find_keepcap_word(slang_T *slang, char_u *fword, char_u *kword);
+स्थिर शून्य score_comp_sal(suginfo_T *su);
+स्थिर शून्य score_combine(suginfo_T *su);
+स्थिर पूर्णांक stp_sal_score(suggest_T *stp, suginfo_T *su, slang_T *slang, char_u *badsound);
+स्थिर शून्य suggest_try_soundalike_prep(शून्य);
+स्थिर शून्य suggest_try_soundalike(suginfo_T *su);
+स्थिर शून्य suggest_try_soundalike_finish(शून्य);
+स्थिर शून्य add_sound_suggest(suginfo_T *su, char_u *goodword, पूर्णांक score, langp_T *lp);
+स्थिर पूर्णांक soundfold_find(slang_T *slang, char_u *word);
+स्थिर पूर्णांक similar_chars(slang_T *slang, पूर्णांक c1, पूर्णांक c2);
+स्थिर शून्य add_suggestion(suginfo_T *su, garray_T *gap, char_u *goodword, पूर्णांक badlen, पूर्णांक score, पूर्णांक altscore, पूर्णांक had_bonus, slang_T *slang, पूर्णांक maxsf);
+स्थिर शून्य check_suggestions(suginfo_T *su, garray_T *gap);
+स्थिर शून्य add_banned(suginfo_T *su, char_u *word);
+स्थिर शून्य rescore_suggestions(suginfo_T *su);
+स्थिर शून्य rescore_one(suginfo_T *su, suggest_T *stp);
+स्थिर पूर्णांक cleanup_suggestions(garray_T *gap, पूर्णांक maxscore, पूर्णांक keep);
+स्थिर पूर्णांक soundalike_score(char_u *goodsound, char_u *badsound);
+स्थिर पूर्णांक spell_edit_score(slang_T *slang, char_u *badword, char_u *goodword);
+स्थिर पूर्णांक spell_edit_score_limit(slang_T *slang, char_u *badword, char_u *goodword, पूर्णांक limit);
+स्थिर पूर्णांक spell_edit_score_limit_w(slang_T *slang, char_u *badword, char_u *goodword, पूर्णांक limit);
 
 /*
  * Return TRUE when the sequence of flags in "compflags" plus "flag" can
  * possibly form a valid compounded word.  This also checks the COMPOUNDRULE
  * lines if they don't contain wildcards.
  */
-    static int
+    स्थिर पूर्णांक
 can_be_compound(
     trystate_T	*sp,
     slang_T	*slang,
     char_u	*compflags,
-    int		flag)
+    पूर्णांक		flag)
 {
     // If the flag doesn't appear in sl_compstartflags or sl_compallflags
     // then it can't possibly compound.
-    if (!byte_in_str(sp->ts_complen == sp->ts_compsplit
+    जर (!byte_in_str(sp->ts_complen == sp->ts_compsplit
 		? slang->sl_compstartflags : slang->sl_compallflags, flag))
-	return FALSE;
+	परत FALSE;
 
     // If there are no wildcards, we can check if the flags collected so far
     // possibly can form a match with COMPOUNDRULE patterns.  This only
     // makes sense when we have two or more words.
-    if (slang->sl_comprules != NULL && sp->ts_complen > sp->ts_compsplit)
+    जर (slang->sl_comprules != रिक्त && sp->ts_complen > sp->ts_compsplit)
     {
-	int v;
+	पूर्णांक v;
 
 	compflags[sp->ts_complen] = flag;
 	compflags[sp->ts_complen + 1] = NUL;
 	v = match_compoundrule(slang, compflags + sp->ts_compsplit);
 	compflags[sp->ts_complen] = NUL;
-	return v;
+	परत v;
     }
 
-    return TRUE;
+    परत TRUE;
 }
 
 /*
  * Adjust the score of common words.
  */
-    static int
+    स्थिर पूर्णांक
 score_wordcount_adj(
     slang_T	*slang,
-    int		score,
+    पूर्णांक		score,
     char_u	*word,
-    int		split)	    // word was split, less bonus
+    पूर्णांक		split)	    // word was split, less bonus
 {
     hashitem_T	*hi;
     wordcount_T	*wc;
-    int		bonus;
-    int		newscore;
+    पूर्णांक		bonus;
+    पूर्णांक		newscore;
 
     hi = hash_find(&slang->sl_wordcount, word);
-    if (HASHITEM_EMPTY(hi))
-	return score;
+    जर (HASHITEM_EMPTY(hi))
+	परत score;
 
     wc = HI2WC(hi);
-    if (wc->wc_count < SCORE_THRES2)
+    जर (wc->wc_मोजणी < SCORE_THRES2)
 	bonus = SCORE_COMMON1;
-    else if (wc->wc_count < SCORE_THRES3)
+    अन्यथा जर (wc->wc_मोजणी < SCORE_THRES3)
 	bonus = SCORE_COMMON2;
-    else
+    अन्यथा
 	bonus = SCORE_COMMON3;
-    if (split)
+    जर (split)
 	newscore = score - bonus / 2;
-    else
+    अन्यथा
 	newscore = score - bonus;
-    if (newscore < 0)
-	return 0;
-    return newscore;
+    जर (newscore < 0)
+	परत 0;
+    परत newscore;
 }
 
 /*
@@ -306,31 +306,31 @@ score_wordcount_adj(
  * capital.  So that make_case_word() can turn WOrd into Word.
  * Add ALLCAP for "WOrD".
  */
-    static int
+    स्थिर पूर्णांक
 badword_captype(char_u *word, char_u *end)
 {
-    int		flags = captype(word, end);
-    int		c;
-    int		l, u;
-    int		first;
+    पूर्णांक		flags = captype(word, end);
+    पूर्णांक		c;
+    पूर्णांक		l, u;
+    पूर्णांक		first;
     char_u	*p;
 
-    if (!(flags & WF_KEEPCAP))
-	return flags;
+    जर (!(flags & WF_KEEPCAP))
+	परत flags;
 
     // Count the number of UPPER and lower case letters.
     l = u = 0;
     first = FALSE;
-    for (p = word; p < end; MB_PTR_ADV(p))
+    साठी (p = word; p < end; MB_PTR_ADV(p))
     {
 	c = PTR2CHAR(p);
-	if (SPELL_ISUPPER(c))
+	जर (SPELL_ISUPPER(c))
 	{
 	    ++u;
-	    if (p == word)
+	    जर (p == word)
 		first = TRUE;
 	}
-	else
+	अन्यथा
 	    ++l;
     }
 
@@ -338,15 +338,15 @@ badword_captype(char_u *word, char_u *end)
     // ALLCAP word.  Otherwise, if the first letter is UPPER then
     // suggest ONECAP.  Exception: "ALl" most likely should be "All",
     // require three upper case letters.
-    if (u > l && u > 2)
+    जर (u > l && u > 2)
 	flags |= WF_ALLCAP;
-    else if (first)
+    अन्यथा जर (first)
 	flags |= WF_ONECAP;
 
-    if (u >= 2 && l >= 2)	// maCARONI maCAroni
+    जर (u >= 2 && l >= 2)	// maCARONI maCAroni
 	flags |= WF_MIXCAP;
 
-    return flags;
+    परत flags;
 }
 
 /*
@@ -354,30 +354,30 @@ badword_captype(char_u *word, char_u *end)
  * "pp" points to the bytes and is advanced over it.
  * Returns the offset.
  */
-    static int
+    स्थिर पूर्णांक
 bytes2offset(char_u **pp)
 {
     char_u	*p = *pp;
-    int		nr;
-    int		c;
+    पूर्णांक		nr;
+    पूर्णांक		c;
 
     c = *p++;
-    if ((c & 0x80) == 0x00)		// 1 byte
+    जर ((c & 0x80) == 0x00)		// 1 byte
     {
 	nr = c - 1;
     }
-    else if ((c & 0xc0) == 0x80)	// 2 bytes
+    अन्यथा जर ((c & 0xc0) == 0x80)	// 2 bytes
     {
 	nr = (c & 0x3f) - 1;
 	nr = nr * 255 + (*p++ - 1);
     }
-    else if ((c & 0xe0) == 0xc0)	// 3 bytes
+    अन्यथा जर ((c & 0xe0) == 0xc0)	// 3 bytes
     {
 	nr = (c & 0x1f) - 1;
 	nr = nr * 255 + (*p++ - 1);
 	nr = nr * 255 + (*p++ - 1);
     }
-    else				// 4 bytes
+    अन्यथा				// 4 bytes
     {
 	nr = (c & 0x0f) - 1;
 	nr = nr * 255 + (*p++ - 1);
@@ -386,7 +386,7 @@ bytes2offset(char_u **pp)
     }
 
     *pp = p;
-    return nr;
+    परत nr;
 }
 
 // values for sps_flags
@@ -394,64 +394,64 @@ bytes2offset(char_u **pp)
 #define SPS_FAST    2
 #define SPS_DOUBLE  4
 
-static int sps_flags = SPS_BEST;	// flags from 'spellsuggest'
-static int sps_limit = 9999;		// max nr of suggestions given
+स्थिर पूर्णांक sps_flags = SPS_BEST;	// flags from 'spellsuggest'
+स्थिर पूर्णांक sps_limit = 9999;		// max nr of suggestions given
 
 /*
  * Check the 'spellsuggest' option.  Return FAIL if it's wrong.
  * Sets "sps_flags" and "sps_limit".
  */
-    int
-spell_check_sps(void)
+    पूर्णांक
+spell_check_sps(शून्य)
 {
     char_u	*p;
     char_u	*s;
     char_u	buf[MAXPATHL];
-    int		f;
+    पूर्णांक		f;
 
     sps_flags = 0;
     sps_limit = 9999;
 
-    for (p = p_sps; *p != NUL; )
+    साठी (p = p_sps; *p != NUL; )
     {
 	copy_option_part(&p, buf, MAXPATHL, ",");
 
 	f = 0;
-	if (VIM_ISDIGIT(*buf))
+	जर (VIM_ISDIGIT(*buf))
 	{
 	    s = buf;
 	    sps_limit = getdigits(&s);
-	    if (*s != NUL && !VIM_ISDIGIT(*s))
+	    जर (*s != NUL && !VIM_ISDIGIT(*s))
 		f = -1;
 	}
 	// Note: Keep this in sync with p_sps_values.
-	else if (STRCMP(buf, "best") == 0)
+	अन्यथा जर (STRCMP(buf, "best") == 0)
 	    f = SPS_BEST;
-	else if (STRCMP(buf, "fast") == 0)
+	अन्यथा जर (STRCMP(buf, "fast") == 0)
 	    f = SPS_FAST;
-	else if (STRCMP(buf, "double") == 0)
+	अन्यथा जर (STRCMP(buf, "double") == 0)
 	    f = SPS_DOUBLE;
-	else if (STRNCMP(buf, "expr:", 5) != 0
+	अन्यथा जर (STRNCMP(buf, "expr:", 5) != 0
 		&& STRNCMP(buf, "file:", 5) != 0
 		&& (STRNCMP(buf, "timeout:", 8) != 0
 		    || (!VIM_ISDIGIT(buf[8])
 				  && !(buf[8] == '-' && VIM_ISDIGIT(buf[9])))))
 	    f = -1;
 
-	if (f == -1 || (sps_flags != 0 && f != 0))
+	जर (f == -1 || (sps_flags != 0 && f != 0))
 	{
 	    sps_flags = SPS_BEST;
 	    sps_limit = 9999;
-	    return FAIL;
+	    परत FAIL;
 	}
-	if (f != 0)
+	जर (f != 0)
 	    sps_flags = f;
     }
 
-    if (sps_flags == 0)
+    जर (sps_flags == 0)
 	sps_flags = SPS_BEST;
 
-    return OK;
+    परत OK;
 }
 
 /*
@@ -460,26 +460,26 @@ spell_check_sps(void)
  * In Visual mode use the highlighted word as the bad word.
  * When "count" is non-zero use that suggestion.
  */
-    void
-spell_suggest(int count)
+    शून्य
+spell_suggest(पूर्णांक मोजणी)
 {
-    char_u	*line = NULL;
+    char_u	*ओळ = रिक्त;
     pos_T	prev_cursor = curwin->w_cursor;
     char_u	wcopy[MAXWLEN + 2];
     char_u	*p;
-    int		i;
-    int		c;
+    पूर्णांक		i;
+    पूर्णांक		c;
     suginfo_T	sug;
     suggest_T	*stp;
-    int		mouse_used;
-    int		need_cap;
-    int		limit;
-    int		selected = count;
-    int		badlen = 0;
-    int		msg_scroll_save = msg_scroll;
-    int		wo_spell_save = curwin->w_p_spell;
+    पूर्णांक		mouse_used;
+    पूर्णांक		need_cap;
+    पूर्णांक		limit;
+    पूर्णांक		selected = मोजणी;
+    पूर्णांक		badlen = 0;
+    पूर्णांक		संदेश_scroll_save = संदेश_scroll;
+    पूर्णांक		wo_spell_save = curwin->w_p_spell;
 
-    if (!curwin->w_p_spell)
+    जर (!curwin->w_p_spell)
     {
 	parse_spelllang(curwin);
 	curwin->w_p_spell = TRUE;
@@ -488,34 +488,34 @@ spell_suggest(int count)
     check_cursor();
     prev_cursor = curwin->w_cursor;
 
-    if (*curwin->w_s->b_p_spl == NUL)
+    जर (*curwin->w_s->b_p_spl == NUL)
     {
 	emsg(_(e_spell_checking_is_not_possible));
-	goto skip;
+	जा skip;
     }
 
-    if (VIsual_active)
+    जर (VIsual_active)
     {
 	// Use the Visually selected text as the bad word.  But reject
 	// a multi-line selection.
-	if (curwin->w_cursor.lnum != VIsual.lnum)
+	जर (curwin->w_cursor.lnum != VIsual.lnum)
 	{
 	    vim_beep(BO_SPELL);
-	    goto skip;
+	    जा skip;
 	}
-	badlen = (int)curwin->w_cursor.col - (int)VIsual.col;
-	if (badlen < 0)
+	badlen = (पूर्णांक)curwin->w_cursor.col - (पूर्णांक)VIsual.col;
+	जर (badlen < 0)
 	    badlen = -badlen;
-	else
+	अन्यथा
 	    curwin->w_cursor.col = VIsual.col;
 	++badlen;
 	end_visual_mode();
 	// make sure we don't include the NUL at the end of the line
-	if (badlen > ml_get_curline_len() - (int)curwin->w_cursor.col)
-	    badlen = ml_get_curline_len() - (int)curwin->w_cursor.col;
+	जर (badlen > ml_get_curline_len() - (पूर्णांक)curwin->w_cursor.col)
+	    badlen = ml_get_curline_len() - (पूर्णांक)curwin->w_cursor.col;
     }
     // Find the start of the badly spelled word.
-    else if (spell_move_to(curwin, FORWARD, SMT_ALL, TRUE, NULL) == 0
+    अन्यथा जर (spell_move_to(curwin, FORWARD, SMT_ALL, TRUE, रिक्त) == 0
 	    || curwin->w_cursor.col > prev_cursor.col)
     {
 	// No bad word or it starts after the cursor: use the word under the
@@ -524,16 +524,16 @@ spell_suggest(int count)
 	char_u *curline = ml_get_curline();
 	p = curline + curwin->w_cursor.col;
 	// Backup to before start of word.
-	while (p > curline && spell_iswordp_nmw(p, curwin))
+	पर्यंत (p > curline && spell_iswordp_nmw(p, curwin))
 	    MB_PTR_BACK(curline, p);
 	// Forward to start of word.
-	while (*p != NUL && !spell_iswordp_nmw(p, curwin))
+	पर्यंत (*p != NUL && !spell_iswordp_nmw(p, curwin))
 	    MB_PTR_ADV(p);
 
-	if (!spell_iswordp_nmw(p, curwin))		// No word found.
+	जर (!spell_iswordp_nmw(p, curwin))		// No word found.
 	{
 	    beep_flush();
-	    goto skip;
+	    जा skip;
 	}
 	curwin->w_cursor.col = (colnr_T)(p - curline);
     }
@@ -545,58 +545,58 @@ spell_suggest(int count)
 							curwin->w_cursor.col);
 
     // Make a copy of current line since autocommands may free the line.
-    line = vim_strnsave(ml_get_curline(), ml_get_curline_len());
-    if (line == NULL)
-	goto skip;
+    ओळ = vim_strnsave(ml_get_curline(), ml_get_curline_len());
+    जर (ओळ == रिक्त)
+	जा skip;
 
     // Get the list of suggestions.  Limit to 'lines' - 2 or the number in
     // 'spellsuggest', whatever is smaller.
-    if (sps_limit > (int)Rows - 2)
-	limit = (int)Rows - 2;
-    else
+    जर (sps_limit > (पूर्णांक)Rows - 2)
+	limit = (पूर्णांक)Rows - 2;
+    अन्यथा
 	limit = sps_limit;
-    spell_find_suggest(line + curwin->w_cursor.col, badlen, &sug, limit,
+    spell_find_suggest(ओळ + curwin->w_cursor.col, badlen, &sug, limit,
 							TRUE, need_cap, TRUE);
 
-    if (sug.su_ga.ga_len == 0)
-	msg(_("Sorry, no suggestions"));
-    else if (count > 0)
+    जर (sug.su_ga.ga_len == 0)
+	संदेश(_("Sorry, no suggestions"));
+    अन्यथा जर (मोजणी > 0)
     {
-	if (count > sug.su_ga.ga_len)
-	    smsg(_("Sorry, only %ld suggestions"), (long)sug.su_ga.ga_len);
+	जर (मोजणी > sug.su_ga.ga_len)
+	    smsg(_("Sorry, only %ld suggestions"), (दीर्घ)sug.su_ga.ga_len);
     }
-    else
+    अन्यथा
     {
 #ifdef FEAT_RIGHTLEFT
 	// When 'rightleft' is set the list is drawn right-left.
 	cmdmsg_rl = curwin->w_p_rl;
-	if (cmdmsg_rl)
-	    msg_col = cmdline_width - 1;
+	जर (cmdmsg_rl)
+	    संदेश_col = cmdline_width - 1;
 #endif
 
 	// List the suggestions.
-	msg_start();
-	msg_row = Rows - 1;	// for when 'cmdheight' > 1
-	lines_left = Rows;	// avoid more prompt
-	vim_snprintf((char *)IObuff, IOSIZE, _("Change \"%.*s\" to:"),
+	संदेश_start();
+	संदेश_row = Rows - 1;	// for when 'cmdheight' > 1
+	ओळी_डावा = Rows;	// avoid more prompt
+	vim_snprintf((अक्षर *)IObuff, IOSIZE, _("Change \"%.*s\" to:"),
 						sug.su_badlen, sug.su_badptr);
 #ifdef FEAT_RIGHTLEFT
-	if (cmdmsg_rl && STRNCMP(IObuff, "Change", 6) == 0)
+	जर (cmdmsg_rl && STRNCMP(IObuff, "Change", 6) == 0)
 	{
 	    // And now the rabbit from the high hat: Avoid showing the
 	    // untranslated message rightleft.
-	    vim_snprintf((char *)IObuff, IOSIZE, ":ot \"%.*s\" egnahC",
+	    vim_snprintf((अक्षर *)IObuff, IOSIZE, ":ot \"%.*s\" egnahC",
 						sug.su_badlen, sug.su_badptr);
 	}
 #endif
-	msg_puts((char *)IObuff);
-	msg_clr_eos();
-	msg_putchar('\n');
+	संदेश_puts((अक्षर *)IObuff);
+	संदेश_clr_eos();
+	संदेश_putchar('\n');
 
-	msg_scroll = TRUE;
-	for (i = 0; i < sug.su_ga.ga_len; ++i)
+	संदेश_scroll = TRUE;
+	साठी (i = 0; i < sug.su_ga.ga_len; ++i)
 	{
-	    int el;
+	    पूर्णांक el;
 
 	    stp = &SUG(sug.su_ga, i);
 
@@ -604,79 +604,79 @@ spell_suggest(int count)
 	    // the not replaced part.  But only when it's not getting too long.
 	    vim_strncpy(wcopy, stp->st_word, MAXWLEN);
 	    el = sug.su_badlen - stp->st_orglen;
-	    if (el > 0 && stp->st_wordlen + el <= MAXWLEN)
+	    जर (el > 0 && stp->st_wordlen + el <= MAXWLEN)
 		vim_strncpy(wcopy + stp->st_wordlen,
 					   sug.su_badptr + stp->st_orglen, el);
-	    vim_snprintf((char *)IObuff, IOSIZE, "%2d", i + 1);
+	    vim_snprintf((अक्षर *)IObuff, IOSIZE, "%2d", i + 1);
 #ifdef FEAT_RIGHTLEFT
-	    if (cmdmsg_rl)
+	    जर (cmdmsg_rl)
 		rl_mirror(IObuff);
 #endif
-	    msg_puts((char *)IObuff);
+	    संदेश_puts((अक्षर *)IObuff);
 
-	    vim_snprintf((char *)IObuff, IOSIZE, " \"%s\"", wcopy);
-	    msg_puts((char *)IObuff);
+	    vim_snprintf((अक्षर *)IObuff, IOSIZE, " \"%s\"", wcopy);
+	    संदेश_puts((अक्षर *)IObuff);
 
 	    // The word may replace more than "su_badlen".
-	    if (sug.su_badlen < stp->st_orglen)
+	    जर (sug.su_badlen < stp->st_orglen)
 	    {
-		vim_snprintf((char *)IObuff, IOSIZE, _(" < \"%.*s\""),
+		vim_snprintf((अक्षर *)IObuff, IOSIZE, _(" < \"%.*s\""),
 					       stp->st_orglen, sug.su_badptr);
-		msg_puts((char *)IObuff);
+		संदेश_puts((अक्षर *)IObuff);
 	    }
 
-	    if (p_verbose > 0)
+	    जर (p_verbose > 0)
 	    {
 		// Add the score.
-		if (sps_flags & (SPS_DOUBLE | SPS_BEST))
-		    vim_snprintf((char *)IObuff, IOSIZE, " (%s%d - %d)",
+		जर (sps_flags & (SPS_DOUBLE | SPS_BEST))
+		    vim_snprintf((अक्षर *)IObuff, IOSIZE, " (%s%d - %d)",
 			stp->st_salscore ? "s " : "",
 			stp->st_score, stp->st_altscore);
-		else
-		    vim_snprintf((char *)IObuff, IOSIZE, " (%d)",
+		अन्यथा
+		    vim_snprintf((अक्षर *)IObuff, IOSIZE, " (%d)",
 			    stp->st_score);
 #ifdef FEAT_RIGHTLEFT
-		if (cmdmsg_rl)
+		जर (cmdmsg_rl)
 		    // Mirror the numbers, but keep the leading space.
 		    rl_mirror(IObuff + 1);
 #endif
-		msg_advance(30);
-		msg_puts((char *)IObuff);
+		संदेश_advance(30);
+		संदेश_puts((अक्षर *)IObuff);
 	    }
-	    msg_putchar('\n');
+	    संदेश_putchar('\n');
 	}
 
 #ifdef FEAT_RIGHTLEFT
 	cmdmsg_rl = FALSE;
-	msg_col = 0;
+	संदेश_col = 0;
 #endif
 	// Ask for choice.
-	selected = prompt_for_number(&mouse_used);
-	if (mouse_used)
-	    selected -= lines_left;
-	lines_left = Rows;		// avoid more prompt
+	selected = prompt_for_संख्या(&mouse_used);
+	जर (mouse_used)
+	    selected -= ओळी_डावा;
+	ओळी_डावा = Rows;		// avoid more prompt
 	// don't delay for 'smd' in normal_cmd()
-	msg_scroll = msg_scroll_save;
+	संदेश_scroll = संदेश_scroll_save;
     }
 
-    if (selected > 0 && selected <= sug.su_ga.ga_len && u_save_cursor() == OK)
+    जर (selected > 0 && selected <= sug.su_ga.ga_len && u_save_cursor() == OK)
     {
 	// Save the from and to text for :spellrepall.
 	VIM_CLEAR(repl_from);
 	VIM_CLEAR(repl_to);
 
 	stp = &SUG(sug.su_ga, selected - 1);
-	if (sug.su_badlen > stp->st_orglen)
+	जर (sug.su_badlen > stp->st_orglen)
 	{
 	    // Replacing less than "su_badlen", append the remainder to
 	    // repl_to.
 	    repl_from = vim_strnsave(sug.su_badptr, sug.su_badlen);
-	    vim_snprintf((char *)IObuff, IOSIZE, "%s%.*s", stp->st_word,
+	    vim_snprintf((अक्षर *)IObuff, IOSIZE, "%s%.*s", stp->st_word,
 		    sug.su_badlen - stp->st_orglen,
 					      sug.su_badptr + stp->st_orglen);
 	    repl_to = vim_strsave(IObuff);
 	}
-	else
+	अन्यथा
 	{
 	    // Replacing su_badlen or more, use the whole word.
 	    repl_from = vim_strnsave(sug.su_badptr, stp->st_orglen);
@@ -684,13 +684,13 @@ spell_suggest(int count)
 	}
 
 	// Replace the word.
-	p = alloc(STRLEN(line) - stp->st_orglen + stp->st_wordlen + 1);
-	if (p != NULL)
+	p = alloc(STRLEN(ओळ) - stp->st_orglen + stp->st_wordlen + 1);
+	जर (p != रिक्त)
 	{
-	    int len_diff = stp->st_wordlen - stp->st_orglen;
+	    पूर्णांक len_diff = stp->st_wordlen - stp->st_orglen;
 
-	    c = (int)(sug.su_badptr - line);
-	    mch_memmove(p, line, c);
+	    c = (पूर्णांक)(sug.su_badptr - ओळ);
+	    mch_memmove(p, ओळ, c);
 	    STRCPY(p + c, stp->st_word);
 	    STRCAT(p, sug.su_badptr + stp->st_orglen);
 
@@ -706,19 +706,19 @@ spell_suggest(int count)
 	    curwin->w_cursor.col = c;
 
 	    changed_bytes(curwin->w_cursor.lnum, c);
-#if defined(FEAT_PROP_POPUP)
-	    if (curbuf->b_has_textprop && len_diff != 0)
+#जर defined(FEAT_PROP_POPUP)
+	    जर (curbuf->b_has_textprop && len_diff != 0)
 		adjust_prop_columns(curwin->w_cursor.lnum, c, len_diff,
 							       APC_SUBSTITUTE);
 #endif
 	}
     }
-    else
+    अन्यथा
 	curwin->w_cursor = prev_cursor;
 
     spell_find_cleanup(&sug);
 skip:
-    vim_free(line);
+    vim_free(ओळ);
     curwin->w_p_spell = wo_spell_save;
 }
 
@@ -726,35 +726,35 @@ skip:
  * Find spell suggestions for "word".  Return them in the growarray "*gap" as
  * a list of allocated strings.
  */
-    void
+    शून्य
 spell_suggest_list(
     garray_T	*gap,
     char_u	*word,
-    int		maxcount,	// maximum nr of suggestions
-    int		need_cap,	// 'spellcapcheck' matched
-    int		interactive)
+    पूर्णांक		maxcount,	// maximum nr of suggestions
+    पूर्णांक		need_cap,	// 'spellcapcheck' matched
+    पूर्णांक		interactive)
 {
     suginfo_T	sug;
-    int		i;
+    पूर्णांक		i;
     suggest_T	*stp;
     char_u	*wcopy;
 
     spell_find_suggest(word, 0, &sug, maxcount, FALSE, need_cap, interactive);
 
     // Make room in "gap".
-    ga_init2(gap, sizeof(char_u *), sug.su_ga.ga_len + 1);
-    if (ga_grow(gap, sug.su_ga.ga_len) == OK)
+    ga_init2(gap, आकार(char_u *), sug.su_ga.ga_len + 1);
+    जर (ga_grow(gap, sug.su_ga.ga_len) == OK)
     {
-	for (i = 0; i < sug.su_ga.ga_len; ++i)
+	साठी (i = 0; i < sug.su_ga.ga_len; ++i)
 	{
 	    stp = &SUG(sug.su_ga, i);
 
 	    // The suggested word may replace only part of "word", add the not
 	    // replaced part.
 	    wcopy = alloc(stp->st_wordlen
-		      + (unsigned)STRLEN(sug.su_badptr + stp->st_orglen) + 1);
-	    if (wcopy == NULL)
-		break;
+		      + (अचिन्हित)STRLEN(sug.su_badptr + stp->st_orglen) + 1);
+	    जर (wcopy == रिक्त)
+		थांबा;
 	    STRCPY(wcopy, stp->st_word);
 	    STRCPY(wcopy + stp->st_wordlen, sug.su_badptr + stp->st_orglen);
 	    ((char_u **)gap->ga_data)[gap->ga_len++] = wcopy;
@@ -771,49 +771,49 @@ spell_suggest_list(
  * Note: does use info for the current window.
  * This is based on the mechanisms of Aspell, but completely reimplemented.
  */
-    static void
+    स्थिर शून्य
 spell_find_suggest(
     char_u	*badptr,
-    int		badlen,		// length of bad word or 0 if unknown
+    पूर्णांक		badlen,		// length of bad word or 0 if unknown
     suginfo_T	*su,
-    int		maxcount,
-    int		banbadword,	// don't include badword in suggestions
-    int		need_cap,	// word should start with capital
-    int		interactive)
+    पूर्णांक		maxcount,
+    पूर्णांक		banbadword,	// don't include badword in suggestions
+    पूर्णांक		need_cap,	// word should start with capital
+    पूर्णांक		interactive)
 {
-    hlf_T	attr = HLF_COUNT;
+    hlf_T	attr = HLF_मोजणी;
     char_u	buf[MAXPATHL];
     char_u	*p;
-    int		do_combine = FALSE;
+    पूर्णांक		do_combine = FALSE;
     char_u	*sps_copy;
 #ifdef FEAT_EVAL
-    static int	expr_busy = FALSE;
+    स्थिर पूर्णांक	अभिव्यक्ती_busy = FALSE;
 #endif
-    int		c;
-    int		i;
+    पूर्णांक		c;
+    पूर्णांक		i;
     langp_T	*lp;
-    int		did_intern = FALSE;
+    पूर्णांक		did_intern = FALSE;
 
     // Set the info in "*su".
     CLEAR_POINTER(su);
-    ga_init2(&su->su_ga, sizeof(suggest_T), 10);
-    ga_init2(&su->su_sga, sizeof(suggest_T), 10);
-    if (*badptr == NUL)
-	return;
+    ga_init2(&su->su_ga, आकार(suggest_T), 10);
+    ga_init2(&su->su_sga, आकार(suggest_T), 10);
+    जर (*badptr == NUL)
+	परत;
     hash_init(&su->su_banned);
 
     su->su_badptr = badptr;
-    if (badlen != 0)
+    जर (badlen != 0)
 	su->su_badlen = badlen;
-    else
-	su->su_badlen = spell_check(curwin, su->su_badptr, &attr, NULL, FALSE);
+    अन्यथा
+	su->su_badlen = spell_check(curwin, su->su_badptr, &attr, रिक्त, FALSE);
     su->su_maxcount = maxcount;
     su->su_maxscore = SCORE_MAXINIT;
 
-    if (su->su_badlen >= MAXWLEN)
+    जर (su->su_badlen >= MAXWLEN)
 	su->su_badlen = MAXWLEN - 1;	// just in case
     vim_strncpy(su->su_badword, su->su_badptr, su->su_badlen);
-    (void)spell_casefold(curwin, su->su_badptr, su->su_badlen,
+    (शून्य)spell_casefold(curwin, su->su_badptr, su->su_badlen,
 						    su->su_fbadword, MAXWLEN);
     // TODO: make this work if the case-folded text is longer than the original
     // text. Currently an illegal byte causes wrong pointer computations.
@@ -822,26 +822,26 @@ spell_find_suggest(
     // get caps flags for bad word
     su->su_badflags = badword_captype(su->su_badptr,
 					       su->su_badptr + su->su_badlen);
-    if (need_cap)
+    जर (need_cap)
 	su->su_badflags |= WF_ONECAP;
 
     // Find the default language for sound folding.  We simply use the first
     // one in 'spelllang' that supports sound folding.  That's good for when
     // using multiple files for one language, it's not that bad when mixing
     // languages (e.g., "pl,en").
-    for (i = 0; i < curbuf->b_s.b_langp.ga_len; ++i)
+    साठी (i = 0; i < curbuf->b_s.b_langp.ga_len; ++i)
     {
 	lp = LANGP_ENTRY(curbuf->b_s.b_langp, i);
-	if (lp->lp_sallang != NULL)
+	जर (lp->lp_sallang != रिक्त)
 	{
 	    su->su_sallang = lp->lp_sallang;
-	    break;
+	    थांबा;
 	}
     }
 
     // Soundfold the bad word with the default sound folding, so that we don't
     // have to do this many times.
-    if (su->su_sallang != NULL)
+    जर (su->su_sallang != रिक्त)
 	spell_soundfold(su->su_sallang, su->su_fbadword, TRUE,
 							  su->su_sal_badword);
 
@@ -849,7 +849,7 @@ spell_find_suggest(
     // word to be bad then it might need to be capitalised.  Add a suggestion
     // for that.
     c = PTR2CHAR(su->su_badptr);
-    if (!SPELL_ISUPPER(c) && attr == HLF_COUNT)
+    जर (!SPELL_ISUPPER(c) && attr == HLF_मोजणी)
     {
 	make_case_word(su->su_badword, buf, WF_ONECAP);
 	add_suggestion(su, &su->su_ga, buf, su->su_badlen, SCORE_ICASE,
@@ -857,44 +857,44 @@ spell_find_suggest(
     }
 
     // Ban the bad word itself.  It may appear in another region.
-    if (banbadword)
+    जर (banbadword)
 	add_banned(su, su->su_badword);
 
     // Make a copy of 'spellsuggest', because the expression may change it.
     sps_copy = vim_strsave(p_sps);
-    if (sps_copy == NULL)
-	return;
+    जर (sps_copy == रिक्त)
+	परत;
     spell_suggest_timeout = 5000;
 
     // Loop over the items in 'spellsuggest'.
-    for (p = sps_copy; *p != NUL; )
+    साठी (p = sps_copy; *p != NUL; )
     {
 	copy_option_part(&p, buf, MAXPATHL, ",");
 
-	if (STRNCMP(buf, "expr:", 5) == 0)
+	जर (STRNCMP(buf, "expr:", 5) == 0)
 	{
 #ifdef FEAT_EVAL
 	    // Evaluate an expression.  Skip this when called recursively,
 	    // when using spellsuggest() in the expression.
-	    if (!expr_busy)
+	    जर (!अभिव्यक्ती_busy)
 	    {
-		expr_busy = TRUE;
-		spell_suggest_expr(su, buf + 5);
-		expr_busy = FALSE;
+		अभिव्यक्ती_busy = TRUE;
+		spell_suggest_अभिव्यक्ती(su, buf + 5);
+		अभिव्यक्ती_busy = FALSE;
 	    }
 #endif
 	}
-	else if (STRNCMP(buf, "file:", 5) == 0)
+	अन्यथा जर (STRNCMP(buf, "file:", 5) == 0)
 	    // Use list of suggestions in a file.
 	    spell_suggest_file(su, buf + 5);
-	else if (STRNCMP(buf, "timeout:", 8) == 0)
+	अन्यथा जर (STRNCMP(buf, "timeout:", 8) == 0)
 	    // Limit the time searching for suggestions.
-	    spell_suggest_timeout = atol((char *)buf + 8);
-	else if (!did_intern)
+	    spell_suggest_timeout = म_से_द((अक्षर *)buf + 8);
+	अन्यथा जर (!did_intern)
 	{
 	    // Use internal method once.
 	    spell_suggest_intern(su, interactive);
-	    if (sps_flags & SPS_DOUBLE)
+	    जर (sps_flags & SPS_DOUBLE)
 		do_combine = TRUE;
 	    did_intern = TRUE;
 	}
@@ -902,7 +902,7 @@ spell_find_suggest(
 
     vim_free(sps_copy);
 
-    if (do_combine)
+    जर (do_combine)
 	// Combine the two list of suggestions.  This must be done last,
 	// because sorting changes the order again.
 	score_combine(su);
@@ -912,27 +912,27 @@ spell_find_suggest(
 /*
  * Find suggestions by evaluating expression "expr".
  */
-    static void
-spell_suggest_expr(suginfo_T *su, char_u *expr)
+    स्थिर शून्य
+spell_suggest_अभिव्यक्ती(suginfo_T *su, char_u *अभिव्यक्ती)
 {
     list_T	*list;
     listitem_T	*li;
-    int		score;
+    पूर्णांक		score;
     char_u	*p;
 
     // The work is split up in a few parts to avoid having to export
     // suginfo_T.
     // First evaluate the expression and get the resulting list.
-    list = eval_spell_expr(su->su_badword, expr);
-    if (list != NULL)
+    list = eval_spell_अभिव्यक्ती(su->su_badword, अभिव्यक्ती);
+    जर (list != रिक्त)
     {
 	// Loop over the items in the list.
-	FOR_ALL_LIST_ITEMS(list, li)
-	    if (li->li_tv.v_type == VAR_LIST)
+	FOR_ALL_LIST_वस्तुसंच(list, li)
+	    जर (li->li_tv.v_type == VAR_LIST)
 	    {
 		// Get the word and the score from the items.
 		score = get_spellword(li->li_tv.vval.v_list, &p);
-		if (score >= 0 && score <= su->su_maxscore)
+		जर (score >= 0 && score <= su->su_maxscore)
 		    add_suggestion(su, &su->su_ga, p, su->su_badlen,
 				       score, 0, TRUE, su->su_sallang, FALSE);
 	    }
@@ -941,49 +941,49 @@ spell_suggest_expr(suginfo_T *su, char_u *expr)
 
     // Remove bogus suggestions, sort and truncate at "maxcount".
     check_suggestions(su, &su->su_ga);
-    (void)cleanup_suggestions(&su->su_ga, su->su_maxscore, su->su_maxcount);
+    (शून्य)cleanup_suggestions(&su->su_ga, su->su_maxscore, su->su_maxcount);
 }
 #endif
 
 /*
  * Find suggestions in file "fname".  Used for "file:" in 'spellsuggest'.
  */
-    static void
+    स्थिर शून्य
 spell_suggest_file(suginfo_T *su, char_u *fname)
 {
-    FILE	*fd;
-    char_u	line[MAXWLEN * 2];
+    खाता	*fd;
+    char_u	ओळ[MAXWLEN * 2];
     char_u	*p;
-    int		len;
+    पूर्णांक		len;
     char_u	cword[MAXWLEN];
 
     // Open the file.
-    fd = mch_fopen((char *)fname, "r");
-    if (fd == NULL)
+    fd = mch_fopen((अक्षर *)fname, "r");
+    जर (fd == रिक्त)
     {
 	semsg(_(e_cant_open_file_str), fname);
-	return;
+	परत;
     }
 
     // Read it line by line.
-    while (!vim_fgets(line, MAXWLEN * 2, fd) && !got_int)
+    पर्यंत (!vim_fgets(ओळ, MAXWLEN * 2, fd) && !got_int)
     {
-	line_breakcheck();
+	ओळ_breakcheck();
 
-	p = vim_strchr(line, '/');
-	if (p == NULL)
-	    continue;	    // No Tab found, just skip the line.
+	p = vim_strchr(ओळ, '/');
+	जर (p == रिक्त)
+	    सुरूठेवा;	    // No Tab found, just skip the line.
 	*p++ = NUL;
-	if (STRICMP(su->su_badword, line) == 0)
+	जर (STRICMP(su->su_badword, ओळ) == 0)
 	{
 	    // Match!  Isolate the good word, until CR or NL.
-	    for (len = 0; p[len] >= ' '; ++len)
+	    साठी (len = 0; p[len] >= ' '; ++len)
 		;
 	    p[len] = NUL;
 
 	    // If the suggestion doesn't have specific case duplicate the case
 	    // of the bad word.
-	    if (captype(p, NULL) == 0)
+	    जर (captype(p, रिक्त) == 0)
 	    {
 		make_case_word(p, cword, su->su_badflags);
 		p = cword;
@@ -994,18 +994,18 @@ spell_suggest_file(suginfo_T *su, char_u *fname)
 	}
     }
 
-    fclose(fd);
+    ख_बंद(fd);
 
     // Remove bogus suggestions, sort and truncate at "maxcount".
     check_suggestions(su, &su->su_ga);
-    (void)cleanup_suggestions(&su->su_ga, su->su_maxscore, su->su_maxcount);
+    (शून्य)cleanup_suggestions(&su->su_ga, su->su_maxscore, su->su_maxcount);
 }
 
 /*
  * Find suggestions for the internal method indicated by "sps_flags".
  */
-    static void
-spell_suggest_intern(suginfo_T *su, int interactive)
+    स्थिर शून्य
+spell_suggest_intern(suginfo_T *su, पूर्णांक interactive)
 {
     // Load the .sug file(s) that are available and not done yet.
     suggest_load_files();
@@ -1021,13 +1021,13 @@ spell_suggest_intern(suginfo_T *su, int interactive)
     suggest_try_change(su);
 
     // For the resulting top-scorers compute the sound-a-like score.
-    if (sps_flags & SPS_DOUBLE)
+    जर (sps_flags & SPS_DOUBLE)
 	score_comp_sal(su);
 
     // 3. Try finding sound-a-like words.
-    if ((sps_flags & SPS_FAST) == 0)
+    जर ((sps_flags & SPS_FAST) == 0)
     {
-	if (sps_flags & SPS_BEST)
+	जर (sps_flags & SPS_BEST)
 	    // Adjust the word score for the suggestions found so far for how
 	    // they sound like.
 	    rescore_suggestions(su);
@@ -1044,13 +1044,13 @@ spell_suggest_intern(suginfo_T *su, int interactive)
 	su->su_maxscore = SCORE_SFMAX1;
 	su->su_sfmaxscore = SCORE_MAXINIT * 3;
 	suggest_try_soundalike(su);
-	if (su->su_ga.ga_len < SUG_CLEAN_COUNT(su))
+	जर (su->su_ga.ga_len < SUG_CLEAN_मोजणी(su))
 	{
 	    // We didn't find enough matches, try again, allowing more
 	    // changes to the soundfold word.
 	    su->su_maxscore = SCORE_SFMAX2;
 	    suggest_try_soundalike(su);
-	    if (su->su_ga.ga_len < SUG_CLEAN_COUNT(su))
+	    जर (su->su_ga.ga_len < SUG_CLEAN_मोजणी(su))
 	    {
 		// Still didn't find enough matches, try again, allowing even
 		// more changes to the soundfold word.
@@ -1065,37 +1065,37 @@ spell_suggest_intern(suginfo_T *su, int interactive)
     // When CTRL-C was hit while searching do show the results.  Only clear
     // got_int when using a command, not for spellsuggest().
     ui_breakcheck();
-    if (interactive && got_int)
+    जर (interactive && got_int)
     {
-	(void)vgetc();
+	(शून्य)vgetc();
 	got_int = FALSE;
     }
 
-    if ((sps_flags & SPS_DOUBLE) == 0 && su->su_ga.ga_len != 0)
+    जर ((sps_flags & SPS_DOUBLE) == 0 && su->su_ga.ga_len != 0)
     {
-	if (sps_flags & SPS_BEST)
+	जर (sps_flags & SPS_BEST)
 	    // Adjust the word score for how it sounds like.
 	    rescore_suggestions(su);
 
 	// Remove bogus suggestions, sort and truncate at "maxcount".
 	check_suggestions(su, &su->su_ga);
-	(void)cleanup_suggestions(&su->su_ga, su->su_maxscore, su->su_maxcount);
+	(शून्य)cleanup_suggestions(&su->su_ga, su->su_maxscore, su->su_maxcount);
     }
 }
 
 /*
  * Free the info put in "*su" by spell_find_suggest().
  */
-    static void
+    स्थिर शून्य
 spell_find_cleanup(suginfo_T *su)
 {
-    int		i;
+    पूर्णांक		i;
 
     // Free the suggestions.
-    for (i = 0; i < su->su_ga.ga_len; ++i)
+    साठी (i = 0; i < su->su_ga.ga_len; ++i)
 	vim_free(SUG(su->su_ga, i).st_word);
     ga_clear(&su->su_ga);
-    for (i = 0; i < su->su_sga.ga_len; ++i)
+    साठी (i = 0; i < su->su_sga.ga_len; ++i)
 	vim_free(SUG(su->su_sga, i).st_word);
     ga_clear(&su->su_sga);
 
@@ -1106,19 +1106,19 @@ spell_find_cleanup(suginfo_T *su)
 /*
  * Try finding suggestions by recognizing specific situations.
  */
-    static void
+    स्थिर शून्य
 suggest_try_special(suginfo_T *su)
 {
     char_u	*p;
-    size_t	len;
-    int		c;
+    माप_प्रकार	len;
+    पूर्णांक		c;
     char_u	word[MAXWLEN];
 
     // Recognize a word that is repeated: "the the".
     p = skiptowhite(su->su_fbadword);
     len = p - su->su_fbadword;
     p = skipwhite(p);
-    if (STRLEN(p) == len && STRNCMP(su->su_fbadword, p, len) == 0)
+    जर (STRLEN(p) == len && STRNCMP(su->su_fbadword, p, len) == 0)
     {
 	// Include badflags: if the badword is onecap or allcap
 	// use that for the goodword too: "The the" -> "The".
@@ -1138,19 +1138,19 @@ suggest_try_special(suginfo_T *su)
  * Change the 0 to 1 to measure how much time is spent in each state.
  * Output is dumped in "suggestprof".
  */
-#if 0
+#जर 0
 # define SUGGEST_PROFILE
 proftime_T current;
 proftime_T total;
-proftime_T times[STATE_FINAL + 1];
-long counts[STATE_FINAL + 1];
+proftime_T बार[STATE_FINAL + 1];
+दीर्घ counts[STATE_FINAL + 1];
 
-    static void
-prof_init(void)
+    स्थिर शून्य
+prof_init(शून्य)
 {
-    for (int i = 0; i <= STATE_FINAL; ++i)
+    साठी (पूर्णांक i = 0; i <= STATE_FINAL; ++i)
     {
-	profile_zero(&times[i]);
+	profile_zero(&बार[i]);
 	counts[i] = 0;
     }
     profile_start(&current);
@@ -1158,65 +1158,65 @@ prof_init(void)
 }
 
 // call before changing state
-    static void
+    स्थिर शून्य
 prof_store(state_T state)
 {
     profile_end(&current);
-    profile_add(&times[state], &current);
+    profile_add(&बार[state], &current);
     ++counts[state];
     profile_start(&current);
 }
 # define PROF_STORE(state) prof_store(state);
 
-    static void
-prof_report(char *name)
+    स्थिर शून्य
+prof_report(अक्षर *name)
 {
-    FILE *fd = fopen("suggestprof", "a");
+    खाता *fd = ख_खोलो("suggestprof", "a");
 
     profile_end(&total);
-    fprintf(fd, "-----------------------\n");
-    fprintf(fd, "%s: %s\n", name, profile_msg(&total));
-    for (int i = 0; i <= STATE_FINAL; ++i)
-	fprintf(fd, "%d: %s (%ld)\n", i, profile_msg(&times[i]), counts[i]);
-    fclose(fd);
+    ख_लिखो(fd, "-----------------------\n");
+    ख_लिखो(fd, "%s: %s\n", name, profile_संदेश(&total));
+    साठी (पूर्णांक i = 0; i <= STATE_FINAL; ++i)
+	ख_लिखो(fd, "%d: %s (%ld)\n", i, profile_संदेश(&बार[i]), counts[i]);
+    ख_बंद(fd);
 }
-#else
+#अन्यथा
 # define PROF_STORE(state)
 #endif
 
 /*
  * Try finding suggestions by adding/removing/swapping letters.
  */
-    static void
+    स्थिर शून्य
 suggest_try_change(suginfo_T *su)
 {
     char_u	fword[MAXWLEN];	    // copy of the bad word, case-folded
-    int		n;
+    पूर्णांक		n;
     char_u	*p;
-    int		lpi;
+    पूर्णांक		lpi;
     langp_T	*lp;
 
     // We make a copy of the case-folded bad word, so that we can modify it
     // to find matches (esp. REP items).  Append some more text, changing
     // chars after the bad word may help.
     STRCPY(fword, su->su_fbadword);
-    n = (int)STRLEN(fword);
+    n = (पूर्णांक)STRLEN(fword);
     p = su->su_badptr + su->su_badlen;
-    (void)spell_casefold(curwin, p, (int)STRLEN(p), fword + n, MAXWLEN - n);
+    (शून्य)spell_casefold(curwin, p, (पूर्णांक)STRLEN(p), fword + n, MAXWLEN - n);
 
     // Make sure the resulting text is not longer than the original text.
-    n = (int)STRLEN(su->su_badptr);
-    if (n < MAXWLEN)
+    n = (पूर्णांक)STRLEN(su->su_badptr);
+    जर (n < MAXWLEN)
 	fword[n] = NUL;
 
-    for (lpi = 0; lpi < curwin->w_s->b_langp.ga_len; ++lpi)
+    साठी (lpi = 0; lpi < curwin->w_s->b_langp.ga_len; ++lpi)
     {
 	lp = LANGP_ENTRY(curwin->w_s->b_langp, lpi);
 
 	// If reloading a spell file fails it's still in the list but
 	// everything has been cleared.
-	if (lp->lp_slang->sl_fbyts == NULL)
-	    continue;
+	जर (lp->lp_slang->sl_fbyts == रिक्त)
+	    सुरूठेवा;
 
 	// Try it for this language.  Will add possible suggestions.
 #ifdef SUGGEST_PROFILE
@@ -1230,8 +1230,8 @@ suggest_try_change(suginfo_T *su)
 }
 
 // Check the maximum score, if we go over it we won't try this change.
-#define TRY_DEEPER(su, stack, depth, add) \
-       ((depth) < MAXWLEN - 1 && (stack)[depth].ts_score + (add) < (su)->su_maxscore)
+#define TRY_DEEPER(su, चळत, depth, add) \
+       ((depth) < MAXWLEN - 1 && (चळत)[depth].ts_score + (add) < (su)->su_maxscore)
 
 /*
  * Try finding suggestions by adding/removing/swapping letters.
@@ -1264,15 +1264,15 @@ suggest_try_change(suginfo_T *su)
  *	"similar_chars()"
  *	use "slang->sl_repsal" instead of "lp->lp_replang->sl_rep"
  */
-    static void
+    स्थिर शून्य
 suggest_trie_walk(
     suginfo_T	*su,
     langp_T	*lp,
     char_u	*fword,
-    int		soundfold)
+    पूर्णांक		soundfold)
 {
     char_u	tword[MAXWLEN];	    // good word collected so far
-    trystate_T	stack[MAXWLEN];
+    trystate_T	चळत[MAXWLEN];
     char_u	preword[MAXWLEN * 3]; // word found with proper case;
 				      // concatenation of prefix compound
 				      // words and split word.  NUL terminated
@@ -1280,54 +1280,54 @@ suggest_trie_walk(
 				      // back.
     char_u	compflags[MAXWLEN];	// compound flags, one for each word
     trystate_T	*sp;
-    int		newscore;
-    int		score;
+    पूर्णांक		newscore;
+    पूर्णांक		score;
     char_u	*byts, *fbyts, *pbyts;
     idx_T	*idxs, *fidxs, *pidxs;
-    int		depth;
-    int		c, c2, c3;
-    int		n = 0;
-    int		flags;
+    पूर्णांक		depth;
+    पूर्णांक		c, c2, c3;
+    पूर्णांक		n = 0;
+    पूर्णांक		flags;
     garray_T	*gap;
     idx_T	arridx;
-    int		len;
+    पूर्णांक		len;
     char_u	*p;
     fromto_T	*ftp;
-    int		fl = 0, tl;
-    int		repextra = 0;	    // extra bytes in fword[] from REP item
+    पूर्णांक		fl = 0, tl;
+    पूर्णांक		repextra = 0;	    // extra bytes in fword[] from REP item
     slang_T	*slang = lp->lp_slang;
-    int		fword_ends;
-    int		goodword_ends;
+    पूर्णांक		fword_ends;
+    पूर्णांक		goodword_ends;
 #ifdef DEBUG_TRIEWALK
     // Stores the name of the change made at each level.
     char_u	changename[MAXWLEN][80];
 #endif
-    int		breakcheckcount = 1000;
+    पूर्णांक		breakcheckcount = 1000;
 #ifdef FEAT_RELTIME
     proftime_T	time_limit;
 #endif
-    int		compound_ok;
+    पूर्णांक		compound_ok;
 
     // Go through the whole case-fold tree, try changes at each node.
     // "tword[]" contains the word collected from nodes in the tree.
     // "fword[]" the word we are trying to match with (initially the bad
     // word).
     depth = 0;
-    sp = &stack[0];
+    sp = &चळत[0];
     CLEAR_POINTER(sp);
     sp->ts_curi = 1;
 
-    if (soundfold)
+    जर (soundfold)
     {
 	// Going through the soundfold tree.
 	byts = fbyts = slang->sl_sbyts;
 	idxs = fidxs = slang->sl_sidxs;
-	pbyts = NULL;
-	pidxs = NULL;
+	pbyts = रिक्त;
+	pidxs = रिक्त;
 	sp->ts_prefixdepth = PFD_NOPREFIX;
 	sp->ts_state = STATE_START;
     }
-    else
+    अन्यथा
     {
 	// When there are postponed prefixes we need to use these first.  At
 	// the end of the prefix we continue in the case-fold tree.
@@ -1335,14 +1335,14 @@ suggest_trie_walk(
 	fidxs = slang->sl_fidxs;
 	pbyts = slang->sl_pbyts;
 	pidxs = slang->sl_pidxs;
-	if (pbyts != NULL)
+	जर (pbyts != रिक्त)
 	{
 	    byts = pbyts;
 	    idxs = pidxs;
 	    sp->ts_prefixdepth = PFD_PREFIXTREE;
 	    sp->ts_state = STATE_NOPREFIX;	// try without prefix first
 	}
-	else
+	अन्यथा
 	{
 	    byts = fbyts;
 	    idxs = fidxs;
@@ -1353,7 +1353,7 @@ suggest_trie_walk(
 #ifdef FEAT_RELTIME
     // The loop may take an indefinite amount of time. Break out after some
     // time.
-    if (spell_suggest_timeout > 0)
+    जर (spell_suggest_timeout > 0)
 	profile_setlimit(spell_suggest_timeout, &time_limit);
 #endif
 
@@ -1362,52 +1362,52 @@ suggest_trie_walk(
     //   increase "depth".
     // - When a state is done go to the next, set "ts_state".
     // - When all states are tried decrease "depth".
-    while (depth >= 0 && !got_int)
+    पर्यंत (depth >= 0 && !got_int)
     {
-	sp = &stack[depth];
-	switch (sp->ts_state)
+	sp = &चळत[depth];
+	निवड (sp->ts_state)
 	{
-	case STATE_START:
-	case STATE_NOPREFIX:
+	स्थिती STATE_START:
+	स्थिती STATE_NOPREFIX:
 	    // Start of node: Deal with NUL bytes, which means
 	    // tword[] may end here.
 	    arridx = sp->ts_arridx;	    // current node in the tree
 	    len = byts[arridx];		    // bytes in this node
 	    arridx += sp->ts_curi;	    // index of current byte
 
-	    if (sp->ts_prefixdepth == PFD_PREFIXTREE)
+	    जर (sp->ts_prefixdepth == PFD_PREFIXTREE)
 	    {
 		// Skip over the NUL bytes, we use them later.
-		for (n = 0; n < len && byts[arridx + n] == 0; ++n)
+		साठी (n = 0; n < len && byts[arridx + n] == 0; ++n)
 		    ;
 		sp->ts_curi += n;
 
 		// Always past NUL bytes now.
-		n = (int)sp->ts_state;
+		n = (पूर्णांक)sp->ts_state;
 		PROF_STORE(sp->ts_state)
 		sp->ts_state = STATE_ENDNUL;
 		sp->ts_save_badflags = su->su_badflags;
 
 		// At end of a prefix or at start of prefixtree: check for
 		// following word.
-		if (depth < MAXWLEN - 1
-			    && (byts[arridx] == 0 || n == (int)STATE_NOPREFIX))
+		जर (depth < MAXWLEN - 1
+			    && (byts[arridx] == 0 || n == (पूर्णांक)STATE_NOPREFIX))
 		{
 		    // Set su->su_badflags to the caps type at this position.
 		    // Use the caps type until here for the prefix itself.
-		    if (has_mbyte)
+		    जर (has_mbyte)
 			n = nofold_len(fword, sp->ts_fidx, su->su_badptr);
-		    else
+		    अन्यथा
 			n = sp->ts_fidx;
 		    flags = badword_captype(su->su_badptr, su->su_badptr + n);
 		    su->su_badflags = badword_captype(su->su_badptr + n,
 					       su->su_badptr + su->su_badlen);
 #ifdef DEBUG_TRIEWALK
-		    sprintf(changename[depth], "prefix");
+		    प्र_लिखो(changename[depth], "prefix");
 #endif
-		    go_deeper(stack, depth, 0);
+		    go_deeper(चळत, depth, 0);
 		    ++depth;
-		    sp = &stack[depth];
+		    sp = &चळत[depth];
 		    sp->ts_prefixdepth = depth - 1;
 		    byts = fbyts;
 		    idxs = fidxs;
@@ -1421,26 +1421,26 @@ suggest_trie_walk(
 		    sp->ts_prewordlen = (char_u)STRLEN(preword);
 		    sp->ts_splitoff = sp->ts_twordlen;
 		}
-		break;
+		थांबा;
 	    }
 
-	    if (sp->ts_curi > len || byts[arridx] != 0)
+	    जर (sp->ts_curi > len || byts[arridx] != 0)
 	    {
 		// Past bytes in node and/or past NUL bytes.
 		PROF_STORE(sp->ts_state)
 		sp->ts_state = STATE_ENDNUL;
 		sp->ts_save_badflags = su->su_badflags;
-		break;
+		थांबा;
 	    }
 
 	    // End of word in tree.
 	    ++sp->ts_curi;		// eat one NUL byte
 
-	    flags = (int)idxs[arridx];
+	    flags = (पूर्णांक)idxs[arridx];
 
 	    // Skip words with the NOSUGGEST flag.
-	    if (flags & WF_NOSUGGEST)
-		break;
+	    जर (flags & WF_NOSUGGEST)
+		थांबा;
 
 	    fword_ends = (fword[sp->ts_fidx] == NUL
 			   || (soundfold
@@ -1448,27 +1448,27 @@ suggest_trie_walk(
 			       : !spell_iswordp(fword + sp->ts_fidx, curwin)));
 	    tword[sp->ts_twordlen] = NUL;
 
-	    if (sp->ts_prefixdepth <= PFD_NOTSPECIAL
+	    जर (sp->ts_prefixdepth <= PFD_NOTSPECIAL
 					&& (sp->ts_flags & TSF_PREFIXOK) == 0
-					&& pbyts != NULL)
+					&& pbyts != रिक्त)
 	    {
 		// There was a prefix before the word.  Check that the prefix
 		// can be used with this word.
 		// Count the length of the NULs in the prefix.  If there are
 		// none this must be the first try without a prefix.
-		n = stack[sp->ts_prefixdepth].ts_arridx;
+		n = चळत[sp->ts_prefixdepth].ts_arridx;
 		len = pbyts[n++];
-		for (c = 0; c < len && pbyts[n + c] == 0; ++c)
+		साठी (c = 0; c < len && pbyts[n + c] == 0; ++c)
 		    ;
-		if (c > 0)
+		जर (c > 0)
 		{
 		    c = valid_word_prefix(c, n, flags,
 				       tword + sp->ts_splitoff, slang, FALSE);
-		    if (c == 0)
-			break;
+		    जर (c == 0)
+			थांबा;
 
 		    // Use the WF_RARE flag for a rare prefix.
-		    if (c & WF_RAREPFX)
+		    जर (c & WF_RAREPFX)
 			flags |= WF_RARE;
 
 		    // Tricky: when checking for both prefix and compounding
@@ -1481,23 +1481,23 @@ suggest_trie_walk(
 
 	    // Check NEEDCOMPOUND: can't use word without compounding.  Do try
 	    // appending another compound word below.
-	    if (sp->ts_complen == sp->ts_compsplit && fword_ends
+	    जर (sp->ts_complen == sp->ts_compsplit && fword_ends
 						     && (flags & WF_NEEDCOMP))
 		goodword_ends = FALSE;
-	    else
+	    अन्यथा
 		goodword_ends = TRUE;
 
-	    p = NULL;
+	    p = रिक्त;
 	    compound_ok = TRUE;
-	    if (sp->ts_complen > sp->ts_compsplit)
+	    जर (sp->ts_complen > sp->ts_compsplit)
 	    {
-		if (slang->sl_nobreak)
+		जर (slang->sl_nobreak)
 		{
 		    // There was a word before this word.  When there was no
 		    // change in this word (it was correct) add the first word
 		    // as a suggestion.  If this word was corrected too, we
 		    // need to check if a correct word follows.
-		    if (sp->ts_fidx - sp->ts_splitfidx
+		    जर (sp->ts_fidx - sp->ts_splitfidx
 					  == sp->ts_twordlen - sp->ts_splitoff
 			    && STRNCMP(fword + sp->ts_splitfidx,
 					tword + sp->ts_splitoff,
@@ -1508,49 +1508,49 @@ suggest_trie_walk(
 						 preword + sp->ts_prewordlen,
 						 sp->ts_prewordlen > 0);
 			// Add the suggestion if the score isn't too bad.
-			if (newscore <= su->su_maxscore)
+			जर (newscore <= su->su_maxscore)
 			    add_suggestion(su, &su->su_ga, preword,
 				    sp->ts_splitfidx - repextra,
 				    newscore, 0, FALSE,
 				    lp->lp_sallang, FALSE);
-			break;
+			थांबा;
 		    }
 		}
-		else
+		अन्यथा
 		{
 		    // There was a compound word before this word.  If this
 		    // word does not support compounding then give up
 		    // (splitting is tried for the word without compound
 		    // flag).
-		    if (((unsigned)flags >> 24) == 0
+		    जर (((अचिन्हित)flags >> 24) == 0
 			    || sp->ts_twordlen - sp->ts_splitoff
 						       < slang->sl_compminlen)
-			break;
+			थांबा;
 		    // For multi-byte chars check character length against
 		    // COMPOUNDMIN.
-		    if (has_mbyte
+		    जर (has_mbyte
 			    && slang->sl_compminlen > 0
 			    && mb_charlen(tword + sp->ts_splitoff)
 						       < slang->sl_compminlen)
-			break;
+			थांबा;
 
-		    compflags[sp->ts_complen] = ((unsigned)flags >> 24);
+		    compflags[sp->ts_complen] = ((अचिन्हित)flags >> 24);
 		    compflags[sp->ts_complen + 1] = NUL;
 		    vim_strncpy(preword + sp->ts_prewordlen,
 			    tword + sp->ts_splitoff,
 			    sp->ts_twordlen - sp->ts_splitoff);
 
 		    // Verify CHECKCOMPOUNDPATTERN  rules.
-		    if (match_checkcompoundpattern(preword,  sp->ts_prewordlen,
+		    जर (match_checkcompoundpattern(preword,  sp->ts_prewordlen,
 							  &slang->sl_comppat))
 			compound_ok = FALSE;
 
-		    if (compound_ok)
+		    जर (compound_ok)
 		    {
 			p = preword;
-			while (*skiptowhite(p) != NUL)
+			पर्यंत (*skiptowhite(p) != NUL)
 			    p = skipwhite(skiptowhite(p));
-			if (fword_ends && !can_compound(slang, p,
+			जर (fword_ends && !can_compound(slang, p,
 						compflags + sp->ts_compsplit))
 			    // Compound is not allowed.  But it may still be
 			    // possible if we add another (short) word.
@@ -1566,100 +1566,100 @@ suggest_trie_walk(
 	    // Form the word with proper case in preword.
 	    // If there is a word from a previous split, append.
 	    // For the soundfold tree don't change the case, simply append.
-	    if (soundfold)
+	    जर (soundfold)
 		STRCPY(preword + sp->ts_prewordlen, tword + sp->ts_splitoff);
-	    else if (flags & WF_KEEPCAP)
+	    अन्यथा जर (flags & WF_KEEPCAP)
 		// Must find the word in the keep-case tree.
 		find_keepcap_word(slang, tword + sp->ts_splitoff,
 						 preword + sp->ts_prewordlen);
-	    else
+	    अन्यथा
 	    {
 		// Include badflags: If the badword is onecap or allcap
 		// use that for the goodword too.  But if the badword is
 		// allcap and it's only one char long use onecap.
 		c = su->su_badflags;
-		if ((c & WF_ALLCAP)
+		जर ((c & WF_ALLCAP)
 			&& su->su_badlen == (*mb_ptr2len)(su->su_badptr))
 		    c = WF_ONECAP;
 		c |= flags;
 
 		// When appending a compound word after a word character don't
 		// use Onecap.
-		if (p != NULL && spell_iswordp_nmw(p, curwin))
+		जर (p != रिक्त && spell_iswordp_nmw(p, curwin))
 		    c &= ~WF_ONECAP;
 		make_case_word(tword + sp->ts_splitoff,
 					      preword + sp->ts_prewordlen, c);
 	    }
 
-	    if (!soundfold)
+	    जर (!soundfold)
 	    {
 		// Don't use a banned word.  It may appear again as a good
 		// word, thus remember it.
-		if (flags & WF_BANNED)
+		जर (flags & WF_BANNED)
 		{
 		    add_banned(su, preword + sp->ts_prewordlen);
-		    break;
+		    थांबा;
 		}
-		if ((sp->ts_complen == sp->ts_compsplit
+		जर ((sp->ts_complen == sp->ts_compsplit
 			    && WAS_BANNED(su, preword + sp->ts_prewordlen))
 						   || WAS_BANNED(su, preword))
 		{
-		    if (slang->sl_compprog == NULL)
-			break;
+		    जर (slang->sl_compprog == रिक्त)
+			थांबा;
 		    // the word so far was banned but we may try compounding
 		    goodword_ends = FALSE;
 		}
 	    }
 
 	    newscore = 0;
-	    if (!soundfold)	// soundfold words don't have flags
+	    जर (!soundfold)	// soundfold words don't have flags
 	    {
-		if ((flags & WF_REGION)
-			    && (((unsigned)flags >> 16) & lp->lp_region) == 0)
+		जर ((flags & WF_REGION)
+			    && (((अचिन्हित)flags >> 16) & lp->lp_region) == 0)
 		    newscore += SCORE_REGION;
-		if (flags & WF_RARE)
+		जर (flags & WF_RARE)
 		    newscore += SCORE_RARE;
 
-		if (!spell_valid_case(su->su_badflags,
-				  captype(preword + sp->ts_prewordlen, NULL)))
+		जर (!spell_valid_case(su->su_badflags,
+				  captype(preword + sp->ts_prewordlen, रिक्त)))
 		    newscore += SCORE_ICASE;
 	    }
 
 	    // TODO: how about splitting in the soundfold tree?
-	    if (fword_ends
+	    जर (fword_ends
 		    && goodword_ends
 		    && sp->ts_fidx >= sp->ts_fidxtry
 		    && compound_ok)
 	    {
 		// The badword also ends: add suggestions.
 #ifdef DEBUG_TRIEWALK
-		if (soundfold && STRCMP(preword, "smwrd") == 0)
+		जर (soundfold && STRCMP(preword, "smwrd") == 0)
 		{
-		    int	    j;
+		    पूर्णांक	    j;
 
 		    // print the stack of changes that brought us here
 		    smsg("------ %s -------", fword);
-		    for (j = 0; j < depth; ++j)
+		    साठी (j = 0; j < depth; ++j)
 			smsg("%s", changename[j]);
 		}
 #endif
-		if (soundfold)
+		जर (soundfold)
 		{
 		    // For soundfolded words we need to find the original
 		    // words, the edit distance and then add them.
 		    add_sound_suggest(su, preword, sp->ts_score, lp);
 		}
-		else if (sp->ts_fidx > 0)
+		अन्यथा जर (sp->ts_fidx > 0)
 		{
 		    // Give a penalty when changing non-word char to word
 		    // char, e.g., "thes," -> "these".
 		    p = fword + sp->ts_fidx;
 		    MB_PTR_BACK(fword, p);
-		    if (!spell_iswordp(p, curwin) && *preword != NUL)
+		    जर (!spell_iswordp(p, curwin) && *preword != NUL)
 		    {
 			p = preword + STRLEN(preword);
 			MB_PTR_BACK(preword, p);
-			if (spell_iswordp(p, curwin))
+			जर (spell_iswordp(p, curwin))
 			    newscore += SCORE_NONWORD;
 		    }
 
@@ -1670,18 +1670,18 @@ suggest_trie_walk(
 						sp->ts_prewordlen > 0);
 
 		    // Add the suggestion if the score isn't too bad.
-		    if (score <= su->su_maxscore)
+		    जर (score <= su->su_maxscore)
 		    {
 			add_suggestion(su, &su->su_ga, preword,
 				    sp->ts_fidx - repextra,
 				    score, 0, FALSE, lp->lp_sallang, FALSE);
 
-			if (su->su_badflags & WF_MIXCAP)
+			जर (su->su_badflags & WF_MIXCAP)
 			{
 			    // We really don't know if the word should be
 			    // upper or lower case, add both.
-			    c = captype(preword, NULL);
-			    if (c == 0 || c == WF_ALLCAP)
+			    c = captype(preword, रिक्त);
+			    जर (c == 0 || c == WF_ALLCAP)
 			    {
 				make_case_word(tword + sp->ts_splitoff,
 					      preword + sp->ts_prewordlen,
@@ -1698,12 +1698,12 @@ suggest_trie_walk(
 	    }
 
 	    // Try word split and/or compounding.
-	    if ((sp->ts_fidx >= sp->ts_fidxtry || fword_ends)
+	    जर ((sp->ts_fidx >= sp->ts_fidxtry || fword_ends)
 		    // Don't split halfway a character.
 		    && (!has_mbyte || sp->ts_tcharlen == 0))
 	    {
-		int	try_compound;
-		int	try_split;
+		पूर्णांक	try_compound;
+		पूर्णांक	try_split;
 
 		// If past the end of the bad word don't try a split.
 		// Otherwise try changing the next word.  E.g., find
@@ -1726,10 +1726,10 @@ suggest_trie_walk(
 		// 3. The badword and the word in the tree end.  It may still
 		//    be possible to compound another (short) word.
 		try_compound = FALSE;
-		if (!soundfold
+		जर (!soundfold
 			&& !slang->sl_nocompoundsugs
-			&& slang->sl_compprog != NULL
-			&& ((unsigned)flags >> 24) != 0
+			&& slang->sl_compprog != रिक्त
+			&& ((अचिन्हित)flags >> 24) != 0
 			&& sp->ts_twordlen - sp->ts_splitoff
 						       >= slang->sl_compminlen
 			&& (!has_mbyte
@@ -1740,23 +1740,23 @@ suggest_trie_walk(
 			    || sp->ts_complen + 1 - sp->ts_compsplit
 							  < slang->sl_compmax)
 			&& (can_be_compound(sp, slang,
-					 compflags, ((unsigned)flags >> 24))))
+					 compflags, ((अचिन्हित)flags >> 24))))
 
 		{
 		    try_compound = TRUE;
-		    compflags[sp->ts_complen] = ((unsigned)flags >> 24);
+		    compflags[sp->ts_complen] = ((अचिन्हित)flags >> 24);
 		    compflags[sp->ts_complen + 1] = NUL;
 		}
 
 		// For NOBREAK we never try splitting, it won't make any word
 		// valid.
-		if (slang->sl_nobreak && !slang->sl_nocompoundsugs)
+		जर (slang->sl_nobreak && !slang->sl_nocompoundsugs)
 		    try_compound = TRUE;
 
 		// If we could add a compound word, and it's also possible to
 		// split at this point, do the split first and set
 		// TSF_DIDSPLIT to avoid doing it again.
-		else if (!fword_ends
+		अन्यथा जर (!fword_ends
 			&& try_compound
 			&& (sp->ts_flags & TSF_DIDSPLIT) == 0)
 		{
@@ -1765,31 +1765,31 @@ suggest_trie_walk(
 		    --sp->ts_curi;	    // do the same NUL again
 		    compflags[sp->ts_complen] = NUL;
 		}
-		else
+		अन्यथा
 		    sp->ts_flags &= ~TSF_DIDSPLIT;
 
-		if (try_split || try_compound)
+		जर (try_split || try_compound)
 		{
-		    if (!try_compound && (!fword_ends || !goodword_ends))
+		    जर (!try_compound && (!fword_ends || !goodword_ends))
 		    {
 			// If we're going to split need to check that the
 			// words so far are valid for compounding.  If there
 			// is only one word it must not have the NEEDCOMPOUND
 			// flag.
-			if (sp->ts_complen == sp->ts_compsplit
+			जर (sp->ts_complen == sp->ts_compsplit
 						     && (flags & WF_NEEDCOMP))
-			    break;
+			    थांबा;
 			p = preword;
-			while (*skiptowhite(p) != NUL)
+			पर्यंत (*skiptowhite(p) != NUL)
 			    p = skipwhite(skiptowhite(p));
-			if (sp->ts_complen > sp->ts_compsplit
+			जर (sp->ts_complen > sp->ts_compsplit
 				&& !can_compound(slang, p,
 						compflags + sp->ts_compsplit))
-			    break;
+			    थांबा;
 
-			if (slang->sl_nosplitsugs)
+			जर (slang->sl_nosplitsugs)
 			    newscore += SCORE_SPLIT_NO;
-			else
+			अन्यथा
 			    newscore += SCORE_SPLIT;
 
 			// Give a bonus to words seen before.
@@ -1797,15 +1797,15 @@ suggest_trie_walk(
 					   preword + sp->ts_prewordlen, TRUE);
 		    }
 
-		    if (TRY_DEEPER(su, stack, depth, newscore))
+		    जर (TRY_DEEPER(su, चळत, depth, newscore))
 		    {
-			go_deeper(stack, depth, newscore);
+			go_deeper(चळत, depth, newscore);
 #ifdef DEBUG_TRIEWALK
-			if (!try_compound && !fword_ends)
-			    sprintf(changename[depth], "%.*s-%s: split",
+			जर (!try_compound && !fword_ends)
+			    प्र_लिखो(changename[depth], "%.*s-%s: split",
 				 sp->ts_twordlen, tword, fword + sp->ts_fidx);
-			else
-			    sprintf(changename[depth], "%.*s-%s: compound",
+			अन्यथा
+			    प्र_लिखो(changename[depth], "%.*s-%s: compound",
 				 sp->ts_twordlen, tword, fword + sp->ts_fidx);
 #endif
 			// Save things to be restored at STATE_SPLITUNDO.
@@ -1814,10 +1814,10 @@ suggest_trie_walk(
 			sp->ts_state = STATE_SPLITUNDO;
 
 			++depth;
-			sp = &stack[depth];
+			sp = &चळत[depth];
 
 			// Append a space to preword when splitting.
-			if (!try_compound && !fword_ends)
+			जर (!try_compound && !fword_ends)
 			    STRCAT(preword, " ");
 			sp->ts_prewordlen = (char_u)STRLEN(preword);
 			sp->ts_splitoff = sp->ts_twordlen;
@@ -1828,17 +1828,17 @@ suggest_trie_walk(
 			// non-word character with a space.  Always skip a
 			// character when the word ends.  But only when the
 			// good word can end.
-			if (((!try_compound && !spell_iswordp_nmw(fword
+			जर (((!try_compound && !spell_iswordp_nmw(fword
 							       + sp->ts_fidx,
 							       curwin))
 				    || fword_ends)
 				&& fword[sp->ts_fidx] != NUL
 				&& goodword_ends)
 			{
-			    int	    l;
+			    पूर्णांक	    l;
 
 			    l = mb_ptr2len(fword + sp->ts_fidx);
-			    if (fword_ends)
+			    जर (fword_ends)
 			    {
 				// Copy the skipped character to preword.
 				mch_memmove(preword + sp->ts_prewordlen,
@@ -1846,7 +1846,7 @@ suggest_trie_walk(
 				sp->ts_prewordlen += l;
 				preword[sp->ts_prewordlen] = NUL;
 			    }
-			    else
+			    अन्यथा
 				sp->ts_score -= SCORE_SPLIT - SCORE_SUBST;
 			    sp->ts_fidx += l;
 			}
@@ -1854,17 +1854,17 @@ suggest_trie_walk(
 			// When compounding include compound flag in
 			// compflags[] (already set above).  When splitting we
 			// may start compounding over again.
-			if (try_compound)
+			जर (try_compound)
 			    ++sp->ts_complen;
-			else
+			अन्यथा
 			    sp->ts_compsplit = sp->ts_complen;
 			sp->ts_prefixdepth = PFD_NOPREFIX;
 
 			// set su->su_badflags to the caps type at this
 			// position
-			if (has_mbyte)
+			जर (has_mbyte)
 			    n = nofold_len(fword, sp->ts_fidx, su->su_badptr);
-			else
+			अन्यथा
 			    n = sp->ts_fidx;
 			su->su_badflags = badword_captype(su->su_badptr + n,
 					       su->su_badptr + su->su_badlen);
@@ -1873,7 +1873,7 @@ suggest_trie_walk(
 			sp->ts_arridx = 0;
 
 			// If there are postponed prefixes, try these too.
-			if (pbyts != NULL)
+			जर (pbyts != रिक्त)
 			{
 			    byts = pbyts;
 			    idxs = pidxs;
@@ -1884,9 +1884,9 @@ suggest_trie_walk(
 		    }
 		}
 	    }
-	    break;
+	    थांबा;
 
-	case STATE_SPLITUNDO:
+	स्थिती STATE_SPLITUNDO:
 	    // Undo the changes done for word split or compound word.
 	    su->su_badflags = sp->ts_save_badflags;
 
@@ -1897,37 +1897,37 @@ suggest_trie_walk(
 	    // In case we went into the prefix tree.
 	    byts = fbyts;
 	    idxs = fidxs;
-	    break;
+	    थांबा;
 
-	case STATE_ENDNUL:
+	स्थिती STATE_ENDNUL:
 	    // Past the NUL bytes in the node.
 	    su->su_badflags = sp->ts_save_badflags;
-	    if (fword[sp->ts_fidx] == NUL && sp->ts_tcharlen == 0)
+	    जर (fword[sp->ts_fidx] == NUL && sp->ts_tcharlen == 0)
 	    {
 		// The badword ends, can't use STATE_PLAIN.
 		PROF_STORE(sp->ts_state)
 		sp->ts_state = STATE_DEL;
-		break;
+		थांबा;
 	    }
 	    PROF_STORE(sp->ts_state)
 	    sp->ts_state = STATE_PLAIN;
 	    // FALLTHROUGH
 
-	case STATE_PLAIN:
+	स्थिती STATE_PLAIN:
 	    // Go over all possible bytes at this node, add each to tword[]
 	    // and use child node.  "ts_curi" is the index.
 	    arridx = sp->ts_arridx;
-	    if (sp->ts_curi > byts[arridx])
+	    जर (sp->ts_curi > byts[arridx])
 	    {
 		// Done all bytes at this node, do next state.  When still at
 		// already changed bytes skip the other tricks.
 		PROF_STORE(sp->ts_state)
-		if (sp->ts_fidx >= sp->ts_fidxtry)
+		जर (sp->ts_fidx >= sp->ts_fidxtry)
 		    sp->ts_state = STATE_DEL;
-		else
+		अन्यथा
 		    sp->ts_state = STATE_FINAL;
 	    }
-	    else
+	    अन्यथा
 	    {
 		arridx += sp->ts_curi++;
 		c = byts[arridx];
@@ -1937,42 +1937,42 @@ suggest_trie_walk(
 		// when the byte was already changed.  And don't try when we
 		// just deleted this byte, accepting it is always cheaper than
 		// delete + substitute.
-		if (c == fword[sp->ts_fidx]
+		जर (c == fword[sp->ts_fidx]
 			|| (sp->ts_tcharlen > 0 && sp->ts_isdiff != DIFF_NONE))
 		    newscore = 0;
-		else
+		अन्यथा
 		    newscore = SCORE_SUBST;
-		if ((newscore == 0
+		जर ((newscore == 0
 			    || (sp->ts_fidx >= sp->ts_fidxtry
 				&& ((sp->ts_flags & TSF_DIDDEL) == 0
 				    || c != fword[sp->ts_delidx])))
-			&& TRY_DEEPER(su, stack, depth, newscore))
+			&& TRY_DEEPER(su, चळत, depth, newscore))
 		{
-		    go_deeper(stack, depth, newscore);
+		    go_deeper(चळत, depth, newscore);
 #ifdef DEBUG_TRIEWALK
-		    if (newscore > 0)
-			sprintf(changename[depth], "%.*s-%s: subst %c to %c",
+		    जर (newscore > 0)
+			प्र_लिखो(changename[depth], "%.*s-%s: subst %c to %c",
 				sp->ts_twordlen, tword, fword + sp->ts_fidx,
 				fword[sp->ts_fidx], c);
-		    else
-			sprintf(changename[depth], "%.*s-%s: accept %c",
+		    अन्यथा
+			प्र_लिखो(changename[depth], "%.*s-%s: accept %c",
 				sp->ts_twordlen, tword, fword + sp->ts_fidx,
 				fword[sp->ts_fidx]);
 #endif
 		    ++depth;
-		    sp = &stack[depth];
-		    if (fword[sp->ts_fidx] != NUL)
+		    sp = &चळत[depth];
+		    जर (fword[sp->ts_fidx] != NUL)
 			++sp->ts_fidx;
 		    tword[sp->ts_twordlen++] = c;
 		    sp->ts_arridx = idxs[arridx];
-		    if (newscore == SCORE_SUBST)
+		    जर (newscore == SCORE_SUBST)
 			sp->ts_isdiff = DIFF_YES;
-		    if (has_mbyte)
+		    जर (has_mbyte)
 		    {
 			// Multi-byte characters are a bit complicated to
 			// handle: They differ when any of the bytes differ
 			// and then their length may also differ.
-			if (sp->ts_tcharlen == 0)
+			जर (sp->ts_tcharlen == 0)
 			{
 			    // First byte.
 			    sp->ts_tcharidx = 0;
@@ -1981,15 +1981,15 @@ suggest_trie_walk(
 			    sp->ts_isdiff = (newscore != 0)
 						       ? DIFF_YES : DIFF_NONE;
 			}
-			else if (sp->ts_isdiff == DIFF_INSERT
+			अन्यथा जर (sp->ts_isdiff == DIFF_घाला
 							    && sp->ts_fidx > 0)
 			    // When inserting trail bytes don't advance in the
 			    // bad word.
 			    --sp->ts_fidx;
-			if (++sp->ts_tcharidx == sp->ts_tcharlen)
+			जर (++sp->ts_tcharidx == sp->ts_tcharlen)
 			{
 			    // Last byte of character.
-			    if (sp->ts_isdiff == DIFF_YES)
+			    जर (sp->ts_isdiff == DIFF_YES)
 			    {
 				// Correct ts_fidx for the byte length of the
 				// character (we didn't check that before).
@@ -1999,7 +1999,7 @@ suggest_trie_walk(
 				// For changing a composing character adjust
 				// the score from SCORE_SUBST to
 				// SCORE_SUBCOMP.
-				if (enc_utf8
+				जर (enc_utf8
 					&& utf_iscomposing(
 					    utf_ptr2char(tword
 						+ sp->ts_twordlen
@@ -2012,7 +2012,7 @@ suggest_trie_walk(
 
 				// For a similar character adjust score from
 				// SCORE_SUBST to SCORE_SIMILAR.
-				else if (!soundfold
+				अन्यथा जर (!soundfold
 					&& slang->sl_has_map
 					&& similar_chars(slang,
 					    mb_ptr2char(tword
@@ -2023,18 +2023,18 @@ suggest_trie_walk(
 				    sp->ts_score -=
 						  SCORE_SUBST - SCORE_SIMILAR;
 			    }
-			    else if (sp->ts_isdiff == DIFF_INSERT
+			    अन्यथा जर (sp->ts_isdiff == DIFF_घाला
 					 && sp->ts_twordlen > sp->ts_tcharlen)
 			    {
 				p = tword + sp->ts_twordlen - sp->ts_tcharlen;
 				c = mb_ptr2char(p);
-				if (enc_utf8 && utf_iscomposing(c))
+				जर (enc_utf8 && utf_iscomposing(c))
 				{
 				    // Inserting a composing char doesn't
 				    // count that much.
 				    sp->ts_score -= SCORE_INS - SCORE_INSCOMP;
 				}
-				else
+				अन्यथा
 				{
 				    // If the previous character was the same,
 				    // thus doubling a character, give a bonus
@@ -2042,7 +2042,7 @@ suggest_trie_walk(
 				    // tree (might seem illogical but does
 				    // give better scores).
 				    MB_PTR_BACK(tword, p);
-				    if (c == mb_ptr2char(p))
+				    जर (c == mb_ptr2char(p))
 					sp->ts_score -= SCORE_INS
 							       - SCORE_INSDUP;
 				}
@@ -2052,12 +2052,12 @@ suggest_trie_walk(
 			    sp->ts_tcharlen = 0;
 			}
 		    }
-		    else
+		    अन्यथा
 		    {
 			// If we found a similar char adjust the score.
 			// We do this after calling go_deeper() because
 			// it's slow.
-			if (newscore != 0
+			जर (newscore != 0
 				&& !soundfold
 				&& slang->sl_has_map
 				&& similar_chars(slang,
@@ -2066,33 +2066,33 @@ suggest_trie_walk(
 		    }
 		}
 	    }
-	    break;
+	    थांबा;
 
-	case STATE_DEL:
+	स्थिती STATE_DEL:
 	    // When past the first byte of a multi-byte char don't try
 	    // delete/insert/swap a character.
-	    if (has_mbyte && sp->ts_tcharlen > 0)
+	    जर (has_mbyte && sp->ts_tcharlen > 0)
 	    {
 		PROF_STORE(sp->ts_state)
 		sp->ts_state = STATE_FINAL;
-		break;
+		थांबा;
 	    }
 	    // Try skipping one character in the bad word (delete it).
 	    PROF_STORE(sp->ts_state)
 	    sp->ts_state = STATE_INS_PREP;
 	    sp->ts_curi = 1;
-	    if (soundfold && sp->ts_fidx == 0 && fword[sp->ts_fidx] == '*')
+	    जर (soundfold && sp->ts_fidx == 0 && fword[sp->ts_fidx] == '*')
 		// Deleting a vowel at the start of a word counts less, see
 		// soundalike_score().
 		newscore = 2 * SCORE_DEL / 3;
-	    else
+	    अन्यथा
 		newscore = SCORE_DEL;
-	    if (fword[sp->ts_fidx] != NUL
-				    && TRY_DEEPER(su, stack, depth, newscore))
+	    जर (fword[sp->ts_fidx] != NUL
+				    && TRY_DEEPER(su, चळत, depth, newscore))
 	    {
-		go_deeper(stack, depth, newscore);
+		go_deeper(चळत, depth, newscore);
 #ifdef DEBUG_TRIEWALK
-		sprintf(changename[depth], "%.*s-%s: delete %c",
+		प्र_लिखो(changename[depth], "%.*s-%s: delete %c",
 			sp->ts_twordlen, tword, fword + sp->ts_fidx,
 			fword[sp->ts_fidx]);
 #endif
@@ -2100,76 +2100,76 @@ suggest_trie_walk(
 
 		// Remember what character we deleted, so that we can avoid
 		// inserting it again.
-		stack[depth].ts_flags |= TSF_DIDDEL;
-		stack[depth].ts_delidx = sp->ts_fidx;
+		चळत[depth].ts_flags |= TSF_DIDDEL;
+		चळत[depth].ts_delidx = sp->ts_fidx;
 
 		// Advance over the character in fword[].  Give a bonus to the
 		// score if the same character is following "nn" -> "n".  It's
 		// a bit illogical for soundfold tree but it does give better
 		// results.
-		if (has_mbyte)
+		जर (has_mbyte)
 		{
 		    c = mb_ptr2char(fword + sp->ts_fidx);
-		    stack[depth].ts_fidx += mb_ptr2len(fword + sp->ts_fidx);
-		    if (enc_utf8 && utf_iscomposing(c))
-			stack[depth].ts_score -= SCORE_DEL - SCORE_DELCOMP;
-		    else if (c == mb_ptr2char(fword + stack[depth].ts_fidx))
-			stack[depth].ts_score -= SCORE_DEL - SCORE_DELDUP;
+		    चळत[depth].ts_fidx += mb_ptr2len(fword + sp->ts_fidx);
+		    जर (enc_utf8 && utf_iscomposing(c))
+			चळत[depth].ts_score -= SCORE_DEL - SCORE_DELCOMP;
+		    अन्यथा जर (c == mb_ptr2char(fword + चळत[depth].ts_fidx))
+			चळत[depth].ts_score -= SCORE_DEL - SCORE_DELDUP;
 		}
-		else
+		अन्यथा
 		{
-		    ++stack[depth].ts_fidx;
-		    if (fword[sp->ts_fidx] == fword[sp->ts_fidx + 1])
-			stack[depth].ts_score -= SCORE_DEL - SCORE_DELDUP;
+		    ++चळत[depth].ts_fidx;
+		    जर (fword[sp->ts_fidx] == fword[sp->ts_fidx + 1])
+			चळत[depth].ts_score -= SCORE_DEL - SCORE_DELDUP;
 		}
-		break;
+		थांबा;
 	    }
 	    // FALLTHROUGH
 
-	case STATE_INS_PREP:
-	    if (sp->ts_flags & TSF_DIDDEL)
+	स्थिती STATE_INS_PREP:
+	    जर (sp->ts_flags & TSF_DIDDEL)
 	    {
 		// If we just deleted a byte then inserting won't make sense,
 		// a substitute is always cheaper.
 		PROF_STORE(sp->ts_state)
 		sp->ts_state = STATE_SWAP;
-		break;
+		थांबा;
 	    }
 
 	    // skip over NUL bytes
 	    n = sp->ts_arridx;
-	    for (;;)
+	    साठी (;;)
 	    {
-		if (sp->ts_curi > byts[n])
+		जर (sp->ts_curi > byts[n])
 		{
 		    // Only NUL bytes at this node, go to next state.
 		    PROF_STORE(sp->ts_state)
 		    sp->ts_state = STATE_SWAP;
-		    break;
+		    थांबा;
 		}
-		if (byts[n + sp->ts_curi] != NUL)
+		जर (byts[n + sp->ts_curi] != NUL)
 		{
 		    // Found a byte to insert.
 		    PROF_STORE(sp->ts_state)
 		    sp->ts_state = STATE_INS;
-		    break;
+		    थांबा;
 		}
 		++sp->ts_curi;
 	    }
-	    break;
+	    थांबा;
 
 	    // FALLTHROUGH
 
-	case STATE_INS:
+	स्थिती STATE_INS:
 	    // Insert one byte.  Repeat this for each possible byte at this
 	    // node.
 	    n = sp->ts_arridx;
-	    if (sp->ts_curi > byts[n])
+	    जर (sp->ts_curi > byts[n])
 	    {
 		// Done all bytes at this node, go to next state.
 		PROF_STORE(sp->ts_state)
 		sp->ts_state = STATE_SWAP;
-		break;
+		थांबा;
 	    }
 
 	    // Do one more byte at this node, but:
@@ -2179,163 +2179,163 @@ suggest_trie_walk(
 	    n += sp->ts_curi++;
 
 	    // break out, if we would be accessing byts buffer out of bounds
-	    if (byts == slang->sl_fbyts && n >= slang->sl_fbyts_len)
+	    जर (byts == slang->sl_fbyts && n >= slang->sl_fbyts_len)
 	    {
 		got_int = TRUE;
-		break;
+		थांबा;
 	    }
 	    c = byts[n];
-	    if (soundfold && sp->ts_twordlen == 0 && c == '*')
+	    जर (soundfold && sp->ts_twordlen == 0 && c == '*')
 		// Inserting a vowel at the start of a word counts less,
 		// see soundalike_score().
 		newscore = 2 * SCORE_INS / 3;
-	    else
+	    अन्यथा
 		newscore = SCORE_INS;
-	    if (c != fword[sp->ts_fidx]
-				    && TRY_DEEPER(su, stack, depth, newscore))
+	    जर (c != fword[sp->ts_fidx]
+				    && TRY_DEEPER(su, चळत, depth, newscore))
 	    {
-		go_deeper(stack, depth, newscore);
+		go_deeper(चळत, depth, newscore);
 #ifdef DEBUG_TRIEWALK
-		sprintf(changename[depth], "%.*s-%s: insert %c",
+		प्र_लिखो(changename[depth], "%.*s-%s: insert %c",
 			sp->ts_twordlen, tword, fword + sp->ts_fidx,
 			c);
 #endif
 		++depth;
-		sp = &stack[depth];
+		sp = &चळत[depth];
 		tword[sp->ts_twordlen++] = c;
 		sp->ts_arridx = idxs[n];
-		if (has_mbyte)
+		जर (has_mbyte)
 		{
 		    fl = MB_BYTE2LEN(c);
-		    if (fl > 1)
+		    जर (fl > 1)
 		    {
 			// There are following bytes for the same character.
 			// We must find all bytes before trying
 			// delete/insert/swap/etc.
 			sp->ts_tcharlen = fl;
 			sp->ts_tcharidx = 1;
-			sp->ts_isdiff = DIFF_INSERT;
+			sp->ts_isdiff = DIFF_घाला;
 		    }
 		}
-		else
+		अन्यथा
 		    fl = 1;
-		if (fl == 1)
+		जर (fl == 1)
 		{
 		    // If the previous character was the same, thus doubling a
 		    // character, give a bonus to the score.  Also for
 		    // soundfold words (illogical but does give a better
 		    // score).
-		    if (sp->ts_twordlen >= 2
+		    जर (sp->ts_twordlen >= 2
 					   && tword[sp->ts_twordlen - 2] == c)
 			sp->ts_score -= SCORE_INS - SCORE_INSDUP;
 		}
 	    }
-	    break;
+	    थांबा;
 
-	case STATE_SWAP:
+	स्थिती STATE_SWAP:
 	    // Swap two bytes in the bad word: "12" -> "21".
 	    // We change "fword" here, it's changed back afterwards at
 	    // STATE_UNSWAP.
 	    p = fword + sp->ts_fidx;
 	    c = *p;
-	    if (c == NUL)
+	    जर (c == NUL)
 	    {
 		// End of word, can't swap or replace.
 		PROF_STORE(sp->ts_state)
 		sp->ts_state = STATE_FINAL;
-		break;
+		थांबा;
 	    }
 
 	    // Don't swap if the first character is not a word character.
 	    // SWAP3 etc. also don't make sense then.
-	    if (!soundfold && !spell_iswordp(p, curwin))
+	    जर (!soundfold && !spell_iswordp(p, curwin))
 	    {
 		PROF_STORE(sp->ts_state)
 		sp->ts_state = STATE_REP_INI;
-		break;
+		थांबा;
 	    }
 
-	    if (has_mbyte)
+	    जर (has_mbyte)
 	    {
 		n = MB_CPTR2LEN(p);
 		c = mb_ptr2char(p);
-		if (p[n] == NUL)
+		जर (p[n] == NUL)
 		    c2 = NUL;
-		else if (!soundfold && !spell_iswordp(p + n, curwin))
+		अन्यथा जर (!soundfold && !spell_iswordp(p + n, curwin))
 		    c2 = c; // don't swap non-word char
-		else
+		अन्यथा
 		    c2 = mb_ptr2char(p + n);
 	    }
-	    else
+	    अन्यथा
 	    {
-		if (p[1] == NUL)
+		जर (p[1] == NUL)
 		    c2 = NUL;
-		else if (!soundfold && !spell_iswordp(p + 1, curwin))
+		अन्यथा जर (!soundfold && !spell_iswordp(p + 1, curwin))
 		    c2 = c; // don't swap non-word char
-		else
+		अन्यथा
 		    c2 = p[1];
 	    }
 
 	    // When the second character is NUL we can't swap.
-	    if (c2 == NUL)
+	    जर (c2 == NUL)
 	    {
 		PROF_STORE(sp->ts_state)
 		sp->ts_state = STATE_REP_INI;
-		break;
+		थांबा;
 	    }
 
 	    // When characters are identical, swap won't do anything.
 	    // Also get here if the second char is not a word character.
-	    if (c == c2)
+	    जर (c == c2)
 	    {
 		PROF_STORE(sp->ts_state)
 		sp->ts_state = STATE_SWAP3;
-		break;
+		थांबा;
 	    }
-	    if (c2 != NUL && TRY_DEEPER(su, stack, depth, SCORE_SWAP))
+	    जर (c2 != NUL && TRY_DEEPER(su, चळत, depth, SCORE_SWAP))
 	    {
-		go_deeper(stack, depth, SCORE_SWAP);
+		go_deeper(चळत, depth, SCORE_SWAP);
 #ifdef DEBUG_TRIEWALK
-		sprintf(changename[depth], "%.*s-%s: swap %c and %c",
+		प्र_लिखो(changename[depth], "%.*s-%s: swap %c and %c",
 			sp->ts_twordlen, tword, fword + sp->ts_fidx,
 			c, c2);
 #endif
 		PROF_STORE(sp->ts_state)
 		sp->ts_state = STATE_UNSWAP;
 		++depth;
-		if (has_mbyte)
+		जर (has_mbyte)
 		{
 		    fl = mb_char2len(c2);
 		    mch_memmove(p, p + n, fl);
 		    mb_char2bytes(c, p + fl);
-		    stack[depth].ts_fidxtry = sp->ts_fidx + n + fl;
+		    चळत[depth].ts_fidxtry = sp->ts_fidx + n + fl;
 		}
-		else
+		अन्यथा
 		{
 		    p[0] = c2;
 		    p[1] = c;
-		    stack[depth].ts_fidxtry = sp->ts_fidx + 2;
+		    चळत[depth].ts_fidxtry = sp->ts_fidx + 2;
 		}
 	    }
-	    else
+	    अन्यथा
 	    {
 		// If this swap doesn't work then SWAP3 won't either.
 		PROF_STORE(sp->ts_state)
 		sp->ts_state = STATE_REP_INI;
 	    }
-	    break;
+	    थांबा;
 
-	case STATE_UNSWAP:
+	स्थिती STATE_UNSWAP:
 	    // Undo the STATE_SWAP swap: "21" -> "12".
 	    p = fword + sp->ts_fidx;
-	    if (has_mbyte)
+	    जर (has_mbyte)
 	    {
 		n = mb_ptr2len(p);
 		c = mb_ptr2char(p + n);
 		mch_memmove(p + mb_ptr2len(p + n), p, n);
 		mb_char2bytes(c, p);
 	    }
-	    else
+	    अन्यथा
 	    {
 		c = *p;
 		*p = p[1];
@@ -2343,28 +2343,28 @@ suggest_trie_walk(
 	    }
 	    // FALLTHROUGH
 
-	case STATE_SWAP3:
+	स्थिती STATE_SWAP3:
 	    // Swap two bytes, skipping one: "123" -> "321".  We change
 	    // "fword" here, it's changed back afterwards at STATE_UNSWAP3.
 	    p = fword + sp->ts_fidx;
-	    if (has_mbyte)
+	    जर (has_mbyte)
 	    {
 		n = MB_CPTR2LEN(p);
 		c = mb_ptr2char(p);
 		fl = MB_CPTR2LEN(p + n);
 		c2 = mb_ptr2char(p + n);
-		if (!soundfold && !spell_iswordp(p + n + fl, curwin))
+		जर (!soundfold && !spell_iswordp(p + n + fl, curwin))
 		    c3 = c;	// don't swap non-word char
-		else
+		अन्यथा
 		    c3 = mb_ptr2char(p + n + fl);
 	    }
-	    else
+	    अन्यथा
 	    {
 		c = *p;
 		c2 = p[1];
-		if (!soundfold && !spell_iswordp(p + 2, curwin))
+		जर (!soundfold && !spell_iswordp(p + 2, curwin))
 		    c3 = c;	// don't swap non-word char
-		else
+		अन्यथा
 		    c3 = p[2];
 	    }
 
@@ -2374,49 +2374,49 @@ suggest_trie_walk(
 	    // Also skip when c3 is NUL.
 	    // Also get here when the third character is not a word character.
 	    // Second character may any char: "a.b" -> "b.a"
-	    if (c == c3 || c3 == NUL)
+	    जर (c == c3 || c3 == NUL)
 	    {
 		PROF_STORE(sp->ts_state)
 		sp->ts_state = STATE_REP_INI;
-		break;
+		थांबा;
 	    }
-	    if (TRY_DEEPER(su, stack, depth, SCORE_SWAP3))
+	    जर (TRY_DEEPER(su, चळत, depth, SCORE_SWAP3))
 	    {
-		go_deeper(stack, depth, SCORE_SWAP3);
+		go_deeper(चळत, depth, SCORE_SWAP3);
 #ifdef DEBUG_TRIEWALK
-		sprintf(changename[depth], "%.*s-%s: swap3 %c and %c",
+		प्र_लिखो(changename[depth], "%.*s-%s: swap3 %c and %c",
 			sp->ts_twordlen, tword, fword + sp->ts_fidx,
 			c, c3);
 #endif
 		PROF_STORE(sp->ts_state)
 		sp->ts_state = STATE_UNSWAP3;
 		++depth;
-		if (has_mbyte)
+		जर (has_mbyte)
 		{
 		    tl = mb_char2len(c3);
 		    mch_memmove(p, p + n + fl, tl);
 		    mb_char2bytes(c2, p + tl);
 		    mb_char2bytes(c, p + fl + tl);
-		    stack[depth].ts_fidxtry = sp->ts_fidx + n + fl + tl;
+		    चळत[depth].ts_fidxtry = sp->ts_fidx + n + fl + tl;
 		}
-		else
+		अन्यथा
 		{
 		    p[0] = p[2];
 		    p[2] = c;
-		    stack[depth].ts_fidxtry = sp->ts_fidx + 3;
+		    चळत[depth].ts_fidxtry = sp->ts_fidx + 3;
 		}
 	    }
-	    else
+	    अन्यथा
 	    {
 		PROF_STORE(sp->ts_state)
 		sp->ts_state = STATE_REP_INI;
 	    }
-	    break;
+	    थांबा;
 
-	case STATE_UNSWAP3:
+	स्थिती STATE_UNSWAP3:
 	    // Undo STATE_SWAP3: "321" -> "123"
 	    p = fword + sp->ts_fidx;
-	    if (has_mbyte)
+	    जर (has_mbyte)
 	    {
 		n = mb_ptr2len(p);
 		c2 = mb_ptr2char(p + n);
@@ -2428,7 +2428,7 @@ suggest_trie_walk(
 		mb_char2bytes(c2, p + tl);
 		p = p + tl;
 	    }
-	    else
+	    अन्यथा
 	    {
 		c = *p;
 		*p = p[2];
@@ -2436,23 +2436,23 @@ suggest_trie_walk(
 		++p;
 	    }
 
-	    if (!soundfold && !spell_iswordp(p, curwin))
+	    जर (!soundfold && !spell_iswordp(p, curwin))
 	    {
 		// Middle char is not a word char, skip the rotate.  First and
 		// third char were already checked at swap and swap3.
 		PROF_STORE(sp->ts_state)
 		sp->ts_state = STATE_REP_INI;
-		break;
+		थांबा;
 	    }
 
 	    // Rotate three characters left: "123" -> "231".  We change
 	    // "fword" here, it's changed back afterwards at STATE_UNROT3L.
-	    if (TRY_DEEPER(su, stack, depth, SCORE_SWAP3))
+	    जर (TRY_DEEPER(su, चळत, depth, SCORE_SWAP3))
 	    {
-		go_deeper(stack, depth, SCORE_SWAP3);
+		go_deeper(चळत, depth, SCORE_SWAP3);
 #ifdef DEBUG_TRIEWALK
 		p = fword + sp->ts_fidx;
-		sprintf(changename[depth], "%.*s-%s: rotate left %c%c%c",
+		प्र_लिखो(changename[depth], "%.*s-%s: rotate left %c%c%c",
 			sp->ts_twordlen, tword, fword + sp->ts_fidx,
 			p[0], p[1], p[2]);
 #endif
@@ -2460,7 +2460,7 @@ suggest_trie_walk(
 		sp->ts_state = STATE_UNROT3L;
 		++depth;
 		p = fword + sp->ts_fidx;
-		if (has_mbyte)
+		जर (has_mbyte)
 		{
 		    n = MB_CPTR2LEN(p);
 		    c = mb_ptr2char(p);
@@ -2468,28 +2468,28 @@ suggest_trie_walk(
 		    fl += MB_CPTR2LEN(p + n + fl);
 		    mch_memmove(p, p + n, fl);
 		    mb_char2bytes(c, p + fl);
-		    stack[depth].ts_fidxtry = sp->ts_fidx + n + fl;
+		    चळत[depth].ts_fidxtry = sp->ts_fidx + n + fl;
 		}
-		else
+		अन्यथा
 		{
 		    c = *p;
 		    *p = p[1];
 		    p[1] = p[2];
 		    p[2] = c;
-		    stack[depth].ts_fidxtry = sp->ts_fidx + 3;
+		    चळत[depth].ts_fidxtry = sp->ts_fidx + 3;
 		}
 	    }
-	    else
+	    अन्यथा
 	    {
 		PROF_STORE(sp->ts_state)
 		sp->ts_state = STATE_REP_INI;
 	    }
-	    break;
+	    थांबा;
 
-	case STATE_UNROT3L:
+	स्थिती STATE_UNROT3L:
 	    // Undo ROT3L: "231" -> "123"
 	    p = fword + sp->ts_fidx;
-	    if (has_mbyte)
+	    जर (has_mbyte)
 	    {
 		n = mb_ptr2len(p);
 		n += mb_ptr2len(p + n);
@@ -2498,7 +2498,7 @@ suggest_trie_walk(
 		mch_memmove(p + tl, p, n);
 		mb_char2bytes(c, p);
 	    }
-	    else
+	    अन्यथा
 	    {
 		c = p[2];
 		p[2] = p[1];
@@ -2508,12 +2508,12 @@ suggest_trie_walk(
 
 	    // Rotate three bytes right: "123" -> "312".  We change "fword"
 	    // here, it's changed back afterwards at STATE_UNROT3R.
-	    if (TRY_DEEPER(su, stack, depth, SCORE_SWAP3))
+	    जर (TRY_DEEPER(su, चळत, depth, SCORE_SWAP3))
 	    {
-		go_deeper(stack, depth, SCORE_SWAP3);
+		go_deeper(चळत, depth, SCORE_SWAP3);
 #ifdef DEBUG_TRIEWALK
 		p = fword + sp->ts_fidx;
-		sprintf(changename[depth], "%.*s-%s: rotate right %c%c%c",
+		प्र_लिखो(changename[depth], "%.*s-%s: rotate right %c%c%c",
 			sp->ts_twordlen, tword, fword + sp->ts_fidx,
 			p[0], p[1], p[2]);
 #endif
@@ -2521,7 +2521,7 @@ suggest_trie_walk(
 		sp->ts_state = STATE_UNROT3R;
 		++depth;
 		p = fword + sp->ts_fidx;
-		if (has_mbyte)
+		जर (has_mbyte)
 		{
 		    n = MB_CPTR2LEN(p);
 		    n += MB_CPTR2LEN(p + n);
@@ -2529,28 +2529,28 @@ suggest_trie_walk(
 		    tl = MB_CPTR2LEN(p + n);
 		    mch_memmove(p + tl, p, n);
 		    mb_char2bytes(c, p);
-		    stack[depth].ts_fidxtry = sp->ts_fidx + n + tl;
+		    चळत[depth].ts_fidxtry = sp->ts_fidx + n + tl;
 		}
-		else
+		अन्यथा
 		{
 		    c = p[2];
 		    p[2] = p[1];
 		    p[1] = *p;
 		    *p = c;
-		    stack[depth].ts_fidxtry = sp->ts_fidx + 3;
+		    चळत[depth].ts_fidxtry = sp->ts_fidx + 3;
 		}
 	    }
-	    else
+	    अन्यथा
 	    {
 		PROF_STORE(sp->ts_state)
 		sp->ts_state = STATE_REP_INI;
 	    }
-	    break;
+	    थांबा;
 
-	case STATE_UNROT3R:
+	स्थिती STATE_UNROT3R:
 	    // Undo ROT3R: "312" -> "123"
 	    p = fword + sp->ts_fidx;
-	    if (has_mbyte)
+	    जर (has_mbyte)
 	    {
 		c = mb_ptr2char(p);
 		tl = mb_ptr2len(p);
@@ -2559,7 +2559,7 @@ suggest_trie_walk(
 		mch_memmove(p, p + tl, n);
 		mb_char2bytes(c, p + n);
 	    }
-	    else
+	    अन्यथा
 	    {
 		c = *p;
 		*p = p[1];
@@ -2568,64 +2568,64 @@ suggest_trie_walk(
 	    }
 	    // FALLTHROUGH
 
-	case STATE_REP_INI:
+	स्थिती STATE_REP_INI:
 	    // Check if matching with REP items from the .aff file would work.
 	    // Quickly skip if:
 	    // - there are no REP items and we are not in the soundfold trie
 	    // - the score is going to be too high anyway
 	    // - already applied a REP item or swapped here
-	    if ((lp->lp_replang == NULL && !soundfold)
+	    जर ((lp->lp_replang == रिक्त && !soundfold)
 		    || sp->ts_score + SCORE_REP >= su->su_maxscore
 		    || sp->ts_fidx < sp->ts_fidxtry)
 	    {
 		PROF_STORE(sp->ts_state)
 		sp->ts_state = STATE_FINAL;
-		break;
+		थांबा;
 	    }
 
 	    // Use the first byte to quickly find the first entry that may
 	    // match.  If the index is -1 there is none.
-	    if (soundfold)
+	    जर (soundfold)
 		sp->ts_curi = slang->sl_repsal_first[fword[sp->ts_fidx]];
-	    else
+	    अन्यथा
 		sp->ts_curi = lp->lp_replang->sl_rep_first[fword[sp->ts_fidx]];
 
-	    if (sp->ts_curi < 0)
+	    जर (sp->ts_curi < 0)
 	    {
 		PROF_STORE(sp->ts_state)
 		sp->ts_state = STATE_FINAL;
-		break;
+		थांबा;
 	    }
 
 	    PROF_STORE(sp->ts_state)
 	    sp->ts_state = STATE_REP;
 	    // FALLTHROUGH
 
-	case STATE_REP:
+	स्थिती STATE_REP:
 	    // Try matching with REP items from the .aff file.  For each match
 	    // replace the characters and check if the resulting word is
 	    // valid.
 	    p = fword + sp->ts_fidx;
 
-	    if (soundfold)
+	    जर (soundfold)
 		gap = &slang->sl_repsal;
-	    else
+	    अन्यथा
 		gap = &lp->lp_replang->sl_rep;
-	    while (sp->ts_curi < gap->ga_len)
+	    पर्यंत (sp->ts_curi < gap->ga_len)
 	    {
 		ftp = (fromto_T *)gap->ga_data + sp->ts_curi++;
-		if (*ftp->ft_from != *p)
+		जर (*ftp->ft_from != *p)
 		{
 		    // past possible matching entries
 		    sp->ts_curi = gap->ga_len;
-		    break;
+		    थांबा;
 		}
-		if (STRNCMP(ftp->ft_from, p, STRLEN(ftp->ft_from)) == 0
-			&& TRY_DEEPER(su, stack, depth, SCORE_REP))
+		जर (STRNCMP(ftp->ft_from, p, STRLEN(ftp->ft_from)) == 0
+			&& TRY_DEEPER(su, चळत, depth, SCORE_REP))
 		{
-		    go_deeper(stack, depth, SCORE_REP);
+		    go_deeper(चळत, depth, SCORE_REP);
 #ifdef DEBUG_TRIEWALK
-		    sprintf(changename[depth], "%.*s-%s: replace %s with %s",
+		    प्र_लिखो(changename[depth], "%.*s-%s: replace %s with %s",
 			    sp->ts_twordlen, tword, fword + sp->ts_fidx,
 			    ftp->ft_from, ftp->ft_to);
 #endif
@@ -2635,40 +2635,40 @@ suggest_trie_walk(
 
 		    // Change the "from" to the "to" string.
 		    ++depth;
-		    fl = (int)STRLEN(ftp->ft_from);
-		    tl = (int)STRLEN(ftp->ft_to);
-		    if (fl != tl)
+		    fl = (पूर्णांक)STRLEN(ftp->ft_from);
+		    tl = (पूर्णांक)STRLEN(ftp->ft_to);
+		    जर (fl != tl)
 		    {
 			STRMOVE(p + tl, p + fl);
 			repextra += tl - fl;
 		    }
 		    mch_memmove(p, ftp->ft_to, tl);
-		    stack[depth].ts_fidxtry = sp->ts_fidx + tl;
-		    stack[depth].ts_tcharlen = 0;
-		    break;
+		    चळत[depth].ts_fidxtry = sp->ts_fidx + tl;
+		    चळत[depth].ts_tcharlen = 0;
+		    थांबा;
 		}
 	    }
 
-	    if (sp->ts_curi >= gap->ga_len && sp->ts_state == STATE_REP)
+	    जर (sp->ts_curi >= gap->ga_len && sp->ts_state == STATE_REP)
 	    {
 		// No (more) matches.
 		PROF_STORE(sp->ts_state)
 		sp->ts_state = STATE_FINAL;
 	    }
 
-	    break;
+	    थांबा;
 
-	case STATE_REP_UNDO:
+	स्थिती STATE_REP_UNDO:
 	    // Undo a REP replacement and continue with the next one.
-	    if (soundfold)
+	    जर (soundfold)
 		gap = &slang->sl_repsal;
-	    else
+	    अन्यथा
 		gap = &lp->lp_replang->sl_rep;
 	    ftp = (fromto_T *)gap->ga_data + sp->ts_curi - 1;
-	    fl = (int)STRLEN(ftp->ft_from);
-	    tl = (int)STRLEN(ftp->ft_to);
+	    fl = (पूर्णांक)STRLEN(ftp->ft_from);
+	    tl = (पूर्णांक)STRLEN(ftp->ft_to);
 	    p = fword + sp->ts_fidx;
-	    if (fl != tl)
+	    जर (fl != tl)
 	    {
 		STRMOVE(p + fl, p + tl);
 		repextra -= tl - fl;
@@ -2676,13 +2676,13 @@ suggest_trie_walk(
 	    mch_memmove(p, ftp->ft_from, fl);
 	    PROF_STORE(sp->ts_state)
 	    sp->ts_state = STATE_REP;
-	    break;
+	    थांबा;
 
-	default:
+	पूर्वनिर्धारित:
 	    // Did all possible states at this level, go up one level.
 	    --depth;
 
-	    if (depth >= 0 && stack[depth].ts_prefixdepth == PFD_PREFIXTREE)
+	    जर (depth >= 0 && चळत[depth].ts_prefixdepth == PFD_PREFIXTREE)
 	    {
 		// Continue in or go back to the prefix tree.
 		byts = pbyts;
@@ -2690,12 +2690,12 @@ suggest_trie_walk(
 	    }
 
 	    // Don't check for CTRL-C too often, it takes time.
-	    if (--breakcheckcount == 0)
+	    जर (--breakcheckcount == 0)
 	    {
 		ui_breakcheck();
 		breakcheckcount = 1000;
 #ifdef FEAT_RELTIME
-		if (spell_suggest_timeout > 0
+		जर (spell_suggest_timeout > 0
 					  && profile_passed_limit(&time_limit))
 		    got_int = TRUE;
 #endif
@@ -2708,14 +2708,14 @@ suggest_trie_walk(
 /*
  * Go one level deeper in the tree.
  */
-    static void
-go_deeper(trystate_T *stack, int depth, int score_add)
+    स्थिर शून्य
+go_deeper(trystate_T *चळत, पूर्णांक depth, पूर्णांक score_add)
 {
-    stack[depth + 1] = stack[depth];
-    stack[depth + 1].ts_state = STATE_START;
-    stack[depth + 1].ts_score = stack[depth].ts_score + score_add;
-    stack[depth + 1].ts_curi = 1;	// start just after length byte
-    stack[depth + 1].ts_flags = 0;
+    चळत[depth + 1] = चळत[depth];
+    चळत[depth + 1].ts_state = STATE_START;
+    चळत[depth + 1].ts_score = चळत[depth].ts_score + score_add;
+    चळत[depth + 1].ts_curi = 1;	// start just after length byte
+    चळत[depth + 1].ts_flags = 0;
 }
 
 /*
@@ -2724,34 +2724,34 @@ go_deeper(trystate_T *stack, int depth, int score_add)
  * Theoretically there could be several keep-case words that result in the
  * same case-folded word, but we only find one...
  */
-    static void
+    स्थिर शून्य
 find_keepcap_word(slang_T *slang, char_u *fword, char_u *kword)
 {
     char_u	uword[MAXWLEN];		// "fword" in upper-case
-    int		depth;
+    पूर्णांक		depth;
     idx_T	tryidx;
 
     // The following arrays are used at each depth in the tree.
     idx_T	arridx[MAXWLEN];
-    int		round[MAXWLEN];
-    int		fwordidx[MAXWLEN];
-    int		uwordidx[MAXWLEN];
-    int		kwordlen[MAXWLEN];
+    पूर्णांक		round[MAXWLEN];
+    पूर्णांक		fwordidx[MAXWLEN];
+    पूर्णांक		uwordidx[MAXWLEN];
+    पूर्णांक		kwordlen[MAXWLEN];
 
-    int		flen, ulen;
-    int		l;
-    int		len;
-    int		c;
+    पूर्णांक		flen, ulen;
+    पूर्णांक		l;
+    पूर्णांक		len;
+    पूर्णांक		c;
     idx_T	lo, hi, m;
     char_u	*p;
     char_u	*byts = slang->sl_kbyts;    // array with bytes of the words
     idx_T	*idxs = slang->sl_kidxs;    // array with indexes
 
-    if (byts == NULL)
+    जर (byts == रिक्त)
     {
 	// array is empty: "cannot happen"
 	*kword = NUL;
-	return;
+	परत;
     }
 
     // Make an all-cap version of "fword".
@@ -2766,89 +2766,89 @@ find_keepcap_word(slang_T *slang, char_u *fword, char_u *kword)
     fwordidx[0] = 0;
     uwordidx[0] = 0;
     kwordlen[0] = 0;
-    while (depth >= 0)
+    पर्यंत (depth >= 0)
     {
-	if (fword[fwordidx[depth]] == NUL)
+	जर (fword[fwordidx[depth]] == NUL)
 	{
 	    // We are at the end of "fword".  If the tree allows a word to end
 	    // here we have found a match.
-	    if (byts[arridx[depth] + 1] == 0)
+	    जर (byts[arridx[depth] + 1] == 0)
 	    {
 		kword[kwordlen[depth]] = NUL;
-		return;
+		परत;
 	    }
 
 	    // kword is getting too long, continue one level up
 	    --depth;
 	}
-	else if (++round[depth] > 2)
+	अन्यथा जर (++round[depth] > 2)
 	{
 	    // tried both fold-case and upper-case character, continue one
 	    // level up
 	    --depth;
 	}
-	else
+	अन्यथा
 	{
 	    // round[depth] == 1: Try using the folded-case character.
 	    // round[depth] == 2: Try using the upper-case character.
-	    if (has_mbyte)
+	    जर (has_mbyte)
 	    {
 		flen = MB_CPTR2LEN(fword + fwordidx[depth]);
 		ulen = MB_CPTR2LEN(uword + uwordidx[depth]);
 	    }
-	    else
+	    अन्यथा
 		ulen = flen = 1;
-	    if (round[depth] == 1)
+	    जर (round[depth] == 1)
 	    {
 		p = fword + fwordidx[depth];
 		l = flen;
 	    }
-	    else
+	    अन्यथा
 	    {
 		p = uword + uwordidx[depth];
 		l = ulen;
 	    }
 
-	    for (tryidx = arridx[depth]; l > 0; --l)
+	    साठी (tryidx = arridx[depth]; l > 0; --l)
 	    {
 		// Perform a binary search in the list of accepted bytes.
 		len = byts[tryidx++];
 		c = *p++;
 		lo = tryidx;
 		hi = tryidx + len - 1;
-		while (lo < hi)
+		पर्यंत (lo < hi)
 		{
 		    m = (lo + hi) / 2;
-		    if (byts[m] > c)
+		    जर (byts[m] > c)
 			hi = m - 1;
-		    else if (byts[m] < c)
+		    अन्यथा जर (byts[m] < c)
 			lo = m + 1;
-		    else
+		    अन्यथा
 		    {
 			lo = hi = m;
-			break;
+			थांबा;
 		    }
 		}
 
 		// Stop if there is no matching byte.
-		if (hi < lo || byts[lo] != c)
-		    break;
+		जर (hi < lo || byts[lo] != c)
+		    थांबा;
 
 		// Continue at the child (if there is one).
 		tryidx = idxs[lo];
 	    }
 
-	    if (l == 0)
+	    जर (l == 0)
 	    {
 		// Found the matching char.  Copy it to "kword" and go a
 		// level deeper.
-		if (round[depth] == 1)
+		जर (round[depth] == 1)
 		{
 		    STRNCPY(kword + kwordlen[depth], fword + fwordidx[depth],
 									flen);
 		    kwordlen[depth + 1] = kwordlen[depth] + flen;
 		}
-		else
+		अन्यथा
 		{
 		    STRNCPY(kword + kwordlen[depth], uword + uwordidx[depth],
 									ulen);
@@ -2872,42 +2872,42 @@ find_keepcap_word(slang_T *slang, char_u *fword, char_u *kword)
  * Compute the sound-a-like score for suggestions in su->su_ga and add them to
  * su->su_sga.
  */
-    static void
+    स्थिर शून्य
 score_comp_sal(suginfo_T *su)
 {
     langp_T	*lp;
     char_u	badsound[MAXWLEN];
-    int		i;
+    पूर्णांक		i;
     suggest_T   *stp;
     suggest_T   *sstp;
-    int		score;
-    int		lpi;
+    पूर्णांक		score;
+    पूर्णांक		lpi;
 
-    if (ga_grow(&su->su_sga, su->su_ga.ga_len) == FAIL)
-	return;
+    जर (ga_grow(&su->su_sga, su->su_ga.ga_len) == FAIL)
+	परत;
 
     // Use the sound-folding of the first language that supports it.
-    for (lpi = 0; lpi < curwin->w_s->b_langp.ga_len; ++lpi)
+    साठी (lpi = 0; lpi < curwin->w_s->b_langp.ga_len; ++lpi)
     {
 	lp = LANGP_ENTRY(curwin->w_s->b_langp, lpi);
-	if (lp->lp_slang->sl_sal.ga_len > 0)
+	जर (lp->lp_slang->sl_sal.ga_len > 0)
 	{
 	    // soundfold the bad word
 	    spell_soundfold(lp->lp_slang, su->su_fbadword, TRUE, badsound);
 
-	    for (i = 0; i < su->su_ga.ga_len; ++i)
+	    साठी (i = 0; i < su->su_ga.ga_len; ++i)
 	    {
 		stp = &SUG(su->su_ga, i);
 
 		// Case-fold the suggested word, sound-fold it and compute the
 		// sound-a-like score.
 		score = stp_sal_score(stp, su, lp->lp_slang, badsound);
-		if (score < SCORE_MAXMAX)
+		जर (score < SCORE_MAXMAX)
 		{
 		    // Add the suggestion.
 		    sstp = &SUG(su->su_sga, su->su_sga.ga_len);
 		    sstp->st_word = vim_strsave(stp->st_word);
-		    if (sstp->st_word != NULL)
+		    जर (sstp->st_word != रिक्त)
 		    {
 			sstp->st_wordlen = stp->st_wordlen;
 			sstp->st_score = score;
@@ -2917,7 +2917,7 @@ score_comp_sal(suginfo_T *su)
 		    }
 		}
 	    }
-	    break;
+	    थांबा;
 	}
     }
 }
@@ -2926,62 +2926,62 @@ score_comp_sal(suginfo_T *su)
  * Combine the list of suggestions in su->su_ga and su->su_sga.
  * They are entwined.
  */
-    static void
+    स्थिर शून्य
 score_combine(suginfo_T *su)
 {
-    int		i;
-    int		j;
+    पूर्णांक		i;
+    पूर्णांक		j;
     garray_T	ga;
     garray_T	*gap;
     langp_T	*lp;
     suggest_T	*stp;
     char_u	*p;
     char_u	badsound[MAXWLEN];
-    int		round;
-    int		lpi;
-    slang_T	*slang = NULL;
+    पूर्णांक		round;
+    पूर्णांक		lpi;
+    slang_T	*slang = रिक्त;
 
     // Add the alternate score to su_ga.
-    for (lpi = 0; lpi < curwin->w_s->b_langp.ga_len; ++lpi)
+    साठी (lpi = 0; lpi < curwin->w_s->b_langp.ga_len; ++lpi)
     {
 	lp = LANGP_ENTRY(curwin->w_s->b_langp, lpi);
-	if (lp->lp_slang->sl_sal.ga_len > 0)
+	जर (lp->lp_slang->sl_sal.ga_len > 0)
 	{
 	    // soundfold the bad word
 	    slang = lp->lp_slang;
 	    spell_soundfold(slang, su->su_fbadword, TRUE, badsound);
 
-	    for (i = 0; i < su->su_ga.ga_len; ++i)
+	    साठी (i = 0; i < su->su_ga.ga_len; ++i)
 	    {
 		stp = &SUG(su->su_ga, i);
 		stp->st_altscore = stp_sal_score(stp, su, slang, badsound);
-		if (stp->st_altscore == SCORE_MAXMAX)
+		जर (stp->st_altscore == SCORE_MAXMAX)
 		    stp->st_score = (stp->st_score * 3 + SCORE_BIG) / 4;
-		else
+		अन्यथा
 		    stp->st_score = (stp->st_score * 3
 						  + stp->st_altscore) / 4;
 		stp->st_salscore = FALSE;
 	    }
-	    break;
+	    थांबा;
 	}
     }
 
-    if (slang == NULL)	// Using "double" without sound folding.
+    जर (slang == रिक्त)	// Using "double" without sound folding.
     {
-	(void)cleanup_suggestions(&su->su_ga, su->su_maxscore,
+	(शून्य)cleanup_suggestions(&su->su_ga, su->su_maxscore,
 							     su->su_maxcount);
-	return;
+	परत;
     }
 
     // Add the alternate score to su_sga.
-    for (i = 0; i < su->su_sga.ga_len; ++i)
+    साठी (i = 0; i < su->su_sga.ga_len; ++i)
     {
 	stp = &SUG(su->su_sga, i);
 	stp->st_altscore = spell_edit_score(slang,
 						su->su_badword, stp->st_word);
-	if (stp->st_score == SCORE_MAXMAX)
+	जर (stp->st_score == SCORE_MAXMAX)
 	    stp->st_score = (SCORE_BIG * 7 + stp->st_altscore) / 8;
-	else
+	अन्यथा
 	    stp->st_score = (stp->st_score * 7 + stp->st_altscore) / 8;
 	stp->st_salscore = TRUE;
     }
@@ -2989,32 +2989,32 @@ score_combine(suginfo_T *su)
     // Remove bad suggestions, sort the suggestions and truncate at "maxcount"
     // for both lists.
     check_suggestions(su, &su->su_ga);
-    (void)cleanup_suggestions(&su->su_ga, su->su_maxscore, su->su_maxcount);
+    (शून्य)cleanup_suggestions(&su->su_ga, su->su_maxscore, su->su_maxcount);
     check_suggestions(su, &su->su_sga);
-    (void)cleanup_suggestions(&su->su_sga, su->su_maxscore, su->su_maxcount);
+    (शून्य)cleanup_suggestions(&su->su_sga, su->su_maxscore, su->su_maxcount);
 
-    ga_init2(&ga, sizeof(suginfo_T), 1);
-    if (ga_grow(&ga, su->su_ga.ga_len + su->su_sga.ga_len) == FAIL)
-	return;
+    ga_init2(&ga, आकार(suginfo_T), 1);
+    जर (ga_grow(&ga, su->su_ga.ga_len + su->su_sga.ga_len) == FAIL)
+	परत;
 
     stp = &SUG(ga, 0);
-    for (i = 0; i < su->su_ga.ga_len || i < su->su_sga.ga_len; ++i)
+    साठी (i = 0; i < su->su_ga.ga_len || i < su->su_sga.ga_len; ++i)
     {
 	// round 1: get a suggestion from su_ga
 	// round 2: get a suggestion from su_sga
-	for (round = 1; round <= 2; ++round)
+	साठी (round = 1; round <= 2; ++round)
 	{
 	    gap = round == 1 ? &su->su_ga : &su->su_sga;
-	    if (i < gap->ga_len)
+	    जर (i < gap->ga_len)
 	    {
 		// Don't add a word if it's already there.
 		p = SUG(*gap, i).st_word;
-		for (j = 0; j < ga.ga_len; ++j)
-		    if (STRCMP(stp[j].st_word, p) == 0)
-			break;
-		if (j == ga.ga_len)
+		साठी (j = 0; j < ga.ga_len; ++j)
+		    जर (STRCMP(stp[j].st_word, p) == 0)
+			थांबा;
+		जर (j == ga.ga_len)
 		    stp[ga.ga_len++] = SUG(*gap, i);
-		else
+		अन्यथा
 		    vim_free(p);
 	    }
 	}
@@ -3024,9 +3024,9 @@ score_combine(suginfo_T *su)
     ga_clear(&su->su_sga);
 
     // Truncate the list to the number of suggestions that will be displayed.
-    if (ga.ga_len > su->su_maxcount)
+    जर (ga.ga_len > su->su_maxcount)
     {
-	for (i = su->su_maxcount; i < ga.ga_len; ++i)
+	साठी (i = su->su_maxcount; i < ga.ga_len; ++i)
 	    vim_free(stp[i].st_word);
 	ga.ga_len = su->su_maxcount;
     }
@@ -3038,7 +3038,7 @@ score_combine(suginfo_T *su)
  * For the goodword in "stp" compute the soundalike score compared to the
  * badword.
  */
-    static int
+    स्थिर पूर्णांक
 stp_sal_score(
     suggest_T	*stp,
     suginfo_T	*su,
@@ -3052,31 +3052,31 @@ stp_sal_score(
     char_u	fword[MAXWLEN];
     char_u	goodsound[MAXWLEN];
     char_u	goodword[MAXWLEN];
-    int		lendiff;
+    पूर्णांक		lendiff;
 
-    lendiff = (int)(su->su_badlen - stp->st_orglen);
-    if (lendiff >= 0)
+    lendiff = (पूर्णांक)(su->su_badlen - stp->st_orglen);
+    जर (lendiff >= 0)
 	pbad = badsound;
-    else
+    अन्यथा
     {
 	// soundfold the bad word with more characters following
-	(void)spell_casefold(curwin,
+	(शून्य)spell_casefold(curwin,
 				su->su_badptr, stp->st_orglen, fword, MAXWLEN);
 
 	// When joining two words the sound often changes a lot.  E.g., "t he"
 	// sounds like "t h" while "the" sounds like "@".  Avoid that by
 	// removing the space.  Don't do it when the good word also contains a
 	// space.
-	if (VIM_ISWHITE(su->su_badptr[su->su_badlen])
+	जर (VIM_ISWHITE(su->su_badptr[su->su_badlen])
 					 && *skiptowhite(stp->st_word) == NUL)
-	    for (p = fword; *(p = skiptowhite(p)) != NUL; )
+	    साठी (p = fword; *(p = skiptowhite(p)) != NUL; )
 		STRMOVE(p, p + 1);
 
 	spell_soundfold(slang, fword, TRUE, badsound2);
 	pbad = badsound2;
     }
 
-    if (lendiff > 0 && stp->st_wordlen + lendiff < MAXWLEN)
+    जर (lendiff > 0 && stp->st_wordlen + lendiff < MAXWLEN)
     {
 	// Add part of the bad word to the good word, so that we soundfold
 	// what replaces the bad word.
@@ -3085,44 +3085,44 @@ stp_sal_score(
 			    su->su_badptr + su->su_badlen - lendiff, lendiff);
 	pgood = goodword;
     }
-    else
+    अन्यथा
 	pgood = stp->st_word;
 
     // Sound-fold the word and compute the score for the difference.
     spell_soundfold(slang, pgood, FALSE, goodsound);
 
-    return soundalike_score(goodsound, pbad);
+    परत soundalike_score(goodsound, pbad);
 }
 
 // structure used to store soundfolded words that add_sound_suggest() has
 // handled already.
-typedef struct
+प्रकारव्याख्या संरचना
 {
-    short	sft_score;	// lowest score used
+    लघु	sft_score;	// lowest score used
     char_u	sft_word[1];    // soundfolded word, actually longer
 } sftword_T;
 
-static sftword_T dumsft;
+स्थिर sftword_T dumsft;
 #define HIKEY2SFT(p)  ((sftword_T *)((p) - (dumsft.sft_word - (char_u *)&dumsft)))
-#define HI2SFT(hi)     HIKEY2SFT((hi)->hi_key)
+#define HI2SFT(hi)     HIKEY2SFT((hi)->hi_किल्ली)
 
 /*
  * Prepare for calling suggest_try_soundalike().
  */
-    static void
-suggest_try_soundalike_prep(void)
+    स्थिर शून्य
+suggest_try_soundalike_prep(शून्य)
 {
     langp_T	*lp;
-    int		lpi;
+    पूर्णांक		lpi;
     slang_T	*slang;
 
     // Do this for all languages that support sound folding and for which a
     // .sug file has been loaded.
-    for (lpi = 0; lpi < curwin->w_s->b_langp.ga_len; ++lpi)
+    साठी (lpi = 0; lpi < curwin->w_s->b_langp.ga_len; ++lpi)
     {
 	lp = LANGP_ENTRY(curwin->w_s->b_langp, lpi);
 	slang = lp->lp_slang;
-	if (slang->sl_sal.ga_len > 0 && slang->sl_sbyts != NULL)
+	जर (slang->sl_sal.ga_len > 0 && slang->sl_sbyts != रिक्त)
 	    // prepare the hashtable used by add_sound_suggest()
 	    hash_init(&slang->sl_sounddone);
     }
@@ -3132,21 +3132,21 @@ suggest_try_soundalike_prep(void)
  * Find suggestions by comparing the word in a sound-a-like form.
  * Note: This doesn't support postponed prefixes.
  */
-    static void
+    स्थिर शून्य
 suggest_try_soundalike(suginfo_T *su)
 {
     char_u	salword[MAXWLEN];
     langp_T	*lp;
-    int		lpi;
+    पूर्णांक		lpi;
     slang_T	*slang;
 
     // Do this for all languages that support sound folding and for which a
     // .sug file has been loaded.
-    for (lpi = 0; lpi < curwin->w_s->b_langp.ga_len; ++lpi)
+    साठी (lpi = 0; lpi < curwin->w_s->b_langp.ga_len; ++lpi)
     {
 	lp = LANGP_ENTRY(curwin->w_s->b_langp, lpi);
 	slang = lp->lp_slang;
-	if (slang->sl_sal.ga_len > 0 && slang->sl_sbyts != NULL)
+	जर (slang->sl_sal.ga_len > 0 && slang->sl_sbyts != रिक्त)
 	{
 	    // soundfold the bad word
 	    spell_soundfold(slang, su->su_fbadword, TRUE, salword);
@@ -3168,27 +3168,27 @@ suggest_try_soundalike(suginfo_T *su)
 /*
  * Finish up after calling suggest_try_soundalike().
  */
-    static void
-suggest_try_soundalike_finish(void)
+    स्थिर शून्य
+suggest_try_soundalike_finish(शून्य)
 {
     langp_T	*lp;
-    int		lpi;
+    पूर्णांक		lpi;
     slang_T	*slang;
-    int		todo;
+    पूर्णांक		todo;
     hashitem_T	*hi;
 
     // Do this for all languages that support sound folding and for which a
     // .sug file has been loaded.
-    for (lpi = 0; lpi < curwin->w_s->b_langp.ga_len; ++lpi)
+    साठी (lpi = 0; lpi < curwin->w_s->b_langp.ga_len; ++lpi)
     {
 	lp = LANGP_ENTRY(curwin->w_s->b_langp, lpi);
 	slang = lp->lp_slang;
-	if (slang->sl_sal.ga_len > 0 && slang->sl_sbyts != NULL)
+	जर (slang->sl_sal.ga_len > 0 && slang->sl_sbyts != रिक्त)
 	{
 	    // Free the info about handled words.
-	    todo = (int)slang->sl_sounddone.ht_used;
-	    FOR_ALL_HASHTAB_ITEMS(&slang->sl_sounddone, hi, todo)
-		if (!HASHITEM_EMPTY(hi))
+	    todo = (पूर्णांक)slang->sl_sounddone.ht_used;
+	    FOR_ALL_HASHTAB_वस्तुसंच(&slang->sl_sounddone, hi, todo)
+		जर (!HASHITEM_EMPTY(hi))
 		{
 		    vim_free(HI2SFT(hi));
 		    --todo;
@@ -3205,31 +3205,31 @@ suggest_try_soundalike_finish(void)
  * A match with a soundfolded word is found.  Add the good word(s) that
  * produce this soundfolded word.
  */
-    static void
+    स्थिर शून्य
 add_sound_suggest(
     suginfo_T	*su,
     char_u	*goodword,
-    int		score,		// soundfold score
+    पूर्णांक		score,		// soundfold score
     langp_T	*lp)
 {
     slang_T	*slang = lp->lp_slang;	// language for sound folding
-    int		sfwordnr;
+    पूर्णांक		sfwordnr;
     char_u	*nrline;
-    int		orgnr;
+    पूर्णांक		orgnr;
     char_u	theword[MAXWLEN];
-    int		i;
-    int		wlen;
+    पूर्णांक		i;
+    पूर्णांक		wlen;
     char_u	*byts;
     idx_T	*idxs;
-    int		n;
-    int		wordcount;
-    int		wc;
-    int		goodscore;
+    पूर्णांक		n;
+    पूर्णांक		wordcount;
+    पूर्णांक		wc;
+    पूर्णांक		goodscore;
     hash_T	hash;
     hashitem_T  *hi;
     sftword_T	*sft;
-    int		bc, gc;
-    int		limit;
+    पूर्णांक		bc, gc;
+    पूर्णांक		limit;
 
     // It's very well possible that the same soundfold word is found several
     // times with different scores.  Since the following is quite slow only do
@@ -3237,36 +3237,36 @@ add_sound_suggest(
     // remember the words that have been done.
     hash = hash_hash(goodword);
     hi = hash_lookup(&slang->sl_sounddone, goodword, hash);
-    if (HASHITEM_EMPTY(hi))
+    जर (HASHITEM_EMPTY(hi))
     {
-	sft = alloc(offsetof(sftword_T, sft_word) + STRLEN(goodword) + 1);
-	if (sft != NULL)
+	sft = alloc(दुरत्व(sftword_T, sft_word) + STRLEN(goodword) + 1);
+	जर (sft != रिक्त)
 	{
 	    sft->sft_score = score;
 	    STRCPY(sft->sft_word, goodword);
 	    hash_add_item(&slang->sl_sounddone, hi, sft->sft_word, hash);
 	}
     }
-    else
+    अन्यथा
     {
 	sft = HI2SFT(hi);
-	if (score >= sft->sft_score)
-	    return;
+	जर (score >= sft->sft_score)
+	    परत;
 	sft->sft_score = score;
     }
 
     // Find the word nr in the soundfold tree.
     sfwordnr = soundfold_find(slang, goodword);
-    if (sfwordnr < 0)
+    जर (sfwordnr < 0)
     {
 	internal_error("add_sound_suggest()");
-	return;
+	परत;
     }
 
     // go over the list of good words that produce this soundfold word
     nrline = ml_get_buf(slang->sl_sugbuf, (linenr_T)(sfwordnr + 1), FALSE);
     orgnr = 0;
-    while (*nrline != NUL)
+    पर्यंत (*nrline != NUL)
     {
 	// The wordnr was stored in a minimal nr of bytes as an offset to the
 	// previous wordnr.
@@ -3278,30 +3278,30 @@ add_sound_suggest(
 	// Lookup the word "orgnr" one of the two tries.
 	n = 0;
 	wordcount = 0;
-	for (wlen = 0; wlen < MAXWLEN - 3; ++wlen)
+	साठी (wlen = 0; wlen < MAXWLEN - 3; ++wlen)
 	{
 	    i = 1;
-	    if (wordcount == orgnr && byts[n + 1] == NUL)
-		break;	// found end of word
+	    जर (wordcount == orgnr && byts[n + 1] == NUL)
+		थांबा;	// found end of word
 
-	    if (byts[n + 1] == NUL)
+	    जर (byts[n + 1] == NUL)
 		++wordcount;
 
 	    // skip over the NUL bytes
-	    for ( ; byts[n + i] == NUL; ++i)
-		if (i > byts[n])	// safety check
+	    साठी ( ; byts[n + i] == NUL; ++i)
+		जर (i > byts[n])	// safety check
 		{
 		    STRCPY(theword + wlen, "BAD");
 		    wlen += 3;
-		    goto badword;
+		    जा badword;
 		}
 
 	    // One of the siblings must have the word.
-	    for ( ; i < byts[n]; ++i)
+	    साठी ( ; i < byts[n]; ++i)
 	    {
 		wc = idxs[idxs[n + i]];	// nr of words under this byte
-		if (wordcount + wc > orgnr)
-		    break;
+		जर (wordcount + wc > orgnr)
+		    थांबा;
 		wordcount += wc;
 	    }
 
@@ -3312,50 +3312,50 @@ badword:
 	theword[wlen] = NUL;
 
 	// Go over the possible flags and regions.
-	for (; i <= byts[n] && byts[n + i] == NUL; ++i)
+	साठी (; i <= byts[n] && byts[n + i] == NUL; ++i)
 	{
 	    char_u	cword[MAXWLEN];
 	    char_u	*p;
-	    int		flags = (int)idxs[n + i];
+	    पूर्णांक		flags = (पूर्णांक)idxs[n + i];
 
 	    // Skip words with the NOSUGGEST flag
-	    if (flags & WF_NOSUGGEST)
-		continue;
+	    जर (flags & WF_NOSUGGEST)
+		सुरूठेवा;
 
-	    if (flags & WF_KEEPCAP)
+	    जर (flags & WF_KEEPCAP)
 	    {
 		// Must find the word in the keep-case tree.
 		find_keepcap_word(slang, theword, cword);
 		p = cword;
 	    }
-	    else
+	    अन्यथा
 	    {
 		flags |= su->su_badflags;
-		if ((flags & WF_CAPMASK) != 0)
+		जर ((flags & WF_CAPMASK) != 0)
 		{
 		    // Need to fix case according to "flags".
 		    make_case_word(theword, cword, flags);
 		    p = cword;
 		}
-		else
+		अन्यथा
 		    p = theword;
 	    }
 
 	    // Add the suggestion.
-	    if (sps_flags & SPS_DOUBLE)
+	    जर (sps_flags & SPS_DOUBLE)
 	    {
 		// Add the suggestion if the score isn't too bad.
-		if (score <= su->su_maxscore)
+		जर (score <= su->su_maxscore)
 		    add_suggestion(su, &su->su_sga, p, su->su_badlen,
 					       score, 0, FALSE, slang, FALSE);
 	    }
-	    else
+	    अन्यथा
 	    {
 		// Add a penalty for words in another region.
-		if ((flags & WF_REGION)
-			    && (((unsigned)flags >> 16) & lp->lp_region) == 0)
+		जर ((flags & WF_REGION)
+			    && (((अचिन्हित)flags >> 16) & lp->lp_region) == 0)
 		    goodscore = SCORE_REGION;
-		else
+		अन्यथा
 		    goodscore = 0;
 
 		// Add a small penalty for changing the first letter from
@@ -3363,10 +3363,10 @@ badword:
 		// less common than "tath" -> "path".  Don't do it when the
 		// letter is the same, that has already been counted.
 		gc = PTR2CHAR(p);
-		if (SPELL_ISUPPER(gc))
+		जर (SPELL_ISUPPER(gc))
 		{
 		    bc = PTR2CHAR(su->su_badword);
-		    if (!SPELL_ISUPPER(bc)
+		    जर (!SPELL_ISUPPER(bc)
 				      && SPELL_TOFOLD(bc) != SPELL_TOFOLD(gc))
 			goodscore += SCORE_ICASE / 2;
 		}
@@ -3379,21 +3379,21 @@ badword:
 		// If the limit is very high then the iterative method is
 		// inefficient, using an array is quicker.
 		limit = MAXSCORE(su->su_sfmaxscore - goodscore, score);
-		if (limit > SCORE_LIMITMAX)
+		जर (limit > SCORE_LIMITMAX)
 		    goodscore += spell_edit_score(slang, su->su_badword, p);
-		else
+		अन्यथा
 		    goodscore += spell_edit_score_limit(slang, su->su_badword,
 								    p, limit);
 
 		// When going over the limit don't bother to do the rest.
-		if (goodscore < SCORE_MAXMAX)
+		जर (goodscore < SCORE_MAXMAX)
 		{
 		    // Give a bonus to words seen before.
 		    goodscore = score_wordcount_adj(slang, goodscore, p, FALSE);
 
 		    // Add the suggestion if the score isn't too bad.
 		    goodscore = RESCORE(goodscore, score);
-		    if (goodscore <= su->su_sfmaxscore)
+		    जर (goodscore <= su->su_sfmaxscore)
 			add_suggestion(su, &su->su_ga, p, su->su_badlen,
 					 goodscore, score, TRUE, slang, TRUE);
 		}
@@ -3406,22 +3406,22 @@ badword:
 /*
  * Find word "word" in fold-case tree for "slang" and return the word number.
  */
-    static int
+    स्थिर पूर्णांक
 soundfold_find(slang_T *slang, char_u *word)
 {
     idx_T	arridx = 0;
-    int		len;
-    int		wlen = 0;
-    int		c;
+    पूर्णांक		len;
+    पूर्णांक		wlen = 0;
+    पूर्णांक		c;
     char_u	*ptr = word;
     char_u	*byts;
     idx_T	*idxs;
-    int		wordnr = 0;
+    पूर्णांक		wordnr = 0;
 
     byts = slang->sl_sbyts;
     idxs = slang->sl_sidxs;
 
-    for (;;)
+    साठी (;;)
     {
 	// First byte is the number of possible bytes.
 	len = byts[arridx++];
@@ -3429,39 +3429,39 @@ soundfold_find(slang_T *slang, char_u *word)
 	// If the first possible byte is a zero the word could end here.
 	// If the word ends we found the word.  If not skip the NUL bytes.
 	c = ptr[wlen];
-	if (byts[arridx] == NUL)
+	जर (byts[arridx] == NUL)
 	{
-	    if (c == NUL)
-		break;
+	    जर (c == NUL)
+		थांबा;
 
 	    // Skip over the zeros, there can be several.
-	    while (len > 0 && byts[arridx] == NUL)
+	    पर्यंत (len > 0 && byts[arridx] == NUL)
 	    {
 		++arridx;
 		--len;
 	    }
-	    if (len == 0)
-		return -1;    // no children, word should have ended here
+	    जर (len == 0)
+		परत -1;    // no children, word should have ended here
 	    ++wordnr;
 	}
 
 	// If the word ends we didn't find it.
-	if (c == NUL)
-	    return -1;
+	जर (c == NUL)
+	    परत -1;
 
 	// Perform a binary search in the list of accepted bytes.
-	if (c == TAB)	    // <Tab> is handled like <Space>
+	जर (c == TAB)	    // <Tab> is handled like <Space>
 	    c = ' ';
-	while (byts[arridx] < c)
+	पर्यंत (byts[arridx] < c)
 	{
 	    // The word count is in the first idxs[] entry of the child.
 	    wordnr += idxs[idxs[arridx]];
 	    ++arridx;
-	    if (--len == 0)	// end of the bytes, didn't find it
-		return -1;
+	    जर (--len == 0)	// end of the bytes, didn't find it
+		परत -1;
 	}
-	if (byts[arridx] != c)	// didn't find the byte
-	    return -1;
+	जर (byts[arridx] != c)	// didn't find the byte
+	    परत -1;
 
 	// Continue at the child (if there is one).
 	arridx = idxs[arridx];
@@ -3469,127 +3469,127 @@ soundfold_find(slang_T *slang, char_u *word)
 
 	// One space in the good word may stand for several spaces in the
 	// checked word.
-	if (c == ' ')
-	    while (ptr[wlen] == ' ' || ptr[wlen] == TAB)
+	जर (c == ' ')
+	    पर्यंत (ptr[wlen] == ' ' || ptr[wlen] == TAB)
 		++wlen;
     }
 
-    return wordnr;
+    परत wordnr;
 }
 
 /*
  * Return TRUE if "c1" and "c2" are similar characters according to the MAP
  * lines in the .aff file.
  */
-    static int
-similar_chars(slang_T *slang, int c1, int c2)
+    स्थिर पूर्णांक
+similar_chars(slang_T *slang, पूर्णांक c1, पूर्णांक c2)
 {
-    int		m1, m2;
+    पूर्णांक		m1, m2;
     char_u	buf[MB_MAXBYTES + 1];
     hashitem_T  *hi;
 
-    if (c1 >= 256)
+    जर (c1 >= 256)
     {
 	buf[mb_char2bytes(c1, buf)] = 0;
 	hi = hash_find(&slang->sl_map_hash, buf);
-	if (HASHITEM_EMPTY(hi))
+	जर (HASHITEM_EMPTY(hi))
 	    m1 = 0;
-	else
-	    m1 = mb_ptr2char(hi->hi_key + STRLEN(hi->hi_key) + 1);
+	अन्यथा
+	    m1 = mb_ptr2char(hi->hi_किल्ली + STRLEN(hi->hi_किल्ली) + 1);
     }
-    else
+    अन्यथा
 	m1 = slang->sl_map_array[c1];
-    if (m1 == 0)
-	return FALSE;
+    जर (m1 == 0)
+	परत FALSE;
 
 
-    if (c2 >= 256)
+    जर (c2 >= 256)
     {
 	buf[mb_char2bytes(c2, buf)] = 0;
 	hi = hash_find(&slang->sl_map_hash, buf);
-	if (HASHITEM_EMPTY(hi))
+	जर (HASHITEM_EMPTY(hi))
 	    m2 = 0;
-	else
-	    m2 = mb_ptr2char(hi->hi_key + STRLEN(hi->hi_key) + 1);
+	अन्यथा
+	    m2 = mb_ptr2char(hi->hi_किल्ली + STRLEN(hi->hi_किल्ली) + 1);
     }
-    else
+    अन्यथा
 	m2 = slang->sl_map_array[c2];
 
-    return m1 == m2;
+    परत m1 == m2;
 }
 
 /*
  * Add a suggestion to the list of suggestions.
  * For a suggestion that is already in the list the lowest score is remembered.
  */
-    static void
+    स्थिर शून्य
 add_suggestion(
     suginfo_T	*su,
     garray_T	*gap,		// either su_ga or su_sga
     char_u	*goodword,
-    int		badlenarg,	// len of bad word replaced with "goodword"
-    int		score,
-    int		altscore,
-    int		had_bonus,	// value for st_had_bonus
+    पूर्णांक		badlenarg,	// len of bad word replaced with "goodword"
+    पूर्णांक		score,
+    पूर्णांक		altscore,
+    पूर्णांक		had_bonus,	// value for st_had_bonus
     slang_T	*slang,		// language for sound folding
-    int		maxsf)		// su_maxscore applies to soundfold score,
+    पूर्णांक		maxsf)		// su_maxscore applies to soundfold score,
 				// su_sfmaxscore to the total score.
 {
-    int		goodlen;	// len of goodword changed
-    int		badlen;		// len of bad word changed
+    पूर्णांक		goodlen;	// len of goodword changed
+    पूर्णांक		badlen;		// len of bad word changed
     suggest_T   *stp;
     suggest_T   new_sug;
-    int		i;
+    पूर्णांक		i;
     char_u	*pgood, *pbad;
 
     // Minimize "badlen" for consistency.  Avoids that changing "the the" to
     // "thee the" is added next to changing the first "the" the "thee".
     pgood = goodword + STRLEN(goodword);
     pbad = su->su_badptr + badlenarg;
-    for (;;)
+    साठी (;;)
     {
-	goodlen = (int)(pgood - goodword);
-	badlen = (int)(pbad - su->su_badptr);
-	if (goodlen <= 0 || badlen <= 0)
-	    break;
+	goodlen = (पूर्णांक)(pgood - goodword);
+	badlen = (पूर्णांक)(pbad - su->su_badptr);
+	जर (goodlen <= 0 || badlen <= 0)
+	    थांबा;
 	MB_PTR_BACK(goodword, pgood);
 	MB_PTR_BACK(su->su_badptr, pbad);
-	if (has_mbyte)
+	जर (has_mbyte)
 	{
-	    if (mb_ptr2char(pgood) != mb_ptr2char(pbad))
-		break;
+	    जर (mb_ptr2char(pgood) != mb_ptr2char(pbad))
+		थांबा;
 	}
-	else if (*pgood != *pbad)
-		break;
+	अन्यथा जर (*pgood != *pbad)
+		थांबा;
     }
 
-    if (badlen == 0 && goodlen == 0)
+    जर (badlen == 0 && goodlen == 0)
 	// goodword doesn't change anything; may happen for "the the" changing
 	// the first "the" to itself.
-	return;
+	परत;
 
-    if (gap->ga_len == 0)
+    जर (gap->ga_len == 0)
 	i = -1;
-    else
+    अन्यथा
     {
 	// Check if the word is already there.  Also check the length that is
 	// being replaced "thes," -> "these" is a different suggestion from
 	// "thes" -> "these".
 	stp = &SUG(*gap, 0);
-	for (i = gap->ga_len; --i >= 0; ++stp)
-	    if (stp->st_wordlen == goodlen
+	साठी (i = gap->ga_len; --i >= 0; ++stp)
+	    जर (stp->st_wordlen == goodlen
 		    && stp->st_orglen == badlen
 		    && STRNCMP(stp->st_word, goodword, goodlen) == 0)
 	    {
 		// Found it.  Remember the word with the lowest score.
-		if (stp->st_slang == NULL)
+		जर (stp->st_slang == रिक्त)
 		    stp->st_slang = slang;
 
 		new_sug.st_score = score;
 		new_sug.st_altscore = altscore;
 		new_sug.st_had_bonus = had_bonus;
 
-		if (stp->st_had_bonus != had_bonus)
+		जर (stp->st_had_bonus != had_bonus)
 		{
 		    // Only one of the two had the soundalike score computed.
 		    // Need to do that for the other one now, otherwise the
@@ -3597,9 +3597,9 @@ add_suggestion(
 		    // suggest_try_change() doesn't compute the soundalike
 		    // word to keep it fast, while some special methods set
 		    // the soundalike score to zero.
-		    if (had_bonus)
+		    जर (had_bonus)
 			rescore_one(su, stp);
-		    else
+		    अन्यथा
 		    {
 			new_sug.st_word = stp->st_word;
 			new_sug.st_wordlen = stp->st_wordlen;
@@ -3609,22 +3609,22 @@ add_suggestion(
 		    }
 		}
 
-		if (stp->st_score > new_sug.st_score)
+		जर (stp->st_score > new_sug.st_score)
 		{
 		    stp->st_score = new_sug.st_score;
 		    stp->st_altscore = new_sug.st_altscore;
 		    stp->st_had_bonus = new_sug.st_had_bonus;
 		}
-		break;
+		थांबा;
 	    }
     }
 
-    if (i < 0 && ga_grow(gap, 1) == OK)
+    जर (i < 0 && ga_grow(gap, 1) == OK)
     {
 	// Add a suggestion.
 	stp = &SUG(*gap, gap->ga_len);
 	stp->st_word = vim_strnsave(goodword, goodlen);
-	if (stp->st_word != NULL)
+	जर (stp->st_word != रिक्त)
 	{
 	    stp->st_wordlen = goodlen;
 	    stp->st_score = score;
@@ -3636,14 +3636,14 @@ add_suggestion(
 
 	    // If we have too many suggestions now, sort the list and keep
 	    // the best suggestions.
-	    if (gap->ga_len > SUG_MAX_COUNT(su))
+	    जर (gap->ga_len > SUG_MAX_मोजणी(su))
 	    {
-		if (maxsf)
+		जर (maxsf)
 		    su->su_sfmaxscore = cleanup_suggestions(gap,
-				      su->su_sfmaxscore, SUG_CLEAN_COUNT(su));
-		else
+				      su->su_sfmaxscore, SUG_CLEAN_मोजणी(su));
+		अन्यथा
 		    su->su_maxscore = cleanup_suggestions(gap,
-					su->su_maxscore, SUG_CLEAN_COUNT(su));
+					su->su_maxscore, SUG_CLEAN_मोजणी(su));
 	    }
 	}
     }
@@ -3653,37 +3653,37 @@ add_suggestion(
  * Suggestions may in fact be flagged as errors.  Esp. for banned words and
  * for split words, such as "the the".  Remove these from the list here.
  */
-    static void
+    स्थिर शून्य
 check_suggestions(
     suginfo_T	*su,
     garray_T	*gap)		    // either su_ga or su_sga
 {
     suggest_T   *stp;
-    int		i;
+    पूर्णांक		i;
     char_u	longword[MAXWLEN + 1];
-    int		len;
+    पूर्णांक		len;
     hlf_T	attr;
 
-    if (gap->ga_len == 0)
-	return;
+    जर (gap->ga_len == 0)
+	परत;
     stp = &SUG(*gap, 0);
-    for (i = gap->ga_len - 1; i >= 0; --i)
+    साठी (i = gap->ga_len - 1; i >= 0; --i)
     {
 	// Need to append what follows to check for "the the".
 	vim_strncpy(longword, stp[i].st_word, MAXWLEN);
 	len = stp[i].st_wordlen;
 	vim_strncpy(longword + len, su->su_badptr + stp[i].st_orglen,
 							       MAXWLEN - len);
-	attr = HLF_COUNT;
-	(void)spell_check(curwin, longword, &attr, NULL, FALSE);
-	if (attr != HLF_COUNT)
+	attr = HLF_मोजणी;
+	(शून्य)spell_check(curwin, longword, &attr, रिक्त, FALSE);
+	जर (attr != HLF_मोजणी)
 	{
 	    // Remove this entry.
 	    vim_free(stp[i].st_word);
 	    --gap->ga_len;
-	    if (i < gap->ga_len)
+	    जर (i < gap->ga_len)
 		mch_memmove(stp + i, stp + i + 1,
-				       sizeof(suggest_T) * (gap->ga_len - i));
+				       आकार(suggest_T) * (gap->ga_len - i));
 	}
     }
 }
@@ -3692,7 +3692,7 @@ check_suggestions(
 /*
  * Add a word to be banned.
  */
-    static void
+    स्थिर शून्य
 add_banned(
     suginfo_T	*su,
     char_u	*word)
@@ -3703,10 +3703,10 @@ add_banned(
 
     hash = hash_hash(word);
     hi = hash_lookup(&su->su_banned, word, hash);
-    if (!HASHITEM_EMPTY(hi))		// already present
-	return;
+    जर (!HASHITEM_EMPTY(hi))		// already present
+	परत;
     s = vim_strsave(word);
-    if (s != NULL)
+    जर (s != रिक्त)
 	hash_add_item(&su->su_banned, hi, s, hash);
 }
 
@@ -3714,20 +3714,20 @@ add_banned(
  * Recompute the score for all suggestions if sound-folding is possible.  This
  * is slow, thus only done for the final results.
  */
-    static void
+    स्थिर शून्य
 rescore_suggestions(suginfo_T *su)
 {
-    int		i;
+    पूर्णांक		i;
 
-    if (su->su_sallang != NULL)
-	for (i = 0; i < su->su_ga.ga_len; ++i)
+    जर (su->su_sallang != रिक्त)
+	साठी (i = 0; i < su->su_ga.ga_len; ++i)
 	    rescore_one(su, &SUG(su->su_ga, i));
 }
 
 /*
  * Recompute the score for one suggestion if sound-folding is possible.
  */
-    static void
+    स्थिर शून्य
 rescore_one(suginfo_T *su, suggest_T *stp)
 {
     slang_T	*slang = stp->st_slang;
@@ -3736,49 +3736,49 @@ rescore_one(suginfo_T *su, suggest_T *stp)
 
     // Only rescore suggestions that have no sal score yet and do have a
     // language.
-    if (slang != NULL && slang->sl_sal.ga_len > 0 && !stp->st_had_bonus)
+    जर (slang != रिक्त && slang->sl_sal.ga_len > 0 && !stp->st_had_bonus)
     {
-	if (slang == su->su_sallang)
+	जर (slang == su->su_sallang)
 	    p = su->su_sal_badword;
-	else
+	अन्यथा
 	{
 	    spell_soundfold(slang, su->su_fbadword, TRUE, sal_badword);
 	    p = sal_badword;
 	}
 
 	stp->st_altscore = stp_sal_score(stp, su, slang, p);
-	if (stp->st_altscore == SCORE_MAXMAX)
+	जर (stp->st_altscore == SCORE_MAXMAX)
 	    stp->st_altscore = SCORE_BIG;
 	stp->st_score = RESCORE(stp->st_score, stp->st_altscore);
 	stp->st_had_bonus = TRUE;
     }
 }
 
-static int sug_compare(const void *s1, const void *s2);
+स्थिर पूर्णांक sug_compare(स्थिरांक शून्य *s1, स्थिरांक शून्य *s2);
 
 /*
  * Function given to qsort() to sort the suggestions on st_score.
  * First on "st_score", then "st_altscore" then alphabetically.
  */
-    static int
-sug_compare(const void *s1, const void *s2)
+    स्थिर पूर्णांक
+sug_compare(स्थिरांक शून्य *s1, स्थिरांक शून्य *s2)
 {
     suggest_T	*p1 = (suggest_T *)s1;
     suggest_T	*p2 = (suggest_T *)s2;
-    int		n;
+    पूर्णांक		n;
 
     n = p1->st_score == p2->st_score ? 0 :
 	p1->st_score > p2->st_score ? 1 : -1;
 
-    if (n == 0)
+    जर (n == 0)
     {
 	n = p1->st_altscore == p2->st_altscore ? 0 :
 	    p1->st_altscore > p2->st_altscore ? 1 : -1;
 
-	if (n == 0)
+	जर (n == 0)
 	    n = STRICMP(p1->st_word, p2->st_word);
     }
-    return n;
+    परत n;
 }
 
 /*
@@ -3787,33 +3787,33 @@ sug_compare(const void *s1, const void *s2)
  * - Remove words that won't be displayed.
  * Returns the maximum score in the list or "maxscore" unmodified.
  */
-    static int
+    स्थिर पूर्णांक
 cleanup_suggestions(
     garray_T	*gap,
-    int		maxscore,
-    int		keep)		// nr of suggestions to keep
+    पूर्णांक		maxscore,
+    पूर्णांक		keep)		// nr of suggestions to keep
 {
-    if (gap->ga_len <= 0)
-	return maxscore;
+    जर (gap->ga_len <= 0)
+	परत maxscore;
 
     // Sort the list.
-    qsort(gap->ga_data, (size_t)gap->ga_len, sizeof(suggest_T),
+    क्विक(gap->ga_data, (माप_प्रकार)gap->ga_len, आकार(suggest_T),
 	    sug_compare);
 
     // Truncate the list to the number of suggestions that will be
     // displayed.
-    if (gap->ga_len > keep)
+    जर (gap->ga_len > keep)
     {
-	int		i;
+	पूर्णांक		i;
 	suggest_T   *stp = &SUG(*gap, 0);
 
-	for (i = keep; i < gap->ga_len; ++i)
+	साठी (i = keep; i < gap->ga_len; ++i)
 	    vim_free(stp[i].st_word);
 	gap->ga_len = keep;
-	if (keep >= 1)
-	    return stp[keep - 1].st_score;
+	जर (keep >= 1)
+	    परत stp[keep - 1].st_score;
     }
-    return maxscore;
+    परत maxscore;
 }
 
 /*
@@ -3822,224 +3822,224 @@ cleanup_suggestions(
  * Instead of a generic loop we write out the code.  That keeps it fast by
  * avoiding checks that will not be possible.
  */
-    static int
+    स्थिर पूर्णांक
 soundalike_score(
     char_u	*goodstart,	// sound-folded good word
     char_u	*badstart)	// sound-folded bad word
 {
     char_u	*goodsound = goodstart;
     char_u	*badsound = badstart;
-    int		goodlen;
-    int		badlen;
-    int		n;
+    पूर्णांक		goodlen;
+    पूर्णांक		badlen;
+    पूर्णांक		n;
     char_u	*pl, *ps;
     char_u	*pl2, *ps2;
-    int		score = 0;
+    पूर्णांक		score = 0;
 
     // Adding/inserting "*" at the start (word starts with vowel) shouldn't be
     // counted so much, vowels halfway the word aren't counted at all.
-    if ((*badsound == '*' || *goodsound == '*') && *badsound != *goodsound)
+    जर ((*badsound == '*' || *goodsound == '*') && *badsound != *goodsound)
     {
-	if ((badsound[0] == NUL && goodsound[1] == NUL)
+	जर ((badsound[0] == NUL && goodsound[1] == NUL)
 	    || (goodsound[0] == NUL && badsound[1] == NUL))
 	    // changing word with vowel to word without a sound
-	    return SCORE_DEL;
-	if (badsound[0] == NUL || goodsound[0] == NUL)
+	    परत SCORE_DEL;
+	जर (badsound[0] == NUL || goodsound[0] == NUL)
 	    // more than two changes
-	    return SCORE_MAXMAX;
+	    परत SCORE_MAXMAX;
 
-	if (badsound[1] == goodsound[1]
+	जर (badsound[1] == goodsound[1]
 		|| (badsound[1] != NUL
 		    && goodsound[1] != NUL
 		    && badsound[2] == goodsound[2]))
 	{
 	    // handle like a substitute
 	}
-	else
+	अन्यथा
 	{
 	    score = 2 * SCORE_DEL / 3;
-	    if (*badsound == '*')
+	    जर (*badsound == '*')
 		++badsound;
-	    else
+	    अन्यथा
 		++goodsound;
 	}
     }
 
-    goodlen = (int)STRLEN(goodsound);
-    badlen = (int)STRLEN(badsound);
+    goodlen = (पूर्णांक)STRLEN(goodsound);
+    badlen = (पूर्णांक)STRLEN(badsound);
 
     // Return quickly if the lengths are too different to be fixed by two
     // changes.
     n = goodlen - badlen;
-    if (n < -2 || n > 2)
-	return SCORE_MAXMAX;
+    जर (n < -2 || n > 2)
+	परत SCORE_MAXMAX;
 
-    if (n > 0)
+    जर (n > 0)
     {
 	pl = goodsound;	    // goodsound is longest
 	ps = badsound;
     }
-    else
+    अन्यथा
     {
 	pl = badsound;	    // badsound is longest
 	ps = goodsound;
     }
 
     // Skip over the identical part.
-    while (*pl == *ps && *pl != NUL)
+    पर्यंत (*pl == *ps && *pl != NUL)
     {
 	++pl;
 	++ps;
     }
 
-    switch (n)
+    निवड (n)
     {
-	case -2:
-	case 2:
+	स्थिती -2:
+	स्थिती 2:
 	    // Must delete two characters from "pl".
 	    ++pl;	// first delete
-	    while (*pl == *ps)
+	    पर्यंत (*pl == *ps)
 	    {
 		++pl;
 		++ps;
 	    }
 	    // strings must be equal after second delete
-	    if (STRCMP(pl + 1, ps) == 0)
-		return score + SCORE_DEL * 2;
+	    जर (STRCMP(pl + 1, ps) == 0)
+		परत score + SCORE_DEL * 2;
 
 	    // Failed to compare.
-	    break;
+	    थांबा;
 
-	case -1:
-	case 1:
+	स्थिती -1:
+	स्थिती 1:
 	    // Minimal one delete from "pl" required.
 
 	    // 1: delete
 	    pl2 = pl + 1;
 	    ps2 = ps;
-	    while (*pl2 == *ps2)
+	    पर्यंत (*pl2 == *ps2)
 	    {
-		if (*pl2 == NUL)	// reached the end
-		    return score + SCORE_DEL;
+		जर (*pl2 == NUL)	// reached the end
+		    परत score + SCORE_DEL;
 		++pl2;
 		++ps2;
 	    }
 
 	    // 2: delete then swap, then rest must be equal
-	    if (pl2[0] == ps2[1] && pl2[1] == ps2[0]
+	    जर (pl2[0] == ps2[1] && pl2[1] == ps2[0]
 					     && STRCMP(pl2 + 2, ps2 + 2) == 0)
-		return score + SCORE_DEL + SCORE_SWAP;
+		परत score + SCORE_DEL + SCORE_SWAP;
 
 	    // 3: delete then substitute, then the rest must be equal
-	    if (STRCMP(pl2 + 1, ps2 + 1) == 0)
-		return score + SCORE_DEL + SCORE_SUBST;
+	    जर (STRCMP(pl2 + 1, ps2 + 1) == 0)
+		परत score + SCORE_DEL + SCORE_SUBST;
 
 	    // 4: first swap then delete
-	    if (pl[0] == ps[1] && pl[1] == ps[0])
+	    जर (pl[0] == ps[1] && pl[1] == ps[0])
 	    {
 		pl2 = pl + 2;	    // swap, skip two chars
 		ps2 = ps + 2;
-		while (*pl2 == *ps2)
+		पर्यंत (*pl2 == *ps2)
 		{
 		    ++pl2;
 		    ++ps2;
 		}
 		// delete a char and then strings must be equal
-		if (STRCMP(pl2 + 1, ps2) == 0)
-		    return score + SCORE_SWAP + SCORE_DEL;
+		जर (STRCMP(pl2 + 1, ps2) == 0)
+		    परत score + SCORE_SWAP + SCORE_DEL;
 	    }
 
 	    // 5: first substitute then delete
 	    pl2 = pl + 1;	    // substitute, skip one char
 	    ps2 = ps + 1;
-	    while (*pl2 == *ps2)
+	    पर्यंत (*pl2 == *ps2)
 	    {
 		++pl2;
 		++ps2;
 	    }
 	    // delete a char and then strings must be equal
-	    if (STRCMP(pl2 + 1, ps2) == 0)
-		return score + SCORE_SUBST + SCORE_DEL;
+	    जर (STRCMP(pl2 + 1, ps2) == 0)
+		परत score + SCORE_SUBST + SCORE_DEL;
 
 	    // Failed to compare.
-	    break;
+	    थांबा;
 
-	case 0:
+	स्थिती 0:
 	    // Lengths are equal, thus changes must result in same length: An
 	    // insert is only possible in combination with a delete.
 	    // 1: check if for identical strings
-	    if (*pl == NUL)
-		return score;
+	    जर (*pl == NUL)
+		परत score;
 
 	    // 2: swap
-	    if (pl[0] == ps[1] && pl[1] == ps[0])
+	    जर (pl[0] == ps[1] && pl[1] == ps[0])
 	    {
 		pl2 = pl + 2;	    // swap, skip two chars
 		ps2 = ps + 2;
-		while (*pl2 == *ps2)
+		पर्यंत (*pl2 == *ps2)
 		{
-		    if (*pl2 == NUL)	// reached the end
-			return score + SCORE_SWAP;
+		    जर (*pl2 == NUL)	// reached the end
+			परत score + SCORE_SWAP;
 		    ++pl2;
 		    ++ps2;
 		}
 		// 3: swap and swap again
-		if (pl2[0] == ps2[1] && pl2[1] == ps2[0]
+		जर (pl2[0] == ps2[1] && pl2[1] == ps2[0]
 					     && STRCMP(pl2 + 2, ps2 + 2) == 0)
-		    return score + SCORE_SWAP + SCORE_SWAP;
+		    परत score + SCORE_SWAP + SCORE_SWAP;
 
 		// 4: swap and substitute
-		if (STRCMP(pl2 + 1, ps2 + 1) == 0)
-		    return score + SCORE_SWAP + SCORE_SUBST;
+		जर (STRCMP(pl2 + 1, ps2 + 1) == 0)
+		    परत score + SCORE_SWAP + SCORE_SUBST;
 	    }
 
 	    // 5: substitute
 	    pl2 = pl + 1;
 	    ps2 = ps + 1;
-	    while (*pl2 == *ps2)
+	    पर्यंत (*pl2 == *ps2)
 	    {
-		if (*pl2 == NUL)	// reached the end
-		    return score + SCORE_SUBST;
+		जर (*pl2 == NUL)	// reached the end
+		    परत score + SCORE_SUBST;
 		++pl2;
 		++ps2;
 	    }
 
 	    // 6: substitute and swap
-	    if (pl2[0] == ps2[1] && pl2[1] == ps2[0]
+	    जर (pl2[0] == ps2[1] && pl2[1] == ps2[0]
 					     && STRCMP(pl2 + 2, ps2 + 2) == 0)
-		return score + SCORE_SUBST + SCORE_SWAP;
+		परत score + SCORE_SUBST + SCORE_SWAP;
 
 	    // 7: substitute and substitute
-	    if (STRCMP(pl2 + 1, ps2 + 1) == 0)
-		return score + SCORE_SUBST + SCORE_SUBST;
+	    जर (STRCMP(pl2 + 1, ps2 + 1) == 0)
+		परत score + SCORE_SUBST + SCORE_SUBST;
 
 	    // 8: insert then delete
 	    pl2 = pl;
 	    ps2 = ps + 1;
-	    while (*pl2 == *ps2)
+	    पर्यंत (*pl2 == *ps2)
 	    {
 		++pl2;
 		++ps2;
 	    }
-	    if (STRCMP(pl2 + 1, ps2) == 0)
-		return score + SCORE_INS + SCORE_DEL;
+	    जर (STRCMP(pl2 + 1, ps2) == 0)
+		परत score + SCORE_INS + SCORE_DEL;
 
 	    // 9: delete then insert
 	    pl2 = pl + 1;
 	    ps2 = ps;
-	    while (*pl2 == *ps2)
+	    पर्यंत (*pl2 == *ps2)
 	    {
 		++pl2;
 		++ps2;
 	    }
-	    if (STRCMP(pl2, ps2 + 1) == 0)
-		return score + SCORE_INS + SCORE_DEL;
+	    जर (STRCMP(pl2, ps2 + 1) == 0)
+		परत score + SCORE_INS + SCORE_DEL;
 
 	    // Failed to compare.
-	    break;
+	    थांबा;
     }
 
-    return SCORE_MAXMAX;
+    परत SCORE_MAXMAX;
 }
 
 /*
@@ -4051,106 +4051,106 @@ soundalike_score(
  * edit_distance().  It has been converted from C++ to C and modified to
  * support multi-byte characters.
  */
-    static int
+    स्थिर पूर्णांक
 spell_edit_score(
     slang_T	*slang,
     char_u	*badword,
     char_u	*goodword)
 {
-    int		*cnt;
-    int		badlen, goodlen;	// lengths including NUL
-    int		j, i;
-    int		t;
-    int		bc, gc;
-    int		pbc, pgc;
+    पूर्णांक		*cnt;
+    पूर्णांक		badlen, goodlen;	// lengths including NUL
+    पूर्णांक		j, i;
+    पूर्णांक		t;
+    पूर्णांक		bc, gc;
+    पूर्णांक		pbc, pgc;
     char_u	*p;
-    int		wbadword[MAXWLEN];
-    int		wgoodword[MAXWLEN];
+    पूर्णांक		wbadword[MAXWLEN];
+    पूर्णांक		wgoodword[MAXWLEN];
 
-    if (has_mbyte)
+    जर (has_mbyte)
     {
 	// Get the characters from the multi-byte strings and put them in an
 	// int array for easy access.
-	for (p = badword, badlen = 0; *p != NUL; )
+	साठी (p = badword, badlen = 0; *p != NUL; )
 	    wbadword[badlen++] = mb_cptr2char_adv(&p);
 	wbadword[badlen++] = 0;
-	for (p = goodword, goodlen = 0; *p != NUL; )
+	साठी (p = goodword, goodlen = 0; *p != NUL; )
 	    wgoodword[goodlen++] = mb_cptr2char_adv(&p);
 	wgoodword[goodlen++] = 0;
     }
-    else
+    अन्यथा
     {
-	badlen = (int)STRLEN(badword) + 1;
-	goodlen = (int)STRLEN(goodword) + 1;
+	badlen = (पूर्णांक)STRLEN(badword) + 1;
+	goodlen = (पूर्णांक)STRLEN(goodword) + 1;
     }
 
     // We use "cnt" as an array: CNT(badword_idx, goodword_idx).
 #define CNT(a, b)   cnt[(a) + (b) * (badlen + 1)]
-    cnt = ALLOC_MULT(int, (badlen + 1) * (goodlen + 1));
-    if (cnt == NULL)
-	return 0;	// out of memory
+    cnt = ALLOC_MULT(पूर्णांक, (badlen + 1) * (goodlen + 1));
+    जर (cnt == रिक्त)
+	परत 0;	// out of memory
 
     CNT(0, 0) = 0;
-    for (j = 1; j <= goodlen; ++j)
+    साठी (j = 1; j <= goodlen; ++j)
 	CNT(0, j) = CNT(0, j - 1) + SCORE_INS;
 
-    for (i = 1; i <= badlen; ++i)
+    साठी (i = 1; i <= badlen; ++i)
     {
 	CNT(i, 0) = CNT(i - 1, 0) + SCORE_DEL;
-	for (j = 1; j <= goodlen; ++j)
+	साठी (j = 1; j <= goodlen; ++j)
 	{
-	    if (has_mbyte)
+	    जर (has_mbyte)
 	    {
 		bc = wbadword[i - 1];
 		gc = wgoodword[j - 1];
 	    }
-	    else
+	    अन्यथा
 	    {
 		bc = badword[i - 1];
 		gc = goodword[j - 1];
 	    }
-	    if (bc == gc)
+	    जर (bc == gc)
 		CNT(i, j) = CNT(i - 1, j - 1);
-	    else
+	    अन्यथा
 	    {
 		// Use a better score when there is only a case difference.
-		if (SPELL_TOFOLD(bc) == SPELL_TOFOLD(gc))
+		जर (SPELL_TOFOLD(bc) == SPELL_TOFOLD(gc))
 		    CNT(i, j) = SCORE_ICASE + CNT(i - 1, j - 1);
-		else
+		अन्यथा
 		{
 		    // For a similar character use SCORE_SIMILAR.
-		    if (slang != NULL
+		    जर (slang != रिक्त
 			    && slang->sl_has_map
 			    && similar_chars(slang, gc, bc))
 			CNT(i, j) = SCORE_SIMILAR + CNT(i - 1, j - 1);
-		    else
+		    अन्यथा
 			CNT(i, j) = SCORE_SUBST + CNT(i - 1, j - 1);
 		}
 
-		if (i > 1 && j > 1)
+		जर (i > 1 && j > 1)
 		{
-		    if (has_mbyte)
+		    जर (has_mbyte)
 		    {
 			pbc = wbadword[i - 2];
 			pgc = wgoodword[j - 2];
 		    }
-		    else
+		    अन्यथा
 		    {
 			pbc = badword[i - 2];
 			pgc = goodword[j - 2];
 		    }
-		    if (bc == pgc && pbc == gc)
+		    जर (bc == pgc && pbc == gc)
 		    {
 			t = SCORE_SWAP + CNT(i - 2, j - 2);
-			if (t < CNT(i, j))
+			जर (t < CNT(i, j))
 			    CNT(i, j) = t;
 		    }
 		}
 		t = SCORE_DEL + CNT(i - 1, j);
-		if (t < CNT(i, j))
+		जर (t < CNT(i, j))
 		    CNT(i, j) = t;
 		t = SCORE_INS + CNT(i, j - 1);
-		if (t < CNT(i, j))
+		जर (t < CNT(i, j))
 		    CNT(i, j) = t;
 	    }
 	}
@@ -4158,14 +4158,14 @@ spell_edit_score(
 
     i = CNT(badlen - 1, goodlen - 1);
     vim_free(cnt);
-    return i;
+    परत i;
 }
 
-typedef struct
+प्रकारव्याख्या संरचना
 {
-    int		badi;
-    int		goodi;
-    int		score;
+    पूर्णांक		badi;
+    पूर्णांक		goodi;
+    पूर्णांक		score;
 } limitscore_T;
 
 /*
@@ -4176,27 +4176,27 @@ typedef struct
  * The idea comes from Aspell leditdist.cpp.  Rewritten in C and added support
  * for multi-byte characters.
  */
-    static int
+    स्थिर पूर्णांक
 spell_edit_score_limit(
     slang_T	*slang,
     char_u	*badword,
     char_u	*goodword,
-    int		limit)
+    पूर्णांक		limit)
 {
-    limitscore_T    stack[10];		// allow for over 3 * 2 edits
-    int		    stackidx;
-    int		    bi, gi;
-    int		    bi2, gi2;
-    int		    bc, gc;
-    int		    score;
-    int		    score_off;
-    int		    minscore;
-    int		    round;
+    limitscore_T    चळत[10];		// allow for over 3 * 2 edits
+    पूर्णांक		    stackidx;
+    पूर्णांक		    bi, gi;
+    पूर्णांक		    bi2, gi2;
+    पूर्णांक		    bc, gc;
+    पूर्णांक		    score;
+    पूर्णांक		    score_off;
+    पूर्णांक		    minscore;
+    पूर्णांक		    round;
 
     // Multi-byte characters require a bit more work, use a different function
     // to avoid testing "has_mbyte" quite often.
-    if (has_mbyte)
-	return spell_edit_score_limit_w(slang, badword, goodword, limit);
+    जर (has_mbyte)
+	परत spell_edit_score_limit_w(slang, badword, goodword, limit);
 
     // The idea is to go from start to end over the words.  So long as
     // characters are equal just continue, this always gives the lowest score.
@@ -4211,174 +4211,174 @@ spell_edit_score_limit(
     score = 0;
     minscore = limit + 1;
 
-    for (;;)
+    साठी (;;)
     {
 	// Skip over an equal part, score remains the same.
-	for (;;)
+	साठी (;;)
 	{
 	    bc = badword[bi];
 	    gc = goodword[gi];
-	    if (bc != gc)	// stop at a char that's different
-		break;
-	    if (bc == NUL)	// both words end
+	    जर (bc != gc)	// stop at a char that's different
+		थांबा;
+	    जर (bc == NUL)	// both words end
 	    {
-		if (score < minscore)
+		जर (score < minscore)
 		    minscore = score;
-		goto pop;	// do next alternative
+		जा काढा;	// do next alternative
 	    }
 	    ++bi;
 	    ++gi;
 	}
 
-	if (gc == NUL)    // goodword ends, delete badword chars
+	जर (gc == NUL)    // goodword ends, delete badword chars
 	{
-	    do
+	    करा
 	    {
-		if ((score += SCORE_DEL) >= minscore)
-		    goto pop;	    // do next alternative
-	    } while (badword[++bi] != NUL);
+		जर ((score += SCORE_DEL) >= minscore)
+		    जा काढा;	    // do next alternative
+	    } पर्यंत (badword[++bi] != NUL);
 	    minscore = score;
 	}
-	else if (bc == NUL) // badword ends, insert badword chars
+	अन्यथा जर (bc == NUL) // badword ends, insert badword chars
 	{
-	    do
+	    करा
 	    {
-		if ((score += SCORE_INS) >= minscore)
-		    goto pop;	    // do next alternative
-	    } while (goodword[++gi] != NUL);
+		जर ((score += SCORE_INS) >= minscore)
+		    जा काढा;	    // do next alternative
+	    } पर्यंत (goodword[++gi] != NUL);
 	    minscore = score;
 	}
-	else			// both words continue
+	अन्यथा			// both words continue
 	{
 	    // If not close to the limit, perform a change.  Only try changes
 	    // that may lead to a lower score than "minscore".
 	    // round 0: try deleting a char from badword
 	    // round 1: try inserting a char in badword
-	    for (round = 0; round <= 1; ++round)
+	    साठी (round = 0; round <= 1; ++round)
 	    {
 		score_off = score + (round == 0 ? SCORE_DEL : SCORE_INS);
-		if (score_off < minscore)
+		जर (score_off < minscore)
 		{
-		    if (score_off + SCORE_EDIT_MIN >= minscore)
+		    जर (score_off + SCORE_EDIT_MIN >= minscore)
 		    {
 			// Near the limit, rest of the words must match.  We
 			// can check that right now, no need to push an item
 			// onto the stack.
 			bi2 = bi + 1 - round;
 			gi2 = gi + round;
-			while (goodword[gi2] == badword[bi2])
+			पर्यंत (goodword[gi2] == badword[bi2])
 			{
-			    if (goodword[gi2] == NUL)
+			    जर (goodword[gi2] == NUL)
 			    {
 				minscore = score_off;
-				break;
+				थांबा;
 			    }
 			    ++bi2;
 			    ++gi2;
 			}
 		    }
-		    else
+		    अन्यथा
 		    {
 			// try deleting/inserting a character later
-			stack[stackidx].badi = bi + 1 - round;
-			stack[stackidx].goodi = gi + round;
-			stack[stackidx].score = score_off;
+			चळत[stackidx].badi = bi + 1 - round;
+			चळत[stackidx].goodi = gi + round;
+			चळत[stackidx].score = score_off;
 			++stackidx;
 		    }
 		}
 	    }
 
-	    if (score + SCORE_SWAP < minscore)
+	    जर (score + SCORE_SWAP < minscore)
 	    {
 		// If swapping two characters makes a match then the
 		// substitution is more expensive, thus there is no need to
 		// try both.
-		if (gc == badword[bi + 1] && bc == goodword[gi + 1])
+		जर (gc == badword[bi + 1] && bc == goodword[gi + 1])
 		{
 		    // Swap two characters, that is: skip them.
 		    gi += 2;
 		    bi += 2;
 		    score += SCORE_SWAP;
-		    continue;
+		    सुरूठेवा;
 		}
 	    }
 
 	    // Substitute one character for another which is the same
 	    // thing as deleting a character from both goodword and badword.
 	    // Use a better score when there is only a case difference.
-	    if (SPELL_TOFOLD(bc) == SPELL_TOFOLD(gc))
+	    जर (SPELL_TOFOLD(bc) == SPELL_TOFOLD(gc))
 		score += SCORE_ICASE;
-	    else
+	    अन्यथा
 	    {
 		// For a similar character use SCORE_SIMILAR.
-		if (slang != NULL
+		जर (slang != रिक्त
 			&& slang->sl_has_map
 			&& similar_chars(slang, gc, bc))
 		    score += SCORE_SIMILAR;
-		else
+		अन्यथा
 		    score += SCORE_SUBST;
 	    }
 
-	    if (score < minscore)
+	    जर (score < minscore)
 	    {
 		// Do the substitution.
 		++gi;
 		++bi;
-		continue;
+		सुरूठेवा;
 	    }
 	}
-pop:
+काढा:
 	// Get here to try the next alternative, pop it from the stack.
-	if (stackidx == 0)		// stack is empty, finished
-	    break;
+	जर (stackidx == 0)		// stack is empty, finished
+	    थांबा;
 
 	// pop an item from the stack
 	--stackidx;
-	gi = stack[stackidx].goodi;
-	bi = stack[stackidx].badi;
-	score = stack[stackidx].score;
+	gi = चळत[stackidx].goodi;
+	bi = चळत[stackidx].badi;
+	score = चळत[stackidx].score;
     }
 
     // When the score goes over "limit" it may actually be much higher.
     // Return a very large number to avoid going below the limit when giving a
     // bonus.
-    if (minscore > limit)
-	return SCORE_MAXMAX;
-    return minscore;
+    जर (minscore > limit)
+	परत SCORE_MAXMAX;
+    परत minscore;
 }
 
 /*
  * Multi-byte version of spell_edit_score_limit().
  * Keep it in sync with the above!
  */
-    static int
+    स्थिर पूर्णांक
 spell_edit_score_limit_w(
     slang_T	*slang,
     char_u	*badword,
     char_u	*goodword,
-    int		limit)
+    पूर्णांक		limit)
 {
-    limitscore_T    stack[10];		// allow for over 3 * 2 edits
-    int		    stackidx;
-    int		    bi, gi;
-    int		    bi2, gi2;
-    int		    bc, gc;
-    int		    score;
-    int		    score_off;
-    int		    minscore;
-    int		    round;
+    limitscore_T    चळत[10];		// allow for over 3 * 2 edits
+    पूर्णांक		    stackidx;
+    पूर्णांक		    bi, gi;
+    पूर्णांक		    bi2, gi2;
+    पूर्णांक		    bc, gc;
+    पूर्णांक		    score;
+    पूर्णांक		    score_off;
+    पूर्णांक		    minscore;
+    पूर्णांक		    round;
     char_u	    *p;
-    int		    wbadword[MAXWLEN];
-    int		    wgoodword[MAXWLEN];
+    पूर्णांक		    wbadword[MAXWLEN];
+    पूर्णांक		    wgoodword[MAXWLEN];
 
     // Get the characters from the multi-byte strings and put them in an
     // int array for easy access.
     bi = 0;
-    for (p = badword; *p != NUL; )
+    साठी (p = badword; *p != NUL; )
 	wbadword[bi++] = mb_cptr2char_adv(&p);
     wbadword[bi++] = 0;
     gi = 0;
-    for (p = goodword; *p != NUL; )
+    साठी (p = goodword; *p != NUL; )
 	wgoodword[gi++] = mb_cptr2char_adv(&p);
     wgoodword[gi++] = 0;
 
@@ -4395,140 +4395,140 @@ spell_edit_score_limit_w(
     score = 0;
     minscore = limit + 1;
 
-    for (;;)
+    साठी (;;)
     {
 	// Skip over an equal part, score remains the same.
-	for (;;)
+	साठी (;;)
 	{
 	    bc = wbadword[bi];
 	    gc = wgoodword[gi];
 
-	    if (bc != gc)	// stop at a char that's different
-		break;
-	    if (bc == NUL)	// both words end
+	    जर (bc != gc)	// stop at a char that's different
+		थांबा;
+	    जर (bc == NUL)	// both words end
 	    {
-		if (score < minscore)
+		जर (score < minscore)
 		    minscore = score;
-		goto pop;	// do next alternative
+		जा काढा;	// do next alternative
 	    }
 	    ++bi;
 	    ++gi;
 	}
 
-	if (gc == NUL)    // goodword ends, delete badword chars
+	जर (gc == NUL)    // goodword ends, delete badword chars
 	{
-	    do
+	    करा
 	    {
-		if ((score += SCORE_DEL) >= minscore)
-		    goto pop;	    // do next alternative
-	    } while (wbadword[++bi] != NUL);
+		जर ((score += SCORE_DEL) >= minscore)
+		    जा काढा;	    // do next alternative
+	    } पर्यंत (wbadword[++bi] != NUL);
 	    minscore = score;
 	}
-	else if (bc == NUL) // badword ends, insert badword chars
+	अन्यथा जर (bc == NUL) // badword ends, insert badword chars
 	{
-	    do
+	    करा
 	    {
-		if ((score += SCORE_INS) >= minscore)
-		    goto pop;	    // do next alternative
-	    } while (wgoodword[++gi] != NUL);
+		जर ((score += SCORE_INS) >= minscore)
+		    जा काढा;	    // do next alternative
+	    } पर्यंत (wgoodword[++gi] != NUL);
 	    minscore = score;
 	}
-	else			// both words continue
+	अन्यथा			// both words continue
 	{
 	    // If not close to the limit, perform a change.  Only try changes
 	    // that may lead to a lower score than "minscore".
 	    // round 0: try deleting a char from badword
 	    // round 1: try inserting a char in badword
-	    for (round = 0; round <= 1; ++round)
+	    साठी (round = 0; round <= 1; ++round)
 	    {
 		score_off = score + (round == 0 ? SCORE_DEL : SCORE_INS);
-		if (score_off < minscore)
+		जर (score_off < minscore)
 		{
-		    if (score_off + SCORE_EDIT_MIN >= minscore)
+		    जर (score_off + SCORE_EDIT_MIN >= minscore)
 		    {
 			// Near the limit, rest of the words must match.  We
 			// can check that right now, no need to push an item
 			// onto the stack.
 			bi2 = bi + 1 - round;
 			gi2 = gi + round;
-			while (wgoodword[gi2] == wbadword[bi2])
+			पर्यंत (wgoodword[gi2] == wbadword[bi2])
 			{
-			    if (wgoodword[gi2] == NUL)
+			    जर (wgoodword[gi2] == NUL)
 			    {
 				minscore = score_off;
-				break;
+				थांबा;
 			    }
 			    ++bi2;
 			    ++gi2;
 			}
 		    }
-		    else
+		    अन्यथा
 		    {
 			// try deleting a character from badword later
-			stack[stackidx].badi = bi + 1 - round;
-			stack[stackidx].goodi = gi + round;
-			stack[stackidx].score = score_off;
+			चळत[stackidx].badi = bi + 1 - round;
+			चळत[stackidx].goodi = gi + round;
+			चळत[stackidx].score = score_off;
 			++stackidx;
 		    }
 		}
 	    }
 
-	    if (score + SCORE_SWAP < minscore)
+	    जर (score + SCORE_SWAP < minscore)
 	    {
 		// If swapping two characters makes a match then the
 		// substitution is more expensive, thus there is no need to
 		// try both.
-		if (gc == wbadword[bi + 1] && bc == wgoodword[gi + 1])
+		जर (gc == wbadword[bi + 1] && bc == wgoodword[gi + 1])
 		{
 		    // Swap two characters, that is: skip them.
 		    gi += 2;
 		    bi += 2;
 		    score += SCORE_SWAP;
-		    continue;
+		    सुरूठेवा;
 		}
 	    }
 
 	    // Substitute one character for another which is the same
 	    // thing as deleting a character from both goodword and badword.
 	    // Use a better score when there is only a case difference.
-	    if (SPELL_TOFOLD(bc) == SPELL_TOFOLD(gc))
+	    जर (SPELL_TOFOLD(bc) == SPELL_TOFOLD(gc))
 		score += SCORE_ICASE;
-	    else
+	    अन्यथा
 	    {
 		// For a similar character use SCORE_SIMILAR.
-		if (slang != NULL
+		जर (slang != रिक्त
 			&& slang->sl_has_map
 			&& similar_chars(slang, gc, bc))
 		    score += SCORE_SIMILAR;
-		else
+		अन्यथा
 		    score += SCORE_SUBST;
 	    }
 
-	    if (score < minscore)
+	    जर (score < minscore)
 	    {
 		// Do the substitution.
 		++gi;
 		++bi;
-		continue;
+		सुरूठेवा;
 	    }
 	}
-pop:
+काढा:
 	// Get here to try the next alternative, pop it from the stack.
-	if (stackidx == 0)		// stack is empty, finished
-	    break;
+	जर (stackidx == 0)		// stack is empty, finished
+	    थांबा;
 
 	// pop an item from the stack
 	--stackidx;
-	gi = stack[stackidx].goodi;
-	bi = stack[stackidx].badi;
-	score = stack[stackidx].score;
+	gi = चळत[stackidx].goodi;
+	bi = चळत[stackidx].badi;
+	score = चळत[stackidx].score;
     }
 
     // When the score goes over "limit" it may actually be much higher.
     // Return a very large number to avoid going below the limit when giving a
     // bonus.
-    if (minscore > limit)
-	return SCORE_MAXMAX;
-    return minscore;
+    जर (minscore > limit)
+	परत SCORE_MAXMAX;
+    परत minscore;
 }
 #endif  // FEAT_SPELL

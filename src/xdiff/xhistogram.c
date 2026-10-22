@@ -41,79 +41,79 @@
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "xinclude.h"
+#अन्तर्भाव "xinclude.h"
 
-#define MAX_PTR	UINT_MAX
-#define MAX_CNT	UINT_MAX
+#define MAX_PTR	अच_पूर्णांक_उच्च
+#define MAX_CNT	अच_पूर्णांक_उच्च
 
-#define LINE_END(n) (line##n + count##n - 1)
-#define LINE_END_PTR(n) (*line##n + *count##n - 1)
+#define ओळ_END(n) (ओळ##n + मोजणी##n - 1)
+#define ओळ_END_PTR(n) (*ओळ##n + *मोजणी##n - 1)
 
-struct histindex {
-	struct record {
-		unsigned int ptr, cnt;
-		struct record *next;
+संरचना histindex {
+	संरचना record {
+		अचिन्हित पूर्णांक ptr, cnt;
+		संरचना record *next;
 	} **records, /* an occurrence */
-	  **line_map; /* map of line to record chain */
+	  **ओळ_map; /* map of line to record chain */
 	chastore_t rcha;
-	unsigned int *next_ptrs;
-	unsigned int table_bits,
+	अचिन्हित पूर्णांक *next_ptrs;
+	अचिन्हित पूर्णांक table_bits,
 		     records_size,
-		     line_map_size;
+		     ओळ_map_size;
 
-	unsigned int max_chain_length,
-		     key_shift,
+	अचिन्हित पूर्णांक max_chain_length,
+		     किल्ली_shift,
 		     ptr_shift;
 
-	unsigned int cnt,
+	अचिन्हित पूर्णांक cnt,
 		     has_common;
 
 	xdfenv_t *env;
-	xpparam_t const *xpp;
+	xpparam_t स्थिरांक *xpp;
 };
 
-struct region {
-	unsigned int begin1, end1;
-	unsigned int begin2, end2;
+संरचना region {
+	अचिन्हित पूर्णांक begin1, end1;
+	अचिन्हित पूर्णांक begin2, end2;
 };
 
-#define LINE_MAP(i, a) (i->line_map[(a) - i->ptr_shift])
+#define ओळ_MAP(i, a) (i->ओळ_map[(a) - i->ptr_shift])
 
 #define NEXT_PTR(index, ptr) \
 	(index->next_ptrs[(ptr) - index->ptr_shift])
 
 #define CNT(index, ptr) \
-	((LINE_MAP(index, ptr))->cnt)
+	((ओळ_MAP(index, ptr))->cnt)
 
 #define REC(env, s, l) \
 	(&env->xdf##s.recs[l - 1])
 
-static int cmp_recs(xrecord_t *r1, xrecord_t *r2)
+स्थिर पूर्णांक cmp_recs(xrecord_t *r1, xrecord_t *r2)
 {
-	return r1->ha == r2->ha;
+	परत r1->ha == r2->ha;
 
 }
 
 #define CMP(i, s1, l1, s2, l2) \
 	(cmp_recs(REC(i->env, s1, l1), REC(i->env, s2, l2)))
 
-#define TABLE_HASH(index, side, line) \
-	XDL_HASHLONG((REC(index->env, side, line))->ha, index->table_bits)
+#define TABLE_HASH(index, side, ओळ) \
+	XDL_HASHLONG((REC(index->env, side, ओळ))->ha, index->table_bits)
 
-static int scanA(struct histindex *index, int line1, int count1)
+स्थिर पूर्णांक scanA(संरचना histindex *index, पूर्णांक line1, पूर्णांक count1)
 {
-	unsigned int ptr, tbl_idx;
-	unsigned int chain_len;
-	struct record **rec_chain, *rec;
+	अचिन्हित पूर्णांक ptr, tbl_idx;
+	अचिन्हित पूर्णांक chain_len;
+	संरचना record **rec_chain, *rec;
 
-	for (ptr = LINE_END(1); (unsigned int)line1 <= ptr; ptr--) {
+	साठी (ptr = ओळ_END(1); (अचिन्हित पूर्णांक)line1 <= ptr; ptr--) {
 		tbl_idx = TABLE_HASH(index, 1, ptr);
 		rec_chain = index->records + tbl_idx;
 		rec = *rec_chain;
 
 		chain_len = 0;
-		while (rec) {
-			if (CMP(index, 1, rec->ptr, 1, ptr)) {
+		पर्यंत (rec) {
+			जर (CMP(index, 1, rec->ptr, 1, ptr)) {
 				/*
 				 * ptr is identical to another element. Insert
 				 * it onto the front of the existing element
@@ -123,57 +123,57 @@ static int scanA(struct histindex *index, int line1, int count1)
 				rec->ptr = ptr;
 				/* cap rec->cnt at MAX_CNT */
 				rec->cnt = (rec->cnt < MAX_CNT) ? rec->cnt + 1 : rec->cnt;
-				LINE_MAP(index, ptr) = rec;
-				goto continue_scan;
+				ओळ_MAP(index, ptr) = rec;
+				जा continue_scan;
 			}
 
 			rec = rec->next;
 			chain_len++;
 		}
 
-		if (chain_len == index->max_chain_length)
-			return -1;
+		जर (chain_len == index->max_chain_length)
+			परत -1;
 
 		/*
 		 * This is the first time we have ever seen this particular
 		 * element in the sequence. Construct a new chain for it.
 		 */
-		if (!(rec = xdl_cha_alloc(&index->rcha)))
-			return -1;
+		जर (!(rec = xdl_cha_alloc(&index->rcha)))
+			परत -1;
 		rec->ptr = ptr;
 		rec->cnt = 1;
 		rec->next = *rec_chain;
 		*rec_chain = rec;
-		LINE_MAP(index, ptr) = rec;
+		ओळ_MAP(index, ptr) = rec;
 
 continue_scan:
 		; /* no op */
 	}
 
-	return 0;
+	परत 0;
 }
 
-static int try_lcs(struct histindex *index, struct region *lcs, int b_ptr,
-	int line1, int count1, int line2, int count2)
+स्थिर पूर्णांक try_lcs(संरचना histindex *index, संरचना region *lcs, पूर्णांक b_ptr,
+	पूर्णांक line1, पूर्णांक count1, पूर्णांक line2, पूर्णांक count2)
 {
-	unsigned int b_next = b_ptr + 1;
-	struct record *rec = index->records[TABLE_HASH(index, 2, b_ptr)];
-	unsigned int as, ae, bs, be, np, rc;
-	int should_break;
+	अचिन्हित पूर्णांक b_next = b_ptr + 1;
+	संरचना record *rec = index->records[TABLE_HASH(index, 2, b_ptr)];
+	अचिन्हित पूर्णांक as, ae, bs, be, np, rc;
+	पूर्णांक should_break;
 
-	for (; rec; rec = rec->next) {
-		if (rec->cnt > index->cnt) {
-			if (!index->has_common)
+	साठी (; rec; rec = rec->next) {
+		जर (rec->cnt > index->cnt) {
+			जर (!index->has_common)
 				index->has_common = CMP(index, 1, rec->ptr, 2, b_ptr);
-			continue;
+			सुरूठेवा;
 		}
 
 		as = rec->ptr;
-		if (!CMP(index, 1, as, 2, b_ptr))
-			continue;
+		जर (!CMP(index, 1, as, 2, b_ptr))
+			सुरूठेवा;
 
 		index->has_common = 1;
-		for (;;) {
+		साठी (;;) {
 			should_break = 0;
 			np = NEXT_PTR(index, as);
 			bs = b_ptr;
@@ -181,24 +181,24 @@ static int try_lcs(struct histindex *index, struct region *lcs, int b_ptr,
 			be = bs;
 			rc = rec->cnt;
 
-			while ((unsigned int)line1 < as && (unsigned int)line2 < bs
+			पर्यंत ((अचिन्हित पूर्णांक)line1 < as && (अचिन्हित पूर्णांक)line2 < bs
 				&& CMP(index, 1, as - 1, 2, bs - 1)) {
 				as--;
 				bs--;
-				if (1 < rc)
+				जर (1 < rc)
 					rc = XDL_MIN(rc, CNT(index, as));
 			}
-			while (ae < (unsigned int)LINE_END(1) && be < (unsigned int)LINE_END(2)
+			पर्यंत (ae < (अचिन्हित पूर्णांक)ओळ_END(1) && be < (अचिन्हित पूर्णांक)ओळ_END(2)
 				&& CMP(index, 1, ae + 1, 2, be + 1)) {
 				ae++;
 				be++;
-				if (1 < rc)
+				जर (1 < rc)
 					rc = XDL_MIN(rc, CNT(index, ae));
 			}
 
-			if (b_next <= be)
+			जर (b_next <= be)
 				b_next = be + 1;
-			if (lcs->end1 - lcs->begin1 < ae - as || rc < index->cnt) {
+			जर (lcs->end1 - lcs->begin1 < ae - as || rc < index->cnt) {
 				lcs->begin1 = as;
 				lcs->begin2 = bs;
 				lcs->end1 = ae;
@@ -206,165 +206,165 @@ static int try_lcs(struct histindex *index, struct region *lcs, int b_ptr,
 				index->cnt = rc;
 			}
 
-			if (np == 0)
-				break;
+			जर (np == 0)
+				थांबा;
 
-			while (np <= ae) {
+			पर्यंत (np <= ae) {
 				np = NEXT_PTR(index, np);
-				if (np == 0) {
+				जर (np == 0) {
 					should_break = 1;
-					break;
+					थांबा;
 				}
 			}
 
-			if (should_break)
-				break;
+			जर (should_break)
+				थांबा;
 
 			as = np;
 		}
 	}
-	return b_next;
+	परत b_next;
 }
 
-static int fall_back_to_classic_diff(xpparam_t const *xpp, xdfenv_t *env,
-		int line1, int count1, int line2, int count2)
+स्थिर पूर्णांक fall_back_to_classic_diff(xpparam_t स्थिरांक *xpp, xdfenv_t *env,
+		पूर्णांक line1, पूर्णांक count1, पूर्णांक line2, पूर्णांक count2)
 {
 	xpparam_t xpparam;
 
-	memset(&xpparam, 0, sizeof(xpparam));
+	स_रखो(&xpparam, 0, आकार(xpparam));
 	xpparam.flags = xpp->flags & ~XDF_DIFF_ALGORITHM_MASK;
 
-	return xdl_fall_back_diff(env, &xpparam,
+	परत xdl_fall_back_diff(env, &xpparam,
 				  line1, count1, line2, count2);
 }
 
-static inline void free_index(struct histindex *index)
+स्थिर ओळीत शून्य free_index(संरचना histindex *index)
 {
 	xdl_free(index->records);
-	xdl_free(index->line_map);
+	xdl_free(index->ओळ_map);
 	xdl_free(index->next_ptrs);
 	xdl_cha_free(&index->rcha);
 }
 
-static int find_lcs(xpparam_t const *xpp, xdfenv_t *env,
-		    struct region *lcs,
-		    int line1, int count1, int line2, int count2)
+स्थिर पूर्णांक find_lcs(xpparam_t स्थिरांक *xpp, xdfenv_t *env,
+		    संरचना region *lcs,
+		    पूर्णांक line1, पूर्णांक count1, पूर्णांक line2, पूर्णांक count2)
 {
-	int b_ptr;
-	int ret = -1;
-	struct histindex index;
+	पूर्णांक b_ptr;
+	पूर्णांक ret = -1;
+	संरचना histindex index;
 
-	memset(&index, 0, sizeof(index));
+	स_रखो(&index, 0, आकार(index));
 
 	index.env = env;
 	index.xpp = xpp;
 
-	index.records = NULL;
-	index.line_map = NULL;
+	index.records = रिक्त;
+	index.ओळ_map = रिक्त;
 	/* in case of early xdl_cha_free() */
-	index.rcha.head = NULL;
+	index.rcha.head = रिक्त;
 
 	index.table_bits = xdl_hashbits(count1);
 	index.records_size = 1 << index.table_bits;
-	if (!XDL_CALLOC_ARRAY(index.records, index.records_size))
-		goto cleanup;
+	जर (!XDL_CALLOC_ARRAY(index.records, index.records_size))
+		जा cleanup;
 
-	index.line_map_size = count1;
-	if (!XDL_CALLOC_ARRAY(index.line_map, index.line_map_size))
-		goto cleanup;
+	index.ओळ_map_size = count1;
+	जर (!XDL_CALLOC_ARRAY(index.ओळ_map, index.ओळ_map_size))
+		जा cleanup;
 
-	if (!XDL_CALLOC_ARRAY(index.next_ptrs, index.line_map_size))
-		goto cleanup;
+	जर (!XDL_CALLOC_ARRAY(index.next_ptrs, index.ओळ_map_size))
+		जा cleanup;
 
 	/* lines / 4 + 1 comes from xprepare.c:xdl_prepare_ctx() */
-	if (xdl_cha_init(&index.rcha, sizeof(struct record), count1 / 4 + 1) < 0)
-		goto cleanup;
+	जर (xdl_cha_init(&index.rcha, आकार(संरचना record), count1 / 4 + 1) < 0)
+		जा cleanup;
 
 	index.ptr_shift = line1;
 	index.max_chain_length = 64;
 
-	if (scanA(&index, line1, count1))
-		goto cleanup;
+	जर (scanA(&index, line1, count1))
+		जा cleanup;
 
 	index.cnt = index.max_chain_length + 1;
 
-	for (b_ptr = line2; b_ptr <= LINE_END(2); )
+	साठी (b_ptr = line2; b_ptr <= ओळ_END(2); )
 		b_ptr = try_lcs(&index, lcs, b_ptr, line1, count1, line2, count2);
 
-	if (index.has_common && index.max_chain_length < index.cnt)
+	जर (index.has_common && index.max_chain_length < index.cnt)
 		ret = 1;
-	else
+	अन्यथा
 		ret = 0;
 
 cleanup:
 	free_index(&index);
-	return ret;
+	परत ret;
 }
 
-static int histogram_diff(xpparam_t const *xpp, xdfenv_t *env,
-	int line1, int count1, int line2, int count2)
+स्थिर पूर्णांक histogram_diff(xpparam_t स्थिरांक *xpp, xdfenv_t *env,
+	पूर्णांक line1, पूर्णांक count1, पूर्णांक line2, पूर्णांक count2)
 {
-	struct region lcs;
-	int lcs_found;
-	int result;
+	संरचना region lcs;
+	पूर्णांक lcs_found;
+	पूर्णांक result;
 redo:
 	result = -1;
 
-	if (count1 <= 0 && count2 <= 0)
-		return 0;
+	जर (count1 <= 0 && count2 <= 0)
+		परत 0;
 
-	if ((unsigned int)LINE_END(1) >= MAX_PTR)
-		return -1;
+	जर ((अचिन्हित पूर्णांक)ओळ_END(1) >= MAX_PTR)
+		परत -1;
 
-	if (!count1) {
-		while(count2--)
+	जर (!count1) {
+		पर्यंत(count2--)
 			env->xdf2.changed[line2++ - 1] = true;
-		return 0;
-	} else if (!count2) {
-		while(count1--)
+		परत 0;
+	} अन्यथा जर (!count2) {
+		पर्यंत(count1--)
 			env->xdf1.changed[line1++ - 1] = true;
-		return 0;
+		परत 0;
 	}
 
-	memset(&lcs, 0, sizeof(lcs));
+	स_रखो(&lcs, 0, आकार(lcs));
 	lcs_found = find_lcs(xpp, env, &lcs, line1, count1, line2, count2);
-	if (lcs_found < 0)
-		goto out;
-	else if (lcs_found)
+	जर (lcs_found < 0)
+		जा out;
+	अन्यथा जर (lcs_found)
 		result = fall_back_to_classic_diff(xpp, env, line1, count1, line2, count2);
-	else {
-		if (lcs.begin1 == 0 && lcs.begin2 == 0) {
-			while (count1--)
+	अन्यथा {
+		जर (lcs.begin1 == 0 && lcs.begin2 == 0) {
+			पर्यंत (count1--)
 				env->xdf1.changed[line1++ - 1] = true;
-			while (count2--)
+			पर्यंत (count2--)
 				env->xdf2.changed[line2++ - 1] = true;
 			result = 0;
-		} else {
+		} अन्यथा {
 			result = histogram_diff(xpp, env,
 						line1, lcs.begin1 - line1,
 						line2, lcs.begin2 - line2);
-			if (result)
-				goto out;
+			जर (result)
+				जा out;
 			/*
 			 * result = histogram_diff(xpp, env,
 			 *            lcs.end1 + 1, LINE_END(1) - lcs.end1,
 			 *            lcs.end2 + 1, LINE_END(2) - lcs.end2);
 			 * but let's optimize tail recursion ourself:
 			*/
-			count1 = LINE_END(1) - lcs.end1;
+			count1 = ओळ_END(1) - lcs.end1;
 			line1 = lcs.end1 + 1;
-			count2 = LINE_END(2) - lcs.end2;
+			count2 = ओळ_END(2) - lcs.end2;
 			line2 = lcs.end2 + 1;
-			goto redo;
+			जा redo;
 		}
 	}
 out:
-	return result;
+	परत result;
 }
 
-int xdl_do_histogram_diff(xpparam_t const *xpp, xdfenv_t *env)
+पूर्णांक xdl_do_histogram_diff(xpparam_t स्थिरांक *xpp, xdfenv_t *env)
 {
-	return histogram_diff(xpp, env,
+	परत histogram_diff(xpp, env,
 		env->xdf1.dstart + 1, env->xdf1.dend - env->xdf1.dstart + 1,
 		env->xdf2.dstart + 1, env->xdf2.dend - env->xdf2.dstart + 1);
 }

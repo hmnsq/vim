@@ -1,7 +1,7 @@
 #ifndef __VTERM_INPUT_H__
 #define __VTERM_INPUT_H__
 
-typedef enum {
+प्रकारव्याख्या गणना {
   VTERM_MOD_NONE  = 0x00,
   VTERM_MOD_SHIFT = 0x01,
   VTERM_MOD_ALT   = 0x02,
@@ -11,54 +11,54 @@ typedef enum {
 } VTermModifier;
 
 // The order here must match keycodes[] in src/keyboard.c!
-typedef enum {
-  VTERM_KEY_NONE,
+प्रकारव्याख्या गणना {
+  VTERM_किल्ली_NONE,
 
-  VTERM_KEY_ENTER,
-  VTERM_KEY_TAB,
-  VTERM_KEY_BACKSPACE,
-  VTERM_KEY_ESCAPE,
+  VTERM_किल्ली_ENTER,
+  VTERM_किल्ली_TAB,
+  VTERM_किल्ली_BACKSPACE,
+  VTERM_किल्ली_ESCAPE,
 
-  VTERM_KEY_UP,
-  VTERM_KEY_DOWN,
-  VTERM_KEY_LEFT,
-  VTERM_KEY_RIGHT,
+  VTERM_किल्ली_UP,
+  VTERM_किल्ली_DOWN,
+  VTERM_किल्ली_डावा,
+  VTERM_किल्ली_उजवा,
 
-  VTERM_KEY_INS,
-  VTERM_KEY_DEL,
-  VTERM_KEY_HOME,
-  VTERM_KEY_END,
-  VTERM_KEY_PAGEUP,
-  VTERM_KEY_PAGEDOWN,
+  VTERM_किल्ली_INS,
+  VTERM_किल्ली_DEL,
+  VTERM_किल्ली_HOME,
+  VTERM_किल्ली_END,
+  VTERM_किल्ली_PAGEUP,
+  VTERM_किल्ली_PAGEDOWN,
 
   // F1 is VTERM_KEY_FUNCTION(1), F2 VTERM_KEY_FUNCTION(2), etc.
-  VTERM_KEY_FUNCTION_0   = 256,
-  VTERM_KEY_FUNCTION_MAX = VTERM_KEY_FUNCTION_0 + 255,
+  VTERM_किल्ली_FUNCTION_0   = 256,
+  VTERM_किल्ली_FUNCTION_MAX = VTERM_किल्ली_FUNCTION_0 + 255,
 
   // keypad keys
-  VTERM_KEY_KP_0,
-  VTERM_KEY_KP_1,
-  VTERM_KEY_KP_2,
-  VTERM_KEY_KP_3,
-  VTERM_KEY_KP_4,
-  VTERM_KEY_KP_5,
-  VTERM_KEY_KP_6,
-  VTERM_KEY_KP_7,
-  VTERM_KEY_KP_8,
-  VTERM_KEY_KP_9,
-  VTERM_KEY_KP_MULT,
-  VTERM_KEY_KP_PLUS,
-  VTERM_KEY_KP_COMMA,
-  VTERM_KEY_KP_MINUS,
-  VTERM_KEY_KP_PERIOD,
-  VTERM_KEY_KP_DIVIDE,
-  VTERM_KEY_KP_ENTER,
-  VTERM_KEY_KP_EQUAL,
+  VTERM_किल्ली_KP_0,
+  VTERM_किल्ली_KP_1,
+  VTERM_किल्ली_KP_2,
+  VTERM_किल्ली_KP_3,
+  VTERM_किल्ली_KP_4,
+  VTERM_किल्ली_KP_5,
+  VTERM_किल्ली_KP_6,
+  VTERM_किल्ली_KP_7,
+  VTERM_किल्ली_KP_8,
+  VTERM_किल्ली_KP_9,
+  VTERM_किल्ली_KP_MULT,
+  VTERM_किल्ली_KP_PLUS,
+  VTERM_किल्ली_KP_COMMA,
+  VTERM_किल्ली_KP_MINUS,
+  VTERM_किल्ली_KP_PERIOD,
+  VTERM_किल्ली_KP_DIVIDE,
+  VTERM_किल्ली_KP_ENTER,
+  VTERM_किल्ली_KP_EQUAL,
 
-  VTERM_KEY_MAX, // Must be last
-  VTERM_N_KEYS = VTERM_KEY_MAX
-} VTermKey;
+  VTERM_किल्ली_MAX, // Must be last
+  VTERM_N_किल्ल्या = VTERM_किल्ली_MAX
+} VTerm_किल्ली;
 
-#define VTERM_KEY_FUNCTION(n) (VTERM_KEY_FUNCTION_0+(n))
+#define VTERM_किल्ली_FUNCTION(n) (VTERM_किल्ली_FUNCTION_0+(n))
 
 #endif

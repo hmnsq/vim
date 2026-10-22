@@ -1,4 +1,4 @@
 # requires python 3.x
 
-import sys
+आयात sys
 print(sys.version)

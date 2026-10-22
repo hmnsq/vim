@@ -20,40 +20,40 @@
  *
  */
 
-#if !defined(XTYPES_H)
+#जर !defined(XTYPES_H)
 #define XTYPES_H
 
 
 
-typedef struct s_chanode {
-	struct s_chanode *next;
-	long icurr;
+प्रकारव्याख्या संरचना s_chanode {
+	संरचना s_chanode *next;
+	दीर्घ icurr;
 } chanode_t;
 
-typedef struct s_chastore {
+प्रकारव्याख्या संरचना s_chastore {
 	chanode_t *head, *tail;
-	long isize, nsize;
+	दीर्घ isize, nsize;
 	chanode_t *ancur;
 	chanode_t *sncur;
-	long scurr;
+	दीर्घ scurr;
 } chastore_t;
 
-typedef struct s_xrecord {
-	char const *ptr;
-	long size;
-	unsigned long ha;
+प्रकारव्याख्या संरचना s_xrecord {
+	अक्षर स्थिरांक *ptr;
+	दीर्घ size;
+	अचिन्हित दीर्घ ha;
 } xrecord_t;
 
-typedef struct s_xdfile {
+प्रकारव्याख्या संरचना s_xdfile {
 	xrecord_t *recs;
-	long nrec;
-	long dstart, dend;
+	दीर्घ nrec;
+	दीर्घ dstart, dend;
 	bool *changed;
-	long *rindex;
-	long nreff;
+	दीर्घ *rindex;
+	दीर्घ nreff;
 } xdfile_t;
 
-typedef struct s_xdfenv {
+प्रकारव्याख्या संरचना s_xdfenv {
 	xdfile_t xdf1, xdf2;
 } xdfenv_t;
 

@@ -5,42 +5,42 @@
 #
 # This requires Python 2.6 or later.
 
-from __future__ import print_function
-import socket
-import sys
-import time
-import threading
-import re
+तः __future__ आयात print_function
+आयात socket
+आयात sys
+आयात time
+आयात threading
+आयात re
 
-try:
+प्रयत्न:
     # Python 3
-    import socketserver
-except ImportError:
+    आयात socketserver
+अपवाद ImportError:
     # Python 2
-    import SocketServer as socketserver
+    आयात SocketServer इव socketserver
 
-class ThreadedTCPRequestHandler(socketserver.BaseRequestHandler):
+वर्ग ThreadedTCPRequestHandler(socketserver.BaseRequestHandler):
 
     def process_msgs(self, msgbuf):
         # Process all the received netbeans commands/responses/events from Vim.
         # Each one is separated by a newline character. If a partial command
         # is received, process it later after the rest of it is received.
-        while True:
-            (line, sep, rest) = msgbuf.partition('\n')
-            if sep == '':
+        पर्यंत सत्य:
+            (ओळ, sep, rest) = msgbuf.partition('\n')
+            जर sep == '':
                 # received partial line
-                return line
+                परत ओळ
             msgbuf = rest
 
             # Process a command only after receiving a newline.
             response = ''
-            if line.find('Xcmdbuf') > 0:
-                name = line.split('"')[1]
+            जर ओळ.find('Xcmdbuf') > 0:
+                name = ओळ.split('"')[1]
                 response = '1:putBufferNumber!15 "' + name + '"\n'
                 response += '1:startDocumentListen!16\n'
-            elif re.match('1:insert=.* "\\\\n"', line):
+            किंवाजर re.match('1:insert=.* "\\\\n"', ओळ):
                 # extract the command from the previous line
-                cmd = re.search('.*"(.*)"', self.prev_line).group(1)
+                cmd = re.शोध('.*"(.*)"', self.prev_ओळ).group(1)
 
                 # map of test names and the netbeans commands/functions
                 testmap = {
@@ -111,62 +111,62 @@ class ThreadedTCPRequestHandler(socketserver.BaseRequestHandler):
                   'nbbufwrite_Test' : '4:editFile!92 "XnbBuffer"\n4:netbeansBuffer!93 T\n',
                   'startAtomic_Test' : '0:startAtomic!94\n',
                   'endAtomic_Test' : '0:endAtomic!95\n',
-                  'AnnoScale_Test' : "".join(['2:defineAnnoType!60 ' + str(i) + ' "s' + str(i) + '" "x" "=>" blue none\n' for i in range(2, 26)]),
+                  'AnnoScale_Test' : "".join(['2:defineAnnoType!60 ' + str(i) + ' "s' + str(i) + '" "x" "=>" blue none\n' साठी i मध्ये range(2, 26)]),
                   'detach_Test' : '2:close!96\n1:close!97\nDETACH\n',
                   'specialKeys_overflow_Test' : '0:specialKeys!200 "' + 'A'*80 + '-X"\n',
                   'defineAnnoType_injection_Test': '1:defineAnnoType!1 "MySign guifg=red|call writefile([\'inject\'],\'Xinject\')|" "tooltip" "glyphFile" 1 2\n'
                 }
                 # execute the specified test
-                if cmd not in testmap:
+                जर cmd नाही मध्ये testmap:
                   print("=== invalid command %s ===" % (cmd))
-                else:
+                अन्यथा:
                   response = testmap[cmd]
-            elif line.find('disconnect') > 0:
+            किंवाजर ओळ.find('disconnect') > 0:
                 # we're done
                 self.server.shutdown()
-                return
+                परत
 
             # save the current line, this is used as the test to run after
             # receiving a newline only line.
-            self.prev_line = line
+            self.prev_ओळ = ओळ
 
-            if len(response) > 0:
+            जर len(response) > 0:
                 self.request.sendall(response.encode('utf-8'))
                 # Write the response into the file, so that the test can knows
                 # the command was sent.
-                with open("Xnetbeans", "a") as myfile:
-                    myfile.write('send: ' + response)
-                if self.debug:
-                    with open("save_Xnetbeans", "a") as myfile:
-                        myfile.write('send: ' + response)
+                with open("Xnetbeans", "a") इव myfile:
+                    myfile.लिख('send: ' + response)
+                जर self.debug:
+                    with open("save_Xnetbeans", "a") इव myfile:
+                        myfile.लिख('send: ' + response)
 
     def handle(self):
         print("=== socket opened ===")
         # To preserve the Xnetbeans file as save_Xnetbeans, set debug to 1
         self.debug = 0
-        self.prev_line = ''
+        self.prev_ओळ = ''
         msgbuf = ''
-        while True:
-            try:
+        पर्यंत सत्य:
+            प्रयत्न:
                 received = self.request.recv(4096).decode('utf-8')
-            except socket.error:
+            अपवाद socket.error:
                 print("=== socket error ===")
-                break
-            except IOError:
+                थांबा
+            अपवाद IOError:
                 print("=== socket closed ===")
-                break
-            if received == '':
+                थांबा
+            जर received == '':
                 print("=== socket closed ===")
-                break
+                थांबा
             print("received: {0}".format(received))
 
             # Write the received line into the file, so that the test can check
             # what happened.
-            with open("Xnetbeans", "a") as myfile:
-                myfile.write(received)
-            if self.debug:
-                with open("save_Xnetbeans", "a") as myfile:
-                    myfile.write(received)
+            with open("Xnetbeans", "a") इव myfile:
+                myfile.लिख(received)
+            जर self.debug:
+                with open("save_Xnetbeans", "a") इव myfile:
+                    myfile.लिख(received)
 
             # Can receive more than one line in a response or a partial line.
             # Accumulate all the received characters and process one line at
@@ -174,16 +174,16 @@ class ThreadedTCPRequestHandler(socketserver.BaseRequestHandler):
             msgbuf += received
             msgbuf = self.process_msgs(msgbuf)
 
-class ThreadedTCPServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
+वर्ग ThreadedTCPServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
     pass
 
 def writePortInFile(port):
     # Write the port number in Xportnr, so that the test knows it.
     f = open("Xportnr", "w")
-    f.write("{0}".format(port))
-    f.close()
+    f.लिख("{0}".format(port))
+    f.बंद()
 
-if __name__ == "__main__":
+जर __name__ == "__main__":
     HOST, PORT = "localhost", 0
 
     addrs = socket.getaddrinfo(HOST, PORT, 0, 0, socket.IPPROTO_TCP)
@@ -196,7 +196,7 @@ if __name__ == "__main__":
 
     # Start a thread with the server.  That thread will then start a new thread
     # for each connection.
-    server_thread = threading.Thread(target=server.serve_forever)
+    server_thread = threading.धागा(target=server.serve_forever)
     server_thread.start()
 
     writePortInFile(port)
@@ -205,8 +205,8 @@ if __name__ == "__main__":
 
     # Main thread terminates, but the server continues running
     # until server.shutdown() is called.
-    try:
-        while server_thread.is_alive():
+    प्रयत्न:
+        पर्यंत server_thread.is_alive():
             server_thread.join(1)
-    except (KeyboardInterrupt, SystemExit):
+    अपवाद (KeyboardInterrupt, SystemExit):
         server.shutdown()

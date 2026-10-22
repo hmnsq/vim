@@ -10,11 +10,11 @@
  * dosinst.h: Common code for dosinst.c and uninstall.c
  */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/stat.h>
-#include <fcntl.h>
+#अन्तर्भाव <stdio.h>
+#अन्तर्भाव <stdlib.h>
+#अन्तर्भाव <string.h>
+#अन्तर्भाव <sys/stat.h>
+#अन्तर्भाव <fcntl.h>
 
 #ifndef UNIX_LINT
 # include <io.h>
@@ -28,20 +28,20 @@
 
 #ifdef UNIX_LINT
 // Running lint on Unix: Some things are missing.
-char *searchpath(char *name);
+अक्षर *searchpath(अक्षर *name);
 #endif
 
-#if defined(UNIX_LINT)
+#जर defined(UNIX_LINT)
 # include <unistd.h>
 # include <errno.h>
 #endif
 
-#include "version.h"
+#अन्तर्भाव "version.h"
 
-#if defined(UNIX_LINT)
-# define vim_mkdir(x, y) mkdir((char *)(x), y)
-#else
-# define vim_mkdir(x, y) _mkdir((char *)(x))
+#जर defined(UNIX_LINT)
+# define vim_mkdir(x, y) सूची_गढ़ो((अक्षर *)(x), y)
+#अन्यथा
+# define vim_mkdir(x, y) _mkdir((अक्षर *)(x))
 #endif
 
 #define sleep(n) Sleep((n) * 1000)
@@ -66,121 +66,121 @@ char *searchpath(char *name);
  * Modern way of creating registry entries, also works on 64 bit windows when
  * compiled as a 32 bit program.
  */
-#ifndef KEY_WOW64_64KEY
-# define KEY_WOW64_64KEY 0x0100
+#ifndef किल्ली_WOW64_64_किल्ली
+# define किल्ली_WOW64_64_किल्ली 0x0100
 #endif
-#ifndef KEY_WOW64_32KEY
-# define KEY_WOW64_32KEY 0x0200
+#ifndef किल्ली_WOW64_32_किल्ली
+# define किल्ली_WOW64_32_किल्ली 0x0200
 #endif
 
 #ifdef __MINGW32__
 # define UNUSED __attribute__((unused))
-#else
+#अन्यथा
 # define UNUSED
 #endif
 
 #define VIM_STARTMENU "Programs\\Vim " VIM_VERSION_SHORT
 
-int	interactive;		// non-zero when running interactively
+पूर्णांक	interactive;		// non-zero when running interactively
 
 /*
  * Call malloc() and exit when out of memory.
  */
-    static void *
-alloc(int len)
+    स्थिर शून्य *
+alloc(पूर्णांक len)
 {
-    void *p;
+    शून्य *p;
 
-    p = malloc(len);
-    if (p == NULL)
+    p = दो_स्मृति(len);
+    जर (p == रिक्त)
     {
-	printf("ERROR: out of memory\n");
-	exit(1);
+	म_लिखो("ERROR: out of memory\n");
+	निकास(1);
     }
-    return p;
+    परत p;
 }
 
 /*
  * The toupper() in Bcc 5.5 doesn't work, use our own implementation.
  */
-    static int
-mytoupper(int c)
+    स्थिर पूर्णांक
+mytoupper(पूर्णांक c)
 {
-    if (c >= 'a' && c <= 'z')
-	return c - 'a' + 'A';
-    return c;
+    जर (c >= 'a' && c <= 'z')
+	परत c - 'a' + 'A';
+    परत c;
 }
 
-    static void
-myexit(int n)
+    स्थिर शून्य
+myexit(पूर्णांक n)
 {
-    if (!interactive)
+    जर (!interactive)
     {
 	// Present a prompt, otherwise error messages can't be read.
-	printf("Press Enter to continue\n");
-	rewind(stdin);
-	(void)getchar();
+	म_लिखो("Press Enter to continue\n");
+	शुरुआत(मानक_निवेश);
+	(शून्य)अक्षर_लो();
     }
-    exit(n);
+    निकास(n);
 }
 
 
-typedef BOOL (WINAPI *LPFN_ISWOW64PROCESS)(HANDLE, PBOOL);
+प्रकारव्याख्या BOOL (WINAPI *LPFN_ISWOW64PROCESS)(HANDLE, PBOOL);
 /*
  * Check if this is a 64-bit OS.
  */
-    static BOOL
-is_64bit_os(void)
+    स्थिर BOOL
+is_64bit_os(शून्य)
 {
 #ifdef _WIN64
-    return TRUE;
-#else
+    परत TRUE;
+#अन्यथा
     BOOL bIsWow64 = FALSE;
     LPFN_ISWOW64PROCESS pIsWow64Process;
 
     pIsWow64Process = (LPFN_ISWOW64PROCESS)GetProcAddress(
 	    GetModuleHandle("kernel32"), "IsWow64Process");
-    if (pIsWow64Process != NULL)
+    जर (pIsWow64Process != रिक्त)
 	pIsWow64Process(GetCurrentProcess(), &bIsWow64);
-    return bIsWow64;
+    परत bIsWow64;
 #endif
 }
 
-    static char *
-searchpath(char *name)
+    स्थिर अक्षर *
+searchpath(अक्षर *name)
 {
-    static char widename[2 * BUFSIZE];
-    static char location[2 * BUFSIZE + 2];
+    स्थिर अक्षर widename[2 * BUFSIZE];
+    स्थिर अक्षर location[2 * BUFSIZE + 2];
 
     // There appears to be a bug in FindExecutableA() on Windows NT.
     // Use FindExecutableW() instead...
     MultiByteToWideChar(CP_ACP, 0, (LPCTSTR)name, -1,
 	    (LPWSTR)widename, BUFSIZE);
-    if (FindExecutableW((LPCWSTR)widename, (LPCWSTR)"",
+    जर (FindExecutableW((LPCWSTR)widename, (LPCWSTR)"",
 		(LPWSTR)location) > (HINSTANCE)32)
     {
 	WideCharToMultiByte(CP_ACP, 0, (LPWSTR)location, -1,
-		(LPSTR)widename, 2 * BUFSIZE, NULL, NULL);
-	return widename;
+		(LPSTR)widename, 2 * BUFSIZE, रिक्त, रिक्त);
+	परत widename;
     }
-    return NULL;
+    परत रिक्त;
 }
 
 /*
  * Call searchpath() and save the result in allocated memory, or return NULL.
  */
-    static char *
-searchpath_save(char *name)
+    स्थिर अक्षर *
+searchpath_save(अक्षर *name)
 {
-    char	*p;
-    char	*s;
+    अक्षर	*p;
+    अक्षर	*s;
 
     p = searchpath(name);
-    if (p == NULL)
-	return NULL;
-    s = alloc(strlen(p) + 1);
-    strcpy(s, p);
-    return s;
+    जर (p == रिक्त)
+	परत रिक्त;
+    s = alloc(म_माप(p) + 1);
+    म_नकल(s, p);
+    परत s;
 }
 
 
@@ -196,10 +196,10 @@ searchpath_save(char *name)
  *
  * Return FAIL on error, OK on success
  */
-    int
+    पूर्णांक
 get_shell_folder_path(
-	char *shell_folder_path,
-	const char *shell_folder_name)
+	अक्षर *shell_folder_path,
+	स्थिरांक अक्षर *shell_folder_name)
 {
     /*
      * The following code was successfully built with make_mvc.mak.
@@ -208,34 +208,34 @@ get_shell_folder_path(
      */
     LPITEMIDLIST    pidl = 0; // Pointer to an Item ID list allocated below
     LPMALLOC	    pMalloc;  // Pointer to an IMalloc interface
-    int		    csidl;
-    int		    alt_csidl = -1;
-    static int	    desktop_csidl = -1;
-    static int	    programs_csidl = -1;
-    int		    *pcsidl;
-    int		    r;
+    पूर्णांक		    csidl;
+    पूर्णांक		    alt_csidl = -1;
+    स्थिर पूर्णांक	    desktop_csidl = -1;
+    स्थिर पूर्णांक	    programs_csidl = -1;
+    पूर्णांक		    *pcsidl;
+    पूर्णांक		    r;
 
-    if (strcmp(shell_folder_name, "desktop") == 0)
+    जर (म_भेद(shell_folder_name, "desktop") == 0)
     {
 	pcsidl = &desktop_csidl;
 	csidl = CSIDL_COMMON_DESKTOPDIRECTORY;
 	alt_csidl = CSIDL_DESKTOP;
     }
-    else if (strncmp(shell_folder_name, "Programs", 8) == 0)
+    अन्यथा जर (म_भेदन(shell_folder_name, "Programs", 8) == 0)
     {
 	pcsidl = &programs_csidl;
 	csidl = CSIDL_COMMON_PROGRAMS;
 	alt_csidl = CSIDL_PROGRAMS;
     }
-    else
+    अन्यथा
     {
-	printf("\nERROR (internal) unrecognised shell_folder_name: \"%s\"\n\n",
+	म_लिखो("\nERROR (internal) unrecognised shell_folder_name: \"%s\"\n\n",
 							   shell_folder_name);
-	return FAIL;
+	परत FAIL;
     }
 
     // Did this stuff before, use the same ID again.
-    if (*pcsidl >= 0)
+    जर (*pcsidl >= 0)
     {
 	csidl = *pcsidl;
 	alt_csidl = -1;
@@ -243,22 +243,22 @@ get_shell_folder_path(
 
 retry:
     // Initialize pointer to IMalloc interface
-    if (NOERROR != SHGetMalloc(&pMalloc))
+    जर (NOERROR != SHGetMalloc(&pMalloc))
     {
-	printf("\nERROR getting interface for shell_folder_name: \"%s\"\n\n",
+	म_लिखो("\nERROR getting interface for shell_folder_name: \"%s\"\n\n",
 							   shell_folder_name);
-	return FAIL;
+	परत FAIL;
     }
 
     // Get an ITEMIDLIST corresponding to the folder code
-    if (NOERROR != SHGetSpecialFolderLocation(0, csidl, &pidl))
+    जर (NOERROR != SHGetSpecialFolderLocation(0, csidl, &pidl))
     {
-	if (alt_csidl < 0 || NOERROR != SHGetSpecialFolderLocation(0,
+	जर (alt_csidl < 0 || NOERROR != SHGetSpecialFolderLocation(0,
 							    alt_csidl, &pidl))
 	{
-	    printf("\nERROR getting ITEMIDLIST for shell_folder_name: \"%s\"\n\n",
+	    म_लिखो("\nERROR getting ITEMIDLIST for shell_folder_name: \"%s\"\n\n",
 							   shell_folder_name);
-	    return FAIL;
+	    परत FAIL;
 	}
 	csidl = alt_csidl;
 	alt_csidl = -1;
@@ -272,39 +272,39 @@ retry:
     // Release the IMalloc interface
     pMalloc->lpVtbl->Release(pMalloc);
 
-    if (!r)
+    जर (!r)
     {
-	if (alt_csidl >= 0)
+	जर (alt_csidl >= 0)
 	{
 	    // We probably get here for Windows 95: the "all users"
 	    // desktop/start menu entry doesn't exist.
 	    csidl = alt_csidl;
 	    alt_csidl = -1;
-	    goto retry;
+	    जा retry;
 	}
-	printf("\nERROR translating ITEMIDLIST for shell_folder_name: \"%s\"\n\n",
+	म_लिखो("\nERROR translating ITEMIDLIST for shell_folder_name: \"%s\"\n\n",
 							   shell_folder_name);
-	return FAIL;
+	परत FAIL;
     }
 
     // If there is an alternative: verify we can write in this directory.
     // This should cause a retry when the "all users" directory exists but we
     // are a normal user and can't write there.
-    if (alt_csidl >= 0)
+    जर (alt_csidl >= 0)
     {
-	char tbuf[BUFSIZE];
-	FILE *fd;
+	अक्षर tbuf[BUFSIZE];
+	खाता *fd;
 
-	strcpy(tbuf, shell_folder_path);
-	strcat(tbuf, "\\vim write test");
-	fd = fopen(tbuf, "w");
-	if (fd == NULL)
+	म_नकल(tbuf, shell_folder_path);
+	म_जोड़ो(tbuf, "\\vim write test");
+	fd = ख_खोलो(tbuf, "w");
+	जर (fd == रिक्त)
 	{
 	    csidl = alt_csidl;
 	    alt_csidl = -1;
-	    goto retry;
+	    जा retry;
 	}
-	fclose(fd);
+	ख_बंद(fd);
 	unlink(tbuf);
     }
 
@@ -312,194 +312,194 @@ retry:
      * Keep the found csidl for next time, so that we don't have to do the
      * write test every time.
      */
-    if (*pcsidl < 0)
+    जर (*pcsidl < 0)
 	*pcsidl = csidl;
 
-    if (strncmp(shell_folder_name, "Programs\\", 9) == 0)
-	strcat(shell_folder_path, shell_folder_name + 8);
+    जर (म_भेदन(shell_folder_name, "Programs\\", 9) == 0)
+	म_जोड़ो(shell_folder_path, shell_folder_name + 8);
 
-    return OK;
+    परत OK;
 }
 
 /*
  * List of targets.  The first one (index zero) is used for the default path
  * for the batch files.
  */
-#define TARGET_COUNT  9
+#define TARGET_मोजणी  9
 
-struct
+संरचना
 {
-    char	*name;		// Vim exe name (without .exe)
-    char	*batname;	// batch file name
-    char	*lnkname;	// shortcut file name
-    char	*exename;	// exe file name
-    char	*exenamearg;	// exe file name when using exearg
-    char	*exearg;	// argument for vim.exe or gvim.exe
-    char	*oldbat;	// path to existing xxx.bat or NULL
-    char	*oldexe;	// path to existing xxx.exe or NULL
-    char	batpath[BUFSIZE];  // path of batch file to create; not
+    अक्षर	*name;		// Vim exe name (without .exe)
+    अक्षर	*batname;	// batch file name
+    अक्षर	*lnkname;	// shortcut file name
+    अक्षर	*exename;	// exe file name
+    अक्षर	*exenamearg;	// exe file name when using exearg
+    अक्षर	*exearg;	// argument for vim.exe or gvim.exe
+    अक्षर	*oldbat;	// path to existing xxx.bat or NULL
+    अक्षर	*oldexe;	// path to existing xxx.exe or NULL
+    अक्षर	batpath[BUFSIZE];  // path of batch file to create; not
 				   // created when it's empty
-} targets[TARGET_COUNT] =
+} targets[TARGET_मोजणी] =
 {
-    {"all",	"batch files", NULL, NULL, NULL, NULL, NULL, NULL, ""},
+    {"all",	"batch files", रिक्त, रिक्त, रिक्त, रिक्त, रिक्त, रिक्त, ""},
     {"vim",	"vim.bat",	"Vim.lnk",
-			"vim.exe",    "vim.exe",  "", NULL, NULL, ""},
+			"vim.exe",    "vim.exe",  "", रिक्त, रिक्त, ""},
     {"gvim",	"gvim.bat",	"gVim.lnk",
-			"gvim.exe",   "gvim.exe", "", NULL, NULL, ""},
+			"gvim.exe",   "gvim.exe", "", रिक्त, रिक्त, ""},
     {"evim",	"evim.bat",	"gVim Easy.lnk",
-			"evim.exe",   "gvim.exe", "-y", NULL, NULL, ""},
+			"evim.exe",   "gvim.exe", "-y", रिक्त, रिक्त, ""},
     {"view",	"view.bat",	"Vim Read-only.lnk",
-			"view.exe",   "vim.exe",  "-R", NULL, NULL, ""},
+			"view.exe",   "vim.exe",  "-R", रिक्त, रिक्त, ""},
     {"gview",	"gview.bat",	"gVim Read-only.lnk",
-			"gview.exe",  "gvim.exe", "-R", NULL, NULL, ""},
+			"gview.exe",  "gvim.exe", "-R", रिक्त, रिक्त, ""},
     {"vimdiff", "vimdiff.bat",	"Vim Diff.lnk",
-			"vimdiff.exe","vim.exe",  "-d", NULL, NULL, ""},
+			"vimdiff.exe","vim.exe",  "-d", रिक्त, रिक्त, ""},
     {"gvimdiff","gvimdiff.bat",	"gVim Diff.lnk",
-			"gvimdiff.exe","gvim.exe", "-d", NULL, NULL, ""},
+			"gvimdiff.exe","gvim.exe", "-d", रिक्त, रिक्त, ""},
     {"vimtutor","vimtutor.bat", "Vim tutor.lnk",
-			"vimtutor.bat",  "vimtutor.bat", "", NULL, NULL, ""},
+			"vimtutor.bat",  "vimtutor.bat", "", रिक्त, रिक्त, ""},
 };
 
 /* Uninstall key for vim.bat, etc. */
 #define VIMBAT_UNINSTKEY    "rem # uninstall key: " VIM_VERSION_NODOT " #"
 
-#define ICON_COUNT 3
-char *(icon_names[ICON_COUNT]) =
+#define ICON_मोजणी 3
+अक्षर *(icon_names[ICON_मोजणी]) =
 	{"gVim " VIM_VERSION_SHORT,
 	 "gVim Easy " VIM_VERSION_SHORT,
 	 "gVim Read only " VIM_VERSION_SHORT};
-char *(icon_link_names[ICON_COUNT]) =
+अक्षर *(icon_link_names[ICON_मोजणी]) =
 	{"gVim " VIM_VERSION_SHORT ".lnk",
 	 "gVim Easy " VIM_VERSION_SHORT ".lnk",
 	 "gVim Read only " VIM_VERSION_SHORT ".lnk"};
 
 /* This is only used for dosinst.c. */
-#if defined(DOSINST)
+#जर defined(DOSINST)
 /*
  * Run an external command and wait for it to finish.
  */
-    static void
-run_command(char *cmd)
+    स्थिर शून्य
+run_command(अक्षर *cmd)
 {
-    char	*cmd_path;
-    char	cmd_buf[BUFSIZE * 2 + 35];
-    char	*p;
+    अक्षर	*cmd_path;
+    अक्षर	cmd_buf[BUFSIZE * 2 + 35];
+    अक्षर	*p;
 
     // On WinNT, 'start' is a shell built-in for cmd.exe rather than an
     // executable (start.exe) like in Win9x.
     cmd_path = searchpath_save("cmd.exe");
-    if (cmd_path != NULL)
+    जर (cmd_path != रिक्त)
     {
 	// There is a cmd.exe, so this might be Windows NT.  If it is,
 	// we need to call cmd.exe explicitly.  If it is a later OS,
 	// calling cmd.exe won't hurt if it is present.
 	// Also, "start" on NT expects a window title argument.
 	// Replace the slashes with backslashes.
-	while ((p = strchr(cmd_path, '/')) != NULL)
+	पर्यंत ((p = म_अक्षर(cmd_path, '/')) != रिक्त)
 	    *p = '\\';
-	sprintf(cmd_buf, "%s /c start \"vimcmd\" /wait %s", cmd_path, cmd);
-	free(cmd_path);
+	प्र_लिखो(cmd_buf, "%s /c start \"vimcmd\" /wait %s", cmd_path, cmd);
+	मुक्त(cmd_path);
     }
-    else
+    अन्यथा
     {
 	// No cmd.exe, just make the call and let the system handle it.
-	sprintf(cmd_buf, "start /w %s", cmd);
+	प्र_लिखो(cmd_buf, "start /w %s", cmd);
     }
-    system(cmd_buf);
+    प्रणाली(cmd_buf);
 }
 #endif
 
 /*
  * Append a backslash to "name" if there isn't one yet.
  */
-    void
-add_pathsep(char *name)
+    शून्य
+add_pathsep(अक्षर *name)
 {
-    int		len = strlen(name);
+    पूर्णांक		len = म_माप(name);
 
-    if (len > 0 && name[len - 1] != '\\' && name[len - 1] != '/')
-	strcat(name, "\\");
+    जर (len > 0 && name[len - 1] != '\\' && name[len - 1] != '/')
+	म_जोड़ो(name, "\\");
 }
 
 /*
  * The normal chdir() does not change the default drive.  This one does.
  */
-    int
-change_drive(int drive)
+    पूर्णांक
+change_drive(पूर्णांक drive)
 {
-    char temp[3] = "-:";
-    temp[0] = (char)(drive + 'A' - 1);
-    return !SetCurrentDirectory(temp);
+    अक्षर temp[3] = "-:";
+    temp[0] = (अक्षर)(drive + 'A' - 1);
+    परत !SetCurrentDirectory(temp);
 }
 
 /*
  * Change directory to "path".
  * Return 0 for success, -1 for failure.
  */
-    int
-mch_chdir(char *path)
+    पूर्णांक
+mch_chdir(अक्षर *path)
 {
-    if (path[0] == NUL)		// just checking...
-	return 0;
-    if (path[1] == ':')		// has a drive name
+    जर (path[0] == NUL)		// just checking...
+	परत 0;
+    जर (path[1] == ':')		// has a drive name
     {
-	if (change_drive(mytoupper(path[0]) - 'A' + 1))
-	    return -1;		// invalid drive name
+	जर (change_drive(mytoupper(path[0]) - 'A' + 1))
+	    परत -1;		// invalid drive name
 	path += 2;
     }
-    if (*path == NUL)		// drive name only
-	return 0;
-    return chdir(path);		// let the normal chdir() do the rest
+    जर (*path == NUL)		// drive name only
+	परत 0;
+    परत स_बदलो(path);		// let the normal chdir() do the rest
 }
 
 /*
  * Expand the executable name into a full path name.
  */
-    static char *
-my_fullpath(char *buf, char *fname UNUSED, int len)
+    स्थिर अक्षर *
+my_fullpath(अक्षर *buf, अक्षर *fname UNUSED, पूर्णांक len)
 {
     // Only GetModuleFileName() will get the long file name path.
     // GetFullPathName() may still use the short (FAT) name.
-    DWORD len_read = GetModuleFileName(NULL, buf, (size_t)len);
+    DWORD len_read = GetModuleFileName(रिक्त, buf, (माप_प्रकार)len);
 
-    return (len_read > 0 && len_read < (DWORD)len) ? buf : NULL;
+    परत (len_read > 0 && len_read < (DWORD)len) ? buf : रिक्त;
 }
 
 /*
  * Remove the tail from a file or directory name.
  * Puts a NUL on the last '/' or '\'.
  */
-    static void
-remove_tail(char *path)
+    स्थिर शून्य
+remove_tail(अक्षर *path)
 {
-    int		i;
+    पूर्णांक		i;
 
-    for (i = strlen(path) - 1; i > 0; --i)
-	if (path[i] == '/' || path[i] == '\\')
+    साठी (i = म_माप(path) - 1; i > 0; --i)
+	जर (path[i] == '/' || path[i] == '\\')
 	{
 	    path[i] = NUL;
-	    break;
+	    थांबा;
 	}
 }
 
 
-char	installdir[MAX_PATH-9];	// top of the installation dir, where the
+अक्षर	installdir[MAX_PATH-9];	// top of the installation dir, where the
 				// install.exe is located, E.g.:
 				// "c:\vim\vim60"
-int	runtimeidx;		// index in installdir[] where "vim60" starts
-char	*sysdrive;		// system drive or "c:\"
+पूर्णांक	runtimeidx;		// index in installdir[] where "vim60" starts
+अक्षर	*sysdrive;		// system drive or "c:\"
 
 /*
  * Setup for using this program.
  * Sets "installdir[]".
  */
-    static void
-do_inits(char **argv)
+    स्थिर शून्य
+do_inits(अक्षर **argv)
 {
     // Find out the full path of our executable.
-    if (my_fullpath(installdir, argv[0], sizeof(installdir)) == NULL)
+    जर (my_fullpath(installdir, argv[0], आकार(installdir)) == रिक्त)
     {
-	printf("ERROR: Cannot get name of executable\n");
+	म_लिखो("ERROR: Cannot get name of executable\n");
 	myexit(1);
     }
     // remove the tail, the executable name "install.exe"
@@ -510,7 +510,7 @@ do_inits(char **argv)
 
     // Find the system drive.  Only used for searching the Vim executable, not
     // very important.
-    sysdrive = getenv("SYSTEMDRIVE");
-    if (sysdrive == NULL || *sysdrive == NUL)
+    sysdrive = दो_पर्या("SYSTEMDRIVE");
+    जर (sysdrive == रिक्त || *sysdrive == NUL)
 	sysdrive = "C:\\";
 }

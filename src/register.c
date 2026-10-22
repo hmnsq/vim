@@ -11,7 +11,7 @@
  * register.c: functions for managing registers
  */
 
-#include "vim.h"
+#अन्तर्भाव "vim.h"
 
 /*
  * Registers:
@@ -23,92 +23,92 @@
  *     38 = Clipboard register '+'. Only if FEAT_CLIPBOARD and FEAT_X11
  *                                  or FEAT_WAYLAND_CLIPBOARD defined
  */
-static yankreg_T	y_regs[NUM_REGISTERS];
+स्थिर yankreg_T	y_regs[अंक_REGISTERS];
 
-static yankreg_T	*y_current;	    // ptr to current yankreg
-static int		y_append;	    // TRUE when appending
-static yankreg_T	*y_previous = NULL; // ptr to last written yankreg
+स्थिर yankreg_T	*y_current;	    // ptr to current yankreg
+स्थिर पूर्णांक		y_append;	    // TRUE when appending
+स्थिर yankreg_T	*y_previous = रिक्त; // ptr to last written yankreg
 
-static int	stuff_yank(int, char_u *);
-static void	put_reedit_in_typebuf(int silent);
-static int	put_in_typebuf(char_u *s, int esc, int colon, int silent);
-static int	yank_copy_line(struct block_def *bd, long y_idx, int exclude_trailing_space);
+स्थिर पूर्णांक	stuff_yank(पूर्णांक, char_u *);
+स्थिर शून्य	put_reedit_in_typebuf(पूर्णांक silent);
+स्थिर पूर्णांक	put_in_typebuf(char_u *s, पूर्णांक esc, पूर्णांक colon, पूर्णांक silent);
+स्थिर पूर्णांक	yank_copy_ओळ(संरचना block_def *bd, दीर्घ y_idx, पूर्णांक exclude_trailing_space);
 #ifdef HAVE_CLIPMETHOD
-static void	copy_yank_reg(yankreg_T *reg);
+स्थिर शून्य	copy_yank_reg(yankreg_T *reg);
 #endif
-static void	dis_msg(char_u *p, int skip_esc);
+स्थिर शून्य	dis_संदेश(char_u *p, पूर्णांक skip_esc);
 
-#if defined(FEAT_VIMINFO)
+#जर defined(FEAT_VIMINFO)
     yankreg_T *
-get_y_regs(void)
+get_y_regs(शून्य)
 {
-    return y_regs;
-}
-#endif
-
-#if defined(FEAT_CLIPBOARD) || defined(FEAT_CLIPBOARD_PROVIDER)
-    yankreg_T *
-get_y_register(int reg)
-{
-    return &y_regs[reg];
+    परत y_regs;
 }
 #endif
 
+#जर defined(FEAT_CLIPBOARD) || defined(FEAT_CLIPBOARD_PROVIDER)
     yankreg_T *
-get_y_current(void)
+get_y_register(पूर्णांक reg)
 {
-    return y_current;
+    परत &y_regs[reg];
+}
+#endif
+
+    yankreg_T *
+get_y_current(शून्य)
+{
+    परत y_current;
 }
 
     yankreg_T *
-get_y_previous(void)
+get_y_previous(शून्य)
 {
-    return y_previous;
+    परत y_previous;
 }
 
-    void
+    शून्य
 set_y_current(yankreg_T *yreg)
 {
     y_current = yreg;
 }
 
-    void
+    शून्य
 set_y_previous(yankreg_T *yreg)
 {
     y_previous = yreg;
 }
 
-    void
-reset_y_append(void)
+    शून्य
+reset_y_append(शून्य)
 {
     y_append = FALSE;
 }
 
 
-#if defined(FEAT_EVAL)
+#जर defined(FEAT_EVAL)
 /*
  * Keep the last expression line here, for repeating.
  */
-static char_u	*expr_line = NULL;
-static exarg_T	*expr_eap = NULL;
+स्थिर char_u	*अभिव्यक्ती_ओळ = रिक्त;
+स्थिर exarg_T	*अभिव्यक्ती_eap = रिक्त;
 
 /*
  * Get an expression for the "\"=expr1" or "CTRL-R =expr1"
  * Returns '=' when OK, NUL otherwise.
  */
-    int
-get_expr_register(void)
+    पूर्णांक
+get_अभिव्यक्ती_register(शून्य)
 {
-    char_u	*new_line;
+    char_u	*new_ओळ;
 
-    new_line = getcmdline('=', 0L, 0, 0);
-    if (new_line == NULL)
-	return NUL;
-    if (*new_line == NUL)	// use previous line
-	vim_free(new_line);
-    else
-	set_expr_line(new_line, NULL);
-    return '=';
+    new_ओळ = getcmdline('=', 0L, 0, 0);
+    जर (new_ओळ == रिक्त)
+	परत NUL;
+    जर (*new_ओळ == NUL)	// use previous line
+	vim_free(new_ओळ);
+    अन्यथा
+	set_अभिव्यक्ती_ओळ(new_ओळ, रिक्त);
+    परत '=';
 }
 
 /*
@@ -117,12 +117,12 @@ get_expr_register(void)
  * "eap" may be used if the next line needs to be checked when evaluating the
  * expression.
  */
-    void
-set_expr_line(char_u *new_line, exarg_T *eap)
+    शून्य
+set_अभिव्यक्ती_ओळ(char_u *new_ओळ, exarg_T *eap)
 {
-    vim_free(expr_line);
-    expr_line = new_line;
-    expr_eap = eap;
+    vim_free(अभिव्यक्ती_ओळ);
+    अभिव्यक्ती_ओळ = new_ओळ;
+    अभिव्यक्ती_eap = eap;
 }
 
 /*
@@ -130,42 +130,42 @@ set_expr_line(char_u *new_line, exarg_T *eap)
  * Returns a pointer to allocated memory, or NULL for failure.
  */
     char_u *
-get_expr_line(void)
+get_अभिव्यक्ती_ओळ(शून्य)
 {
-    char_u	*expr_copy;
+    char_u	*अभिव्यक्ती_copy;
     char_u	*rv;
-    static int	nested = 0;
+    स्थिर पूर्णांक	nested = 0;
 
-    if (expr_line == NULL)
-	return NULL;
+    जर (अभिव्यक्ती_ओळ == रिक्त)
+	परत रिक्त;
 
     // Make a copy of the expression, because evaluating it may cause it to be
     // changed.
-    expr_copy = vim_strsave(expr_line);
-    if (expr_copy == NULL)
-	return NULL;
+    अभिव्यक्ती_copy = vim_strsave(अभिव्यक्ती_ओळ);
+    जर (अभिव्यक्ती_copy == रिक्त)
+	परत रिक्त;
 
     // When we are invoked recursively limit the evaluation to 10 levels.
     // Then return the string as-is.
-    if (nested >= 10)
-	return expr_copy;
+    जर (nested >= 10)
+	परत अभिव्यक्ती_copy;
 
     ++nested;
-    rv = eval_to_string_eap(expr_copy, TRUE, expr_eap, FALSE);
+    rv = eval_to_string_eap(अभिव्यक्ती_copy, TRUE, अभिव्यक्ती_eap, FALSE);
     --nested;
-    vim_free(expr_copy);
-    return rv;
+    vim_free(अभिव्यक्ती_copy);
+    परत rv;
 }
 
 /*
  * Get the '=' register expression itself, without evaluating it.
  */
-    static char_u *
-get_expr_line_src(void)
+    स्थिर char_u *
+get_अभिव्यक्ती_ओळ_src(शून्य)
 {
-    if (expr_line == NULL)
-	return NULL;
-    return vim_strsave(expr_line);
+    जर (अभिव्यक्ती_ओळ == रिक्त)
+	परत रिक्त;
+    परत vim_strsave(अभिव्यक्ती_ओळ);
 }
 #endif // FEAT_EVAL
 
@@ -173,27 +173,27 @@ get_expr_line_src(void)
  * Check if 'regname' is a valid name of a yank register.
  * Note: There is no check for 0 (default register), caller should do this
  */
-    int
+    पूर्णांक
 valid_yank_reg(
-    int	    regname,
-    int	    writing)	    // if TRUE check for writable registers
+    पूर्णांक	    regname,
+    पूर्णांक	    writing)	    // if TRUE check for writable registers
 {
-    if (       (regname > 0 && ASCII_ISALNUM(regname))
+    जर (       (regname > 0 && ASCII_ISALNUM(regname))
 	    || (!writing && vim_strchr((char_u *)
 #ifdef FEAT_EVAL
 				    "/#.%:="
-#else
+#अन्यथा
 				    "/#.%:"
 #endif
-					, regname) != NULL)
+					, regname) != रिक्त)
 	    || regname == '"'
 	    || regname == '-'
 	    || regname == '_'
-#if defined(FEAT_CLIPBOARD) // If +clipboard is enabled, then these registers
+#जर defined(FEAT_CLIPBOARD) // If +clipboard is enabled, then these registers
 			    // always exist.
 	    || regname == '*'
 	    || regname == '+'
-#elif defined(FEAT_CLIPBOARD_PROVIDER)
+#किंवाजर defined(FEAT_CLIPBOARD_PROVIDER)
 	    || ( // If -clipboard, then these registers only exist when
 		 // clipmethod is set to provider.
 	     clipmethod == CLIPMETHOD_PROVIDER && (
@@ -205,17 +205,17 @@ valid_yank_reg(
 	    || (!writing && regname == '~')
 #endif
 							)
-	return TRUE;
+	परत TRUE;
 #ifndef FEAT_CLIPBOARD
     // clipboard support not enabled in this build
-    else if (regname == '*' || regname == '+')
+    अन्यथा जर (regname == '*' || regname == '+')
     {
 	// Warn about missing clipboard support once
-	msg_warn_missing_clipboard();
-	return FALSE;
+	संदेश_warn_missing_clipboard();
+	परत FALSE;
     }
 #endif
-    return FALSE;
+    परत FALSE;
 }
 
 /*
@@ -229,103 +229,103 @@ valid_yank_reg(
  * Return TRUE when the register should be inserted literally (selection or
  * clipboard).
  */
-    int
-get_yank_register(int regname, int writing)
+    पूर्णांक
+get_yank_register(पूर्णांक regname, पूर्णांक writing)
 {
-    int	    i;
-    int	    ret = FALSE;
+    पूर्णांक	    i;
+    पूर्णांक	    ret = FALSE;
 
     y_append = FALSE;
-    if ((regname == 0 || regname == '"') && !writing && y_previous != NULL)
+    जर ((regname == 0 || regname == '"') && !writing && y_previous != रिक्त)
     {
 	y_current = y_previous;
-	return ret;
+	परत ret;
     }
     i = regname;
-    if (VIM_ISDIGIT(i))
+    जर (VIM_ISDIGIT(i))
 	i -= '0';
-    else if (ASCII_ISLOWER(i))
-	i = CharOrdLow(i) + 10;
-    else if (ASCII_ISUPPER(i))
+    अन्यथा जर (ASCII_ISLOWER(i))
+	i = Char_Ord_खालचा(i) + 10;
+    अन्यथा जर (ASCII_ISUPPER(i))
     {
 	i = CharOrdUp(i) + 10;
 	y_append = TRUE;
     }
-    else if (regname == '-')
+    अन्यथा जर (regname == '-')
 	i = DELETION_REGISTER;
 #ifdef FEAT_CLIPBOARD
     // When selection is not available, use register 0 instead of '*'
-    else if (clip_star.available && regname == '*')
+    अन्यथा जर (clip_star.available && regname == '*')
     {
 	i = STAR_REGISTER;
 	ret = TRUE;
     }
     // When clipboard is not available, use register 0 instead of '+'
-    else if (clip_plus.available && regname == '+')
+    अन्यथा जर (clip_plus.available && regname == '+')
     {
 # ifdef FEAT_CLIPBOARD_PROVIDER
 	// We want to use the actual + register, since PLUS_REGISTER may be
 	// pointing to STAR_REGISTER.
-	if (clipmethod == CLIPMETHOD_PROVIDER)
+	जर (clipmethod == CLIPMETHOD_PROVIDER)
 	    i = REAL_PLUS_REGISTER;
-	else
+	अन्यथा
 # endif
 	    i = PLUS_REGISTER;
 	ret = TRUE;
     }
-#elif defined(FEAT_CLIPBOARD_PROVIDER)
-    else if (regname == '*')
+#किंवाजर defined(FEAT_CLIPBOARD_PROVIDER)
+    अन्यथा जर (regname == '*')
     {
 	i = STAR_REGISTER;
 	ret = TRUE;
     }
-    else if (regname == '+')
+    अन्यथा जर (regname == '+')
     {
 	i = REAL_PLUS_REGISTER;
 	ret = TRUE;
     }
 #endif
 #ifdef FEAT_DND
-    else if (!writing && regname == '~')
+    अन्यथा जर (!writing && regname == '~')
 	i = TILDE_REGISTER;
 #endif
-    else		// not 0-9, a-z, A-Z or '-': use register 0
+    अन्यथा		// not 0-9, a-z, A-Z or '-': use register 0
 	i = 0;
     y_current = &(y_regs[i]);
-    if (writing)	// remember the register we write into for do_put()
+    जर (writing)	// remember the register we write into for do_put()
 	y_previous = y_current;
-    return ret;
+    परत ret;
 }
 
 /*
  * Obtain the contents of a "normal" register. The register is made empty.
  * The returned pointer has allocated memory, use put_register() later.
  */
-    void *
+    शून्य *
 get_register(
-    int		name,
-    int		copy)	// make a copy, if FALSE make register empty.
+    पूर्णांक		name,
+    पूर्णांक		copy)	// make a copy, if FALSE make register empty.
 {
     yankreg_T	*reg;
-    int		i;
+    पूर्णांक		i;
 
 #ifdef FEAT_CLIPBOARD_PROVIDER
     call_clip_provider_request(name);
 #endif
 #ifdef FEAT_CLIPBOARD
-    if (clipmethod != CLIPMETHOD_PROVIDER)
+    जर (clipmethod != CLIPMETHOD_PROVIDER)
     {
 	// When Visual area changed, may have to update selection.  Obtain the
 	// selection too.
-	if (name == '*' && clip_star.available)
+	जर (name == '*' && clip_star.available)
 	{
-	    if (clip_isautosel_star())
+	    जर (clip_isautosel_star())
 		clip_update_selection(&clip_star);
 	    may_get_selection(name);
 	}
-	if (name == '+' && clip_plus.available)
+	जर (name == '+' && clip_plus.available)
 	{
-	    if (clip_isautosel_plus())
+	    जर (clip_isautosel_plus())
 		clip_update_selection(&clip_plus);
 	    may_get_selection(name);
 	}
@@ -334,47 +334,47 @@ get_register(
 
     get_yank_register(name, 0);
     reg = ALLOC_ONE(yankreg_T);
-    if (reg == NULL)
-	return (void *)NULL;
+    जर (reg == रिक्त)
+	परत (शून्य *)रिक्त;
 
     *reg = *y_current;
-    if (copy)
+    जर (copy)
     {
 	// If we run out of memory some or all of the lines are empty.
-	if (reg->y_size == 0 || y_current->y_array == NULL)
-	    reg->y_array = NULL;
-	else
+	जर (reg->y_size == 0 || y_current->y_array == रिक्त)
+	    reg->y_array = रिक्त;
+	अन्यथा
 	    reg->y_array = ALLOC_MULT(string_T, reg->y_size);
-	if (reg->y_array != NULL)
+	जर (reg->y_array != रिक्त)
 	{
-	    for (i = 0; i < reg->y_size; ++i)
+	    साठी (i = 0; i < reg->y_size; ++i)
 	    {
 		reg->y_array[i].string = vim_strnsave(y_current->y_array[i].string,
 					    y_current->y_array[i].length);
-		if (reg->y_array[i].string == NULL)
+		जर (reg->y_array[i].string == रिक्त)
 		{
 		    // The allocation failed so clean up and exit
-		    while (--i >= 0)
+		    पर्यंत (--i >= 0)
 			vim_free(reg->y_array[i].string);
 		    vim_free(reg->y_array);
 		    vim_free(reg);
-		    return (void *)NULL;
+		    परत (शून्य *)रिक्त;
 		}
 
 		reg->y_array[i].length = y_current->y_array[i].length;
 	    }
 	}
     }
-    else
-	y_current->y_array = NULL;
-    return (void *)reg;
+    अन्यथा
+	y_current->y_array = रिक्त;
+    परत (शून्य *)reg;
 }
 
 /*
  * Put "reg" into register "name".  Free any previous contents and "reg".
  */
-    void
-put_register(int name, void *reg)
+    शून्य
+put_register(पूर्णांक name, शून्य *reg)
 {
     get_yank_register(name, 0);
     free_yank_all();
@@ -387,9 +387,9 @@ put_register(int name, void *reg)
 #endif
 }
 
-#if defined(FEAT_CLIPBOARD)
-    void
-free_register(void *reg)
+#जर defined(FEAT_CLIPBOARD)
+    शून्य
+free_register(शून्य *reg)
 {
     yankreg_T tmp;
 
@@ -404,15 +404,15 @@ free_register(void *reg)
 /*
  * return TRUE if the current yank register has type MLINE
  */
-    int
-yank_register_mline(int regname)
+    पूर्णांक
+yank_register_mline(पूर्णांक regname)
 {
-    if (regname != 0 && !valid_yank_reg(regname, FALSE))
-	return FALSE;
-    if (regname == '_')		// black hole is always empty
-	return FALSE;
+    जर (regname != 0 && !valid_yank_reg(regname, FALSE))
+	परत FALSE;
+    जर (regname == '_')		// black hole is always empty
+	परत FALSE;
     get_yank_register(regname, FALSE);
-    return (y_current->y_type == MLINE);
+    परत (y_current->y_type == MLINE);
 }
 
 /*
@@ -420,20 +420,20 @@ yank_register_mline(int regname)
  *
  * Return FAIL for failure, OK otherwise.
  */
-    int
-do_record(int c)
+    पूर्णांक
+do_record(पूर्णांक c)
 {
     char_u	    *p;
-    static int	    regname;
+    स्थिर पूर्णांक	    regname;
     yankreg_T	    *old_y_previous, *old_y_current;
-    int		    retval;
+    पूर्णांक		    retval;
 
-    if (reg_recording == 0)	    // start recording
+    जर (reg_recording == 0)	    // start recording
     {
 	// registers 0-9, a-z and " are allowed
-	if (c < 0 || (!ASCII_ISALNUM(c) && c != '"'))
+	जर (c < 0 || (!ASCII_ISALNUM(c) && c != '"'))
 	    retval = FAIL;
-	else
+	अन्यथा
 	{
 	    reg_recording = c;
 	    showmode();
@@ -441,17 +441,17 @@ do_record(int c)
 	    retval = OK;
 	}
     }
-    else			    // stop recording
+    अन्यथा			    // stop recording
     {
 	// Get the recorded key hits.  K_SPECIAL and CSI will be escaped, this
 	// needs to be removed again to put it in a register.  exec_reg then
 	// adds the escaping back later.
 	reg_recording = 0;
-	msg("");
+	संदेश("");
 	p = get_recorded();
-	if (p == NULL)
+	जर (p == रिक्त)
 	    retval = FAIL;
-	else
+	अन्यथा
 	{
 	    // Remove escaping for CSI and K_SPECIAL in multi-byte chars.
 	    vim_unescape_csi(p);
@@ -467,7 +467,7 @@ do_record(int c)
 	    y_current = old_y_current;
 	}
     }
-    return retval;
+    परत retval;
 }
 
 /*
@@ -476,38 +476,38 @@ do_record(int c)
  *
  * return FAIL for failure, OK otherwise
  */
-    static int
-stuff_yank(int regname, char_u *p)
+    स्थिर पूर्णांक
+stuff_yank(पूर्णांक regname, char_u *p)
 {
-    size_t  plen;
+    माप_प्रकार  plen;
 
     // check for read-only register
-    if (regname != 0 && !valid_yank_reg(regname, TRUE))
+    जर (regname != 0 && !valid_yank_reg(regname, TRUE))
     {
 	vim_free(p);
-	return FAIL;
+	परत FAIL;
     }
-    if (regname == '_')		    // black hole: don't do anything
+    जर (regname == '_')		    // black hole: don't do anything
     {
 	vim_free(p);
-	return OK;
+	परत OK;
     }
 
     plen = STRLEN(p);
     get_yank_register(regname, TRUE);
-    if (y_append && y_current->y_array != NULL)
+    जर (y_append && y_current->y_array != रिक्त)
     {
 	string_T    *pp;
 	char_u	    *tmp;
-	size_t	    tmplen;
+	माप_प्रकार	    tmplen;
 
 	pp = &(y_current->y_array[y_current->y_size - 1]);
 	tmplen = pp->length + plen;
 	tmp = alloc(tmplen + 1);
-	if (tmp == NULL)
+	जर (tmp == रिक्त)
 	{
 	    vim_free(p);
-	    return FAIL;
+	    परत FAIL;
 	}
 	STRCPY(tmp, pp->string);
 	STRCPY(tmp + pp->length, p);
@@ -516,13 +516,13 @@ stuff_yank(int regname, char_u *p)
 	pp->string = tmp;
 	pp->length = tmplen;
     }
-    else
+    अन्यथा
     {
 	free_yank_all();
-	if ((y_current->y_array = ALLOC_ONE(string_T)) == NULL)
+	जर ((y_current->y_array = ALLOC_ONE(string_T)) == रिक्त)
 	{
 	    vim_free(p);
-	    return FAIL;
+	    परत FAIL;
 	}
 	y_current->y_array[0].string = p;
 	y_current->y_array[0].length = plen;
@@ -532,23 +532,23 @@ stuff_yank(int regname, char_u *p)
 	y_current->y_time_set = vim_time();
 #endif
     }
-    return OK;
+    परत OK;
 }
 
 /*
  * Last executed register (@ command)
  */
-static int execreg_lastc = NUL;
+स्थिर पूर्णांक execreg_lastc = NUL;
 
-#if defined(FEAT_VIMINFO)
-    int
-get_execreg_lastc(void)
+#जर defined(FEAT_VIMINFO)
+    पूर्णांक
+get_execreg_lastc(शून्य)
 {
-    return execreg_lastc;
+    परत execreg_lastc;
 }
 
-    void
-set_execreg_lastc(int lastc)
+    शून्य
+set_execreg_lastc(पूर्णांक lastc)
 {
     execreg_lastc = lastc;
 }
@@ -570,48 +570,48 @@ set_execreg_lastc(int lastc)
  * Returns the concatenated line. The index of the line that should be
  * processed next is returned in idx.
  */
-    static char_u *
-execreg_line_continuation(string_T *lines, long *idx)
+    स्थिर char_u *
+execreg_ओळ_continuation(string_T *ओळी, दीर्घ *idx)
 {
     garray_T	ga;
-    long	cmd_start = *idx;
-    long	cmd_end = *idx;
+    दीर्घ	cmd_start = *idx;
+    दीर्घ	cmd_end = *idx;
     string_T	*tmp;
-    int		j;
+    पूर्णांक		j;
     char_u	*str;
 
-    ga_init2(&ga, sizeof(char_u), 400);
+    ga_init2(&ga, आकार(char_u), 400);
 
     // search backwards to find the first line of this command.
     // Any line not starting with \ or "\ is the start of the
     // command.
-    while (--cmd_start > 0)
+    पर्यंत (--cmd_start > 0)
     {
 	char_u	*p;
 
-	p = skipwhite(lines[cmd_start].string);
-	if (*p != '\\' && (p[0] != '"' || p[1] != '\\' || p[2] != ' '))
-	    break;
+	p = skipwhite(ओळी[cmd_start].string);
+	जर (*p != '\\' && (p[0] != '"' || p[1] != '\\' || p[2] != ' '))
+	    थांबा;
     }
 
     // join all the lines
-    tmp = &lines[cmd_start];
+    tmp = &ओळी[cmd_start];
     ga_concat_len(&ga, tmp->string, tmp->length);
-    for (j = cmd_start + 1; j <= cmd_end; j++)
+    साठी (j = cmd_start + 1; j <= cmd_end; j++)
     {
 	char_u	*p;
 
-	tmp = &lines[j];
+	tmp = &ओळी[j];
 	p = skipwhite(tmp->string);
-	if (*p == '\\')
+	जर (*p == '\\')
 	{
 	    // Adjust the growsize to the current length to
 	    // speed up concatenating many lines.
-	    if (ga.ga_len > 400)
+	    जर (ga.ga_len > 400)
 	    {
-		if (ga.ga_len > 8000)
+		जर (ga.ga_len > 8000)
 		    ga.ga_growsize = 8000;
-		else
+		अन्यथा
 		    ga.ga_growsize = ga.ga_len;
 	    }
 	    p++;
@@ -623,7 +623,7 @@ execreg_line_continuation(string_T *lines, long *idx)
     ga_clear(&ga);
 
     *idx = cmd_start;
-    return str;
+    परत str;
 }
 
 /*
@@ -631,33 +631,33 @@ execreg_line_continuation(string_T *lines, long *idx)
  *
  * Return FAIL for failure, OK otherwise.
  */
-    int
+    पूर्णांक
 do_execreg(
-    int	    regname,
-    int	    colon,		// insert ':' before each line
-    int	    addcr,		// always add '\n' to end of line
-    int	    silent)		// set "silent" flag in typeahead buffer
+    पूर्णांक	    regname,
+    पूर्णांक	    colon,		// insert ':' before each line
+    पूर्णांक	    addcr,		// always add '\n' to end of line
+    पूर्णांक	    silent)		// set "silent" flag in typeahead buffer
 {
-    long	i;
+    दीर्घ	i;
     char_u	*p;
-    int		retval = OK;
-    int		remap;
+    पूर्णांक		retval = OK;
+    पूर्णांक		remap;
 
     // repeat previous one
-    if (regname == '@')
+    जर (regname == '@')
     {
-	if (execreg_lastc == NUL)
+	जर (execreg_lastc == NUL)
 	{
 	    emsg(_(e_no_previously_used_register));
-	    return FAIL;
+	    परत FAIL;
 	}
 	regname = execreg_lastc;
     }
     // check for valid regname
-    if (regname == '%' || regname == '#' || !valid_yank_reg(regname, FALSE))
+    जर (regname == '%' || regname == '#' || !valid_yank_reg(regname, FALSE))
     {
 	emsg_invreg(regname);
-	return FAIL;
+	परत FAIL;
     }
     execreg_lastc = regname;
 
@@ -665,21 +665,21 @@ do_execreg(
     call_clip_provider_request(regname);
 #endif
 #ifdef FEAT_CLIPBOARD
-    if (clipmethod != CLIPMETHOD_PROVIDER)
+    जर (clipmethod != CLIPMETHOD_PROVIDER)
 	regname = may_get_selection(regname);
 #endif
 
     // black hole: don't stuff anything
-    if (regname == '_')
-	return OK;
+    जर (regname == '_')
+	परत OK;
 
     // use last command line
-    if (regname == ':')
+    जर (regname == ':')
     {
-	if (last_cmdline == NULL)
+	जर (last_cmdline == रिक्त)
 	{
-	    emsg(_(e_no_previous_command_line));
-	    return FAIL;
+	    emsg(_(e_no_previous_command_ओळ));
+	    परत FAIL;
 	}
 	// don't keep the cmdline containing @:
 	VIM_CLEAR(new_last_cmdline);
@@ -690,115 +690,115 @@ do_execreg(
 			  "\020\021\022\023\024\025\026\027"
 			  "\030\031\032\033\034\035\036\037",
 		    Ctrl_V, FALSE);
-	if (p != NULL)
+	जर (p != रिक्त)
 	{
 	    // When in Visual mode "'<,'>" will be prepended to the command.
 	    // Remove it when it's already there.
-	    if (VIsual_active && STRNCMP(p, "'<,'>", 5) == 0)
+	    जर (VIsual_active && STRNCMP(p, "'<,'>", 5) == 0)
 		retval = put_in_typebuf(p + 5, TRUE, TRUE, silent);
-	    else
+	    अन्यथा
 		retval = put_in_typebuf(p, TRUE, TRUE, silent);
 	}
 	vim_free(p);
     }
 #ifdef FEAT_EVAL
-    else if (regname == '=')
+    अन्यथा जर (regname == '=')
     {
-	p = get_expr_line();
-	if (p == NULL)
-	    return FAIL;
+	p = get_अभिव्यक्ती_ओळ();
+	जर (p == रिक्त)
+	    परत FAIL;
 	retval = put_in_typebuf(p, TRUE, colon, silent);
 	vim_free(p);
     }
 #endif
-    else if (regname == '.')		// use last inserted text
+    अन्यथा जर (regname == '.')		// use last inserted text
     {
-	p = get_last_insert_save();
-	if (p == NULL)
+	p = get_last_घाला_save();
+	जर (p == रिक्त)
 	{
 	    emsg(_(e_no_inserted_text_yet));
-	    return FAIL;
+	    परत FAIL;
 	}
 	retval = put_in_typebuf(p, FALSE, colon, silent);
 	vim_free(p);
     }
-    else
+    अन्यथा
     {
 	get_yank_register(regname, FALSE);
-	if (y_current->y_array == NULL)
-	    return FAIL;
+	जर (y_current->y_array == रिक्त)
+	    परत FAIL;
 
 	// Disallow remapping for ":@r".
 	remap = colon ? REMAP_NONE : REMAP_YES;
 
 	// Insert lines into typeahead buffer, from last one to first one.
 	put_reedit_in_typebuf(silent);
-	for (i = y_current->y_size; --i >= 0; )
+	साठी (i = y_current->y_size; --i >= 0; )
 	{
 	    char_u *escaped;
 	    char_u *str;
-	    int	    free_str = FALSE;
+	    पूर्णांक	    free_str = FALSE;
 
 	    // insert NL between lines and after last line if type is MLINE
-	    if (y_current->y_type == MLINE || i < y_current->y_size - 1
+	    जर (y_current->y_type == MLINE || i < y_current->y_size - 1
 								     || addcr)
 	    {
-		if (ins_typebuf((char_u *)"\n", remap, 0, TRUE, silent) == FAIL)
-		    return FAIL;
+		जर (ins_typebuf((char_u *)"\n", remap, 0, TRUE, silent) == FAIL)
+		    परत FAIL;
 	    }
 
 	    // Handle line-continuation for :@<register>
 	    str = y_current->y_array[i].string;
-	    if (colon && i > 0)
+	    जर (colon && i > 0)
 	    {
 		p = skipwhite(str);
-		if (*p == '\\' || (p[0] == '"' && p[1] == '\\' && p[2] == ' '))
+		जर (*p == '\\' || (p[0] == '"' && p[1] == '\\' && p[2] == ' '))
 		{
-		    str = execreg_line_continuation(y_current->y_array, &i);
-		    if (str == NULL)
-			return FAIL;
+		    str = execreg_ओळ_continuation(y_current->y_array, &i);
+		    जर (str == रिक्त)
+			परत FAIL;
 		    free_str = TRUE;
 		}
 	    }
 	    escaped = vim_strsave_escape_csi(str);
-	    if (free_str)
+	    जर (free_str)
 		vim_free(str);
-	    if (escaped == NULL)
-		return FAIL;
+	    जर (escaped == रिक्त)
+		परत FAIL;
 	    retval = ins_typebuf(escaped, remap, 0, TRUE, silent);
 	    vim_free(escaped);
-	    if (retval == FAIL)
-		return FAIL;
-	    if (colon && ins_typebuf((char_u *)":", remap, 0, TRUE, silent)
+	    जर (retval == FAIL)
+		परत FAIL;
+	    जर (colon && ins_typebuf((char_u *)":", remap, 0, TRUE, silent)
 								      == FAIL)
-		return FAIL;
+		परत FAIL;
 	}
 	reg_executing = regname == 0 ? '"' : regname; // disable "q" command
 	pending_end_reg_executing = FALSE;
     }
-    return retval;
+    परत retval;
 }
 
 /*
  * If "restart_edit" is not zero, put it in the typeahead buffer, so that it's
  * used only after other typeahead has been processed.
  */
-    static void
-put_reedit_in_typebuf(int silent)
+    स्थिर शून्य
+put_reedit_in_typebuf(पूर्णांक silent)
 {
-    if (restart_edit == NUL)
-	return;
+    जर (restart_edit == NUL)
+	परत;
 
     char_u	buf[] = { K_SPECIAL, KS_EXTRA, KE_COMMAND,
 	// :startinsert
 	's', 't', 'a', 'r', 't', 'i', CAR, NUL };
-    if (restart_edit == 'R')
+    जर (restart_edit == 'R')
 	buf[8] = 'r';  // :startreplace
-    else if (restart_edit == 'V')
+    अन्यथा जर (restart_edit == 'V')
 	buf[8] = 'g';  // :startgreplace
-    else if (restart_edit == 'A')
+    अन्यथा जर (restart_edit == 'A')
 	buf[8] = '!';  // :startinsert!
-    if (ins_typebuf(buf, REMAP_NONE, 0, TRUE, silent) == OK)
+    जर (ins_typebuf(buf, REMAP_NONE, 0, TRUE, silent) == OK)
 	restart_edit = NUL;
 }
 
@@ -808,37 +808,37 @@ put_reedit_in_typebuf(int silent)
  * When "esc" is TRUE it is to be taken literally: Escape CSI characters and
  * no remapping.
  */
-    static int
+    स्थिर पूर्णांक
 put_in_typebuf(
     char_u	*s,
-    int		esc,
-    int		colon,	    // add ':' before the line
-    int		silent)
+    पूर्णांक		esc,
+    पूर्णांक		colon,	    // add ':' before the line
+    पूर्णांक		silent)
 {
-    int		retval = OK;
+    पूर्णांक		retval = OK;
 
     put_reedit_in_typebuf(silent);
-    if (colon)
+    जर (colon)
 	retval = ins_typebuf((char_u *)"\n", REMAP_NONE, 0, TRUE, silent);
-    if (retval == OK)
+    जर (retval == OK)
     {
 	char_u	*p;
 
-	if (esc)
+	जर (esc)
 	    p = vim_strsave_escape_csi(s);
-	else
+	अन्यथा
 	    p = s;
-	if (p == NULL)
+	जर (p == रिक्त)
 	    retval = FAIL;
-	else
+	अन्यथा
 	    retval = ins_typebuf(p, esc ? REMAP_NONE : REMAP_YES,
 							     0, TRUE, silent);
-	if (esc)
+	जर (esc)
 	    vim_free(p);
     }
-    if (colon && retval == OK)
+    जर (colon && retval == OK)
 	retval = ins_typebuf((char_u *)":", REMAP_NONE, 0, TRUE, silent);
-    return retval;
+    परत retval;
 }
 
 /*
@@ -847,67 +847,67 @@ put_in_typebuf(
  *
  * return FAIL for failure, OK otherwise
  */
-    int
-insert_reg(
-    int		regname,
-    int		literally_arg)	// insert literally, not as if typed
+    पूर्णांक
+घाला_reg(
+    पूर्णांक		regname,
+    पूर्णांक		literally_arg)	// insert literally, not as if typed
 {
-    long	i;
-    int		retval = OK;
+    दीर्घ	i;
+    पूर्णांक		retval = OK;
     char_u	*arg;
-    int		allocated;
-    int		literally = literally_arg;
+    पूर्णांक		allocated;
+    पूर्णांक		literally = literally_arg;
 
     // It is possible to get into an endless loop by having CTRL-R a in
     // register a and then, in insert mode, doing CTRL-R a.
     // If you hit CTRL-C, the loop will be broken here.
     ui_breakcheck();
-    if (got_int)
-	return FAIL;
+    जर (got_int)
+	परत FAIL;
 
     // check for valid regname
-    if (regname != NUL && !valid_yank_reg(regname, FALSE))
-	return FAIL;
+    जर (regname != NUL && !valid_yank_reg(regname, FALSE))
+	परत FAIL;
 
 #ifdef FEAT_CLIPBOARD_PROVIDER
     call_clip_provider_request(regname);
 #endif
 #ifdef FEAT_CLIPBOARD
-    if (clipmethod != CLIPMETHOD_PROVIDER)
+    जर (clipmethod != CLIPMETHOD_PROVIDER)
 	regname = may_get_selection(regname);
 #endif
 
-    if (regname == '.')			// insert last inserted text
+    जर (regname == '.')			// insert last inserted text
 	retval = stuff_inserted(NUL, 1L, TRUE);
-    else if (get_spec_reg(regname, &arg, &allocated, TRUE))
+    अन्यथा जर (get_spec_reg(regname, &arg, &allocated, TRUE))
     {
-	if (arg == NULL)
-	    return FAIL;
+	जर (arg == रिक्त)
+	    परत FAIL;
 	stuffescaped(arg, literally);
-	if (allocated)
+	जर (allocated)
 	    vim_free(arg);
     }
-    else				// name or number register
+    अन्यथा				// name or number register
     {
-	if (get_yank_register(regname, FALSE))
+	जर (get_yank_register(regname, FALSE))
 	    literally = TRUE;
-	if (y_current->y_array == NULL)
+	जर (y_current->y_array == रिक्त)
 	    retval = FAIL;
-	else
+	अन्यथा
 	{
-	    for (i = 0; i < y_current->y_size; ++i)
+	    साठी (i = 0; i < y_current->y_size; ++i)
 	    {
-		if (regname == '-' && y_current->y_type == MCHAR)
+		जर (regname == '-' && y_current->y_type == MCHAR)
 		{
-		    int dir = BACKWARD;
-		    if ((State & REPLACE_FLAG) != 0)
+		    पूर्णांक dir = BACKWARD;
+		    जर ((State & REPLACE_FLAG) != 0)
 		    {
 			pos_T curpos;
-			if (u_save_cursor() == FAIL)
-			    return FAIL;
-			del_chars((long)mb_charlen(y_current->y_array[0].string), TRUE);
+			जर (u_save_cursor() == FAIL)
+			    परत FAIL;
+			del_chars((दीर्घ)mb_charlen(y_current->y_array[0].string), TRUE);
 			curpos = curwin->w_cursor;
-			if (oneright() == FAIL)
+			जर (oneright() == FAIL)
 			    // hit end of line, need to put forward (after the current position)
 			    dir = FORWARD;
 			curwin->w_cursor = curpos;
@@ -915,109 +915,109 @@ insert_reg(
 
 		    AppendCharToRedobuff(Ctrl_R);
 		    AppendCharToRedobuff(regname);
-		    do_put(regname, NULL, dir, 1L, PUT_CURSEND);
+		    do_put(regname, रिक्त, dir, 1L, PUT_CURSEND);
 		}
-		else
+		अन्यथा
 		{
 		    stuffescaped(y_current->y_array[i].string, literally);
 		    // Insert a newline between lines and after last line if
 		    // y_type is MLINE.
-		    if (y_current->y_type == MLINE || i < y_current->y_size - 1)
+		    जर (y_current->y_type == MLINE || i < y_current->y_size - 1)
 			stuffcharReadbuff('\n');
 		}
 	    }
 	}
     }
 
-    return retval;
+    परत retval;
 }
 
 /*
  * If "regname" is a special register, return TRUE and store a pointer to its
  * value in "argp".
  */
-    int
+    पूर्णांक
 get_spec_reg(
-    int		regname,
+    पूर्णांक		regname,
     char_u	**argp,
-    int		*allocated,	// return: TRUE when value was allocated
-    int		errmsg)		// give error message when failing
+    पूर्णांक		*allocated,	// return: TRUE when value was allocated
+    पूर्णांक		errmsg)		// give error message when failing
 {
-    int		cnt;
+    पूर्णांक		cnt;
 
-    *argp = NULL;
+    *argp = रिक्त;
     *allocated = FALSE;
-    switch (regname)
+    निवड (regname)
     {
-	case '%':		// file name
-	    if (errmsg)
+	स्थिती '%':		// file name
+	    जर (errmsg)
 		check_fname();	// will give emsg if not set
 	    *argp = curbuf->b_fname;
-	    return TRUE;
+	    परत TRUE;
 
-	case '#':		// alternate file name
+	स्थिती '#':		// alternate file name
 	    *argp = getaltfname(errmsg);	// may give emsg if not set
-	    return TRUE;
+	    परत TRUE;
 
 #ifdef FEAT_EVAL
-	case '=':		// result of expression
-	    *argp = get_expr_line();
+	स्थिती '=':		// result of expression
+	    *argp = get_अभिव्यक्ती_ओळ();
 	    *allocated = TRUE;
-	    return TRUE;
+	    परत TRUE;
 #endif
 
-	case ':':		// last command line
-	    if (last_cmdline == NULL && errmsg)
-		emsg(_(e_no_previous_command_line));
+	स्थिती ':':		// last command line
+	    जर (last_cmdline == रिक्त && errmsg)
+		emsg(_(e_no_previous_command_ओळ));
 	    *argp = last_cmdline;
-	    return TRUE;
+	    परत TRUE;
 
-	case '/':		// last search-pattern
-	    if (last_search_pat() == NULL && errmsg)
+	स्थिती '/':		// last search-pattern
+	    जर (last_शोध_pat() == रिक्त && errmsg)
 		emsg(_(e_no_previous_regular_expression));
-	    *argp = last_search_pat();
-	    return TRUE;
+	    *argp = last_शोध_pat();
+	    परत TRUE;
 
-	case '.':		// last inserted text
-	    *argp = get_last_insert_save();
+	स्थिती '.':		// last inserted text
+	    *argp = get_last_घाला_save();
 	    *allocated = TRUE;
-	    if (*argp == NULL && errmsg)
+	    जर (*argp == रिक्त && errmsg)
 		emsg(_(e_no_inserted_text_yet));
-	    return TRUE;
+	    परत TRUE;
 
-	case Ctrl_F:		// Filename under cursor
-	case Ctrl_P:		// Path under cursor, expand via "path"
-	    if (!errmsg)
-		return FALSE;
+	स्थिती Ctrl_F:		// Filename under cursor
+	स्थिती Ctrl_P:		// Path under cursor, expand via "path"
+	    जर (!errmsg)
+		परत FALSE;
 	    *argp = file_name_at_cursor(FNAME_MESS | FNAME_HYP
-			    | (regname == Ctrl_P ? FNAME_EXP : 0), 1L, NULL);
+			    | (regname == Ctrl_P ? FNAME_EXP : 0), 1L, रिक्त);
 	    *allocated = TRUE;
-	    return TRUE;
+	    परत TRUE;
 
-	case Ctrl_W:		// word under cursor
-	case Ctrl_A:		// WORD (mnemonic All) under cursor
-	    if (!errmsg)
-		return FALSE;
+	स्थिती Ctrl_W:		// word under cursor
+	स्थिती Ctrl_A:		// WORD (mnemonic All) under cursor
+	    जर (!errmsg)
+		परत FALSE;
 	    cnt = find_ident_under_cursor(argp, regname == Ctrl_W
 				   ?  (FIND_IDENT|FIND_STRING) : FIND_STRING);
-	    *argp = cnt ? vim_strnsave(*argp, cnt) : NULL;
+	    *argp = cnt ? vim_strnsave(*argp, cnt) : रिक्त;
 	    *allocated = TRUE;
-	    return TRUE;
+	    परत TRUE;
 
-	case Ctrl_L:		// Line under cursor
-	    if (!errmsg)
-		return FALSE;
+	स्थिती Ctrl_L:		// Line under cursor
+	    जर (!errmsg)
+		परत FALSE;
 
 	    *argp = ml_get_buf(curwin->w_buffer,
 			curwin->w_cursor.lnum, FALSE);
-	    return TRUE;
+	    परत TRUE;
 
-	case '_':		// black hole: always empty
+	स्थिती '_':		// black hole: always empty
 	    *argp = (char_u *)"";
-	    return TRUE;
+	    परत TRUE;
     }
 
-    return FALSE;
+    परत FALSE;
 }
 
 /*
@@ -1029,141 +1029,141 @@ get_spec_reg(
  *
  * return FAIL for failure, OK otherwise
  */
-    int
+    पूर्णांक
 cmdline_paste_reg(
-    int regname,
-    int literally_arg,	// Insert text literally instead of "as typed"
-    int remcr)		// don't add CR characters
+    पूर्णांक regname,
+    पूर्णांक literally_arg,	// Insert text literally instead of "as typed"
+    पूर्णांक remcr)		// don't add CR characters
 {
-    long	i;
-    int		literally = literally_arg;
+    दीर्घ	i;
+    पूर्णांक		literally = literally_arg;
 
-    if (get_yank_register(regname, FALSE))
+    जर (get_yank_register(regname, FALSE))
 	literally = TRUE;
-    if (y_current->y_array == NULL)
-	return FAIL;
+    जर (y_current->y_array == रिक्त)
+	परत FAIL;
 
-    for (i = 0; i < y_current->y_size; ++i)
+    साठी (i = 0; i < y_current->y_size; ++i)
     {
 	cmdline_paste_str(y_current->y_array[i].string, literally);
 
 	// Insert ^M between lines and after last line if type is MLINE.
 	// Don't do this when "remcr" is TRUE.
-	if ((y_current->y_type == MLINE || i < y_current->y_size - 1) && !remcr)
+	जर ((y_current->y_type == MLINE || i < y_current->y_size - 1) && !remcr)
 	    cmdline_paste_str((char_u *)"\r", literally);
 
 	// Check for CTRL-C, in case someone tries to paste a few thousand
 	// lines and gets bored.
 	ui_breakcheck();
-	if (got_int)
-	    return FAIL;
+	जर (got_int)
+	    परत FAIL;
     }
-    return OK;
+    परत OK;
 }
 
 /*
  * Shift the delete registers: "9 is cleared, "8 becomes "9, etc.
  */
-    void
-shift_delete_registers(void)
+    शून्य
+shift_delete_registers(शून्य)
 {
-    int		n;
+    पूर्णांक		n;
 
     y_current = &y_regs[9];
     free_yank_all();			// free register nine
-    for (n = 9; n > 1; --n)
+    साठी (n = 9; n > 1; --n)
 	y_regs[n] = y_regs[n - 1];
     y_current = &y_regs[1];
-    if (!y_append)
+    जर (!y_append)
 	y_previous = y_current;
-    y_regs[1].y_array = NULL;		// set register one to empty
+    y_regs[1].y_array = रिक्त;		// set register one to empty
 }
 
-#if defined(FEAT_EVAL)
-    static void
-add_regtype_to_dict(int regname, dict_T *dict, char_u *buf, int bufsize)
+#जर defined(FEAT_EVAL)
+    स्थिर शून्य
+add_regtype_to_dict(पूर्णांक regname, dict_T *dict, char_u *buf, पूर्णांक bufsize)
 {
-    size_t  buflen;
-    long    reglen;
+    माप_प्रकार  buflen;
+    दीर्घ    reglen;
     // Register type
-    switch (get_reg_type(regname, &reglen))
+    निवड (get_reg_type(regname, &reglen))
     {
-	case MLINE:
+	स्थिती MLINE:
 	    buf[0] = 'V';
 	    buf[1] = NUL;
 	    buflen = 1;
-	    break;
-	case MCHAR:
+	    थांबा;
+	स्थिती MCHAR:
 	    buf[0] = 'v';
 	    buf[1] = NUL;
 	    buflen = 1;
-	    break;
-	case MBLOCK:
-	    buflen = vim_snprintf_safelen((char *)buf, bufsize,
+	    थांबा;
+	स्थिती MBLOCK:
+	    buflen = vim_snprintf_safelen((अक्षर *)buf, bufsize,
 		"%c%ld", Ctrl_V, reglen + 1);
-	    break;
-	default:
+	    थांबा;
+	पूर्वनिर्धारित:
 	    buf[0] = NUL;
 	    buflen = 0;
-	    break;
+	    थांबा;
     }
-    (void)dict_add_string_len(dict, "regtype", buf, (int)buflen);
+    (शून्य)dict_add_string_len(dict, "regtype", buf, (पूर्णांक)buflen);
 }
 
-    void
+    शून्य
 yank_do_autocmd(oparg_T *oap, yankreg_T *reg)
 {
-    static int	    recursive = FALSE;
+    स्थिर पूर्णांक	    recursive = FALSE;
     dict_T	    *v_event;
     list_T	    *list;
-    int		    n;
+    पूर्णांक		    n;
     char_u	    buf[NUMBUFLEN + 2];
-    size_t	    buflen;
+    माप_प्रकार	    buflen;
     save_v_event_T  save_v_event;
 
-    if (recursive)
-	return;
+    जर (recursive)
+	परत;
 
     v_event = get_v_event(&save_v_event);
 
     list = list_alloc();
-    if (list == NULL)
-	return;
+    जर (list == रिक्त)
+	परत;
 
     // yanked text contents
-    for (n = 0; n < reg->y_size; n++)
-	list_append_string(list, reg->y_array[n].string, (int)reg->y_array[n].length);
+    साठी (n = 0; n < reg->y_size; n++)
+	list_append_string(list, reg->y_array[n].string, (पूर्णांक)reg->y_array[n].length);
     list->lv_lock = VAR_FIXED;
-    if (dict_add_list(v_event, "regcontents", list) == FAIL)
+    जर (dict_add_list(v_event, "regcontents", list) == FAIL)
 	list_unref(list);
 
     // register name or empty string for unnamed operation
     buf[0] = (char_u)oap->regname;
     buf[1] = NUL;
     buflen = (buf[0] == NUL) ? 0 : 1;
-    (void)dict_add_string_len(v_event, "regname", buf, (int)buflen);
+    (शून्य)dict_add_string_len(v_event, "regname", buf, (पूर्णांक)buflen);
 
     // motion type: inclusive or exclusive
-    (void)dict_add_bool(v_event, "inclusive", oap->inclusive);
+    (शून्य)dict_add_bool(v_event, "inclusive", oap->inclusive);
 
     // kind of operation (yank, delete, change)
     buf[0] = get_op_char(oap->op_type);
     buf[1] = get_extra_op_char(oap->op_type);
     buf[2] = NUL;
     buflen = (buf[0] == NUL) ? 0 : (buf[1] == NUL) ? 1 : 2;
-    (void)dict_add_string_len(v_event, "operator", buf, (int)buflen);
+    (शून्य)dict_add_string_len(v_event, "operator", buf, (पूर्णांक)buflen);
 
-    add_regtype_to_dict(oap->regname, v_event, buf, sizeof(buf));
+    add_regtype_to_dict(oap->regname, v_event, buf, आकार(buf));
 
     // selection type - visual or not
-    (void)dict_add_bool(v_event, "visual", oap->is_VIsual);
+    (शून्य)dict_add_bool(v_event, "visual", oap->is_VIsual);
 
     // Lock the dictionary and its keys
-    dict_set_items_ro(v_event);
+    dict_set_वस्तुसंच_ro(v_event);
 
     recursive = TRUE;
     textlock++;
-    apply_autocmds(EVENT_TEXTYANKPOST, NULL, NULL, FALSE, curbuf);
+    apply_autocmds(EVENT_TEXTYANKPOST, रिक्त, रिक्त, FALSE, curbuf);
     textlock--;
     recursive = FALSE;
 
@@ -1171,35 +1171,35 @@ yank_do_autocmd(oparg_T *oap, yankreg_T *reg)
     restore_v_event(v_event, &save_v_event);
 }
 
-    static void
+    स्थिर शून्य
 put_do_autocmd(
-	int	    regname,
+	पूर्णांक	    regname,
 	yankreg_T   *reg,	// May be NULL, if special register
-	string_T    *insert,	// Not NULL if special register, except '.'
+	string_T    *घाला,	// Not NULL if special register, except '.'
 	bool	    post,	// If Post or Pre
-	int	    dir)	// BACKWARD for 'P', FORWARD for 'p'
+	पूर्णांक	    dir)	// BACKWARD for 'P', FORWARD for 'p'
 {
-    static bool	    recursive = false;
+    स्थिर bool	    recursive = false;
     dict_T	    *v_event;
     list_T	    *list;
-    int		    n;
+    पूर्णांक		    n;
     char_u	    buf[NUMBUFLEN + 2];
-    size_t	    buflen;
+    माप_प्रकार	    buflen;
     save_v_event_T  save_v_event;
 
-    if (recursive || regname == '_')
-	return;
+    जर (recursive || regname == '_')
+	परत;
 
-    if (regname != '.' && insert == NULL
-	    && reg == NULL)
+    जर (regname != '.' && घाला == रिक्त
+	    && reg == रिक्त)
 	// Can happen when pasting text in normal mode in a terminal buffer
-	return;
+	परत;
 
     v_event = get_v_event(&save_v_event);
 
     list = list_alloc();
-    if (list == NULL)
-	return;
+    जर (list == रिक्त)
+	परत;
 
     // Make sure regcontents will be up to date
 # ifdef FEAT_CLIPBOARD_PROVIDER
@@ -1207,60 +1207,60 @@ put_do_autocmd(
     call_clip_provider_request(regname);
 # endif
 # ifdef FEAT_CLIPBOARD
-    if (clipmethod != CLIPMETHOD_PROVIDER)
+    जर (clipmethod != CLIPMETHOD_PROVIDER)
 	regname = may_get_selection(regname);
 # endif
 
-    if (regname == '.')
+    जर (regname == '.')
     {
-	if (last_insert_ga.ga_data != NULL)
+	जर (last_घाला_ga.ga_data != रिक्त)
 	    // Get the last inserted text to place in "regcontents"
-	    list_append_string(list, last_insert_ga.ga_data,
-		    (int)last_insert_ga.ga_len);
+	    list_append_string(list, last_घाला_ga.ga_data,
+		    (पूर्णांक)last_घाला_ga.ga_len);
     }
-    else if (insert != NULL)
+    अन्यथा जर (घाला != रिक्त)
     {
-	list_append_string(list, insert->string, (int)insert->length);
+	list_append_string(list, घाला->string, (पूर्णांक)घाला->length);
     }
-    else
+    अन्यथा
     {
-	for (n = 0; n < reg->y_size; n++)
+	साठी (n = 0; n < reg->y_size; n++)
 	    list_append_string(list, reg->y_array[n].string,
-		    (int)reg->y_array[n].length);
+		    (पूर्णांक)reg->y_array[n].length);
     }
 
     list->lv_lock = VAR_FIXED;
-    if (dict_add_list(v_event, "regcontents", list) == FAIL)
+    जर (dict_add_list(v_event, "regcontents", list) == FAIL)
 	list_unref(list);
 
     // register name or empty string for unnamed operation
     buf[0] = (char_u)regname;
     buf[1] = NUL;
     buflen = (buf[0] == NUL) ? 0 : 1;
-    (void)dict_add_string_len(v_event, "regname", buf, (int)buflen);
+    (शून्य)dict_add_string_len(v_event, "regname", buf, (पूर्णांक)buflen);
 
     // kind of operation (P, p)
     buf[0] = dir == BACKWARD ? 'P' : 'p';
     buf[1] = NUL;
     buflen = 1;
-    (void)dict_add_string_len(v_event, "operator", buf, (int)buflen);
+    (शून्य)dict_add_string_len(v_event, "operator", buf, (पूर्णांक)buflen);
 
-    add_regtype_to_dict(regname, v_event, buf, sizeof(buf));
+    add_regtype_to_dict(regname, v_event, buf, आकार(buf));
 # ifdef FEAT_CLIPBOARD_PROVIDER
     dec_clip_provider();
 # endif
 
-    (void)dict_add_bool(v_event, "visual", VIsual_active);
+    (शून्य)dict_add_bool(v_event, "visual", VIsual_active);
 
     // Lock the dictionary and its keys
-    dict_set_items_ro(v_event);
+    dict_set_वस्तुसंच_ro(v_event);
 
     recursive = true;
     textlock++;
-    if (post)
-	apply_autocmds(EVENT_TEXTPUTPOST, NULL, NULL, FALSE, curbuf);
-    else
-	apply_autocmds(EVENT_TEXTPUTPRE, NULL, NULL, FALSE, curbuf);
+    जर (post)
+	apply_autocmds(EVENT_TEXTPUTPOST, रिक्त, रिक्त, FALSE, curbuf);
+    अन्यथा
+	apply_autocmds(EVENT_TEXTPUTPRE, रिक्त, रिक्त, FALSE, curbuf);
     textlock--;
     recursive = false;
 
@@ -1272,25 +1272,25 @@ put_do_autocmd(
 /*
  * set all the yank registers to empty (called from main())
  */
-    void
-init_yank(void)
+    शून्य
+init_yank(शून्य)
 {
-    int		i;
+    पूर्णांक		i;
 
-    for (i = 0; i < NUM_REGISTERS; ++i)
-	y_regs[i].y_array = NULL;
+    साठी (i = 0; i < अंक_REGISTERS; ++i)
+	y_regs[i].y_array = रिक्त;
 }
 
-#if defined(EXITFREE)
-    void
-clear_registers(void)
+#जर defined(EXITFREE)
+    शून्य
+clear_registers(शून्य)
 {
-    int		i;
+    पूर्णांक		i;
 
-    for (i = 0; i < NUM_REGISTERS; ++i)
+    साठी (i = 0; i < अंक_REGISTERS; ++i)
     {
 	y_current = &y_regs[i];
-	if (y_current->y_array != NULL)
+	जर (y_current->y_array != रिक्त)
 	    free_yank_all();
     }
 }
@@ -1300,21 +1300,21 @@ clear_registers(void)
  * Free "n" lines from the current yank register.
  * Called for normal freeing and in case of error.
  */
-    static void
-free_yank(long n)
+    स्थिर शून्य
+free_yank(दीर्घ n)
 {
-    if (y_current->y_array == NULL)
-	return;
+    जर (y_current->y_array == रिक्त)
+	परत;
 
-    long	    i;
+    दीर्घ	    i;
 
-    for (i = n; --i >= 0; )
+    साठी (i = n; --i >= 0; )
 	VIM_CLEAR_STRING(y_current->y_array[i]);
     VIM_CLEAR(y_current->y_array);
 }
 
-    void
-free_yank_all(void)
+    शून्य
+free_yank_all(शून्य)
 {
     free_yank(y_current->y_size);
 }
@@ -1327,50 +1327,50 @@ free_yank_all(void)
  *
  * Return FAIL for failure, OK otherwise.
  */
-    int
-op_yank(oparg_T *oap, int deleting, int mess)
+    पूर्णांक
+op_yank(oparg_T *oap, पूर्णांक deleting, पूर्णांक mess)
 {
-    long		y_idx;		// index in y_array[]
+    दीर्घ		y_idx;		// index in y_array[]
     yankreg_T		*curr;		// copy of y_current
     yankreg_T		newreg;		// new yank register when appending
     linenr_T		lnum;		// current line number
-    int			yanktype = oap->motion_type;
-    long		yanklines = oap->line_count;
+    पूर्णांक			yanktype = oap->motion_type;
+    दीर्घ		yanklines = oap->ओळ_मोजणी;
     linenr_T		yankendlnum = oap->end.lnum;
     char_u		*pnew;
-    struct block_def	bd;
+    संरचना block_def	bd;
 
 				    // check for read-only register
-    if (oap->regname != 0 && !valid_yank_reg(oap->regname, TRUE))
+    जर (oap->regname != 0 && !valid_yank_reg(oap->regname, TRUE))
     {
 	beep_flush();
-	return FAIL;
+	परत FAIL;
     }
-    if (oap->regname == '_')	    // black hole: nothing to do
-	return OK;
+    जर (oap->regname == '_')	    // black hole: nothing to do
+	परत OK;
 
 #ifdef FEAT_CLIPBOARD
-    if ((!clip_star.available && oap->regname == '*') ||
+    जर ((!clip_star.available && oap->regname == '*') ||
 	(!clip_plus.available && oap->regname == '+'))
     {
 	oap->regname = 0;
-	msg_warn_missing_clipboard();
+	संदेश_warn_missing_clipboard();
     }
 #endif
 
-    if (!deleting)		    // op_delete() already set y_current
+    जर (!deleting)		    // op_delete() already set y_current
 	get_yank_register(oap->regname, TRUE);
 
     curr = y_current;
 				    // append to existing contents
-    if (y_append && y_current->y_array != NULL)
+    जर (y_append && y_current->y_array != रिक्त)
 	y_current = &newreg;
-    else
+    अन्यथा
 	free_yank_all();	    // free previously yanked lines
 
     // If the cursor was in column 1 before and after the movement, and the
     // operator is not inclusive, the yank is always linewise.
-    if (       oap->motion_type == MCHAR
+    जर (       oap->motion_type == MCHAR
 	    && oap->start.col == 0
 	    && !oap->inclusive
 	    && (!oap->is_VIsual || *p_sel == 'o')
@@ -1386,11 +1386,11 @@ op_yank(oparg_T *oap, int deleting, int mess)
     y_current->y_size = yanklines;
     y_current->y_type = yanktype;   // set the yank register type
     y_current->y_width = 0;
-    y_current->y_array = lalloc_clear(sizeof(string_T) * yanklines, TRUE);
-    if (y_current->y_array == NULL)
+    y_current->y_array = lalloc_clear(आकार(string_T) * yanklines, TRUE);
+    जर (y_current->y_array == रिक्त)
     {
 	y_current = curr;
-	return FAIL;
+	परत FAIL;
     }
 #ifdef FEAT_VIMINFO
     y_current->y_time_set = vim_time();
@@ -1399,65 +1399,65 @@ op_yank(oparg_T *oap, int deleting, int mess)
     y_idx = 0;
     lnum = oap->start.lnum;
 
-    if (oap->block_mode)
+    जर (oap->block_mode)
     {
 	// Visual block mode
 	y_current->y_type = MBLOCK;	    // set the yank register type
 	y_current->y_width = oap->end_vcol - oap->start_vcol;
 
-	if (curwin->w_curswant == MAXCOL && y_current->y_width > 0)
+	जर (curwin->w_curswant == MAXCOL && y_current->y_width > 0)
 	    y_current->y_width--;
     }
 
-    for ( ; lnum <= yankendlnum; lnum++, y_idx++)
+    साठी ( ; lnum <= yankendlnum; lnum++, y_idx++)
     {
-	switch (y_current->y_type)
+	निवड (y_current->y_type)
 	{
-	    case MBLOCK:
+	    स्थिती MBLOCK:
 		block_prep(oap, &bd, lnum, FALSE);
-		if (yank_copy_line(&bd, y_idx, oap->excl_tr_ws) == FAIL)
-		    goto fail;
-		break;
+		जर (yank_copy_ओळ(&bd, y_idx, oap->excl_tr_ws) == FAIL)
+		    जा fail;
+		थांबा;
 
-	    case MLINE:
+	    स्थिती MLINE:
 		y_current->y_array[y_idx].length = ml_get_len(lnum);
-		if ((y_current->y_array[y_idx].string =
+		जर ((y_current->y_array[y_idx].string =
 					vim_strnsave(ml_get(lnum),
-					y_current->y_array[y_idx].length)) == NULL)
+					y_current->y_array[y_idx].length)) == रिक्त)
 		{
 		    VIM_CLEAR_STRING(y_current->y_array[y_idx]);
-		    goto fail;
+		    जा fail;
 		}
-		break;
+		थांबा;
 
-	    case MCHAR:
+	    स्थिती MCHAR:
 		{
-		    int tmp;
+		    पूर्णांक tmp;
 
 		    charwise_block_prep(oap->start, oap->end, &bd, lnum, oap->inclusive);
 
 		    // make sure bd.textlen is not longer than the text
-		    tmp = (int)STRLEN(bd.textstart);
-		    if (tmp < bd.textlen)
+		    tmp = (पूर्णांक)STRLEN(bd.textstart);
+		    जर (tmp < bd.textlen)
 			bd.textlen = tmp;
 
-		    if (yank_copy_line(&bd, y_idx, FALSE) == FAIL)
-			goto fail;
-		    break;
+		    जर (yank_copy_ओळ(&bd, y_idx, FALSE) == FAIL)
+			जा fail;
+		    थांबा;
 		}
 		// NOTREACHED
 	}
     }
 
-    if (curr != y_current)	// append the new block to the old block
+    जर (curr != y_current)	// append the new block to the old block
     {
 	string_T *new_ptr;
-	long j;
+	दीर्घ j;
 
 	new_ptr = ALLOC_MULT(string_T, curr->y_size + y_current->y_size);
-	if (new_ptr == NULL)
-	    goto fail;
-	for (j = 0; j < curr->y_size; ++j)
+	जर (new_ptr == रिक्त)
+	    जा fail;
+	साठी (j = 0; j < curr->y_size; ++j)
 	    new_ptr[j] = curr->y_array[j];
 	vim_free(curr->y_array);
 	curr->y_array = new_ptr;
@@ -1465,18 +1465,18 @@ op_yank(oparg_T *oap, int deleting, int mess)
 	curr->y_time_set = vim_time();
 #endif
 
-	if (yanktype == MLINE)	// MLINE overrides MCHAR and MBLOCK
+	जर (yanktype == MLINE)	// MLINE overrides MCHAR and MBLOCK
 	    curr->y_type = MLINE;
 
 	// Concatenate the last line of the old block with the first line of
 	// the new block, unless being Vi compatible.
-	if (curr->y_type == MCHAR && vim_strchr(p_cpo, CPO_REGAPPEND) == NULL)
+	जर (curr->y_type == MCHAR && vim_strchr(p_cpo, CPO_REGAPPEND) == रिक्त)
 	{
 	    pnew = alloc(curr->y_array[curr->y_size - 1].length + y_current->y_array[0].length + 1);
-	    if (pnew == NULL)
+	    जर (pnew == रिक्त)
 	    {
 		y_idx = y_current->y_size - 1;
-		goto fail;
+		जा fail;
 	    }
 
 	    --j;
@@ -1489,41 +1489,41 @@ op_yank(oparg_T *oap, int deleting, int mess)
 	    VIM_CLEAR_STRING(y_current->y_array[0]);
 	    y_idx = 1;
 	}
-	else
+	अन्यथा
 	    y_idx = 0;
-	while (y_idx < y_current->y_size)
+	पर्यंत (y_idx < y_current->y_size)
 	    curr->y_array[j++] = y_current->y_array[y_idx++];
 	curr->y_size = j;
 	vim_free(y_current->y_array);
 	y_current = curr;
     }
 
-    if (mess)			// Display message about yank?
+    जर (mess)			// Display message about yank?
     {
-	if (yanktype == MCHAR
+	जर (yanktype == MCHAR
 		&& !oap->block_mode
 		&& yanklines == 1)
 	    yanklines = 0;
 	// Some versions of Vi use ">=" here, some don't...
-	if (yanklines > p_report)
+	जर (yanklines > p_report)
 	{
-	    char namebuf[100];
+	    अक्षर namebuf[100];
 
-	    if (oap->regname == NUL)
+	    जर (oap->regname == NUL)
 		*namebuf = NUL;
-	    else
-		vim_snprintf(namebuf, sizeof(namebuf),
+	    अन्यथा
+		vim_snprintf(namebuf, आकार(namebuf),
 						_(" into \"%c"), oap->regname);
 
 	    // redisplay now, so message is not deleted
 	    update_topline_redraw();
-	    if (oap->block_mode)
+	    जर (oap->block_mode)
 	    {
 		smsg(NGETTEXT("block of %ld line yanked%s",
 				     "block of %ld lines yanked%s", yanklines),
 			yanklines, namebuf);
 	    }
-	    else
+	    अन्यथा
 	    {
 		smsg(NGETTEXT("%ld line yanked%s",
 					      "%ld lines yanked%s", yanklines),
@@ -1532,51 +1532,51 @@ op_yank(oparg_T *oap, int deleting, int mess)
 	}
     }
 
-    if ((cmdmod.cmod_flags & CMOD_LOCKMARKS) == 0)
+    जर ((cmdmod.cmod_flags & CMOD_LOCKMARKS) == 0)
     {
 	// Set "'[" and "']" marks.
 	curbuf->b_op_start = oap->start;
 	curbuf->b_op_end = oap->end;
-	if (yanktype == MLINE && !oap->block_mode)
+	जर (yanktype == MLINE && !oap->block_mode)
 	{
 	    curbuf->b_op_start.col = 0;
 	    curbuf->b_op_end.col = MAXCOL;
 	}
-	if (yanktype != MLINE && !oap->inclusive)
+	जर (yanktype != MLINE && !oap->inclusive)
 	    // Exclude the end position.
 	    decl(&curbuf->b_op_end);
     }
 
 #ifdef FEAT_CLIPBOARD_PROVIDER
     inc_clip_provider();
-    if (curr == &y_regs[REAL_PLUS_REGISTER] || (!deleting && oap->regname == 0
+    जर (curr == &y_regs[REAL_PLUS_REGISTER] || (!deleting && oap->regname == 0
 		&& (clip_unnamed & CLIP_UNNAMED_PLUS)))
     {
-	if (curr != &(y_regs[REAL_PLUS_REGISTER]))
+	जर (curr != &(y_regs[REAL_PLUS_REGISTER]))
 	    copy_yank_reg(&(y_regs[REAL_PLUS_REGISTER]));
 	call_clip_provider_set('+');
     }
-    if (curr == &y_regs[STAR_REGISTER] || (!deleting && oap->regname == 0
+    जर (curr == &y_regs[STAR_REGISTER] || (!deleting && oap->regname == 0
 		&& (clip_unnamed & CLIP_UNNAMED)))
     {
-	if (curr != &(y_regs[STAR_REGISTER]))
+	जर (curr != &(y_regs[STAR_REGISTER]))
 	    copy_yank_reg(&(y_regs[STAR_REGISTER]));
 	call_clip_provider_set('*');
     }
 #endif
 
 #ifdef FEAT_CLIPBOARD
-    if (clipmethod != CLIPMETHOD_PROVIDER)
+    जर (clipmethod != CLIPMETHOD_PROVIDER)
     {
 	// If we were yanking to the '*' register, send result to clipboard. If
 	// no register was specified, and "unnamed" in 'clipboard', make a copy
 	// to the '*' register.
-	if (clip_star.available
+	जर (clip_star.available
 		&& (curr == &(y_regs[STAR_REGISTER])
 		    || (!deleting && oap->regname == 0
 			&& ((clip_unnamed | clip_unnamed_saved) & CLIP_UNNAMED))))
 	{
-	    if (curr != &(y_regs[STAR_REGISTER]))
+	    जर (curr != &(y_regs[STAR_REGISTER]))
 		// Copy the text from register 0 to the clipboard register.
 		copy_yank_reg(&(y_regs[STAR_REGISTER]));
 
@@ -1584,15 +1584,15 @@ op_yank(oparg_T *oap, int deleting, int mess)
 	    clip_gen_set_selection(&clip_star);
 	}
 
-# if defined(FEAT_X11) || defined(FEAT_WAYLAND_CLIPBOARD)
+# जर defined(FEAT_X11) || defined(FEAT_WAYLAND_CLIPBOARD)
 	// If we were yanking to the '+' register, send result to selection.
-	if (clip_plus.available
+	जर (clip_plus.available
 		&& (curr == &(y_regs[PLUS_REGISTER])
 		    || (!deleting && oap->regname == 0
 			&& ((clip_unnamed | clip_unnamed_saved) &
 			    CLIP_UNNAMED_PLUS))))
 	{
-	    if (curr != &(y_regs[PLUS_REGISTER]))
+	    जर (curr != &(y_regs[PLUS_REGISTER]))
 		// Copy the text from register 0 to the clipboard register.
 		copy_yank_reg(&(y_regs[PLUS_REGISTER]));
 
@@ -1603,47 +1603,47 @@ op_yank(oparg_T *oap, int deleting, int mess)
     }
 #endif
 
-#if defined(FEAT_EVAL)
-    if (!deleting && has_textyankpost())
+#जर defined(FEAT_EVAL)
+    जर (!deleting && has_textyankpost())
 	yank_do_autocmd(oap, y_current);
 #endif
 #ifdef FEAT_CLIPBOARD_PROVIDER
     dec_clip_provider();
 #endif
-    return OK;
+    परत OK;
 
 fail:		// free the allocated lines
     free_yank(y_idx + 1);
     y_current = curr;
-    return FAIL;
+    परत FAIL;
 }
 
 /*
  * Copy a block range into a register.
  * If "exclude_trailing_space" is set, do not copy trailing whitespaces.
  */
-    static int
-yank_copy_line(struct block_def *bd, long y_idx, int exclude_trailing_space)
+    स्थिर पूर्णांक
+yank_copy_ओळ(संरचना block_def *bd, दीर्घ y_idx, पूर्णांक exclude_trailing_space)
 {
     char_u	*pnew;
 
-    if (exclude_trailing_space)
+    जर (exclude_trailing_space)
 	bd->endspaces = 0;
-    if ((pnew = alloc(bd->startspaces + bd->endspaces + bd->textlen + 1))
-								      == NULL)
-	return FAIL;
+    जर ((pnew = alloc(bd->startspaces + bd->endspaces + bd->textlen + 1))
+								      == रिक्त)
+	परत FAIL;
     y_current->y_array[y_idx].string = pnew;
-    vim_memset(pnew, ' ', (size_t)bd->startspaces);
+    vim_memset(pnew, ' ', (माप_प्रकार)bd->startspaces);
     pnew += bd->startspaces;
-    mch_memmove(pnew, bd->textstart, (size_t)bd->textlen);
+    mch_memmove(pnew, bd->textstart, (माप_प्रकार)bd->textlen);
     pnew += bd->textlen;
-    vim_memset(pnew, ' ', (size_t)bd->endspaces);
+    vim_memset(pnew, ' ', (माप_प्रकार)bd->endspaces);
     pnew += bd->endspaces;
-    if (exclude_trailing_space)
+    जर (exclude_trailing_space)
     {
-	int s = bd->textlen + bd->endspaces;
+	पूर्णांक s = bd->textlen + bd->endspaces;
 
-	while (s > 0 && VIM_ISWHITE(*(bd->textstart + s - 1)))
+	पर्यंत (s > 0 && VIM_ISWHITE(*(bd->textstart + s - 1)))
 	{
 	    s = s - (*mb_head_off)(bd->textstart, bd->textstart + s - 1) - 1;
 	    pnew--;
@@ -1651,37 +1651,37 @@ yank_copy_line(struct block_def *bd, long y_idx, int exclude_trailing_space)
     }
     *pnew = NUL;
 
-    y_current->y_array[y_idx].length = (size_t)(pnew - y_current->y_array[y_idx].string);
+    y_current->y_array[y_idx].length = (माप_प्रकार)(pnew - y_current->y_array[y_idx].string);
 
-    return OK;
+    परत OK;
 }
 
 #ifdef HAVE_CLIPMETHOD
 /*
  * Make a copy of the y_current register to register "reg".
  */
-    static void
+    स्थिर शून्य
 copy_yank_reg(yankreg_T *reg)
 {
     yankreg_T	*curr = y_current;
-    long	j;
+    दीर्घ	j;
 
     y_current = reg;
     free_yank_all();
     *y_current = *curr;
     y_current->y_array = lalloc_clear(
-				    sizeof(string_T) * y_current->y_size, TRUE);
-    if (y_current->y_array == NULL)
+				    आकार(string_T) * y_current->y_size, TRUE);
+    जर (y_current->y_array == रिक्त)
 	y_current->y_size = 0;
-    else
-	for (j = 0; j < y_current->y_size; ++j)
+    अन्यथा
+	साठी (j = 0; j < y_current->y_size; ++j)
 	{
-	    if ((y_current->y_array[j].string = vim_strnsave(curr->y_array[j].string,
-						curr->y_array[j].length)) == NULL)
+	    जर ((y_current->y_array[j].string = vim_strnsave(curr->y_array[j].string,
+						curr->y_array[j].length)) == रिक्त)
 	    {
 		free_yank(j);
 		y_current->y_size = 0;
-		break;
+		थांबा;
 	    }
 	    y_current->y_array[j].length = curr->y_array[j].length;
 	}
@@ -1697,35 +1697,35 @@ copy_yank_reg(yankreg_T *reg)
  *	    PUT_LINE		force linewise put (":put")
  *	    PUT_BLOCK_INNER     in block mode, do not add trailing spaces
  */
-    void
+    शून्य
 do_put(
-    int		regname,
-    char_u	*expr_result,	// result for regname "=" when compiled
-    int		dir,		// BACKWARD for 'P', FORWARD for 'p'
-    long	count,
-    int		flags)
+    पूर्णांक		regname,
+    char_u	*अभिव्यक्ती_result,	// result for regname "=" when compiled
+    पूर्णांक		dir,		// BACKWARD for 'P', FORWARD for 'p'
+    दीर्घ	मोजणी,
+    पूर्णांक		flags)
 {
     char_u	*ptr;
     char_u	*newp;
     char_u	*oldp;
-    int		yanklen;
-    int		totlen = 0;		// init for gcc
+    पूर्णांक		yanklen;
+    पूर्णांक		totlen = 0;		// init for gcc
     linenr_T	lnum;
     colnr_T	col;
-    long	i;			// index in y_array[]
-    int		y_type;
-    long	y_size;
-    int		oldlen;
-    long	y_width = 0;
+    दीर्घ	i;			// index in y_array[]
+    पूर्णांक		y_type;
+    दीर्घ	y_size;
+    पूर्णांक		oldlen;
+    दीर्घ	y_width = 0;
     colnr_T	vcol;
-    string_T	*y_array = NULL;
-    yankreg_T	*y_current_used = NULL;
-    long	nr_lines = 0;
-    string_T	insert_string;
-    int		allocated = FALSE;
+    string_T	*y_array = रिक्त;
+    yankreg_T	*y_current_used = रिक्त;
+    दीर्घ	nr_ओळी = 0;
+    string_T	घाला_string;
+    पूर्णांक		allocated = FALSE;
     pos_T	orig_start = curbuf->b_op_start;
     pos_T	orig_end = curbuf->b_op_end;
-    unsigned int cur_ve_flags = get_ve_flags();
+    अचिन्हित पूर्णांक cur_ve_flags = get_ve_flags();
 
 #ifdef HAVE_CLIPMETHOD
     adjust_clip_reg(&regname);
@@ -1735,13 +1735,13 @@ do_put(
     call_clip_provider_request(regname);
 #endif
 #ifdef FEAT_CLIPBOARD
-    if (clipmethod != CLIPMETHOD_PROVIDER)
+    जर (clipmethod != CLIPMETHOD_PROVIDER)
 	// Adjust register name for "unnamed" in 'clipboard'.
-	(void)may_get_selection(regname);
+	(शून्य)may_get_selection(regname);
 #endif
 
     // Remove any preinserted text (issue #19329)
-    if (ins_compl_preinsert_effect())
+    जर (ins_compl_preinsert_effect())
 	ins_compl_delete();
 
     curbuf->b_op_start = curwin->w_cursor;	// default for '[ mark
@@ -1749,139 +1749,139 @@ do_put(
 
     // Using inserted text works differently, because the register includes
     // special characters (newlines, etc.).
-    if (regname == '.')
+    जर (regname == '.')
     {
-	if (VIsual_active)
+	जर (VIsual_active)
 	    stuffcharReadbuff(VIsual_mode);
 
 #ifdef FEAT_EVAL
 	bool has_textput_events = has_textputpre() || has_textputpost();
-	if (has_textput_events)
-	    add_last_insert++;
+	जर (has_textput_events)
+	    add_last_घाला++;
 #endif
 
-	(void)stuff_inserted((dir == FORWARD ? (count == -1 ? 'o' : 'a') :
-				    (count == -1 ? 'O' : 'i')), count, FALSE);
+	(शून्य)stuff_inserted((dir == FORWARD ? (मोजणी == -1 ? 'o' : 'a') :
+				    (मोजणी == -1 ? 'O' : 'i')), मोजणी, FALSE);
 
 #ifdef FEAT_EVAL
 	// Since the text is not inserted into the buffer immediately, just call
 	// TextPutPost after TextPutPre.
-	if (has_textputpre())
-	    put_do_autocmd('.', NULL, NULL, false, dir);
+	जर (has_textputpre())
+	    put_do_autocmd('.', रिक्त, रिक्त, false, dir);
 #endif
 #ifdef FEAT_CLIPBOARD_PROVIDER
 	dec_clip_provider();
 #endif
 #ifdef FEAT_EVAL
-	if (has_textputpost())
-	    put_do_autocmd('.', NULL, NULL, true, dir);
+	जर (has_textputpost())
+	    put_do_autocmd('.', रिक्त, रिक्त, true, dir);
 
-	if (has_textput_events && --add_last_insert == 0)
-	    ga_clear(&last_insert_ga);
+	जर (has_textput_events && --add_last_घाला == 0)
+	    ga_clear(&last_घाला_ga);
 #endif
 
 	// Putting the text is done later, so can't really move the cursor to
 	// the next character.  Use "l" to simulate it.
-	if ((flags & PUT_CURSEND) && gchar_cursor() != NUL)
+	जर ((flags & PUT_CURSEND) && gchar_cursor() != NUL)
 	    stuffcharReadbuff('l');
-	return;
+	परत;
     }
 
     // For special registers '%' (file name), '#' (alternate file name) and
     // ':' (last command line), etc. we have to create a fake yank register.
     // For compiled code "expr_result" holds the expression result.
-    insert_string.string = NULL;
-    if (regname == '=' && expr_result != NULL)
-	insert_string.string = expr_result;
-    else if (get_spec_reg(regname, &insert_string.string, &allocated, TRUE)
-		&& insert_string.string == NULL)
+    घाला_string.string = रिक्त;
+    जर (regname == '=' && अभिव्यक्ती_result != रिक्त)
+	घाला_string.string = अभिव्यक्ती_result;
+    अन्यथा जर (get_spec_reg(regname, &घाला_string.string, &allocated, TRUE)
+		&& घाला_string.string == रिक्त)
     {
 #ifdef FEAT_CLIPBOARD_PROVIDER
 	dec_clip_provider();
 #endif
-	return;
+	परत;
     }
 
     // Autocommands may be executed when saving lines for undo.  This might
     // make "y_array" invalid, so we start undo now to avoid that.
-    if (u_save(curwin->w_cursor.lnum, curwin->w_cursor.lnum + 1) == FAIL)
-	goto end;
+    जर (u_save(curwin->w_cursor.lnum, curwin->w_cursor.lnum + 1) == FAIL)
+	जा end;
 
-    if (insert_string.string != NULL)
+    जर (घाला_string.string != रिक्त)
     {
-	insert_string.length = STRLEN(insert_string.string);
+	घाला_string.length = STRLEN(घाला_string.string);
 
 	y_type = MCHAR;
 #ifdef FEAT_EVAL
-	if (regname == '=')
+	जर (regname == '=')
 	{
-	    size_t  ptrlen;
+	    माप_प्रकार  ptrlen;
 	    char_u  *tmp;
 
 	    // For the = register we need to split the string at NL
 	    // characters.
 	    // Loop twice: count the number of lines and save them.
-	    for (;;)
+	    साठी (;;)
 	    {
 		y_size = 0;
-		ptr = insert_string.string;
-		ptrlen = insert_string.length;
-		while (ptr != NULL)
+		ptr = घाला_string.string;
+		ptrlen = घाला_string.length;
+		पर्यंत (ptr != रिक्त)
 		{
-		    if (y_array != NULL)
+		    जर (y_array != रिक्त)
 			y_array[y_size].string = ptr;
 		    ++y_size;
 		    tmp = vim_strchr(ptr, '\n');
-		    if (tmp == NULL)
+		    जर (tmp == रिक्त)
 		    {
-			if (y_array != NULL)
+			जर (y_array != रिक्त)
 			    y_array[y_size - 1].length = ptrlen;
 		    }
-		    else
+		    अन्यथा
 		    {
-			if (y_array != NULL)
+			जर (y_array != रिक्त)
 			{
 			    *tmp = NUL;
-			    y_array[y_size - 1].length = (size_t)(tmp - ptr);
+			    y_array[y_size - 1].length = (माप_प्रकार)(tmp - ptr);
 			    ptrlen -= y_array[y_size - 1].length + 1;
 			}
 			++tmp;
 			// A trailing '\n' makes the register linewise.
-			if (*tmp == NUL)
+			जर (*tmp == NUL)
 			{
 			    y_type = MLINE;
-			    break;
+			    थांबा;
 			}
 		    }
 		    ptr = tmp;
 		}
-		if (y_array != NULL)
-		    break;
+		जर (y_array != रिक्त)
+		    थांबा;
 		y_array = ALLOC_MULT(string_T, y_size);
-		if (y_array == NULL)
-		    goto end;
+		जर (y_array == रिक्त)
+		    जा end;
 	    }
 	}
-	else
+	अन्यथा
 #endif
 	{
 	    y_size = 1;		// use fake one-line yank register
-	    y_array = &insert_string;
+	    y_array = &घाला_string;
 	}
 #ifdef FEAT_EVAL
-	if (has_textputpre())
-	    put_do_autocmd(regname, NULL, &insert_string, false, dir);
+	जर (has_textputpre())
+	    put_do_autocmd(regname, रिक्त, &घाला_string, false, dir);
 #endif
     }
-    else
+    अन्यथा
     {
 #ifdef FEAT_EVAL
-	if (has_textputpre())
+	जर (has_textputpre())
 	{
 	    // Make sure to call this before we set the variables, as setreg()
 	    // may be called and invalidate them.
 	    get_yank_register(regname, FALSE);
-	    put_do_autocmd(regname, y_current, NULL, false, dir);
+	    put_do_autocmd(regname, y_current, रिक्त, false, dir);
 	}
 #endif
 	get_yank_register(regname, FALSE);
@@ -1893,40 +1893,40 @@ do_put(
 	y_current_used = y_current;
     }
 
-    if (y_type == MLINE)
+    जर (y_type == MLINE)
     {
-	if (flags & PUT_LINE_SPLIT)
+	जर (flags & PUT_ओळ_SPLIT)
 	{
 	    char_u *p_orig;
 	    char_u *p;
-	    size_t plen;
+	    माप_प्रकार plen;
 
 	    // "p" or "P" in Visual mode: split the lines to put the text in
 	    // between.
-	    if (u_save_cursor() == FAIL)
-		goto end;
+	    जर (u_save_cursor() == FAIL)
+		जा end;
 	    p_orig = p = ml_get_cursor();
 	    plen = ml_get_cursor_len();
-	    if (dir == FORWARD && *p != NUL)
+	    जर (dir == FORWARD && *p != NUL)
 		MB_PTR_ADV(p);
-	    ptr = vim_strnsave(p, plen - (size_t)(p - p_orig));
-	    if (ptr == NULL)
-		goto end;
+	    ptr = vim_strnsave(p, plen - (माप_प्रकार)(p - p_orig));
+	    जर (ptr == रिक्त)
+		जा end;
 	    ml_append(curwin->w_cursor.lnum, ptr, (colnr_T)0, FALSE);
 	    vim_free(ptr);
 
 	    oldp = ml_get_curline();
 	    p = oldp + curwin->w_cursor.col;
-	    if (dir == FORWARD && *p != NUL)
+	    जर (dir == FORWARD && *p != NUL)
 		MB_PTR_ADV(p);
-	    ptr = vim_strnsave(oldp, (size_t)(p - oldp));
-	    if (ptr == NULL)
-		goto end;
+	    ptr = vim_strnsave(oldp, (माप_प्रकार)(p - oldp));
+	    जर (ptr == रिक्त)
+		जा end;
 	    ml_replace(curwin->w_cursor.lnum, ptr, FALSE);
-	    ++nr_lines;
+	    ++nr_ओळी;
 	    dir = FORWARD;
 	}
-	if (flags & PUT_LINE_FORWARD)
+	जर (flags & PUT_ओळ_FORWARD)
 	{
 	    // Must be "p" for a Visual block, put lines below the block.
 	    curwin->w_cursor = curbuf->b_visual.vi_end;
@@ -1936,73 +1936,73 @@ do_put(
 	curbuf->b_op_end = curwin->w_cursor;	// default for '] mark
     }
 
-    if (flags & PUT_LINE)	// :put command or "p" in Visual line mode.
+    जर (flags & PUT_ओळ)	// :put command or "p" in Visual line mode.
 	y_type = MLINE;
 
-    if (y_size == 0 || y_array == NULL)
+    जर (y_size == 0 || y_array == रिक्त)
     {
 	semsg(_(e_nothing_in_register_str),
 		  regname == 0 ? (char_u *)"\"" : transchar(regname));
-	goto end;
+	जा end;
     }
 
-    if (y_type == MBLOCK)
+    जर (y_type == MBLOCK)
     {
 	lnum = curwin->w_cursor.lnum + y_size + 1;
-	if (lnum > curbuf->b_ml.ml_line_count)
-	    lnum = curbuf->b_ml.ml_line_count + 1;
-	if (u_save(curwin->w_cursor.lnum - 1, lnum) == FAIL)
-	    goto end;
+	जर (lnum > curbuf->b_ml.ml_ओळ_मोजणी)
+	    lnum = curbuf->b_ml.ml_ओळ_मोजणी + 1;
+	जर (u_save(curwin->w_cursor.lnum - 1, lnum) == FAIL)
+	    जा end;
     }
-    else if (y_type == MLINE)
+    अन्यथा जर (y_type == MLINE)
     {
 	lnum = curwin->w_cursor.lnum;
 #ifdef FEAT_FOLDING
 	// Correct line number for closed fold.  Don't move the cursor yet,
 	// u_save() uses it.
-	if (dir == BACKWARD)
-	    (void)hasFolding(lnum, &lnum, NULL);
-	else
-	    (void)hasFolding(lnum, NULL, &lnum);
+	जर (dir == BACKWARD)
+	    (शून्य)hasFolding(lnum, &lnum, रिक्त);
+	अन्यथा
+	    (शून्य)hasFolding(lnum, रिक्त, &lnum);
 #endif
-	if (dir == FORWARD)
+	जर (dir == FORWARD)
 	    ++lnum;
 	// In an empty buffer the empty line is going to be replaced, include
 	// it in the saved lines.
-	if ((BUFEMPTY() ? u_save(0, 2) : u_save(lnum - 1, lnum)) == FAIL)
-	    goto end;
+	जर ((BUFEMPTY() ? u_save(0, 2) : u_save(lnum - 1, lnum)) == FAIL)
+	    जा end;
 #ifdef FEAT_FOLDING
-	if (dir == FORWARD)
+	जर (dir == FORWARD)
 	    curwin->w_cursor.lnum = lnum - 1;
-	else
+	अन्यथा
 	    curwin->w_cursor.lnum = lnum;
 	curbuf->b_op_start = curwin->w_cursor;	// for mark_adjust()
 #endif
     }
-    else if (u_save_cursor() == FAIL)
-	goto end;
+    अन्यथा जर (u_save_cursor() == FAIL)
+	जा end;
 
-    if (cur_ve_flags == VE_ALL && y_type == MCHAR)
+    जर (cur_ve_flags == VE_ALL && y_type == MCHAR)
     {
-	if (gchar_cursor() == TAB)
+	जर (gchar_cursor() == TAB)
 	{
-	    int viscol = getviscol();
-	    int ts = curbuf->b_p_ts;
+	    पूर्णांक viscol = getviscol();
+	    पूर्णांक ts = curbuf->b_p_ts;
 
 	    // Don't need to insert spaces when "p" on the last position of a
 	    // tab or "P" on the first position.
-	    if (dir == FORWARD ?
+	    जर (dir == FORWARD ?
 #ifdef FEAT_VARTABS
 		    tabstop_padding(viscol, ts, curbuf->b_p_vts_array) != 1
-#else
+#अन्यथा
 		    ts - (viscol % ts) != 1
 #endif
 		    : curwin->w_cursor.coladd > 0)
 		coladvance_force(viscol);
-	    else
+	    अन्यथा
 		curwin->w_cursor.coladd = 0;
 	}
-	else if (curwin->w_cursor.coladd > 0 || gchar_cursor() == NUL)
+	अन्यथा जर (curwin->w_cursor.coladd > 0 || gchar_cursor() == NUL)
 	    coladvance_force(getviscol() + (dir == FORWARD));
     }
 
@@ -2010,56 +2010,56 @@ do_put(
     col = curwin->w_cursor.col;
 
     // Block mode
-    if (y_type == MBLOCK)
+    जर (y_type == MBLOCK)
     {
-	int	delcount;
-	int	incr = 0;
-	struct block_def bd;
-	long	j;
-	int	c = gchar_cursor();
+	पूर्णांक	delcount;
+	पूर्णांक	incr = 0;
+	संरचना block_def bd;
+	दीर्घ	j;
+	पूर्णांक	c = gchar_cursor();
 	colnr_T	endcol2 = 0;
 
-	if (dir == FORWARD && c != NUL)
+	जर (dir == FORWARD && c != NUL)
 	{
-	    if (cur_ve_flags == VE_ALL)
-		getvcol(curwin, &curwin->w_cursor, &col, NULL, &endcol2, 0);
-	    else
-		getvcol(curwin, &curwin->w_cursor, NULL, NULL, &col, 0);
+	    जर (cur_ve_flags == VE_ALL)
+		getvcol(curwin, &curwin->w_cursor, &col, रिक्त, &endcol2, 0);
+	    अन्यथा
+		getvcol(curwin, &curwin->w_cursor, रिक्त, रिक्त, &col, 0);
 
-	    if (has_mbyte)
+	    जर (has_mbyte)
 		// move to start of next multi-byte character
 		curwin->w_cursor.col += (*mb_ptr2len)(ml_get_cursor());
-	    else
-		if (c != TAB || cur_ve_flags != VE_ALL)
+	    अन्यथा
+		जर (c != TAB || cur_ve_flags != VE_ALL)
 		    ++curwin->w_cursor.col;
 	    ++col;
 	}
-	else
-	    getvcol(curwin, &curwin->w_cursor, &col, NULL, &endcol2, 0);
+	अन्यथा
+	    getvcol(curwin, &curwin->w_cursor, &col, रिक्त, &endcol2, 0);
 
 	col += curwin->w_cursor.coladd;
-	if (cur_ve_flags == VE_ALL
+	जर (cur_ve_flags == VE_ALL
 		&& (curwin->w_cursor.coladd > 0
 		    || endcol2 == curwin->w_cursor.col))
 	{
-	    if (dir == FORWARD && c == NUL)
+	    जर (dir == FORWARD && c == NUL)
 		++col;
-	    if (dir != FORWARD && c != NUL && curwin->w_cursor.coladd > 0)
+	    जर (dir != FORWARD && c != NUL && curwin->w_cursor.coladd > 0)
 		++curwin->w_cursor.col;
-	    if (c == TAB)
+	    जर (c == TAB)
 	    {
-		if (dir == BACKWARD && curwin->w_cursor.col)
+		जर (dir == BACKWARD && curwin->w_cursor.col)
 		    curwin->w_cursor.col--;
-		if (dir == FORWARD && col - 1 == endcol2)
+		जर (dir == FORWARD && col - 1 == endcol2)
 		    curwin->w_cursor.col++;
 	    }
 	}
 	curwin->w_cursor.coladd = 0;
 	bd.textcol = 0;
-	for (i = 0; i < y_size; ++i)
+	साठी (i = 0; i < y_size; ++i)
 	{
-	    int		    spaces = 0;
-	    char	    shortline;
+	    पूर्णांक		    spaces = 0;
+	    अक्षर	    shortline;
 	    chartabsize_T   cts;
 
 	    bd.startspaces = 0;
@@ -2068,12 +2068,12 @@ do_put(
 	    delcount = 0;
 
 	    // add a new line
-	    if (curwin->w_cursor.lnum > curbuf->b_ml.ml_line_count)
+	    जर (curwin->w_cursor.lnum > curbuf->b_ml.ml_ओळ_मोजणी)
 	    {
-		if (ml_append(curbuf->b_ml.ml_line_count, (char_u *)"",
+		जर (ml_append(curbuf->b_ml.ml_ओळ_मोजणी, (char_u *)"",
 						   (colnr_T)1, FALSE) == FAIL)
-		    break;
-		++nr_lines;
+		    थांबा;
+		++nr_ओळी;
 	    }
 	    // get the old line and advance to the position to insert at
 	    oldp = ml_get_curline();
@@ -2081,7 +2081,7 @@ do_put(
 	    init_chartabsize_arg(&cts, curwin, curwin->w_cursor.lnum, 0,
 								  oldp, oldp);
 
-	    while (cts.cts_vcol < col && *cts.cts_ptr != NUL)
+	    पर्यंत (cts.cts_vcol < col && *cts.cts_ptr != NUL)
 	    {
 		// Count a tab for what it's worth (if list mode not on)
 		incr = lbr_chartabsize_adv(&cts);
@@ -2094,17 +2094,17 @@ do_put(
 
 	    shortline = (vcol < col) || (vcol == col && !*ptr) ;
 
-	    if (vcol < col) // line too short, pad with spaces
+	    जर (vcol < col) // line too short, pad with spaces
 		bd.startspaces = col - vcol;
-	    else if (vcol > col)
+	    अन्यथा जर (vcol > col)
 	    {
 		bd.endspaces = vcol - col;
 		bd.startspaces = incr - bd.endspaces;
 		--bd.textcol;
 		delcount = 1;
-		if (has_mbyte)
+		जर (has_mbyte)
 		    bd.textcol -= (*mb_head_off)(oldp, oldp + bd.textcol);
-		if (oldp[bd.textcol] != TAB)
+		जर (oldp[bd.textcol] != TAB)
 		{
 		    // Only a Tab can be split into spaces.  Other
 		    // characters will have to be moved to after the
@@ -2114,9 +2114,9 @@ do_put(
 		}
 	    }
 
-	    yanklen = (int)y_array[i].length;
+	    yanklen = (पूर्णांक)y_array[i].length;
 
-	    if ((flags & PUT_BLOCK_INNER) == 0)
+	    जर ((flags & PUT_BLOCK_INNER) == 0)
 	    {
 		// calculate number of spaces required to fill right side of
 		// block
@@ -2124,71 +2124,71 @@ do_put(
 		init_chartabsize_arg(&cts, curwin, 0, 0,
 						      y_array[i].string, y_array[i].string);
 
-		while (*cts.cts_ptr != NUL)
+		पर्यंत (*cts.cts_ptr != NUL)
 		{
 		    spaces -= lbr_chartabsize_adv(&cts);
 		    cts.cts_vcol = 0;
 		}
 		clear_chartabsize_arg(&cts);
-		if (spaces < 0)
+		जर (spaces < 0)
 		    spaces = 0;
 	    }
 
 	    // Insert the new text.
 	    // First check for multiplication overflow.
-	    if (yanklen + spaces != 0
-		     && count > ((INT_MAX - (bd.startspaces + bd.endspaces))
+	    जर (yanklen + spaces != 0
+		     && मोजणी > ((पूर्णांक_उच्च - (bd.startspaces + bd.endspaces))
 							/ (yanklen + spaces)))
 	    {
 		emsg(_(e_resulting_text_too_long));
-		break;
+		थांबा;
 	    }
 
-	    totlen = count * (yanklen + spaces) + bd.startspaces + bd.endspaces;
+	    totlen = मोजणी * (yanklen + spaces) + bd.startspaces + bd.endspaces;
 	    newp = alloc(totlen + oldlen + 1);
-	    if (newp == NULL)
-		break;
+	    जर (newp == रिक्त)
+		थांबा;
 
 	    // copy part up to cursor to new line
 	    ptr = newp;
-	    mch_memmove(ptr, oldp, (size_t)bd.textcol);
+	    mch_memmove(ptr, oldp, (माप_प्रकार)bd.textcol);
 	    ptr += bd.textcol;
 
 	    // may insert some spaces before the new text
-	    vim_memset(ptr, ' ', (size_t)bd.startspaces);
+	    vim_memset(ptr, ' ', (माप_प्रकार)bd.startspaces);
 	    ptr += bd.startspaces;
 
 	    // insert the new text
-	    for (j = 0; j < count; ++j)
+	    साठी (j = 0; j < मोजणी; ++j)
 	    {
-		mch_memmove(ptr, y_array[i].string, (size_t)yanklen);
+		mch_memmove(ptr, y_array[i].string, (माप_प्रकार)yanklen);
 		ptr += yanklen;
 
 		// insert block's trailing spaces only if there's text behind
-		if ((j < count - 1 || !shortline) && spaces > 0)
+		जर ((j < मोजणी - 1 || !shortline) && spaces > 0)
 		{
-		    vim_memset(ptr, ' ', (size_t)spaces);
+		    vim_memset(ptr, ' ', (माप_प्रकार)spaces);
 		    ptr += spaces;
 		}
-		else
+		अन्यथा
 		    totlen -= spaces;  // didn't use these spaces
 	    }
 
 	    // may insert some spaces after the new text
-	    vim_memset(ptr, ' ', (size_t)bd.endspaces);
+	    vim_memset(ptr, ' ', (माप_प्रकार)bd.endspaces);
 	    ptr += bd.endspaces;
 
 	    // move the text after the cursor to the end of the line.
 	    mch_memmove(ptr, oldp + bd.textcol + delcount,
-				(size_t)(oldlen - bd.textcol - delcount + 1));
+				(माप_प्रकार)(oldlen - bd.textcol - delcount + 1));
 	    ml_replace(curwin->w_cursor.lnum, newp, FALSE);
 
 	    ++curwin->w_cursor.lnum;
-	    if (i == 0)
+	    जर (i == 0)
 		curwin->w_cursor.col += bd.startspaces;
 	}
 
-	changed_lines(lnum, 0, curwin->w_cursor.lnum - nr_lines, nr_lines);
+	changed_ओळी(lnum, 0, curwin->w_cursor.lnum - nr_ओळी, nr_ओळी);
 
 	// Set '[ mark.
 	curbuf->b_op_start = curwin->w_cursor;
@@ -2197,10 +2197,10 @@ do_put(
 	// adjust '] mark
 	curbuf->b_op_end.lnum = curwin->w_cursor.lnum - 1;
 	curbuf->b_op_end.col = bd.textcol + totlen - 1;
-	if (curbuf->b_op_end.col < 0)
+	जर (curbuf->b_op_end.col < 0)
 	    curbuf->b_op_end.col = 0;
 	curbuf->b_op_end.coladd = 0;
-	if (flags & PUT_CURSEND)
+	जर (flags & PUT_CURSEND)
 	{
 	    colnr_T len;
 
@@ -2209,41 +2209,41 @@ do_put(
 
 	    // in Insert mode we might be after the NUL, correct for that
 	    len = ml_get_curline_len();
-	    if (curwin->w_cursor.col > len)
+	    जर (curwin->w_cursor.col > len)
 		curwin->w_cursor.col = len;
 	}
-	else
+	अन्यथा
 	    curwin->w_cursor.lnum = lnum;
     }
-    else
+    अन्यथा
     {
 	pos_T	new_cursor;
 
-	yanklen = (int)y_array[0].length;
+	yanklen = (पूर्णांक)y_array[0].length;
 
 	// Character or Line mode
-	if (y_type == MCHAR)
+	जर (y_type == MCHAR)
 	{
 	    // if type is MCHAR, FORWARD is the same as BACKWARD on the next
 	    // char
-	    if (dir == FORWARD && gchar_cursor() != NUL)
+	    जर (dir == FORWARD && gchar_cursor() != NUL)
 	    {
-		if (has_mbyte)
+		जर (has_mbyte)
 		{
-		    int bytelen = (*mb_ptr2len)(ml_get_cursor());
+		    पूर्णांक bytelen = (*mb_ptr2len)(ml_get_cursor());
 
 		    // put it on the next of the multi-byte character.
 		    col += bytelen;
-		    if (yanklen)
+		    जर (yanklen)
 		    {
 			curwin->w_cursor.col += bytelen;
 			curbuf->b_op_end.col += bytelen;
 		    }
 		}
-		else
+		अन्यथा
 		{
 		    ++col;
-		    if (yanklen)
+		    जर (yanklen)
 		    {
 			++curwin->w_cursor.col;
 			++curbuf->b_op_end.col;
@@ -2253,23 +2253,23 @@ do_put(
 	    curbuf->b_op_start = curwin->w_cursor;
 	}
 	// Line mode: BACKWARD is the same as FORWARD on the previous line
-	else if (dir == BACKWARD)
+	अन्यथा जर (dir == BACKWARD)
 	    --lnum;
 	new_cursor = curwin->w_cursor;
 
 	// simple case: insert into one line at a time
-	if (y_type == MCHAR && y_size == 1)
+	जर (y_type == MCHAR && y_size == 1)
 	{
 	    linenr_T	end_lnum = 0; // init for gcc
 	    linenr_T	start_lnum = lnum;
-	    int		first_byte_off = 0;
+	    पूर्णांक		first_byte_off = 0;
 
-	    if (VIsual_active)
+	    जर (VIsual_active)
 	    {
 		end_lnum = curbuf->b_visual.vi_end.lnum;
-		if (end_lnum < curbuf->b_visual.vi_start.lnum)
+		जर (end_lnum < curbuf->b_visual.vi_start.lnum)
 		    end_lnum = curbuf->b_visual.vi_start.lnum;
-		if (end_lnum > start_lnum)
+		जर (end_lnum > start_lnum)
 		{
 		    pos_T   pos;
 
@@ -2279,51 +2279,51 @@ do_put(
 		    pos.lnum = lnum;
 		    pos.col = col;
 		    pos.coladd = 0;
-		    getvcol(curwin, &pos, NULL, &vcol, NULL, 0);
+		    getvcol(curwin, &pos, रिक्त, &vcol, रिक्त, 0);
 		}
 	    }
 
-	    if (count == 0 || yanklen == 0)
+	    जर (मोजणी == 0 || yanklen == 0)
 	    {
-		if (VIsual_active)
+		जर (VIsual_active)
 		    lnum = end_lnum;
 	    }
-	    else if (count > INT_MAX / yanklen)
+	    अन्यथा जर (मोजणी > पूर्णांक_उच्च / yanklen)
 		// multiplication overflow
 		emsg(_(e_resulting_text_too_long));
-	    else
+	    अन्यथा
 	    {
-		totlen = count * yanklen;
-		do
+		totlen = मोजणी * yanklen;
+		करा
 		{
 		    oldp = ml_get(lnum);
 		    oldlen = ml_get_len(lnum);
-		    if (lnum > start_lnum)
+		    जर (lnum > start_lnum)
 		    {
 			pos_T   pos;
 
 			pos.lnum = lnum;
-			if (getvpos(&pos, vcol) == OK)
+			जर (getvpos(&pos, vcol) == OK)
 			    col = pos.col;
-			else
+			अन्यथा
 			    col = MAXCOL;
 		    }
-		    if (VIsual_active && col > oldlen)
+		    जर (VIsual_active && col > oldlen)
 		    {
 			lnum++;
-			continue;
+			सुरूठेवा;
 		    }
 		    newp = alloc(totlen + oldlen + 1);
-		    if (newp == NULL)
-			goto end;	// alloc() gave an error message
-		    mch_memmove(newp, oldp, (size_t)col);
+		    जर (newp == रिक्त)
+			जा end;	// alloc() gave an error message
+		    mch_memmove(newp, oldp, (माप_प्रकार)col);
 		    ptr = newp + col;
-		    for (i = 0; i < count; ++i)
+		    साठी (i = 0; i < मोजणी; ++i)
 		    {
-			mch_memmove(ptr, y_array[0].string, (size_t)yanklen);
+			mch_memmove(ptr, y_array[0].string, (माप_प्रकार)yanklen);
 			ptr += yanklen;
 		    }
-		    mch_memmove(ptr, oldp + col, (size_t)(oldlen - col) + 1);	    // +1 for NUL
+		    mch_memmove(ptr, oldp + col, (माप_प्रकार)(oldlen - col) + 1);	    // +1 for NUL
 
 		    // compute the byte offset for the last character
 		    first_byte_off = mb_head_off(newp, ptr - 1);
@@ -2334,18 +2334,18 @@ do_put(
 		    inserted_bytes(lnum, col, totlen);
 
 		    // Place cursor on last putted char.
-		    if (lnum == curwin->w_cursor.lnum)
+		    जर (lnum == curwin->w_cursor.lnum)
 		    {
 			// make sure curwin->w_virtcol is updated
 			changed_cline_bef_curs();
 			invalidate_botline();
 			curwin->w_cursor.col += (colnr_T)(totlen - 1);
 		    }
-		    if (VIsual_active)
+		    जर (VIsual_active)
 			lnum++;
-		} while (VIsual_active && lnum <= end_lnum);
+		} पर्यंत (VIsual_active && lnum <= end_lnum);
 
-		if (VIsual_active) // reset lnum to the last visual line
+		जर (VIsual_active) // reset lnum to the last visual line
 		    lnum--;
 	    }
 
@@ -2354,40 +2354,40 @@ do_put(
 	    curbuf->b_op_end.col -= first_byte_off;
 
 	    // For "CTRL-O p" in Insert mode, put cursor after last char
-	    if (totlen && (restart_edit != 0 || (flags & PUT_CURSEND)))
+	    जर (totlen && (restart_edit != 0 || (flags & PUT_CURSEND)))
 		++curwin->w_cursor.col;
-	    else
+	    अन्यथा
 		curwin->w_cursor.col -= first_byte_off;
 	}
-	else
+	अन्यथा
 	{
 	    linenr_T	new_lnum = new_cursor.lnum;
-	    int		indent;
-	    int		orig_indent = 0;
-	    int		indent_diff = 0;	// init for gcc
-	    int		first_indent = TRUE;
-	    int		lendiff = 0;
-	    long	cnt;
+	    पूर्णांक		indent;
+	    पूर्णांक		orig_indent = 0;
+	    पूर्णांक		indent_diff = 0;	// init for gcc
+	    पूर्णांक		first_indent = TRUE;
+	    पूर्णांक		lendiff = 0;
+	    दीर्घ	cnt;
 
-	    if (flags & PUT_FIXINDENT)
+	    जर (flags & PUT_FIXINDENT)
 		orig_indent = get_indent();
 
 	    // Insert at least one line.  When y_type is MCHAR, break the first
 	    // line in two.
-	    for (cnt = 1; cnt <= count; ++cnt)
+	    साठी (cnt = 1; cnt <= मोजणी; ++cnt)
 	    {
 		i = 0;
-		if (y_type == MCHAR)
+		जर (y_type == MCHAR)
 		{
 		    // Split the current line in two at the insert position.
 		    // First insert y_array[size - 1] in front of second line.
 		    // Then append y_array[0] to first line.
 		    lnum = new_cursor.lnum;
 		    ptr = ml_get(lnum) + col;
-		    totlen = (int)y_array[y_size - 1].length;
+		    totlen = (पूर्णांक)y_array[y_size - 1].length;
 		    newp = alloc(ml_get_len(lnum) - col + totlen + 1);
-		    if (newp == NULL)
-			goto error;
+		    जर (newp == रिक्त)
+			जा error;
 		    STRCPY(newp, y_array[y_size - 1].string);
 		    STRCPY(newp + totlen, ptr);
 		    // insert second line
@@ -2397,154 +2397,154 @@ do_put(
 
 		    oldp = ml_get(lnum);
 		    newp = alloc(col + yanklen + 1);
-		    if (newp == NULL)
-			goto error;
+		    जर (newp == रिक्त)
+			जा error;
 					    // copy first part of line
-		    mch_memmove(newp, oldp, (size_t)col);
+		    mch_memmove(newp, oldp, (माप_प्रकार)col);
 					    // append to first line
-		    mch_memmove(newp + col, y_array[0].string, (size_t)(yanklen + 1));
+		    mch_memmove(newp + col, y_array[0].string, (माप_प्रकार)(yanklen + 1));
 		    ml_replace(lnum, newp, FALSE);
 
 		    curwin->w_cursor.lnum = lnum;
 		    i = 1;
 		}
 
-		for (; i < y_size; ++i)
+		साठी (; i < y_size; ++i)
 		{
-		    if (y_type != MCHAR || i < y_size - 1)
+		    जर (y_type != MCHAR || i < y_size - 1)
 		    {
-			if (ml_append(lnum, y_array[i].string, (colnr_T)0, FALSE)
+			जर (ml_append(lnum, y_array[i].string, (colnr_T)0, FALSE)
 								      == FAIL)
-			    goto error;
+			    जा error;
 			new_lnum++;
 		    }
 		    lnum++;
-		    ++nr_lines;
-		    if (flags & PUT_FIXINDENT)
+		    ++nr_ओळी;
+		    जर (flags & PUT_FIXINDENT)
 		    {
 			pos_T	old_pos = curwin->w_cursor;
 
 			curwin->w_cursor.lnum = lnum;
 			ptr = ml_get(lnum);
-			if (cnt == count && i == y_size - 1)
+			जर (cnt == मोजणी && i == y_size - 1)
 			    lendiff = ml_get_len(lnum);
-			if (*ptr == '#' && preprocs_left())
+			जर (*ptr == '#' && preprocs_डावा())
 			    indent = 0;     // Leave # lines at start
-			else if (*ptr == NUL)
+			अन्यथा जर (*ptr == NUL)
 			    indent = 0;     // Ignore empty lines
-			else if (first_indent)
+			अन्यथा जर (first_indent)
 			{
 			    indent_diff = orig_indent - get_indent();
 			    indent = orig_indent;
 			    first_indent = FALSE;
 			}
-			else if ((indent = get_indent() + indent_diff) < 0)
+			अन्यथा जर ((indent = get_indent() + indent_diff) < 0)
 			    indent = 0;
-			(void)set_indent(indent, 0);
+			(शून्य)set_indent(indent, 0);
 			curwin->w_cursor = old_pos;
 			// remember how many chars were removed
-			if (cnt == count && i == y_size - 1)
+			जर (cnt == मोजणी && i == y_size - 1)
 			    lendiff -= ml_get_len(lnum);
 		    }
 		}
-		if (cnt == 1)
+		जर (cnt == 1)
 		    new_lnum = lnum;
 	    }
 
 error:
 	    // Adjust marks.
-	    if (y_type == MLINE)
+	    जर (y_type == MLINE)
 	    {
 		curbuf->b_op_start.col = 0;
-		if (dir == FORWARD)
+		जर (dir == FORWARD)
 		    curbuf->b_op_start.lnum++;
 	    }
 	    mark_adjust(curbuf->b_op_start.lnum + (y_type == MCHAR),
-					     (linenr_T)MAXLNUM, nr_lines, 0L);
+					     (linenr_T)MAXLNUM, nr_ओळी, 0L);
 
 	    // note changed text for displaying and folding
-	    if (y_type == MCHAR)
-		changed_lines(curwin->w_cursor.lnum, col,
-					 curwin->w_cursor.lnum + 1, nr_lines);
-	    else
-		changed_lines(curbuf->b_op_start.lnum, 0,
-					   curbuf->b_op_start.lnum, nr_lines);
-	    if (y_current_used != NULL && (y_current_used != y_current
+	    जर (y_type == MCHAR)
+		changed_ओळी(curwin->w_cursor.lnum, col,
+					 curwin->w_cursor.lnum + 1, nr_ओळी);
+	    अन्यथा
+		changed_ओळी(curbuf->b_op_start.lnum, 0,
+					   curbuf->b_op_start.lnum, nr_ओळी);
+	    जर (y_current_used != रिक्त && (y_current_used != y_current
 					     || y_current->y_array != y_array))
 	    {
 		// Something invoked through changed_lines() has changed the
 		// yank buffer, e.g. a GUI clipboard callback.
 		emsg(_(e_yank_register_changed_while_using_it));
-		goto end;
+		जा end;
 	    }
 
 	    // Put the '] mark on the first byte of the last inserted character.
 	    // Correct the length for change in indent.
 	    curbuf->b_op_end.lnum = new_lnum;
 	    col = MAX(0, (colnr_T)y_array[y_size - 1].length - lendiff);
-	    if (col > 1)
+	    जर (col > 1)
 	    {
 		curbuf->b_op_end.col = col - 1;
-		if (y_array[y_size - 1].length > 0)
+		जर (y_array[y_size - 1].length > 0)
 		    curbuf->b_op_end.col -= mb_head_off(y_array[y_size - 1].string,
 						y_array[y_size - 1].string + y_array[y_size - 1].length - 1);
 	    }
-	    else
+	    अन्यथा
 		curbuf->b_op_end.col = 0;
 
-	    if (flags & PUT_CURSLINE)
+	    जर (flags & PUT_CURSLINE)
 	    {
 		// ":put": put cursor on last inserted line
 		curwin->w_cursor.lnum = lnum;
 		beginline(BL_WHITE | BL_FIX);
 	    }
-	    else if (flags & PUT_CURSEND)
+	    अन्यथा जर (flags & PUT_CURSEND)
 	    {
 		// put cursor after inserted text
-		if (y_type == MLINE)
+		जर (y_type == MLINE)
 		{
-		    if (lnum >= curbuf->b_ml.ml_line_count)
-			curwin->w_cursor.lnum = curbuf->b_ml.ml_line_count;
-		    else
+		    जर (lnum >= curbuf->b_ml.ml_ओळ_मोजणी)
+			curwin->w_cursor.lnum = curbuf->b_ml.ml_ओळ_मोजणी;
+		    अन्यथा
 			curwin->w_cursor.lnum = lnum + 1;
 		    curwin->w_cursor.col = 0;
 		}
-		else
+		अन्यथा
 		{
 		    curwin->w_cursor.lnum = new_lnum;
 		    curwin->w_cursor.col = col;
 		    curbuf->b_op_end = curwin->w_cursor;
-		    if (col > 1)
+		    जर (col > 1)
 			curbuf->b_op_end.col = col - 1;
 		}
 	    }
-	    else if (y_type == MLINE)
+	    अन्यथा जर (y_type == MLINE)
 	    {
 		// put cursor on first non-blank in first inserted line
 		curwin->w_cursor.col = 0;
-		if (dir == FORWARD)
+		जर (dir == FORWARD)
 		    ++curwin->w_cursor.lnum;
 		beginline(BL_WHITE | BL_FIX);
 	    }
-	    else	// put cursor on first inserted character
+	    अन्यथा	// put cursor on first inserted character
 		curwin->w_cursor = new_cursor;
 	}
     }
 
-    msgmore(nr_lines);
+    msgmore(nr_ओळी);
     curwin->w_set_curswant = true;
 
     // Make sure the cursor is not after the NUL.
-    int len = ml_get_curline_len();
-    if (curwin->w_cursor.col > len)
+    पूर्णांक len = ml_get_curline_len();
+    जर (curwin->w_cursor.col > len)
     {
-	if (cur_ve_flags == VE_ALL)
+	जर (cur_ve_flags == VE_ALL)
 	    curwin->w_cursor.coladd = curwin->w_cursor.col - len;
 	curwin->w_cursor.col = len;
     }
 
 end:
-    if (cmdmod.cmod_flags & CMOD_LOCKMARKS)
+    जर (cmdmod.cmod_flags & CMOD_LOCKMARKS)
     {
 	curbuf->b_op_start = orig_start;
 	curbuf->b_op_end = orig_end;
@@ -2555,18 +2555,18 @@ end:
 #endif
 
 #ifdef FEAT_EVAL
-    if (has_textputpost())
+    जर (has_textputpost())
     {
-	if (insert_string.string == NULL)
-	    put_do_autocmd(regname, y_current, NULL, true, dir);
-	else
-	    put_do_autocmd(regname, NULL, &insert_string, true, dir);
+	जर (घाला_string.string == रिक्त)
+	    put_do_autocmd(regname, y_current, रिक्त, true, dir);
+	अन्यथा
+	    put_do_autocmd(regname, रिक्त, &घाला_string, true, dir);
     }
 #endif
 
-    if (allocated)
-	vim_free(insert_string.string);
-    if (regname == '=')
+    जर (allocated)
+	vim_free(घाला_string.string);
+    जर (regname == '=')
 	vim_free(y_array);
 
     VIsual_active = FALSE;
@@ -2578,62 +2578,62 @@ end:
 /*
  * Return the character name of the register with the given number.
  */
-    int
-get_register_name(int num)
+    पूर्णांक
+get_register_name(पूर्णांक अंक)
 {
-    if (num == -1)
-	return '"';
-    else if (num < 10)
-	return num + '0';
-    else if (num == DELETION_REGISTER)
-	return '-';
-#if defined(FEAT_CLIPBOARD) || defined(FEAT_CLIPBOARD_PROVIDER)
-    else if (num == STAR_REGISTER)
-	return '*';
+    जर (अंक == -1)
+	परत '"';
+    अन्यथा जर (अंक < 10)
+	परत अंक + '0';
+    अन्यथा जर (अंक == DELETION_REGISTER)
+	परत '-';
+#जर defined(FEAT_CLIPBOARD) || defined(FEAT_CLIPBOARD_PROVIDER)
+    अन्यथा जर (अंक == STAR_REGISTER)
+	परत '*';
     // If there is only one clipboard, we only want the plus register to point
     // to the star register if the clipboard provider is not being used. If the
     // clipboard provider is being used, then both registers should be available
     // no matter the platform
-    else if (clipmethod == CLIPMETHOD_PROVIDER && num == REAL_PLUS_REGISTER)
-	return '+';
-    else if (clipmethod != CLIPMETHOD_PROVIDER && num == PLUS_REGISTER)
-	return '+';
+    अन्यथा जर (clipmethod == CLIPMETHOD_PROVIDER && अंक == REAL_PLUS_REGISTER)
+	परत '+';
+    अन्यथा जर (clipmethod != CLIPMETHOD_PROVIDER && अंक == PLUS_REGISTER)
+	परत '+';
 #endif
-    else
-	return num + 'a' - 10;
+    अन्यथा
+	परत अंक + 'a' - 10;
 }
 
-#if defined(FEAT_EVAL)
+#जर defined(FEAT_EVAL)
 /*
  * Return the index of the register "" points to.
  */
-    int
-get_unname_register(void)
+    पूर्णांक
+get_unname_register(शून्य)
 {
-    return y_previous == NULL ? -1 : y_previous - &y_regs[0];
+    परत y_previous == रिक्त ? -1 : y_previous - &y_regs[0];
 }
 #endif
 
 /*
  * ":dis" and ":registers": Display the contents of the yank registers.
  */
-    void
+    शून्य
 ex_display(exarg_T *eap)
 {
-    int		i, n;
-    long	j;
+    पूर्णांक		i, n;
+    दीर्घ	j;
     char_u	*p;
     yankreg_T	*yb;
-    int		name;
-    int		attr;
+    पूर्णांक		name;
+    पूर्णांक		attr;
     char_u	*arg = eap->arg;
-    int		clen;
-    int		type;
-    string_T	insert;
+    पूर्णांक		clen;
+    पूर्णांक		type;
+    string_T	घाला;
 
-    silence_w23_w24_msg++;
-    if (arg != NULL && *arg == NUL)
-	arg = NULL;
+    silence_w23_w24_संदेश++;
+    जर (arg != रिक्त && *arg == NUL)
+	arg = रिक्त;
     attr = HL_ATTR(HLF_8);
 
 #ifdef FEAT_CLIPBOARD_PROVIDER
@@ -2641,23 +2641,23 @@ ex_display(exarg_T *eap)
 #endif
 
     // Highlight title
-    msg_puts_title(_("\nType Name Content"));
-    for (i = -1; i < NUM_REGISTERS && !got_int; ++i)
+    संदेश_puts_title(_("\nType Name Content"));
+    साठी (i = -1; i < अंक_REGISTERS && !got_int; ++i)
     {
 	name = get_register_name(i);
-	switch (get_reg_type(name, NULL))
+	निवड (get_reg_type(name, रिक्त))
 	{
-	    case MLINE: type = 'l'; break;
-	    case MCHAR: type = 'c'; break;
-	    default:	type = 'b'; break;
+	    स्थिती MLINE: type = 'l'; थांबा;
+	    स्थिती MCHAR: type = 'c'; थांबा;
+	    पूर्वनिर्धारित:	type = 'b'; थांबा;
 	}
-	if (arg != NULL && vim_strchr(arg, name) == NULL
+	जर (arg != रिक्त && vim_strchr(arg, name) == रिक्त
 #ifdef ONE_CLIPBOARD
 		// Star register and plus register contain the same thing.
-		&& (name != '*' || vim_strchr(arg, '+') == NULL)
+		&& (name != '*' || vim_strchr(arg, '+') == रिक्त)
 #endif
 		)
-	    continue;	    // did not ask for this register
+	    सुरूठेवा;	    // did not ask for this register
 
 #ifdef HAVE_CLIPMETHOD
 	adjust_clip_reg(&name);
@@ -2666,66 +2666,66 @@ ex_display(exarg_T *eap)
 	call_clip_provider_request(name);
 #endif
 #ifdef FEAT_CLIPBOARD
-	if (clipmethod != CLIPMETHOD_PROVIDER)
+	जर (clipmethod != CLIPMETHOD_PROVIDER)
 	    // Adjust register name for "unnamed" in 'clipboard'.
 	    // When it's a clipboard register, fill it with the current contents
 	    // of the clipboard.
-	    (void)may_get_selection(name);
+	    (शून्य)may_get_selection(name);
 #endif
 
-	if (i == -1)
+	जर (i == -1)
 	{
-	    if (y_previous != NULL)
+	    जर (y_previous != रिक्त)
 		yb = y_previous;
-	    else
+	    अन्यथा
 		yb = &(y_regs[0]);
 	}
-	else
+	अन्यथा
 	    yb = &(y_regs[i]);
 
 #ifdef FEAT_EVAL
-	if (name == MB_TOLOWER(redir_reg)
-		|| (vim_strchr((char_u *)"\"*+", redir_reg) != NULL &&
+	जर (name == MB_TOLOWER(redir_reg)
+		|| (vim_strchr((char_u *)"\"*+", redir_reg) != रिक्त &&
 		    (yb == y_previous || yb == &y_regs[0])))
-	    continue;	    // do not list register being written to, the
+	    सुरूठेवा;	    // do not list register being written to, the
 			    // pointer can be freed
 #endif
 
-	if (yb->y_array != NULL)
+	जर (yb->y_array != रिक्त)
 	{
-	    int do_show = FALSE;
+	    पूर्णांक do_show = FALSE;
 
-	    for (j = 0; !do_show && j < yb->y_size; ++j)
+	    साठी (j = 0; !do_show && j < yb->y_size; ++j)
 		do_show = !message_filtered(yb->y_array[j].string);
 
-	    if (do_show || yb->y_size == 0)
+	    जर (do_show || yb->y_size == 0)
 	    {
-		msg_putchar('\n');
-		msg_puts("  ");
-		msg_putchar(type);
-		msg_puts("  ");
-		msg_putchar('"');
-		msg_putchar(name);
-		msg_puts("   ");
+		संदेश_putchar('\n');
+		संदेश_puts("  ");
+		संदेश_putchar(type);
+		संदेश_puts("  ");
+		संदेश_putchar('"');
+		संदेश_putchar(name);
+		संदेश_puts("   ");
 
-		n = (int)Columns - 11;
-		for (j = 0; j < yb->y_size && n > 1; ++j)
+		n = (पूर्णांक)Columns - 11;
+		साठी (j = 0; j < yb->y_size && n > 1; ++j)
 		{
-		    if (j)
+		    जर (j)
 		    {
-			msg_puts_attr("^J", attr);
+			संदेश_puts_attr("^J", attr);
 			n -= 2;
 		    }
-		    for (p = yb->y_array[j].string;
+		    साठी (p = yb->y_array[j].string;
 				    *p != NUL && (n -= ptr2cells(p)) >= 0; ++p)
 		    {
 			clen = (*mb_ptr2len)(p);
-			msg_outtrans_len(p, clen);
+			संदेश_outtrans_len(p, clen);
 			p += clen - 1;
 		    }
 		}
-		if (n > 1 && yb->y_type == MLINE)
-		    msg_puts_attr("^J", attr);
+		जर (n > 1 && yb->y_type == MLINE)
+		    संदेश_puts_attr("^J", attr);
 		out_flush();		    // show one line at a time
 	    }
 	    ui_breakcheck();
@@ -2733,105 +2733,105 @@ ex_display(exarg_T *eap)
     }
 
     // display last inserted text
-    insert = get_last_insert();
-    if ((p = insert.string) != NULL
-		  && (arg == NULL || vim_strchr(arg, '.') != NULL) && !got_int
+    घाला = get_last_घाला();
+    जर ((p = घाला.string) != रिक्त
+		  && (arg == रिक्त || vim_strchr(arg, '.') != रिक्त) && !got_int
 						      && !message_filtered(p))
     {
-	msg_puts("\n  c  \".   ");
-	dis_msg(p, TRUE);
+	संदेश_puts("\n  c  \".   ");
+	dis_संदेश(p, TRUE);
     }
 
     // display last command line
-    if (last_cmdline != NULL && (arg == NULL || vim_strchr(arg, ':') != NULL)
+    जर (last_cmdline != रिक्त && (arg == रिक्त || vim_strchr(arg, ':') != रिक्त)
 			       && !got_int && !message_filtered(last_cmdline))
     {
-	msg_puts("\n  c  \":   ");
-	dis_msg(last_cmdline, FALSE);
+	संदेश_puts("\n  c  \":   ");
+	dis_संदेश(last_cmdline, FALSE);
     }
 
     // display current file name
-    if (curbuf->b_fname != NULL
-	    && (arg == NULL || vim_strchr(arg, '%') != NULL) && !got_int
+    जर (curbuf->b_fname != रिक्त
+	    && (arg == रिक्त || vim_strchr(arg, '%') != रिक्त) && !got_int
 					&& !message_filtered(curbuf->b_fname))
     {
-	msg_puts("\n  c  \"%   ");
-	dis_msg(curbuf->b_fname, FALSE);
+	संदेश_puts("\n  c  \"%   ");
+	dis_संदेश(curbuf->b_fname, FALSE);
     }
 
     // display alternate file name
-    if ((arg == NULL || vim_strchr(arg, '#') != NULL) && !got_int)
+    जर ((arg == रिक्त || vim_strchr(arg, '#') != रिक्त) && !got_int)
     {
 	char_u	    *fname;
 	linenr_T    dummy;
 
-	if (buflist_name_nr(0, &fname, &dummy) != FAIL
+	जर (buflist_name_nr(0, &fname, &dummy) != FAIL
 						  && !message_filtered(fname))
 	{
-	    msg_puts("\n  c  \"#   ");
-	    dis_msg(fname, FALSE);
+	    संदेश_puts("\n  c  \"#   ");
+	    dis_संदेश(fname, FALSE);
 	}
     }
 
     // display last search pattern
-    if (last_search_pat() != NULL
-		 && (arg == NULL || vim_strchr(arg, '/') != NULL) && !got_int
-				      && !message_filtered(last_search_pat()))
+    जर (last_शोध_pat() != रिक्त
+		 && (arg == रिक्त || vim_strchr(arg, '/') != रिक्त) && !got_int
+				      && !message_filtered(last_शोध_pat()))
     {
-	msg_puts("\n  c  \"/   ");
-	dis_msg(last_search_pat(), FALSE);
+	संदेश_puts("\n  c  \"/   ");
+	dis_संदेश(last_शोध_pat(), FALSE);
     }
 
 #ifdef FEAT_EVAL
     // display last used expression
-    if (expr_line != NULL && (arg == NULL || vim_strchr(arg, '=') != NULL)
-				  && !got_int && !message_filtered(expr_line))
+    जर (अभिव्यक्ती_ओळ != रिक्त && (arg == रिक्त || vim_strchr(arg, '=') != रिक्त)
+				  && !got_int && !message_filtered(अभिव्यक्ती_ओळ))
     {
-	msg_puts("\n  c  \"=   ");
-	dis_msg(expr_line, FALSE);
+	संदेश_puts("\n  c  \"=   ");
+	dis_संदेश(अभिव्यक्ती_ओळ, FALSE);
     }
 #endif
 
 #ifdef FEAT_CLIPBOARD_PROVIDER
     dec_clip_provider();
 #endif
-    silence_w23_w24_msg--;
+    silence_w23_w24_संदेश--;
 }
 
 /*
  * display a string for do_dis()
  * truncate at end of screen line
  */
-    static void
-dis_msg(
+    स्थिर शून्य
+dis_संदेश(
     char_u	*p,
-    int		skip_esc)	    // if TRUE, ignore trailing ESC
+    पूर्णांक		skip_esc)	    // if TRUE, ignore trailing ESC
 {
-    int		n;
-    int		l;
+    पूर्णांक		n;
+    पूर्णांक		l;
 
-    n = (int)Columns - 6;
-    while (*p != NUL
+    n = (पूर्णांक)Columns - 6;
+    पर्यंत (*p != NUL
 	    && !(*p == ESC && skip_esc && *(p + 1) == NUL)
 	    && (n -= ptr2cells(p)) >= 0)
     {
-	if (has_mbyte && (l = (*mb_ptr2len)(p)) > 1)
+	जर (has_mbyte && (l = (*mb_ptr2len)(p)) > 1)
 	{
-	    msg_outtrans_len(p, l);
+	    संदेश_outtrans_len(p, l);
 	    p += l;
 	}
-	else
-	    msg_outtrans_len(p++, 1);
+	अन्यथा
+	    संदेश_outtrans_len(p++, 1);
     }
     ui_breakcheck();
 }
 
-#if defined(FEAT_DND)
+#जर defined(FEAT_DND)
 /*
  * Replace the contents of the '~' register with str.
  */
-    void
-dnd_yank_drag_data(char_u *str, long len)
+    शून्य
+dnd_yank_drag_data(char_u *str, दीर्घ len)
 {
     yankreg_T *curr;
 
@@ -2850,70 +2850,70 @@ dnd_yank_drag_data(char_u *str, long len)
  * Returns MAUTO for error.
  */
     char_u
-get_reg_type(int regname, long *reglen)
+get_reg_type(पूर्णांक regname, दीर्घ *reglen)
 {
-    switch (regname)
+    निवड (regname)
     {
-	case '%':		// file name
-	case '#':		// alternate file name
-	case '=':		// expression
-	case ':':		// last command line
-	case '/':		// last search-pattern
-	case '.':		// last inserted text
-	case Ctrl_F:		// Filename under cursor
-	case Ctrl_P:		// Path under cursor, expand via "path"
-	case Ctrl_W:		// word under cursor
-	case Ctrl_A:		// WORD (mnemonic All) under cursor
-	case '_':		// black hole: always empty
-	    return MCHAR;
+	स्थिती '%':		// file name
+	स्थिती '#':		// alternate file name
+	स्थिती '=':		// expression
+	स्थिती ':':		// last command line
+	स्थिती '/':		// last search-pattern
+	स्थिती '.':		// last inserted text
+	स्थिती Ctrl_F:		// Filename under cursor
+	स्थिती Ctrl_P:		// Path under cursor, expand via "path"
+	स्थिती Ctrl_W:		// word under cursor
+	स्थिती Ctrl_A:		// WORD (mnemonic All) under cursor
+	स्थिती '_':		// black hole: always empty
+	    परत MCHAR;
     }
 
 #ifdef FEAT_CLIPBOARD_PROVIDER
     call_clip_provider_request(regname);
 #endif
 #ifdef FEAT_CLIPBOARD
-    if (clipmethod != CLIPMETHOD_PROVIDER)
+    जर (clipmethod != CLIPMETHOD_PROVIDER)
 	regname = may_get_selection(regname);
 #endif
 
-    if (regname != NUL && !valid_yank_reg(regname, FALSE))
-	return MAUTO;
+    जर (regname != NUL && !valid_yank_reg(regname, FALSE))
+	परत MAUTO;
 
     get_yank_register(regname, FALSE);
 
-    if (y_current->y_array != NULL)
+    जर (y_current->y_array != रिक्त)
     {
-	if (reglen != NULL && y_current->y_type == MBLOCK)
+	जर (reglen != रिक्त && y_current->y_type == MBLOCK)
 	    *reglen = y_current->y_width;
-	return y_current->y_type;
+	परत y_current->y_type;
     }
-    return MAUTO;
+    परत MAUTO;
 }
 
-#if defined(FEAT_EVAL)
+#जर defined(FEAT_EVAL)
 /*
  * When "flags" has GREG_LIST return a list with text "s".
  * Otherwise just return "s".
  */
-    static char_u *
-getreg_wrap_one_line(char_u *s, int flags)
+    स्थिर char_u *
+getreg_wrap_one_ओळ(char_u *s, पूर्णांक flags)
 {
-    if (flags & GREG_LIST)
+    जर (flags & GREG_LIST)
     {
 	list_T *list = list_alloc();
 
-	if (list != NULL)
+	जर (list != रिक्त)
 	{
-	    if (list_append_string(list, NULL, -1) == FAIL)
+	    जर (list_append_string(list, रिक्त, -1) == FAIL)
 	    {
 		list_free(list);
-		return NULL;
+		परत रिक्त;
 	    }
 	    list->lv_first->li_tv.vval.v_string = s;
 	}
-	return (char_u *)list;
+	परत (char_u *)list;
     }
-    return s;
+    परत s;
 }
 
 /*
@@ -2927,114 +2927,114 @@ getreg_wrap_one_line(char_u *s, int flags)
  *	GREG_LIST	Return a list of lines instead of a single string.
  */
     char_u *
-get_reg_contents(int regname, int flags)
+get_reg_contents(पूर्णांक regname, पूर्णांक flags)
 {
     linenr_T	i;
     char_u	*retval;
-    int		allocated;
-    long	len;
+    पूर्णांक		allocated;
+    दीर्घ	len;
 
     // Don't allow using an expression register inside an expression
-    if (regname == '=')
+    जर (regname == '=')
     {
-	if (flags & GREG_NO_EXPR)
-	    return NULL;
-	if (flags & GREG_EXPR_SRC)
-	    return getreg_wrap_one_line(get_expr_line_src(), flags);
-	return getreg_wrap_one_line(get_expr_line(), flags);
+	जर (flags & GREG_NO_अभिव्यक्ती)
+	    परत रिक्त;
+	जर (flags & GREG_अभिव्यक्ती_SRC)
+	    परत getreg_wrap_one_ओळ(get_अभिव्यक्ती_ओळ_src(), flags);
+	परत getreg_wrap_one_ओळ(get_अभिव्यक्ती_ओळ(), flags);
     }
 
-    if (regname == '@')	    // "@@" is used for unnamed register
+    जर (regname == '@')	    // "@@" is used for unnamed register
 	regname = '"';
 
     // check for valid regname
-    if (regname != NUL && !valid_yank_reg(regname, FALSE))
-	return NULL;
+    जर (regname != NUL && !valid_yank_reg(regname, FALSE))
+	परत रिक्त;
 
 # ifdef FEAT_CLIPBOARD_PROVIDER
     call_clip_provider_request(regname);
 # endif
 # ifdef FEAT_CLIPBOARD
-    if (clipmethod != CLIPMETHOD_PROVIDER)
+    जर (clipmethod != CLIPMETHOD_PROVIDER)
 	regname = may_get_selection(regname);
 # endif
 
-    if (get_spec_reg(regname, &retval, &allocated, FALSE))
+    जर (get_spec_reg(regname, &retval, &allocated, FALSE))
     {
-	if (retval == NULL)
-	    return NULL;
-	if (allocated)
-	    return getreg_wrap_one_line(retval, flags);
-	return getreg_wrap_one_line(vim_strsave(retval), flags);
+	जर (retval == रिक्त)
+	    परत रिक्त;
+	जर (allocated)
+	    परत getreg_wrap_one_ओळ(retval, flags);
+	परत getreg_wrap_one_ओळ(vim_strsave(retval), flags);
     }
 
     get_yank_register(regname, FALSE);
-    if (y_current->y_array == NULL)
-	return NULL;
+    जर (y_current->y_array == रिक्त)
+	परत रिक्त;
 
-    if (flags & GREG_LIST)
+    जर (flags & GREG_LIST)
     {
 	list_T	*list = list_alloc();
 
-	if (list == NULL)
-	    return NULL;
-	for (i = 0; i < y_current->y_size; ++i)
+	जर (list == रिक्त)
+	    परत रिक्त;
+	साठी (i = 0; i < y_current->y_size; ++i)
 	{
-	    if (list_append_string(list, y_current->y_array[i].string,
-		(int)y_current->y_array[i].length) == FAIL)
+	    जर (list_append_string(list, y_current->y_array[i].string,
+		(पूर्णांक)y_current->y_array[i].length) == FAIL)
 	    {
 		list_free(list);
-		return NULL;
+		परत रिक्त;
 	    }
 	}
-	return (char_u *)list;
+	परत (char_u *)list;
     }
 
     // Compute length of resulting string.
     len = 0;
-    for (i = 0; i < y_current->y_size; ++i)
+    साठी (i = 0; i < y_current->y_size; ++i)
     {
-	len += (long)y_current->y_array[i].length;
+	len += (दीर्घ)y_current->y_array[i].length;
 
 	// Insert a newline between lines and after the last line if y_type is
 	// MLINE.
-	if (y_current->y_type == MLINE || i < y_current->y_size - 1)
+	जर (y_current->y_type == MLINE || i < y_current->y_size - 1)
 	    ++len;
     }
 
     retval = alloc(len + 1);
-    if (retval == NULL)
-	return NULL;
+    जर (retval == रिक्त)
+	परत रिक्त;
 
     // Copy the lines of the yank register into the string.
     len = 0;
-    for (i = 0; i < y_current->y_size; ++i)
+    साठी (i = 0; i < y_current->y_size; ++i)
     {
 	STRCPY(retval + len, y_current->y_array[i].string);
-	len += (long)y_current->y_array[i].length;
+	len += (दीर्घ)y_current->y_array[i].length;
 
 	// Insert a newline between lines and after the last line if y_type is
 	// MLINE.
-	if (y_current->y_type == MLINE || i < y_current->y_size - 1)
+	जर (y_current->y_type == MLINE || i < y_current->y_size - 1)
 	    retval[len++] = '\n';
     }
     retval[len] = NUL;
 
-    return retval;
+    परत retval;
 }
 
-    static int
+    स्थिर पूर्णांक
 init_write_reg(
-    int		name,
+    पूर्णांक		name,
     yankreg_T	**old_y_previous,
     yankreg_T	**old_y_current,
-    int		must_append,
-    int		*yank_type UNUSED)
+    पूर्णांक		must_append,
+    पूर्णांक		*yank_type UNUSED)
 {
-    if (!valid_yank_reg(name, TRUE))	    // check for valid reg name
+    जर (!valid_yank_reg(name, TRUE))	    // check for valid reg name
     {
 	emsg_invreg(name);
-	return FAIL;
+	परत FAIL;
     }
 
     // Don't want to change the current (unnamed) register
@@ -3042,14 +3042,14 @@ init_write_reg(
     *old_y_current = y_current;
 
     get_yank_register(name, TRUE);
-    if (!y_append && !must_append)
+    जर (!y_append && !must_append)
 	free_yank_all();
-    return OK;
+    परत OK;
 }
 
-    static void
+    स्थिर शून्य
 finish_write_reg(
-    int		name,
+    पूर्णांक		name,
     yankreg_T	*old_y_previous,
     yankreg_T	*old_y_current)
 {
@@ -3059,7 +3059,7 @@ finish_write_reg(
 # endif
 
     // ':let @" = "val"' should change the meaning of the "" register
-    if (name != '"')
+    जर (name != '"')
 	y_previous = old_y_previous;
     y_current = old_y_current;
 }
@@ -3073,50 +3073,50 @@ finish_write_reg(
  * Careful: 'str' is modified, you may have to use a copy!
  * If "str" ends in '\n' or '\r', use linewise, otherwise use characterwise.
  */
-    void
+    शून्य
 write_reg_contents(
-    int		name,
+    पूर्णांक		name,
     char_u	*str,
-    int		maxlen,
-    int		must_append)
+    पूर्णांक		maxlen,
+    पूर्णांक		must_append)
 {
     write_reg_contents_ex(name, str, maxlen, must_append, MAUTO, 0L);
 }
 
-    void
+    शून्य
 write_reg_contents_lst(
-    int		name,
+    पूर्णांक		name,
     char_u	**strings,
-    int		maxlen UNUSED,
-    int		must_append,
-    int		yank_type,
-    long	block_len)
+    पूर्णांक		maxlen UNUSED,
+    पूर्णांक		must_append,
+    पूर्णांक		yank_type,
+    दीर्घ	block_len)
 {
     yankreg_T  *old_y_previous, *old_y_current;
 
-    if (name == '/' || name == '=' || name == '#')
+    जर (name == '/' || name == '=' || name == '#')
     {
 	char_u	*s;
 
-	if (strings[0] == NULL)
+	जर (strings[0] == रिक्त)
 	    s = (char_u *)"";
-	else if (strings[1] != NULL)
+	अन्यथा जर (strings[1] != रिक्त)
 	{
-	    semsg(_(e_register_char_cannot_contain_multiple_lines), name);
-	    return;
+	    semsg(_(e_register_char_cannot_contain_multiple_ओळी), name);
+	    परत;
 	}
-	else
+	अन्यथा
 	    s = strings[0];
 	write_reg_contents_ex(name, s, -1, must_append, yank_type, block_len);
-	return;
+	परत;
     }
 
-    if (name == '_')	    // black hole: nothing to do
-	return;
+    जर (name == '_')	    // black hole: nothing to do
+	परत;
 
-    if (init_write_reg(name, &old_y_previous, &old_y_current, must_append,
+    जर (init_write_reg(name, &old_y_previous, &old_y_current, must_append,
 		&yank_type) == FAIL)
-	return;
+	परत;
 
     str_to_reg(y_current, yank_type, (char_u *)strings, -1, block_len, TRUE);
 
@@ -3127,80 +3127,80 @@ write_reg_contents_lst(
 # endif
 }
 
-    void
+    शून्य
 write_reg_contents_ex(
-    int		name,
+    पूर्णांक		name,
     char_u	*str,
-    int		maxlen,
-    int		must_append,
-    int		yank_type,
-    long	block_len)
+    पूर्णांक		maxlen,
+    पूर्णांक		must_append,
+    पूर्णांक		yank_type,
+    दीर्घ	block_len)
 {
     yankreg_T	*old_y_previous, *old_y_current;
-    long	len;
+    दीर्घ	len;
 
-    if (maxlen >= 0)
+    जर (maxlen >= 0)
 	len = maxlen;
-    else
-	len = (long)STRLEN(str);
+    अन्यथा
+	len = (दीर्घ)STRLEN(str);
 
     // Special case: '/' search pattern
-    if (name == '/')
+    जर (name == '/')
     {
-	set_last_search_pat(str, RE_SEARCH, TRUE, TRUE);
-	return;
+	set_last_शोध_pat(str, RE_शोध, TRUE, TRUE);
+	परत;
     }
 
-    if (name == '#')
+    जर (name == '#')
     {
-	if (len == 0)
+	जर (len == 0)
 	{
 	  curwin->w_alt_fnum = 0; // clear altfile
-	  return;
+	  परत;
 	}
 
 	buf_T	*buf;
 
-	if (VIM_ISDIGIT(*str))
+	जर (VIM_ISDIGIT(*str))
 	{
-	    int	num = atoi((char *)str);
+	    पूर्णांक	अंक = म_से_प((अक्षर *)str);
 
-	    buf = buflist_findnr(num);
-	    if (buf == NULL)
-		semsg(_(e_buffer_nr_does_not_exist), (long)num);
+	    buf = buflist_findnr(अंक);
+	    जर (buf == रिक्त)
+		semsg(_(e_buffer_nr_does_not_exist), (दीर्घ)अंक);
 	}
-	else
+	अन्यथा
 	    buf = buflist_findnr(buflist_findpat(str, str + len,
 							 TRUE, FALSE, FALSE));
-	if (buf == NULL)
-	    return;
+	जर (buf == रिक्त)
+	    परत;
 	curwin->w_alt_fnum = buf->b_fnum;
-	return;
+	परत;
     }
 
-    if (name == '=')
+    जर (name == '=')
     {
 	char_u	    *p, *s;
 
-	p = vim_strnsave(str, (size_t)len);
-	if (p == NULL)
-	    return;
-	if (must_append && expr_line != NULL)
+	p = vim_strnsave(str, (माप_प्रकार)len);
+	जर (p == रिक्त)
+	    परत;
+	जर (must_append && अभिव्यक्ती_ओळ != रिक्त)
 	{
-	    s = concat_str(expr_line, p);
+	    s = concat_str(अभिव्यक्ती_ओळ, p);
 	    vim_free(p);
 	    p = s;
 	}
-	set_expr_line(p, NULL);
-	return;
+	set_अभिव्यक्ती_ओळ(p, रिक्त);
+	परत;
     }
 
-    if (name == '_')	    // black hole: nothing to do
-	return;
+    जर (name == '_')	    // black hole: nothing to do
+	परत;
 
-    if (init_write_reg(name, &old_y_previous, &old_y_current, must_append,
+    जर (init_write_reg(name, &old_y_previous, &old_y_current, must_append,
 		&yank_type) == FAIL)
-	return;
+	परत;
 
     str_to_reg(y_current, yank_type, str, len, block_len, FALSE);
 
@@ -3212,61 +3212,61 @@ write_reg_contents_ex(
 }
 #endif	// FEAT_EVAL
 
-#if defined(FEAT_CLIPBOARD) || defined(FEAT_EVAL)
+#जर defined(FEAT_CLIPBOARD) || defined(FEAT_EVAL)
 /*
  * Put a string into a register.  When the register is not empty, the string
  * is appended.
  */
-    void
+    शून्य
 str_to_reg(
     yankreg_T	*y_ptr,		// pointer to yank register
-    int		yank_type,	// MCHAR, MLINE, MBLOCK, MAUTO
+    पूर्णांक		yank_type,	// MCHAR, MLINE, MBLOCK, MAUTO
     char_u	*str,		// string to put in register
-    long	len,		// length of string
-    long	blocklen,	// width of Visual block
-    int		str_list)	// TRUE if str is char_u **
+    दीर्घ	len,		// length of string
+    दीर्घ	blocklen,	// width of Visual block
+    पूर्णांक		str_list)	// TRUE if str is char_u **
 {
-    int		type;			// MCHAR, MLINE or MBLOCK
-    int		lnum;
-    long	start;
-    long	i;
-    int		extra;
-    int		newlines;		// number of lines added
-    int		extraline = 0;		// extra line at the end
-    int		append = FALSE;		// append to last line in register
+    पूर्णांक		type;			// MCHAR, MLINE or MBLOCK
+    पूर्णांक		lnum;
+    दीर्घ	start;
+    दीर्घ	i;
+    पूर्णांक		extra;
+    पूर्णांक		newlines;		// number of lines added
+    पूर्णांक		extraline = 0;		// extra line at the end
+    पूर्णांक		append = FALSE;		// append to last line in register
     char_u	*s;
     char_u	**ss;
     string_T	*pp;
-    long	maxlen;
+    दीर्घ	maxlen;
 
-    if (y_ptr->y_array == NULL)		// NULL means empty register
+    जर (y_ptr->y_array == रिक्त)		// NULL means empty register
 	y_ptr->y_size = 0;
 
-    if (yank_type == MAUTO)
+    जर (yank_type == MAUTO)
 	type = ((str_list || (len > 0 && (str[len - 1] == NL
 					    || str[len - 1] == CAR)))
 							     ? MLINE : MCHAR);
-    else
+    अन्यथा
 	type = yank_type;
 
     // Count the number of lines within the string
     newlines = 0;
-    if (str_list)
+    जर (str_list)
     {
-	for (ss = (char_u **) str; *ss != NULL; ++ss)
+	साठी (ss = (char_u **) str; *ss != रिक्त; ++ss)
 	    ++newlines;
     }
-    else
+    अन्यथा
     {
-	for (i = 0; i < len; i++)
-	    if (str[i] == '\n')
+	साठी (i = 0; i < len; i++)
+	    जर (str[i] == '\n')
 		++newlines;
-	if (type == MCHAR || len == 0 || str[len - 1] != '\n')
+	जर (type == MCHAR || len == 0 || str[len - 1] != '\n')
 	{
 	    extraline = 1;
 	    ++newlines;	// count extra newline at the end
 	}
-	if (y_ptr->y_size > 0 && y_ptr->y_type == MCHAR)
+	जर (y_ptr->y_size > 0 && y_ptr->y_type == MCHAR)
 	{
 	    append = TRUE;
 	    --newlines;	// uncount newline when appending first line
@@ -3274,89 +3274,89 @@ str_to_reg(
     }
 
     // Without any lines make the register empty.
-    if (y_ptr->y_size + newlines == 0)
+    जर (y_ptr->y_size + newlines == 0)
     {
 	VIM_CLEAR(y_ptr->y_array);
-	return;
+	परत;
     }
 
     // Allocate an array to hold the pointers to the new register lines.
     // If the register was not empty, move the existing lines to the new array.
-    pp = lalloc_clear((y_ptr->y_size + newlines) * sizeof(string_T), TRUE);
-    if (pp == NULL)	// out of memory
-	return;
-    for (lnum = 0; lnum < y_ptr->y_size; ++lnum)
+    pp = lalloc_clear((y_ptr->y_size + newlines) * आकार(string_T), TRUE);
+    जर (pp == रिक्त)	// out of memory
+	परत;
+    साठी (lnum = 0; lnum < y_ptr->y_size; ++lnum)
 	pp[lnum] = y_ptr->y_array[lnum];
     vim_free(y_ptr->y_array);
     y_ptr->y_array = pp;
     maxlen = 0;
 
     // Find the end of each line and save it into the array.
-    if (str_list)
+    जर (str_list)
     {
-	for (ss = (char_u **) str; *ss != NULL; ++ss, ++lnum)
+	साठी (ss = (char_u **) str; *ss != रिक्त; ++ss, ++lnum)
 	{
 	    pp[lnum].length = STRLEN(*ss);
 	    pp[lnum].string = vim_strnsave(*ss, pp[lnum].length);
-	    if (type == MBLOCK)
+	    जर (type == MBLOCK)
 	    {
-		int charlen = vim_strsize(*ss);
+		पूर्णांक charlen = vim_strsize(*ss);
 
-		if (charlen > maxlen)
+		जर (charlen > maxlen)
 		    maxlen = charlen;
 	    }
 	}
     }
-    else
+    अन्यथा
     {
-	for (start = 0; start < len + extraline; start += i + 1)
+	साठी (start = 0; start < len + extraline; start += i + 1)
 	{
-	    int charlen = 0;
+	    पूर्णांक charlen = 0;
 
-	    for (i = start; i < len;)	// find the end of the line
+	    साठी (i = start; i < len;)	// find the end of the line
 	    {
-		if (str[i] == '\n')
-		    break;
-		if (type == MBLOCK)
+		जर (str[i] == '\n')
+		    थांबा;
+		जर (type == MBLOCK)
 		{
-		    if (str[i] >= 0x80)
+		    जर (str[i] >= 0x80)
 			charlen += mb_ptr2cells_len(str + i, len - i);
-		    else
+		    अन्यथा
 			charlen += byte2cells(str[i]);
 		}
 
-		if (str[i] == NUL)
+		जर (str[i] == NUL)
 		    i++; // registers can have NUL chars
-		else
+		अन्यथा
 		    i += mb_ptr2len_len(str + i, len - i);
 	    }
 	    i -= start;			// i is now length of line
-	    if (charlen > maxlen)
+	    जर (charlen > maxlen)
 		maxlen = charlen;
-	    if (append)
+	    जर (append)
 	    {
 		--lnum;
-		extra = (int)y_ptr->y_array[lnum].length;
+		extra = (पूर्णांक)y_ptr->y_array[lnum].length;
 	    }
-	    else
+	    अन्यथा
 		extra = 0;
 	    s = alloc(i + extra + 1);
-	    if (s == NULL)
-		break;
-	    if (extra)
-		mch_memmove(s, y_ptr->y_array[lnum].string, (size_t)extra);
-	    if (append)
+	    जर (s == रिक्त)
+		थांबा;
+	    जर (extra)
+		mch_memmove(s, y_ptr->y_array[lnum].string, (माप_प्रकार)extra);
+	    जर (append)
 		vim_free(y_ptr->y_array[lnum].string);
-	    if (i > 0)
-		mch_memmove(s + extra, str + start, (size_t)i);
+	    जर (i > 0)
+		mch_memmove(s + extra, str + start, (माप_प्रकार)i);
 	    extra += i;
 	    s[extra] = NUL;
 	    y_ptr->y_array[lnum].string = s;
 	    y_ptr->y_array[lnum].length = extra;
 	    ++lnum;
-	    while (--extra >= 0)
+	    पर्यंत (--extra >= 0)
 	    {
-		if (*s == NUL)
+		जर (*s == NUL)
 		    *s = '\n';	    // replace NUL with newline
 		++s;
 	    }
@@ -3365,9 +3365,9 @@ str_to_reg(
     }
     y_ptr->y_type = type;
     y_ptr->y_size = lnum;
-    if (type == MBLOCK)
+    जर (type == MBLOCK)
 	y_ptr->y_width = (blocklen < 0 ? maxlen - 1 : blocklen);
-    else
+    अन्यथा
 	y_ptr->y_width = 0;
 # ifdef FEAT_VIMINFO
     y_ptr->y_time_set = vim_time();

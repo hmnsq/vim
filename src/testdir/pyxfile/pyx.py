@@ -1,2 +1,2 @@
-import sys
+आयात sys
 print(sys.version)
