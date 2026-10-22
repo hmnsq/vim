@@ -21,8 +21,8 @@ struct _VimToolbar
 {
     GtkWidget parent;
 
-    int style; // TOOLBAR_* flags
-    int iconsize; // TBIS_* values
+    цяло style; // TOOLBAR_* flags
+    цяло iconsize; // TBIS_* values
 
     GList *items;
 
@@ -35,8 +35,8 @@ struct _VimToolbar
 
 G_DEFINE_TYPE(VimToolbar, vim_toolbar, GTK_TYPE_WIDGET)
 
-static void vim_toolbar_size_allocate(GtkWidget *widget, int width, int height, int baseline);
-static void vim_toolbar_measure(GtkWidget *widget, GtkOrientation orientation, int for_size, int *minimum, int *natural, int *minimum_baseline, int *natural_baseline);
+static void vim_toolbar_size_allocate(GtkWidget *widget, цяло width, цяло height, цяло baseline);
+static void vim_toolbar_measure(GtkWidget *widget, GtkOrientation orientation, цяло for_size, цяло *minimum, цяло *natural, цяло *minimum_baseline, цяло *natural_baseline);
 
     static void
 vim_toolbar_dispose(GObject *object)
@@ -101,7 +101,7 @@ vim_toolbar_init(VimToolbar *self)
     GtkWidget *
 vim_toolbar_new(void)
 {
-    return g_object_new(VIM_TYPE_TOOLBAR, NULL);
+    върни g_object_new(VIM_TYPE_TOOLBAR, NULL);
 }
 
 /*
@@ -109,12 +109,12 @@ vim_toolbar_new(void)
  * overflowing items.
  */
     static void
-vim_toolbar_insert(VimToolbar *self, GtkWidget *widget, int idx)
+vim_toolbar_insert(VimToolbar *self, GtkWidget *widget, цяло idx)
 {
     GtkWidget	*cur_child = gtk_widget_get_first_child(self->strip);
-    int		i = 0;
+    цяло		i = 0;
 
-    while (cur_child != NULL && i != idx - 1)
+    докато (cur_child != NULL && i != idx - 1)
     {
 	cur_child = gtk_widget_get_next_sibling(cur_child);
 	i++;
@@ -129,23 +129,23 @@ vim_toolbar_insert(VimToolbar *self, GtkWidget *widget, int idx)
  * Update "btn" according to "style" and "iconsize".
  */
     static void
-set_button_style(GtkWidget *btn, int style, int iconsize, gboolean invalidate)
+set_button_style(GtkWidget *btn, цяло style, цяло iconsize, gboolean invalidate)
 {
     GtkWidget *box;
     GtkWidget *icon;
     GtkWidget *label;
 
-    if (GTK_IS_SEPARATOR(btn))
-	return;
+    ако (GTK_IS_SEPARATOR(btn))
+	върни;
 
     box = gtk_button_get_child(GTK_BUTTON(btn));
-    if (style & TOOLBAR_HORIZ)
+    ако (style & TOOLBAR_HORIZ)
     {
 	gtk_orientable_set_orientation(GTK_ORIENTABLE(box),
 		GTK_ORIENTATION_HORIZONTAL);
 	gtk_box_set_spacing(GTK_BOX(box), 8);
     }
-    else
+    иначе
     {
 	gtk_orientable_set_orientation(GTK_ORIENTABLE(box),
 		GTK_ORIENTATION_VERTICAL);
@@ -155,9 +155,9 @@ set_button_style(GtkWidget *btn, int style, int iconsize, gboolean invalidate)
     gtk_widget_set_has_tooltip(btn, style & TOOLBAR_TOOLTIPS);
 
     icon = g_object_get_data(G_OBJECT(btn), "icon");
-    if (icon != NULL)
+    ако (icon != NULL)
     {
-	if (style & TOOLBAR_ICONS)
+	ако (style & TOOLBAR_ICONS)
 	{
 	    GtkIconSize size;
 
@@ -180,17 +180,17 @@ set_button_style(GtkWidget *btn, int style, int iconsize, gboolean invalidate)
 	    gtk_image_set_icon_size(GTK_IMAGE(icon), size);
 	    gtk_widget_set_visible(icon, TRUE);
 	}
-	else
+	иначе
 	    gtk_widget_set_visible(icon, FALSE);
     }
 
     label = g_object_get_data(G_OBJECT(btn), "label");
-    if (label != NULL)
+    ако (label != NULL)
 	gtk_widget_set_visible(label, style & TOOLBAR_TEXT);
 
     // Used to cache width in toolbar ("self->strip"). -1 means not calculated
     // yet.
-    if (invalidate)
+    ако (invalidate)
 	g_object_set_data(G_OBJECT(btn), "toolbar-width", GINT_TO_POINTER(-1));
 }
 
@@ -216,7 +216,7 @@ vim_toolbar_insert_button(
 	VimToolbar  *self,
 	GtkWidget   *icon,
 	const char  *text,
-	int	    idx)
+	цяло	    idx)
 {
     GtkWidget *btn = gtk_button_new();
     GtkWidget *box;
@@ -226,14 +226,14 @@ vim_toolbar_insert_button(
 
     gtk_button_set_child(GTK_BUTTON(btn), box);
 
-    if (icon != NULL)
+    ако (icon != NULL)
     {
 	gtk_widget_set_valign (icon, GTK_ALIGN_CENTER);
 	gtk_widget_set_vexpand (icon, TRUE);
 	gtk_box_append(GTK_BOX(box), icon);
 	g_object_set_data(G_OBJECT(btn), "icon", icon);
     }
-    if (text != NULL)
+    ако (text != NULL)
     {
 	GtkWidget *label = gtk_label_new(text);
 
@@ -249,47 +249,47 @@ vim_toolbar_insert_button(
 	    G_CALLBACK(button_clicked), self, G_CONNECT_DEFAULT);
 
     vim_toolbar_insert(self, btn, idx);
-    return btn;
+    върни btn;
 }
 
 /*
  * Insert a toolbar separator at the given index and return the widget.
  */
     GtkWidget *
-vim_toolbar_insert_separator(VimToolbar *self, int idx)
+vim_toolbar_insert_separator(VimToolbar *self, цяло idx)
 {
     GtkWidget *sep = gtk_separator_new(GTK_ORIENTATION_VERTICAL);
 
     g_object_set_data(G_OBJECT(sep), "toolbar-width", GINT_TO_POINTER(-1));
     vim_toolbar_insert(self, sep, idx);
-    return sep;
+    върни sep;
 }
 
 /*
  * Update the style and iconsize of the toolbar
  */
     void
-vim_toolbar_set_style(VimToolbar *self, int style, int iconsize)
+vim_toolbar_set_style(VimToolbar *self, цяло style, цяло iconsize)
 {
     GtkWidget *cur_child = gtk_widget_get_first_child(self->strip);
 
-    if (style == self->style && self->iconsize == iconsize)
-	return;
+    ако (style == self->style && self->iconsize == iconsize)
+	върни;
 
     self->style = style;
     self->iconsize = iconsize;
 
-    while (cur_child != NULL)
+    докато (cur_child != NULL)
     {
-	if (!GTK_IS_SEPARATOR(cur_child))
+	ако (!GTK_IS_SEPARATOR(cur_child))
 	    set_button_style(cur_child, style, iconsize, TRUE);
 	cur_child = gtk_widget_get_next_sibling(cur_child);
     }
 
     cur_child = gtk_widget_get_first_child(self->overflow_box);
-    while (cur_child != NULL)
+    докато (cur_child != NULL)
     {
-	if (!GTK_IS_SEPARATOR(cur_child))
+	ако (!GTK_IS_SEPARATOR(cur_child))
 	    set_button_style(cur_child, style, iconsize, TRUE);
 	cur_child = gtk_widget_get_next_sibling(cur_child);
     }
@@ -303,9 +303,9 @@ vim_toolbar_set_style(VimToolbar *self, int style, int iconsize)
     void
 vim_toolbar_remove(VimToolbar *self, GtkWidget *item)
 {
-    if (gtk_widget_get_parent(item) == self->strip)
+    ако (gtk_widget_get_parent(item) == self->strip)
 	gtk_box_remove(GTK_BOX(self->strip), item);
-    else
+    иначе
 	gtk_box_remove(GTK_BOX(self->overflow_box), item);
 
     self->items = g_list_remove(self->items, item);
@@ -326,8 +326,8 @@ vim_toolbar_move_item_to(
     GtkBox *from, *to;
 
     to = overflow ? GTK_BOX(self->overflow_box) : GTK_BOX(self->strip);
-    if (gtk_widget_get_parent(item) == GTK_WIDGET(to))
-	return;
+    ако (gtk_widget_get_parent(item) == GTK_WIDGET(to))
+	върни;
 
     from = overflow ? GTK_BOX(self->strip) : GTK_BOX(self->overflow_box);
 
@@ -336,13 +336,13 @@ vim_toolbar_move_item_to(
     gtk_box_append(to, item);
     g_object_unref(item);
 
-    if (GTK_IS_SEPARATOR(item))
+    ако (GTK_IS_SEPARATOR(item))
 	gtk_widget_set_visible(item, !overflow);
-    else
+    иначе
     {
-	if (overflow)
+	ако (overflow)
 	{
-	    int style = self->style;
+	    цяло style = self->style;
 
 	    // Force set these flags for the overflow menu, to mimic what GTK3
 	    // GtkToolbar does.
@@ -351,15 +351,15 @@ vim_toolbar_move_item_to(
 	    style |= TOOLBAR_ICONS;
 	    set_button_style(item, style, self->iconsize, FALSE);
 	}
-	else
+	иначе
 	    set_button_style(item, self->style, self->iconsize, FALSE);
     }
 }
 
-    static int
+    static цяло
 get_item_width(GtkWidget *item)
 {
-    int toolbar_width = -1;
+    цяло toolbar_width = -1;
 
     // Always use cached width for item, because width in overflow menu is
     // different (GtkBox is in horizontal layout). Also use it for separators,
@@ -367,7 +367,7 @@ get_item_width(GtkWidget *item)
     toolbar_width = GPOINTER_TO_INT(
 	    g_object_get_data(G_OBJECT(item), "toolbar-width"));
 
-    if (toolbar_width == -1)
+    ако (toolbar_width == -1)
     {
 	GtkRequisition min_req, nat_req;
 	gtk_widget_get_preferred_size(item, &min_req, &nat_req);
@@ -377,68 +377,68 @@ get_item_width(GtkWidget *item)
 	g_object_set_data(G_OBJECT(item),
 		"toolbar-width", GINT_TO_POINTER(toolbar_width));
     }
-    return toolbar_width;
+    върни toolbar_width;
 }
 
     static void
 vim_toolbar_size_allocate(
 	GtkWidget   *widget,
-	int	    width,
-	int	    height,
-	int	    baseline)
+	цяло	    width,
+	цяло	    height,
+	цяло	    baseline)
 {
     VimToolbar	    *self = VIM_TOOLBAR(widget);
     GtkAllocation   alloc;
-    int		    used = 0;
-    int		    avail;
+    цяло		    used = 0;
+    цяло		    avail;
     GList	    *overflow_ele = NULL;
     GtkWidget	    *child;
 
     avail = width - get_item_width(self->overflow_btn);
 
-    for (GList *ele = self->items; ele != NULL; ele = ele->next)
+    за (GList *ele = self->items; ele != NULL; ele = ele->next)
     {
 	GtkWidget   *item = ele->data;
-	int	    toolbar_width = get_item_width(item);
+	цяло	    toolbar_width = get_item_width(item);
 
-	if (used + toolbar_width > avail)
+	ако (used + toolbar_width > avail)
 	{
 	    overflow_ele = ele;
 	    break;
 	}
-	else
+	иначе
 	    vim_toolbar_move_item_to(self, item, FALSE);
 	used += toolbar_width;
     }
 
-    if (overflow_ele != NULL)
+    ако (overflow_ele != NULL)
     {
-	int	    remaining = width - used;
+	цяло	    remaining = width - used;
 	gboolean    need_overflow_btn = FALSE;
 
 	// Move all items in the overflow to the toolbar, so we can add them
 	// in the correct order back again. Also check if the overflow button is
 	// still needed (can fit all toolbar items by disabling it).
-	while ((child = gtk_widget_get_first_child(self->overflow_box))
+	докато ((child = gtk_widget_get_first_child(self->overflow_box))
 		!= NULL)
 	    vim_toolbar_move_item_to(self, child, FALSE);
 
-	for (GList *ele = overflow_ele; ele != NULL; ele = ele->next)
+	за (GList *ele = overflow_ele; ele != NULL; ele = ele->next)
 	{
 	    remaining -= get_item_width(ele->data);
-	    if (remaining < 0)
+	    ако (remaining < 0)
 	    {
 		need_overflow_btn = TRUE;
 		break;
 	    }
 	}
 
-	if (need_overflow_btn)
-	    for (; overflow_ele != NULL; overflow_ele = overflow_ele->next)
+	ако (need_overflow_btn)
+	    за (; overflow_ele != NULL; overflow_ele = overflow_ele->next)
 		vim_toolbar_move_item_to(self, overflow_ele->data, TRUE);
 	gtk_widget_set_visible(self->overflow_btn, need_overflow_btn);
     }
-    else
+    иначе
 	gtk_widget_set_visible(self->overflow_btn, FALSE);
 
     alloc.x = alloc.y = 0;
@@ -452,39 +452,39 @@ vim_toolbar_size_allocate(
 vim_toolbar_measure(
 	GtkWidget	*widget,
 	GtkOrientation	orientation,
-	int		for_size,
-	int		*min,
-	int		*nat,
-	int		*min_baseline,
-	int		*nat_baseline)
+	цяло		for_size,
+	цяло		*min,
+	цяло		*nat,
+	цяло		*min_baseline,
+	цяло		*nat_baseline)
 {
     VimToolbar	*self = VIM_TOOLBAR(widget);
-    int		strip_min = 0, strip_nat = 0;
-    int		obtn_min = 0, obtn_nat = 0;
+    цяло		strip_min = 0, strip_nat = 0;
+    цяло		obtn_min = 0, obtn_nat = 0;
 
     gtk_widget_measure(self->strip, orientation, for_size,
 	    &strip_min, &strip_nat, NULL, NULL);
     gtk_widget_measure(self->overflow_btn, orientation, for_size,
 	    &obtn_min, &obtn_nat, NULL, NULL);
 
-    if (orientation == GTK_ORIENTATION_HORIZONTAL)
+    ако (orientation == GTK_ORIENTATION_HORIZONTAL)
     {
-	if (min != NULL)
+	ако (min != NULL)
 	    *min = obtn_min;
-	if (nat != NULL)
+	ако (nat != NULL)
 	    *nat = strip_nat + obtn_nat;
     }
-    else
+    иначе
     {
-	if (min != NULL)
+	ако (min != NULL)
 	    *min = MAX(strip_min, obtn_min);
-	if (nat != NULL)
+	ако (nat != NULL)
 	    *nat = MAX(strip_nat, obtn_nat);
     }
 
-    if (min_baseline != NULL)
+    ако (min_baseline != NULL)
 	*min_baseline = -1;
-    if (nat_baseline != NULL)
+    ако (nat_baseline != NULL)
 	*nat_baseline = -1;
 }
 

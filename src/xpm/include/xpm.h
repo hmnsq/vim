@@ -69,26 +69,26 @@
 # include <malloc.h>
 # include "simx.h"		/* defines some X stuff using MSW types */
 #define NEED_STRCASECMP		/* at least for MSVC++ */
-#else /* FOR_MSW */
+#иначе /* FOR_MSW */
 # ifdef AMIGA
 #  include "amigax.h"
-# else /* not AMIGA */
+# иначе /* not AMIGA */
 #  include <X11/Xlib.h>
 #  include <X11/Xutil.h>
 # endif /* not AMIGA */
 #endif /* FOR_MSW */
 
 /* let's define Pixel if it is not done yet */
-#if ! defined(_XtIntrinsic_h) && ! defined(PIXEL_ALREADY_TYPEDEFED)
+#ако ! defined(_XtIntrinsic_h) && ! defined(PIXEL_ALREADY_TYPEDEFED)
 typedef unsigned long Pixel;	/* Index into colormap */
 # define PIXEL_ALREADY_TYPEDEFED
 #endif
 
 /* make sure we know whether function prototypes are needed or not */
 #ifndef NeedFunctionPrototypes
-# if defined(__STDC__) || defined(__cplusplus) || defined(c_plusplus)
+# ако defined(__STDC__) || defined(__cplusplus) || defined(c_plusplus)
 #  define NeedFunctionPrototypes 1
-# else
+# иначе
 #  define NeedFunctionPrototypes 0
 # endif
 #endif
@@ -115,7 +115,7 @@ typedef struct {
 
 typedef struct {
     char *name;			/* name of the extension */
-    unsigned int nlines;	/* number of lines in this extension */
+    unsigned цяло nlines;	/* number of lines in this extension */
     char **lines;		/* pointer to the extension array of strings */
 }      XpmExtension;
 
@@ -129,12 +129,12 @@ typedef struct {
 }      XpmColor;
 
 typedef struct {
-    unsigned int width;		/* image width */
-    unsigned int height;	/* image height */
-    unsigned int cpp;		/* number of characters per pixel */
-    unsigned int ncolors;	/* number of colors */
+    unsigned цяло width;		/* image width */
+    unsigned цяло height;	/* image height */
+    unsigned цяло cpp;		/* number of characters per pixel */
+    unsigned цяло ncolors;	/* number of colors */
     XpmColor *colorTable;	/* list of related colors */
-    unsigned int *data;		/* image data */
+    unsigned цяло *data;		/* image data */
 }      XpmImage;
 
 typedef struct {
@@ -142,14 +142,14 @@ typedef struct {
     char *hints_cmt;		/* Comment of the hints section */
     char *colors_cmt;		/* Comment of the colors section */
     char *pixels_cmt;		/* Comment of the pixels section */
-    unsigned int x_hotspot;	/* Returns the x hotspot's coordinate */
-    unsigned int y_hotspot;	/* Returns the y hotspot's coordinate */
-    unsigned int nextensions;	/* number of extensions */
+    unsigned цяло x_hotspot;	/* Returns the x hotspot's coordinate */
+    unsigned цяло y_hotspot;	/* Returns the y hotspot's coordinate */
+    unsigned цяло nextensions;	/* number of extensions */
     XpmExtension *extensions;	/* pointer to array of extensions */
 }      XpmInfo;
 
-typedef int (*XpmAllocColorFunc)(
-#if NeedFunctionPrototypes
+typedef цяло (*XpmAllocColorFunc)(
+#ако NeedFunctionPrototypes
     Display*			/* display */,
     Colormap			/* colormap */,
     char*			/* colorname */,
@@ -158,12 +158,12 @@ typedef int (*XpmAllocColorFunc)(
 #endif
 );
 
-typedef int (*XpmFreeColorsFunc)(
-#if NeedFunctionPrototypes
+typedef цяло (*XpmFreeColorsFunc)(
+#ако NeedFunctionPrototypes
     Display*			/* display */,
     Colormap			/* colormap */,
     Pixel*			/* pixels */,
-    int				/* npixels */,
+    цяло				/* npixels */,
     void*			/* closure */
 #endif
 );
@@ -174,52 +174,52 @@ typedef struct {
 
     Visual *visual;			/* Specifies the visual to use */
     Colormap colormap;			/* Specifies the colormap to use */
-    unsigned int depth;			/* Specifies the depth */
-    unsigned int width;			/* Returns the width of the created
+    unsigned цяло depth;			/* Specifies the depth */
+    unsigned цяло width;			/* Returns the width of the created
 					   pixmap */
-    unsigned int height;		/* Returns the height of the created
+    unsigned цяло height;		/* Returns the height of the created
 					   pixmap */
-    unsigned int x_hotspot;		/* Returns the x hotspot's
+    unsigned цяло x_hotspot;		/* Returns the x hotspot's
 					   coordinate */
-    unsigned int y_hotspot;		/* Returns the y hotspot's
+    unsigned цяло y_hotspot;		/* Returns the y hotspot's
 					   coordinate */
-    unsigned int cpp;			/* Specifies the number of char per
+    unsigned цяло cpp;			/* Specifies the number of char per
 					   pixel */
     Pixel *pixels;			/* List of used color pixels */
-    unsigned int npixels;		/* Number of used pixels */
+    unsigned цяло npixels;		/* Number of used pixels */
     XpmColorSymbol *colorsymbols;	/* List of color symbols to override */
-    unsigned int numsymbols;		/* Number of symbols */
+    unsigned цяло numsymbols;		/* Number of symbols */
     char *rgb_fname;			/* RGB text file name */
-    unsigned int nextensions;		/* Number of extensions */
+    unsigned цяло nextensions;		/* Number of extensions */
     XpmExtension *extensions;		/* List of extensions */
 
-    unsigned int ncolors;               /* Number of colors */
+    unsigned цяло ncolors;               /* Number of colors */
     XpmColor *colorTable;               /* List of colors */
 /* 3.2 backward compatibility code */
     char *hints_cmt;                    /* Comment of the hints section */
     char *colors_cmt;                   /* Comment of the colors section */
     char *pixels_cmt;                   /* Comment of the pixels section */
 /* end 3.2 bc */
-    unsigned int mask_pixel;            /* Color table index of transparent
+    unsigned цяло mask_pixel;            /* Color table index of transparent
                                            color */
 
     /* Color Allocation Directives */
     Bool exactColors;			/* Only use exact colors for visual */
-    unsigned int closeness;		/* Allowable RGB deviation */
-    unsigned int red_closeness;		/* Allowable red deviation */
-    unsigned int green_closeness;	/* Allowable green deviation */
-    unsigned int blue_closeness;	/* Allowable blue deviation */
-    int color_key;			/* Use colors from this color set */
+    unsigned цяло closeness;		/* Allowable RGB deviation */
+    unsigned цяло red_closeness;		/* Allowable red deviation */
+    unsigned цяло green_closeness;	/* Allowable green deviation */
+    unsigned цяло blue_closeness;	/* Allowable blue deviation */
+    цяло color_key;			/* Use colors from this color set */
 
     Pixel *alloc_pixels;		/* Returns the list of alloc'ed color
 					   pixels */
-    int nalloc_pixels;			/* Returns the number of alloc'ed
+    цяло nalloc_pixels;			/* Returns the number of alloc'ed
 					   color pixels */
 
     Bool alloc_close_colors;    	/* Specify whether close colors should
 					   be allocated using XAllocColor
 					   or not */
-    int bitmap_format;			/* Specify the format of 1bit depth
+    цяло bitmap_format;			/* Specify the format of 1bit depth
 					   images: ZPixmap or XYBitmap */
 
     /* Color functions */
@@ -271,7 +271,7 @@ typedef struct {
 /* XpmAttributes mask_pixel value when there is no mask */
 #ifndef FOR_MSW
 #define XpmUndefPixel 0x80000000
-#else
+#иначе
 /* int is only 16 bit for MSW */
 #define XpmUndefPixel 0x8000
 #endif
@@ -289,10 +289,10 @@ typedef struct {
 
 
 /* macros for forward declarations of functions with prototypes */
-#if NeedFunctionPrototypes
+#ако NeedFunctionPrototypes
 #define FUNC(f, t, p) extern t f p
 #define LFUNC(f, t, p) static t f p
-#else
+#иначе
 #define FUNC(f, t, p) extern t f()
 #define LFUNC(f, t, p) static t f()
 #endif
@@ -309,152 +309,152 @@ extern "C" {
 /* FOR_MSW, all ..Pixmap.. are excluded, only the ..XImage.. are used */
 /* Same for Amiga! */
 
-#if !defined(FOR_MSW) && !defined(AMIGA)
-    FUNC(XpmCreatePixmapFromData, int, (Display *display,
+#ако !defined(FOR_MSW) && !defined(AMIGA)
+    FUNC(XpmCreatePixmapFromData, цяло, (Display *display,
 					Drawable d,
 					char **data,
 					Pixmap *pixmap_return,
 					Pixmap *shapemask_return,
 					XpmAttributes *attributes));
 
-    FUNC(XpmCreateDataFromPixmap, int, (Display *display,
+    FUNC(XpmCreateDataFromPixmap, цяло, (Display *display,
 					char ***data_return,
 					Pixmap pixmap,
 					Pixmap shapemask,
 					XpmAttributes *attributes));
 
-    FUNC(XpmReadFileToPixmap, int, (Display *display,
+    FUNC(XpmReadFileToPixmap, цяло, (Display *display,
 				    Drawable d,
 				    char *filename,
 				    Pixmap *pixmap_return,
 				    Pixmap *shapemask_return,
 				    XpmAttributes *attributes));
 
-    FUNC(XpmWriteFileFromPixmap, int, (Display *display,
+    FUNC(XpmWriteFileFromPixmap, цяло, (Display *display,
 				       char *filename,
 				       Pixmap pixmap,
 				       Pixmap shapemask,
 				       XpmAttributes *attributes));
 #endif
 
-    FUNC(XpmCreateImageFromData, int, (Display *display,
+    FUNC(XpmCreateImageFromData, цяло, (Display *display,
 				       char **data,
 				       XImage **image_return,
 				       XImage **shapemask_return,
 				       XpmAttributes *attributes));
 
-    FUNC(XpmCreateDataFromImage, int, (Display *display,
+    FUNC(XpmCreateDataFromImage, цяло, (Display *display,
 				       char ***data_return,
 				       XImage *image,
 				       XImage *shapeimage,
 				       XpmAttributes *attributes));
 
-    FUNC(XpmReadFileToImage, int, (Display *display,
+    FUNC(XpmReadFileToImage, цяло, (Display *display,
 				   char *filename,
 				   XImage **image_return,
 				   XImage **shapeimage_return,
 				   XpmAttributes *attributes));
 
-    FUNC(XpmWriteFileFromImage, int, (Display *display,
+    FUNC(XpmWriteFileFromImage, цяло, (Display *display,
 				      char *filename,
 				      XImage *image,
 				      XImage *shapeimage,
 				      XpmAttributes *attributes));
 
-    FUNC(XpmCreateImageFromBuffer, int, (Display *display,
+    FUNC(XpmCreateImageFromBuffer, цяло, (Display *display,
 					 char *buffer,
 					 XImage **image_return,
 					 XImage **shapemask_return,
 					 XpmAttributes *attributes));
-#if !defined(FOR_MSW) && !defined(AMIGA)
-    FUNC(XpmCreatePixmapFromBuffer, int, (Display *display,
+#ако !defined(FOR_MSW) && !defined(AMIGA)
+    FUNC(XpmCreatePixmapFromBuffer, цяло, (Display *display,
 					  Drawable d,
 					  char *buffer,
 					  Pixmap *pixmap_return,
 					  Pixmap *shapemask_return,
 					  XpmAttributes *attributes));
 
-    FUNC(XpmCreateBufferFromImage, int, (Display *display,
+    FUNC(XpmCreateBufferFromImage, цяло, (Display *display,
 					 char **buffer_return,
 					 XImage *image,
 					 XImage *shapeimage,
 					 XpmAttributes *attributes));
 
-    FUNC(XpmCreateBufferFromPixmap, int, (Display *display,
+    FUNC(XpmCreateBufferFromPixmap, цяло, (Display *display,
 					  char **buffer_return,
 					  Pixmap pixmap,
 					  Pixmap shapemask,
 					  XpmAttributes *attributes));
 #endif
-    FUNC(XpmReadFileToBuffer, int, (char *filename, char **buffer_return));
-    FUNC(XpmWriteFileFromBuffer, int, (char *filename, char *buffer));
+    FUNC(XpmReadFileToBuffer, цяло, (char *filename, char **buffer_return));
+    FUNC(XpmWriteFileFromBuffer, цяло, (char *filename, char *buffer));
 
-    FUNC(XpmReadFileToData, int, (char *filename, char ***data_return));
-    FUNC(XpmWriteFileFromData, int, (char *filename, char **data));
+    FUNC(XpmReadFileToData, цяло, (char *filename, char ***data_return));
+    FUNC(XpmWriteFileFromData, цяло, (char *filename, char **data));
 
-    FUNC(XpmAttributesSize, int, ());
+    FUNC(XpmAttributesSize, цяло, ());
     FUNC(XpmFreeAttributes, void, (XpmAttributes *attributes));
     FUNC(XpmFreeExtensions, void, (XpmExtension *extensions,
-				   int nextensions));
+				   цяло nextensions));
 
     FUNC(XpmFreeXpmImage, void, (XpmImage *image));
     FUNC(XpmFreeXpmInfo, void, (XpmInfo *info));
-    FUNC(XpmGetErrorString, char *, (int errcode));
-    FUNC(XpmLibraryVersion, int, ());
+    FUNC(XpmGetErrorString, char *, (цяло errcode));
+    FUNC(XpmLibraryVersion, цяло, ());
 
     /* XpmImage functions */
-    FUNC(XpmReadFileToXpmImage, int, (char *filename,
+    FUNC(XpmReadFileToXpmImage, цяло, (char *filename,
 				      XpmImage *image,
 				      XpmInfo *info));
 
-    FUNC(XpmWriteFileFromXpmImage, int, (char *filename,
+    FUNC(XpmWriteFileFromXpmImage, цяло, (char *filename,
 					 XpmImage *image,
 					 XpmInfo *info));
-#if !defined(FOR_MSW) && !defined(AMIGA)
-    FUNC(XpmCreatePixmapFromXpmImage, int, (Display *display,
+#ако !defined(FOR_MSW) && !defined(AMIGA)
+    FUNC(XpmCreatePixmapFromXpmImage, цяло, (Display *display,
 					    Drawable d,
 					    XpmImage *image,
 					    Pixmap *pixmap_return,
 					    Pixmap *shapemask_return,
 					    XpmAttributes *attributes));
 #endif
-    FUNC(XpmCreateImageFromXpmImage, int, (Display *display,
+    FUNC(XpmCreateImageFromXpmImage, цяло, (Display *display,
 					   XpmImage *image,
 					   XImage **image_return,
 					   XImage **shapeimage_return,
 					   XpmAttributes *attributes));
 
-    FUNC(XpmCreateXpmImageFromImage, int, (Display *display,
+    FUNC(XpmCreateXpmImageFromImage, цяло, (Display *display,
 					   XImage *image,
 					   XImage *shapeimage,
 					   XpmImage *xpmimage,
 					   XpmAttributes *attributes));
-#if !defined(FOR_MSW) && !defined(AMIGA)
-    FUNC(XpmCreateXpmImageFromPixmap, int, (Display *display,
+#ако !defined(FOR_MSW) && !defined(AMIGA)
+    FUNC(XpmCreateXpmImageFromPixmap, цяло, (Display *display,
 					    Pixmap pixmap,
 					    Pixmap shapemask,
 					    XpmImage *xpmimage,
 					    XpmAttributes *attributes));
 #endif
-    FUNC(XpmCreateDataFromXpmImage, int, (char ***data_return,
+    FUNC(XpmCreateDataFromXpmImage, цяло, (char ***data_return,
 					  XpmImage *image,
 					  XpmInfo *info));
 
-    FUNC(XpmCreateXpmImageFromData, int, (char **data,
+    FUNC(XpmCreateXpmImageFromData, цяло, (char **data,
 					  XpmImage *image,
 					  XpmInfo *info));
 
-    FUNC(XpmCreateXpmImageFromBuffer, int, (char *buffer,
+    FUNC(XpmCreateXpmImageFromBuffer, цяло, (char *buffer,
 					    XpmImage *image,
 					    XpmInfo *info));
 
-    FUNC(XpmCreateBufferFromXpmImage, int, (char **buffer_return,
+    FUNC(XpmCreateBufferFromXpmImage, цяло, (char **buffer_return,
 					    XpmImage *image,
 					    XpmInfo *info));
 
-    FUNC(XpmGetParseError, int, (char *filename,
-				 int *linenum_return,
-				 int *charnum_return));
+    FUNC(XpmGetParseError, цяло, (char *filename,
+				 цяло *linenum_return,
+				 цяло *charnum_return));
 
     FUNC(XpmFree, void, (void *ptr));
 

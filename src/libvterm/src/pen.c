@@ -32,12 +32,12 @@ static const VTermRGB ansi_colors[] = {
   { 255, 255, 255 }, // white for real
 };
 
-static int ramp6[] = {
+static цяло ramp6[] = {
   0x00, 0x5F, 0x87, 0xAF, 0xD7, 0xFF,
 };
 
 // Use 0x81 instead of 0x80 to be able to distinguish from ansi black
-static int ramp24[] = {
+static цяло ramp24[] = {
   0x08, 0x12, 0x1C, 0x26, 0x30, 0x3A, 0x44, 0x4E, 0x58, 0x62, 0x6C, 0x76,
   0x81, 0x8A, 0x94, 0x9E, 0xA8, 0xB2, 0xBC, 0xC6, 0xD0, 0xDA, 0xE4, 0xEE,
 };
@@ -52,23 +52,23 @@ static void lookup_default_colour_ansi(long idx, VTermColor *col)
   col->type = VTERM_COLOR_INDEXED;
 }
 
-static int lookup_colour_ansi(const VTermState *state, long index, VTermColor *col)
+static цяло lookup_colour_ansi(const VTermState *state, long index, VTermColor *col)
 {
-  if(index >= 0 && index < 16) {
+  ако(index >= 0 && index < 16) {
     *col = state->colors[index];
-    return TRUE;
+    върни TRUE;
   }
 
-  return FALSE;
+  върни FALSE;
 }
 
-static int lookup_colour_palette(const VTermState *state, long index, VTermColor *col)
+static цяло lookup_colour_palette(const VTermState *state, long index, VTermColor *col)
 {
-  if(index >= 0 && index < 16) {
+  ако(index >= 0 && index < 16) {
     // Normal 8 colours or high intensity - parse as palette 0
-    return lookup_colour_ansi(state, index, col);
+    върни lookup_colour_ansi(state, index, col);
   }
-  else if(index >= 16 && index < 232) {
+  иначе ако(index >= 16 && index < 232) {
     // 216-colour cube
     index -= 16;
 
@@ -76,42 +76,42 @@ static int lookup_colour_palette(const VTermState *state, long index, VTermColor
                          ramp6[index/6   % 6],
                          ramp6[index     % 6]);
 
-    return TRUE;
+    върни TRUE;
   }
-  else if(index >= 232 && index < 256) {
+  иначе ако(index >= 232 && index < 256) {
     // 24 greyscales
     index -= 232;
 
     vterm_color_rgb(col, ramp24[index], ramp24[index], ramp24[index]);
 
-    return TRUE;
+    върни TRUE;
   }
 
-  return FALSE;
+  върни FALSE;
 }
 
-static int lookup_colour(const VTermState *state, int palette, const long args[], int argcount, VTermColor *col)
+static цяло lookup_colour(const VTermState *state, цяло palette, const long args[], цяло argcount, VTermColor *col)
 {
   switch(palette) {
   case 2: // RGB mode - 3 args contain colour values directly
-    if(argcount < 3)
-      return argcount;
+    ако(argcount < 3)
+      върни argcount;
 
     vterm_color_rgb(col, (uint8_t)CSI_ARG(args[0]), (uint8_t)CSI_ARG(args[1]), (uint8_t)CSI_ARG(args[2]));
 
-    return 3;
+    върни 3;
 
   case 5: // XTerm 256-colour mode
-    if (!argcount || CSI_ARG_IS_MISSING(args[0])) {
-      return argcount ? 1 : 0;
+    ако (!argcount || CSI_ARG_IS_MISSING(args[0])) {
+      върни argcount ? 1 : 0;
     }
 
     lookup_colour_palette(state, args[0], col);
-    return 1;
+    върни 1;
 
   default:
     DEBUG_LOG1("Unrecognised colour palette %d\n", palette);
-    return 0;
+    върни 0;
   }
 }
 
@@ -120,24 +120,24 @@ static int lookup_colour(const VTermState *state, int palette, const long args[]
 static void setpenattr(VTermState *state, VTermAttr attr, VTermValueType type UNUSED, VTermValue *val)
 {
 #ifdef DEBUG
-  if(type != vterm_get_attr_type(attr)) {
+  ако(type != vterm_get_attr_type(attr)) {
     DEBUG_LOG3("Cannot set attr %d as it has type %d, not type %d\n",
         attr, vterm_get_attr_type(attr), type);
-    return;
+    върни;
   }
 #endif
-  if(state->callbacks && state->callbacks->setpenattr)
+  ако(state->callbacks && state->callbacks->setpenattr)
     (*state->callbacks->setpenattr)(attr, val, state->cbdata);
 }
 
-static void setpenattr_bool(VTermState *state, VTermAttr attr, int boolean)
+static void setpenattr_bool(VTermState *state, VTermAttr attr, цяло boolean)
 {
   VTermValue val;
   val.boolean = boolean;
   setpenattr(state, attr, VTERM_VALUETYPE_BOOL, &val);
 }
 
-static void setpenattr_int(VTermState *state, VTermAttr attr, int number)
+static void setpenattr_int(VTermState *state, VTermAttr attr, цяло number)
 {
   VTermValue val;
   val.number = number;
@@ -167,7 +167,7 @@ INTERNAL void vterm_state_newpen(VTermState *state)
   vterm_color_rgb(&state->default_bg, 0, 0, 0);
   vterm_state_set_default_colors(state, &state->default_fg, &state->default_bg);
 
-  for(int col = 0; col < 16; col++)
+  за(цяло col = 0; col < 16; col++)
     lookup_default_colour_ansi(col, &state->colors[col]);
 }
 
@@ -188,12 +188,12 @@ INTERNAL void vterm_state_resetpen(VTermState *state)
   state->pen.bg = state->default_bg;  setpenattr_col(state, VTERM_ATTR_BACKGROUND, state->default_bg);
 }
 
-INTERNAL void vterm_state_savepen(VTermState *state, int save)
+INTERNAL void vterm_state_savepen(VTermState *state, цяло save)
 {
-  if(save) {
+  ако(save) {
     state->saved.pen = state->pen;
   }
-  else {
+  иначе {
     state->pen = state->saved.pen;
 
     setpenattr_bool(state, VTERM_ATTR_BOLD,      state->pen.bold);
@@ -226,24 +226,24 @@ void vterm_color_indexed(VTermColor *col, uint8_t idx)
   col->index = idx;
 }
 
-int vterm_color_is_equal(const VTermColor *a, const VTermColor *b)
+цяло vterm_color_is_equal(const VTermColor *a, const VTermColor *b)
 {
   /* First make sure that the two colours are of the same type (RGB/Indexed) */
-  if (a->type != b->type) {
-    return FALSE;
+  ако (a->type != b->type) {
+    върни FALSE;
   }
 
   /* Depending on the type inspect the corresponding members */
-  if (VTERM_COLOR_IS_INDEXED(a)) {
-    return a->index == b->index;
+  ако (VTERM_COLOR_IS_INDEXED(a)) {
+    върни a->index == b->index;
   }
-  else if (VTERM_COLOR_IS_RGB(a)) {
-    return    (a->red   == b->red)
+  иначе ако (VTERM_COLOR_IS_RGB(a)) {
+    върни    (a->red   == b->red)
            && (a->green == b->green)
            && (a->blue  == b->blue);
   }
 
-  return 0;
+  върни 0;
 }
 
 void vterm_state_get_default_colors(const VTermState *state, VTermColor *default_fg, VTermColor *default_bg)
@@ -252,56 +252,56 @@ void vterm_state_get_default_colors(const VTermState *state, VTermColor *default
   *default_bg = state->default_bg;
 }
 
-void vterm_state_get_palette_color(const VTermState *state, int index, VTermColor *col)
+void vterm_state_get_palette_color(const VTermState *state, цяло index, VTermColor *col)
 {
   lookup_colour_palette(state, index, col);
 }
 
 void vterm_state_set_default_colors(VTermState *state, const VTermColor *default_fg, const VTermColor *default_bg)
 {
-  if(default_fg) {
+  ако(default_fg) {
     state->default_fg = *default_fg;
     state->default_fg.type = (state->default_fg.type & ~VTERM_COLOR_DEFAULT_MASK)
                            | VTERM_COLOR_DEFAULT_FG;
   }
 
-  if(default_bg) {
+  ако(default_bg) {
     state->default_bg = *default_bg;
     state->default_bg.type = (state->default_bg.type & ~VTERM_COLOR_DEFAULT_MASK)
                            | VTERM_COLOR_DEFAULT_BG;
   }
 }
 
-void vterm_state_set_palette_color(VTermState *state, int index, const VTermColor *col)
+void vterm_state_set_palette_color(VTermState *state, цяло index, const VTermColor *col)
 {
-  if(index >= 0 && index < 16)
+  ако(index >= 0 && index < 16)
     state->colors[index] = *col;
 }
 
 void vterm_state_convert_color_to_rgb(const VTermState *state, VTermColor *col)
 {
-  if (VTERM_COLOR_IS_INDEXED(col)) { /* Convert indexed colors to RGB */
+  ако (VTERM_COLOR_IS_INDEXED(col)) { /* Convert indexed colors to RGB */
     lookup_colour_palette(state, col->index, col);
   }
   col->type &= VTERM_COLOR_TYPE_MASK; /* Reset any metadata but the type */
 }
 
-void vterm_state_set_bold_highbright(VTermState *state, int bold_is_highbright)
+void vterm_state_set_bold_highbright(VTermState *state, цяло bold_is_highbright)
 {
   state->bold_is_highbright = bold_is_highbright;
 }
 
-INTERNAL void vterm_state_setpen(VTermState *state, const long args[], int argcount)
+INTERNAL void vterm_state_setpen(VTermState *state, const long args[], цяло argcount)
 {
   // SGR - ECMA-48 8.3.117
 
-  int argi = 0;
-  int value;
+  цяло argi = 0;
+  цяло value;
 
-  while(argi < argcount) {
+  докато(argi < argcount) {
     // This logic is easier to do 'done' backwards; set it true, and make it
     // false again in the 'default' case
-    int done = 1;
+    цяло done = 1;
 
     long arg;
     switch(arg = CSI_ARG(args[argi])) {
@@ -314,7 +314,7 @@ INTERNAL void vterm_state_setpen(VTermState *state, const long args[], int argco
       const VTermColor *fg = &state->pen.fg;
       state->pen.bold = 1;
       setpenattr_bool(state, VTERM_ATTR_BOLD, 1);
-      if(!VTERM_COLOR_IS_DEFAULT_FG(fg) && VTERM_COLOR_IS_INDEXED(fg) && fg->index < 8 && state->bold_is_highbright)
+      ако(!VTERM_COLOR_IS_DEFAULT_FG(fg) && VTERM_COLOR_IS_INDEXED(fg) && fg->index < 8 && state->bold_is_highbright)
         set_pen_col_ansi(state, VTERM_ATTR_FOREGROUND, fg->index + (state->pen.bold ? 8 : 0));
       break;
     }
@@ -326,7 +326,7 @@ INTERNAL void vterm_state_setpen(VTermState *state, const long args[], int argco
 
     case 4: // Underline
       state->pen.underline = VTERM_UNDERLINE_SINGLE;
-      if(CSI_ARG_HAS_MORE(args[argi])) {
+      ако(CSI_ARG_HAS_MORE(args[argi])) {
         argi++;
         switch(CSI_ARG(args[argi])) {
           case 0:
@@ -415,14 +415,14 @@ INTERNAL void vterm_state_setpen(VTermState *state, const long args[], int argco
     case 30: case 31: case 32: case 33:
     case 34: case 35: case 36: case 37: // Foreground colour palette
       value = CSI_ARG(args[argi]) - 30;
-      if(state->pen.bold && state->bold_is_highbright)
+      ако(state->pen.bold && state->bold_is_highbright)
         value += 8;
       set_pen_col_ansi(state, VTERM_ATTR_FOREGROUND, value);
       break;
 
     case 38: // Foreground colour alternative palette
-      if(argcount - argi < 1)
-        return;
+      ако(argcount - argi < 1)
+        върни;
       argi += 1 + lookup_colour(state, CSI_ARG(args[argi+1]), args+argi+2, argcount-argi-2, &state->pen.fg);
       setpenattr_col(state, VTERM_ATTR_FOREGROUND, state->pen.fg);
       break;
@@ -439,8 +439,8 @@ INTERNAL void vterm_state_setpen(VTermState *state, const long args[], int argco
       break;
 
     case 48: // Background colour alternative palette
-      if(argcount - argi < 1)
-        return;
+      ако(argcount - argi < 1)
+        върни;
       argi += 1 + lookup_colour(state, CSI_ARG(args[argi+1]), args+argi+2, argcount-argi-2, &state->pen.bg);
       setpenattr_col(state, VTERM_ATTR_BACKGROUND, state->pen.bg);
       break;
@@ -479,150 +479,150 @@ INTERNAL void vterm_state_setpen(VTermState *state, const long args[], int argco
       break;
     }
 
-    if(!done)
+    ако(!done)
     {
       DEBUG_LOG1("libvterm: Unhandled CSI SGR %ld\n", arg);
     }
 
-    while(CSI_ARG_HAS_MORE(args[argi++]))
+    докато(CSI_ARG_HAS_MORE(args[argi++]))
       ;
   }
 }
 
-static int vterm_state_getpen_color(const VTermColor *col, int argi, long args[], int fg)
+static цяло vterm_state_getpen_color(const VTermColor *col, цяло argi, long args[], цяло fg)
 {
     /* Do nothing if the given color is the default color */
-    if (( fg && VTERM_COLOR_IS_DEFAULT_FG(col)) ||
+    ако (( fg && VTERM_COLOR_IS_DEFAULT_FG(col)) ||
         (!fg && VTERM_COLOR_IS_DEFAULT_BG(col))) {
-        return argi;
+        върни argi;
     }
 
     /* Decide whether to send an indexed color or an RGB color */
-    if (VTERM_COLOR_IS_INDEXED(col)) {
+    ако (VTERM_COLOR_IS_INDEXED(col)) {
         const uint8_t idx = col->index;
-        if (idx < 8) {
+        ако (idx < 8) {
             args[argi++] = (idx + (fg ? 30 : 40));
         }
-        else if (idx < 16) {
+        иначе ако (idx < 16) {
             args[argi++] = (idx - 8 + (fg ? 90 : 100));
         }
-        else {
+        иначе {
             args[argi++] = CSI_ARG_FLAG_MORE | (fg ? 38 : 48);
             args[argi++] = CSI_ARG_FLAG_MORE | 5;
             args[argi++] = idx;
         }
     }
-    else if (VTERM_COLOR_IS_RGB(col)) {
+    иначе ако (VTERM_COLOR_IS_RGB(col)) {
         args[argi++] = CSI_ARG_FLAG_MORE | (fg ? 38 : 48);
         args[argi++] = CSI_ARG_FLAG_MORE | 2;
         args[argi++] = CSI_ARG_FLAG_MORE | col->red;
         args[argi++] = CSI_ARG_FLAG_MORE | col->green;
         args[argi++] = col->blue;
     }
-    return argi;
+    върни argi;
 }
 
-INTERNAL int vterm_state_getpen(VTermState *state, long args[], int argcount UNUSED)
+INTERNAL цяло vterm_state_getpen(VTermState *state, long args[], цяло argcount UNUSED)
 {
-  int argi = 0;
+  цяло argi = 0;
 
-  if(state->pen.bold)
+  ако(state->pen.bold)
     args[argi++] = 1;
 
-  if(state->pen.italic)
+  ако(state->pen.italic)
     args[argi++] = 3;
 
-  if(state->pen.underline == VTERM_UNDERLINE_SINGLE)
+  ако(state->pen.underline == VTERM_UNDERLINE_SINGLE)
     args[argi++] = 4;
-  if(state->pen.underline == VTERM_UNDERLINE_CURLY)
+  ако(state->pen.underline == VTERM_UNDERLINE_CURLY)
     args[argi++] = 4 | CSI_ARG_FLAG_MORE, args[argi++] = 3;
 
-  if(state->pen.blink)
+  ако(state->pen.blink)
     args[argi++] = 5;
 
-  if(state->pen.reverse)
+  ако(state->pen.reverse)
     args[argi++] = 7;
 
-  if(state->pen.conceal)
+  ако(state->pen.conceal)
     args[argi++] = 8;
 
-  if(state->pen.strike)
+  ако(state->pen.strike)
     args[argi++] = 9;
 
-  if(state->pen.font)
+  ако(state->pen.font)
     args[argi++] = 10 + state->pen.font;
 
-  if(state->pen.underline == VTERM_UNDERLINE_DOUBLE)
+  ако(state->pen.underline == VTERM_UNDERLINE_DOUBLE)
     args[argi++] = 21;
 
   argi = vterm_state_getpen_color(&state->pen.fg, argi, args, TRUE);
 
   argi = vterm_state_getpen_color(&state->pen.bg, argi, args, FALSE);
 
-  if(state->pen.small) {
-    if(state->pen.baseline == VTERM_BASELINE_RAISE)
+  ако(state->pen.small) {
+    ако(state->pen.baseline == VTERM_BASELINE_RAISE)
       args[argi++] = 73;
-    else if(state->pen.baseline == VTERM_BASELINE_LOWER)
+    иначе ако(state->pen.baseline == VTERM_BASELINE_LOWER)
       args[argi++] = 74;
   }
 
-  return argi;
+  върни argi;
 }
 
-int vterm_state_get_penattr(const VTermState *state, VTermAttr attr, VTermValue *val)
+цяло vterm_state_get_penattr(const VTermState *state, VTermAttr attr, VTermValue *val)
 {
   switch(attr) {
   case VTERM_ATTR_BOLD:
     val->boolean = state->pen.bold;
-    return 1;
+    върни 1;
 
   case VTERM_ATTR_UNDERLINE:
     val->number = state->pen.underline;
-    return 1;
+    върни 1;
 
   case VTERM_ATTR_ITALIC:
     val->boolean = state->pen.italic;
-    return 1;
+    върни 1;
 
   case VTERM_ATTR_BLINK:
     val->boolean = state->pen.blink;
-    return 1;
+    върни 1;
 
   case VTERM_ATTR_REVERSE:
     val->boolean = state->pen.reverse;
-    return 1;
+    върни 1;
 
   case VTERM_ATTR_CONCEAL:
     val->boolean = state->pen.conceal;
-    return 1;
+    върни 1;
 
   case VTERM_ATTR_STRIKE:
     val->boolean = state->pen.strike;
-    return 1;
+    върни 1;
 
   case VTERM_ATTR_FONT:
     val->number = state->pen.font;
-    return 1;
+    върни 1;
 
   case VTERM_ATTR_FOREGROUND:
     val->color = state->pen.fg;
-    return 1;
+    върни 1;
 
   case VTERM_ATTR_BACKGROUND:
     val->color = state->pen.bg;
-    return 1;
+    върни 1;
 
   case VTERM_ATTR_SMALL:
     val->boolean = state->pen.small;
-    return 1;
+    върни 1;
 
   case VTERM_ATTR_BASELINE:
     val->number = state->pen.baseline;
-    return 1;
+    върни 1;
 
   case VTERM_N_ATTRS:
-    return 0;
+    върни 0;
   }
 
-  return 0;
+  върни 0;
 }

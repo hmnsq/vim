@@ -13,19 +13,19 @@
 
 // Use SPELL_PRINTTREE for debugging: dump the word tree after adding a word.
 // Only use it for small word lists!
-#if 0
+#ако 0
 # define SPELL_PRINTTREE
 #endif
 
 // Use SPELL_COMPRESS_ALWAYS for debugging: compress the word tree after
 // adding a word.  Only use it for small word lists!
-#if 0
+#ако 0
 # define SPELL_COMPRESS_ALWAYS
 #endif
 
 // Use DEBUG_TRIEWALK to print the changes made in suggest_trie_walk() for a
 // specific word.
-#if 0
+#ако 0
 # define DEBUG_TRIEWALK
 #endif
 
@@ -38,9 +38,9 @@
 
 // Type used for indexes in the word tree need to be at least 4 bytes.  If int
 // is 8 bytes we could use something smaller, but what?
-typedef int idx_T;
+typedef цяло idx_T;
 
-typedef int salfirst_T;
+typedef цяло salfirst_T;
 
 /*
  * Structure used to store words and other info for one language, loaded from
@@ -63,7 +63,7 @@ struct slang_S
     slang_T	*sl_next;	// next language
     char_u	*sl_name;	// language name "en", "en.rare", "nl", etc.
     char_u	*sl_fname;	// name of .spl file
-    int		sl_add;		// TRUE if it's a .add file.
+    цяло		sl_add;		// TRUE if it's a .add file.
 
     char_u	*sl_fbyts;	// case-folded word bytes
     long	sl_fbyts_len;	// length of sl_fbyts
@@ -82,10 +82,10 @@ struct slang_S
 
     hashtab_T	sl_wordcount;	// hashtable with word count, wordcount_T
 
-    int		sl_compmax;	// COMPOUNDWORDMAX (default: MAXWLEN)
-    int		sl_compminlen;	// COMPOUNDMIN (default: 0)
-    int		sl_compsylmax;	// COMPOUNDSYLMAX (default: MAXWLEN)
-    int		sl_compoptions;	// COMP_* flags
+    цяло		sl_compmax;	// COMPOUNDWORDMAX (default: MAXWLEN)
+    цяло		sl_compminlen;	// COMPOUNDMIN (default: 0)
+    цяло		sl_compsylmax;	// COMPOUNDSYLMAX (default: MAXWLEN)
+    цяло		sl_compoptions;	// COMP_* flags
     garray_T	sl_comppat;	// CHECKCOMPOUNDPATTERN items
     regprog_T	*sl_compprog;	// COMPOUNDRULE turned into a regexp progrm
 				// (NULL when no compounding)
@@ -96,7 +96,7 @@ struct slang_S
     char_u	*sl_syllable;	// SYLLABLE repeatable chars or NULL
     garray_T	sl_syl_items;	// syllable items
 
-    int		sl_prefixcnt;	// number of items in "sl_prefprog"
+    цяло		sl_prefixcnt;	// number of items in "sl_prefprog"
     regprog_T	**sl_prefprog;	// table with regprogs for prefixes
 
     garray_T	sl_rep;		// list of fromto_T entries from REP lines
@@ -105,16 +105,16 @@ struct slang_S
     garray_T	sl_sal;		// list of salitem_T entries from SAL lines
     salfirst_T	sl_sal_first[256];  // indexes where byte first appears, -1 if
 				    // there is none
-    int		sl_followup;	// SAL followup
-    int		sl_collapse;	// SAL collapse_result
-    int		sl_rem_accents;	// SAL remove_accents
-    int		sl_sofo;	// SOFOFROM and SOFOTO instead of SAL items:
+    цяло		sl_followup;	// SAL followup
+    цяло		sl_collapse;	// SAL collapse_result
+    цяло		sl_rem_accents;	// SAL remove_accents
+    цяло		sl_sofo;	// SOFOFROM and SOFOTO instead of SAL items:
 				// "sl_sal_first" maps chars, when has_mbyte
 				// "sl_sal" is a list of wide char lists.
     garray_T	sl_repsal;	// list of fromto_T entries from REPSAL lines
     short	sl_repsal_first[256];  // sl_rep_first for REPSAL lines
-    int		sl_nosplitsugs;	// don't suggest splitting a word
-    int		sl_nocompoundsugs; // don't suggest compounding
+    цяло		sl_nosplitsugs;	// don't suggest splitting a word
+    цяло		sl_nocompoundsugs; // don't suggest compounding
 
     // Info from the .sug file.  Loaded on demand.
     time_t	sl_sugtime;	// timestamp for .sug file
@@ -122,12 +122,12 @@ struct slang_S
     long	sl_sbyts_len;	// length of sl_sbyts
     idx_T	*sl_sidxs;	// soundfolded word indexes
     buf_T	*sl_sugbuf;	// buffer with word number table
-    int		sl_sugloaded;	// TRUE when .sug file was loaded or failed to
+    цяло		sl_sugloaded;	// TRUE when .sug file was loaded or failed to
 				// load
 
-    int		sl_has_map;	// TRUE if there is a MAP line
+    цяло		sl_has_map;	// TRUE if there is a MAP line
     hashtab_T	sl_map_hash;	// MAP for multi-byte chars
-    int		sl_map_array[256]; // MAP for first 256 chars
+    цяло		sl_map_array[256]; // MAP for first 256 chars
     hashtab_T	sl_sounddone;	// table with soundfolded words that have
 				// handled, see add_sound_suggest()
 };
@@ -136,7 +136,7 @@ struct slang_S
 # define SPL_FNAME_TMPL  "%s_%s.spl"
 # define SPL_FNAME_ADD   "_add."
 # define SPL_FNAME_ASCII "_ascii."
-#else
+#иначе
 # define SPL_FNAME_TMPL  "%s.%s.spl"
 # define SPL_FNAME_ADD   ".add."
 # define SPL_FNAME_ASCII ".ascii."
@@ -201,13 +201,13 @@ typedef struct fromto_S
 typedef struct salitem_S
 {
     char_u	*sm_lead;	// leading letters
-    int		sm_leadlen;	// length of "sm_lead"
+    цяло		sm_leadlen;	// length of "sm_lead"
     char_u	*sm_oneof;	// letters from () or NULL
     char_u	*sm_rules;	// rules like ^, $, priority
     char_u	*sm_to;		// replacement.
-    int		*sm_lead_w;	// wide character copy of "sm_lead"
-    int		*sm_oneof_w;	// wide character copy of "sm_oneof"
-    int		*sm_to_w;	// wide character copy of "sm_to"
+    цяло		*sm_lead_w;	// wide character copy of "sm_lead"
+    цяло		*sm_oneof_w;	// wide character copy of "sm_oneof"
+    цяло		*sm_to_w;	// wide character copy of "sm_to"
 } salitem_T;
 
 // Values for SP_*ERROR are negative, positive values are used by
@@ -224,7 +224,7 @@ typedef struct langp_S
     slang_T	*lp_slang;	// info for this language
     slang_T	*lp_sallang;	// language used for sound folding or NULL
     slang_T	*lp_replang;	// language used for REP items or NULL
-    int		lp_region;	// bitmask for region or REGION_ALL
+    цяло		lp_region;	// bitmask for region or REGION_ALL
 } langp_T;
 
 #define LANGP_ENTRY(ga, i)	(((langp_T *)(ga).ga_data) + (i))
@@ -250,7 +250,7 @@ typedef struct spelltab_S
  * differ from what the .spl file uses.
  * These must not be called with negative number!
  */
-#if defined(HAVE_WCHAR_H)
+#ако defined(HAVE_WCHAR_H)
 # include <wchar.h>	    // for towupper() and towlower()
 #endif
 // Multi-byte implementation.  For Unicode we can call utf_*(), but don't do
@@ -258,24 +258,24 @@ typedef struct spelltab_S
 // the "w" library function for characters above 255 if available.
 #ifdef HAVE_TOWLOWER
 # define SPELL_TOFOLD(c) (enc_utf8 && (c) >= 128 ? utf_fold(c) \
-	    : (c) < 256 ? (int)spelltab.st_fold[c] : (int)towlower(c))
-#else
+	    : (c) < 256 ? (цяло)spelltab.st_fold[c] : (цяло)towlower(c))
+#иначе
 # define SPELL_TOFOLD(c) (enc_utf8 && (c) >= 128 ? utf_fold(c) \
-	    : (c) < 256 ? (int)spelltab.st_fold[c] : (c))
+	    : (c) < 256 ? (цяло)spelltab.st_fold[c] : (c))
 #endif
 
 #ifdef HAVE_TOWUPPER
 # define SPELL_TOUPPER(c) (enc_utf8 && (c) >= 128 ? utf_toupper(c) \
-	    : (c) < 256 ? (int)spelltab.st_upper[c] : (int)towupper(c))
-#else
+	    : (c) < 256 ? (цяло)spelltab.st_upper[c] : (цяло)towupper(c))
+#иначе
 # define SPELL_TOUPPER(c) (enc_utf8 && (c) >= 128 ? utf_toupper(c) \
-	    : (c) < 256 ? (int)spelltab.st_upper[c] : (c))
+	    : (c) < 256 ? (цяло)spelltab.st_upper[c] : (c))
 #endif
 
 #ifdef HAVE_ISWUPPER
 # define SPELL_ISUPPER(c) (enc_utf8 && (c) >= 128 ? utf_isupper(c) \
 	    : (c) < 256 ? spelltab.st_isu[c] : iswupper(c))
-#else
+#иначе
 # define SPELL_ISUPPER(c) (enc_utf8 && (c) >= 128 ? utf_isupper(c) \
 	    : (c) < 256 ? spelltab.st_isu[c] : (FALSE))
 #endif
@@ -284,7 +284,7 @@ typedef struct spelltab_S
 # ifdef IN_SPELL_C
 #  define SPELL_EXTERN
 #  define SPELL_INIT(x) x
-# else
+# иначе
 #  define SPELL_EXTERN extern
 #  define SPELL_INIT(x)
 # endif
@@ -297,7 +297,7 @@ SPELL_EXTERN slang_T	*first_lang SPELL_INIT(= NULL);
 SPELL_EXTERN char_u	*int_wordlist SPELL_INIT(= NULL);
 
 SPELL_EXTERN spelltab_T   spelltab;
-SPELL_EXTERN int	  did_set_spelltab;
+SPELL_EXTERN цяло	  did_set_spelltab;
 
 // Values for "what" argument of spell_add_word()
 # define SPELL_ADD_GOOD	0

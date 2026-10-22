@@ -234,22 +234,22 @@ typedef enum {
 
 // arguments to ISN_BCALL
 typedef struct {
-    int	    cbf_idx;	    // index in "global_functions"
-    int	    cbf_argcount;   // number of arguments on top of stack
+    цяло	    cbf_idx;	    // index in "global_functions"
+    цяло	    cbf_argcount;   // number of arguments on top of stack
 } cbfunc_T;
 
 // arguments to ISN_DCALL
 typedef struct {
-    int	    cdf_idx;	    // index in "def_functions" for ISN_DCALL
-    int	    cdf_argcount;   // number of arguments on top of stack
+    цяло	    cdf_idx;	    // index in "def_functions" for ISN_DCALL
+    цяло	    cdf_argcount;   // number of arguments on top of stack
 } cdfunc_T;
 
 // arguments to ISN_METHODCALL
 typedef struct {
     class_T *cmf_itf;	    // interface used
-    int	    cmf_idx;	    // index in "def_functions" for ISN_METHODCALL
-    int	    cmf_argcount;   // number of arguments on top of stack
-    int	    cmf_is_super;   // doing "super.Func", use cmf_itf, not cmf_idx
+    цяло	    cmf_idx;	    // index in "def_functions" for ISN_METHODCALL
+    цяло	    cmf_argcount;   // number of arguments on top of stack
+    цяло	    cmf_is_super;   // doing "super.Func", use cmf_itf, not cmf_idx
     ufunc_T *cmf_ufunc;	    // for a generic method: the method of
 			    // "cmf_itf" with the type arguments, NULL
 			    // otherwise
@@ -264,20 +264,20 @@ typedef struct {
 
 // arguments to ISN_PCALL
 typedef struct {
-    int	    cpf_top;	    // when TRUE partial is above the arguments
-    int	    cpf_argcount;   // number of arguments on top of stack
+    цяло	    cpf_top;	    // when TRUE partial is above the arguments
+    цяло	    cpf_argcount;   // number of arguments on top of stack
 } cpfunc_T;
 
 // arguments to ISN_UCALL and ISN_XCALL
 typedef struct {
     char_u  *cuf_name;
-    int	    cuf_argcount;   // number of arguments on top of stack
+    цяло	    cuf_argcount;   // number of arguments on top of stack
 } cufunc_T;
 
 // arguments to ISN_GETITEM
 typedef struct {
     varnumber_T	gi_index;
-    int		gi_with_op;
+    цяло		gi_with_op;
 } getitem_T;
 
 typedef enum {
@@ -293,25 +293,25 @@ typedef enum {
 // arguments to ISN_JUMP
 typedef struct {
     jumpwhen_T	jump_when;
-    int		jump_where;	// position to jump to
+    цяло		jump_where;	// position to jump to
 } jump_T;
 
 // arguments to ISN_JUMP_IF_ARG_SET and ISN_JUMP_IF_ARG_NOT_SET
 typedef struct {
-    int		jump_arg_off;	// argument index, negative
-    int		jump_where;	// position to jump to
+    цяло		jump_arg_off;	// argument index, negative
+    цяло		jump_where;	// position to jump to
 } jumparg_T;
 
 // arguments to ISN_FOR
 typedef struct {
     short	for_loop_idx;	// loop variable index
-    int		for_end;	// position to jump to after done
+    цяло		for_end;	// position to jump to after done
 } forloop_T;
 
 // arguments to ISN_WHILE
 typedef struct {
     short	while_funcref_idx;  // variable index for funcref count
-    int		while_end;	    // position to jump to after done
+    цяло		while_end;	    // position to jump to after done
 } whileloop_T;
 
 // arguments to ISN_ENDLOOP
@@ -324,9 +324,9 @@ typedef struct {
 
 // indirect arguments to ISN_TRY
 typedef struct {
-    int	    try_catch;	    // position to jump to on throw
-    int	    try_finally;    // :finally or :endtry position to jump to
-    int	    try_endtry;	    // :endtry position to jump to
+    цяло	    try_catch;	    // position to jump to on throw
+    цяло	    try_finally;    // :finally or :endtry position to jump to
+    цяло	    try_endtry;	    // :endtry position to jump to
 } tryref_T;
 
 // arguments to ISN_TRY
@@ -336,20 +336,20 @@ typedef struct {
 
 // arguments to ISN_TRYCONT
 typedef struct {
-    int	    tct_levels;	    // number of nested try statements
-    int	    tct_where;	    // position to jump to, WHILE or FOR
+    цяло	    tct_levels;	    // number of nested try statements
+    цяло	    tct_where;	    // position to jump to, WHILE or FOR
 } trycont_T;
 
 // arguments to ISN_ECHO
 typedef struct {
-    int	    echo_with_white;    // :echo instead of :echon
-    int	    echo_count;		// number of expressions
+    цяло	    echo_with_white;    // :echo instead of :echon
+    цяло	    echo_count;		// number of expressions
 } echo_T;
 
 // arguments to ISN_OPNR, ISN_OPFLOAT, etc.
 typedef struct {
     exprtype_T	op_type;
-    int		op_ic;	    // TRUE with '#', FALSE with '?', else MAYBE
+    цяло		op_ic;	    // TRUE with '#', FALSE with '?', else MAYBE
 } opexpr_T;
 
 // arguments to ISN_CHECKTYPE
@@ -362,27 +362,27 @@ typedef struct {
 
 // arguments to ISN_STORENR
 typedef struct {
-    int		stnr_idx;
+    цяло		stnr_idx;
     varnumber_T	stnr_val;
 } storenr_T;
 
 // arguments to ISN_STOREOPT and ISN_STOREFUNCOPT
 typedef struct {
     char_u	*so_name;
-    int		so_flags;
+    цяло		so_flags;
 } storeopt_T;
 
 // arguments to ISN_LOADS and ISN_STORES
 typedef struct {
     char_u	*ls_name;	// variable name (with s: for ISN_STORES)
-    int		ls_sid;		// script ID
+    цяло		ls_sid;		// script ID
 } loadstore_T;
 
 // arguments to ISN_LOADSCRIPT and ISN_STORESCRIPT
 typedef struct {
-    int		sref_sid;	// script ID
-    int		sref_idx;	// index in sn_var_vals
-    int		sref_seq;	// sn_script_seq when compiled
+    цяло		sref_sid;	// script ID
+    цяло		sref_idx;	// index in sn_var_vals
+    цяло		sref_seq;	// sn_script_seq when compiled
     type_T	*sref_type;	// type of the variable when compiled
 } scriptref_T;
 
@@ -393,7 +393,7 @@ typedef struct {
 // arguments to ISN_UNLET
 typedef struct {
     char_u	*ul_name;	// variable name with g:, w:, etc.
-    int		ul_forceit;	// forceit flag
+    цяло		ul_forceit;	// forceit flag
 } unlet_T;
 
 // extra arguments for funcref_T
@@ -401,15 +401,15 @@ typedef struct {
     char_u	  *fre_func_name;	// function name for legacy function
     loopvarinfo_T fre_loopvar_info;	// info about variables inside loops
     class_T	  *fre_class;		// class for a method
-    int		  fre_object_method;	// class or object method
-    int		  fre_method_idx;	// method index on "fre_class"
-    int		  fre_outer_depth;	// when > 0: use the context of the
+    цяло		  fre_object_method;	// class or object method
+    цяло		  fre_method_idx;	// method index on "fre_class"
+    цяло		  fre_outer_depth;	// when > 0: use the context of the
 					// function this many levels up
 } funcref_extra_T;
 
 // arguments to ISN_FUNCREF
 typedef struct {
-    int		    fr_dfunc_idx;   // function index for :def function
+    цяло		    fr_dfunc_idx;   // function index for :def function
     funcref_extra_T *fr_extra;	    // optional extra information
 } funcref_T;
 
@@ -426,19 +426,19 @@ typedef struct {
 
 // arguments to ISN_CHECKLEN
 typedef struct {
-    int		cl_min_len;	// minimum length
-    int		cl_more_OK;	// longer is allowed
+    цяло		cl_min_len;	// minimum length
+    цяло		cl_more_OK;	// longer is allowed
 } checklen_T;
 
 // arguments to ISN_SHUFFLE
 typedef struct {
-    int		shfl_item;	// item to move (relative to top of stack)
-    int		shfl_up;	// places to move upwards
+    цяло		shfl_item;	// item to move (relative to top of stack)
+    цяло		shfl_up;	// places to move upwards
 } shuffle_T;
 
 // arguments to ISN_PUT
 typedef struct {
-    int		put_regname;	// register, can be NUL
+    цяло		put_regname;	// register, can be NUL
     linenr_T	put_lnum;	// line number to put below
 } put_T;
 
@@ -449,14 +449,14 @@ typedef struct {
 
 // arguments to ISN_UNPACK
 typedef struct {
-    int		unp_count;	// number of items to produce
-    int		unp_semicolon;	// last item gets list of remainder
+    цяло		unp_count;	// number of items to produce
+    цяло		unp_semicolon;	// last item gets list of remainder
 } unpack_T;
 
 // arguments to ISN_LOADOUTER and ISN_STOREOUTER
 typedef struct {
-    int		outer_idx;	// index
-    int		outer_depth;	// nesting level, stack frames to go up;
+    цяло		outer_idx;	// index
+    цяло		outer_depth;	// nesting level, stack frames to go up;
 				// negative for a loop variable, the loop
 				// depth is -outer_depth - 1
 } isn_outer_T;
@@ -469,9 +469,9 @@ typedef struct {
 
 // indirect arguments to ISN_TRY
 typedef struct {
-    int		cer_cmdidx;
+    цяло		cer_cmdidx;
     char_u	*cer_cmdline;
-    int		cer_forceit;
+    цяло		cer_forceit;
 } cexprref_T;
 
 // arguments to ISN_CEXPR_CORE
@@ -481,44 +481,44 @@ typedef struct {
 
 // arguments to ISN_2STRING and ISN_2STRING_ANY
 typedef struct {
-    int		offset;
-    int		flags;
+    цяло		offset;
+    цяло		flags;
 } tostring_T;
 
 // arguments to ISN_2BOOL
 typedef struct {
-    int		offset;
-    int		invert;
+    цяло		offset;
+    цяло		invert;
 } tobool_T;
 
 // arguments to ISN_DEBUG
 typedef struct {
     varnumber_T	dbg_var_names_len;  // current number of local variables
-    int		dbg_break_lnum;	    // first line to break after
+    цяло		dbg_break_lnum;	    // first line to break after
 } debug_T;
 
 // arguments to ISN_DEFER
 typedef struct {
-    int		defer_var_idx;	    // local variable index for defer list
-    int		defer_argcount;	    // number of arguments
+    цяло		defer_var_idx;	    // local variable index for defer list
+    цяло		defer_argcount;	    // number of arguments
 } deferins_T;
 
 // arguments to ISN_ECHOWINDOW
 typedef struct {
-    int		ewin_count;	    // number of arguments
+    цяло		ewin_count;	    // number of arguments
     long	ewin_time;	    // time argument (msec)
 } echowin_T;
 
 // arguments to ISN_CONSTRUCT
 typedef struct {
-    int		construct_size;	    // size of object in bytes
+    цяло		construct_size;	    // size of object in bytes
     class_T	*construct_class;   // class the object is created from
 } construct_T;
 
 // arguments to ISN_STORE_CLASSMEMBER, ISN_LOAD_CLASSMEMBER, ISN_GET_ITF_MEMBER
 typedef struct {
     class_T	*cm_class;
-    int		cm_idx;
+    цяло		cm_idx;
 } classmember_T;
 
 // arguments to ISN_STOREINDEX
@@ -531,7 +531,7 @@ typedef struct {
 typedef struct {
     char_u	*lu_string;	// for exec_command
     class_T	*lu_cl_exec;	// executing, null if not class/obj method
-    int		lu_is_arg;	// is lval_root a function arg
+    цяло		lu_is_arg;	// is lval_root a function arg
 } lockunlock_T;
 
 /*
@@ -539,7 +539,7 @@ typedef struct {
  */
 struct isn_S {
     isntype_T	isn_type;
-    int		isn_lnum;
+    цяло		isn_lnum;
     union {
 	char_u		    *string;
 	varnumber_T	    number;
@@ -600,12 +600,12 @@ struct isn_S {
  */
 struct dfunc_S {
     ufunc_T	*df_ufunc;	    // struct containing most stuff
-    int		df_refcount;	    // how many ufunc_T point to this dfunc_T
-    int		df_idx;		    // index in def_functions
+    цяло		df_refcount;	    // how many ufunc_T point to this dfunc_T
+    цяло		df_idx;		    // index in def_functions
     char	df_deleted;	    // if TRUE function was deleted
     char	df_delete_busy;	    // TRUE when in
 				    // delete_def_function_contents()
-    int		df_script_seq;	    // Value of sctx_T sc_seq when the function
+    цяло		df_script_seq;	    // Value of sctx_T sc_seq when the function
 				    // was compiled.
     char_u	*df_name;	    // name used for error messages
 
@@ -614,17 +614,17 @@ struct dfunc_S {
 
     // After compiling "df_instr" and/or "df_instr_prof" is not NULL.
     isn_T	*df_instr;	    // function body to be executed
-    int		df_instr_count;	    // size of "df_instr"
-    int		df_instr_debug_count; // size of "df_instr_debug"
+    цяло		df_instr_count;	    // size of "df_instr"
+    цяло		df_instr_debug_count; // size of "df_instr_debug"
     isn_T	*df_instr_debug;      // like "df_instr" with debugging
 #ifdef FEAT_PROFILE
     isn_T	*df_instr_prof;	     // like "df_instr" with profiling
-    int		df_instr_prof_count; // size of "df_instr_prof"
+    цяло		df_instr_prof_count; // size of "df_instr_prof"
 #endif
 
-    int		df_varcount;	    // number of local variables
-    int		df_has_closure;	    // one if a closure was created
-    int		df_defer_var_idx;   // index of local variable that has a list
+    цяло		df_varcount;	    // number of local variables
+    цяло		df_has_closure;	    // one if a closure was created
+    цяло		df_defer_var_idx;   // index of local variable that has a list
 				    // of deferred function calls; zero if not
 				    // set
 };
@@ -661,7 +661,7 @@ extern garray_T def_functions;
 	    : ((do_profiling == PROF_YES && (dfunc->df_ufunc)->uf_profiling) \
 		? (dfunc)->df_instr_prof \
 		: (dfunc)->df_instr))
-#else
+#иначе
 # define INSTRUCTIONS(dfunc) \
 	(debug_break_level > 0 || may_break_in_function((dfunc)->df_ufunc) \
 		? (dfunc)->df_instr_debug \
@@ -677,8 +677,8 @@ extern garray_T def_functions;
 #define PPSIZE 50
 typedef struct {
     typval_T	pp_tv[PPSIZE];	// stack of ppconst constants
-    int		pp_used;	// active entries in pp_tv[]
-    int		pp_is_const;	// all generated code was constants, used for a
+    цяло		pp_used;	// active entries in pp_tv[]
+    цяло		pp_is_const;	// all generated code was constants, used for a
 				// list or dict with constant members
 } ppconst_T;
 
@@ -695,33 +695,33 @@ typedef enum {
 typedef struct endlabel_S endlabel_T;
 struct endlabel_S {
     endlabel_T	*el_next;	    // chain end_label locations
-    int		el_end_label;	    // instruction idx where to set end
+    цяло		el_end_label;	    // instruction idx where to set end
 };
 
 /*
  * info specific for the scope of :if / elseif / else
  */
 typedef struct {
-    int		is_seen_else;
-    int		is_seen_skip_not;   // a block was unconditionally executed
-    int		is_had_return;	    // every block ends in :return
-    int		is_if_label;	    // instruction idx at IF or ELSEIF
+    цяло		is_seen_else;
+    цяло		is_seen_skip_not;   // a block was unconditionally executed
+    цяло		is_had_return;	    // every block ends in :return
+    цяло		is_if_label;	    // instruction idx at IF or ELSEIF
     endlabel_T	*is_end_label;	    // instructions to set end label
 } ifscope_T;
 
 // info used by :for and :while needed for ENDLOOP
 typedef struct {
-    int	    li_local_count;	    // ctx_locals.ga_len at loop start
-    int	    li_closure_count;	    // ctx_closure_count at loop start
-    int	    li_funcref_idx;	    // index of var that holds funcref count
-    int	    li_depth;		    // nested loop depth
+    цяло	    li_local_count;	    // ctx_locals.ga_len at loop start
+    цяло	    li_closure_count;	    // ctx_closure_count at loop start
+    цяло	    li_funcref_idx;	    // index of var that holds funcref count
+    цяло	    li_depth;		    // nested loop depth
 } loop_info_T;
 
 /*
  * info specific for the scope of :while
  */
 typedef struct {
-    int		ws_top_label;	    // instruction idx at WHILE
+    цяло		ws_top_label;	    // instruction idx at WHILE
     endlabel_T	*ws_end_label;	    // instructions to set end
     loop_info_T ws_loop_info;	    // info for LOOPEND
 } whilescope_T;
@@ -730,7 +730,7 @@ typedef struct {
  * info specific for the scope of :for
  */
 typedef struct {
-    int		fs_top_label;	    // instruction idx at FOR
+    цяло		fs_top_label;	    // instruction idx at FOR
     endlabel_T	*fs_end_label;	    // break instructions
     loop_info_T	fs_loop_info;	    // info for LOOPEND
 } forscope_T;
@@ -739,12 +739,12 @@ typedef struct {
  * info specific for the scope of :try
  */
 typedef struct {
-    int		ts_try_label;	    // instruction idx at TRY
+    цяло		ts_try_label;	    // instruction idx at TRY
     endlabel_T	*ts_end_label;	    // jump to :finally or :endtry
-    int		ts_catch_label;	    // instruction idx of last CATCH
-    int		ts_caught_all;	    // "catch" without argument encountered
-    int		ts_has_finally;	    // "finally" encountered
-    int		ts_no_return;	    // one of the blocks did not end in return
+    цяло		ts_catch_label;	    // instruction idx of last CATCH
+    цяло		ts_caught_all;	    // "catch" without argument encountered
+    цяло		ts_has_finally;	    // "finally" encountered
+    цяло		ts_no_return;	    // one of the blocks did not end in return
 } tryscope_T;
 
 typedef enum {
@@ -763,9 +763,9 @@ typedef struct scope_S scope_T;
 struct scope_S {
     scope_T	*se_outer;	    // scope containing this one
     scopetype_T se_type;
-    int		se_local_count;	    // ctx_locals.ga_len before scope
+    цяло		se_local_count;	    // ctx_locals.ga_len before scope
     skip_T	se_skip_save;	    // ctx_skip before the block
-    int		se_loop_depth;	    // number of loop scopes, including this
+    цяло		se_loop_depth;	    // number of loop scopes, including this
     union {
 	ifscope_T	se_if;
 	whilescope_T	se_while;
@@ -780,14 +780,14 @@ struct scope_S {
 typedef struct {
     char_u	*lv_name;
     type_T	*lv_type;
-    int		lv_idx;		// index of the variable on the stack
-    int		lv_loop_depth;	// depth for variable inside a loop or -1
-    int		lv_loop_idx;	// index of first variable inside a loop or -1
-    int		lv_from_outer;	// nesting level, using ctx_outer scope
-    int		lv_const;	// ASSIGN_VAR (can be assigned to),
+    цяло		lv_idx;		// index of the variable on the stack
+    цяло		lv_loop_depth;	// depth for variable inside a loop or -1
+    цяло		lv_loop_idx;	// index of first variable inside a loop or -1
+    цяло		lv_from_outer;	// nesting level, using ctx_outer scope
+    цяло		lv_const;	// ASSIGN_VAR (can be assigned to),
 				// ASSIGN_FINAL (no assignment) or ASSIGN_CONST
 				// (value cannot be changed)
-    int		lv_arg;		// when TRUE this is an argument
+    цяло		lv_arg;		// when TRUE this is an argument
     ufunc_T	*lv_ufunc;	// for a nested function: its ufunc, see
 				// compile_nested_generic_func()
 } lvar_T;
@@ -827,28 +827,28 @@ typedef struct {
 				    // "[expr]" or ".name".
     char_u	    *lhs_end;	    // end including any type
 
-    int		    lhs_has_index;  // has "[expr]" or ".name"
+    цяло		    lhs_has_index;  // has "[expr]" or ".name"
 
-    int		    lhs_new_local;  // create new local variable
-    int		    lhs_opt_flags;  // for when destination is an option
-    int		    lhs_vimvaridx;  // for when destination is a v:var
+    цяло		    lhs_new_local;  // create new local variable
+    цяло		    lhs_opt_flags;  // for when destination is an option
+    цяло		    lhs_vimvaridx;  // for when destination is a v:var
 
     lvar_T	    lhs_local_lvar; // used for existing local destination
     lvar_T	    lhs_arg_lvar;   // used for argument destination
     lvar_T	    *lhs_lvar;	    // points to destination lvar
 
     class_T	    *lhs_class;		    // for dest_class_member
-    int		    lhs_classmember_idx;    // for dest_class_member
+    цяло		    lhs_classmember_idx;    // for dest_class_member
 
-    int		    lhs_scriptvar_sid;
-    int		    lhs_scriptvar_idx;
+    цяло		    lhs_scriptvar_sid;
+    цяло		    lhs_scriptvar_idx;
 
-    int		    lhs_has_type;   // type was specified
+    цяло		    lhs_has_type;   // type was specified
     type_T	    *lhs_type;
-    int		    lhs_member_idx;    // object member index
+    цяло		    lhs_member_idx;    // object member index
     type_T	    *lhs_member_type;  // list/dict/object member type
 
-    int		    lhs_append;	    // used by ISN_REDIREND
+    цяло		    lhs_append;	    // used by ISN_REDIREND
 } lhs_T;
 
 /*
@@ -857,35 +857,35 @@ typedef struct {
  */
 struct cctx_S {
     ufunc_T	*ctx_ufunc;	    // current function
-    int		ctx_lnum;	    // line number in current function
+    цяло		ctx_lnum;	    // line number in current function
     char_u	*ctx_line_start;    // start of current line or NULL
     garray_T	ctx_instr;	    // generated instructions
 
-    int		ctx_prev_lnum;	    // line number below previous command, for
+    цяло		ctx_prev_lnum;	    // line number below previous command, for
 				    // debugging
 
     compiletype_T ctx_compile_type;
 
     garray_T	ctx_locals;	    // currently visible local variables
 
-    int		ctx_has_closure;    // set to one if a FUNCREF was used in the
+    цяло		ctx_has_closure;    // set to one if a FUNCREF was used in the
 				    // function
-    int		ctx_closure_count;  // incremented for each closure created in
+    цяло		ctx_closure_count;  // incremented for each closure created in
 				    // the function.
 
     skip_T	ctx_skip;
     scope_T	*ctx_scope;	    // current scope, NULL at toplevel
-    int		ctx_had_return;	    // last seen statement was "return"
-    int		ctx_had_throw;	    // last seen statement was "throw"
+    цяло		ctx_had_return;	    // last seen statement was "return"
+    цяло		ctx_had_throw;	    // last seen statement was "throw"
 
     cctx_T	*ctx_outer;	    // outer scope for lambda or nested
 				    // function
-    int		ctx_outer_used;	    // var in ctx_outer was used
+    цяло		ctx_outer_used;	    // var in ctx_outer was used
 
     garray_T	ctx_type_stack;	    // type of each item on the stack
     garray_T	*ctx_type_list;	    // list of pointers to allocated types
 
-    int		ctx_has_cmdmod;	    // ISN_CMDMOD was generated
+    цяло		ctx_has_cmdmod;	    // ISN_CMDMOD was generated
 
     lhs_T	ctx_redir_lhs;	    // LHS for ":redir => var", valid when
 				    // lhs_name is not NULL

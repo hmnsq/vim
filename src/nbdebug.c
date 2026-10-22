@@ -34,9 +34,9 @@ u_int		 nb_dlevel = 0;		// nb_debug verbosity level
 
 void		 nbdb(char *, ...) ATTRIBUTE_FORMAT_PRINTF(1, 2);
 
-static int	 lookup(char *);
+static цяло	 lookup(char *);
 #ifdef USE_NB_ERRORHANDLER
-static int	 errorHandler(Display *, XErrorEvent *);
+static цяло	 errorHandler(Display *, XErrorEvent *);
 #endif
 
 /*
@@ -59,18 +59,18 @@ nbdebug_wait(
 #endif
 
 	// for debugging purposes only
-	if (wait_flags & WT_ENV && wait_var && getenv(wait_var) != NULL)
+	ако (wait_flags & WT_ENV && wait_var && getenv(wait_var) != NULL)
 	{
 		sleep(atoi(getenv(wait_var)));
 	}
-	else if (wait_flags & WT_WAIT && lookup("~/.gvimwait"))
+	иначе ако (wait_flags & WT_WAIT && lookup("~/.gvimwait"))
 	{
 		sleep(wait_secs > 0 && wait_secs < 120 ? wait_secs : 20);
 	}
-	else if (wait_flags & WT_STOP && lookup("~/.gvimstop"))
+	иначе ако (wait_flags & WT_STOP && lookup("~/.gvimstop"))
 	{
-		int w = 1;
-		while (w)
+		цяло w = 1;
+		докато (w)
 		{
 			;
 		}
@@ -85,18 +85,18 @@ nbdebug_log_init(
 	char		*file;		// possible nb_debug output file
 	char		*cp;		// nb_dlevel pointer
 
-	if (log_var && (file = getenv(log_var)) != NULL)
+	ако (log_var && (file = getenv(log_var)) != NULL)
 	{
 		time_t now;
 
 		nb_debug = fopen(file, "a");
 		time(&now);
 		fprintf(nb_debug, "%s", get_ctime(now, TRUE));
-		if (level_var && (cp = getenv(level_var)) != NULL)
+		ако (level_var && (cp = getenv(level_var)) != NULL)
 		{
 			nb_dlevel = strtoul(cp, NULL, 0);
 		}
-		else
+		иначе
 		{
 			nb_dlevel = NB_TRACE;	// default level
 		}
@@ -112,7 +112,7 @@ nbdbg(char *fmt, ...)
 {
 	va_list		 ap;
 
-	if (nb_debug != NULL && nb_dlevel & NB_TRACE)
+	ако (nb_debug != NULL && nb_dlevel & NB_TRACE)
 	{
 		va_start(ap, fmt);
 		vfprintf(nb_debug, fmt, ap);
@@ -122,23 +122,23 @@ nbdbg(char *fmt, ...)
 
 }
 
-	static int
+	static цяло
 lookup(char *file)
 {
 	char		 buf[BUFSIZ];
 
 	expand_env((char_u *) file, (char_u *) buf, BUFSIZ);
-	return
+	върни
 #ifndef FEAT_GUI_MSWIN
 		(access(buf, F_OK) == 0);
-#else
+#иначе
 		(access(buf, 0) == 0);
 #endif
 
 }
 
 #ifdef USE_NB_ERRORHANDLER
-	static int
+	static цяло
 errorHandler(
 	Display		*dpy,
 	XErrorEvent	*err)
@@ -154,13 +154,13 @@ errorHandler(
 	    "XRequest", buf, "Unknown", msg, sizeof(msg));
 	nbdbg("\tMajor opcode of failed request: %d (%s)\n",
 	    err->request_code, msg);
-	if (err->request_code > 128)
+	ако (err->request_code > 128)
 	{
 		nbdbg("\tMinor opcode of failed request: %d\n",
 		    err->minor_code);
 	}
 
-	return 0;
+	върни 0;
 }
 #endif
 

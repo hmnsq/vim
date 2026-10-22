@@ -3,8 +3,8 @@
  *
  */
 
-#if defined(__VMS) || defined(__vms)
-# if !defined(VMS)
+#ако defined(__VMS) || defined(__vms)
+# ако !defined(VMS)
 #  define VMS
 # endif
 #endif
@@ -145,14 +145,14 @@
 #define VIM_SIZEOF_INT  4
 #define VIM_SIZEOF_LONG 4
 
-#if __USE_OFF64_T
+#ако __USE_OFF64_T
 # define SIZEOF_OFF_T 8
-#else
+#иначе
 # define SIZEOF_OFF_T 4
 #endif
 
 // Hardware specific
-#if defined(__VAX) || defined(VAX)
+#ако defined(__VAX) || defined(VAX)
 # undef  HAVE_GETTIMEOFDAY
 # undef  HAVE_USLEEP
 # undef  HAVE_STRCASECMP
@@ -165,7 +165,7 @@
 # define LONG_LONG_MAX  (2147483647)
 # define ULONG_LONG_MAX (4294967295U)
 
-#else // ALPHA, IA64, X86_64
+#иначе // ALPHA, IA64, X86_64
 # define HAVE_GETTIMEOFDAY
 # define HAVE_USLEEP
 # define HAVE_STRCASECMP
@@ -177,12 +177,12 @@
 # define LONG_LONG_MAX  (9223372036854775807)
 # define ULONG_LONG_MAX (18446744073709551615U)
 
-# if defined(__DECC) && (__CRTL_VER >= 80500000) && (__STDC_VERSION__ >= 199901L) /* C99 */
+# ако defined(__DECC) && (__CRTL_VER >= 80500000) && (__STDC_VERSION__ >= 199901L) /* C99 */
 #  define HAVE_ISINF
 #  define HAVE_ISNAN
 # endif
 
-# if defined(X86_64)
+# ако defined(X86_64)
 #  define HAVE_FSEEKO
 #  define HAVE_STDINT_H
 #  define HAVE_XOS_R_H
@@ -191,7 +191,7 @@
 #endif /* VAX [else] */
 
 // Compiler specific
-#if defined(VAXC) || defined(__VAXC)
+#ако defined(VAXC) || defined(__VAXC)
 # undef  HAVE_SELECT
 # undef  HAVE_FCNTL_H
 # undef  HAVE_UNISTD_H
@@ -200,7 +200,7 @@
 # define BROKEN_LOCALE
 # undef  DYNAMIC_ICONV
 # undef	HAVE_STRFTIME
-#else   // DECC
+#иначе   // DECC
 # define HAVE_SELECT
 # define HAVE_FCNTL_H
 # define HAVE_UNISTD_H 1
@@ -211,16 +211,16 @@
 # define HAVE_STRFTIME
 #endif
 
-#if defined(USE_ICONV)
+#ако defined(USE_ICONV)
 # define HAVE_ICONV_H
 # define HAVE_ICONV
-#else
+#иначе
 # undef HAVE_ICONV_H
 # undef HAVE_ICONV
 #endif
 
 // GUI support defines
-#if defined(FEAT_GUI_MOTIF) || defined(FEAT_GUI_GTK)
+#ако defined(FEAT_GUI_MOTIF) || defined(FEAT_GUI_GTK)
 # define X_INCLUDE_GRP_H  // To use getgrgid
 # define XUSE_MTSAFE_API
 # define HAVE_X11
@@ -236,5 +236,5 @@
 #ifndef HAVE_STDINT_H
    typedef unsigned char  uint8_t;
    typedef unsigned short uint16_t;
-   typedef unsigned int   uint32_t;
+   typedef unsigned цяло   uint32_t;
 #endif

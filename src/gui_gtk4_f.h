@@ -16,8 +16,8 @@
 G_DECLARE_FINAL_TYPE(VimForm, vim_form, VIM, FORM, GtkWidget)
 
 GtkWidget *vim_form_new(void);
-void vim_form_put(VimForm *self, GtkWidget *widget, int x, int y);
-void vim_form_move(VimForm *self, GtkWidget *widget, int x, int y);
+void vim_form_put(VimForm *self, GtkWidget *widget, цяло x, цяло y);
+void vim_form_move(VimForm *self, GtkWidget *widget, цяло x, цяло y);
 void vim_form_move_resize(VimForm *self, GtkWidget *widget, gint x, gint y, gint w, gint h);
 void vim_form_remove(VimForm *self, GtkWidget *widget);
 

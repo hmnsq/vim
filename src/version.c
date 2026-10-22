@@ -28,8 +28,8 @@
 char		*Version = VIM_VERSION_SHORT;
 static char	*mediumVersion = VIM_VERSION_MEDIUM;
 
-#if defined(HAVE_DATE_TIME)
-# if defined(VMS) && defined(VAXC)
+#ако defined(HAVE_DATE_TIME)
+# ако defined(VMS) && defined(VAXC)
 char	longVersion[sizeof(VIM_VERSION_LONG_DATE) + sizeof(__DATE__)
 						      + sizeof(__TIME__) + 3];
 
@@ -43,7 +43,7 @@ init_longVersion(void)
     strcpy(longVersion, VIM_VERSION_LONG_DATE);
 #  ifdef BUILD_DATE
     strcat(longVersion, BUILD_DATE);
-#  else
+#  иначе
     strcat(longVersion, __DATE__);
     strcat(longVersion, " ");
     strcat(longVersion, __TIME__);
@@ -51,18 +51,18 @@ init_longVersion(void)
     strcat(longVersion, ")");
 }
 
-# else
+# иначе
 char	*longVersion = NULL;
 
     void
 init_longVersion(void)
 {
-    if (longVersion != NULL)
-	return;
+    ако (longVersion != NULL)
+	върни;
 
 #  ifdef BUILD_DATE
     char *date_time = BUILD_DATE;
-#  else
+#  иначе
     char *date_time = __DATE__ " " __TIME__;
 #  endif
     char *msg = _("%s (%s, compiled %s)");
@@ -72,14 +72,14 @@ init_longVersion(void)
 	+ strlen(date_time);
 
     longVersion = alloc(len);
-    if (longVersion == NULL)
+    ако (longVersion == NULL)
 	longVersion = VIM_VERSION_LONG;
-    else
+    иначе
 	vim_snprintf(longVersion, len, msg,
 		VIM_VERSION_LONG_ONLY, VIM_VERSION_DATE_ONLY, date_time);
 }
 # endif
-#else
+#иначе
 char	*longVersion = VIM_VERSION_LONG;
 
     void
@@ -93,72 +93,72 @@ static char *(features[]) =
 {
 #ifdef HAVE_ACL
 	"+acl",
-#else
+#иначе
 	"-acl",
 #endif
 #ifdef FEAT_ARABIC
 	"+arabic",
-#else
+#иначе
 	"-arabic",
 #endif
 #ifdef AMIGA		// only for Amiga systems
 # ifdef FEAT_ARP
 	"+ARP",
-# else
+# иначе
 	"-ARP",
 # endif
 #endif
 #ifdef FEAT_AUTOCHDIR
 	"+autochdir",
-#else
+#иначе
 	"-autochdir",
 #endif
 	"+autocmd",
 #ifdef FEAT_AUTOSERVERNAME
 	"+autoservername",
-#else
+#иначе
 	"-autoservername",
 #endif
 #ifdef FEAT_BEVAL_GUI
 	"+balloon_eval",
-#else
+#иначе
 	"-balloon_eval",
 #endif
 #ifdef FEAT_BEVAL_TERM
 	"+balloon_eval_term",
-#else
+#иначе
 	"-balloon_eval_term",
 #endif
 #ifdef FEAT_BROWSE
 	"+browse",
-#else
+#иначе
 	"-browse",
 #endif
 	"++builtin_terms",
 #ifdef FEAT_BYTEOFF
 	"+byte_offset",
-#else
+#иначе
 	"-byte_offset",
 #endif
 #ifdef FEAT_JOB_CHANNEL
 	"+channel",
-#else
+#иначе
 	"-channel",
 #endif
 	"+cindent",
 #ifdef FEAT_CLIENTSERVER
 	"+clientserver",
-#else
+#иначе
 	"-clientserver",
 #endif
 #ifdef FEAT_CLIPBOARD
 	"+clipboard",
-#else
+#иначе
 	"-clipboard",
 #endif
 #ifdef FEAT_CLIPBOARD_PROVIDER
 	"+clipboard_provider",
-#else
+#иначе
 	"-clipboard_provider",
 #endif
 	"+cmdline_compl",
@@ -167,159 +167,159 @@ static char *(features[]) =
 	"+comments",
 #ifdef FEAT_CONCEAL
 	"+conceal",
-#else
+#иначе
 	"-conceal",
 #endif
 #ifdef FEAT_CRYPT
 	"+cryptv",
-#else
+#иначе
 	"-cryptv",
 #endif
 #ifdef FEAT_CSCOPE
 	"+cscope",
-#else
+#иначе
 	"-cscope",
 #endif
 	"+cursorbind",
 #ifdef CURSOR_SHAPE
 	"+cursorshape",
-#else
+#иначе
 	"-cursorshape",
 #endif
-#if defined(FEAT_CON_DIALOG) && defined(FEAT_GUI_DIALOG)
+#ако defined(FEAT_CON_DIALOG) && defined(FEAT_GUI_DIALOG)
 	"+dialog_con_gui",
-#else
-# if defined(FEAT_CON_DIALOG)
+#иначе
+# ако defined(FEAT_CON_DIALOG)
 	"+dialog_con",
-# else
-#  if defined(FEAT_GUI_DIALOG)
+# иначе
+#  ако defined(FEAT_GUI_DIALOG)
 	"+dialog_gui",
-#  else
+#  иначе
 	"-dialog",
 #  endif
 # endif
 #endif
 #ifdef FEAT_DIFF
 	"+diff",
-#else
+#иначе
 	"-diff",
 #endif
 #ifdef FEAT_DIGRAPHS
 	"+digraphs",
-#else
+#иначе
 	"-digraphs",
 #endif
 #ifdef FEAT_GUI_MSWIN
 # ifdef FEAT_DIRECTX
 	"+directx",
-# else
+# иначе
 	"-directx",
 # endif
 #endif
 #ifdef FEAT_DND
 	"+dnd",
-#else
+#иначе
 	"-dnd",
 #endif
 	"-ebcdic",
 #ifdef FEAT_EMACS_TAGS
 	"+emacs_tags",
-#else
+#иначе
 	"-emacs_tags",
 #endif
 #ifdef FEAT_EVAL
 	"+eval",
-#else
+#иначе
 	"-eval",
 #endif
 	"+ex_extra",
 #ifdef FEAT_SEARCH_EXTRA
 	"+extra_search",
-#else
+#иначе
 	"-extra_search",
 #endif
 	"-farsi",
 	"+file_in_path",
 #ifdef FEAT_FIND_ID
 	"+find_in_path",
-#else
+#иначе
 	"-find_in_path",
 #endif
 	"+float",
 #ifdef FEAT_FOLDING
 	"+folding",
-#else
+#иначе
 	"-folding",
 #endif
 	"-footer",
 	// only interesting on Unix systems
-#if !defined(USE_SYSTEM) && defined(UNIX)
+#ако !defined(USE_SYSTEM) && defined(UNIX)
 	"+fork()",
 #endif
 #ifdef FEAT_GETTEXT
 # ifdef DYNAMIC_GETTEXT
 	"+gettext/dyn",
-# else
+# иначе
 	"+gettext",
 # endif
-#else
+#иначе
 	"-gettext",
 #endif
 	"-hangul_input",
-#if (defined(HAVE_ICONV_H) && defined(USE_ICONV)) || defined(DYNAMIC_ICONV)
+#ако (defined(HAVE_ICONV_H) && defined(USE_ICONV)) || defined(DYNAMIC_ICONV)
 # ifdef DYNAMIC_ICONV
 	"+iconv/dyn",
-# else
+# иначе
 	"+iconv",
 # endif
-#else
+#иначе
 	"-iconv",
 #endif
 #ifdef FEAT_IMAGE
 	"+image",
-#else
+#иначе
 	"-image",
 #endif
 #ifdef FEAT_IMAGE_POPUP
 	"+image_popup",
-#else
+#иначе
 	"-image_popup",
 #endif
 	"+insert_expand",
 #ifdef FEAT_IPV6
 	"+ipv6",
-#else
+#иначе
 	"-ipv6",
 #endif
 #ifdef FEAT_JOB_CHANNEL
 	"+job",
-#else
+#иначе
 	"-job",
 #endif
 	"+jumplist",
 #ifdef FEAT_KEYMAP
 	"+keymap",
-#else
+#иначе
 	"-keymap",
 #endif
 #ifdef FEAT_EVAL
 	"+lambda",
-#else
+#иначе
 	"-lambda",
 #endif
 #ifdef FEAT_LANGMAP
 	"+langmap",
-#else
+#иначе
 	"-langmap",
 #endif
 #ifdef FEAT_LIBCALL
 	"+libcall",
-#else
+#иначе
 	"-libcall",
 #endif
 #ifdef FEAT_LINEBREAK
 	"+linebreak",
-#else
+#иначе
 	"-linebreak",
 #endif
 	"+lispindent",
@@ -328,47 +328,47 @@ static char *(features[]) =
 #ifdef FEAT_LUA
 # ifdef DYNAMIC_LUA
 	"+lua/dyn",
-# else
+# иначе
 	"+lua",
 # endif
-#else
+#иначе
 	"-lua",
 #endif
 #ifdef FEAT_MENU
 	"+menu",
-#else
+#иначе
 	"-menu",
 #endif
 #ifdef FEAT_SESSION
 	"+mksession",
-#else
+#иначе
 	"-mksession",
 #endif
 	"+modify_fname",
 	"+mouse",
-#if defined(UNIX) || defined(VMS)
+#ако defined(UNIX) || defined(VMS)
 # ifdef FEAT_MOUSE_DEC
 	"+mouse_dec",
-# else
+# иначе
 	"-mouse_dec",
 # endif
 # ifdef FEAT_MOUSE_GPM
 #  ifdef DYNAMIC_GPM
 	"+mouse_gpm/dyn",
-#  else
+#  иначе
 	"+mouse_gpm",
 #  endif
-# else
+# иначе
 	"-mouse_gpm",
 # endif
 # ifdef FEAT_MOUSE_JSB
 	"+mouse_jsbterm",
-# else
+# иначе
 	"-mouse_jsbterm",
 # endif
 # ifdef FEAT_MOUSE_NET
 	"+mouse_netterm",
-# else
+# иначе
 	"-mouse_netterm",
 # endif
 #endif
@@ -376,212 +376,212 @@ static char *(features[]) =
 #ifdef __QNX__
 # ifdef FEAT_MOUSE_PTERM
 	"+mouse_pterm",
-# else
+# иначе
 	"-mouse_pterm",
 # endif
 #endif
 
-#if defined(UNIX) || defined(VMS)
+#ако defined(UNIX) || defined(VMS)
 	"+mouse_sgr",
 # ifdef FEAT_SYSMOUSE
 	"+mouse_sysmouse",
-# else
+# иначе
 	"-mouse_sysmouse",
 # endif
 # ifdef FEAT_MOUSE_URXVT
 	"+mouse_urxvt",
-# else
+# иначе
 	"-mouse_urxvt",
 # endif
 	"+mouse_xterm",
 #endif
 #ifdef FEAT_MOUSESHAPE
 	"+mouseshape",
-#else
+#иначе
 	"-mouseshape",
 #endif
 
 #ifdef FEAT_MBYTE_IME
 # ifdef DYNAMIC_IME
 	"+multi_byte_ime/dyn",
-# else
+# иначе
 	"+multi_byte_ime",
 # endif
-#else
+#иначе
 	"+multi_byte",
 #endif
 #ifdef FEAT_MULTI_LANG
 	"+multi_lang",
-#else
+#иначе
 	"-multi_lang",
 #endif
 #ifdef FEAT_MZSCHEME
 # ifdef DYNAMIC_MZSCHEME
 	"+mzscheme/dyn",
-# else
+# иначе
 	"+mzscheme",
 # endif
-#else
+#иначе
 	"-mzscheme",
 #endif
 #ifdef FEAT_NETBEANS_INTG
 	"+netbeans_intg",
-#else
+#иначе
 	"-netbeans_intg",
 #endif
 	"+num64",
 #ifdef FEAT_GUI_MSWIN
 # ifdef FEAT_OLE
 	"+ole",
-# else
+# иначе
 	"-ole",
 # endif
 #endif
 #ifdef FEAT_EVAL
 	"+packages",
-#else
+#иначе
 	"-packages",
 #endif
 #ifdef FEAT_PRINT_PANGO
 	"+pango",
-#else
+#иначе
 	"-pango",
 #endif
 	"+path_extra",
 #ifdef FEAT_PERL
 # ifdef DYNAMIC_PERL
 	"+perl/dyn",
-# else
+# иначе
 	"+perl",
 # endif
-#else
+#иначе
 	"-perl",
 #endif
 #ifdef FEAT_PERSISTENT_UNDO
 	"+persistent_undo",
-#else
+#иначе
 	"-persistent_undo",
 #endif
 #ifdef FEAT_PROP_POPUP
 	"+popupwin",
-#else
+#иначе
 	"-popupwin",
 #endif
 #ifdef FEAT_PRINTER
 # ifdef FEAT_POSTSCRIPT
 	"+postscript",
-# else
+# иначе
 	"-postscript",
 # endif
 	"+printer",
-#else
+#иначе
 	"-printer",
 #endif
 #ifdef FEAT_PROFILE
 	"+profile",
-#else
+#иначе
 	"-profile",
 #endif
 #ifdef FEAT_PYTHON
 # ifdef DYNAMIC_PYTHON
 	"+python/dyn",
-# else
+# иначе
 	"+python",
 # endif
-#else
+#иначе
 	"-python",
 #endif
 #ifdef FEAT_PYTHON3
 # ifdef DYNAMIC_PYTHON3
 #  ifdef DYNAMIC_PYTHON3_STABLE_ABI
 	"+python3/dyn-stable",
-#  else
+#  иначе
 	"+python3/dyn",
 #  endif
-# else
+# иначе
 	"+python3",
 # endif
-#else
+#иначе
 	"-python3",
 #endif
 #ifdef FEAT_QUICKFIX
 	"+quickfix",
-#else
+#иначе
 	"-quickfix",
 #endif
 #ifdef FEAT_RELTIME
 	"+reltime",
-#else
+#иначе
 	"-reltime",
 #endif
 #ifdef FEAT_RIGHTLEFT
 	"+rightleft",
-#else
+#иначе
 	"-rightleft",
 #endif
 #ifdef FEAT_RUBY
 # ifdef DYNAMIC_RUBY
 	"+ruby/dyn",
-# else
+# иначе
 	"+ruby",
 # endif
-#else
+#иначе
 	"-ruby",
 #endif
 	"+scrollbind",
 #ifdef FEAT_SIGNS
 	"+signs",
-#else
+#иначе
 	"-signs",
 #endif
 	"+smartindent",
 #ifdef FEAT_SOCKETSERVER
 	"+socketserver",
-#else
+#иначе
 	"-socketserver",
 #endif
 #ifdef FEAT_SODIUM
 # ifdef DYNAMIC_SODIUM
 	"+sodium/dyn",
-# else
+# иначе
 	"+sodium",
 # endif
-#else
+#иначе
 	"-sodium",
 #endif
 #ifdef FEAT_SOUND
 	"+sound",
-#else
+#иначе
 	"-sound",
 #endif
 #ifdef FEAT_SPELL
 	"+spell",
-#else
+#иначе
 	"-spell",
 #endif
 #ifdef STARTUPTIME
 	"+startuptime",
-#else
+#иначе
 	"-startuptime",
 #endif
 #ifdef FEAT_STL_OPT
 	"+statusline",
-#else
+#иначе
 	"-statusline",
 #endif
 	"-sun_workshop",
 #ifdef FEAT_SYN_HL
 	"+syntax",
-#else
+#иначе
 	"-syntax",
 #endif
 	    // only interesting on Unix systems
-#if defined(USE_SYSTEM) && defined(UNIX)
+#ако defined(USE_SYSTEM) && defined(UNIX)
 	"+system()",
 #endif
-#if defined(FEAT_TABPANEL)
+#ако defined(FEAT_TABPANEL)
 	"+tabpanel",
-#else
+#иначе
 	"-tabpanel",
 #endif
 	"-tag_any_white",
@@ -590,71 +590,71 @@ static char *(features[]) =
 #ifdef FEAT_TCL
 # ifdef DYNAMIC_TCL
 	"+tcl/dyn",
-# else
+# иначе
 	"+tcl",
 # endif
-#else
+#иначе
 	"-tcl",
 #endif
 #ifdef FEAT_TERMGUICOLORS
 	"+termguicolors",
-#else
+#иначе
 	"-termguicolors",
 #endif
 #ifdef FEAT_TERMINAL
 	"+terminal",
-#else
+#иначе
 	"-terminal",
 #endif
-#if defined(UNIX)
+#ако defined(UNIX)
 // only Unix can have terminfo instead of termcap
 # ifdef TERMINFO
 	"+terminfo",
-# else
+# иначе
 	"-terminfo",
 # endif
 #endif
 #ifdef FEAT_TERMRESPONSE
 	"+termresponse",
-#else
+#иначе
 	"-termresponse",
 #endif
 	"+textobjects",
 #ifdef FEAT_PROP_POPUP
 	"+textprop",
-#else
+#иначе
 	"-textprop",
 #endif
-#if !defined(UNIX)
+#ако !defined(UNIX)
 // unix always includes termcap support
 # ifdef HAVE_TGETENT
 	"+tgetent",
-# else
+# иначе
 	"-tgetent",
 # endif
 #endif
 #ifdef FEAT_TIMERS
 	"+timers",
-#else
+#иначе
 	"-timers",
 #endif
 	"+title",
 #ifdef FEAT_TOOLBAR
 	"+toolbar",
-#else
+#иначе
 	"-toolbar",
 #endif
 	"+user_commands",
 #ifdef FEAT_VARTABS
 	"+vartabs",
-#else
+#иначе
 	"-vartabs",
 #endif
 	"+vertsplit",
 	"+vim9script",
 #ifdef FEAT_VIMINFO
 	"+viminfo",
-#else
+#иначе
 	"-viminfo",
 #endif
 	"+virtualedit",
@@ -664,18 +664,18 @@ static char *(features[]) =
 #ifdef MSWIN
 # ifdef FEAT_VTP
 	"+vtp",
-# else
+# иначе
 	"-vtp",
 # endif
 #endif
 #ifdef FEAT_WAYLAND
 	"+wayland",
-#else
+#иначе
 	"-wayland",
 #endif
 #ifdef FEAT_WAYLAND_CLIPBOARD
 	"+wayland_clipboard",
-#else
+#иначе
 	"-wayland_clipboard",
 #endif
 	"+wildignore",
@@ -683,65 +683,65 @@ static char *(features[]) =
 	"+windows",
 #ifdef FEAT_WRITEBACKUP
 	"+writebackup",
-#else
+#иначе
 	"-writebackup",
 #endif
-#if defined(UNIX) || defined(VMS)
+#ако defined(UNIX) || defined(VMS)
 # ifdef FEAT_X11
 	"+X11",
-# else
+# иначе
 	"-X11",
 # endif
 #endif
 #ifdef FEAT_XATTR
 	"+xattr",
-#else
+#иначе
 	"-xattr",
 #endif
 #ifdef FEAT_XFONTSET
 	"+xfontset",
-#else
+#иначе
 	"-xfontset",
 #endif
 #ifdef FEAT_XIM
 	"+xim",
-#else
+#иначе
 	"-xim",
 #endif
-#if defined(MSWIN)
+#ако defined(MSWIN)
 # ifdef FEAT_XPM_W32
 	"+xpm_w32",
-# else
+# иначе
 	"-xpm_w32",
 # endif
 #elif defined(HAVE_XPM)
 	"+xpm",
-#else
+#иначе
 	"-xpm",
 #endif
-#if defined(UNIX) || defined(VMS)
-# if defined(USE_XSMP_INTERACT)
+#ако defined(UNIX) || defined(VMS)
+# ако defined(USE_XSMP_INTERACT)
 	"+xsmp_interact",
 # elif defined(USE_XSMP)
 	"+xsmp",
-# else
+# иначе
 	"-xsmp",
 # endif
 # ifdef FEAT_XCLIPBOARD
 	"+xterm_clipboard",
-# else
+# иначе
 	"-xterm_clipboard",
 # endif
 #endif
 #ifdef FEAT_XTERM_SAVE
 	"+xterm_save",
-#else
+#иначе
 	"-xterm_save",
 #endif
 	NULL
 };
 
-static int included_patches[] =
+static цяло included_patches[] =
 {   /* Add new patch number below this line */
 /**/
     1225,
@@ -3210,38 +3210,38 @@ static char *(extra_patches[]) =
     NULL
 };
 
-    int
+    цяло
 highest_patch(void)
 {
     // this relies on the highest patch number to be the first entry
-    return included_patches[0];
+    върни included_patches[0];
 }
 
-#if defined(FEAT_EVAL)
+#ако defined(FEAT_EVAL)
 /*
  * Return TRUE if patch "n" has been included.
  */
-    int
-has_patch(int n)
+    цяло
+has_patch(цяло n)
 {
-    int		h, m, l;
+    цяло		h, m, l;
 
     // Perform a binary search.
     l = 0;
-    h = (int)ARRAY_LENGTH(included_patches) - 1;
-    for (;;)
+    h = (цяло)ARRAY_LENGTH(included_patches) - 1;
+    за (;;)
     {
 	m = (l + h) / 2;
-	if (included_patches[m] == n)
-	    return TRUE;
-	if (l == h)
+	ако (included_patches[m] == n)
+	    върни TRUE;
+	ако (l == h)
 	    break;
-	if (included_patches[m] < n)
+	ако (included_patches[m] < n)
 	    h = m;
-	else
+	иначе
 	    l = m + 1;
     }
-    return FALSE;
+    върни FALSE;
 }
 #endif
 
@@ -3251,7 +3251,7 @@ ex_version(exarg_T *eap)
     /*
      * Ignore a ":version 9.99" command.
      */
-    if (*eap->arg == NUL)
+    ако (*eap->arg == NUL)
     {
 	msg_putchar('\n');
 	list_version();
@@ -3264,19 +3264,19 @@ ex_version(exarg_T *eap)
  * When "wrap" is TRUE wrap the string in [].
  */
     static void
-version_msg_wrap(char_u *s, int wrap)
+version_msg_wrap(char_u *s, цяло wrap)
 {
-    int		len = vim_strsize(s) + (wrap ? 2 : 0);
+    цяло		len = vim_strsize(s) + (wrap ? 2 : 0);
 
-    if (!got_int && len < cmdline_width && msg_col + len >= cmdline_width
+    ако (!got_int && len < cmdline_width && msg_col + len >= cmdline_width
 								&& *s != '\n')
 	msg_putchar('\n');
-    if (!got_int)
+    ако (!got_int)
     {
-	if (wrap)
+	ако (wrap)
 	    msg_puts("[");
 	msg_puts((char *)s);
-	if (wrap)
+	ако (wrap)
 	    msg_puts("]");
     }
 }
@@ -3302,40 +3302,40 @@ list_features(void)
  * The entry with index "current" is inclosed in [].
  */
     void
-list_in_columns(char_u **items, int size, int current)
+list_in_columns(char_u **items, цяло size, цяло current)
 {
-    int		i;
-    int		ncol;
-    int		nrow;
-    int		cur_row = 1;
-    int		item_count = 0;
-    int		width = 0;
+    цяло		i;
+    цяло		ncol;
+    цяло		nrow;
+    цяло		cur_row = 1;
+    цяло		item_count = 0;
+    цяло		width = 0;
 #ifdef FEAT_SYN_HL
-    int		use_highlight = (items == (char_u **)features);
+    цяло		use_highlight = (items == (char_u **)features);
 #endif
 
     // Find the length of the longest item, use that + 1 as the column
     // width.
-    for (i = 0; size < 0 ? items[i] != NULL : i < size; ++i)
+    за (i = 0; size < 0 ? items[i] != NULL : i < size; ++i)
     {
-	int l = vim_strsize(items[i]) + (i == current ? 2 : 0);
+	цяло l = vim_strsize(items[i]) + (i == current ? 2 : 0);
 
-	if (l > width)
+	ако (l > width)
 	    width = l;
 	++item_count;
     }
     width += 1;
 
-    if (cmdline_width < width)
+    ако (cmdline_width < width)
     {
 	// Not enough screen columns - show one per line
-	for (i = 0; i < item_count; ++i)
+	за (i = 0; i < item_count; ++i)
 	{
 	    version_msg_wrap(items[i], i == current);
-	    if (msg_col > 0 && i < item_count - 1)
+	    ако (msg_col > 0 && i < item_count - 1)
 		msg_putchar('\n');
 	}
-	return;
+	върни;
     }
 
     // The rightmost column doesn't need a separator.
@@ -3344,42 +3344,42 @@ list_in_columns(char_u **items, int size, int current)
     nrow = item_count / ncol + ((item_count % ncol) ? 1 : 0);
 
     // "i" counts columns then rows.  "idx" counts rows then columns.
-    for (i = 0; !got_int && i < nrow * ncol; ++i)
+    за (i = 0; !got_int && i < nrow * ncol; ++i)
     {
-	int idx = (i / ncol) + (i % ncol) * nrow;
+	цяло idx = (i / ncol) + (i % ncol) * nrow;
 
-	if (idx < item_count)
+	ако (idx < item_count)
 	{
-	    int last_col = (i + 1) % ncol == 0;
+	    цяло last_col = (i + 1) % ncol == 0;
 
-	    if (idx == current)
+	    ако (idx == current)
 		msg_putchar('[');
 #ifdef FEAT_SYN_HL
-	    if (use_highlight && items[idx][0] == '-')
+	    ако (use_highlight && items[idx][0] == '-')
 		msg_puts_attr((char *)items[idx], HL_ATTR(HLF_W));
-	    else
+	    иначе
 #endif
 		msg_puts((char *)items[idx]);
-	    if (idx == current)
+	    ако (idx == current)
 		msg_putchar(']');
-	    if (last_col)
+	    ако (last_col)
 	    {
-		if (msg_col > 0 && cur_row < nrow)
+		ако (msg_col > 0 && cur_row < nrow)
 		    msg_putchar('\n');
 		++cur_row;
 	    }
-	    else
+	    иначе
 	    {
-		while (msg_col % width)
+		докато (msg_col % width)
 		    msg_putchar(' ');
 	    }
 	}
-	else
+	иначе
 	{
 	    // this row is out of items, thus at the end of the row
-	    if (msg_col > 0)
+	    ако (msg_col > 0)
 	    {
-		if (cur_row < nrow)
+		ако (cur_row < nrow)
 		    msg_putchar('\n');
 		++cur_row;
 	    }
@@ -3390,8 +3390,8 @@ list_in_columns(char_u **items, int size, int current)
     void
 list_version(void)
 {
-    int		i;
-    int		first;
+    цяло		i;
+    цяло		first;
     char	*s = "";
 
     /*
@@ -3404,47 +3404,47 @@ list_version(void)
 # ifdef FEAT_GUI_MSWIN
 #  ifdef VIMDLL
 #   ifdef _WIN64
-#    if defined(_M_ARM64) || defined(_M_ARM64EC)
+#    ако defined(_M_ARM64) || defined(_M_ARM64EC)
      msg_puts(_("\nMS-Windows ARM64 GUI/console version"));
-#    else
+#    иначе
      msg_puts(_("\nMS-Windows 64-bit GUI/console version"));
 #    endif
-#   else
+#   иначе
     msg_puts(_("\nMS-Windows 32-bit GUI/console version"));
 #   endif
-#  else
+#  иначе
 #   ifdef _WIN64
-#    if defined(_M_ARM64) || defined(_M_ARM64EC)
+#    ако defined(_M_ARM64) || defined(_M_ARM64EC)
      msg_puts(_("\nMS-Windows ARM64 GUI version"));
-#    else
+#    иначе
      msg_puts(_("\nMS-Windows 64-bit GUI version"));
 #    endif
-#   else
+#   иначе
     msg_puts(_("\nMS-Windows 32-bit GUI version"));
 #   endif
 #  endif
 #  ifdef FEAT_OLE
     msg_puts(_(" with OLE support"));
 #  endif
-# else
+# иначе
 #  ifdef _WIN64
-#   if defined(_M_ARM64) || defined(_M_ARM64EC)
+#   ако defined(_M_ARM64) || defined(_M_ARM64EC)
     msg_puts(_("\nMS-Windows ARM64 console version"));
-#   else
+#   иначе
     msg_puts(_("\nMS-Windows 64-bit console version"));
 #   endif
-#  else
+#  иначе
     msg_puts(_("\nMS-Windows 32-bit console version"));
 #  endif
 # endif
 #endif
-#if defined(MACOS_X)
-# if defined(MACOS_X_DARWIN)
+#ако defined(MACOS_X)
+# ако defined(MACOS_X_DARWIN)
     msg_puts(_("\nmacOS version"));
-# else
+# иначе
     msg_puts(_("\nmacOS version w/o darwin feat."));
 # endif
-# if defined(__arm64__)
+# ако defined(__arm64__)
     msg_puts(" - arm64");
 # elif defined(__x86_64__)
     msg_puts(" - x86_64");
@@ -3454,11 +3454,11 @@ list_version(void)
 #ifdef VMS
     msg_puts(_("\nOpenVMS (build) arch, version"));
 # ifdef HAVE_PATHDEF
-    if (*compiled_arch != NUL)
+    ако (*compiled_arch != NUL)
     {
 	msg_puts(": ");
 	msg_puts((char *)compiled_arch);
-	if (*compiled_vers != NUL)
+	ако (*compiled_vers != NUL)
 	{
 	    msg_puts(", ");
 	    msg_puts((char *)compiled_vers);
@@ -3471,21 +3471,21 @@ list_version(void)
 
     // Print the list of patch numbers if there is at least one.
     // Print a range when patches are consecutive: "1-10, 12, 15-40, 42-45"
-    if (included_patches[0] != 0)
+    ако (included_patches[0] != 0)
     {
 	msg_puts(_("\nIncluded patches: "));
 	first = -1;
-	i = (int)ARRAY_LENGTH(included_patches) - 1;
-	while (--i >= 0)
+	i = (цяло)ARRAY_LENGTH(included_patches) - 1;
+	докато (--i >= 0)
 	{
-	    if (first < 0)
+	    ако (first < 0)
 		first = included_patches[i];
-	    if (i == 0 || included_patches[i - 1] != included_patches[i] + 1)
+	    ако (i == 0 || included_patches[i - 1] != included_patches[i] + 1)
 	    {
 		msg_puts(s);
 		s = ", ";
 		msg_outnum((long)first);
-		if (first != included_patches[i])
+		ако (first != included_patches[i])
 		{
 		    msg_puts("-");
 		    msg_outnum((long)included_patches[i]);
@@ -3496,11 +3496,11 @@ list_version(void)
     }
 
     // Print the list of extra patch descriptions if there is at least one.
-    if (extra_patches[0] != NULL)
+    ако (extra_patches[0] != NULL)
     {
 	msg_puts(_("\nExtra patches: "));
 	s = "";
-	for (i = 0; extra_patches[i] != NULL; ++i)
+	за (i = 0; extra_patches[i] != NULL; ++i)
 	{
 	    msg_puts(s);
 	    s = ", ";
@@ -3515,15 +3515,15 @@ list_version(void)
 #endif
 
 #ifdef HAVE_PATHDEF
-    if (*compiled_user != NUL || *compiled_sys != NUL)
+    ако (*compiled_user != NUL || *compiled_sys != NUL)
     {
 	msg_puts(_("\nCompiled "));
-	if (*compiled_user != NUL)
+	ако (*compiled_user != NUL)
 	{
 	    msg_puts(_("by "));
 	    msg_puts((char *)compiled_user);
 	}
-	if (*compiled_sys != NUL)
+	ако (*compiled_sys != NUL)
 	{
 	    msg_puts("@");
 	    msg_puts((char *)compiled_sys);
@@ -3531,23 +3531,23 @@ list_version(void)
     }
 #endif
 
-#if defined(FEAT_HUGE)
+#ако defined(FEAT_HUGE)
     msg_puts(_("\nHuge version "));
 #elif defined(FEAT_NORMAL)
     msg_puts(_("\nNormal version "));
-#else
+#иначе
     msg_puts(_("\nTiny version "));
 #endif
-#if !defined(FEAT_GUI)
+#ако !defined(FEAT_GUI)
     msg_puts(_("without GUI."));
 #elif defined(FEAT_GUI_GTK)
-# if defined(USE_GTK4)
+# ако defined(USE_GTK4)
     msg_puts(_("with GTK4 GUI."));
 # elif defined(USE_GTK3)
     msg_puts(_("with GTK3 GUI."));
 # elif defined(FEAT_GUI_GNOME)
     msg_puts(_("with GTK2-GNOME GUI."));
-# else
+# иначе
     msg_puts(_("with GTK2 GUI."));
 # endif
 #elif defined(FEAT_GUI_MOTIF)
@@ -3562,7 +3562,7 @@ list_version(void)
     version_msg(_("  Features included (+) or not (-):\n"));
 
     list_features();
-    if (msg_col > 0)
+    ако (msg_col > 0)
 	msg_putchar('\n');
 
 #ifdef SYS_VIMRC_FILE
@@ -3580,7 +3580,7 @@ list_version(void)
     version_msg(USR_VIMRC_FILE2);
     version_msg("\"\n");
 #endif
-#if defined(USR_VIMRC_FILE3) && defined(XDG_VIMRC_FILE)
+#ако defined(USR_VIMRC_FILE3) && defined(XDG_VIMRC_FILE)
     version_msg(_(" 3rd user vimrc file: \""));
     version_msg(USR_VIMRC_FILE3);
     version_msg("\"\n");
@@ -3637,13 +3637,13 @@ list_version(void)
 # endif
 #endif
 #ifdef HAVE_PATHDEF
-    if (*default_vim_dir != NUL)
+    ако (*default_vim_dir != NUL)
     {
 	version_msg(_("  fall-back for $VIM: \""));
 	version_msg((char *)default_vim_dir);
 	version_msg("\"\n");
     }
-    if (*default_vimruntime_dir != NUL)
+    ако (*default_vimruntime_dir != NUL)
     {
 	version_msg(_(" f-b for $VIMRUNTIME: \""));
 	version_msg((char *)default_vimruntime_dir);
@@ -3653,7 +3653,7 @@ list_version(void)
     version_msg((char *)all_cflags);
     version_msg("\n");
 # ifdef VMS
-    if (*compiler_version != NUL)
+    ако (*compiler_version != NUL)
     {
 	version_msg(_("Compiler: "));
 	version_msg((char *)compiler_version);
@@ -3669,8 +3669,8 @@ list_version(void)
 #endif
 }
 
-static void do_intro_line(int row, char_u *mesg, int add_version, int attr);
-static void intro_message(int colon);
+static void do_intro_line(цяло row, char_u *mesg, цяло add_version, цяло attr);
+static void intro_message(цяло colon);
 
 /*
  * Show the intro message when not editing a file.
@@ -3678,7 +3678,7 @@ static void intro_message(int colon);
     void
 maybe_intro_message(void)
 {
-    if (BUFEMPTY()
+    ако (BUFEMPTY()
 	    && curbuf->b_fname == NULL
 	    && firstwin->w_next == NULL
 	    && vim_strchr(p_shm, SHM_INTRO) == NULL)
@@ -3692,12 +3692,12 @@ maybe_intro_message(void)
  */
     static void
 intro_message(
-    int		colon)		// TRUE for ":intro"
+    цяло		colon)		// TRUE for ":intro"
 {
-    int		i;
-    int		row;
-    int		blanklines;
-    int		sponsor;
+    цяло		i;
+    цяло		row;
+    цяло		blanklines;
+    цяло		sponsor;
     char	*p;
     static char	*(lines[]) =
     {
@@ -3749,77 +3749,77 @@ intro_message(
 #endif
 
     // blanklines = screen height - # message lines
-    blanklines = (int)Rows - (ARRAY_LENGTH(lines) - 1);
-    if (!p_cp)
+    blanklines = (цяло)Rows - (ARRAY_LENGTH(lines) - 1);
+    ако (!p_cp)
 	blanklines += 4;  // add 4 for not showing "Vi compatible" message
 
     // Don't overwrite a statusline.  Depends on 'cmdheight'.
-    if (p_ls > 1)
+    ако (p_ls > 1)
 	blanklines -= Rows - topframe->fr_height;
-    if (blanklines < 0)
+    ако (blanklines < 0)
 	blanklines = 0;
 
     // Show the sponsor and Uganda message two out of four times
-    sponsor = (int)time(NULL);
+    sponsor = (цяло)time(NULL);
     sponsor = ((sponsor & 2) == 0) - ((sponsor & 4) == 0);
 
     // start displaying the message lines after half of the blank lines
     row = blanklines / 2;
-    if ((row >= 2 && topframe->fr_width >= 50) || colon)
+    ако ((row >= 2 && topframe->fr_width >= 50) || colon)
     {
-	for (i = 0; i < (int)ARRAY_LENGTH(lines); ++i)
+	за (i = 0; i < (цяло)ARRAY_LENGTH(lines); ++i)
 	{
 	    p = lines[i];
 #ifdef FEAT_GUI
-	    if (p_im && gui.in_use && gui_lines[i] != NULL)
+	    ако (p_im && gui.in_use && gui_lines[i] != NULL)
 		p = gui_lines[i];
 #endif
-	    if (p == NULL)
+	    ако (p == NULL)
 	    {
-		if (!p_cp)
+		ако (!p_cp)
 		    break;
 		continue;
 	    }
-	    if (sponsor != 0)
+	    ако (sponsor != 0)
 	    {
-		if (strstr(p, "children") != NULL)
+		ако (strstr(p, "children") != NULL)
 		    p = N_("Sponsor Vim development!");
-		else if (strstr(p, "Kuwasha") != NULL)
+		иначе ако (strstr(p, "Kuwasha") != NULL)
 		    p = N_("type  :help sponsor<Enter>    for information ");
-		else if (strstr(p, "Orphans") != NULL)
+		иначе ако (strstr(p, "Orphans") != NULL)
 		    p = N_("menu  Help->Sponsor           for information    ");
 	    }
-	    if (*p != NUL)
+	    ако (*p != NUL)
 		do_intro_line(row, (char_u *)_(p), i == 2, 0);
 	    ++row;
 	}
     }
 
     // Make the wait-return message appear just below the text.
-    if (colon)
+    ако (colon)
 	msg_row = row;
 }
 
     static void
 do_intro_line(
-    int		row,
+    цяло		row,
     char_u	*mesg,
-    int		add_version,
-    int		attr)
+    цяло		add_version,
+    цяло		attr)
 {
     char_u	vers[20];
-    int		col;
+    цяло		col;
     char_u	*p;
-    int		l;
-    int		clen;
+    цяло		l;
+    цяло		clen;
 #ifdef MODIFIED_BY
 # define MODBY_LEN 150
     char_u	modby[MODBY_LEN];
 
-    if (*mesg == ' ')
+    ако (*mesg == ' ')
     {
 	vim_strncpy(modby, (char_u *)_("Modified by "), MODBY_LEN - 1);
-	l = (int)STRLEN(modby);
+	l = (цяло)STRLEN(modby);
 	vim_strncpy(modby + l, (char_u *)MODIFIED_BY, MODBY_LEN - l - 1);
 	mesg = modby;
     }
@@ -3827,40 +3827,40 @@ do_intro_line(
 
     // Center the message horizontally.
     col = vim_strsize(mesg);
-    if (add_version)
+    ако (add_version)
     {
 	STRCPY(vers, mediumVersion);
-	if (highest_patch())
+	ако (highest_patch())
 	{
 	    // Check for 9.9x or 9.9xx, alpha/beta version
-	    if (SAFE_isalpha((int)vers[3]))
+	    ако (SAFE_isalpha((цяло)vers[3]))
 	    {
-		int len = (SAFE_isalpha((int)vers[4])) ? 5 : 4;
+		цяло len = (SAFE_isalpha((цяло)vers[4])) ? 5 : 4;
 		sprintf((char *)vers + len, ".%d%s", highest_patch(),
 							 mediumVersion + len);
 	    }
-	    else
+	    иначе
 		sprintf((char *)vers + 3, ".%d", highest_patch());
 	}
-	col += (int)STRLEN(vers);
+	col += (цяло)STRLEN(vers);
     }
     col = (topframe->fr_width - col) / 2;
-    if (col < 0)
+    ако (col < 0)
 	col = 0;
 
     // Split up in parts to highlight <> items differently.
-    for (p = mesg; *p != NUL; p += l)
+    за (p = mesg; *p != NUL; p += l)
     {
 	clen = 0;
-	for (l = 0; p[l] != NUL
+	за (l = 0; p[l] != NUL
 			 && (l == 0 || (p[l] != '<' && p[l - 1] != '>')); ++l)
 	{
-	    if (has_mbyte)
+	    ако (has_mbyte)
 	    {
 		clen += ptr2cells(p + l);
 		l += (*mb_ptr2len)(p + l) - 1;
 	    }
-	    else
+	    иначе
 		clen += byte2cells(p[l]);
 	}
 	screen_puts_len(p, l, row, col + firstwin->w_wincol,
@@ -3869,7 +3869,7 @@ do_intro_line(
     }
 
     // Add the version number to the version line.
-    if (add_version)
+    ако (add_version)
 	screen_puts(vers, row, col + firstwin->w_wincol, 0);
 }
 
@@ -3880,7 +3880,7 @@ do_intro_line(
 ex_intro(exarg_T *eap UNUSED)
 {
     screenclear();
-#if defined(FEAT_TABPANEL)
+#ако defined(FEAT_TABPANEL)
     draw_tabpanel();
 #endif
     intro_message(TRUE);

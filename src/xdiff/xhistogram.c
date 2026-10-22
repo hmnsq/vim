@@ -51,21 +51,21 @@
 
 struct histindex {
 	struct record {
-		unsigned int ptr, cnt;
+		unsigned цяло ptr, cnt;
 		struct record *next;
 	} **records, /* an occurrence */
 	  **line_map; /* map of line to record chain */
 	chastore_t rcha;
-	unsigned int *next_ptrs;
-	unsigned int table_bits,
+	unsigned цяло *next_ptrs;
+	unsigned цяло table_bits,
 		     records_size,
 		     line_map_size;
 
-	unsigned int max_chain_length,
+	unsigned цяло max_chain_length,
 		     key_shift,
 		     ptr_shift;
 
-	unsigned int cnt,
+	unsigned цяло cnt,
 		     has_common;
 
 	xdfenv_t *env;
@@ -73,8 +73,8 @@ struct histindex {
 };
 
 struct region {
-	unsigned int begin1, end1;
-	unsigned int begin2, end2;
+	unsigned цяло begin1, end1;
+	unsigned цяло begin2, end2;
 };
 
 #define LINE_MAP(i, a) (i->line_map[(a) - i->ptr_shift])
@@ -88,9 +88,9 @@ struct region {
 #define REC(env, s, l) \
 	(&env->xdf##s.recs[l - 1])
 
-static int cmp_recs(xrecord_t *r1, xrecord_t *r2)
+static цяло cmp_recs(xrecord_t *r1, xrecord_t *r2)
 {
-	return r1->ha == r2->ha;
+	върни r1->ha == r2->ha;
 
 }
 
@@ -100,20 +100,20 @@ static int cmp_recs(xrecord_t *r1, xrecord_t *r2)
 #define TABLE_HASH(index, side, line) \
 	XDL_HASHLONG((REC(index->env, side, line))->ha, index->table_bits)
 
-static int scanA(struct histindex *index, int line1, int count1)
+static цяло scanA(struct histindex *index, цяло line1, цяло count1)
 {
-	unsigned int ptr, tbl_idx;
-	unsigned int chain_len;
+	unsigned цяло ptr, tbl_idx;
+	unsigned цяло chain_len;
 	struct record **rec_chain, *rec;
 
-	for (ptr = LINE_END(1); (unsigned int)line1 <= ptr; ptr--) {
+	за (ptr = LINE_END(1); (unsigned цяло)line1 <= ptr; ptr--) {
 		tbl_idx = TABLE_HASH(index, 1, ptr);
 		rec_chain = index->records + tbl_idx;
 		rec = *rec_chain;
 
 		chain_len = 0;
-		while (rec) {
-			if (CMP(index, 1, rec->ptr, 1, ptr)) {
+		докато (rec) {
+			ако (CMP(index, 1, rec->ptr, 1, ptr)) {
 				/*
 				 * ptr is identical to another element. Insert
 				 * it onto the front of the existing element
@@ -131,15 +131,15 @@ static int scanA(struct histindex *index, int line1, int count1)
 			chain_len++;
 		}
 
-		if (chain_len == index->max_chain_length)
-			return -1;
+		ако (chain_len == index->max_chain_length)
+			върни -1;
 
 		/*
 		 * This is the first time we have ever seen this particular
 		 * element in the sequence. Construct a new chain for it.
 		 */
-		if (!(rec = xdl_cha_alloc(&index->rcha)))
-			return -1;
+		ако (!(rec = xdl_cha_alloc(&index->rcha)))
+			върни -1;
 		rec->ptr = ptr;
 		rec->cnt = 1;
 		rec->next = *rec_chain;
@@ -150,30 +150,30 @@ continue_scan:
 		; /* no op */
 	}
 
-	return 0;
+	върни 0;
 }
 
-static int try_lcs(struct histindex *index, struct region *lcs, int b_ptr,
-	int line1, int count1, int line2, int count2)
+static цяло try_lcs(struct histindex *index, struct region *lcs, цяло b_ptr,
+	цяло line1, цяло count1, цяло line2, цяло count2)
 {
-	unsigned int b_next = b_ptr + 1;
+	unsigned цяло b_next = b_ptr + 1;
 	struct record *rec = index->records[TABLE_HASH(index, 2, b_ptr)];
-	unsigned int as, ae, bs, be, np, rc;
-	int should_break;
+	unsigned цяло as, ae, bs, be, np, rc;
+	цяло should_break;
 
-	for (; rec; rec = rec->next) {
-		if (rec->cnt > index->cnt) {
-			if (!index->has_common)
+	за (; rec; rec = rec->next) {
+		ако (rec->cnt > index->cnt) {
+			ако (!index->has_common)
 				index->has_common = CMP(index, 1, rec->ptr, 2, b_ptr);
 			continue;
 		}
 
 		as = rec->ptr;
-		if (!CMP(index, 1, as, 2, b_ptr))
+		ако (!CMP(index, 1, as, 2, b_ptr))
 			continue;
 
 		index->has_common = 1;
-		for (;;) {
+		за (;;) {
 			should_break = 0;
 			np = NEXT_PTR(index, as);
 			bs = b_ptr;
@@ -181,24 +181,24 @@ static int try_lcs(struct histindex *index, struct region *lcs, int b_ptr,
 			be = bs;
 			rc = rec->cnt;
 
-			while ((unsigned int)line1 < as && (unsigned int)line2 < bs
+			докато ((unsigned цяло)line1 < as && (unsigned цяло)line2 < bs
 				&& CMP(index, 1, as - 1, 2, bs - 1)) {
 				as--;
 				bs--;
-				if (1 < rc)
+				ако (1 < rc)
 					rc = XDL_MIN(rc, CNT(index, as));
 			}
-			while (ae < (unsigned int)LINE_END(1) && be < (unsigned int)LINE_END(2)
+			докато (ae < (unsigned цяло)LINE_END(1) && be < (unsigned цяло)LINE_END(2)
 				&& CMP(index, 1, ae + 1, 2, be + 1)) {
 				ae++;
 				be++;
-				if (1 < rc)
+				ако (1 < rc)
 					rc = XDL_MIN(rc, CNT(index, ae));
 			}
 
-			if (b_next <= be)
+			ако (b_next <= be)
 				b_next = be + 1;
-			if (lcs->end1 - lcs->begin1 < ae - as || rc < index->cnt) {
+			ако (lcs->end1 - lcs->begin1 < ae - as || rc < index->cnt) {
 				lcs->begin1 = as;
 				lcs->begin2 = bs;
 				lcs->end1 = ae;
@@ -206,35 +206,35 @@ static int try_lcs(struct histindex *index, struct region *lcs, int b_ptr,
 				index->cnt = rc;
 			}
 
-			if (np == 0)
+			ако (np == 0)
 				break;
 
-			while (np <= ae) {
+			докато (np <= ae) {
 				np = NEXT_PTR(index, np);
-				if (np == 0) {
+				ако (np == 0) {
 					should_break = 1;
 					break;
 				}
 			}
 
-			if (should_break)
+			ако (should_break)
 				break;
 
 			as = np;
 		}
 	}
-	return b_next;
+	върни b_next;
 }
 
-static int fall_back_to_classic_diff(xpparam_t const *xpp, xdfenv_t *env,
-		int line1, int count1, int line2, int count2)
+static цяло fall_back_to_classic_diff(xpparam_t const *xpp, xdfenv_t *env,
+		цяло line1, цяло count1, цяло line2, цяло count2)
 {
 	xpparam_t xpparam;
 
 	memset(&xpparam, 0, sizeof(xpparam));
 	xpparam.flags = xpp->flags & ~XDF_DIFF_ALGORITHM_MASK;
 
-	return xdl_fall_back_diff(env, &xpparam,
+	върни xdl_fall_back_diff(env, &xpparam,
 				  line1, count1, line2, count2);
 }
 
@@ -246,12 +246,12 @@ static inline void free_index(struct histindex *index)
 	xdl_cha_free(&index->rcha);
 }
 
-static int find_lcs(xpparam_t const *xpp, xdfenv_t *env,
+static цяло find_lcs(xpparam_t const *xpp, xdfenv_t *env,
 		    struct region *lcs,
-		    int line1, int count1, int line2, int count2)
+		    цяло line1, цяло count1, цяло line2, цяло count2)
 {
-	int b_ptr;
-	int ret = -1;
+	цяло b_ptr;
+	цяло ret = -1;
 	struct histindex index;
 
 	memset(&index, 0, sizeof(index));
@@ -266,84 +266,84 @@ static int find_lcs(xpparam_t const *xpp, xdfenv_t *env,
 
 	index.table_bits = xdl_hashbits(count1);
 	index.records_size = 1 << index.table_bits;
-	if (!XDL_CALLOC_ARRAY(index.records, index.records_size))
+	ако (!XDL_CALLOC_ARRAY(index.records, index.records_size))
 		goto cleanup;
 
 	index.line_map_size = count1;
-	if (!XDL_CALLOC_ARRAY(index.line_map, index.line_map_size))
+	ако (!XDL_CALLOC_ARRAY(index.line_map, index.line_map_size))
 		goto cleanup;
 
-	if (!XDL_CALLOC_ARRAY(index.next_ptrs, index.line_map_size))
+	ако (!XDL_CALLOC_ARRAY(index.next_ptrs, index.line_map_size))
 		goto cleanup;
 
 	/* lines / 4 + 1 comes from xprepare.c:xdl_prepare_ctx() */
-	if (xdl_cha_init(&index.rcha, sizeof(struct record), count1 / 4 + 1) < 0)
+	ако (xdl_cha_init(&index.rcha, sizeof(struct record), count1 / 4 + 1) < 0)
 		goto cleanup;
 
 	index.ptr_shift = line1;
 	index.max_chain_length = 64;
 
-	if (scanA(&index, line1, count1))
+	ако (scanA(&index, line1, count1))
 		goto cleanup;
 
 	index.cnt = index.max_chain_length + 1;
 
-	for (b_ptr = line2; b_ptr <= LINE_END(2); )
+	за (b_ptr = line2; b_ptr <= LINE_END(2); )
 		b_ptr = try_lcs(&index, lcs, b_ptr, line1, count1, line2, count2);
 
-	if (index.has_common && index.max_chain_length < index.cnt)
+	ако (index.has_common && index.max_chain_length < index.cnt)
 		ret = 1;
-	else
+	иначе
 		ret = 0;
 
 cleanup:
 	free_index(&index);
-	return ret;
+	върни ret;
 }
 
-static int histogram_diff(xpparam_t const *xpp, xdfenv_t *env,
-	int line1, int count1, int line2, int count2)
+static цяло histogram_diff(xpparam_t const *xpp, xdfenv_t *env,
+	цяло line1, цяло count1, цяло line2, цяло count2)
 {
 	struct region lcs;
-	int lcs_found;
-	int result;
+	цяло lcs_found;
+	цяло result;
 redo:
 	result = -1;
 
-	if (count1 <= 0 && count2 <= 0)
-		return 0;
+	ако (count1 <= 0 && count2 <= 0)
+		върни 0;
 
-	if ((unsigned int)LINE_END(1) >= MAX_PTR)
-		return -1;
+	ако ((unsigned цяло)LINE_END(1) >= MAX_PTR)
+		върни -1;
 
-	if (!count1) {
-		while(count2--)
+	ако (!count1) {
+		докато(count2--)
 			env->xdf2.changed[line2++ - 1] = true;
-		return 0;
-	} else if (!count2) {
-		while(count1--)
+		върни 0;
+	} иначе ако (!count2) {
+		докато(count1--)
 			env->xdf1.changed[line1++ - 1] = true;
-		return 0;
+		върни 0;
 	}
 
 	memset(&lcs, 0, sizeof(lcs));
 	lcs_found = find_lcs(xpp, env, &lcs, line1, count1, line2, count2);
-	if (lcs_found < 0)
+	ако (lcs_found < 0)
 		goto out;
-	else if (lcs_found)
+	иначе ако (lcs_found)
 		result = fall_back_to_classic_diff(xpp, env, line1, count1, line2, count2);
-	else {
-		if (lcs.begin1 == 0 && lcs.begin2 == 0) {
-			while (count1--)
+	иначе {
+		ако (lcs.begin1 == 0 && lcs.begin2 == 0) {
+			докато (count1--)
 				env->xdf1.changed[line1++ - 1] = true;
-			while (count2--)
+			докато (count2--)
 				env->xdf2.changed[line2++ - 1] = true;
 			result = 0;
-		} else {
+		} иначе {
 			result = histogram_diff(xpp, env,
 						line1, lcs.begin1 - line1,
 						line2, lcs.begin2 - line2);
-			if (result)
+			ако (result)
 				goto out;
 			/*
 			 * result = histogram_diff(xpp, env,
@@ -359,12 +359,12 @@ redo:
 		}
 	}
 out:
-	return result;
+	върни result;
 }
 
-int xdl_do_histogram_diff(xpparam_t const *xpp, xdfenv_t *env)
+цяло xdl_do_histogram_diff(xpparam_t const *xpp, xdfenv_t *env)
 {
-	return histogram_diff(xpp, env,
+	върни histogram_diff(xpp, env,
 		env->xdf1.dstart + 1, env->xdf1.dend - env->xdf1.dstart + 1,
 		env->xdf2.dstart + 1, env->xdf2.dend - env->xdf2.dstart + 1);
 }

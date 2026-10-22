@@ -46,7 +46,7 @@
  * second file.
  */
 struct hashmap {
-	int nr, alloc;
+	цяло nr, alloc;
 	struct entry {
 		unsigned long hash;
 		/*
@@ -74,19 +74,19 @@ struct hashmap {
 	xpparam_t const *xpp;
 };
 
-static int is_anchor(xpparam_t const *xpp, const char *line)
+static цяло is_anchor(xpparam_t const *xpp, const char *line)
 {
 	size_t i;
-	for (i = 0; i < xpp->anchors_nr; i++) {
-		if (!strncmp(line, xpp->anchors[i], strlen(xpp->anchors[i])))
-			return 1;
+	за (i = 0; i < xpp->anchors_nr; i++) {
+		ако (!strncmp(line, xpp->anchors[i], strlen(xpp->anchors[i])))
+			върни 1;
 	}
-	return 0;
+	върни 0;
 }
 
 /* The argument "pass" is 1 for the first file, 2 for the second. */
-static void insert_record(xpparam_t const *xpp, int line, struct hashmap *map,
-			  int pass)
+static void insert_record(xpparam_t const *xpp, цяло line, struct hashmap *map,
+			  цяло pass)
 {
 	xrecord_t *records = pass == 1 ?
 		map->env->xdf1.recs : map->env->xdf2.recs;
@@ -101,30 +101,30 @@ static void insert_record(xpparam_t const *xpp, int line, struct hashmap *map,
 	 * So we multiply ha by 2 in the hope that the hashing was
 	 * "unique enough".
 	 */
-	int index = (int)((record->ha << 1) % map->alloc);
+	цяло index = (цяло)((record->ha << 1) % map->alloc);
 
-	while (map->entries[index].line1) {
-		if (map->entries[index].hash != record->ha) {
-			if (++index >= map->alloc)
+	докато (map->entries[index].line1) {
+		ако (map->entries[index].hash != record->ha) {
+			ако (++index >= map->alloc)
 				index = 0;
 			continue;
 		}
-		if (pass == 2)
+		ако (pass == 2)
 			map->has_matches = 1;
-		if (pass == 1 || map->entries[index].line2)
+		ако (pass == 1 || map->entries[index].line2)
 			map->entries[index].line2 = NON_UNIQUE;
-		else
+		иначе
 			map->entries[index].line2 = line;
-		return;
+		върни;
 	}
-	if (pass == 2)
-		return;
+	ако (pass == 2)
+		върни;
 	map->entries[index].line1 = line;
 	map->entries[index].hash = record->ha;
 	map->entries[index].anchor = is_anchor(xpp, map->env->xdf1.recs[line - 1].ptr);
-	if (!map->first)
+	ако (!map->first)
 		map->first = map->entries + index;
-	if (map->last) {
+	ако (map->last) {
 		map->last->next = map->entries + index;
 		map->entries[index].previous = map->last;
 	}
@@ -139,48 +139,48 @@ static void insert_record(xpparam_t const *xpp, int line, struct hashmap *map,
  *
  * It is assumed that env has been prepared using xdl_prepare().
  */
-static int fill_hashmap(xpparam_t const *xpp, xdfenv_t *env,
+static цяло fill_hashmap(xpparam_t const *xpp, xdfenv_t *env,
 		struct hashmap *result,
-		int line1, int count1, int line2, int count2)
+		цяло line1, цяло count1, цяло line2, цяло count2)
 {
 	result->xpp = xpp;
 	result->env = env;
 
 	/* We know exactly how large we want the hash map */
 	result->alloc = count1 * 2;
-	if (!XDL_CALLOC_ARRAY(result->entries, result->alloc))
-		return -1;
+	ако (!XDL_CALLOC_ARRAY(result->entries, result->alloc))
+		върни -1;
 
 	/* First, fill with entries from the first file */
-	while (count1--)
+	докато (count1--)
 		insert_record(xpp, line1++, result, 1);
 
 	/* Then search for matches in the second file */
-	while (count2--)
+	докато (count2--)
 		insert_record(xpp, line2++, result, 2);
 
-	return 0;
+	върни 0;
 }
 
 /*
  * Find the longest sequence with a smaller last element (meaning a smaller
  * line2, as we construct the sequence with entries ordered by line1).
  */
-static int binary_search(struct entry **sequence, int longest,
+static цяло binary_search(struct entry **sequence, цяло longest,
 		struct entry *entry)
 {
-	int left = -1, right = longest;
+	цяло left = -1, right = longest;
 
-	while (left + 1 < right) {
-		int middle = left + (right - left) / 2;
+	докато (left + 1 < right) {
+		цяло middle = left + (right - left) / 2;
 		/* by construction, no two entries can be equal */
-		if (sequence[middle]->line2 > entry->line2)
+		ако (sequence[middle]->line2 > entry->line2)
 			right = middle;
-		else
+		иначе
 			left = middle;
 	}
 	/* return the index in "sequence", _not_ the sequence length */
-	return left;
+	върни left;
 }
 
 /*
@@ -192,10 +192,10 @@ static int binary_search(struct entry **sequence, int longest,
  * item per sequence length: the sequence with the smallest last
  * element (in terms of line2).
  */
-static int find_longest_common_sequence(struct hashmap *map, struct entry **res)
+static цяло find_longest_common_sequence(struct hashmap *map, struct entry **res)
 {
 	struct entry **sequence;
-	int longest = 0, i;
+	цяло longest = 0, i;
 	struct entry *entry;
 
 	/*
@@ -203,95 +203,95 @@ static int find_longest_common_sequence(struct hashmap *map, struct entry **res)
 	 * Therefore, overriding entries before this has no effect, so
 	 * do not do that either.
 	 */
-	int anchor_i = -1;
+	цяло anchor_i = -1;
 
-	if (!XDL_ALLOC_ARRAY(sequence, map->nr))
-		return -1;
+	ако (!XDL_ALLOC_ARRAY(sequence, map->nr))
+		върни -1;
 
-	for (entry = map->first; entry; entry = entry->next) {
-		if (!entry->line2 || entry->line2 == NON_UNIQUE)
+	за (entry = map->first; entry; entry = entry->next) {
+		ако (!entry->line2 || entry->line2 == NON_UNIQUE)
 			continue;
 		i = binary_search(sequence, longest, entry);
 		entry->previous = i < 0 ? NULL : sequence[i];
 		++i;
-		if (i <= anchor_i)
+		ако (i <= anchor_i)
 			continue;
 		sequence[i] = entry;
-		if (entry->anchor) {
+		ако (entry->anchor) {
 			anchor_i = i;
 			longest = anchor_i + 1;
-		} else if (i == longest) {
+		} иначе ако (i == longest) {
 			longest++;
 		}
 	}
 
 	/* No common unique lines were found */
-	if (!longest) {
+	ако (!longest) {
 		*res = NULL;
 		xdl_free(sequence);
-		return 0;
+		върни 0;
 	}
 
 	/* Iterate starting at the last element, adjusting the "next" members */
 	entry = sequence[longest - 1];
 	entry->next = NULL;
-	while (entry->previous) {
+	докато (entry->previous) {
 		entry->previous->next = entry;
 		entry = entry->previous;
 	}
 	*res = entry;
 	xdl_free(sequence);
-	return 0;
+	върни 0;
 }
 
-static int match(struct hashmap *map, int line1, int line2)
+static цяло match(struct hashmap *map, цяло line1, цяло line2)
 {
 	xrecord_t *record1 = &map->env->xdf1.recs[line1 - 1];
 	xrecord_t *record2 = &map->env->xdf2.recs[line2 - 1];
-	return record1->ha == record2->ha;
+	върни record1->ha == record2->ha;
 }
 
-static int patience_diff(xpparam_t const *xpp, xdfenv_t *env,
-		int line1, int count1, int line2, int count2);
+static цяло patience_diff(xpparam_t const *xpp, xdfenv_t *env,
+		цяло line1, цяло count1, цяло line2, цяло count2);
 
-static int walk_common_sequence(struct hashmap *map, struct entry *first,
-		int line1, int count1, int line2, int count2)
+static цяло walk_common_sequence(struct hashmap *map, struct entry *first,
+		цяло line1, цяло count1, цяло line2, цяло count2)
 {
-	int end1 = line1 + count1, end2 = line2 + count2;
-	int next1, next2;
+	цяло end1 = line1 + count1, end2 = line2 + count2;
+	цяло next1, next2;
 
-	for (;;) {
+	за (;;) {
 		/* Try to grow the line ranges of common lines */
-		if (first) {
+		ако (first) {
 			next1 = first->line1;
 			next2 = first->line2;
-			while (next1 > line1 && next2 > line2 &&
+			докато (next1 > line1 && next2 > line2 &&
 					match(map, next1 - 1, next2 - 1)) {
 				next1--;
 				next2--;
 			}
-		} else {
+		} иначе {
 			next1 = end1;
 			next2 = end2;
 		}
-		while (line1 < next1 && line2 < next2 &&
+		докато (line1 < next1 && line2 < next2 &&
 				match(map, line1, line2)) {
 			line1++;
 			line2++;
 		}
 
 		/* Recurse */
-		if (next1 > line1 || next2 > line2) {
-			if (patience_diff(map->xpp, map->env,
+		ако (next1 > line1 || next2 > line2) {
+			ако (patience_diff(map->xpp, map->env,
 					line1, next1 - line1,
 					line2, next2 - line2))
-				return -1;
+				върни -1;
 		}
 
-		if (!first)
-			return 0;
+		ако (!first)
+			върни 0;
 
-		while (first->next &&
+		докато (first->next &&
 				first->next->line1 == first->line1 + 1 &&
 				first->next->line2 == first->line2 + 1)
 			first = first->next;
@@ -303,15 +303,15 @@ static int walk_common_sequence(struct hashmap *map, struct entry *first,
 	}
 }
 
-static int fall_back_to_classic_diff(struct hashmap *map,
-		int line1, int count1, int line2, int count2)
+static цяло fall_back_to_classic_diff(struct hashmap *map,
+		цяло line1, цяло count1, цяло line2, цяло count2)
 {
 	xpparam_t xpp;
 
 	memset(&xpp, 0, sizeof(xpp));
 	xpp.flags = map->xpp->flags & ~XDF_DIFF_ALGORITHM_MASK;
 
-	return xdl_fall_back_diff(map->env, &xpp,
+	върни xdl_fall_back_diff(map->env, &xpp,
 				  line1, count1, line2, count2);
 }
 
@@ -321,54 +321,54 @@ static int fall_back_to_classic_diff(struct hashmap *map,
  *
  * This function assumes that env was prepared with xdl_prepare_env().
  */
-static int patience_diff(xpparam_t const *xpp, xdfenv_t *env,
-		int line1, int count1, int line2, int count2)
+static цяло patience_diff(xpparam_t const *xpp, xdfenv_t *env,
+		цяло line1, цяло count1, цяло line2, цяло count2)
 {
 	struct hashmap map;
 	struct entry *first;
-	int result = 0;
+	цяло result = 0;
 
 	/* trivial case: one side is empty */
-	if (!count1) {
-		while(count2--)
+	ако (!count1) {
+		докато(count2--)
 			env->xdf2.changed[line2++ - 1] = true;
-		return 0;
-	} else if (!count2) {
-		while(count1--)
+		върни 0;
+	} иначе ако (!count2) {
+		докато(count1--)
 			env->xdf1.changed[line1++ - 1] = true;
-		return 0;
+		върни 0;
 	}
 
 	memset(&map, 0, sizeof(map));
-	if (fill_hashmap(xpp, env, &map,
+	ако (fill_hashmap(xpp, env, &map,
 			line1, count1, line2, count2))
-		return -1;
+		върни -1;
 
 	/* are there any matching lines at all? */
-	if (!map.has_matches) {
-		while(count1--)
+	ако (!map.has_matches) {
+		докато(count1--)
 			env->xdf1.changed[line1++ - 1] = true;
-		while(count2--)
+		докато(count2--)
 			env->xdf2.changed[line2++ - 1] = true;
 		xdl_free(map.entries);
-		return 0;
+		върни 0;
 	}
 
 	result = find_longest_common_sequence(&map, &first);
-	if (result)
+	ако (result)
 		goto out;
-	if (first)
+	ако (first)
 		result = walk_common_sequence(&map, first,
 			line1, count1, line2, count2);
-	else
+	иначе
 		result = fall_back_to_classic_diff(&map,
 			line1, count1, line2, count2);
  out:
 	xdl_free(map.entries);
-	return result;
+	върни result;
 }
 
-int xdl_do_patience_diff(xpparam_t const *xpp, xdfenv_t *env)
+цяло xdl_do_patience_diff(xpparam_t const *xpp, xdfenv_t *env)
 {
-	return patience_diff(xpp, env, 1, env->xdf1.nrec, 1, env->xdf2.nrec);
+	върни patience_diff(xpp, env, 1, env->xdf1.nrec, 1, env->xdf2.nrec);
 }

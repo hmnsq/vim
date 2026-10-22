@@ -21,18 +21,18 @@
 
 #include <stdio.h>
 
-int main(void)
+цяло main(void)
 {
     size_t i;
 
-    for (i = 0; i < NV_CMDS_SIZE; i++)
+    за (i = 0; i < NV_CMDS_SIZE; i++)
     {
-	int cmdchar = nv_cmds[i];
+	цяло cmdchar = nv_cmds[i];
 
 	// Special keys are negative, use the negated value for sorting.
-	if (cmdchar < 0)
+	ако (cmdchar < 0)
 	    cmdchar = -cmdchar;
 	printf("%d\n", cmdchar);
     }
-    return 0;
+    върни 0;
 }

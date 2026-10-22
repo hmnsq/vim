@@ -16,15 +16,15 @@
 #include <lualib.h>
 #include <lauxlib.h>
 
-#if __STDC_VERSION__ >= 199901L
+#ако __STDC_VERSION__ >= 199901L
 # define LUAV_INLINE inline
-#else
+#иначе
 # define LUAV_INLINE
 #endif
 
 // Only do the following when the feature is enabled.  Needed for "make
 // depend".
-#if defined(FEAT_LUA)
+#ако defined(FEAT_LUA)
 
 # define LUAVIM_CHUNKNAME "vim chunk"
 # define LUAVIM_NAME "vim"
@@ -33,7 +33,7 @@
 
 # ifdef LUA_RELEASE
 #  define LUAVIM_VERSION LUA_RELEASE
-# else
+# иначе
 #  define LUAVIM_VERSION LUA_VERSION
 # endif
 
@@ -46,11 +46,11 @@ typedef struct {
     char_u	*name;	// funcref
     dict_T	*self;	// selfdict
 } luaV_Funcref;
-typedef int (*msgfunc_T)(char *);
+typedef цяло (*msgfunc_T)(char *);
 
 typedef struct {
-    int lua_funcref;    // ref to a lua func
-    int lua_tableref;   // ref to a lua table if metatable else LUA_NOREF. used
+    цяло lua_funcref;    // ref to a lua func
+    цяло lua_tableref;   // ref to a lua table if metatable else LUA_NOREF. used
 			// for __call
     lua_State *L;
 } luaV_CFuncState;
@@ -77,26 +77,26 @@ static const char LUAVIM_UDATA_CACHE[] = "luaV_udata_cache";
     lua_pushlightuserdata((L), (void *)(s)); \
     lua_rawget((L), LUA_REGISTRYINDEX)
 # define luaV_checksandbox(L) \
-    if (sandbox) luaL_error((L), "not allowed in sandbox")
+    ако (sandbox) luaL_error((L), "not allowed in sandbox")
 # define luaV_msg(L) luaV_msgfunc((L), (msgfunc_T) msg)
 # define luaV_emsg(L) luaV_msgfunc((L), (msgfunc_T) emsg)
 # define luaV_checktypval(L, a, v, msg) \
     do { \
-	if (luaV_totypval(L, a, v) == FAIL) \
+	ако (luaV_totypval(L, a, v) == FAIL) \
 	    luaL_error(L, msg ": cannot convert value"); \
-    } while (0)
+    } докато (0)
 
 static luaV_List *luaV_pushlist(lua_State *L, list_T *lis);
 static luaV_Dict *luaV_pushdict(lua_State *L, dict_T *dic);
 static luaV_Blob *luaV_pushblob(lua_State *L, blob_T *blo);
 static luaV_Funcref *luaV_pushfuncref(lua_State *L, char_u *name);
-static int luaV_call_lua_func(int argcount, typval_T *argvars, typval_T *rettv, void *state);
+static цяло luaV_call_lua_func(цяло argcount, typval_T *argvars, typval_T *rettv, void *state);
 static void luaV_call_lua_func_free(void *state);
 
-# if LUA_VERSION_NUM <= 501
+# ако LUA_VERSION_NUM <= 501
 #  define luaV_register(L, l) luaL_register(L, NULL, l)
 #  define luaL_typeerror luaL_typerror
-# else
+# иначе
 #  define luaV_register(L, l) luaL_setfuncs(L, l, 0)
 # endif
 
@@ -107,7 +107,7 @@ static void luaV_call_lua_func_free(void *state);
 #   define symbol_from_dll GetProcAddress
 #   define close_dll FreeLibrary
 #   define load_dll_error GetWin32Error
-#  else
+#  иначе
 #   include <dlfcn.h>
 #   define HANDLE void*
 #   define load_dll(n) dlopen((n), RTLD_LAZY|RTLD_GLOBAL)
@@ -117,21 +117,21 @@ static void luaV_call_lua_func_free(void *state);
 #  endif
 
 // lauxlib
-#  if LUA_VERSION_NUM <= 501
+#  ако LUA_VERSION_NUM <= 501
 #   define luaL_register dll_luaL_register
 #   define luaL_prepbuffer dll_luaL_prepbuffer
 #   define luaL_openlib dll_luaL_openlib
 #   define luaL_typerror dll_luaL_typerror
 #   define luaL_loadfile dll_luaL_loadfile
 #   define luaL_loadbuffer dll_luaL_loadbuffer
-#  else
+#  иначе
 #   define luaL_prepbuffsize dll_luaL_prepbuffsize
 #   define luaL_setfuncs dll_luaL_setfuncs
 #   define luaL_loadfilex dll_luaL_loadfilex
 #   define luaL_loadbufferx dll_luaL_loadbufferx
 #   define luaL_argerror dll_luaL_argerror
 #  endif
-#  if LUA_VERSION_NUM >= 504
+#  ако LUA_VERSION_NUM >= 504
 #   define luaL_typeerror dll_luaL_typeerror
 #  endif
 #  define luaL_checkany dll_luaL_checkany
@@ -148,12 +148,12 @@ static void luaV_call_lua_func_free(void *state);
 #  define luaL_ref dll_luaL_ref
 #  define luaL_unref dll_luaL_unref
 // lua
-#  if LUA_VERSION_NUM <= 501
+#  ако LUA_VERSION_NUM <= 501
 #   define lua_tonumber dll_lua_tonumber
 #   define lua_tointeger dll_lua_tointeger
 #   define lua_call dll_lua_call
 #   define lua_pcall dll_lua_pcall
-#  else
+#  иначе
 #   define lua_tonumberx dll_lua_tonumberx
 #   define lua_tointegerx dll_lua_tointegerx
 #   define lua_callk dll_lua_callk
@@ -161,11 +161,11 @@ static void luaV_call_lua_func_free(void *state);
 #   define lua_getglobal dll_lua_getglobal
 #   define lua_setglobal dll_lua_setglobal
 #  endif
-#  if LUA_VERSION_NUM <= 502
+#  ако LUA_VERSION_NUM <= 502
 #   define lua_replace dll_lua_replace
 #   define lua_remove dll_lua_remove
 #  endif
-#  if LUA_VERSION_NUM >= 503
+#  ако LUA_VERSION_NUM >= 503
 #   define lua_rotate dll_lua_rotate
 #   define lua_copy dll_lua_copy
 #  endif
@@ -195,9 +195,9 @@ static void luaV_call_lua_func_free(void *state);
 #  define lua_rawgeti dll_lua_rawgeti
 #  define lua_createtable dll_lua_createtable
 #  define lua_settable dll_lua_settable
-#  if LUA_VERSION_NUM >= 504
+#  ако LUA_VERSION_NUM >= 504
 #   define lua_newuserdatauv dll_lua_newuserdatauv
-#  else
+#  иначе
 #   define lua_newuserdata dll_lua_newuserdata
 #  endif
 #  define lua_getmetatable dll_lua_getmetatable
@@ -215,129 +215,129 @@ static void luaV_call_lua_func_free(void *state);
 #  define luaopen_os dll_luaopen_os
 #  define luaopen_package dll_luaopen_package
 #  define luaopen_debug dll_luaopen_debug
-#  if LUA_VERSION_NUM >= 505
+#  ако LUA_VERSION_NUM >= 505
 #   define luaL_openselectedlibs dll_luaL_openselectedlibs
-#  else
+#  иначе
 #   define luaL_openlibs dll_luaL_openlibs
 #  endif
 
 // lauxlib
-#  if LUA_VERSION_NUM <= 501
+#  ако LUA_VERSION_NUM <= 501
 void (*dll_luaL_register) (lua_State *L, const char *libname, const luaL_Reg *l);
 char *(*dll_luaL_prepbuffer) (luaL_Buffer *B);
-void (*dll_luaL_openlib) (lua_State *L, const char *libname, const luaL_Reg *l, int nup);
-int (*dll_luaL_typerror) (lua_State *L, int narg, const char *tname);
-int (*dll_luaL_loadfile) (lua_State *L, const char *filename);
-int (*dll_luaL_loadbuffer) (lua_State *L, const char *buff, size_t sz, const char *name);
-#  else
+void (*dll_luaL_openlib) (lua_State *L, const char *libname, const luaL_Reg *l, цяло nup);
+цяло (*dll_luaL_typerror) (lua_State *L, цяло narg, const char *tname);
+цяло (*dll_luaL_loadfile) (lua_State *L, const char *filename);
+цяло (*dll_luaL_loadbuffer) (lua_State *L, const char *buff, size_t sz, const char *name);
+#  иначе
 char *(*dll_luaL_prepbuffsize) (luaL_Buffer *B, size_t sz);
-void (*dll_luaL_setfuncs) (lua_State *L, const luaL_Reg *l, int nup);
-int (*dll_luaL_loadfilex) (lua_State *L, const char *filename, const char *mode);
-int (*dll_luaL_loadbufferx) (lua_State *L, const char *buff, size_t sz, const char *name, const char *mode);
-int (*dll_luaL_argerror) (lua_State *L, int numarg, const char *extramsg);
+void (*dll_luaL_setfuncs) (lua_State *L, const luaL_Reg *l, цяло nup);
+цяло (*dll_luaL_loadfilex) (lua_State *L, const char *filename, const char *mode);
+цяло (*dll_luaL_loadbufferx) (lua_State *L, const char *buff, size_t sz, const char *name, const char *mode);
+цяло (*dll_luaL_argerror) (lua_State *L, цяло numarg, const char *extramsg);
 #  endif
-#  if LUA_VERSION_NUM >= 504
-int (*dll_luaL_typeerror) (lua_State *L, int narg, const char *tname);
+#  ако LUA_VERSION_NUM >= 504
+цяло (*dll_luaL_typeerror) (lua_State *L, цяло narg, const char *tname);
 #  endif
-void (*dll_luaL_checkany) (lua_State *L, int narg);
-const char *(*dll_luaL_checklstring) (lua_State *L, int numArg, size_t *l);
-lua_Integer (*dll_luaL_checkinteger) (lua_State *L, int numArg);
-lua_Integer (*dll_luaL_optinteger) (lua_State *L, int nArg, lua_Integer def);
-void (*dll_luaL_checktype) (lua_State *L, int narg, int t);
-int (*dll_luaL_error) (lua_State *L, const char *fmt, ...);
+void (*dll_luaL_checkany) (lua_State *L, цяло narg);
+const char *(*dll_luaL_checklstring) (lua_State *L, цяло numArg, size_t *l);
+lua_Integer (*dll_luaL_checkinteger) (lua_State *L, цяло numArg);
+lua_Integer (*dll_luaL_optinteger) (lua_State *L, цяло nArg, lua_Integer def);
+void (*dll_luaL_checktype) (lua_State *L, цяло narg, цяло t);
+цяло (*dll_luaL_error) (lua_State *L, const char *fmt, ...);
 lua_State *(*dll_luaL_newstate) (void);
 void (*dll_luaL_buffinit) (lua_State *L, luaL_Buffer *B);
 void (*dll_luaL_addlstring) (luaL_Buffer *B, const char *s, size_t l);
 void (*dll_luaL_pushresult) (luaL_Buffer *B);
-int (*dll_luaL_loadstring) (lua_State *L, const char *s);
-int (*dll_luaL_ref) (lua_State *L, int idx);
-#  if LUA_VERSION_NUM <= 502
-void (*dll_luaL_unref) (lua_State *L, int idx, int n);
-#  else
-void (*dll_luaL_unref) (lua_State *L, int idx, lua_Integer n);
+цяло (*dll_luaL_loadstring) (lua_State *L, const char *s);
+цяло (*dll_luaL_ref) (lua_State *L, цяло idx);
+#  ако LUA_VERSION_NUM <= 502
+void (*dll_luaL_unref) (lua_State *L, цяло idx, цяло n);
+#  иначе
+void (*dll_luaL_unref) (lua_State *L, цяло idx, lua_Integer n);
 #  endif
 // lua
-#  if LUA_VERSION_NUM <= 501
-lua_Number (*dll_lua_tonumber) (lua_State *L, int idx);
-lua_Integer (*dll_lua_tointeger) (lua_State *L, int idx);
-void (*dll_lua_call) (lua_State *L, int nargs, int nresults);
-int (*dll_lua_pcall) (lua_State *L, int nargs, int nresults, int errfunc);
-#  else
-lua_Number (*dll_lua_tonumberx) (lua_State *L, int idx, int *isnum);
-lua_Integer (*dll_lua_tointegerx) (lua_State *L, int idx, int *isnum);
-void (*dll_lua_callk) (lua_State *L, int nargs, int nresults, int ctx,
+#  ако LUA_VERSION_NUM <= 501
+lua_Number (*dll_lua_tonumber) (lua_State *L, цяло idx);
+lua_Integer (*dll_lua_tointeger) (lua_State *L, цяло idx);
+void (*dll_lua_call) (lua_State *L, цяло nargs, цяло nresults);
+цяло (*dll_lua_pcall) (lua_State *L, цяло nargs, цяло nresults, цяло errfunc);
+#  иначе
+lua_Number (*dll_lua_tonumberx) (lua_State *L, цяло idx, цяло *isnum);
+lua_Integer (*dll_lua_tointegerx) (lua_State *L, цяло idx, цяло *isnum);
+void (*dll_lua_callk) (lua_State *L, цяло nargs, цяло nresults, цяло ctx,
 	lua_CFunction k);
-int (*dll_lua_pcallk) (lua_State *L, int nargs, int nresults, int errfunc,
-	int ctx, lua_CFunction k);
+цяло (*dll_lua_pcallk) (lua_State *L, цяло nargs, цяло nresults, цяло errfunc,
+	цяло ctx, lua_CFunction k);
 void (*dll_lua_getglobal) (lua_State *L, const char *var);
 void (*dll_lua_setglobal) (lua_State *L, const char *var);
 #  endif
-#  if LUA_VERSION_NUM <= 502
-void (*dll_lua_replace) (lua_State *L, int idx);
-void (*dll_lua_remove) (lua_State *L, int idx);
+#  ако LUA_VERSION_NUM <= 502
+void (*dll_lua_replace) (lua_State *L, цяло idx);
+void (*dll_lua_remove) (lua_State *L, цяло idx);
 #  endif
-#  if LUA_VERSION_NUM >= 503
-void  (*dll_lua_rotate) (lua_State *L, int idx, int n);
-void (*dll_lua_copy) (lua_State *L, int fromidx, int toidx);
+#  ако LUA_VERSION_NUM >= 503
+void  (*dll_lua_rotate) (lua_State *L, цяло idx, цяло n);
+void (*dll_lua_copy) (lua_State *L, цяло fromidx, цяло toidx);
 #  endif
-const char *(*dll_lua_typename) (lua_State *L, int tp);
+const char *(*dll_lua_typename) (lua_State *L, цяло tp);
 void       (*dll_lua_close) (lua_State *L);
-int (*dll_lua_gettop) (lua_State *L);
-void (*dll_lua_settop) (lua_State *L, int idx);
-void (*dll_lua_pushvalue) (lua_State *L, int idx);
-int (*dll_lua_isnumber) (lua_State *L, int idx);
-int (*dll_lua_isstring) (lua_State *L, int idx);
-int (*dll_lua_type) (lua_State *L, int idx);
-int (*dll_lua_rawequal) (lua_State *L, int idx1, int idx2);
-int (*dll_lua_toboolean) (lua_State *L, int idx);
-const char *(*dll_lua_tolstring) (lua_State *L, int idx, size_t *len);
-void *(*dll_lua_touserdata) (lua_State *L, int idx);
+цяло (*dll_lua_gettop) (lua_State *L);
+void (*dll_lua_settop) (lua_State *L, цяло idx);
+void (*dll_lua_pushvalue) (lua_State *L, цяло idx);
+цяло (*dll_lua_isnumber) (lua_State *L, цяло idx);
+цяло (*dll_lua_isstring) (lua_State *L, цяло idx);
+цяло (*dll_lua_type) (lua_State *L, цяло idx);
+цяло (*dll_lua_rawequal) (lua_State *L, цяло idx1, цяло idx2);
+цяло (*dll_lua_toboolean) (lua_State *L, цяло idx);
+const char *(*dll_lua_tolstring) (lua_State *L, цяло idx, size_t *len);
+void *(*dll_lua_touserdata) (lua_State *L, цяло idx);
 void (*dll_lua_pushnil) (lua_State *L);
 void (*dll_lua_pushnumber) (lua_State *L, lua_Number n);
 void (*dll_lua_pushinteger) (lua_State *L, lua_Integer n);
 void (*dll_lua_pushlstring) (lua_State *L, const char *s, size_t l);
 void (*dll_lua_pushstring) (lua_State *L, const char *s);
 const char *(*dll_lua_pushfstring) (lua_State *L, const char *fmt, ...);
-void (*dll_lua_pushcclosure) (lua_State *L, lua_CFunction fn, int n);
-void (*dll_lua_pushboolean) (lua_State *L, int b);
+void (*dll_lua_pushcclosure) (lua_State *L, lua_CFunction fn, цяло n);
+void (*dll_lua_pushboolean) (lua_State *L, цяло b);
 void (*dll_lua_pushlightuserdata) (lua_State *L, void *p);
-void (*dll_lua_getfield) (lua_State *L, int idx, const char *k);
-#  if LUA_VERSION_NUM <= 502
-void (*dll_lua_rawget) (lua_State *L, int idx);
-void (*dll_lua_rawgeti) (lua_State *L, int idx, int n);
-#  else
-int (*dll_lua_rawget) (lua_State *L, int idx);
-int (*dll_lua_rawgeti) (lua_State *L, int idx, lua_Integer n);
+void (*dll_lua_getfield) (lua_State *L, цяло idx, const char *k);
+#  ако LUA_VERSION_NUM <= 502
+void (*dll_lua_rawget) (lua_State *L, цяло idx);
+void (*dll_lua_rawgeti) (lua_State *L, цяло idx, цяло n);
+#  иначе
+цяло (*dll_lua_rawget) (lua_State *L, цяло idx);
+цяло (*dll_lua_rawgeti) (lua_State *L, цяло idx, lua_Integer n);
 #  endif
-void (*dll_lua_createtable) (lua_State *L, int narr, int nrec);
-void (*dll_lua_settable) (lua_State *L, int idx);
-#  if LUA_VERSION_NUM >= 504
-void *(*dll_lua_newuserdatauv) (lua_State *L, size_t sz, int nuvalue);
-#  else
+void (*dll_lua_createtable) (lua_State *L, цяло narr, цяло nrec);
+void (*dll_lua_settable) (lua_State *L, цяло idx);
+#  ако LUA_VERSION_NUM >= 504
+void *(*dll_lua_newuserdatauv) (lua_State *L, size_t sz, цяло nuvalue);
+#  иначе
 void *(*dll_lua_newuserdata) (lua_State *L, size_t sz);
 #  endif
-int (*dll_lua_getmetatable) (lua_State *L, int objindex);
-void (*dll_lua_setfield) (lua_State *L, int idx, const char *k);
-void (*dll_lua_rawset) (lua_State *L, int idx);
-#  if LUA_VERSION_NUM <= 502
-void (*dll_lua_rawseti) (lua_State *L, int idx, int n);
-#  else
-void (*dll_lua_rawseti) (lua_State *L, int idx, lua_Integer n);
+цяло (*dll_lua_getmetatable) (lua_State *L, цяло objindex);
+void (*dll_lua_setfield) (lua_State *L, цяло idx, const char *k);
+void (*dll_lua_rawset) (lua_State *L, цяло idx);
+#  ако LUA_VERSION_NUM <= 502
+void (*dll_lua_rawseti) (lua_State *L, цяло idx, цяло n);
+#  иначе
+void (*dll_lua_rawseti) (lua_State *L, цяло idx, lua_Integer n);
 #  endif
-int (*dll_lua_setmetatable) (lua_State *L, int objindex);
-int (*dll_lua_next) (lua_State *L, int idx);
+цяло (*dll_lua_setmetatable) (lua_State *L, цяло objindex);
+цяло (*dll_lua_next) (lua_State *L, цяло idx);
 // libs
-int (*dll_luaopen_base) (lua_State *L);
-int (*dll_luaopen_table) (lua_State *L);
-int (*dll_luaopen_string) (lua_State *L);
-int (*dll_luaopen_math) (lua_State *L);
-int (*dll_luaopen_io) (lua_State *L);
-int (*dll_luaopen_os) (lua_State *L);
-int (*dll_luaopen_package) (lua_State *L);
-int (*dll_luaopen_debug) (lua_State *L);
-#  if LUA_VERSION_NUM >= 505
-void (*dll_luaL_openselectedlibs) (lua_State *L, int load, int preload);
-#  else
+цяло (*dll_luaopen_base) (lua_State *L);
+цяло (*dll_luaopen_table) (lua_State *L);
+цяло (*dll_luaopen_string) (lua_State *L);
+цяло (*dll_luaopen_math) (lua_State *L);
+цяло (*dll_luaopen_io) (lua_State *L);
+цяло (*dll_luaopen_os) (lua_State *L);
+цяло (*dll_luaopen_package) (lua_State *L);
+цяло (*dll_luaopen_debug) (lua_State *L);
+#  ако LUA_VERSION_NUM >= 505
+void (*dll_luaL_openselectedlibs) (lua_State *L, цяло load, цяло preload);
+#  иначе
 void (*dll_luaL_openlibs) (lua_State *L);
 #  endif
 
@@ -349,21 +349,21 @@ typedef struct {
 
 static const luaV_Reg luaV_dll[] = {
     // lauxlib
-#  if LUA_VERSION_NUM <= 501
+#  ако LUA_VERSION_NUM <= 501
     {"luaL_register", (luaV_function) &dll_luaL_register},
     {"luaL_prepbuffer", (luaV_function) &dll_luaL_prepbuffer},
     {"luaL_openlib", (luaV_function) &dll_luaL_openlib},
     {"luaL_typerror", (luaV_function) &dll_luaL_typerror},
     {"luaL_loadfile", (luaV_function) &dll_luaL_loadfile},
     {"luaL_loadbuffer", (luaV_function) &dll_luaL_loadbuffer},
-#  else
+#  иначе
     {"luaL_prepbuffsize", (luaV_function) &dll_luaL_prepbuffsize},
     {"luaL_setfuncs", (luaV_function) &dll_luaL_setfuncs},
     {"luaL_loadfilex", (luaV_function) &dll_luaL_loadfilex},
     {"luaL_loadbufferx", (luaV_function) &dll_luaL_loadbufferx},
     {"luaL_argerror", (luaV_function) &dll_luaL_argerror},
 #  endif
-#  if LUA_VERSION_NUM >= 504
+#  ако LUA_VERSION_NUM >= 504
     {"luaL_typeerror", (luaV_function) &dll_luaL_typeerror},
 #  endif
     {"luaL_checkany", (luaV_function) &dll_luaL_checkany},
@@ -380,12 +380,12 @@ static const luaV_Reg luaV_dll[] = {
     {"luaL_ref", (luaV_function) &dll_luaL_ref},
     {"luaL_unref", (luaV_function) &dll_luaL_unref},
     // lua
-#  if LUA_VERSION_NUM <= 501
+#  ако LUA_VERSION_NUM <= 501
     {"lua_tonumber", (luaV_function) &dll_lua_tonumber},
     {"lua_tointeger", (luaV_function) &dll_lua_tointeger},
     {"lua_call", (luaV_function) &dll_lua_call},
     {"lua_pcall", (luaV_function) &dll_lua_pcall},
-#  else
+#  иначе
     {"lua_tonumberx", (luaV_function) &dll_lua_tonumberx},
     {"lua_tointegerx", (luaV_function) &dll_lua_tointegerx},
     {"lua_callk", (luaV_function) &dll_lua_callk},
@@ -393,11 +393,11 @@ static const luaV_Reg luaV_dll[] = {
     {"lua_getglobal", (luaV_function) &dll_lua_getglobal},
     {"lua_setglobal", (luaV_function) &dll_lua_setglobal},
 #  endif
-#  if LUA_VERSION_NUM <= 502
+#  ако LUA_VERSION_NUM <= 502
     {"lua_replace", (luaV_function) &dll_lua_replace},
     {"lua_remove", (luaV_function) &dll_lua_remove},
 #  endif
-#  if LUA_VERSION_NUM >= 503
+#  ако LUA_VERSION_NUM >= 503
     {"lua_rotate", (luaV_function) &dll_lua_rotate},
     {"lua_copy", (luaV_function) &dll_lua_copy},
 #  endif
@@ -427,9 +427,9 @@ static const luaV_Reg luaV_dll[] = {
     {"lua_rawgeti", (luaV_function) &dll_lua_rawgeti},
     {"lua_createtable", (luaV_function) &dll_lua_createtable},
     {"lua_settable", (luaV_function) &dll_lua_settable},
-#  if LUA_VERSION_NUM >= 504
+#  ако LUA_VERSION_NUM >= 504
     {"lua_newuserdatauv", (luaV_function) &dll_lua_newuserdatauv},
-#  else
+#  иначе
     {"lua_newuserdata", (luaV_function) &dll_lua_newuserdata},
 #  endif
     {"lua_getmetatable", (luaV_function) &dll_lua_getmetatable},
@@ -447,9 +447,9 @@ static const luaV_Reg luaV_dll[] = {
     {"luaopen_os", (luaV_function) &dll_luaopen_os},
     {"luaopen_package", (luaV_function) &dll_luaopen_package},
     {"luaopen_debug", (luaV_function) &dll_luaopen_debug},
-#  if LUA_VERSION_NUM >= 505
+#  ако LUA_VERSION_NUM >= 505
     {"luaL_openselectedlibs", (luaV_function) &dll_luaL_openselectedlibs},
-#  else
+#  иначе
     {"luaL_openlibs", (luaV_function) &dll_luaL_openlibs},
 #  endif
     {NULL, NULL}
@@ -457,48 +457,48 @@ static const luaV_Reg luaV_dll[] = {
 
 static HANDLE hinstLua = NULL;
 
-    static int
-lua_link_init(char *libname, int verbose)
+    static цяло
+lua_link_init(char *libname, цяло verbose)
 {
     const luaV_Reg *reg;
-    if (hinstLua) return OK;
+    ако (hinstLua) върни OK;
     hinstLua = load_dll(libname);
-    if (!hinstLua)
+    ако (!hinstLua)
     {
-	if (verbose)
+	ако (verbose)
 	    semsg(_(e_could_not_load_library_str_str), libname, load_dll_error());
-	return FAIL;
+	върни FAIL;
     }
-    for (reg = luaV_dll; reg->func; reg++)
+    за (reg = luaV_dll; reg->func; reg++)
     {
-	if ((*reg->func = symbol_from_dll(hinstLua, reg->name)) == NULL)
+	ако ((*reg->func = symbol_from_dll(hinstLua, reg->name)) == NULL)
 	{
 	    close_dll(hinstLua);
 	    hinstLua = 0;
-	    if (verbose)
+	    ако (verbose)
 		semsg(_(e_could_not_load_library_function_str), reg->name);
-	    return FAIL;
+	    върни FAIL;
 	}
     }
-    return OK;
+    върни OK;
 }
 # endif // DYNAMIC_LUA
 
-# if defined(DYNAMIC_LUA)
-    int
-lua_enabled(int verbose)
+# ако defined(DYNAMIC_LUA)
+    цяло
+lua_enabled(цяло verbose)
 {
-    return lua_link_init((char *)p_luadll, verbose) == OK;
+    върни lua_link_init((char *)p_luadll, verbose) == OK;
 }
 # endif
 
-# if LUA_VERSION_NUM > 501 && LUA_VERSION_NUM < 504
-    static int
-luaL_typeerror(lua_State *L, int narg, const char *tname)
+# ако LUA_VERSION_NUM > 501 && LUA_VERSION_NUM < 504
+    static цяло
+luaL_typeerror(lua_State *L, цяло narg, const char *tname)
 {
     const char *msg = lua_pushfstring(L, "%s expected, got %s",
 	    tname, luaL_typename(L, narg));
-    return luaL_argerror(L, narg, msg);
+    върни luaL_argerror(L, narg, msg);
 }
 # endif
 
@@ -535,34 +535,34 @@ luaV_newmetatable(lua_State *L, const char *tname)
 }
 
     static void *
-luaV_toudata(lua_State *L, int ud, const char *tname)
+luaV_toudata(lua_State *L, цяло ud, const char *tname)
 {
     void *p = lua_touserdata(L, ud);
 
-    if (p == NULL)
-	return NULL;
+    ако (p == NULL)
+	върни NULL;
 
     // value is userdata
-    if (lua_getmetatable(L, ud)) // does it have a metatable?
+    ако (lua_getmetatable(L, ud)) // does it have a metatable?
     {
 	luaV_getfield(L, tname); // get metatable
-	if (lua_rawequal(L, -1, -2)) // MTs match?
+	ако (lua_rawequal(L, -1, -2)) // MTs match?
 	{
 	    lua_pop(L, 2); // MTs
-	    return p;
+	    върни p;
 	}
     }
 
-    return NULL;
+    върни NULL;
 }
 
     static void *
 luaV_checkcache(lua_State *L, void *p)
 {
     luaV_getudata(L, p);
-    if (lua_isnil(L, -1)) luaL_error(L, "invalid object");
+    ако (lua_isnil(L, -1)) luaL_error(L, "invalid object");
     lua_pop(L, 1);
-    return p;
+    върни p;
 }
 
 # define luaV_unbox(L,luatyp,ud) (*((luatyp *) lua_touserdata((L),(ud))))
@@ -571,20 +571,20 @@ luaV_checkcache(lua_State *L, void *p)
     luaV_checkcache((L), (void *) luaV_unbox((L),luatyp,(ud)))
 
     static void *
-luaV_checkudata(lua_State *L, int ud, const char *tname)
+luaV_checkudata(lua_State *L, цяло ud, const char *tname)
 {
     void *p = luaV_toudata(L, ud, tname);
-    if (p == NULL) luaL_typeerror(L, ud, tname);
-    return p;
+    ако (p == NULL) luaL_typeerror(L, ud, tname);
+    върни p;
 }
 
     static void
 luaV_pushtypval(lua_State *L, typval_T *tv)
 {
-    if (tv == NULL)
+    ако (tv == NULL)
     {
 	lua_pushnil(L);
-	return;
+	върни;
     }
     switch (tv->v_type)
     {
@@ -593,7 +593,7 @@ luaV_pushtypval(lua_State *L, typval_T *tv)
 					    ? "" : (char *)tv->vval.v_string);
 	    break;
 	case VAR_NUMBER:
-	    lua_pushinteger(L, (int) tv->vval.v_number);
+	    lua_pushinteger(L, (цяло) tv->vval.v_number);
 	    break;
 	case VAR_FLOAT:
 	    lua_pushnumber(L, (lua_Number) tv->vval.v_float);
@@ -606,9 +606,9 @@ luaV_pushtypval(lua_State *L, typval_T *tv)
 	    break;
 	case VAR_BOOL:
 	case VAR_SPECIAL:
-	    if (tv->vval.v_number <= VVAL_TRUE)
-		lua_pushboolean(L, (int) tv->vval.v_number);
-	    else
+	    ако (tv->vval.v_number <= VVAL_TRUE)
+		lua_pushboolean(L, (цяло) tv->vval.v_number);
+	    иначе
 		lua_pushnil(L);
 	    break;
 	case VAR_FUNC:
@@ -631,10 +631,10 @@ luaV_pushtypval(lua_State *L, typval_T *tv)
  * Converts lua value at 'pos' to typval 'tv'.
  * Returns OK or FAIL.
  */
-    static int
-luaV_totypval(lua_State *L, int pos, typval_T *tv)
+    static цяло
+luaV_totypval(lua_State *L, цяло pos, typval_T *tv)
 {
-    int status = OK;
+    цяло status = OK;
 
     tv->v_lock = 0;
 
@@ -656,13 +656,13 @@ luaV_totypval(lua_State *L, int pos, typval_T *tv)
 	{
 	    const lua_Number n = lua_tonumber(L, pos);
 
-	    if (n > (lua_Number)INT64_MAX || n < (lua_Number)INT64_MIN
+	    ако (n > (lua_Number)INT64_MAX || n < (lua_Number)INT64_MIN
 		    || ((lua_Number)((varnumber_T)n)) != n)
 	    {
 		tv->v_type = VAR_FLOAT;
 		tv->vval.v_float = (float_T)n;
 	    }
-	    else
+	    иначе
 	    {
 		tv->v_type = VAR_NUMBER;
 		tv->vval.v_number = (varnumber_T)n;
@@ -687,17 +687,17 @@ luaV_totypval(lua_State *L, int pos, typval_T *tv)
 	}
 	case LUA_TTABLE:
 	{
-	    int lua_tableref;
+	    цяло lua_tableref;
 
 	    lua_pushvalue(L, pos);
 	    lua_tableref = luaL_ref(L, LUA_REGISTRYINDEX);
-	    if (lua_getmetatable(L, pos))
+	    ако (lua_getmetatable(L, pos))
 	    {
 		lua_getfield(L, -1, LUA___CALL);
-		if (lua_isfunction(L, -1))
+		ако (lua_isfunction(L, -1))
 		{
 		    char_u *name;
-		    int lua_funcref = luaL_ref(L, LUA_REGISTRYINDEX);
+		    цяло lua_funcref = luaL_ref(L, LUA_REGISTRYINDEX);
 		    luaV_CFuncState *state = ALLOC_CLEAR_ONE(luaV_CFuncState);
 
 		    state->lua_funcref = lua_funcref;
@@ -719,11 +719,11 @@ luaV_totypval(lua_State *L, int pos, typval_T *tv)
 	{
 	    void *p = lua_touserdata(L, pos);
 
-	    if (lua_getmetatable(L, pos)) // has metatable?
+	    ако (lua_getmetatable(L, pos)) // has metatable?
 	    {
 		// check list
 		luaV_getfield(L, LUAVIM_LIST);
-		if (lua_rawequal(L, -1, -2))
+		ако (lua_rawequal(L, -1, -2))
 		{
 		    tv->v_type = VAR_LIST;
 		    tv->vval.v_list = *((luaV_List *) p);
@@ -733,7 +733,7 @@ luaV_totypval(lua_State *L, int pos, typval_T *tv)
 		}
 		// check dict
 		luaV_getfield(L, LUAVIM_DICT);
-		if (lua_rawequal(L, -1, -3))
+		ако (lua_rawequal(L, -1, -3))
 		{
 		    tv->v_type = VAR_DICT;
 		    tv->vval.v_dict = *((luaV_Dict *) p);
@@ -743,7 +743,7 @@ luaV_totypval(lua_State *L, int pos, typval_T *tv)
 		}
 		// check blob
 		luaV_getfield(L, LUAVIM_BLOB);
-		if (lua_rawequal(L, -1, -4))
+		ако (lua_rawequal(L, -1, -4))
 		{
 		    tv->v_type = VAR_BLOB;
 		    tv->vval.v_blob = *((luaV_Blob *) p);
@@ -753,7 +753,7 @@ luaV_totypval(lua_State *L, int pos, typval_T *tv)
 		}
 		// check funcref
 		luaV_getfield(L, LUAVIM_FUNCREF);
-		if (lua_rawequal(L, -1, -5))
+		ако (lua_rawequal(L, -1, -5))
 		{
 		    luaV_Funcref *f = (luaV_Funcref *) p;
 
@@ -772,7 +772,7 @@ luaV_totypval(lua_State *L, int pos, typval_T *tv)
 	    tv->vval.v_number = 0;
 	    status = FAIL;
     }
-    return status;
+    върни status;
 }
 
 /*
@@ -780,15 +780,15 @@ luaV_totypval(lua_State *L, int pos, typval_T *tv)
  * \n with \0 otherwise
  */
     static void
-luaV_addlstring(luaL_Buffer *b, const char *s, size_t l, int toline)
+luaV_addlstring(luaL_Buffer *b, const char *s, size_t l, цяло toline)
 {
-    while (l--)
+    докато (l--)
     {
-	if (*s == '\0' && toline)
+	ако (*s == '\0' && toline)
 	    luaL_addchar(b, '\n');
-	else if (*s == '\n' && !toline)
+	иначе ако (*s == '\n' && !toline)
 	    luaL_addchar(b, '\0');
-	else
+	иначе
 	    luaL_addchar(b, *s);
 	s++;
     }
@@ -805,7 +805,7 @@ luaV_pushline(lua_State *L, buf_T *buf, linenr_T n)
 }
 
     static char_u *
-luaV_toline(lua_State *L, int pos)
+luaV_toline(lua_State *L, цяло pos)
 {
     size_t l;
     const char *s = lua_tolstring(L, pos, &l);
@@ -814,7 +814,7 @@ luaV_toline(lua_State *L, int pos)
     luaL_buffinit(L, &b);
     luaV_addlstring(&b, s, l, 1);
     luaL_pushresult(&b);
-    return (char_u *) lua_tostring(L, -1);
+    върни (char_u *) lua_tostring(L, -1);
 }
 
 /*
@@ -832,9 +832,9 @@ luaV_msgfunc(lua_State *L, msgfunc_T mf)
     luaL_pushresult(&b);
     // break string
     p = s = lua_tolstring(L, -1, &l);
-    while (l--)
+    докато (l--)
     {
-	if (*p++ == '\0') // break?
+	ако (*p++ == '\0') // break?
 	{
 	    mf((char *)s);
 	    s = p;
@@ -853,7 +853,7 @@ luaV_msgfunc(lua_State *L, msgfunc_T mf)
 	luaV_setudata(L, obj); /* cache[obj] = udata */ \
 	luaV_getfield(L, luatname); \
 	lua_setmetatable(L, -2); \
-	return o; \
+	върни o; \
     }
 
 # define luaV_pushtype(typ,tname,luatyp) \
@@ -861,28 +861,28 @@ luaV_msgfunc(lua_State *L, msgfunc_T mf)
     luaV_push##tname(lua_State *L, typ *obj) \
     { \
 	luatyp *o = NULL; \
-	if (obj == NULL) \
+	ако (obj == NULL) \
 	    lua_pushnil(L); \
-	else \
+	иначе \
 	{ \
 	    luaV_getudata(L, obj); \
-	    if (lua_isnil(L, -1)) /* not interned? */ \
+	    ако (lua_isnil(L, -1)) /* not interned? */ \
 	    { \
 		lua_pop(L, 1); \
 		o = luaV_new##tname(L, obj); \
 	    } \
-	    else \
+	    иначе \
 		o = (luatyp *) lua_touserdata(L, -1); \
 	} \
-	return o; \
+	върни o; \
     }
 
 # define luaV_type_tostring(tname,luatname) \
-	static int \
+	static цяло \
     luaV_##tname##_tostring(lua_State *L) \
     { \
 	lua_pushfstring(L, "%s: %p", luatname, lua_touserdata(L, 1)); \
-	return 1; \
+	върни 1; \
     }
 
 // =======   List type   =======
@@ -896,45 +896,45 @@ luaV_newlist(lua_State *L, list_T *lis)
     luaV_setudata(L, lis); // cache[lis] = udata
     luaV_getfield(L, LUAVIM_LIST);
     lua_setmetatable(L, -2);
-    return l;
+    върни l;
 }
 
 luaV_pushtype(list_T, list, luaV_List)
 luaV_type_tostring(list, LUAVIM_LIST)
 
-    static int
+    static цяло
 luaV_list_len(lua_State *L)
 {
     list_T *l = luaV_unbox(L, luaV_List, 1);
-    lua_pushinteger(L, (int) list_len(l));
-    return 1;
+    lua_pushinteger(L, (цяло) list_len(l));
+    върни 1;
 }
 
-    static int
+    static цяло
 luaV_list_iter(lua_State *L)
 {
     listitem_T *li = (listitem_T *) lua_touserdata(L, lua_upvalueindex(1));
-    if (li == NULL) return 0;
+    ако (li == NULL) върни 0;
     luaV_pushtypval(L, &li->li_tv);
     lua_pushlightuserdata(L, (void *) li->li_next);
     lua_replace(L, lua_upvalueindex(1));
-    return 1;
+    върни 1;
 }
 
-    static int
+    static цяло
 luaV_list_call(lua_State *L)
 {
     list_T *l = luaV_unbox(L, luaV_List, 1);
     lua_pushlightuserdata(L, (void *) l->lv_first);
     lua_pushcclosure(L, luaV_list_iter, 1);
-    return 1;
+    върни 1;
 }
 
-    static int
+    static цяло
 luaV_list_index(lua_State *L)
 {
     list_T *l = luaV_unbox(L, luaV_List, 1);
-    if (lua_isnumber(L, 2)) // list item?
+    ако (lua_isnumber(L, 2)) // list item?
     {
 	long n = (long) luaL_checkinteger(L, 2);
 	listitem_T *li;
@@ -943,29 +943,29 @@ luaV_list_index(lua_State *L)
 	// normalize.
 	n -= 1;
 	li = list_find(l, n);
-	if (li == NULL)
+	ако (li == NULL)
 	    lua_pushnil(L);
-	else
+	иначе
 	    luaV_pushtypval(L, &li->li_tv);
     }
-    else if (lua_isstring(L, 2)) // method?
+    иначе ако (lua_isstring(L, 2)) // method?
     {
 	const char *s = lua_tostring(L, 2);
-	if (strncmp(s, "add", 3) == 0
+	ако (strncmp(s, "add", 3) == 0
 		|| strncmp(s, "insert", 6) == 0)
 	{
 	    lua_getmetatable(L, 1);
 	    lua_getfield(L, -1, s);
 	}
-	else
+	иначе
 	    lua_pushnil(L);
     }
-    else
+    иначе
 	lua_pushnil(L);
-    return 1;
+    върни 1;
 }
 
-    static int
+    static цяло
 luaV_list_newindex(lua_State *L)
 {
     list_T *l = luaV_unbox(L, luaV_List, 1);
@@ -975,28 +975,28 @@ luaV_list_newindex(lua_State *L)
     // Lua array index starts with 1 while Vim uses 0, subtract 1 to normalize.
     n -= 1;
 
-    if (l->lv_lock)
+    ако (l->lv_lock)
 	luaL_error(L, "list is locked");
     li = list_find(l, n);
-    if (li == NULL)
+    ако (li == NULL)
     {
-	if (!lua_isnil(L, 3))
+	ако (!lua_isnil(L, 3))
 	{
 	    typval_T v;
 	    luaV_checktypval(L, 3, &v, "inserting list item");
-	    if (list_insert_tv(l, &v, li) == FAIL)
+	    ако (list_insert_tv(l, &v, li) == FAIL)
 		luaL_error(L, "failed to add item to list");
 	    clear_tv(&v);
 	}
     }
-    else
+    иначе
     {
-	if (lua_isnil(L, 3)) // remove?
+	ако (lua_isnil(L, 3)) // remove?
 	{
 	    vimlist_remove(l, li, li);
 	    listitem_free(l, li);
 	}
-	else
+	иначе
 	{
 	    typval_T v;
 	    luaV_checktypval(L, 3, &v, "setting list item");
@@ -1004,27 +1004,27 @@ luaV_list_newindex(lua_State *L)
 	    li->li_tv = v;
 	}
     }
-    return 0;
+    върни 0;
 }
 
-    static int
+    static цяло
 luaV_list_add(lua_State *L)
 {
     luaV_List *lis = luaV_checkudata(L, 1, LUAVIM_LIST);
     list_T *l = (list_T *) luaV_checkcache(L, (void *) *lis);
     typval_T v;
-    if (l->lv_lock)
+    ако (l->lv_lock)
 	luaL_error(L, "list is locked");
     lua_settop(L, 2);
     luaV_checktypval(L, 2, &v, "adding list item");
-    if (list_append_tv(l, &v) == FAIL)
+    ако (list_append_tv(l, &v) == FAIL)
 	luaL_error(L, "failed to add item to list");
     clear_tv(&v);
     lua_settop(L, 1);
-    return 1;
+    върни 1;
 }
 
-    static int
+    static цяло
 luaV_list_insert(lua_State *L)
 {
     luaV_List *lis = luaV_checkudata(L, 1, LUAVIM_LIST);
@@ -1032,21 +1032,21 @@ luaV_list_insert(lua_State *L)
     long pos = (long) luaL_optinteger(L, 3, 0);
     listitem_T *li = NULL;
     typval_T v;
-    if (l->lv_lock)
+    ако (l->lv_lock)
 	luaL_error(L, "list is locked");
-    if (pos < l->lv_len)
+    ако (pos < l->lv_len)
     {
 	li = list_find(l, pos);
-	if (li == NULL)
+	ако (li == NULL)
 	    luaL_error(L, "invalid position");
     }
     lua_settop(L, 2);
     luaV_checktypval(L, 2, &v, "inserting list item");
-    if (list_insert_tv(l, &v, li) == FAIL)
+    ако (list_insert_tv(l, &v, li) == FAIL)
 	luaL_error(L, "failed to add item to list");
     clear_tv(&v);
     lua_settop(L, 1);
-    return 1;
+    върни 1;
 }
 
 static const luaL_Reg luaV_List_mt[] = {
@@ -1072,29 +1072,29 @@ luaV_newdict(lua_State *L, dict_T *dic)
     luaV_setudata(L, dic); // cache[dic] = udata
     luaV_getfield(L, LUAVIM_DICT);
     lua_setmetatable(L, -2);
-    return d;
+    върни d;
 }
 
 luaV_pushtype(dict_T, dict, luaV_Dict)
 luaV_type_tostring(dict, LUAVIM_DICT)
 
-    static int
+    static цяло
 luaV_dict_len(lua_State *L)
 {
     dict_T *d = luaV_unbox(L, luaV_Dict, 1);
-    lua_pushinteger(L, (int) dict_len(d));
-    return 1;
+    lua_pushinteger(L, (цяло) dict_len(d));
+    върни 1;
 }
 
-    static int
+    static цяло
 luaV_dict_iter(lua_State *L UNUSED)
 {
 # ifdef FEAT_EVAL
     hashitem_T *hi = (hashitem_T *) lua_touserdata(L, lua_upvalueindex(1));
-    int n = lua_tointeger(L, lua_upvalueindex(2));
+    цяло n = lua_tointeger(L, lua_upvalueindex(2));
     dictitem_T *di;
-    if (n <= 0) return 0;
-    while (HASHITEM_EMPTY(hi)) hi++;
+    ако (n <= 0) върни 0;
+    докато (HASHITEM_EMPTY(hi)) hi++;
     di = dict_lookup(hi);
     lua_pushstring(L, (char *) hi->hi_key);
     luaV_pushtypval(L, &di->di_tv);
@@ -1102,13 +1102,13 @@ luaV_dict_iter(lua_State *L UNUSED)
     lua_replace(L, lua_upvalueindex(1));
     lua_pushinteger(L, n - 1);
     lua_replace(L, lua_upvalueindex(2));
-    return 2;
-# else
-    return 0;
+    върни 2;
+# иначе
+    върни 0;
 # endif
 }
 
-    static int
+    static цяло
 luaV_dict_call(lua_State *L)
 {
     dict_T *d = luaV_unbox(L, luaV_Dict, 1);
@@ -1116,34 +1116,34 @@ luaV_dict_call(lua_State *L)
     lua_pushlightuserdata(L, (void *) ht->ht_array);
     lua_pushinteger(L, ht->ht_used); // # remaining items
     lua_pushcclosure(L, luaV_dict_iter, 2);
-    return 1;
+    върни 1;
 }
 
-    static int
+    static цяло
 luaV_dict_index(lua_State *L)
 {
     dict_T *d = luaV_unbox(L, luaV_Dict, 1);
     char_u *key = (char_u *) luaL_checkstring(L, 2);
     dictitem_T *di = dict_find(d, key, -1);
 
-    if (di == NULL)
+    ако (di == NULL)
     {
 	lua_pushnil(L);
-	return 1;
+	върни 1;
     }
 
     luaV_pushtypval(L, &di->di_tv);
-    if (di->di_tv.v_type == VAR_FUNC) // funcref?
+    ако (di->di_tv.v_type == VAR_FUNC) // funcref?
     {
 	luaV_Funcref *f = (luaV_Funcref *) lua_touserdata(L, -1);
 	f->self = d; // keep "self" reference
 	d->dv_refcount++;
     }
 
-    return 1;
+    върни 1;
 }
 
-    static int
+    static цяло
 luaV_dict_newindex(lua_State *L)
 {
     dict_T *d = luaV_unbox(L, luaV_Dict, 1);
@@ -1151,50 +1151,50 @@ luaV_dict_newindex(lua_State *L)
     dictitem_T *di;
     typval_T tv;
 
-    if (d->dv_lock)
+    ако (d->dv_lock)
 	luaL_error(L, "dict is locked");
-    if (key == NULL)
-	return 0;
-    if (*key == NUL)
+    ако (key == NULL)
+	върни 0;
+    ако (*key == NUL)
 	luaL_error(L, "empty key");
-    if (!lua_isnil(L, 3)) // read value?
+    ако (!lua_isnil(L, 3)) // read value?
     {
 	luaV_checktypval(L, 3, &tv, "setting dict item");
-	if (d->dv_scope == VAR_DEF_SCOPE && tv.v_type == VAR_FUNC)
+	ако (d->dv_scope == VAR_DEF_SCOPE && tv.v_type == VAR_FUNC)
 	{
 	    clear_tv(&tv);
 	    luaL_error(L, "cannot assign funcref to builtin scope");
 	}
     }
     di = dict_find(d, key, -1);
-    if (di == NULL) // non-existing key?
+    ако (di == NULL) // non-existing key?
     {
-	if (lua_isnil(L, 3))
-	    return 0;
+	ако (lua_isnil(L, 3))
+	    върни 0;
 	di = dictitem_alloc(key);
-	if (di == NULL)
+	ако (di == NULL)
 	{
 	    clear_tv(&tv);
-	    return 0;
+	    върни 0;
 	}
-	if (dict_add(d, di) == FAIL)
+	ако (dict_add(d, di) == FAIL)
 	{
 	    vim_free(di);
 	    clear_tv(&tv);
-	    return 0;
+	    върни 0;
 	}
     }
-    else
+    иначе
 	clear_tv(&di->di_tv);
-    if (lua_isnil(L, 3)) // remove?
+    ако (lua_isnil(L, 3)) // remove?
     {
 	hashitem_T *hi = hash_find(&d->dv_hashtab, di->di_key);
 	hash_remove(&d->dv_hashtab, hi, "Lua new index");
 	dictitem_free(di);
     }
-    else
+    иначе
 	di->di_tv = tv;
-    return 0;
+    върни 0;
 }
 
 static const luaL_Reg luaV_Dict_mt[] = {
@@ -1218,109 +1218,109 @@ luaV_newblob(lua_State *L, blob_T *blo)
     luaV_setudata(L, blo); // cache[blo] = udata
     luaV_getfield(L, LUAVIM_BLOB);
     lua_setmetatable(L, -2);
-    return b;
+    върни b;
 }
 
 luaV_pushtype(blob_T, blob, luaV_Blob)
 luaV_type_tostring(blob, LUAVIM_BLOB)
 
-    static int
+    static цяло
 luaV_blob_gc(lua_State *L)
 {
     blob_T *b = luaV_unbox(L, luaV_Blob, 1);
     blob_unref(b);
-    return 0;
+    върни 0;
 }
 
-    static int
+    static цяло
 luaV_blob_len(lua_State *L)
 {
     blob_T *b = luaV_unbox(L, luaV_Blob, 1);
-    lua_pushinteger(L, (int) blob_len(b));
-    return 1;
+    lua_pushinteger(L, (цяло) blob_len(b));
+    върни 1;
 }
 
-    static int
+    static цяло
 luaV_blob_index(lua_State *L)
 {
     blob_T *b = luaV_unbox(L, luaV_Blob, 1);
-    if (lua_isnumber(L, 2))
+    ако (lua_isnumber(L, 2))
     {
-	int idx = luaL_checkinteger(L, 2);
-	if (idx < 0)
+	цяло idx = luaL_checkinteger(L, 2);
+	ако (idx < 0)
 	    // Negative index is relative to the end.
-	    idx += (int) blob_len(b);
-	if (idx >= 0 && idx < blob_len(b))
+	    idx += (цяло) blob_len(b);
+	ако (idx >= 0 && idx < blob_len(b))
 	    lua_pushnumber(L, (lua_Number) blob_get(b, idx));
-	else
+	иначе
 	    lua_pushnil(L);
     }
-    else if (lua_isstring(L, 2))
+    иначе ако (lua_isstring(L, 2))
     {
 	const char *s = lua_tostring(L, 2);
-	if (strncmp(s, "add", 3) == 0)
+	ако (strncmp(s, "add", 3) == 0)
 	{
 	    lua_getmetatable(L, 1);
 	    lua_getfield(L, -1, s);
 	}
-	else
+	иначе
 	    lua_pushnil(L);
     }
-    else
+    иначе
 	lua_pushnil(L);
-    return 1;
+    върни 1;
 }
 
-    static int
+    static цяло
 luaV_blob_newindex(lua_State *L)
 {
     blob_T *b = luaV_unbox(L, luaV_Blob, 1);
-    if (b->bv_lock)
+    ако (b->bv_lock)
 	luaL_error(L, "blob is locked");
 
-    if (!lua_isnumber(L, 2))
-	return 0;
+    ако (!lua_isnumber(L, 2))
+	върни 0;
 
     long len = blob_len(b);
-    int idx = luaL_checkinteger(L, 2);
-    int val = luaL_checkinteger(L, 3);
-    if (idx < 0)
+    цяло idx = luaL_checkinteger(L, 2);
+    цяло val = luaL_checkinteger(L, 3);
+    ако (idx < 0)
 	// Negative index is relative to the end.
-	idx += (int) len;
-    if ((idx >= 0 && idx < len)
+	idx += (цяло) len;
+    ако ((idx >= 0 && idx < len)
 	    || (idx == len && ga_grow(&b->bv_ga, 1) == OK))
     {
 	blob_set(b, idx, (char_u) val);
-	if (idx == len)
+	ако (idx == len)
 	    ++b->bv_ga.ga_len;
     }
-    else
+    иначе
 	luaL_error(L, "index out of range");
 
-    return 0;
+    върни 0;
 }
 
-    static int
+    static цяло
 luaV_blob_add(lua_State *L)
 {
     luaV_Blob *blo = luaV_checkudata(L, 1, LUAVIM_BLOB);
     blob_T *b = (blob_T *) luaV_checkcache(L, (void *) *blo);
-    if (b->bv_lock)
+    ако (b->bv_lock)
 	luaL_error(L, "blob is locked");
     lua_settop(L, 2);
-    if (!lua_isstring(L, 2))
+    ако (!lua_isstring(L, 2))
 	luaL_error(L, "string expected, got %s", luaL_typename(L, 2));
-    else
+    иначе
     {
 	size_t i, l = 0;
 	const char *s = lua_tolstring(L, 2, &l);
 
-	if (ga_grow(&b->bv_ga, (int)l) == OK)
-	    for (i = 0; i < l; ++i)
+	ако (ga_grow(&b->bv_ga, (цяло)l) == OK)
+	    за (i = 0; i < l; ++i)
 		ga_append(&b->bv_ga, s[i]);
     }
     lua_settop(L, 1);
-    return 1;
+    върни 1;
 }
 
 static const luaL_Reg luaV_Blob_mt[] = {
@@ -1341,7 +1341,7 @@ luaV_newfuncref(lua_State *L, char_u *name)
 {
     luaV_Funcref *f = (luaV_Funcref *)lua_newuserdata(L, sizeof(luaV_Funcref));
 
-    if (name != NULL)
+    ако (name != NULL)
     {
 	func_ref(name);
 	f->name = vim_strsave(name);
@@ -1349,19 +1349,19 @@ luaV_newfuncref(lua_State *L, char_u *name)
     f->self = NULL;
     luaV_getfield(L, LUAVIM_FUNCREF);
     lua_setmetatable(L, -2);
-    return f;
+    върни f;
 }
 
     static luaV_Funcref *
 luaV_pushfuncref(lua_State *L, char_u *name)
 {
-    return luaV_newfuncref(L, name);
+    върни luaV_newfuncref(L, name);
 }
 
 
 luaV_type_tostring(funcref, LUAVIM_FUNCREF)
 
-    static int
+    static цяло
 luaV_funcref_gc(lua_State *L)
 {
     luaV_Funcref *f = (luaV_Funcref *) lua_touserdata(L, 1);
@@ -1370,50 +1370,50 @@ luaV_funcref_gc(lua_State *L)
     vim_free(f->name);
     // NOTE: Don't call "dict_unref(f->self)", because the dict of "f->self"
     // will be (or has been already) freed by Vim's garbage collection.
-    return 0;
+    върни 0;
 }
 
 // equivalent to string(funcref)
-    static int
+    static цяло
 luaV_funcref_len(lua_State *L)
 {
     luaV_Funcref *f = (luaV_Funcref *) lua_touserdata(L, 1);
 
     lua_pushstring(L, (const char *) f->name);
-    return 1;
+    върни 1;
 }
 
-    static int
+    static цяло
 luaV_funcref_call(lua_State *L)
 {
     luaV_Funcref *f = (luaV_Funcref *) lua_touserdata(L, 1);
-    int i, n = lua_gettop(L) - 1; // #args
-    int status = FAIL;
+    цяло i, n = lua_gettop(L) - 1; // #args
+    цяло status = FAIL;
     typval_T args;
     typval_T rettv;
 
     args.v_type = VAR_LIST;
     args.vval.v_list = list_alloc();
     rettv.v_type = VAR_UNKNOWN; // as in clear_tv
-    if (args.vval.v_list != NULL)
+    ако (args.vval.v_list != NULL)
     {
 	typval_T v;
 
-	for (i = 0; i < n; i++)
+	за (i = 0; i < n; i++)
 	{
 	    luaV_checktypval(L, i + 2, &v, "calling funcref");
 	    list_append_tv(args.vval.v_list, &v);
 	    clear_tv(&v);
 	}
 	status = func_call(f->name, &args, NULL, f->self, &rettv);
-	if (status == OK)
+	ако (status == OK)
 	    luaV_pushtypval(L, &rettv);
 	clear_tv(&args);
 	clear_tv(&rettv);
     }
-    if (status != OK)
+    ако (status != OK)
 	luaL_error(L, "cannot call funcref");
-    return 1;
+    върни 1;
 }
 
 static const luaL_Reg luaV_Funcref_mt[] = {
@@ -1431,43 +1431,43 @@ luaV_newtype(buf_T, buffer, luaV_Buffer, LUAVIM_BUFFER)
 luaV_pushtype(buf_T, buffer, luaV_Buffer)
 luaV_type_tostring(buffer, LUAVIM_BUFFER)
 
-    static int
+    static цяло
 luaV_buffer_len(lua_State *L)
 {
     buf_T *b = (buf_T *) luaV_checkvalid(L, luaV_Buffer, 1);
     lua_pushinteger(L, b->b_ml.ml_line_count);
-    return 1;
+    върни 1;
 }
 
-    static int
+    static цяло
 luaV_buffer_call(lua_State *L)
 {
     buf_T *b = (buf_T *) luaV_checkvalid(L, luaV_Buffer, 1);
     lua_settop(L, 1);
     set_curbuf(b, DOBUF_SPLIT);
-    return 1;
+    върни 1;
 }
 
-    static int
+    static цяло
 luaV_buffer_index(lua_State *L)
 {
     buf_T *b = (buf_T *) luaV_checkvalid(L, luaV_Buffer, 1);
     linenr_T n = (linenr_T) lua_tointeger(L, 2);
-    if (n > 0 && n <= b->b_ml.ml_line_count)
+    ако (n > 0 && n <= b->b_ml.ml_line_count)
 	luaV_pushline(L, b, n);
-    else if (lua_isstring(L, 2))
+    иначе ако (lua_isstring(L, 2))
     {
 	const char *s = lua_tostring(L, 2);
-	if (strncmp(s, "name", 4) == 0)
+	ако (strncmp(s, "name", 4) == 0)
 	    lua_pushstring(L, (b->b_sfname == NULL)
 					? "" : (char *) b->b_sfname);
-	else if (strncmp(s, "fname", 5) == 0)
+	иначе ако (strncmp(s, "fname", 5) == 0)
 	    lua_pushstring(L, (b->b_ffname == NULL)
 					? "" : (char *) b->b_ffname);
-	else if (strncmp(s, "number", 6) == 0)
+	иначе ако (strncmp(s, "number", 6) == 0)
 	    lua_pushinteger(L, b->b_fnum);
 	// methods
-	else if (strncmp(s,   "insert", 6) == 0
+	иначе ако (strncmp(s,   "insert", 6) == 0
 		|| strncmp(s, "next", 4) == 0
 		|| strncmp(s, "previous", 8) == 0
 		|| strncmp(s, "isvalid", 7) == 0)
@@ -1475,15 +1475,15 @@ luaV_buffer_index(lua_State *L)
 	    lua_getmetatable(L, 1);
 	    lua_getfield(L, -1, s);
 	}
-	else
+	иначе
 	    lua_pushnil(L);
     }
-    else
+    иначе
 	lua_pushnil(L);
-    return 1;
+    върни 1;
 }
 
-    static int
+    static цяло
 luaV_buffer_newindex(lua_State *L)
 {
     buf_T *b = (buf_T *) luaV_checkvalid(L, luaV_Buffer, 1);
@@ -1491,35 +1491,35 @@ luaV_buffer_newindex(lua_State *L)
 # ifdef HAVE_SANDBOX
     luaV_checksandbox(L);
 # endif
-    if (n < 1 || n > b->b_ml.ml_line_count)
+    ако (n < 1 || n > b->b_ml.ml_line_count)
 	luaL_error(L, "invalid line number");
-    if (lua_isnil(L, 3)) // delete line
+    ако (lua_isnil(L, 3)) // delete line
     {
 	buf_T *buf = curbuf;
 	curbuf = b;
-	if (u_savedel(n, 1L) == FAIL)
+	ако (u_savedel(n, 1L) == FAIL)
 	{
 	    curbuf = buf;
 	    luaL_error(L, "cannot save undo information");
 	}
-	else if (ml_delete(n) == FAIL)
+	иначе ако (ml_delete(n) == FAIL)
 	{
 	    curbuf = buf;
 	    luaL_error(L, "cannot delete line");
 	}
-	else
+	иначе
 	{
 	    deleted_lines_mark(n, 1L);
-	    if (b == curwin->w_buffer) // fix cursor in current window?
+	    ако (b == curwin->w_buffer) // fix cursor in current window?
 	    {
-		if (curwin->w_cursor.lnum >= n)
+		ако (curwin->w_cursor.lnum >= n)
 		{
-		    if (curwin->w_cursor.lnum > n)
+		    ако (curwin->w_cursor.lnum > n)
 		    {
 			curwin->w_cursor.lnum -= 1;
 			check_cursor_col();
 		    }
-		    else
+		    иначе
 			check_cursor();
 		    changed_cline_bef_curs();
 		}
@@ -1528,32 +1528,32 @@ luaV_buffer_newindex(lua_State *L)
 	}
 	curbuf = buf;
     }
-    else if (lua_isstring(L, 3)) // update line
+    иначе ако (lua_isstring(L, 3)) // update line
     {
 	buf_T *buf = curbuf;
 	curbuf = b;
-	if (u_savesub(n) == FAIL)
+	ако (u_savesub(n) == FAIL)
 	{
 	    curbuf = buf;
 	    luaL_error(L, "cannot save undo information");
 	}
-	else if (ml_replace(n, luaV_toline(L, 3), TRUE) == FAIL)
+	иначе ако (ml_replace(n, luaV_toline(L, 3), TRUE) == FAIL)
 	{
 	    curbuf = buf;
 	    luaL_error(L, "cannot replace line");
 	}
-	else
+	иначе
 	    changed_bytes(n, 0);
 	curbuf = buf;
-	if (b == curwin->w_buffer)
+	ако (b == curwin->w_buffer)
 	    check_cursor_col();
     }
-    else
+    иначе
 	luaL_error(L, "wrong argument to change line");
-    return 0;
+    върни 0;
 }
 
-    static int
+    static цяло
 luaV_buffer_insert(lua_State *L)
 {
     luaV_Buffer *lb = luaV_checkudata(L, 1, LUAVIM_BUFFER);
@@ -1566,53 +1566,53 @@ luaV_buffer_insert(lua_State *L)
     luaV_checksandbox(L);
 # endif
     // fix insertion line
-    if (n < 0) n = 0;
-    if (n > last) n = last;
+    ако (n < 0) n = 0;
+    ако (n > last) n = last;
     // insert
     buf = curbuf;
     curbuf = b;
-    if (u_save(n, n + 1) == FAIL)
+    ако (u_save(n, n + 1) == FAIL)
     {
 	curbuf = buf;
 	luaL_error(L, "cannot save undo information");
     }
-    else if (ml_append(n, luaV_toline(L, 2), 0, FALSE) == FAIL)
+    иначе ако (ml_append(n, luaV_toline(L, 2), 0, FALSE) == FAIL)
     {
 	curbuf = buf;
 	luaL_error(L, "cannot insert line");
     }
-    else
+    иначе
 	appended_lines_mark(n, 1L);
     curbuf = buf;
     update_screen(UPD_VALID);
-    return 0;
+    върни 0;
 }
 
-    static int
+    static цяло
 luaV_buffer_next(lua_State *L)
 {
     luaV_Buffer *b = luaV_checkudata(L, 1, LUAVIM_BUFFER);
     buf_T *buf = (buf_T *) luaV_checkcache(L, (void *) *b);
     luaV_pushbuffer(L, buf->b_next);
-    return 1;
+    върни 1;
 }
 
-    static int
+    static цяло
 luaV_buffer_previous(lua_State *L)
 {
     luaV_Buffer *b = luaV_checkudata(L, 1, LUAVIM_BUFFER);
     buf_T *buf = (buf_T *) luaV_checkcache(L, (void *) *b);
     luaV_pushbuffer(L, buf->b_prev);
-    return 1;
+    върни 1;
 }
 
-    static int
+    static цяло
 luaV_buffer_isvalid(lua_State *L)
 {
     luaV_Buffer *b = luaV_checkudata(L, 1, LUAVIM_BUFFER);
     luaV_getudata(L, *b);
     lua_pushboolean(L, !lua_isnil(L, -1));
-    return 1;
+    върни 1;
 }
 
 static const luaL_Reg luaV_Buffer_mt[] = {
@@ -1635,60 +1635,60 @@ luaV_newtype(win_T, window, luaV_Window, LUAVIM_WINDOW)
 luaV_pushtype(win_T, window, luaV_Window)
 luaV_type_tostring(window, LUAVIM_WINDOW)
 
-    static int
+    static цяло
 luaV_window_call(lua_State *L)
 {
     win_T *w = (win_T *) luaV_checkvalid(L, luaV_Window, 1);
     lua_settop(L, 1);
     win_goto(w);
-    return 1;
+    върни 1;
 }
 
-    static int
+    static цяло
 luaV_window_index(lua_State *L)
 {
     win_T *w = (win_T *) luaV_checkvalid(L, luaV_Window, 1);
     const char *s = luaL_checkstring(L, 2);
-    if (strncmp(s, "buffer", 6) == 0)
+    ако (strncmp(s, "buffer", 6) == 0)
 	luaV_pushbuffer(L, w->w_buffer);
-    else if (strncmp(s, "line", 4) == 0)
+    иначе ако (strncmp(s, "line", 4) == 0)
 	lua_pushinteger(L, w->w_cursor.lnum);
-    else if (strncmp(s, "col", 3) == 0)
+    иначе ако (strncmp(s, "col", 3) == 0)
 	lua_pushinteger(L, w->w_cursor.col + 1);
-    else if (strncmp(s, "width", 5) == 0)
+    иначе ако (strncmp(s, "width", 5) == 0)
 	lua_pushinteger(L, w->w_width);
-    else if (strncmp(s, "height", 6) == 0)
+    иначе ако (strncmp(s, "height", 6) == 0)
 	lua_pushinteger(L, w->w_height);
     // methods
-    else if (strncmp(s,   "next", 4) == 0
+    иначе ако (strncmp(s,   "next", 4) == 0
 	    || strncmp(s, "previous", 8) == 0
 	    || strncmp(s, "isvalid", 7) == 0)
     {
 	lua_getmetatable(L, 1);
 	lua_getfield(L, -1, s);
     }
-    else
+    иначе
 	lua_pushnil(L);
-    return 1;
+    върни 1;
 }
 
-    static int
+    static цяло
 luaV_window_newindex(lua_State *L)
 {
     win_T *w = (win_T *) luaV_checkvalid(L, luaV_Window, 1);
     const char *s = luaL_checkstring(L, 2);
-    int v = luaL_checkinteger(L, 3);
-    if (strncmp(s, "line", 4) == 0)
+    цяло v = luaL_checkinteger(L, 3);
+    ако (strncmp(s, "line", 4) == 0)
     {
 # ifdef HAVE_SANDBOX
 	luaV_checksandbox(L);
 # endif
-	if (v < 1 || v > w->w_buffer->b_ml.ml_line_count)
+	ако (v < 1 || v > w->w_buffer->b_ml.ml_line_count)
 	    luaL_error(L, "line out of range");
 	w->w_cursor.lnum = v;
 	update_screen(UPD_VALID);
     }
-    else if (strncmp(s, "col", 3) == 0)
+    иначе ако (strncmp(s, "col", 3) == 0)
     {
 # ifdef HAVE_SANDBOX
 	luaV_checksandbox(L);
@@ -1697,7 +1697,7 @@ luaV_window_newindex(lua_State *L)
 	w->w_set_curswant = true;
 	update_screen(UPD_VALID);
     }
-    else if (strncmp(s, "width", 5) == 0)
+    иначе ако (strncmp(s, "width", 5) == 0)
     {
 	win_T *win = curwin;
 # ifdef FEAT_GUI
@@ -1707,7 +1707,7 @@ luaV_window_newindex(lua_State *L)
 	win_setwidth(v);
 	curwin = win;
     }
-    else if (strncmp(s, "height", 6) == 0)
+    иначе ако (strncmp(s, "height", 6) == 0)
     {
 	win_T *win = curwin;
 # ifdef FEAT_GUI
@@ -1717,36 +1717,36 @@ luaV_window_newindex(lua_State *L)
 	win_setheight(v);
 	curwin = win;
     }
-    else
+    иначе
 	luaL_error(L, "invalid window property: `%s'", s);
-    return 0;
+    върни 0;
 }
 
-    static int
+    static цяло
 luaV_window_next(lua_State *L)
 {
     luaV_Window *w = luaV_checkudata(L, 1, LUAVIM_WINDOW);
     win_T *win = (win_T *) luaV_checkcache(L, (void *) *w);
     luaV_pushwindow(L, win->w_next);
-    return 1;
+    върни 1;
 }
 
-    static int
+    static цяло
 luaV_window_previous(lua_State *L)
 {
     luaV_Window *w = luaV_checkudata(L, 1, LUAVIM_WINDOW);
     win_T *win = (win_T *) luaV_checkcache(L, (void *) *w);
     luaV_pushwindow(L, win->w_prev);
-    return 1;
+    върни 1;
 }
 
-    static int
+    static цяло
 luaV_window_isvalid(lua_State *L)
 {
     luaV_Window *w = luaV_checkudata(L, 1, LUAVIM_WINDOW);
     luaV_getudata(L, *w);
     lua_pushboolean(L, !lua_isnil(L, -1));
-    return 1;
+    върни 1;
 }
 
 static const luaL_Reg luaV_Window_mt[] = {
@@ -1763,49 +1763,49 @@ static const luaL_Reg luaV_Window_mt[] = {
 
 // =======   Vim module   =======
 
-    static int
+    static цяло
 luaV_print(lua_State *L)
 {
-    int		i, n = lua_gettop(L); // nargs
+    цяло		i, n = lua_gettop(L); // nargs
     const char	*s;
     size_t	l;
     garray_T	msg_ga;
 
     ga_init2(&msg_ga, 1, 128);
     lua_getglobal(L, "tostring");
-    for (i = 1; i <= n; i++)
+    за (i = 1; i <= n; i++)
     {
 	lua_pushvalue(L, -1); // tostring
 	lua_pushvalue(L, i); // arg
 	lua_call(L, 1, 1);
 	s = lua_tolstring(L, -1, &l);
-	if (s == NULL)
-	    return luaL_error(L, "cannot convert to string");
-	if (i > 1)
+	ако (s == NULL)
+	    върни luaL_error(L, "cannot convert to string");
+	ако (i > 1)
 	    ga_append(&msg_ga, ' '); // use space instead of tab
 	ga_concat_len(&msg_ga, (char_u *)s, l);
 	lua_pop(L, 1);
     }
     // Replace any "\n" with "\0"
-    for (i = 0; i < msg_ga.ga_len; i++)
-	if (((char *)msg_ga.ga_data)[i] == '\n')
+    за (i = 0; i < msg_ga.ga_len; i++)
+	ако (((char *)msg_ga.ga_data)[i] == '\n')
 	    ((char *)msg_ga.ga_data)[i] = '\0';
     lua_pushlstring(L, msg_ga.ga_data, msg_ga.ga_len);
-    if (!got_int)
+    ако (!got_int)
 	luaV_msg(L);
 
     ga_clear(&msg_ga);
-    return 0;
+    върни 0;
 }
 
-    static int
+    static цяло
 luaV_debug(lua_State *L)
 {
     lua_settop(L, 0);
     lua_getglobal(L, "vim");
     lua_getfield(L, -1, "eval");
     lua_remove(L, -2); // vim.eval at position 1
-    for (;;)
+    за (;;)
     {
 	const char *input;
 	size_t l;
@@ -1813,10 +1813,10 @@ luaV_debug(lua_State *L)
 	lua_pushliteral(L, "input('lua_debug> ')");
 	lua_call(L, 1, 1); // return string
 	input = lua_tolstring(L, -1, &l);
-	if (l == 0 || strcmp(input, "cont") == 0)
-	    return 0;
+	ако (l == 0 || strcmp(input, "cont") == 0)
+	    върни 0;
 	msg_putchar('\n'); // avoid outputting on input line
-	if (luaL_loadbuffer(L, input, l, "=(debug command)")
+	ако (luaL_loadbuffer(L, input, l, "=(debug command)")
 		|| lua_pcall(L, 0, 0, 0))
 	    luaV_emsg(L);
 	lua_settop(L, 1); // remove eventual returns, but keep vim.eval
@@ -1829,105 +1829,105 @@ luaV_get_var_scope(lua_State *L)
     const char	*scope = luaL_checkstring(L, 1);
     dict_T	*dict = NULL;
 
-    if (STRICMP((char *)scope, "g") == 0)
+    ако (STRICMP((char *)scope, "g") == 0)
 	dict = get_globvar_dict();
-    else if (STRICMP((char *)scope, "v") == 0)
+    иначе ако (STRICMP((char *)scope, "v") == 0)
 	dict = get_vimvar_dict();
-    else if (STRICMP((char *)scope, "b") == 0)
+    иначе ако (STRICMP((char *)scope, "b") == 0)
 	dict = curbuf->b_vars;
-    else if (STRICMP((char *)scope, "w") == 0)
+    иначе ако (STRICMP((char *)scope, "w") == 0)
 	dict = curwin->w_vars;
-    else if (STRICMP((char *)scope, "t") == 0)
+    иначе ако (STRICMP((char *)scope, "t") == 0)
 	dict = curtab->tp_vars;
-    else
+    иначе
     {
 	luaL_error(L, "invalid scope %s", scope);
-	return NULL;
+	върни NULL;
     }
 
-    return dict;
+    върни dict;
 }
 
-    static int
+    static цяло
 luaV_setvar(lua_State *L)
 {
     dict_T	*dict;
     dictitem_T	*di;
     size_t	len;
     char	*name;
-    int		del;
+    цяло		del;
     char	*error = NULL;
 
     name = (char *)luaL_checklstring(L, 3, &len);
     del = (lua_gettop(L) < 4) || lua_isnil(L, 4);
 
     dict = luaV_get_var_scope(L);
-    if (dict == NULL)
-	return 0;
+    ако (dict == NULL)
+	върни 0;
 
-    di = dict_find(dict, (char_u *)name, (int)len);
-    if (di != NULL)
+    di = dict_find(dict, (char_u *)name, (цяло)len);
+    ако (di != NULL)
     {
-	if (di->di_flags & DI_FLAGS_RO)
+	ако (di->di_flags & DI_FLAGS_RO)
 	    error = "variable is read-only";
-	else if (di->di_flags & DI_FLAGS_LOCK)
+	иначе ако (di->di_flags & DI_FLAGS_LOCK)
 	    error = "variable is locked";
-	else if (del && di->di_flags & DI_FLAGS_FIX)
+	иначе ако (del && di->di_flags & DI_FLAGS_FIX)
 	    error = "variable is fixed";
-	if (error != NULL)
-	    return luaL_error(L, error);
+	ако (error != NULL)
+	    върни luaL_error(L, error);
     }
-    else if (dict->dv_lock)
-	return luaL_error(L, "Dictionary is locked");
+    иначе ако (dict->dv_lock)
+	върни luaL_error(L, "Dictionary is locked");
 
-    if (del)
+    ако (del)
     {
 	// Delete the key
-	if (di == NULL)
+	ако (di == NULL)
 	    // Doesn't exist, nothing to do
-	    return 0;
+	    върни 0;
 	// Delete the entry
 	dictitem_remove(dict, di, "Lua delete variable");
     }
-    else
+    иначе
     {
 	// Update the key
 	typval_T	tv;
 
 	// Convert the lua value to a Vim script type in the temporary variable
 	lua_pushvalue(L, 4);
-	if (luaV_totypval(L, -1, &tv) == FAIL)
-	    return luaL_error(L, "Couldn't convert lua value");
+	ако (luaV_totypval(L, -1, &tv) == FAIL)
+	    върни luaL_error(L, "Couldn't convert lua value");
 
-	if (di == NULL)
+	ако (di == NULL)
 	{
 	    // Need to create an entry
 	    di = dictitem_alloc((char_u *)name);
-	    if (di == NULL)
+	    ако (di == NULL)
 	    {
 		clear_tv(&tv);
-		return 0;
+		върни 0;
 	    }
 	    // Update the value
 	    copy_tv(&tv, &di->di_tv);
-	    if (dict_add(dict, di) == FAIL)
+	    ако (dict_add(dict, di) == FAIL)
 	    {
 		dictitem_free(di);
 		clear_tv(&tv);
-		return luaL_error(L, "Couldn't add to dictionary");
+		върни luaL_error(L, "Couldn't add to dictionary");
 	    }
 	}
-	else
+	иначе
 	{
-	    int type_error = FALSE;
-	    if (dict == get_vimvar_dict()
+	    цяло type_error = FALSE;
+	    ако (dict == get_vimvar_dict()
 	       && !before_set_vvar((char_u *)name, di, &tv, TRUE, &type_error))
 	    {
 		clear_tv(&tv);
-		if (type_error)
-		    return luaL_error(L,
+		ако (type_error)
+		    върни luaL_error(L,
 				"Setting v:%s to value with wrong type", name);
-		return 0;
+		върни 0;
 	    }
 	    // Clear the old value
 	    clear_tv(&di->di_tv);
@@ -1939,25 +1939,25 @@ luaV_setvar(lua_State *L)
 	clear_tv(&tv);
     }
 
-    return 0;
+    върни 0;
 }
 
-    static int
+    static цяло
 luaV_getvar(lua_State *L)
 {
     dict_T	*dict = luaV_get_var_scope(L);
     size_t	len;
     const char	*name = luaL_checklstring(L, 3, &len);
-    dictitem_T	*di = dict_find(dict, (char_u *)name, (int)len);
+    dictitem_T	*di = dict_find(dict, (char_u *)name, (цяло)len);
 
-    if (di == NULL)
-	return 0;  // nil
+    ако (di == NULL)
+	върни 0;  // nil
 
     luaV_pushtypval(L, &di->di_tv);
-    return 1;
+    върни 1;
 }
 
-    static int
+    static цяло
 luaV_command(lua_State *L)
 {
     char_u  *s = vim_strsave((char_u *)luaL_checkstring(L, 1));
@@ -1965,96 +1965,96 @@ luaV_command(lua_State *L)
     execute_cmds_from_string(s);
     vim_free(s);
     update_screen(UPD_VALID);
-    return 0;
+    върни 0;
 }
 
-    static int
+    static цяло
 luaV_eval(lua_State *L)
 {
     typval_T *tv = eval_expr((char_u *) luaL_checkstring(L, 1), NULL);
 
-    if (tv == NULL) luaL_error(L, "invalid expression");
+    ако (tv == NULL) luaL_error(L, "invalid expression");
     luaV_pushtypval(L, tv);
     free_tv(tv);
-    return 1;
+    върни 1;
 }
 
-    static int
+    static цяло
 luaV_beep(lua_State *L UNUSED)
 {
     vim_beep(BO_LANG);
-    return 0;
+    върни 0;
 }
 
-    static int
+    static цяло
 luaV_line(lua_State *L)
 {
     luaV_pushline(L, curbuf, curwin->w_cursor.lnum);
-    return 1;
+    върни 1;
 }
 
-    static int
+    static цяло
 luaV_list(lua_State *L)
 {
     list_T *l;
-    int initarg = !lua_isnoneornil(L, 1);
+    цяло initarg = !lua_isnoneornil(L, 1);
 
-    if (initarg && lua_type(L, 1) != LUA_TTABLE)
+    ако (initarg && lua_type(L, 1) != LUA_TTABLE)
 	luaL_error(L, "table expected, got %s", luaL_typename(L, 1));
 
     l = list_alloc();
-    if (l == NULL)
+    ако (l == NULL)
     {
 	lua_pushnil(L);
-	return 1;
+	върни 1;
     }
 
     luaV_newlist(L, l);
-    if (!initarg)
-	return 1;
+    ако (!initarg)
+	върни 1;
 
     // traverse table to init list
-    int notnil, i = 0;
+    цяло notnil, i = 0;
     typval_T v;
     do
     {
 	lua_rawgeti(L, 1, ++i);
 	notnil = !lua_isnil(L, -1);
-	if (notnil)
+	ако (notnil)
 	{
 	    luaV_checktypval(L, -1, &v, "vim.list");
 	    list_append_tv(l, &v);
 	    clear_tv(&v);
 	}
 	lua_pop(L, 1); // value
-    } while (notnil);
+    } докато (notnil);
 
-    return 1;
+    върни 1;
 }
 
-    static int
+    static цяло
 luaV_dict(lua_State *L)
 {
     dict_T *d;
-    int initarg = !lua_isnoneornil(L, 1);
+    цяло initarg = !lua_isnoneornil(L, 1);
 
-    if (initarg && lua_type(L, 1) != LUA_TTABLE)
+    ако (initarg && lua_type(L, 1) != LUA_TTABLE)
 	luaL_error(L, "table expected, got %s", luaL_typename(L, 1));
 
     d = dict_alloc();
-    if (d == NULL)
+    ако (d == NULL)
     {
 	lua_pushnil(L);
-	return 1;
+	върни 1;
     }
 
     luaV_newdict(L, d);
-    if (!initarg)
-	return 1;
+    ако (!initarg)
+	върни 1;
 
     // traverse table to init dict
     lua_pushnil(L);
-    while (lua_next(L, 1))
+    докато (lua_next(L, 1))
     {
 	char_u *key;
 	dictitem_T *di;
@@ -2062,202 +2062,202 @@ luaV_dict(lua_State *L)
 
 	lua_pushvalue(L, -2); // dup key in case it's a number
 	key = (char_u *) lua_tostring(L, -1);
-	if (key == NULL)
+	ако (key == NULL)
 	{
 	    lua_pushnil(L);
-	    return 1;
+	    върни 1;
 	}
-	if (*key == NUL)
+	ако (*key == NUL)
 	    luaL_error(L, "table has empty key");
 	luaV_checktypval(L, -2, &v, "vim.dict"); // value
 	di = dictitem_alloc(key);
-	if (di == NULL || dict_add(d, di) == FAIL)
+	ако (di == NULL || dict_add(d, di) == FAIL)
 	{
 	    vim_free(di);
 	    lua_pushnil(L);
-	    return 1;
+	    върни 1;
 	}
 	di->di_tv = v;
 	lua_pop(L, 2); // key copy and value
     }
 
-    return 1;
+    върни 1;
 }
 
-    static int
+    static цяло
 luaV_blob(lua_State *L)
 {
     blob_T *b;
-    int initarg = !lua_isnoneornil(L, 1);
+    цяло initarg = !lua_isnoneornil(L, 1);
 
-    if (initarg && !lua_isstring(L, 1))
+    ако (initarg && !lua_isstring(L, 1))
 	luaL_error(L, "string expected, got %s", luaL_typename(L, 1));
 
     b = blob_alloc();
-    if (b == NULL)
+    ако (b == NULL)
     {
 	lua_pushnil(L);
-	return 1;
+	върни 1;
     }
 
     luaV_newblob(L, b);
-    if (!initarg)
-	return 1;
+    ако (!initarg)
+	върни 1;
 
     // traverse table to init blob
     size_t i, l = 0;
     const char *s = lua_tolstring(L, 1, &l);
 
-    if (ga_grow(&b->bv_ga, (int)l) == OK)
-	for (i = 0; i < l; ++i)
+    ако (ga_grow(&b->bv_ga, (цяло)l) == OK)
+	за (i = 0; i < l; ++i)
 	    ga_append(&b->bv_ga, s[i]);
 
-    return 1;
+    върни 1;
 }
 
-    static int
+    static цяло
 luaV_funcref(lua_State *L)
 {
     const char *name = luaL_checkstring(L, 1);
     // note: not checking if function exists (needs function_exists)
-    if (name == NULL || *name == NUL || VIM_ISDIGIT(*name))
+    ако (name == NULL || *name == NUL || VIM_ISDIGIT(*name))
 	luaL_error(L, "invalid function name: %s", name);
     luaV_newfuncref(L, (char_u *) name);
-    return 1;
+    върни 1;
 }
 
-    static int
+    static цяло
 luaV_buffer(lua_State *L)
 {
     buf_T *buf;
-    if (lua_isstring(L, 1)) // get by number or name?
+    ако (lua_isstring(L, 1)) // get by number or name?
     {
-	if (lua_isnumber(L, 1)) // by number?
+	ако (lua_isnumber(L, 1)) // by number?
 	{
-	    int n = lua_tointeger(L, 1);
+	    цяло n = lua_tointeger(L, 1);
 	    FOR_ALL_BUFFERS(buf)
-		if (buf->b_fnum == n) break;
+		ако (buf->b_fnum == n) break;
 	}
-	else // by name
+	иначе // by name
 	{
 	    size_t l;
 	    const char *s = lua_tolstring(L, 1, &l);
 	    FOR_ALL_BUFFERS(buf)
 	    {
-		if (buf->b_ffname == NULL || buf->b_sfname == NULL)
+		ако (buf->b_ffname == NULL || buf->b_sfname == NULL)
 		{
-		    if (l == 0) break;
+		    ако (l == 0) break;
 		}
-		else if (strncmp(s, (char *)buf->b_ffname, l) == 0
+		иначе ако (strncmp(s, (char *)buf->b_ffname, l) == 0
 			|| strncmp(s, (char *)buf->b_sfname, l) == 0)
 		    break;
 	    }
 	}
     }
-    else
+    иначе
 	buf = (lua_toboolean(L, 1)) ? firstbuf : curbuf; // first buffer?
     luaV_pushbuffer(L, buf);
-    return 1;
+    върни 1;
 }
 
-    static int
+    static цяло
 luaV_window(lua_State *L)
 {
     win_T *win;
-    if (lua_isnumber(L, 1)) // get by number?
+    ако (lua_isnumber(L, 1)) // get by number?
     {
-	int n = lua_tointeger(L, 1);
-	for (win = firstwin; win != NULL; win = win->w_next, n--)
-	    if (n == 1) break;
+	цяло n = lua_tointeger(L, 1);
+	за (win = firstwin; win != NULL; win = win->w_next, n--)
+	    ако (n == 1) break;
     }
-    else
+    иначе
 	win = (lua_toboolean(L, 1)) ? firstwin : curwin; // first window?
     luaV_pushwindow(L, win);
-    return 1;
+    върни 1;
 }
 
-    static int
+    static цяло
 luaV_open(lua_State *L)
 {
     char_u *s = NULL;
 # ifdef HAVE_SANDBOX
     luaV_checksandbox(L);
 # endif
-    if (lua_isstring(L, 1)) s = (char_u *) lua_tostring(L, 1);
+    ако (lua_isstring(L, 1)) s = (char_u *) lua_tostring(L, 1);
     luaV_pushbuffer(L, buflist_new(s, NULL, 1L, BLN_LISTED));
-    return 1;
+    върни 1;
 }
 
-    static int
+    static цяло
 luaV_type(lua_State *L)
 {
     luaL_checkany(L, 1);
-    if (lua_type(L, 1) == LUA_TUSERDATA) // check vim udata?
+    ако (lua_type(L, 1) == LUA_TUSERDATA) // check vim udata?
     {
 	lua_settop(L, 1);
-	if (lua_getmetatable(L, 1))
+	ако (lua_getmetatable(L, 1))
 	{
 	    luaV_getfield(L, LUAVIM_LIST);
-	    if (lua_rawequal(L, -1, 2))
+	    ако (lua_rawequal(L, -1, 2))
 	    {
 		lua_pushstring(L, "list");
-		return 1;
+		върни 1;
 	    }
 	    luaV_getfield(L, LUAVIM_DICT);
-	    if (lua_rawequal(L, -1, 2))
+	    ако (lua_rawequal(L, -1, 2))
 	    {
 		lua_pushstring(L, "dict");
-		return 1;
+		върни 1;
 	    }
 	    luaV_getfield(L, LUAVIM_BLOB);
-	    if (lua_rawequal(L, -1, 2))
+	    ако (lua_rawequal(L, -1, 2))
 	    {
 		lua_pushstring(L, "blob");
-		return 1;
+		върни 1;
 	    }
 	    luaV_getfield(L, LUAVIM_FUNCREF);
-	    if (lua_rawequal(L, -1, 2))
+	    ако (lua_rawequal(L, -1, 2))
 	    {
 		lua_pushstring(L, "funcref");
-		return 1;
+		върни 1;
 	    }
 	    luaV_getfield(L, LUAVIM_BUFFER);
-	    if (lua_rawequal(L, -1, 2))
+	    ако (lua_rawequal(L, -1, 2))
 	    {
 		lua_pushstring(L, "buffer");
-		return 1;
+		върни 1;
 	    }
 	    luaV_getfield(L, LUAVIM_WINDOW);
-	    if (lua_rawequal(L, -1, 2))
+	    ако (lua_rawequal(L, -1, 2))
 	    {
 		lua_pushstring(L, "window");
-		return 1;
+		върни 1;
 	    }
 	}
     }
     lua_pushstring(L, luaL_typename(L, 1)); // fallback
-    return 1;
+    върни 1;
 }
 
-    static int
+    static цяло
 luaV_call(lua_State *L)
 {
-    int		argc = lua_gettop(L) - 1;
+    цяло		argc = lua_gettop(L) - 1;
     size_t	funcname_len;
     char_u	*funcname;
     char	*error = NULL;
     typval_T	rettv;
     typval_T	argv[MAX_FUNC_ARGS + 1];
-    int		i = 0;
+    цяло		i = 0;
 
-    if (argc > MAX_FUNC_ARGS)
-	return luaL_error(L, "Function called with too many arguments");
+    ако (argc > MAX_FUNC_ARGS)
+	върни luaL_error(L, "Function called with too many arguments");
 
     funcname = (char_u *)luaL_checklstring(L, 1, &funcname_len);
 
-    for (; i < argc; i++)
+    за (; i < argc; i++)
     {
-	if (luaV_totypval(L, i + 2, &argv[i]) == FAIL)
+	ако (luaV_totypval(L, i + 2, &argv[i]) == FAIL)
 	{
 	    error = "lua: cannot convert value";
 	    goto free_vim_args;
@@ -2266,7 +2266,7 @@ luaV_call(lua_State *L)
 
     argv[argc].v_type = VAR_UNKNOWN;
 
-    if (call_vim_function(funcname, argc, argv, &rettv) == FAIL)
+    ако (call_vim_function(funcname, argc, argv, &rettv) == FAIL)
     {
 	error = "lua: call_vim_function failed";
 	goto free_vim_args;
@@ -2276,19 +2276,19 @@ luaV_call(lua_State *L)
     clear_tv(&rettv);
 
 free_vim_args:
-    while (i > 0)
+    докато (i > 0)
 	clear_tv(&argv[--i]);
 
-    if (error == NULL)
-	return 1;
-    else
-	return luaL_error(L, error);
+    ако (error == NULL)
+	върни 1;
+    иначе
+	върни luaL_error(L, error);
 }
 
 /*
  * Return the Vim version as a Lua table
  */
-    static int
+    static цяло
 luaV_version(lua_State *L)
 {
     lua_newtable(L);
@@ -2301,7 +2301,7 @@ luaV_version(lua_State *L)
     lua_pushstring(L, "patch");
     lua_pushinteger(L, highest_patch());
     lua_settable(L, -3);
-    return 1;
+    върни 1;
 }
 
 static const luaL_Reg luaV_module[] = {
@@ -2328,15 +2328,15 @@ static const luaL_Reg luaV_module[] = {
 /*
  * for freeing list, dict, buffer and window objects; lightuserdata as arg
  */
-    static int
+    static цяло
 luaV_free(lua_State *L)
 {
     lua_pushnil(L);
     luaV_setudata(L, lua_touserdata(L, 1));
-    return 0;
+    върни 0;
 }
 
-    static int
+    static цяло
 luaV_luaeval(lua_State *L)
 {
     luaL_Buffer b;
@@ -2349,27 +2349,27 @@ luaV_luaeval(lua_State *L)
     luaL_addlstring(&b, str, l);
     luaL_pushresult(&b);
     str = lua_tolstring(L, -1, &l);
-    if (luaL_loadbuffer(L, str, l, LUAVIM_EVALNAME)) // compile error?
+    ако (luaL_loadbuffer(L, str, l, LUAVIM_EVALNAME)) // compile error?
     {
 	luaV_emsg(L);
-	return 0;
+	върни 0;
     }
     luaV_pushtypval(L, arg);
-    if (lua_pcall(L, 1, 1, 0)) // running error?
+    ако (lua_pcall(L, 1, 1, 0)) // running error?
     {
 	luaV_emsg(L);
-	return 0;
+	върни 0;
     }
-    if (luaV_totypval(L, -1, rettv) == FAIL)
+    ако (luaV_totypval(L, -1, rettv) == FAIL)
 	emsg("luaeval: cannot convert value");
-    return 0;
+    върни 0;
 }
 
-    static int
+    static цяло
 luaV_setref(lua_State *L)
 {
-    int copyID = lua_tointeger(L, 1);
-    int abort = FALSE;
+    цяло copyID = lua_tointeger(L, 1);
+    цяло abort = FALSE;
 
     lua_pushlightuserdata(L, (void *) LUAVIM_UDATA_CACHE);
     lua_rawget(L, LUA_REGISTRYINDEX);  // the cache table
@@ -2379,22 +2379,22 @@ luaV_setref(lua_State *L)
     luaV_getfield(L, LUAVIM_FUNCREF);
     lua_pushnil(L);
     // traverse cache table
-    while (!abort && lua_next(L, 2) != 0)
+    докато (!abort && lua_next(L, 2) != 0)
     {
 	lua_getmetatable(L, -1);
-	if (lua_rawequal(L, -1, 3)) // list?
+	ако (lua_rawequal(L, -1, 3)) // list?
 	{
 	    list_T *l = (list_T *)lua_touserdata(L, 6); // key
 
 	    abort = set_ref_in_list(l, copyID);
 	}
-	else if (lua_rawequal(L, -1, 4)) // dict?
+	иначе ако (lua_rawequal(L, -1, 4)) // dict?
 	{
 	    dict_T *d = (dict_T *)lua_touserdata(L, 6); // key
 
 	    abort = set_ref_in_dict(d, copyID);
 	}
-	else if (lua_rawequal(L, -1, 5)) // funcref?
+	иначе ако (lua_rawequal(L, -1, 5)) // funcref?
 	{
 	    luaV_Funcref *f = (luaV_Funcref *)lua_touserdata(L, 6); // key
 
@@ -2403,21 +2403,21 @@ luaV_setref(lua_State *L)
 	lua_pop(L, 2); // metatable and value
     }
     lua_pushinteger(L, abort);
-    return 1;
+    върни 1;
 }
 
-    static int
+    static цяло
 luaV_pushversion(lua_State *L)
 {
-    int major = 0;
-    int minor = 0;
-    int patch = 0;
+    цяло major = 0;
+    цяло minor = 0;
+    цяло patch = 0;
     char s[16];
 
     sscanf(LUAVIM_VERSION, "Lua %d.%d.%d", &major, &minor, &patch);
     vim_snprintf(s, sizeof(s), "%d.%d.%d", major, minor, patch);
     lua_pushstring(L, s);
-    return 0;
+    върни 0;
 }
 
 # define LUA_VIM_FN_CODE \
@@ -2514,7 +2514,7 @@ luaV_pushversion(lua_State *L)
     "  vim.t = make_dict_accessor('t')\n"\
     "end"
 
-    static int
+    static цяло
 luaopen_vim(lua_State *L)
 {
     lua_newtable(L);  // cache table
@@ -2579,28 +2579,28 @@ luaopen_vim(lua_State *L)
     lua_getglobal(L, LUAVIM_NAME);
     lua_getfield(L, -1, "_update_package_paths");
 
-    if (lua_pcall(L, 0, 0, 0))
+    ако (lua_pcall(L, 0, 0, 0))
 	luaV_emsg(L);
 
-    return 0;
+    върни 0;
 }
 
     static lua_State *
 luaV_newstate(void)
 {
     lua_State *L = luaL_newstate();
-# if LUA_VERSION_NUM >= 505
+# ако LUA_VERSION_NUM >= 505
     luaL_openselectedlibs(L, ~0, 0); // core libs
-# else
+# иначе
     luaL_openlibs(L); // core libs
 # endif
     lua_pushcfunction(L, luaopen_vim); // vim
     lua_call(L, 0, 0);
-    return L;
+    върни L;
 }
 
     static void
-luaV_setrange(lua_State *L, int line1, int line2)
+luaV_setrange(lua_State *L, цяло line1, цяло line2)
 {
     lua_getglobal(L, LUAVIM_NAME);
     lua_pushinteger(L, line1);
@@ -2615,35 +2615,35 @@ luaV_setrange(lua_State *L, int line1, int line2)
 
 static lua_State *L = NULL;
 
-    static int
+    static цяло
 lua_isopen(void)
 {
-    return L != NULL;
+    върни L != NULL;
 }
 
-    static int
+    static цяло
 lua_init(void)
 {
-    if (lua_isopen())
-	return OK;
+    ако (lua_isopen())
+	върни OK;
 
 # ifdef DYNAMIC_LUA
-    if (!lua_enabled(TRUE))
+    ако (!lua_enabled(TRUE))
     {
 	emsg(_("Lua library cannot be loaded."));
-	return FAIL;
+	върни FAIL;
     }
 # endif
     L = luaV_newstate();
 
-    return OK;
+    върни OK;
 }
 
     void
 lua_end(void)
 {
-    if (!lua_isopen())
-	return;
+    ако (!lua_isopen())
+	върни;
 
     lua_close(L);
     L = NULL;
@@ -2657,16 +2657,16 @@ ex_lua(exarg_T *eap)
 {
     char *script = (char *)script_get(eap, eap->arg);
 
-    if (!eap->skip && lua_init() == OK)
+    ако (!eap->skip && lua_init() == OK)
     {
 	char *s = script != NULL ? script : (char *)eap->arg;
 
 	luaV_setrange(L, eap->line1, eap->line2);
-	if (luaL_loadbuffer(L, s, strlen(s), LUAVIM_CHUNKNAME)
+	ако (luaL_loadbuffer(L, s, strlen(s), LUAVIM_CHUNKNAME)
 		|| lua_pcall(L, 0, 0, 0))
 	    luaV_emsg(L);
     }
-    if (script != NULL)
+    ако (script != NULL)
 	vim_free(script);
 }
 
@@ -2679,11 +2679,11 @@ ex_luado(exarg_T *eap)
     size_t len;
     buf_T *was_curbuf = curbuf;
 
-    if (lua_init() == FAIL) return;
-    if (u_save(eap->line1 - 1, eap->line2 + 1) == FAIL)
+    ако (lua_init() == FAIL) върни;
+    ако (u_save(eap->line1 - 1, eap->line2 + 1) == FAIL)
     {
 	emsg(_("cannot save undo information"));
-	return;
+	върни;
     }
     luaV_setrange(L, eap->line1, eap->line2);
     luaL_buffinit(L, &b);
@@ -2692,24 +2692,24 @@ ex_luado(exarg_T *eap)
     luaL_addlstring(&b, " end", 4); // footer
     luaL_pushresult(&b);
     s = lua_tolstring(L, -1, &len);
-    if (luaL_loadbuffer(L, s, len, LUAVIM_CHUNKNAME))
+    ако (luaL_loadbuffer(L, s, len, LUAVIM_CHUNKNAME))
     {
 	luaV_emsg(L);
 	lua_pop(L, 1); // function body
-	return;
+	върни;
     }
     lua_call(L, 0, 1);
     lua_replace(L, -2); // function -> body
-    for (l = eap->line1; l <= eap->line2; l++)
+    за (l = eap->line1; l <= eap->line2; l++)
     {
 	// Check the line number, the command may have deleted lines.
-	if (l > curbuf->b_ml.ml_line_count)
+	ако (l > curbuf->b_ml.ml_line_count)
 	    break;
 
 	lua_pushvalue(L, -1); // function
 	luaV_pushline(L, curbuf, l); // current line as arg
 	lua_pushinteger(L, l); // current line number as arg
-	if (lua_pcall(L, 2, 1, 0))
+	ако (lua_pcall(L, 2, 1, 0))
 	{
 	    luaV_emsg(L);
 	    break;
@@ -2717,10 +2717,10 @@ ex_luado(exarg_T *eap)
 
 	// Catch the command switching to another buffer.
 	// Check the line number, the command may have deleted lines.
-	if (curbuf != was_curbuf || l > curbuf->b_ml.ml_line_count)
+	ако (curbuf != was_curbuf || l > curbuf->b_ml.ml_line_count)
 	    break;
 
-	if (lua_isstring(L, -1)) // update line?
+	ако (lua_isstring(L, -1)) // update line?
 	{
 # ifdef HAVE_SANDBOX
 	    luaV_checksandbox(L);
@@ -2739,12 +2739,12 @@ ex_luado(exarg_T *eap)
     void
 ex_luafile(exarg_T *eap)
 {
-    if (lua_init() == FAIL)
-	return;
-    if (!eap->skip)
+    ако (lua_init() == FAIL)
+	върни;
+    ако (!eap->skip)
     {
 	luaV_setrange(L, eap->line1, eap->line2);
-	if (luaL_loadfile(L, (char *) eap->arg) || lua_pcall(L, 0, 0, 0))
+	ако (luaL_loadfile(L, (char *) eap->arg) || lua_pcall(L, 0, 0, 0))
 	    luaV_emsg(L);
     }
 }
@@ -2753,7 +2753,7 @@ ex_luafile(exarg_T *eap)
 	void \
     lua_##tname##_free(typ *o) \
     { \
-	if (!lua_isopen()) return; \
+	ако (!lua_isopen()) върни; \
 	luaV_getfield(L, LUAVIM_FREE); \
 	lua_pushlightuserdata(L, (void *) o); \
 	lua_call(L, 1, 0); \
@@ -2773,13 +2773,13 @@ do_luaeval(char_u *str, typval_T *arg, typval_T *rettv)
     lua_call(L, 3, 0);
 }
 
-    int
-set_ref_in_lua(int copyID)
+    цяло
+set_ref_in_lua(цяло copyID)
 {
-    int aborted = 0;
+    цяло aborted = 0;
 
-    if (!lua_isopen())
-	return 0;
+    ако (!lua_isopen())
+	върни 0;
 
     luaV_getfield(L, LUAVIM_SETREF);
     // call the function with 1 arg, getting 1 result back
@@ -2790,55 +2790,55 @@ set_ref_in_lua(int copyID)
     // pop result off the stack
     lua_pop(L, 1);
 
-    return aborted;
+    върни aborted;
 }
 
     void
 update_package_paths_in_lua(void)
 {
-    if (!lua_isopen())
-	return;
+    ако (!lua_isopen())
+	върни;
 
     lua_getglobal(L, "vim");
     lua_getfield(L, -1, "_update_package_paths");
 
-    if (lua_pcall(L, 0, 0, 0))
+    ако (lua_pcall(L, 0, 0, 0))
 	luaV_emsg(L);
 }
 
 /*
  * Native C function callback
  */
-    static int
+    static цяло
 luaV_call_lua_func(
-	int	 argcount,
+	цяло	 argcount,
 	typval_T *argvars,
 	typval_T *rettv,
 	void	 *state)
 {
-    int i;
-    int luaargcount = argcount;
+    цяло i;
+    цяло luaargcount = argcount;
     luaV_CFuncState *funcstate = (luaV_CFuncState*)state;
     lua_rawgeti(funcstate->L, LUA_REGISTRYINDEX, funcstate->lua_funcref);
 
-    if (funcstate->lua_tableref != LUA_NOREF)
+    ако (funcstate->lua_tableref != LUA_NOREF)
     {
 	// First arg for metatable __call method is a table
 	luaargcount += 1;
 	lua_rawgeti(funcstate->L, LUA_REGISTRYINDEX, funcstate->lua_tableref);
     }
 
-    for (i = 0; i < argcount; ++i)
+    за (i = 0; i < argcount; ++i)
 	luaV_pushtypval(funcstate->L, &argvars[i]);
 
-    if (lua_pcall(funcstate->L, luaargcount, 1, 0))
+    ако (lua_pcall(funcstate->L, luaargcount, 1, 0))
     {
 	luaV_emsg(funcstate->L);
-	return (int)FCERR_OTHER;
+	върни (цяло)FCERR_OTHER;
     }
 
     luaV_checktypval(funcstate->L, -1, rettv, "get return value");
-    return (int)FCERR_NONE;
+    върни (цяло)FCERR_NONE;
 }
 
 /*
@@ -2850,7 +2850,7 @@ luaV_call_lua_func_free(void *state)
     luaV_CFuncState *funcstate = (luaV_CFuncState*)state;
     luaL_unref(L, LUA_REGISTRYINDEX, funcstate->lua_funcref);
     funcstate->L = NULL;
-    if (funcstate->lua_tableref != LUA_NOREF)
+    ако (funcstate->lua_tableref != LUA_NOREF)
 	luaL_unref(L, LUA_REGISTRYINDEX, funcstate->lua_tableref);
     VIM_CLEAR(funcstate);
 }

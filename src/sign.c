@@ -13,7 +13,7 @@
 
 #include "vim.h"
 
-#if defined(FEAT_SIGNS)
+#ако defined(FEAT_SIGNS)
 
 /*
  * Struct to hold the sign properties.
@@ -23,22 +23,22 @@ typedef struct sign sign_T;
 struct sign
 {
     sign_T *sn_next; // next sign in list
-    int sn_typenr; // type number of sign
+    цяло sn_typenr; // type number of sign
     char_u *sn_name; // name of sign
     char_u *sn_icon; // name of pixmap
 # ifdef FEAT_SIGN_ICONS
     void *sn_image; // icon image
 # endif
     char_u *sn_text; // text used instead of pixmap
-    int sn_line_hl; // highlight ID for line
-    int sn_text_hl; // highlight ID for text
-    int sn_cul_hl; // highlight ID for text on current line when 'cursorline' is set
-    int sn_num_hl; // highlight ID for line number
-    int sn_priority; // default priority of this sign, -1 means SIGN_DEF_PRIO
+    цяло sn_line_hl; // highlight ID for line
+    цяло sn_text_hl; // highlight ID for text
+    цяло sn_cul_hl; // highlight ID for text on current line when 'cursorline' is set
+    цяло sn_num_hl; // highlight ID for line number
+    цяло sn_priority; // default priority of this sign, -1 means SIGN_DEF_PRIO
 };
 
 static sign_T *first_sign = NULL;
-static int next_sign_typenr = 1;
+static цяло next_sign_typenr = 1;
 
 static void sign_list_defined(sign_T *sp);
 static void sign_undefine(sign_T *sp, sign_T *sp_prev);
@@ -60,10 +60,10 @@ static char *cmds[] = { "define",
 };
 
 # define FOR_ALL_SIGNS(sp) \
-     for ((sp) = first_sign; (sp) != NULL; (sp) = (sp)->sn_next)
+     за ((sp) = first_sign; (sp) != NULL; (sp) = (sp)->sn_next)
 
 static hashtab_T sg_table; // sign group (signgroup_T) hashtable
-static int next_sign_id = 1; // next sign id in the global group
+static цяло next_sign_id = 1; // next sign id in the global group
 
 /*
  * Initialize data needed for managing signs
@@ -85,26 +85,26 @@ sign_group_ref(char_u *groupname)
     hashitem_T *hi = hash_lookup(&sg_table, groupname, hash);
     signgroup_T *group = NULL;
 
-    if (HASHITEM_EMPTY(hi))
+    ако (HASHITEM_EMPTY(hi))
     {
         // new group
         group = alloc(offsetof(signgroup_T, sg_name) + STRLEN(groupname) + 1);
-        if (group == NULL)
-            return NULL;
+        ако (group == NULL)
+            върни NULL;
 
         STRCPY(group->sg_name, groupname);
         group->sg_refcount = 1;
         group->sg_next_sign_id = 1;
         hash_add_item(&sg_table, hi, group->sg_name, hash);
     }
-    else
+    иначе
     {
         // existing group
         group = HI2SG(hi);
         group->sg_refcount++;
     }
 
-    return group;
+    върни group;
 }
 
 /*
@@ -115,12 +115,12 @@ static void
 sign_group_unref(char_u *groupname)
 {
     hashitem_T *hi = hash_find(&sg_table, groupname);
-    if (HASHITEM_EMPTY(hi))
-        return;
+    ако (HASHITEM_EMPTY(hi))
+        върни;
 
     signgroup_T *group = HI2SG(hi);
     group->sg_refcount--;
-    if (group->sg_refcount == 0)
+    ако (group->sg_refcount == 0)
     {
         // All the signs in this group are removed
         hash_remove(&sg_table, hi, "sign remove");
@@ -133,10 +133,10 @@ sign_group_unref(char_u *groupname)
  * A sign can either be in the global group (sign->se_group == NULL)
  * or in a named group. If 'group' is '*', then the sign is part of the group.
  */
-static int
+static цяло
 sign_in_group(sign_entry_T *sign, char_u *group)
 {
-    return ((group != NULL && STRCMP(group, "*") == 0) ||
+    върни ((group != NULL && STRCMP(group, "*") == 0) ||
             (group == NULL && sign->se_group == NULL) ||
             (group != NULL && sign->se_group != NULL &&
              STRCMP(group, sign->se_group->sg_name) == 0));
@@ -146,47 +146,47 @@ sign_in_group(sign_entry_T *sign, char_u *group)
  * Return TRUE if "sign" is to be displayed in window "wp".
  * If the group name starts with "PopUp" it only shows in a popup window.
  */
-static int
+static цяло
 sign_group_for_window(sign_entry_T *sign, win_T *wp)
 {
-    int for_popup = sign->se_group != NULL &&
+    цяло for_popup = sign->se_group != NULL &&
                     STRNCMP("PopUp", sign->se_group->sg_name, 5) == 0;
 
-    return WIN_IS_POPUP(wp) ? for_popup : !for_popup;
+    върни WIN_IS_POPUP(wp) ? for_popup : !for_popup;
 }
 
 /*
  * Get the next free sign identifier in the specified group
  */
-static int
+static цяло
 sign_group_get_next_signid(buf_T *buf, char_u *groupname)
 {
-    int id = 1;
+    цяло id = 1;
     signgroup_T *group = NULL;
     sign_entry_T *sign = NULL;
 
-    if (groupname != NULL)
+    ако (groupname != NULL)
     {
         hashitem_T *hi = hash_find(&sg_table, groupname);
-        if (HASHITEM_EMPTY(hi))
-            return id;
+        ако (HASHITEM_EMPTY(hi))
+            върни id;
         group = HI2SG(hi);
     }
 
     // Search for the next usable sign identifier
-    int found = FALSE;
-    while (!found)
+    цяло found = FALSE;
+    докато (!found)
     {
-        if (group == NULL)
+        ако (group == NULL)
             id = next_sign_id++; // global group
-        else
+        иначе
             id = group->sg_next_sign_id++;
 
         // Check whether this sign is already placed in the buffer
         found = TRUE;
         FOR_ALL_SIGNS_IN_BUF(buf, sign)
         {
-            if (id == sign->se_id && sign_in_group(sign, groupname))
+            ако (id == sign->se_id && sign_in_group(sign, groupname))
             {
                 found = FALSE; // sign identifier is in use
                 break;
@@ -194,7 +194,7 @@ sign_group_get_next_signid(buf_T *buf, char_u *groupname)
         }
     }
 
-    return id;
+    върни id;
 }
 
 /*
@@ -205,31 +205,31 @@ static void
 insert_sign(buf_T *buf, // buffer to store sign in
             sign_entry_T *prev, // previous sign entry
             sign_entry_T *next, // next sign entry
-            int id, // sign ID
+            цяло id, // sign ID
             char_u *group, // sign group; NULL for global group
-            int prio, // sign priority
+            цяло prio, // sign priority
             linenr_T lnum, // line number which gets the mark
-            int typenr) // typenr of sign we are adding
+            цяло typenr) // typenr of sign we are adding
 {
     sign_entry_T *newsign =
         lalloc_id(sizeof(sign_entry_T), FALSE, aid_insert_sign);
-    if (newsign == NULL)
-        return;
+    ако (newsign == NULL)
+        върни;
 
     newsign->se_id = id;
     newsign->se_lnum = lnum;
     newsign->se_typenr = typenr;
 
-    if (group != NULL)
+    ако (group != NULL)
     {
         newsign->se_group = sign_group_ref(group);
-        if (newsign->se_group == NULL)
+        ако (newsign->se_group == NULL)
         {
             vim_free(newsign);
-            return;
+            върни;
         }
     }
-    else
+    иначе
     {
         newsign->se_group = NULL;
     }
@@ -237,14 +237,14 @@ insert_sign(buf_T *buf, // buffer to store sign in
     newsign->se_priority = prio;
     newsign->se_next = next;
     newsign->se_prev = prev;
-    if (next != NULL)
+    ако (next != NULL)
         next->se_prev = newsign;
 
-    if (prev == NULL)
+    ако (prev == NULL)
     {
         // When adding first sign need to redraw the windows to create the
         // column for signs.
-        if (buf->b_signlist == NULL)
+        ако (buf->b_signlist == NULL)
         {
             redraw_buf_later(buf, UPD_NOT_VALID);
             changed_line_abv_curs();
@@ -253,11 +253,11 @@ insert_sign(buf_T *buf, // buffer to store sign in
         // first sign in signlist
         buf->b_signlist = newsign;
 # ifdef FEAT_NETBEANS_INTG
-        if (netbeans_active())
+        ако (netbeans_active())
             buf->b_has_sign_column = true;
 # endif
     }
-    else
+    иначе
     {
         prev->se_next = newsign;
     }
@@ -273,15 +273,15 @@ insert_sign(buf_T *buf, // buffer to store sign in
 static void
 insert_sign_by_lnum_prio(buf_T *buf, // buffer to store sign in
                          sign_entry_T *prev, // previous sign entry
-                         int id, // sign ID
+                         цяло id, // sign ID
                          char_u *group, // sign group; NULL for global group
-                         int prio, // sign priority
+                         цяло prio, // sign priority
                          linenr_T lnum, // line number which gets the mark
-                         int typenr) // typenr of sign we are adding
+                         цяло typenr) // typenr of sign we are adding
 {
     // keep signs sorted by lnum and by priority: insert new sign at
     // the proper position in the list for this lnum.
-    while (prev != NULL && prev->se_lnum == lnum && prev->se_priority <= prio)
+    докато (prev != NULL && prev->se_lnum == lnum && prev->se_priority <= prio)
         prev = prev->se_prev;
 
     sign_entry_T *sign = (prev == NULL) ? buf->b_signlist : prev->se_next;
@@ -293,26 +293,26 @@ insert_sign_by_lnum_prio(buf_T *buf, // buffer to store sign in
  * Lookup a sign by typenr. Returns NULL if sign is not found.
  */
 static sign_T *
-find_sign_by_typenr(int typenr)
+find_sign_by_typenr(цяло typenr)
 {
     sign_T *sp = NULL;
     FOR_ALL_SIGNS(sp)
-        if (sp->sn_typenr == typenr)
-            return sp;
-    return NULL;
+        ако (sp->sn_typenr == typenr)
+            върни sp;
+    върни NULL;
 }
 
 /*
  * Get the name of a sign by its typenr.
  */
 static char_u *
-sign_typenr2name(int typenr)
+sign_typenr2name(цяло typenr)
 {
     sign_T *sp = NULL;
     FOR_ALL_SIGNS(sp)
-        if (sp->sn_typenr == typenr)
-            return sp->sn_name;
-    return (char_u *)_("[Deleted]");
+        ако (sp->sn_typenr == typenr)
+            върни sp->sn_name;
+    върни (char_u *)_("[Deleted]");
 }
 
 /*
@@ -322,19 +322,19 @@ static dict_T *
 sign_get_info(sign_entry_T *sign)
 {
     dict_T *d = dict_alloc_id(aid_sign_getinfo);
-    if (d == NULL)
-        return NULL;
+    ако (d == NULL)
+        върни NULL;
 
     dict_add_number(d, "id", sign->se_id);
-    if (sign->se_group == NULL)
+    ако (sign->se_group == NULL)
         dict_add_string_len(d, "group", (char_u *)"", 0);
-    else
+    иначе
         dict_add_string(d, "group", sign->se_group->sg_name);
     dict_add_number(d, "lnum", sign->se_lnum);
     dict_add_string(d, "name", sign_typenr2name(sign->se_typenr));
     dict_add_number(d, "priority", sign->se_priority);
 
-    return d;
+    върни d;
 }
 
 /*
@@ -347,64 +347,64 @@ sign_sort_by_prio_on_line(buf_T *buf, sign_entry_T *sign)
 {
     // If there is only one sign in the buffer or only one sign on the line or
     // the sign is already sorted by priority, then return.
-    if ((sign->se_prev == NULL || sign->se_prev->se_lnum != sign->se_lnum ||
+    ако ((sign->se_prev == NULL || sign->se_prev->se_lnum != sign->se_lnum ||
          sign->se_prev->se_priority > sign->se_priority) &&
         (sign->se_next == NULL || sign->se_next->se_lnum != sign->se_lnum ||
          sign->se_next->se_priority < sign->se_priority))
-        return;
+        върни;
 
     // One or more signs on the same line as 'sign'
     // Find a sign after which 'sign' should be inserted
 
     // First search backward for a sign with higher priority on the same line
     sign_entry_T *p = sign;
-    while (p->se_prev != NULL && p->se_prev->se_lnum == sign->se_lnum &&
+    докато (p->se_prev != NULL && p->se_prev->se_lnum == sign->se_lnum &&
            p->se_prev->se_priority <= sign->se_priority)
         p = p->se_prev;
 
-    if (p == sign)
+    ако (p == sign)
     {
         // Sign not found. Search forward for a sign with priority just before
         // 'sign'.
         p = sign->se_next;
-        while (p->se_next != NULL && p->se_next->se_lnum == sign->se_lnum &&
+        докато (p->se_next != NULL && p->se_next->se_lnum == sign->se_lnum &&
                p->se_next->se_priority > sign->se_priority)
             p = p->se_next;
     }
 
     // Remove 'sign' from the list
-    if (buf->b_signlist == sign)
+    ако (buf->b_signlist == sign)
         buf->b_signlist = sign->se_next;
 
-    if (sign->se_prev != NULL)
+    ако (sign->se_prev != NULL)
         sign->se_prev->se_next = sign->se_next;
 
-    if (sign->se_next != NULL)
+    ако (sign->se_next != NULL)
         sign->se_next->se_prev = sign->se_prev;
 
     sign->se_prev = NULL;
     sign->se_next = NULL;
 
     // Re-insert 'sign' at the right place
-    if (p->se_priority <= sign->se_priority)
+    ако (p->se_priority <= sign->se_priority)
     {
         // 'sign' has a higher priority and should be inserted before 'p'
         sign->se_prev = p->se_prev;
         sign->se_next = p;
         p->se_prev = sign;
-        if (sign->se_prev != NULL)
+        ако (sign->se_prev != NULL)
             sign->se_prev->se_next = sign;
 
-        if (buf->b_signlist == p)
+        ако (buf->b_signlist == p)
             buf->b_signlist = sign;
     }
-    else
+    иначе
     {
         // 'sign' has a lower priority and should be inserted after 'p'
         sign->se_prev = p;
         sign->se_next = p->se_next;
         p->se_next = sign;
-        if (sign->se_next != NULL)
+        ако (sign->se_next != NULL)
             sign->se_next->se_prev = sign;
     }
 }
@@ -414,11 +414,11 @@ sign_sort_by_prio_on_line(buf_T *buf, sign_entry_T *sign)
  */
 static void
 buf_addsign(buf_T *buf, // buffer to store sign in
-            int id, // sign ID
+            цяло id, // sign ID
             char_u *groupname, // sign group
-            int prio, // sign priority
+            цяло prio, // sign priority
             linenr_T lnum, // line number which gets the mark
-            int typenr) // typenr of sign we are adding
+            цяло typenr) // typenr of sign we are adding
 {
     sign_entry_T *sign = NULL; // a sign in the signlist
     sign_entry_T *prev = NULL; // the previous sign
@@ -427,26 +427,26 @@ buf_addsign(buf_T *buf, // buffer to store sign in
     // strictly earlier line, resume the search from there instead of the head;
     // this makes placing many signs on distinct, ascending lines close to
     // linear.  Signs on the same line fall back to a scan from the head.
-    if (buf->b_sign_finger != NULL && buf->b_sign_finger->se_lnum < lnum)
+    ако (buf->b_sign_finger != NULL && buf->b_sign_finger->se_lnum < lnum)
         prev = buf->b_sign_finger;
 
-    for (sign = (prev == NULL) ? buf->b_signlist : prev->se_next; sign != NULL;
+    за (sign = (prev == NULL) ? buf->b_signlist : prev->se_next; sign != NULL;
          sign = sign->se_next)
     {
-        if (lnum == sign->se_lnum && id == sign->se_id &&
+        ако (lnum == sign->se_lnum && id == sign->se_id &&
             sign_in_group(sign, groupname))
         {
             // Update an existing sign
             sign->se_typenr = typenr;
             sign->se_priority = prio;
             sign_sort_by_prio_on_line(buf, sign);
-            return;
+            върни;
         }
-        else if (lnum < sign->se_lnum)
+        иначе ако (lnum < sign->se_lnum)
         {
             insert_sign_by_lnum_prio(buf, prev, id, groupname, prio, lnum,
                                      typenr);
-            return;
+            върни;
         }
         prev = sign;
     }
@@ -460,24 +460,24 @@ buf_addsign(buf_T *buf, // buffer to store sign in
  */
 static linenr_T
 buf_change_sign_type(buf_T *buf, // buffer to store sign in
-                     int markId, // sign ID
+                     цяло markId, // sign ID
                      char_u *group, // sign group
-                     int typenr, // typenr of sign we are adding
-                     int prio) // sign priority
+                     цяло typenr, // typenr of sign we are adding
+                     цяло prio) // sign priority
 {
     sign_entry_T *sign = NULL; // a sign in the signlist
     FOR_ALL_SIGNS_IN_BUF(buf, sign)
     {
-        if (sign->se_id == markId && sign_in_group(sign, group))
+        ако (sign->se_id == markId && sign_in_group(sign, group))
         {
             sign->se_typenr = typenr;
             sign->se_priority = prio;
             sign_sort_by_prio_on_line(buf, sign);
-            return sign->se_lnum;
+            върни sign->se_lnum;
         }
     }
 
-    return (linenr_T)0;
+    върни (linenr_T)0;
 }
 
 /*
@@ -485,7 +485,7 @@ buf_change_sign_type(buf_T *buf, // buffer to store sign in
  * 'buf'. Used when refreshing the screen. Returns TRUE if a sign is found on
  * 'lnum', FALSE otherwise.
  */
-int
+цяло
 buf_get_signattrs(win_T *wp, linenr_T lnum, sign_attrs_T *sattr)
 {
     CLEAR_POINTER(sattr);
@@ -496,10 +496,10 @@ buf_get_signattrs(win_T *wp, linenr_T lnum, sign_attrs_T *sattr)
     {
         // Signs are sorted by line number in the buffer. No need to check
         // for signs after the specified line number 'lnum'.
-        if (sign->se_lnum > lnum)
+        ако (sign->se_lnum > lnum)
             break;
 
-        if (sign->se_lnum == lnum
+        ако (sign->se_lnum == lnum
 # ifdef FEAT_PROP_POPUP
             && sign_group_for_window(sign, wp)
 # endif
@@ -507,39 +507,39 @@ buf_get_signattrs(win_T *wp, linenr_T lnum, sign_attrs_T *sattr)
         {
             sattr->sat_typenr = sign->se_typenr;
             sign_T *sp = find_sign_by_typenr(sign->se_typenr);
-            if (sp == NULL)
-                return FALSE;
+            ако (sp == NULL)
+                върни FALSE;
 
 # ifdef FEAT_SIGN_ICONS
             sattr->sat_icon = sp->sn_image;
 # endif
             sattr->sat_text = sp->sn_text;
 
-            if (sattr->sat_text != NULL && sp->sn_text_hl > 0)
+            ако (sattr->sat_text != NULL && sp->sn_text_hl > 0)
                 sattr->sat_texthl = syn_id2attr(sp->sn_text_hl);
 
-            if (sp->sn_line_hl > 0)
+            ако (sp->sn_line_hl > 0)
                 sattr->sat_linehl = syn_id2attr(sp->sn_line_hl);
 
-            if (sp->sn_cul_hl > 0)
+            ако (sp->sn_cul_hl > 0)
                 sattr->sat_culhl = syn_id2attr(sp->sn_cul_hl);
 
-            if (sp->sn_num_hl > 0)
+            ако (sp->sn_num_hl > 0)
                 sattr->sat_numhl = syn_id2attr(sp->sn_num_hl);
 
             sattr->sat_priority = sign->se_priority;
 
             // If there is another sign next with the same priority, may
             // combine the text and the line highlighting.
-            if (sign->se_next != NULL &&
+            ако (sign->se_next != NULL &&
                 sign->se_next->se_priority == sign->se_priority &&
                 sign->se_next->se_lnum == sign->se_lnum)
             {
                 sign_T *next_sp = find_sign_by_typenr(sign->se_next->se_typenr);
-                if (next_sp == NULL)
-                    return FALSE;
+                ако (next_sp == NULL)
+                    върни FALSE;
 
-                if (sattr->sat_icon == NULL && sattr->sat_text == NULL)
+                ако (sattr->sat_icon == NULL && sattr->sat_text == NULL)
                 {
 # ifdef FEAT_SIGN_ICONS
                     sattr->sat_icon = next_sp->sn_image;
@@ -547,22 +547,22 @@ buf_get_signattrs(win_T *wp, linenr_T lnum, sign_attrs_T *sattr)
                     sattr->sat_text = next_sp->sn_text;
                 }
 
-                if (sp->sn_text_hl <= 0 && next_sp->sn_text_hl > 0)
+                ако (sp->sn_text_hl <= 0 && next_sp->sn_text_hl > 0)
                     sattr->sat_texthl = syn_id2attr(next_sp->sn_text_hl);
 
-                if (sp->sn_line_hl <= 0 && next_sp->sn_line_hl > 0)
+                ако (sp->sn_line_hl <= 0 && next_sp->sn_line_hl > 0)
                     sattr->sat_linehl = syn_id2attr(next_sp->sn_line_hl);
 
-                if (sp->sn_cul_hl <= 0 && next_sp->sn_cul_hl > 0)
+                ако (sp->sn_cul_hl <= 0 && next_sp->sn_cul_hl > 0)
                     sattr->sat_culhl = syn_id2attr(next_sp->sn_cul_hl);
 
-                if (sp->sn_num_hl <= 0 && next_sp->sn_num_hl > 0)
+                ако (sp->sn_num_hl <= 0 && next_sp->sn_num_hl > 0)
                     sattr->sat_numhl = syn_id2attr(next_sp->sn_num_hl);
             }
-            return TRUE;
+            върни TRUE;
         }
     }
-    return FALSE;
+    върни FALSE;
 }
 
 /*
@@ -578,7 +578,7 @@ buf_get_signattrs(win_T *wp, linenr_T lnum, sign_attrs_T *sattr)
 linenr_T
 buf_delsign(buf_T *buf, // buffer sign is stored in
             linenr_T atlnum, // sign at this line, 0 - at any line
-            int id, // sign id
+            цяло id, // sign id
             char_u *group) // sign group
 {
     buf->b_sign_finger = NULL; // a removal invalidates the insertion finger
@@ -587,21 +587,21 @@ buf_delsign(buf_T *buf, // buffer sign is stored in
     sign_entry_T *next = NULL; // the next sign in a b_signlist
     linenr_T lnum = 0; // line number whose sign was deleted
 
-    for (sign_entry_T *sign = buf->b_signlist; sign != NULL; sign = next)
+    за (sign_entry_T *sign = buf->b_signlist; sign != NULL; sign = next)
     {
         next = sign->se_next;
 
-        if ((id == 0 || sign->se_id == id) &&
+        ако ((id == 0 || sign->se_id == id) &&
             (atlnum == 0 || sign->se_lnum == atlnum) &&
             sign_in_group(sign, group))
         {
             *lastp = next;
-            if (next != NULL)
+            ако (next != NULL)
                 next->se_prev = sign->se_prev;
 
             lnum = sign->se_lnum;
 
-            if (sign->se_group != NULL)
+            ако (sign->se_group != NULL)
                 sign_group_unref(sign->se_group->sg_name);
 
             vim_free(sign);
@@ -611,11 +611,11 @@ buf_delsign(buf_T *buf, // buffer sign is stored in
             // If deleting a sign with a specific identifier in a particular
             // group or deleting any sign at a particular line number, delete
             // only one sign.
-            if (group == NULL || (*group != '*' && id != 0) ||
+            ако (group == NULL || (*group != '*' && id != 0) ||
                 (*group == '*' && atlnum != 0))
                 break;
         }
-        else
+        иначе
         {
             lastp = &sign->se_next;
         }
@@ -623,13 +623,13 @@ buf_delsign(buf_T *buf, // buffer sign is stored in
 
     // When deleting the last sign the cursor position may change, because the
     // sign columns no longer shows.  And the 'signcolumn' may be hidden.
-    if (buf->b_signlist == NULL)
+    ако (buf->b_signlist == NULL)
     {
         redraw_buf_later(buf, UPD_NOT_VALID);
         changed_line_abv_curs();
     }
 
-    return lnum;
+    върни lnum;
 }
 
 /*
@@ -637,17 +637,17 @@ buf_delsign(buf_T *buf, // buffer sign is stored in
  * the sign does not exist, return 0 as the line number. This will still let
  * the correct file get loaded.
  */
-int
+цяло
 buf_findsign(buf_T *buf, // buffer to store sign in
-             int id, // sign ID
+             цяло id, // sign ID
              char_u *group) // sign group
 {
     sign_entry_T *sign = NULL; // a sign in the signlist
     FOR_ALL_SIGNS_IN_BUF(buf, sign)
-        if (sign->se_id == id && sign_in_group(sign, group))
-            return sign->se_lnum;
+        ако (sign->se_id == id && sign_in_group(sign, group))
+            върни sign->se_lnum;
 
-    return 0;
+    върни 0;
 }
 
 /*
@@ -664,77 +664,77 @@ buf_getsign_at_line(buf_T *buf, // buffer whose sign we are searching for
     {
         // Signs are sorted by line number in the buffer. No need to check
         // for signs after the specified line number 'lnum'.
-        if (sign->se_lnum > lnum)
+        ако (sign->se_lnum > lnum)
             break;
 
-        if (sign->se_lnum == lnum && sign_in_group(sign, groupname))
-            return sign;
+        ако (sign->se_lnum == lnum && sign_in_group(sign, groupname))
+            върни sign;
     }
 
-    return NULL;
+    върни NULL;
 }
 
 /*
  * Return the identifier of the sign at line number 'lnum' in buffer 'buf'.
  */
-int
+цяло
 buf_findsign_id(buf_T *buf, // buffer whose sign we are searching for
                 linenr_T lnum, // line number of sign
                 char_u *groupname) // sign group name
 {
     // a sign in the signlist
     sign_entry_T *sign = buf_getsign_at_line(buf, lnum, groupname);
-    if (sign != NULL)
-        return sign->se_id;
+    ако (sign != NULL)
+        върни sign->se_id;
 
-    return 0;
+    върни 0;
 }
 
-# if defined(FEAT_NETBEANS_INTG)
+# ако defined(FEAT_NETBEANS_INTG)
 /*
  * See if a given type of sign exists on a specific line.
  */
-int
+цяло
 buf_findsigntype_id(buf_T *buf, // buffer whose sign we are searching for
                     linenr_T lnum, // line number of sign
-                    int typenr) // sign type number
+                    цяло typenr) // sign type number
 {
     sign_entry_T *sign = NULL; // a sign in the signlist
     FOR_ALL_SIGNS_IN_BUF(buf, sign)
     {
         // Signs are sorted by line number in the buffer. No need to check
         // for signs after the specified line number 'lnum'.
-        if (sign->se_lnum > lnum)
+        ако (sign->se_lnum > lnum)
             break;
 
-        if (sign->se_lnum == lnum && sign->se_typenr == typenr)
-            return sign->se_id;
+        ако (sign->se_lnum == lnum && sign->se_typenr == typenr)
+            върни sign->se_id;
     }
 
-    return 0;
+    върни 0;
 }
 
-#  if defined(FEAT_SIGN_ICONS)
+#  ако defined(FEAT_SIGN_ICONS)
 /*
  * Return the number of icons on the given line.
  */
-int
+цяло
 buf_signcount(buf_T *buf, linenr_T lnum)
 {
-    int count = 0;
+    цяло count = 0;
     sign_entry_T *sign = NULL; // a sign in the signlist
     FOR_ALL_SIGNS_IN_BUF(buf, sign)
     {
         // Signs are sorted by line number in the buffer. No need to check
         // for signs after the specified line number 'lnum'.
-        if (sign->se_lnum > lnum)
+        ако (sign->se_lnum > lnum)
             break;
 
-        if (sign->se_lnum == lnum && sign_get_image(sign->se_typenr) != NULL)
+        ако (sign->se_lnum == lnum && sign_get_image(sign->se_typenr) != NULL)
             count++;
     }
 
-    return count;
+    върни count;
 }
 #  endif // FEAT_SIGN_ICONS
 # endif // FEAT_NETBEANS_INTG
@@ -749,7 +749,7 @@ buf_delete_signs(buf_T *buf, char_u *group)
     buf->b_sign_finger = NULL; // a removal invalidates the insertion finger
     // When deleting the last sign need to redraw the windows to remove the
     // sign column. Not when curwin is NULL (this means we're exiting).
-    if (buf->b_signlist != NULL && curwin != NULL)
+    ако (buf->b_signlist != NULL && curwin != NULL)
     {
         redraw_buf_later(buf, UPD_NOT_VALID);
         changed_line_abv_curs();
@@ -759,22 +759,22 @@ buf_delete_signs(buf_T *buf, char_u *group)
     sign_entry_T **lastp = &buf->b_signlist;
     sign_entry_T *next = NULL;
 
-    for (sign_entry_T *sign = buf->b_signlist; sign != NULL; sign = next)
+    за (sign_entry_T *sign = buf->b_signlist; sign != NULL; sign = next)
     {
         next = sign->se_next;
-        if (sign_in_group(sign, group))
+        ако (sign_in_group(sign, group))
         {
             *lastp = next;
 
-            if (next != NULL)
+            ако (next != NULL)
                 next->se_prev = sign->se_prev;
 
-            if (sign->se_group != NULL)
+            ако (sign->se_group != NULL)
                 sign_group_unref(sign->se_group->sg_name);
 
             vim_free(sign);
         }
-        else
+        иначе
         {
             lastp = &sign->se_next;
         }
@@ -794,9 +794,9 @@ sign_list_placed(buf_T *rbuf, char_u *sign_group)
     msg_putchar('\n');
 
     buf_T *buf = (rbuf == NULL) ? firstbuf : rbuf;
-    while (buf != NULL && !got_int)
+    докато (buf != NULL && !got_int)
     {
-        if (buf->b_signlist != NULL)
+        ако (buf->b_signlist != NULL)
         {
             vim_snprintf(lbuf, MSG_BUF_LEN, _("Signs for %s:"), buf->b_fname);
             msg_puts_attr(lbuf, HL_ATTR(HLF_D));
@@ -806,16 +806,16 @@ sign_list_placed(buf_T *rbuf, char_u *sign_group)
         sign_entry_T *sign = NULL;
         FOR_ALL_SIGNS_IN_BUF(buf, sign)
         {
-            if (got_int)
+            ако (got_int)
                 break;
 
-            if (!sign_in_group(sign, sign_group))
+            ако (!sign_in_group(sign, sign_group))
                 continue;
 
-            if (sign->se_group != NULL)
+            ако (sign->se_group != NULL)
                 vim_snprintf(group, MSG_BUF_LEN, _("  group=%s"),
                              sign->se_group->sg_name);
-            else
+            иначе
                 group[0] = '\0';
 
             vim_snprintf(lbuf, MSG_BUF_LEN,
@@ -827,7 +827,7 @@ sign_list_placed(buf_T *rbuf, char_u *sign_group)
             msg_putchar('\n');
         }
 
-        if (rbuf != NULL)
+        ако (rbuf != NULL)
             break;
 
         buf = buf->b_next;
@@ -849,17 +849,17 @@ sign_mark_adjust(
     FOR_ALL_SIGNS_IN_BUF(curbuf, sign)
     {
         // Ignore changes to lines after the sign
-        if (sign->se_lnum < line1)
+        ако (sign->se_lnum < line1)
             continue;
 
         linenr_T new_lnum = sign->se_lnum;
 
-        if (sign->se_lnum <= line2)
+        ако (sign->se_lnum <= line2)
         {
-            if (amount != MAXLNUM)
+            ако (amount != MAXLNUM)
                 new_lnum += amount;
         }
-        else if (sign->se_lnum > line2)
+        иначе ако (sign->se_lnum > line2)
         {
             // Lines inserted or deleted before the sign
             new_lnum += amount_after;
@@ -868,7 +868,7 @@ sign_mark_adjust(
         // If the new sign line number is past the last line in the buffer,
         // then don't adjust the line number. Otherwise, it will always be past
         // the last line and will not be visible.
-        if (new_lnum <= curbuf->b_ml.ml_line_count)
+        ако (new_lnum <= curbuf->b_ml.ml_line_count)
             sign->se_lnum = new_lnum;
     }
 }
@@ -877,19 +877,19 @@ sign_mark_adjust(
  * Find index of a ":sign" subcmd from its name.
  * "*end_cmd" must be writable.
  */
-static int
+static цяло
 sign_cmd_idx(char_u *begin_cmd, // begin of sign subcmd
              char_u *end_cmd) // just after sign subcmd
 {
-    int idx = 0;
+    цяло idx = 0;
     char save = *end_cmd;
     *end_cmd = NUL;
 
-    while (cmds[idx] != NULL && STRCMP(begin_cmd, cmds[idx]) != 0)
+    докато (cmds[idx] != NULL && STRCMP(begin_cmd, cmds[idx]) != 0)
         ++idx;
 
     *end_cmd = save;
-    return idx;
+    върни idx;
 }
 
 /*
@@ -898,20 +898,20 @@ sign_cmd_idx(char_u *begin_cmd, // begin of sign subcmd
 static sign_T *
 sign_find(char_u *name, sign_T **sp_prev)
 {
-    if (sp_prev != NULL)
+    ако (sp_prev != NULL)
         *sp_prev = NULL;
 
     sign_T *sp = NULL;
     FOR_ALL_SIGNS(sp)
     {
-        if (STRCMP(sp->sn_name, name) == 0)
+        ако (STRCMP(sp->sn_name, name) == 0)
             break;
 
-        if (sp_prev != NULL)
+        ако (sp_prev != NULL)
             *sp_prev = sp;
     }
 
-    return sp;
+    върни sp;
 }
 
 /*
@@ -920,31 +920,31 @@ sign_find(char_u *name, sign_T **sp_prev)
 static sign_T *
 alloc_new_sign(char_u *name)
 {
-    int start = next_sign_typenr;
+    цяло start = next_sign_typenr;
 
     // Allocate a new sign.
     sign_T *sp = alloc_clear_id(sizeof(sign_T), aid_sign_define_by_name);
-    if (sp == NULL)
-        return NULL;
+    ако (sp == NULL)
+        върни NULL;
 
     // Check that next_sign_typenr is not already being used.
     // This only happens after wrapping around.  Hopefully
     // another one got deleted and we can use its number.
     sign_T *lp = first_sign;
-    while (lp != NULL)
+    докато (lp != NULL)
     {
-        if (lp->sn_typenr == next_sign_typenr)
+        ако (lp->sn_typenr == next_sign_typenr)
         {
             ++next_sign_typenr;
 
-            if (next_sign_typenr == MAX_TYPENR)
+            ако (next_sign_typenr == MAX_TYPENR)
                 next_sign_typenr = 1;
 
-            if (next_sign_typenr == start)
+            ако (next_sign_typenr == start)
             {
                 vim_free(sp);
                 emsg(_(e_too_many_signs_defined));
-                return NULL;
+                върни NULL;
             }
 
             lp = first_sign; // start all over
@@ -955,17 +955,17 @@ alloc_new_sign(char_u *name)
 
     sp->sn_typenr = next_sign_typenr;
 
-    if (++next_sign_typenr == MAX_TYPENR)
+    ако (++next_sign_typenr == MAX_TYPENR)
         next_sign_typenr = 1; // wrap around
 
     sp->sn_name = vim_strsave(name);
-    if (sp->sn_name == NULL) // out of memory
+    ако (sp->sn_name == NULL) // out of memory
     {
         vim_free(sp);
-        return NULL;
+        върни NULL;
     }
 
-    return sp;
+    върни sp;
 }
 
 /*
@@ -978,10 +978,10 @@ sign_define_init_icon(sign_T *sp, char_u *icon)
     sp->sn_icon = vim_strsave(icon);
     backslash_halve(sp->sn_icon);
 # ifdef FEAT_SIGN_ICONS
-    if (gui.in_use)
+    ако (gui.in_use)
     {
         out_flush();
-        if (sp->sn_image != NULL)
+        ако (sp->sn_image != NULL)
             gui_mch_destroy_sign(sp->sn_image);
         sp->sn_image = gui_mch_register_sign(sp->sn_icon);
     }
@@ -991,17 +991,17 @@ sign_define_init_icon(sign_T *sp, char_u *icon)
 /*
  * Initialize the text for a new sign
  */
-static int
+static цяло
 sign_define_init_text(sign_T *sp, char_u *text)
 {
     char_u *s = NULL;
-    char_u *endp = text + (int)STRLEN(text);
-    int cells = 0;
+    char_u *endp = text + (цяло)STRLEN(text);
+    цяло cells = 0;
 
     // Remove backslashes so that it is possible to use a space.
-    for (s = text; s + 1 < endp; ++s)
+    за (s = text; s + 1 < endp; ++s)
     {
-        if (*s == '\\')
+        ако (*s == '\\')
         {
             STRMOVE(s, s + 1);
             --endp;
@@ -1009,50 +1009,50 @@ sign_define_init_text(sign_T *sp, char_u *text)
     }
 
     // Count cells and check for non-printable chars
-    if (has_mbyte)
+    ако (has_mbyte)
     {
-        for (s = text; s < endp; s += (*mb_ptr2len)(s))
+        за (s = text; s < endp; s += (*mb_ptr2len)(s))
         {
-            if (!vim_isprintc((*mb_ptr2char)(s)))
+            ако (!vim_isprintc((*mb_ptr2char)(s)))
                 break;
 
             cells += (*mb_ptr2cells)(s);
         }
     }
-    else
+    иначе
     {
-        for (s = text; s < endp; ++s)
+        за (s = text; s < endp; ++s)
         {
-            if (!vim_isprintc(*s))
+            ако (!vim_isprintc(*s))
                 break;
         }
-        cells = (int)(s - text);
+        cells = (цяло)(s - text);
     }
 
     // Currently sign text must be one or two display cells
-    if (s != endp || cells < 1 || cells > 2)
+    ако (s != endp || cells < 1 || cells > 2)
     {
         semsg(_(e_invalid_sign_text_str), text);
-        return FAIL;
+        върни FAIL;
     }
 
     vim_free(sp->sn_text);
     // Allocate one byte more if we need to pad up
     // with a space.
-    int len = (int)(endp - text + ((cells == 1) ? 1 : 0));
+    цяло len = (цяло)(endp - text + ((cells == 1) ? 1 : 0));
     sp->sn_text = vim_strnsave(text, len);
 
     // For single character sign text, pad with a space.
-    if (sp->sn_text != NULL && cells == 1)
+    ако (sp->sn_text != NULL && cells == 1)
         STRCPY(sp->sn_text + len - 1, " ");
 
-    return OK;
+    върни OK;
 }
 
 /*
  * Define a new sign or update an existing sign
  */
-int
+цяло
 sign_define_by_name(char_u *name,
                     char_u *icon,
                     char_u *linehl,
@@ -1060,104 +1060,104 @@ sign_define_by_name(char_u *name,
                     char_u *texthl,
                     char_u *culhl,
                     char_u *numhl,
-                    int prio)
+                    цяло prio)
 {
     sign_T *sp_prev = NULL;
     sign_T *sp = sign_find(name, &sp_prev);
-    if (sp == NULL)
+    ако (sp == NULL)
     {
         sp = alloc_new_sign(name);
-        if (sp == NULL)
-            return FAIL;
+        ако (sp == NULL)
+            върни FAIL;
 
         // add the new sign to the list of signs
-        if (sp_prev == NULL)
+        ако (sp_prev == NULL)
             first_sign = sp;
-        else
+        иначе
             sp_prev->sn_next = sp;
     }
-    else
+    иначе
     {
         win_T *wp = NULL;
         // Signs may already exist, a redraw is needed in windows with a
         // non-empty sign list.
         FOR_ALL_WINDOWS(wp)
         {
-            if (wp->w_buffer->b_signlist != NULL)
+            ако (wp->w_buffer->b_signlist != NULL)
                 redraw_buf_later(wp->w_buffer, UPD_NOT_VALID);
         }
     }
 
     // set values for a defined sign.
-    if (icon != NULL)
+    ако (icon != NULL)
         sign_define_init_icon(sp, icon);
 
-    if (text != NULL && (sign_define_init_text(sp, text) == FAIL))
-        return FAIL;
+    ако (text != NULL && (sign_define_init_text(sp, text) == FAIL))
+        върни FAIL;
 
     sp->sn_priority = prio;
 
-    if (linehl != NULL)
+    ако (linehl != NULL)
     {
-        if (*linehl == NUL)
+        ако (*linehl == NUL)
             sp->sn_line_hl = 0;
-        else
-            sp->sn_line_hl = syn_check_group(linehl, (int)STRLEN(linehl));
+        иначе
+            sp->sn_line_hl = syn_check_group(linehl, (цяло)STRLEN(linehl));
     }
 
-    if (texthl != NULL)
+    ако (texthl != NULL)
     {
-        if (*texthl == NUL)
+        ако (*texthl == NUL)
             sp->sn_text_hl = 0;
-        else
-            sp->sn_text_hl = syn_check_group(texthl, (int)STRLEN(texthl));
+        иначе
+            sp->sn_text_hl = syn_check_group(texthl, (цяло)STRLEN(texthl));
     }
 
-    if (culhl != NULL)
+    ако (culhl != NULL)
     {
-        if (*culhl == NUL)
+        ако (*culhl == NUL)
             sp->sn_cul_hl = 0;
-        else
-            sp->sn_cul_hl = syn_check_group(culhl, (int)STRLEN(culhl));
+        иначе
+            sp->sn_cul_hl = syn_check_group(culhl, (цяло)STRLEN(culhl));
     }
 
-    if (numhl != NULL)
+    ако (numhl != NULL)
     {
-        if (*numhl == NUL)
+        ако (*numhl == NUL)
             sp->sn_num_hl = 0;
-        else
-            sp->sn_num_hl = syn_check_group(numhl, (int)STRLEN(numhl));
+        иначе
+            sp->sn_num_hl = syn_check_group(numhl, (цяло)STRLEN(numhl));
     }
 
-    return OK;
+    върни OK;
 }
 
 /*
  * Return TRUE if sign "name" exists.
  */
-int
+цяло
 sign_exists_by_name(char_u *name)
 {
-    return sign_find(name, NULL) != NULL;
+    върни sign_find(name, NULL) != NULL;
 }
 
 /*
  * Free the sign specified by 'name'.
  */
-int
-sign_undefine_by_name(char_u *name, int give_error)
+цяло
+sign_undefine_by_name(char_u *name, цяло give_error)
 {
     sign_T *sp_prev = NULL;
     sign_T *sp = sign_find(name, &sp_prev);
-    if (sp == NULL)
+    ако (sp == NULL)
     {
-        if (give_error)
+        ако (give_error)
             semsg(_(e_unknown_sign_str), name);
-        return FAIL;
+        върни FAIL;
     }
     sign_undefine(sp, sp_prev);
 
-    return OK;
+    върни OK;
 }
 
 /*
@@ -1167,22 +1167,22 @@ static void
 sign_list_by_name(char_u *name)
 {
     sign_T *sp = sign_find(name, NULL);
-    if (sp != NULL)
+    ако (sp != NULL)
         sign_list_defined(sp);
-    else
+    иначе
         semsg(_(e_unknown_sign_str), name);
 }
 
 static void
-may_force_numberwidth_recompute(buf_T *buf, int unplace)
+may_force_numberwidth_recompute(buf_T *buf, цяло unplace)
 {
-# if defined(FEAT_LINEBREAK)
+# ако defined(FEAT_LINEBREAK)
     tabpage_T *tp = NULL;
     win_T *wp = NULL;
 
     FOR_ALL_TAB_WINDOWS(tp, wp)
     {
-        if (wp->w_buffer == buf && (wp->w_p_nu || wp->w_p_rnu) &&
+        ако (wp->w_buffer == buf && (wp->w_p_nu || wp->w_p_rnu) &&
             (unplace || wp->w_nrwidth_width < 2) &&
             (*wp->w_p_scl == 'n' && *(wp->w_p_scl + 1) == 'u'))
             wp->w_nrwidth_line_count = 0;
@@ -1193,52 +1193,52 @@ may_force_numberwidth_recompute(buf_T *buf, int unplace)
 /*
  * Place a sign at the specified file location or update a sign.
  */
-int
-sign_place(int *sign_id,
+цяло
+sign_place(цяло *sign_id,
            char_u *sign_group,
            char_u *sign_name,
            buf_T *buf,
            linenr_T lnum,
-           int prio)
+           цяло prio)
 {
     // Check for reserved character '*' in group name
-    if (sign_group != NULL && (*sign_group == '*' || *sign_group == '\0'))
-        return FAIL;
+    ако (sign_group != NULL && (*sign_group == '*' || *sign_group == '\0'))
+        върни FAIL;
 
     sign_T *sp = NULL;
     FOR_ALL_SIGNS(sp)
     {
-        if (STRCMP(sp->sn_name, sign_name) == 0)
+        ако (STRCMP(sp->sn_name, sign_name) == 0)
             break;
     }
 
-    if (sp == NULL)
+    ако (sp == NULL)
     {
         semsg(_(e_unknown_sign_str), sign_name);
-        return FAIL;
+        върни FAIL;
     }
 
-    if (*sign_id == 0)
+    ако (*sign_id == 0)
         *sign_id = sign_group_get_next_signid(buf, sign_group);
 
     // Use the default priority value for this sign.
-    if (prio == -1)
+    ако (prio == -1)
         prio = (sp->sn_priority != -1) ? sp->sn_priority : SIGN_DEF_PRIO;
 
-    if (lnum > 0)
+    ако (lnum > 0)
     {
         // ":sign place {id} line={lnum} name={name} file={fname}":
         // place a sign
         buf_addsign(buf, *sign_id, sign_group, prio, lnum, sp->sn_typenr);
     }
-    else
+    иначе
     {
         // ":sign place {id} file={fname}": change sign type and/or priority
         lnum = buf_change_sign_type(buf, *sign_id, sign_group, sp->sn_typenr,
                                     prio);
     }
 
-    if (lnum > 0)
+    ако (lnum > 0)
     {
         redraw_buf_line_later(buf, lnum);
 
@@ -1246,45 +1246,45 @@ sign_place(int *sign_id,
         // number column is less than 2, then force recomputing the width.
         may_force_numberwidth_recompute(buf, FALSE);
     }
-    else
+    иначе
     {
         semsg(_(e_not_possible_to_change_sign_str), sign_name);
-        return FAIL;
+        върни FAIL;
     }
 
-    return OK;
+    върни OK;
 }
 
 /*
  * Unplace the specified sign
  */
-static int
-sign_unplace(int sign_id, char_u *sign_group, buf_T *buf, linenr_T atlnum)
+static цяло
+sign_unplace(цяло sign_id, char_u *sign_group, buf_T *buf, linenr_T atlnum)
 {
-    if (buf->b_signlist == NULL) // No signs in the buffer
-        return OK;
+    ако (buf->b_signlist == NULL) // No signs in the buffer
+        върни OK;
 
-    if (sign_id == 0)
+    ако (sign_id == 0)
     {
         // Delete all the signs in the specified buffer
         redraw_buf_later(buf, UPD_NOT_VALID);
         buf_delete_signs(buf, sign_group);
     }
-    else
+    иначе
     {
         // Delete only the specified signs
         linenr_T lnum = buf_delsign(buf, atlnum, sign_id, sign_group);
-        if (lnum == 0)
-            return FAIL;
+        ако (lnum == 0)
+            върни FAIL;
     }
 
     // When all the signs in a buffer are removed, force recomputing the
     // number column width (if enabled) in all the windows displaying the
     // buffer if 'signcolumn' is set to 'number' in that window.
-    if (buf->b_signlist == NULL)
+    ако (buf->b_signlist == NULL)
         may_force_numberwidth_recompute(buf, TRUE);
 
-    return OK;
+    върни OK;
 }
 
 /*
@@ -1293,12 +1293,12 @@ sign_unplace(int sign_id, char_u *sign_group, buf_T *buf, linenr_T atlnum)
 static void
 sign_unplace_at_cursor(char_u *groupname)
 {
-    int id =
+    цяло id =
         buf_findsign_id(curwin->w_buffer, curwin->w_cursor.lnum, groupname);
 
-    if (id > 0)
+    ако (id > 0)
         sign_unplace(id, groupname, curwin->w_buffer, curwin->w_cursor.lnum);
-    else
+    иначе
         emsg(_(e_missing_sign_number));
 }
 
@@ -1306,39 +1306,39 @@ sign_unplace_at_cursor(char_u *groupname)
  * Jump to a sign.
  */
 static linenr_T
-sign_jump(int sign_id, char_u *sign_group, buf_T *buf)
+sign_jump(цяло sign_id, char_u *sign_group, buf_T *buf)
 {
     linenr_T lnum = buf_findsign(buf, sign_id, sign_group);
-    if (lnum <= 0)
+    ако (lnum <= 0)
     {
         semsg(_(e_invalid_sign_id_nr), sign_id);
-        return -1;
+        върни -1;
     }
 
     // goto a sign ...
-    if (buf_jump_open_win(buf) != NULL)
+    ако (buf_jump_open_win(buf) != NULL)
     { // ... in a current window
         curwin->w_cursor.lnum = lnum;
         check_cursor_lnum();
         beginline(BL_WHITE);
     }
-    else
+    иначе
     { // ... not currently in a window
-        if (buf->b_fname == NULL)
+        ако (buf->b_fname == NULL)
         {
             emsg(_(e_cannot_jump_to_buffer_that_does_not_have_name));
-            return -1;
+            върни -1;
         }
         setpcmark();
-        if (do_ecmd(buf->b_fnum, NULL, NULL, NULL, lnum,
+        ако (do_ecmd(buf->b_fnum, NULL, NULL, NULL, lnum,
                     buf_hide(curbuf) ? ECMD_HIDE : 0, curwin) == FAIL)
-            return -1;
+            върни -1;
     }
 # ifdef FEAT_FOLDING
     foldOpenCursor();
 # endif
 
-    return lnum;
+    върни lnum;
 }
 
 /*
@@ -1355,53 +1355,53 @@ sign_define_cmd(char_u *sign_name, char_u *cmdline)
     char_u *texthl = NULL;
     char_u *culhl = NULL;
     char_u *numhl = NULL;
-    int prio = -1;
-    int failed = FALSE;
+    цяло prio = -1;
+    цяло failed = FALSE;
 
     // set values for a defined sign.
-    while (TRUE)
+    докато (TRUE)
     {
         arg = skipwhite(p);
-        if (*arg == NUL)
+        ако (*arg == NUL)
             break;
 
         p = skiptowhite_esc(arg);
-        if (STRNCMP(arg, "icon=", 5) == 0)
+        ако (STRNCMP(arg, "icon=", 5) == 0)
         {
             arg += 5;
             icon = vim_strnsave(arg, p - arg);
         }
-        else if (STRNCMP(arg, "text=", 5) == 0)
+        иначе ако (STRNCMP(arg, "text=", 5) == 0)
         {
             arg += 5;
             text = vim_strnsave(arg, p - arg);
         }
-        else if (STRNCMP(arg, "linehl=", 7) == 0)
+        иначе ако (STRNCMP(arg, "linehl=", 7) == 0)
         {
             arg += 7;
             linehl = vim_strnsave(arg, p - arg);
         }
-        else if (STRNCMP(arg, "texthl=", 7) == 0)
+        иначе ако (STRNCMP(arg, "texthl=", 7) == 0)
         {
             arg += 7;
             texthl = vim_strnsave(arg, p - arg);
         }
-        else if (STRNCMP(arg, "culhl=", 6) == 0)
+        иначе ако (STRNCMP(arg, "culhl=", 6) == 0)
         {
             arg += 6;
             culhl = vim_strnsave(arg, p - arg);
         }
-        else if (STRNCMP(arg, "numhl=", 6) == 0)
+        иначе ако (STRNCMP(arg, "numhl=", 6) == 0)
         {
             arg += 6;
             numhl = vim_strnsave(arg, p - arg);
         }
-        else if (STRNCMP(arg, "priority=", 9) == 0)
+        иначе ако (STRNCMP(arg, "priority=", 9) == 0)
         {
             arg += 9;
             prio = atoi((char *)arg);
         }
-        else
+        иначе
         {
             semsg(_(e_invalid_argument_str), arg);
             failed = TRUE;
@@ -1409,7 +1409,7 @@ sign_define_cmd(char_u *sign_name, char_u *cmdline)
         }
     }
 
-    if (!failed)
+    ако (!failed)
         sign_define_by_name(sign_name, icon, linehl, text, texthl, culhl, numhl,
                             prio);
 
@@ -1428,11 +1428,11 @@ static void
 sign_place_cmd(buf_T *buf,
                linenr_T lnum,
                char_u *sign_name,
-               int id,
+               цяло id,
                char_u *group,
-               int prio)
+               цяло prio)
 {
-    if (id <= 0)
+    ако (id <= 0)
     {
         // List signs placed in a file/buffer
         //   :sign place file={fname}
@@ -1444,19 +1444,19 @@ sign_place_cmd(buf_T *buf,
         //   :sign place
         //   :sign place group={group}
         //   :sign place group=*
-        if (lnum >= 0 || sign_name != NULL || (group != NULL && *group == '\0'))
+        ако (lnum >= 0 || sign_name != NULL || (group != NULL && *group == '\0'))
             emsg(_(e_invalid_argument));
-        else
+        иначе
             sign_list_placed(buf, group);
     }
-    else
+    иначе
     {
         // Place a new sign
-        if (sign_name == NULL || buf == NULL ||
+        ако (sign_name == NULL || buf == NULL ||
             (group != NULL && *group == '\0'))
         {
             emsg(_(e_invalid_argument));
-            return;
+            върни;
         }
 
         sign_place(&id, group, sign_name, buf, lnum, prio);
@@ -1470,18 +1470,18 @@ static void
 sign_unplace_cmd(buf_T *buf,
                  linenr_T lnum,
                  char_u *sign_name,
-                 int id,
+                 цяло id,
                  char_u *group)
 {
-    if (lnum >= 0 || sign_name != NULL || (group != NULL && *group == '\0'))
+    ако (lnum >= 0 || sign_name != NULL || (group != NULL && *group == '\0'))
     {
         emsg(_(e_invalid_argument));
-        return;
+        върни;
     }
 
-    if (id == -2)
+    ако (id == -2)
     {
-        if (buf != NULL)
+        ако (buf != NULL)
         {
             // :sign unplace * file={fname}
             // :sign unplace * group={group} file={fname}
@@ -1491,21 +1491,21 @@ sign_unplace_cmd(buf_T *buf,
             // :sign unplace * group=* buffer={nr}
             sign_unplace(0, group, buf, 0);
         }
-        else
+        иначе
         {
             // :sign unplace *
             // :sign unplace * group={group}
             // :sign unplace * group=*
             FOR_ALL_BUFFERS(buf)
             {
-                if (buf->b_signlist != NULL)
+                ако (buf->b_signlist != NULL)
                     buf_delete_signs(buf, group);
             }
         }
     }
-    else
+    иначе
     {
-        if (buf != NULL)
+        ако (buf != NULL)
         {
             // :sign unplace {id} file={fname}
             // :sign unplace {id} group={group} file={fname}
@@ -1515,15 +1515,15 @@ sign_unplace_cmd(buf_T *buf,
             // :sign unplace {id} group=* buffer={nr}
             sign_unplace(id, group, buf, 0);
         }
-        else
+        иначе
         {
-            if (id == -1)
+            ако (id == -1)
             {
                 // :sign unplace group={group}
                 // :sign unplace group=*
                 sign_unplace_at_cursor(group);
             }
-            else
+            иначе
             {
                 // :sign unplace {id}
                 // :sign unplace {id} group={group}
@@ -1546,22 +1546,22 @@ static void
 sign_jump_cmd(buf_T *buf,
               linenr_T lnum,
               char_u *sign_name,
-              int id,
+              цяло id,
               char_u *group)
 {
-    if (sign_name == NULL && group == NULL && id == -1)
+    ако (sign_name == NULL && group == NULL && id == -1)
     {
         emsg(_(e_argument_required));
-        return;
+        върни;
     }
 
-    if (buf == NULL || (group != NULL && *group == '\0') || lnum >= 0 ||
+    ако (buf == NULL || (group != NULL && *group == '\0') || lnum >= 0 ||
         sign_name != NULL)
     {
         // File or buffer is not specified or an empty group is used
         // or a line number or a sign name is specified.
         emsg(_(e_invalid_argument));
-        return;
+        върни;
     }
 
     (void)sign_jump(id, group, buf);
@@ -1573,121 +1573,121 @@ sign_jump_cmd(buf_T *buf,
  * The supported arguments are: line={lnum} name={name} group={group}
  * priority={prio} and file={fname} or buffer={nr}.
  */
-static int
-parse_sign_cmd_args(int cmd,
+static цяло
+parse_sign_cmd_args(цяло cmd,
                     char_u *arg,
                     char_u **sign_name,
-                    int *signid,
+                    цяло *signid,
                     char_u **group,
-                    int *prio,
+                    цяло *prio,
                     buf_T **buf,
                     linenr_T *lnum)
 {
     char_u *arg1 = arg;
     char_u *filename = NULL;
-    int lnum_arg = FALSE;
+    цяло lnum_arg = FALSE;
 
     // first arg could be placed sign id
-    if (VIM_ISDIGIT(*arg))
+    ако (VIM_ISDIGIT(*arg))
     {
         *signid = getdigits(&arg);
-        if (!VIM_ISWHITE(*arg) && *arg != NUL)
+        ако (!VIM_ISWHITE(*arg) && *arg != NUL)
         {
             *signid = -1;
             arg = arg1;
         }
-        else
+        иначе
         {
             arg = skipwhite(arg);
         }
     }
 
-    while (*arg != NUL)
+    докато (*arg != NUL)
     {
-        if (STRNCMP(arg, "line=", 5) == 0)
+        ако (STRNCMP(arg, "line=", 5) == 0)
         {
             arg += 5;
             *lnum = atoi((char *)arg);
             arg = skiptowhite(arg);
             lnum_arg = TRUE;
         }
-        else if (STRNCMP(arg, "*", 1) == 0 && cmd == SIGNCMD_UNPLACE)
+        иначе ако (STRNCMP(arg, "*", 1) == 0 && cmd == SIGNCMD_UNPLACE)
         {
-            if (*signid != -1)
+            ако (*signid != -1)
             {
                 emsg(_(e_invalid_argument));
-                return FAIL;
+                върни FAIL;
             }
             *signid = -2;
             arg = skiptowhite(arg + 1);
         }
-        else if (STRNCMP(arg, "name=", 5) == 0)
+        иначе ако (STRNCMP(arg, "name=", 5) == 0)
         {
             arg += 5;
             char_u *name = arg;
             arg = skiptowhite(arg);
-            if (*arg != NUL)
+            ако (*arg != NUL)
                 *arg++ = NUL;
 
-            while (name[0] == '0' && name[1] != NUL)
+            докато (name[0] == '0' && name[1] != NUL)
                 ++name;
 
             *sign_name = name;
         }
-        else if (STRNCMP(arg, "group=", 6) == 0)
+        иначе ако (STRNCMP(arg, "group=", 6) == 0)
         {
             arg += 6;
             *group = arg;
             arg = skiptowhite(arg);
-            if (*arg != NUL)
+            ако (*arg != NUL)
                 *arg++ = NUL;
         }
-        else if (STRNCMP(arg, "priority=", 9) == 0)
+        иначе ако (STRNCMP(arg, "priority=", 9) == 0)
         {
             arg += 9;
             *prio = atoi((char *)arg);
             arg = skiptowhite(arg);
         }
-        else if (STRNCMP(arg, "file=", 5) == 0)
+        иначе ако (STRNCMP(arg, "file=", 5) == 0)
         {
             arg += 5;
             filename = arg;
             *buf = buflist_findname_exp(arg);
             break;
         }
-        else if (STRNCMP(arg, "buffer=", 7) == 0)
+        иначе ако (STRNCMP(arg, "buffer=", 7) == 0)
         {
             arg += 7;
             filename = arg;
-            *buf = buflist_findnr((int)getdigits(&arg));
+            *buf = buflist_findnr((цяло)getdigits(&arg));
 
-            if (*skipwhite(arg) != NUL)
+            ако (*skipwhite(arg) != NUL)
                 semsg(_(e_trailing_characters_str), arg);
 
             break;
         }
-        else
+        иначе
         {
             emsg(_(e_invalid_argument));
-            return FAIL;
+            върни FAIL;
         }
 
         arg = skipwhite(arg);
     }
 
-    if (filename != NULL && *buf == NULL)
+    ако (filename != NULL && *buf == NULL)
     {
         semsg(_(e_invalid_buffer_name_str), filename);
-        return FAIL;
+        върни FAIL;
     }
 
     // If the filename is not supplied for the sign place or the sign jump
     // command, then use the current buffer.
-    if (filename == NULL &&
+    ако (filename == NULL &&
         ((cmd == SIGNCMD_PLACE && lnum_arg) || cmd == SIGNCMD_JUMP))
         *buf = curwin->w_buffer;
 
-    return OK;
+    върни OK;
 }
 
 /*
@@ -1700,69 +1700,69 @@ ex_sign(exarg_T *eap)
 
     // Parse the subcommand.
     char_u *p = skiptowhite(arg);
-    int idx = sign_cmd_idx(arg, p);
-    if (idx == SIGNCMD_LAST)
+    цяло idx = sign_cmd_idx(arg, p);
+    ако (idx == SIGNCMD_LAST)
     {
         semsg(_(e_unknown_sign_command_str), arg);
-        return;
+        върни;
     }
     arg = skipwhite(p);
 
-    if (idx > SIGNCMD_LIST)
+    ако (idx > SIGNCMD_LIST)
     {
         char_u *sign_name = NULL;
-        int id = -1;
+        цяло id = -1;
         char_u *group = NULL;
-        int prio = -1;
+        цяло prio = -1;
         buf_T *buf = NULL;
         linenr_T lnum = -1;
 
         // Parse command line arguments
-        if (parse_sign_cmd_args(idx, arg, &sign_name, &id, &group, &prio, &buf,
+        ако (parse_sign_cmd_args(idx, arg, &sign_name, &id, &group, &prio, &buf,
                                 &lnum) == FAIL)
-            return;
+            върни;
 
-        if (idx == SIGNCMD_PLACE)
+        ако (idx == SIGNCMD_PLACE)
             sign_place_cmd(buf, lnum, sign_name, id, group, prio);
-        else if (idx == SIGNCMD_UNPLACE)
+        иначе ако (idx == SIGNCMD_UNPLACE)
             sign_unplace_cmd(buf, lnum, sign_name, id, group);
-        else if (idx == SIGNCMD_JUMP)
+        иначе ако (idx == SIGNCMD_JUMP)
             sign_jump_cmd(buf, lnum, sign_name, id, group);
 
-        return;
+        върни;
     }
 
     // Define, undefine or list signs.
-    if (idx == SIGNCMD_LIST && *arg == NUL)
+    ако (idx == SIGNCMD_LIST && *arg == NUL)
     {
         // ":sign list": list all defined signs
-        for (sign_T *sp = first_sign; sp != NULL && !got_int; sp = sp->sn_next)
+        за (sign_T *sp = first_sign; sp != NULL && !got_int; sp = sp->sn_next)
             sign_list_defined(sp);
     }
-    else if (*arg == NUL)
+    иначе ако (*arg == NUL)
     {
         emsg(_(e_missing_sign_name));
     }
-    else
+    иначе
     {
 
         // Isolate the sign name.  If it's a number skip leading zeroes,
         // so that "099" and "99" are the same sign.  But keep "0".
         p = skiptowhite(arg);
-        if (*p != NUL)
+        ако (*p != NUL)
             *p++ = NUL;
 
-        while (arg[0] == '0' && arg[1] != NUL)
+        докато (arg[0] == '0' && arg[1] != NUL)
             ++arg;
 
         char_u *name = vim_strsave(arg);
 
-        if (idx == SIGNCMD_DEFINE)
+        ако (idx == SIGNCMD_DEFINE)
             sign_define_cmd(name, p);
-        else if (idx == SIGNCMD_LIST)
+        иначе ако (idx == SIGNCMD_LIST)
             // ":sign list {name}"
             sign_list_by_name(name);
-        else
+        иначе
             // ":sign undefine {name}"
             sign_undefine_by_name(name, TRUE);
 
@@ -1778,52 +1778,52 @@ sign_getinfo(sign_T *sp, dict_T *retdict)
 {
     dict_add_string(retdict, "name", sp->sn_name);
 
-    if (sp->sn_icon != NULL)
+    ако (sp->sn_icon != NULL)
         dict_add_string(retdict, "icon", sp->sn_icon);
 
-    if (sp->sn_text != NULL)
+    ако (sp->sn_text != NULL)
         dict_add_string(retdict, "text", sp->sn_text);
 
-    if (sp->sn_priority > 0)
+    ако (sp->sn_priority > 0)
         dict_add_number(retdict, "priority", sp->sn_priority);
 
-    if (sp->sn_line_hl > 0)
+    ако (sp->sn_line_hl > 0)
     {
         char_u *p = get_highlight_name_ext(NULL, sp->sn_line_hl - 1, FALSE);
-        if (p == NULL)
+        ако (p == NULL)
             dict_add_string_len(retdict, "linehl",
                 (char_u *)"NONE", STRLEN_LITERAL("NONE"));
-        else
+        иначе
             dict_add_string(retdict, "linehl", p);
     }
 
-    if (sp->sn_text_hl > 0)
+    ако (sp->sn_text_hl > 0)
     {
         char_u *p = get_highlight_name_ext(NULL, sp->sn_text_hl - 1, FALSE);
-        if (p == NULL)
+        ако (p == NULL)
             dict_add_string_len(retdict, "texthl",
                 (char_u *)"NONE", STRLEN_LITERAL("NONE"));
-        else
+        иначе
             dict_add_string(retdict, "texthl", p);
     }
 
-    if (sp->sn_cul_hl > 0)
+    ако (sp->sn_cul_hl > 0)
     {
         char_u *p = get_highlight_name_ext(NULL, sp->sn_cul_hl - 1, FALSE);
-        if (p == NULL)
+        ако (p == NULL)
             dict_add_string_len(retdict, "culhl",
                 (char_u *)"NONE", STRLEN_LITERAL("NONE"));
-        else
+        иначе
             dict_add_string(retdict, "culhl", p);
     }
 
-    if (sp->sn_num_hl > 0)
+    ако (sp->sn_num_hl > 0)
     {
         char_u *p = get_highlight_name_ext(NULL, sp->sn_num_hl - 1, FALSE);
-        if (p == NULL)
+        ако (p == NULL)
             dict_add_string_len(retdict, "numhl",
                 (char_u *)"NONE", STRLEN_LITERAL("NONE"));
-        else
+        иначе
             dict_add_string(retdict, "numhl", p);
     }
 }
@@ -1837,28 +1837,28 @@ sign_getlist(char_u *name, list_T *retlist)
 {
     sign_T *sp = first_sign;
 
-    if (name != NULL)
+    ако (name != NULL)
     {
         sp = sign_find(name, NULL);
-        if (sp == NULL)
-            return;
+        ако (sp == NULL)
+            върни;
     }
 
-    for (; sp != NULL && !got_int; sp = sp->sn_next)
+    за (; sp != NULL && !got_int; sp = sp->sn_next)
     {
         dict_T *dict = dict_alloc_id(aid_sign_getlist);
-        if (dict == NULL)
-            return;
+        ако (dict == NULL)
+            върни;
 
-        if (list_append_dict(retlist, dict) == FAIL)
+        ако (list_append_dict(retlist, dict) == FAIL)
         {
             dict_unref(dict);
-            return;
+            върни;
         }
 
         sign_getinfo(sp, dict);
 
-        if (name != NULL) // handle only the specified sign
+        ако (name != NULL) // handle only the specified sign
             break;
     }
 }
@@ -1873,7 +1873,7 @@ get_buffer_signs(buf_T *buf, list_T *l)
     FOR_ALL_SIGNS_IN_BUF(buf, sign)
     {
         dict_T *d = sign_get_info(sign);
-        if (d != NULL && list_append_dict(l, d) == FAIL)
+        ако (d != NULL && list_append_dict(l, d) == FAIL)
             dict_unref(d);
     }
 }
@@ -1884,45 +1884,45 @@ get_buffer_signs(buf_T *buf, list_T *l)
 static void
 sign_get_placed_in_buf(buf_T *buf,
                        linenr_T lnum,
-                       int sign_id,
+                       цяло sign_id,
                        char_u *sign_group,
                        list_T *retlist)
 {
     dict_T *d = dict_alloc_id(aid_sign_getplaced_dict);
-    if (d == NULL)
-        return;
+    ако (d == NULL)
+        върни;
 
-    if (list_append_dict(retlist, d) == FAIL)
+    ако (list_append_dict(retlist, d) == FAIL)
     {
         dict_unref(d);
-        return;
+        върни;
     }
 
     dict_add_number(d, "bufnr", (long)buf->b_fnum);
 
     list_T *l = list_alloc_id(aid_sign_getplaced_list);
-    if (l == NULL)
-        return;
+    ако (l == NULL)
+        върни;
 
-    if (dict_add_list(d, "signs", l) == FAIL)
+    ако (dict_add_list(d, "signs", l) == FAIL)
     {
         list_unref(l);
-        return;
+        върни;
     }
 
     sign_entry_T *sign = NULL;
     FOR_ALL_SIGNS_IN_BUF(buf, sign)
     {
-        if (!sign_in_group(sign, sign_group))
+        ако (!sign_in_group(sign, sign_group))
             continue;
 
-        if ((lnum == 0 && sign_id == 0) ||
+        ако ((lnum == 0 && sign_id == 0) ||
             (sign_id == 0 && lnum == sign->se_lnum) ||
             (lnum == 0 && sign_id == sign->se_id) ||
             (lnum == sign->se_lnum && sign_id == sign->se_id))
         {
             dict_T *sdict = sign_get_info(sign);
-            if (sdict != NULL && list_append_dict(l, sdict) == FAIL)
+            ако (sdict != NULL && list_append_dict(l, sdict) == FAIL)
                 dict_unref(sdict);
         }
     }
@@ -1936,25 +1936,25 @@ sign_get_placed_in_buf(buf_T *buf,
 static void
 sign_get_placed(buf_T *buf,
                 linenr_T lnum,
-                int sign_id,
+                цяло sign_id,
                 char_u *sign_group,
                 list_T *retlist)
 {
-    if (buf != NULL)
+    ако (buf != NULL)
     {
         sign_get_placed_in_buf(buf, lnum, sign_id, sign_group, retlist);
     }
-    else
+    иначе
     {
         FOR_ALL_BUFFERS(buf)
         {
-            if (buf->b_signlist != NULL)
+            ако (buf->b_signlist != NULL)
                 sign_get_placed_in_buf(buf, 0, sign_id, sign_group, retlist);
         }
     }
 }
 
-# if defined(FEAT_SIGN_ICONS)
+# ако defined(FEAT_SIGN_ICONS)
 /*
  * Allocate the icons.  Called when the GUI has started.  Allows defining
  * signs before it starts.
@@ -1965,7 +1965,7 @@ sign_gui_started(void)
     sign_T *sp = NULL;
     FOR_ALL_SIGNS(sp)
     {
-        if (sp->sn_icon != NULL)
+        ако (sp->sn_icon != NULL)
             sp->sn_image = gui_mch_register_sign(sp->sn_icon);
     }
 }
@@ -1981,71 +1981,71 @@ sign_list_defined(sign_T *sp)
 
     smsg("sign %s", sp->sn_name);
 
-    if (sp->sn_icon != NULL)
+    ако (sp->sn_icon != NULL)
     {
         msg_puts(" icon=");
         msg_outtrans(sp->sn_icon);
 # ifdef FEAT_SIGN_ICONS
-        if (sp->sn_image == NULL)
+        ако (sp->sn_image == NULL)
             msg_puts(_(" (NOT FOUND)"));
-# else
+# иначе
         msg_puts(_(" (not supported)"));
 # endif
     }
 
-    if (sp->sn_text != NULL)
+    ако (sp->sn_text != NULL)
     {
         msg_puts(" text=");
         msg_outtrans(sp->sn_text);
     }
 
-    if (sp->sn_priority > 0)
+    ако (sp->sn_priority > 0)
     {
         vim_snprintf(lbuf, MSG_BUF_LEN, " priority=%d", sp->sn_priority);
         msg_puts(lbuf);
     }
 
-    if (sp->sn_line_hl > 0)
+    ако (sp->sn_line_hl > 0)
     {
         msg_puts(" linehl=");
 
         char_u *p = get_highlight_name_ext(NULL, sp->sn_line_hl - 1, FALSE);
-        if (p == NULL)
+        ако (p == NULL)
             msg_puts("NONE");
-        else
+        иначе
             msg_puts((char *)p);
     }
 
-    if (sp->sn_text_hl > 0)
+    ако (sp->sn_text_hl > 0)
     {
         msg_puts(" texthl=");
 
         char_u *p = get_highlight_name_ext(NULL, sp->sn_text_hl - 1, FALSE);
-        if (p == NULL)
+        ако (p == NULL)
             msg_puts("NONE");
-        else
+        иначе
             msg_puts((char *)p);
     }
 
-    if (sp->sn_cul_hl > 0)
+    ако (sp->sn_cul_hl > 0)
     {
         msg_puts(" culhl=");
 
         char_u *p = get_highlight_name_ext(NULL, sp->sn_cul_hl - 1, FALSE);
-        if (p == NULL)
+        ако (p == NULL)
             msg_puts("NONE");
-        else
+        иначе
             msg_puts((char *)p);
     }
 
-    if (sp->sn_num_hl > 0)
+    ако (sp->sn_num_hl > 0)
     {
         msg_puts(" numhl=");
 
         char_u *p = get_highlight_name_ext(NULL, sp->sn_num_hl - 1, FALSE);
-        if (p == NULL)
+        ако (p == NULL)
             msg_puts("NONE");
-        else
+        иначе
             msg_puts((char *)p);
     }
 }
@@ -2059,7 +2059,7 @@ sign_undefine(sign_T *sp, sign_T *sp_prev)
     vim_free(sp->sn_name);
     vim_free(sp->sn_icon);
 # ifdef FEAT_SIGN_ICONS
-    if (sp->sn_image != NULL)
+    ако (sp->sn_image != NULL)
     {
         out_flush();
         gui_mch_destroy_sign(sp->sn_image);
@@ -2067,25 +2067,25 @@ sign_undefine(sign_T *sp, sign_T *sp_prev)
 # endif
     vim_free(sp->sn_text);
 
-    if (sp_prev == NULL)
+    ако (sp_prev == NULL)
         first_sign = sp->sn_next;
-    else
+    иначе
         sp_prev->sn_next = sp->sn_next;
 
     vim_free(sp);
 }
 
-# if defined(FEAT_SIGN_ICONS)
+# ако defined(FEAT_SIGN_ICONS)
 void *
-sign_get_image(int typenr) // the attribute which may have a sign
+sign_get_image(цяло typenr) // the attribute which may have a sign
 {
     sign_T *sp = NULL;
     FOR_ALL_SIGNS(sp)
     {
-        if (sp->sn_typenr == typenr)
-            return sp->sn_image;
+        ако (sp->sn_typenr == typenr)
+            върни sp->sn_image;
     }
-    return NULL;
+    върни NULL;
 }
 # endif
 
@@ -2095,7 +2095,7 @@ sign_get_image(int typenr) // the attribute which may have a sign
 void
 free_signs(void)
 {
-    while (first_sign != NULL)
+    докато (first_sign != NULL)
         sign_undefine(first_sign, NULL);
 }
 
@@ -2114,44 +2114,44 @@ static enum
  * Return the n'th sign name (used for command line completion)
  */
 static char_u *
-get_nth_sign_name(int idx)
+get_nth_sign_name(цяло idx)
 {
-    int current_idx = 0;
+    цяло current_idx = 0;
     sign_T *sp = NULL;
 
     // Complete with name of signs already defined
     FOR_ALL_SIGNS(sp)
     {
-        if (current_idx++ == idx)
-            return sp->sn_name;
+        ако (current_idx++ == idx)
+            върни sp->sn_name;
     }
-    return NULL;
+    върни NULL;
 }
 
 /*
  * Return the n'th sign group name (used for command line completion)
  */
 static char_u *
-get_nth_sign_group_name(int idx)
+get_nth_sign_group_name(цяло idx)
 {
-    int current_idx = 0;
-    int todo = (int)sg_table.ht_used;
+    цяло current_idx = 0;
+    цяло todo = (цяло)sg_table.ht_used;
     hashitem_T *hi = NULL;
 
     // Complete with name of sign groups already defined
     FOR_ALL_HASHTAB_ITEMS(&sg_table, hi, todo)
     {
-        if (!HASHITEM_EMPTY(hi))
+        ако (!HASHITEM_EMPTY(hi))
         {
             --todo;
-            if (current_idx++ == idx)
+            ако (current_idx++ == idx)
             {
                 signgroup_T *group = HI2SG(hi);
-                return group->sg_name;
+                върни group->sg_name;
             }
         }
     }
-    return NULL;
+    върни NULL;
 }
 
 /*
@@ -2159,40 +2159,40 @@ get_nth_sign_group_name(int idx)
  * expansion.
  */
 char_u *
-get_sign_name(expand_T *xp UNUSED, int idx)
+get_sign_name(expand_T *xp UNUSED, цяло idx)
 {
     switch (expand_what)
     {
         case EXP_SUBCMD:
-            return (char_u *)cmds[idx];
+            върни (char_u *)cmds[idx];
         case EXP_DEFINE:
         {
             char *define_arg[] = { "culhl=", "icon=",   "linehl=",   "numhl=",
                                    "text=",  "texthl=", "priority=", NULL };
-            return (char_u *)define_arg[idx];
+            върни (char_u *)define_arg[idx];
         }
         case EXP_PLACE:
         {
             char *place_arg[] = { "line=", "name=",   "group=", "priority=",
                                   "file=", "buffer=", NULL };
-            return (char_u *)place_arg[idx];
+            върни (char_u *)place_arg[idx];
         }
         case EXP_LIST:
         {
             char *list_arg[] = { "group=", "file=", "buffer=", NULL };
-            return (char_u *)list_arg[idx];
+            върни (char_u *)list_arg[idx];
         }
         case EXP_UNPLACE:
         {
             char *unplace_arg[] = { "group=", "file=", "buffer=", NULL };
-            return (char_u *)unplace_arg[idx];
+            върни (char_u *)unplace_arg[idx];
         }
         case EXP_SIGN_NAMES:
-            return get_nth_sign_name(idx);
+            върни get_nth_sign_name(idx);
         case EXP_SIGN_GROUPS:
-            return get_nth_sign_group_name(idx);
+            върни get_nth_sign_group_name(idx);
         default:
-            return NULL;
+            върни NULL;
     }
 }
 
@@ -2205,7 +2205,7 @@ set_context_in_sign_cmd(expand_T *xp, char_u *arg)
     char_u *p;
     char_u *end_subcmd;
     char_u *last;
-    int cmd_idx;
+    цяло cmd_idx;
     char_u *begin_subcmd_args;
 
     // Default: expand subcommands.
@@ -2216,8 +2216,8 @@ set_context_in_sign_cmd(expand_T *xp, char_u *arg)
     end_subcmd = skiptowhite(arg);
     // expand subcmd name
     // :sign {subcmd}<CTRL-D>
-    if (*end_subcmd == NUL)
-        return;
+    ако (*end_subcmd == NUL)
+        върни;
 
     cmd_idx = sign_cmd_idx(arg, end_subcmd);
 
@@ -2240,14 +2240,14 @@ set_context_in_sign_cmd(expand_T *xp, char_u *arg)
         last = p;
         p = skiptowhite(p);
     }
-    while (*p != NUL);
+    докато (*p != NUL);
 
     p = vim_strchr(last, '=');
 
     // :sign define {name} {args}... {last}=
     //                               |     |
     //                            last     p
-    if (p == NULL)
+    ако (p == NULL)
     {
         // Expand last argument name (before equal sign).
         xp->xp_pattern = last;
@@ -2258,10 +2258,10 @@ set_context_in_sign_cmd(expand_T *xp, char_u *arg)
                 break;
             case SIGNCMD_PLACE:
                 // List placed signs
-                if (VIM_ISDIGIT(*begin_subcmd_args))
+                ако (VIM_ISDIGIT(*begin_subcmd_args))
                     //   :sign place {id} {args}...
                     expand_what = EXP_PLACE;
-                else
+                иначе
                     //   :sign place {args}...
                     expand_what = EXP_LIST;
                 break;
@@ -2279,40 +2279,40 @@ set_context_in_sign_cmd(expand_T *xp, char_u *arg)
                 xp->xp_context = EXPAND_NOTHING;
         }
     }
-    else
+    иначе
     {
         // Expand last argument value (after equal sign).
         xp->xp_pattern = p + 1;
         switch (cmd_idx)
         {
             case SIGNCMD_DEFINE:
-                if (STRNCMP(last, "texthl", 6) == 0 ||
+                ако (STRNCMP(last, "texthl", 6) == 0 ||
                     STRNCMP(last, "linehl", 6) == 0 ||
                     STRNCMP(last, "culhl", 5) == 0 ||
                     STRNCMP(last, "numhl", 5) == 0)
                     xp->xp_context = EXPAND_HIGHLIGHT;
-                else if (STRNCMP(last, "icon", 4) == 0)
+                иначе ако (STRNCMP(last, "icon", 4) == 0)
                     xp->xp_context = EXPAND_FILES;
-                else
+                иначе
                     xp->xp_context = EXPAND_NOTHING;
                 break;
             case SIGNCMD_PLACE:
-                if (STRNCMP(last, "name", 4) == 0)
+                ако (STRNCMP(last, "name", 4) == 0)
                     expand_what = EXP_SIGN_NAMES;
-                else if (STRNCMP(last, "group", 5) == 0)
+                иначе ако (STRNCMP(last, "group", 5) == 0)
                     expand_what = EXP_SIGN_GROUPS;
-                else if (STRNCMP(last, "file", 4) == 0)
+                иначе ако (STRNCMP(last, "file", 4) == 0)
                     xp->xp_context = EXPAND_BUFFERS;
-                else
+                иначе
                     xp->xp_context = EXPAND_NOTHING;
                 break;
             case SIGNCMD_UNPLACE:
             case SIGNCMD_JUMP:
-                if (STRNCMP(last, "group", 5) == 0)
+                ако (STRNCMP(last, "group", 5) == 0)
                     expand_what = EXP_SIGN_GROUPS;
-                else if (STRNCMP(last, "file", 4) == 0)
+                иначе ако (STRNCMP(last, "file", 4) == 0)
                     xp->xp_context = EXPAND_BUFFERS;
-                else
+                иначе
                     xp->xp_context = EXPAND_NOTHING;
                 break;
             default:
@@ -2325,7 +2325,7 @@ set_context_in_sign_cmd(expand_T *xp, char_u *arg)
  * Define a sign using the attributes in 'dict'. Returns 0 on success and -1 on
  * failure.
  */
-static int
+static цяло
 sign_define_from_dict(char_u *name_arg, dict_T *dict)
 {
     char_u *name = NULL;
@@ -2335,21 +2335,21 @@ sign_define_from_dict(char_u *name_arg, dict_T *dict)
     char_u *texthl = NULL;
     char_u *culhl = NULL;
     char_u *numhl = NULL;
-    int prio = -1;
-    int retval = -1;
+    цяло prio = -1;
+    цяло retval = -1;
 
-    if (name_arg == NULL && dict == NULL)
-        return retval;
+    ако (name_arg == NULL && dict == NULL)
+        върни retval;
 
-    if (name_arg == NULL)
+    ако (name_arg == NULL)
         name = dict_get_string(dict, "name", TRUE);
-    else
+    иначе
         name = vim_strsave(name_arg);
 
-    if (name == NULL || name[0] == NUL)
+    ако (name == NULL || name[0] == NUL)
         goto cleanup;
 
-    if (dict != NULL)
+    ако (dict != NULL)
     {
         icon = dict_get_string(dict, "icon", TRUE);
         linehl = dict_get_string(dict, "linehl", TRUE);
@@ -2360,7 +2360,7 @@ sign_define_from_dict(char_u *name_arg, dict_T *dict)
         prio = dict_get_number_def(dict, "priority", -1);
     }
 
-    if (sign_define_by_name(name, icon, linehl, text, texthl, culhl, numhl,
+    ако (sign_define_by_name(name, icon, linehl, text, texthl, culhl, numhl,
                             prio) == OK)
         retval = 0;
 
@@ -2373,7 +2373,7 @@ cleanup:
     vim_free(culhl);
     vim_free(numhl);
 
-    return retval;
+    върни retval;
 }
 
 /*
@@ -2386,11 +2386,11 @@ sign_define_multiple(list_T *l, list_T *retlist)
     listitem_T *li = NULL;
     FOR_ALL_LIST_ITEMS(l, li)
     {
-        int retval = -1;
+        цяло retval = -1;
 
-        if (li->li_tv.v_type == VAR_DICT)
+        ако (li->li_tv.v_type == VAR_DICT)
             retval = sign_define_from_dict(NULL, li->li_tv.vval.v_dict);
-        else
+        иначе
             emsg(_(e_dictionary_required));
 
         list_append_number(retlist, retval);
@@ -2403,29 +2403,29 @@ sign_define_multiple(list_T *l, list_T *retlist)
 void
 f_sign_define(typval_T *argvars, typval_T *rettv)
 {
-    if (in_vim9script() && (check_for_string_or_list_arg(argvars, 0) == FAIL ||
+    ако (in_vim9script() && (check_for_string_or_list_arg(argvars, 0) == FAIL ||
                             check_for_opt_dict_arg(argvars, 1) == FAIL))
-        return;
+        върни;
 
-    if (argvars[0].v_type == VAR_LIST && argvars[1].v_type == VAR_UNKNOWN)
+    ако (argvars[0].v_type == VAR_LIST && argvars[1].v_type == VAR_UNKNOWN)
     {
         // Define multiple signs
-        if (rettv_list_alloc(rettv) == FAIL)
-            return;
+        ако (rettv_list_alloc(rettv) == FAIL)
+            върни;
 
         sign_define_multiple(argvars[0].vval.v_list, rettv->vval.v_list);
-        return;
+        върни;
     }
 
     // Define a single sign
     rettv->vval.v_number = -1;
 
     char_u *name = tv_get_string_chk(&argvars[0]);
-    if (name == NULL)
-        return;
+    ако (name == NULL)
+        върни;
 
-    if (check_for_opt_dict_arg(argvars, 1) == FAIL)
-        return;
+    ако (check_for_opt_dict_arg(argvars, 1) == FAIL)
+        върни;
 
     rettv->vval.v_number = sign_define_from_dict(
         name, argvars[1].v_type == VAR_DICT ? argvars[1].vval.v_dict : NULL);
@@ -2437,14 +2437,14 @@ f_sign_define(typval_T *argvars, typval_T *rettv)
 void
 f_sign_getdefined(typval_T *argvars, typval_T *rettv)
 {
-    if (rettv_list_alloc_id(rettv, aid_sign_getdefined) == FAIL)
-        return;
+    ако (rettv_list_alloc_id(rettv, aid_sign_getdefined) == FAIL)
+        върни;
 
-    if (in_vim9script() && check_for_opt_string_arg(argvars, 0) == FAIL)
-        return;
+    ако (in_vim9script() && check_for_opt_string_arg(argvars, 0) == FAIL)
+        върни;
 
     char_u *name = NULL;
-    if (argvars[0].v_type != VAR_UNKNOWN)
+    ако (argvars[0].v_type != VAR_UNKNOWN)
         name = tv_get_string(&argvars[0]);
 
     sign_getlist(name, rettv->vval.v_list);
@@ -2458,59 +2458,59 @@ f_sign_getplaced(typval_T *argvars, typval_T *rettv)
 {
     buf_T *buf = NULL;
     linenr_T lnum = 0;
-    int sign_id = 0;
+    цяло sign_id = 0;
     char_u *group = NULL;
 
-    if (rettv_list_alloc_id(rettv, aid_sign_getplaced) == FAIL)
-        return;
+    ако (rettv_list_alloc_id(rettv, aid_sign_getplaced) == FAIL)
+        върни;
 
-    if (in_vim9script() && (check_for_opt_buffer_arg(argvars, 0) == FAIL ||
+    ако (in_vim9script() && (check_for_opt_buffer_arg(argvars, 0) == FAIL ||
                             (argvars[0].v_type != VAR_UNKNOWN &&
                              check_for_opt_dict_arg(argvars, 1) == FAIL)))
-        return;
+        върни;
 
-    if (argvars[0].v_type != VAR_UNKNOWN)
+    ако (argvars[0].v_type != VAR_UNKNOWN)
     {
         // get signs placed in the specified buffer
         buf = get_buf_arg(&argvars[0]);
-        if (buf == NULL)
-            return;
+        ако (buf == NULL)
+            върни;
 
-        if (argvars[1].v_type != VAR_UNKNOWN)
+        ако (argvars[1].v_type != VAR_UNKNOWN)
         {
-            if (check_for_nonnull_dict_arg(argvars, 1) == FAIL)
-                return;
+            ако (check_for_nonnull_dict_arg(argvars, 1) == FAIL)
+                върни;
 
             dictitem_T *di = NULL;
             dict_T *dict = argvars[1].vval.v_dict;
 
-            if ((di = dict_find(dict, (char_u *)"lnum", -1)) != NULL)
+            ако ((di = dict_find(dict, (char_u *)"lnum", -1)) != NULL)
             {
                 // get signs placed at this line
-                int notanum = FALSE;
+                цяло notanum = FALSE;
                 tv_get_number_chk(&di->di_tv, &notanum);
-                if (notanum)
-                    return;
+                ако (notanum)
+                    върни;
 
                 lnum = tv_get_lnum(&di->di_tv);
             }
 
-            if ((di = dict_find(dict, (char_u *)"id", -1)) != NULL)
+            ако ((di = dict_find(dict, (char_u *)"id", -1)) != NULL)
             {
                 // get sign placed with this identifier
-                int notanum = FALSE;
-                sign_id = (int)tv_get_number_chk(&di->di_tv, &notanum);
-                if (notanum)
-                    return;
+                цяло notanum = FALSE;
+                sign_id = (цяло)tv_get_number_chk(&di->di_tv, &notanum);
+                ако (notanum)
+                    върни;
             }
 
-            if ((di = dict_find(dict, (char_u *)"group", -1)) != NULL)
+            ако ((di = dict_find(dict, (char_u *)"group", -1)) != NULL)
             {
                 group = tv_get_string_chk(&di->di_tv);
-                if (group == NULL)
-                    return;
+                ако (group == NULL)
+                    върни;
 
-                if (*group == '\0') // empty string means global group
+                ако (*group == '\0') // empty string means global group
                     group = NULL;
             }
         }
@@ -2528,42 +2528,42 @@ f_sign_jump(typval_T *argvars, typval_T *rettv)
     char_u *sign_group = NULL;
     rettv->vval.v_number = -1;
 
-    if (in_vim9script() && (check_for_number_arg(argvars, 0) == FAIL ||
+    ако (in_vim9script() && (check_for_number_arg(argvars, 0) == FAIL ||
                             check_for_string_arg(argvars, 1) == FAIL ||
                             check_for_buffer_arg(argvars, 2) == FAIL))
-        return;
+        върни;
 
-    int notanum = FALSE;
+    цяло notanum = FALSE;
     // Sign identifier
-    int sign_id = (int)tv_get_number_chk(&argvars[0], &notanum);
-    if (notanum)
-        return;
+    цяло sign_id = (цяло)tv_get_number_chk(&argvars[0], &notanum);
+    ако (notanum)
+        върни;
 
-    if (sign_id <= 0)
+    ако (sign_id <= 0)
     {
         emsg(_(e_invalid_argument));
-        return;
+        върни;
     }
 
     // Sign group
     sign_group = tv_get_string_chk(&argvars[1]);
-    if (sign_group == NULL)
-        return;
+    ако (sign_group == NULL)
+        върни;
 
-    if (sign_group[0] == '\0')
+    ако (sign_group[0] == '\0')
     {
         sign_group = NULL; // global sign group
     }
-    else
+    иначе
     {
         sign_group = vim_strsave(sign_group);
-        if (sign_group == NULL)
-            return;
+        ако (sign_group == NULL)
+            върни;
     }
 
     // Buffer to place the sign
     buf_T *buf = get_buf_arg(&argvars[2]);
-    if (buf == NULL)
+    ако (buf == NULL)
         goto cleanup;
 
     rettv->vval.v_number = sign_jump(sign_id, sign_group, buf);
@@ -2576,115 +2576,115 @@ cleanup:
  * Place a new sign using the values specified in dict 'dict'. Returns the sign
  * identifier if successfully placed, otherwise returns 0.
  */
-static int
+static цяло
 sign_place_from_dict(typval_T *id_tv,
                      typval_T *group_tv,
                      typval_T *name_tv,
                      typval_T *buf_tv,
                      dict_T *dict)
 {
-    int sign_id = 0;
+    цяло sign_id = 0;
     char_u *group = NULL;
     char_u *sign_name = NULL;
     buf_T *buf = NULL;
     dictitem_T *di = NULL;
     linenr_T lnum = 0;
-    int prio = -1;
-    int ret_sign_id = -1;
+    цяло prio = -1;
+    цяло ret_sign_id = -1;
 
     // sign identifier
-    if (id_tv == NULL)
+    ако (id_tv == NULL)
     {
         di = dict_find(dict, (char_u *)"id", -1);
-        if (di != NULL)
+        ако (di != NULL)
             id_tv = &di->di_tv;
     }
 
-    if (id_tv == NULL)
+    ако (id_tv == NULL)
     {
         sign_id = 0;
     }
-    else
+    иначе
     {
-        int notanum = FALSE;
+        цяло notanum = FALSE;
         sign_id = tv_get_number_chk(id_tv, &notanum);
 
-        if (notanum)
-            return -1;
+        ако (notanum)
+            върни -1;
 
-        if (sign_id < 0)
+        ако (sign_id < 0)
         {
             emsg(_(e_invalid_argument));
-            return -1;
+            върни -1;
         }
     }
 
     // sign group
-    if (group_tv == NULL)
+    ако (group_tv == NULL)
     {
         di = dict_find(dict, (char_u *)"group", -1);
-        if (di != NULL)
+        ако (di != NULL)
             group_tv = &di->di_tv;
     }
 
-    if (group_tv == NULL)
+    ако (group_tv == NULL)
     {
         group = NULL; // global group
     }
-    else
+    иначе
     {
         group = tv_get_string_chk(group_tv);
-        if (group == NULL)
+        ако (group == NULL)
             goto cleanup;
 
-        if (group[0] == '\0') // global sign group
+        ако (group[0] == '\0') // global sign group
         {
             group = NULL;
         }
-        else
+        иначе
         {
             group = vim_strsave(group);
-            if (group == NULL)
-                return -1;
+            ако (group == NULL)
+                върни -1;
         }
     }
 
     // sign name
-    if (name_tv == NULL)
+    ако (name_tv == NULL)
     {
         di = dict_find(dict, (char_u *)"name", -1);
-        if (di != NULL)
+        ако (di != NULL)
             name_tv = &di->di_tv;
     }
 
-    if (name_tv == NULL)
+    ако (name_tv == NULL)
         goto cleanup;
 
     sign_name = tv_get_string_chk(name_tv);
-    if (sign_name == NULL)
+    ако (sign_name == NULL)
         goto cleanup;
 
     // buffer to place the sign
-    if (buf_tv == NULL)
+    ако (buf_tv == NULL)
     {
         di = dict_find(dict, (char_u *)"buffer", -1);
-        if (di != NULL)
+        ако (di != NULL)
             buf_tv = &di->di_tv;
     }
 
-    if (buf_tv == NULL)
+    ако (buf_tv == NULL)
         goto cleanup;
 
     buf = get_buf_arg(buf_tv);
-    if (buf == NULL)
+    ако (buf == NULL)
         goto cleanup;
 
     // line number of the sign
     di = dict_find(dict, (char_u *)"lnum", -1);
-    if (di != NULL)
+    ако (di != NULL)
     {
         lnum = tv_get_lnum(&di->di_tv);
-        if (lnum <= 0)
+        ако (lnum <= 0)
         {
             emsg(_(e_invalid_argument));
             goto cleanup;
@@ -2693,21 +2693,21 @@ sign_place_from_dict(typval_T *id_tv,
 
     // sign priority
     di = dict_find(dict, (char_u *)"priority", -1);
-    if (di != NULL)
+    ако (di != NULL)
     {
-        int notanum = FALSE;
-        prio = (int)tv_get_number_chk(&di->di_tv, &notanum);
-        if (notanum)
+        цяло notanum = FALSE;
+        prio = (цяло)tv_get_number_chk(&di->di_tv, &notanum);
+        ако (notanum)
             goto cleanup;
     }
 
-    if (sign_place(&sign_id, group, sign_name, buf, lnum, prio) == OK)
+    ако (sign_place(&sign_id, group, sign_name, buf, lnum, prio) == OK)
         ret_sign_id = sign_id;
 
 cleanup:
     vim_free(group);
 
-    return ret_sign_id;
+    върни ret_sign_id;
 }
 
 /*
@@ -2719,17 +2719,17 @@ f_sign_place(typval_T *argvars, typval_T *rettv)
     dict_T *dict = NULL;
     rettv->vval.v_number = -1;
 
-    if (in_vim9script() && (check_for_number_arg(argvars, 0) == FAIL ||
+    ако (in_vim9script() && (check_for_number_arg(argvars, 0) == FAIL ||
                             check_for_string_arg(argvars, 1) == FAIL ||
                             check_for_string_arg(argvars, 2) == FAIL ||
                             check_for_buffer_arg(argvars, 3) == FAIL ||
                             check_for_opt_dict_arg(argvars, 4) == FAIL))
-        return;
+        върни;
 
-    if (argvars[4].v_type != VAR_UNKNOWN)
+    ако (argvars[4].v_type != VAR_UNKNOWN)
     {
-        if (check_for_nonnull_dict_arg(argvars, 4) == FAIL)
-            return;
+        ако (check_for_nonnull_dict_arg(argvars, 4) == FAIL)
+            върни;
         dict = argvars[4].vval.v_dict;
     }
 
@@ -2743,25 +2743,25 @@ f_sign_place(typval_T *argvars, typval_T *rettv)
 void
 f_sign_placelist(typval_T *argvars, typval_T *rettv)
 {
-    if (rettv_list_alloc(rettv) == FAIL)
-        return;
+    ако (rettv_list_alloc(rettv) == FAIL)
+        върни;
 
-    if (in_vim9script() && check_for_list_arg(argvars, 0) == FAIL)
-        return;
+    ако (in_vim9script() && check_for_list_arg(argvars, 0) == FAIL)
+        върни;
 
-    if (check_for_list_arg(argvars, 0) == FAIL)
-        return;
+    ако (check_for_list_arg(argvars, 0) == FAIL)
+        върни;
 
     // Process the List of sign attributes
     listitem_T *li = NULL;
     FOR_ALL_LIST_ITEMS(argvars[0].vval.v_list, li)
     {
-        int sign_id = -1;
+        цяло sign_id = -1;
 
-        if (li->li_tv.v_type == VAR_DICT)
+        ако (li->li_tv.v_type == VAR_DICT)
             sign_id = sign_place_from_dict(NULL, NULL, NULL, NULL,
                                            li->li_tv.vval.v_dict);
-        else
+        иначе
             emsg(_(e_dictionary_required));
 
         list_append_number(rettv->vval.v_list, sign_id);
@@ -2777,9 +2777,9 @@ sign_undefine_multiple(list_T *l, list_T *retlist)
     listitem_T *li = NULL;
     FOR_ALL_LIST_ITEMS(l, li)
     {
-        int retval = -1;
+        цяло retval = -1;
         char_u *name = tv_get_string_chk(&li->li_tv);
-        if (name != NULL && (sign_undefine_by_name(name, TRUE) == OK))
+        ако (name != NULL && (sign_undefine_by_name(name, TRUE) == OK))
             retval = 0;
 
         list_append_number(retlist, retval);
@@ -2793,35 +2793,35 @@ void
 f_sign_undefine(typval_T *argvars, typval_T *rettv)
 {
 
-    if (in_vim9script() && check_for_opt_string_or_list_arg(argvars, 0) == FAIL)
-        return;
+    ако (in_vim9script() && check_for_opt_string_or_list_arg(argvars, 0) == FAIL)
+        върни;
 
-    if (argvars[0].v_type == VAR_LIST && argvars[1].v_type == VAR_UNKNOWN)
+    ако (argvars[0].v_type == VAR_LIST && argvars[1].v_type == VAR_UNKNOWN)
     {
         // Undefine multiple signs
-        if (rettv_list_alloc(rettv) == FAIL)
-            return;
+        ако (rettv_list_alloc(rettv) == FAIL)
+            върни;
 
         sign_undefine_multiple(argvars[0].vval.v_list, rettv->vval.v_list);
-        return;
+        върни;
     }
 
     rettv->vval.v_number = -1;
 
-    if (argvars[0].v_type == VAR_UNKNOWN)
+    ако (argvars[0].v_type == VAR_UNKNOWN)
     {
         // Free all the signs
         free_signs();
         rettv->vval.v_number = 0;
     }
-    else
+    иначе
     {
         // Free only the specified sign
         char_u *name = tv_get_string_chk(&argvars[0]);
-        if (name == NULL)
-            return;
+        ако (name == NULL)
+            върни;
 
-        if (sign_undefine_by_name(name, TRUE) == OK)
+        ако (sign_undefine_by_name(name, TRUE) == OK)
             rettv->vval.v_number = 0;
     }
 }
@@ -2830,46 +2830,46 @@ f_sign_undefine(typval_T *argvars, typval_T *rettv)
  * Unplace the sign with attributes specified in 'dict'. Returns 0 on success
  * and -1 on failure.
  */
-static int
+static цяло
 sign_unplace_from_dict(typval_T *group_tv, dict_T *dict)
 {
-    int sign_id = 0;
+    цяло sign_id = 0;
     buf_T *buf = NULL;
     char_u *group = NULL;
-    int retval = -1;
+    цяло retval = -1;
 
     // sign group
     group = (group_tv != NULL) ? tv_get_string(group_tv)
                                : dict_get_string(dict, "group", FALSE);
 
-    if (group != NULL)
+    ако (group != NULL)
     {
-        if (group[0] == '\0') // global sign group
+        ако (group[0] == '\0') // global sign group
         {
             group = NULL;
         }
-        else
+        иначе
         {
             group = vim_strsave(group);
-            if (group == NULL)
-                return retval;
+            ако (group == NULL)
+                върни retval;
         }
     }
 
-    if (dict != NULL)
+    ако (dict != NULL)
     {
         dictitem_T *di = dict_find(dict, (char_u *)"buffer", -1);
-        if (di != NULL)
+        ако (di != NULL)
         {
             buf = get_buf_arg(&di->di_tv);
-            if (buf == NULL)
+            ако (buf == NULL)
                 goto cleanup;
         }
 
-        if (dict_has_key(dict, "id"))
+        ако (dict_has_key(dict, "id"))
         {
             sign_id = dict_get_number(dict, "id");
-            if (sign_id <= 0)
+            ако (sign_id <= 0)
             {
                 emsg(_(e_invalid_argument));
                 goto cleanup;
@@ -2877,21 +2877,21 @@ sign_unplace_from_dict(typval_T *group_tv, dict_T *dict)
         }
     }
 
-    if (buf == NULL)
+    ако (buf == NULL)
     {
         // Delete the sign in all the buffers
         retval = 0;
         FOR_ALL_BUFFERS(buf)
-            if (sign_unplace(sign_id, group, buf, 0) != OK)
+            ако (sign_unplace(sign_id, group, buf, 0) != OK)
                 retval = -1;
     }
-    else if (sign_unplace(sign_id, group, buf, 0) == OK)
+    иначе ако (sign_unplace(sign_id, group, buf, 0) == OK)
         retval = 0;
 
 cleanup:
     vim_free(group);
 
-    return retval;
+    върни retval;
 }
 
 sign_entry_T *
@@ -2900,31 +2900,31 @@ get_first_valid_sign(win_T *wp)
     sign_entry_T *sign = wp->w_buffer->b_signlist;
 
 # ifdef FEAT_PROP_POPUP
-    while (sign != NULL && !sign_group_for_window(sign, wp))
+    докато (sign != NULL && !sign_group_for_window(sign, wp))
         sign = sign->se_next;
 # endif
-    return sign;
+    върни sign;
 }
 
 /*
  * Return TRUE when window "wp" has a column to draw signs in.
  */
-int
+цяло
 signcolumn_on(win_T *wp)
 {
     // If 'signcolumn' is set to 'number', signs are displayed in the 'number'
     // column (if present). Otherwise signs are to be displayed in the sign
     // column.
-    if (*wp->w_p_scl == 'n' && *(wp->w_p_scl + 1) == 'u')
-        return get_first_valid_sign(wp) != NULL && !wp->w_p_nu && !wp->w_p_rnu;
+    ако (*wp->w_p_scl == 'n' && *(wp->w_p_scl + 1) == 'u')
+        върни get_first_valid_sign(wp) != NULL && !wp->w_p_nu && !wp->w_p_rnu;
 
-    if (*wp->w_p_scl == 'n')
-        return FALSE;
+    ако (*wp->w_p_scl == 'n')
+        върни FALSE;
 
-    if (*wp->w_p_scl == 'y')
-        return TRUE;
+    ако (*wp->w_p_scl == 'y')
+        върни TRUE;
 
-    return (get_first_valid_sign(wp) != NULL
+    върни (get_first_valid_sign(wp) != NULL
 # ifdef FEAT_NETBEANS_INTG
             || wp->w_buffer->b_has_sign_column
 # endif
@@ -2940,11 +2940,11 @@ f_sign_unplace(typval_T *argvars, typval_T *rettv)
     dict_T *dict = NULL;
     rettv->vval.v_number = -1;
 
-    if ((check_for_string_arg(argvars, 0) == FAIL ||
+    ако ((check_for_string_arg(argvars, 0) == FAIL ||
          check_for_opt_dict_arg(argvars, 1) == FAIL))
-        return;
+        върни;
 
-    if (argvars[1].v_type != VAR_UNKNOWN)
+    ако (argvars[1].v_type != VAR_UNKNOWN)
         dict = argvars[1].vval.v_dict;
 
     rettv->vval.v_number = sign_unplace_from_dict(&argvars[0], dict);
@@ -2956,23 +2956,23 @@ f_sign_unplace(typval_T *argvars, typval_T *rettv)
 void
 f_sign_unplacelist(typval_T *argvars, typval_T *rettv)
 {
-    if (rettv_list_alloc(rettv) == FAIL)
-        return;
+    ако (rettv_list_alloc(rettv) == FAIL)
+        върни;
 
-    if (in_vim9script() && check_for_list_arg(argvars, 0) == FAIL)
-        return;
+    ако (in_vim9script() && check_for_list_arg(argvars, 0) == FAIL)
+        върни;
 
-    if (check_for_list_arg(argvars, 0) == FAIL)
-        return;
+    ако (check_for_list_arg(argvars, 0) == FAIL)
+        върни;
 
     listitem_T *li = NULL;
     FOR_ALL_LIST_ITEMS(argvars[0].vval.v_list, li)
     {
-        int retval = -1;
+        цяло retval = -1;
 
-        if (li->li_tv.v_type == VAR_DICT)
+        ако (li->li_tv.v_type == VAR_DICT)
             retval = sign_unplace_from_dict(NULL, li->li_tv.vval.v_dict);
-        else
+        иначе
             emsg(_(e_dictionary_required));
 
         list_append_number(rettv->vval.v_list, retval);

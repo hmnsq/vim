@@ -13,14 +13,14 @@
 
 #include "vim.h"
 
-#if defined(FEAT_TABPANEL)
+#ако defined(FEAT_TABPANEL)
 
-static void do_by_tplmode(int tplmode, int col_start, int col_end,
-	int *pcurtab_row, int *ptabpagenr);
+static void do_by_tplmode(цяло tplmode, цяло col_start, цяло col_end,
+	цяло *pcurtab_row, цяло *ptabpagenr);
 static void tabpanel_free_click_regions(void);
 static void tabpanel_append_click_regions(stl_clickrec_T *clicktab,
-	char_u *buf, int row, int col_start, int col_end, int tabnr);
-static void draw_tabpanel_scrollbar(int screen_col);
+	char_u *buf, цяло row, цяло col_start, цяло col_end, цяло tabnr);
+static void draw_tabpanel_scrollbar(цяло screen_col);
 
 // set pcurtab_row. don't redraw tabpanel.
 #define TPLMODE_GET_CURTAB_ROW	0
@@ -39,78 +39,78 @@ static void draw_tabpanel_scrollbar(int screen_col);
 #define ALIGN_RIGHT		1
 
 static char_u *opt_name = (char_u *)"tabpanel";
-static int opt_scope = OPT_LOCAL;
-static int tpl_align = ALIGN_LEFT;
-static int tpl_columns = 20;
+static цяло opt_scope = OPT_LOCAL;
+static цяло tpl_align = ALIGN_LEFT;
+static цяло tpl_columns = 20;
 static bool tpl_is_vert = false;
 static bool tpl_scrollbar = false;
-static int tpl_scroll_offset = 0;
-static int tpl_total_rows = 0;
-static int tpl_scrollbar_col = -1;  // screen column of scrollbar, -1 if none
+static цяло tpl_scroll_offset = 0;
+static цяло tpl_total_rows = 0;
+static цяло tpl_scrollbar_col = -1;  // screen column of scrollbar, -1 if none
 static tabpage_T *tpl_last_curtab = NULL;   // last curtab seen by draw_tabpanel
 
 typedef struct {
     win_T   *wp;
     win_T   *cwp;
     char_u  *user_defined;
-    int	maxrow;
-    int	offsetrow;
-    int	*prow;
-    int	*pcol;
-    int	attr;
-    int	col_start;
-    int	col_end;
+    цяло	maxrow;
+    цяло	offsetrow;
+    цяло	*prow;
+    цяло	*pcol;
+    цяло	attr;
+    цяло	col_start;
+    цяло	col_end;
 } tabpanel_T;
 
-    int
+    цяло
 tabpanelopt_changed(void)
 {
     char_u	*p;
-    int		new_align = ALIGN_LEFT;
+    цяло		new_align = ALIGN_LEFT;
     long	new_columns = 20;
     bool	new_is_vert = false;
     bool	new_scrollbar = false;
 
     p = p_tplo;
-    while (*p != NUL)
+    докато (*p != NUL)
     {
-	if (STRNCMP(p, "align:", 6) == 0)
+	ако (STRNCMP(p, "align:", 6) == 0)
 	{
 	    p += 6;
-	    if (STRNCMP(p, "left", 4) == 0)
+	    ако (STRNCMP(p, "left", 4) == 0)
 	    {
 		p += 4;
 		new_align = ALIGN_LEFT;
 	    }
-	    else if (STRNCMP(p, "right", 5) == 0)
+	    иначе ако (STRNCMP(p, "right", 5) == 0)
 	    {
 		p += 5;
 		new_align = ALIGN_RIGHT;
 	    }
-	    else
-		return FAIL;
+	    иначе
+		върни FAIL;
 	}
-	else if (STRNCMP(p, "columns:", 8) == 0 && VIM_ISDIGIT(p[8]))
+	иначе ако (STRNCMP(p, "columns:", 8) == 0 && VIM_ISDIGIT(p[8]))
 	{
 	    p += 8;
 	    new_columns = getdigits(&p);
-	    if (new_columns < 0 || new_columns > 1000)
-		return FAIL;
+	    ако (new_columns < 0 || new_columns > 1000)
+		върни FAIL;
 	}
-	else if (STRNCMP(p, "vert", 4) == 0)
+	иначе ако (STRNCMP(p, "vert", 4) == 0)
 	{
 	    p += 4;
 	    new_is_vert = true;
 	}
-	else if (STRNCMP(p, "scrollbar", 9) == 0)
+	иначе ако (STRNCMP(p, "scrollbar", 9) == 0)
 	{
 	    p += 9;
 	    new_scrollbar = true;
 	}
 
-	if (*p != ',' && *p != NUL)
-	    return FAIL;
-	if (*p == ',')
+	ако (*p != ',' && *p != NUL)
+	    върни FAIL;
+	ако (*p == ',')
 	    ++p;
     }
 
@@ -123,7 +123,7 @@ tabpanelopt_changed(void)
     tpl_last_curtab = NULL;
 
     shell_new_columns();
-    return OK;
+    върни OK;
 }
 
 /*
@@ -133,37 +133,37 @@ tabpanelopt_changed(void)
     void
 tabpanel_forget_tabpage(const tabpage_T *tp)
 {
-    if (tpl_last_curtab == tp)
+    ако (tpl_last_curtab == tp)
 	tpl_last_curtab = NULL;
 }
 
 /*
  * Return the width of tabpanel.
  */
-    int
+    цяло
 tabpanel_width(void)
 {
     switch (p_stpl)
     {
 	case 0:
-	    return 0;
+	    върни 0;
 	case 1:
-	    if (first_tabpage->tp_next == NULL)
-		return 0;
+	    ако (first_tabpage->tp_next == NULL)
+		върни 0;
     }
-    if (Columns < tpl_columns)
-	return 0;
-    else
-	return tpl_columns;
+    ако (Columns < tpl_columns)
+	върни 0;
+    иначе
+	върни tpl_columns;
 }
 
 /*
  * Return the offset of a window considering the width of tabpanel.
  */
-    int
+    цяло
 tabpanel_leftcol(void)
 {
-    return tpl_align == ALIGN_RIGHT ? 0 : tabpanel_width();
+    върни tpl_align == ALIGN_RIGHT ? 0 : tabpanel_width();
 }
 
 /*
@@ -172,11 +172,11 @@ tabpanel_leftcol(void)
     static void
 tabpanel_free_click_regions(void)
 {
-    int n;
+    цяло n;
 
-    if (tabpanel_stl_click != NULL)
+    ако (tabpanel_stl_click != NULL)
     {
-	for (n = 0; n < tabpanel_stl_click_count; n++)
+	за (n = 0; n < tabpanel_stl_click_count; n++)
 	    vim_free(tabpanel_stl_click[n].funcname);
 	VIM_CLEAR(tabpanel_stl_click);
     }
@@ -193,30 +193,30 @@ tabpanel_free_click_regions(void)
 tabpanel_append_click_regions(
 	stl_clickrec_T	*clicktab,
 	char_u		*buf,
-	int		row,
-	int		col_start,
-	int		col_end,
-	int		tabnr)
+	цяло		row,
+	цяло		col_start,
+	цяло		col_end,
+	цяло		tabnr)
 {
-    int		count = 0;
-    int		n;
-    int		base_col;
-    int		acc_width = 0;
-    int		max_w = col_end - col_start;
+    цяло		count = 0;
+    цяло		n;
+    цяло		base_col;
+    цяло		acc_width = 0;
+    цяло		max_w = col_end - col_start;
     char_u	*p;
     char_u	*cur_funcname = NULL;
-    int		cur_minwid = 0;
-    int		region_start_col;
+    цяло		cur_minwid = 0;
+    цяло		region_start_col;
     stl_click_region_T *new_arr;
-    int		limit;
+    цяло		limit;
 
-    if (clicktab == NULL)
-	return;
+    ако (clicktab == NULL)
+	върни;
 
-    for (n = 0; clicktab[n].start != NULL; n++)
+    за (n = 0; clicktab[n].start != NULL; n++)
 	count++;
-    if (count == 0)
-	return;
+    ако (count == 0)
+	върни;
 
     base_col = (tpl_align == ALIGN_RIGHT ? topframe->fr_width : 0) + col_start;
     region_start_col = base_col;
@@ -225,18 +225,18 @@ tabpanel_append_click_regions(
     // (one close for each record plus a possible trailing region).
     new_arr = vim_realloc(tabpanel_stl_click,
 	    sizeof(stl_click_region_T) * (tabpanel_stl_click_count + count + 1));
-    if (new_arr == NULL)
-	return;
+    ако (new_arr == NULL)
+	върни;
     tabpanel_stl_click = new_arr;
 
     p = buf;
-    for (n = 0; clicktab[n].start != NULL; n++)
+    за (n = 0; clicktab[n].start != NULL; n++)
     {
-	acc_width += vim_strnsize(p, (int)(clicktab[n].start - p));
+	acc_width += vim_strnsize(p, (цяло)(clicktab[n].start - p));
 	p = clicktab[n].start;
 	limit = acc_width < max_w ? acc_width : max_w;
 
-	if (cur_funcname != NULL)
+	ако (cur_funcname != NULL)
 	{
 	    stl_click_region_T *r =
 				&tabpanel_stl_click[tabpanel_stl_click_count];
@@ -255,7 +255,7 @@ tabpanel_append_click_regions(
     }
 
     // Close the final region if it extends to the end.
-    if (cur_funcname != NULL)
+    ако (cur_funcname != NULL)
     {
 	stl_click_region_T *r = &tabpanel_stl_click[tabpanel_stl_click_count];
 	r->row = row;
@@ -275,21 +275,21 @@ tabpanel_append_click_regions(
  * offset is preserved in those cases.
  */
     static void
-follow_curtab_if_needed(int curtab_row)
+follow_curtab_if_needed(цяло curtab_row)
 {
-    if (Rows <= 0 || curtab == tpl_last_curtab)
-	return;
+    ако (Rows <= 0 || curtab == tpl_last_curtab)
+	върни;
 
-    if (curtab_row < tpl_scroll_offset)
+    ако (curtab_row < tpl_scroll_offset)
 	tpl_scroll_offset = curtab_row;
-    else if (curtab_row >= tpl_scroll_offset + Rows)
+    иначе ако (curtab_row >= tpl_scroll_offset + Rows)
 	tpl_scroll_offset = curtab_row - Rows + 1;
 
-    int max_offset = tpl_total_rows > Rows ? tpl_total_rows - Rows : 0;
+    цяло max_offset = tpl_total_rows > Rows ? tpl_total_rows - Rows : 0;
 
-    if (tpl_scroll_offset < 0)
+    ако (tpl_scroll_offset < 0)
 	tpl_scroll_offset = 0;
-    else if (tpl_scroll_offset > max_offset)
+    иначе ако (tpl_scroll_offset > max_offset)
 	tpl_scroll_offset = max_offset;
 }
 
@@ -299,18 +299,18 @@ follow_curtab_if_needed(int curtab_row)
     void
 draw_tabpanel(void)
 {
-    int saved_KeyTyped = KeyTyped;
-    int saved_got_int = got_int;
-    int maxwidth = tabpanel_width();
-    int vs_attr = HL_ATTR(HLF_C);
-    int curtab_row = 0;
-    int vsrow = 0;
-    int is_right = tpl_align == ALIGN_RIGHT;
+    цяло saved_KeyTyped = KeyTyped;
+    цяло saved_got_int = got_int;
+    цяло maxwidth = tabpanel_width();
+    цяло vs_attr = HL_ATTR(HLF_C);
+    цяло curtab_row = 0;
+    цяло vsrow = 0;
+    цяло is_right = tpl_align == ALIGN_RIGHT;
 
-    if (maxwidth == 0)
+    ако (maxwidth == 0)
     {
 	tabpanel_free_click_regions();
-	return;
+	върни;
     }
 
     // Discard old click regions — they'll be rebuilt during redraw below.
@@ -319,16 +319,16 @@ draw_tabpanel(void)
     // Reset got_int to avoid build_stl_str_hl() isn't evaluated.
     got_int = FALSE;
 
-    int sb_len = tpl_scrollbar ? SCROLL_LEN : 0;
-    int sb_screen_col = -1;
+    цяло sb_len = tpl_scrollbar ? SCROLL_LEN : 0;
+    цяло sb_screen_col = -1;
 
     // The scrollbar is always placed at the right edge of the tabpanel,
     // regardless of 'align'.  The vertical separator sits at the panel's
     // boundary with the buffer area (left edge for align:right, right edge
     // for align:left).
-    if (tpl_is_vert)
+    ако (tpl_is_vert)
     {
-	if (is_right)
+	ако (is_right)
 	{
 	    // Panel on the right: vert at panel's left edge, scrollbar at
 	    // panel's right edge (= screen's right edge).
@@ -337,13 +337,13 @@ draw_tabpanel(void)
 	    follow_curtab_if_needed(curtab_row);
 	    do_by_tplmode(TPLMODE_REDRAW, VERT_LEN, maxwidth - sb_len,
 		    &curtab_row, NULL);
-	    for (vsrow = 0; vsrow < Rows; vsrow++)
+	    за (vsrow = 0; vsrow < Rows; vsrow++)
 		screen_putchar(curwin->w_fill_chars.tpl_vert, vsrow,
 			topframe->fr_width, vs_attr);
-	    if (tpl_scrollbar)
+	    ако (tpl_scrollbar)
 		sb_screen_col = topframe->fr_width + maxwidth - SCROLL_LEN;
 	}
-	else
+	иначе
 	{
 	    // Panel on the left: scrollbar just left of vert, vert at
 	    // panel's right edge (boundary with buffer).
@@ -352,16 +352,16 @@ draw_tabpanel(void)
 	    follow_curtab_if_needed(curtab_row);
 	    do_by_tplmode(TPLMODE_REDRAW, 0, maxwidth - VERT_LEN - sb_len,
 		    &curtab_row, NULL);
-	    for (vsrow = 0; vsrow < Rows; vsrow++)
+	    за (vsrow = 0; vsrow < Rows; vsrow++)
 		screen_putchar(curwin->w_fill_chars.tpl_vert, vsrow,
 			maxwidth - VERT_LEN, vs_attr);
-	    if (tpl_scrollbar)
+	    ако (tpl_scrollbar)
 		sb_screen_col = maxwidth - VERT_LEN - SCROLL_LEN;
 	}
     }
-    else
+    иначе
     {
-	if (is_right)
+	ако (is_right)
 	{
 	    // Panel on the right, no vert: scrollbar at screen's right edge.
 	    do_by_tplmode(TPLMODE_GET_CURTAB_ROW, 0, maxwidth - sb_len,
@@ -369,23 +369,23 @@ draw_tabpanel(void)
 	    follow_curtab_if_needed(curtab_row);
 	    do_by_tplmode(TPLMODE_REDRAW, 0, maxwidth - sb_len,
 		    &curtab_row, NULL);
-	    if (tpl_scrollbar)
+	    ако (tpl_scrollbar)
 		sb_screen_col = topframe->fr_width + maxwidth - SCROLL_LEN;
 	}
-	else
+	иначе
 	{
 	    do_by_tplmode(TPLMODE_GET_CURTAB_ROW, 0, maxwidth - sb_len,
 		    &curtab_row, NULL);
 	    follow_curtab_if_needed(curtab_row);
 	    do_by_tplmode(TPLMODE_REDRAW, 0, maxwidth - sb_len,
 		    &curtab_row, NULL);
-	    if (tpl_scrollbar)
+	    ако (tpl_scrollbar)
 		sb_screen_col = maxwidth - SCROLL_LEN;
 	}
     }
 
     tpl_scrollbar_col = sb_screen_col;
-    if (sb_screen_col >= 0)
+    ако (sb_screen_col >= 0)
 	draw_tabpanel_scrollbar(sb_screen_col);
 
     got_int |= saved_got_int;
@@ -400,21 +400,21 @@ draw_tabpanel(void)
 /*
  * Return tabpagenr when clicking and dragging in tabpanel.
  */
-    int
+    цяло
 get_tabpagenr_on_tabpanel(void)
 {
-    int		maxwidth = tabpanel_width();
-    int		curtab_row = 0;
-    int		tabpagenr = 0;
+    цяло		maxwidth = tabpanel_width();
+    цяло		curtab_row = 0;
+    цяло		tabpagenr = 0;
 
-    if (maxwidth == 0)
-	return -1;
+    ако (maxwidth == 0)
+	върни -1;
 
     do_by_tplmode(TPLMODE_GET_CURTAB_ROW, 0, maxwidth, &curtab_row, NULL);
     do_by_tplmode(TPLMODE_GET_TABPAGENR, 0, maxwidth, &curtab_row,
 	    &tabpagenr);
 
-    return tabpagenr;
+    върни tabpagenr;
 }
 
 /*
@@ -422,15 +422,15 @@ get_tabpagenr_on_tabpanel(void)
  */
     static void
 screen_fill_tailing_area(
-	int	tplmode,
-	int	row_start,
-	int	row_end,
-	int	col_start,
-	int	col_end,
-	int	attr)
+	цяло	tplmode,
+	цяло	row_start,
+	цяло	row_end,
+	цяло	col_start,
+	цяло	col_end,
+	цяло	attr)
 {
-    int is_right = tpl_align == ALIGN_RIGHT;
-    if (tplmode == TPLMODE_REDRAW)
+    цяло is_right = tpl_align == ALIGN_RIGHT;
+    ако (tplmode == TPLMODE_REDRAW)
 	screen_fill(row_start, row_end,
 		(is_right ? topframe->fr_width : 0) + col_start,
 		(is_right ? topframe->fr_width : 0) + col_end,
@@ -442,51 +442,51 @@ screen_fill_tailing_area(
  */
     static void
 screen_puts_len_for_tabpanel(
-	int	    tplmode,
+	цяло	    tplmode,
 	char_u	    *p,
-	int	    len,
-	int	    attr,
+	цяло	    len,
+	цяло	    attr,
 	tabpanel_T  *pargs)
 {
-    int		j;
-    int		chlen;
-    int		chcells;
+    цяло		j;
+    цяло		chlen;
+    цяло		chcells;
     char_u	buf[IOSIZE];
     char_u	*temp;
 
-    for (j = 0; j < len;)
+    за (j = 0; j < len;)
     {
-	if (tplmode != TPLMODE_GET_CURTAB_ROW
+	ако (tplmode != TPLMODE_GET_CURTAB_ROW
 		&& pargs->maxrow <= *pargs->prow - pargs->offsetrow)
 	    break;
 
-	if (has_mbyte)
+	ако (has_mbyte)
 	    chlen = (*mb_ptr2len)(p + j);
-	else
+	иначе
 	    chlen = 1;
 
-	for (int k = 0; k < chlen; k++)
+	за (цяло k = 0; k < chlen; k++)
 	    buf[k] = p[j + k];
 	buf[chlen] = NUL;
 	j += chlen;
 
 	// Make all characters printable.
 	temp = transstr(buf);
-	if (temp != NULL)
+	ако (temp != NULL)
 	{
 	    vim_strncpy(buf, temp, sizeof(buf) - 1);
 	    vim_free(temp);
 	}
 
-	if (has_mbyte)
+	ако (has_mbyte)
 	    chcells = (*mb_ptr2cells)(buf);
-	else
+	иначе
 	    chcells = 1;
 
-	if (pargs->col_end < (*pargs->pcol) + chcells)
+	ако (pargs->col_end < (*pargs->pcol) + chcells)
 	{
 	    // fill the tailing area of current row.
-	    if (*pargs->prow - pargs->offsetrow >= 0
+	    ако (*pargs->prow - pargs->offsetrow >= 0
 		    && *pargs->prow - pargs->offsetrow < pargs->maxrow)
 		screen_fill_tailing_area(tplmode,
 			*pargs->prow - pargs->offsetrow,
@@ -494,16 +494,16 @@ screen_puts_len_for_tabpanel(
 			*pargs->pcol, pargs->col_end, attr);
 	    *pargs->pcol = pargs->col_end;
 
-	    if (pargs->col_end < chcells)
+	    ако (pargs->col_end < chcells)
 		break;
 	}
 
-	if (*pargs->pcol + chcells <= pargs->col_end)
+	ако (*pargs->pcol + chcells <= pargs->col_end)
 	{
-	    int off = (tpl_align == ALIGN_RIGHT)
+	    цяло off = (tpl_align == ALIGN_RIGHT)
 		    ? topframe->fr_width
 		    : 0;
-	    if (tplmode == TPLMODE_REDRAW
+	    ако (tplmode == TPLMODE_REDRAW
 		    && (*pargs->prow - pargs->offsetrow >= 0
 		    && *pargs->prow - pargs->offsetrow < pargs->maxrow))
 		screen_puts(buf, *pargs->prow - pargs->offsetrow,
@@ -517,34 +517,34 @@ screen_puts_len_for_tabpanel(
  * default tabpanel drawing behavior if 'tabpanel' option is empty.
  */
     static void
-draw_tabpanel_default(int tplmode, tabpanel_T *pargs)
+draw_tabpanel_default(цяло tplmode, tabpanel_T *pargs)
 {
-    int		modified;
-    int		wincount;
-    int		len = 0;
+    цяло		modified;
+    цяло		wincount;
+    цяло		len = 0;
     char_u	buf[2] = { NUL, NUL };
 
     modified = FALSE;
-    for (wincount = 0; pargs->wp != NULL;
+    за (wincount = 0; pargs->wp != NULL;
 	    pargs->wp = pargs->wp->w_next, ++wincount)
-	if (bufIsChanged(pargs->wp->w_buffer))
+	ако (bufIsChanged(pargs->wp->w_buffer))
 	    modified = TRUE;
 
-    if (modified || wincount > 1)
+    ако (modified || wincount > 1)
     {
-	if (wincount > 1)
+	ако (wincount > 1)
 	{
 	    vim_snprintf((char *)NameBuff, MAXPATHL, "%d", wincount);
-	    len = (int)STRLEN(NameBuff);
+	    len = (цяло)STRLEN(NameBuff);
 	    screen_puts_len_for_tabpanel(tplmode, NameBuff, len,
-#if defined(FEAT_SYN_HL)
+#ако defined(FEAT_SYN_HL)
 		    hl_combine_attr(pargs->attr, HL_ATTR(HLF_T)),
-#else
+#иначе
 		    pargs->attr,
 #endif
 		    pargs);
 	}
-	if (modified)
+	ако (modified)
 	{
 	    buf[0] = '+';
 	    screen_puts_len_for_tabpanel(tplmode, buf, 1, pargs->attr, pargs);
@@ -556,11 +556,11 @@ draw_tabpanel_default(int tplmode, tabpanel_T *pargs)
 
     get_trans_bufname(pargs->cwp->w_buffer);
     shorten_dir(NameBuff);
-    len = (int)STRLEN(NameBuff);
+    len = (цяло)STRLEN(NameBuff);
     screen_puts_len_for_tabpanel(tplmode, NameBuff, len, pargs->attr, pargs);
 
     // fill the tailing area of current row.
-    if (*pargs->prow - pargs->offsetrow >= 0
+    ако (*pargs->prow - pargs->offsetrow >= 0
 	    && *pargs->prow - pargs->offsetrow < pargs->maxrow)
 	screen_fill_tailing_area(tplmode, *pargs->prow - pargs->offsetrow,
 		*pargs->prow - pargs->offsetrow + 1,
@@ -574,45 +574,45 @@ draw_tabpanel_default(int tplmode, tabpanel_T *pargs)
  */
     static void
 draw_tabpanel_with_highlight(
-	int	    tplmode,
+	цяло	    tplmode,
 	char_u	    *buf,
 	stl_hlrec_T *hltab,
 	tabpanel_T  *pargs)
 {
     char_u	*p;
-    int		curattr;
-    int		n;
+    цяло		curattr;
+    цяло		n;
 
     curattr = pargs->attr;
     p = buf;
-    for (n = 0; hltab[n].start != NULL; n++)
+    за (n = 0; hltab[n].start != NULL; n++)
     {
-	screen_puts_len_for_tabpanel(tplmode, p, (int)(hltab[n].start - p),
+	screen_puts_len_for_tabpanel(tplmode, p, (цяло)(hltab[n].start - p),
 		curattr, pargs);
 	p = hltab[n].start;
-	if (hltab[n].userhl == 0)
+	ако (hltab[n].userhl == 0)
 	    curattr = pargs->attr;
-	else if (hltab[n].userhl < 0)
+	иначе ако (hltab[n].userhl < 0)
 	    curattr = syn_id2attr(-hltab[n].userhl);
 #ifdef FEAT_TERMINAL
-	else if (pargs->wp != NULL && pargs->wp != curwin
+	иначе ако (pargs->wp != NULL && pargs->wp != curwin
 		&& bt_terminal(pargs->wp->w_buffer)
 		&& pargs->wp->w_status_height != 0)
 	    curattr = highlight_stltermnc[hltab[n].userhl - 1];
-	else if (pargs->wp != NULL && bt_terminal(pargs->wp->w_buffer)
+	иначе ако (pargs->wp != NULL && bt_terminal(pargs->wp->w_buffer)
 		&& pargs->wp->w_status_height != 0)
 	    curattr = highlight_stlterm[hltab[n].userhl - 1];
 #endif
-	else if (pargs->wp != NULL && pargs->wp != curwin
+	иначе ако (pargs->wp != NULL && pargs->wp != curwin
 		&& pargs->wp->w_status_height != 0)
 	    curattr = highlight_stlnc[hltab[n].userhl - 1];
-	else
+	иначе
 	    curattr = highlight_user[hltab[n].userhl - 1];
     }
-    screen_puts_len_for_tabpanel(tplmode, p, (int)STRLEN(p), curattr, pargs);
+    screen_puts_len_for_tabpanel(tplmode, p, (цяло)STRLEN(p), curattr, pargs);
 
     // fill the tailing area of current row.
-    if (*pargs->prow - pargs->offsetrow >= 0
+    ако (*pargs->prow - pargs->offsetrow >= 0
 	    && *pargs->prow - pargs->offsetrow < pargs->maxrow)
 	screen_fill_tailing_area(tplmode, *pargs->prow - pargs->offsetrow,
 		*pargs->prow - pargs->offsetrow + 1, *pargs->pcol,
@@ -625,17 +625,17 @@ draw_tabpanel_with_highlight(
  */
     static void
 do_by_tplmode(
-	int	tplmode,
-	int	col_start,
-	int	col_end,
-	int	*pcurtab_row,
-	int	*ptabpagenr)
+	цяло	tplmode,
+	цяло	col_start,
+	цяло	col_end,
+	цяло	*pcurtab_row,
+	цяло	*ptabpagenr)
 {
-    int		attr_tplf = HL_ATTR(HLF_TPLF);
-    int		attr_tpls = HL_ATTR(HLF_TPLS);
-    int		attr_tpl = HL_ATTR(HLF_TPL);
-    int		col = col_start;
-    int		row = 0;
+    цяло		attr_tplf = HL_ATTR(HLF_TPLF);
+    цяло		attr_tpls = HL_ATTR(HLF_TPLS);
+    цяло		attr_tpl = HL_ATTR(HLF_TPL);
+    цяло		col = col_start;
+    цяло		row = 0;
     tabpage_T	*tp = NULL;
     typval_T	v;
     tabpanel_T	args;
@@ -645,14 +645,14 @@ do_by_tplmode(
     args.col_start = col_start;
     args.col_end = col_end;
 
-    if (tplmode != TPLMODE_GET_CURTAB_ROW && args.maxrow > 0)
+    ако (tplmode != TPLMODE_GET_CURTAB_ROW && args.maxrow > 0)
 	args.offsetrow = tpl_scroll_offset;
 
     tp = first_tabpage;
 
-    for (row = 0; tp != NULL; row++)
+    за (row = 0; tp != NULL; row++)
     {
-	if (tplmode != TPLMODE_GET_CURTAB_ROW
+	ако (tplmode != TPLMODE_GET_CURTAB_ROW
 		&& args.maxrow <= row - args.offsetrow)
 	    break;
 
@@ -662,23 +662,23 @@ do_by_tplmode(
 	v.vval.v_number = tabpage_index(tp);
 	set_var((char_u *)"g:actual_curtabpage", &v, TRUE);
 
-	if (tp->tp_topframe == topframe)
+	ако (tp->tp_topframe == topframe)
 	{
 	    args.attr = attr_tpls;
-	    if (tplmode == TPLMODE_GET_CURTAB_ROW)
+	    ако (tplmode == TPLMODE_GET_CURTAB_ROW)
 		// Capture the row of the current tab and keep iterating so
 		// tpl_total_rows receives the true content height below.
 		*pcurtab_row = row;
 	}
-	else
+	иначе
 	    args.attr = attr_tpl;
 
-	if (tp == curtab)
+	ако (tp == curtab)
 	{
 	    args.cwp = curwin;
 	    args.wp = firstwin;
 	}
-	else
+	иначе
 	{
 	    args.cwp = tp->tp_curwin;
 	    args.wp = tp->tp_firstwin;
@@ -686,25 +686,25 @@ do_by_tplmode(
 
 	char_u	*usefmt = vim_strsave(p_tpl);
 
-	if (usefmt != NULL && *usefmt != NUL)
+	ако (usefmt != NULL && *usefmt != NUL)
 	{
-	    int	carry_hl = 0;
+	    цяло	carry_hl = 0;
 
-	    while (*usefmt != NUL)
+	    докато (*usefmt != NUL)
 	    {
 		char_u	buf[IOSIZE];
 		stl_hlrec_T	*hltab;
 		stl_hlrec_T	*tabtab;
 		stl_clickrec_T	*clicktab = NULL;
 
-		if (tplmode != TPLMODE_GET_CURTAB_ROW
+		ако (tplmode != TPLMODE_GET_CURTAB_ROW
 			&& args.maxrow <= row - args.offsetrow)
 		    break;
 
 		buf[0] = NUL;
 #ifdef ENABLE_STL_MODE_MULTI_NL
 		(void)build_stl_str_hl_mline_nl
-#else
+#иначе
 		(void)build_stl_str_hl_mline
 #endif
 			(args.cwp, buf, sizeof(buf),
@@ -720,31 +720,31 @@ do_by_tplmode(
 
 		// Record any %[FuncName] click regions for this line once
 		// the text has been drawn.  Only visible rows participate.
-		if (tplmode == TPLMODE_REDRAW && clicktab != NULL)
+		ако (tplmode == TPLMODE_REDRAW && clicktab != NULL)
 		{
-		    int screen_row = row - args.offsetrow;
-		    int m;
+		    цяло screen_row = row - args.offsetrow;
+		    цяло m;
 
-		    if (screen_row >= 0 && screen_row < args.maxrow)
+		    ако (screen_row >= 0 && screen_row < args.maxrow)
 			tabpanel_append_click_regions(clicktab, buf,
 				screen_row, args.col_start, args.col_end,
-				(int)v.vval.v_number);
+				(цяло)v.vval.v_number);
 		    // We took ownership of the click records — free the
 		    // function names (matches the non-NULL clicktab path in
 		    // build_stl_str_hl()).
-		    for (m = 0; clicktab[m].start != NULL; m++)
+		    за (m = 0; clicktab[m].start != NULL; m++)
 			vim_free(clicktab[m].funcname);
 		}
 
 		// Move to next line for %@
-		if (*usefmt != NUL)
+		ако (*usefmt != NUL)
 		{
 		    row++;
 		    col = col_start;
 		}
 	    }
 	}
-	else
+	иначе
 	{
 	    args.user_defined = NULL;
 	    args.prow = &row;
@@ -757,7 +757,7 @@ do_by_tplmode(
 
 	tp = tp->tp_next;
 
-	if ((tplmode == TPLMODE_GET_TABPAGENR)
+	ако ((tplmode == TPLMODE_GET_TABPAGENR)
 		&& (mouse_row <= (row - args.offsetrow)))
 	{
 	    *ptabpagenr = v.vval.v_number;
@@ -772,7 +772,7 @@ do_by_tplmode(
     // Capture the true content height during the GET_CURTAB_ROW pass, which
     // ignores maxrow and therefore walks every tab.  REDRAW stops at the
     // visible edge so its "row" is clamped and unusable here.
-    if (tplmode == TPLMODE_GET_CURTAB_ROW)
+    ако (tplmode == TPLMODE_GET_CURTAB_ROW)
 	tpl_total_rows = row;
 }
 
@@ -782,37 +782,37 @@ do_by_tplmode(
  * are derived from tpl_scroll_offset, tpl_total_rows and Rows.
  */
     static void
-draw_tabpanel_scrollbar(int screen_col)
+draw_tabpanel_scrollbar(цяло screen_col)
 {
-    int attr_sb = HL_ATTR(HLF_PSB);
-    int attr_thumb = HL_ATTR(HLF_PST);
-    int thumb_top = 0;
-    int thumb_height = 0;
+    цяло attr_sb = HL_ATTR(HLF_PSB);
+    цяло attr_thumb = HL_ATTR(HLF_PST);
+    цяло thumb_top = 0;
+    цяло thumb_height = 0;
 
-    if (tpl_total_rows > Rows && Rows > 0)
+    ако (tpl_total_rows > Rows && Rows > 0)
     {
-	int max_offset = tpl_total_rows - Rows;
-	int track_range;
+	цяло max_offset = tpl_total_rows - Rows;
+	цяло track_range;
 
 	thumb_height = Rows * Rows / tpl_total_rows;
-	if (thumb_height < 1)
+	ако (thumb_height < 1)
 	    thumb_height = 1;
 
 	// Map tpl_scroll_offset onto the track: at offset 0 the thumb's top
 	// is at row 0, at the maximum offset its bottom reaches the last
 	// row.  This is the exact inverse of tabpanel_drag_scrollbar().
 	track_range = Rows - thumb_height;
-	if (track_range > 0 && max_offset > 0)
+	ако (track_range > 0 && max_offset > 0)
 	    thumb_top = track_range * tpl_scroll_offset / max_offset;
-	else
+	иначе
 	    thumb_top = 0;
-	if (thumb_top + thumb_height > Rows)
+	ако (thumb_top + thumb_height > Rows)
 	    thumb_top = Rows - thumb_height;
-	if (thumb_top < 0)
+	ако (thumb_top < 0)
 	    thumb_top = 0;
     }
 
-    for (int r = 0; r < Rows; r++)
+    за (цяло r = 0; r < Rows; r++)
     {
 	bool on_thumb = thumb_height > 0
 	    && r >= thumb_top && r < thumb_top + thumb_height;
@@ -827,9 +827,9 @@ draw_tabpanel_scrollbar(int screen_col)
     bool
 mouse_on_tabpanel(void)
 {
-    if (tabpanel_width() == 0)
-	return false;
-    return mouse_col < firstwin->w_wincol
+    ако (tabpanel_width() == 0)
+	върни false;
+    върни mouse_col < firstwin->w_wincol
 	|| mouse_col >= firstwin->w_wincol + topframe->fr_width;
 }
 
@@ -841,7 +841,7 @@ mouse_on_tabpanel(void)
     bool
 mouse_on_tabpanel_scrollbar(void)
 {
-    return tpl_scrollbar && tpl_scrollbar_col >= 0
+    върни tpl_scrollbar && tpl_scrollbar_col >= 0
 	&& mouse_col == tpl_scrollbar_col;
 }
 
@@ -852,38 +852,38 @@ mouse_on_tabpanel_scrollbar(void)
  * Returns true if the event was consumed (offset changed or not).
  */
     bool
-tabpanel_drag_scrollbar(int screen_row)
+tabpanel_drag_scrollbar(цяло screen_row)
 {
-    int thumb_height;
-    int max_offset;
-    int track_range;
-    int thumb_top;
-    int new_offset;
+    цяло thumb_height;
+    цяло max_offset;
+    цяло track_range;
+    цяло thumb_top;
+    цяло new_offset;
 
-    if (!tpl_scrollbar || Rows <= 0 || tpl_total_rows <= Rows)
-	return false;
+    ако (!tpl_scrollbar || Rows <= 0 || tpl_total_rows <= Rows)
+	върни false;
 
     thumb_height = Rows * Rows / tpl_total_rows;
-    if (thumb_height < 1)
+    ако (thumb_height < 1)
 	thumb_height = 1;
     track_range = Rows - thumb_height;
-    if (track_range <= 0)
-	return true;
+    ако (track_range <= 0)
+	върни true;
 
     max_offset = tpl_total_rows - Rows;
     thumb_top = screen_row - thumb_height / 2;
-    if (thumb_top < 0)
+    ако (thumb_top < 0)
 	thumb_top = 0;
-    if (thumb_top > track_range)
+    ако (thumb_top > track_range)
 	thumb_top = track_range;
 
     new_offset = thumb_top * max_offset / track_range;
-    if (new_offset != tpl_scroll_offset)
+    ако (new_offset != tpl_scroll_offset)
     {
 	tpl_scroll_offset = new_offset;
 	redraw_tabpanel = TRUE;
     }
-    return true;
+    върни true;
 }
 
 /*
@@ -891,29 +891,29 @@ tabpanel_drag_scrollbar(int screen_row)
  * Returns true if the offset changed and a redraw was scheduled.
  */
     bool
-tabpanel_scroll(int dir, int count)
+tabpanel_scroll(цяло dir, цяло count)
 {
-    int max_offset;
-    int new_offset;
+    цяло max_offset;
+    цяло new_offset;
 
-    if (tabpanel_width() == 0)
-	return false;
+    ако (tabpanel_width() == 0)
+	върни false;
 
     max_offset = tpl_total_rows - Rows;
-    if (max_offset < 0)
+    ако (max_offset < 0)
 	max_offset = 0;
 
     new_offset = tpl_scroll_offset + (dir > 0 ? count : -count);
-    if (new_offset < 0)
+    ако (new_offset < 0)
 	new_offset = 0;
-    if (new_offset > max_offset)
+    ако (new_offset > max_offset)
 	new_offset = max_offset;
-    if (new_offset == tpl_scroll_offset)
-	return false;
+    ако (new_offset == tpl_scroll_offset)
+	върни false;
 
     tpl_scroll_offset = new_offset;
     redraw_tabpanel = TRUE;
-    return true;
+    върни true;
 }
 
 /*
@@ -921,27 +921,27 @@ tabpanel_scroll(int dir, int count)
  * Returns true if the offset changed and a redraw was scheduled.
  */
     bool
-tabpanel_set_offset(int offset)
+tabpanel_set_offset(цяло offset)
 {
-    int max_offset;
+    цяло max_offset;
 
-    if (tabpanel_width() == 0)
-	return false;
+    ако (tabpanel_width() == 0)
+	върни false;
 
     max_offset = tpl_total_rows - Rows;
-    if (max_offset < 0)
+    ако (max_offset < 0)
 	max_offset = 0;
 
-    if (offset < 0)
+    ако (offset < 0)
 	offset = 0;
-    if (offset > max_offset)
+    ако (offset > max_offset)
 	offset = max_offset;
-    if (offset == tpl_scroll_offset)
-	return false;
+    ако (offset == tpl_scroll_offset)
+	върни false;
 
     tpl_scroll_offset = offset;
     redraw_tabpanel = TRUE;
-    return true;
+    върни true;
 }
 
 /*
@@ -951,14 +951,14 @@ tabpanel_set_offset(int offset)
 f_tabpanel_getinfo(typval_T *argvars UNUSED, typval_T *rettv)
 {
     dict_T	*d;
-    int		max_offset;
+    цяло		max_offset;
 
-    if (rettv_dict_alloc(rettv) == FAIL)
-	return;
+    ако (rettv_dict_alloc(rettv) == FAIL)
+	върни;
     d = rettv->vval.v_dict;
 
     max_offset = tpl_total_rows - Rows;
-    if (max_offset < 0)
+    ако (max_offset < 0)
 	max_offset = 0;
 
     dict_add_string(d, "align",
@@ -977,39 +977,39 @@ f_tabpanel_getinfo(typval_T *argvars UNUSED, typval_T *rettv)
 f_tabpanel_scroll(typval_T *argvars, typval_T *rettv)
 {
     varnumber_T	n;
-    int		absolute = 0;
+    цяло		absolute = 0;
     bool	changed;
 
     rettv->v_type = VAR_BOOL;
     rettv->vval.v_number = VVAL_FALSE;
 
-    if (in_vim9script()
+    ако (in_vim9script()
 	    && (check_for_number_arg(argvars, 0) == FAIL
 		|| check_for_opt_dict_arg(argvars, 1) == FAIL))
-	return;
+	върни;
 
     n = tv_get_number_chk(&argvars[0], NULL);
-    if (argvars[1].v_type != VAR_UNKNOWN)
+    ако (argvars[1].v_type != VAR_UNKNOWN)
     {
-	if (argvars[1].v_type != VAR_DICT || argvars[1].vval.v_dict == NULL)
+	ако (argvars[1].v_type != VAR_DICT || argvars[1].vval.v_dict == NULL)
 	{
 	    emsg(_(e_dictionary_required));
-	    return;
+	    върни;
 	}
 	absolute = dict_get_bool(argvars[1].vval.v_dict, "absolute", FALSE);
     }
 
     // Clamp to int range to avoid signed overflow when casting and negating.
-    if (n > INT_MAX)
+    ако (n > INT_MAX)
 	n = INT_MAX;
-    else if (n < -INT_MAX)
+    иначе ако (n < -INT_MAX)
 	n = -INT_MAX;
 
-    if (absolute)
-	changed = tabpanel_set_offset((int)n);
-    else
+    ако (absolute)
+	changed = tabpanel_set_offset((цяло)n);
+    иначе
 	changed = tabpanel_scroll(n >= 0 ? 1 : -1,
-				  (int)(n >= 0 ? n : -n));
+				  (цяло)(n >= 0 ? n : -n));
 
     rettv->vval.v_number = changed ? VVAL_TRUE : VVAL_FALSE;
 }

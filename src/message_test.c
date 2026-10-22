@@ -168,16 +168,16 @@ test_trunc_string_mbyte(void)
     static void
 test_vim_snprintf(void)
 {
-    int		n;
+    цяло		n;
     size_t	bsize;
-    int		bsize_int;
+    цяло		bsize_int;
     void	*ptr = (void *)0x87654321;
 
     // Loop on various buffer sizes to make sure that truncation of
     // vim_snprintf() is correct.
-    for (bsize = 0; bsize < 15; ++bsize)
+    за (bsize = 0; bsize < 15; ++bsize)
     {
-	bsize_int = (int)bsize - 1;
+	bsize_int = (цяло)bsize - 1;
 
 	// buf is the heap rather than in the stack
 	// so valgrind can detect buffer overflows if any.
@@ -297,7 +297,7 @@ test_vim_snprintf(void)
 # define PREFIX_LEN  0
 # define PREFIX_STR1 ""
 # define PREFIX_STR2 "00"
-#else
+#иначе
 # define PREFIX_LEN  2
 # define PREFIX_STR1 "0x"
 # define PREFIX_STR2 "0x"
@@ -325,15 +325,15 @@ test_vim_snprintf(void)
     static void
 test_vim_snprintf_positional(void)
 {
-    int		n;
+    цяло		n;
     size_t	bsize;
-    int		bsize_int;
+    цяло		bsize_int;
 
     // Loop on various buffer sizes to make sure that truncation of
     // vim_snprintf() is correct.
-    for (bsize = 0; bsize < 25; ++bsize)
+    за (bsize = 0; bsize < 25; ++bsize)
     {
-	bsize_int = (int)bsize - 1;
+	bsize_int = (цяло)bsize - 1;
 
 	// buf is the heap rather than in the stack
 	// so valgrind can detect buffer overflows if any.
@@ -502,8 +502,8 @@ test_vim_snprintf_positional(void)
     }
 }
 
-    int
-main(int argc, char **argv)
+    цяло
+main(цяло argc, char **argv)
 {
     CLEAR_FIELD(params);
     params.argc = argc;
@@ -524,5 +524,5 @@ main(int argc, char **argv)
     test_vim_snprintf();
     test_vim_snprintf_positional();
 
-    return 0;
+    върни 0;
 }

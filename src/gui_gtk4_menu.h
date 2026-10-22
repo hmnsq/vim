@@ -41,7 +41,7 @@ void vim_menu_bar_item_set_text(VimMenuBarItem *self, const char *text);
 
 GtkWidget *vim_menu_bar_new(void);
 GtkWidget *vim_menu_bar_to_menu(VimMenuBar *self);
-void vim_menu_bar_insert_item(VimMenuBar *self, VimMenuBarItem *item, int idx);
+void vim_menu_bar_insert_item(VimMenuBar *self, VimMenuBarItem *item, цяло idx);
 void vim_menu_bar_remove(VimMenuBar *self, GtkWidget *item);
 void vim_menu_bar_show(VimMenuBar *self, VimMenuBarItem *item);
 
@@ -51,8 +51,8 @@ void vim_menu_item_set_accel(VimMenuItem *self, const char *accel_text);
 void vim_menu_item_set_submenu(VimMenuItem *self, VimMenu *submenu);
 
 GtkWidget *vim_menu_new(void);
-void vim_menu_insert_item(VimMenu *self, VimMenuItem *item, int idx);
-GtkWidget *vim_menu_insert_separator(VimMenu *self, int idx);
+void vim_menu_insert_item(VimMenu *self, VimMenuItem *item, цяло idx);
+GtkWidget *vim_menu_insert_separator(VimMenu *self, цяло idx);
 void vim_menu_remove(VimMenu *self, GtkWidget *item);
 GtkWidget *vim_menu_copy(VimMenu *self);
 

@@ -22,9 +22,9 @@ G_DECLARE_FINAL_TYPE(VimToolbar, vim_toolbar, VIM, TOOLBAR, GtkWidget)
 typedef struct _VimToolbarItem VimToolbarItem;
 
 GtkWidget *vim_toolbar_new(void);
-GtkWidget *vim_toolbar_insert_button(VimToolbar *self, GtkWidget *icon, const char *text, int idx);
-GtkWidget *vim_toolbar_insert_separator(VimToolbar *self, int idx);
-void vim_toolbar_set_style(VimToolbar *self, int style, int iconsize);
+GtkWidget *vim_toolbar_insert_button(VimToolbar *self, GtkWidget *icon, const char *text, цяло idx);
+GtkWidget *vim_toolbar_insert_separator(VimToolbar *self, цяло idx);
+void vim_toolbar_set_style(VimToolbar *self, цяло style, цяло iconsize);
 void vim_toolbar_remove(VimToolbar *self, GtkWidget *item);
 
 #endif

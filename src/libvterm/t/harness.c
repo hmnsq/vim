@@ -12,31 +12,31 @@ static size_t inplace_hex2bytes(char *s)
 {
   char *inpos = s, *outpos = s;
 
-  while(*inpos) {
-    unsigned int ch;
-    if(sscanf(inpos, "%2x", &ch) < 1)
+  докато(*inpos) {
+    unsigned цяло ch;
+    ако(sscanf(inpos, "%2x", &ch) < 1)
       break;
     *outpos = ch;
     outpos += 1; inpos += 2;
   }
 
-  return outpos - s;
+  върни outpos - s;
 }
 
 static VTermModifier strpe_modifiers(char **strp)
 {
   VTermModifier state = 0;
 
-  while((*strp)[0]) {
+  докато((*strp)[0]) {
     switch(((*strp)++)[0]) {
       case 'S': state |= VTERM_MOD_SHIFT; break;
       case 'C': state |= VTERM_MOD_CTRL;  break;
       case 'A': state |= VTERM_MOD_ALT;   break;
-      default: return state;
+      default: върни state;
     }
   }
 
-  return state;
+  върни state;
 }
 
 static VTermKey strp_key(char *str)
@@ -52,31 +52,31 @@ static VTermKey strp_key(char *str)
     { "F1",    VTERM_KEY_FUNCTION(1) },
     { NULL,    VTERM_KEY_NONE },
   };
-  int i;
+  цяло i;
 
-  for(i = 0; keys[i].name; i++) {
-    if(streq(str, keys[i].name))
-      return keys[i].key;
+  за(i = 0; keys[i].name; i++) {
+    ако(streq(str, keys[i].name))
+      върни keys[i].key;
   }
 
-  return VTERM_KEY_NONE;
+  върни VTERM_KEY_NONE;
 }
 
 static void print_color(const VTermColor *col)
 {
-  if (VTERM_COLOR_IS_RGB(col)) {
+  ако (VTERM_COLOR_IS_RGB(col)) {
     printf("rgb(%d,%d,%d", col->red, col->green, col->blue);
   }
-  else if (VTERM_COLOR_IS_INDEXED(col)) {
+  иначе ако (VTERM_COLOR_IS_INDEXED(col)) {
     printf("idx(%d", col->index);
   }
-  else {
+  иначе {
     printf("invalid(%d", col->type);
   }
-  if (VTERM_COLOR_IS_DEFAULT_FG(col)) {
+  ако (VTERM_COLOR_IS_DEFAULT_FG(col)) {
     printf(",is_default_fg");
   }
-  if (VTERM_COLOR_IS_DEFAULT_BG(col)) {
+  ако (VTERM_COLOR_IS_DEFAULT_BG(col)) {
     printf(",is_default_bg");
   }
   printf(")");
@@ -85,21 +85,21 @@ static void print_color(const VTermColor *col)
 static VTermColor strpe_color(char **strp)
 {
   uint8_t r, g, b, idx;
-  int len = 0;
+  цяло len = 0;
   VTermColor col;
 
-  if(sscanf(*strp, "rgb(%hhu,%hhu,%hhu)%n", &r, &g, &b, &len) == 3 && len > 0) {
+  ако(sscanf(*strp, "rgb(%hhu,%hhu,%hhu)%n", &r, &g, &b, &len) == 3 && len > 0) {
     *strp += len;
     vterm_color_rgb(&col, r, g, b);
   }
-  else if(sscanf(*strp, "idx(%hhu)%n", &idx, &len) == 1 && len > 0) {
+  иначе ако(sscanf(*strp, "idx(%hhu)%n", &idx, &len) == 1 && len > 0) {
     *strp += len;
     vterm_color_indexed(&col, idx);
   }
-  else
+  иначе
     vterm_color_rgb(&col, 127, 127, 127);
 
-  return col;
+  върни col;
 }
 
 static VTerm *vt;
@@ -113,47 +113,47 @@ static void term_output(const char *s, size_t len, void *user UNUSED)
   size_t i;
 
   printf("output ");
-  for(i = 0; i < len; i++)
+  за(i = 0; i < len; i++)
     printf("%x%s", (unsigned char)s[i], i < len-1 ? "," : "\n");
 }
 
 static void printhex(const char *s, size_t len)
 {
-  while(len--)
+  докато(len--)
     printf("%02x", (uint8_t)(s++)[0]);
 }
 
-static int parser_text(const char bytes[], size_t len, void *user UNUSED)
+static цяло parser_text(const char bytes[], size_t len, void *user UNUSED)
 {
   size_t i;
 
   printf("text ");
-  for(i = 0; i < len; i++) {
+  за(i = 0; i < len; i++) {
     unsigned char b = bytes[i];
-    if(b < 0x20 || b == 0x7f || (b >= 0x80 && b < 0xa0))
+    ако(b < 0x20 || b == 0x7f || (b >= 0x80 && b < 0xa0))
       break;
     printf(i ? ",%x" : "%x", b);
   }
   printf("\n");
 
-  return i;
+  върни i;
 }
 
-static int parser_control(unsigned char control, void *user UNUSED)
+static цяло parser_control(unsigned char control, void *user UNUSED)
 {
   printf("control %02x\n", control);
 
-  return 1;
+  върни 1;
 }
 
-static int parser_escape(const char bytes[], size_t len, void *user UNUSED)
+static цяло parser_escape(const char bytes[], size_t len, void *user UNUSED)
 {
-  if(bytes[0] >= 0x20 && bytes[0] < 0x30) {
-    if(len < 2)
-      return -1;
+  ако(bytes[0] >= 0x20 && bytes[0] < 0x30) {
+    ако(len < 2)
+      върни -1;
     len = 2;
   }
-  else {
+  иначе {
     len = 1;
   }
 
@@ -161,132 +161,132 @@ static int parser_escape(const char bytes[], size_t len, void *user UNUSED)
   printhex(bytes, len);
   printf("\n");
 
-  return len;
+  върни len;
 }
 
-static int parser_csi(const char *leader, const long args[], int argcount, const char *intermed, char command, void *user UNUSED)
+static цяло parser_csi(const char *leader, const long args[], цяло argcount, const char *intermed, char command, void *user UNUSED)
 {
-  int i;
+  цяло i;
   printf("csi %02x", command);
 
-  if(leader && leader[0]) {
+  ако(leader && leader[0]) {
     printf(" L=");
-    for(i = 0; leader[i]; i++)
+    за(i = 0; leader[i]; i++)
       printf("%02x", leader[i]);
   }
 
-  for(i = 0; i < argcount; i++) {
+  за(i = 0; i < argcount; i++) {
     char sep = i ? ',' : ' ';
 
-    if(args[i] == CSI_ARG_MISSING)
+    ако(args[i] == CSI_ARG_MISSING)
       printf("%c*", sep);
-    else
+    иначе
       printf("%c%ld%s", sep, CSI_ARG(args[i]), CSI_ARG_HAS_MORE(args[i]) ? "+" : "");
   }
 
-  if(intermed && intermed[0]) {
+  ако(intermed && intermed[0]) {
     printf(" I=");
-    for(i = 0; intermed[i]; i++)
+    за(i = 0; intermed[i]; i++)
       printf("%02x", intermed[i]);
   }
 
   printf("\n");
 
-  return 1;
+  върни 1;
 }
 
-static int parser_osc(int command, VTermStringFragment frag, void *user UNUSED)
+static цяло parser_osc(цяло command, VTermStringFragment frag, void *user UNUSED)
 {
 
   printf("osc ");
 
-  if(frag.initial) {
-    if(command == -1)
+  ако(frag.initial) {
+    ако(command == -1)
       printf("[");
-    else
+    иначе
       printf("[%d;", command);
   }
 
   printhex(frag.str, frag.len);
 
-  if(frag.final)
+  ако(frag.final)
     printf("]");
 
   printf("\n");
 
-  return 1;
+  върни 1;
 }
 
-static int parser_dcs(const char *command, size_t commandlen, VTermStringFragment frag, void *user UNUSED)
+static цяло parser_dcs(const char *command, size_t commandlen, VTermStringFragment frag, void *user UNUSED)
 {
   printf("dcs ");
 
-  if(frag.initial) {
+  ако(frag.initial) {
     size_t i;
     printf("[");
-    for(i = 0; i < commandlen; i++)
+    за(i = 0; i < commandlen; i++)
       printf("%02x", command[i]);
   }
 
   printhex(frag.str, frag.len);
 
-  if(frag.final)
+  ако(frag.final)
     printf("]");
 
   printf("\n");
 
-  return 1;
+  върни 1;
 }
 
-static int parser_apc(VTermStringFragment frag, void *user UNUSED)
+static цяло parser_apc(VTermStringFragment frag, void *user UNUSED)
 {
   printf("apc ");
 
-  if(frag.initial)
+  ако(frag.initial)
     printf("[");
 
   printhex(frag.str, frag.len);
 
-  if(frag.final)
+  ако(frag.final)
     printf("]");
 
   printf("\n");
 
-  return 1;
+  върни 1;
 }
 
-static int parser_pm(VTermStringFragment frag, void *user UNUSED)
+static цяло parser_pm(VTermStringFragment frag, void *user UNUSED)
 {
   printf("pm ");
 
-  if(frag.initial)
+  ако(frag.initial)
     printf("[");
 
   printhex(frag.str, frag.len);
 
-  if(frag.final)
+  ако(frag.final)
     printf("]");
 
   printf("\n");
 
-  return 1;
+  върни 1;
 }
 
-static int parser_sos(VTermStringFragment frag, void *user UNUSED)
+static цяло parser_sos(VTermStringFragment frag, void *user UNUSED)
 {
   printf("sos ");
 
-  if(frag.initial)
+  ако(frag.initial)
     printf("[");
 
   printhex(frag.str, frag.len);
 
-  if(frag.final)
+  ако(frag.final)
     printf("]");
 
   printf("\n");
 
-  return 1;
+  върни 1;
 }
 
 static VTermParserCallbacks parser_cbs = {
@@ -314,140 +314,140 @@ static VTermStateFallbacks fallbacks = {
 
 /* These callbacks are shared by State and Screen */
 
-static int want_movecursor = 0;
+static цяло want_movecursor = 0;
 static VTermPos state_pos;
-static int movecursor(VTermPos pos, VTermPos oldpos UNUSED, int visible UNUSED, void *user UNUSED)
+static цяло movecursor(VTermPos pos, VTermPos oldpos UNUSED, цяло visible UNUSED, void *user UNUSED)
 {
   state_pos = pos;
 
-  if(want_movecursor)
+  ако(want_movecursor)
     printf("movecursor %d,%d\n", pos.row, pos.col);
 
-  return 1;
+  върни 1;
 }
 
-static int want_premove = 0;
-static int premove(VTermRect rect, void *user UNUSED)
+static цяло want_premove = 0;
+static цяло premove(VTermRect rect, void *user UNUSED)
 {
-  if(!want_premove)
-    return 0;
+  ако(!want_premove)
+    върни 0;
 
   printf("premove %d..%d,%d..%d\n",
       rect.start_row, rect.end_row, rect.start_col, rect.end_col);
 
-  return 1;
+  върни 1;
 }
 
-static int want_scrollrect = 0;
-static int scrollrect(VTermRect rect, int downward, int rightward, void *user UNUSED)
+static цяло want_scrollrect = 0;
+static цяло scrollrect(VTermRect rect, цяло downward, цяло rightward, void *user UNUSED)
 {
-  if(!want_scrollrect)
-    return 0;
+  ако(!want_scrollrect)
+    върни 0;
 
   printf("scrollrect %d..%d,%d..%d => %+d,%+d\n",
       rect.start_row, rect.end_row, rect.start_col, rect.end_col,
       downward, rightward);
 
-  return 1;
+  върни 1;
 }
 
-static int want_moverect = 0;
-static int moverect(VTermRect dest, VTermRect src, void *user UNUSED)
+static цяло want_moverect = 0;
+static цяло moverect(VTermRect dest, VTermRect src, void *user UNUSED)
 {
-  if(!want_moverect)
-    return 0;
+  ако(!want_moverect)
+    върни 0;
 
   printf("moverect %d..%d,%d..%d -> %d..%d,%d..%d\n",
       src.start_row,  src.end_row,  src.start_col,  src.end_col,
       dest.start_row, dest.end_row, dest.start_col, dest.end_col);
 
-  return 1;
+  върни 1;
 }
 
-static int want_settermprop = 0;
-static int settermprop(VTermProp prop, VTermValue *val, void *user UNUSED)
+static цяло want_settermprop = 0;
+static цяло settermprop(VTermProp prop, VTermValue *val, void *user UNUSED)
 {
   VTermValueType type;
-  if(!want_settermprop)
-    return 1;
+  ако(!want_settermprop)
+    върни 1;
 
   type = vterm_get_prop_type(prop);
   switch(type) {
   case VTERM_VALUETYPE_BOOL:
     printf("settermprop %d %s\n", prop, val->boolean ? "true" : "false");
-    return 1;
+    върни 1;
   case VTERM_VALUETYPE_INT:
     printf("settermprop %d %d\n", prop, val->number);
-    return 1;
+    върни 1;
   case VTERM_VALUETYPE_STRING:
     printf("settermprop %d %s\"%.*s\"%s\n", prop,
         val->string.initial ? "[" : "", val->string.len, val->string.str, val->string.final ? "]" : "");
-    return 1;
+    върни 1;
   case VTERM_VALUETYPE_COLOR:
     printf("settermprop %d ", prop);
     print_color(&val->color);
     printf("\n");
-    return 1;
+    върни 1;
 
   case VTERM_N_VALUETYPES:
-    return 0;
+    върни 0;
   }
 
-  return 0;
+  върни 0;
 }
 
 // These callbacks are for State
 
-static int want_state_putglyph = 0;
-static int state_putglyph(VTermGlyphInfo *info, VTermPos pos, void *user UNUSED)
+static цяло want_state_putglyph = 0;
+static цяло state_putglyph(VTermGlyphInfo *info, VTermPos pos, void *user UNUSED)
 {
-  int i;
-  if(!want_state_putglyph)
-    return 1;
+  цяло i;
+  ако(!want_state_putglyph)
+    върни 1;
 
   printf("putglyph ");
-  for(i = 0; i < VTERM_MAX_CHARS_PER_CELL && info->chars[i]; i++)
+  за(i = 0; i < VTERM_MAX_CHARS_PER_CELL && info->chars[i]; i++)
     printf(i ? ",%x" : "%x", info->chars[i]);
   printf(" %d %d,%d", info->width, pos.row, pos.col);
-  if(info->protected_cell)
+  ако(info->protected_cell)
     printf(" prot");
-  if(info->dwl)
+  ако(info->dwl)
     printf(" dwl");
-  if(info->dhl)
+  ако(info->dhl)
     printf(" dhl-%s", info->dhl == 1 ? "top" : info->dhl == 2 ? "bottom" : "?" );
   printf("\n");
 
-  return 1;
+  върни 1;
 }
 
-static int want_state_erase = 0;
-static int state_erase(VTermRect rect, int selective, void *user UNUSED)
+static цяло want_state_erase = 0;
+static цяло state_erase(VTermRect rect, цяло selective, void *user UNUSED)
 {
-  if(!want_state_erase)
-    return 1;
+  ако(!want_state_erase)
+    върни 1;
 
   printf("erase %d..%d,%d..%d%s\n",
       rect.start_row, rect.end_row, rect.start_col, rect.end_col,
       selective ? " selective" : "");
 
-  return 1;
+  върни 1;
 }
 
 static struct {
-  int bold;
-  int underline;
-  int italic;
-  int blink;
-  int reverse;
-  int conceal;
-  int strike;
-  int font;
-  int small;
-  int baseline;
+  цяло bold;
+  цяло underline;
+  цяло italic;
+  цяло blink;
+  цяло reverse;
+  цяло conceal;
+  цяло strike;
+  цяло font;
+  цяло small;
+  цяло baseline;
   VTermColor foreground;
   VTermColor background;
 } state_pen;
-static int state_setpenattr(VTermAttr attr, VTermValue *val, void *user UNUSED)
+static цяло state_setpenattr(VTermAttr attr, VTermValue *val, void *user UNUSED)
 {
   switch(attr) {
   case VTERM_ATTR_BOLD:
@@ -488,24 +488,24 @@ static int state_setpenattr(VTermAttr attr, VTermValue *val, void *user UNUSED)
     break;
 
   case VTERM_N_ATTRS:
-    return 0;
+    върни 0;
   }
 
-  return 1;
+  върни 1;
 }
 
-static int state_setlineinfo(int row UNUSED, const VTermLineInfo *newinfo UNUSED, const VTermLineInfo *oldinfo UNUSED, void *user UNUSED)
+static цяло state_setlineinfo(цяло row UNUSED, const VTermLineInfo *newinfo UNUSED, const VTermLineInfo *oldinfo UNUSED, void *user UNUSED)
 {
-  return 1;
+  върни 1;
 }
 
-static int want_state_scrollback = 0;
-static int state_sb_clear(void *user UNUSED) {
-  if(!want_state_scrollback)
-    return 1;
+static цяло want_state_scrollback = 0;
+static цяло state_sb_clear(void *user UNUSED) {
+  ако(!want_state_scrollback)
+    върни 1;
 
   printf("sb_clear\n");
-  return 0;
+  върни 0;
 }
 
 VTermStateCallbacks state_cbs = {
@@ -524,24 +524,24 @@ VTermStateCallbacks state_cbs = {
   premove, // premove
 };
 
-static int selection_set(VTermSelectionMask mask, VTermStringFragment frag, void *user UNUSED)
+static цяло selection_set(VTermSelectionMask mask, VTermStringFragment frag, void *user UNUSED)
 {
   printf("selection-set mask=%04X ", mask);
-  if(frag.initial)
+  ако(frag.initial)
     printf("[");
   printhex(frag.str, frag.len);
-  if(frag.final)
+  ако(frag.final)
     printf("]");
   printf("\n");
 
-  return 1;
+  върни 1;
 }
 
-static int selection_query(VTermSelectionMask mask, void *user UNUSED)
+static цяло selection_query(VTermSelectionMask mask, void *user UNUSED)
 {
   printf("selection-query mask=%04X\n", mask);
 
-  return 1;
+  върни 1;
 }
 
 VTermSelectionCallbacks selection_cbs = {
@@ -549,43 +549,43 @@ VTermSelectionCallbacks selection_cbs = {
   .query = selection_query,
 };
 
-static int want_screen_damage = 0;
-static int want_screen_damage_cells = 0;
-static int screen_damage(VTermRect rect, void *user UNUSED)
+static цяло want_screen_damage = 0;
+static цяло want_screen_damage_cells = 0;
+static цяло screen_damage(VTermRect rect, void *user UNUSED)
 {
-  if(!want_screen_damage)
-    return 1;
+  ако(!want_screen_damage)
+    върни 1;
 
   printf("damage %d..%d,%d..%d",
       rect.start_row, rect.end_row, rect.start_col, rect.end_col);
 
-  if(want_screen_damage_cells) {
-    int equals = FALSE;
-    int row;
-    int col;
+  ако(want_screen_damage_cells) {
+    цяло equals = FALSE;
+    цяло row;
+    цяло col;
 
-    for(row = rect.start_row; row < rect.end_row; row++) {
-      int eol = rect.end_col;
-      while(eol > rect.start_col) {
+    за(row = rect.start_row; row < rect.end_row; row++) {
+      цяло eol = rect.end_col;
+      докато(eol > rect.start_col) {
         VTermScreenCell cell;
 	VTermPos pos;
 	pos.row = row;
 	pos.col = eol-1;
         vterm_screen_get_cell(screen, pos, &cell);
-        if(cell.chars[0])
+        ако(cell.chars[0])
           break;
 
         eol--;
       }
 
-      if(eol == rect.start_col)
+      ако(eol == rect.start_col)
         break;
 
-      if(!equals)
+      ако(!equals)
         printf(" ="), equals = TRUE;
 
       printf(" %d<", row);
-      for(col = rect.start_col; col < eol; col++) {
+      за(col = rect.start_col; col < eol; col++) {
         VTermScreenCell cell;
 	VTermPos pos;
 	pos.row = row;
@@ -599,58 +599,58 @@ static int screen_damage(VTermRect rect, void *user UNUSED)
 
   printf("\n");
 
-  return 1;
+  върни 1;
 }
 
-static int want_screen_scrollback = 0;
-static int screen_sb_pushline4(int cols, const VTermScreenCell *cells, int continuation, void *user UNUSED)
+static цяло want_screen_scrollback = 0;
+static цяло screen_sb_pushline4(цяло cols, const VTermScreenCell *cells, цяло continuation, void *user UNUSED)
 {
-  int eol;
-  int c;
+  цяло eol;
+  цяло c;
 
-  if(!want_screen_scrollback)
-    return 1;
+  ако(!want_screen_scrollback)
+    върни 1;
 
   eol = cols;
-  while(eol && !cells[eol-1].chars[0])
+  докато(eol && !cells[eol-1].chars[0])
     eol--;
 
   printf("sb_pushline %d%s =", cols, continuation ? " cont" : "");
-  for(c = 0; c < eol; c++)
+  за(c = 0; c < eol; c++)
     printf(" %02X", cells[c].chars[0]);
   printf("\n");
 
-  return 1;
+  върни 1;
 }
 
-static int screen_sb_popline(int cols, VTermScreenCell *cells, void *user UNUSED)
+static цяло screen_sb_popline(цяло cols, VTermScreenCell *cells, void *user UNUSED)
 {
-  int col;
+  цяло col;
 
-  if(!want_screen_scrollback)
-    return 0;
+  ако(!want_screen_scrollback)
+    върни 0;
 
   // All lines of scrollback contain "ABCDE"
-  for(col = 0; col < cols; col++) {
-    if(col < 5)
+  за(col = 0; col < cols; col++) {
+    ако(col < 5)
       cells[col].chars[0] = 'A' + col;
-    else
+    иначе
       cells[col].chars[0] = 0;
 
     cells[col].width = 1;
   }
 
   printf("sb_popline %d\n", cols);
-  return 1;
+  върни 1;
 }
 
-static int screen_sb_clear(void *user UNUSED)
+static цяло screen_sb_clear(void *user UNUSED)
 {
-  if(!want_screen_scrollback)
-    return 1;
+  ако(!want_screen_scrollback)
+    върни 1;
 
   printf("sb_clear\n");
-  return 0;
+  върни 0;
 }
 
 VTermScreenCallbacks screen_cbs = {
@@ -666,41 +666,41 @@ VTermScreenCallbacks screen_cbs = {
   screen_sb_pushline4, // sb_pushline4
 };
 
-int main(int argc UNUSED, char **argv UNUSED)
+цяло main(цяло argc UNUSED, char **argv UNUSED)
 {
   char line[1024] = {0};
-  int flag;
+  цяло flag;
 
-  int err;
+  цяло err;
 
   setvbuf(stdout, NULL, _IONBF, 0);
 
-  while(fgets(line, sizeof line, stdin)) {
+  докато(fgets(line, sizeof line, stdin)) {
     char *nl;
     size_t outlen;
     err = 0;
 
-    if((nl = strchr(line, '\n')))
+    ако((nl = strchr(line, '\n')))
       *nl = '\0';
 
-    if(streq(line, "INIT")) {
-      if(!vt)
+    ако(streq(line, "INIT")) {
+      ако(!vt)
         vt = vterm_new(25, 80);
 
       // Somehow this makes tests fail
       // vterm_output_set_callback(vt, term_output, NULL);
     }
 
-    else if(streq(line, "WANTPARSER")) {
+    иначе ако(streq(line, "WANTPARSER")) {
       assert(vt);
       vterm_parser_set_callbacks(vt, &parser_cbs, NULL);
     }
 
-    else if(strstartswith(line, "WANTSTATE") && (line[9] == '\0' || line[9] == ' ')) {
-      int i = 9;
-      int sense = 1;
+    иначе ако(strstartswith(line, "WANTSTATE") && (line[9] == '\0' || line[9] == ' ')) {
+      цяло i = 9;
+      цяло sense = 1;
       assert(vt);
-      if(!state) {
+      ако(!state) {
         state = vterm_obtain_state(vt);
         vterm_state_set_callbacks(state, &state_cbs, NULL);
         vterm_state_callbacks_has_premove(state);
@@ -712,9 +712,9 @@ int main(int argc UNUSED, char **argv UNUSED)
         vterm_state_reset(state, 1);
       }
 
-      while(line[i] == ' ')
+      докато(line[i] == ' ')
         i++;
-      for( ; line[i]; i++)
+      за( ; line[i]; i++)
         switch(line[i]) {
         case '+':
           sense = 1;
@@ -751,18 +751,18 @@ int main(int argc UNUSED, char **argv UNUSED)
         }
     }
 
-    else if(strstartswith(line, "WANTSCREEN") && (line[10] == '\0' || line[10] == ' ')) {
-      int i = 10;
-      int sense = 1;
+    иначе ако(strstartswith(line, "WANTSCREEN") && (line[10] == '\0' || line[10] == ' ')) {
+      цяло i = 10;
+      цяло sense = 1;
       assert(vt);
-      if(!screen)
+      ако(!screen)
         screen = vterm_obtain_screen(vt);
       vterm_screen_set_callbacks(screen, &screen_cbs, NULL);
       vterm_screen_callbacks_has_pushline4(screen);
 
-      while(line[i] == ' ')
+      докато(line[i] == ' ')
         i++;
-      for( ; line[i]; i++)
+      за( ; line[i]; i++)
         switch(line[i]) {
         case '-':
           sense = 0;
@@ -797,74 +797,74 @@ int main(int argc UNUSED, char **argv UNUSED)
         }
     }
 
-    else if(sscanf(line, "UTF8 %d", &flag)) {
+    иначе ако(sscanf(line, "UTF8 %d", &flag)) {
       vterm_set_utf8(vt, flag);
     }
 
-    else if(streq(line, "RESET")) {
-      if(state) {
+    иначе ако(streq(line, "RESET")) {
+      ако(state) {
         vterm_state_reset(state, 1);
         vterm_state_get_cursorpos(state, &state_pos);
       }
-      if(screen) {
+      ако(screen) {
         vterm_screen_reset(screen, 1);
       }
     }
 
-    else if(strstartswith(line, "RESIZE ")) {
-      int rows, cols;
+    иначе ако(strstartswith(line, "RESIZE ")) {
+      цяло rows, cols;
       char *linep = line + 7;
-      while(linep[0] == ' ')
+      докато(linep[0] == ' ')
         linep++;
       sscanf(linep, "%d, %d", &rows, &cols);
       vterm_set_size(vt, rows, cols);
     }
 
-    else if(strstartswith(line, "PUSH ")) {
+    иначе ако(strstartswith(line, "PUSH ")) {
       char *bytes = line + 5;
       size_t len = inplace_hex2bytes(bytes);
       assert(len);
 
       size_t written = vterm_input_write(vt, bytes, len);
-      if(written < len)
+      ако(written < len)
         fprintf(stderr, "! short write\n");
     }
 
-    else if(streq(line, "WANTENCODING")) {
+    иначе ако(streq(line, "WANTENCODING")) {
       // This isn't really external API but it's hard to get this out any
       // other way
       encoding.enc = vterm_lookup_encoding(ENC_UTF8, 'u');
-      if(encoding.enc->init)
+      ако(encoding.enc->init)
         (*encoding.enc->init)(encoding.enc, encoding.data);
     }
 
-    else if(strstartswith(line, "ENCIN ")) {
+    иначе ако(strstartswith(line, "ENCIN ")) {
       char *bytes = line + 6;
       size_t len = inplace_hex2bytes(bytes);
       assert(len);
 
       uint32_t cp[1024];
-      int cpi = 0;
+      цяло cpi = 0;
       size_t pos = 0;
 
       (*encoding.enc->decode)(encoding.enc, encoding.data,
           cp, &cpi, len, bytes, &pos, len);
 
-      if(cpi > 0) {
-	int i;
+      ако(cpi > 0) {
+	цяло i;
         printf("encout ");
-        for(i = 0; i < cpi; i++) {
+        за(i = 0; i < cpi; i++) {
           printf(i ? ",%x" : "%x", cp[i]);
         }
         printf("\n");
       }
     }
 
-    else if(strstartswith(line, "INCHAR ")) {
+    иначе ако(strstartswith(line, "INCHAR ")) {
       char *linep = line + 7;
-      unsigned int c = 0;
+      unsigned цяло c = 0;
       VTermModifier mod;
-      while(linep[0] == ' ')
+      докато(linep[0] == ' ')
         linep++;
       mod = strpe_modifiers(&linep);
       sscanf(linep, " %x", &c);
@@ -872,83 +872,83 @@ int main(int argc UNUSED, char **argv UNUSED)
       vterm_keyboard_unichar(vt, c, mod);
     }
 
-    else if(strstartswith(line, "INKEY ")) {
+    иначе ако(strstartswith(line, "INKEY ")) {
       VTermModifier mod;
       VTermKey key;
       char *linep = line + 6;
-      while(linep[0] == ' ')
+      докато(linep[0] == ' ')
         linep++;
       mod = strpe_modifiers(&linep);
-      while(linep[0] == ' ')
+      докато(linep[0] == ' ')
         linep++;
       key = strp_key(linep);
 
       vterm_keyboard_key(vt, key, mod);
     }
 
-    else if(strstartswith(line, "PASTE ")) {
+    иначе ако(strstartswith(line, "PASTE ")) {
       char *linep = line + 6;
-      if(streq(linep, "START"))
+      ако(streq(linep, "START"))
         vterm_keyboard_start_paste(vt);
-      else if(streq(linep, "END"))
+      иначе ако(streq(linep, "END"))
         vterm_keyboard_end_paste(vt);
-      else
+      иначе
         goto abort_line;
     }
 
-    else if(strstartswith(line, "FOCUS ")) {
+    иначе ако(strstartswith(line, "FOCUS ")) {
       assert(state);
       char *linep = line + 6;
-      if(streq(linep, "IN"))
+      ако(streq(linep, "IN"))
         vterm_state_focus_in(state);
-      else if(streq(linep, "OUT"))
+      иначе ако(streq(linep, "OUT"))
         vterm_state_focus_out(state);
-      else
+      иначе
         goto abort_line;
     }
 
-    else if(strstartswith(line, "MOUSEMOVE ")) {
+    иначе ако(strstartswith(line, "MOUSEMOVE ")) {
       char *linep = line + 10;
-      int row, col, len;
+      цяло row, col, len;
       VTermModifier mod;
-      while(linep[0] == ' ')
+      докато(linep[0] == ' ')
         linep++;
       sscanf(linep, "%d,%d%n", &row, &col, &len);
       linep += len;
-      while(linep[0] == ' ')
+      докато(linep[0] == ' ')
         linep++;
       mod = strpe_modifiers(&linep);
       vterm_mouse_move(vt, row, col, mod);
     }
 
-    else if(strstartswith(line, "MOUSEBTN ")) {
+    иначе ако(strstartswith(line, "MOUSEBTN ")) {
       char *linep = line + 9;
       char press;
-      int button, len;
+      цяло button, len;
       VTermModifier mod;
-      while(linep[0] == ' ')
+      докато(linep[0] == ' ')
         linep++;
       sscanf(linep, "%c %d%n", &press, &button, &len);
       linep += len;
-      while(linep[0] == ' ')
+      докато(linep[0] == ' ')
         linep++;
       mod = strpe_modifiers(&linep);
       vterm_mouse_button(vt, button, (press == 'd' || press == 'D'), mod);
     }
 
-    else if(strstartswith(line, "SELECTION ")) {
+    иначе ако(strstartswith(line, "SELECTION ")) {
       char *linep = line + 10;
-      unsigned int mask;
-      int len;
+      unsigned цяло mask;
+      цяло len;
       VTermStringFragment frag = { 0 };
       sscanf(linep, "%x%n", &mask, &len);
       linep += len;
-      while(linep[0] == ' ')
+      докато(linep[0] == ' ')
         linep++;
-      if(linep[0] == '[') {
+      ако(linep[0] == '[') {
         frag.initial = TRUE;
         linep++;
-        while(linep[0] == ' ')
+        докато(linep[0] == ' ')
           linep++;
       }
       frag.len = inplace_hex2bytes(linep);
@@ -956,221 +956,221 @@ int main(int argc UNUSED, char **argv UNUSED)
       assert(frag.len);
 
       linep += frag.len * 2;
-      while(linep[0] == ' ')
+      докато(linep[0] == ' ')
         linep++;
-      if(linep[0] == ']') {
+      ако(linep[0] == ']') {
         frag.final = TRUE;
       }
       vterm_state_send_selection(state, mask, frag);
     }
 
-    else if(strstartswith(line, "DAMAGEMERGE ")) {
+    иначе ако(strstartswith(line, "DAMAGEMERGE ")) {
       assert(screen);
       char *linep = line + 12;
-      while(linep[0] == ' ')
+      докато(linep[0] == ' ')
         linep++;
-      if(streq(linep, "CELL"))
+      ако(streq(linep, "CELL"))
         vterm_screen_set_damage_merge(screen, VTERM_DAMAGE_CELL);
-      else if(streq(linep, "ROW"))
+      иначе ако(streq(linep, "ROW"))
         vterm_screen_set_damage_merge(screen, VTERM_DAMAGE_ROW);
-      else if(streq(linep, "SCREEN"))
+      иначе ако(streq(linep, "SCREEN"))
         vterm_screen_set_damage_merge(screen, VTERM_DAMAGE_SCREEN);
-      else if(streq(linep, "SCROLL"))
+      иначе ако(streq(linep, "SCROLL"))
         vterm_screen_set_damage_merge(screen, VTERM_DAMAGE_SCROLL);
     }
 
-    else if(strstartswith(line, "DAMAGEFLUSH")) {
+    иначе ако(strstartswith(line, "DAMAGEFLUSH")) {
       assert(screen);
       vterm_screen_flush_damage(screen);
     }
 
-    else if(strstartswith(line, "SETDEFAULTCOL ")) {
+    иначе ако(strstartswith(line, "SETDEFAULTCOL ")) {
       assert(screen);
       char *linep = line + 14;
-      while(linep[0] == ' ')
+      докато(linep[0] == ' ')
         linep++;
       VTermColor fg = strpe_color(&linep);
-      if(linep[0]) {
-        while(linep[0] == ' ')
+      ако(linep[0]) {
+        докато(linep[0] == ' ')
           linep++;
         VTermColor bg = strpe_color(&linep);
 
         vterm_screen_set_default_colors(screen, &fg, &bg);
       }
-      else
+      иначе
         vterm_screen_set_default_colors(screen, &fg, NULL);
     }
 
-    else if(line[0] == '?') {
-      if(streq(line, "?cursor")) {
+    иначе ако(line[0] == '?') {
+      ако(streq(line, "?cursor")) {
         assert(state);
         VTermPos pos;
         vterm_state_get_cursorpos(state, &pos);
-        if(pos.row != state_pos.row)
+        ако(pos.row != state_pos.row)
           printf("! row mismatch: state=%d,%d event=%d,%d\n",
               pos.row, pos.col, state_pos.row, state_pos.col);
-        else if(pos.col != state_pos.col)
+        иначе ако(pos.col != state_pos.col)
           printf("! col mismatch: state=%d,%d event=%d,%d\n",
               pos.row, pos.col, state_pos.row, state_pos.col);
-        else
+        иначе
           printf("%d,%d\n", state_pos.row, state_pos.col);
       }
-      else if(strstartswith(line, "?pen ")) {
+      иначе ако(strstartswith(line, "?pen ")) {
         assert(state);
         VTermValue val;
         char *linep = line + 5;
-        while(linep[0] == ' ')
+        докато(linep[0] == ' ')
           linep++;
 
 #define BOOLSTR(v) ((v) ? "on" : "off")
 
-        if(streq(linep, "bold")) {
+        ако(streq(linep, "bold")) {
           vterm_state_get_penattr(state, VTERM_ATTR_BOLD, &val);
-          if(val.boolean != state_pen.bold)
+          ако(val.boolean != state_pen.bold)
             printf("! pen bold mismatch; state=%s, event=%s\n",
                 BOOLSTR(val.boolean), BOOLSTR(state_pen.bold));
-          else
+          иначе
             printf("%s\n", BOOLSTR(state_pen.bold));
         }
-        else if(streq(linep, "underline")) {
+        иначе ако(streq(linep, "underline")) {
           vterm_state_get_penattr(state, VTERM_ATTR_UNDERLINE, &val);
-          if(val.boolean != state_pen.underline)
+          ако(val.boolean != state_pen.underline)
             printf("! pen underline mismatch; state=%d, event=%d\n",
                 val.boolean, state_pen.underline);
-          else
+          иначе
             printf("%d\n", state_pen.underline);
         }
-        else if(streq(linep, "italic")) {
+        иначе ако(streq(linep, "italic")) {
           vterm_state_get_penattr(state, VTERM_ATTR_ITALIC, &val);
-          if(val.boolean != state_pen.italic)
+          ако(val.boolean != state_pen.italic)
             printf("! pen italic mismatch; state=%s, event=%s\n",
                 BOOLSTR(val.boolean), BOOLSTR(state_pen.italic));
-          else
+          иначе
             printf("%s\n", BOOLSTR(state_pen.italic));
         }
-        else if(streq(linep, "blink")) {
+        иначе ако(streq(linep, "blink")) {
           vterm_state_get_penattr(state, VTERM_ATTR_BLINK, &val);
-          if(val.boolean != state_pen.blink)
+          ако(val.boolean != state_pen.blink)
             printf("! pen blink mismatch; state=%s, event=%s\n",
                 BOOLSTR(val.boolean), BOOLSTR(state_pen.blink));
-          else
+          иначе
             printf("%s\n", BOOLSTR(state_pen.blink));
         }
-        else if(streq(linep, "reverse")) {
+        иначе ако(streq(linep, "reverse")) {
           vterm_state_get_penattr(state, VTERM_ATTR_REVERSE, &val);
-          if(val.boolean != state_pen.reverse)
+          ако(val.boolean != state_pen.reverse)
             printf("! pen reverse mismatch; state=%s, event=%s\n",
                 BOOLSTR(val.boolean), BOOLSTR(state_pen.reverse));
-          else
+          иначе
             printf("%s\n", BOOLSTR(state_pen.reverse));
         }
-        else if(streq(linep, "font")) {
+        иначе ако(streq(linep, "font")) {
           vterm_state_get_penattr(state, VTERM_ATTR_FONT, &val);
-          if(val.boolean != state_pen.font)
+          ако(val.boolean != state_pen.font)
             printf("! pen font mismatch; state=%d, event=%d\n",
                 val.boolean, state_pen.font);
-          else
+          иначе
             printf("%d\n", state_pen.font);
         }
-        else if(streq(linep, "small")) {
+        иначе ако(streq(linep, "small")) {
           vterm_state_get_penattr(state, VTERM_ATTR_SMALL, &val);
-          if(val.boolean != state_pen.small)
+          ако(val.boolean != state_pen.small)
             printf("! pen small mismatch; state=%s, event=%s\n",
                 BOOLSTR(val.boolean), BOOLSTR(state_pen.small));
-          else
+          иначе
             printf("%s\n", BOOLSTR(state_pen.small));
         }
-        else if(streq(linep, "baseline")) {
+        иначе ако(streq(linep, "baseline")) {
           vterm_state_get_penattr(state, VTERM_ATTR_BASELINE, &val);
-          if(val.number != state_pen.baseline)
+          ако(val.number != state_pen.baseline)
             printf("! pen baseline mismatch: state=%d, event=%d\n",
                 val.number, state_pen.baseline);
-          else
+          иначе
             printf("%s\n", state_pen.baseline == VTERM_BASELINE_RAISE ? "raise"
                          : state_pen.baseline == VTERM_BASELINE_LOWER ? "lower"
                          : "normal");
         }
-        else if(streq(linep, "foreground")) {
+        иначе ако(streq(linep, "foreground")) {
           print_color(&state_pen.foreground);
           printf("\n");
         }
-        else if(streq(linep, "background")) {
+        иначе ако(streq(linep, "background")) {
           print_color(&state_pen.background);
           printf("\n");
         }
-        else
+        иначе
           printf("?\n");
       }
-      else if(strstartswith(line, "?lineinfo ")) {
+      иначе ако(strstartswith(line, "?lineinfo ")) {
         assert(state);
         char *linep = line + 10;
-        int row;
+        цяло row;
         const VTermLineInfo *info;
-        while(linep[0] == ' ')
+        докато(linep[0] == ' ')
           linep++;
-        if(sscanf(linep, "%d", &row) < 1) {
+        ако(sscanf(linep, "%d", &row) < 1) {
           printf("! lineinfo unrecognised input\n");
           goto abort_line;
         }
         info = vterm_state_get_lineinfo(state, row);
-        if(info->doublewidth)
+        ако(info->doublewidth)
           printf("dwl ");
-        if(info->doubleheight)
+        ако(info->doubleheight)
           printf("dhl ");
-        if(info->continuation)
+        ако(info->continuation)
           printf("cont ");
         printf("\n");
       }
-      else if(strstartswith(line, "?screen_chars ")) {
+      иначе ако(strstartswith(line, "?screen_chars ")) {
         assert(screen);
         char *linep = line + 13;
         VTermRect rect;
         size_t len;
-        while(linep[0] == ' ')
+        докато(linep[0] == ' ')
           linep++;
-        if(sscanf(linep, "%d,%d,%d,%d", &rect.start_row, &rect.start_col, &rect.end_row, &rect.end_col) == 4)
+        ако(sscanf(linep, "%d,%d,%d,%d", &rect.start_row, &rect.start_col, &rect.end_row, &rect.end_col) == 4)
           ; // fine
-        else if(sscanf(linep, "%d", &rect.start_row) == 1) {
+        иначе ако(sscanf(linep, "%d", &rect.start_row) == 1) {
           rect.end_row = rect.start_row + 1;
           rect.start_col = 0;
           vterm_get_size(vt, NULL, &rect.end_col);
         }
-        else {
+        иначе {
           printf("! screen_chars unrecognised input\n");
           goto abort_line;
         }
         len = vterm_screen_get_chars(screen, NULL, 0, rect);
-        if(len == (size_t)-1)
+        ако(len == (size_t)-1)
           printf("! screen_chars error\n");
-        else if(len == 0)
+        иначе ако(len == 0)
           printf("\n");
-        else {
+        иначе {
           uint32_t *chars = malloc(sizeof(uint32_t) * len);
           size_t i;
           vterm_screen_get_chars(screen, chars, len, rect);
-          for(i = 0; i < len; i++) {
+          за(i = 0; i < len; i++) {
             printf("0x%02x%s", chars[i], i < len-1 ? "," : "\n");
           }
           free(chars);
         }
       }
-      else if(strstartswith(line, "?screen_text ")) {
+      иначе ако(strstartswith(line, "?screen_text ")) {
         assert(screen);
         char *linep = line + 12;
         VTermRect rect;
         size_t len;
-        while(linep[0] == ' ')
+        докато(linep[0] == ' ')
           linep++;
-        if(sscanf(linep, "%d,%d,%d,%d", &rect.start_row, &rect.start_col, &rect.end_row, &rect.end_col) < 4) {
+        ако(sscanf(linep, "%d,%d,%d,%d", &rect.start_row, &rect.start_col, &rect.end_row, &rect.end_col) < 4) {
           printf("! screen_text unrecognised input\n");
           goto abort_line;
         }
         len = vterm_screen_get_text(screen, NULL, 0, rect);
-        if(len == (size_t)-1)
+        ако(len == (size_t)-1)
           printf("! screen_text error\n");
-        else if(len == 0)
+        иначе ако(len == 0)
           printf("\n");
-        else {
+        иначе {
           // Put an overwrite guard at both ends of the buffer
           unsigned char *buffer = malloc(len + 4);
           unsigned char *text = buffer + 2;
@@ -1179,14 +1179,14 @@ int main(int argc UNUSED, char **argv UNUSED)
 
           vterm_screen_get_text(screen, (char *)text, len, rect);
 
-          if(text[-2] != 0x55 || text[-1] != 0xAA)
+          ако(text[-2] != 0x55 || text[-1] != 0xAA)
             printf("! screen_get_text buffer overrun left [%02x,%02x]\n", text[-2], text[-1]);
-          else if(text[len] != 0x55 || text[len+1] != 0xAA)
+          иначе ако(text[len] != 0x55 || text[len+1] != 0xAA)
             printf("! screen_get_text buffer overrun right [%02x,%02x]\n", text[len], text[len+1]);
-          else
+          иначе
 	  {
 	    size_t i;
-            for(i = 0; i < len; i++) {
+            за(i = 0; i < len; i++) {
               printf("0x%02x%s", text[i], i < len-1 ? "," : "\n");
             }
 	  }
@@ -1194,38 +1194,38 @@ int main(int argc UNUSED, char **argv UNUSED)
           free(buffer);
         }
       }
-      else if(strstartswith(line, "?screen_cell ")) {
+      иначе ако(strstartswith(line, "?screen_cell ")) {
         assert(screen);
         char *linep = line + 12;
-	int i;
+	цяло i;
         VTermPos pos;
         VTermScreenCell cell;
-        while(linep[0] == ' ')
+        докато(linep[0] == ' ')
           linep++;
-        if(sscanf(linep, "%d,%d\n", &pos.row, &pos.col) < 2) {
+        ако(sscanf(linep, "%d,%d\n", &pos.row, &pos.col) < 2) {
           printf("! screen_cell unrecognised input\n");
           goto abort_line;
         }
-        if(!vterm_screen_get_cell(screen, pos, &cell))
+        ако(!vterm_screen_get_cell(screen, pos, &cell))
           goto abort_line;
         printf("{");
-        for(i = 0; i < VTERM_MAX_CHARS_PER_CELL && cell.chars[i]; i++) {
+        за(i = 0; i < VTERM_MAX_CHARS_PER_CELL && cell.chars[i]; i++) {
           printf("%s0x%x", i ? "," : "", cell.chars[i]);
         }
         printf("} width=%d attrs={", cell.width);
-        if(cell.attrs.bold)      printf("B");
-        if(cell.attrs.underline) printf("U%d", cell.attrs.underline);
-        if(cell.attrs.italic)    printf("I");
-        if(cell.attrs.blink)     printf("K");
-        if(cell.attrs.reverse)   printf("R");
-        if(cell.attrs.font)      printf("F%d", cell.attrs.font);
-        if(cell.attrs.small)     printf("S");
-        if(cell.attrs.baseline)  printf(
+        ако(cell.attrs.bold)      printf("B");
+        ако(cell.attrs.underline) printf("U%d", cell.attrs.underline);
+        ако(cell.attrs.italic)    printf("I");
+        ако(cell.attrs.blink)     printf("K");
+        ако(cell.attrs.reverse)   printf("R");
+        ако(cell.attrs.font)      printf("F%d", cell.attrs.font);
+        ако(cell.attrs.small)     printf("S");
+        ако(cell.attrs.baseline)  printf(
             cell.attrs.baseline == VTERM_BASELINE_RAISE ? "^" :
                                                           "_");
         printf("} ");
-        if(cell.attrs.dwl)       printf("dwl ");
-        if(cell.attrs.dhl)       printf("dhl-%s ", cell.attrs.dhl == 2 ? "bottom" : "top");
+        ако(cell.attrs.dwl)       printf("dwl ");
+        ако(cell.attrs.dhl)       printf("dhl-%s ", cell.attrs.dhl == 2 ? "bottom" : "top");
         printf("fg=");
         vterm_screen_convert_color_to_rgb(screen, &cell.fg);
         print_color(&cell.fg);
@@ -1234,49 +1234,49 @@ int main(int argc UNUSED, char **argv UNUSED)
         print_color(&cell.bg);
         printf("\n");
       }
-      else if(strstartswith(line, "?screen_eol ")) {
+      иначе ако(strstartswith(line, "?screen_eol ")) {
         assert(screen);
         VTermPos pos;
         char *linep = line + 12;
-        while(linep[0] == ' ')
+        докато(linep[0] == ' ')
           linep++;
-        if(sscanf(linep, "%d,%d\n", &pos.row, &pos.col) < 2) {
+        ако(sscanf(linep, "%d,%d\n", &pos.row, &pos.col) < 2) {
           printf("! screen_eol unrecognised input\n");
           goto abort_line;
         }
         printf("%d\n", vterm_screen_is_eol(screen, pos));
       }
-      else if(strstartswith(line, "?screen_attrs_extent ")) {
+      иначе ако(strstartswith(line, "?screen_attrs_extent ")) {
         assert(screen);
         VTermPos pos;
         VTermRect rect;
         char *linep = line + 21;
-        while(linep[0] == ' ')
+        докато(linep[0] == ' ')
           linep++;
-        if(sscanf(linep, "%d,%d\n", &pos.row, &pos.col) < 2) {
+        ако(sscanf(linep, "%d,%d\n", &pos.row, &pos.col) < 2) {
           printf("! screen_attrs_extent unrecognised input\n");
           goto abort_line;
         }
 	rect.start_col = 0;
 	rect.end_col   = -1;
-        if(!vterm_screen_get_attrs_extent(screen, &rect, pos, ~0)) {
+        ако(!vterm_screen_get_attrs_extent(screen, &rect, pos, ~0)) {
           printf("! screen_attrs_extent failed\n");
           goto abort_line;
         }
         printf("%d,%d-%d,%d\n", rect.start_row, rect.start_col, rect.end_row, rect.end_col);
       }
-      else
+      иначе
         printf("?\n");
 
       memset(line, 0, sizeof line);
       continue;
     }
 
-    else
+    иначе
       abort_line: err = 1;
 
     outlen = vterm_output_get_buffer_current(vt);
-    if(outlen > 0) {
+    ако(outlen > 0) {
       char outbuff[1024];
       vterm_output_read(vt, outbuff, outlen);
 
@@ -1288,5 +1288,5 @@ int main(int argc UNUSED, char **argv UNUSED)
 
   vterm_free(vt);
 
-  return 0;
+  върни 0;
 }
