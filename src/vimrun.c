@@ -15,73 +15,73 @@
  *	      console kills Vim.  Now it only kills vimrun.
  */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <conio.h>
+#ضمن <stdio.h>
+#ضمن <stdlib.h>
+#ضمن <conio.h>
 #ifndef WIN32_LEAN_AND_MEAN
 # define WIN32_LEAN_AND_MEAN
 #endif
-#include <windows.h>
+#ضمن <windows.h>
 
-    int
-main(void)
+    صحيح
+main(فراغ)
 {
-    const wchar_t   *p;
+    ثابت wchar_t   *p;
     wchar_t	    *cmd;
     size_t	    cmdlen;
-    int		    retval;
-    int		    inquote = 0;
-    int		    silent = 0;
+    صحيح		    retval;
+    صحيح		    inquote = 0;
+    صحيح		    silent = 0;
     HANDLE	    hstdout;
     DWORD	    written;
 
-    p = (const wchar_t *)GetCommandLineW();
+    p = (ثابت wchar_t *)Get_Command_لي_W();
 
     /*
      * Skip the executable name, which might be in "".
      */
-    while (*p)
+    طالما (*p)
     {
-	if (*p == L'"')
+	إذا (*p == L'"')
 	    inquote = !inquote;
-	else if (!inquote && *p == L' ')
+	وإلا إذا (!inquote && *p == L' ')
 	{
 	    ++p;
-	    break;
+	    اكسر;
 	}
 	++p;
     }
-    while (*p == L' ')
+    طالما (*p == L' ')
 	++p;
 
     /*
      * "-s" argument: don't wait for a key hit.
      */
-    if (p[0] == L'-' && p[1] == L's' && p[2] == L' ')
+    إذا (p[0] == L'-' && p[1] == L's' && p[2] == L' ')
     {
 	silent = 1;
 	p += 3;
-	while (*p == L' ')
+	طالما (*p == L' ')
 	    ++p;
     }
 
     // Print the command, including quotes and redirection.
     hstdout = GetStdHandle(STD_OUTPUT_HANDLE);
-    WriteConsoleW(hstdout, p, wcslen(p), &written, NULL);
-    WriteConsoleW(hstdout, L"\r\n", 2, &written, NULL);
+    WriteConsoleW(hstdout, p, wcslen(p), &written, عدم);
+    WriteConsoleW(hstdout, L"\r\n", 2, &written, عدم);
 
     // If the command starts and ends with double quotes,
     // Enclose the command in parentheses.
-    cmd = NULL;
+    cmd = عدم;
     cmdlen = wcslen(p);
-    if (cmdlen >= 2 && p[0] == L'"' && p[cmdlen - 1] == L'"')
+    إذا (cmdlen >= 2 && p[0] == L'"' && p[cmdlen - 1] == L'"')
     {
 	cmdlen += 3;
-	cmd = malloc(cmdlen * sizeof(wchar_t));
-	if (cmd == NULL)
+	cmd = malloc(cmdlen * حجم(wchar_t));
+	إذا (cmd == عدم)
 	{
 	    perror("vimrun malloc(): ");
-	    return -1;
+	    أرجع -1;
 	}
 	_snwprintf(cmd, cmdlen, L"(%s)", p);
 	p = cmd;
@@ -92,22 +92,22 @@ main(void)
      */
     retval = _wsystem(p);
 
-    if (cmd)
-	free(cmd);
+    إذا (cmd)
+	حرر(cmd);
 
-    if (retval == -1)
+    إذا (retval == -1)
 	perror("vimrun system(): ");
-    else if (retval != 0)
+    وإلا إذا (retval != 0)
 	printf("shell returned %d\n", retval);
 
-    if (!silent)
+    إذا (!silent)
     {
 	puts("Hit any key to close this window...");
 
-	while (_kbhit())
-	    (void)_getch();
-	(void)_getch();
+	طالما (_kbhit())
+	    (فراغ)_getch();
+	(فراغ)_getch();
     }
 
-    return retval;
+    أرجع retval;
 }

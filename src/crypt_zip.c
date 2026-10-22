@@ -10,9 +10,9 @@
 /*
  * crypt_zip.c: Zip encryption support.
  */
-#include "vim.h"
+#ضمن "vim.h"
 
-#if defined(FEAT_CRYPT)
+#إذا defined(FEAT_CRYPT)
 /*
  * Optional encryption support.
  * Mohsin Ahmed, mosh@sasi.com, 98-09-24
@@ -24,106 +24,106 @@
  */
 
 // Need a type that should be 32 bits. 64 also works but wastes space.
-typedef unsigned int u32_T;	// int is at least 32 bits
+تعريفنوع unsigned صحيح u32_T;	// int is at least 32 bits
 
 // The state of encryption, referenced by cryptstate_T.
-typedef struct {
-    u32_T keys[3];
+تعريفنوع بنية {
+    u32_T مبوداي[3];
 } zip_state_T;
 
 
-static u32_T crc_32_table[256];
+ساكن u32_T crc_32_table[256];
 
 /*
  * Fill the CRC table, if not done already.
  */
-    static void
-make_crc_tab(void)
+    ساكن فراغ
+make_crc_tab(فراغ)
 {
     u32_T	s, t, v;
-    static int	done = FALSE;
+    ساكن صحيح	done = FALSE;
 
-    if (done)
-	return;
-    for (t = 0; t < 256; t++)
+    إذا (done)
+	أرجع;
+    لكل (t = 0; t < 256; t++)
     {
 	v = t;
-	for (s = 0; s < 8; s++)
+	لكل (s = 0; s < 8; s++)
 	    v = (v >> 1) ^ ((v & 1) * (u32_T)0xedb88320L);
 	crc_32_table[t] = v;
     }
     done = TRUE;
 }
 
-#define CRC32(c, b) (crc_32_table[((int)(c) ^ (b)) & 0xff] ^ ((c) >> 8))
+#define CRC32(c, b) (crc_32_table[((صحيح)(c) ^ (b)) & 0xff] ^ ((c) >> 8))
 
 /*
  * Return the next byte in the pseudo-random sequence.
  */
-#define DECRYPT_BYTE_ZIP(keys, t) \
+#define DECRYPT_BYTE_ZIP(مبوداي, t) \
 { \
-    short_u temp = (short_u)keys[2] | 2; \
-    t = (int)(((unsigned)(temp * (temp ^ 1U)) >> 8) & 0xff); \
+    short_u temp = (short_u)مبوداي[2] | 2; \
+    t = (صحيح)(((unsigned)(temp * (temp ^ 1U)) >> 8) & 0xff); \
 }
 
 /*
  * Update the encryption keys with the next byte of plain text.
  */
-#define UPDATE_KEYS_ZIP(keys, c) do { \
-    keys[0] = CRC32(keys[0], (c)); \
-    keys[1] += keys[0] & 0xff; \
-    keys[1] = keys[1] * 134775813L + 1; \
-    keys[2] = CRC32(keys[2], (int)(keys[1] >> 24)); \
-} while (0)
+#define UPDATE_مبوداي_ZIP(مبوداي, c) افعل { \
+    مبوداي[0] = CRC32(مبوداي[0], (c)); \
+    مبوداي[1] += مبوداي[0] & 0xff; \
+    مبوداي[1] = مبوداي[1] * 134775813L + 1; \
+    مبوداي[2] = CRC32(مبوداي[2], (صحيح)(مبوداي[1] >> 24)); \
+} طالما (0)
 
 /*
  * Initialize for encryption/decryption.
  */
-    int
+    صحيح
 crypt_zip_init(
     cryptstate_T    *state,
-    char_u	    *key,
+    char_u	    *مبودي,
     crypt_arg_T     *arg UNUSED)
 {
     char_u	*p;
     zip_state_T	*zs;
 
     zs = ALLOC_ONE(zip_state_T);
-    if (zs == NULL)
-	return FAIL;
+    إذا (zs == عدم)
+	أرجع FAIL;
     state->method_state = zs;
 
     make_crc_tab();
-    zs->keys[0] = 305419896L;
-    zs->keys[1] = 591751049L;
-    zs->keys[2] = 878082192L;
-    for (p = key; *p != NUL; ++p)
-	UPDATE_KEYS_ZIP(zs->keys, (int)*p);
+    zs->مبوداي[0] = 305419896L;
+    zs->مبوداي[1] = 591751049L;
+    zs->مبوداي[2] = 878082192L;
+    لكل (p = مبودي; *p != NUL; ++p)
+	UPDATE_مبوداي_ZIP(zs->مبوداي, (صحيح)*p);
 
-    return OK;
+    أرجع OK;
 }
 
 /*
  * Encrypt "from[len]" into "to[len]".
  * "from" and "to" can be equal to encrypt in place.
  */
-    void
+    فراغ
 crypt_zip_encode(
     cryptstate_T *state,
     char_u	*from,
     size_t	len,
     char_u	*to,
-    int		last UNUSED)
+    صحيح		last UNUSED)
 {
     zip_state_T *zs = state->method_state;
     size_t	i;
-    int		ztemp, t;
+    صحيح		ztemp, t;
 
-    for (i = 0; i < len; ++i)
+    لكل (i = 0; i < len; ++i)
     {
 	ztemp = from[i];
-	DECRYPT_BYTE_ZIP(zs->keys, t);
-	UPDATE_KEYS_ZIP(zs->keys, ztemp);
+	DECRYPT_BYTE_ZIP(zs->مبوداي, t);
+	UPDATE_مبوداي_ZIP(zs->مبوداي, ztemp);
 	to[i] = t ^ ztemp;
     }
 }
@@ -131,23 +131,23 @@ crypt_zip_encode(
 /*
  * Decrypt "from[len]" into "to[len]".
  */
-    void
+    فراغ
 crypt_zip_decode(
     cryptstate_T *state,
     char_u	*from,
     size_t	len,
     char_u	*to,
-    int		last UNUSED)
+    صحيح		last UNUSED)
 {
     zip_state_T *zs = state->method_state;
     size_t	i;
     short_u	temp;
 
-    for (i = 0; i < len; ++i)
+    لكل (i = 0; i < len; ++i)
     {
-	temp = (short_u)zs->keys[2] | 2;
-	temp = (int)(((unsigned)(temp * (temp ^ 1U)) >> 8) & 0xff);
-	UPDATE_KEYS_ZIP(zs->keys, to[i] = from[i] ^ temp);
+	temp = (short_u)zs->مبوداي[2] | 2;
+	temp = (صحيح)(((unsigned)(temp * (temp ^ 1U)) >> 8) & 0xff);
+	UPDATE_مبوداي_ZIP(zs->مبوداي, to[i] = from[i] ^ temp);
     }
 }
 
