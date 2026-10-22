@@ -13,11 +13,11 @@
 
 #include "vim.h"
 
-#if (defined(HAVE_LOCALE_H) || defined(X_LOCALE)) \
+#如果 (defined(HAVE_LOCALE_H) || defined(X_LOCALE)) \
 	&& (defined(FEAT_EVAL) || defined(FEAT_MULTI_LANG))
 # define HAVE_GET_LOCALE_VAL
     static char_u *
-get_locale_val(int what)
+get_locale_val(整数 what)
 {
     char_u	*loc;
 
@@ -25,19 +25,19 @@ get_locale_val(int what)
     loc = (char_u *)setlocale(what, NULL);
 
 # ifdef MSWIN
-    if (loc != NULL)
+    如果 (loc != NULL)
     {
 	char_u	*p;
 
 	// setocale() returns something like "LC_COLLATE=<name>;LC_..." when
 	// one of the values (e.g., LC_CTYPE) differs.
 	p = vim_strchr(loc, '=');
-	if (p != NULL)
+	如果 (p != NULL)
 	{
 	    loc = ++p;
-	    while (*p != NUL)	// remove trailing newline
+	    当 (*p != NUL)	// remove trailing newline
 	    {
-		if (*p < ' ' || *p == ';')
+		如果 (*p < ' ' || *p == ';')
 		{
 		    *p = NUL;
 		    break;
@@ -48,7 +48,7 @@ get_locale_val(int what)
     }
 # endif
 
-    return loc;
+    返回 loc;
 }
 #endif
 
@@ -62,7 +62,7 @@ get_locale_val(int what)
     static char_u *
 gettext_lang(char_u *name)
 {
-    int		i;
+    整数		i;
     static char *(mtable[]) = {
 			"afrikaans",	"af",
 			"czech",	"cs",
@@ -84,22 +84,22 @@ gettext_lang(char_u *name)
 			"chinese_taiwan", "zh_TW",
 			NULL};
 
-    for (i = 0; mtable[i] != NULL; i += 2)
-	if (STRNICMP(mtable[i], name, STRLEN(mtable[i])) == 0)
-	    return (char_u *)mtable[i + 1];
-    return name;
+    为 (i = 0; mtable[i] != NULL; i += 2)
+	如果 (STRNICMP(mtable[i], name, STRLEN(mtable[i])) == 0)
+	    返回 (char_u *)mtable[i + 1];
+    返回 name;
 }
 #endif
 
-#if defined(FEAT_MULTI_LANG)
+#如果 defined(FEAT_MULTI_LANG)
 /*
  * Return TRUE when "lang" starts with a valid language name.
  * Rejects NULL, empty string, "C", "C.UTF-8" and others.
  */
-    static int
+    static 整数
 is_valid_mess_lang(char_u *lang)
 {
-    return lang != NULL && ASCII_ISALPHA(lang[0]) && ASCII_ISALPHA(lang[1]);
+    返回 lang != NULL && ASCII_ISALPHA(lang[0]) && ASCII_ISALPHA(lang[1]);
 }
 
 /*
@@ -112,35 +112,35 @@ get_mess_lang(void)
     char_u *p;
 
 # ifdef HAVE_GET_LOCALE_VAL
-#  if defined(LC_MESSAGES)
+#  如果 defined(LC_MESSAGES)
     p = get_locale_val(LC_MESSAGES);
-#  else
+#  否则
     // This is necessary for Win32, where LC_MESSAGES is not defined and $LANG
     // may be set to the LCID number.  $LANG holds the display language, see
     // set_init_lang_env().  Otherwise LC_COLLATE is the best guess, LC_TIME
     // and LC_MONETARY may be set differently for a Japanese working in the US.
     p = mch_getenv((char_u *)"LANG");
-    if (!is_valid_mess_lang(p))
+    如果 (!is_valid_mess_lang(p))
 	p = get_locale_val(LC_COLLATE);
 #  endif
-# else
+# 否则
     p = mch_getenv((char_u *)"LC_ALL");
-    if (!is_valid_mess_lang(p))
+    如果 (!is_valid_mess_lang(p))
     {
 	p = mch_getenv((char_u *)"LC_MESSAGES");
-	if (!is_valid_mess_lang(p))
+	如果 (!is_valid_mess_lang(p))
 	    p = mch_getenv((char_u *)"LANG");
     }
 # endif
 # ifdef MSWIN
     p = gettext_lang(p);
 # endif
-    return is_valid_mess_lang(p) ? p : NULL;
+    返回 is_valid_mess_lang(p) ? p : NULL;
 }
 #endif
 
 // Complicated #if; matches with where get_mess_env() is used below.
-#if (defined(FEAT_EVAL) && !((defined(HAVE_LOCALE_H) || defined(X_LOCALE)) \
+#如果 (defined(FEAT_EVAL) && !((defined(HAVE_LOCALE_H) || defined(X_LOCALE)) \
 	    && defined(LC_MESSAGES))) \
 	|| ((defined(HAVE_LOCALE_H) || defined(X_LOCALE)) \
 		&& !defined(LC_MESSAGES))
@@ -153,25 +153,25 @@ get_mess_env(void)
     char_u	*p;
 
     p = mch_getenv((char_u *)"LC_ALL");
-    if (p != NULL && *p != NUL)
-	return p;
+    如果 (p != NULL && *p != NUL)
+	返回 p;
 
     p = mch_getenv((char_u *)"LC_MESSAGES");
-    if (p != NULL && *p != NUL)
-	return p;
+    如果 (p != NULL && *p != NUL)
+	返回 p;
 
     p = mch_getenv((char_u *)"LANG");
-    if (p != NULL && VIM_ISDIGIT(*p))
+    如果 (p != NULL && VIM_ISDIGIT(*p))
 	p = NULL;		// ignore something like "1043"
 # ifdef HAVE_GET_LOCALE_VAL
-    if (p == NULL || *p == NUL)
+    如果 (p == NULL || *p == NUL)
 	p = get_locale_val(LC_CTYPE);
 # endif
-    return p;
+    返回 p;
 }
 #endif
 
-#if defined(FEAT_EVAL)
+#如果 defined(FEAT_EVAL)
 
 /*
  * Set the "v:lang" variable according to the current locale setting.
@@ -184,7 +184,7 @@ set_lang_var(void)
 
 # ifdef HAVE_GET_LOCALE_VAL
     loc = get_locale_val(LC_CTYPE);
-# else
+# 否则
     // setlocale() not supported: use the default value
     loc = (char_u *)"C";
 # endif
@@ -192,9 +192,9 @@ set_lang_var(void)
 
     // When LC_MESSAGES isn't defined use the value from $LC_MESSAGES, fall
     // back to LC_CTYPE if it's empty.
-# if defined(HAVE_GET_LOCALE_VAL) && defined(LC_MESSAGES)
+# 如果 defined(HAVE_GET_LOCALE_VAL) && defined(LC_MESSAGES)
     loc = get_locale_val(LC_MESSAGES);
-# else
+# 否则
     loc = get_mess_env();
 # endif
     set_vim_var_string(VV_LANG, loc, -1);
@@ -206,7 +206,7 @@ set_lang_var(void)
 
 # ifdef HAVE_GET_LOCALE_VAL
     loc = get_locale_val(LC_COLLATE);
-# else
+# 否则
     // setlocale() not supported: use the default value
     loc = (char_u *)"C";
 # endif
@@ -214,7 +214,7 @@ set_lang_var(void)
 }
 #endif
 
-#if defined(HAVE_LOCALE_H) || defined(X_LOCALE)
+#如果 defined(HAVE_LOCALE_H) || defined(X_LOCALE)
 /*
  * Setup to use the current locale (for ctype() and many other things).
  */
@@ -227,7 +227,7 @@ init_locale(void)
     // Tell Gtk not to change our locale settings.
     gtk_disable_setlocale();
 # endif
-# if defined(LC_NUMERIC)
+# 如果 defined(LC_NUMERIC)
     // Make sure strtod() uses a decimal point, not a comma.
     setlocale(LC_NUMERIC, "C");
 # endif
@@ -241,7 +241,7 @@ init_locale(void)
 
 # ifdef FEAT_GETTEXT
     {
-	int	mustfree = FALSE;
+	整数	mustfree = FALSE;
 	char_u	*p;
 
 #  ifdef DYNAMIC_GETTEXT
@@ -251,12 +251,12 @@ init_locale(void)
 	// expand_env() doesn't work yet, because g_chartab[] is not
 	// initialized yet, call vim_getenv() directly
 	p = vim_getenv((char_u *)"VIMRUNTIME", &mustfree);
-	if (p != NULL && *p != NUL)
+	如果 (p != NULL && *p != NUL)
 	{
 	    vim_snprintf((char *)NameBuff, MAXPATHL, "%s/lang", p);
 	    bindtextdomain(VIMPACKAGE, (char *)NameBuff);
 	}
-	if (mustfree)
+	如果 (mustfree)
 	    vim_free(p);
 	textdomain(VIMPACKAGE);
     }
@@ -272,11 +272,11 @@ ex_language(exarg_T *eap)
     char	*loc;
     char_u	*p;
     char_u	*name;
-    int		what = LC_ALL;
+    整数		what = LC_ALL;
     char	*whatstr = "";
 # ifdef LC_MESSAGES
 #  define VIM_LC_MESSAGES LC_MESSAGES
-# else
+# 否则
 #  define VIM_LC_MESSAGES 6789
 # endif
 
@@ -286,27 +286,27 @@ ex_language(exarg_T *eap)
     // Allow abbreviation, but require at least 3 characters to avoid
     // confusion with a two letter language name "me" or "ct".
     p = skiptowhite(eap->arg);
-    if ((*p == NUL || VIM_ISWHITE(*p)) && p - eap->arg >= 3)
+    如果 ((*p == NUL || VIM_ISWHITE(*p)) && p - eap->arg >= 3)
     {
-	if (STRNICMP(eap->arg, "messages", p - eap->arg) == 0)
+	如果 (STRNICMP(eap->arg, "messages", p - eap->arg) == 0)
 	{
 	    what = VIM_LC_MESSAGES;
 	    name = skipwhite(p);
 	    whatstr = "messages ";
 	}
-	else if (STRNICMP(eap->arg, "ctype", p - eap->arg) == 0)
+	否则 如果 (STRNICMP(eap->arg, "ctype", p - eap->arg) == 0)
 	{
 	    what = LC_CTYPE;
 	    name = skipwhite(p);
 	    whatstr = "ctype ";
 	}
-	else if (STRNICMP(eap->arg, "time", p - eap->arg) == 0)
+	否则 如果 (STRNICMP(eap->arg, "time", p - eap->arg) == 0)
 	{
 	    what = LC_TIME;
 	    name = skipwhite(p);
 	    whatstr = "time ";
 	}
-	else if (STRNICMP(eap->arg, "collate", p - eap->arg) == 0)
+	否则 如果 (STRNICMP(eap->arg, "collate", p - eap->arg) == 0)
 	{
 	    what = LC_COLLATE;
 	    name = skipwhite(p);
@@ -314,57 +314,57 @@ ex_language(exarg_T *eap)
 	}
     }
 
-    if (*name == NUL)
+    如果 (*name == NUL)
     {
 # ifndef LC_MESSAGES
-	if (what == VIM_LC_MESSAGES)
+	如果 (what == VIM_LC_MESSAGES)
 	    p = get_mess_env();
-	else
+	否则
 # endif
 	    p = (char_u *)setlocale(what, NULL);
-	if (p == NULL || *p == NUL)
+	如果 (p == NULL || *p == NUL)
 	    p = (char_u *)"Unknown";
 	smsg(_("Current %slanguage: \"%s\""), whatstr, p);
     }
-    else
+    否则
     {
 # ifndef LC_MESSAGES
-	if (what == VIM_LC_MESSAGES)
+	如果 (what == VIM_LC_MESSAGES)
 	    loc = "";
-	else
+	否则
 # endif
 	{
 	    loc = setlocale(what, (char *)name);
-# if defined(LC_NUMERIC)
+# 如果 defined(LC_NUMERIC)
 	    // Make sure strtod() uses a decimal point, not a comma.
 	    setlocale(LC_NUMERIC, "C");
 # endif
 	}
-	if (loc == NULL)
+	如果 (loc == NULL)
 	    semsg(_(e_cannot_set_language_to_str), name);
-	else
+	否则
 	{
 # ifdef HAVE_NL_MSG_CAT_CNTR
 	    // Need to do this for GNU gettext, otherwise cached translations
 	    // will be used again.
-	    extern int _nl_msg_cat_cntr;
+	    extern 整数 _nl_msg_cat_cntr;
 
 	    ++_nl_msg_cat_cntr;
 # elif defined(DYNAMIC_GETTEXT)
 	    // Same thing when gettext is loaded at runtime.
-	    if (dyn_libintl_nl_msg_cat_cntr != NULL)
+	    如果 (dyn_libintl_nl_msg_cat_cntr != NULL)
 		++*dyn_libintl_nl_msg_cat_cntr;
 # endif
 	    // Reset $LC_ALL, otherwise it would overrule everything.
 	    vim_setenv((char_u *)"LC_ALL", (char_u *)"");
 
-	    if (what != LC_TIME && what != LC_COLLATE)
+	    如果 (what != LC_TIME && what != LC_COLLATE)
 	    {
 		// Tell gettext() what to translate to.  It apparently doesn't
 		// use the currently effective locale.  Also do this when
 		// FEAT_GETTEXT isn't defined, so that shell commands use this
 		// value.
-		if (what == LC_ALL)
+		如果 (what == LC_ALL)
 		{
 		    vim_setenv((char_u *)"LANG", name);
 # ifdef MSWIN
@@ -374,12 +374,12 @@ ex_language(exarg_T *eap)
 		    setlocale(LC_CTYPE, "C");
 # endif
 		}
-		if (what != LC_CTYPE)
+		如果 (what != LC_CTYPE)
 		{
 		    char_u	*mname;
 # ifdef MSWIN
 		    mname = gettext_lang(name);
-# else
+# 否则
 		    mname = name;
 # endif
 		    // Clear $LANGUAGE because GNU gettext uses it.
@@ -402,7 +402,7 @@ ex_language(exarg_T *eap)
 
 static char_u	**locales = NULL;	// Array of all available locales
 
-static int	did_init_locales = FALSE;
+static 整数	did_init_locales = FALSE;
 
 /*
  * Return an array of strings for all available locales + NULL for the
@@ -423,11 +423,11 @@ find_locales(void)
 # ifndef MSWIN
     locale_list = get_cmd_output((char_u *)"locale -a",
 						    NULL, SHELL_SILENT, NULL);
-# else
+# 否则
     // Find all available locales by examining the directories in
     // $VIMRUNTIME/lang/
     {
-	int		options = WILD_SILENT|WILD_USE_NL|WILD_KEEP_ALL;
+	整数		options = WILD_SILENT|WILD_USE_NL|WILD_KEEP_ALL;
 	expand_T	xpc;
 	char_u		*p;
 
@@ -436,49 +436,49 @@ find_locales(void)
 	locale_list = ExpandOne(&xpc, (char_u *)"$VIMRUNTIME/lang/*",
 						      NULL, options, WILD_ALL);
 	ExpandCleanup(&xpc);
-	if (locale_list == NULL)
+	如果 (locale_list == NULL)
 	    // Add a dummy input, that will be skipped lated but we need to
 	    // have something in locale_list so that the C locale is added at
 	    // the end.
 	    locale_list = vim_strsave((char_u *)".\n");
 	p = locale_list;
 	// find the last directory delimiter
-	while (p != NULL && *p != NUL)
+	当 (p != NULL && *p != NUL)
 	{
-	    if (*p == '\n')
+	    如果 (*p == '\n')
 		break;
-	    if (*p == '\\')
+	    如果 (*p == '\\')
 		len = p - locale_list;
 	    p++;
 	}
     }
 # endif
-    if (locale_list == NULL)
-	return NULL;
+    如果 (locale_list == NULL)
+	返回 NULL;
     ga_init2(&locales_ga, sizeof(char_u *), 20);
 
     // Transform locale_list string where each locale is separated by "\n"
     // into an array of locale strings.
     loc = (char_u *)strtok((char *)locale_list, "\n");
 
-    while (loc != NULL)
+    当 (loc != NULL)
     {
-	int ignore = FALSE;
+	整数 ignore = FALSE;
 
 # ifdef MSWIN
-	if (len > 0)
+	如果 (len > 0)
 	    loc += len + 1;
 	// skip locales with a dot (which indicates the charset)
-	if (vim_strchr(loc, '.') != NULL)
+	如果 (vim_strchr(loc, '.') != NULL)
 	    ignore = TRUE;
 # endif
-	if (!ignore)
+	如果 (!ignore)
 	{
-	    if (ga_grow(&locales_ga, 1) == FAIL)
+	    如果 (ga_grow(&locales_ga, 1) == FAIL)
 		break;
 
 	    loc = vim_strsave(loc);
-	    if (loc == NULL)
+	    如果 (loc == NULL)
 		break;
 
 	    ((char_u **)locales_ga.ga_data)[locales_ga.ga_len++] = loc;
@@ -488,19 +488,19 @@ find_locales(void)
 
 # ifdef MSWIN
     // Add the C locale
-    if (ga_grow(&locales_ga, 1) == OK)
+    如果 (ga_grow(&locales_ga, 1) == OK)
 	((char_u **)locales_ga.ga_data)[locales_ga.ga_len++] =
 						    vim_strsave((char_u *)"C");
 # endif
 
     vim_free(locale_list);
-    if (ga_grow(&locales_ga, 1) == FAIL)
+    如果 (ga_grow(&locales_ga, 1) == FAIL)
     {
 	ga_clear(&locales_ga);
-	return NULL;
+	返回 NULL;
     }
     ((char_u **)locales_ga.ga_data)[locales_ga.ga_len] = NULL;
-    return (char_u **)locales_ga.ga_data;
+    返回 (char_u **)locales_ga.ga_data;
 }
 
 /*
@@ -509,23 +509,23 @@ find_locales(void)
     static void
 init_locales(void)
 {
-    if (did_init_locales)
-	return;
+    如果 (did_init_locales)
+	返回;
 
     did_init_locales = TRUE;
     locales = find_locales();
 }
 
-# if defined(EXITFREE)
+# 如果 defined(EXITFREE)
     void
 free_locales(void)
 {
-    int			i;
+    整数			i;
 
-    if (locales == NULL)
-	return;
+    如果 (locales == NULL)
+	返回;
 
-    for (i = 0; locales[i] != NULL; i++)
+    为 (i = 0; locales[i] != NULL; i++)
 	vim_free(locales[i]);
     VIM_CLEAR(locales);
 }
@@ -536,33 +536,33 @@ free_locales(void)
  * ":language" command.
  */
     char_u *
-get_lang_arg(expand_T *xp UNUSED, int idx)
+get_lang_arg(expand_T *xp UNUSED, 整数 idx)
 {
-    if (idx == 0)
-	return (char_u *)"messages";
-    if (idx == 1)
-	return (char_u *)"ctype";
-    if (idx == 2)
-	return (char_u *)"time";
-    if (idx == 3)
-	return (char_u *)"collate";
+    如果 (idx == 0)
+	返回 (char_u *)"messages";
+    如果 (idx == 1)
+	返回 (char_u *)"ctype";
+    如果 (idx == 2)
+	返回 (char_u *)"time";
+    如果 (idx == 3)
+	返回 (char_u *)"collate";
 
     init_locales();
-    if (locales == NULL)
-	return NULL;
-    return locales[idx - 4];
+    如果 (locales == NULL)
+	返回 NULL;
+    返回 locales[idx - 4];
 }
 
 /*
  * Function given to ExpandGeneric() to obtain the available locales.
  */
     char_u *
-get_locales(expand_T *xp UNUSED, int idx)
+get_locales(expand_T *xp UNUSED, 整数 idx)
 {
     init_locales();
-    if (locales == NULL)
-	return NULL;
-    return locales[idx];
+    如果 (locales == NULL)
+	返回 NULL;
+    返回 locales[idx];
 }
 
 #endif

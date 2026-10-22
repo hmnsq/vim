@@ -21,7 +21,7 @@
 // This file has to be included because the tested functions are static
 #include "json.c"
 
-#if defined(FEAT_EVAL)
+#如果 defined(FEAT_EVAL)
 /*
  * Test json_find_end() with incomplete items.
  */
@@ -144,11 +144,11 @@ test_decode_find_end(void)
     assert(json_find_end(&reader, 0) == MAYBE);
 }
 
-    static int
+    static 整数
 fill_from_cookie(js_read_T *reader)
 {
     reader->js_buf = reader->js_cookie;
-    return TRUE;
+    返回 TRUE;
 }
 
 /*
@@ -191,14 +191,14 @@ test_fill_called_on_string(void)
 }
 #endif
 
-    int
-main(void)
+    整数
+主要(void)
 {
-#if defined(FEAT_EVAL)
+#如果 defined(FEAT_EVAL)
     p_mfd = 100;
     test_decode_find_end();
     test_fill_called_on_find_end();
     test_fill_called_on_string();
 #endif
-    return 0;
+    返回 0;
 }

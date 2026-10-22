@@ -13,7 +13,7 @@
 
 #include "vim.h"
 
-#if defined(FEAT_SOUND)
+#如果 defined(FEAT_SOUND)
 
 static long sound_id = 0;
 
@@ -35,10 +35,10 @@ static soundcb_T *first_callback = NULL;
  * Return TRUE when a sound callback has been created, it may be invoked when
  * the sound finishes playing.  Also see has_sound_callback_in_queue().
  */
-int
+整数
 has_any_sound_callback(void)
 {
-    return first_callback != NULL;
+    返回 first_callback != NULL;
 }
 
 static soundcb_T *
@@ -47,30 +47,30 @@ get_sound_callback(typval_T *arg)
     callback_T callback;
     soundcb_T *soundcb;
 
-    if (arg->v_type == VAR_UNKNOWN)
-        return NULL;
+    如果 (arg->v_type == VAR_UNKNOWN)
+        返回 NULL;
     callback = get_callback(arg);
-    if (callback.cb_name == NULL)
-        return NULL;
+    如果 (callback.cb_name == NULL)
+        返回 NULL;
 
     soundcb = ALLOC_ONE(soundcb_T);
-    if (soundcb == NULL)
+    如果 (soundcb == NULL)
     {
         free_callback(&callback);
-        return NULL;
+        返回 NULL;
     }
 
     soundcb->snd_next = first_callback;
     first_callback = soundcb;
     set_callback(&soundcb->snd_callback, &callback);
-    return soundcb;
+    返回 soundcb;
 }
 
 /*
  * Call "soundcb" with proper parameters.
  */
 void
-call_sound_callback(soundcb_T *soundcb, long snd_id, int result)
+call_sound_callback(soundcb_T *soundcb, long snd_id, 整数 result)
 {
     typval_T argv[3];
     typval_T rettv;
@@ -94,12 +94,12 @@ delete_sound_callback(soundcb_T *soundcb)
     soundcb_T *p;
     soundcb_T *prev = NULL;
 
-    for (p = first_callback; p != NULL; prev = p, p = p->snd_next)
-        if (p == soundcb)
+    为 (p = first_callback; p != NULL; prev = p, p = p->snd_next)
+        如果 (p == soundcb)
         {
-            if (prev == NULL)
+            如果 (prev == NULL)
                 first_callback = p->snd_next;
-            else
+            否则
                 prev->snd_next = p->snd_next;
             free_callback(&p->snd_callback);
             vim_free(p);
@@ -107,7 +107,7 @@ delete_sound_callback(soundcb_T *soundcb)
         }
 }
 
-# if defined(HAVE_CANBERRA)
+# 如果 defined(HAVE_CANBERRA)
 
 /*
  * Sound implementation for Linux/Unix using libcanberra.
@@ -123,7 +123,7 @@ struct soundcb_queue_S
 {
     soundcb_queue_T *scb_next;
     uint32_t scb_id; // ID of the sound
-    int scb_result; // CA_ value
+    整数 scb_result; // CA_ value
     soundcb_T *scb_callback; // function to call
 };
 
@@ -138,15 +138,15 @@ static soundcb_queue_T *callback_queue = NULL;
 static void
 sound_callback(ca_context *c UNUSED,
                uint32_t id,
-               int error_code,
+               整数 error_code,
                void *userdata)
 {
     soundcb_T *soundcb = (soundcb_T *)userdata;
     soundcb_queue_T *scb;
 
     scb = ALLOC_ONE(soundcb_queue_T);
-    if (scb == NULL)
-        return;
+    如果 (scb == NULL)
+        返回;
     scb->scb_next = callback_queue;
     callback_queue = scb;
     scb->scb_id = id;
@@ -161,10 +161,10 @@ sound_callback(ca_context *c UNUSED,
 /*
  * Return TRUE if there is a sound callback to be called.
  */
-int
+整数
 has_sound_callback_in_queue(void)
 {
-    return callback_queue != NULL;
+    返回 callback_queue != NULL;
 }
 
 /*
@@ -175,7 +175,7 @@ invoke_sound_callback(void)
 {
     soundcb_queue_T *scb;
 
-    while (callback_queue != NULL)
+    当 (callback_queue != NULL)
     {
         scb = callback_queue;
         callback_queue = scb->scb_next;
@@ -189,21 +189,21 @@ invoke_sound_callback(void)
 }
 
 static void
-sound_play_common(typval_T *argvars, typval_T *rettv, int playfile)
+sound_play_common(typval_T *argvars, typval_T *rettv, 整数 playfile)
 {
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-        return;
+    如果 (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+        返回;
 
-    if (context == NULL)
+    如果 (context == NULL)
         ca_context_create(&context);
-    if (context == NULL)
-        return;
+    如果 (context == NULL)
+        返回;
 
     soundcb_T *soundcb = get_sound_callback(&argvars[1]);
-    int res = CA_ERROR_INVALID;
+    整数 res = CA_ERROR_INVALID;
 
     ++sound_id;
-    if (soundcb == NULL)
+    如果 (soundcb == NULL)
     {
         res = ca_context_play(context, sound_id,
                               playfile ? CA_PROP_MEDIA_FILENAME
@@ -211,24 +211,24 @@ sound_play_common(typval_T *argvars, typval_T *rettv, int playfile)
                               tv_get_string(&argvars[0]),
                               CA_PROP_CANBERRA_CACHE_CONTROL, "volatile", NULL);
     }
-    else
+    否则
     {
         static ca_proplist *proplist = NULL;
 
         ca_proplist_create(&proplist);
-        if (proplist != NULL)
+        如果 (proplist != NULL)
         {
-            if (playfile)
+            如果 (playfile)
                 ca_proplist_sets(proplist, CA_PROP_MEDIA_FILENAME,
                                  (char *)tv_get_string(&argvars[0]));
-            else
+            否则
                 ca_proplist_sets(proplist, CA_PROP_EVENT_ID,
                                  (char *)tv_get_string(&argvars[0]));
             ca_proplist_sets(proplist, CA_PROP_CANBERRA_CACHE_CONTROL,
                              "volatile");
             res = ca_context_play_full(context, sound_id, proplist,
                                        sound_callback, soundcb);
-            if (res != CA_SUCCESS)
+            如果 (res != CA_SUCCESS)
                 delete_sound_callback(soundcb);
 
             ca_proplist_destroy(proplist);
@@ -258,10 +258,10 @@ f_sound_playfile(typval_T *argvars, typval_T *rettv)
 void
 f_sound_stop(typval_T *argvars, typval_T *rettv UNUSED)
 {
-    if (in_vim9script() && check_for_number_arg(argvars, 0) == FAIL)
-        return;
+    如果 (in_vim9script() && check_for_number_arg(argvars, 0) == FAIL)
+        返回;
 
-    if (context != NULL)
+    如果 (context != NULL)
         ca_context_cancel(context, tv_get_number(&argvars[0]));
 }
 
@@ -271,25 +271,25 @@ f_sound_stop(typval_T *argvars, typval_T *rettv UNUSED)
 void
 f_sound_clear(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
 {
-    if (context == NULL)
-        return;
+    如果 (context == NULL)
+        返回;
     ca_context_destroy(context);
     context = NULL;
 }
 
-#  if defined(EXITFREE)
+#  如果 defined(EXITFREE)
 void
 sound_free(void)
 {
     soundcb_queue_T *scb;
 
-    if (context != NULL)
+    如果 (context != NULL)
         ca_context_destroy(context);
 
-    while (first_callback != NULL)
+    当 (first_callback != NULL)
         delete_sound_callback(first_callback);
 
-    while (callback_queue != NULL)
+    当 (callback_queue != NULL)
     {
         scb = callback_queue;
         callback_queue = scb->scb_next;
@@ -315,8 +315,8 @@ sound_wndproc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
     switch (message)
     {
         case MM_MCINOTIFY:
-            for (p = first_callback; p != NULL; p = p->snd_next)
-                if (p->snd_device_id == (MCIDEVICEID)lParam)
+            为 (p = first_callback; p != NULL; p = p->snd_next)
+                如果 (p->snd_device_id == (MCIDEVICEID)lParam)
                 {
                     char buf[32];
 
@@ -335,13 +335,13 @@ sound_wndproc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
             break;
     }
 
-    return DefWindowProc(hwnd, message, wParam, lParam);
+    返回 DefWindowProc(hwnd, message, wParam, lParam);
 }
 
 static HWND
 sound_window(void)
 {
-    if (g_hWndSound == NULL)
+    如果 (g_hWndSound == NULL)
     {
         LPCSTR clazz = "VimSound";
         WNDCLASS wndclass = { 0, sound_wndproc, 0,    0, g_hinst, NULL, 0,
@@ -351,7 +351,7 @@ sound_window(void)
                                    NULL, g_hinst, NULL);
     }
 
-    return g_hWndSound;
+    返回 g_hWndSound;
 }
 
 void
@@ -359,14 +359,14 @@ f_sound_playevent(typval_T *argvars, typval_T *rettv)
 {
     WCHAR *wp;
 
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-        return;
+    如果 (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+        返回;
 
     wp = enc_to_utf16(tv_get_string(&argvars[0]), NULL);
-    if (wp == NULL)
-        return;
+    如果 (wp == NULL)
+        返回;
 
-    if (PlaySoundW(wp, NULL, SND_ASYNC | SND_ALIAS))
+    如果 (PlaySoundW(wp, NULL, SND_ASYNC | SND_ALIAS))
         rettv->vval.v_number = ++sound_id;
     free(wp);
 }
@@ -382,46 +382,46 @@ f_sound_playfile(typval_T *argvars, typval_T *rettv)
     char buf[32];
     MCIERROR err;
 
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-        return;
+    如果 (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+        返回;
 
     filename = tv_get_string(&argvars[0]);
 
     len = STRLEN(filename) + 5 + 18 + 2 + 1;
     p = alloc(len);
-    if (p == NULL)
+    如果 (p == NULL)
     {
-        return;
+        返回;
     }
     vim_snprintf((char *)p, len, "open \"%s\" alias sound%06ld", filename,
                  newid);
 
     wp = enc_to_utf16((char_u *)p, NULL);
     free(p);
-    if (wp == NULL)
-        return;
+    如果 (wp == NULL)
+        返回;
 
     err = mciSendStringW(wp, NULL, 0, sound_window());
     free(wp);
-    if (err != 0)
-        return;
+    如果 (err != 0)
+        返回;
 
     vim_snprintf(buf, sizeof(buf), "play sound%06ld notify", newid);
     err = mciSendStringA(buf, NULL, 0, sound_window());
-    if (err != 0)
+    如果 (err != 0)
         goto failure;
 
     sound_id = newid;
     rettv->vval.v_number = sound_id;
 
     soundcb = get_sound_callback(&argvars[1]);
-    if (soundcb != NULL)
+    如果 (soundcb != NULL)
     {
         vim_snprintf(buf, sizeof(buf), "sound%06ld", newid);
         soundcb->snd_id = newid;
         soundcb->snd_device_id = mciGetDeviceID(buf);
     }
-    return;
+    返回;
 
 failure:
     vim_snprintf(buf, sizeof(buf), "close sound%06ld", newid);
@@ -434,8 +434,8 @@ f_sound_stop(typval_T *argvars, typval_T *rettv UNUSED)
     long id;
     char buf[32];
 
-    if (in_vim9script() && check_for_number_arg(argvars, 0) == FAIL)
-        return;
+    如果 (in_vim9script() && check_for_number_arg(argvars, 0) == FAIL)
+        返回;
 
     id = tv_get_number(&argvars[0]);
     vim_snprintf(buf, sizeof(buf), "stop sound%06ld", id);
@@ -449,13 +449,13 @@ f_sound_clear(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
     mciSendStringA("close all", NULL, 0, NULL);
 }
 
-#  if defined(EXITFREE)
+#  如果 defined(EXITFREE)
 void
 sound_free(void)
 {
     CloseWindow(g_hWndSound);
 
-    while (first_callback != NULL)
+    当 (first_callback != NULL)
         delete_sound_callback(first_callback);
 }
 #  endif
@@ -466,8 +466,8 @@ sound_free(void)
 static void
 sound_play_common(typval_T *argvars, typval_T *rettv, bool playfile)
 {
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-        return;
+    如果 (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+        返回;
 
     char_u *sound_name = tv_get_string(&argvars[0]);
     soundcb_T *soundcb = get_sound_callback(&argvars[1]);
@@ -475,7 +475,7 @@ sound_play_common(typval_T *argvars, typval_T *rettv, bool playfile)
     ++sound_id;
 
     bool play_success = sound_mch_play(sound_name, sound_id, soundcb, playfile);
-    if (!play_success && soundcb)
+    如果 (!play_success && soundcb)
     {
         delete_sound_callback(soundcb);
     }
@@ -497,8 +497,8 @@ f_sound_playfile(typval_T *argvars, typval_T *rettv)
 void
 f_sound_stop(typval_T *argvars, typval_T *rettv UNUSED)
 {
-    if (in_vim9script() && check_for_number_arg(argvars, 0) == FAIL)
-        return;
+    如果 (in_vim9script() && check_for_number_arg(argvars, 0) == FAIL)
+        返回;
     sound_mch_stop(tv_get_number(&argvars[0]));
 }
 
@@ -508,12 +508,12 @@ f_sound_clear(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
     sound_mch_clear();
 }
 
-#  if defined(EXITFREE)
+#  如果 defined(EXITFREE)
 void
 sound_free(void)
 {
     sound_mch_free();
-    while (first_callback != NULL)
+    当 (first_callback != NULL)
         delete_sound_callback(first_callback);
 }
 #  endif

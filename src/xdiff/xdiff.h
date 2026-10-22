@@ -20,7 +20,7 @@
  *
  */
 
-#if !defined(XDIFF_H)
+#如果 !defined(XDIFF_H)
 #define XDIFF_H
 
 #ifdef __cplusplus
@@ -82,7 +82,7 @@ typedef struct s_xpparam {
 	unsigned long flags;
 
 	/* -I<regex> */
- #if 0  // unused by Vim
+ #如果 0  // unused by Vim
 	regex_t **ignore_regex;
 	size_t ignore_regex_nr;
 #endif
@@ -94,16 +94,16 @@ typedef struct s_xpparam {
 
 typedef struct s_xdemitcb {
 	void *priv;
-	int (*out_hunk)(void *,
+	整数 (*out_hunk)(void *,
 			long old_begin, long old_nr,
 			long new_begin, long new_nr,
 			const char *func, long funclen);
-	int (*out_line)(void *, mmbuffer_t *, int);
+	整数 (*out_line)(void *, mmbuffer_t *, 整数);
 } xdemitcb_t;
 
 typedef long (*find_func_t)(const char *line, long line_len, char *buffer, long buffer_size, void *priv);
 
-typedef int (*xdl_emit_hunk_consume_func_t)(long start_a, long count_a,
+typedef 整数 (*xdl_emit_hunk_consume_func_t)(long start_a, long count_a,
 					    long start_b, long count_b,
 					    void *cb_data);
 
@@ -122,7 +122,7 @@ typedef struct s_bdiffparam {
 
 #ifdef VMS
 # include "[]vim.h"
-#else
+#否则
 # include "../vim.h"
 #endif
 
@@ -134,15 +134,15 @@ typedef struct s_bdiffparam {
 void *xdl_mmfile_first(mmfile_t *mmf, long *size);
 long xdl_mmfile_size(mmfile_t *mmf);
 
-int xdl_diff(mmfile_t *mf1, mmfile_t *mf2, xpparam_t const *xpp,
+整数 xdl_diff(mmfile_t *mf1, mmfile_t *mf2, xpparam_t const *xpp,
 	     xdemitconf_t const *xecfg, xdemitcb_t *ecb);
 
 typedef struct s_xmparam {
 	xpparam_t xpp;
-	int marker_size;
-	int level;
-	int favor;
-	int style;
+	整数 marker_size;
+	整数 level;
+	整数 favor;
+	整数 style;
 	const char *ancestor;	/* label for orig */
 	const char *file1;	/* label for mf1 */
 	const char *file2;	/* label for mf2 */
@@ -150,7 +150,7 @@ typedef struct s_xmparam {
 
 #define DEFAULT_CONFLICT_MARKER_SIZE 7
 
-int xdl_merge(mmfile_t *orig, mmfile_t *mf1, mmfile_t *mf2,
+整数 xdl_merge(mmfile_t *orig, mmfile_t *mf1, mmfile_t *mf2,
 		xmparam_t const *xmp, mmbuffer_t *result);
 
 #ifdef __cplusplus

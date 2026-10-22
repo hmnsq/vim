@@ -57,7 +57,7 @@ static struct
 
     char_u *filename;
 
-    int media;
+    整数 media;
     bool portrait;
     bool collate;
     bool duplex;
@@ -84,7 +84,7 @@ static struct
 
     // Current position to draw from
     double cur_x;
-    int cur_line;
+    整数 cur_line;
     long_u cur_fg;
     long_u cur_bg;
 
@@ -105,19 +105,19 @@ static const char *print_formats[] = {
  * (width or height).
  */
     static double
-to_device_units(int idx, double physsize, int def_number)
+to_device_units(整数 idx, double physsize, 整数 def_number)
 {
     float	ret;
-    int		u;
-    int		nr;
+    整数		u;
+    整数		nr;
 
     u = prt_get_unit(idx);
-    if (u == PRT_UNIT_NONE)
+    如果 (u == PRT_UNIT_NONE)
     {
 	u = PRT_UNIT_PERC;
 	nr = def_number;
     }
-    else
+    否则
 	nr = printer_opts[idx].number;
 
     switch (u)
@@ -137,7 +137,7 @@ to_device_units(int idx, double physsize, int def_number)
 	    break;
     }
 
-    return ret;
+    返回 ret;
 }
 
 /*
@@ -162,35 +162,35 @@ get_page_margins(
 /*
  * Get characters per line (excluding margins).
  */
-    static int
+    static 整数
 get_cpl(void)
 {
-    if (prt_use_number())
+    如果 (prt_use_number())
     {
 	pctx.number_width = PRINT_NUMBER_WIDTH * pctx.char_width;
 	pctx.left_margin += pctx.number_width;
     }
-    else
+    否则
 	pctx.number_width = 0.0;
 
-    return (int)((pctx.right_margin - pctx.left_margin) / pctx.char_width);
+    返回 (整数)((pctx.right_margin - pctx.left_margin) / pctx.char_width);
 }
 
 /*
  * Get number of lines of text that fit on a page (excluding the header).
  */
-    static int
+    static 整数
 get_lpp(void)
 {
-    int lpp;
+    整数 lpp;
 
     // Calculate lpp
-    lpp = (int)((pctx.bottom_margin - pctx.top_margin) / pctx.char_height);
+    lpp = (整数)((pctx.bottom_margin - pctx.top_margin) / pctx.char_height);
 
     // Adjust top margin if there is a header
     pctx.top_margin += pctx.char_height * prt_header_height();
 
-    return lpp - prt_header_height();
+    返回 lpp - prt_header_height();
 }
 
 /*
@@ -201,44 +201,44 @@ get_font(char_u *name)
 {
     PangoFontDescription *font;
 
-    if (name == NULL)
-	return NULL;
+    如果 (name == NULL)
+	返回 NULL;
 
     font = pango_font_description_from_string((const char *)name);
-    if (font == NULL)
+    如果 (font == NULL)
     {
 	semsg(_(e_unknown_printer_font_str), name);
-	return NULL;
+	返回 NULL;
     }
 
     // Ensure a size is set
-    if (pango_font_description_get_size(font) <= 0)
+    如果 (pango_font_description_get_size(font) <= 0)
 	pango_font_description_set_size(font, 10 * PANGO_SCALE);
 
-    return font;
+    返回 font;
 }
 
-    int
+    整数
 mch_print_init(
 	prt_settings_T  *psettings,
 	char_u		*jobname,
-	int		forceit UNUSED)
+	整数		forceit UNUSED)
 {
     char_u	*paper_name;
-    int		paper_strlen;
+    整数		paper_strlen;
     bool	portrait;
-    int		media;
+    整数		media;
     char_u	*filename = NULL;
 #ifdef USE_GTK4_PRINT_DIALOG
     bool	dialog = false;
 
-    if (gui.in_use && !forceit && psettings->outfile == NULL)
+    如果 (gui.in_use && !forceit && psettings->outfile == NULL)
     {
 	filename = gui_gtk4_print_dialog(psettings, jobname,
 		&pctx.page_width, &pctx.page_height);
 
-	if (filename == NULL)
-	    return FAIL;
+	如果 (filename == NULL)
+	    返回 FAIL;
 	dialog = true;
     }
 #endif
@@ -248,49 +248,49 @@ mch_print_init(
     // Let GTK handle stuff when using dialog. Not sure if our postscript DSC
     // comments can interfere with dialog settings, but don't add them...
 #ifdef USE_GTK4_PRINT_DIALOG
-    if (!dialog)
+    如果 (!dialog)
 #endif
     {
 	// Get paper type to use
 	portrait = (!printer_opts[OPT_PRINT_PORTRAIT].present ||
 		TOLOWER_ASC(printer_opts[OPT_PRINT_PORTRAIT].string[0]) == 'y');
 	pctx.portrait = portrait;
-	if (printer_opts[OPT_PRINT_PAPER].present)
+	如果 (printer_opts[OPT_PRINT_PAPER].present)
 	{
 	    paper_name = printer_opts[OPT_PRINT_PAPER].string;
 	    paper_strlen = printer_opts[OPT_PRINT_PAPER].strlen;
 	}
-	else
+	否则
 	{
 	    paper_name = (char_u *)"A4";
 	    paper_strlen = 2;
 	}
 
 	// Set width and height using given paper type
-	for (media = 0; media < (int)PRT_MEDIASIZE_LEN; ++media)
-	    if ((int)STRLEN(prt_mediasize[media].name) == paper_strlen
+	为 (media = 0; media < (整数)PRT_MEDIASIZE_LEN; ++media)
+	    如果 ((整数)STRLEN(prt_mediasize[media].name) == paper_strlen
 		    && STRNICMP(prt_mediasize[media].name,
 			paper_name, paper_strlen) == 0)
 		break;
-	if (media == PRT_MEDIASIZE_LEN)
+	如果 (media == PRT_MEDIASIZE_LEN)
 	    media = 0;
 	pctx.media = media;
 
-	if (portrait)
+	如果 (portrait)
 	{
 	    pctx.page_width = prt_mediasize[media].width;
 	    pctx.page_height = prt_mediasize[media].height;
 	}
-	else
+	否则
 	{
 	    pctx.page_width = prt_mediasize[media].height;
 	    pctx.page_height = prt_mediasize[media].width;
 	}
 
-	if (printer_opts[OPT_PRINT_FORMAT].present)
+	如果 (printer_opts[OPT_PRINT_FORMAT].present)
 	{
-	    for (int i = 0; i < (int)ARRAY_LENGTH(print_formats); i++)
-		if (STRNCMP(printer_opts[OPT_PRINT_FORMAT].string,
+	    为 (整数 i = 0; i < (整数)ARRAY_LENGTH(print_formats); i++)
+		如果 (STRNCMP(printer_opts[OPT_PRINT_FORMAT].string,
 			    print_formats[i],
 			    printer_opts[OPT_PRINT_FORMAT].strlen) == 0)
 		{
@@ -302,52 +302,52 @@ mch_print_init(
     psettings->user_abort = FALSE;
 
 #ifdef USE_GTK4_PRINT_DIALOG
-    if (dialog)
+    如果 (dialog)
 	// Always use PDF for dialog
 	pctx.format = PRT_FORMAT_PDF;
 #endif
 
-    if (filename == NULL)
+    如果 (filename == NULL)
     {
 	// If the user didn't specify a file name, use a temp file.
-	if (psettings->outfile == NULL)
+	如果 (psettings->outfile == NULL)
 	{
 	    filename = vim_tempname('p', TRUE);
-	    if (filename == NULL)
+	    如果 (filename == NULL)
 	    {
 		emsg(_(e_cant_get_temp_file_name));
-		return FAIL;
+		返回 FAIL;
 	    }
 	}
-	else
+	否则
 	    filename = expand_env_save(psettings->outfile);
     }
 
     // If using dialog, then always use PDF
-    if (pctx.format == PRT_FORMAT_PS)
+    如果 (pctx.format == PRT_FORMAT_PS)
 	pctx.surface = cairo_ps_surface_create((const char *)filename,
 		pctx.page_width, pctx.page_height);
-    else
+    否则
 	pctx.surface = cairo_pdf_surface_create((const char *)filename,
 		pctx.page_width, pctx.page_height);
 
     pctx.filename = (char_u *)filename;
 
-    if (cairo_surface_status(pctx.surface) != CAIRO_STATUS_SUCCESS)
+    如果 (cairo_surface_status(pctx.surface) != CAIRO_STATUS_SUCCESS)
     {
 	emsg(_(e_cant_open_postscript_output_file));
 	mch_print_cleanup();
-	return FAIL;
+	返回 FAIL;
     }
 
     pctx.cr = cairo_create(pctx.surface);
     pctx.text_context = pango_cairo_create_context(pctx.cr);
     pctx.font = get_font(p_pfn);
 
-    if (pctx.font == NULL)
+    如果 (pctx.font == NULL)
     {
 	mch_print_cleanup();
-	return FAIL;
+	返回 FAIL;
     }
 
     pango_context_set_font_description(pctx.text_context, pctx.font);
@@ -358,8 +358,8 @@ mch_print_init(
     {
 	PangoLayout	    *layout;
 	PangoFontMetrics    *metrics;
-	int		    ascent;
-	int		    descent;
+	整数		    ascent;
+	整数		    descent;
 
 	layout = pango_layout_new(pctx.text_context);
 	pango_layout_set_font_description(layout, pctx.font);
@@ -418,7 +418,7 @@ mch_print_init(
     psettings->jobname = jobname;
 
 #ifdef USE_GTK4_PRINT_DIALOG
-    if (!dialog)
+    如果 (!dialog)
 #endif
     {
 	pctx.collate = (!printer_opts[OPT_PRINT_COLLATE].present ||
@@ -427,14 +427,14 @@ mch_print_init(
 	pctx.duplex = TRUE;
 	pctx.tumble = FALSE;
 	psettings->duplex = TRUE;
-	if (printer_opts[OPT_PRINT_DUPLEX].present)
+	如果 (printer_opts[OPT_PRINT_DUPLEX].present)
 	{
-	    if (STRNICMP(printer_opts[OPT_PRINT_DUPLEX].string, "off", 3) == 0)
+	    如果 (STRNICMP(printer_opts[OPT_PRINT_DUPLEX].string, "off", 3) == 0)
 	    {
 		pctx.duplex = FALSE;
 		psettings->duplex = 0;
 	    }
-	    else if (STRNICMP(printer_opts[OPT_PRINT_DUPLEX].string, "short",
+	    否则 如果 (STRNICMP(printer_opts[OPT_PRINT_DUPLEX].string, "short",
 			5) == 0)
 		pctx.tumble = TRUE;
 	}
@@ -444,7 +444,7 @@ mch_print_init(
     pctx.dialog = dialog;
 #endif
 
-    return OK;
+    返回 OK;
 }
 
 /*
@@ -456,22 +456,22 @@ emit_dsc_comment(char *comment, char *fmt, ...)
     static char buf[257];
 
     va_list ap;
-    int	    len = sizeof(buf);
-    int	    o;
+    整数	    len = sizeof(buf);
+    整数	    o;
     char    *s = buf;
 
-    if (fmt == NULL)
+    如果 (fmt == NULL)
     {
 	o = vim_snprintf(s, len, "%%%%%s", comment);
 	goto exit;
     }
-    else
+    否则
 	o = vim_snprintf(s, len, "%%%%%s: ", comment);
 
     len -= o;
     s += o;
-    if (len <= 0)
-	return;
+    如果 (len <= 0)
+	返回;
 
     va_start(ap, fmt);
     vim_vsnprintf(s, len, fmt, ap);
@@ -481,7 +481,7 @@ exit:
     cairo_ps_surface_dsc_comment(pctx.surface, buf);
 }
 
-    int
+    整数
 mch_print_begin(prt_settings_T *psettings)
 {
     char user[256];
@@ -491,14 +491,14 @@ mch_print_begin(prt_settings_T *psettings)
     pctx.draw_flags = 0;
 
 #ifdef USE_GTK4_PRINT_DIALOG
-    if (pctx.dialog)
-	return TRUE;
+    如果 (pctx.dialog)
+	返回 TRUE;
 #endif
 
-    if (!get_user_name((char_u *)user, sizeof(user)))
+    如果 (!get_user_name((char_u *)user, sizeof(user)))
 	STRCPY(user, "Unknown");
 
-    if (pctx.format == PRT_FORMAT_PS)
+    如果 (pctx.format == PRT_FORMAT_PS)
     {
 	emit_dsc_comment("Title", (char *)psettings->jobname);
 	emit_dsc_comment("For", user);
@@ -523,31 +523,31 @@ mch_print_begin(prt_settings_T *psettings)
 	emit_dsc_comment("PageMedia", prt_mediasize[pctx.media].name);
 	emit_dsc_comment("EndDefaults", NULL);
     }
-    else if (pctx.format == PRT_FORMAT_PDF)
+    否则 如果 (pctx.format == PRT_FORMAT_PDF)
     {
 	char_u *str = (char_u *)user;
 
-	if (output_conv.vc_type != CONV_NONE)
+	如果 (output_conv.vc_type != CONV_NONE)
 	    str = string_convert(&output_conv, str, NULL);
 
 	cairo_pdf_surface_set_metadata(pctx.surface,
 		CAIRO_PDF_METADATA_AUTHOR, (char *)str);
-	if (output_conv.vc_type != CONV_NONE)
+	如果 (output_conv.vc_type != CONV_NONE)
 	    vim_free(str);
 
 	str = psettings->jobname;
-	if (output_conv.vc_type != CONV_NONE)
+	如果 (output_conv.vc_type != CONV_NONE)
 	    str = string_convert(&output_conv, str, NULL);
 	cairo_pdf_surface_set_metadata(pctx.surface,
 		CAIRO_PDF_METADATA_TITLE, (char *)str);
-	if (output_conv.vc_type != CONV_NONE)
+	如果 (output_conv.vc_type != CONV_NONE)
 	    vim_free(str);
 
 	cairo_pdf_surface_set_metadata(pctx.surface,
 		CAIRO_PDF_METADATA_CREATOR, VIM_VERSION_LONG);
     }
 
-    return TRUE;
+    返回 TRUE;
 }
 
     void
@@ -556,7 +556,7 @@ mch_print_end(prt_settings_T *psettings)
     // Make sure surface flushes to file or stream
     cairo_surface_finish(pctx.surface);
 
-    if (psettings->outfile == NULL && !got_int && !psettings->user_abort
+    如果 (psettings->outfile == NULL && !got_int && !psettings->user_abort
 	    && pctx.filename != NULL
 #ifdef USE_GTK4_PRINT_DIALOG
 	    && !pctx.dialog
@@ -566,44 +566,44 @@ mch_print_end(prt_settings_T *psettings)
 	msg(_("Sending to printer..."));
 
 	// Not printing to a file: use 'printexpr' to print the file.
-	if (eval_printexpr(pctx.filename, psettings->arguments) == FAIL)
+	如果 (eval_printexpr(pctx.filename, psettings->arguments) == FAIL)
 	    emsg(_(e_failed_to_print_postscript_file));
-	else
+	否则
 	    msg(_("Print job sent."));
     }
 
     mch_print_cleanup();
 }
 
-    int
+    整数
 mch_print_end_page(void)
 {
     cairo_show_page(pctx.cr);
-    return TRUE;
+    返回 TRUE;
 }
 
 /*
  * Do nothing because we create a new page for the cairo surface at the end of
  * every page.
  */
-    int
+    整数
 mch_print_begin_page(char_u *str UNUSED)
 {
-    return TRUE;
+    返回 TRUE;
 }
 
-    int
+    整数
 mch_print_blank_page(void)
 {
     mch_print_end_page();
-    return TRUE;
+    返回 TRUE;
 }
 
     void
-mch_print_start_line(int margin, int page_line)
+mch_print_start_line(整数 margin, 整数 page_line)
 {
     pctx.cur_x = pctx.left_margin;
-    if (margin)
+    如果 (margin)
 	pctx.cur_x -= pctx.number_width;
 
     pctx.cur_line = page_line;
@@ -621,8 +621,8 @@ long_to_rgb(long_u c, double *r, double *g, double *b)
  * Don't use PangoLayout for rendering the text, so that we can handle the
  * positioning and sizing ourselves.
  */
-    int
-mch_print_text_out(char_u *textp, int len)
+    整数
+mch_print_text_out(char_u *textp, 整数 len)
 {
     PangoAttrList	*attr_list;
     GList		*item_list;
@@ -633,13 +633,13 @@ mch_print_text_out(char_u *textp, int len)
     double		next_x;
 
     // Always convert to UTF-8, Pango expects that
-    if (output_conv.vc_type == CONV_NONE)
+    如果 (output_conv.vc_type == CONV_NONE)
 	str = textp;
-    else
+    否则
 	str = string_convert(&output_conv, textp, &len);
 
-    if (str == NULL)
-	return TRUE;
+    如果 (str == NULL)
+	返回 TRUE;
 
     attr_list = pango_attr_list_new();
 
@@ -653,10 +653,10 @@ mch_print_text_out(char_u *textp, int len)
     }G_STMT_END
 
     // Underline attribute does not work with pango_itemize().
-    if ((pctx.draw_flags & PRT_DRAW_BOLD))
+    如果 ((pctx.draw_flags & PRT_DRAW_BOLD))
 	INSERT_PANGO_ATTR(pango_attr_weight_new(PANGO_WEIGHT_BOLD),
 		attr_list, 0, len);
-    if (pctx.draw_flags & PRT_DRAW_ITALIC)
+    如果 (pctx.draw_flags & PRT_DRAW_ITALIC)
 	INSERT_PANGO_ATTR(pango_attr_style_new(PANGO_STYLE_ITALIC),
 		attr_list, 0, len);
 
@@ -670,7 +670,7 @@ mch_print_text_out(char_u *textp, int len)
 
     // Loop is probably unnecessary, because "str" represents a single character.
     // Do it anyways to be sure.
-    while (item_list != NULL)
+    当 (item_list != NULL)
     {
 	PangoItem   *item;
 	double	    o;
@@ -688,7 +688,7 @@ mch_print_text_out(char_u *textp, int len)
 
 	// Draw background color (only if different). Cannot batch bg color,
 	// because then we would overwrite glyphs.
-	if (pctx.cur_bg != PRCOLOR_WHITE)
+	如果 (pctx.cur_bg != PRCOLOR_WHITE)
 	{
 	    long_to_rgb(pctx.cur_bg, &r, &g, &b);
 	    cairo_set_source_rgb(pctx.cr, r, g, b);
@@ -708,7 +708,7 @@ mch_print_text_out(char_u *textp, int len)
     }
 
     // Draw underline if needed
-    if (pctx.draw_flags & PRT_DRAW_UNDERLINE)
+    如果 (pctx.draw_flags & PRT_DRAW_UNDERLINE)
     {
 	double y = GET_TEXT_Y(pctx.cur_line) - pctx.ul_pos;
 
@@ -726,24 +726,24 @@ mch_print_text_out(char_u *textp, int len)
 
     next_x = pctx.cur_x + pctx.char_width;
 
-    if (output_conv.vc_type != CONV_NONE)
+    如果 (output_conv.vc_type != CONV_NONE)
 	vim_free(str);
 
     // Use epsilon when comparing floating point
-    return (next_x > pctx.right_margin) &&
+    返回 (next_x > pctx.right_margin) &&
 	((next_x - pctx.right_margin) > (pctx.right_margin * 1e-5));
 }
 
     void
-mch_print_set_font(int bold, int italic, int underline)
+mch_print_set_font(整数 bold, 整数 italic, 整数 underline)
 {
     pctx.draw_flags = 0;
 
-    if (bold)
+    如果 (bold)
 	pctx.draw_flags |= PRT_DRAW_BOLD;
-    if (italic)
+    如果 (italic)
 	pctx.draw_flags |= PRT_DRAW_ITALIC;
-    if (underline)
+    如果 (underline)
 	pctx.draw_flags |= PRT_DRAW_UNDERLINE;
 }
 
@@ -771,7 +771,7 @@ mch_print_cleanup(void)
 
 #ifdef USE_GTK4_PRINT_DIALOG
     // If using dialog, defer the temp file deletion later
-    if (pctx.dialog)
+    如果 (pctx.dialog)
 	gui_gtk4_print_finish();
 #endif
 

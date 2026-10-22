@@ -14,47 +14,47 @@
 
 #include "vim.h"
 
-#if defined(FEAT_MENU)
+#如果 defined(FEAT_MENU)
 
 #define MENUDEPTH   10		// maximum depth of menus
 
 #ifdef FEAT_GUI_MSWIN
-static int add_menu_path(char_u *, vimmenu_T *, int *, char_u *, int);
-#else
-static int add_menu_path(char_u *, vimmenu_T *, int *, char_u *);
+static 整数 add_menu_path(char_u *, vimmenu_T *, 整数 *, char_u *, 整数);
+#否则
+static 整数 add_menu_path(char_u *, vimmenu_T *, 整数 *, char_u *);
 #endif
-static int menu_nable_recurse(vimmenu_T *menu, char_u *name, int modes, int enable);
-static int remove_menu(vimmenu_T **, char_u *, int, int silent);
+static 整数 menu_nable_recurse(vimmenu_T *menu, char_u *name, 整数 modes, 整数 enable);
+static 整数 remove_menu(vimmenu_T **, char_u *, 整数, 整数 silent);
 static void free_menu(vimmenu_T **menup);
-static void free_menu_string(vimmenu_T *, int);
-static int show_menus(char_u *, int);
-static void show_menus_recursive(vimmenu_T *, int, int);
+static void free_menu_string(vimmenu_T *, 整数);
+static 整数 show_menus(char_u *, 整数);
+static void show_menus_recursive(vimmenu_T *, 整数, 整数);
 static char_u *menu_name_skip(char_u *name);
-static int menu_name_equal(char_u *name, vimmenu_T *menu);
-static int menu_namecmp(char_u *name, char_u *mname);
-static int get_menu_cmd_modes(char_u *, int, int *, int *);
-static char_u *popup_mode_name(char_u *name, int idx);
-static char_u *menu_text(char_u *text, int *mnemonic, char_u **actext);
+static 整数 menu_name_equal(char_u *name, vimmenu_T *menu);
+static 整数 menu_namecmp(char_u *name, char_u *mname);
+static 整数 get_menu_cmd_modes(char_u *, 整数, 整数 *, 整数 *);
+static char_u *popup_mode_name(char_u *name, 整数 idx);
+static char_u *menu_text(char_u *text, 整数 *mnemonic, char_u **actext);
 
-#if defined(FEAT_GUI_MSWIN) && defined(FEAT_TEAROFF)
-static void gui_create_tearoffs_recurse(vimmenu_T *menu, const char_u *pname, int *pri_tab, int pri_idx);
-static void gui_add_tearoff(char_u *tearpath, int *pri_tab, int pri_idx);
+#如果 defined(FEAT_GUI_MSWIN) && defined(FEAT_TEAROFF)
+static void gui_create_tearoffs_recurse(vimmenu_T *menu, const char_u *pname, 整数 *pri_tab, 整数 pri_idx);
+static void gui_add_tearoff(char_u *tearpath, 整数 *pri_tab, 整数 pri_idx);
 static void gui_destroy_tearoffs_recurse(vimmenu_T *menu);
-static int s_tearoffs = FALSE;
+static 整数 s_tearoffs = FALSE;
 #endif
 
-static int menu_is_hidden(char_u *name);
-static int menu_is_tearoff(char_u *name);
+static 整数 menu_is_hidden(char_u *name);
+static 整数 menu_is_tearoff(char_u *name);
 
 // When non-zero no menu must be added or cleared.  Prevents the list of menus
 // changing while listing them.
-static int menus_locked = 0;
+static 整数 menus_locked = 0;
 
-#if defined(FEAT_MULTI_LANG) || defined(FEAT_TOOLBAR)
+#如果 defined(FEAT_MULTI_LANG) || defined(FEAT_TOOLBAR)
 static char_u *menu_skip_part(char_u *p);
 #endif
 #ifdef FEAT_MULTI_LANG
-static char_u *menutrans_lookup(char_u *name, int len);
+static char_u *menutrans_lookup(char_u *name, 整数 len);
 static void menu_unescape_name(char_u	*p);
 #endif
 
@@ -80,41 +80,41 @@ static const char *toolbar_names[] =
 /*
  * Return TRUE if "name" is a window toolbar menu name.
  */
-    static int
+    static 整数
 menu_is_winbar(char_u *name)
 {
-    return (STRNCMP(name, "WinBar", 6) == 0);
+    返回 (STRNCMP(name, "WinBar", 6) == 0);
 }
 
-    int
+    整数
 winbar_height(win_T *wp)
 {
-    if (wp->w_winbar != NULL && wp->w_winbar->children != NULL)
-	return 1;
-    return 0;
+    如果 (wp->w_winbar != NULL && wp->w_winbar->children != NULL)
+	返回 1;
+    返回 0;
 }
 
     static vimmenu_T **
 get_root_menu(char_u *name)
 {
-    if (menu_is_winbar(name))
-	return &curwin->w_winbar;
-    return &root_menu;
+    如果 (menu_is_winbar(name))
+	返回 &curwin->w_winbar;
+    返回 &root_menu;
 }
 
 /*
  * If "menus_locked" is set then give an error and return TRUE.
  * Otherwise return FALSE.
  */
-    static int
+    static 整数
 is_menus_locked(void)
 {
-    if (menus_locked > 0)
+    如果 (menus_locked > 0)
     {
 	emsg(_(e_cannot_change_menus_while_listing));
-	return TRUE;
+	返回 TRUE;
     }
-    return FALSE;
+    返回 FALSE;
 }
 
 /*
@@ -125,24 +125,24 @@ ex_menu(
     exarg_T	*eap)		    // Ex command arguments
 {
     char_u	*menu_path;
-    int		modes;
+    整数		modes;
     char_u	*map_to;
-    int		noremap;
-    int		silent = FALSE;
-    int		special = FALSE;
-    int		unmenu;
+    整数		noremap;
+    整数		silent = FALSE;
+    整数		special = FALSE;
+    整数		unmenu;
     char_u	*map_buf;
     char_u	*arg;
     char_u	*p;
-    int		i;
-#if defined(FEAT_GUI) && !defined(FEAT_GUI_GTK)
-    int		old_menu_height;
-# if defined(FEAT_TOOLBAR) && !defined(FEAT_GUI_MSWIN)
-    int		old_toolbar_height;
+    整数		i;
+#如果 defined(FEAT_GUI) && !defined(FEAT_GUI_GTK)
+    整数		old_menu_height;
+# 如果 defined(FEAT_TOOLBAR) && !defined(FEAT_GUI_MSWIN)
+    整数		old_toolbar_height;
 # endif
 #endif
-    int		pri_tab[MENUDEPTH + 1];
-    int		enable = MAYBE;	    // TRUE for "menu enable", FALSE for "menu
+    整数		pri_tab[MENUDEPTH + 1];
+    整数		enable = MAYBE;	    // TRUE for "menu enable", FALSE for "menu
 				    // disable
 #ifdef FEAT_TOOLBAR
     char_u	*icon = NULL;
@@ -153,21 +153,21 @@ ex_menu(
     modes = get_menu_cmd_modes(eap->cmd, eap->forceit, &noremap, &unmenu);
     arg = eap->arg;
 
-    for (;;)
+    为 (;;)
     {
-	if (STRNCMP(arg, "<script>", 8) == 0)
+	如果 (STRNCMP(arg, "<script>", 8) == 0)
 	{
 	    noremap = REMAP_SCRIPT;
 	    arg = skipwhite(arg + 8);
 	    continue;
 	}
-	if (STRNCMP(arg, "<silent>", 8) == 0)
+	如果 (STRNCMP(arg, "<silent>", 8) == 0)
 	{
 	    silent = TRUE;
 	    arg = skipwhite(arg + 8);
 	    continue;
 	}
-	if (STRNCMP(arg, "<special>", 9) == 0)
+	如果 (STRNCMP(arg, "<special>", 9) == 0)
 	{
 	    special = TRUE;
 	    arg = skipwhite(arg + 9);
@@ -178,19 +178,19 @@ ex_menu(
 
 
     // Locate an optional "icon=filename" argument.
-    if (STRNCMP(arg, "icon=", 5) == 0)
+    如果 (STRNCMP(arg, "icon=", 5) == 0)
     {
 	arg += 5;
 #ifdef FEAT_TOOLBAR
 	icon = arg;
 #endif
-	while (*arg != NUL && *arg != ' ')
+	当 (*arg != NUL && *arg != ' ')
 	{
-	    if (*arg == '\\')
+	    如果 (*arg == '\\')
 		STRMOVE(arg, arg + 1);
 	    MB_PTR_ADV(arg);
 	}
-	if (*arg != NUL)
+	如果 (*arg != NUL)
 	{
 	    *arg++ = NUL;
 	    arg = skipwhite(arg);
@@ -200,41 +200,41 @@ ex_menu(
     /*
      * Fill in the priority table.
      */
-    for (p = arg; *p; ++p)
-	if (!VIM_ISDIGIT(*p) && *p != '.')
+    为 (p = arg; *p; ++p)
+	如果 (!VIM_ISDIGIT(*p) && *p != '.')
 	    break;
-    if (VIM_ISWHITE(*p))
+    如果 (VIM_ISWHITE(*p))
     {
-	for (i = 0; i < MENUDEPTH && !VIM_ISWHITE(*arg); ++i)
+	为 (i = 0; i < MENUDEPTH && !VIM_ISWHITE(*arg); ++i)
 	{
 	    pri_tab[i] = getdigits(&arg);
-	    if (pri_tab[i] == 0)
+	    如果 (pri_tab[i] == 0)
 		pri_tab[i] = 500;
-	    if (*arg == '.')
+	    如果 (*arg == '.')
 		++arg;
 	}
 	arg = skipwhite(arg);
     }
-    else if (eap->addr_count && eap->line2 != 0)
+    否则 如果 (eap->addr_count && eap->line2 != 0)
     {
 	pri_tab[0] = eap->line2;
 	i = 1;
     }
-    else
+    否则
 	i = 0;
-    while (i < MENUDEPTH)
+    当 (i < MENUDEPTH)
 	pri_tab[i++] = 500;
     pri_tab[MENUDEPTH] = -1;		// mark end of the table
 
     /*
      * Check for "disable" or "enable" argument.
      */
-    if (STRNCMP(arg, "enable", 6) == 0 && VIM_ISWHITE(arg[6]))
+    如果 (STRNCMP(arg, "enable", 6) == 0 && VIM_ISWHITE(arg[6]))
     {
 	enable = TRUE;
 	arg = skipwhite(arg + 6);
     }
-    else if (STRNCMP(arg, "disable", 7) == 0 && VIM_ISWHITE(arg[7]))
+    否则 如果 (STRNCMP(arg, "disable", 7) == 0 && VIM_ISWHITE(arg[7]))
     {
 	enable = FALSE;
 	arg = skipwhite(arg + 7);
@@ -243,10 +243,10 @@ ex_menu(
     /*
      * If there is no argument, display all menus.
      */
-    if (*arg == NUL)
+    如果 (*arg == NUL)
     {
 	show_menus(arg, modes);
-	return;
+	返回;
     }
 
 #ifdef FEAT_TOOLBAR
@@ -255,27 +255,27 @@ ex_menu(
      */
     menuarg.iconidx = -1;
     menuarg.icon_builtin = FALSE;
-    if (menu_is_toolbar(arg))
+    如果 (menu_is_toolbar(arg))
     {
 	menu_path = menu_skip_part(arg);
-	if (*menu_path == '.')
+	如果 (*menu_path == '.')
 	{
 	    p = menu_skip_part(++menu_path);
-	    if (STRNCMP(menu_path, "BuiltIn", 7) == 0)
+	    如果 (STRNCMP(menu_path, "BuiltIn", 7) == 0)
 	    {
-		if (skipdigits(menu_path + 7) == p)
+		如果 (skipdigits(menu_path + 7) == p)
 		{
 		    menuarg.iconidx = atoi((char *)menu_path + 7);
-		    if (menuarg.iconidx >= (int)TOOLBAR_NAME_COUNT)
+		    如果 (menuarg.iconidx >= (整数)TOOLBAR_NAME_COUNT)
 			menuarg.iconidx = -1;
-		    else
+		    否则
 			menuarg.icon_builtin = TRUE;
 		}
 	    }
-	    else
+	    否则
 	    {
-		for (i = 0; i < (int)TOOLBAR_NAME_COUNT; ++i)
-		    if (STRNCMP(toolbar_names[i], menu_path, p - menu_path)
+		为 (i = 0; i < (整数)TOOLBAR_NAME_COUNT; ++i)
+		    如果 (STRNCMP(toolbar_names[i], menu_path, p - menu_path)
 									 == 0)
 		    {
 			menuarg.iconidx = i;
@@ -287,7 +287,7 @@ ex_menu(
 #endif
 
     menu_path = arg;
-    if (*menu_path == '.')
+    如果 (*menu_path == '.')
     {
 	semsg(_(e_invalid_argument_str), menu_path);
 	goto theend;
@@ -298,45 +298,45 @@ ex_menu(
     /*
      * If there is only a menu name, display menus with that name.
      */
-    if (*map_to == NUL && !unmenu && enable == MAYBE)
+    如果 (*map_to == NUL && !unmenu && enable == MAYBE)
     {
 	show_menus(menu_path, modes);
 	goto theend;
     }
-    else if (*map_to != NUL && (unmenu || enable != MAYBE))
+    否则 如果 (*map_to != NUL && (unmenu || enable != MAYBE))
     {
 	semsg(_(e_trailing_characters_str), map_to);
 	goto theend;
     }
-#if defined(FEAT_GUI) && !(defined(FEAT_GUI_GTK) || defined(FEAT_GUI_PHOTON))
+#如果 defined(FEAT_GUI) && !(defined(FEAT_GUI_GTK) || defined(FEAT_GUI_PHOTON))
     old_menu_height = gui.menu_height;
-# if defined(FEAT_TOOLBAR) && !defined(FEAT_GUI_MSWIN)
+# 如果 defined(FEAT_TOOLBAR) && !defined(FEAT_GUI_MSWIN)
     old_toolbar_height = gui.toolbar_height;
 # endif
 #endif
 
     root_menu_ptr = get_root_menu(menu_path);
-    if (root_menu_ptr == &curwin->w_winbar)
+    如果 (root_menu_ptr == &curwin->w_winbar)
 	// Assume the window toolbar menu will change.
 	redraw_later(UPD_NOT_VALID);
 
-    if (enable != MAYBE)
+    如果 (enable != MAYBE)
     {
 	/*
 	 * Change sensitivity of the menu.
 	 * For the PopUp menu, remove a menu for each mode separately.
 	 * Careful: menu_nable_recurse() changes menu_path.
 	 */
-	if (STRCMP(menu_path, "*") == 0)	// meaning: do all menus
+	如果 (STRCMP(menu_path, "*") == 0)	// meaning: do all menus
 	    menu_path = (char_u *)"";
 
-	if (menu_is_popup(menu_path))
+	如果 (menu_is_popup(menu_path))
 	{
-	    for (i = 0; i < MENU_INDEX_TIP; ++i)
-		if (modes & (1 << i))
+	    为 (i = 0; i < MENU_INDEX_TIP; ++i)
+		如果 (modes & (1 << i))
 		{
 		    p = popup_mode_name(menu_path, i);
-		    if (p != NULL)
+		    如果 (p != NULL)
 		    {
 			menu_nable_recurse(*root_menu_ptr, p, MENU_ALL_MODES,
 								      enable);
@@ -346,27 +346,27 @@ ex_menu(
 	}
 	menu_nable_recurse(*root_menu_ptr, menu_path, modes, enable);
     }
-    else if (unmenu)
+    否则 如果 (unmenu)
     {
-	if (is_menus_locked())
+	如果 (is_menus_locked())
 	    goto theend;
 
 	/*
 	 * Delete menu(s).
 	 */
-	if (STRCMP(menu_path, "*") == 0)	// meaning: remove all menus
+	如果 (STRCMP(menu_path, "*") == 0)	// meaning: remove all menus
 	    menu_path = (char_u *)"";
 
 	/*
 	 * For the PopUp menu, remove a menu for each mode separately.
 	 */
-	if (menu_is_popup(menu_path))
+	如果 (menu_is_popup(menu_path))
 	{
-	    for (i = 0; i < MENU_INDEX_TIP; ++i)
-		if (modes & (1 << i))
+	    为 (i = 0; i < MENU_INDEX_TIP; ++i)
+		如果 (modes & (1 << i))
 		{
 		    p = popup_mode_name(menu_path, i);
-		    if (p != NULL)
+		    如果 (p != NULL)
 		    {
 			remove_menu(root_menu_ptr, p, MENU_ALL_MODES, TRUE);
 			vim_free(p);
@@ -377,23 +377,23 @@ ex_menu(
 	// Careful: remove_menu() changes menu_path
 	remove_menu(root_menu_ptr, menu_path, modes, FALSE);
     }
-    else
+    否则
     {
-	if (is_menus_locked())
+	如果 (is_menus_locked())
 	    goto theend;
 
 	/*
 	 * Add menu(s).
 	 * Replace special key codes.
 	 */
-	if (STRICMP(map_to, "<nop>") == 0)	// "<Nop>" means nothing
+	如果 (STRICMP(map_to, "<nop>") == 0)	// "<Nop>" means nothing
 	{
 	    map_to = (char_u *)"";
 	    map_buf = NULL;
 	}
-	else if (modes & MENU_TIP_MODE)
+	否则 如果 (modes & MENU_TIP_MODE)
 	    map_buf = NULL;	// Menu tips are plain text.
-	else
+	否则
 	    map_to = replace_termcodes(map_to, &map_buf, 0,
 			REPTERM_DO_LT | (special ? REPTERM_SPECIAL : 0), NULL);
 	menuarg.modes = modes;
@@ -411,13 +411,13 @@ ex_menu(
 	/*
 	 * For the PopUp menu, add a menu for each mode separately.
 	 */
-	if (menu_is_popup(menu_path))
+	如果 (menu_is_popup(menu_path))
 	{
-	    for (i = 0; i < MENU_INDEX_TIP; ++i)
-		if (modes & (1 << i))
+	    为 (i = 0; i < MENU_INDEX_TIP; ++i)
+		如果 (modes & (1 << i))
 		{
 		    p = popup_mode_name(menu_path, i);
-		    if (p != NULL)
+		    如果 (p != NULL)
 		    {
 			// Include all modes, to make ":amenu" work
 			menuarg.modes = modes;
@@ -439,25 +439,25 @@ ex_menu(
 	vim_free(map_buf);
     }
 
-#if defined(FEAT_GUI) && !(defined(FEAT_GUI_GTK))
+#如果 defined(FEAT_GUI) && !(defined(FEAT_GUI_GTK))
     // If the menubar height changed, resize the window
-    if (gui.in_use
+    如果 (gui.in_use
 	    && (gui.menu_height != old_menu_height
-# if defined(FEAT_TOOLBAR) && !defined(FEAT_GUI_MSWIN)
+# 如果 defined(FEAT_TOOLBAR) && !defined(FEAT_GUI_MSWIN)
 		|| gui.toolbar_height != old_toolbar_height
 # endif
 	    ))
 	gui_set_shellsize(FALSE, FALSE, RESIZE_VERT);
 #endif
-    if (root_menu_ptr == &curwin->w_winbar)
+    如果 (root_menu_ptr == &curwin->w_winbar)
     {
-	int h = winbar_height(curwin);
+	整数 h = winbar_height(curwin);
 
-	if (h != curwin->w_winbar_height)
+	如果 (h != curwin->w_winbar_height)
 	{
-	    if (h == 0)
+	    如果 (h == 0)
 		++curwin->w_height;
-	    else if (curwin->w_height > 0)
+	    否则 如果 (curwin->w_height > 0)
 		--curwin->w_height;
 	    curwin->w_winbar_height = h;
 	}
@@ -471,20 +471,20 @@ theend:
 /*
  * Add the menu with the given name to the menu hierarchy
  */
-    static int
+    static 整数
 add_menu_path(
     char_u	*menu_path,
     vimmenu_T	*menuarg,	// passes modes, iconfile, iconidx,
 				// icon_builtin, silent[0], noremap[0]
-    int		*pri_tab,
+    整数		*pri_tab,
     char_u	*call_data
 #ifdef FEAT_GUI_MSWIN
-    , int	addtearoff	// may add tearoff item
+    , 整数	addtearoff	// may add tearoff item
 #endif
     )
 {
     char_u	*path_name;
-    int		modes = menuarg->modes;
+    整数		modes = menuarg->modes;
     vimmenu_T	**menup;
     vimmenu_T	*menu = NULL;
     vimmenu_T	*parent;
@@ -493,16 +493,16 @@ add_menu_path(
     char_u	*name;
     char_u	*dname;
     char_u	*next_name;
-    int		i;
-    int		c;
-    int		d;
+    整数		i;
+    整数		c;
+    整数		d;
 #ifdef FEAT_GUI
-    int		idx;
-    int		new_idx;
+    整数		idx;
+    整数		new_idx;
 #endif
-    int		pri_idx = 0;
-    int		old_modes = 0;
-    int		amenu;
+    整数		pri_idx = 0;
+    整数		old_modes = 0;
+    整数		amenu;
 #ifdef FEAT_MULTI_LANG
     char_u	*en_name;
     char_u	*map_to = NULL;
@@ -511,31 +511,31 @@ add_menu_path(
 
     // Make a copy so we can stuff around with it, since it could be const
     path_name = vim_strsave(menu_path);
-    if (path_name == NULL)
-	return FAIL;
+    如果 (path_name == NULL)
+	返回 FAIL;
     root_menu_ptr = get_root_menu(menu_path);
     menup = root_menu_ptr;
     parent = NULL;
     name = path_name;
-    while (*name)
+    当 (*name)
     {
 	// Get name of this element in the menu hierarchy, and the simplified
 	// name (without mnemonic and accelerator text).
 	next_name = menu_name_skip(name);
 #ifdef	FEAT_MULTI_LANG
-	map_to = menutrans_lookup(name, (int)STRLEN(name));
-	if (map_to != NULL)
+	map_to = menutrans_lookup(name, (整数)STRLEN(name));
+	如果 (map_to != NULL)
 	{
 	    en_name = name;
 	    name = map_to;
 	}
-	else
+	否则
 	    en_name = NULL;
 #endif
 	dname = menu_text(name, NULL, NULL);
-	if (dname == NULL)
+	如果 (dname == NULL)
 	    goto erret;
-	if (*dname == NUL)
+	如果 (*dname == NUL)
 	{
 	    // Only a mnemonic or accelerator is not valid.
 	    emsg(_(e_empty_menu_name));
@@ -549,23 +549,23 @@ add_menu_path(
 	new_idx = 0;
 #endif
 	menu = *menup;
-	while (menu != NULL)
+	当 (menu != NULL)
 	{
-	    if (menu_name_equal(name, menu) || menu_name_equal(dname, menu))
+	    如果 (menu_name_equal(name, menu) || menu_name_equal(dname, menu))
 	    {
-		if (*next_name == NUL && menu->children != NULL)
+		如果 (*next_name == NUL && menu->children != NULL)
 		{
-		    if (!sys_menu)
+		    如果 (!sys_menu)
 			emsg(_(e_menu_path_must_not_lead_to_sub_menu));
 		    goto erret;
 		}
-		if (*next_name != NUL && menu->children == NULL
+		如果 (*next_name != NUL && menu->children == NULL
 #ifdef FEAT_GUI_MSWIN
 			&& addtearoff
 #endif
 			)
 		{
-		    if (!sys_menu)
+		    如果 (!sys_menu)
 			emsg(_(e_part_of_menu_item_path_is_not_sub_menu));
 		    goto erret;
 		}
@@ -575,12 +575,12 @@ add_menu_path(
 
 	    // Count menus, to find where this one needs to be inserted.
 	    // Ignore menus that are not in the menubar (PopUp and Toolbar)
-	    if (parent != NULL || menu_is_menubar(menu->name))
+	    如果 (parent != NULL || menu_is_menubar(menu->name))
 	    {
 #ifdef FEAT_GUI
 		++idx;
 #endif
-		if (menu->priority <= pri_tab[pri_idx])
+		如果 (menu->priority <= pri_tab[pri_idx])
 		{
 		    lower_pri = menup;
 #ifdef FEAT_GUI
@@ -591,15 +591,15 @@ add_menu_path(
 	    menu = menu->next;
 	}
 
-	if (menu == NULL)
+	如果 (menu == NULL)
 	{
-	    if (*next_name == NUL && parent == NULL)
+	    如果 (*next_name == NUL && parent == NULL)
 	    {
 		emsg(_(e_must_not_add_menu_items_directly_to_menu_bar));
 		goto erret;
 	    }
 
-	    if (menu_is_separator(dname) && *next_name != NUL)
+	    如果 (menu_is_separator(dname) && *next_name != NUL)
 	    {
 		emsg(_(e_separator_cannot_be_part_of_menu_path));
 		goto erret;
@@ -607,7 +607,7 @@ add_menu_path(
 
 	    // Not already there, so let's add it
 	    menu = ALLOC_CLEAR_ONE(vimmenu_T);
-	    if (menu == NULL)
+	    如果 (menu == NULL)
 		goto erret;
 
 	    menu->modes = modes;
@@ -616,12 +616,12 @@ add_menu_path(
 	    // separate mnemonic and accelerator text from actual menu name
 	    menu->dname = menu_text(name, &menu->mnemonic, &menu->actext);
 #ifdef	FEAT_MULTI_LANG
-	    if (en_name != NULL)
+	    如果 (en_name != NULL)
 	    {
 		menu->en_name = vim_strsave(en_name);
 		menu->en_dname = menu_text(en_name, NULL, NULL);
 	    }
-	    else
+	    否则
 	    {
 		menu->en_name = NULL;
 		menu->en_dname = NULL;
@@ -646,16 +646,16 @@ add_menu_path(
 #ifdef FEAT_TOOLBAR
 	    menu->iconidx = menuarg->iconidx;
 	    menu->icon_builtin = menuarg->icon_builtin;
-	    if (*next_name == NUL && menuarg->iconfile != NULL)
+	    如果 (*next_name == NUL && menuarg->iconfile != NULL)
 		menu->iconfile = vim_strsave(menuarg->iconfile);
 #endif
-#if defined(FEAT_GUI_MSWIN) && defined(FEAT_TEAROFF)
+#如果 defined(FEAT_GUI_MSWIN) && defined(FEAT_TEAROFF)
 	    // the tearoff item must be present in the modes of each item.
-	    if (parent != NULL && menu_is_tearoff(parent->children->dname))
+	    如果 (parent != NULL && menu_is_tearoff(parent->children->dname))
 		parent->children->modes |= modes;
 #endif
 	}
-	else
+	否则
 	{
 	    old_modes = menu->modes;
 
@@ -666,7 +666,7 @@ add_menu_path(
 	     */
 #ifdef FEAT_GUI_MSWIN
 	    // If adding a tearbar (addtearoff == FALSE) don't update modes
-	    if (addtearoff)
+	    如果 (addtearoff)
 #endif
 	    {
 		menu->modes |= modes;
@@ -679,12 +679,12 @@ add_menu_path(
 	 * Add the menu item when it's used in one of the modes, but not when
 	 * only a tooltip is defined.
 	 */
-	if ((old_modes & MENU_ALL_MODES) == 0
+	如果 ((old_modes & MENU_ALL_MODES) == 0
 		&& (menu->modes & MENU_ALL_MODES) != 0)
 	{
-	    if (gui.in_use)  // Otherwise it will be added when GUI starts
+	    如果 (gui.in_use)  // Otherwise it will be added when GUI starts
 	    {
-		if (*next_name == NUL)
+		如果 (*next_name == NUL)
 		{
 		    // Real menu item, not sub-menu
 		    gui_mch_add_menu_item(menu, new_idx);
@@ -692,16 +692,16 @@ add_menu_path(
 		    // Want to update menus now even if mode not changed
 		    force_menu_update = TRUE;
 		}
-		else
+		否则
 		{
 		    // Sub-menu (not at end of path yet)
 		    gui_mch_add_menu(menu, new_idx);
 		}
 	    }
 
-# if defined(FEAT_GUI_MSWIN) && defined(FEAT_TEAROFF)
+# 如果 defined(FEAT_GUI_MSWIN) && defined(FEAT_TEAROFF)
 	    // When adding a new submenu, may add a tearoff item
-	    if (	addtearoff
+	    如果 (	addtearoff
 		    && *next_name
 		    && vim_strchr(p_go, GO_TEAROFF) != NULL
 		    && menu_is_menubar(name)
@@ -718,16 +718,16 @@ add_menu_path(
 		 * string, so we must correct for special characters.
 		 */
 		tearpath = alloc(STRLEN(menu_path) + TEAR_LEN + 2);
-		if (tearpath != NULL)
+		如果 (tearpath != NULL)
 		{
 		    char_u  *s;
-		    int	    len;
+		    整数	    len;
 
 		    STRCPY(tearpath, menu_path);
-		    len = (int)(next_name - path_name - 1);
-		    for (s = tearpath; *s && s < tearpath + len; MB_PTR_ADV(s))
+		    len = (整数)(next_name - path_name - 1);
+		    为 (s = tearpath; *s && s < tearpath + len; MB_PTR_ADV(s))
 		    {
-			if ((*s == '\\' || *s == Ctrl_V) && s[1])
+			如果 ((*s == '\\' || *s == Ctrl_V) && s[1])
 			{
 			    ++len;
 			    ++s;
@@ -746,7 +746,7 @@ add_menu_path(
 	parent = menu;
 	name = next_name;
 	VIM_CLEAR(dname);
-	if (pri_tab[pri_idx + 1] != -1)
+	如果 (pri_tab[pri_idx + 1] != -1)
 	    ++pri_idx;
     }
     vim_free(path_name);
@@ -757,10 +757,10 @@ add_menu_path(
      */
     amenu = ((modes & (MENU_NORMAL_MODE | MENU_INSERT_MODE)) ==
 				       (MENU_NORMAL_MODE | MENU_INSERT_MODE));
-    if (sys_menu)
+    如果 (sys_menu)
 	modes &= ~old_modes;
 
-    if (menu != NULL && modes)
+    如果 (menu != NULL && modes)
     {
 #ifdef FEAT_GUI
 	menu->cb = gui_menu_cb;
@@ -768,9 +768,9 @@ add_menu_path(
 	p = (call_data == NULL) ? NULL : vim_strsave(call_data);
 
 	// loop over all modes, may add more than one
-	for (i = 0; i < MENU_MODES; ++i)
+	为 (i = 0; i < MENU_MODES; ++i)
 	{
-	    if (modes & (1 << i))
+	    如果 (modes & (1 << i))
 	    {
 		// free any old menu
 		free_menu_string(menu, i);
@@ -780,7 +780,7 @@ add_menu_path(
 		// Don't do this for "<Nop>".
 		c = 0;
 		d = 0;
-		if (amenu && call_data != NULL && *call_data != NUL
+		如果 (amenu && call_data != NULL && *call_data != NUL
 #ifdef FEAT_GUI_MSWIN
 		       && addtearoff
 #endif
@@ -801,22 +801,22 @@ add_menu_path(
 		    }
 		}
 
-		if (c != 0)
+		如果 (c != 0)
 		{
 		    menu->strings[i] = alloc(STRLEN(call_data) + 5);
-		    if (menu->strings[i] != NULL)
+		    如果 (menu->strings[i] != NULL)
 		    {
 			menu->strings[i][0] = c;
-			if (d == 0)
+			如果 (d == 0)
 			    STRCPY(menu->strings[i] + 1, call_data);
-			else
+			否则
 			{
 			    menu->strings[i][1] = d;
 			    STRCPY(menu->strings[i] + 2, call_data);
 			}
-			if (c == Ctrl_C)
+			如果 (c == Ctrl_C)
 			{
-			    int	    len = (int)STRLEN(menu->strings[i]);
+			    整数	    len = (整数)STRLEN(menu->strings[i]);
 
 			    // Append CTRL-\ CTRL-G to obey 'insertmode'.
 			    menu->strings[i][len] = Ctrl_BSL;
@@ -825,20 +825,20 @@ add_menu_path(
 			}
 		    }
 		}
-		else
+		否则
 		    menu->strings[i] = p;
 		menu->noremap[i] = menuarg->noremap[0];
 		menu->silent[i] = menuarg->silent[0];
 	    }
 	}
-#if defined(FEAT_TOOLBAR) && !defined(FEAT_GUI_MSWIN) \
+#如果 defined(FEAT_TOOLBAR) && !defined(FEAT_GUI_MSWIN) \
 	&& (defined(FEAT_BEVAL_GUI) || defined(FEAT_GUI_GTK))
 	// Need to update the menu tip.
-	if (modes & MENU_TIP_MODE)
+	如果 (modes & MENU_TIP_MODE)
 	    gui_mch_menu_set_tip(menu);
 #endif
     }
-    return OK;
+    返回 OK;
 
 erret:
     vim_free(path_name);
@@ -846,61 +846,61 @@ erret:
 
     // Delete any empty submenu we added before discovering the error.  Repeat
     // for higher levels.
-    while (parent != NULL && parent->children == NULL)
+    当 (parent != NULL && parent->children == NULL)
     {
-	if (parent->parent == NULL)
+	如果 (parent->parent == NULL)
 	    menup = root_menu_ptr;
-	else
+	否则
 	    menup = &parent->parent->children;
-	for ( ; *menup != NULL && *menup != parent; menup = &((*menup)->next))
+	为 ( ; *menup != NULL && *menup != parent; menup = &((*menup)->next))
 	    ;
-	if (*menup == NULL) // safety check
+	如果 (*menup == NULL) // safety check
 	    break;
 	parent = parent->parent;
 	free_menu(menup);
     }
-    return FAIL;
+    返回 FAIL;
 }
 
 /*
  * Set the (sub)menu with the given name to enabled or disabled.
  * Called recursively.
  */
-    static int
+    static 整数
 menu_nable_recurse(
     vimmenu_T	*menu,
     char_u	*name,
-    int		modes,
-    int		enable)
+    整数		modes,
+    整数		enable)
 {
     char_u	*p;
 
-    if (menu == NULL)
-	return OK;		// Got to bottom of hierarchy
+    如果 (menu == NULL)
+	返回 OK;		// Got to bottom of hierarchy
 
     // Get name of this element in the menu hierarchy
     p = menu_name_skip(name);
 
     // Find the menu
-    while (menu != NULL)
+    当 (menu != NULL)
     {
-	if (*name == NUL || *name == '*' || menu_name_equal(name, menu))
+	如果 (*name == NUL || *name == '*' || menu_name_equal(name, menu))
 	{
-	    if (*p != NUL)
+	    如果 (*p != NUL)
 	    {
-		if (menu->children == NULL)
+		如果 (menu->children == NULL)
 		{
 		    emsg(_(e_part_of_menu_item_path_is_not_sub_menu));
-		    return FAIL;
+		    返回 FAIL;
 		}
-		if (menu_nable_recurse(menu->children, p, modes, enable)
+		如果 (menu_nable_recurse(menu->children, p, modes, enable)
 								      == FAIL)
-		    return FAIL;
+		    返回 FAIL;
 	    }
-	    else
-		if (enable)
+	    否则
+		如果 (enable)
 		    menu->enabled |= modes;
-		else
+		否则
 		    menu->enabled &= ~modes;
 
 	    /*
@@ -908,15 +908,15 @@ menu_nable_recurse(
 	     * modes, so keep looping, otherwise we are just doing the named
 	     * menu item (which has been found) so break here.
 	     */
-	    if (*name != NUL && *name != '*')
+	    如果 (*name != NUL && *name != '*')
 		break;
 	}
 	menu = menu->next;
     }
-    if (*name != NUL && *name != '*' && menu == NULL)
+    如果 (*name != NUL && *name != '*' && menu == NULL)
     {
 	semsg(_(e_no_menu_str), name);
-	return FAIL;
+	返回 FAIL;
     }
 
 #ifdef FEAT_GUI
@@ -924,62 +924,62 @@ menu_nable_recurse(
     force_menu_update = TRUE;
 #endif
 
-    return OK;
+    返回 OK;
 }
 
 /*
  * Remove the (sub)menu with the given name from the menu hierarchy
  * Called recursively.
  */
-    static int
+    static 整数
 remove_menu(
     vimmenu_T	**menup,
     char_u	*name,
-    int		modes,
-    int		silent)		// don't give error messages
+    整数		modes,
+    整数		silent)		// don't give error messages
 {
     vimmenu_T	*menu;
     vimmenu_T	*child;
     char_u	*p;
 
-    if (*menup == NULL)
-	return OK;		// Got to bottom of hierarchy
+    如果 (*menup == NULL)
+	返回 OK;		// Got to bottom of hierarchy
 
     // Get name of this element in the menu hierarchy
     p = menu_name_skip(name);
 
     // Find the menu
-    while ((menu = *menup) != NULL)
+    当 ((menu = *menup) != NULL)
     {
-	if (*name == NUL || menu_name_equal(name, menu))
+	如果 (*name == NUL || menu_name_equal(name, menu))
 	{
-	    if (*p != NUL && menu->children == NULL)
+	    如果 (*p != NUL && menu->children == NULL)
 	    {
-		if (!silent)
+		如果 (!silent)
 		    emsg(_(e_part_of_menu_item_path_is_not_sub_menu));
-		return FAIL;
+		返回 FAIL;
 	    }
-	    if ((menu->modes & modes) != 0x0)
+	    如果 ((menu->modes & modes) != 0x0)
 	    {
-#if defined(FEAT_GUI_MSWIN) & defined(FEAT_TEAROFF)
+#如果 defined(FEAT_GUI_MSWIN) & defined(FEAT_TEAROFF)
 		/*
 		 * If we are removing all entries for this menu,MENU_ALL_MODES,
 		 * Then kill any tearoff before we start
 		 */
-		if (*p == NUL && modes == MENU_ALL_MODES)
+		如果 (*p == NUL && modes == MENU_ALL_MODES)
 		{
-		    if (IsWindow(menu->tearoff_handle))
+		    如果 (IsWindow(menu->tearoff_handle))
 			DestroyWindow(menu->tearoff_handle);
 		}
 #endif
-		if (remove_menu(&menu->children, p, modes, silent) == FAIL)
-		    return FAIL;
+		如果 (remove_menu(&menu->children, p, modes, silent) == FAIL)
+		    返回 FAIL;
 	    }
-	    else if (*name != NUL)
+	    否则 如果 (*name != NUL)
 	    {
-		if (!silent)
+		如果 (!silent)
 		    emsg(_(e_menu_only_exists_in_another_mode));
-		return FAIL;
+		返回 FAIL;
 	    }
 
 	    /*
@@ -987,57 +987,57 @@ remove_menu(
 	     * modes, so keep looping, otherwise we are just removing the named
 	     * menu item (which has been found) so break here.
 	     */
-	    if (*name != NUL)
+	    如果 (*name != NUL)
 		break;
 
 	    // Remove the menu item for the given mode[s].  If the menu item
 	    // is no longer valid in ANY mode, delete it
 	    menu->modes &= ~modes;
-	    if (modes & MENU_TIP_MODE)
+	    如果 (modes & MENU_TIP_MODE)
 		free_menu_string(menu, MENU_INDEX_TIP);
-	    if ((menu->modes & MENU_ALL_MODES) == 0)
+	    如果 ((menu->modes & MENU_ALL_MODES) == 0)
 		free_menu(menup);
-	    else
+	    否则
 		menup = &menu->next;
 	}
-	else
+	否则
 	    menup = &menu->next;
     }
-    if (*name != NUL)
+    如果 (*name != NUL)
     {
-	if (menu == NULL)
+	如果 (menu == NULL)
 	{
-	    if (!silent)
+	    如果 (!silent)
 		semsg(_(e_no_menu_str), name);
-	    return FAIL;
+	    返回 FAIL;
 	}
 
 
 	// Recalculate modes for menu based on the new updated children
 	menu->modes &= ~modes;
-#if defined(FEAT_GUI_MSWIN) & defined(FEAT_TEAROFF)
-	if ((s_tearoffs) && (menu->children != NULL)) // there's a tear bar.
+#如果 defined(FEAT_GUI_MSWIN) & defined(FEAT_TEAROFF)
+	如果 ((s_tearoffs) && (menu->children != NULL)) // there's a tear bar.
 	    child = menu->children->next; // don't count tearoff bar
-	else
+	否则
 #endif
 	    child = menu->children;
-	for ( ; child != NULL; child = child->next)
+	为 ( ; child != NULL; child = child->next)
 	    menu->modes |= child->modes;
-	if (modes & MENU_TIP_MODE)
+	如果 (modes & MENU_TIP_MODE)
 	{
 	    free_menu_string(menu, MENU_INDEX_TIP);
-#if defined(FEAT_TOOLBAR) && !defined(FEAT_GUI_MSWIN) \
+#如果 defined(FEAT_TOOLBAR) && !defined(FEAT_GUI_MSWIN) \
 	    && (defined(FEAT_BEVAL_GUI) || defined(FEAT_GUI_GTK))
 	    // Need to update the menu tip.
-	    if (gui.in_use)
+	    如果 (gui.in_use)
 		gui_mch_menu_set_tip(menu);
 #endif
 	}
-	if ((menu->modes & MENU_ALL_MODES) == 0)
+	如果 ((menu->modes & MENU_ALL_MODES) == 0)
 	{
 	    // The menu item is no longer valid in ANY mode, so delete it
-#if defined(FEAT_GUI_MSWIN) & defined(FEAT_TEAROFF)
-	    if (s_tearoffs && menu->children != NULL) // there's a tear bar.
+#如果 defined(FEAT_GUI_MSWIN) & defined(FEAT_TEAROFF)
+	    如果 (s_tearoffs && menu->children != NULL) // there's a tear bar.
 		free_menu(&menu->children);
 #endif
 	    *menup = menu;
@@ -1045,7 +1045,7 @@ remove_menu(
 	}
     }
 
-    return OK;
+    返回 OK;
 }
 
 /*
@@ -1064,7 +1064,7 @@ remove_winbar(win_T *wp)
     static void
 free_menu(vimmenu_T **menup)
 {
-    int		i;
+    整数		i;
     vimmenu_T	*menu;
 
     menu = *menup;
@@ -1072,7 +1072,7 @@ free_menu(vimmenu_T **menup)
 #ifdef FEAT_GUI
     // Free machine specific menu structures (only when already created)
     // Also may rebuild a tearoff'ed menu
-    if (gui.in_use)
+    如果 (gui.in_use)
 	gui_mch_destroy_menu(menu);
 #endif
 
@@ -1092,7 +1092,7 @@ free_menu(vimmenu_T **menup)
     vim_free(menu->xpm_fname);
 # endif
 #endif
-    for (i = 0; i < MENU_MODES; i++)
+    为 (i = 0; i < MENU_MODES; i++)
 	free_menu_string(menu, i);
     vim_free(menu);
 
@@ -1106,15 +1106,15 @@ free_menu(vimmenu_T **menup)
  * Free the menu->string with the given index.
  */
     static void
-free_menu_string(vimmenu_T *menu, int idx)
+free_menu_string(vimmenu_T *menu, 整数 idx)
 {
-    int		count = 0;
-    int		i;
+    整数		count = 0;
+    整数		i;
 
-    for (i = 0; i < MENU_MODES; i++)
-	if (menu->strings[i] == menu->strings[idx])
+    为 (i = 0; i < MENU_MODES; i++)
+	如果 (menu->strings[i] == menu->strings[idx])
 	    count++;
-    if (count == 1)
+    如果 (count == 1)
 	vim_free(menu->strings[idx]);
     menu->strings[idx] = NULL;
 }
@@ -1122,8 +1122,8 @@ free_menu_string(vimmenu_T *menu, int idx)
 /*
  * Show the mapping associated with a menu item or hierarchy in a sub-menu.
  */
-    static int
-show_menus(char_u *path_name, int modes)
+    static 整数
+show_menus(char_u *path_name, 整数 modes)
 {
     char_u	*p;
     char_u	*name;
@@ -1131,40 +1131,40 @@ show_menus(char_u *path_name, int modes)
     vimmenu_T	*parent = NULL;
 
     name = path_name = vim_strsave(path_name);
-    if (path_name == NULL)
-	return FAIL;
+    如果 (path_name == NULL)
+	返回 FAIL;
     menu = *get_root_menu(path_name);
 
     // First, find the (sub)menu with the given name
-    while (*name)
+    当 (*name)
     {
 	p = menu_name_skip(name);
-	while (menu != NULL)
+	当 (menu != NULL)
 	{
-	    if (menu_name_equal(name, menu))
+	    如果 (menu_name_equal(name, menu))
 	    {
 		// Found menu
-		if (*p != NUL && menu->children == NULL)
+		如果 (*p != NUL && menu->children == NULL)
 		{
 		    emsg(_(e_part_of_menu_item_path_is_not_sub_menu));
 		    vim_free(path_name);
-		    return FAIL;
+		    返回 FAIL;
 		}
-		else if ((menu->modes & modes) == 0x0)
+		否则 如果 ((menu->modes & modes) == 0x0)
 		{
 		    emsg(_(e_menu_only_exists_in_another_mode));
 		    vim_free(path_name);
-		    return FAIL;
+		    返回 FAIL;
 		}
 		break;
 	    }
 	    menu = menu->next;
 	}
-	if (menu == NULL)
+	如果 (menu == NULL)
 	{
 	    semsg(_(e_no_menu_str), name);
 	    vim_free(path_name);
-	    return FAIL;
+	    返回 FAIL;
 	}
 	name = p;
 	parent = menu;
@@ -1180,29 +1180,29 @@ show_menus(char_u *path_name, int modes)
     show_menus_recursive(parent, modes, 0);
 
     --menus_locked;
-    return OK;
+    返回 OK;
 }
 
 /*
  * Recursively show the mappings associated with the menus under the given one
  */
     static void
-show_menus_recursive(vimmenu_T *menu, int modes, int depth)
+show_menus_recursive(vimmenu_T *menu, 整数 modes, 整数 depth)
 {
-    int		i;
-    int		bit;
+    整数		i;
+    整数		bit;
 
-    if (menu != NULL && (menu->modes & modes) == 0x0)
-	return;
+    如果 (menu != NULL && (menu->modes & modes) == 0x0)
+	返回;
 
-    if (menu != NULL)
+    如果 (menu != NULL)
     {
 	msg_putchar('\n');
-	if (got_int)		// "q" hit for "--more--"
-	    return;
-	for (i = 0; i < depth; i++)
+	如果 (got_int)		// "q" hit for "--more--"
+	    返回;
+	为 (i = 0; i < depth; i++)
 	    msg_puts("  ");
-	if (menu->priority)
+	如果 (menu->priority)
 	{
 	    msg_outnum((long)menu->priority);
 	    msg_puts(" ");
@@ -1211,51 +1211,51 @@ show_menus_recursive(vimmenu_T *menu, int modes, int depth)
 	msg_outtrans_attr(menu->name, HL_ATTR(HLF_D));
     }
 
-    if (menu != NULL && menu->children == NULL)
+    如果 (menu != NULL && menu->children == NULL)
     {
-	for (bit = 0; bit < MENU_MODES; bit++)
-	    if ((menu->modes & modes & (1 << bit)) != 0)
+	为 (bit = 0; bit < MENU_MODES; bit++)
+	    如果 ((menu->modes & modes & (1 << bit)) != 0)
 	    {
 		msg_putchar('\n');
-		if (got_int)		// "q" hit for "--more--"
-		    return;
-		for (i = 0; i < depth + 2; i++)
+		如果 (got_int)		// "q" hit for "--more--"
+		    返回;
+		为 (i = 0; i < depth + 2; i++)
 		    msg_puts("  ");
 		msg_puts(menu_mode_chars[bit]);
-		if (menu->noremap[bit] == REMAP_NONE)
+		如果 (menu->noremap[bit] == REMAP_NONE)
 		    msg_putchar('*');
-		else if (menu->noremap[bit] == REMAP_SCRIPT)
+		否则 如果 (menu->noremap[bit] == REMAP_SCRIPT)
 		    msg_putchar('&');
-		else
+		否则
 		    msg_putchar(' ');
-		if (menu->silent[bit])
+		如果 (menu->silent[bit])
 		    msg_putchar('s');
-		else
+		否则
 		    msg_putchar(' ');
-		if ((menu->modes & menu->enabled & (1 << bit)) == 0)
+		如果 ((menu->modes & menu->enabled & (1 << bit)) == 0)
 		    msg_putchar('-');
-		else
+		否则
 		    msg_putchar(' ');
 		msg_puts(" ");
-		if (*menu->strings[bit] == NUL)
+		如果 (*menu->strings[bit] == NUL)
 		    msg_puts_attr("<Nop>", HL_ATTR(HLF_8));
-		else
+		否则
 		    msg_outtrans_special(menu->strings[bit], FALSE, 0);
 	    }
     }
-    else
+    否则
     {
-	if (menu == NULL)
+	如果 (menu == NULL)
 	{
 	    menu = root_menu;
 	    depth--;
 	}
-	else
+	否则
 	    menu = menu->children;
 
 	// recursively show all children.  Skip PopUp[nvoci].
-	for (; menu != NULL && !got_int; menu = menu->next)
-	    if (!menu_is_hidden(menu->dname))
+	为 (; menu != NULL && !got_int; menu = menu->next)
+	    如果 (!menu_is_hidden(menu->dname))
 		show_menus_recursive(menu, modes, depth + 1);
     }
 }
@@ -1265,8 +1265,8 @@ show_menus_recursive(vimmenu_T *menu, int modes, int depth)
  */
 static vimmenu_T	*expand_menu = NULL;
 static vimmenu_T	*expand_menu_alt = NULL;
-static int		expand_modes = 0x0;
-static int		expand_emenu;	// TRUE for ":emenu" command
+static 整数		expand_modes = 0x0;
+static 整数		expand_emenu;	// TRUE for ":emenu" command
 
 /*
  * Work out what to complete when doing command line completion of menu names.
@@ -1276,57 +1276,57 @@ set_context_in_menu_cmd(
     expand_T	*xp,
     char_u	*cmd,
     char_u	*arg,
-    int		forceit)
+    整数		forceit)
 {
     char_u	*after_dot;
     char_u	*p;
     char_u	*path_name = NULL;
     char_u	*name;
-    int		unmenu;
+    整数		unmenu;
     vimmenu_T	*menu;
-    int		expand_menus;
+    整数		expand_menus;
 
     xp->xp_context = EXPAND_UNSUCCESSFUL;
 
 
     // Check for priority numbers, enable and disable
-    for (p = arg; *p; ++p)
-	if (!VIM_ISDIGIT(*p) && *p != '.')
+    为 (p = arg; *p; ++p)
+	如果 (!VIM_ISDIGIT(*p) && *p != '.')
 	    break;
 
-    if (!VIM_ISWHITE(*p))
+    如果 (!VIM_ISWHITE(*p))
     {
-	if (STRNCMP(arg, "enable", 6) == 0
+	如果 (STRNCMP(arg, "enable", 6) == 0
 		&& (arg[6] == NUL ||  VIM_ISWHITE(arg[6])))
 	    p = arg + 6;
-	else if (STRNCMP(arg, "disable", 7) == 0
+	否则 如果 (STRNCMP(arg, "disable", 7) == 0
 		&& (arg[7] == NUL || VIM_ISWHITE(arg[7])))
 	    p = arg + 7;
-	else
+	否则
 	    p = arg;
     }
 
-    while (*p != NUL && VIM_ISWHITE(*p))
+    当 (*p != NUL && VIM_ISWHITE(*p))
 	++p;
 
     arg = after_dot = p;
 
-    for (; *p && !VIM_ISWHITE(*p); ++p)
+    为 (; *p && !VIM_ISWHITE(*p); ++p)
     {
-	if ((*p == '\\' || *p == Ctrl_V) && p[1] != NUL)
+	如果 ((*p == '\\' || *p == Ctrl_V) && p[1] != NUL)
 	    p++;
-	else if (*p == '.')
+	否则 如果 (*p == '.')
 	    after_dot = p + 1;
     }
 
     // ":tearoff" and ":popup" only use menus, not entries
     expand_menus = !((*cmd == 't' && cmd[1] == 'e') || *cmd == 'p');
     expand_emenu = (*cmd == 'e');
-    if (expand_menus && VIM_ISWHITE(*p))
-	return NULL;	// TODO: check for next command?
-    if (*p == NUL)		// Complete the menu name
+    如果 (expand_menus && VIM_ISWHITE(*p))
+	返回 NULL;	// TODO: check for next command?
+    如果 (*p == NUL)		// Complete the menu name
     {
-	int try_alt_menu = TRUE;
+	整数 try_alt_menu = TRUE;
 
 	/*
 	 * With :unmenu, you only want to match menus for the appropriate mode.
@@ -1334,27 +1334,27 @@ set_context_in_menu_cmd(
 	 * one in another mode, so match menus from other modes too.
 	 */
 	expand_modes = get_menu_cmd_modes(cmd, forceit, NULL, &unmenu);
-	if (!unmenu)
+	如果 (!unmenu)
 	    expand_modes = MENU_ALL_MODES;
 
 	menu = root_menu;
-	if (after_dot != arg)
+	如果 (after_dot != arg)
 	{
 	    path_name = alloc(after_dot - arg);
-	    if (path_name == NULL)
-		return NULL;
+	    如果 (path_name == NULL)
+		返回 NULL;
 	    vim_strncpy(path_name, arg, after_dot - arg - 1);
 	}
 	name = path_name;
-	while (name != NULL && *name)
+	当 (name != NULL && *name)
 	{
 	    p = menu_name_skip(name);
-	    while (menu != NULL)
+	    当 (menu != NULL)
 	    {
-		if (menu_name_equal(name, menu))
+		如果 (menu_name_equal(name, menu))
 		{
 		    // Found menu
-		    if ((*p != NUL && menu->children == NULL)
+		    如果 ((*p != NUL && menu->children == NULL)
 			|| ((menu->modes & expand_modes) == 0x0))
 		    {
 			/*
@@ -1362,22 +1362,22 @@ set_context_in_menu_cmd(
 			 * Or menu exists only in another mode.
 			 */
 			vim_free(path_name);
-			return NULL;
+			返回 NULL;
 		    }
 		    break;
 		}
 		menu = menu->next;
-		if (menu == NULL && try_alt_menu)
+		如果 (menu == NULL && try_alt_menu)
 		{
 		    menu = curwin->w_winbar;
 		    try_alt_menu = FALSE;
 		}
 	    }
-	    if (menu == NULL)
+	    如果 (menu == NULL)
 	    {
 		// No menu found with the name we were looking for
 		vim_free(path_name);
-		return NULL;
+		返回 NULL;
 	    }
 	    name = p;
 	    menu = menu->children;
@@ -1388,14 +1388,14 @@ set_context_in_menu_cmd(
 	xp->xp_context = expand_menus ? EXPAND_MENUNAMES : EXPAND_MENUS;
 	xp->xp_pattern = after_dot;
 	expand_menu = menu;
-	if (expand_menu == root_menu)
+	如果 (expand_menu == root_menu)
 	    expand_menu_alt = curwin->w_winbar;
-	else
+	否则
 	    expand_menu_alt = NULL;
     }
-    else			// We're in the mapping part
+    否则			// We're in the mapping part
 	xp->xp_context = EXPAND_NOTHING;
-    return NULL;
+    返回 NULL;
 }
 
 /*
@@ -1403,16 +1403,16 @@ set_context_in_menu_cmd(
  * entries).
  */
     char_u *
-get_menu_name(expand_T *xp UNUSED, int idx)
+get_menu_name(expand_T *xp UNUSED, 整数 idx)
 {
     static vimmenu_T	*menu = NULL;
-    static int		did_alt_menu = FALSE;
+    static 整数		did_alt_menu = FALSE;
     char_u		*str;
 #ifdef FEAT_MULTI_LANG
-    static  int		should_advance = FALSE;
+    static  整数		should_advance = FALSE;
 #endif
 
-    if (idx == 0)	    // first call: start at first item
+    如果 (idx == 0)	    // first call: start at first item
     {
 	menu = expand_menu;
 	did_alt_menu = FALSE;
@@ -1422,45 +1422,45 @@ get_menu_name(expand_T *xp UNUSED, int idx)
     }
 
     // Skip PopUp[nvoci].
-    while (menu != NULL && (menu_is_hidden(menu->dname)
+    当 (menu != NULL && (menu_is_hidden(menu->dname)
 	    || menu_is_separator(menu->dname)
 	    || menu_is_tearoff(menu->dname)
 	    || menu->children == NULL))
     {
 	menu = menu->next;
-	if (menu == NULL && !did_alt_menu)
+	如果 (menu == NULL && !did_alt_menu)
 	{
 	    menu = expand_menu_alt;
 	    did_alt_menu = TRUE;
 	}
     }
 
-    if (menu == NULL)	    // at end of linked list
-	return NULL;
+    如果 (menu == NULL)	    // at end of linked list
+	返回 NULL;
 
-    if (menu->modes & expand_modes)
+    如果 (menu->modes & expand_modes)
 #ifdef FEAT_MULTI_LANG
-	if (should_advance)
+	如果 (should_advance)
 	    str = menu->en_dname;
-	else
+	否则
 	{
 #endif
 	    str = menu->dname;
 #ifdef FEAT_MULTI_LANG
-	    if (menu->en_dname == NULL)
+	    如果 (menu->en_dname == NULL)
 		should_advance = TRUE;
 	}
 #endif
-    else
+    否则
 	str = (char_u *)"";
 
 #ifdef FEAT_MULTI_LANG
-    if (should_advance)
+    如果 (should_advance)
 #endif
     {
 	// Advance to next menu entry.
 	menu = menu->next;
-	if (menu == NULL && !did_alt_menu)
+	如果 (menu == NULL && !did_alt_menu)
 	{
 	    menu = expand_menu_alt;
 	    did_alt_menu = TRUE;
@@ -1471,7 +1471,7 @@ get_menu_name(expand_T *xp UNUSED, int idx)
     should_advance = !should_advance;
 #endif
 
-    return str;
+    返回 str;
 }
 
 /*
@@ -1479,18 +1479,18 @@ get_menu_name(expand_T *xp UNUSED, int idx)
  * entries.
  */
     char_u *
-get_menu_names(expand_T *xp UNUSED, int idx)
+get_menu_names(expand_T *xp UNUSED, 整数 idx)
 {
     static vimmenu_T	*menu = NULL;
-    static int		did_alt_menu = FALSE;
+    static 整数		did_alt_menu = FALSE;
 #define TBUFFER_LEN 256
     static char_u	tbuffer[TBUFFER_LEN]; //hack
     char_u		*str;
 #ifdef FEAT_MULTI_LANG
-    static  int		should_advance = FALSE;
+    static  整数		should_advance = FALSE;
 #endif
 
-    if (idx == 0)	    // first call: start at first item
+    如果 (idx == 0)	    // first call: start at first item
     {
 	menu = expand_menu;
 	did_alt_menu = FALSE;
@@ -1500,7 +1500,7 @@ get_menu_names(expand_T *xp UNUSED, int idx)
     }
 
     // Skip Browse-style entries, popup menus and separators.
-    while (menu != NULL
+    当 (menu != NULL
 	    && (   menu_is_hidden(menu->dname)
 		|| (expand_emenu && menu_is_separator(menu->dname))
 		|| menu_is_tearoff(menu->dname)
@@ -1510,29 +1510,29 @@ get_menu_names(expand_T *xp UNUSED, int idx)
 	       ))
     {
 	menu = menu->next;
-	if (menu == NULL && !did_alt_menu)
+	如果 (menu == NULL && !did_alt_menu)
 	{
 	    menu = expand_menu_alt;
 	    did_alt_menu = TRUE;
 	}
     }
 
-    if (menu == NULL)	    // at end of linked list
-	return NULL;
+    如果 (menu == NULL)	    // at end of linked list
+	返回 NULL;
 
-    if (menu->modes & expand_modes)
+    如果 (menu->modes & expand_modes)
     {
-	if (menu->children != NULL)
+	如果 (menu->children != NULL)
 	{
 #ifdef FEAT_MULTI_LANG
-	    if (should_advance)
+	    如果 (should_advance)
 		vim_strncpy(tbuffer, menu->en_dname, TBUFFER_LEN - 2);
-	    else
+	    否则
 	    {
 #endif
 		vim_strncpy(tbuffer, menu->dname,  TBUFFER_LEN - 2);
 #ifdef FEAT_MULTI_LANG
-		if (menu->en_dname == NULL)
+		如果 (menu->en_dname == NULL)
 		    should_advance = TRUE;
 	    }
 #endif
@@ -1541,32 +1541,32 @@ get_menu_names(expand_T *xp UNUSED, int idx)
 	    STRCAT(tbuffer, "\001");
 	    str = tbuffer;
 	}
-	else
+	否则
 #ifdef FEAT_MULTI_LANG
 	{
-	    if (should_advance)
+	    如果 (should_advance)
 		str = menu->en_dname;
-	    else
+	    否则
 	    {
 #endif
 		str = menu->dname;
 #ifdef FEAT_MULTI_LANG
-		if (menu->en_dname == NULL)
+		如果 (menu->en_dname == NULL)
 		    should_advance = TRUE;
 	    }
 	}
 #endif
     }
-    else
+    否则
 	str = (char_u *)"";
 
 #ifdef FEAT_MULTI_LANG
-    if (should_advance)
+    如果 (should_advance)
 #endif
     {
 	// Advance to next menu entry.
 	menu = menu->next;
-	if (menu == NULL && !did_alt_menu)
+	如果 (menu == NULL && !did_alt_menu)
 	{
 	    menu = expand_menu_alt;
 	    did_alt_menu = TRUE;
@@ -1577,7 +1577,7 @@ get_menu_names(expand_T *xp UNUSED, int idx)
     should_advance = !should_advance;
 #endif
 
-    return str;
+    返回 str;
 }
 
 /*
@@ -1590,45 +1590,45 @@ menu_name_skip(char_u *name)
 {
     char_u  *p;
 
-    for (p = name; *p && *p != '.'; MB_PTR_ADV(p))
+    为 (p = name; *p && *p != '.'; MB_PTR_ADV(p))
     {
-	if (*p == '\\' || *p == Ctrl_V)
+	如果 (*p == '\\' || *p == Ctrl_V)
 	{
 	    STRMOVE(p, p + 1);
-	    if (*p == NUL)
+	    如果 (*p == NUL)
 		break;
 	}
     }
-    if (*p)
+    如果 (*p)
 	*p++ = NUL;
-    return p;
+    返回 p;
 }
 
 /*
  * Return TRUE when "name" matches with menu "menu".  The name is compared in
  * two ways: raw menu name and menu name without '&'.  ignore part after a TAB.
  */
-    static int
+    static 整数
 menu_name_equal(char_u *name, vimmenu_T *menu)
 {
 #ifdef FEAT_MULTI_LANG
-    if (menu->en_name != NULL
+    如果 (menu->en_name != NULL
 	    && (menu_namecmp(name, menu->en_name)
 		|| menu_namecmp(name, menu->en_dname)))
-	return TRUE;
+	返回 TRUE;
 #endif
-    return menu_namecmp(name, menu->name) || menu_namecmp(name, menu->dname);
+    返回 menu_namecmp(name, menu->name) || menu_namecmp(name, menu->dname);
 }
 
-    static int
+    static 整数
 menu_namecmp(char_u *name, char_u *mname)
 {
-    int		i;
+    整数		i;
 
-    for (i = 0; name[i] != NUL && name[i] != TAB; ++i)
-	if (name[i] != mname[i])
+    为 (i = 0; name[i] != NUL && name[i] != TAB; ++i)
+	如果 (name[i] != mname[i])
 	    break;
-    return ((name[i] == NUL || name[i] == TAB)
+    返回 ((name[i] == NUL || name[i] == TAB)
 	    && (mname[i] == NUL || mname[i] == TAB));
 }
 
@@ -1640,14 +1640,14 @@ menu_namecmp(char_u *name, char_u *mname)
  * If "unmenu" is not NULL, then the flag it points to is set according to
  * whether the command is an "unmenu" command.
  */
-    static int
+    static 整数
 get_menu_cmd_modes(
     char_u  *cmd,
-    int	    forceit,	    // Was there a "!" after the command?
-    int	    *noremap,
-    int	    *unmenu)
+    整数	    forceit,	    // Was there a "!" after the command?
+    整数	    *noremap,
+    整数	    *unmenu)
 {
-    int	    modes;
+    整数	    modes;
 
     switch (*cmd++)
     {
@@ -1667,7 +1667,7 @@ get_menu_cmd_modes(
 	    modes = MENU_INSERT_MODE;
 	    break;
 	case 't':
-	    if (*cmd == 'l')		// tlmenu, tlunmenu, tlnoremenu
+	    如果 (*cmd == 'l')		// tlmenu, tlunmenu, tlnoremenu
 	    {
 		modes = MENU_TERMINAL_MODE;
 		++cmd;
@@ -1684,7 +1684,7 @@ get_menu_cmd_modes(
 				    | MENU_OP_PENDING_MODE;
 	    break;
 	case 'n':
-	    if (*cmd != 'o')		// nmenu, not noremenu
+	    如果 (*cmd != 'o')		// nmenu, not noremenu
 	    {
 		modes = MENU_NORMAL_MODE;
 		break;
@@ -1692,18 +1692,18 @@ get_menu_cmd_modes(
 	    // FALLTHROUGH
 	default:
 	    --cmd;
-	    if (forceit)		// menu!!
+	    如果 (forceit)		// menu!!
 		modes = MENU_INSERT_MODE | MENU_CMDLINE_MODE;
-	    else			// menu
+	    否则			// menu
 		modes = MENU_NORMAL_MODE | MENU_VISUAL_MODE | MENU_SELECT_MODE
 						       | MENU_OP_PENDING_MODE;
     }
 
-    if (noremap != NULL)
+    如果 (noremap != NULL)
 	*noremap = (*cmd == 'n' ? REMAP_NONE : REMAP_YES);
-    if (unmenu != NULL)
+    如果 (unmenu != NULL)
 	*unmenu = (*cmd == 'u');
-    return modes;
+    返回 modes;
 }
 
 /*
@@ -1711,42 +1711,42 @@ get_menu_cmd_modes(
  * of get_menu_cmd_modes().
  */
     static char_u *
-get_menu_mode_str(int modes)
+get_menu_mode_str(整数 modes)
 {
-    if ((modes & (MENU_INSERT_MODE | MENU_CMDLINE_MODE | MENU_NORMAL_MODE |
+    如果 ((modes & (MENU_INSERT_MODE | MENU_CMDLINE_MODE | MENU_NORMAL_MODE |
 		  MENU_VISUAL_MODE | MENU_SELECT_MODE | MENU_OP_PENDING_MODE))
 	    == (MENU_INSERT_MODE | MENU_CMDLINE_MODE | MENU_NORMAL_MODE |
 		MENU_VISUAL_MODE | MENU_SELECT_MODE | MENU_OP_PENDING_MODE))
-	return (char_u *)"a";
-    if ((modes & (MENU_NORMAL_MODE | MENU_VISUAL_MODE | MENU_SELECT_MODE |
+	返回 (char_u *)"a";
+    如果 ((modes & (MENU_NORMAL_MODE | MENU_VISUAL_MODE | MENU_SELECT_MODE |
 		  MENU_OP_PENDING_MODE))
 	    == (MENU_NORMAL_MODE | MENU_VISUAL_MODE | MENU_SELECT_MODE |
 		MENU_OP_PENDING_MODE))
-	return (char_u *)" ";
-    if ((modes & (MENU_INSERT_MODE | MENU_CMDLINE_MODE))
+	返回 (char_u *)" ";
+    如果 ((modes & (MENU_INSERT_MODE | MENU_CMDLINE_MODE))
 	    == (MENU_INSERT_MODE | MENU_CMDLINE_MODE))
-	return (char_u *)"!";
-    if ((modes & (MENU_VISUAL_MODE | MENU_SELECT_MODE))
+	返回 (char_u *)"!";
+    如果 ((modes & (MENU_VISUAL_MODE | MENU_SELECT_MODE))
 	    == (MENU_VISUAL_MODE | MENU_SELECT_MODE))
-	return (char_u *)"v";
-    if (modes & MENU_VISUAL_MODE)
-	return (char_u *)"x";
-    if (modes & MENU_SELECT_MODE)
-	return (char_u *)"s";
-    if (modes & MENU_OP_PENDING_MODE)
-	return (char_u *)"o";
-    if (modes & MENU_INSERT_MODE)
-	return (char_u *)"i";
-    if (modes & MENU_TERMINAL_MODE)
-	return (char_u *)"tl";
-    if (modes & MENU_CMDLINE_MODE)
-	return (char_u *)"c";
-    if (modes & MENU_NORMAL_MODE)
-	return (char_u *)"n";
-    if (modes & MENU_TIP_MODE)
-	return (char_u *)"t";
+	返回 (char_u *)"v";
+    如果 (modes & MENU_VISUAL_MODE)
+	返回 (char_u *)"x";
+    如果 (modes & MENU_SELECT_MODE)
+	返回 (char_u *)"s";
+    如果 (modes & MENU_OP_PENDING_MODE)
+	返回 (char_u *)"o";
+    如果 (modes & MENU_INSERT_MODE)
+	返回 (char_u *)"i";
+    如果 (modes & MENU_TERMINAL_MODE)
+	返回 (char_u *)"tl";
+    如果 (modes & MENU_CMDLINE_MODE)
+	返回 (char_u *)"c";
+    如果 (modes & MENU_NORMAL_MODE)
+	返回 (char_u *)"n";
+    如果 (modes & MENU_TIP_MODE)
+	返回 (char_u *)"t";
 
-    return (char_u *)"";
+    返回 (char_u *)"";
 }
 
 /*
@@ -1754,62 +1754,62 @@ get_menu_mode_str(int modes)
  * Returns the name in allocated memory (NULL for failure).
  */
     static char_u *
-popup_mode_name(char_u *name, int idx)
+popup_mode_name(char_u *name, 整数 idx)
 {
     char_u	*p;
-    int		len = (int)STRLEN(name);
+    整数		len = (整数)STRLEN(name);
     char	*mode_chars = menu_mode_chars[idx];
-    int		mode_chars_len = (int)strlen(mode_chars);
-    int		i;
+    整数		mode_chars_len = (整数)strlen(mode_chars);
+    整数		i;
 
     p = vim_strnsave(name, len + mode_chars_len);
-    if (p == NULL)
-	return NULL;
+    如果 (p == NULL)
+	返回 NULL;
 
     mch_memmove(p + 5 + mode_chars_len, p + 5, (size_t)(len - 4));
-    for (i = 0; i < mode_chars_len; ++i)
+    为 (i = 0; i < mode_chars_len; ++i)
 	p[5 + i] = menu_mode_chars[idx][i];
-    return p;
+    返回 p;
 }
 
-#if defined(FEAT_GUI)
+#如果 defined(FEAT_GUI)
 /*
  * Return the index into the menu->strings or menu->noremap arrays for the
  * current state.  Returns MENU_INDEX_INVALID if there is no mapping for the
  * given menu in the current mode.
  */
-    int
-get_menu_index(vimmenu_T *menu, int state)
+    整数
+get_menu_index(vimmenu_T *menu, 整数 state)
 {
-    int		idx;
+    整数		idx;
 
-    if ((state & MODE_INSERT))
+    如果 ((state & MODE_INSERT))
 	idx = MENU_INDEX_INSERT;
-    else if (state & MODE_CMDLINE)
+    否则 如果 (state & MODE_CMDLINE)
 	idx = MENU_INDEX_CMDLINE;
 # ifdef FEAT_TERMINAL
-    else if (term_use_loop())
+    否则 如果 (term_use_loop())
 	idx = MENU_INDEX_TERMINAL;
 # endif
-    else if (VIsual_active)
+    否则 如果 (VIsual_active)
     {
-	if (VIsual_select)
+	如果 (VIsual_select)
 	    idx = MENU_INDEX_SELECT;
-	else
+	否则
 	    idx = MENU_INDEX_VISUAL;
     }
-    else if (state == MODE_HITRETURN || state == MODE_ASKMORE)
+    否则 如果 (state == MODE_HITRETURN || state == MODE_ASKMORE)
 	idx = MENU_INDEX_CMDLINE;
-    else if (finish_op)
+    否则 如果 (finish_op)
 	idx = MENU_INDEX_OP_PENDING;
-    else if ((state & MODE_NORMAL))
+    否则 如果 ((state & MODE_NORMAL))
 	idx = MENU_INDEX_NORMAL;
-    else
+    否则
 	idx = MENU_INDEX_INVALID;
 
-    if (idx != MENU_INDEX_INVALID && menu->strings[idx] == NULL)
+    如果 (idx != MENU_INDEX_INVALID && menu->strings[idx] == NULL)
 	idx = MENU_INDEX_INVALID;
-    return idx;
+    返回 idx;
 }
 #endif
 
@@ -1821,34 +1821,34 @@ get_menu_index(vimmenu_T *menu, int state)
  * If actext != NULL, *actext is set to the text after the first TAB.
  */
     static char_u *
-menu_text(char_u *str, int *mnemonic, char_u **actext)
+menu_text(char_u *str, 整数 *mnemonic, char_u **actext)
 {
     char_u	*p;
     char_u	*text;
 
     // Locate accelerator text, after the first TAB
     p = vim_strchr(str, TAB);
-    if (p != NULL)
+    如果 (p != NULL)
     {
-	if (actext != NULL)
+	如果 (actext != NULL)
 	    *actext = vim_strsave(p + 1);
 	text = vim_strnsave(str, p - str);
     }
-    else
+    否则
 	text = vim_strsave(str);
 
     // Find mnemonic characters "&a" and reduce "&&" to "&".
-    for (p = text; p != NULL; )
+    为 (p = text; p != NULL; )
     {
 	p = vim_strchr(p, '&');
-	if (p != NULL)
+	如果 (p != NULL)
 	{
-	    if (p[1] == NUL)	    // trailing "&"
+	    如果 (p[1] == NUL)	    // trailing "&"
 		break;
-	    if (mnemonic != NULL && p[1] != '&')
-#if !defined(__MVS__) || defined(MOTIF390_MNEMONIC_FIXED)
+	    如果 (mnemonic != NULL && p[1] != '&')
+#如果 !defined(__MVS__) || defined(MOTIF390_MNEMONIC_FIXED)
 		*mnemonic = p[1];
-#else
+#否则
 	    {
 		/*
 		 * Well there is a bug in the Motif libraries on OS390 Unix.
@@ -1865,16 +1865,16 @@ menu_text(char_u *str, int *mnemonic, char_u **actext)
 	    p = p + 1;
 	}
     }
-    return text;
+    返回 text;
 }
 
 /*
  * Return TRUE if "name" can be a menu in the MenuBar.
  */
-    int
+    整数
 menu_is_menubar(char_u *name)
 {
-    return (!menu_is_popup(name)
+    返回 (!menu_is_popup(name)
 	    && !menu_is_toolbar(name)
 	    && !menu_is_winbar(name)
 	    && *name != MNU_HIDDEN_CHAR);
@@ -1883,103 +1883,103 @@ menu_is_menubar(char_u *name)
 /*
  * Return TRUE if "name" is a popup menu name.
  */
-    int
+    整数
 menu_is_popup(char_u *name)
 {
-    return (STRNCMP(name, "PopUp", 5) == 0);
+    返回 (STRNCMP(name, "PopUp", 5) == 0);
 }
 
-#if defined(FEAT_GUI_MOTIF) && (XmVersion <= 1002)
+#如果 defined(FEAT_GUI_MOTIF) && (XmVersion <= 1002)
 /*
  * Return TRUE if "name" is part of a popup menu.
  */
-    int
+    整数
 menu_is_child_of_popup(vimmenu_T *menu)
 {
-    while (menu->parent != NULL)
+    当 (menu->parent != NULL)
 	menu = menu->parent;
-    return menu_is_popup(menu->name);
+    返回 menu_is_popup(menu->name);
 }
 #endif
 
 /*
  * Return TRUE if "name" is a toolbar menu name.
  */
-    int
+    整数
 menu_is_toolbar(char_u *name)
 {
-    return (STRNCMP(name, "ToolBar", 7) == 0);
+    返回 (STRNCMP(name, "ToolBar", 7) == 0);
 }
 
 /*
  * Return TRUE if the name is a menu separator identifier: Starts and ends
  * with '-'
  */
-    int
+    整数
 menu_is_separator(char_u *name)
 {
-    return (name[0] == '-' && name[STRLEN(name) - 1] == '-');
+    返回 (name[0] == '-' && name[STRLEN(name) - 1] == '-');
 }
 
 /*
  * Return TRUE if the menu is hidden:  Starts with ']'
  */
-    static int
+    static 整数
 menu_is_hidden(char_u *name)
 {
-    return (name[0] == ']') || (menu_is_popup(name) && name[5] != NUL);
+    返回 (name[0] == ']') || (menu_is_popup(name) && name[5] != NUL);
 }
 
 /*
  * Return TRUE if the menu is the tearoff menu.
  */
-    static int
+    static 整数
 menu_is_tearoff(char_u *name UNUSED)
 {
 #ifdef FEAT_GUI
-    return (STRCMP(name, TEAR_STRING) == 0);
-#else
-    return FALSE;
+    返回 (STRCMP(name, TEAR_STRING) == 0);
+#否则
+    返回 FALSE;
 #endif
 }
 
-#if defined(FEAT_GUI) || defined(FEAT_TERM_POPUP_MENU)
+#如果 defined(FEAT_GUI) || defined(FEAT_TERM_POPUP_MENU)
 
-    static int
+    static 整数
 get_menu_mode(void)
 {
 # ifdef FEAT_TERMINAL
-    if (term_use_loop())
-	return MENU_INDEX_TERMINAL;
+    如果 (term_use_loop())
+	返回 MENU_INDEX_TERMINAL;
 # endif
-    if (VIsual_active)
+    如果 (VIsual_active)
     {
-	if (VIsual_select)
-	    return MENU_INDEX_SELECT;
-	return MENU_INDEX_VISUAL;
+	如果 (VIsual_select)
+	    返回 MENU_INDEX_SELECT;
+	返回 MENU_INDEX_VISUAL;
     }
-    if (State & MODE_INSERT)
-	return MENU_INDEX_INSERT;
-    if ((State & MODE_CMDLINE) || State == MODE_ASKMORE
+    如果 (State & MODE_INSERT)
+	返回 MENU_INDEX_INSERT;
+    如果 ((State & MODE_CMDLINE) || State == MODE_ASKMORE
 						    || State == MODE_HITRETURN)
-	return MENU_INDEX_CMDLINE;
-    if (finish_op)
-	return MENU_INDEX_OP_PENDING;
-    if (State & MODE_NORMAL)
-	return MENU_INDEX_NORMAL;
-    if (State & MODE_LANGMAP)	// must be a "r" command, like Insert mode
-	return MENU_INDEX_INSERT;
-    return MENU_INDEX_INVALID;
+	返回 MENU_INDEX_CMDLINE;
+    如果 (finish_op)
+	返回 MENU_INDEX_OP_PENDING;
+    如果 (State & MODE_NORMAL)
+	返回 MENU_INDEX_NORMAL;
+    如果 (State & MODE_LANGMAP)	// must be a "r" command, like Insert mode
+	返回 MENU_INDEX_INSERT;
+    返回 MENU_INDEX_INVALID;
 }
 
-    int
+    整数
 get_menu_mode_flag(void)
 {
-    int mode = get_menu_mode();
+    整数 mode = get_menu_mode();
 
-    if (mode == MENU_INDEX_INVALID)
-	return 0;
-    return 1 << mode;
+    如果 (mode == MENU_INDEX_INVALID)
+	返回 0;
+    返回 1 << mode;
 }
 
 /*
@@ -1991,28 +1991,28 @@ get_menu_mode_flag(void)
 show_popupmenu(void)
 {
     vimmenu_T	*menu;
-    int		menu_mode;
+    整数		menu_mode;
     char*	mode;
-    int		mode_len;
+    整数		mode_len;
 
     menu_mode = get_menu_mode();
-    if (menu_mode == MENU_INDEX_INVALID)
-	return;
+    如果 (menu_mode == MENU_INDEX_INVALID)
+	返回;
     mode = menu_mode_chars[menu_mode];
-    mode_len = (int)strlen(mode);
+    mode_len = (整数)strlen(mode);
 
     apply_autocmds(EVENT_MENUPOPUP, (char_u*)mode, NULL, FALSE, curbuf);
 
     FOR_ALL_MENUS(menu)
-	if (STRNCMP("PopUp", menu->name, 5) == 0 && STRNCMP(menu->name + 5, mode, mode_len) == 0)
+	如果 (STRNCMP("PopUp", menu->name, 5) == 0 && STRNCMP(menu->name + 5, mode, mode_len) == 0)
 	    break;
 
     // Only show a popup when it is defined and has entries
-    if (menu == NULL || menu->children == NULL)
-	return;
+    如果 (menu == NULL || menu->children == NULL)
+	返回;
 
-# if defined(FEAT_GUI)
-    if (gui.in_use)
+# 如果 defined(FEAT_GUI)
+    如果 (gui.in_use)
     {
 	// Update the menus now, in case the MenuPopup autocommand did
 	// anything.
@@ -2020,16 +2020,16 @@ show_popupmenu(void)
 	gui_mch_show_popupmenu(menu);
     }
 # endif
-# if defined(FEAT_GUI) && defined(FEAT_TERM_POPUP_MENU)
-    else
+# 如果 defined(FEAT_GUI) && defined(FEAT_TERM_POPUP_MENU)
+    否则
 # endif
-# if defined(FEAT_TERM_POPUP_MENU)
+# 如果 defined(FEAT_TERM_POPUP_MENU)
 	pum_show_popupmenu(menu);
 # endif
 }
 #endif
 
-#if defined(FEAT_GUI)
+#如果 defined(FEAT_GUI)
 
 /*
  * Check that a pointer appears in the menu tree.  Used to protect from using
@@ -2037,17 +2037,17 @@ show_popupmenu(void)
  * handled.
  * Return OK or FAIL.  Used recursively.
  */
-    int
+    整数
 check_menu_pointer(vimmenu_T *root, vimmenu_T *menu_to_check)
 {
     vimmenu_T	*p;
 
-    for (p = root; p != NULL; p = p->next)
-	if (p == menu_to_check
+    为 (p = root; p != NULL; p = p->next)
+	如果 (p == menu_to_check
 		|| (p->children != NULL
 		    && check_menu_pointer(p->children, menu_to_check) == OK))
-	    return OK;
-    return FAIL;
+	    返回 OK;
+    返回 FAIL;
 }
 
 /*
@@ -2060,19 +2060,19 @@ check_menu_pointer(vimmenu_T *root, vimmenu_T *menu_to_check)
     void
 gui_create_initial_menus(vimmenu_T *menu)
 {
-    int		idx = 0;
+    整数		idx = 0;
 
-    while (menu != NULL)
+    当 (menu != NULL)
     {
 	// Don't add a menu when only a tip was defined.
-	if (menu->modes & MENU_ALL_MODES)
+	如果 (menu->modes & MENU_ALL_MODES)
 	{
-	    if (menu->children != NULL)
+	    如果 (menu->children != NULL)
 	    {
 		gui_mch_add_menu(menu, idx);
 		gui_create_initial_menus(menu->children);
 	    }
-	    else
+	    否则
 		gui_mch_add_menu_item(menu, idx);
 	}
 	menu = menu->next;
@@ -2084,30 +2084,30 @@ gui_create_initial_menus(vimmenu_T *menu)
  * Used recursively by gui_update_menus (see below)
  */
     static void
-gui_update_menus_recurse(vimmenu_T *menu, int mode)
+gui_update_menus_recurse(vimmenu_T *menu, 整数 mode)
 {
-    int		grey;
+    整数		grey;
 
-    while (menu)
+    当 (menu)
     {
-	if ((menu->modes & menu->enabled & mode)
-# if defined(FEAT_GUI_MSWIN) && defined(FEAT_TEAROFF)
+	如果 ((menu->modes & menu->enabled & mode)
+# 如果 defined(FEAT_GUI_MSWIN) && defined(FEAT_TEAROFF)
 		|| menu_is_tearoff(menu->dname)
 # endif
 	   )
 	    grey = FALSE;
-	else
+	否则
 	    grey = TRUE;
 
 	// Never hide a toplevel menu, it may make the menubar resize or
 	// disappear. Same problem for ToolBar items.
-	if (vim_strchr(p_go, GO_GREY) != NULL || menu->parent == NULL
+	如果 (vim_strchr(p_go, GO_GREY) != NULL || menu->parent == NULL
 # ifdef FEAT_TOOLBAR
 		|| menu_is_toolbar(menu->parent->name)
 # endif
 		   )
 	    gui_mch_menu_grey(menu, grey);
-	else
+	否则
 	    gui_mch_menu_hidden(menu, grey);
 	gui_update_menus_recurse(menu->children, mode);
 	menu = menu->next;
@@ -2120,17 +2120,17 @@ gui_update_menus_recurse(vimmenu_T *menu, int mode)
  * since last time.  If "modes" is not 0, then we use these modes instead.
  */
     void
-gui_update_menus(int modes)
+gui_update_menus(整数 modes)
 {
-    static int	    prev_mode = -1;
-    int		    mode = 0;
+    static 整数	    prev_mode = -1;
+    整数		    mode = 0;
 
-    if (modes != 0x0)
+    如果 (modes != 0x0)
 	mode = modes;
-    else
+    否则
 	mode = get_menu_mode_flag();
 
-    if (force_menu_update || mode != prev_mode)
+    如果 (force_menu_update || mode != prev_mode)
     {
 	gui_update_menus_recurse(root_menu, mode);
 	gui_mch_draw_menubar();
@@ -2139,29 +2139,29 @@ gui_update_menus(int modes)
     }
 }
 
-# if defined(FEAT_GUI_MSWIN) || defined(FEAT_GUI_MOTIF) \
+# 如果 defined(FEAT_GUI_MSWIN) || defined(FEAT_GUI_MOTIF) \
     || defined(FEAT_GUI_GTK) || defined(FEAT_GUI_PHOTON)
 /*
  * Check if a key is used as a mnemonic for a toplevel menu.
  * Case of the key is ignored.
  */
-    int
-gui_is_menu_shortcut(int key)
+    整数
+gui_is_menu_shortcut(整数 key)
 {
     vimmenu_T	*menu;
 
-    if (key < 256)
+    如果 (key < 256)
 	key = TOLOWER_LOC(key);
     FOR_ALL_MENUS(menu)
-	if (menu->mnemonic == key
+	如果 (menu->mnemonic == key
 		|| (menu->mnemonic < 256 && TOLOWER_LOC(menu->mnemonic) == key))
-	    return TRUE;
-    return FALSE;
+	    返回 TRUE;
+    返回 FALSE;
 }
 # endif
 #endif // FEAT_GUI
 
-#if defined(FEAT_GUI_MSWIN) && defined(FEAT_TEAROFF)
+#如果 defined(FEAT_GUI_MSWIN) && defined(FEAT_TEAROFF)
 
 /*
  * Deal with tearoff items that are added like a menu item.
@@ -2169,19 +2169,19 @@ gui_is_menu_shortcut(int key)
  */
 
     void
-gui_mch_toggle_tearoffs(int enable)
+gui_mch_toggle_tearoffs(整数 enable)
 {
-    int		pri_tab[MENUDEPTH + 1];
-    int		i;
+    整数		pri_tab[MENUDEPTH + 1];
+    整数		i;
 
-    if (enable)
+    如果 (enable)
     {
-	for (i = 0; i < MENUDEPTH; ++i)
+	为 (i = 0; i < MENUDEPTH; ++i)
 	    pri_tab[i] = 500;
 	pri_tab[MENUDEPTH] = -1;
 	gui_create_tearoffs_recurse(root_menu, (char_u *)"", pri_tab, 0);
     }
-    else
+    否则
 	gui_destroy_tearoffs_recurse(root_menu);
     s_tearoffs = enable;
 }
@@ -2193,41 +2193,41 @@ gui_mch_toggle_tearoffs(int enable)
 gui_create_tearoffs_recurse(
     vimmenu_T		*menu,
     const char_u	*pname,
-    int			*pri_tab,
-    int			pri_idx)
+    整数			*pri_tab,
+    整数			pri_idx)
 {
     char_u	*newpname = NULL;
-    int		len;
+    整数		len;
     char_u	*s;
     char_u	*d;
 
-    if (pri_tab[pri_idx + 1] != -1)
+    如果 (pri_tab[pri_idx + 1] != -1)
 	++pri_idx;
-    while (menu != NULL)
+    当 (menu != NULL)
     {
-	if (menu->children != NULL && menu_is_menubar(menu->name))
+	如果 (menu->children != NULL && menu_is_menubar(menu->name))
 	{
 	    // Add the menu name to the menu path.  Insert a backslash before
 	    // dots (it's used to separate menu names).
-	    len = (int)STRLEN(pname) + (int)STRLEN(menu->name);
-	    for (s = menu->name; *s; ++s)
-		if (*s == '.' || *s == '\\')
+	    len = (整数)STRLEN(pname) + (整数)STRLEN(menu->name);
+	    为 (s = menu->name; *s; ++s)
+		如果 (*s == '.' || *s == '\\')
 		    ++len;
 	    newpname = alloc(len + TEAR_LEN + 2);
-	    if (newpname != NULL)
+	    如果 (newpname != NULL)
 	    {
 		STRCPY(newpname, pname);
 		d = newpname + STRLEN(newpname);
-		for (s = menu->name; *s; ++s)
+		为 (s = menu->name; *s; ++s)
 		{
-		    if (*s == '.' || *s == '\\')
+		    如果 (*s == '.' || *s == '\\')
 			*d++ = '\\';
 		    *d++ = *s;
 		}
 		*d = NUL;
 
 		// check if tearoff already exists
-		if (STRCMP(menu->children->name, TEAR_STRING) != 0)
+		如果 (STRCMP(menu->children->name, TEAR_STRING) != 0)
 		{
 		    gui_add_tearoff(newpname, pri_tab, pri_idx - 1);
 		    *d = NUL;			// remove TEAR_STRING
@@ -2248,15 +2248,15 @@ gui_create_tearoffs_recurse(
  * "tearpath" is the menu path, and must have room to add TEAR_STRING.
  */
     static void
-gui_add_tearoff(char_u *tearpath, int *pri_tab, int pri_idx)
+gui_add_tearoff(char_u *tearpath, 整数 *pri_tab, 整数 pri_idx)
 {
     char_u	*tbuf;
-    int		t;
+    整数		t;
     vimmenu_T	menuarg;
 
-    tbuf = alloc(5 + (unsigned int)STRLEN(tearpath));
-    if (tbuf == NULL)
-	return;
+    tbuf = alloc(5 + (unsigned 整数)STRLEN(tearpath));
+    如果 (tbuf == NULL)
+	返回;
 
     tbuf[0] = K_SPECIAL;
     tbuf[1] = K_SECOND(K_TEAROFF);
@@ -2296,17 +2296,17 @@ gui_add_tearoff(char_u *tearpath, int *pri_tab, int pri_idx)
     static void
 gui_destroy_tearoffs_recurse(vimmenu_T *menu)
 {
-    while (menu)
+    当 (menu)
     {
-	if (menu->children)
+	如果 (menu->children)
 	{
 	    // check if tearoff exists
-	    if (STRCMP(menu->children->name, TEAR_STRING) == 0)
+	    如果 (STRCMP(menu->children->name, TEAR_STRING) == 0)
 	    {
 		// Disconnect the item and free the memory
 		free_menu(&menu->children);
 	    }
-	    if (menu->children != NULL) // if not the last one
+	    如果 (menu->children != NULL) // if not the last one
 		gui_destroy_tearoffs_recurse(menu->children);
 	}
 	menu = menu->next;
@@ -2322,28 +2322,28 @@ gui_destroy_tearoffs_recurse(vimmenu_T *menu)
  * on the current state.
  */
     void
-execute_menu(exarg_T *eap, vimmenu_T *menu, int mode_idx)
+execute_menu(exarg_T *eap, vimmenu_T *menu, 整数 mode_idx)
 {
-    int		idx = mode_idx;
+    整数		idx = mode_idx;
 
-    if (idx < 0)
+    如果 (idx < 0)
     {
 	// Use the Insert mode entry when returning to Insert mode.
-	if (restart_edit && current_sctx.sc_sid == 0)
+	如果 (restart_edit && current_sctx.sc_sid == 0)
 	{
 	    idx = MENU_INDEX_INSERT;
 	}
 #ifdef FEAT_TERMINAL
-	else if (term_use_loop())
+	否则 如果 (term_use_loop())
 	{
 	    idx = MENU_INDEX_TERMINAL;
 	}
 #endif
-	else if (VIsual_active)
+	否则 如果 (VIsual_active)
 	{
 	    idx = MENU_INDEX_VISUAL;
 	}
-	else if (eap != NULL && eap->addr_count)
+	否则 如果 (eap != NULL && eap->addr_count)
 	{
 	    pos_T	tpos;
 
@@ -2353,7 +2353,7 @@ execute_menu(exarg_T *eap, vimmenu_T *menu, int mode_idx)
 	    // quick way of detecting whether we are doing this from a
 	    // selection - see if the range matches up with the visual
 	    // select start and end.
-	    if ((curbuf->b_visual.vi_start.lnum == eap->line1)
+	    如果 ((curbuf->b_visual.vi_start.lnum == eap->line1)
 		    && (curbuf->b_visual.vi_end.lnum) == eap->line2)
 	    {
 		// Set it up for visual mode - equivalent to gv.
@@ -2362,7 +2362,7 @@ execute_menu(exarg_T *eap, vimmenu_T *menu, int mode_idx)
 		curwin->w_cursor = curbuf->b_visual.vi_start;
 		curwin->w_curswant = curbuf->b_visual.vi_curswant;
 	    }
-	    else
+	    否则
 	    {
 		// Set it up for line-wise visual mode
 		VIsual_mode = 'V';
@@ -2384,36 +2384,36 @@ execute_menu(exarg_T *eap, vimmenu_T *menu, int mode_idx)
 
 	    // Adjust the cursor to make sure it is in the correct pos
 	    // for exclusive mode
-	    if (*p_sel == 'e' && gchar_cursor() != NUL)
+	    如果 (*p_sel == 'e' && gchar_cursor() != NUL)
 		++curwin->w_cursor.col;
 	}
     }
 
     // For the WinBar menu always use the Normal mode menu.
-    if (idx == MENU_INDEX_INVALID || eap == NULL)
+    如果 (idx == MENU_INDEX_INVALID || eap == NULL)
 	idx = MENU_INDEX_NORMAL;
 
-    if (menu->strings[idx] != NULL && (menu->modes & (1 << idx)))
+    如果 (menu->strings[idx] != NULL && (menu->modes & (1 << idx)))
     {
 	// When executing a script or function execute the commands right now.
 	// Also for the window toolbar.
 	// Otherwise put them in the typeahead buffer.
-	if (eap == NULL || current_sctx.sc_sid != 0)
+	如果 (eap == NULL || current_sctx.sc_sid != 0)
 	{
 	    save_state_T save_state;
 
 	    ++ex_normal_busy;
-	    if (save_current_state(&save_state))
+	    如果 (save_current_state(&save_state))
 		exec_normal_cmd(menu->strings[idx], menu->noremap[idx],
 							   menu->silent[idx]);
 	    restore_current_state(&save_state);
 	    --ex_normal_busy;
 	}
-	else
+	否则
 	    ins_typebuf(menu->strings[idx], menu->noremap[idx], 0,
 						     TRUE, menu->silent[idx]);
     }
-    else if (eap != NULL)
+    否则 如果 (eap != NULL)
     {
 	char_u	*mode;
 
@@ -2456,30 +2456,30 @@ menu_getbyname(char_u *name_arg)
     char_u	*saved_name;
     vimmenu_T	*menu;
     char_u	*p;
-    int		gave_emsg = FALSE;
+    整数		gave_emsg = FALSE;
 
     saved_name = vim_strsave(name_arg);
-    if (saved_name == NULL)
-	return NULL;
+    如果 (saved_name == NULL)
+	返回 NULL;
 
     menu = *get_root_menu(saved_name);
     name = saved_name;
-    while (*name)
+    当 (*name)
     {
 	// Find in the menu hierarchy
 	p = menu_name_skip(name);
 
-	while (menu != NULL)
+	当 (menu != NULL)
 	{
-	    if (menu_name_equal(name, menu))
+	    如果 (menu_name_equal(name, menu))
 	    {
-		if (*p == NUL && menu->children != NULL)
+		如果 (*p == NUL && menu->children != NULL)
 		{
 		    emsg(_(e_menu_path_must_lead_to_menu_item));
 		    gave_emsg = TRUE;
 		    menu = NULL;
 		}
-		else if (*p != NUL && menu->children == NULL)
+		否则 如果 (*p != NUL && menu->children == NULL)
 		{
 		    emsg(_(e_part_of_menu_item_path_is_not_sub_menu));
 		    menu = NULL;
@@ -2488,20 +2488,20 @@ menu_getbyname(char_u *name_arg)
 	    }
 	    menu = menu->next;
 	}
-	if (menu == NULL || *p == NUL)
+	如果 (menu == NULL || *p == NUL)
 	    break;
 	menu = menu->children;
 	name = p;
     }
     vim_free(saved_name);
-    if (menu == NULL)
+    如果 (menu == NULL)
     {
-	if (!gave_emsg)
+	如果 (!gave_emsg)
 	    semsg(_(e_menu_not_found_str), name_arg);
-	return NULL;
+	返回 NULL;
     }
 
-    return menu;
+    返回 menu;
 }
 
 /*
@@ -2513,9 +2513,9 @@ ex_emenu(exarg_T *eap)
 {
     vimmenu_T	*menu;
     char_u	*arg = eap->arg;
-    int		mode_idx = MENU_INDEX_INVALID;
+    整数		mode_idx = MENU_INDEX_INVALID;
 
-    if (arg[0] && VIM_ISWHITE(arg[1]))
+    如果 (arg[0] && VIM_ISWHITE(arg[1]))
     {
 	switch (arg[0])
 	{
@@ -2527,14 +2527,14 @@ ex_emenu(exarg_T *eap)
 	    case 'i': mode_idx = MENU_INDEX_INSERT; break;
 	    case 'c': mode_idx = MENU_INDEX_CMDLINE; break;
 	    default: semsg(_(e_invalid_argument_str), arg);
-		     return;
+		     返回;
 	}
 	arg = skipwhite(arg + 2);
     }
 
     menu = menu_getbyname(arg);
-    if (menu == NULL)
-	return;
+    如果 (menu == NULL)
+	返回;
 
     // Found the menu, so execute.
     execute_menu(eap, menu, mode_idx);
@@ -2544,26 +2544,26 @@ ex_emenu(exarg_T *eap)
  * Handle a click in the window toolbar of "wp" at column "col".
  */
     void
-winbar_click(win_T *wp, int col)
+winbar_click(win_T *wp, 整数 col)
 {
-    int		idx;
+    整数		idx;
 
-    if (wp->w_winbar_items == NULL)
-	return;
-    for (idx = 0; wp->w_winbar_items[idx].wb_menu != NULL; ++idx)
+    如果 (wp->w_winbar_items == NULL)
+	返回;
+    为 (idx = 0; wp->w_winbar_items[idx].wb_menu != NULL; ++idx)
     {
 	winbar_item_T *item = &wp->w_winbar_items[idx];
 
-	if (col >= item->wb_startcol && col <= item->wb_endcol)
+	如果 (col >= item->wb_startcol && col <= item->wb_endcol)
 	{
 	    win_T   *save_curwin = NULL;
 	    pos_T   save_visual = VIsual;
-	    int	    save_visual_active = VIsual_active;
-	    int	    save_visual_select = VIsual_select;
-	    int	    save_visual_reselect = VIsual_reselect;
-	    int	    save_visual_mode = VIsual_mode;
+	    整数	    save_visual_active = VIsual_active;
+	    整数	    save_visual_select = VIsual_select;
+	    整数	    save_visual_reselect = VIsual_reselect;
+	    整数	    save_visual_mode = VIsual_mode;
 
-	    if (wp != curwin)
+	    如果 (wp != curwin)
 	    {
 		// Clicking in the window toolbar of a not-current window.
 		// Make that window the current one and save Visual mode.
@@ -2577,7 +2577,7 @@ winbar_click(win_T *wp, int col)
 	    // Note: the command might close the current window.
 	    execute_menu(NULL, item->wb_menu, -1);
 
-	    if (save_curwin != NULL && win_valid(save_curwin))
+	    如果 (save_curwin != NULL && win_valid(save_curwin))
 	    {
 		curwin = save_curwin;
 		curbuf = curwin->w_buffer;
@@ -2587,13 +2587,13 @@ winbar_click(win_T *wp, int col)
 		VIsual_reselect = save_visual_reselect;
 		VIsual_mode = save_visual_mode;
 	    }
-	    if (!win_valid(wp))
+	    如果 (!win_valid(wp))
 		break;
 	}
     }
 }
 
-#if defined(FEAT_GUI_MSWIN) || defined(FEAT_GUI_GTK) \
+#如果 defined(FEAT_GUI_MSWIN) || defined(FEAT_GUI_GTK) \
 	|| defined(FEAT_TERM_POPUP_MENU) || defined(FEAT_GUI_HAIKU) \
 	|| defined(FEAT_BEVAL_TIP)
 /*
@@ -2610,36 +2610,36 @@ gui_find_menu(char_u *path_name)
     menu = *get_root_menu(path_name);
 
     saved_name = vim_strsave(path_name);
-    if (saved_name == NULL)
-	return NULL;
+    如果 (saved_name == NULL)
+	返回 NULL;
 
     name = saved_name;
-    while (*name)
+    当 (*name)
     {
 	// find the end of one dot-separated name and put a NUL at the dot
 	p = menu_name_skip(name);
 
-	while (menu != NULL)
+	当 (menu != NULL)
 	{
-	    if (menu_name_equal(name, menu))
+	    如果 (menu_name_equal(name, menu))
 	    {
-		if (menu->children == NULL)
+		如果 (menu->children == NULL)
 		{
 		    // found a menu item instead of a sub-menu
-		    if (*p == NUL)
+		    如果 (*p == NUL)
 			emsg(_(e_menu_path_must_lead_to_sub_menu));
-		    else
+		    否则
 			emsg(_(e_part_of_menu_item_path_is_not_sub_menu));
 		    menu = NULL;
 		    goto theend;
 		}
-		if (*p == NUL)	    // found a full match
+		如果 (*p == NUL)	    // found a full match
 		    goto theend;
 		break;
 	    }
 	    menu = menu->next;
 	}
-	if (menu == NULL)	// didn't find it
+	如果 (menu == NULL)	// didn't find it
 	    break;
 
 	// Found a match, search the sub-menu.
@@ -2647,11 +2647,11 @@ gui_find_menu(char_u *path_name)
 	name = p;
     }
 
-    if (menu == NULL)
+    如果 (menu == NULL)
 	emsg(_(e_menu_not_found_check_menu_names));
 theend:
     vim_free(saved_name);
-    return menu;
+    返回 menu;
 }
 #endif
 
@@ -2681,19 +2681,19 @@ ex_menutranslate(exarg_T *eap UNUSED)
 #ifdef FEAT_MULTI_LANG
     char_u		*arg = eap->arg;
     menutrans_T		*tp;
-    int			i;
+    整数			i;
     char_u		*from, *from_noamp, *to;
 
-    if (menutrans_ga.ga_itemsize == 0)
+    如果 (menutrans_ga.ga_itemsize == 0)
 	ga_init2(&menutrans_ga, sizeof(menutrans_T), 5);
 
     /*
      * ":menutrans clear": clear all translations.
      */
-    if (STRNCMP(arg, "clear", 5) == 0 && ends_excmd2(arg, skipwhite(arg + 5)))
+    如果 (STRNCMP(arg, "clear", 5) == 0 && ends_excmd2(arg, skipwhite(arg + 5)))
     {
 	tp = (menutrans_T *)menutrans_ga.ga_data;
-	for (i = 0; i < menutrans_ga.ga_len; ++i)
+	为 (i = 0; i < menutrans_ga.ga_len; ++i)
 	{
 	    vim_free(tp[i].from);
 	    vim_free(tp[i].from_noamp);
@@ -2705,7 +2705,7 @@ ex_menutranslate(exarg_T *eap UNUSED)
 	del_menutrans_vars();
 # endif
     }
-    else
+    否则
     {
 	// ":menutrans from to": add translation
 	from = arg;
@@ -2713,21 +2713,21 @@ ex_menutranslate(exarg_T *eap UNUSED)
 	to = skipwhite(arg);
 	*arg = NUL;
 	arg = menu_skip_part(to);
-	if (arg == to || ends_excmd2(eap->arg, from)
+	如果 (arg == to || ends_excmd2(eap->arg, from)
 		      || ends_excmd2(eap->arg, to)
 		      || !ends_excmd2(eap->arg, skipwhite(arg)))
 	    emsg(_(e_invalid_argument));
-	else
+	否则
 	{
-	    if (ga_grow(&menutrans_ga, 1) == OK)
+	    如果 (ga_grow(&menutrans_ga, 1) == OK)
 	    {
 		tp = (menutrans_T *)menutrans_ga.ga_data;
 		from = vim_strsave(from);
-		if (from != NULL)
+		如果 (from != NULL)
 		{
 		    from_noamp = menu_text(from, NULL, NULL);
 		    to = vim_strnsave(to, arg - to);
-		    if (from_noamp != NULL && to != NULL)
+		    如果 (from_noamp != NULL && to != NULL)
 		    {
 			menu_translate_tab_and_shift(from);
 			menu_translate_tab_and_shift(to);
@@ -2738,7 +2738,7 @@ ex_menutranslate(exarg_T *eap UNUSED)
 			tp[menutrans_ga.ga_len].to = to;
 			++menutrans_ga.ga_len;
 		    }
-		    else
+		    否则
 		    {
 			vim_free(from);
 			vim_free(from_noamp);
@@ -2751,20 +2751,20 @@ ex_menutranslate(exarg_T *eap UNUSED)
 #endif
 }
 
-#if defined(FEAT_MULTI_LANG) || defined(FEAT_TOOLBAR)
+#如果 defined(FEAT_MULTI_LANG) || defined(FEAT_TOOLBAR)
 /*
  * Find the character just after one part of a menu name.
  */
     static char_u *
 menu_skip_part(char_u *p)
 {
-    while (*p != NUL && *p != '.' && !VIM_ISWHITE(*p))
+    当 (*p != NUL && *p != '.' && !VIM_ISWHITE(*p))
     {
-	if ((*p == '\\' || *p == Ctrl_V) && p[1] != NUL)
+	如果 ((*p == '\\' || *p == Ctrl_V) && p[1] != NUL)
 	    ++p;
 	++p;
     }
-    return p;
+    返回 p;
 }
 #endif
 
@@ -2774,33 +2774,33 @@ menu_skip_part(char_u *p)
  * Return a pointer to the translation or NULL if not found.
  */
     static char_u *
-menutrans_lookup(char_u *name, int len)
+menutrans_lookup(char_u *name, 整数 len)
 {
     menutrans_T		*tp = (menutrans_T *)menutrans_ga.ga_data;
-    int			i;
+    整数			i;
     char_u		*dname;
 
-    for (i = 0; i < menutrans_ga.ga_len; ++i)
-	if (STRNICMP(name, tp[i].from, len) == 0 && tp[i].from[len] == NUL)
-	    return tp[i].to;
+    为 (i = 0; i < menutrans_ga.ga_len; ++i)
+	如果 (STRNICMP(name, tp[i].from, len) == 0 && tp[i].from[len] == NUL)
+	    返回 tp[i].to;
 
     // Now try again while ignoring '&' characters.
     i = name[len];
     name[len] = NUL;
     dname = menu_text(name, NULL, NULL);
     name[len] = i;
-    if (dname == NULL)
-	return NULL;
+    如果 (dname == NULL)
+	返回 NULL;
 
-    for (i = 0; i < menutrans_ga.ga_len; ++i)
-	if (STRICMP(dname, tp[i].from_noamp) == 0)
+    为 (i = 0; i < menutrans_ga.ga_len; ++i)
+	如果 (STRICMP(dname, tp[i].from_noamp) == 0)
 	{
 	    vim_free(dname);
-	    return tp[i].to;
+	    返回 tp[i].to;
 	}
     vim_free(dname);
 
-    return NULL;
+    返回 NULL;
 }
 
 /*
@@ -2811,8 +2811,8 @@ menu_unescape_name(char_u *name)
 {
     char_u  *p;
 
-    for (p = name; *p && *p != '.'; MB_PTR_ADV(p))
-	if (*p == '\\')
+    为 (p = name; *p && *p != '.'; MB_PTR_ADV(p))
+	如果 (*p == '\\')
 	    STRMOVE(p, p + 1);
 }
 #endif // FEAT_MULTI_LANG
@@ -2826,81 +2826,81 @@ menu_translate_tab_and_shift(char_u *arg_start)
 {
     char_u	*arg = arg_start;
 
-    while (*arg && !VIM_ISWHITE(*arg))
+    当 (*arg && !VIM_ISWHITE(*arg))
     {
-	if ((*arg == '\\' || *arg == Ctrl_V) && arg[1] != NUL)
+	如果 ((*arg == '\\' || *arg == Ctrl_V) && arg[1] != NUL)
 	    arg++;
-	else if (STRNICMP(arg, "<TAB>", 5) == 0)
+	否则 如果 (STRNICMP(arg, "<TAB>", 5) == 0)
 	{
 	    *arg = TAB;
 	    STRMOVE(arg + 1, arg + 5);
 	}
 	arg++;
     }
-    if (*arg != NUL)
+    如果 (*arg != NUL)
 	*arg++ = NUL;
     arg = skipwhite(arg);
 
-    return arg;
+    返回 arg;
 }
 
 /*
  * Get the information about a menu item in mode 'which'
  */
-    static int
-menuitem_getinfo(char_u *menu_name, vimmenu_T *menu, int modes, dict_T *dict)
+    static 整数
+menuitem_getinfo(char_u *menu_name, vimmenu_T *menu, 整数 modes, dict_T *dict)
 {
-    int		status;
+    整数		status;
     list_T	*l;
 
-    if (*menu_name == NUL)
+    如果 (*menu_name == NUL)
     {
 	// Return all the top-level menus
 	vimmenu_T	*topmenu;
 
 	l = list_alloc();
-	if (l == NULL)
-	    return FAIL;
+	如果 (l == NULL)
+	    返回 FAIL;
 
-	if (dict_add_list(dict, "submenus", l) == FAIL)
+	如果 (dict_add_list(dict, "submenus", l) == FAIL)
 	{
 	    list_unref(l);
-	    return FAIL;
+	    返回 FAIL;
 	}
 	// get all the children.  Skip PopUp[nvoci].
-	for (topmenu = menu; topmenu != NULL; topmenu = topmenu->next)
-	    if (!menu_is_hidden(topmenu->dname))
+	为 (topmenu = menu; topmenu != NULL; topmenu = topmenu->next)
+	    如果 (!menu_is_hidden(topmenu->dname))
 		list_append_string(l, topmenu->dname, -1);
-	return OK;
+	返回 OK;
     }
 
-    if (menu_is_tearoff(menu->dname))		// skip tearoff menu item
-	return OK;
+    如果 (menu_is_tearoff(menu->dname))		// skip tearoff menu item
+	返回 OK;
 
     status = dict_add_string(dict, "name", menu->name);
-    if (status == OK)
+    如果 (status == OK)
 	status = dict_add_string(dict, "display", menu->dname);
-    if (status == OK && menu->actext != NULL)
+    如果 (status == OK && menu->actext != NULL)
 	status = dict_add_string(dict, "accel", menu->actext);
-    if (status == OK)
+    如果 (status == OK)
 	status = dict_add_number(dict, "priority", menu->priority);
-    if (status == OK)
+    如果 (status == OK)
 	status = dict_add_string(dict, "modes",
 					get_menu_mode_str(menu->modes));
 #ifdef FEAT_TOOLBAR
-    if (status == OK && menu->iconfile != NULL)
+    如果 (status == OK && menu->iconfile != NULL)
 	status = dict_add_string(dict, "icon", menu->iconfile);
-    if (status == OK && menu->iconidx >= 0)
+    如果 (status == OK && menu->iconidx >= 0)
 	status = dict_add_number(dict, "iconidx", menu->iconidx);
 #endif
-    if (status == OK)
+    如果 (status == OK)
     {
 	char_u	buf[NUMBUFLEN];
-	int	buflen;
+	整数	buflen;
 
-	if (has_mbyte)
+	如果 (has_mbyte)
 	    buflen = utf_char2bytes(menu->mnemonic, buf);
-	else
+	否则
 	{
 	    buf[0] = (char_u)menu->mnemonic;
 	    buflen = (buf[0] == NUL) ? 0 : 1;
@@ -2908,21 +2908,21 @@ menuitem_getinfo(char_u *menu_name, vimmenu_T *menu, int modes, dict_T *dict)
 	buf[buflen] = NUL;
 	status = dict_add_string_len(dict, "shortcut", buf, buflen);
     }
-    if (status == OK && menu->children == NULL)
+    如果 (status == OK && menu->children == NULL)
     {
-	int		bit;
+	整数		bit;
 
 	// Get the first mode in which the menu is available
-	for (bit = 0; bit < MENU_MODES && !((1 << bit) & modes); bit++)
+	为 (bit = 0; bit < MENU_MODES && !((1 << bit) & modes); bit++)
 	    ;
-	if (bit < MENU_MODES) // just in case, avoid Coverity warning
+	如果 (bit < MENU_MODES) // just in case, avoid Coverity warning
 	{
-	    if (menu->strings[bit] != NULL)
+	    如果 (menu->strings[bit] != NULL)
 	    {
-		if (*menu->strings[bit] == NUL)
+		如果 (*menu->strings[bit] == NUL)
 		    status = dict_add_string_len(dict, "rhs",
 			(char_u *)"<Nop>", STRLEN_LITERAL("<Nop>"));
-		else
+		否则
 		{
 		    char_u *tofree = NULL;
 
@@ -2931,44 +2931,44 @@ menuitem_getinfo(char_u *menu_name, vimmenu_T *menu, int modes, dict_T *dict)
 		    vim_free(tofree);
 		}
 	    }
-	    if (status == OK)
+	    如果 (status == OK)
 		status = dict_add_bool(dict, "noremenu",
 					     menu->noremap[bit] == REMAP_NONE);
-	    if (status == OK)
+	    如果 (status == OK)
 		status = dict_add_bool(dict, "script",
 					   menu->noremap[bit] == REMAP_SCRIPT);
-	    if (status == OK)
+	    如果 (status == OK)
 		status = dict_add_bool(dict, "silent", menu->silent[bit]);
-	    if (status == OK)
+	    如果 (status == OK)
 		status = dict_add_bool(dict, "enabled",
 					  ((menu->enabled & (1 << bit)) != 0));
 	}
     }
 
     // If there are submenus, add all the submenu display names
-    if (status == OK && menu->children != NULL)
+    如果 (status == OK && menu->children != NULL)
     {
 	vimmenu_T	*child;
 
 	l = list_alloc();
-	if (l == NULL)
-	    return FAIL;
+	如果 (l == NULL)
+	    返回 FAIL;
 
-	if (dict_add_list(dict, "submenus", l) == FAIL)
+	如果 (dict_add_list(dict, "submenus", l) == FAIL)
 	{
 	    list_unref(l);
-	    return FAIL;
+	    返回 FAIL;
 	}
 	child = menu->children;
-	while (child)
+	当 (child)
 	{
-	    if (!menu_is_tearoff(child->dname))		// skip tearoff menu
+	    如果 (!menu_is_tearoff(child->dname))		// skip tearoff menu
 		list_append_string(l, child->dname, -1);
 	    child = child->next;
 	}
     }
 
-    return status;
+    返回 status;
 }
 
 /*
@@ -2980,56 +2980,56 @@ f_menu_info(typval_T *argvars, typval_T *rettv)
 {
     char_u	*menu_name;
     char_u	*which;
-    int		modes;
+    整数		modes;
     char_u	*saved_name;
     char_u	*name;
     vimmenu_T	*menu;
     dict_T	*retdict;
 
-    if (rettv_dict_alloc(rettv) == FAIL)
-	return;
+    如果 (rettv_dict_alloc(rettv) == FAIL)
+	返回;
     retdict = rettv->vval.v_dict;
 
-    if (in_vim9script()
+    如果 (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_opt_string_arg(argvars, 1) == FAIL))
-	return;
+	返回;
 
     menu_name = tv_get_string_chk(&argvars[0]);
-    if (menu_name == NULL)
-	return;
+    如果 (menu_name == NULL)
+	返回;
 
     // menu mode
-    if (argvars[1].v_type != VAR_UNKNOWN)
+    如果 (argvars[1].v_type != VAR_UNKNOWN)
 	which = tv_get_string_chk(&argvars[1]);
-    else
+    否则
 	which = (char_u *)"";	    // Default is modes for "menu"
-    if (which == NULL)
-	return;
+    如果 (which == NULL)
+	返回;
 
     modes = get_menu_cmd_modes(which, *which == '!', NULL, NULL);
 
     // Locate the specified menu or menu item
     menu = *get_root_menu(menu_name);
     saved_name = vim_strsave(menu_name);
-    if (saved_name == NULL)
-	return;
-    if (*saved_name != NUL)
+    如果 (saved_name == NULL)
+	返回;
+    如果 (*saved_name != NUL)
     {
 	char_u	*p;
 
 	name = saved_name;
-	while (*name)
+	当 (*name)
 	{
 	    // Find in the menu hierarchy
 	    p = menu_name_skip(name);
-	    while (menu != NULL)
+	    当 (menu != NULL)
 	    {
-		if (menu_name_equal(name, menu))
+		如果 (menu_name_equal(name, menu))
 		    break;
 		menu = menu->next;
 	    }
-	    if (menu == NULL || *p == NUL)
+	    如果 (menu == NULL || *p == NUL)
 		break;
 	    menu = menu->children;
 	    name = p;
@@ -3037,10 +3037,10 @@ f_menu_info(typval_T *argvars, typval_T *rettv)
     }
     vim_free(saved_name);
 
-    if (menu == NULL)		// specified menu not found
-	return;
+    如果 (menu == NULL)		// specified menu not found
+	返回;
 
-    if (menu->modes & modes)
+    如果 (menu->modes & modes)
 	menuitem_getinfo(menu_name, menu, modes, retdict);
 }
 

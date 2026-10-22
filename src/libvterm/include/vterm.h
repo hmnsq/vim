@@ -19,7 +19,7 @@ extern "C" {
 // VIM: from stdint.h
 typedef unsigned char		uint8_t;
 typedef unsigned short		uint16_t;
-typedef unsigned int		uint32_t;
+typedef unsigned 整数		uint32_t;
 
 // VIM: define max screen cols and rows
 #define VTERM_MAX_COLS 1000
@@ -43,8 +43,8 @@ typedef struct VTermScreen VTermScreen;
 
 // Specifies a screen point.
 typedef struct {
-  int row;
-  int col;
+  整数 row;
+  整数 col;
 } VTermPos;
 
 /* some small utility functions; we can just keep these static here */
@@ -55,30 +55,30 @@ typedef struct {
  * Return  0  if "a" and "b" are equal
  * Return > 0 if "a" is after "b".
  */
-int vterm_pos_cmp(VTermPos a, VTermPos b);
+整数 vterm_pos_cmp(VTermPos a, VTermPos b);
 
-#if defined(DEFINE_INLINES) || USE_INLINE
-INLINE int vterm_pos_cmp(VTermPos a, VTermPos b)
+#如果 defined(DEFINE_INLINES) || USE_INLINE
+INLINE 整数 vterm_pos_cmp(VTermPos a, VTermPos b)
 {
-  return (a.row == b.row) ? a.col - b.col : a.row - b.row;
+  返回 (a.row == b.row) ? a.col - b.col : a.row - b.row;
 }
 #endif
 
 // Specifies a rectangular screen area.
 typedef struct {
-  int start_row;
-  int end_row;
-  int start_col;
-  int end_col;
+  整数 start_row;
+  整数 end_row;
+  整数 start_col;
+  整数 end_col;
 } VTermRect;
 
 /* true if the rect contains the point */
-int vterm_rect_contains(VTermRect r, VTermPos p);
+整数 vterm_rect_contains(VTermRect r, VTermPos p);
 
-#if defined(DEFINE_INLINES) || USE_INLINE
-INLINE int vterm_rect_contains(VTermRect r, VTermPos p)
+#如果 defined(DEFINE_INLINES) || USE_INLINE
+INLINE 整数 vterm_rect_contains(VTermRect r, VTermPos p)
 {
-  return p.row >= r.start_row && p.row < r.end_row &&
+  返回 p.row >= r.start_row && p.row < r.end_row &&
          p.col >= r.start_col && p.col < r.end_col;
 }
 #endif
@@ -86,10 +86,10 @@ INLINE int vterm_rect_contains(VTermRect r, VTermPos p)
 /* move a rect */
 // Move "rect" "row_delta" down and "col_delta" right.
 // Does not check boundaries.
-void vterm_rect_move(VTermRect *rect, int row_delta, int col_delta);
+void vterm_rect_move(VTermRect *rect, 整数 row_delta, 整数 col_delta);
 
-#if defined(DEFINE_INLINES) || USE_INLINE
-INLINE void vterm_rect_move(VTermRect *rect, int row_delta, int col_delta)
+#如果 defined(DEFINE_INLINES) || USE_INLINE
+INLINE void vterm_rect_move(VTermRect *rect, 整数 row_delta, 整数 col_delta)
 {
   rect->start_row += row_delta; rect->end_row += row_delta;
   rect->start_col += col_delta; rect->end_col += col_delta;
@@ -206,7 +206,7 @@ void vterm_color_indexed(VTermColor *col, uint8_t idx);
 /**
  * Compares two colours. Returns true if the colors are equal, false otherwise.
  */
-int vterm_color_is_equal(const VTermColor *a, const VTermColor *b);
+整数 vterm_color_is_equal(const VTermColor *a, const VTermColor *b);
 
 typedef enum {
   /* VTERM_VALUETYPE_NONE = 0 */
@@ -221,13 +221,13 @@ typedef enum {
 typedef struct {
   const char *str;
   size_t      len : 30;
-  unsigned int  initial : 1;
-  unsigned int  final : 1;
+  unsigned 整数  initial : 1;
+  unsigned 整数  final : 1;
 } VTermStringFragment;
 
 typedef union {
-  int boolean;
-  int number;
+  整数 boolean;
+  整数 number;
   VTermStringFragment string;
   VTermColor color;
 } VTermValue;
@@ -293,16 +293,16 @@ typedef enum {
 
 typedef struct {
   const uint32_t *chars;
-  int             width;
-  unsigned int    protected_cell:1;  /* DECSCA-protected against DECSEL/DECSED */
-  unsigned int    dwl:1;             /* DECDWL or DECDHL double-width line */
-  unsigned int    dhl:2;             /* DECDHL double-height line (1=top 2=bottom) */
+  整数             width;
+  unsigned 整数    protected_cell:1;  /* DECSCA-protected against DECSEL/DECSED */
+  unsigned 整数    dwl:1;             /* DECDWL or DECDHL double-width line */
+  unsigned 整数    dhl:2;             /* DECDHL double-height line (1=top 2=bottom) */
 } VTermGlyphInfo;
 
 typedef struct {
-  unsigned int    doublewidth:1;     /* DECDWL or DECDHL line */
-  unsigned int    doubleheight:2;    /* DECDHL line (1=top 2=bottom) */
-  unsigned int    continuation:1;    /* Line is a flow continuation of the previous */
+  unsigned 整数    doublewidth:1;     /* DECDWL or DECDHL line */
+  unsigned 整数    doubleheight:2;    /* DECDHL line (1=top 2=bottom) */
+  unsigned 整数    continuation:1;    /* Line is a flow continuation of the previous */
 } VTermLineInfo;
 
 /* Copies of VTermState fields that the 'resize' callback might have reason to
@@ -322,12 +322,12 @@ typedef struct {
   void  (*free)(void *ptr, void *allocdata);
 } VTermAllocatorFunctions;
 
-void vterm_check_version(int major, int minor);
+void vterm_check_version(整数 major, 整数 minor);
 
 struct VTermBuilder {
-  int ver; /* currently unused but reserved for some sort of ABI version flag */
+  整数 ver; /* currently unused but reserved for some sort of ABI version flag */
 
-  int rows, cols;
+  整数 rows, cols;
 
   const VTermAllocatorFunctions *allocator;
   void *allocdata;
@@ -341,22 +341,22 @@ VTerm *vterm_build(const struct VTermBuilder *builder);
 
 /* A convenient shortcut for default cases */
 // Allocate and initialize a new terminal with default allocators.
-VTerm *vterm_new(int rows, int cols);
+VTerm *vterm_new(整数 rows, 整数 cols);
 /* These shortcuts are generally discouraged in favour of just using vterm_build() */
 
 // Allocate and initialize a new terminal with specified allocators.
-VTerm *vterm_new_with_allocator(int rows, int cols, VTermAllocatorFunctions *funcs, void *allocdata);
+VTerm *vterm_new_with_allocator(整数 rows, 整数 cols, VTermAllocatorFunctions *funcs, void *allocdata);
 
 // Free and cleanup a terminal and all its data.
 void   vterm_free(VTerm* vt);
 
 // Get the current size of the terminal and store in "rowsp" and "colsp".
-void vterm_get_size(const VTerm *vt, int *rowsp, int *colsp);
+void vterm_get_size(const VTerm *vt, 整数 *rowsp, 整数 *colsp);
 
-void vterm_set_size(VTerm *vt, int rows, int cols);
+void vterm_set_size(VTerm *vt, 整数 rows, 整数 cols);
 
-int  vterm_get_utf8(const VTerm *vt);
-void vterm_set_utf8(VTerm *vt, int is_utf8);
+整数  vterm_get_utf8(const VTerm *vt);
+void vterm_set_utf8(VTerm *vt, 整数 is_utf8);
 
 size_t vterm_input_write(VTerm *vt, const char *bytes, size_t len);
 
@@ -373,18 +373,18 @@ size_t vterm_output_get_buffer_remaining(const VTerm *vt);
 /* This too */
 size_t vterm_output_read(VTerm *vt, char *buffer, size_t len);
 
-int vterm_is_modify_other_keys(VTerm *vt);
-int vterm_is_kitty_keyboard(VTerm *vt);
+整数 vterm_is_modify_other_keys(VTerm *vt);
+整数 vterm_is_kitty_keyboard(VTerm *vt);
 void vterm_keyboard_unichar(VTerm *vt, uint32_t c, VTermModifier mod);
 void vterm_keyboard_key(VTerm *vt, VTermKey key, VTermModifier mod);
 
 void vterm_keyboard_start_paste(VTerm *vt);
 void vterm_keyboard_end_paste(VTerm *vt);
 
-void vterm_mouse_move(VTerm *vt, int row, int col, VTermModifier mod);
+void vterm_mouse_move(VTerm *vt, 整数 row, 整数 col, VTermModifier mod);
 // "button" is 1 for left, 2 for middle, 3 for right.
 // Button 4 is scroll wheel down, button 5 is scroll wheel up.
-void vterm_mouse_button(VTerm *vt, int button, int pressed, VTermModifier mod);
+void vterm_mouse_button(VTerm *vt, 整数 button, 整数 pressed, VTermModifier mod);
 
 // ------------
 // Parser layer
@@ -413,16 +413,16 @@ void vterm_mouse_button(VTerm *vt, int button, int pressed, VTermModifier mod);
 #define CSI_ARG_COUNT(a)      (CSI_ARG(a) == CSI_ARG_MISSING || CSI_ARG(a) == 0 ? 1 : CSI_ARG(a))
 
 typedef struct {
-  int (*text)(const char *bytes, size_t len, void *user);
-  int (*control)(unsigned char control, void *user);
-  int (*escape)(const char *bytes, size_t len, void *user);
-  int (*csi)(const char *leader, const long args[], int argcount, const char *intermed, char command, void *user);
-  int (*osc)(int command, VTermStringFragment frag, void *user);
-  int (*dcs)(const char *command, size_t commandlen, VTermStringFragment frag, void *user);
-  int (*apc)(VTermStringFragment frag, void *user);
-  int (*pm)(VTermStringFragment frag, void *user);
-  int (*sos)(VTermStringFragment frag, void *user);
-  int (*resize)(int rows, int cols, void *user);
+  整数 (*text)(const char *bytes, size_t len, void *user);
+  整数 (*control)(unsigned char control, void *user);
+  整数 (*escape)(const char *bytes, size_t len, void *user);
+  整数 (*csi)(const char *leader, const long args[], 整数 argcount, const char *intermed, char command, void *user);
+  整数 (*osc)(整数 command, VTermStringFragment frag, void *user);
+  整数 (*dcs)(const char *command, size_t commandlen, VTermStringFragment frag, void *user);
+  整数 (*apc)(VTermStringFragment frag, void *user);
+  整数 (*pm)(VTermStringFragment frag, void *user);
+  整数 (*sos)(VTermStringFragment frag, void *user);
+  整数 (*resize)(整数 rows, 整数 cols, void *user);
 } VTermParserCallbacks;
 
 void  vterm_parser_set_callbacks(VTerm *vt, const VTermParserCallbacks *callbacks, void *user);
@@ -431,39 +431,39 @@ void *vterm_parser_get_cbdata(VTerm *vt);
 /* Normally NUL, CAN, SUB and DEL are ignored. Setting this true causes them
  * to be emitted by the 'control' callback
  */
-void vterm_parser_set_emit_nul(VTerm *vt, int emit);
+void vterm_parser_set_emit_nul(VTerm *vt, 整数 emit);
 
 // -----------
 // State layer
 // -----------
 
 typedef struct {
-  int (*putglyph)(VTermGlyphInfo *info, VTermPos pos, void *user);
-  int (*movecursor)(VTermPos pos, VTermPos oldpos, int visible, void *user);
-  int (*scrollrect)(VTermRect rect, int downward, int rightward, void *user);
-  int (*moverect)(VTermRect dest, VTermRect src, void *user);
-  int (*erase)(VTermRect rect, int selective, void *user);
-  int (*initpen)(void *user);
-  int (*setpenattr)(VTermAttr attr, VTermValue *val, void *user);
+  整数 (*putglyph)(VTermGlyphInfo *info, VTermPos pos, void *user);
+  整数 (*movecursor)(VTermPos pos, VTermPos oldpos, 整数 visible, void *user);
+  整数 (*scrollrect)(VTermRect rect, 整数 downward, 整数 rightward, void *user);
+  整数 (*moverect)(VTermRect dest, VTermRect src, void *user);
+  整数 (*erase)(VTermRect rect, 整数 selective, void *user);
+  整数 (*initpen)(void *user);
+  整数 (*setpenattr)(VTermAttr attr, VTermValue *val, void *user);
   // Callback for setting various properties.  Must return 1 if the property
   // was accepted, 0 otherwise.
-  int (*settermprop)(VTermProp prop, VTermValue *val, void *user);
-  int (*bell)(void *user);
-  int (*resize)(int rows, int cols, VTermStateFields *fields, void *user);
-  int (*setlineinfo)(int row, const VTermLineInfo *newinfo, const VTermLineInfo *oldinfo, void *user);
-  int (*sb_clear)(void *user);
+  整数 (*settermprop)(VTermProp prop, VTermValue *val, void *user);
+  整数 (*bell)(void *user);
+  整数 (*resize)(整数 rows, 整数 cols, VTermStateFields *fields, void *user);
+  整数 (*setlineinfo)(整数 row, const VTermLineInfo *newinfo, const VTermLineInfo *oldinfo, void *user);
+  整数 (*sb_clear)(void *user);
   // ABI-compat only enabled if vterm_state_callbacks_has_premove() is invoked
-  int (*premove)(VTermRect dest, void *user);
+  整数 (*premove)(VTermRect dest, void *user);
 } VTermStateCallbacks;
 
 // VIM: added
 typedef struct {
   VTermPos pos;
-  int	   buttons;
+  整数	   buttons;
 #define MOUSE_BUTTON_LEFT 0x01
 #define MOUSE_BUTTON_MIDDLE 0x02
 #define MOUSE_BUTTON_RIGHT 0x04
-  int      flags;
+  整数      flags;
 #define MOUSE_WANT_CLICK 0x01
 #define MOUSE_WANT_DRAG  0x02
 #define MOUSE_WANT_MOVE  0x04
@@ -471,18 +471,18 @@ typedef struct {
 } VTermMouseState;
 
 typedef struct {
-  int (*control)(unsigned char control, void *user);
-  int (*csi)(const char *leader, const long args[], int argcount, const char *intermed, char command, void *user);
-  int (*osc)(int command, VTermStringFragment frag, void *user);
-  int (*dcs)(const char *command, size_t commandlen, VTermStringFragment frag, void *user);
-  int (*apc)(VTermStringFragment frag, void *user);
-  int (*pm)(VTermStringFragment frag, void *user);
-  int (*sos)(VTermStringFragment frag, void *user);
+  整数 (*control)(unsigned char control, void *user);
+  整数 (*csi)(const char *leader, const long args[], 整数 argcount, const char *intermed, char command, void *user);
+  整数 (*osc)(整数 command, VTermStringFragment frag, void *user);
+  整数 (*dcs)(const char *command, size_t commandlen, VTermStringFragment frag, void *user);
+  整数 (*apc)(VTermStringFragment frag, void *user);
+  整数 (*pm)(VTermStringFragment frag, void *user);
+  整数 (*sos)(VTermStringFragment frag, void *user);
 } VTermStateFallbacks;
 
 typedef struct {
-  int (*set)(VTermSelectionMask mask, VTermStringFragment frag, void *user);
-  int (*query)(VTermSelectionMask mask, void *user);
+  整数 (*set)(VTermSelectionMask mask, VTermStringFragment frag, void *user);
+  整数 (*query)(VTermSelectionMask mask, void *user);
 } VTermSelectionCallbacks;
 
 VTermState *vterm_obtain_state(VTerm *vt);
@@ -496,21 +496,21 @@ void  vterm_state_set_unrecognised_fallbacks(VTermState *state, const VTermState
 void *vterm_state_get_unrecognised_fbdata(VTermState *state);
 
 // Initialize the state.
-void vterm_state_reset(VTermState *state, int hard);
+void vterm_state_reset(VTermState *state, 整数 hard);
 
 void vterm_state_get_cursorpos(const VTermState *state, VTermPos *cursorpos);
 // VIM: added
 void vterm_state_get_mousestate(const VTermState *state, VTermMouseState *mousestate);
 void vterm_state_get_default_colors(const VTermState *state, VTermColor *default_fg, VTermColor *default_bg);
-void vterm_state_get_palette_color(const VTermState *state, int index, VTermColor *col);
+void vterm_state_get_palette_color(const VTermState *state, 整数 index, VTermColor *col);
 void vterm_state_set_default_colors(VTermState *state, const VTermColor *default_fg, const VTermColor *default_bg);
-void vterm_state_set_palette_color(VTermState *state, int index, const VTermColor *col);
-void vterm_state_set_bold_highbright(VTermState *state, int bold_is_highbright);
-int  vterm_state_get_penattr(const VTermState *state, VTermAttr attr, VTermValue *val);
-int  vterm_state_set_termprop(VTermState *state, VTermProp prop, VTermValue *val);
+void vterm_state_set_palette_color(VTermState *state, 整数 index, const VTermColor *col);
+void vterm_state_set_bold_highbright(VTermState *state, 整数 bold_is_highbright);
+整数  vterm_state_get_penattr(const VTermState *state, VTermAttr attr, VTermValue *val);
+整数  vterm_state_set_termprop(VTermState *state, VTermProp prop, VTermValue *val);
 void vterm_state_focus_in(VTermState *state);
 void vterm_state_focus_out(VTermState *state);
-const VTermLineInfo *vterm_state_get_lineinfo(const VTermState *state, int row);
+const VTermLineInfo *vterm_state_get_lineinfo(const VTermState *state, 整数 row);
 
 /**
  * Makes sure that the given color `col` is indeed an RGB colour. After this
@@ -534,18 +534,18 @@ void vterm_state_send_selection(VTermState *state, VTermSelectionMask mask, VTer
 // ------------
 
 typedef struct {
-    unsigned int bold      : 1;
-    unsigned int underline : 2;
-    unsigned int italic    : 1;
-    unsigned int blink     : 1;
-    unsigned int reverse   : 1;
-    unsigned int conceal   : 1;
-    unsigned int strike    : 1;
-    unsigned int font      : 4; /* 0 to 9 */
-    unsigned int dwl       : 1; /* On a DECDWL or DECDHL line */
-    unsigned int dhl       : 2; /* On a DECDHL line (1=top 2=bottom) */
-    unsigned int small     : 1;
-    unsigned int baseline  : 2;
+    unsigned 整数 bold      : 1;
+    unsigned 整数 underline : 2;
+    unsigned 整数 italic    : 1;
+    unsigned 整数 blink     : 1;
+    unsigned 整数 reverse   : 1;
+    unsigned 整数 conceal   : 1;
+    unsigned 整数 strike    : 1;
+    unsigned 整数 font      : 4; /* 0 to 9 */
+    unsigned 整数 dwl       : 1; /* On a DECDWL or DECDHL line */
+    unsigned 整数 dhl       : 2; /* On a DECDHL line (1=top 2=bottom) */
+    unsigned 整数 small     : 1;
+    unsigned 整数 baseline  : 2;
 } VTermScreenCellAttrs;
 
 enum {
@@ -570,20 +570,20 @@ typedef struct {
 
 // All fields are optional, NULL when not used.
 typedef struct {
-  int (*damage)(VTermRect rect, void *user);
-  int (*moverect)(VTermRect dest, VTermRect src, void *user);
-  int (*movecursor)(VTermPos pos, VTermPos oldpos, int visible, void *user);
-  int (*settermprop)(VTermProp prop, VTermValue *val, void *user);
-  int (*bell)(void *user);
-  int (*resize)(int rows, int cols, void *user);
+  整数 (*damage)(VTermRect rect, void *user);
+  整数 (*moverect)(VTermRect dest, VTermRect src, void *user);
+  整数 (*movecursor)(VTermPos pos, VTermPos oldpos, 整数 visible, void *user);
+  整数 (*settermprop)(VTermProp prop, VTermValue *val, void *user);
+  整数 (*bell)(void *user);
+  整数 (*resize)(整数 rows, 整数 cols, void *user);
   // A line was pushed off the top of the window.
   // "cells[cols]" contains the cells of that line.
   // Return value is unused.
-  int (*sb_pushline)(int cols, const VTermScreenCell *cells, void *user);
-  int (*sb_popline)(int cols, VTermScreenCell *cells, void *user);
-  int (*sb_clear)(void* user);
+  整数 (*sb_pushline)(整数 cols, const VTermScreenCell *cells, void *user);
+  整数 (*sb_popline)(整数 cols, VTermScreenCell *cells, void *user);
+  整数 (*sb_clear)(void* user);
   /* ABI-compat this is only used if vterm_screen_callbacks_has_pushline4() is called */
-  int (*sb_pushline4)(int cols, const VTermScreenCell *cells, int continuation, void *user);
+  整数 (*sb_pushline4)(整数 cols, const VTermScreenCell *cells, 整数 continuation, void *user);
 } VTermScreenCallbacks;
 
 // Return the screen of the vterm.
@@ -601,7 +601,7 @@ void vterm_screen_callbacks_has_pushline4(VTermScreen *screen);
 void  vterm_screen_set_unrecognised_fallbacks(VTermScreen *screen, const VTermStateFallbacks *fallbacks, void *user);
 void *vterm_screen_get_unrecognised_fbdata(VTermScreen *screen);
 
-void vterm_screen_enable_reflow(VTermScreen *screen, int reflow);
+void vterm_screen_enable_reflow(VTermScreen *screen, 整数 reflow);
 
 // Back-compat alias for the brief time it was in 0.3-RC1
 #define vterm_screen_set_reflow  vterm_screen_enable_reflow
@@ -609,7 +609,7 @@ void vterm_screen_enable_reflow(VTermScreen *screen, int reflow);
 // Enable support for using the alternate screen if "altscreen" is non-zero.
 // Before that switching to the alternate screen won't work.
 // Calling with "altscreen" zero has no effect.
-void vterm_screen_enable_altscreen(VTermScreen *screen, int altscreen);
+void vterm_screen_enable_altscreen(VTermScreen *screen, 整数 altscreen);
 
 typedef enum {
   VTERM_DAMAGE_CELL,    /* every cell */
@@ -629,7 +629,7 @@ void vterm_screen_set_damage_merge(VTermScreen *screen, VTermDamageSize size);
  * Reset the screen.  Also invokes vterm_state_reset().
  * Must be called before the terminal can be used.
  */
-void   vterm_screen_reset(VTermScreen *screen, int hard);
+void   vterm_screen_reset(VTermScreen *screen, 整数 hard);
 
 /* Neither of these functions NUL-terminate the buffer */
 size_t vterm_screen_get_chars(const VTermScreen *screen, uint32_t *chars, size_t len, const VTermRect rect);
@@ -652,11 +652,11 @@ typedef enum {
   VTERM_ALL_ATTRS_MASK = (1 << 12) - 1
 } VTermAttrMask;
 
-int vterm_screen_get_attrs_extent(const VTermScreen *screen, VTermRect *extent, VTermPos pos, VTermAttrMask attrs);
+整数 vterm_screen_get_attrs_extent(const VTermScreen *screen, VTermRect *extent, VTermPos pos, VTermAttrMask attrs);
 
-int vterm_screen_get_cell(const VTermScreen *screen, VTermPos pos, VTermScreenCell *cell);
+整数 vterm_screen_get_cell(const VTermScreen *screen, VTermPos pos, VTermScreenCell *cell);
 
-int vterm_screen_is_eol(const VTermScreen *screen, VTermPos pos);
+整数 vterm_screen_is_eol(const VTermScreen *screen, VTermPos pos);
 
 /**
  * Same as vterm_state_convert_color_to_rgb(), but takes a `screen` instead of a `state`
@@ -678,10 +678,10 @@ VTermValueType vterm_get_attr_type(VTermAttr attr);
 VTermValueType vterm_get_prop_type(VTermProp prop);
 
 void vterm_scroll_rect(VTermRect rect,
-                       int downward,
-                       int rightward,
-                       int (*moverect)(VTermRect src, VTermRect dest, void *user),
-                       int (*eraserect)(VTermRect rect, int selective, void *user),
+                       整数 downward,
+                       整数 rightward,
+                       整数 (*moverect)(VTermRect src, VTermRect dest, void *user),
+                       整数 (*eraserect)(VTermRect rect, 整数 selective, void *user),
                        void *user);
 
 void vterm_copy_cells(VTermRect dest,

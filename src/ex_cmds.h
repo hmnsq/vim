@@ -113,7 +113,7 @@ static struct cmdname
     long_u	cmd_argt;	// flags declared above
     cmd_addr_T	cmd_addr_type;	// flag for address type
 } cmdnames[] =
-#else
+#否则
 # define EXCMD(a, b, c, d, e)  a
 enum CMD_index
 #endif
@@ -1951,27 +1951,27 @@ struct exarg
 # endif
     cmdidx_T	cmdidx;		// the index for the command
     long	argt;		// flags for the command
-    int		skip;		// don't execute the command, only parse it
-    int		forceit;	// TRUE if ! present
-    int		addr_count;	// the number of addresses given
+    整数		skip;		// don't execute the command, only parse it
+    整数		forceit;	// TRUE if ! present
+    整数		addr_count;	// the number of addresses given
     linenr_T	line1;		// the first line number
     linenr_T	line2;		// the second line number or count
     cmd_addr_T	addr_type;	// type of the count/range
-    int		flags;		// extra flags after count: EXFLAG_
+    整数		flags;		// extra flags after count: EXFLAG_
     char_u	*do_ecmd_cmd;	// +command arg to be used in edited file
     linenr_T	do_ecmd_lnum;	// the line number in an edited file
-    int		append;		// TRUE with ":w >>file" command
-    int		usefilter;	// TRUE with ":w !command" and ":r!command"
-    int		amount;		// number of '>' or '<' for shift command
-    int		regname;	// register name (NUL if none)
-    int		force_bin;	// 0, FORCE_BIN or FORCE_NOBIN
-    int		read_edit;	// ++edit argument
-    int		force_ff;	// ++ff= argument (first char of argument)
-    int		force_enc;	// ++enc= argument (index in cmd[])
-    int		bad_char;	// BAD_KEEP, BAD_DROP or replacement byte
-    int		useridx;	// user command index
+    整数		append;		// TRUE with ":w >>file" command
+    整数		usefilter;	// TRUE with ":w !command" and ":r!command"
+    整数		amount;		// number of '>' or '<' for shift command
+    整数		regname;	// register name (NUL if none)
+    整数		force_bin;	// 0, FORCE_BIN or FORCE_NOBIN
+    整数		read_edit;	// ++edit argument
+    整数		force_ff;	// ++ff= argument (first char of argument)
+    整数		force_enc;	// ++enc= argument (index in cmd[])
+    整数		bad_char;	// BAD_KEEP, BAD_DROP or replacement byte
+    整数		useridx;	// user command index
     char	*errmsg;	// returned error message
-    char_u	*(*ea_getline)(int, void *, int, getline_opt_T);
+    char_u	*(*ea_getline)(整数, void *, 整数, getline_opt_T);
     void	*cookie;	// argument for getline()
 # ifdef FEAT_EVAL
     cstack_T	*cstack;	// condition stack for ":if" etc.

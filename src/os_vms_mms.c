@@ -3,19 +3,19 @@
 #include	<string.h>
 #include	<unixio.h>
 #include	"vim.h"
-int main(int argc, char *argv[])
+整数 主要(整数 argc, char *argv[])
 {
     FILE	*fpi, *fpo;
     char	cmd[132], buf[BUFSIZ], *argp, *error_file, target[132], *mms;
-    int		err = 0, err_line = 0;
+    整数		err = 0, err_line = 0;
 
     mms = "mms";
     argc--;
     argv++;
-    while (argc-- > 0)
+    当 (argc-- > 0)
     {
 	argp = *argv++;
-	if (*argp == '-')
+	如果 (*argp == '-')
 	{
 	    switch (*++argp)
 	    {
@@ -23,7 +23,7 @@ int main(int argc, char *argv[])
 		    mms = ++argp;
 		    break;
 		case 'e':
-		    if (!*(error_file = ++argp))
+		    如果 (!*(error_file = ++argp))
 		    {
 			error_file = *argv++;
 			argc--;
@@ -33,9 +33,9 @@ int main(int argc, char *argv[])
 		    break;
 	    }
 	}
-	else
+	否则
 	{
-	    if (*target)
+	    如果 (*target)
 		strcat(target, " ");
 	    strcat(target, argp);
 	}
@@ -45,24 +45,24 @@ int main(int argc, char *argv[])
     system(cmd);
     fpi = fopen("tmp:errors.vim_tmp", "r");
     fpo = fopen(error_file, "w");
-    while (fgets(buf, BUFSIZ, fpi))
+    当 (fgets(buf, BUFSIZ, fpi))
     {
-	if (!memcmp(buf, "%CC-", 4))
+	如果 (!memcmp(buf, "%CC-", 4))
 	{
 	    err_line++;
 	    buf[strlen(buf)-1] = '\0';
 	    err++;
 	}
-	else
+	否则
 	{
-	    if (err_line)
+	    如果 (err_line)
 	    {
-		if (strstr(buf, _("At line")))
+		如果 (strstr(buf, _("At line")))
 		{
 		    err_line = 0;
 		    fprintf(fpo, "@");
 		}
-		else
+		否则
 		    buf[strlen(buf)-1] = '\0';
 	    }
 	}
@@ -70,8 +70,8 @@ int main(int argc, char *argv[])
     }
     fclose(fpi);
     fclose(fpo);
-    while (!delete("tmp:errors.vim_tmp"))
+    当 (!delete("tmp:errors.vim_tmp"))
 	/*nop*/;
     exit(err ? 44 : 1);
-    return(0);
+    返回(0);
 }

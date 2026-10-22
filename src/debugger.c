@@ -13,8 +13,8 @@
 
 #include "vim.h"
 
-#if defined(FEAT_EVAL)
-static int debug_greedy = FALSE;	// batch mode debugging: don't save
+#如果 defined(FEAT_EVAL)
+static 整数 debug_greedy = FALSE;	// batch mode debugging: don't save
 					// and restore typeahead.
 static void do_setdebugtracelevel(char_u *arg);
 static void do_checkbacktracelevel(void);
@@ -22,12 +22,12 @@ static void do_showbacktrace(char_u *cmd);
 
 static char_u *debug_oldval = NULL;	// old and newval for debug expressions
 static char_u *debug_newval = NULL;
-static int     debug_expr   = 0;	// use debug_expr
+static 整数     debug_expr   = 0;	// use debug_expr
 
-    int
+    整数
 has_watchexpr(void)
 {
-    return debug_expr;
+    返回 debug_expr;
 }
 
 /*
@@ -37,23 +37,23 @@ has_watchexpr(void)
     void
 do_debug(char_u *cmd)
 {
-    int		save_msg_scroll = msg_scroll;
-    int		save_State = State;
-    int		save_did_emsg = did_emsg;
-    int		save_cmd_silent = cmd_silent;
-    int		save_msg_silent = msg_silent;
-    int		save_emsg_silent = emsg_silent;
-    int		save_redir_off = redir_off;
+    整数		save_msg_scroll = msg_scroll;
+    整数		save_State = State;
+    整数		save_did_emsg = did_emsg;
+    整数		save_cmd_silent = cmd_silent;
+    整数		save_msg_silent = msg_silent;
+    整数		save_emsg_silent = emsg_silent;
+    整数		save_redir_off = redir_off;
     tasave_T	typeaheadbuf;
-    int		typeahead_saved = FALSE;
-    int		save_ignore_script = 0;
-    int		save_ex_normal_busy;
-    int		n;
+    整数		typeahead_saved = FALSE;
+    整数		save_ignore_script = 0;
+    整数		save_ex_normal_busy;
+    整数		n;
     char_u	*cmdline = NULL;
     char_u	*p;
     char_u	*sname;
     char	*tail = NULL;
-    static int	last_cmd = 0;
+    static 整数	last_cmd = 0;
 #define CMD_CONT	1
 #define CMD_NEXT	2
 #define CMD_STEP	3
@@ -67,11 +67,11 @@ do_debug(char_u *cmd)
 
 #ifdef ALWAYS_USE_GUI
     // Can't do this when there is no terminal for input/output.
-    if (!gui.in_use)
+    如果 (!gui.in_use)
     {
 	// Break as soon as possible.
 	debug_break_level = 9999;
-	return;
+	返回;
     }
 #endif
 
@@ -92,29 +92,29 @@ do_debug(char_u *cmd)
     State = MODE_NORMAL;
     debug_mode = TRUE;
 
-    if (!debug_did_msg)
+    如果 (!debug_did_msg)
 	msg(_("Entering Debug mode.  Type \"cont\" to continue."));
-    if (debug_oldval != NULL)
+    如果 (debug_oldval != NULL)
     {
 	smsg(_("Oldval = \"%s\""), debug_oldval);
 	VIM_CLEAR(debug_oldval);
     }
-    if (debug_newval != NULL)
+    如果 (debug_newval != NULL)
     {
 	smsg(_("Newval = \"%s\""), debug_newval);
 	VIM_CLEAR(debug_newval);
     }
     sname = estack_sfile(ESTACK_NONE);
-    if (sname != NULL)
+    如果 (sname != NULL)
 	msg((char *)sname);
     vim_free(sname);
-    if (SOURCING_LNUM != 0)
+    如果 (SOURCING_LNUM != 0)
 	smsg(_("line %ld: %s"), SOURCING_LNUM, cmd);
-    else
+    否则
 	smsg(_("cmd: %s"), cmd);
 
     // Repeat getting a command and executing it.
-    for (;;)
+    为 (;;)
     {
 	msg_scroll = TRUE;
 	need_wait_return = FALSE;
@@ -126,7 +126,7 @@ do_debug(char_u *cmd)
 	// it empty. Set ignore_script to avoid reading from script input.
 	save_ex_normal_busy = ex_normal_busy;
 	ex_normal_busy = 0;
-	if (!debug_greedy)
+	如果 (!debug_greedy)
 	{
 	    save_typeahead(&typeaheadbuf);
 	    typeahead_saved = TRUE;
@@ -142,7 +142,7 @@ do_debug(char_u *cmd)
 	cmdline = getcmdline_prompt('>', NULL, 0, EXPAND_NOTHING, NULL);
 
 	debug_break_level = n;
-	if (typeahead_saved)
+	如果 (typeahead_saved)
 	{
 	    restore_typeahead(&typeaheadbuf, TRUE);
 	    ignore_script = save_ignore_script;
@@ -151,13 +151,13 @@ do_debug(char_u *cmd)
 
 	cmdline_row = msg_row;
 	msg_starthere();
-	if (cmdline != NULL)
+	如果 (cmdline != NULL)
 	{
 	    // If this is a debug command, set "last_cmd".
 	    // If not, reset "last_cmd".
 	    // For a blank line use previous command.
 	    p = skipwhite(cmdline);
-	    if (*p != NUL)
+	    如果 (*p != NUL)
 	    {
 		switch (*p)
 		{
@@ -172,12 +172,12 @@ do_debug(char_u *cmd)
 			      break;
 		    case 'f':
 			      last_cmd = 0;
-			      if (p[1] == 'r')
+			      如果 (p[1] == 'r')
 			      {
 				  last_cmd = CMD_FRAME;
 				  tail = "rame";
 			      }
-			      else
+			      否则
 			      {
 				  last_cmd = CMD_FINISH;
 				  tail = "inish";
@@ -190,9 +190,9 @@ do_debug(char_u *cmd)
 			      tail = "nterrupt";
 			      break;
 		    case 'b': last_cmd = CMD_BACKTRACE;
-			      if (p[1] == 't')
+			      如果 (p[1] == 't')
 				  tail = "t";
-			      else
+			      否则
 				  tail = "acktrace";
 			      break;
 		    case 'w': last_cmd = CMD_BACKTRACE;
@@ -206,21 +206,21 @@ do_debug(char_u *cmd)
 			      break;
 		    default: last_cmd = 0;
 		}
-		if (last_cmd != 0)
+		如果 (last_cmd != 0)
 		{
 		    // Check that the tail matches.
 		    ++p;
-		    while (*p != NUL && *p == *tail)
+		    当 (*p != NUL && *p == *tail)
 		    {
 			++p;
 			++tail;
 		    }
-		    if (ASCII_ISALPHA(*p) && last_cmd != CMD_FRAME)
+		    如果 (ASCII_ISALPHA(*p) && last_cmd != CMD_FRAME)
 			last_cmd = 0;
 		}
 	    }
 
-	    if (last_cmd != 0)
+	    如果 (last_cmd != 0)
 	    {
 		// Execute debug command: decide where to break next and
 		// return.
@@ -252,11 +252,11 @@ do_debug(char_u *cmd)
 			do_showbacktrace(cmd);
 			continue;
 		    case CMD_FRAME:
-			if (*p == NUL)
+			如果 (*p == NUL)
 			{
 			    do_showbacktrace(cmd);
 			}
-			else
+			否则
 			{
 			    p = skipwhite(p);
 			    do_setdebugtracelevel(p);
@@ -287,7 +287,7 @@ do_debug(char_u *cmd)
     }
     vim_free(cmdline);
 
-    if (RedrawingDisabled > 0)
+    如果 (RedrawingDisabled > 0)
 	--RedrawingDisabled;
     --no_wait_return;
     redraw_all_later(UPD_NOT_VALID);
@@ -308,33 +308,33 @@ do_debug(char_u *cmd)
     debug_did_msg = TRUE;
 }
 
-    static int
+    static 整数
 get_maxbacktrace_level(char_u *sname)
 {
     char	*p, *q;
-    int		maxbacktrace = 0;
+    整数		maxbacktrace = 0;
 
-    if (sname == NULL)
-	return 0;
+    如果 (sname == NULL)
+	返回 0;
 
     p = (char *)sname;
-    while ((q = strstr(p, "..")) != NULL)
+    当 ((q = strstr(p, "..")) != NULL)
     {
 	p = q + 2;
 	maxbacktrace++;
     }
-    return maxbacktrace;
+    返回 maxbacktrace;
 }
 
     static void
 do_setdebugtracelevel(char_u *arg)
 {
-    int level;
+    整数 level;
 
     level = atoi((char *)arg);
-    if (*arg == '+' || level < 0)
+    如果 (*arg == '+' || level < 0)
 	debug_backtrace_level += level;
-    else
+    否则
 	debug_backtrace_level = level;
 
     do_checkbacktracelevel();
@@ -343,17 +343,17 @@ do_setdebugtracelevel(char_u *arg)
     static void
 do_checkbacktracelevel(void)
 {
-    if (debug_backtrace_level < 0)
+    如果 (debug_backtrace_level < 0)
     {
 	debug_backtrace_level = 0;
 	msg(_("frame is zero"));
     }
-    else
+    否则
     {
 	char_u	*sname = estack_sfile(ESTACK_NONE);
-	int	max = get_maxbacktrace_level(sname);
+	整数	max = get_maxbacktrace_level(sname);
 
-	if (debug_backtrace_level > max)
+	如果 (debug_backtrace_level > max)
 	{
 	    debug_backtrace_level = max;
 	    smsg(_("frame at highest level: %d"), max);
@@ -368,25 +368,25 @@ do_showbacktrace(char_u *cmd)
     char_u  *sname;
     char    *cur;
     char    *next;
-    int	    i = 0;
-    int	    max;
+    整数	    i = 0;
+    整数	    max;
 
     sname = estack_sfile(ESTACK_NONE);
     max = get_maxbacktrace_level(sname);
-    if (sname != NULL)
+    如果 (sname != NULL)
     {
 	cur = (char *)sname;
-	while (!got_int)
+	当 (!got_int)
 	{
 	    next = strstr(cur, "..");
-	    if (next != NULL)
+	    如果 (next != NULL)
 		*next = NUL;
-	    if (i == max - debug_backtrace_level)
+	    如果 (i == max - debug_backtrace_level)
 		smsg("->%d %s", max - i, cur);
-	    else
+	    否则
 		smsg("  %d %s", max - i, cur);
 	    ++i;
-	    if (next == NULL)
+	    如果 (next == NULL)
 		break;
 	    *next = '.';
 	    cur = next + 2;
@@ -394,9 +394,9 @@ do_showbacktrace(char_u *cmd)
 	vim_free(sname);
     }
 
-    if (SOURCING_LNUM != 0)
+    如果 (SOURCING_LNUM != 0)
 	smsg(_("line %ld: %s"), (long)SOURCING_LNUM, cmd);
-    else
+    否则
 	smsg(_("cmd: %s"), cmd);
 }
 
@@ -406,7 +406,7 @@ do_showbacktrace(char_u *cmd)
     void
 ex_debug(exarg_T *eap)
 {
-    int		debug_break_level_save = debug_break_level;
+    整数		debug_break_level_save = debug_break_level;
 
     debug_break_level = 9999;
     do_cmdline_cmd(eap->arg);
@@ -423,7 +423,7 @@ static linenr_T	debug_breakpoint_lnum;
  * a skipped command decides itself that a debug prompt should be displayed, it
  * can do so by calling dbg_check_skipped().
  */
-static int	debug_skipped;
+static 整数	debug_skipped;
 static char_u	*debug_skipped_name;
 
 /*
@@ -439,16 +439,16 @@ dbg_check_breakpoint(exarg_T *eap)
     char_u	*p;
 
     debug_skipped = FALSE;
-    if (debug_breakpoint_name != NULL)
+    如果 (debug_breakpoint_name != NULL)
     {
-	if (!eap->skip)
+	如果 (!eap->skip)
 	{
 	    // replace K_SNR with "<SNR>"
-	    if (debug_breakpoint_name[0] == K_SPECIAL
+	    如果 (debug_breakpoint_name[0] == K_SPECIAL
 		    && debug_breakpoint_name[1] == KS_EXTRA
 		    && debug_breakpoint_name[2] == KE_SNR)
 		p = (char_u *)"<SNR>";
-	    else
+	    否则
 		p = (char_u *)"";
 	    smsg(_("Breakpoint in \"%s%s\" line %ld"),
 		    p,
@@ -457,18 +457,18 @@ dbg_check_breakpoint(exarg_T *eap)
 	    debug_breakpoint_name = NULL;
 	    do_debug(eap->cmd);
 	}
-	else
+	否则
 	{
 	    debug_skipped = TRUE;
 	    debug_skipped_name = debug_breakpoint_name;
 	    debug_breakpoint_name = NULL;
 	}
     }
-    else if (ex_nesting_level <= debug_break_level)
+    否则 如果 (ex_nesting_level <= debug_break_level)
     {
-	if (!eap->skip)
+	如果 (!eap->skip)
 	    do_debug(eap->cmd);
-	else
+	否则
 	{
 	    debug_skipped = TRUE;
 	    debug_skipped_name = NULL;
@@ -480,13 +480,13 @@ dbg_check_breakpoint(exarg_T *eap)
  * Go to debug mode if skipped by dbg_check_breakpoint() because eap->skip was
  * set.  Return TRUE when the debug mode is entered this time.
  */
-    int
+    整数
 dbg_check_skipped(exarg_T *eap)
 {
-    int		prev_got_int;
+    整数		prev_got_int;
 
-    if (!debug_skipped)
-	return FALSE;
+    如果 (!debug_skipped)
+	返回 FALSE;
 
     // Save the value of got_int and reset it.  We don't want a previous
     // interruption cause flushing the input buffer.
@@ -498,7 +498,7 @@ dbg_check_skipped(exarg_T *eap)
     (void)dbg_check_breakpoint(eap);
     eap->skip = TRUE;
     got_int |= prev_got_int;
-    return TRUE;
+    返回 TRUE;
 }
 
 /*
@@ -507,23 +507,23 @@ dbg_check_skipped(exarg_T *eap)
  */
 struct debuggy
 {
-    int		dbg_nr;		// breakpoint number
-    int		dbg_type;	// DBG_FUNC, DBG_FILE or DBG_EXPR
+    整数		dbg_nr;		// breakpoint number
+    整数		dbg_type;	// DBG_FUNC, DBG_FILE or DBG_EXPR
     char_u	*dbg_name;	// function, expression or file name
     regprog_T	*dbg_prog;	// regexp program
     linenr_T	dbg_lnum;	// line number in function or file
-    int		dbg_forceit;	// ! used
+    整数		dbg_forceit;	// ! used
 #ifdef FEAT_EVAL
     typval_T    *dbg_val;       // last result of watchexpression
 #endif
-    int		dbg_level;      // stored nested level for expr
+    整数		dbg_level;      // stored nested level for expr
 };
 
 static garray_T dbg_breakp = {0, 0, sizeof(struct debuggy), 4, NULL};
 #define BREAKP(idx)		(((struct debuggy *)dbg_breakp.ga_data)[idx])
 #define DEBUGGY(gap, idx)	(((struct debuggy *)gap->ga_data)[idx])
-static int last_breakp = 0;	// nr of last defined breakpoint
-static int has_expr_breakpoint = FALSE;
+static 整数 last_breakp = 0;	// nr of last defined breakpoint
+static 整数 has_expr_breakpoint = FALSE;
 
 #ifdef FEAT_PROFILE
 // Profiling uses file and func names similar to breakpoints.
@@ -534,7 +534,7 @@ static garray_T prof_ga = {0, 0, sizeof(struct debuggy), 4, NULL};
 static hashtab_T prof_cache[N_PROF_HTAB];
 # define PROF_HTAB_FUNCS 0
 # define PROF_HTAB_FILES 1
-static int prof_cache_initialized;
+static 整数 prof_cache_initialized;
 typedef struct profentry_S
 {
     char    pen_flags;	// cache data booleans: profiling, forceit
@@ -552,17 +552,17 @@ typedef struct profentry_S
 # define HI2PE(hi)	HIKEY2PE((hi)->hi_key)
 
 static void prof_clear_cache(void);
-# define PROF_CLEAR_CACHE(gap) do {if ((gap) == &prof_ga) prof_clear_cache();} while (0)
+# define PROF_CLEAR_CACHE(gap) do {如果 ((gap) == &prof_ga) prof_clear_cache();} 当 (0)
 // Can enable to get some info about profile caching
 // #define PROF_CACHE_LOG
-#else
-# define PROF_CLEAR_CACHE(gap) do {} while (0)
+#否则
+# define PROF_CLEAR_CACHE(gap) do {} 当 (0)
 #endif
 #define DBG_FUNC	1
 #define DBG_FILE	2
 #define DBG_EXPR	3
 
-static linenr_T debuggy_find(int file,char_u *fname, linenr_T after, garray_T *gap, int *fp);
+static linenr_T debuggy_find(整数 file,char_u *fname, linenr_T after, garray_T *gap, 整数 *fp);
 
 /*
  * Evaluate the "bp->dbg_name" expression and return the result.
@@ -578,7 +578,7 @@ eval_expr_no_emsg(struct debuggy *bp)
     tv = eval_expr(bp->dbg_name, NULL);
     --emsg_off;
 
-    return tv;
+    返回 tv;
 }
 
 /*
@@ -587,7 +587,7 @@ eval_expr_no_emsg(struct debuggy *bp)
  * is allocated.
  * Returns FAIL for failure.
  */
-    static int
+    static 整数
 dbg_parsearg(
     char_u	*arg,
     garray_T	*gap)	    // either &dbg_breakp or &prof_ga
@@ -595,48 +595,48 @@ dbg_parsearg(
     char_u	*p = arg;
     char_u	*q;
     struct debuggy *bp;
-    int		here = FALSE;
+    整数		here = FALSE;
 
-    if (ga_grow(gap, 1) == FAIL)
-	return FAIL;
+    如果 (ga_grow(gap, 1) == FAIL)
+	返回 FAIL;
     bp = &DEBUGGY(gap, gap->ga_len);
 
     // Find "func" or "file".
-    if (STRNCMP(p, "func", 4) == 0)
+    如果 (STRNCMP(p, "func", 4) == 0)
 	bp->dbg_type = DBG_FUNC;
-    else if (STRNCMP(p, "file", 4) == 0)
+    否则 如果 (STRNCMP(p, "file", 4) == 0)
 	bp->dbg_type = DBG_FILE;
-    else if (
+    否则 如果 (
 #ifdef FEAT_PROFILE
 	    gap != &prof_ga &&
 #endif
 	    STRNCMP(p, "here", 4) == 0)
     {
-	if (curbuf->b_ffname == NULL)
+	如果 (curbuf->b_ffname == NULL)
 	{
 	    emsg(_(e_no_file_name));
-	    return FAIL;
+	    返回 FAIL;
 	}
 	bp->dbg_type = DBG_FILE;
 	here = TRUE;
     }
-    else if (
+    否则 如果 (
 #ifdef FEAT_PROFILE
 	    gap != &prof_ga &&
 #endif
 	    STRNCMP(p, "expr", 4) == 0)
 	bp->dbg_type = DBG_EXPR;
-    else
+    否则
     {
 	semsg(_(e_invalid_argument_str), p);
-	return FAIL;
+	返回 FAIL;
     }
     p = skipwhite(p + 4);
 
     // Find optional line number.
-    if (here)
+    如果 (here)
 	bp->dbg_lnum = curwin->w_cursor.lnum;
-    else if (
+    否则 如果 (
 #ifdef FEAT_PROFILE
 	    gap != &prof_ga &&
 #endif
@@ -645,52 +645,52 @@ dbg_parsearg(
 	bp->dbg_lnum = getdigits(&p);
 	p = skipwhite(p);
     }
-    else
+    否则
 	bp->dbg_lnum = 0;
 
     // Find the function or file name.  Don't accept a function name with ().
-    if ((!here && *p == NUL)
+    如果 ((!here && *p == NUL)
 	    || (here && *p != NUL)
 	    || (bp->dbg_type == DBG_FUNC && strstr((char *)p, "()") != NULL))
     {
 	semsg(_(e_invalid_argument_str), arg);
-	return FAIL;
+	返回 FAIL;
     }
 
-    if (bp->dbg_type == DBG_FUNC)
+    如果 (bp->dbg_type == DBG_FUNC)
 	bp->dbg_name = vim_strsave(STRNCMP(p, "g:", 2) == 0 ? p + 2 : p);
-    else if (here)
+    否则 如果 (here)
 	bp->dbg_name = vim_strsave(curbuf->b_ffname);
-    else if (bp->dbg_type == DBG_EXPR)
+    否则 如果 (bp->dbg_type == DBG_EXPR)
     {
 	bp->dbg_name = vim_strsave(p);
-	if (bp->dbg_name != NULL)
+	如果 (bp->dbg_name != NULL)
 	    bp->dbg_val = eval_expr_no_emsg(bp);
     }
-    else
+    否则
     {
 	// Expand the file name in the same way as do_source().  This means
 	// doing it twice, so that $DIR/file gets expanded when $DIR is
 	// "~/dir".
 	q = expand_env_save(p);
-	if (q == NULL)
-	    return FAIL;
+	如果 (q == NULL)
+	    返回 FAIL;
 	p = expand_env_save(q);
 	vim_free(q);
-	if (p == NULL)
-	    return FAIL;
-	if (*p != '*')
+	如果 (p == NULL)
+	    返回 FAIL;
+	如果 (*p != '*')
 	{
 	    bp->dbg_name = fix_fname(p);
 	    vim_free(p);
 	}
-	else
+	否则
 	    bp->dbg_name = p;
     }
 
-    if (bp->dbg_name == NULL)
-	return FAIL;
-    return OK;
+    如果 (bp->dbg_name == NULL)
+	返回 FAIL;
+    返回 OK;
 }
 
 /*
@@ -705,32 +705,32 @@ ex_breakadd(exarg_T *eap)
 
     gap = &dbg_breakp;
 #ifdef FEAT_PROFILE
-    if (eap->cmdidx == CMD_profile)
+    如果 (eap->cmdidx == CMD_profile)
 	gap = &prof_ga;
 #endif
 
-    if (dbg_parsearg(eap->arg, gap) != OK)
-	return;
+    如果 (dbg_parsearg(eap->arg, gap) != OK)
+	返回;
 
     bp = &DEBUGGY(gap, gap->ga_len);
     bp->dbg_forceit = eap->forceit;
 
-    if (bp->dbg_type != DBG_EXPR)
+    如果 (bp->dbg_type != DBG_EXPR)
     {
 	pat = file_pat_to_reg_pat(bp->dbg_name, NULL, NULL, FALSE);
-	if (pat != NULL)
+	如果 (pat != NULL)
 	{
 	    bp->dbg_prog = vim_regcomp(pat, RE_MAGIC + RE_STRING);
 	    vim_free(pat);
 	}
-	if (pat == NULL || bp->dbg_prog == NULL)
+	如果 (pat == NULL || bp->dbg_prog == NULL)
 	    vim_free(bp->dbg_name);
-	else
+	否则
 	{
-	    if (bp->dbg_lnum == 0)	// default line number is 1
+	    如果 (bp->dbg_lnum == 0)	// default line number is 1
 		bp->dbg_lnum = 1;
 #ifdef FEAT_PROFILE
-	    if (eap->cmdidx != CMD_profile)
+	    如果 (eap->cmdidx != CMD_profile)
 #endif
 	    {
 		DEBUGGY(gap, gap->ga_len).dbg_nr = ++last_breakp;
@@ -740,12 +740,12 @@ ex_breakadd(exarg_T *eap)
 	    PROF_CLEAR_CACHE(gap);
 	}
     }
-    else
+    否则
     {
 	// DBG_EXPR
 	DEBUGGY(gap, gap->ga_len++).dbg_nr = ++last_breakp;
 	++debug_tick;
-	if (gap == &dbg_breakp)
+	如果 (gap == &dbg_breakp)
 	    has_expr_breakpoint = TRUE;
     }
 }
@@ -756,20 +756,20 @@ ex_breakadd(exarg_T *eap)
     void
 ex_debuggreedy(exarg_T *eap)
 {
-    if (eap->addr_count == 0 || eap->line2 != 0)
+    如果 (eap->addr_count == 0 || eap->line2 != 0)
 	debug_greedy = TRUE;
-    else
+    否则
 	debug_greedy = FALSE;
 }
 
     static void
 update_has_expr_breakpoint(void)
 {
-    int i;
+    整数 i;
 
     has_expr_breakpoint = FALSE;
-    for (i = 0; i < dbg_breakp.ga_len; ++i)
-	if (BREAKP(i).dbg_type == DBG_EXPR)
+    为 (i = 0; i < dbg_breakp.ga_len; ++i)
+	如果 (BREAKP(i).dbg_type == DBG_EXPR)
 	{
 	    has_expr_breakpoint = TRUE;
 	    break;
@@ -779,10 +779,10 @@ update_has_expr_breakpoint(void)
 /*
  * Return TRUE if there is any expression breakpoint.
  */
-    int
+    整数
 debug_has_expr_breakpoint(void)
 {
-    return has_expr_breakpoint;
+    返回 has_expr_breakpoint;
 }
 
 /*
@@ -792,50 +792,50 @@ debug_has_expr_breakpoint(void)
 ex_breakdel(exarg_T *eap)
 {
     struct debuggy *bp, *bpi;
-    int		nr;
-    int		todel = -1;
-    int		del_all = FALSE;
-    int		i;
+    整数		nr;
+    整数		todel = -1;
+    整数		del_all = FALSE;
+    整数		i;
     linenr_T	best_lnum = 0;
     garray_T	*gap;
 
     gap = &dbg_breakp;
-    if (eap->cmdidx == CMD_profdel)
+    如果 (eap->cmdidx == CMD_profdel)
     {
 #ifdef FEAT_PROFILE
 	gap = &prof_ga;
-#else
+#否则
 	ex_ni(eap);
-	return;
+	返回;
 #endif
     }
 
-    if (vim_isdigit(*eap->arg))
+    如果 (vim_isdigit(*eap->arg))
     {
 	// ":breakdel {nr}"
 	nr = atol((char *)eap->arg);
-	for (i = 0; i < gap->ga_len; ++i)
-	    if (DEBUGGY(gap, i).dbg_nr == nr)
+	为 (i = 0; i < gap->ga_len; ++i)
+	    如果 (DEBUGGY(gap, i).dbg_nr == nr)
 	    {
 		todel = i;
 		break;
 	    }
     }
-    else if (*eap->arg == '*')
+    否则 如果 (*eap->arg == '*')
     {
 	todel = 0;
 	del_all = TRUE;
     }
-    else
+    否则
     {
 	// ":breakdel {func|file|expr} [lnum] {name}"
-	if (dbg_parsearg(eap->arg, gap) == FAIL)
-	    return;
+	如果 (dbg_parsearg(eap->arg, gap) == FAIL)
+	    返回;
 	bp = &DEBUGGY(gap, gap->ga_len);
-	for (i = 0; i < gap->ga_len; ++i)
+	为 (i = 0; i < gap->ga_len; ++i)
 	{
 	    bpi = &DEBUGGY(gap, i);
-	    if (bp->dbg_type == bpi->dbg_type
+	    如果 (bp->dbg_type == bpi->dbg_type
 		    && STRCMP(bp->dbg_name, bpi->dbg_name) == 0
 		    && (bp->dbg_lnum == bpi->dbg_lnum
 			|| (bp->dbg_lnum == 0
@@ -849,38 +849,38 @@ ex_breakdel(exarg_T *eap)
 	vim_free(bp->dbg_name);
     }
 
-    if (todel < 0)
+    如果 (todel < 0)
     {
 	semsg(_(e_breakpoint_not_found_str), eap->arg);
-	return;
+	返回;
     }
 
-    while (gap->ga_len > 0)
+    当 (gap->ga_len > 0)
     {
 	vim_free(DEBUGGY(gap, todel).dbg_name);
 #ifdef FEAT_EVAL
-	if (DEBUGGY(gap, todel).dbg_type == DBG_EXPR
+	如果 (DEBUGGY(gap, todel).dbg_type == DBG_EXPR
 		&& DEBUGGY(gap, todel).dbg_val != NULL)
 	    free_tv(DEBUGGY(gap, todel).dbg_val);
 #endif
 	vim_regfree(DEBUGGY(gap, todel).dbg_prog);
 	--gap->ga_len;
-	if (todel < gap->ga_len)
+	如果 (todel < gap->ga_len)
 	    mch_memmove(&DEBUGGY(gap, todel), &DEBUGGY(gap, todel + 1),
 		    (gap->ga_len - todel) * sizeof(struct debuggy));
 #ifdef FEAT_PROFILE
-	if (eap->cmdidx == CMD_breakdel)
+	如果 (eap->cmdidx == CMD_breakdel)
 #endif
 	    ++debug_tick;
-	if (!del_all)
+	如果 (!del_all)
 	    break;
     }
     PROF_CLEAR_CACHE(gap);
 
     // If all breakpoints were removed clear the array.
-    if (gap->ga_len == 0)
+    如果 (gap->ga_len == 0)
 	ga_clear(gap);
-    if (gap == &dbg_breakp)
+    如果 (gap == &dbg_breakp)
 	update_has_expr_breakpoint();
 }
 
@@ -891,26 +891,26 @@ ex_breakdel(exarg_T *eap)
 ex_breaklist(exarg_T *eap UNUSED)
 {
     struct debuggy *bp;
-    int		i;
+    整数		i;
 
-    if (dbg_breakp.ga_len == 0)
+    如果 (dbg_breakp.ga_len == 0)
     {
 	msg(_("No breakpoints defined"));
-	return;
+	返回;
     }
 
-    for (i = 0; i < dbg_breakp.ga_len; ++i)
+    为 (i = 0; i < dbg_breakp.ga_len; ++i)
     {
 	bp = &BREAKP(i);
-	if (bp->dbg_type == DBG_FILE)
+	如果 (bp->dbg_type == DBG_FILE)
 	    home_replace(NULL, bp->dbg_name, NameBuff, MAXPATHL, TRUE);
-	if (bp->dbg_type != DBG_EXPR)
+	如果 (bp->dbg_type != DBG_EXPR)
 	    smsg(_("%3d  %s %s  line %ld"),
 		    bp->dbg_nr,
 		    bp->dbg_type == DBG_FUNC ? "func" : "file",
 		    bp->dbg_type == DBG_FUNC ? bp->dbg_name : NameBuff,
 		    (long)bp->dbg_lnum);
-	else
+	否则
 	    smsg(_("%3d  expr %s"),
 		    bp->dbg_nr, bp->dbg_name);
     }
@@ -922,87 +922,87 @@ ex_breaklist(exarg_T *eap UNUSED)
  */
     linenr_T
 dbg_find_breakpoint(
-    int		file,	    // TRUE for a file, FALSE for a function
+    整数		file,	    // TRUE for a file, FALSE for a function
     char_u	*fname,	    // file or function name
     linenr_T	after)	    // after this line number
 {
-    return debuggy_find(file, fname, after, &dbg_breakp, NULL);
+    返回 debuggy_find(file, fname, after, &dbg_breakp, NULL);
 }
 
-#if defined(FEAT_PROFILE)
-# if defined(PROF_CACHE_LOG)
-static int count_lookups[2];
+#如果 defined(FEAT_PROFILE)
+# 如果 defined(PROF_CACHE_LOG)
+static 整数 count_lookups[2];
 # endif
 /*
  * Return TRUE if profiling is on for a function or sourced file.
  * Cache the results of debuggy_find().
  * Cache is cleared whenever prof_ga.ga_len is changed.
  */
-    int
+    整数
 has_profiling(
-    int		file,	    // TRUE for a file, FALSE for a function
+    整数		file,	    // TRUE for a file, FALSE for a function
     char_u	*fname,	    // file or function name
-    int		*fp,	    // return: forceit
+    整数		*fp,	    // return: forceit
     hash_T	*hashp)	    // use/return fname hash, may be NULL
 {
-    if (prof_ga.ga_len == 0 || !prof_cache_initialized)
-	return debuggy_find(file, fname, (linenr_T)0, &prof_ga, fp)
+    如果 (prof_ga.ga_len == 0 || !prof_cache_initialized)
+	返回 debuggy_find(file, fname, (linenr_T)0, &prof_ga, fp)
 							     != (linenr_T)0;
 
     hash_T hash;
-    if (hashp != NULL)
+    如果 (hashp != NULL)
     {
 	hash = *hashp;
-	if (hash == 0)
+	如果 (hash == 0)
 	{
 	    hash = hash_hash(fname);
 	    *hashp = hash;
 	}
     }
-    else
+    否则
 	hash = hash_hash(fname);
 
     hashtab_T *ht = &prof_cache[file ? PROF_HTAB_FILES : PROF_HTAB_FUNCS];
     hashitem_T *hi = hash_lookup(ht, fname, hash);
     profentry_T *pe;
-    if (HASHITEM_EMPTY(hi))
+    如果 (HASHITEM_EMPTY(hi))
     {
 	pe = alloc(offsetof(profentry_T, pen_name) + STRLEN(fname) + 1);
-	if (pe == NULL)
-	    return FALSE;
+	如果 (pe == NULL)
+	    返回 FALSE;
 	STRCPY(pe->pen_name, fname);
 	pe->pen_flags = 0;
 	// run debuggy_find and capture return and forceit
-	int f;
-	int lnum = debuggy_find(file, fname, (linenr_T)0, &prof_ga, &f);
-	if (lnum)
+	整数 f;
+	整数 lnum = debuggy_find(file, fname, (linenr_T)0, &prof_ga, &f);
+	如果 (lnum)
 	{
 	    PEN_SET_PROFILING(pe);
-	    if (f)
+	    如果 (f)
 		PEN_SET_FORCEIT(pe);
 	}
 	hash_add_item(ht, hi, pe->pen_name, hash);
-# if defined(PROF_CACHE_LOG)
+# 如果 defined(PROF_CACHE_LOG)
 	ch_log(NULL, "has_profiling: %s %s forceit %s, profile %s",
 	       file ? "file" : "func", fname,
 	       PEN_IS_FORCEIT(pe) ? "true" : "false",
 	       PEN_IS_PROFILING(pe) ? "true" : "false");
 # endif
     }
-    else
+    否则
 	pe = HI2PE(hi);
-    if (fp)
+    如果 (fp)
 	*fp = PEN_IS_FORCEIT(pe);
-# if defined(PROF_CACHE_LOG)
+# 如果 defined(PROF_CACHE_LOG)
     count_lookups[file ? PROF_HTAB_FILES : PROF_HTAB_FUNCS]++;
 # endif
-    return PEN_IS_PROFILING(pe);
+    返回 PEN_IS_PROFILING(pe);
 }
 
     static void
 prof_clear_cache(void)
 {
-    if (!prof_cache_initialized)
+    如果 (!prof_cache_initialized)
     {
 	hash_init(&prof_cache[PROF_HTAB_FUNCS]);
 	hash_init(&prof_cache[PROF_HTAB_FILES]);
@@ -1010,12 +1010,12 @@ prof_clear_cache(void)
     }
 
     hashtab_T *ht;
-    for (ht = &prof_cache[0]; ht < &prof_cache[N_PROF_HTAB]; ht++)
+    为 (ht = &prof_cache[0]; ht < &prof_cache[N_PROF_HTAB]; ht++)
     {
-	if (ht->ht_used > 0)
+	如果 (ht->ht_used > 0)
 	{
-# if defined(PROF_CACHE_LOG)
-	    int idx = ht == &prof_cache[PROF_HTAB_FUNCS]
+# 如果 defined(PROF_CACHE_LOG)
+	    整数 idx = ht == &prof_cache[PROF_HTAB_FUNCS]
 		      ? PROF_HTAB_FUNCS : PROF_HTAB_FILES;
 	    ch_log(NULL, "prof_clear_cache: %s, used: %ld, lookups: %d",
 		   idx == PROF_HTAB_FUNCS ? "function" : "script",
@@ -1034,22 +1034,22 @@ prof_clear_cache(void)
  */
     static linenr_T
 debuggy_find(
-    int		is_file,    // TRUE for a file, FALSE for a function
+    整数		is_file,    // TRUE for a file, FALSE for a function
     char_u	*fname,	    // file or function name
     linenr_T	after,	    // after this line number
     garray_T	*gap,	    // either &dbg_breakp or &prof_ga
-    int		*fp)	    // if not NULL: return forceit
+    整数		*fp)	    // if not NULL: return forceit
 {
     struct debuggy *bp;
-    int		i;
+    整数		i;
     linenr_T	lnum = 0;
     char_u	*name = NULL;
     char_u	*short_name = fname;
-    int		prev_got_int;
+    整数		prev_got_int;
 
     // Return quickly when there are no breakpoints.
-    if (gap->ga_len == 0)
-	return (linenr_T)0;
+    如果 (gap->ga_len == 0)
+	返回 (linenr_T)0;
 
     // For a script-local function remove the prefix, so that
     // "profile func Func" matches "Func" in any script.  Otherwise it's very
@@ -1057,23 +1057,23 @@ debuggy_find(
     // function in the wrong script, but that is much better than not being
     // able to profile/debug a function in a script with unknown ID.
     // Also match a script-specific name.
-    if (!is_file && fname[0] == K_SPECIAL)
+    如果 (!is_file && fname[0] == K_SPECIAL)
     {
 	short_name = vim_strchr(fname, '_') + 1;
 	name = alloc(STRLEN(fname) + 3);
-	if (name != NULL)
+	如果 (name != NULL)
 	{
 	    STRCPY(name, "<SNR>");
 	    STRCPY(name + 5, fname + 3);
 	}
     }
 
-    for (i = 0; i < gap->ga_len; ++i)
+    为 (i = 0; i < gap->ga_len; ++i)
     {
 	// Skip entries that are not useful or are for a line that is beyond
 	// an already found breakpoint.
 	bp = &DEBUGGY(gap, i);
-	if (((bp->dbg_type == DBG_FILE) == is_file
+	如果 (((bp->dbg_type == DBG_FILE) == is_file
 		    && bp->dbg_type != DBG_EXPR && (
 #ifdef FEAT_PROFILE
 		gap == &prof_ga ||
@@ -1085,31 +1085,31 @@ debuggy_find(
 	    // while matching should abort it.
 	    prev_got_int = got_int;
 	    got_int = FALSE;
-	    if ((name != NULL
+	    如果 ((name != NULL
 		   && vim_regexec_prog(&bp->dbg_prog, FALSE, name, (colnr_T)0))
 		    || vim_regexec_prog(&bp->dbg_prog, FALSE,
 						       short_name, (colnr_T)0))
 	    {
 		lnum = bp->dbg_lnum;
-		if (fp != NULL)
+		如果 (fp != NULL)
 		    *fp = bp->dbg_forceit;
 	    }
 	    got_int |= prev_got_int;
 #ifdef FEAT_PROFILE
-	    if (lnum && gap == &prof_ga)
+	    如果 (lnum && gap == &prof_ga)
 		break;
 #endif
 	}
 #ifdef FEAT_EVAL
-	else if (bp->dbg_type == DBG_EXPR)
+	否则 如果 (bp->dbg_type == DBG_EXPR)
 	{
 	    typval_T *tv;
-	    int	      line = FALSE;
+	    整数	      line = FALSE;
 
 	    tv = eval_expr_no_emsg(bp);
-	    if (tv != NULL)
+	    如果 (tv != NULL)
 	    {
-		if (bp->dbg_val == NULL)
+		如果 (bp->dbg_val == NULL)
 		{
 		    vim_free(debug_oldval);
 		    debug_oldval = typval_tostring(NULL, TRUE);
@@ -1118,14 +1118,14 @@ debuggy_find(
 		    debug_newval = typval_tostring(bp->dbg_val, TRUE);
 		    line = TRUE;
 		}
-		else
+		否则
 		{
 		    // Use "==" instead of "is" for strings, that is what we
 		    // always have done.
 		    exprtype_T	type = tv->v_type == VAR_STRING
 							? EXPR_EQUAL : EXPR_IS;
 
-		    if (typval_compare(tv, bp->dbg_val, type, FALSE) == OK
+		    如果 (typval_compare(tv, bp->dbg_val, type, FALSE) == OK
 			    && tv->vval.v_number == FALSE)
 		    {
 			typval_T *v;
@@ -1144,7 +1144,7 @@ debuggy_find(
 		    free_tv(tv);
 		}
 	    }
-	    else if (bp->dbg_val != NULL)
+	    否则 如果 (bp->dbg_val != NULL)
 	    {
 		vim_free(debug_oldval);
 		debug_oldval = typval_tostring(bp->dbg_val, TRUE);
@@ -1155,7 +1155,7 @@ debuggy_find(
 		line = TRUE;
 	    }
 
-	    if (line)
+	    如果 (line)
 	    {
 		lnum = after > 0 ? after : 1;
 		break;
@@ -1163,10 +1163,10 @@ debuggy_find(
 	}
 #endif
     }
-    if (name != fname)
+    如果 (name != fname)
 	vim_free(name);
 
-    return lnum;
+    返回 lnum;
 }
 
 /*

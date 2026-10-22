@@ -21,34 +21,34 @@
 #include <stdio.h>
 #include <string.h>
 
-	int
-main(int argc, char **argv)
+	整数
+主要(整数 argc, char **argv)
 {
 	char buffer[BUFSIZ];
 	char *p;
 
-	while (fgets(buffer, BUFSIZ, stdin) != NULL)
+	当 (fgets(buffer, BUFSIZ, stdin) != NULL)
 	{
-		for (p = buffer; *p != 0; p++)
+		为 (p = buffer; *p != 0; p++)
 		{
-			if (strncmp(p, "charset=utf-8", 13) == 0
+			如果 (strncmp(p, "charset=utf-8", 13) == 0
 				|| strncmp(p, "charset=UTF-8", 13) == 0)
 			{
 				fputs("charset=BIG-5", stdout);
 				p += 12;
 			}
-			else if (strncmp(p, "# Original translations", 23) == 0)
+			否则 如果 (strncmp(p, "# Original translations", 23) == 0)
 			{
 				fputs("# Generated from zh_TW.UTF-8.po, DO NOT EDIT.", stdout);
-				while (p[1] != '\n')
+				当 (p[1] != '\n')
 					++p;
 			}
-			else
+			否则
 			{
-				if (*(unsigned char *)p >= 0xA1)
+				如果 (*(unsigned char *)p >= 0xA1)
 				{
 					putchar(*p++);
-					if (*p == '\\')
+					如果 (*p == '\\')
 						putchar(*p);
 				}
 				putchar(*p);

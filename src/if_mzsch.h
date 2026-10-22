@@ -20,10 +20,10 @@
 # undef __CYGWIN32__
 #endif
 
-#if MZSCHEME_VERSION_MAJOR >= 299
+#如果 MZSCHEME_VERSION_MAJOR >= 299
 # define SCHEME_STRINGP(obj) (SCHEME_BYTE_STRINGP(obj) || SCHEME_CHAR_STRINGP(obj))
 # define BYTE_STRING_VALUE(obj) ((char_u *)SCHEME_BYTE_STR_VAL(obj))
-#else
+#否则
 // macros for compatibility with older versions
 # define scheme_current_config() scheme_config
 # define scheme_make_sized_byte_string scheme_make_sized_string
@@ -64,7 +64,7 @@
  * seg faults will indicate not registered refs
  */
 # define MZ_GC_CHECK() scheme_collect_garbage();
-#else
+#否则
 # define MZ_GC_CHECK()			// empty
 #endif
 

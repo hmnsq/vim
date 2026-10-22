@@ -25,14 +25,14 @@
  * XpmP.h is preferred, because it makes the signs drawn with a transparent
  * background instead of black.
  */
-#if defined(HAVE_XM_XPMP_H) && defined(FEAT_GUI_MOTIF) \
+#如果 defined(HAVE_XM_XPMP_H) && defined(FEAT_GUI_MOTIF) \
 	&& !defined(HAVE_X11_XPM_H)
 # include <Xm/XpmP.h>
-#else
+#否则
 # ifdef HAVE_X11_XPM_H
 #  ifdef VMS
 #   include <xpm.h>
-#  else
+#  否则
 #   include <X11/xpm.h>
 #  endif
 # endif
@@ -41,7 +41,7 @@
 #ifdef FEAT_XFONTSET
 # ifdef X_LOCALE
 #  include <X11/Xlocale.h>
-# else
+# 否则
 #  include <locale.h>
 # endif
 #endif
@@ -61,7 +61,7 @@
 #define DFLT_FONT		"7x13"
 #ifdef FONTSET_ALWAYS
 # define DFLT_MENU_FONT		XtDefaultFontSet
-#else
+#否则
 # define DFLT_MENU_FONT		XtDefaultFont
 #endif
 #define DFLT_TOOLTIP_FONT	XtDefaultFontSet
@@ -86,46 +86,46 @@ static Atom   wm_atoms[2];	// Window Manager Atoms
  * normal font (current_fontset == NULL, use gui.text_gc and gui.back_gc).
  */
 static XFontSet current_fontset = NULL;
-# if !defined(XDrawString)
+# 如果 !defined(XDrawString)
 #  define XDrawString(dpy, win, gc, x, y, str, n) \
 	do \
 	{ \
-	    if (current_fontset != NULL) \
+	    如果 (current_fontset != NULL) \
 		XmbDrawString(dpy, win, current_fontset, gc, x, y, str, n); \
-	    else \
+	    否则 \
 		XDrawString(dpy, win, gc, x, y, str, n); \
-	} while (0)
+	} 当 (0)
 # endif
-# if !defined(XDrawString16)
+# 如果 !defined(XDrawString16)
 #  define XDrawString16(dpy, win, gc, x, y, str, n) \
 	do \
 	{ \
-	    if (current_fontset != NULL) \
+	    如果 (current_fontset != NULL) \
 		XwcDrawString(dpy, win, current_fontset, gc, x, y, (wchar_t *)str, n); \
-	    else \
+	    否则 \
 		XDrawString16(dpy, win, gc, x, y, (XChar2b *)str, n); \
-	} while (0)
+	} 当 (0)
 # endif
-# if !defined(XDrawImageString16)
+# 如果 !defined(XDrawImageString16)
 #  define XDrawImageString16(dpy, win, gc, x, y, str, n) \
 	do \
 	{ \
-	    if (current_fontset != NULL) \
+	    如果 (current_fontset != NULL) \
 		XwcDrawImageString(dpy, win, current_fontset, gc, x, y, (wchar_t *)str, n); \
-	    else \
+	    否则 \
 		XDrawImageString16(dpy, win, gc, x, y, (XChar2b *)str, n); \
-	} while (0)
+	} 当 (0)
 # endif
-static int check_fontset_sanity(XFontSet fs);
-static int fontset_width(XFontSet fs);
-static int fontset_ascent(XFontSet fs);
+static 整数 check_fontset_sanity(XFontSet fs);
+static 整数 fontset_width(XFontSet fs);
+static 整数 fontset_ascent(XFontSet fs);
 #endif
 
 static guicolor_T	prev_fg_color = INVALCOLOR;
 static guicolor_T	prev_bg_color = INVALCOLOR;
 static guicolor_T	prev_sp_color = INVALCOLOR;
 
-#if defined(FEAT_GUI_MOTIF) && defined(FEAT_MENU)
+#如果 defined(FEAT_GUI_MOTIF) && defined(FEAT_MENU)
 static XButtonPressedEvent last_mouse_event;
 #endif
 
@@ -361,7 +361,7 @@ static XtResource vim_resources[] =
 	XtNborderWidth,
 	XtCBorderWidth,
 	XtRInt,
-	sizeof(int),
+	sizeof(整数),
 	XtOffsetOf(gui_T, border_width),
 	XtRImmediate,
 	(XtPointer)2
@@ -370,7 +370,7 @@ static XtResource vim_resources[] =
 	XtNscrollbarWidth,
 	XtCScrollbarWidth,
 	XtRInt,
-	sizeof(int),
+	sizeof(整数),
 	XtOffsetOf(gui_T, scrollbar_width),
 	XtRImmediate,
 	(XtPointer)SB_DEFAULT_WIDTH
@@ -380,7 +380,7 @@ static XtResource vim_resources[] =
 # ifdef FONTSET_ALWAYS
 	XtNmenuFontSet,
 	XtCMenuFontSet,
-# else
+# 否则
 	XtNmenuFont,
 	XtCMenuFont,
 # endif
@@ -524,14 +524,14 @@ static XrmOptionDescRec cmdline_options[] =
     {"-mf",		".menuFontSet",	    XrmoptionSepArg,	NULL},
     {"-menufont",	".menuFontSet",	    XrmoptionSepArg,	NULL},
     {"-menufontset",	".menuFontSet",	    XrmoptionSepArg,	NULL},
-#else
+#否则
     {"-mf",		".menuFont",	    XrmoptionSepArg,	NULL},
     {"-menufont",	".menuFont",	    XrmoptionSepArg,	NULL},
 #endif
     {"-xrm",		NULL,		    XrmoptionResArg,	NULL}
 };
 
-static int gui_argc = 0;
+static 整数 gui_argc = 0;
 static char **gui_argv = NULL;
 
 /*
@@ -543,7 +543,7 @@ gui_x11_timer_cb(
     XtPointer	    timed_out,
     XtIntervalId    *interval_id UNUSED)
 {
-    *((int *)timed_out) = TRUE;
+    *((整数 *)timed_out) = TRUE;
 }
 
 #ifdef FEAT_JOB_CHANNEL
@@ -572,8 +572,8 @@ gui_x11_visibility_cb(
     XEvent	*event,
     Boolean	*dum UNUSED)
 {
-    if (event->type != VisibilityNotify)
-	return;
+    如果 (event->type != VisibilityNotify)
+	返回;
 
     gui.visibility = event->xvisibility.state;
 
@@ -596,10 +596,10 @@ gui_x11_expose_cb(
     Boolean	*dum UNUSED)
 {
     XExposeEvent	*gevent;
-    int			new_x;
+    整数			new_x;
 
-    if (event->type != Expose)
-	return;
+    如果 (event->type != Expose)
+	返回;
 
     out_flush();	    // make sure all output has been processed
 
@@ -609,20 +609,20 @@ gui_x11_expose_cb(
     new_x = FILL_X(0);
 
     // Clear the border areas if needed
-    if (gevent->x < new_x)
+    如果 (gevent->x < new_x)
 	XClearArea(gui.dpy, gui.wid, 0, 0, new_x, 0, False);
-    if (gevent->y < FILL_Y(0))
+    如果 (gevent->y < FILL_Y(0))
 	XClearArea(gui.dpy, gui.wid, 0, 0, 0, FILL_Y(0), False);
-    if (gevent->x > FILL_X(Columns))
-	XClearArea(gui.dpy, gui.wid, FILL_X((int)Columns), 0, 0, 0, False);
-    if (gevent->y > FILL_Y(Rows))
-	XClearArea(gui.dpy, gui.wid, 0, FILL_Y((int)Rows), 0, 0, False);
+    如果 (gevent->x > FILL_X(Columns))
+	XClearArea(gui.dpy, gui.wid, FILL_X((整数)Columns), 0, 0, 0, False);
+    如果 (gevent->y > FILL_Y(Rows))
+	XClearArea(gui.dpy, gui.wid, 0, FILL_Y((整数)Rows), 0, 0, False);
 
     // This is needed for when redrawing is slow.
     gui_mch_update();
 }
 
-#if defined(FEAT_NETBEANS_INTG) && defined(FEAT_GUI_MOTIF)
+#如果 defined(FEAT_NETBEANS_INTG) && defined(FEAT_GUI_MOTIF)
 /*
  * This function fills in the XRectangle object with the current x,y
  * coordinates and height, width so that an XtVaSetValues to the same shell of
@@ -637,20 +637,20 @@ gui_x11_expose_cb(
 shellRectangle(Widget shell, XRectangle *r)
 {
     Window		rootw, shellw, child, parentw;
-    int			absx, absy;
+    整数			absx, absy;
     XWindowAttributes	a;
     Window		*children;
-    unsigned int	childrenCount;
+    unsigned 整数	childrenCount;
 
     shellw = XtWindow(shell);
-    if (shellw == 0)
-	return;
-    for (;;)
+    如果 (shellw == 0)
+	返回;
+    为 (;;)
     {
 	XQueryTree(XtDisplay(shell), shellw, &rootw, &parentw,
 						   &children, &childrenCount);
 	XFree(children);
-	if (parentw == rootw)
+	如果 (parentw == rootw)
 	    break;
 	shellw = parentw;
     }
@@ -670,12 +670,12 @@ gui_x11_resize_window_cb(
     XEvent	*event,
     Boolean	*dum UNUSED)
 {
-    static int lastWidth, lastHeight;
+    static 整数 lastWidth, lastHeight;
 
-    if (event->type != ConfigureNotify)
-	return;
+    如果 (event->type != ConfigureNotify)
+	返回;
 
-    if (event->xconfigure.width != lastWidth
+    如果 (event->xconfigure.width != lastWidth
 	    || event->xconfigure.height != lastHeight)
     {
 	lastWidth = event->xconfigure.width;
@@ -686,8 +686,8 @@ gui_x11_resize_window_cb(
 #endif
 		     );
     }
-#if defined(FEAT_NETBEANS_INTG) && defined(FEAT_GUI_MOTIF)
-    if (netbeans_active())
+#如果 defined(FEAT_NETBEANS_INTG) && defined(FEAT_GUI_MOTIF)
+    如果 (netbeans_active())
     {
 	XRectangle  rec;
 
@@ -730,8 +730,8 @@ gui_x11_leave_cb(
     gui_focus_change(FALSE);
 }
 
-#if defined(X_HAVE_UTF8_STRING)
-# if X_HAVE_UTF8_STRING
+#如果 defined(X_HAVE_UTF8_STRING)
+# 如果 X_HAVE_UTF8_STRING
 #  define USE_UTF8LOOKUP
 # endif
 #endif
@@ -750,61 +750,61 @@ gui_x11_key_hit_cb(
     char_u		*string = string_shortbuf;
     Boolean		string_alloced = False;
     Status		status;
-#else
+#否则
     char_u		string[4], string2[3];
 #endif
     KeySym		key_sym;
-    int			len;
-    int			i;
-    int			modifiers;
-    int			key;
+    整数			len;
+    整数			i;
+    整数			modifiers;
+    整数			key;
 
     ev_press = (XKeyPressedEvent *)event;
 
 #ifdef FEAT_XIM
-    if (xic)
+    如果 (xic)
     {
 # ifdef USE_UTF8LOOKUP
 	// XFree86 4.0.2 or newer: Be able to get UTF-8 characters even when
 	// the locale isn't utf-8.
-	if (enc_utf8)
+	如果 (enc_utf8)
 	    len = Xutf8LookupString(xic, ev_press, (char *)string,
 				  sizeof(string_shortbuf), &key_sym, &status);
-	else
+	否则
 # endif
 	    len = XmbLookupString(xic, ev_press, (char *)string,
 				  sizeof(string_shortbuf), &key_sym, &status);
-	if (status == XBufferOverflow)
+	如果 (status == XBufferOverflow)
 	{
 	    string = (char_u *)XtMalloc(len + 1);
 	    string_alloced = True;
 # ifdef USE_UTF8LOOKUP
 	    // XFree86 4.0.2 or newer: Be able to get UTF-8 characters even
 	    // when the locale isn't utf-8.
-	    if (enc_utf8)
+	    如果 (enc_utf8)
 		len = Xutf8LookupString(xic, ev_press, (char *)string,
 						      len, &key_sym, &status);
-	    else
+	    否则
 # endif
 		len = XmbLookupString(xic, ev_press, (char *)string,
 						      len, &key_sym, &status);
 	}
-	if (status == XLookupNone || status == XLookupChars)
+	如果 (status == XLookupNone || status == XLookupChars)
 	    key_sym = XK_VoidSymbol;
 
 	// Do conversion from 'termencoding' to 'encoding'.  When using
 	// Xutf8LookupString() it has already been done.
-	if (len > 0 && input_conv.vc_type != CONV_NONE
+	如果 (len > 0 && input_conv.vc_type != CONV_NONE
 # ifdef USE_UTF8LOOKUP
 		&& !enc_utf8
 # endif
 		)
 	{
-	    int		maxlen = len * 4 + 40;	// guessed
+	    整数		maxlen = len * 4 + 40;	// guessed
 	    char_u	*p = (char_u *)XtMalloc(maxlen);
 
 	    mch_memmove(p, string, len);
-	    if (string_alloced)
+	    如果 (string_alloced)
 		XtFree((char *)string);
 	    string = p;
 	    string_alloced = True;
@@ -813,16 +813,16 @@ gui_x11_key_hit_cb(
 
 	// Translate CSI to K_CSI, otherwise it could be recognized as the
 	// start of a special key.
-	for (i = 0; i < len; ++i)
-	    if (string[i] == CSI)
+	为 (i = 0; i < len; ++i)
+	    如果 (string[i] == CSI)
 	    {
 		char_u	*p = (char_u *)XtMalloc(len + 3);
 
 		mch_memmove(p, string, i + 1);
 		p[i + 1] = KS_EXTRA;
-		p[i + 2] = (int)KE_CSI;
+		p[i + 2] = (整数)KE_CSI;
 		mch_memmove(p + i + 3, string + i + 1, len - i);
-		if (string_alloced)
+		如果 (string_alloced)
 		    XtFree((char *)string);
 		string = p;
 		string_alloced = True;
@@ -830,7 +830,7 @@ gui_x11_key_hit_cb(
 		len += 2;
 	    }
     }
-    else
+    否则
 #endif
 	len = XLookupString(ev_press, (char *)string, sizeof(string),
 		&key_sym, NULL);
@@ -841,23 +841,23 @@ gui_x11_key_hit_cb(
     * easier than trying to XRebindKeysym() on them with every possible
     * combination of modifiers.
     */
-    if (key_sym == SunXK_F36 || key_sym == SunXK_F37)
+    如果 (key_sym == SunXK_F36 || key_sym == SunXK_F37)
 	len = 0;
 #endif
 
-    if (key_sym == XK_space)
+    如果 (key_sym == XK_space)
 	string[0] = ' ';	// Otherwise Ctrl-Space doesn't work
 
     /*
      * Only on some machines ^_ requires Ctrl+Shift+minus.  For consistency,
      * allow just Ctrl+minus too.
      */
-    if (key_sym == XK_minus && (ev_press->state & ControlMask))
+    如果 (key_sym == XK_minus && (ev_press->state & ControlMask))
 	string[0] = Ctrl__;
 
 #ifdef XK_ISO_Left_Tab
     // why do we get XK_ISO_Left_Tab instead of XK_Tab for shift-tab?
-    if (key_sym == XK_ISO_Left_Tab)
+    如果 (key_sym == XK_ISO_Left_Tab)
     {
 	key_sym = XK_Tab;
 	string[0] = TAB;
@@ -869,20 +869,20 @@ gui_x11_key_hit_cb(
     // done later, the same as it happens for the terminal.  Hopefully that
     // works for everybody...
 
-    if (len == 1 && string[0] == CSI)
+    如果 (len == 1 && string[0] == CSI)
     {
 	string[1] = KS_EXTRA;
-	string[2] = (int)KE_CSI;
+	string[2] = (整数)KE_CSI;
 	len = -3;
     }
 
     // Check for special keys.  Also do this when len == 1 (key has an ASCII
     // value) to detect backspace, delete and keypad keys.
-    if (len == 0 || len == 1)
+    如果 (len == 0 || len == 1)
     {
-	for (i = 0; special_keys[i].key_sym != (KeySym)0; i++)
+	为 (i = 0; special_keys[i].key_sym != (KeySym)0; i++)
 	{
-	    if (special_keys[i].key_sym == key_sym)
+	    如果 (special_keys[i].key_sym == key_sym)
 	    {
 		string[0] = CSI;
 		string[1] = special_keys[i].vim_code0;
@@ -894,47 +894,47 @@ gui_x11_key_hit_cb(
     }
 
     // Unrecognised key is ignored.
-    if (len == 0)
+    如果 (len == 0)
 	goto theend;
 
     // Handle modifiers.
     modifiers = 0;
-    if (ev_press->state & ShiftMask)
+    如果 (ev_press->state & ShiftMask)
 	modifiers |= MOD_MASK_SHIFT;
-    if (ev_press->state & ControlMask)
+    如果 (ev_press->state & ControlMask)
     {
 	modifiers |= MOD_MASK_CTRL;
-	if (len == 1 && string[0] < 0x20)
+	如果 (len == 1 && string[0] < 0x20)
 	    // Use the character before applyng CTRL.
 	    string[0] += 0x40;
     }
-    if (ev_press->state & Mod1Mask)
+    如果 (ev_press->state & Mod1Mask)
 	modifiers |= MOD_MASK_ALT;
-    if (ev_press->state & Mod4Mask)
+    如果 (ev_press->state & Mod4Mask)
 	modifiers |= MOD_MASK_META;
 
     /*
      * For some keys a shift modifier is translated into another key
      * code.
      */
-    if (len == -3)
+    如果 (len == -3)
 	key = TO_SPECIAL(string[1], string[2]);
-    else
+    否则
     {
 	string[len] = NUL;
 	key = mb_ptr2char(string);
     }
     key = simplify_key(key, &modifiers);
-    if (key == CSI)
+    如果 (key == CSI)
 	key = K_CSI;
-    if (IS_SPECIAL(key))
+    如果 (IS_SPECIAL(key))
     {
 	string[0] = CSI;
 	string[1] = K_SECOND(key);
 	string[2] = K_THIRD(key);
 	len = 3;
     }
-    else
+    否则
     {
 	// Some keys need adjustment when the Ctrl modifier is used.
 	key = may_adjust_key_for_ctrl(modifiers, key);
@@ -946,7 +946,7 @@ gui_x11_key_hit_cb(
 	modifiers = may_remove_shift_modifier(modifiers, key);
     }
 
-    if (modifiers != 0)
+    如果 (modifiers != 0)
     {
 	string2[0] = CSI;
 	string2[1] = KS_MODIFIER;
@@ -956,9 +956,9 @@ gui_x11_key_hit_cb(
 
     // Check if the key interrupts.
     {
-	int int_ch = check_for_interrupt(key, modifiers);
+	整数 int_ch = check_for_interrupt(key, modifiers);
 
-	if (int_ch != NUL)
+	如果 (int_ch != NUL)
 	{
 	    trash_input_buf();
 	    string[0] = int_ch;
@@ -971,21 +971,21 @@ gui_x11_key_hit_cb(
     /*
      * blank out the pointer if necessary
      */
-    if (p_mh)
+    如果 (p_mh)
 	gui_mch_mousehide(TRUE);
 
-#if defined(FEAT_BEVAL_TIP)
+#如果 defined(FEAT_BEVAL_TIP)
     {
 	BalloonEval *be;
 
-	if ((be = gui_mch_currently_showing_beval()) != NULL)
+	如果 ((be = gui_mch_currently_showing_beval()) != NULL)
 	    gui_mch_unpost_balloon(be);
     }
 #endif
 theend:
     {}	    // some compilers need a statement here
 #ifdef FEAT_XIM
-    if (string_alloced)
+    如果 (string_alloced)
 	XtFree((char *)string);
 #endif
 }
@@ -998,15 +998,15 @@ gui_x11_mouse_cb(
     Boolean	*dum UNUSED)
 {
     static XtIntervalId timer = (XtIntervalId)0;
-    static int	timed_out = TRUE;
+    static 整数	timed_out = TRUE;
 
-    int		button;
-    int		repeated_click = FALSE;
-    int		x, y;
+    整数		button;
+    整数		repeated_click = FALSE;
+    整数		x, y;
     int_u	x_modifiers;
     int_u	vim_modifiers;
 
-    if (event->type == MotionNotify)
+    如果 (event->type == MotionNotify)
     {
 	// Get the latest position, avoids lagging behind on a drag.
 	x = event->xmotion.x;
@@ -1020,24 +1020,24 @@ gui_x11_mouse_cb(
 	 */
 	gui_mch_mousehide(FALSE);
 
-	if (button != MOUSE_DRAG)	// just moving the rodent
+	如果 (button != MOUSE_DRAG)	// just moving the rodent
 	{
 #ifdef FEAT_MENU
-	    if (dud)			// moved in vimForm
+	    如果 (dud)			// moved in vimForm
 		y -= gui.menu_height;
 #endif
 	    gui_mouse_moved(x, y);
-	    return;
+	    返回;
 	}
     }
-    else
+    否则
     {
 	x = event->xbutton.x;
 	y = event->xbutton.y;
-	if (event->type == ButtonPress)
+	如果 (event->type == ButtonPress)
 	{
 	    // Handle multiple clicks
-	    if (!timed_out)
+	    如果 (!timed_out)
 	    {
 		XtRemoveTimeOut(timer);
 		repeated_click = TRUE;
@@ -1058,26 +1058,26 @@ gui_x11_mouse_cb(
 		case 8:		button = MOUSE_X1;	break;
 		case 9:		button = MOUSE_X2;	break;
 		default:
-		    return;	// Unknown button
+		    返回;	// Unknown button
 	    }
 	}
-	else if (event->type == ButtonRelease)
+	否则 如果 (event->type == ButtonRelease)
 	    button = MOUSE_RELEASE;
-	else
-	    return;	// Unknown mouse event type
+	否则
+	    返回;	// Unknown mouse event type
 
 	x_modifiers = event->xbutton.state;
-#if defined(FEAT_GUI_MOTIF) && defined(FEAT_MENU)
+#如果 defined(FEAT_GUI_MOTIF) && defined(FEAT_MENU)
 	last_mouse_event = event->xbutton;
 #endif
     }
 
     vim_modifiers = 0x0;
-    if (x_modifiers & ShiftMask)
+    如果 (x_modifiers & ShiftMask)
 	vim_modifiers |= MOUSE_SHIFT;
-    if (x_modifiers & ControlMask)
+    如果 (x_modifiers & ControlMask)
 	vim_modifiers |= MOUSE_CTRL;
-    if (x_modifiers & Mod1Mask)	    // Alt or Meta key
+    如果 (x_modifiers & Mod1Mask)	    // Alt or Meta key
 	vim_modifiers |= MOUSE_ALT;
 
     gui_send_mouse_event(button, x, y, repeated_click, vim_modifiers);
@@ -1093,58 +1093,58 @@ gui_x11_mouse_cb(
  * when vim is started, whether or not the GUI has been started.
  */
     void
-gui_mch_prepare(int *argc, char **argv)
+gui_mch_prepare(整数 *argc, char **argv)
 {
-    int	    arg;
-    int	    i;
+    整数	    arg;
+    整数	    i;
 
     /*
      * Move all the entries in argv which are relevant to X into gui_argv.
      */
     gui_argc = 0;
     gui_argv = LALLOC_MULT(char *, *argc);
-    if (gui_argv == NULL)
-	return;
+    如果 (gui_argv == NULL)
+	返回;
     gui_argv[gui_argc++] = argv[0];
     arg = 1;
-    while (arg < *argc)
+    当 (arg < *argc)
     {
 	// Look for argv[arg] in cmdline_options[] table
-	for (i = 0; i < (int)XtNumber(cmdline_options); i++)
-	    if (strcmp(argv[arg], cmdline_options[i].option) == 0)
+	为 (i = 0; i < (整数)XtNumber(cmdline_options); i++)
+	    如果 (strcmp(argv[arg], cmdline_options[i].option) == 0)
 		break;
 
-	if (i < (int)XtNumber(cmdline_options))
+	如果 (i < (整数)XtNumber(cmdline_options))
 	{
 	    // Remember finding "-rv" or "-reverse"
-	    if (strcmp("-rv", argv[arg]) == 0
+	    如果 (strcmp("-rv", argv[arg]) == 0
 		    || strcmp("-reverse", argv[arg]) == 0)
 		found_reverse_arg = TRUE;
-	    else if ((strcmp("-fn", argv[arg]) == 0
+	    否则 如果 ((strcmp("-fn", argv[arg]) == 0
 			|| strcmp("-font", argv[arg]) == 0)
 		    && arg + 1 < *argc)
 		font_argument = argv[arg + 1];
 
 	    // Found match in table, so move it into gui_argv
 	    gui_argv[gui_argc++] = argv[arg];
-	    if (--*argc > arg)
+	    如果 (--*argc > arg)
 	    {
 		mch_memmove(&argv[arg], &argv[arg + 1], (*argc - arg)
 						    * sizeof(char *));
-		if (cmdline_options[i].argKind != XrmoptionNoArg)
+		如果 (cmdline_options[i].argKind != XrmoptionNoArg)
 		{
 		    // Move the options argument as well
 		    gui_argv[gui_argc++] = argv[arg];
-		    if (--*argc > arg)
+		    如果 (--*argc > arg)
 			mch_memmove(&argv[arg], &argv[arg + 1], (*argc - arg)
 							    * sizeof(char *));
 		}
 	    }
 	    argv[*argc] = NULL;
 	}
-	else
+	否则
 #ifdef FEAT_NETBEANS_INTG
-	    if (strncmp("-nb", argv[arg], 3) == 0)
+	    如果 (strncmp("-nb", argv[arg], 3) == 0)
 	{
 	    gui.dofork = false;	// don't fork() when starting GUI
 	    netbeansArg = argv[arg];
@@ -1152,7 +1152,7 @@ gui_mch_prepare(int *argc, char **argv)
 					    (--*argc - arg) * sizeof(char *));
 	    argv[*argc] = NULL;
 	}
-	else
+	否则
 #endif
 	    arg++;
     }
@@ -1160,11 +1160,11 @@ gui_mch_prepare(int *argc, char **argv)
 
 #ifndef XtSpecificationRelease
 # define CARDINAL (Cardinal *)
-#else
-# if XtSpecificationRelease == 4
+#否则
+# 如果 XtSpecificationRelease == 4
 #  define CARDINAL (Cardinal *)
-# else
-#  define CARDINAL (int *)
+# 否则
+#  define CARDINAL (整数 *)
 # endif
 #endif
 
@@ -1172,36 +1172,36 @@ gui_mch_prepare(int *argc, char **argv)
  * Check if the GUI can be started.  Called before gvimrc is sourced.
  * Return OK or FAIL.
  */
-    int
+    整数
 gui_mch_init_check(void)
 {
 #ifdef FEAT_XIM
     XtSetLanguageProc(NULL, NULL, NULL);
 #endif
     open_app_context();
-    if (app_context != NULL)
+    如果 (app_context != NULL)
 	gui.dpy = XtOpenDisplay(app_context, 0, VIM_NAME, VIM_CLASS,
 		cmdline_options, XtNumber(cmdline_options),
 		CARDINAL &gui_argc, gui_argv);
 
-#if defined(LC_NUMERIC)
+#如果 defined(LC_NUMERIC)
     {
 	// The call to XtOpenDisplay() may have set the locale from the
 	// environment. Set LC_NUMERIC to "C" to make sure that strtod() uses a
 	// decimal point, not a comma.
 	char *p = setlocale(LC_NUMERIC, NULL);
 
-	if (p == NULL || strcmp(p, "C") != 0)
+	如果 (p == NULL || strcmp(p, "C") != 0)
 	   setlocale(LC_NUMERIC, "C");
     }
 #endif
-    if (app_context == NULL || gui.dpy == NULL)
+    如果 (app_context == NULL || gui.dpy == NULL)
     {
 	gui.dying = true;
 	emsg(_(e_cannot_open_display));
-	return FAIL;
+	返回 FAIL;
     }
-    return OK;
+    返回 OK;
 }
 
 
@@ -1214,10 +1214,10 @@ static XtInputId _xsmp_xtinputid;
     static void
 local_xsmp_handle_requests(
     XtPointer	c UNUSED,
-    int		*s UNUSED,
+    整数		*s UNUSED,
     XtInputId	*i UNUSED)
 {
-    if (xsmp_handle_requests() == FAIL)
+    如果 (xsmp_handle_requests() == FAIL)
 	XtRemoveInput(_xsmp_xtinputid);
 }
 #endif
@@ -1227,15 +1227,15 @@ local_xsmp_handle_requests(
  * Initialise the X GUI.  Create all the windows, set up all the call-backs etc.
  * Returns OK for success, FAIL when the GUI can't be started.
  */
-    int
+    整数
 gui_mch_init(void)
 {
     XtGCMask	gc_mask;
     XGCValues	gc_vals;
-    int		x, y, mask;
+    整数		x, y, mask;
     unsigned	w, h;
 
-#if 0
+#如果 0
     // Uncomment this to enable synchronous mode for debugging
     XSynchronize(gui.dpy, True);
 #endif
@@ -1269,7 +1269,7 @@ gui_mch_init(void)
     gui.back_pixel = gui.def_back_pixel;
 
     // Check if reverse video needs to be applied (on Sun it's done by X)
-    if (gui.rsrc_rev_video && gui_get_lightness(gui.back_pixel)
+    如果 (gui.rsrc_rev_video && gui_get_lightness(gui.back_pixel)
 					  > gui_get_lightness(gui.norm_pixel))
     {
 	gui.norm_pixel = gui.def_back_pixel;
@@ -1308,19 +1308,19 @@ gui_mch_init(void)
     gui.visibility = VisibilityUnobscured;
     x11_setup_atoms(gui.dpy);
 
-    if (gui_win_x != -1 && gui_win_y != -1)
+    如果 (gui_win_x != -1 && gui_win_y != -1)
 	gui_mch_set_winpos(gui_win_x, gui_win_y);
 
     // Now adapt the supplied(?) geometry-settings
     // Added by Kjetil Jacobsen <kjetilja@stud.cs.uit.no>
-    if (gui.geom != NULL && *gui.geom != NUL)
+    如果 (gui.geom != NULL && *gui.geom != NUL)
     {
 	mask = XParseGeometry((char *)gui.geom, &x, &y, &w, &h);
-	if (mask & WidthValue)
+	如果 (mask & WidthValue)
 	    Columns = w;
-	if (mask & HeightValue)
+	如果 (mask & HeightValue)
 	{
-	    if (p_window > (long)h - 1 || !option_was_set((char_u *)"window"))
+	    如果 (p_window > (long)h - 1 || !option_was_set((char_u *)"window"))
 		p_window = h - 1;
 	    Rows = h;
 	}
@@ -1330,7 +1330,7 @@ gui_mch_init(void)
 	 * users geometry, so we get good defaults when they don't. This needs
 	 * to be done before the shell is popped up.
 	 */
-	if (mask & (XValue|YValue))
+	如果 (mask & (XValue|YValue))
 	    XtVaSetValues(vimShell, XtNgeometry, gui.geom, NULL);
     }
 
@@ -1339,7 +1339,7 @@ gui_mch_init(void)
    /*
     * Add an icon to Vim (Marcel Douben: 11 May 1998).
     */
-    if (vim_strchr(p_go, GO_ICON) != NULL)
+    如果 (vim_strchr(p_go, GO_ICON) != NULL)
     {
 #ifndef HAVE_XPM
 # include "vim_icon.xbm"
@@ -1360,7 +1360,7 @@ gui_mch_init(void)
 		    vim_mask_icon_width,
 		    vim_mask_icon_height));
 	XtSetValues(vimShell, arg, (Cardinal)2);
-#else
+#否则
 // Use Pixmaps, looking much nicer.
 
 # include "../runtime/vim32x32.xpm"
@@ -1372,7 +1372,7 @@ gui_mch_init(void)
     static char		**magick = vim32x32;
     Window		root_window;
     XIconSize		*size;
-    int			number_sizes;
+    整数			number_sizes;
     Display		*dsp;
     Screen		*scr;
     XpmAttributes	attr;
@@ -1382,16 +1382,16 @@ gui_mch_init(void)
      * Adjust the icon to the preferences of the actual window manager.
      */
     root_window = XRootWindowOfScreen(XtScreen(vimShell));
-    if (XGetIconSizes(XtDisplay(vimShell), root_window,
+    如果 (XGetIconSizes(XtDisplay(vimShell), root_window,
 						   &size, &number_sizes) != 0)
     {
-	if (number_sizes > 0)
+	如果 (number_sizes > 0)
 	{
-	    if (size->max_height >= 48 && size->max_width >= 48)
+	    如果 (size->max_height >= 48 && size->max_width >= 48)
 		magick = vim48x48;
-	    else if (size->max_height >= 32 && size->max_width >= 32)
+	    否则 如果 (size->max_height >= 32 && size->max_width >= 32)
 		magick = vim32x32;
-	    else if (size->max_height >= 16 && size->max_width >= 16)
+	    否则 如果 (size->max_height >= 16 && size->max_width >= 16)
 		magick = vim16x16;
 	}
     }
@@ -1408,7 +1408,7 @@ gui_mch_init(void)
     attr.colormap = cmap;
     attr.depth = DefaultDepthOfScreen(scr);
 
-    if (!icon)
+    如果 (!icon)
     {
 	XpmCreatePixmapFromData(dsp, root_window, magick, &icon,
 							   &icon_mask, &attr);
@@ -1428,12 +1428,12 @@ gui_mch_init(void)
 
 #ifdef USE_XSMP
     // Attach listener on ICE connection
-    if (-1 != xsmp_icefd)
+    如果 (-1 != xsmp_icefd)
 	_xsmp_xtinputid = XtAppAddInput(app_context, xsmp_icefd,
 		(XtPointer)XtInputReadMask, local_xsmp_handle_requests, NULL);
 #endif
 
-    return OK;
+    返回 OK;
 }
 
 /*
@@ -1461,19 +1461,19 @@ gui_mch_new_colors(void)
     gc_mask = GCForeground | GCBackground;
     gc_vals.foreground = gui.norm_pixel;
     gc_vals.background = gui.back_pixel;
-    if (gui.text_gc != NULL)
+    如果 (gui.text_gc != NULL)
 	XChangeGC(gui.dpy, gui.text_gc, gc_mask, &gc_vals);
 
     gc_vals.foreground = gui.back_pixel;
     gc_vals.background = gui.norm_pixel;
-    if (gui.back_gc != NULL)
+    如果 (gui.back_gc != NULL)
 	XChangeGC(gui.dpy, gui.back_gc, gc_mask, &gc_vals);
 
     gc_mask |= GCFunction;
     gc_vals.foreground = gui.norm_pixel ^ gui.back_pixel;
     gc_vals.background = gui.norm_pixel ^ gui.back_pixel;
     gc_vals.function   = GXxor;
-    if (gui.invert_gc != NULL)
+    如果 (gui.invert_gc != NULL)
 	XChangeGC(gui.dpy, gui.invert_gc, gc_mask, &gc_vals);
 
     gui_x11_set_back_color();
@@ -1482,7 +1482,7 @@ gui_mch_new_colors(void)
 /*
  * Open the GUI window which was created by a call to gui_mch_init().
  */
-    int
+    整数
 gui_mch_open(void)
 {
     // Actually open the window
@@ -1513,13 +1513,13 @@ gui_mch_open(void)
 #endif
 
 #ifdef FEAT_CLIENTSERVER
-    if (serverName == NULL && serverDelayedStartName != NULL)
+    如果 (serverName == NULL && serverDelayedStartName != NULL)
     {
 	// This is a :gui command in a plain vim with no previous server
 	commWindow = XtWindow(vimShell);
 	(void)serverRegisterName(gui.dpy, serverDelayedStartName);
     }
-    else
+    否则
     {
 	/*
 	 * Cannot handle "widget-less" windows with XtProcessEvent() we'll
@@ -1540,10 +1540,10 @@ gui_mch_open(void)
     xim_init();
 #endif
 
-    return OK;
+    返回 OK;
 }
 
-#if defined(FEAT_BEVAL_GUI)
+#如果 defined(FEAT_BEVAL_GUI)
 /*
  * Convert the tooltip fontset name to an XFontSet.
  */
@@ -1557,14 +1557,14 @@ gui_init_tooltip_font(void)
     to.addr = (XtPointer)&gui.tooltip_fontset;
     to.size = sizeof(XFontSet);
 
-    if (XtConvertAndStore(vimShell, XtRString, &from, XtRFontSet, &to) == False)
+    如果 (XtConvertAndStore(vimShell, XtRString, &from, XtRFontSet, &to) == False)
     {
 	// Failed. What to do?
     }
 }
 #endif
 
-#if defined(FEAT_MENU)
+#如果 defined(FEAT_MENU)
 // Convert the menu font/fontset name to an XFontStruct/XFontset
     void
 gui_init_menu_font(void)
@@ -1577,17 +1577,17 @@ gui_init_menu_font(void)
     to.addr = (XtPointer)&gui.menu_fontset;
     to.size = sizeof(GuiFontset);
 
-    if (XtConvertAndStore(vimShell, XtRString, &from, XtRFontSet, &to) == False)
+    如果 (XtConvertAndStore(vimShell, XtRString, &from, XtRFontSet, &to) == False)
     {
 	// Failed. What to do?
     }
-# else
+# 否则
     from.addr = (char *)gui.rsrc_menu_font_name;
     from.size = strlen(from.addr);
     to.addr = (XtPointer)&gui.menu_font;
     to.size = sizeof(GuiFont);
 
-    if (XtConvertAndStore(vimShell, XtRString, &from, XtRFontStruct, &to) == False)
+    如果 (XtConvertAndStore(vimShell, XtRString, &from, XtRFontStruct, &to) == False)
     {
 	// Failed. What to do?
     }
@@ -1596,9 +1596,9 @@ gui_init_menu_font(void)
 #endif
 
     void
-gui_mch_exit(int rc UNUSED)
+gui_mch_exit(整数 rc UNUSED)
 {
-#if 0
+#如果 0
     // Lesstif gives an error message here, and so does Solaris.  The man page
     // says that this isn't needed when exiting, so just skip it.
     XtCloseDisplay(gui.dpy);
@@ -1609,8 +1609,8 @@ gui_mch_exit(int rc UNUSED)
 /*
  * Get the position of the top left corner of the window.
  */
-    int
-gui_mch_get_winpos(int *x, int *y)
+    整数
+gui_mch_get_winpos(整数 *x, 整数 *y)
 {
     Dimension	xpos, ypos;
 
@@ -1620,7 +1620,7 @@ gui_mch_get_winpos(int *x, int *y)
 	NULL);
     *x = xpos;
     *y = ypos;
-    return OK;
+    返回 OK;
 }
 
 /*
@@ -1628,7 +1628,7 @@ gui_mch_get_winpos(int *x, int *y)
  * coordinates.
  */
     void
-gui_mch_set_winpos(int x, int y)
+gui_mch_set_winpos(整数 x, 整数 y)
 {
     XtVaSetValues(vimShell,
 	XtNx,	x,
@@ -1638,13 +1638,13 @@ gui_mch_set_winpos(int x, int y)
 
     void
 gui_mch_set_shellsize(
-    int		width,
-    int		height,
-    int		min_width,
-    int		min_height,
-    int		base_width,
-    int		base_height,
-    int		direction UNUSED)
+    整数		width,
+    整数		height,
+    整数		min_width,
+    整数		min_height,
+    整数		base_width,
+    整数		base_height,
+    整数		direction UNUSED)
 {
 #ifdef FEAT_XIM
     height += xim_get_status_area_height(),
@@ -1652,7 +1652,7 @@ gui_mch_set_shellsize(
     XtVaSetValues(vimShell,
 	XtNwidthInc,	gui.char_width,
 	XtNheightInc,	gui.char_height,
-#if defined(XtSpecificationRelease) && XtSpecificationRelease >= 4
+#如果 defined(XtSpecificationRelease) && XtSpecificationRelease >= 4
 	XtNbaseWidth,	base_width,
 	XtNbaseHeight,	base_height,
 #endif
@@ -1669,8 +1669,8 @@ gui_mch_set_shellsize(
  */
     void
 gui_mch_get_screen_dimensions(
-    int	    *screen_w,
-    int	    *screen_h)
+    整数	    *screen_w,
+    整数	    *screen_h)
 {
     *screen_w = DisplayWidth(gui.dpy, DefaultScreen(gui.dpy)) - 10;
     *screen_h = DisplayHeight(gui.dpy, DefaultScreen(gui.dpy)) - p_ghr;
@@ -1682,10 +1682,10 @@ gui_mch_get_screen_dimensions(
  * If "fontset" is TRUE, load the "font_name" as a fontset.
  * Return FAIL if the font could not be loaded, OK otherwise.
  */
-    int
+    整数
 gui_mch_init_font(
     char_u	*font_name,
-    int		do_fontset UNUSED)
+    整数		do_fontset UNUSED)
 {
     XFontStruct	*font = NULL;
 
@@ -1696,32 +1696,32 @@ gui_mch_init_font(
 #ifdef FEAT_GUI_MOTIF
     // A font name equal "*" is indicating, that we should activate the font
     // selection dialogue to get a new font name. So let us do it here.
-    if (font_name != NULL && STRCMP(font_name, "*") == 0)
+    如果 (font_name != NULL && STRCMP(font_name, "*") == 0)
     {
 	font_name = gui_xm_select_font(hl_get_font_name());
 
 	// Do not reset to default font except on GUI startup.
-	if (font_name == NULL && !gui.starting)
-	    return OK;
+	如果 (font_name == NULL && !gui.starting)
+	    返回 OK;
     }
 #endif
 
 #ifdef FEAT_XFONTSET
-    if (do_fontset)
+    如果 (do_fontset)
     {
 	// If 'guifontset' is set, VIM treats all font specifications as if
 	// they were fontsets, and 'guifontset' becomes the default.
-	if (font_name != NULL)
+	如果 (font_name != NULL)
 	{
 	    fontset = (XFontSet)gui_mch_get_fontset(font_name, FALSE, TRUE);
-	    if (fontset == NULL)
-		return FAIL;
+	    如果 (fontset == NULL)
+		返回 FAIL;
 	}
     }
-    else
+    否则
 #endif
     {
-	if (font_name == NULL)
+	如果 (font_name == NULL)
 	{
 	    /*
 	     * If none of the fonts in 'font' could be loaded, try the one set
@@ -1730,20 +1730,20 @@ gui_mch_init_font(
 	     */
 	    font_name = gui.rsrc_font_name;
 	    font = (XFontStruct *)gui_mch_get_font(font_name, FALSE);
-	    if (font == NULL)
+	    如果 (font == NULL)
 		font_name = (char_u *)DFLT_FONT;
 	}
-	if (font == NULL)
+	如果 (font == NULL)
 	    font = (XFontStruct *)gui_mch_get_font(font_name, FALSE);
-	if (font == NULL)
-	    return FAIL;
+	如果 (font == NULL)
+	    返回 FAIL;
     }
 
     gui_mch_free_font(gui.norm_font);
 #ifdef FEAT_XFONTSET
     gui_mch_free_fontset(gui.fontset);
 
-    if (fontset != NULL)
+    如果 (fontset != NULL)
     {
 	gui.norm_font = NOFONT;
 	gui.fontset = (GuiFontset)fontset;
@@ -1751,7 +1751,7 @@ gui_mch_init_font(
 	gui.char_height = fontset_height(fontset) + p_linespace;
 	gui.char_ascent = fontset_ascent(fontset) + p_linespace / 2;
     }
-    else
+    否则
 #endif
     {
 	gui.norm_font = (GuiFont)font;
@@ -1770,38 +1770,38 @@ gui_mch_init_font(
      * We should also try to work out what font to use for these when they are
      * not specified by X resources, but we don't yet.
      */
-    if (font_name == gui.rsrc_font_name)
+    如果 (font_name == gui.rsrc_font_name)
     {
-	if (gui.bold_font == NOFONT
+	如果 (gui.bold_font == NOFONT
 		&& gui.rsrc_bold_font_name != NULL
 		&& *gui.rsrc_bold_font_name != NUL)
 	    gui.bold_font = gui_mch_get_font(gui.rsrc_bold_font_name, FALSE);
-	if (gui.ital_font == NOFONT
+	如果 (gui.ital_font == NOFONT
 		&& gui.rsrc_ital_font_name != NULL
 		&& *gui.rsrc_ital_font_name != NUL)
 	    gui.ital_font = gui_mch_get_font(gui.rsrc_ital_font_name, FALSE);
-	if (gui.boldital_font == NOFONT
+	如果 (gui.boldital_font == NOFONT
 		&& gui.rsrc_boldital_font_name != NULL
 		&& *gui.rsrc_boldital_font_name != NUL)
 	    gui.boldital_font = gui_mch_get_font(gui.rsrc_boldital_font_name,
 								       FALSE);
     }
-    else
+    否则
     {
 	// When not using the font specified by the resources, also don't use
 	// the bold/italic fonts, otherwise setting 'guifont' will look very
 	// strange.
-	if (gui.bold_font != NOFONT)
+	如果 (gui.bold_font != NOFONT)
 	{
 	    XFreeFont(gui.dpy, (XFontStruct *)gui.bold_font);
 	    gui.bold_font = NOFONT;
 	}
-	if (gui.ital_font != NOFONT)
+	如果 (gui.ital_font != NOFONT)
 	{
 	    XFreeFont(gui.dpy, (XFontStruct *)gui.ital_font);
 	    gui.ital_font = NOFONT;
 	}
-	if (gui.boldital_font != NOFONT)
+	如果 (gui.boldital_font != NOFONT)
 	{
 	    XFreeFont(gui.dpy, (XFontStruct *)gui.boldital_font);
 	    gui.boldital_font = NOFONT;
@@ -1812,27 +1812,27 @@ gui_mch_init_font(
     gui_motif_synch_fonts();
 #endif
 
-    return OK;
+    返回 OK;
 }
 
 /*
  * Get a font structure for highlighting.
  */
     GuiFont
-gui_mch_get_font(char_u *name, int giveErrorIfMissing)
+gui_mch_get_font(char_u *name, 整数 giveErrorIfMissing)
 {
     XFontStruct	*font;
 
-    if (!gui.in_use || name == NULL)	// can't do this when GUI not running
-	return NOFONT;
+    如果 (!gui.in_use || name == NULL)	// can't do this when GUI not running
+	返回 NOFONT;
 
     font = XLoadQueryFont(gui.dpy, (char *)name);
 
-    if (font == NULL)
+    如果 (font == NULL)
     {
-	if (giveErrorIfMissing)
+	如果 (giveErrorIfMissing)
 	    semsg(_(e_unknown_font_str), name);
-	return NOFONT;
+	返回 NOFONT;
     }
 
 #ifdef DEBUG
@@ -1853,16 +1853,16 @@ gui_mch_get_font(char_u *name, int giveErrorIfMissing)
     printf("\n");
 #endif
 
-    if (font->max_bounds.width != font->min_bounds.width)
+    如果 (font->max_bounds.width != font->min_bounds.width)
     {
 	semsg(_(e_font_str_is_not_fixed_width), name);
 	XFreeFont(gui.dpy, font);
-	return NOFONT;
+	返回 NOFONT;
     }
-    return (GuiFont)font;
+    返回 (GuiFont)font;
 }
 
-#if defined(FEAT_EVAL)
+#如果 defined(FEAT_EVAL)
 /*
  * Return the name of font "font" in allocated memory.
  */
@@ -1871,51 +1871,51 @@ gui_mch_get_fontname(GuiFont font, char_u *name)
 {
     char_u *ret = NULL;
 
-    if (name != NULL && font == NULL)
+    如果 (name != NULL && font == NULL)
     {
 	// In this case, there's no way other than doing this.
 	ret = vim_strsave(name);
     }
-    else if (font != NULL)
+    否则 如果 (font != NULL)
     {
 	// In this case, try to retrieve the XLFD corresponding to 'font'->fid;
 	// if failed, use 'name' unless it's NULL.
 	unsigned long value = 0L;
 
-	if (XGetFontProperty(font, XA_FONT, &value))
+	如果 (XGetFontProperty(font, XA_FONT, &value))
 	{
 	    char *xa_font_name = NULL;
 
 	    xa_font_name = XGetAtomName(gui.dpy, value);
-	    if (xa_font_name != NULL)
+	    如果 (xa_font_name != NULL)
 	    {
 		ret = vim_strsave((char_u *)xa_font_name);
 		XFree(xa_font_name);
 	    }
-	    else if (name != NULL)
+	    否则 如果 (name != NULL)
 		ret = vim_strsave(name);
 	}
-	else if (name != NULL)
+	否则 如果 (name != NULL)
 	    ret = vim_strsave(name);
     }
-    return ret;
+    返回 ret;
 }
 #endif
 
 /*
  * Adjust gui.char_height (after 'linespace' was changed).
  */
-    int
+    整数
 gui_mch_adjust_charheight(void)
 {
 #ifdef FEAT_XFONTSET
-    if (gui.fontset != NOFONTSET)
+    如果 (gui.fontset != NOFONTSET)
     {
 	gui.char_height = fontset_height((XFontSet)gui.fontset) + p_linespace;
 	gui.char_ascent = fontset_ascent((XFontSet)gui.fontset)
 							    + p_linespace / 2;
     }
-    else
+    否则
 #endif
     {
 	XFontStruct *font = (XFontStruct *)gui.norm_font;
@@ -1923,7 +1923,7 @@ gui_mch_adjust_charheight(void)
 	gui.char_height = font->ascent + font->descent + p_linespace;
 	gui.char_ascent = font->ascent + p_linespace / 2;
     }
-    return OK;
+    返回 OK;
 }
 
 /*
@@ -1935,7 +1935,7 @@ gui_mch_set_font(GuiFont font)
     static Font	prev_font = (Font)-1;
     Font	fid = ((XFontStruct *)font)->fid;
 
-    if (fid != prev_font)
+    如果 (fid != prev_font)
     {
 	XSetFont(gui.dpy, gui.text_gc, fid);
 	XSetFont(gui.dpy, gui.back_gc, fid);
@@ -1947,7 +1947,7 @@ gui_mch_set_font(GuiFont font)
 #endif
 }
 
-#if defined(FEAT_XFONTSET)
+#如果 defined(FEAT_XFONTSET)
 /*
  * Set the current text fontset.
  * Adjust the ascent, in case it's different.
@@ -1966,18 +1966,18 @@ gui_mch_set_fontset(GuiFontset fontset)
     void
 gui_mch_free_font(GuiFont font)
 {
-    if (font != NOFONT)
+    如果 (font != NOFONT)
 	XFreeFont(gui.dpy, (XFontStruct *)font);
 }
 
-#if defined(FEAT_XFONTSET)
+#如果 defined(FEAT_XFONTSET)
 /*
  * If a fontset is not going to be used, free its structure.
  */
     void
 gui_mch_free_fontset(GuiFontset fontset)
 {
-    if (fontset != NOFONTSET)
+    如果 (fontset != NOFONTSET)
 	XFreeFontSet(gui.dpy, (XFontSet)fontset);
 }
 
@@ -1988,84 +1988,84 @@ gui_mch_free_fontset(GuiFontset fontset)
     GuiFontset
 gui_mch_get_fontset(
     char_u	*name,
-    int		giveErrorIfMissing,
-    int		fixed_width)
+    整数		giveErrorIfMissing,
+    整数		fixed_width)
 {
     XFontSet	fontset;
     char	**missing, *def_str;
-    int		num_missing;
+    整数		num_missing;
 
-    if (!gui.in_use || name == NULL)
-	return NOFONTSET;
+    如果 (!gui.in_use || name == NULL)
+	返回 NOFONTSET;
 
     fontset = XCreateFontSet(gui.dpy, (char *)name, &missing, &num_missing,
 			     &def_str);
-    if (num_missing > 0)
+    如果 (num_missing > 0)
     {
-	int i;
+	整数 i;
 
-	if (giveErrorIfMissing)
+	如果 (giveErrorIfMissing)
 	{
 	    semsg(_(e_fonts_for_the_following_charsets_are_missing_in_fontset), name);
-	    for (i = 0; i < num_missing; i++)
+	    为 (i = 0; i < num_missing; i++)
 		semsg("%s", missing[i]);
 	}
 	XFreeStringList(missing);
     }
 
-    if (fontset == NULL)
+    如果 (fontset == NULL)
     {
-	if (giveErrorIfMissing)
+	如果 (giveErrorIfMissing)
 	    semsg(_(e_unknown_fontset_str), name);
-	return NOFONTSET;
+	返回 NOFONTSET;
     }
 
-    if (fixed_width && check_fontset_sanity(fontset) == FAIL)
+    如果 (fixed_width && check_fontset_sanity(fontset) == FAIL)
     {
 	XFreeFontSet(gui.dpy, fontset);
-	return NOFONTSET;
+	返回 NOFONTSET;
     }
-    return (GuiFontset)fontset;
+    返回 (GuiFontset)fontset;
 }
 
 /*
  * Check if fontset "fs" is fixed width.
  */
-    static int
+    static 整数
 check_fontset_sanity(XFontSet fs)
 {
     XFontStruct	**xfs;
     char	**font_name;
-    int		fn;
+    整数		fn;
     char	*base_name;
-    int		i;
-    int		min_width;
-    int		min_font_idx = 0;
+    整数		i;
+    整数		min_width;
+    整数		min_font_idx = 0;
 
     base_name = XBaseFontNameListOfFontSet(fs);
     fn = XFontsOfFontSet(fs, &xfs, &font_name);
-    for (i = 0; i < fn; i++)
+    为 (i = 0; i < fn; i++)
     {
-	if (xfs[i]->max_bounds.width != xfs[i]->min_bounds.width)
+	如果 (xfs[i]->max_bounds.width != xfs[i]->min_bounds.width)
 	{
 	    semsg(_(e_fontsent_name_str_font_str_is_not_fixed_width),
 		    base_name, font_name[i]);
-	    return FAIL;
+	    返回 FAIL;
 	}
     }
     // scan base font width
     min_width = 32767;
-    for (i = 0; i < fn; i++)
+    为 (i = 0; i < fn; i++)
     {
-	if (xfs[i]->max_bounds.width<min_width)
+	如果 (xfs[i]->max_bounds.width<min_width)
 	{
 	    min_width = xfs[i]->max_bounds.width;
 	    min_font_idx = i;
 	}
     }
-    for (i = 0; i < fn; i++)
+    为 (i = 0; i < fn; i++)
     {
-	if (	   xfs[i]->max_bounds.width != 2 * min_width
+	如果 (	   xfs[i]->max_bounds.width != 2 * min_width
 		&& xfs[i]->max_bounds.width != min_width)
 	{
 	    semsg(_(e_fontset_name_str), base_name);
@@ -2073,50 +2073,50 @@ check_fontset_sanity(XFontSet fs)
 	    semsg(_("Font%d: %s"), i, font_name[i]);
 	    semsg(_("Font%d width is not twice that of font0"), i);
 	    semsg(_("Font0 width: %d"),
-				     (int)xfs[min_font_idx]->max_bounds.width);
-	    semsg(_("Font%d width: %d"), i, (int)xfs[i]->max_bounds.width);
-	    return FAIL;
+				     (整数)xfs[min_font_idx]->max_bounds.width);
+	    semsg(_("Font%d width: %d"), i, (整数)xfs[i]->max_bounds.width);
+	    返回 FAIL;
 	}
     }
     // it seems ok. Good Luck!!
-    return OK;
+    返回 OK;
 }
 
-    static int
+    static 整数
 fontset_width(XFontSet fs)
 {
- return XmbTextEscapement(fs, "Vim", 3) / 3;
+ 返回 XmbTextEscapement(fs, "Vim", 3) / 3;
 }
 
-    int
+    整数
 fontset_height(
     XFontSet fs)
 {
     XFontSetExtents *extents;
 
     extents = XExtentsOfFontSet(fs);
-    return extents->max_logical_extent.height;
+    返回 extents->max_logical_extent.height;
 }
 
-# if 0
+# 如果 0
 // NOT USED YET
-    static int
+    static 整数
 fontset_descent(XFontSet fs)
 {
     XFontSetExtents *extents;
 
     extents = XExtentsOfFontSet (fs);
-    return extents->max_logical_extent.height + extents->max_logical_extent.y;
+    返回 extents->max_logical_extent.height + extents->max_logical_extent.y;
 }
 # endif
 
-    static int
+    static 整数
 fontset_ascent(XFontSet fs)
 {
     XFontSetExtents *extents;
 
     extents = XExtentsOfFontSet(fs);
-    return -extents->max_logical_extent.y;
+    返回 -extents->max_logical_extent.y;
 }
 
 #endif // FEAT_XFONTSET
@@ -2131,14 +2131,14 @@ gui_mch_get_color(char_u *name)
     guicolor_T	requested;
 
     // can't do this when GUI not running
-    if (!gui.in_use || name == NULL || *name == NUL)
-	return INVALCOLOR;
+    如果 (!gui.in_use || name == NULL || *name == NUL)
+	返回 INVALCOLOR;
 
     requested = gui_get_color_cmn(name);
-    if (requested == INVALCOLOR)
-	return INVALCOLOR;
+    如果 (requested == INVALCOLOR)
+	返回 INVALCOLOR;
 
-    return gui_mch_get_rgb_color(
+    返回 gui_mch_get_rgb_color(
 	    (requested & 0xff0000) >> 16,
 	    (requested & 0xff00) >> 8,
 	    requested & 0xff);
@@ -2149,29 +2149,29 @@ gui_mch_get_color(char_u *name)
  * Return INVALCOLOR for error.
  */
     guicolor_T
-gui_mch_get_rgb_color(int r, int g, int b)
+gui_mch_get_rgb_color(整数 r, 整数 g, 整数 b)
 {
     XColor	available;
     Colormap	colormap;
 
-#if 0
+#如果 0
 // Using XParseColor() is very slow, put rgb in XColor directly.
 
     char	spec[8]; // space enough to hold "#RRGGBB"
     vim_snprintf(spec, sizeof(spec), "#%.2x%.2x%.2x", r, g, b);
-    if (XParseColor(gui.dpy, colormap, (char *)spec, &available) != 0
+    如果 (XParseColor(gui.dpy, colormap, (char *)spec, &available) != 0
 	    && XAllocColor(gui.dpy, colormap, &available) != 0)
-	return (guicolor_T)available.pixel;
+	返回 (guicolor_T)available.pixel;
 #endif
     colormap = DefaultColormap(gui.dpy, DefaultScreen(gui.dpy));
     CLEAR_FIELD(available);
     available.red = r << 8;
     available.green = g << 8;
     available.blue = b << 8;
-    if (XAllocColor(gui.dpy, colormap, &available) != 0)
-	return (guicolor_T)available.pixel;
+    如果 (XAllocColor(gui.dpy, colormap, &available) != 0)
+	返回 (guicolor_T)available.pixel;
 
-    return INVALCOLOR;
+    返回 INVALCOLOR;
 }
 
 /*
@@ -2180,8 +2180,8 @@ gui_mch_get_rgb_color(int r, int g, int b)
     void
 gui_mch_set_fg_color(guicolor_T color)
 {
-    if (color == prev_fg_color)
-	return;
+    如果 (color == prev_fg_color)
+	返回;
 
     XSetForeground(gui.dpy, gui.text_gc, (Pixel)color);
     prev_fg_color = color;
@@ -2193,8 +2193,8 @@ gui_mch_set_fg_color(guicolor_T color)
     void
 gui_mch_set_bg_color(guicolor_T color)
 {
-    if (color == prev_bg_color)
-	return;
+    如果 (color == prev_bg_color)
+	返回;
 
     XSetBackground(gui.dpy, gui.text_gc, (Pixel)color);
     prev_bg_color = color;
@@ -2218,12 +2218,12 @@ gui_x11_create_blank_mouse(void)
     Pixmap blank_pixmap = XCreatePixmap(gui.dpy, gui.wid, 1, 1, 1);
     GC gc = XCreateGC(gui.dpy, blank_pixmap, (unsigned long)0, (XGCValues*)0);
 
-    if (gc != NULL)
+    如果 (gc != NULL)
     {
 	XDrawPoint(gui.dpy, blank_pixmap, gc, 0, 0);
 	XFreeGC(gui.dpy, gc);
     }
-    return XCreatePixmapCursor(gui.dpy, blank_pixmap, blank_pixmap,
+    返回 XCreatePixmapCursor(gui.dpy, blank_pixmap, blank_pixmap,
 		     (XColor*)&gui.norm_pixel, (XColor*)&gui.norm_pixel, 0, 0);
 }
 
@@ -2231,14 +2231,14 @@ gui_x11_create_blank_mouse(void)
  * Draw a curled line at the bottom of the character cell.
  */
     static void
-draw_curl(int row, int col, int cells)
+draw_curl(整数 row, 整数 col, 整数 cells)
 {
-    int			i;
-    int			offset;
-    static const int	val[8] = {1, 0, 0, 0, 1, 2, 2, 2 };
+    整数			i;
+    整数			offset;
+    static const 整数	val[8] = {1, 0, 0, 0, 1, 2, 2, 2 };
 
     XSetForeground(gui.dpy, gui.text_gc, prev_sp_color);
-    for (i = FILL_X(col); i < FILL_X(col + cells); ++i)
+    为 (i = FILL_X(col); i < FILL_X(col + cells); ++i)
     {
 	offset = val[i % 8];
 	XDrawPoint(gui.dpy, gui.wid, gui.text_gc, i,
@@ -2249,25 +2249,25 @@ draw_curl(int row, int col, int cells)
 
     void
 gui_mch_draw_string(
-    int		row,
-    int		col,
+    整数		row,
+    整数		col,
     char_u	*s,
-    int		len,
-    int		flags)
+    整数		len,
+    整数		flags)
 {
-    int			cells = len;
+    整数			cells = len;
     static void		*buf = NULL;
-    static int		buflen = 0;
+    static 整数		buflen = 0;
     char_u		*p;
-    int			wlen = 0;
-    int			c;
+    整数			wlen = 0;
+    整数			c;
 
-    if (enc_utf8)
+    如果 (enc_utf8)
     {
 	// Convert UTF-8 byte sequence to 16 bit characters for the X
 	// functions.  Need a buffer for the 16 bit characters.  Keep it
 	// between calls, because allocating it each time is slow.
-	if (buflen < len)
+	如果 (buflen < len)
 	{
 	    XtFree((char *)buf);
 	    buf = (void *)XtMalloc(len * (sizeof(XChar2b) < sizeof(wchar_t)
@@ -2276,22 +2276,22 @@ gui_mch_draw_string(
 	}
 	p = s;
 	cells = 0;
-	while (p < s + len)
+	当 (p < s + len)
 	{
 	    c = utf_ptr2char(p);
 #ifdef FEAT_XFONTSET
-	    if (current_fontset != NULL)
+	    如果 (current_fontset != NULL)
 	    {
 # ifdef SMALL_WCHAR_T
-		if (c >= 0x10000)
+		如果 (c >= 0x10000)
 		    c = 0xbf;		// show chars > 0xffff as ?
 # endif
 		((wchar_t *)buf)[wlen] = c;
 	    }
-	    else
+	    否则
 #endif
 	    {
-		if (c >= 0x10000)
+		如果 (c >= 0x10000)
 		    c = 0xbf;		// show chars > 0xffff as ?
 		((XChar2b *)buf)[wlen].byte1 = (unsigned)c >> 8;
 		((XChar2b *)buf)[wlen].byte2 = c;
@@ -2301,10 +2301,10 @@ gui_mch_draw_string(
 	    p += utf_ptr2len(p);
 	}
     }
-    else if (has_mbyte)
+    否则 如果 (has_mbyte)
     {
 	cells = 0;
-	for (p = s; p < s + len; )
+	为 (p = s; p < s + len; )
 	{
 	    cells += ptr2cells(p);
 	    p += (*mb_ptr2len)(p);
@@ -2312,7 +2312,7 @@ gui_mch_draw_string(
     }
 
 #ifdef FEAT_XFONTSET
-    if (current_fontset != NULL)
+    如果 (current_fontset != NULL)
     {
 	// Setup a clip rectangle to avoid spilling over in the next or
 	// previous line.  This is apparently needed for some fonts which are
@@ -2328,16 +2328,16 @@ gui_mch_draw_string(
     }
 #endif
 
-    if (flags & DRAW_TRANSP)
+    如果 (flags & DRAW_TRANSP)
     {
-	if (enc_utf8)
+	如果 (enc_utf8)
 	    XDrawString16(gui.dpy, gui.wid, gui.text_gc, TEXT_X(col),
 		    TEXT_Y(row), buf, wlen);
-	else
+	否则
 	    XDrawString(gui.dpy, gui.wid, gui.text_gc, TEXT_X(col),
 		    TEXT_Y(row), (char *)s, len);
     }
-    else if (p_linespace != 0
+    否则 如果 (p_linespace != 0
 #ifdef FEAT_XFONTSET
 	    || current_fontset != NULL
 #endif
@@ -2348,55 +2348,55 @@ gui_mch_draw_string(
 		FILL_Y(row), gui.char_width * cells, gui.char_height);
 	XSetForeground(gui.dpy, gui.text_gc, prev_fg_color);
 
-	if (enc_utf8)
+	如果 (enc_utf8)
 	    XDrawString16(gui.dpy, gui.wid, gui.text_gc, TEXT_X(col),
 		    TEXT_Y(row), buf, wlen);
-	else
+	否则
 	    XDrawString(gui.dpy, gui.wid, gui.text_gc, TEXT_X(col),
 		    TEXT_Y(row), (char *)s, len);
     }
-    else
+    否则
     {
 	// XmbDrawImageString has bug, don't use it for fontset.
-	if (enc_utf8)
+	如果 (enc_utf8)
 	    XDrawImageString16(gui.dpy, gui.wid, gui.text_gc, TEXT_X(col),
 		    TEXT_Y(row), buf, wlen);
-	else
+	否则
 	    XDrawImageString(gui.dpy, gui.wid, gui.text_gc, TEXT_X(col),
 		    TEXT_Y(row), (char *)s, len);
     }
 
     // Bold trick: draw the text again with a one-pixel offset.
-    if (flags & DRAW_BOLD)
+    如果 (flags & DRAW_BOLD)
     {
-	if (enc_utf8)
+	如果 (enc_utf8)
 	    XDrawString16(gui.dpy, gui.wid, gui.text_gc, TEXT_X(col) + 1,
 		    TEXT_Y(row), buf, wlen);
-	else
+	否则
 	    XDrawString(gui.dpy, gui.wid, gui.text_gc, TEXT_X(col) + 1,
 		    TEXT_Y(row), (char *)s, len);
     }
 
     // Undercurl: draw curl at the bottom of the character cell.
-    if (flags & DRAW_UNDERC)
+    如果 (flags & DRAW_UNDERC)
 	draw_curl(row, col, cells);
 
     // Underline: draw a line at the bottom of the character cell.
-    if (flags & DRAW_UNDERL)
+    如果 (flags & DRAW_UNDERL)
     {
-	int	y = FILL_Y(row + 1) - 1;
+	整数	y = FILL_Y(row + 1) - 1;
 
 	// When p_linespace is 0, overwrite the bottom row of pixels.
 	// Otherwise put the line just below the character.
-	if (p_linespace > 1)
+	如果 (p_linespace > 1)
 	    y -= p_linespace - 1;
 	XDrawLine(gui.dpy, gui.wid, gui.text_gc, FILL_X(col),
 		y, FILL_X(col + cells) - 1, y);
     }
 
-    if (flags & DRAW_STRIKE)
+    如果 (flags & DRAW_STRIKE)
     {
-	int	y = FILL_Y(row + 1) - gui.char_height/2;
+	整数	y = FILL_Y(row + 1) - gui.char_height/2;
 
 	XSetForeground(gui.dpy, gui.text_gc, prev_sp_color);
 	XDrawLine(gui.dpy, gui.wid, gui.text_gc, FILL_X(col),
@@ -2405,7 +2405,7 @@ gui_mch_draw_string(
     }
 
 #ifdef FEAT_XFONTSET
-    if (current_fontset != NULL)
+    如果 (current_fontset != NULL)
 	XSetClipMask(gui.dpy, gui.text_gc, None);
 #endif
 }
@@ -2413,27 +2413,27 @@ gui_mch_draw_string(
 /*
  * Return OK if the key with the termcap name "name" is supported.
  */
-    int
+    整数
 gui_mch_haskey(char_u *name)
 {
-    int i;
+    整数 i;
 
-    for (i = 0; special_keys[i].key_sym != (KeySym)0; i++)
-	if (name[0] == special_keys[i].vim_code0 &&
+    为 (i = 0; special_keys[i].key_sym != (KeySym)0; i++)
+	如果 (name[0] == special_keys[i].vim_code0 &&
 					 name[1] == special_keys[i].vim_code1)
-	    return OK;
-    return FAIL;
+	    返回 OK;
+    返回 FAIL;
 }
 
 /*
  * Return the text window-id and display.  Only required for X-based GUI's
  */
-    int
+    整数
 gui_get_x11_windis(Window *win, Display **dis)
 {
     *win = XtWindow(vimShell);
     *dis = gui.dpy;
-    return OK;
+    返回 OK;
 }
 
     void
@@ -2443,17 +2443,17 @@ gui_mch_beep(void)
 }
 
     void
-gui_mch_flash(int msec)
+gui_mch_flash(整数 msec)
 {
     // Do a visual beep by reversing the foreground and background colors
     XFillRectangle(gui.dpy, gui.wid, gui.invert_gc, 0, 0,
-	    FILL_X((int)Columns) + gui.border_offset,
-	    FILL_Y((int)Rows) + gui.border_offset);
+	    FILL_X((整数)Columns) + gui.border_offset,
+	    FILL_Y((整数)Rows) + gui.border_offset);
     XSync(gui.dpy, False);
     ui_delay((long)msec, TRUE);	// wait for a few msec
     XFillRectangle(gui.dpy, gui.wid, gui.invert_gc, 0, 0,
-	    FILL_X((int)Columns) + gui.border_offset,
-	    FILL_Y((int)Rows) + gui.border_offset);
+	    FILL_X((整数)Columns) + gui.border_offset,
+	    FILL_Y((整数)Rows) + gui.border_offset);
 }
 
 /*
@@ -2461,10 +2461,10 @@ gui_mch_flash(int msec)
  */
     void
 gui_mch_invert_rectangle(
-    int	    r,
-    int	    c,
-    int	    nr,
-    int	    nc)
+    整数	    r,
+    整数	    c,
+    整数	    nr,
+    整数	    nc)
 {
     XFillRectangle(gui.dpy, gui.wid, gui.invert_gc,
 	FILL_X(c), FILL_Y(r), (nc) * gui.char_width, (nr) * gui.char_height);
@@ -2479,7 +2479,7 @@ gui_mch_iconify(void)
     XIconifyWindow(gui.dpy, XtWindow(vimShell), DefaultScreen(gui.dpy));
 }
 
-#if defined(FEAT_EVAL)
+#如果 defined(FEAT_EVAL)
 /*
  * Bring the Vim window to the foreground.
  */
@@ -2496,9 +2496,9 @@ gui_mch_set_foreground(void)
     void
 gui_mch_draw_hollow_cursor(guicolor_T color)
 {
-    int		w = 1;
+    整数		w = 1;
 
-    if (mb_lefthalve(gui.row, gui.col))
+    如果 (mb_lefthalve(gui.row, gui.col))
 	w = 2;
     gui_mch_set_fg_color(color);
     XDrawRectangle(gui.dpy, gui.wid, gui.text_gc, FILL_X(gui.col),
@@ -2510,7 +2510,7 @@ gui_mch_draw_hollow_cursor(guicolor_T color)
  * color "color".
  */
     void
-gui_mch_draw_part_cursor(int w, int h, guicolor_T color)
+gui_mch_draw_part_cursor(整数 w, 整数 h, guicolor_T color)
 {
     gui_mch_set_fg_color(color);
 
@@ -2536,12 +2536,12 @@ gui_mch_update(void)
     XtInputMask mask, desired;
 
 #ifdef ALT_X_INPUT
-    if (suppress_alternate_input)
+    如果 (suppress_alternate_input)
 	desired = (XtIMXEvent | XtIMTimer);
-    else
+    否则
 #endif
 	desired = (XtIMAll);
-    while ((mask = XtAppPending(app_context)) && (mask & desired)
+    当 ((mask = XtAppPending(app_context)) && (mask & desired)
 	    && !vim_is_input_buf_full())
 	XtAppProcessEvent(app_context, desired);
 }
@@ -2555,17 +2555,17 @@ gui_mch_update(void)
  * Returns OK if a character was found to be available within the given time,
  * or FAIL otherwise.
  */
-    int
+    整数
 gui_mch_wait_for_chars(long wtime)
 {
-    int	    focus;
-    int	    retval = FAIL;
+    整数	    focus;
+    整数	    retval = FAIL;
 
     /*
      * Make this static, in case gui_x11_timer_cb is called after leaving
      * this function (otherwise a random value on the stack may be changed).
      */
-    static int	    timed_out;
+    static 整数	    timed_out;
     XtIntervalId    timer = (XtIntervalId)0;
     XtInputMask	    desired;
 #ifdef FEAT_JOB_CHANNEL
@@ -2574,28 +2574,28 @@ gui_mch_wait_for_chars(long wtime)
 
     timed_out = FALSE;
 
-    if (wtime >= 0)
+    如果 (wtime >= 0)
 	timer = XtAppAddTimeOut(app_context,
 				(long_u)(wtime == 0 ? 1L : wtime),
 						 gui_x11_timer_cb, &timed_out);
 #ifdef FEAT_JOB_CHANNEL
     // If there is a channel with the keep_open flag we need to poll for input
     // on them.
-    if (channel_any_keep_open())
+    如果 (channel_any_keep_open())
 	channel_timer = XtAppAddTimeOut(app_context, (long_u)20,
 				   channel_poll_cb, (XtPointer)&channel_timer);
 #endif
 
     focus = gui.in_focus;
     desired = (XtIMAll);
-    while (!timed_out)
+    当 (!timed_out)
     {
 	// Stop or start blinking when focus changes
-	if (gui.in_focus != focus)
+	如果 (gui.in_focus != focus)
 	{
-	    if (gui.in_focus)
+	    如果 (gui.in_focus)
 		gui_mch_start_blink();
-	    else
+	    否则
 		gui_mch_stop_blink(TRUE);
 	    focus = gui.in_focus;
 	}
@@ -2606,7 +2606,7 @@ gui_mch_wait_for_chars(long wtime)
 # endif
 	parse_queued_messages();
 # ifdef FEAT_TIMERS
-	if (did_add_timer)
+	如果 (did_add_timer)
 	    // Need to recompute the waiting time.
 	    break;
 # endif
@@ -2622,21 +2622,21 @@ gui_mch_wait_for_chars(long wtime)
 	 */
 	XtAppProcessEvent(app_context, desired);
 
-	if (input_available())
+	如果 (input_available())
 	{
 	    retval = OK;
 	    break;
 	}
     }
 
-    if (timer != (XtIntervalId)0 && !timed_out)
+    如果 (timer != (XtIntervalId)0 && !timed_out)
 	XtRemoveTimeOut(timer);
 #ifdef FEAT_JOB_CHANNEL
-    if (channel_timer != (XtIntervalId)0)
+    如果 (channel_timer != (XtIntervalId)0)
 	XtRemoveTimeOut(channel_timer);
 #endif
 
-    return retval;
+    返回 retval;
 }
 
 /*
@@ -2658,12 +2658,12 @@ gui_mch_flush(void)
  */
     void
 gui_mch_clear_block(
-    int		row1,
-    int		col1,
-    int		row2,
-    int		col2)
+    整数		row1,
+    整数		col1,
+    整数		row2,
+    整数		col2)
 {
-    int		x;
+    整数		x;
 
     x = FILL_X(col1);
 
@@ -2685,10 +2685,10 @@ gui_mch_clear_all(void)
  * text further down within the scroll region.
  */
     void
-gui_mch_delete_lines(int row, int num_lines)
+gui_mch_delete_lines(整数 row, 整数 num_lines)
 {
-    if (gui.visibility == VisibilityFullyObscured)
-	return;	    // Can't see the window
+    如果 (gui.visibility == VisibilityFullyObscured)
+	返回;	    // Can't see the window
 
     // copy one extra pixel at the far right, for when bold has spilled
     // over
@@ -2710,10 +2710,10 @@ gui_mch_delete_lines(int row, int num_lines)
  * following text within the scroll region.
  */
     void
-gui_mch_insert_lines(int row, int num_lines)
+gui_mch_insert_lines(整数 row, 整数 num_lines)
 {
-    if (gui.visibility == VisibilityFullyObscured)
-	return;	    // Can't see the window
+    如果 (gui.visibility == VisibilityFullyObscured)
+	返回;	    // Can't see the window
 
     // copy one extra pixel at the far right, for when bold has spilled
     // over
@@ -2738,23 +2738,23 @@ gui_x11_check_copy_area(void)
     XEvent		    event;
     XGraphicsExposeEvent    *gevent;
 
-    if (gui.visibility != VisibilityPartiallyObscured)
-	return;
+    如果 (gui.visibility != VisibilityPartiallyObscured)
+	返回;
 
     XFlush(gui.dpy);
 
     // Wait to check whether the scroll worked or not
-    for (;;)
+    为 (;;)
     {
-	if (XCheckTypedEvent(gui.dpy, NoExpose, &event))
-	    return;	// The scroll worked.
+	如果 (XCheckTypedEvent(gui.dpy, NoExpose, &event))
+	    返回;	// The scroll worked.
 
-	if (XCheckTypedEvent(gui.dpy, GraphicsExpose, &event))
+	如果 (XCheckTypedEvent(gui.dpy, GraphicsExpose, &event))
 	{
 	    gevent = (XGraphicsExposeEvent *)&event;
 	    gui_redraw(gevent->x, gevent->y, gevent->width, gevent->height);
-	    if (gevent->count == 0)
-		return;		// This was the last expose event
+	    如果 (gevent->count == 0)
+		返回;		// This was the last expose event
 	}
 	XSync(gui.dpy, False);
     }
@@ -2770,10 +2770,10 @@ clip_mch_lose_selection(Clipboard_T *cbd)
     clip_x11_lose_selection(vimShell, cbd);
 }
 
-    int
+    整数
 clip_mch_own_selection(Clipboard_T *cbd)
 {
-    return clip_x11_own_selection(vimShell, cbd);
+    返回 clip_x11_own_selection(vimShell, cbd);
 }
 
     void
@@ -2789,7 +2789,7 @@ clip_mch_set_selection(
     clip_x11_set_selection(cbd);
 }
 
-#if defined(FEAT_MENU)
+#如果 defined(FEAT_MENU)
 /*
  * Menu stuff.
  */
@@ -2798,19 +2798,19 @@ clip_mch_set_selection(
  * Make a menu either grey or not grey.
  */
     void
-gui_mch_menu_grey(vimmenu_T *menu, int grey)
+gui_mch_menu_grey(vimmenu_T *menu, 整数 grey)
 {
-    if (menu->id == (Widget)0)
-	return;
+    如果 (menu->id == (Widget)0)
+	返回;
 
     gui_mch_menu_hidden(menu, False);
-    if (grey
+    如果 (grey
 # ifdef FEAT_GUI_MOTIF
 	    || !menu->sensitive
 # endif
        )
 	XtSetSensitive(menu->id, False);
-    else
+    否则
 	XtSetSensitive(menu->id, True);
 }
 
@@ -2818,14 +2818,14 @@ gui_mch_menu_grey(vimmenu_T *menu, int grey)
  * Make menu item hidden or not hidden
  */
     void
-gui_mch_menu_hidden(vimmenu_T *menu, int hidden)
+gui_mch_menu_hidden(vimmenu_T *menu, 整数 hidden)
 {
-    if (menu->id == (Widget)0)
-	return;
+    如果 (menu->id == (Widget)0)
+	返回;
 
-    if (hidden)
+    如果 (hidden)
 	XtUnmanageChild(menu->id);
-    else
+    否则
 	XtManageChild(menu->id);
 }
 
@@ -2865,15 +2865,15 @@ gui_x11_wm_protocol_handler(
     /*
      * Only deal with Client messages.
      */
-    if (event->type != ClientMessage)
-	return;
+    如果 (event->type != ClientMessage)
+	返回;
 
     /*
      * The WM_SAVE_YOURSELF event arrives when the window manager wants to
      * exit.  That can be cancelled though, thus Vim shouldn't exit here.
      * Just sync our swap files.
      */
-    if ((Atom)((XClientMessageEvent *)event)->data.l[0] ==
+    如果 ((Atom)((XClientMessageEvent *)event)->data.l[0] ==
 						  wm_atoms[SAVE_YOURSELF_IDX])
     {
 	out_flush();
@@ -2883,12 +2883,12 @@ gui_x11_wm_protocol_handler(
 	// know we are done saving ourselves.  We don't want to be restarted,
 	// thus set argv to NULL.
 	XSetCommand(gui.dpy, XtWindow(vimShell), NULL, 0);
-	return;
+	返回;
     }
 
-    if ((Atom)((XClientMessageEvent *)event)->data.l[0] !=
+    如果 ((Atom)((XClientMessageEvent *)event)->data.l[0] !=
 						  wm_atoms[DELETE_WINDOW_IDX])
-	return;
+	返回;
 
     gui_shell_closed();
 }
@@ -2906,7 +2906,7 @@ gui_x11_send_event_handler(
 {
     XPropertyEvent *e = (XPropertyEvent *) event;
 
-    if (e->type == PropertyNotify && e->window == commWindow
+    如果 (e->type == PropertyNotify && e->window == commWindow
 	    && e->atom == commProperty &&  e->state == PropertyNewValue)
 	serverEventProc(gui.dpy, event, 0);
 }
@@ -2925,22 +2925,22 @@ gui_x11_send_event_handler(
 #define BLINK_OFF   1
 #define BLINK_ON    2
 
-static int		blink_state = BLINK_NONE;
+static 整数		blink_state = BLINK_NONE;
 static long_u		blink_waittime = 700;
 static long_u		blink_ontime = 400;
 static long_u		blink_offtime = 250;
 static XtIntervalId	blink_timer = (XtIntervalId)0;
 
-    int
+    整数
 gui_mch_is_blinking(void)
 {
-    return blink_state != BLINK_NONE;
+    返回 blink_state != BLINK_NONE;
 }
 
-    int
+    整数
 gui_mch_is_blink_off(void)
 {
-    return blink_state == BLINK_OFF;
+    返回 blink_state == BLINK_OFF;
 }
 
     void
@@ -2955,14 +2955,14 @@ gui_mch_set_blinking(long waittime, long on, long off)
  * Stop the cursor blinking.  Show the cursor if it wasn't shown.
  */
     void
-gui_mch_stop_blink(int may_call_gui_update_cursor)
+gui_mch_stop_blink(整数 may_call_gui_update_cursor)
 {
-    if (blink_timer != (XtIntervalId)0)
+    如果 (blink_timer != (XtIntervalId)0)
     {
 	XtRemoveTimeOut(blink_timer);
 	blink_timer = (XtIntervalId)0;
     }
-    if (blink_state == BLINK_OFF && may_call_gui_update_cursor)
+    如果 (blink_state == BLINK_OFF && may_call_gui_update_cursor)
 	gui_update_cursor(TRUE, FALSE);
     blink_state = BLINK_NONE;
 }
@@ -2972,14 +2972,14 @@ gui_x11_blink_cb(
     XtPointer	    timed_out UNUSED,
     XtIntervalId    *interval_id UNUSED)
 {
-    if (blink_state == BLINK_ON)
+    如果 (blink_state == BLINK_ON)
     {
 	gui_undraw_cursor();
 	blink_state = BLINK_OFF;
 	blink_timer = XtAppAddTimeOut(app_context, blink_offtime,
 						      gui_x11_blink_cb, NULL);
     }
-    else
+    否则
     {
 	gui_update_cursor(TRUE, FALSE);
 	blink_state = BLINK_ON;
@@ -2995,10 +2995,10 @@ gui_x11_blink_cb(
     void
 gui_mch_start_blink(void)
 {
-    if (blink_timer != (XtIntervalId)0)
+    如果 (blink_timer != (XtIntervalId)0)
 	XtRemoveTimeOut(blink_timer);
     // Only switch blinking on if none of the times is zero
-    if (blink_waittime && blink_ontime && blink_offtime && gui.in_focus)
+    如果 (blink_waittime && blink_ontime && blink_offtime && gui.in_focus)
     {
 	blink_timer = XtAppAddTimeOut(app_context, blink_waittime,
 						      gui_x11_blink_cb, NULL);
@@ -3020,7 +3020,7 @@ gui_mch_get_rgb(guicolor_T pixel)
     xc.pixel = pixel;
     XQueryColor(gui.dpy, colormap, &xc);
 
-    return (guicolor_T)(((xc.red & 0xff00) << 8) + (xc.green & 0xff00)
+    返回 (guicolor_T)(((xc.red & 0xff00) << 8) + (xc.green & 0xff00)
 						   + ((unsigned)xc.blue >> 8));
 }
 
@@ -3045,7 +3045,7 @@ gui_x11_callbacks(Widget textArea, Widget vimForm)
      * Only install these enter/leave callbacks when 'p' in 'guioptions'.
      * Only needed for some window managers.
      */
-    if (vim_strchr(p_go, GO_POINTER) != NULL)
+    如果 (vim_strchr(p_go, GO_POINTER) != NULL)
     {
 	XtAddEventHandler(vimShell, LeaveWindowMask, FALSE, gui_x11_leave_cb,
 	    (XtPointer)0);
@@ -3074,19 +3074,19 @@ gui_x11_callbacks(Widget textArea, Widget vimForm)
  * Get current mouse coordinates in text window.
  */
     void
-gui_mch_getmouse(int *x, int *y)
+gui_mch_getmouse(整数 *x, 整数 *y)
 {
-    int		rootx, rooty, winx, winy;
+    整数		rootx, rooty, winx, winy;
     Window	root, child;
-    unsigned int mask;
+    unsigned 整数 mask;
 
-    if (gui.wid && XQueryPointer(gui.dpy, gui.wid, &root, &child,
+    如果 (gui.wid && XQueryPointer(gui.dpy, gui.wid, &root, &child,
 					 &rootx, &rooty, &winx, &winy, &mask))
     {
 	*x = winx;
 	*y = winy;
     }
-    else
+    否则
     {
 	*x = -1;
 	*y = -1;
@@ -3094,33 +3094,33 @@ gui_mch_getmouse(int *x, int *y)
 }
 
     void
-gui_mch_setmouse(int x, int y)
+gui_mch_setmouse(整数 x, 整数 y)
 {
-    if (gui.wid)
+    如果 (gui.wid)
 	XWarpPointer(gui.dpy, (Window)0, gui.wid, 0, 0, 0, 0, x, y);
 }
 
-#if defined(FEAT_GUI_MOTIF) && defined(FEAT_MENU)
+#如果 defined(FEAT_GUI_MOTIF) && defined(FEAT_MENU)
     XButtonPressedEvent *
 gui_x11_get_last_mouse_event(void)
 {
-    return &last_mouse_event;
+    返回 &last_mouse_event;
 }
 #endif
 
-#if defined(FEAT_SIGN_ICONS)
+#如果 defined(FEAT_SIGN_ICONS)
 
 // Signs are currently always 2 chars wide.  Hopefully the font is big enough
 // to provide room for the bitmap!
 # define SIGN_WIDTH (gui.char_width * 2)
 
     void
-gui_mch_drawsign(int row, int col, int typenr)
+gui_mch_drawsign(整数 row, 整数 col, 整数 typenr)
 {
     XImage	*sign;
 
-    if (!gui.in_use || (sign = (XImage *)sign_get_image(typenr)) == NULL)
-	return;
+    如果 (!gui.in_use || (sign = (XImage *)sign_get_image(typenr)) == NULL)
+	返回;
 
     XClearArea(gui.dpy, gui.wid, TEXT_X(col), TEXT_Y(row) - sign->height,
 	    SIGN_WIDTH, gui.char_height, FALSE);
@@ -3135,12 +3135,12 @@ gui_mch_register_sign(char_u *signfile)
 {
     XpmAttributes   attrs;
     XImage	    *sign = NULL;
-    int		    status;
+    整数		    status;
 
     /*
      * Setup the color substitution table.
      */
-    if (signfile[0] != NUL && signfile[0] != '-')
+    如果 (signfile[0] != NUL && signfile[0] != '-')
     {
 	XpmColorSymbol color[5] =
 	{
@@ -3157,17 +3157,17 @@ gui_mch_register_sign(char_u *signfile)
 	attrs.colorsymbols[1].pixel = gui.norm_pixel;
 	status = XpmReadFileToImage(gui.dpy, (char *)signfile,
 							 &sign, NULL, &attrs);
-	if (status == 0)
+	如果 (status == 0)
 	{
 	    // Sign width is fixed at two columns now.
 	    // if (sign->width > gui.sign_width)
 	    //     gui.sign_width = sign->width + 8;
 	}
-	else
+	否则
 	    emsg(_(e_couldnt_read_in_sign_data));
     }
 
-    return (void *)sign;
+    返回 (void *)sign;
 }
 
     void
@@ -3181,7 +3181,7 @@ gui_mch_destroy_sign(void *sign)
 #ifdef FEAT_MOUSESHAPE
 // The last set mouse pointer shape is remembered, to be used when it goes
 // from hidden to not hidden.
-static int last_shape = 0;
+static 整数 last_shape = 0;
 #endif
 
 /*
@@ -3189,27 +3189,27 @@ static int last_shape = 0;
  */
     void
 gui_mch_mousehide(
-    int		hide)	// TRUE = use blank ptr, FALSE = use parent ptr
+    整数		hide)	// TRUE = use blank ptr, FALSE = use parent ptr
 {
-    if (gui.pointer_hidden == hide)
-	return;
+    如果 (gui.pointer_hidden == hide)
+	返回;
 
     gui.pointer_hidden = hide;
-    if (hide)
+    如果 (hide)
 	XDefineCursor(gui.dpy, gui.wid, gui.blank_pointer);
-    else
+    否则
 #ifdef FEAT_MOUSESHAPE
 	mch_set_mouse_shape(last_shape);
-#else
+#否则
     XUndefineCursor(gui.dpy, gui.wid);
 #endif
 }
 
-#if defined(FEAT_MOUSESHAPE)
+#如果 defined(FEAT_MOUSESHAPE)
 
 // Table for shape IDs.  Keep in sync with the mshape_names[] table in
 // misc2.c!
-static int mshape_ids[] =
+static 整数 mshape_ids[] =
 {
     XC_left_ptr,		// arrow
     0,				// blank
@@ -3231,36 +3231,36 @@ static int mshape_ids[] =
 };
 
     void
-mch_set_mouse_shape(int shape)
+mch_set_mouse_shape(整数 shape)
 {
-    int	    id;
+    整数	    id;
 
-    if (!gui.in_use)
-	return;
+    如果 (!gui.in_use)
+	返回;
 
-    if (shape == MSHAPE_HIDE || gui.pointer_hidden)
+    如果 (shape == MSHAPE_HIDE || gui.pointer_hidden)
 	XDefineCursor(gui.dpy, gui.wid, gui.blank_pointer);
-    else
+    否则
     {
-	if (shape >= MSHAPE_NUMBERED)
+	如果 (shape >= MSHAPE_NUMBERED)
 	{
 	    id = shape - MSHAPE_NUMBERED;
-	    if (id >= XC_num_glyphs)
+	    如果 (id >= XC_num_glyphs)
 		id = XC_left_ptr;
-	    else
+	    否则
 		id &= ~1;	// they are always even (why?)
 	}
-	else
+	否则
 	    id = mshape_ids[shape];
 
 	XDefineCursor(gui.dpy, gui.wid, XCreateFontCursor(gui.dpy, id));
     }
-    if (shape != MSHAPE_HIDE)
+    如果 (shape != MSHAPE_HIDE)
 	last_shape = shape;
 }
 #endif
 
-#if defined(FEAT_TOOLBAR) && defined(FEAT_BEVAL_GUI)
+#如果 defined(FEAT_TOOLBAR) && defined(FEAT_BEVAL_GUI)
 /*
  * Set the balloon-eval used for the tooltip of a toolbar menu item.
  * The check for a non-toolbar item was added, because there is a crash when
@@ -3269,18 +3269,18 @@ mch_set_mouse_shape(int shape)
     void
 gui_mch_menu_set_tip(vimmenu_T *menu)
 {
-    if (menu->id == NULL || menu->parent == NULL
+    如果 (menu->id == NULL || menu->parent == NULL
 				|| !menu_is_toolbar(menu->parent->name))
-	return;
+	返回;
 
     // Always destroy and create the balloon, in case the string was
     // changed.
-    if (menu->tip != NULL)
+    如果 (menu->tip != NULL)
     {
 	gui_mch_destroy_beval_area(menu->tip);
 	menu->tip = NULL;
     }
-    if (menu->strings[MENU_INDEX_TIP] != NULL)
+    如果 (menu->strings[MENU_INDEX_TIP] != NULL)
 	menu->tip = gui_mch_create_beval_area(
 		menu->id,
 		menu->strings[MENU_INDEX_TIP],

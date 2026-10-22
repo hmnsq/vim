@@ -25,33 +25,33 @@ class ThreadedTCPRequestHandler(socketserver.BaseRequestHandler):
         self.request.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
 
     def debuglog(self, msg):
-        if self.debug:
+        如果 self.debug:
             with open("Xlspserver.log", "a") as myfile:
                 myfile.write(msg)
 
     def send_lsp_req(self, msgid, method, params):
         v = {'jsonrpc': '2.0', 'id': msgid, 'method': method}
-        if len(params) != 0:
+        如果 len(params) != 0:
             v['params'] = params
         s = json.dumps(v)
         req = "Content-Length: " + str(len(s)) + "\r\n"
         req += "Content-Type: application/vscode-jsonrpc; charset=utf-8\r\n"
         req += "\r\n"
         req += s
-        if self.debug:
+        如果 self.debug:
             self.debuglog("SEND: ({0} bytes) '{1}'\n".format(len(req), req))
         self.request.sendall(req.encode('utf-8'))
 
     def send_lsp_resp(self, msgid, resp_dict):
         v = {'jsonrpc': '2.0', 'result': resp_dict}
-        if msgid != -1:
+        如果 msgid != -1:
             v['id'] = msgid
         s = json.dumps(v)
         resp = "Content-Length: " + str(len(s)) + "\r\n"
         resp += "Content-Type: application/vscode-jsonrpc; charset=utf-8\r\n"
         resp += "\r\n"
         resp += s
-        if self.debug:
+        如果 self.debug:
             self.debuglog("SEND: ({0} bytes) '{1}'\n".format(len(resp), resp))
         self.request.sendall(resp.encode('utf-8'))
 
@@ -219,7 +219,7 @@ class ThreadedTCPRequestHandler(socketserver.BaseRequestHandler):
     def process_msg(self, msg):
         try:
             decoded = json.loads(msg)
-            if 'method' in decoded:
+            如果 'method' in decoded:
                 test_map = {
                         'ping': self.do_ping,
                         'echo': self.do_echo,
@@ -243,41 +243,41 @@ class ThreadedTCPRequestHandler(socketserver.BaseRequestHandler):
                         'server-req-in-middle': self.do_server_req_in_middle,
                         'server-req-in-middle-resp': self.do_server_req_in_middle_resp,
                         }
-                if decoded['method'] in test_map:
+                如果 decoded['method'] in test_map:
                     test_map[decoded['method']](decoded)
-                else:
+                否则:
                     self.debuglog("Error: Unsupported method - " + decoded['method'] + "\n")
-            else:
+            否则:
                 self.debuglog("Error: 'method' field is not found\n")
 
         except ValueError:
             self.debuglog("Error: json decoding failed\n")
 
     def process_msgs(self, msgbuf):
-        while True:
+        当 True:
             sidx = msgbuf.find('Content-Length: ')
-            if sidx == -1:
+            如果 sidx == -1:
                 # partial message received
-                return msgbuf
+                返回 msgbuf
             sidx += 16
             eidx = msgbuf.find('\r\n')
-            if eidx == -1:
+            如果 eidx == -1:
                 # partial message received
-                return msgbuf
-            msglen = int(msgbuf[sidx:eidx])
+                返回 msgbuf
+            msglen = 整数(msgbuf[sidx:eidx])
 
             hdrend = msgbuf.find('\r\n\r\n')
-            if hdrend == -1:
+            如果 hdrend == -1:
                 # partial message received
-                return msgbuf
+                返回 msgbuf
 
-            if msglen > len(msgbuf[hdrend + 4:]):
-                if self.debug:
+            如果 msglen > len(msgbuf[hdrend + 4:]):
+                如果 self.debug:
                     self.debuglog("Partial message ({0} bytes)\n".format(len(msgbuf)))
                 # partial message received
-                return msgbuf
+                返回 msgbuf
 
-            if self.debug:
+            如果 self.debug:
                 self.debuglog("Complete message ({0} bytes) received\n".format(msglen))
 
             # Remove the header
@@ -293,7 +293,7 @@ class ThreadedTCPRequestHandler(socketserver.BaseRequestHandler):
         self.debug = False
         self.debuglog("=== socket opened ===\n")
         msgbuf = ''
-        while True:
+        当 True:
             try:
                 received = self.request.recv(4096).decode('utf-8')
             except socket.error:
@@ -302,12 +302,12 @@ class ThreadedTCPRequestHandler(socketserver.BaseRequestHandler):
             except IOError:
                 self.debuglog("=== socket closed ===\n")
                 break
-            if received == '':
+            如果 received == '':
                 self.debuglog("=== socket closed ===\n")
                 break
 
             # Write the received lines into the file for debugging
-            if self.debug:
+            如果 self.debug:
                 self.debuglog("RECV: ({0} bytes) '{1}'\n".format(len(received), received))
 
             # Can receive more than one line in a response or a partial line.
@@ -325,11 +325,11 @@ def writePortInFile(port):
     f.write("{0}".format(port))
     f.close()
 
-def main(host, port, server_class=ThreadedTCPServer):
+def 主要(host, port, server_class=ThreadedTCPServer):
     # Wait half a second before opening the port to test waittime in ch_open().
     # We do want to get the port number, get that first.  We cannot open the
     # socket, guess a port is free.
-    if len(sys.argv) >= 2 and sys.argv[1] == 'delay':
+    如果 len(sys.argv) >= 2 and sys.argv[1] == 'delay':
         port = 13684
         writePortInFile(port)
         time.sleep(0.5)
@@ -352,10 +352,10 @@ def main(host, port, server_class=ThreadedTCPServer):
     # Main thread terminates, but the server continues running
     # until server.shutdown() is called.
     try:
-        while server_thread.is_alive():
+        当 server_thread.is_alive():
             server_thread.join(1)
     except (KeyboardInterrupt, SystemExit):
         server.shutdown()
 
-if __name__ == "__main__":
-    main("localhost", 0)
+如果 __name__ == "__main__":
+    主要("localhost", 0)

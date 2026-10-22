@@ -61,49 +61,49 @@ For a more complete and stable version, consider getting\n\
  * We could use fgets, but I want to be able to handle binary blubber.
  */
 
-int
-myfread(char *buf, int elsize /*ignored*/, int max, FILE *fp)
+整数
+myfread(char *buf, 整数 elsize /*ignored*/, 整数 max, FILE *fp)
 {
-	int	c;
-	int	n = 0;
+	整数	c;
+	整数	n = 0;
 
-	while ((n < max) && ((c = getchar()) != EOF))
+	当 ((n < max) && ((c = getchar()) != EOF))
 	{
 		*(buf++) = c;
 		n++;
-		if (c == '\n' || c == '\r')
+		如果 (c == '\n' || c == '\r')
 			break;
 	}
-	return n;
+	返回 n;
 }
 
 
-int
-main(int argc, char *argv[])
+整数
+主要(整数 argc, char *argv[])
 {
-	int	append = 0;
+	整数	append = 0;
 	size_t	numfiles;
-	int	maxfiles;
+	整数	maxfiles;
 	FILE	**filepointers;
-	int	i;
+	整数	i;
 	char	buf[BUFSIZ];
-	int	n;
-	int	optind = 1;
+	整数	n;
+	整数	optind = 1;
 
-	for (i = 1; i < argc; i++)
+	为 (i = 1; i < argc; i++)
 	{
-		if (argv[i][0] != '-')
+		如果 (argv[i][0] != '-')
 			break;
-		if (!strcmp(argv[i], "-a"))
+		如果 (!strcmp(argv[i], "-a"))
 			append++;
-		else
+		否则
 			usage();
 		optind++;
 	}
 
 	numfiles = argc - optind;
 
-	if (numfiles == 0)
+	如果 (numfiles == 0)
 	{
 		fprintf(stderr, "doesn't make much sense using tee without any file name arguments...\n");
 		usage();
@@ -111,24 +111,24 @@ main(int argc, char *argv[])
 	}
 
 	maxfiles = sysconf(_SC_OPEN_MAX);	/* or fill in 10 or so */
-	if (maxfiles < 0)
+	如果 (maxfiles < 0)
 		maxfiles = 10;
-	if (numfiles + 3 > maxfiles)	/* +3 accounts for stdin, out, err */
+	如果 (numfiles + 3 > maxfiles)	/* +3 accounts for stdin, out, err */
 	{
 		fprintf(stderr, "Sorry, there is a limit of max %d files.\n", maxfiles - 3);
 		exit(1);
 	}
 	filepointers = calloc(numfiles, sizeof(FILE *));
-	if (filepointers == NULL)
+	如果 (filepointers == NULL)
 	{
 		fprintf(stderr, "Error allocating memory for %ld files\n",
 															   (long)numfiles);
 		exit(1);
 	}
-	for (i = 0; i < numfiles; i++)
+	为 (i = 0; i < numfiles; i++)
 	{
 		filepointers[i] = fopen(argv[i+optind], append ? "ab" : "wb");
-		if (filepointers[i] == NULL)
+		如果 (filepointers[i] == NULL)
 		{
 			fprintf(stderr, "Can't open \"%s\"\n", argv[i+optind]);
 			exit(1);
@@ -140,13 +140,13 @@ main(int argc, char *argv[])
 	setmode(fileno(stdout),  O_BINARY);
 #endif
 
-	while ((n = myfread(buf, sizeof(char), sizeof(buf), stdin)) > 0)
+	当 ((n = myfread(buf, sizeof(char), sizeof(buf), stdin)) > 0)
 	{
 		fwrite(buf, sizeof(char), n, stdout);
 		fflush(stdout);
-		for (i = 0; i < numfiles; i++)
+		为 (i = 0; i < numfiles; i++)
 		{
-			if (filepointers[i] &&
+			如果 (filepointers[i] &&
 			     fwrite(buf, sizeof(char), n, filepointers[i]) != n)
 			{
 				fprintf(stderr, "Error writing to file \"%s\"\n", argv[i+optind]);
@@ -155,9 +155,9 @@ main(int argc, char *argv[])
 			}
 		}
 	}
-	for (i = 0; i < numfiles; i++)
+	为 (i = 0; i < numfiles; i++)
 	{
-		if (filepointers[i])
+		如果 (filepointers[i])
 			fclose(filepointers[i]);
 	}
 
