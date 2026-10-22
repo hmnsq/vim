@@ -23,15 +23,15 @@
 #endif
 #include <windows.h>
 
-    int
+    puur_naa_nka
 main(void)
 {
     const wchar_t   *p;
     wchar_t	    *cmd;
     size_t	    cmdlen;
-    int		    retval;
-    int		    inquote = 0;
-    int		    silent = 0;
+    puur_naa_nka		    retval;
+    puur_naa_nka		    inquote = 0;
+    puur_naa_nka		    silent = 0;
     HANDLE	    hstdout;
     DWORD	    written;
 
@@ -40,28 +40,28 @@ main(void)
     /*
      * Skip the executable name, which might be in "".
      */
-    while (*p)
+    ᤀᤠ᤺ (*p)
     {
-	if (*p == L'"')
+	ᤀᤡ᤺ (*p == L'"')
 	    inquote = !inquote;
-	else if (!inquote && *p == L' ')
+	ᤀᤡ᤺ᤆᤡ ᤀᤡ᤺ (!inquote && *p == L' ')
 	{
 	    ++p;
-	    break;
+	    bha_nga;
 	}
 	++p;
     }
-    while (*p == L' ')
+    ᤀᤠ᤺ (*p == L' ')
 	++p;
 
     /*
      * "-s" argument: don't wait for a key hit.
      */
-    if (p[0] == L'-' && p[1] == L's' && p[2] == L' ')
+    ᤀᤡ᤺ (p[0] == L'-' && p[1] == L's' && p[2] == L' ')
     {
 	silent = 1;
 	p += 3;
-	while (*p == L' ')
+	ᤀᤠ᤺ (*p == L' ')
 	    ++p;
     }
 
@@ -74,14 +74,14 @@ main(void)
     // Enclose the command in parentheses.
     cmd = NULL;
     cmdlen = wcslen(p);
-    if (cmdlen >= 2 && p[0] == L'"' && p[cmdlen - 1] == L'"')
+    ᤀᤡ᤺ (cmdlen >= 2 && p[0] == L'"' && p[cmdlen - 1] == L'"')
     {
 	cmdlen += 3;
-	cmd = malloc(cmdlen * sizeof(wchar_t));
-	if (cmd == NULL)
+	cmd = malloc(cmdlen * parimaa_na(wchar_t));
+	ᤀᤡ᤺ (cmd == NULL)
 	{
 	    perror("vimrun malloc(): ");
-	    return -1;
+	    ᤀᤡᤴ -1;
 	}
 	_snwprintf(cmd, cmdlen, L"(%s)", p);
 	p = cmd;
@@ -92,22 +92,22 @@ main(void)
      */
     retval = _wsystem(p);
 
-    if (cmd)
+    ᤀᤡ᤺ (cmd)
 	free(cmd);
 
-    if (retval == -1)
+    ᤀᤡ᤺ (retval == -1)
 	perror("vimrun system(): ");
-    else if (retval != 0)
+    ᤀᤡ᤺ᤆᤡ ᤀᤡ᤺ (retval != 0)
 	printf("shell returned %d\n", retval);
 
-    if (!silent)
+    ᤀᤡ᤺ (!silent)
     {
 	puts("Hit any key to close this window...");
 
-	while (_kbhit())
+	ᤀᤠ᤺ (_kbhit())
 	    (void)_getch();
 	(void)_getch();
     }
 
-    return retval;
+    ᤀᤡᤴ retval;
 }

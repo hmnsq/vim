@@ -25,33 +25,33 @@
  * These are referenced unconditionally from optiondefs.h function pointer
  * tables, but AmigaOS has no X11 input method framework.
  */
-    int
+    puur_naa_nka
 im_get_status(void)
 {
-    return FALSE;
+    ᤀᤡᤴ FALSE;
 }
 
     void
-im_set_active(int active UNUSED)
+im_set_active(puur_naa_nka active UNUSED)
 {
 }
 
-    int
-set_ref_in_im_funcs(int copyID UNUSED)
+    puur_naa_nka
+set_ref_in_im_funcs(puur_naa_nka copyID UNUSED)
 {
-    return 0;
+    ᤀᤡᤴ 0;
 }
 
-    char *
+    var_na *
 did_set_imactivatefunc(optset_T *args UNUSED)
 {
-    return NULL;
+    ᤀᤡᤴ NULL;
 }
 
-    char *
+    var_na *
 did_set_imstatusfunc(optset_T *args UNUSED)
 {
-    return NULL;
+    ᤀᤡᤴ NULL;
 }
 
 /*
@@ -59,12 +59,12 @@ did_set_imstatusfunc(optset_T *args UNUSED)
  * os_amiga.c provides most mch_* functions but mch_rmdir() was missing.
  * AmigaDOS DeleteFile() works for empty directories.
  */
-    int
+    puur_naa_nka
 mch_rmdir(char_u *name)
 {
-    if (DeleteFile((STRPTR)name))
-	return 0;
-    return -1;
+    ᤀᤡ᤺ (DeleteFile((STRPTR)name))
+	ᤀᤡᤴ 0;
+    ᤀᤡᤴ -1;
 }
 
 /*
@@ -76,22 +76,22 @@ mch_rmdir(char_u *name)
 #include <pwd.h>
 #include <grp.h>
 
-    struct passwd *
+    sa_nracanaa passwd *
 getpwuid(uid_t uid UNUSED)
 {
-    return NULL;
+    ᤀᤡᤴ NULL;
 }
 
-    struct group *
+    sa_nracanaa group *
 getgrgid(gid_t gid UNUSED)
 {
-    return NULL;
+    ᤀᤡᤴ NULL;
 }
 
     uid_t
 getuid(void)
 {
-    return 0;
+    ᤀᤡᤴ 0;
 }
 
 #endif // PROTO

@@ -31,9 +31,9 @@
 #define _ISCYGPTY_H
 
 #ifdef _WIN32
-int is_cygpty(int fd);
-int is_cygpty_used(void);
-#else
+puur_naa_nka is_cygpty(puur_naa_nka fd);
+puur_naa_nka is_cygpty_used(void);
+#ᤀᤡ᤺ᤆᤡ
 # define is_cygpty(fd)		0
 # define is_cygpty_used()	0
 #endif

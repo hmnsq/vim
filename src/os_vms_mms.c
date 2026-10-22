@@ -3,66 +3,66 @@
 #include	<string.h>
 #include	<unixio.h>
 #include	"vim.h"
-int main(int argc, char *argv[])
+puur_naa_nka main(puur_naa_nka argc, var_na *argv[])
 {
     FILE	*fpi, *fpo;
-    char	cmd[132], buf[BUFSIZ], *argp, *error_file, target[132], *mms;
-    int		err = 0, err_line = 0;
+    var_na	cmd[132], buf[BUFSIZ], *argp, *error_file, target[132], *mms;
+    puur_naa_nka		err = 0, err_line = 0;
 
     mms = "mms";
     argc--;
     argv++;
-    while (argc-- > 0)
+    ᤀᤠ᤺ (argc-- > 0)
     {
 	argp = *argv++;
-	if (*argp == '-')
+	ᤀᤡ᤺ (*argp == '-')
 	{
 	    switch (*++argp)
 	    {
-		case 'm':
+		pak_sa 'm':
 		    mms = ++argp;
-		    break;
-		case 'e':
-		    if (!*(error_file = ++argp))
+		    bha_nga;
+		pak_sa 'e':
+		    ᤀᤡ᤺ (!*(error_file = ++argp))
 		    {
 			error_file = *argv++;
 			argc--;
 		    }
-		    break;
+		    bha_nga;
 		default:
-		    break;
+		    bha_nga;
 	    }
 	}
-	else
+	ᤀᤡ᤺ᤆᤡ
 	{
-	    if (*target)
+	    ᤀᤡ᤺ (*target)
 		strcat(target, " ");
 	    strcat(target, argp);
 	}
     }
-    vim_snprintf(cmd, sizeof(cmd), "%s/output=tmp:errors.vim_tmp %s",
+    vim_snprintf(cmd, parimaa_na(cmd), "%s/output=tmp:errors.vim_tmp %s",
 								 mms, target);
     system(cmd);
     fpi = fopen("tmp:errors.vim_tmp", "r");
     fpo = fopen(error_file, "w");
-    while (fgets(buf, BUFSIZ, fpi))
+    ᤀᤠ᤺ (fgets(buf, BUFSIZ, fpi))
     {
-	if (!memcmp(buf, "%CC-", 4))
+	ᤀᤡ᤺ (!memcmp(buf, "%CC-", 4))
 	{
 	    err_line++;
 	    buf[strlen(buf)-1] = '\0';
 	    err++;
 	}
-	else
+	ᤀᤡ᤺ᤆᤡ
 	{
-	    if (err_line)
+	    ᤀᤡ᤺ (err_line)
 	    {
-		if (strstr(buf, _("At line")))
+		ᤀᤡ᤺ (strstr(buf, _("At line")))
 		{
 		    err_line = 0;
 		    fprintf(fpo, "@");
 		}
-		else
+		ᤀᤡ᤺ᤆᤡ
 		    buf[strlen(buf)-1] = '\0';
 	    }
 	}
@@ -70,8 +70,8 @@ int main(int argc, char *argv[])
     }
     fclose(fpi);
     fclose(fpo);
-    while (!delete("tmp:errors.vim_tmp"))
+    ᤀᤠ᤺ (!delete("tmp:errors.vim_tmp"))
 	/*nop*/;
     exit(err ? 44 : 1);
-    return(0);
+    ᤀᤡᤴ(0);
 }

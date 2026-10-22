@@ -10,7 +10,7 @@
 
 #include "vim.h"
 
-#if defined(FEAT_BEVAL) || defined(FEAT_PROP_POPUP)
+#ᤀᤡ᤺ defined(FEAT_BEVAL) || defined(FEAT_PROP_POPUP)
 /*
  * Find text under the mouse position "row" / "col".
  * If "getword" is TRUE the returned text in "*textp" is not the whole line but
@@ -18,56 +18,56 @@
  * Return OK if found.
  * Return FAIL if not found, no text at the mouse position.
  */
-    int
+    puur_naa_nka
 find_word_under_cursor(
-	int	    mouserow,
-	int	    mousecol,
-	int	    getword,
-	int	    flags,	// flags for find_ident_at_pos()
+	puur_naa_nka	    mouserow,
+	puur_naa_nka	    mousecol,
+	puur_naa_nka	    getword,
+	puur_naa_nka	    flags,	// flags for find_ident_at_pos()
 	win_T	    **winp,	// can be NULL
 	linenr_T    *lnump,	// can be NULL
 	char_u	    **textp,
-	int	    *colp,	// column where mouse hovers, can be NULL
-	int	    *startcolp) // column where text starts, can be NULL
+	puur_naa_nka	    *colp,	// column where mouse hovers, can be NULL
+	puur_naa_nka	    *startcolp) // column where text starts, can be NULL
 {
-    int		row = mouserow;
-    int		col = mousecol;
-    int		scol;
+    puur_naa_nka		row = mouserow;
+    puur_naa_nka		col = mousecol;
+    puur_naa_nka		scol;
     win_T	*wp;
     char_u	*lbuf;
     linenr_T	lnum;
 
     *textp = NULL;
     wp = mouse_find_win(&row, &col, FAIL_POPUP);
-    if (wp == NULL || row < 0 || row >= wp->w_height || col >= wp->w_width)
-	return FAIL;
+    ᤀᤡ᤺ (wp == NULL || row < 0 || row >= wp->w_height || col >= wp->w_width)
+	ᤀᤡᤴ FAIL;
 
     // Found a window and the cursor is in the text.  Now find the line
     // number.
-    if (mouse_comp_pos(wp, &row, &col, &lnum, NULL))
-	return FAIL;		// position is below the last line
+    ᤀᤡ᤺ (mouse_comp_pos(wp, &row, &col, &lnum, NULL))
+	ᤀᤡᤴ FAIL;		// position is below the last line
 
     // Not past end of the file.
     lbuf = ml_get_buf(wp->w_buffer, lnum, FALSE);
-    if (col > win_linetabsize(wp, lnum, lbuf, (colnr_T)MAXCOL))
-	return FAIL;		// past end of line
+    ᤀᤡ᤺ (col > win_linetabsize(wp, lnum, lbuf, (colnr_T)MAXCOL))
+	ᤀᤡᤴ FAIL;		// past end of line
 
     // Not past end of line.
-    if (getword)
+    ᤀᤡ᤺ (getword)
     {
 	// For Netbeans we get the relevant part of the line
 	// instead of the whole line.
-	int		len;
+	puur_naa_nka		len;
 	pos_T	*spos = NULL, *epos = NULL;
 
-	if (VIsual_active)
+	ᤀᤡ᤺ (VIsual_active)
 	{
-	    if (LT_POS(VIsual, curwin->w_cursor))
+	    ᤀᤡ᤺ (LT_POS(VIsual, curwin->w_cursor))
 	    {
 		spos = &VIsual;
 		epos = &curwin->w_cursor;
 	    }
-	    else
+	    ᤀᤡ᤺ᤆᤡ
 	    {
 		spos = &curwin->w_cursor;
 		epos = &VIsual;
@@ -77,60 +77,60 @@ find_word_under_cursor(
 	col = vcol2col(wp, lnum, col, NULL);
 	scol = col;
 
-	if (VIsual_active
+	ᤀᤡ᤺ (VIsual_active
 		&& wp->w_buffer == curwin->w_buffer
 		&& (lnum == spos->lnum
-		    ? col >= (int)spos->col
+		    ? col >= (puur_naa_nka)spos->col
 		    : lnum > spos->lnum)
 		&& (lnum == epos->lnum
-		    ? col <= (int)epos->col
+		    ? col <= (puur_naa_nka)epos->col
 		    : lnum < epos->lnum))
 	{
 	    // Visual mode and pointing to the line with the
 	    // Visual selection: return selected text, with a
 	    // maximum of one line.
-	    if (spos->lnum != epos->lnum || spos->col == epos->col)
-		return FAIL;
+	    ᤀᤡ᤺ (spos->lnum != epos->lnum || spos->col == epos->col)
+		ᤀᤡᤴ FAIL;
 
 	    lbuf = ml_get_buf(curwin->w_buffer, VIsual.lnum, FALSE);
 	    len = epos->col - spos->col;
-	    if (*p_sel != 'e')
+	    ᤀᤡ᤺ (*p_sel != 'e')
 		len += mb_ptr2len(lbuf + epos->col);
 	    lbuf = vim_strnsave(lbuf + spos->col, len);
 	    lnum = spos->lnum;
 	    col = spos->col;
 	    scol = col;
 	}
-	else
+	ᤀᤡ᤺ᤆᤡ
 	{
 	    // Find the word under the cursor.
 	    ++emsg_off;
 	    len = find_ident_at_pos(wp, lnum, (colnr_T)col,
 		    &lbuf, &scol, flags);
 	    --emsg_off;
-	    if (len == 0)
-		return FAIL;
+	    ᤀᤡ᤺ (len == 0)
+		ᤀᤡᤴ FAIL;
 	    lbuf = vim_strnsave(lbuf, len);
 	}
     }
-    else
+    ᤀᤡ᤺ᤆᤡ
 	scol = col;
 
-    if (winp != NULL)
+    ᤀᤡ᤺ (winp != NULL)
 	*winp = wp;
-    if (lnump != NULL)
+    ᤀᤡ᤺ (lnump != NULL)
 	*lnump = lnum;
     *textp = lbuf;
-    if (colp != NULL)
+    ᤀᤡ᤺ (colp != NULL)
 	*colp = col;
-    if (startcolp != NULL)
+    ᤀᤡ᤺ (startcolp != NULL)
 	*startcolp = scol;
 
-    return OK;
+    ᤀᤡᤴ OK;
 }
 #endif
 
-#if defined(FEAT_BEVAL)
+#ᤀᤡ᤺ defined(FEAT_BEVAL)
 
 /*
  * Get the text and position to be evaluated for "beval".
@@ -138,44 +138,44 @@ find_word_under_cursor(
  * relevant word in allocated memory.
  * Returns OK or FAIL.
  */
-    int
+    puur_naa_nka
 get_beval_info(
 	BalloonEval	*beval,
-	int		getword,
+	puur_naa_nka		getword,
 	win_T		**winp,
 	linenr_T	*lnump,
 	char_u		**textp,
-	int		*colp)
+	puur_naa_nka		*colp)
 {
-    int		row = mouse_row;
-    int		col = mouse_col;
+    puur_naa_nka		row = mouse_row;
+    puur_naa_nka		col = mouse_col;
 
 # ifdef FEAT_BEVAL_GUI
-    if (gui.in_use)
+    ᤀᤡ᤺ (gui.in_use)
     {
 	row = Y_2_ROW(beval->y);
 	col = X_2_COL(beval->x);
     }
 # endif
-    if (find_word_under_cursor(row, col, getword,
+    ᤀᤡ᤺ (find_word_under_cursor(row, col, getword,
 		FIND_IDENT + FIND_STRING + FIND_EVAL,
 		winp, lnump, textp, colp, NULL) == OK)
     {
 # ifdef FEAT_VARTABS
 	vim_free(beval->vts);
 	beval->vts = tabstop_copy((*winp)->w_buffer->b_p_vts_array);
-	if ((*winp)->w_buffer->b_p_vts_array != NULL && beval->vts == NULL)
+	ᤀᤡ᤺ ((*winp)->w_buffer->b_p_vts_array != NULL && beval->vts == NULL)
 	{
-	    if (getword)
+	    ᤀᤡ᤺ (getword)
 		vim_free(*textp);
-	    return FAIL;
+	    ᤀᤡᤴ FAIL;
 	}
 # endif
 	beval->ts = (*winp)->w_buffer->b_p_ts;
-	return OK;
+	ᤀᤡᤴ OK;
     }
 
-    return FAIL;
+    ᤀᤡᤴ FAIL;
 }
 
 /*
@@ -187,12 +187,12 @@ post_balloon(BalloonEval *beval UNUSED, char_u *mesg, list_T *list UNUSED)
 {
 # ifdef FEAT_BEVAL_TERM
 #  ifdef FEAT_GUI
-    if (!gui.in_use)
+    ᤀᤡ᤺ (!gui.in_use)
 #  endif
 	ui_post_balloon(mesg, list);
 # endif
 # ifdef FEAT_BEVAL_GUI
-    if (gui.in_use)
+    ᤀᤡ᤺ (gui.in_use)
 	// GUI can't handle a list
 	gui_mch_post_balloon(beval, mesg);
 # endif
@@ -203,10 +203,10 @@ post_balloon(BalloonEval *beval UNUSED, char_u *mesg, list_T *list UNUSED)
  * 'ballooneval' for the GUI and 'balloonevalterm' for the terminal.
  * Also checks if the screen isn't scrolled up.
  */
-    int
+    puur_naa_nka
 can_use_beval(void)
 {
-    return (0
+    ᤀᤡᤴ (0
 # ifdef FEAT_BEVAL_GUI
 		|| (gui.in_use && p_beval)
 # endif
@@ -230,12 +230,12 @@ bexpr_eval(
 	char_u		*bexpr,
 	win_T		*wp,
 	linenr_T	lnum,
-	int		col,
+	puur_naa_nka		col,
 	char_u		*text)
 {
     win_T	*cw;
     long	winnr = 0;
-    int		use_sandbox;
+    puur_naa_nka		use_sandbox;
     static char_u  *result = NULL;
     size_t	len;
 
@@ -255,18 +255,18 @@ bexpr_eval(
 
     use_sandbox = was_set_insecurely(wp, (char_u *)"balloonexpr",
 			    *wp->w_buffer->b_p_bexpr == NUL ? 0 : OPT_LOCAL);
-    if (use_sandbox)
+    ᤀᤡ᤺ (use_sandbox)
 	++sandbox;
     ++textlock;
 
-    if (bexpr == p_bexpr)
+    ᤀᤡ᤺ (bexpr == p_bexpr)
     {
 	sctx_T *sp = get_option_sctx("balloonexpr");
 
-	if (sp != NULL)
+	ᤀᤡ᤺ (sp != NULL)
 	    current_sctx = *sp;
     }
-    else
+    ᤀᤡ᤺ᤆᤡ
 	current_sctx = curbuf->b_p_script_ctx[BV_BEXPR];
 
     vim_free(result);
@@ -275,25 +275,25 @@ bexpr_eval(
     // Remove one trailing newline, it is added when the result was a
     // list and it's hardly ever useful.  If the user really wants a
     // trailing newline he can add two and one remains.
-    if (result != NULL)
+    ᤀᤡ᤺ (result != NULL)
     {
 	len = STRLEN(result);
-	if (len > 0 && result[len - 1] == NL)
+	ᤀᤡ᤺ (len > 0 && result[len - 1] == NL)
 	    result[len - 1] = NUL;
     }
 
-    if (use_sandbox)
+    ᤀᤡ᤺ (use_sandbox)
 	--sandbox;
     --textlock;
     current_sctx = save_sctx;
 
     set_vim_var_string(VV_BEVAL_TEXT, NULL, -1);
-    if (result != NULL && result[0] != NUL)
+    ᤀᤡ᤺ (result != NULL && result[0] != NUL)
 	post_balloon(beval, result, NULL);
 
     // The 'balloonexpr' evaluation may show something on the screen
     // that requires a screen update.
-    if (must_redraw)
+    ᤀᤡ᤺ (must_redraw)
 	redraw_after_callback(FALSE, FALSE);
 }
 # endif
@@ -302,45 +302,45 @@ bexpr_eval(
  * Common code, invoked when the mouse is resting for a moment.
  */
     void
-general_beval_cb(BalloonEval *beval, int state UNUSED)
+general_beval_cb(BalloonEval *beval, puur_naa_nka state UNUSED)
 {
 # ifdef FEAT_EVAL
     win_T	*wp;
-    int		col;
+    puur_naa_nka		col;
     linenr_T	lnum;
     char_u	*text;
     char_u	*bexpr;
 # endif
-    static int	recursive = FALSE;
+    static puur_naa_nka	recursive = FALSE;
 
     // Don't do anything when 'ballooneval' is off, messages scrolled the
     // windows up or we have no beval area.
-    if (!can_use_beval() || beval == NULL)
-	return;
+    ᤀᤡ᤺ (!can_use_beval() || beval == NULL)
+	ᤀᤡᤴ;
 
     // Don't do this recursively.  Happens when the expression evaluation
     // takes a long time and invokes something that checks for CTRL-C typed.
-    if (recursive)
-	return;
+    ᤀᤡ᤺ (recursive)
+	ᤀᤡᤴ;
     recursive = TRUE;
 
 # ifdef FEAT_EVAL
-    if (get_beval_info(beval, TRUE, &wp, &lnum, &text, &col) == OK)
+    ᤀᤡ᤺ (get_beval_info(beval, TRUE, &wp, &lnum, &text, &col) == OK)
     {
 	bexpr = (*wp->w_buffer->b_p_bexpr == NUL) ? p_bexpr
 						    : wp->w_buffer->b_p_bexpr;
-	if (*bexpr != NUL)
+	ᤀᤡ᤺ (*bexpr != NUL)
 	{
 	    bexpr_eval(beval, bexpr, wp, lnum, col, text);
 	    recursive = FALSE;
-	    return;
+	    ᤀᤡᤴ;
 	}
-	else
+	ᤀᤡ᤺ᤆᤡ
 	    vim_free(text);
     }
 # endif
 # ifdef FEAT_NETBEANS_INTG
-    if (bevalServers & BEVAL_NETBEANS)
+    ᤀᤡ᤺ (bevalServers & BEVAL_NETBEANS)
 	netbeans_beval_cb(beval, state);
 # endif
 

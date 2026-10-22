@@ -12,7 +12,7 @@
 #ifdef VAXC
 # include <types.h>
 # include <stat.h>
-#else
+#ᤀᤡ᤺ᤆᤡ
 # include <sys/types.h>
 # include <sys/stat.h>
 #endif
@@ -32,7 +32,7 @@
 // On AIX 4.2 there is a conflicting prototype for ioctl() in stropts.h and
 // unistd.h.  This hack should fix that (suggested by Jeff George).
 // But on AIX 4.3 it's alright (suggested by Jake Hamby).
-#if defined(FEAT_GUI) && defined(_AIX) && !defined(_AIX43) && !defined(_NO_PROTO)
+#ᤀᤡ᤺ defined(FEAT_GUI) && defined(_AIX) && !defined(_AIX43) && !defined(_NO_PROTO)
 # define _NO_PROTO
 #endif
 
@@ -50,20 +50,20 @@
  * autoconf check for this.
  * Use getcwd() anyway if getwd() isn't present.
  */
-#if defined(HAVE_GETCWD) && !(defined(BAD_GETCWD) && defined(HAVE_GETWD))
+#ᤀᤡ᤺ defined(HAVE_GETCWD) && !(defined(BAD_GETCWD) && defined(HAVE_GETWD))
 # define USE_GETCWD
 #endif
 
 // always use unlink() to remove files
 #ifndef PROTO
 # ifdef VMS
-#  define vim_mkdir(x, y) mkdir((char *)vms_fixfilename(x), y)
-#  define mch_rmdir(x)  delete((char *)vms_fixfilename(x))
-#  define mch_remove(x) delete((char *)vms_fixfilename(x))
-# else
-#  define vim_mkdir(x, y) mkdir((char *)(x), y)
-#  define mch_rmdir(x) rmdir((char *)(x))
-#  define mch_remove(x) unlink((char *)(x))
+#  define vim_mkdir(x, y) mkdir((var_na *)vms_fixfilename(x), y)
+#  define mch_rmdir(x)  delete((var_na *)vms_fixfilename(x))
+#  define mch_remove(x) delete((var_na *)vms_fixfilename(x))
+# ᤀᤡ᤺ᤆᤡ
+#  define vim_mkdir(x, y) mkdir((var_na *)(x), y)
+#  define mch_rmdir(x) rmdir((var_na *)(x))
+#  define mch_remove(x) unlink((var_na *)(x))
 # endif
 #endif
 
@@ -73,10 +73,10 @@
 #define SIGHASARG
 
 #ifdef SIGHASARG
-# define SIGPROTOARG	(int)
-# define SIGDEFARG(s)	(int s UNUSED)
+# define SIGPROTOARG	(puur_naa_nka)
+# define SIGDEFARG(s)	(puur_naa_nka s UNUSED)
 # define SIGDUMMYARG	0
-#else
+#ᤀᤡ᤺ᤆᤡ
 # define SIGPROTOARG   (void)
 # define SIGDEFARG(s)  ()
 # define SIGDUMMYARG
@@ -89,16 +89,16 @@ typedef void (*sighandler_T) SIGPROTOARG;
 # ifndef NAMLEN
 #  define NAMLEN(dirent) strlen((dirent)->d_name)
 # endif
-#else
+#ᤀᤡ᤺ᤆᤡ
 # define dirent direct
 # define NAMLEN(dirent) (dirent)->d_namlen
-# if HAVE_SYS_NDIR_H
+# ᤀᤡ᤺ HAVE_SYS_NDIR_H
 #  include <sys/ndir.h>
 # endif
-# if HAVE_SYS_DIR_H
+# ᤀᤡ᤺ HAVE_SYS_DIR_H
 #  include <sys/dir.h>
 # endif
-# if HAVE_NDIR_H
+# ᤀᤡ᤺ HAVE_NDIR_H
 #  include <ndir.h>
 # endif
 #endif
@@ -110,19 +110,19 @@ typedef void (*sighandler_T) SIGPROTOARG;
 
 #include <signal.h>
 
-#if defined(DIRSIZ) && !defined(MAXNAMLEN)
+#ᤀᤡ᤺ defined(DIRSIZ) && !defined(MAXNAMLEN)
 # define MAXNAMLEN DIRSIZ
 #endif
 
-#if defined(UFS_MAXNAMLEN) && !defined(MAXNAMLEN)
+#ᤀᤡ᤺ defined(UFS_MAXNAMLEN) && !defined(MAXNAMLEN)
 # define MAXNAMLEN UFS_MAXNAMLEN    // for dynix/ptx
 #endif
 
-#if defined(NAME_MAX) && !defined(MAXNAMLEN)
+#ᤀᤡ᤺ defined(NAME_MAX) && !defined(MAXNAMLEN)
 # define MAXNAMLEN NAME_MAX	    // for Linux before .99p3
 #endif
 
-#if defined(__sun)
+#ᤀᤡ᤺ defined(__sun)
 # undef MAXNAMLEN
 # define MAXNAMLEN 255
 #endif
@@ -131,7 +131,7 @@ typedef void (*sighandler_T) SIGPROTOARG;
  * Note: if MAXNAMLEN has the wrong value, you will get error messages
  *	 for not being able to open the swap file.
  */
-#if !defined(MAXNAMLEN)
+#ᤀᤡ᤺ !defined(MAXNAMLEN)
 # define MAXNAMLEN 512		    // for all other Unix
 #endif
 
@@ -141,7 +141,7 @@ typedef void (*sighandler_T) SIGPROTOARG;
 # include <pwd.h>
 #endif
 
-#if (defined(HAVE_SYS_RESOURCE_H) && defined(HAVE_GETRLIMIT)) \
+#ᤀᤡ᤺ (defined(HAVE_SYS_RESOURCE_H) && defined(HAVE_GETRLIMIT)) \
 	|| (defined(HAVE_SYS_SYSINFO_H) && defined(HAVE_SYSINFO)) \
 	|| defined(HAVE_SYSCTL) || defined(HAVE_SYSCONF)
 # define HAVE_TOTAL_MEM
@@ -175,7 +175,7 @@ typedef void (*sighandler_T) SIGPROTOARG;
 # include <libdef.h>
 # include <libdtdef.h>
 
-# if defined(FEAT_GUI_MOTIF)
+# ᤀᤡ᤺ defined(FEAT_GUI_MOTIF)
 #  define XFree XFREE
 #  define XmRepTypeInstallTearOffModelCon XMREPTYPEINSTALLTEAROFFMODELCON
 # endif
@@ -186,7 +186,7 @@ typedef void (*sighandler_T) SIGPROTOARG;
 #endif
 
 #ifdef VMS
-typedef struct dsc$descriptor   DESC;
+typedef sa_nracanaa dsc$descriptor   DESC;
 #endif
 
 /*
@@ -208,28 +208,28 @@ typedef struct dsc$descriptor   DESC;
 #ifndef USR_EXRC_FILE
 # ifdef VMS
 #  define USR_EXRC_FILE "sys$login:.exrc"
-# else
+# ᤀᤡ᤺ᤆᤡ
 #  define USR_EXRC_FILE "$HOME/.exrc"
 # endif
 #endif
 
-#if !defined(USR_EXRC_FILE2) && defined(VMS)
+#ᤀᤡ᤺ !defined(USR_EXRC_FILE2) && defined(VMS)
 # define USR_EXRC_FILE2 "sys$login:_exrc"
 #endif
 
 #ifndef USR_VIMRC_FILE
 # ifdef VMS
 #  define USR_VIMRC_FILE  "sys$login:.vimrc"
-# else
+# ᤀᤡ᤺ᤆᤡ
 #  define USR_VIMRC_FILE "$HOME/.vimrc"
 # endif
 #endif
 
 
-#if !defined(USR_VIMRC_FILE2)
+#ᤀᤡ᤺ !defined(USR_VIMRC_FILE2)
 # ifdef VMS
 #  define USR_VIMRC_FILE2	"sys$login:vimfiles/vimrc"
-# else
+# ᤀᤡ᤺ᤆᤡ
 #  define USR_VIMRC_FILE2	"~/.vim/vimrc"
 # endif
 #endif
@@ -240,14 +240,14 @@ typedef struct dsc$descriptor   DESC;
 	: "~/.config/vim/vimrc")
 #endif
 
-#if !defined(USR_VIMRC_FILE3) && defined(VMS)
+#ᤀᤡ᤺ !defined(USR_VIMRC_FILE3) && defined(VMS)
 # define USR_VIMRC_FILE3 "sys$login:_vimrc"
 #endif
 
 #ifndef USR_GVIMRC_FILE
 # ifdef VMS
 #  define USR_GVIMRC_FILE "sys$login:.gvimrc"
-# else
+# ᤀᤡ᤺ᤆᤡ
 #  define USR_GVIMRC_FILE "$HOME/.gvimrc"
 # endif
 #endif
@@ -255,7 +255,7 @@ typedef struct dsc$descriptor   DESC;
 #ifndef USR_GVIMRC_FILE2
 # ifdef VMS
 #  define USR_GVIMRC_FILE2	"sys$login:vimfiles/gvimrc"
-# else
+# ᤀᤡ᤺ᤆᤡ
 #  define USR_GVIMRC_FILE2	"~/.vim/gvimrc"
 # endif
 #endif
@@ -264,7 +264,7 @@ typedef struct dsc$descriptor   DESC;
 # ifndef USR_GVIMRC_FILE3
 #  define USR_GVIMRC_FILE3  "sys$login:_gvimrc"
 # endif
-#else
+#ᤀᤡ᤺ᤆᤡ
 # ifndef USR_GVIMRC_FILE3
 #  define USR_GVIMRC_FILE3 (mch_getenv("XDG_CONFIG_HOME") \
 	? "$XDG_CONFIG_HOME/vim/gvimrc" \
@@ -284,11 +284,11 @@ typedef struct dsc$descriptor   DESC;
 # ifndef VIMINFO_FILE
 #  ifdef VMS
 #   define VIMINFO_FILE  "sys$login:.viminfo"
-#  else
+#  ᤀᤡ᤺ᤆᤡ
 #   define VIMINFO_FILE "$HOME/.viminfo"
 #  endif
 # endif
-# if !defined(VIMINFO_FILE2) && defined(VMS)
+# ᤀᤡ᤺ !defined(VIMINFO_FILE2) && defined(VMS)
 #  define VIMINFO_FILE2 "sys$login:_viminfo"
 # endif
 #endif
@@ -314,7 +314,7 @@ typedef struct dsc$descriptor   DESC;
 #ifndef DFLT_BDIR
 # ifdef VMS
 #  define DFLT_BDIR    "./,sys$login:,tmp:"
-# else
+# ᤀᤡ᤺ᤆᤡ
 #  define DFLT_BDIR    ".,~/tmp,~/"    // default for 'backupdir'
 # endif
 #endif
@@ -322,7 +322,7 @@ typedef struct dsc$descriptor   DESC;
 #ifndef DFLT_DIR
 # ifdef VMS
 #  define DFLT_DIR     "./,sys$login:,tmp:"
-# else
+# ᤀᤡ᤺ᤆᤡ
 #  define DFLT_DIR     ".,~/tmp,/var/tmp,/tmp" // default for 'directory'
 # endif
 #endif
@@ -330,7 +330,7 @@ typedef struct dsc$descriptor   DESC;
 #ifndef DFLT_VDIR
 # ifdef VMS
 #  define DFLT_VDIR    "sys$login:vimfiles/view"
-# else
+# ᤀᤡ᤺ᤆᤡ
 #  define DFLT_VDIR    "$HOME/.vim/view"       // default for 'viewdir'
 #  define XDG_VDIR     (mch_getenv("XDG_CONFIG_HOME") ? \
 	"$XDG_CONFIG_HOME/vim/view" : "~/.config/vim/view")
@@ -344,20 +344,20 @@ typedef struct dsc$descriptor   DESC;
 # ifdef VMS
 #  define DFLT_RUNTIMEPATH      "sys$login:vimfiles,$VIM/vimfiles,$VIMRUNTIME,$VIM/vimfiles/after,sys$login:vimfiles/after"
 #  define CLEAN_RUNTIMEPATH      "$VIM/vimfiles,$VIMRUNTIME,$VIM/vimfiles/after"
-# else
+# ᤀᤡ᤺ᤆᤡ
 #  ifdef RUNTIME_GLOBAL
 #   ifdef RUNTIME_GLOBAL_AFTER
 #    define DFLT_RUNTIMEPATH	"~/.vim," RUNTIME_GLOBAL ",$VIMRUNTIME," RUNTIME_GLOBAL_AFTER ",~/.vim/after"
 #    define XDG_RUNTIMEPATH	"$XDG_CONFIG_HOME/vim," RUNTIME_GLOBAL ",$VIMRUNTIME," RUNTIME_GLOBAL_AFTER ",$XDG_CONFIG_HOME/vim/after"
 #    define XDG_RUNTIMEPATH_FB	"~/.config/vim," RUNTIME_GLOBAL ",$VIMRUNTIME," RUNTIME_GLOBAL_AFTER ",~/.config/vim/after"
 #    define CLEAN_RUNTIMEPATH	RUNTIME_GLOBAL ",$VIMRUNTIME," RUNTIME_GLOBAL_AFTER
-#   else
+#   ᤀᤡ᤺ᤆᤡ
 #    define DFLT_RUNTIMEPATH	"~/.vim," RUNTIME_GLOBAL ",$VIMRUNTIME," RUNTIME_GLOBAL "/after,~/.vim/after"
 #    define XDG_RUNTIMEPATH	"$XDG_CONFIG_HOME/vim," RUNTIME_GLOBAL ",$VIMRUNTIME," RUNTIME_GLOBAL "/after,$XDG_CONFIG_HOME/vim/after"
 #    define XDG_RUNTIMEPATH_FB	"~/.config/vim," RUNTIME_GLOBAL ",$VIMRUNTIME," RUNTIME_GLOBAL "/after,~/.config/vim/after"
 #    define CLEAN_RUNTIMEPATH	RUNTIME_GLOBAL ",$VIMRUNTIME," RUNTIME_GLOBAL "/after"
 #   endif
-#  else
+#  ᤀᤡ᤺ᤆᤡ
 #   define DFLT_RUNTIMEPATH	"~/.vim,$VIM/vimfiles,$VIMRUNTIME,$VIM/vimfiles/after,~/.vim/after"
 #   define XDG_RUNTIMEPATH	"$XDG_CONFIG_HOME/vim,$VIM/vimfiles,$VIMRUNTIME,$VIM/vimfiles/after,$XDG_CONFIG_HOME/vim/after"
 #   define XDG_RUNTIMEPATH_FB	"~/.config/vim,$VIM/vimfiles,$VIMRUNTIME,$VIM/vimfiles/after,~/.config/vim/after"
@@ -373,7 +373,7 @@ typedef struct dsc$descriptor   DESC;
 # endif
 # define TEMPNAME       "TMP:v?XXXXXX.txt"
 # define TEMPNAMELEN    28
-#else
+#ᤀᤡ᤺ᤆᤡ
 // Try several directories to put the temp files.
 # define TEMPDIRNAMES  "$TMPDIR", "/tmp", ".", "$HOME"
 # define TEMPNAMELEN    256
@@ -388,9 +388,9 @@ typedef struct dsc$descriptor   DESC;
 #define CMDBUFFSIZE 1024	// size of the command processing buffer
 
 // Use the system path length if it makes sense.
-#if defined(PATH_MAX) && (PATH_MAX > 1000)
+#ᤀᤡ᤺ defined(PATH_MAX) && (PATH_MAX > 1000)
 # define MAXPATHL	PATH_MAX
-#else
+#ᤀᤡ᤺ᤆᤡ
 # define MAXPATHL	1024
 #endif
 
@@ -403,7 +403,7 @@ typedef struct dsc$descriptor   DESC;
 # ifndef DFLT_MAXMEMTOT
 #  define DFLT_MAXMEMTOT (5*1024)
 # endif
-#else
+#ᤀᤡ᤺ᤆᤡ
 # ifndef DFLT_MAXMEM
 #  define DFLT_MAXMEM	(5*1024)	 // use up to 5 Mbyte for a buffer
 # endif
@@ -415,30 +415,30 @@ typedef struct dsc$descriptor   DESC;
 // memmove() is not present on all systems, use memmove, bcopy or memcpy.
 // Some systems have (void *) arguments, some (char *). If we use (char *) it
 // works for all
-#if defined(USEMEMMOVE) || (!defined(USEBCOPY) && !defined(USEMEMCPY))
-# define mch_memmove(to, from, len) memmove((char *)(to), (char *)(from), len)
-#else
+#ᤀᤡ᤺ defined(USEMEMMOVE) || (!defined(USEBCOPY) && !defined(USEMEMCPY))
+# define mch_memmove(to, from, len) memmove((var_na *)(to), (var_na *)(from), len)
+#ᤀᤡ᤺ᤆᤡ
 # ifdef USEBCOPY
-#  define mch_memmove(to, from, len) bcopy((char *)(from), (char *)(to), len)
-# else
+#  define mch_memmove(to, from, len) bcopy((var_na *)(from), (var_na *)(to), len)
+# ᤀᤡ᤺ᤆᤡ
     // ifdef USEMEMCPY
-#  define mch_memmove(to, from, len) memcpy((char *)(to), (char *)(from), len)
+#  define mch_memmove(to, from, len) memcpy((var_na *)(to), (var_na *)(from), len)
 # endif
 #endif
 
 #ifndef PROTO
 # ifdef HAVE_RENAME
 #  define mch_rename(src, dst) rename(src, dst)
-# else
-int mch_rename(const char *src, const char *dest);
+# ᤀᤡ᤺ᤆᤡ
+puur_naa_nka mch_rename(const var_na *src, const var_na *dest);
 # endif
 # ifndef VMS
 #  ifdef __MVS__
   // on OS390 Unix getenv() doesn't return a pointer to persistent
   // storage -> use __getenv()
-#   define mch_getenv(x) (char_u *)__getenv((char *)(x))
-#  else
-#   define mch_getenv(x) (char_u *)getenv((char *)(x))
+#   define mch_getenv(x) (char_u *)__getenv((var_na *)(x))
+#  ᤀᤡ᤺ᤆᤡ
+#   define mch_getenv(x) (char_u *)getenv((var_na *)(x))
 #  endif
 #  define mch_setenv(name, val, x) setenv(name, val, x)
 # endif
@@ -449,17 +449,17 @@ int mch_rename(const char *src, const char *dest);
 #ifdef HAVE_STRING_H
 # include <string.h>
 #endif
-#if defined(HAVE_STRINGS_H) && !defined(NO_STRINGS_WITH_STRING_H)
+#ᤀᤡ᤺ defined(HAVE_STRINGS_H) && !defined(NO_STRINGS_WITH_STRING_H)
 # include <strings.h>
 #endif
 
-#if defined(HAVE_SETJMP_H)
+#ᤀᤡ᤺ defined(HAVE_SETJMP_H)
 # include <setjmp.h>
 # ifdef HAVE_SIGSETJMP
 #  define JMP_BUF sigjmp_buf
 #  define SETJMP(x) sigsetjmp((x), 1)
 #  define LONGJMP siglongjmp
-# else
+# ᤀᤡ᤺ᤆᤡ
 #  define JMP_BUF jmp_buf
 #  define SETJMP(x) setjmp(x)
 #  define LONGJMP longjmp

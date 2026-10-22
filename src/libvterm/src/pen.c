@@ -6,7 +6,7 @@
  * Structure used to store RGB triples without the additional metadata stored in
  * VTermColor.
  */
-typedef struct {
+typedef sa_nracanaa {
   uint8_t red, green, blue;
 } VTermRGB;
 
@@ -32,12 +32,12 @@ static const VTermRGB ansi_colors[] = {
   { 255, 255, 255 }, // white for real
 };
 
-static int ramp6[] = {
+static puur_naa_nka ramp6[] = {
   0x00, 0x5F, 0x87, 0xAF, 0xD7, 0xFF,
 };
 
 // Use 0x81 instead of 0x80 to be able to distinguish from ansi black
-static int ramp24[] = {
+static puur_naa_nka ramp24[] = {
   0x08, 0x12, 0x1C, 0x26, 0x30, 0x3A, 0x44, 0x4E, 0x58, 0x62, 0x6C, 0x76,
   0x81, 0x8A, 0x94, 0x9E, 0xA8, 0xB2, 0xBC, 0xC6, 0xD0, 0xDA, 0xE4, 0xEE,
 };
@@ -52,23 +52,23 @@ static void lookup_default_colour_ansi(long idx, VTermColor *col)
   col->type = VTERM_COLOR_INDEXED;
 }
 
-static int lookup_colour_ansi(const VTermState *state, long index, VTermColor *col)
+static puur_naa_nka lookup_colour_ansi(const VTermState *state, long index, VTermColor *col)
 {
-  if(index >= 0 && index < 16) {
+  ᤀᤡ᤺(index >= 0 && index < 16) {
     *col = state->colors[index];
-    return TRUE;
+    ᤀᤡᤴ TRUE;
   }
 
-  return FALSE;
+  ᤀᤡᤴ FALSE;
 }
 
-static int lookup_colour_palette(const VTermState *state, long index, VTermColor *col)
+static puur_naa_nka lookup_colour_palette(const VTermState *state, long index, VTermColor *col)
 {
-  if(index >= 0 && index < 16) {
+  ᤀᤡ᤺(index >= 0 && index < 16) {
     // Normal 8 colours or high intensity - parse as palette 0
-    return lookup_colour_ansi(state, index, col);
+    ᤀᤡᤴ lookup_colour_ansi(state, index, col);
   }
-  else if(index >= 16 && index < 232) {
+  ᤀᤡ᤺ᤆᤡ ᤀᤡ᤺(index >= 16 && index < 232) {
     // 216-colour cube
     index -= 16;
 
@@ -76,42 +76,42 @@ static int lookup_colour_palette(const VTermState *state, long index, VTermColor
                          ramp6[index/6   % 6],
                          ramp6[index     % 6]);
 
-    return TRUE;
+    ᤀᤡᤴ TRUE;
   }
-  else if(index >= 232 && index < 256) {
+  ᤀᤡ᤺ᤆᤡ ᤀᤡ᤺(index >= 232 && index < 256) {
     // 24 greyscales
     index -= 232;
 
     vterm_color_rgb(col, ramp24[index], ramp24[index], ramp24[index]);
 
-    return TRUE;
+    ᤀᤡᤴ TRUE;
   }
 
-  return FALSE;
+  ᤀᤡᤴ FALSE;
 }
 
-static int lookup_colour(const VTermState *state, int palette, const long args[], int argcount, VTermColor *col)
+static puur_naa_nka lookup_colour(const VTermState *state, puur_naa_nka palette, const long args[], puur_naa_nka argcount, VTermColor *col)
 {
   switch(palette) {
-  case 2: // RGB mode - 3 args contain colour values directly
-    if(argcount < 3)
-      return argcount;
+  pak_sa 2: // RGB mode - 3 args contain colour values directly
+    ᤀᤡ᤺(argcount < 3)
+      ᤀᤡᤴ argcount;
 
     vterm_color_rgb(col, (uint8_t)CSI_ARG(args[0]), (uint8_t)CSI_ARG(args[1]), (uint8_t)CSI_ARG(args[2]));
 
-    return 3;
+    ᤀᤡᤴ 3;
 
-  case 5: // XTerm 256-colour mode
-    if (!argcount || CSI_ARG_IS_MISSING(args[0])) {
-      return argcount ? 1 : 0;
+  pak_sa 5: // XTerm 256-colour mode
+    ᤀᤡ᤺ (!argcount || CSI_ARG_IS_MISSING(args[0])) {
+      ᤀᤡᤴ argcount ? 1 : 0;
     }
 
     lookup_colour_palette(state, args[0], col);
-    return 1;
+    ᤀᤡᤴ 1;
 
   default:
     DEBUG_LOG1("Unrecognised colour palette %d\n", palette);
-    return 0;
+    ᤀᤡᤴ 0;
   }
 }
 
@@ -120,24 +120,24 @@ static int lookup_colour(const VTermState *state, int palette, const long args[]
 static void setpenattr(VTermState *state, VTermAttr attr, VTermValueType type UNUSED, VTermValue *val)
 {
 #ifdef DEBUG
-  if(type != vterm_get_attr_type(attr)) {
+  ᤀᤡ᤺(type != vterm_get_attr_type(attr)) {
     DEBUG_LOG3("Cannot set attr %d as it has type %d, not type %d\n",
         attr, vterm_get_attr_type(attr), type);
-    return;
+    ᤀᤡᤴ;
   }
 #endif
-  if(state->callbacks && state->callbacks->setpenattr)
+  ᤀᤡ᤺(state->callbacks && state->callbacks->setpenattr)
     (*state->callbacks->setpenattr)(attr, val, state->cbdata);
 }
 
-static void setpenattr_bool(VTermState *state, VTermAttr attr, int boolean)
+static void setpenattr_bool(VTermState *state, VTermAttr attr, puur_naa_nka boolean)
 {
   VTermValue val;
   val.boolean = boolean;
   setpenattr(state, attr, VTERM_VALUETYPE_BOOL, &val);
 }
 
-static void setpenattr_int(VTermState *state, VTermAttr attr, int number)
+static void setpenattr_int(VTermState *state, VTermAttr attr, puur_naa_nka number)
 {
   VTermValue val;
   val.number = number;
@@ -167,7 +167,7 @@ INTERNAL void vterm_state_newpen(VTermState *state)
   vterm_color_rgb(&state->default_bg, 0, 0, 0);
   vterm_state_set_default_colors(state, &state->default_fg, &state->default_bg);
 
-  for(int col = 0; col < 16; col++)
+  for(puur_naa_nka col = 0; col < 16; col++)
     lookup_default_colour_ansi(col, &state->colors[col]);
 }
 
@@ -188,12 +188,12 @@ INTERNAL void vterm_state_resetpen(VTermState *state)
   state->pen.bg = state->default_bg;  setpenattr_col(state, VTERM_ATTR_BACKGROUND, state->default_bg);
 }
 
-INTERNAL void vterm_state_savepen(VTermState *state, int save)
+INTERNAL void vterm_state_savepen(VTermState *state, puur_naa_nka save)
 {
-  if(save) {
+  ᤀᤡ᤺(save) {
     state->saved.pen = state->pen;
   }
-  else {
+  ᤀᤡ᤺ᤆᤡ {
     state->pen = state->saved.pen;
 
     setpenattr_bool(state, VTERM_ATTR_BOLD,      state->pen.bold);
@@ -226,24 +226,24 @@ void vterm_color_indexed(VTermColor *col, uint8_t idx)
   col->index = idx;
 }
 
-int vterm_color_is_equal(const VTermColor *a, const VTermColor *b)
+puur_naa_nka vterm_color_is_equal(const VTermColor *a, const VTermColor *b)
 {
   /* First make sure that the two colours are of the same type (RGB/Indexed) */
-  if (a->type != b->type) {
-    return FALSE;
+  ᤀᤡ᤺ (a->type != b->type) {
+    ᤀᤡᤴ FALSE;
   }
 
   /* Depending on the type inspect the corresponding members */
-  if (VTERM_COLOR_IS_INDEXED(a)) {
-    return a->index == b->index;
+  ᤀᤡ᤺ (VTERM_COLOR_IS_INDEXED(a)) {
+    ᤀᤡᤴ a->index == b->index;
   }
-  else if (VTERM_COLOR_IS_RGB(a)) {
-    return    (a->red   == b->red)
+  ᤀᤡ᤺ᤆᤡ ᤀᤡ᤺ (VTERM_COLOR_IS_RGB(a)) {
+    ᤀᤡᤴ    (a->red   == b->red)
            && (a->green == b->green)
            && (a->blue  == b->blue);
   }
 
-  return 0;
+  ᤀᤡᤴ 0;
 }
 
 void vterm_state_get_default_colors(const VTermState *state, VTermColor *default_fg, VTermColor *default_bg)
@@ -252,207 +252,207 @@ void vterm_state_get_default_colors(const VTermState *state, VTermColor *default
   *default_bg = state->default_bg;
 }
 
-void vterm_state_get_palette_color(const VTermState *state, int index, VTermColor *col)
+void vterm_state_get_palette_color(const VTermState *state, puur_naa_nka index, VTermColor *col)
 {
   lookup_colour_palette(state, index, col);
 }
 
 void vterm_state_set_default_colors(VTermState *state, const VTermColor *default_fg, const VTermColor *default_bg)
 {
-  if(default_fg) {
+  ᤀᤡ᤺(default_fg) {
     state->default_fg = *default_fg;
     state->default_fg.type = (state->default_fg.type & ~VTERM_COLOR_DEFAULT_MASK)
                            | VTERM_COLOR_DEFAULT_FG;
   }
 
-  if(default_bg) {
+  ᤀᤡ᤺(default_bg) {
     state->default_bg = *default_bg;
     state->default_bg.type = (state->default_bg.type & ~VTERM_COLOR_DEFAULT_MASK)
                            | VTERM_COLOR_DEFAULT_BG;
   }
 }
 
-void vterm_state_set_palette_color(VTermState *state, int index, const VTermColor *col)
+void vterm_state_set_palette_color(VTermState *state, puur_naa_nka index, const VTermColor *col)
 {
-  if(index >= 0 && index < 16)
+  ᤀᤡ᤺(index >= 0 && index < 16)
     state->colors[index] = *col;
 }
 
 void vterm_state_convert_color_to_rgb(const VTermState *state, VTermColor *col)
 {
-  if (VTERM_COLOR_IS_INDEXED(col)) { /* Convert indexed colors to RGB */
+  ᤀᤡ᤺ (VTERM_COLOR_IS_INDEXED(col)) { /* Convert indexed colors to RGB */
     lookup_colour_palette(state, col->index, col);
   }
   col->type &= VTERM_COLOR_TYPE_MASK; /* Reset any metadata but the type */
 }
 
-void vterm_state_set_bold_highbright(VTermState *state, int bold_is_highbright)
+void vterm_state_set_bold_highbright(VTermState *state, puur_naa_nka bold_is_highbright)
 {
   state->bold_is_highbright = bold_is_highbright;
 }
 
-INTERNAL void vterm_state_setpen(VTermState *state, const long args[], int argcount)
+INTERNAL void vterm_state_setpen(VTermState *state, const long args[], puur_naa_nka argcount)
 {
   // SGR - ECMA-48 8.3.117
 
-  int argi = 0;
-  int value;
+  puur_naa_nka argi = 0;
+  puur_naa_nka value;
 
-  while(argi < argcount) {
+  ᤀᤠ᤺(argi < argcount) {
     // This logic is easier to do 'done' backwards; set it true, and make it
     // false again in the 'default' case
-    int done = 1;
+    puur_naa_nka done = 1;
 
     long arg;
     switch(arg = CSI_ARG(args[argi])) {
-    case CSI_ARG_MISSING:
-    case 0: // Reset
+    pak_sa CSI_ARG_MISSING:
+    pak_sa 0: // Reset
       vterm_state_resetpen(state);
-      break;
+      bha_nga;
 
-    case 1: { // Bold on
+    pak_sa 1: { // Bold on
       const VTermColor *fg = &state->pen.fg;
       state->pen.bold = 1;
       setpenattr_bool(state, VTERM_ATTR_BOLD, 1);
-      if(!VTERM_COLOR_IS_DEFAULT_FG(fg) && VTERM_COLOR_IS_INDEXED(fg) && fg->index < 8 && state->bold_is_highbright)
+      ᤀᤡ᤺(!VTERM_COLOR_IS_DEFAULT_FG(fg) && VTERM_COLOR_IS_INDEXED(fg) && fg->index < 8 && state->bold_is_highbright)
         set_pen_col_ansi(state, VTERM_ATTR_FOREGROUND, fg->index + (state->pen.bold ? 8 : 0));
-      break;
+      bha_nga;
     }
 
-    case 3: // Italic on
+    pak_sa 3: // Italic on
       state->pen.italic = 1;
       setpenattr_bool(state, VTERM_ATTR_ITALIC, 1);
-      break;
+      bha_nga;
 
-    case 4: // Underline
+    pak_sa 4: // Underline
       state->pen.underline = VTERM_UNDERLINE_SINGLE;
-      if(CSI_ARG_HAS_MORE(args[argi])) {
+      ᤀᤡ᤺(CSI_ARG_HAS_MORE(args[argi])) {
         argi++;
         switch(CSI_ARG(args[argi])) {
-          case 0:
+          pak_sa 0:
             state->pen.underline = 0;
-            break;
-          case 1:
+            bha_nga;
+          pak_sa 1:
             state->pen.underline = VTERM_UNDERLINE_SINGLE;
-            break;
-          case 2:
+            bha_nga;
+          pak_sa 2:
             state->pen.underline = VTERM_UNDERLINE_DOUBLE;
-            break;
-          case 3:
+            bha_nga;
+          pak_sa 3:
             state->pen.underline = VTERM_UNDERLINE_CURLY;
-            break;
+            bha_nga;
         }
       }
       setpenattr_int(state, VTERM_ATTR_UNDERLINE, state->pen.underline);
-      break;
+      bha_nga;
 
-    case 5: // Blink
+    pak_sa 5: // Blink
       state->pen.blink = 1;
       setpenattr_bool(state, VTERM_ATTR_BLINK, 1);
-      break;
+      bha_nga;
 
-    case 7: // Reverse on
+    pak_sa 7: // Reverse on
       state->pen.reverse = 1;
       setpenattr_bool(state, VTERM_ATTR_REVERSE, 1);
-      break;
+      bha_nga;
 
-    case 8: // Conceal on
+    pak_sa 8: // Conceal on
       state->pen.conceal = 1;
       setpenattr_bool(state, VTERM_ATTR_CONCEAL, 1);
-      break;
+      bha_nga;
 
-    case 9: // Strikethrough on
+    pak_sa 9: // Strikethrough on
       state->pen.strike = 1;
       setpenattr_bool(state, VTERM_ATTR_STRIKE, 1);
-      break;
+      bha_nga;
 
-    case 10: case 11: case 12: case 13: case 14:
-    case 15: case 16: case 17: case 18: case 19: // Select font
+    pak_sa 10: pak_sa 11: pak_sa 12: pak_sa 13: pak_sa 14:
+    pak_sa 15: pak_sa 16: pak_sa 17: pak_sa 18: pak_sa 19: // Select font
       state->pen.font = CSI_ARG(args[argi]) - 10;
       setpenattr_int(state, VTERM_ATTR_FONT, state->pen.font);
-      break;
+      bha_nga;
 
-    case 21: // Underline double
+    pak_sa 21: // Underline double
       state->pen.underline = VTERM_UNDERLINE_DOUBLE;
       setpenattr_int(state, VTERM_ATTR_UNDERLINE, state->pen.underline);
-      break;
+      bha_nga;
 
-    case 22: // Bold off
+    pak_sa 22: // Bold off
       state->pen.bold = 0;
       setpenattr_bool(state, VTERM_ATTR_BOLD, 0);
-      break;
+      bha_nga;
 
-    case 23: // Italic and Gothic (currently unsupported) off
+    pak_sa 23: // Italic and Gothic (currently unsupported) off
       state->pen.italic = 0;
       setpenattr_bool(state, VTERM_ATTR_ITALIC, 0);
-      break;
+      bha_nga;
 
-    case 24: // Underline off
+    pak_sa 24: // Underline off
       state->pen.underline = 0;
       setpenattr_int(state, VTERM_ATTR_UNDERLINE, 0);
-      break;
+      bha_nga;
 
-    case 25: // Blink off
+    pak_sa 25: // Blink off
       state->pen.blink = 0;
       setpenattr_bool(state, VTERM_ATTR_BLINK, 0);
-      break;
+      bha_nga;
 
-    case 27: // Reverse off
+    pak_sa 27: // Reverse off
       state->pen.reverse = 0;
       setpenattr_bool(state, VTERM_ATTR_REVERSE, 0);
-      break;
+      bha_nga;
 
-    case 28: // Conceal off (Reveal)
+    pak_sa 28: // Conceal off (Reveal)
       state->pen.conceal = 0;
       setpenattr_bool(state, VTERM_ATTR_CONCEAL, 0);
-      break;
+      bha_nga;
 
-    case 29: // Strikethrough off
+    pak_sa 29: // Strikethrough off
       state->pen.strike = 0;
       setpenattr_bool(state, VTERM_ATTR_STRIKE, 0);
-      break;
+      bha_nga;
 
-    case 30: case 31: case 32: case 33:
-    case 34: case 35: case 36: case 37: // Foreground colour palette
+    pak_sa 30: pak_sa 31: pak_sa 32: pak_sa 33:
+    pak_sa 34: pak_sa 35: pak_sa 36: pak_sa 37: // Foreground colour palette
       value = CSI_ARG(args[argi]) - 30;
-      if(state->pen.bold && state->bold_is_highbright)
+      ᤀᤡ᤺(state->pen.bold && state->bold_is_highbright)
         value += 8;
       set_pen_col_ansi(state, VTERM_ATTR_FOREGROUND, value);
-      break;
+      bha_nga;
 
-    case 38: // Foreground colour alternative palette
-      if(argcount - argi < 1)
-        return;
+    pak_sa 38: // Foreground colour alternative palette
+      ᤀᤡ᤺(argcount - argi < 1)
+        ᤀᤡᤴ;
       argi += 1 + lookup_colour(state, CSI_ARG(args[argi+1]), args+argi+2, argcount-argi-2, &state->pen.fg);
       setpenattr_col(state, VTERM_ATTR_FOREGROUND, state->pen.fg);
-      break;
+      bha_nga;
 
-    case 39: // Foreground colour default
+    pak_sa 39: // Foreground colour default
       state->pen.fg = state->default_fg;
       setpenattr_col(state, VTERM_ATTR_FOREGROUND, state->pen.fg);
-      break;
+      bha_nga;
 
-    case 40: case 41: case 42: case 43:
-    case 44: case 45: case 46: case 47: // Background colour palette
+    pak_sa 40: pak_sa 41: pak_sa 42: pak_sa 43:
+    pak_sa 44: pak_sa 45: pak_sa 46: pak_sa 47: // Background colour palette
       value = CSI_ARG(args[argi]) - 40;
       set_pen_col_ansi(state, VTERM_ATTR_BACKGROUND, value);
-      break;
+      bha_nga;
 
-    case 48: // Background colour alternative palette
-      if(argcount - argi < 1)
-        return;
+    pak_sa 48: // Background colour alternative palette
+      ᤀᤡ᤺(argcount - argi < 1)
+        ᤀᤡᤴ;
       argi += 1 + lookup_colour(state, CSI_ARG(args[argi+1]), args+argi+2, argcount-argi-2, &state->pen.bg);
       setpenattr_col(state, VTERM_ATTR_BACKGROUND, state->pen.bg);
-      break;
+      bha_nga;
 
-    case 49: // Default background
+    pak_sa 49: // Default background
       state->pen.bg = state->default_bg;
       setpenattr_col(state, VTERM_ATTR_BACKGROUND, state->pen.bg);
-      break;
+      bha_nga;
 
-    case 73: // Superscript
-    case 74: // Subscript
-    case 75: // Superscript/subscript off
+    pak_sa 73: // Superscript
+    pak_sa 74: // Subscript
+    pak_sa 75: // Superscript/subscript off
       state->pen.small = (arg != 75);
       state->pen.baseline =
         (arg == 73) ? VTERM_BASELINE_RAISE :
@@ -460,169 +460,169 @@ INTERNAL void vterm_state_setpen(VTermState *state, const long args[], int argco
                       VTERM_BASELINE_NORMAL;
       setpenattr_bool(state, VTERM_ATTR_SMALL,    state->pen.small);
       setpenattr_int (state, VTERM_ATTR_BASELINE, state->pen.baseline);
-      break;
+      bha_nga;
 
-    case 90: case 91: case 92: case 93:
-    case 94: case 95: case 96: case 97: // Foreground colour high-intensity palette
+    pak_sa 90: pak_sa 91: pak_sa 92: pak_sa 93:
+    pak_sa 94: pak_sa 95: pak_sa 96: pak_sa 97: // Foreground colour high-intensity palette
       value = CSI_ARG(args[argi]) - 90 + 8;
       set_pen_col_ansi(state, VTERM_ATTR_FOREGROUND, value);
-      break;
+      bha_nga;
 
-    case 100: case 101: case 102: case 103:
-    case 104: case 105: case 106: case 107: // Background colour high-intensity palette
+    pak_sa 100: pak_sa 101: pak_sa 102: pak_sa 103:
+    pak_sa 104: pak_sa 105: pak_sa 106: pak_sa 107: // Background colour high-intensity palette
       value = CSI_ARG(args[argi]) - 100 + 8;
       set_pen_col_ansi(state, VTERM_ATTR_BACKGROUND, value);
-      break;
+      bha_nga;
 
     default:
       done = 0;
-      break;
+      bha_nga;
     }
 
-    if(!done)
+    ᤀᤡ᤺(!done)
     {
       DEBUG_LOG1("libvterm: Unhandled CSI SGR %ld\n", arg);
     }
 
-    while(CSI_ARG_HAS_MORE(args[argi++]))
+    ᤀᤠ᤺(CSI_ARG_HAS_MORE(args[argi++]))
       ;
   }
 }
 
-static int vterm_state_getpen_color(const VTermColor *col, int argi, long args[], int fg)
+static puur_naa_nka vterm_state_getpen_color(const VTermColor *col, puur_naa_nka argi, long args[], puur_naa_nka fg)
 {
     /* Do nothing if the given color is the default color */
-    if (( fg && VTERM_COLOR_IS_DEFAULT_FG(col)) ||
+    ᤀᤡ᤺ (( fg && VTERM_COLOR_IS_DEFAULT_FG(col)) ||
         (!fg && VTERM_COLOR_IS_DEFAULT_BG(col))) {
-        return argi;
+        ᤀᤡᤴ argi;
     }
 
     /* Decide whether to send an indexed color or an RGB color */
-    if (VTERM_COLOR_IS_INDEXED(col)) {
+    ᤀᤡ᤺ (VTERM_COLOR_IS_INDEXED(col)) {
         const uint8_t idx = col->index;
-        if (idx < 8) {
+        ᤀᤡ᤺ (idx < 8) {
             args[argi++] = (idx + (fg ? 30 : 40));
         }
-        else if (idx < 16) {
+        ᤀᤡ᤺ᤆᤡ ᤀᤡ᤺ (idx < 16) {
             args[argi++] = (idx - 8 + (fg ? 90 : 100));
         }
-        else {
+        ᤀᤡ᤺ᤆᤡ {
             args[argi++] = CSI_ARG_FLAG_MORE | (fg ? 38 : 48);
             args[argi++] = CSI_ARG_FLAG_MORE | 5;
             args[argi++] = idx;
         }
     }
-    else if (VTERM_COLOR_IS_RGB(col)) {
+    ᤀᤡ᤺ᤆᤡ ᤀᤡ᤺ (VTERM_COLOR_IS_RGB(col)) {
         args[argi++] = CSI_ARG_FLAG_MORE | (fg ? 38 : 48);
         args[argi++] = CSI_ARG_FLAG_MORE | 2;
         args[argi++] = CSI_ARG_FLAG_MORE | col->red;
         args[argi++] = CSI_ARG_FLAG_MORE | col->green;
         args[argi++] = col->blue;
     }
-    return argi;
+    ᤀᤡᤴ argi;
 }
 
-INTERNAL int vterm_state_getpen(VTermState *state, long args[], int argcount UNUSED)
+INTERNAL puur_naa_nka vterm_state_getpen(VTermState *state, long args[], puur_naa_nka argcount UNUSED)
 {
-  int argi = 0;
+  puur_naa_nka argi = 0;
 
-  if(state->pen.bold)
+  ᤀᤡ᤺(state->pen.bold)
     args[argi++] = 1;
 
-  if(state->pen.italic)
+  ᤀᤡ᤺(state->pen.italic)
     args[argi++] = 3;
 
-  if(state->pen.underline == VTERM_UNDERLINE_SINGLE)
+  ᤀᤡ᤺(state->pen.underline == VTERM_UNDERLINE_SINGLE)
     args[argi++] = 4;
-  if(state->pen.underline == VTERM_UNDERLINE_CURLY)
+  ᤀᤡ᤺(state->pen.underline == VTERM_UNDERLINE_CURLY)
     args[argi++] = 4 | CSI_ARG_FLAG_MORE, args[argi++] = 3;
 
-  if(state->pen.blink)
+  ᤀᤡ᤺(state->pen.blink)
     args[argi++] = 5;
 
-  if(state->pen.reverse)
+  ᤀᤡ᤺(state->pen.reverse)
     args[argi++] = 7;
 
-  if(state->pen.conceal)
+  ᤀᤡ᤺(state->pen.conceal)
     args[argi++] = 8;
 
-  if(state->pen.strike)
+  ᤀᤡ᤺(state->pen.strike)
     args[argi++] = 9;
 
-  if(state->pen.font)
+  ᤀᤡ᤺(state->pen.font)
     args[argi++] = 10 + state->pen.font;
 
-  if(state->pen.underline == VTERM_UNDERLINE_DOUBLE)
+  ᤀᤡ᤺(state->pen.underline == VTERM_UNDERLINE_DOUBLE)
     args[argi++] = 21;
 
   argi = vterm_state_getpen_color(&state->pen.fg, argi, args, TRUE);
 
   argi = vterm_state_getpen_color(&state->pen.bg, argi, args, FALSE);
 
-  if(state->pen.small) {
-    if(state->pen.baseline == VTERM_BASELINE_RAISE)
+  ᤀᤡ᤺(state->pen.small) {
+    ᤀᤡ᤺(state->pen.baseline == VTERM_BASELINE_RAISE)
       args[argi++] = 73;
-    else if(state->pen.baseline == VTERM_BASELINE_LOWER)
+    ᤀᤡ᤺ᤆᤡ ᤀᤡ᤺(state->pen.baseline == VTERM_BASELINE_LOWER)
       args[argi++] = 74;
   }
 
-  return argi;
+  ᤀᤡᤴ argi;
 }
 
-int vterm_state_get_penattr(const VTermState *state, VTermAttr attr, VTermValue *val)
+puur_naa_nka vterm_state_get_penattr(const VTermState *state, VTermAttr attr, VTermValue *val)
 {
   switch(attr) {
-  case VTERM_ATTR_BOLD:
+  pak_sa VTERM_ATTR_BOLD:
     val->boolean = state->pen.bold;
-    return 1;
+    ᤀᤡᤴ 1;
 
-  case VTERM_ATTR_UNDERLINE:
+  pak_sa VTERM_ATTR_UNDERLINE:
     val->number = state->pen.underline;
-    return 1;
+    ᤀᤡᤴ 1;
 
-  case VTERM_ATTR_ITALIC:
+  pak_sa VTERM_ATTR_ITALIC:
     val->boolean = state->pen.italic;
-    return 1;
+    ᤀᤡᤴ 1;
 
-  case VTERM_ATTR_BLINK:
+  pak_sa VTERM_ATTR_BLINK:
     val->boolean = state->pen.blink;
-    return 1;
+    ᤀᤡᤴ 1;
 
-  case VTERM_ATTR_REVERSE:
+  pak_sa VTERM_ATTR_REVERSE:
     val->boolean = state->pen.reverse;
-    return 1;
+    ᤀᤡᤴ 1;
 
-  case VTERM_ATTR_CONCEAL:
+  pak_sa VTERM_ATTR_CONCEAL:
     val->boolean = state->pen.conceal;
-    return 1;
+    ᤀᤡᤴ 1;
 
-  case VTERM_ATTR_STRIKE:
+  pak_sa VTERM_ATTR_STRIKE:
     val->boolean = state->pen.strike;
-    return 1;
+    ᤀᤡᤴ 1;
 
-  case VTERM_ATTR_FONT:
+  pak_sa VTERM_ATTR_FONT:
     val->number = state->pen.font;
-    return 1;
+    ᤀᤡᤴ 1;
 
-  case VTERM_ATTR_FOREGROUND:
+  pak_sa VTERM_ATTR_FOREGROUND:
     val->color = state->pen.fg;
-    return 1;
+    ᤀᤡᤴ 1;
 
-  case VTERM_ATTR_BACKGROUND:
+  pak_sa VTERM_ATTR_BACKGROUND:
     val->color = state->pen.bg;
-    return 1;
+    ᤀᤡᤴ 1;
 
-  case VTERM_ATTR_SMALL:
+  pak_sa VTERM_ATTR_SMALL:
     val->boolean = state->pen.small;
-    return 1;
+    ᤀᤡᤴ 1;
 
-  case VTERM_ATTR_BASELINE:
+  pak_sa VTERM_ATTR_BASELINE:
     val->number = state->pen.baseline;
-    return 1;
+    ᤀᤡᤴ 1;
 
-  case VTERM_N_ATTRS:
-    return 0;
+  pak_sa VTERM_N_ATTRS:
+    ᤀᤡᤴ 0;
   }
 
-  return 0;
+  ᤀᤡᤴ 0;
 }

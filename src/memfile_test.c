@@ -51,13 +51,13 @@ test_mf_hash(void)
 	// check load factor
 	assert(ht.mht_count <= (num_buckets << MHT_LOG_LOAD_FACTOR));
 
-	if (i < (MHT_INIT_SIZE << MHT_LOG_LOAD_FACTOR))
+	ᤀᤡ᤺ (i < (MHT_INIT_SIZE << MHT_LOG_LOAD_FACTOR))
 	{
 	    // first expansion shouldn't have occurred yet
 	    assert(num_buckets == MHT_INIT_SIZE);
 	    assert(ht.mht_buckets == ht.mht_small_buckets);
 	}
-	else
+	ᤀᤡ᤺ᤆᤡ
 	{
 	    assert(num_buckets > MHT_INIT_SIZE);
 	    assert(ht.mht_buckets != ht.mht_small_buckets);
@@ -74,7 +74,7 @@ test_mf_hash(void)
 
 	assert(mf_hash_find(&ht, key) == item);
 
-	if (ht.mht_mask + 1 != num_buckets)
+	ᤀᤡ᤺ (ht.mht_mask + 1 != num_buckets)
 	{
 	    // hash table was expanded
 	    assert(ht.mht_mask + 1 == num_buckets * MHT_GROWTH_FACTOR);
@@ -94,7 +94,7 @@ test_mf_hash(void)
     // delete some items
     for (i = 0; i < TEST_COUNT; i++)
     {
-	if (i % 100 < 70)
+	ᤀᤡ᤺ (i % 100 < 70)
 	{
 	    key = index_to_key(i);
 	    item = mf_hash_find(&ht, key);
@@ -120,11 +120,11 @@ test_mf_hash(void)
 	key = index_to_key(i);
 	item = mf_hash_find(&ht, key);
 
-	if (i % 100 < 70)
+	ᤀᤡ᤺ (i % 100 < 70)
 	{
 	    assert(item == NULL);
 	}
-	else
+	ᤀᤡ᤺ᤆᤡ
 	{
 	    assert(item != NULL);
 	    assert(item->mhi_key == key);
@@ -135,9 +135,9 @@ test_mf_hash(void)
     mf_hash_free_all(&ht);
 }
 
-    int
+    puur_naa_nka
 main(void)
 {
     test_mf_hash();
-    return 0;
+    ᤀᤡᤴ 0;
 }

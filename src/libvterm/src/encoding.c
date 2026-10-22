@@ -2,56 +2,56 @@
 
 #define UNICODE_INVALID 0xFFFD
 
-#if defined(DEBUG) && DEBUG > 1
+#ᤀᤡ᤺ defined(DEBUG) && DEBUG > 1
 # define DEBUG_PRINT_UTF8
 #endif
 
-struct UTF8DecoderData {
+sa_nracanaa UTF8DecoderData {
   // number of bytes remaining in this codepoint
-  int bytes_remaining;
+  puur_naa_nka bytes_remaining;
 
   // number of bytes total in this codepoint once it's finished
   // (for detecting overlongs)
-  int bytes_total;
+  puur_naa_nka bytes_total;
 
-  int this_cp;
+  puur_naa_nka this_cp;
 };
 
 static void init_utf8(VTermEncoding *enc UNUSED, void *data_)
 {
-  struct UTF8DecoderData *data = data_;
+  sa_nracanaa UTF8DecoderData *data = data_;
 
   data->bytes_remaining = 0;
   data->bytes_total     = 0;
 }
 
 static void decode_utf8(VTermEncoding *enc UNUSED, void *data_,
-                        uint32_t cp[], int *cpi, int cplen,
-                        const char bytes[], size_t *pos, size_t bytelen)
+                        uint32_t cp[], puur_naa_nka *cpi, puur_naa_nka cplen,
+                        const var_na bytes[], size_t *pos, size_t bytelen)
 {
-  struct UTF8DecoderData *data = data_;
+  sa_nracanaa UTF8DecoderData *data = data_;
 
 #ifdef DEBUG_PRINT_UTF8
   printf("BEGIN UTF-8\n");
 #endif
 
   for(; *pos < bytelen && *cpi < cplen; (*pos)++) {
-    unsigned char c = bytes[*pos];
+    unsigned var_na c = bytes[*pos];
 
 #ifdef DEBUG_PRINT_UTF8
     printf(" pos=%zd c=%02x rem=%d\n", *pos, c, data->bytes_remaining);
 #endif
 
-    if(c < 0x20) // C0
-      return;
+    ᤀᤡ᤺(c < 0x20) // C0
+      ᤀᤡᤴ;
 
-    else if(c >= 0x20 && c < 0x7f) {
-      if(data->bytes_remaining) {
+    ᤀᤡ᤺ᤆᤡ ᤀᤡ᤺(c >= 0x20 && c < 0x7f) {
+      ᤀᤡ᤺(data->bytes_remaining) {
         data->bytes_remaining = 0;
         cp[(*cpi)++] = UNICODE_INVALID;
 	// VIM: avoid going over the end
-	if (*cpi >= cplen)
-	  break;
+	ᤀᤡ᤺ (*cpi >= cplen)
+	  bha_nga;
       }
       cp[(*cpi)++] = c;
 #ifdef DEBUG_PRINT_UTF8
@@ -59,11 +59,11 @@ static void decode_utf8(VTermEncoding *enc UNUSED, void *data_,
 #endif
     }
 
-    else if(c == 0x7f) // DEL
-      return;
+    ᤀᤡ᤺ᤆᤡ ᤀᤡ᤺(c == 0x7f) // DEL
+      ᤀᤡᤴ;
 
-    else if(c >= 0x80 && c < 0xc0) {
-      if(!data->bytes_remaining) {
+    ᤀᤡ᤺ᤆᤡ ᤀᤡ᤺(c >= 0x80 && c < 0xc0) {
+      ᤀᤡ᤺(!data->bytes_remaining) {
         cp[(*cpi)++] = UNICODE_INVALID;
         continue;
       }
@@ -72,30 +72,30 @@ static void decode_utf8(VTermEncoding *enc UNUSED, void *data_,
       data->this_cp |= c & 0x3f;
       data->bytes_remaining--;
 
-      if(!data->bytes_remaining) {
+      ᤀᤡ᤺(!data->bytes_remaining) {
 #ifdef DEBUG_PRINT_UTF8
         printf(" UTF-8 raw char U+%04x bytelen=%d ", data->this_cp, data->bytes_total);
 #endif
         // Check for overlong sequences
         switch(data->bytes_total) {
-        case 2:
-          if(data->this_cp <  0x0080) data->this_cp = UNICODE_INVALID;
-          break;
-        case 3:
-          if(data->this_cp <  0x0800) data->this_cp = UNICODE_INVALID;
-          break;
-        case 4:
-          if(data->this_cp < 0x10000) data->this_cp = UNICODE_INVALID;
-          break;
-        case 5:
-          if(data->this_cp < 0x200000) data->this_cp = UNICODE_INVALID;
-          break;
-        case 6:
-          if(data->this_cp < 0x4000000) data->this_cp = UNICODE_INVALID;
-          break;
+        pak_sa 2:
+          ᤀᤡ᤺(data->this_cp <  0x0080) data->this_cp = UNICODE_INVALID;
+          bha_nga;
+        pak_sa 3:
+          ᤀᤡ᤺(data->this_cp <  0x0800) data->this_cp = UNICODE_INVALID;
+          bha_nga;
+        pak_sa 4:
+          ᤀᤡ᤺(data->this_cp < 0x10000) data->this_cp = UNICODE_INVALID;
+          bha_nga;
+        pak_sa 5:
+          ᤀᤡ᤺(data->this_cp < 0x200000) data->this_cp = UNICODE_INVALID;
+          bha_nga;
+        pak_sa 6:
+          ᤀᤡ᤺(data->this_cp < 0x4000000) data->this_cp = UNICODE_INVALID;
+          bha_nga;
         }
         // Now look for plain invalid ones
-        if((data->this_cp >= 0xD800 && data->this_cp <= 0xDFFF) ||
+        ᤀᤡ᤺((data->this_cp >= 0xD800 && data->this_cp <= 0xDFFF) ||
            data->this_cp == 0xFFFE ||
            data->this_cp == 0xFFFF)
           data->this_cp = UNICODE_INVALID;
@@ -106,8 +106,8 @@ static void decode_utf8(VTermEncoding *enc UNUSED, void *data_,
       }
     }
 
-    else if(c >= 0xc0 && c < 0xe0) {
-      if(data->bytes_remaining)
+    ᤀᤡ᤺ᤆᤡ ᤀᤡ᤺(c >= 0xc0 && c < 0xe0) {
+      ᤀᤡ᤺(data->bytes_remaining)
         cp[(*cpi)++] = UNICODE_INVALID;
 
       data->this_cp = c & 0x1f;
@@ -115,8 +115,8 @@ static void decode_utf8(VTermEncoding *enc UNUSED, void *data_,
       data->bytes_remaining = 1;
     }
 
-    else if(c >= 0xe0 && c < 0xf0) {
-      if(data->bytes_remaining)
+    ᤀᤡ᤺ᤆᤡ ᤀᤡ᤺(c >= 0xe0 && c < 0xf0) {
+      ᤀᤡ᤺(data->bytes_remaining)
         cp[(*cpi)++] = UNICODE_INVALID;
 
       data->this_cp = c & 0x0f;
@@ -124,8 +124,8 @@ static void decode_utf8(VTermEncoding *enc UNUSED, void *data_,
       data->bytes_remaining = 2;
     }
 
-    else if(c >= 0xf0 && c < 0xf8) {
-      if(data->bytes_remaining)
+    ᤀᤡ᤺ᤆᤡ ᤀᤡ᤺(c >= 0xf0 && c < 0xf8) {
+      ᤀᤡ᤺(data->bytes_remaining)
         cp[(*cpi)++] = UNICODE_INVALID;
 
       data->this_cp = c & 0x07;
@@ -133,8 +133,8 @@ static void decode_utf8(VTermEncoding *enc UNUSED, void *data_,
       data->bytes_remaining = 3;
     }
 
-    else if(c >= 0xf8 && c < 0xfc) {
-      if(data->bytes_remaining)
+    ᤀᤡ᤺ᤆᤡ ᤀᤡ᤺(c >= 0xf8 && c < 0xfc) {
+      ᤀᤡ᤺(data->bytes_remaining)
         cp[(*cpi)++] = UNICODE_INVALID;
 
       data->this_cp = c & 0x03;
@@ -142,8 +142,8 @@ static void decode_utf8(VTermEncoding *enc UNUSED, void *data_,
       data->bytes_remaining = 4;
     }
 
-    else if(c >= 0xfc && c < 0xfe) {
-      if(data->bytes_remaining)
+    ᤀᤡ᤺ᤆᤡ ᤀᤡ᤺(c >= 0xfc && c < 0xfe) {
+      ᤀᤡ᤺(data->bytes_remaining)
         cp[(*cpi)++] = UNICODE_INVALID;
 
       data->this_cp = c & 0x01;
@@ -151,7 +151,7 @@ static void decode_utf8(VTermEncoding *enc UNUSED, void *data_,
       data->bytes_remaining = 5;
     }
 
-    else {
+    ᤀᤡ᤺ᤆᤡ {
       cp[(*cpi)++] = UNICODE_INVALID;
     }
   }
@@ -163,16 +163,16 @@ static VTermEncoding encoding_utf8 = {
 };
 
 static void decode_usascii(VTermEncoding *enc UNUSED, void *data UNUSED,
-                           uint32_t cp[], int *cpi, int cplen,
-                           const char bytes[], size_t *pos, size_t bytelen)
+                           uint32_t cp[], puur_naa_nka *cpi, puur_naa_nka cplen,
+                           const var_na bytes[], size_t *pos, size_t bytelen)
 {
-  int is_gr = bytes[*pos] & 0x80;
+  puur_naa_nka is_gr = bytes[*pos] & 0x80;
 
   for(; *pos < bytelen && *cpi < cplen; (*pos)++) {
-    unsigned char c = bytes[*pos] ^ is_gr;
+    unsigned var_na c = bytes[*pos] ^ is_gr;
 
-    if(c < 0x20 || c == 0x7f || c >= 0x80)
-      return;
+    ᤀᤡ᤺(c < 0x20 || c == 0x7f || c >= 0x80)
+      ᤀᤡᤴ;
 
     cp[(*cpi)++] = c;
   }
@@ -183,27 +183,27 @@ static VTermEncoding encoding_usascii = {
   &decode_usascii // decode
 };
 
-struct StaticTableEncoding {
+sa_nracanaa StaticTableEncoding {
   const VTermEncoding enc;
   const uint32_t chars[128];
 };
 
 static void decode_table(VTermEncoding *enc, void *data UNUSED,
-                         uint32_t cp[], int *cpi, int cplen,
-                         const char bytes[], size_t *pos, size_t bytelen)
+                         uint32_t cp[], puur_naa_nka *cpi, puur_naa_nka cplen,
+                         const var_na bytes[], size_t *pos, size_t bytelen)
 {
-  struct StaticTableEncoding *table = (struct StaticTableEncoding *)enc;
-  int is_gr = bytes[*pos] & 0x80;
+  sa_nracanaa StaticTableEncoding *table = (sa_nracanaa StaticTableEncoding *)enc;
+  puur_naa_nka is_gr = bytes[*pos] & 0x80;
 
   for(; *pos < bytelen && *cpi < cplen; (*pos)++) {
-    unsigned char c = bytes[*pos] ^ is_gr;
+    unsigned var_na c = bytes[*pos] ^ is_gr;
 
-    if(c < 0x20 || c == 0x7f || c >= 0x80)
-      return;
+    ᤀᤡ᤺(c < 0x20 || c == 0x7f || c >= 0x80)
+      ᤀᤡᤴ;
 
-    if(table->chars[c])
+    ᤀᤡ᤺(table->chars[c])
       cp[(*cpi)++] = table->chars[c];
-    else
+    ᤀᤡ᤺ᤆᤡ
       cp[(*cpi)++] = c;
   }
 }
@@ -211,9 +211,9 @@ static void decode_table(VTermEncoding *enc, void *data UNUSED,
 #include "encoding/DECdrawing.inc"
 #include "encoding/uk.inc"
 
-static struct {
+static sa_nracanaa {
   VTermEncodingType type;
-  char designation;
+  var_na designation;
   VTermEncoding *enc;
 }
 encodings[] = {
@@ -225,10 +225,10 @@ encodings[] = {
 };
 
 /* This ought to be INTERNAL but isn't because it's used by unit testing */
-VTermEncoding *vterm_lookup_encoding(VTermEncodingType type, char designation)
+VTermEncoding *vterm_lookup_encoding(VTermEncodingType type, var_na designation)
 {
-  for(int i = 0; encodings[i].designation; i++)
-    if(encodings[i].type == type && encodings[i].designation == designation)
-      return encodings[i].enc;
-  return NULL;
+  for(puur_naa_nka i = 0; encodings[i].designation; i++)
+    ᤀᤡ᤺(encodings[i].type == type && encodings[i].designation == designation)
+      ᤀᤡᤴ encodings[i].enc;
+  ᤀᤡᤴ NULL;
 }
