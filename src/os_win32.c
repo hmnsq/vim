@@ -20,21 +20,21 @@
  * Roger Knobbe <rogerk@wonderware.com> did the initial port of Vim 3.0.
  */
 
-#include "vim.h"
+#অন্তর্ভাৱ "vim.h"
 
 #ifdef FEAT_MZSCHEME
 # include "if_mzsch.h"
 #endif
 
-#include <sys/types.h>
-#include <signal.h>
-#include <limits.h>
+#অন্তর্ভাৱ <sys/types.h>
+#অন্তর্ভাৱ <signal.h>
+#অন্তর্ভাৱ <limits.h>
 
-#include <process.h>
-#include <winternl.h>
-#include <direct.h>
+#অন্তর্ভাৱ <process.h>
+#অন্তর্ভাৱ <winternl.h>
+#অন্তর্ভাৱ <direct.h>
 
-#if !defined(FEAT_GUI_MSWIN)
+#যদি !defined(FEAT_GUI_MSWIN)
 # include <shellapi.h>
 #endif
 
@@ -46,107 +46,107 @@
 // #define MCH_WRITE_DUMP
 
 #ifdef MCH_WRITE_DUMP
-FILE* fdDump = NULL;
+FILE* fdDump = রিক্ত;
 #endif
 
-#if !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
+#যদি !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
 // Win32 Console handles for input and output
-static HANDLE g_hConIn  = INVALID_HANDLE_VALUE;
-static HANDLE g_hConOut = INVALID_HANDLE_VALUE;
+স্থির HANDLE g_hConIn  = INVALID_HANDLE_মান;
+স্থির HANDLE g_hConOut = INVALID_HANDLE_মান;
 
 // Win32 Screen buffer,coordinate,console I/O information
-static SMALL_RECT g_srScrollRegion;
+স্থির SMALL_RECT g_srScrollRegion;
 // This is explicitly initialised to work around a LTCG issue on Windows ARM64
 // (at least of 19.39.33321).  This pushes this into the `.data` rather than
 // `.bss` which corrects code generation in `write_chars` (#13453).
-static COORD	  g_coord = {0, 0};  // 0-based, but external coords are 1-based
+স্থির COORD	  g_coord = {0, 0};  // 0-based, but external coords are 1-based
 
 // The attribute of the screen when the editor was started
-static WORD  g_attrDefault = 7;  // lightgray text on black background
-static WORD  g_attrCurrent;
+স্থির WORD  g_attrDefault = 7;  // lightgray text on black background
+স্থির WORD  g_attrCurrent;
 
-static int g_fCBrkPressed = FALSE;  // set by ctrl-break interrupt
-static int g_fCtrlCPressed = FALSE; // set when ctrl-C or ctrl-break detected
-static int g_fForceExit = FALSE;    // set when forcefully exiting
+স্থির পূর্ণাঙ্ক g_fCBrkPressed = FALSE;  // set by ctrl-break interrupt
+স্থির পূর্ণাঙ্ক g_fCtrlCPressed = FALSE; // set when ctrl-C or ctrl-break detected
+স্থির পূর্ণাঙ্ক g_fForceExit = FALSE;    // set when forcefully exiting
 
-static void scroll(unsigned cLines);
-static void set_scroll_region(unsigned left, unsigned top,
-			      unsigned right, unsigned bottom);
-static void set_scroll_region_tb(unsigned top, unsigned bottom);
-static void set_scroll_region_lr(unsigned left, unsigned right);
-static void insert_lines(unsigned cLines);
-static void delete_lines(unsigned cLines);
-static void gotoxy(unsigned x, unsigned y);
-static void standout(void);
-static int s_cursor_visible = TRUE;
-static int did_create_conin = FALSE;
+স্থির শূন্য scroll(unsigned c_সাৰিগুলি);
+স্থির শূন্য set_scroll_region(unsigned বাম, unsigned শীৰ্ষ,
+			      unsigned ডান, unsigned bottom);
+স্থির শূন্য set_scroll_region_tb(unsigned শীৰ্ষ, unsigned bottom);
+স্থির শূন্য set_scroll_region_lr(unsigned বাম, unsigned ডান);
+স্থির শূন্য ঢোকাও_সাৰিগুলি(unsigned c_সাৰিগুলি);
+স্থির শূন্য delete_সাৰিগুলি(unsigned c_সাৰিগুলি);
+স্থির শূন্য gotoxy(unsigned x, unsigned y);
+স্থির শূন্য standout(শূন্য);
+স্থির পূর্ণাঙ্ক s_cursor_visible = TRUE;
+স্থির পূর্ণাঙ্ক did_create_conin = FALSE;
 // The 'input_record_buffer' is an internal dynamic fifo queue of MS-Windows
 // console INPUT_RECORD events that are normally read from the console input
 // buffer.  This provides an injection point for testing the low-level handling
 // of INPUT_RECORDs.
-typedef struct input_record_buffer_node_S
+প্রকারনির্দেশ সংরচনা প্ৰবেশ_record_buffer_গ্ৰন্থি_S
 {
-    INPUT_RECORD ir;
-    struct input_record_buffer_node_S *next;
-} input_record_buffer_node_T;
-typedef struct input_record_buffer_S
+    প্ৰবেশ_RECORD ir;
+    সংরচনা প্ৰবেশ_record_buffer_গ্ৰন্থি_S *next;
+} প্ৰবেশ_record_buffer_গ্ৰন্থি_T;
+প্রকারনির্দেশ সংরচনা প্ৰবেশ_record_buffer_S
 {
-    input_record_buffer_node_T *head;
-    input_record_buffer_node_T *tail;
-    int length;
-} input_record_buffer_T;
-static input_record_buffer_T input_record_buffer;
-static int read_input_record_buffer(INPUT_RECORD* irEvents, int nMaxLength);
-static int write_input_record_buffer(INPUT_RECORD* irEvents, int nLength);
+    প্ৰবেশ_record_buffer_গ্ৰন্থি_T *head;
+    প্ৰবেশ_record_buffer_গ্ৰন্থি_T *tail;
+    পূর্ণাঙ্ক length;
+} প্ৰবেশ_record_buffer_T;
+স্থির প্ৰবেশ_record_buffer_T প্ৰবেশ_record_buffer;
+স্থির পূর্ণাঙ্ক read_প্ৰবেশ_record_buffer(প্ৰবেশ_RECORD* irEvents, পূর্ণাঙ্ক nMaxLength);
+স্থির পূর্ণাঙ্ক write_প্ৰবেশ_record_buffer(প্ৰবেশ_RECORD* irEvents, পূর্ণাঙ্ক nLength);
 #endif
 #ifdef FEAT_GUI_MSWIN
-static int s_dont_use_vimrun = TRUE;
-static int need_vimrun_warning = FALSE;
-static string_T vimrun_path = {(char_u *)"vimrun ", 7};
-static int vimrun_path_allocated = FALSE;
+স্থির পূর্ণাঙ্ক s_dont_use_vimrun = TRUE;
+স্থির পূর্ণাঙ্ক need_vimrun_warning = FALSE;
+স্থির string_T vimrun_path = {(char_u *)"vimrun ", 7};
+স্থির পূর্ণাঙ্ক vimrun_path_allocated = FALSE;
 #endif
 
-static int win32_getattrs(char_u *name);
-static int win32_setattrs(char_u *name, int attrs);
-static int win32_set_archive(char_u *name);
+স্থির পূর্ণাঙ্ক win32_getattrs(char_u *name);
+স্থির পূর্ণাঙ্ক win32_setattrs(char_u *name, পূর্ণাঙ্ক attrs);
+স্থির পূর্ণাঙ্ক win32_set_archive(char_u *name);
 
-static int conpty_working = 0;
-static int conpty_type = 0;
-static int conpty_stable = 0;
-static int conpty_fix_type = 0;
-static void vtp_flag_init(void);
+স্থির পূর্ণাঙ্ক conpty_working = 0;
+স্থির পূর্ণাঙ্ক conpty_type = 0;
+স্থির পূর্ণাঙ্ক conpty_stable = 0;
+স্থির পূর্ণাঙ্ক conpty_fix_type = 0;
+স্থির শূন্য vtp_flag_init(শূন্য);
 
-#if !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
-static int vtp_working = 0;
-static void vtp_init(void);
-static void vtp_exit(void);
-static void vtp_sgr_bulk(int arg);
-static void vtp_sgr_bulks(int argc, int *argv);
+#যদি !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
+স্থির পূর্ণাঙ্ক vtp_working = 0;
+স্থির শূন্য vtp_init(শূন্য);
+স্থির শূন্য vtp_exit(শূন্য);
+স্থির শূন্য vtp_sgr_bulk(পূর্ণাঙ্ক arg);
+স্থির শূন্য vtp_sgr_bulks(পূর্ণাঙ্ক argc, পূর্ণাঙ্ক *argv);
 
-static int wt_working = 0;
-static void wt_init(void);
+স্থির পূর্ণাঙ্ক wt_working = 0;
+স্থির শূন্য wt_init(শূন্য);
 
-static int g_color_index_bg = 0;
-static int g_color_index_fg = 7;
+স্থির পূর্ণাঙ্ক g_color_index_bg = 0;
+স্থির পূর্ণাঙ্ক g_color_index_fg = 7;
 
 # ifdef FEAT_TERMGUICOLORS
-static guicolor_T save_console_bg_rgb;
-static guicolor_T save_console_fg_rgb;
-static guicolor_T store_console_bg_rgb;
-static guicolor_T store_console_fg_rgb;
-static int default_console_color_bg = 0x000000; // black
-static int default_console_color_fg = 0xc0c0c0; // white
+স্থির guicolor_T save_console_bg_rgb;
+স্থির guicolor_T save_console_fg_rgb;
+স্থির guicolor_T store_console_bg_rgb;
+স্থির guicolor_T store_console_fg_rgb;
+স্থির পূর্ণাঙ্ক default_console_color_bg = 0x000000; // black
+স্থির পূর্ণাঙ্ক default_console_color_fg = 0xc0c0c0; // white
 #  define USE_VTP		(vtp_working && is_term_win32() \
 						 && (p_tgc || t_colors >= 256))
 #  define USE_WT		(wt_working)
-# else
+# অন্যথা
 #  define USE_VTP		0
 #  define USE_WT		0
 # endif
 
-static void set_console_color_rgb(void);
-static void reset_console_color_rgb(void);
-static void restore_console_color_rgb(void);
+স্থির শূন্য set_console_color_rgb(শূন্য);
+স্থির শূন্য reset_console_color_rgb(শূন্য);
+স্থির শূন্য restore_console_color_rgb(শূন্য);
 #endif  // !FEAT_GUI_MSWIN || VIMDLL
 
 // This flag is newly created from Windows 10
@@ -154,120 +154,120 @@ static void restore_console_color_rgb(void);
 # define ENABLE_VIRTUAL_TERMINAL_PROCESSING 0x0004
 #endif
 
-#if !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
-static int suppress_winsize = 1;	// don't fiddle with console
+#যদি !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
+স্থির পূর্ণাঙ্ক suppress_winsize = 1;	// don't fiddle with console
 #endif
 
-static WCHAR *exe_pathw = NULL;
+স্থির WCHAR *exe_pathw = রিক্ত;
 
-#if !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
-static BOOL use_alternate_screen_buffer = FALSE;
+#যদি !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
+স্থির BOOL use_alternate_screen_buffer = FALSE;
 #endif
 
-extern DWORD win_version; // this is in os_mswin.c
+বাহ্য DWORD win_version; // this is in os_mswin.c
 
-#if !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
-    static BOOL
+#যদি !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
+    স্থির BOOL
 is_ambiwidth_event(
-    INPUT_RECORD *ir)
+    প্ৰবেশ_RECORD *ir)
 {
-    return ir->EventType == KEY_EVENT
-		&& ir->Event.KeyEvent.bKeyDown
-		&& ir->Event.KeyEvent.wRepeatCount == 1
-		&& ir->Event.KeyEvent.wVirtualKeyCode == 0x12
-		&& ir->Event.KeyEvent.wVirtualScanCode == 0x38
-		&& ir->Event.KeyEvent.uChar.UnicodeChar == 0
-		&& ir->Event.KeyEvent.dwControlKeyState == 2;
+    ঘূৰাই ir->EventType == চাবি_EVENT
+		&& ir->Event.চাবি_Event_2.b_চাবি_Down
+		&& ir->Event.চাবি_Event_2.w_Repeat_গুনতি == 1
+		&& ir->Event.চাবি_Event_2.w_Virtual_চাবি_Code == 0x12
+		&& ir->Event.চাবি_Event_2.wVirtualScanCode == 0x38
+		&& ir->Event.চাবি_Event_2.uChar.UnicodeChar == 0
+		&& ir->Event.চাবি_Event_2.dw_Control_চাবি_State == 2;
 }
 
-    static void
+    স্থির শূন্য
 make_ambiwidth_event(
-    INPUT_RECORD *down,
-    INPUT_RECORD *up)
+    প্ৰবেশ_RECORD *down,
+    প্ৰবেশ_RECORD *up)
 {
-    down->Event.KeyEvent.wVirtualKeyCode = 0;
-    down->Event.KeyEvent.wVirtualScanCode = 0;
-    down->Event.KeyEvent.uChar.UnicodeChar
-				    = up->Event.KeyEvent.uChar.UnicodeChar;
-    down->Event.KeyEvent.dwControlKeyState = 0;
+    down->Event.চাবি_Event_2.w_Virtual_চাবি_Code = 0;
+    down->Event.চাবি_Event_2.wVirtualScanCode = 0;
+    down->Event.চাবি_Event_2.uChar.UnicodeChar
+				    = up->Event.চাবি_Event_2.uChar.UnicodeChar;
+    down->Event.চাবি_Event_2.dw_Control_চাবি_State = 0;
 }
 
 /*
  * Version of ReadConsoleInput() that works with IME.
  * Works around problems on Windows 8.
  */
-    static BOOL
-read_console_input(
-    HANDLE	    hInput,
-    INPUT_RECORD    *lpBuffer,
-    int		    nLength,
+    স্থির BOOL
+read_console_প্ৰবেশ(
+    HANDLE	    h_প্ৰবেশ,
+    প্ৰবেশ_RECORD    *lpBuffer,
+    পূর্ণাঙ্ক		    nLength,
     LPDWORD	    lpEvents)
 {
-    enum
+    গণনা
     {
 	IRSIZE = 10
     };
-    static INPUT_RECORD s_irCache[IRSIZE];
-    static DWORD s_dwIndex = 0;
-    static DWORD s_dwMax = 0;
+    স্থির প্ৰবেশ_RECORD s_irCache[IRSIZE];
+    স্থির DWORD s_dwIndex = 0;
+    স্থির DWORD s_dwMax = 0;
     DWORD dwEvents;
-    int head;
-    int tail;
-    int i;
-    static INPUT_RECORD s_irPseudo;
+    পূর্ণাঙ্ক head;
+    পূর্ণাঙ্ক tail;
+    পূর্ণাঙ্ক i;
+    স্থির প্ৰবেশ_RECORD s_irPseudo;
 
-    if (s_dwMax == 0 && input_record_buffer.length > 0)
+    যদি (s_dwMax == 0 && প্ৰবেশ_record_buffer.length > 0)
     {
-	dwEvents = read_input_record_buffer(s_irCache, IRSIZE);
+	dwEvents = read_প্ৰবেশ_record_buffer(s_irCache, IRSIZE);
 	s_dwIndex = 0;
 	s_dwMax = dwEvents;
     }
 
-    if (nLength == -2)
-	return (s_dwMax > 0) ? TRUE : FALSE;
+    যদি (nLength == -2)
+	ঘূৰাই (s_dwMax > 0) ? TRUE : FALSE;
 
-    if (win_version < MAKE_VER(6, 2, 0)) // Before Windows 8
+    যদি (win_version < MAKE_VER(6, 2, 0)) // Before Windows 8
     {
-	if (nLength == -1)
-	    return PeekConsoleInputW(hInput, lpBuffer, 1, lpEvents);
-	return ReadConsoleInputW(hInput, lpBuffer, 1, &dwEvents);
+	যদি (nLength == -1)
+	    ঘূৰাই Peek_Console_প্ৰবেশ_W(h_প্ৰবেশ, lpBuffer, 1, lpEvents);
+	ঘূৰাই Read_Console_প্ৰবেশ_W(h_প্ৰবেশ, lpBuffer, 1, &dwEvents);
     }
 
-    if (s_dwMax == 0)
+    যদি (s_dwMax == 0)
     {
-	if (!vtp_working && nLength == -1)
-	    return PeekConsoleInputW(hInput, lpBuffer, 1, lpEvents);
-	GetNumberOfConsoleInputEvents(hInput, &dwEvents);
-	if (dwEvents == 0 && nLength == -1)
-	    return PeekConsoleInputW(hInput, lpBuffer, 1, lpEvents);
-	ReadConsoleInputW(hInput, s_irCache, IRSIZE, &dwEvents);
+	যদি (!vtp_working && nLength == -1)
+	    ঘূৰাই Peek_Console_প্ৰবেশ_W(h_প্ৰবেশ, lpBuffer, 1, lpEvents);
+	Get_সংখ্যা_Of_Console_প্ৰবেশ_Events(h_প্ৰবেশ, &dwEvents);
+	যদি (dwEvents == 0 && nLength == -1)
+	    ঘূৰাই Peek_Console_প্ৰবেশ_W(h_প্ৰবেশ, lpBuffer, 1, lpEvents);
+	Read_Console_প্ৰবেশ_W(h_প্ৰবেশ, s_irCache, IRSIZE, &dwEvents);
 	s_dwIndex = 0;
 	s_dwMax = dwEvents;
-	if (dwEvents == 0)
+	যদি (dwEvents == 0)
 	{
 	    *lpEvents = 0;
-	    return TRUE;
+	    ঘূৰাই TRUE;
 	}
 
-	for (i = s_dwIndex; i < (int)s_dwMax - 1; ++i)
-	    if (is_ambiwidth_event(&s_irCache[i]))
+	বাবে (i = s_dwIndex; i < (পূর্ণাঙ্ক)s_dwMax - 1; ++i)
+	    যদি (is_ambiwidth_event(&s_irCache[i]))
 		make_ambiwidth_event(&s_irCache[i], &s_irCache[i + 1]);
 
-	if (s_dwMax > 1)
+	যদি (s_dwMax > 1)
 	{
 	    head = 0;
 	    tail = s_dwMax - 1;
-	    while (head != tail)
+	    যেতিয়ালৈ (head != tail)
 	    {
-		if (s_irCache[head].EventType == WINDOW_BUFFER_SIZE_EVENT
+		যদি (s_irCache[head].EventType == WINDOW_BUFFER_SIZE_EVENT
 			&& s_irCache[head + 1].EventType
 						  == WINDOW_BUFFER_SIZE_EVENT)
 		{
 		    // Remove duplicate event to avoid flicker.
-		    for (i = head; i < tail; ++i)
+		    বাবে (i = head; i < tail; ++i)
 			s_irCache[i] = s_irCache[i + 1];
 		    --tail;
-		    continue;
+		    অনুৱর্ত;
 		}
 		head++;
 	    }
@@ -275,102 +275,102 @@ read_console_input(
 	}
     }
 
-    if (s_irCache[s_dwIndex].EventType == KEY_EVENT)
+    যদি (s_irCache[s_dwIndex].EventType == চাবি_EVENT)
     {
-	if (s_irCache[s_dwIndex].Event.KeyEvent.wRepeatCount > 1)
+	যদি (s_irCache[s_dwIndex].Event.চাবি_Event_2.w_Repeat_গুনতি > 1)
 	{
 	    s_irPseudo = s_irCache[s_dwIndex];
-	    s_irPseudo.Event.KeyEvent.wRepeatCount = 1;
-	    s_irCache[s_dwIndex].Event.KeyEvent.wRepeatCount--;
+	    s_irPseudo.Event.চাবি_Event_2.w_Repeat_গুনতি = 1;
+	    s_irCache[s_dwIndex].Event.চাবি_Event_2.w_Repeat_গুনতি--;
 	    *lpBuffer = s_irPseudo;
 	    *lpEvents = 1;
-	    return TRUE;
+	    ঘূৰাই TRUE;
 	}
     }
 
     *lpBuffer = s_irCache[s_dwIndex];
-    if (!(nLength == -1 || nLength == -2) && ++s_dwIndex >= s_dwMax)
+    যদি (!(nLength == -1 || nLength == -2) && ++s_dwIndex >= s_dwMax)
 	s_dwMax = 0;
     *lpEvents = 1;
-    return TRUE;
+    ঘূৰাই TRUE;
 }
 
 /*
  * Version of PeekConsoleInput() that works with IME.
  */
-    static BOOL
-peek_console_input(
-    HANDLE	    hInput,
-    INPUT_RECORD    *lpBuffer,
+    স্থির BOOL
+peek_console_প্ৰবেশ(
+    HANDLE	    h_প্ৰবেশ,
+    প্ৰবেশ_RECORD    *lpBuffer,
     DWORD	    nLength UNUSED,
     LPDWORD	    lpEvents)
 {
-    return read_console_input(hInput, lpBuffer, -1, lpEvents);
+    ঘূৰাই read_console_প্ৰবেশ(h_প্ৰবেশ, lpBuffer, -1, lpEvents);
 }
 
 # ifdef FEAT_CLIENTSERVER
-    static DWORD
-msg_wait_for_multiple_objects(
-    DWORD    nCount,
+    স্থির DWORD
+বাৰ্তা_wait_for_multiple_objects(
+    DWORD    n_গুনতি,
     LPHANDLE pHandles,
     BOOL     fWaitAll,
     DWORD    dwMilliseconds,
     DWORD    dwWakeMask)
 {
-    if (read_console_input(NULL, NULL, -2, NULL))
-	return WAIT_OBJECT_0;
-    return MsgWaitForMultipleObjects(nCount, pHandles, fWaitAll,
+    যদি (read_console_প্ৰবেশ(রিক্ত, রিক্ত, -2, রিক্ত))
+	ঘূৰাই WAIT_OBJECT_0;
+    ঘূৰাই বাৰ্তা_Wait_For_Multiple_Objects(n_গুনতি, pHandles, fWaitAll,
 				     dwMilliseconds, dwWakeMask);
 }
 # endif
 
 # ifndef FEAT_CLIENTSERVER
-    static DWORD
+    স্থির DWORD
 wait_for_single_object(
     HANDLE hHandle,
     DWORD dwMilliseconds)
 {
-    if (read_console_input(NULL, NULL, -2, NULL))
-	return WAIT_OBJECT_0;
-    return WaitForSingleObject(hHandle, dwMilliseconds);
+    যদি (read_console_প্ৰবেশ(রিক্ত, রিক্ত, -2, রিক্ত))
+	ঘূৰাই WAIT_OBJECT_0;
+    ঘূৰাই WaitForSingleObject(hHandle, dwMilliseconds);
 }
 # endif
 #endif   // !FEAT_GUI_MSWIN || VIMDLL
 
-    void
-mch_get_exe_name(void)
+    শূন্য
+mch_get_exe_name(শূন্য)
 {
-    int		updated = FALSE;
-    static int	enc_prev = -1;
+    পূর্ণাঙ্ক		updated = FALSE;
+    স্থির পূর্ণাঙ্ক	enc_prev = -1;
     WCHAR	*path;
     size_t	pathlen;
 
-    if (exe_name == NULL || exe_pathw == NULL || enc_prev != enc_codepage)
+    যদি (exe_name == রিক্ত || exe_pathw == রিক্ত || enc_prev != enc_codepage)
     {
 	WCHAR	buf[MAX_PATH];
 	WCHAR	*p;
 
 	// store the name of the executable, may be used for $VIM
-	p = buf + GetModuleFileNameW(NULL, buf, MAX_PATH);
-	if (p > buf)
+	p = buf + GetModuleFileNameW(রিক্ত, buf, MAX_PATH);
+	যদি (p > buf)
 	{
-	    if (enc_codepage == -1)
+	    যদি (enc_codepage == -1)
 		enc_codepage = GetACP();
 	    vim_free(exe_name);
-	    exe_name = utf16_to_enc(buf, NULL);
+	    exe_name = utf16_to_enc(buf, রিক্ত);
 	    enc_prev = enc_codepage;
 
 	    // truncate the buffer at the last path separator
 	    // to isolate the path.
-	    do
+	    কৰা
 	    {
 		--p;
-		if (*p == L'\\')
+		যদি (*p == L'\\')
 		{
 		    *p = L'\0';
-		    break;
+		    ভঙ্গ;
 		}
-	    } while (p > buf);
+	    } যেতিয়ালৈ (p > buf);
 
 	    vim_free(exe_pathw);
 	    exe_pathw = _wcsdup(buf);
@@ -378,14 +378,14 @@ mch_get_exe_name(void)
 	}
     }
 
-    if (exe_pathw == NULL || !updated)
-	return;
+    যদি (exe_pathw == রিক্ত || !updated)
+	ঘূৰাই;
 
     // Append our starting directory to $PATH, so that when doing
     // "!xxd" it's found in our starting directory.  Needed because
     // SearchPath() also looks there.
     path = _wgetenv(L"PATH");
-    pathlen = (path == NULL) ? 0 : wcslen(path);
+    pathlen = (path == রিক্ত) ? 0 : wcslen(path);
 
     // Maximum length of $PATH is more than MAXPATHL. 8191 is often mentioned
     // as the maximum length that works. Add an extra 7 characters (5 for
@@ -393,24 +393,24 @@ mch_get_exe_name(void)
 #define EXTRA_LEN 7
 #define MAX_ENV_STRING_LEN 8191
 
-    if (pathlen + wcslen(exe_pathw) < MAX_ENV_STRING_LEN)
+    যদি (pathlen + wcslen(exe_pathw) < MAX_ENV_STRING_LEN)
     {
 	WCHAR   temp[MAX_ENV_STRING_LEN + EXTRA_LEN] = L"PATH=";
 	size_t  templen = 5;
 
-	if (pathlen == 0)
+	যদি (pathlen == 0)
 	    wcscpy(temp + templen, exe_pathw);
-	else
+	অন্যথা
 	{
 	    wcscpy(temp + templen, path);
 
 	    // Check if exe_path is already included in $PATH.
-	    if (wcsstr(temp, exe_pathw) == NULL)
+	    যদি (wcsstr(temp, exe_pathw) == রিক্ত)
 	    {
 		templen += pathlen;
 
 		// Append ';' if $PATH doesn't end with it.
-		if (temp[templen - 1] != L';')
+		যদি (temp[templen - 1] != L';')
 		{
 		    wcscpy(temp + templen, L";");
 		    ++templen;
@@ -432,15 +432,15 @@ mch_get_exe_name(void)
 /*
  * Unescape characters in "p" that appear in "escaped".
  */
-    static void
+    স্থির শূন্য
 unescape_shellxquote(char_u *p, char_u *escaped)
 {
-    int	    l = (int)STRLEN(p);
-    int	    n;
+    পূর্ণাঙ্ক	    l = (পূর্ণাঙ্ক)STRLEN(p);
+    পূর্ণাঙ্ক	    n;
 
-    while (*p != NUL)
+    যেতিয়ালৈ (*p != NUL)
     {
-	if (*p == '^' && vim_strchr(escaped, p[1]) != NULL)
+	যদি (*p == '^' && vim_strchr(escaped, p[1]) != রিক্ত)
 	    mch_memmove(p, p + 1, l--);
 	n = (*mb_ptr2len)(p);
 	p += n;
@@ -452,27 +452,27 @@ unescape_shellxquote(char_u *p, char_u *escaped)
  * Load library "name".
  */
     HINSTANCE
-vimLoadLib(const char *name)
+vimLoadLib(ধ্রুৱ ৱর্ণ *name)
 {
-    HINSTANCE	dll = NULL;
+    HINSTANCE	dll = রিক্ত;
 
     // No need to load any library when registering OLE.
-    if (found_register_arg)
-	return NULL;
+    যদি (found_register_arg)
+	ঘূৰাই রিক্ত;
 
     // NOTE: Do not use mch_dirname() and mch_chdir() here, they may call
     // vimLoadLib() recursively, which causes a stack overflow.
-    if (exe_pathw == NULL)
+    যদি (exe_pathw == রিক্ত)
     {
 	mch_get_exe_name();
-	if (exe_pathw == NULL)
-	    return NULL;
+	যদি (exe_pathw == রিক্ত)
+	    ঘূৰাই রিক্ত;
     }
 
     WCHAR old_dirw[MAXPATHL];
 
-    if (GetCurrentDirectoryW(MAXPATHL, old_dirw) == 0)
-	return NULL;
+    যদি (GetCurrentDirectoryW(MAXPATHL, old_dirw) == 0)
+	ঘূৰাই রিক্ত;
 
     // Change directory to where the executable is, both to make
     // sure we find a .dll there and to avoid looking for a .dll
@@ -480,32 +480,32 @@ vimLoadLib(const char *name)
     SetCurrentDirectoryW(exe_pathw);
     dll = LoadLibrary(name);
     SetCurrentDirectoryW(old_dirw);
-    return dll;
+    ঘূৰাই dll;
 }
 
-#if defined(VIMDLL)
+#যদি defined(VIMDLL)
 /*
  * Check if the current executable file is for the GUI subsystem.
  */
-    int
-mch_is_gui_executable(void)
+    পূর্ণাঙ্ক
+mch_is_gui_executable(শূন্য)
 {
-    PBYTE		pImage = (PBYTE)GetModuleHandle(NULL);
+    PBYTE		pImage = (PBYTE)GetModuleHandle(রিক্ত);
     PIMAGE_DOS_HEADER	pDOS = (PIMAGE_DOS_HEADER)pImage;
     PIMAGE_NT_HEADERS	pPE;
 
-    if (pDOS->e_magic != IMAGE_DOS_SIGNATURE)
-	return FALSE;
+    যদি (pDOS->e_magic != IMAGE_DOS_SIGNATURE)
+	ঘূৰাই FALSE;
     pPE = (PIMAGE_NT_HEADERS)(pImage + pDOS->e_lfanew);
-    if (pPE->Signature != IMAGE_NT_SIGNATURE)
-	return FALSE;
-    if (pPE->OptionalHeader.Subsystem == IMAGE_SUBSYSTEM_WINDOWS_GUI)
-	return TRUE;
-    return FALSE;
+    যদি (pPE->Signature != IMAGE_NT_SIGNATURE)
+	ঘূৰাই FALSE;
+    যদি (pPE->OptionalHeader.Subsystem == IMAGE_SUBSYSTEM_WINDOWS_GUI)
+	ঘূৰাই TRUE;
+    ঘূৰাই FALSE;
 }
 #endif
 
-#if defined(DYNAMIC_ICONV) || defined(DYNAMIC_GETTEXT) \
+#যদি defined(DYNAMIC_ICONV) || defined(DYNAMIC_GETTEXT) \
     || defined(FEAT_PYTHON3)
 /*
  * Get related information about 'funcname' which is imported by 'hInst'.
@@ -514,9 +514,9 @@ mch_is_gui_executable(void)
  * If 'info' is 2, hook the function with 'ptr', and return the original
  * function address.
  */
-    static void *
-get_imported_func_info(HINSTANCE hInst, const char *funcname, int info,
-	const void *ptr)
+    স্থির শূন্য *
+get_imported_func_info(HINSTANCE hInst, ধ্রুৱ ৱর্ণ *funcname, পূর্ণাঙ্ক info,
+	ধ্রুৱ শূন্য *ptr)
 {
     PBYTE			pImage = (PBYTE)hInst;
     PIMAGE_DOS_HEADER		pDOS = (PIMAGE_DOS_HEADER)hInst;
@@ -527,93 +527,93 @@ get_imported_func_info(HINSTANCE hInst, const char *funcname, int info,
     PIMAGE_IMPORT_BY_NAME	pImpName;
     DWORD			ImpVA;
 
-    if (pDOS->e_magic != IMAGE_DOS_SIGNATURE)
-	return NULL;
+    যদি (pDOS->e_magic != IMAGE_DOS_SIGNATURE)
+	ঘূৰাই রিক্ত;
     pPE = (PIMAGE_NT_HEADERS)(pImage + pDOS->e_lfanew);
-    if (pPE->Signature != IMAGE_NT_SIGNATURE)
-	return NULL;
+    যদি (pPE->Signature != IMAGE_NT_SIGNATURE)
+	ঘূৰাই রিক্ত;
 
     ImpVA = pPE->OptionalHeader
 		.DataDirectory[IMAGE_DIRECTORY_ENTRY_IMPORT].VirtualAddress;
-    if (ImpVA == 0)
-	return NULL;	// No Import Table
+    যদি (ImpVA == 0)
+	ঘূৰাই রিক্ত;	// No Import Table
     pImpDesc = (PIMAGE_IMPORT_DESCRIPTOR)(pImage + ImpVA);
 
-    for (; pImpDesc->FirstThunk; ++pImpDesc)
+    বাবে (; pImpDesc->FirstThunk; ++pImpDesc)
     {
-	if (!pImpDesc->OriginalFirstThunk)
-	    continue;
+	যদি (!pImpDesc->OriginalFirstThunk)
+	    অনুৱর্ত;
 	pIAT = (PIMAGE_THUNK_DATA)(pImage + pImpDesc->FirstThunk);
 	pINT = (PIMAGE_THUNK_DATA)(pImage + pImpDesc->OriginalFirstThunk);
-	for (; pIAT->u1.Function; ++pIAT, ++pINT)
+	বাবে (; pIAT->u1.Function; ++pIAT, ++pINT)
 	{
-	    if (IMAGE_SNAP_BY_ORDINAL(pINT->u1.Ordinal))
-		continue;
+	    যদি (IMAGE_SNAP_BY_ORDINAL(pINT->u1.Ordinal))
+		অনুৱর্ত;
 	    pImpName = (PIMAGE_IMPORT_BY_NAME)(pImage
 					+ (UINT_PTR)(pINT->u1.AddressOfData));
-	    if (strcmp((char *)pImpName->Name, funcname) == 0)
+	    যদি (strcmp((ৱর্ণ *)pImpName->Name, funcname) == 0)
 	    {
-		void *original;
+		শূন্য *original;
 		DWORD old, new = PAGE_READWRITE;
 
-		switch (info)
+		ৱিকল্প (info)
 		{
-		    case 0:
-			return (void *)pIAT->u1.Function;
-		    case 1:
-			return (void *)(pImage + pImpDesc->Name);
-		    case 2:
-			original = (void *)pIAT->u1.Function;
-			VirtualProtect(&pIAT->u1.Function, sizeof(void *),
+		    পক্ষ 0:
+			ঘূৰাই (শূন্য *)pIAT->u1.Function;
+		    পক্ষ 1:
+			ঘূৰাই (শূন্য *)(pImage + pImpDesc->Name);
+		    পক্ষ 2:
+			original = (শূন্য *)pIAT->u1.Function;
+			VirtualProtect(&pIAT->u1.Function, পরিমাণ(শূন্য *),
 				new, &old);
 			pIAT->u1.Function = (UINT_PTR)ptr;
-			VirtualProtect(&pIAT->u1.Function, sizeof(void *),
+			VirtualProtect(&pIAT->u1.Function, পরিমাণ(শূন্য *),
 				old, &new);
-			return original;
-		    default:
-			return NULL;
+			ঘূৰাই original;
+		    স্ৱভাৱ:
+			ঘূৰাই রিক্ত;
 		}
 	    }
 	}
     }
-    return NULL;
+    ঘূৰাই রিক্ত;
 }
 
 /*
  * Get the module handle which 'funcname' in 'hInst' is imported from.
  */
     HINSTANCE
-find_imported_module_by_funcname(HINSTANCE hInst, const char *funcname)
+find_imported_module_by_funcname(HINSTANCE hInst, ধ্রুৱ ৱর্ণ *funcname)
 {
-    char    *modulename;
+    ৱর্ণ    *modulename;
 
-    modulename = (char *)get_imported_func_info(hInst, funcname, 1, NULL);
-    if (modulename != NULL)
-	return GetModuleHandleA(modulename);
-    return NULL;
+    modulename = (ৱর্ণ *)get_imported_func_info(hInst, funcname, 1, রিক্ত);
+    যদি (modulename != রিক্ত)
+	ঘূৰাই GetModuleHandleA(modulename);
+    ঘূৰাই রিক্ত;
 }
 
 /*
  * Get the address of 'funcname' which is imported by 'hInst' DLL.
  */
-    void *
-get_dll_import_func(HINSTANCE hInst, const char *funcname)
+    শূন্য *
+get_dll_import_func(HINSTANCE hInst, ধ্রুৱ ৱর্ণ *funcname)
 {
-    return get_imported_func_info(hInst, funcname, 0, NULL);
+    ঘূৰাই get_imported_func_info(hInst, funcname, 0, রিক্ত);
 }
 
 /*
  * Hook the function named 'funcname' which is imported by 'hInst' DLL,
  * and return the original function address.
  */
-    void *
-hook_dll_import_func(HINSTANCE hInst, const char *funcname, const void *hook)
+    শূন্য *
+hook_dll_import_func(HINSTANCE hInst, ধ্রুৱ ৱর্ণ *funcname, ধ্রুৱ শূন্য *hook)
 {
-    return get_imported_func_info(hInst, funcname, 2, hook);
+    ঘূৰাই get_imported_func_info(hInst, funcname, 2, hook);
 }
 #endif
 
-#if defined(FEAT_PYTHON3)
+#যদি defined(FEAT_PYTHON3)
 /*
  * Check if the specified DLL is a function forwarder.
  * If yes, return the instance of the forwarded DLL.
@@ -632,79 +632,79 @@ get_forwarded_dll(HINSTANCE hInst)
     DWORD			ExpSize;
     LPDWORD			pFunctionTable;
 
-    if (pDOS->e_magic != IMAGE_DOS_SIGNATURE)
-	return NULL;
+    যদি (pDOS->e_magic != IMAGE_DOS_SIGNATURE)
+	ঘূৰাই রিক্ত;
     pPE = (PIMAGE_NT_HEADERS)(pImage + pDOS->e_lfanew);
-    if (pPE->Signature != IMAGE_NT_SIGNATURE)
-	return NULL;
+    যদি (pPE->Signature != IMAGE_NT_SIGNATURE)
+	ঘূৰাই রিক্ত;
 
     ExpVA = pPE->OptionalHeader
 		.DataDirectory[IMAGE_DIRECTORY_ENTRY_EXPORT].VirtualAddress;
     ExpSize = pPE->OptionalHeader
 		.DataDirectory[IMAGE_DIRECTORY_ENTRY_EXPORT].Size;
-    if (ExpVA == 0)
-	return hInst;	// No Export Directory
+    যদি (ExpVA == 0)
+	ঘূৰাই hInst;	// No Export Directory
     pExpDir = (PIMAGE_EXPORT_DIRECTORY)(pImage + ExpVA);
     pFunctionTable = (LPDWORD)(pImage + pExpDir->AddressOfFunctions);
 
-    if (pExpDir->NumberOfNames == 0)
-	return hInst;	// No export names.
+    যদি (pExpDir->সংখ্যা_Of_Names == 0)
+	ঘূৰাই hInst;	// No export names.
 
     // Check only the first entry.
-    if ((pFunctionTable[0] < ExpVA) || (pFunctionTable[0] >= ExpVA + ExpSize))
+    যদি ((pFunctionTable[0] < ExpVA) || (pFunctionTable[0] >= ExpVA + ExpSize))
 	// The first entry is not a function forwarder.
-	return hInst;
+	ঘূৰাই hInst;
 
     // The first entry is a function forwarder.
     // The name is represented as "DllName.FunctionName".
-    const char *name = (const char *)(pImage + pFunctionTable[0]);
-    const char *p = strchr(name, '.');
-    if (p == NULL)
-	return hInst;
+    ধ্রুৱ ৱর্ণ *name = (ধ্রুৱ ৱর্ণ *)(pImage + pFunctionTable[0]);
+    ধ্রুৱ ৱর্ণ *p = strchr(name, '.');
+    যদি (p == রিক্ত)
+	ঘূৰাই hInst;
 
     // Extract DllName.
-    char buf[MAX_PATH];
-    if (p - name + 1 > sizeof(buf))
-	return NULL;
+    ৱর্ণ buf[MAX_PATH];
+    যদি (p - name + 1 > পরিমাণ(buf))
+	ঘূৰাই রিক্ত;
     strncpy(buf, name, p - name);
     buf[p - name] = NUL;
-    return GetModuleHandleA(buf);
+    ঘূৰাই GetModuleHandleA(buf);
 }
 #endif
 
-#if defined(DYNAMIC_GETTEXT)
+#যদি defined(DYNAMIC_GETTEXT)
 # ifndef GETTEXT_DLL
 #  define GETTEXT_DLL "libintl.dll"
 #  define GETTEXT_DLL_ALT1 "libintl-8.dll"
 #  define GETTEXT_DLL_ALT2 "intl.dll"
 # endif
 // Dummy functions
-static char *null_libintl_gettext(const char *);
-static char *null_libintl_ngettext(const char *, const char *, unsigned long n);
-static char *null_libintl_textdomain(const char *);
-static char *null_libintl_bindtextdomain(const char *, const char *);
-static char *null_libintl_bind_textdomain_codeset(const char *, const char *);
-static int null_libintl_wputenv(const wchar_t *);
+স্থির ৱর্ণ *null_libintl_gettext(ধ্রুৱ ৱর্ণ *);
+স্থির ৱর্ণ *null_libintl_ngettext(ধ্রুৱ ৱর্ণ *, ধ্রুৱ ৱর্ণ *, unsigned long n);
+স্থির ৱর্ণ *null_libintl_textdomain(ধ্রুৱ ৱর্ণ *);
+স্থির ৱর্ণ *null_libintl_bindtextdomain(ধ্রুৱ ৱর্ণ *, ধ্রুৱ ৱর্ণ *);
+স্থির ৱর্ণ *null_libintl_bind_textdomain_codeset(ধ্রুৱ ৱর্ণ *, ধ্রুৱ ৱর্ণ *);
+স্থির পূর্ণাঙ্ক null_libintl_wputenv(ধ্রুৱ wchar_t *);
 
-static HINSTANCE hLibintlDLL = NULL;
-char *(*dyn_libintl_gettext)(const char *) = null_libintl_gettext;
-char *(*dyn_libintl_ngettext)(const char *, const char *, unsigned long n)
+স্থির HINSTANCE hLibintlDLL = রিক্ত;
+ৱর্ণ *(*dyn_libintl_gettext)(ধ্রুৱ ৱর্ণ *) = null_libintl_gettext;
+ৱর্ণ *(*dyn_libintl_ngettext)(ধ্রুৱ ৱর্ণ *, ধ্রুৱ ৱর্ণ *, unsigned long n)
 						= null_libintl_ngettext;
-char *(*dyn_libintl_textdomain)(const char *) = null_libintl_textdomain;
-char *(*dyn_libintl_bindtextdomain)(const char *, const char *)
+ৱর্ণ *(*dyn_libintl_textdomain)(ধ্রুৱ ৱর্ণ *) = null_libintl_textdomain;
+ৱর্ণ *(*dyn_libintl_bindtextdomain)(ধ্রুৱ ৱর্ণ *, ধ্রুৱ ৱর্ণ *)
 						= null_libintl_bindtextdomain;
-char *(*dyn_libintl_bind_textdomain_codeset)(const char *, const char *)
+ৱর্ণ *(*dyn_libintl_bind_textdomain_codeset)(ধ্রুৱ ৱর্ণ *, ধ্রুৱ ৱর্ণ *)
 				       = null_libintl_bind_textdomain_codeset;
-int (*dyn_libintl_wputenv)(const wchar_t *) = null_libintl_wputenv;
-int *dyn_libintl_nl_msg_cat_cntr = NULL;
+পূর্ণাঙ্ক (*dyn_libintl_wputenv)(ধ্রুৱ wchar_t *) = null_libintl_wputenv;
+পূর্ণাঙ্ক *dyn_libintl_nl_বাৰ্তা_cat_cntr = রিক্ত;
 
-    int
-dyn_libintl_init(void)
+    পূর্ণাঙ্ক
+dyn_libintl_init(শূন্য)
 {
-    int i;
-    static struct
+    পূর্ণাঙ্ক i;
+    স্থির সংরচনা
     {
-	char	    *name;
+	ৱর্ণ	    *name;
 	FARPROC	    *ptr;
     } libintl_entry[] =
     {
@@ -712,129 +712,129 @@ dyn_libintl_init(void)
 	{"ngettext", (FARPROC*)&dyn_libintl_ngettext},
 	{"textdomain", (FARPROC*)&dyn_libintl_textdomain},
 	{"bindtextdomain", (FARPROC*)&dyn_libintl_bindtextdomain},
-	{NULL, NULL}
+	{রিক্ত, রিক্ত}
     };
     HINSTANCE hmsvcrt;
 
     // No need to initialize twice.
-    if (hLibintlDLL != NULL)
-	return 1;
+    যদি (hLibintlDLL != রিক্ত)
+	ঘূৰাই 1;
     // Load gettext library (libintl.dll and other names).
     hLibintlDLL = vimLoadLib(GETTEXT_DLL);
 # ifdef GETTEXT_DLL_ALT1
-    if (!hLibintlDLL)
+    যদি (!hLibintlDLL)
 	hLibintlDLL = vimLoadLib(GETTEXT_DLL_ALT1);
 # endif
 # ifdef GETTEXT_DLL_ALT2
-    if (!hLibintlDLL)
+    যদি (!hLibintlDLL)
 	hLibintlDLL = vimLoadLib(GETTEXT_DLL_ALT2);
 # endif
-    if (!hLibintlDLL)
+    যদি (!hLibintlDLL)
     {
-	if (p_verbose > 0)
+	যদি (p_verbose > 0)
 	{
 	    verbose_enter();
 	    semsg(_(e_could_not_load_library_str_str), GETTEXT_DLL, GetWin32Error());
 	    verbose_leave();
 	}
-	return 0;
+	ঘূৰাই 0;
     }
-    for (i = 0; libintl_entry[i].name != NULL
-					 && libintl_entry[i].ptr != NULL; ++i)
+    বাবে (i = 0; libintl_entry[i].name != রিক্ত
+					 && libintl_entry[i].ptr != রিক্ত; ++i)
     {
-	if ((*libintl_entry[i].ptr = GetProcAddress(hLibintlDLL,
-					      libintl_entry[i].name)) == NULL)
+	যদি ((*libintl_entry[i].ptr = GetProcAddress(hLibintlDLL,
+					      libintl_entry[i].name)) == রিক্ত)
 	{
 	    dyn_libintl_end();
-	    if (p_verbose > 0)
+	    যদি (p_verbose > 0)
 	    {
 		verbose_enter();
 		semsg(_(e_could_not_load_library_function_str), libintl_entry[i].name);
 		verbose_leave();
 	    }
-	    return 0;
+	    ঘূৰাই 0;
 	}
     }
 
     // The bind_textdomain_codeset() function is optional.
-    dyn_libintl_bind_textdomain_codeset = (char *(*)(const char *, const char *))
+    dyn_libintl_bind_textdomain_codeset = (ৱর্ণ *(*)(ধ্রুৱ ৱর্ণ *, ধ্রুৱ ৱর্ণ *))
 			GetProcAddress(hLibintlDLL, "bind_textdomain_codeset");
-    if (dyn_libintl_bind_textdomain_codeset == NULL)
+    যদি (dyn_libintl_bind_textdomain_codeset == রিক্ত)
 	dyn_libintl_bind_textdomain_codeset =
 					 null_libintl_bind_textdomain_codeset;
 
     // _wputenv() function for the libintl.dll is optional.
     hmsvcrt = find_imported_module_by_funcname(hLibintlDLL, "getenv");
-    if (hmsvcrt != NULL)
-	dyn_libintl_wputenv = (int (*)(const wchar_t *))
+    যদি (hmsvcrt != রিক্ত)
+	dyn_libintl_wputenv = (পূর্ণাঙ্ক (*)(ধ্রুৱ wchar_t *))
 					GetProcAddress(hmsvcrt, "_wputenv");
-    if (dyn_libintl_wputenv == NULL || dyn_libintl_wputenv == _wputenv)
+    যদি (dyn_libintl_wputenv == রিক্ত || dyn_libintl_wputenv == _wputenv)
 	dyn_libintl_wputenv = null_libintl_wputenv;
 
     // The _nl_msg_cat_cntr variable is optional.  It is used to make gettext
     // drop the translations it cached.
-    dyn_libintl_nl_msg_cat_cntr = (int *)GetProcAddress(hLibintlDLL,
+    dyn_libintl_nl_বাৰ্তা_cat_cntr = (পূর্ণাঙ্ক *)GetProcAddress(hLibintlDLL,
 							 "_nl_msg_cat_cntr");
 
-    return 1;
+    ঘূৰাই 1;
 }
 
-    void
-dyn_libintl_end(void)
+    শূন্য
+dyn_libintl_end(শূন্য)
 {
-    if (hLibintlDLL)
+    যদি (hLibintlDLL)
 	FreeLibrary(hLibintlDLL);
-    hLibintlDLL			= NULL;
+    hLibintlDLL			= রিক্ত;
     dyn_libintl_gettext		= null_libintl_gettext;
     dyn_libintl_ngettext	= null_libintl_ngettext;
     dyn_libintl_textdomain	= null_libintl_textdomain;
     dyn_libintl_bindtextdomain	= null_libintl_bindtextdomain;
     dyn_libintl_bind_textdomain_codeset = null_libintl_bind_textdomain_codeset;
     dyn_libintl_wputenv		= null_libintl_wputenv;
-    dyn_libintl_nl_msg_cat_cntr	= NULL;
+    dyn_libintl_nl_বাৰ্তা_cat_cntr	= রিক্ত;
 }
 
-    static char *
-null_libintl_gettext(const char *msgid)
+    স্থির ৱর্ণ *
+null_libintl_gettext(ধ্রুৱ ৱর্ণ *msgid)
 {
-    return (char*)msgid;
+    ঘূৰাই (ৱর্ণ*)msgid;
 }
 
-    static char *
+    স্থির ৱর্ণ *
 null_libintl_ngettext(
-	const char *msgid,
-	const char *msgid_plural,
+	ধ্রুৱ ৱর্ণ *msgid,
+	ধ্রুৱ ৱর্ণ *msgid_plural,
 	unsigned long n)
 {
-    return (char *)(n == 1 ? msgid : msgid_plural);
+    ঘূৰাই (ৱর্ণ *)(n == 1 ? msgid : msgid_plural);
 }
 
-    static char *
+    স্থির ৱর্ণ *
 null_libintl_bindtextdomain(
-	const char *domainname UNUSED,
-	const char *dirname UNUSED)
+	ধ্রুৱ ৱর্ণ *domainname UNUSED,
+	ধ্রুৱ ৱর্ণ *dirname UNUSED)
 {
-    return NULL;
+    ঘূৰাই রিক্ত;
 }
 
-    static char *
+    স্থির ৱর্ণ *
 null_libintl_bind_textdomain_codeset(
-	const char *domainname UNUSED,
-	const char *codeset UNUSED)
+	ধ্রুৱ ৱর্ণ *domainname UNUSED,
+	ধ্রুৱ ৱর্ণ *codeset UNUSED)
 {
-    return NULL;
+    ঘূৰাই রিক্ত;
 }
 
-    static char *
-null_libintl_textdomain(const char *domainname UNUSED)
+    স্থির ৱর্ণ *
+null_libintl_textdomain(ধ্রুৱ ৱর্ণ *domainname UNUSED)
 {
-    return NULL;
+    ঘূৰাই রিক্ত;
 }
 
-    static int
-null_libintl_wputenv(const wchar_t *envstring UNUSED)
+    স্থির পূর্ণাঙ্ক
+null_libintl_wputenv(ধ্রুৱ wchar_t *envstring UNUSED)
 {
-    return 0;
+    ঘূৰাই 0;
 }
 
 #endif // DYNAMIC_GETTEXT
@@ -856,69 +856,69 @@ null_libintl_wputenv(const wchar_t *envstring UNUSED)
 /*
  * Enables or disables the specified privilege.
  */
-    static BOOL
+    স্থির BOOL
 win32_enable_privilege(LPTSTR lpszPrivilege)
 {
     LUID		luid;
     HANDLE		hToken;
     TOKEN_PRIVILEGES	tokenPrivileges;
 
-    if (!OpenProcessToken(GetCurrentProcess(),
+    যদি (!OpenProcessToken(GetCurrentProcess(),
 		TOKEN_ADJUST_PRIVILEGES | TOKEN_QUERY, &hToken))
-	return FALSE;
+	ঘূৰাই FALSE;
 
-    if (!LookupPrivilegeValue(NULL, lpszPrivilege, &luid))
+    যদি (!Lookup_Privilege_মান(রিক্ত, lpszPrivilege, &luid))
     {
 	CloseHandle(hToken);
-	return FALSE;
+	ঘূৰাই FALSE;
     }
 
-    tokenPrivileges.PrivilegeCount	     = 1;
+    tokenPrivileges.Privilege_গুনতি	     = 1;
     tokenPrivileges.Privileges[0].Luid       = luid;
     tokenPrivileges.Privileges[0].Attributes = SE_PRIVILEGE_ENABLED;
 
-    if (!AdjustTokenPrivileges(hToken, FALSE, &tokenPrivileges, 0, NULL, NULL))
+    যদি (!AdjustTokenPrivileges(hToken, FALSE, &tokenPrivileges, 0, রিক্ত, রিক্ত))
     {
 	CloseHandle(hToken);
-	return FALSE;
+	ঘূৰাই FALSE;
     }
 
-    if (GetLastError() != ERROR_SUCCESS)
+    যদি (GetLastError() != ERROR_SUCCESS)
     {
 	CloseHandle(hToken);
-	return FALSE;
+	ঘূৰাই FALSE;
     }
 
     CloseHandle(hToken);
-    return TRUE;
+    ঘূৰাই TRUE;
 }
 #endif
 
 /*
  * Fill in "windowsVersion" if possible and enable security privilege for ACL.
  */
-    void
-PlatformId(void)
+    শূন্য
+PlatformId(শূন্য)
 {
 #ifdef FEAT_EVAL
     DWORD major = (win_version >> 24) & 0xFF;
     DWORD minor = (win_version >> 16) & 0xFF;
-    vim_snprintf(windowsVersion, sizeof(windowsVersion), "%d.%d", major, minor);
+    vim_snprintf(windowsVersion, পরিমাণ(windowsVersion), "%d.%d", major, minor);
 #endif
 
 #ifdef HAVE_ACL
     // Enable privilege for getting or setting SACLs.
-    if (!win32_enable_privilege(SE_SECURITY_NAME))
-	return;
+    যদি (!win32_enable_privilege(SE_SECURITY_NAME))
+	ঘূৰাই;
 #endif
 }
 
-#if !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
+#যদি !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
 
 # define SHIFT  (SHIFT_PRESSED)
-# define CTRL   (RIGHT_CTRL_PRESSED | LEFT_CTRL_PRESSED)
-# define ALT    (RIGHT_ALT_PRESSED  | LEFT_ALT_PRESSED)
-# define ALT_GR (RIGHT_ALT_PRESSED  | LEFT_CTRL_PRESSED)
+# define CTRL   (ডান_CTRL_PRESSED | বাম_CTRL_PRESSED)
+# define ALT    (ডান_ALT_PRESSED  | বাম_ALT_PRESSED)
+# define ALT_GR (ডান_ALT_PRESSED  | বাম_CTRL_PRESSED)
 
 
 // When uChar.AsciiChar is 0, then we need to look at wVirtualKeyCode.
@@ -928,15 +928,15 @@ PlatformId(void)
 // so that the user can have access to all SHIFT-, CTRL-, and ALT-
 // combinations of function/arrow/etc keys.
 
-static const struct
+স্থির ধ্রুৱ সংরচনা
 {
-    WORD    wVirtKey;
-    BOOL    fAnsiKey;
-    int	    chAlone;
-    int	    chShift;
-    int	    chCtrl;
-    int	    chAlt;
-} VirtKeyMap[] =
+    WORD    w_Virt_চাবি;
+    BOOL    f_Ansi_চাবি;
+    পূর্ণাঙ্ক	    chAlone;
+    পূর্ণাঙ্ক	    chShift;
+    পূর্ণাঙ্ক	    chCtrl;
+    পূর্ণাঙ্ক	    chAlt;
+} Virt_চাবি_Map[] =
 {
 //    Key	ANSI	alone	shift	ctrl	    alt
     { VK_ESCAPE,FALSE,	ESC,	ESC,	ESC,	    ESC,    },
@@ -957,18 +957,18 @@ static const struct
     { VK_HOME,	TRUE,	'G',	'\302',	'w',	    '\303', },
     { VK_UP,	TRUE,	'H',	'\304',	'\305',	    '\306', },
     { VK_PRIOR,	TRUE,	'I',	'\307',	'\204',	    '\310', }, // PgUp
-    { VK_LEFT,	TRUE,	'K',	'\311',	's',	    '\312', },
-    { VK_RIGHT,	TRUE,	'M',	'\313',	't',	    '\314', },
+    { VK_বাম,	TRUE,	'K',	'\311',	's',	    '\312', },
+    { VK_ডান,	TRUE,	'M',	'\313',	't',	    '\314', },
     { VK_END,	TRUE,	'O',	'\315',	'u',	    '\316', },
     { VK_DOWN,	TRUE,	'P',	'\317',	'\320',	    '\321', },
     { VK_NEXT,	TRUE,	'Q',	'\322',	'v',	    '\323', }, // PgDn
-    { VK_INSERT,TRUE,	'R',	'\324',	'\325',	    '\326', },
+    { VK_ঢোকাও,TRUE,	'R',	'\324',	'\325',	    '\326', },
     { VK_DELETE,TRUE,	'S',	'\327',	'\330',	    '\331', },
     { VK_BACK,	TRUE,	'x',	'y',	'z',	    '{', }, // Backspace
 
     { VK_SNAPSHOT,TRUE,	0,	0,	0,	    'r', }, // PrtScrn
 
-# if 0
+# যদি 0
     // Most people don't have F13-F20, but what the hell...
     { VK_F13,	TRUE,	'\332',	'\333',	'\334',	    '\335', },
     { VK_F14,	TRUE,	'\336',	'\337',	'\340',	    '\341', },
@@ -1001,342 +1001,342 @@ static const struct
 /*
  * The return code indicates key code size.
  */
-    static int
-win32_kbd_patch_key(
-    KEY_EVENT_RECORD *pker)
+    স্থির পূর্ণাঙ্ক
+win32_kbd_patch_চাবি(
+    চাবি_EVENT_RECORD *pker)
 {
-    UINT uMods = pker->dwControlKeyState;
-    static int s_iIsDead = 0;
-    static WORD awAnsiCode[2];
-    static BYTE abKeystate[256];
+    UINT uMods = pker->dw_Control_চাবি_State;
+    স্থির পূর্ণাঙ্ক s_iIsDead = 0;
+    স্থির WORD awAnsiCode[2];
+    স্থির BYTE abKeystate[256];
 
-    if (s_iIsDead == 2)
+    যদি (s_iIsDead == 2)
     {
 	pker->uChar.UnicodeChar = (WCHAR) awAnsiCode[1];
 	s_iIsDead = 0;
-	return 1;
+	ঘূৰাই 1;
     }
 
     // check if it already has a valid unicode character.
-    if (pker->uChar.UnicodeChar != 0)
-	return 1;
+    যদি (pker->uChar.UnicodeChar != 0)
+	ঘূৰাই 1;
 
     CLEAR_FIELD(abKeystate);
 
     // Clear any pending dead keys
-    ToUnicode(VK_SPACE, MapVirtualKey(VK_SPACE, 0), abKeystate, awAnsiCode, 2, 0);
+    ToUnicode(VK_SPACE, Map_Virtual_চাবি(VK_SPACE, 0), abKeystate, awAnsiCode, 2, 0);
 
-    if (uMods & SHIFT_PRESSED)
+    যদি (uMods & SHIFT_PRESSED)
 	abKeystate[VK_SHIFT] = 0x80;
-    if (uMods & CAPSLOCK_ON)
+    যদি (uMods & CAPSLOCK_ON)
 	abKeystate[VK_CAPITAL] = 1;
 
-    if ((uMods & ALT_GR) == ALT_GR)
+    যদি ((uMods & ALT_GR) == ALT_GR)
     {
 	abKeystate[VK_CONTROL] = abKeystate[VK_LCONTROL] =
 	    abKeystate[VK_MENU] = abKeystate[VK_RMENU] = 0x80;
     }
 
-    s_iIsDead = ToUnicode(pker->wVirtualKeyCode, pker->wVirtualScanCode,
+    s_iIsDead = ToUnicode(pker->w_Virtual_চাবি_Code, pker->wVirtualScanCode,
 			abKeystate, awAnsiCode, 2, 0);
 
-    if (s_iIsDead > 0)
+    যদি (s_iIsDead > 0)
 	pker->uChar.UnicodeChar = (WCHAR) awAnsiCode[0];
 
-    return s_iIsDead;
+    ঘূৰাই s_iIsDead;
 }
 
-static BOOL g_fJustGotFocus = FALSE;
+স্থির BOOL g_fJustGotFocus = FALSE;
 
 /*
  * Decode a KEY_EVENT into one or two keystrokes
  */
-    static BOOL
-decode_key_event(
-    KEY_EVENT_RECORD	*pker,
+    স্থির BOOL
+decode_চাবি_event(
+    চাবি_EVENT_RECORD	*pker,
     WCHAR		*pch,
     WCHAR		*pch2,
-    int			*pmodifiers,
+    পূর্ণাঙ্ক			*pmodifiers,
     BOOL		fDoPost UNUSED)
 {
-    int i;
-    const int nModifs = pker->dwControlKeyState & (SHIFT | ALT | CTRL);
+    পূর্ণাঙ্ক i;
+    ধ্রুৱ পূর্ণাঙ্ক nModifs = pker->dw_Control_চাবি_State & (SHIFT | ALT | CTRL);
 
     *pch = *pch2 = NUL;
     g_fJustGotFocus = FALSE;
 
     // ignore key up events
-    if (!pker->bKeyDown)
-	return FALSE;
+    যদি (!pker->b_চাবি_Down)
+	ঘূৰাই FALSE;
 
     // ignore some keystrokes
-    switch (pker->wVirtualKeyCode)
+    ৱিকল্প (pker->w_Virtual_চাবি_Code)
     {
     // modifiers
-    case VK_SHIFT:
-    case VK_CONTROL:
-    case VK_MENU:   // Alt key
-	return FALSE;
+    পক্ষ VK_SHIFT:
+    পক্ষ VK_CONTROL:
+    পক্ষ VK_MENU:   // Alt key
+	ঘূৰাই FALSE;
 
-    default:
-	break;
+    স্ৱভাৱ:
+	ভঙ্গ;
     }
 
     // Shift-TAB
-    if (pker->wVirtualKeyCode == VK_TAB && (nModifs & SHIFT_PRESSED))
+    যদি (pker->w_Virtual_চাবি_Code == VK_TAB && (nModifs & SHIFT_PRESSED))
     {
 	*pch = K_NUL;
 	*pch2 = '\017';
-	return TRUE;
+	ঘূৰাই TRUE;
     }
 
-    for (i = ARRAY_LENGTH(VirtKeyMap); --i >= 0; )
+    বাবে (i = ARRAY_LENGTH(Virt_চাবি_Map); --i >= 0; )
     {
-	if (VirtKeyMap[i].wVirtKey == pker->wVirtualKeyCode)
+	যদি (Virt_চাবি_Map[i].w_Virt_চাবি == pker->w_Virtual_চাবি_Code)
 	{
-	    *pch = VirtKeyMap[i].chAlone;
-	    if ((nModifs & SHIFT) != 0)
-		*pch = VirtKeyMap[i].chShift;
-	    else if ((nModifs & CTRL) != 0 && (nModifs & ~CTRL) == 0)
-		*pch = VirtKeyMap[i].chCtrl;
-	    else if ((nModifs & ALT) != 0)
-		*pch = VirtKeyMap[i].chAlt;
+	    *pch = Virt_চাবি_Map[i].chAlone;
+	    যদি ((nModifs & SHIFT) != 0)
+		*pch = Virt_চাবি_Map[i].chShift;
+	    অন্যথা যদি ((nModifs & CTRL) != 0 && (nModifs & ~CTRL) == 0)
+		*pch = Virt_চাবি_Map[i].chCtrl;
+	    অন্যথা যদি ((nModifs & ALT) != 0)
+		*pch = Virt_চাবি_Map[i].chAlt;
 
-	    if (*pch != 0)
+	    যদি (*pch != 0)
 	    {
-		if (VirtKeyMap[i].fAnsiKey)
+		যদি (Virt_চাবি_Map[i].f_Ansi_চাবি)
 		{
 		    *pch2 = *pch;
 		    *pch = K_NUL;
-		    if (pmodifiers)
+		    যদি (pmodifiers)
 		    {
-			if (pker->wVirtualKeyCode >= VK_F1
-			    && pker->wVirtualKeyCode <= VK_F12)
+			যদি (pker->w_Virtual_চাবি_Code >= VK_F1
+			    && pker->w_Virtual_চাবি_Code <= VK_F12)
 			{
-			    if ((nModifs & ALT) != 0)
+			    যদি ((nModifs & ALT) != 0)
 			    {
 				*pmodifiers |= MOD_MASK_ALT;
-				if ((nModifs & SHIFT) == 0)
-				    *pch2 = VirtKeyMap[i].chAlone;
+				যদি ((nModifs & SHIFT) == 0)
+				    *pch2 = Virt_চাবি_Map[i].chAlone;
 			    }
-			    if ((nModifs & CTRL) != 0)
+			    যদি ((nModifs & CTRL) != 0)
 			    {
 				*pmodifiers |= MOD_MASK_CTRL;
-				if ((nModifs & SHIFT) == 0)
-				    *pch2 = VirtKeyMap[i].chAlone;
+				যদি ((nModifs & SHIFT) == 0)
+				    *pch2 = Virt_চাবি_Map[i].chAlone;
 			    }
 			}
-			else if (pker->wVirtualKeyCode >= VK_END
-				&& pker->wVirtualKeyCode <= VK_DOWN)
+			অন্যথা যদি (pker->w_Virtual_চাবি_Code >= VK_END
+				&& pker->w_Virtual_চাবি_Code <= VK_DOWN)
 			{
 			    // (0x23 - 0x28): VK_END, VK_HOME,
 			    // VK_LEFT, VK_UP, VK_RIGHT, VK_DOWN
 
 			    *pmodifiers = 0;
-			    *pch2 = VirtKeyMap[i].chAlone;
-			    if ((nModifs & SHIFT) != 0
+			    *pch2 = Virt_চাবি_Map[i].chAlone;
+			    যদি ((nModifs & SHIFT) != 0
 						    && (nModifs & ~SHIFT) == 0)
 			    {
-				*pch2 = VirtKeyMap[i].chShift;
+				*pch2 = Virt_চাবি_Map[i].chShift;
 			    }
-			    if ((nModifs & CTRL) != 0
+			    যদি ((nModifs & CTRL) != 0
 						     && (nModifs & ~CTRL) == 0)
 			    {
-				*pch2 = VirtKeyMap[i].chCtrl;
-				if (pker->wVirtualKeyCode == VK_UP
-				    || pker->wVirtualKeyCode == VK_DOWN)
+				*pch2 = Virt_চাবি_Map[i].chCtrl;
+				যদি (pker->w_Virtual_চাবি_Code == VK_UP
+				    || pker->w_Virtual_চাবি_Code == VK_DOWN)
 				{
 				    *pmodifiers |= MOD_MASK_CTRL;
-				    *pch2 = VirtKeyMap[i].chAlone;
+				    *pch2 = Virt_চাবি_Map[i].chAlone;
 				}
 			    }
-			    if ((nModifs & SHIFT) != 0
+			    যদি ((nModifs & SHIFT) != 0
 						      && (nModifs & CTRL) != 0)
 			    {
 				*pmodifiers |= MOD_MASK_CTRL;
-				*pch2 = VirtKeyMap[i].chShift;
+				*pch2 = Virt_চাবি_Map[i].chShift;
 			    }
-			    if ((nModifs & ALT) != 0)
+			    যদি ((nModifs & ALT) != 0)
 			    {
-				*pch2 = VirtKeyMap[i].chAlt;
+				*pch2 = Virt_চাবি_Map[i].chAlt;
 				*pmodifiers |= MOD_MASK_ALT;
-				if ((nModifs & ~ALT) == 0)
+				যদি ((nModifs & ~ALT) == 0)
 				{
-				    *pch2 = VirtKeyMap[i].chAlone;
+				    *pch2 = Virt_চাবি_Map[i].chAlone;
 				}
-				else if ((nModifs & SHIFT) != 0)
+				অন্যথা যদি ((nModifs & SHIFT) != 0)
 				{
-				    *pch2 = VirtKeyMap[i].chShift;
+				    *pch2 = Virt_চাবি_Map[i].chShift;
 				}
-				else if ((nModifs & CTRL) != 0)
+				অন্যথা যদি ((nModifs & CTRL) != 0)
 				{
-				    if (pker->wVirtualKeyCode == VK_UP
-					|| pker->wVirtualKeyCode == VK_DOWN)
+				    যদি (pker->w_Virtual_চাবি_Code == VK_UP
+					|| pker->w_Virtual_চাবি_Code == VK_DOWN)
 				    {
 					*pmodifiers |= MOD_MASK_CTRL;
-					*pch2 = VirtKeyMap[i].chAlone;
+					*pch2 = Virt_চাবি_Map[i].chAlone;
 				    }
-				    else
+				    অন্যথা
 				    {
-					*pch2 = VirtKeyMap[i].chCtrl;
+					*pch2 = Virt_চাবি_Map[i].chCtrl;
 				    }
 				}
 			    }
 			}
-			else if (pker->wVirtualKeyCode == VK_INSERT
+			অন্যথা যদি (pker->w_Virtual_চাবি_Code == VK_ঢোকাও
 					&& (nModifs & SHIFT) != 0
 					&& (nModifs & ~SHIFT) == 0)
 			{
 			    *pmodifiers = 0;
-			    *pch2 = VirtKeyMap[i].chShift;
+			    *pch2 = Virt_চাবি_Map[i].chShift;
 			}
-			else
+			অন্যথা
 			{
-			    *pch2 = VirtKeyMap[i].chAlone;
-			    if ((nModifs & SHIFT) != 0)
+			    *pch2 = Virt_চাবি_Map[i].chAlone;
+			    যদি ((nModifs & SHIFT) != 0)
 				*pmodifiers |= MOD_MASK_SHIFT;
-			    if ((nModifs & CTRL) != 0)
+			    যদি ((nModifs & CTRL) != 0)
 				*pmodifiers |= MOD_MASK_CTRL;
-			    if ((nModifs & ALT) != 0)
+			    যদি ((nModifs & ALT) != 0)
 				*pmodifiers |= MOD_MASK_ALT;
 			}
 		    }
 		}
 
-		return TRUE;
+		ঘূৰাই TRUE;
 	    }
 	}
     }
 
-    i = win32_kbd_patch_key(pker);
+    i = win32_kbd_patch_চাবি(pker);
 
-    if (i < 0)
+    যদি (i < 0)
 	*pch = NUL;
-    else
+    অন্যথা
     {
 	*pch = (i > 0) ? pker->uChar.UnicodeChar : NUL;
 
-	if (pmodifiers != NULL)
+	যদি (pmodifiers != রিক্ত)
 	{
 	    // Pass on the ALT key as a modifier, but only when not combined
 	    // with CTRL (which is ALTGR).
-	    if ((nModifs & ALT) != 0 && (nModifs & CTRL) == 0)
+	    যদি ((nModifs & ALT) != 0 && (nModifs & CTRL) == 0)
 		*pmodifiers |= MOD_MASK_ALT;
 
 	    // Pass on SHIFT only for special keys, because we don't know when
 	    // it's already included with the character.
-	    if ((nModifs & SHIFT) != 0 && *pch <= 0x20)
+	    যদি ((nModifs & SHIFT) != 0 && *pch <= 0x20)
 		*pmodifiers |= MOD_MASK_SHIFT;
 
 	    // Pass on CTRL only for non-special keys, because we don't know
 	    // when it's already included with the character.  And not when
 	    // combined with ALT (which is ALTGR).
-	    if ((nModifs & CTRL) != 0 && (nModifs & ALT) == 0
+	    যদি ((nModifs & CTRL) != 0 && (nModifs & ALT) == 0
 					       && *pch >= 0x20 && *pch < 0x80)
 		*pmodifiers |= MOD_MASK_CTRL;
 	}
     }
 
-    return (*pch != NUL);
+    ঘূৰাই (*pch != NUL);
 }
 
-# if defined(FEAT_EVAL)
-    static int
-encode_key_event(dict_T *args, INPUT_RECORD *ir)
+# যদি defined(FEAT_EVAL)
+    স্থির পূর্ণাঙ্ক
+encode_চাবি_event(dict_T *args, প্ৰবেশ_RECORD *ir)
 {
-    static int s_dwMods = 0;
+    স্থির পূর্ণাঙ্ক s_dwMods = 0;
 
     char_u *action = dict_get_string(args, "event", TRUE);
-    if (action && (STRICMP(action, "keydown") == 0
+    যদি (action && (STRICMP(action, "keydown") == 0
 					|| STRICMP(action, "keyup") == 0))
     {
-	BOOL isKeyDown = STRICMP(action, "keydown") == 0;
-	WORD vkCode = dict_get_number_def(args, "keycode", 0);
-	if (vkCode <= 0 || vkCode >= 0xFF)
+	BOOL is_চাবি_Down = STRICMP(action, "keydown") == 0;
+	WORD vkCode = dict_get_সংখ্যা_def(args, "keycode", 0);
+	যদি (vkCode <= 0 || vkCode >= 0xFF)
 	{
 	    semsg(_(e_invalid_argument_nr), (long)vkCode);
-	    return FALSE;
+	    ঘূৰাই FALSE;
 	}
 
-	ir->EventType = KEY_EVENT;
-	KEY_EVENT_RECORD ker;
-	ZeroMemory(&ker, sizeof(ker));
-	ker.bKeyDown = isKeyDown;
-	ker.wRepeatCount = 1;
+	ir->EventType = চাবি_EVENT;
+	চাবি_EVENT_RECORD ker;
+	ZeroMemory(&ker, পরিমাণ(ker));
+	ker.b_চাবি_Down = is_চাবি_Down;
+	ker.w_Repeat_গুনতি = 1;
 	ker.wVirtualScanCode = 0;
-	ker.dwControlKeyState = 0;
-	int mods = (int)dict_get_number(args, "modifiers");
+	ker.dw_Control_চাবি_State = 0;
+	পূর্ণাঙ্ক mods = (পূর্ণাঙ্ক)dict_get_সংখ্যা(args, "modifiers");
 	// Encode the win32 console key modifiers from Vim keyboard modifiers.
-	if (mods)
+	যদি (mods)
 	{
 	    // If "modifiers" is explicitly set in the args, then we reset any
 	    // remembered modifier key state that may have been set from
 	    // earlier mod-key-down events, even if they are not yet unset by
 	    // earlier mod-key-up events.
 	    s_dwMods = 0;
-	    if (mods & MOD_MASK_SHIFT)
-		ker.dwControlKeyState |= SHIFT_PRESSED;
-	    if (mods & MOD_MASK_CTRL)
-		ker.dwControlKeyState |= LEFT_CTRL_PRESSED;
-	    if (mods & MOD_MASK_ALT)
-		ker.dwControlKeyState |= LEFT_ALT_PRESSED;
+	    যদি (mods & MOD_MASK_SHIFT)
+		ker.dw_Control_চাবি_State |= SHIFT_PRESSED;
+	    যদি (mods & MOD_MASK_CTRL)
+		ker.dw_Control_চাবি_State |= বাম_CTRL_PRESSED;
+	    যদি (mods & MOD_MASK_ALT)
+		ker.dw_Control_চাবি_State |= বাম_ALT_PRESSED;
 	}
 
-	if (vkCode == VK_LSHIFT || vkCode == VK_RSHIFT || vkCode == VK_SHIFT)
+	যদি (vkCode == VK_LSHIFT || vkCode == VK_RSHIFT || vkCode == VK_SHIFT)
 	{
-	    if (isKeyDown)
+	    যদি (is_চাবি_Down)
 		s_dwMods |= SHIFT_PRESSED;
-	    else
+	    অন্যথা
 		s_dwMods &= ~SHIFT_PRESSED;
 	}
-	else if (vkCode == VK_LCONTROL || vkCode == VK_CONTROL)
+	অন্যথা যদি (vkCode == VK_LCONTROL || vkCode == VK_CONTROL)
 	{
-	    if (isKeyDown)
-		s_dwMods |= LEFT_CTRL_PRESSED;
-	    else
-		s_dwMods &= ~LEFT_CTRL_PRESSED;
+	    যদি (is_চাবি_Down)
+		s_dwMods |= বাম_CTRL_PRESSED;
+	    অন্যথা
+		s_dwMods &= ~বাম_CTRL_PRESSED;
 	}
-	else if (vkCode == VK_RCONTROL)
+	অন্যথা যদি (vkCode == VK_RCONTROL)
 	{
-	    if (isKeyDown)
-		s_dwMods |= RIGHT_CTRL_PRESSED;
-	    else
-		s_dwMods &= ~RIGHT_CTRL_PRESSED;
+	    যদি (is_চাবি_Down)
+		s_dwMods |= ডান_CTRL_PRESSED;
+	    অন্যথা
+		s_dwMods &= ~ডান_CTRL_PRESSED;
 	}
-	else if (vkCode == VK_LMENU || vkCode == VK_MENU)
+	অন্যথা যদি (vkCode == VK_LMENU || vkCode == VK_MENU)
 	{
-	    if (isKeyDown)
-		s_dwMods |= LEFT_ALT_PRESSED;
-	    else
-		s_dwMods &= ~LEFT_ALT_PRESSED;
+	    যদি (is_চাবি_Down)
+		s_dwMods |= বাম_ALT_PRESSED;
+	    অন্যথা
+		s_dwMods &= ~বাম_ALT_PRESSED;
 	}
-	else if (vkCode == VK_RMENU)
+	অন্যথা যদি (vkCode == VK_RMENU)
 	{
-	    if (isKeyDown)
-		s_dwMods |= RIGHT_ALT_PRESSED;
-	    else
-		s_dwMods &= ~RIGHT_ALT_PRESSED;
+	    যদি (is_চাবি_Down)
+		s_dwMods |= ডান_ALT_PRESSED;
+	    অন্যথা
+		s_dwMods &= ~ডান_ALT_PRESSED;
 	}
-	ker.dwControlKeyState |= s_dwMods;
-	ker.wVirtualKeyCode = vkCode;
+	ker.dw_Control_চাবি_State |= s_dwMods;
+	ker.w_Virtual_চাবি_Code = vkCode;
 	ker.uChar.UnicodeChar = 0;
-	ir->Event.KeyEvent = ker;
+	ir->Event.চাবি_Event_2 = ker;
 	vim_free(action);
     }
-    else
+    অন্যথা
     {
-	if (action == NULL)
+	যদি (action == রিক্ত)
 	{
 	    semsg(_(e_missing_argument_str), "event");
 	}
-	else
+	অন্যথা
 	{
-	    semsg(_(e_invalid_value_for_argument_str_str), "event", action);
+	    semsg(_(e_invalid_মান_for_argument_str_str), "event", action);
 	    vim_free(action);
 	}
-	return FALSE;
+	ঘূৰাই FALSE;
     }
-    return TRUE;
+    ঘূৰাই TRUE;
 }
 # endif  // FEAT_EVAL
 #endif // !FEAT_GUI_MSWIN || VIMDLL
@@ -1345,41 +1345,41 @@ encode_key_event(dict_T *args, INPUT_RECORD *ir)
 /*
  * For the GUI the mouse handling is in gui_w32.c.
  */
-#if !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
-static int g_fMouseAvail = FALSE;   // mouse present
-static int g_fMouseActive = FALSE;  // mouse enabled
-static int g_nMouseClick = -1;	    // mouse status
-static int g_xMouse;		    // mouse x coordinate
-static int g_yMouse;		    // mouse y coordinate
-static DWORD g_cmodein = 0;	    // Original console input mode
-static DWORD g_cmodeout = 0;	    // Original console output mode
+#যদি !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
+স্থির পূর্ণাঙ্ক g_fMouseAvail = FALSE;   // mouse present
+স্থির পূর্ণাঙ্ক g_fMouseActive = FALSE;  // mouse enabled
+স্থির পূর্ণাঙ্ক g_nMouseClick = -1;	    // mouse status
+স্থির পূর্ণাঙ্ক g_xMouse;		    // mouse x coordinate
+স্থির পূর্ণাঙ্ক g_yMouse;		    // mouse y coordinate
+স্থির DWORD g_cmodein = 0;	    // Original console input mode
+স্থির DWORD g_cmodeout = 0;	    // Original console output mode
 
 /*
  * Enable or disable mouse input
  */
-    void
-mch_setmouse(int on)
+    শূন্য
+mch_setmouse(পূর্ণাঙ্ক on)
 {
     DWORD cmodein;
 
 # ifdef VIMDLL
-    if (gui.in_use)
-	return;
+    যদি (gui.in_use)
+	ঘূৰাই;
 # endif
-    if (!g_fMouseAvail)
-	return;
+    যদি (!g_fMouseAvail)
+	ঘূৰাই;
 
     g_fMouseActive = on;
     GetConsoleMode(g_hConIn, &cmodein);
 
-    if (g_fMouseActive)
+    যদি (g_fMouseActive)
     {
-	cmodein |= ENABLE_MOUSE_INPUT;
+	cmodein |= ENABLE_MOUSE_প্ৰবেশ;
 	cmodein &= ~ENABLE_QUICK_EDIT_MODE;
     }
-    else
+    অন্যথা
     {
-	cmodein &= ~ENABLE_MOUSE_INPUT;
+	cmodein &= ~ENABLE_MOUSE_প্ৰবেশ;
 	cmodein |= g_cmodein & ENABLE_QUICK_EDIT_MODE;
     }
 
@@ -1387,12 +1387,12 @@ mch_setmouse(int on)
 }
 
 
-# if defined(FEAT_BEVAL_TERM)
+# যদি defined(FEAT_BEVAL_TERM)
 /*
  * Called when 'balloonevalterm' changed.
  */
-    void
-mch_bevalterm_changed(void)
+    শূন্য
+mch_bevalterm_changed(শূন্য)
 {
     mch_setmouse(g_fMouseActive);
 }
@@ -1419,20 +1419,20 @@ mch_bevalterm_changed(void)
  *       the wheel was rotated forward, away from the user.
  *    -  Otherwise, the wheel was rotated backward, toward the user.
  */
-    static void
+    স্থির শূন্য
 decode_mouse_wheel(MOUSE_EVENT_RECORD *pmer)
 {
-    int	    horizontal = (pmer->dwEventFlags == MOUSE_HWHEELED);
-    int	    zDelta = pmer->dwButtonState;
+    পূর্ণাঙ্ক	    horizontal = (pmer->dwEventFlags == MOUSE_HWHEELED);
+    পূর্ণাঙ্ক	    zDelta = pmer->dwButtonState;
 
     g_xMouse = pmer->dwMousePosition.X;
     g_yMouse = pmer->dwMousePosition.Y;
 
 # ifdef FEAT_PROP_POPUP
-    int lcol = g_xMouse;
-    int lrow = g_yMouse;
+    পূর্ণাঙ্ক lcol = g_xMouse;
+    পূর্ণাঙ্ক lrow = g_yMouse;
     win_T *wp = mouse_find_win(&lrow, &lcol, FIND_POPUP);
-    if (wp != NULL && popup_is_popup(wp))
+    যদি (wp != রিক্ত && popup_is_popup(wp))
     {
 	g_nMouseClick = -1;
 	cmdarg_T cap;
@@ -1440,12 +1440,12 @@ decode_mouse_wheel(MOUSE_EVENT_RECORD *pmer)
 	CLEAR_FIELD(cap);
 	clear_oparg(&oa);
 	cap.oap = &oa;
-	if (horizontal)
+	যদি (horizontal)
 	{
-	    cap.arg = zDelta < 0 ? MSCR_LEFT : MSCR_RIGHT;
+	    cap.arg = zDelta < 0 ? MSCR_বাম : MSCR_ডান;
 	    cap.cmdchar = zDelta < 0 ? K_MOUSELEFT : K_MOUSERIGHT;
 	}
-	else
+	অন্যথা
 	{
 	    cap.cmdchar = zDelta < 0 ? K_MOUSEUP : K_MOUSEDOWN;
 	    cap.arg = zDelta < 0 ? MSCR_UP : MSCR_DOWN;
@@ -1467,24 +1467,24 @@ decode_mouse_wheel(MOUSE_EVENT_RECORD *pmer)
     char_u direction = 0;
 
     // Decode the direction into an event that Vim can process
-    if (horizontal)
+    যদি (horizontal)
 	direction = zDelta >= 0 ? KE_MOUSELEFT : KE_MOUSERIGHT;
-    else
+    অন্যথা
 	direction = zDelta >= 0 ? KE_MOUSEDOWN : KE_MOUSEUP;
 
     // Decode the win32 console key modifiers into Vim mouse modifiers.
-    if (pmer->dwControlKeyState & SHIFT_PRESSED)
+    যদি (pmer->dw_Control_চাবি_State & SHIFT_PRESSED)
 	modifiers |= MOD_MASK_SHIFT; // MOUSE_SHIFT;
-    if (pmer->dwControlKeyState & (RIGHT_CTRL_PRESSED | LEFT_CTRL_PRESSED))
+    যদি (pmer->dw_Control_চাবি_State & (ডান_CTRL_PRESSED | বাম_CTRL_PRESSED))
 	modifiers |= MOD_MASK_CTRL; // MOUSE_CTRL;
-    if (pmer->dwControlKeyState & (RIGHT_ALT_PRESSED  | LEFT_ALT_PRESSED))
+    যদি (pmer->dw_Control_চাবি_State & (ডান_ALT_PRESSED  | বাম_ALT_PRESSED))
 	modifiers |= MOD_MASK_ALT; // MOUSE_ALT;
 
     // add (bitwise or) the scroll direction and the key modifier chars
     // together.
     g_nMouseClick = ((direction << 8) | modifiers);
 
-    return;
+    ঘূৰাই;
 }
 
 /*
@@ -1514,198 +1514,198 @@ decode_mouse_wheel(MOUSE_EVENT_RECORD *pmer)
  * so we need to delay a little.  Also, we tend not to get MOUSE_RELEASE
  * in such cases, if the user is clicking quickly.
  */
-    static BOOL
+    স্থির BOOL
 decode_mouse_event(
     MOUSE_EVENT_RECORD *pmer)
 {
-    static int s_nOldButton = -1;
-    static int s_nOldMouseClick = -1;
-    static int s_xOldMouse = -1;
-    static int s_yOldMouse = -1;
-    static linenr_T s_old_topline = 0;
+    স্থির পূর্ণাঙ্ক s_nOldButton = -1;
+    স্থির পূর্ণাঙ্ক s_nOldMouseClick = -1;
+    স্থির পূর্ণাঙ্ক s_xOldMouse = -1;
+    স্থির পূর্ণাঙ্ক s_yOldMouse = -1;
+    স্থির linenr_T s_old_topline = 0;
 # ifdef FEAT_DIFF
-    static int s_old_topfill = 0;
+    স্থির পূর্ণাঙ্ক s_old_topfill = 0;
 # endif
-    static int s_cClicks = 1;
-    static BOOL s_fReleased = TRUE;
-    static DWORD s_dwLastClickTime = 0;
-    static BOOL s_fNextIsMiddle = FALSE;
+    স্থির পূর্ণাঙ্ক s_cClicks = 1;
+    স্থির BOOL s_fReleased = TRUE;
+    স্থির DWORD s_dwLastClickTime = 0;
+    স্থির BOOL s_f_Next_Is_মধ্য = FALSE;
 
-    static DWORD cButtons = 0;	// number of buttons supported
+    স্থির DWORD cButtons = 0;	// number of buttons supported
 
-    const DWORD LEFT = FROM_LEFT_1ST_BUTTON_PRESSED;
-    const DWORD MIDDLE = FROM_LEFT_2ND_BUTTON_PRESSED;
-    const DWORD RIGHT = RIGHTMOST_BUTTON_PRESSED;
-    const DWORD LEFT_RIGHT = LEFT | RIGHT;
+    ধ্রুৱ DWORD বাম_2 = FROM_বাম_1_ST_BUTTON_PRESSED;
+    ধ্রুৱ DWORD মধ্য = FROM_বাম_2_ND_BUTTON_PRESSED;
+    ধ্রুৱ DWORD ডান_2 = RIGHTMOST_BUTTON_PRESSED;
+    ধ্রুৱ DWORD বাম_ডান = বাম_2 | ডান_2;
 
-    int nButton;
+    পূর্ণাঙ্ক nButton;
 
-    if (cButtons == 0 && !GetNumberOfConsoleMouseButtons(&cButtons))
+    যদি (cButtons == 0 && !Get_সংখ্যা_Of_Console_Mouse_Buttons(&cButtons))
 	cButtons = 2;
 
-    if (!g_fMouseAvail || !g_fMouseActive)
+    যদি (!g_fMouseAvail || !g_fMouseActive)
     {
 	g_nMouseClick = -1;
-	return FALSE;
+	ঘূৰাই FALSE;
     }
 
     // get a spurious MOUSE_EVENT immediately after receiving focus; ignore
-    if (g_fJustGotFocus)
+    যদি (g_fJustGotFocus)
     {
 	g_fJustGotFocus = FALSE;
-	return FALSE;
+	ঘূৰাই FALSE;
     }
 
     // If there is an unprocessed mouse click drop this one.
-    if (g_nMouseClick != -1)
-	return TRUE;
+    যদি (g_nMouseClick != -1)
+	ঘূৰাই TRUE;
 
-    if (pmer->dwEventFlags == MOUSE_WHEELED
+    যদি (pmer->dwEventFlags == MOUSE_WHEELED
 				       || pmer->dwEventFlags == MOUSE_HWHEELED)
     {
 	decode_mouse_wheel(pmer);
-	return TRUE;  // we now should have a mouse scroll in g_nMouseClick
+	ঘূৰাই TRUE;  // we now should have a mouse scroll in g_nMouseClick
     }
 
     nButton = -1;
     g_xMouse = pmer->dwMousePosition.X;
     g_yMouse = pmer->dwMousePosition.Y;
 
-    if (pmer->dwEventFlags == MOUSE_MOVED)
+    যদি (pmer->dwEventFlags == MOUSE_MOVED)
     {
 	// Ignore MOUSE_MOVED events if (x, y) hasn't changed.	(We get these
 	// events even when the mouse moves only within a char cell.)
-	if (s_xOldMouse == g_xMouse && s_yOldMouse == g_yMouse)
-	    return FALSE;
+	যদি (s_xOldMouse == g_xMouse && s_yOldMouse == g_yMouse)
+	    ঘূৰাই FALSE;
     }
 
     // If no buttons are pressed...
-    if ((pmer->dwButtonState & ((1 << cButtons) - 1)) == 0)
+    যদি ((pmer->dwButtonState & ((1 << cButtons) - 1)) == 0)
     {
 	nButton = MOUSE_RELEASE;
 
 	// If the last thing returned was MOUSE_RELEASE, ignore this
-	if (s_fReleased)
+	যদি (s_fReleased)
 	{
 # ifdef FEAT_BEVAL_TERM
 	    // do return mouse move events when we want them
-	    if (p_bevalterm)
+	    যদি (p_bevalterm)
 		nButton = MOUSE_DRAG;
-	    else
+	    অন্যথা
 # endif
-		return FALSE;
+		ঘূৰাই FALSE;
 	}
 
 	s_fReleased = TRUE;
     }
-    else    // one or more buttons pressed
+    অন্যথা    // one or more buttons pressed
     {
 	// on a 2-button mouse, hold down left and right buttons
 	// simultaneously to get MIDDLE.
 
-	if (cButtons == 2 && s_nOldButton != MOUSE_DRAG)
+	যদি (cButtons == 2 && s_nOldButton != MOUSE_DRAG)
 	{
-	    DWORD dwLR = (pmer->dwButtonState & LEFT_RIGHT);
+	    DWORD dwLR = (pmer->dwButtonState & বাম_ডান);
 
 	    // if either left or right button only is pressed, see if the
 	    // next mouse event has both of them pressed
-	    if (dwLR == LEFT || dwLR == RIGHT)
+	    যদি (dwLR == বাম_2 || dwLR == ডান_2)
 	    {
-		for (;;)
+		বাবে (;;)
 		{
 		    // wait a short time for next input event
-		    if (WaitForSingleObject(g_hConIn, p_mouset / 3)
+		    যদি (WaitForSingleObject(g_hConIn, p_mouset / 3)
 							     != WAIT_OBJECT_0)
-			break;
-		    else
+			ভঙ্গ;
+		    অন্যথা
 		    {
 			DWORD cRecords = 0;
-			INPUT_RECORD ir;
+			প্ৰবেশ_RECORD ir;
 			MOUSE_EVENT_RECORD* pmer2 = &ir.Event.MouseEvent;
 
-			peek_console_input(g_hConIn, &ir, 1, &cRecords);
+			peek_console_প্ৰবেশ(g_hConIn, &ir, 1, &cRecords);
 
-			if (cRecords == 0 || ir.EventType != MOUSE_EVENT
-				|| !(pmer2->dwButtonState & LEFT_RIGHT))
-			    break;
-			else
+			যদি (cRecords == 0 || ir.EventType != MOUSE_EVENT
+				|| !(pmer2->dwButtonState & বাম_ডান))
+			    ভঙ্গ;
+			অন্যথা
 			{
-			    if (pmer2->dwEventFlags != MOUSE_MOVED)
+			    যদি (pmer2->dwEventFlags != MOUSE_MOVED)
 			    {
-				read_console_input(g_hConIn, &ir, 1, &cRecords);
+				read_console_প্ৰবেশ(g_hConIn, &ir, 1, &cRecords);
 
-				return decode_mouse_event(pmer2);
+				ঘূৰাই decode_mouse_event(pmer2);
 			    }
-			    else if (s_xOldMouse == pmer2->dwMousePosition.X &&
+			    অন্যথা যদি (s_xOldMouse == pmer2->dwMousePosition.X &&
 				     s_yOldMouse == pmer2->dwMousePosition.Y)
 			    {
 				// throw away spurious mouse move
-				read_console_input(g_hConIn, &ir, 1, &cRecords);
+				read_console_প্ৰবেশ(g_hConIn, &ir, 1, &cRecords);
 
 				// are there any more mouse events in queue?
-				peek_console_input(g_hConIn, &ir, 1, &cRecords);
+				peek_console_প্ৰবেশ(g_hConIn, &ir, 1, &cRecords);
 
-				if (cRecords==0 || ir.EventType != MOUSE_EVENT)
-				    break;
+				যদি (cRecords==0 || ir.EventType != MOUSE_EVENT)
+				    ভঙ্গ;
 			    }
-			    else
-				break;
+			    অন্যথা
+				ভঙ্গ;
 			}
 		    }
 		}
 	    }
 	}
 
-	if (s_fNextIsMiddle)
+	যদি (s_f_Next_Is_মধ্য)
 	{
 	    nButton = (pmer->dwEventFlags == MOUSE_MOVED)
-		? MOUSE_DRAG : MOUSE_MIDDLE;
-	    s_fNextIsMiddle = FALSE;
+		? MOUSE_DRAG : MOUSE_মধ্য;
+	    s_f_Next_Is_মধ্য = FALSE;
 	}
-	else if (cButtons == 2	&&
-	    ((pmer->dwButtonState & LEFT_RIGHT) == LEFT_RIGHT))
+	অন্যথা যদি (cButtons == 2	&&
+	    ((pmer->dwButtonState & বাম_ডান) == বাম_ডান))
 	{
-	    nButton = MOUSE_MIDDLE;
+	    nButton = MOUSE_মধ্য;
 
-	    if (! s_fReleased && pmer->dwEventFlags != MOUSE_MOVED)
+	    যদি (! s_fReleased && pmer->dwEventFlags != MOUSE_MOVED)
 	    {
-		s_fNextIsMiddle = TRUE;
+		s_f_Next_Is_মধ্য = TRUE;
 		nButton = MOUSE_RELEASE;
 	    }
 	}
-	else if ((pmer->dwButtonState & LEFT) == LEFT)
-	    nButton = MOUSE_LEFT;
-	else if ((pmer->dwButtonState & MIDDLE) == MIDDLE)
-	    nButton = MOUSE_MIDDLE;
-	else if ((pmer->dwButtonState & RIGHT) == RIGHT)
-	    nButton = MOUSE_RIGHT;
+	অন্যথা যদি ((pmer->dwButtonState & বাম_2) == বাম_2)
+	    nButton = MOUSE_বাম;
+	অন্যথা যদি ((pmer->dwButtonState & মধ্য) == মধ্য)
+	    nButton = MOUSE_মধ্য;
+	অন্যথা যদি ((pmer->dwButtonState & ডান_2) == ডান_2)
+	    nButton = MOUSE_ডান;
 
-	if (! s_fReleased && ! s_fNextIsMiddle
+	যদি (! s_fReleased && ! s_f_Next_Is_মধ্য
 		&& nButton != s_nOldButton && s_nOldButton != MOUSE_DRAG)
-	    return FALSE;
+	    ঘূৰাই FALSE;
 
-	s_fReleased = s_fNextIsMiddle;
+	s_fReleased = s_f_Next_Is_মধ্য;
     }
 
-    if (pmer->dwEventFlags == 0 || pmer->dwEventFlags == DOUBLE_CLICK)
+    যদি (pmer->dwEventFlags == 0 || pmer->dwEventFlags == DOUBLE_CLICK)
     {
 	// button pressed or released, without mouse moving
-	if (nButton != -1 && nButton != MOUSE_RELEASE)
+	যদি (nButton != -1 && nButton != MOUSE_RELEASE)
 	{
-	    DWORD dwCurrentTime = GetTickCount();
+	    DWORD dwCurrentTime = Get_Tick_গুনতি();
 
-	    if (s_xOldMouse != g_xMouse
+	    যদি (s_xOldMouse != g_xMouse
 		    || s_yOldMouse != g_yMouse
 		    || s_nOldButton != nButton
 		    || s_old_topline != curwin->w_topline
 # ifdef FEAT_DIFF
 		    || s_old_topfill != curwin->w_topfill
 # endif
-		    || (int)(dwCurrentTime - s_dwLastClickTime) > p_mouset)
+		    || (পূর্ণাঙ্ক)(dwCurrentTime - s_dwLastClickTime) > p_mouset)
 	    {
 		s_cClicks = 1;
 	    }
-	    else if (++s_cClicks > 4)
+	    অন্যথা যদি (++s_cClicks > 4)
 	    {
 		s_cClicks = 1;
 	    }
@@ -1713,39 +1713,39 @@ decode_mouse_event(
 	    s_dwLastClickTime = dwCurrentTime;
 	}
     }
-    else if (pmer->dwEventFlags == MOUSE_MOVED)
+    অন্যথা যদি (pmer->dwEventFlags == MOUSE_MOVED)
     {
-	if (nButton != -1 && nButton != MOUSE_RELEASE)
+	যদি (nButton != -1 && nButton != MOUSE_RELEASE)
 	    nButton = MOUSE_DRAG;
 
 	s_cClicks = 1;
     }
 
-    if (nButton == -1)
-	return FALSE;
+    যদি (nButton == -1)
+	ঘূৰাই FALSE;
 
-    if (nButton != MOUSE_RELEASE)
+    যদি (nButton != MOUSE_RELEASE)
 	s_nOldButton = nButton;
 
     g_nMouseClick = nButton;
 
-    if (pmer->dwControlKeyState & SHIFT_PRESSED)
+    যদি (pmer->dw_Control_চাবি_State & SHIFT_PRESSED)
 	g_nMouseClick |= MOUSE_SHIFT;
-    if (pmer->dwControlKeyState & (RIGHT_CTRL_PRESSED | LEFT_CTRL_PRESSED))
+    যদি (pmer->dw_Control_চাবি_State & (ডান_CTRL_PRESSED | বাম_CTRL_PRESSED))
 	g_nMouseClick |= MOUSE_CTRL;
-    if (pmer->dwControlKeyState & (RIGHT_ALT_PRESSED  | LEFT_ALT_PRESSED))
+    যদি (pmer->dw_Control_চাবি_State & (ডান_ALT_PRESSED  | বাম_ALT_PRESSED))
 	g_nMouseClick |= MOUSE_ALT;
 
-    if (nButton != MOUSE_DRAG && nButton != MOUSE_RELEASE)
-	SET_NUM_MOUSE_CLICKS(g_nMouseClick, s_cClicks);
+    যদি (nButton != MOUSE_DRAG && nButton != MOUSE_RELEASE)
+	SET_অঙ্ক_MOUSE_CLICKS(g_nMouseClick, s_cClicks);
 
     // only pass on interesting (i.e., different) mouse events
-    if (s_xOldMouse == g_xMouse
+    যদি (s_xOldMouse == g_xMouse
 	    && s_yOldMouse == g_yMouse
 	    && s_nOldMouseClick == g_nMouseClick)
     {
 	g_nMouseClick = -1;
-	return FALSE;
+	ঘূৰাই FALSE;
     }
 
     s_xOldMouse = g_xMouse;
@@ -1756,169 +1756,169 @@ decode_mouse_event(
 # endif
     s_nOldMouseClick = g_nMouseClick;
 
-    return TRUE;
+    ঘূৰাই TRUE;
 }
 
 # ifdef FEAT_EVAL
-    static int
-encode_mouse_event(dict_T *args, INPUT_RECORD *ir)
+    স্থির পূর্ণাঙ্ক
+encode_mouse_event(dict_T *args, প্ৰবেশ_RECORD *ir)
 {
-    int		button;
-    int		row;
-    int		col;
-    int		repeated_click;
+    পূর্ণাঙ্ক		button;
+    পূর্ণাঙ্ক		row;
+    পূর্ণাঙ্ক		col;
+    পূর্ণাঙ্ক		repeated_click;
     int_u	mods = 0;
-    int		move;
+    পূর্ণাঙ্ক		move;
 
-    if (!dict_has_key(args, "row") || !dict_has_key(args, "col"))
-	return FALSE;
+    যদি (!dict_has_চাবি(args, "row") || !dict_has_চাবি(args, "col"))
+	ঘূৰাই FALSE;
 
     // Note: "move" is optional, requires fewer arguments
-    move = (int)dict_get_bool(args, "move", FALSE);
-    if (!move && (!dict_has_key(args, "button")
-	    || !dict_has_key(args, "multiclick")
-	    || !dict_has_key(args, "modifiers")))
-	return FALSE;
+    move = (পূর্ণাঙ্ক)dict_get_bool(args, "move", FALSE);
+    যদি (!move && (!dict_has_চাবি(args, "button")
+	    || !dict_has_চাবি(args, "multiclick")
+	    || !dict_has_চাবি(args, "modifiers")))
+	ঘূৰাই FALSE;
 
-    row = (int)dict_get_number(args, "row") - 1;
-    col = (int)dict_get_number(args, "col") - 1;
+    row = (পূর্ণাঙ্ক)dict_get_সংখ্যা(args, "row") - 1;
+    col = (পূর্ণাঙ্ক)dict_get_সংখ্যা(args, "col") - 1;
 
     ir->EventType = MOUSE_EVENT;
     MOUSE_EVENT_RECORD mer;
-    ZeroMemory(&mer, sizeof(mer));
+    ZeroMemory(&mer, পরিমাণ(mer));
     mer.dwMousePosition.X  = col;
     mer.dwMousePosition.Y  = row;
 
-    if (move)
+    যদি (move)
     {
 	mer.dwButtonState = 0;
 	mer.dwEventFlags = MOUSE_MOVED;
     }
-    else
+    অন্যথা
     {
-	button = (int)dict_get_number(args, "button");
-	repeated_click = (int)dict_get_number(args, "multiclick");
-	mods = (int)dict_get_number(args, "modifiers");
+	button = (পূর্ণাঙ্ক)dict_get_সংখ্যা(args, "button");
+	repeated_click = (পূর্ণাঙ্ক)dict_get_সংখ্যা(args, "multiclick");
+	mods = (পূর্ণাঙ্ক)dict_get_সংখ্যা(args, "modifiers");
 	// Reset the scroll values to known values.
 	// XXX: Remove this when/if the scroll step is made configurable.
 	mouse_set_hor_scroll_step(6);
 	mouse_set_vert_scroll_step(3);
 
-	switch (button)
+	ৱিকল্প (button)
 	{
-	    case MOUSE_LEFT:
-		mer.dwButtonState = FROM_LEFT_1ST_BUTTON_PRESSED;
+	    পক্ষ MOUSE_বাম:
+		mer.dwButtonState = FROM_বাম_1_ST_BUTTON_PRESSED;
 		mer.dwEventFlags = repeated_click == 1 ? DOUBLE_CLICK : 0;
-		break;
-	    case MOUSE_MIDDLE:
-		mer.dwButtonState = FROM_LEFT_2ND_BUTTON_PRESSED;
+		ভঙ্গ;
+	    পক্ষ MOUSE_মধ্য:
+		mer.dwButtonState = FROM_বাম_2_ND_BUTTON_PRESSED;
 		mer.dwEventFlags = repeated_click == 1 ? DOUBLE_CLICK : 0;
-		break;
-	    case MOUSE_RIGHT:
+		ভঙ্গ;
+	    পক্ষ MOUSE_ডান:
 		mer.dwButtonState = RIGHTMOST_BUTTON_PRESSED;
 		mer.dwEventFlags = repeated_click == 1 ? DOUBLE_CLICK : 0;
-		break;
-	    case MOUSE_RELEASE:
+		ভঙ্গ;
+	    পক্ষ MOUSE_RELEASE:
 		// umm?  Assume Left Release?
 		mer.dwEventFlags = 0;
 
-	    case MOUSE_MOVE:
+	    পক্ষ MOUSE_MOVE:
 		mer.dwButtonState = 0;
 		mer.dwEventFlags = MOUSE_MOVED;
-		break;
-	    case MOUSE_X1:
-		mer.dwButtonState = FROM_LEFT_3RD_BUTTON_PRESSED;
-		break;
-	    case MOUSE_X2:
-		mer.dwButtonState = FROM_LEFT_4TH_BUTTON_PRESSED;
-		break;
-	    case MOUSE_4:  // KE_MOUSEDOWN;
+		ভঙ্গ;
+	    পক্ষ MOUSE_X1:
+		mer.dwButtonState = FROM_বাম_3_RD_BUTTON_PRESSED;
+		ভঙ্গ;
+	    পক্ষ MOUSE_X2:
+		mer.dwButtonState = FROM_বাম_4_TH_BUTTON_PRESSED;
+		ভঙ্গ;
+	    পক্ষ MOUSE_4:  // KE_MOUSEDOWN;
 		mer.dwButtonState = -1;
 		mer.dwEventFlags = MOUSE_WHEELED;
-		break;
-	    case MOUSE_5:  // KE_MOUSEUP;
+		ভঙ্গ;
+	    পক্ষ MOUSE_5:  // KE_MOUSEUP;
 		mer.dwButtonState = +1;
 		mer.dwEventFlags = MOUSE_WHEELED;
-		break;
-	    case MOUSE_6:  // KE_MOUSELEFT;
+		ভঙ্গ;
+	    পক্ষ MOUSE_6:  // KE_MOUSELEFT;
 		mer.dwButtonState = -1;
 		mer.dwEventFlags = MOUSE_HWHEELED;
-		break;
-	    case MOUSE_7:  // KE_MOUSERIGHT;
+		ভঙ্গ;
+	    পক্ষ MOUSE_7:  // KE_MOUSERIGHT;
 		mer.dwButtonState = +1;
 		mer.dwEventFlags = MOUSE_HWHEELED;
-		break;
-	    default:
+		ভঙ্গ;
+	    স্ৱভাৱ:
 		semsg(_(e_invalid_argument_str), "button");
-		return FALSE;
+		ঘূৰাই FALSE;
 	}
     }
 
-    mer.dwControlKeyState = 0;
-    if (mods != 0)
+    mer.dw_Control_চাবি_State = 0;
+    যদি (mods != 0)
     {
 	// Encode the win32 console key modifiers from Vim MOUSE modifiers.
-	if (mods & MOUSE_SHIFT)
-	    mer.dwControlKeyState |= SHIFT_PRESSED;
-	if (mods & MOUSE_CTRL)
-	    mer.dwControlKeyState |= LEFT_CTRL_PRESSED;
-	if (mods & MOUSE_ALT)
-	    mer.dwControlKeyState |= LEFT_ALT_PRESSED;
+	যদি (mods & MOUSE_SHIFT)
+	    mer.dw_Control_চাবি_State |= SHIFT_PRESSED;
+	যদি (mods & MOUSE_CTRL)
+	    mer.dw_Control_চাবি_State |= বাম_CTRL_PRESSED;
+	যদি (mods & MOUSE_ALT)
+	    mer.dw_Control_চাবি_State |= বাম_ALT_PRESSED;
     }
     ir->Event.MouseEvent = mer;
-    return TRUE;
+    ঘূৰাই TRUE;
 }
 # endif  // FEAT_EVAL
 
-    static int
-write_input_record_buffer(INPUT_RECORD* irEvents, int nLength)
+    স্থির পূর্ণাঙ্ক
+write_প্ৰবেশ_record_buffer(প্ৰবেশ_RECORD* irEvents, পূর্ণাঙ্ক nLength)
 {
-    int				nCount = 0;
-    input_record_buffer_node_T	*event_node;
+    পূর্ণাঙ্ক				n_গুনতি = 0;
+    প্ৰবেশ_record_buffer_গ্ৰন্থি_T	*event_গ্ৰন্থি;
 
-    while (nCount < nLength)
+    যেতিয়ালৈ (n_গুনতি < nLength)
     {
-	event_node = alloc(sizeof(input_record_buffer_node_T));
-	if (event_node == NULL)
-	    return -1;
+	event_গ্ৰন্থি = alloc(পরিমাণ(প্ৰবেশ_record_buffer_গ্ৰন্থি_T));
+	যদি (event_গ্ৰন্থি == রিক্ত)
+	    ঘূৰাই -1;
 
-	event_node->ir = irEvents[nCount++];
-	event_node->next = NULL;
+	event_গ্ৰন্থি->ir = irEvents[n_গুনতি++];
+	event_গ্ৰন্থি->next = রিক্ত;
 
-	input_record_buffer.length++;
-	if (input_record_buffer.tail == NULL)
+	প্ৰবেশ_record_buffer.length++;
+	যদি (প্ৰবেশ_record_buffer.tail == রিক্ত)
 	{
-	    input_record_buffer.head = event_node;
-	    input_record_buffer.tail = event_node;
+	    প্ৰবেশ_record_buffer.head = event_গ্ৰন্থি;
+	    প্ৰবেশ_record_buffer.tail = event_গ্ৰন্থি;
 	}
-	else
+	অন্যথা
 	{
-	    input_record_buffer.tail->next = event_node;
-	    input_record_buffer.tail = input_record_buffer.tail->next;
+	    প্ৰবেশ_record_buffer.tail->next = event_গ্ৰন্থি;
+	    প্ৰবেশ_record_buffer.tail = প্ৰবেশ_record_buffer.tail->next;
 	}
     }
-    return nCount;
+    ঘূৰাই n_গুনতি;
 }
 
-    static int
-read_input_record_buffer(INPUT_RECORD* irEvents, int nMaxLength)
+    স্থির পূর্ণাঙ্ক
+read_প্ৰবেশ_record_buffer(প্ৰবেশ_RECORD* irEvents, পূর্ণাঙ্ক nMaxLength)
 {
-    int nCount = 0;
-    while (nCount < nMaxLength && input_record_buffer.head != NULL)
+    পূর্ণাঙ্ক n_গুনতি = 0;
+    যেতিয়ালৈ (n_গুনতি < nMaxLength && প্ৰবেশ_record_buffer.head != রিক্ত)
     {
-	input_record_buffer.length--;
-	input_record_buffer_node_T *pop_head = input_record_buffer.head;
-	irEvents[nCount++] = pop_head->ir;
-	input_record_buffer.head = pop_head->next;
-	vim_free(pop_head);
-	if (input_record_buffer.length == 0)
-	    input_record_buffer.tail = NULL;
+	প্ৰবেশ_record_buffer.length--;
+	প্ৰবেশ_record_buffer_গ্ৰন্থি_T *বেৰ_কৰো_head = প্ৰবেশ_record_buffer.head;
+	irEvents[n_গুনতি++] = বেৰ_কৰো_head->ir;
+	প্ৰবেশ_record_buffer.head = বেৰ_কৰো_head->next;
+	vim_free(বেৰ_কৰো_head);
+	যদি (প্ৰবেশ_record_buffer.length == 0)
+	    প্ৰবেশ_record_buffer.tail = রিক্ত;
     }
-    return nCount;
+    ঘূৰাই n_গুনতি;
 }
-#else  // FEAT_GUI_MSWIN && !VIMDLL
-    void
-mch_setmouse(int on UNUSED)
+#অন্যথা  // FEAT_GUI_MSWIN && !VIMDLL
+    শূন্য
+mch_setmouse(পূর্ণাঙ্ক on UNUSED)
 {
 }
 #endif // FEAT_GUI_MSWIN && !VIMDLL
@@ -1941,115 +1941,115 @@ mch_setmouse(int on UNUSED)
  * Note: INPUT_RECORDs are only used by the Windows console, not the GUI.  The
  * GUI sends MSG structs instead.
  */
-    int
+    পূর্ণাঙ্ক
 test_mswin_event(char_u *event, dict_T *args)
 {
-    int lpEventsWritten = 0;
+    পূর্ণাঙ্ক lpEventsWritten = 0;
 
-# if defined(VIMDLL) || defined(FEAT_GUI_MSWIN)
-    if (gui.in_use)
-	return test_gui_w32_sendevent(event, args);
+# যদি defined(VIMDLL) || defined(FEAT_GUI_MSWIN)
+    যদি (gui.in_use)
+	ঘূৰাই test_gui_w32_sendevent(event, args);
 # endif
 
-# if defined(VIMDLL) || !defined(FEAT_GUI_MSWIN)
+# যদি defined(VIMDLL) || !defined(FEAT_GUI_MSWIN)
 
 // Currently implemented event record types are; KEY_EVENT and MOUSE_EVENT
 // Potentially could also implement: FOCUS_EVENT and WINDOW_BUFFER_SIZE_EVENT
 // Maybe also:  MENU_EVENT
 
-    INPUT_RECORD ir;
-    BOOL input_encoded = FALSE;
+    প্ৰবেশ_RECORD ir;
+    BOOL প্ৰবেশ_encoded = FALSE;
     BOOL execute = FALSE;
-    if (STRCMP(event, "key") == 0)
+    যদি (STRCMP(event, "key") == 0)
     {
 	execute = dict_get_bool(args, "execute", FALSE);
-	if (dict_has_key(args, "event"))
-	    input_encoded = encode_key_event(args, &ir);
-	else if (!execute)
+	যদি (dict_has_চাবি(args, "event"))
+	    প্ৰবেশ_encoded = encode_চাবি_event(args, &ir);
+	অন্যথা যদি (!execute)
 	{
 	    semsg(_(e_missing_argument_str), "event");
-	    return FALSE;
+	    ঘূৰাই FALSE;
 	}
     }
-    else if (STRCMP(event, "mouse") == 0)
+    অন্যথা যদি (STRCMP(event, "mouse") == 0)
     {
 	execute = TRUE;
-	input_encoded = encode_mouse_event(args, &ir);
+	প্ৰবেশ_encoded = encode_mouse_event(args, &ir);
     }
-    else
+    অন্যথা
     {
-	semsg(_(e_invalid_value_for_argument_str_str), "event", event);
-	return FALSE;
+	semsg(_(e_invalid_মান_for_argument_str_str), "event", event);
+	ঘূৰাই FALSE;
     }
 
     // Ideally, WriteConsoleInput would be used to inject these low-level
     // events.  But, this doesn't work well in the CI test environment.  So
     // implementing an input_record_buffer instead.
-    if (input_encoded)
+    যদি (প্ৰবেশ_encoded)
     {
-	if ((lpEventsWritten = write_input_record_buffer(&ir, 1)) < 0)
+	যদি ((lpEventsWritten = write_প্ৰবেশ_record_buffer(&ir, 1)) < 0)
 	{
 	    semsg(_(e_out_of_memory), "event");
-	    return FALSE;
+	    ঘূৰাই FALSE;
 	}
     }
 
     // Set flags to execute the event, ie. like feedkeys mode X.
-    if (execute)
+    যদি (execute)
     {
-	int save_msg_scroll = msg_scroll;
+	পূর্ণাঙ্ক save_বাৰ্তা_scroll = বাৰ্তা_scroll;
 	// Avoid a 1 second delay when the keys start Insert mode.
-	msg_scroll = FALSE;
-	ch_log(NULL, "test_mswin_event() executing");
+	বাৰ্তা_scroll = FALSE;
+	ch_log(রিক্ত, "test_mswin_event() executing");
 	exec_normal(TRUE, TRUE, TRUE);
-	msg_scroll |= save_msg_scroll;
+	বাৰ্তা_scroll |= save_বাৰ্তা_scroll;
     }
 
 # endif
-    return lpEventsWritten;
+    ঘূৰাই lpEventsWritten;
 }
 #endif // FEAT_EVAL
 
-#if defined(MCH_CURSOR_SHAPE)
+#যদি defined(MCH_CURSOR_SHAPE)
 /*
  * Set the shape of the cursor.
  * 'thickness' can be from 1 (thin) to 99 (block)
  */
-    static void
-mch_set_cursor_shape(int thickness)
+    স্থির শূন্য
+mch_set_cursor_shape(পূর্ণাঙ্ক thickness)
 {
-    if (vtp_working)
+    যদি (vtp_working)
     {
-	if (*T_CSI == NUL)
+	যদি (*T_CSI == NUL)
 	{
 	    // If 't_SI' is not set, use the default cursor styles.
-	    if (thickness < 50)
+	    যদি (thickness < 50)
 		vtp_printf("\033[3 q");	// underline
-	    else
+	    অন্যথা
 		vtp_printf("\033[0 q");	// default
 	}
     }
-    else
+    অন্যথা
     {
 	CONSOLE_CURSOR_INFO ConsoleCursorInfo;
 	ConsoleCursorInfo.dwSize = thickness;
 	ConsoleCursorInfo.bVisible = s_cursor_visible;
 
 	SetConsoleCursorInfo(g_hConOut, &ConsoleCursorInfo);
-	if (s_cursor_visible)
+	যদি (s_cursor_visible)
 	    SetConsoleCursorPosition(g_hConOut, g_coord);
     }
 }
 
-    void
-mch_update_cursor(void)
+    শূন্য
+mch_update_cursor(শূন্য)
 {
-    int		idx;
-    int		thickness;
+    পূর্ণাঙ্ক		idx;
+    পূর্ণাঙ্ক		thickness;
 
 # ifdef VIMDLL
-    if (gui.in_use)
-	return;
+    যদি (gui.in_use)
+	ঘূৰাই;
 # endif
 
     /*
@@ -2057,26 +2057,26 @@ mch_update_cursor(void)
      */
     idx = get_shape_idx(FALSE);
 
-    if (shape_table[idx].shape == SHAPE_BLOCK)
+    যদি (shape_table[idx].shape == SHAPE_BLOCK)
 	thickness = 99;	// 100 doesn't work on W95
-    else
+    অন্যথা
 	thickness = shape_table[idx].percentage;
     mch_set_cursor_shape(thickness);
 }
 #endif
 
-#if !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
+#যদি !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
 /*
  * Handle FOCUS_EVENT.
  */
-    static void
-handle_focus_event(INPUT_RECORD ir)
+    স্থির শূন্য
+handle_focus_event(প্ৰবেশ_RECORD ir)
 {
     g_fJustGotFocus = ir.Event.FocusEvent.bSetFocus;
-    ui_focus_change((int)g_fJustGotFocus);
+    ui_focus_change((পূর্ণাঙ্ক)g_fJustGotFocus);
 }
 
-static void ResizeConBuf(HANDLE hConsole, COORD coordScreen);
+স্থির শূন্য ResizeConBuf(HANDLE hConsole, COORD coordScreen);
 
 /*
  * Wait until console input from keyboard or mouse is available,
@@ -2084,30 +2084,30 @@ static void ResizeConBuf(HANDLE hConsole, COORD coordScreen);
  * When "ignore_input" is TRUE even wait when input is available.
  * Return TRUE if something is available FALSE if not.
  */
-    static int
-WaitForChar(long msec, int ignore_input)
+    স্থির পূর্ণাঙ্ক
+WaitForChar(long msec, পূর্ণাঙ্ক ignore_প্ৰবেশ)
 {
     DWORD	    dwNow = 0, dwEndTime = 0;
-    INPUT_RECORD    ir;
+    প্ৰবেশ_RECORD    ir;
     DWORD	    cRecords;
     WCHAR	    ch, ch2;
 # ifdef FEAT_TIMERS
-    int		    tb_change_cnt = typebuf.tb_change_cnt;
+    পূর্ণাঙ্ক		    tb_change_cnt = typebuf.tb_change_cnt;
 # endif
 
-    if (msec > 0)
+    যদি (msec > 0)
 	// Wait until the specified time has elapsed.
-	dwEndTime = GetTickCount() + msec;
-    else if (msec < 0)
+	dwEndTime = Get_Tick_গুনতি() + msec;
+    অন্যথা যদি (msec < 0)
 	// Wait forever.
 	dwEndTime = INFINITE;
 
     // We need to loop until the end of the time period, because
     // we might get multiple unusable mouse events in that time.
-    for (;;)
+    বাবে (;;)
     {
 	// Only process messages when waiting.
-	if (msec != 0)
+	যদি (msec != 0)
 	{
 # ifdef MESSAGE_QUEUE
 	    parse_queued_messages();
@@ -2120,80 +2120,80 @@ WaitForChar(long msec, int ignore_input)
 # endif
 	}
 
-	if (g_nMouseClick != -1
+	যদি (g_nMouseClick != -1
 # ifdef FEAT_CLIENTSERVER
-		|| (!ignore_input && input_available())
+		|| (!ignore_প্ৰবেশ && প্ৰবেশ_available())
 # endif
 	   )
-	    return TRUE;
+	    ঘূৰাই TRUE;
 
-	if (msec > 0)
+	যদি (msec > 0)
 	{
 	    // If the specified wait time has passed, return.  Beware that
 	    // GetTickCount() may wrap around (overflow).
-	    dwNow = GetTickCount();
-	    if ((int)(dwNow - dwEndTime) >= 0)
-		break;
+	    dwNow = Get_Tick_গুনতি();
+	    যদি ((পূর্ণাঙ্ক)(dwNow - dwEndTime) >= 0)
+		ভঙ্গ;
 	}
-	if (msec != 0)
+	যদি (msec != 0)
 	{
 	    DWORD dwWaitTime = dwEndTime - dwNow;
 
 	    // Don't wait for more than 11 msec to avoid dropping characters,
 	    // check channel while waiting for input and handle a callback from
 	    // 'balloonexpr'.
-	    if (dwWaitTime > 11)
+	    যদি (dwWaitTime > 11)
 		dwWaitTime = 11;
 
 # ifdef FEAT_MZSCHEME
-	    if (mzthreads_allowed() && p_mzq > 0 && (long)dwWaitTime > p_mzq)
+	    যদি (mzthreads_allowed() && p_mzq > 0 && (long)dwWaitTime > p_mzq)
 		dwWaitTime = p_mzq; // don't wait longer than 'mzquantum'
 # endif
 # ifdef FEAT_TIMERS
 	    // When waiting very briefly don't trigger timers.
-	    if (dwWaitTime > 10)
+	    যদি (dwWaitTime > 10)
 	    {
 		long	due_time;
 
 		// Trigger timers and then get the time in msec until the next
 		// one is due.  Wait up to that time.
 		due_time = check_due_timer();
-		if (typebuf.tb_change_cnt != tb_change_cnt)
+		যদি (typebuf.tb_change_cnt != tb_change_cnt)
 		{
 		    // timer may have used feedkeys().
-		    return FALSE;
+		    ঘূৰাই FALSE;
 		}
-		if (due_time > 0 && dwWaitTime > (DWORD)due_time)
+		যদি (due_time > 0 && dwWaitTime > (DWORD)due_time)
 		    dwWaitTime = due_time;
 	    }
 # endif
-	    if (
+	    যদি (
 # ifdef FEAT_CLIENTSERVER
 		    // Wait for either an event on the console input or a
 		    // message in the client-server window.
-		    msg_wait_for_multiple_objects(1, &g_hConIn, FALSE,
+		    বাৰ্তা_wait_for_multiple_objects(1, &g_hConIn, FALSE,
 				  dwWaitTime, QS_SENDMESSAGE) != WAIT_OBJECT_0
-# else
+# অন্যথা
 		    wait_for_single_object(g_hConIn, dwWaitTime)
 							      != WAIT_OBJECT_0
 # endif
 		    )
-		continue;
+		অনুৱর্ত;
 	}
 
 	cRecords = 0;
-	peek_console_input(g_hConIn, &ir, 1, &cRecords);
+	peek_console_প্ৰবেশ(g_hConIn, &ir, 1, &cRecords);
 
 # ifdef FEAT_MBYTE_IME
 	// May have to redraw if the cursor ends up in the wrong place.
 	// Only when not peeking.
-	if (State == MODE_CMDLINE && msg_row == Rows - 1 && msec != 0)
+	যদি (State == MODE_CMDLINE && বাৰ্তা_row == Rows - 1 && msec != 0)
 	{
 	    CONSOLE_SCREEN_BUFFER_INFO csbi;
 
-	    if (GetConsoleScreenBufferInfo(g_hConOut, &csbi))
+	    যদি (GetConsoleScreenBufferInfo(g_hConOut, &csbi))
 	    {
-		if (csbi.dwCursorPosition.Y != msg_row)
+		যদি (csbi.dwCursorPosition.Y != বাৰ্তা_row)
 		{
 		    // The screen is now messed up, must redraw the command
 		    // line and later all the windows.
@@ -2205,148 +2205,148 @@ WaitForChar(long msec, int ignore_input)
 	}
 # endif
 
-	if (cRecords > 0)
+	যদি (cRecords > 0)
 	{
-	    if (ir.EventType == KEY_EVENT && ir.Event.KeyEvent.bKeyDown)
+	    যদি (ir.EventType == চাবি_EVENT && ir.Event.চাবি_Event_2.b_চাবি_Down)
 	    {
 # ifdef FEAT_MBYTE_IME
 		// Windows IME sends two '\n's with only one 'ENTER'.  First:
 		// wVirtualKeyCode == 13. second: wVirtualKeyCode == 0
-		if (ir.Event.KeyEvent.uChar.UnicodeChar == 0
-			&& ir.Event.KeyEvent.wVirtualKeyCode == 13)
+		যদি (ir.Event.চাবি_Event_2.uChar.UnicodeChar == 0
+			&& ir.Event.চাবি_Event_2.w_Virtual_চাবি_Code == 13)
 		{
-		    read_console_input(g_hConIn, &ir, 1, &cRecords);
-		    continue;
+		    read_console_প্ৰবেশ(g_hConIn, &ir, 1, &cRecords);
+		    অনুৱর্ত;
 		}
 # endif
-		if (decode_key_event(&ir.Event.KeyEvent, &ch, &ch2,
-								 NULL, FALSE))
-		    return TRUE;
+		যদি (decode_চাবি_event(&ir.Event.চাবি_Event_2, &ch, &ch2,
+								 রিক্ত, FALSE))
+		    ঘূৰাই TRUE;
 	    }
 
-	    read_console_input(g_hConIn, &ir, 1, &cRecords);
+	    read_console_প্ৰবেশ(g_hConIn, &ir, 1, &cRecords);
 
-	    if (ir.EventType == FOCUS_EVENT)
+	    যদি (ir.EventType == FOCUS_EVENT)
 		handle_focus_event(ir);
-	    else if (ir.EventType == WINDOW_BUFFER_SIZE_EVENT)
+	    অন্যথা যদি (ir.EventType == WINDOW_BUFFER_SIZE_EVENT)
 	    {
 		COORD dwSize = ir.Event.WindowBufferSizeEvent.dwSize;
 
 		// Only call shell_resized() when the size actually changed to
 		// avoid the screen is cleared.
-		if (dwSize.X != Columns || dwSize.Y != Rows)
+		যদি (dwSize.X != Columns || dwSize.Y != Rows)
 		{
 		    CONSOLE_SCREEN_BUFFER_INFO csbi;
 		    GetConsoleScreenBufferInfo(g_hConOut, &csbi);
-		    dwSize.X = csbi.srWindow.Right - csbi.srWindow.Left + 1;
-		    dwSize.Y = csbi.srWindow.Bottom - csbi.srWindow.Top + 1;
-		    if (dwSize.X != Columns || dwSize.Y != Rows)
+		    dwSize.X = csbi.srWindow.ডান_3 - csbi.srWindow.বাম_3 + 1;
+		    dwSize.Y = csbi.srWindow.Bottom - csbi.srWindow.শীৰ্ষ_2 + 1;
+		    যদি (dwSize.X != Columns || dwSize.Y != Rows)
 		    {
 			ResizeConBuf(g_hConOut, dwSize);
 			shell_resized();
 		    }
 		}
 	    }
-	    else if (ir.EventType == MOUSE_EVENT
+	    অন্যথা যদি (ir.EventType == MOUSE_EVENT
 		    && decode_mouse_event(&ir.Event.MouseEvent))
-		return TRUE;
+		ঘূৰাই TRUE;
 	}
-	else if (msec == 0)
-	    break;
+	অন্যথা যদি (msec == 0)
+	    ভঙ্গ;
     }
 
 # ifdef FEAT_CLIENTSERVER
     // Something might have been received while we were waiting.
-    if (input_available())
-	return TRUE;
+    যদি (প্ৰবেশ_available())
+	ঘূৰাই TRUE;
 # endif
 
-    return FALSE;
+    ঘূৰাই FALSE;
 }
 
 /*
  * return non-zero if a character is available
  */
-    int
-mch_char_avail(void)
+    পূর্ণাঙ্ক
+mch_char_avail(শূন্য)
 {
 # ifdef VIMDLL
-    if (gui.in_use)
-	return TRUE;
+    যদি (gui.in_use)
+	ঘূৰাই TRUE;
 # endif
-    return WaitForChar(0L, FALSE);
+    ঘূৰাই WaitForChar(0L, FALSE);
 }
 
-# if defined(FEAT_TERMINAL)
+# যদি defined(FEAT_TERMINAL)
 /*
  * Check for any pending input or messages.
  */
-    int
-mch_check_messages(void)
+    পূর্ণাঙ্ক
+mch_check_messages(শূন্য)
 {
 #  ifdef VIMDLL
-    if (gui.in_use)
-	return TRUE;
+    যদি (gui.in_use)
+	ঘূৰাই TRUE;
 #  endif
-    return WaitForChar(0L, TRUE);
+    ঘূৰাই WaitForChar(0L, TRUE);
 }
 # endif
 
 /*
  * Create the console input.  Used when reading stdin doesn't work.
  */
-    static void
-create_conin(void)
+    স্থির শূন্য
+create_conin(শূন্য)
 {
     g_hConIn =	CreateFile("CONIN$", GENERIC_READ|GENERIC_WRITE,
 			FILE_SHARE_READ|FILE_SHARE_WRITE,
-			(LPSECURITY_ATTRIBUTES) NULL,
-			OPEN_EXISTING, 0, (HANDLE)NULL);
+			(LPSECURITY_ATTRIBUTES) রিক্ত,
+			OPEN_EXISTING, 0, (HANDLE)রিক্ত);
     did_create_conin = TRUE;
 }
 
 /*
  * Get a keystroke or a mouse event, use a blocking wait.
  */
-    static WCHAR
-tgetch(int *pmodifiers, WCHAR *pch2)
+    স্থির WCHAR
+tgetch(পূর্ণাঙ্ক *pmodifiers, WCHAR *pch2)
 {
     WCHAR ch;
 
-    for (;;)
+    বাবে (;;)
     {
-	INPUT_RECORD ir;
+	প্ৰবেশ_RECORD ir;
 	DWORD cRecords = 0;
 
 # ifdef FEAT_CLIENTSERVER
-	(void)WaitForChar(-1L, FALSE);
-	if (input_available())
-	    return 0;
-	if (g_nMouseClick != -1)
-	    return 0;
+	(শূন্য)WaitForChar(-1L, FALSE);
+	যদি (প্ৰবেশ_available())
+	    ঘূৰাই 0;
+	যদি (g_nMouseClick != -1)
+	    ঘূৰাই 0;
 # endif
-	if (read_console_input(g_hConIn, &ir, 1, &cRecords) == 0)
+	যদি (read_console_প্ৰবেশ(g_hConIn, &ir, 1, &cRecords) == 0)
 	{
-	    if (did_create_conin)
+	    যদি (did_create_conin)
 		read_error_exit();
 	    create_conin();
-	    continue;
+	    অনুৱর্ত;
 	}
 
-	if (ir.EventType == KEY_EVENT)
+	যদি (ir.EventType == চাবি_EVENT)
 	{
-	    if (decode_key_event(&ir.Event.KeyEvent, &ch, pch2,
+	    যদি (decode_চাবি_event(&ir.Event.চাবি_Event_2, &ch, pch2,
 							    pmodifiers, TRUE))
-		return ch;
+		ঘূৰাই ch;
 	}
-	else if (ir.EventType == FOCUS_EVENT)
+	অন্যথা যদি (ir.EventType == FOCUS_EVENT)
 	    handle_focus_event(ir);
-	else if (ir.EventType == WINDOW_BUFFER_SIZE_EVENT)
+	অন্যথা যদি (ir.EventType == WINDOW_BUFFER_SIZE_EVENT)
 	    shell_resized();
-	else if (ir.EventType == MOUSE_EVENT)
+	অন্যথা যদি (ir.EventType == MOUSE_EVENT)
 	{
-	    if (decode_mouse_event(&ir.Event.MouseEvent))
-		return 0;
+	    যদি (decode_mouse_event(&ir.Event.MouseEvent))
+		ঘূৰাই 0;
 	}
     }
 }
@@ -2361,42 +2361,42 @@ tgetch(int *pmodifiers, WCHAR *pch2)
  * If time == -1, wait forever for characters.
  * Returns the number of characters read into buf.
  */
-    int
+    পূর্ণাঙ্ক
 mch_inchar(
     char_u	*buf UNUSED,
-    int		maxlen UNUSED,
+    পূর্ণাঙ্ক		maxlen UNUSED,
     long	time UNUSED,
-    int		tb_change_cnt UNUSED)
+    পূর্ণাঙ্ক		tb_change_cnt UNUSED)
 {
-#if !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
+#যদি !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
 
-    int		len;
-    int		c;
+    পূর্ণাঙ্ক		len;
+    পূর্ণাঙ্ক		c;
 # ifdef VIMDLL
 // Extra space for maximum three CSIs. E.g. U+1B6DB -> 0xF0 0x9B 0x9B 0x9B.
 #  define TYPEAHEADSPACE    6
-# else
+# অন্যথা
 #  define TYPEAHEADSPACE    0
 # endif
 # define TYPEAHEADLEN	    (20 + TYPEAHEADSPACE)
-    static char_u   typeahead[TYPEAHEADLEN];	// previously typed bytes.
-    static int	    typeaheadlen = 0;
+    স্থির char_u   typeahead[TYPEAHEADLEN];	// previously typed bytes.
+    স্থির পূর্ণাঙ্ক	    typeaheadlen = 0;
 
 # ifdef VIMDLL
-    if (gui.in_use)
-	return 0;
+    যদি (gui.in_use)
+	ঘূৰাই 0;
 # endif
 
     // First use any typeahead that was kept because "buf" was too small.
-    if (typeaheadlen > 0)
-	goto theend;
+    যদি (typeaheadlen > 0)
+	গচ্ছ theend;
 
-    if (time >= 0)
+    যদি (time >= 0)
     {
-	if (!WaitForChar(time, FALSE))     // no character available
-	    return 0;
+	যদি (!WaitForChar(time, FALSE))     // no character available
+	    ঘূৰাই 0;
     }
-    else    // time == -1, wait forever
+    অন্যথা    // time == -1, wait forever
     {
 	mch_set_winsize_now();	// Allow winsize changes from now on
 
@@ -2405,14 +2405,14 @@ mch_inchar(
 	 * write the autoscript file to disk.  Or cause the CursorHold event
 	 * to be triggered.
 	 */
-	if (!WaitForChar(p_ut, FALSE))
+	যদি (!WaitForChar(p_ut, FALSE))
 	{
-	    if (trigger_cursorhold() && maxlen >= 3)
+	    যদি (trigger_cursorhold() && maxlen >= 3)
 	    {
 		buf[0] = K_SPECIAL;
 		buf[1] = KS_EXTRA;
-		buf[2] = (int)KE_CURSORHOLD;
-		return 3;
+		buf[2] = (পূর্ণাঙ্ক)KE_CURSORHOLD;
+		ঘূৰাই 3;
 	    }
 	    before_blocking();
 	}
@@ -2426,7 +2426,7 @@ mch_inchar(
     g_fCBrkPressed = FALSE;
 
 # ifdef MCH_WRITE_DUMP
-    if (fdDump)
+    যদি (fdDump)
 	fputc('[', fdDump);
 # endif
 
@@ -2434,32 +2434,32 @@ mch_inchar(
     // to get and still room in the buffer.  A mouse event uses up to
     // 10 bytes: 3 (modifier) + 3 (scroll event) + 4 (coordinates), and a
     // keyboard input uses up to 7 bytes: 3 (modifier) + 4 (UTF-8 char).
-    while ((typeaheadlen == 0 || WaitForChar(0L, FALSE))
+    যেতিয়ালৈ ((typeaheadlen == 0 || WaitForChar(0L, FALSE))
 			  && typeaheadlen + 10 + TYPEAHEADSPACE <= TYPEAHEADLEN)
     {
-	if (typebuf_changed(tb_change_cnt))
+	যদি (typebuf_changed(tb_change_cnt))
 	{
 	    // "buf" may be invalid now if a client put something in the
 	    // typeahead buffer and "buf" is in the typeahead buffer.
 	    typeaheadlen = 0;
-	    break;
+	    ভঙ্গ;
 	}
-	if (g_nMouseClick != -1)
+	যদি (g_nMouseClick != -1)
 	{
 # ifdef MCH_WRITE_DUMP
-	    if (fdDump)
+	    যদি (fdDump)
 		fprintf(fdDump, "{%02x @ %d, %d}",
 			g_nMouseClick, g_xMouse, g_yMouse);
 # endif
 	    char_u modifiers = ((char_u *)(&g_nMouseClick))[0];
 	    char_u scroll_dir = ((char_u *)(&g_nMouseClick))[1];
 
-	    if (scroll_dir == KE_MOUSEDOWN
+	    যদি (scroll_dir == KE_MOUSEDOWN
 		    || scroll_dir == KE_MOUSEUP
 		    || scroll_dir == KE_MOUSELEFT
 		    || scroll_dir == KE_MOUSERIGHT)
 	    {
-		if (modifiers > 0)
+		যদি (modifiers > 0)
 		{
 		    // use K_SPECIAL instead of CSI to make mappings work
 		    typeahead[typeaheadlen++] = K_SPECIAL;
@@ -2470,7 +2470,7 @@ mch_inchar(
 		typeahead[typeaheadlen++] = KS_EXTRA;
 		typeahead[typeaheadlen++] = scroll_dir;
 	    }
-	    else
+	    অন্যথা
 	    {
 		typeahead[typeaheadlen++] = ESC + 128;
 		typeahead[typeaheadlen++] = 'M';
@@ -2487,64 +2487,64 @@ mch_inchar(
 
 	    g_nMouseClick = -1;
 	}
-	else
+	অন্যথা
 	{
 	    WCHAR	ch2 = NUL;
-	    int		modifiers = 0;
+	    পূর্ণাঙ্ক		modifiers = 0;
 
 	    c = tgetch(&modifiers, &ch2);
 
-	    c = simplify_key(c, &modifiers);
+	    c = simplify_চাবি(c, &modifiers);
 
 	    // Some chars need adjustment when the Ctrl modifier is used.
-	    ++no_reduce_keys;
-	    c = may_adjust_key_for_ctrl(modifiers, c);
-	    --no_reduce_keys;
+	    ++no_reduce_চাবিগুলি;
+	    c = may_adjust_চাবি_for_ctrl(modifiers, c);
+	    --no_reduce_চাবিগুলি;
 
 	    // remove the SHIFT modifier for keys where it's already included,
 	    // e.g., '(' and '*'
 	    modifiers = may_remove_shift_modifier(modifiers, c);
 
-	    if (typebuf_changed(tb_change_cnt))
+	    যদি (typebuf_changed(tb_change_cnt))
 	    {
 		// "buf" may be invalid now if a client put something in the
 		// typeahead buffer and "buf" is in the typeahead buffer.
 		typeaheadlen = 0;
-		break;
+		ভঙ্গ;
 	    }
 
-	    if (c == Ctrl_C && ctrl_c_interrupts)
+	    যদি (c == Ctrl_C && ctrl_c_interrupts)
 	    {
-# if defined(FEAT_CLIENTSERVER)
-		trash_input_buf();
+# যদি defined(FEAT_CLIENTSERVER)
+		trash_প্ৰবেশ_buf();
 # endif
 		got_int = TRUE;
 	    }
 
-	    if (g_nMouseClick == -1)
+	    যদি (g_nMouseClick == -1)
 	    {
-		int	n = 1;
+		পূর্ণাঙ্ক	n = 1;
 
-		if (ch2 == NUL)
+		যদি (ch2 == NUL)
 		{
-		    int	    i, j;
+		    পূর্ণাঙ্ক	    i, j;
 		    char_u  *p;
 		    WCHAR   ch[2];
 
 		    ch[0] = c;
-		    if (c >= 0xD800 && c <= 0xDBFF)	// High surrogate
+		    যদি (c >= 0xD800 && c <= 0xDBFF)	// High surrogate
 		    {
 			ch[1] = tgetch(&modifiers, &ch2);
 			n++;
 		    }
 		    p = utf16_to_enc(ch, &n);
-		    if (p != NULL)
+		    যদি (p != রিক্ত)
 		    {
-			for (i = 0, j = 0; i < n; i++)
+			বাবে (i = 0, j = 0; i < n; i++)
 			{
 			    typeahead[typeaheadlen + j++] = p[i];
 # ifdef VIMDLL
-			    if (p[i] == CSI)
+			    যদি (p[i] == CSI)
 			    {
 				typeahead[typeaheadlen + j++] = KS_EXTRA;
 				typeahead[typeaheadlen + j++] = KE_CSI;
@@ -2555,11 +2555,11 @@ mch_inchar(
 			vim_free(p);
 		    }
 		}
-		else
+		অন্যথা
 		{
 		    typeahead[typeaheadlen] = c;
 # ifdef VIMDLL
-		    if (c == CSI)
+		    যদি (c == CSI)
 		    {
 			typeahead[typeaheadlen + 1] = KS_EXTRA;
 			typeahead[typeaheadlen + 2] = KE_CSI;
@@ -2567,28 +2567,28 @@ mch_inchar(
 		    }
 # endif
 		}
-		if (ch2 != NUL)
+		যদি (ch2 != NUL)
 		{
-		    if (c == K_NUL)
+		    যদি (c == K_NUL)
 		    {
-			switch (ch2)
+			ৱিকল্প (ch2)
 			{
-			case (WCHAR)'\324': // SHIFT+Insert
-			case (WCHAR)'\325': // CTRL+Insert
-			case (WCHAR)'\327': // SHIFT+Delete
-			case (WCHAR)'\330': // CTRL+Delete
+			পক্ষ (WCHAR)'\324': // SHIFT+Insert
+			পক্ষ (WCHAR)'\325': // CTRL+Insert
+			পক্ষ (WCHAR)'\327': // SHIFT+Delete
+			পক্ষ (WCHAR)'\330': // CTRL+Delete
 			    typeahead[typeaheadlen + n] = (char_u)ch2;
 			    n++;
-			    break;
+			    ভঙ্গ;
 
-			default:
+			স্ৱভাৱ:
 			    typeahead[typeaheadlen + n] = 3;
 			    typeahead[typeaheadlen + n + 1] = (char_u)ch2;
 			    n += 2;
-			    break;
+			    ভঙ্গ;
 			}
 		    }
-		    else
+		    অন্যথা
 		    {
 			typeahead[typeaheadlen + n] = 3;
 			typeahead[typeaheadlen + n + 1] = (char_u)ch2;
@@ -2600,7 +2600,7 @@ mch_inchar(
 		// when it's one byte, the 8th bit isn't set yet and not
 		// using a double-byte encoding (would become a lead
 		// byte).
-		if ((modifiers & MOD_MASK_ALT)
+		যদি ((modifiers & MOD_MASK_ALT)
 			&& n == 1
 			&& (typeahead[typeaheadlen] & 0x80) == 0
 			&& !enc_dbcs
@@ -2611,7 +2611,7 @@ mch_inchar(
 		    modifiers &= ~MOD_MASK_ALT;
 		}
 
-		if (modifiers != 0)
+		যদি (modifiers != 0)
 		{
 		    // Prepend modifiers to the character.
 		    mch_memmove(typeahead + typeaheadlen + 3,
@@ -2624,7 +2624,7 @@ mch_inchar(
 		typeaheadlen += n;
 
 # ifdef MCH_WRITE_DUMP
-		if (fdDump)
+		যদি (fdDump)
 		    fputc(c, fdDump);
 # endif
 	    }
@@ -2632,7 +2632,7 @@ mch_inchar(
     }
 
 # ifdef MCH_WRITE_DUMP
-    if (fdDump)
+    যদি (fdDump)
     {
 	fputs("]\n", fdDump);
 	fflush(fdDump);
@@ -2642,22 +2642,22 @@ mch_inchar(
 theend:
     // Move typeahead to "buf", as much as fits.
     len = 0;
-    while (len < maxlen && typeaheadlen > 0)
+    যেতিয়ালৈ (len < maxlen && typeaheadlen > 0)
     {
 	buf[len++] = typeahead[0];
 	mch_memmove(typeahead, typeahead + 1, --typeaheadlen);
     }
 # ifdef FEAT_EVAL
-    if (len > 0)
+    যদি (len > 0)
     {
 	buf[len] = NUL;
-	ch_log(NULL, "raw key input: \"%s\"", buf);
+	ch_log(রিক্ত, "raw key input: \"%s\"", buf);
     }
 # endif
-    return len;
+    ঘূৰাই len;
 
-#else // FEAT_GUI_MSWIN && !VIMDLL
-    return 0;
+#অন্যথা // FEAT_GUI_MSWIN && !VIMDLL
+    ঘূৰাই 0;
 #endif // FEAT_GUI_MSWIN && !VIMDLL
 }
 
@@ -2667,32 +2667,32 @@ theend:
  * the allocated memory.
  * TODO: Should somehow check if it's really executable.
  */
-    static int
-executable_file(char *name, char_u **path)
+    স্থির পূর্ণাঙ্ক
+executable_file(ৱর্ণ *name, char_u **path)
 {
-    int attrs = win32_getattrs((char_u *)name);
+    পূর্ণাঙ্ক attrs = win32_getattrs((char_u *)name);
 
     // The file doesn't exist or is a folder.
-    if (attrs == -1 || (attrs & FILE_ATTRIBUTE_DIRECTORY))
-	return FALSE;
+    যদি (attrs == -1 || (attrs & FILE_ATTRIBUTE_DIRECTORY))
+	ঘূৰাই FALSE;
     // Check if the file is an AppExecLink, a special alias used by Windows
     // Store for its apps.
-    if (attrs & FILE_ATTRIBUTE_REPARSE_POINT)
+    যদি (attrs & FILE_ATTRIBUTE_REPARSE_POINT)
     {
 	char_u	*res = resolve_appexeclink((char_u *)name);
-	if (res == NULL)
+	যদি (res == রিক্ত)
 	    res = resolve_reparse_point((char_u *)name);
-	if (res == NULL)
-	    return FALSE;
+	যদি (res == রিক্ত)
+	    ঘূৰাই FALSE;
 	// The path is already absolute.
-	if (path != NULL)
+	যদি (path != রিক্ত)
 	    *path = res;
-	else
+	অন্যথা
 	    vim_free(res);
     }
-    else if (path != NULL)
+    অন্যথা যদি (path != রিক্ত)
 	*path = FullName_save((char_u *)name, FALSE);
-    return TRUE;
+    ঘূৰাই TRUE;
 }
 
 /*
@@ -2700,7 +2700,7 @@ executable_file(char *name, char_u **path)
  * An inconclusive search (e.g. a directory which cannot be enumerated) must
  * not skip the normal checks.
  */
-    static bool
+    স্থির bool
 executable_prefix_exists(char_u *name)
 {
     WCHAR		*wn;
@@ -2708,19 +2708,19 @@ executable_prefix_exists(char_u *name)
     HANDLE		handle;
     DWORD		error;
 
-    wn = enc_to_utf16(name, NULL);
-    if (wn == NULL)
-	return true;
+    wn = enc_to_utf16(name, রিক্ত);
+    যদি (wn == রিক্ত)
+	ঘূৰাই true;
     handle = FindFirstFileExW(wn, FindExInfoBasic, &data,
-					    FindExSearchNameMatch, NULL, 0);
+					    Find_Ex_অনুসন্ধান_Name_Match, রিক্ত, 0);
     error = GetLastError();
     vim_free(wn);
-    if (handle != INVALID_HANDLE_VALUE)
+    যদি (handle != INVALID_HANDLE_মান)
     {
 	FindClose(handle);
-	return true;
+	ঘূৰাই true;
     }
-    return error != ERROR_FILE_NOT_FOUND && error != ERROR_PATH_NOT_FOUND;
+    ঘূৰাই error != ERROR_FILE_NOT_FOUND && error != ERROR_PATH_NOT_FOUND;
 }
 
 /*
@@ -2730,48 +2730,48 @@ executable_prefix_exists(char_u *name)
  * When returning TRUE and "path" is not NULL save the path and set "*path" to
  * the allocated memory.
  */
-    static int
+    স্থির পূর্ণাঙ্ক
 executable_exists(
-    char	*name,
+    ৱর্ণ	*name,
     size_t	namelen,
     char_u	**path,
-    int		use_path,
-    int		use_pathext)
+    পূর্ণাঙ্ক		use_path,
+    পূর্ণাঙ্ক		use_pathext)
 {
     // WinNT and later can use _MAX_PATH wide characters for a pathname, which
     // means that the maximum pathname is _MAX_PATH * 3 bytes when 'enc' is
     // UTF-8.
     char_u	buf[_MAX_PATH * 3];
     char_u	*p;
-    string_T	pathbuf = {NULL, 0};
-    int		pathbuf_allocated = FALSE;
-    string_T	pathext = {NULL, 0};
-    int		pathext_allocated = FALSE;
-    char_u	*shname = NULL;
-    int		noext = FALSE;
+    string_T	pathbuf = {রিক্ত, 0};
+    পূর্ণাঙ্ক		pathbuf_allocated = FALSE;
+    string_T	pathext = {রিক্ত, 0};
+    পূর্ণাঙ্ক		pathext_allocated = FALSE;
+    char_u	*shname = রিক্ত;
+    পূর্ণাঙ্ক		noext = FALSE;
     bool	simple_pathext = true;
-    int		ext_count = 0;
-    int		retval = FALSE;
+    পূর্ণাঙ্ক		ext_গুনতি = 0;
+    পূর্ণাঙ্ক		retval = FALSE;
 
-    if (namelen >= sizeof(buf))	// safety check
-	return FALSE;
+    যদি (namelen >= পরিমাণ(buf))	// safety check
+	ঘূৰাই FALSE;
 
     // Using the name directly when a Unix-shell like 'shell'.
     shname = gettail(p_sh);
-    if (strstr((char *)shname, "sh") != NULL &&
-	!(strstr((char *)shname, "powershell") != NULL
-				    || strstr((char *)shname, "pwsh") != NULL))
+    যদি (strstr((ৱর্ণ *)shname, "sh") != রিক্ত &&
+	!(strstr((ৱর্ণ *)shname, "powershell") != রিক্ত
+				    || strstr((ৱর্ণ *)shname, "pwsh") != রিক্ত))
 	noext = TRUE;
 
-    if (use_pathext)
+    যদি (use_pathext)
     {
 	pathext.string = mch_getenv("PATHEXT");
-	if (pathext.string == NULL)
+	যদি (pathext.string == রিক্ত)
 	    STR_LITERAL_SET(pathext, ".com;.exe;.bat;.cmd");
-	else
+	অন্যথা
 	    pathext.length = STRLEN(pathext.string);
 
-	if (noext == FALSE)
+	যদি (noext == FALSE)
 	{
 	    char_u  *e;
 	    char_u  *q;
@@ -2782,32 +2782,32 @@ executable_exists(
 	     * Check "name" ends with extension.
 	     */
 	    p = pathext.string;
-	    while (*p)
+	    যেতিয়ালৈ (*p)
 	    {
-		if (p[0] == ';'
+		যদি (p[0] == ';'
 			    || (p[0] == '.' && (p[1] == NUL || p[1] == ';')))
 		{
 		    // Skip empty or single ".".
-		    if (*p == '.')
+		    যদি (*p == '.')
 			simple_pathext = false;
 		    ++p;
-		    continue;
+		    অনুৱর্ত;
 		}
 		e = vim_strchr(p, ';');
-		if (e == NULL)
+		যদি (e == রিক্ত)
 		    e = pathext.string + pathext.length;
 		plen = (size_t)(e - p);
-		++ext_count;
-		if (*p != '.')
+		++ext_গুনতি;
+		যদি (*p != '.')
 		    simple_pathext = false;
-		for (q = p + 1; q < e; ++q)
-		    if (!ASCII_ISALNUM(*q))
+		বাবে (q = p + 1; q < e; ++q)
+		    যদি (!ASCII_ISALNUM(*q))
 			simple_pathext = false;
 
-		if (_strnicoll(name + namelen - plen, (char *)p, plen) == 0)
+		যদি (_strnicoll(name + namelen - plen, (ৱর্ণ *)p, plen) == 0)
 		{
 		    noext = TRUE;
-		    break;
+		    ভঙ্গ;
 		}
 
 		p = e;
@@ -2816,17 +2816,17 @@ executable_exists(
     }
 
     // Prepend single "." to pathext, it means no extension added.
-    if (pathext.string == NULL)
+    যদি (pathext.string == রিক্ত)
 	STR_LITERAL_SET(pathext, ".");
-    else if (noext == TRUE)
+    অন্যথা যদি (noext == TRUE)
     {
 	char_u  *tmp;
 
 	tmp = alloc(pathext.length + 3);
-	if (tmp == NULL)
+	যদি (tmp == রিক্ত)
 	{
 	    retval = FALSE;
-	    goto theend;
+	    গচ্ছ theend;
 	}
 
 	STRCPY(tmp, ".;");
@@ -2837,22 +2837,22 @@ executable_exists(
     }
 
     // Use $PATH when "use_path" is TRUE and "name" is basename.
-    if (use_path && gettail((char_u *)name) == (char_u *)name)
+    যদি (use_path && gettail((char_u *)name) == (char_u *)name)
     {
 	p = mch_getenv("PATH");
-	if (p != NULL)
+	যদি (p != রিক্ত)
 	{
 	    size_t  plen = STRLEN(p);
 
 	    pathbuf.string = alloc(plen + 3);
-	    if (pathbuf.string == NULL)
+	    যদি (pathbuf.string == রিক্ত)
 	    {
 		retval = FALSE;
-		goto theend;
+		গচ্ছ theend;
 	    }
 
-	    if (mch_getenv("NoDefaultCurrentDirectoryInExePath") == NULL &&
-		    strstr((char *)gettail(p_sh), "cmd.exe") != NULL)
+	    যদি (mch_getenv("NoDefaultCurrentDirectoryInExePath") == রিক্ত &&
+		    strstr((ৱর্ণ *)gettail(p_sh), "cmd.exe") != রিক্ত)
 	    {
 		STRCPY(pathbuf.string, ".;");
 		pathbuf.length = 2;
@@ -2867,40 +2867,40 @@ executable_exists(
      * Walk through all entries in $PATH to check if "name" exists there and
      * is an executable file.
      */
-    if (pathbuf.string == NULL)
+    যদি (pathbuf.string == রিক্ত)
 	STR_LITERAL_SET(pathbuf, ".");
     p = pathbuf.string;
-    while (*p)
+    যেতিয়ালৈ (*p)
     {
 	char_u	*e;
 	size_t	buflen;
 
-	if (*p == ';') // Skip empty entry
+	যদি (*p == ';') // Skip empty entry
 	{
 	    ++p;
-	    continue;
+	    অনুৱর্ত;
 	}
 	e = vim_strchr(p, ';');
-	if (e == NULL)
+	যদি (e == রিক্ত)
 	    e = pathbuf.string + pathbuf.length;
 
-	if (e - p + namelen + 2 > sizeof(buf))
+	যদি (e - p + namelen + 2 > পরিমাণ(buf))
 	{
 	    retval = FALSE;
-	    goto theend;
+	    গচ্ছ theend;
 	}
 	// A single "." that means current dir.
-	if (e - p == 1 && *p == '.')
+	যদি (e - p == 1 && *p == '.')
 	{
 	    STRCPY(buf, name);
 	    buflen = namelen;
 	}
-	else
+	অন্যথা
 	{
 	    buflen = vim_snprintf_safelen(
-		(char *)buf,
-		sizeof(buf),
-		"%.*s%s%s", (int)(e - p), p,
+		(ৱর্ণ *)buf,
+		পরিমাণ(buf),
+		"%.*s%s%s", (পূর্ণাঙ্ক)(e - p), p,
 		!after_pathsep(p, e) ? PATHSEPSTR : "",
 		name);
 	}
@@ -2910,11 +2910,11 @@ executable_exists(
 	// few extensions, or an explicit executable suffix, it is cheaper to
 	// use the normal checks.  Leave unusual paths and suffixes to those
 	// checks as well, to preserve their path normalization and semantics.
-	if (!noext && simple_pathext && ext_count >= 3 && buflen > 0
-		&& buflen + 2 <= sizeof(buf)
+	যদি (!noext && simple_pathext && ext_গুনতি >= 3 && buflen > 0
+		&& buflen + 2 <= পরিমাণ(buf)
 		&& buf[buflen - 1] != '.' && buf[buflen - 1] != ' '
-		&& vim_strpbrk(buf, (char_u *)"*?") == NULL
-		&& vim_strchr(gettail(buf), ':') == NULL)
+		&& vim_strpbrk(buf, (char_u *)"*?") == রিক্ত
+		&& vim_strchr(gettail(buf), ':') == রিক্ত)
 	{
 	    bool exists;
 
@@ -2922,10 +2922,10 @@ executable_exists(
 	    buf[buflen + 1] = NUL;
 	    exists = executable_prefix_exists(buf);
 	    buf[buflen] = NUL;
-	    if (!exists)
+	    যদি (!exists)
 	    {
 		p = e;
-		continue;
+		অনুৱর্ত;
 	    }
 	}
 
@@ -2934,34 +2934,34 @@ executable_exists(
 	 * Check "name" with extension added.
 	 */
 	p = pathext.string;
-	while (*p)
+	যেতিয়ালৈ (*p)
 	{
 	    char_u  *e2;
 
-	    if (*p == ';')
+	    যদি (*p == ';')
 	    {
 		// Skip empty entry
 		++p;
-		continue;
+		অনুৱর্ত;
 	    }
 	    e2 = vim_strchr(p, ';');
-	    if (e2 == NULL)
+	    যদি (e2 == রিক্ত)
 		e2 = pathext.string + pathext.length;
 
-	    if (!(p[0] == '.' && (p[1] == NUL || p[1] == ';')))
+	    যদি (!(p[0] == '.' && (p[1] == NUL || p[1] == ';')))
 	    {
 		// Not a single "." that means no extension is added.
-		if (e2 - p + buflen + 1 > sizeof(buf))
+		যদি (e2 - p + buflen + 1 > পরিমাণ(buf))
 		{
 		    retval = FALSE;
-		    goto theend;
+		    গচ্ছ theend;
 		}
 		vim_strncpy(buf + buflen, p, e2 - p);
 	    }
-	    if (executable_file((char *)buf, path))
+	    যদি (executable_file((ৱর্ণ *)buf, path))
 	    {
 		retval = TRUE;
-		goto theend;
+		গচ্ছ theend;
 	    }
 
 	    p = e2;
@@ -2971,14 +2971,14 @@ executable_exists(
     }
 
 theend:
-    if (pathbuf_allocated)
-	free(pathbuf.string);
-    if (pathext_allocated)
-	free(pathext.string);
-    return retval;
+    যদি (pathbuf_allocated)
+	মুক্ত(pathbuf.string);
+    যদি (pathext_allocated)
+	মুক্ত(pathext.string);
+    ঘূৰাই retval;
 }
 
-#if (defined(__MINGW32__) && __MSVCRT_VERSION__ >= 0x800) || \
+#যদি (defined(__MINGW32__) && __MSVCRT_VERSION__ >= 0x800) || \
 	(defined(_MSC_VER) && _MSC_VER >= 1400)
 /*
  * Bad parameter handler.
@@ -2992,18 +2992,18 @@ theend:
  * NULL/0.  Debug builds will also produce assert dialogs from the CRT, it is
  * worth allowing these to make debugging of issues easier.
  */
-    static void
-bad_param_handler(const wchar_t *expression UNUSED,
-    const wchar_t *function UNUSED,
-    const wchar_t *file UNUSED,
-    unsigned int line UNUSED,
+    স্থির শূন্য
+bad_param_handler(ধ্রুৱ wchar_t *expression UNUSED,
+    ধ্রুৱ wchar_t *function UNUSED,
+    ধ্রুৱ wchar_t *file UNUSED,
+    unsigned পূর্ণাঙ্ক সাৰি UNUSED,
     uintptr_t pReserved UNUSED)
 {
 }
 
 # define SET_INVALID_PARAM_HANDLER \
-	((void)_set_invalid_parameter_handler(bad_param_handler))
-#else
+	((শূন্য)_set_invalid_parameter_handler(bad_param_handler))
+#অন্যথা
 # define SET_INVALID_PARAM_HANDLER
 #endif
 
@@ -3012,11 +3012,11 @@ bad_param_handler(const wchar_t *expression UNUSED,
 /*
  * GUI version of mch_init().
  */
-    static void
-mch_init_g(void)
+    স্থির শূন্য
+mch_init_g(শূন্য)
 {
 # ifndef __MINGW32__
-    extern int _fmode;
+    বাহ্য পূর্ণাঙ্ক _fmode;
 # endif
 
     // Silently handle invalid parameters to CRT functions
@@ -3026,7 +3026,7 @@ mch_init_g(void)
     // for the timestamp test to work on removed floppies.
     SetErrorMode(SEM_FAILCRITICALERRORS);
 
-    _fmode = O_BINARY;		// we do our own CR-LF translation
+    _fmode = O_দ্বিমিক;		// we do our own CR-LF translation
 
     // Specify window size.  Is there a place to get the default from?
     Rows = 25;
@@ -3038,34 +3038,34 @@ mch_init_g(void)
 	size_t	exe_pathlen = (size_t)(gettail(exe_name) - exe_name);
 
 	// Note: 10 is length of 'vimrun.exe'.
-	if (exe_pathlen + 10 >= sizeof(vimrun_location))
+	যদি (exe_pathlen + 10 >= পরিমাণ(vimrun_location))
 	{
-	    if (executable_exists("vimrun.exe", STRLEN_LITERAL("vimrun.exe"),
-		    NULL, TRUE, FALSE))
+	    যদি (executable_exists("vimrun.exe", STRLEN_LITERAL("vimrun.exe"),
+		    রিক্ত, TRUE, FALSE))
 		s_dont_use_vimrun = FALSE;
 	}
-	else
+	অন্যথা
 	{
 	    // First try in same directory as gvim.exe.
-	    if (exe_pathlen > 0)
+	    যদি (exe_pathlen > 0)
 		vim_strncpy(vimrun_location, exe_name, exe_pathlen);
 	    STRCPY(vimrun_location + exe_pathlen, "vimrun.exe");
 
-	    if (mch_getperm(vimrun_location) >= 0)
+	    যদি (mch_getperm(vimrun_location) >= 0)
 	    {
 		char_u  *p;
 		size_t  plen;
 
-		if (exe_pathlen > 0 && *skiptowhite(vimrun_location) != NUL)
+		যদি (exe_pathlen > 0 && *skiptowhite(vimrun_location) != NUL)
 		{
 		    // Enclose path with white space in double quotes.
 		    plen = vim_snprintf_safelen(
-			(char *)vimrun_location,
-			sizeof(vimrun_location),
+			(ৱর্ণ *)vimrun_location,
+			পরিমাণ(vimrun_location),
 			"\"%.*svimrun\" ",
-			(int)exe_pathlen, exe_name);
+			(পূর্ণাঙ্ক)exe_pathlen, exe_name);
 		}
-		else
+		অন্যথা
 		{
 		    // Remove the suffix ('.exe').
 		    vimrun_location[exe_pathlen + 6] = ' ';
@@ -3074,7 +3074,7 @@ mch_init_g(void)
 		}
 
 		p = vim_strnsave(vimrun_location, plen);
-		if (p != NULL)
+		যদি (p != রিক্ত)
 		{
 		    vimrun_path.string = p;
 		    vimrun_path.length = plen;
@@ -3082,15 +3082,15 @@ mch_init_g(void)
 		    s_dont_use_vimrun = FALSE;
 		}
 	    }
-	    else if (executable_exists("vimrun.exe", STRLEN_LITERAL("vimrun.exe"),
-		    NULL, TRUE, FALSE))
+	    অন্যথা যদি (executable_exists("vimrun.exe", STRLEN_LITERAL("vimrun.exe"),
+		    রিক্ত, TRUE, FALSE))
 		s_dont_use_vimrun = FALSE;
 	}
 
 	// Don't give the warning for a missing vimrun.exe right now, but only
 	// when vimrun was supposed to be used.  Don't bother people that do
 	// not need vimrun.exe.
-	if (s_dont_use_vimrun)
+	যদি (s_dont_use_vimrun)
 	    need_vimrun_warning = TRUE;
     }
 
@@ -3098,9 +3098,9 @@ mch_init_g(void)
      * If "findstr.exe" doesn't exist, use "grep -n" for 'grepprg'.
      * Otherwise the default "findstr /n" is used.
      */
-    if (!executable_exists("findstr.exe", STRLEN_LITERAL("findstr.exe"),
-	    NULL, TRUE, FALSE))
-	set_option_value_give_err((char_u *)"grepprg",
+    যদি (!executable_exists("findstr.exe", STRLEN_LITERAL("findstr.exe"),
+	    রিক্ত, TRUE, FALSE))
+	set_option_মান_give_err((char_u *)"grepprg",
 						    0, (char_u *)"grep -n", 0);
 
 # ifdef FEAT_CLIPBOARD
@@ -3113,10 +3113,10 @@ mch_init_g(void)
 
 #endif // FEAT_GUI_MSWIN
 
-#if !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
+#যদি !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
 
-# define SRWIDTH(sr) ((sr).Right - (sr).Left + 1)
-# define SRHEIGHT(sr) ((sr).Bottom - (sr).Top + 1)
+# define SRWIDTH(sr) ((sr).ডান_3 - (sr).বাম_3 + 1)
+# define SRHEIGHT(sr) ((sr).Bottom - (sr).শীৰ্ষ_2 + 1)
 
 /*
  * ClearConsoleBuffer()
@@ -3126,27 +3126,27 @@ mch_init_g(void)
  * Returns:
  *  TRUE on success
  */
-    static BOOL
+    স্থির BOOL
 ClearConsoleBuffer(WORD wAttribute)
 {
     CONSOLE_SCREEN_BUFFER_INFO csbi;
     COORD coord;
-    DWORD NumCells, dummy;
+    DWORD অঙ্ক_Cells, dummy;
 
-    if (!GetConsoleScreenBufferInfo(g_hConOut, &csbi))
-	return FALSE;
+    যদি (!GetConsoleScreenBufferInfo(g_hConOut, &csbi))
+	ঘূৰাই FALSE;
 
-    NumCells = csbi.dwSize.X * csbi.dwSize.Y;
+    অঙ্ক_Cells = csbi.dwSize.X * csbi.dwSize.Y;
     coord.X = 0;
     coord.Y = 0;
-    if (!FillConsoleOutputCharacter(g_hConOut, ' ', NumCells,
+    যদি (!FillConsoleOutputCharacter(g_hConOut, ' ', অঙ্ক_Cells,
 	    coord, &dummy))
-	return FALSE;
-    if (!FillConsoleOutputAttribute(g_hConOut, wAttribute, NumCells,
+	ঘূৰাই FALSE;
+    যদি (!FillConsoleOutputAttribute(g_hConOut, wAttribute, অঙ্ক_Cells,
 	    coord, &dummy))
-	return FALSE;
+	ঘূৰাই FALSE;
 
-    return TRUE;
+    ঘূৰাই TRUE;
 }
 
 /*
@@ -3157,7 +3157,7 @@ ClearConsoleBuffer(WORD wAttribute)
  * Returns:
  *  TRUE on success
  */
-    static BOOL
+    স্থির BOOL
 FitConsoleWindow(
     COORD dwBufferSize,
     BOOL WantAdjust)
@@ -3166,48 +3166,48 @@ FitConsoleWindow(
     COORD dwWindowSize;
     BOOL NeedAdjust = FALSE;
 
-    if (!GetConsoleScreenBufferInfo(g_hConOut, &csbi))
-	return FALSE;
+    যদি (!GetConsoleScreenBufferInfo(g_hConOut, &csbi))
+	ঘূৰাই FALSE;
 
     /*
      * A buffer resize will fail if the current console window does
      * not lie completely within that buffer.  To avoid this, we might
      * have to move and possibly shrink the window.
      */
-    if (csbi.srWindow.Right >= dwBufferSize.X)
+    যদি (csbi.srWindow.ডান_3 >= dwBufferSize.X)
     {
 	dwWindowSize.X = SRWIDTH(csbi.srWindow);
-	if (dwWindowSize.X > dwBufferSize.X)
+	যদি (dwWindowSize.X > dwBufferSize.X)
 	    dwWindowSize.X = dwBufferSize.X;
-	csbi.srWindow.Right = dwBufferSize.X - 1;
-	csbi.srWindow.Left = dwBufferSize.X - dwWindowSize.X;
+	csbi.srWindow.ডান_3 = dwBufferSize.X - 1;
+	csbi.srWindow.বাম_3 = dwBufferSize.X - dwWindowSize.X;
 	NeedAdjust = TRUE;
     }
-    if (csbi.srWindow.Bottom >= dwBufferSize.Y)
+    যদি (csbi.srWindow.Bottom >= dwBufferSize.Y)
     {
 	dwWindowSize.Y = SRHEIGHT(csbi.srWindow);
-	if (dwWindowSize.Y > dwBufferSize.Y)
+	যদি (dwWindowSize.Y > dwBufferSize.Y)
 	    dwWindowSize.Y = dwBufferSize.Y;
 	csbi.srWindow.Bottom = dwBufferSize.Y - 1;
-	csbi.srWindow.Top = dwBufferSize.Y - dwWindowSize.Y;
+	csbi.srWindow.শীৰ্ষ_2 = dwBufferSize.Y - dwWindowSize.Y;
 	NeedAdjust = TRUE;
     }
-    if (NeedAdjust && WantAdjust)
+    যদি (NeedAdjust && WantAdjust)
     {
-	if (!SetConsoleWindowInfo(g_hConOut, TRUE, &csbi.srWindow))
-	    return FALSE;
+	যদি (!SetConsoleWindowInfo(g_hConOut, TRUE, &csbi.srWindow))
+	    ঘূৰাই FALSE;
     }
-    return TRUE;
+    ঘূৰাই TRUE;
 }
 
-typedef struct ConsoleBufferStruct
+প্রকারনির্দেশ সংরচনা ConsoleBufferStruct
 {
     BOOL			IsValid;
     CONSOLE_SCREEN_BUFFER_INFO	Info;
     PCHAR_INFO			Buffer;
     COORD			BufferSize;
     PSMALL_RECT			Regions;
-    int				NumRegions;
+    পূর্ণাঙ্ক				অঙ্ক_Regions;
 } ConsoleBuffer;
 
 /*
@@ -3220,47 +3220,47 @@ typedef struct ConsoleBufferStruct
  *  TRUE if all information was saved; FALSE otherwise
  *  If FALSE, still sets cb->IsValid if buffer characteristics were saved.
  */
-    static BOOL
+    স্থির BOOL
 SaveConsoleBuffer(
     ConsoleBuffer *cb)
 {
-    DWORD NumCells;
+    DWORD অঙ্ক_Cells;
     COORD BufferCoord;
     SMALL_RECT ReadRegion;
     WORD Y, Y_incr;
-    int i, numregions;
+    পূর্ণাঙ্ক i, numregions;
 
-    if (cb == NULL)
-	return FALSE;
+    যদি (cb == রিক্ত)
+	ঘূৰাই FALSE;
 
-    if (!GetConsoleScreenBufferInfo(g_hConOut, &cb->Info))
+    যদি (!GetConsoleScreenBufferInfo(g_hConOut, &cb->Info))
     {
 	cb->IsValid = FALSE;
-	return FALSE;
+	ঘূৰাই FALSE;
     }
     cb->IsValid = TRUE;
 
     // VTP uses alternate screen buffer.
     // No need to save buffer contents for restoration.
-    if (use_alternate_screen_buffer)
-	return TRUE;
+    যদি (use_alternate_screen_buffer)
+	ঘূৰাই TRUE;
 
     /*
      * Allocate a buffer large enough to hold the entire console screen
      * buffer.  If this ConsoleBuffer structure has already been initialized
      * with a buffer of the correct size, then just use that one.
      */
-    if (!cb->IsValid || cb->Buffer == NULL ||
+    যদি (!cb->IsValid || cb->Buffer == রিক্ত ||
 	    cb->BufferSize.X != cb->Info.dwSize.X ||
 	    cb->BufferSize.Y != cb->Info.dwSize.Y)
     {
 	cb->BufferSize.X = cb->Info.dwSize.X;
 	cb->BufferSize.Y = cb->Info.dwSize.Y;
-	NumCells = cb->BufferSize.X * cb->BufferSize.Y;
+	অঙ্ক_Cells = cb->BufferSize.X * cb->BufferSize.Y;
 	vim_free(cb->Buffer);
-	cb->Buffer = ALLOC_MULT(CHAR_INFO, NumCells);
-	if (cb->Buffer == NULL)
-	    return FALSE;
+	cb->Buffer = ALLOC_MULT(CHAR_INFO, অঙ্ক_Cells);
+	যদি (cb->Buffer == রিক্ত)
+	    ঘূৰাই FALSE;
     }
 
     /*
@@ -3273,24 +3273,24 @@ SaveConsoleBuffer(
      * height of each chunk will be (12000 / width).
      */
     BufferCoord.X = 0;
-    ReadRegion.Left = 0;
-    ReadRegion.Right = cb->Info.dwSize.X - 1;
+    ReadRegion.বাম_3 = 0;
+    ReadRegion.ডান_3 = cb->Info.dwSize.X - 1;
     Y_incr = 12000 / cb->Info.dwSize.X;
 
     numregions = (cb->Info.dwSize.Y + Y_incr - 1) / Y_incr;
-    if (cb->Regions == NULL || numregions != cb->NumRegions)
+    যদি (cb->Regions == রিক্ত || numregions != cb->অঙ্ক_Regions)
     {
-	cb->NumRegions = numregions;
+	cb->অঙ্ক_Regions = numregions;
 	vim_free(cb->Regions);
-	cb->Regions = ALLOC_MULT(SMALL_RECT, cb->NumRegions);
-	if (cb->Regions == NULL)
+	cb->Regions = ALLOC_MULT(SMALL_RECT, cb->অঙ্ক_Regions);
+	যদি (cb->Regions == রিক্ত)
 	{
 	    VIM_CLEAR(cb->Buffer);
-	    return FALSE;
+	    ঘূৰাই FALSE;
 	}
     }
 
-    for (i = 0, Y = 0; i < cb->NumRegions; i++, Y += Y_incr)
+    বাবে (i = 0, Y = 0; i < cb->অঙ্ক_Regions; i++, Y += Y_incr)
     {
 	/*
 	 * Read into position (0, Y) in our buffer.
@@ -3302,9 +3302,9 @@ SaveConsoleBuffer(
 	 * a region of size width by Y_incr.  Don't worry if this region is
 	 * too large for the remaining buffer; it will be cropped.
 	 */
-	ReadRegion.Top = Y;
+	ReadRegion.শীৰ্ষ_2 = Y;
 	ReadRegion.Bottom = Y + Y_incr - 1;
-	if (!ReadConsoleOutputW(g_hConOut,	// output handle
+	যদি (!ReadConsoleOutputW(g_hConOut,	// output handle
 		cb->Buffer,			// our buffer
 		cb->BufferSize,			// dimensions of our buffer
 		BufferCoord,			// offset in our buffer
@@ -3312,12 +3312,12 @@ SaveConsoleBuffer(
 	{
 	    VIM_CLEAR(cb->Buffer);
 	    VIM_CLEAR(cb->Regions);
-	    return FALSE;
+	    ঘূৰাই FALSE;
 	}
 	cb->Regions[i] = ReadRegion;
     }
 
-    return TRUE;
+    ঘূৰাই TRUE;
 }
 
 /*
@@ -3329,85 +3329,85 @@ SaveConsoleBuffer(
  * Returns:
  *  TRUE on success
  */
-    static BOOL
+    স্থির BOOL
 RestoreConsoleBuffer(
     ConsoleBuffer   *cb,
     BOOL	    RestoreScreen)
 {
     COORD BufferCoord;
     SMALL_RECT WriteRegion;
-    int i;
+    পূর্ণাঙ্ক i;
 
-    if (cb == NULL || !cb->IsValid)
-	return FALSE;
+    যদি (cb == রিক্ত || !cb->IsValid)
+	ঘূৰাই FALSE;
 
     /*
      * Before restoring the buffer contents, clear the current buffer, and
      * restore the cursor position and window information.  Doing this now
      * prevents old buffer contents from "flashing" onto the screen.
      */
-    if (RestoreScreen)
+    যদি (RestoreScreen)
 	ClearConsoleBuffer(cb->Info.wAttributes);
 
     FitConsoleWindow(cb->Info.dwSize, TRUE);
-    if (!SetConsoleScreenBufferSize(g_hConOut, cb->Info.dwSize))
-	return FALSE;
-    if (!SetConsoleTextAttribute(g_hConOut, cb->Info.wAttributes))
-	return FALSE;
+    যদি (!SetConsoleScreenBufferSize(g_hConOut, cb->Info.dwSize))
+	ঘূৰাই FALSE;
+    যদি (!SetConsoleTextAttribute(g_hConOut, cb->Info.wAttributes))
+	ঘূৰাই FALSE;
 
-    if (!RestoreScreen)
+    যদি (!RestoreScreen)
     {
 	/*
 	 * No need to restore the screen buffer contents, so we're done.
 	 */
-	return TRUE;
+	ঘূৰাই TRUE;
     }
 
-    if (!SetConsoleCursorPosition(g_hConOut, cb->Info.dwCursorPosition))
-	return FALSE;
-    if (!SetConsoleWindowInfo(g_hConOut, TRUE, &cb->Info.srWindow))
-	return FALSE;
+    যদি (!SetConsoleCursorPosition(g_hConOut, cb->Info.dwCursorPosition))
+	ঘূৰাই FALSE;
+    যদি (!SetConsoleWindowInfo(g_hConOut, TRUE, &cb->Info.srWindow))
+	ঘূৰাই FALSE;
 
     // VTP uses alternate screen buffer.
     // No need to restore buffer contents.
-    if (use_alternate_screen_buffer)
-	return TRUE;
+    যদি (use_alternate_screen_buffer)
+	ঘূৰাই TRUE;
 
     /*
      * Restore the screen buffer contents.
      */
-    if (cb->Buffer != NULL)
+    যদি (cb->Buffer != রিক্ত)
     {
-	for (i = 0; i < cb->NumRegions; i++)
+	বাবে (i = 0; i < cb->অঙ্ক_Regions; i++)
 	{
-	    BufferCoord.X = cb->Regions[i].Left;
-	    BufferCoord.Y = cb->Regions[i].Top;
+	    BufferCoord.X = cb->Regions[i].বাম_3;
+	    BufferCoord.Y = cb->Regions[i].শীৰ্ষ_2;
 	    WriteRegion = cb->Regions[i];
-	    if (!WriteConsoleOutputW(g_hConOut,	// output handle
+	    যদি (!WriteConsoleOutputW(g_hConOut,	// output handle
 			cb->Buffer,		// our buffer
 			cb->BufferSize,		// dimensions of our buffer
 			BufferCoord,		// offset in our buffer
 			&WriteRegion))		// region to restore
-		return FALSE;
+		ঘূৰাই FALSE;
 	}
     }
 
-    return TRUE;
+    ঘূৰাই TRUE;
 }
 
 # define FEAT_RESTORE_ORIG_SCREEN
 # ifdef FEAT_RESTORE_ORIG_SCREEN
-static ConsoleBuffer g_cbOrig = { 0 };
+স্থির ConsoleBuffer g_cbOrig = { 0 };
 # endif
-static ConsoleBuffer g_cbNonTermcap = { 0 };
-static ConsoleBuffer g_cbTermcap = { 0 };
+স্থির ConsoleBuffer g_cbNonTermcap = { 0 };
+স্থির ConsoleBuffer g_cbTermcap = { 0 };
 
-char g_szOrigTitle[256] = { 0 };
-HWND g_hWnd = NULL;	// also used in os_mswin.c
-static HICON g_hOrigIconSmall = NULL;
-static HICON g_hOrigIcon = NULL;
-static HICON g_hVimIcon = NULL;
-static BOOL g_fCanChangeIcon = FALSE;
+ৱর্ণ g_szOrigTitle[256] = { 0 };
+HWND g_hWnd = রিক্ত;	// also used in os_mswin.c
+স্থির HICON g_hOrigIconSmall = রিক্ত;
+স্থির HICON g_hOrigIcon = রিক্ত;
+স্থির HICON g_hVimIcon = রিক্ত;
+স্থির BOOL g_fCanChangeIcon = FALSE;
 
 /*
  * GetConsoleIcon()
@@ -3417,22 +3417,22 @@ static BOOL g_fCanChangeIcon = FALSE;
  * Returns:
  *  TRUE on success
  */
-    static BOOL
+    স্থির BOOL
 GetConsoleIcon(
     HWND	hWnd,
     HICON	*phIconSmall,
     HICON	*phIcon)
 {
-    if (hWnd == NULL)
-	return FALSE;
+    যদি (hWnd == রিক্ত)
+	ঘূৰাই FALSE;
 
-    if (phIconSmall != NULL)
+    যদি (phIconSmall != রিক্ত)
 	*phIconSmall = (HICON)SendMessage(hWnd, WM_GETICON,
 					       (WPARAM)ICON_SMALL, (LPARAM)0);
-    if (phIcon != NULL)
+    যদি (phIcon != রিক্ত)
 	*phIcon = (HICON)SendMessage(hWnd, WM_GETICON,
 						 (WPARAM)ICON_BIG, (LPARAM)0);
-    return TRUE;
+    ঘূৰাই TRUE;
 }
 
 /*
@@ -3443,22 +3443,22 @@ GetConsoleIcon(
  * Returns:
  *  TRUE on success
  */
-    static BOOL
+    স্থির BOOL
 SetConsoleIcon(
     HWND    hWnd,
     HICON   hIconSmall,
     HICON   hIcon)
 {
-    if (hWnd == NULL)
-	return FALSE;
+    যদি (hWnd == রিক্ত)
+	ঘূৰাই FALSE;
 
-    if (hIconSmall != NULL)
+    যদি (hIconSmall != রিক্ত)
 	SendMessage(hWnd, WM_SETICON,
 			    (WPARAM)ICON_SMALL, (LPARAM)hIconSmall);
-    if (hIcon != NULL)
+    যদি (hIcon != রিক্ত)
 	SendMessage(hWnd, WM_SETICON,
 			    (WPARAM)ICON_BIG, (LPARAM) hIcon);
-    return TRUE;
+    ঘূৰাই TRUE;
 }
 
 /*
@@ -3471,12 +3471,12 @@ SetConsoleIcon(
  *  nor is it possible when running Vim remotely using Telnet (since the
  *  console window the user sees is owned by a remote process).
  */
-    static void
-SaveConsoleTitleAndIcon(void)
+    স্থির শূন্য
+SaveConsoleTitleAndIcon(শূন্য)
 {
     // Save the original title.
-    if (!GetConsoleTitle(g_szOrigTitle, sizeof(g_szOrigTitle)))
-	return;
+    যদি (!GetConsoleTitle(g_szOrigTitle, পরিমাণ(g_szOrigTitle)))
+	ঘূৰাই;
 
     /*
      * Obtain a handle to the console window using GetConsoleWindow() from
@@ -3486,40 +3486,40 @@ SaveConsoleTitleAndIcon(void)
      * anyway.
      */
     g_hWnd = GetConsoleWindow();
-    if (g_hWnd == NULL)
-	return;
+    যদি (g_hWnd == রিক্ত)
+	ঘূৰাই;
 
     // Save the original console window icon.
     GetConsoleIcon(g_hWnd, &g_hOrigIconSmall, &g_hOrigIcon);
-    if (g_hOrigIconSmall == NULL || g_hOrigIcon == NULL)
-	return;
+    যদি (g_hOrigIconSmall == রিক্ত || g_hOrigIcon == রিক্ত)
+	ঘূৰাই;
 
     // Extract the first icon contained in the Vim executable.
-    if (
+    যদি (
 # ifdef FEAT_LIBCALL
 	    mch_icon_load((HANDLE *)&g_hVimIcon) == FAIL ||
 # endif
-	    g_hVimIcon == NULL)
-	g_hVimIcon = ExtractIcon(NULL, (LPCSTR)exe_name, 0);
-    if (g_hVimIcon != NULL)
+	    g_hVimIcon == রিক্ত)
+	g_hVimIcon = ExtractIcon(রিক্ত, (LPCSTR)exe_name, 0);
+    যদি (g_hVimIcon != রিক্ত)
 	g_fCanChangeIcon = TRUE;
 }
 
-static int g_fWindInitCalled = FALSE;
-static int g_fTermcapMode = FALSE;
-static CONSOLE_CURSOR_INFO g_cci;
+স্থির পূর্ণাঙ্ক g_fWindInitCalled = FALSE;
+স্থির পূর্ণাঙ্ক g_fTermcapMode = FALSE;
+স্থির CONSOLE_CURSOR_INFO g_cci;
 
 /*
  * non-GUI version of mch_init().
  */
-    static void
-mch_init_c(void)
+    স্থির শূন্য
+mch_init_c(শূন্য)
 {
 # ifndef FEAT_RESTORE_ORIG_SCREEN
     CONSOLE_SCREEN_BUFFER_INFO csbi;
 # endif
 # ifndef __MINGW32__
-    extern int _fmode;
+    বাহ্য পূর্ণাঙ্ক _fmode;
 # endif
 
     // Silently handle invalid parameters to CRT functions
@@ -3529,13 +3529,13 @@ mch_init_c(void)
     // for the timestamp test to work on removed floppies.
     SetErrorMode(SEM_FAILCRITICALERRORS);
 
-    _fmode = O_BINARY;		// we do our own CR-LF translation
+    _fmode = O_দ্বিমিক;		// we do our own CR-LF translation
     out_flush();
 
     // Obtain handles for the standard Console I/O devices
-    if (read_cmd_fd == 0)
-	g_hConIn =  GetStdHandle(STD_INPUT_HANDLE);
-    else
+    যদি (read_cmd_fd == 0)
+	g_hConIn =  GetStdHandle(STD_প্ৰবেশ_HANDLE);
+    অন্যথা
 	create_conin();
     g_hConOut = GetStdHandle(STD_OUTPUT_HANDLE);
 
@@ -3545,14 +3545,14 @@ mch_init_c(void)
     // Save the initial console buffer for later restoration
     SaveConsoleBuffer(&g_cbOrig);
     g_attrCurrent = g_attrDefault = g_cbOrig.Info.wAttributes;
-# else
+# অন্যথা
     // Get current text attributes
     GetConsoleScreenBufferInfo(g_hConOut, &csbi);
     g_attrCurrent = g_attrDefault = csbi.wAttributes;
 # endif
-    if (cterm_normal_fg_color == 0)
+    যদি (cterm_normal_fg_color == 0)
 	cterm_normal_fg_color = (g_attrCurrent & 0xf) + 1;
-    if (cterm_normal_bg_color == 0)
+    যদি (cterm_normal_bg_color == 0)
 	cterm_normal_bg_color = ((g_attrCurrent >> 4) & 0xf) + 1;
 
     // Fg and Bg color index number at startup
@@ -3572,20 +3572,20 @@ mch_init_c(void)
      * Note that Vim presently only has one size of icon (32x32), but it
      * automatically gets scaled down to 16x16 when setting the small icon.
      */
-    if (g_fCanChangeIcon)
+    যদি (g_fCanChangeIcon)
 	SetConsoleIcon(g_hWnd, g_hVimIcon, g_hVimIcon);
 
     ui_get_shellsize();
 
     vtp_init();
     // Switch to a new alternate screen buffer.
-    if (use_alternate_screen_buffer)
+    যদি (use_alternate_screen_buffer)
 	vtp_printf("\033[?1049h");
 
 # ifdef MCH_WRITE_DUMP
     fdDump = fopen("dump", "wt");
 
-    if (fdDump)
+    যদি (fdDump)
     {
 	time_t t;
 
@@ -3609,11 +3609,11 @@ mch_init_c(void)
  * Shut down and exit with status `r'
  * Careful: mch_exit() may be called before mch_init()!
  */
-    static void
-mch_exit_c(int r)
+    স্থির শূন্য
+mch_exit_c(পূর্ণাঙ্ক r)
 {
     // Copy flag since stoptermcap() will clear the flag.
-    int fTermcapMode = g_fTermcapMode;
+    পূর্ণাঙ্ক fTermcapMode = g_fTermcapMode;
 
     exiting = TRUE;
 
@@ -3621,15 +3621,15 @@ mch_exit_c(int r)
 
     stoptermcap();
     // Switch back to main screen buffer if TermcapMode was not active.
-    if (!fTermcapMode &&  use_alternate_screen_buffer)
+    যদি (!fTermcapMode &&  use_alternate_screen_buffer)
 	vtp_printf("\033[?1049l");
 
-    if (g_fWindInitCalled)
+    যদি (g_fWindInitCalled)
 	settmode(TMODE_COOK);
 
     ml_close_all(TRUE);		// remove all memfiles
 
-    if (g_fWindInitCalled)
+    যদি (g_fWindInitCalled)
     {
 	mch_restore_title(SAVE_RESTORE_BOTH);
 	/*
@@ -3637,11 +3637,11 @@ mch_exit_c(int r)
 	 * what they were at startup.  Don't do this when the window is
 	 * closed, Vim would hang here.
 	 */
-	if (g_fCanChangeIcon && !g_fForceExit)
+	যদি (g_fCanChangeIcon && !g_fForceExit)
 	    SetConsoleIcon(g_hWnd, g_hOrigIconSmall, g_hOrigIcon);
 
 # ifdef MCH_WRITE_DUMP
-	if (fdDump)
+	যদি (fdDump)
 	{
 	    time_t t;
 
@@ -3649,7 +3649,7 @@ mch_exit_c(int r)
 	    fputs(ctime(&t), fdDump);
 	    fclose(fdDump);
 	}
-	fdDump = NULL;
+	fdDump = রিক্ত;
 # endif
     }
 
@@ -3665,41 +3665,41 @@ mch_exit_c(int r)
 }
 #endif // !FEAT_GUI_MSWIN || VIMDLL
 
-    void
-mch_init(void)
+    শূন্য
+mch_init(শূন্য)
 {
 #ifdef VIMDLL
-    if (gui.starting)
+    যদি (gui.starting)
 	mch_init_g();
-    else
+    অন্যথা
 	mch_init_c();
-#elif defined(FEAT_GUI_MSWIN)
+#নোচেদ্যদি defined(FEAT_GUI_MSWIN)
     mch_init_g();
-#else
+#অন্যথা
     mch_init_c();
 #endif
 }
 
-    void
-mch_exit(int r)
+    শূন্য
+mch_exit(পূর্ণাঙ্ক r)
 {
 #ifdef FEAT_NETBEANS_INTG
     netbeans_send_disconnect();
 #endif
 
 #ifdef VIMDLL
-    if (vimrun_path_allocated)
+    যদি (vimrun_path_allocated)
 	vim_free(vimrun_path.string);
 
-    if (gui.in_use || gui.starting)
+    যদি (gui.in_use || gui.starting)
 	mch_exit_g(r);
-    else
+    অন্যথা
 	mch_exit_c(r);
-#elif defined(FEAT_GUI_MSWIN)
-    if (vimrun_path_allocated)
+#নোচেদ্যদি defined(FEAT_GUI_MSWIN)
+    যদি (vimrun_path_allocated)
 	vim_free(vimrun_path.string);
     mch_exit_g(r);
-#else
+#অন্যথা
     mch_exit_c(r);
 #endif
 }
@@ -3707,23 +3707,23 @@ mch_exit(int r)
 /*
  * Do we have an interactive window?
  */
-    int
+    পূর্ণাঙ্ক
 mch_check_win(
-    int argc UNUSED,
-    char **argv UNUSED)
+    পূর্ণাঙ্ক argc UNUSED,
+    ৱর্ণ **argv UNUSED)
 {
     mch_get_exe_name();
 
-#if defined(FEAT_GUI_MSWIN) && !defined(VIMDLL)
-    return OK;	    // GUI always has a tty
-#else
+#যদি defined(FEAT_GUI_MSWIN) && !defined(VIMDLL)
+    ঘূৰাই OK;	    // GUI always has a tty
+#অন্যথা
 # ifdef VIMDLL
-    if (gui.in_use)
-	return OK;
+    যদি (gui.in_use)
+	ঘূৰাই OK;
 # endif
-    if (isatty(1))
-	return OK;
-    return FAIL;
+    যদি (isatty(1))
+	ঘূৰাই OK;
+    ঘূৰাই FAIL;
 #endif
 }
 
@@ -3731,36 +3731,36 @@ mch_check_win(
  * Set the case of the file name, if it already exists.
  * When "len" is > 0, also expand short to long filenames.
  */
-    void
+    শূন্য
 fname_case(
     char_u	*name,
-    int		len)
+    পূর্ণাঙ্ক		len)
 {
     WCHAR   *p;
     WCHAR   buf[_MAX_PATH + 1];
 
-    if (*name == NUL)
-	return;
+    যদি (*name == NUL)
+	ঘূৰাই;
 
     slash_adjust(name);
 
-    p = enc_to_utf16(name, NULL);
-    if (p == NULL)
-	return;
+    p = enc_to_utf16(name, রিক্ত);
+    যদি (p == রিক্ত)
+	ঘূৰাই;
 
-    if (GetLongPathNameW(p, buf, _MAX_PATH))
+    যদি (GetLongPathNameW(p, buf, _MAX_PATH))
     {
-	char_u	*q = utf16_to_enc(buf, NULL);
+	char_u	*q = utf16_to_enc(buf, রিক্ত);
 
-	if (q != NULL)
+	যদি (q != রিক্ত)
 	{
-	    if (len > 0)
+	    যদি (len > 0)
 		vim_strncpy(name, q, len - 1);
-	    else
+	    অন্যথা
 	    {
 		size_t  namelen = STRLEN(name);
 
-		if (namelen >= STRLEN(q))
+		যদি (namelen >= STRLEN(q))
 		    vim_strncpy(name, q, namelen);
 	    }
 	    vim_free(q);
@@ -3773,47 +3773,47 @@ fname_case(
 /*
  * Insert user name in s[len].
  */
-    int
+    পূর্ণাঙ্ক
 mch_get_user_name(
     char_u  *s,
-    int	    len)
+    পূর্ণাঙ্ক	    len)
 {
     WCHAR wszUserName[256 + 1];	// UNLEN is 256
     DWORD wcch = ARRAY_LENGTH(wszUserName);
 
-    if (GetUserNameW(wszUserName, &wcch))
+    যদি (GetUserNameW(wszUserName, &wcch))
     {
-	char_u  *p = utf16_to_enc(wszUserName, NULL);
+	char_u  *p = utf16_to_enc(wszUserName, রিক্ত);
 
-	if (p != NULL)
+	যদি (p != রিক্ত)
 	{
 	    vim_strncpy(s, p, len - 1);
 	    vim_free(p);
-	    return OK;
+	    ঘূৰাই OK;
 	}
     }
     s[0] = NUL;
-    return FAIL;
+    ঘূৰাই FAIL;
 }
 
 
 /*
  * Insert host name in s[len].
  */
-    void
+    শূন্য
 mch_get_host_name(
     char_u	*s,
-    int		len)
+    পূর্ণাঙ্ক		len)
 {
     WCHAR wszHostName[256 + 1];
     DWORD wcch = ARRAY_LENGTH(wszHostName);
 
-    if (!GetComputerNameW(wszHostName, &wcch))
-	return;
+    যদি (!GetComputerNameW(wszHostName, &wcch))
+	ঘূৰাই;
 
-    char_u  *p = utf16_to_enc(wszHostName, NULL);
-    if (p == NULL)
-	return;
+    char_u  *p = utf16_to_enc(wszHostName, রিক্ত);
+    যদি (p == রিক্ত)
+	ঘূৰাই;
 
     vim_strncpy(s, p, len - 1);
     vim_free(p);
@@ -3824,37 +3824,37 @@ mch_get_host_name(
  * return process ID
  */
     long
-mch_get_pid(void)
+mch_get_pid(শূন্য)
 {
-    return (long)GetCurrentProcessId();
+    ঘূৰাই (long)GetCurrentProcessId();
 }
 
 /*
  * return TRUE if process "pid" is still running
  */
-    int
+    পূর্ণাঙ্ক
 mch_process_running(long pid)
 {
     HANDLE  hProcess = OpenProcess(PROCESS_QUERY_INFORMATION, 0, (DWORD)pid);
     DWORD   status = 0;
-    int	    ret = FALSE;
+    পূর্ণাঙ্ক	    ret = FALSE;
 
-    if (hProcess == NULL)
-	return FALSE;  // might not have access
-    if (GetExitCodeProcess(hProcess, &status))
+    যদি (hProcess == রিক্ত)
+	ঘূৰাই FALSE;  // might not have access
+    যদি (GetExitCodeProcess(hProcess, &status))
 	ret = status == STILL_ACTIVE;
     CloseHandle(hProcess);
-    return ret;
+    ঘূৰাই ret;
 }
 
 /*
  * Get name of current directory into buffer 'buf' of length 'len' bytes.
  * Return OK for success, FAIL for failure.
  */
-    int
+    পূর্ণাঙ্ক
 mch_dirname(
     char_u	*buf,
-    int		len)
+    পূর্ণাঙ্ক		len)
 {
     WCHAR   wbuf[_MAX_PATH + 1];
 
@@ -3864,33 +3864,33 @@ mch_dirname(
      * But the Win32s known bug list says that getcwd() doesn't work
      * so use the Win32 system call instead. <Negri>
      */
-    if (GetCurrentDirectoryW(_MAX_PATH, wbuf) == 0)
-	return FAIL;
+    যদি (GetCurrentDirectoryW(_MAX_PATH, wbuf) == 0)
+	ঘূৰাই FAIL;
 
     WCHAR   wcbuf[_MAX_PATH + 1];
-    char_u  *p = NULL;
+    char_u  *p = রিক্ত;
 
-    if (GetLongPathNameW(wbuf, wcbuf, _MAX_PATH) != 0)
+    যদি (GetLongPathNameW(wbuf, wcbuf, _MAX_PATH) != 0)
     {
-	p = utf16_to_enc(wcbuf, NULL);
-	if (p != NULL)
+	p = utf16_to_enc(wcbuf, রিক্ত);
+	যদি (p != রিক্ত)
 	{
-	    if (STRLEN(p) >= (size_t)len)
+	    যদি (STRLEN(p) >= (size_t)len)
 	    {
 		// long path name is too long, fall back to short one
 		VIM_CLEAR(p);
 	    }
 	}
     }
-    if (p == NULL)
-	p = utf16_to_enc(wbuf, NULL);
+    যদি (p == রিক্ত)
+	p = utf16_to_enc(wbuf, রিক্ত);
 
-    if (p == NULL)
-	return FAIL;
+    যদি (p == রিক্ত)
+	ঘূৰাই FAIL;
 
     vim_strncpy(buf, p, len - 1);
     vim_free(p);
-    return OK;
+    ঘূৰাই OK;
 }
 
 /*
@@ -3902,7 +3902,7 @@ mch_getperm(char_u *name)
 {
     stat_T	st;
 
-    return (mch_stat((char *)name, &st) == 0)
+    ঘূৰাই (mch_stat((ৱর্ণ *)name, &st) == 0)
 	? (long)(unsigned short)st.st_mode
 	: -1L;
 }
@@ -3913,35 +3913,35 @@ mch_getperm(char_u *name)
  *
  * Return FAIL for failure, OK otherwise.
  */
-    int
+    পূর্ণাঙ্ক
 mch_setperm(char_u *name, long perm)
 {
     long	n;
     WCHAR	*p;
 
-    p = enc_to_utf16(name, NULL);
-    if (p == NULL)
-	return FAIL;
+    p = enc_to_utf16(name, রিক্ত);
+    যদি (p == রিক্ত)
+	ঘূৰাই FAIL;
 
     n = _wchmod(p, perm);
     vim_free(p);
-    if (n == -1)
-	return FAIL;
+    যদি (n == -1)
+	ঘূৰাই FAIL;
 
     win32_set_archive(name);
 
-    return OK;
+    ঘূৰাই OK;
 }
 
 /*
  * Set hidden flag for "name".
  */
-    void
+    শূন্য
 mch_hide(char_u *name)
 {
-    int attrs = win32_getattrs(name);
-    if (attrs == -1)
-	return;
+    পূর্ণাঙ্ক attrs = win32_getattrs(name);
+    যদি (attrs == -1)
+	ঘূৰাই;
 
     attrs |= FILE_ATTRIBUTE_HIDDEN;
     win32_setattrs(name, attrs);
@@ -3950,30 +3950,30 @@ mch_hide(char_u *name)
 /*
  * Return TRUE if file "name" exists and is hidden.
  */
-    int
+    পূর্ণাঙ্ক
 mch_ishidden(char_u *name)
 {
-    int f = win32_getattrs(name);
+    পূর্ণাঙ্ক f = win32_getattrs(name);
 
-    if (f == -1)
-	return FALSE;		    // file does not exist at all
+    যদি (f == -1)
+	ঘূৰাই FALSE;		    // file does not exist at all
 
-    return (f & FILE_ATTRIBUTE_HIDDEN) != 0;
+    ঘূৰাই (f & FILE_ATTRIBUTE_HIDDEN) != 0;
 }
 
 /*
  * return TRUE if "name" is a directory
  * return FALSE if "name" is not a directory or upon error
  */
-    int
+    পূর্ণাঙ্ক
 mch_isdir(char_u *name)
 {
-    int f = win32_getattrs(name);
+    পূর্ণাঙ্ক f = win32_getattrs(name);
 
-    if (f == -1)
-	return FALSE;		    // file does not exist at all
+    যদি (f == -1)
+	ঘূৰাই FALSE;		    // file does not exist at all
 
-    return (f & FILE_ATTRIBUTE_DIRECTORY) != 0;
+    ঘূৰাই (f & FILE_ATTRIBUTE_DIRECTORY) != 0;
 }
 
 /*
@@ -3981,24 +3981,24 @@ mch_isdir(char_u *name)
  * Return FALSE otherwise, also when the attributes cannot be obtained for
  * another reason.
  */
-    int
+    পূর্ণাঙ্ক
 mch_isdir_or_missing(char_u *name)
 {
     WCHAR	*p;
     DWORD	attr;
     DWORD	error = 0;
 
-    p = enc_to_utf16(name, NULL);
-    if (p == NULL)
-	return FALSE;
+    p = enc_to_utf16(name, রিক্ত);
+    যদি (p == রিক্ত)
+	ঘূৰাই FALSE;
     attr = GetFileAttributesW(p);
-    if (attr == INVALID_FILE_ATTRIBUTES)
+    যদি (attr == INVALID_FILE_ATTRIBUTES)
 	error = GetLastError();
     vim_free(p);
 
-    if (attr == INVALID_FILE_ATTRIBUTES)
-	return error == ERROR_FILE_NOT_FOUND || error == ERROR_PATH_NOT_FOUND;
-    return (attr & FILE_ATTRIBUTE_DIRECTORY) != 0;
+    যদি (attr == INVALID_FILE_ATTRIBUTES)
+	ঘূৰাই error == ERROR_FILE_NOT_FOUND || error == ERROR_PATH_NOT_FOUND;
+    ঘূৰাই (attr & FILE_ATTRIBUTE_DIRECTORY) != 0;
 }
 
 /*
@@ -4006,103 +4006,103 @@ mch_isdir_or_missing(char_u *name)
  * return FALSE if "name" is not a directory
  * return FALSE for error
  */
-    int
+    পূর্ণাঙ্ক
 mch_isrealdir(char_u *name)
 {
-    return mch_isdir(name) && !mch_is_symbolic_link(name);
+    ঘূৰাই mch_isdir(name) && !mch_is_symbolic_link(name);
 }
 
 /*
  * Create directory "name".
  * Return 0 on success, -1 on error.
  */
-    int
+    পূর্ণাঙ্ক
 mch_mkdir(char_u *name)
 {
     WCHAR   *p;
-    int	    retval;
+    পূর্ণাঙ্ক	    retval;
 
-    p = enc_to_utf16(name, NULL);
-    if (p == NULL)
-	return -1;
+    p = enc_to_utf16(name, রিক্ত);
+    যদি (p == রিক্ত)
+	ঘূৰাই -1;
     retval = _wmkdir(p);
     vim_free(p);
-    return retval;
+    ঘূৰাই retval;
 }
 
 /*
  * Delete directory "name".
  * Return 0 on success, -1 on error.
  */
-    int
+    পূর্ণাঙ্ক
 mch_rmdir(char_u *name)
 {
     WCHAR   *p;
-    int	    retval;
+    পূর্ণাঙ্ক	    retval;
 
-    p = enc_to_utf16(name, NULL);
-    if (p == NULL)
-	return -1;
+    p = enc_to_utf16(name, রিক্ত);
+    যদি (p == রিক্ত)
+	ঘূৰাই -1;
     retval = _wrmdir(p);
     vim_free(p);
-    return retval;
+    ঘূৰাই retval;
 }
 
 /*
  * Return TRUE if file "fname" has more than one link.
  */
-    int
+    পূর্ণাঙ্ক
 mch_is_hard_link(char_u *fname)
 {
     BY_HANDLE_FILE_INFORMATION info;
 
-    return win32_fileinfo(fname, &info) == FILEINFO_OK
-						   && info.nNumberOfLinks > 1;
+    ঘূৰাই win32_fileinfo(fname, &info) == FILEINFO_OK
+						   && info.n_সংখ্যা_Of_Links > 1;
 }
 
 /*
  * Return TRUE if "name" is a symbolic link (or a junction).
  */
-    int
+    পূর্ণাঙ্ক
 mch_is_symbolic_link(char_u *name)
 {
     HANDLE		hFind;
-    int			res = FALSE;
+    পূর্ণাঙ্ক			res = FALSE;
     DWORD		fileFlags = 0, reparseTag = 0;
     WCHAR		*wn;
     WIN32_FIND_DATAW	findDataW;
 
-    wn = enc_to_utf16(name, NULL);
-    if (wn == NULL)
-	return FALSE;
+    wn = enc_to_utf16(name, রিক্ত);
+    যদি (wn == রিক্ত)
+	ঘূৰাই FALSE;
 
     hFind = FindFirstFileW(wn, &findDataW);
     vim_free(wn);
-    if (hFind != INVALID_HANDLE_VALUE)
+    যদি (hFind != INVALID_HANDLE_মান)
     {
 	fileFlags = findDataW.dwFileAttributes;
 	reparseTag = findDataW.dwReserved0;
 	FindClose(hFind);
     }
 
-    if ((fileFlags & FILE_ATTRIBUTE_REPARSE_POINT)
+    যদি ((fileFlags & FILE_ATTRIBUTE_REPARSE_POINT)
 	    && (reparseTag == IO_REPARSE_TAG_SYMLINK
 		|| reparseTag == IO_REPARSE_TAG_MOUNT_POINT))
 	res = TRUE;
 
-    return res;
+    ঘূৰাই res;
 }
 
 /*
  * Return TRUE if file "fname" has more than one link or if it is a symbolic
  * link.
  */
-    int
+    পূর্ণাঙ্ক
 mch_is_linked(char_u *fname)
 {
-    if (mch_is_hard_link(fname) || mch_is_symbolic_link(fname))
-	return TRUE;
-    return FALSE;
+    যদি (mch_is_hard_link(fname) || mch_is_symbolic_link(fname))
+	ঘূৰাই TRUE;
+    ঘূৰাই FALSE;
 }
 
 /*
@@ -4112,36 +4112,36 @@ mch_is_linked(char_u *fname)
  * Returns FILEINFO_READ_FAIL when CreateFile() failed.
  * Returns FILEINFO_INFO_FAIL when GetFileInformationByHandle() failed.
  */
-    int
+    পূর্ণাঙ্ক
 win32_fileinfo(char_u *fname, BY_HANDLE_FILE_INFORMATION *info)
 {
     HANDLE	hFile;
-    int		res = FILEINFO_READ_FAIL;
+    পূর্ণাঙ্ক		res = FILEINFO_READ_FAIL;
     WCHAR	*wn;
 
-    wn = enc_to_utf16(fname, NULL);
-    if (wn == NULL)
-	return FILEINFO_ENC_FAIL;
+    wn = enc_to_utf16(fname, রিক্ত);
+    যদি (wn == রিক্ত)
+	ঘূৰাই FILEINFO_ENC_FAIL;
 
     hFile = CreateFileW(wn,	// file name
 	    GENERIC_READ,	// access mode
 	    FILE_SHARE_READ | FILE_SHARE_WRITE,	// share mode
-	    NULL,		// security descriptor
+	    রিক্ত,		// security descriptor
 	    OPEN_EXISTING,	// creation disposition
 	    FILE_FLAG_BACKUP_SEMANTICS,	// file attributes
-	    NULL);		// handle to template file
+	    রিক্ত);		// handle to template file
     vim_free(wn);
 
-    if (hFile == INVALID_HANDLE_VALUE)
-	return FILEINFO_READ_FAIL;
+    যদি (hFile == INVALID_HANDLE_মান)
+	ঘূৰাই FILEINFO_READ_FAIL;
 
-    if (GetFileInformationByHandle(hFile, info) != 0)
+    যদি (GetFileInformationByHandle(hFile, info) != 0)
 	res = FILEINFO_OK;
-    else
+    অন্যথা
 	res = FILEINFO_INFO_FAIL;
     CloseHandle(hFile);
 
-    return res;
+    ঘূৰাই res;
 }
 
 /*
@@ -4149,20 +4149,20 @@ win32_fileinfo(char_u *fname, BY_HANDLE_FILE_INFORMATION *info)
  * -1 : error
  * else FILE_ATTRIBUTE_* defined in winnt.h
  */
-    static int
+    স্থির পূর্ণাঙ্ক
 win32_getattrs(char_u *name)
 {
-    int		attr;
+    পূর্ণাঙ্ক		attr;
     WCHAR	*p;
 
-    p = enc_to_utf16(name, NULL);
-    if (p == NULL)
-	return INVALID_FILE_ATTRIBUTES;
+    p = enc_to_utf16(name, রিক্ত);
+    যদি (p == রিক্ত)
+	ঘূৰাই INVALID_FILE_ATTRIBUTES;
 
     attr = GetFileAttributesW(p);
     vim_free(p);
 
-    return attr;
+    ঘূৰাই attr;
 }
 
 /*
@@ -4170,34 +4170,34 @@ win32_getattrs(char_u *name)
  *
  * return -1 for failure, 0 otherwise
  */
-    static int
-win32_setattrs(char_u *name, int attrs)
+    স্থির পূর্ণাঙ্ক
+win32_setattrs(char_u *name, পূর্ণাঙ্ক attrs)
 {
-    int	    res;
+    পূর্ণাঙ্ক	    res;
     WCHAR   *p;
 
-    p = enc_to_utf16(name, NULL);
-    if (p == NULL)
-	return -1;
+    p = enc_to_utf16(name, রিক্ত);
+    যদি (p == রিক্ত)
+	ঘূৰাই -1;
 
     res = SetFileAttributesW(p, attrs);
     vim_free(p);
 
-    return res ? 0 : -1;
+    ঘূৰাই res ? 0 : -1;
 }
 
 /*
  * Set archive flag for "name".
  */
-    static int
+    স্থির পূর্ণাঙ্ক
 win32_set_archive(char_u *name)
 {
-    int attrs = win32_getattrs(name);
-    if (attrs == -1)
-	return -1;
+    পূর্ণাঙ্ক attrs = win32_getattrs(name);
+    যদি (attrs == -1)
+	ঘূৰাই -1;
 
     attrs |= FILE_ATTRIBUTE_ARCHIVE;
-    return win32_setattrs(name, attrs);
+    ঘূৰাই win32_setattrs(name, attrs);
 }
 
 /*
@@ -4205,12 +4205,12 @@ win32_set_archive(char_u *name)
  * Strange semantics of Win32: a readonly directory is writable, but you can't
  * delete a file.  Let's say this means it is writable.
  */
-    int
+    পূর্ণাঙ্ক
 mch_writable(char_u *name)
 {
-    int attrs = win32_getattrs(name);
+    পূর্ণাঙ্ক attrs = win32_getattrs(name);
 
-    return (attrs != -1 && (!(attrs & FILE_ATTRIBUTE_READONLY)
+    ঘূৰাই (attrs != -1 && (!(attrs & FILE_ATTRIBUTE_READONLY)
 			  || (attrs & FILE_ATTRIBUTE_DIRECTORY)));
 }
 
@@ -4220,10 +4220,10 @@ mch_writable(char_u *name)
  * When returning TRUE and "path" is not NULL save the path and set "*path" to
  * the allocated memory.
  */
-    int
-mch_can_exe(char_u *name, char_u **path, int use_path UNUSED)
+    পূর্ণাঙ্ক
+mch_can_exe(char_u *name, char_u **path, পূর্ণাঙ্ক use_path UNUSED)
 {
-    return executable_exists((char *)name, STRLEN(name), path, TRUE, TRUE);
+    ঘূৰাই executable_exists((ৱর্ণ *)name, STRLEN(name), path, TRUE, TRUE);
 }
 
 /*
@@ -4232,45 +4232,45 @@ mch_can_exe(char_u *name, char_u **path, int use_path UNUSED)
  * NODE_WRITABLE: writable device, socket, fifo, etc.
  * NODE_OTHER: non-writable things
  */
-    int
+    পূর্ণাঙ্ক
 mch_nodetype(char_u *name)
 {
     HANDLE	hFile;
-    int		type;
+    পূর্ণাঙ্ক		type;
     WCHAR	*wn;
 
     // We can't open a file with a name "\\.\con" or "\\.\prn" and trying to
     // read from it later will cause Vim to hang.  Thus return NODE_WRITABLE
     // here.
-    if (STRNCMP(name, "\\\\.\\", 4) == 0)
-	return NODE_WRITABLE;
+    যদি (STRNCMP(name, "\\\\.\\", 4) == 0)
+	ঘূৰাই গ্ৰন্থি_WRITABLE;
 
-    wn = enc_to_utf16(name, NULL);
-    if (wn == NULL)
-	return NODE_NORMAL;
+    wn = enc_to_utf16(name, রিক্ত);
+    যদি (wn == রিক্ত)
+	ঘূৰাই গ্ৰন্থি_NORMAL;
 
     hFile = CreateFileW(wn,	    // file name
 	    GENERIC_WRITE,	    // access mode
 	    0,			    // share mode
-	    NULL,		    // security descriptor
+	    রিক্ত,		    // security descriptor
 	    OPEN_EXISTING,	    // creation disposition
 	    0,			    // file attributes
-	    NULL);		    // handle to template file
+	    রিক্ত);		    // handle to template file
     vim_free(wn);
-    if (hFile == INVALID_HANDLE_VALUE)
-	return NODE_NORMAL;
+    যদি (hFile == INVALID_HANDLE_মান)
+	ঘূৰাই গ্ৰন্থি_NORMAL;
 
     type = GetFileType(hFile);
     CloseHandle(hFile);
-    if (type == FILE_TYPE_CHAR)
-	return NODE_WRITABLE;
-    if (type == FILE_TYPE_DISK)
-	return NODE_NORMAL;
-    return NODE_OTHER;
+    যদি (type == FILE_TYPE_CHAR)
+	ঘূৰাই গ্ৰন্থি_WRITABLE;
+    যদি (type == FILE_TYPE_DISK)
+	ঘূৰাই গ্ৰন্থি_NORMAL;
+    ঘূৰাই গ্ৰন্থি_OTHER;
 }
 
 #ifdef HAVE_ACL
-struct my_acl
+সংরচনা my_acl
 {
     PSECURITY_DESCRIPTOR    pSecurityDescriptor;
     PSID		    pSidOwner;
@@ -4288,21 +4288,21 @@ struct my_acl
 mch_get_acl(char_u *fname)
 {
 #ifndef HAVE_ACL
-    return (vim_acl_T)NULL;
-#else
-    struct my_acl   *p = NULL;
+    ঘূৰাই (vim_acl_T)রিক্ত;
+#অন্যথা
+    সংরচনা my_acl   *p = রিক্ত;
     DWORD   err;
 
-    p = ALLOC_CLEAR_ONE(struct my_acl);
-    if (p != NULL)
+    p = ALLOC_CLEAR_ONE(সংরচনা my_acl);
+    যদি (p != রিক্ত)
     {
 	WCHAR	*wn;
 
-	wn = enc_to_utf16(fname, NULL);
-	if (wn == NULL)
+	wn = enc_to_utf16(fname, রিক্ত);
+	যদি (wn == রিক্ত)
 	{
 	    vim_free(p);
-	    return NULL;
+	    ঘূৰাই রিক্ত;
 	}
 
 	// Try to retrieve the entire security descriptor.
@@ -4318,29 +4318,29 @@ mch_get_acl(char_u *fname)
 		&p->pDacl,		// Discretionary information.
 		&p->pSacl,		// For auditing purposes.
 		&p->pSecurityDescriptor);
-	if (err == ERROR_ACCESS_DENIED ||
+	যদি (err == ERROR_ACCESS_DENIED ||
 		err == ERROR_PRIVILEGE_NOT_HELD)
 	{
 	    // Retrieve only DACL.
-	    (void)GetNamedSecurityInfoW(
+	    (শূন্য)GetNamedSecurityInfoW(
 		    wn,
 		    SE_FILE_OBJECT,
 		    DACL_SECURITY_INFORMATION,
-		    NULL,
-		    NULL,
+		    রিক্ত,
+		    রিক্ত,
 		    &p->pDacl,
-		    NULL,
+		    রিক্ত,
 		    &p->pSecurityDescriptor);
 	}
-	if (p->pSecurityDescriptor == NULL)
+	যদি (p->pSecurityDescriptor == রিক্ত)
 	{
 	    mch_free_acl((vim_acl_T)p);
-	    p = NULL;
+	    p = রিক্ত;
 	}
 	vim_free(wn);
     }
 
-    return (vim_acl_T)p;
+    ঘূৰাই (vim_acl_T)p;
 #endif
 }
 
@@ -4348,22 +4348,22 @@ mch_get_acl(char_u *fname)
 /*
  * Check if "acl" contains inherited ACE.
  */
-    static BOOL
+    স্থির BOOL
 is_acl_inherited(PACL acl)
 {
     DWORD   i;
     ACL_SIZE_INFORMATION    acl_info;
     PACCESS_ALLOWED_ACE	    ace;
 
-    acl_info.AceCount = 0;
-    GetAclInformation(acl, &acl_info, sizeof(acl_info), AclSizeInformation);
-    for (i = 0; i < acl_info.AceCount; i++)
+    acl_info.Ace_গুনতি = 0;
+    GetAclInformation(acl, &acl_info, পরিমাণ(acl_info), AclSizeInformation);
+    বাবে (i = 0; i < acl_info.Ace_গুনতি; i++)
     {
 	GetAce(acl, i, (LPVOID *)&ace);
-	if (ace->Header.AceFlags & INHERITED_ACE)
-	    return TRUE;
+	যদি (ace->Header.AceFlags & INHERITED_ACE)
+	    ঘূৰাই TRUE;
     }
-    return FALSE;
+    ঘূৰাই FALSE;
 }
 #endif
 
@@ -4372,38 +4372,38 @@ is_acl_inherited(PACL acl)
  * Errors are ignored.
  * This must only be called with "acl" equal to what mch_get_acl() returned.
  */
-    void
+    শূন্য
 mch_set_acl(char_u *fname, vim_acl_T acl)
 {
 #ifdef HAVE_ACL
-    struct my_acl   *p = (struct my_acl *)acl;
+    সংরচনা my_acl   *p = (সংরচনা my_acl *)acl;
     SECURITY_INFORMATION    sec_info = 0;
     WCHAR	    *wn;
 
-    if (p == NULL)
-	return;
+    যদি (p == রিক্ত)
+	ঘূৰাই;
 
-    wn = enc_to_utf16(fname, NULL);
-    if (wn == NULL)
-	return;
+    wn = enc_to_utf16(fname, রিক্ত);
+    যদি (wn == রিক্ত)
+	ঘূৰাই;
 
     // Set security flags
-    if (p->pSidOwner)
+    যদি (p->pSidOwner)
 	sec_info |= OWNER_SECURITY_INFORMATION;
-    if (p->pSidGroup)
+    যদি (p->pSidGroup)
 	sec_info |= GROUP_SECURITY_INFORMATION;
-    if (p->pDacl)
+    যদি (p->pDacl)
     {
 	sec_info |= DACL_SECURITY_INFORMATION;
 	// Do not inherit its parent's DACL.
 	// If the DACL is inherited, Cygwin permissions would be changed.
-	if (!is_acl_inherited(p->pDacl))
+	যদি (!is_acl_inherited(p->pDacl))
 	    sec_info |= PROTECTED_DACL_SECURITY_INFORMATION;
     }
-    if (p->pSacl)
+    যদি (p->pSacl)
 	sec_info |= SACL_SECURITY_INFORMATION;
 
-    (void)SetNamedSecurityInfoW(
+    (শূন্য)SetNamedSecurityInfoW(
 	    wn,			// Abstract filename
 	    SE_FILE_OBJECT,	// File Object
 	    sec_info,
@@ -4416,13 +4416,13 @@ mch_set_acl(char_u *fname, vim_acl_T acl)
 #endif
 }
 
-    void
+    শূন্য
 mch_free_acl(vim_acl_T acl)
 {
 #ifdef HAVE_ACL
-    struct my_acl   *p = (struct my_acl *)acl;
+    সংরচনা my_acl   *p = (সংরচনা my_acl *)acl;
 
-    if (p != NULL)
+    যদি (p != রিক্ত)
     {
 	LocalFree(p->pSecurityDescriptor);	// Free the memory just in case
 	vim_free(p);
@@ -4430,47 +4430,47 @@ mch_free_acl(vim_acl_T acl)
 #endif
 }
 
-#if !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
+#যদি !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
 
 /*
  * handler for ctrl-break, ctrl-c interrupts, and fatal events.
  */
-    static BOOL WINAPI
+    স্থির BOOL WINAPI
 handler_routine(
     DWORD dwCtrlType)
 {
-    INPUT_RECORD ir;
+    প্ৰবেশ_RECORD ir;
     DWORD out;
 
-    switch (dwCtrlType)
+    ৱিকল্প (dwCtrlType)
     {
-    case CTRL_C_EVENT:
-	if (ctrl_c_interrupts)
+    পক্ষ CTRL_C_EVENT:
+	যদি (ctrl_c_interrupts)
 	    g_fCtrlCPressed = TRUE;
-	return TRUE;
+	ঘূৰাই TRUE;
 
-    case CTRL_BREAK_EVENT:
+    পক্ষ CTRL_BREAK_EVENT:
 	g_fCBrkPressed	= TRUE;
 	ctrl_break_was_pressed = TRUE;
 	// ReadConsoleInput is blocking, send a key event to continue.
-	ir.EventType = KEY_EVENT;
-	ir.Event.KeyEvent.bKeyDown = TRUE;
-	ir.Event.KeyEvent.wRepeatCount = 1;
-	ir.Event.KeyEvent.wVirtualKeyCode = VK_CANCEL;
-	ir.Event.KeyEvent.wVirtualScanCode = 0;
-	ir.Event.KeyEvent.dwControlKeyState = 0;
-	ir.Event.KeyEvent.uChar.UnicodeChar = 0;
-	WriteConsoleInput(g_hConIn, &ir, 1, &out);
-	return TRUE;
+	ir.EventType = চাবি_EVENT;
+	ir.Event.চাবি_Event_2.b_চাবি_Down = TRUE;
+	ir.Event.চাবি_Event_2.w_Repeat_গুনতি = 1;
+	ir.Event.চাবি_Event_2.w_Virtual_চাবি_Code = VK_CANCEL;
+	ir.Event.চাবি_Event_2.wVirtualScanCode = 0;
+	ir.Event.চাবি_Event_2.dw_Control_চাবি_State = 0;
+	ir.Event.চাবি_Event_2.uChar.UnicodeChar = 0;
+	Write_Console_প্ৰবেশ(g_hConIn, &ir, 1, &out);
+	ঘূৰাই TRUE;
 
     // fatal events: shut down gracefully
-    case CTRL_CLOSE_EVENT:
-    case CTRL_LOGOFF_EVENT:
-    case CTRL_SHUTDOWN_EVENT:
-	windgoto((int)Rows - 1, cmdline_col_off);
+    পক্ষ CTRL_CLOSE_EVENT:
+    পক্ষ CTRL_LOGOFF_EVENT:
+    পক্ষ CTRL_SHUTDOWN_EVENT:
+	windgoto((পূর্ণাঙ্ক)Rows - 1, cmdline_col_off);
 	g_fForceExit = TRUE;
 
-	vim_snprintf((char *)IObuff, IOSIZE, _("Vim: Caught %s event\n"),
+	vim_snprintf((ৱর্ণ *)IObuff, IOSIZE, _("Vim: Caught %s event\n"),
 		(dwCtrlType == CTRL_CLOSE_EVENT
 		     ? _("close")
 		     : dwCtrlType == CTRL_LOGOFF_EVENT
@@ -4482,10 +4482,10 @@ handler_routine(
 
 	preserve_exit();	// output IObuff, preserve files and exit
 
-	return TRUE;		// not reached
+	ঘূৰাই TRUE;		// not reached
 
-    default:
-	return FALSE;
+    স্ৱভাৱ:
+	ঘূৰাই FALSE;
     }
 }
 
@@ -4493,7 +4493,7 @@ handler_routine(
 /*
  * set the tty in (raw) ? "raw" : "cooked" mode
  */
-    void
+    শূন্য
 mch_settmode(tmode_T tmode)
 {
     DWORD cmodein;
@@ -4501,21 +4501,21 @@ mch_settmode(tmode_T tmode)
     BOOL bEnableHandler;
 
 # ifdef VIMDLL
-    if (gui.in_use)
-	return;
+    যদি (gui.in_use)
+	ঘূৰাই;
 # endif
     GetConsoleMode(g_hConIn, &cmodein);
     GetConsoleMode(g_hConOut, &cmodeout);
-    if (tmode == TMODE_RAW)
+    যদি (tmode == TMODE_RAW)
     {
-	cmodein &= ~(ENABLE_LINE_INPUT | ENABLE_PROCESSED_INPUT |
-		     ENABLE_ECHO_INPUT);
-	if (g_fMouseActive)
+	cmodein &= ~(ENABLE_সাৰি_প্ৰবেশ | ENABLE_PROCESSED_প্ৰবেশ |
+		     ENABLE_ECHO_প্ৰবেশ);
+	যদি (g_fMouseActive)
 	{
-	    cmodein |= ENABLE_MOUSE_INPUT;
+	    cmodein |= ENABLE_MOUSE_প্ৰবেশ;
 	    cmodein &= ~ENABLE_QUICK_EDIT_MODE;
 	}
-	else
+	অন্যথা
 	{
 	    cmodein |= g_cmodein & ENABLE_QUICK_EDIT_MODE;
 	}
@@ -4524,16 +4524,16 @@ mch_settmode(tmode_T tmode)
 	    // Do not turn off the ENABLE_PROCESSED_OUTPUT flag when using
 	    // VTP.
 	    ((vtp_working) ? 0 : ENABLE_PROCESSED_OUTPUT) |
-# else
+# অন্যথা
 	    ENABLE_PROCESSED_OUTPUT |
 # endif
 	    ENABLE_WRAP_AT_EOL_OUTPUT);
 	bEnableHandler = TRUE;
     }
-    else // cooked
+    অন্যথা // cooked
     {
-	cmodein |= (ENABLE_LINE_INPUT | ENABLE_PROCESSED_INPUT |
-		    ENABLE_ECHO_INPUT);
+	cmodein |= (ENABLE_সাৰি_প্ৰবেশ | ENABLE_PROCESSED_প্ৰবেশ |
+		    ENABLE_ECHO_প্ৰবেশ);
 	cmodeout |= (ENABLE_PROCESSED_OUTPUT | ENABLE_WRAP_AT_EOL_OUTPUT);
 	bEnableHandler = FALSE;
     }
@@ -4542,7 +4542,7 @@ mch_settmode(tmode_T tmode)
     SetConsoleCtrlHandler(handler_routine, bEnableHandler);
 
 # ifdef MCH_WRITE_DUMP
-    if (fdDump)
+    যদি (fdDump)
     {
 	fprintf(fdDump, "mch_settmode(%s, in = %x, out = %x)\n",
 		tmode == TMODE_RAW ? "raw" :
@@ -4558,16 +4558,16 @@ mch_settmode(tmode_T tmode)
  * Get the size of the current window in `Rows' and `Columns'
  * Return OK when size could be determined, FAIL otherwise.
  */
-    int
-mch_get_shellsize(void)
+    পূর্ণাঙ্ক
+mch_get_shellsize(শূন্য)
 {
     CONSOLE_SCREEN_BUFFER_INFO csbi;
 
 # ifdef VIMDLL
-    if (gui.in_use)
-	return OK;
+    যদি (gui.in_use)
+	ঘূৰাই OK;
 # endif
-    if (!g_fTermcapMode && g_cbTermcap.IsValid)
+    যদি (!g_fTermcapMode && g_cbTermcap.IsValid)
     {
 	/*
 	 * For some reason, we are trying to get the screen dimensions
@@ -4578,34 +4578,34 @@ mch_get_shellsize(void)
 	Rows = g_cbTermcap.Info.dwSize.Y;
 	Columns = g_cbTermcap.Info.dwSize.X;
     }
-    else if (GetConsoleScreenBufferInfo(g_hConOut, &csbi))
+    অন্যথা যদি (GetConsoleScreenBufferInfo(g_hConOut, &csbi))
     {
-	Rows = csbi.srWindow.Bottom - csbi.srWindow.Top + 1;
-	Columns = csbi.srWindow.Right - csbi.srWindow.Left + 1;
+	Rows = csbi.srWindow.Bottom - csbi.srWindow.শীৰ্ষ_2 + 1;
+	Columns = csbi.srWindow.ডান_3 - csbi.srWindow.বাম_3 + 1;
     }
-    else
+    অন্যথা
     {
 	Rows = 25;
 	Columns = 80;
     }
-    return OK;
+    ঘূৰাই OK;
 }
 
 /*
  * Resize console buffer to 'COORD'
  */
-    static void
+    স্থির শূন্য
 ResizeConBuf(
     HANDLE  hConsole,
     COORD   coordScreen)
 {
-    if (use_alternate_screen_buffer)
-	return;
+    যদি (use_alternate_screen_buffer)
+	ঘূৰাই;
 
-    if (!SetConsoleScreenBufferSize(hConsole, coordScreen))
+    যদি (!SetConsoleScreenBufferSize(hConsole, coordScreen))
     {
 # ifdef MCH_WRITE_DUMP
-	if (fdDump)
+	যদি (fdDump)
 	{
 	    fprintf(fdDump, "SetConsoleScreenBufferSize failed: %lx\n",
 		    GetLastError());
@@ -4618,15 +4618,15 @@ ResizeConBuf(
 /*
  * Resize console window size to 'srWindowRect'
  */
-    static void
+    স্থির শূন্য
 ResizeWindow(
     HANDLE     hConsole,
     SMALL_RECT srWindowRect)
 {
-    if (!SetConsoleWindowInfo(hConsole, TRUE, &srWindowRect))
+    যদি (!SetConsoleWindowInfo(hConsole, TRUE, &srWindowRect))
     {
 # ifdef MCH_WRITE_DUMP
-	if (fdDump)
+	যদি (fdDump)
 	{
 	    fprintf(fdDump, "SetConsoleWindowInfo failed: %lx\n",
 		    GetLastError());
@@ -4639,20 +4639,20 @@ ResizeWindow(
 /*
  * Set a console window to `xSize' * `ySize'
  */
-    static void
+    স্থির শূন্য
 ResizeConBufAndWindow(
     HANDLE  hConsole,
-    int	    xSize,
-    int	    ySize)
+    পূর্ণাঙ্ক	    xSize,
+    পূর্ণাঙ্ক	    ySize)
 {
     CONSOLE_SCREEN_BUFFER_INFO csbi;	// hold current console buffer info
     SMALL_RECT	    srWindowRect;	// hold the new console size
     COORD	    coordScreen;
     COORD	    cursor;
-    static int	    resized = FALSE;
+    স্থির পূর্ণাঙ্ক	    resized = FALSE;
 
 # ifdef MCH_WRITE_DUMP
-    if (fdDump)
+    যদি (fdDump)
     {
 	fprintf(fdDump, "ResizeConBufAndWindow(%d, %d)\n", xSize, ySize);
 	fflush(fdDump);
@@ -4663,29 +4663,29 @@ ResizeConBufAndWindow(
     coordScreen = GetLargestConsoleWindowSize(hConsole);
 
     // define the new console window size and scroll position
-    srWindowRect.Left = srWindowRect.Top = (SHORT) 0;
-    srWindowRect.Right =  (SHORT) (min(xSize, coordScreen.X) - 1);
+    srWindowRect.বাম_3 = srWindowRect.শীৰ্ষ_2 = (SHORT) 0;
+    srWindowRect.ডান_3 =  (SHORT) (min(xSize, coordScreen.X) - 1);
     srWindowRect.Bottom = (SHORT) (min(ySize, coordScreen.Y) - 1);
 
-    if (GetConsoleScreenBufferInfo(g_hConOut, &csbi))
+    যদি (GetConsoleScreenBufferInfo(g_hConOut, &csbi))
     {
-	int sx, sy;
+	পূর্ণাঙ্ক sx, sy;
 
-	sx = csbi.srWindow.Right - csbi.srWindow.Left + 1;
-	sy = csbi.srWindow.Bottom - csbi.srWindow.Top + 1;
-	if (sy < ySize || sx < xSize)
+	sx = csbi.srWindow.ডান_3 - csbi.srWindow.বাম_3 + 1;
+	sy = csbi.srWindow.Bottom - csbi.srWindow.শীৰ্ষ_2 + 1;
+	যদি (sy < ySize || sx < xSize)
 	{
 	    /*
 	     * Increasing number of lines/columns, do buffer first.
 	     * Use the maximal size in x and y direction.
 	     */
-	    if (sy < ySize)
+	    যদি (sy < ySize)
 		coordScreen.Y = ySize;
-	    else
+	    অন্যথা
 		coordScreen.Y = sy;
-	    if (sx < xSize)
+	    যদি (sx < xSize)
 		coordScreen.X = xSize;
-	    else
+	    অন্যথা
 		coordScreen.X = sx;
 	    SetConsoleScreenBufferSize(hConsole, coordScreen);
 	}
@@ -4696,16 +4696,16 @@ ResizeConBufAndWindow(
     coordScreen.Y = ySize;
 
     // In the new console call API, only the first time in reverse order
-    if (!vtp_working || resized)
+    যদি (!vtp_working || resized)
     {
 	ResizeWindow(hConsole, srWindowRect);
 	ResizeConBuf(hConsole, coordScreen);
     }
-    else
+    অন্যথা
     {
 	// Workaround for a Windows 10 bug
-	cursor.X = srWindowRect.Left;
-	cursor.Y = srWindowRect.Top;
+	cursor.X = srWindowRect.বাম_3;
+	cursor.Y = srWindowRect.শীৰ্ষ_2;
 	SetConsoleCursorPosition(hConsole, cursor);
 
 	ResizeConBuf(hConsole, coordScreen);
@@ -4718,30 +4718,30 @@ ResizeConBufAndWindow(
 /*
  * Set the console window to `Rows' * `Columns'
  */
-    void
-mch_set_shellsize(void)
+    শূন্য
+mch_set_shellsize(শূন্য)
 {
     COORD coordScreen;
 
 # ifdef VIMDLL
-    if (gui.in_use)
-	return;
+    যদি (gui.in_use)
+	ঘূৰাই;
 # endif
     // Don't change window size while still starting up
-    if (suppress_winsize != 0)
+    যদি (suppress_winsize != 0)
     {
 	suppress_winsize = 2;
-	return;
+	ঘূৰাই;
     }
 
-    if (term_console)
+    যদি (term_console)
     {
 	coordScreen = GetLargestConsoleWindowSize(g_hConOut);
 
 	// Clamp Rows and Columns to reasonable values
-	if (Rows > coordScreen.Y)
+	যদি (Rows > coordScreen.Y)
 	    Rows = coordScreen.Y;
-	if (Columns > coordScreen.X)
+	যদি (Columns > coordScreen.X)
 	    Columns = coordScreen.X;
 
 	ResizeConBufAndWindow(g_hConOut, Columns, Rows);
@@ -4751,12 +4751,12 @@ mch_set_shellsize(void)
 /*
  * Rows and/or Columns has changed.
  */
-    void
-mch_new_shellsize(void)
+    শূন্য
+mch_new_shellsize(শূন্য)
 {
 # ifdef VIMDLL
-    if (gui.in_use)
-	return;
+    যদি (gui.in_use)
+	ঘূৰাই;
 # endif
     set_scroll_region(0, 0, Columns - 1, Rows - 1);
 }
@@ -4765,10 +4765,10 @@ mch_new_shellsize(void)
 /*
  * Called when started up, to set the winsize that was delayed.
  */
-    void
-mch_set_winsize_now(void)
+    শূন্য
+mch_set_winsize_now(শূন্য)
 {
-    if (suppress_winsize == 2)
+    যদি (suppress_winsize == 2)
     {
 	suppress_winsize = 0;
 	mch_set_shellsize();
@@ -4777,12 +4777,12 @@ mch_set_winsize_now(void)
     suppress_winsize = 0;
 }
 
-# if defined(FEAT_IMAGE) || defined(FEAT_EVAL)
+# যদি defined(FEAT_IMAGE) || defined(FEAT_EVAL)
 /*
  * Try to get the current terminal cell size in pixels.
  */
-    void
-mch_calc_cell_size(struct cellsize *cs_out)
+    শূন্য
+mch_calc_cell_size(সংরচনা cellsize *cs_out)
 {
     CONSOLE_FONT_INFOEX cfi;
     DWORD cmodeold;
@@ -4791,25 +4791,25 @@ mch_calc_cell_size(struct cellsize *cs_out)
     cs_out->cs_xpixel = -1;
     cs_out->cs_ypixel = -1;
 
-    if (g_hConOut == INVALID_HANDLE_VALUE)
-	return;
+    যদি (g_hConOut == INVALID_HANDLE_মান)
+	ঘূৰাই;
 
-    cfi.cbSize = sizeof(cfi);
-    if (GetCurrentConsoleFontEx(g_hConOut, FALSE, &cfi)
+    cfi.cbSize = পরিমাণ(cfi);
+    যদি (GetCurrentConsoleFontEx(g_hConOut, FALSE, &cfi)
 	    && cfi.dwFontSize.X > 0 && cfi.dwFontSize.Y > 0)
     {
 	cs_out->cs_xpixel = cfi.dwFontSize.X;
 	cs_out->cs_ypixel = cfi.dwFontSize.Y;
-	return;
+	ঘূৰাই;
     }
 
     GetConsoleMode(g_hConIn, &cmodein);
     cmodeold = cmodein;
-    cmodein &= ~(ENABLE_LINE_INPUT | ENABLE_ECHO_INPUT
-	    | ENABLE_PROCESSED_INPUT);
-    cmodein |= ENABLE_VIRTUAL_TERMINAL_INPUT;
+    cmodein &= ~(ENABLE_সাৰি_প্ৰবেশ | ENABLE_ECHO_প্ৰবেশ
+	    | ENABLE_PROCESSED_প্ৰবেশ);
+    cmodein |= ENABLE_VIRTUAL_TERMINAL_প্ৰবেশ;
 
-    if (SetConsoleMode(g_hConIn, cmodein))
+    যদি (SetConsoleMode(g_hConIn, cmodein))
     {
 	// We will receive the window dimensions later
 	vtp_printf("\033[14t");
@@ -4820,34 +4820,34 @@ mch_calc_cell_size(struct cellsize *cs_out)
 
 #endif
 
-    static BOOL
+    স্থির BOOL
 vim_create_process(
-    char		*cmd,
+    ৱর্ণ		*cmd,
     BOOL		inherit_handles,
     DWORD		flags,
     STARTUPINFO		*si,
     PROCESS_INFORMATION *pi,
     LPVOID		*env,
-    char		*cwd)
+    ৱর্ণ		*cwd)
 {
     BOOL	ret = FALSE;
-    WCHAR	*wcmd, *wcwd = NULL;
+    WCHAR	*wcmd, *wcwd = রিক্ত;
 
-    wcmd = enc_to_utf16((char_u *)cmd, NULL);
-    if (wcmd == NULL)
-	return FALSE;
-    if (cwd != NULL)
+    wcmd = enc_to_utf16((char_u *)cmd, রিক্ত);
+    যদি (wcmd == রিক্ত)
+	ঘূৰাই FALSE;
+    যদি (cwd != রিক্ত)
     {
-	wcwd = enc_to_utf16((char_u *)cwd, NULL);
-	if (wcwd == NULL)
-	    goto theend;
+	wcwd = enc_to_utf16((char_u *)cwd, রিক্ত);
+	যদি (wcwd == রিক্ত)
+	    গচ্ছ theend;
     }
 
     ret = CreateProcessW(
-	    NULL,		// Executable name
+	    রিক্ত,		// Executable name
 	    wcmd,		// Command to execute
-	    NULL,		// Process security attributes
-	    NULL,		// Thread security attributes
+	    রিক্ত,		// Process security attributes
+	    রিক্ত,		// Thread security attributes
 	    inherit_handles,	// Inherit handles
 	    flags,		// Creation flags
 	    env,		// Environment
@@ -4857,29 +4857,29 @@ vim_create_process(
 theend:
     vim_free(wcmd);
     vim_free(wcwd);
-    return ret;
+    ঘূৰাই ret;
 }
 
 
-    static HINSTANCE
+    স্থির HINSTANCE
 vim_shell_execute(
-    char *cmd,
+    ৱর্ণ *cmd,
     INT	 n_show_cmd)
 {
     HINSTANCE	ret;
     WCHAR	*wcmd;
 
-    wcmd = enc_to_utf16((char_u *)cmd, NULL);
-    if (wcmd == NULL)
-	return (HINSTANCE) 0;
+    wcmd = enc_to_utf16((char_u *)cmd, রিক্ত);
+    যদি (wcmd == রিক্ত)
+	ঘূৰাই (HINSTANCE) 0;
 
-    ret = ShellExecuteW(NULL, NULL, wcmd, NULL, NULL, n_show_cmd);
+    ret = ShellExecuteW(রিক্ত, রিক্ত, wcmd, রিক্ত, রিক্ত, n_show_cmd);
     vim_free(wcmd);
-    return ret;
+    ঘূৰাই ret;
 }
 
 
-#if defined(FEAT_GUI_MSWIN)
+#যদি defined(FEAT_GUI_MSWIN)
 
 /*
  * Specialised version of system() for Win32 GUI mode.
@@ -4889,58 +4889,58 @@ vim_shell_execute(
  *    3. Wait for the subprocess to terminate and get its exit code
  *    4. Prompt the user to press a key to close the console window
  */
-    static int
-mch_system_classic(char *cmd, int options)
+    স্থির পূর্ণাঙ্ক
+mch_system_classic(ৱর্ণ *cmd, পূর্ণাঙ্ক options)
 {
     STARTUPINFO		si;
     PROCESS_INFORMATION pi;
     DWORD		ret = 0;
     HWND		hwnd = GetFocus();
 
-    si.cb = sizeof(si);
-    si.lpReserved = NULL;
-    si.lpDesktop = NULL;
-    si.lpTitle = NULL;
+    si.cb = পরিমাণ(si);
+    si.lpReserved = রিক্ত;
+    si.lpDesktop = রিক্ত;
+    si.lpTitle = রিক্ত;
     si.dwFlags = STARTF_USESHOWWINDOW;
     /*
      * It's nicer to run a filter command in a minimized window.
      * Don't activate the window to keep focus on Vim.
      */
-    if (options & SHELL_DOOUT)
+    যদি (options & SHELL_DOOUT)
 	si.wShowWindow = SW_SHOWMINNOACTIVE;
-    else
+    অন্যথা
 	si.wShowWindow = SW_SHOWNORMAL;
     si.cbReserved2 = 0;
-    si.lpReserved2 = NULL;
+    si.lpReserved2 = রিক্ত;
 
     // Now, run the command
     vim_create_process(cmd, FALSE,
 	    CREATE_DEFAULT_ERROR_MODE |	CREATE_NEW_CONSOLE,
-	    &si, &pi, NULL, NULL);
+	    &si, &pi, রিক্ত, রিক্ত);
 
     // Wait for the command to terminate before continuing
     {
-	int	    delay = 1;
+	পূর্ণাঙ্ক	    delay = 1;
 
 	// Keep updating the window while waiting for the shell to finish.
-	for (;;)
+	বাবে (;;)
 	{
-	    MSG	msg;
+	    বাৰ্তা_2	বাৰ্তা;
 
-	    if (PeekMessageW(&msg, (HWND)NULL, 0, 0, PM_REMOVE))
+	    যদি (PeekMessageW(&বাৰ্তা, (HWND)রিক্ত, 0, 0, PM_REMOVE))
 	    {
-		TranslateMessage(&msg);
-		DispatchMessageW(&msg);
+		TranslateMessage(&বাৰ্তা);
+		DispatchMessageW(&বাৰ্তা);
 		delay = 1;
-		continue;
+		অনুৱর্ত;
 	    }
-	    if (WaitForSingleObject(pi.hProcess, delay) != WAIT_TIMEOUT)
-		break;
+	    যদি (WaitForSingleObject(pi.hProcess, delay) != WAIT_TIMEOUT)
+		ভঙ্গ;
 
 	    // We start waiting for a very short time and then increase it, so
 	    // that we respond quickly when the process is quick, and don't
 	    // consume too much overhead when it's slow.
-	    if (delay < 50)
+	    যদি (delay < 50)
 		delay += 10;
 	}
 
@@ -4959,7 +4959,7 @@ mch_system_classic(char *cmd, int options)
     // processing.
     gui_mch_update();
 
-    return ret;
+    ঘূৰাই ret;
 }
 
 /*
@@ -4967,7 +4967,7 @@ mch_system_classic(char *cmd, int options)
  * process. This way avoid to hang up vim totally if the children
  * process take a long time to process the lines.
  */
-    static unsigned int __stdcall
+    স্থির unsigned পূর্ণাঙ্ক __stdcall
 sub_process_writer(LPVOID param)
 {
     HANDLE	    g_hChildStd_IN_Wr = param;
@@ -4976,54 +4976,54 @@ sub_process_writer(LPVOID param)
     DWORD	    l;
     char_u	    *lp = ml_get(lnum);
     char_u	    *s;
-    int		    written = 0;
+    পূর্ণাঙ্ক		    written = 0;
 
-    for (;;)
+    বাবে (;;)
     {
 	l = (DWORD)STRLEN(lp + written);
-	if (l == 0)
+	যদি (l == 0)
 	    len = 0;
-	else if (lp[written] == NL)
+	অন্যথা যদি (lp[written] == NL)
 	{
 	    // NL -> NUL translation
-	    WriteFile(g_hChildStd_IN_Wr, "", 1, &len, NULL);
+	    WriteFile(g_hChildStd_IN_Wr, "", 1, &len, রিক্ত);
 	}
-	else
+	অন্যথা
 	{
 	    s = vim_strchr(lp + written, NL);
-	    WriteFile(g_hChildStd_IN_Wr, (char *)lp + written,
-		      s == NULL ? l : (DWORD)(s - (lp + written)),
-		      &len, NULL);
+	    WriteFile(g_hChildStd_IN_Wr, (ৱর্ণ *)lp + written,
+		      s == রিক্ত ? l : (DWORD)(s - (lp + written)),
+		      &len, রিক্ত);
 	}
-	if (len == l)
+	যদি (len == l)
 	{
 	    // Finished a line, add a NL, unless this line should not have
 	    // one.
-	    if (lnum != curbuf->b_op_end.lnum
+	    যদি (lnum != curbuf->b_op_end.lnum
 		|| (!curbuf->b_p_bin
 		    && curbuf->b_p_fixeol)
 		|| (lnum != curbuf->b_no_eol_lnum
-		    && (lnum != curbuf->b_ml.ml_line_count
+		    && (lnum != curbuf->b_ml.ml_সাৰি_গুনতি
 			|| curbuf->b_p_eol)))
 	    {
 		WriteFile(g_hChildStd_IN_Wr, "\n", 1,
-						  (LPDWORD)&vim_ignored, NULL);
+						  (LPDWORD)&vim_ignored, রিক্ত);
 	    }
 
 	    ++lnum;
-	    if (lnum > curbuf->b_op_end.lnum)
-		break;
+	    যদি (lnum > curbuf->b_op_end.lnum)
+		ভঙ্গ;
 
 	    lp = ml_get(lnum);
 	    written = 0;
 	}
-	else if (len > 0)
+	অন্যথা যদি (len > 0)
 	    written += len;
     }
 
     // finished all the lines, close pipe
     CloseHandle(g_hChildStd_IN_Wr);
-    return 0;
+    ঘূৰাই 0;
 }
 
 
@@ -5033,8 +5033,8 @@ sub_process_writer(LPVOID param)
  * This function read from the children's stdout and write the
  * data on screen or in the buffer accordingly.
  */
-    static void
-dump_pipe(int	    options,
+    স্থির শূন্য
+dump_pipe(পূর্ণাঙ্ক	    options,
 	  HANDLE    g_hChildStd_OUT_Rd,
 	  garray_T  *ga,
 	  char_u    buffer[],
@@ -5042,50 +5042,50 @@ dump_pipe(int	    options,
 {
     DWORD	availableBytes = 0;
     DWORD	i;
-    int		ret;
+    পূর্ণাঙ্ক		ret;
     DWORD	len;
     DWORD	toRead;
 
     // we query the pipe to see if there is any data to read
     // to avoid to perform a blocking read
     ret = PeekNamedPipe(g_hChildStd_OUT_Rd, // pipe to query
-			NULL,		    // optional buffer
+			রিক্ত,		    // optional buffer
 			0,		    // buffer size
-			NULL,		    // number of read bytes
+			রিক্ত,		    // number of read bytes
 			&availableBytes,    // available bytes total
-			NULL);		    // byteLeft
+			রিক্ত);		    // byteLeft
 
     // We got real data in the pipe, read it
-    while (ret != 0 && availableBytes > 0)
+    যেতিয়ালৈ (ret != 0 && availableBytes > 0)
     {
 	toRead = (DWORD)(BUFLEN - *buffer_off);
 	toRead = availableBytes < toRead ? availableBytes : toRead;
-	ReadFile(g_hChildStd_OUT_Rd, buffer + *buffer_off, toRead , &len, NULL);
+	ReadFile(g_hChildStd_OUT_Rd, buffer + *buffer_off, toRead , &len, রিক্ত);
 
 	// If we haven't read anything, there is a problem
-	if (len == 0)
-	    break;
+	যদি (len == 0)
+	    ভঙ্গ;
 
 	availableBytes -= len;
 
-	if (options & SHELL_READ)
+	যদি (options & SHELL_READ)
 	{
 	    // Do NUL -> NL translation, append NL separated
 	    // lines to the current buffer.
-	    for (i = 0; i < len; ++i)
+	    বাবে (i = 0; i < len; ++i)
 	    {
-		if (buffer[i] == NL)
-		    append_ga_line(ga);
-		else if (buffer[i] == NUL)
+		যদি (buffer[i] == NL)
+		    append_ga_সাৰি(ga);
+		অন্যথা যদি (buffer[i] == NUL)
 		    ga_append(ga, NL);
-		else
+		অন্যথা
 		    ga_append(ga, buffer[i]);
 	    }
 	}
-	else if (has_mbyte)
+	অন্যথা যদি (has_mbyte)
 	{
-	    int		l;
-	    int		c;
+	    পূর্ণাঙ্ক		l;
+	    পূর্ণাঙ্ক		c;
 	    char_u	*p;
 
 	    len += *buffer_off;
@@ -5094,44 +5094,44 @@ dump_pipe(int	    options,
 	    // Check if the last character in buffer[] is
 	    // incomplete, keep these bytes for the next
 	    // round.
-	    for (p = buffer; p < buffer + len; p += l)
+	    বাবে (p = buffer; p < buffer + len; p += l)
 	    {
 		l = MB_CPTR2LEN(p);
-		if (l == 0)
+		যদি (l == 0)
 		    l = 1;  // NUL byte?
-		else if (MB_BYTE2LEN(*p) != l)
-		    break;
+		অন্যথা যদি (MB_BYTE2LEN(*p) != l)
+		    ভঙ্গ;
 	    }
-	    if (p == buffer)	// no complete character
+	    যদি (p == buffer)	// no complete character
 	    {
 		// avoid getting stuck at an illegal byte
-		if (len >= 12)
+		যদি (len >= 12)
 		    ++p;
-		else
+		অন্যথা
 		{
 		    *buffer_off = len;
-		    return;
+		    ঘূৰাই;
 		}
 	    }
 	    c = *p;
 	    *p = NUL;
-	    msg_puts((char *)buffer);
-	    if (p < buffer + len)
+	    বাৰ্তা_puts((ৱর্ণ *)buffer);
+	    যদি (p < buffer + len)
 	    {
 		*p = c;
 		*buffer_off = (DWORD)((buffer + len) - p);
 		mch_memmove(buffer, p, *buffer_off);
-		return;
+		ঘূৰাই;
 	    }
 	    *buffer_off = 0;
 	}
-	else
+	অন্যথা
 	{
 	    buffer[len] = NUL;
-	    msg_puts((char *)buffer);
+	    বাৰ্তা_puts((ৱর্ণ *)buffer);
 	}
 
-	windgoto(msg_row, cmdline_col_off + msg_col);
+	windgoto(বাৰ্তা_row, cmdline_col_off + বাৰ্তা_col);
 	cursor_on();
 	out_flush();
     }
@@ -5141,40 +5141,40 @@ dump_pipe(int	    options,
  * Version of system to use for windows NT > 5.0 (Win2K), use pipe
  * for communication and doesn't open any new window.
  */
-    static int
-mch_system_piped(char *cmd, int options)
+    স্থির পূর্ণাঙ্ক
+mch_system_piped(ৱর্ণ *cmd, পূর্ণাঙ্ক options)
 {
     STARTUPINFO		si;
     PROCESS_INFORMATION pi;
     DWORD		ret = 0;
 
-    HANDLE g_hChildStd_IN_Rd = NULL;
-    HANDLE g_hChildStd_IN_Wr = NULL;
-    HANDLE g_hChildStd_OUT_Rd = NULL;
-    HANDLE g_hChildStd_OUT_Wr = NULL;
+    HANDLE g_hChildStd_IN_Rd = রিক্ত;
+    HANDLE g_hChildStd_IN_Wr = রিক্ত;
+    HANDLE g_hChildStd_OUT_Rd = রিক্ত;
+    HANDLE g_hChildStd_OUT_Wr = রিক্ত;
 
     char_u	buffer[BUFLEN + 1]; // reading buffer + size
     DWORD	len;
 
     // buffer used to receive keys
     char_u	ta_buf[BUFLEN + 1];	// TypeAHead
-    int		ta_len = 0;		// valid bytes in ta_buf[]
+    পূর্ণাঙ্ক		ta_len = 0;		// valid bytes in ta_buf[]
 
     DWORD	i;
-    int		noread_cnt = 0;
+    পূর্ণাঙ্ক		noread_cnt = 0;
     garray_T	ga;
-    int		delay = 1;
+    পূর্ণাঙ্ক		delay = 1;
     DWORD	buffer_off = 0;	// valid bytes in buffer[]
-    char	*p = NULL;
+    ৱর্ণ	*p = রিক্ত;
 
     SECURITY_ATTRIBUTES saAttr;
 
     // Set the bInheritHandle flag so pipe handles are inherited.
-    saAttr.nLength = sizeof(SECURITY_ATTRIBUTES);
+    saAttr.nLength = পরিমাণ(SECURITY_ATTRIBUTES);
     saAttr.bInheritHandle = TRUE;
-    saAttr.lpSecurityDescriptor = NULL;
+    saAttr.lpSecurityDescriptor = রিক্ত;
 
-    if ( ! CreatePipe(&g_hChildStd_OUT_Rd, &g_hChildStd_OUT_Wr, &saAttr, 0)
+    যদি ( ! CreatePipe(&g_hChildStd_OUT_Rd, &g_hChildStd_OUT_Wr, &saAttr, 0)
 	// Ensure the read handle to the pipe for STDOUT is not inherited.
        || ! SetHandleInformation(g_hChildStd_OUT_Rd, HANDLE_FLAG_INHERIT, 0)
 	// Create a pipe for the child process's STDIN.
@@ -5186,32 +5186,32 @@ mch_system_piped(char *cmd, int options)
 	CloseHandle(g_hChildStd_IN_Wr);
 	CloseHandle(g_hChildStd_OUT_Rd);
 	CloseHandle(g_hChildStd_OUT_Wr);
-	msg_puts(_("\nCannot create pipes\n"));
+	বাৰ্তা_puts(_("\nCannot create pipes\n"));
     }
 
-    si.cb = sizeof(si);
-    si.lpReserved = NULL;
-    si.lpDesktop = NULL;
-    si.lpTitle = NULL;
+    si.cb = পরিমাণ(si);
+    si.lpReserved = রিক্ত;
+    si.lpDesktop = রিক্ত;
+    si.lpTitle = রিক্ত;
     si.dwFlags = STARTF_USESHOWWINDOW | STARTF_USESTDHANDLES;
 
     // set-up our file redirection
     si.hStdError = g_hChildStd_OUT_Wr;
     si.hStdOutput = g_hChildStd_OUT_Wr;
-    si.hStdInput = g_hChildStd_IN_Rd;
+    si.h_Std_প্ৰবেশ = g_hChildStd_IN_Rd;
     si.wShowWindow = SW_HIDE;
     si.cbReserved2 = 0;
-    si.lpReserved2 = NULL;
+    si.lpReserved2 = রিক্ত;
 
-    if (options & SHELL_READ)
+    যদি (options & SHELL_READ)
 	ga_init2(&ga, 1, BUFLEN);
 
-    if (cmd != NULL)
+    যদি (cmd != রিক্ত)
     {
-	p = (char *)vim_strsave((char_u *)cmd);
-	if (p != NULL)
+	p = (ৱর্ণ *)vim_strsave((char_u *)cmd);
+	যদি (p != রিক্ত)
 	    unescape_shellxquote((char_u *)p, p_sxe);
-	else
+	অন্যথা
 	    p = cmd;
     }
 
@@ -5220,48 +5220,48 @@ mch_system_piped(char *cmd, int options)
     // handle inheritance was deactivated for pending temp file, but, if we
     // deactivate it, the pipes don't work for some reason.
     vim_create_process(p, TRUE, CREATE_DEFAULT_ERROR_MODE,
-						&si, &pi, NULL, NULL);
+						&si, &pi, রিক্ত, রিক্ত);
 
-    if (p != cmd)
+    যদি (p != cmd)
 	vim_free(p);
 
     // Close our unused side of the pipes
     CloseHandle(g_hChildStd_IN_Rd);
     CloseHandle(g_hChildStd_OUT_Wr);
 
-    if (options & SHELL_WRITE)
+    যদি (options & SHELL_WRITE)
     {
 	HANDLE thread = (HANDLE)
-	 _beginthreadex(NULL,  // security attributes
+	 _beginthreadex(রিক্ত,  // security attributes
 			0,     // default stack size
 			sub_process_writer, // function to be executed
 			g_hChildStd_IN_Wr,  // parameter
 			0,		 // creation flag, start immediately
-			NULL);		    // we don't care about thread id
+			রিক্ত);		    // we don't care about thread id
 	CloseHandle(thread);
-	g_hChildStd_IN_Wr = NULL;
+	g_hChildStd_IN_Wr = রিক্ত;
     }
 
     // Keep updating the window while waiting for the shell to finish.
-    for (;;)
+    বাবে (;;)
     {
-	MSG	msg;
+	বাৰ্তা_2	বাৰ্তা;
 
-	if (PeekMessageW(&msg, (HWND)NULL, 0, 0, PM_REMOVE))
+	যদি (PeekMessageW(&বাৰ্তা, (HWND)রিক্ত, 0, 0, PM_REMOVE))
 	{
-	    TranslateMessage(&msg);
-	    DispatchMessageW(&msg);
+	    TranslateMessage(&বাৰ্তা);
+	    DispatchMessageW(&বাৰ্তা);
 	}
 
 	// write pipe information in the window
-	if ((options & (SHELL_READ|SHELL_WRITE))
+	যদি ((options & (SHELL_READ|SHELL_WRITE))
 # ifdef FEAT_GUI
 		|| gui.in_use
 # endif
 	    )
 	{
 	    len = 0;
-	    if (((options &
+	    যদি (((options &
 			(SHELL_READ|SHELL_WRITE|SHELL_COOKED))
 		    != (SHELL_READ|SHELL_WRITE|SHELL_COOKED)
 # ifdef FEAT_GUI
@@ -5270,22 +5270,22 @@ mch_system_piped(char *cmd, int options)
 		    )
 		&& (ta_len > 0 || noread_cnt > 4))
 	    {
-		if (ta_len == 0)
+		যদি (ta_len == 0)
 		{
 		    // Get extra characters when we don't have any.  Reset the
 		    // counter and timer.
 		    noread_cnt = 0;
 		    len = ui_inchar(ta_buf, BUFLEN, 10L, 0);
 		}
-		if (ta_len > 0 || len > 0)
+		যদি (ta_len > 0 || len > 0)
 		{
 		    /*
 		     * For pipes: Check for CTRL-C: send interrupt signal to
 		     * child.
 		     */
-		    if (len == 1 && cmd != NULL)
+		    যদি (len == 1 && cmd != রিক্ত)
 		    {
-			if (ta_buf[ta_len] == Ctrl_C)
+			যদি (ta_buf[ta_len] == Ctrl_C)
 			{
 			    // Learn what exit code is expected, for
 			// now put 9 as SIGKILL
@@ -5297,15 +5297,15 @@ mch_system_piped(char *cmd, int options)
 		     * Check for CTRL-D: EOF, close pipe to child.
 		     * Ctrl_D may be decorated by _OnChar()
 		     */
-		    if ((len == 1 || len == 4 ) && cmd != NULL)
+		    যদি ((len == 1 || len == 4 ) && cmd != রিক্ত)
 		    {
-			if (ta_buf[0] == Ctrl_D
+			যদি (ta_buf[0] == Ctrl_D
 			    || (ta_buf[0] == CSI
 				&& ta_buf[1] == KS_MODIFIER
 				&& ta_buf[3] == Ctrl_D))
 			{
 			    CloseHandle(g_hChildStd_IN_Wr);
-			    g_hChildStd_IN_Wr = NULL;
+			    g_hChildStd_IN_Wr = রিক্ত;
 			    len = 0;
 			}
 		    }
@@ -5316,21 +5316,21 @@ mch_system_piped(char *cmd, int options)
 		     * For pipes: echo the typed characters.  For a pty this
 		     * does not seem to work.
 		     */
-		    for (i = ta_len; i < ta_len + len; ++i)
+		    বাবে (i = ta_len; i < ta_len + len; ++i)
 		    {
-			if (ta_buf[i] == '\n' || ta_buf[i] == '\b')
-			    msg_putchar(ta_buf[i]);
-			else if (has_mbyte)
+			যদি (ta_buf[i] == '\n' || ta_buf[i] == '\b')
+			    বাৰ্তা_putchar(ta_buf[i]);
+			অন্যথা যদি (has_mbyte)
 			{
-			    int l = (*mb_ptr2len)(ta_buf + i);
+			    পূর্ণাঙ্ক l = (*mb_ptr2len)(ta_buf + i);
 
-			    msg_outtrans_len(ta_buf + i, l);
+			    বাৰ্তা_outtrans_len(ta_buf + i, l);
 			    i += l - 1;
 			}
-			else
-			    msg_outtrans_len(ta_buf + i, 1);
+			অন্যথা
+			    বাৰ্তা_outtrans_len(ta_buf + i, 1);
 		    }
-		    windgoto(msg_row, cmdline_col_off + msg_col);
+		    windgoto(বাৰ্তা_row, cmdline_col_off + বাৰ্তা_col);
 		    out_flush();
 
 		    ta_len += len;
@@ -5342,15 +5342,15 @@ mch_system_piped(char *cmd, int options)
 		     * lines, drop the typed characters (only check for
 		     * CTRL-C).
 		     */
-		    if (options & SHELL_WRITE)
+		    যদি (options & SHELL_WRITE)
 			ta_len = 0;
-		    else if (g_hChildStd_IN_Wr != NULL)
+		    অন্যথা যদি (g_hChildStd_IN_Wr != রিক্ত)
 		    {
-			WriteFile(g_hChildStd_IN_Wr, (char*)ta_buf,
-				    1, &len, NULL);
+			WriteFile(g_hChildStd_IN_Wr, (ৱর্ণ*)ta_buf,
+				    1, &len, রিক্ত);
 			// if we are typing in, we want to keep things reactive
 			delay = 1;
-			if (len > 0)
+			যদি (len > 0)
 			{
 			    ta_len -= len;
 			    mch_memmove(ta_buf, ta_buf + len, ta_len);
@@ -5360,13 +5360,13 @@ mch_system_piped(char *cmd, int options)
 	    }
 	}
 
-	if (ta_len)
+	যদি (ta_len)
 	    ui_inchar_undo(ta_buf, ta_len);
 
-	if (WaitForSingleObject(pi.hProcess, delay) != WAIT_TIMEOUT)
+	যদি (WaitForSingleObject(pi.hProcess, delay) != WAIT_TIMEOUT)
 	{
 	    dump_pipe(options, g_hChildStd_OUT_Rd, &ga, buffer, &buffer_off);
-	    break;
+	    ভঙ্গ;
 	}
 
 	++noread_cnt;
@@ -5375,13 +5375,13 @@ mch_system_piped(char *cmd, int options)
 	// We start waiting for a very short time and then increase it, so
 	// that we respond quickly when the process is quick, and don't
 	// consume too much overhead when it's slow.
-	if (delay < 50)
+	যদি (delay < 50)
 	    delay += 10;
     }
 
     // Close the pipe
     CloseHandle(g_hChildStd_OUT_Rd);
-    if (g_hChildStd_IN_Wr != NULL)
+    যদি (g_hChildStd_IN_Wr != রিক্ত)
 	CloseHandle(g_hChildStd_IN_Wr);
 
     WaitForSingleObject(pi.hProcess, INFINITE);
@@ -5389,15 +5389,15 @@ mch_system_piped(char *cmd, int options)
     // Get the command exit code
     GetExitCodeProcess(pi.hProcess, &ret);
 
-    if (options & SHELL_READ)
+    যদি (options & SHELL_READ)
     {
-	if (ga.ga_len > 0)
+	যদি (ga.ga_len > 0)
 	{
-	    append_ga_line(&ga);
+	    append_ga_সাৰি(&ga);
 	    // remember that the NL was missing
 	    curbuf->b_no_eol_lnum = curwin->w_cursor.lnum;
 	}
-	else
+	অন্যথা
 	    curbuf->b_no_eol_lnum = 0;
 	ga_clear(&ga);
     }
@@ -5406,25 +5406,25 @@ mch_system_piped(char *cmd, int options)
     CloseHandle(pi.hThread);
     CloseHandle(pi.hProcess);
 
-    return ret;
+    ঘূৰাই ret;
 }
 
-    static int
-mch_system_g(char *cmd, int options)
+    স্থির পূর্ণাঙ্ক
+mch_system_g(ৱর্ণ *cmd, পূর্ণাঙ্ক options)
 {
     // if we can pipe and the shelltemp option is off
-    if (!p_stmp)
-	return mch_system_piped(cmd, options);
-    else
-	return mch_system_classic(cmd, options);
+    যদি (!p_stmp)
+	ঘূৰাই mch_system_piped(cmd, options);
+    অন্যথা
+	ঘূৰাই mch_system_classic(cmd, options);
 }
 #endif
 
-#if !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
-    static int
-mch_system_c(char *cmd, int options UNUSED)
+#যদি !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
+    স্থির পূর্ণাঙ্ক
+mch_system_c(ৱর্ণ *cmd, পূর্ণাঙ্ক options UNUSED)
 {
-    int		ret;
+    পূর্ণাঙ্ক		ret;
     WCHAR	*wcmd;
     char_u	*buf;
     size_t	len;
@@ -5432,79 +5432,79 @@ mch_system_c(char *cmd, int options UNUSED)
     // If the command starts and ends with double quotes, enclose the command
     // in parentheses.
     len = STRLEN(cmd);
-    if (len >= 2 && cmd[0] == '"' && cmd[len - 1] == '"')
+    যদি (len >= 2 && cmd[0] == '"' && cmd[len - 1] == '"')
     {
 	len += 3;
 	buf = alloc(len);
-	if (buf == NULL)
-	    return -1;
-	vim_snprintf((char *)buf, len, "(%s)", cmd);
-	wcmd = enc_to_utf16(buf, NULL);
-	free(buf);
+	যদি (buf == রিক্ত)
+	    ঘূৰাই -1;
+	vim_snprintf((ৱর্ণ *)buf, len, "(%s)", cmd);
+	wcmd = enc_to_utf16(buf, রিক্ত);
+	মুক্ত(buf);
     }
-    else
-	wcmd = enc_to_utf16((char_u *)cmd, NULL);
+    অন্যথা
+	wcmd = enc_to_utf16((char_u *)cmd, রিক্ত);
 
-    if (wcmd == NULL)
-	return -1;
+    যদি (wcmd == রিক্ত)
+	ঘূৰাই -1;
 
     ret = _wsystem(wcmd);
     vim_free(wcmd);
-    return ret;
+    ঘূৰাই ret;
 }
 
 #endif
 
-    static int
-mch_system(char *cmd, int options)
+    স্থির পূর্ণাঙ্ক
+mch_system(ৱর্ণ *cmd, পূর্ণাঙ্ক options)
 {
 #ifdef VIMDLL
-    if (gui.in_use || gui.starting)
-	return mch_system_g(cmd, options);
-    else
-	return mch_system_c(cmd, options);
-#elif defined(FEAT_GUI_MSWIN)
-    return mch_system_g(cmd, options);
-#else
-    return mch_system_c(cmd, options);
+    যদি (gui.in_use || gui.starting)
+	ঘূৰাই mch_system_g(cmd, options);
+    অন্যথা
+	ঘূৰাই mch_system_c(cmd, options);
+#নোচেদ্যদি defined(FEAT_GUI_MSWIN)
+    ঘূৰাই mch_system_g(cmd, options);
+#অন্যথা
+    ঘূৰাই mch_system_c(cmd, options);
 #endif
 }
 
-#if defined(FEAT_GUI) && defined(FEAT_TERMINAL)
+#যদি defined(FEAT_GUI) && defined(FEAT_TERMINAL)
 /*
  * Use a terminal window to run a shell command in.
  */
-    static int
+    স্থির পূর্ণাঙ্ক
 mch_call_shell_terminal(
     char_u	*cmd,
-    int		options UNUSED)	// SHELL_*, see vim.h
+    পূর্ণাঙ্ক		options UNUSED)	// SHELL_*, see vim.h
 {
     jobopt_T	opt;
-    char_u	*newcmd = NULL;
+    char_u	*newcmd = রিক্ত;
     typval_T	argvar[2];
     long_u	cmdlen;
-    int		retval = -1;
+    পূর্ণাঙ্ক		retval = -1;
     buf_T	*buf;
     job_T	*job;
     aco_save_T	aco;
     oparg_T	oa;		// operator arguments
 
-    if (cmd == NULL)
+    যদি (cmd == রিক্ত)
 	cmdlen = STRLEN(p_sh) + 1;
-    else
+    অন্যথা
 	cmdlen = STRLEN(p_sh) + STRLEN(p_shcf) + STRLEN(cmd) + 10;
     newcmd = alloc(cmdlen);
-    if (newcmd == NULL)
-	return 255;
-    if (cmd == NULL)
+    যদি (newcmd == রিক্ত)
+	ঘূৰাই 255;
+    যদি (cmd == রিক্ত)
     {
 	STRCPY(newcmd, p_sh);
-	ch_log(NULL, "starting terminal to run a shell");
+	ch_log(রিক্ত, "starting terminal to run a shell");
     }
-    else
+    অন্যথা
     {
-	vim_snprintf((char *)newcmd, cmdlen, "%s %s %s", p_sh, p_shcf, cmd);
-	ch_log(NULL, "starting terminal for system command '%s'", cmd);
+	vim_snprintf((ৱর্ণ *)newcmd, cmdlen, "%s %s %s", p_sh, p_shcf, cmd);
+	ch_log(রিক্ত, "starting terminal for system command '%s'", cmd);
     }
 
     init_job_options(&opt);
@@ -5512,11 +5512,11 @@ mch_call_shell_terminal(
     argvar[0].v_type = VAR_STRING;
     argvar[0].vval.v_string = newcmd;
     argvar[1].v_type = VAR_UNKNOWN;
-    buf = term_start(argvar, NULL, &opt, TERM_START_SYSTEM);
-    if (buf == NULL)
+    buf = term_start(argvar, রিক্ত, &opt, TERM_START_SYSTEM);
+    যদি (buf == রিক্ত)
     {
 	vim_free(newcmd);
-	return 255;
+	ঘূৰাই 255;
     }
 
     job = term_getjob(buf->b_term);
@@ -5524,24 +5524,24 @@ mch_call_shell_terminal(
 
     // Find a window to make "buf" curbuf.
     aucmd_prepbuf(&aco, buf);
-    if (curbuf == buf)
+    যদি (curbuf == buf)
     {
 	// Only do this when a window was found for "buf".
 	clear_oparg(&oa);
-	while (term_use_loop())
+	যেতিয়ালৈ (term_use_loop())
 	{
-	    if (oa.op_type == OP_NOP && oa.regname == NUL && !VIsual_active)
+	    যদি (oa.op_type == OP_NOP && oa.regname == NUL && !VIsual_active)
 	    {
 		// If terminal_loop() returns OK we got a key that is handled
 		// in Normal model. We don't do redrawing anyway.
-		if (terminal_loop(TRUE) == OK)
+		যদি (terminal_loop(TRUE) == OK)
 		    normal_cmd(&oa, TRUE);
 	    }
-	    else
+	    অন্যথা
 		normal_cmd(&oa, TRUE);
 	}
 	retval = job->jv_exitval;
-	ch_log(NULL, "system command finished");
+	ch_log(রিক্ত, "system command finished");
 
 	job_unref(job);
 
@@ -5553,21 +5553,21 @@ mch_call_shell_terminal(
     do_buffer(DOBUF_WIPE, DOBUF_FIRST, FORWARD, buf->b_fnum, TRUE);
 
     vim_free(newcmd);
-    return retval;
+    ঘূৰাই retval;
 }
 #endif
 /* Restore a previous environment variable value, or unset it if NULL.
  * 'must_free' indicates whether 'old_value' was allocated.
  */
-    static void
-restore_env_var(char_u *name, char_u *old_value, int must_free)
+    স্থির শূন্য
+restore_env_var(char_u *name, char_u *old_মান, পূর্ণাঙ্ক must_free)
 {
-    if (old_value != NULL)
+    যদি (old_মান != রিক্ত)
     {
-	vim_setenv(name, old_value);
-	if (must_free)
-	    vim_free(old_value);
-	return;
+	vim_setenv(name, old_মান);
+	যদি (must_free)
+	    vim_free(old_মান);
+	ঘূৰাই;
     }
     vim_unsetenv(name);
 }
@@ -5575,33 +5575,33 @@ restore_env_var(char_u *name, char_u *old_value, int must_free)
 /*
  * Either execute a command by calling the shell or start a new shell
  */
-    int
+    পূর্ণাঙ্ক
 mch_call_shell(
     char_u  *cmd,
-    int	    options)	// SHELL_*, see vim.h
+    পূর্ণাঙ্ক	    options)	// SHELL_*, see vim.h
 {
-    int		x = 0;
-    int		tmode = cur_tmode;
+    পূর্ণাঙ্ক		x = 0;
+    পূর্ণাঙ্ক		tmode = cur_tmode;
     WCHAR	szShellTitle[512];
-    int		must_free;
+    পূর্ণাঙ্ক		must_free;
     char_u	*oldval;
 
 #ifdef FEAT_EVAL
-    ch_log(NULL, "executing shell command: %s", cmd);
+    ch_log(রিক্ত, "executing shell command: %s", cmd);
 #endif
     // Change the title to reflect that we are in a subshell.
-    if (GetConsoleTitleW(szShellTitle, ARRAY_LENGTH(szShellTitle) - 4) > 0)
+    যদি (GetConsoleTitleW(szShellTitle, ARRAY_LENGTH(szShellTitle) - 4) > 0)
     {
-	if (cmd == NULL)
+	যদি (cmd == রিক্ত)
 	    wcscat(szShellTitle, L" :sh");
-	else
+	অন্যথা
 	{
-	    WCHAR *wn = enc_to_utf16((char_u *)cmd, NULL);
+	    WCHAR *wn = enc_to_utf16((char_u *)cmd, রিক্ত);
 
-	    if (wn != NULL)
+	    যদি (wn != রিক্ত)
 	    {
 		wcscat(szShellTitle, L" - !");
-		if ((wcslen(szShellTitle) + wcslen(wn) <
+		যদি ((wcslen(szShellTitle) + wcslen(wn) <
 			    ARRAY_LENGTH(szShellTitle)))
 		    wcscat(szShellTitle, wn);
 		SetConsoleTitleW(szShellTitle);
@@ -5618,30 +5618,30 @@ mch_call_shell(
     out_flush();
 
 #ifdef MCH_WRITE_DUMP
-    if (fdDump)
+    যদি (fdDump)
     {
 	fprintf(fdDump, "mch_call_shell(\"%s\", %d)\n", cmd, options);
 	fflush(fdDump);
     }
 #endif
-#if defined(FEAT_GUI) && defined(FEAT_TERMINAL)
+#যদি defined(FEAT_GUI) && defined(FEAT_TERMINAL)
     // TODO: make the terminal window work with input or output redirected.
-    if (
+    যদি (
 # ifdef VIMDLL
 	    gui.in_use &&
 # endif
-	    vim_strchr(p_go, GO_TERMINAL) != NULL
+	    vim_strchr(p_go, GO_TERMINAL) != রিক্ত
 	 && (options & (SHELL_FILTER|SHELL_DOOUT|SHELL_WRITE|SHELL_READ)) == 0)
     {
 	char_u	*cmdbase = cmd;
 
-	if (cmdbase != NULL)
+	যদি (cmdbase != রিক্ত)
 	    // Skip a leading quote and (.
-	    while (*cmdbase == '"' || *cmdbase == '(')
+	    যেতিয়ালৈ (*cmdbase == '"' || *cmdbase == '(')
 		++cmdbase;
 
 	// Check the command does not begin with "start "
-	if (cmdbase == NULL || STRNICMP(cmdbase, "start", 5) != 0
+	যদি (cmdbase == রিক্ত || STRNICMP(cmdbase, "start", 5) != 0
 						   || !VIM_ISWHITE(cmdbase[5]))
 	{
 	    // Use a terminal window to run the command in.
@@ -5649,7 +5649,7 @@ mch_call_shell(
 	    resettitle();
 	    restore_env_var((char_u *)"NoDefaultCurrentDirectoryInExePath",
 		    oldval, must_free);
-	    return x;
+	    ঘূৰাই x;
 	}
     }
 #endif
@@ -5666,27 +5666,27 @@ mch_call_shell(
     mch_signal(SIGTERM, SIG_IGN);
     mch_signal(SIGABRT, SIG_IGN);
 
-    if (options & SHELL_COOKED)
+    যদি (options & SHELL_COOKED)
 	settmode(TMODE_COOK);	// set to normal mode
 
-    if (cmd == NULL)
+    যদি (cmd == রিক্ত)
     {
-	x = mch_system((char *)p_sh, options);
+	x = mch_system((ৱর্ণ *)p_sh, options);
     }
-    else
+    অন্যথা
     {
 	// we use "command" or "cmd" to start the shell; slow but easy
-	char_u	*newcmd = NULL;
+	char_u	*newcmd = রিক্ত;
 	char_u	*cmdbase = cmd;
 	long_u	cmdlen;
 
 	// Skip a leading ", ( and "(.
-	if (*cmdbase == '"' )
+	যদি (*cmdbase == '"' )
 	    ++cmdbase;
-	if (*cmdbase == '(')
+	যদি (*cmdbase == '(')
 	    ++cmdbase;
 
-	if ((STRNICMP(cmdbase, "start", 5) == 0) && VIM_ISWHITE(cmdbase[5]))
+	যদি ((STRNICMP(cmdbase, "start", 5) == 0) && VIM_ISWHITE(cmdbase[5]))
 	{
 	    STARTUPINFO		si;
 	    PROCESS_INFORMATION	pi;
@@ -5694,17 +5694,17 @@ mch_call_shell(
 	    INT			n_show_cmd = SW_SHOWNORMAL;
 	    char_u		*p;
 
-	    ZeroMemory(&si, sizeof(si));
-	    si.cb = sizeof(si);
-	    si.lpReserved = NULL;
-	    si.lpDesktop = NULL;
-	    si.lpTitle = NULL;
+	    ZeroMemory(&si, পরিমাণ(si));
+	    si.cb = পরিমাণ(si);
+	    si.lpReserved = রিক্ত;
+	    si.lpDesktop = রিক্ত;
+	    si.lpTitle = রিক্ত;
 	    si.dwFlags = 0;
 	    si.cbReserved2 = 0;
-	    si.lpReserved2 = NULL;
+	    si.lpReserved2 = রিক্ত;
 
 	    cmdbase = skipwhite(cmdbase + 5);
-	    if ((STRNICMP(cmdbase, "/min", 4) == 0)
+	    যদি ((STRNICMP(cmdbase, "/min", 4) == 0)
 		    && VIM_ISWHITE(cmdbase[4]))
 	    {
 		cmdbase = skipwhite(cmdbase + 4);
@@ -5712,31 +5712,31 @@ mch_call_shell(
 		si.wShowWindow = SW_SHOWMINNOACTIVE;
 		n_show_cmd = SW_SHOWMINNOACTIVE;
 	    }
-	    else if ((STRNICMP(cmdbase, "/b", 2) == 0)
+	    অন্যথা যদি ((STRNICMP(cmdbase, "/b", 2) == 0)
 		    && VIM_ISWHITE(cmdbase[2]))
 	    {
 		cmdbase = skipwhite(cmdbase + 2);
 		flags = CREATE_NO_WINDOW;
 		si.dwFlags = STARTF_USESTDHANDLES;
-		si.hStdInput = CreateFile("\\\\.\\NUL",	// File name
+		si.h_Std_প্ৰবেশ = CreateFile("\\\\.\\NUL",	// File name
 		    GENERIC_READ,			// Access flags
 		    0,					// Share flags
-		    NULL,				// Security att.
+		    রিক্ত,				// Security att.
 		    OPEN_EXISTING,			// Open flags
 		    FILE_ATTRIBUTE_NORMAL,		// File att.
-		    NULL);				// Temp file
-		si.hStdOutput = si.hStdInput;
-		si.hStdError = si.hStdInput;
+		    রিক্ত);				// Temp file
+		si.hStdOutput = si.h_Std_প্ৰবেশ;
+		si.hStdError = si.h_Std_প্ৰবেশ;
 	    }
 
 	    // Remove a trailing ", ) and )" if they have a match
 	    // at the start of the command.
-	    if (cmdbase > cmd)
+	    যদি (cmdbase > cmd)
 	    {
 		p = cmdbase + STRLEN(cmdbase);
-		if (p > cmdbase && p[-1] == '"' && *cmd == '"')
+		যদি (p > cmdbase && p[-1] == '"' && *cmd == '"')
 		    *--p = NUL;
-		if (p > cmdbase && p[-1] == ')'
+		যদি (p > cmdbase && p[-1] == ')'
 			&& (*cmd =='(' || cmd[1] == '('))
 		    *--p = NUL;
 	    }
@@ -5751,25 +5751,25 @@ mch_call_shell(
 	     * shellxescape except '|' for avoiding to be treated as
 	     * argument to them. Pass the arguments to sub-shell.
 	     */
-	    if (flags != CREATE_NEW_CONSOLE)
+	    যদি (flags != CREATE_NEW_CONSOLE)
 	    {
 		char_u	*subcmd;
 		char_u	*cmd_shell = mch_getenv("COMSPEC");
 
-		if (cmd_shell == NULL || *cmd_shell == NUL)
+		যদি (cmd_shell == রিক্ত || *cmd_shell == NUL)
 		    cmd_shell = (char_u *)default_shell();
 
 		subcmd = vim_strsave_escaped_ext(cmdbase,
 			(char_u *)"|", '^', FALSE);
-		if (subcmd != NULL)
+		যদি (subcmd != রিক্ত)
 		{
 		    // make "cmd.exe /c arguments"
 		    cmdlen = STRLEN(cmd_shell) + STRLEN(subcmd) + 5;
 		    newcmd = alloc(cmdlen);
-		    if (newcmd != NULL)
-			vim_snprintf((char *)newcmd, cmdlen, "%s /c %s",
+		    যদি (newcmd != রিক্ত)
+			vim_snprintf((ৱর্ণ *)newcmd, cmdlen, "%s /c %s",
 						       cmd_shell, subcmd);
-		    else
+		    অন্যথা
 			newcmd = cmdbase;
 		    vim_free(subcmd);
 		}
@@ -5780,36 +5780,36 @@ mch_call_shell(
 	     * inherit our handles which causes unpleasant dangling swap
 	     * files if we exit before the spawned process
 	     */
-	    if (vim_create_process((char *)newcmd, FALSE, flags,
-			&si, &pi, NULL, NULL))
+	    যদি (vim_create_process((ৱর্ণ *)newcmd, FALSE, flags,
+			&si, &pi, রিক্ত, রিক্ত))
 		x = 0;
-	    else if (vim_shell_execute((char *)newcmd, n_show_cmd)
+	    অন্যথা যদি (vim_shell_execute((ৱর্ণ *)newcmd, n_show_cmd)
 							       > (HINSTANCE)32)
 		x = 0;
-	    else
+	    অন্যথা
 	    {
 		x = -1;
 #ifdef FEAT_GUI_MSWIN
 # ifdef VIMDLL
-		if (gui.in_use)
+		যদি (gui.in_use)
 # endif
 		    emsg(_(e_command_not_found));
 #endif
 	    }
 
-	    if (newcmd != cmdbase)
+	    যদি (newcmd != cmdbase)
 		vim_free(newcmd);
 
-	    if (si.dwFlags == STARTF_USESTDHANDLES && si.hStdInput != NULL)
+	    যদি (si.dwFlags == STARTF_USESTDHANDLES && si.h_Std_প্ৰবেশ != রিক্ত)
 	    {
 		// Close the handle to \\.\NUL created above.
-		CloseHandle(si.hStdInput);
+		CloseHandle(si.h_Std_প্ৰবেশ);
 	    }
 	    // Close the handles to the subprocess, so that it goes away
 	    CloseHandle(pi.hThread);
 	    CloseHandle(pi.hProcess);
 	}
-	else
+	অন্যথা
 	{
 	    cmdlen =
 #ifdef FEAT_GUI_MSWIN
@@ -5821,53 +5821,53 @@ mch_call_shell(
 		STRLEN(p_sh) + STRLEN(p_shcf) + STRLEN(cmd) + 10;
 
 	    newcmd = alloc(cmdlen);
-	    if (newcmd != NULL)
+	    যদি (newcmd != রিক্ত)
 	    {
-#if defined(FEAT_GUI_MSWIN)
-		if (
+#যদি defined(FEAT_GUI_MSWIN)
+		যদি (
 # ifdef VIMDLL
 		    (gui.in_use || gui.starting) &&
 # endif
 		    need_vimrun_warning)
 		{
-		    char *msg = _("VIMRUN.EXE not found in your $PATH.\n"
+		    ৱর্ণ *বাৰ্তা = _("VIMRUN.EXE not found in your $PATH.\n"
 			"External commands will not pause after completion.\n"
 			"See  :help win32-vimrun  for more information.");
-		    char *title = _("Vim Warning");
-		    WCHAR *wmsg = enc_to_utf16((char_u *)msg, NULL);
-		    WCHAR *wtitle = enc_to_utf16((char_u *)title, NULL);
+		    ৱর্ণ *title = _("Vim Warning");
+		    WCHAR *wmsg = enc_to_utf16((char_u *)বাৰ্তা, রিক্ত);
+		    WCHAR *wtitle = enc_to_utf16((char_u *)title, রিক্ত);
 
-		    if (wmsg != NULL && wtitle != NULL)
-			MessageBoxW(NULL, wmsg, wtitle, MB_ICONWARNING);
+		    যদি (wmsg != রিক্ত && wtitle != রিক্ত)
+			MessageBoxW(রিক্ত, wmsg, wtitle, MB_ICONWARNING);
 		    vim_free(wmsg);
 		    vim_free(wtitle);
 		    need_vimrun_warning = FALSE;
 		}
-		if (
+		যদি (
 # ifdef VIMDLL
 		    (gui.in_use || gui.starting) &&
 # endif
 		    !s_dont_use_vimrun && p_stmp)
 		    // Use vimrun to execute the command.  It opens a console
 		    // window, which can be closed without killing Vim.
-		    vim_snprintf((char *)newcmd, cmdlen, "%s%s%s %s %s",
+		    vim_snprintf((ৱর্ণ *)newcmd, cmdlen, "%s%s%s %s %s",
 			    vimrun_path.string,
-			    (msg_silent != 0 || (options & SHELL_DOOUT))
+			    (বাৰ্তা_silent != 0 || (options & SHELL_DOOUT))
 								 ? "-s " : "",
 			    p_sh, p_shcf, cmd);
-		else if (
+		অন্যথা যদি (
 # ifdef VIMDLL
 			(gui.in_use || gui.starting) &&
 # endif
 			s_dont_use_vimrun && STRCMP(p_shcf, "/c") == 0)
 		    // workaround for the case that "vimrun" does not exist
-		    vim_snprintf((char *)newcmd, cmdlen, "%s %s %s %s %s",
+		    vim_snprintf((ৱর্ণ *)newcmd, cmdlen, "%s %s %s %s %s",
 					   p_sh, p_shcf, p_sh, p_shcf, cmd);
-		else
+		অন্যথা
 #endif
-		    vim_snprintf((char *)newcmd, cmdlen, "%s %s %s",
+		    vim_snprintf((ৱর্ণ *)newcmd, cmdlen, "%s %s %s",
 							   p_sh, p_shcf, cmd);
-		x = mch_system((char *)newcmd, options);
+		x = mch_system((ৱর্ণ *)newcmd, options);
 		vim_free(newcmd);
 	    }
 	}
@@ -5877,7 +5877,7 @@ mch_call_shell(
     restore_env_var((char_u *)"NoDefaultCurrentDirectoryInExePath",
 	    oldval, must_free);
 
-    if (tmode == TMODE_RAW)
+    যদি (tmode == TMODE_RAW)
     {
 	// The shell may have messed with the mode, always set it.
 	cur_tmode = TMODE_UNKNOWN;
@@ -5885,15 +5885,15 @@ mch_call_shell(
     }
 
     // Print the return value, unless "vimrun" was used.
-    if (x != 0 && !(options & SHELL_SILENT) && !emsg_silent
-#if defined(FEAT_GUI_MSWIN)
+    যদি (x != 0 && !(options & SHELL_SILENT) && !emsg_silent
+#যদি defined(FEAT_GUI_MSWIN)
 	    && ((gui.in_use || gui.starting) ?
 		((options & SHELL_DOOUT) || s_dont_use_vimrun || !p_stmp) : 1)
 #endif
 	    )
     {
 	smsg(_("shell returned %d"), x);
-	msg_putchar('\n');
+	বাৰ্তা_putchar('\n');
     }
     resettitle();
 
@@ -5905,11 +5905,11 @@ mch_call_shell(
     mch_signal(SIGTERM, SIG_DFL);
     mch_signal(SIGABRT, SIG_DFL);
 
-    return x;
+    ঘূৰাই x;
 }
 
-#if defined(FEAT_JOB_CHANNEL)
-    static HANDLE
+#যদি defined(FEAT_JOB_CHANNEL)
+    স্থির HANDLE
 job_io_file_open(
 	char_u *fname,
 	DWORD dwDesiredAccess,
@@ -5921,54 +5921,54 @@ job_io_file_open(
     HANDLE h;
     WCHAR *wn;
 
-    wn = enc_to_utf16(fname, NULL);
-    if (wn == NULL)
-	return INVALID_HANDLE_VALUE;
+    wn = enc_to_utf16(fname, রিক্ত);
+    যদি (wn == রিক্ত)
+	ঘূৰাই INVALID_HANDLE_মান;
 
     h = CreateFileW(wn, dwDesiredAccess, dwShareMode,
 	    lpSecurityAttributes, dwCreationDisposition,
-	    dwFlagsAndAttributes, NULL);
+	    dwFlagsAndAttributes, রিক্ত);
     vim_free(wn);
-    return h;
+    ঘূৰাই h;
 }
 
 /*
  * Turn the dictionary "env" into a NUL separated list that can be used as the
  * environment argument of vim_create_process().
  */
-    void
-win32_build_env(dict_T *env, garray_T *gap, int is_terminal)
+    শূন্য
+win32_build_env(dict_T *env, garray_T *gap, পূর্ণাঙ্ক is_terminal)
 {
     hashitem_T	*hi;
-    long_u	todo = env != NULL ? env->dv_hashtab.ht_used : 0;
+    long_u	todo = env != রিক্ত ? env->dv_hashtab.ht_used : 0;
     LPVOID	base = GetEnvironmentStringsW();
 
     // for last \0
-    if (ga_grow(gap, 1) == FAIL)
-	return;
+    যদি (ga_grow(gap, 1) == FAIL)
+	ঘূৰাই;
 
-    if (env != NULL)
+    যদি (env != রিক্ত)
     {
-	FOR_ALL_HASHTAB_ITEMS(&env->dv_hashtab, hi, todo)
+	FOR_ALL_HASHTAB_বস্তুসমূহ(&env->dv_hashtab, hi, todo)
 	{
-	    if (!HASHITEM_EMPTY(hi))
+	    যদি (!HASHITEM_EMPTY(hi))
 	    {
 		typval_T *item = &dict_lookup(hi)->di_tv;
-		WCHAR   *wkey = enc_to_utf16((char_u *)hi->hi_key, NULL);
-		WCHAR   *wval = enc_to_utf16(tv_get_string(item), NULL);
+		WCHAR   *wkey = enc_to_utf16((char_u *)hi->hi_চাবি, রিক্ত);
+		WCHAR   *wval = enc_to_utf16(tv_get_string(item), রিক্ত);
 		--todo;
-		if (wkey != NULL && wval != NULL)
+		যদি (wkey != রিক্ত && wval != রিক্ত)
 		{
 		    size_t	n;
 		    size_t	lkey = wcslen(wkey);
 		    size_t	lval = wcslen(wval);
 
-		    if (ga_grow(gap, (int)(lkey + lval + 2)) == FAIL)
-			continue;
-		    for (n = 0; n < lkey; n++)
+		    যদি (ga_grow(gap, (পূর্ণাঙ্ক)(lkey + lval + 2)) == FAIL)
+			অনুৱর্ত;
+		    বাবে (n = 0; n < lkey; n++)
 			*((WCHAR*)gap->ga_data + gap->ga_len++) = wkey[n];
 		    *((WCHAR*)gap->ga_data + gap->ga_len++) = L'=';
-		    for (n = 0; n < lval; n++)
+		    বাবে (n = 0; n < lval; n++)
 			*((WCHAR*)gap->ga_data + gap->ga_len++) = wval[n];
 		    *((WCHAR*)gap->ga_data + gap->ga_len++) = L'\0';
 		}
@@ -5978,17 +5978,17 @@ win32_build_env(dict_T *env, garray_T *gap, int is_terminal)
 	}
     }
 
-    if (base)
+    যদি (base)
     {
 	WCHAR	*p = (WCHAR*) base;
 
 	// for last \0
-	if (ga_grow(gap, 1) == FAIL)
-	    return;
+	যদি (ga_grow(gap, 1) == FAIL)
+	    ঘূৰাই;
 
-	while (*p != 0 || *(p + 1) != 0)
+	যেতিয়ালৈ (*p != 0 || *(p + 1) != 0)
 	{
-	    if (ga_grow(gap, 1) == OK)
+	    যদি (ga_grow(gap, 1) == OK)
 		*((WCHAR*)gap->ga_data + gap->ga_len++) = *p;
 	    p++;
 	}
@@ -5996,7 +5996,7 @@ win32_build_env(dict_T *env, garray_T *gap, int is_terminal)
 	*((WCHAR*)gap->ga_data + gap->ga_len++) = L'\0';
     }
 
-# if defined(FEAT_CLIENTSERVER) || defined(FEAT_TERMINAL)
+# যদি defined(FEAT_CLIENTSERVER) || defined(FEAT_TERMINAL)
     {
 #  ifdef FEAT_CLIENTSERVER
 	char_u	*servername = get_vim_var_str(VV_SEND_SERVER);
@@ -6018,24 +6018,24 @@ win32_build_env(dict_T *env, garray_T *gap, int is_terminal)
 #  endif
 		    ;
 
-	if (ga_grow(gap, (int)n) == OK)
+	যদি (ga_grow(gap, (পূর্ণাঙ্ক)n) == OK)
 	{
 #  ifdef FEAT_CLIENTSERVER
-	    for (n = 0; n < 15; n++)
+	    বাবে (n = 0; n < 15; n++)
 		*((WCHAR*)gap->ga_data + gap->ga_len++) =
 		    (WCHAR)"VIM_SERVERNAME="[n];
-	    for (n = 0; n < servername_len; n++)
+	    বাবে (n = 0; n < servername_len; n++)
 		*((WCHAR*)gap->ga_data + gap->ga_len++) =
 		    (WCHAR)servername[n];
 	    *((WCHAR*)gap->ga_data + gap->ga_len++) = L'\0';
 #  endif
 #  ifdef FEAT_TERMINAL
-	    if (is_terminal)
+	    যদি (is_terminal)
 	    {
-		for (n = 0; n < 13; n++)
+		বাবে (n = 0; n < 13; n++)
 		    *((WCHAR*)gap->ga_data + gap->ga_len++) =
 			(WCHAR)"VIM_TERMINAL="[n];
-		for (n = 0; n < version_len; n++)
+		বাবে (n = 0; n < version_len; n++)
 		    *((WCHAR*)gap->ga_data + gap->ga_len++) =
 			(WCHAR)version[n];
 		*((WCHAR*)gap->ga_data + gap->ga_len++) = L'\0';
@@ -6050,11 +6050,11 @@ win32_build_env(dict_T *env, garray_T *gap, int is_terminal)
  * Create a pair of pipes.
  * Return TRUE for success, FALSE for failure.
  */
-    static BOOL
+    স্থির BOOL
 create_pipe_pair(HANDLE handles[2])
 {
-    static LONG		s;
-    char		name[64];
+    স্থির LONG		s;
+    ৱর্ণ		name[64];
     SECURITY_ATTRIBUTES sa;
 
     sprintf(name, "\\\\?\\pipe\\vim-%08lx-%08lx",
@@ -6066,32 +6066,32 @@ create_pipe_pair(HANDLE handles[2])
 	    name,
 	    PIPE_ACCESS_OUTBOUND | FILE_FLAG_OVERLAPPED,
 	    PIPE_TYPE_BYTE | PIPE_NOWAIT,
-	    1, MAX_NAMED_PIPE_SIZE, 0, 0, NULL);
+	    1, MAX_NAMED_PIPE_SIZE, 0, 0, রিক্ত);
 
-    if (handles[1] == INVALID_HANDLE_VALUE)
-	return FALSE;
+    যদি (handles[1] == INVALID_HANDLE_মান)
+	ঘূৰাই FALSE;
 
-    sa.nLength = sizeof(sa);
+    sa.nLength = পরিমাণ(sa);
     sa.bInheritHandle = TRUE;
-    sa.lpSecurityDescriptor = NULL;
+    sa.lpSecurityDescriptor = রিক্ত;
 
     handles[0] = CreateFile(name,
 	    FILE_GENERIC_READ,
 	    FILE_SHARE_READ, &sa,
 	    OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
 
-    if (handles[0] == INVALID_HANDLE_VALUE)
+    যদি (handles[0] == INVALID_HANDLE_মান)
     {
 	CloseHandle(handles[1]);
-	return FALSE;
+	ঘূৰাই FALSE;
     }
 
-    return TRUE;
+    ঘূৰাই TRUE;
 }
 
 #endif // FEAT_JOB_CHANNEL
 
-#if defined(FEAT_EVAL)
+#যদি defined(FEAT_EVAL)
 /*
  * Execute "argv" directly without the shell and return the output.
  * Used by system() and systemlist() when the command is a List.
@@ -6102,71 +6102,71 @@ create_pipe_pair(HANDLE handles[2])
  */
     char_u *
 mch_get_cmd_output_direct(
-    char	**argv,
+    ৱর্ণ	**argv,
     char_u	*infile,
-    int		flags UNUSED,
-    int		*ret_len)
+    পূর্ণাঙ্ক		flags UNUSED,
+    পূর্ণাঙ্ক		*ret_len)
 {
     STARTUPINFO		si;
     PROCESS_INFORMATION pi;
     SECURITY_ATTRIBUTES saAttr;
-    HANDLE		hChildStdoutRd = INVALID_HANDLE_VALUE;
-    HANDLE		hChildStdoutWr = INVALID_HANDLE_VALUE;
-    HANDLE		hChildStdinRd = INVALID_HANDLE_VALUE;
+    HANDLE		hChildStdoutRd = INVALID_HANDLE_মান;
+    HANDLE		hChildStdoutWr = INVALID_HANDLE_মান;
+    HANDLE		hChildStdinRd = INVALID_HANDLE_মান;
     garray_T		cmd_ga;
     garray_T		out_ga;
-    char_u		*buffer = NULL;
+    char_u		*buffer = রিক্ত;
     DWORD		exit_code = (DWORD)-1;
-    int			i;
+    পূর্ণাঙ্ক			i;
 
     // Build a command string from argv.
     ga_init2(&cmd_ga, 1, 256);
-    for (i = 0; argv[i] != NULL; i++)
+    বাবে (i = 0; argv[i] != রিক্ত; i++)
     {
 	char_u	*arg = (char_u *)argv[i];
 	char_u	*s = arg;
-	int	has_spaces = FALSE;
-	int	j;
+	পূর্ণাঙ্ক	has_spaces = FALSE;
+	পূর্ণাঙ্ক	j;
 
-	for (j = 0; s[j] != NUL; j++)
-	    if (s[j] == ' ' || s[j] == '\t' || s[j] == '"')
+	বাবে (j = 0; s[j] != NUL; j++)
+	    যদি (s[j] == ' ' || s[j] == '\t' || s[j] == '"')
 	    {
 		has_spaces = TRUE;
-		break;
+		ভঙ্গ;
 	    }
 
-	if (i > 0)
+	যদি (i > 0)
 	    ga_append(&cmd_ga, ' ');
 
-	if (has_spaces)
+	যদি (has_spaces)
 	{
-	    int	num_bs;
+	    পূর্ণাঙ্ক	অঙ্ক_bs;
 
 	    ga_append(&cmd_ga, '"');
-	    for (j = 0; arg[j] != NUL; j++)
+	    বাবে (j = 0; arg[j] != NUL; j++)
 	    {
-		num_bs = 0;
-		while (arg[j] == '\\')
+		অঙ্ক_bs = 0;
+		যেতিয়ালৈ (arg[j] == '\\')
 		{
-		    num_bs++;
+		    অঙ্ক_bs++;
 		    j++;
 		}
 
-		if (arg[j] == NUL)
+		যদি (arg[j] == NUL)
 		{
 		    // Backslashes before closing quote must be doubled.
-		    while (num_bs-- > 0)
+		    যেতিয়ালৈ (অঙ্ক_bs-- > 0)
 		    {
 			ga_append(&cmd_ga, '\\');
 			ga_append(&cmd_ga, '\\');
 		    }
-		    break;
+		    ভঙ্গ;
 		}
-		else if (arg[j] == '"')
+		অন্যথা যদি (arg[j] == '"')
 		{
 		    // Backslashes before a double quote must be doubled,
 		    // and the double quote must be escaped.
-		    while (num_bs-- > 0)
+		    যেতিয়ালৈ (অঙ্ক_bs-- > 0)
 		    {
 			ga_append(&cmd_ga, '\\');
 			ga_append(&cmd_ga, '\\');
@@ -6174,91 +6174,91 @@ mch_get_cmd_output_direct(
 		    ga_append(&cmd_ga, '\\');
 		    ga_append(&cmd_ga, '"');
 		}
-		else
+		অন্যথা
 		{
-		    while (num_bs-- > 0)
+		    যেতিয়ালৈ (অঙ্ক_bs-- > 0)
 			ga_append(&cmd_ga, '\\');
 		    ga_append(&cmd_ga, arg[j]);
 		}
 	    }
 	    ga_append(&cmd_ga, '"');
 	}
-	else
+	অন্যথা
 	    ga_concat(&cmd_ga, arg);
     }
     ga_append(&cmd_ga, NUL);
 
     ga_init2(&out_ga, 1, 4096);
 
-    saAttr.nLength = sizeof(SECURITY_ATTRIBUTES);
+    saAttr.nLength = পরিমাণ(SECURITY_ATTRIBUTES);
     saAttr.bInheritHandle = TRUE;
-    saAttr.lpSecurityDescriptor = NULL;
+    saAttr.lpSecurityDescriptor = রিক্ত;
 
     // Create a pipe for the child's stdout.
-    if (!CreatePipe(&hChildStdoutRd, &hChildStdoutWr, &saAttr, 0)
+    যদি (!CreatePipe(&hChildStdoutRd, &hChildStdoutWr, &saAttr, 0)
 	    || !SetHandleInformation(hChildStdoutRd, HANDLE_FLAG_INHERIT, 0))
     {
 	emsg(_(e_cannot_create_pipes));
-	goto done;
+	গচ্ছ done;
     }
 
     // Set up stdin from infile if provided.
-    if (infile != NULL)
+    যদি (infile != রিক্ত)
     {
-	WCHAR *winfile = enc_to_utf16(infile, NULL);
+	WCHAR *winfile = enc_to_utf16(infile, রিক্ত);
 
-	if (winfile != NULL)
+	যদি (winfile != রিক্ত)
 	{
 	    hChildStdinRd = CreateFileW(winfile, GENERIC_READ,
 		    FILE_SHARE_READ, &saAttr, OPEN_EXISTING,
-		    FILE_ATTRIBUTE_NORMAL, NULL);
+		    FILE_ATTRIBUTE_NORMAL, রিক্ত);
 	    vim_free(winfile);
 	}
     }
 
-    ZeroMemory(&pi, sizeof(pi));
-    ZeroMemory(&si, sizeof(si));
-    si.cb = sizeof(si);
+    ZeroMemory(&pi, পরিমাণ(pi));
+    ZeroMemory(&si, পরিমাণ(si));
+    si.cb = পরিমাণ(si);
     si.dwFlags = STARTF_USESTDHANDLES | STARTF_USESHOWWINDOW;
     si.wShowWindow = SW_HIDE;
     si.hStdOutput = hChildStdoutWr;
     si.hStdError = hChildStdoutWr;
-    si.hStdInput = (hChildStdinRd != INVALID_HANDLE_VALUE)
-		    ? hChildStdinRd : INVALID_HANDLE_VALUE;
+    si.h_Std_প্ৰবেশ = (hChildStdinRd != INVALID_HANDLE_মান)
+		    ? hChildStdinRd : INVALID_HANDLE_মান;
 
-    ch_log(NULL, "directly executing: %s", (char *)cmd_ga.ga_data);
+    ch_log(রিক্ত, "directly executing: %s", (ৱর্ণ *)cmd_ga.ga_data);
 
     // Create the child process directly, without going through the shell.
-    if (!vim_create_process((char *)cmd_ga.ga_data, TRUE,
+    যদি (!vim_create_process((ৱর্ণ *)cmd_ga.ga_data, TRUE,
 		CREATE_DEFAULT_ERROR_MODE | CREATE_NEW_PROCESS_GROUP,
-		&si, &pi, NULL, NULL))
+		&si, &pi, রিক্ত, রিক্ত))
     {
 	semsg(_(e_invalid_argument_str), cmd_ga.ga_data);
-	goto done;
+	গচ্ছ done;
     }
 
     // Close the write end of stdout pipe and stdin in the parent so that
     // ReadFile() will get EOF when the child process exits.
     CloseHandle(hChildStdoutWr);
-    hChildStdoutWr = INVALID_HANDLE_VALUE;
-    if (hChildStdinRd != INVALID_HANDLE_VALUE)
+    hChildStdoutWr = INVALID_HANDLE_মান;
+    যদি (hChildStdinRd != INVALID_HANDLE_মান)
     {
 	CloseHandle(hChildStdinRd);
-	hChildStdinRd = INVALID_HANDLE_VALUE;
+	hChildStdinRd = INVALID_HANDLE_মান;
     }
 
     // Read output from child process.
-    for (;;)
+    বাবে (;;)
     {
-	char	buf[4096];
+	ৱর্ণ	buf[4096];
 	DWORD	n;
 
-	if (!ReadFile(hChildStdoutRd, buf, sizeof(buf), &n, NULL) || n == 0)
-	    break;
-	if (ga_grow(&out_ga, (int)n) == OK)
+	যদি (!ReadFile(hChildStdoutRd, buf, পরিমাণ(buf), &n, রিক্ত) || n == 0)
+	    ভঙ্গ;
+	যদি (ga_grow(&out_ga, (পূর্ণাঙ্ক)n) == OK)
 	{
-	    mch_memmove((char *)out_ga.ga_data + out_ga.ga_len, buf, n);
-	    out_ga.ga_len += (int)n;
+	    mch_memmove((ৱর্ণ *)out_ga.ga_data + out_ga.ga_len, buf, n);
+	    out_ga.ga_len += (পূর্ণাঙ্ক)n;
 	}
     }
 
@@ -6270,167 +6270,167 @@ mch_get_cmd_output_direct(
 
     set_vim_var_nr(VV_SHELL_ERROR, (long)exit_code);
 
-    if (out_ga.ga_len > 0)
+    যদি (out_ga.ga_len > 0)
     {
 	buffer = alloc(out_ga.ga_len + 1);
-	if (buffer != NULL)
+	যদি (buffer != রিক্ত)
 	{
 	    mch_memmove(buffer, out_ga.ga_data, out_ga.ga_len);
-	    if (ret_len == NULL)
+	    যদি (ret_len == রিক্ত)
 	    {
 		// Change NUL into SOH, otherwise the string is truncated.
-		for (i = 0; i < out_ga.ga_len; ++i)
-		    if (buffer[i] == NUL)
+		বাবে (i = 0; i < out_ga.ga_len; ++i)
+		    যদি (buffer[i] == NUL)
 			buffer[i] = 1;
 		buffer[out_ga.ga_len] = NUL;
 	    }
-	    else
+	    অন্যথা
 		*ret_len = out_ga.ga_len;
 	}
     }
-    else if (ret_len != NULL)
+    অন্যথা যদি (ret_len != রিক্ত)
 	*ret_len = 0;
 
 done:
     ga_clear(&cmd_ga);
     ga_clear(&out_ga);
-    if (hChildStdoutRd != INVALID_HANDLE_VALUE)
+    যদি (hChildStdoutRd != INVALID_HANDLE_মান)
 	CloseHandle(hChildStdoutRd);
-    if (hChildStdoutWr != INVALID_HANDLE_VALUE)
+    যদি (hChildStdoutWr != INVALID_HANDLE_মান)
 	CloseHandle(hChildStdoutWr);
-    if (hChildStdinRd != INVALID_HANDLE_VALUE)
+    যদি (hChildStdinRd != INVALID_HANDLE_মান)
 	CloseHandle(hChildStdinRd);
-    return buffer;
+    ঘূৰাই buffer;
 }
 #endif // FEAT_EVAL
 
-#if defined(FEAT_JOB_CHANNEL)
-    void
-mch_job_start(char *cmd, job_T *job, jobopt_T *options)
+#যদি defined(FEAT_JOB_CHANNEL)
+    শূন্য
+mch_job_start(ৱর্ণ *cmd, job_T *job, jobopt_T *options)
 {
     STARTUPINFO		si;
     PROCESS_INFORMATION	pi;
     HANDLE		jo;
     SECURITY_ATTRIBUTES saAttr;
-    channel_T		*channel = NULL;
+    channel_T		*channel = রিক্ত;
     HANDLE		ifd[2];
     HANDLE		ofd[2];
     HANDLE		efd[2];
     garray_T		ga;
 
-    int		use_null_for_in = options->jo_io[PART_IN] == JIO_NULL;
-    int		use_null_for_out = options->jo_io[PART_OUT] == JIO_NULL;
-    int		use_null_for_err = options->jo_io[PART_ERR] == JIO_NULL;
-    int		use_file_for_in = options->jo_io[PART_IN] == JIO_FILE;
-    int		use_file_for_out = options->jo_io[PART_OUT] == JIO_FILE;
-    int		use_file_for_err = options->jo_io[PART_ERR] == JIO_FILE;
-    int		use_out_for_err = options->jo_io[PART_ERR] == JIO_OUT;
+    পূর্ণাঙ্ক		use_null_for_in = options->jo_io[PART_IN] == JIO_NULL;
+    পূর্ণাঙ্ক		use_null_for_out = options->jo_io[PART_OUT] == JIO_NULL;
+    পূর্ণাঙ্ক		use_null_for_err = options->jo_io[PART_ERR] == JIO_NULL;
+    পূর্ণাঙ্ক		use_file_for_in = options->jo_io[PART_IN] == JIO_FILE;
+    পূর্ণাঙ্ক		use_file_for_out = options->jo_io[PART_OUT] == JIO_FILE;
+    পূর্ণাঙ্ক		use_file_for_err = options->jo_io[PART_ERR] == JIO_FILE;
+    পূর্ণাঙ্ক		use_out_for_err = options->jo_io[PART_ERR] == JIO_OUT;
 
-    if (use_out_for_err && use_null_for_out)
+    যদি (use_out_for_err && use_null_for_out)
 	use_null_for_err = TRUE;
 
-    ifd[0] = INVALID_HANDLE_VALUE;
-    ifd[1] = INVALID_HANDLE_VALUE;
-    ofd[0] = INVALID_HANDLE_VALUE;
-    ofd[1] = INVALID_HANDLE_VALUE;
-    efd[0] = INVALID_HANDLE_VALUE;
-    efd[1] = INVALID_HANDLE_VALUE;
-    ga_init2(&ga, sizeof(wchar_t), 500);
+    ifd[0] = INVALID_HANDLE_মান;
+    ifd[1] = INVALID_HANDLE_মান;
+    ofd[0] = INVALID_HANDLE_মান;
+    ofd[1] = INVALID_HANDLE_মান;
+    efd[0] = INVALID_HANDLE_মান;
+    efd[1] = INVALID_HANDLE_মান;
+    ga_init2(&ga, পরিমাণ(wchar_t), 500);
 
-    jo = CreateJobObject(NULL, NULL);
-    if (jo == NULL)
+    jo = CreateJobObject(রিক্ত, রিক্ত);
+    যদি (jo == রিক্ত)
     {
 	job->jv_status = JOB_FAILED;
-	goto failed;
+	গচ্ছ failed;
     }
 
-    if (options->jo_env != NULL)
+    যদি (options->jo_env != রিক্ত)
 	win32_build_env(options->jo_env, &ga, FALSE);
 
-    ZeroMemory(&pi, sizeof(pi));
-    ZeroMemory(&si, sizeof(si));
-    si.cb = sizeof(si);
+    ZeroMemory(&pi, পরিমাণ(pi));
+    ZeroMemory(&si, পরিমাণ(si));
+    si.cb = পরিমাণ(si);
     si.dwFlags |= STARTF_USESHOWWINDOW;
     si.wShowWindow = SW_HIDE;
 
-    saAttr.nLength = sizeof(SECURITY_ATTRIBUTES);
+    saAttr.nLength = পরিমাণ(SECURITY_ATTRIBUTES);
     saAttr.bInheritHandle = TRUE;
-    saAttr.lpSecurityDescriptor = NULL;
+    saAttr.lpSecurityDescriptor = রিক্ত;
 
-    if (use_file_for_in)
+    যদি (use_file_for_in)
     {
 	char_u *fname = options->jo_io_name[PART_IN];
 
 	ifd[0] = job_io_file_open(fname, GENERIC_READ,
 		FILE_SHARE_READ | FILE_SHARE_WRITE,
 		&saAttr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL);
-	if (ifd[0] == INVALID_HANDLE_VALUE)
+	যদি (ifd[0] == INVALID_HANDLE_মান)
 	{
 	    semsg(_(e_cant_open_file_str), fname);
-	    goto failed;
+	    গচ্ছ failed;
 	}
     }
-    else if (!use_null_for_in
+    অন্যথা যদি (!use_null_for_in
 	    && (!create_pipe_pair(ifd)
 		|| !SetHandleInformation(ifd[1], HANDLE_FLAG_INHERIT, 0)))
-	goto failed;
+	গচ্ছ failed;
 
-    if (use_file_for_out)
+    যদি (use_file_for_out)
     {
 	char_u *fname = options->jo_io_name[PART_OUT];
 
 	ofd[1] = job_io_file_open(fname, GENERIC_WRITE,
 		FILE_SHARE_READ | FILE_SHARE_WRITE,
 		&saAttr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL);
-	if (ofd[1] == INVALID_HANDLE_VALUE)
+	যদি (ofd[1] == INVALID_HANDLE_মান)
 	{
 	    semsg(_(e_cant_open_file_str), fname);
-	    goto failed;
+	    গচ্ছ failed;
 	}
     }
-    else if (!use_null_for_out &&
+    অন্যথা যদি (!use_null_for_out &&
 	    (!CreatePipe(&ofd[0], &ofd[1], &saAttr, 0)
 	    || !SetHandleInformation(ofd[0], HANDLE_FLAG_INHERIT, 0)))
-	goto failed;
+	গচ্ছ failed;
 
-    if (use_file_for_err)
+    যদি (use_file_for_err)
     {
 	char_u *fname = options->jo_io_name[PART_ERR];
 
 	efd[1] = job_io_file_open(fname, GENERIC_WRITE,
 		FILE_SHARE_READ | FILE_SHARE_WRITE,
 		&saAttr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL);
-	if (efd[1] == INVALID_HANDLE_VALUE)
+	যদি (efd[1] == INVALID_HANDLE_মান)
 	{
 	    semsg(_(e_cant_open_file_str), fname);
-	    goto failed;
+	    গচ্ছ failed;
 	}
     }
-    else if (!use_out_for_err && !use_null_for_err &&
+    অন্যথা যদি (!use_out_for_err && !use_null_for_err &&
 	    (!CreatePipe(&efd[0], &efd[1], &saAttr, 0)
 	    || !SetHandleInformation(efd[0], HANDLE_FLAG_INHERIT, 0)))
-	goto failed;
+	গচ্ছ failed;
 
     si.dwFlags |= STARTF_USESTDHANDLES;
-    si.hStdInput = ifd[0];
+    si.h_Std_প্ৰবেশ = ifd[0];
     si.hStdOutput = ofd[1];
     si.hStdError = use_out_for_err ? ofd[1] : efd[1];
 
-    if (!use_null_for_in || !use_null_for_out || !use_null_for_err)
+    যদি (!use_null_for_in || !use_null_for_out || !use_null_for_err)
     {
-	if (options->jo_set & JO_CHANNEL)
+	যদি (options->jo_set & JO_CHANNEL)
 	{
 	    channel = options->jo_channel;
-	    if (channel != NULL)
+	    যদি (channel != রিক্ত)
 		++channel->ch_refcount;
 	}
-	else
+	অন্যথা
 	    channel = add_channel();
-	if (channel == NULL)
-	    goto failed;
+	যদি (channel == রিক্ত)
+	    গচ্ছ failed;
     }
 
-    if (!vim_create_process(cmd, TRUE,
+    যদি (!vim_create_process(cmd, TRUE,
 	    CREATE_SUSPENDED |
 	    CREATE_DEFAULT_ERROR_MODE |
 	    CREATE_NEW_PROCESS_GROUP |
@@ -6438,21 +6438,21 @@ mch_job_start(char *cmd, job_T *job, jobopt_T *options)
 	    CREATE_NEW_CONSOLE,
 	    &si, &pi,
 	    ga.ga_data,
-	    (char *)options->jo_cwd))
+	    (ৱর্ণ *)options->jo_cwd))
     {
 	CloseHandle(jo);
 	job->jv_status = JOB_FAILED;
-	goto failed;
+	গচ্ছ failed;
     }
 
     ga_clear(&ga);
 
-    if (!AssignProcessToJobObject(jo, pi.hProcess))
+    যদি (!AssignProcessToJobObject(jo, pi.hProcess))
     {
 	// if failing, switch the way to terminate
 	// process with TerminateProcess.
 	CloseHandle(jo);
-	jo = NULL;
+	jo = রিক্ত;
     }
     ResumeThread(pi.hThread);
     CloseHandle(pi.hThread);
@@ -6462,11 +6462,11 @@ mch_job_start(char *cmd, job_T *job, jobopt_T *options)
 
     CloseHandle(ifd[0]);
     CloseHandle(ofd[1]);
-    if (!use_out_for_err && !use_null_for_err)
+    যদি (!use_out_for_err && !use_null_for_err)
 	CloseHandle(efd[1]);
 
     job->jv_channel = channel;
-    if (channel != NULL)
+    যদি (channel != রিক্ত)
     {
 	channel_set_pipes(channel,
 		      use_file_for_in || use_null_for_in
@@ -6477,7 +6477,7 @@ mch_job_start(char *cmd, job_T *job, jobopt_T *options)
 					    ? INVALID_FD : (sock_T)efd[0]);
 	channel_set_job(channel, job, options);
     }
-    return;
+    ঘূৰাই;
 
 failed:
     CloseHandle(ifd[0]);
@@ -6490,23 +6490,23 @@ failed:
     ga_clear(&ga);
 }
 
-    char *
+    ৱর্ণ *
 mch_job_status(job_T *job)
 {
     DWORD dwExitCode = 0;
 
-    if (!GetExitCodeProcess(job->jv_proc_info.hProcess, &dwExitCode)
+    যদি (!GetExitCodeProcess(job->jv_proc_info.hProcess, &dwExitCode)
 	    || dwExitCode != STILL_ACTIVE)
     {
-	job->jv_exitval = (int)dwExitCode;
-	if (job->jv_status < JOB_ENDED)
+	job->jv_exitval = (পূর্ণাঙ্ক)dwExitCode;
+	যদি (job->jv_status < JOB_ENDED)
 	{
 	    ch_log(job->jv_channel, "Job ended");
 	    job->jv_status = JOB_ENDED;
 	}
-	return "dead";
+	ঘূৰাই "dead";
     }
-    return "run";
+    ঘূৰাই "run";
 }
 
     job_T *
@@ -6516,136 +6516,136 @@ mch_detect_ended_job(job_T *job_list)
     job_T *jobArray[MAXIMUM_WAIT_OBJECTS];
     job_T *job = job_list;
 
-    while (job != NULL)
+    যেতিয়ালৈ (job != রিক্ত)
     {
 	DWORD n;
 	DWORD result;
 
-	for (n = 0; n < MAXIMUM_WAIT_OBJECTS
-				       && job != NULL; job = job->jv_next)
+	বাবে (n = 0; n < MAXIMUM_WAIT_OBJECTS
+				       && job != রিক্ত; job = job->jv_next)
 	{
-	    if (job->jv_status == JOB_STARTED)
+	    যদি (job->jv_status == JOB_STARTED)
 	    {
 		jobHandles[n] = job->jv_proc_info.hProcess;
 		jobArray[n] = job;
 		++n;
 	    }
 	}
-	if (n == 0)
-	    continue;
+	যদি (n == 0)
+	    অনুৱর্ত;
 	result = WaitForMultipleObjects(n, jobHandles, FALSE, 0);
-	if (result >= WAIT_OBJECT_0 && result < WAIT_OBJECT_0 + n)
+	যদি (result >= WAIT_OBJECT_0 && result < WAIT_OBJECT_0 + n)
 	{
 	    job_T *wait_job = jobArray[result - WAIT_OBJECT_0];
 
-	    if (STRCMP(mch_job_status(wait_job), "dead") == 0)
-		return wait_job;
+	    যদি (STRCMP(mch_job_status(wait_job), "dead") == 0)
+		ঘূৰাই wait_job;
 	}
     }
-    return NULL;
+    ঘূৰাই রিক্ত;
 }
 
-    static BOOL
-terminate_all(HANDLE process, int code)
+    স্থির BOOL
+terminate_all(HANDLE process, পূর্ণাঙ্ক code)
 {
     PROCESSENTRY32  pe;
-    HANDLE	    h = INVALID_HANDLE_VALUE;
+    HANDLE	    h = INVALID_HANDLE_মান;
     DWORD	    pid = GetProcessId(process);
 
-    if (pid != 0)
+    যদি (pid != 0)
     {
 	h = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
-	if (h != INVALID_HANDLE_VALUE)
+	যদি (h != INVALID_HANDLE_মান)
 	{
-	    pe.dwSize = sizeof(PROCESSENTRY32);
-	    if (!Process32First(h, &pe))
-		goto theend;
+	    pe.dwSize = পরিমাণ(PROCESSENTRY32);
+	    যদি (!Process32First(h, &pe))
+		গচ্ছ theend;
 
-	    do
+	    কৰা
 	    {
-		if (pe.th32ParentProcessID == pid)
+		যদি (pe.th32ParentProcessID == pid)
 		{
 		    HANDLE ph = OpenProcess(
 				  PROCESS_ALL_ACCESS, FALSE, pe.th32ProcessID);
-		    if (ph != NULL)
+		    যদি (ph != রিক্ত)
 		    {
 			terminate_all(ph, code);
 			CloseHandle(ph);
 		    }
 		}
-	    } while (Process32Next(h, &pe));
+	    } যেতিয়ালৈ (Process32Next(h, &pe));
 
 	    CloseHandle(h);
 	}
     }
 
 theend:
-    return TerminateProcess(process, code);
+    ঘূৰাই TerminateProcess(process, code);
 }
 
 /*
  * Send a (deadly) signal to "job".
  * Return FAIL if it didn't work.
  */
-    int
+    পূর্ণাঙ্ক
 mch_signal_job(job_T *job, char_u *how)
 {
-    int ret;
+    পূর্ণাঙ্ক ret;
 
-    if (STRCMP(how, "term") == 0 || STRCMP(how, "kill") == 0 || *how == NUL)
+    যদি (STRCMP(how, "term") == 0 || STRCMP(how, "kill") == 0 || *how == NUL)
     {
 	// deadly signal
-	if (job->jv_job_object != NULL)
+	যদি (job->jv_job_object != রিক্ত)
 	{
-	    if (job->jv_channel != NULL && job->jv_channel->ch_anonymous_pipe)
+	    যদি (job->jv_channel != রিক্ত && job->jv_channel->ch_anonymous_pipe)
 		job->jv_channel->ch_killing = TRUE;
-	    return TerminateJobObject(job->jv_job_object, (UINT)-1) ? OK : FAIL;
+	    ঘূৰাই TerminateJobObject(job->jv_job_object, (UINT)-1) ? OK : FAIL;
 	}
-	return terminate_all(job->jv_proc_info.hProcess, -1) ? OK : FAIL;
+	ঘূৰাই terminate_all(job->jv_proc_info.hProcess, -1) ? OK : FAIL;
     }
 
-    if (!AttachConsole(job->jv_proc_info.dwProcessId))
-	return FAIL;
+    যদি (!AttachConsole(job->jv_proc_info.dwProcessId))
+	ঘূৰাই FAIL;
     ret = GenerateConsoleCtrlEvent(
 		STRCMP(how, "int") == 0 ? CTRL_C_EVENT : CTRL_BREAK_EVENT,
 		job->jv_proc_info.dwProcessId)
 	    ? OK : FAIL;
     FreeConsole();
-    return ret;
+    ঘূৰাই ret;
 }
 
 /*
  * Clear the data related to "job".
  */
-    void
+    শূন্য
 mch_clear_job(job_T *job)
 {
-    if (job->jv_status == JOB_FAILED)
-	return;
+    যদি (job->jv_status == JOB_FAILED)
+	ঘূৰাই;
 
-    if (job->jv_job_object != NULL)
+    যদি (job->jv_job_object != রিক্ত)
 	CloseHandle(job->jv_job_object);
     CloseHandle(job->jv_proc_info.hProcess);
 }
 #endif
 
 
-#if !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
+#যদি !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
 
 /*
  * Start termcap mode
  */
-    static void
-termcap_mode_start(void)
+    স্থির শূন্য
+termcap_mode_start(শূন্য)
 {
     DWORD cmodein;
 
-    if (g_fTermcapMode)
-	return;
+    যদি (g_fTermcapMode)
+	ঘূৰাই;
 
     SaveConsoleBuffer(&g_cbNonTermcap);
 
-    if (g_cbTermcap.IsValid)
+    যদি (g_cbTermcap.IsValid)
     {
 	/*
 	 * We've been in termcap mode before.  Restore certain screen
@@ -6659,7 +6659,7 @@ termcap_mode_start(void)
 	Rows = g_cbTermcap.Info.dwSize.Y;
 	Columns = g_cbTermcap.Info.dwSize.X;
     }
-    else
+    অন্যথা
     {
 	/*
 	 * This is our first time entering termcap mode.  Clear the console
@@ -6674,17 +6674,17 @@ termcap_mode_start(void)
     resettitle();
 
     GetConsoleMode(g_hConIn, &cmodein);
-    if (g_fMouseActive)
+    যদি (g_fMouseActive)
     {
-	cmodein |= ENABLE_MOUSE_INPUT;
+	cmodein |= ENABLE_MOUSE_প্ৰবেশ;
 	cmodein &= ~ENABLE_QUICK_EDIT_MODE;
     }
-    else
+    অন্যথা
     {
-	cmodein &= ~ENABLE_MOUSE_INPUT;
+	cmodein &= ~ENABLE_MOUSE_প্ৰবেশ;
 	cmodein |= g_cmodein & ENABLE_QUICK_EDIT_MODE;
     }
-    cmodein |= ENABLE_WINDOW_INPUT;
+    cmodein |= ENABLE_WINDOW_প্ৰবেশ;
     SetConsoleMode(g_hConIn, cmodein | ENABLE_EXTENDED_FLAGS);
 
     redraw_later_clear();
@@ -6695,37 +6695,37 @@ termcap_mode_start(void)
 /*
  * End termcap mode
  */
-    static void
-termcap_mode_end(void)
+    স্থির শূন্য
+termcap_mode_end(শূন্য)
 {
     DWORD cmodein;
     ConsoleBuffer *cb;
     COORD coord;
     DWORD dwDummy;
 
-    if (!g_fTermcapMode)
-	return;
+    যদি (!g_fTermcapMode)
+	ঘূৰাই;
 
     SaveConsoleBuffer(&g_cbTermcap);
 
     GetConsoleMode(g_hConIn, &cmodein);
-    cmodein &= ~(ENABLE_MOUSE_INPUT | ENABLE_WINDOW_INPUT);
+    cmodein &= ~(ENABLE_MOUSE_প্ৰবেশ | ENABLE_WINDOW_প্ৰবেশ);
     cmodein |= g_cmodein & ENABLE_QUICK_EDIT_MODE;
     SetConsoleMode(g_hConIn, cmodein | ENABLE_EXTENDED_FLAGS);
 
 # ifdef FEAT_RESTORE_ORIG_SCREEN
     cb = exiting ? &g_cbOrig : &g_cbNonTermcap;
-# else
+# অন্যথা
     cb = &g_cbNonTermcap;
 # endif
     RestoreConsoleBuffer(cb, p_rs);
     restore_console_color_rgb();
 
     // Switch back to main screen buffer.
-    if (exiting && use_alternate_screen_buffer)
+    যদি (exiting && use_alternate_screen_buffer)
 	vtp_printf("\033[?1049l");
 
-    if (!USE_WT && (p_rs || exiting))
+    যদি (!USE_WT && (p_rs || exiting))
     {
 	/*
 	 * Clear anything that happens to be on the current line.
@@ -6742,7 +6742,7 @@ termcap_mode_end(void)
 	 * the prompt string, which causes the screen to scroll.  To
 	 * counter this, move the cursor up one line before exiting.
 	 */
-	if (exiting && !p_rs)
+	যদি (exiting && !p_rs)
 	    coord.Y--;
 	/*
 	 * Position the cursor at the leftmost column of the desired row.
@@ -6755,17 +6755,17 @@ termcap_mode_end(void)
 #endif
 
 
-#if !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
+#যদি !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
 
 /*
  * clear `n' chars, starting from `coord'
  */
-    static void
+    স্থির শূন্য
 clear_chars(
     COORD coord,
     DWORD n)
 {
-    if (!vtp_working)
+    যদি (!vtp_working)
     {
 	DWORD dwDummy;
 
@@ -6773,7 +6773,7 @@ clear_chars(
 	FillConsoleOutputAttribute(g_hConOut, g_attrCurrent, n, coord,
 								     &dwDummy);
     }
-    else
+    অন্যথা
     {
 	set_console_color_rgb();
 	gotoxy(coord.X + 1, coord.Y + 1);
@@ -6785,14 +6785,14 @@ clear_chars(
 /*
  * Clear the screen
  */
-    static void
-clear_screen(void)
+    স্থির শূন্য
+clear_screen(শূন্য)
 {
     g_coord.X = g_coord.Y = 0;
 
-    if (!vtp_working)
+    যদি (!vtp_working)
 	clear_chars(g_coord, Rows * Columns);
-    else
+    অন্যথা
     {
 	set_console_color_rgb();
 	gotoxy(1, 1);
@@ -6804,15 +6804,15 @@ clear_screen(void)
 /*
  * Clear to end of display
  */
-    static void
-clear_to_end_of_display(void)
+    স্থির শূন্য
+clear_to_end_of_display(শূন্য)
 {
     COORD save = g_coord;
 
-    if (!vtp_working)
+    যদি (!vtp_working)
 	clear_chars(g_coord, (Rows - g_coord.Y - 1)
 					   * Columns + (Columns - g_coord.X));
-    else
+    অন্যথা
     {
 	set_console_color_rgb();
 	gotoxy(g_coord.X + 1, g_coord.Y + 1);
@@ -6827,14 +6827,14 @@ clear_to_end_of_display(void)
 /*
  * Clear to end of line
  */
-    static void
-clear_to_end_of_line(void)
+    স্থির শূন্য
+clear_to_end_of_সাৰি(শূন্য)
 {
     COORD save = g_coord;
 
-    if (!vtp_working)
+    যদি (!vtp_working)
 	clear_chars(g_coord, Columns - g_coord.X);
-    else
+    অন্যথা
     {
 	set_console_color_rgb();
 	gotoxy(g_coord.X + 1, g_coord.Y + 1);
@@ -6849,13 +6849,13 @@ clear_to_end_of_line(void)
 /*
  * Scroll the scroll region up by `cLines' lines
  */
-    static void
-scroll(unsigned cLines)
+    স্থির শূন্য
+scroll(unsigned c_সাৰিগুলি)
 {
     COORD oldcoord = g_coord;
 
-    gotoxy(g_srScrollRegion.Left + 1, g_srScrollRegion.Top + 1);
-    delete_lines(cLines);
+    gotoxy(g_srScrollRegion.বাম_3 + 1, g_srScrollRegion.শীৰ্ষ_2 + 1);
+    delete_সাৰিগুলি(c_সাৰিগুলি);
 
     g_coord = oldcoord;
 }
@@ -6864,79 +6864,79 @@ scroll(unsigned cLines)
 /*
  * Set the scroll region
  */
-    static void
+    স্থির শূন্য
 set_scroll_region(
-    unsigned left,
-    unsigned top,
-    unsigned right,
+    unsigned বাম,
+    unsigned শীৰ্ষ,
+    unsigned ডান,
     unsigned bottom)
 {
-    if (left >= right
-	    || top >= bottom
-	    || right > (unsigned) Columns - 1
+    যদি (বাম >= ডান
+	    || শীৰ্ষ >= bottom
+	    || ডান > (unsigned) Columns - 1
 	    || bottom > (unsigned) Rows - 1)
-	return;
+	ঘূৰাই;
 
-    g_srScrollRegion.Left =   left;
-    g_srScrollRegion.Top =    top;
-    g_srScrollRegion.Right =  right;
+    g_srScrollRegion.বাম_3 =   বাম;
+    g_srScrollRegion.শীৰ্ষ_2 =    শীৰ্ষ;
+    g_srScrollRegion.ডান_3 =  ডান;
     g_srScrollRegion.Bottom = bottom;
 }
 
-    static void
+    স্থির শূন্য
 set_scroll_region_tb(
-    unsigned top,
+    unsigned শীৰ্ষ,
     unsigned bottom)
 {
-    if (top >= bottom || bottom > (unsigned)Rows - 1)
-	return;
+    যদি (শীৰ্ষ >= bottom || bottom > (unsigned)Rows - 1)
+	ঘূৰাই;
 
-    g_srScrollRegion.Top = top;
+    g_srScrollRegion.শীৰ্ষ_2 = শীৰ্ষ;
     g_srScrollRegion.Bottom = bottom;
 }
 
-    static void
+    স্থির শূন্য
 set_scroll_region_lr(
-    unsigned left,
-    unsigned right)
+    unsigned বাম,
+    unsigned ডান)
 {
-    if (left >= right || right > (unsigned)Columns - 1)
-	return;
+    যদি (বাম >= ডান || ডান > (unsigned)Columns - 1)
+	ঘূৰাই;
 
-    g_srScrollRegion.Left = left;
-    g_srScrollRegion.Right = right;
+    g_srScrollRegion.বাম_3 = বাম;
+    g_srScrollRegion.ডান_3 = ডান;
 }
 
 
 /*
  * Insert `cLines' lines at the current cursor position
  */
-    static void
-insert_lines(unsigned cLines)
+    স্থির শূন্য
+ঢোকাও_সাৰিগুলি(unsigned c_সাৰিগুলি)
 {
     SMALL_RECT	    source, clip;
     COORD	    dest;
     CHAR_INFO	    fill;
 
-    gotoxy(g_srScrollRegion.Left + 1, g_srScrollRegion.Top + 1);
+    gotoxy(g_srScrollRegion.বাম_3 + 1, g_srScrollRegion.শীৰ্ষ_2 + 1);
 
-    dest.X = g_srScrollRegion.Left;
-    dest.Y = g_coord.Y + cLines;
+    dest.X = g_srScrollRegion.বাম_3;
+    dest.Y = g_coord.Y + c_সাৰিগুলি;
 
-    source.Left   = g_srScrollRegion.Left;
-    source.Top	  = g_coord.Y;
-    source.Right  = g_srScrollRegion.Right;
-    source.Bottom = g_srScrollRegion.Bottom - cLines;
+    source.বাম_3   = g_srScrollRegion.বাম_3;
+    source.শীৰ্ষ_2	  = g_coord.Y;
+    source.ডান_3  = g_srScrollRegion.ডান_3;
+    source.Bottom = g_srScrollRegion.Bottom - c_সাৰিগুলি;
 
-    clip.Left   = g_srScrollRegion.Left;
-    clip.Top    = g_coord.Y;
-    clip.Right  = g_srScrollRegion.Right;
+    clip.বাম_3   = g_srScrollRegion.বাম_3;
+    clip.শীৰ্ষ_2    = g_coord.Y;
+    clip.ডান_3  = g_srScrollRegion.ডান_3;
     clip.Bottom = g_srScrollRegion.Bottom;
 
     fill.Char.AsciiChar = ' ';
-    if (!USE_VTP)
+    যদি (!USE_VTP)
 	fill.Attributes = g_attrCurrent;
-    else
+    অন্যথা
 	fill.Attributes = g_attrDefault;
 
     set_console_color_rgb();
@@ -6950,29 +6950,29 @@ insert_lines(unsigned cLines)
     // here... (this also occurs scrolling the same way in the other
     // direction).
 
-    if (source.Bottom < dest.Y)
+    যদি (source.Bottom < dest.Y)
     {
 	COORD coord;
-	int   i;
+	পূর্ণাঙ্ক   i;
 
-	coord.X = source.Left;
-	for (i = clip.Top; i < dest.Y; ++i)
+	coord.X = source.বাম_3;
+	বাবে (i = clip.শীৰ্ষ_2; i < dest.Y; ++i)
 	{
 	    coord.Y = i;
-	    clear_chars(coord, source.Right - source.Left + 1);
+	    clear_chars(coord, source.ডান_3 - source.বাম_3 + 1);
 	}
     }
 
-    if (vtp_working)
+    যদি (vtp_working)
     {
 	COORD coord;
-	int i;
+	পূর্ণাঙ্ক i;
 
-	coord.X = source.Left;
-	for (i = source.Top; i < dest.Y; ++i)
+	coord.X = source.বাম_3;
+	বাবে (i = source.শীৰ্ষ_2; i < dest.Y; ++i)
 	{
 	    coord.Y = i;
-	    clear_chars(coord, source.Right - source.Left + 1);
+	    clear_chars(coord, source.ডান_3 - source.বাম_3 + 1);
 	}
     }
 }
@@ -6981,33 +6981,33 @@ insert_lines(unsigned cLines)
 /*
  * Delete `cLines' lines at the current cursor position
  */
-    static void
-delete_lines(unsigned cLines)
+    স্থির শূন্য
+delete_সাৰিগুলি(unsigned c_সাৰিগুলি)
 {
     SMALL_RECT	    source, clip;
     COORD	    dest;
     CHAR_INFO	    fill;
-    int		    nb;
+    পূর্ণাঙ্ক		    nb;
 
-    gotoxy(g_srScrollRegion.Left + 1, g_srScrollRegion.Top + 1);
+    gotoxy(g_srScrollRegion.বাম_3 + 1, g_srScrollRegion.শীৰ্ষ_2 + 1);
 
-    dest.X = g_srScrollRegion.Left;
+    dest.X = g_srScrollRegion.বাম_3;
     dest.Y = g_coord.Y;
 
-    source.Left   = g_srScrollRegion.Left;
-    source.Top	  = g_coord.Y + cLines;
-    source.Right  = g_srScrollRegion.Right;
+    source.বাম_3   = g_srScrollRegion.বাম_3;
+    source.শীৰ্ষ_2	  = g_coord.Y + c_সাৰিগুলি;
+    source.ডান_3  = g_srScrollRegion.ডান_3;
     source.Bottom = g_srScrollRegion.Bottom;
 
-    clip.Left   = g_srScrollRegion.Left;
-    clip.Top    = g_coord.Y;
-    clip.Right  = g_srScrollRegion.Right;
+    clip.বাম_3   = g_srScrollRegion.বাম_3;
+    clip.শীৰ্ষ_2    = g_coord.Y;
+    clip.ডান_3  = g_srScrollRegion.ডান_3;
     clip.Bottom = g_srScrollRegion.Bottom;
 
     fill.Char.AsciiChar = ' ';
-    if (!vtp_working)
+    যদি (!vtp_working)
 	fill.Attributes = g_attrCurrent;
-    else
+    অন্যথা
 	fill.Attributes = g_attrDefault;
 
     set_console_color_rgb();
@@ -7017,31 +7017,31 @@ delete_lines(unsigned cLines)
     // Here we have to deal with a win32 console flake; See insert_lines()
     // above.
 
-    nb = dest.Y + (source.Bottom - source.Top) + 1;
+    nb = dest.Y + (source.Bottom - source.শীৰ্ষ_2) + 1;
 
-    if (nb < source.Top)
+    যদি (nb < source.শীৰ্ষ_2)
     {
 	COORD coord;
-	int   i;
+	পূর্ণাঙ্ক   i;
 
-	coord.X = source.Left;
-	for (i = nb; i < clip.Bottom; ++i)
+	coord.X = source.বাম_3;
+	বাবে (i = nb; i < clip.Bottom; ++i)
 	{
 	    coord.Y = i;
-	    clear_chars(coord, source.Right - source.Left + 1);
+	    clear_chars(coord, source.ডান_3 - source.বাম_3 + 1);
 	}
     }
 
-    if (vtp_working)
+    যদি (vtp_working)
     {
 	COORD coord;
-	int i;
+	পূর্ণাঙ্ক i;
 
-	coord.X = source.Left;
-	for (i = nb; i <= source.Bottom; ++i)
+	coord.X = source.বাম_3;
+	বাবে (i = nb; i <= source.Bottom; ++i)
 	{
 	    coord.Y = i;
-	    clear_chars(coord, source.Right - source.Left + 1);
+	    clear_chars(coord, source.ডান_3 - source.বাম_3 + 1);
 	}
     }
 }
@@ -7050,15 +7050,15 @@ delete_lines(unsigned cLines)
 /*
  * Set the cursor position to (x,y) (1-based).
  */
-    static void
+    স্থির শূন্য
 gotoxy(
     unsigned x,
     unsigned y)
 {
-    if (x < 1 || x > (unsigned)Columns || y < 1 || y > (unsigned)Rows)
-	return;
+    যদি (x < 1 || x > (unsigned)Columns || y < 1 || y > (unsigned)Rows)
+	ঘূৰাই;
 
-    if (!USE_VTP)
+    যদি (!USE_VTP)
     {
 	// There are reports of double-width characters not displayed
 	// correctly.  This workaround should fix it, similar to how it's done
@@ -7071,7 +7071,7 @@ gotoxy(
 	g_coord.Y = y - 1;
 	SetConsoleCursorPosition(g_hConOut, g_coord);
     }
-    else
+    অন্যথা
     {
 	// Move the cursor to the left edge of the screen to prevent screen
 	// destruction.  Insider build bug.  Always enabled because it's cheap
@@ -7090,7 +7090,7 @@ gotoxy(
  * Set the current text attribute = (foreground | background)
  * See ../runtime/doc/os_win32.txt for the numbers.
  */
-    static void
+    স্থির শূন্য
 textattr(WORD wAttr)
 {
     g_attrCurrent = wAttr & 0xff;
@@ -7099,26 +7099,26 @@ textattr(WORD wAttr)
 }
 
 
-    static void
+    স্থির শূন্য
 textcolor(WORD wAttr)
 {
     g_attrCurrent = (g_attrCurrent & 0xf0) + (wAttr & 0x0f);
 
-    if (!vtp_working)
+    যদি (!vtp_working)
 	SetConsoleTextAttribute(g_hConOut, g_attrCurrent);
-    else
+    অন্যথা
 	vtp_sgr_bulk(wAttr);
 }
 
 
-    static void
+    স্থির শূন্য
 textbackground(WORD wAttr)
 {
     g_attrCurrent = (g_attrCurrent & 0x0f) + ((wAttr & 0x0f) << 4);
 
-    if (!vtp_working)
+    যদি (!vtp_working)
 	SetConsoleTextAttribute(g_hConOut, g_attrCurrent);
-    else
+    অন্যথা
 	vtp_sgr_bulk(wAttr);
 }
 
@@ -7126,23 +7126,23 @@ textbackground(WORD wAttr)
 /*
  * restore the default text attribute (whatever we started with)
  */
-    static void
-normvideo(void)
+    স্থির শূন্য
+normvideo(শূন্য)
 {
-    if (!vtp_working)
+    যদি (!vtp_working)
 	textattr(g_attrDefault);
-    else
+    অন্যথা
 	vtp_sgr_bulk(0);
 }
 
 
-static WORD g_attrPreStandout = 0;
+স্থির WORD g_attrPreStandout = 0;
 
 /*
  * Make the text standout, by brightening it
  */
-    static void
-standout(void)
+    স্থির শূন্য
+standout(শূন্য)
 {
     g_attrPreStandout = g_attrCurrent;
 
@@ -7153,10 +7153,10 @@ standout(void)
 /*
  * Turn off standout mode
  */
-    static void
-standend(void)
+    স্থির শূন্য
+standend(শূন্য)
 {
-    if (g_attrPreStandout)
+    যদি (g_attrPreStandout)
 	textattr(g_attrPreStandout);
 
     g_attrPreStandout = 0;
@@ -7166,15 +7166,15 @@ standend(void)
 /*
  * Set normal fg/bg color, based on T_ME.  Called when t_me has been set.
  */
-    void
-mch_set_normal_colors(void)
+    শূন্য
+mch_set_normal_colors(শূন্য)
 {
     char_u	*p;
-    int		n;
+    পূর্ণাঙ্ক		n;
 
     cterm_normal_fg_color = (g_attrDefault & 0xf) + 1;
     cterm_normal_bg_color = ((g_attrDefault >> 4) & 0xf) + 1;
-    if (
+    যদি (
 # ifdef FEAT_TERMGUICOLORS
 	!p_tgc &&
 # endif
@@ -7182,7 +7182,7 @@ mch_set_normal_colors(void)
     {
 	p = T_ME + 2;
 	n = getdigits(&p);
-	if (*p == 'm' && n > 0)
+	যদি (*p == 'm' && n > 0)
 	{
 	    cterm_normal_fg_color = (n & 0xf) + 1;
 	    cterm_normal_bg_color = ((n >> 4) & 0xf) + 1;
@@ -7198,22 +7198,22 @@ mch_set_normal_colors(void)
 /*
  * visual bell: flash the screen
  */
-    static void
-visual_bell(void)
+    স্থির শূন্য
+visual_bell(শূন্য)
 {
     COORD   coordOrigin = {0, 0};
     WORD    attrFlash = ~g_attrCurrent & 0xff;
 
     DWORD   dwDummy;
-    LPWORD  oldattrs = NULL;
+    LPWORD  oldattrs = রিক্ত;
 
 # ifdef FEAT_TERMGUICOLORS
-    if (!(p_tgc || t_colors >= 256))
+    যদি (!(p_tgc || t_colors >= 256))
 # endif
     {
 	oldattrs = ALLOC_MULT(WORD, Rows * Columns);
-	if (oldattrs == NULL)
-	    return;
+	যদি (oldattrs == রিক্ত)
+	    ঘূৰাই;
 	ReadConsoleOutputAttribute(g_hConOut, oldattrs, Rows * Columns,
 			       coordOrigin, &dwDummy);
     }
@@ -7223,7 +7223,7 @@ visual_bell(void)
 
     Sleep(15);	    // wait for 15 msec
 
-    if (oldattrs != NULL)
+    যদি (oldattrs != রিক্ত)
     {
 	WriteConsoleOutputAttribute(g_hConOut, oldattrs, Rows * Columns,
 				coordOrigin, &dwDummy);
@@ -7235,19 +7235,19 @@ visual_bell(void)
 /*
  * Make the cursor visible or invisible
  */
-    static void
+    স্থির শূন্য
 cursor_visible(BOOL fVisible)
 {
     s_cursor_visible = fVisible;
 
-    if (vtp_working)
+    যদি (vtp_working)
     {
 	// In vtp mode, visibility is controlled solely by DECTCEM.  Skip
 	// mch_update_cursor() since shape is independent of visibility and
 	// re-emitting DECSCUSR can cause the terminal to briefly redisplay
 	// the cursor while a redraw is in progress.
 	vtp_printf("\033[?25%c", fVisible ? 'h' : 'l');
-	return;
+	ঘূৰাই;
     }
 
 # ifdef MCH_CURSOR_SHAPE
@@ -7263,7 +7263,7 @@ cursor_visible(BOOL fVisible)
  * Write "cbToWrite" bytes in `pchBuf' to the screen.
  * Returns the number of bytes actually written (at least one).
  */
-    static DWORD
+    স্থির DWORD
 write_chars(
     char_u *pchBuf,
     DWORD  cbToWrite)
@@ -7271,41 +7271,41 @@ write_chars(
     COORD	    coord = g_coord;
     DWORD	    written;
     DWORD	    n, cchwritten;
-    static DWORD    cells;
-    static WCHAR    *unicodebuf = NULL;
-    static int	    unibuflen = 0;
-    static int	    length;
-    int		    cp = enc_utf8 ? CP_UTF8 : enc_codepage;
-    static WCHAR    *utf8spbuf = NULL;
-    static int	    utf8splength;
-    static DWORD    utf8spcells;
-    static WCHAR    **utf8usingbuf = &unicodebuf;
+    স্থির DWORD    cells;
+    স্থির WCHAR    *unicodebuf = রিক্ত;
+    স্থির পূর্ণাঙ্ক	    unibuflen = 0;
+    স্থির পূর্ণাঙ্ক	    length;
+    পূর্ণাঙ্ক		    cp = enc_utf8 ? CP_UTF8 : enc_codepage;
+    স্থির WCHAR    *utf8spbuf = রিক্ত;
+    স্থির পূর্ণাঙ্ক	    utf8splength;
+    স্থির DWORD    utf8spcells;
+    স্থির WCHAR    **utf8usingbuf = &unicodebuf;
 
-    if (cbToWrite != 1 || *pchBuf != ' ' || !enc_utf8)
+    যদি (cbToWrite != 1 || *pchBuf != ' ' || !enc_utf8)
     {
 	utf8usingbuf = &unicodebuf;
-	do
+	কৰা
 	{
 	    length = MultiByteToWideChar(cp, 0, (LPCSTR)pchBuf, cbToWrite,
 							unicodebuf, unibuflen);
-	    if (length && length <= unibuflen)
-		break;
+	    যদি (length && length <= unibuflen)
+		ভঙ্গ;
 	    vim_free(unicodebuf);
-	    unicodebuf = length ? LALLOC_MULT(WCHAR, length) : NULL;
+	    unicodebuf = length ? LALLOC_MULT(WCHAR, length) : রিক্ত;
 	    unibuflen = unibuflen ? 0 : length;
-	} while (TRUE);
+	} যেতিয়ালৈ (TRUE);
 	cells = mb_string2cells(pchBuf, cbToWrite);
     }
-    else // cbToWrite == 1 && *pchBuf == ' ' && enc_utf8
+    অন্যথা // cbToWrite == 1 && *pchBuf == ' ' && enc_utf8
     {
-	if (utf8usingbuf != &utf8spbuf)
+	যদি (utf8usingbuf != &utf8spbuf)
 	{
-	    if (utf8spbuf == NULL)
+	    যদি (utf8spbuf == রিক্ত)
 	    {
 		cells = mb_string2cells((char_u *)" ", 1);
-		length = MultiByteToWideChar(CP_UTF8, 0, " ", 1, NULL, 0);
+		length = MultiByteToWideChar(CP_UTF8, 0, " ", 1, রিক্ত, 0);
 		utf8spbuf = LALLOC_MULT(WCHAR, length);
-		if (utf8spbuf != NULL)
+		যদি (utf8spbuf != রিক্ত)
 		{
 		    MultiByteToWideChar(CP_UTF8, 0, " ", 1, utf8spbuf, length);
 		    utf8usingbuf = &utf8spbuf;
@@ -7313,7 +7313,7 @@ write_chars(
 		    utf8spcells = cells;
 		}
 	    }
-	    else
+	    অন্যথা
 	    {
 		utf8usingbuf = &utf8spbuf;
 		length = utf8splength;
@@ -7322,142 +7322,142 @@ write_chars(
 	}
     }
 
-    if (!USE_VTP)
+    যদি (!USE_VTP)
     {
 	FillConsoleOutputAttribute(g_hConOut, g_attrCurrent, cells,
 				    coord, &written);
 	// When writing fails or didn't write a single character, pretend one
 	// character was written, otherwise we get stuck.
-	if (WriteConsoleOutputCharacterW(g_hConOut, *utf8usingbuf, length,
+	যদি (WriteConsoleOutputCharacterW(g_hConOut, *utf8usingbuf, length,
 		    coord, &cchwritten) == 0
 		|| cchwritten == 0 || cchwritten == (DWORD)-1)
 	    cchwritten = 1;
     }
-    else
+    অন্যথা
     {
-	if (WriteConsoleW(g_hConOut, *utf8usingbuf, length, &cchwritten,
-		    NULL) == 0 || cchwritten == 0)
+	যদি (WriteConsoleW(g_hConOut, *utf8usingbuf, length, &cchwritten,
+		    রিক্ত) == 0 || cchwritten == 0)
 	    cchwritten = 1;
     }
 
-    if (cchwritten == (DWORD)length)
+    যদি (cchwritten == (DWORD)length)
     {
 	written = cbToWrite;
 	g_coord.X += (SHORT)cells;
     }
-    else
+    অন্যথা
     {
 	char_u *p = pchBuf;
-	for (n = 0; n < cchwritten; n++)
+	বাবে (n = 0; n < cchwritten; n++)
 	    MB_CPTR_ADV(p);
 	written = p - pchBuf;
 	g_coord.X += (SHORT)mb_string2cells(pchBuf, written);
     }
 
-    while (g_coord.X > g_srScrollRegion.Right)
+    যেতিয়ালৈ (g_coord.X > g_srScrollRegion.ডান_3)
     {
 	g_coord.X -= (SHORT) Columns;
-	if (g_coord.Y < g_srScrollRegion.Bottom)
+	যদি (g_coord.Y < g_srScrollRegion.Bottom)
 	    g_coord.Y++;
     }
 
     // Cursor under VTP is always in the correct position, no need to reset.
-    if (!USE_VTP)
+    যদি (!USE_VTP)
 	gotoxy(g_coord.X + 1, g_coord.Y + 1);
 
-    return written;
+    ঘূৰাই written;
 }
 
-    static char_u *
+    স্থির char_u *
 get_seq(
-    int *args,
-    int *count,
+    পূর্ণাঙ্ক *args,
+    পূর্ণাঙ্ক *গুনতি,
     char_u *head)
 {
-    int argc;
+    পূর্ণাঙ্ক argc;
     char_u *p;
 
-    if (head == NULL || *head != '\033')
-	return NULL;
+    যদি (head == রিক্ত || *head != '\033')
+	ঘূৰাই রিক্ত;
 
     argc = 0;
     p = head;
     ++p;
-    do
+    কৰা
     {
 	++p;
 	args[argc] = getdigits(&p);
 	argc += (argc < 15) ? 1 : 0;
-    } while (*p == ';');
-    *count = argc;
+    } যেতিয়ালৈ (*p == ';');
+    *গুনতি = argc;
 
-    return p;
+    ঘূৰাই p;
 }
 
-    static char_u *
+    স্থির char_u *
 get_sgr(
-    int *args,
-    int *count,
+    পূর্ণাঙ্ক *args,
+    পূর্ণাঙ্ক *গুনতি,
     char_u *head)
 {
-    char_u *p = get_seq(args, count, head);
+    char_u *p = get_seq(args, গুনতি, head);
 
-    return (p && *p == 'm') ? ++p : NULL;
+    ঘূৰাই (p && *p == 'm') ? ++p : রিক্ত;
 }
 
 /*
  * Pointer to next if SGR (^[[n;2;*;*;*m), NULL otherwise.
  */
-    static char_u *
+    স্থির char_u *
 sgrn2(
     char_u *head,
-    int	   n)
+    পূর্ণাঙ্ক	   n)
 {
-    int argc;
-    int args[16];
+    পূর্ণাঙ্ক argc;
+    পূর্ণাঙ্ক args[16];
     char_u *p = get_sgr(args, &argc, head);
 
-    return p && argc == 5 && args[0] == n && args[1] == 2 ? p : NULL;
+    ঘূৰাই p && argc == 5 && args[0] == n && args[1] == 2 ? p : রিক্ত;
 }
 
 /*
  * Pointer to next if SGR(^[[nm)<space>ESC, NULL otherwise.
  */
-    static char_u *
+    স্থির char_u *
 sgrnc(
     char_u *head,
-    int	   n)
+    পূর্ণাঙ্ক	   n)
 {
-    int argc;
-    int args[16];
+    পূর্ণাঙ্ক argc;
+    পূর্ণাঙ্ক args[16];
     char_u *p = get_sgr(args, &argc, head);
 
-    return p && argc == 1 && args[0] == n && (p = skipwhite(p)) && *p == '\033'
-								    ? p : NULL;
+    ঘূৰাই p && argc == 1 && args[0] == n && (p = skipwhite(p)) && *p == '\033'
+								    ? p : রিক্ত;
 }
 
-    static char_u *
+    স্থির char_u *
 skipblank(char_u *q)
 {
     char_u *p = q;
 
-    while (*p == ' ' || *p == '\t' || *p == '\n' || *p == '\r')
+    যেতিয়ালৈ (*p == ' ' || *p == '\t' || *p == '\n' || *p == '\r')
 	++p;
-    return p;
+    ঘূৰাই p;
 }
 
 /*
  * Pointer to the next if any whitespace that may follow SGR is ESC, otherwise
  * NULL.
  */
-    static char_u *
+    স্থির char_u *
 sgrn2c(
     char_u *head,
-    int	   n)
+    পূর্ণাঙ্ক	   n)
 {
     char_u *p = sgrn2(head, n);
 
-    return p && *p != NUL && (p = skipblank(p)) && *p == '\033' ? p : NULL;
+    ঘূৰাই p && *p != NUL && (p = skipblank(p)) && *p == '\033' ? p : রিক্ত;
 }
 
 /*
@@ -7465,38 +7465,38 @@ sgrn2c(
  * a pointer to the character following the newline is returned.
  * Otherwise NULL.
  */
-    static char_u *
+    স্থির char_u *
 sgrn2cn(
     char_u *head,
-    int n)
+    পূর্ণাঙ্ক n)
 {
     char_u *p = sgrn2(head, n);
 
-    return p && p[0] == 0x0a && p[1] == '\033' ? ++p : NULL;
+    ঘূৰাই p && p[0] == 0x0a && p[1] == '\033' ? ++p : রিক্ত;
 }
 
-static bool in_dcs = false;	// inside a DCS (sixel) sequence
-static bool dcs_esc = false;	// last DCS byte written was ESC
+স্থির bool in_dcs = false;	// inside a DCS (sixel) sequence
+স্থির bool dcs_esc = false;	// last DCS byte written was ESC
 
 /*
  * Write "len" bytes at "s" with WriteConsoleW, so that the console's own VT
  * parser processes them.  Needed for DCS sequences when USE_VTP is off.
  */
-    static void
-write_vt(char_u *s, int len)
+    স্থির শূন্য
+write_vt(char_u *s, পূর্ণাঙ্ক len)
 {
-    int		wlen;
+    পূর্ণাঙ্ক		wlen;
     WCHAR	*ws;
     DWORD	written;
 
-    wlen = MultiByteToWideChar(CP_UTF8, 0, (LPCSTR)s, len, NULL, 0);
-    if (wlen <= 0)
-	return;
+    wlen = MultiByteToWideChar(CP_UTF8, 0, (LPCSTR)s, len, রিক্ত, 0);
+    যদি (wlen <= 0)
+	ঘূৰাই;
     ws = ALLOC_MULT(WCHAR, wlen);
-    if (ws == NULL)
-	return;
+    যদি (ws == রিক্ত)
+	ঘূৰাই;
     MultiByteToWideChar(CP_UTF8, 0, (LPCSTR)s, len, ws, wlen);
-    WriteConsoleW(g_hConOut, ws, wlen, &written, NULL);
+    WriteConsoleW(g_hConOut, ws, wlen, &written, রিক্ত);
     vim_free(ws);
 }
 
@@ -7505,171 +7505,171 @@ write_vt(char_u *s, int len)
  * Returns "end" when the ST is not in this chunk; "in_dcs" then stays set so
  * that the next mch_write() call continues the scan.
  */
-    static char_u *
+    স্থির char_u *
 skip_dcs(char_u *s, char_u *end)
 {
-    for (char_u *p = s; p < end; ++p)
+    বাবে (char_u *p = s; p < end; ++p)
     {
-	if (dcs_esc && *p == '\\')
+	যদি (dcs_esc && *p == '\\')
 	{
 	    dcs_esc = false;
 	    in_dcs = false;
-	    return p + 1;
+	    ঘূৰাই p + 1;
 	}
 	dcs_esc = *p == ESC;
     }
-    return end;
+    ঘূৰাই end;
 }
 
 /*
  * mch_write(): write the output buffer to the screen, translating ESC
  * sequences into calls to console output routines.
  */
-    void
+    শূন্য
 mch_write(
     char_u  *s,
-    int	    len)
+    পূর্ণাঙ্ক	    len)
 {
     char_u  *end = s + len;
 
 # ifdef VIMDLL
-    if (gui.in_use)
-	return;
+    যদি (gui.in_use)
+	ঘূৰাই;
 # endif
 
-    if (!term_console)
+    যদি (!term_console)
     {
-	write(1, s, (unsigned)len);
-	return;
+	লিখ(1, s, (unsigned)len);
+	ঘূৰাই;
     }
 
     // translate ESC | sequences into faked bios calls
-    while (len--)
+    যেতিয়ালৈ (len--)
     {
-	int prefix = -1;
+	পূর্ণাঙ্ক prefix = -1;
 	char_u ch;
 
 	// While processing a sequence, on rare occasions it seems that another
 	// sequence may be inserted asynchronously.
-	if (len < 0)
+	যদি (len < 0)
 	{
 	    redraw_all_later(UPD_CLEAR);
-	    return;
+	    ঘূৰাই;
 	}
 
-	if (in_dcs)
+	যদি (in_dcs)
 	{
 	    // Continuation of a DCS sequence split over several writes.
-	    int	l = (int)(skip_dcs(s, end) - s);
+	    পূর্ণাঙ্ক	l = (পূর্ণাঙ্ক)(skip_dcs(s, end) - s);
 
-	    if (vtp_working)
+	    যদি (vtp_working)
 		write_vt(s, l);
 	    len -= l - 1;
 	    s += l;
-	    continue;
+	    অনুৱর্ত;
 	}
 
-	while (s + ++prefix < end)
+	যেতিয়ালৈ (s + ++prefix < end)
 	{
 	    ch = s[prefix];
-	    if (ch <= 0x1e && !(ch != '\n' && ch != '\r' && ch != '\b'
+	    যদি (ch <= 0x1e && !(ch != '\n' && ch != '\r' && ch != '\b'
 						&& ch != '\a' && ch != '\033'))
-		break;
+		ভঙ্গ;
 	}
 
-	if (p_wd)
+	যদি (p_wd)
 	{
 	    WaitForChar(p_wd, FALSE);
-	    if (prefix != 0)
+	    যদি (prefix != 0)
 		prefix = 1;
 	}
 
-	if (prefix != 0)
+	যদি (prefix != 0)
 	{
 	    DWORD nWritten;
 
 	    nWritten = write_chars(s, prefix);
 # ifdef MCH_WRITE_DUMP
-	    if (fdDump)
+	    যদি (fdDump)
 	    {
 		fputc('>', fdDump);
-		fwrite(s, sizeof(char_u), nWritten, fdDump);
+		fwrite(s, পরিমাণ(char_u), nWritten, fdDump);
 		fputs("<\n", fdDump);
 	    }
 # endif
 	    len -= (nWritten - 1);
 	    s += nWritten;
 	}
-	else if (s[0] == '\n')
+	অন্যথা যদি (s[0] == '\n')
 	{
 	    // \n, newline: go to the beginning of the next line or scroll
-	    if (g_coord.Y == g_srScrollRegion.Bottom)
+	    যদি (g_coord.Y == g_srScrollRegion.Bottom)
 	    {
 		scroll(1);
-		gotoxy(g_srScrollRegion.Left + 1, g_srScrollRegion.Bottom + 1);
+		gotoxy(g_srScrollRegion.বাম_3 + 1, g_srScrollRegion.Bottom + 1);
 	    }
-	    else
+	    অন্যথা
 	    {
-		gotoxy(g_srScrollRegion.Left + 1, g_coord.Y + 2);
+		gotoxy(g_srScrollRegion.বাম_3 + 1, g_coord.Y + 2);
 	    }
 # ifdef MCH_WRITE_DUMP
-	    if (fdDump)
+	    যদি (fdDump)
 		fputs("\\n\n", fdDump);
 # endif
 	    s++;
 	}
-	else if (s[0] == '\r')
+	অন্যথা যদি (s[0] == '\r')
 	{
 	    // \r, carriage return: go to beginning of line
-	    gotoxy(g_srScrollRegion.Left+1, g_coord.Y + 1);
+	    gotoxy(g_srScrollRegion.বাম_3+1, g_coord.Y + 1);
 # ifdef MCH_WRITE_DUMP
-	    if (fdDump)
+	    যদি (fdDump)
 		fputs("\\r\n", fdDump);
 # endif
 	    s++;
 	}
-	else if (s[0] == '\b')
+	অন্যথা যদি (s[0] == '\b')
 	{
 	    // \b, backspace: move cursor one position left
-	    if (g_coord.X > g_srScrollRegion.Left)
+	    যদি (g_coord.X > g_srScrollRegion.বাম_3)
 		g_coord.X--;
-	    else if (g_coord.Y > g_srScrollRegion.Top)
+	    অন্যথা যদি (g_coord.Y > g_srScrollRegion.শীৰ্ষ_2)
 	    {
-		g_coord.X = g_srScrollRegion.Right;
+		g_coord.X = g_srScrollRegion.ডান_3;
 		g_coord.Y--;
 	    }
 	    gotoxy(g_coord.X + 1, g_coord.Y + 1);
 # ifdef MCH_WRITE_DUMP
-	    if (fdDump)
+	    যদি (fdDump)
 		fputs("\\b\n", fdDump);
 # endif
 	    s++;
 	}
-	else if (s[0] == '\a')
+	অন্যথা যদি (s[0] == '\a')
 	{
 	    // \a, bell
 	    MessageBeep(0xFFFFFFFF);
 # ifdef MCH_WRITE_DUMP
-	    if (fdDump)
+	    যদি (fdDump)
 		fputs("\\a\n", fdDump);
 # endif
 	    s++;
 	}
-	else if (s[0] == ESC && len >= 3-1 && s[1] == '|')
+	অন্যথা যদি (s[0] == ESC && len >= 3-1 && s[1] == '|')
 	{
 # ifdef MCH_WRITE_DUMP
 	    char_u  *old_s = s;
 # endif
 	    char_u  *p;
-	    int	    arg1 = 0, arg2 = 0, argc = 0, args[16];
+	    পূর্ণাঙ্ক	    arg1 = 0, arg2 = 0, argc = 0, args[16];
 	    char_u  *sp;
 
-	    switch (s[2])
+	    ৱিকল্প (s[2])
 	    {
-	    case '0': case '1': case '2': case '3': case '4':
-	    case '5': case '6': case '7': case '8': case '9':
-		if (*(p = get_seq(args, &argc, s)) != 'm')
-		    goto notsgr;
+	    পক্ষ '0': পক্ষ '1': পক্ষ '2': পক্ষ '3': পক্ষ '4':
+	    পক্ষ '5': পক্ষ '6': পক্ষ '7': পক্ষ '8': পক্ষ '9':
+		যদি (*(p = get_seq(args, &argc, s)) != 'm')
+		    গচ্ছ notsgr;
 
 		p = s;
 
@@ -7678,31 +7678,31 @@ mch_write(
 
 		// If resetFG,FG,BG,<cr>,BG,FG are connected, the preceding
 		// resetFG,FG,BG are omitted.
-		if (sgrn2(sgrn2(sgrn2cn(sgrn2(sgrnc(p, 39), 38), 48), 48), 38))
+		যদি (sgrn2(sgrn2(sgrn2cn(sgrn2(sgrnc(p, 39), 38), 48), 48), 38))
 		{
 		    p = sgrn2(sgrn2(sgrnc(p, 39), 38), 48);
-		    len = len + 1 - (int)(p - s);
+		    len = len + 1 - (পূর্ণাঙ্ক)(p - s);
 		    s = p;
-		    break;
+		    ভঙ্গ;
 		}
 
 		// If FG,BG,BG,FG of SGR are connected, the first FG can be
 		// omitted.
-		if (sgrn2(sgrn2(sgrn2c((sp = sgrn2(p, 38)), 48), 48), 38))
+		যদি (sgrn2(sgrn2(sgrn2c((sp = sgrn2(p, 38)), 48), 48), 38))
 		    p = sp;
 
 		// If FG,BG,FG,BG of SGR are connected, the first FG can be
 		// omitted.
-		if (sgrn2(sgrn2(sgrn2c((sp = sgrn2(p, 38)), 48), 38), 48))
+		যদি (sgrn2(sgrn2(sgrn2c((sp = sgrn2(p, 38)), 48), 38), 48))
 		    p = sp;
 
 		// If BG,BG of SGR are connected, the first BG can be omitted.
-		if (sgrn2((sp = sgrn2(p, 48)), 48))
+		যদি (sgrn2((sp = sgrn2(p, 48)), 48))
 		    p = sp;
 
 		// If restoreFG and FG are connected, the restoreFG can be
 		// omitted.
-		if (sgrn2((sp = sgrnc(p, 39)), 38))
+		যদি (sgrn2((sp = sgrnc(p, 39)), 38))
 		    p = sp;
 
 		p = get_seq(args, &argc, p);
@@ -7710,132 +7710,132 @@ mch_write(
 notsgr:
 		arg1 = args[0];
 		arg2 = args[1];
-		if (*p == 'm')
+		যদি (*p == 'm')
 		{
-		    if (argc == 1 && args[0] == 0)
+		    যদি (argc == 1 && args[0] == 0)
 			normvideo();
-		    else if (argc == 1)
+		    অন্যথা যদি (argc == 1)
 		    {
-			if (USE_VTP)
+			যদি (USE_VTP)
 			    textcolor((WORD)arg1);
-			else
+			অন্যথা
 			    textattr((WORD)arg1);
 		    }
-		    else if (vtp_working)
+		    অন্যথা যদি (vtp_working)
 			vtp_sgr_bulks(argc, args);
 		}
-		else if (argc == 2 && *p == 'H')
+		অন্যথা যদি (argc == 2 && *p == 'H')
 		{
 		    gotoxy(arg2, arg1);
 		}
-		else if (argc == 2 && *p == 'r')
+		অন্যথা যদি (argc == 2 && *p == 'r')
 		{
 		    set_scroll_region(0, arg1 - 1, Columns - 1, arg2 - 1);
 		}
-		else if (argc == 2 && *p == 'R')
+		অন্যথা যদি (argc == 2 && *p == 'R')
 		{
 		    set_scroll_region_tb(arg1, arg2);
 		}
-		else if (argc == 2 && *p == 'V')
+		অন্যথা যদি (argc == 2 && *p == 'V')
 		{
 		    set_scroll_region_lr(arg1, arg2);
 		}
-		else if (argc == 1 && *p == 'A')
+		অন্যথা যদি (argc == 1 && *p == 'A')
 		{
 		    gotoxy(g_coord.X + 1,
-			   max(g_srScrollRegion.Top, g_coord.Y - arg1) + 1);
+			   max(g_srScrollRegion.শীৰ্ষ_2, g_coord.Y - arg1) + 1);
 		}
-		else if (argc == 1 && *p == 'b')
+		অন্যথা যদি (argc == 1 && *p == 'b')
 		{
 		    textbackground((WORD) arg1);
 		}
-		else if (argc == 1 && *p == 'C')
+		অন্যথা যদি (argc == 1 && *p == 'C')
 		{
-		    gotoxy(min(g_srScrollRegion.Right, g_coord.X + arg1) + 1,
+		    gotoxy(min(g_srScrollRegion.ডান_3, g_coord.X + arg1) + 1,
 			   g_coord.Y + 1);
 		}
-		else if (argc == 1 && *p == 'f')
+		অন্যথা যদি (argc == 1 && *p == 'f')
 		{
 		    textcolor((WORD) arg1);
 		}
-		else if (argc == 1 && *p == 'H')
+		অন্যথা যদি (argc == 1 && *p == 'H')
 		{
 		    gotoxy(1, arg1);
 		}
-		else if (argc == 1 && *p == 'L')
+		অন্যথা যদি (argc == 1 && *p == 'L')
 		{
-		    insert_lines(arg1);
+		    ঢোকাও_সাৰিগুলি(arg1);
 		}
-		else if (argc == 1 && *p == 'M')
+		অন্যথা যদি (argc == 1 && *p == 'M')
 		{
-		    delete_lines(arg1);
+		    delete_সাৰিগুলি(arg1);
 		}
 
-		len -= (int)(p - s);
+		len -= (পূর্ণাঙ্ক)(p - s);
 		s = p + 1;
-		break;
+		ভঙ্গ;
 
-	    case 'A':
+	    পক্ষ 'A':
 		gotoxy(g_coord.X + 1,
-		       max(g_srScrollRegion.Top, g_coord.Y - 1) + 1);
-		goto got3;
+		       max(g_srScrollRegion.শীৰ্ষ_2, g_coord.Y - 1) + 1);
+		গচ্ছ got3;
 
-	    case 'B':
+	    পক্ষ 'B':
 		visual_bell();
-		goto got3;
+		গচ্ছ got3;
 
-	    case 'C':
-		gotoxy(min(g_srScrollRegion.Right, g_coord.X + 1) + 1,
+	    পক্ষ 'C':
+		gotoxy(min(g_srScrollRegion.ডান_3, g_coord.X + 1) + 1,
 		       g_coord.Y + 1);
-		goto got3;
+		গচ্ছ got3;
 
-	    case 'E':
+	    পক্ষ 'E':
 		termcap_mode_end();
-		goto got3;
+		গচ্ছ got3;
 
-	    case 'F':
+	    পক্ষ 'F':
 		standout();
-		goto got3;
+		গচ্ছ got3;
 
-	    case 'f':
+	    পক্ষ 'f':
 		standend();
-		goto got3;
+		গচ্ছ got3;
 
-	    case 'H':
+	    পক্ষ 'H':
 		gotoxy(1, 1);
-		goto got3;
+		গচ্ছ got3;
 
-	    case 'j':
+	    পক্ষ 'j':
 		clear_to_end_of_display();
-		goto got3;
+		গচ্ছ got3;
 
-	    case 'J':
+	    পক্ষ 'J':
 		clear_screen();
-		goto got3;
+		গচ্ছ got3;
 
-	    case 'K':
-		clear_to_end_of_line();
-		goto got3;
+	    পক্ষ 'K':
+		clear_to_end_of_সাৰি();
+		গচ্ছ got3;
 
-	    case 'L':
-		insert_lines(1);
-		goto got3;
+	    পক্ষ 'L':
+		ঢোকাও_সাৰিগুলি(1);
+		গচ্ছ got3;
 
-	    case 'M':
-		delete_lines(1);
-		goto got3;
+	    পক্ষ 'M':
+		delete_সাৰিগুলি(1);
+		গচ্ছ got3;
 
-	    case 'S':
+	    পক্ষ 'S':
 		termcap_mode_start();
-		goto got3;
+		গচ্ছ got3;
 
-	    case 'V':
+	    পক্ষ 'V':
 		cursor_visible(TRUE);
-		goto got3;
+		গচ্ছ got3;
 
-	    case 'v':
+	    পক্ষ 'v':
 		cursor_visible(FALSE);
-		goto got3;
+		গচ্ছ got3;
 
 	    got3:
 		s += 3;
@@ -7843,61 +7843,61 @@ notsgr:
 	    }
 
 # ifdef MCH_WRITE_DUMP
-	    if (fdDump)
+	    যদি (fdDump)
 	    {
 		fputs("ESC | ", fdDump);
-		fwrite(old_s + 2, sizeof(char_u), s - old_s - 2, fdDump);
+		fwrite(old_s + 2, পরিমাণ(char_u), s - old_s - 2, fdDump);
 		fputc('\n', fdDump);
 	    }
 # endif
 	}
-	else if (s[0] == ESC && len >= 3-1 && s[1] == '[')
+	অন্যথা যদি (s[0] == ESC && len >= 3-1 && s[1] == '[')
 	{
 	    // CSI sequences should not be written as plain text to the
 	    // console.  Parse the sequence and skip over it.  When
 	    // USE_VTP is active, pass through known safe ones (e.g.
 	    // DECSCUSR for cursor shape) via vtp_printf().
-	    int l = 2;
+	    পূর্ণাঙ্ক l = 2;
 
 	    // skip parameter and intermediate bytes (0x20-0x3F)
-	    while (s + l < end && s[l] >= 0x20 && s[l] <= 0x3F)
+	    যেতিয়ালৈ (s + l < end && s[l] >= 0x20 && s[l] <= 0x3F)
 		l++;
 	    // skip the final byte (0x40-0x7E)
-	    if (s + l < end && s[l] >= 0x40 && s[l] <= 0x7E)
+	    যদি (s + l < end && s[l] >= 0x40 && s[l] <= 0x7E)
 	    {
 		// DECSCUSR (cursor style): pass through to terminal
-		if (USE_VTP && s[l] == 'q')
+		যদি (USE_VTP && s[l] == 'q')
 		    vtp_printf("%.*s", l + 1, s);
 		l++;
 	    }
 	    len -= l - 1;
 	    s += l;
 	}
-	else if (s[0] == ESC && len >= 2-1 && s[1] == 'P')
+	অন্যথা যদি (s[0] == ESC && len >= 2-1 && s[1] == 'P')
 	{
 	    // DCS (e.g. sixel image): write_chars() would print it as raw text
 	    // when USE_VTP is off, so let the console's VT parser handle it.
-	    int	l;
+	    পূর্ণাঙ্ক	l;
 
 	    in_dcs = true;
 	    dcs_esc = false;
-	    l = (int)(skip_dcs(s + 2, end) - s);
-	    if (vtp_working)
+	    l = (পূর্ণাঙ্ক)(skip_dcs(s + 2, end) - s);
+	    যদি (vtp_working)
 		write_vt(s, l);
 	    len -= l - 1;
 	    s += l;
 	}
-	else
+	অন্যথা
 	{
 	    // Write a single character
 	    DWORD nWritten;
 
 	    nWritten = write_chars(s, 1);
 # ifdef MCH_WRITE_DUMP
-	    if (fdDump)
+	    যদি (fdDump)
 	    {
 		fputc('>', fdDump);
-		fwrite(s, sizeof(char_u), nWritten, fdDump);
+		fwrite(s, পরিমাণ(char_u), nWritten, fdDump);
 		fputs("<\n", fdDump);
 	    }
 # endif
@@ -7908,16 +7908,16 @@ notsgr:
     }
 
 # ifdef MCH_WRITE_DUMP
-    if (fdDump)
+    যদি (fdDump)
 	fflush(fdDump);
 # endif
 }
 
-#else // FEAT_GUI_MSWIN && !VIMDLL
-    void
+#অন্যথা // FEAT_GUI_MSWIN && !VIMDLL
+    শূন্য
 mch_write(
     char_u  *s UNUSED,
-    int	    len UNUSED)
+    পূর্ণাঙ্ক	    len UNUSED)
 {
     // never used
 }
@@ -7928,41 +7928,41 @@ mch_write(
 /*
  * Delay for "msec" milliseconds.
  */
-    void
+    শূন্য
 mch_delay(
     long    msec,
-    int	    flags UNUSED)
+    পূর্ণাঙ্ক	    flags UNUSED)
 {
-#if defined(FEAT_GUI_MSWIN) && !defined(VIMDLL)
-    Sleep((int)msec);	    // never wait for input
-#else // Console
+#যদি defined(FEAT_GUI_MSWIN) && !defined(VIMDLL)
+    Sleep((পূর্ণাঙ্ক)msec);	    // never wait for input
+#অন্যথা // Console
 # ifdef VIMDLL
-    if (gui.in_use)
+    যদি (gui.in_use)
     {
-	Sleep((int)msec);	    // never wait for input
-	return;
+	Sleep((পূর্ণাঙ্ক)msec);	    // never wait for input
+	ঘূৰাই;
     }
 # endif
-    if (flags & MCH_DELAY_IGNOREINPUT)
+    যদি (flags & MCH_DELAY_IGNOREINPUT)
 # ifdef FEAT_MZSCHEME
-	if (mzthreads_allowed() && p_mzq > 0 && msec > p_mzq)
+	যদি (mzthreads_allowed() && p_mzq > 0 && msec > p_mzq)
 	{
-	    int towait = p_mzq;
+	    পূর্ণাঙ্ক towait = p_mzq;
 
 	    // if msec is large enough, wait by portions in p_mzq
-	    while (msec > 0)
+	    যেতিয়ালৈ (msec > 0)
 	    {
 		mzvim_check_threads();
-		if (msec < towait)
+		যদি (msec < towait)
 		    towait = msec;
 		Sleep(towait);
 		msec -= towait;
 	    }
 	}
-	else
+	অন্যথা
 # endif
-	    Sleep((int)msec);
-    else
+	    Sleep((পূর্ণাঙ্ক)msec);
+    অন্যথা
 	WaitForChar(msec, FALSE);
 #endif
 }
@@ -7973,42 +7973,42 @@ mch_delay(
  * This can also remove a symbolic link like Unix.
  * Return 0 for success, -1 for failure.
  */
-    int
+    পূর্ণাঙ্ক
 mch_remove(char_u *name)
 {
     WCHAR	*wn;
-    int		n;
+    পূর্ণাঙ্ক		n;
 
     /*
      * On Windows, deleting a directory's symbolic link is done by
      * RemoveDirectory(): mch_rmdir.  It seems unnatural, but it is fact.
      */
-    if (mch_isdir(name) && mch_is_symbolic_link(name))
-	return mch_rmdir(name);
+    যদি (mch_isdir(name) && mch_is_symbolic_link(name))
+	ঘূৰাই mch_rmdir(name);
 
     win32_setattrs(name, FILE_ATTRIBUTE_NORMAL);
 
-    wn = enc_to_utf16(name, NULL);
-    if (wn == NULL)
-	return -1;
+    wn = enc_to_utf16(name, রিক্ত);
+    যদি (wn == রিক্ত)
+	ঘূৰাই -1;
 
     n = DeleteFileW(wn) ? 0 : -1;
     vim_free(wn);
-    return n;
+    ঘূৰাই n;
 }
 
 
 /*
  * Check for an "interrupt signal": CTRL-break or CTRL-C.
  */
-    void
-mch_breakcheck(int force UNUSED)
+    শূন্য
+mch_breakcheck(পূর্ণাঙ্ক force UNUSED)
 {
-#if !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
+#যদি !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
 # ifdef VIMDLL
-    if (!gui.in_use)
+    যদি (!gui.in_use)
 # endif
-	if (g_fCtrlCPressed || g_fCBrkPressed)
+	যদি (g_fCtrlCPressed || g_fCBrkPressed)
 	{
 	    ctrl_break_was_pressed = g_fCBrkPressed;
 	    g_fCtrlCPressed = g_fCBrkPressed = FALSE;
@@ -8024,26 +8024,26 @@ mch_breakcheck(int force UNUSED)
  * How much main memory in KiB that can be used by VIM.
  */
     long_u
-mch_total_mem(int special UNUSED)
+mch_total_mem(পূর্ণাঙ্ক special UNUSED)
 {
     MEMORYSTATUSEX  ms;
 
     // Need to use GlobalMemoryStatusEx() when there is more memory than
     // what fits in 32 bits.
-    ms.dwLength = sizeof(MEMORYSTATUSEX);
+    ms.dwLength = পরিমাণ(MEMORYSTATUSEX);
     GlobalMemoryStatusEx(&ms);
-    if (ms.ullAvailVirtual < ms.ullTotalPhys)
+    যদি (ms.ullAvailVirtual < ms.ullTotalPhys)
     {
 	// Process address space fits in physical RAM, use all of it.
-	return (long_u)(ms.ullAvailVirtual / 1024);
+	ঘূৰাই (long_u)(ms.ullAvailVirtual / 1024);
     }
-    if (ms.ullTotalPhys <= WINNT_RESERVE_BYTES)
+    যদি (ms.ullTotalPhys <= WINNT_RESERVE_BYTES)
     {
 	// Catch old NT box or perverse hardware setup.
-	return (long_u)((ms.ullTotalPhys / 2) / 1024);
+	ঘূৰাই (long_u)((ms.ullTotalPhys / 2) / 1024);
     }
     // Use physical RAM less reserve for OS + data.
-    return (long_u)((ms.ullTotalPhys - WINNT_RESERVE_BYTES) / 1024);
+    ঘূৰাই (long_u)((ms.ullTotalPhys - WINNT_RESERVE_BYTES) / 1024);
 }
 
 /*
@@ -8052,13 +8052,13 @@ mch_total_mem(int special UNUSED)
  * "path" has backslashes before chars that are not to be expanded.
  * Returns the number of matches found.
  */
-    int
+    পূর্ণাঙ্ক
 mch_expandpath(
     garray_T	*gap,
     char_u	*path,
-    int		flags)		// EW_* flags
+    পূর্ণাঙ্ক		flags)		// EW_* flags
 {
-    return dos_expandpath(gap, path, 0, flags, FALSE);
+    ঘূৰাই dos_expandpath(gap, path, 0, flags, FALSE);
 }
 
 /*
@@ -8070,7 +8070,7 @@ mch_expandpath(
  * Like rename(), returns 0 upon success, non-zero upon failure.
  * Should probably set errno appropriately when errors occur.
  */
-    int
+    পূর্ণাঙ্ক
 mch_wrename(WCHAR *wold, WCHAR *wnew)
 {
     WCHAR	*p;
@@ -8081,45 +8081,45 @@ mch_wrename(WCHAR *wold, WCHAR *wnew)
 
     // No need to play tricks unless the file name contains a "~" as the
     // seventh character.
-    for (p = q = wold; *p != L'\0'; ++p)
+    বাবে (p = q = wold; *p != L'\0'; ++p)
     {
-	switch (*p)
+	ৱিকল্প (*p)
 	{
-	case L'/':
-	case L'\\':
-	case L':':
-	    if (*(p + 1) != L'\0')
+	পক্ষ L'/':
+	পক্ষ L'\\':
+	পক্ষ L':':
+	    যদি (*(p + 1) != L'\0')
 		q = p + 1;	    // point to the character after the path
 				    // separator.
-	    break;
+	    ভঙ্গ;
 
-	default:
-	    break;
+	স্ৱভাৱ:
+	    ভঙ্গ;
 	}
     }
 
     // If the length of the file name is less than 8 characters or the seventh
     // character is not a "~', do a normal move.
-    if ((int)(p - q) < 8 || q[6] != L'~')
-	return (MoveFileW(wold, wnew) == 0);
+    যদি ((পূর্ণাঙ্ক)(p - q) < 8 || q[6] != L'~')
+	ঘূৰাই (MoveFileW(wold, wnew) == 0);
 
     // Get base path of new file name.  Undocumented feature: If pszNewFile is
     // a directory, no error is returned and pszFilePart will be NULL.
-    if (GetFullPathNameW(wnew, _MAX_PATH, szNewPath, &p) == 0 || p == NULL)
-	return -1;
+    যদি (GetFullPathNameW(wnew, _MAX_PATH, szNewPath, &p) == 0 || p == রিক্ত)
+	ঘূৰাই -1;
     *p = NUL;
 
     // Get (and create) a unique temporary file name in directory of new file
-    if (GetTempFileNameW(szNewPath, L"VIM", 0, szTempFile) == 0)
-	return -2;
+    যদি (GetTempFileNameW(szNewPath, L"VIM", 0, szTempFile) == 0)
+	ঘূৰাই -2;
 
     // blow the temp file away
-    if (!DeleteFileW(szTempFile))
-	return -3;
+    যদি (!DeleteFileW(szTempFile))
+	ঘূৰাই -3;
 
     // rename old file to the temp file
-    if (!MoveFileW(wold, szTempFile))
-	return -4;
+    যদি (!MoveFileW(wold, szTempFile))
+	ঘূৰাই -4;
 
     // now create an empty file called pszOldFile; this prevents the operating
     // system using pszOldFile as an alias (SFN) if we're renaming within the
@@ -8130,29 +8130,29 @@ mch_wrename(WCHAR *wold, WCHAR *wnew)
     // cause all sorts of problems later in buf_write().  So, we create an
     // empty file called filena~1.txt and the system will have to find some
     // other SFN for filena~1.txt~, such as filena~2.txt
-    if ((hf = CreateFileW(wold, GENERIC_WRITE, 0, NULL, CREATE_NEW,
-		    FILE_ATTRIBUTE_NORMAL, NULL)) == INVALID_HANDLE_VALUE)
-	return -5;
-    if (!CloseHandle(hf))
-	return -6;
+    যদি ((hf = CreateFileW(wold, GENERIC_WRITE, 0, রিক্ত, CREATE_NEW,
+		    FILE_ATTRIBUTE_NORMAL, রিক্ত)) == INVALID_HANDLE_মান)
+	ঘূৰাই -5;
+    যদি (!CloseHandle(hf))
+	ঘূৰাই -6;
 
     // rename the temp file to the new file
-    if (!MoveFileW(szTempFile, wnew))
+    যদি (!MoveFileW(szTempFile, wnew))
     {
 	// Renaming failed.  Rename the file back to its old name, so that it
 	// looks like nothing happened.
-	(void)MoveFileW(szTempFile, wold);
-	return -7;
+	(শূন্য)MoveFileW(szTempFile, wold);
+	ঘূৰাই -7;
     }
 
     // Seems to be left around on Novell filesystems
     DeleteFileW(szTempFile);
 
     // finally, remove the empty old file
-    if (!DeleteFileW(wold))
-	return -8;
+    যদি (!DeleteFileW(wold))
+	ঘূৰাই -8;
 
-    return 0;
+    ঘূৰাই 0;
 }
 
 
@@ -8160,86 +8160,86 @@ mch_wrename(WCHAR *wold, WCHAR *wnew)
  * Converts the filenames to UTF-16, then call mch_wrename().
  * Like rename(), returns 0 upon success, non-zero upon failure.
  */
-    int
+    পূর্ণাঙ্ক
 mch_rename(
-    const char	*pszOldFile,
-    const char	*pszNewFile)
+    ধ্রুৱ ৱর্ণ	*pszOldFile,
+    ধ্রুৱ ৱর্ণ	*pszNewFile)
 {
-    WCHAR	*wold = NULL;
-    WCHAR	*wnew = NULL;
-    int		retval = -1;
+    WCHAR	*wold = রিক্ত;
+    WCHAR	*wnew = রিক্ত;
+    পূর্ণাঙ্ক		retval = -1;
 
-    wold = enc_to_utf16((char_u *)pszOldFile, NULL);
-    wnew = enc_to_utf16((char_u *)pszNewFile, NULL);
-    if (wold != NULL && wnew != NULL)
+    wold = enc_to_utf16((char_u *)pszOldFile, রিক্ত);
+    wnew = enc_to_utf16((char_u *)pszNewFile, রিক্ত);
+    যদি (wold != রিক্ত && wnew != রিক্ত)
 	retval = mch_wrename(wold, wnew);
     vim_free(wold);
     vim_free(wnew);
-    return retval;
+    ঘূৰাই retval;
 }
 
 /*
  * Get the default shell for the current hardware platform
  */
-    char *
-default_shell(void)
+    ৱর্ণ *
+default_shell(শূন্য)
 {
-    return "cmd.exe";
+    ঘূৰাই "cmd.exe";
 }
 
 /*
  * mch_access() extends access() to do more detailed check on network drives.
  * Returns 0 if file "n" has access rights according to "p", -1 otherwise.
  */
-    int
-mch_access(char *n, int p)
+    পূর্ণাঙ্ক
+mch_access(ৱর্ণ *n, পূর্ণাঙ্ক p)
 {
     HANDLE	hFile;
-    int		retval = -1;	    // default: fail
+    পূর্ণাঙ্ক		retval = -1;	    // default: fail
     WCHAR	*wn;
 
-    wn = enc_to_utf16((char_u *)n, NULL);
-    if (wn == NULL)
-	return -1;
+    wn = enc_to_utf16((char_u *)n, রিক্ত);
+    যদি (wn == রিক্ত)
+	ঘূৰাই -1;
 
-    if (mch_isdir((char_u *)n))
+    যদি (mch_isdir((char_u *)n))
     {
 	WCHAR TempNameW[_MAX_PATH + 16] = L"";
 
-	if (p & R_OK)
+	যদি (p & R_OK)
 	{
 	    // Read check is performed by seeing if we can do a find file on
 	    // the directory for any file.
-	    int			i;
+	    পূর্ণাঙ্ক			i;
 	    WIN32_FIND_DATAW    d;
 
-	    for (i = 0; i < _MAX_PATH && wn[i] != 0; ++i)
+	    বাবে (i = 0; i < _MAX_PATH && wn[i] != 0; ++i)
 		TempNameW[i] = wn[i];
-	    if (TempNameW[i - 1] != '\\' && TempNameW[i - 1] != '/')
+	    যদি (TempNameW[i - 1] != '\\' && TempNameW[i - 1] != '/')
 		TempNameW[i++] = '\\';
 	    TempNameW[i++] = '*';
 	    TempNameW[i++] = 0;
 
 	    hFile = FindFirstFileW(TempNameW, &d);
-	    if (hFile == INVALID_HANDLE_VALUE)
-		goto getout;
-	    else
-		(void)FindClose(hFile);
+	    যদি (hFile == INVALID_HANDLE_মান)
+		গচ্ছ getout;
+	    অন্যথা
+		(শূন্য)FindClose(hFile);
 	}
 
-	if (p & W_OK)
+	যদি (p & W_OK)
 	{
 	    // Trying to create a temporary file in the directory should catch
 	    // directories on read-only network shares.  However, in
 	    // directories whose ACL allows writes but denies deletes will end
 	    // up keeping the temporary file :-(.
-	    if (!GetTempFileNameW(wn, L"VIM", 0, TempNameW))
-		goto getout;
-	    else
+	    যদি (!GetTempFileNameW(wn, L"VIM", 0, TempNameW))
+		গচ্ছ getout;
+	    অন্যথা
 		DeleteFileW(TempNameW);
 	}
     }
-    else
+    অন্যথা
     {
 	// Don't consider a file read-only if another process has opened it.
 	DWORD share_mode = FILE_SHARE_READ | FILE_SHARE_WRITE;
@@ -8250,69 +8250,69 @@ mch_access(char *n, int p)
 					     | ((p & R_OK) ? GENERIC_READ : 0);
 
 	hFile = CreateFileW(wn, access_mode, share_mode,
-					     NULL, OPEN_EXISTING, 0, NULL);
-	if (hFile == INVALID_HANDLE_VALUE)
-	    goto getout;
+					     রিক্ত, OPEN_EXISTING, 0, রিক্ত);
+	যদি (hFile == INVALID_HANDLE_মান)
+	    গচ্ছ getout;
 	CloseHandle(hFile);
     }
 
     retval = 0;	    // success
 getout:
     vim_free(wn);
-    return retval;
+    ঘূৰাই retval;
 }
 
 /*
  * Version of open() that may use UTF-16 file name.
  */
-    int
-mch_open(const char *name, int flags, int mode)
+    পূর্ণাঙ্ক
+mch_open(ধ্রুৱ ৱর্ণ *name, পূর্ণাঙ্ক flags, পূর্ণাঙ্ক mode)
 {
     WCHAR	*wn;
-    int		f;
+    পূর্ণাঙ্ক		f;
 
-    wn = enc_to_utf16((char_u *)name, NULL);
-    if (wn == NULL)
-	return -1;
+    wn = enc_to_utf16((char_u *)name, রিক্ত);
+    যদি (wn == রিক্ত)
+	ঘূৰাই -1;
 
     f = _wopen(wn, flags, mode);
     vim_free(wn);
-    return f;
+    ঘূৰাই f;
 }
 
 /*
  * Version of fopen() that uses UTF-16 file name.
  */
     FILE *
-mch_fopen(const char *name, const char *mode)
+mch_fopen(ধ্রুৱ ৱর্ণ *name, ধ্রুৱ ৱর্ণ *mode)
 {
     WCHAR	*wn, *wm;
-    FILE	*f = NULL;
+    FILE	*f = রিক্ত;
 
-#if defined(DEBUG) && _MSC_VER >= 1400
+#যদি defined(DEBUG) && _MSC_VER >= 1400
     // Work around an annoying assertion in the Microsoft debug CRT
     // when mode's text/binary setting doesn't match _get_fmode().
-    char newMode = mode[strlen(mode) - 1];
-    int oldMode = 0;
+    ৱর্ণ newMode = mode[strlen(mode) - 1];
+    পূর্ণাঙ্ক oldMode = 0;
 
     _get_fmode(&oldMode);
-    if (newMode == 't')
+    যদি (newMode == 't')
 	_set_fmode(_O_TEXT);
-    else if (newMode == 'b')
-	_set_fmode(_O_BINARY);
+    অন্যথা যদি (newMode == 'b')
+	_set_fmode(O_দ্বিমিক_2);
 #endif
-    wn = enc_to_utf16((char_u *)name, NULL);
-    wm = enc_to_utf16((char_u *)mode, NULL);
-    if (wn != NULL && wm != NULL)
+    wn = enc_to_utf16((char_u *)name, রিক্ত);
+    wm = enc_to_utf16((char_u *)mode, রিক্ত);
+    যদি (wn != রিক্ত && wm != রিক্ত)
 	f = _wfopen(wn, wm);
     vim_free(wn);
     vim_free(wm);
 
-#if defined(DEBUG) && _MSC_VER >= 1400
-    if (oldMode != 0)
+#যদি defined(DEBUG) && _MSC_VER >= 1400
+    যদি (oldMode != 0)
 	_set_fmode(oldMode);
 #endif
-    return f;
+    ঘূৰাই f;
 }
 
 /*
@@ -8336,123 +8336,123 @@ mch_fopen(const char *name, const char *mode)
  * and write to stream "substream" of file "to".
  * Errors are ignored.
  */
-    static void
-copy_substream(HANDLE sh, void *context, WCHAR *to, WCHAR *substream, long len)
+    স্থির শূন্য
+copy_substream(HANDLE sh, শূন্য *context, WCHAR *to, WCHAR *substream, long len)
 {
     HANDLE  hTo;
     WCHAR   *to_name;
 
-    to_name = alloc((wcslen(to) + wcslen(substream) + 1) * sizeof(WCHAR));
-    if (to_name == NULL)
-	return;
+    to_name = alloc((wcslen(to) + wcslen(substream) + 1) * পরিমাণ(WCHAR));
+    যদি (to_name == রিক্ত)
+	ঘূৰাই;
 
     wcscpy(to_name, to);
     wcscat(to_name, substream);
 
-    hTo = CreateFileW(to_name, GENERIC_WRITE, 0, NULL, OPEN_ALWAYS,
-						 FILE_ATTRIBUTE_NORMAL, NULL);
-    if (hTo != INVALID_HANDLE_VALUE)
+    hTo = CreateFileW(to_name, GENERIC_WRITE, 0, রিক্ত, OPEN_ALWAYS,
+						 FILE_ATTRIBUTE_NORMAL, রিক্ত);
+    যদি (hTo != INVALID_HANDLE_মান)
     {
 	long	done;
 	DWORD	todo;
 	DWORD	readcnt, written;
-	char	buf[4096];
+	ৱর্ণ	buf[4096];
 
 	// Copy block of bytes at a time.  Abort when something goes wrong.
-	for (done = 0; done < len; done += written)
+	বাবে (done = 0; done < len; done += written)
 	{
 	    // (size_t) cast for Borland C 5.5
-	    todo = (DWORD)((size_t)(len - done) > sizeof(buf) ? sizeof(buf)
+	    todo = (DWORD)((size_t)(len - done) > পরিমাণ(buf) ? পরিমাণ(buf)
 						       : (size_t)(len - done));
-	    if (!BackupRead(sh, (LPBYTE)buf, todo, &readcnt,
+	    যদি (!BackupRead(sh, (LPBYTE)buf, todo, &readcnt,
 						       FALSE, FALSE, context)
 		    || readcnt != todo
-		    || !WriteFile(hTo, buf, todo, &written, NULL)
+		    || !WriteFile(hTo, buf, todo, &written, রিক্ত)
 		    || written != todo)
-		break;
+		ভঙ্গ;
 	}
 	CloseHandle(hTo);
     }
 
-    free(to_name);
+    মুক্ত(to_name);
 }
 
 /*
  * Copy info streams from file "from" to file "to".
  */
-    static void
+    স্থির শূন্য
 copy_infostreams(char_u *from, char_u *to)
 {
     WCHAR		*fromw;
     WCHAR		*tow;
     HANDLE		sh;
     WIN32_STREAM_ID	sid;
-    int			headersize;
+    পূর্ণাঙ্ক			headersize;
     WCHAR		streamname[_MAX_PATH];
     DWORD		readcount;
-    void		*context = NULL;
+    শূন্য		*context = রিক্ত;
     DWORD		lo, hi;
-    int			len;
+    পূর্ণাঙ্ক			len;
 
     // Convert the file names to wide characters.
-    fromw = enc_to_utf16(from, NULL);
-    tow = enc_to_utf16(to, NULL);
-    if (fromw != NULL && tow != NULL)
+    fromw = enc_to_utf16(from, রিক্ত);
+    tow = enc_to_utf16(to, রিক্ত);
+    যদি (fromw != রিক্ত && tow != রিক্ত)
     {
 	// Open the file for reading.
-	sh = CreateFileW(fromw, GENERIC_READ, FILE_SHARE_READ, NULL,
-			     OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, NULL);
-	if (sh != INVALID_HANDLE_VALUE)
+	sh = CreateFileW(fromw, GENERIC_READ, FILE_SHARE_READ, রিক্ত,
+			     OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, রিক্ত);
+	যদি (sh != INVALID_HANDLE_মান)
 	{
 	    // Use BackupRead() to find the info streams.  Repeat until we
 	    // have done them all.
-	    for (;;)
+	    বাবে (;;)
 	    {
 		// Get the header to find the length of the stream name.  If
 		// the "readcount" is zero we have done all info streams.
-		ZeroMemory(&sid, sizeof(WIN32_STREAM_ID));
-		headersize = (int)((char *)&sid.cStreamName - (char *)&sid.dwStreamId);
-		if (!BackupRead(sh, (LPBYTE)&sid, headersize,
+		ZeroMemory(&sid, পরিমাণ(WIN32_STREAM_ID));
+		headersize = (পূর্ণাঙ্ক)((ৱর্ণ *)&sid.cStreamName - (ৱর্ণ *)&sid.dwStreamId);
+		যদি (!BackupRead(sh, (LPBYTE)&sid, headersize,
 					   &readcount, FALSE, FALSE, &context)
 			|| readcount == 0)
-		    break;
+		    ভঙ্গ;
 
 		// We only deal with streams that have a name.  The normal
 		// file data appears to be without a name, even though docs
 		// suggest it is called "::$DATA".
-		if (sid.dwStreamNameSize > 0)
+		যদি (sid.dwStreamNameSize > 0)
 		{
 		    // Read the stream name.
-		    if (!BackupRead(sh, (LPBYTE)streamname,
+		    যদি (!BackupRead(sh, (LPBYTE)streamname,
 							 sid.dwStreamNameSize,
 					  &readcount, FALSE, FALSE, &context))
-			break;
+			ভঙ্গ;
 
 		    // Copy an info stream with a name ":anything:$DATA".
 		    // Skip "::$DATA", it has no stream name (examples suggest
 		    // it might be used for the normal file contents).
 		    // Note that BackupRead() counts bytes, but the name is in
 		    // wide characters.
-		    len = readcount / sizeof(WCHAR);
+		    len = readcount / পরিমাণ(WCHAR);
 		    streamname[len] = 0;
-		    if (len > 7 && wcsicmp(streamname + len - 6,
+		    যদি (len > 7 && wcsicmp(streamname + len - 6,
 							      L":$DATA") == 0)
 		    {
 			streamname[len - 6] = 0;
 			copy_substream(sh, &context, tow, streamname,
-						    (long)sid.Size.u.LowPart);
+						    (long)sid.Size.u.নিচেৰ_Part);
 		    }
 		}
 
 		// Advance to the next stream.  We might try seeking too far,
 		// but BackupSeek() doesn't skip over stream borders, thus
 		// that's OK.
-		(void)BackupSeek(sh, sid.Size.u.LowPart, sid.Size.u.HighPart,
+		(শূন্য)BackupSeek(sh, sid.Size.u.নিচেৰ_Part, sid.Size.u.উপৰেৰ_Part,
 							  &lo, &hi, &context);
 	    }
 
 	    // Clear the context.
-	    (void)BackupRead(sh, NULL, 0, &readcount, TRUE, FALSE, &context);
+	    (শূন্য)BackupRead(sh, রিক্ত, 0, &readcount, TRUE, FALSE, &context);
 
 	    CloseHandle(sh);
 	}
@@ -8469,34 +8469,34 @@ copy_infostreams(char_u *from, char_u *to)
 # define STATUS_SUCCESS	    ((NTSTATUS) 0x00000000L)
 #endif
 
-typedef struct _FILE_FULL_EA_INFORMATION_ {
+প্রকারনির্দেশ সংরচনা _FILE_FULL_EA_INFORMATION_ {
     ULONG  NextEntryOffset;
     UCHAR  Flags;
     UCHAR  EaNameLength;
-    USHORT EaValueLength;
+    USHORT Ea_মান_Length;
     CHAR   EaName[1];
 } FILE_FULL_EA_INFORMATION_, *PFILE_FULL_EA_INFORMATION_;
 
-typedef struct _FILE_EA_INFORMATION_ {
+প্রকারনির্দেশ সংরচনা _FILE_EA_INFORMATION_ {
     ULONG EaSize;
 } FILE_EA_INFORMATION_, *PFILE_EA_INFORMATION_;
 
 #ifndef PROTO
-typedef NTSTATUS (NTAPI *PfnNtOpenFile)(
+প্রকারনির্দেশ NTSTATUS (NTAPI *PfnNtOpenFile)(
 	PHANDLE FileHandle,
 	ACCESS_MASK DesiredAccess,
 	POBJECT_ATTRIBUTES ObjectAttributes,
 	PIO_STATUS_BLOCK IoStatusBlock,
 	ULONG ShareAccess,
 	ULONG OpenOptions);
-typedef NTSTATUS (NTAPI *PfnNtClose)(
+প্রকারনির্দেশ NTSTATUS (NTAPI *PfnNtClose)(
 	HANDLE Handle);
-typedef NTSTATUS (NTAPI *PfnNtSetEaFile)(
+প্রকারনির্দেশ NTSTATUS (NTAPI *PfnNtSetEaFile)(
 	HANDLE		    FileHandle,
 	PIO_STATUS_BLOCK    IoStatusBlock,
 	PVOID		    Buffer,
 	ULONG		    Length);
-typedef NTSTATUS (NTAPI *PfnNtQueryEaFile)(
+প্রকারনির্দেশ NTSTATUS (NTAPI *PfnNtQueryEaFile)(
 	HANDLE FileHandle,
 	PIO_STATUS_BLOCK IoStatusBlock,
 	PVOID Buffer,
@@ -8506,37 +8506,37 @@ typedef NTSTATUS (NTAPI *PfnNtQueryEaFile)(
 	ULONG EaListLength,
 	PULONG EaIndex,
 	BOOLEAN RestartScan);
-typedef NTSTATUS (NTAPI *PfnNtQueryInformationFile)(
+প্রকারনির্দেশ NTSTATUS (NTAPI *PfnNtQueryInformationFile)(
 	HANDLE			FileHandle,
 	PIO_STATUS_BLOCK	IoStatusBlock,
 	PVOID			FileInformation,
 	ULONG			Length,
 	FILE_INFORMATION_CLASS FileInformationClass);
-typedef VOID (NTAPI *PfnRtlInitUnicodeString)(
+প্রকারনির্দেশ VOID (NTAPI *PfnRtlInitUnicodeString)(
 	PUNICODE_STRING DestinationString,
 	PCWSTR SourceString);
 
-PfnNtOpenFile pNtOpenFile = NULL;
-PfnNtClose pNtClose = NULL;
-PfnNtSetEaFile pNtSetEaFile = NULL;
-PfnNtQueryEaFile pNtQueryEaFile = NULL;
-PfnNtQueryInformationFile pNtQueryInformationFile = NULL;
-PfnRtlInitUnicodeString pRtlInitUnicodeString = NULL;
+PfnNtOpenFile pNtOpenFile = রিক্ত;
+PfnNtClose pNtClose = রিক্ত;
+PfnNtSetEaFile pNtSetEaFile = রিক্ত;
+PfnNtQueryEaFile pNtQueryEaFile = রিক্ত;
+PfnNtQueryInformationFile pNtQueryInformationFile = রিক্ত;
+PfnRtlInitUnicodeString pRtlInitUnicodeString = রিক্ত;
 #endif
 
 /*
  * Load ntdll.dll functions.
  */
-    static BOOL
-load_ntdll(void)
+    স্থির BOOL
+load_ntdll(শূন্য)
 {
-    static int	loaded = -1;
+    স্থির পূর্ণাঙ্ক	loaded = -1;
 
-    if (loaded != -1)
-	return (BOOL) loaded;
+    যদি (loaded != -1)
+	ঘূৰাই (BOOL) loaded;
 
     HMODULE hNtdll = GetModuleHandle("ntdll.dll");
-    if (hNtdll != NULL)
+    যদি (hNtdll != রিক্ত)
     {
 	pNtOpenFile = (PfnNtOpenFile) GetProcAddress(hNtdll, "NtOpenFile");
 	pNtClose = (PfnNtClose) GetProcAddress(hNtdll, "NtClose");
@@ -8549,69 +8549,69 @@ load_ntdll(void)
 	pRtlInitUnicodeString = (PfnRtlInitUnicodeString)
 	    GetProcAddress(hNtdll, "RtlInitUnicodeString");
     }
-    if (pNtOpenFile == NULL
-	    || pNtClose == NULL
-	    || pNtSetEaFile == NULL
-	    || pNtQueryEaFile == NULL
-	    || pNtQueryInformationFile == NULL
-	    || pRtlInitUnicodeString == NULL)
+    যদি (pNtOpenFile == রিক্ত
+	    || pNtClose == রিক্ত
+	    || pNtSetEaFile == রিক্ত
+	    || pNtQueryEaFile == রিক্ত
+	    || pNtQueryInformationFile == রিক্ত
+	    || pRtlInitUnicodeString == রিক্ত)
 	loaded = FALSE;
-    else
+    অন্যথা
 	loaded = TRUE;
-    return (BOOL) loaded;
+    ঘূৰাই (BOOL) loaded;
 }
 
 /*
  * Copy extended attributes (EA) from file "from" to file "to".
  */
-    static void
+    স্থির শূন্য
 copy_extattr(char_u *from, char_u *to)
 {
-    char_u		    *fromf = NULL;
-    char_u		    *tof = NULL;
-    WCHAR		    *fromw = NULL;
-    WCHAR		    *tow = NULL;
+    char_u		    *fromf = রিক্ত;
+    char_u		    *tof = রিক্ত;
+    WCHAR		    *fromw = রিক্ত;
+    WCHAR		    *tow = রিক্ত;
     UNICODE_STRING	    u;
     HANDLE		    h;
     OBJECT_ATTRIBUTES	    oa;
     IO_STATUS_BLOCK	    iosb;
     FILE_EA_INFORMATION_    eainfo = {0};
-    void		    *ea = NULL;
+    শূন্য		    *ea = রিক্ত;
 
-    if (!load_ntdll())
-	return;
+    যদি (!load_ntdll())
+	ঘূৰাই;
 
     // Convert the file names to the fully qualified object names.
     fromf = alloc(STRLEN(from) + 5);
     tof = alloc(STRLEN(to) + 5);
-    if (fromf == NULL || tof == NULL)
-	goto theend;
+    যদি (fromf == রিক্ত || tof == রিক্ত)
+	গচ্ছ theend;
     STRCPY(fromf, "\\??\\");
     STRCPY(fromf + STRLEN_LITERAL("\\??\\"), from);
     STRCPY(tof, "\\??\\");
     STRCPY(tof + STRLEN_LITERAL("\\??\\"), to);
 
     // Convert the names to wide characters.
-    fromw = enc_to_utf16(fromf, NULL);
-    tow = enc_to_utf16(tof, NULL);
-    if (fromw == NULL || tow == NULL)
-	goto theend;
+    fromw = enc_to_utf16(fromf, রিক্ত);
+    tow = enc_to_utf16(tof, রিক্ত);
+    যদি (fromw == রিক্ত || tow == রিক্ত)
+	গচ্ছ theend;
 
     // Get the EA.
     pRtlInitUnicodeString(&u, fromw);
-    InitializeObjectAttributes(&oa, &u, 0, NULL, NULL);
-    if (pNtOpenFile(&h, FILE_READ_EA, &oa, &iosb, 0,
+    InitializeObjectAttributes(&oa, &u, 0, রিক্ত, রিক্ত);
+    যদি (pNtOpenFile(&h, FILE_READ_EA, &oa, &iosb, 0,
 		FILE_NON_DIRECTORY_FILE) != STATUS_SUCCESS)
-	goto theend;
-    pNtQueryInformationFile(h, &iosb, &eainfo, sizeof(eainfo),
+	গচ্ছ theend;
+    pNtQueryInformationFile(h, &iosb, &eainfo, পরিমাণ(eainfo),
 	    FileEaInformation);
-    if (eainfo.EaSize != 0)
+    যদি (eainfo.EaSize != 0)
     {
 	ea = alloc(eainfo.EaSize);
-	if (ea != NULL)
+	যদি (ea != রিক্ত)
 	{
-	    if (pNtQueryEaFile(h, &iosb, ea, eainfo.EaSize, FALSE,
-			NULL, 0, NULL, TRUE) != STATUS_SUCCESS)
+	    যদি (pNtQueryEaFile(h, &iosb, ea, eainfo.EaSize, FALSE,
+			রিক্ত, 0, রিক্ত, TRUE) != STATUS_SUCCESS)
 	    {
 		VIM_CLEAR(ea);
 	    }
@@ -8620,13 +8620,13 @@ copy_extattr(char_u *from, char_u *to)
     pNtClose(h);
 
     // Set the EA.
-    if (ea != NULL)
+    যদি (ea != রিক্ত)
     {
 	pRtlInitUnicodeString(&u, tow);
-	InitializeObjectAttributes(&oa, &u, 0, NULL, NULL);
-	if (pNtOpenFile(&h, FILE_WRITE_EA, &oa, &iosb, 0,
+	InitializeObjectAttributes(&oa, &u, 0, রিক্ত, রিক্ত);
+	যদি (pNtOpenFile(&h, FILE_WRITE_EA, &oa, &iosb, 0,
 		    FILE_NON_DIRECTORY_FILE) != STATUS_SUCCESS)
-	    goto theend;
+	    গচ্ছ theend;
 
 	pNtSetEaFile(h, &iosb, ea, eainfo.EaSize);
 	pNtClose(h);
@@ -8645,73 +8645,73 @@ theend:
  * For Windows NT and later we copy info streams.
  * Always returns zero, errors are ignored.
  */
-    int
+    পূর্ণাঙ্ক
 mch_copy_file_attribute(char_u *from, char_u *to)
 {
     // File streams only work on Windows NT and later.
     copy_infostreams(from, to);
     copy_extattr(from, to);
-    return 0;
+    ঘূৰাই 0;
 }
 
 
 /*
  * The command line arguments in UTF-16
  */
-static int	nArgsW = 0;
-static LPWSTR	*ArglistW = NULL;
-static int	global_argc = 0;
-static char	**global_argv;
+স্থির পূর্ণাঙ্ক	nArgsW = 0;
+স্থির LPWSTR	*ArglistW = রিক্ত;
+স্থির পূর্ণাঙ্ক	global_argc = 0;
+স্থির ৱর্ণ	**global_argv;
 
-static int	used_file_argc = 0;	// last argument in global_argv[] used
+স্থির পূর্ণাঙ্ক	used_file_argc = 0;	// last argument in global_argv[] used
 					// for the argument list.
-static int	*used_file_indexes = NULL; // indexes in global_argv[] for
+স্থির পূর্ণাঙ্ক	*used_file_indexes = রিক্ত; // indexes in global_argv[] for
 					   // command line arguments added to
 					   // the argument list
-static int	used_file_count = 0;	// nr of entries in used_file_indexes
-static int	used_file_literal = FALSE;  // take file names literally
-static int	used_file_full_path = FALSE;  // file name was full path
+স্থির পূর্ণাঙ্ক	used_file_গুনতি = 0;	// nr of entries in used_file_indexes
+স্থির পূর্ণাঙ্ক	used_file_literal = FALSE;  // take file names literally
+স্থির পূর্ণাঙ্ক	used_file_full_path = FALSE;  // file name was full path
 #ifdef FEAT_DIFF
-static int	used_file_diff_mode = FALSE;  // file name was with diff mode
+স্থির পূর্ণাঙ্ক	used_file_diff_mode = FALSE;  // file name was with diff mode
 #endif
-static int	used_alist_count = 0;
+স্থির পূর্ণাঙ্ক	used_alist_গুনতি = 0;
 
 
 /*
  * Get the command line arguments.  Unicode version.
  * Returns argc.  Zero when something fails.
  */
-    int
-get_cmd_argsW(char ***argvp)
+    পূর্ণাঙ্ক
+get_cmd_argsW(ৱর্ণ ***argvp)
 {
-    char	**argv = NULL;
-    int		argc = 0;
-    int		i;
+    ৱর্ণ	**argv = রিক্ত;
+    পূর্ণাঙ্ক		argc = 0;
+    পূর্ণাঙ্ক		i;
 
     free_cmd_argsW();
-    ArglistW = CommandLineToArgvW(GetCommandLineW(), &nArgsW);
-    if (ArglistW != NULL)
+    ArglistW = Command_সাৰি_To_Argv_W(Get_Command_সাৰি_W(), &nArgsW);
+    যদি (ArglistW != রিক্ত)
     {
-	argv = alloc((nArgsW + 1) * sizeof(char *));
-	if (argv != NULL)
+	argv = alloc((nArgsW + 1) * পরিমাণ(ৱর্ণ *));
+	যদি (argv != রিক্ত)
 	{
 	    argc = nArgsW;
-	    argv[argc] = NULL;
-	    for (i = 0; i < argc; ++i)
+	    argv[argc] = রিক্ত;
+	    বাবে (i = 0; i < argc; ++i)
 	    {
-		int	len;
+		পূর্ণাঙ্ক	len;
 
 		// Convert each Unicode argument to UTF-8.
 		WideCharToMultiByte_alloc(CP_UTF8, 0,
-				ArglistW[i], (int)wcslen(ArglistW[i]) + 1,
+				ArglistW[i], (পূর্ণাঙ্ক)wcslen(ArglistW[i]) + 1,
 				(LPSTR *)&argv[i], &len, 0, 0);
-		if (argv[i] == NULL)
+		যদি (argv[i] == রিক্ত)
 		{
 		    // Out of memory, clear everything.
-		    while (i > 0)
-			free(argv[--i]);
-		    free(argv);
-		    argv = NULL;
+		    যেতিয়ালৈ (i > 0)
+			মুক্ত(argv[--i]);
+		    মুক্ত(argv);
+		    argv = রিক্ত;
 		    argc = 0;
 		}
 	    }
@@ -8720,26 +8720,26 @@ get_cmd_argsW(char ***argvp)
 
     global_argc = argc;
     global_argv = argv;
-    if (argc > 0)
+    যদি (argc > 0)
     {
-	if (used_file_indexes != NULL)
-	    free(used_file_indexes);
-	used_file_indexes = alloc(argc * sizeof(int));
+	যদি (used_file_indexes != রিক্ত)
+	    মুক্ত(used_file_indexes);
+	used_file_indexes = alloc(argc * পরিমাণ(পূর্ণাঙ্ক));
     }
 
-    if (argvp != NULL)
+    যদি (argvp != রিক্ত)
 	*argvp = argv;
-    return argc;
+    ঘূৰাই argc;
 }
 
-    void
-free_cmd_argsW(void)
+    শূন্য
+free_cmd_argsW(শূন্য)
 {
-    if (ArglistW == NULL)
-	return;
+    যদি (ArglistW == রিক্ত)
+	ঘূৰাই;
 
     GlobalFree(ArglistW);
-    ArglistW = NULL;
+    ArglistW = রিক্ত;
 }
 
 /*
@@ -8747,19 +8747,19 @@ free_cmd_argsW(void)
  * This avoids that we have to re-parse the argument list when fix_arg_enc()
  * is called.
  */
-    void
-used_file_arg(char *name, int literal, int full_path, int diff_mode)
+    শূন্য
+used_file_arg(ৱর্ণ *name, পূর্ণাঙ্ক literal, পূর্ণাঙ্ক full_path, পূর্ণাঙ্ক diff_mode)
 {
-    int		i;
+    পূর্ণাঙ্ক		i;
 
-    if (used_file_indexes == NULL)
-	return;
-    for (i = used_file_argc + 1; i < global_argc; ++i)
-	if (STRCMP(global_argv[i], name) == 0)
+    যদি (used_file_indexes == রিক্ত)
+	ঘূৰাই;
+    বাবে (i = used_file_argc + 1; i < global_argc; ++i)
+	যদি (STRCMP(global_argv[i], name) == 0)
 	{
 	    used_file_argc = i;
-	    used_file_indexes[used_file_count++] = i;
-	    break;
+	    used_file_indexes[used_file_গুনতি++] = i;
+	    ভঙ্গ;
 	}
     used_file_literal = literal;
     used_file_full_path = full_path;
@@ -8772,10 +8772,10 @@ used_file_arg(char *name, int literal, int full_path, int diff_mode)
  * Remember the length of the argument list as it was.  If it changes then we
  * leave it alone when 'encoding' is set.
  */
-    void
-set_alist_count(void)
+    শূন্য
+set_alist_গুনতি(শূন্য)
 {
-    used_alist_count = GARGCOUNT;
+    used_alist_গুনতি = GARGCOUNT;
 }
 
 /*
@@ -8783,50 +8783,50 @@ set_alist_count(void)
  * has been changed while starting up.  Use the UTF-16 command line arguments
  * and convert them to 'encoding'.
  */
-    void
-fix_arg_enc(void)
+    শূন্য
+fix_arg_enc(শূন্য)
 {
-    int		i;
-    int		idx;
+    পূর্ণাঙ্ক		i;
+    পূর্ণাঙ্ক		idx;
     char_u	*str;
-    int		*fnum_list;
+    পূর্ণাঙ্ক		*fnum_list;
 
     // Safety checks:
     // - if argument count differs between the wide and non-wide argument
     //   list, something must be wrong.
     // - the file name arguments must have been located.
     // - the length of the argument list wasn't changed by the user.
-    if (global_argc != nArgsW
-	    || ArglistW == NULL
-	    || used_file_indexes == NULL
-	    || used_file_count == 0
-	    || used_alist_count != GARGCOUNT)
-	return;
+    যদি (global_argc != nArgsW
+	    || ArglistW == রিক্ত
+	    || used_file_indexes == রিক্ত
+	    || used_file_গুনতি == 0
+	    || used_alist_গুনতি != GARGCOUNT)
+	ঘূৰাই;
 
     // Remember the buffer numbers for the arguments.
-    fnum_list = ALLOC_MULT(int, GARGCOUNT);
-    if (fnum_list == NULL)
-	return;		// out of memory
-    for (i = 0; i < GARGCOUNT; ++i)
+    fnum_list = ALLOC_MULT(পূর্ণাঙ্ক, GARGCOUNT);
+    যদি (fnum_list == রিক্ত)
+	ঘূৰাই;		// out of memory
+    বাবে (i = 0; i < GARGCOUNT; ++i)
 	fnum_list[i] = GARGLIST[i].ae_fnum;
 
     // Clear the argument list.  Make room for the new arguments.
     alist_clear(&global_alist);
-    if (ga_grow(&global_alist.al_ga, used_file_count) == FAIL)
-	return;		// out of memory
+    যদি (ga_grow(&global_alist.al_ga, used_file_গুনতি) == FAIL)
+	ঘূৰাই;		// out of memory
 
-    for (i = 0; i < used_file_count; ++i)
+    বাবে (i = 0; i < used_file_গুনতি; ++i)
     {
 	idx = used_file_indexes[i];
-	str = utf16_to_enc(ArglistW[idx], NULL);
-	if (str != NULL)
+	str = utf16_to_enc(ArglistW[idx], রিক্ত);
+	যদি (str != রিক্ত)
 	{
-	    int literal = used_file_literal;
+	    পূর্ণাঙ্ক literal = used_file_literal;
 
 #ifdef FEAT_DIFF
 	    // When using diff mode may need to concatenate file name to
 	    // directory name.  Just like it's done in main().
-	    if (used_file_diff_mode && mch_isdir(str) && GARGCOUNT > 0
+	    যদি (used_file_diff_mode && mch_isdir(str) && GARGCOUNT > 0
 				      && !mch_isdir(alist_name(&GARGLIST[0])))
 	    {
 		char_u	    *tail;
@@ -8834,7 +8834,7 @@ fix_arg_enc(void)
 
 		tail = gettail(alist_name(&GARGLIST[0]));
 		concat_fnames(str, STRLEN(str), tail, STRLEN(tail), TRUE, &ret);
-		if (ret.string != NULL)
+		যদি (ret.string != রিক্ত)
 		{
 		    vim_free(str);
 		    str = ret.string;
@@ -8843,23 +8843,23 @@ fix_arg_enc(void)
 #endif
 	    // Re-use the old buffer by renaming it.  When not using literal
 	    // names it's done by alist_expand() below.
-	    if (used_file_literal)
+	    যদি (used_file_literal)
 		buf_set_name(fnum_list[i], str);
 
 	    // Check backtick literal. backtick literal is already expanded in
 	    // main.c, so this part add str as literal.
-	    if (literal == FALSE)
+	    যদি (literal == FALSE)
 	    {
 		size_t len = STRLEN(str);
 
-		if (len > 2 && *str == '`' && *(str + len - 1) == '`')
+		যদি (len > 2 && *str == '`' && *(str + len - 1) == '`')
 		    literal = TRUE;
 	    }
 	    alist_add(&global_alist, str, literal ? 2 : 0);
 	}
     }
 
-    if (!used_file_literal)
+    যদি (!used_file_literal)
     {
 	// Now expand wildcards in the arguments.
 	// Temporarily add '(' and ')' to 'isfname'.  These are valid
@@ -8871,7 +8871,7 @@ fix_arg_enc(void)
 	// Use :legacy so that it also works when in Vim9 script.
 	do_cmdline_cmd((char_u *)":legacy let g:SaVe_ISF = &isf|set isf+=(,)");
 	do_cmdline_cmd((char_u *)":legacy let g:SaVe_WIG = &wig|set wig=");
-	alist_expand(fnum_list, used_alist_count);
+	alist_expand(fnum_list, used_alist_গুনতি);
 	do_cmdline_cmd(
 		(char_u *)":legacy let &isf = g:SaVe_ISF|unlet g:SaVe_ISF");
 	do_cmdline_cmd(
@@ -8880,34 +8880,34 @@ fix_arg_enc(void)
 
     // If wildcard expansion failed, we are editing the first file of the
     // arglist and there is no file name: Edit the first argument now.
-    if (curwin->w_arg_idx == 0 && curbuf->b_fname == NULL)
+    যদি (curwin->w_arg_idx == 0 && curbuf->b_fname == রিক্ত)
     {
 	do_cmdline_cmd((char_u *)":rewind");
-	if (GARGCOUNT == 1 && used_file_full_path
+	যদি (GARGCOUNT == 1 && used_file_full_path
 		&& vim_chdirfile(alist_name(&GARGLIST[0]), "drop") == OK)
 	    last_chdir_reason = "drop";
     }
 
-    set_alist_count();
+    set_alist_গুনতি();
 }
 
-    int
-mch_setenv(char *var, char *value, int x UNUSED)
+    পূর্ণাঙ্ক
+mch_setenv(ৱর্ণ *var, ৱর্ণ *মান, পূর্ণাঙ্ক x UNUSED)
 {
     char_u	*envbuf;
     WCHAR	*p;
 
-    envbuf = alloc(STRLEN(var) + STRLEN(value) + 2);
-    if (envbuf == NULL)
-	return -1;
+    envbuf = alloc(STRLEN(var) + STRLEN(মান) + 2);
+    যদি (envbuf == রিক্ত)
+	ঘূৰাই -1;
 
-    sprintf((char *)envbuf, "%s=%s", var, value);
+    sprintf((ৱর্ণ *)envbuf, "%s=%s", var, মান);
 
-    p = enc_to_utf16(envbuf, NULL);
+    p = enc_to_utf16(envbuf, রিক্ত);
 
     vim_free(envbuf);
-    if (p == NULL)
-	return -1;
+    যদি (p == রিক্ত)
+	ঘূৰাই -1;
     _wputenv(p);
 #ifdef libintl_wputenv
     libintl_wputenv(p);
@@ -8915,7 +8915,7 @@ mch_setenv(char *var, char *value, int x UNUSED)
     // Unlike Un*x systems, we can free the string for _wputenv().
     vim_free(p);
 
-    return 0;
+    ঘূৰাই 0;
 }
 
 /*
@@ -8964,15 +8964,15 @@ mch_setenv(char *var, char *value, int x UNUSED)
 // Win Server 2022 (May 10, 2022) is build 20348, its conpty is widely used.
 // Win 11 starts from build 22000, even though the major version says 10!
 
-    static void
-vtp_flag_init(void)
+    স্থির শূন্য
+vtp_flag_init(শূন্য)
 {
-#if !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
+#যদি !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
     DWORD   mode;
     HANDLE  out;
 
 # ifdef VIMDLL
-    if (!gui.in_use)
+    যদি (!gui.in_use)
 # endif
     {
 	out = GetStdHandle(STD_OUTPUT_HANDLE);
@@ -8980,7 +8980,7 @@ vtp_flag_init(void)
 	vtp_working = (win_version >= VTP_FIRST_SUPPORT_BUILD) ? 1 : 0;
 	GetConsoleMode(out, &mode);
 	mode |= (ENABLE_PROCESSED_OUTPUT | ENABLE_VIRTUAL_TERMINAL_PROCESSING);
-	if (SetConsoleMode(out, mode) == 0)
+	যদি (SetConsoleMode(out, mode) == 0)
 	    vtp_working = 0;
 
 	// VTP uses alternate screen buffer.
@@ -8990,32 +8990,32 @@ vtp_flag_init(void)
     }
 #endif
 
-    if (win_version >= CONPTY_FIRST_SUPPORT_BUILD)
+    যদি (win_version >= CONPTY_FIRST_SUPPORT_BUILD)
 	conpty_working = 1;
-    if (win_version >= CONPTY_STABLE_BUILD)
+    যদি (win_version >= CONPTY_STABLE_BUILD)
 	conpty_stable = 1;
 
-    if (win_version <= CONPTY_INSIDER_BUILD)
+    যদি (win_version <= CONPTY_INSIDER_BUILD)
 	conpty_type = 3;
-    if (win_version <= CONPTY_1909_BUILD)
+    যদি (win_version <= CONPTY_1909_BUILD)
 	conpty_type = 2;
-    if (win_version <= CONPTY_1903_BUILD)
+    যদি (win_version <= CONPTY_1903_BUILD)
 	conpty_type = 2;
-    if (win_version < CONPTY_FIRST_SUPPORT_BUILD)
+    যদি (win_version < CONPTY_FIRST_SUPPORT_BUILD)
 	conpty_type = 1;
 
-    if (win_version >= CONPTY_NEXT_UPDATE_BUILD)
+    যদি (win_version >= CONPTY_NEXT_UPDATE_BUILD)
 	conpty_fix_type = 1;
 }
 
-#if !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
+#যদি !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
 
-    static void
-vtp_init(void)
+    স্থির শূন্য
+vtp_init(শূন্য)
 {
 # ifdef FEAT_TERMGUICOLORS
     CONSOLE_SCREEN_BUFFER_INFOEX csbi;
-    csbi.cbSize = sizeof(csbi);
+    csbi.cbSize = পরিমাণ(csbi);
     GetConsoleScreenBufferInfoEx(g_hConOut, &csbi);
     save_console_bg_rgb = (guicolor_T)csbi.ColorTable[g_color_index_bg];
     save_console_fg_rgb = (guicolor_T)csbi.ColorTable[g_color_index_fg];
@@ -9035,89 +9035,89 @@ vtp_init(void)
     set_console_color_rgb();
 }
 
-    static void
-vtp_exit(void)
+    স্থির শূন্য
+vtp_exit(শূন্য)
 {
     restore_console_color_rgb();
 }
 
-    int
+    পূর্ণাঙ্ক
 vtp_printf(
-    char *format,
+    ৱর্ণ *format,
     ...)
 {
     char_u  buf[100];
     va_list list;
     DWORD   result;
-    int	    len;
+    পূর্ণাঙ্ক	    len;
 
-    if (silent_mode)
-	return 0;
+    যদি (silent_mode)
+	ঘূৰাই 0;
 
     va_start(list, format);
-    len = vim_vsnprintf((char *)buf, 100, (char *)format, list);
+    len = vim_vsnprintf((ৱর্ণ *)buf, 100, (ৱর্ণ *)format, list);
     va_end(list);
-    WriteConsoleA(g_hConOut, buf, (DWORD)len, &result, NULL);
-    return (int)result;
+    WriteConsoleA(g_hConOut, buf, (DWORD)len, &result, রিক্ত);
+    ঘূৰাই (পূর্ণাঙ্ক)result;
 }
 
-    static void
+    স্থির শূন্য
 vtp_sgr_bulk(
-    int arg)
+    পূর্ণাঙ্ক arg)
 {
-    int args[1];
+    পূর্ণাঙ্ক args[1];
 
     args[0] = arg;
     vtp_sgr_bulks(1, args);
 }
 
 # define FAST256(x) \
-    if ((*p-- = "0123456789"[(n = x % 10)]) \
+    যদি ((*p-- = "0123456789"[(n = x % 10)]) \
 	    && x >= 10 && (*p-- = "0123456789"[((m = x % 100) - n) / 10]) \
 	    && x >= 100 && (*p-- = "012"[((x & 0xff) - m) / 100]));
 
 # define FAST256CASE(x) \
-    case x: \
+    পক্ষ x: \
 	FAST256(newargs[x - 1]);
 
-    static void
+    স্থির শূন্য
 vtp_sgr_bulks(
-    int argc,
-    int *args)
+    পূর্ণাঙ্ক argc,
+    পূর্ণাঙ্ক *args)
 {
 # define MAXSGR 16
 # define SGRBUFSIZE 2 + 4 * MAXSGR + 1 // '\033[' + SGR + 'm'
     char_u  buf[SGRBUFSIZE];
     char_u  *p;
-    int	    in, out;
-    int	    newargs[16];
-    static int sgrfgr = -1, sgrfgg, sgrfgb;
-    static int sgrbgr = -1, sgrbgg, sgrbgb;
+    পূর্ণাঙ্ক	    in, out;
+    পূর্ণাঙ্ক	    newargs[16];
+    স্থির পূর্ণাঙ্ক sgrfgr = -1, sgrfgg, sgrfgb;
+    স্থির পূর্ণাঙ্ক sgrbgr = -1, sgrbgg, sgrbgb;
 
-    if (argc == 0)
+    যদি (argc == 0)
     {
 	sgrfgr = sgrbgr = -1;
 	vtp_printf("\033[m");
-	return;
+	ঘূৰাই;
     }
 
     in = out = 0;
-    while (in < argc)
+    যেতিয়ালৈ (in < argc)
     {
-	int s = args[in];
-	int copylen = 1;
+	পূর্ণাঙ্ক s = args[in];
+	পূর্ণাঙ্ক copylen = 1;
 
-	if (s == 38)
+	যদি (s == 38)
 	{
-	    if (argc - in >= 5 && args[in + 1] == 2)
+	    যদি (argc - in >= 5 && args[in + 1] == 2)
 	    {
-		if (sgrfgr == args[in + 2] && sgrfgg == args[in + 3]
+		যদি (sgrfgr == args[in + 2] && sgrfgg == args[in + 3]
 						     && sgrfgb == args[in + 4])
 		{
 		    in += 5;
 		    copylen = 0;
 		}
-		else
+		অন্যথা
 		{
 		    sgrfgr = args[in + 2];
 		    sgrfgg = args[in + 3];
@@ -9125,23 +9125,23 @@ vtp_sgr_bulks(
 		    copylen = 5;
 		}
 	    }
-	    else if (argc - in >= 3 && args[in + 1] == 5)
+	    অন্যথা যদি (argc - in >= 3 && args[in + 1] == 5)
 	    {
 		sgrfgr = -1;
 		copylen = 3;
 	    }
 	}
-	else if (s == 48)
+	অন্যথা যদি (s == 48)
 	{
-	    if (argc - in >= 5 && args[in + 1] == 2)
+	    যদি (argc - in >= 5 && args[in + 1] == 2)
 	    {
-		if (sgrbgr == args[in + 2] && sgrbgg == args[in + 3]
+		যদি (sgrbgr == args[in + 2] && sgrbgg == args[in + 3]
 						     && sgrbgb == args[in + 4])
 		{
 		    in += 5;
 		    copylen = 0;
 		}
-		else
+		অন্যথা
 		{
 		    sgrbgr = args[in + 2];
 		    sgrbgg = args[in + 3];
@@ -9149,33 +9149,33 @@ vtp_sgr_bulks(
 		    copylen = 5;
 		}
 	    }
-	    else if (argc - in >= 3 && args[in + 1] == 5)
+	    অন্যথা যদি (argc - in >= 3 && args[in + 1] == 5)
 	    {
 		sgrbgr = -1;
 		copylen = 3;
 	    }
 	}
-	else if (30 <= s && s <= 39)
+	অন্যথা যদি (30 <= s && s <= 39)
 	    sgrfgr = -1;
-	else if (90 <= s && s <= 97)
+	অন্যথা যদি (90 <= s && s <= 97)
 	    sgrfgr = -1;
-	else if (40 <= s && s <= 49)
+	অন্যথা যদি (40 <= s && s <= 49)
 	    sgrbgr = -1;
-	else if (100 <= s && s <= 107)
+	অন্যথা যদি (100 <= s && s <= 107)
 	    sgrbgr = -1;
-	else if (s == 0)
+	অন্যথা যদি (s == 0)
 	    sgrfgr = sgrbgr = -1;
 
-	while (copylen--)
+	যেতিয়ালৈ (copylen--)
 	    newargs[out++] = args[in++];
     }
 
-    p = &buf[sizeof(buf) - 1];
+    p = &buf[পরিমাণ(buf) - 1];
     *p-- = 'm';
 
-    switch (out)
+    ৱিকল্প (out)
     {
-	int	n, m;
+	পূর্ণাঙ্ক	n, m;
 	DWORD	r;
 
 	FAST256CASE(16);
@@ -9211,61 +9211,61 @@ vtp_sgr_bulks(
 	FAST256CASE(1);
 	*p-- = '[';
 	*p = '\033';
-	WriteConsoleA(g_hConOut, p, (DWORD)(&buf[SGRBUFSIZE] - p), &r, NULL);
-    default:
-	break;
+	WriteConsoleA(g_hConOut, p, (DWORD)(&buf[SGRBUFSIZE] - p), &r, রিক্ত);
+    স্ৱভাৱ:
+	ভঙ্গ;
     }
 }
 
-    static void
-wt_init(void)
+    স্থির শূন্য
+wt_init(শূন্য)
 {
-    wt_working = mch_getenv("WT_SESSION") != NULL;
+    wt_working = mch_getenv("WT_SESSION") != রিক্ত;
 }
 
 # ifdef FEAT_TERMGUICOLORS
-    static int
+    স্থির পূর্ণাঙ্ক
 ctermtoxterm(
-    int cterm)
+    পূর্ণাঙ্ক cterm)
 {
     char_u r, g, b, idx;
 
     cterm_color2rgb(cterm, &r, &g, &b, &idx);
-    return (((int)r << 16) | ((int)g << 8) | (int)b);
+    ঘূৰাই (((পূর্ণাঙ্ক)r << 16) | ((পূর্ণাঙ্ক)g << 8) | (পূর্ণাঙ্ক)b);
 }
 # endif
 
-    static void
-set_console_color_rgb(void)
+    স্থির শূন্য
+set_console_color_rgb(শূন্য)
 {
 # ifdef FEAT_TERMGUICOLORS
     CONSOLE_SCREEN_BUFFER_INFOEX csbi;
     guicolor_T	fg, bg;
-    int		ctermfg, ctermbg;
+    পূর্ণাঙ্ক		ctermfg, ctermbg;
 
-    if (!vtp_working)
-	return;
+    যদি (!vtp_working)
+	ঘূৰাই;
 
     get_default_console_color(&ctermfg, &ctermbg, &fg, &bg);
 
-    if (p_tgc || t_colors >= 256)
+    যদি (p_tgc || t_colors >= 256)
     {
 	term_fg_rgb_color(fg);
 	term_bg_rgb_color(bg);
-	return;
+	ঘূৰাই;
     }
 
-    if (use_alternate_screen_buffer)
-	return;
+    যদি (use_alternate_screen_buffer)
+	ঘূৰাই;
 
     fg = (GetRValue(fg) << 16) | (GetGValue(fg) << 8) | GetBValue(fg);
     bg = (GetRValue(bg) << 16) | (GetGValue(bg) << 8) | GetBValue(bg);
 
-    csbi.cbSize = sizeof(csbi);
+    csbi.cbSize = পরিমাণ(csbi);
     GetConsoleScreenBufferInfoEx(g_hConOut, &csbi);
 
-    csbi.cbSize = sizeof(csbi);
-    csbi.srWindow.Right += 1;
+    csbi.cbSize = পরিমাণ(csbi);
+    csbi.srWindow.ডান_3 += 1;
     csbi.srWindow.Bottom += 1;
     store_console_bg_rgb = csbi.ColorTable[g_color_index_bg];
     store_console_fg_rgb = csbi.ColorTable[g_color_index_fg];
@@ -9275,44 +9275,44 @@ set_console_color_rgb(void)
 # endif
 }
 
-# if defined(FEAT_TERMGUICOLORS)
-    void
+# যদি defined(FEAT_TERMGUICOLORS)
+    শূন্য
 get_default_console_color(
-    int *cterm_fg,
-    int *cterm_bg,
+    পূর্ণাঙ্ক *cterm_fg,
+    পূর্ণাঙ্ক *cterm_bg,
     guicolor_T *gui_fg,
     guicolor_T *gui_bg)
 {
-    int id;
+    পূর্ণাঙ্ক id;
     guicolor_T guifg = INVALCOLOR;
     guicolor_T guibg = INVALCOLOR;
-    int ctermfg = 0;
-    int ctermbg = 0;
-    int dummynull = 0;
+    পূর্ণাঙ্ক ctermfg = 0;
+    পূর্ণাঙ্ক ctermbg = 0;
+    পূর্ণাঙ্ক dummynull = 0;
 
     id = syn_name2id((char_u *)"Normal");
-    if (id > 0 && p_tgc)
+    যদি (id > 0 && p_tgc)
 	syn_id2colors(id, &guifg, &guibg);
-    if (guifg == INVALCOLOR)
+    যদি (guifg == INVALCOLOR)
     {
 	ctermfg = -1;
-	if (id > 0)
+	যদি (id > 0)
 	    syn_id2cterm_bg(id, &ctermfg, &dummynull);
-	if (ctermfg != -1)
+	যদি (ctermfg != -1)
 	    guifg = ctermtoxterm(ctermfg);
-	else
+	অন্যথা
 	    guifg = USE_WT ? INVALCOLOR : default_console_color_fg;
 	cterm_normal_fg_gui_color = guifg;
 	ctermfg = ctermfg < 0 ? 0 : ctermfg;
     }
-    if (guibg == INVALCOLOR)
+    যদি (guibg == INVALCOLOR)
     {
 	ctermbg = -1;
-	if (id > 0)
+	যদি (id > 0)
 	    syn_id2cterm_bg(id, &dummynull, &ctermbg);
-	if (ctermbg != -1)
+	যদি (ctermbg != -1)
 	    guibg = ctermtoxterm(ctermbg);
-	else
+	অন্যথা
 	    guibg = USE_WT ? INVALCOLOR : default_console_color_bg;
 	cterm_normal_bg_gui_color = guibg;
 	ctermbg = ctermbg < 0 ? 0 : ctermbg;
@@ -9328,20 +9328,20 @@ get_default_console_color(
 /*
  * Set the console colors to the original colors or the last set colors.
  */
-    static void
-reset_console_color_rgb(void)
+    স্থির শূন্য
+reset_console_color_rgb(শূন্য)
 {
 # ifdef FEAT_TERMGUICOLORS
-    if (use_alternate_screen_buffer)
-	return;
+    যদি (use_alternate_screen_buffer)
+	ঘূৰাই;
 
     CONSOLE_SCREEN_BUFFER_INFOEX csbi;
 
-    csbi.cbSize = sizeof(csbi);
+    csbi.cbSize = পরিমাণ(csbi);
     GetConsoleScreenBufferInfoEx(g_hConOut, &csbi);
 
-    csbi.cbSize = sizeof(csbi);
-    csbi.srWindow.Right += 1;
+    csbi.cbSize = পরিমাণ(csbi);
+    csbi.srWindow.ডান_3 += 1;
     csbi.srWindow.Bottom += 1;
     csbi.ColorTable[g_color_index_bg] = (COLORREF)store_console_bg_rgb;
     csbi.ColorTable[g_color_index_fg] = (COLORREF)store_console_fg_rgb;
@@ -9352,20 +9352,20 @@ reset_console_color_rgb(void)
 /*
  * Set the console colors to the original colors.
  */
-    static void
-restore_console_color_rgb(void)
+    স্থির শূন্য
+restore_console_color_rgb(শূন্য)
 {
 # ifdef FEAT_TERMGUICOLORS
-    if (use_alternate_screen_buffer)
-	return;
+    যদি (use_alternate_screen_buffer)
+	ঘূৰাই;
 
     CONSOLE_SCREEN_BUFFER_INFOEX csbi;
 
-    csbi.cbSize = sizeof(csbi);
+    csbi.cbSize = পরিমাণ(csbi);
     GetConsoleScreenBufferInfoEx(g_hConOut, &csbi);
 
-    csbi.cbSize = sizeof(csbi);
-    csbi.srWindow.Right += 1;
+    csbi.cbSize = পরিমাণ(csbi);
+    csbi.srWindow.ডান_3 += 1;
     csbi.srWindow.Bottom += 1;
     csbi.ColorTable[g_color_index_bg] = (COLORREF)save_console_bg_rgb;
     csbi.ColorTable[g_color_index_fg] = (COLORREF)save_console_fg_rgb;
@@ -9373,80 +9373,80 @@ restore_console_color_rgb(void)
 # endif
 }
 
-    void
-control_console_color_rgb(void)
+    শূন্য
+control_console_color_rgb(শূন্য)
 {
-    if (vtp_working)
+    যদি (vtp_working)
 	set_console_color_rgb();
-    else
+    অন্যথা
 	reset_console_color_rgb();
 }
 
-    int
-use_vtp(void)
+    পূর্ণাঙ্ক
+use_vtp(শূন্য)
 {
-    return USE_VTP;
+    ঘূৰাই USE_VTP;
 }
 
-    int
-is_term_win32(void)
+    পূর্ণাঙ্ক
+is_term_win32(শূন্য)
 {
-    return T_NAME != NULL && STRCMP(T_NAME, "win32") == 0;
+    ঘূৰাই T_NAME != রিক্ত && STRCMP(T_NAME, "win32") == 0;
 }
 
-    int
-has_vtp_working(void)
+    পূর্ণাঙ্ক
+has_vtp_working(শূন্য)
 {
-    return vtp_working;
+    ঘূৰাই vtp_working;
 }
 
 #endif
 
-    int
-has_conpty_working(void)
+    পূর্ণাঙ্ক
+has_conpty_working(শূন্য)
 {
-    return conpty_working;
+    ঘূৰাই conpty_working;
 }
 
-    int
-get_conpty_type(void)
+    পূর্ণাঙ্ক
+get_conpty_type(শূন্য)
 {
-    return conpty_type;
+    ঘূৰাই conpty_type;
 }
 
-    int
-is_conpty_stable(void)
+    পূর্ণাঙ্ক
+is_conpty_stable(শূন্য)
 {
-    return conpty_stable;
+    ঘূৰাই conpty_stable;
 }
 
-    int
-get_conpty_fix_type(void)
+    পূর্ণাঙ্ক
+get_conpty_fix_type(শূন্য)
 {
-    return conpty_fix_type;
+    ঘূৰাই conpty_fix_type;
 }
 
-#if !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
-    void
-resize_console_buf(void)
+#যদি !defined(FEAT_GUI_MSWIN) || defined(VIMDLL)
+    শূন্য
+resize_console_buf(শূন্য)
 {
-    if (use_alternate_screen_buffer)
-	return;
+    যদি (use_alternate_screen_buffer)
+	ঘূৰাই;
 
     CONSOLE_SCREEN_BUFFER_INFO csbi;
     COORD coord;
     SMALL_RECT newsize;
 
-    if (!GetConsoleScreenBufferInfo(g_hConOut, &csbi))
-	return;
+    যদি (!GetConsoleScreenBufferInfo(g_hConOut, &csbi))
+	ঘূৰাই;
 
     coord.X = SRWIDTH(csbi.srWindow);
     coord.Y = SRHEIGHT(csbi.srWindow);
     SetConsoleScreenBufferSize(g_hConOut, coord);
 
-    newsize.Left = 0;
-    newsize.Top = 0;
-    newsize.Right = coord.X - 1;
+    newsize.বাম_3 = 0;
+    newsize.শীৰ্ষ_2 = 0;
+    newsize.ডান_3 = coord.X - 1;
     newsize.Bottom = coord.Y - 1;
     SetConsoleWindowInfo(g_hConOut, TRUE, &newsize);
 
@@ -9454,46 +9454,46 @@ resize_console_buf(void)
 }
 #endif
 
-    char *
-GetWin32Error(void)
+    ৱর্ণ *
+GetWin32Error(শূন্য)
 {
-    static char	*oldmsg = NULL;
-    char	*acp_msg = NULL;
+    স্থির ৱর্ণ	*oldmsg = রিক্ত;
+    ৱর্ণ	*acp_বাৰ্তা = রিক্ত;
     DWORD	acp_len;
-    char	*enc_msg = NULL;
-    int		enc_len = 0;
+    ৱর্ণ	*enc_বাৰ্তা = রিক্ত;
+    পূর্ণাঙ্ক		enc_len = 0;
 
     // get formatted message from OS
     acp_len = FormatMessage(
 	    FORMAT_MESSAGE_ALLOCATE_BUFFER|FORMAT_MESSAGE_FROM_SYSTEM,
-	    NULL, GetLastError(), 0, (LPSTR)&acp_msg, 0, NULL);
-    if (acp_len == 0 || acp_msg == NULL)
-	return NULL;
+	    রিক্ত, GetLastError(), 0, (LPSTR)&acp_বাৰ্তা, 0, রিক্ত);
+    যদি (acp_len == 0 || acp_বাৰ্তা == রিক্ত)
+	ঘূৰাই রিক্ত;
 
     // clean oldmsg if remained.
-    if (oldmsg != NULL)
+    যদি (oldmsg != রিক্ত)
     {
 	vim_free(oldmsg);
-	oldmsg = NULL;
+	oldmsg = রিক্ত;
     }
 
-    acp_to_enc((char_u *)acp_msg, (int)acp_len, (char_u **)&enc_msg, &enc_len);
-    LocalFree(acp_msg);
-    if (enc_msg == NULL)
-	return NULL;
+    acp_to_enc((char_u *)acp_বাৰ্তা, (পূর্ণাঙ্ক)acp_len, (char_u **)&enc_বাৰ্তা, &enc_len);
+    LocalFree(acp_বাৰ্তা);
+    যদি (enc_বাৰ্তা == রিক্ত)
+	ঘূৰাই রিক্ত;
 
     // remove trailing \r\n
-    char *pcrlf = strstr(enc_msg, "\r\n");
-    if (pcrlf != NULL)
+    ৱর্ণ *pcrlf = strstr(enc_বাৰ্তা, "\r\n");
+    যদি (pcrlf != রিক্ত)
 	*pcrlf = NUL;
 
-    oldmsg = enc_msg;
-    return enc_msg;
+    oldmsg = enc_বাৰ্তা;
+    ঘূৰাই enc_বাৰ্তা;
 }
 
-#if defined(FEAT_RELTIME)
-static HANDLE   timer_handle;
-static int      timer_active = FALSE;
+#যদি defined(FEAT_RELTIME)
+স্থির HANDLE   timer_handle;
+স্থির পূর্ণাঙ্ক      timer_active = FALSE;
 
 /*
  * Calls to start_timeout alternate the return value pointer between the two
@@ -9503,13 +9503,13 @@ static int      timer_active = FALSE;
  * deleted. Ping-ponging between the two flags prevents this causing 'fake'
  * timeouts.
  */
-static sig_atomic_t timeout_flags[2];
-static int	    timeout_flag_idx = 0;
-static sig_atomic_t *timeout_flag = &timeout_flags[0];
+স্থির sig_atomic_t timeout_flags[2];
+স্থির পূর্ণাঙ্ক	    timeout_flag_idx = 0;
+স্থির sig_atomic_t *timeout_flag = &timeout_flags[0];
 
 
-    static void CALLBACK
-set_flag(void *param, BOOLEAN unused2 UNUSED)
+    স্থির শূন্য CALLBACK
+set_flag(শূন্য *param, BOOLEAN unused2 UNUSED)
 {
     *(sig_atomic_t *)param = TRUE;
 }
@@ -9517,14 +9517,14 @@ set_flag(void *param, BOOLEAN unused2 UNUSED)
 /*
  * Stop any active timeout.
  */
-    void
-stop_timeout(void)
+    শূন্য
+stop_timeout(শূন্য)
 {
-    if (timer_active)
+    যদি (timer_active)
     {
-	BOOL ret = DeleteTimerQueueTimer(NULL, timer_handle, NULL);
+	BOOL ret = DeleteTimerQueueTimer(রিক্ত, timer_handle, রিক্ত);
 	timer_active = FALSE;
-	if (!ret && GetLastError() != ERROR_IO_PENDING)
+	যদি (!ret && GetLastError() != ERROR_IO_PENDING)
 	{
 	    semsg(_(e_could_not_clear_timeout_str), GetWin32Error());
 	}
@@ -9545,7 +9545,7 @@ stop_timeout(void)
  * This function is not expected to fail, but if it does it still returns a
  * valid flag pointer; the flag will remain stuck at zero.
  */
-    volatile sig_atomic_t *
+    চঞ্চল sig_atomic_t *
 start_timeout(long msec)
 {
     BOOL ret;
@@ -9554,18 +9554,18 @@ start_timeout(long msec)
 
     stop_timeout();
     ret = CreateTimerQueueTimer(
-	    &timer_handle, NULL, set_flag, timeout_flag,
+	    &timer_handle, রিক্ত, set_flag, timeout_flag,
 	    (DWORD)msec, 0, WT_EXECUTEDEFAULT);
-    if (!ret)
+    যদি (!ret)
     {
 	semsg(_(e_could_not_set_timeout_str), GetWin32Error());
     }
-    else
+    অন্যথা
     {
 	timeout_flag_idx = (timeout_flag_idx + 1) % 2;
 	timer_active = TRUE;
 	*timeout_flag = FALSE;
     }
-    return timeout_flag;
+    ঘূৰাই timeout_flag;
 }
 #endif

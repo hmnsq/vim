@@ -1,19 +1,19 @@
-#include "vterm_internal.h"
+#অন্তর্ভাৱ "vterm_internal.h"
 
-#include <stdio.h>
-#include <string.h>
+#অন্তর্ভাৱ <stdio.h>
+#অন্তর্ভাৱ <string.h>
 
 #define strneq(a,b,n) (strncmp(a,b,n)==0)
 
-#if defined(DEBUG) && DEBUG > 1
+#যদি defined(DEBUG) && DEBUG > 1
 # define DEBUG_GLYPH_COMBINE
 #endif
 
-static int on_resize(int rows, int cols, void *user);
+স্থির পূর্ণাঙ্ক on_resize(পূর্ণাঙ্ক rows, পূর্ণাঙ্ক cols, শূন্য *user);
 
 /* Some convenient wrappers to make callback functions easier */
 
-static void putglyph(VTermState *state, const uint32_t chars[], int width, VTermPos pos)
+স্থির শূন্য putglyph(VTermState *state, ধ্রুৱ uint32_t chars[], পূর্ণাঙ্ক width, VTermPos pos)
 {
   VTermGlyphInfo info;
 
@@ -23,48 +23,48 @@ static void putglyph(VTermState *state, const uint32_t chars[], int width, VTerm
   info.dwl = state->lineinfo[pos.row].doublewidth;
   info.dhl = state->lineinfo[pos.row].doubleheight;
 
-  if(state->callbacks && state->callbacks->putglyph)
-    if((*state->callbacks->putglyph)(&info, pos, state->cbdata))
-      return;
+  যদি(state->callbacks && state->callbacks->putglyph)
+    যদি((*state->callbacks->putglyph)(&info, pos, state->cbdata))
+      ঘূৰাই;
 
   DEBUG_LOG3("libvterm: Unhandled putglyph U+%04x at (%d,%d)\n", chars[0], pos.col, pos.row);
 }
 
-static void updatecursor(VTermState *state, VTermPos *oldpos, int cancel_phantom)
+স্থির শূন্য updatecursor(VTermState *state, VTermPos *oldpos, পূর্ণাঙ্ক cancel_phantom)
 {
-  if(state->pos.col == oldpos->col && state->pos.row == oldpos->row)
-    return;
+  যদি(state->pos.col == oldpos->col && state->pos.row == oldpos->row)
+    ঘূৰাই;
 
-  if(cancel_phantom)
+  যদি(cancel_phantom)
     state->at_phantom = 0;
 
-  if(state->callbacks && state->callbacks->movecursor)
-    if((*state->callbacks->movecursor)(state->pos, *oldpos, state->mode.cursor_visible, state->cbdata))
-      return;
+  যদি(state->callbacks && state->callbacks->movecursor)
+    যদি((*state->callbacks->movecursor)(state->pos, *oldpos, state->mode.cursor_visible, state->cbdata))
+      ঘূৰাই;
 }
 
-static void erase(VTermState *state, VTermRect rect, int selective)
+স্থির শূন্য erase(VTermState *state, VTermRect rect, পূর্ণাঙ্ক selective)
 {
-  if(rect.end_col == state->cols) {
-    int row;
+  যদি(rect.end_col == state->cols) {
+    পূর্ণাঙ্ক row;
     /* If we're erasing the final cells of any lines, cancel the continuation
      * marker on the subsequent line
      */
-    for(row = rect.start_row + 1; row < rect.end_row + 1 && row < state->rows; row++)
+    বাবে(row = rect.start_row + 1; row < rect.end_row + 1 && row < state->rows; row++)
       state->lineinfo[row].continuation = 0;
   }
 
-  if(state->callbacks && state->callbacks->erase)
-    if((*state->callbacks->erase)(rect, selective, state->cbdata))
-      return;
+  যদি(state->callbacks && state->callbacks->erase)
+    যদি((*state->callbacks->erase)(rect, selective, state->cbdata))
+      ঘূৰাই;
 }
 
-static VTermState *vterm_state_new(VTerm *vt)
+স্থির VTermState *vterm_state_new(VTerm *vt)
 {
-  VTermState *state = vterm_allocator_malloc(vt, sizeof(VTermState));
+  VTermState *state = vterm_allocator_malloc(vt, পরিমাণ(VTermState));
 
-  if (state == NULL)
-    return NULL;
+  যদি (state == রিক্ত)
+    ঘূৰাই রিক্ত;
   state->vt = vt;
 
   state->rows = vt->rows;
@@ -76,92 +76,92 @@ static VTermState *vterm_state_new(VTerm *vt)
 
   state->mouse_protocol = MOUSE_X10;
 
-  state->callbacks = NULL;
-  state->cbdata    = NULL;
+  state->callbacks = রিক্ত;
+  state->cbdata    = রিক্ত;
   state->callbacks_has_premove = 0;
 
-  state->selection.callbacks = NULL;
-  state->selection.user      = NULL;
-  state->selection.buffer    = NULL;
+  state->selection.callbacks = রিক্ত;
+  state->selection.user      = রিক্ত;
+  state->selection.buffer    = রিক্ত;
 
   vterm_state_newpen(state);
 
   state->bold_is_highbright = 0;
 
   state->combine_chars_size = 16;
-  state->combine_chars = vterm_allocator_malloc(state->vt, state->combine_chars_size * sizeof(state->combine_chars[0]));
+  state->combine_chars = vterm_allocator_malloc(state->vt, state->combine_chars_size * পরিমাণ(state->combine_chars[0]));
 
   state->tabstops = vterm_allocator_malloc(state->vt, (state->cols + 7) / 8);
 
-  state->lineinfos[BUFIDX_PRIMARY]   = vterm_allocator_malloc(state->vt, state->rows * sizeof(VTermLineInfo));
+  state->lineinfos[BUFIDX_PRIMARY]   = vterm_allocator_malloc(state->vt, state->rows * পরিমাণ(VTerm_সাৰি_Info));
   /* TODO: Make an 'enable' function */
-  state->lineinfos[BUFIDX_ALTSCREEN] = vterm_allocator_malloc(state->vt, state->rows * sizeof(VTermLineInfo));
+  state->lineinfos[BUFIDX_ALTSCREEN] = vterm_allocator_malloc(state->vt, state->rows * পরিমাণ(VTerm_সাৰি_Info));
   state->lineinfo = state->lineinfos[BUFIDX_PRIMARY];
 
   state->encoding_utf8.enc = vterm_lookup_encoding(ENC_UTF8, 'u');
-  if(state->encoding_utf8.enc->init)
+  যদি(state->encoding_utf8.enc->init)
     (*state->encoding_utf8.enc->init)(state->encoding_utf8.enc, state->encoding_utf8.data);
 
-  return state;
+  ঘূৰাই state;
 }
 
-INTERNAL void vterm_state_free(VTermState *state)
+INTERNAL শূন্য vterm_state_free(VTermState *state)
 {
   vterm_allocator_free(state->vt, state->tabstops);
   vterm_allocator_free(state->vt, state->lineinfos[BUFIDX_PRIMARY]);
-  if(state->lineinfos[BUFIDX_ALTSCREEN])
+  যদি(state->lineinfos[BUFIDX_ALTSCREEN])
     vterm_allocator_free(state->vt, state->lineinfos[BUFIDX_ALTSCREEN]);
   vterm_allocator_free(state->vt, state->combine_chars);
   vterm_allocator_free(state->vt, state);
 }
 
-static void scroll(VTermState *state, VTermRect rect, int downward, int rightward)
+স্থির শূন্য scroll(VTermState *state, VTermRect rect, পূর্ণাঙ্ক downward, পূর্ণাঙ্ক rightward)
 {
-  int rows;
-  int cols;
-  if(!downward && !rightward)
-    return;
+  পূর্ণাঙ্ক rows;
+  পূর্ণাঙ্ক cols;
+  যদি(!downward && !rightward)
+    ঘূৰাই;
 
   // A degenerate rectangle makes "rows" or "cols" below negative, which
   // inverts the clamping of "downward" and "rightward" and results in a
   // negative height being passed to memmove().  This happens when a scroll
   // region survives a resize that made the terminal smaller.
-  if(rect.end_row <= rect.start_row || rect.end_col <= rect.start_col)
-    return;
+  যদি(rect.end_row <= rect.start_row || rect.end_col <= rect.start_col)
+    ঘূৰাই;
 
   rows = rect.end_row - rect.start_row;
-  if(downward > rows)
+  যদি(downward > rows)
     downward = rows;
-  else if(downward < -rows)
+  অন্যথা যদি(downward < -rows)
     downward = -rows;
 
   cols = rect.end_col - rect.start_col;
-  if(rightward > cols)
+  যদি(rightward > cols)
     rightward = cols;
-  else if(rightward < -cols)
+  অন্যথা যদি(rightward < -cols)
     rightward = -cols;
 
-  if(state->callbacks_has_premove && state->callbacks && state->callbacks->premove) {
+  যদি(state->callbacks_has_premove && state->callbacks && state->callbacks->premove) {
     // TODO: technically this logic is wrong if both downward != 0 and rightward != 0
 
     /* Work out what subsection of the destination area is about to be destroyed */
-    if(downward > 0)
+    যদি(downward > 0)
       /* about to destroy the top */
       (*state->callbacks->premove)((VTermRect){
           .start_row = rect.start_row, .end_row = rect.start_row + downward,
           .start_col = rect.start_col, .end_col = rect.end_col}, state->cbdata);
-    else if(downward < 0)
+    অন্যথা যদি(downward < 0)
       /* about to destroy the bottom */
       (*state->callbacks->premove)((VTermRect){
           .start_row = rect.end_row + downward, .end_row = rect.end_row,
           .start_col = rect.start_col,          .end_col = rect.end_col}, state->cbdata);
 
-    if(rightward > 0)
+    যদি(rightward > 0)
       /* about to destroy the left */
       (*state->callbacks->premove)((VTermRect){
           .start_row = rect.start_row, .end_row = rect.end_row,
           .start_col = rect.start_col, .end_col = rect.start_col + rightward}, state->cbdata);
-    else if(rightward < 0)
+    অন্যথা যদি(rightward < 0)
       /* about to destroy the right */
       (*state->callbacks->premove)((VTermRect){
           .start_row = rect.start_row,           .end_row = rect.end_row,
@@ -169,57 +169,57 @@ static void scroll(VTermState *state, VTermRect rect, int downward, int rightwar
   }
 
   // Update lineinfo if full line
-  if(rect.start_col == 0 && rect.end_col == state->cols && rightward == 0) {
-    int height = rect.end_row - rect.start_row - abs(downward);
-    int row;
-    VTermLineInfo zeroLineInfo = {0x0};
+  যদি(rect.start_col == 0 && rect.end_col == state->cols && rightward == 0) {
+    পূর্ণাঙ্ক height = rect.end_row - rect.start_row - abs(downward);
+    পূর্ণাঙ্ক row;
+    VTerm_সাৰি_Info zero_সাৰি_Info = {0x0};
 
-    if(downward > 0) {
+    যদি(downward > 0) {
       memmove(state->lineinfo + rect.start_row,
               state->lineinfo + rect.start_row + downward,
-              height * sizeof(state->lineinfo[0]));
-      for(row = rect.end_row - downward; row < rect.end_row; row++)
-        state->lineinfo[row] = zeroLineInfo;
+              height * পরিমাণ(state->lineinfo[0]));
+      বাবে(row = rect.end_row - downward; row < rect.end_row; row++)
+        state->lineinfo[row] = zero_সাৰি_Info;
     }
-    else {
+    অন্যথা {
       memmove(state->lineinfo + rect.start_row - downward,
               state->lineinfo + rect.start_row,
-              height * sizeof(state->lineinfo[0]));
-      for(row = rect.start_row; row < rect.start_row - downward; row++)
-        state->lineinfo[row] = zeroLineInfo;
+              height * পরিমাণ(state->lineinfo[0]));
+      বাবে(row = rect.start_row; row < rect.start_row - downward; row++)
+        state->lineinfo[row] = zero_সাৰি_Info;
     }
   }
 
-  if(state->callbacks && state->callbacks->scrollrect)
-    if((*state->callbacks->scrollrect)(rect, downward, rightward, state->cbdata))
-      return;
+  যদি(state->callbacks && state->callbacks->scrollrect)
+    যদি((*state->callbacks->scrollrect)(rect, downward, rightward, state->cbdata))
+      ঘূৰাই;
 
-  if(state->callbacks)
+  যদি(state->callbacks)
     vterm_scroll_rect(rect, downward, rightward,
         state->callbacks->moverect, state->callbacks->erase, state->cbdata);
 }
 
-static void linefeed(VTermState *state)
+স্থির শূন্য linefeed(VTermState *state)
 {
-  if(state->pos.row == SCROLLREGION_BOTTOM(state) - 1) {
+  যদি(state->pos.row == SCROLLREGION_BOTTOM(state) - 1) {
     VTermRect rect;
-    rect.start_row = state->scrollregion_top;
+    rect.start_row = state->scrollregion_শীৰ্ষ;
     rect.end_row   = SCROLLREGION_BOTTOM(state);
-    rect.start_col = SCROLLREGION_LEFT(state);
-    rect.end_col   = SCROLLREGION_RIGHT(state);
+    rect.start_col = SCROLLREGION_বাম(state);
+    rect.end_col   = SCROLLREGION_ডান(state);
 
     scroll(state, rect, 1, 0);
   }
-  else if(state->pos.row < state->rows-1)
+  অন্যথা যদি(state->pos.row < state->rows-1)
     state->pos.row++;
 }
 
-static void grow_combine_buffer(VTermState *state)
+স্থির শূন্য grow_combine_buffer(VTermState *state)
 {
   size_t    new_size = state->combine_chars_size * 2;
-  uint32_t *new_chars = vterm_allocator_malloc(state->vt, new_size * sizeof(new_chars[0]));
+  uint32_t *new_chars = vterm_allocator_malloc(state->vt, new_size * পরিমাণ(new_chars[0]));
 
-  memcpy(new_chars, state->combine_chars, state->combine_chars_size * sizeof(new_chars[0]));
+  memcpy(new_chars, state->combine_chars, state->combine_chars_size * পরিমাণ(new_chars[0]));
 
   vterm_allocator_free(state->vt, state->combine_chars);
 
@@ -227,54 +227,54 @@ static void grow_combine_buffer(VTermState *state)
   state->combine_chars_size = new_size;
 }
 
-static void set_col_tabstop(VTermState *state, int col)
+স্থির শূন্য set_col_tabstop(VTermState *state, পূর্ণাঙ্ক col)
 {
-  unsigned char mask = 1 << (col & 7);
+  unsigned ৱর্ণ mask = 1 << (col & 7);
   state->tabstops[col >> 3] |= mask;
 }
 
-static void clear_col_tabstop(VTermState *state, int col)
+স্থির শূন্য clear_col_tabstop(VTermState *state, পূর্ণাঙ্ক col)
 {
-  unsigned char mask = 1 << (col & 7);
+  unsigned ৱর্ণ mask = 1 << (col & 7);
   state->tabstops[col >> 3] &= ~mask;
 }
 
-static int is_col_tabstop(VTermState *state, int col)
+স্থির পূর্ণাঙ্ক is_col_tabstop(VTermState *state, পূর্ণাঙ্ক col)
 {
-  unsigned char mask = 1 << (col & 7);
-  return state->tabstops[col >> 3] & mask;
+  unsigned ৱর্ণ mask = 1 << (col & 7);
+  ঘূৰাই state->tabstops[col >> 3] & mask;
 }
 
-static int is_cursor_in_scrollregion(const VTermState *state)
+স্থির পূর্ণাঙ্ক is_cursor_in_scrollregion(ধ্রুৱ VTermState *state)
 {
-  if(state->pos.row < state->scrollregion_top ||
+  যদি(state->pos.row < state->scrollregion_শীৰ্ষ ||
      state->pos.row >= SCROLLREGION_BOTTOM(state))
-    return 0;
-  if(state->pos.col < SCROLLREGION_LEFT(state) ||
-     state->pos.col >= SCROLLREGION_RIGHT(state))
-    return 0;
+    ঘূৰাই 0;
+  যদি(state->pos.col < SCROLLREGION_বাম(state) ||
+     state->pos.col >= SCROLLREGION_ডান(state))
+    ঘূৰাই 0;
 
-  return 1;
+  ঘূৰাই 1;
 }
 
-static void tab(VTermState *state, int count, int direction)
+স্থির শূন্য tab(VTermState *state, পূর্ণাঙ্ক গুনতি, পূর্ণাঙ্ক direction)
 {
-  while(count > 0) {
-    if(direction > 0) {
-      if(state->pos.col >= THISROWWIDTH(state)-1)
-        return;
+  যেতিয়ালৈ(গুনতি > 0) {
+    যদি(direction > 0) {
+      যদি(state->pos.col >= THISROWWIDTH(state)-1)
+        ঘূৰাই;
 
       state->pos.col++;
     }
-    else if(direction < 0) {
-      if(state->pos.col < 1)
-        return;
+    অন্যথা যদি(direction < 0) {
+      যদি(state->pos.col < 1)
+        ঘূৰাই;
 
       state->pos.col--;
     }
 
-    if(is_col_tabstop(state, state->pos.col))
-      count--;
+    যদি(is_col_tabstop(state, state->pos.col))
+      গুনতি--;
   }
 }
 
@@ -285,101 +285,101 @@ static void tab(VTermState *state, int count, int direction)
 #define DWL_ON  1
 
 #define DHL_OFF    0
-#define DHL_TOP    1
+#define DHL_শীৰ্ষ    1
 #define DHL_BOTTOM 2
 
-static void set_lineinfo(VTermState *state, int row, int force, int dwl, int dhl)
+স্থির শূন্য set_lineinfo(VTermState *state, পূর্ণাঙ্ক row, পূর্ণাঙ্ক force, পূর্ণাঙ্ক dwl, পূর্ণাঙ্ক dhl)
 {
-  VTermLineInfo info = state->lineinfo[row];
+  VTerm_সাৰি_Info info = state->lineinfo[row];
 
-  if(dwl == DWL_OFF)
+  যদি(dwl == DWL_OFF)
     info.doublewidth = DWL_OFF;
-  else if(dwl == DWL_ON)
+  অন্যথা যদি(dwl == DWL_ON)
     info.doublewidth = DWL_ON;
   // else -1 to ignore
 
-  if(dhl == DHL_OFF)
+  যদি(dhl == DHL_OFF)
     info.doubleheight = DHL_OFF;
-  else if(dhl == DHL_TOP)
-    info.doubleheight = DHL_TOP;
-  else if(dhl == DHL_BOTTOM)
+  অন্যথা যদি(dhl == DHL_শীৰ্ষ)
+    info.doubleheight = DHL_শীৰ্ষ;
+  অন্যথা যদি(dhl == DHL_BOTTOM)
     info.doubleheight = DHL_BOTTOM;
 
-  if((state->callbacks &&
+  যদি((state->callbacks &&
       state->callbacks->setlineinfo &&
       (*state->callbacks->setlineinfo)(row, &info, state->lineinfo + row, state->cbdata))
       || force)
     state->lineinfo[row] = info;
 }
 
-static int on_text(const char bytes[], size_t len, void *user)
+স্থির পূর্ণাঙ্ক on_text(ধ্রুৱ ৱর্ণ bytes[], size_t len, শূন্য *user)
 {
   VTermState *state = user;
-  int npoints = 0;
+  পূর্ণাঙ্ক npoints = 0;
   size_t eaten = 0;
   VTermEncodingInstance *encoding;
-  int i = 0;
+  পূর্ণাঙ্ক i = 0;
 
   VTermPos oldpos = state->pos;
 
   // We'll have at most len codepoints, plus one from a previous incomplete
   // sequence.
   uint32_t *codepoints = (uint32_t *)(state->vt->tmpbuffer);
-  size_t maxpoints = (state->vt->tmpbuffer_len) / sizeof(uint32_t);
+  size_t maxpoints = (state->vt->tmpbuffer_len) / পরিমাণ(uint32_t);
 
   encoding =
     state->gsingle_set     ? &state->encoding[state->gsingle_set] :
     !(bytes[eaten] & 0x80) ? &state->encoding[state->gl_set] :
     state->vt->mode.utf8   ? &state->encoding_utf8 :
                              &state->encoding[state->gr_set];
-  if (encoding->enc == state->encoding_utf8.enc)
+  যদি (encoding->enc == state->encoding_utf8.enc)
     encoding = &state->encoding_utf8;  // Only use one UTF-8 encoding state.
 
   (*encoding->enc->decode)(encoding->enc, encoding->data,
-      codepoints, &npoints, state->gsingle_set ? 1 : (int)maxpoints,
+      codepoints, &npoints, state->gsingle_set ? 1 : (পূর্ণাঙ্ক)maxpoints,
       bytes, &eaten, len);
 
   /* There's a chance an encoding (e.g. UTF-8) hasn't found enough bytes yet
    * for even a single codepoint
    */
-  if(!npoints)
+  যদি(!npoints)
   {
-    return (int)eaten;
+    ঘূৰাই (পূর্ণাঙ্ক)eaten;
   }
 
-  if(state->gsingle_set && npoints)
+  যদি(state->gsingle_set && npoints)
     state->gsingle_set = 0;
 
   /* This is a combining char. that needs to be merged with the previous
    * glyph output */
-  if(vterm_unicode_is_combining(codepoints[i])) {
+  যদি(vterm_unicode_is_combining(codepoints[i])) {
     /* See if the cursor has moved since */
-    if(state->pos.row == state->combine_pos.row && state->pos.col == state->combine_pos.col + state->combine_width) {
+    যদি(state->pos.row == state->combine_pos.row && state->pos.col == state->combine_pos.col + state->combine_width) {
 #ifdef DEBUG_GLYPH_COMBINE
-      int printpos;
+      পূর্ণাঙ্ক printpos;
       printf("DEBUG: COMBINING SPLIT GLYPH of chars {");
-      for(printpos = 0; state->combine_chars[printpos]; printpos++)
+      বাবে(printpos = 0; state->combine_chars[printpos]; printpos++)
         printf("U+%04x ", state->combine_chars[printpos]);
       printf("} + {");
 #endif
 
       /* Find where we need to append these combining chars */
-      int saved_i = 0;
-      while(state->combine_chars[saved_i])
+      পূর্ণাঙ্ক saved_i = 0;
+      যেতিয়ালৈ(state->combine_chars[saved_i])
         saved_i++;
 
       /* Add extra ones */
-      while(i < npoints && vterm_unicode_is_combining(codepoints[i])) {
-        if(saved_i >= (int)state->combine_chars_size)
+      যেতিয়ালৈ(i < npoints && vterm_unicode_is_combining(codepoints[i])) {
+        যদি(saved_i >= (পূর্ণাঙ্ক)state->combine_chars_size)
           grow_combine_buffer(state);
         state->combine_chars[saved_i++] = codepoints[i++];
       }
-      if(saved_i >= (int)state->combine_chars_size)
+      যদি(saved_i >= (পূর্ণাঙ্ক)state->combine_chars_size)
         grow_combine_buffer(state);
       state->combine_chars[saved_i] = 0;
 
 #ifdef DEBUG_GLYPH_COMBINE
-      for(; state->combine_chars[printpos]; printpos++)
+      বাবে(; state->combine_chars[printpos]; printpos++)
         printf("U+%04x ", state->combine_chars[printpos]);
       printf("}\n");
 #endif
@@ -387,71 +387,71 @@ static int on_text(const char bytes[], size_t len, void *user)
       /* Now render it */
       putglyph(state, state->combine_chars, state->combine_width, state->combine_pos);
     }
-    else {
+    অন্যথা {
       DEBUG_LOG("libvterm: TODO: Skip over split char+combining\n");
     }
   }
 
-  for(; i < npoints; i++) {
+  বাবে(; i < npoints; i++) {
     // Try to find combining characters following this
-    int glyph_starts = i;
-    int glyph_ends;
-    int width = 0;
+    পূর্ণাঙ্ক glyph_starts = i;
+    পূর্ণাঙ্ক glyph_ends;
+    পূর্ণাঙ্ক width = 0;
 
-    for(glyph_ends = i + 1;
+    বাবে(glyph_ends = i + 1;
         (glyph_ends < npoints) && (glyph_ends < glyph_starts + VTERM_MAX_CHARS_PER_CELL);
         glyph_ends++)
-      if(!vterm_unicode_is_combining(codepoints[glyph_ends]))
-        break;
+      যদি(!vterm_unicode_is_combining(codepoints[glyph_ends]))
+        ভঙ্গ;
 
-    uint32_t *chars = vterm_allocator_malloc(state->vt, (VTERM_MAX_CHARS_PER_CELL + 1) * sizeof(uint32_t));
-    if (chars == NULL)
-      break;
+    uint32_t *chars = vterm_allocator_malloc(state->vt, (VTERM_MAX_CHARS_PER_CELL + 1) * পরিমাণ(uint32_t));
+    যদি (chars == রিক্ত)
+      ভঙ্গ;
 
-    for( ; i < glyph_ends; i++) {
-      int this_width;
-      if(vterm_get_special_pty_type() == 2) {
+    বাবে( ; i < glyph_ends; i++) {
+      পূর্ণাঙ্ক this_width;
+      যদি(vterm_get_special_pty_type() == 2) {
         state->vt->in_backspace -= (state->vt->in_backspace > 0) ? 1 : 0;
-        if(state->vt->in_backspace == 1)
+        যদি(state->vt->in_backspace == 1)
           codepoints[i] = 0; // codepoints under this condition must be 0
       }
       chars[i - glyph_starts] = codepoints[i];
       this_width = vterm_unicode_width(codepoints[i]);
 #ifdef DEBUG
-      if(this_width < 0) {
+      যদি(this_width < 0) {
         fprintf(stderr, "Text with negative-width codepoint U+%04x\n", codepoints[i]);
         abort();
       }
 #endif
-      if (i == glyph_starts || this_width > width)
+      যদি (i == glyph_starts || this_width > width)
 	width = this_width;  // TODO: should be += ?
     }
 
-    if (width < 0)
+    যদি (width < 0)
       width = 0;
 
-    while(i < npoints && vterm_unicode_is_combining(codepoints[i]))
+    যেতিয়ালৈ(i < npoints && vterm_unicode_is_combining(codepoints[i]))
       i++;
 
     chars[glyph_ends - glyph_starts] = 0;
     i--;
 
 #ifdef DEBUG_GLYPH_COMBINE
-    int printpos;
+    পূর্ণাঙ্ক printpos;
     printf("DEBUG: COMBINED GLYPH of %d chars {", glyph_ends - glyph_starts);
-    for(printpos = 0; printpos < glyph_ends - glyph_starts; printpos++)
+    বাবে(printpos = 0; printpos < glyph_ends - glyph_starts; printpos++)
       printf("U+%04x ", chars[printpos]);
     printf("}, onscreen width %d\n", width);
 #endif
 
-    if(state->at_phantom || state->pos.col + width > THISROWWIDTH(state)) {
+    যদি(state->at_phantom || state->pos.col + width > THISROWWIDTH(state)) {
       linefeed(state);
       state->pos.col = 0;
       state->at_phantom = 0;
       state->lineinfo[state->pos.row].continuation = 1;
     }
 
-    if(state->mode.insert) {
+    যদি(state->mode.ঢোকাও) {
       // TODO: This will be a little inefficient for large bodies of text, as
       // it'll have to 'ICH' effectively before every glyph. We should scan
       // ahead and ICH as many times as required
@@ -465,27 +465,27 @@ static int on_text(const char bytes[], size_t len, void *user)
 
     putglyph(state, chars, width, state->pos);
 
-    if(i == npoints - 1) {
+    যদি(i == npoints - 1) {
       /* End of the buffer. Save the chars in case we have to combine with
        * more on the next call */
-      int save_i;
-      for(save_i = 0; chars[save_i]; save_i++) {
-        if(save_i >= (int)state->combine_chars_size)
+      পূর্ণাঙ্ক save_i;
+      বাবে(save_i = 0; chars[save_i]; save_i++) {
+        যদি(save_i >= (পূর্ণাঙ্ক)state->combine_chars_size)
           grow_combine_buffer(state);
         state->combine_chars[save_i] = chars[save_i];
       }
-      if(save_i >= (int)state->combine_chars_size)
+      যদি(save_i >= (পূর্ণাঙ্ক)state->combine_chars_size)
         grow_combine_buffer(state);
       state->combine_chars[save_i] = 0;
       state->combine_width = width;
       state->combine_pos = state->pos;
     }
 
-    if(state->pos.col + width >= THISROWWIDTH(state)) {
-      if(state->mode.autowrap)
+    যদি(state->pos.col + width >= THISROWWIDTH(state)) {
+      যদি(state->mode.autowrap)
         state->at_phantom = 1;
     }
-    else {
+    অন্যথা {
       state->pos.col += width;
     }
     vterm_allocator_free(state->vt, chars);
@@ -494,7 +494,7 @@ static int on_text(const char bytes[], size_t len, void *user)
   updatecursor(state, &oldpos, 0);
 
 #ifdef DEBUG
-  if(state->pos.row < 0 || state->pos.row >= state->rows ||
+  যদি(state->pos.row < 0 || state->pos.row >= state->rows ||
      state->pos.col < 0 || state->pos.col >= state->cols) {
     fprintf(stderr, "Position out of bounds after text: (%d,%d)\n",
         state->pos.row, state->pos.col);
@@ -502,10 +502,10 @@ static int on_text(const char bytes[], size_t len, void *user)
   }
 #endif
 
-  return (int)eaten;
+  ঘূৰাই (পূর্ণাঙ্ক)eaten;
 }
 
-static int on_control(unsigned char control, void *user)
+স্থির পূর্ণাঙ্ক on_control(unsigned ৱর্ণ control, শূন্য *user)
 {
   VTermState *state = user;
 
@@ -517,94 +517,94 @@ static int on_control(unsigned char control, void *user)
   VTermPos leadpos = state->pos;
   leadpos.col -= (leadpos.col >= 2 ? 2 : 0);
 
-  switch(control) {
-  case 0x07: // BEL - ECMA-48 8.3.3
-    if(state->callbacks && state->callbacks->bell)
+  ৱিকল্প(control) {
+  পক্ষ 0x07: // BEL - ECMA-48 8.3.3
+    যদি(state->callbacks && state->callbacks->bell)
       (*state->callbacks->bell)(state->cbdata);
-    break;
+    ভঙ্গ;
 
-  case 0x08: // BS - ECMA-48 8.3.5
-    if(state->pos.col > 0)
+  পক্ষ 0x08: // BS - ECMA-48 8.3.5
+    যদি(state->pos.col > 0)
       state->pos.col--;
-    if(vterm_get_special_pty_type() == 2) {
+    যদি(vterm_get_special_pty_type() == 2) {
       // In 2 cell letters, go back 2 cells
       vterm_screen_get_cell(state->vt->screen, leadpos, &cell);
-      if(vterm_unicode_width(cell.chars[0]) == 2)
+      যদি(vterm_unicode_width(cell.chars[0]) == 2)
         state->pos.col--;
     }
-    break;
+    ভঙ্গ;
 
-  case 0x09: // HT - ECMA-48 8.3.60
+  পক্ষ 0x09: // HT - ECMA-48 8.3.60
     tab(state, 1, +1);
-    break;
+    ভঙ্গ;
 
-  case 0x0a: // LF - ECMA-48 8.3.74
-  case 0x0b: // VT
-  case 0x0c: // FF
+  পক্ষ 0x0a: // LF - ECMA-48 8.3.74
+  পক্ষ 0x0b: // VT
+  পক্ষ 0x0c: // FF
     linefeed(state);
-    if(state->mode.newline)
+    যদি(state->mode.newline)
       state->pos.col = 0;
-    break;
+    ভঙ্গ;
 
-  case 0x0d: // CR - ECMA-48 8.3.15
+  পক্ষ 0x0d: // CR - ECMA-48 8.3.15
     state->pos.col = 0;
-    break;
+    ভঙ্গ;
 
-  case 0x0e: // LS1 - ECMA-48 8.3.76
+  পক্ষ 0x0e: // LS1 - ECMA-48 8.3.76
     state->gl_set = 1;
-    break;
+    ভঙ্গ;
 
-  case 0x0f: // LS0 - ECMA-48 8.3.75
+  পক্ষ 0x0f: // LS0 - ECMA-48 8.3.75
     state->gl_set = 0;
-    break;
+    ভঙ্গ;
 
-  case 0x84: // IND - DEPRECATED but implemented for completeness
+  পক্ষ 0x84: // IND - DEPRECATED but implemented for completeness
     linefeed(state);
-    break;
+    ভঙ্গ;
 
-  case 0x85: // NEL - ECMA-48 8.3.86
+  পক্ষ 0x85: // NEL - ECMA-48 8.3.86
     linefeed(state);
     state->pos.col = 0;
-    break;
+    ভঙ্গ;
 
-  case 0x88: // HTS - ECMA-48 8.3.62
+  পক্ষ 0x88: // HTS - ECMA-48 8.3.62
     set_col_tabstop(state, state->pos.col);
-    break;
+    ভঙ্গ;
 
-  case 0x8d: // RI - ECMA-48 8.3.104
-    if(state->pos.row == state->scrollregion_top) {
+  পক্ষ 0x8d: // RI - ECMA-48 8.3.104
+    যদি(state->pos.row == state->scrollregion_শীৰ্ষ) {
       VTermRect rect;
-      rect.start_row = state->scrollregion_top;
+      rect.start_row = state->scrollregion_শীৰ্ষ;
       rect.end_row   = SCROLLREGION_BOTTOM(state);
-      rect.start_col = SCROLLREGION_LEFT(state);
-      rect.end_col   = SCROLLREGION_RIGHT(state);
+      rect.start_col = SCROLLREGION_বাম(state);
+      rect.end_col   = SCROLLREGION_ডান(state);
 
       scroll(state, rect, -1, 0);
     }
-    else if(state->pos.row > 0)
+    অন্যথা যদি(state->pos.row > 0)
         state->pos.row--;
-    break;
+    ভঙ্গ;
 
-  case 0x8e: // SS2 - ECMA-48 8.3.141
+  পক্ষ 0x8e: // SS2 - ECMA-48 8.3.141
     state->gsingle_set = 2;
-    break;
+    ভঙ্গ;
 
-  case 0x8f: // SS3 - ECMA-48 8.3.142
+  পক্ষ 0x8f: // SS3 - ECMA-48 8.3.142
     state->gsingle_set = 3;
-    break;
+    ভঙ্গ;
 
-  default:
-    if(state->fallbacks && state->fallbacks->control)
-      if((*state->fallbacks->control)(control, state->fbdata))
-        return 1;
+  স্ৱভাৱ:
+    যদি(state->fallbacks && state->fallbacks->control)
+      যদি((*state->fallbacks->control)(control, state->fbdata))
+        ঘূৰাই 1;
 
-    return 0;
+    ঘূৰাই 0;
   }
 
   updatecursor(state, &oldpos, 1);
 
 #ifdef DEBUG
-  if(state->pos.row < 0 || state->pos.row >= state->rows ||
+  যদি(state->pos.row < 0 || state->pos.row >= state->rows ||
      state->pos.col < 0 || state->pos.col >= state->cols) {
     fprintf(stderr, "Position out of bounds after Ctrl %02x: (%d,%d)\n",
         control, state->pos.row, state->pos.col);
@@ -612,34 +612,34 @@ static int on_control(unsigned char control, void *user)
   }
 #endif
 
-  return 1;
+  ঘূৰাই 1;
 }
 
-static int settermprop_bool(VTermState *state, VTermProp prop, int v)
+স্থির পূর্ণাঙ্ক settermprop_bool(VTermState *state, VTermProp prop, পূর্ণাঙ্ক v)
 {
-  VTermValue val;
+  VTerm_মান val;
   val.boolean = v;
-  return vterm_state_set_termprop(state, prop, &val);
+  ঘূৰাই vterm_state_set_termprop(state, prop, &val);
 }
 
-static int settermprop_int(VTermState *state, VTermProp prop, int v)
+স্থির পূর্ণাঙ্ক settermprop_int(VTermState *state, VTermProp prop, পূর্ণাঙ্ক v)
 {
-  VTermValue val;
-  val.number = v;
-  return vterm_state_set_termprop(state, prop, &val);
+  VTerm_মান val;
+  val.সংখ্যা = v;
+  ঘূৰাই vterm_state_set_termprop(state, prop, &val);
 }
 
-static int settermprop_string(VTermState *state, VTermProp prop, VTermStringFragment frag)
+স্থির পূর্ণাঙ্ক settermprop_string(VTermState *state, VTermProp prop, VTermStringFragment frag)
 {
-  VTermValue val;
+  VTerm_মান val;
 
   val.string = frag;
-  return vterm_state_set_termprop(state, prop, &val);
+  ঘূৰাই vterm_state_set_termprop(state, prop, &val);
 }
 
-static void savecursor(VTermState *state, int save)
+স্থির শূন্য savecursor(VTermState *state, পূর্ণাঙ্ক save)
 {
-  if(save) {
+  যদি(save) {
     state->saved.pos = state->pos;
     state->saved.mode.cursor_visible = state->mode.cursor_visible;
     state->saved.mode.cursor_blink   = state->mode.cursor_blink;
@@ -647,7 +647,7 @@ static void savecursor(VTermState *state, int save)
 
     vterm_state_savepen(state, 1);
   }
-  else {
+  অন্যথা {
     VTermPos oldpos = state->pos;
 
     state->pos = state->saved.pos;
@@ -662,470 +662,470 @@ static void savecursor(VTermState *state, int save)
   }
 }
 
-static int on_escape(const char *bytes, size_t len, void *user)
+স্থির পূর্ণাঙ্ক on_escape(ধ্রুৱ ৱর্ণ *bytes, size_t len, শূন্য *user)
 {
   VTermState *state = user;
 
   /* Easier to decode this from the first byte, even though the final
    * byte terminates it
    */
-  switch(bytes[0]) {
-  case ' ':
-    if(len != 2)
-      return 0;
+  ৱিকল্প(bytes[0]) {
+  পক্ষ ' ':
+    যদি(len != 2)
+      ঘূৰাই 0;
 
-    switch(bytes[1]) {
-      case 'F': // S7C1T
+    ৱিকল্প(bytes[1]) {
+      পক্ষ 'F': // S7C1T
         state->vt->mode.ctrl8bit = 0;
-        break;
+        ভঙ্গ;
 
-      case 'G': // S8C1T
+      পক্ষ 'G': // S8C1T
         state->vt->mode.ctrl8bit = 1;
-        break;
+        ভঙ্গ;
 
-      default:
-        return 0;
+      স্ৱভাৱ:
+        ঘূৰাই 0;
     }
-    return 2;
+    ঘূৰাই 2;
 
-  case '#':
-    if(len != 2)
-      return 0;
+  পক্ষ '#':
+    যদি(len != 2)
+      ঘূৰাই 0;
 
-    switch(bytes[1]) {
-      case '3': // DECDHL top
-        if(state->mode.leftrightmargin)
-          break;
-        set_lineinfo(state, state->pos.row, NO_FORCE, DWL_ON, DHL_TOP);
-        break;
+    ৱিকল্প(bytes[1]) {
+      পক্ষ '3': // DECDHL top
+        যদি(state->mode.leftrightmargin)
+          ভঙ্গ;
+        set_lineinfo(state, state->pos.row, NO_FORCE, DWL_ON, DHL_শীৰ্ষ);
+        ভঙ্গ;
 
-      case '4': // DECDHL bottom
-        if(state->mode.leftrightmargin)
-          break;
+      পক্ষ '4': // DECDHL bottom
+        যদি(state->mode.leftrightmargin)
+          ভঙ্গ;
         set_lineinfo(state, state->pos.row, NO_FORCE, DWL_ON, DHL_BOTTOM);
-        break;
+        ভঙ্গ;
 
-      case '5': // DECSWL
-        if(state->mode.leftrightmargin)
-          break;
+      পক্ষ '5': // DECSWL
+        যদি(state->mode.leftrightmargin)
+          ভঙ্গ;
         set_lineinfo(state, state->pos.row, NO_FORCE, DWL_OFF, DHL_OFF);
-        break;
+        ভঙ্গ;
 
-      case '6': // DECDWL
-        if(state->mode.leftrightmargin)
-          break;
+      পক্ষ '6': // DECDWL
+        যদি(state->mode.leftrightmargin)
+          ভঙ্গ;
         set_lineinfo(state, state->pos.row, NO_FORCE, DWL_ON, DHL_OFF);
-        break;
+        ভঙ্গ;
 
-      case '8': // DECALN
+      পক্ষ '8': // DECALN
       {
         VTermPos pos;
         uint32_t E[] = { 'E', 0 };
-        for(pos.row = 0; pos.row < state->rows; pos.row++)
-          for(pos.col = 0; pos.col < ROWWIDTH(state, pos.row); pos.col++)
+        বাবে(pos.row = 0; pos.row < state->rows; pos.row++)
+          বাবে(pos.col = 0; pos.col < ROWWIDTH(state, pos.row); pos.col++)
             putglyph(state, E, 1, pos);
-        break;
+        ভঙ্গ;
       }
 
-      default:
-        return 0;
+      স্ৱভাৱ:
+        ঘূৰাই 0;
     }
-    return 2;
+    ঘূৰাই 2;
 
-  case '(': case ')': case '*': case '+': // SCS
-    if(len != 2)
-      return 0;
+  পক্ষ '(': পক্ষ ')': পক্ষ '*': পক্ষ '+': // SCS
+    যদি(len != 2)
+      ঘূৰাই 0;
 
     {
-      int setnum = bytes[0] - 0x28;
+      পূর্ণাঙ্ক setnum = bytes[0] - 0x28;
       VTermEncoding *newenc = vterm_lookup_encoding(ENC_SINGLE_94, bytes[1]);
 
-      if(newenc) {
+      যদি(newenc) {
         state->encoding[setnum].enc = newenc;
 
-        if(newenc->init)
+        যদি(newenc->init)
           (*newenc->init)(newenc, state->encoding[setnum].data);
       }
     }
 
-    return 2;
+    ঘূৰাই 2;
 
-  case '7': // DECSC
+  পক্ষ '7': // DECSC
     savecursor(state, 1);
-    return 1;
+    ঘূৰাই 1;
 
-  case '8': // DECRC
+  পক্ষ '8': // DECRC
     savecursor(state, 0);
-    return 1;
+    ঘূৰাই 1;
 
-  case '<': // Ignored by VT100. Used in VT52 mode to switch up to VT100
-    return 1;
+  পক্ষ '<': // Ignored by VT100. Used in VT52 mode to switch up to VT100
+    ঘূৰাই 1;
 
-  case '=': // DECKPAM
+  পক্ষ '=': // DECKPAM
     state->mode.keypad = 1;
-    return 1;
+    ঘূৰাই 1;
 
-  case '>': // DECKPNM
+  পক্ষ '>': // DECKPNM
     state->mode.keypad = 0;
-    return 1;
+    ঘূৰাই 1;
 
-  case 'c': // RIS - ECMA-48 8.3.105
+  পক্ষ 'c': // RIS - ECMA-48 8.3.105
   {
     VTermPos oldpos = state->pos;
     vterm_state_reset(state, 1);
-    if(state->callbacks && state->callbacks->movecursor)
+    যদি(state->callbacks && state->callbacks->movecursor)
       (*state->callbacks->movecursor)(state->pos, oldpos, state->mode.cursor_visible, state->cbdata);
-    return 1;
+    ঘূৰাই 1;
   }
 
-  case 'n': // LS2 - ECMA-48 8.3.78
+  পক্ষ 'n': // LS2 - ECMA-48 8.3.78
     state->gl_set = 2;
-    return 1;
+    ঘূৰাই 1;
 
-  case 'o': // LS3 - ECMA-48 8.3.80
+  পক্ষ 'o': // LS3 - ECMA-48 8.3.80
     state->gl_set = 3;
-    return 1;
+    ঘূৰাই 1;
 
-  case '~': // LS1R - ECMA-48 8.3.77
+  পক্ষ '~': // LS1R - ECMA-48 8.3.77
     state->gr_set = 1;
-    return 1;
+    ঘূৰাই 1;
 
-  case '}': // LS2R - ECMA-48 8.3.79
+  পক্ষ '}': // LS2R - ECMA-48 8.3.79
     state->gr_set = 2;
-    return 1;
+    ঘূৰাই 1;
 
-  case '|': // LS3R - ECMA-48 8.3.81
+  পক্ষ '|': // LS3R - ECMA-48 8.3.81
     state->gr_set = 3;
-    return 1;
+    ঘূৰাই 1;
 
-  default:
-    return 0;
+  স্ৱভাৱ:
+    ঘূৰাই 0;
   }
 }
 
-static void set_mode(VTermState *state, int num, int val)
+স্থির শূন্য set_mode(VTermState *state, পূর্ণাঙ্ক অঙ্ক, পূর্ণাঙ্ক val)
 {
-  switch(num) {
-  case 4: // IRM - ECMA-48 7.2.10
-    state->mode.insert = val;
-    break;
+  ৱিকল্প(অঙ্ক) {
+  পক্ষ 4: // IRM - ECMA-48 7.2.10
+    state->mode.ঢোকাও = val;
+    ভঙ্গ;
 
-  case 20: // LNM - ANSI X3.4-1977
+  পক্ষ 20: // LNM - ANSI X3.4-1977
     state->mode.newline = val;
-    break;
+    ভঙ্গ;
 
-  default:
-    DEBUG_LOG1("libvterm: Unknown mode %d\n", num);
-    return;
+  স্ৱভাৱ:
+    DEBUG_LOG1("libvterm: Unknown mode %d\n", অঙ্ক);
+    ঘূৰাই;
   }
 }
 
-static void set_dec_mode(VTermState *state, int num, int val)
+স্থির শূন্য set_dec_mode(VTermState *state, পূর্ণাঙ্ক অঙ্ক, পূর্ণাঙ্ক val)
 {
-  switch(num) {
-  case 1:
+  ৱিকল্প(অঙ্ক) {
+  পক্ষ 1:
     state->mode.cursor = val;
-    break;
+    ভঙ্গ;
 
-  case 5: // DECSCNM - screen mode
+  পক্ষ 5: // DECSCNM - screen mode
     settermprop_bool(state, VTERM_PROP_REVERSE, val);
-    break;
+    ভঙ্গ;
 
-  case 6: // DECOM - origin mode
+  পক্ষ 6: // DECOM - origin mode
     {
       VTermPos oldpos = state->pos;
       state->mode.origin = val;
-      state->pos.row = state->mode.origin ? state->scrollregion_top : 0;
-      state->pos.col = state->mode.origin ? SCROLLREGION_LEFT(state) : 0;
+      state->pos.row = state->mode.origin ? state->scrollregion_শীৰ্ষ : 0;
+      state->pos.col = state->mode.origin ? SCROLLREGION_বাম(state) : 0;
       updatecursor(state, &oldpos, 1);
     }
-    break;
+    ভঙ্গ;
 
-  case 7:
+  পক্ষ 7:
     state->mode.autowrap = val;
-    break;
+    ভঙ্গ;
 
-  case 12:
+  পক্ষ 12:
     settermprop_bool(state, VTERM_PROP_CURSORBLINK, val);
-    break;
+    ভঙ্গ;
 
-  case 25:
+  পক্ষ 25:
     settermprop_bool(state, VTERM_PROP_CURSORVISIBLE, val);
-    break;
+    ভঙ্গ;
 
-  case 69: // DECVSSM - vertical split screen mode
+  পক্ষ 69: // DECVSSM - vertical split screen mode
            // DECLRMM - left/right margin mode
     state->mode.leftrightmargin = val;
-    if(val) {
-      int row;
+    যদি(val) {
+      পূর্ণাঙ্ক row;
 
       // Setting DECVSSM must clear doublewidth/doubleheight state of every line
-      for(row = 0; row < state->rows; row++)
+      বাবে(row = 0; row < state->rows; row++)
         set_lineinfo(state, row, FORCE, DWL_OFF, DHL_OFF);
     }
 
-    break;
+    ভঙ্গ;
 
-  case 1000:
-  case 1002:
-  case 1003:
+  পক্ষ 1000:
+  পক্ষ 1002:
+  পক্ষ 1003:
     settermprop_int(state, VTERM_PROP_MOUSE,
         !val          ? VTERM_PROP_MOUSE_NONE  :
-        (num == 1000) ? VTERM_PROP_MOUSE_CLICK :
-        (num == 1002) ? VTERM_PROP_MOUSE_DRAG  :
+        (অঙ্ক == 1000) ? VTERM_PROP_MOUSE_CLICK :
+        (অঙ্ক == 1002) ? VTERM_PROP_MOUSE_DRAG  :
                         VTERM_PROP_MOUSE_MOVE);
-    break;
+    ভঙ্গ;
 
-  case 1004:
+  পক্ষ 1004:
     settermprop_bool(state, VTERM_PROP_FOCUSREPORT, val);
     state->mode.report_focus = val;
-    break;
+    ভঙ্গ;
 
-  case 1005:
+  পক্ষ 1005:
     state->mouse_protocol = val ? MOUSE_UTF8 : MOUSE_X10;
-    break;
+    ভঙ্গ;
 
-  case 1006:
+  পক্ষ 1006:
     state->mouse_protocol = val ? MOUSE_SGR : MOUSE_X10;
-    break;
+    ভঙ্গ;
 
-  case 1015:
+  পক্ষ 1015:
     state->mouse_protocol = val ? MOUSE_RXVT : MOUSE_X10;
-    break;
+    ভঙ্গ;
 
-  case 1047:
+  পক্ষ 1047:
     settermprop_bool(state, VTERM_PROP_ALTSCREEN, val);
-    break;
+    ভঙ্গ;
 
-  case 1048:
+  পক্ষ 1048:
     savecursor(state, val);
-    break;
+    ভঙ্গ;
 
-  case 1049:
+  পক্ষ 1049:
     settermprop_bool(state, VTERM_PROP_ALTSCREEN, val);
     savecursor(state, val);
-    break;
+    ভঙ্গ;
 
-  case 2004:
+  পক্ষ 2004:
     state->mode.bracketpaste = val;
-    break;
+    ভঙ্গ;
 
-  default:
-    DEBUG_LOG1("libvterm: Unknown DEC mode %d\n", num);
-    return;
+  স্ৱভাৱ:
+    DEBUG_LOG1("libvterm: Unknown DEC mode %d\n", অঙ্ক);
+    ঘূৰাই;
   }
 }
 
-static void request_dec_mode(VTermState *state, int num)
+স্থির শূন্য request_dec_mode(VTermState *state, পূর্ণাঙ্ক অঙ্ক)
 {
-  int reply;
+  পূর্ণাঙ্ক reply;
 
-  switch(num) {
-    case 1:
+  ৱিকল্প(অঙ্ক) {
+    পক্ষ 1:
       reply = state->mode.cursor;
-      break;
+      ভঙ্গ;
 
-    case 5:
+    পক্ষ 5:
       reply = state->mode.screen;
-      break;
+      ভঙ্গ;
 
-    case 6:
+    পক্ষ 6:
       reply = state->mode.origin;
-      break;
+      ভঙ্গ;
 
-    case 7:
+    পক্ষ 7:
       reply = state->mode.autowrap;
-      break;
+      ভঙ্গ;
 
-    case 12:
+    পক্ষ 12:
       reply = state->mode.cursor_blink;
-      break;
+      ভঙ্গ;
 
-    case 25:
+    পক্ষ 25:
       reply = state->mode.cursor_visible;
-      break;
+      ভঙ্গ;
 
-    case 69:
+    পক্ষ 69:
       reply = state->mode.leftrightmargin;
-      break;
+      ভঙ্গ;
 
-    case 1000:
+    পক্ষ 1000:
       reply = state->mouse_flags == MOUSE_WANT_CLICK;
-      break;
+      ভঙ্গ;
 
-    case 1002:
+    পক্ষ 1002:
       reply = state->mouse_flags == (MOUSE_WANT_CLICK|MOUSE_WANT_DRAG);
-      break;
+      ভঙ্গ;
 
-    case 1003:
+    পক্ষ 1003:
       reply = state->mouse_flags == (MOUSE_WANT_CLICK|MOUSE_WANT_MOVE);
-      break;
+      ভঙ্গ;
 
-    case 1004:
+    পক্ষ 1004:
       reply = state->mode.report_focus;
-      break;
+      ভঙ্গ;
 
-    case 1005:
+    পক্ষ 1005:
       reply = state->mouse_protocol == MOUSE_UTF8;
-      break;
+      ভঙ্গ;
 
-    case 1006:
+    পক্ষ 1006:
       reply = state->mouse_protocol == MOUSE_SGR;
-      break;
+      ভঙ্গ;
 
-    case 1015:
+    পক্ষ 1015:
       reply = state->mouse_protocol == MOUSE_RXVT;
-      break;
+      ভঙ্গ;
 
-    case 1047:
+    পক্ষ 1047:
       reply = state->mode.alt_screen;
-      break;
+      ভঙ্গ;
 
-    case 2004:
+    পক্ষ 2004:
       reply = state->mode.bracketpaste;
-      break;
+      ভঙ্গ;
 
-    default:
-      vterm_push_output_sprintf_ctrl(state->vt, C1_CSI, "?%d;%d$y", num, 0);
-      return;
+    স্ৱভাৱ:
+      vterm_ঠেলো_output_sprintf_ctrl(state->vt, C1_CSI, "?%d;%d$y", অঙ্ক, 0);
+      ঘূৰাই;
   }
 
-  vterm_push_output_sprintf_ctrl(state->vt, C1_CSI, "?%d;%d$y", num, reply ? 1 : 2);
+  vterm_ঠেলো_output_sprintf_ctrl(state->vt, C1_CSI, "?%d;%d$y", অঙ্ক, reply ? 1 : 2);
 }
 
-static void request_version_string(VTermState *state)
+স্থির শূন্য request_version_string(VTermState *state)
 {
-  vterm_push_output_sprintf_str(state->vt, C1_DCS, TRUE, ">|libvterm(%d.%d)",
+  vterm_ঠেলো_output_sprintf_str(state->vt, C1_DCS, TRUE, ">|libvterm(%d.%d)",
       VTERM_VERSION_MAJOR, VTERM_VERSION_MINOR);
 }
 
-static int on_csi(const char *leader, const long args[], int argcount, const char *intermed, char command, void *user)
+স্থির পূর্ণাঙ্ক on_csi(ধ্রুৱ ৱর্ণ *leader, ধ্রুৱ long args[], পূর্ণাঙ্ক argcount, ধ্রুৱ ৱর্ণ *intermed, ৱর্ণ command, শূন্য *user)
 {
   VTermState *state = user;
-  int leader_byte = 0;
-  int intermed_byte = 0;
-  int cancel_phantom = 1;
+  পূর্ণাঙ্ক leader_byte = 0;
+  পূর্ণাঙ্ক intermed_byte = 0;
+  পূর্ণাঙ্ক cancel_phantom = 1;
   VTermPos oldpos = state->pos;
-  int handled = 1;
+  পূর্ণাঙ্ক handled = 1;
 
   // Some temporaries for later code
-  int count, val;
-  int row, col;
+  পূর্ণাঙ্ক গুনতি, val;
+  পূর্ণাঙ্ক row, col;
   VTermRect rect;
-  int selective;
+  পূর্ণাঙ্ক selective;
 
-  if(leader && leader[0]) {
-    if(leader[1]) // longer than 1 char
-      return 0;
+  যদি(leader && leader[0]) {
+    যদি(leader[1]) // longer than 1 char
+      ঘূৰাই 0;
 
-    switch(leader[0]) {
-    case '?':
-    case '>':
-    case '<':
+    ৱিকল্প(leader[0]) {
+    পক্ষ '?':
+    পক্ষ '>':
+    পক্ষ '<':
       leader_byte = leader[0];
-      break;
-    default:
-      return 0;
+      ভঙ্গ;
+    স্ৱভাৱ:
+      ঘূৰাই 0;
     }
   }
 
-  if(intermed && intermed[0]) {
-    if(intermed[1]) // longer than 1 char
-      return 0;
+  যদি(intermed && intermed[0]) {
+    যদি(intermed[1]) // longer than 1 char
+      ঘূৰাই 0;
 
-    switch(intermed[0]) {
-    case ' ':
-    case '!':
-    case '"':
-    case '$':
-    case '\'':
+    ৱিকল্প(intermed[0]) {
+    পক্ষ ' ':
+    পক্ষ '!':
+    পক্ষ '"':
+    পক্ষ '$':
+    পক্ষ '\'':
       intermed_byte = intermed[0];
-      break;
-    default:
-      return 0;
+      ভঙ্গ;
+    স্ৱভাৱ:
+      ঘূৰাই 0;
     }
   }
 
   oldpos = state->pos;
 
-#define LBOUND(v,min) if((v) < (min)) (v) = (min)
-#define UBOUND(v,max) if((v) > (max)) (v) = (max)
+#define LBOUND(v,min) যদি((v) < (min)) (v) = (min)
+#define UBOUND(v,max) যদি((v) > (max)) (v) = (max)
 
 #define LEADER(l,b) ((l << 8) | b)
 #define INTERMED(i,b) ((i << 16) | b)
 
-  switch(intermed_byte << 16 | leader_byte << 8 | command) {
-  case 0x40: // ICH - ECMA-48 8.3.64
-    count = CSI_ARG_COUNT(args[0]);
+  ৱিকল্প(intermed_byte << 16 | leader_byte << 8 | command) {
+  পক্ষ 0x40: // ICH - ECMA-48 8.3.64
+    গুনতি = CSI_ARG_গুনতি(args[0]);
 
-    if(!is_cursor_in_scrollregion(state))
-      break;
+    যদি(!is_cursor_in_scrollregion(state))
+      ভঙ্গ;
 
     rect.start_row = state->pos.row;
     rect.end_row   = state->pos.row + 1;
     rect.start_col = state->pos.col;
-    if(state->mode.leftrightmargin)
-      rect.end_col = SCROLLREGION_RIGHT(state);
-    else
+    যদি(state->mode.leftrightmargin)
+      rect.end_col = SCROLLREGION_ডান(state);
+    অন্যথা
       rect.end_col = THISROWWIDTH(state);
 
-    scroll(state, rect, 0, -count);
+    scroll(state, rect, 0, -গুনতি);
 
-    break;
+    ভঙ্গ;
 
-  case 0x41: // CUU - ECMA-48 8.3.22
-    count = CSI_ARG_COUNT(args[0]);
-    state->pos.row -= count;
+  পক্ষ 0x41: // CUU - ECMA-48 8.3.22
+    গুনতি = CSI_ARG_গুনতি(args[0]);
+    state->pos.row -= গুনতি;
     state->at_phantom = 0;
-    break;
+    ভঙ্গ;
 
-  case 0x42: // CUD - ECMA-48 8.3.19
-    count = CSI_ARG_COUNT(args[0]);
-    state->pos.row += count;
+  পক্ষ 0x42: // CUD - ECMA-48 8.3.19
+    গুনতি = CSI_ARG_গুনতি(args[0]);
+    state->pos.row += গুনতি;
     state->at_phantom = 0;
-    break;
+    ভঙ্গ;
 
-  case 0x43: // CUF - ECMA-48 8.3.20
-    count = CSI_ARG_COUNT(args[0]);
-    state->pos.col += count;
+  পক্ষ 0x43: // CUF - ECMA-48 8.3.20
+    গুনতি = CSI_ARG_গুনতি(args[0]);
+    state->pos.col += গুনতি;
     state->at_phantom = 0;
-    break;
+    ভঙ্গ;
 
-  case 0x44: // CUB - ECMA-48 8.3.18
-    count = CSI_ARG_COUNT(args[0]);
-    state->pos.col -= count;
+  পক্ষ 0x44: // CUB - ECMA-48 8.3.18
+    গুনতি = CSI_ARG_গুনতি(args[0]);
+    state->pos.col -= গুনতি;
     state->at_phantom = 0;
-    break;
+    ভঙ্গ;
 
-  case 0x45: // CNL - ECMA-48 8.3.12
-    count = CSI_ARG_COUNT(args[0]);
+  পক্ষ 0x45: // CNL - ECMA-48 8.3.12
+    গুনতি = CSI_ARG_গুনতি(args[0]);
     state->pos.col = 0;
-    state->pos.row += count;
+    state->pos.row += গুনতি;
     state->at_phantom = 0;
-    break;
+    ভঙ্গ;
 
-  case 0x46: // CPL - ECMA-48 8.3.13
-    count = CSI_ARG_COUNT(args[0]);
+  পক্ষ 0x46: // CPL - ECMA-48 8.3.13
+    গুনতি = CSI_ARG_গুনতি(args[0]);
     state->pos.col = 0;
-    state->pos.row -= count;
+    state->pos.row -= গুনতি;
     state->at_phantom = 0;
-    break;
+    ভঙ্গ;
 
-  case 0x47: // CHA - ECMA-48 8.3.9
+  পক্ষ 0x47: // CHA - ECMA-48 8.3.9
     val = CSI_ARG_OR(args[0], 1);
     state->pos.col = val-1;
     state->at_phantom = 0;
-    break;
+    ভঙ্গ;
 
-  case 0x48: // CUP - ECMA-48 8.3.21
+  পক্ষ 0x48: // CUP - ECMA-48 8.3.21
     row = CSI_ARG_OR(args[0], 1);
     col = argcount < 2 || CSI_ARG_IS_MISSING(args[1]) ? 1 : CSI_ARG(args[1]);
     // zero-based
-    if(vterm_get_special_pty_type() == 2) {
+    যদি(vterm_get_special_pty_type() == 2) {
       // Fix a sequence that is not correct right now
-      if(state->pos.row == row - 1) {
-        int cnt, ptr = 0;
-        for(cnt = 0; cnt < col - 1; ++cnt) {
+      যদি(state->pos.row == row - 1) {
+        পূর্ণাঙ্ক cnt, ptr = 0;
+        বাবে(cnt = 0; cnt < col - 1; ++cnt) {
 	  VTermPos p;
 	  VTermScreenCell c0, c1;
 	  p.row = row - 1;
@@ -1143,581 +1143,581 @@ static int on_csi(const char *leader, const long args[], int argcount, const cha
     }
     state->pos.row = row-1;
     state->pos.col = col-1;
-    if(state->mode.origin) {
-      state->pos.row += state->scrollregion_top;
-      state->pos.col += SCROLLREGION_LEFT(state);
+    যদি(state->mode.origin) {
+      state->pos.row += state->scrollregion_শীৰ্ষ;
+      state->pos.col += SCROLLREGION_বাম(state);
     }
     state->at_phantom = 0;
-    break;
+    ভঙ্গ;
 
-  case 0x49: // CHT - ECMA-48 8.3.10
-    count = CSI_ARG_COUNT(args[0]);
-    tab(state, count, +1);
-    break;
+  পক্ষ 0x49: // CHT - ECMA-48 8.3.10
+    গুনতি = CSI_ARG_গুনতি(args[0]);
+    tab(state, গুনতি, +1);
+    ভঙ্গ;
 
-  case 0x4a: // ED - ECMA-48 8.3.39
-  case LEADER('?', 0x4a): // DECSED - Selective Erase in Display
+  পক্ষ 0x4a: // ED - ECMA-48 8.3.39
+  পক্ষ LEADER('?', 0x4a): // DECSED - Selective Erase in Display
     selective = (leader_byte == '?');
-    switch(CSI_ARG(args[0])) {
-    case CSI_ARG_MISSING:
-    case 0:
+    ৱিকল্প(CSI_ARG(args[0])) {
+    পক্ষ CSI_ARG_MISSING:
+    পক্ষ 0:
       rect.start_row = state->pos.row; rect.end_row = state->pos.row + 1;
       rect.start_col = state->pos.col; rect.end_col = state->cols;
-      if(rect.end_col > rect.start_col)
+      যদি(rect.end_col > rect.start_col)
         erase(state, rect, selective);
 
       rect.start_row = state->pos.row + 1; rect.end_row = state->rows;
       rect.start_col = 0;
-      for(row = rect.start_row; row < rect.end_row; row++)
+      বাবে(row = rect.start_row; row < rect.end_row; row++)
 	set_lineinfo(state, row, FORCE, DWL_OFF, DHL_OFF);
-      if(rect.end_row > rect.start_row)
+      যদি(rect.end_row > rect.start_row)
         erase(state, rect, selective);
-      break;
+      ভঙ্গ;
 
-    case 1:
+    পক্ষ 1:
       rect.start_row = 0; rect.end_row = state->pos.row;
       rect.start_col = 0; rect.end_col = state->cols;
-      for(row = rect.start_row; row < rect.end_row; row++)
+      বাবে(row = rect.start_row; row < rect.end_row; row++)
 	set_lineinfo(state, row, FORCE, DWL_OFF, DHL_OFF);
-      if(rect.end_col > rect.start_col)
+      যদি(rect.end_col > rect.start_col)
         erase(state, rect, selective);
 
       rect.start_row = state->pos.row; rect.end_row = state->pos.row + 1;
                           rect.end_col = state->pos.col + 1;
-      if(rect.end_row > rect.start_row)
+      যদি(rect.end_row > rect.start_row)
         erase(state, rect, selective);
-      break;
+      ভঙ্গ;
 
-    case 2:
+    পক্ষ 2:
       rect.start_row = 0; rect.end_row = state->rows;
       rect.start_col = 0; rect.end_col = state->cols;
-      for(row = rect.start_row; row < rect.end_row; row++)
+      বাবে(row = rect.start_row; row < rect.end_row; row++)
 	set_lineinfo(state, row, FORCE, DWL_OFF, DHL_OFF);
       erase(state, rect, selective);
-      break;
+      ভঙ্গ;
 
-    case 3:
-      if(state->callbacks && state->callbacks->sb_clear)
-        if((*state->callbacks->sb_clear)(state->cbdata))
-          return 1;
-      break;
+    পক্ষ 3:
+      যদি(state->callbacks && state->callbacks->sb_clear)
+        যদি((*state->callbacks->sb_clear)(state->cbdata))
+          ঘূৰাই 1;
+      ভঙ্গ;
     }
-    break;
+    ভঙ্গ;
 
-  case 0x4b: // EL - ECMA-48 8.3.41
-  case LEADER('?', 0x4b): // DECSEL - Selective Erase in Line
+  পক্ষ 0x4b: // EL - ECMA-48 8.3.41
+  পক্ষ LEADER('?', 0x4b): // DECSEL - Selective Erase in Line
     selective = (leader_byte == '?');
     rect.start_row = state->pos.row;
     rect.end_row   = state->pos.row + 1;
 
-    switch(CSI_ARG(args[0])) {
-    case CSI_ARG_MISSING:
-    case 0:
-      rect.start_col = state->pos.col; rect.end_col = THISROWWIDTH(state); break;
-    case 1:
-      rect.start_col = 0; rect.end_col = state->pos.col + 1; break;
-    case 2:
-      rect.start_col = 0; rect.end_col = THISROWWIDTH(state); break;
-    default:
-      return 0;
+    ৱিকল্প(CSI_ARG(args[0])) {
+    পক্ষ CSI_ARG_MISSING:
+    পক্ষ 0:
+      rect.start_col = state->pos.col; rect.end_col = THISROWWIDTH(state); ভঙ্গ;
+    পক্ষ 1:
+      rect.start_col = 0; rect.end_col = state->pos.col + 1; ভঙ্গ;
+    পক্ষ 2:
+      rect.start_col = 0; rect.end_col = THISROWWIDTH(state); ভঙ্গ;
+    স্ৱভাৱ:
+      ঘূৰাই 0;
     }
 
-    if(rect.end_col > rect.start_col)
+    যদি(rect.end_col > rect.start_col)
       erase(state, rect, selective);
 
-    break;
+    ভঙ্গ;
 
-  case 0x4c: // IL - ECMA-48 8.3.67
-    count = CSI_ARG_COUNT(args[0]);
+  পক্ষ 0x4c: // IL - ECMA-48 8.3.67
+    গুনতি = CSI_ARG_গুনতি(args[0]);
 
-    if(!is_cursor_in_scrollregion(state))
-      break;
-
-    rect.start_row = state->pos.row;
-    rect.end_row   = SCROLLREGION_BOTTOM(state);
-    rect.start_col = SCROLLREGION_LEFT(state);
-    rect.end_col   = SCROLLREGION_RIGHT(state);
-
-    scroll(state, rect, -count, 0);
-
-    break;
-
-  case 0x4d: // DL - ECMA-48 8.3.32
-    count = CSI_ARG_COUNT(args[0]);
-
-    if(!is_cursor_in_scrollregion(state))
-      break;
+    যদি(!is_cursor_in_scrollregion(state))
+      ভঙ্গ;
 
     rect.start_row = state->pos.row;
     rect.end_row   = SCROLLREGION_BOTTOM(state);
-    rect.start_col = SCROLLREGION_LEFT(state);
-    rect.end_col   = SCROLLREGION_RIGHT(state);
+    rect.start_col = SCROLLREGION_বাম(state);
+    rect.end_col   = SCROLLREGION_ডান(state);
 
-    scroll(state, rect, count, 0);
+    scroll(state, rect, -গুনতি, 0);
 
-    break;
+    ভঙ্গ;
 
-  case 0x50: // DCH - ECMA-48 8.3.26
-    count = CSI_ARG_COUNT(args[0]);
+  পক্ষ 0x4d: // DL - ECMA-48 8.3.32
+    গুনতি = CSI_ARG_গুনতি(args[0]);
 
-    if(!is_cursor_in_scrollregion(state))
-      break;
+    যদি(!is_cursor_in_scrollregion(state))
+      ভঙ্গ;
+
+    rect.start_row = state->pos.row;
+    rect.end_row   = SCROLLREGION_BOTTOM(state);
+    rect.start_col = SCROLLREGION_বাম(state);
+    rect.end_col   = SCROLLREGION_ডান(state);
+
+    scroll(state, rect, গুনতি, 0);
+
+    ভঙ্গ;
+
+  পক্ষ 0x50: // DCH - ECMA-48 8.3.26
+    গুনতি = CSI_ARG_গুনতি(args[0]);
+
+    যদি(!is_cursor_in_scrollregion(state))
+      ভঙ্গ;
 
     rect.start_row = state->pos.row;
     rect.end_row   = state->pos.row + 1;
     rect.start_col = state->pos.col;
-    if(state->mode.leftrightmargin)
-      rect.end_col = SCROLLREGION_RIGHT(state);
-    else
+    যদি(state->mode.leftrightmargin)
+      rect.end_col = SCROLLREGION_ডান(state);
+    অন্যথা
       rect.end_col = THISROWWIDTH(state);
 
-    scroll(state, rect, 0, count);
+    scroll(state, rect, 0, গুনতি);
 
-    break;
+    ভঙ্গ;
 
-  case 0x53: // SU - ECMA-48 8.3.147
-    count = CSI_ARG_COUNT(args[0]);
+  পক্ষ 0x53: // SU - ECMA-48 8.3.147
+    গুনতি = CSI_ARG_গুনতি(args[0]);
 
-    rect.start_row = state->scrollregion_top;
+    rect.start_row = state->scrollregion_শীৰ্ষ;
     rect.end_row   = SCROLLREGION_BOTTOM(state);
-    rect.start_col = SCROLLREGION_LEFT(state);
-    rect.end_col   = SCROLLREGION_RIGHT(state);
+    rect.start_col = SCROLLREGION_বাম(state);
+    rect.end_col   = SCROLLREGION_ডান(state);
 
-    scroll(state, rect, count, 0);
+    scroll(state, rect, গুনতি, 0);
 
-    break;
+    ভঙ্গ;
 
-  case 0x54: // SD - ECMA-48 8.3.113
-    count = CSI_ARG_COUNT(args[0]);
+  পক্ষ 0x54: // SD - ECMA-48 8.3.113
+    গুনতি = CSI_ARG_গুনতি(args[0]);
 
-    rect.start_row = state->scrollregion_top;
+    rect.start_row = state->scrollregion_শীৰ্ষ;
     rect.end_row   = SCROLLREGION_BOTTOM(state);
-    rect.start_col = SCROLLREGION_LEFT(state);
-    rect.end_col   = SCROLLREGION_RIGHT(state);
+    rect.start_col = SCROLLREGION_বাম(state);
+    rect.end_col   = SCROLLREGION_ডান(state);
 
-    scroll(state, rect, -count, 0);
+    scroll(state, rect, -গুনতি, 0);
 
-    break;
+    ভঙ্গ;
 
-  case 0x58: // ECH - ECMA-48 8.3.38
-    count = CSI_ARG_COUNT(args[0]);
+  পক্ষ 0x58: // ECH - ECMA-48 8.3.38
+    গুনতি = CSI_ARG_গুনতি(args[0]);
 
     rect.start_row = state->pos.row;
     rect.end_row   = state->pos.row + 1;
     rect.start_col = state->pos.col;
-    rect.end_col   = state->pos.col + count;
+    rect.end_col   = state->pos.col + গুনতি;
     UBOUND(rect.end_col, THISROWWIDTH(state));
 
     erase(state, rect, 0);
-    break;
+    ভঙ্গ;
 
-  case 0x5a: // CBT - ECMA-48 8.3.7
-    count = CSI_ARG_COUNT(args[0]);
-    tab(state, count, -1);
-    break;
+  পক্ষ 0x5a: // CBT - ECMA-48 8.3.7
+    গুনতি = CSI_ARG_গুনতি(args[0]);
+    tab(state, গুনতি, -1);
+    ভঙ্গ;
 
-  case 0x60: // HPA - ECMA-48 8.3.57
+  পক্ষ 0x60: // HPA - ECMA-48 8.3.57
     col = CSI_ARG_OR(args[0], 1);
     state->pos.col = col-1;
     state->at_phantom = 0;
-    break;
+    ভঙ্গ;
 
-  case 0x61: // HPR - ECMA-48 8.3.59
-    count = CSI_ARG_COUNT(args[0]);
-    state->pos.col += count;
+  পক্ষ 0x61: // HPR - ECMA-48 8.3.59
+    গুনতি = CSI_ARG_গুনতি(args[0]);
+    state->pos.col += গুনতি;
     state->at_phantom = 0;
-    break;
+    ভঙ্গ;
 
-  case 0x62: { // REP - ECMA-48 8.3.103
-    const int row_width = THISROWWIDTH(state);
+  পক্ষ 0x62: { // REP - ECMA-48 8.3.103
+    ধ্রুৱ পূর্ণাঙ্ক row_width = THISROWWIDTH(state);
 
     // ECMA-48 repeats the preceding graphic character; when none was
     // printed yet "combine_width" is zero and the loop below would never
     // advance the cursor.  Ignore the control then, like xterm does.
-    if(state->combine_width < 1)
-      break;
+    যদি(state->combine_width < 1)
+      ভঙ্গ;
 
-    count = CSI_ARG_COUNT(args[0]);
-    col = state->pos.col + count;
+    গুনতি = CSI_ARG_গুনতি(args[0]);
+    col = state->pos.col + গুনতি;
     UBOUND(col, row_width);
-    while (state->pos.col < col) {
+    যেতিয়ালৈ (state->pos.col < col) {
       putglyph(state, state->combine_chars, state->combine_width, state->pos);
       state->pos.col += state->combine_width;
     }
-    if (state->pos.col + state->combine_width >= row_width) {
-      if (state->mode.autowrap) {
+    যদি (state->pos.col + state->combine_width >= row_width) {
+      যদি (state->mode.autowrap) {
         state->at_phantom = 1;
         cancel_phantom = 0;
       }
     }
-    break;
+    ভঙ্গ;
   }
 
-  case 0x63: // DA - ECMA-48 8.3.24
+  পক্ষ 0x63: // DA - ECMA-48 8.3.24
     val = CSI_ARG_OR(args[0], 0);
-    if(val == 0)
+    যদি(val == 0)
       // DEC VT100 response
-      vterm_push_output_sprintf_ctrl(state->vt, C1_CSI, "?1;2c");
-    break;
+      vterm_ঠেলো_output_sprintf_ctrl(state->vt, C1_CSI, "?1;2c");
+    ভঙ্গ;
 
-  case LEADER('>', 0x63): // DEC secondary Device Attributes
+  পক্ষ LEADER('>', 0x63): // DEC secondary Device Attributes
     // This returns xterm version number 100.
-    vterm_push_output_sprintf_ctrl(state->vt, C1_CSI, ">%d;%d;%dc", 0, 100, 0);
-    break;
+    vterm_ঠেলো_output_sprintf_ctrl(state->vt, C1_CSI, ">%d;%d;%dc", 0, 100, 0);
+    ভঙ্গ;
 
-  case 0x64: // VPA - ECMA-48 8.3.158
+  পক্ষ 0x64: // VPA - ECMA-48 8.3.158
     row = CSI_ARG_OR(args[0], 1);
     state->pos.row = row-1;
-    if(state->mode.origin)
-      state->pos.row += state->scrollregion_top;
+    যদি(state->mode.origin)
+      state->pos.row += state->scrollregion_শীৰ্ষ;
     state->at_phantom = 0;
-    break;
+    ভঙ্গ;
 
-  case 0x65: // VPR - ECMA-48 8.3.160
-    count = CSI_ARG_COUNT(args[0]);
-    state->pos.row += count;
+  পক্ষ 0x65: // VPR - ECMA-48 8.3.160
+    গুনতি = CSI_ARG_গুনতি(args[0]);
+    state->pos.row += গুনতি;
     state->at_phantom = 0;
-    break;
+    ভঙ্গ;
 
-  case 0x66: // HVP - ECMA-48 8.3.63
+  পক্ষ 0x66: // HVP - ECMA-48 8.3.63
     row = CSI_ARG_OR(args[0], 1);
     col = argcount < 2 || CSI_ARG_IS_MISSING(args[1]) ? 1 : CSI_ARG(args[1]);
     // zero-based
     state->pos.row = row-1;
     state->pos.col = col-1;
-    if(state->mode.origin) {
-      state->pos.row += state->scrollregion_top;
-      state->pos.col += SCROLLREGION_LEFT(state);
+    যদি(state->mode.origin) {
+      state->pos.row += state->scrollregion_শীৰ্ষ;
+      state->pos.col += SCROLLREGION_বাম(state);
     }
     state->at_phantom = 0;
-    break;
+    ভঙ্গ;
 
-  case 0x67: // TBC - ECMA-48 8.3.154
+  পক্ষ 0x67: // TBC - ECMA-48 8.3.154
     val = CSI_ARG_OR(args[0], 0);
 
-    switch(val) {
-    case 0:
+    ৱিকল্প(val) {
+    পক্ষ 0:
       clear_col_tabstop(state, state->pos.col);
-      break;
-    case 3:
-    case 5:
-      for(col = 0; col < state->cols; col++)
+      ভঙ্গ;
+    পক্ষ 3:
+    পক্ষ 5:
+      বাবে(col = 0; col < state->cols; col++)
         clear_col_tabstop(state, col);
-      break;
-    case 1:
-    case 2:
-    case 4:
-      break;
+      ভঙ্গ;
+    পক্ষ 1:
+    পক্ষ 2:
+    পক্ষ 4:
+      ভঙ্গ;
     /* TODO: 1, 2 and 4 aren't meaningful yet without line tab stops */
-    default:
-      return 0;
+    স্ৱভাৱ:
+      ঘূৰাই 0;
     }
-    break;
+    ভঙ্গ;
 
-  case 0x68: // SM - ECMA-48 8.3.125
-    if(!CSI_ARG_IS_MISSING(args[0]))
+  পক্ষ 0x68: // SM - ECMA-48 8.3.125
+    যদি(!CSI_ARG_IS_MISSING(args[0]))
       set_mode(state, CSI_ARG(args[0]), 1);
-    break;
+    ভঙ্গ;
 
-  case LEADER('?', 0x68): // DEC private mode set
-    for(int i = 0; i < argcount; i++) {
-      if(!CSI_ARG_IS_MISSING(args[i]))
+  পক্ষ LEADER('?', 0x68): // DEC private mode set
+    বাবে(পূর্ণাঙ্ক i = 0; i < argcount; i++) {
+      যদি(!CSI_ARG_IS_MISSING(args[i]))
         set_dec_mode(state, CSI_ARG(args[i]), 1);
     }
-    break;
+    ভঙ্গ;
 
-  case 0x6a: // HPB - ECMA-48 8.3.58
-    count = CSI_ARG_COUNT(args[0]);
-    state->pos.col -= count;
+  পক্ষ 0x6a: // HPB - ECMA-48 8.3.58
+    গুনতি = CSI_ARG_গুনতি(args[0]);
+    state->pos.col -= গুনতি;
     state->at_phantom = 0;
-    break;
+    ভঙ্গ;
 
-  case 0x6b: // VPB - ECMA-48 8.3.159
-    count = CSI_ARG_COUNT(args[0]);
-    state->pos.row -= count;
+  পক্ষ 0x6b: // VPB - ECMA-48 8.3.159
+    গুনতি = CSI_ARG_গুনতি(args[0]);
+    state->pos.row -= গুনতি;
     state->at_phantom = 0;
-    break;
+    ভঙ্গ;
 
-  case 0x6c: // RM - ECMA-48 8.3.106
-    if(!CSI_ARG_IS_MISSING(args[0]))
+  পক্ষ 0x6c: // RM - ECMA-48 8.3.106
+    যদি(!CSI_ARG_IS_MISSING(args[0]))
       set_mode(state, CSI_ARG(args[0]), 0);
-    break;
+    ভঙ্গ;
 
-  case LEADER('?', 0x6c): // DEC private mode reset
-    for(int i = 0; i < argcount; i++) {
-      if(!CSI_ARG_IS_MISSING(args[i]))
+  পক্ষ LEADER('?', 0x6c): // DEC private mode reset
+    বাবে(পূর্ণাঙ্ক i = 0; i < argcount; i++) {
+      যদি(!CSI_ARG_IS_MISSING(args[i]))
         set_dec_mode(state, CSI_ARG(args[i]), 0);
     }
-    break;
+    ভঙ্গ;
 
-  case 0x6d: // SGR - ECMA-48 8.3.117
+  পক্ষ 0x6d: // SGR - ECMA-48 8.3.117
     vterm_state_setpen(state, args, argcount);
-    break;
+    ভঙ্গ;
 
-  case LEADER('?', 0x6d): // DECSGR and XTQMODKEYS
+  পক্ষ LEADER('?', 0x6d): // DECSGR and XTQMODKEYS
     // CSI ? 4 m  XTQMODKEYS: request modifyOtherKeys level
-    if (argcount == 1 && CSI_ARG(args[0]) == 4)
+    যদি (argcount == 1 && CSI_ARG(args[0]) == 4)
     {
-      vterm_push_output_sprintf_ctrl(state->vt, C1_CSI, ">4;%dm",
-					state->mode.modify_other_keys ? 2 : 0);
-      break;
+      vterm_ঠেলো_output_sprintf_ctrl(state->vt, C1_CSI, ">4;%dm",
+					state->mode.modify_other_চাবিগুলি ? 2 : 0);
+      ভঙ্গ;
     }
 
     /* No actual DEC terminal recognised these, but some printers did. These
      * are alternative ways to request subscript/superscript/off
      */
-    for(int argi = 0; argi < argcount; argi++) {
+    বাবে(পূর্ণাঙ্ক argi = 0; argi < argcount; argi++) {
       long arg;
-      switch(arg = CSI_ARG(args[argi])) {
-        case 4: // Superscript on
+      ৱিকল্প(arg = CSI_ARG(args[argi])) {
+        পক্ষ 4: // Superscript on
           arg = 73;
           vterm_state_setpen(state, &arg, 1);
-          break;
-        case 5: // Subscript on
+          ভঙ্গ;
+        পক্ষ 5: // Subscript on
           arg = 74;
           vterm_state_setpen(state, &arg, 1);
-          break;
-        case 24: // Super+subscript off
+          ভঙ্গ;
+        পক্ষ 24: // Super+subscript off
           arg = 75;
           vterm_state_setpen(state, &arg, 1);
-          break;
+          ভঙ্গ;
       }
     }
-    break;
+    ভঙ্গ;
 
-  case LEADER('>', 0x6d): // CSI > 4 ; Pv m   xterm resource modifyOtherKeys
-    if (argcount == 2 && CSI_ARG(args[0]) == 4)
+  পক্ষ LEADER('>', 0x6d): // CSI > 4 ; Pv m   xterm resource modifyOtherKeys
+    যদি (argcount == 2 && CSI_ARG(args[0]) == 4)
     {
       // can't have both modify_other_keys and kitty_keyboard
       state->mode.kitty_keyboard = 0;
 
-      state->mode.modify_other_keys = CSI_ARG(args[1]) == 2;
+      state->mode.modify_other_চাবিগুলি = CSI_ARG(args[1]) == 2;
     }
-    break;
+    ভঙ্গ;
 
-  case LEADER('>', 0x75): // CSI > 1 u  enable kitty keyboard protocol
-    if (argcount == 1 && CSI_ARG(args[0]) == 1)
+  পক্ষ LEADER('>', 0x75): // CSI > 1 u  enable kitty keyboard protocol
+    যদি (argcount == 1 && CSI_ARG(args[0]) == 1)
     {
       // can't have both modify_other_keys and kitty_keyboard
-      state->mode.modify_other_keys = 0;
+      state->mode.modify_other_চাবিগুলি = 0;
 
       state->mode.kitty_keyboard = 1;
     }
-    break;
+    ভঙ্গ;
 
-  case LEADER('<', 0x75): // CSI < u  disable kitty keyboard protocol
-    if (argcount <= 1)
+  পক্ষ LEADER('<', 0x75): // CSI < u  disable kitty keyboard protocol
+    যদি (argcount <= 1)
       state->mode.kitty_keyboard = 0;
-    break;
+    ভঙ্গ;
 
-  case LEADER('?', 0x75): // CSI ? u  request kitty keyboard protocol state
-    if (argcount <= 1)
+  পক্ষ LEADER('?', 0x75): // CSI ? u  request kitty keyboard protocol state
+    যদি (argcount <= 1)
       // TODO: this only uses the values zero and one.  The protocol specifies
       // more values, the progressive enhancement flags.
-      vterm_push_output_sprintf_ctrl(state->vt, C1_CSI, "?%du",
+      vterm_ঠেলো_output_sprintf_ctrl(state->vt, C1_CSI, "?%du",
 						   state->mode.kitty_keyboard);
-    break;
+    ভঙ্গ;
 
-  case 0x6e: // DSR - ECMA-48 8.3.35
-  case LEADER('?', 0x6e): // DECDSR
+  পক্ষ 0x6e: // DSR - ECMA-48 8.3.35
+  পক্ষ LEADER('?', 0x6e): // DECDSR
     val = CSI_ARG_OR(args[0], 0);
 
     {
-      char *qmark = (leader_byte == '?') ? "?" : "";
+      ৱর্ণ *qmark = (leader_byte == '?') ? "?" : "";
 
-      switch(val) {
-      case 0: case 1: case 2: case 3: case 4:
+      ৱিকল্প(val) {
+      পক্ষ 0: পক্ষ 1: পক্ষ 2: পক্ষ 3: পক্ষ 4:
         // ignore - these are replies
-        break;
-      case 5:
-        vterm_push_output_sprintf_ctrl(state->vt, C1_CSI, "%s0n", qmark);
-        break;
-      case 6: // CPR - cursor position report
-        vterm_push_output_sprintf_ctrl(state->vt, C1_CSI, "%s%d;%dR", qmark, state->pos.row + 1, state->pos.col + 1);
-        break;
+        ভঙ্গ;
+      পক্ষ 5:
+        vterm_ঠেলো_output_sprintf_ctrl(state->vt, C1_CSI, "%s0n", qmark);
+        ভঙ্গ;
+      পক্ষ 6: // CPR - cursor position report
+        vterm_ঠেলো_output_sprintf_ctrl(state->vt, C1_CSI, "%s%d;%dR", qmark, state->pos.row + 1, state->pos.col + 1);
+        ভঙ্গ;
       }
     }
-    break;
+    ভঙ্গ;
 
 
-  case INTERMED('!', 0x70): // DECSTR - DEC soft terminal reset
+  পক্ষ INTERMED('!', 0x70): // DECSTR - DEC soft terminal reset
     vterm_state_reset(state, 0);
-    break;
+    ভঙ্গ;
 
-  case LEADER('?', INTERMED('$', 0x70)):
+  পক্ষ LEADER('?', INTERMED('$', 0x70)):
     request_dec_mode(state, CSI_ARG(args[0]));
-    break;
+    ভঙ্গ;
 
-  case LEADER('>', 0x71): // XTVERSION - xterm query version string
+  পক্ষ LEADER('>', 0x71): // XTVERSION - xterm query version string
     request_version_string(state);
-    break;
+    ভঙ্গ;
 
-  case INTERMED(' ', 0x71): // DECSCUSR - DEC set cursor shape
+  পক্ষ INTERMED(' ', 0x71): // DECSCUSR - DEC set cursor shape
     val = CSI_ARG_OR(args[0], 1);
 
-    switch(val) {
-    case 0: case 1:
+    ৱিকল্প(val) {
+    পক্ষ 0: পক্ষ 1:
       settermprop_bool(state, VTERM_PROP_CURSORBLINK, 1);
       settermprop_int (state, VTERM_PROP_CURSORSHAPE, VTERM_PROP_CURSORSHAPE_BLOCK);
-      break;
-    case 2:
+      ভঙ্গ;
+    পক্ষ 2:
       settermprop_bool(state, VTERM_PROP_CURSORBLINK, 0);
       settermprop_int (state, VTERM_PROP_CURSORSHAPE, VTERM_PROP_CURSORSHAPE_BLOCK);
-      break;
-    case 3:
+      ভঙ্গ;
+    পক্ষ 3:
       settermprop_bool(state, VTERM_PROP_CURSORBLINK, 1);
       settermprop_int (state, VTERM_PROP_CURSORSHAPE, VTERM_PROP_CURSORSHAPE_UNDERLINE);
-      break;
-    case 4:
+      ভঙ্গ;
+    পক্ষ 4:
       settermprop_bool(state, VTERM_PROP_CURSORBLINK, 0);
       settermprop_int (state, VTERM_PROP_CURSORSHAPE, VTERM_PROP_CURSORSHAPE_UNDERLINE);
-      break;
-    case 5:
+      ভঙ্গ;
+    পক্ষ 5:
       settermprop_bool(state, VTERM_PROP_CURSORBLINK, 1);
-      settermprop_int (state, VTERM_PROP_CURSORSHAPE, VTERM_PROP_CURSORSHAPE_BAR_LEFT);
-      break;
-    case 6:
+      settermprop_int (state, VTERM_PROP_CURSORSHAPE, VTERM_PROP_CURSORSHAPE_BAR_বাম);
+      ভঙ্গ;
+    পক্ষ 6:
       settermprop_bool(state, VTERM_PROP_CURSORBLINK, 0);
-      settermprop_int (state, VTERM_PROP_CURSORSHAPE, VTERM_PROP_CURSORSHAPE_BAR_LEFT);
-      break;
+      settermprop_int (state, VTERM_PROP_CURSORSHAPE, VTERM_PROP_CURSORSHAPE_BAR_বাম);
+      ভঙ্গ;
     }
 
-    break;
+    ভঙ্গ;
 
-  case INTERMED('"', 0x71): // DECSCA - DEC select character protection attribute
+  পক্ষ INTERMED('"', 0x71): // DECSCA - DEC select character protection attribute
     val = CSI_ARG_OR(args[0], 0);
 
-    switch(val) {
-    case 0: case 2:
+    ৱিকল্প(val) {
+    পক্ষ 0: পক্ষ 2:
       state->protected_cell = 0;
-      break;
-    case 1:
+      ভঙ্গ;
+    পক্ষ 1:
       state->protected_cell = 1;
-      break;
+      ভঙ্গ;
     }
 
-    break;
+    ভঙ্গ;
 
-  case 0x72: // DECSTBM - DEC custom
-    state->scrollregion_top = CSI_ARG_OR(args[0], 1) - 1;
+  পক্ষ 0x72: // DECSTBM - DEC custom
+    state->scrollregion_শীৰ্ষ = CSI_ARG_OR(args[0], 1) - 1;
     state->scrollregion_bottom = argcount < 2 || CSI_ARG_IS_MISSING(args[1]) ? -1 : CSI_ARG(args[1]);
-    LBOUND(state->scrollregion_top, 0);
-    UBOUND(state->scrollregion_top, state->rows);
+    LBOUND(state->scrollregion_শীৰ্ষ, 0);
+    UBOUND(state->scrollregion_শীৰ্ষ, state->rows);
     LBOUND(state->scrollregion_bottom, -1);
-    if(state->scrollregion_top == 0 && state->scrollregion_bottom == state->rows)
+    যদি(state->scrollregion_শীৰ্ষ == 0 && state->scrollregion_bottom == state->rows)
       state->scrollregion_bottom = -1;
-    else
+    অন্যথা
       UBOUND(state->scrollregion_bottom, state->rows);
 
-    if(SCROLLREGION_BOTTOM(state) <= state->scrollregion_top) {
+    যদি(SCROLLREGION_BOTTOM(state) <= state->scrollregion_শীৰ্ষ) {
       // Invalid
-      state->scrollregion_top    = 0;
+      state->scrollregion_শীৰ্ষ    = 0;
       state->scrollregion_bottom = -1;
     }
 
     // Setting the scrolling region restores the cursor to the home position
     state->pos.row = 0;
     state->pos.col = 0;
-    if(state->mode.origin) {
-      state->pos.row += state->scrollregion_top;
-      state->pos.col += SCROLLREGION_LEFT(state);
+    যদি(state->mode.origin) {
+      state->pos.row += state->scrollregion_শীৰ্ষ;
+      state->pos.col += SCROLLREGION_বাম(state);
     }
 
-    break;
+    ভঙ্গ;
 
-  case 0x73: // DECSLRM - DEC custom
+  পক্ষ 0x73: // DECSLRM - DEC custom
     // Always allow setting these margins, just they won't take effect without DECVSSM
-    state->scrollregion_left = CSI_ARG_OR(args[0], 1) - 1;
-    state->scrollregion_right = argcount < 2 || CSI_ARG_IS_MISSING(args[1]) ? -1 : CSI_ARG(args[1]);
-    LBOUND(state->scrollregion_left, 0);
-    UBOUND(state->scrollregion_left, state->cols);
-    LBOUND(state->scrollregion_right, -1);
-    if(state->scrollregion_left == 0 && state->scrollregion_right == state->cols)
-      state->scrollregion_right = -1;
-    else
-      UBOUND(state->scrollregion_right, state->cols);
+    state->scrollregion_বাম = CSI_ARG_OR(args[0], 1) - 1;
+    state->scrollregion_ডান = argcount < 2 || CSI_ARG_IS_MISSING(args[1]) ? -1 : CSI_ARG(args[1]);
+    LBOUND(state->scrollregion_বাম, 0);
+    UBOUND(state->scrollregion_বাম, state->cols);
+    LBOUND(state->scrollregion_ডান, -1);
+    যদি(state->scrollregion_বাম == 0 && state->scrollregion_ডান == state->cols)
+      state->scrollregion_ডান = -1;
+    অন্যথা
+      UBOUND(state->scrollregion_ডান, state->cols);
 
-    if(state->scrollregion_right > -1 &&
-       state->scrollregion_right <= state->scrollregion_left) {
+    যদি(state->scrollregion_ডান > -1 &&
+       state->scrollregion_ডান <= state->scrollregion_বাম) {
       // Invalid
-      state->scrollregion_left  = 0;
-      state->scrollregion_right = -1;
+      state->scrollregion_বাম  = 0;
+      state->scrollregion_ডান = -1;
     }
 
     // Setting the scrolling region restores the cursor to the home position
     state->pos.row = 0;
     state->pos.col = 0;
-    if(state->mode.origin) {
-      state->pos.row += state->scrollregion_top;
-      state->pos.col += SCROLLREGION_LEFT(state);
+    যদি(state->mode.origin) {
+      state->pos.row += state->scrollregion_শীৰ্ষ;
+      state->pos.col += SCROLLREGION_বাম(state);
     }
 
-    break;
+    ভঙ্গ;
 
-  case 0x74:
-    switch(CSI_ARG(args[0])) {
-      case 8: // CSI 8 ; rows ; cols t  set size
-        if (argcount == 3 &&
+  পক্ষ 0x74:
+    ৱিকল্প(CSI_ARG(args[0])) {
+      পক্ষ 8: // CSI 8 ; rows ; cols t  set size
+        যদি (argcount == 3 &&
             !CSI_ARG_IS_MISSING(args[1]) && !CSI_ARG_IS_MISSING(args[2]) &&
             CSI_ARG(args[1]) > 0 && CSI_ARG(args[2]) > 0)
 	  on_resize(CSI_ARG(args[1]), CSI_ARG(args[2]), state);
-	break;
-      default:
+	ভঙ্গ;
+      স্ৱভাৱ:
 	handled = 0;
-	break;
+	ভঙ্গ;
     }
-    break;
+    ভঙ্গ;
 
-  case INTERMED('\'', 0x7D): // DECIC
-    count = CSI_ARG_COUNT(args[0]);
+  পক্ষ INTERMED('\'', 0x7D): // DECIC
+    গুনতি = CSI_ARG_গুনতি(args[0]);
 
-    if(!is_cursor_in_scrollregion(state))
-      break;
+    যদি(!is_cursor_in_scrollregion(state))
+      ভঙ্গ;
 
-    rect.start_row = state->scrollregion_top;
+    rect.start_row = state->scrollregion_শীৰ্ষ;
     rect.end_row   = SCROLLREGION_BOTTOM(state);
     rect.start_col = state->pos.col;
-    rect.end_col   = SCROLLREGION_RIGHT(state);
+    rect.end_col   = SCROLLREGION_ডান(state);
 
-    scroll(state, rect, 0, -count);
+    scroll(state, rect, 0, -গুনতি);
 
-    break;
+    ভঙ্গ;
 
-  case INTERMED('\'', 0x7E): // DECDC
-    count = CSI_ARG_COUNT(args[0]);
+  পক্ষ INTERMED('\'', 0x7E): // DECDC
+    গুনতি = CSI_ARG_গুনতি(args[0]);
 
-    if(!is_cursor_in_scrollregion(state))
-      break;
+    যদি(!is_cursor_in_scrollregion(state))
+      ভঙ্গ;
 
-    rect.start_row = state->scrollregion_top;
+    rect.start_row = state->scrollregion_শীৰ্ষ;
     rect.end_row   = SCROLLREGION_BOTTOM(state);
     rect.start_col = state->pos.col;
-    rect.end_col   = SCROLLREGION_RIGHT(state);
+    rect.end_col   = SCROLLREGION_ডান(state);
 
-    scroll(state, rect, 0, count);
+    scroll(state, rect, 0, গুনতি);
 
-    break;
+    ভঙ্গ;
 
-  default:
+  স্ৱভাৱ:
     handled = 0;
-    break;
+    ভঙ্গ;
   }
 
-  if (!handled) {
-    if(state->fallbacks && state->fallbacks->csi)
-      if((*state->fallbacks->csi)(leader, args, argcount, intermed, command, state->fbdata))
-        return 1;
+  যদি (!handled) {
+    যদি(state->fallbacks && state->fallbacks->csi)
+      যদি((*state->fallbacks->csi)(leader, args, argcount, intermed, command, state->fbdata))
+        ঘূৰাই 1;
 
-    return 0;
+    ঘূৰাই 0;
   }
 
-  if(state->mode.origin) {
-    LBOUND(state->pos.row, state->scrollregion_top);
+  যদি(state->mode.origin) {
+    LBOUND(state->pos.row, state->scrollregion_শীৰ্ষ);
     UBOUND(state->pos.row, SCROLLREGION_BOTTOM(state)-1);
-    LBOUND(state->pos.col, SCROLLREGION_LEFT(state));
-    UBOUND(state->pos.col, SCROLLREGION_RIGHT(state)-1);
+    LBOUND(state->pos.col, SCROLLREGION_বাম(state));
+    UBOUND(state->pos.col, SCROLLREGION_ডান(state)-1);
   }
-  else {
+  অন্যথা {
     LBOUND(state->pos.row, 0);
     UBOUND(state->pos.row, state->rows-1);
     LBOUND(state->pos.col, 0);
@@ -1727,189 +1727,189 @@ static int on_csi(const char *leader, const long args[], int argcount, const cha
   updatecursor(state, &oldpos, cancel_phantom);
 
 #ifdef DEBUG
-  if(state->pos.row < 0 || state->pos.row >= state->rows ||
+  যদি(state->pos.row < 0 || state->pos.row >= state->rows ||
      state->pos.col < 0 || state->pos.col >= state->cols) {
     fprintf(stderr, "Position out of bounds after CSI %c: (%d,%d)\n",
         command, state->pos.row, state->pos.col);
     abort();
   }
 
-  if(SCROLLREGION_BOTTOM(state) <= state->scrollregion_top) {
+  যদি(SCROLLREGION_BOTTOM(state) <= state->scrollregion_শীৰ্ষ) {
     fprintf(stderr, "Scroll region height out of bounds after CSI %c: %d <= %d\n",
-        command, SCROLLREGION_BOTTOM(state), state->scrollregion_top);
+        command, SCROLLREGION_BOTTOM(state), state->scrollregion_শীৰ্ষ);
     abort();
   }
 
-  if(SCROLLREGION_RIGHT(state) <= SCROLLREGION_LEFT(state)) {
+  যদি(SCROLLREGION_ডান(state) <= SCROLLREGION_বাম(state)) {
     fprintf(stderr, "Scroll region width out of bounds after CSI %c: %d <= %d\n",
-        command, SCROLLREGION_RIGHT(state), SCROLLREGION_LEFT(state));
+        command, SCROLLREGION_ডান(state), SCROLLREGION_বাম(state));
     abort();
   }
 #endif
 
-  return 1;
+  ঘূৰাই 1;
 }
 
-static char base64_one(uint8_t b)
+স্থির ৱর্ণ base64_one(uint8_t b)
 {
-  if(b < 26)
-    return 'A' + b;
-  else if(b < 52)
-    return 'a' + b - 26;
-  else if(b < 62)
-    return '0' + b - 52;
-  else if(b == 62)
-    return '+';
-  else if(b == 63)
-    return '/';
-  return 0;
+  যদি(b < 26)
+    ঘূৰাই 'A' + b;
+  অন্যথা যদি(b < 52)
+    ঘূৰাই 'a' + b - 26;
+  অন্যথা যদি(b < 62)
+    ঘূৰাই '0' + b - 52;
+  অন্যথা যদি(b == 62)
+    ঘূৰাই '+';
+  অন্যথা যদি(b == 63)
+    ঘূৰাই '/';
+  ঘূৰাই 0;
 }
 
-static uint8_t unbase64one(char c)
+স্থির uint8_t unbase64one(ৱর্ণ c)
 {
-  if(c >= 'A' && c <= 'Z')
-    return c - 'A';
-  else if(c >= 'a' && c <= 'z')
-    return c - 'a' + 26;
-  else if(c >= '0' && c <= '9')
-    return c - '0' + 52;
-  else if(c == '+')
-    return 62;
-  else if(c == '/')
-    return 63;
+  যদি(c >= 'A' && c <= 'Z')
+    ঘূৰাই c - 'A';
+  অন্যথা যদি(c >= 'a' && c <= 'z')
+    ঘূৰাই c - 'a' + 26;
+  অন্যথা যদি(c >= '0' && c <= '9')
+    ঘূৰাই c - '0' + 52;
+  অন্যথা যদি(c == '+')
+    ঘূৰাই 62;
+  অন্যথা যদি(c == '/')
+    ঘূৰাই 63;
 
-  return 0xFF;
+  ঘূৰাই 0xFF;
 }
 
-static void osc_selection(VTermState *state, VTermStringFragment frag)
+স্থির শূন্য osc_selection(VTermState *state, VTermStringFragment frag)
 {
-  if(frag.initial) {
+  যদি(frag.initial) {
     state->tmp.selection.mask = 0;
     state->tmp.selection.state = SELECTION_INITIAL;
   }
 
-  while(!state->tmp.selection.state && frag.len) {
+  যেতিয়ালৈ(!state->tmp.selection.state && frag.len) {
     /* Parse selection parameter */
-    switch(frag.str[0]) {
-      case 'c':
+    ৱিকল্প(frag.str[0]) {
+      পক্ষ 'c':
         state->tmp.selection.mask |= VTERM_SELECTION_CLIPBOARD;
-        break;
-      case 'p':
+        ভঙ্গ;
+      পক্ষ 'p':
         state->tmp.selection.mask |= VTERM_SELECTION_PRIMARY;
-        break;
-      case 'q':
+        ভঙ্গ;
+      পক্ষ 'q':
         state->tmp.selection.mask |= VTERM_SELECTION_SECONDARY;
-        break;
-      case 's':
+        ভঙ্গ;
+      পক্ষ 's':
         state->tmp.selection.mask |= VTERM_SELECTION_SELECT;
-        break;
-      case '0':
-      case '1':
-      case '2':
-      case '3':
-      case '4':
-      case '5':
-      case '6':
-      case '7':
+        ভঙ্গ;
+      পক্ষ '0':
+      পক্ষ '1':
+      পক্ষ '2':
+      পক্ষ '3':
+      পক্ষ '4':
+      পক্ষ '5':
+      পক্ষ '6':
+      পক্ষ '7':
         state->tmp.selection.mask |= (VTERM_SELECTION_CUT0 << (frag.str[0] - '0'));
-        break;
+        ভঙ্গ;
 
-      case ';':
+      পক্ষ ';':
         state->tmp.selection.state = SELECTION_SELECTED;
-        if(!state->tmp.selection.mask)
+        যদি(!state->tmp.selection.mask)
           state->tmp.selection.mask = VTERM_SELECTION_SELECT|VTERM_SELECTION_CUT0;
-        break;
+        ভঙ্গ;
     }
 
     frag.str++;
     frag.len--;
   }
 
-  if(!frag.len) {
+  যদি(!frag.len) {
     /* Clear selection if we're already finished but didn't do anything */
-    if(frag.final && state->selection.callbacks->set) {
+    যদি(frag.final && state->selection.callbacks->set) {
       (*state->selection.callbacks->set)(state->tmp.selection.mask, (VTermStringFragment){
-              .str     = NULL,
+              .str     = রিক্ত,
               .len     = 0,
               .initial = state->tmp.selection.state != SELECTION_SET,
               .final   = TRUE,
             }, state->selection.user);
     }
-    return;
+    ঘূৰাই;
   }
 
-  if(state->tmp.selection.state == SELECTION_SELECTED) {
-    if(frag.str[0] == '?') {
+  যদি(state->tmp.selection.state == SELECTION_SELECTED) {
+    যদি(frag.str[0] == '?') {
       state->tmp.selection.state = SELECTION_QUERY;
     }
-    else {
+    অন্যথা {
       state->tmp.selection.state = SELECTION_SET_INITIAL;
       state->tmp.selection.recvpartial = 0;
     }
   }
 
-  if(state->tmp.selection.state == SELECTION_QUERY) {
-    if(state->selection.callbacks->query)
+  যদি(state->tmp.selection.state == SELECTION_QUERY) {
+    যদি(state->selection.callbacks->query)
       (*state->selection.callbacks->query)(state->tmp.selection.mask, state->selection.user);
-    return;
+    ঘূৰাই;
   }
 
-  if(state->tmp.selection.state == SELECTION_INVALID)
-    return;
+  যদি(state->tmp.selection.state == SELECTION_INVALID)
+    ঘূৰাই;
 
-  if(state->selection.callbacks->set) {
+  যদি(state->selection.callbacks->set) {
     size_t bufcur = 0;
-    char *buffer = state->selection.buffer;
+    ৱর্ণ *buffer = state->selection.buffer;
 
     uint32_t x = 0; /* Current decoding value */
-    int n = 0;      /* Number of sextets consumed */
+    পূর্ণাঙ্ক n = 0;      /* Number of sextets consumed */
 
-    if(state->tmp.selection.recvpartial) {
+    যদি(state->tmp.selection.recvpartial) {
       n = state->tmp.selection.recvpartial >> 24;
       x = state->tmp.selection.recvpartial & 0x03FFFF; /* could be up to 18 bits of state in here */
 
       state->tmp.selection.recvpartial = 0;
     }
 
-    while((state->selection.buflen - bufcur) >= 3 && frag.len) {
-      if(frag.str[0] == '=') {
-        if(n == 2) {
+    যেতিয়ালৈ((state->selection.buflen - bufcur) >= 3 && frag.len) {
+      যদি(frag.str[0] == '=') {
+        যদি(n == 2) {
           buffer[0] = (x >> 4) & 0xFF;
           buffer += 1, bufcur += 1;
         }
-        if(n == 3) {
+        যদি(n == 3) {
           buffer[0] = (x >> 10) & 0xFF;
           buffer[1] = (x >>  2) & 0xFF;
           buffer += 2, bufcur += 2;
         }
 
-        while(frag.len && frag.str[0] == '=')
+        যেতিয়ালৈ(frag.len && frag.str[0] == '=')
           frag.str++, frag.len--;
 
         n = 0;
       }
-      else {
+      অন্যথা {
         uint8_t b = unbase64one(frag.str[0]);
-        if(b == 0xFF) {
+        যদি(b == 0xFF) {
           DEBUG_LOG1("base64decode bad input %02X\n", (uint8_t)frag.str[0]);
 
           state->tmp.selection.state = SELECTION_INVALID;
-          if(state->selection.callbacks->set) {
+          যদি(state->selection.callbacks->set) {
             (*state->selection.callbacks->set)(state->tmp.selection.mask, (VTermStringFragment){
-                .str     = NULL,
+                .str     = রিক্ত,
                 .len     = 0,
                 .initial = TRUE,
                 .final   = TRUE,
                 }, state->selection.user);
           }
-          break;
+          ভঙ্গ;
         }
 
         x = (x << 6) | b;
         n++;
         frag.str++, frag.len--;
 
-        if(n == 4) {
+        যদি(n == 4) {
           buffer[0] = (x >> 16) & 0xFF;
           buffer[1] = (x >>  8) & 0xFF;
           buffer[2] = (x >>  0) & 0xFF;
@@ -1920,8 +1920,8 @@ static void osc_selection(VTermState *state, VTermStringFragment frag)
         }
       }
 
-      if(!frag.len || (state->selection.buflen - bufcur) < 3) {
-        if(bufcur) {
+      যদি(!frag.len || (state->selection.buflen - bufcur) < 3) {
+        যদি(bufcur) {
 	  VTermStringFragment setfrag = {
 	    state->selection.buffer, // str
 	    bufcur, // len
@@ -1938,237 +1938,237 @@ static void osc_selection(VTermState *state, VTermStringFragment frag)
       }
     }
 
-    if(n)
+    যদি(n)
       state->tmp.selection.recvpartial = (n << 24) | x;
   }
 }
 
-static int on_osc(int command, VTermStringFragment frag, void *user)
+স্থির পূর্ণাঙ্ক on_osc(পূর্ণাঙ্ক command, VTermStringFragment frag, শূন্য *user)
 {
   VTermState *state = user;
 
-  switch(command) {
-    case 0:
+  ৱিকল্প(command) {
+    পক্ষ 0:
       settermprop_string(state, VTERM_PROP_ICONNAME, frag);
       settermprop_string(state, VTERM_PROP_TITLE, frag);
-      return 1;
+      ঘূৰাই 1;
 
-    case 1:
+    পক্ষ 1:
       settermprop_string(state, VTERM_PROP_ICONNAME, frag);
-      return 1;
+      ঘূৰাই 1;
 
-    case 2:
+    পক্ষ 2:
       settermprop_string(state, VTERM_PROP_TITLE, frag);
-      return 1;
+      ঘূৰাই 1;
 
-    case 10:
+    পক্ষ 10:
       {
         // request foreground color: <Esc>]10;?<0x07>
-        int red = state->default_fg.red;
-        int blue = state->default_fg.blue;
-        int green = state->default_fg.green;
-        vterm_push_output_sprintf_ctrl(state->vt, C1_OSC, "10;rgb:%02x%02x/%02x%02x/%02x%02x\x07", red, red, green, green, blue, blue);
-        return 1;
+        পূর্ণাঙ্ক red = state->default_fg.red;
+        পূর্ণাঙ্ক blue = state->default_fg.blue;
+        পূর্ণাঙ্ক green = state->default_fg.green;
+        vterm_ঠেলো_output_sprintf_ctrl(state->vt, C1_OSC, "10;rgb:%02x%02x/%02x%02x/%02x%02x\x07", red, red, green, green, blue, blue);
+        ঘূৰাই 1;
       }
 
-    case 11:
+    পক্ষ 11:
       {
 	// request background color: <Esc>]11;?<0x07>
-	int red = state->default_bg.red;
-	int blue = state->default_bg.blue;
-	int green = state->default_bg.green;
-	vterm_push_output_sprintf_ctrl(state->vt, C1_OSC, "11;rgb:%02x%02x/%02x%02x/%02x%02x\x07", red, red, green, green, blue, blue);
-	return 1;
+	পূর্ণাঙ্ক red = state->default_bg.red;
+	পূর্ণাঙ্ক blue = state->default_bg.blue;
+	পূর্ণাঙ্ক green = state->default_bg.green;
+	vterm_ঠেলো_output_sprintf_ctrl(state->vt, C1_OSC, "11;rgb:%02x%02x/%02x%02x/%02x%02x\x07", red, red, green, green, blue, blue);
+	ঘূৰাই 1;
       }
-    case 12:
+    পক্ষ 12:
       settermprop_string(state, VTERM_PROP_CURSORCOLOR, frag);
-      return 1;
+      ঘূৰাই 1;
 
-    case 52:
-      if(state->selection.callbacks)
+    পক্ষ 52:
+      যদি(state->selection.callbacks)
         osc_selection(state, frag);
 
-      return 1;
+      ঘূৰাই 1;
 
-    default:
-      if(state->fallbacks && state->fallbacks->osc)
-        if((*state->fallbacks->osc)(command, frag, state->fbdata))
-          return 1;
+    স্ৱভাৱ:
+      যদি(state->fallbacks && state->fallbacks->osc)
+        যদি((*state->fallbacks->osc)(command, frag, state->fbdata))
+          ঘূৰাই 1;
   }
 
-  return 0;
+  ঘূৰাই 0;
 }
 
-static void request_status_string(VTermState *state, VTermStringFragment frag)
+স্থির শূন্য request_status_string(VTermState *state, VTermStringFragment frag)
 {
   VTerm *vt = state->vt;
 
-  char *tmp = state->tmp.decrqss;
+  ৱর্ণ *tmp = state->tmp.decrqss;
 
-  if(frag.initial)
+  যদি(frag.initial)
     tmp[0] = tmp[1] = tmp[2] = tmp[3] = 0;
 
   size_t i = 0;
-  while(i < sizeof(state->tmp.decrqss)-1 && tmp[i])
+  যেতিয়ালৈ(i < পরিমাণ(state->tmp.decrqss)-1 && tmp[i])
     i++;
-  while(i < sizeof(state->tmp.decrqss)-1 && frag.len--)
+  যেতিয়ালৈ(i < পরিমাণ(state->tmp.decrqss)-1 && frag.len--)
     tmp[i++] = (frag.str++)[0];
   tmp[i] = 0;
 
-  if(!frag.final)
-    return;
+  যদি(!frag.final)
+    ঘূৰাই;
 
-  switch(tmp[0] | tmp[1]<<8 | tmp[2]<<16) {
-    case 'm': {
+  ৱিকল্প(tmp[0] | tmp[1]<<8 | tmp[2]<<16) {
+    পক্ষ 'm': {
       // Query SGR
       long args[20];
-      int argc = vterm_state_getpen(state, args, sizeof(args)/sizeof(args[0]));
+      পূর্ণাঙ্ক argc = vterm_state_getpen(state, args, পরিমাণ(args)/পরিমাণ(args[0]));
       size_t cur = 0;
 
       cur += SNPRINTF(vt->tmpbuffer + cur, vt->tmpbuffer_len - cur,
           vt->mode.ctrl8bit ? "\x90" "1$r" : ESC_S "P" "1$r"); // DCS 1$r ...
-      if(cur >= vt->tmpbuffer_len)
-        return;
+      যদি(cur >= vt->tmpbuffer_len)
+        ঘূৰাই;
 
-      for(int argi = 0; argi < argc; argi++) {
+      বাবে(পূর্ণাঙ্ক argi = 0; argi < argc; argi++) {
         cur += SNPRINTF(vt->tmpbuffer + cur, vt->tmpbuffer_len - cur,
             argi == argc - 1             ? "%ld" :
             CSI_ARG_HAS_MORE(args[argi]) ? "%ld:" :
                                            "%ld;",
             CSI_ARG(args[argi]));
-        if(cur >= vt->tmpbuffer_len)
-          return;
+        যদি(cur >= vt->tmpbuffer_len)
+          ঘূৰাই;
       }
 
       cur += SNPRINTF(vt->tmpbuffer + cur, vt->tmpbuffer_len - cur,
           vt->mode.ctrl8bit ? "m" "\x9C" : "m" ESC_S "\\"); // ... m ST
-      if(cur >= vt->tmpbuffer_len)
-        return;
+      যদি(cur >= vt->tmpbuffer_len)
+        ঘূৰাই;
 
-      vterm_push_output_bytes(vt, vt->tmpbuffer, cur);
-      return;
+      vterm_ঠেলো_output_bytes(vt, vt->tmpbuffer, cur);
+      ঘূৰাই;
     }
 
-    case 'r':
+    পক্ষ 'r':
       // Query DECSTBM
-      vterm_push_output_sprintf_str(vt, C1_DCS, TRUE,
-          "1$r%d;%dr", state->scrollregion_top+1, SCROLLREGION_BOTTOM(state));
-      return;
+      vterm_ঠেলো_output_sprintf_str(vt, C1_DCS, TRUE,
+          "1$r%d;%dr", state->scrollregion_শীৰ্ষ+1, SCROLLREGION_BOTTOM(state));
+      ঘূৰাই;
 
-    case 's':
+    পক্ষ 's':
       // Query DECSLRM
-      vterm_push_output_sprintf_str(vt, C1_DCS, TRUE,
-          "1$r%d;%ds", SCROLLREGION_LEFT(state)+1, SCROLLREGION_RIGHT(state));
-      return;
+      vterm_ঠেলো_output_sprintf_str(vt, C1_DCS, TRUE,
+          "1$r%d;%ds", SCROLLREGION_বাম(state)+1, SCROLLREGION_ডান(state));
+      ঘূৰাই;
 
-    case ' '|('q'<<8): {
+    পক্ষ ' '|('q'<<8): {
       // Query DECSCUSR
-      int reply;
-      switch(state->mode.cursor_shape) {
-        case VTERM_PROP_CURSORSHAPE_BLOCK:     reply = 2; break;
-        case VTERM_PROP_CURSORSHAPE_UNDERLINE: reply = 4; break;
-	default: /* VTERM_PROP_CURSORSHAPE_BAR_LEFT */ reply = 6; break;
+      পূর্ণাঙ্ক reply;
+      ৱিকল্প(state->mode.cursor_shape) {
+        পক্ষ VTERM_PROP_CURSORSHAPE_BLOCK:     reply = 2; ভঙ্গ;
+        পক্ষ VTERM_PROP_CURSORSHAPE_UNDERLINE: reply = 4; ভঙ্গ;
+	স্ৱভাৱ: /* VTERM_PROP_CURSORSHAPE_BAR_LEFT */ reply = 6; ভঙ্গ;
       }
-      if(state->mode.cursor_blink)
+      যদি(state->mode.cursor_blink)
         reply--;
-      vterm_push_output_sprintf_str(vt, C1_DCS, TRUE,
+      vterm_ঠেলো_output_sprintf_str(vt, C1_DCS, TRUE,
           "1$r%d q", reply);
-      return;
+      ঘূৰাই;
     }
 
-    case '\"'|('q'<<8):
+    পক্ষ '\"'|('q'<<8):
       // Query DECSCA
-      vterm_push_output_sprintf_str(vt, C1_DCS, TRUE,
+      vterm_ঠেলো_output_sprintf_str(vt, C1_DCS, TRUE,
           "1$r%d\"q", state->protected_cell ? 1 : 2);
-      return;
+      ঘূৰাই;
   }
 
-  vterm_push_output_sprintf_str(state->vt, C1_DCS, TRUE, "0$r");
+  vterm_ঠেলো_output_sprintf_str(state->vt, C1_DCS, TRUE, "0$r");
 }
 
-static int on_dcs(const char *command, size_t commandlen, VTermStringFragment frag, void *user)
+স্থির পূর্ণাঙ্ক on_dcs(ধ্রুৱ ৱর্ণ *command, size_t commandlen, VTermStringFragment frag, শূন্য *user)
 {
   VTermState *state = user;
 
-  if(commandlen == 2 && strneq(command, "$q", 2)) {
+  যদি(commandlen == 2 && strneq(command, "$q", 2)) {
     request_status_string(state, frag);
-    return 1;
+    ঘূৰাই 1;
   }
-  else if(state->fallbacks && state->fallbacks->dcs)
-    if((*state->fallbacks->dcs)(command, commandlen, frag, state->fbdata))
-      return 1;
+  অন্যথা যদি(state->fallbacks && state->fallbacks->dcs)
+    যদি((*state->fallbacks->dcs)(command, commandlen, frag, state->fbdata))
+      ঘূৰাই 1;
 
-  DEBUG_LOG2("libvterm: Unhandled DCS %.*s\n", (int)commandlen, command);
-  return 0;
+  DEBUG_LOG2("libvterm: Unhandled DCS %.*s\n", (পূর্ণাঙ্ক)commandlen, command);
+  ঘূৰাই 0;
 }
 
-static int on_apc(VTermStringFragment frag, void *user)
+স্থির পূর্ণাঙ্ক on_apc(VTermStringFragment frag, শূন্য *user)
 {
   VTermState *state = user;
 
-  if(state->fallbacks && state->fallbacks->apc)
-    if((*state->fallbacks->apc)(frag, state->fbdata))
-      return 1;
+  যদি(state->fallbacks && state->fallbacks->apc)
+    যদি((*state->fallbacks->apc)(frag, state->fbdata))
+      ঘূৰাই 1;
 
   /* No DEBUG_LOG because all APCs are unhandled */
-  return 0;
+  ঘূৰাই 0;
 }
 
-static int on_pm(VTermStringFragment frag, void *user)
+স্থির পূর্ণাঙ্ক on_pm(VTermStringFragment frag, শূন্য *user)
 {
   VTermState *state = user;
 
-  if(state->fallbacks && state->fallbacks->pm)
-    if((*state->fallbacks->pm)(frag, state->fbdata))
-      return 1;
+  যদি(state->fallbacks && state->fallbacks->pm)
+    যদি((*state->fallbacks->pm)(frag, state->fbdata))
+      ঘূৰাই 1;
 
   /* No DEBUG_LOG because all PMs are unhandled */
-  return 0;
+  ঘূৰাই 0;
 }
 
-static int on_sos(VTermStringFragment frag, void *user)
+স্থির পূর্ণাঙ্ক on_sos(VTermStringFragment frag, শূন্য *user)
 {
   VTermState *state = user;
 
-  if(state->fallbacks && state->fallbacks->sos)
-    if((*state->fallbacks->sos)(frag, state->fbdata))
-      return 1;
+  যদি(state->fallbacks && state->fallbacks->sos)
+    যদি((*state->fallbacks->sos)(frag, state->fbdata))
+      ঘূৰাই 1;
 
   /* No DEBUG_LOG because all SOSs are unhandled */
-  return 0;
+  ঘূৰাই 0;
 }
 
-static int on_resize(int rows, int cols, void *user)
+স্থির পূর্ণাঙ্ক on_resize(পূর্ণাঙ্ক rows, পূর্ণাঙ্ক cols, শূন্য *user)
 {
   VTermState *state = user;
   VTermPos oldpos = state->pos;
 
-  if (cols > VTERM_MAX_COLS)
+  যদি (cols > VTERM_MAX_COLS)
     cols = VTERM_MAX_COLS;
 
-  if (rows > VTERM_MAX_ROWS)
+  যদি (rows > VTERM_MAX_ROWS)
     rows = VTERM_MAX_ROWS;
 
-  if(cols != state->cols) {
-    unsigned char *newtabstops = vterm_allocator_malloc(state->vt, (cols + 7) / 8);
-    if (newtabstops == NULL)
-      return 0;
+  যদি(cols != state->cols) {
+    unsigned ৱর্ণ *newtabstops = vterm_allocator_malloc(state->vt, (cols + 7) / 8);
+    যদি (newtabstops == রিক্ত)
+      ঘূৰাই 0;
 
     /* TODO: This can all be done much more efficiently bytewise */
-    int col;
-    for(col = 0; col < state->cols && col < cols; col++) {
-      unsigned char mask = 1 << (col & 7);
-      if(state->tabstops[col >> 3] & mask)
+    পূর্ণাঙ্ক col;
+    বাবে(col = 0; col < state->cols && col < cols; col++) {
+      unsigned ৱর্ণ mask = 1 << (col & 7);
+      যদি(state->tabstops[col >> 3] & mask)
         newtabstops[col >> 3] |= mask;
-      else
+      অন্যথা
         newtabstops[col >> 3] &= ~mask;
       }
 
-    for( ; col < cols; col++) {
-      unsigned char mask = 1 << (col & 7);
-      if(col % 8 == 0)
+    বাবে( ; col < cols; col++) {
+      unsigned ৱর্ণ mask = 1 << (col & 7);
+      যদি(col % 8 == 0)
         newtabstops[col >> 3] |= mask;
-      else
+      অন্যথা
         newtabstops[col >> 3] &= ~mask;
     }
 
@@ -2179,24 +2179,24 @@ static int on_resize(int rows, int cols, void *user)
   state->rows = rows;
   state->cols = cols;
 
-  if(state->scrollregion_bottom > -1)
+  যদি(state->scrollregion_bottom > -1)
     UBOUND(state->scrollregion_bottom, state->rows);
-  if(state->scrollregion_right > -1)
-    UBOUND(state->scrollregion_right, state->cols);
+  যদি(state->scrollregion_ডান > -1)
+    UBOUND(state->scrollregion_ডান, state->cols);
 
   // The near edges need clamping as well, otherwise a scroll region that
   // was set before the terminal was made smaller can start past the last
   // row or column.  Drop a region that no longer makes sense, just like
   // DECSTBM and DECSLRM do when it is set.
-  UBOUND(state->scrollregion_top, state->rows);
-  UBOUND(state->scrollregion_left, state->cols);
-  if(SCROLLREGION_BOTTOM(state) <= state->scrollregion_top) {
-    state->scrollregion_top = 0;
+  UBOUND(state->scrollregion_শীৰ্ষ, state->rows);
+  UBOUND(state->scrollregion_বাম, state->cols);
+  যদি(SCROLLREGION_BOTTOM(state) <= state->scrollregion_শীৰ্ষ) {
+    state->scrollregion_শীৰ্ষ = 0;
     state->scrollregion_bottom = -1;
   }
-  if(SCROLLREGION_RIGHT(state) <= state->scrollregion_left) {
-    state->scrollregion_left = 0;
-    state->scrollregion_right = -1;
+  যদি(SCROLLREGION_ডান(state) <= state->scrollregion_বাম) {
+    state->scrollregion_বাম = 0;
+    state->scrollregion_ডান = -1;
   }
 
   VTermStateFields fields;
@@ -2204,29 +2204,29 @@ static int on_resize(int rows, int cols, void *user)
   fields.lineinfos[0] = state->lineinfos[0];
   fields.lineinfos[1] = state->lineinfos[1];
 
-  if(state->callbacks && state->callbacks->resize) {
+  যদি(state->callbacks && state->callbacks->resize) {
     (*state->callbacks->resize)(rows, cols, &fields, state->cbdata);
     state->pos = fields.pos;
 
     state->lineinfos[0] = fields.lineinfos[0];
     state->lineinfos[1] = fields.lineinfos[1];
   }
-  else {
-    if(rows != state->rows) {
-      for(int bufidx = BUFIDX_PRIMARY; bufidx <= BUFIDX_ALTSCREEN; bufidx++) {
-        VTermLineInfo *oldlineinfo = state->lineinfos[bufidx];
-        if(!oldlineinfo)
-          continue;
+  অন্যথা {
+    যদি(rows != state->rows) {
+      বাবে(পূর্ণাঙ্ক bufidx = BUFIDX_PRIMARY; bufidx <= BUFIDX_ALTSCREEN; bufidx++) {
+        VTerm_সাৰি_Info *oldlineinfo = state->lineinfos[bufidx];
+        যদি(!oldlineinfo)
+          অনুৱর্ত;
 
-        VTermLineInfo *newlineinfo = vterm_allocator_malloc(state->vt, rows * sizeof(VTermLineInfo));
+        VTerm_সাৰি_Info *newlineinfo = vterm_allocator_malloc(state->vt, rows * পরিমাণ(VTerm_সাৰি_Info));
 
-        int row;
-        for(row = 0; row < state->rows && row < rows; row++) {
+        পূর্ণাঙ্ক row;
+        বাবে(row = 0; row < state->rows && row < rows; row++) {
           newlineinfo[row] = oldlineinfo[row];
         }
 
-        for( ; row < rows; row++) {
-          newlineinfo[row] = (VTermLineInfo){
+        বাবে( ; row < rows; row++) {
+          newlineinfo[row] = (VTerm_সাৰি_Info){
             .doublewidth = 0,
           };
         }
@@ -2239,26 +2239,26 @@ static int on_resize(int rows, int cols, void *user)
 
   state->lineinfo = state->lineinfos[state->mode.alt_screen ? BUFIDX_ALTSCREEN : BUFIDX_PRIMARY];
 
-  if(state->at_phantom && state->pos.col < cols-1) {
+  যদি(state->at_phantom && state->pos.col < cols-1) {
     state->at_phantom = 0;
     state->pos.col++;
   }
 
-  if(state->pos.row < 0)
+  যদি(state->pos.row < 0)
     state->pos.row = 0;
-  if(state->pos.row >= rows)
+  যদি(state->pos.row >= rows)
     state->pos.row = rows - 1;
-  if(state->pos.col < 0)
+  যদি(state->pos.col < 0)
     state->pos.col = 0;
-  if(state->pos.col >= cols)
+  যদি(state->pos.col >= cols)
     state->pos.col = cols - 1;
 
   updatecursor(state, &oldpos, 1);
 
-  return 1;
+  ঘূৰাই 1;
 }
 
-static const VTermParserCallbacks parser_callbacks = {
+স্থির ধ্রুৱ VTermParserCallbacks parser_callbacks = {
   on_text, // text
   on_control, // control
   on_escape, // escape
@@ -2277,30 +2277,30 @@ static const VTermParserCallbacks parser_callbacks = {
  */
 VTermState *vterm_obtain_state(VTerm *vt)
 {
-  if(vt->state)
-    return vt->state;
+  যদি(vt->state)
+    ঘূৰাই vt->state;
 
   VTermState *state = vterm_state_new(vt);
-  if (state == NULL)
-    return NULL;
+  যদি (state == রিক্ত)
+    ঘূৰাই রিক্ত;
   vt->state = state;
 
   vterm_parser_set_callbacks(vt, &parser_callbacks, state);
 
-  return state;
+  ঘূৰাই state;
 }
 
-void vterm_state_reset(VTermState *state, int hard)
+শূন্য vterm_state_reset(VTermState *state, পূর্ণাঙ্ক hard)
 {
-  state->scrollregion_top = 0;
+  state->scrollregion_শীৰ্ষ = 0;
   state->scrollregion_bottom = -1;
-  state->scrollregion_left = 0;
-  state->scrollregion_right = -1;
+  state->scrollregion_বাম = 0;
+  state->scrollregion_ডান = -1;
 
   state->mode.keypad          = 0;
   state->mode.cursor          = 0;
   state->mode.autowrap        = 1;
-  state->mode.insert          = 0;
+  state->mode.ঢোকাও          = 0;
   state->mode.newline         = 0;
   state->mode.alt_screen      = 0;
   state->mode.origin          = 0;
@@ -2312,16 +2312,16 @@ void vterm_state_reset(VTermState *state, int hard)
 
   state->vt->mode.ctrl8bit   = 0;
 
-  for(int col = 0; col < state->cols; col++)
-    if(col % 8 == 0)
+  বাবে(পূর্ণাঙ্ক col = 0; col < state->cols; col++)
+    যদি(col % 8 == 0)
       set_col_tabstop(state, col);
-    else
+    অন্যথা
       clear_col_tabstop(state, col);
 
-  for(int row = 0; row < state->rows; row++)
+  বাবে(পূর্ণাঙ্ক row = 0; row < state->rows; row++)
     set_lineinfo(state, row, FORCE, DWL_OFF, DHL_OFF);
 
-  if(state->callbacks && state->callbacks->initpen)
+  যদি(state->callbacks && state->callbacks->initpen)
     (*state->callbacks->initpen)(state->cbdata);
 
   vterm_state_resetpen(state);
@@ -2330,9 +2330,9 @@ void vterm_state_reset(VTermState *state, int hard)
       vterm_lookup_encoding(ENC_UTF8,      'u') :
       vterm_lookup_encoding(ENC_SINGLE_94, 'B');
 
-  for(int i = 0; i < 4; i++) {
+  বাবে(পূর্ণাঙ্ক i = 0; i < 4; i++) {
     state->encoding[i].enc = default_enc;
-    if(default_enc->init)
+    যদি(default_enc->init)
       (*default_enc->init)(default_enc, state->encoding[i].data);
   }
 
@@ -2347,7 +2347,7 @@ void vterm_state_reset(VTermState *state, int hard)
   settermprop_bool(state, VTERM_PROP_CURSORBLINK,   1);
   settermprop_int (state, VTERM_PROP_CURSORSHAPE,   VTERM_PROP_CURSORSHAPE_BLOCK);
 
-  if(hard) {
+  যদি(hard) {
     state->pos.row = 0;
     state->pos.col = 0;
     state->at_phantom = 0;
@@ -2359,12 +2359,12 @@ void vterm_state_reset(VTermState *state, int hard)
   }
 }
 
-void vterm_state_get_cursorpos(const VTermState *state, VTermPos *cursorpos)
+শূন্য vterm_state_get_cursorpos(ধ্রুৱ VTermState *state, VTermPos *cursorpos)
 {
   *cursorpos = state->pos;
 }
 
-void vterm_state_get_mousestate(const VTermState *state, VTermMouseState *mousestate)
+শূন্য vterm_state_get_mousestate(ধ্রুৱ VTermState *state, VTermMouseState *mousestate)
 {
   mousestate->pos.col = state->mouse_col;
   mousestate->pos.row = state->mouse_row;
@@ -2372,125 +2372,125 @@ void vterm_state_get_mousestate(const VTermState *state, VTermMouseState *mouses
   mousestate->flags = state->mouse_flags;
 }
 
-void vterm_state_set_callbacks(VTermState *state, const VTermStateCallbacks *callbacks, void *user)
+শূন্য vterm_state_set_callbacks(VTermState *state, ধ্রুৱ VTermStateCallbacks *callbacks, শূন্য *user)
 {
-  if(callbacks) {
+  যদি(callbacks) {
     state->callbacks = callbacks;
     state->cbdata = user;
 
-    if(state->callbacks && state->callbacks->initpen)
+    যদি(state->callbacks && state->callbacks->initpen)
       (*state->callbacks->initpen)(state->cbdata);
   }
-  else {
-    state->callbacks = NULL;
-    state->cbdata = NULL;
+  অন্যথা {
+    state->callbacks = রিক্ত;
+    state->cbdata = রিক্ত;
   }
 }
 
-void vterm_state_callbacks_has_premove(VTermState *state)
+শূন্য vterm_state_callbacks_has_premove(VTermState *state)
 {
   state->callbacks_has_premove = 1;
 }
 
-void *vterm_state_get_cbdata(VTermState *state)
+শূন্য *vterm_state_get_cbdata(VTermState *state)
 {
-  return state->cbdata;
+  ঘূৰাই state->cbdata;
 }
 
-void vterm_state_set_unrecognised_fallbacks(VTermState *state, const VTermStateFallbacks *fallbacks, void *user)
+শূন্য vterm_state_set_unrecognised_fallbacks(VTermState *state, ধ্রুৱ VTermStateFallbacks *fallbacks, শূন্য *user)
 {
-  if(fallbacks) {
+  যদি(fallbacks) {
     state->fallbacks = fallbacks;
     state->fbdata = user;
   }
-  else {
-    state->fallbacks = NULL;
-    state->fbdata = NULL;
+  অন্যথা {
+    state->fallbacks = রিক্ত;
+    state->fbdata = রিক্ত;
   }
 }
 
-void *vterm_state_get_unrecognised_fbdata(VTermState *state)
+শূন্য *vterm_state_get_unrecognised_fbdata(VTermState *state)
 {
-  return state->fbdata;
+  ঘূৰাই state->fbdata;
 }
 
-int vterm_state_set_termprop(VTermState *state, VTermProp prop, VTermValue *val)
+পূর্ণাঙ্ক vterm_state_set_termprop(VTermState *state, VTermProp prop, VTerm_মান *val)
 {
   /* Only store the new value of the property if usercode said it was happy.
    * This is especially important for altscreen switching */
-  if(state->callbacks && state->callbacks->settermprop)
-    if(!(*state->callbacks->settermprop)(prop, val, state->cbdata))
-      return 0;
+  যদি(state->callbacks && state->callbacks->settermprop)
+    যদি(!(*state->callbacks->settermprop)(prop, val, state->cbdata))
+      ঘূৰাই 0;
 
-  switch(prop) {
-  case VTERM_PROP_TITLE:
-  case VTERM_PROP_ICONNAME:
-  case VTERM_PROP_CURSORCOLOR:
+  ৱিকল্প(prop) {
+  পক্ষ VTERM_PROP_TITLE:
+  পক্ষ VTERM_PROP_ICONNAME:
+  পক্ষ VTERM_PROP_CURSORCOLOR:
     // we don't store these, just transparently pass through
-    return 1;
-  case VTERM_PROP_CURSORVISIBLE:
+    ঘূৰাই 1;
+  পক্ষ VTERM_PROP_CURSORVISIBLE:
     state->mode.cursor_visible = val->boolean;
-    return 1;
-  case VTERM_PROP_CURSORBLINK:
+    ঘূৰাই 1;
+  পক্ষ VTERM_PROP_CURSORBLINK:
     state->mode.cursor_blink = val->boolean;
-    return 1;
-  case VTERM_PROP_CURSORSHAPE:
-    state->mode.cursor_shape = val->number;
-    return 1;
-  case VTERM_PROP_REVERSE:
+    ঘূৰাই 1;
+  পক্ষ VTERM_PROP_CURSORSHAPE:
+    state->mode.cursor_shape = val->সংখ্যা;
+    ঘূৰাই 1;
+  পক্ষ VTERM_PROP_REVERSE:
     state->mode.screen = val->boolean;
-    return 1;
-  case VTERM_PROP_ALTSCREEN:
+    ঘূৰাই 1;
+  পক্ষ VTERM_PROP_ALTSCREEN:
     state->mode.alt_screen = val->boolean;
     state->lineinfo = state->lineinfos[state->mode.alt_screen ? BUFIDX_ALTSCREEN : BUFIDX_PRIMARY];
-    if(state->mode.alt_screen) {
+    যদি(state->mode.alt_screen) {
       VTermRect rect = {0, 0, 0, 0};
       rect.end_row = state->rows;
       rect.end_col = state->cols;
       erase(state, rect, 0);
     }
-    return 1;
-  case VTERM_PROP_MOUSE:
+    ঘূৰাই 1;
+  পক্ষ VTERM_PROP_MOUSE:
     state->mouse_flags = 0;
-    if(val->number)
+    যদি(val->সংখ্যা)
       state->mouse_flags |= MOUSE_WANT_CLICK;
-    if(val->number == VTERM_PROP_MOUSE_DRAG)
+    যদি(val->সংখ্যা == VTERM_PROP_MOUSE_DRAG)
       state->mouse_flags |= MOUSE_WANT_DRAG;
-    if(val->number == VTERM_PROP_MOUSE_MOVE)
+    যদি(val->সংখ্যা == VTERM_PROP_MOUSE_MOVE)
       state->mouse_flags |= MOUSE_WANT_MOVE;
-    return 1;
-  case VTERM_PROP_FOCUSREPORT:
+    ঘূৰাই 1;
+  পক্ষ VTERM_PROP_FOCUSREPORT:
     state->mode.report_focus = val->boolean;
-    return 1;
+    ঘূৰাই 1;
 
-  case VTERM_N_PROPS:
-    return 0;
+  পক্ষ VTERM_N_PROPS:
+    ঘূৰাই 0;
   }
 
-  return 0;
+  ঘূৰাই 0;
 }
 
-void vterm_state_focus_in(VTermState *state)
+শূন্য vterm_state_focus_in(VTermState *state)
 {
-  if(state->mode.report_focus)
-    vterm_push_output_sprintf_ctrl(state->vt, C1_CSI, "I");
+  যদি(state->mode.report_focus)
+    vterm_ঠেলো_output_sprintf_ctrl(state->vt, C1_CSI, "I");
 }
 
-void vterm_state_focus_out(VTermState *state)
+শূন্য vterm_state_focus_out(VTermState *state)
 {
-  if(state->mode.report_focus)
-    vterm_push_output_sprintf_ctrl(state->vt, C1_CSI, "O");
+  যদি(state->mode.report_focus)
+    vterm_ঠেলো_output_sprintf_ctrl(state->vt, C1_CSI, "O");
 }
 
-const VTermLineInfo *vterm_state_get_lineinfo(const VTermState *state, int row)
+ধ্রুৱ VTerm_সাৰি_Info *vterm_state_get_lineinfo(ধ্রুৱ VTermState *state, পূর্ণাঙ্ক row)
 {
-  return state->lineinfo + row;
+  ঘূৰাই state->lineinfo + row;
 }
 
-void vterm_state_set_selection_callbacks(VTermState *state, const VTermSelectionCallbacks *callbacks, void *user,
-    char *buffer, size_t buflen)
+শূন্য vterm_state_set_selection_callbacks(VTermState *state, ধ্রুৱ VTermSelectionCallbacks *callbacks, শূন্য *user,
+    ৱর্ণ *buffer, size_t buflen)
 {
-  if(buflen && !buffer)
+  যদি(buflen && !buffer)
     buffer = vterm_allocator_malloc(state->vt, buflen);
 
   state->selection.callbacks = callbacks;
@@ -2499,43 +2499,43 @@ void vterm_state_set_selection_callbacks(VTermState *state, const VTermSelection
   state->selection.buflen    = buflen;
 }
 
-void vterm_state_send_selection(VTermState *state, VTermSelectionMask mask, VTermStringFragment frag)
+শূন্য vterm_state_send_selection(VTermState *state, VTermSelectionMask mask, VTermStringFragment frag)
 {
   VTerm *vt = state->vt;
 
-  if(frag.initial) {
+  যদি(frag.initial) {
     /* TODO: support sending more than one mask bit */
-    static char selection_chars[] = "cpqs";
-    int idx;
-    for(idx = 0; idx < 4; idx++)
-      if(mask & (1 << idx))
-        break;
+    স্থির ৱর্ণ selection_chars[] = "cpqs";
+    পূর্ণাঙ্ক idx;
+    বাবে(idx = 0; idx < 4; idx++)
+      যদি(mask & (1 << idx))
+        ভঙ্গ;
 
-    vterm_push_output_sprintf_str(vt, C1_OSC, FALSE, "52;%c;", selection_chars[idx]);
+    vterm_ঠেলো_output_sprintf_str(vt, C1_OSC, FALSE, "52;%c;", selection_chars[idx]);
 
     state->tmp.selection.sendpartial = 0;
   }
 
-  if(frag.len) {
+  যদি(frag.len) {
     size_t bufcur = 0;
-    char *buffer = state->selection.buffer;
+    ৱর্ণ *buffer = state->selection.buffer;
 
     uint32_t x = 0;
-    int n = 0;
+    পূর্ণাঙ্ক n = 0;
 
-    if(state->tmp.selection.sendpartial) {
+    যদি(state->tmp.selection.sendpartial) {
       n = state->tmp.selection.sendpartial >> 24;
       x = state->tmp.selection.sendpartial & 0xFFFFFF;
 
       state->tmp.selection.sendpartial = 0;
     }
 
-    while((state->selection.buflen - bufcur) >= 4 && frag.len) {
+    যেতিয়ালৈ((state->selection.buflen - bufcur) >= 4 && frag.len) {
       x = (x << 8) | frag.str[0];
       n++;
       frag.str++, frag.len--;
 
-      if(n == 3) {
+      যদি(n == 3) {
         buffer[0] = base64_one((x >> 18) & 0x3F);
         buffer[1] = base64_one((x >> 12) & 0x3F);
         buffer[2] = base64_one((x >>  6) & 0x3F);
@@ -2546,24 +2546,24 @@ void vterm_state_send_selection(VTermState *state, VTermSelectionMask mask, VTer
         n = 0;
       }
 
-      if(!frag.len || (state->selection.buflen - bufcur) < 4) {
-        if(bufcur)
-          vterm_push_output_bytes(vt, state->selection.buffer, bufcur);
+      যদি(!frag.len || (state->selection.buflen - bufcur) < 4) {
+        যদি(bufcur)
+          vterm_ঠেলো_output_bytes(vt, state->selection.buffer, bufcur);
 
         buffer = state->selection.buffer;
         bufcur = 0;
       }
     }
 
-    if(n)
+    যদি(n)
       state->tmp.selection.sendpartial = (n << 24) | x;
   }
 
-  if(frag.final) {
-    if(state->tmp.selection.sendpartial) {
-      int n      = state->tmp.selection.sendpartial >> 24;
+  যদি(frag.final) {
+    যদি(state->tmp.selection.sendpartial) {
+      পূর্ণাঙ্ক n      = state->tmp.selection.sendpartial >> 24;
       uint32_t x = state->tmp.selection.sendpartial & 0xFFFFFF;
-      char *buffer = state->selection.buffer;
+      ৱর্ণ *buffer = state->selection.buffer;
 
       /* n is either 1 or 2 now */
       x <<= (n == 1) ? 16 : 8;
@@ -2573,9 +2573,9 @@ void vterm_state_send_selection(VTermState *state, VTermSelectionMask mask, VTer
       buffer[2] = (n == 1) ? '=' : base64_one((x >>  6) & 0x3F);
       buffer[3] = '=';
 
-      vterm_push_output_sprintf_str(vt, 0, TRUE, "%.*s", 4, buffer);
+      vterm_ঠেলো_output_sprintf_str(vt, 0, TRUE, "%.*s", 4, buffer);
     }
-    else
-      vterm_push_output_sprintf_str(vt, 0, TRUE, "");
+    অন্যথা
+      vterm_ঠেলো_output_sprintf_str(vt, 0, TRUE, "");
   }
 }

@@ -9,11 +9,11 @@
 
 #ifdef FEAT_IMAGE
 
-#include <pixman.h>
+#অন্তর্ভাৱ <pixman.h>
 
 #define PLACEMENT_ID_INC 1000
 
-typedef enum
+প্রকারনির্দেশ গণনা
 {
     IMAGE_BACKEND_NONE = -1,
     IMAGE_BACKEND_GUI = 0,
@@ -24,13 +24,13 @@ typedef enum
 /*
  * Enum value is the number of bytes a pixel takes up
  */
-typedef enum
+প্রকারনির্দেশ গণনা
 {
     IMAGE_FORMAT_RGB = 3,
     IMAGE_FORMAT_RGBA = 4
 } image_format_T;
 
-typedef enum
+প্রকারনির্দেশ গণনা
 {
     IMAGE_STATE_PUBLIC,
     IMAGE_STATE_PRIVATE
@@ -41,7 +41,7 @@ typedef enum
  * higher values will always be on top of other image placements with a lower
  * use that have the same zindex as the higher use image.
  */
-typedef enum
+প্রকারনির্দেশ গণনা
 {
     // See find_next_popup() for why (global popups are always drawn first,
     // meaning they should be below local tab popups).
@@ -55,11 +55,11 @@ typedef enum
  * Represents image data, that can be referenced by multiple image placements,
  * each with a different view.
  */
-typedef struct image_S image_T;
-struct image_S
+প্রকারনির্দেশ সংরচনা image_S image_T;
+সংরচনা image_S
 {
     int_u id;
-    int refcount;
+    পূর্ণাঙ্ক refcount;
 
     // If image state is public, then it can be modified using the builtin
     // functions.
@@ -67,15 +67,15 @@ struct image_S
 
     uint8_t	    *data; // If NULL, then image is invalid and should not be
 			   // used.
-    int		    width;  // In physical pixels
-    int		    height; // In physical pixels
+    পূর্ণাঙ্ক		    width;  // In physical pixels
+    পূর্ণাঙ্ক		    height; // In physical pixels
     image_format_T  fmt;
 
     // Incremented every time the image data changes.
     int_u	    ver;
 
     image_backend_T backend;
-    void	    *backend_data;
+    শূন্য	    *backend_data;
 
     image_T *next;
     image_T *prev;
@@ -93,8 +93,8 @@ struct image_S
 /*
  * Represents an image placement, which is a visible view of an image.
  */
-typedef struct image_placement_S image_placement_T;
-struct image_placement_S
+প্রকারনির্দেশ সংরচনা image_placement_S image_placement_T;
+সংরচনা image_placement_S
 {
     int_u   id;
     int_u   gen;    // See image_placement_new(), note that "use" is prioritized
@@ -103,12 +103,12 @@ struct image_placement_S
 		    // (and the position + zindex).
 
     image_backend_T backend;
-    void	    *backend_data;
+    শূন্য	    *backend_data;
 
     // Note that positioning uses the top left of the final cropped image
     linenr_T	row;
     colnr_T	col;
-    int		zindex;
+    পূর্ণাঙ্ক		zindex;
 
     int_u flags;
 
@@ -130,10 +130,10 @@ struct image_placement_S
     int_u img_ver; // Current image version, if it is different from the image,
 		   // then must redraw the image.
 
-    int cell_width; // Cell dimensions used to draw this placement
-    int cell_height;
+    পূর্ণাঙ্ক cell_width; // Cell dimensions used to draw this placement
+    পূর্ণাঙ্ক cell_height;
 
-    int row_off;
+    পূর্ণাঙ্ক row_off;
 
     image_placement_use_T use;
 
@@ -141,17 +141,17 @@ struct image_placement_S
     image_placement_T *prev;
 };
 
-#else
+#অন্যথা
 
 // Dummy structs for .pro files when GUI Vim is compiled without image support
-typedef struct
+প্রকারনির্দেশ সংরচনা
 {
-    int dummy;
+    পূর্ণাঙ্ক dummy;
 } image_T;
 
-typedef struct
+প্রকারনির্দেশ সংরচনা
 {
-    int dummy;
+    পূর্ণাঙ্ক dummy;
 } image_placement_T;
 
 #endif // FEAT_IMAGE

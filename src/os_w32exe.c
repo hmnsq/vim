@@ -13,37 +13,37 @@
  * Ron Aaron <ronaharon@yahoo.com> wrote this and the DLL support code.
  * Adapted by Ken Takata.
  */
-#include "vim.h"
+#অন্তর্ভাৱ "vim.h"
 
 // cproto doesn't create a prototype for VimMain()
 #ifdef VIMDLL
 __declspec(dllimport)
 #endif
-int VimMain(int argc, char **argv);
+পূর্ণাঙ্ক VimMain(পূর্ণাঙ্ক argc, ৱর্ণ **argv);
 
 #ifdef VIMDLL
 # define SaveInst(hInst)    // Do nothing
-#else
-void SaveInst(HINSTANCE hInst);
+#অন্যথা
+শূন্য SaveInst(HINSTANCE hInst);
 #endif
 
 #ifdef FEAT_GUI
-    int WINAPI
+    পূর্ণাঙ্ক WINAPI
 wWinMain(
     HINSTANCE	hInstance,
     HINSTANCE	hPrevInst UNUSED,
-    LPWSTR	lpszCmdLine UNUSED,
-    int		nCmdShow UNUSED)
+    LPWSTR	lpsz_Cmd_সাৰি UNUSED,
+    পূর্ণাঙ্ক		nCmdShow UNUSED)
 {
     SaveInst(hInstance);
-    return VimMain(0, NULL);
+    ঘূৰাই VimMain(0, রিক্ত);
 }
-#else
-    int
-wmain(int argc UNUSED, wchar_t **argv UNUSED)
+#অন্যথা
+    পূর্ণাঙ্ক
+wmain(পূর্ণাঙ্ক argc UNUSED, wchar_t **argv UNUSED)
 {
-    SaveInst(GetModuleHandleW(NULL));
-    return VimMain(0, NULL);
+    SaveInst(GetModuleHandleW(রিক্ত));
+    ঘূৰাই VimMain(0, রিক্ত);
 }
 #endif
 
@@ -57,37 +57,37 @@ wmain(int argc UNUSED, wchar_t **argv UNUSED)
 // For MinGW, the -nostdlib compiler option and the --entry linker option are
 // needed.
 # ifdef FEAT_GUI
-    void WINAPI
-wWinMainCRTStartup(void)
+    শূন্য WINAPI
+wWinMainCRTStartup(শূন্য)
 {
-    VimMain(0, NULL);
+    VimMain(0, রিক্ত);
 }
-# else
-    void
-wmainCRTStartup(void)
+# অন্যথা
+    শূন্য
+wmainCRTStartup(শূন্য)
 {
-    VimMain(0, NULL);
+    VimMain(0, রিক্ত);
 }
 # endif
 #endif	// USE_OWNSTARTUP
 
 
-#if defined(VIMDLL) && defined(FEAT_MZSCHEME)
+#যদি defined(VIMDLL) && defined(FEAT_MZSCHEME)
 
-# if defined(_MSC_VER)
-static __declspec(thread) void *tls_space;
-extern intptr_t _tls_index;
+# যদি defined(_MSC_VER)
+স্থির __declspec(thread) শূন্য *tls_space;
+বাহ্য intptr_t _tls_index;
 # elif defined(__MINGW32__)
-static __thread void *tls_space;
-extern intptr_t _tls_index;
+স্থির __thread শূন্য *tls_space;
+বাহ্য intptr_t _tls_index;
 # endif
 
 // Get TLS information that is needed for if_mzsch.
-    __declspec(dllexport) void
-get_tls_info(void ***ptls_space, intptr_t *ptls_index)
+    __declspec(dllexport) শূন্য
+get_tls_info(শূন্য ***ptls_space, intptr_t *ptls_index)
 {
     *ptls_space = &tls_space;
     *ptls_index = _tls_index;
-    return;
+    ঘূৰাই;
 }
 #endif

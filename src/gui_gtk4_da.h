@@ -10,30 +10,30 @@
 #ifndef GUI_GTK4_DRAW_AREA_H
 #define GUI_GTK4_DRAW_AREA_H
 
-#include "vim.h"
+#অন্তর্ভাৱ "vim.h"
 
-#include <gtk/gtk.h>
+#অন্তর্ভাৱ <gtk/gtk.h>
 
 #define VIM_TYPE_DRAW_AREA (vim_draw_area_get_type())
 G_DECLARE_FINAL_TYPE(VimDrawArea, vim_draw_area, VIM, DRAW_AREA, GtkWidget)
 
-GtkWidget *vim_draw_area_new(void);
-void vim_draw_area_set_size(VimDrawArea *self, int rows, int cols);
-int vim_draw_area_draw_string(VimDrawArea *self, int row, int col, char_u *s, int len, int flags);
-void vim_draw_area_clear_block(VimDrawArea *self, int row1, int col1, int row2, int col2);
-void vim_draw_area_clear(VimDrawArea *self);
-void vim_draw_area_move_block(VimDrawArea *self, int to, int row1, int row2, int col1, int col2);
-void vim_draw_area_set_cursor(VimDrawArea *self, int w, int h);
-void vim_draw_area_invert_block(VimDrawArea *self, int row, int col, int nrows, int ncols);
-#if defined(FEAT_SIGN_ICONS)
-void vim_draw_area_add_sign(VimDrawArea *self, GdkTexture *sign, int row, int col, int width, int height);
+GtkWidget *vim_draw_area_new(শূন্য);
+শূন্য vim_draw_area_set_size(VimDrawArea *self, পূর্ণাঙ্ক rows, পূর্ণাঙ্ক cols);
+পূর্ণাঙ্ক vim_draw_area_draw_string(VimDrawArea *self, পূর্ণাঙ্ক row, পূর্ণাঙ্ক col, char_u *s, পূর্ণাঙ্ক len, পূর্ণাঙ্ক flags);
+শূন্য vim_draw_area_clear_block(VimDrawArea *self, পূর্ণাঙ্ক row1, পূর্ণাঙ্ক col1, পূর্ণাঙ্ক row2, পূর্ণাঙ্ক col2);
+শূন্য vim_draw_area_clear(VimDrawArea *self);
+শূন্য vim_draw_area_move_block(VimDrawArea *self, পূর্ণাঙ্ক to, পূর্ণাঙ্ক row1, পূর্ণাঙ্ক row2, পূর্ণাঙ্ক col1, পূর্ণাঙ্ক col2);
+শূন্য vim_draw_area_set_cursor(VimDrawArea *self, পূর্ণাঙ্ক w, পূর্ণাঙ্ক h);
+শূন্য vim_draw_area_invert_block(VimDrawArea *self, পূর্ণাঙ্ক row, পূর্ণাঙ্ক col, পূর্ণাঙ্ক nrows, পূর্ণাঙ্ক ncols);
+#যদি defined(FEAT_SIGN_ICONS)
+শূন্য vim_draw_area_add_sign(VimDrawArea *self, GdkTexture *sign, পূর্ণাঙ্ক row, পূর্ণাঙ্ক col, পূর্ণাঙ্ক width, পূর্ণাঙ্ক height);
 #endif
 #ifdef FEAT_NETBEANS_INTG
-void vim_draw_area_add_multisign(VimDrawArea *self, cairo_surface_t *surf, int row, int col, int width, int height);
+শূন্য vim_draw_area_add_multisign(VimDrawArea *self, cairo_surface_t *surf, পূর্ণাঙ্ক row, পূর্ণাঙ্ক col, পূর্ণাঙ্ক width, পূর্ণাঙ্ক height);
 #endif
 #ifdef FEAT_IMAGE_GUI
-void vim_draw_area_add_external(VimDrawArea *self, GskRenderNode *node);
-void vim_draw_area_remove_external(VimDrawArea *self, GskRenderNode *node);
+শূন্য vim_draw_area_add_external(VimDrawArea *self, Gsk_Render_গ্ৰন্থি *গ্ৰন্থি);
+শূন্য vim_draw_area_remove_external(VimDrawArea *self, Gsk_Render_গ্ৰন্থি *গ্ৰন্থি);
 #endif
 
 #endif

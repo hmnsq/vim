@@ -8,39 +8,39 @@
  * See README.txt for an overview of the Vim source code.
  */
 
-#include "vim.h"
+#অন্তর্ভাৱ "vim.h"
 
-#include <Xm/Form.h>
-#include <Xm/RowColumn.h>
-#include <Xm/PushB.h>
-#include <Xm/Text.h>
-#include <Xm/TextF.h>
-#include <Xm/Separator.h>
-#include <Xm/Label.h>
-#include <Xm/CascadeB.h>
-#include <Xm/ScrollBar.h>
-#include <Xm/MenuShell.h>
-#include <Xm/DrawingA.h>
-#if (XmVersion >= 1002)
+#অন্তর্ভাৱ <Xm/Form.h>
+#অন্তর্ভাৱ <Xm/RowColumn.h>
+#অন্তর্ভাৱ <Xm/PushB.h>
+#অন্তর্ভাৱ <Xm/Text.h>
+#অন্তর্ভাৱ <Xm/TextF.h>
+#অন্তর্ভাৱ <Xm/Separator.h>
+#অন্তর্ভাৱ <Xm/Label.h>
+#অন্তর্ভাৱ <Xm/CascadeB.h>
+#অন্তর্ভাৱ <Xm/ScrollBar.h>
+#অন্তর্ভাৱ <Xm/MenuShell.h>
+#অন্তর্ভাৱ <Xm/DrawingA.h>
+#যদি (XmVersion >= 1002)
 # include <Xm/RepType.h>
 #endif
-#include <Xm/Frame.h>
-#include <Xm/LabelG.h>
-#include <Xm/ToggleBG.h>
-#include <Xm/SeparatoG.h>
-#include <Xm/XmP.h>
+#অন্তর্ভাৱ <Xm/Frame.h>
+#অন্তর্ভাৱ <Xm/LabelG.h>
+#অন্তর্ভাৱ <Xm/ToggleBG.h>
+#অন্তর্ভাৱ <Xm/SeparatoG.h>
+#অন্তর্ভাৱ <Xm/XmP.h>
 
-#include <X11/keysym.h>
-#include <X11/Xatom.h>
-#include <X11/StringDefs.h>
-#include <X11/Intrinsic.h>
+#অন্তর্ভাৱ <X11/keysym.h>
+#অন্তর্ভাৱ <X11/Xatom.h>
+#অন্তর্ভাৱ <X11/StringDefs.h>
+#অন্তর্ভাৱ <X11/Intrinsic.h>
 #ifdef HAVE_X11_XPM_H
-# if defined(VMS)
+# যদি defined(VMS)
 #  include <xpm.h>
-# else
+# অন্যথা
 #  include <X11/xpm.h>
 # endif
-#else
+#অন্যথা
 # ifdef HAVE_XM_XPMP_H
 #  include <Xm/XpmP.h>
 # endif
@@ -49,9 +49,9 @@
 # include <Xm/Notebook.h>
 #endif
 
-#include "gui_xmebw.h"	// for our Enhanced Button Widget
+#অন্তর্ভাৱ "gui_xmebw.h"	// for our Enhanced Button Widget
 
-#if defined(FEAT_GUI_DIALOG) && defined(HAVE_XPM)
+#যদি defined(FEAT_GUI_DIALOG) && defined(HAVE_XPM)
 # include "../pixmaps/alert.xpm"
 # include "../pixmaps/error.xpm"
 # include "../pixmaps/generic.xpm"
@@ -61,38 +61,38 @@
 
 #define MOTIF_POPUP
 
-extern Widget vimShell;
+বাহ্য Widget vimShell;
 
-static Widget vimForm;
-static Widget textAreaForm;
+স্থির Widget vimForm;
+স্থির Widget textAreaForm;
 Widget textArea;
 #ifdef FEAT_TOOLBAR
-static Widget toolBarFrame;
-static Widget toolBar;
+স্থির Widget toolBarFrame;
+স্থির Widget toolBar;
 #endif
 #ifdef FEAT_GUI_TABLINE
-static Widget	tabLine;
-static Widget	tabLine_menu = 0;
-static int	showing_tabline = 0;
+স্থির Widget	tab_সাৰি;
+স্থির Widget	tab_সাৰি_menu = 0;
+স্থির পূর্ণাঙ্ক	showing_tabline = 0;
 #endif
 #ifdef FEAT_MENU
-# if (XmVersion >= 1002)
+# যদি (XmVersion >= 1002)
 // remember the last set value for the tearoff item
-static int tearoff_val = (int)XmTEAR_OFF_ENABLED;
+স্থির পূর্ণাঙ্ক tearoff_val = (পূর্ণাঙ্ক)XmTEAR_OFF_ENABLED;
 # endif
-static Widget menuBar;
+স্থির Widget menuBar;
 #endif
 
 #ifdef FEAT_TOOLBAR
-static void reset_focus(void);
+স্থির শূন্য reset_focus(শূন্য);
 #endif
 
-static void gui_motif_menu_colors(Widget id);
-static void gui_motif_scroll_colors(Widget id);
+স্থির শূন্য gui_motif_menu_colors(Widget id);
+স্থির শূন্য gui_motif_scroll_colors(Widget id);
 
-#if (XmVersion >= 1002)
+#যদি (XmVersion >= 1002)
 # define STRING_TAG  XmFONTLIST_DEFAULT_TAG
-#else
+#অন্যথা
 # define STRING_TAG  XmSTRING_DEFAULT_CHARSET
 #endif
 
@@ -100,23 +100,23 @@ static void gui_motif_scroll_colors(Widget id);
  * Call-back routines.
  */
 
-    static void
+    স্থির শূন্য
 scroll_cb(Widget w UNUSED, XtPointer client_data, XtPointer call_data)
 {
     scrollbar_T *sb;
-    long	value;
-    int		dragging;
+    long	মান;
+    পূর্ণাঙ্ক		dragging;
 
     sb = gui_find_scrollbar((long)client_data);
 
-    value = ((XmScrollBarCallbackStruct *)call_data)->value;
+    মান = ((XmScrollBarCallbackStruct *)call_data)->মান;
     dragging = (((XmScrollBarCallbackStruct *)call_data)->reason ==
-							      (int)XmCR_DRAG);
-    gui_drag_scrollbar(sb, value, dragging);
+							      (পূর্ণাঙ্ক)XmCR_DRAG);
+    gui_drag_scrollbar(sb, মান, dragging);
 }
 
 #ifdef FEAT_GUI_TABLINE
-    static void
+    স্থির শূন্য
 tabline_cb(
     Widget	w UNUSED,
     XtPointer	client_data UNUSED,
@@ -125,11 +125,11 @@ tabline_cb(
     XmNotebookCallbackStruct *nptr;
 
     nptr = (XmNotebookCallbackStruct *)call_data;
-    if (nptr->reason != (int)XmCR_NONE)
-	send_tabline_event(nptr->page_number);
+    যদি (nptr->reason != (পূর্ণাঙ্ক)XmCR_NONE)
+	send_tabline_event(nptr->page_সংখ্যা);
 }
 
-    static void
+    স্থির শূন্য
 tabline_button_cb(
     Widget	w,
     XtPointer	client_data UNUSED,
@@ -137,53 +137,53 @@ tabline_button_cb(
 {
     XtPointer	cmd, tab_idx;
 
-    XtVaGetValues(w, XmNuserData, &cmd, NULL);
-    XtVaGetValues(tabLine_menu, XmNuserData, &tab_idx, NULL);
+    Xt_Va_Get_মানসমূহ(w, XmNuserData, &cmd, রিক্ত);
+    Xt_Va_Get_মানসমূহ(tab_সাৰি_menu, XmNuserData, &tab_idx, রিক্ত);
 
-    send_tabline_menu_event((int)(long)tab_idx, (int)(long)cmd);
+    send_tabline_menu_event((পূর্ণাঙ্ক)(long)tab_idx, (পূর্ণাঙ্ক)(long)cmd);
 }
 
 /*
  * Tabline single mouse click timeout handler
  */
-    static void
+    স্থির শূন্য
 motif_tabline_timer_cb (
     XtPointer		timed_out,
     XtIntervalId	*interval_id UNUSED)
 {
-    *((int *)timed_out) = TRUE;
+    *((পূর্ণাঙ্ক *)timed_out) = TRUE;
 }
 
 /*
  * check if the tabline tab scroller is clicked
  */
-    static int
+    স্থির পূর্ণাঙ্ক
 tabline_scroller_clicked(
-    char		*scroller_name,
+    ৱর্ণ		*scroller_name,
     XButtonPressedEvent *event)
 {
     Widget	tab_scroll_w;
     Position	pos_x, pos_y;
     Dimension	width, height;
 
-    tab_scroll_w = XtNameToWidget(tabLine, scroller_name);
-    if (tab_scroll_w != (Widget)0)
+    tab_scroll_w = XtNameToWidget(tab_সাৰি, scroller_name);
+    যদি (tab_scroll_w != (Widget)0)
     {
-	XtVaGetValues(tab_scroll_w, XmNx, &pos_x, XmNy, &pos_y, XmNwidth,
-		      &width, XmNheight, &height, NULL);
-	if (pos_x >= 0)
+	Xt_Va_Get_মানসমূহ(tab_scroll_w, XmNx, &pos_x, XmNy, &pos_y, XmNwidth,
+		      &width, XmNheight, &height, রিক্ত);
+	যদি (pos_x >= 0)
 	{
 	    // Tab scroller (next) is visible
-	    if (event->x >= pos_x && event->x <= pos_x + width
+	    যদি (event->x >= pos_x && event->x <= pos_x + width
 		    && event->y >= pos_y && event->y <= pos_y + height)
 		// Clicked on the scroller
-		return TRUE;
+		ঘূৰাই TRUE;
 	}
     }
-    return FALSE;
+    ঘূৰাই FALSE;
 }
 
-    static void
+    স্থির শূন্য
 tabline_menu_cb(
     Widget	w,
     XtPointer	closure UNUSED,
@@ -192,21 +192,21 @@ tabline_menu_cb(
 {
     Widget			tab_w;
     XButtonPressedEvent		*event;
-    int				tab_idx = 0;
+    পূর্ণাঙ্ক				tab_idx = 0;
     WidgetList			children;
-    Cardinal			numChildren;
-    static XtIntervalId		timer = (XtIntervalId)0;
-    static int			timed_out = TRUE;
+    Cardinal			অঙ্ক_Children;
+    স্থির XtIntervalId		timer = (XtIntervalId)0;
+    স্থির পূর্ণাঙ্ক			timed_out = TRUE;
 
     event = (XButtonPressedEvent *)e;
 
-    if (event->button == Button1)
+    যদি (event->button == Button1)
     {
-	if (tabline_scroller_clicked("MajorTabScrollerNext", event)
+	যদি (tabline_scroller_clicked("MajorTabScrollerNext", event)
 	    || tabline_scroller_clicked("MajorTabScrollerPrevious", event))
-	    return;
+	    ঘূৰাই;
 
-	if (!timed_out)
+	যদি (!timed_out)
 	{
 	    XtRemoveTimeOut(timer);
 	    timed_out = TRUE;
@@ -216,7 +216,7 @@ tabline_menu_cb(
 	     */
 	    send_tabline_menu_event(0, TABLINE_MENU_NEW);
 	}
-	else
+	অন্যথা
 	{
 	    /*
 	     * Single click on the tabline gutter, start a timer to check
@@ -226,53 +226,53 @@ tabline_menu_cb(
 				    motif_tabline_timer_cb, &timed_out);
 	    timed_out = FALSE;
 	}
-	return;
+	ঘূৰাই;
     }
 
-    if (event->button == Button2)
+    যদি (event->button == Button2)
     {
 	// Middle mouse click on tabpage label closes that tab.
-	XtVaGetValues(tabLine_menu, XmNuserData, &tab_idx, NULL);
-	send_tabline_menu_event(tab_idx, (int)TABLINE_MENU_CLOSE);
-	return;
+	Xt_Va_Get_মানসমূহ(tab_সাৰি_menu, XmNuserData, &tab_idx, রিক্ত);
+	send_tabline_menu_event(tab_idx, (পূর্ণাঙ্ক)TABLINE_MENU_CLOSE);
+	ঘূৰাই;
     }
 
-    if (event->button != Button3)
-	return;
+    যদি (event->button != Button3)
+	ঘূৰাই;
 
     // When ignoring events don't show the menu.
-    if (hold_gui_events || cmdwin_type != 0)
-	return;
+    যদি (hold_gui_events || cmdwin_type != 0)
+	ঘূৰাই;
 
-    if (event->subwindow != None)
+    যদি (event->subwindow != None)
     {
 	tab_w = XtWindowToWidget(XtDisplay(w), event->subwindow);
 	// LINTED: avoid warning: dubious operation on enum
-	if (tab_w != (Widget)0 && XmIsPushButton(tab_w))
-	    XtVaGetValues(tab_w, XmNpageNumber, &tab_idx, NULL);
+	যদি (tab_w != (Widget)0 && Xm_Is_ঠেলো_Button(tab_w))
+	    Xt_Va_Get_মানসমূহ(tab_w, Xm_Npage_সংখ্যা, &tab_idx, রিক্ত);
     }
 
-    XtVaSetValues(tabLine_menu, XmNuserData, (XtPointer)(long)tab_idx, NULL);
-    XtVaGetValues(tabLine_menu, XmNchildren, &children, XmNnumChildren,
-		  &numChildren, NULL);
-    XtManageChildren(children, numChildren);
-    XmMenuPosition(tabLine_menu, (XButtonPressedEvent *)e) ;
-    XtManageChild(tabLine_menu);
+    Xt_Va_Set_মানসমূহ(tab_সাৰি_menu, XmNuserData, (XtPointer)(long)tab_idx, রিক্ত);
+    Xt_Va_Get_মানসমূহ(tab_সাৰি_menu, XmNchildren, &children, XmNnumChildren,
+		  &অঙ্ক_Children, রিক্ত);
+    XtManageChildren(children, অঙ্ক_Children);
+    XmMenuPosition(tab_সাৰি_menu, (XButtonPressedEvent *)e) ;
+    XtManageChild(tab_সাৰি_menu);
 }
 
-    static void
-tabline_balloon_cb(BalloonEval *beval, int state UNUSED)
+    স্থির শূন্য
+tabline_balloon_cb(BalloonEval *beval, পূর্ণাঙ্ক state UNUSED)
 {
-    int		nr;
+    পূর্ণাঙ্ক		nr;
     tabpage_T	*tp;
 
-    if (beval->target == (Widget)0)
-	return;
+    যদি (beval->target == (Widget)0)
+	ঘূৰাই;
 
-    XtVaGetValues(beval->target, XmNpageNumber, &nr, NULL);
+    Xt_Va_Get_মানসমূহ(beval->target, Xm_Npage_সংখ্যা, &nr, রিক্ত);
     tp = find_tabpage(nr);
-    if (tp == NULL)
-	return;
+    যদি (tp == রিক্ত)
+	ঘূৰাই;
 
     get_tabline_label(tp, TRUE);
     gui_mch_post_balloon(beval, NameBuff);
@@ -289,25 +289,25 @@ tabline_balloon_cb(BalloonEval *beval, int state UNUSED)
  * By Marcin Dalecki.
  */
 
-#include <Xm/XmP.h>
-#include <Xm/LabelP.h>
+#অন্তর্ভাৱ <Xm/XmP.h>
+#অন্তর্ভাৱ <Xm/LabelP.h>
 
-static XtExposeProc old_label_expose = NULL;
+স্থির XtExposeProc old_label_expose = রিক্ত;
 
-    static void
+    স্থির শূন্য
 label_expose(Widget _w, XEvent *_event, Region _region)
 {
     GC		    insensitiveGC;
     XmLabelWidget   lw = (XmLabelWidget)_w;
-    unsigned char   label_type = (int)XmSTRING;
+    unsigned ৱর্ণ   label_type = (পূর্ণাঙ্ক)XmSTRING;
 
-    XtVaGetValues(_w, XmNlabelType, &label_type, (XtPointer)0);
+    Xt_Va_Get_মানসমূহ(_w, XmNlabelType, &label_type, (XtPointer)0);
 
-    if (XtIsSensitive(_w) || label_type != (int)XmSTRING)
+    যদি (XtIsSensitive(_w) || label_type != (পূর্ণাঙ্ক)XmSTRING)
 	(*old_label_expose)(_w, _event, _region);
-    else
+    অন্যথা
     {
-	XGCValues   values;
+	XGCValues   মানসমূহ;
 	XtGCMask    mask;
 	XtGCMask    dynamic;
 	XFontStruct *fs;
@@ -319,51 +319,51 @@ label_expose(Widget _w, XEvent *_event, Region _region)
 
 	mask = GCForeground | GCBackground | GCGraphicsExposures;
 	dynamic = GCClipMask | GCClipXOrigin | GCClipYOrigin;
-	values.graphics_exposures = False;
+	মানসমূহ.graphics_exposures = False;
 
-	if (fs != 0)
+	যদি (fs != 0)
 	{
 	    mask |= GCFont;
-	    values.font = fs->fid;
+	    মানসমূহ.font = fs->fid;
 	}
 
-	if (lw->primitive.top_shadow_pixmap != None
-		&& lw->primitive.top_shadow_pixmap != XmUNSPECIFIED_PIXMAP)
+	যদি (lw->primitive.শীৰ্ষ_shadow_pixmap != None
+		&& lw->primitive.শীৰ্ষ_shadow_pixmap != XmUNSPECIFIED_PIXMAP)
 	{
 	    mask |= GCFillStyle | GCTile;
-	    values.fill_style = FillTiled;
-	    values.tile = lw->primitive.top_shadow_pixmap;
+	    মানসমূহ.fill_style = FillTiled;
+	    মানসমূহ.tile = lw->primitive.শীৰ্ষ_shadow_pixmap;
 	}
 
 	lw->label.TextRect.x += 1;
 	lw->label.TextRect.y += 1;
-	if (lw->label._acc_text != 0)
+	যদি (lw->label._acc_text != 0)
 	{
 	    lw->label.acc_TextRect.x += 1;
 	    lw->label.acc_TextRect.y += 1;
 	}
 
-	values.foreground = lw->primitive.top_shadow_color;
-	values.background = lw->core.background_pixel;
+	মানসমূহ.foreground = lw->primitive.শীৰ্ষ_shadow_color;
+	মানসমূহ.background = lw->core.background_pixel;
 
 	lw->label.insensitive_GC = XtAllocateGC((Widget)lw, 0, mask,
-					       &values, dynamic, (XtGCMask)0);
+					       &মানসমূহ, dynamic, (XtGCMask)0);
 	(*old_label_expose)(_w, _event, _region);
 	XtReleaseGC(_w, lw->label.insensitive_GC);
 
 	lw->label.TextRect.x -= 1;
 	lw->label.TextRect.y -= 1;
-	if (lw->label._acc_text != 0)
+	যদি (lw->label._acc_text != 0)
 	{
 	    lw->label.acc_TextRect.x -= 1;
 	    lw->label.acc_TextRect.y -= 1;
 	}
 
-	values.foreground = lw->primitive.bottom_shadow_color;
-	values.background = lw->core.background_pixel;
+	মানসমূহ.foreground = lw->primitive.bottom_shadow_color;
+	মানসমূহ.background = lw->core.background_pixel;
 
 	lw->label.insensitive_GC = XtAllocateGC((Widget) lw, 0, mask,
-					       &values, dynamic, (XtGCMask)0);
+					       &মানসমূহ, dynamic, (XtGCMask)0);
 	(*old_label_expose)(_w, _event, _region);
 	XtReleaseGC(_w, lw->label.insensitive_GC);
 
@@ -374,20 +374,20 @@ label_expose(Widget _w, XEvent *_event, Region _region)
 /*
  * Create all the motif widgets necessary.
  */
-    void
-gui_x11_create_widgets(void)
+    শূন্য
+gui_x11_create_widgets(শূন্য)
 {
 #ifdef FEAT_GUI_TABLINE
     Widget	button, scroller;
     Arg		args[10];
-    int		n;
+    পূর্ণাঙ্ক		n;
     XmString	xms;
 #endif
 
     /*
      * Install the 3D shade effect drawing routines.
      */
-    if (old_label_expose == NULL)
+    যদি (old_label_expose == রিক্ত)
     {
 	old_label_expose = xmLabelWidgetClass->core_class.expose;
 	xmLabelWidgetClass->core_class.expose = label_expose;
@@ -401,12 +401,12 @@ gui_x11_create_widgets(void)
     /*
      * Install the tearOffModel resource converter.
      */
-#if (XmVersion >= 1002)
+#যদি (XmVersion >= 1002)
     XmRepTypeInstallTearOffModelConverter();
 #endif
 
     // Make sure the "Quit" menu entry of the window manager is ignored
-    XtVaSetValues(vimShell, XmNdeleteResponse, XmDO_NOTHING, NULL);
+    Xt_Va_Set_মানসমূহ(vimShell, XmNdeleteResponse, XmDO_NOTHING, রিক্ত);
 
     vimForm = XtVaCreateManagedWidget("vimForm",
 	xmFormWidgetClass, vimShell,
@@ -416,15 +416,15 @@ gui_x11_create_widgets(void)
 	XmNmarginWidth, 0,
 	XmNmarginHeight, 0,
 	XmNresizePolicy, XmRESIZE_ANY,
-	NULL);
+	রিক্ত);
     gui_motif_menu_colors(vimForm);
 
 #ifdef FEAT_MENU
     {
 	Arg al[7]; // Make sure there is enough room for arguments!
-	int ac = 0;
+	পূর্ণাঙ্ক ac = 0;
 
-# if (XmVersion >= 1002)
+# যদি (XmVersion >= 1002)
 	XtSetArg(al[ac], XmNtearOffModel, tearoff_val); ac++;
 # endif
 	XtSetArg(al[ac], XmNleftAttachment,  XmATTACH_FORM); ac++;
@@ -453,7 +453,7 @@ gui_x11_create_widgets(void)
 	XmNmarginWidth, 0,
 	XmNleftAttachment, XmATTACH_FORM,
 	XmNrightAttachment, XmATTACH_FORM,
-	NULL);
+	রিক্ত);
     gui_motif_menu_colors(toolBarFrame);
 
     toolBar = XtVaCreateManagedWidget("toolBar",
@@ -470,7 +470,7 @@ gui_x11_create_widgets(void)
 	XmNmarginHeight, 0,
 	XmNmarginWidth, 0,
 	XmNadjustLast, True,
-	NULL);
+	রিক্ত);
     gui_motif_menu_colors(toolBar);
 
 #endif
@@ -481,18 +481,18 @@ gui_x11_create_widgets(void)
     XtSetArg(args[n], XmNbindingType, XmNONE); n++;
     XtSetArg(args[n], XmNorientation, XmVERTICAL); n++;
     XtSetArg(args[n], XmNbackPageSize, XmNONE); n++;
-    XtSetArg(args[n], XmNbackPageNumber, 0); n++;
-    XtSetArg(args[n], XmNbackPagePlacement, XmTOP_RIGHT); n++;
+    XtSetArg(args[n], Xm_Nback_Page_সংখ্যা, 0); n++;
+    XtSetArg(args[n], XmNbackPagePlacement, Xm_শীৰ্ষ_ডান); n++;
     XtSetArg(args[n], XmNmajorTabSpacing, 0); n++;
     XtSetArg(args[n], XmNshadowThickness, 0); n++;
     XtSetArg(args[n], XmNleftAttachment, XmATTACH_FORM); n++;
     XtSetArg(args[n], XmNrightAttachment, XmATTACH_FORM); n++;
-    tabLine = XmCreateNotebook(vimForm, "Vim tabline", args, n);
+    tab_সাৰি = XmCreateNotebook(vimForm, "Vim tabline", args, n);
 
-    XtAddCallback(tabLine, XmNpageChangedCallback, (XtCallbackProc)tabline_cb,
-			NULL);
-    XtAddEventHandler(tabLine, ButtonPressMask, False,
-			(XtEventHandler)tabline_menu_cb, NULL);
+    XtAddCallback(tab_সাৰি, XmNpageChangedCallback, (XtCallbackProc)tabline_cb,
+			রিক্ত);
+    XtAddEventHandler(tab_সাৰি, ButtonPressMask, False,
+			(XtEventHandler)tabline_menu_cb, রিক্ত);
 
     gui.tabline_height = TABLINE_HEIGHT;
 
@@ -503,42 +503,42 @@ gui_x11_create_widgets(void)
      * managed by the Notebook widget and the notebook widget geometry
      * is adjusted to account for the minor scroller widgets.
      */
-    scroller = XtNameToWidget(tabLine, "MinorTabScrollerNext");
-    XtVaSetValues(scroller, XmNwidth, 0, XmNresizable, False,
-		  XmNtraversalOn, False, NULL);
-    scroller = XtNameToWidget(tabLine, "MinorTabScrollerPrevious");
-    XtVaSetValues(scroller, XmNwidth, 0, XmNresizable, False,
-		  XmNtraversalOn, False, NULL);
+    scroller = XtNameToWidget(tab_সাৰি, "MinorTabScrollerNext");
+    Xt_Va_Set_মানসমূহ(scroller, XmNwidth, 0, XmNresizable, False,
+		  XmNtraversalOn, False, রিক্ত);
+    scroller = XtNameToWidget(tab_সাৰি, "MinorTabScrollerPrevious");
+    Xt_Va_Set_মানসমূহ(scroller, XmNwidth, 0, XmNresizable, False,
+		  XmNtraversalOn, False, রিক্ত);
 
     // Create the tabline popup menu
-    tabLine_menu = XmCreatePopupMenu(tabLine, "tabline popup", NULL, 0);
+    tab_সাৰি_menu = XmCreatePopupMenu(tab_সাৰি, "tabline popup", রিক্ত, 0);
 
     // Add the buttons to the tabline popup menu
     n = 0;
     XtSetArg(args[n], XmNuserData, (XtPointer)TABLINE_MENU_CLOSE); n++;
-    xms = XmStringCreate((char *)"Close tab", STRING_TAG);
+    xms = XmStringCreate((ৱর্ণ *)"Close tab", STRING_TAG);
     XtSetArg(args[n], XmNlabelString, xms); n++;
-    button = XmCreatePushButton(tabLine_menu, "Close", args, n);
+    button = Xm_Create_ঠেলো_Button(tab_সাৰি_menu, "Close", args, n);
     XtAddCallback(button, XmNactivateCallback,
-		  (XtCallbackProc)tabline_button_cb, NULL);
+		  (XtCallbackProc)tabline_button_cb, রিক্ত);
     XmStringFree(xms);
 
     n = 0;
     XtSetArg(args[n], XmNuserData, (XtPointer)TABLINE_MENU_NEW); n++;
-    xms = XmStringCreate((char *)"New Tab", STRING_TAG);
+    xms = XmStringCreate((ৱর্ণ *)"New Tab", STRING_TAG);
     XtSetArg(args[n], XmNlabelString, xms); n++;
-    button = XmCreatePushButton(tabLine_menu, "New Tab", args, n);
+    button = Xm_Create_ঠেলো_Button(tab_সাৰি_menu, "New Tab", args, n);
     XtAddCallback(button, XmNactivateCallback,
-		  (XtCallbackProc)tabline_button_cb, NULL);
+		  (XtCallbackProc)tabline_button_cb, রিক্ত);
     XmStringFree(xms);
 
     n = 0;
     XtSetArg(args[n], XmNuserData, (XtPointer)TABLINE_MENU_OPEN); n++;
-    xms = XmStringCreate((char *)"Open tab...", STRING_TAG);
+    xms = XmStringCreate((ৱর্ণ *)"Open tab...", STRING_TAG);
     XtSetArg(args[n], XmNlabelString, xms); n++;
-    button = XmCreatePushButton(tabLine_menu, "Open tab...", args, n);
+    button = Xm_Create_ঠেলো_Button(tab_সাৰি_menu, "Open tab...", args, n);
     XtAddCallback(button, XmNactivateCallback,
-		  (XtCallbackProc)tabline_button_cb, NULL);
+		  (XtCallbackProc)tabline_button_cb, রিক্ত);
     XmStringFree(xms);
 #endif
 
@@ -551,7 +551,7 @@ gui_x11_create_widgets(void)
 	XmNmarginWidth, 0,
 	XmNmarginHeight, 0,
 	XmNresizePolicy, XmRESIZE_ANY,
-	NULL);
+	রিক্ত);
     gui_motif_scroll_colors(textAreaForm);
 
     textArea = XtVaCreateManagedWidget("textArea",
@@ -570,7 +570,7 @@ gui_x11_create_widgets(void)
 	XmNborderWidth, 0,
 	XmNhighlightThickness, 0,
 	XmNshadowThickness, 0,
-	NULL);
+	রিক্ত);
 
     /*
      * Install the callbacks.
@@ -584,21 +584,21 @@ gui_x11_create_widgets(void)
 /*
  * Called when the GUI is not going to start after all.
  */
-    void
-gui_x11_destroy_widgets(void)
+    শূন্য
+gui_x11_destroy_widgets(শূন্য)
 {
-    textArea = NULL;
+    textArea = রিক্ত;
 #ifdef FEAT_MENU
-    menuBar = NULL;
+    menuBar = রিক্ত;
 #endif
 }
 
-    void
+    শূন্য
 gui_mch_set_text_area_pos(
-    int	    x UNUSED,
-    int	    y UNUSED,
-    int	    w UNUSED,
-    int	    h UNUSED)
+    পূর্ণাঙ্ক	    x UNUSED,
+    পূর্ণাঙ্ক	    y UNUSED,
+    পূর্ণাঙ্ক	    w UNUSED,
+    পূর্ণাঙ্ক	    h UNUSED)
 {
 #ifdef FEAT_TOOLBAR
     // Give keyboard focus to the textArea instead of the toolbar.
@@ -606,46 +606,46 @@ gui_mch_set_text_area_pos(
 #endif
 }
 
-    void
-gui_x11_set_back_color(void)
+    শূন্য
+gui_x11_set_back_color(শূন্য)
 {
-    if (textArea != NULL)
-#if (XmVersion >= 1002)
+    যদি (textArea != রিক্ত)
+#যদি (XmVersion >= 1002)
 	XmChangeColor(textArea, gui.back_pixel);
-#else
-	XtVaSetValues(textArea,
+#অন্যথা
+	Xt_Va_Set_মানসমূহ(textArea,
 		  XmNbackground, gui.back_pixel,
-		  NULL);
+		  রিক্ত);
 #endif
 }
 
 /*
  * Manage dialog centered on pointer.
  */
-    void
+    শূন্য
 manage_centered(Widget dialog_child)
 {
     Widget shell = XtParent(dialog_child);
-    Window root, child;
-    unsigned int mask;
-    unsigned int width, height, border_width, depth;
-    int x, y, win_x, win_y, maxX, maxY;
+    Window মূল, child;
+    unsigned পূর্ণাঙ্ক mask;
+    unsigned পূর্ণাঙ্ক width, height, border_width, depth;
+    পূর্ণাঙ্ক x, y, win_x, win_y, maxX, maxY;
     Boolean mappedWhenManaged;
 
     // Temporarily set value of XmNmappedWhenManaged
     // to stop the dialog from popping up right away
-    XtVaGetValues(shell, XmNmappedWhenManaged, &mappedWhenManaged, NULL);
-    XtVaSetValues(shell, XmNmappedWhenManaged, False, NULL);
+    Xt_Va_Get_মানসমূহ(shell, XmNmappedWhenManaged, &mappedWhenManaged, রিক্ত);
+    Xt_Va_Set_মানসমূহ(shell, XmNmappedWhenManaged, False, রিক্ত);
 
     XtManageChild(dialog_child);
 
     // Get the pointer position (x, y)
-    XQueryPointer(XtDisplay(shell), XtWindow(shell), &root, &child,
+    XQueryPointer(XtDisplay(shell), XtWindow(shell), &মূল, &child,
 		  &x, &y, &win_x, &win_y, &mask);
 
     // Translate the pointer position (x, y) into a position for the new
     // window that will place the pointer at its center
-    XGetGeometry(XtDisplay(shell), XtWindow(shell), &root, &win_x, &win_y,
+    XGetGeometry(XtDisplay(shell), XtWindow(shell), &মূল, &win_x, &win_y,
 		 &width, &height, &border_width, &depth);
     width += 2 * border_width;
     height += 2 * border_width;
@@ -655,26 +655,26 @@ manage_centered(Widget dialog_child)
     // Ensure that the dialog remains on screen
     maxX = XtScreen(shell)->width - width;
     maxY = XtScreen(shell)->height - height;
-    if (x < 0)
+    যদি (x < 0)
 	x = 0;
-    if (x > maxX)
+    যদি (x > maxX)
 	x = maxX;
-    if (y < 0)
+    যদি (y < 0)
 	y = 0;
-    if (y > maxY)
+    যদি (y > maxY)
 	y = maxY;
 
     // Set desired window position in the DialogShell
-    XtVaSetValues(shell, XmNx, x, XmNy, y, NULL);
+    Xt_Va_Set_মানসমূহ(shell, XmNx, x, XmNy, y, রিক্ত);
 
     // Map the widget
     XtMapWidget(shell);
 
     // Restore the value of XmNmappedWhenManaged
-    XtVaSetValues(shell, XmNmappedWhenManaged, mappedWhenManaged, NULL);
+    Xt_Va_Set_মানসমূহ(shell, XmNmappedWhenManaged, mappedWhenManaged, রিক্ত);
 }
 
-#if defined(FEAT_MENU) || defined(FEAT_GUI_DIALOG)
+#যদি defined(FEAT_MENU) || defined(FEAT_GUI_DIALOG)
 
 /*
  * Encapsulate the way an XmFontList is created.
@@ -684,22 +684,22 @@ gui_motif_create_fontlist(XFontStruct *font)
 {
     XmFontList font_list;
 
-# if (XmVersion <= 1001)
+# যদি (XmVersion <= 1001)
     // Motif 1.1 method
     font_list = XmFontListCreate(font, STRING_TAG);
-# else
+# অন্যথা
     // Motif 1.2 method
     XmFontListEntry font_list_entry;
 
     font_list_entry = XmFontListEntryCreate(STRING_TAG, XmFONT_IS_FONT,
 					    (XtPointer)font);
-    font_list = XmFontListAppendEntry(NULL, font_list_entry);
+    font_list = XmFontListAppendEntry(রিক্ত, font_list_entry);
     XmFontListEntryFree(&font_list_entry);
 # endif
-    return font_list;
+    ঘূৰাই font_list;
 }
 
-# if ((XmVersion > 1001) && defined(FEAT_XFONTSET))
+# যদি ((XmVersion > 1001) && defined(FEAT_XFONTSET))
     XmFontList
 gui_motif_fontset2fontlist(XFontSet *fontset)
 {
@@ -711,132 +711,132 @@ gui_motif_fontset2fontlist(XFontSet *fontset)
     font_list_entry = XmFontListEntryCreate(STRING_TAG,
 					    XmFONT_IS_FONTSET,
 					    (XtPointer)*fontset);
-    font_list = XmFontListAppendEntry(NULL, font_list_entry);
+    font_list = XmFontListAppendEntry(রিক্ত, font_list_entry);
     XmFontListEntryFree(&font_list_entry);
-    return font_list;
+    ঘূৰাই font_list;
 }
 # endif
 
 #endif
 
-#if defined(FEAT_MENU)
+#যদি defined(FEAT_MENU)
 /*
  * Menu stuff.
  */
 
-static void gui_motif_add_actext(vimmenu_T *menu);
-# if (XmVersion >= 1002)
-static void toggle_tearoff(Widget wid);
-static void gui_mch_recurse_tearoffs(vimmenu_T *menu);
+স্থির শূন্য gui_motif_add_actext(vimmenu_T *menu);
+# যদি (XmVersion >= 1002)
+স্থির শূন্য toggle_tearoff(Widget wid);
+স্থির শূন্য gui_mch_recurse_tearoffs(vimmenu_T *menu);
 # endif
-static void submenu_change(vimmenu_T *mp, int colors);
+স্থির শূন্য submenu_change(vimmenu_T *mp, পূর্ণাঙ্ক colors);
 
-static void do_set_mnemonics(int enable);
-static int menu_enabled = TRUE;
+স্থির শূন্য do_set_mnemonics(পূর্ণাঙ্ক enable);
+স্থির পূর্ণাঙ্ক menu_enabled = TRUE;
 
-    void
-gui_mch_enable_menu(int flag)
+    শূন্য
+gui_mch_enable_menu(পূর্ণাঙ্ক flag)
 {
-    if (flag)
+    যদি (flag)
     {
 	XtManageChild(menuBar);
 # ifdef FEAT_TOOLBAR
-	if (XtIsManaged(XtParent(toolBar)))
+	যদি (XtIsManaged(XtParent(toolBar)))
 	{
 	    // toolBar is attached to top form
-	    XtVaSetValues(XtParent(toolBar),
+	    Xt_Va_Set_মানসমূহ(XtParent(toolBar),
 		XmNtopAttachment, XmATTACH_WIDGET,
 		XmNtopWidget, menuBar,
-		NULL);
+		রিক্ত);
 #  ifdef FEAT_GUI_TABLINE
-	    if (showing_tabline)
+	    যদি (showing_tabline)
 	    {
-		XtVaSetValues(tabLine,
+		Xt_Va_Set_মানসমূহ(tab_সাৰি,
 			      XmNtopAttachment, XmATTACH_WIDGET,
 			      XmNtopWidget, XtParent(toolBar),
-			      NULL);
-		XtVaSetValues(textAreaForm,
+			      রিক্ত);
+		Xt_Va_Set_মানসমূহ(textAreaForm,
 			      XmNtopAttachment, XmATTACH_WIDGET,
-			      XmNtopWidget, tabLine,
-			      NULL);
+			      XmNtopWidget, tab_সাৰি,
+			      রিক্ত);
 	    }
-	    else
+	    অন্যথা
 #  endif
-		XtVaSetValues(textAreaForm,
+		Xt_Va_Set_মানসমূহ(textAreaForm,
 			      XmNtopAttachment, XmATTACH_WIDGET,
 			      XmNtopWidget, XtParent(toolBar),
-			      NULL);
+			      রিক্ত);
 	}
-	else
+	অন্যথা
 # endif
 	{
 # ifdef FEAT_GUI_TABLINE
-	    if (showing_tabline)
+	    যদি (showing_tabline)
 	    {
-		XtVaSetValues(tabLine,
+		Xt_Va_Set_মানসমূহ(tab_সাৰি,
 			      XmNtopAttachment, XmATTACH_WIDGET,
 			      XmNtopWidget, menuBar,
-			      NULL);
-		XtVaSetValues(textAreaForm,
+			      রিক্ত);
+		Xt_Va_Set_মানসমূহ(textAreaForm,
 			      XmNtopAttachment, XmATTACH_WIDGET,
-			      XmNtopWidget, tabLine,
-			      NULL);
+			      XmNtopWidget, tab_সাৰি,
+			      রিক্ত);
 	    }
-	    else
+	    অন্যথা
 # endif
-		XtVaSetValues(textAreaForm,
+		Xt_Va_Set_মানসমূহ(textAreaForm,
 			      XmNtopAttachment, XmATTACH_WIDGET,
 			      XmNtopWidget, menuBar,
-			      NULL);
+			      রিক্ত);
 	}
     }
-    else
+    অন্যথা
     {
 	XtUnmanageChild(menuBar);
 # ifdef FEAT_TOOLBAR
-	if (XtIsManaged(XtParent(toolBar)))
+	যদি (XtIsManaged(XtParent(toolBar)))
 	{
-	    XtVaSetValues(XtParent(toolBar),
+	    Xt_Va_Set_মানসমূহ(XtParent(toolBar),
 		XmNtopAttachment, XmATTACH_FORM,
-		NULL);
+		রিক্ত);
 #  ifdef FEAT_GUI_TABLINE
-	    if (showing_tabline)
+	    যদি (showing_tabline)
 	    {
-		XtVaSetValues(tabLine,
+		Xt_Va_Set_মানসমূহ(tab_সাৰি,
 			      XmNtopAttachment, XmATTACH_WIDGET,
 			      XmNtopWidget, XtParent(toolBar),
-			      NULL);
-		XtVaSetValues(textAreaForm,
+			      রিক্ত);
+		Xt_Va_Set_মানসমূহ(textAreaForm,
 			      XmNtopAttachment, XmATTACH_WIDGET,
-			      XmNtopWidget, tabLine,
-			      NULL);
+			      XmNtopWidget, tab_সাৰি,
+			      রিক্ত);
 	    }
-	    else
+	    অন্যথা
 #  endif
-		XtVaSetValues(textAreaForm,
+		Xt_Va_Set_মানসমূহ(textAreaForm,
 			      XmNtopAttachment, XmATTACH_WIDGET,
 			      XmNtopWidget, XtParent(toolBar),
-			      NULL);
+			      রিক্ত);
 	}
-	else
+	অন্যথা
 # endif
 	{
 # ifdef FEAT_GUI_TABLINE
-	    if (showing_tabline)
+	    যদি (showing_tabline)
 	    {
-		XtVaSetValues(tabLine,
+		Xt_Va_Set_মানসমূহ(tab_সাৰি,
 			      XmNtopAttachment, XmATTACH_FORM,
-			      NULL);
-		XtVaSetValues(textAreaForm,
+			      রিক্ত);
+		Xt_Va_Set_মানসমূহ(textAreaForm,
 			      XmNtopAttachment, XmATTACH_WIDGET,
-			      XmNtopWidget, tabLine,
-			      NULL);
+			      XmNtopWidget, tab_সাৰি,
+			      রিক্ত);
 	    }
-	    else
+	    অন্যথা
 # endif
-		XtVaSetValues(textAreaForm,
+		Xt_Va_Set_মানসমূহ(textAreaForm,
 			      XmNtopAttachment, XmATTACH_FORM,
-			      NULL);
+			      রিক্ত);
 	}
     }
 
@@ -845,54 +845,54 @@ gui_mch_enable_menu(int flag)
 /*
  * Enable or disable mnemonics for the toplevel menus.
  */
-    void
-gui_motif_set_mnemonics(int enable)
+    শূন্য
+gui_motif_set_mnemonics(পূর্ণাঙ্ক enable)
 {
     /*
      * Don't enable menu mnemonics when the menu bar is disabled, LessTif
      * crashes when using a mnemonic then.
      */
-    if (!menu_enabled)
+    যদি (!menu_enabled)
 	enable = FALSE;
     do_set_mnemonics(enable);
 }
 
-    static void
-do_set_mnemonics(int enable)
+    স্থির শূন্য
+do_set_mnemonics(পূর্ণাঙ্ক enable)
 {
     vimmenu_T	*menu;
 
     FOR_ALL_MENUS(menu)
-	if (menu->id != (Widget)0)
-	    XtVaSetValues(menu->id,
+	যদি (menu->id != (Widget)0)
+	    Xt_Va_Set_মানসমূহ(menu->id,
 		    XmNmnemonic, enable ? menu->mnemonic : NUL,
-		    NULL);
+		    রিক্ত);
 }
 
-    void
-gui_mch_add_menu(vimmenu_T *menu, int idx)
+    শূন্য
+gui_mch_add_menu(vimmenu_T *menu, পূর্ণাঙ্ক idx)
 {
     XmString	label;
     Widget	shell;
     vimmenu_T	*parent = menu->parent;
 
 # ifdef MOTIF_POPUP
-    if (menu_is_popup(menu->name))
+    যদি (menu_is_popup(menu->name))
     {
 	Arg arg[2];
-	int n = 0;
+	পূর্ণাঙ্ক n = 0;
 
 	// Only create the popup menu when it's actually used, otherwise there
 	// is a delay when using the right mouse button.
-#  if (XmVersion <= 1002)
-	if (mouse_model_popup())
+#  যদি (XmVersion <= 1002)
+	যদি (mouse_model_popup())
 #  endif
 	{
-	    if (gui.menu_bg_pixel != INVALCOLOR)
+	    যদি (gui.menu_bg_pixel != INVALCOLOR)
 	    {
 		XtSetArg(arg[0], XmNbackground, gui.menu_bg_pixel); n++;
 	    }
-	    if (gui.menu_fg_pixel != INVALCOLOR)
+	    যদি (gui.menu_fg_pixel != INVALCOLOR)
 	    {
 		XtSetArg(arg[1], XmNforeground, gui.menu_fg_pixel); n++;
 	    }
@@ -900,39 +900,39 @@ gui_mch_add_menu(vimmenu_T *menu, int idx)
 								      arg, n);
 	    menu->id = (Widget)0;
 	}
-	return;
+	ঘূৰাই;
     }
 # endif
 
-    if (!menu_is_menubar(menu->name)
-	    || (parent != NULL && parent->submenu_id == (Widget)0))
-	return;
+    যদি (!menu_is_menubar(menu->name)
+	    || (parent != রিক্ত && parent->submenu_id == (Widget)0))
+	ঘূৰাই;
 
-    label = XmStringCreate((char *)menu->dname, STRING_TAG);
-    if (label == NULL)
-	return;
+    label = XmStringCreate((ৱর্ণ *)menu->dname, STRING_TAG);
+    যদি (label == রিক্ত)
+	ঘূৰাই;
     menu->id = XtVaCreateWidget("subMenu",
 	    xmCascadeButtonWidgetClass,
-	    (parent == NULL) ? menuBar : parent->submenu_id,
+	    (parent == রিক্ত) ? menuBar : parent->submenu_id,
 	    XmNlabelString, label,
 	    XmNmnemonic, p_wak[0] == 'n' ? NUL : menu->mnemonic,
-# if (XmVersion >= 1002)
+# যদি (XmVersion >= 1002)
 	    // submenu: count the tearoff item (needed for LessTif)
-	    XmNpositionIndex, idx + (parent != NULL
-			   && tearoff_val == (int)XmTEAR_OFF_ENABLED ? 1 : 0),
+	    XmNpositionIndex, idx + (parent != রিক্ত
+			   && tearoff_val == (পূর্ণাঙ্ক)XmTEAR_OFF_ENABLED ? 1 : 0),
 # endif
-	    NULL);
+	    রিক্ত);
     XmStringFree(label);
 
-    if (menu->id == (Widget)0)		// failed
-	return;
+    যদি (menu->id == (Widget)0)		// failed
+	ঘূৰাই;
 
     // The "Help" menu is a special case, and should be placed at the far
     // right hand side of the menu-bar.  It's recognized by its high priority.
-    if (parent == NULL && menu->priority >= 9999)
-	XtVaSetValues(menuBar,
+    যদি (parent == রিক্ত && menu->priority >= 9999)
+	Xt_Va_Set_মানসমূহ(menuBar,
 		XmNmenuHelpWidget, menu->id,
-		NULL);
+		রিক্ত);
 
     gui_motif_menu_colors(menu->id);
     gui_motif_menu_fontlist(menu->id);
@@ -944,29 +944,29 @@ gui_mch_add_menu(vimmenu_T *menu, int idx)
 	xmMenuShellWidgetClass, menu->id,
 	XmNwidth, 1,
 	XmNheight, 1,
-	NULL);
+	রিক্ত);
     gui_motif_menu_colors(shell);
     menu->submenu_id = XtVaCreateWidget("rowColumnMenu",
 	xmRowColumnWidgetClass, shell,
 	XmNrowColumnType, XmMENU_PULLDOWN,
-	NULL);
+	রিক্ত);
     gui_motif_menu_colors(menu->submenu_id);
 
-    if (menu->submenu_id == (Widget)0)		// failed
-	return;
+    যদি (menu->submenu_id == (Widget)0)		// failed
+	ঘূৰাই;
 
-# if (XmVersion >= 1002)
+# যদি (XmVersion >= 1002)
     // Set the colors for the tear off widget
     toggle_tearoff(menu->submenu_id);
 # endif
 
-    XtVaSetValues(menu->id,
+    Xt_Va_Set_মানসমূহ(menu->id,
 	XmNsubMenuId, menu->submenu_id,
-	NULL);
+	রিক্ত);
 
     // When we add a top-level item to the menu bar, we can figure out how
     // high the menu bar should be.
-    if (parent == NULL)
+    যদি (parent == রিক্ত)
 	gui_mch_compute_menu_height(menu->id);
 }
 
@@ -974,59 +974,59 @@ gui_mch_add_menu(vimmenu_T *menu, int idx)
 /*
  * Add mnemonic and accelerator text to a menu button.
  */
-    static void
+    স্থির শূন্য
 gui_motif_add_actext(vimmenu_T *menu)
 {
     XmString	label;
 
     // Add accelerator text, if there is one
-    if (menu->actext == NULL || menu->id == (Widget)0)
-	return;
+    যদি (menu->actext == রিক্ত || menu->id == (Widget)0)
+	ঘূৰাই;
 
-    label = XmStringCreate((char *)menu->actext, STRING_TAG);
-    if (label == NULL)
-	return;
-    XtVaSetValues(menu->id, XmNacceleratorText, label, NULL);
+    label = XmStringCreate((ৱর্ণ *)menu->actext, STRING_TAG);
+    যদি (label == রিক্ত)
+	ঘূৰাই;
+    Xt_Va_Set_মানসমূহ(menu->id, XmNacceleratorText, label, রিক্ত);
     XmStringFree(label);
 }
 
-    void
-gui_mch_toggle_tearoffs(int enable)
+    শূন্য
+gui_mch_toggle_tearoffs(পূর্ণাঙ্ক enable)
 {
-# if (XmVersion >= 1002)
-    if (enable)
-	tearoff_val = (int)XmTEAR_OFF_ENABLED;
-    else
-	tearoff_val = (int)XmTEAR_OFF_DISABLED;
+# যদি (XmVersion >= 1002)
+    যদি (enable)
+	tearoff_val = (পূর্ণাঙ্ক)XmTEAR_OFF_ENABLED;
+    অন্যথা
+	tearoff_val = (পূর্ণাঙ্ক)XmTEAR_OFF_DISABLED;
     toggle_tearoff(menuBar);
-    gui_mch_recurse_tearoffs(root_menu);
+    gui_mch_recurse_tearoffs(মূল_menu);
 # endif
 }
 
-# if (XmVersion >= 1002)
+# যদি (XmVersion >= 1002)
 /*
  * Set the tearoff for one menu widget on or off, and set the color of the
  * tearoff widget.
  */
-    static void
+    স্থির শূন্য
 toggle_tearoff(Widget wid)
 {
     Widget	w;
 
-    XtVaSetValues(wid, XmNtearOffModel, tearoff_val, NULL);
-    if (tearoff_val == (int)XmTEAR_OFF_ENABLED
+    Xt_Va_Set_মানসমূহ(wid, XmNtearOffModel, tearoff_val, রিক্ত);
+    যদি (tearoff_val == (পূর্ণাঙ্ক)XmTEAR_OFF_ENABLED
 	    && (w = XmGetTearOffControl(wid)) != (Widget)0)
 	gui_motif_menu_colors(w);
 }
 
-    static void
+    স্থির শূন্য
 gui_mch_recurse_tearoffs(vimmenu_T *menu)
 {
-    while (menu != NULL)
+    যেতিয়ালৈ (menu != রিক্ত)
     {
-	if (!menu_is_popup(menu->name))
+	যদি (!menu_is_popup(menu->name))
 	{
-	    if (menu->submenu_id != (Widget)0)
+	    যদি (menu->submenu_id != (Widget)0)
 		toggle_tearoff(menu->submenu_id);
 	    gui_mch_recurse_tearoffs(menu->children);
 	}
@@ -1035,13 +1035,13 @@ gui_mch_recurse_tearoffs(vimmenu_T *menu)
 }
 # endif
 
-    int
-gui_mch_text_area_extra_height(void)
+    পূর্ণাঙ্ক
+gui_mch_text_area_extra_height(শূন্য)
 {
     Dimension	shadowHeight;
 
-    XtVaGetValues(textAreaForm, XmNshadowThickness, &shadowHeight, NULL);
-    return shadowHeight;
+    Xt_Va_Get_মানসমূহ(textAreaForm, XmNshadowThickness, &shadowHeight, রিক্ত);
+    ঘূৰাই shadowHeight;
 }
 
 /*
@@ -1049,37 +1049,37 @@ gui_mch_text_area_extra_height(void)
  * We need to check all the items for their position and height, for the case
  * there are several rows, and/or some characters extend higher or lower.
  */
-    void
+    শূন্য
 gui_mch_compute_menu_height(
     Widget	id)		    // can be NULL when deleting menu
 {
     Dimension	y, maxy;
     Dimension	margin, shadow;
     vimmenu_T	*mp;
-    static Dimension	height = 21;	// normal height of a menu item
+    স্থির Dimension	height = 21;	// normal height of a menu item
 
     /*
      * Get the height of the new item, before managing it, because it will
      * still reflect the font size.  After managing it depends on the menu
      * height, which is what we just wanted to get!.
      */
-    if (id != (Widget)0)
-	XtVaGetValues(id, XmNheight, &height, NULL);
+    যদি (id != (Widget)0)
+	Xt_Va_Get_মানসমূহ(id, XmNheight, &height, রিক্ত);
 
     // Find any menu Widget, to be able to call XtManageChild()
-    else
+    অন্যথা
 	FOR_ALL_MENUS(mp)
-	    if (mp->id != (Widget)0 && menu_is_menubar(mp->name))
+	    যদি (mp->id != (Widget)0 && menu_is_menubar(mp->name))
 	    {
 		id = mp->id;
-		break;
+		ভঙ্গ;
 	    }
 
     /*
      * Now manage the menu item, to make them all be positioned (makes an
      * extra row when needed, removes it when not needed).
      */
-    if (id != (Widget)0)
+    যদি (id != (Widget)0)
 	XtManageChild(id);
 
     /*
@@ -1088,18 +1088,18 @@ gui_mch_compute_menu_height(
     maxy = 0;
     FOR_ALL_MENUS(mp)
     {
-	if (mp->id != (Widget)0 && menu_is_menubar(mp->name))
+	যদি (mp->id != (Widget)0 && menu_is_menubar(mp->name))
 	{
-	    XtVaGetValues(mp->id, XmNy, &y, NULL);
-	    if (y > maxy)
+	    Xt_Va_Get_মানসমূহ(mp->id, XmNy, &y, রিক্ত);
+	    যদি (y > maxy)
 		maxy = y;
 	}
     }
 
-    XtVaGetValues(menuBar,
+    Xt_Va_Get_মানসমূহ(menuBar,
 	XmNmarginHeight, &margin,
 	XmNshadowThickness, &shadow,
-	NULL);
+	রিক্ত);
 
     /*
      * This computation is the result of trial-and-error:
@@ -1116,8 +1116,8 @@ gui_mch_compute_menu_height(
     // Somehow the menu bar doesn't resize automatically.  Set it here,
     // even though this is a catch 22.  Don't do this when starting up,
     // somehow the menu gets very high then.
-    if (gui.shell_created)
-	XtVaSetValues(menuBar, XmNheight, gui.menu_height, NULL);
+    যদি (gui.shell_created)
+	Xt_Va_Set_মানসমূহ(menuBar, XmNheight, gui.menu_height, রিক্ত);
 }
 
 # ifdef FEAT_TOOLBAR
@@ -1127,16 +1127,16 @@ gui_mch_compute_menu_height(
  */
 #  include "gui_x11_pm.h"
 
-static char **get_toolbar_pixmap(vimmenu_T *menu, char **fname);
+স্থির ৱর্ণ **get_toolbar_pixmap(vimmenu_T *menu, ৱর্ণ **fname);
 
 /*
  * Read an Xpm file.  Return OK or FAIL.
  */
-    static int
+    স্থির পূর্ণাঙ্ক
 check_xpm(char_u *path)
 {
     XpmAttributes attrs;
-    int		status;
+    পূর্ণাঙ্ক		status;
     Pixmap	mask;
     Pixmap	map;
 
@@ -1144,13 +1144,13 @@ check_xpm(char_u *path)
 
     // Create the "sensitive" pixmap
     status = XpmReadFileToPixmap(gui.dpy,
-	    RootWindow(gui.dpy, DefaultScreen(gui.dpy)),
-	    (char *)path, &map, &mask, &attrs);
+	    মূল_Window(gui.dpy, DefaultScreen(gui.dpy)),
+	    (ৱর্ণ *)path, &map, &mask, &attrs);
     XpmFreeAttributes(&attrs);
 
-    if (status == XpmSuccess)
-	return OK;
-    return FAIL;
+    যদি (status == XpmSuccess)
+	ঘূৰাই OK;
+    ঘূৰাই FAIL;
 }
 
 
@@ -1160,103 +1160,103 @@ check_xpm(char_u *path)
  * (in allocated memory).
  * Return a blank pixmap if it fails.
  */
-    static char **
-get_toolbar_pixmap(vimmenu_T *menu, char **fname)
+    স্থির ৱর্ণ **
+get_toolbar_pixmap(vimmenu_T *menu, ৱর্ণ **fname)
 {
     char_u	buf[MAXPATHL];		// buffer storing expanded pathname
-    char	**xpm = NULL;		// xpm array
-    int		res;
+    ৱর্ণ	**xpm = রিক্ত;		// xpm array
+    পূর্ণাঙ্ক		res;
 
-    *fname = NULL;
+    *fname = রিক্ত;
     buf[0] = NUL;			// start with NULL path
 
-    if (menu->iconfile != NULL)
+    যদি (menu->iconfile != রিক্ত)
     {
 	// Use the "icon="  argument.
 	gui_find_iconfile(menu->iconfile, buf, "xpm");
 	res = check_xpm(buf);
 
 	// If it failed, try using the menu name.
-	if (res == FAIL && gui_find_bitmap(menu->name, buf, "xpm") == OK)
+	যদি (res == FAIL && gui_find_bitmap(menu->name, buf, "xpm") == OK)
 	    res = check_xpm(buf);
-	if (res == OK)
+	যদি (res == OK)
 	{
-	    *fname = (char *)vim_strsave(buf);
-	    return tb_blank_xpm;
+	    *fname = (ৱর্ণ *)vim_strsave(buf);
+	    ঘূৰাই tb_blank_xpm;
 	}
     }
 
-    if (menu->icon_builtin || gui_find_bitmap(menu->name, buf, "xpm") == FAIL)
+    যদি (menu->icon_builtin || gui_find_bitmap(menu->name, buf, "xpm") == FAIL)
     {
-	if (menu->iconidx >= 0 && menu->iconidx
-	       < (int)(sizeof(built_in_pixmaps) / sizeof(built_in_pixmaps[0])))
+	যদি (menu->iconidx >= 0 && menu->iconidx
+	       < (পূর্ণাঙ্ক)(পরিমাণ(built_in_pixmaps) / পরিমাণ(built_in_pixmaps[0])))
 	    xpm = built_in_pixmaps[menu->iconidx];
-	else
+	অন্যথা
 	    xpm = tb_blank_xpm;
     }
 
-    return xpm;
+    ঘূৰাই xpm;
 }
 
 /*
  * Add arguments for the toolbar pixmap to a menu item.
  */
-    static int
-add_pixmap_args(vimmenu_T *menu, Arg *args, int n)
+    স্থির পূর্ণাঙ্ক
+add_pixmap_args(vimmenu_T *menu, Arg *args, পূর্ণাঙ্ক n)
 {
     vim_free(menu->xpm_fname);
     menu->xpm = get_toolbar_pixmap(menu, &menu->xpm_fname);
-    if (menu->xpm == NULL)
+    যদি (menu->xpm == রিক্ত)
     {
 	XtSetArg(args[n], XmNlabelType, XmSTRING); n++;
     }
-    else
+    অন্যথা
     {
-	if (menu->xpm_fname != NULL)
+	যদি (menu->xpm_fname != রিক্ত)
 	{
 	    XtSetArg(args[n], XmNpixmapFile, menu->xpm_fname); n++;
 	}
 	XtSetArg(args[n], XmNpixmapData, menu->xpm); n++;
 	XtSetArg(args[n], XmNlabelLocation, XmBOTTOM); n++;
     }
-    return n;
+    ঘূৰাই n;
 }
 # endif // FEAT_TOOLBAR
 
-    void
-gui_mch_add_menu_item(vimmenu_T *menu, int idx)
+    শূন্য
+gui_mch_add_menu_item(vimmenu_T *menu, পূর্ণাঙ্ক idx)
 {
     XmString	label;
     vimmenu_T	*parent = menu->parent;
 
-# if (XmVersion <= 1002)
+# যদি (XmVersion <= 1002)
     // Don't add Popup menu items when the popup menu isn't used.
-    if (menu_is_child_of_popup(menu) && !mouse_model_popup())
-	return;
+    যদি (menu_is_child_of_popup(menu) && !mouse_model_popup())
+	ঘূৰাই;
 # endif
 
 # ifdef FEAT_TOOLBAR
-    if (menu_is_toolbar(parent->name))
+    যদি (menu_is_toolbar(parent->name))
     {
 	WidgetClass	type;
-	XmString	xms = NULL;    // fallback label if pixmap not found
-	int		n;
+	XmString	xms = রিক্ত;    // fallback label if pixmap not found
+	পূর্ণাঙ্ক		n;
 	Arg		args[18];
 
 	n = 0;
-	if (menu_is_separator(menu->name))
+	যদি (menu_is_separator(menu->name))
 	{
-	    char	*cp;
+	    ৱর্ণ	*cp;
 	    Dimension	wid;
 
 	    /*
 	     * A separator has the format "-sep%d[:%d]-". The optional :%d is
 	     * a width specifier. If no width is specified then we choose one.
 	     */
-	    cp = (char *)vim_strchr(menu->name, ':');
-	    if (cp != NULL)
+	    cp = (ৱর্ণ *)vim_strchr(menu->name, ':');
+	    যদি (cp != রিক্ত)
 		wid = (Dimension)atoi(++cp);
-	    else
+	    অন্যথা
 		wid = 4;
 
 	    type = xmSeparatorWidgetClass;
@@ -1265,7 +1265,7 @@ gui_mch_add_menu_item(vimmenu_T *menu, int idx)
 	    XtSetArg(args[n], XmNorientation, XmVERTICAL); n++;
 	    XtSetArg(args[n], XmNseparatorType, XmSHADOW_ETCHED_IN); n++;
 	}
-	else
+	অন্যথা
 	{
 	    // Without shadows one can't sense whatever the button has been
 	    // pressed or not! However we want to save a bit of space...
@@ -1277,7 +1277,7 @@ gui_mch_add_menu_item(vimmenu_T *menu, int idx)
 	    XtSetArg(args[n], XmNtraversalOn, False); n++;
 	    // Set the label here, so that we can switch between icons/text
 	    // by changing the XmNlabelType resource.
-	    xms = XmStringCreate((char *)menu->dname, STRING_TAG);
+	    xms = XmStringCreate((ৱর্ণ *)menu->dname, STRING_TAG);
 	    XtSetArg(args[n], XmNlabelString, xms); n++;
 
 	    n = add_pixmap_args(menu, args, n);
@@ -1286,19 +1286,19 @@ gui_mch_add_menu_item(vimmenu_T *menu, int idx)
 	}
 
 	XtSetArg(args[n], XmNpositionIndex, idx); n++;
-	if (menu->id == NULL)
+	যদি (menu->id == রিক্ত)
 	{
-	    menu->id = XtCreateManagedWidget((char *)menu->dname,
+	    menu->id = XtCreateManagedWidget((ৱর্ণ *)menu->dname,
 			type, toolBar, args, n);
-	    if (menu->id != NULL && type == xmEnhancedButtonWidgetClass)
+	    যদি (menu->id != রিক্ত && type == xmEnhancedButtonWidgetClass)
 	    {
 		XtAddCallback(menu->id,
 			XmNactivateCallback, gui_x11_menu_cb, menu);
 	    }
 	}
-	else
-	    XtSetValues(menu->id, args, n);
-	if (xms != NULL)
+	অন্যথা
+	    Xt_Set_মানসমূহ(menu->id, args, n);
+	যদি (xms != রিক্ত)
 	    XmStringFree(xms);
 
 #  ifdef FEAT_BEVAL_GUI
@@ -1306,55 +1306,55 @@ gui_mch_add_menu_item(vimmenu_T *menu, int idx)
 #  endif
 
 	menu->parent = parent;
-	menu->submenu_id = NULL;
+	menu->submenu_id = রিক্ত;
 	// When adding first item to toolbar it might have to be enabled .
-	if (!XtIsManaged(XtParent(toolBar))
-		    && vim_strchr(p_go, GO_TOOLBAR) != NULL)
+	যদি (!XtIsManaged(XtParent(toolBar))
+		    && vim_strchr(p_go, GO_TOOLBAR) != রিক্ত)
 	    gui_mch_show_toolbar(TRUE);
 	gui.toolbar_height = gui_mch_compute_toolbar_height();
-	return;
+	ঘূৰাই;
     } // toolbar menu item
 # endif
 
     // No parent, must be a non-menubar menu
-    if (parent->submenu_id == (Widget)0)
-	return;
+    যদি (parent->submenu_id == (Widget)0)
+	ঘূৰাই;
 
     menu->submenu_id = (Widget)0;
 
     // Add menu separator
-    if (menu_is_separator(menu->name))
+    যদি (menu_is_separator(menu->name))
     {
 	menu->id = XtVaCreateWidget("subMenu",
 		xmSeparatorGadgetClass, parent->submenu_id,
-# if (XmVersion >= 1002)
+# যদি (XmVersion >= 1002)
 		// count the tearoff item (needed for LessTif)
-		XmNpositionIndex, idx + (tearoff_val == (int)XmTEAR_OFF_ENABLED
+		XmNpositionIndex, idx + (tearoff_val == (পূর্ণাঙ্ক)XmTEAR_OFF_ENABLED
 								     ? 1 : 0),
 # endif
-		NULL);
+		রিক্ত);
 	gui_motif_menu_colors(menu->id);
-	return;
+	ঘূৰাই;
     }
 
-    label = XmStringCreate((char *)menu->dname, STRING_TAG);
-    if (label == NULL)
-	return;
+    label = XmStringCreate((ৱর্ণ *)menu->dname, STRING_TAG);
+    যদি (label == রিক্ত)
+	ঘূৰাই;
     menu->id = XtVaCreateWidget("subMenu",
-	xmPushButtonWidgetClass, parent->submenu_id,
+	xm_ঠেলো_Button_Widget_Class, parent->submenu_id,
 	XmNlabelString, label,
 	XmNmnemonic, menu->mnemonic,
-# if (XmVersion >= 1002)
+# যদি (XmVersion >= 1002)
 	// count the tearoff item (needed for LessTif)
-	XmNpositionIndex, idx + (tearoff_val == (int)XmTEAR_OFF_ENABLED
+	XmNpositionIndex, idx + (tearoff_val == (পূর্ণাঙ্ক)XmTEAR_OFF_ENABLED
 								     ? 1 : 0),
 # endif
-	NULL);
+	রিক্ত);
     gui_motif_menu_colors(menu->id);
     gui_motif_menu_fontlist(menu->id);
     XmStringFree(label);
 
-    if (menu->id != (Widget)0)
+    যদি (menu->id != (Widget)0)
     {
 	XtAddCallback(menu->id, XmNactivateCallback, gui_x11_menu_cb,
 		(XtPointer)menu);
@@ -1363,35 +1363,35 @@ gui_mch_add_menu_item(vimmenu_T *menu, int idx)
     }
 }
 
-# if (XmVersion <= 1002)
+# যদি (XmVersion <= 1002)
 /*
  * This function will destroy/create the popup menus dynamically,
  * according to the value of 'mousemodel'.
  * This will fix the "right mouse button freeze" that occurs when
  * there exists a popup menu but it isn't managed.
  */
-    void
+    শূন্য
 gui_motif_update_mousemodel(vimmenu_T *menu)
 {
-    int		idx = 0;
+    পূর্ণাঙ্ক		idx = 0;
 
     // When GUI hasn't started the menus have not been created.
-    if (!gui.in_use)
-	return;
+    যদি (!gui.in_use)
+	ঘূৰাই;
 
-    while (menu)
+    যেতিয়ালৈ (menu)
     {
-      if (menu->children != NULL)
+      যদি (menu->children != রিক্ত)
       {
-	  if (menu_is_popup(menu->name))
+	  যদি (menu_is_popup(menu->name))
 	  {
-	      if (mouse_model_popup())
+	      যদি (mouse_model_popup())
 	      {
 		  // Popup menu will be used.  Create the popup menus.
 		  gui_mch_add_menu(menu, idx);
 		  gui_motif_update_mousemodel(menu->children);
 	      }
-	      else
+	      অন্যথা
 	      {
 		  // Popup menu will not be used.  Destroy the popup menus.
 		  gui_motif_update_mousemodel(menu->children);
@@ -1399,11 +1399,11 @@ gui_motif_update_mousemodel(vimmenu_T *menu)
 	      }
 	  }
       }
-      else if (menu_is_child_of_popup(menu))
+      অন্যথা যদি (menu_is_child_of_popup(menu))
       {
-	  if (mouse_model_popup())
+	  যদি (mouse_model_popup())
 	      gui_mch_add_menu_item(menu, idx);
-	  else
+	  অন্যথা
 	      gui_mch_destroy_menu(menu);
       }
       menu = menu->next;
@@ -1412,34 +1412,34 @@ gui_motif_update_mousemodel(vimmenu_T *menu)
 }
 # endif
 
-    void
-gui_mch_new_menu_colors(void)
+    শূন্য
+gui_mch_new_menu_colors(শূন্য)
 {
-    if (menuBar == (Widget)0)
-	return;
+    যদি (menuBar == (Widget)0)
+	ঘূৰাই;
     gui_motif_menu_colors(menuBar);
 # ifdef FEAT_TOOLBAR
     gui_motif_menu_colors(toolBarFrame);
     gui_motif_menu_colors(toolBar);
 # endif
 
-    submenu_change(root_menu, TRUE);
+    submenu_change(মূল_menu, TRUE);
 }
 
-    void
-gui_mch_new_menu_font(void)
+    শূন্য
+gui_mch_new_menu_font(শূন্য)
 {
-    if (menuBar == (Widget)0)
-	return;
-    submenu_change(root_menu, FALSE);
+    যদি (menuBar == (Widget)0)
+	ঘূৰাই;
+    submenu_change(মূল_menu, FALSE);
     {
 	Dimension   height;
 	Position w, h;
 
-	XtVaGetValues(menuBar, XmNheight, &height, NULL);
+	Xt_Va_Get_মানসমূহ(menuBar, XmNheight, &height, রিক্ত);
 	gui.menu_height = height;
 
-	XtVaGetValues(vimShell, XtNwidth, &w, XtNheight, &h, NULL);
+	Xt_Va_Get_মানসমূহ(vimShell, XtNwidth, &w, XtNheight, &h, রিক্ত);
 	gui_resize_shell(w, h
 # ifdef FEAT_XIM
 		- xim_get_status_area_height()
@@ -1450,105 +1450,105 @@ gui_mch_new_menu_font(void)
     ui_new_shellsize();
 }
 
-# if defined(FEAT_BEVAL_GUI)
-    void
-gui_mch_new_tooltip_font(void)
+# যদি defined(FEAT_BEVAL_GUI)
+    শূন্য
+gui_mch_new_tooltip_font(শূন্য)
 {
 #  ifdef FEAT_TOOLBAR
     vimmenu_T   *menu;
 
-    if (toolBar == (Widget)0)
-	return;
+    যদি (toolBar == (Widget)0)
+	ঘূৰাই;
 
     menu = gui_find_menu((char_u *)"ToolBar");
-    if (menu != NULL)
+    যদি (menu != রিক্ত)
 	submenu_change(menu, FALSE);
 #  endif
 }
 
-    void
-gui_mch_new_tooltip_colors(void)
+    শূন্য
+gui_mch_new_tooltip_colors(শূন্য)
 {
 #  ifdef FEAT_TOOLBAR
     vimmenu_T   *toolbar;
 
-    if (toolBar == (Widget)0)
-	return;
+    যদি (toolBar == (Widget)0)
+	ঘূৰাই;
 
     toolbar = gui_find_menu((char_u *)"ToolBar");
-    if (toolbar != NULL)
+    যদি (toolbar != রিক্ত)
 	submenu_change(toolbar, TRUE);
 #  endif
 }
 # endif
 
-    static void
+    স্থির শূন্য
 submenu_change(
     vimmenu_T	*menu,
-    int		colors)		// TRUE for colors, FALSE for font
+    পূর্ণাঙ্ক		colors)		// TRUE for colors, FALSE for font
 {
     vimmenu_T	*mp;
 
-    for (mp = menu; mp != NULL; mp = mp->next)
+    বাবে (mp = menu; mp != রিক্ত; mp = mp->next)
     {
-	if (mp->id != (Widget)0)
+	যদি (mp->id != (Widget)0)
 	{
-	    if (colors)
+	    যদি (colors)
 	    {
 		gui_motif_menu_colors(mp->id);
 # ifdef FEAT_TOOLBAR
 		// For a toolbar item: Free the pixmap and allocate a new one,
 		// so that the background color is right.
-		if (mp->xpm != NULL)
+		যদি (mp->xpm != রিক্ত)
 		{
-		    int		n = 0;
+		    পূর্ণাঙ্ক		n = 0;
 		    Arg		args[18];
 
 		    n = add_pixmap_args(mp, args, n);
-		    XtSetValues(mp->id, args, n);
+		    Xt_Set_মানসমূহ(mp->id, args, n);
 		}
 #  ifdef FEAT_BEVAL_GUI
 		// If we have a tooltip, then we need to change its font
-		if (mp->tip != NULL)
+		যদি (mp->tip != রিক্ত)
 		{
 		    Arg args[2];
 
 		    args[0].name = XmNbackground;
-		    args[0].value = gui.tooltip_bg_pixel;
+		    args[0].মান = gui.tooltip_bg_pixel;
 		    args[1].name = XmNforeground;
-		    args[1].value = gui.tooltip_fg_pixel;
-		    XtSetValues(mp->tip->balloonLabel, &args[0], XtNumber(args));
+		    args[1].মান = gui.tooltip_fg_pixel;
+		    Xt_Set_মানসমূহ(mp->tip->balloonLabel, &args[0], Xt_সংখ্যা(args));
 		}
 #  endif
 # endif
 	    }
-	    else
+	    অন্যথা
 	    {
 		gui_motif_menu_fontlist(mp->id);
 # ifdef FEAT_BEVAL_GUI
 		// If we have a tooltip, then we need to change its font
-		if (mp->tip != NULL)
+		যদি (mp->tip != রিক্ত)
 		{
 		    Arg args[1];
 
 		    args[0].name = XmNfontList;
-		    args[0].value = (XtArgVal)gui_motif_fontset2fontlist(
+		    args[0].মান = (XtArgVal)gui_motif_fontset2fontlist(
 						    &gui.tooltip_fontset);
-		    XtSetValues(mp->tip->balloonLabel, &args[0], XtNumber(args));
+		    Xt_Set_মানসমূহ(mp->tip->balloonLabel, &args[0], Xt_সংখ্যা(args));
 		}
 # endif
 	    }
 	}
 
-	if (mp->children != NULL)
+	যদি (mp->children != রিক্ত)
 	{
-# if (XmVersion >= 1002)
+# যদি (XmVersion >= 1002)
 	    // Set the colors/font for the tear off widget
-	    if (mp->submenu_id != (Widget)0)
+	    যদি (mp->submenu_id != (Widget)0)
 	    {
-		if (colors)
+		যদি (colors)
 		    gui_motif_menu_colors(mp->submenu_id);
-		else
+		অন্যথা
 		    gui_motif_menu_fontlist(mp->submenu_id);
 		toggle_tearoff(mp->submenu_id);
 	    }
@@ -1562,26 +1562,26 @@ submenu_change(
 /*
  * Destroy the machine specific menu widget.
  */
-    void
+    শূন্য
 gui_mch_destroy_menu(vimmenu_T *menu)
 {
     // Please be sure to destroy the parent widget first (i.e. menu->id).
     // On the other hand, problems have been reported that the submenu must be
     // deleted first...
-    if (menu->submenu_id != (Widget)0)
+    যদি (menu->submenu_id != (Widget)0)
     {
 	XtDestroyWidget(menu->submenu_id);
 	menu->submenu_id = (Widget)0;
     }
 
-    if (menu->id == (Widget)0)
-	return;
+    যদি (menu->id == (Widget)0)
+	ঘূৰাই;
 
     Widget	    parent;
 
     parent = XtParent(menu->id);
-# if defined(FEAT_TOOLBAR) && defined(FEAT_BEVAL_GUI)
-    if (parent == toolBar && menu->tip != NULL)
+# যদি defined(FEAT_TOOLBAR) && defined(FEAT_BEVAL_GUI)
+    যদি (parent == toolBar && menu->tip != রিক্ত)
     {
 	// We try to destroy this before the actual menu, because there are
 	// callbacks, etc. that will be unregistered during the tooltip
@@ -1592,29 +1592,29 @@ gui_mch_destroy_menu(vimmenu_T *menu)
 	// deallocated by Xt, and unknown behaviour will ensue (probably
 	// a core dump).
 	gui_mch_destroy_beval_area(menu->tip);
-	menu->tip = NULL;
+	menu->tip = রিক্ত;
     }
 # endif
     XtDestroyWidget(menu->id);
     menu->id = (Widget)0;
-    if (parent == menuBar)
+    যদি (parent == menuBar)
 	gui_mch_compute_menu_height((Widget)0);
 # ifdef FEAT_TOOLBAR
-    else if (parent == toolBar)
+    অন্যথা যদি (parent == toolBar)
     {
-	Cardinal    num_children;
+	Cardinal    অঙ্ক_children;
 
 	// When removing last toolbar item, don't display the toolbar.
-	XtVaGetValues(toolBar, XmNnumChildren, &num_children, NULL);
-	if (num_children == 0)
+	Xt_Va_Get_মানসমূহ(toolBar, XmNnumChildren, &অঙ্ক_children, রিক্ত);
+	যদি (অঙ্ক_children == 0)
 	    gui_mch_show_toolbar(FALSE);
-	else
+	অন্যথা
 	    gui.toolbar_height = gui_mch_compute_toolbar_height();
     }
 # endif
 }
 
-    void
+    শূন্য
 gui_mch_show_popupmenu(vimmenu_T *menu UNUSED)
 {
 # ifdef MOTIF_POPUP
@@ -1628,11 +1628,11 @@ gui_mch_show_popupmenu(vimmenu_T *menu UNUSED)
 /*
  * Set the menu and scrollbar colors to their default values.
  */
-    void
-gui_mch_def_colors(void)
+    শূন্য
+gui_mch_def_colors(শূন্য)
 {
-    if (!gui.in_use)
-	return;
+    যদি (!gui.in_use)
+	ঘূৰাই;
 
     gui.menu_fg_pixel = gui_get_color((char_u *)gui.rsrc_menu_fg_name);
     gui.menu_bg_pixel = gui_get_color((char_u *)gui.rsrc_menu_bg_name);
@@ -1651,202 +1651,202 @@ gui_mch_def_colors(void)
  * Scrollbar stuff.
  */
 
-    void
+    শূন্য
 gui_mch_set_scrollbar_thumb(
     scrollbar_T *sb,
     long	val,
     long	size,
     long	max)
 {
-    if (sb->id != (Widget)0)
-	XtVaSetValues(sb->id,
+    যদি (sb->id != (Widget)0)
+	Xt_Va_Set_মানসমূহ(sb->id,
 		  XmNvalue, val,
 		  XmNsliderSize, size,
 		  XmNpageIncrement, (size > 2 ? size - 2 : 1),
 		  XmNmaximum, max + 1,	    // Motif has max one past the end
-		  NULL);
+		  রিক্ত);
 }
 
-    void
+    শূন্য
 gui_mch_set_scrollbar_pos(
     scrollbar_T *sb,
-    int		x,
-    int		y,
-    int		w,
-    int		h)
+    পূর্ণাঙ্ক		x,
+    পূর্ণাঙ্ক		y,
+    পূর্ণাঙ্ক		w,
+    পূর্ণাঙ্ক		h)
 {
-    if (sb->id == (Widget)0)
-	return;
+    যদি (sb->id == (Widget)0)
+	ঘূৰাই;
 
-    if (sb->type == SBAR_LEFT || sb->type == SBAR_RIGHT)
+    যদি (sb->type == SBAR_বাম || sb->type == SBAR_ডান)
     {
-	if (y == 0)
+	যদি (y == 0)
 	    h -= gui.border_offset;
-	else
+	অন্যথা
 	    y -= gui.border_offset;
-	XtVaSetValues(sb->id,
+	Xt_Va_Set_মানসমূহ(sb->id,
 		XmNtopOffset, y,
 		XmNbottomOffset, -y - h,
 		XmNwidth, w,
-		NULL);
+		রিক্ত);
     }
-    else
-	XtVaSetValues(sb->id,
+    অন্যথা
+	Xt_Va_Set_মানসমূহ(sb->id,
 		XmNtopOffset, y,
 		XmNleftOffset, x,
-		XmNrightOffset, gui.which_scrollbars[SBAR_RIGHT]
+		XmNrightOffset, gui.which_scrollbars[SBAR_ডান]
 						     ? gui.scrollbar_width : 0,
 		XmNheight, h,
-		NULL);
+		রিক্ত);
     XtManageChild(sb->id);
 }
 
-    int
-gui_mch_get_scrollbar_xpadding(void)
+    পূর্ণাঙ্ক
+gui_mch_get_scrollbar_xpadding(শূন্য)
 {
-    int xpad;
+    পূর্ণাঙ্ক xpad;
     Dimension tw, ww;
     Position  tx;
 
-    XtVaGetValues(textArea, XtNwidth, &tw, XtNx, &tx, NULL);
-    XtVaGetValues(vimShell, XtNwidth, &ww, NULL);
+    Xt_Va_Get_মানসমূহ(textArea, XtNwidth, &tw, XtNx, &tx, রিক্ত);
+    Xt_Va_Get_মানসমূহ(vimShell, XtNwidth, &ww, রিক্ত);
     xpad = ww - tw - tx - gui.scrollbar_width;
-    return (xpad < 0) ? 0 : xpad;
+    ঘূৰাই (xpad < 0) ? 0 : xpad;
 }
 
-    int
-gui_mch_get_scrollbar_ypadding(void)
+    পূর্ণাঙ্ক
+gui_mch_get_scrollbar_ypadding(শূন্য)
 {
-    int ypad;
+    পূর্ণাঙ্ক ypad;
     Dimension th, wh;
     Position  ty;
 
-    XtVaGetValues(textArea, XtNheight, &th, XtNy, &ty, NULL);
-    XtVaGetValues(vimShell, XtNheight, &wh, NULL);
+    Xt_Va_Get_মানসমূহ(textArea, XtNheight, &th, XtNy, &ty, রিক্ত);
+    Xt_Va_Get_মানসমূহ(vimShell, XtNheight, &wh, রিক্ত);
     ypad = wh - th - ty - gui.scrollbar_height;
-    return (ypad < 0) ? 0 : ypad;
+    ঘূৰাই (ypad < 0) ? 0 : ypad;
 }
 
-    void
-gui_mch_enable_scrollbar(scrollbar_T *sb, int flag)
+    শূন্য
+gui_mch_enable_scrollbar(scrollbar_T *sb, পূর্ণাঙ্ক flag)
 {
     Arg		args[16];
-    int		n;
+    পূর্ণাঙ্ক		n;
 
-    if (sb->id == (Widget)0)
-	return;
+    যদি (sb->id == (Widget)0)
+	ঘূৰাই;
 
     n = 0;
-    if (flag)
+    যদি (flag)
     {
-	switch (sb->type)
+	ৱিকল্প (sb->type)
 	{
-	    case SBAR_LEFT:
+	    পক্ষ SBAR_বাম:
 		XtSetArg(args[n], XmNleftOffset, gui.scrollbar_width); n++;
-		break;
+		ভঙ্গ;
 
-	    case SBAR_RIGHT:
+	    পক্ষ SBAR_ডান:
 		XtSetArg(args[n], XmNrightOffset, gui.scrollbar_width); n++;
-		break;
+		ভঙ্গ;
 
-	    case SBAR_BOTTOM:
+	    পক্ষ SBAR_BOTTOM:
 		XtSetArg(args[n], XmNbottomOffset, gui.scrollbar_height);n++;
-		break;
+		ভঙ্গ;
 	}
-	XtSetValues(textArea, args, n);
+	Xt_Set_মানসমূহ(textArea, args, n);
 	XtManageChild(sb->id);
     }
-    else
+    অন্যথা
     {
-	if (!gui.which_scrollbars[sb->type])
+	যদি (!gui.which_scrollbars[sb->type])
 	{
 	    // The scrollbars of this type are all disabled, adjust the
 	    // textArea attachment offset.
-	    switch (sb->type)
+	    ৱিকল্প (sb->type)
 	    {
-		case SBAR_LEFT:
+		পক্ষ SBAR_বাম:
 		    XtSetArg(args[n], XmNleftOffset, 0); n++;
-		    break;
+		    ভঙ্গ;
 
-		case SBAR_RIGHT:
+		পক্ষ SBAR_ডান:
 		    XtSetArg(args[n], XmNrightOffset, 0); n++;
-		    break;
+		    ভঙ্গ;
 
-		case SBAR_BOTTOM:
+		পক্ষ SBAR_BOTTOM:
 		    XtSetArg(args[n], XmNbottomOffset, 0);n++;
-		    break;
+		    ভঙ্গ;
 	    }
-	    XtSetValues(textArea, args, n);
+	    Xt_Set_মানসমূহ(textArea, args, n);
 	}
 	XtUnmanageChild(sb->id);
     }
 }
 
-    void
+    শূন্য
 gui_mch_create_scrollbar(
     scrollbar_T *sb,
-    int		orient)	// SBAR_VERT or SBAR_HORIZ
+    পূর্ণাঙ্ক		orient)	// SBAR_VERT or SBAR_HORIZ
 {
     Arg		args[16];
-    int		n = 0;
+    পূর্ণাঙ্ক		n = 0;
 
     XtSetArg(args[n], XmNminimum, 0); n++;
     XtSetArg(args[n], XmNorientation,
 	    (orient == SBAR_VERT) ? XmVERTICAL : XmHORIZONTAL); n++;
 
-    switch (sb->type)
+    ৱিকল্প (sb->type)
     {
-	case SBAR_LEFT:
+	পক্ষ SBAR_বাম:
 	    XtSetArg(args[n], XmNtopAttachment, XmATTACH_FORM); n++;
 	    XtSetArg(args[n], XmNbottomAttachment, XmATTACH_OPPOSITE_FORM); n++;
 	    XtSetArg(args[n], XmNleftAttachment, XmATTACH_FORM); n++;
 	    XtSetArg(args[n], XmNwidth, gui.scrollbar_width); n++;
-	    break;
+	    ভঙ্গ;
 
-	case SBAR_RIGHT:
+	পক্ষ SBAR_ডান:
 	    XtSetArg(args[n], XmNtopAttachment, XmATTACH_FORM); n++;
 	    XtSetArg(args[n], XmNbottomAttachment, XmATTACH_OPPOSITE_FORM); n++;
 	    XtSetArg(args[n], XmNrightAttachment, XmATTACH_FORM); n++;
 	    XtSetArg(args[n], XmNwidth, gui.scrollbar_width); n++;
-	    break;
+	    ভঙ্গ;
 
-	case SBAR_BOTTOM:
+	পক্ষ SBAR_BOTTOM:
 	    XtSetArg(args[n], XmNleftAttachment, XmATTACH_FORM); n++;
 	    XtSetArg(args[n], XmNrightAttachment, XmATTACH_FORM); n++;
 	    XtSetArg(args[n], XmNbottomAttachment, XmATTACH_FORM); n++;
 	    XtSetArg(args[n], XmNheight, gui.scrollbar_height); n++;
-	    break;
+	    ভঙ্গ;
     }
 
     sb->id = XtCreateWidget("scrollBar",
 	    xmScrollBarWidgetClass, textAreaForm, args, n);
-    if (sb->id == (Widget)0)
-	return;
+    যদি (sb->id == (Widget)0)
+	ঘূৰাই;
 
     gui_mch_set_scrollbar_colors(sb);
     XtAddCallback(sb->id, XmNvalueChangedCallback,
 	    scroll_cb, (XtPointer)sb->ident);
     XtAddCallback(sb->id, XmNdragCallback,
 	    scroll_cb, (XtPointer)sb->ident);
-    XtAddEventHandler(sb->id, KeyPressMask, FALSE, gui_x11_key_hit_cb,
+    XtAddEventHandler(sb->id, চাবি_Press_Mask, FALSE, gui_x11_চাবি_hit_cb,
 	    (XtPointer)0);
 }
 
-    void
+    শূন্য
 gui_mch_destroy_scrollbar(scrollbar_T *sb)
 {
-    if (sb->id != (Widget)0)
+    যদি (sb->id != (Widget)0)
 	XtDestroyWidget(sb->id);
 }
 
-    void
+    শূন্য
 gui_mch_set_scrollbar_colors(scrollbar_T *sb)
 {
-    if (sb->id != (Widget)0)
+    যদি (sb->id != (Widget)0)
     {
-	if (gui.scroll_bg_pixel != INVALCOLOR)
+	যদি (gui.scroll_bg_pixel != INVALCOLOR)
 	{
-#if (XmVersion>=1002)
+#যদি (XmVersion>=1002)
 	    // This should not only set the through color but also adjust
 	    // related colors, such as shadows.
 	    XmChangeColor(sb->id, gui.scroll_bg_pixel);
@@ -1854,20 +1854,20 @@ gui_mch_set_scrollbar_colors(scrollbar_T *sb)
 
 	    // Set the through color directly, in case XmChangeColor() decided
 	    // to change it.
-	    XtVaSetValues(sb->id,
+	    Xt_Va_Set_মানসমূহ(sb->id,
 		    XmNtroughColor, gui.scroll_bg_pixel,
-		    NULL);
+		    রিক্ত);
 	}
 
-	if (gui.scroll_fg_pixel != INVALCOLOR)
-	    XtVaSetValues(sb->id,
+	যদি (gui.scroll_fg_pixel != INVALCOLOR)
+	    Xt_Va_Set_মানসমূহ(sb->id,
 		    XmNforeground, gui.scroll_fg_pixel,
 		    XmNbackground, gui.scroll_fg_pixel,
-		    NULL);
+		    রিক্ত);
     }
 
     // This is needed for the rectangle below the vertical scrollbars.
-    if (sb == &gui.bottom_sbar && textAreaForm != (Widget)0)
+    যদি (sb == &gui.bottom_sbar && textAreaForm != (Widget)0)
 	gui_motif_scroll_colors(textAreaForm);
 }
 
@@ -1876,9 +1876,9 @@ gui_mch_set_scrollbar_colors(scrollbar_T *sb)
  */
 
     Window
-gui_x11_get_wid(void)
+gui_x11_get_wid(শূন্য)
 {
-    return(XtWindow(textArea));
+    ঘূৰাই(XtWindow(textArea));
 }
 
 /*
@@ -1887,65 +1887,65 @@ gui_x11_get_wid(void)
  * keyboard focus.  If the mnemonic is on a label, look in the userData field
  * of the label to see if it points to another widget, and give that the focus.
  */
-    static void
-do_mnemonic(Widget w, unsigned int keycode)
+    স্থির শূন্য
+do_mnemonic(Widget w, unsigned পূর্ণাঙ্ক keycode)
 {
     WidgetList	    children;
-    int		    numChildren, i;
+    পূর্ণাঙ্ক		    অঙ্ক_Children, i;
     Boolean	    isMenu;
-    KeySym	    mnemonic = '\0';
-    char	    mneString[2];
+    চাবি_Sym	    mnemonic = '\0';
+    ৱর্ণ	    mneString[2];
     Widget	    userData;
-    unsigned char   rowColType;
+    unsigned ৱর্ণ   rowColType;
 
-    if (XtIsComposite(w))
+    যদি (XtIsComposite(w))
     {
-	if (XtClass(w) == xmRowColumnWidgetClass)
+	যদি (XtClass(w) == xmRowColumnWidgetClass)
 	{
-	    XtVaGetValues(w, XmNrowColumnType, &rowColType, NULL);
-	    isMenu = (rowColType != (unsigned char)XmWORK_AREA);
+	    Xt_Va_Get_মানসমূহ(w, XmNrowColumnType, &rowColType, রিক্ত);
+	    isMenu = (rowColType != (unsigned ৱর্ণ)XmWORK_AREA);
 	}
-	else
+	অন্যথা
 	    isMenu = False;
-	if (!isMenu)
+	যদি (!isMenu)
 	{
-	    XtVaGetValues(w, XmNchildren, &children, XmNnumChildren,
-			  &numChildren, NULL);
-	    for (i = 0; i < numChildren; i++)
+	    Xt_Va_Get_মানসমূহ(w, XmNchildren, &children, XmNnumChildren,
+			  &অঙ্ক_Children, রিক্ত);
+	    বাবে (i = 0; i < অঙ্ক_Children; i++)
 		do_mnemonic(children[i], keycode);
 	}
     }
-    else
+    অন্যথা
     {
-	XtVaGetValues(w, XmNmnemonic, &mnemonic, NULL);
-	if (mnemonic != '\0')
+	Xt_Va_Get_মানসমূহ(w, XmNmnemonic, &mnemonic, রিক্ত);
+	যদি (mnemonic != '\0')
 	{
 	    mneString[0] = mnemonic;
 	    mneString[1] = '\0';
-	    if (XKeysymToKeycode(XtDisplay(XtParent(w)),
+	    যদি (XKeysymToKeycode(XtDisplay(XtParent(w)),
 				       XStringToKeysym(mneString)) == keycode)
 	    {
-		if (XtClass(w) == xmLabelWidgetClass
+		যদি (XtClass(w) == xmLabelWidgetClass
 			|| XtClass(w) == xmLabelGadgetClass)
 		{
-		    XtVaGetValues(w, XmNuserData, &userData, NULL);
-		    if (userData != NULL && XtIsWidget(userData))
+		    Xt_Va_Get_মানসমূহ(w, XmNuserData, &userData, রিক্ত);
+		    যদি (userData != রিক্ত && XtIsWidget(userData))
 			XmProcessTraversal(userData, XmTRAVERSE_CURRENT);
 		}
-		else
+		অন্যথা
 		{
-		    XKeyPressedEvent keyEvent;
+		    XKeyPressedEvent চাবি_Event;
 
 		    XmProcessTraversal(w, XmTRAVERSE_CURRENT);
 
-		    CLEAR_FIELD(keyEvent);
-		    keyEvent.type = KeyPress;
-		    keyEvent.serial = 1;
-		    keyEvent.send_event = True;
-		    keyEvent.display = XtDisplay(w);
-		    keyEvent.window = XtWindow(w);
-		    XtCallActionProc(w, "Activate", (XEvent *) & keyEvent,
-								     NULL, 0);
+		    CLEAR_FIELD(চাবি_Event);
+		    চাবি_Event.type = চাবি_Press;
+		    চাবি_Event.serial = 1;
+		    চাবি_Event.send_event = True;
+		    চাবি_Event.display = XtDisplay(w);
+		    চাবি_Event.window = XtWindow(w);
+		    XtCallActionProc(w, "Activate", (XEvent *) & চাবি_Event,
+								     রিক্ত, 0);
 		}
 	    }
 	}
@@ -1955,7 +1955,7 @@ do_mnemonic(Widget w, unsigned int keycode)
 /*
  * Callback routine for dialog mnemonic processing.
  */
-    static void
+    স্থির শূন্য
 mnemonic_event(
 	Widget	    w,
 	XtPointer   call_data UNUSED,
@@ -1971,41 +1971,41 @@ mnemonic_event(
  * a passive grab to the dialog widget for the mnemonic character, thus
  * directing mnemonic events to the dialog widget.
  */
-    static void
+    স্থির শূন্য
 add_mnemonic_grabs(Widget dialog, Widget w)
 {
-    char	    mneString[2];
+    ৱর্ণ	    mneString[2];
     WidgetList	    children;
-    int		    numChildren, i;
+    পূর্ণাঙ্ক		    অঙ্ক_Children, i;
     Boolean	    isMenu;
-    KeySym	    mnemonic = '\0';
-    unsigned char   rowColType;
+    চাবি_Sym	    mnemonic = '\0';
+    unsigned ৱর্ণ   rowColType;
 
-    if (XtIsComposite(w))
+    যদি (XtIsComposite(w))
     {
-	if (XtClass(w) == xmRowColumnWidgetClass)
+	যদি (XtClass(w) == xmRowColumnWidgetClass)
 	{
-	    XtVaGetValues(w, XmNrowColumnType, &rowColType, NULL);
-	    isMenu = (rowColType != (unsigned char)XmWORK_AREA);
+	    Xt_Va_Get_মানসমূহ(w, XmNrowColumnType, &rowColType, রিক্ত);
+	    isMenu = (rowColType != (unsigned ৱর্ণ)XmWORK_AREA);
 	}
-	else
+	অন্যথা
 	    isMenu = False;
-	if (!isMenu)
+	যদি (!isMenu)
 	{
-	    XtVaGetValues(w, XmNchildren, &children, XmNnumChildren,
-							  &numChildren, NULL);
-	    for (i = 0; i < numChildren; i++)
+	    Xt_Va_Get_মানসমূহ(w, XmNchildren, &children, XmNnumChildren,
+							  &অঙ্ক_Children, রিক্ত);
+	    বাবে (i = 0; i < অঙ্ক_Children; i++)
 		add_mnemonic_grabs(dialog, children[i]);
 	}
     }
-    else
+    অন্যথা
     {
-	XtVaGetValues(w, XmNmnemonic, &mnemonic, NULL);
-	if (mnemonic != '\0')
+	Xt_Va_Get_মানসমূহ(w, XmNmnemonic, &mnemonic, রিক্ত);
+	যদি (mnemonic != '\0')
 	{
 	    mneString[0] = mnemonic;
 	    mneString[1] = '\0';
-	    XtGrabKey(dialog, XKeysymToKeycode(XtDisplay(dialog),
+	    Xt_Grab_চাবি(dialog, XKeysymToKeycode(XtDisplay(dialog),
 						  XStringToKeysym(mneString)),
 		    Mod1Mask, True, GrabModeAsync, GrabModeAsync);
 	}
@@ -2021,75 +2021,75 @@ add_mnemonic_grabs(Widget dialog, Widget w)
  * the appropriate label and set the XmNuserData resource of the label to the
  * widget to get the focus when the mnemonic is typed.
  */
-    static void
+    স্থির শূন্য
 activate_dialog_mnemonics(Widget dialog)
 {
-    if (!dialog)
-	return;
+    যদি (!dialog)
+	ঘূৰাই;
 
-    XtAddEventHandler(dialog, KeyPressMask, False,
-			   (XtEventHandler) mnemonic_event, (XtPointer) NULL);
+    XtAddEventHandler(dialog, চাবি_Press_Mask, False,
+			   (XtEventHandler) mnemonic_event, (XtPointer) রিক্ত);
     add_mnemonic_grabs(dialog, dialog);
 }
 
 /*
  * Removes the event handler and key-grabs for dialog mnemonic handling.
  */
-    static void
+    স্থির শূন্য
 suppress_dialog_mnemonics(Widget dialog)
 {
-    if (!dialog)
-	return;
+    যদি (!dialog)
+	ঘূৰাই;
 
-    XtUngrabKey(dialog, AnyKey, Mod1Mask);
-    XtRemoveEventHandler(dialog, KeyPressMask, False,
-			   (XtEventHandler) mnemonic_event, (XtPointer) NULL);
+    Xt_Ungrab_চাবি(dialog, Any_চাবি, Mod1Mask);
+    XtRemoveEventHandler(dialog, চাবি_Press_Mask, False,
+			   (XtEventHandler) mnemonic_event, (XtPointer) রিক্ত);
 }
 
-#if defined(FEAT_BROWSE) || defined(FEAT_GUI_DIALOG)
+#যদি defined(FEAT_BROWSE) || defined(FEAT_GUI_DIALOG)
 /*
  * Use the 'guifont' or 'guifontset' as a fontlist for a dialog widget.
  */
-    static void
+    স্থির শূন্য
 set_fontlist(Widget id)
 {
     XmFontList fl;
 
 # ifdef FONTSET_ALWAYS
-    if (gui.fontset != NOFONTSET)
+    যদি (gui.fontset != NOFONTSET)
     {
 	fl = gui_motif_fontset2fontlist((XFontSet *)&gui.fontset);
-	if (fl != NULL)
+	যদি (fl != রিক্ত)
 	{
-	    if (XtIsManaged(id))
+	    যদি (XtIsManaged(id))
 	    {
 		XtUnmanageChild(id);
-		XtVaSetValues(id, XmNfontList, fl, NULL);
+		Xt_Va_Set_মানসমূহ(id, XmNfontList, fl, রিক্ত);
 		// We should force the widget to recalculate its
 		// geometry now.
 		XtManageChild(id);
 	    }
-	    else
-		XtVaSetValues(id, XmNfontList, fl, NULL);
+	    অন্যথা
+		Xt_Va_Set_মানসমূহ(id, XmNfontList, fl, রিক্ত);
 	    XmFontListFree(fl);
 	}
     }
-# else
-    if (gui.norm_font != NOFONT)
+# অন্যথা
+    যদি (gui.norm_font != NOFONT)
     {
 	fl = gui_motif_create_fontlist((XFontStruct *)gui.norm_font);
-	if (fl != NULL)
+	যদি (fl != রিক্ত)
 	{
-	    if (XtIsManaged(id))
+	    যদি (XtIsManaged(id))
 	    {
 		XtUnmanageChild(id);
-		XtVaSetValues(id, XmNfontList, fl, NULL);
+		Xt_Va_Set_মানসমূহ(id, XmNfontList, fl, রিক্ত);
 		// We should force the widget to recalculate its
 		// geometry now.
 		XtManageChild(id);
 	    }
-	    else
-		XtVaSetValues(id, XmNfontList, fl, NULL);
+	    অন্যথা
+		Xt_Va_Set_মানসমূহ(id, XmNfontList, fl, রিক্ত);
 	    XmFontListFree(fl);
 	}
     }
@@ -2097,7 +2097,7 @@ set_fontlist(Widget id)
 }
 #endif
 
-#if defined(FEAT_BROWSE)
+#যদি defined(FEAT_BROWSE)
 
 /*
  * file selector related stuff
@@ -2106,19 +2106,19 @@ set_fontlist(Widget id)
 # include <Xm/FileSB.h>
 # include <Xm/XmStrDefs.h>
 
-typedef struct dialog_callback_arg
+প্রকারনির্দেশ সংরচনা dialog_callback_arg
 {
-    char *  args;   // not used right now
-    int	    id;
+    ৱর্ণ *  args;   // not used right now
+    পূর্ণাঙ্ক	    id;
 } dcbarg_T;
 
-static Widget dialog_wgt;
-static char *browse_fname = NULL;
-static XmStringCharSet charset = (XmStringCharSet) XmSTRING_DEFAULT_CHARSET;
+স্থির Widget dialog_wgt;
+স্থির ৱর্ণ *browse_fname = রিক্ত;
+স্থির XmStringCharSet charset = (XmStringCharSet) XmSTRING_DEFAULT_CHARSET;
 				// used to set up XmStrings
 
-static void DialogCancelCB(Widget, XtPointer, XtPointer);
-static void DialogAcceptCB(Widget, XtPointer, XtPointer);
+স্থির শূন্য DialogCancelCB(Widget, XtPointer, XtPointer);
+স্থির শূন্য DialogAcceptCB(Widget, XtPointer, XtPointer);
 
 /*
  * This function is used to translate the predefined label text of the
@@ -2129,29 +2129,29 @@ static void DialogAcceptCB(Widget, XtPointer, XtPointer);
  * - equalize the messages between different GUI implementations as far as
  * possible.
  */
-    static void
-set_predefined_label(Widget parent, String name, char *new_label)
+    স্থির শূন্য
+set_predefined_label(Widget parent, String name, ৱর্ণ *new_label)
 {
     XmString	str;
     Widget	w;
     char_u	*p, *next;
-    KeySym	mnemonic = NUL;
+    চাবি_Sym	mnemonic = NUL;
 
     w = XtNameToWidget(parent, name);
 
-    if (!w)
-	return;
+    যদি (!w)
+	ঘূৰাই;
 
     p = vim_strsave((char_u *)new_label);
-    if (p == NULL)
-	return;
-    for (next = p; *next; ++next)
+    যদি (p == রিক্ত)
+	ঘূৰাই;
+    বাবে (next = p; *next; ++next)
     {
-	if (*next == DLG_HOTKEY_CHAR)
+	যদি (*next == DLG_HOTKEY_CHAR)
 	{
-	    int len = STRLEN(next);
+	    পূর্ণাঙ্ক len = STRLEN(next);
 
-	    if (len > 0)
+	    যদি (len > 0)
 	    {
 		mch_memmove(next, next + 1, len);
 		mnemonic = next[0];
@@ -2159,28 +2159,28 @@ set_predefined_label(Widget parent, String name, char *new_label)
 	}
     }
 
-    str = XmStringCreate((char *)p, STRING_TAG);
+    str = XmStringCreate((ৱর্ণ *)p, STRING_TAG);
     vim_free(p);
 
-    if (str != NULL)
+    যদি (str != রিক্ত)
     {
-	XtVaSetValues(w,
+	Xt_Va_Set_মানসমূহ(w,
 		XmNlabelString, str,
 		XmNmnemonic, mnemonic,
-		NULL);
+		রিক্ত);
 	XmStringFree(str);
     }
     gui_motif_menu_fontlist(w);
 }
 
-    static void
+    স্থির শূন্য
 set_predefined_fontlist(Widget parent, String name)
 {
     Widget w;
     w = XtNameToWidget(parent, name);
 
-    if (!w)
-	return;
+    যদি (!w)
+	ঘূৰাই;
 
     set_fontlist(w);
 }
@@ -2191,7 +2191,7 @@ set_predefined_fontlist(Widget parent, String name)
  */
     char_u *
 gui_mch_browse(
-    int		saving UNUSED,	// select file to write
+    পূর্ণাঙ্ক		saving UNUSED,	// select file to write
     char_u	*title,		// title for the window
     char_u	*dflt,		// default name
     char_u	*ext UNUSED,	// not used (extension added)
@@ -2201,23 +2201,23 @@ gui_mch_browse(
     char_u	dirbuf[MAXPATHL];
     char_u	dfltbuf[MAXPATHL];
     char_u	*pattern;
-    char_u	*tofree = NULL;
+    char_u	*tofree = রিক্ত;
 
     // There a difference between the resource name and value, Therefore, we
     // avoid to (ab-)use the (maybe internationalized!) dialog title as a
     // dialog name.
 
-    dialog_wgt = XmCreateFileSelectionDialog(vimShell, "browseDialog", NULL, 0);
+    dialog_wgt = XmCreateFileSelectionDialog(vimShell, "browseDialog", রিক্ত, 0);
 
-    if (initdir == NULL || *initdir == NUL)
+    যদি (initdir == রিক্ত || *initdir == NUL)
     {
 	mch_dirname(dirbuf, MAXPATHL);
 	initdir = dirbuf;
     }
 
-    if (dflt == NULL)
+    যদি (dflt == রিক্ত)
 	dflt = (char_u *)"";
-    else if (STRLEN(initdir) + STRLEN(dflt) + 2 < MAXPATHL)
+    অন্যথা যদি (STRLEN(initdir) + STRLEN(dflt) + 2 < MAXPATHL)
     {
 	// The default selection should be the full path, "dflt" is only the
 	// file name.
@@ -2229,36 +2229,36 @@ gui_mch_browse(
 
     // Can only use one pattern for a file name.  Get the first pattern out of
     // the filter.  An empty pattern means everything matches.
-    if (filter == NULL)
+    যদি (filter == রিক্ত)
 	pattern = (char_u *)"";
-    else
+    অন্যথা
     {
 	char_u	*s, *p;
 
 	s = filter;
-	for (p = filter; *p != NUL; ++p)
+	বাবে (p = filter; *p != NUL; ++p)
 	{
-	    if (*p == '\t')	// end of description, start of pattern
+	    যদি (*p == '\t')	// end of description, start of pattern
 		s = p + 1;
-	    if (*p == ';' || *p == '\n')	// end of (first) pattern
-		break;
+	    যদি (*p == ';' || *p == '\n')	// end of (first) pattern
+		ভঙ্গ;
 	}
 	pattern = vim_strnsave(s, p - s);
 	tofree = pattern;
-	if (pattern == NULL)
+	যদি (pattern == রিক্ত)
 	    pattern = (char_u *)"";
     }
 
-    XtVaSetValues(dialog_wgt,
+    Xt_Va_Set_মানসমূহ(dialog_wgt,
 	XtVaTypedArg,
-	    XmNdirectory, XmRString, (char *)initdir, STRLEN(initdir) + 1,
+	    XmNdirectory, XmRString, (ৱর্ণ *)initdir, STRLEN(initdir) + 1,
 	XtVaTypedArg,
-	    XmNdirSpec,	XmRString, (char *)dflt, STRLEN(dflt) + 1,
+	    XmNdirSpec,	XmRString, (ৱর্ণ *)dflt, STRLEN(dflt) + 1,
 	XtVaTypedArg,
-	    XmNpattern,	XmRString, (char *)pattern, STRLEN(pattern) + 1,
+	    XmNpattern,	XmRString, (ৱর্ণ *)pattern, STRLEN(pattern) + 1,
 	XtVaTypedArg,
-	    XmNdialogTitle, XmRString, (char *)title, STRLEN(title) + 1,
-	NULL);
+	    XmNdialogTitle, XmRString, (ৱর্ণ *)title, STRLEN(title) + 1,
+	রিক্ত);
 
     set_predefined_label(dialog_wgt, "Apply", _("&Filter"));
     set_predefined_label(dialog_wgt, "Cancel", _("&Cancel"));
@@ -2275,32 +2275,32 @@ gui_mch_browse(
     set_predefined_fontlist(dialog_wgt, "ItemsListSW.ItemsList");
 
     gui_motif_menu_colors(dialog_wgt);
-    if (gui.scroll_bg_pixel != INVALCOLOR)
-	XtVaSetValues(dialog_wgt, XmNtroughColor, gui.scroll_bg_pixel, NULL);
+    যদি (gui.scroll_bg_pixel != INVALCOLOR)
+	Xt_Va_Set_মানসমূহ(dialog_wgt, XmNtroughColor, gui.scroll_bg_pixel, রিক্ত);
 
     XtAddCallback(dialog_wgt, XmNokCallback, DialogAcceptCB, (XtPointer)0);
     XtAddCallback(dialog_wgt, XmNcancelCallback, DialogCancelCB, (XtPointer)0);
     // We have no help in this window, so hide help button
     XtUnmanageChild(XmFileSelectionBoxGetChild(dialog_wgt,
-					(unsigned char)XmDIALOG_HELP_BUTTON));
+					(unsigned ৱর্ণ)XmDIALOG_HELP_BUTTON));
 
     manage_centered(dialog_wgt);
     activate_dialog_mnemonics(dialog_wgt);
 
     // sit in a loop until the dialog box has gone away
-    do
+    কৰা
     {
 	XtAppProcessEvent(XtWidgetToApplicationContext(dialog_wgt),
-	    (XtInputMask)XtIMAll);
-    } while (XtIsManaged(dialog_wgt));
+	    (Xt_প্ৰবেশ_Mask)XtIMAll);
+    } যেতিয়ালৈ (XtIsManaged(dialog_wgt));
 
     suppress_dialog_mnemonics(dialog_wgt);
     XtDestroyWidget(dialog_wgt);
     vim_free(tofree);
 
-    if (browse_fname == NULL)
-	return NULL;
-    return vim_strsave((char_u *)browse_fname);
+    যদি (browse_fname == রিক্ত)
+	ঘূৰাই রিক্ত;
+    ঘূৰাই vim_strsave((char_u *)browse_fname);
 }
 
 /*
@@ -2312,16 +2312,16 @@ gui_mch_browse(
 /*
  * Process callback from Dialog cancel actions.
  */
-    static void
+    স্থির শূন্য
 DialogCancelCB(
     Widget	w UNUSED,		//  widget id
     XtPointer	client_data UNUSED,	//  data from application
     XtPointer	call_data UNUSED)	//  data from widget class
 {
-    if (browse_fname != NULL)
+    যদি (browse_fname != রিক্ত)
     {
 	XtFree(browse_fname);
-	browse_fname = NULL;
+	browse_fname = রিক্ত;
     }
     XtUnmanageChild(dialog_wgt);
 }
@@ -2329,7 +2329,7 @@ DialogCancelCB(
 /*
  * Process callback from Dialog actions.
  */
-    static void
+    স্থির শূন্য
 DialogAcceptCB(
     Widget	w UNUSED,		//  widget id
     XtPointer	client_data UNUSED,	//  data from application
@@ -2337,15 +2337,15 @@ DialogAcceptCB(
 {
     XmFileSelectionBoxCallbackStruct *fcb;
 
-    if (browse_fname != NULL)
+    যদি (browse_fname != রিক্ত)
     {
 	XtFree(browse_fname);
-	browse_fname = NULL;
+	browse_fname = রিক্ত;
     }
     fcb = (XmFileSelectionBoxCallbackStruct *)call_data;
 
     // get the filename from the file selection box
-    XmStringGetLtoR(fcb->value, charset, &browse_fname);
+    XmStringGetLtoR(fcb->মান, charset, &browse_fname);
 
     // popdown the file selection box
     XtUnmanageChild(dialog_wgt);
@@ -2353,69 +2353,69 @@ DialogAcceptCB(
 
 #endif // FEAT_BROWSE
 
-#if defined(FEAT_GUI_DIALOG)
+#যদি defined(FEAT_GUI_DIALOG)
 
-static int	dialogStatus;
+স্থির পূর্ণাঙ্ক	dialogStatus;
 
 /*
  * Callback function for the textfield.  When CR is hit this works like
  * hitting the "OK" button, ESC like "Cancel".
  */
-    static void
+    স্থির শূন্য
 keyhit_callback(
     Widget		w,
     XtPointer		client_data UNUSED,
     XEvent		*event,
     Boolean		*cont UNUSED)
 {
-    char	buf[2];
-    KeySym	key_sym;
+    ৱর্ণ	buf[2];
+    চাবি_Sym	চাবি_sym;
 
-    if (XLookupString(&(event->xkey), buf, 2, &key_sym, NULL) == 1)
+    যদি (XLookupString(&(event->xkey), buf, 2, &চাবি_sym, রিক্ত) == 1)
     {
-	if (*buf == CAR)
+	যদি (*buf == CAR)
 	    dialogStatus = 1;
-	else if (*buf == ESC)
+	অন্যথা যদি (*buf == ESC)
 	    dialogStatus = 2;
     }
-    if ((key_sym == XK_Left || key_sym == XK_Right)
+    যদি ((চাবি_sym == XK_বাম || চাবি_sym == XK_ডান)
 	    && !(event->xkey.state & ShiftMask))
 	XmTextFieldClearSelection(w, XtLastTimestampProcessed(gui.dpy));
 }
 
-    static void
+    স্থির শূন্য
 butproc(
     Widget	w UNUSED,
     XtPointer	client_data,
     XtPointer	call_data UNUSED)
 {
-    dialogStatus = (int)(long)client_data + 1;
+    dialogStatus = (পূর্ণাঙ্ক)(long)client_data + 1;
 }
 
 # ifdef HAVE_XPM
 
-    static Widget
+    স্থির Widget
 create_pixmap_label(
     Widget	parent,
     String	name,
-    char	**data,
+    ৱর্ণ	**data,
     ArgList	args,
     Cardinal	arg)
 {
     Widget		label;
     Display		*dsp;
     Screen		*scr;
-    int			depth;
+    পূর্ণাঙ্ক			depth;
     Pixmap		pixmap = 0;
     XpmAttributes	attr;
     Boolean		rs;
-    XpmColorSymbol	color[5] =
+    Xpm_Color_প্ৰতীক	color[5] =
     {
-	{"none", NULL, 0},
-	{"iconColor1", NULL, 0},
-	{"bottomShadowColor", NULL, 0},
-	{"topShadowColor", NULL, 0},
-	{"selectColor", NULL, 0}
+	{"none", রিক্ত, 0},
+	{"iconColor1", রিক্ত, 0},
+	{"bottomShadowColor", রিক্ত, 0},
+	{"topShadowColor", রিক্ত, 0},
+	{"selectColor", রিক্ত, 0}
     };
 
     label = XmCreateLabelGadget(parent, name, args, arg);
@@ -2427,7 +2427,7 @@ create_pixmap_label(
      */
     dsp = XtDisplayOfObject(label);
     scr = XtScreenOfObject(label);
-    XtVaGetValues(XtIsSubclass(label, coreWidgetClass)
+    Xt_Va_Get_মানসমূহ(XtIsSubclass(label, coreWidgetClass)
 	    ?  label : XtParent(label),
 		  XmNdepth, &depth,
 		  XmNbackground, &color[0].pixel,
@@ -2435,95 +2435,95 @@ create_pixmap_label(
 		  XmNbottomShadowColor, &color[2].pixel,
 		  XmNtopShadowColor, &color[3].pixel,
 		  XmNhighlight, &color[4].pixel,
-		  NULL);
+		  রিক্ত);
 
     attr.valuemask = XpmColorSymbols | XpmCloseness | XpmDepth;
     attr.colorsymbols = color;
     attr.numsymbols = 5;
     attr.closeness = 65535;
     attr.depth = depth;
-    XpmCreatePixmapFromData(dsp, RootWindowOfScreen(scr),
-		    data, &pixmap, NULL, &attr);
+    XpmCreatePixmapFromData(dsp, মূল_Window_Of_Screen(scr),
+		    data, &pixmap, রিক্ত, &attr);
 
-    XtVaGetValues(label, XmNrecomputeSize, &rs, NULL);
-    XtVaSetValues(label, XmNrecomputeSize, True, NULL);
-    XtVaSetValues(label,
+    Xt_Va_Get_মানসমূহ(label, XmNrecomputeSize, &rs, রিক্ত);
+    Xt_Va_Set_মানসমূহ(label, XmNrecomputeSize, True, রিক্ত);
+    Xt_Va_Set_মানসমূহ(label,
 	    XmNlabelType, XmPIXMAP,
 	    XmNlabelPixmap, pixmap,
-	    NULL);
-    XtVaSetValues(label, XmNrecomputeSize, rs, NULL);
+	    রিক্ত);
+    Xt_Va_Set_মানসমূহ(label, XmNrecomputeSize, rs, রিক্ত);
 
-    return label;
+    ঘূৰাই label;
 }
 # endif
 
-    int
+    পূর্ণাঙ্ক
 gui_mch_dialog(
-    int		type UNUSED,
+    পূর্ণাঙ্ক		type UNUSED,
     char_u	*title,
     char_u	*message,
     char_u	*button_names,
-    int		dfltbutton,
+    পূর্ণাঙ্ক		dfltbutton,
     char_u	*textfield,		// buffer of size IOSIZE
-    int		ex_cmd UNUSED)
+    পূর্ণাঙ্ক		ex_cmd UNUSED)
 {
     char_u		*buts;
     char_u		*p, *next;
     XtAppContext	app;
     XmString		label;
-    int			butcount;
+    পূর্ণাঙ্ক			butcount;
     Widget		w;
-    Widget		dialogform = NULL;
-    Widget		form = NULL;
-    Widget		dialogtextfield = NULL;
+    Widget		dialogform = রিক্ত;
+    Widget		form = রিক্ত;
+    Widget		dialogtextfield = রিক্ত;
     Widget		*buttons;
-    Widget		sep_form = NULL;
+    Widget		sep_form = রিক্ত;
     Boolean		vertical;
-    Widget		separator = NULL;
-    int			n;
+    Widget		separator = রিক্ত;
+    পূর্ণাঙ্ক			n;
     Arg			args[6];
 # ifdef HAVE_XPM
-    char		**icon_data = NULL;
-    Widget		dialogpixmap = NULL;
+    ৱর্ণ		**icon_data = রিক্ত;
+    Widget		dialogpixmap = রিক্ত;
 # endif
 
-    if (title == NULL)
+    যদি (title == রিক্ত)
 	title = (char_u *)_("Vim dialog");
 
     // if our pointer is currently hidden, then we should show it.
     gui_mch_mousehide(FALSE);
 
-    dialogform = XmCreateFormDialog(vimShell, (char *)"dialog", NULL, 0);
+    dialogform = XmCreateFormDialog(vimShell, (ৱর্ণ *)"dialog", রিক্ত, 0);
 
     // Check 'v' flag in 'guioptions': vertical button placement.
-    vertical = (vim_strchr(p_go, GO_VERTICAL) != NULL);
+    vertical = (vim_strchr(p_go, GO_VERTICAL) != রিক্ত);
 
     // Set the title of the Dialog window
-    label = XmStringCreateSimple((char *)title);
-    if (label == NULL)
-	return -1;
-    XtVaSetValues(dialogform,
+    label = XmStringCreateSimple((ৱর্ণ *)title);
+    যদি (label == রিক্ত)
+	ঘূৰাই -1;
+    Xt_Va_Set_মানসমূহ(dialogform,
 	    XmNdialogTitle, label,
 	    XmNhorizontalSpacing, 4,
 	    XmNverticalSpacing, vertical ? 0 : 4,
-	    NULL);
+	    রিক্ত);
     XmStringFree(label);
 
     // make a copy, so that we can insert NULs
     buts = vim_strsave(button_names);
-    if (buts == NULL)
-	return -1;
+    যদি (buts == রিক্ত)
+	ঘূৰাই -1;
 
     // Count the number of buttons and allocate buttons[].
     butcount = 1;
-    for (p = buts; *p; ++p)
-	if (*p == DLG_BUTTON_SEP)
+    বাবে (p = buts; *p; ++p)
+	যদি (*p == DLG_BUTTON_SEP)
 	    ++butcount;
     buttons = ALLOC_MULT(Widget, butcount);
-    if (buttons == NULL)
+    যদি (buttons == রিক্ত)
     {
 	vim_free(buts);
-	return -1;
+	ঘূৰাই -1;
     }
 
     /*
@@ -2531,60 +2531,60 @@ gui_mch_dialog(
      */
     sep_form = (Widget) 0;
     p = buts;
-    for (butcount = 0; *p; ++butcount)
+    বাবে (butcount = 0; *p; ++butcount)
     {
-	KeySym mnemonic = NUL;
+	চাবি_Sym mnemonic = NUL;
 
-	for (next = p; *next; ++next)
+	বাবে (next = p; *next; ++next)
 	{
-	    if (*next == DLG_HOTKEY_CHAR)
+	    যদি (*next == DLG_HOTKEY_CHAR)
 	    {
-		int len = STRLEN(next);
+		পূর্ণাঙ্ক len = STRLEN(next);
 
-		if (len > 0)
+		যদি (len > 0)
 		{
 		    mch_memmove(next, next + 1, len);
 		    mnemonic = next[0];
 		}
 	    }
-	    if (*next == DLG_BUTTON_SEP)
+	    যদি (*next == DLG_BUTTON_SEP)
 	    {
 		*next++ = NUL;
-		break;
+		ভঙ্গ;
 	    }
 	}
-	label = XmStringCreate(_((char *)p), STRING_TAG);
-	if (label == NULL)
-	    break;
+	label = XmStringCreate(_((ৱর্ণ *)p), STRING_TAG);
+	যদি (label == রিক্ত)
+	    ভঙ্গ;
 
 	buttons[butcount] = XtVaCreateManagedWidget("button",
-		xmPushButtonWidgetClass, dialogform,
+		xm_ঠেলো_Button_Widget_Class, dialogform,
 		XmNlabelString, label,
 		XmNmnemonic, mnemonic,
 		XmNbottomAttachment, XmATTACH_FORM,
 		XmNbottomOffset, 4,
 		XmNshowAsDefault, butcount == dfltbutton - 1,
 		XmNdefaultButtonShadowThickness, 1,
-		NULL);
+		রিক্ত);
 	XmStringFree(label);
 	gui_motif_menu_fontlist(buttons[butcount]);
 
 	// Layout properly.
 
-	if (butcount > 0)
+	যদি (butcount > 0)
 	{
-	    if (vertical)
-		XtVaSetValues(buttons[butcount],
+	    যদি (vertical)
+		Xt_Va_Set_মানসমূহ(buttons[butcount],
 			XmNtopWidget, buttons[butcount - 1],
-			NULL);
-	    else
+			রিক্ত);
+	    অন্যথা
 	    {
-		if (*next == NUL)
+		যদি (*next == NUL)
 		{
-		    XtVaSetValues(buttons[butcount],
+		    Xt_Va_Set_মানসমূহ(buttons[butcount],
 			    XmNrightAttachment, XmATTACH_FORM,
 			    XmNrightOffset, 4,
-			    NULL);
+			    রিক্ত);
 
 		    // fill in a form as invisible separator
 		    sep_form = XtVaCreateWidget("separatorForm",
@@ -2595,26 +2595,26 @@ gui_mch_dialog(
 			    XmNrightWidget, buttons[butcount],
 			    XmNbottomAttachment, XmATTACH_FORM,
 			    XmNbottomOffset, 4,
-			    NULL);
+			    রিক্ত);
 		    XtManageChild(sep_form);
 		}
-		else
+		অন্যথা
 		{
-		    XtVaSetValues(buttons[butcount],
+		    Xt_Va_Set_মানসমূহ(buttons[butcount],
 			    XmNleftAttachment, XmATTACH_WIDGET,
 			    XmNleftWidget, buttons[butcount - 1],
-			    NULL);
+			    রিক্ত);
 		}
 	    }
 	}
-	else if (!vertical)
+	অন্যথা যদি (!vertical)
 	{
-	    if (*next == NUL)
+	    যদি (*next == NUL)
 	    {
-		XtVaSetValues(buttons[0],
+		Xt_Va_Set_মানসমূহ(buttons[0],
 			XmNrightAttachment, XmATTACH_FORM,
 			XmNrightOffset, 4,
-			NULL);
+			রিক্ত);
 
 		// fill in a form as invisible separator
 		sep_form = XtVaCreateWidget("separatorForm",
@@ -2625,14 +2625,14 @@ gui_mch_dialog(
 			XmNrightWidget, buttons[0],
 			XmNbottomAttachment, XmATTACH_FORM,
 			XmNbottomOffset, 4,
-			NULL);
+			রিক্ত);
 		XtManageChild(sep_form);
 	    }
-	    else
-		XtVaSetValues(buttons[0],
+	    অন্যথা
+		Xt_Va_Set_মানসমূহ(buttons[0],
 			XmNleftAttachment, XmATTACH_FORM,
 			XmNleftOffset, 4,
-			NULL);
+			রিক্ত);
 	}
 
 	XtAddCallback(buttons[butcount], XmNactivateCallback,
@@ -2642,7 +2642,7 @@ gui_mch_dialog(
     vim_free(buts);
 
     separator = (Widget) 0;
-    if (butcount > 0)
+    যদি (butcount > 0)
     {
 	// Create the separator for beauty.
 	n = 0;
@@ -2656,28 +2656,28 @@ gui_mch_dialog(
 	XtManageChild(separator);
     }
 
-    if (textfield != NULL)
+    যদি (textfield != রিক্ত)
     {
 	dialogtextfield = XtVaCreateWidget("textField",
 		xmTextFieldWidgetClass, dialogform,
 		XmNleftAttachment, XmATTACH_FORM,
 		XmNrightAttachment, XmATTACH_FORM,
-		NULL);
-	if (butcount > 0)
-	    XtVaSetValues(dialogtextfield,
+		রিক্ত);
+	যদি (butcount > 0)
+	    Xt_Va_Set_মানসমূহ(dialogtextfield,
 		    XmNbottomAttachment, XmATTACH_WIDGET,
 		    XmNbottomWidget, separator,
-		    NULL);
-	else
-	    XtVaSetValues(dialogtextfield,
+		    রিক্ত);
+	অন্যথা
+	    Xt_Va_Set_মানসমূহ(dialogtextfield,
 		    XmNbottomAttachment, XmATTACH_FORM,
-		    NULL);
+		    রিক্ত);
 
 	set_fontlist(dialogtextfield);
-	XmTextFieldSetString(dialogtextfield, (char *)textfield);
+	XmTextFieldSetString(dialogtextfield, (ৱর্ণ *)textfield);
 	XtManageChild(dialogtextfield);
-	XtAddEventHandler(dialogtextfield, KeyPressMask, False,
-			    (XtEventHandler)keyhit_callback, (XtPointer)NULL);
+	XtAddEventHandler(dialogtextfield, চাবি_Press_Mask, False,
+			    (XtEventHandler)keyhit_callback, (XtPointer)রিক্ত);
     }
 
     // Form holding both message and pixmap labels
@@ -2686,29 +2686,29 @@ gui_mch_dialog(
 	    XmNleftAttachment, XmATTACH_FORM,
 	    XmNrightAttachment, XmATTACH_FORM,
 	    XmNtopAttachment, XmATTACH_FORM,
-	    NULL);
+	    রিক্ত);
     XtManageChild(form);
 
 # ifdef HAVE_XPM
     // Add a pixmap, left of the message.
-    switch (type)
+    ৱিকল্প (type)
     {
-	case VIM_GENERIC:
+	পক্ষ VIM_GENERIC:
 	    icon_data = generic_xpm;
-	    break;
-	case VIM_ERROR:
+	    ভঙ্গ;
+	পক্ষ VIM_ERROR:
 	    icon_data = error_xpm;
-	    break;
-	case VIM_WARNING:
+	    ভঙ্গ;
+	পক্ষ VIM_WARNING:
 	    icon_data = alert_xpm;
-	    break;
-	case VIM_INFO:
+	    ভঙ্গ;
+	পক্ষ VIM_INFO:
 	    icon_data = info_xpm;
-	    break;
-	case VIM_QUESTION:
+	    ভঙ্গ;
+	পক্ষ VIM_QUESTION:
 	    icon_data = quest_xpm;
-	    break;
-	default:
+	    ভঙ্গ;
+	স্ৱভাৱ:
 	    icon_data = generic_xpm;
     }
 
@@ -2730,11 +2730,11 @@ gui_mch_dialog(
     // properly localized string, we use LtoR here. The symptom is that the
     // string is not shown properly in multiple lines as it does in native
     // Motif.
-    label = XmStringCreateLtoR((char *)message, STRING_TAG);
-    if (label == NULL)
+    label = XmStringCreateLtoR((ৱর্ণ *)message, STRING_TAG);
+    যদি (label == রিক্ত)
     {
 	vim_free(buttons);
-	return -1;
+	ঘূৰাই -1;
     }
     w = XtVaCreateManagedWidget("dialogMessage",
 				xmLabelGadgetClass, form,
@@ -2745,7 +2745,7 @@ gui_mch_dialog(
 # ifdef HAVE_XPM
 				XmNleftAttachment, XmATTACH_WIDGET,
 				XmNleftWidget, dialogpixmap,
-# else
+# অন্যথা
 				XmNleftAttachment, XmATTACH_FORM,
 # endif
 				XmNleftOffset, 8,
@@ -2753,46 +2753,46 @@ gui_mch_dialog(
 				XmNrightOffset, 8,
 				XmNbottomAttachment, XmATTACH_FORM,
 				XmNbottomOffset, 8,
-				NULL);
+				রিক্ত);
     XmStringFree(label);
     set_fontlist(w);
 
-    if (textfield != NULL)
+    যদি (textfield != রিক্ত)
     {
-	XtVaSetValues(form,
+	Xt_Va_Set_মানসমূহ(form,
 		XmNbottomAttachment, XmATTACH_WIDGET,
 		XmNbottomWidget, dialogtextfield,
-		NULL);
+		রিক্ত);
     }
-    else
+    অন্যথা
     {
-	if (butcount > 0)
-	    XtVaSetValues(form,
+	যদি (butcount > 0)
+	    Xt_Va_Set_মানসমূহ(form,
 		    XmNbottomAttachment, XmATTACH_WIDGET,
 		    XmNbottomWidget, separator,
-		    NULL);
-	else
-	    XtVaSetValues(form,
+		    রিক্ত);
+	অন্যথা
+	    Xt_Va_Set_মানসমূহ(form,
 		    XmNbottomAttachment, XmATTACH_FORM,
-		    NULL);
+		    রিক্ত);
     }
 
-    if (dfltbutton < 1)
+    যদি (dfltbutton < 1)
 	dfltbutton = 1;
-    if (dfltbutton > butcount)
+    যদি (dfltbutton > butcount)
 	dfltbutton = butcount;
-    XtVaSetValues(dialogform,
-	    XmNdefaultButton, buttons[dfltbutton - 1], NULL);
-    if (textfield != NULL)
-	XtVaSetValues(dialogform, XmNinitialFocus, dialogtextfield, NULL);
-    else
-	XtVaSetValues(dialogform, XmNinitialFocus, buttons[dfltbutton - 1],
-									NULL);
+    Xt_Va_Set_মানসমূহ(dialogform,
+	    XmNdefaultButton, buttons[dfltbutton - 1], রিক্ত);
+    যদি (textfield != রিক্ত)
+	Xt_Va_Set_মানসমূহ(dialogform, XmNinitialFocus, dialogtextfield, রিক্ত);
+    অন্যথা
+	Xt_Va_Set_মানসমূহ(dialogform, XmNinitialFocus, buttons[dfltbutton - 1],
+									রিক্ত);
 
     manage_centered(dialogform);
     activate_dialog_mnemonics(dialogform);
 
-    if (textfield != NULL && *textfield != NUL)
+    যদি (textfield != রিক্ত && *textfield != NUL)
     {
 	// This only works after the textfield has been realised.
 	XmTextFieldSetSelection(dialogtextfield,
@@ -2806,95 +2806,95 @@ gui_mch_dialog(
 
     // Loop until a button is pressed or the dialog is killed somehow.
     dialogStatus = -1;
-    for (;;)
+    বাবে (;;)
     {
-	XtAppProcessEvent(app, (XtInputMask)XtIMAll);
-	if (dialogStatus >= 0 || !XtIsManaged(dialogform))
-	    break;
+	XtAppProcessEvent(app, (Xt_প্ৰবেশ_Mask)XtIMAll);
+	যদি (dialogStatus >= 0 || !XtIsManaged(dialogform))
+	    ভঙ্গ;
     }
 
     vim_free(buttons);
 
-    if (textfield != NULL)
+    যদি (textfield != রিক্ত)
     {
 	p = (char_u *)XmTextGetString(dialogtextfield);
-	if (p == NULL || dialogStatus < 0)
+	যদি (p == রিক্ত || dialogStatus < 0)
 	    *textfield = NUL;
-	else
+	অন্যথা
 	    vim_strncpy(textfield, p, IOSIZE - 1);
-	XtFree((char *)p);
+	XtFree((ৱর্ণ *)p);
     }
 
     suppress_dialog_mnemonics(dialogform);
     XtDestroyWidget(dialogform);
 
-    return dialogStatus;
+    ঘূৰাই dialogStatus;
 }
 #endif // FEAT_GUI_DIALOG
 
-#if defined(FEAT_TOOLBAR)
-    void
-gui_mch_show_toolbar(int showit)
+#যদি defined(FEAT_TOOLBAR)
+    শূন্য
+gui_mch_show_toolbar(পূর্ণাঙ্ক showit)
 {
-    Cardinal	numChildren;	    // how many children toolBar has
+    Cardinal	অঙ্ক_Children;	    // how many children toolBar has
 
-    if (toolBar == (Widget)0)
-	return;
-    XtVaGetValues(toolBar, XmNnumChildren, &numChildren, NULL);
-    if (showit && numChildren > 0)
+    যদি (toolBar == (Widget)0)
+	ঘূৰাই;
+    Xt_Va_Get_মানসমূহ(toolBar, XmNnumChildren, &অঙ্ক_Children, রিক্ত);
+    যদি (showit && অঙ্ক_Children > 0)
     {
 	// Assume that we want to show the toolbar if p_toolbar contains
 	// valid option settings, therefore p_toolbar must not be NULL.
 	WidgetList  children;
 
-	XtVaGetValues(toolBar, XmNchildren, &children, NULL);
+	Xt_Va_Get_মানসমূহ(toolBar, XmNchildren, &children, রিক্ত);
 	{
-	    void    (*action)(BalloonEval *);
-	    int	    text = 0;
+	    শূন্য    (*action)(BalloonEval *);
+	    পূর্ণাঙ্ক	    text = 0;
 
-	    if (strstr((const char *)p_toolbar, "tooltips"))
+	    যদি (strstr((ধ্রুৱ ৱর্ণ *)p_toolbar, "tooltips"))
 		action = &gui_mch_enable_beval_area;
-	    else
+	    অন্যথা
 		action = &gui_mch_disable_beval_area;
-	    if (strstr((const char *)p_toolbar, "text"))
+	    যদি (strstr((ধ্রুৱ ৱর্ণ *)p_toolbar, "text"))
 		text = 1;
-	    else if (strstr((const char *)p_toolbar, "icons"))
+	    অন্যথা যদি (strstr((ধ্রুৱ ৱর্ণ *)p_toolbar, "icons"))
 		text = -1;
-	    if (text != 0)
+	    যদি (text != 0)
 	    {
 		vimmenu_T   *toolbar;
 		vimmenu_T   *cur;
 
 		FOR_ALL_MENUS(toolbar)
-		    if (menu_is_toolbar(toolbar->dname))
-			break;
+		    যদি (menu_is_toolbar(toolbar->dname))
+			ভঙ্গ;
 		// Assumption: toolbar is NULL if there is no toolbar,
 		//	       otherwise it contains the toolbar menu structure.
 		//
 		// Assumption: "numChildren" == the number of items in the list
 		//	       of items beginning with toolbar->children.
-		if (toolbar)
+		যদি (toolbar)
 		{
-		    for (cur = toolbar->children; cur; cur = cur->next)
+		    বাবে (cur = toolbar->children; cur; cur = cur->next)
 		    {
 			Arg	    args[1];
-			int	    n = 0;
+			পূর্ণাঙ্ক	    n = 0;
 
 			// Enable/Disable tooltip (OK to enable while
 			// currently enabled).
-			if (cur->tip != NULL)
+			যদি (cur->tip != রিক্ত)
 			    (*action)(cur->tip);
-			if (!menu_is_separator(cur->name))
+			যদি (!menu_is_separator(cur->name))
 			{
-			    if (text == 1 || cur->xpm == NULL)
+			    যদি (text == 1 || cur->xpm == রিক্ত)
 			    {
 				XtSetArg(args[n], XmNlabelType, XmSTRING);
 				++n;
 			    }
-			    if (cur->id != NULL)
+			    যদি (cur->id != রিক্ত)
 			    {
 				XtUnmanageChild(cur->id);
-				XtSetValues(cur->id, args, n);
+				Xt_Set_মানসমূহ(cur->id, args, n);
 				XtManageChild(cur->id);
 			    }
 			}
@@ -2905,75 +2905,75 @@ gui_mch_show_toolbar(int showit)
 	gui.toolbar_height = gui_mch_compute_toolbar_height();
 	XtManageChild(XtParent(toolBar));
 # ifdef FEAT_GUI_TABLINE
-	if (showing_tabline)
+	যদি (showing_tabline)
 	{
-	    XtVaSetValues(tabLine,
+	    Xt_Va_Set_মানসমূহ(tab_সাৰি,
 			  XmNtopAttachment, XmATTACH_WIDGET,
 			  XmNtopWidget, XtParent(toolBar),
-			  NULL);
-	    XtVaSetValues(textAreaForm,
+			  রিক্ত);
+	    Xt_Va_Set_মানসমূহ(textAreaForm,
 			  XmNtopAttachment, XmATTACH_WIDGET,
-			  XmNtopWidget, tabLine,
-			  NULL);
+			  XmNtopWidget, tab_সাৰি,
+			  রিক্ত);
 	}
-	else
+	অন্যথা
 # endif
-	    XtVaSetValues(textAreaForm,
+	    Xt_Va_Set_মানসমূহ(textAreaForm,
 			  XmNtopAttachment, XmATTACH_WIDGET,
 			  XmNtopWidget, XtParent(toolBar),
-			  NULL);
-	if (XtIsManaged(menuBar))
-	    XtVaSetValues(XtParent(toolBar),
+			  রিক্ত);
+	যদি (XtIsManaged(menuBar))
+	    Xt_Va_Set_মানসমূহ(XtParent(toolBar),
 		    XmNtopAttachment, XmATTACH_WIDGET,
 		    XmNtopWidget, menuBar,
-		    NULL);
-	else
-	    XtVaSetValues(XtParent(toolBar),
+		    রিক্ত);
+	অন্যথা
+	    Xt_Va_Set_মানসমূহ(XtParent(toolBar),
 		    XmNtopAttachment, XmATTACH_FORM,
-		    NULL);
+		    রিক্ত);
     }
-    else
+    অন্যথা
     {
 	gui.toolbar_height = 0;
-	if (XtIsManaged(menuBar))
+	যদি (XtIsManaged(menuBar))
 	{
 # ifdef FEAT_GUI_TABLINE
-	    if (showing_tabline)
+	    যদি (showing_tabline)
 	    {
-		XtVaSetValues(tabLine,
+		Xt_Va_Set_মানসমূহ(tab_সাৰি,
 			      XmNtopAttachment, XmATTACH_WIDGET,
 			      XmNtopWidget, menuBar,
-			      NULL);
-		XtVaSetValues(textAreaForm,
+			      রিক্ত);
+		Xt_Va_Set_মানসমূহ(textAreaForm,
 			      XmNtopAttachment, XmATTACH_WIDGET,
-			      XmNtopWidget, tabLine,
-			      NULL);
+			      XmNtopWidget, tab_সাৰি,
+			      রিক্ত);
 	    }
-	    else
+	    অন্যথা
 # endif
-		XtVaSetValues(textAreaForm,
+		Xt_Va_Set_মানসমূহ(textAreaForm,
 			      XmNtopAttachment, XmATTACH_WIDGET,
 			      XmNtopWidget, menuBar,
-			      NULL);
+			      রিক্ত);
 	}
-	else
+	অন্যথা
 	{
 # ifdef FEAT_GUI_TABLINE
-	    if (showing_tabline)
+	    যদি (showing_tabline)
 	    {
-		XtVaSetValues(tabLine,
+		Xt_Va_Set_মানসমূহ(tab_সাৰি,
 			      XmNtopAttachment, XmATTACH_FORM,
-			      NULL);
-		XtVaSetValues(textAreaForm,
+			      রিক্ত);
+		Xt_Va_Set_মানসমূহ(textAreaForm,
 			      XmNtopAttachment, XmATTACH_WIDGET,
-			      XmNtopWidget, tabLine,
-			      NULL);
+			      XmNtopWidget, tab_সাৰি,
+			      রিক্ত);
 	    }
-	    else
+	    অন্যথা
 # endif
-		XtVaSetValues(textAreaForm,
+		Xt_Va_Set_মানসমূহ(textAreaForm,
 			      XmNtopAttachment, XmATTACH_FORM,
-			      NULL);
+			      রিক্ত);
 	}
 
 	XtUnmanageChild(XtParent(toolBar));
@@ -2986,61 +2986,61 @@ gui_mch_show_toolbar(int showit)
  * such that the user can type page up/down etc. and have the
  * input go to the editor window, not the button
  */
-    static void
-reset_focus(void)
+    স্থির শূন্য
+reset_focus(শূন্য)
 {
-    if (textArea != NULL)
+    যদি (textArea != রিক্ত)
 	XmProcessTraversal(textArea, XmTRAVERSE_CURRENT);
 }
 
-    int
-gui_mch_compute_toolbar_height(void)
+    পূর্ণাঙ্ক
+gui_mch_compute_toolbar_height(শূন্য)
 {
     Dimension	borders;
     Dimension	height;		    // total Toolbar height
     Dimension	whgt;		    // height of each widget
     WidgetList	children;	    // list of toolBar's children
-    Cardinal	numChildren;	    // how many children toolBar has
-    int		i;
+    Cardinal	অঙ্ক_Children;	    // how many children toolBar has
+    পূর্ণাঙ্ক		i;
 
     borders = 0;
     height = 0;
-    if (toolBar != (Widget)0 && toolBarFrame != (Widget)0)
+    যদি (toolBar != (Widget)0 && toolBarFrame != (Widget)0)
     {				    // get height of XmFrame parent
 	Dimension	fst;
 	Dimension	fmh;
 	Dimension	tst;
 	Dimension	tmh;
 
-	XtVaGetValues(toolBarFrame,
+	Xt_Va_Get_মানসমূহ(toolBarFrame,
 		XmNshadowThickness, &fst,
 		XmNmarginHeight, &fmh,
-		NULL);
+		রিক্ত);
 	borders += fst + fmh;
-	XtVaGetValues(toolBar,
+	Xt_Va_Get_মানসমূহ(toolBar,
 		XmNshadowThickness, &tst,
 		XmNmarginHeight, &tmh,
 		XmNchildren, &children,
-		XmNnumChildren, &numChildren, NULL);
+		XmNnumChildren, &অঙ্ক_Children, রিক্ত);
 	borders += tst + tmh;
-	for (i = 0; i < (int)numChildren; i++)
+	বাবে (i = 0; i < (পূর্ণাঙ্ক)অঙ্ক_Children; i++)
 	{
 	    whgt = 0;
-	    XtVaGetValues(children[i], XmNheight, &whgt, NULL);
-	    if (height < whgt)
+	    Xt_Va_Get_মানসমূহ(children[i], XmNheight, &whgt, রিক্ত);
+	    যদি (height < whgt)
 		height = whgt;
 	}
     }
 # ifdef LESSTIF_VERSION
     // Hack: When starting up we get wrong dimensions.
-    if (height < 10)
+    যদি (height < 10)
 	height = 24;
 # endif
 
-    return (int)(height + (borders << 1));
+    ঘূৰাই (পূর্ণাঙ্ক)(height + (borders << 1));
 }
 
-    void
+    শূন্য
 motif_get_toolbar_colors(
     Pixel       *bgp,
     Pixel       *fgp,
@@ -3048,75 +3048,75 @@ motif_get_toolbar_colors(
     Pixel       *tsp,
     Pixel       *hsp)
 {
-    XtVaGetValues(toolBar,
+    Xt_Va_Get_মানসমূহ(toolBar,
 	    XmNbackground, bgp,
 	    XmNforeground, fgp,
 	    XmNbottomShadowColor, bsp,
 	    XmNtopShadowColor, tsp,
 	    XmNhighlightColor, hsp,
-	    NULL);
+	    রিক্ত);
 }
 #endif
 
-#if defined(FEAT_GUI_TABLINE)
+#যদি defined(FEAT_GUI_TABLINE)
 /*
  * Show or hide the tabline.
  */
-    void
-gui_mch_show_tabline(int showit)
+    শূন্য
+gui_mch_show_tabline(পূর্ণাঙ্ক showit)
 {
-    if (tabLine == (Widget)0)
-	return;
+    যদি (tab_সাৰি == (Widget)0)
+	ঘূৰাই;
 
-    if (!showit != !showing_tabline)
+    যদি (!showit != !showing_tabline)
     {
-	if (showit)
+	যদি (showit)
 	{
-	    XtManageChild(tabLine);
-	    XtUnmanageChild(XtNameToWidget(tabLine, "PageScroller"));
-	    XtUnmanageChild(XtNameToWidget(tabLine, "MinorTabScrollerNext"));
-	    XtUnmanageChild(XtNameToWidget(tabLine,
+	    XtManageChild(tab_সাৰি);
+	    XtUnmanageChild(XtNameToWidget(tab_সাৰি, "PageScroller"));
+	    XtUnmanageChild(XtNameToWidget(tab_সাৰি, "MinorTabScrollerNext"));
+	    XtUnmanageChild(XtNameToWidget(tab_সাৰি,
 					   "MinorTabScrollerPrevious"));
 # ifdef FEAT_MENU
 #  ifdef FEAT_TOOLBAR
-	    if (XtIsManaged(XtParent(toolBar)))
-		XtVaSetValues(tabLine,
+	    যদি (XtIsManaged(XtParent(toolBar)))
+		Xt_Va_Set_মানসমূহ(tab_সাৰি,
 			      XmNtopAttachment, XmATTACH_WIDGET,
-			      XmNtopWidget, XtParent(toolBar), NULL);
-	    else
+			      XmNtopWidget, XtParent(toolBar), রিক্ত);
+	    অন্যথা
 #  endif
-		if (XtIsManaged(menuBar))
-		XtVaSetValues(tabLine,
+		যদি (XtIsManaged(menuBar))
+		Xt_Va_Set_মানসমূহ(tab_সাৰি,
 			      XmNtopAttachment, XmATTACH_WIDGET,
-			      XmNtopWidget, menuBar, NULL);
-	    else
+			      XmNtopWidget, menuBar, রিক্ত);
+	    অন্যথা
 # endif
-		XtVaSetValues(tabLine,
-			      XmNtopAttachment, XmATTACH_FORM, NULL);
-	    XtVaSetValues(textAreaForm,
+		Xt_Va_Set_মানসমূহ(tab_সাৰি,
+			      XmNtopAttachment, XmATTACH_FORM, রিক্ত);
+	    Xt_Va_Set_মানসমূহ(textAreaForm,
 			  XmNtopAttachment, XmATTACH_WIDGET,
-			  XmNtopWidget, tabLine,
-			  NULL);
+			  XmNtopWidget, tab_সাৰি,
+			  রিক্ত);
 	}
-	else
+	অন্যথা
 	{
-	    XtUnmanageChild(tabLine);
+	    XtUnmanageChild(tab_সাৰি);
 # ifdef FEAT_MENU
 #  ifdef FEAT_TOOLBAR
-	    if (XtIsManaged(XtParent(toolBar)))
-		XtVaSetValues(textAreaForm,
+	    যদি (XtIsManaged(XtParent(toolBar)))
+		Xt_Va_Set_মানসমূহ(textAreaForm,
 			      XmNtopAttachment, XmATTACH_WIDGET,
-			      XmNtopWidget, XtParent(toolBar), NULL);
-	    else
+			      XmNtopWidget, XtParent(toolBar), রিক্ত);
+	    অন্যথা
 #  endif
-		if (XtIsManaged(menuBar))
-		XtVaSetValues(textAreaForm,
+		যদি (XtIsManaged(menuBar))
+		Xt_Va_Set_মানসমূহ(textAreaForm,
 			      XmNtopAttachment, XmATTACH_WIDGET,
-			      XmNtopWidget, menuBar, NULL);
-	    else
+			      XmNtopWidget, menuBar, রিক্ত);
+	    অন্যথা
 # endif
-		XtVaSetValues(textAreaForm,
-			      XmNtopAttachment, XmATTACH_FORM, NULL);
+		Xt_Va_Set_মানসমূহ(textAreaForm,
+			      XmNtopAttachment, XmATTACH_FORM, রিক্ত);
 	}
 	showing_tabline = showit;
     }
@@ -3125,41 +3125,41 @@ gui_mch_show_tabline(int showit)
 /*
  * Return TRUE when tabline is displayed.
  */
-    int
-gui_mch_showing_tabline(void)
+    পূর্ণাঙ্ক
+gui_mch_showing_tabline(শূন্য)
 {
-    return tabLine != (Widget)0 && showing_tabline;
+    ঘূৰাই tab_সাৰি != (Widget)0 && showing_tabline;
 }
 
 /*
  * Update the labels of the tabline.
  */
-    void
-gui_mch_update_tabline(void)
+    শূন্য
+gui_mch_update_tabline(শূন্য)
 {
     tabpage_T		*tp;
-    int			nr = 1, n;
+    পূর্ণাঙ্ক			nr = 1, n;
     Arg			args[10];
-    int			curtabidx = 0, currentpage;
+    পূর্ণাঙ্ক			curtabidx = 0, currentpage;
     Widget		tab;
     XmNotebookPageInfo	page_info;
     XmNotebookPageStatus page_status;
-    int			last_page, tab_count;
+    পূর্ণাঙ্ক			last_page, tab_গুনতি;
     XmString		label_str;
-    char		*label_cstr;
+    ৱর্ণ		*label_cstr;
     BalloonEval		*beval;
 
-    if (tabLine == (Widget)0)
-	return;
+    যদি (tab_সাৰি == (Widget)0)
+	ঘূৰাই;
 
     // Add a label for each tab page.  They all contain the same text area.
-    for (tp = first_tabpage; tp != NULL; tp = tp->tp_next, ++nr)
+    বাবে (tp = first_tabpage; tp != রিক্ত; tp = tp->tp_next, ++nr)
     {
-	if (tp == curtab)
+	যদি (tp == curtab)
 	    curtabidx = nr;
 
-	page_status = XmNotebookGetPageInfo(tabLine, nr, &page_info);
-	if (page_status == XmPAGE_INVALID
+	page_status = XmNotebookGetPageInfo(tab_সাৰি, nr, &page_info);
+	যদি (page_status == XmPAGE_INVALID
 		|| page_info.major_tab_widget == (Widget)0)
 	{
 	    // Add the tab
@@ -3169,28 +3169,28 @@ gui_mch_update_tabline(void)
 	    XtSetArg(args[n], XmNalignment, XmALIGNMENT_BEGINNING); n++;
 	    XtSetArg(args[n], XmNhighlightThickness, 1); n++;
 	    XtSetArg(args[n], XmNshadowThickness , 1); n++;
-	    tab = XmCreatePushButton(tabLine, "-Empty-", args, n);
+	    tab = Xm_Create_ঠেলো_Button(tab_সাৰি, "-Empty-", args, n);
 	    XtManageChild(tab);
-	    beval = gui_mch_create_beval_area(tab, NULL, tabline_balloon_cb,
-									NULL);
-	    XtVaSetValues(tab, XmNuserData, beval, NULL);
+	    beval = gui_mch_create_beval_area(tab, রিক্ত, tabline_balloon_cb,
+									রিক্ত);
+	    Xt_Va_Set_মানসমূহ(tab, XmNuserData, beval, রিক্ত);
 	}
-	else
+	অন্যথা
 	    tab = page_info.major_tab_widget;
 
-	XtVaSetValues(tab, XmNpageNumber, nr, NULL);
+	Xt_Va_Set_মানসমূহ(tab, Xm_Npage_সংখ্যা, nr, রিক্ত);
 
 	/*
 	 * Change the label text only if it is different
 	 */
-	XtVaGetValues(tab, XmNlabelString, &label_str, NULL);
-	if (XmStringGetLtoR(label_str, XmSTRING_DEFAULT_CHARSET, &label_cstr))
+	Xt_Va_Get_মানসমূহ(tab, XmNlabelString, &label_str, রিক্ত);
+	যদি (XmStringGetLtoR(label_str, XmSTRING_DEFAULT_CHARSET, &label_cstr))
 	{
 	    get_tabline_label(tp, FALSE);
-	    if (STRCMP(label_cstr, NameBuff) != 0)
+	    যদি (STRCMP(label_cstr, NameBuff) != 0)
 	    {
-		XtVaSetValues(tab, XtVaTypedArg, XmNlabelString, XmRString,
-			      NameBuff, STRLEN(NameBuff) + 1, NULL);
+		Xt_Va_Set_মানসমূহ(tab, XtVaTypedArg, XmNlabelString, XmRString,
+			      NameBuff, STRLEN(NameBuff) + 1, রিক্ত);
 		/*
 		 * Force a resize of the tab label button
 		 */
@@ -3201,19 +3201,19 @@ gui_mch_update_tabline(void)
 	}
     }
 
-    tab_count = nr - 1;
+    tab_গুনতি = nr - 1;
 
-    XtVaGetValues(tabLine, XmNlastPageNumber, &last_page, NULL);
+    Xt_Va_Get_মানসমূহ(tab_সাৰি, Xm_Nlast_Page_সংখ্যা, &last_page, রিক্ত);
 
     // Remove any old labels.
-    while (nr <= last_page)
+    যেতিয়ালৈ (nr <= last_page)
     {
-	if (XmNotebookGetPageInfo(tabLine, nr, &page_info) != XmPAGE_INVALID
-	    && page_info.page_number == nr
+	যদি (XmNotebookGetPageInfo(tab_সাৰি, nr, &page_info) != XmPAGE_INVALID
+	    && page_info.page_সংখ্যা == nr
 	    && page_info.major_tab_widget != (Widget)0)
 	{
-	    XtVaGetValues(page_info.major_tab_widget, XmNuserData, &beval, NULL);
-	    if (beval != NULL)
+	    Xt_Va_Get_মানসমূহ(page_info.major_tab_widget, XmNuserData, &beval, রিক্ত);
+	    যদি (beval != রিক্ত)
 		gui_mch_destroy_beval_area(beval);
 	    XtUnmanageChild(page_info.major_tab_widget);
 	    XtDestroyWidget(page_info.major_tab_widget);
@@ -3221,108 +3221,108 @@ gui_mch_update_tabline(void)
 	nr++;
     }
 
-    XtVaSetValues(tabLine, XmNlastPageNumber, tab_count, NULL);
+    Xt_Va_Set_মানসমূহ(tab_সাৰি, Xm_Nlast_Page_সংখ্যা, tab_গুনতি, রিক্ত);
 
-    XtVaGetValues(tabLine, XmNcurrentPageNumber, &currentpage, NULL);
-    if (currentpage != curtabidx)
-	XtVaSetValues(tabLine, XmNcurrentPageNumber, curtabidx, NULL);
+    Xt_Va_Get_মানসমূহ(tab_সাৰি, Xm_Ncurrent_Page_সংখ্যা, &currentpage, রিক্ত);
+    যদি (currentpage != curtabidx)
+	Xt_Va_Set_মানসমূহ(tab_সাৰি, Xm_Ncurrent_Page_সংখ্যা, curtabidx, রিক্ত);
 }
 
 /*
  * Set the current tab to "nr".  First tab is 1.
  */
-    void
-gui_mch_set_curtab(int nr)
+    শূন্য
+gui_mch_set_curtab(পূর্ণাঙ্ক nr)
 {
-    int		currentpage;
+    পূর্ণাঙ্ক		currentpage;
 
-    if (tabLine == (Widget)0)
-	return;
+    যদি (tab_সাৰি == (Widget)0)
+	ঘূৰাই;
 
-    XtVaGetValues(tabLine, XmNcurrentPageNumber, &currentpage, NULL);
-    if (currentpage != nr)
-	XtVaSetValues(tabLine, XmNcurrentPageNumber, nr, NULL);
+    Xt_Va_Get_মানসমূহ(tab_সাৰি, Xm_Ncurrent_Page_সংখ্যা, &currentpage, রিক্ত);
+    যদি (currentpage != nr)
+	Xt_Va_Set_মানসমূহ(tab_সাৰি, Xm_Ncurrent_Page_সংখ্যা, nr, রিক্ত);
 }
 #endif
 
 /*
  * Set the colors of Widget "id" to the menu colors.
  */
-    static void
+    স্থির শূন্য
 gui_motif_menu_colors(Widget id)
 {
-    if (gui.menu_bg_pixel != INVALCOLOR)
-#if (XmVersion >= 1002)
+    যদি (gui.menu_bg_pixel != INVALCOLOR)
+#যদি (XmVersion >= 1002)
 	XmChangeColor(id, gui.menu_bg_pixel);
-#else
-	XtVaSetValues(id, XmNbackground, gui.menu_bg_pixel, NULL);
+#অন্যথা
+	Xt_Va_Set_মানসমূহ(id, XmNbackground, gui.menu_bg_pixel, রিক্ত);
 #endif
-    if (gui.menu_fg_pixel != INVALCOLOR)
-	XtVaSetValues(id, XmNforeground, gui.menu_fg_pixel, NULL);
+    যদি (gui.menu_fg_pixel != INVALCOLOR)
+	Xt_Va_Set_মানসমূহ(id, XmNforeground, gui.menu_fg_pixel, রিক্ত);
 }
 
 /*
  * Set the colors of Widget "id" to the scrollbar colors.
  */
-    static void
+    স্থির শূন্য
 gui_motif_scroll_colors(Widget id)
 {
-    if (gui.scroll_bg_pixel != INVALCOLOR)
-#if (XmVersion >= 1002)
+    যদি (gui.scroll_bg_pixel != INVALCOLOR)
+#যদি (XmVersion >= 1002)
 	XmChangeColor(id, gui.scroll_bg_pixel);
-#else
-	XtVaSetValues(id, XmNbackground, gui.scroll_bg_pixel, NULL);
+#অন্যথা
+	Xt_Va_Set_মানসমূহ(id, XmNbackground, gui.scroll_bg_pixel, রিক্ত);
 #endif
-    if (gui.scroll_fg_pixel != INVALCOLOR)
-	XtVaSetValues(id, XmNforeground, gui.scroll_fg_pixel, NULL);
+    যদি (gui.scroll_fg_pixel != INVALCOLOR)
+	Xt_Va_Set_মানসমূহ(id, XmNforeground, gui.scroll_fg_pixel, রিক্ত);
 }
 
 /*
  * Set the fontlist for Widget "id" to use gui.menu_fontset or gui.menu_font.
  */
-    void
+    শূন্য
 gui_motif_menu_fontlist(Widget id UNUSED)
 {
 #ifdef FEAT_MENU
 # ifdef FONTSET_ALWAYS
-    if (gui.menu_fontset != NOFONTSET)
+    যদি (gui.menu_fontset != NOFONTSET)
     {
 	XmFontList fl;
 
 	fl = gui_motif_fontset2fontlist((XFontSet *)&gui.menu_fontset);
-	if (fl != NULL)
+	যদি (fl != রিক্ত)
 	{
-	    if (XtIsManaged(id))
+	    যদি (XtIsManaged(id))
 	    {
 		XtUnmanageChild(id);
-		XtVaSetValues(id, XmNfontList, fl, NULL);
+		Xt_Va_Set_মানসমূহ(id, XmNfontList, fl, রিক্ত);
 		// We should force the widget to recalculate its
 		// geometry now.
 		XtManageChild(id);
 	    }
-	    else
-		XtVaSetValues(id, XmNfontList, fl, NULL);
+	    অন্যথা
+		Xt_Va_Set_মানসমূহ(id, XmNfontList, fl, রিক্ত);
 	    XmFontListFree(fl);
 	}
     }
-# else
-    if (gui.menu_font != NOFONT)
+# অন্যথা
+    যদি (gui.menu_font != NOFONT)
     {
 	XmFontList fl;
 
 	fl = gui_motif_create_fontlist((XFontStruct *)gui.menu_font);
-	if (fl != NULL)
+	যদি (fl != রিক্ত)
 	{
-	    if (XtIsManaged(id))
+	    যদি (XtIsManaged(id))
 	    {
 		XtUnmanageChild(id);
-		XtVaSetValues(id, XmNfontList, fl, NULL);
+		Xt_Va_Set_মানসমূহ(id, XmNfontList, fl, রিক্ত);
 		// We should force the widget to recalculate its
 		// geometry now.
 		XtManageChild(id);
 	    }
-	    else
-		XtVaSetValues(id, XmNfontList, fl, NULL);
+	    অন্যথা
+		Xt_Va_Set_মানসমূহ(id, XmNfontList, fl, রিক্ত);
 	    XmFontListFree(fl);
 	}
     }
@@ -3335,7 +3335,7 @@ gui_motif_menu_fontlist(Widget id UNUSED)
  * We don't create it twice for the sake of speed.
  */
 
-typedef struct _SharedFindReplace
+প্রকারনির্দেশ সংরচনা _SharedFindReplace
 {
     Widget dialog;	// the main dialog widget
     Widget wword;	// 'Exact match' check button
@@ -3352,10 +3352,10 @@ typedef struct _SharedFindReplace
     Widget cancel;
 } SharedFindReplace;
 
-static SharedFindReplace find_widgets = {NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL};
-static SharedFindReplace repl_widgets = {NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL};
+স্থির SharedFindReplace find_widgets = {রিক্ত, রিক্ত, রিক্ত, রিক্ত, রিক্ত, রিক্ত, রিক্ত, রিক্ত, রিক্ত, রিক্ত, রিক্ত, রিক্ত};
+স্থির SharedFindReplace repl_widgets = {রিক্ত, রিক্ত, রিক্ত, রিক্ত, রিক্ত, রিক্ত, রিক্ত, রিক্ত, রিক্ত, রিক্ত, রিক্ত, রিক্ত};
 
-    static void
+    স্থির শূন্য
 find_replace_destroy_callback(
     Widget	w UNUSED,
     XtPointer	client_data,
@@ -3363,12 +3363,12 @@ find_replace_destroy_callback(
 {
     SharedFindReplace *cd = (SharedFindReplace *)client_data;
 
-    if (cd != NULL)
+    যদি (cd != রিক্ত)
        // suppress_dialog_mnemonics(cd->dialog);
 	cd->dialog = (Widget)0;
 }
 
-    static void
+    স্থির শূন্য
 find_replace_dismiss_callback(
     Widget	w UNUSED,
     XtPointer	client_data,
@@ -3376,11 +3376,11 @@ find_replace_dismiss_callback(
 {
     SharedFindReplace *cd = (SharedFindReplace *)client_data;
 
-    if (cd != NULL)
+    যদি (cd != রিক্ত)
 	XtUnmanageChild(cd->dialog);
 }
 
-    static void
+    স্থির শূন্য
 entry_activate_callback(
     Widget	w UNUSED,
     XtPointer	client_data,
@@ -3389,20 +3389,20 @@ entry_activate_callback(
     XmProcessTraversal((Widget)client_data, XmTRAVERSE_CURRENT);
 }
 
-    static void
+    স্থির শূন্য
 find_replace_callback(
     Widget	w UNUSED,
     XtPointer	client_data,
     XtPointer	call_data UNUSED)
 {
     long_u	flags = (long_u)client_data;
-    char	*find_text, *repl_text;
+    ৱর্ণ	*find_text, *repl_text;
     Boolean	direction_down = TRUE;
     Boolean	wword;
     Boolean	mcase;
     SharedFindReplace *sfr;
 
-    if (flags == FRD_UNDO)
+    যদি (flags == FRD_UNDO)
     {
 	char_u	*save_cpo = p_cpo;
 
@@ -3411,77 +3411,77 @@ find_replace_callback(
 	u_undo(1);
 	p_cpo = save_cpo;
 	gui_update_screen();
-	return;
+	ঘূৰাই;
     }
 
     // Get the search/replace strings from the dialog
-    if (flags == FRD_FINDNEXT)
+    যদি (flags == FRD_FINDNEXT)
     {
-	repl_text = NULL;
+	repl_text = রিক্ত;
 	sfr = &find_widgets;
     }
-    else
+    অন্যথা
     {
 	repl_text = XmTextFieldGetString(repl_widgets.with);
 	sfr = &repl_widgets;
     }
     find_text = XmTextFieldGetString(sfr->what);
-    XtVaGetValues(sfr->down, XmNset, &direction_down, NULL);
-    XtVaGetValues(sfr->wword, XmNset, &wword, NULL);
-    XtVaGetValues(sfr->mcase, XmNset, &mcase, NULL);
-    if (wword)
+    Xt_Va_Get_মানসমূহ(sfr->down, XmNset, &direction_down, রিক্ত);
+    Xt_Va_Get_মানসমূহ(sfr->wword, XmNset, &wword, রিক্ত);
+    Xt_Va_Get_মানসমূহ(sfr->mcase, XmNset, &mcase, রিক্ত);
+    যদি (wword)
 	flags |= FRD_WHOLE_WORD;
-    if (mcase)
+    যদি (mcase)
 	flags |= FRD_MATCH_CASE;
 
-    (void)gui_do_findrepl((int)flags, (char_u *)find_text, (char_u *)repl_text,
+    (শূন্য)gui_do_findrepl((পূর্ণাঙ্ক)flags, (char_u *)find_text, (char_u *)repl_text,
 							      direction_down);
 
-    if (find_text != NULL)
+    যদি (find_text != রিক্ত)
 	XtFree(find_text);
-    if (repl_text != NULL)
+    যদি (repl_text != রিক্ত)
 	XtFree(repl_text);
 }
 
-    static void
+    স্থির শূন্য
 find_replace_keypress(
     Widget		w UNUSED,
     SharedFindReplace	*frdp,
     XKeyEvent		*event,
     Boolean		*b UNUSED)
 {
-    KeySym keysym;
+    চাবি_Sym keysym;
 
-    if (frdp == NULL)
-	return;
+    যদি (frdp == রিক্ত)
+	ঘূৰাই;
 
     keysym = XLookupKeysym(event, 0);
 
     // the scape key pops the whole dialog down
-    if (keysym == XK_Escape)
+    যদি (keysym == XK_Escape)
 	XtUnmanageChild(frdp->dialog);
 }
 
-    static void
-set_label(Widget w, char *label)
+    স্থির শূন্য
+set_label(Widget w, ৱর্ণ *label)
 {
     XmString	str;
     char_u	*p, *next;
-    KeySym	mnemonic = NUL;
+    চাবি_Sym	mnemonic = NUL;
 
-    if (!w)
-	return;
+    যদি (!w)
+	ঘূৰাই;
 
     p = vim_strsave((char_u *)label);
-    if (p == NULL)
-	return;
-    for (next = p; *next; ++next)
+    যদি (p == রিক্ত)
+	ঘূৰাই;
+    বাবে (next = p; *next; ++next)
     {
-	if (*next == DLG_HOTKEY_CHAR)
+	যদি (*next == DLG_HOTKEY_CHAR)
 	{
-	    int len = STRLEN(next);
+	    পূর্ণাঙ্ক len = STRLEN(next);
 
-	    if (len > 0)
+	    যদি (len > 0)
 	    {
 		mch_memmove(next, next + 1, len);
 		mnemonic = next[0];
@@ -3489,33 +3489,33 @@ set_label(Widget w, char *label)
 	}
     }
 
-    str = XmStringCreateSimple((char *)p);
+    str = XmStringCreateSimple((ৱর্ণ *)p);
     vim_free(p);
-    if (str)
+    যদি (str)
     {
-	XtVaSetValues(w,
+	Xt_Va_Set_মানসমূহ(w,
 		XmNlabelString, str,
 		XmNmnemonic, mnemonic,
-		NULL);
+		রিক্ত);
 	XmStringFree(str);
     }
     gui_motif_menu_fontlist(w);
 }
 
-    static void
-find_replace_dialog_create(char_u *arg, int do_replace)
+    স্থির শূন্য
+find_replace_dialog_create(char_u *arg, পূর্ণাঙ্ক do_replace)
 {
     SharedFindReplace	*frdp;
     Widget		separator;
-    Widget		input_form;
+    Widget		প্ৰবেশ_form;
     Widget		button_form;
     Widget		toggle_form;
     Widget		frame;
     XmString		str;
-    int			n;
+    পূর্ণাঙ্ক			n;
     Arg			args[6];
-    int			wword = FALSE;
-    int			mcase = !p_ic;
+    পূর্ণাঙ্ক			wword = FALSE;
+    পূর্ণাঙ্ক			mcase = !p_ic;
     Dimension		width;
     Dimension		widest;
     char_u		*entry_text;
@@ -3526,31 +3526,31 @@ find_replace_dialog_create(char_u *arg, int do_replace)
     entry_text = get_find_dialog_text(arg, &wword, &mcase);
 
     // If the dialog already exists, just raise it.
-    if (frdp->dialog)
+    যদি (frdp->dialog)
     {
 	gui_motif_synch_fonts();
 
 	// If the window is already up, just pop it to the top
-	if (XtIsManaged(frdp->dialog))
+	যদি (XtIsManaged(frdp->dialog))
 	    XMapRaised(XtDisplay(frdp->dialog),
 					    XtWindow(XtParent(frdp->dialog)));
-	else
+	অন্যথা
 	    XtManageChild(frdp->dialog);
 	XtPopup(XtParent(frdp->dialog), XtGrabNone);
 	XmProcessTraversal(frdp->what, XmTRAVERSE_CURRENT);
 
-	if (entry_text != NULL)
-	    XmTextFieldSetString(frdp->what, (char *)entry_text);
+	যদি (entry_text != রিক্ত)
+	    XmTextFieldSetString(frdp->what, (ৱর্ণ *)entry_text);
 	vim_free(entry_text);
 
-	XtVaSetValues(frdp->wword, XmNset, wword, NULL);
-	return;
+	Xt_Va_Set_মানসমূহ(frdp->wword, XmNset, wword, রিক্ত);
+	ঘূৰাই;
     }
 
     // Create a fresh new dialog window
-    if (do_replace)
+    যদি (do_replace)
 	 str = XmStringCreateSimple(_("VIM - Search and Replace..."));
-    else
+    অন্যথা
 	 str = XmStringCreateSimple(_("VIM - Search..."));
 
     n = 0;
@@ -3571,63 +3571,63 @@ find_replace_dialog_create(char_u *arg, int do_replace)
 	    XmNtopOffset, 4,
 	    XmNbottomAttachment, XmATTACH_FORM,
 	    XmNbottomOffset, 4,
-	    NULL);
+	    রিক্ত);
 
     frdp->find = XtVaCreateManagedWidget("findButton",
-	    xmPushButtonWidgetClass, button_form,
+	    xm_ঠেলো_Button_Widget_Class, button_form,
 	    XmNsensitive, True,
 	    XmNtopAttachment, XmATTACH_FORM,
 	    XmNleftAttachment, XmATTACH_FORM,
 	    XmNrightAttachment, XmATTACH_FORM,
-	    NULL);
+	    রিক্ত);
     set_label(frdp->find, _("Find &Next"));
 
     XtAddCallback(frdp->find, XmNactivateCallback,
 	    find_replace_callback,
 	    (do_replace ? (XtPointer)FRD_R_FINDNEXT : (XtPointer)FRD_FINDNEXT));
 
-    if (do_replace)
+    যদি (do_replace)
     {
 	frdp->replace = XtVaCreateManagedWidget("replaceButton",
-		xmPushButtonWidgetClass, button_form,
+		xm_ঠেলো_Button_Widget_Class, button_form,
 		XmNtopAttachment, XmATTACH_WIDGET,
 		XmNtopWidget, frdp->find,
 		XmNleftAttachment, XmATTACH_FORM,
 		XmNrightAttachment, XmATTACH_FORM,
-		NULL);
+		রিক্ত);
 	set_label(frdp->replace, _("&Replace"));
 	XtAddCallback(frdp->replace, XmNactivateCallback,
 		find_replace_callback, (XtPointer)FRD_REPLACE);
 
 	frdp->all = XtVaCreateManagedWidget("replaceAllButton",
-		xmPushButtonWidgetClass, button_form,
+		xm_ঠেলো_Button_Widget_Class, button_form,
 		XmNtopAttachment, XmATTACH_WIDGET,
 		XmNtopWidget, frdp->replace,
 		XmNleftAttachment, XmATTACH_FORM,
 		XmNrightAttachment, XmATTACH_FORM,
-		NULL);
+		রিক্ত);
 	set_label(frdp->all, _("Replace &All"));
 	XtAddCallback(frdp->all, XmNactivateCallback,
 		find_replace_callback, (XtPointer)FRD_REPLACEALL);
 
 	frdp->undo = XtVaCreateManagedWidget("undoButton",
-		xmPushButtonWidgetClass, button_form,
+		xm_ঠেলো_Button_Widget_Class, button_form,
 		XmNtopAttachment, XmATTACH_WIDGET,
 		XmNtopWidget, frdp->all,
 		XmNleftAttachment, XmATTACH_FORM,
 		XmNrightAttachment, XmATTACH_FORM,
-		NULL);
+		রিক্ত);
 	set_label(frdp->undo, _("&Undo"));
 	XtAddCallback(frdp->undo, XmNactivateCallback,
 		find_replace_callback, (XtPointer)FRD_UNDO);
     }
 
     frdp->cancel = XtVaCreateManagedWidget("closeButton",
-	    xmPushButtonWidgetClass, button_form,
+	    xm_ঠেলো_Button_Widget_Class, button_form,
 	    XmNleftAttachment, XmATTACH_FORM,
 	    XmNrightAttachment, XmATTACH_FORM,
 	    XmNbottomAttachment, XmATTACH_FORM,
-	    NULL);
+	    রিক্ত);
     set_label(frdp->cancel, _("&Cancel"));
     XtAddCallback(frdp->cancel, XmNactivateCallback,
 	    find_replace_dismiss_callback, frdp);
@@ -3645,7 +3645,7 @@ find_replace_dialog_create(char_u *arg, int do_replace)
     separator = XmCreateSeparatorGadget(frdp->dialog, "separator", args, n);
     XtManageChild(separator);
 
-    input_form = XtVaCreateWidget("inputForm",
+    প্ৰবেশ_form = XtVaCreateWidget("inputForm",
 	    xmFormWidgetClass,	frdp->dialog,
 	    XmNleftAttachment, XmATTACH_FORM,
 	    XmNleftOffset, 4,
@@ -3654,7 +3654,7 @@ find_replace_dialog_create(char_u *arg, int do_replace)
 	    XmNrightOffset, 4,
 	    XmNtopAttachment, XmATTACH_FORM,
 	    XmNtopOffset, 4,
-	    NULL);
+	    রিক্ত);
 
     {
 	Widget label_what;
@@ -3662,47 +3662,47 @@ find_replace_dialog_create(char_u *arg, int do_replace)
 
 	str = XmStringCreateSimple(_("Find what:"));
 	label_what = XtVaCreateManagedWidget("whatLabel",
-		xmLabelGadgetClass, input_form,
+		xmLabelGadgetClass, প্ৰবেশ_form,
 		XmNlabelString, str,
 		XmNleftAttachment,	XmATTACH_FORM,
 		XmNtopAttachment, XmATTACH_FORM,
 		XmNtopOffset, 4,
-		NULL);
+		রিক্ত);
 	XmStringFree(str);
 	gui_motif_menu_fontlist(label_what);
 
 	frdp->what = XtVaCreateManagedWidget("whatText",
-		xmTextFieldWidgetClass, input_form,
+		xmTextFieldWidgetClass, প্ৰবেশ_form,
 		XmNtopAttachment, XmATTACH_FORM,
 		XmNrightAttachment, XmATTACH_FORM,
 		XmNleftAttachment, XmATTACH_FORM,
-		NULL);
+		রিক্ত);
 
-	if (do_replace)
+	যদি (do_replace)
 	{
 	    frdp->with = XtVaCreateManagedWidget("withText",
-		    xmTextFieldWidgetClass,	input_form,
+		    xmTextFieldWidgetClass,	প্ৰবেশ_form,
 		    XmNtopAttachment, XmATTACH_WIDGET,
 		    XmNtopWidget, frdp->what,
 		    XmNtopOffset, 4,
 		    XmNleftAttachment, XmATTACH_FORM,
 		    XmNrightAttachment, XmATTACH_FORM,
 		    XmNbottomAttachment, XmATTACH_FORM,
-		    NULL);
+		    রিক্ত);
 
 	    XtAddCallback(frdp->with, XmNactivateCallback,
 		    find_replace_callback, (XtPointer) FRD_R_FINDNEXT);
 
 	    str = XmStringCreateSimple(_("Replace with:"));
 	    label_with = XtVaCreateManagedWidget("withLabel",
-		    xmLabelGadgetClass, input_form,
+		    xmLabelGadgetClass, প্ৰবেশ_form,
 		    XmNlabelString, str,
 		    XmNleftAttachment, XmATTACH_FORM,
 		    XmNtopAttachment, XmATTACH_WIDGET,
 		    XmNtopWidget, frdp->what,
 		    XmNtopOffset, 4,
 		    XmNbottomAttachment, XmATTACH_FORM,
-		    NULL);
+		    রিক্ত);
 	    XmStringFree(str);
 	    gui_motif_menu_fontlist(label_with);
 
@@ -3712,12 +3712,12 @@ find_replace_dialog_create(char_u *arg, int do_replace)
 	     */
 	    XtAddCallback(frdp->what, XmNactivateCallback,
 		    entry_activate_callback, frdp->with);
-	    XtAddEventHandler(frdp->with, KeyPressMask, False,
+	    XtAddEventHandler(frdp->with, চাবি_Press_Mask, False,
 			    (XtEventHandler)find_replace_keypress,
 			    (XtPointer) frdp);
 
 	}
-	else
+	অন্যথা
 	{
 	    /*
 	     * Make the entry activation do the search.
@@ -3725,29 +3725,29 @@ find_replace_dialog_create(char_u *arg, int do_replace)
 	    XtAddCallback(frdp->what, XmNactivateCallback,
 		    find_replace_callback, (XtPointer)FRD_FINDNEXT);
 	}
-	XtAddEventHandler(frdp->what, KeyPressMask, False,
+	XtAddEventHandler(frdp->what, চাবি_Press_Mask, False,
 			    (XtEventHandler)find_replace_keypress,
 			    (XtPointer)frdp);
 
 	// Get the maximum width between the label widgets and line them up.
 	n = 0;
 	XtSetArg(args[n], XmNwidth, &width); n++;
-	XtGetValues(label_what, args, n);
+	Xt_Get_মানসমূহ(label_what, args, n);
 	widest = width;
-	if (do_replace)
+	যদি (do_replace)
 	{
-	    XtGetValues(label_with, args, n);
-	    if (width > widest)
+	    Xt_Get_মানসমূহ(label_with, args, n);
+	    যদি (width > widest)
 		widest = width;
 	}
 
-	XtVaSetValues(frdp->what, XmNleftOffset, widest, NULL);
-	if (do_replace)
-	    XtVaSetValues(frdp->with, XmNleftOffset, widest, NULL);
+	Xt_Va_Set_মানসমূহ(frdp->what, XmNleftOffset, widest, রিক্ত);
+	যদি (do_replace)
+	    Xt_Va_Set_মানসমূহ(frdp->with, XmNleftOffset, widest, রিক্ত);
 
     }
 
-    XtManageChild(input_form);
+    XtManageChild(প্ৰবেশ_form);
 
     {
 	Widget radio_box;
@@ -3756,13 +3756,13 @@ find_replace_dialog_create(char_u *arg, int do_replace)
 	frame = XtVaCreateWidget("directionFrame",
 		xmFrameWidgetClass, frdp->dialog,
 		XmNtopAttachment, XmATTACH_WIDGET,
-		XmNtopWidget, input_form,
+		XmNtopWidget, প্ৰবেশ_form,
 		XmNtopOffset, 4,
 		XmNbottomAttachment, XmATTACH_FORM,
 		XmNbottomOffset, 4,
 		XmNrightAttachment, XmATTACH_OPPOSITE_WIDGET,
-		XmNrightWidget, input_form,
-		NULL);
+		XmNrightWidget, প্ৰবেশ_form,
+		রিক্ত);
 
 	str = XmStringCreateSimple(_("Direction"));
 	w = XtVaCreateManagedWidget("directionFrameLabel",
@@ -3770,19 +3770,19 @@ find_replace_dialog_create(char_u *arg, int do_replace)
 		XmNlabelString, str,
 		XmNchildHorizontalAlignment, XmALIGNMENT_BEGINNING,
 		XmNchildType, XmFRAME_TITLE_CHILD,
-		NULL);
+		রিক্ত);
 	XmStringFree(str);
 	gui_motif_menu_fontlist(w);
 
 	radio_box = XmCreateRadioBox(frame, "radioBox",
-		(ArgList)NULL, 0);
+		(ArgList)রিক্ত, 0);
 
 	str = XmStringCreateSimple( _("Up"));
 	frdp->up = XtVaCreateManagedWidget("upRadioButton",
 		xmToggleButtonGadgetClass, radio_box,
 		XmNlabelString, str,
 		XmNset, False,
-		NULL);
+		রিক্ত);
 	XmStringFree(str);
 	gui_motif_menu_fontlist(frdp->up);
 
@@ -3791,7 +3791,7 @@ find_replace_dialog_create(char_u *arg, int do_replace)
 		xmToggleButtonGadgetClass, radio_box,
 		XmNlabelString, str,
 		XmNset, True,
-		NULL);
+		রিক্ত);
 	XmStringFree(str);
 	gui_motif_menu_fontlist(frdp->down);
 
@@ -3807,11 +3807,11 @@ find_replace_dialog_create(char_u *arg, int do_replace)
 	    XmNrightWidget, frame,
 	    XmNrightOffset, 4,
 	    XmNtopAttachment, XmATTACH_WIDGET,
-	    XmNtopWidget, input_form,
+	    XmNtopWidget, প্ৰবেশ_form,
 	    XmNtopOffset, 4,
 	    XmNbottomAttachment, XmATTACH_FORM,
 	    XmNbottomOffset, 4,
-	    NULL);
+	    রিক্ত);
 
     str = XmStringCreateSimple(_("Match whole word only"));
     frdp->wword = XtVaCreateManagedWidget("wordToggle",
@@ -3822,7 +3822,7 @@ find_replace_dialog_create(char_u *arg, int do_replace)
 	    XmNleftAttachment, XmATTACH_FORM,
 	    XmNleftOffset, 4,
 	    XmNset, wword,
-	    NULL);
+	    রিক্ত);
     XmStringFree(str);
 
     str = XmStringCreateSimple(_("Match case"));
@@ -3835,15 +3835,15 @@ find_replace_dialog_create(char_u *arg, int do_replace)
 	    XmNtopWidget, frdp->wword,
 	    XmNtopOffset, 4,
 	    XmNset, mcase,
-	    NULL);
+	    রিক্ত);
     XmStringFree(str);
     gui_motif_menu_fontlist(frdp->wword);
     gui_motif_menu_fontlist(frdp->mcase);
 
     XtManageChild(toggle_form);
 
-    if (entry_text != NULL)
-	XmTextFieldSetString(frdp->what, (char *)entry_text);
+    যদি (entry_text != রিক্ত)
+	XmTextFieldSetString(frdp->what, (ৱর্ণ *)entry_text);
     vim_free(entry_text);
 
     gui_motif_synch_fonts();
@@ -3853,21 +3853,21 @@ find_replace_dialog_create(char_u *arg, int do_replace)
     XmProcessTraversal(frdp->what, XmTRAVERSE_CURRENT);
 }
 
-   void
+   শূন্য
 gui_mch_find_dialog(exarg_T *eap)
 {
-    if (!gui.in_use)
-	return;
+    যদি (!gui.in_use)
+	ঘূৰাই;
 
     find_replace_dialog_create(eap->arg, FALSE);
 }
 
 
-    void
+    শূন্য
 gui_mch_replace_dialog(exarg_T *eap)
 {
-    if (!gui.in_use)
-	return;
+    যদি (!gui.in_use)
+	ঘূৰাই;
 
     find_replace_dialog_create(eap->arg, TRUE);
 }
@@ -3878,31 +3878,31 @@ gui_mch_replace_dialog(exarg_T *eap)
  * If you don't understand why this should be needed, please try to
  * search for "pi\xea\xb6\xe6" in iso8859-2.
  */
-    void
-gui_motif_synch_fonts(void)
+    শূন্য
+gui_motif_synch_fonts(শূন্য)
 {
     SharedFindReplace *frdp;
-    int		    do_replace;
+    পূর্ণাঙ্ক		    do_replace;
     XFontStruct	    *font;
     XmFontList	    font_list;
 
     // FIXME: Unless we find out how to create a XmFontList from a XFontSet,
     // we just give up here on font synchronization.
     font = (XFontStruct *)gui.norm_font;
-    if (font == NULL)
-	return;
+    যদি (font == রিক্ত)
+	ঘূৰাই;
 
     font_list = gui_motif_create_fontlist(font);
 
     // OK this loop is a bit tricky...
-    for (do_replace = 0; do_replace <= 1; ++do_replace)
+    বাবে (do_replace = 0; do_replace <= 1; ++do_replace)
     {
 	frdp = (do_replace) ? (&repl_widgets) : (&find_widgets);
-	if (frdp->dialog)
+	যদি (frdp->dialog)
 	{
-	    XtVaSetValues(frdp->what, XmNfontList, font_list, NULL);
-	    if (do_replace)
-		XtVaSetValues(frdp->with, XmNfontList, font_list, NULL);
+	    Xt_Va_Set_মানসমূহ(frdp->what, XmNfontList, font_list, রিক্ত);
+	    যদি (do_replace)
+		Xt_Va_Set_মানসমূহ(frdp->with, XmNfontList, font_list, রিক্ত);
 	}
     }
 

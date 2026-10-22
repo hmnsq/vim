@@ -14,36 +14,36 @@
  * Don't include these while generating prototypes.  Prevents problems when
  * files are missing.
  */
-#if !defined(PROTO) && !defined(NOPROTO)
+#যদি !defined(PROTO) && !defined(NOPROTO)
 
 /*
  * Machine-dependent routines.
  */
 // avoid errors in function prototypes
-# if !defined(FEAT_X11) && !defined(FEAT_GUI_GTK)
-#  define Display int
-#  define Widget int
+# যদি !defined(FEAT_X11) && !defined(FEAT_GUI_GTK)
+#  define Display পূর্ণাঙ্ক
+#  define Widget পূর্ণাঙ্ক
 # endif
 # ifndef FEAT_GUI_GTK
-#  define GdkEvent int
-#  define GdkEventKey int
+#  define GdkEvent পূর্ণাঙ্ক
+#  define Gdk_Event_চাবি পূর্ণাঙ্ক
 # endif
 # ifndef FEAT_X11
-#  define XImage int
+#  define XImage পূর্ণাঙ্ক
 # endif
 
 # ifdef AMIGA
 #  include "os_amiga.pro"
 # endif
-# if defined(UNIX) || defined(VMS)
+# যদি defined(UNIX) || defined(VMS)
 #  include "os_unix.pro"
 # endif
 # ifdef MSWIN
 #  include "os_win32.pro"
 #  include "os_mswin.pro"
 #  include "winclip.pro"
-#  if (defined(__GNUC__) && !defined(__MINGW32__))
-extern int _stricoll(char *a, char *b);
+#  যদি (defined(__GNUC__) && !defined(__MINGW32__))
+বাহ্য পূর্ণাঙ্ক _stricoll(ৱর্ণ *a, ৱর্ণ *b);
 #  endif
 # endif
 # ifdef VMS
@@ -134,26 +134,26 @@ extern int _stricoll(char *a, char *b);
 # endif
 
 // These prototypes cannot be produced automatically.
-int smsg(const char *, ...) ATTRIBUTE_COLD ATTRIBUTE_FORMAT_PRINTF(1, 2);
+পূর্ণাঙ্ক smsg(ধ্রুৱ ৱর্ণ *, ...) ATTRIBUTE_COLD ATTRIBUTE_FORMAT_PRINTF(1, 2);
 
-int smsg_attr(int, const char *, ...) ATTRIBUTE_FORMAT_PRINTF(2, 3);
+পূর্ণাঙ্ক smsg_attr(পূর্ণাঙ্ক, ধ্রুৱ ৱর্ণ *, ...) ATTRIBUTE_FORMAT_PRINTF(2, 3);
 
-int smsg_attr_keep(int, const char *, ...) ATTRIBUTE_FORMAT_PRINTF(2, 3);
-
-// These prototypes cannot be produced automatically.
-int semsg(const char *, ...) ATTRIBUTE_COLD ATTRIBUTE_FORMAT_PRINTF(1, 2);
+পূর্ণাঙ্ক smsg_attr_keep(পূর্ণাঙ্ক, ধ্রুৱ ৱর্ণ *, ...) ATTRIBUTE_FORMAT_PRINTF(2, 3);
 
 // These prototypes cannot be produced automatically.
-void siemsg(const char *, ...) ATTRIBUTE_COLD ATTRIBUTE_FORMAT_PRINTF(1, 2);
+পূর্ণাঙ্ক semsg(ধ্রুৱ ৱর্ণ *, ...) ATTRIBUTE_COLD ATTRIBUTE_FORMAT_PRINTF(1, 2);
 
-int vim_snprintf_add(char *, size_t, const char *, ...) ATTRIBUTE_FORMAT_PRINTF(3, 4);
+// These prototypes cannot be produced automatically.
+শূন্য siemsg(ধ্রুৱ ৱর্ণ *, ...) ATTRIBUTE_COLD ATTRIBUTE_FORMAT_PRINTF(1, 2);
 
-int vim_snprintf(char *, size_t, const char *, ...) ATTRIBUTE_FORMAT_PRINTF(3, 4);
-size_t vim_snprintf_safelen(char *, size_t, const char *, ...) ATTRIBUTE_FORMAT_PRINTF(3, 4);
+পূর্ণাঙ্ক vim_snprintf_add(ৱর্ণ *, size_t, ধ্রুৱ ৱর্ণ *, ...) ATTRIBUTE_FORMAT_PRINTF(3, 4);
 
-int vim_vsnprintf(char *str, size_t str_m, const char *fmt, va_list ap)
+পূর্ণাঙ্ক vim_snprintf(ৱর্ণ *, size_t, ধ্রুৱ ৱর্ণ *, ...) ATTRIBUTE_FORMAT_PRINTF(3, 4);
+size_t vim_snprintf_safelen(ৱর্ণ *, size_t, ধ্রুৱ ৱর্ণ *, ...) ATTRIBUTE_FORMAT_PRINTF(3, 4);
+
+পূর্ণাঙ্ক vim_vsnprintf(ৱর্ণ *str, size_t str_m, ধ্রুৱ ৱর্ণ *fmt, va_list ap)
 	ATTRIBUTE_FORMAT_PRINTF(3, 0);
-int vim_vsnprintf_typval(char *str, size_t str_m, const char *fmt, va_list ap, typval_T *tvs)
+পূর্ণাঙ্ক vim_vsnprintf_typval(ৱর্ণ *str, size_t str_m, ধ্রুৱ ৱর্ণ *fmt, va_list ap, typval_T *tvs)
 	ATTRIBUTE_FORMAT_PRINTF(3, 0);
 
 # include "message.pro"
@@ -164,22 +164,22 @@ char_u *vim_strpbrk(char_u *s, char_u *charset);
 # endif
 # ifndef HAVE_QSORT
 // Use our own qsort(), don't define the prototype when not used.
-void qsort(void *base, size_t elm_count, size_t elm_size, int (*cmp)(const void *, const void *));
+শূন্য qsort(শূন্য *base, size_t elm_গুনতি, size_t elm_size, পূর্ণাঙ্ক (*cmp)(ধ্রুৱ শূন্য *, ধ্রুৱ শূন্য *));
 # endif
 # include "mouse.pro"
 # include "move.pro"
 # include "mbyte.pro"
 # ifdef VIMDLL
 // Function name differs when VIMDLL is defined
-int mbyte_im_get_status(void);
-void mbyte_im_set_active(int active_arg);
+পূর্ণাঙ্ক mbyte_im_get_status(শূন্য);
+শূন্য mbyte_im_set_active(পূর্ণাঙ্ক active_arg);
 # endif
 # include "normal.pro"
 # include "ops.pro"
 # include "option.pro"
 # include "optionstr.pro"
 # include "popupmenu.pro"
-# if defined(FEAT_PROFILE) || defined(FEAT_RELTIME)
+# যদি defined(FEAT_PROFILE) || defined(FEAT_RELTIME)
 #  include "profiler.pro"
 # endif
 # include "quickfix.pro"
@@ -191,7 +191,7 @@ void mbyte_im_set_active(int active_arg);
 # include "scriptfile.pro"
 # include "screen.pro"
 # include "session.pro"
-# if defined(FEAT_CRYPT) || defined(FEAT_PERSISTENT_UNDO)
+# যদি defined(FEAT_CRYPT) || defined(FEAT_PERSISTENT_UNDO)
 #  include "sha256.pro"
 # endif
 # include "fuzzy.pro"
@@ -210,7 +210,7 @@ void mbyte_im_set_active(int active_arg);
 # ifdef FEAT_TERMINAL
 #  include "terminal.pro"
 # endif
-# if defined(HAVE_TGETENT) && (defined(AMIGA) || defined(VMS))
+# যদি defined(HAVE_TGETENT) && (defined(AMIGA) || defined(VMS))
 #  include "termlib.pro"
 # endif
 # ifdef FEAT_PROP_POPUP
@@ -279,9 +279,9 @@ void mbyte_im_set_active(int active_arg);
 // Ugly solution for "BalloonEval" not being defined while it's used in some
 // .pro files.
 # ifndef FEAT_BEVAL
-#  define BalloonEval int
+#  define BalloonEval পূর্ণাঙ্ক
 # endif
-# if defined(FEAT_BEVAL) || defined(FEAT_PROP_POPUP)
+# যদি defined(FEAT_BEVAL) || defined(FEAT_PROP_POPUP)
 #  include "beval.pro"
 # endif
 
@@ -298,22 +298,22 @@ void mbyte_im_set_active(int active_arg);
 
 # ifdef FEAT_EVAL
 // Not generated automatically so that we can add an extra attribute.
-void ch_log(channel_T *ch, const char *fmt, ...) ATTRIBUTE_FORMAT_PRINTF(2, 3);
-void ch_error(channel_T *ch, const char *fmt, ...) ATTRIBUTE_FORMAT_PRINTF(2, 3);
+শূন্য ch_log(channel_T *ch, ধ্রুৱ ৱর্ণ *fmt, ...) ATTRIBUTE_FORMAT_PRINTF(2, 3);
+শূন্য ch_error(channel_T *ch, ধ্রুৱ ৱর্ণ *fmt, ...) ATTRIBUTE_FORMAT_PRINTF(2, 3);
 # endif
 
-# if defined(FEAT_GUI) || defined(FEAT_JOB_CHANNEL)
-#  if defined(UNIX) || defined(MACOS_X) || defined(VMS)
+# যদি defined(FEAT_GUI) || defined(FEAT_JOB_CHANNEL)
+#  যদি defined(UNIX) || defined(MACOS_X) || defined(VMS)
 #   include "pty.pro"
 #  endif
 # endif
 
 # ifdef FEAT_GUI
 #  include "gui.pro"
-#  if !defined(HAVE_SETENV) && !defined(HAVE_PUTENV) && !defined(VMS)
-extern int putenv(const char *string);			// in misc2.c
+#  যদি !defined(HAVE_SETENV) && !defined(HAVE_PUTENV) && !defined(VMS)
+বাহ্য পূর্ণাঙ্ক putenv(ধ্রুৱ ৱর্ণ *string);			// in misc2.c
 #   ifdef USE_VIMPTY_GETENV
-extern char_u *vimpty_getenv(const char_u *string);	// in misc2.c
+বাহ্য char_u *vimpty_getenv(ধ্রুৱ char_u *string);	// in misc2.c
 #   endif
 #  endif
 #  ifdef FEAT_GUI_MSWIN
@@ -322,7 +322,7 @@ extern char_u *vimpty_getenv(const char_u *string);	// in misc2.c
 #  ifdef FEAT_GUI_GTK
 #   ifdef USE_GTK4
 #    include "gui_gtk4.pro"
-#   else
+#   অন্যথা
 #    include "gui_gtk.pro"
 #    include "gui_gtk_x11.pro"
 #   endif
@@ -345,7 +345,7 @@ extern char_u *vimpty_getenv(const char_u *string);	// in misc2.c
 # ifdef FEAT_OLE
 #  include "if_ole.pro"
 # endif
-# if defined(FEAT_CLIENTSERVER) && defined(FEAT_X11)
+# যদি defined(FEAT_CLIENTSERVER) && defined(FEAT_X11)
 #  include "if_xcmdsrv.pro"
 # endif
 
@@ -356,8 +356,8 @@ extern char_u *vimpty_getenv(const char_u *string);	// in misc2.c
  * not included here for the perl files.  Use a dummy define for CV for the
  * other files.
  */
-# if defined(FEAT_PERL) && !defined(IN_PERL_FILE)
-#  define CV void
+# যদি defined(FEAT_PERL) && !defined(IN_PERL_FILE)
+#  define CV শূন্য
 #  include "if_perl.pro"
 # endif
 
@@ -367,11 +367,11 @@ extern char_u *vimpty_getenv(const char_u *string);	// in misc2.c
 # ifdef MACOS_X
 #  include "os_macosx.pro"
 # endif
-# if defined(MACOS_X_DARWIN) && defined(FEAT_CLIPBOARD) && !defined(FEAT_GUI)
+# যদি defined(MACOS_X_DARWIN) && defined(FEAT_CLIPBOARD) && !defined(FEAT_GUI)
 // functions in os_macosx.m
-void clip_mch_lose_selection(Clipboard_T *cbd);
-int clip_mch_own_selection(Clipboard_T *cbd);
-void clip_mch_request_selection(Clipboard_T *cbd);
-void clip_mch_set_selection(Clipboard_T *cbd);
+শূন্য clip_mch_lose_selection(Clipboard_T *cbd);
+পূর্ণাঙ্ক clip_mch_own_selection(Clipboard_T *cbd);
+শূন্য clip_mch_request_selection(Clipboard_T *cbd);
+শূন্য clip_mch_set_selection(Clipboard_T *cbd);
 # endif
 #endif // !PROTO && !NOPROTO

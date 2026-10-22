@@ -23,219 +23,219 @@
  * e.g., replace LONG with LONG_PTR, etc.
  */
 
-#include "vim.h"
+#অন্তর্ভাৱ "vim.h"
 
-#if defined(FEAT_DIRECTX)
+#যদি defined(FEAT_DIRECTX)
 # include "gui_dwrite.h"
 #endif
 
 // values for "dead_key"
-#define DEAD_KEY_OFF			0	// no dead key
-#define DEAD_KEY_SET_DEFAULT		1	// dead key pressed
-#define DEAD_KEY_TRANSIENT_IN_ON_CHAR	2	// wait for next key press
-#define DEAD_KEY_SKIP_ON_CHAR		3	// skip next _OnChar()
+#define DEAD_চাবি_OFF			0	// no dead key
+#define DEAD_চাবি_SET_DEFAULT		1	// dead key pressed
+#define DEAD_চাবি_TRANSIENT_IN_ON_CHAR	2	// wait for next key press
+#define DEAD_চাবি_SKIP_ON_CHAR		3	// skip next _OnChar()
 
-#if defined(FEAT_DIRECTX)
-static DWriteContext *s_dwc = NULL;
-static int s_directx_enabled = 0;
-static int s_directx_load_attempted = 0;
-# define IS_ENABLE_DIRECTX() (s_directx_enabled && s_dwc != NULL && enc_utf8)
-static int directx_enabled(void);
-static void directx_binddc(void);
+#যদি defined(FEAT_DIRECTX)
+স্থির DWriteContext *s_dwc = রিক্ত;
+স্থির পূর্ণাঙ্ক s_directx_enabled = 0;
+স্থির পূর্ণাঙ্ক s_directx_load_attempted = 0;
+# define IS_ENABLE_DIRECTX() (s_directx_enabled && s_dwc != রিক্ত && enc_utf8)
+স্থির পূর্ণাঙ্ক directx_enabled(শূন্য);
+স্থির শূন্য directx_binddc(শূন্য);
 #endif
 
 #ifdef FEAT_MENU
-static int gui_mswin_get_menu_height(int fix_window);
-#else
+স্থির পূর্ণাঙ্ক gui_mswin_get_menu_height(পূর্ণাঙ্ক fix_window);
+#অন্যথা
 # define gui_mswin_get_menu_height(fix_window)	0
 #endif
 
-typedef struct keycode_trans_strategy {
-    void (*ptr_on_char) (HWND /*hwnd UNUSED*/, UINT /*cch*/, int /*cRepeat UNUSED*/);
-    void (*ptr_on_sys_char) (HWND /*hwnd UNUSED*/, UINT /*cch*/, int /*cRepeat UNUSED*/);
-    void (*ptr_process_message_usual_key) (UINT /*vk*/, const MSG* /*pmsg*/);
-    int  (*ptr_get_active_modifiers)(void);
-    int  (*is_experimental)(void);
+প্রকারনির্দেশ সংরচনা keycode_trans_strategy {
+    শূন্য (*ptr_on_char) (HWND /*hwnd UNUSED*/, UINT /*cch*/, পূর্ণাঙ্ক /*cRepeat UNUSED*/);
+    শূন্য (*ptr_on_sys_char) (HWND /*hwnd UNUSED*/, UINT /*cch*/, পূর্ণাঙ্ক /*cRepeat UNUSED*/);
+    শূন্য (*ptr_process_message_usual_চাবি) (UINT /*vk*/, ধ্রুৱ বাৰ্তা_2* /*pmsg*/);
+    পূর্ণাঙ্ক  (*ptr_get_active_modifiers)(শূন্য);
+    পূর্ণাঙ্ক  (*is_experimental)(শূন্য);
 } keycode_trans_strategy;
 
 // forward declarations for input instance initializer
-static void _OnChar_experimental(HWND /*hwnd UNUSED*/, UINT /*cch*/, int /*cRepeat UNUSED*/);
-static void _OnSysChar_experimental(HWND /*hwnd UNUSED*/, UINT /*cch*/, int /*cRepeat UNUSED*/);
-static void process_message_usual_key_experimental(UINT /*vk*/, const MSG* /*pmsg*/);
-static int  get_active_modifiers_experimental(void);
-static int  is_experimental_true(void);
+স্থির শূন্য _OnChar_experimental(HWND /*hwnd UNUSED*/, UINT /*cch*/, পূর্ণাঙ্ক /*cRepeat UNUSED*/);
+স্থির শূন্য _OnSysChar_experimental(HWND /*hwnd UNUSED*/, UINT /*cch*/, পূর্ণাঙ্ক /*cRepeat UNUSED*/);
+স্থির শূন্য process_message_usual_চাবি_experimental(UINT /*vk*/, ধ্রুৱ বাৰ্তা_2* /*pmsg*/);
+স্থির পূর্ণাঙ্ক  get_active_modifiers_experimental(শূন্য);
+স্থির পূর্ণাঙ্ক  is_experimental_true(শূন্য);
 
 keycode_trans_strategy keycode_trans_strategy_experimental = {
       _OnChar_experimental      // ptr_on_char
     , _OnSysChar_experimental // ptr_on_sys_char
-    , process_message_usual_key_experimental // ptr_process_message_usual_key
+    , process_message_usual_চাবি_experimental // ptr_process_message_usual_key
     , get_active_modifiers_experimental
     , is_experimental_true
 };
 
 // forward declarations for input instance initializer
-static void _OnChar_classic(HWND /*hwnd UNUSED*/, UINT /*cch*/, int /*cRepeat UNUSED*/);
-static void _OnSysChar_classic(HWND /*hwnd UNUSED*/, UINT /*cch*/, int /*cRepeat UNUSED*/);
-static void process_message_usual_key_classic(UINT /*vk*/, const MSG* /*pmsg*/);
-static int  get_active_modifiers_classic(void);
-static int  is_experimental_false(void);
+স্থির শূন্য _OnChar_classic(HWND /*hwnd UNUSED*/, UINT /*cch*/, পূর্ণাঙ্ক /*cRepeat UNUSED*/);
+স্থির শূন্য _OnSysChar_classic(HWND /*hwnd UNUSED*/, UINT /*cch*/, পূর্ণাঙ্ক /*cRepeat UNUSED*/);
+স্থির শূন্য process_message_usual_চাবি_classic(UINT /*vk*/, ধ্রুৱ বাৰ্তা_2* /*pmsg*/);
+স্থির পূর্ণাঙ্ক  get_active_modifiers_classic(শূন্য);
+স্থির পূর্ণাঙ্ক  is_experimental_false(শূন্য);
 
 keycode_trans_strategy keycode_trans_strategy_classic = {
       _OnChar_classic      // ptr_on_char
     , _OnSysChar_classic // ptr_on_sys_char
-    , process_message_usual_key_classic // ptr_process_message_usual_key
+    , process_message_usual_চাবি_classic // ptr_process_message_usual_key
     , get_active_modifiers_classic
     , is_experimental_false
 };
 
-keycode_trans_strategy *keycode_trans_strategy_used = NULL;
+keycode_trans_strategy *keycode_trans_strategy_used = রিক্ত;
 
-static int is_experimental_true(void)
+স্থির পূর্ণাঙ্ক is_experimental_true(শূন্য)
 {
-    return 1;
+    ঘূৰাই 1;
 }
 
-static int is_experimental_false(void)
+স্থির পূর্ণাঙ্ক is_experimental_false(শূন্য)
 {
-    return 0;
+    ঘূৰাই 0;
 }
 
 /*
  * Initialize the keycode translation strategy.
  */
-static void keycode_trans_strategy_init(void)
+স্থির শূন্য keycode_trans_strategy_init(শূন্য)
 {
-    const char *strategy = NULL;
+    ধ্রুৱ ৱর্ণ *strategy = রিক্ত;
 
     // set default value as fallback
     keycode_trans_strategy_used = &keycode_trans_strategy_classic;
 
     strategy = getenv("VIM_KEYCODE_TRANS_STRATEGY");
-    if (strategy == NULL)
+    যদি (strategy == রিক্ত)
     {
-	return;
+	ঘূৰাই;
     }
 
-    if (STRICMP(strategy, "classic") == 0)
+    যদি (STRICMP(strategy, "classic") == 0)
     {
 	keycode_trans_strategy_used = &keycode_trans_strategy_classic;
-	return;
+	ঘূৰাই;
     }
 
-    if (STRICMP(strategy, "experimental") == 0)
+    যদি (STRICMP(strategy, "experimental") == 0)
     {
 	keycode_trans_strategy_used = &keycode_trans_strategy_experimental;
-	return;
+	ঘূৰাই;
     }
 
 }
 
-#if defined(FEAT_RENDER_OPTIONS)
-    int
+#যদি defined(FEAT_RENDER_OPTIONS)
+    পূর্ণাঙ্ক
 gui_mch_set_rendering_options(char_u *s)
 {
 # ifdef FEAT_DIRECTX
     char_u  *p, *q;
 
-    int	    dx_enable = 0;
-    int	    dx_flags = 0;
-    float   dx_gamma = 0.0f;
-    float   dx_contrast = 0.0f;
-    float   dx_level = 0.0f;
-    int	    dx_geom = 0;
-    int	    dx_renmode = 0;
-    int	    dx_taamode = 0;
+    পূর্ণাঙ্ক	    dx_enable = 0;
+    পূর্ণাঙ্ক	    dx_flags = 0;
+    ভিন্ন   dx_gamma = 0.0f;
+    ভিন্ন   dx_contrast = 0.0f;
+    ভিন্ন   dx_level = 0.0f;
+    পূর্ণাঙ্ক	    dx_geom = 0;
+    পূর্ণাঙ্ক	    dx_renmode = 0;
+    পূর্ণাঙ্ক	    dx_taamode = 0;
     // parse string as rendering options.
-    for (p = s; p != NULL && *p != NUL; )
+    বাবে (p = s; p != রিক্ত && *p != NUL; )
     {
 	char_u  item[256];
 	char_u  name[128];
-	char_u  value[128];
+	char_u  মান[128];
 
-	copy_option_part(&p, item, sizeof(item), ",");
-	if (p == NULL)
-	    break;
+	copy_option_part(&p, item, পরিমাণ(item), ",");
+	যদি (p == রিক্ত)
+	    ভঙ্গ;
 	q = &item[0];
-	copy_option_part(&q, name, sizeof(name), ":");
-	if (q == NULL)
-	    return FAIL;
-	copy_option_part(&q, value, sizeof(value), ":");
+	copy_option_part(&q, name, পরিমাণ(name), ":");
+	যদি (q == রিক্ত)
+	    ঘূৰাই FAIL;
+	copy_option_part(&q, মান, পরিমাণ(মান), ":");
 
-	if (STRCMP(name, "type") == 0)
+	যদি (STRCMP(name, "type") == 0)
 	{
-	    if (STRCMP(value, "directx") == 0)
+	    যদি (STRCMP(মান, "directx") == 0)
 		dx_enable = 1;
-	    else
-		return FAIL;
+	    অন্যথা
+		ঘূৰাই FAIL;
 	}
-	else if (STRCMP(name, "gamma") == 0)
+	অন্যথা যদি (STRCMP(name, "gamma") == 0)
 	{
 	    dx_flags |= 1 << 0;
-	    dx_gamma = (float)atof((char *)value);
+	    dx_gamma = (ভিন্ন)atof((ৱর্ণ *)মান);
 	}
-	else if (STRCMP(name, "contrast") == 0)
+	অন্যথা যদি (STRCMP(name, "contrast") == 0)
 	{
 	    dx_flags |= 1 << 1;
-	    dx_contrast = (float)atof((char *)value);
+	    dx_contrast = (ভিন্ন)atof((ৱর্ণ *)মান);
 	}
-	else if (STRCMP(name, "level") == 0)
+	অন্যথা যদি (STRCMP(name, "level") == 0)
 	{
 	    dx_flags |= 1 << 2;
-	    dx_level = (float)atof((char *)value);
+	    dx_level = (ভিন্ন)atof((ৱর্ণ *)মান);
 	}
-	else if (STRCMP(name, "geom") == 0)
+	অন্যথা যদি (STRCMP(name, "geom") == 0)
 	{
 	    dx_flags |= 1 << 3;
-	    dx_geom = atoi((char *)value);
-	    if (dx_geom < 0 || dx_geom > 2)
-		return FAIL;
+	    dx_geom = atoi((ৱর্ণ *)মান);
+	    যদি (dx_geom < 0 || dx_geom > 2)
+		ঘূৰাই FAIL;
 	}
-	else if (STRCMP(name, "renmode") == 0)
+	অন্যথা যদি (STRCMP(name, "renmode") == 0)
 	{
 	    dx_flags |= 1 << 4;
-	    dx_renmode = atoi((char *)value);
-	    if (dx_renmode < 0 || dx_renmode > 6)
-		return FAIL;
+	    dx_renmode = atoi((ৱর্ণ *)মান);
+	    যদি (dx_renmode < 0 || dx_renmode > 6)
+		ঘূৰাই FAIL;
 	}
-	else if (STRCMP(name, "taamode") == 0)
+	অন্যথা যদি (STRCMP(name, "taamode") == 0)
 	{
 	    dx_flags |= 1 << 5;
-	    dx_taamode = atoi((char *)value);
-	    if (dx_taamode < 0 || dx_taamode > 3)
-		return FAIL;
+	    dx_taamode = atoi((ৱর্ণ *)মান);
+	    যদি (dx_taamode < 0 || dx_taamode > 3)
+		ঘূৰাই FAIL;
 	}
-	else if (STRCMP(name, "scrlines") == 0)
+	অন্যথা যদি (STRCMP(name, "scrlines") == 0)
 	{
 	    // Deprecated.  Simply ignore it.
 	}
-	else
-	    return FAIL;
+	অন্যথা
+	    ঘূৰাই FAIL;
     }
 
-    if (!gui.in_use)
-	return OK;  // only checking the syntax of the value
+    যদি (!gui.in_use)
+	ঘূৰাই OK;  // only checking the syntax of the value
 
     // Enable DirectX/DirectWrite
-    if (dx_enable)
+    যদি (dx_enable)
     {
-	if (!directx_enabled())
-	    return FAIL;
-	DWriteContext_SetRenderingParams(s_dwc, NULL);
-	if (dx_flags)
+	যদি (!directx_enabled())
+	    ঘূৰাই FAIL;
+	DWriteContext_SetRenderingParams(s_dwc, রিক্ত);
+	যদি (dx_flags)
 	{
 	    DWriteRenderingParams param;
 	    DWriteContext_GetRenderingParams(s_dwc, &param);
-	    if (dx_flags & (1 << 0))
+	    যদি (dx_flags & (1 << 0))
 		param.gamma = dx_gamma;
-	    if (dx_flags & (1 << 1))
+	    যদি (dx_flags & (1 << 1))
 		param.enhancedContrast = dx_contrast;
-	    if (dx_flags & (1 << 2))
+	    যদি (dx_flags & (1 << 2))
 		param.clearTypeLevel = dx_level;
-	    if (dx_flags & (1 << 3))
+	    যদি (dx_flags & (1 << 3))
 		param.pixelGeometry = dx_geom;
-	    if (dx_flags & (1 << 4))
+	    যদি (dx_flags & (1 << 4))
 		param.renderingMode = dx_renmode;
-	    if (dx_flags & (1 << 5))
+	    যদি (dx_flags & (1 << 5))
 		param.textAntialiasMode = dx_taamode;
 	    DWriteContext_SetRenderingParams(s_dwc, &param);
 	}
@@ -243,9 +243,9 @@ gui_mch_set_rendering_options(char_u *s)
     s_directx_enabled = dx_enable;
     gui.directx_enabled = IS_ENABLE_DIRECTX();
 
-    return OK;
-# else
-    return FAIL;
+    ঘূৰাই OK;
+# অন্যথা
+    ঘূৰাই FAIL;
 # endif
 }
 #endif
@@ -255,26 +255,26 @@ gui_mch_set_rendering_options(char_u *s)
  */
 #ifndef HANDLE_WM_XBUTTONUP
 # define HANDLE_WM_XBUTTONUP(hwnd, wParam, lParam, fn) \
-   ((fn)((hwnd), (int)(short)LOWORD(lParam), (int)(short)HIWORD(lParam), (UINT)(wParam)), 0L)
+   ((fn)((hwnd), (পূর্ণাঙ্ক)(short)LOWORD(lParam), (পূর্ণাঙ্ক)(short)HIWORD(lParam), (UINT)(wParam)), 0L)
 #endif
 #ifndef HANDLE_WM_XBUTTONDOWN
 # define HANDLE_WM_XBUTTONDOWN(hwnd, wParam, lParam, fn) \
-   ((fn)((hwnd), FALSE, (int)(short)LOWORD(lParam), (int)(short)HIWORD(lParam), (UINT)(wParam)), 0L)
+   ((fn)((hwnd), FALSE, (পূর্ণাঙ্ক)(short)LOWORD(lParam), (পূর্ণাঙ্ক)(short)HIWORD(lParam), (UINT)(wParam)), 0L)
 #endif
 #ifndef HANDLE_WM_XBUTTONDBLCLK
 # define HANDLE_WM_XBUTTONDBLCLK(hwnd, wParam, lParam, fn) \
-   ((fn)((hwnd), TRUE, (int)(short)LOWORD(lParam), (int)(short)HIWORD(lParam), (UINT)(wParam)), 0L)
+   ((fn)((hwnd), TRUE, (পূর্ণাঙ্ক)(short)LOWORD(lParam), (পূর্ণাঙ্ক)(short)HIWORD(lParam), (UINT)(wParam)), 0L)
 #endif
 
 
-#include "version.h"	// used by dialog box routine for default title
+#অন্তর্ভাৱ "version.h"	// used by dialog box routine for default title
 #ifdef DEBUG
 # include <tchar.h>
 #endif
 
-#include <shellapi.h>
-#include <commctrl.h>
-#include <windowsx.h>
+#অন্তর্ভাৱ <shellapi.h>
+#অন্তর্ভাৱ <commctrl.h>
+#অন্তর্ভাৱ <windowsx.h>
 
 #ifdef FEAT_MENU
 # define MENUHINTS		// show menu hints in command line
@@ -327,74 +327,74 @@ gui_mch_set_rendering_options(char_u *s)
 # define DWMWA_TEXT_COLOR		36
 #endif
 
-static void _OnPaint(HWND hwnd);
-static void fill_rect(const RECT *rcp, HBRUSH hbr, COLORREF color);
-static void clear_rect(RECT *rcp);
+স্থির শূন্য _OnPaint(HWND hwnd);
+স্থির শূন্য fill_rect(ধ্রুৱ RECT *rcp, HBRUSH hbr, COLORREF color);
+স্থির শূন্য clear_rect(RECT *rcp);
 
-static WORD		s_dlgfntheight;		// height of the dialog font
-static WORD		s_dlgfntwidth;		// width of the dialog font
+স্থির WORD		s_dlgfntheight;		// height of the dialog font
+স্থির WORD		s_dlgfntwidth;		// width of the dialog font
 
 #ifdef FEAT_MENU
-static HMENU		s_menuBar = NULL;
+স্থির HMENU		s_menuBar = রিক্ত;
 #endif
 #ifdef FEAT_TEAROFF
-static void rebuild_tearoff(vimmenu_T *menu);
-static HBITMAP	s_htearbitmap;	    // bitmap used to indicate tearoff
+স্থির শূন্য rebuild_tearoff(vimmenu_T *menu);
+স্থির HBITMAP	s_htearbitmap;	    // bitmap used to indicate tearoff
 #endif
 
 // Flag that is set while processing a message that must not be interrupted by
 // processing another message.
-static int		s_busy_processing = FALSE;
+স্থির পূর্ণাঙ্ক		s_busy_processing = FALSE;
 
-static int		destroying = FALSE;	// call DestroyWindow() ourselves
+স্থির পূর্ণাঙ্ক		destroying = FALSE;	// call DestroyWindow() ourselves
 
 #ifdef MSWIN_FIND_REPLACE
-static UINT		s_findrep_msg = 0;
-static FINDREPLACEW	s_findrep_struct;
-static HWND		s_findrep_hwnd = NULL;
-static int		s_findrep_is_find;	// TRUE for find dialog, FALSE
+স্থির UINT		s_findrep_বাৰ্তা = 0;
+স্থির FINDREPLACEW	s_findrep_struct;
+স্থির HWND		s_findrep_hwnd = রিক্ত;
+স্থির পূর্ণাঙ্ক		s_findrep_is_find;	// TRUE for find dialog, FALSE
 						// for find/replace dialog
 #endif
 
-HWND			s_hwnd = NULL;
-static HDC		s_hdc = NULL;
-static HBRUSH		s_brush = NULL;
+HWND			s_hwnd = রিক্ত;
+স্থির HDC		s_hdc = রিক্ত;
+স্থির HBRUSH		s_brush = রিক্ত;
 
 #ifdef FEAT_TOOLBAR
-static HWND		s_toolbarhwnd = NULL;
-static WNDPROC		s_toolbar_wndproc = NULL;
+স্থির HWND		s_toolbarhwnd = রিক্ত;
+স্থির WNDPROC		s_toolbar_wndproc = রিক্ত;
 #endif
 
 #ifdef FEAT_GUI_TABLINE
-static HWND		s_tabhwnd = NULL;
-static WNDPROC		s_tabline_wndproc = NULL;
-static int		showing_tabline = 0;
+স্থির HWND		s_tabhwnd = রিক্ত;
+স্থির WNDPROC		s_tabline_wndproc = রিক্ত;
+স্থির পূর্ণাঙ্ক		showing_tabline = 0;
 #endif
 
-static WPARAM		s_wParam = 0;
+স্থির WPARAM		s_wParam = 0;
 
-static HWND		s_textArea = NULL;
+স্থির HWND		s_textArea = রিক্ত;
 
 // Set when the text area was painted with the background color only, because
 // the screen contents were not available yet.
-static bool		s_textarea_bg_only = false;
+স্থির bool		s_textarea_bg_only = false;
 
-static UINT		s_uMsg = 0;
+স্থির UINT		s_u_বাৰ্তা = 0;
 
-static char_u		*s_textfield; // Used by dialogs to pass back strings
+স্থির char_u		*s_textfield; // Used by dialogs to pass back strings
 
-static int		s_need_activate = FALSE;
+স্থির পূর্ণাঙ্ক		s_need_activate = FALSE;
 
 // This variable is set when waiting for an event, which is the only moment
 // scrollbar dragging can be done directly.  It's not allowed while commands
 // are executed, because it may move the cursor and that may cause unexpected
 // problems (e.g., while ":s" is working).
-static int allow_scrollbar = FALSE;
+স্থির পূর্ণাঙ্ক allow_scrollbar = FALSE;
 
 #ifndef _DPI_AWARENESS_CONTEXTS_
-typedef HANDLE DPI_AWARENESS_CONTEXT;
+প্রকারনির্দেশ HANDLE DPI_AWARENESS_CONTEXT;
 
-typedef enum DPI_AWARENESS {
+প্রকারনির্দেশ গণনা DPI_AWARENESS {
     DPI_AWARENESS_INVALID	    = -1,
     DPI_AWARENESS_UNAWARE	    = 0,
     DPI_AWARENESS_SYSTEM_AWARE	    = 1,
@@ -409,75 +409,75 @@ typedef enum DPI_AWARENESS {
 #endif
 
 #define DEFAULT_DPI	96
-static int		s_dpi = DEFAULT_DPI;
-static BOOL		s_in_dpichanged = FALSE;
+স্থির পূর্ণাঙ্ক		s_dpi = DEFAULT_DPI;
+স্থির BOOL		s_in_dpichanged = FALSE;
 #ifdef FEAT_MBYTE_IME
-static DPI_AWARENESS	s_process_dpi_aware = DPI_AWARENESS_INVALID;
+স্থির DPI_AWARENESS	s_process_dpi_aware = DPI_AWARENESS_INVALID;
 #endif
-static RECT		s_suggested_rect;
+স্থির RECT		s_suggested_rect;
 
-static UINT (WINAPI *pGetDpiForSystem)(void) = NULL;
-static UINT (WINAPI *pGetDpiForWindow)(HWND hwnd) = NULL;
-static int (WINAPI *pGetSystemMetricsForDpi)(int, UINT) = NULL;
+স্থির UINT (WINAPI *pGetDpiForSystem)(শূন্য) = রিক্ত;
+স্থির UINT (WINAPI *pGetDpiForWindow)(HWND hwnd) = রিক্ত;
+স্থির পূর্ণাঙ্ক (WINAPI *pGetSystemMetricsForDpi)(পূর্ণাঙ্ক, UINT) = রিক্ত;
 //static INT (WINAPI *pGetWindowDpiAwarenessContext)(HWND hwnd) = NULL;
-static DPI_AWARENESS_CONTEXT (WINAPI *pSetThreadDpiAwarenessContext)(DPI_AWARENESS_CONTEXT dpiContext) = NULL;
+স্থির DPI_AWARENESS_CONTEXT (WINAPI *pSetThreadDpiAwarenessContext)(DPI_AWARENESS_CONTEXT dpiContext) = রিক্ত;
 #ifdef FEAT_MBYTE_IME
-static DPI_AWARENESS (WINAPI *pGetAwarenessFromDpiAwarenessContext)(DPI_AWARENESS_CONTEXT) = NULL;
+স্থির DPI_AWARENESS (WINAPI *pGetAwarenessFromDpiAwarenessContext)(DPI_AWARENESS_CONTEXT) = রিক্ত;
 #endif
 
-static HINSTANCE hLibDwm = NULL;
-static HRESULT (WINAPI *pDwmSetWindowAttribute)(HWND, DWORD, LPCVOID, DWORD);
-static void dyn_dwm_load(void);
+স্থির HINSTANCE hLibDwm = রিক্ত;
+স্থির HRESULT (WINAPI *pDwmSetWindowAttribute)(HWND, DWORD, LPCVOID, DWORD);
+স্থির শূন্য dyn_dwm_load(শূন্য);
 
-static int fullscreen_on = FALSE;
+স্থির পূর্ণাঙ্ক fullscreen_on = FALSE;
 
 #ifdef FEAT_GUI_DARKTHEME
 
-static HINSTANCE hUxThemeLib = NULL;
-static DWORD (WINAPI *pSetPreferredAppMode)(DWORD) = NULL;
-static void (WINAPI *pFlushMenuThemes)(void) = NULL;
-static void dyn_uxtheme_load(void);
+স্থির HINSTANCE hUxThemeLib = রিক্ত;
+স্থির DWORD (WINAPI *pSetPreferredAppMode)(DWORD) = রিক্ত;
+স্থির শূন্য (WINAPI *pFlushMenuThemes)(শূন্য) = রিক্ত;
+স্থির শূন্য dyn_uxtheme_load(শূন্য);
 #endif
 
-    static int WINAPI
-stubGetSystemMetricsForDpi(int nIndex, UINT dpi UNUSED)
+    স্থির পূর্ণাঙ্ক WINAPI
+stubGetSystemMetricsForDpi(পূর্ণাঙ্ক nIndex, UINT dpi UNUSED)
 {
-    return GetSystemMetrics(nIndex);
+    ঘূৰাই GetSystemMetrics(nIndex);
 }
 
-    static int
-adjust_fontsize_by_dpi(int size)
+    স্থির পূর্ণাঙ্ক
+adjust_fontsize_by_dpi(পূর্ণাঙ্ক size)
 {
-    return size * s_dpi / (int)pGetDpiForSystem();
+    ঘূৰাই size * s_dpi / (পূর্ণাঙ্ক)pGetDpiForSystem();
 }
 
-    static int
-adjust_by_system_dpi(int size)
+    স্থির পূর্ণাঙ্ক
+adjust_by_system_dpi(পূর্ণাঙ্ক size)
 {
-    return size * (int)pGetDpiForSystem() / DEFAULT_DPI;
+    ঘূৰাই size * (পূর্ণাঙ্ক)pGetDpiForSystem() / DEFAULT_DPI;
 }
 
-#if defined(FEAT_DIRECTX)
-    static int
-directx_enabled(void)
+#যদি defined(FEAT_DIRECTX)
+    স্থির পূর্ণাঙ্ক
+directx_enabled(শূন্য)
 {
-    if (s_dwc != NULL)
-	return 1;
-    else if (s_directx_load_attempted)
-	return 0;
+    যদি (s_dwc != রিক্ত)
+	ঘূৰাই 1;
+    অন্যথা যদি (s_directx_load_attempted)
+	ঘূৰাই 0;
     // load DirectX
     DWrite_Init();
     s_directx_load_attempted = 1;
     s_dwc = DWriteContext_Open();
     directx_binddc();
-    return s_dwc != NULL ? 1 : 0;
+    ঘূৰাই s_dwc != রিক্ত ? 1 : 0;
 }
 
-    static void
-directx_binddc(void)
+    স্থির শূন্য
+directx_binddc(শূন্য)
 {
-    if (s_textArea == NULL)
-	return;
+    যদি (s_textArea == রিক্ত)
+	ঘূৰাই;
 
     RECT	rect;
     GetClientRect(s_textArea, &rect);
@@ -485,19 +485,19 @@ directx_binddc(void)
 }
 #endif
 
-extern int current_font_height;	    // this is in os_mswin.c
+বাহ্য পূর্ণাঙ্ক current_font_height;	    // this is in os_mswin.c
 
-static struct
+স্থির সংরচনা
 {
-    UINT    key_sym;
+    UINT    চাবি_sym;
     char_u  vim_code0;
     char_u  vim_code1;
-} special_keys[] =
+} special_চাবিগুলি[] =
 {
     {VK_UP,		'k', 'u'},
     {VK_DOWN,		'k', 'd'},
-    {VK_LEFT,		'k', 'l'},
-    {VK_RIGHT,		'k', 'r'},
+    {VK_বাম,		'k', 'l'},
+    {VK_ডান,		'k', 'r'},
 
     {VK_F1,		'k', '1'},
     {VK_F2,		'k', '2'},
@@ -531,7 +531,7 @@ static struct
 
     {VK_HELP,		'%', '1'},
     {VK_BACK,		'k', 'b'},
-    {VK_INSERT,		'k', 'I'},
+    {VK_ঢোকাও,		'k', 'I'},
     {VK_DELETE,		'k', 'D'},
     {VK_HOME,		'k', 'h'},
     {VK_END,		'@', '7'},
@@ -568,25 +568,25 @@ static struct
 };
 
 // Local variables
-static int	s_button_pending = -1;
+স্থির পূর্ণাঙ্ক	s_button_pending = -1;
 
 // s_getting_focus is set when we got focus but didn't see mouse-up event yet,
 // so don't reset s_button_pending.
-static int	s_getting_focus = FALSE;
+স্থির পূর্ণাঙ্ক	s_getting_focus = FALSE;
 
-static int	s_x_pending;
-static int	s_y_pending;
-static UINT	s_kFlags_pending;
-static UINT_PTR	s_wait_timer = 0;	  // Timer for get char from user
-static int	s_timed_out = FALSE;
-static int	dead_key = DEAD_KEY_OFF;
-static UINT	surrogate_pending_ch = 0; // 0: no surrogate pending,
+স্থির পূর্ণাঙ্ক	s_x_pending;
+স্থির পূর্ণাঙ্ক	s_y_pending;
+স্থির UINT	s_kFlags_pending;
+স্থির UINT_PTR	s_wait_timer = 0;	  // Timer for get char from user
+স্থির পূর্ণাঙ্ক	s_timed_out = FALSE;
+স্থির পূর্ণাঙ্ক	dead_চাবি = DEAD_চাবি_OFF;
+স্থির UINT	surrogate_pending_ch = 0; // 0: no surrogate pending,
 					  // else a high surrogate
 
 #ifdef FEAT_BEVAL_GUI
 // balloon-eval WM_NOTIFY_HANDLER
-static void Handle_WM_Notify(HWND hwnd, LPNMHDR pnmh);
-static void track_user_activity(UINT uMsg);
+স্থির শূন্য Handle_WM_Notify(HWND hwnd, LPNMHDR pnmh);
+স্থির শূন্য track_user_activity(UINT u_বাৰ্তা);
 #endif
 
 /*
@@ -596,34 +596,34 @@ static void track_user_activity(UINT uMsg);
  */
 #ifdef FEAT_MBYTE_IME
 // holds LOGFONTW for 'guifontwide' if available, otherwise 'guifont'
-static LOGFONTW norm_logfont;
+স্থির LOGFONTW norm_logfont;
 // holds LOGFONTW for 'guifont' always.
-static LOGFONTW sub_logfont;
+স্থির LOGFONTW sub_logfont;
 #endif
 
 #ifdef FEAT_MBYTE_IME
-static LRESULT _OnImeNotify(HWND hWnd, DWORD dwCommand, DWORD dwData);
+স্থির LRESULT _OnImeNotify(HWND hWnd, DWORD dwCommand, DWORD dwData);
 #endif
 
-#if defined(FEAT_BROWSE)
-static char_u *convert_filter(char_u *s);
+#যদি defined(FEAT_BROWSE)
+স্থির char_u *convert_filter(char_u *s);
 #endif
 
 #ifdef DEBUG_PRINT_ERROR
 /*
  * Print out the last Windows error message
  */
-    static void
-print_windows_error(void)
+    স্থির শূন্য
+print_windows_error(শূন্য)
 {
-    LPVOID  lpMsgBuf;
+    LPVOID  lp_বাৰ্তা_Buf;
 
     FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM,
-		  NULL, GetLastError(),
+		  রিক্ত, GetLastError(),
 		  MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-		  (LPTSTR) &lpMsgBuf, 0, NULL);
-    TRACE1("Error: %s\n", lpMsgBuf);
-    LocalFree(lpMsgBuf);
+		  (LPTSTR) &lp_বাৰ্তা_Buf, 0, রিক্ত);
+    TRACE1("Error: %s\n", lp_বাৰ্তা_Buf);
+    LocalFree(lp_বাৰ্তা_Buf);
 }
 #endif
 
@@ -640,25 +640,25 @@ print_windows_error(void)
 #define BLINK_OFF   1
 #define BLINK_ON    2
 
-static int		blink_state = BLINK_NONE;
-static long_u		blink_waittime = 700;
-static long_u		blink_ontime = 400;
-static long_u		blink_offtime = 250;
-static UINT_PTR		blink_timer = 0;
+স্থির পূর্ণাঙ্ক		blink_state = BLINK_NONE;
+স্থির long_u		blink_waittime = 700;
+স্থির long_u		blink_ontime = 400;
+স্থির long_u		blink_offtime = 250;
+স্থির UINT_PTR		blink_timer = 0;
 
-    int
-gui_mch_is_blinking(void)
+    পূর্ণাঙ্ক
+gui_mch_is_blinking(শূন্য)
 {
-    return blink_state != BLINK_NONE;
+    ঘূৰাই blink_state != BLINK_NONE;
 }
 
-    int
-gui_mch_is_blink_off(void)
+    পূর্ণাঙ্ক
+gui_mch_is_blink_off(শূন্য)
 {
-    return blink_state == BLINK_OFF;
+    ঘূৰাই blink_state == BLINK_OFF;
 }
 
-    void
+    শূন্য
 gui_mch_set_blinking(long wait, long on, long off)
 {
     blink_waittime = wait;
@@ -666,51 +666,51 @@ gui_mch_set_blinking(long wait, long on, long off)
     blink_offtime = off;
 }
 
-    static VOID CALLBACK
+    স্থির VOID CALLBACK
 _OnBlinkTimer(
     HWND hwnd,
-    UINT uMsg UNUSED,
+    UINT u_বাৰ্তা UNUSED,
     UINT_PTR idEvent,
     DWORD dwTime UNUSED)
 {
-    MSG msg;
+    বাৰ্তা_2 বাৰ্তা;
 
     /*
     TRACE2("Got timer event, id %d, blink_timer %d\n", idEvent, blink_timer);
     */
 
-    KillTimer(NULL, idEvent);
+    KillTimer(রিক্ত, idEvent);
 
     // Eat spurious WM_TIMER messages
-    while (PeekMessageW(&msg, hwnd, WM_TIMER, WM_TIMER, PM_REMOVE))
+    যেতিয়ালৈ (PeekMessageW(&বাৰ্তা, hwnd, WM_TIMER, WM_TIMER, PM_REMOVE))
 	;
 
-    if (blink_state == BLINK_ON)
+    যদি (blink_state == BLINK_ON)
     {
 	gui_undraw_cursor();
 	blink_state = BLINK_OFF;
-	blink_timer = SetTimer(NULL, 0, (UINT)blink_offtime, _OnBlinkTimer);
+	blink_timer = SetTimer(রিক্ত, 0, (UINT)blink_offtime, _OnBlinkTimer);
     }
-    else
+    অন্যথা
     {
 	gui_update_cursor(TRUE, FALSE);
 	blink_state = BLINK_ON;
-	blink_timer = SetTimer(NULL, 0, (UINT)blink_ontime, _OnBlinkTimer);
+	blink_timer = SetTimer(রিক্ত, 0, (UINT)blink_ontime, _OnBlinkTimer);
     }
     gui_mch_flush();
 }
 
-    static void
-gui_mswin_rm_blink_timer(void)
+    স্থির শূন্য
+gui_mswin_rm_blink_timer(শূন্য)
 {
-    MSG msg;
+    বাৰ্তা_2 বাৰ্তা;
 
-    if (blink_timer == 0)
-	return;
+    যদি (blink_timer == 0)
+	ঘূৰাই;
 
-    KillTimer(NULL, blink_timer);
+    KillTimer(রিক্ত, blink_timer);
     // Eat spurious WM_TIMER messages
-    while (PeekMessageW(&msg, s_hwnd, WM_TIMER, WM_TIMER, PM_REMOVE))
+    যেতিয়ালৈ (PeekMessageW(&বাৰ্তা, s_hwnd, WM_TIMER, WM_TIMER, PM_REMOVE))
 	;
     blink_timer = 0;
 }
@@ -718,11 +718,11 @@ gui_mswin_rm_blink_timer(void)
 /*
  * Stop the cursor blinking.  Show the cursor if it wasn't shown.
  */
-    void
-gui_mch_stop_blink(int may_call_gui_update_cursor)
+    শূন্য
+gui_mch_stop_blink(পূর্ণাঙ্ক may_call_gui_update_cursor)
 {
     gui_mswin_rm_blink_timer();
-    if (blink_state == BLINK_OFF && may_call_gui_update_cursor)
+    যদি (blink_state == BLINK_OFF && may_call_gui_update_cursor)
     {
 	gui_update_cursor(TRUE, FALSE);
 	gui_mch_flush();
@@ -734,15 +734,15 @@ gui_mch_stop_blink(int may_call_gui_update_cursor)
  * Start the cursor blinking.  If it was already blinking, this restarts the
  * waiting time and shows the cursor.
  */
-    void
-gui_mch_start_blink(void)
+    শূন্য
+gui_mch_start_blink(শূন্য)
 {
     gui_mswin_rm_blink_timer();
 
     // Only switch blinking on if none of the times is zero
-    if (blink_waittime && blink_ontime && blink_offtime && gui.in_focus)
+    যদি (blink_waittime && blink_ontime && blink_offtime && gui.in_focus)
     {
-	blink_timer = SetTimer(NULL, 0, (UINT)blink_waittime, _OnBlinkTimer);
+	blink_timer = SetTimer(রিক্ত, 0, (UINT)blink_waittime, _OnBlinkTimer);
 	blink_state = BLINK_ON;
 	gui_update_cursor(TRUE, FALSE);
 	gui_mch_flush();
@@ -753,35 +753,35 @@ gui_mch_start_blink(void)
  * Call-back routines.
  */
 
-    static VOID CALLBACK
+    স্থির VOID CALLBACK
 _OnTimer(
     HWND hwnd,
-    UINT uMsg UNUSED,
+    UINT u_বাৰ্তা UNUSED,
     UINT_PTR idEvent,
     DWORD dwTime UNUSED)
 {
-    MSG msg;
+    বাৰ্তা_2 বাৰ্তা;
 
     /*
     TRACE2("Got timer event, id %d, s_wait_timer %d\n", idEvent, s_wait_timer);
     */
-    KillTimer(NULL, idEvent);
+    KillTimer(রিক্ত, idEvent);
     s_timed_out = TRUE;
 
     // Eat spurious WM_TIMER messages
-    while (PeekMessageW(&msg, hwnd, WM_TIMER, WM_TIMER, PM_REMOVE))
+    যেতিয়ালৈ (PeekMessageW(&বাৰ্তা, hwnd, WM_TIMER, WM_TIMER, PM_REMOVE))
 	;
-    if (idEvent == s_wait_timer)
+    যদি (idEvent == s_wait_timer)
 	s_wait_timer = 0;
 }
 
-    static void
+    স্থির শূন্য
 _OnDeadChar(
     HWND hwnd UNUSED,
     UINT ch UNUSED,
-    int cRepeat UNUSED)
+    পূর্ণাঙ্ক cRepeat UNUSED)
 {
-    dead_key = DEAD_KEY_SET_DEFAULT;
+    dead_চাবি = DEAD_চাবি_SET_DEFAULT;
 }
 
 /*
@@ -795,15 +795,15 @@ _OnDeadChar(
  * of UTF-16 code units to a single Unicode code point, presuming it is the
  * matching low surrogate.
  */
-    static int
-char_to_string(int ch, char_u *string, int slen, int had_alt)
+    স্থির পূর্ণাঙ্ক
+char_to_string(পূর্ণাঙ্ক ch, char_u *string, পূর্ণাঙ্ক slen, পূর্ণাঙ্ক had_alt)
 {
-    int		len;
-    int		i;
+    পূর্ণাঙ্ক		len;
+    পূর্ণাঙ্ক		i;
     WCHAR	wstring[2];
-    char_u	*ws = NULL;
+    char_u	*ws = রিক্ত;
 
-    if (surrogate_pending_ch != 0)
+    যদি (surrogate_pending_ch != 0)
     {
 	// We don't guarantee ch is a low surrogate to match the high surrogate
 	// we already have; it should be, but if it isn't, tough luck.
@@ -812,14 +812,14 @@ char_to_string(int ch, char_u *string, int slen, int had_alt)
 	surrogate_pending_ch = 0;
 	len = 2;
     }
-    else if (ch >= 0xD800 && ch <= 0xDBFF)	// high surrogate
+    অন্যথা যদি (ch >= 0xD800 && ch <= 0xDBFF)	// high surrogate
     {
 	// We don't have the entire code point yet, only the first UTF-16 code
 	// unit; so just remember it and use it in the next call.
 	surrogate_pending_ch = ch;
-	return 0;
+	ঘূৰাই 0;
     }
-    else
+    অন্যথা
     {
 	wstring[0] = ch;
 	len = 1;
@@ -828,54 +828,54 @@ char_to_string(int ch, char_u *string, int slen, int had_alt)
     // "ch" is a UTF-16 character.  Convert it to a string of bytes.  When
     // "enc_codepage" is non-zero use the standard Win32 function,
     // otherwise use our own conversion function (e.g., for UTF-8).
-    if (enc_codepage > 0)
+    যদি (enc_codepage > 0)
     {
 	len = WideCharToMultiByte(enc_codepage, 0, wstring, len,
-		(LPSTR)string, slen, 0, NULL);
+		(LPSTR)string, slen, 0, রিক্ত);
 	// If we had included the ALT key into the character but now the
 	// upper bit is no longer set, that probably means the conversion
 	// failed.  Convert the original character and set the upper bit
 	// afterwards.
-	if (had_alt && len == 1 && ch >= 0x80 && string[0] < 0x80)
+	যদি (had_alt && len == 1 && ch >= 0x80 && string[0] < 0x80)
 	{
 	    wstring[0] = ch & 0x7f;
 	    len = WideCharToMultiByte(enc_codepage, 0, wstring, len,
-		    (LPSTR)string, slen, 0, NULL);
-	    if (len == 1) // safety check
+		    (LPSTR)string, slen, 0, রিক্ত);
+	    যদি (len == 1) // safety check
 		string[0] |= 0x80;
 	}
     }
-    else
+    অন্যথা
     {
 	ws = utf16_to_enc(wstring, &len);
-	if (ws == NULL)
+	যদি (ws == রিক্ত)
 	    len = 0;
-	else
+	অন্যথা
 	{
-	    if (len > slen)	// just in case
+	    যদি (len > slen)	// just in case
 		len = slen;
 	    mch_memmove(string, ws, len);
 	    vim_free(ws);
 	}
     }
 
-    if (len == 0)
+    যদি (len == 0)
     {
 	string[0] = ch;
 	len = 1;
     }
 
-    for (i = 0; i < len; ++i)
-	if (string[i] == CSI && len <= slen - 2)
+    বাবে (i = 0; i < len; ++i)
+	যদি (string[i] == CSI && len <= slen - 2)
 	{
 	    // Insert CSI as K_CSI.
 	    mch_memmove(string + i + 3, string + i + 1, len - i - 1);
 	    string[++i] = KS_EXTRA;
-	    string[++i] = (int)KE_CSI;
+	    string[++i] = (পূর্ণাঙ্ক)KE_CSI;
 	    len += 2;
 	}
 
-    return len;
+    ঘূৰাই len;
 }
 
 /*
@@ -887,42 +887,42 @@ char_to_string(int ch, char_u *string, int slen, int had_alt)
  * area, and usages not via "get_active_modifiers_via_ptr" should
  * be watched.
  */
-    static int
-get_active_modifiers_experimental(void)
+    স্থির পূর্ণাঙ্ক
+get_active_modifiers_experimental(শূন্য)
 {
-    int modifiers = 0;
+    পূর্ণাঙ্ক modifiers = 0;
 
-    if (GetKeyState(VK_CONTROL) & 0x8000)
+    যদি (Get_চাবি_State(VK_CONTROL) & 0x8000)
 	modifiers |= MOD_MASK_CTRL;
-    if (GetKeyState(VK_SHIFT) & 0x8000)
+    যদি (Get_চাবি_State(VK_SHIFT) & 0x8000)
 	modifiers |= MOD_MASK_SHIFT;
     // Windows handles Ctrl + Alt as AltGr and vice-versa. We can distinguish
     // the two cases by checking whether the left or the right Alt key is
     // pressed.
-    if (GetKeyState(VK_LMENU) & 0x8000)
+    যদি (Get_চাবি_State(VK_LMENU) & 0x8000)
 	modifiers |= MOD_MASK_ALT;
-    if ((modifiers & MOD_MASK_CTRL) && (GetKeyState(VK_RMENU) & 0x8000))
+    যদি ((modifiers & MOD_MASK_CTRL) && (Get_চাবি_State(VK_RMENU) & 0x8000))
 	modifiers &= ~MOD_MASK_CTRL;
     // Add RightALT only if it is hold alone (without Ctrl), because if AltGr
     // is pressed, Windows claims that Ctrl is hold as well. That way we can
     // recognize Right-ALT alone and be sure that not AltGr is hold.
-    if (!(GetKeyState(VK_CONTROL) & 0x8000)
-	    &&  (GetKeyState(VK_RMENU) & 0x8000)
-	    && !(GetKeyState(VK_LMENU) & 0x8000)) // seems AltGr has both set
+    যদি (!(Get_চাবি_State(VK_CONTROL) & 0x8000)
+	    &&  (Get_চাবি_State(VK_RMENU) & 0x8000)
+	    && !(Get_চাবি_State(VK_LMENU) & 0x8000)) // seems AltGr has both set
 	modifiers |= MOD_MASK_ALT;
 
-    return modifiers;
+    ঘূৰাই modifiers;
 }
 
 /*
  * "Classic" implementation, existing prior to v8.2.4807
  */
-    static int
-get_active_modifiers_classic(void)
+    স্থির পূর্ণাঙ্ক
+get_active_modifiers_classic(শূন্য)
 {
-    int modifiers = 0;
+    পূর্ণাঙ্ক modifiers = 0;
 
-    if (GetKeyState(VK_SHIFT) & 0x8000)
+    যদি (Get_চাবি_State(VK_SHIFT) & 0x8000)
 	modifiers |= MOD_MASK_SHIFT;
     /*
      * Don't use caps-lock as shift, because these are special keys
@@ -933,35 +933,35 @@ get_active_modifiers_classic(void)
     if (GetKeyState(VK_CAPITAL) & 0x0001)
 	modifiers ^= MOD_MASK_SHIFT;
     */
-    if (GetKeyState(VK_CONTROL) & 0x8000)
+    যদি (Get_চাবি_State(VK_CONTROL) & 0x8000)
 	modifiers |= MOD_MASK_CTRL;
-    if (GetKeyState(VK_MENU) & 0x8000)
+    যদি (Get_চাবি_State(VK_MENU) & 0x8000)
 	modifiers |= MOD_MASK_ALT;
 
-    return modifiers;
+    ঘূৰাই modifiers;
 }
 
-    static int
-get_active_modifiers(void)
+    স্থির পূর্ণাঙ্ক
+get_active_modifiers(শূন্য)
 {
-    return get_active_modifiers_experimental();
+    ঘূৰাই get_active_modifiers_experimental();
 }
 
-    static int
-get_active_modifiers_via_ptr(void)
+    স্থির পূর্ণাঙ্ক
+get_active_modifiers_via_ptr(শূন্য)
 {
     // marshal to corresponding implementation
-    return keycode_trans_strategy_used->ptr_get_active_modifiers();
+    ঘূৰাই keycode_trans_strategy_used->ptr_get_active_modifiers();
 }
 
 /*
  * Key hit, add it to the input buffer.
  */
-    static void
+    স্থির শূন্য
 _OnChar(
     HWND hwnd UNUSED,
     UINT cch,
-    int cRepeat UNUSED)
+    পূর্ণাঙ্ক cRepeat UNUSED)
 {
     // marshal to corresponding implementation
     keycode_trans_strategy_used->ptr_on_char(hwnd, cch, cRepeat);
@@ -971,93 +971,93 @@ _OnChar(
  * Experimental implementation, introduced in v8.2.4807
  * "processing key event in Win32 GUI is not ideal"
  */
-    static void
+    স্থির শূন্য
 _OnChar_experimental(
     HWND hwnd UNUSED,
     UINT cch,
-    int cRepeat UNUSED)
+    পূর্ণাঙ্ক cRepeat UNUSED)
 {
     char_u	string[40];
-    int		len = 0;
-    int		modifiers;
-    int		ch = cch;   // special keys are negative
+    পূর্ণাঙ্ক		len = 0;
+    পূর্ণাঙ্ক		modifiers;
+    পূর্ণাঙ্ক		ch = cch;   // special keys are negative
 
-    if (dead_key == DEAD_KEY_SKIP_ON_CHAR)
-	return;
+    যদি (dead_চাবি == DEAD_চাবি_SKIP_ON_CHAR)
+	ঘূৰাই;
 
     //  keep DEAD_KEY_TRANSIENT_IN_ON_CHAR value for later handling in
     //  process_message()
-    if (dead_key != DEAD_KEY_TRANSIENT_IN_ON_CHAR)
-	dead_key = DEAD_KEY_OFF;
+    যদি (dead_চাবি != DEAD_চাবি_TRANSIENT_IN_ON_CHAR)
+	dead_চাবি = DEAD_চাবি_OFF;
 
     modifiers = get_active_modifiers_experimental();
 
-    ch = simplify_key(ch, &modifiers);
+    ch = simplify_চাবি(ch, &modifiers);
 
     // Some keys need adjustment when the Ctrl modifier is used.
-    ++no_reduce_keys;
-    ch = may_adjust_key_for_ctrl(modifiers, ch);
-    --no_reduce_keys;
+    ++no_reduce_চাবিগুলি;
+    ch = may_adjust_চাবি_for_ctrl(modifiers, ch);
+    --no_reduce_চাবিগুলি;
 
     // remove the SHIFT modifier for keys where it's already included, e.g.,
     // '(' and '*'
     modifiers = may_remove_shift_modifier(modifiers, ch);
 
     // Unify modifiers somewhat.  No longer use ALT to set the 8th bit.
-    ch = extract_modifiers(ch, &modifiers, FALSE, NULL);
-    if (ch == CSI)
+    ch = extract_modifiers(ch, &modifiers, FALSE, রিক্ত);
+    যদি (ch == CSI)
 	ch = K_CSI;
 
-    if (modifiers)
+    যদি (modifiers)
     {
 	string[0] = CSI;
 	string[1] = KS_MODIFIER;
 	string[2] = modifiers;
-	add_to_input_buf(string, 3);
+	add_to_প্ৰবেশ_buf(string, 3);
     }
 
     len = char_to_string(ch, string, 40, FALSE);
-    if (len == 1 && string[0] == Ctrl_C && ctrl_c_interrupts)
+    যদি (len == 1 && string[0] == Ctrl_C && ctrl_c_interrupts)
     {
-	trash_input_buf();
+	trash_প্ৰবেশ_buf();
 	got_int = TRUE;
     }
 
-    add_to_input_buf(string, len);
+    add_to_প্ৰবেশ_buf(string, len);
 }
 
 /*
  * "Classic" implementation, existing prior to v8.2.4807
  */
-    static void
+    স্থির শূন্য
 _OnChar_classic(
     HWND hwnd UNUSED,
     UINT ch,
-    int cRepeat UNUSED)
+    পূর্ণাঙ্ক cRepeat UNUSED)
 {
     char_u	string[40];
-    int		len = 0;
+    পূর্ণাঙ্ক		len = 0;
 
-    dead_key = 0;
+    dead_চাবি = 0;
 
     len = char_to_string(ch, string, 40, FALSE);
-    if (len == 1 && string[0] == Ctrl_C && ctrl_c_interrupts)
+    যদি (len == 1 && string[0] == Ctrl_C && ctrl_c_interrupts)
     {
-	trash_input_buf();
+	trash_প্ৰবেশ_buf();
 	got_int = TRUE;
     }
 
-    add_to_input_buf(string, len);
+    add_to_প্ৰবেশ_buf(string, len);
 }
 
 /*
  * Alt-Key hit, add it to the input buffer.
  */
-    static void
+    স্থির শূন্য
 _OnSysChar(
     HWND hwnd UNUSED,
     UINT cch,
-    int cRepeat UNUSED)
+    পূর্ণাঙ্ক cRepeat UNUSED)
 {
     // marshal to corresponding implementation
     keycode_trans_strategy_used->ptr_on_sys_char(hwnd, cch, cRepeat);
@@ -1067,73 +1067,73 @@ _OnSysChar(
  * Experimental implementation, introduced in v8.2.4807
  * "processing key event in Win32 GUI is not ideal"
  */
-    static void
+    স্থির শূন্য
 _OnSysChar_experimental(
     HWND hwnd UNUSED,
     UINT cch,
-    int cRepeat UNUSED)
+    পূর্ণাঙ্ক cRepeat UNUSED)
 {
     char_u	string[40]; // Enough for multibyte character
-    int		len;
-    int		modifiers;
-    int		ch = cch;   // special keys are negative
+    পূর্ণাঙ্ক		len;
+    পূর্ণাঙ্ক		modifiers;
+    পূর্ণাঙ্ক		ch = cch;   // special keys are negative
 
-    dead_key = DEAD_KEY_OFF;
+    dead_চাবি = DEAD_চাবি_OFF;
 
     // OK, we have a character key (given by ch) which was entered with the
     // ALT key pressed. Eg, if the user presses Alt-A, then ch == 'A'. Note
     // that the system distinguishes Alt-a and Alt-A (Alt-Shift-a unless
     // CAPSLOCK is pressed) at this point.
     modifiers = get_active_modifiers_experimental();
-    ch = simplify_key(ch, &modifiers);
+    ch = simplify_চাবি(ch, &modifiers);
     // remove the SHIFT modifier for keys where it's already included, e.g.,
     // '(' and '*'
     modifiers = may_remove_shift_modifier(modifiers, ch);
 
     // Unify modifiers somewhat.  No longer use ALT to set the 8th bit.
-    ch = extract_modifiers(ch, &modifiers, FALSE, NULL);
-    if (ch == CSI)
+    ch = extract_modifiers(ch, &modifiers, FALSE, রিক্ত);
+    যদি (ch == CSI)
 	ch = K_CSI;
 
     len = 0;
-    if (modifiers)
+    যদি (modifiers)
     {
 	string[len++] = CSI;
 	string[len++] = KS_MODIFIER;
 	string[len++] = modifiers;
     }
 
-    if (IS_SPECIAL((int)ch))
+    যদি (IS_SPECIAL((পূর্ণাঙ্ক)ch))
     {
 	string[len++] = CSI;
-	string[len++] = K_SECOND((int)ch);
-	string[len++] = K_THIRD((int)ch);
+	string[len++] = K_SECOND((পূর্ণাঙ্ক)ch);
+	string[len++] = K_THIRD((পূর্ণাঙ্ক)ch);
     }
-    else
+    অন্যথা
     {
 	// Although the documentation isn't clear about it, we assume "ch" is
 	// a Unicode character.
 	len += char_to_string(ch, string + len, 40 - len, TRUE);
     }
 
-    add_to_input_buf(string, len);
+    add_to_প্ৰবেশ_buf(string, len);
 }
 
 /*
  * "Classic" implementation, existing prior to v8.2.4807
  */
-    static void
+    স্থির শূন্য
 _OnSysChar_classic(
     HWND hwnd UNUSED,
     UINT cch,
-    int cRepeat UNUSED)
+    পূর্ণাঙ্ক cRepeat UNUSED)
 {
     char_u	string[40]; // Enough for multibyte character
-    int		len;
-    int		modifiers;
-    int		ch = cch;   // special keys are negative
+    পূর্ণাঙ্ক		len;
+    পূর্ণাঙ্ক		modifiers;
+    পূর্ণাঙ্ক		ch = cch;   // special keys are negative
 
-    dead_key = 0;
+    dead_চাবি = 0;
 
     // TRACE("OnSysChar(%d, %c)\n", ch, ch);
 
@@ -1142,140 +1142,140 @@ _OnSysChar_classic(
     // that the system distinguishes Alt-a and Alt-A (Alt-Shift-a unless
     // CAPSLOCK is pressed) at this point.
     modifiers = MOD_MASK_ALT;
-    if (GetKeyState(VK_SHIFT) & 0x8000)
+    যদি (Get_চাবি_State(VK_SHIFT) & 0x8000)
 	modifiers |= MOD_MASK_SHIFT;
-    if (GetKeyState(VK_CONTROL) & 0x8000)
+    যদি (Get_চাবি_State(VK_CONTROL) & 0x8000)
 	modifiers |= MOD_MASK_CTRL;
 
-    ch = simplify_key(ch, &modifiers);
+    ch = simplify_চাবি(ch, &modifiers);
     // remove the SHIFT modifier for keys where it's already included, e.g.,
     // '(' and '*'
     modifiers = may_remove_shift_modifier(modifiers, ch);
 
     // Unify modifiers somewhat.  No longer use ALT to set the 8th bit.
-    ch = extract_modifiers(ch, &modifiers, FALSE, NULL);
-    if (ch == CSI)
+    ch = extract_modifiers(ch, &modifiers, FALSE, রিক্ত);
+    যদি (ch == CSI)
 	ch = K_CSI;
 
     len = 0;
-    if (modifiers)
+    যদি (modifiers)
     {
 	string[len++] = CSI;
 	string[len++] = KS_MODIFIER;
 	string[len++] = modifiers;
     }
 
-    if (IS_SPECIAL((int)ch))
+    যদি (IS_SPECIAL((পূর্ণাঙ্ক)ch))
     {
 	string[len++] = CSI;
-	string[len++] = K_SECOND((int)ch);
-	string[len++] = K_THIRD((int)ch);
+	string[len++] = K_SECOND((পূর্ণাঙ্ক)ch);
+	string[len++] = K_THIRD((পূর্ণাঙ্ক)ch);
     }
-    else
+    অন্যথা
     {
 	// Although the documentation isn't clear about it, we assume "ch" is
 	// a Unicode character.
 	len += char_to_string(ch, string + len, 40 - len, TRUE);
     }
 
-    add_to_input_buf(string, len);
+    add_to_প্ৰবেশ_buf(string, len);
 }
 
-    static void
+    স্থির শূন্য
 _OnMouseEvent(
-    int button,
-    int x,
-    int y,
-    int repeated_click,
-    UINT keyFlags)
+    পূর্ণাঙ্ক button,
+    পূর্ণাঙ্ক x,
+    পূর্ণাঙ্ক y,
+    পূর্ণাঙ্ক repeated_click,
+    UINT চাবি_Flags)
 {
-    int vim_modifiers = 0x0;
+    পূর্ণাঙ্ক vim_modifiers = 0x0;
 
     s_getting_focus = FALSE;
 
-    if (keyFlags & MK_SHIFT)
+    যদি (চাবি_Flags & MK_SHIFT)
 	vim_modifiers |= MOUSE_SHIFT;
-    if (keyFlags & MK_CONTROL)
+    যদি (চাবি_Flags & MK_CONTROL)
 	vim_modifiers |= MOUSE_CTRL;
-    if (GetKeyState(VK_LMENU) & 0x8000)
+    যদি (Get_চাবি_State(VK_LMENU) & 0x8000)
 	vim_modifiers |= MOUSE_ALT;
 
     gui_send_mouse_event(button, x, y, repeated_click, vim_modifiers);
 }
 
-    static void
+    স্থির শূন্য
 _OnMouseButtonDown(
     HWND hwnd UNUSED,
     BOOL fDoubleClick UNUSED,
-    int x,
-    int y,
-    UINT keyFlags)
+    পূর্ণাঙ্ক x,
+    পূর্ণাঙ্ক y,
+    UINT চাবি_Flags)
 {
-    static LONG	s_prevTime = 0;
+    স্থির LONG	s_prevTime = 0;
 
     LONG    currentTime = GetMessageTime();
-    int	    button = -1;
-    int	    repeated_click;
+    পূর্ণাঙ্ক	    button = -1;
+    পূর্ণাঙ্ক	    repeated_click;
 
     // Give main window the focus: this is so the cursor isn't hollow.
-    (void)SetFocus(s_hwnd);
+    (শূন্য)SetFocus(s_hwnd);
 
-    if (s_uMsg == WM_LBUTTONDOWN || s_uMsg == WM_LBUTTONDBLCLK)
-	button = MOUSE_LEFT;
-    else if (s_uMsg == WM_MBUTTONDOWN || s_uMsg == WM_MBUTTONDBLCLK)
-	button = MOUSE_MIDDLE;
-    else if (s_uMsg == WM_RBUTTONDOWN || s_uMsg == WM_RBUTTONDBLCLK)
-	button = MOUSE_RIGHT;
-    else if (s_uMsg == WM_XBUTTONDOWN || s_uMsg == WM_XBUTTONDBLCLK)
+    যদি (s_u_বাৰ্তা == WM_LBUTTONDOWN || s_u_বাৰ্তা == WM_LBUTTONDBLCLK)
+	button = MOUSE_বাম;
+    অন্যথা যদি (s_u_বাৰ্তা == WM_MBUTTONDOWN || s_u_বাৰ্তা == WM_MBUTTONDBLCLK)
+	button = MOUSE_মধ্য;
+    অন্যথা যদি (s_u_বাৰ্তা == WM_RBUTTONDOWN || s_u_বাৰ্তা == WM_RBUTTONDBLCLK)
+	button = MOUSE_ডান;
+    অন্যথা যদি (s_u_বাৰ্তা == WM_XBUTTONDOWN || s_u_বাৰ্তা == WM_XBUTTONDBLCLK)
     {
 	button = ((GET_XBUTTON_WPARAM(s_wParam) == 1) ? MOUSE_X1 : MOUSE_X2);
     }
-    else if (s_uMsg == WM_CAPTURECHANGED)
+    অন্যথা যদি (s_u_বাৰ্তা == WM_CAPTURECHANGED)
     {
 	// on W95/NT4, somehow you get in here with an odd Msg
 	// if you press one button while holding down the other..
-	if (s_button_pending == MOUSE_LEFT)
-	    button = MOUSE_RIGHT;
-	else
-	    button = MOUSE_LEFT;
+	যদি (s_button_pending == MOUSE_বাম)
+	    button = MOUSE_ডান;
+	অন্যথা
+	    button = MOUSE_বাম;
     }
 
-    if (button < 0)
-	return;
+    যদি (button < 0)
+	ঘূৰাই;
 
-    repeated_click = ((int)(currentTime - s_prevTime) < p_mouset);
+    repeated_click = ((পূর্ণাঙ্ক)(currentTime - s_prevTime) < p_mouset);
 
     /*
      * Holding down the left and right buttons simulates pushing the middle
      * button.
      */
-    if (repeated_click
-	    && ((button == MOUSE_LEFT && s_button_pending == MOUSE_RIGHT)
-		|| (button == MOUSE_RIGHT
-		    && s_button_pending == MOUSE_LEFT)))
+    যদি (repeated_click
+	    && ((button == MOUSE_বাম && s_button_pending == MOUSE_ডান)
+		|| (button == MOUSE_ডান
+		    && s_button_pending == MOUSE_বাম)))
     {
 	/*
 	 * Hmm, gui.c will ignore more than one button down at a time, so
 	 * pretend we let go of it first.
 	 */
 	gui_send_mouse_event(MOUSE_RELEASE, x, y, FALSE, 0x0);
-	button = MOUSE_MIDDLE;
+	button = MOUSE_মধ্য;
 	repeated_click = FALSE;
 	s_button_pending = -1;
-	_OnMouseEvent(button, x, y, repeated_click, keyFlags);
+	_OnMouseEvent(button, x, y, repeated_click, চাবি_Flags);
     }
-    else if ((repeated_click)
-	    || (mouse_model_popup() && (button == MOUSE_RIGHT)))
+    অন্যথা যদি ((repeated_click)
+	    || (mouse_model_popup() && (button == MOUSE_ডান)))
     {
-	if (s_button_pending > -1)
+	যদি (s_button_pending > -1)
 	{
-	    _OnMouseEvent(s_button_pending, x, y, FALSE, keyFlags);
+	    _OnMouseEvent(s_button_pending, x, y, FALSE, চাবি_Flags);
 	    s_button_pending = -1;
 	}
 	// TRACE("Button down at x %d, y %d\n", x, y);
-	_OnMouseEvent(button, x, y, repeated_click, keyFlags);
+	_OnMouseEvent(button, x, y, repeated_click, চাবি_Flags);
     }
-    else
+    অন্যথা
     {
 	/*
 	 * If this is the first press (i.e. not a multiple click) don't
@@ -1293,40 +1293,40 @@ _OnMouseButtonDown(
 	s_button_pending = button;
 	s_x_pending = x;
 	s_y_pending = y;
-	s_kFlags_pending = keyFlags;
+	s_kFlags_pending = চাবি_Flags;
     }
 
     s_prevTime = currentTime;
 }
 
-    static void
+    স্থির শূন্য
 _OnMouseMoveOrRelease(
     HWND hwnd UNUSED,
-    int x,
-    int y,
-    UINT keyFlags)
+    পূর্ণাঙ্ক x,
+    পূর্ণাঙ্ক y,
+    UINT চাবি_Flags)
 {
-    int button;
+    পূর্ণাঙ্ক button;
 
     s_getting_focus = FALSE;
-    if (s_button_pending > -1)
+    যদি (s_button_pending > -1)
     {
 	// Delayed action for mouse down event
 	_OnMouseEvent(s_button_pending, s_x_pending,
 					s_y_pending, FALSE, s_kFlags_pending);
 	s_button_pending = -1;
     }
-    if (s_uMsg == WM_MOUSEMOVE)
+    যদি (s_u_বাৰ্তা == WM_MOUSEMOVE)
     {
 	/*
 	 * It's only a MOUSE_DRAG if one or more mouse buttons are being held
 	 * down.
 	 */
-	if (!(keyFlags & (MK_LBUTTON | MK_MBUTTON | MK_RBUTTON
+	যদি (!(চাবি_Flags & (MK_LBUTTON | MK_MBUTTON | MK_RBUTTON
 						| MK_XBUTTON1 | MK_XBUTTON2)))
 	{
 	    gui_mouse_moved(x, y);
-	    return;
+	    ঘূৰাই;
 	}
 
 	/*
@@ -1337,25 +1337,25 @@ _OnMouseMoveOrRelease(
 	button = MOUSE_DRAG;
 	// TRACE("  move at x %d, y %d\n", x, y);
     }
-    else
+    অন্যথা
     {
 	ReleaseCapture();
 	button = MOUSE_RELEASE;
 	// TRACE("  up at x %d, y %d\n", x, y);
     }
 
-    _OnMouseEvent(button, x, y, FALSE, keyFlags);
+    _OnMouseEvent(button, x, y, FALSE, চাবি_Flags);
 }
 
-    static void
+    স্থির শূন্য
 _OnSizeTextArea(
     HWND hwnd UNUSED,
     UINT state UNUSED,
-    int cx UNUSED,
-    int cy UNUSED)
+    পূর্ণাঙ্ক cx UNUSED,
+    পূর্ণাঙ্ক cy UNUSED)
 {
-#if defined(FEAT_DIRECTX)
-    if (IS_ENABLE_DIRECTX())
+#যদি defined(FEAT_DIRECTX)
+    যদি (IS_ENABLE_DIRECTX())
 	directx_binddc();
 #endif
 }
@@ -1364,42 +1364,42 @@ _OnSizeTextArea(
 /*
  * Find the vimmenu_T with the given id
  */
-    static vimmenu_T *
+    স্থির vimmenu_T *
 gui_mswin_find_menu(
     vimmenu_T	*pMenu,
-    int		id)
+    পূর্ণাঙ্ক		id)
 {
     vimmenu_T	*pChildMenu;
 
-    while (pMenu)
+    যেতিয়ালৈ (pMenu)
     {
-	if (pMenu->id == (UINT)id)
-	    break;
-	if (pMenu->children != NULL)
+	যদি (pMenu->id == (UINT)id)
+	    ভঙ্গ;
+	যদি (pMenu->children != রিক্ত)
 	{
 	    pChildMenu = gui_mswin_find_menu(pMenu->children, id);
-	    if (pChildMenu)
+	    যদি (pChildMenu)
 	    {
 		pMenu = pChildMenu;
-		break;
+		ভঙ্গ;
 	    }
 	}
 	pMenu = pMenu->next;
     }
-    return pMenu;
+    ঘূৰাই pMenu;
 }
 
-    static void
+    স্থির শূন্য
 _OnMenu(
     HWND	hwnd UNUSED,
-    int		id,
+    পূর্ণাঙ্ক		id,
     HWND	hwndCtl UNUSED,
     UINT	codeNotify UNUSED)
 {
     vimmenu_T	*pMenu;
 
-    pMenu = gui_mswin_find_menu(root_menu, id);
-    if (pMenu)
+    pMenu = gui_mswin_find_menu(মূল_menu, id);
+    যদি (pMenu)
 	gui_menu_cb(pMenu);
 }
 #endif
@@ -1408,115 +1408,115 @@ _OnMenu(
 /*
  * Handle a Find/Replace window message.
  */
-    static void
-_OnFindRepl(void)
+    স্থির শূন্য
+_OnFindRepl(শূন্য)
 {
-    int	    flags = 0;
-    int	    down;
+    পূর্ণাঙ্ক	    flags = 0;
+    পূর্ণাঙ্ক	    down;
 
-    if (s_findrep_struct.Flags & FR_DIALOGTERM)
+    যদি (s_findrep_struct.Flags & FR_DIALOGTERM)
 	// Give main window the focus back.
-	(void)SetFocus(s_hwnd);
+	(শূন্য)SetFocus(s_hwnd);
 
-    if (s_findrep_struct.Flags & FR_FINDNEXT)
+    যদি (s_findrep_struct.Flags & FR_FINDNEXT)
     {
 	flags = FRD_FINDNEXT;
 
 	// Give main window the focus back: this is so the cursor isn't
 	// hollow.
-	(void)SetFocus(s_hwnd);
+	(শূন্য)SetFocus(s_hwnd);
     }
-    else if (s_findrep_struct.Flags & FR_REPLACE)
+    অন্যথা যদি (s_findrep_struct.Flags & FR_REPLACE)
     {
 	flags = FRD_REPLACE;
 
 	// Give main window the focus back: this is so the cursor isn't
 	// hollow.
-	(void)SetFocus(s_hwnd);
+	(শূন্য)SetFocus(s_hwnd);
     }
-    else if (s_findrep_struct.Flags & FR_REPLACEALL)
+    অন্যথা যদি (s_findrep_struct.Flags & FR_REPLACEALL)
     {
 	flags = FRD_REPLACEALL;
     }
 
-    if (flags == 0)
-	return;
+    যদি (flags == 0)
+	ঘূৰাই;
 
     char_u	*p, *q;
 
     // Call the generic GUI function to do the actual work.
-    if (s_findrep_struct.Flags & FR_WHOLEWORD)
+    যদি (s_findrep_struct.Flags & FR_WHOLEWORD)
 	flags |= FRD_WHOLE_WORD;
-    if (s_findrep_struct.Flags & FR_MATCHCASE)
+    যদি (s_findrep_struct.Flags & FR_MATCHCASE)
 	flags |= FRD_MATCH_CASE;
     down = (s_findrep_struct.Flags & FR_DOWN) != 0;
-    p = utf16_to_enc(s_findrep_struct.lpstrFindWhat, NULL);
-    q = utf16_to_enc(s_findrep_struct.lpstrReplaceWith, NULL);
-    if (p != NULL && q != NULL)
+    p = utf16_to_enc(s_findrep_struct.lpstrFindWhat, রিক্ত);
+    q = utf16_to_enc(s_findrep_struct.lpstrReplaceWith, রিক্ত);
+    যদি (p != রিক্ত && q != রিক্ত)
 	gui_do_findrepl(flags, p, q, down);
     vim_free(p);
     vim_free(q);
 }
 #endif
 
-    static void
-HandleMouseHide(UINT uMsg, LPARAM lParam)
+    স্থির শূন্য
+HandleMouseHide(UINT u_বাৰ্তা, LPARAM lParam)
 {
-    static LPARAM last_lParam = 0L;
+    স্থির LPARAM last_lParam = 0L;
 
     // We sometimes get a mousemove when the mouse didn't move...
-    if (uMsg == WM_MOUSEMOVE || uMsg == WM_NCMOUSEMOVE)
+    যদি (u_বাৰ্তা == WM_MOUSEMOVE || u_বাৰ্তা == WM_NCMOUSEMOVE)
     {
-	if (lParam == last_lParam)
-	    return;
+	যদি (lParam == last_lParam)
+	    ঘূৰাই;
 	last_lParam = lParam;
     }
 
     // Handle specially, to centralise coding. We need to be sure we catch all
     // possible events which should cause us to restore the cursor (as it is a
     // shared resource, we take full responsibility for it).
-    switch (uMsg)
+    ৱিকল্প (u_বাৰ্তা)
     {
-    case WM_KEYUP:
-    case WM_CHAR:
+    পক্ষ WM_KEYUP:
+    পক্ষ WM_CHAR:
 	/*
 	 * blank out the pointer if necessary
 	 */
-	if (p_mh)
+	যদি (p_mh)
 	    gui_mch_mousehide(TRUE);
-	break;
+	ভঙ্গ;
 
-    case WM_SYSKEYUP:	 // show the pointer when a system-key is pressed
-    case WM_SYSCHAR:
-    case WM_MOUSEMOVE:	 // show the pointer on any mouse action
-    case WM_LBUTTONDOWN:
-    case WM_LBUTTONUP:
-    case WM_MBUTTONDOWN:
-    case WM_MBUTTONUP:
-    case WM_RBUTTONDOWN:
-    case WM_RBUTTONUP:
-    case WM_XBUTTONDOWN:
-    case WM_XBUTTONUP:
-    case WM_NCMOUSEMOVE:
-    case WM_NCLBUTTONDOWN:
-    case WM_NCLBUTTONUP:
-    case WM_NCMBUTTONDOWN:
-    case WM_NCMBUTTONUP:
-    case WM_NCRBUTTONDOWN:
-    case WM_NCRBUTTONUP:
-    case WM_KILLFOCUS:
+    পক্ষ WM_SYSKEYUP:	 // show the pointer when a system-key is pressed
+    পক্ষ WM_SYSCHAR:
+    পক্ষ WM_MOUSEMOVE:	 // show the pointer on any mouse action
+    পক্ষ WM_LBUTTONDOWN:
+    পক্ষ WM_LBUTTONUP:
+    পক্ষ WM_MBUTTONDOWN:
+    পক্ষ WM_MBUTTONUP:
+    পক্ষ WM_RBUTTONDOWN:
+    পক্ষ WM_RBUTTONUP:
+    পক্ষ WM_XBUTTONDOWN:
+    পক্ষ WM_XBUTTONUP:
+    পক্ষ WM_NCMOUSEMOVE:
+    পক্ষ WM_NCLBUTTONDOWN:
+    পক্ষ WM_NCLBUTTONUP:
+    পক্ষ WM_NCMBUTTONDOWN:
+    পক্ষ WM_NCMBUTTONUP:
+    পক্ষ WM_NCRBUTTONDOWN:
+    পক্ষ WM_NCRBUTTONUP:
+    পক্ষ WM_KILLFOCUS:
 	/*
 	 * if the pointer is currently hidden, then we should show it.
 	 */
 	gui_mch_mousehide(FALSE);
-	break;
+	ভঙ্গ;
     }
 }
 
-    static LRESULT CALLBACK
+    স্থির LRESULT CALLBACK
 _TextAreaWndProc(
     HWND hwnd,
-    UINT uMsg,
+    UINT u_বাৰ্তা,
     WPARAM wParam,
     LPARAM lParam)
 {
@@ -1525,61 +1525,61 @@ _TextAreaWndProc(
 	  hwnd, uMsg, wParam, lParam);
     */
 
-    HandleMouseHide(uMsg, lParam);
+    HandleMouseHide(u_বাৰ্তা, lParam);
 
-    s_uMsg = uMsg;
+    s_u_বাৰ্তা = u_বাৰ্তা;
     s_wParam = wParam;
 
 #ifdef FEAT_BEVAL_GUI
-    track_user_activity(uMsg);
+    track_user_activity(u_বাৰ্তা);
 #endif
 
-    switch (uMsg)
+    ৱিকল্প (u_বাৰ্তা)
     {
-	HANDLE_MSG(hwnd, WM_LBUTTONDBLCLK,_OnMouseButtonDown);
-	HANDLE_MSG(hwnd, WM_LBUTTONDOWN,_OnMouseButtonDown);
-	HANDLE_MSG(hwnd, WM_LBUTTONUP,	_OnMouseMoveOrRelease);
-	HANDLE_MSG(hwnd, WM_MBUTTONDBLCLK,_OnMouseButtonDown);
-	HANDLE_MSG(hwnd, WM_MBUTTONDOWN,_OnMouseButtonDown);
-	HANDLE_MSG(hwnd, WM_MBUTTONUP,	_OnMouseMoveOrRelease);
-	HANDLE_MSG(hwnd, WM_MOUSEMOVE,	_OnMouseMoveOrRelease);
-	HANDLE_MSG(hwnd, WM_PAINT,	_OnPaint);
-	HANDLE_MSG(hwnd, WM_RBUTTONDBLCLK,_OnMouseButtonDown);
-	HANDLE_MSG(hwnd, WM_RBUTTONDOWN,_OnMouseButtonDown);
-	HANDLE_MSG(hwnd, WM_RBUTTONUP,	_OnMouseMoveOrRelease);
-	HANDLE_MSG(hwnd, WM_XBUTTONDBLCLK,_OnMouseButtonDown);
-	HANDLE_MSG(hwnd, WM_XBUTTONDOWN,_OnMouseButtonDown);
-	HANDLE_MSG(hwnd, WM_XBUTTONUP,	_OnMouseMoveOrRelease);
-	HANDLE_MSG(hwnd, WM_SIZE,	_OnSizeTextArea);
+	HANDLE_বাৰ্তা(hwnd, WM_LBUTTONDBLCLK,_OnMouseButtonDown);
+	HANDLE_বাৰ্তা(hwnd, WM_LBUTTONDOWN,_OnMouseButtonDown);
+	HANDLE_বাৰ্তা(hwnd, WM_LBUTTONUP,	_OnMouseMoveOrRelease);
+	HANDLE_বাৰ্তা(hwnd, WM_MBUTTONDBLCLK,_OnMouseButtonDown);
+	HANDLE_বাৰ্তা(hwnd, WM_MBUTTONDOWN,_OnMouseButtonDown);
+	HANDLE_বাৰ্তা(hwnd, WM_MBUTTONUP,	_OnMouseMoveOrRelease);
+	HANDLE_বাৰ্তা(hwnd, WM_MOUSEMOVE,	_OnMouseMoveOrRelease);
+	HANDLE_বাৰ্তা(hwnd, WM_PAINT,	_OnPaint);
+	HANDLE_বাৰ্তা(hwnd, WM_RBUTTONDBLCLK,_OnMouseButtonDown);
+	HANDLE_বাৰ্তা(hwnd, WM_RBUTTONDOWN,_OnMouseButtonDown);
+	HANDLE_বাৰ্তা(hwnd, WM_RBUTTONUP,	_OnMouseMoveOrRelease);
+	HANDLE_বাৰ্তা(hwnd, WM_XBUTTONDBLCLK,_OnMouseButtonDown);
+	HANDLE_বাৰ্তা(hwnd, WM_XBUTTONDOWN,_OnMouseButtonDown);
+	HANDLE_বাৰ্তা(hwnd, WM_XBUTTONUP,	_OnMouseMoveOrRelease);
+	HANDLE_বাৰ্তা(hwnd, WM_SIZE,	_OnSizeTextArea);
 
 #ifdef FEAT_BEVAL_GUI
-	case WM_NOTIFY: Handle_WM_Notify(hwnd, (LPNMHDR)lParam);
-	    return TRUE;
+	পক্ষ WM_NOTIFY: Handle_WM_Notify(hwnd, (LPNMHDR)lParam);
+	    ঘূৰাই TRUE;
 #endif
-	default:
-	    return DefWindowProcW(hwnd, uMsg, wParam, lParam);
+	স্ৱভাৱ:
+	    ঘূৰাই DefWindowProcW(hwnd, u_বাৰ্তা, wParam, lParam);
     }
 }
 
-    static void
-dyn_dwm_load(void)
+    স্থির শূন্য
+dyn_dwm_load(শূন্য)
 {
     hLibDwm = vimLoadLib("dwmapi.dll");
-    if (hLibDwm == NULL)
-	return;
+    যদি (hLibDwm == রিক্ত)
+	ঘূৰাই;
 
     pDwmSetWindowAttribute = (HRESULT (WINAPI *)(HWND, DWORD, LPCVOID, DWORD))
 	GetProcAddress(hLibDwm, "DwmSetWindowAttribute");
 
-    if (pDwmSetWindowAttribute == NULL)
+    যদি (pDwmSetWindowAttribute == রিক্ত)
     {
 	FreeLibrary(hLibDwm);
-	hLibDwm = NULL;
-	return;
+	hLibDwm = রিক্ত;
+	ঘূৰাই;
     }
 }
 
-extern DWORD win_version; // this is in os_mswin.c
+বাহ্য DWORD win_version; // this is in os_mswin.c
 
 /*
  * Set TitleBar's color. Handle hl-TitleBar and hl-TitleBarNC.
@@ -1588,65 +1588,65 @@ extern DWORD win_version; // this is in os_mswin.c
  * if "TitleBar guibg=NONE guifg=NONE" reset the window back to using the
  * system's default behavior for the border color.
  */
-    void
-gui_mch_set_titlebar_colors(void)
+    শূন্য
+gui_mch_set_titlebar_colors(শূন্য)
 {
 #define DWMWA_COLOR_DEFAULT 0xFFFFFFFF
-    if (pDwmSetWindowAttribute == NULL || win_version < MAKE_VER(10, 0, 22000))
-	return;
+    যদি (pDwmSetWindowAttribute == রিক্ত || win_version < MAKE_VER(10, 0, 22000))
+	ঘূৰাই;
 
     guicolor_T captionColor = DWMWA_COLOR_DEFAULT;
     guicolor_T textColor = DWMWA_COLOR_DEFAULT;
 
-    if (vim_strchr(p_go, GO_TITLEBAR) != NULL)
+    যদি (vim_strchr(p_go, GO_TITLEBAR) != রিক্ত)
     {
-	if (gui.in_focus)
+	যদি (gui.in_focus)
 	{
 	    captionColor = gui.title_bg_pixel;
 	    textColor = gui.title_fg_pixel;
 	}
-	else
+	অন্যথা
 	{
 	    captionColor = gui.titlenc_bg_pixel;
 	    textColor = gui.titlenc_fg_pixel;
 	}
 
-	if (captionColor == INVALCOLOR)
+	যদি (captionColor == INVALCOLOR)
 	    captionColor = DWMWA_COLOR_DEFAULT;
-	if (textColor == INVALCOLOR)
+	যদি (textColor == INVALCOLOR)
 	    textColor = DWMWA_COLOR_DEFAULT;
     }
 
     pDwmSetWindowAttribute(s_hwnd, DWMWA_CAPTION_COLOR,
-	    &captionColor, sizeof(captionColor));
+	    &captionColor, পরিমাণ(captionColor));
     pDwmSetWindowAttribute(s_hwnd, DWMWA_TEXT_COLOR,
-	    &textColor, sizeof(textColor));
+	    &textColor, পরিমাণ(textColor));
 }
 
 /*
  * Called when the foreground or background color has been changed.
  */
-    void
-gui_mch_new_colors(void)
+    শূন্য
+gui_mch_new_colors(শূন্য)
 {
     HBRUSH prevBrush;
 
     s_brush = CreateSolidBrush(gui.back_pixel);
     prevBrush = (HBRUSH)SetClassLongPtr(
 				s_hwnd, GCLP_HBRBACKGROUND, (LONG_PTR)s_brush);
-    InvalidateRect(s_hwnd, NULL, TRUE);
+    InvalidateRect(s_hwnd, রিক্ত, TRUE);
     // The text area is a child window, the invalidation above does not
     // include it.
-    if (s_textarea_bg_only && s_textArea != NULL)
-	InvalidateRect(s_textArea, NULL, TRUE);
+    যদি (s_textarea_bg_only && s_textArea != রিক্ত)
+	InvalidateRect(s_textArea, রিক্ত, TRUE);
     DeleteObject(prevBrush);
 }
 
 /*
  * Set the colors to their default values.
  */
-    void
-gui_mch_def_colors(void)
+    শূন্য
+gui_mch_def_colors(শূন্য)
 {
     gui.norm_pixel = GetSysColor(COLOR_WINDOWTEXT);
     gui.back_pixel = GetSysColor(COLOR_WINDOW);
@@ -1657,18 +1657,18 @@ gui_mch_def_colors(void)
 /*
  * Open the GUI window which was created by a call to gui_mch_init().
  */
-    int
-gui_mch_open(void)
+    পূর্ণাঙ্ক
+gui_mch_open(শূন্য)
 {
     // Actually open the window, if not already visible
     // (may be done already in gui_mch_set_shellsize)
-    if (!IsWindowVisible(s_hwnd))
+    যদি (!IsWindowVisible(s_hwnd))
     {
 	ShowWindow(s_hwnd, SW_SHOWDEFAULT);
 
 	// Waiting for the message loop leaves the window undrawn while a
 	// slow VimEnter autocommand runs. The flush presents the DirectX draw.
-	if (s_textArea != NULL)
+	যদি (s_textArea != রিক্ত)
 	{
 	    UpdateWindow(s_textArea);
 	    gui_mch_flush();
@@ -1681,67 +1681,67 @@ gui_mch_open(void)
     s_findrep_struct.lpstrReplaceWith[0] = NUL;
 #endif
 
-    return OK;
+    ঘূৰাই OK;
 }
 
 /*
  * Get the position of the top left corner of the window.
  */
-    int
-gui_mch_get_winpos(int *x, int *y)
+    পূর্ণাঙ্ক
+gui_mch_get_winpos(পূর্ণাঙ্ক *x, পূর্ণাঙ্ক *y)
 {
     RECT    rect;
 
     GetWindowRect(s_hwnd, &rect);
-    *x = rect.left;
-    *y = rect.top;
-    return OK;
+    *x = rect.বাম;
+    *y = rect.শীৰ্ষ;
+    ঘূৰাই OK;
 }
 
 /*
  * Set the position of the top left corner of the window to the given
  * coordinates.
  */
-    void
-gui_mch_set_winpos(int x, int y)
+    শূন্য
+gui_mch_set_winpos(পূর্ণাঙ্ক x, পূর্ণাঙ্ক y)
 {
-    SetWindowPos(s_hwnd, NULL, x, y, 0, 0,
+    SetWindowPos(s_hwnd, রিক্ত, x, y, 0, 0,
 		 SWP_NOZORDER | SWP_NOSIZE | SWP_NOACTIVATE);
 }
-    void
-gui_mch_set_text_area_pos(int x, int y, int w, int h)
+    শূন্য
+gui_mch_set_text_area_pos(পূর্ণাঙ্ক x, পূর্ণাঙ্ক y, পূর্ণাঙ্ক w, পূর্ণাঙ্ক h)
 {
-    static int oldx = 0;
-    static int oldy = 0;
+    স্থির পূর্ণাঙ্ক oldx = 0;
+    স্থির পূর্ণাঙ্ক oldy = 0;
 
-    SetWindowPos(s_textArea, NULL, x, y, w, h, SWP_NOZORDER | SWP_NOACTIVATE);
+    SetWindowPos(s_textArea, রিক্ত, x, y, w, h, SWP_NOZORDER | SWP_NOACTIVATE);
 
 #ifdef FEAT_TOOLBAR
-    if (vim_strchr(p_go, GO_TOOLBAR) != NULL)
+    যদি (vim_strchr(p_go, GO_TOOLBAR) != রিক্ত)
 	SendMessage(s_toolbarhwnd, WM_SIZE,
 	      (WPARAM)0, MAKELPARAM(w, gui.toolbar_height));
 #endif
-#if defined(FEAT_GUI_TABLINE)
-    if (showing_tabline)
+#যদি defined(FEAT_GUI_TABLINE)
+    যদি (showing_tabline)
     {
-	int	top = 0;
+	পূর্ণাঙ্ক	শীৰ্ষ = 0;
 	RECT	rect;
 
 # ifdef FEAT_TOOLBAR
-	if (vim_strchr(p_go, GO_TOOLBAR) != NULL)
-	    top = gui.toolbar_height;
+	যদি (vim_strchr(p_go, GO_TOOLBAR) != রিক্ত)
+	    শীৰ্ষ = gui.toolbar_height;
 # endif
 	GetClientRect(s_hwnd, &rect);
-	MoveWindow(s_tabhwnd, 0, top, rect.right, gui.tabline_height, TRUE);
+	MoveWindow(s_tabhwnd, 0, শীৰ্ষ, rect.ডান, gui.tabline_height, TRUE);
     }
 #endif
 
     // When side scroll bar is unshown, the size of window will change.
     // then, the text area move left or right. thus client rect should be
     // forcedly redrawn. (Yasuhiro Matsumoto)
-    if (oldx != x || oldy != y)
+    যদি (oldx != x || oldy != y)
     {
-	InvalidateRect(s_hwnd, NULL, FALSE);
+	InvalidateRect(s_hwnd, রিক্ত, FALSE);
 	oldx = x;
 	oldy = y;
     }
@@ -1752,10 +1752,10 @@ gui_mch_set_text_area_pos(int x, int y, int w, int h)
  * Scrollbar stuff:
  */
 
-    void
+    শূন্য
 gui_mch_enable_scrollbar(
     scrollbar_T     *sb,
-    int		    flag)
+    পূর্ণাঙ্ক		    flag)
 {
     ShowScrollBar(sb->id, SB_CTL, flag);
 
@@ -1764,82 +1764,82 @@ gui_mch_enable_scrollbar(
     // NT 4.0 it's not...
 }
 
-    void
+    শূন্য
 gui_mch_set_scrollbar_pos(
     scrollbar_T *sb,
-    int		x,
-    int		y,
-    int		w,
-    int		h)
+    পূর্ণাঙ্ক		x,
+    পূর্ণাঙ্ক		y,
+    পূর্ণাঙ্ক		w,
+    পূর্ণাঙ্ক		h)
 {
-    SetWindowPos(sb->id, NULL, x, y, w, h,
+    SetWindowPos(sb->id, রিক্ত, x, y, w, h,
 			      SWP_NOZORDER | SWP_NOACTIVATE | SWP_SHOWWINDOW);
 }
 
-    int
-gui_mch_get_scrollbar_xpadding(void)
+    পূর্ণাঙ্ক
+gui_mch_get_scrollbar_xpadding(শূন্য)
 {
     RECT    rcTxt, rcWnd;
-    int	    xpad;
+    পূর্ণাঙ্ক	    xpad;
 
     GetWindowRect(s_textArea, &rcTxt);
     GetWindowRect(s_hwnd, &rcWnd);
-    xpad = rcWnd.right - rcTxt.right - gui.scrollbar_width
+    xpad = rcWnd.ডান - rcTxt.ডান - gui.scrollbar_width
 	- pGetSystemMetricsForDpi(SM_CXFRAME, s_dpi)
 	- pGetSystemMetricsForDpi(SM_CXPADDEDBORDER, s_dpi);
-    return (xpad < 0) ? 0 : xpad;
+    ঘূৰাই (xpad < 0) ? 0 : xpad;
 }
 
-    int
-gui_mch_get_scrollbar_ypadding(void)
+    পূর্ণাঙ্ক
+gui_mch_get_scrollbar_ypadding(শূন্য)
 {
     RECT    rcTxt, rcWnd;
-    int	    ypad;
+    পূর্ণাঙ্ক	    ypad;
 
     GetWindowRect(s_textArea, &rcTxt);
     GetWindowRect(s_hwnd, &rcWnd);
     ypad = rcWnd.bottom - rcTxt.bottom - gui.scrollbar_height
 	- pGetSystemMetricsForDpi(SM_CYFRAME, s_dpi)
 	- pGetSystemMetricsForDpi(SM_CXPADDEDBORDER, s_dpi);
-    return (ypad < 0) ? 0 : ypad;
+    ঘূৰাই (ypad < 0) ? 0 : ypad;
 }
 
-    void
+    শূন্য
 gui_mch_create_scrollbar(
     scrollbar_T *sb,
-    int		orient)	// SBAR_VERT or SBAR_HORIZ
+    পূর্ণাঙ্ক		orient)	// SBAR_VERT or SBAR_HORIZ
 {
     sb->id = CreateWindow(
 	"SCROLLBAR", "Scrollbar",
 	WS_CHILD | ((orient == SBAR_VERT) ? SBS_VERT : SBS_HORZ), 0, 0,
 	10,				// Any value will do for now
 	10,				// Any value will do for now
-	s_hwnd, NULL,
-	g_hinst, NULL);
+	s_hwnd, রিক্ত,
+	g_hinst, রিক্ত);
 }
 
 /*
  * Find the scrollbar with the given hwnd.
  */
-    static scrollbar_T *
+    স্থির scrollbar_T *
 gui_mswin_find_scrollbar(HWND hwnd)
 {
     win_T	*wp;
 
-    if (gui.bottom_sbar.id == hwnd)
-	return &gui.bottom_sbar;
+    যদি (gui.bottom_sbar.id == hwnd)
+	ঘূৰাই &gui.bottom_sbar;
     FOR_ALL_WINDOWS(wp)
     {
-	if (wp->w_scrollbars[SBAR_LEFT].id == hwnd)
-	    return &wp->w_scrollbars[SBAR_LEFT];
-	if (wp->w_scrollbars[SBAR_RIGHT].id == hwnd)
-	    return &wp->w_scrollbars[SBAR_RIGHT];
+	যদি (wp->w_scrollbars[SBAR_বাম].id == hwnd)
+	    ঘূৰাই &wp->w_scrollbars[SBAR_বাম];
+	যদি (wp->w_scrollbars[SBAR_ডান].id == hwnd)
+	    ঘূৰাই &wp->w_scrollbars[SBAR_ডান];
     }
-    return NULL;
+    ঘূৰাই রিক্ত;
 }
 
-    static void
-update_scrollbar_size(void)
+    স্থির শূন্য
+update_scrollbar_size(শূন্য)
 {
     gui.scrollbar_width = pGetSystemMetricsForDpi(SM_CXVSCROLL, s_dpi);
     gui.scrollbar_height = pGetSystemMetricsForDpi(SM_CYHSCROLL, s_dpi);
@@ -1848,7 +1848,7 @@ update_scrollbar_size(void)
 /*
  * Get the average character size of a font.
  */
-    static void
+    স্থির শূন্য
 GetAverageFontSize(HDC hdc, SIZE *size)
 {
     // GetTextMetrics() may not return the right value in tmAveCharWidth
@@ -1862,8 +1862,8 @@ GetAverageFontSize(HDC hdc, SIZE *size)
 /*
  * Get the character size of a font.
  */
-    static void
-GetFontSize(GuiFont font, int *char_width, int *char_height)
+    স্থির শূন্য
+GetFontSize(GuiFont font, পূর্ণাঙ্ক *char_width, পূর্ণাঙ্ক *char_height)
 {
     HWND    hwnd = GetDesktopWindow();
     HDC	    hdc = GetWindowDC(hwnd);
@@ -1874,9 +1874,9 @@ GetFontSize(GuiFont font, int *char_width, int *char_height)
     GetTextMetrics(hdc, &tm);
     GetAverageFontSize(hdc, &size);
 
-    if (char_width)
+    যদি (char_width)
 	*char_width = size.cx + tm.tmOverhang;
-    if (char_height)
+    যদি (char_height)
 	*char_height = tm.tmHeight + p_linespace;
 
     SelectFont(hdc, hfntOld);
@@ -1887,7 +1887,7 @@ GetFontSize(GuiFont font, int *char_width, int *char_height)
 /*
  * Update the character size in "gui" structure with the specified font.
  */
-    static void
+    স্থির শূন্য
 UpdateFontSize(GuiFont font)
 {
     GetFontSize(font, &gui.char_width, &gui.char_height);
@@ -1896,31 +1896,31 @@ UpdateFontSize(GuiFont font)
 /*
  * Adjust gui.char_height (after 'linespace' was changed).
  */
-    int
-gui_mch_adjust_charheight(void)
+    পূর্ণাঙ্ক
+gui_mch_adjust_charheight(শূন্য)
 {
     UpdateFontSize(gui.norm_font);
-    return OK;
+    ঘূৰাই OK;
 }
 
-    static GuiFont
+    স্থির GuiFont
 get_font_handle(LOGFONTW *lf)
 {
-    HFONT   font = NULL;
+    HFONT   font = রিক্ত;
 
     // Load the font
     font = CreateFontIndirectW(lf);
 
-    if (font == NULL)
-	return NOFONT;
+    যদি (font == রিক্ত)
+	ঘূৰাই NOFONT;
 
-    return (GuiFont)font;
+    ঘূৰাই (GuiFont)font;
 }
 
-    static int
-pixels_to_points(int pixels, int vertical)
+    স্থির পূর্ণাঙ্ক
+pixels_to_points(পূর্ণাঙ্ক pixels, পূর্ণাঙ্ক vertical)
 {
-    int		points;
+    পূর্ণাঙ্ক		points;
     HWND	hwnd;
     HDC		hdc;
 
@@ -1932,28 +1932,28 @@ pixels_to_points(int pixels, int vertical)
 
     ReleaseDC(hwnd, hdc);
 
-    return points;
+    ঘূৰাই points;
 }
 
     GuiFont
 gui_mch_get_font(
     char_u	*name,
-    int		giveErrorIfMissing)
+    পূর্ণাঙ্ক		giveErrorIfMissing)
 {
     LOGFONTW	lf;
     GuiFont	font = NOFONT;
 
-    if (get_logfont(&lf, name, NULL, giveErrorIfMissing) == OK)
+    যদি (get_logfont(&lf, name, রিক্ত, giveErrorIfMissing) == OK)
     {
 	lf.lfHeight = adjust_fontsize_by_dpi(lf.lfHeight);
 	font = get_font_handle(&lf);
     }
-    if (font == NOFONT && giveErrorIfMissing)
+    যদি (font == NOFONT && giveErrorIfMissing)
 	semsg(_(e_unknown_font_str), name);
-    return font;
+    ঘূৰাই font;
 }
 
-#if defined(FEAT_EVAL)
+#যদি defined(FEAT_EVAL)
 /*
  * Return the name of font "font" in allocated memory.
  * Don't know how to get the actual name, thus use the provided name.
@@ -1961,16 +1961,16 @@ gui_mch_get_font(
     char_u *
 gui_mch_get_fontname(GuiFont font UNUSED, char_u *name)
 {
-    if (name == NULL)
-	return NULL;
-    return vim_strsave(name);
+    যদি (name == রিক্ত)
+	ঘূৰাই রিক্ত;
+    ঘূৰাই vim_strsave(name);
 }
 #endif
 
-    void
+    শূন্য
 gui_mch_free_font(GuiFont font)
 {
-    if (font)
+    যদি (font)
 	DeleteObject((HFONT)font);
 }
 
@@ -1981,15 +1981,15 @@ gui_mch_free_font(GuiFont font)
     guicolor_T
 gui_mch_get_color(char_u *name)
 {
-    int i;
+    পূর্ণাঙ্ক i;
 
-    typedef struct SysColorTable
+    প্রকারনির্দেশ সংরচনা SysColorTable
     {
-	char	    *name;
-	int	    color;
+	ৱর্ণ	    *name;
+	পূর্ণাঙ্ক	    color;
     } SysColorTable;
 
-    static SysColorTable sys_table[] =
+    স্থির SysColorTable sys_table[] =
     {
 	{"SYS_3DDKSHADOW", COLOR_3DDKSHADOW},
 	{"SYS_3DHILIGHT", COLOR_3DHILIGHT},
@@ -2029,71 +2029,71 @@ gui_mch_get_color(char_u *name)
     /*
      * Try to look up a system colour.
      */
-    for (i = 0; i < (int)ARRAY_LENGTH(sys_table); i++)
-	if (STRICMP(name, sys_table[i].name) == 0)
-	    return GetSysColor(sys_table[i].color);
+    বাবে (i = 0; i < (পূর্ণাঙ্ক)ARRAY_LENGTH(sys_table); i++)
+	যদি (STRICMP(name, sys_table[i].name) == 0)
+	    ঘূৰাই GetSysColor(sys_table[i].color);
 
-    return gui_get_color_cmn(name);
+    ঘূৰাই gui_get_color_cmn(name);
 }
 
     guicolor_T
-gui_mch_get_rgb_color(int r, int g, int b)
+gui_mch_get_rgb_color(পূর্ণাঙ্ক r, পূর্ণাঙ্ক g, পূর্ণাঙ্ক b)
 {
-    return gui_get_rgb_color_cmn(r, g, b);
+    ঘূৰাই gui_get_rgb_color_cmn(r, g, b);
 }
 
 /*
  * Return OK if the key with the termcap name "name" is supported.
  */
-    int
+    পূর্ণাঙ্ক
 gui_mch_haskey(char_u *name)
 {
-    int i;
+    পূর্ণাঙ্ক i;
 
-    for (i = 0; special_keys[i].vim_code1 != NUL; i++)
-	if (name[0] == special_keys[i].vim_code0
-				       && name[1] == special_keys[i].vim_code1)
-	    return OK;
-    return FAIL;
+    বাবে (i = 0; special_চাবিগুলি[i].vim_code1 != NUL; i++)
+	যদি (name[0] == special_চাবিগুলি[i].vim_code0
+				       && name[1] == special_চাবিগুলি[i].vim_code1)
+	    ঘূৰাই OK;
+    ঘূৰাই FAIL;
 }
 
-    void
-gui_mch_beep(void)
+    শূন্য
+gui_mch_beep(শূন্য)
 {
     MessageBeep((UINT)-1);
 }
 /*
  * Invert a rectangle from row r, column c, for nr rows and nc columns.
  */
-    void
+    শূন্য
 gui_mch_invert_rectangle(
-    int	    r,
-    int	    c,
-    int	    nr,
-    int	    nc)
+    পূর্ণাঙ্ক	    r,
+    পূর্ণাঙ্ক	    c,
+    পূর্ণাঙ্ক	    nr,
+    পূর্ণাঙ্ক	    nc)
 {
     RECT    rc;
 
-#if defined(FEAT_DIRECTX)
-    if (IS_ENABLE_DIRECTX())
+#যদি defined(FEAT_DIRECTX)
+    যদি (IS_ENABLE_DIRECTX())
 	DWriteContext_Flush(s_dwc);
 #endif
 
     /*
      * Note: InvertRect() excludes right and bottom of rectangle.
      */
-    rc.left = FILL_X(c);
-    rc.top = FILL_Y(r);
-    rc.right = rc.left + nc * gui.char_width;
-    rc.bottom = rc.top + nr * gui.char_height;
+    rc.বাম = FILL_X(c);
+    rc.শীৰ্ষ = FILL_Y(r);
+    rc.ডান = rc.বাম + nc * gui.char_width;
+    rc.bottom = rc.শীৰ্ষ + nr * gui.char_height;
     InvertRect(s_hdc, &rc);
 }
 
 /*
  * Iconify the GUI window.
  */
-    void
-gui_mch_iconify(void)
+    শূন্য
+gui_mch_iconify(শূন্য)
 {
     ShowWindow(s_hwnd, SW_MINIMIZE);
 }
@@ -2101,26 +2101,26 @@ gui_mch_iconify(void)
 /*
  * Draw a cursor without focus.
  */
-    void
+    শূন্য
 gui_mch_draw_hollow_cursor(guicolor_T color)
 {
     HBRUSH  hbr;
     RECT    rc;
 
-#if defined(FEAT_DIRECTX)
-    if (IS_ENABLE_DIRECTX())
+#যদি defined(FEAT_DIRECTX)
+    যদি (IS_ENABLE_DIRECTX())
 	DWriteContext_Flush(s_dwc);
 #endif
 
     /*
      * Note: FrameRect() excludes right and bottom of rectangle.
      */
-    rc.left = FILL_X(gui.col);
-    rc.top = FILL_Y(gui.row);
-    rc.right = rc.left + gui.char_width;
-    if (mb_lefthalve(gui.row, gui.col))
-	rc.right += gui.char_width;
-    rc.bottom = rc.top + gui.char_height;
+    rc.বাম = FILL_X(gui.col);
+    rc.শীৰ্ষ = FILL_Y(gui.row);
+    rc.ডান = rc.বাম + gui.char_width;
+    যদি (mb_lefthalve(gui.row, gui.col))
+	rc.ডান += gui.char_width;
+    rc.bottom = rc.শীৰ্ষ + gui.char_height;
     hbr = CreateSolidBrush(color);
     FrameRect(s_hdc, &rc, hbr);
     DeleteBrush(hbr);
@@ -2129,10 +2129,10 @@ gui_mch_draw_hollow_cursor(guicolor_T color)
  * Draw part of a cursor, "w" pixels wide, and "h" pixels high, using
  * color "color".
  */
-    void
+    শূন্য
 gui_mch_draw_part_cursor(
-    int		w,
-    int		h,
+    পূর্ণাঙ্ক		w,
+    পূর্ণাঙ্ক		h,
     guicolor_T	color)
 {
     RECT	rc;
@@ -2140,17 +2140,17 @@ gui_mch_draw_part_cursor(
     /*
      * Note: FillRect() excludes right and bottom of rectangle.
      */
-    rc.left =
+    rc.বাম =
 #ifdef FEAT_RIGHTLEFT
 		// vertical line should be on the right of current point
-		CURSOR_BAR_RIGHT ? FILL_X(gui.col + 1) - w :
+		CURSOR_BAR_ডান ? FILL_X(gui.col + 1) - w :
 #endif
 		    FILL_X(gui.col);
-    rc.top = FILL_Y(gui.row) + gui.char_height - h;
-    rc.right = rc.left + w;
-    rc.bottom = rc.top + h;
+    rc.শীৰ্ষ = FILL_Y(gui.row) + gui.char_height - h;
+    rc.ডান = rc.বাম + w;
+    rc.bottom = rc.শীৰ্ষ + h;
 
-    fill_rect(&rc, NULL, color);
+    fill_rect(&rc, রিক্ত, color);
 }
 
 
@@ -2158,57 +2158,57 @@ gui_mch_draw_part_cursor(
  * Generates a VK_SPACE when the internal dead_key flag is set to output the
  * dead key's nominal character and re-post the original message.
  */
-    static void
-outputDeadKey_rePost_Ex(MSG originalMsg, int dead_key2set)
+    স্থির শূন্য
+output_Dead_চাবি_re_Post_Ex(বাৰ্তা_2 original_বাৰ্তা, পূর্ণাঙ্ক dead_key2set)
 {
-    static MSG deadCharExpel;
+    স্থির বাৰ্তা_2 deadCharExpel;
 
-    if (dead_key == DEAD_KEY_OFF)
-	return;
+    যদি (dead_চাবি == DEAD_চাবি_OFF)
+	ঘূৰাই;
 
-    dead_key = dead_key2set;
+    dead_চাবি = dead_key2set;
 
     // Make Windows generate the dead key's character
-    deadCharExpel.message = originalMsg.message;
-    deadCharExpel.hwnd    = originalMsg.hwnd;
+    deadCharExpel.message = original_বাৰ্তা.message;
+    deadCharExpel.hwnd    = original_বাৰ্তা.hwnd;
     deadCharExpel.wParam  = VK_SPACE;
 
     TranslateMessage(&deadCharExpel);
 
     // re-generate the current character free of the dead char influence
-    PostMessage(originalMsg.hwnd, originalMsg.message, originalMsg.wParam,
-							  originalMsg.lParam);
+    PostMessage(original_বাৰ্তা.hwnd, original_বাৰ্তা.message, original_বাৰ্তা.wParam,
+							  original_বাৰ্তা.lParam);
 }
 
 /*
  * Wrapper for outputDeadKey_rePost_Ex which always reset dead_key value.
  */
-    static void
-outputDeadKey_rePost(MSG originalMsg)
+    স্থির শূন্য
+output_Dead_চাবি_re_Post(বাৰ্তা_2 original_বাৰ্তা)
 {
-    outputDeadKey_rePost_Ex(originalMsg, DEAD_KEY_OFF);
+    output_Dead_চাবি_re_Post_Ex(original_বাৰ্তা, DEAD_চাবি_OFF);
 }
 
 /*
  * Refactored out part of process_message(), responsible for
  * handling the case of "not a special key"
  */
-static void process_message_usual_key(UINT vk, const MSG *pmsg)
+স্থির শূন্য process_message_usual_চাবি(UINT vk, ধ্রুৱ বাৰ্তা_2 *pmsg)
 {
     // marshal to corresponding implementation
-    keycode_trans_strategy_used->ptr_process_message_usual_key(vk, pmsg);
+    keycode_trans_strategy_used->ptr_process_message_usual_চাবি(vk, pmsg);
 }
 
 /*
  * Experimental implementation, introduced in v8.2.4807
  * "processing key event in Win32 GUI is not ideal"
  */
-    static void
-process_message_usual_key_experimental(UINT vk, const MSG *pmsg)
+    স্থির শূন্য
+process_message_usual_চাবি_experimental(UINT vk, ধ্রুৱ বাৰ্তা_2 *pmsg)
 {
     WCHAR	ch[8];
-    int		len;
-    int		i;
+    পূর্ণাঙ্ক		len;
+    পূর্ণাঙ্ক		i;
     UINT	scan_code;
     BYTE	keyboard_state[256];
 
@@ -2216,13 +2216,13 @@ process_message_usual_key_experimental(UINT vk, const MSG *pmsg)
     // really care about the presence of Ctrl/Alt as those modifiers are
     // handled by Vim separately.
     memset(keyboard_state, 0, 256);
-    if (GetKeyState(VK_SHIFT) & 0x8000)
+    যদি (Get_চাবি_State(VK_SHIFT) & 0x8000)
 	keyboard_state[VK_SHIFT] = 0x80;
-    if (GetKeyState(VK_CAPITAL) & 0x0001)
+    যদি (Get_চাবি_State(VK_CAPITAL) & 0x0001)
 	keyboard_state[VK_CAPITAL] = 0x01;
     // Alt-Gr is synthesized as Alt + Ctrl.
-    if ((GetKeyState(VK_RMENU) & 0x8000)
-				 && (GetKeyState(VK_CONTROL) & 0x8000))
+    যদি ((Get_চাবি_State(VK_RMENU) & 0x8000)
+				 && (Get_চাবি_State(VK_CONTROL) & 0x8000))
     {
 	keyboard_state[VK_MENU] = 0x80;
 	keyboard_state[VK_CONTROL] = 0x80;
@@ -2230,32 +2230,32 @@ process_message_usual_key_experimental(UINT vk, const MSG *pmsg)
 
     // Translate the virtual key according to the current keyboard
     // layout.
-    scan_code = MapVirtualKey(vk, MAPVK_VK_TO_VSC);
+    scan_code = Map_Virtual_চাবি(vk, MAPVK_VK_TO_VSC);
     // Convert the scan-code into a sequence of zero or more unicode
     // codepoints.
     // If this is a dead key ToUnicode returns a negative value.
     len = ToUnicode(vk, scan_code, keyboard_state, ch, ARRAY_LENGTH(ch),
 	    0);
-    if (len < 0)
-	dead_key = DEAD_KEY_SET_DEFAULT;
+    যদি (len < 0)
+	dead_চাবি = DEAD_চাবি_SET_DEFAULT;
 
-    if (len <= 0)
+    যদি (len <= 0)
     {
-	int wm_char = NUL;
+	পূর্ণাঙ্ক wm_char = NUL;
 
-	if (dead_key == DEAD_KEY_SET_DEFAULT
-		&& (GetKeyState(VK_CONTROL) & 0x8000))
+	যদি (dead_চাবি == DEAD_চাবি_SET_DEFAULT
+		&& (Get_চাবি_State(VK_CONTROL) & 0x8000))
 	{
-	    if (   // AZERTY CTRL+dead_circumflex
+	    যদি (   // AZERTY CTRL+dead_circumflex
 		   (vk == 221 && scan_code == 26)
 		   // QWERTZ CTRL+dead_circumflex
 		|| (vk == 220 && scan_code == 41))
 		wm_char = '[';
-	    if (   // QWERTZ CTRL+dead_two-overdots
+	    যদি (   // QWERTZ CTRL+dead_two-overdots
 		   (vk == 192 && scan_code == 27))
 		wm_char = ']';
 	}
-	if (wm_char != NUL)
+	যদি (wm_char != NUL)
 	{
 	    // post WM_CHAR='[' - which will be interpreted with CTRL
 	    // still hold as ESC
@@ -2263,20 +2263,20 @@ process_message_usual_key_experimental(UINT vk, const MSG *pmsg)
 	    // ask _OnChar() to not touch this state, wait for next key
 	    // press and maintain knowledge that we are "poisoned" with
 	    // "dead state"
-	    dead_key = DEAD_KEY_TRANSIENT_IN_ON_CHAR;
+	    dead_চাবি = DEAD_চাবি_TRANSIENT_IN_ON_CHAR;
 	}
-	return;
+	ঘূৰাই;
     }
 
     // Post the message as TranslateMessage would do.
-    if (pmsg->message == WM_KEYDOWN)
+    যদি (pmsg->message == WM_KEYDOWN)
     {
-	for (i = 0; i < len; i++)
+	বাবে (i = 0; i < len; i++)
 	    PostMessageW(pmsg->hwnd, WM_CHAR, ch[i], pmsg->lParam);
     }
-    else
+    অন্যথা
     {
-	for (i = 0; i < len; i++)
+	বাবে (i = 0; i < len; i++)
 	    PostMessageW(pmsg->hwnd, WM_SYSCHAR, ch[i], pmsg->lParam);
     }
 }
@@ -2284,41 +2284,41 @@ process_message_usual_key_experimental(UINT vk, const MSG *pmsg)
 /*
  * "Classic" implementation, existing prior to v8.2.4807
  */
-    static void
-process_message_usual_key_classic(UINT vk, const MSG *pmsg)
+    স্থির শূন্য
+process_message_usual_চাবি_classic(UINT vk, ধ্রুৱ বাৰ্তা_2 *pmsg)
 {
     char_u	string[40];
 
     // Some keys need C-S- where they should only need C-.
     // Ignore 0xff, Windows XP sends it when NUMLOCK has changed since
     // system startup (Helmut Stiegler, 2003 Oct 3).
-    if (vk != 0xff
-	    && (GetKeyState(VK_CONTROL) & 0x8000)
-	    && !(GetKeyState(VK_SHIFT) & 0x8000)
-	    && !(GetKeyState(VK_MENU) & 0x8000))
+    যদি (vk != 0xff
+	    && (Get_চাবি_State(VK_CONTROL) & 0x8000)
+	    && !(Get_চাবি_State(VK_SHIFT) & 0x8000)
+	    && !(Get_চাবি_State(VK_MENU) & 0x8000))
     {
 	// CTRL-6 is '^'; Japanese keyboard maps '^' to vk == 0xDE
-	if (vk == '6' || MapVirtualKey(vk, 2) == (UINT)'^')
+	যদি (vk == '6' || Map_Virtual_চাবি(vk, 2) == (UINT)'^')
 	{
 	    string[0] = Ctrl_HAT;
-	    add_to_input_buf(string, 1);
+	    add_to_প্ৰবেশ_buf(string, 1);
 	}
 	// vk == 0xBD AZERTY for CTRL-'-', but CTRL-[ for * QWERTY!
-	else if (vk == 0xBD)	// QWERTY for CTRL-'-'
+	অন্যথা যদি (vk == 0xBD)	// QWERTY for CTRL-'-'
 	{
 	    string[0] = Ctrl__;
-	    add_to_input_buf(string, 1);
+	    add_to_প্ৰবেশ_buf(string, 1);
 	}
 	// CTRL-2 is '@'; Japanese keyboard maps '@' to vk == 0xC0
-	else if (vk == '2' || MapVirtualKey(vk, 2) == (UINT)'@')
+	অন্যথা যদি (vk == '2' || Map_Virtual_চাবি(vk, 2) == (UINT)'@')
 	{
 	    string[0] = Ctrl_AT;
-	    add_to_input_buf(string, 1);
+	    add_to_প্ৰবেশ_buf(string, 1);
 	}
-	else
+	অন্যথা
 	    TranslateMessage(pmsg);
     }
-    else
+    অন্যথা
 	TranslateMessage(pmsg);
 }
 
@@ -2326,55 +2326,55 @@ process_message_usual_key_classic(UINT vk, const MSG *pmsg)
  * Process a single Windows message.
  * If one is not available we hang until one is.
  */
-    static void
-process_message(void)
+    স্থির শূন্য
+process_message(শূন্য)
 {
-    MSG		msg;
+    বাৰ্তা_2		বাৰ্তা;
     UINT	vk = 0;		// Virtual key
     char_u	string[40];
-    int		i;
-    int		modifiers = 0;
-    int		key;
+    পূর্ণাঙ্ক		i;
+    পূর্ণাঙ্ক		modifiers = 0;
+    পূর্ণাঙ্ক		চাবি;
 #ifdef FEAT_MENU
-    static char_u k10[] = {K_SPECIAL, 'k', ';', 0};
+    স্থির char_u k10[] = {K_SPECIAL, 'k', ';', 0};
 #endif
-    static int  keycode_trans_strategy_initialized = 0;
+    স্থির পূর্ণাঙ্ক  keycode_trans_strategy_initialized = 0;
 
     // lazy initialize - first time only
-    if (!keycode_trans_strategy_initialized)
+    যদি (!keycode_trans_strategy_initialized)
     {
 	keycode_trans_strategy_initialized = 1;
 	keycode_trans_strategy_init();
     }
 
-    GetMessageW(&msg, NULL, 0, 0);
+    GetMessageW(&বাৰ্তা, রিক্ত, 0, 0);
 
 #ifdef FEAT_OLE
     // Look after OLE Automation commands
-    if (msg.message == WM_OLE)
+    যদি (বাৰ্তা.message == WM_OLE)
     {
-	char_u *str = (char_u *)msg.lParam;
-	if (str == NULL || *str == NUL)
+	char_u *str = (char_u *)বাৰ্তা.lParam;
+	যদি (str == রিক্ত || *str == NUL)
 	{
 	    // Message can't be ours, forward it.  Fixes problem with Ultramon
 	    // 3.0.4
-	    DispatchMessageW(&msg);
+	    DispatchMessageW(&বাৰ্তা);
 	}
-	else
+	অন্যথা
 	{
-	    add_to_input_buf(str, (int)STRLEN(str));
+	    add_to_প্ৰবেশ_buf(str, (পূর্ণাঙ্ক)STRLEN(str));
 	    vim_free(str);  // was allocated in CVim::SendKeys()
 	}
-	return;
+	ঘূৰাই;
     }
 #endif
 
 #ifdef MSWIN_FIND_REPLACE
     // Don't process messages used by the dialog
-    if (s_findrep_hwnd != NULL && IsDialogMessageW(s_findrep_hwnd, &msg))
+    যদি (s_findrep_hwnd != রিক্ত && IsDialogMessageW(s_findrep_hwnd, &বাৰ্তা))
     {
-	HandleMouseHide(msg.message, msg.lParam);
-	return;
+	HandleMouseHide(বাৰ্তা.message, বাৰ্তা.lParam);
+	ঘূৰাই;
     }
 #endif
 
@@ -2382,9 +2382,9 @@ process_message(void)
      * Check if it's a special key that we recognise.  If not, call
      * TranslateMessage().
      */
-    if (msg.message == WM_KEYDOWN || msg.message == WM_SYSKEYDOWN)
+    যদি (বাৰ্তা.message == WM_KEYDOWN || বাৰ্তা.message == WM_SYSKEYDOWN)
     {
-	vk = (int) msg.wParam;
+	vk = (পূর্ণাঙ্ক) বাৰ্তা.wParam;
 
 	/*
 	 * Handle dead keys in special conditions in other cases we let Windows
@@ -2405,13 +2405,13 @@ process_message(void)
 	 * We are at the moment after WM_CHAR with DEAD_KEY_SKIP_ON_CHAR event
 	 * was handled by _WndProc, this keypress we want to process normally
 	 */
-	if (keycode_trans_strategy_used->is_experimental()
-		&& dead_key == DEAD_KEY_SKIP_ON_CHAR)
+	যদি (keycode_trans_strategy_used->is_experimental()
+		&& dead_চাবি == DEAD_চাবি_SKIP_ON_CHAR)
 	{
-	    dead_key = DEAD_KEY_OFF;
+	    dead_চাবি = DEAD_চাবি_OFF;
 	}
 
-	if (dead_key != DEAD_KEY_OFF)
+	যদি (dead_চাবি != DEAD_চাবি_OFF)
 	{
 	    /*
 	     * Expel the dead key pressed with Ctrl in a special way.
@@ -2431,18 +2431,18 @@ process_message(void)
 	     * outputDeadKey_rePost() since we do not wish to reset dead_key
 	     * value.
 	     */
-	    if (keycode_trans_strategy_used->is_experimental() &&
-		    dead_key == DEAD_KEY_TRANSIENT_IN_ON_CHAR)
+	    যদি (keycode_trans_strategy_used->is_experimental() &&
+		    dead_চাবি == DEAD_চাবি_TRANSIENT_IN_ON_CHAR)
 	    {
-		outputDeadKey_rePost_Ex(msg,
-				       /*dead_key2set=*/DEAD_KEY_SKIP_ON_CHAR);
-		return;
+		output_Dead_চাবি_re_Post_Ex(বাৰ্তা,
+				       /*dead_key2set=*/DEAD_চাবি_SKIP_ON_CHAR);
+		ঘূৰাই;
 	    }
 
-	    if (dead_key != DEAD_KEY_SET_DEFAULT)
+	    যদি (dead_চাবি != DEAD_চাবি_SET_DEFAULT)
 	    {
 		// should never happen - is there a way to make ASSERT here?
-		return;
+		ঘূৰাই;
 	    }
 
 	    /*
@@ -2457,44 +2457,44 @@ process_message(void)
 	     * char and VK_BACK or VK_ESCAPE. That is most likely what the
 	     * user expects.
 	     */
-	    if ((vk == VK_SPACE || vk == VK_BACK || vk == VK_ESCAPE))
+	    যদি ((vk == VK_SPACE || vk == VK_BACK || vk == VK_ESCAPE))
 	    {
-		dead_key = DEAD_KEY_OFF;
-		TranslateMessage(&msg);
-		return;
+		dead_চাবি = DEAD_চাবি_OFF;
+		TranslateMessage(&বাৰ্তা);
+		ঘূৰাই;
 	    }
 	    // In modes where we are not typing, dead keys should behave
 	    // normally
-	    else if ((get_real_state()
-			    & (MODE_INSERT | MODE_CMDLINE | MODE_SELECT)) == 0)
+	    অন্যথা যদি ((get_real_state()
+			    & (MODE_ঢোকাও | MODE_CMDLINE | MODE_SELECT)) == 0)
 	    {
-		outputDeadKey_rePost(msg);
-		return;
+		output_Dead_চাবি_re_Post(বাৰ্তা);
+		ঘূৰাই;
 	    }
 	}
 
 	// Check for CTRL-BREAK
-	if (vk == VK_CANCEL)
+	যদি (vk == VK_CANCEL)
 	{
-	    trash_input_buf();
+	    trash_প্ৰবেশ_buf();
 	    got_int = TRUE;
 	    ctrl_break_was_pressed = TRUE;
 	    string[0] = Ctrl_C;
-	    add_to_input_buf(string, 1);
+	    add_to_প্ৰবেশ_buf(string, 1);
 	}
 
 	// This is an IME event or a synthetic keystroke, let Windows handle it.
-	if (vk == VK_PROCESSKEY || vk == VK_PACKET)
+	যদি (vk == VK_PROCESSKEY || vk == VK_PACKET)
 	{
-	    TranslateMessage(&msg);
-	    return;
+	    TranslateMessage(&বাৰ্তা);
+	    ঘূৰাই;
 	}
 
-	for (i = 0; special_keys[i].key_sym != 0; i++)
+	বাবে (i = 0; special_চাবিগুলি[i].চাবি_sym != 0; i++)
 	{
 	    // ignore VK_SPACE when ALT key pressed: system menu
-	    if (special_keys[i].key_sym == vk
-		    && (vk != VK_SPACE || !(GetKeyState(VK_MENU) & 0x8000)))
+	    যদি (special_চাবিগুলি[i].চাবি_sym == vk
+		    && (vk != VK_SPACE || !(Get_চাবি_State(VK_MENU) & 0x8000)))
 	    {
 		/*
 		 * Behave as expected if we have a dead key and the special key
@@ -2502,83 +2502,83 @@ process_message(void)
 		 * character output (such as a NUMPAD printable character or
 		 * the TAB key, etc...).
 		 */
-		if (dead_key == DEAD_KEY_SET_DEFAULT
-			&& (special_keys[i].vim_code0 == 'K'
+		যদি (dead_চাবি == DEAD_চাবি_SET_DEFAULT
+			&& (special_চাবিগুলি[i].vim_code0 == 'K'
 						|| vk == VK_TAB || vk == CAR))
 		{
-		    outputDeadKey_rePost(msg);
-		    return;
+		    output_Dead_চাবি_re_Post(বাৰ্তা);
+		    ঘূৰাই;
 		}
 
 #ifdef FEAT_MENU
 		// Check for <F10>: Windows selects the menu.  When <F10> is
 		// mapped we want to use the mapping instead.
-		if (vk == VK_F10
+		যদি (vk == VK_F10
 			&& gui.menu_is_active
 			&& check_map(k10, State, FALSE, TRUE, FALSE,
-							  NULL, NULL) == NULL)
-		    break;
+							  রিক্ত, রিক্ত) == রিক্ত)
+		    ভঙ্গ;
 #endif
 		modifiers = get_active_modifiers_via_ptr();
 
-		if (special_keys[i].vim_code1 == NUL)
-		    key = special_keys[i].vim_code0;
-		else
-		    key = TO_SPECIAL(special_keys[i].vim_code0,
-						   special_keys[i].vim_code1);
-		key = simplify_key(key, &modifiers);
-		if (key == CSI)
-		    key = K_CSI;
+		যদি (special_চাবিগুলি[i].vim_code1 == NUL)
+		    চাবি = special_চাবিগুলি[i].vim_code0;
+		অন্যথা
+		    চাবি = TO_SPECIAL(special_চাবিগুলি[i].vim_code0,
+						   special_চাবিগুলি[i].vim_code1);
+		চাবি = simplify_চাবি(চাবি, &modifiers);
+		যদি (চাবি == CSI)
+		    চাবি = K_CSI;
 
-		if (modifiers)
+		যদি (modifiers)
 		{
 		    string[0] = CSI;
 		    string[1] = KS_MODIFIER;
 		    string[2] = modifiers;
-		    add_to_input_buf(string, 3);
+		    add_to_প্ৰবেশ_buf(string, 3);
 		}
 
-		if (IS_SPECIAL(key))
+		যদি (IS_SPECIAL(চাবি))
 		{
 		    string[0] = CSI;
-		    string[1] = K_SECOND(key);
-		    string[2] = K_THIRD(key);
-		    add_to_input_buf(string, 3);
+		    string[1] = K_SECOND(চাবি);
+		    string[2] = K_THIRD(চাবি);
+		    add_to_প্ৰবেশ_buf(string, 3);
 		}
-		else
+		অন্যথা
 		{
-		    int	len;
+		    পূর্ণাঙ্ক	len;
 
 		    // Handle "key" as a Unicode character.
-		    len = char_to_string(key, string, 40, FALSE);
-		    add_to_input_buf(string, len);
+		    len = char_to_string(চাবি, string, 40, FALSE);
+		    add_to_প্ৰবেশ_buf(string, len);
 		}
-		break;
+		ভঙ্গ;
 	    }
 	}
 
 	// Not a special key.
-	if (special_keys[i].key_sym == 0)
+	যদি (special_চাবিগুলি[i].চাবি_sym == 0)
 	{
-	    process_message_usual_key(vk, &msg);
+	    process_message_usual_চাবি(vk, &বাৰ্তা);
 	}
     }
 #ifdef FEAT_MBYTE_IME
-    else if (msg.message == WM_IME_NOTIFY)
-	_OnImeNotify(msg.hwnd, (DWORD)msg.wParam, (DWORD)msg.lParam);
-    else if (msg.message == WM_KEYUP && im_get_status())
+    অন্যথা যদি (বাৰ্তা.message == WM_IME_NOTIFY)
+	_OnImeNotify(বাৰ্তা.hwnd, (DWORD)বাৰ্তা.wParam, (DWORD)বাৰ্তা.lParam);
+    অন্যথা যদি (বাৰ্তা.message == WM_KEYUP && im_get_status())
 	// added for non-MS IME (Yasuhiro Matsumoto)
-	TranslateMessage(&msg);
+	TranslateMessage(&বাৰ্তা);
 #endif
 
 #ifdef FEAT_MENU
     // Check for <F10>: Default effect is to select the menu.  When <F10> is
     // mapped we need to stop it here to avoid strange effects (e.g., for the
     // key-up event)
-    if (vk != VK_F10 || check_map(k10, State, FALSE, TRUE, FALSE,
-							  NULL, NULL) == NULL)
+    যদি (vk != VK_F10 || check_map(k10, State, FALSE, TRUE, FALSE,
+							  রিক্ত, রিক্ত) == রিক্ত)
 #endif
-	DispatchMessageW(&msg);
+	DispatchMessageW(&বাৰ্তা);
 }
 
 /*
@@ -2587,28 +2587,28 @@ process_message(void)
  * nothing in the event queue (& no timers pending), then we return
  * immediately.
  */
-    void
-gui_mch_update(void)
+    শূন্য
+gui_mch_update(শূন্য)
 {
-    MSG	    msg;
+    বাৰ্তা_2	    বাৰ্তা;
 
-    if (!s_busy_processing)
-	while (PeekMessageW(&msg, NULL, 0, 0, PM_NOREMOVE)
-						  && !vim_is_input_buf_full())
+    যদি (!s_busy_processing)
+	যেতিয়ালৈ (PeekMessageW(&বাৰ্তা, রিক্ত, 0, 0, PM_NOREMOVE)
+						  && !vim_is_প্ৰবেশ_buf_full())
 	    process_message();
 }
 
-    static void
-remove_any_timer(void)
+    স্থির শূন্য
+remove_any_timer(শূন্য)
 {
-    MSG		msg;
+    বাৰ্তা_2		বাৰ্তা;
 
-    if (s_wait_timer != 0 && !s_timed_out)
+    যদি (s_wait_timer != 0 && !s_timed_out)
     {
-	KillTimer(NULL, s_wait_timer);
+	KillTimer(রিক্ত, s_wait_timer);
 
 	// Eat spurious WM_TIMER messages
-	while (PeekMessageW(&msg, s_hwnd, WM_TIMER, WM_TIMER, PM_REMOVE))
+	যেতিয়ালৈ (PeekMessageW(&বাৰ্তা, s_hwnd, WM_TIMER, WM_TIMER, PM_REMOVE))
 	    ;
 	s_wait_timer = 0;
     }
@@ -2618,16 +2618,16 @@ remove_any_timer(void)
 // A client message may be handled re-entrantly, e.g. during a redraw while a
 // command line is being read; inserting the keys into the typeahead buffer
 // then corrupts it. Store them here until a safe point.
-static garray_T	server_pending_ga = {0, 0, 0, 0, NULL};
+স্থির garray_T	server_pending_ga = {0, 0, 0, 0, রিক্ত};
 
 /*
  * Store keys received from a client, to be inserted into the typeahead buffer
  * later by server_flush_input().
  */
-    void
-server_add_input(char_u *str)
+    শূন্য
+server_add_প্ৰবেশ(char_u *str)
 {
-    if (server_pending_ga.ga_data == NULL)
+    যদি (server_pending_ga.ga_data == রিক্ত)
 	ga_init2(&server_pending_ga, 1, 200);
     ga_concat(&server_pending_ga, str);
 }
@@ -2637,18 +2637,18 @@ server_add_input(char_u *str)
  * buffer is empty, so that they are not mixed into a command that is currently
  * being read.
  */
-    static void
-server_flush_input(void)
+    স্থির শূন্য
+server_flush_প্ৰবেশ(শূন্য)
 {
     char_u  *str;
 
-    if (server_pending_ga.ga_len == 0 || typebuf.tb_len != 0)
-	return;
+    যদি (server_pending_ga.ga_len == 0 || typebuf.tb_len != 0)
+	ঘূৰাই;
     str = vim_strnsave(server_pending_ga.ga_data, server_pending_ga.ga_len);
     server_pending_ga.ga_len = 0;
-    if (str != NULL)
+    যদি (str != রিক্ত)
     {
-	server_to_input_buf(str);
+	server_to_প্ৰবেশ_buf(str);
 	vim_free(str);
     }
 }
@@ -2663,42 +2663,42 @@ server_flush_input(void)
  * Returns OK if a character was found to be available within the given time,
  * or FAIL otherwise.
  */
-    int
+    পূর্ণাঙ্ক
 gui_mch_wait_for_chars(long wtime)
 {
-    int		focus;
+    পূর্ণাঙ্ক		focus;
 
     s_timed_out = FALSE;
 
-    if (wtime >= 0)
+    যদি (wtime >= 0)
     {
 	// Don't do anything while processing a (scroll) message.
-	if (s_busy_processing)
-	    return FAIL;
+	যদি (s_busy_processing)
+	    ঘূৰাই FAIL;
 
 	// When called with "wtime" zero, just want one msec.
-	s_wait_timer = SetTimer(NULL, 0, (UINT)(wtime == 0 ? 1 : wtime),
+	s_wait_timer = SetTimer(রিক্ত, 0, (UINT)(wtime == 0 ? 1 : wtime),
 								_OnTimer);
     }
 
     allow_scrollbar = TRUE;
 
     focus = gui.in_focus;
-    while (!s_timed_out)
+    যেতিয়ালৈ (!s_timed_out)
     {
 	// Stop or start blinking when focus changes
-	if (gui.in_focus != focus)
+	যদি (gui.in_focus != focus)
 	{
-	    if (gui.in_focus)
+	    যদি (gui.in_focus)
 		gui_mch_start_blink();
-	    else
+	    অন্যথা
 		gui_mch_stop_blink(TRUE);
 	    focus = gui.in_focus;
 	}
 
-	if (s_need_activate)
+	যদি (s_need_activate)
 	{
-	    (void)SetForegroundWindow(s_hwnd);
+	    (শূন্য)SetForegroundWindow(s_hwnd);
 	    s_need_activate = FALSE;
 	}
 
@@ -2707,33 +2707,33 @@ gui_mch_wait_for_chars(long wtime)
 #endif
 #ifdef MESSAGE_QUEUE
 	// Check channel I/O while waiting for a message.
-	for (;;)
+	বাবে (;;)
 	{
-	    MSG msg;
+	    বাৰ্তা_2 বাৰ্তা;
 
 	    parse_queued_messages();
 # ifdef FEAT_CLIENTSERVER
 	    // Insert keys from a client that were postponed to this safe point.
-	    server_flush_input();
+	    server_flush_প্ৰবেশ();
 # endif
 # ifdef FEAT_TIMERS
-	    if (did_add_timer)
-		break;
+	    যদি (did_add_timer)
+		ভঙ্গ;
 # endif
-	    if (PeekMessageW(&msg, NULL, 0, 0, PM_NOREMOVE))
+	    যদি (PeekMessageW(&বাৰ্তা, রিক্ত, 0, 0, PM_NOREMOVE))
 	    {
 		process_message();
-		break;
+		ভঙ্গ;
 	    }
-	    else if (input_available()
+	    অন্যথা যদি (প্ৰবেশ_available()
 		    // TODO: The 10 msec is a compromise between laggy response
 		    // and consuming more CPU time.  Better would be to handle
 		    // channel messages when they arrive.
-		    || MsgWaitForMultipleObjects(0, NULL, FALSE, 10,
+		    || বাৰ্তা_Wait_For_Multiple_Objects(0, রিক্ত, FALSE, 10,
 						  QS_ALLINPUT) != WAIT_TIMEOUT)
-		break;
+		ভঙ্গ;
 	}
-#else
+#অন্যথা
 	// Don't use gui_mch_update() because then we will spin-lock until a
 	// char arrives, instead we use GetMessage() to hang until an
 	// event arrives.  No need to check for input_buf_full because we are
@@ -2741,7 +2741,7 @@ gui_mch_wait_for_chars(long wtime)
 	process_message();
 #endif
 
-	if (input_available())
+	যদি (প্ৰবেশ_available())
 	{
 	    remove_any_timer();
 	    allow_scrollbar = FALSE;
@@ -2749,35 +2749,35 @@ gui_mch_wait_for_chars(long wtime)
 	    // Clear pending mouse button, the release event may have been
 	    // taken by the dialog window.  But don't do this when getting
 	    // focus, we need the mouse-up event then.
-	    if (!s_getting_focus)
+	    যদি (!s_getting_focus)
 		s_button_pending = -1;
 
-	    return OK;
+	    ঘূৰাই OK;
 	}
 
 #ifdef FEAT_TIMERS
-	if (did_add_timer)
+	যদি (did_add_timer)
 	{
 	    // Need to recompute the waiting time.
 	    remove_any_timer();
-	    break;
+	    ভঙ্গ;
 	}
 #endif
     }
     allow_scrollbar = FALSE;
-    return FAIL;
+    ঘূৰাই FAIL;
 }
 
 /*
  * Clear a rectangular region of the screen from text pos (row1, col1) to
  * (row2, col2) inclusive.
  */
-    void
+    শূন্য
 gui_mch_clear_block(
-    int		row1,
-    int		col1,
-    int		row2,
-    int		col2)
+    পূর্ণাঙ্ক		row1,
+    পূর্ণাঙ্ক		col1,
+    পূর্ণাঙ্ক		row2,
+    পূর্ণাঙ্ক		col2)
 {
     RECT	rc;
 
@@ -2786,9 +2786,9 @@ gui_mch_clear_block(
      * spilled over to the window border.
      * Note: FillRect() excludes right and bottom of rectangle.
      */
-    rc.left = FILL_X(col1);
-    rc.top = FILL_Y(row1);
-    rc.right = FILL_X(col2 + 1) + (col2 == Columns - 1);
+    rc.বাম = FILL_X(col1);
+    rc.শীৰ্ষ = FILL_Y(row1);
+    rc.ডান = FILL_X(col2 + 1) + (col2 == Columns - 1);
     rc.bottom = FILL_Y(row2 + 1);
     clear_rect(&rc);
 }
@@ -2796,14 +2796,14 @@ gui_mch_clear_block(
 /*
  * Clear the whole text window.
  */
-    void
-gui_mch_clear_all(void)
+    শূন্য
+gui_mch_clear_all(শূন্য)
 {
     RECT    rc;
 
-    rc.left = 0;
-    rc.top = 0;
-    rc.right = Columns * gui.char_width + 2 * gui.border_width;
+    rc.বাম = 0;
+    rc.শীৰ্ষ = 0;
+    rc.ডান = Columns * gui.char_width + 2 * gui.border_width;
     rc.bottom = Rows * gui.char_height + 2 * gui.border_width;
     clear_rect(&rc);
 }
@@ -2811,32 +2811,32 @@ gui_mch_clear_all(void)
  * Menu stuff.
  */
 
-    void
-gui_mch_enable_menu(int flag)
+    শূন্য
+gui_mch_enable_menu(পূর্ণাঙ্ক flag)
 {
 #ifdef FEAT_MENU
-    SetMenu(s_hwnd, flag ? s_menuBar : NULL);
+    SetMenu(s_hwnd, flag ? s_menuBar : রিক্ত);
 #endif
 }
 
-    void
+    শূন্য
 gui_mch_set_menu_pos(
-    int	    x UNUSED,
-    int	    y UNUSED,
-    int	    w UNUSED,
-    int	    h UNUSED)
+    পূর্ণাঙ্ক	    x UNUSED,
+    পূর্ণাঙ্ক	    y UNUSED,
+    পূর্ণাঙ্ক	    w UNUSED,
+    পূর্ণাঙ্ক	    h UNUSED)
 {
     // It will be in the right place anyway
 }
 
-#if defined(FEAT_MENU)
+#যদি defined(FEAT_MENU)
 /*
  * Make menu item hidden or not hidden
  */
-    void
+    শূন্য
 gui_mch_menu_hidden(
     vimmenu_T	*menu,
-    int		hidden)
+    পূর্ণাঙ্ক		hidden)
 {
     /*
      * This doesn't do what we want.  Hmm, just grey the menu items for now.
@@ -2853,8 +2853,8 @@ gui_mch_menu_hidden(
 /*
  * This is called after setting all the menus to grey/hidden or not.
  */
-    void
-gui_mch_draw_menubar(void)
+    শূন্য
+gui_mch_draw_menubar(শূন্য)
 {
     DrawMenuBar(s_hwnd);
 }
@@ -2866,72 +2866,72 @@ gui_mch_draw_menubar(void)
     guicolor_T
 gui_mch_get_rgb(guicolor_T pixel)
 {
-    return (guicolor_T)((GetRValue(pixel) << 16) + (GetGValue(pixel) << 8)
+    ঘূৰাই (guicolor_T)((GetRValue(pixel) << 16) + (GetGValue(pixel) << 8)
 							   + GetBValue(pixel));
 }
 
-#if defined(FEAT_GUI_DIALOG)
+#যদি defined(FEAT_GUI_DIALOG)
 /*
  * Convert pixels in X to dialog units
  */
-    static WORD
-PixelToDialogX(int numPixels)
+    স্থির WORD
+PixelToDialogX(পূর্ণাঙ্ক অঙ্ক_Pixels)
 {
-    return (WORD)((numPixels * 4) / s_dlgfntwidth);
+    ঘূৰাই (WORD)((অঙ্ক_Pixels * 4) / s_dlgfntwidth);
 }
 
 /*
  * Convert pixels in Y to dialog units
  */
-    static WORD
-PixelToDialogY(int numPixels)
+    স্থির WORD
+PixelToDialogY(পূর্ণাঙ্ক অঙ্ক_Pixels)
 {
-    return (WORD)((numPixels * 8) / s_dlgfntheight);
+    ঘূৰাই (WORD)((অঙ্ক_Pixels * 8) / s_dlgfntheight);
 }
 
 /*
  * Return the width in pixels of the given text in the given DC.
  */
-    static int
-GetTextWidth(HDC hdc, char_u *str, int len)
+    স্থির পূর্ণাঙ্ক
+GetTextWidth(HDC hdc, char_u *str, পূর্ণাঙ্ক len)
 {
     SIZE    size;
 
     GetTextExtentPoint(hdc, (LPCSTR)str, len, &size);
-    return size.cx;
+    ঘূৰাই size.cx;
 }
 
 /*
  * Return the width in pixels of the given text in the given DC, taking care
  * of 'encoding' to active codepage conversion.
  */
-    static int
-GetTextWidthEnc(HDC hdc, char_u *str, int len)
+    স্থির পূর্ণাঙ্ক
+GetTextWidthEnc(HDC hdc, char_u *str, পূর্ণাঙ্ক len)
 {
     SIZE	size;
     WCHAR	*wstr;
-    int		n;
-    int		wlen = len;
+    পূর্ণাঙ্ক		n;
+    পূর্ণাঙ্ক		wlen = len;
 
     wstr = enc_to_utf16(str, &wlen);
-    if (wstr == NULL)
-	return 0;
+    যদি (wstr == রিক্ত)
+	ঘূৰাই 0;
 
     n = GetTextExtentPointW(hdc, wstr, wlen, &size);
     vim_free(wstr);
-    if (n)
-	return size.cx;
-    return 0;
+    যদি (n)
+	ঘূৰাই size.cx;
+    ঘূৰাই 0;
 }
 
-static void get_work_area(RECT *spi_rect);
+স্থির শূন্য get_work_area(RECT *spi_rect);
 
 /*
  * A quick little routine that will center one window over another, handy for
  * dialog boxes.  Taken from the Win32SDK samples and modified for multiple
  * monitors.
  */
-    static BOOL
+    স্থির BOOL
 CenterWindow(
     HWND hwndChild,
     HWND hwndParent)
@@ -2939,115 +2939,115 @@ CenterWindow(
     HMONITOR	    mon;
     MONITORINFO	    moninfo;
     RECT	    rChild, rParent, rScreen;
-    int		    wChild, hChild, wParent, hParent;
-    int		    xNew, yNew;
+    পূর্ণাঙ্ক		    wChild, hChild, wParent, hParent;
+    পূর্ণাঙ্ক		    xNew, yNew;
     HDC		    hdc;
 
     GetWindowRect(hwndChild, &rChild);
-    wChild = rChild.right - rChild.left;
-    hChild = rChild.bottom - rChild.top;
+    wChild = rChild.ডান - rChild.বাম;
+    hChild = rChild.bottom - rChild.শীৰ্ষ;
 
     // If Vim is minimized put the window in the middle of the screen.
-    if (hwndParent == NULL || IsMinimized(hwndParent))
+    যদি (hwndParent == রিক্ত || IsMinimized(hwndParent))
 	get_work_area(&rParent);
-    else
+    অন্যথা
 	GetWindowRect(hwndParent, &rParent);
-    wParent = rParent.right - rParent.left;
-    hParent = rParent.bottom - rParent.top;
+    wParent = rParent.ডান - rParent.বাম;
+    hParent = rParent.bottom - rParent.শীৰ্ষ;
 
-    moninfo.cbSize = sizeof(MONITORINFO);
+    moninfo.cbSize = পরিমাণ(MONITORINFO);
     mon = MonitorFromWindow(hwndChild, MONITOR_DEFAULTTOPRIMARY);
-    if (mon != NULL && GetMonitorInfo(mon, &moninfo))
+    যদি (mon != রিক্ত && GetMonitorInfo(mon, &moninfo))
     {
 	rScreen = moninfo.rcWork;
     }
-    else
+    অন্যথা
     {
 	hdc = GetDC(hwndChild);
-	rScreen.left = 0;
-	rScreen.top = 0;
-	rScreen.right = GetDeviceCaps(hdc, HORZRES);
+	rScreen.বাম = 0;
+	rScreen.শীৰ্ষ = 0;
+	rScreen.ডান = GetDeviceCaps(hdc, HORZRES);
 	rScreen.bottom = GetDeviceCaps(hdc, VERTRES);
 	ReleaseDC(hwndChild, hdc);
     }
 
-    xNew = rParent.left + ((wParent - wChild) / 2);
-    if (xNew < rScreen.left)
-	xNew = rScreen.left;
-    else if ((xNew + wChild) > rScreen.right)
-	xNew = rScreen.right - wChild;
+    xNew = rParent.বাম + ((wParent - wChild) / 2);
+    যদি (xNew < rScreen.বাম)
+	xNew = rScreen.বাম;
+    অন্যথা যদি ((xNew + wChild) > rScreen.ডান)
+	xNew = rScreen.ডান - wChild;
 
-    yNew = rParent.top + ((hParent - hChild) / 2);
-    if (yNew < rScreen.top)
-	yNew = rScreen.top;
-    else if ((yNew + hChild) > rScreen.bottom)
+    yNew = rParent.শীৰ্ষ + ((hParent - hChild) / 2);
+    যদি (yNew < rScreen.শীৰ্ষ)
+	yNew = rScreen.শীৰ্ষ;
+    অন্যথা যদি ((yNew + hChild) > rScreen.bottom)
 	yNew = rScreen.bottom - hChild;
 
-    return SetWindowPos(hwndChild, NULL, xNew, yNew, 0, 0,
+    ঘূৰাই SetWindowPos(hwndChild, রিক্ত, xNew, yNew, 0, 0,
 						   SWP_NOSIZE | SWP_NOZORDER);
 }
 #endif // FEAT_GUI_DIALOG
 
-#if defined(FEAT_TOOLBAR)
-    void
-gui_mch_show_toolbar(int showit)
+#যদি defined(FEAT_TOOLBAR)
+    শূন্য
+gui_mch_show_toolbar(পূর্ণাঙ্ক showit)
 {
-    if (s_toolbarhwnd == NULL)
-	return;
+    যদি (s_toolbarhwnd == রিক্ত)
+	ঘূৰাই;
 
-    if (showit)
+    যদি (showit)
     {
 	// Enable unicode support
 	SendMessage(s_toolbarhwnd, TB_SETUNICODEFORMAT, (WPARAM)TRUE,
 								(LPARAM)0);
 	ShowWindow(s_toolbarhwnd, SW_SHOW);
     }
-    else
+    অন্যথা
 	ShowWindow(s_toolbarhwnd, SW_HIDE);
 }
 
 // The number of bitmaps is fixed.  Exit is missing!
-# define TOOLBAR_BITMAP_COUNT 31
+# define TOOLBAR_BITMAP_গুনতি 31
 
 #endif
 
-#if defined(FEAT_GUI_TABLINE)
-    static void
+#যদি defined(FEAT_GUI_TABLINE)
+    স্থির শূন্য
 add_tabline_popup_menu_entry(HMENU pmenu, UINT item_id, char_u *item_text)
 {
     WCHAR	    *wn;
     MENUITEMINFOW   infow;
 
-    wn = enc_to_utf16(item_text, NULL);
-    if (wn == NULL)
-	return;
+    wn = enc_to_utf16(item_text, রিক্ত);
+    যদি (wn == রিক্ত)
+	ঘূৰাই;
 
-    infow.cbSize = sizeof(infow);
+    infow.cbSize = পরিমাণ(infow);
     infow.fMask = MIIM_TYPE | MIIM_ID;
     infow.wID = item_id;
     infow.fType = MFT_STRING;
     infow.dwTypeData = wn;
     infow.cch = (UINT)wcslen(wn);
-    InsertMenuItemW(pmenu, item_id, FALSE, &infow);
+    ঢোকাও_Menu_Item_W(pmenu, item_id, FALSE, &infow);
     vim_free(wn);
 }
 
-    static void
-show_tabline_popup_menu(void)
+    স্থির শূন্য
+show_tabline_popup_menu(শূন্য)
 {
     HMENU	    tab_pmenu;
     long	    rval;
     POINT	    pt;
 
     // When ignoring events don't show the menu.
-    if (hold_gui_events || cmdwin_type != 0)
-	return;
+    যদি (hold_gui_events || cmdwin_type != 0)
+	ঘূৰাই;
 
     tab_pmenu = CreatePopupMenu();
-    if (tab_pmenu == NULL)
-	return;
+    যদি (tab_pmenu == রিক্ত)
+	ঘূৰাই;
 
-    if (first_tabpage->tp_next != NULL)
+    যদি (first_tabpage->tp_next != রিক্ত)
 	add_tabline_popup_menu_entry(tab_pmenu,
 				TABLINE_MENU_CLOSE, (char_u *)_("Close tab"));
     add_tabline_popup_menu_entry(tab_pmenu,
@@ -3057,45 +3057,45 @@ show_tabline_popup_menu(void)
 
     GetCursorPos(&pt);
     rval = TrackPopupMenuEx(tab_pmenu, TPM_RETURNCMD, pt.x, pt.y, s_tabhwnd,
-									NULL);
+									রিক্ত);
 
     DestroyMenu(tab_pmenu);
 
     // Add the string cmd into input buffer
-    if (rval > 0)
+    যদি (rval > 0)
     {
 	TCHITTESTINFO htinfo;
-	int idx;
+	পূর্ণাঙ্ক idx;
 
-	if (ScreenToClient(s_tabhwnd, &pt) == 0)
-	    return;
+	যদি (ScreenToClient(s_tabhwnd, &pt) == 0)
+	    ঘূৰাই;
 
 	htinfo.pt.x = pt.x;
 	htinfo.pt.y = pt.y;
 	idx = TabCtrl_HitTest(s_tabhwnd, &htinfo);
-	if (idx == -1)
+	যদি (idx == -1)
 	    idx = 0;
-	else
+	অন্যথা
 	    idx += 1;
 
-	send_tabline_menu_event(idx, (int)rval);
+	send_tabline_menu_event(idx, (পূর্ণাঙ্ক)rval);
     }
 }
 
 /*
  * Show or hide the tabline.
  */
-    void
-gui_mch_show_tabline(int showit)
+    শূন্য
+gui_mch_show_tabline(পূর্ণাঙ্ক showit)
 {
-    if (s_tabhwnd == NULL)
-	return;
+    যদি (s_tabhwnd == রিক্ত)
+	ঘূৰাই;
 
-    if (!showit != !showing_tabline)
+    যদি (!showit != !showing_tabline)
     {
-	if (showit)
+	যদি (showit)
 	    ShowWindow(s_tabhwnd, SW_SHOW);
-	else
+	অন্যথা
 	    ShowWindow(s_tabhwnd, SW_HIDE);
 	showing_tabline = showit;
     }
@@ -3104,27 +3104,27 @@ gui_mch_show_tabline(int showit)
 /*
  * Return TRUE when tabline is displayed.
  */
-    int
-gui_mch_showing_tabline(void)
+    পূর্ণাঙ্ক
+gui_mch_showing_tabline(শূন্য)
 {
-    return s_tabhwnd != NULL && showing_tabline;
+    ঘূৰাই s_tabhwnd != রিক্ত && showing_tabline;
 }
 
 /*
  * Update the labels of the tabline.
  */
-    void
-gui_mch_update_tabline(void)
+    শূন্য
+gui_mch_update_tabline(শূন্য)
 {
     tabpage_T	*tp;
     TCITEM	tie;
-    int		nr = 0;
-    int		curtabidx = 0;
-    int		tabadded = 0;
-    WCHAR	*wstr = NULL;
+    পূর্ণাঙ্ক		nr = 0;
+    পূর্ণাঙ্ক		curtabidx = 0;
+    পূর্ণাঙ্ক		tabadded = 0;
+    WCHAR	*wstr = রিক্ত;
 
-    if (s_tabhwnd == NULL)
-	return;
+    যদি (s_tabhwnd == রিক্ত)
+	ঘূৰাই;
 
     // Enable unicode support
     SendMessage(s_tabhwnd, CCM_SETUNICODEFORMAT, (WPARAM)TRUE, (LPARAM)0);
@@ -3136,24 +3136,24 @@ gui_mch_update_tabline(void)
     SendMessage(s_tabhwnd, WM_SETREDRAW, (WPARAM)FALSE, 0);
 
     // Add a label for each tab page.  They all contain the same text area.
-    for (tp = first_tabpage; tp != NULL; tp = tp->tp_next, ++nr)
+    বাবে (tp = first_tabpage; tp != রিক্ত; tp = tp->tp_next, ++nr)
     {
-	if (tp == curtab)
+	যদি (tp == curtab)
 	    curtabidx = nr;
 
-	if (nr >= TabCtrl_GetItemCount(s_tabhwnd))
+	যদি (nr >= Tab_Ctrl_Get_Item_গুনতি(s_tabhwnd))
 	{
 	    // Add the tab
 	    tie.pszText = "-Empty-";
-	    TabCtrl_InsertItem(s_tabhwnd, nr, &tie);
+	    Tab_Ctrl_ঢোকাও_Item(s_tabhwnd, nr, &tie);
 	    tabadded = 1;
 	}
 
 	get_tabline_label(tp, FALSE);
 	tie.pszText = (LPSTR)NameBuff;
 
-	wstr = enc_to_utf16(NameBuff, NULL);
-	if (wstr != NULL)
+	wstr = enc_to_utf16(NameBuff, রিক্ত);
+	যদি (wstr != রিক্ত)
 	{
 	    TCITEMW		tiw;
 
@@ -3166,68 +3166,68 @@ gui_mch_update_tabline(void)
     }
 
     // Remove any old labels.
-    while (nr < TabCtrl_GetItemCount(s_tabhwnd))
+    যেতিয়ালৈ (nr < Tab_Ctrl_Get_Item_গুনতি(s_tabhwnd))
 	TabCtrl_DeleteItem(s_tabhwnd, nr);
 
-    if (!tabadded && TabCtrl_GetCurSel(s_tabhwnd) != curtabidx)
+    যদি (!tabadded && TabCtrl_GetCurSel(s_tabhwnd) != curtabidx)
 	TabCtrl_SetCurSel(s_tabhwnd, curtabidx);
 
     // Re-enable redraw and redraw.
     SendMessage(s_tabhwnd, WM_SETREDRAW, (WPARAM)TRUE, 0);
-    RedrawWindow(s_tabhwnd, NULL, NULL,
+    RedrawWindow(s_tabhwnd, রিক্ত, রিক্ত,
 		    RDW_ERASE | RDW_FRAME | RDW_INVALIDATE | RDW_ALLCHILDREN);
 
-    if (tabadded && TabCtrl_GetCurSel(s_tabhwnd) != curtabidx)
+    যদি (tabadded && TabCtrl_GetCurSel(s_tabhwnd) != curtabidx)
 	TabCtrl_SetCurSel(s_tabhwnd, curtabidx);
 }
 
 /*
  * Set the current tab to "nr".  First tab is 1.
  */
-    void
-gui_mch_set_curtab(int nr)
+    শূন্য
+gui_mch_set_curtab(পূর্ণাঙ্ক nr)
 {
-    if (s_tabhwnd == NULL)
-	return;
+    যদি (s_tabhwnd == রিক্ত)
+	ঘূৰাই;
 
-    if (TabCtrl_GetCurSel(s_tabhwnd) != nr - 1)
+    যদি (TabCtrl_GetCurSel(s_tabhwnd) != nr - 1)
 	TabCtrl_SetCurSel(s_tabhwnd, nr - 1);
 }
 
 #endif
 
 #ifdef FEAT_GUI_DARKTHEME
-    void
-gui_mch_set_dark_theme(int dark)
+    শূন্য
+gui_mch_set_dark_theme(পূর্ণাঙ্ক dark)
 {
-    if (pDwmSetWindowAttribute != NULL && win_version >= MAKE_VER(10, 0, 18985))
+    যদি (pDwmSetWindowAttribute != রিক্ত && win_version >= MAKE_VER(10, 0, 18985))
 	pDwmSetWindowAttribute(s_hwnd, DWMWA_USE_IMMERSIVE_DARK_MODE, &dark,
-		sizeof(dark));
+		পরিমাণ(dark));
 
-    if (pSetPreferredAppMode != NULL && win_version >= MAKE_VER(10, 0, 18362))
+    যদি (pSetPreferredAppMode != রিক্ত && win_version >= MAKE_VER(10, 0, 18362))
 	pSetPreferredAppMode(dark);
 
-    if (pFlushMenuThemes != NULL && win_version >= MAKE_VER(10, 0, 18362))
+    যদি (pFlushMenuThemes != রিক্ত && win_version >= MAKE_VER(10, 0, 18362))
 	pFlushMenuThemes();
 }
 
-    static void
-dyn_uxtheme_load(void)
+    স্থির শূন্য
+dyn_uxtheme_load(শূন্য)
 {
     hUxThemeLib = vimLoadLib("uxtheme.dll");
-    if (hUxThemeLib == NULL)
-	return;
+    যদি (hUxThemeLib == রিক্ত)
+	ঘূৰাই;
 
     pSetPreferredAppMode = (DWORD (WINAPI *)(DWORD))
 	GetProcAddress(hUxThemeLib, MAKEINTRESOURCE(135));
-    pFlushMenuThemes = (void (WINAPI *)(void))
+    pFlushMenuThemes = (শূন্য (WINAPI *)(শূন্য))
 	GetProcAddress(hUxThemeLib, MAKEINTRESOURCE(136));
 
-    if (pSetPreferredAppMode == NULL || pFlushMenuThemes == NULL)
+    যদি (pSetPreferredAppMode == রিক্ত || pFlushMenuThemes == রিক্ত)
     {
 	FreeLibrary(hUxThemeLib);
-	hUxThemeLib = NULL;
-	return;
+	hUxThemeLib = রিক্ত;
+	ঘূৰাই;
     }
 }
 
@@ -3237,30 +3237,30 @@ dyn_uxtheme_load(void)
  * When flag is true, set fullscreen on.
  * When flag is false, set fullscreen off.
  */
-    void
-gui_mch_set_fullscreen(int flag)
+    শূন্য
+gui_mch_set_fullscreen(পূর্ণাঙ্ক flag)
 {
-    static RECT normal_rect;
-    static LONG_PTR normal_style, normal_exstyle;
+    স্থির RECT normal_rect;
+    স্থির LONG_PTR normal_style, normal_exstyle;
     HMONITOR	mon;
     MONITORINFO	moninfo;
     RECT	rc;
 
-    if (!full_screen) // Windows not set yet.
-	return;
+    যদি (!full_screen) // Windows not set yet.
+	ঘূৰাই;
 
-    if (flag)
+    যদি (flag)
     {
-	if (fullscreen_on)
-	    return;
+	যদি (fullscreen_on)
+	    ঘূৰাই;
 
 	// Enter fullscreen mode
 	GetWindowRect(s_hwnd, &rc);
 
-	moninfo.cbSize = sizeof(MONITORINFO);
+	moninfo.cbSize = পরিমাণ(MONITORINFO);
 	mon = MonitorFromRect(&rc, MONITOR_DEFAULTTONEAREST);
-	if (mon == NULL || !GetMonitorInfo(mon, &moninfo))
-	    return;
+	যদি (mon == রিক্ত || !GetMonitorInfo(mon, &moninfo))
+	    ঘূৰাই;
 
 	// Save current window state
 	GetWindowRect(s_hwnd, &normal_rect);
@@ -3273,30 +3273,30 @@ gui_mch_set_fullscreen(int flag)
 	SetWindowLongPtr(s_hwnd, GWL_EXSTYLE,
 		normal_exstyle & ~(WS_EX_DLGMODALFRAME | WS_EX_WINDOWEDGE |
 		    WS_EX_CLIENTEDGE | WS_EX_STATICEDGE));
-	SetWindowPos(s_hwnd, NULL,
-		moninfo.rcMonitor.left,
-		moninfo.rcMonitor.top,
-		moninfo.rcMonitor.right - moninfo.rcMonitor.left,
-		moninfo.rcMonitor.bottom - moninfo.rcMonitor.top,
+	SetWindowPos(s_hwnd, রিক্ত,
+		moninfo.rcMonitor.বাম,
+		moninfo.rcMonitor.শীৰ্ষ,
+		moninfo.rcMonitor.ডান - moninfo.rcMonitor.বাম,
+		moninfo.rcMonitor.bottom - moninfo.rcMonitor.শীৰ্ষ,
 		SWP_NOZORDER | SWP_NOACTIVATE | SWP_FRAMECHANGED);
 
 	fullscreen_on = TRUE;
     }
-    else
+    অন্যথা
     {
-	if (!fullscreen_on)
-	    return;
+	যদি (!fullscreen_on)
+	    ঘূৰাই;
 
 	// Exit fullscreen mode
 	SetWindowLongPtr(s_hwnd, GWL_STYLE, normal_style);
 	SetWindowLongPtr(s_hwnd, GWL_EXSTYLE, normal_exstyle);
 
 	// Restore original window position and size
-	SetWindowPos(s_hwnd, NULL,
-		normal_rect.left,
-		normal_rect.top,
-		normal_rect.right - normal_rect.left,
-		normal_rect.bottom - normal_rect.top,
+	SetWindowPos(s_hwnd, রিক্ত,
+		normal_rect.বাম,
+		normal_rect.শীৰ্ষ,
+		normal_rect.ডান - normal_rect.বাম,
+		normal_rect.bottom - normal_rect.শীৰ্ষ,
 		SWP_NOZORDER | SWP_NOACTIVATE | SWP_FRAMECHANGED);
 
 	fullscreen_on = FALSE;
@@ -3306,34 +3306,34 @@ gui_mch_set_fullscreen(int flag)
 /*
  * ":simalt" command.
  */
-    void
+    শূন্য
 ex_simalt(exarg_T *eap)
 {
-    char_u	*keys = eap->arg;
-    int		fill_typebuf = FALSE;
-    char_u	key_name[4];
+    char_u	*চাবিগুলি = eap->arg;
+    পূর্ণাঙ্ক		fill_typebuf = FALSE;
+    char_u	চাবি_name[4];
 
     PostMessage(s_hwnd, WM_SYSCOMMAND, (WPARAM)SC_KEYMENU, (LPARAM)0);
-    while (*keys)
+    যেতিয়ালৈ (*চাবিগুলি)
     {
-	if (*keys == '~')
-	    *keys = ' ';	    // for showing system menu
-	PostMessage(s_hwnd, WM_CHAR, (WPARAM)*keys, (LPARAM)0);
-	keys++;
+	যদি (*চাবিগুলি == '~')
+	    *চাবিগুলি = ' ';	    // for showing system menu
+	PostMessage(s_hwnd, WM_CHAR, (WPARAM)*চাবিগুলি, (LPARAM)0);
+	চাবিগুলি++;
 	fill_typebuf = TRUE;
     }
-    if (fill_typebuf)
+    যদি (fill_typebuf)
     {
 	// Put a NOP in the typeahead buffer so that the message will get
 	// processed.
-	key_name[0] = K_SPECIAL;
-	key_name[1] = KS_EXTRA;
-	key_name[2] = KE_NOP;
-	key_name[3] = NUL;
-#if defined(FEAT_CLIENTSERVER) || defined(FEAT_EVAL)
+	চাবি_name[0] = K_SPECIAL;
+	চাবি_name[1] = KS_EXTRA;
+	চাবি_name[2] = KE_NOP;
+	চাবি_name[3] = NUL;
+#যদি defined(FEAT_CLIENTSERVER) || defined(FEAT_EVAL)
 	typebuf_was_filled = TRUE;
 #endif
-	(void)ins_typebuf(key_name, REMAP_NONE, 0, TRUE, FALSE);
+	(শূন্য)ins_typebuf(চাবি_name, REMAP_NONE, 0, TRUE, FALSE);
     }
 }
 
@@ -3343,11 +3343,11 @@ ex_simalt(exarg_T *eap)
  * the replace dialog first, and the other way around.
  */
 #ifdef MSWIN_FIND_REPLACE
-    static void
+    স্থির শূন্য
 initialise_findrep(char_u *initial_string)
 {
-    int		wword = FALSE;
-    int		mcase = !p_ic;
+    পূর্ণাঙ্ক		wword = FALSE;
+    পূর্ণাঙ্ক		mcase = !p_ic;
     char_u	*entry_text;
 
     // Get the search string to use.
@@ -3355,16 +3355,16 @@ initialise_findrep(char_u *initial_string)
 
     s_findrep_struct.hwndOwner = s_hwnd;
     s_findrep_struct.Flags = FR_DOWN;
-    if (mcase)
+    যদি (mcase)
 	s_findrep_struct.Flags |= FR_MATCHCASE;
-    if (wword)
+    যদি (wword)
 	s_findrep_struct.Flags |= FR_WHOLEWORD;
-    if (entry_text != NULL && *entry_text != NUL)
+    যদি (entry_text != রিক্ত && *entry_text != NUL)
     {
-	WCHAR *p = enc_to_utf16(entry_text, NULL);
-	if (p != NULL)
+	WCHAR *p = enc_to_utf16(entry_text, রিক্ত);
+	যদি (p != রিক্ত)
 	{
-	    int len = s_findrep_struct.wFindWhatLen - 1;
+	    পূর্ণাঙ্ক len = s_findrep_struct.wFindWhatLen - 1;
 
 	    wcsncpy(s_findrep_struct.lpstrFindWhat, p, len);
 	    s_findrep_struct.lpstrFindWhat[len] = NUL;
@@ -3375,42 +3375,42 @@ initialise_findrep(char_u *initial_string)
 }
 #endif
 
-    static void
-set_window_title(HWND hwnd, char *title)
+    স্থির শূন্য
+set_window_title(HWND hwnd, ৱর্ণ *title)
 {
-    if (title != NULL)
+    যদি (title != রিক্ত)
     {
 	WCHAR	*wbuf;
 
 	// Convert the title from 'encoding' to UTF-16.
-	wbuf = (WCHAR *)enc_to_utf16((char_u *)title, NULL);
-	if (wbuf != NULL)
+	wbuf = (WCHAR *)enc_to_utf16((char_u *)title, রিক্ত);
+	যদি (wbuf != রিক্ত)
 	{
 	    SetWindowTextW(hwnd, wbuf);
 	    vim_free(wbuf);
 	}
     }
-    else
-	(void)SetWindowTextW(hwnd, NULL);
+    অন্যথা
+	(শূন্য)SetWindowTextW(hwnd, রিক্ত);
 }
 
-    void
+    শূন্য
 gui_mch_find_dialog(exarg_T *eap)
 {
 #ifdef MSWIN_FIND_REPLACE
-    if (s_findrep_msg != 0)
+    যদি (s_findrep_বাৰ্তা != 0)
     {
-	if (IsWindow(s_findrep_hwnd) && !s_findrep_is_find)
+	যদি (IsWindow(s_findrep_hwnd) && !s_findrep_is_find)
 	    DestroyWindow(s_findrep_hwnd);
 
-	if (!IsWindow(s_findrep_hwnd))
+	যদি (!IsWindow(s_findrep_hwnd))
 	{
 	    initialise_findrep(eap->arg);
 	    s_findrep_hwnd = FindTextW(&s_findrep_struct);
 	}
 
 	set_window_title(s_findrep_hwnd, _("Find string"));
-	(void)SetFocus(s_findrep_hwnd);
+	(শূন্য)SetFocus(s_findrep_hwnd);
 
 	s_findrep_is_find = TRUE;
     }
@@ -3418,23 +3418,23 @@ gui_mch_find_dialog(exarg_T *eap)
 }
 
 
-    void
+    শূন্য
 gui_mch_replace_dialog(exarg_T *eap)
 {
 #ifdef MSWIN_FIND_REPLACE
-    if (s_findrep_msg != 0)
+    যদি (s_findrep_বাৰ্তা != 0)
     {
-	if (IsWindow(s_findrep_hwnd) && s_findrep_is_find)
+	যদি (IsWindow(s_findrep_hwnd) && s_findrep_is_find)
 	    DestroyWindow(s_findrep_hwnd);
 
-	if (!IsWindow(s_findrep_hwnd))
+	যদি (!IsWindow(s_findrep_hwnd))
 	{
 	    initialise_findrep(eap->arg);
 	    s_findrep_hwnd = ReplaceTextW(&s_findrep_struct);
 	}
 
 	set_window_title(s_findrep_hwnd, _("Find & Replace"));
-	(void)SetFocus(s_findrep_hwnd);
+	(শূন্য)SetFocus(s_findrep_hwnd);
 
 	s_findrep_is_find = FALSE;
     }
@@ -3445,30 +3445,30 @@ gui_mch_replace_dialog(exarg_T *eap)
 /*
  * Set visibility of the pointer.
  */
-    void
-gui_mch_mousehide(int hide)
+    শূন্য
+gui_mch_mousehide(পূর্ণাঙ্ক hide)
 {
-    if (hide == gui.pointer_hidden)
-	return;
+    যদি (hide == gui.pointer_hidden)
+	ঘূৰাই;
 
     ShowCursor(!hide);
     gui.pointer_hidden = hide;
 }
 
 #ifdef FEAT_MENU
-    static void
-gui_mch_show_popupmenu_at(vimmenu_T *menu, int x, int y)
+    স্থির শূন্য
+gui_mch_show_popupmenu_at(vimmenu_T *menu, পূর্ণাঙ্ক x, পূর্ণাঙ্ক y)
 {
     // Unhide the mouse, we don't get move events here.
     gui_mch_mousehide(FALSE);
 
-    (void)TrackPopupMenu(
+    (শূন্য)TrackPopupMenu(
 	(HMENU)menu->submenu_id,
 	TPM_LEFTALIGN | TPM_LEFTBUTTON,
 	x, y,
-	(int)0,	    //reserved param
+	(পূর্ণাঙ্ক)0,	    //reserved param
 	s_hwnd,
-	NULL);
+	রিক্ত);
     /*
      * NOTE: The pop-up menu can eat the mouse up event.
      * We deal with this in normal.c.
@@ -3479,8 +3479,8 @@ gui_mch_show_popupmenu_at(vimmenu_T *menu, int x, int y)
 /*
  * Got a message when the system will go down.
  */
-    static void
-_OnEndSession(void)
+    স্থির শূন্য
+_OnEndSession(শূন্য)
 {
     getout_preserve_modified(1);
 }
@@ -3489,7 +3489,7 @@ _OnEndSession(void)
  * Get this message when the user clicks on the cross in the top right corner
  * of a Windows95 window.
  */
-    static void
+    স্থির শূন্য
 _OnClose(HWND hwnd UNUSED)
 {
     gui_shell_closed();
@@ -3498,63 +3498,63 @@ _OnClose(HWND hwnd UNUSED)
 /*
  * Get a message when the window is being destroyed.
  */
-    static void
+    স্থির শূন্য
 _OnDestroy(HWND hwnd)
 {
-    if (!destroying)
+    যদি (!destroying)
 	_OnClose(hwnd);
 }
 
-    static void
+    স্থির শূন্য
 _OnPaint(
     HWND hwnd)
 {
-    if (IsMinimized(hwnd))
-	return;
+    যদি (IsMinimized(hwnd))
+	ঘূৰাই;
 
     PAINTSTRUCT ps;
 
     out_flush();	    // make sure all output has been processed
-    (void)BeginPaint(hwnd, &ps);
+    (শূন্য)BeginPaint(hwnd, &ps);
 
     // prevent multi-byte characters from misprinting on an invalid
     // rectangle
-    if (has_mbyte)
+    যদি (has_mbyte)
     {
 	RECT rect;
 
 	GetClientRect(hwnd, &rect);
-	ps.rcPaint.left = rect.left;
-	ps.rcPaint.right = rect.right;
+	ps.rcPaint.বাম = rect.বাম;
+	ps.rcPaint.ডান = rect.ডান;
     }
 
-    if (!IsRectEmpty(&ps.rcPaint))
+    যদি (!IsRectEmpty(&ps.rcPaint))
     {
 	// The text area has no background brush, thus undefined pixels remain
 	// visible until the screen contents are drawn.
-	if (!screen_cleared || ScreenLines == NULL)
+	যদি (!screen_cleared || Screen_সাৰিগুলি == রিক্ত)
 	{
 	    clear_rect(&ps.rcPaint);
 	    s_textarea_bg_only = true;
 	}
-	else
+	অন্যথা
 	    s_textarea_bg_only = false;
-	gui_redraw(ps.rcPaint.left, ps.rcPaint.top,
-		ps.rcPaint.right - ps.rcPaint.left + 1,
-		ps.rcPaint.bottom - ps.rcPaint.top + 1);
+	gui_redraw(ps.rcPaint.বাম, ps.rcPaint.শীৰ্ষ,
+		ps.rcPaint.ডান - ps.rcPaint.বাম + 1,
+		ps.rcPaint.bottom - ps.rcPaint.শীৰ্ষ + 1);
     }
 
     EndPaint(hwnd, &ps);
 }
 
-    static void
+    স্থির শূন্য
 _OnSize(
     HWND hwnd,
     UINT state UNUSED,
-    int cx,
-    int cy)
+    পূর্ণাঙ্ক cx,
+    পূর্ণাঙ্ক cy)
 {
-    if (!IsMinimized(hwnd) && !s_in_dpichanged)
+    যদি (!IsMinimized(hwnd) && !s_in_dpichanged)
     {
 	gui_resize_shell(cx, cy);
 
@@ -3563,32 +3563,32 @@ _OnSize(
     }
 }
 
-    static void
+    স্থির শূন্য
 _OnSetFocus(
     HWND hwnd,
     HWND hwndOldFocus)
 {
     gui_focus_change(TRUE);
     s_getting_focus = TRUE;
-    (void)DefWindowProcW(hwnd, WM_SETFOCUS, (WPARAM)hwndOldFocus, 0);
+    (শূন্য)DefWindowProcW(hwnd, WM_SETFOCUS, (WPARAM)hwndOldFocus, 0);
 }
 
-    static void
+    স্থির শূন্য
 _OnKillFocus(
     HWND hwnd,
     HWND hwndNewFocus)
 {
-    if (destroying)
-	return;
+    যদি (destroying)
+	ঘূৰাই;
     gui_focus_change(FALSE);
     s_getting_focus = FALSE;
-    (void)DefWindowProcW(hwnd, WM_KILLFOCUS, (WPARAM)hwndNewFocus, 0);
+    (শূন্য)DefWindowProcW(hwnd, WM_KILLFOCUS, (WPARAM)hwndNewFocus, 0);
 }
 
 /*
  * Get a message when the user switches back to vim
  */
-    static LRESULT
+    স্থির LRESULT
 _OnActivateApp(
     HWND hwnd,
     BOOL fActivate,
@@ -3596,10 +3596,10 @@ _OnActivateApp(
 {
     // we call gui_focus_change() in _OnSetFocus()
     // gui_focus_change((int)fActivate);
-    return DefWindowProcW(hwnd, WM_ACTIVATEAPP, fActivate, (DWORD)dwThreadId);
+    ঘূৰাই DefWindowProcW(hwnd, WM_ACTIVATEAPP, fActivate, (DWORD)dwThreadId);
 }
 
-    void
+    শূন্য
 gui_mch_destroy_scrollbar(scrollbar_T *sb)
 {
     DestroyWindow(sb->id);
@@ -3608,41 +3608,41 @@ gui_mch_destroy_scrollbar(scrollbar_T *sb)
 /*
  * Get current mouse coordinates in text window.
  */
-    void
-gui_mch_getmouse(int *x, int *y)
+    শূন্য
+gui_mch_getmouse(পূর্ণাঙ্ক *x, পূর্ণাঙ্ক *y)
 {
     RECT rct;
     POINT mp;
 
-    (void)GetWindowRect(s_textArea, &rct);
-    (void)GetCursorPos(&mp);
-    *x = (int)(mp.x - rct.left);
-    *y = (int)(mp.y - rct.top);
+    (শূন্য)GetWindowRect(s_textArea, &rct);
+    (শূন্য)GetCursorPos(&mp);
+    *x = (পূর্ণাঙ্ক)(mp.x - rct.বাম);
+    *y = (পূর্ণাঙ্ক)(mp.y - rct.শীৰ্ষ);
 }
 
 /*
  * Move mouse pointer to character at (x, y).
  */
-    void
-gui_mch_setmouse(int x, int y)
+    শূন্য
+gui_mch_setmouse(পূর্ণাঙ্ক x, পূর্ণাঙ্ক y)
 {
     RECT rct;
 
-    (void)GetWindowRect(s_textArea, &rct);
-    (void)SetCursorPos(x + gui.border_offset + rct.left,
-		       y + gui.border_offset + rct.top);
+    (শূন্য)GetWindowRect(s_textArea, &rct);
+    (শূন্য)SetCursorPos(x + gui.border_offset + rct.বাম,
+		       y + gui.border_offset + rct.শীৰ্ষ);
 }
 
-    static void
+    স্থির শূন্য
 gui_mswin_get_valid_dimensions(
-    int w,
-    int h,
-    int *valid_w,
-    int *valid_h,
-    int *cols,
-    int *rows)
+    পূর্ণাঙ্ক w,
+    পূর্ণাঙ্ক h,
+    পূর্ণাঙ্ক *valid_w,
+    পূর্ণাঙ্ক *valid_h,
+    পূর্ণাঙ্ক *cols,
+    পূর্ণাঙ্ক *rows)
 {
-    int	    base_width, base_height;
+    পূর্ণাঙ্ক	    base_width, base_height;
 
     base_width = gui_get_base_width()
 	+ (pGetSystemMetricsForDpi(SM_CXFRAME, s_dpi) +
@@ -3658,23 +3658,23 @@ gui_mswin_get_valid_dimensions(
     *valid_h = base_height + *rows * gui.char_height;
 }
 
-    void
-gui_mch_flash(int msec)
+    শূন্য
+gui_mch_flash(পূর্ণাঙ্ক msec)
 {
     RECT    rc;
 
-#if defined(FEAT_DIRECTX)
-    if (IS_ENABLE_DIRECTX())
+#যদি defined(FEAT_DIRECTX)
+    যদি (IS_ENABLE_DIRECTX())
 	DWriteContext_Flush(s_dwc);
 #endif
 
     /*
      * Note: InvertRect() excludes right and bottom of rectangle.
      */
-    rc.left = 0;
-    rc.top = 0;
-    rc.right = gui.num_cols * gui.char_width;
-    rc.bottom = gui.num_rows * gui.char_height;
+    rc.বাম = 0;
+    rc.শীৰ্ষ = 0;
+    rc.ডান = gui.অঙ্ক_cols * gui.char_width;
+    rc.bottom = gui.অঙ্ক_rows * gui.char_height;
     InvertRect(s_hdc, &rc);
     gui_mch_flush();			// make sure it's displayed
 
@@ -3686,12 +3686,12 @@ gui_mch_flash(int msec)
 /*
  * Check if the specified point is on-screen. (multi-monitor aware)
  */
-    static BOOL
-is_point_onscreen(int x, int y)
+    স্থির BOOL
+is_point_onscreen(পূর্ণাঙ্ক x, পূর্ণাঙ্ক y)
 {
     POINT   pt = {x, y};
 
-    return MonitorFromPoint(pt, MONITOR_DEFAULTTONULL) != NULL;
+    ঘূৰাই MonitorFromPoint(pt, MONITOR_DEFAULTTONULL) != রিক্ত;
 }
 
 /*
@@ -3701,29 +3701,29 @@ is_point_onscreen(int x, int y)
  * the window portion that is off-screen.  Scrolling by DWriteContext_Scroll()
  * only works when the whole window is on-screen.
  */
-    static BOOL
+    স্থির BOOL
 is_window_onscreen(HWND hwnd)
 {
     RECT    rc;
     POINT   p1, p2;
 
     GetClientRect(hwnd, &rc);
-    p1.x = rc.left;
-    p1.y = rc.top;
-    p2.x = rc.right - 1;
+    p1.x = rc.বাম;
+    p1.y = rc.শীৰ্ষ;
+    p2.x = rc.ডান - 1;
     p2.y = rc.bottom - 1;
     ClientToScreen(hwnd, &p1);
     ClientToScreen(hwnd, &p2);
 
-    if (!is_point_onscreen(p1.x, p1.y))
-	return FALSE;
-    if (!is_point_onscreen(p1.x, p2.y))
-	return FALSE;
-    if (!is_point_onscreen(p2.x, p1.y))
-	return FALSE;
-    if (!is_point_onscreen(p2.x, p2.y))
-	return FALSE;
-    return TRUE;
+    যদি (!is_point_onscreen(p1.x, p1.y))
+	ঘূৰাই FALSE;
+    যদি (!is_point_onscreen(p1.x, p2.y))
+	ঘূৰাই FALSE;
+    যদি (!is_point_onscreen(p2.x, p1.y))
+	ঘূৰাই FALSE;
+    যদি (!is_point_onscreen(p2.x, p2.y))
+	ঘূৰাই FALSE;
+    ঘূৰাই TRUE;
 }
 
 /*
@@ -3731,26 +3731,26 @@ is_window_onscreen(HWND hwnd)
  * The SW_INVALIDATE is required when part of the window is covered or
  * off-screen. Refer to MS KB Q75236.
  */
-    static int
-get_scroll_flags(void)
+    স্থির পূর্ণাঙ্ক
+get_scroll_flags(শূন্য)
 {
     HWND	hwnd;
     RECT	rcVim, rcOther, rcDest;
 
     // Check if the window is (partly) off-screen.
-    if (!is_window_onscreen(s_hwnd))
-	return SW_INVALIDATE;
+    যদি (!is_window_onscreen(s_hwnd))
+	ঘূৰাই SW_INVALIDATE;
 
     // Check if there is a window (partly) on top of us.
     GetWindowRect(s_hwnd, &rcVim);
-    for (hwnd = s_hwnd; (hwnd = GetWindow(hwnd, GW_HWNDPREV)) != (HWND)0; )
-	if (IsWindowVisible(hwnd))
+    বাবে (hwnd = s_hwnd; (hwnd = GetWindow(hwnd, GW_HWNDPREV)) != (HWND)0; )
+	যদি (IsWindowVisible(hwnd))
 	{
 	    GetWindowRect(hwnd, &rcOther);
-	    if (IntersectRect(&rcDest, &rcVim, &rcOther))
-		return SW_INVALIDATE;
+	    যদি (IntersectRect(&rcDest, &rcVim, &rcOther))
+		ঘূৰাই SW_INVALIDATE;
 	}
-    return 0;
+    ঘূৰাই 0;
 }
 
 /*
@@ -3761,8 +3761,8 @@ get_scroll_flags(void)
  * The problem can be avoided by calling GetPixel() to get a pixel in
  * the region before ScrollWindowEx().
  */
-    static void
-intel_gpu_workaround(void)
+    স্থির শূন্য
+intel_gpu_workaround(শূন্য)
 {
     GetPixel(s_hdc, FILL_X(gui.col), FILL_Y(gui.row));
 }
@@ -3771,33 +3771,33 @@ intel_gpu_workaround(void)
  * Delete the given number of lines from the given row, scrolling up any
  * text further down within the scroll region.
  */
-    void
-gui_mch_delete_lines(
-    int	    row,
-    int	    num_lines)
+    শূন্য
+gui_mch_delete_সাৰিগুলি(
+    পূর্ণাঙ্ক	    row,
+    পূর্ণাঙ্ক	    অঙ্ক_সাৰিগুলি)
 {
     RECT	rc;
 
-    rc.left = FILL_X(gui.scroll_region_left);
-    rc.right = FILL_X(gui.scroll_region_right + 1);
-    rc.top = FILL_Y(row);
+    rc.বাম = FILL_X(gui.scroll_region_বাম);
+    rc.ডান = FILL_X(gui.scroll_region_ডান + 1);
+    rc.শীৰ্ষ = FILL_Y(row);
     rc.bottom = FILL_Y(gui.scroll_region_bot + 1);
 
-#if defined(FEAT_DIRECTX)
-    if (IS_ENABLE_DIRECTX() && is_window_onscreen(s_hwnd))
+#যদি defined(FEAT_DIRECTX)
+    যদি (IS_ENABLE_DIRECTX() && is_window_onscreen(s_hwnd))
     {
-	DWriteContext_Scroll(s_dwc, 0, -num_lines * gui.char_height, &rc);
+	DWriteContext_Scroll(s_dwc, 0, -অঙ্ক_সাৰিগুলি * gui.char_height, &rc);
     }
-    else
+    অন্যথা
 #endif
     {
-#if defined(FEAT_DIRECTX)
-	if (IS_ENABLE_DIRECTX())
+#যদি defined(FEAT_DIRECTX)
+	যদি (IS_ENABLE_DIRECTX())
 	    DWriteContext_Flush(s_dwc);
 #endif
 	intel_gpu_workaround();
-	ScrollWindowEx(s_textArea, 0, -num_lines * gui.char_height,
-				    &rc, &rc, NULL, NULL, get_scroll_flags());
+	ScrollWindowEx(s_textArea, 0, -অঙ্ক_সাৰিগুলি * gui.char_height,
+				    &rc, &rc, রিক্ত, রিক্ত, get_scroll_flags());
 	UpdateWindow(s_textArea);
     }
 
@@ -3807,59 +3807,59 @@ gui_mch_delete_lines(
     // It's probably fixed by disabling drawing the cursor while scrolling.
     // gui.cursor_is_valid = false;
 
-    gui_clear_block(gui.scroll_region_bot - num_lines + 1,
-						       gui.scroll_region_left,
-	gui.scroll_region_bot, gui.scroll_region_right);
+    gui_clear_block(gui.scroll_region_bot - অঙ্ক_সাৰিগুলি + 1,
+						       gui.scroll_region_বাম,
+	gui.scroll_region_bot, gui.scroll_region_ডান);
 }
 
 /*
  * Insert the given number of lines before the given row, scrolling down any
  * following text within the scroll region.
  */
-    void
-gui_mch_insert_lines(
-    int		row,
-    int		num_lines)
+    শূন্য
+gui_mch_ঢোকাও_সাৰিগুলি(
+    পূর্ণাঙ্ক		row,
+    পূর্ণাঙ্ক		অঙ্ক_সাৰিগুলি)
 {
     RECT	rc;
 
-    rc.left = FILL_X(gui.scroll_region_left);
-    rc.right = FILL_X(gui.scroll_region_right + 1);
-    rc.top = FILL_Y(row);
+    rc.বাম = FILL_X(gui.scroll_region_বাম);
+    rc.ডান = FILL_X(gui.scroll_region_ডান + 1);
+    rc.শীৰ্ষ = FILL_Y(row);
     rc.bottom = FILL_Y(gui.scroll_region_bot + 1);
 
-#if defined(FEAT_DIRECTX)
-    if (IS_ENABLE_DIRECTX() && is_window_onscreen(s_hwnd))
+#যদি defined(FEAT_DIRECTX)
+    যদি (IS_ENABLE_DIRECTX() && is_window_onscreen(s_hwnd))
     {
-	DWriteContext_Scroll(s_dwc, 0, num_lines * gui.char_height, &rc);
+	DWriteContext_Scroll(s_dwc, 0, অঙ্ক_সাৰিগুলি * gui.char_height, &rc);
     }
-    else
+    অন্যথা
 #endif
     {
-#if defined(FEAT_DIRECTX)
-	if (IS_ENABLE_DIRECTX())
+#যদি defined(FEAT_DIRECTX)
+	যদি (IS_ENABLE_DIRECTX())
 	    DWriteContext_Flush(s_dwc);
 #endif
 	intel_gpu_workaround();
 	// The SW_INVALIDATE is required when part of the window is covered or
 	// off-screen.  How do we avoid it when it's not needed?
-	ScrollWindowEx(s_textArea, 0, num_lines * gui.char_height,
-				    &rc, &rc, NULL, NULL, get_scroll_flags());
+	ScrollWindowEx(s_textArea, 0, অঙ্ক_সাৰিগুলি * gui.char_height,
+				    &rc, &rc, রিক্ত, রিক্ত, get_scroll_flags());
 	UpdateWindow(s_textArea);
     }
 
-    gui_clear_block(row, gui.scroll_region_left,
-				row + num_lines - 1, gui.scroll_region_right);
+    gui_clear_block(row, gui.scroll_region_বাম,
+				row + অঙ্ক_সাৰিগুলি - 1, gui.scroll_region_ডান);
 }
 
 
-    void
-gui_mch_exit(int rc UNUSED)
+    শূন্য
+gui_mch_exit(পূর্ণাঙ্ক rc UNUSED)
 {
-#if defined(FEAT_DIRECTX)
+#যদি defined(FEAT_DIRECTX)
     DWriteContext_Close(s_dwc);
     DWrite_Final();
-    s_dwc = NULL;
+    s_dwc = রিক্ত;
 #endif
 
     ReleaseDC(s_textArea, s_hdc);
@@ -3867,61 +3867,61 @@ gui_mch_exit(int rc UNUSED)
 
 #ifdef FEAT_TEAROFF
     // Unload the tearoff bitmap
-    (void)DeleteObject((HGDIOBJ)s_htearbitmap);
+    (শূন্য)DeleteObject((HGDIOBJ)s_htearbitmap);
 #endif
 
     // Destroy our window (if we have one).
-    if (s_hwnd != NULL)
+    যদি (s_hwnd != রিক্ত)
     {
 	destroying = TRUE;	// ignore WM_DESTROY message now
 	DestroyWindow(s_hwnd);
     }
 }
 
-    static char_u *
+    স্থির char_u *
 logfont2name(LOGFONTW lf)
 {
-    char	*charset_name;
-    char	*quality_name;
-    char	*font_name;
+    ৱর্ণ	*charset_name;
+    ৱর্ণ	*quality_name;
+    ৱর্ণ	*font_name;
     size_t	res_size;
-    char	*res;
+    ৱর্ণ	*res;
 
-    font_name = (char *)utf16_to_enc(lf.lfFaceName, NULL);
-    if (font_name == NULL)
-	return NULL;
-    charset_name = charset_id2name((int)lf.lfCharSet);
-    quality_name = quality_id2name((int)lf.lfQuality);
+    font_name = (ৱর্ণ *)utf16_to_enc(lf.lfFaceName, রিক্ত);
+    যদি (font_name == রিক্ত)
+	ঘূৰাই রিক্ত;
+    charset_name = charset_id2name((পূর্ণাঙ্ক)lf.lfCharSet);
+    quality_name = quality_id2name((পূর্ণাঙ্ক)lf.lfQuality);
 
     res_size = STRLEN(font_name) + 30
-		    + (charset_name == NULL ? 0 : STRLEN(charset_name) + 2)
-		    + (quality_name == NULL ? 0 : STRLEN(quality_name) + 2);
+		    + (charset_name == রিক্ত ? 0 : STRLEN(charset_name) + 2)
+		    + (quality_name == রিক্ত ? 0 : STRLEN(quality_name) + 2);
     res = alloc(res_size);
-    if (res != NULL)
+    যদি (res != রিক্ত)
     {
-	char	*p;
-	int	points;
+	ৱর্ণ	*p;
+	পূর্ণাঙ্ক	points;
 	size_t	res_len;
 
 	// replace spaces in font_name with underscores.
-	for (p = font_name; *p != NUL; ++p)
+	বাবে (p = font_name; *p != NUL; ++p)
 	{
-	    if (isspace(*p))
+	    যদি (isspace(*p))
 		*p = '_';
 	}
 
 	// make a normal font string out of the lf thing:
 	points = pixels_to_points(
 			 lf.lfHeight < 0 ? -lf.lfHeight : lf.lfHeight, TRUE);
-	if (lf.lfWeight == FW_NORMAL || lf.lfWeight == FW_BOLD)
+	যদি (lf.lfWeight == FW_NORMAL || lf.lfWeight == FW_BOLD)
 	    res_len = vim_snprintf_safelen(
-		(char *)res, res_size, "%s:h%d", font_name, points);
-	else
+		(ৱর্ণ *)res, res_size, "%s:h%d", font_name, points);
+	অন্যথা
 	    res_len = vim_snprintf_safelen(
-		(char *)res, res_size, "%s:h%d:W%ld", font_name, points, lf.lfWeight);
+		(ৱর্ণ *)res, res_size, "%s:h%d:W%ld", font_name, points, lf.lfWeight);
 
 	res_len += vim_snprintf_safelen(
-	    (char *)res + res_len,
+	    (ৱর্ণ *)res + res_len,
 	    res_size - res_len,
 	    "%s%s%s%s",
 	    lf.lfItalic ? ":i" : "",
@@ -3929,16 +3929,16 @@ logfont2name(LOGFONTW lf)
 	    lf.lfUnderline ? ":u" : "",
 	    lf.lfStrikeOut ? ":s" : "");
 
-	if (charset_name != NULL)
-	    res_len += vim_snprintf_safelen((char *)res + res_len,
+	যদি (charset_name != রিক্ত)
+	    res_len += vim_snprintf_safelen((ৱর্ণ *)res + res_len,
 		res_size - res_len, ":c%s", charset_name);
-	if (quality_name != NULL)
-	    vim_snprintf((char *)res + res_len,
+	যদি (quality_name != রিক্ত)
+	    vim_snprintf((ৱর্ণ *)res + res_len,
 		res_size - res_len, ":q%s", quality_name);
     }
 
     vim_free(font_name);
-    return (char_u *)res;
+    ঘূৰাই (char_u *)res;
 }
 
 
@@ -3947,20 +3947,20 @@ logfont2name(LOGFONTW lf)
  * Set correct LOGFONTW to IME.  Use 'guifontwide' if available, otherwise use
  * 'guifont'.
  */
-    static void
-update_im_font(void)
+    স্থির শূন্য
+update_im_font(শূন্য)
 {
     LOGFONTW	lf_wide, lf;
 
-    if (p_guifontwide != NULL && *p_guifontwide != NUL
+    যদি (p_guifontwide != রিক্ত && *p_guifontwide != NUL
 	    && gui.wide_font != NOFONT
-	    && GetObjectW((HFONT)gui.wide_font, sizeof(lf_wide), &lf_wide))
+	    && GetObjectW((HFONT)gui.wide_font, পরিমাণ(lf_wide), &lf_wide))
 	norm_logfont = lf_wide;
-    else
+    অন্যথা
 	norm_logfont = sub_logfont;
 
     lf = norm_logfont;
-    if (s_process_dpi_aware == DPI_AWARENESS_UNAWARE)
+    যদি (s_process_dpi_aware == DPI_AWARENESS_UNAWARE)
 	// Work around when PerMonitorV2 is not enabled in the process level.
 	lf.lfHeight = lf.lfHeight * DEFAULT_DPI / s_dpi;
     im_set_font(&lf);
@@ -3970,8 +3970,8 @@ update_im_font(void)
 /*
  * Handler of gui.wide_font (p_guifontwide) changed notification.
  */
-    void
-gui_mch_wide_font_changed(void)
+    শূন্য
+gui_mch_wide_font_changed(শূন্য)
 {
     LOGFONTW lf;
 
@@ -3986,20 +3986,20 @@ gui_mch_wide_font_changed(void)
     gui_mch_free_font(gui.wide_boldital_font);
     gui.wide_boldital_font = NOFONT;
 
-    if (gui.wide_font
-	&& GetObjectW((HFONT)gui.wide_font, sizeof(lf), &lf))
+    যদি (gui.wide_font
+	&& GetObjectW((HFONT)gui.wide_font, পরিমাণ(lf), &lf))
     {
-	if (!lf.lfItalic)
+	যদি (!lf.lfItalic)
 	{
 	    lf.lfItalic = TRUE;
 	    gui.wide_ital_font = get_font_handle(&lf);
 	    lf.lfItalic = FALSE;
 	}
-	if (lf.lfWeight < FW_BOLD)
+	যদি (lf.lfWeight < FW_BOLD)
 	{
 	    lf.lfWeight = FW_BOLD;
 	    gui.wide_bold_font = get_font_handle(&lf);
-	    if (!lf.lfItalic)
+	    যদি (!lf.lfItalic)
 	    {
 		lf.lfItalic = TRUE;
 		gui.wide_boldital_font = get_font_handle(&lf);
@@ -4012,83 +4012,83 @@ gui_mch_wide_font_changed(void)
  * Initialise vim to use the font with the given name.
  * Return FAIL if the font could not be loaded, OK otherwise.
  */
-    int
-gui_mch_init_font(char_u *font_name, int fontset UNUSED)
+    পূর্ণাঙ্ক
+gui_mch_init_font(char_u *font_name, পূর্ণাঙ্ক fontset UNUSED)
 {
     LOGFONTW	lf, lfOrig;
     GuiFont	font = NOFONT;
     char_u	*p;
 
     // Load the font
-    if (get_logfont(&lf, font_name, NULL, TRUE) == OK)
+    যদি (get_logfont(&lf, font_name, রিক্ত, TRUE) == OK)
     {
 	lfOrig = lf;
 	lf.lfHeight = adjust_fontsize_by_dpi(lf.lfHeight);
 	font = get_font_handle(&lf);
     }
-    if (font == NOFONT)
-	return FAIL;
+    যদি (font == NOFONT)
+	ঘূৰাই FAIL;
 
-#if defined(FEAT_DIRECTX)
+#যদি defined(FEAT_DIRECTX)
     // Parse font features from guifont (e.g., ":fss19=1:fcalt=0:fliga=1").
     {
 	DWriteFontFeature features[DWRITE_MAX_FONT_FEATURES];
-	int		    feat_count = 0;
+	পূর্ণাঙ্ক		    feat_গুনতি = 0;
 	char_u		    *fp;
 
-	if (font_name != NULL)
+	যদি (font_name != রিক্ত)
 	{
 	    // Find each ":f" option in font_name.
-	    for (fp = font_name; *fp != NUL; fp++)
+	    বাবে (fp = font_name; *fp != NUL; fp++)
 	    {
-		if (*fp == ':' && *(fp + 1) == 'f')
+		যদি (*fp == ':' && *(fp + 1) == 'f')
 		{
 		    char_u tag[5];
-		    int    ti = 0;
-		    unsigned int param = 1;
+		    পূর্ণাঙ্ক    ti = 0;
+		    unsigned পূর্ণাঙ্ক param = 1;
 
 		    fp += 2;  // skip ":f"
-		    while (*fp != NUL && *fp != '=' && *fp != ':'
+		    যেতিয়ালৈ (*fp != NUL && *fp != '=' && *fp != ':'
 			    && ti < 4)
 			tag[ti++] = *fp++;
 		    tag[ti] = NUL;
 
-		    if (ti != 4)
-			continue;  // invalid tag length
+		    যদি (ti != 4)
+			অনুৱর্ত;  // invalid tag length
 
-		    if (*fp == '=')
+		    যদি (*fp == '=')
 		    {
 			fp++;
-			param = (unsigned int)atoi((char *)fp);
-			while (*fp >= '0' && *fp <= '9')
+			param = (unsigned পূর্ণাঙ্ক)atoi((ৱর্ণ *)fp);
+			যেতিয়ালৈ (*fp >= '0' && *fp <= '9')
 			    fp++;
 		    }
 
-		    if (feat_count < DWRITE_MAX_FONT_FEATURES)
+		    যদি (feat_গুনতি < DWRITE_MAX_FONT_FEATURES)
 		    {
-			features[feat_count].tag =
-			    ((unsigned int)tag[0])
-			    | ((unsigned int)tag[1] << 8)
-			    | ((unsigned int)tag[2] << 16)
-			    | ((unsigned int)tag[3] << 24);
-			features[feat_count].parameter = param;
-			feat_count++;
+			features[feat_গুনতি].tag =
+			    ((unsigned পূর্ণাঙ্ক)tag[0])
+			    | ((unsigned পূর্ণাঙ্ক)tag[1] << 8)
+			    | ((unsigned পূর্ণাঙ্ক)tag[2] << 16)
+			    | ((unsigned পূর্ণাঙ্ক)tag[3] << 24);
+			features[feat_গুনতি].parameter = param;
+			feat_গুনতি++;
 		    }
 
 		    fp--;  // adjust for loop increment
 		}
 	    }
 	}
-	DWriteContext_SetFontFeatures(s_dwc, features, feat_count);
+	DWriteContext_SetFontFeatures(s_dwc, features, feat_গুনতি);
     }
 #endif
 
-    if (font_name == NULL)
+    যদি (font_name == রিক্ত)
 	font_name = (char_u *)"";
 #ifdef FEAT_MBYTE_IME
     norm_logfont = lf;
     sub_logfont = lf;
-    if (!s_in_dpichanged)
+    যদি (!s_in_dpichanged)
 	update_im_font();
 #endif
     gui_mch_free_font(gui.norm_font);
@@ -4097,17 +4097,17 @@ gui_mch_init_font(char_u *font_name, int fontset UNUSED)
     UpdateFontSize(font);
 
     p = logfont2name(lfOrig);
-    if (p != NULL)
+    যদি (p != রিক্ত)
     {
 	hl_set_font_name(p);
 
 	// When setting 'guifont' to "*" replace it with the actual font name.
-	if (STRCMP(font_name, "*") == 0 && STRCMP(p_guifont, "*") == 0)
+	যদি (STRCMP(font_name, "*") == 0 && STRCMP(p_guifont, "*") == 0)
 	{
 	    vim_free(p_guifont);
 	    p_guifont = p;
 	}
-	else
+	অন্যথা
 	    vim_free(p);
     }
 
@@ -4118,55 +4118,55 @@ gui_mch_init_font(char_u *font_name, int fontset UNUSED)
     gui_mch_free_font(gui.boldital_font);
     gui.boldital_font = NOFONT;
 
-    if (!lf.lfItalic)
+    যদি (!lf.lfItalic)
     {
 	lf.lfItalic = TRUE;
 	gui.ital_font = get_font_handle(&lf);
 	lf.lfItalic = FALSE;
     }
-    if (lf.lfWeight < FW_BOLD)
+    যদি (lf.lfWeight < FW_BOLD)
     {
 	lf.lfWeight = FW_BOLD;
 	gui.bold_font = get_font_handle(&lf);
-	if (!lf.lfItalic)
+	যদি (!lf.lfItalic)
 	{
 	    lf.lfItalic = TRUE;
 	    gui.boldital_font = get_font_handle(&lf);
 	}
     }
 
-    return OK;
+    ঘূৰাই OK;
 }
 
 /*
  * Return TRUE if the GUI window is maximized, filling the whole screen.
  * Also return TRUE if the window is snapped.
  */
-    int
-gui_mch_maximized(void)
+    পূর্ণাঙ্ক
+gui_mch_maximized(শূন্য)
 {
     WINDOWPLACEMENT wp;
     RECT	    rc;
 
-    wp.length = sizeof(WINDOWPLACEMENT);
-    if (GetWindowPlacement(s_hwnd, &wp))
+    wp.length = পরিমাণ(WINDOWPLACEMENT);
+    যদি (GetWindowPlacement(s_hwnd, &wp))
     {
-	if (wp.showCmd == SW_SHOWMAXIMIZED
+	যদি (wp.showCmd == SW_SHOWMAXIMIZED
 	    || (wp.showCmd == SW_SHOWMINIMIZED
 		    && wp.flags == WPF_RESTORETOMAXIMIZED))
-	    return TRUE;
-	if (wp.showCmd == SW_SHOWMINIMIZED)
-	    return FALSE;
+	    ঘূৰাই TRUE;
+	যদি (wp.showCmd == SW_SHOWMINIMIZED)
+	    ঘূৰাই FALSE;
 
 	// Assume the window is snapped when the sizes from two APIs differ.
 	GetWindowRect(s_hwnd, &rc);
-	if ((rc.right - rc.left !=
-		    wp.rcNormalPosition.right - wp.rcNormalPosition.left)
-		|| (rc.bottom - rc.top !=
-		    wp.rcNormalPosition.bottom - wp.rcNormalPosition.top))
-	    return TRUE;
+	যদি ((rc.ডান - rc.বাম !=
+		    wp.rcNormalPosition.ডান - wp.rcNormalPosition.বাম)
+		|| (rc.bottom - rc.শীৰ্ষ !=
+		    wp.rcNormalPosition.bottom - wp.rcNormalPosition.শীৰ্ষ))
+	    ঘূৰাই TRUE;
     }
-    return FALSE;
+    ঘূৰাই FALSE;
 }
 
 /*
@@ -4174,46 +4174,46 @@ gui_mch_maximized(void)
  * is set.  Compute the new Rows and Columns.  This is like resizing the
  * window.
  */
-    void
-gui_mch_newfont(void)
+    শূন্য
+gui_mch_newfont(শূন্য)
 {
     RECT	rect;
 
     GetWindowRect(s_hwnd, &rect);
-    if (win_socket_id == 0)
+    যদি (win_socket_id == 0)
     {
-	gui_resize_shell(rect.right - rect.left
+	gui_resize_shell(rect.ডান - rect.বাম
 	    - (pGetSystemMetricsForDpi(SM_CXFRAME, s_dpi) +
 	       pGetSystemMetricsForDpi(SM_CXPADDEDBORDER, s_dpi)) * 2,
-	    rect.bottom - rect.top
+	    rect.bottom - rect.শীৰ্ষ
 	    - (pGetSystemMetricsForDpi(SM_CYFRAME, s_dpi) +
 	       pGetSystemMetricsForDpi(SM_CXPADDEDBORDER, s_dpi)) * 2
 	    - pGetSystemMetricsForDpi(SM_CYCAPTION, s_dpi)
 	    - gui_mswin_get_menu_height(FALSE));
     }
-    else
+    অন্যথা
     {
 	// Inside another window, don't use the frame and border.
-	gui_resize_shell(rect.right - rect.left,
-	    rect.bottom - rect.top - gui_mswin_get_menu_height(FALSE));
+	gui_resize_shell(rect.ডান - rect.বাম,
+	    rect.bottom - rect.শীৰ্ষ - gui_mswin_get_menu_height(FALSE));
     }
 }
 
 /*
  * Set the window title
  */
-    void
+    শূন্য
 gui_mch_settitle(
     char_u  *title,
     char_u  *icon UNUSED)
 {
-    set_window_title(s_hwnd, (title == NULL ? "VIM" : (char *)title));
+    set_window_title(s_hwnd, (title == রিক্ত ? "VIM" : (ৱর্ণ *)title));
 }
 
-#if defined(FEAT_MOUSESHAPE)
+#যদি defined(FEAT_MOUSESHAPE)
 // Table for shape IDCs.  Keep in sync with the mshape_names[] table in
 // misc2.c!
-static LPCSTR mshape_idcs[] =
+স্থির LPCSTR mshape_idcs[] =
 {
     IDC_ARROW,			// arrow
     MAKEINTRESOURCE(0),		// blank
@@ -4234,51 +4234,51 @@ static LPCSTR mshape_idcs[] =
     IDC_ARROW			// last one
 };
 
-    void
-mch_set_mouse_shape(int shape)
+    শূন্য
+mch_set_mouse_shape(পূর্ণাঙ্ক shape)
 {
     LPCSTR idc;
 
-    if (shape == MSHAPE_HIDE)
+    যদি (shape == MSHAPE_HIDE)
 	ShowCursor(FALSE);
-    else
+    অন্যথা
     {
-	if (shape >= MSHAPE_NUMBERED)
+	যদি (shape >= MSHAPE_NUMBERED)
 	    idc = IDC_ARROW;
-	else
+	অন্যথা
 	    idc = mshape_idcs[shape];
-	SetClassLongPtr(s_textArea, GCLP_HCURSOR, (LONG_PTR)LoadCursor(NULL, idc));
-	if (!p_mh)
+	SetClassLongPtr(s_textArea, GCLP_HCURSOR, (LONG_PTR)LoadCursor(রিক্ত, idc));
+	যদি (!p_mh)
 	{
 	    POINT mp;
 
 	    // Set the position to make it redrawn with the new shape.
-	    (void)GetCursorPos(&mp);
-	    (void)SetCursorPos(mp.x, mp.y);
+	    (শূন্য)GetCursorPos(&mp);
+	    (শূন্য)SetCursorPos(mp.x, mp.y);
 	    ShowCursor(TRUE);
 	}
     }
 }
 #endif
 
-#if defined(FEAT_BROWSE)
+#যদি defined(FEAT_BROWSE)
 /*
  * Wide version of convert_filter().
  */
-    static WCHAR *
+    স্থির WCHAR *
 convert_filterW(char_u *s)
 {
     char_u *tmp;
-    int len;
+    পূর্ণাঙ্ক len;
     WCHAR *res;
 
     tmp = convert_filter(s);
-    if (tmp == NULL)
-	return NULL;
-    len = (int)STRLEN(s) + 3;
+    যদি (tmp == রিক্ত)
+	ঘূৰাই রিক্ত;
+    len = (পূর্ণাঙ্ক)STRLEN(s) + 3;
     res = enc_to_utf16(tmp, &len);
     vim_free(tmp);
-    return res;
+    ঘূৰাই res;
 }
 
 /*
@@ -4293,7 +4293,7 @@ convert_filterW(char_u *s)
  */
     char_u *
 gui_mch_browse(
-	int saving,
+	পূর্ণাঙ্ক saving,
 	char_u *title,
 	char_u *dflt,
 	char_u *ext,
@@ -4305,24 +4305,24 @@ gui_mch_browse(
     OPENFILENAMEW	fileStruct;
     WCHAR		fileBuf[MAXPATHL];
     WCHAR		*wp;
-    int			i;
-    WCHAR		*titlep = NULL;
-    WCHAR		*extp = NULL;
-    WCHAR		*initdirp = NULL;
+    পূর্ণাঙ্ক			i;
+    WCHAR		*titlep = রিক্ত;
+    WCHAR		*extp = রিক্ত;
+    WCHAR		*initdirp = রিক্ত;
     WCHAR		*filterp;
     char_u		*p, *q;
     BOOL		ret;
 
-    if (dflt == NULL)
+    যদি (dflt == রিক্ত)
 	fileBuf[0] = NUL;
-    else
+    অন্যথা
     {
-	wp = enc_to_utf16(dflt, NULL);
-	if (wp == NULL)
+	wp = enc_to_utf16(dflt, রিক্ত);
+	যদি (wp == রিক্ত)
 	    fileBuf[0] = NUL;
-	else
+	অন্যথা
 	{
-	    for (i = 0; wp[i] != NUL && i < MAXPATHL - 1; ++i)
+	    বাবে (i = 0; wp[i] != NUL && i < MAXPATHL - 1; ++i)
 		fileBuf[i] = wp[i];
 	    fileBuf[i] = NUL;
 	    vim_free(wp);
@@ -4336,16 +4336,16 @@ gui_mch_browse(
 # ifdef OPENFILENAME_SIZE_VERSION_400W
     // be compatible with Windows NT 4.0
     fileStruct.lStructSize = OPENFILENAME_SIZE_VERSION_400W;
-# else
-    fileStruct.lStructSize = sizeof(fileStruct);
+# অন্যথা
+    fileStruct.lStructSize = পরিমাণ(fileStruct);
 # endif
 
-    if (title != NULL)
-	titlep = enc_to_utf16(title, NULL);
+    যদি (title != রিক্ত)
+	titlep = enc_to_utf16(title, রিক্ত);
     fileStruct.lpstrTitle = titlep;
 
-    if (ext != NULL)
-	extp = enc_to_utf16(ext, NULL);
+    যদি (ext != রিক্ত)
+	extp = enc_to_utf16(ext, রিক্ত);
     fileStruct.lpstrDefExt = extp;
 
     fileStruct.lpstrFile = fileBuf;
@@ -4353,14 +4353,14 @@ gui_mch_browse(
     fileStruct.lpstrFilter = filterp;
     fileStruct.hwndOwner = s_hwnd;		// main Vim window is owner
     // has an initial dir been specified?
-    if (initdir != NULL && *initdir != NUL)
+    যদি (initdir != রিক্ত && *initdir != NUL)
     {
 	// Must have backslashes here, no matter what 'shellslash' says
-	initdirp = enc_to_utf16(initdir, NULL);
-	if (initdirp != NULL)
+	initdirp = enc_to_utf16(initdir, রিক্ত);
+	যদি (initdirp != রিক্ত)
 	{
-	    for (wp = initdirp; *wp != NUL; ++wp)
-		if (*wp == '/')
+	    বাবে (wp = initdirp; *wp != NUL; ++wp)
+		যদি (*wp == '/')
 		    *wp = '\\';
 	}
 	fileStruct.lpstrInitialDir = initdirp;
@@ -4376,12 +4376,12 @@ gui_mch_browse(
      */
     fileStruct.Flags = (OFN_NOCHANGEDIR | OFN_PATHMUSTEXIST | OFN_HIDEREADONLY);
 # ifdef FEAT_SHORTCUT
-    if (curbuf->b_p_bin)
+    যদি (curbuf->b_p_bin)
 	fileStruct.Flags |= OFN_NODEREFERENCELINKS;
 # endif
-    if (saving)
+    যদি (saving)
 	ret = GetSaveFileNameW(&fileStruct);
-    else
+    অন্যথা
 	ret = GetOpenFileNameW(&fileStruct);
 
     vim_free(filterp);
@@ -4389,13 +4389,13 @@ gui_mch_browse(
     vim_free(titlep);
     vim_free(extp);
 
-    if (!ret)
-	return NULL;
+    যদি (!ret)
+	ঘূৰাই রিক্ত;
 
     // Convert from UTF-16 to 'encoding'.
-    p = utf16_to_enc(fileBuf, NULL);
-    if (p == NULL)
-	return NULL;
+    p = utf16_to_enc(fileBuf, রিক্ত);
+    যদি (p == রিক্ত)
+	ঘূৰাই রিক্ত;
 
     // Give focus back to main window (when using MDI).
     SetFocus(s_hwnd);
@@ -4403,7 +4403,7 @@ gui_mch_browse(
     // Shorten the file name if possible
     q = vim_strsave(shorten_fname1(p));
     vim_free(p);
-    return q;
+    ঘূৰাই q;
 }
 
 
@@ -4414,7 +4414,7 @@ gui_mch_browse(
  *
  * Keep in sync with convert_filterW() above!
  */
-    static char_u *
+    স্থির char_u *
 convert_filter(char_u *s)
 {
     char_u	*res;
@@ -4422,19 +4422,19 @@ convert_filter(char_u *s)
     unsigned	i;
 
     res = alloc(s_len + 3);
-    if (res != NULL)
+    যদি (res != রিক্ত)
     {
-	for (i = 0; i < s_len; ++i)
-	    if (s[i] == '\t' || s[i] == '\n')
+	বাবে (i = 0; i < s_len; ++i)
+	    যদি (s[i] == '\t' || s[i] == '\n')
 		res[i] = '\0';
-	    else
+	    অন্যথা
 		res[i] = s[i];
 	res[s_len] = NUL;
 	// Add two extra NULs to make sure it's properly terminated.
 	res[s_len + 1] = NUL;
 	res[s_len + 2] = NUL;
     }
-    return res;
+    ঘূৰাই res;
 }
 
 /*
@@ -4445,12 +4445,12 @@ gui_mch_browsedir(char_u *title, char_u *initdir)
 {
     // We fake this: Use a filter that doesn't select anything and a default
     // file name that won't be used.
-    return gui_mch_browse(0, title, (char_u *)_("Not Used"), NULL,
+    ঘূৰাই gui_mch_browse(0, title, (char_u *)_("Not Used"), রিক্ত,
 			      initdir, (char_u *)_("Directory\t*.nothing\n"));
 }
 #endif // FEAT_BROWSE
 
-    static void
+    স্থির শূন্য
 _OnDropFiles(
     HWND hwnd UNUSED,
     HDROP hDrop)
@@ -4458,8 +4458,8 @@ _OnDropFiles(
 #define BUFPATHLEN _MAX_PATH
 #define DRAGQVAL 0xFFFFFFFF
     WCHAR   wszFile[BUFPATHLEN];
-    char    szFile[BUFPATHLEN];
-    UINT    cFiles = DragQueryFile(hDrop, DRAGQVAL, NULL, 0);
+    ৱর্ণ    szFile[BUFPATHLEN];
+    UINT    cFiles = DragQueryFile(hDrop, DRAGQVAL, রিক্ত, 0);
     UINT    i;
     char_u  **fnames;
     POINT   pt;
@@ -4473,12 +4473,12 @@ _OnDropFiles(
 
     fnames = ALLOC_MULT(char_u *, cFiles);
 
-    if (fnames != NULL)
-	for (i = 0; i < cFiles; ++i)
+    যদি (fnames != রিক্ত)
+	বাবে (i = 0; i < cFiles; ++i)
 	{
-	    if (DragQueryFileW(hDrop, i, wszFile, BUFPATHLEN) > 0)
-		fnames[i] = utf16_to_enc(wszFile, NULL);
-	    else
+	    যদি (DragQueryFileW(hDrop, i, wszFile, BUFPATHLEN) > 0)
+		fnames[i] = utf16_to_enc(wszFile, রিক্ত);
+	    অন্যথা
 	    {
 		DragQueryFile(hDrop, i, szFile, BUFPATHLEN);
 		fnames[i] = vim_strsave((char_u *)szFile);
@@ -4487,16 +4487,16 @@ _OnDropFiles(
 
     DragFinish(hDrop);
 
-    if (fnames == NULL)
-	return;
+    যদি (fnames == রিক্ত)
+	ঘূৰাই;
 
-    int kbd_modifiers = get_active_modifiers();
+    পূর্ণাঙ্ক kbd_modifiers = get_active_modifiers();
 
-    if ((kbd_modifiers & MOD_MASK_SHIFT) != 0)
+    যদি ((kbd_modifiers & MOD_MASK_SHIFT) != 0)
 	modifiers |= MOUSE_SHIFT;
-    if ((kbd_modifiers & MOD_MASK_CTRL) != 0)
+    যদি ((kbd_modifiers & MOD_MASK_CTRL) != 0)
 	modifiers |= MOUSE_CTRL;
-    if ((kbd_modifiers & MOD_MASK_ALT) != 0)
+    যদি ((kbd_modifiers & MOD_MASK_ALT) != 0)
 	modifiers |= MOUSE_ALT;
 
     gui_handle_drop(pt.x, pt.y, modifiers, fnames, cFiles);
@@ -4504,28 +4504,28 @@ _OnDropFiles(
     s_need_activate = TRUE;
 }
 
-    static int
+    স্থির পূর্ণাঙ্ক
 _OnScroll(
     HWND hwnd UNUSED,
     HWND hwndCtl,
     UINT code,
-    int pos)
+    পূর্ণাঙ্ক pos)
 {
-    static UINT	prev_code = 0;   // code of previous call
+    স্থির UINT	prev_code = 0;   // code of previous call
     scrollbar_T *sb, *sb_info;
     long	val;
-    int		dragging = FALSE;
-    int		dont_scroll_save = dont_scroll;
+    পূর্ণাঙ্ক		dragging = FALSE;
+    পূর্ণাঙ্ক		dont_scroll_save = dont_scroll;
     SCROLLINFO	si;
 
-    si.cbSize = sizeof(si);
+    si.cbSize = পরিমাণ(si);
     si.fMask = SIF_POS;
 
     sb = gui_mswin_find_scrollbar(hwndCtl);
-    if (sb == NULL)
-	return 0;
+    যদি (sb == রিক্ত)
+	ঘূৰাই 0;
 
-    if (sb->wp != NULL)		// Left or right scrollbar
+    যদি (sb->wp != রিক্ত)		// Left or right scrollbar
     {
 	/*
 	 * Careful: need to get scrollbar info out of first (left) scrollbar
@@ -4534,38 +4534,38 @@ _OnScroll(
 	 */
 	sb_info = &sb->wp->w_scrollbars[0];
     }
-    else	    // Bottom scrollbar
+    অন্যথা	    // Bottom scrollbar
 	sb_info = sb;
-    val = sb_info->value;
+    val = sb_info->মান;
 
-    switch (code)
+    ৱিকল্প (code)
     {
-	case SB_THUMBTRACK:
+	পক্ষ SB_THUMBTRACK:
 	    val = pos;
 	    dragging = TRUE;
-	    if (sb->scroll_shift > 0)
+	    যদি (sb->scroll_shift > 0)
 		val <<= sb->scroll_shift;
-	    break;
-	case SB_LINEDOWN:
+	    ভঙ্গ;
+	পক্ষ SB_LINEDOWN:
 	    val++;
-	    break;
-	case SB_LINEUP:
+	    ভঙ্গ;
+	পক্ষ SB_LINEUP:
 	    val--;
-	    break;
-	case SB_PAGEDOWN:
+	    ভঙ্গ;
+	পক্ষ SB_PAGEDOWN:
 	    val += (sb_info->size > 2 ? sb_info->size - 2 : 1);
-	    break;
-	case SB_PAGEUP:
+	    ভঙ্গ;
+	পক্ষ SB_PAGEUP:
 	    val -= (sb_info->size > 2 ? sb_info->size - 2 : 1);
-	    break;
-	case SB_TOP:
+	    ভঙ্গ;
+	পক্ষ SB_শীৰ্ষ:
 	    val = 0;
-	    break;
-	case SB_BOTTOM:
+	    ভঙ্গ;
+	পক্ষ SB_BOTTOM:
 	    val = sb_info->max;
-	    break;
-	case SB_ENDSCROLL:
-	    if (prev_code == SB_THUMBTRACK)
+	    ভঙ্গ;
+	পক্ষ SB_ENDSCROLL:
+	    যদি (prev_code == SB_THUMBTRACK)
 	    {
 		/*
 		 * "pos" only gives us 16-bit data.  In case of large file,
@@ -4573,14 +4573,14 @@ _OnScroll(
 		 * is not valid while the scrollbar is being dragged.
 		 */
 		val = GetScrollPos(hwndCtl, SB_CTL);
-		if (sb->scroll_shift > 0)
+		যদি (sb->scroll_shift > 0)
 		    val <<= sb->scroll_shift;
 	    }
-	    break;
+	    ভঙ্গ;
 
-	default:
+	স্ৱভাৱ:
 	    // TRACE("Unknown scrollbar event %d\n", code);
-	    return 0;
+	    ঘূৰাই 0;
     }
     prev_code = code;
 
@@ -4590,10 +4590,10 @@ _OnScroll(
     /*
      * When moving a vertical scrollbar, move the other vertical scrollbar too.
      */
-    if (sb->wp != NULL)
+    যদি (sb->wp != রিক্ত)
     {
 	scrollbar_T *sba = sb->wp->w_scrollbars;
-	HWND    id = sba[ (sb == sba + SBAR_LEFT) ? SBAR_RIGHT : SBAR_LEFT].id;
+	HWND    id = sba[ (sb == sba + SBAR_বাম) ? SBAR_ডান : SBAR_বাম].id;
 
 	SetScrollInfo(id, SB_CTL, &si, TRUE);
     }
@@ -4613,7 +4613,7 @@ _OnScroll(
     s_busy_processing = FALSE;
     dont_scroll = dont_scroll_save;
 
-    return 0;
+    ঘূৰাই 0;
 }
 
 
@@ -4634,16 +4634,16 @@ _OnScroll(
 # define ID_BEVAL_TOOLTIP   200
 # define BEVAL_TEXT_LEN	    MAXPATHL
 
-static BalloonEval  *cur_beval = NULL;
-static UINT_PTR	    beval_timer_id = 0;
-static DWORD	    last_user_activity = 0;
+স্থির BalloonEval  *cur_beval = রিক্ত;
+স্থির UINT_PTR	    beval_timer_id = 0;
+স্থির DWORD	    last_user_activity = 0;
 #endif // defined(FEAT_BEVAL_GUI)
 
 
 // Local variables:
 
 #ifdef FEAT_MENU
-static UINT	s_menu_id = 100;
+স্থির UINT	s_menu_id = 100;
 #endif
 
 /*
@@ -4663,7 +4663,7 @@ static UINT	s_menu_id = 100;
 /*
  * stuff for dialogs, menus, tearoffs etc.
  */
-static PWORD
+স্থির PWORD
 add_dialog_element(
 	PWORD p,
 	DWORD lStyle,
@@ -4673,58 +4673,58 @@ add_dialog_element(
 	WORD h,
 	WORD Id,
 	WORD clss,
-	const char *caption);
-static LPWORD lpwAlign(LPWORD);
-static int nCopyAnsiToWideChar(LPWORD, LPSTR, BOOL);
-#if defined(FEAT_MENU) && defined(FEAT_TEAROFF)
-static void gui_mch_tearoff(char_u *title, vimmenu_T *menu, int initX, int initY);
+	ধ্রুৱ ৱর্ণ *caption);
+স্থির LPWORD lpwAlign(LPWORD);
+স্থির পূর্ণাঙ্ক nCopyAnsiToWideChar(LPWORD, LPSTR, BOOL);
+#যদি defined(FEAT_MENU) && defined(FEAT_TEAROFF)
+স্থির শূন্য gui_mch_tearoff(char_u *title, vimmenu_T *menu, পূর্ণাঙ্ক initX, পূর্ণাঙ্ক initY);
 #endif
-static void get_dialog_font_metrics(void);
+স্থির শূন্য get_dialog_font_metrics(শূন্য);
 
-static int dialog_default_button = -1;
+স্থির পূর্ণাঙ্ক dialog_default_button = -1;
 
 #ifdef FEAT_TOOLBAR
-static void initialise_toolbar(void);
-static void update_toolbar_size(void);
-static LRESULT CALLBACK toolbar_wndproc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
-static int get_toolbar_bitmap(vimmenu_T *menu);
-#else
+স্থির শূন্য initialise_toolbar(শূন্য);
+স্থির শূন্য update_toolbar_size(শূন্য);
+স্থির LRESULT CALLBACK toolbar_wndproc(HWND hwnd, UINT u_বাৰ্তা, WPARAM wParam, LPARAM lParam);
+স্থির পূর্ণাঙ্ক get_toolbar_bitmap(vimmenu_T *menu);
+#অন্যথা
 # define update_toolbar_size()
 #endif
 
 #ifdef FEAT_GUI_TABLINE
-static void initialise_tabline(void);
-static LRESULT CALLBACK tabline_wndproc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+স্থির শূন্য initialise_tabline(শূন্য);
+স্থির LRESULT CALLBACK tabline_wndproc(HWND hwnd, UINT u_বাৰ্তা, WPARAM wParam, LPARAM lParam);
 #endif
 
 #ifdef FEAT_MBYTE_IME
-static LRESULT _OnImeComposition(HWND hwnd, WPARAM dbcs, LPARAM param);
-static char_u *GetResultStr(HWND hwnd, int GCS, int *lenp);
+স্থির LRESULT _OnImeComposition(HWND hwnd, WPARAM dbcs, LPARAM param);
+স্থির char_u *GetResultStr(HWND hwnd, পূর্ণাঙ্ক GCS, পূর্ণাঙ্ক *lenp);
 #endif
-#if defined(FEAT_MBYTE_IME) && defined(DYNAMIC_IME)
+#যদি defined(FEAT_MBYTE_IME) && defined(DYNAMIC_IME)
 # ifdef NOIME
-typedef struct tagCOMPOSITIONFORM {
+প্রকারনির্দেশ সংরচনা tagCOMPOSITIONFORM {
     DWORD dwStyle;
     POINT ptCurrentPos;
     RECT  rcArea;
 } COMPOSITIONFORM, *PCOMPOSITIONFORM, NEAR *NPCOMPOSITIONFORM, FAR *LPCOMPOSITIONFORM;
-typedef HANDLE HIMC;
+প্রকারনির্দেশ HANDLE HIMC;
 # endif
 
-static HINSTANCE hLibImm = NULL;
-static LONG (WINAPI *pImmGetCompositionStringW)(HIMC, DWORD, LPVOID, DWORD);
-static HIMC (WINAPI *pImmGetContext)(HWND);
-static HIMC (WINAPI *pImmAssociateContext)(HWND, HIMC);
-static BOOL (WINAPI *pImmReleaseContext)(HWND, HIMC);
-static BOOL (WINAPI *pImmGetOpenStatus)(HIMC);
-static BOOL (WINAPI *pImmSetOpenStatus)(HIMC, BOOL);
-static BOOL (WINAPI *pImmGetCompositionFontW)(HIMC, LPLOGFONTW);
-static BOOL (WINAPI *pImmSetCompositionFontW)(HIMC, LPLOGFONTW);
-static BOOL (WINAPI *pImmSetCompositionWindow)(HIMC, LPCOMPOSITIONFORM);
-static BOOL (WINAPI *pImmGetConversionStatus)(HIMC, LPDWORD, LPDWORD);
-static BOOL (WINAPI *pImmSetConversionStatus)(HIMC, DWORD, DWORD);
-static void dyn_imm_load(void);
-#else
+স্থির HINSTANCE hLibImm = রিক্ত;
+স্থির LONG (WINAPI *pImmGetCompositionStringW)(HIMC, DWORD, LPVOID, DWORD);
+স্থির HIMC (WINAPI *pImmGetContext)(HWND);
+স্থির HIMC (WINAPI *pImmAssociateContext)(HWND, HIMC);
+স্থির BOOL (WINAPI *pImmReleaseContext)(HWND, HIMC);
+স্থির BOOL (WINAPI *pImmGetOpenStatus)(HIMC);
+স্থির BOOL (WINAPI *pImmSetOpenStatus)(HIMC, BOOL);
+স্থির BOOL (WINAPI *pImmGetCompositionFontW)(HIMC, LPLOGFONTW);
+স্থির BOOL (WINAPI *pImmSetCompositionFontW)(HIMC, LPLOGFONTW);
+স্থির BOOL (WINAPI *pImmSetCompositionWindow)(HIMC, LPCOMPOSITIONFORM);
+স্থির BOOL (WINAPI *pImmGetConversionStatus)(HIMC, LPDWORD, LPDWORD);
+স্থির BOOL (WINAPI *pImmSetConversionStatus)(HIMC, DWORD, DWORD);
+স্থির শূন্য dyn_imm_load(শূন্য);
+#অন্যথা
 # define pImmGetCompositionStringW ImmGetCompositionStringW
 # define pImmGetContext		  ImmGetContext
 # define pImmAssociateContext	  ImmAssociateContext
@@ -4742,24 +4742,24 @@ static void dyn_imm_load(void);
 /*
  * Figure out how high the menu bar is at the moment.
  */
-    static int
+    স্থির পূর্ণাঙ্ক
 gui_mswin_get_menu_height(
-    int	    fix_window)	    // If TRUE, resize window if menu height changed
+    পূর্ণাঙ্ক	    fix_window)	    // If TRUE, resize window if menu height changed
 {
-    static int	old_menu_height = -1;
+    স্থির পূর্ণাঙ্ক	old_menu_height = -1;
 
     RECT    rc1, rc2;
-    int	    num;
-    int	    menu_height;
+    পূর্ণাঙ্ক	    অঙ্ক;
+    পূর্ণাঙ্ক	    menu_height;
 
-    if (gui.menu_is_active)
-	num = GetMenuItemCount(s_menuBar);
-    else
-	num = 0;
+    যদি (gui.menu_is_active)
+	অঙ্ক = Get_Menu_Item_গুনতি(s_menuBar);
+    অন্যথা
+	অঙ্ক = 0;
 
-    if (num == 0)
+    যদি (অঙ্ক == 0)
 	menu_height = 0;
-    else if (IsMinimized(s_hwnd))
+    অন্যথা যদি (IsMinimized(s_hwnd))
     {
 	// The height of the menu cannot be determined while the window is
 	// minimized.  Take the previous height if the menu is changed in that
@@ -4767,7 +4767,7 @@ gui_mswin_get_menu_height(
 	// increases due to the unaccounted-for menu height.
 	menu_height = old_menu_height == -1 ? 0 : old_menu_height;
     }
-    else
+    অন্যথা
     {
 	/*
 	 * In case 'lines' is set in _vimrc/_gvimrc window width doesn't
@@ -4777,20 +4777,20 @@ gui_mswin_get_menu_height(
 	 * should wrap over more than one line.
 	 */
 	GetMenuItemRect(s_hwnd, s_menuBar, 0, &rc1);
-	if (gui.starting)
-	    menu_height = rc1.bottom - rc1.top + 1;
-	else
+	যদি (gui.starting)
+	    menu_height = rc1.bottom - rc1.শীৰ্ষ + 1;
+	অন্যথা
 	{
-	    GetMenuItemRect(s_hwnd, s_menuBar, num - 1, &rc2);
-	    menu_height = rc2.bottom - rc1.top + 1;
+	    GetMenuItemRect(s_hwnd, s_menuBar, অঙ্ক - 1, &rc2);
+	    menu_height = rc2.bottom - rc1.শীৰ্ষ + 1;
 	}
     }
 
-    if (fix_window && menu_height != old_menu_height)
+    যদি (fix_window && menu_height != old_menu_height)
 	gui_set_shellsize(FALSE, FALSE, RESIZE_VERT);
     old_menu_height = menu_height;
 
-    return menu_height;
+    ঘূৰাই menu_height;
 }
 #endif // FEAT_MENU
 
@@ -4798,26 +4798,26 @@ gui_mswin_get_menu_height(
 /*
  * Setup for the Intellimouse
  */
-    static long
-mouse_vertical_scroll_step(void)
+    স্থির long
+mouse_vertical_scroll_step(শূন্য)
 {
     UINT val;
-    if (SystemParametersInfo(SPI_GETWHEELSCROLLLINES, 0, &val, 0))
-	return (val != WHEEL_PAGESCROLL) ? (long)val : -1;
-    return 3; // Safe default;
+    যদি (SystemParametersInfo(SPI_GETWHEELSCROLLLINES, 0, &val, 0))
+	ঘূৰাই (val != WHEEL_PAGESCROLL) ? (long)val : -1;
+    ঘূৰাই 3; // Safe default;
 }
 
-    static long
-mouse_horizontal_scroll_step(void)
+    স্থির long
+mouse_horizontal_scroll_step(শূন্য)
 {
     UINT val;
-    if (SystemParametersInfo(SPI_GETWHEELSCROLLCHARS, 0, &val, 0))
-	return (long)val;
-    return 3; // Safe default;
+    যদি (SystemParametersInfo(SPI_GETWHEELSCROLLCHARS, 0, &val, 0))
+	ঘূৰাই (long)val;
+    ঘূৰাই 3; // Safe default;
 }
 
-    static void
-init_mouse_wheel(void)
+    স্থির শূন্য
+init_mouse_wheel(শূন্য)
 {
     // Get the default values for the horizontal and vertical scroll steps from
     // the system.
@@ -4828,20 +4828,20 @@ init_mouse_wheel(void)
 /*
  * Mouse scroll event handler.
  */
-    static void
-_OnMouseWheel(HWND hwnd UNUSED, WPARAM wParam, LPARAM lParam, int horizontal)
+    স্থির শূন্য
+_OnMouseWheel(HWND hwnd UNUSED, WPARAM wParam, LPARAM lParam, পূর্ণাঙ্ক horizontal)
 {
-    int		button;
+    পূর্ণাঙ্ক		button;
     win_T	*wp;
-    int		modifiers = 0;
-    int		kbd_modifiers;
-    int		zDelta = GET_WHEEL_DELTA_WPARAM(wParam);
+    পূর্ণাঙ্ক		modifiers = 0;
+    পূর্ণাঙ্ক		kbd_modifiers;
+    পূর্ণাঙ্ক		zDelta = GET_WHEEL_DELTA_WPARAM(wParam);
     POINT	pt;
 
     wp = gui_mouse_window(FIND_POPUP);
 
 #ifdef FEAT_PROP_POPUP
-    if (wp != NULL && popup_is_popup(wp))
+    যদি (wp != রিক্ত && popup_is_popup(wp))
     {
 	cmdarg_T cap;
 	oparg_T	oa;
@@ -4850,12 +4850,12 @@ _OnMouseWheel(HWND hwnd UNUSED, WPARAM wParam, LPARAM lParam, int horizontal)
 	mouse_row = wp->w_winrow;
 	mouse_col = wp->w_wincol;
 	CLEAR_FIELD(cap);
-	if (horizontal)
+	যদি (horizontal)
 	{
-	    cap.arg = zDelta < 0 ? MSCR_LEFT : MSCR_RIGHT;
+	    cap.arg = zDelta < 0 ? MSCR_বাম : MSCR_ডান;
 	    cap.cmdchar = zDelta < 0 ? K_MOUSELEFT : K_MOUSERIGHT;
 	}
-	else
+	অন্যথা
 	{
 	    cap.arg = zDelta < 0 ? MSCR_UP : MSCR_DOWN;
 	    cap.cmdchar = zDelta < 0 ? K_MOUSEUP : K_MOUSEDOWN;
@@ -4869,23 +4869,23 @@ _OnMouseWheel(HWND hwnd UNUSED, WPARAM wParam, LPARAM lParam, int horizontal)
     }
 #endif
 
-    if (wp == NULL || !p_scf)
+    যদি (wp == রিক্ত || !p_scf)
 	wp = curwin;
 
     // Translate the scroll event into an event that Vim can process so that
     // the user has a chance to map the scrollwheel buttons.
-    if (horizontal)
+    যদি (horizontal)
 	button = zDelta >= 0 ? MOUSE_6 : MOUSE_7;
-    else
+    অন্যথা
 	button = zDelta >= 0 ? MOUSE_4 : MOUSE_5;
 
     kbd_modifiers = get_active_modifiers();
 
-    if ((kbd_modifiers & MOD_MASK_SHIFT) != 0)
+    যদি ((kbd_modifiers & MOD_MASK_SHIFT) != 0)
 	modifiers |= MOUSE_SHIFT;
-    if ((kbd_modifiers & MOD_MASK_CTRL) != 0)
+    যদি ((kbd_modifiers & MOD_MASK_CTRL) != 0)
 	modifiers |= MOUSE_CTRL;
-    if ((kbd_modifiers & MOD_MASK_ALT) != 0)
+    যদি ((kbd_modifiers & MOD_MASK_ALT) != 0)
 	modifiers |= MOUSE_ALT;
 
     // The cursor position is relative to the upper-left corner of the screen.
@@ -4901,30 +4901,30 @@ _OnMouseWheel(HWND hwnd UNUSED, WPARAM wParam, LPARAM lParam, int horizontal)
  * Get Menu Font.
  * Return OK or FAIL.
  */
-    static int
+    স্থির পূর্ণাঙ্ক
 gui_w32_get_menu_font(LOGFONTW *lf)
 {
     NONCLIENTMETRICSW nm;
 
-    nm.cbSize = sizeof(NONCLIENTMETRICSW);
-    if (!SystemParametersInfoW(
+    nm.cbSize = পরিমাণ(NONCLIENTMETRICSW);
+    যদি (!SystemParametersInfoW(
 	    SPI_GETNONCLIENTMETRICS,
-	    sizeof(NONCLIENTMETRICSW),
+	    পরিমাণ(NONCLIENTMETRICSW),
 	    &nm,
 	    0))
-	return FAIL;
+	ঘূৰাই FAIL;
     *lf = nm.lfMenuFont;
-    return OK;
+    ঘূৰাই OK;
 }
 #endif
 
 
-#if defined(FEAT_GUI_TABLINE) && defined(USE_SYSMENU_FONT)
+#যদি defined(FEAT_GUI_TABLINE) && defined(USE_SYSMENU_FONT)
 /*
  * Set the GUI tabline font to the system menu font
  */
-    static void
-set_tabline_font(void)
+    স্থির শূন্য
+set_tabline_font(শূন্য)
 {
     LOGFONTW	lfSysmenu;
     HFONT	font;
@@ -4933,8 +4933,8 @@ set_tabline_font(void)
     HFONT	hfntOld;
     TEXTMETRIC	tm;
 
-    if (gui_w32_get_menu_font(&lfSysmenu) != OK)
-	return;
+    যদি (gui_w32_get_menu_font(&lfSysmenu) != OK)
+	ঘূৰাই;
 
     lfSysmenu.lfHeight = adjust_fontsize_by_dpi(lfSysmenu.lfHeight);
     font = CreateFontIndirectW(&lfSysmenu);
@@ -4959,43 +4959,43 @@ set_tabline_font(void)
      */
     gui.tabline_height = tm.tmHeight + tm.tmInternalLeading + 7;
 }
-#else
+#অন্যথা
 # define set_tabline_font()
 #endif
 
 /*
  * Invoked when a setting was changed.
  */
-    static LRESULT CALLBACK
+    স্থির LRESULT CALLBACK
 _OnSettingChange(UINT param)
 {
-    switch (param)
+    ৱিকল্প (param)
     {
-	case SPI_SETWHEELSCROLLLINES:
+	পক্ষ SPI_SETWHEELSCROLLLINES:
 	    mouse_set_vert_scroll_step(mouse_vertical_scroll_step());
-	    break;
-	case SPI_SETWHEELSCROLLCHARS:
+	    ভঙ্গ;
+	পক্ষ SPI_SETWHEELSCROLLCHARS:
 	    mouse_set_hor_scroll_step(mouse_horizontal_scroll_step());
-	    break;
-	case SPI_SETNONCLIENTMETRICS:
+	    ভঙ্গ;
+	পক্ষ SPI_SETNONCLIENTMETRICS:
 	    set_tabline_font();
-	    break;
-	default:
-	    break;
+	    ভঙ্গ;
+	স্ৱভাৱ:
+	    ভঙ্গ;
     }
-    return 0;
+    ঘূৰাই 0;
 }
 
 #ifdef FEAT_NETBEANS_INTG
-    static void
+    স্থির শূন্য
 _OnWindowPosChanged(
     HWND hwnd,
-    const LPWINDOWPOS lpwpos)
+    ধ্রুৱ LPWINDOWPOS lpwpos)
 {
-    static int x = 0, y = 0, cx = 0, cy = 0;
-    extern int WSInitialized;
+    স্থির পূর্ণাঙ্ক x = 0, y = 0, cx = 0, cy = 0;
+    বাহ্য পূর্ণাঙ্ক WSInitialized;
 
-    if (WSInitialized && (lpwpos->x != x || lpwpos->y != y
+    যদি (WSInitialized && (lpwpos->x != x || lpwpos->y != y
 				     || lpwpos->cx != cx || lpwpos->cy != cy))
     {
 	x = lpwpos->x;
@@ -5010,85 +5010,85 @@ _OnWindowPosChanged(
 #endif
 
 
-static HWND hwndTip = NULL;
+স্থির HWND hwndTip = রিক্ত;
 
-    static void
-show_sizing_tip(int cols, int rows)
+    স্থির শূন্য
+show_sizing_tip(পূর্ণাঙ্ক cols, পূর্ণাঙ্ক rows)
 {
     TOOLINFOA ti;
-    char buf[32];
+    ৱর্ণ buf[32];
 
-    ti.cbSize = sizeof(ti);
+    ti.cbSize = পরিমাণ(ti);
     ti.hwnd = s_hwnd;
     ti.uId = (UINT_PTR)s_hwnd;
     ti.uFlags = TTF_SUBCLASS | TTF_IDISHWND;
     ti.lpszText = buf;
     sprintf(buf, "%dx%d", cols, rows);
-    if (hwndTip == NULL)
+    যদি (hwndTip == রিক্ত)
     {
-	hwndTip = CreateWindowExA(0, TOOLTIPS_CLASSA, NULL,
+	hwndTip = CreateWindowExA(0, TOOLTIPS_CLASSA, রিক্ত,
 		WS_POPUP | TTS_ALWAYSTIP | TTS_NOPREFIX,
 		CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,
-		s_hwnd, NULL, GetModuleHandle(NULL), NULL);
+		s_hwnd, রিক্ত, GetModuleHandle(রিক্ত), রিক্ত);
 	SendMessage(hwndTip, TTM_ADDTOOL, 0, (LPARAM)&ti);
 	SendMessage(hwndTip, TTM_TRACKACTIVATE, TRUE, (LPARAM)&ti);
     }
-    else
+    অন্যথা
     {
 	SendMessage(hwndTip, TTM_UPDATETIPTEXT, 0, (LPARAM)&ti);
     }
     SendMessage(hwndTip, TTM_POPUP, 0, 0);
 }
 
-    static void
-destroy_sizing_tip(void)
+    স্থির শূন্য
+destroy_sizing_tip(শূন্য)
 {
-    if (hwndTip == NULL)
-	return;
+    যদি (hwndTip == রিক্ত)
+	ঘূৰাই;
 
     DestroyWindow(hwndTip);
-    hwndTip = NULL;
+    hwndTip = রিক্ত;
 }
 
-    static int
+    স্থির পূর্ণাঙ্ক
 _DuringSizing(
     UINT fwSide,
     LPRECT lprc)
 {
-    int	    w, h;
-    int	    valid_w, valid_h;
-    int	    w_offset, h_offset;
-    int	    cols, rows;
+    পূর্ণাঙ্ক	    w, h;
+    পূর্ণাঙ্ক	    valid_w, valid_h;
+    পূর্ণাঙ্ক	    w_offset, h_offset;
+    পূর্ণাঙ্ক	    cols, rows;
 
-    w = lprc->right - lprc->left;
-    h = lprc->bottom - lprc->top;
+    w = lprc->ডান - lprc->বাম;
+    h = lprc->bottom - lprc->শীৰ্ষ;
     gui_mswin_get_valid_dimensions(w, h, &valid_w, &valid_h, &cols, &rows);
     w_offset = w - valid_w;
     h_offset = h - valid_h;
 
-    if (fwSide == WMSZ_LEFT || fwSide == WMSZ_TOPLEFT
+    যদি (fwSide == WMSZ_বাম || fwSide == WMSZ_TOPLEFT
 			    || fwSide == WMSZ_BOTTOMLEFT)
-	lprc->left += w_offset;
-    else if (fwSide == WMSZ_RIGHT || fwSide == WMSZ_TOPRIGHT
+	lprc->বাম += w_offset;
+    অন্যথা যদি (fwSide == WMSZ_ডান || fwSide == WMSZ_TOPRIGHT
 			    || fwSide == WMSZ_BOTTOMRIGHT)
-	lprc->right -= w_offset;
+	lprc->ডান -= w_offset;
 
-    if (fwSide == WMSZ_TOP || fwSide == WMSZ_TOPLEFT
+    যদি (fwSide == WMSZ_শীৰ্ষ || fwSide == WMSZ_TOPLEFT
 			    || fwSide == WMSZ_TOPRIGHT)
-	lprc->top += h_offset;
-    else if (fwSide == WMSZ_BOTTOM || fwSide == WMSZ_BOTTOMLEFT
+	lprc->শীৰ্ষ += h_offset;
+    অন্যথা যদি (fwSide == WMSZ_BOTTOM || fwSide == WMSZ_BOTTOMLEFT
 			    || fwSide == WMSZ_BOTTOMRIGHT)
 	lprc->bottom -= h_offset;
 
     show_sizing_tip(cols, rows);
-    return TRUE;
+    ঘূৰাই TRUE;
 }
 
 #ifdef FEAT_GUI_TABLINE
-    static void
-_OnRButtonUp(HWND hwnd, int x, int y, UINT keyFlags)
+    স্থির শূন্য
+_OnRButtonUp(HWND hwnd, পূর্ণাঙ্ক x, পূর্ণাঙ্ক y, UINT চাবি_Flags)
 {
-    if (gui_mch_showing_tabline())
+    যদি (gui_mch_showing_tabline())
     {
 	POINT pt;
 	RECT rect;
@@ -5098,81 +5098,81 @@ _OnRButtonUp(HWND hwnd, int x, int y, UINT keyFlags)
 	 */
 	GetCursorPos(&pt);
 	GetWindowRect(s_textArea, &rect);
-	if (pt.y < rect.top)
+	যদি (pt.y < rect.শীৰ্ষ)
 	{
 	    show_tabline_popup_menu();
-	    return;
+	    ঘূৰাই;
 	}
     }
-    FORWARD_WM_RBUTTONUP(hwnd, x, y, keyFlags, DefWindowProcW);
+    FORWARD_WM_RBUTTONUP(hwnd, x, y, চাবি_Flags, DefWindowProcW);
 }
 
-    static void
-_OnLButtonDown(HWND hwnd, BOOL fDoubleClick, int x, int y, UINT keyFlags)
+    স্থির শূন্য
+_OnLButtonDown(HWND hwnd, BOOL fDoubleClick, পূর্ণাঙ্ক x, পূর্ণাঙ্ক y, UINT চাবি_Flags)
 {
     /*
      * If the user double clicked the tabline, create a new tab
      */
-    if (gui_mch_showing_tabline())
+    যদি (gui_mch_showing_tabline())
     {
 	POINT pt;
 	RECT rect;
 
 	GetCursorPos(&pt);
 	GetWindowRect(s_textArea, &rect);
-	if (pt.y < rect.top)
+	যদি (pt.y < rect.শীৰ্ষ)
 	    send_tabline_menu_event(0, TABLINE_MENU_NEW);
     }
-    FORWARD_WM_LBUTTONDOWN(hwnd, fDoubleClick, x, y, keyFlags, DefWindowProcW);
+    FORWARD_WM_LBUTTONDOWN(hwnd, fDoubleClick, x, y, চাবি_Flags, DefWindowProcW);
 }
 #endif
 
-    static UINT
-_OnNCHitTest(HWND hwnd, int xPos, int yPos)
+    স্থির UINT
+_OnNCHitTest(HWND hwnd, পূর্ণাঙ্ক xPos, পূর্ণাঙ্ক yPos)
 {
     UINT	result;
-    int		x, y;
+    পূর্ণাঙ্ক		x, y;
 
     result = FORWARD_WM_NCHITTEST(hwnd, xPos, yPos, DefWindowProcW);
-    if (result != HTCLIENT)
-	return result;
+    যদি (result != HTCLIENT)
+	ঘূৰাই result;
 
 #ifdef FEAT_GUI_TABLINE
-    if (gui_mch_showing_tabline())
+    যদি (gui_mch_showing_tabline())
     {
 	RECT rct;
 
 	// If the cursor is on the GUI tabline, don't process this event
 	GetWindowRect(s_textArea, &rct);
-	if (yPos < rct.top)
-	    return result;
+	যদি (yPos < rct.শীৰ্ষ)
+	    ঘূৰাই result;
     }
 #endif
-    (void)gui_mch_get_winpos(&x, &y);
+    (শূন্য)gui_mch_get_winpos(&x, &y);
     xPos -= x;
 
-    if (xPos < 48) // <VN> TODO should use system metric?
-	return HTBOTTOMLEFT;
-    else
-	return HTBOTTOMRIGHT;
+    যদি (xPos < 48) // <VN> TODO should use system metric?
+	ঘূৰাই HTBOTTOMLEFT;
+    অন্যথা
+	ঘূৰাই HTBOTTOMRIGHT;
 }
 
-#if defined(FEAT_TOOLBAR) || defined(FEAT_GUI_TABLINE)
-    static LRESULT
+#যদি defined(FEAT_TOOLBAR) || defined(FEAT_GUI_TABLINE)
+    স্থির LRESULT
 _OnNotify(HWND hwnd, UINT id, NMHDR *hdr)
 {
-    switch (hdr->code)
+    ৱিকল্প (hdr->code)
     {
-	case TTN_GETDISPINFOW:
-	case TTN_GETDISPINFO:
+	পক্ষ TTN_GETDISPINFOW:
+	পক্ষ TTN_GETDISPINFO:
 	    {
-		char_u		*str = NULL;
-		static void	*tt_text = NULL;
+		char_u		*str = রিক্ত;
+		স্থির শূন্য	*tt_text = রিক্ত;
 
 		VIM_CLEAR(tt_text);
 
 # ifdef FEAT_GUI_TABLINE
-		if (gui_mch_showing_tabline()
+		যদি (gui_mch_showing_tabline()
 			&& hdr->hwndFrom == TabCtrl_GetToolTips(s_tabhwnd))
 		{
 		    POINT	pt;
@@ -5183,10 +5183,10 @@ _OnNotify(HWND hwnd, UINT id, NMHDR *hdr)
 		     * Get the cursor position within the tab control
 		     */
 		    GetCursorPos(&pt);
-		    if (ScreenToClient(s_tabhwnd, &pt) != 0)
+		    যদি (ScreenToClient(s_tabhwnd, &pt) != 0)
 		    {
 			TCHITTESTINFO htinfo;
-			int idx;
+			পূর্ণাঙ্ক idx;
 
 			/*
 			 * Get the tab under the cursor
@@ -5194,12 +5194,12 @@ _OnNotify(HWND hwnd, UINT id, NMHDR *hdr)
 			htinfo.pt.x = pt.x;
 			htinfo.pt.y = pt.y;
 			idx = TabCtrl_HitTest(s_tabhwnd, &htinfo);
-			if (idx != -1)
+			যদি (idx != -1)
 			{
 			    tabpage_T *tp;
 
 			    tp = find_tabpage(idx + 1);
-			    if (tp != NULL)
+			    যদি (tp != রিক্ত)
 			    {
 				get_tabline_label(tp, TRUE);
 				str = NameBuff;
@@ -5210,122 +5210,122 @@ _OnNotify(HWND hwnd, UINT id, NMHDR *hdr)
 # endif
 # ifdef FEAT_TOOLBAR
 #  ifdef FEAT_GUI_TABLINE
-		else
+		অন্যথা
 #  endif
 		{
 		    UINT	idButton;
 		    vimmenu_T	*pMenu;
 
 		    idButton = (UINT) hdr->idFrom;
-		    pMenu = gui_mswin_find_menu(root_menu, idButton);
-		    if (pMenu)
+		    pMenu = gui_mswin_find_menu(মূল_menu, idButton);
+		    যদি (pMenu)
 			str = pMenu->strings[MENU_INDEX_TIP];
 		}
 # endif
-		if (str == NULL)
-		    break;
+		যদি (str == রিক্ত)
+		    ভঙ্গ;
 
 		// Set the maximum width, this also enables using \n for
 		// line break.
 		SendMessage(hdr->hwndFrom, TTM_SETMAXTIPWIDTH, 0, 500);
 
-		if (hdr->code == TTN_GETDISPINFOW)
+		যদি (hdr->code == TTN_GETDISPINFOW)
 		{
 		    LPNMTTDISPINFOW	lpdi = (LPNMTTDISPINFOW)hdr;
 
-		    tt_text = enc_to_utf16(str, NULL);
+		    tt_text = enc_to_utf16(str, রিক্ত);
 		    lpdi->lpszText = tt_text;
 		    // can't show tooltip if failed
 		}
-		else
+		অন্যথা
 		{
 		    LPNMTTDISPINFO	lpdi = (LPNMTTDISPINFO)hdr;
 		    size_t		len = STRLEN(str);
 
-		    if (len < sizeof(lpdi->szText)
-			    || ((tt_text = vim_strnsave(str, len)) == NULL))
+		    যদি (len < পরিমাণ(lpdi->szText)
+			    || ((tt_text = vim_strnsave(str, len)) == রিক্ত))
 			vim_strncpy((char_u *)lpdi->szText, str,
-				sizeof(lpdi->szText) - 1);
-		    else
+				পরিমাণ(lpdi->szText) - 1);
+		    অন্যথা
 			lpdi->lpszText = tt_text;
 		}
 	    }
-	    break;
+	    ভঙ্গ;
 
 # ifdef FEAT_GUI_TABLINE
-	case TCN_SELCHANGE:
-	    if (gui_mch_showing_tabline() && (hdr->hwndFrom == s_tabhwnd))
+	পক্ষ TCN_SELCHANGE:
+	    যদি (gui_mch_showing_tabline() && (hdr->hwndFrom == s_tabhwnd))
 	    {
 		send_tabline_event(TabCtrl_GetCurSel(s_tabhwnd) + 1);
-		return 0L;
+		ঘূৰাই 0L;
 	    }
-	    break;
+	    ভঙ্গ;
 
-	case NM_RCLICK:
-	    if (gui_mch_showing_tabline() && (hdr->hwndFrom == s_tabhwnd))
+	পক্ষ NM_RCLICK:
+	    যদি (gui_mch_showing_tabline() && (hdr->hwndFrom == s_tabhwnd))
 	    {
 		show_tabline_popup_menu();
-		return 0L;
+		ঘূৰাই 0L;
 	    }
-	    break;
+	    ভঙ্গ;
 # endif
 
-	default:
-	    break;
+	স্ৱভাৱ:
+	    ভঙ্গ;
     }
-    return DefWindowProcW(hwnd, WM_NOTIFY, (WPARAM)id, (LPARAM)hdr);
+    ঘূৰাই DefWindowProcW(hwnd, WM_NOTIFY, (WPARAM)id, (LPARAM)hdr);
 }
 #endif
 
-#if defined(MENUHINTS) && defined(FEAT_MENU)
-    static LRESULT
+#যদি defined(MENUHINTS) && defined(FEAT_MENU)
+    স্থির LRESULT
 _OnMenuSelect(HWND hwnd, WPARAM wParam, LPARAM lParam)
 {
-    if (((UINT) HIWORD(wParam)
+    যদি (((UINT) HIWORD(wParam)
 		& (0xffff ^ (MF_MOUSESELECT + MF_BITMAP + MF_POPUP)))
 	    == MF_HILITE
 	    && (State & MODE_CMDLINE) == 0)
     {
 	vimmenu_T   *pMenu;
-	static int  did_menu_tip = FALSE;
+	স্থির পূর্ণাঙ্ক  did_menu_tip = FALSE;
 
-	if (did_menu_tip)
+	যদি (did_menu_tip)
 	{
-	    msg_clr_cmdline();
+	    বাৰ্তা_clr_cmdline();
 	    setcursor();
 	    out_flush();
 	    did_menu_tip = FALSE;
 	}
 
-	pMenu = gui_mswin_find_menu(root_menu, (UINT)LOWORD(wParam));
-	if (pMenu != NULL && pMenu->strings[MENU_INDEX_TIP] != NULL)
+	pMenu = gui_mswin_find_menu(মূল_menu, (UINT)LOWORD(wParam));
+	যদি (pMenu != রিক্ত && pMenu->strings[MENU_INDEX_TIP] != রিক্ত)
 	{
 	    MENUITEMINFO menuinfo;
 
-	    menuinfo.cbSize = sizeof(MENUITEMINFO);
+	    menuinfo.cbSize = পরিমাণ(MENUITEMINFO);
 	    menuinfo.fMask = MIIM_ID;		    // We only want to check if the menu item exists,
 						    // so retrieve something simple.
-	    if (GetMenuItemInfo(s_menuBar, pMenu->id, FALSE, &menuinfo))
+	    যদি (GetMenuItemInfo(s_menuBar, pMenu->id, FALSE, &menuinfo))
 	    {
-		++msg_hist_off;
-		msg((char *)pMenu->strings[MENU_INDEX_TIP]);
-		--msg_hist_off;
+		++বাৰ্তা_hist_off;
+		বাৰ্তা((ৱর্ণ *)pMenu->strings[MENU_INDEX_TIP]);
+		--বাৰ্তা_hist_off;
 		setcursor();
 		out_flush();
 		did_menu_tip = TRUE;
 	    }
 	}
-	return 0L;
+	ঘূৰাই 0L;
     }
-    return DefWindowProcW(hwnd, WM_MENUSELECT, wParam, lParam);
+    ঘূৰাই DefWindowProcW(hwnd, WM_MENUSELECT, wParam, lParam);
 }
 #endif
 
-    static BOOL
+    স্থির BOOL
 _OnGetDpiScaledSize(HWND hwnd UNUSED, UINT dpi, SIZE *size)
 {
-    int		old_width, old_height;
-    int		new_width, new_height;
+    পূর্ণাঙ্ক		old_width, old_height;
+    পূর্ণাঙ্ক		new_width, new_height;
     LOGFONTW	lf;
     HFONT	font;
 
@@ -5333,15 +5333,15 @@ _OnGetDpiScaledSize(HWND hwnd UNUSED, UINT dpi, SIZE *size)
 
     // Calculate new approximate size.
     GetFontSize(gui.norm_font, &old_width, &old_height);    // Current size
-    GetObjectW((HFONT)gui.norm_font, sizeof(lf), &lf);
-    lf.lfHeight = lf.lfHeight * (int)dpi / s_dpi;
+    GetObjectW((HFONT)gui.norm_font, পরিমাণ(lf), &lf);
+    lf.lfHeight = lf.lfHeight * (পূর্ণাঙ্ক)dpi / s_dpi;
     font = CreateFontIndirectW(&lf);
-    if (font)
+    যদি (font)
     {
 	GetFontSize((GuiFont)font, &new_width, &new_height);	// New size
 	DeleteFont(font);
     }
-    else
+    অন্যথা
     {
 	new_width = old_width;
 	new_height = old_height;
@@ -5350,10 +5350,10 @@ _OnGetDpiScaledSize(HWND hwnd UNUSED, UINT dpi, SIZE *size)
     size->cy = size->cy * new_height / old_height;
     //TRACE("New approx. SIZE=(%d,%d)", size->cx, size->cy);
 
-    return TRUE;
+    ঘূৰাই TRUE;
 }
 
-    static LRESULT
+    স্থির LRESULT
 _OnDpiChanged(HWND hwnd, UINT xdpi UNUSED, UINT ydpi, RECT *rc)
 {
     s_dpi = ydpi;
@@ -5374,162 +5374,162 @@ _OnDpiChanged(HWND hwnd, UINT xdpi UNUSED, UINT ydpi, RECT *rc)
 #ifdef FEAT_MBYTE_IME
     im_set_position(gui.row, gui.col);
 #endif
-    InvalidateRect(hwnd, NULL, TRUE);
+    InvalidateRect(hwnd, রিক্ত, TRUE);
 
     s_in_dpichanged = FALSE;
-    return 0L;
+    ঘূৰাই 0L;
 }
 
 
-    static LRESULT CALLBACK
+    স্থির LRESULT CALLBACK
 _WndProc(
     HWND hwnd,
-    UINT uMsg,
+    UINT u_বাৰ্তা,
     WPARAM wParam,
     LPARAM lParam)
 {
     // ch_log(NULL, "WndProc: hwnd = %08x, msg = %x, wParam = %x, lParam = %x",
 	    // hwnd, uMsg, wParam, lParam);
 
-    HandleMouseHide(uMsg, lParam);
+    HandleMouseHide(u_বাৰ্তা, lParam);
 
-    s_uMsg = uMsg;
+    s_u_বাৰ্তা = u_বাৰ্তা;
     s_wParam = wParam;
 
-    switch (uMsg)
+    ৱিকল্প (u_বাৰ্তা)
     {
-	HANDLE_MSG(hwnd, WM_DEADCHAR,	_OnDeadChar);
-	HANDLE_MSG(hwnd, WM_SYSDEADCHAR, _OnDeadChar);
+	HANDLE_বাৰ্তা(hwnd, WM_DEADCHAR,	_OnDeadChar);
+	HANDLE_বাৰ্তা(hwnd, WM_SYSDEADCHAR, _OnDeadChar);
 	// HANDLE_MSG(hwnd, WM_ACTIVATE,    _OnActivate);
-	HANDLE_MSG(hwnd, WM_CLOSE,	_OnClose);
+	HANDLE_বাৰ্তা(hwnd, WM_CLOSE,	_OnClose);
 	// HANDLE_MSG(hwnd, WM_COMMAND,	_OnCommand);
-	HANDLE_MSG(hwnd, WM_DESTROY,	_OnDestroy);
-	HANDLE_MSG(hwnd, WM_DROPFILES,	_OnDropFiles);
-	HANDLE_MSG(hwnd, WM_HSCROLL,	_OnScroll);
-	HANDLE_MSG(hwnd, WM_KILLFOCUS,	_OnKillFocus);
+	HANDLE_বাৰ্তা(hwnd, WM_DESTROY,	_OnDestroy);
+	HANDLE_বাৰ্তা(hwnd, WM_DROPFILES,	_OnDropFiles);
+	HANDLE_বাৰ্তা(hwnd, WM_HSCROLL,	_OnScroll);
+	HANDLE_বাৰ্তা(hwnd, WM_KILLFOCUS,	_OnKillFocus);
 #ifdef FEAT_MENU
-	HANDLE_MSG(hwnd, WM_COMMAND,	_OnMenu);
+	HANDLE_বাৰ্তা(hwnd, WM_COMMAND,	_OnMenu);
 #endif
 	// HANDLE_MSG(hwnd, WM_MOVE,	    _OnMove);
 	// HANDLE_MSG(hwnd, WM_NCACTIVATE,  _OnNCActivate);
-	HANDLE_MSG(hwnd, WM_SETFOCUS,	_OnSetFocus);
-	HANDLE_MSG(hwnd, WM_SIZE,	_OnSize);
+	HANDLE_বাৰ্তা(hwnd, WM_SETFOCUS,	_OnSetFocus);
+	HANDLE_বাৰ্তা(hwnd, WM_SIZE,	_OnSize);
 	// HANDLE_MSG(hwnd, WM_SYSCOMMAND,  _OnSysCommand);
 	// HANDLE_MSG(hwnd, WM_SYSKEYDOWN,  _OnAltKey);
-	HANDLE_MSG(hwnd, WM_VSCROLL,	_OnScroll);
+	HANDLE_বাৰ্তা(hwnd, WM_VSCROLL,	_OnScroll);
 	// HANDLE_MSG(hwnd, WM_WINDOWPOSCHANGING,	_OnWindowPosChanging);
-	HANDLE_MSG(hwnd, WM_ACTIVATEAPP, _OnActivateApp);
+	HANDLE_বাৰ্তা(hwnd, WM_ACTIVATEAPP, _OnActivateApp);
 #ifdef FEAT_NETBEANS_INTG
-	HANDLE_MSG(hwnd, WM_WINDOWPOSCHANGED, _OnWindowPosChanged);
+	HANDLE_বাৰ্তা(hwnd, WM_WINDOWPOSCHANGED, _OnWindowPosChanged);
 #endif
 #ifdef FEAT_GUI_TABLINE
-	HANDLE_MSG(hwnd, WM_RBUTTONUP,	_OnRButtonUp);
-	HANDLE_MSG(hwnd, WM_LBUTTONDBLCLK,  _OnLButtonDown);
+	HANDLE_বাৰ্তা(hwnd, WM_RBUTTONUP,	_OnRButtonUp);
+	HANDLE_বাৰ্তা(hwnd, WM_LBUTTONDBLCLK,  _OnLButtonDown);
 #endif
-	HANDLE_MSG(hwnd, WM_NCHITTEST,	_OnNCHitTest);
+	HANDLE_বাৰ্তা(hwnd, WM_NCHITTEST,	_OnNCHitTest);
 
-    case WM_QUERYENDSESSION:	// System wants to go down.
+    পক্ষ WM_QUERYENDSESSION:	// System wants to go down.
 	gui_shell_closed();	// Will exit when no changed buffers.
-	return FALSE;		// Do NOT allow system to go down.
+	ঘূৰাই FALSE;		// Do NOT allow system to go down.
 
-    case WM_ENDSESSION:
-	if (wParam)	// system only really goes down when wParam is TRUE
+    পক্ষ WM_ENDSESSION:
+	যদি (wParam)	// system only really goes down when wParam is TRUE
 	{
 	    _OnEndSession();
-	    return 0L;
+	    ঘূৰাই 0L;
 	}
-	break;
+	ভঙ্গ;
 
-    case WM_CHAR:
+    পক্ষ WM_CHAR:
 	// Don't use HANDLE_MSG() for WM_CHAR, it truncates wParam to a single
 	// byte while we want the UTF-16 character value.
-	_OnChar(hwnd, (UINT)wParam, (int)(short)LOWORD(lParam));
-	return 0L;
+	_OnChar(hwnd, (UINT)wParam, (পূর্ণাঙ্ক)(short)LOWORD(lParam));
+	ঘূৰাই 0L;
 
-    case WM_SYSCHAR:
+    পক্ষ WM_SYSCHAR:
 	/*
 	 * if 'winaltkeys' is "no", or it's "menu" and it's not a menu
 	 * shortcut key, handle like a typed ALT key, otherwise call Windows
 	 * ALT key handling.
 	 */
 #ifdef FEAT_MENU
-	if (	!gui.menu_is_active
+	যদি (	!gui.menu_is_active
 		|| p_wak[0] == 'n'
-		|| (p_wak[0] == 'm' && !gui_is_menu_shortcut((int)wParam))
+		|| (p_wak[0] == 'm' && !gui_is_menu_shortcut((পূর্ণাঙ্ক)wParam))
 		)
 #endif
 	{
-	    _OnSysChar(hwnd, (UINT)wParam, (int)(short)LOWORD(lParam));
-	    return 0L;
+	    _OnSysChar(hwnd, (UINT)wParam, (পূর্ণাঙ্ক)(short)LOWORD(lParam));
+	    ঘূৰাই 0L;
 	}
 #ifdef FEAT_MENU
-	else
-	    return DefWindowProcW(hwnd, uMsg, wParam, lParam);
+	অন্যথা
+	    ঘূৰাই DefWindowProcW(hwnd, u_বাৰ্তা, wParam, lParam);
 #endif
 
-    case WM_SYSKEYUP:
+    পক্ষ WM_SYSKEYUP:
 #ifdef FEAT_MENU
 	// This used to be done only when menu is active: ALT key is used for
 	// that.  But that caused problems when menu is disabled and using
 	// Alt-Tab-Esc: get into a strange state where no mouse-moved events
 	// are received, mouse pointer remains hidden.
-	return DefWindowProcW(hwnd, uMsg, wParam, lParam);
-#else
-	return 0L;
+	ঘূৰাই DefWindowProcW(hwnd, u_বাৰ্তা, wParam, lParam);
+#অন্যথা
+	ঘূৰাই 0L;
 #endif
 
-    case WM_EXITSIZEMOVE:
+    পক্ষ WM_EXITSIZEMOVE:
 	destroy_sizing_tip();
-	break;
+	ভঙ্গ;
 
-    case WM_SIZING:	// HANDLE_MSG doesn't seem to handle this one
-	return _DuringSizing((UINT)wParam, (LPRECT)lParam);
+    পক্ষ WM_SIZING:	// HANDLE_MSG doesn't seem to handle this one
+	ঘূৰাই _DuringSizing((UINT)wParam, (LPRECT)lParam);
 
-    case WM_MOUSEWHEEL:
-    case WM_MOUSEHWHEEL:
-	_OnMouseWheel(hwnd, wParam, lParam, uMsg == WM_MOUSEHWHEEL);
-	return 0L;
+    পক্ষ WM_MOUSEWHEEL:
+    পক্ষ WM_MOUSEHWHEEL:
+	_OnMouseWheel(hwnd, wParam, lParam, u_বাৰ্তা == WM_MOUSEHWHEEL);
+	ঘূৰাই 0L;
 
 	// Notification for change in SystemParametersInfo()
-    case WM_SETTINGCHANGE:
-	return _OnSettingChange((UINT)wParam);
+    পক্ষ WM_SETTINGCHANGE:
+	ঘূৰাই _OnSettingChange((UINT)wParam);
 
-#if defined(FEAT_TOOLBAR) || defined(FEAT_GUI_TABLINE)
-    case WM_NOTIFY:
-	return _OnNotify(hwnd, (UINT)wParam, (NMHDR*)lParam);
+#যদি defined(FEAT_TOOLBAR) || defined(FEAT_GUI_TABLINE)
+    পক্ষ WM_NOTIFY:
+	ঘূৰাই _OnNotify(hwnd, (UINT)wParam, (NMHDR*)lParam);
 #endif
 
-#if defined(MENUHINTS) && defined(FEAT_MENU)
-    case WM_MENUSELECT:
-	return _OnMenuSelect(hwnd, wParam, lParam);
+#যদি defined(MENUHINTS) && defined(FEAT_MENU)
+    পক্ষ WM_MENUSELECT:
+	ঘূৰাই _OnMenuSelect(hwnd, wParam, lParam);
 #endif
 
 #ifdef FEAT_MBYTE_IME
-    case WM_IME_NOTIFY:
-	if (!_OnImeNotify(hwnd, (DWORD)wParam, (DWORD)lParam))
-	    return DefWindowProcW(hwnd, uMsg, wParam, lParam);
-	return 1L;
+    পক্ষ WM_IME_NOTIFY:
+	যদি (!_OnImeNotify(hwnd, (DWORD)wParam, (DWORD)lParam))
+	    ঘূৰাই DefWindowProcW(hwnd, u_বাৰ্তা, wParam, lParam);
+	ঘূৰাই 1L;
 
-    case WM_IME_COMPOSITION:
-	if (!_OnImeComposition(hwnd, wParam, lParam))
-	    return DefWindowProcW(hwnd, uMsg, wParam, lParam);
-	return 1L;
+    পক্ষ WM_IME_COMPOSITION:
+	যদি (!_OnImeComposition(hwnd, wParam, lParam))
+	    ঘূৰাই DefWindowProcW(hwnd, u_বাৰ্তা, wParam, lParam);
+	ঘূৰাই 1L;
 #endif
-    case WM_GETDPISCALEDSIZE:
-	return _OnGetDpiScaledSize(hwnd, (UINT)wParam, (SIZE *)lParam);
-    case WM_DPICHANGED:
-	return _OnDpiChanged(hwnd, (UINT)LOWORD(wParam), (UINT)HIWORD(wParam),
+    পক্ষ WM_GETDPISCALEDSIZE:
+	ঘূৰাই _OnGetDpiScaledSize(hwnd, (UINT)wParam, (SIZE *)lParam);
+    পক্ষ WM_DPICHANGED:
+	ঘূৰাই _OnDpiChanged(hwnd, (UINT)LOWORD(wParam), (UINT)HIWORD(wParam),
 		(RECT*)lParam);
 
-    default:
+    স্ৱভাৱ:
 #ifdef MSWIN_FIND_REPLACE
-	if (uMsg == s_findrep_msg && s_findrep_msg != 0)
+	যদি (u_বাৰ্তা == s_findrep_বাৰ্তা && s_findrep_বাৰ্তা != 0)
 	    _OnFindRepl();
 #endif
-	break;
+	ভঙ্গ;
     }
 
-    return DefWindowProcW(hwnd, uMsg, wParam, lParam);
+    ঘূৰাই DefWindowProcW(hwnd, u_বাৰ্তা, wParam, lParam);
 }
 
 /*
@@ -5537,37 +5537,37 @@ _WndProc(
  */
 
 // parent window, if specified with -P
-HWND vim_parent_hwnd = NULL;
+HWND vim_parent_hwnd = রিক্ত;
 
-    static BOOL CALLBACK
+    স্থির BOOL CALLBACK
 FindWindowTitle(HWND hwnd, LPARAM lParam)
 {
-    char	buf[2048];
-    char	*title = (char *)lParam;
+    ৱর্ণ	buf[2048];
+    ৱর্ণ	*title = (ৱর্ণ *)lParam;
 
-    if (GetWindowText(hwnd, buf, sizeof(buf)))
+    যদি (GetWindowText(hwnd, buf, পরিমাণ(buf)))
     {
-	if (strstr(buf, title) != NULL)
+	যদি (strstr(buf, title) != রিক্ত)
 	{
 	    // Found it.  Store the window ref. and quit searching if MDI
 	    // works.
-	    vim_parent_hwnd = FindWindowEx(hwnd, NULL, "MDIClient", NULL);
-	    if (vim_parent_hwnd != NULL)
-		return FALSE;
+	    vim_parent_hwnd = FindWindowEx(hwnd, রিক্ত, "MDIClient", রিক্ত);
+	    যদি (vim_parent_hwnd != রিক্ত)
+		ঘূৰাই FALSE;
 	}
     }
-    return TRUE;	// continue searching
+    ঘূৰাই TRUE;	// continue searching
 }
 
 /*
  * Invoked for '-P "title"' argument: search for parent application to open
  * our window in.
  */
-    void
-gui_mch_set_parent(char *title)
+    শূন্য
+gui_mch_set_parent(ৱর্ণ *title)
 {
     EnumWindows(FindWindowTitle, (LPARAM)title);
-    if (vim_parent_hwnd == NULL)
+    যদি (vim_parent_hwnd == রিক্ত)
     {
 	semsg(_(e_cannot_find_window_title_str), title);
 	mch_exit(2);
@@ -5575,10 +5575,10 @@ gui_mch_set_parent(char *title)
 }
 
 #ifndef FEAT_OLE
-    static void
-ole_error(char *arg)
+    স্থির শূন্য
+ole_error(ৱর্ণ *arg)
 {
-    char buf[IOSIZE];
+    ৱর্ণ buf[IOSIZE];
 
 # ifdef VIMDLL
     gui.in_use = mch_is_gui_executable();
@@ -5591,97 +5591,97 @@ ole_error(char *arg)
 }
 #endif
 
-#if defined(GUI_MAY_SPAWN)
-    static char *
-gvim_error(void)
+#যদি defined(GUI_MAY_SPAWN)
+    স্থির ৱর্ণ *
+gvim_error(শূন্য)
 {
-    char *msg = _(e_gui_cannot_be_used_cannot_execute_gvim_exe);
+    ৱর্ণ *বাৰ্তা = _(e_gui_cannot_be_used_cannot_execute_gvim_exe);
 
-    if (starting)
+    যদি (starting)
     {
-	mch_errmsg(msg);
+	mch_errmsg(বাৰ্তা);
 	mch_errmsg("\n");
 	mch_exit(2);
     }
-    return msg;
+    ঘূৰাই বাৰ্তা;
 }
 
-    char *
+    ৱর্ণ *
 gui_mch_do_spawn(char_u *arg)
 {
-    int			len;
-# if defined(FEAT_SESSION) && defined(EXPERIMENTAL_GUI_CMD)
-    char_u		*session = NULL;
-    LPWSTR		tofree1 = NULL;
+    পূর্ণাঙ্ক			len;
+# যদি defined(FEAT_SESSION) && defined(EXPERIMENTAL_GUI_CMD)
+    char_u		*session = রিক্ত;
+    LPWSTR		tofree1 = রিক্ত;
 # endif
     WCHAR		name[MAX_PATH];
-    LPWSTR		cmd, newcmd = NULL, p, warg, tofree2 = NULL;
-    STARTUPINFOW	si = {sizeof(si)};
+    LPWSTR		cmd, newcmd = রিক্ত, p, warg, tofree2 = রিক্ত;
+    STARTUPINFOW	si = {পরিমাণ(si)};
     PROCESS_INFORMATION pi;
 
-    if (!GetModuleFileNameW(g_hinst, name, MAX_PATH))
-	goto error;
+    যদি (!GetModuleFileNameW(g_hinst, name, MAX_PATH))
+	গচ্ছ error;
     p = wcsrchr(name, L'\\');
-    if (p == NULL)
-	goto error;
+    যদি (p == রিক্ত)
+	গচ্ছ error;
     // Replace the executable name from vim(d).exe to gvim(d).exe.
 # ifdef DEBUG
     wcscpy(p + 1, L"gvimd.exe");
-# else
+# অন্যথা
     wcscpy(p + 1, L"gvim.exe");
 # endif
 
-# if defined(FEAT_SESSION) && defined(EXPERIMENTAL_GUI_CMD)
-    if (starting)
+# যদি defined(FEAT_SESSION) && defined(EXPERIMENTAL_GUI_CMD)
+    যদি (starting)
 # endif
     {
 	// Pass the command line to the new process.
-	p = GetCommandLineW();
+	p = Get_Command_সাৰি_W();
 	// Skip 1st argument.
-	while (*p && *p != L' ' && *p != L'\t')
+	যেতিয়ালৈ (*p && *p != L' ' && *p != L'\t')
 	{
-	    if (*p == L'"')
+	    যদি (*p == L'"')
 	    {
 		// Skip quoted strings
-		while (*++p && *p != L'"');
+		যেতিয়ালৈ (*++p && *p != L'"');
 	    }
 
 	    ++p;
 	}
 	cmd = p;
     }
-# if defined(FEAT_SESSION) && defined(EXPERIMENTAL_GUI_CMD)
-    else
+# যদি defined(FEAT_SESSION) && defined(EXPERIMENTAL_GUI_CMD)
+    অন্যথা
     {
 	// Create a session file and pass it to the new process.
 	LPWSTR	wsession;
 	char_u	*savebg;
-	int	ret;
+	পূর্ণাঙ্ক	ret;
 
 	session = vim_tempname('s', FALSE);
-	if (session == NULL)
-	    goto error;
+	যদি (session == রিক্ত)
+	    গচ্ছ error;
 	savebg = p_bg;
 	p_bg = vim_strnsave((char_u *)"light", 5);	// Set 'bg' to "light".
-	if (p_bg == NULL)
+	যদি (p_bg == রিক্ত)
 	{
 	    p_bg = savebg;
-	    goto error;
+	    গচ্ছ error;
 	}
 	ret = write_session_file(session);
 	vim_free(p_bg);
 	p_bg = savebg;
-	if (!ret)
-	    goto error;
-	wsession = enc_to_utf16(session, NULL);
-	if (wsession == NULL)
-	    goto error;
-	len = (int)wcslen(wsession) * 2 + 27 + 1;
+	যদি (!ret)
+	    গচ্ছ error;
+	wsession = enc_to_utf16(session, রিক্ত);
+	যদি (wsession == রিক্ত)
+	    গচ্ছ error;
+	len = (পূর্ণাঙ্ক)wcslen(wsession) * 2 + 27 + 1;
 	cmd = ALLOC_MULT(WCHAR, len);
-	if (cmd == NULL)
+	যদি (cmd == রিক্ত)
 	{
 	    vim_free(wsession);
-	    goto error;
+	    গচ্ছ error;
 	}
 	tofree1 = cmd;
 	_snwprintf(cmd, len, L" -S \"%s\" -c \"call delete('%s')\"",
@@ -5691,41 +5691,41 @@ gui_mch_do_spawn(char_u *arg)
 # endif
 
     // Check additional arguments to the `:gui` command.
-    if (arg != NULL)
+    যদি (arg != রিক্ত)
     {
-	warg = enc_to_utf16(arg, NULL);
-	if (warg == NULL)
-	    goto error;
+	warg = enc_to_utf16(arg, রিক্ত);
+	যদি (warg == রিক্ত)
+	    গচ্ছ error;
 	tofree2 = warg;
     }
-    else
+    অন্যথা
 	warg = L"";
 
     // Set up the new command line.
-    len = (int)wcslen(name) + (int)wcslen(cmd) + (int)wcslen(warg) + 4;
+    len = (পূর্ণাঙ্ক)wcslen(name) + (পূর্ণাঙ্ক)wcslen(cmd) + (পূর্ণাঙ্ক)wcslen(warg) + 4;
     newcmd = ALLOC_MULT(WCHAR, len);
-    if (newcmd == NULL)
-	goto error;
+    যদি (newcmd == রিক্ত)
+	গচ্ছ error;
     _snwprintf(newcmd, len, L"\"%s\"%s %s", name, cmd, warg);
 
     // Spawn a new GUI process.
-    if (!CreateProcessW(NULL, newcmd, NULL, NULL, TRUE, 0,
-		NULL, NULL, &si, &pi))
-	goto error;
+    যদি (!CreateProcessW(রিক্ত, newcmd, রিক্ত, রিক্ত, TRUE, 0,
+		রিক্ত, রিক্ত, &si, &pi))
+	গচ্ছ error;
     CloseHandle(pi.hProcess);
     CloseHandle(pi.hThread);
     mch_exit(0);
 
 error:
-# if defined(FEAT_SESSION) && defined(EXPERIMENTAL_GUI_CMD)
-    if (session)
+# যদি defined(FEAT_SESSION) && defined(EXPERIMENTAL_GUI_CMD)
+    যদি (session)
 	mch_remove(session);
     vim_free(session);
     vim_free(tofree1);
 # endif
     vim_free(newcmd);
     vim_free(tofree2);
-    return gvim_error();
+    ঘূৰাই gvim_error();
 }
 #endif
 
@@ -5734,46 +5734,46 @@ error:
  * deleted from argv, and *argc is decremented accordingly.  This is called
  * when Vim is started, whether or not the GUI has been started.
  */
-    void
-gui_mch_prepare(int *argc, char **argv)
+    শূন্য
+gui_mch_prepare(পূর্ণাঙ্ক *argc, ৱর্ণ **argv)
 {
-    int		silent = FALSE;
-    int		idx;
+    পূর্ণাঙ্ক		silent = FALSE;
+    পূর্ণাঙ্ক		idx;
 
     // Check for special OLE command line parameters
-    if ((*argc == 2 || *argc == 3) && (argv[1][0] == '-' || argv[1][0] == '/'))
+    যদি ((*argc == 2 || *argc == 3) && (argv[1][0] == '-' || argv[1][0] == '/'))
     {
 	// Check for a "-silent" argument first.
-	if (*argc == 3 && STRICMP(argv[1] + 1, "silent") == 0
+	যদি (*argc == 3 && STRICMP(argv[1] + 1, "silent") == 0
 		&& (argv[2][0] == '-' || argv[2][0] == '/'))
 	{
 	    silent = TRUE;
 	    idx = 2;
 	}
-	else
+	অন্যথা
 	    idx = 1;
 
 	// Register Vim as an OLE Automation server
-	if (STRICMP(argv[idx] + 1, "register") == 0)
+	যদি (STRICMP(argv[idx] + 1, "register") == 0)
 	{
 #ifdef FEAT_OLE
 	    RegisterMe(silent);
 	    mch_exit(0);
-#else
-	    if (!silent)
+#অন্যথা
+	    যদি (!silent)
 		ole_error("register");
 	    mch_exit(2);
 #endif
 	}
 
 	// Unregister Vim as an OLE Automation server
-	if (STRICMP(argv[idx] + 1, "unregister") == 0)
+	যদি (STRICMP(argv[idx] + 1, "unregister") == 0)
 	{
 #ifdef FEAT_OLE
 	    UnregisterMe(!silent);
 	    mch_exit(0);
-#else
-	    if (!silent)
+#অন্যথা
+	    যদি (!silent)
 		ole_error("unregister");
 	    mch_exit(2);
 #endif
@@ -5783,11 +5783,11 @@ gui_mch_prepare(int *argc, char **argv)
 	// application wants to treat the case when it is started manually
 	// differently from the case where it is started via automation (and
 	// we don't).
-	if (STRICMP(argv[idx] + 1, "embedding") == 0)
+	যদি (STRICMP(argv[idx] + 1, "embedding") == 0)
 	{
 #ifdef FEAT_OLE
 	    *argc = 1;
-#else
+#অন্যথা
 	    ole_error("embedding");
 	    mch_exit(2);
 #endif
@@ -5796,14 +5796,14 @@ gui_mch_prepare(int *argc, char **argv)
 
 #ifdef FEAT_OLE
 # ifdef VIMDLL
-    if (mch_is_gui_executable())
+    যদি (mch_is_gui_executable())
 # endif
     {
-	int	bDoRestart = FALSE;
+	পূর্ণাঙ্ক	bDoRestart = FALSE;
 
 	InitOLE(&bDoRestart);
 	// automatically exit after registering
-	if (bDoRestart)
+	যদি (bDoRestart)
 	    mch_exit(0);
     }
 #endif
@@ -5811,67 +5811,67 @@ gui_mch_prepare(int *argc, char **argv)
 #ifdef FEAT_NETBEANS_INTG
     {
 	// stolen from gui_x11.c
-	int arg;
+	পূর্ণাঙ্ক arg;
 
-	for (arg = 1; arg < *argc; arg++)
-	    if (strncmp("-nb", argv[arg], 3) == 0)
+	বাবে (arg = 1; arg < *argc; arg++)
+	    যদি (strncmp("-nb", argv[arg], 3) == 0)
 	    {
 		netbeansArg = argv[arg];
 		mch_memmove(&argv[arg], &argv[arg + 1],
-					    (--*argc - arg) * sizeof(char *));
-		argv[*argc] = NULL;
-		break;	// enough?
+					    (--*argc - arg) * পরিমাণ(ৱর্ণ *));
+		argv[*argc] = রিক্ত;
+		ভঙ্গ;	// enough?
 	    }
     }
 #endif
 }
 
-    static void
-load_dpi_func(void)
+    স্থির শূন্য
+load_dpi_func(শূন্য)
 {
     HMODULE	hUser32;
 
     hUser32 = GetModuleHandle("user32.dll");
-    if (hUser32 == NULL)
-	goto fail;
+    যদি (hUser32 == রিক্ত)
+	গচ্ছ fail;
 
-    pGetDpiForSystem = (UINT (WINAPI *)(void))GetProcAddress(hUser32, "GetDpiForSystem");
+    pGetDpiForSystem = (UINT (WINAPI *)(শূন্য))GetProcAddress(hUser32, "GetDpiForSystem");
     pGetDpiForWindow = (UINT (WINAPI *)(HWND))GetProcAddress(hUser32, "GetDpiForWindow");
-    pGetSystemMetricsForDpi = (int (WINAPI *)(int, UINT))GetProcAddress(hUser32, "GetSystemMetricsForDpi");
+    pGetSystemMetricsForDpi = (পূর্ণাঙ্ক (WINAPI *)(পূর্ণাঙ্ক, UINT))GetProcAddress(hUser32, "GetSystemMetricsForDpi");
     //pGetWindowDpiAwarenessContext = (void*)GetProcAddress(hUser32, "GetWindowDpiAwarenessContext");
     pSetThreadDpiAwarenessContext = (DPI_AWARENESS_CONTEXT (WINAPI *)(DPI_AWARENESS_CONTEXT))GetProcAddress(hUser32, "SetThreadDpiAwarenessContext");
 #ifdef FEAT_MBYTE_IME
     pGetAwarenessFromDpiAwarenessContext = (DPI_AWARENESS (WINAPI *)(DPI_AWARENESS_CONTEXT))GetProcAddress(hUser32, "GetAwarenessFromDpiAwarenessContext");
 #endif
 
-    if (pSetThreadDpiAwarenessContext != NULL)
+    যদি (pSetThreadDpiAwarenessContext != রিক্ত)
     {
 	DPI_AWARENESS_CONTEXT oldctx = pSetThreadDpiAwarenessContext(
 		DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
-	if (oldctx != NULL)
+	যদি (oldctx != রিক্ত)
 	{
 	    TRACE("DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2 enabled");
 #ifdef FEAT_MBYTE_IME
 	    s_process_dpi_aware = pGetAwarenessFromDpiAwarenessContext(oldctx);
 # ifdef DEBUG
-	    if (s_process_dpi_aware == DPI_AWARENESS_UNAWARE)
+	    যদি (s_process_dpi_aware == DPI_AWARENESS_UNAWARE)
 	    {
 		TRACE("WARNING: PerMonitorV2 is not enabled in the process level for some reasons. IME window may not shown correctly.");
 	    }
 # endif
 #endif
-	    return;
+	    ঘূৰাই;
 	}
     }
 
 fail:
     // Disable PerMonitorV2 APIs.
     pGetDpiForSystem = vimGetDpiForSystem;
-    pGetDpiForWindow = NULL;
+    pGetDpiForWindow = রিক্ত;
     pGetSystemMetricsForDpi = stubGetSystemMetricsForDpi;
-    pSetThreadDpiAwarenessContext = NULL;
+    pSetThreadDpiAwarenessContext = রিক্ত;
 #ifdef FEAT_MBYTE_IME
-    pGetAwarenessFromDpiAwarenessContext = NULL;
+    pGetAwarenessFromDpiAwarenessContext = রিক্ত;
 #endif
 }
 
@@ -5879,17 +5879,17 @@ fail:
  * Initialise the GUI.	Create all the windows, set up all the call-backs
  * etc.
  */
-    int
-gui_mch_init(void)
+    পূর্ণাঙ্ক
+gui_mch_init(শূন্য)
 {
-    const WCHAR szVimWndClassW[] = VIM_CLASSW;
-    const WCHAR szTextAreaClassW[] = L"VimTextArea";
+    ধ্রুৱ WCHAR szVimWndClassW[] = VIM_CLASSW;
+    ধ্রুৱ WCHAR szTextAreaClassW[] = L"VimTextArea";
     WNDCLASSW wndclassw;
 
     // Return here if the window was already opened (happens when
     // gui_mch_dialog() is called early).
-    if (s_hwnd != NULL)
-	goto theend;
+    যদি (s_hwnd != রিক্ত)
+	গচ্ছ theend;
 
     /*
      * Load the tearoff bitmap
@@ -5921,7 +5921,7 @@ gui_mch_init(void)
 
     // First try using the wide version, so that we can use any title.
     // Otherwise only characters in the active codepage will work.
-    if (GetClassInfoW(g_hinst, szVimWndClassW, &wndclassw) == 0)
+    যদি (GetClassInfoW(g_hinst, szVimWndClassW, &wndclassw) == 0)
     {
 	wndclassw.style = CS_DBLCLKS;
 	wndclassw.lpfnWndProc = _WndProc;
@@ -5929,16 +5929,16 @@ gui_mch_init(void)
 	wndclassw.cbWndExtra = 0;
 	wndclassw.hInstance = g_hinst;
 	wndclassw.hIcon = LoadIcon(wndclassw.hInstance, "IDR_VIM");
-	wndclassw.hCursor = LoadCursor(NULL, IDC_ARROW);
+	wndclassw.hCursor = LoadCursor(রিক্ত, IDC_ARROW);
 	wndclassw.hbrBackground = s_brush;
-	wndclassw.lpszMenuName = NULL;
+	wndclassw.lpszMenuName = রিক্ত;
 	wndclassw.lpszClassName = szVimWndClassW;
 
-	if (RegisterClassW(&wndclassw) == 0)
-	    return FAIL;
+	যদি (RegisterClassW(&wndclassw) == 0)
+	    ঘূৰাই FAIL;
     }
 
-    if (vim_parent_hwnd != NULL)
+    যদি (vim_parent_hwnd != রিক্ত)
     {
 #ifdef HAVE_TRY_EXCEPT
 	__try
@@ -5956,8 +5956,8 @@ gui_mch_init(void)
 		gui_win_y == -1 ? CW_USEDEFAULT : gui_win_y,
 		100,				// Any value will do
 		100,				// Any value will do
-		vim_parent_hwnd, NULL,
-		g_hinst, NULL);
+		vim_parent_hwnd, রিক্ত,
+		g_hinst, রিক্ত);
 #ifdef HAVE_TRY_EXCEPT
 	}
 	__except(EXCEPTION_EXECUTE_HANDLER)
@@ -5965,17 +5965,17 @@ gui_mch_init(void)
 	    // NOP
 	}
 #endif
-	if (s_hwnd == NULL)
+	যদি (s_hwnd == রিক্ত)
 	{
 	    emsg(_(e_unable_to_open_window_inside_mdi_application));
 	    mch_exit(2);
 	}
     }
-    else
+    অন্যথা
     {
 	// If the provided windowid is not valid reset it to zero, so that it
 	// is ignored and we open our own window.
-	if (IsWindow((HWND)win_socket_id) <= 0)
+	যদি (IsWindow((HWND)win_socket_id) <= 0)
 	    win_socket_id = 0;
 
 	// Create a window.  If win_socket_id is not zero without border and
@@ -5988,45 +5988,45 @@ gui_mch_init(void)
 		gui_win_y == -1 ? CW_USEDEFAULT : gui_win_y,
 		100,				// Any value will do
 		100,				// Any value will do
-		NULL, NULL,
-		g_hinst, NULL);
-	if (s_hwnd != NULL && win_socket_id != 0)
+		রিক্ত, রিক্ত,
+		g_hinst, রিক্ত);
+	যদি (s_hwnd != রিক্ত && win_socket_id != 0)
 	{
 	    SetParent(s_hwnd, (HWND)win_socket_id);
 	    ShowWindow(s_hwnd, SW_SHOWMAXIMIZED);
 	}
     }
 
-    if (s_hwnd == NULL)
-	return FAIL;
+    যদি (s_hwnd == রিক্ত)
+	ঘূৰাই FAIL;
 
-    if (pGetDpiForWindow != NULL)
+    যদি (pGetDpiForWindow != রিক্ত)
     {
 	s_dpi = pGetDpiForWindow(s_hwnd);
 	update_scrollbar_size();
 	//TRACE("System DPI: %d, DPI: %d", pGetDpiForSystem(), s_dpi);
     }
 
-#if defined(FEAT_MBYTE_IME) && defined(DYNAMIC_IME)
+#যদি defined(FEAT_MBYTE_IME) && defined(DYNAMIC_IME)
     dyn_imm_load();
 #endif
 
     // Create the text area window
-    if (GetClassInfoW(g_hinst, szTextAreaClassW, &wndclassw) == 0)
+    যদি (GetClassInfoW(g_hinst, szTextAreaClassW, &wndclassw) == 0)
     {
 	wndclassw.style = CS_OWNDC;
 	wndclassw.lpfnWndProc = _TextAreaWndProc;
 	wndclassw.cbClsExtra = 0;
 	wndclassw.cbWndExtra = 0;
 	wndclassw.hInstance = g_hinst;
-	wndclassw.hIcon = NULL;
-	wndclassw.hCursor = LoadCursor(NULL, IDC_ARROW);
-	wndclassw.hbrBackground = NULL;
-	wndclassw.lpszMenuName = NULL;
+	wndclassw.hIcon = রিক্ত;
+	wndclassw.hCursor = LoadCursor(রিক্ত, IDC_ARROW);
+	wndclassw.hbrBackground = রিক্ত;
+	wndclassw.lpszMenuName = রিক্ত;
 	wndclassw.lpszClassName = szTextAreaClassW;
 
-	if (RegisterClassW(&wndclassw) == 0)
-	    return FAIL;
+	যদি (RegisterClassW(&wndclassw) == 0)
+	    ঘূৰাই FAIL;
     }
 
     s_textArea = CreateWindowExW(
@@ -6035,18 +6035,18 @@ gui_mch_init(void)
 	WS_CHILD | WS_VISIBLE, 0, 0,
 	100,				// Any value will do for now
 	100,				// Any value will do for now
-	s_hwnd, NULL,
-	g_hinst, NULL);
+	s_hwnd, রিক্ত,
+	g_hinst, রিক্ত);
 
-    if (s_textArea == NULL)
-	return FAIL;
+    যদি (s_textArea == রিক্ত)
+	ঘূৰাই FAIL;
 
 #ifdef FEAT_LIBCALL
     // Try loading an icon from $RUNTIMEPATH/bitmaps/vim.ico.
     {
-	HANDLE	hIcon = NULL;
+	HANDLE	hIcon = রিক্ত;
 
-	if (mch_icon_load(&hIcon) == OK && hIcon != NULL)
+	যদি (mch_icon_load(&hIcon) == OK && hIcon != রিক্ত)
 	    SendMessage(s_hwnd, WM_SETICON, ICON_SMALL, (LPARAM)hIcon);
     }
 #endif
@@ -6110,10 +6110,10 @@ gui_mch_init(void)
     /*
      * Initialise the dialog box stuff
      */
-    s_findrep_msg = RegisterWindowMessage(FINDMSGSTRING);
+    s_findrep_বাৰ্তা = RegisterWindowMessage(FINDMSGSTRING);
 
     // Initialise the struct
-    s_findrep_struct.lStructSize = sizeof(s_findrep_struct);
+    s_findrep_struct.lStructSize = পরিমাণ(s_findrep_struct);
     s_findrep_struct.lpstrFindWhat = ALLOC_MULT(WCHAR, MSWIN_FR_BUFSIZE);
     s_findrep_struct.lpstrFindWhat[0] = NUL;
     s_findrep_struct.lpstrReplaceWith = ALLOC_MULT(WCHAR, MSWIN_FR_BUFSIZE);
@@ -6128,22 +6128,22 @@ gui_mch_init(void)
 #endif
 
 #ifdef FEAT_RENDER_OPTIONS
-    if (p_rop)
-	(void)gui_mch_set_rendering_options(p_rop);
+    যদি (p_rop)
+	(শূন্য)gui_mch_set_rendering_options(p_rop);
 #endif
 
 theend:
     // Display any pending error messages
     display_errors();
 
-    return OK;
+    ঘূৰাই OK;
 }
 
 /*
  * Get the size of the screen, taking position on multiple monitors into
  * account (if supported).
  */
-    static void
+    স্থির শূন্য
 get_work_area(RECT *spi_rect)
 {
     HMONITOR	    mon;
@@ -6151,13 +6151,13 @@ get_work_area(RECT *spi_rect)
 
     // work out which monitor the window is on, and get *its* work area
     mon = MonitorFromWindow(s_hwnd, MONITOR_DEFAULTTOPRIMARY);
-    if (mon != NULL)
+    যদি (mon != রিক্ত)
     {
-	moninfo.cbSize = sizeof(MONITORINFO);
-	if (GetMonitorInfo(mon, &moninfo))
+	moninfo.cbSize = পরিমাণ(MONITORINFO);
+	যদি (GetMonitorInfo(mon, &moninfo))
 	{
 	    *spi_rect = moninfo.rcWork;
-	    return;
+	    ঘূৰাই;
 	}
     }
     // this is the old method...
@@ -6167,19 +6167,19 @@ get_work_area(RECT *spi_rect)
 /*
  * Set the size of the window to the given width and height in pixels.
  */
-    void
+    শূন্য
 gui_mch_set_shellsize(
-	int width,
-	int height,
-	int min_width UNUSED,
-	int min_height UNUSED,
-	int base_width UNUSED,
-	int base_height UNUSED,
-	int direction)
+	পূর্ণাঙ্ক width,
+	পূর্ণাঙ্ক height,
+	পূর্ণাঙ্ক min_width UNUSED,
+	পূর্ণাঙ্ক min_height UNUSED,
+	পূর্ণাঙ্ক base_width UNUSED,
+	পূর্ণাঙ্ক base_height UNUSED,
+	পূর্ণাঙ্ক direction)
 {
     RECT	workarea_rect;
     RECT	window_rect;
-    int		win_width, win_height;
+    পূর্ণাঙ্ক		win_width, win_height;
 
     // Try to keep window completely on screen.
     // Get position of the screen work area.  This is the part that is not
@@ -6189,13 +6189,13 @@ gui_mch_set_shellsize(
     // Resizing a maximized window looks very strange, unzoom it first.
     // But don't do it when still starting up, it may have been requested in
     // the shortcut.
-    if (IsZoomed(s_hwnd) && starting == 0)
+    যদি (IsZoomed(s_hwnd) && starting == 0)
 	ShowWindow(s_hwnd, SW_SHOWNORMAL);
 
-    if (s_in_dpichanged)
+    যদি (s_in_dpichanged)
 	// Use the suggested position when in WM_DPICHANGED.
 	window_rect = s_suggested_rect;
-    else
+    অন্যথা
 	// Use current position.
 	GetWindowRect(s_hwnd, &window_rect);
 
@@ -6210,35 +6210,35 @@ gui_mch_set_shellsize(
     // The following should take care of keeping Vim on the same monitor, no
     // matter if the secondary monitor is left or right of the primary
     // monitor.
-    window_rect.right = window_rect.left + win_width;
-    window_rect.bottom = window_rect.top + win_height;
+    window_rect.ডান = window_rect.বাম + win_width;
+    window_rect.bottom = window_rect.শীৰ্ষ + win_height;
 
     // If the window is going off the screen, move it on to the screen.
     // Don't adjust the position when in WM_DPICHANGED.
-    if (!s_in_dpichanged)
+    যদি (!s_in_dpichanged)
     {
-	if ((direction & RESIZE_HOR)
-		&& window_rect.right > workarea_rect.right)
+	যদি ((direction & RESIZE_HOR)
+		&& window_rect.ডান > workarea_rect.ডান)
 	    OffsetRect(&window_rect,
-		    workarea_rect.right - window_rect.right, 0);
+		    workarea_rect.ডান - window_rect.ডান, 0);
 
-	if ((direction & RESIZE_HOR)
-		&& window_rect.left < workarea_rect.left)
+	যদি ((direction & RESIZE_HOR)
+		&& window_rect.বাম < workarea_rect.বাম)
 	    OffsetRect(&window_rect,
-		    workarea_rect.left - window_rect.left, 0);
+		    workarea_rect.বাম - window_rect.বাম, 0);
 
-	if ((direction & RESIZE_VERT)
+	যদি ((direction & RESIZE_VERT)
 		&& window_rect.bottom > workarea_rect.bottom)
 	    OffsetRect(&window_rect,
 		    0, workarea_rect.bottom - window_rect.bottom);
 
-	if ((direction & RESIZE_VERT)
-		&& window_rect.top < workarea_rect.top)
+	যদি ((direction & RESIZE_VERT)
+		&& window_rect.শীৰ্ষ < workarea_rect.শীৰ্ষ)
 	    OffsetRect(&window_rect,
-		    0, workarea_rect.top - window_rect.top);
+		    0, workarea_rect.শীৰ্ষ - window_rect.শীৰ্ষ);
     }
 
-    MoveWindow(s_hwnd, window_rect.left, window_rect.top,
+    MoveWindow(s_hwnd, window_rect.বাম, window_rect.শীৰ্ষ,
 						win_width, win_height, TRUE);
 
     //TRACE("New pos: %d,%d  New size: %d,%d",
@@ -6252,7 +6252,7 @@ gui_mch_set_shellsize(
 }
 
 
-    void
+    শূন্য
 gui_mch_set_scrollbar_thumb(
     scrollbar_T *sb,
     long	val,
@@ -6262,7 +6262,7 @@ gui_mch_set_scrollbar_thumb(
     SCROLLINFO	info;
 
     sb->scroll_shift = 0;
-    while (max > 32767)
+    যেতিয়ালৈ (max > 32767)
     {
 	max = (max + 1) >> 1;
 	val  >>= 1;
@@ -6270,10 +6270,10 @@ gui_mch_set_scrollbar_thumb(
 	++sb->scroll_shift;
     }
 
-    if (sb->scroll_shift > 0)
+    যদি (sb->scroll_shift > 0)
 	++size;
 
-    info.cbSize = sizeof(info);
+    info.cbSize = পরিমাণ(info);
     info.fMask = SIF_POS | SIF_RANGE | SIF_PAGE;
     info.nPos = val;
     info.nMin = 0;
@@ -6286,7 +6286,7 @@ gui_mch_set_scrollbar_thumb(
 /*
  * Set the current text font.
  */
-    void
+    শূন্য
 gui_mch_set_font(GuiFont font)
 {
     gui.currFont = font;
@@ -6296,7 +6296,7 @@ gui_mch_set_font(GuiFont font)
 /*
  * Set the current text foreground color.
  */
-    void
+    শূন্য
 gui_mch_set_fg_color(guicolor_T color)
 {
     gui.currFgColor = color;
@@ -6305,7 +6305,7 @@ gui_mch_set_fg_color(guicolor_T color)
 /*
  * Set the current text background color.
  */
-    void
+    শূন্য
 gui_mch_set_bg_color(guicolor_T color)
 {
     gui.currBgColor = color;
@@ -6314,7 +6314,7 @@ gui_mch_set_bg_color(guicolor_T color)
 /*
  * Set the current text special color.
  */
-    void
+    শূন্য
 gui_mch_set_sp_color(guicolor_T color)
 {
     gui.currSpColor = color;
@@ -6333,21 +6333,21 @@ gui_mch_set_sp_color(guicolor_T color)
 /*
  * handle WM_IME_NOTIFY message
  */
-    static LRESULT
+    স্থির LRESULT
 _OnImeNotify(HWND hWnd, DWORD dwCommand, DWORD dwData UNUSED)
 {
     LRESULT lResult = 0;
     HIMC hImc;
 
-    if (!pImmGetContext || (hImc = pImmGetContext(hWnd)) == (HIMC)0)
-	return lResult;
-    switch (dwCommand)
+    যদি (!pImmGetContext || (hImc = pImmGetContext(hWnd)) == (HIMC)0)
+	ঘূৰাই lResult;
+    ৱিকল্প (dwCommand)
     {
-	case IMN_SETOPENSTATUS:
-	    if (pImmGetOpenStatus(hImc))
+	পক্ষ IMN_SETOPENSTATUS:
+	    যদি (pImmGetOpenStatus(hImc))
 	    {
 		LOGFONTW lf = norm_logfont;
-		if (s_process_dpi_aware == DPI_AWARENESS_UNAWARE)
+		যদি (s_process_dpi_aware == DPI_AWARENESS_UNAWARE)
 		    // Work around when PerMonitorV2 is not enabled in the process level.
 		    lf.lfHeight = lf.lfHeight * DEFAULT_DPI / s_dpi;
 		pImmSetCompositionFontW(hImc, &lf);
@@ -6355,15 +6355,15 @@ _OnImeNotify(HWND hWnd, DWORD dwCommand, DWORD dwData UNUSED)
 
 		// Disable langmap
 		State &= ~MODE_LANGMAP;
-		if (State & MODE_INSERT)
+		যদি (State & MODE_ঢোকাও)
 		{
-# if defined(FEAT_KEYMAP)
+# যদি defined(FEAT_KEYMAP)
 		    // Unshown 'keymap' in status lines
-		    if (curbuf->b_p_iminsert == B_IMODE_LMAP)
+		    যদি (curbuf->b_p_iminsert == B_IMODE_LMAP)
 		    {
 			// Save cursor position
-			int old_row = gui.row;
-			int old_col = gui.col;
+			পূর্ণাঙ্ক old_row = gui.row;
+			পূর্ণাঙ্ক old_col = gui.col;
 
 			// This must be called here before
 			// status_redraw_curbuf(), otherwise the mode
@@ -6381,29 +6381,29 @@ _OnImeNotify(HWND hWnd, DWORD dwCommand, DWORD dwData UNUSED)
 	    gui_update_cursor(TRUE, FALSE);
 	    gui_mch_flush();
 	    lResult = 0;
-	    break;
+	    ভঙ্গ;
     }
     pImmReleaseContext(hWnd, hImc);
-    return lResult;
+    ঘূৰাই lResult;
 }
 
-    static LRESULT
+    স্থির LRESULT
 _OnImeComposition(HWND hwnd, WPARAM dbcs UNUSED, LPARAM param)
 {
     char_u	*ret;
-    int		len;
+    পূর্ণাঙ্ক		len;
 
-    if ((param & GCS_RESULTSTR) == 0) // Composition unfinished.
-	return 0;
+    যদি ((param & GCS_RESULTSTR) == 0) // Composition unfinished.
+	ঘূৰাই 0;
 
     ret = GetResultStr(hwnd, GCS_RESULTSTR, &len);
-    if (ret != NULL)
+    যদি (ret != রিক্ত)
     {
-	add_to_input_buf_csi(ret, len);
+	add_to_প্ৰবেশ_buf_csi(ret, len);
 	vim_free(ret);
-	return 1;
+	ঘূৰাই 1;
     }
-    return 0;
+    ঘূৰাই 0;
 }
 
 /*
@@ -6412,50 +6412,50 @@ _OnImeComposition(HWND hwnd, WPARAM dbcs UNUSED, LPARAM param)
  * This handles WM_IME_COMPOSITION with GCS_RESULTSTR flag on.
  * get complete composition string
  */
-    static char_u *
-GetResultStr(HWND hwnd, int GCS, int *lenp)
+    স্থির char_u *
+GetResultStr(HWND hwnd, পূর্ণাঙ্ক GCS, পূর্ণাঙ্ক *lenp)
 {
     HIMC	hIMC;		// Input context handle.
     LONG	ret;
-    WCHAR	*buf = NULL;
-    char_u	*convbuf = NULL;
+    WCHAR	*buf = রিক্ত;
+    char_u	*convbuf = রিক্ত;
 
-    if (!pImmGetContext || (hIMC = pImmGetContext(hwnd)) == (HIMC)0)
-	return NULL;
+    যদি (!pImmGetContext || (hIMC = pImmGetContext(hwnd)) == (HIMC)0)
+	ঘূৰাই রিক্ত;
 
     // Get the length of the composition string.
-    ret = pImmGetCompositionStringW(hIMC, GCS, NULL, 0);
-    if (ret <= 0)
-	return NULL;
+    ret = pImmGetCompositionStringW(hIMC, GCS, রিক্ত, 0);
+    যদি (ret <= 0)
+	ঘূৰাই রিক্ত;
 
     // Allocate the requested buffer plus space for the NUL character.
-    buf = alloc(ret + sizeof(WCHAR));
-    if (buf == NULL)
-	return NULL;
+    buf = alloc(ret + পরিমাণ(WCHAR));
+    যদি (buf == রিক্ত)
+	ঘূৰাই রিক্ত;
 
     // Reads in the composition string.
     pImmGetCompositionStringW(hIMC, GCS, buf, ret);
-    *lenp = ret / sizeof(WCHAR);
+    *lenp = ret / পরিমাণ(WCHAR);
 
     convbuf = utf16_to_enc(buf, lenp);
     pImmReleaseContext(hwnd, hIMC);
     vim_free(buf);
-    return convbuf;
+    ঘূৰাই convbuf;
 }
 #endif
 
 // For global functions we need prototypes.
-#if defined(FEAT_MBYTE_IME)
+#যদি defined(FEAT_MBYTE_IME)
 
 /*
  * set font to IM.
  */
-    void
+    শূন্য
 im_set_font(LOGFONTW *lf)
 {
     HIMC hImc;
 
-    if (pImmGetContext && (hImc = pImmGetContext(s_hwnd)) != (HIMC)0)
+    যদি (pImmGetContext && (hImc = pImmGetContext(s_hwnd)) != (HIMC)0)
     {
 	pImmSetCompositionFontW(hImc, lf);
 	pImmReleaseContext(s_hwnd, hImc);
@@ -6465,12 +6465,12 @@ im_set_font(LOGFONTW *lf)
 /*
  * Notify cursor position to IM.
  */
-    void
-im_set_position(int row, int col)
+    শূন্য
+im_set_position(পূর্ণাঙ্ক row, পূর্ণাঙ্ক col)
 {
     HIMC hImc;
 
-    if (pImmGetContext && (hImc = pImmGetContext(s_hwnd)) != (HIMC)0)
+    যদি (pImmGetContext && (hImc = pImmGetContext(s_hwnd)) != (HIMC)0)
     {
 	COMPOSITIONFORM	cfs;
 
@@ -6478,7 +6478,7 @@ im_set_position(int row, int col)
 	cfs.ptCurrentPos.x = FILL_X(col);
 	cfs.ptCurrentPos.y = FILL_Y(row);
 	MapWindowPoints(s_textArea, s_hwnd, &cfs.ptCurrentPos, 1);
-	if (s_process_dpi_aware == DPI_AWARENESS_UNAWARE)
+	যদি (s_process_dpi_aware == DPI_AWARENESS_UNAWARE)
 	{
 	    // Work around when PerMonitorV2 is not enabled in the process level.
 	    cfs.ptCurrentPos.x = cfs.ptCurrentPos.x * DEFAULT_DPI / s_dpi;
@@ -6493,65 +6493,65 @@ im_set_position(int row, int col)
 /*
  * Set IM status on ("active" is TRUE) or off ("active" is FALSE).
  */
-    void
-im_set_active(int active)
+    শূন্য
+im_set_active(পূর্ণাঙ্ক active)
 {
     HIMC	hImc;
-    static HIMC	hImcOld = (HIMC)0;
+    স্থির HIMC	hImcOld = (HIMC)0;
 
 # ifdef VIMDLL
-    if (!gui.in_use && !gui.starting)
+    যদি (!gui.in_use && !gui.starting)
     {
 	mbyte_im_set_active(active);
-	return;
+	ঘূৰাই;
     }
 # endif
 
-    if (!pImmGetContext)    // if NULL imm32.dll wasn't loaded (yet)
-	return;
+    যদি (!pImmGetContext)    // if NULL imm32.dll wasn't loaded (yet)
+	ঘূৰাই;
 
-    if (p_imdisable)
+    যদি (p_imdisable)
     {
-	if (hImcOld == (HIMC)0)
+	যদি (hImcOld == (HIMC)0)
 	{
 	    hImcOld = pImmGetContext(s_hwnd);
-	    if (hImcOld)
+	    যদি (hImcOld)
 		pImmAssociateContext(s_hwnd, (HIMC)0);
 	}
 	active = FALSE;
     }
-    else if (hImcOld != (HIMC)0)
+    অন্যথা যদি (hImcOld != (HIMC)0)
     {
 	pImmAssociateContext(s_hwnd, hImcOld);
 	hImcOld = (HIMC)0;
     }
 
     hImc = pImmGetContext(s_hwnd);
-    if (!hImc)
-	return;
+    যদি (!hImc)
+	ঘূৰাই;
 
     /*
      * for Korean ime
      */
     HKL hKL = GetKeyboardLayout(0);
 
-    if (LOWORD(hKL) == MAKELANGID(LANG_KOREAN, SUBLANG_KOREAN))
+    যদি (LOWORD(hKL) == MAKELANGID(LANG_KOREAN, SUBLANG_KOREAN))
     {
-	static DWORD dwConversionSaved = 0, dwSentenceSaved = 0;
-	static BOOL bSaved = FALSE;
+	স্থির DWORD dwConversionSaved = 0, dwSentenceSaved = 0;
+	স্থির BOOL bSaved = FALSE;
 
-	if (active)
+	যদি (active)
 	{
 	    // if we have a saved conversion status, restore it
-	    if (bSaved)
+	    যদি (bSaved)
 		pImmSetConversionStatus(hImc, dwConversionSaved,
 			dwSentenceSaved);
 	    bSaved = FALSE;
 	}
-	else
+	অন্যথা
 	{
 	    // save conversion status and disable korean
-	    if (pImmGetConversionStatus(hImc, &dwConversionSaved,
+	    যদি (pImmGetConversionStatus(hImc, &dwConversionSaved,
 			&dwSentenceSaved))
 	    {
 		bSaved = TRUE;
@@ -6570,23 +6570,23 @@ im_set_active(int active)
 /*
  * Get IM status.  When IM is on, return not 0.  Else return 0.
  */
-    int
-im_get_status(void)
+    পূর্ণাঙ্ক
+im_get_status(শূন্য)
 {
-    int		status = 0;
+    পূর্ণাঙ্ক		status = 0;
     HIMC	hImc;
 
 # ifdef VIMDLL
-    if (!gui.in_use && !gui.starting)
-	return mbyte_im_get_status();
+    যদি (!gui.in_use && !gui.starting)
+	ঘূৰাই mbyte_im_get_status();
 # endif
 
-    if (pImmGetContext && (hImc = pImmGetContext(s_hwnd)) != (HIMC)0)
+    যদি (pImmGetContext && (hImc = pImmGetContext(s_hwnd)) != (HIMC)0)
     {
 	status = pImmGetOpenStatus(hImc) ? 1 : 0;
 	pImmReleaseContext(s_hwnd, hImc);
     }
-    return status;
+    ঘূৰাই status;
 }
 
 #endif // FEAT_MBYTE_IME
@@ -6595,24 +6595,24 @@ im_get_status(void)
 /*
  * Convert latin9 text "text[len]" to ucs-2 in "unicodebuf".
  */
-    static void
-latin9_to_ucs(char_u *text, int len, WCHAR *unicodebuf)
+    স্থির শূন্য
+latin9_to_ucs(char_u *text, পূর্ণাঙ্ক len, WCHAR *unicodebuf)
 {
-    int		c;
+    পূর্ণাঙ্ক		c;
 
-    while (--len >= 0)
+    যেতিয়ালৈ (--len >= 0)
     {
 	c = *text++;
-	switch (c)
+	ৱিকল্প (c)
 	{
-	    case 0xa4: c = 0x20ac; break;   // euro
-	    case 0xa6: c = 0x0160; break;   // S hat
-	    case 0xa8: c = 0x0161; break;   // S -hat
-	    case 0xb4: c = 0x017d; break;   // Z hat
-	    case 0xb8: c = 0x017e; break;   // Z -hat
-	    case 0xbc: c = 0x0152; break;   // OE
-	    case 0xbd: c = 0x0153; break;   // oe
-	    case 0xbe: c = 0x0178; break;   // Y
+	    পক্ষ 0xa4: c = 0x20ac; ভঙ্গ;   // euro
+	    পক্ষ 0xa6: c = 0x0160; ভঙ্গ;   // S hat
+	    পক্ষ 0xa8: c = 0x0161; ভঙ্গ;   // S -hat
+	    পক্ষ 0xb4: c = 0x017d; ভঙ্গ;   // Z hat
+	    পক্ষ 0xb8: c = 0x017e; ভঙ্গ;   // Z -hat
+	    পক্ষ 0xbc: c = 0x0152; ভঙ্গ;   // OE
+	    পক্ষ 0xbd: c = 0x0153; ভঙ্গ;   // oe
+	    পক্ষ 0xbe: c = 0x0178; ভঙ্গ;   // Y
 	}
 	*unicodebuf++ = c;
     }
@@ -6631,102 +6631,102 @@ latin9_to_ucs(char_u *text, int len, WCHAR *unicodebuf)
  * 'rightleft' mode.  It makes display take *slightly* longer, but not
  * noticeably so.
  */
-    static void
+    স্থির শূন্য
 RevOut( HDC hdc,
-	int col,
-	int row,
+	পূর্ণাঙ্ক col,
+	পূর্ণাঙ্ক row,
 	UINT foptions,
 	CONST RECT *pcliprect,
 	LPCTSTR text,
 	UINT len,
 	CONST INT *padding)
 {
-    int		ix;
+    পূর্ণাঙ্ক		ix;
 
-    for (ix = 0; ix < (int)len; ++ix)
+    বাবে (ix = 0; ix < (পূর্ণাঙ্ক)len; ++ix)
 	ExtTextOut(hdc, col + TEXT_X(ix), row, foptions,
 					pcliprect, text + ix, 1, padding);
 }
 #endif
 
-    static void
-draw_line(
-    int		x1,
-    int		y1,
-    int		x2,
-    int		y2,
+    স্থির শূন্য
+draw_সাৰি(
+    পূর্ণাঙ্ক		x1,
+    পূর্ণাঙ্ক		y1,
+    পূর্ণাঙ্ক		x2,
+    পূর্ণাঙ্ক		y2,
     COLORREF	color)
 {
-#if defined(FEAT_DIRECTX)
-    if (IS_ENABLE_DIRECTX())
-	DWriteContext_DrawLine(s_dwc, x1, y1, x2, y2, color);
-    else
+#যদি defined(FEAT_DIRECTX)
+    যদি (IS_ENABLE_DIRECTX())
+	DWrite_Context_Draw_সাৰি(s_dwc, x1, y1, x2, y2, color);
+    অন্যথা
 #endif
     {
 	HPEN	hpen = CreatePen(PS_SOLID, 1, color);
 	HPEN	old_pen = SelectObject(s_hdc, hpen);
-	MoveToEx(s_hdc, x1, y1, NULL);
+	MoveToEx(s_hdc, x1, y1, রিক্ত);
 	// Note: LineTo() excludes the last pixel in the line.
-	LineTo(s_hdc, x2, y2);
+	সাৰি_To(s_hdc, x2, y2);
 	DeleteObject(SelectObject(s_hdc, old_pen));
     }
 }
 
-    static void
+    স্থির শূন্য
 set_pixel(
-    int		x,
-    int		y,
+    পূর্ণাঙ্ক		x,
+    পূর্ণাঙ্ক		y,
     COLORREF	color)
 {
-#if defined(FEAT_DIRECTX)
-    if (IS_ENABLE_DIRECTX())
+#যদি defined(FEAT_DIRECTX)
+    যদি (IS_ENABLE_DIRECTX())
 	DWriteContext_SetPixel(s_dwc, x, y, color);
-    else
+    অন্যথা
 #endif
 	SetPixel(s_hdc, x, y, color);
 }
 
-    static void
+    স্থির শূন্য
 fill_rect(
-    const RECT	*rcp,
+    ধ্রুৱ RECT	*rcp,
     HBRUSH	hbr,
     COLORREF	color)
 {
-#if defined(FEAT_DIRECTX)
-    if (IS_ENABLE_DIRECTX())
+#যদি defined(FEAT_DIRECTX)
+    যদি (IS_ENABLE_DIRECTX())
 	DWriteContext_FillRect(s_dwc, rcp, color);
-    else
+    অন্যথা
 #endif
     {
 	HBRUSH	hbr2;
 
-	if (hbr == NULL)
+	যদি (hbr == রিক্ত)
 	    hbr2 = CreateSolidBrush(color);
-	else
+	অন্যথা
 	    hbr2 = hbr;
 	FillRect(s_hdc, rcp, hbr2);
-	if (hbr == NULL)
+	যদি (hbr == রিক্ত)
 	    DeleteBrush(hbr2);
     }
 }
 
-    void
+    শূন্য
 gui_mch_draw_string(
-    int		row,
-    int		col,
+    পূর্ণাঙ্ক		row,
+    পূর্ণাঙ্ক		col,
     char_u	*text,
-    int		len,
-    int		flags)
+    পূর্ণাঙ্ক		len,
+    পূর্ণাঙ্ক		flags)
 {
-    static int	*padding = NULL;
-    static int	pad_size = 0;
-    const RECT	*pcliprect = NULL;
+    স্থির পূর্ণাঙ্ক	*padding = রিক্ত;
+    স্থির পূর্ণাঙ্ক	pad_size = 0;
+    ধ্রুৱ RECT	*pcliprect = রিক্ত;
     UINT	foptions = 0;
-    static WCHAR *unicodebuf = NULL;
-    static int   *unicodepdy = NULL;
-    static int	unibuflen = 0;
-    int		n = 0;
-    int		y;
+    স্থির WCHAR *unicodebuf = রিক্ত;
+    স্থির পূর্ণাঙ্ক   *unicodepdy = রিক্ত;
+    স্থির পূর্ণাঙ্ক	unibuflen = 0;
+    পূর্ণাঙ্ক		n = 0;
+    পূর্ণাঙ্ক		y;
 
     /*
      * Italic and bold text seems to have an extra row of pixels at the bottom
@@ -6741,44 +6741,44 @@ gui_mch_draw_string(
      * pixels.	We still need this code because otherwise the top row of pixels
      * becomes a problem. - webb.
      */
-    static HBRUSH	hbr_cache[2] = {NULL, NULL};
-    static guicolor_T	brush_color[2] = {INVALCOLOR, INVALCOLOR};
-    static int		brush_lru = 0;
+    স্থির HBRUSH	hbr_cache[2] = {রিক্ত, রিক্ত};
+    স্থির guicolor_T	brush_color[2] = {INVALCOLOR, INVALCOLOR};
+    স্থির পূর্ণাঙ্ক		brush_lru = 0;
     HBRUSH		hbr;
     RECT		rc;
 
-    if (!(flags & DRAW_TRANSP))
+    যদি (!(flags & DRAW_TRANSP))
     {
 	/*
 	 * Clear background first.
 	 * Note: FillRect() excludes right and bottom of rectangle.
 	 */
-	rc.left = FILL_X(col);
-	rc.top = FILL_Y(row);
-	if (has_mbyte)
+	rc.বাম = FILL_X(col);
+	rc.শীৰ্ষ = FILL_Y(row);
+	যদি (has_mbyte)
 	{
 	    // Compute the length in display cells.
-	    rc.right = FILL_X(col + mb_string2cells(text, len));
+	    rc.ডান = FILL_X(col + mb_string2cells(text, len));
 	}
-	else
-	    rc.right = FILL_X(col + len);
+	অন্যথা
+	    rc.ডান = FILL_X(col + len);
 	rc.bottom = FILL_Y(row + 1);
 
 	// Cache the created brush, that saves a lot of time.  We need two:
 	// one for cursor background and one for the normal background.
-	if (gui.currBgColor == brush_color[0])
+	যদি (gui.currBgColor == brush_color[0])
 	{
 	    hbr = hbr_cache[0];
 	    brush_lru = 1;
 	}
-	else if (gui.currBgColor == brush_color[1])
+	অন্যথা যদি (gui.currBgColor == brush_color[1])
 	{
 	    hbr = hbr_cache[1];
 	    brush_lru = 0;
 	}
-	else
+	অন্যথা
 	{
-	    if (hbr_cache[brush_lru] != NULL)
+	    যদি (hbr_cache[brush_lru] != রিক্ত)
 		DeleteBrush(hbr_cache[brush_lru]);
 	    hbr_cache[brush_lru] = CreateSolidBrush(gui.currBgColor);
 	    brush_color[brush_lru] = gui.currBgColor;
@@ -6794,7 +6794,7 @@ gui_mch_draw_string(
 	 * When drawing block cursor, prevent inverted character spilling
 	 * over character cell (can happen with bold/italic)
 	 */
-	if (flags & DRAW_CURSOR)
+	যদি (flags & DRAW_CURSOR)
 	{
 	    pcliprect = &rc;
 	    foptions = ETO_CLIPPED;
@@ -6803,7 +6803,7 @@ gui_mch_draw_string(
 	// DirectWrite anti-aliasing can extend glyph pixels beyond cell
 	// boundaries, leaving artifacts when adjacent cells are not
 	// redrawn.  Clip to the cell rect to prevent this.
-	else if (IS_ENABLE_DIRECTX())
+	অন্যথা যদি (IS_ENABLE_DIRECTX())
 	{
 	    pcliprect = &rc;
 	    foptions = ETO_CLIPPED;
@@ -6814,22 +6814,22 @@ gui_mch_draw_string(
     SelectFont(s_hdc, gui.currFont);
 
 #ifdef FEAT_DIRECTX
-    if (IS_ENABLE_DIRECTX())
+    যদি (IS_ENABLE_DIRECTX())
 	DWriteContext_SetFont(s_dwc, (HFONT)gui.currFont);
 #endif
 
-    if (pad_size != Columns || padding == NULL || padding[0] != gui.char_width)
+    যদি (pad_size != Columns || padding == রিক্ত || padding[0] != gui.char_width)
     {
-	int	i;
+	পূর্ণাঙ্ক	i;
 
 	vim_free(padding);
 	pad_size = Columns;
 
 	// Don't give an out-of-memory message here, it would call us
 	// recursively.
-	padding = LALLOC_MULT(int, pad_size);
-	if (padding != NULL)
-	    for (i = 0; i < pad_size; i++)
+	padding = LALLOC_MULT(পূর্ণাঙ্ক, pad_size);
+	যদি (padding != রিক্ত)
+	    বাবে (i = 0; i < pad_size; i++)
 		padding[i] = gui.char_width;
     }
 
@@ -6842,89 +6842,89 @@ gui_mch_draw_string(
 
     // Check if there are any UTF-8 characters.  If not, use normal text
     // output to speed up output.
-    if (enc_utf8)
-	for (n = 0; n < len; ++n)
-	    if (text[n] >= 0x80)
-		break;
+    যদি (enc_utf8)
+	বাবে (n = 0; n < len; ++n)
+	    যদি (text[n] >= 0x80)
+		ভঙ্গ;
 
-#if defined(FEAT_DIRECTX)
+#যদি defined(FEAT_DIRECTX)
     // Quick hack to enable DirectWrite.  To use DirectWrite (antialias), it is
     // required that unicode drawing routine, currently.  So this forces it
     // enabled.
-    if (IS_ENABLE_DIRECTX())
+    যদি (IS_ENABLE_DIRECTX())
 	n = 0; // Keep n < len, to enter block for unicode.
 #endif
 
     // Check if the Unicode buffer exists and is big enough.  Create it
     // with the same length as the multi-byte string, the number of wide
     // characters is always equal or smaller.
-    if ((enc_utf8
-		|| (enc_codepage > 0 && (int)GetACP() != enc_codepage)
+    যদি ((enc_utf8
+		|| (enc_codepage > 0 && (পূর্ণাঙ্ক)GetACP() != enc_codepage)
 		|| enc_latin9)
-	    && (unicodebuf == NULL || len > unibuflen))
+	    && (unicodebuf == রিক্ত || len > unibuflen))
     {
 	vim_free(unicodebuf);
 	unicodebuf = LALLOC_MULT(WCHAR, len);
 
 	vim_free(unicodepdy);
-	unicodepdy = LALLOC_MULT(int, len);
+	unicodepdy = LALLOC_MULT(পূর্ণাঙ্ক, len);
 
 	unibuflen = len;
     }
 
-    if (enc_utf8 && n < len && unicodebuf != NULL)
+    যদি (enc_utf8 && n < len && unicodebuf != রিক্ত)
     {
 	// Output UTF-8 characters.  Composing characters should be
 	// handled here.
-	int		i;
-	int		wlen;	// string length in words
-	int		cells;	// cell width of string up to composing char
-	int		cw;	// width of current cell
-	int		c;
+	পূর্ণাঙ্ক		i;
+	পূর্ণাঙ্ক		wlen;	// string length in words
+	পূর্ণাঙ্ক		cells;	// cell width of string up to composing char
+	পূর্ণাঙ্ক		cw;	// width of current cell
+	পূর্ণাঙ্ক		c;
 
 	wlen = 0;
 	cells = 0;
-	for (i = 0; i < len; )
+	বাবে (i = 0; i < len; )
 	{
 	    c = utf_ptr2char(text + i);
-	    if (c >= 0x10000)
+	    যদি (c >= 0x10000)
 	    {
 		// Turn into UTF-16 encoding.
 		unicodebuf[wlen++] = ((c - 0x10000) >> 10) + 0xD800;
 		unicodebuf[wlen++] = ((c - 0x10000) & 0x3ff) + 0xDC00;
 	    }
-	    else
+	    অন্যথা
 	    {
 		unicodebuf[wlen++] = c;
 	    }
 
-	    if (utf_iscomposing(c))
+	    যদি (utf_iscomposing(c))
 		cw = 0;
-	    else
+	    অন্যথা
 	    {
 		cw = utf_char2cells(c);
-		if (cw > 2)		// don't use 4 for unprintable char
+		যদি (cw > 2)		// don't use 4 for unprintable char
 		    cw = 1;
 	    }
 
-	    if (unicodepdy != NULL)
+	    যদি (unicodepdy != রিক্ত)
 	    {
 		// Use unicodepdy to make characters fit as we expect, even
 		// when the font uses different widths (e.g., bold character
 		// is wider).
-		if (c >= 0x10000)
+		যদি (c >= 0x10000)
 		{
 		    unicodepdy[wlen - 2] = cw * gui.char_width;
 		    unicodepdy[wlen - 1] = 0;
 		}
-		else
+		অন্যথা
 		    unicodepdy[wlen - 1] = cw * gui.char_width;
 	    }
 	    cells += cw;
 	    i += utf_ptr2len_len(text + i, len - i);
 	}
-#if defined(FEAT_DIRECTX)
-	if (IS_ENABLE_DIRECTX())
+#যদি defined(FEAT_DIRECTX)
+	যদি (IS_ENABLE_DIRECTX())
 	{
 	    // Add one to "cells" for italics.
 	    DWriteContext_DrawText(s_dwc, unicodebuf, wlen,
@@ -6933,39 +6933,39 @@ gui_mch_draw_string(
 		    gui.char_width, gui.currFgColor,
 		    foptions, pcliprect, unicodepdy);
 	}
-	else
+	অন্যথা
 #endif
 	    ExtTextOutW(s_hdc, TEXT_X(col), TEXT_Y(row),
 		    foptions, pcliprect, unicodebuf, wlen, unicodepdy);
 	len = cells;	// used for underlining
     }
-    else if ((enc_codepage > 0 && (int)GetACP() != enc_codepage) || enc_latin9)
+    অন্যথা যদি ((enc_codepage > 0 && (পূর্ণাঙ্ক)GetACP() != enc_codepage) || enc_latin9)
     {
 	// If we want to display codepage data, and the current CP is not the
 	// ANSI one, we need to go via Unicode.
-	if (unicodebuf != NULL)
+	যদি (unicodebuf != রিক্ত)
 	{
-	    if (enc_latin9)
+	    যদি (enc_latin9)
 		latin9_to_ucs(text, len, unicodebuf);
-	    else
+	    অন্যথা
 		len = MultiByteToWideChar(enc_codepage,
 			MB_PRECOMPOSED,
-			(char *)text, len,
+			(ৱর্ণ *)text, len,
 			(LPWSTR)unicodebuf, unibuflen);
-	    if (len != 0)
+	    যদি (len != 0)
 	    {
 		// Use unicodepdy to make characters fit as we expect, even
 		// when the font uses different widths (e.g., bold character
 		// is wider).
-		if (unicodepdy != NULL)
+		যদি (unicodepdy != রিক্ত)
 		{
-		    int i;
-		    int cw;
+		    পূর্ণাঙ্ক i;
+		    পূর্ণাঙ্ক cw;
 
-		    for (i = 0; i < len; ++i)
+		    বাবে (i = 0; i < len; ++i)
 		    {
 			cw = utf_char2cells(unicodebuf[i]);
-			if (cw > 2)
+			যদি (cw > 2)
 			    cw = 1;
 			unicodepdy[i] = cw * gui.char_width;
 		    }
@@ -6975,47 +6975,47 @@ gui_mch_draw_string(
 	    }
 	}
     }
-    else
+    অন্যথা
     {
 #ifdef FEAT_RIGHTLEFT
 	// Windows will mess up RL text, so we have to draw it character by
 	// character.  Only do this if RL is on, since it's slow.
-	if (curwin->w_p_rl)
+	যদি (curwin->w_p_rl)
 	    RevOut(s_hdc, TEXT_X(col), TEXT_Y(row),
-			 foptions, pcliprect, (char *)text, len, padding);
-	else
+			 foptions, pcliprect, (ৱর্ণ *)text, len, padding);
+	অন্যথা
 #endif
 	    ExtTextOut(s_hdc, TEXT_X(col), TEXT_Y(row),
-			 foptions, pcliprect, (char *)text, len, padding);
+			 foptions, pcliprect, (ৱর্ণ *)text, len, padding);
     }
 
     // Underline
-    if (flags & DRAW_UNDERL)
+    যদি (flags & DRAW_UNDERL)
     {
 	// When p_linespace is 0, overwrite the bottom row of pixels.
 	// Otherwise put the line just below the character.
 	y = FILL_Y(row + 1) - 1;
-	if (p_linespace > 1)
+	যদি (p_linespace > 1)
 	    y -= p_linespace - 1;
-	draw_line(FILL_X(col), y, FILL_X(col + len), y, gui.currFgColor);
+	draw_সাৰি(FILL_X(col), y, FILL_X(col + len), y, gui.currFgColor);
     }
 
     // Strikethrough
-    if (flags & DRAW_STRIKE)
+    যদি (flags & DRAW_STRIKE)
     {
 	y = FILL_Y(row + 1) - gui.char_height/2;
-	draw_line(FILL_X(col), y, FILL_X(col + len), y, gui.currSpColor);
+	draw_সাৰি(FILL_X(col), y, FILL_X(col + len), y, gui.currSpColor);
     }
 
     // Undercurl
-    if (flags & DRAW_UNDERC)
+    যদি (flags & DRAW_UNDERC)
     {
-	int			x;
-	int			offset;
-	static const int	val[8] = {1, 0, 0, 0, 1, 2, 2, 2 };
+	পূর্ণাঙ্ক			x;
+	পূর্ণাঙ্ক			offset;
+	স্থির ধ্রুৱ পূর্ণাঙ্ক	val[8] = {1, 0, 0, 0, 1, 2, 2, 2 };
 
 	y = FILL_Y(row + 1) - 1;
-	for (x = FILL_X(col); x < FILL_X(col + len); ++x)
+	বাবে (x = FILL_X(col); x < FILL_X(col + len); ++x)
 	{
 	    offset = val[x % 8];
 	    set_pixel(x, y - offset, gui.currSpColor);
@@ -7031,39 +7031,39 @@ gui_mch_draw_string(
 /*
  * Flush any output to the screen
  */
-    void
-gui_mch_flush(void)
+    শূন্য
+gui_mch_flush(শূন্য)
 {
-#if defined(FEAT_DIRECTX)
-    if (IS_ENABLE_DIRECTX())
+#যদি defined(FEAT_DIRECTX)
+    যদি (IS_ENABLE_DIRECTX())
 	DWriteContext_Flush(s_dwc);
 #endif
 
     GdiFlush();
 }
 
-    static void
+    স্থির শূন্য
 clear_rect(RECT *rcp)
 {
-    fill_rect(rcp, NULL, gui.back_pixel);
+    fill_rect(rcp, রিক্ত, gui.back_pixel);
 }
 
 
-    void
-gui_mch_get_screen_dimensions(int *screen_w, int *screen_h)
+    শূন্য
+gui_mch_get_screen_dimensions(পূর্ণাঙ্ক *screen_w, পূর্ণাঙ্ক *screen_h)
 {
     RECT	workarea_rect;
 
     get_work_area(&workarea_rect);
 
-    *screen_w = workarea_rect.right - workarea_rect.left
+    *screen_w = workarea_rect.ডান - workarea_rect.বাম
 		- (pGetSystemMetricsForDpi(SM_CXFRAME, s_dpi) +
 		   pGetSystemMetricsForDpi(SM_CXPADDEDBORDER, s_dpi)) * 2;
 
     // FIXME: dirty trick: Because the gui_get_base_height() doesn't include
     // the menubar for MSwin, we subtract it from the screen height, so that
     // the window size can be made to fit on the screen.
-    *screen_h = workarea_rect.bottom - workarea_rect.top
+    *screen_h = workarea_rect.bottom - workarea_rect.শীৰ্ষ
 		- (pGetSystemMetricsForDpi(SM_CYFRAME, s_dpi) +
 		   pGetSystemMetricsForDpi(SM_CXPADDEDBORDER, s_dpi)) * 2
 		- pGetSystemMetricsForDpi(SM_CYCAPTION, s_dpi)
@@ -7071,30 +7071,30 @@ gui_mch_get_screen_dimensions(int *screen_w, int *screen_h)
 }
 
 
-#if defined(FEAT_MENU)
+#যদি defined(FEAT_MENU)
 /*
  * Add a sub menu to the menu bar.
  */
-    void
+    শূন্য
 gui_mch_add_menu(
     vimmenu_T	*menu,
-    int		pos)
+    পূর্ণাঙ্ক		pos)
 {
     vimmenu_T	*parent = menu->parent;
 
     menu->submenu_id = CreatePopupMenu();
     menu->id = s_menu_id++;
 
-    if (menu_is_menubar(menu->name))
+    যদি (menu_is_menubar(menu->name))
     {
 	WCHAR	*wn;
 	MENUITEMINFOW	infow;
 
-	wn = enc_to_utf16(menu->name, NULL);
-	if (wn == NULL)
-	    return;
+	wn = enc_to_utf16(menu->name, রিক্ত);
+	যদি (wn == রিক্ত)
+	    ঘূৰাই;
 
-	infow.cbSize = sizeof(infow);
+	infow.cbSize = পরিমাণ(infow);
 	infow.fMask = MIIM_DATA | MIIM_TYPE | MIIM_ID
 	    | MIIM_SUBMENU;
 	infow.dwItemData = (long_u)menu;
@@ -7103,71 +7103,71 @@ gui_mch_add_menu(
 	infow.dwTypeData = wn;
 	infow.cch = (UINT)wcslen(wn);
 	infow.hSubMenu = menu->submenu_id;
-	InsertMenuItemW((parent == NULL)
+	ঢোকাও_Menu_Item_W((parent == রিক্ত)
 		? s_menuBar : parent->submenu_id,
 		(UINT)pos, TRUE, &infow);
 	vim_free(wn);
     }
 
     // Fix window size if menu may have wrapped
-    if (parent == NULL)
+    যদি (parent == রিক্ত)
 	gui_mswin_get_menu_height(!gui.starting);
 # ifdef FEAT_TEAROFF
-    else if (IsWindow(parent->tearoff_handle))
+    অন্যথা যদি (IsWindow(parent->tearoff_handle))
 	rebuild_tearoff(parent);
 # endif
 }
 
-    void
+    শূন্য
 gui_mch_show_popupmenu(vimmenu_T *menu)
 {
     POINT mp;
 
-    (void)GetCursorPos(&mp);
-    gui_mch_show_popupmenu_at(menu, (int)mp.x, (int)mp.y);
+    (শূন্য)GetCursorPos(&mp);
+    gui_mch_show_popupmenu_at(menu, (পূর্ণাঙ্ক)mp.x, (পূর্ণাঙ্ক)mp.y);
 }
 
-    void
-gui_make_popup(char_u *path_name, int mouse_pos)
+    শূন্য
+gui_make_popup(char_u *path_name, পূর্ণাঙ্ক mouse_pos)
 {
     vimmenu_T	*menu = gui_find_menu(path_name);
 
-    if (menu == NULL)
-	return;
+    যদি (menu == রিক্ত)
+	ঘূৰাই;
 
     POINT	p;
 
     // Find the position of the current cursor
     GetDCOrgEx(s_hdc, &p);
-    if (mouse_pos)
+    যদি (mouse_pos)
     {
-	int	mx, my;
+	পূর্ণাঙ্ক	mx, my;
 
 	gui_mch_getmouse(&mx, &my);
 	p.x += mx;
 	p.y += my;
     }
-    else if (curwin != NULL)
+    অন্যথা যদি (curwin != রিক্ত)
     {
 	p.x += TEXT_X(curwin->w_wincol + curwin->w_wcol + 1);
 	p.y += TEXT_Y(W_WINROW(curwin) + curwin->w_wrow + 1);
     }
-    msg_scroll = FALSE;
-    gui_mch_show_popupmenu_at(menu, (int)p.x, (int)p.y);
+    বাৰ্তা_scroll = FALSE;
+    gui_mch_show_popupmenu_at(menu, (পূর্ণাঙ্ক)p.x, (পূর্ণাঙ্ক)p.y);
 }
 
-# if defined(FEAT_TEAROFF)
+# যদি defined(FEAT_TEAROFF)
 /*
  * Given a menu descriptor, e.g. "File.New", find it in the menu hierarchy and
  * create it as a pseudo-"tearoff menu".
  */
-    void
+    শূন্য
 gui_make_tearoff(char_u *path_name)
 {
     vimmenu_T	*menu = gui_find_menu(path_name);
 
     // Found the menu, so tear it off.
-    if (menu != NULL)
+    যদি (menu != রিক্ত)
 	gui_mch_tearoff(menu->dname, menu, 0xffffL, 0xffffL);
 }
 # endif
@@ -7175,36 +7175,36 @@ gui_make_tearoff(char_u *path_name)
 /*
  * Add a menu item to a menu
  */
-    void
+    শূন্য
 gui_mch_add_menu_item(
     vimmenu_T	*menu,
-    int		idx)
+    পূর্ণাঙ্ক		idx)
 {
     vimmenu_T	*parent = menu->parent;
 
     menu->id = s_menu_id++;
-    menu->submenu_id = NULL;
+    menu->submenu_id = রিক্ত;
 
 # ifdef FEAT_TEAROFF
-    if (STRNCMP(menu->name, TEAR_STRING, TEAR_LEN) == 0)
+    যদি (STRNCMP(menu->name, TEAR_STRING, TEAR_LEN) == 0)
     {
-	InsertMenu(parent->submenu_id, (UINT)idx, MF_BITMAP|MF_BYPOSITION,
+	ঢোকাও_Menu(parent->submenu_id, (UINT)idx, MF_BITMAP|MF_BYPOSITION,
 		(UINT)menu->id, (LPCTSTR) s_htearbitmap);
     }
-    else
+    অন্যথা
 # endif
 # ifdef FEAT_TOOLBAR
-    if (menu_is_toolbar(parent->name))
+    যদি (menu_is_toolbar(parent->name))
     {
 	TBBUTTON newtb;
 
 	CLEAR_FIELD(newtb);
-	if (menu_is_separator(menu->name))
+	যদি (menu_is_separator(menu->name))
 	{
 	    newtb.iBitmap = 0;
 	    newtb.fsStyle = TBSTYLE_SEP;
 	}
-	else
+	অন্যথা
 	{
 	    newtb.iBitmap = get_toolbar_bitmap(menu);
 	    newtb.fsStyle = TBSTYLE_BUTTON;
@@ -7216,22 +7216,22 @@ gui_mch_add_menu_item(
 							     (LPARAM)&newtb);
 	menu->submenu_id = (HMENU)-1;
     }
-    else
+    অন্যথা
 # endif
     {
 	WCHAR	*wn;
 
-	wn = enc_to_utf16(menu->name, NULL);
-	if (wn != NULL)
+	wn = enc_to_utf16(menu->name, রিক্ত);
+	যদি (wn != রিক্ত)
 	{
-	    InsertMenuW(parent->submenu_id, (UINT)idx,
+	    ঢোকাও_Menu_W(parent->submenu_id, (UINT)idx,
 		    (menu_is_separator(menu->name)
 		     ? MF_SEPARATOR : MF_STRING) | MF_BYPOSITION,
 		    (UINT)menu->id, wn);
 	    vim_free(wn);
 	}
 # ifdef FEAT_TEAROFF
-	if (IsWindow(parent->tearoff_handle))
+	যদি (IsWindow(parent->tearoff_handle))
 	    rebuild_tearoff(parent);
 # endif
     }
@@ -7240,37 +7240,37 @@ gui_mch_add_menu_item(
 /*
  * Destroy the machine specific menu widget.
  */
-    void
+    শূন্য
 gui_mch_destroy_menu(vimmenu_T *menu)
 {
 # ifdef FEAT_TOOLBAR
     /*
      * is this a toolbar button?
      */
-    if (menu->submenu_id == (HMENU)-1)
+    যদি (menu->submenu_id == (HMENU)-1)
     {
-	int iButton;
+	পূর্ণাঙ্ক iButton;
 
-	iButton = (int)SendMessage(s_toolbarhwnd, TB_COMMANDTOINDEX,
+	iButton = (পূর্ণাঙ্ক)SendMessage(s_toolbarhwnd, TB_COMMANDTOINDEX,
 							 (WPARAM)menu->id, 0);
 	SendMessage(s_toolbarhwnd, TB_DELETEBUTTON, (WPARAM)iButton, 0);
     }
-    else
+    অন্যথা
 # endif
     {
-	if (menu->parent != NULL
+	যদি (menu->parent != রিক্ত
 		&& menu_is_popup(menu->parent->dname)
-		&& menu->parent->submenu_id != NULL)
+		&& menu->parent->submenu_id != রিক্ত)
 	    RemoveMenu(menu->parent->submenu_id, menu->id, MF_BYCOMMAND);
-	else
+	অন্যথা
 	    RemoveMenu(s_menuBar, menu->id, MF_BYCOMMAND);
-	if (menu->submenu_id != NULL)
+	যদি (menu->submenu_id != রিক্ত)
 	    DestroyMenu(menu->submenu_id);
 # ifdef FEAT_TEAROFF
-	if (IsWindow(menu->tearoff_handle))
+	যদি (IsWindow(menu->tearoff_handle))
 	    DestroyWindow(menu->tearoff_handle);
-	if (menu->parent != NULL
-		&& menu->parent->children != NULL
+	যদি (menu->parent != রিক্ত
+		&& menu->parent->children != রিক্ত
 		&& IsWindow(menu->parent->tearoff_handle))
 	{
 	    // This menu must not show up when rebuilding the tearoff window.
@@ -7282,7 +7282,7 @@ gui_mch_destroy_menu(vimmenu_T *menu)
 }
 
 # ifdef FEAT_TEAROFF
-    static void
+    স্থির শূন্য
 rebuild_tearoff(vimmenu_T *menu)
 {
     //hackish
@@ -7290,31 +7290,31 @@ rebuild_tearoff(vimmenu_T *menu)
     RECT	trect;
     RECT	rct;
     RECT	roct;
-    int		x, y;
+    পূর্ণাঙ্ক		x, y;
 
     HWND thwnd = menu->tearoff_handle;
 
     GetWindowText(thwnd, (LPSTR)tbuf, 127);
-    if (GetWindowRect(thwnd, &trect)
+    যদি (GetWindowRect(thwnd, &trect)
 	    && GetWindowRect(s_hwnd, &rct)
 	    && GetClientRect(s_hwnd, &roct))
     {
-	x = trect.left - rct.left;
-	y = (trect.top -  rct.bottom  + roct.bottom);
+	x = trect.বাম - rct.বাম;
+	y = (trect.শীৰ্ষ -  rct.bottom  + roct.bottom);
     }
-    else
+    অন্যথা
     {
 	x = y = 0xffffL;
     }
     DestroyWindow(thwnd);
-    if (menu->children != NULL)
+    যদি (menu->children != রিক্ত)
     {
 	gui_mch_tearoff(tbuf, menu, x, y);
-	if (IsWindow(menu->tearoff_handle))
-	    (void) SetWindowPos(menu->tearoff_handle,
-				NULL,
-				(int)trect.left,
-				(int)trect.top,
+	যদি (IsWindow(menu->tearoff_handle))
+	    (শূন্য) SetWindowPos(menu->tearoff_handle,
+				রিক্ত,
+				(পূর্ণাঙ্ক)trect.বাম,
+				(পূর্ণাঙ্ক)trect.শীৰ্ষ,
 				0, 0,
 				SWP_NOSIZE | SWP_NOZORDER | SWP_NOACTIVATE);
     }
@@ -7324,25 +7324,25 @@ rebuild_tearoff(vimmenu_T *menu)
 /*
  * Make a menu either grey or not grey.
  */
-    void
+    শূন্য
 gui_mch_menu_grey(
     vimmenu_T	*menu,
-    int	    grey)
+    পূর্ণাঙ্ক	    grey)
 {
 # ifdef FEAT_TOOLBAR
     /*
      * is this a toolbar button?
      */
-    if (menu->submenu_id == (HMENU)-1)
+    যদি (menu->submenu_id == (HMENU)-1)
 	SendMessage(s_toolbarhwnd, TB_ENABLEBUTTON,
 		(WPARAM)menu->id, (LPARAM) MAKELONG((grey ? FALSE : TRUE), 0));
-    else
+    অন্যথা
 # endif
-	(void)EnableMenuItem(menu->parent ? menu->parent->submenu_id : s_menuBar,
+	(শূন্য)EnableMenuItem(menu->parent ? menu->parent->submenu_id : s_menuBar,
 		menu->id, MF_BYCOMMAND | (grey ? MF_GRAYED : MF_ENABLED));
 
 # ifdef FEAT_TEAROFF
-    if ((menu->parent != NULL) && (IsWindow(menu->parent->tearoff_handle)))
+    যদি ((menu->parent != রিক্ত) && (IsWindow(menu->parent->tearoff_handle)))
     {
 	WORD menuID;
 	HWND menuHandle;
@@ -7350,12 +7350,12 @@ gui_mch_menu_grey(
 	/*
 	 * A tearoff button has changed state.
 	 */
-	if (menu->children == NULL)
+	যদি (menu->children == রিক্ত)
 	    menuID = (WORD)(menu->id);
-	else
+	অন্যথা
 	    menuID = (WORD)((long_u)(menu->submenu_id) | (DWORD)0x8000);
 	menuHandle = GetDlgItem(menu->parent->tearoff_handle, menuID);
-	if (menuHandle)
+	যদি (menuHandle)
 	    EnableWindow(menuHandle, !grey);
 
     }
@@ -7370,7 +7370,7 @@ gui_mch_menu_grey(
 #define add_word(x)		*p++ = (x)
 #define add_long(x)		dwp = (DWORD *)p; *dwp++ = (x); p = (WORD *)dwp
 
-#if defined(FEAT_GUI_DIALOG)
+#যদি defined(FEAT_GUI_DIALOG)
 /*
  * stuff for dialogs
  */
@@ -7382,45 +7382,45 @@ gui_mch_menu_grey(
  * pressed, return that button's ID - IDCANCEL (2), which is the button's
  * number.
  */
-    static LRESULT CALLBACK
+    স্থির LRESULT CALLBACK
 dialog_callback(
     HWND hwnd,
     UINT message,
     WPARAM wParam,
     LPARAM lParam UNUSED)
 {
-    if (message == WM_INITDIALOG)
+    যদি (message == WM_INITDIALOG)
     {
 	CenterWindow(hwnd, GetWindow(hwnd, GW_OWNER));
 	// Set focus to the dialog.  Set the default button, if specified.
-	(void)SetFocus(hwnd);
-	if (dialog_default_button > IDCANCEL)
-	    (void)SetFocus(GetDlgItem(hwnd, dialog_default_button));
-	else
+	(শূন্য)SetFocus(hwnd);
+	যদি (dialog_default_button > IDCANCEL)
+	    (শূন্য)SetFocus(GetDlgItem(hwnd, dialog_default_button));
+	অন্যথা
 	    // We don't have a default, set focus on another element of the
 	    // dialog window, probably the icon
-	    (void)SetFocus(GetDlgItem(hwnd, DLG_NONBUTTON_CONTROL));
-	return FALSE;
+	    (শূন্য)SetFocus(GetDlgItem(hwnd, DLG_NONBUTTON_CONTROL));
+	ঘূৰাই FALSE;
     }
 
-    if (message == WM_COMMAND)
+    যদি (message == WM_COMMAND)
     {
-	int	button = LOWORD(wParam);
+	পূর্ণাঙ্ক	button = LOWORD(wParam);
 
 	// Don't end the dialog if something was selected that was
 	// not a button.
-	if (button >= DLG_NONBUTTON_CONTROL)
-	    return TRUE;
+	যদি (button >= DLG_NONBUTTON_CONTROL)
+	    ঘূৰাই TRUE;
 
 	// If the edit box exists, copy the string.
-	if (s_textfield != NULL)
+	যদি (s_textfield != রিক্ত)
 	{
 	    WCHAR  *wp = ALLOC_MULT(WCHAR, IOSIZE);
 	    char_u *p;
 
 	    GetDlgItemTextW(hwnd, DLG_NONBUTTON_CONTROL + 2, wp, IOSIZE);
-	    p = utf16_to_enc(wp, NULL);
-	    if (p != NULL)
+	    p = utf16_to_enc(wp, রিক্ত);
+	    যদি (p != রিক্ত)
 	    {
 		vim_strncpy(s_textfield, p, IOSIZE);
 		vim_free(p);
@@ -7432,22 +7432,22 @@ dialog_callback(
 	 * Need to check for IDOK because if the user just hits Return to
 	 * accept the default value, some reason this is what we get.
 	 */
-	if (button == IDOK)
+	যদি (button == IDOK)
 	{
-	    if (dialog_default_button > IDCANCEL)
+	    যদি (dialog_default_button > IDCANCEL)
 		EndDialog(hwnd, dialog_default_button);
 	}
-	else
+	অন্যথা
 	    EndDialog(hwnd, button - IDCANCEL);
-	return TRUE;
+	ঘূৰাই TRUE;
     }
 
-    if ((message == WM_SYSCOMMAND) && (wParam == SC_CLOSE))
+    যদি ((message == WM_SYSCOMMAND) && (wParam == SC_CLOSE))
     {
 	EndDialog(hwnd, 0);
-	return TRUE;
+	ঘূৰাই TRUE;
     }
-    return FALSE;
+    ঘূৰাই FALSE;
 }
 
 /*
@@ -7467,7 +7467,7 @@ dialog_callback(
  * If stubbing out this fn, return 1.
  */
 
-static const char *dlg_icons[] = // must match names in resource file
+স্থির ধ্রুৱ ৱর্ণ *dlg_icons[] = // must match names in resource file
 {
     "IDR_VIM",
     "IDR_VIM_ERROR",
@@ -7476,28 +7476,28 @@ static const char *dlg_icons[] = // must match names in resource file
     "IDR_VIM_QUESTION"
 };
 
-    int
+    পূর্ণাঙ্ক
 gui_mch_dialog(
-    int		 type,
+    পূর্ণাঙ্ক		 type,
     char_u	*title,
     char_u	*message,
     char_u	*buttons,
-    int		 dfltbutton,
+    পূর্ণাঙ্ক		 dfltbutton,
     char_u	*textfield,
-    int		ex_cmd UNUSED)
+    পূর্ণাঙ্ক		ex_cmd UNUSED)
 {
     WORD	*p, *pdlgtemplate, *pnumitems;
     DWORD	*dwp;
-    int		numButtons;
-    int		*buttonWidths, *buttonPositions;
-    int		buttonYpos;
-    int		nchar, i;
+    পূর্ণাঙ্ক		অঙ্ক_Buttons;
+    পূর্ণাঙ্ক		*buttonWidths, *buttonPositions;
+    পূর্ণাঙ্ক		buttonYpos;
+    পূর্ণাঙ্ক		nchar, i;
     DWORD	lStyle;
-    int		dlgwidth = 0;
-    int		dlgheight;
-    int		editboxheight;
-    int		horizWidth = 0;
-    int		msgheight;
+    পূর্ণাঙ্ক		dlgwidth = 0;
+    পূর্ণাঙ্ক		dlgheight;
+    পূর্ণাঙ্ক		editboxheight;
+    পূর্ণাঙ্ক		horizWidth = 0;
+    পূর্ণাঙ্ক		msgheight;
     char_u	*pstart;
     char_u	*pend;
     char_u	*last_white;
@@ -7507,43 +7507,43 @@ gui_mch_dialog(
     HDC		hdc;
     HFONT	font, oldFont;
     TEXTMETRIC	fontInfo;
-    int		fontHeight;
-    int		textWidth, minButtonWidth, messageWidth;
-    int		maxDialogWidth;
-    int		maxDialogHeight;
-    int		scroll_flag = 0;
-    int		vertical;
-    int		dlgPaddingX;
-    int		dlgPaddingY;
+    পূর্ণাঙ্ক		fontHeight;
+    পূর্ণাঙ্ক		textWidth, minButtonWidth, messageWidth;
+    পূর্ণাঙ্ক		maxDialogWidth;
+    পূর্ণাঙ্ক		maxDialogHeight;
+    পূর্ণাঙ্ক		scroll_flag = 0;
+    পূর্ণাঙ্ক		vertical;
+    পূর্ণাঙ্ক		dlgPaddingX;
+    পূর্ণাঙ্ক		dlgPaddingY;
 # ifdef USE_SYSMENU_FONT
     LOGFONTW	lfSysmenu;
-    int		use_lfSysmenu = FALSE;
+    পূর্ণাঙ্ক		use_lfSysmenu = FALSE;
 # endif
     garray_T	ga;
-    int		l;
-    int		dlg_icon_width;
-    int		dlg_icon_height;
-    int		dpi;
+    পূর্ণাঙ্ক		l;
+    পূর্ণাঙ্ক		dlg_icon_width;
+    পূর্ণাঙ্ক		dlg_icon_height;
+    পূর্ণাঙ্ক		dpi;
 
 # ifndef NO_CONSOLE
     // Don't output anything in silent mode ("ex -s")
 #  ifdef VIMDLL
-    if (!(gui.in_use || gui.starting))
+    যদি (!(gui.in_use || gui.starting))
 #  endif
-	if (silent_mode)
-	    return dfltbutton;   // return default option
+	যদি (silent_mode)
+	    ঘূৰাই dfltbutton;   // return default option
 # endif
 
-    if (s_hwnd == NULL)
+    যদি (s_hwnd == রিক্ত)
     {
 	load_dpi_func();
 	s_dpi = dpi = pGetDpiForSystem();
 	get_dialog_font_metrics();
     }
-    else
+    অন্যথা
 	dpi = pGetDpiForSystem();
 
-    if ((type < 0) || (type > VIM_LAST_TYPE))
+    যদি ((type < 0) || (type > VIM_LAST_TYPE))
 	type = 0;
 
     // allocate some memory for dialog template
@@ -7551,8 +7551,8 @@ gui_mch_dialog(
     pdlgtemplate = p = (PWORD)LocalAlloc(LPTR,
 					DLG_ALLOC_SIZE + STRLEN(message) * 2);
 
-    if (p == NULL)
-	return -1;
+    যদি (p == রিক্ত)
+	ঘূৰাই -1;
 
     /*
      * make a copy of 'buttons' to fiddle with it.  compiler grizzles because
@@ -7560,30 +7560,30 @@ gui_mch_dialog(
      * const.
      */
     tbuffer = vim_strsave(buttons);
-    if (tbuffer == NULL)
-	return -1;
+    যদি (tbuffer == রিক্ত)
+	ঘূৰাই -1;
 
     --dfltbutton;   // Change from one-based to zero-based
 
     // Count buttons
-    numButtons = 1;
-    for (i = 0; tbuffer[i] != '\0'; i++)
+    অঙ্ক_Buttons = 1;
+    বাবে (i = 0; tbuffer[i] != '\0'; i++)
     {
-	if (tbuffer[i] == DLG_BUTTON_SEP)
-	    numButtons++;
+	যদি (tbuffer[i] == DLG_BUTTON_SEP)
+	    অঙ্ক_Buttons++;
     }
-    if (dfltbutton >= numButtons)
+    যদি (dfltbutton >= অঙ্ক_Buttons)
 	dfltbutton = -1;
 
     // Allocate array to hold the width of each button
-    buttonWidths = ALLOC_MULT(int, numButtons);
-    if (buttonWidths == NULL)
-	return -1;
+    buttonWidths = ALLOC_MULT(পূর্ণাঙ্ক, অঙ্ক_Buttons);
+    যদি (buttonWidths == রিক্ত)
+	ঘূৰাই -1;
 
     // Allocate array to hold the X position of each button
-    buttonPositions = ALLOC_MULT(int, numButtons);
-    if (buttonPositions == NULL)
-	return -1;
+    buttonPositions = ALLOC_MULT(পূর্ণাঙ্ক, অঙ্ক_Buttons);
+    যদি (buttonPositions == রিক্ত)
+	ঘূৰাই -1;
 
     /*
      * Calculate how big the dialog must be.
@@ -7591,12 +7591,12 @@ gui_mch_dialog(
     hwnd = GetDesktopWindow();
     hdc = GetWindowDC(hwnd);
 # ifdef USE_SYSMENU_FONT
-    if (gui_w32_get_menu_font(&lfSysmenu) == OK)
+    যদি (gui_w32_get_menu_font(&lfSysmenu) == OK)
     {
 	font = CreateFontIndirectW(&lfSysmenu);
 	use_lfSysmenu = TRUE;
     }
-    else
+    অন্যথা
 # endif
 	font = CreateFont(-DLG_FONT_POINT_SIZE, 0, 0, 0, 0, 0, 0, 0,
 			0, 0, 0, 0, VARIABLE_PITCH, DLG_FONT_NAME);
@@ -7612,33 +7612,33 @@ gui_mch_dialog(
     minButtonWidth = GetTextWidth(hdc, (char_u *)"Cancel", 6);
 
     // Maximum width of a dialog, if possible
-    if (s_hwnd == NULL)
+    যদি (s_hwnd == রিক্ত)
     {
 	RECT	workarea_rect;
 
 	// We don't have a window, use the desktop area.
 	get_work_area(&workarea_rect);
-	maxDialogWidth = workarea_rect.right - workarea_rect.left - 100;
-	if (maxDialogWidth > adjust_by_system_dpi(600))
+	maxDialogWidth = workarea_rect.ডান - workarea_rect.বাম - 100;
+	যদি (maxDialogWidth > adjust_by_system_dpi(600))
 	    maxDialogWidth = adjust_by_system_dpi(600);
 	// Leave some room for the taskbar.
-	maxDialogHeight = workarea_rect.bottom - workarea_rect.top - 150;
+	maxDialogHeight = workarea_rect.bottom - workarea_rect.শীৰ্ষ - 150;
     }
-    else
+    অন্যথা
     {
 	// Use our own window for the size, unless it's very small.
 	GetWindowRect(s_hwnd, &rect);
-	maxDialogWidth = rect.right - rect.left
+	maxDialogWidth = rect.ডান - rect.বাম
 		       - (pGetSystemMetricsForDpi(SM_CXFRAME, dpi) +
 			  pGetSystemMetricsForDpi(SM_CXPADDEDBORDER, dpi)) * 2;
-	if (maxDialogWidth < adjust_by_system_dpi(DLG_MIN_MAX_WIDTH))
+	যদি (maxDialogWidth < adjust_by_system_dpi(DLG_MIN_MAX_WIDTH))
 	    maxDialogWidth = adjust_by_system_dpi(DLG_MIN_MAX_WIDTH);
 
-	maxDialogHeight = rect.bottom - rect.top
+	maxDialogHeight = rect.bottom - rect.শীৰ্ষ
 		       - (pGetSystemMetricsForDpi(SM_CYFRAME, dpi) +
 			  pGetSystemMetricsForDpi(SM_CXPADDEDBORDER, dpi)) * 4
 		       - pGetSystemMetricsForDpi(SM_CYCAPTION, dpi);
-	if (maxDialogHeight < adjust_by_system_dpi(DLG_MIN_MAX_HEIGHT))
+	যদি (maxDialogHeight < adjust_by_system_dpi(DLG_MIN_MAX_HEIGHT))
 	    maxDialogHeight = adjust_by_system_dpi(DLG_MIN_MAX_HEIGHT);
     }
 
@@ -7648,8 +7648,8 @@ gui_mch_dialog(
     pstart = message;
     messageWidth = 0;
     msgheight = 0;
-    ga_init2(&ga, sizeof(char), 500);
-    do
+    ga_init2(&ga, পরিমাণ(ৱর্ণ), 500);
+    কৰা
     {
 	msgheight += fontHeight;    // at least one line
 
@@ -7657,46 +7657,46 @@ gui_mch_dialog(
 	// at a word boundary, which would mean we can't compute the number of
 	// wrapped lines.
 	textWidth = 0;
-	last_white = NULL;
-	for (pend = pstart; *pend != NUL && *pend != '\n'; )
+	last_white = রিক্ত;
+	বাবে (pend = pstart; *pend != NUL && *pend != '\n'; )
 	{
 	    l = (*mb_ptr2len)(pend);
-	    if (l == 1 && VIM_ISWHITE(*pend)
+	    যদি (l == 1 && VIM_ISWHITE(*pend)
 					&& textWidth > maxDialogWidth * 3 / 4)
 		last_white = pend;
 	    textWidth += GetTextWidthEnc(hdc, pend, l);
-	    if (textWidth >= maxDialogWidth)
+	    যদি (textWidth >= maxDialogWidth)
 	    {
 		// Line will wrap.
 		messageWidth = maxDialogWidth;
 		msgheight += fontHeight;
 		textWidth = 0;
 
-		if (last_white != NULL)
+		যদি (last_white != রিক্ত)
 		{
 		    // break the line just after a space
-		    if (pend > last_white)
-			ga.ga_len -= (int)(pend - (last_white + 1));
+		    যদি (pend > last_white)
+			ga.ga_len -= (পূর্ণাঙ্ক)(pend - (last_white + 1));
 		    pend = last_white + 1;
-		    last_white = NULL;
+		    last_white = রিক্ত;
 		}
 		ga_append(&ga, '\r');
 		ga_append(&ga, '\n');
-		continue;
+		অনুৱর্ত;
 	    }
 
-	    while (--l >= 0)
+	    যেতিয়ালৈ (--l >= 0)
 		ga_append(&ga, *pend++);
 	}
-	if (textWidth > messageWidth)
+	যদি (textWidth > messageWidth)
 	    messageWidth = textWidth;
 
 	ga_append(&ga, '\r');
 	ga_append(&ga, '\n');
 	pstart = pend + 1;
-    } while (*pend != NUL);
+    } যেতিয়ালৈ (*pend != NUL);
 
-    if (ga.ga_data != NULL)
+    যদি (ga.ga_data != রিক্ত)
 	message = ga.ga_data;
 
     messageWidth += 10;		// roundoff space
@@ -7708,60 +7708,60 @@ gui_mch_dialog(
     dlgwidth = messageWidth + dlg_icon_width + 3 * dlgPaddingX
 			     + pGetSystemMetricsForDpi(SM_CXVSCROLL, dpi);
 
-    if (msgheight < dlg_icon_height)
+    যদি (msgheight < dlg_icon_height)
 	msgheight = dlg_icon_height;
 
     /*
      * Check button names.  A long one will make the dialog wider.
      * When called early (-register error message) p_go isn't initialized.
      */
-    vertical = (p_go != NULL && vim_strchr(p_go, GO_VERTICAL) != NULL);
-    if (!vertical)
+    vertical = (p_go != রিক্ত && vim_strchr(p_go, GO_VERTICAL) != রিক্ত);
+    যদি (!vertical)
     {
 	// Place buttons horizontally if they fit.
 	horizWidth = dlgPaddingX;
 	pstart = tbuffer;
 	i = 0;
-	do
+	কৰা
 	{
 	    pend = vim_strchr(pstart, DLG_BUTTON_SEP);
-	    if (pend == NULL)
+	    যদি (pend == রিক্ত)
 		pend = pstart + STRLEN(pstart);	// Last button name.
-	    textWidth = GetTextWidthEnc(hdc, pstart, (int)(pend - pstart));
-	    if (textWidth < minButtonWidth)
+	    textWidth = GetTextWidthEnc(hdc, pstart, (পূর্ণাঙ্ক)(pend - pstart));
+	    যদি (textWidth < minButtonWidth)
 		textWidth = minButtonWidth;
 	    textWidth += dlgPaddingX;	    // Padding within button
 	    buttonWidths[i] = textWidth;
 	    buttonPositions[i++] = horizWidth;
 	    horizWidth += textWidth + dlgPaddingX; // Pad between buttons
 	    pstart = pend + 1;
-	} while (*pend != NUL);
+	} যেতিয়ালৈ (*pend != NUL);
 
-	if (horizWidth > maxDialogWidth)
+	যদি (horizWidth > maxDialogWidth)
 	    vertical = TRUE;	// Too wide to fit on the screen.
-	else if (horizWidth > dlgwidth)
+	অন্যথা যদি (horizWidth > dlgwidth)
 	    dlgwidth = horizWidth;
     }
 
-    if (vertical)
+    যদি (vertical)
     {
 	// Stack buttons vertically.
 	pstart = tbuffer;
-	do
+	কৰা
 	{
 	    pend = vim_strchr(pstart, DLG_BUTTON_SEP);
-	    if (pend == NULL)
+	    যদি (pend == রিক্ত)
 		pend = pstart + STRLEN(pstart);	// Last button name.
-	    textWidth = GetTextWidthEnc(hdc, pstart, (int)(pend - pstart));
+	    textWidth = GetTextWidthEnc(hdc, pstart, (পূর্ণাঙ্ক)(pend - pstart));
 	    textWidth += dlgPaddingX;		// Padding within button
 	    textWidth += DLG_VERT_PADDING_X * 2; // Padding around button
-	    if (textWidth > dlgwidth)
+	    যদি (textWidth > dlgwidth)
 		dlgwidth = textWidth;
 	    pstart = pend + 1;
-	} while (*pend != NUL);
+	} যেতিয়ালৈ (*pend != NUL);
     }
 
-    if (dlgwidth < DLG_MIN_WIDTH)
+    যদি (dlgwidth < DLG_MIN_WIDTH)
 	dlgwidth = DLG_MIN_WIDTH;	// Don't allow a really thin dialog!
 
     // start to fill in the dlgtemplate information.  addressing by WORDs
@@ -7776,19 +7776,19 @@ gui_mch_dialog(
     add_word(PixelToDialogX(dlgwidth));	// cx
 
     // Dialog height.
-    if (vertical)
+    যদি (vertical)
 	dlgheight = msgheight + 2 * dlgPaddingY
-			   + DLG_VERT_PADDING_Y + 2 * fontHeight * numButtons;
-    else
+			   + DLG_VERT_PADDING_Y + 2 * fontHeight * অঙ্ক_Buttons;
+    অন্যথা
 	dlgheight = msgheight + 3 * dlgPaddingY + 2 * fontHeight;
 
     // Dialog needs to be taller if contains an edit box.
     editboxheight = fontHeight + dlgPaddingY + 4 * DLG_VERT_PADDING_Y;
-    if (textfield != NULL)
+    যদি (textfield != রিক্ত)
 	dlgheight += editboxheight;
 
     // Restrict the size to a maximum.  Causes a scrollbar to show up.
-    if (dlgheight > maxDialogHeight)
+    যদি (dlgheight > maxDialogHeight)
     {
 	msgheight = msgheight - (dlgheight - maxDialogHeight);
 	dlgheight = maxDialogHeight;
@@ -7809,15 +7809,15 @@ gui_mch_dialog(
 
     // do the font, since DS_3DLOOK doesn't work properly
 # ifdef USE_SYSMENU_FONT
-    if (use_lfSysmenu)
+    যদি (use_lfSysmenu)
     {
 	// point size
 	*p++ = -MulDiv(lfSysmenu.lfHeight, 72,
 		GetDeviceCaps(hdc, LOGPIXELSY));
 	wcscpy(p, lfSysmenu.lfFaceName);
-	nchar = (int)wcslen(lfSysmenu.lfFaceName) + 1;
+	nchar = (পূর্ণাঙ্ক)wcslen(lfSysmenu.lfFaceName) + 1;
     }
-    else
+    অন্যথা
 # endif
     {
 	*p++ = DLG_FONT_POINT_SIZE;		// point size
@@ -7827,21 +7827,21 @@ gui_mch_dialog(
 
     buttonYpos = msgheight + 2 * dlgPaddingY;
 
-    if (textfield != NULL)
+    যদি (textfield != রিক্ত)
 	buttonYpos += editboxheight;
 
     pstart = tbuffer;
-    if (!vertical)
+    যদি (!vertical)
 	horizWidth = (dlgwidth - horizWidth) / 2;	// Now it's X offset
-    for (i = 0; i < numButtons; i++)
+    বাবে (i = 0; i < অঙ্ক_Buttons; i++)
     {
 	// get end of this button.
-	for (	pend = pstart;
+	বাবে (	pend = pstart;
 		*pend && (*pend != DLG_BUTTON_SEP);
 		pend++)
 	    ;
 
-	if (*pend)
+	যদি (*pend)
 	    *pend = '\0';
 
 	/*
@@ -7857,7 +7857,7 @@ gui_mch_dialog(
 	 * dialog.  Also needed for when the textfield is the default control.
 	 * It appears to work now (perhaps not on Win95?).
 	 */
-	if (vertical)
+	যদি (vertical)
 	{
 	    p = add_dialog_element(p,
 		    (i == dfltbutton
@@ -7867,9 +7867,9 @@ gui_mch_dialog(
 				   + 2 * fontHeight * i),
 		    PixelToDialogX(dlgwidth - 2 * DLG_VERT_PADDING_X),
 		    (WORD)(PixelToDialogY(2 * fontHeight) - 1),
-		    (WORD)(IDCANCEL + 1 + i), (WORD)0x0080, (char *)pstart);
+		    (WORD)(IDCANCEL + 1 + i), (WORD)0x0080, (ৱর্ণ *)pstart);
 	}
-	else
+	অন্যথা
 	{
 	    p = add_dialog_element(p,
 		    (i == dfltbutton
@@ -7878,11 +7878,11 @@ gui_mch_dialog(
 		    PixelToDialogY(buttonYpos), // TBK
 		    PixelToDialogX(buttonWidths[i]),
 		    (WORD)(PixelToDialogY(2 * fontHeight) - 1),
-		    (WORD)(IDCANCEL + 1 + i), (WORD)0x0080, (char *)pstart);
+		    (WORD)(IDCANCEL + 1 + i), (WORD)0x0080, (ৱর্ণ *)pstart);
 	}
 	pstart = pend + 1;	//next button
     }
-    *pnumitems += numButtons;
+    *pnumitems += অঙ্ক_Buttons;
 
     // Vim icon
     p = add_dialog_element(p, SS_ICON,
@@ -7894,22 +7894,22 @@ gui_mch_dialog(
 	    dlg_icons[type]);
 
     // Dialog message
-    p = add_dialog_element(p, ES_LEFT|scroll_flag|ES_MULTILINE|ES_READONLY,
+    p = add_dialog_element(p, ES_বাম|scroll_flag|ES_MULTILINE|ES_READONLY,
 	    PixelToDialogX(2 * dlgPaddingX + dlg_icon_width),
 	    PixelToDialogY(dlgPaddingY),
 	    (WORD)(PixelToDialogX(messageWidth) + 1),
 	    PixelToDialogY(msgheight),
-	    DLG_NONBUTTON_CONTROL + 1, (WORD)0x0081, (char *)message);
+	    DLG_NONBUTTON_CONTROL + 1, (WORD)0x0081, (ৱর্ণ *)message);
 
     // Edit box
-    if (textfield != NULL)
+    যদি (textfield != রিক্ত)
     {
-	p = add_dialog_element(p, ES_LEFT|ES_AUTOHSCROLL|WS_TABSTOP|WS_BORDER,
+	p = add_dialog_element(p, ES_বাম|ES_AUTOHSCROLL|WS_TABSTOP|WS_BORDER,
 		PixelToDialogX(2 * dlgPaddingX),
 		PixelToDialogY(2 * dlgPaddingY + msgheight),
 		PixelToDialogX(dlgwidth - 4 * dlgPaddingX),
 		PixelToDialogY(fontHeight + dlgPaddingY),
-		DLG_NONBUTTON_CONTROL + 2, (WORD)0x0081, (char *)textfield);
+		DLG_NONBUTTON_CONTROL + 2, (WORD)0x0081, (ৱর্ণ *)textfield);
 	*pnumitems += 1;
     }
 
@@ -7923,19 +7923,19 @@ gui_mch_dialog(
     // If we have an edit box, make that the default. We also need to tell
     // dialog_callback() if this dialog contains an edit box or not. We do
     // this by setting s_textfield if it does.
-    if (textfield != NULL)
+    যদি (textfield != রিক্ত)
     {
 	dialog_default_button = DLG_NONBUTTON_CONTROL + 2;
 	s_textfield = textfield;
     }
-    else
+    অন্যথা
     {
 	dialog_default_button = IDCANCEL + 1 + dfltbutton;
-	s_textfield = NULL;
+	s_textfield = রিক্ত;
     }
 
     // show the dialog box modally and get a return value
-    nchar = (int)DialogBoxIndirect(
+    nchar = (পূর্ণাঙ্ক)DialogBoxIndirect(
 	    g_hinst,
 	    (LPDLGTEMPLATE)pdlgtemplate,
 	    s_hwnd,
@@ -7948,9 +7948,9 @@ gui_mch_dialog(
     vim_free(ga.ga_data);
 
     // Focus back to our window (for when MDI is used).
-    (void)SetFocus(s_hwnd);
+    (শূন্য)SetFocus(s_hwnd);
 
-    return nchar;
+    ঘূৰাই nchar;
 }
 
 #endif // FEAT_GUI_DIALOG
@@ -7971,7 +7971,7 @@ gui_mch_dialog(
  *  TODO: use the length information noted here to enable the dialog creation
  *  routines to work out more exactly how much memory they need to alloc.
  */
-    static PWORD
+    স্থির PWORD
 add_dialog_element(
     PWORD p,
     DWORD lStyle,
@@ -7981,9 +7981,9 @@ add_dialog_element(
     WORD h,
     WORD Id,
     WORD clss,
-    const char *caption)
+    ধ্রুৱ ৱর্ণ *caption)
 {
-    int nchar;
+    পূর্ণাঙ্ক nchar;
 
     p = lpwAlign(p);	// Align to dword boundary
     lStyle = lStyle | WS_VISIBLE | WS_CHILD;
@@ -8005,7 +8005,7 @@ add_dialog_element(
 
     *p++ = 0;  // advance pointer over nExtraStuff WORD   - 2 more
 
-    return p;	// total = 15 + strlen(caption) words
+    ঘূৰাই p;	// total = 15 + strlen(caption) words
 		// bytes read = 2 * total
 }
 
@@ -8014,7 +8014,7 @@ add_dialog_element(
  * Helper routine.  Take an input pointer, return closest pointer that is
  * aligned on a DWORD (4 byte) boundary.  Taken from the Win32SDK samples.
  */
-    static LPWORD
+    স্থির LPWORD
 lpwAlign(
     LPWORD lpIn)
 {
@@ -8024,7 +8024,7 @@ lpwAlign(
     ul += 3;
     ul >>= 2;
     ul <<= 2;
-    return (LPWORD)ul;
+    ঘূৰাই (LPWORD)ul;
 }
 
 /*
@@ -8034,40 +8034,40 @@ lpwAlign(
  * char NULL).  Partly taken from the Win32SDK samples.
  * If "use_enc" is TRUE, 'encoding' is used for "lpAnsiIn". If FALSE, current
  * ACP is used for "lpAnsiIn". */
-    static int
+    স্থির পূর্ণাঙ্ক
 nCopyAnsiToWideChar(
     LPWORD lpWCStr,
     LPSTR lpAnsiIn,
     BOOL use_enc)
 {
-    int		nChar = 0;
-    int		len = lstrlen(lpAnsiIn) + 1;	// include NUL character
-    int		i;
+    পূর্ণাঙ্ক		nChar = 0;
+    পূর্ণাঙ্ক		len = lstrlen(lpAnsiIn) + 1;	// include NUL character
+    পূর্ণাঙ্ক		i;
     WCHAR	*wn;
 
-    if (use_enc && enc_codepage >= 0 && (int)GetACP() != enc_codepage)
+    যদি (use_enc && enc_codepage >= 0 && (পূর্ণাঙ্ক)GetACP() != enc_codepage)
     {
 	// Not a codepage, use our own conversion function.
-	wn = enc_to_utf16((char_u *)lpAnsiIn, NULL);
-	if (wn != NULL)
+	wn = enc_to_utf16((char_u *)lpAnsiIn, রিক্ত);
+	যদি (wn != রিক্ত)
 	{
 	    wcscpy(lpWCStr, wn);
-	    nChar = (int)wcslen(wn) + 1;
+	    nChar = (পূর্ণাঙ্ক)wcslen(wn) + 1;
 	    vim_free(wn);
 	}
     }
-    if (nChar == 0)
+    যদি (nChar == 0)
 	// Use Win32 conversion function.
 	nChar = MultiByteToWideChar(
 		enc_codepage > 0 ? enc_codepage : CP_ACP,
 		MB_PRECOMPOSED,
 		lpAnsiIn, len,
 		lpWCStr, len);
-    for (i = 0; i < nChar; ++i)
-	if (lpWCStr[i] == (WORD)'\t')	// replace tabs with spaces
+    বাবে (i = 0; i < nChar; ++i)
+	যদি (lpWCStr[i] == (WORD)'\t')	// replace tabs with spaces
 	    lpWCStr[i] = (WORD)' ';
 
-    return nChar;
+    ঘূৰাই nChar;
 }
 
 
@@ -8075,21 +8075,21 @@ nCopyAnsiToWideChar(
 /*
  * Lookup menu handle from "menu_id".
  */
-    static HMENU
+    স্থির HMENU
 tearoff_lookup_menuhandle(
     vimmenu_T *menu,
     WORD menu_id)
 {
-    for ( ; menu != NULL; menu = menu->next)
+    বাবে ( ; menu != রিক্ত; menu = menu->next)
     {
-	if (menu->modes == 0)	// this menu has just been deleted
-	    continue;
-	if (menu_is_separator(menu->dname))
-	    continue;
-	if ((WORD)((long_u)(menu->submenu_id) | (DWORD)0x8000) == menu_id)
-	    return menu->submenu_id;
+	যদি (menu->modes == 0)	// this menu has just been deleted
+	    অনুৱর্ত;
+	যদি (menu_is_separator(menu->dname))
+	    অনুৱর্ত;
+	যদি ((WORD)((long_u)(menu->submenu_id) | (DWORD)0x8000) == menu_id)
+	    ঘূৰাই menu->submenu_id;
     }
-    return NULL;
+    ঘূৰাই রিক্ত;
 }
 
 /*
@@ -8097,49 +8097,49 @@ tearoff_lookup_menuhandle(
  * "tearoff menus" Very simple - forward button presses (to fool Vim into
  * thinking its menus have been clicked), and go away when closed.
  */
-    static LRESULT CALLBACK
+    স্থির LRESULT CALLBACK
 tearoff_callback(
     HWND hwnd,
     UINT message,
     WPARAM wParam,
     LPARAM lParam)
 {
-    if (message == WM_INITDIALOG)
+    যদি (message == WM_INITDIALOG)
     {
 	SetWindowLongPtr(hwnd, DWLP_USER, (LONG_PTR)lParam);
-	return (TRUE);
+	ঘূৰাই (TRUE);
     }
 
     // May show the mouse pointer again.
     HandleMouseHide(message, lParam);
 
-    if (message == WM_COMMAND)
+    যদি (message == WM_COMMAND)
     {
-	if ((WORD)(LOWORD(wParam)) & 0x8000)
+	যদি ((WORD)(LOWORD(wParam)) & 0x8000)
 	{
 	    POINT   mp;
 	    RECT    rect;
 
-	    if (GetCursorPos(&mp) && GetWindowRect(hwnd, &rect))
+	    যদি (GetCursorPos(&mp) && GetWindowRect(hwnd, &rect))
 	    {
 		vimmenu_T *menu;
 
 		menu = (vimmenu_T*)GetWindowLongPtr(hwnd, DWLP_USER);
-		(void)TrackPopupMenu(
+		(শূন্য)TrackPopupMenu(
 			 tearoff_lookup_menuhandle(menu, LOWORD(wParam)),
 			 TPM_LEFTALIGN | TPM_LEFTBUTTON,
-			 (int)rect.right - 8,
-			 (int)mp.y,
-			 (int)0,	    // reserved param
+			 (পূর্ণাঙ্ক)rect.ডান - 8,
+			 (পূর্ণাঙ্ক)mp.y,
+			 (পূর্ণাঙ্ক)0,	    // reserved param
 			 s_hwnd,
-			 NULL);
+			 রিক্ত);
 		/*
 		 * NOTE: The pop-up menu can eat the mouse up event.
 		 * We deal with this in normal.c.
 		 */
 	    }
 	}
-	else
+	অন্যথা
 	    // Pass on messages to the main Vim window
 	    PostMessage(s_hwnd, WM_COMMAND, LOWORD(wParam), 0);
 	/*
@@ -8147,20 +8147,20 @@ tearoff_callback(
 	 * choosing a tearoff button you can start typing again
 	 * straight away.
 	 */
-	(void)SetFocus(s_hwnd);
-	return TRUE;
+	(শূন্য)SetFocus(s_hwnd);
+	ঘূৰাই TRUE;
     }
-    if ((message == WM_SYSCOMMAND) && (wParam == SC_CLOSE))
+    যদি ((message == WM_SYSCOMMAND) && (wParam == SC_CLOSE))
     {
 	DestroyWindow(hwnd);
-	return TRUE;
+	ঘূৰাই TRUE;
     }
 
     // When moved around, give main window the focus back.
-    if (message == WM_EXITSIZEMOVE)
-	(void)SetActiveWindow(s_hwnd);
+    যদি (message == WM_EXITSIZEMOVE)
+	(শূন্য)SetActiveWindow(s_hwnd);
 
-    return FALSE;
+    ঘূৰাই FALSE;
 }
 #endif
 
@@ -8170,8 +8170,8 @@ tearoff_callback(
  * We don't use the GetDialogBaseUnits() API, because we don't use the
  * (old-style) system font.
  */
-    static void
-get_dialog_font_metrics(void)
+    স্থির শূন্য
+get_dialog_font_metrics(শূন্য)
 {
     HDC		    hdc;
     HFONT	    hfontTools = 0;
@@ -8181,9 +8181,9 @@ get_dialog_font_metrics(void)
 #endif
 
 #ifdef USE_SYSMENU_FONT
-    if (gui_w32_get_menu_font(&lfSysmenu) == OK)
+    যদি (gui_w32_get_menu_font(&lfSysmenu) == OK)
 	hfontTools = CreateFontIndirectW(&lfSysmenu);
-    else
+    অন্যথা
 #endif
 	hfontTools = CreateFont(-DLG_FONT_POINT_SIZE, 0, 0, 0, 0, 0, 0, 0,
 				0, 0, 0, 0, VARIABLE_PITCH, DLG_FONT_NAME);
@@ -8197,81 +8197,81 @@ get_dialog_font_metrics(void)
     s_dlgfntheight = (WORD)size.cy;
 }
 
-#if defined(FEAT_MENU) && defined(FEAT_TEAROFF)
+#যদি defined(FEAT_MENU) && defined(FEAT_TEAROFF)
 /*
  * Create a pseudo-"tearoff menu" based on the child
  * items of a given menu pointer.
  */
-    static void
+    স্থির শূন্য
 gui_mch_tearoff(
     char_u	*title,
     vimmenu_T	*menu,
-    int		initX,
-    int		initY)
+    পূর্ণাঙ্ক		initX,
+    পূর্ণাঙ্ক		initY)
 {
     WORD	*p, *pdlgtemplate, *pnumitems, *ptrueheight;
-    int		template_len;
-    int		nchar, textWidth, submenuWidth;
+    পূর্ণাঙ্ক		template_len;
+    পূর্ণাঙ্ক		nchar, textWidth, submenuWidth;
     DWORD	lStyle;
     DWORD	lExtendedStyle;
     WORD	dlgwidth;
     WORD	menuID;
     vimmenu_T	*pmenu;
-    vimmenu_T	*top_menu;
+    vimmenu_T	*শীৰ্ষ_menu;
     vimmenu_T	*the_menu = menu;
     HWND	hwnd;
     HDC		hdc;
     HFONT	font, oldFont;
-    int		col, spaceWidth, len;
-    int		columnWidths[2];
+    পূর্ণাঙ্ক		col, spaceWidth, len;
+    পূর্ণাঙ্ক		columnWidths[2];
     char_u	*label, *text;
-    int		acLen = 0;
-    int		nameLen;
-    int		padding0, padding1, padding2 = 0;
-    int		sepPadding=0;
-    int		x;
-    int		y;
+    পূর্ণাঙ্ক		acLen = 0;
+    পূর্ণাঙ্ক		nameLen;
+    পূর্ণাঙ্ক		padding0, padding1, padding2 = 0;
+    পূর্ণাঙ্ক		sepPadding=0;
+    পূর্ণাঙ্ক		x;
+    পূর্ণাঙ্ক		y;
 # ifdef USE_SYSMENU_FONT
     LOGFONTW	lfSysmenu;
-    int		use_lfSysmenu = FALSE;
+    পূর্ণাঙ্ক		use_lfSysmenu = FALSE;
 # endif
 
     /*
      * If this menu is already torn off, move it to the mouse position.
      */
-    if (IsWindow(menu->tearoff_handle))
+    যদি (IsWindow(menu->tearoff_handle))
     {
 	POINT mp;
-	if (GetCursorPos(&mp))
+	যদি (GetCursorPos(&mp))
 	{
-	    SetWindowPos(menu->tearoff_handle, NULL, mp.x, mp.y, 0, 0,
+	    SetWindowPos(menu->tearoff_handle, রিক্ত, mp.x, mp.y, 0, 0,
 		    SWP_NOACTIVATE | SWP_NOSIZE | SWP_NOZORDER);
 	}
-	return;
+	ঘূৰাই;
     }
 
     /*
      * Create a new tearoff.
      */
-    if (*title == MNU_HIDDEN_CHAR)
+    যদি (*title == MNU_HIDDEN_CHAR)
 	title++;
 
     // Allocate memory to store the dialog template.  It's made bigger when
     // needed.
     template_len = DLG_ALLOC_SIZE;
     pdlgtemplate = p = (WORD *)LocalAlloc(LPTR, template_len);
-    if (p == NULL)
-	return;
+    যদি (p == রিক্ত)
+	ঘূৰাই;
 
     hwnd = GetDesktopWindow();
     hdc = GetWindowDC(hwnd);
 # ifdef USE_SYSMENU_FONT
-    if (gui_w32_get_menu_font(&lfSysmenu) == OK)
+    যদি (gui_w32_get_menu_font(&lfSysmenu) == OK)
     {
 	font = CreateFontIndirectW(&lfSysmenu);
 	use_lfSysmenu = TRUE;
     }
-    else
+    অন্যথা
 # endif
 	font = CreateFont(-DLG_FONT_POINT_SIZE, 0, 0, 0, 0, 0, 0, 0,
 			0, 0, 0, 0, VARIABLE_PITCH, DLG_FONT_NAME);
@@ -8285,32 +8285,32 @@ gui_mch_tearoff(
     // Figure out max width of the text column, the accelerator column and the
     // optional submenu column.
     submenuWidth = 0;
-    for (col = 0; col < 2; col++)
+    বাবে (col = 0; col < 2; col++)
     {
 	columnWidths[col] = 0;
 	FOR_ALL_CHILD_MENUS(menu, pmenu)
 	{
 	    // Use "dname" here to compute the width of the visible text.
 	    text = (col == 0) ? pmenu->dname : pmenu->actext;
-	    if (text != NULL && *text != NUL)
+	    যদি (text != রিক্ত && *text != NUL)
 	    {
-		textWidth = GetTextWidthEnc(hdc, text, (int)STRLEN(text));
-		if (textWidth > columnWidths[col])
+		textWidth = GetTextWidthEnc(hdc, text, (পূর্ণাঙ্ক)STRLEN(text));
+		যদি (textWidth > columnWidths[col])
 		    columnWidths[col] = textWidth;
 	    }
-	    if (pmenu->children != NULL)
+	    যদি (pmenu->children != রিক্ত)
 		submenuWidth = TEAROFF_COLUMN_PADDING * spaceWidth;
 	}
     }
-    if (columnWidths[1] == 0)
+    যদি (columnWidths[1] == 0)
     {
 	// no accelerators
-	if (submenuWidth != 0)
+	যদি (submenuWidth != 0)
 	    columnWidths[0] += submenuWidth;
-	else
+	অন্যথা
 	    columnWidths[0] += spaceWidth;
     }
-    else
+    অন্যথা
     {
 	// there is an accelerator column
 	columnWidths[0] += TEAROFF_COLUMN_PADDING * spaceWidth;
@@ -8321,14 +8321,14 @@ gui_mch_tearoff(
      * Now find the total width of our 'menu'.
      */
     textWidth = columnWidths[0] + columnWidths[1];
-    if (submenuWidth != 0)
+    যদি (submenuWidth != 0)
     {
 	submenuWidth = GetTextWidth(hdc, (char_u *)TEAROFF_SUBMENU_LABEL,
-				  (int)STRLEN_LITERAL(TEAROFF_SUBMENU_LABEL));
+				  (পূর্ণাঙ্ক)STRLEN_LITERAL(TEAROFF_SUBMENU_LABEL));
 	textWidth += submenuWidth;
     }
-    dlgwidth = GetTextWidthEnc(hdc, title, (int)STRLEN(title));
-    if (textWidth > dlgwidth)
+    dlgwidth = GetTextWidthEnc(hdc, title, (পূর্ণাঙ্ক)STRLEN(title));
+    যদি (textWidth > dlgwidth)
 	dlgwidth = textWidth;
     dlgwidth += 2 * TEAROFF_PADDING_X + TEAROFF_BUTTON_PAD_X;
 
@@ -8343,13 +8343,13 @@ gui_mch_tearoff(
     pnumitems = p;	// save where the number of items must be stored
     *p++ = 0;		// NumberOfItems(will change later)
     gui_mch_getmouse(&x, &y);
-    if (initX == 0xffffL)
+    যদি (initX == 0xffffL)
 	*p++ = PixelToDialogX(x); // x
-    else
+    অন্যথা
 	*p++ = PixelToDialogX(initX); // x
-    if (initY == 0xffffL)
+    যদি (initY == 0xffffL)
 	*p++ = PixelToDialogY(y); // y
-    else
+    অন্যথা
 	*p++ = PixelToDialogY(initY); // y
     *p++ = PixelToDialogX(dlgwidth);    // cx
     ptrueheight = p;
@@ -8365,15 +8365,15 @@ gui_mch_tearoff(
 
     // do the font, since DS_3DLOOK doesn't work properly
 # ifdef USE_SYSMENU_FONT
-    if (use_lfSysmenu)
+    যদি (use_lfSysmenu)
     {
 	// point size
 	*p++ = -MulDiv(lfSysmenu.lfHeight, 72,
 		GetDeviceCaps(hdc, LOGPIXELSY));
 	wcscpy(p, lfSysmenu.lfFaceName);
-	nchar = (int)wcslen(lfSysmenu.lfFaceName) + 1;
+	nchar = (পূর্ণাঙ্ক)wcslen(lfSysmenu.lfFaceName) + 1;
     }
-    else
+    অন্যথা
 # endif
     {
 	*p++ = DLG_FONT_POINT_SIZE;		// point size
@@ -8385,33 +8385,33 @@ gui_mch_tearoff(
      * Loop over all the items in the menu.
      * But skip over the tearbar.
      */
-    if (STRCMP(menu->children->name, TEAR_STRING) == 0)
+    যদি (STRCMP(menu->children->name, TEAR_STRING) == 0)
 	menu = menu->children->next;
-    else
+    অন্যথা
 	menu = menu->children;
-    top_menu = menu;
-    for ( ; menu != NULL; menu = menu->next)
+    শীৰ্ষ_menu = menu;
+    বাবে ( ; menu != রিক্ত; menu = menu->next)
     {
-	if (menu->modes == 0)	// this menu has just been deleted
-	    continue;
-	if (menu_is_separator(menu->dname))
+	যদি (menu->modes == 0)	// this menu has just been deleted
+	    অনুৱর্ত;
+	যদি (menu_is_separator(menu->dname))
 	{
 	    sepPadding += 3;
-	    continue;
+	    অনুৱর্ত;
 	}
 
 	// Check if there still is plenty of room in the template.  Make it
 	// larger when needed.
-	if (((char *)p - (char *)pdlgtemplate) + 1000 > template_len)
+	যদি (((ৱর্ণ *)p - (ৱর্ণ *)pdlgtemplate) + 1000 > template_len)
 	{
 	    WORD    *newp;
 
 	    newp = (WORD *)LocalAlloc(LPTR, template_len + 4096);
-	    if (newp != NULL)
+	    যদি (newp != রিক্ত)
 	    {
 		template_len += 4096;
 		mch_memmove(newp, pdlgtemplate,
-					    (char *)p - (char *)pdlgtemplate);
+					    (ৱর্ণ *)p - (ৱর্ণ *)pdlgtemplate);
 		p = newp + (p - pdlgtemplate);
 		pnumitems = newp + (pnumitems - pdlgtemplate);
 		ptrueheight = newp + (ptrueheight - pdlgtemplate);
@@ -8423,60 +8423,60 @@ gui_mch_tearoff(
 	// Figure out minimal length of this menu label.  Use "name" for the
 	// actual text, "dname" for estimating the displayed size.  "name"
 	// has "&a" for mnemonic and includes the accelerator.
-	len = nameLen = (int)STRLEN(menu->name);
+	len = nameLen = (পূর্ণাঙ্ক)STRLEN(menu->name);
 	padding0 = (columnWidths[0] - GetTextWidthEnc(hdc, menu->dname,
-				      (int)STRLEN(menu->dname))) / spaceWidth;
+				      (পূর্ণাঙ্ক)STRLEN(menu->dname))) / spaceWidth;
 	len += padding0;
 
-	if (menu->actext != NULL)
+	যদি (menu->actext != রিক্ত)
 	{
-	    acLen = (int)STRLEN(menu->actext);
+	    acLen = (পূর্ণাঙ্ক)STRLEN(menu->actext);
 	    len += acLen;
 	    textWidth = GetTextWidthEnc(hdc, menu->actext, acLen);
 	}
-	else
+	অন্যথা
 	    textWidth = 0;
 	padding1 = (columnWidths[1] - textWidth) / spaceWidth;
 	len += padding1;
 
-	if (menu->children == NULL)
+	যদি (menu->children == রিক্ত)
 	{
 	    padding2 = submenuWidth / spaceWidth;
 	    len += padding2;
 	    menuID = (WORD)(menu->id);
 	}
-	else
+	অন্যথা
 	{
-	    len += (int)STRLEN_LITERAL(TEAROFF_SUBMENU_LABEL);
+	    len += (পূর্ণাঙ্ক)STRLEN_LITERAL(TEAROFF_SUBMENU_LABEL);
 	    menuID = (WORD)((long_u)(menu->submenu_id) | (DWORD)0x8000);
 	}
 
 	// Allocate menu label and fill it in
 	text = label = alloc(len + 1);
-	if (label == NULL)
-	    break;
+	যদি (label == রিক্ত)
+	    ভঙ্গ;
 
 	vim_strncpy(text, menu->name, nameLen);
 	text = vim_strchr(text, TAB);	    // stop at TAB before actext
-	if (text == NULL)
+	যদি (text == রিক্ত)
 	    text = label + nameLen;	    // no actext, use whole name
-	while (padding0-- > 0)
+	যেতিয়ালৈ (padding0-- > 0)
 	    *text++ = ' ';
-	if (menu->actext != NULL)
+	যদি (menu->actext != রিক্ত)
 	{
 	    STRNCPY(text, menu->actext, acLen);
 	    text += acLen;
 	}
-	while (padding1-- > 0)
+	যেতিয়ালৈ (padding1-- > 0)
 	    *text++ = ' ';
-	if (menu->children != NULL)
+	যদি (menu->children != রিক্ত)
 	{
 	    STRCPY(text, TEAROFF_SUBMENU_LABEL);
 	    text += STRLEN_LITERAL(TEAROFF_SUBMENU_LABEL);
 	}
-	else
+	অন্যথা
 	{
-	    while (padding2-- > 0)
+	    যেতিয়ালৈ (padding2-- > 0)
 		*text++ = ' ';
 	}
 	*text = NUL;
@@ -8486,12 +8486,12 @@ gui_mch_tearoff(
 	 * W95/NT4 it makes the tear-off look more like a menu.
 	 */
 	p = add_dialog_element(p,
-		BS_PUSHBUTTON|BS_LEFT,
+		BS_PUSHBUTTON|BS_বাম,
 		(WORD)PixelToDialogX(TEAROFF_PADDING_X),
 		(WORD)(sepPadding + 1 + 13 * (*pnumitems)),
 		(WORD)PixelToDialogX(dlgwidth - 2 * TEAROFF_PADDING_X),
 		(WORD)12,
-		menuID, (WORD)0x0080, (char *)label);
+		menuID, (WORD)0x0080, (ৱর্ণ *)label);
 	vim_free(label);
 	(*pnumitems)++;
     }
@@ -8505,7 +8505,7 @@ gui_mch_tearoff(
 	    (LPDLGTEMPLATE)pdlgtemplate,
 	    s_hwnd,
 	    (DLGPROC)tearoff_callback,
-	    (LPARAM)top_menu);
+	    (LPARAM)শীৰ্ষ_menu);
 
     LocalFree(LocalHandle(pdlgtemplate));
     SelectFont(hdc, oldFont);
@@ -8517,14 +8517,14 @@ gui_mch_tearoff(
      * a tearoff, the user doesn't have to click with the mouse just to start
      * typing again!
      */
-    (void)SetActiveWindow(s_hwnd);
+    (শূন্য)SetActiveWindow(s_hwnd);
 
     // make sure the right buttons are enabled
     force_menu_update = TRUE;
 }
 #endif
 
-#if defined(FEAT_TOOLBAR)
+#যদি defined(FEAT_TOOLBAR)
 # include "gui_w32_rc.h"
 
 /*
@@ -8532,8 +8532,8 @@ gui_mch_tearoff(
  *  (just like the menu, there are no defaults, it's all
  *  set up through menu.vim)
  */
-    static void
-initialise_toolbar(void)
+    স্থির শূন্য
+initialise_toolbar(শূন্য)
 {
     InitCommonControls();
     s_toolbarhwnd = CreateToolbarEx(
@@ -8543,13 +8543,13 @@ initialise_toolbar(void)
 		    31,			//number of images in initial bitmap
 		    g_hinst,
 		    IDR_TOOLBAR1,	// id of initial bitmap
-		    NULL,
+		    রিক্ত,
 		    0,			// initial number of buttons
 		    TOOLBAR_BUTTON_WIDTH, //api guide is wrong!
 		    TOOLBAR_BUTTON_HEIGHT,
 		    TOOLBAR_BUTTON_WIDTH,
 		    TOOLBAR_BUTTON_HEIGHT,
-		    sizeof(TBBUTTON)
+		    পরিমাণ(TBBUTTON)
 		    );
 
     // Remove transparency from the toolbar to prevent the main window
@@ -8559,18 +8559,18 @@ initialise_toolbar(void)
 
     s_toolbar_wndproc = SubclassWindow(s_toolbarhwnd, toolbar_wndproc);
 
-    gui_mch_show_toolbar(vim_strchr(p_go, GO_TOOLBAR) != NULL);
+    gui_mch_show_toolbar(vim_strchr(p_go, GO_TOOLBAR) != রিক্ত);
 
     update_toolbar_size();
 }
 
-    static void
-update_toolbar_size(void)
+    স্থির শূন্য
+update_toolbar_size(শূন্য)
 {
-    int		w, h;
+    পূর্ণাঙ্ক		w, h;
     TBMETRICS	tbm;
 
-    tbm.cbSize = sizeof(TBMETRICS);
+    tbm.cbSize = পরিমাণ(TBMETRICS);
     tbm.dwMask = TBMF_PAD | TBMF_BUTTONSPACING;
     SendMessage(s_toolbarhwnd, TB_GETMETRICS, 0, (LPARAM)&tbm);
     //TRACE("Pad: %d, %d", tbm.cxPad, tbm.cyPad);
@@ -8590,35 +8590,35 @@ update_toolbar_size(void)
     // It would be nice if the toolbar images are resized based on DPI.
 }
 
-    static LRESULT CALLBACK
+    স্থির LRESULT CALLBACK
 toolbar_wndproc(
     HWND hwnd,
-    UINT uMsg,
+    UINT u_বাৰ্তা,
     WPARAM wParam,
     LPARAM lParam)
 {
-    HandleMouseHide(uMsg, lParam);
-    return CallWindowProc(s_toolbar_wndproc, hwnd, uMsg, wParam, lParam);
+    HandleMouseHide(u_বাৰ্তা, lParam);
+    ঘূৰাই CallWindowProc(s_toolbar_wndproc, hwnd, u_বাৰ্তা, wParam, lParam);
 }
 
-    static int
+    স্থির পূর্ণাঙ্ক
 get_toolbar_bitmap(vimmenu_T *menu)
 {
-    int i = -1;
+    পূর্ণাঙ্ক i = -1;
 
     /*
      * Check user bitmaps first, unless builtin is specified.
      */
-    if (!menu->icon_builtin)
+    যদি (!menu->icon_builtin)
     {
 	char_u fname[MAXPATHL];
-	HANDLE hbitmap = NULL;
+	HANDLE hbitmap = রিক্ত;
 
-	if (menu->iconfile != NULL)
+	যদি (menu->iconfile != রিক্ত)
 	{
 	    gui_find_iconfile(menu->iconfile, fname, "bmp");
 	    hbitmap = LoadImage(
-			NULL,
+			রিক্ত,
 			(LPCSTR)fname,
 			IMAGE_BITMAP,
 			TOOLBAR_BUTTON_WIDTH,
@@ -8632,14 +8632,14 @@ get_toolbar_bitmap(vimmenu_T *menu)
 	 * If the LoadImage call failed, or the "icon=" file
 	 * didn't exist or wasn't specified, try the menu name
 	 */
-	if (hbitmap == NULL
+	যদি (hbitmap == রিক্ত
 		&& (gui_find_bitmap(
 # ifdef FEAT_MULTI_LANG
-			    menu->en_dname != NULL ? menu->en_dname :
+			    menu->en_dname != রিক্ত ? menu->en_dname :
 # endif
 					menu->dname, fname, "bmp") == OK))
 	    hbitmap = LoadImage(
-		    NULL,
+		    রিক্ত,
 		    (LPCSTR)fname,
 		    IMAGE_BITMAP,
 		    TOOLBAR_BUTTON_WIDTH,
@@ -8648,35 +8648,35 @@ get_toolbar_bitmap(vimmenu_T *menu)
 		    LR_LOADMAP3DCOLORS
 		);
 
-	if (hbitmap != NULL)
+	যদি (hbitmap != রিক্ত)
 	{
 	    TBADDBITMAP tbAddBitmap;
 
-	    tbAddBitmap.hInst = NULL;
+	    tbAddBitmap.hInst = রিক্ত;
 	    tbAddBitmap.nID = (long_u)hbitmap;
 
-	    i = (int)SendMessage(s_toolbarhwnd, TB_ADDBITMAP,
+	    i = (পূর্ণাঙ্ক)SendMessage(s_toolbarhwnd, TB_ADDBITMAP,
 			    (WPARAM)1, (LPARAM)&tbAddBitmap);
 	    // i will be set to -1 if it fails
 	}
     }
-    if (i == -1 && menu->iconidx >= 0 && menu->iconidx < TOOLBAR_BITMAP_COUNT)
+    যদি (i == -1 && menu->iconidx >= 0 && menu->iconidx < TOOLBAR_BITMAP_গুনতি)
 	i = menu->iconidx;
 
-    return i;
+    ঘূৰাই i;
 }
 #endif
 
-#if defined(FEAT_GUI_TABLINE)
-    static void
-initialise_tabline(void)
+#যদি defined(FEAT_GUI_TABLINE)
+    স্থির শূন্য
+initialise_tabline(শূন্য)
 {
     InitCommonControls();
 
     s_tabhwnd = CreateWindow(WC_TABCONTROL, "Vim tabline",
 	    WS_CHILD|TCS_FOCUSNEVER|TCS_TOOLTIPS,
 	    CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,
-	    CW_USEDEFAULT, s_hwnd, NULL, g_hinst, NULL);
+	    CW_USEDEFAULT, s_hwnd, রিক্ত, g_hinst, রিক্ত);
     s_tabline_wndproc = SubclassWindow(s_tabhwnd, tabline_wndproc);
 
     gui.tabline_height = TABLINE_HEIGHT;
@@ -8687,85 +8687,85 @@ initialise_tabline(void)
 /*
  * Get tabpage_T from POINT.
  */
-    static tabpage_T *
+    স্থির tabpage_T *
 GetTabFromPoint(
     HWND    hWnd,
     POINT   pt)
 {
-    tabpage_T	*ptp = NULL;
+    tabpage_T	*ptp = রিক্ত;
 
-    if (gui_mch_showing_tabline())
+    যদি (gui_mch_showing_tabline())
     {
 	TCHITTESTINFO htinfo;
 	htinfo.pt = pt;
 	// ignore if a window under cursor is not tabcontrol.
-	if (s_tabhwnd == hWnd)
+	যদি (s_tabhwnd == hWnd)
 	{
-	    int idx = TabCtrl_HitTest(s_tabhwnd, &htinfo);
-	    if (idx != -1)
+	    পূর্ণাঙ্ক idx = TabCtrl_HitTest(s_tabhwnd, &htinfo);
+	    যদি (idx != -1)
 		ptp = find_tabpage(idx + 1);
 	}
     }
-    return ptp;
+    ঘূৰাই ptp;
 }
 
-static POINT	    s_pt = {0, 0};
-static HCURSOR      s_hCursor = NULL;
+স্থির POINT	    s_pt = {0, 0};
+স্থির HCURSOR      s_hCursor = রিক্ত;
 
-    static LRESULT CALLBACK
+    স্থির LRESULT CALLBACK
 tabline_wndproc(
     HWND hwnd,
-    UINT uMsg,
+    UINT u_বাৰ্তা,
     WPARAM wParam,
     LPARAM lParam)
 {
     POINT	pt;
     tabpage_T	*tp;
     RECT	rect;
-    int		nCenter;
-    int		idx0;
-    int		idx1;
+    পূর্ণাঙ্ক		nCenter;
+    পূর্ণাঙ্ক		idx0;
+    পূর্ণাঙ্ক		idx1;
 
-    HandleMouseHide(uMsg, lParam);
+    HandleMouseHide(u_বাৰ্তা, lParam);
 
-    switch (uMsg)
+    ৱিকল্প (u_বাৰ্তা)
     {
-	case WM_LBUTTONDOWN:
+	পক্ষ WM_LBUTTONDOWN:
 	    {
 		s_pt.x = GET_X_LPARAM(lParam);
 		s_pt.y = GET_Y_LPARAM(lParam);
 		SetCapture(hwnd);
 		s_hCursor = GetCursor(); // backup default cursor
-		break;
+		ভঙ্গ;
 	    }
-	case WM_MOUSEMOVE:
-	    if (GetCapture() == hwnd
+	পক্ষ WM_MOUSEMOVE:
+	    যদি (GetCapture() == hwnd
 		    && ((wParam & MK_LBUTTON)) != 0)
 	    {
 		pt.x = GET_X_LPARAM(lParam);
 		pt.y = s_pt.y;
-		if (abs(pt.x - s_pt.x) >
+		যদি (abs(pt.x - s_pt.x) >
 			pGetSystemMetricsForDpi(SM_CXDRAG, s_dpi))
 		{
-		    SetCursor(LoadCursor(NULL, IDC_SIZEWE));
+		    SetCursor(LoadCursor(রিক্ত, IDC_SIZEWE));
 
 		    tp = GetTabFromPoint(hwnd, pt);
-		    if (tp != NULL)
+		    যদি (tp != রিক্ত)
 		    {
 			idx0 = tabpage_index(curtab) - 1;
 			idx1 = tabpage_index(tp) - 1;
 
 			TabCtrl_GetItemRect(hwnd, idx1, &rect);
-			nCenter = rect.left + (rect.right - rect.left) / 2;
+			nCenter = rect.বাম + (rect.ডান - rect.বাম) / 2;
 
 			// Check if the mouse cursor goes over the center of
 			// the next tab to prevent "flickering".
-			if ((idx0 < idx1) && (nCenter < pt.x))
+			যদি ((idx0 < idx1) && (nCenter < pt.x))
 			{
 			    tabpage_move(idx1 + 1);
 			    update_screen(0);
 			}
-			else if ((idx1 < idx0) && (pt.x < nCenter))
+			অন্যথা যদি ((idx1 < idx0) && (pt.x < nCenter))
 			{
 			    tabpage_move(idx1);
 			    update_screen(0);
@@ -8773,58 +8773,58 @@ tabline_wndproc(
 		    }
 		}
 	    }
-	    break;
-	case WM_LBUTTONUP:
+	    ভঙ্গ;
+	পক্ষ WM_LBUTTONUP:
 	    {
-		if (GetCapture() == hwnd)
+		যদি (GetCapture() == hwnd)
 		{
 		    SetCursor(s_hCursor);
 		    ReleaseCapture();
 		}
-		break;
+		ভঙ্গ;
 	    }
-	case WM_MBUTTONUP:
+	পক্ষ WM_MBUTTONUP:
 	    {
 		TCHITTESTINFO htinfo;
 
 		htinfo.pt.x = GET_X_LPARAM(lParam);
 		htinfo.pt.y = GET_Y_LPARAM(lParam);
 		idx0 = TabCtrl_HitTest(hwnd, &htinfo);
-		if (idx0 != -1)
+		যদি (idx0 != -1)
 		{
 		    idx0 += 1;
 		    send_tabline_menu_event(idx0, TABLINE_MENU_CLOSE);
 		}
-		break;
+		ভঙ্গ;
 	    }
-	default:
-	    break;
+	স্ৱভাৱ:
+	    ভঙ্গ;
     }
 
-    return CallWindowProc(s_tabline_wndproc, hwnd, uMsg, wParam, lParam);
+    ঘূৰাই CallWindowProc(s_tabline_wndproc, hwnd, u_বাৰ্তা, wParam, lParam);
 }
 #endif
 
-#if defined(FEAT_OLE) || defined(FEAT_EVAL)
+#যদি defined(FEAT_OLE) || defined(FEAT_EVAL)
 /*
  * Make the GUI window come to the foreground.
  */
-    void
-gui_mch_set_foreground(void)
+    শূন্য
+gui_mch_set_foreground(শূন্য)
 {
-    if (IsIconic(s_hwnd))
+    যদি (IsIconic(s_hwnd))
 	 SendMessage(s_hwnd, WM_SYSCOMMAND, SC_RESTORE, 0);
     SetForegroundWindow(s_hwnd);
 }
 #endif
 
-#if defined(FEAT_MBYTE_IME) && defined(DYNAMIC_IME)
-    static void
-dyn_imm_load(void)
+#যদি defined(FEAT_MBYTE_IME) && defined(DYNAMIC_IME)
+    স্থির শূন্য
+dyn_imm_load(শূন্য)
 {
     hLibImm = vimLoadLib("imm32.dll");
-    if (hLibImm == NULL)
-	return;
+    যদি (hLibImm == রিক্ত)
+	ঘূৰাই;
 
     pImmGetCompositionStringW
 	    = (LONG (WINAPI *)(HIMC, DWORD, LPVOID, DWORD))GetProcAddress(hLibImm, "ImmGetCompositionStringW");
@@ -8849,36 +8849,36 @@ dyn_imm_load(void)
     pImmSetConversionStatus
 	    = (BOOL (WINAPI *)(HIMC, DWORD, DWORD))GetProcAddress(hLibImm, "ImmSetConversionStatus");
 
-    if (       pImmGetCompositionStringW == NULL
-	    || pImmGetContext == NULL
-	    || pImmAssociateContext == NULL
-	    || pImmReleaseContext == NULL
-	    || pImmGetOpenStatus == NULL
-	    || pImmSetOpenStatus == NULL
-	    || pImmGetCompositionFontW == NULL
-	    || pImmSetCompositionFontW == NULL
-	    || pImmSetCompositionWindow == NULL
-	    || pImmGetConversionStatus == NULL
-	    || pImmSetConversionStatus == NULL)
+    যদি (       pImmGetCompositionStringW == রিক্ত
+	    || pImmGetContext == রিক্ত
+	    || pImmAssociateContext == রিক্ত
+	    || pImmReleaseContext == রিক্ত
+	    || pImmGetOpenStatus == রিক্ত
+	    || pImmSetOpenStatus == রিক্ত
+	    || pImmGetCompositionFontW == রিক্ত
+	    || pImmSetCompositionFontW == রিক্ত
+	    || pImmSetCompositionWindow == রিক্ত
+	    || pImmGetConversionStatus == রিক্ত
+	    || pImmSetConversionStatus == রিক্ত)
     {
 	FreeLibrary(hLibImm);
-	hLibImm = NULL;
-	pImmGetContext = NULL;
-	return;
+	hLibImm = রিক্ত;
+	pImmGetContext = রিক্ত;
+	ঘূৰাই;
     }
 
-    return;
+    ঘূৰাই;
 }
 
 #endif
 
-#if defined(FEAT_SIGN_ICONS)
+#যদি defined(FEAT_SIGN_ICONS)
 
 # ifdef FEAT_XPM_W32
 #  define IMAGE_XPM   100
 # endif
 
-typedef struct _signicon_t
+প্রকারনির্দেশ সংরচনা _signicon_t
 {
     HANDLE	hImage;
     UINT	uType;
@@ -8887,17 +8887,17 @@ typedef struct _signicon_t
 # endif
 } signicon_t;
 
-    void
-gui_mch_drawsign(int row, int col, int typenr)
+    শূন্য
+gui_mch_drawsign(পূর্ণাঙ্ক row, পূর্ণাঙ্ক col, পূর্ণাঙ্ক typenr)
 {
     signicon_t *sign;
-    int x, y, w, h;
+    পূর্ণাঙ্ক x, y, w, h;
 
-    if (!gui.in_use || (sign = (signicon_t *)sign_get_image(typenr)) == NULL)
-	return;
+    যদি (!gui.in_use || (sign = (signicon_t *)sign_get_image(typenr)) == রিক্ত)
+	ঘূৰাই;
 
-# if defined(FEAT_DIRECTX)
-    if (IS_ENABLE_DIRECTX())
+# যদি defined(FEAT_DIRECTX)
+    যদি (IS_ENABLE_DIRECTX())
 	DWriteContext_Flush(s_dwc);
 # endif
 
@@ -8905,9 +8905,9 @@ gui_mch_drawsign(int row, int col, int typenr)
     y = TEXT_Y(row);
     w = gui.char_width * 2;
     h = gui.char_height;
-    switch (sign->uType)
+    ৱিকল্প (sign->uType)
     {
-	case IMAGE_BITMAP:
+	পক্ষ IMAGE_BITMAP:
 	    {
 		HDC hdcMem;
 		HBITMAP hbmpOld;
@@ -8918,13 +8918,13 @@ gui_mch_drawsign(int row, int col, int typenr)
 		SelectObject(hdcMem, hbmpOld);
 		DeleteDC(hdcMem);
 	    }
-	    break;
-	case IMAGE_ICON:
-	case IMAGE_CURSOR:
-	    DrawIconEx(s_hdc, x, y, (HICON)sign->hImage, w, h, 0, NULL, DI_NORMAL);
-	    break;
+	    ভঙ্গ;
+	পক্ষ IMAGE_ICON:
+	পক্ষ IMAGE_CURSOR:
+	    DrawIconEx(s_hdc, x, y, (HICON)sign->hImage, w, h, 0, রিক্ত, DI_NORMAL);
+	    ভঙ্গ;
 # ifdef FEAT_XPM_W32
-	case IMAGE_XPM:
+	পক্ষ IMAGE_XPM:
 	    {
 		HDC hdcMem;
 		HBITMAP hbmpOld;
@@ -8940,98 +8940,98 @@ gui_mch_drawsign(int row, int col, int typenr)
 		SelectObject(hdcMem, hbmpOld);
 		DeleteDC(hdcMem);
 	    }
-	    break;
+	    ভঙ্গ;
 # endif
     }
 }
 
-    static void
+    স্থির শূন্য
 close_signicon_image(signicon_t *sign)
 {
-    if (sign == NULL)
-	return;
+    যদি (sign == রিক্ত)
+	ঘূৰাই;
 
-    switch (sign->uType)
+    ৱিকল্প (sign->uType)
     {
-	case IMAGE_BITMAP:
+	পক্ষ IMAGE_BITMAP:
 	    DeleteObject((HGDIOBJ)sign->hImage);
-	    break;
-	case IMAGE_CURSOR:
+	    ভঙ্গ;
+	পক্ষ IMAGE_CURSOR:
 	    DestroyCursor((HCURSOR)sign->hImage);
-	    break;
-	case IMAGE_ICON:
+	    ভঙ্গ;
+	পক্ষ IMAGE_ICON:
 	    DestroyIcon((HICON)sign->hImage);
-	    break;
+	    ভঙ্গ;
 # ifdef FEAT_XPM_W32
-	case IMAGE_XPM:
+	পক্ষ IMAGE_XPM:
 	    DeleteObject((HBITMAP)sign->hImage);
 	    DeleteObject((HBITMAP)sign->hShape);
-	    break;
+	    ভঙ্গ;
 # endif
     }
 }
 
-    void *
+    শূন্য *
 gui_mch_register_sign(char_u *signfile)
 {
     signicon_t	sign, *psign;
     char_u	*ext;
 
-    sign.hImage = NULL;
+    sign.hImage = রিক্ত;
     ext = signfile + STRLEN(signfile) - 4; // get extension
-    if (ext > signfile)
+    যদি (ext > signfile)
     {
-	int do_load = 1;
+	পূর্ণাঙ্ক do_load = 1;
 
-	if (STRICMP(ext, ".bmp") == 0)
+	যদি (STRICMP(ext, ".bmp") == 0)
 	    sign.uType =  IMAGE_BITMAP;
-	else if (STRICMP(ext, ".ico") == 0)
+	অন্যথা যদি (STRICMP(ext, ".ico") == 0)
 	    sign.uType =  IMAGE_ICON;
-	else if (STRICMP(ext, ".cur") == 0 || STRICMP(ext, ".ani") == 0)
+	অন্যথা যদি (STRICMP(ext, ".cur") == 0 || STRICMP(ext, ".ani") == 0)
 	    sign.uType =  IMAGE_CURSOR;
-	else
+	অন্যথা
 	    do_load = 0;
 
-	if (do_load)
-	    sign.hImage = (HANDLE)LoadImage(NULL, (LPCSTR)signfile, sign.uType,
+	যদি (do_load)
+	    sign.hImage = (HANDLE)LoadImage(রিক্ত, (LPCSTR)signfile, sign.uType,
 		    gui.char_width * 2, gui.char_height,
 		    LR_LOADFROMFILE | LR_CREATEDIBSECTION);
 # ifdef FEAT_XPM_W32
-	if (STRICMP(ext, ".xpm") == 0)
+	যদি (STRICMP(ext, ".xpm") == 0)
 	{
 	    sign.uType = IMAGE_XPM;
-	    LoadXpmImage((char *)signfile, (HBITMAP *)&sign.hImage,
+	    LoadXpmImage((ৱর্ণ *)signfile, (HBITMAP *)&sign.hImage,
 		    (HBITMAP *)&sign.hShape);
 	}
 # endif
     }
 
-    psign = NULL;
-    if (sign.hImage && (psign = ALLOC_ONE(signicon_t)) != NULL)
+    psign = রিক্ত;
+    যদি (sign.hImage && (psign = ALLOC_ONE(signicon_t)) != রিক্ত)
 	*psign = sign;
 
-    if (!psign)
+    যদি (!psign)
     {
-	if (sign.hImage)
+	যদি (sign.hImage)
 	    close_signicon_image(&sign);
 	emsg(_(e_couldnt_read_in_sign_data));
     }
-    return (void *)psign;
+    ঘূৰাই (শূন্য *)psign;
 
 }
 
-    void
-gui_mch_destroy_sign(void *sign)
+    শূন্য
+gui_mch_destroy_sign(শূন্য *sign)
 {
-    if (sign == NULL)
-	return;
+    যদি (sign == রিক্ত)
+	ঘূৰাই;
 
     close_signicon_image((signicon_t *)sign);
     vim_free(sign);
 }
 #endif
 
-#if defined(FEAT_BEVAL_GUI)
+#যদি defined(FEAT_BEVAL_GUI)
 
 /*
  * BALLOON-EVAL IMPLEMENTATION FOR WINDOWS.
@@ -9054,42 +9054,42 @@ gui_mch_destroy_sign(void *sign)
  * 5) WM_NOTIFY:TTN_POP destroys created tooltip
  */
 
-    static void
-make_tooltip(BalloonEval *beval, char *text, POINT pt)
+    স্থির শূন্য
+make_tooltip(BalloonEval *beval, ৱর্ণ *text, POINT pt)
 {
     TOOLINFOW	*pti;
     RECT	rect;
 
     pti = ALLOC_ONE(TOOLINFOW);
-    if (pti == NULL)
-	return;
+    যদি (pti == রিক্ত)
+	ঘূৰাই;
 
     beval->balloon = CreateWindowExW(WS_EX_TOPMOST, TOOLTIPS_CLASSW,
-	    NULL, WS_POPUP | TTS_NOPREFIX | TTS_ALWAYSTIP,
+	    রিক্ত, WS_POPUP | TTS_NOPREFIX | TTS_ALWAYSTIP,
 	    CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,
-	    beval->target, NULL, g_hinst, NULL);
+	    beval->target, রিক্ত, g_hinst, রিক্ত);
 
     SetWindowPos(beval->balloon, HWND_TOPMOST, 0, 0, 0, 0,
 	    SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
 
-    pti->cbSize = sizeof(TOOLINFOW);
+    pti->cbSize = পরিমাণ(TOOLINFOW);
     pti->uFlags = TTF_SUBCLASS;
     pti->hwnd = beval->target;
     pti->hinst = 0; // Don't use string resources
     pti->uId = ID_BEVAL_TOOLTIP;
 
     pti->lpszText = LPSTR_TEXTCALLBACKW;
-    beval->tofree = enc_to_utf16((char_u*)text, NULL);
+    beval->tofree = enc_to_utf16((char_u*)text, রিক্ত);
     pti->lParam = (LPARAM)beval->tofree;
     // switch multiline tooltips on
-    if (GetClientRect(s_textArea, &rect))
+    যদি (GetClientRect(s_textArea, &rect))
 	SendMessageW(beval->balloon, TTM_SETMAXTIPWIDTH, 0,
-		(LPARAM)rect.right);
+		(LPARAM)rect.ডান);
 
     // Limit ballooneval bounding rect to CursorPos neighbourhood.
-    pti->rect.left = pt.x - 3;
-    pti->rect.top = pt.y - 3;
-    pti->rect.right = pt.x + 3;
+    pti->rect.বাম = pt.x - 3;
+    pti->rect.শীৰ্ষ = pt.y - 3;
+    pti->rect.ডান = pt.x + 3;
     pti->rect.bottom = pt.y + 3;
 
     SendMessageW(beval->balloon, TTM_ADDTOOLW, 0, (LPARAM)pti);
@@ -9108,35 +9108,35 @@ make_tooltip(BalloonEval *beval, char *text, POINT pt)
     vim_free(pti);
 }
 
-    static void
+    স্থির শূন্য
 delete_tooltip(BalloonEval *beval)
 {
     PostMessage(beval->balloon, WM_CLOSE, 0, 0);
 }
 
-    static VOID CALLBACK
+    স্থির VOID CALLBACK
 beval_timer_proc(
     HWND	hwnd UNUSED,
-    UINT	uMsg UNUSED,
+    UINT	u_বাৰ্তা UNUSED,
     UINT_PTR	idEvent UNUSED,
     DWORD	dwTime)
 {
     POINT	pt;
     RECT	rect;
 
-    if (cur_beval == NULL || cur_beval->showState == ShS_SHOWING || !p_beval)
-	return;
+    যদি (cur_beval == রিক্ত || cur_beval->showState == ShS_SHOWING || !p_beval)
+	ঘূৰাই;
 
     GetCursorPos(&pt);
-    if (WindowFromPoint(pt) != s_textArea)
-	return;
+    যদি (WindowFromPoint(pt) != s_textArea)
+	ঘূৰাই;
 
     ScreenToClient(s_textArea, &pt);
     GetClientRect(s_textArea, &rect);
-    if (!PtInRect(&rect, pt))
-	return;
+    যদি (!PtInRect(&rect, pt))
+	ঘূৰাই;
 
-    if (last_user_activity > 0
+    যদি (last_user_activity > 0
 	    && (dwTime - last_user_activity) >= (DWORD)p_bdlay
 	    && (cur_beval->showState != ShS_PENDING
 		|| abs(cur_beval->x - pt.x) > 3
@@ -9148,136 +9148,136 @@ beval_timer_proc(
 	cur_beval->x = pt.x;
 	cur_beval->y = pt.y;
 
-	if (cur_beval->msgCB != NULL)
-	    (*cur_beval->msgCB)(cur_beval, 0);
+	যদি (cur_beval->বাৰ্তা_CB != রিক্ত)
+	    (*cur_beval->বাৰ্তা_CB)(cur_beval, 0);
     }
 }
 
-    void
+    শূন্য
 gui_mch_disable_beval_area(BalloonEval *beval UNUSED)
 {
     KillTimer(s_textArea, beval_timer_id);
 }
 
-    void
+    শূন্য
 gui_mch_enable_beval_area(BalloonEval *beval)
 {
-    if (beval == NULL)
-	return;
+    যদি (beval == রিক্ত)
+	ঘূৰাই;
     beval_timer_id = SetTimer(s_textArea, 0, (UINT)(p_bdlay / 2),
 							     beval_timer_proc);
 }
 
-    void
+    শূন্য
 gui_mch_post_balloon(BalloonEval *beval, char_u *mesg)
 {
     POINT   pt;
 
-    vim_free(beval->msg);
-    beval->msg = mesg == NULL ? NULL : vim_strsave(mesg);
-    if (beval->msg == NULL)
+    vim_free(beval->বাৰ্তা);
+    beval->বাৰ্তা = mesg == রিক্ত ? রিক্ত : vim_strsave(mesg);
+    যদি (beval->বাৰ্তা == রিক্ত)
     {
 	delete_tooltip(beval);
 	beval->showState = ShS_NEUTRAL;
-	return;
+	ঘূৰাই;
     }
 
-    if (beval->showState == ShS_SHOWING)
-	return;
+    যদি (beval->showState == ShS_SHOWING)
+	ঘূৰাই;
     GetCursorPos(&pt);
     ScreenToClient(s_textArea, &pt);
 
-    if (abs(beval->x - pt.x) < 3 && abs(beval->y - pt.y) < 3)
+    যদি (abs(beval->x - pt.x) < 3 && abs(beval->y - pt.y) < 3)
     {
 	// cursor is still here
 	gui_mch_disable_beval_area(cur_beval);
 	beval->showState = ShS_SHOWING;
-	make_tooltip(beval, (char *)mesg, pt);
+	make_tooltip(beval, (ৱর্ণ *)mesg, pt);
     }
 }
 
     BalloonEval *
 gui_mch_create_beval_area(
-    void	*target UNUSED,	// ignored, always use s_textArea
+    শূন্য	*target UNUSED,	// ignored, always use s_textArea
     char_u	*mesg,
-    void	(*mesgCB)(BalloonEval *, int),
-    void	*clientData)
+    শূন্য	(*mesgCB)(BalloonEval *, পূর্ণাঙ্ক),
+    শূন্য	*clientData)
 {
     // partially stolen from gui_beval.c
     BalloonEval	*beval;
 
-    if (mesg != NULL && mesgCB != NULL)
+    যদি (mesg != রিক্ত && mesgCB != রিক্ত)
     {
 	iemsg(e_cannot_create_ballooneval_with_both_message_and_callback);
-	return NULL;
+	ঘূৰাই রিক্ত;
     }
 
     beval = ALLOC_CLEAR_ONE(BalloonEval);
-    if (beval != NULL)
+    যদি (beval != রিক্ত)
     {
 	beval->target = s_textArea;
 
 	beval->showState = ShS_NEUTRAL;
-	beval->msg = mesg;
-	beval->msgCB = mesgCB;
+	beval->বাৰ্তা = mesg;
+	beval->বাৰ্তা_CB = mesgCB;
 	beval->clientData = clientData;
 
 	InitCommonControls();
 	cur_beval = beval;
 
-	if (p_beval)
+	যদি (p_beval)
 	    gui_mch_enable_beval_area(beval);
     }
-    return beval;
+    ঘূৰাই beval;
 }
 
-    static void
+    স্থির শূন্য
 Handle_WM_Notify(HWND hwnd UNUSED, LPNMHDR pnmh)
 {
-    if (pnmh->idFrom != ID_BEVAL_TOOLTIP) // it is not our tooltip
-	return;
+    যদি (pnmh->idFrom != ID_BEVAL_TOOLTIP) // it is not our tooltip
+	ঘূৰাই;
 
-    if (cur_beval == NULL)
-	return;
+    যদি (cur_beval == রিক্ত)
+	ঘূৰাই;
 
-    switch (pnmh->code)
+    ৱিকল্প (pnmh->code)
     {
-	case TTN_SHOW:
-	    break;
-	case TTN_POP: // Before tooltip disappear
+	পক্ষ TTN_SHOW:
+	    ভঙ্গ;
+	পক্ষ TTN_বেৰ_কৰো: // Before tooltip disappear
 	    delete_tooltip(cur_beval);
 	    gui_mch_enable_beval_area(cur_beval);
 
 	    cur_beval->showState = ShS_NEUTRAL;
-	    break;
-	case TTN_GETDISPINFO:
+	    ভঙ্গ;
+	পক্ষ TTN_GETDISPINFO:
 	    {
 		// if you get there then we have new common controls
 		NMTTDISPINFO *info = (NMTTDISPINFO *)pnmh;
 		info->lpszText = (LPSTR)info->lParam;
 		info->uFlags |= TTF_DI_SETITEM;
 	    }
-	    break;
-	case TTN_GETDISPINFOW:
+	    ভঙ্গ;
+	পক্ষ TTN_GETDISPINFOW:
 	    {
 		// if we get here then we have new common controls
 		NMTTDISPINFOW *info = (NMTTDISPINFOW *)pnmh;
 		info->lpszText = (LPWSTR)info->lParam;
 		info->uFlags |= TTF_DI_SETITEM;
 	    }
-	    break;
+	    ভঙ্গ;
     }
 }
 
-    static void
-track_user_activity(UINT uMsg)
+    স্থির শূন্য
+track_user_activity(UINT u_বাৰ্তা)
 {
-    if ((uMsg >= WM_MOUSEFIRST && uMsg <= WM_MOUSELAST)
-	    || (uMsg >= WM_KEYFIRST && uMsg <= WM_KEYLAST))
-	last_user_activity = GetTickCount();
+    যদি ((u_বাৰ্তা >= WM_MOUSEFIRST && u_বাৰ্তা <= WM_MOUSELAST)
+	    || (u_বাৰ্তা >= WM_KEYFIRST && u_বাৰ্তা <= WM_KEYLAST))
+	last_user_activity = Get_Tick_গুনতি();
 }
 
-    void
+    শূন্য
 gui_mch_destroy_beval_area(BalloonEval *beval)
 {
 # ifdef FEAT_VARTABS
@@ -9288,30 +9288,30 @@ gui_mch_destroy_beval_area(BalloonEval *beval)
 }
 #endif // FEAT_BEVAL_GUI
 
-#if defined(FEAT_NETBEANS_INTG)
+#যদি defined(FEAT_NETBEANS_INTG)
 /*
  * We have multiple signs to draw at the same location. Draw the
  * multi-sign indicator (down-arrow) instead. This is the Win32 version.
  */
-    void
-netbeans_draw_multisign_indicator(int row)
+    শূন্য
+netbeans_draw_multisign_indicator(পূর্ণাঙ্ক row)
 {
-    int i;
-    int y;
-    int x;
+    পূর্ণাঙ্ক i;
+    পূর্ণাঙ্ক y;
+    পূর্ণাঙ্ক x;
 
-    if (!netbeans_active())
-	return;
+    যদি (!netbeans_active())
+	ঘূৰাই;
 
     x = 0;
     y = TEXT_Y(row);
 
-# if defined(FEAT_DIRECTX)
-    if (IS_ENABLE_DIRECTX())
+# যদি defined(FEAT_DIRECTX)
+    যদি (IS_ENABLE_DIRECTX())
 	DWriteContext_Flush(s_dwc);
 # endif
 
-    for (i = 0; i < gui.char_height - 3; i++)
+    বাবে (i = 0; i < gui.char_height - 3; i++)
 	SetPixel(s_hdc, x+2, y++, gui.currFgColor);
 
     SetPixel(s_hdc, x+0, y, gui.currFgColor);
@@ -9324,48 +9324,48 @@ netbeans_draw_multisign_indicator(int row)
 }
 #endif
 
-#if defined(FEAT_EVAL)
+#যদি defined(FEAT_EVAL)
 
 // TODO: at the moment, this is just a copy of test_gui_mouse_event.
 // But, we could instead generate actual Win32 mouse event messages,
 // ie. to make it consistent with test_gui_w32_sendevent_keyboard.
-    static int
+    স্থির পূর্ণাঙ্ক
 test_gui_w32_sendevent_mouse(dict_T *args)
 {
-    if (!dict_has_key(args, "row") || !dict_has_key(args, "col"))
-	return FALSE;
+    যদি (!dict_has_চাবি(args, "row") || !dict_has_চাবি(args, "col"))
+	ঘূৰাই FALSE;
 
     // Note: "move" is optional, requires fewer arguments
-    int move = (int)dict_get_bool(args, "move", FALSE);
+    পূর্ণাঙ্ক move = (পূর্ণাঙ্ক)dict_get_bool(args, "move", FALSE);
 
-    if (!move && (!dict_has_key(args, "button")
-	    || !dict_has_key(args, "multiclick")
-	    || !dict_has_key(args, "modifiers")))
-	return FALSE;
+    যদি (!move && (!dict_has_চাবি(args, "button")
+	    || !dict_has_চাবি(args, "multiclick")
+	    || !dict_has_চাবি(args, "modifiers")))
+	ঘূৰাই FALSE;
 
-    int row = (int)dict_get_number(args, "row");
-    int col = (int)dict_get_number(args, "col");
+    পূর্ণাঙ্ক row = (পূর্ণাঙ্ক)dict_get_সংখ্যা(args, "row");
+    পূর্ণাঙ্ক col = (পূর্ণাঙ্ক)dict_get_সংখ্যা(args, "col");
 
-    if (move)
+    যদি (move)
     {
 	// the "move" argument expects row and col coordnates to be in pixels,
 	// unless "cell" is specified and is TRUE.
-	if (dict_get_bool(args, "cell", FALSE))
+	যদি (dict_get_bool(args, "cell", FALSE))
 	{
 	    // calculate the middle of the character cell
 	    // Note: Cell coordinates are 1-based from Vim script
-	    int pY = (row - 1) * gui.char_height + gui.char_height / 2;
-	    int pX = (col - 1) * gui.char_width + gui.char_width / 2;
+	    পূর্ণাঙ্ক pY = (row - 1) * gui.char_height + gui.char_height / 2;
+	    পূর্ণাঙ্ক pX = (col - 1) * gui.char_width + gui.char_width / 2;
 	    gui_mouse_moved(pX, pY);
 	}
-	else
+	অন্যথা
 	    gui_mouse_moved(col, row);
     }
-    else
+    অন্যথা
     {
-	int button = (int)dict_get_number(args, "button");
-	int repeated_click = (int)dict_get_number(args, "multiclick");
-	int_u mods = (int)dict_get_number(args, "modifiers");
+	পূর্ণাঙ্ক button = (পূর্ণাঙ্ক)dict_get_সংখ্যা(args, "button");
+	পূর্ণাঙ্ক repeated_click = (পূর্ণাঙ্ক)dict_get_সংখ্যা(args, "multiclick");
+	int_u mods = (পূর্ণাঙ্ক)dict_get_সংখ্যা(args, "modifiers");
 
 	// Reset the scroll values to known values.
 	// XXX: Remove this when/if the scroll step is made configurable.
@@ -9375,172 +9375,172 @@ test_gui_w32_sendevent_mouse(dict_T *args)
 	gui_send_mouse_event(button, TEXT_X(col - 1), TEXT_Y(row - 1),
 							repeated_click, mods);
     }
-    return TRUE;
+    ঘূৰাই TRUE;
 }
 
-    static int
+    স্থির পূর্ণাঙ্ক
 test_gui_w32_sendevent_keyboard(dict_T *args)
 {
-    INPUT inputs[1];
-    INPUT modkeys[3];
-    SecureZeroMemory(inputs, sizeof(INPUT));
-    SecureZeroMemory(modkeys, 3 * sizeof(INPUT));
+    প্ৰবেশ_2 inputs[1];
+    প্ৰবেশ_2 modkeys[3];
+    SecureZeroMemory(inputs, পরিমাণ(প্ৰবেশ_2));
+    SecureZeroMemory(modkeys, 3 * পরিমাণ(প্ৰবেশ_2));
 
     char_u *event = dict_get_string(args, "event", TRUE);
 
-    if (event && (STRICMP(event, "keydown") == 0
+    যদি (event && (STRICMP(event, "keydown") == 0
 				      || STRICMP(event, "keyup") == 0))
     {
-	WORD vkCode = dict_get_number_def(args, "keycode", 0);
-	if (vkCode <= 0 || vkCode >= 0xFF)
+	WORD vkCode = dict_get_সংখ্যা_def(args, "keycode", 0);
+	যদি (vkCode <= 0 || vkCode >= 0xFF)
 	{
 	    semsg(_(e_invalid_argument_nr), (long)vkCode);
-	    return FALSE;
+	    ঘূৰাই FALSE;
 	}
 
-	BOOL isModKey = (vkCode == VK_SHIFT || vkCode == VK_CONTROL
+	BOOL is_Mod_চাবি = (vkCode == VK_SHIFT || vkCode == VK_CONTROL
 	    || vkCode == VK_MENU || vkCode == VK_LSHIFT || vkCode == VK_RSHIFT
 	    || vkCode == VK_LCONTROL || vkCode == VK_RCONTROL
 	    || vkCode == VK_LMENU || vkCode == VK_RMENU );
 
 	BOOL unwrapMods = FALSE;
-	int mods = (int)dict_get_number(args, "modifiers");
+	পূর্ণাঙ্ক mods = (পূর্ণাঙ্ক)dict_get_সংখ্যা(args, "modifiers");
 
 	// If there are modifiers in the args, and it is not a keyup event and
 	// vkCode is not a modifier key, then we generate virtual modifier key
 	// messages before sending the actual key message.
-	if (mods && STRICMP(event, "keydown") == 0 && !isModKey)
+	যদি (mods && STRICMP(event, "keydown") == 0 && !is_Mod_চাবি)
 	{
-	    int n = 0;
-	    if (mods & MOD_MASK_SHIFT)
+	    পূর্ণাঙ্ক n = 0;
+	    যদি (mods & MOD_MASK_SHIFT)
 	    {
-		modkeys[n].type = INPUT_KEYBOARD;
+		modkeys[n].type = প্ৰবেশ_KEYBOARD;
 		modkeys[n].ki.wVk = VK_LSHIFT;
 		n++;
 	    }
-	    if (mods & MOD_MASK_CTRL)
+	    যদি (mods & MOD_MASK_CTRL)
 	    {
-		modkeys[n].type = INPUT_KEYBOARD;
+		modkeys[n].type = প্ৰবেশ_KEYBOARD;
 		modkeys[n].ki.wVk = VK_LCONTROL;
 		n++;
 	    }
-	    if (mods & MOD_MASK_ALT)
+	    যদি (mods & MOD_MASK_ALT)
 	    {
-		modkeys[n].type = INPUT_KEYBOARD;
+		modkeys[n].type = প্ৰবেশ_KEYBOARD;
 		modkeys[n].ki.wVk = VK_LMENU;
 		n++;
 	    }
-	    if (n)
+	    যদি (n)
 	    {
-		(void)SetForegroundWindow(s_hwnd);
-		SendInput(n, modkeys, sizeof(INPUT));
+		(শূন্য)SetForegroundWindow(s_hwnd);
+		Send_প্ৰবেশ(n, modkeys, পরিমাণ(প্ৰবেশ_2));
 	    }
 	}
 
-	inputs[0].type = INPUT_KEYBOARD;
+	inputs[0].type = প্ৰবেশ_KEYBOARD;
 	inputs[0].ki.wVk = vkCode;
-	if (STRICMP(event, "keyup") == 0)
+	যদি (STRICMP(event, "keyup") == 0)
 	{
 	    inputs[0].ki.dwFlags = KEYEVENTF_KEYUP;
-	    if (!isModKey)
+	    যদি (!is_Mod_চাবি)
 		unwrapMods = TRUE;
 	}
 
-	(void)SetForegroundWindow(s_hwnd);
-	SendInput(ARRAYSIZE(inputs), inputs, sizeof(INPUT));
+	(শূন্য)SetForegroundWindow(s_hwnd);
+	Send_প্ৰবেশ(ARRAYSIZE(inputs), inputs, পরিমাণ(প্ৰবেশ_2));
 	vim_free(event);
 
-	if (unwrapMods)
+	যদি (unwrapMods)
 	{
-	    modkeys[0].type = INPUT_KEYBOARD;
+	    modkeys[0].type = প্ৰবেশ_KEYBOARD;
 	    modkeys[0].ki.wVk = VK_LSHIFT;
 	    modkeys[0].ki.dwFlags = KEYEVENTF_KEYUP;
 
-	    modkeys[1].type = INPUT_KEYBOARD;
+	    modkeys[1].type = প্ৰবেশ_KEYBOARD;
 	    modkeys[1].ki.wVk = VK_LCONTROL;
 	    modkeys[1].ki.dwFlags = KEYEVENTF_KEYUP;
 
-	    modkeys[2].type = INPUT_KEYBOARD;
+	    modkeys[2].type = প্ৰবেশ_KEYBOARD;
 	    modkeys[2].ki.wVk = VK_LMENU;
 	    modkeys[2].ki.dwFlags = KEYEVENTF_KEYUP;
 
-	    (void)SetForegroundWindow(s_hwnd);
-	    SendInput(3, modkeys, sizeof(INPUT));
+	    (শূন্য)SetForegroundWindow(s_hwnd);
+	    Send_প্ৰবেশ(3, modkeys, পরিমাণ(প্ৰবেশ_2));
 	}
     }
-    else
+    অন্যথা
     {
-	if (event == NULL)
+	যদি (event == রিক্ত)
 	{
 	    semsg(_(e_missing_argument_str), "event");
 	}
-	else
+	অন্যথা
 	{
-	    semsg(_(e_invalid_value_for_argument_str_str), "event", event);
+	    semsg(_(e_invalid_মান_for_argument_str_str), "event", event);
 	    vim_free(event);
 	}
-	return FALSE;
+	ঘূৰাই FALSE;
     }
-    return TRUE;
+    ঘূৰাই TRUE;
 }
 
-    static int
+    স্থির পূর্ণাঙ্ক
 test_gui_w32_sendevent_set_keycode_trans_strategy(dict_T *args)
 {
-    int handled = 0;
+    পূর্ণাঙ্ক handled = 0;
     char_u *strategy = dict_get_string(args, "strategy", TRUE);
 
-    if (strategy)
+    যদি (strategy)
     {
-	if (STRICMP(strategy, "classic") == 0)
+	যদি (STRICMP(strategy, "classic") == 0)
 	{
 	    handled = 1;
 	    keycode_trans_strategy_used = &keycode_trans_strategy_classic;
 	}
-	else if (STRICMP(strategy, "experimental") == 0)
+	অন্যথা যদি (STRICMP(strategy, "experimental") == 0)
 	{
 	    handled = 1;
 	    keycode_trans_strategy_used = &keycode_trans_strategy_experimental;
 	}
     }
 
-    if (!handled)
+    যদি (!handled)
     {
-	if (strategy == NULL)
+	যদি (strategy == রিক্ত)
 	{
 	    semsg(_(e_missing_argument_str), "strategy");
 	}
-	else
+	অন্যথা
 	{
-	    semsg(_(e_invalid_value_for_argument_str_str), "strategy", strategy);
+	    semsg(_(e_invalid_মান_for_argument_str_str), "strategy", strategy);
 	    vim_free(strategy);
 	}
-	return FALSE;
+	ঘূৰাই FALSE;
     }
-    return TRUE;
+    ঘূৰাই TRUE;
 }
 
 
-    int
+    পূর্ণাঙ্ক
 test_gui_w32_sendevent(char_u *event, dict_T *args)
 {
-    if (STRICMP(event, "key") == 0)
-	return test_gui_w32_sendevent_keyboard(args);
-    else if (STRICMP(event, "mouse") == 0)
-	return test_gui_w32_sendevent_mouse(args);
-    else if (STRICMP(event, "set_keycode_trans_strategy") == 0)
-	return test_gui_w32_sendevent_set_keycode_trans_strategy(args);
-    else
+    যদি (STRICMP(event, "key") == 0)
+	ঘূৰাই test_gui_w32_sendevent_keyboard(args);
+    অন্যথা যদি (STRICMP(event, "mouse") == 0)
+	ঘূৰাই test_gui_w32_sendevent_mouse(args);
+    অন্যথা যদি (STRICMP(event, "set_keycode_trans_strategy") == 0)
+	ঘূৰাই test_gui_w32_sendevent_set_keycode_trans_strategy(args);
+    অন্যথা
     {
-	semsg(_(e_invalid_value_for_argument_str_str), "event", event);
-	return FALSE;
+	semsg(_(e_invalid_মান_for_argument_str_str), "event", event);
+	ঘূৰাই FALSE;
     }
 }
 #endif
 
-#if defined(FEAT_IMAGE_GUI)
+#যদি defined(FEAT_IMAGE_GUI)
 
-typedef struct
+প্রকারনির্দেশ সংরচনা
 {
     HBITMAP hbm;
     HDC	    hdc;
@@ -9552,48 +9552,48 @@ typedef struct
  * has 4 bytes per pixel and the alpha channel is flattened onto the GUI window
  * background colour (pre-multiplied blend).
  */
-    static void
-upload_popup_image_pixels(uint8_t *dst, uint8_t *src, int iw, int ih, image_format_T fmt)
+    স্থির শূন্য
+upload_popup_image_pixels(uint8_t *dst, uint8_t *src, পূর্ণাঙ্ক iw, পূর্ণাঙ্ক ih, image_format_T fmt)
 {
-    int		y, x;
-    int		stride = iw * 4;
-    int		src_bpp = fmt == IMAGE_FORMAT_RGBA ? 4 : 3;
+    পূর্ণাঙ্ক		y, x;
+    পূর্ণাঙ্ক		stride = iw * 4;
+    পূর্ণাঙ্ক		src_bpp = fmt == IMAGE_FORMAT_RGBA ? 4 : 3;
     COLORREF	bg = fmt == IMAGE_FORMAT_RGBA ? gui_mch_get_rgb(gui.back_pixel) : 0;
     BYTE	bg_r = GetRValue(bg);
     BYTE	bg_g = GetGValue(bg);
     BYTE	bg_b = GetBValue(bg);
 
-    for (y = 0; y < ih; y++)
+    বাবে (y = 0; y < ih; y++)
     {
 	uint8_t *s = src + (size_t)y * iw * src_bpp;
 	uint8_t *d = dst + (size_t)y * stride;
 
-	for (x = 0; x < iw; x++)
+	বাবে (x = 0; x < iw; x++)
 	{
-	    if (fmt == IMAGE_FORMAT_RGBA)
+	    যদি (fmt == IMAGE_FORMAT_RGBA)
 	    {
-		int a = s[3];
+		পূর্ণাঙ্ক a = s[3];
 
-		if (a == 255)
+		যদি (a == 255)
 		{
 		    d[0] = s[2];
 		    d[1] = s[1];
 		    d[2] = s[0];
 		}
-		else if (a == 0)
+		অন্যথা যদি (a == 0)
 		{
 		    d[0] = (uint8_t )bg_b;
 		    d[1] = (uint8_t)bg_g;
 		    d[2] = (uint8_t)bg_r;
 		}
-		else
+		অন্যথা
 		{
 		    d[0] = (uint8_t)((s[2] * a + bg_b * (255 - a)) / 255);
 		    d[1] = (uint8_t)((s[1] * a + bg_g * (255 - a)) / 255);
 		    d[2] = (uint8_t)((s[0] * a + bg_r * (255 - a)) / 255);
 		}
 	    }
-	    else
+	    অন্যথা
 	    {
 		d[0] = s[2];	// B
 		d[1] = s[1];	// G
@@ -9606,42 +9606,42 @@ upload_popup_image_pixels(uint8_t *dst, uint8_t *src, int iw, int ih, image_form
     }
 }
 
-    int
+    পূর্ণাঙ্ক
 image_gui_init(image_T *img)
 {
     image_gdi_T *ctx = ALLOC_CLEAR_ONE(image_gdi_T);
     BITMAPINFO	bmi;
     HBITMAP	hbm;
     HDC		mem_dc;
-    int		iw, ih;
-    void	*bits = NULL;
+    পূর্ণাঙ্ক		iw, ih;
+    শূন্য	*bits = রিক্ত;
 
-    if (ctx == NULL)
-	return FAIL;
+    যদি (ctx == রিক্ত)
+	ঘূৰাই FAIL;
 
     image_get_dimensions(img, &iw, &ih);
 
     CLEAR_FIELD(bmi);
-    bmi.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
+    bmi.bmiHeader.biSize = পরিমাণ(BITMAPINFOHEADER);
     bmi.bmiHeader.biWidth = iw;
     bmi.bmiHeader.biHeight = -ih; // Top-down
     bmi.bmiHeader.biPlanes = 1;
-    bmi.bmiHeader.biBitCount = 32;
+    bmi.bmiHeader.bi_Bit_গুনতি = 32;
     bmi.bmiHeader.biCompression = BI_RGB;
 
-    hbm = CreateDIBSection(s_hdc, &bmi, DIB_RGB_COLORS, &bits, NULL, 0);
-    if (hbm == NULL || bits == NULL)
+    hbm = CreateDIBSection(s_hdc, &bmi, DIB_RGB_COLORS, &bits, রিক্ত, 0);
+    যদি (hbm == রিক্ত || bits == রিক্ত)
     {
-	if (hbm != NULL)
+	যদি (hbm != রিক্ত)
 	    DeleteObject(hbm);
-	return false;
+	ঘূৰাই false;
     }
 
     mem_dc = CreateCompatibleDC(s_hdc);
-    if (mem_dc == NULL)
+    যদি (mem_dc == রিক্ত)
     {
 	DeleteObject(hbm);
-	return false;
+	ঘূৰাই false;
     }
 
     SelectObject(mem_dc, hbm);
@@ -9651,10 +9651,10 @@ image_gui_init(image_T *img)
     ctx->hdc = mem_dc;
 
     img->backend_data = ctx;
-    return OK;
+    ঘূৰাই OK;
 }
 
-    void
+    শূন্য
 image_gui_uninit(image_T *img)
 {
     image_gdi_T *ctx = img->backend_data;
@@ -9664,42 +9664,42 @@ image_gui_uninit(image_T *img)
     vim_free(ctx);
 }
 
-    int
+    পূর্ণাঙ্ক
 image_placement_gui_init(image_placement_T *place UNUSED)
 {
-    return OK;
+    ঘূৰাই OK;
 }
 
-    void
+    শূন্য
 image_placement_gui_uninit(image_placement_T *place UNUSED)
 {
 }
 
-    void
+    শূন্য
 image_placement_gui_draw(image_placement_T *place)
 {
     image_T	    *img = place->img;
     image_gdi_T	    *ictx = img->backend_data;
     pixman_box32_t  *rects;
-    int		    n_rects;
+    পূর্ণাঙ্ক		    n_rects;
 
     rects = pixman_region32_rectangles(&place->visible, &n_rects);
-    if (rects == NULL || n_rects == 0)
-	return;
+    যদি (rects == রিক্ত || n_rects == 0)
+	ঘূৰাই;
 
-# if defined(FEAT_DIRECTX)
+# যদি defined(FEAT_DIRECTX)
     // Commit any pending DirectWrite output so popup text and borders are on
     // s_hdc before we blit on top.
-    if (IS_ENABLE_DIRECTX())
+    যদি (IS_ENABLE_DIRECTX())
 	DWriteContext_Flush(s_dwc);
 # endif
 
-    for (int i = 0; i < n_rects; i++)
+    বাবে (পূর্ণাঙ্ক i = 0; i < n_rects; i++)
     {
 	pixman_box32_t	rect = rects[i];
-	int		row, col;
-	int		posx, posy;
-	int		x, y, w, h;
+	পূর্ণাঙ্ক		row, col;
+	পূর্ণাঙ্ক		posx, posy;
+	পূর্ণাঙ্ক		x, y, w, h;
 
 	image_placement_subrect(place, rect, &row, &col, &x, &y, &w, &h, true);
 	posx = FILL_X(col);
@@ -9710,7 +9710,7 @@ image_placement_gui_draw(image_placement_T *place)
     }
 }
 
-    void
+    শূন্য
 image_placement_gui_clear(image_placement_T *place UNUSED)
 {
 }

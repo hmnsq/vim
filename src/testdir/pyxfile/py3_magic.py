@@ -1,4 +1,4 @@
 # requires python 3.x
 
-import sys
+আনযন sys
 print(sys.version)

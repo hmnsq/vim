@@ -10,42 +10,42 @@
 /*
  * misc2.c: Various functions.
  */
-#include "vim.h"
+#অন্তর্ভাৱ "vim.h"
 
-static char_u	*username = NULL; // cached result of mch_get_user_name()
+স্থির char_u	*username = রিক্ত; // cached result of mch_get_user_name()
 
-static int coladvance2(pos_T *pos, int addspaces, int finetune, colnr_T wcol);
+স্থির পূর্ণাঙ্ক coladvance2(pos_T *pos, পূর্ণাঙ্ক addspaces, পূর্ণাঙ্ক finetune, colnr_T wcol);
 
 /*
  * Return TRUE if in the current mode we need to use virtual.
  */
-    int
-virtual_active(void)
+    পূর্ণাঙ্ক
+virtual_active(শূন্য)
 {
-    unsigned int cur_ve_flags = get_ve_flags();
+    unsigned পূর্ণাঙ্ক cur_ve_flags = get_ve_flags();
 
-    if (cur_ve_flags == VE_ALL
-	    || ((cur_ve_flags & VE_INSERT) && (State & MODE_INSERT)))
-	return TRUE;
+    যদি (cur_ve_flags == VE_ALL
+	    || ((cur_ve_flags & VE_ঢোকাও) && (State & MODE_ঢোকাও)))
+	ঘূৰাই TRUE;
 
     // While an operator is being executed we return "virtual_op", because
     // VIsual_active has already been reset, thus we can't check for "block"
     // being used.
-    if (virtual_op != MAYBE)
-	return virtual_op;
-    return (cur_ve_flags & VE_BLOCK) && VIsual_active && VIsual_mode == Ctrl_V;
+    যদি (virtual_op != MAYBE)
+	ঘূৰাই virtual_op;
+    ঘূৰাই (cur_ve_flags & VE_BLOCK) && VIsual_active && VIsual_mode == Ctrl_V;
 }
 
 /*
  * Get the screen position of the cursor.
  */
-    int
-getviscol(void)
+    পূর্ণাঙ্ক
+getviscol(শূন্য)
 {
     colnr_T	x;
 
-    getvvcol(curwin, &curwin->w_cursor, &x, NULL, NULL, GETVCOL_NO_ABOVE);
-    return (int)x;
+    getvvcol(curwin, &curwin->w_cursor, &x, রিক্ত, রিক্ত, GETVCOL_NO_ABOVE);
+    ঘূৰাই (পূর্ণাঙ্ক)x;
 }
 
 /*
@@ -53,23 +53,23 @@ getviscol(void)
  * cursor in that column.
  * The caller must have saved the cursor line for undo!
  */
-    int
+    পূর্ণাঙ্ক
 coladvance_force(colnr_T wcol)
 {
-    int rc = coladvance2(&curwin->w_cursor, TRUE, FALSE, wcol);
+    পূর্ণাঙ্ক rc = coladvance2(&curwin->w_cursor, TRUE, FALSE, wcol);
 
-    if (wcol == MAXCOL)
+    যদি (wcol == MAXCOL)
 	curwin->w_valid &= ~VALID_VIRTCOL;
-    else
+    অন্যথা
 	// Virtcol is valid
 	set_valid_virtcol(curwin, wcol);
-    return rc;
+    ঘূৰাই rc;
 }
 
 /*
  * Get the screen position of character col with a coladd in the cursor line.
  */
-    int
+    পূর্ণাঙ্ক
 getviscol2(colnr_T col, colnr_T coladd)
 {
     colnr_T	x;
@@ -78,8 +78,8 @@ getviscol2(colnr_T col, colnr_T coladd)
     pos.lnum = curwin->w_cursor.lnum;
     pos.col = col;
     pos.coladd = coladd;
-    getvvcol(curwin, &pos, &x, NULL, NULL, GETVCOL_NO_ABOVE);
-    return (int)x;
+    getvvcol(curwin, &pos, &x, রিক্ত, রিক্ত, GETVCOL_NO_ABOVE);
+    ঘূৰাই (পূর্ণাঙ্ক)x;
 }
 
 /*
@@ -91,17 +91,17 @@ getviscol2(colnr_T col, colnr_T coladd)
  *
  * return OK if desired column is reached, FAIL if not
  */
-    int
+    পূর্ণাঙ্ক
 coladvance(colnr_T wantcol)
 {
-    int rc = getvpos(&curwin->w_cursor, wantcol);
+    পূর্ণাঙ্ক rc = getvpos(&curwin->w_cursor, wantcol);
 
-    if (wantcol == MAXCOL || rc == FAIL)
+    যদি (wantcol == MAXCOL || rc == FAIL)
 	curwin->w_valid &= ~VALID_VIRTCOL;
-    else if (*ml_get_cursor() != TAB)
+    অন্যথা যদি (*ml_get_cursor() != TAB)
 	// Virtcol is valid when not on a TAB
 	set_valid_virtcol(curwin, wantcol);
-    return rc;
+    ঘূৰাই rc;
 }
 
 /*
@@ -109,67 +109,67 @@ coladvance(colnr_T wantcol)
  * "wantcol".
  * return OK if desired column is reached, FAIL if not
  */
-    int
+    পূর্ণাঙ্ক
 getvpos(pos_T *pos, colnr_T wantcol)
 {
-    return coladvance2(pos, FALSE, virtual_active(), wantcol);
+    ঘূৰাই coladvance2(pos, FALSE, virtual_active(), wantcol);
 }
 
-    static int
+    স্থির পূর্ণাঙ্ক
 coladvance2(
     pos_T	*pos,
-    int		addspaces,	// change the text to achieve our goal?
-    int		finetune,	// change char offset for the exact column
+    পূর্ণাঙ্ক		addspaces,	// change the text to achieve our goal?
+    পূর্ণাঙ্ক		finetune,	// change char offset for the exact column
     colnr_T	wcol_arg)	// column to move to (can be negative)
 {
     colnr_T	wcol = wcol_arg;
-    int		idx;
-    char_u	*line;
-    int		linelen;
+    পূর্ণাঙ্ক		idx;
+    char_u	*সাৰি;
+    পূর্ণাঙ্ক		linelen;
     colnr_T	col = 0;
-    int		csize = 0;
-    int		one_more;
+    পূর্ণাঙ্ক		csize = 0;
+    পূর্ণাঙ্ক		one_more;
 #ifdef FEAT_LINEBREAK
-    int		head = 0;
+    পূর্ণাঙ্ক		head = 0;
 #endif
 
-    one_more = (State & MODE_INSERT)
+    one_more = (State & MODE_ঢোকাও)
 		    || restart_edit != NUL
 		    || (VIsual_active && *p_sel != 'o')
 		    || ((get_ve_flags() & VE_ONEMORE) && wcol < MAXCOL);
-    line = ml_get_buf(curbuf, pos->lnum, FALSE);
+    সাৰি = ml_get_buf(curbuf, pos->lnum, FALSE);
     linelen = ml_get_buf_len(curbuf, pos->lnum);
 
-    if (wcol >= MAXCOL)
+    যদি (wcol >= MAXCOL)
     {
 	    idx = linelen - 1 + one_more;
 	    col = wcol;
 
-	    if ((addspaces || finetune) && !VIsual_active)
+	    যদি ((addspaces || finetune) && !VIsual_active)
 	    {
 		curwin->w_curswant = linetabsize_no_outer(curwin, pos->lnum)
 								   + one_more;
-		if (curwin->w_curswant > 0)
+		যদি (curwin->w_curswant > 0)
 		    --curwin->w_curswant;
 	    }
     }
-    else
+    অন্যথা
     {
-	int		width = curwin->w_width - win_col_off(curwin);
+	পূর্ণাঙ্ক		width = curwin->w_width - win_col_off(curwin);
 	chartabsize_T	cts;
 
-	if (finetune
+	যদি (finetune
 		&& curwin->w_p_wrap
 		&& curwin->w_width != 0
 		&& wcol >= (colnr_T)width
 		&& width > 0)
 	{
 	    csize = linetabsize_no_outer_eol(curwin, pos->lnum);
-	    if (csize > 0)
+	    যদি (csize > 0)
 		csize--;
 
-	    if (wcol / width > (colnr_T)csize / width
-		    && ((State & MODE_INSERT) == 0 || (int)wcol > csize + 1))
+	    যদি (wcol / width > (colnr_T)csize / width
+		    && ((State & MODE_ঢোকাও) == 0 || (পূর্ণাঙ্ক)wcol > csize + 1))
 	    {
 		// In case of line wrapping don't move the cursor beyond the
 		// right screen edge.  In Insert mode allow going just beyond
@@ -179,23 +179,23 @@ coladvance2(
 	    }
 	}
 
-	init_chartabsize_arg(&cts, curwin, pos->lnum, 0, line, line);
+	init_chartabsize_arg(&cts, curwin, pos->lnum, 0, সাৰি, সাৰি);
 #ifdef FEAT_PROP_POPUP
 	cts.cts_no_above = true;
 #endif
-	while (cts.cts_vcol <= wcol && *cts.cts_ptr != NUL)
+	যেতিয়ালৈ (cts.cts_vcol <= wcol && *cts.cts_ptr != NUL)
 	{
 	    // Count a tab for what it's worth (if list mode not on)
 #ifdef FEAT_LINEBREAK
-	    csize = win_lbr_chartabsize(&cts, &head, NULL);
+	    csize = win_lbr_chartabsize(&cts, &head, রিক্ত);
 	    MB_PTR_ADV(cts.cts_ptr);
-#else
+#অন্যথা
 	    csize = lbr_chartabsize_adv(&cts);
 #endif
 	    cts.cts_vcol += csize;
 	}
 	col = cts.cts_vcol;
-	idx = (int)(cts.cts_ptr - line);
+	idx = (পূর্ণাঙ্ক)(cts.cts_ptr - সাৰি);
 	clear_chartabsize_arg(&cts);
 
 	/*
@@ -204,7 +204,7 @@ coladvance2(
 	 * a line has the correct indexing.  The one_more comparison
 	 * replaces an explicit add of one_more later on.
 	 */
-	if (col > wcol || (!virtual_active() && one_more == 0))
+	যদি (col > wcol || (!virtual_active() && one_more == 0))
 	{
 	    idx -= 1;
 #ifdef FEAT_LINEBREAK
@@ -214,7 +214,7 @@ coladvance2(
 	    col -= csize;
 	}
 
-	if (virtual_active()
+	যদি (virtual_active()
 		&& addspaces
 		&& wcol >= 0
 		&& ((col != wcol && col != wcol + 1) || csize > 1))
@@ -222,20 +222,20 @@ coladvance2(
 	    // 'virtualedit' is set: The difference between wcol and col is
 	    // filled with spaces.
 
-	    if (line[idx] == NUL)
+	    যদি (সাৰি[idx] == NUL)
 	    {
 		// Append spaces
-		int	correct = wcol - col;
+		পূর্ণাঙ্ক	correct = wcol - col;
 		char_u	*newline = alloc(idx + correct + 1);
-		int	t;
+		পূর্ণাঙ্ক	t;
 
-		if (newline == NULL)
-		    return FAIL;
+		যদি (newline == রিক্ত)
+		    ঘূৰাই FAIL;
 
-		for (t = 0; t < idx; ++t)
-		    newline[t] = line[t];
+		বাবে (t = 0; t < idx; ++t)
+		    newline[t] = সাৰি[t];
 
-		for (t = 0; t < correct; ++t)
+		বাবে (t = 0; t < correct; ++t)
 		    newline[t + idx] = ' ';
 
 		newline[idx + correct] = NUL;
@@ -245,27 +245,27 @@ coladvance2(
 		idx += correct;
 		col = wcol;
 	    }
-	    else
+	    অন্যথা
 	    {
 		// Break a tab
-		int	correct = wcol - col - csize + 1; // negative!!
+		পূর্ণাঙ্ক	correct = wcol - col - csize + 1; // negative!!
 		char_u	*newline;
-		int	t, s = 0;
-		int	v;
+		পূর্ণাঙ্ক	t, s = 0;
+		পূর্ণাঙ্ক	v;
 
-		if (-correct > csize)
-		    return FAIL;
+		যদি (-correct > csize)
+		    ঘূৰাই FAIL;
 
 		newline = alloc(linelen + csize);
-		if (newline == NULL)
-		    return FAIL;
+		যদি (newline == রিক্ত)
+		    ঘূৰাই FAIL;
 
-		for (t = 0; t < linelen; t++)
+		বাবে (t = 0; t < linelen; t++)
 		{
-		    if (t != idx)
-			newline[s++] = line[t];
-		    else
-			for (v = 0; v < csize; v++)
+		    যদি (t != idx)
+			newline[s++] = সাৰি[t];
+		    অন্যথা
+			বাবে (v = 0; v < csize; v++)
 			    newline[s++] = ' ';
 		}
 
@@ -279,32 +279,32 @@ coladvance2(
 	}
     }
 
-    if (idx < 0)
+    যদি (idx < 0)
 	pos->col = 0;
-    else
+    অন্যথা
 	pos->col = idx;
 
     pos->coladd = 0;
 
-    if (finetune)
+    যদি (finetune)
     {
-	if (wcol == MAXCOL)
+	যদি (wcol == MAXCOL)
 	{
 	    // The width of the last character is used to set coladd.
-	    if (!one_more)
+	    যদি (!one_more)
 	    {
 		colnr_T	    scol, ecol;
 
-		getvcol(curwin, pos, &scol, NULL, &ecol, 0);
+		getvcol(curwin, pos, &scol, রিক্ত, &ecol, 0);
 		pos->coladd = ecol - scol;
 	    }
 	}
-	else
+	অন্যথা
 	{
-	    int b = (int)wcol - (int)col;
+	    পূর্ণাঙ্ক b = (পূর্ণাঙ্ক)wcol - (পূর্ণাঙ্ক)col;
 
 	    // The difference between wcol and col is used to set coladd.
-	    if (b > 0 && b < (MAXCOL - 2 * curwin->w_width))
+	    যদি (b > 0 && b < (MAXCOL - 2 * curwin->w_width))
 		pos->coladd = b;
 
 	    col += b;
@@ -312,21 +312,21 @@ coladvance2(
     }
 
     // prevent from moving onto a trail byte
-    if (has_mbyte)
+    যদি (has_mbyte)
 	mb_adjustpos(curbuf, pos);
 
-    if (wcol < 0 || col < wcol)
-	return FAIL;
-    return OK;
+    যদি (wcol < 0 || col < wcol)
+	ঘূৰাই FAIL;
+    ঘূৰাই OK;
 }
 
 /*
  * Increment the cursor position.  See inc() for return values.
  */
-    int
-inc_cursor(void)
+    পূর্ণাঙ্ক
+inc_cursor(শূন্য)
 {
-    return inc(&curwin->w_cursor);
+    ঘূৰাই inc(&curwin->w_cursor);
 }
 
 /*
@@ -336,50 +336,50 @@ inc_cursor(void)
  * Return -1 when at the end of file.
  * Return 0 otherwise.
  */
-    int
+    পূর্ণাঙ্ক
 inc(pos_T *lp)
 {
     char_u  *p;
 
     // when searching position may be set to end of a line
-    if (lp->col != MAXCOL)
+    যদি (lp->col != MAXCOL)
     {
 	p = ml_get_pos(lp);
-	if (*p != NUL)	// still within line, move to next char (may be NUL)
+	যদি (*p != NUL)	// still within line, move to next char (may be NUL)
 	{
-	    if (has_mbyte)
+	    যদি (has_mbyte)
 	    {
-		int l = (*mb_ptr2len)(p);
+		পূর্ণাঙ্ক l = (*mb_ptr2len)(p);
 
 		lp->col += l;
-		return ((p[l] != NUL) ? 0 : 2);
+		ঘূৰাই ((p[l] != NUL) ? 0 : 2);
 	    }
 	    lp->col++;
 	    lp->coladd = 0;
-	    return ((p[1] != NUL) ? 0 : 2);
+	    ঘূৰাই ((p[1] != NUL) ? 0 : 2);
 	}
     }
-    if (lp->lnum != curbuf->b_ml.ml_line_count)     // there is a next line
+    যদি (lp->lnum != curbuf->b_ml.ml_সাৰি_গুনতি)     // there is a next line
     {
 	lp->col = 0;
 	lp->lnum++;
 	lp->coladd = 0;
-	return 1;
+	ঘূৰাই 1;
     }
-    return -1;
+    ঘূৰাই -1;
 }
 
 /*
  * incl(lp): same as inc(), but skip the NUL at the end of non-empty lines
  */
-    int
+    পূর্ণাঙ্ক
 incl(pos_T *lp)
 {
-    int	    r;
+    পূর্ণাঙ্ক	    r;
 
-    if ((r = inc(lp)) >= 1 && lp->col)
+    যদি ((r = inc(lp)) >= 1 && lp->col)
 	r = inc(lp);
-    return r;
+    ঘূৰাই r;
 }
 
 /*
@@ -388,66 +388,66 @@ incl(pos_T *lp)
  * Decrement the line pointer 'p' crossing line boundaries as necessary.
  * Return 1 when crossing a line, -1 when at start of file, 0 otherwise.
  */
-    int
-dec_cursor(void)
+    পূর্ণাঙ্ক
+dec_cursor(শূন্য)
 {
-    return dec(&curwin->w_cursor);
+    ঘূৰাই dec(&curwin->w_cursor);
 }
 
-    int
+    পূর্ণাঙ্ক
 dec(pos_T *lp)
 {
     char_u	*p;
 
     lp->coladd = 0;
-    if (lp->col == MAXCOL)
+    যদি (lp->col == MAXCOL)
     {
 	// past end of line
 	p = ml_get(lp->lnum);
 	lp->col = ml_get_len(lp->lnum);
-	if (has_mbyte)
+	যদি (has_mbyte)
 	    lp->col -= (*mb_head_off)(p, p + lp->col);
-	return 0;
+	ঘূৰাই 0;
     }
 
-    if (lp->col > 0)
+    যদি (lp->col > 0)
     {
 	// still within line
 	lp->col--;
-	if (has_mbyte)
+	যদি (has_mbyte)
 	{
 	    p = ml_get(lp->lnum);
 	    lp->col -= (*mb_head_off)(p, p + lp->col);
 	}
-	return 0;
+	ঘূৰাই 0;
     }
 
-    if (lp->lnum > 1)
+    যদি (lp->lnum > 1)
     {
 	// there is a prior line
 	lp->lnum--;
 	p = ml_get(lp->lnum);
 	lp->col = ml_get_len(lp->lnum);
-	if (has_mbyte)
+	যদি (has_mbyte)
 	    lp->col -= (*mb_head_off)(p, p + lp->col);
-	return 1;
+	ঘূৰাই 1;
     }
 
     // at start of file
-    return -1;
+    ঘূৰাই -1;
 }
 
 /*
  * decl(lp): same as dec(), but skip the NUL at the end of non-empty lines
  */
-    int
+    পূর্ণাঙ্ক
 decl(pos_T *lp)
 {
-    int	    r;
+    পূর্ণাঙ্ক	    r;
 
-    if ((r = dec(lp)) == 1 && lp->col)
+    যদি ((r = dec(lp)) == 1 && lp->col)
 	r = dec(lp);
-    return r;
+    ঘূৰাই r;
 }
 
 /*
@@ -464,28 +464,28 @@ get_cursor_rel_lnum(
     linenr_T	retval = 0;
 
 #ifdef FEAT_FOLDING
-    if (hasAnyFolding(wp))
+    যদি (hasAnyFolding(wp))
     {
-	if (lnum > cursor)
+	যদি (lnum > cursor)
 	{
-	    while (lnum > cursor)
+	    যেতিয়ালৈ (lnum > cursor)
 	    {
-		(void)hasFoldingWin(wp, lnum, &lnum, NULL, TRUE, NULL);
+		(শূন্য)hasFoldingWin(wp, lnum, &lnum, রিক্ত, TRUE, রিক্ত);
 		// if lnum and cursor are in the same fold,
 		// now lnum <= cursor
-		if (lnum > cursor)
+		যদি (lnum > cursor)
 		    retval++;
 		lnum--;
 	    }
 	}
-	else if (lnum < cursor)
+	অন্যথা যদি (lnum < cursor)
 	{
-	    while (lnum < cursor)
+	    যেতিয়ালৈ (lnum < cursor)
 	    {
-		(void)hasFoldingWin(wp, lnum, NULL, &lnum, TRUE, NULL);
+		(শূন্য)hasFoldingWin(wp, lnum, রিক্ত, &lnum, TRUE, রিক্ত);
 		// if lnum and cursor are in the same fold,
 		// now lnum >= cursor
-		if (lnum < cursor)
+		যদি (lnum < cursor)
 		    retval--;
 		lnum++;
 	    }
@@ -493,29 +493,29 @@ get_cursor_rel_lnum(
 	// else if (lnum == cursor)
 	//     retval = 0;
     }
-    else
+    অন্যথা
 #endif
 	retval = lnum - cursor;
 
-    return retval;
+    ঘূৰাই retval;
 }
 
 /*
  * Make sure "pos.lnum" and "pos.col" are valid in "buf".
  * This allows for the col to be on the NUL byte.
  */
-    void
+    শূন্য
 check_pos(buf_T *buf, pos_T *pos)
 {
     colnr_T len;
 
-    if (pos->lnum > buf->b_ml.ml_line_count)
-	pos->lnum = buf->b_ml.ml_line_count;
+    যদি (pos->lnum > buf->b_ml.ml_সাৰি_গুনতি)
+	pos->lnum = buf->b_ml.ml_সাৰি_গুনতি;
 
-    if (pos->col > 0)
+    যদি (pos->col > 0)
     {
 	len = ml_get_buf_len(buf, pos->lnum);
-	if (pos->col > len)
+	যদি (pos->col > len)
 	    pos->col = len;
     }
 }
@@ -523,28 +523,28 @@ check_pos(buf_T *buf, pos_T *pos)
 /*
  * Make sure curwin->w_cursor.lnum is valid.
  */
-    void
-check_cursor_lnum(void)
+    শূন্য
+check_cursor_lnum(শূন্য)
 {
-    if (curwin->w_cursor.lnum > curbuf->b_ml.ml_line_count)
+    যদি (curwin->w_cursor.lnum > curbuf->b_ml.ml_সাৰি_গুনতি)
     {
 #ifdef FEAT_FOLDING
 	// If there is a closed fold at the end of the file, put the cursor in
 	// its first line.  Otherwise in the last line.
-	if (!hasFolding(curbuf->b_ml.ml_line_count,
-						&curwin->w_cursor.lnum, NULL))
+	যদি (!hasFolding(curbuf->b_ml.ml_সাৰি_গুনতি,
+						&curwin->w_cursor.lnum, রিক্ত))
 #endif
-	    curwin->w_cursor.lnum = curbuf->b_ml.ml_line_count;
+	    curwin->w_cursor.lnum = curbuf->b_ml.ml_সাৰি_গুনতি;
     }
-    if (curwin->w_cursor.lnum <= 0)
+    যদি (curwin->w_cursor.lnum <= 0)
 	curwin->w_cursor.lnum = 1;
 }
 
 /*
  * Make sure curwin->w_cursor.col is valid.
  */
-    void
-check_cursor_col(void)
+    শূন্য
+check_cursor_col(শূন্য)
 {
     check_cursor_col_win(curwin);
 }
@@ -552,63 +552,63 @@ check_cursor_col(void)
 /*
  * Make sure win->w_cursor.col is valid.
  */
-    void
+    শূন্য
 check_cursor_col_win(win_T *win)
 {
     colnr_T      len;
     colnr_T      oldcol = win->w_cursor.col;
     colnr_T      oldcoladd = win->w_cursor.col + win->w_cursor.coladd;
-    unsigned int cur_ve_flags = get_ve_flags();
+    unsigned পূর্ণাঙ্ক cur_ve_flags = get_ve_flags();
 
     len = ml_get_buf_len(win->w_buffer, win->w_cursor.lnum);
-    if (len == 0)
+    যদি (len == 0)
 	win->w_cursor.col = 0;
-    else if (win->w_cursor.col >= len)
+    অন্যথা যদি (win->w_cursor.col >= len)
     {
 	// Allow cursor past end-of-line when:
 	// - in Insert mode or restarting Insert mode
 	// - in Visual mode and 'selection' isn't "old"
 	// - 'virtualedit' is set
-	if ((State & MODE_INSERT) || restart_edit
+	যদি ((State & MODE_ঢোকাও) || restart_edit
 		|| (VIsual_active && *p_sel != 'o')
 		|| (cur_ve_flags & VE_ONEMORE)
 		|| virtual_active())
 	    win->w_cursor.col = len;
-	else
+	অন্যথা
 	{
 	    win->w_cursor.col = len - 1;
 	    // Move the cursor to the head byte.
-	    if (has_mbyte)
+	    যদি (has_mbyte)
 		mb_adjustpos(win->w_buffer, &win->w_cursor);
 	}
     }
-    else if (win->w_cursor.col < 0)
+    অন্যথা যদি (win->w_cursor.col < 0)
 	win->w_cursor.col = 0;
 
     // If virtual editing is on, we can leave the cursor on the old position,
     // only we must set it to virtual.  But don't do it when at the end of the
     // line.
-    if (oldcol == MAXCOL)
+    যদি (oldcol == MAXCOL)
 	win->w_cursor.coladd = 0;
-    else if (cur_ve_flags == VE_ALL)
+    অন্যথা যদি (cur_ve_flags == VE_ALL)
     {
-	if (oldcoladd > win->w_cursor.col)
+	যদি (oldcoladd > win->w_cursor.col)
 	{
 	    win->w_cursor.coladd = oldcoladd - win->w_cursor.col;
 
 	    // Make sure that coladd is not more than the char width.
 	    // Not for the last character, coladd is then used when the cursor
 	    // is actually after the last character.
-	    if (win->w_cursor.col + 1 < len)
+	    যদি (win->w_cursor.col + 1 < len)
 	    {
-		int cs, ce;
+		পূর্ণাঙ্ক cs, ce;
 
-		getvcol(win, &win->w_cursor, &cs, NULL, &ce, 0);
-		if (win->w_cursor.coladd > ce - cs)
+		getvcol(win, &win->w_cursor, &cs, রিক্ত, &ce, 0);
+		যদি (win->w_cursor.coladd > ce - cs)
 		    win->w_cursor.coladd = ce - cs;
 	    }
 	}
-	else
+	অন্যথা
 	    // avoid weird number when there is a miscalculation or overflow
 	    win->w_cursor.coladd = 0;
     }
@@ -617,8 +617,8 @@ check_cursor_col_win(win_T *win)
 /*
  * make sure curwin->w_cursor in on a valid character
  */
-    void
-check_cursor(void)
+    শূন্য
+check_cursor(শূন্য)
 {
     check_cursor_lnum();
     check_cursor_col();
@@ -628,20 +628,20 @@ check_cursor(void)
  * Check if VIsual position is valid, correct it if not.
  * Can be called when in Visual mode and a change has been made.
  */
-    void
-check_visual_pos(void)
+    শূন্য
+check_visual_pos(শূন্য)
 {
-    if (VIsual.lnum > curbuf->b_ml.ml_line_count)
+    যদি (VIsual.lnum > curbuf->b_ml.ml_সাৰি_গুনতি)
     {
-	VIsual.lnum = curbuf->b_ml.ml_line_count;
+	VIsual.lnum = curbuf->b_ml.ml_সাৰি_গুনতি;
 	VIsual.col = 0;
 	VIsual.coladd = 0;
     }
-    else
+    অন্যথা
     {
-	int len = ml_get_len(VIsual.lnum);
+	পূর্ণাঙ্ক len = ml_get_len(VIsual.lnum);
 
-	if (VIsual.col > len)
+	যদি (VIsual.col > len)
 	{
 	    VIsual.col = len;
 	    VIsual.coladd = 0;
@@ -653,10 +653,10 @@ check_visual_pos(void)
  * Make sure curwin->w_cursor is not on the NUL at the end of the line.
  * Allow it when in Visual mode and 'selection' is not "old".
  */
-    void
-adjust_cursor_col(void)
+    শূন্য
+adjust_cursor_col(শূন্য)
 {
-    if (curwin->w_cursor.col > 0
+    যদি (curwin->w_cursor.col > 0
 	    && (!VIsual_active || *p_sel == 'o')
 	    && gchar_cursor() == NUL)
 	--curwin->w_cursor.col;
@@ -667,14 +667,14 @@ adjust_cursor_col(void)
  * Adjust the cursor position if needed.
  * Return TRUE if the cursor was moved.
  */
-    int
+    পূর্ণাঙ্ক
 set_leftcol(colnr_T leftcol)
 {
-    int		retval = FALSE;
+    পূর্ণাঙ্ক		retval = FALSE;
 
     // Return quickly when there is no change.
-    if (curwin->w_leftcol == leftcol)
-	return FALSE;
+    যদি (curwin->w_leftcol == leftcol)
+	ঘূৰাই FALSE;
     curwin->w_leftcol = leftcol;
 
     changed_cline_bef_curs();
@@ -683,42 +683,42 @@ set_leftcol(colnr_T leftcol)
 
     // If the cursor is right or left of the screen, move it to last or first
     // visible character.
-    long siso = get_sidescrolloff_value();
-    if (curwin->w_virtcol > (colnr_T)(lastcol - siso))
+    long siso = get_sidescrolloff_মান();
+    যদি (curwin->w_virtcol > (colnr_T)(lastcol - siso))
     {
 	retval = TRUE;
 	coladvance((colnr_T)(lastcol - siso));
     }
-    else if (curwin->w_virtcol < curwin->w_leftcol + siso)
+    অন্যথা যদি (curwin->w_virtcol < curwin->w_leftcol + siso)
     {
 	retval = TRUE;
-	(void)coladvance((colnr_T)(curwin->w_leftcol + siso));
+	(শূন্য)coladvance((colnr_T)(curwin->w_leftcol + siso));
     }
 
     // If the start of the character under the cursor is not on the screen,
     // advance the cursor one more char.  If this fails (last char of the
     // line) adjust the scrolling.
     colnr_T	s, e;
-    getvvcol(curwin, &curwin->w_cursor, &s, NULL, &e, 0);
-    if (e > (colnr_T)lastcol)
+    getvvcol(curwin, &curwin->w_cursor, &s, রিক্ত, &e, 0);
+    যদি (e > (colnr_T)lastcol)
     {
 	retval = TRUE;
 	coladvance(s - 1);
     }
-    else if (s < curwin->w_leftcol)
+    অন্যথা যদি (s < curwin->w_leftcol)
     {
 	retval = TRUE;
-	if (coladvance(e + 1) == FAIL)	// there isn't another character
+	যদি (coladvance(e + 1) == FAIL)	// there isn't another character
 	{
 	    curwin->w_leftcol = s;	// adjust w_leftcol instead
 	    changed_cline_bef_curs();
 	}
     }
 
-    if (retval)
+    যদি (retval)
 	curwin->w_set_curswant = true;
     redraw_later(UPD_NOT_VALID);
-    return retval;
+    ঘূৰাই retval;
 }
 
 /*
@@ -728,49 +728,49 @@ set_leftcol(colnr_T leftcol)
  * "*option" is advanced to the next part.
  * The length is returned.
  */
-    int
+    পূর্ণাঙ্ক
 copy_option_part(
     char_u	**option,
     char_u	*buf,
-    int		maxlen,
-    char	*sep_chars)
+    পূর্ণাঙ্ক		maxlen,
+    ৱর্ণ	*sep_chars)
 {
-    int	    len = 0;
+    পূর্ণাঙ্ক	    len = 0;
     char_u  *p = *option;
 
     // skip '.' at start of option part, for 'suffixes'
-    if (*p == '.')
+    যদি (*p == '.')
 	buf[len++] = *p++;
-    while (*p != NUL && vim_strchr((char_u *)sep_chars, *p) == NULL)
+    যেতিয়ালৈ (*p != NUL && vim_strchr((char_u *)sep_chars, *p) == রিক্ত)
     {
 	/*
 	 * Skip backslash before a separator character and space.
 	 */
-	if (p[0] == '\\' && vim_strchr((char_u *)sep_chars, p[1]) != NULL)
+	যদি (p[0] == '\\' && vim_strchr((char_u *)sep_chars, p[1]) != রিক্ত)
 	    ++p;
-	if (len < maxlen - 1)
+	যদি (len < maxlen - 1)
 	    buf[len++] = *p;
 	++p;
     }
     buf[len] = NUL;
 
-    if (*p != NUL && *p != ',')	// skip non-standard separator
+    যদি (*p != NUL && *p != ',')	// skip non-standard separator
 	++p;
     p = skip_to_option_part(p);	// p points to next file name
 
     *option = p;
-    return len;
+    ঘূৰাই len;
 }
 
-#if !defined(HAVE_MEMSET) && !defined(PROTO)
-    void *
-vim_memset(void *ptr, int c, size_t size)
+#যদি !defined(HAVE_MEMSET) && !defined(PROTO)
+    শূন্য *
+vim_memset(শূন্য *ptr, পূর্ণাঙ্ক c, size_t size)
 {
-    char *p = ptr;
+    ৱর্ণ *p = ptr;
 
-    while (size-- > 0)
+    যেতিয়ালৈ (size-- > 0)
 	*p++ = c;
-    return ptr;
+    ঘূৰাই ptr;
 }
 #endif
 
@@ -778,10 +778,10 @@ vim_memset(void *ptr, int c, size_t size)
  * Vim has its own isspace() function, because on some machines isspace()
  * can't handle characters above 128.
  */
-    int
-vim_isspace(int x)
+    পূর্ণাঙ্ক
+vim_isspace(পূর্ণাঙ্ক x)
 {
-    return ((x >= 9 && x <= 13) || x == ' ');
+    ঘূৰাই ((x >= 9 && x <= 13) || x == ' ');
 }
 
 /************************************************************************
@@ -793,7 +793,7 @@ vim_isspace(int x)
  * Some useful tables.
  */
 
-static struct modmasktable
+স্থির সংরচনা modmasktable
 {
     short	mod_mask;	// Bit-mask for particular key modifier
     short	mod_flag;	// Bit(s) for particular key modifier
@@ -807,7 +807,7 @@ static struct modmasktable
     {MOD_MASK_MULTI_CLICK,	MOD_MASK_2CLICK,	(char_u)'2'},
     {MOD_MASK_MULTI_CLICK,	MOD_MASK_3CLICK,	(char_u)'3'},
     {MOD_MASK_MULTI_CLICK,	MOD_MASK_4CLICK,	(char_u)'4'},
-#if defined(MACOS_X) || defined(FEAT_GUI_GTK)
+#যদি defined(MACOS_X) || defined(FEAT_GUI_GTK)
     {MOD_MASK_CMD,		MOD_MASK_CMD,		(char_u)'D'},
 #endif
     // 'A' must be the last one
@@ -820,9 +820,9 @@ static struct modmasktable
  * Shifted key terminal codes and their unshifted equivalent.
  * Don't add mouse codes here, they are handled separately!
  */
-#define MOD_KEYS_ENTRY_SIZE 5
+#define MOD_চাবিগুলি_ENTRY_SIZE 5
 
-static char_u modifier_keys_table[] =
+স্থির char_u modifier_চাবিগুলি_table[] =
 {
 //  mod mask	    with modifier		without modifier
     MOD_MASK_SHIFT, '&', '9',			'@', '1',	// begin
@@ -833,15 +833,15 @@ static char_u modifier_keys_table[] =
     MOD_MASK_SHIFT, '*', '4',			'k', 'D',	// delete char
     MOD_MASK_SHIFT, '*', '5',			'k', 'L',	// delete line
     MOD_MASK_SHIFT, '*', '7',			'@', '7',	// end
-    MOD_MASK_CTRL,  KS_EXTRA, (int)KE_C_END,	'@', '7',	// end
+    MOD_MASK_CTRL,  KS_EXTRA, (পূর্ণাঙ্ক)KE_C_END,	'@', '7',	// end
     MOD_MASK_SHIFT, '*', '9',			'@', '9',	// exit
     MOD_MASK_SHIFT, '*', '0',			'@', '0',	// find
     MOD_MASK_SHIFT, '#', '1',			'%', '1',	// help
     MOD_MASK_SHIFT, '#', '2',			'k', 'h',	// home
-    MOD_MASK_CTRL,  KS_EXTRA, (int)KE_C_HOME,	'k', 'h',	// home
+    MOD_MASK_CTRL,  KS_EXTRA, (পূর্ণাঙ্ক)KE_C_HOME,	'k', 'h',	// home
     MOD_MASK_SHIFT, '#', '3',			'k', 'I',	// insert
     MOD_MASK_SHIFT, '#', '4',			'k', 'l',	// left arrow
-    MOD_MASK_CTRL,  KS_EXTRA, (int)KE_C_LEFT,	'k', 'l',	// left arrow
+    MOD_MASK_CTRL,  KS_EXTRA, (পূর্ণাঙ্ক)KE_C_বাম,	'k', 'l',	// left arrow
     MOD_MASK_SHIFT, '%', 'a',			'%', '3',	// message
     MOD_MASK_SHIFT, '%', 'b',			'%', '4',	// move
     MOD_MASK_SHIFT, '%', 'c',			'%', '5',	// next
@@ -851,74 +851,74 @@ static char_u modifier_keys_table[] =
     MOD_MASK_SHIFT, '%', 'g',			'%', '0',	// redo
     MOD_MASK_SHIFT, '%', 'h',			'&', '3',	// replace
     MOD_MASK_SHIFT, '%', 'i',			'k', 'r',	// right arr.
-    MOD_MASK_CTRL,  KS_EXTRA, (int)KE_C_RIGHT,	'k', 'r',	// right arr.
+    MOD_MASK_CTRL,  KS_EXTRA, (পূর্ণাঙ্ক)KE_C_ডান,	'k', 'r',	// right arr.
     MOD_MASK_SHIFT, '%', 'j',			'&', '5',	// resume
     MOD_MASK_SHIFT, '!', '1',			'&', '6',	// save
     MOD_MASK_SHIFT, '!', '2',			'&', '7',	// suspend
     MOD_MASK_SHIFT, '!', '3',			'&', '8',	// undo
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_UP,	'k', 'u',	// up arrow
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_DOWN,	'k', 'd',	// down arrow
+    MOD_MASK_SHIFT, KS_EXTRA, (পূর্ণাঙ্ক)KE_S_UP,	'k', 'u',	// up arrow
+    MOD_MASK_SHIFT, KS_EXTRA, (পূর্ণাঙ্ক)KE_S_DOWN,	'k', 'd',	// down arrow
 
 								// vt100 F1
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_XF1,	KS_EXTRA, (int)KE_XF1,
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_XF2,	KS_EXTRA, (int)KE_XF2,
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_XF3,	KS_EXTRA, (int)KE_XF3,
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_XF4,	KS_EXTRA, (int)KE_XF4,
+    MOD_MASK_SHIFT, KS_EXTRA, (পূর্ণাঙ্ক)KE_S_XF1,	KS_EXTRA, (পূর্ণাঙ্ক)KE_XF1,
+    MOD_MASK_SHIFT, KS_EXTRA, (পূর্ণাঙ্ক)KE_S_XF2,	KS_EXTRA, (পূর্ণাঙ্ক)KE_XF2,
+    MOD_MASK_SHIFT, KS_EXTRA, (পূর্ণাঙ্ক)KE_S_XF3,	KS_EXTRA, (পূর্ণাঙ্ক)KE_XF3,
+    MOD_MASK_SHIFT, KS_EXTRA, (পূর্ণাঙ্ক)KE_S_XF4,	KS_EXTRA, (পূর্ণাঙ্ক)KE_XF4,
 
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F1,	'k', '1',	// F1
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F2,	'k', '2',
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F3,	'k', '3',
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F4,	'k', '4',
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F5,	'k', '5',
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F6,	'k', '6',
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F7,	'k', '7',
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F8,	'k', '8',
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F9,	'k', '9',
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F10,	'k', ';',	// F10
+    MOD_MASK_SHIFT, KS_EXTRA, (পূর্ণাঙ্ক)KE_S_F1,	'k', '1',	// F1
+    MOD_MASK_SHIFT, KS_EXTRA, (পূর্ণাঙ্ক)KE_S_F2,	'k', '2',
+    MOD_MASK_SHIFT, KS_EXTRA, (পূর্ণাঙ্ক)KE_S_F3,	'k', '3',
+    MOD_MASK_SHIFT, KS_EXTRA, (পূর্ণাঙ্ক)KE_S_F4,	'k', '4',
+    MOD_MASK_SHIFT, KS_EXTRA, (পূর্ণাঙ্ক)KE_S_F5,	'k', '5',
+    MOD_MASK_SHIFT, KS_EXTRA, (পূর্ণাঙ্ক)KE_S_F6,	'k', '6',
+    MOD_MASK_SHIFT, KS_EXTRA, (পূর্ণাঙ্ক)KE_S_F7,	'k', '7',
+    MOD_MASK_SHIFT, KS_EXTRA, (পূর্ণাঙ্ক)KE_S_F8,	'k', '8',
+    MOD_MASK_SHIFT, KS_EXTRA, (পূর্ণাঙ্ক)KE_S_F9,	'k', '9',
+    MOD_MASK_SHIFT, KS_EXTRA, (পূর্ণাঙ্ক)KE_S_F10,	'k', ';',	// F10
 
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F11,	'F', '1',
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F12,	'F', '2',
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F13,	'F', '3',
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F14,	'F', '4',
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F15,	'F', '5',
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F16,	'F', '6',
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F17,	'F', '7',
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F18,	'F', '8',
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F19,	'F', '9',
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F20,	'F', 'A',
+    MOD_MASK_SHIFT, KS_EXTRA, (পূর্ণাঙ্ক)KE_S_F11,	'F', '1',
+    MOD_MASK_SHIFT, KS_EXTRA, (পূর্ণাঙ্ক)KE_S_F12,	'F', '2',
+    MOD_MASK_SHIFT, KS_EXTRA, (পূর্ণাঙ্ক)KE_S_F13,	'F', '3',
+    MOD_MASK_SHIFT, KS_EXTRA, (পূর্ণাঙ্ক)KE_S_F14,	'F', '4',
+    MOD_MASK_SHIFT, KS_EXTRA, (পূর্ণাঙ্ক)KE_S_F15,	'F', '5',
+    MOD_MASK_SHIFT, KS_EXTRA, (পূর্ণাঙ্ক)KE_S_F16,	'F', '6',
+    MOD_MASK_SHIFT, KS_EXTRA, (পূর্ণাঙ্ক)KE_S_F17,	'F', '7',
+    MOD_MASK_SHIFT, KS_EXTRA, (পূর্ণাঙ্ক)KE_S_F18,	'F', '8',
+    MOD_MASK_SHIFT, KS_EXTRA, (পূর্ণাঙ্ক)KE_S_F19,	'F', '9',
+    MOD_MASK_SHIFT, KS_EXTRA, (পূর্ণাঙ্ক)KE_S_F20,	'F', 'A',
 
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F21,	'F', 'B',
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F22,	'F', 'C',
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F23,	'F', 'D',
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F24,	'F', 'E',
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F25,	'F', 'F',
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F26,	'F', 'G',
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F27,	'F', 'H',
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F28,	'F', 'I',
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F29,	'F', 'J',
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F30,	'F', 'K',
+    MOD_MASK_SHIFT, KS_EXTRA, (পূর্ণাঙ্ক)KE_S_F21,	'F', 'B',
+    MOD_MASK_SHIFT, KS_EXTRA, (পূর্ণাঙ্ক)KE_S_F22,	'F', 'C',
+    MOD_MASK_SHIFT, KS_EXTRA, (পূর্ণাঙ্ক)KE_S_F23,	'F', 'D',
+    MOD_MASK_SHIFT, KS_EXTRA, (পূর্ণাঙ্ক)KE_S_F24,	'F', 'E',
+    MOD_MASK_SHIFT, KS_EXTRA, (পূর্ণাঙ্ক)KE_S_F25,	'F', 'F',
+    MOD_MASK_SHIFT, KS_EXTRA, (পূর্ণাঙ্ক)KE_S_F26,	'F', 'G',
+    MOD_MASK_SHIFT, KS_EXTRA, (পূর্ণাঙ্ক)KE_S_F27,	'F', 'H',
+    MOD_MASK_SHIFT, KS_EXTRA, (পূর্ণাঙ্ক)KE_S_F28,	'F', 'I',
+    MOD_MASK_SHIFT, KS_EXTRA, (পূর্ণাঙ্ক)KE_S_F29,	'F', 'J',
+    MOD_MASK_SHIFT, KS_EXTRA, (পূর্ণাঙ্ক)KE_S_F30,	'F', 'K',
 
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F31,	'F', 'L',
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F32,	'F', 'M',
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F33,	'F', 'N',
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F34,	'F', 'O',
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F35,	'F', 'P',
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F36,	'F', 'Q',
-    MOD_MASK_SHIFT, KS_EXTRA, (int)KE_S_F37,	'F', 'R',
+    MOD_MASK_SHIFT, KS_EXTRA, (পূর্ণাঙ্ক)KE_S_F31,	'F', 'L',
+    MOD_MASK_SHIFT, KS_EXTRA, (পূর্ণাঙ্ক)KE_S_F32,	'F', 'M',
+    MOD_MASK_SHIFT, KS_EXTRA, (পূর্ণাঙ্ক)KE_S_F33,	'F', 'N',
+    MOD_MASK_SHIFT, KS_EXTRA, (পূর্ণাঙ্ক)KE_S_F34,	'F', 'O',
+    MOD_MASK_SHIFT, KS_EXTRA, (পূর্ণাঙ্ক)KE_S_F35,	'F', 'P',
+    MOD_MASK_SHIFT, KS_EXTRA, (পূর্ণাঙ্ক)KE_S_F36,	'F', 'Q',
+    MOD_MASK_SHIFT, KS_EXTRA, (পূর্ণাঙ্ক)KE_S_F37,	'F', 'R',
 
 							    // TAB pseudo code
-    MOD_MASK_SHIFT, 'k', 'B',			KS_EXTRA, (int)KE_TAB,
+    MOD_MASK_SHIFT, 'k', 'B',			KS_EXTRA, (পূর্ণাঙ্ক)KE_TAB,
 
     NUL
 };
 
-static struct key_name_entry
+স্থির সংরচনা চাবি_name_entry
 {
-    int		enabled;	    // is this entry available (TRUE/FALSE)?
-    int		key;		    // special key code or ascii value
+    পূর্ণাঙ্ক		enabled;	    // is this entry available (TRUE/FALSE)?
+    পূর্ণাঙ্ক		চাবি;		    // special key code or ascii value
     string_T	name;		    // name of key
-    int		is_alt;		    // is an alternative name
-} key_names_table[] =
+    পূর্ণাঙ্ক		is_alt;		    // is an alternative name
+} চাবি_names_table[] =
 // Must be sorted by the 'name.string' field in ascending order because it is used by bsearch()!
 {
     {TRUE, K_BS, STR_LITERAL_INIT("BackSpace"), TRUE},
@@ -932,7 +932,7 @@ static struct key_name_entry
     {
 #ifdef FEAT_MOUSE_DEC
     TRUE,
-#else
+#অন্যথা
     FALSE,
 #endif
 	K_DEC_MOUSE, STR_LITERAL_INIT("DecMouse"), FALSE},
@@ -995,7 +995,7 @@ static struct key_name_entry
     {
 #ifdef FEAT_MOUSE_JSB
     TRUE,
-#else
+#অন্যথা
     FALSE,
 #endif
 	K_JSBTERM_MOUSE, STR_LITERAL_INIT("JsbMouse"), FALSE},
@@ -1022,7 +1022,7 @@ static struct key_name_entry
     {TRUE, K_KPAGEUP, STR_LITERAL_INIT("kPageUp"), FALSE},
     {TRUE, K_KPLUS, STR_LITERAL_INIT("kPlus"), FALSE},
     {TRUE, K_KPOINT, STR_LITERAL_INIT("kPoint"), FALSE},
-    {TRUE, K_LEFT, STR_LITERAL_INIT("Left"), FALSE},
+    {TRUE, K_বাম, STR_LITERAL_INIT("Left"), FALSE},
     {TRUE, K_LEFTDRAG, STR_LITERAL_INIT("LeftDrag"), FALSE},
     {TRUE, K_LEFTMOUSE, STR_LITERAL_INIT("LeftMouse"), FALSE},
     {TRUE, K_LEFTMOUSE_NM, STR_LITERAL_INIT("LeftMouseNM"), FALSE},
@@ -1041,7 +1041,7 @@ static struct key_name_entry
     {
 #ifdef FEAT_MOUSE_NET
     TRUE,
-#else
+#অন্যথা
     FALSE,
 #endif
 	K_NETTERM_MOUSE, STR_LITERAL_INIT("NetMouse"), FALSE},
@@ -1057,12 +1057,12 @@ static struct key_name_entry
     {
 #ifdef FEAT_MOUSE_PTERM
     TRUE,
-#else
+#অন্যথা
     FALSE,
 #endif
 	K_PTERM_MOUSE, STR_LITERAL_INIT("PtermMouse"), FALSE},
     {TRUE, CAR, STR_LITERAL_INIT("Return"), TRUE},
-    {TRUE, K_RIGHT, STR_LITERAL_INIT("Right"), FALSE},
+    {TRUE, K_ডান, STR_LITERAL_INIT("Right"), FALSE},
     {TRUE, K_RIGHTDRAG, STR_LITERAL_INIT("RightDrag"), FALSE},
     {TRUE, K_RIGHTMOUSE, STR_LITERAL_INIT("RightMouse"), FALSE},
     {TRUE, K_RIGHTRELEASE, STR_LITERAL_INIT("RightRelease"), FALSE},
@@ -1076,7 +1076,7 @@ static struct key_name_entry
     {
 #ifdef FEAT_EVAL
     TRUE,
-#else
+#অন্যথা
     FALSE,
 #endif
 	K_SNR, STR_LITERAL_INIT("SNR"), FALSE},
@@ -1088,7 +1088,7 @@ static struct key_name_entry
     {
 #ifdef FEAT_MOUSE_URXVT
     TRUE,
-#else
+#অন্যথা
     FALSE,
 #endif
 	K_URXVT_MOUSE, STR_LITERAL_INIT("UrxvtMouse"), FALSE},
@@ -1119,80 +1119,80 @@ static struct key_name_entry
  * Return the modifier mask bit (MOD_MASK_*) which corresponds to the given
  * modifier name ('S' for Shift, 'C' for Ctrl etc).
  */
-    static int
-name_to_mod_mask(int c)
+    স্থির পূর্ণাঙ্ক
+name_to_mod_mask(পূর্ণাঙ্ক c)
 {
-    int	    i;
+    পূর্ণাঙ্ক	    i;
 
     c = TOUPPER_ASC(c);
-    for (i = 0; mod_mask_table[i].mod_mask != 0; i++)
-	if (c == mod_mask_table[i].name)
-	    return mod_mask_table[i].mod_flag;
-    return 0;
+    বাবে (i = 0; mod_mask_table[i].mod_mask != 0; i++)
+	যদি (c == mod_mask_table[i].name)
+	    ঘূৰাই mod_mask_table[i].mod_flag;
+    ঘূৰাই 0;
 }
 
 /*
  * Check if if there is a special key code for "key" that includes the
  * modifiers specified.
  */
-    int
-simplify_key(int key, int *modifiers)
+    পূর্ণাঙ্ক
+simplify_চাবি(পূর্ণাঙ্ক চাবি, পূর্ণাঙ্ক *modifiers)
 {
-    int	    i;
-    int	    key0;
-    int	    key1;
+    পূর্ণাঙ্ক	    i;
+    পূর্ণাঙ্ক	    key0;
+    পূর্ণাঙ্ক	    key1;
 
-    if (!(*modifiers & (MOD_MASK_SHIFT | MOD_MASK_CTRL)))
-	return key;
+    যদি (!(*modifiers & (MOD_MASK_SHIFT | MOD_MASK_CTRL)))
+	ঘূৰাই চাবি;
 
     // TAB is a special case
-    if (key == TAB && (*modifiers & MOD_MASK_SHIFT))
+    যদি (চাবি == TAB && (*modifiers & MOD_MASK_SHIFT))
     {
 	*modifiers &= ~MOD_MASK_SHIFT;
-	return K_S_TAB;
+	ঘূৰাই K_S_TAB;
     }
-    key0 = KEY2TERMCAP0(key);
-    key1 = KEY2TERMCAP1(key);
-    for (i = 0; modifier_keys_table[i] != NUL; i += MOD_KEYS_ENTRY_SIZE)
+    key0 = KEY2TERMCAP0(চাবি);
+    key1 = KEY2TERMCAP1(চাবি);
+    বাবে (i = 0; modifier_চাবিগুলি_table[i] != NUL; i += MOD_চাবিগুলি_ENTRY_SIZE)
     {
-	if (key0 == modifier_keys_table[i + 3]
-		&& key1 == modifier_keys_table[i + 4]
-		&& (*modifiers & modifier_keys_table[i]))
+	যদি (key0 == modifier_চাবিগুলি_table[i + 3]
+		&& key1 == modifier_চাবিগুলি_table[i + 4]
+		&& (*modifiers & modifier_চাবিগুলি_table[i]))
 	{
-	    *modifiers &= ~modifier_keys_table[i];
-	    return TERMCAP2KEY(modifier_keys_table[i + 1],
-		    modifier_keys_table[i + 2]);
+	    *modifiers &= ~modifier_চাবিগুলি_table[i];
+	    ঘূৰাই TERMCAP2_চাবি(modifier_চাবিগুলি_table[i + 1],
+		    modifier_চাবিগুলি_table[i + 2]);
 	}
     }
-    return key;
+    ঘূৰাই চাবি;
 }
 
 /*
  * Change <xHome> to <Home>, <xUp> to <Up>, etc.
  */
-    int
-handle_x_keys(int key)
+    পূর্ণাঙ্ক
+handle_x_চাবিগুলি(পূর্ণাঙ্ক চাবি)
 {
-    switch (key)
+    ৱিকল্প (চাবি)
     {
-	case K_XUP:	return K_UP;
-	case K_XDOWN:	return K_DOWN;
-	case K_XLEFT:	return K_LEFT;
-	case K_XRIGHT:	return K_RIGHT;
-	case K_XHOME:	return K_HOME;
-	case K_ZHOME:	return K_HOME;
-	case K_XEND:	return K_END;
-	case K_ZEND:	return K_END;
-	case K_XF1:	return K_F1;
-	case K_XF2:	return K_F2;
-	case K_XF3:	return K_F3;
-	case K_XF4:	return K_F4;
-	case K_S_XF1:	return K_S_F1;
-	case K_S_XF2:	return K_S_F2;
-	case K_S_XF3:	return K_S_F3;
-	case K_S_XF4:	return K_S_F4;
+	পক্ষ K_XUP:	ঘূৰাই K_UP;
+	পক্ষ K_XDOWN:	ঘূৰাই K_DOWN;
+	পক্ষ K_XLEFT:	ঘূৰাই K_বাম;
+	পক্ষ K_XRIGHT:	ঘূৰাই K_ডান;
+	পক্ষ K_XHOME:	ঘূৰাই K_HOME;
+	পক্ষ K_ZHOME:	ঘূৰাই K_HOME;
+	পক্ষ K_XEND:	ঘূৰাই K_END;
+	পক্ষ K_ZEND:	ঘূৰাই K_END;
+	পক্ষ K_XF1:	ঘূৰাই K_F1;
+	পক্ষ K_XF2:	ঘূৰাই K_F2;
+	পক্ষ K_XF3:	ঘূৰাই K_F3;
+	পক্ষ K_XF4:	ঘূৰাই K_F4;
+	পক্ষ K_S_XF1:	ঘূৰাই K_S_F1;
+	পক্ষ K_S_XF2:	ঘূৰাই K_S_F2;
+	পক্ষ K_S_XF3:	ঘূৰাই K_S_F3;
+	পক্ষ K_S_XF4:	ঘূৰাই K_S_F4;
     }
-    return key;
+    ঘূৰাই চাবি;
 }
 
 /*
@@ -1200,55 +1200,55 @@ handle_x_keys(int key)
  * modifiers are down.
  */
     char_u *
-get_special_key_name(int c, int modifiers)
+get_special_চাবি_name(পূর্ণাঙ্ক c, পূর্ণাঙ্ক modifiers)
 {
-    static char_u string[MAX_KEY_NAME_LEN + 1];
-    int	    i, idx, len;
-    int	    table_idx;
+    স্থির char_u string[MAX_চাবি_NAME_LEN + 1];
+    পূর্ণাঙ্ক	    i, idx, len;
+    পূর্ণাঙ্ক	    table_idx;
 
     string[0] = '<';
     idx = 1;
 
     // Key that stands for a normal character.
-    if (IS_SPECIAL(c) && KEY2TERMCAP0(c) == KS_KEY)
+    যদি (IS_SPECIAL(c) && KEY2TERMCAP0(c) == KS_চাবি)
 	c = KEY2TERMCAP1(c);
 
     /*
      * Translate shifted special keys into unshifted keys and set modifier.
      * Same for CTRL and ALT modifiers.
      */
-    if (IS_SPECIAL(c))
+    যদি (IS_SPECIAL(c))
     {
-	for (i = 0; modifier_keys_table[i] != 0; i += MOD_KEYS_ENTRY_SIZE)
-	    if (       KEY2TERMCAP0(c) == (int)modifier_keys_table[i + 1]
-		    && (int)KEY2TERMCAP1(c) == (int)modifier_keys_table[i + 2])
+	বাবে (i = 0; modifier_চাবিগুলি_table[i] != 0; i += MOD_চাবিগুলি_ENTRY_SIZE)
+	    যদি (       KEY2TERMCAP0(c) == (পূর্ণাঙ্ক)modifier_চাবিগুলি_table[i + 1]
+		    && (পূর্ণাঙ্ক)KEY2TERMCAP1(c) == (পূর্ণাঙ্ক)modifier_চাবিগুলি_table[i + 2])
 	    {
-		modifiers |= modifier_keys_table[i];
-		c = TERMCAP2KEY(modifier_keys_table[i + 3],
-						   modifier_keys_table[i + 4]);
-		break;
+		modifiers |= modifier_চাবিগুলি_table[i];
+		c = TERMCAP2_চাবি(modifier_চাবিগুলি_table[i + 3],
+						   modifier_চাবিগুলি_table[i + 4]);
+		ভঙ্গ;
 	    }
     }
 
     // try to find the key in the special key table
-    table_idx = find_special_key_in_table(c);
+    table_idx = find_special_চাবি_in_table(c);
 
     /*
      * When not a known special key, and not a printable character, try to
      * extract modifiers.
      */
-    if (c > 0 && (*mb_char2len)(c) == 1)
+    যদি (c > 0 && (*mb_char2len)(c) == 1)
     {
-	if (table_idx < 0
+	যদি (table_idx < 0
 		&& (!vim_isprintc(c) || (c & 0x7f) == ' ')
 		&& (c & 0x80))
 	{
 	    c &= 0x7f;
 	    modifiers |= MOD_MASK_ALT;
 	    // try again, to find the un-alted key in the special key table
-	    table_idx = find_special_key_in_table(c);
+	    table_idx = find_special_চাবি_in_table(c);
 	}
-	if (table_idx < 0 && !vim_isprintc(c) && c < ' ')
+	যদি (table_idx < 0 && !vim_isprintc(c) && c < ' ')
 	{
 	    c += '@';
 	    modifiers |= MOD_MASK_CTRL;
@@ -1256,17 +1256,17 @@ get_special_key_name(int c, int modifiers)
     }
 
     // translate the modifier into a string
-    for (i = 0; mod_mask_table[i].name != 'A'; i++)
-	if ((modifiers & mod_mask_table[i].mod_mask)
+    বাবে (i = 0; mod_mask_table[i].name != 'A'; i++)
+	যদি ((modifiers & mod_mask_table[i].mod_mask)
 						== mod_mask_table[i].mod_flag)
 	{
 	    string[idx++] = mod_mask_table[i].name;
 	    string[idx++] = (char_u)'-';
 	}
 
-    if (table_idx < 0)		// unknown special key, may output t_xx
+    যদি (table_idx < 0)		// unknown special key, may output t_xx
     {
-	if (IS_SPECIAL(c))
+	যদি (IS_SPECIAL(c))
 	{
 	    string[idx++] = 't';
 	    string[idx++] = '_';
@@ -1274,37 +1274,37 @@ get_special_key_name(int c, int modifiers)
 	    string[idx++] = KEY2TERMCAP1(c);
 	}
 	// Not a special key, only modifiers, output directly
-	else
+	অন্যথা
 	{
 	    len = (*mb_char2len)(c);
-	    if (len == 1 && vim_isprintc(c))
+	    যদি (len == 1 && vim_isprintc(c))
 		string[idx++] = c;
-	    else if (has_mbyte && len > 1)
+	    অন্যথা যদি (has_mbyte && len > 1)
 		idx += (*mb_char2bytes)(c, string + idx);
-	    else
+	    অন্যথা
 	    {
 		char_u	*s = transchar(c);
-		while (*s)
+		যেতিয়ালৈ (*s)
 		    string[idx++] = *s++;
 	    }
 	}
     }
-    else		// use name of special key
+    অন্যথা		// use name of special key
     {
 	string_T    *s;
 
-	s = &key_names_table[table_idx].name;
+	s = &চাবি_names_table[table_idx].name;
 
-	if (s->length + idx + 2 <= MAX_KEY_NAME_LEN)
+	যদি (s->length + idx + 2 <= MAX_চাবি_NAME_LEN)
 	{
 	    STRCPY(string + idx, s->string);
-	    idx += (int)s->length;
+	    idx += (পূর্ণাঙ্ক)s->length;
 	}
     }
     string[idx++] = '>';
     string[idx] = NUL;
 
-    return string;
+    ঘূৰাই string;
 }
 
 /*
@@ -1313,22 +1313,22 @@ get_special_key_name(int c, int modifiers)
  * If there is a match, "srcp" is advanced to after the <> name.
  * "dst[]" must be big enough to hold the result (up to six characters)!
  */
-    int
+    পূর্ণাঙ্ক
 trans_special(
     char_u	**srcp,
     char_u	*dst,
-    int		flags,		// FSK_ values
-    int		escape_ks,	// escape K_SPECIAL bytes in the character
-    int		*did_simplify)  // FSK_SIMPLIFY and found <C-H> or <A-x>
+    পূর্ণাঙ্ক		flags,		// FSK_ values
+    পূর্ণাঙ্ক		escape_ks,	// escape K_SPECIAL bytes in the character
+    পূর্ণাঙ্ক		*did_simplify)  // FSK_SIMPLIFY and found <C-H> or <A-x>
 {
-    int		modifiers = 0;
-    int		key;
+    পূর্ণাঙ্ক		modifiers = 0;
+    পূর্ণাঙ্ক		চাবি;
 
-    key = find_special_key(srcp, &modifiers, flags, did_simplify);
-    if (key == 0)
-	return 0;
+    চাবি = find_special_চাবি(srcp, &modifiers, flags, did_simplify);
+    যদি (চাবি == 0)
+	ঘূৰাই 0;
 
-    return special_to_buf(key, modifiers, escape_ks, dst);
+    ঘূৰাই special_to_buf(চাবি, modifiers, escape_ks, dst);
 }
 
 /*
@@ -1338,33 +1338,33 @@ trans_special(
  * The sequence is not NUL terminated.
  * This is how characters in a string are encoded.
  */
-    int
-special_to_buf(int key, int modifiers, int escape_ks, char_u *dst)
+    পূর্ণাঙ্ক
+special_to_buf(পূর্ণাঙ্ক চাবি, পূর্ণাঙ্ক modifiers, পূর্ণাঙ্ক escape_ks, char_u *dst)
 {
-    int		dlen = 0;
+    পূর্ণাঙ্ক		dlen = 0;
 
     // Put the appropriate modifier in a string
-    if (modifiers != 0)
+    যদি (modifiers != 0)
     {
 	dst[dlen++] = K_SPECIAL;
 	dst[dlen++] = KS_MODIFIER;
 	dst[dlen++] = modifiers;
     }
 
-    if (IS_SPECIAL(key))
+    যদি (IS_SPECIAL(চাবি))
     {
 	dst[dlen++] = K_SPECIAL;
-	dst[dlen++] = KEY2TERMCAP0(key);
-	dst[dlen++] = KEY2TERMCAP1(key);
+	dst[dlen++] = KEY2TERMCAP0(চাবি);
+	dst[dlen++] = KEY2TERMCAP1(চাবি);
     }
-    else if (escape_ks)
-	dlen = (int)(add_char2buf(key, dst + dlen) - dst);
-    else if (has_mbyte)
-	dlen += (*mb_char2bytes)(key, dst + dlen);
-    else
-	dst[dlen++] = key;
+    অন্যথা যদি (escape_ks)
+	dlen = (পূর্ণাঙ্ক)(add_char2buf(চাবি, dst + dlen) - dst);
+    অন্যথা যদি (has_mbyte)
+	dlen += (*mb_char2bytes)(চাবি, dst + dlen);
+    অন্যথা
+	dst[dlen++] = চাবি;
 
-    return dlen;
+    ঘূৰাই dlen;
 }
 
 /*
@@ -1373,81 +1373,81 @@ special_to_buf(int key, int modifiers, int escape_ks, char_u *dst)
  * "srcp" is advanced to after the <> name.
  * returns 0 if there is no match.
  */
-    int
-find_special_key(
+    পূর্ণাঙ্ক
+find_special_চাবি(
     char_u	**srcp,
-    int		*modp,
-    int		flags,		// FSK_ values
-    int		*did_simplify)  // found <C-H> or <A-x>
+    পূর্ণাঙ্ক		*modp,
+    পূর্ণাঙ্ক		flags,		// FSK_ values
+    পূর্ণাঙ্ক		*did_simplify)  // found <C-H> or <A-x>
 {
     char_u	*last_dash;
     char_u	*end_of_name;
     char_u	*src;
     char_u	*bp;
-    int		in_string = flags & FSK_IN_STRING;
-    int		modifiers;
-    int		bit;
-    int		key;
+    পূর্ণাঙ্ক		in_string = flags & FSK_IN_STRING;
+    পূর্ণাঙ্ক		modifiers;
+    পূর্ণাঙ্ক		bit;
+    পূর্ণাঙ্ক		চাবি;
     uvarnumber_T	n;
-    int		l;
+    পূর্ণাঙ্ক		l;
 
     src = *srcp;
-    if (src[0] != '<')
-	return 0;
-    if (src[1] == '*')	    // <*xxx>: do not simplify
+    যদি (src[0] != '<')
+	ঘূৰাই 0;
+    যদি (src[1] == '*')	    // <*xxx>: do not simplify
 	++src;
 
     // Find end of modifier list
     last_dash = src;
-    for (bp = src + 1; *bp == '-' || vim_isNormalIDc(*bp); bp++)
+    বাবে (bp = src + 1; *bp == '-' || vim_isNormalIDc(*bp); bp++)
     {
-	if (*bp == '-')
+	যদি (*bp == '-')
 	{
 	    last_dash = bp;
-	    if (bp[1] != NUL)
+	    যদি (bp[1] != NUL)
 	    {
-		if (has_mbyte)
+		যদি (has_mbyte)
 		    l = mb_ptr2len(bp + 1);
-		else
+		অন্যথা
 		    l = 1;
 		// Anything accepted, like <C-?>.
 		// <C-"> or <M-"> are not special in strings as " is
 		// the string delimiter. With a backslash it works: <M-\">
-		if (!(in_string && bp[1] == '"') && bp[l + 1] == '>')
+		যদি (!(in_string && bp[1] == '"') && bp[l + 1] == '>')
 		    bp += l;
-		else if (in_string && bp[1] == '\\' && bp[2] == '"'
+		অন্যথা যদি (in_string && bp[1] == '\\' && bp[2] == '"'
 							   && bp[3] == '>')
 		    bp += 2;
 	    }
 	}
-	if (bp[0] == 't' && bp[1] == '_' && bp[2] && bp[3])
+	যদি (bp[0] == 't' && bp[1] == '_' && bp[2] && bp[3])
 	    bp += 3;	// skip t_xx, xx may be '-' or '>'
-	else if (STRNICMP(bp, "char-", 5) == 0)
+	অন্যথা যদি (STRNICMP(bp, "char-", 5) == 0)
 	{
-	    vim_str2nr(bp + 5, NULL, &l, STR2NR_ALL, NULL, NULL, 0, TRUE, NULL);
-	    if (l == 0)
+	    vim_str2nr(bp + 5, রিক্ত, &l, STR2NR_ALL, রিক্ত, রিক্ত, 0, TRUE, রিক্ত);
+	    যদি (l == 0)
 	    {
 		emsg(_(e_invalid_argument));
-		return 0;
+		ঘূৰাই 0;
 	    }
 	    bp += l + 5;
-	    break;
+	    ভঙ্গ;
 	}
     }
 
-    if (*bp == '>')	// found matching '>'
+    যদি (*bp == '>')	// found matching '>'
     {
 	end_of_name = bp + 1;
 
 	// Which modifiers are given?
 	modifiers = 0x0;
-	for (bp = src + 1; bp < last_dash; bp++)
+	বাবে (bp = src + 1; bp < last_dash; bp++)
 	{
-	    if (*bp != '-')
+	    যদি (*bp != '-')
 	    {
 		bit = name_to_mod_mask(*bp);
-		if (bit == 0x0)
-		    break;	// Illegal modifier name
+		যদি (bit == 0x0)
+		    ভঙ্গ;	// Illegal modifier name
 		modifiers |= bit;
 	    }
 	}
@@ -1455,39 +1455,39 @@ find_special_key(
 	/*
 	 * Legal modifier name.
 	 */
-	if (bp >= last_dash)
+	যদি (bp >= last_dash)
 	{
-	    if (STRNICMP(last_dash + 1, "char-", 5) == 0
+	    যদি (STRNICMP(last_dash + 1, "char-", 5) == 0
 						 && VIM_ISDIGIT(last_dash[6]))
 	    {
 		// <Char-123> or <Char-033> or <Char-0x33>
-		vim_str2nr(last_dash + 6, NULL, &l, STR2NR_ALL, NULL,
-							    &n, 0, TRUE, NULL);
-		if (l == 0)
+		vim_str2nr(last_dash + 6, রিক্ত, &l, STR2NR_ALL, রিক্ত,
+							    &n, 0, TRUE, রিক্ত);
+		যদি (l == 0)
 		{
 		    emsg(_(e_invalid_argument));
-		    return 0;
+		    ঘূৰাই 0;
 		}
-		key = (int)n;
+		চাবি = (পূর্ণাঙ্ক)n;
 	    }
-	    else
+	    অন্যথা
 	    {
-		int off = 1;
+		পূর্ণাঙ্ক off = 1;
 
 		// Modifier with single letter, or special key name.
-		if (in_string && last_dash[1] == '\\' && last_dash[2] == '"')
+		যদি (in_string && last_dash[1] == '\\' && last_dash[2] == '"')
 		    off = 2;
-		if (has_mbyte)
+		যদি (has_mbyte)
 		    l = mb_ptr2len(last_dash + off);
-		else
+		অন্যথা
 		    l = 1;
-		if (modifiers != 0 && last_dash[l + off] == '>')
-		    key = PTR2CHAR(last_dash + off);
-		else
+		যদি (modifiers != 0 && last_dash[l + off] == '>')
+		    চাবি = PTR2CHAR(last_dash + off);
+		অন্যথা
 		{
-		    key = get_special_key_code(last_dash + off);
-		    if (!(flags & FSK_KEEP_X_KEY))
-			key = handle_x_keys(key);
+		    চাবি = get_special_চাবি_code(last_dash + off);
+		    যদি (!(flags & FSK_KEEP_X_চাবি))
+			চাবি = handle_x_চাবিগুলি(চাবি);
 		}
 	    }
 
@@ -1495,23 +1495,23 @@ find_special_key(
 	     * get_special_key_code() may return NUL for invalid
 	     * special key name.
 	     */
-	    if (key != NUL)
+	    যদি (চাবি != NUL)
 	    {
 		/*
 		 * Only use a modifier when there is no special key code that
 		 * includes the modifier.
 		 */
-		key = simplify_key(key, &modifiers);
+		চাবি = simplify_চাবি(চাবি, &modifiers);
 
-		if ((flags & FSK_KEYCODE) == 0)
+		যদি ((flags & FSK_KEYCODE) == 0)
 		{
 		    // don't want keycode, use single byte code
-		    if (key == K_BS)
-			key = BS;
-		    else if (key == K_DEL || key == K_KDEL)
-			key = DEL;
+		    যদি (চাবি == K_BS)
+			চাবি = BS;
+		    অন্যথা যদি (চাবি == K_DEL || চাবি == K_KDEL)
+			চাবি = DEL;
 		}
-		else if (key == 27
+		অন্যথা যদি (চাবি == 27
 			&& (flags & FSK_FROM_PART) != 0
 			&& (kitty_protocol_state == KKPS_ENABLED
 			    || kitty_protocol_state == KKPS_DISABLED))
@@ -1520,27 +1520,27 @@ find_special_key(
 		    // Esc character.  For the simplified keys use the Esc
 		    // character and set did_simplify, then in the
 		    // non-simplified keys use K_ESC.
-		    if ((flags & FSK_SIMPLIFY) != 0)
+		    যদি ((flags & FSK_SIMPLIFY) != 0)
 		    {
-			if (did_simplify != NULL)
+			যদি (did_simplify != রিক্ত)
 			    *did_simplify = TRUE;
 		    }
-		    else
-			key = K_ESC;
+		    অন্যথা
+			চাবি = K_ESC;
 		}
 
 		// Normal Key with modifier: Try to make a single byte code.
-		if (!IS_SPECIAL(key))
-		    key = extract_modifiers(key, &modifiers,
+		যদি (!IS_SPECIAL(চাবি))
+		    চাবি = extract_modifiers(চাবি, &modifiers,
 					   flags & FSK_SIMPLIFY, did_simplify);
 
 		*modp = modifiers;
 		*srcp = end_of_name;
-		return key;
+		ঘূৰাই চাবি;
 	    }
 	}
     }
-    return 0;
+    ঘূৰাই 0;
 }
 
 
@@ -1554,33 +1554,33 @@ find_special_key(
  * use "H".
  * Returns the possibly adjusted key.
  */
-    int
-may_adjust_key_for_ctrl(int modifiers, int key)
+    পূর্ণাঙ্ক
+may_adjust_চাবি_for_ctrl(পূর্ণাঙ্ক modifiers, পূর্ণাঙ্ক চাবি)
 {
-    if ((modifiers & MOD_MASK_CTRL) == 0)
-	return key;
+    যদি ((modifiers & MOD_MASK_CTRL) == 0)
+	ঘূৰাই চাবি;
 
-    if (ASCII_ISALPHA(key))
+    যদি (ASCII_ISALPHA(চাবি))
     {
 #ifdef FEAT_TERMINAL
-	check_no_reduce_keys();  // may update the no_reduce_keys flag
+	check_no_reduce_চাবিগুলি();  // may update the no_reduce_keys flag
 #endif
-	return no_reduce_keys == 0 ? TOUPPER_ASC(key) : key;
+	ঘূৰাই no_reduce_চাবিগুলি == 0 ? TOUPPER_ASC(চাবি) : চাবি;
     }
-    if (key == '2')
-	return '@';
-    if (key == '6')
-	return '^';
-    if (key == '-')
-	return '_';
+    যদি (চাবি == '2')
+	ঘূৰাই '@';
+    যদি (চাবি == '6')
+	ঘূৰাই '^';
+    যদি (চাবি == '-')
+	ঘূৰাই '_';
 
     // On a Belgian keyboard AltGr $ is ']', on other keyboards '$' can only be
     // obtained with Shift.  Assume that '$' without shift implies a Belgian
     // keyboard, where CTRL-$ means CTRL-].
-    if (key == '$' && (modifiers & MOD_MASK_SHIFT) == 0)
-	return ']';
+    যদি (চাবি == '$' && (modifiers & MOD_MASK_SHIFT) == 0)
+	ঘূৰাই ']';
 
-    return key;
+    ঘূৰাই চাবি;
 }
 
 /*
@@ -1591,27 +1591,27 @@ may_adjust_key_for_ctrl(int modifiers, int key)
  * This includes all printable ASCII characters except a-z.
  * Digits are included because with AZERTY the Shift key is used to get them.
  */
-    int
-may_remove_shift_modifier(int modifiers, int key)
+    পূর্ণাঙ্ক
+may_remove_shift_modifier(পূর্ণাঙ্ক modifiers, পূর্ণাঙ্ক চাবি)
 {
-    if ((modifiers == MOD_MASK_SHIFT
+    যদি ((modifiers == MOD_MASK_SHIFT
 		|| modifiers == (MOD_MASK_SHIFT | MOD_MASK_ALT)
 #ifdef FEAT_GUI_GTK
 		|| modifiers == (MOD_MASK_SHIFT | MOD_MASK_CMD)
 #endif
 		|| modifiers == (MOD_MASK_SHIFT | MOD_MASK_META))
-	    && ((key >= '!' && key <= '/')
-		|| (key >= ':' && key <= 'Z')
-		|| vim_isdigit(key)
-		|| (key >= '[' && key <= '`')
-		|| (key >= '{' && key <= '~')))
-	return modifiers & ~MOD_MASK_SHIFT;
+	    && ((চাবি >= '!' && চাবি <= '/')
+		|| (চাবি >= ':' && চাবি <= 'Z')
+		|| vim_isdigit(চাবি)
+		|| (চাবি >= '[' && চাবি <= '`')
+		|| (চাবি >= '{' && চাবি <= '~')))
+	ঘূৰাই modifiers & ~MOD_MASK_SHIFT;
 
-    if (modifiers == (MOD_MASK_SHIFT | MOD_MASK_CTRL)
-		&& (key == '{' || key == '}' || key == '|'))
-	return modifiers & ~MOD_MASK_SHIFT;
+    যদি (modifiers == (MOD_MASK_SHIFT | MOD_MASK_CTRL)
+		&& (চাবি == '{' || চাবি == '}' || চাবি == '|'))
+	ঘূৰাই modifiers & ~MOD_MASK_SHIFT;
 
-    return modifiers;
+    ঘূৰাই modifiers;
 }
 
 /*
@@ -1621,73 +1621,73 @@ may_remove_shift_modifier(int modifiers, int key)
  * When "simplify" is TRUE and Ctrl or Alt is removed from modifiers set
  * "did_simplify" when it's not NULL.
  */
-    int
-extract_modifiers(int key, int *modp, int simplify, int *did_simplify)
+    পূর্ণাঙ্ক
+extract_modifiers(পূর্ণাঙ্ক চাবি, পূর্ণাঙ্ক *modp, পূর্ণাঙ্ক simplify, পূর্ণাঙ্ক *did_simplify)
 {
-    int	modifiers = *modp;
+    পূর্ণাঙ্ক	modifiers = *modp;
 
 #ifdef MACOS_X
     // Command-key really special, no fancynest
-    if (!(modifiers & MOD_MASK_CMD))
+    যদি (!(modifiers & MOD_MASK_CMD))
 #endif
-    if ((modifiers & MOD_MASK_SHIFT) && ASCII_ISALPHA(key))
+    যদি ((modifiers & MOD_MASK_SHIFT) && ASCII_ISALPHA(চাবি))
     {
-	key = TOUPPER_ASC(key);
+	চাবি = TOUPPER_ASC(চাবি);
 	// With <C-S-a> we keep the shift modifier.
 	// With <S-a>, <A-S-a> and <S-A> we don't keep the shift modifier.
-	if (simplify || modifiers == MOD_MASK_SHIFT
+	যদি (simplify || modifiers == MOD_MASK_SHIFT
 		|| modifiers == (MOD_MASK_SHIFT | MOD_MASK_ALT)
 		|| modifiers == (MOD_MASK_SHIFT | MOD_MASK_META))
 	    modifiers &= ~MOD_MASK_SHIFT;
     }
 
     // <C-H> and <C-h> mean the same thing, always use "H"
-    if ((modifiers & MOD_MASK_CTRL) && ASCII_ISALPHA(key))
-	key = TOUPPER_ASC(key);
+    যদি ((modifiers & MOD_MASK_CTRL) && ASCII_ISALPHA(চাবি))
+	চাবি = TOUPPER_ASC(চাবি);
 
-    if (simplify && (modifiers & MOD_MASK_CTRL)
-	    && ((key >= '?' && key <= '_') || ASCII_ISALPHA(key)))
+    যদি (simplify && (modifiers & MOD_MASK_CTRL)
+	    && ((চাবি >= '?' && চাবি <= '_') || ASCII_ISALPHA(চাবি)))
     {
-	key = Ctrl_chr(key);
+	চাবি = Ctrl_chr(চাবি);
 	modifiers &= ~MOD_MASK_CTRL;
 	// <C-@> is <Nul>
-	if (key == NUL)
-	    key = K_ZERO;
-	if (did_simplify != NULL)
+	যদি (চাবি == NUL)
+	    চাবি = K_ZERO;
+	যদি (did_simplify != রিক্ত)
 	    *did_simplify = TRUE;
     }
 
 #ifdef MACOS_X
     // Command-key really special, no fancynest
-    if (!(modifiers & MOD_MASK_CMD))
+    যদি (!(modifiers & MOD_MASK_CMD))
 #endif
-    if (simplify && (modifiers & MOD_MASK_ALT) && key < 0x80
+    যদি (simplify && (modifiers & MOD_MASK_ALT) && চাবি < 0x80
 	    && !enc_dbcs)		// avoid creating a lead byte
     {
-	key |= 0x80;
+	চাবি |= 0x80;
 	modifiers &= ~MOD_MASK_ALT;	// remove the META modifier
-	if (did_simplify != NULL)
+	যদি (did_simplify != রিক্ত)
 	    *did_simplify = TRUE;
     }
 
     *modp = modifiers;
-    return key;
+    ঘূৰাই চাবি;
 }
 
 /*
  * Try to find key "c" in the special key table.
  * Return the index when found, -1 when not found.
  */
-    int
-find_special_key_in_table(int c)
+    পূর্ণাঙ্ক
+find_special_চাবি_in_table(পূর্ণাঙ্ক c)
 {
-    int	    i;
+    পূর্ণাঙ্ক	    i;
 
-    for (i = 0; i < (int)ARRAY_LENGTH(key_names_table); i++)
-	if (c == key_names_table[i].key && !key_names_table[i].is_alt)
-	    return key_names_table[i].enabled ? i : -1;
+    বাবে (i = 0; i < (পূর্ণাঙ্ক)ARRAY_LENGTH(চাবি_names_table); i++)
+	যদি (c == চাবি_names_table[i].চাবি && !চাবি_names_table[i].is_alt)
+	    ঘূৰাই চাবি_names_table[i].enabled ? i : -1;
 
-    return -1;
+    ঘূৰাই -1;
 }
 
 
@@ -1700,38 +1700,38 @@ find_special_key_in_table(int c)
  * 'LeftMouse'.
  * These characters are identified by vim_isNormalIDc().
  */
-    static int
-cmp_key_name_entry(const void *a, const void *b)
+    স্থির পূর্ণাঙ্ক
+cmp_চাবি_name_entry(ধ্রুৱ শূন্য *a, ধ্রুৱ শূন্য *b)
 {
-    char_u  *p1 = ((struct key_name_entry *)a)->name.string;
-    char_u  *p2 = ((struct key_name_entry *)b)->name.string;
-    int	    result = 0;
+    char_u  *p1 = ((সংরচনা চাবি_name_entry *)a)->name.string;
+    char_u  *p2 = ((সংরচনা চাবি_name_entry *)b)->name.string;
+    পূর্ণাঙ্ক	    result = 0;
 
-    if (p1 == p2)
-	return 0;
+    যদি (p1 == p2)
+	ঘূৰাই 0;
 
-    while (vim_isNormalIDc(*p1) && *p2 != NUL)
+    যেতিয়ালৈ (vim_isNormalIDc(*p1) && *p2 != NUL)
     {
-	if ((result = TOLOWER_ASC(*p1) - TOLOWER_ASC(*p2)) != 0)
-	    break;
+	যদি ((result = TOLOWER_ASC(*p1) - TOLOWER_ASC(*p2)) != 0)
+	    ভঙ্গ;
 	++p1;
 	++p2;
     }
 
-    if (result == 0)
+    যদি (result == 0)
     {
-	if (*p2 == NUL)
+	যদি (*p2 == NUL)
 	{
-	    if (vim_isNormalIDc(*p1))
+	    যদি (vim_isNormalIDc(*p1))
 		result = 1;
 	}
-	else
+	অন্যথা
 	{
 	    result = -1;
 	}
     }
 
-    return result;
+    ঘূৰাই result;
 }
 
 /*
@@ -1741,99 +1741,99 @@ cmp_key_name_entry(const void *a, const void *b)
  * termcap name.
  * Return the key code, or 0 if not found.
  */
-    int
-get_special_key_code(char_u *name)
+    পূর্ণাঙ্ক
+get_special_চাবি_code(char_u *name)
 {
     /*
      * If it's <t_xx> we get the code for xx from the termcap
      */
-    if (name[0] == 't' && name[1] == '_' && name[2] != NUL && name[3] != NUL)
+    যদি (name[0] == 't' && name[1] == '_' && name[2] != NUL && name[3] != NUL)
     {
 	char_u  string[3];
 
 	string[0] = name[2];
 	string[1] = name[3];
 	string[2] = NUL;
-	if (add_termcap_entry(string, FALSE) == OK)
-	    return TERMCAP2KEY(name[2], name[3]);
+	যদি (add_termcap_entry(string, FALSE) == OK)
+	    ঘূৰাই TERMCAP2_চাবি(name[2], name[3]);
     }
-    else
+    অন্যথা
     {
-	struct key_name_entry	target;
-	struct key_name_entry	*entry;
+	সংরচনা চাবি_name_entry	target;
+	সংরচনা চাবি_name_entry	*entry;
 
 	target.enabled = TRUE;
-	target.key = 0;
+	target.চাবি = 0;
 	target.name.string = name;
 	target.name.length = 0;
 
-	entry = (struct key_name_entry *)bsearch(
+	entry = (সংরচনা চাবি_name_entry *)bsearch(
 	    &target,
-	    &key_names_table,
-	    ARRAY_LENGTH(key_names_table),
-	    sizeof(key_names_table[0]),
-	    cmp_key_name_entry);
-	if (entry != NULL && entry->enabled)
+	    &চাবি_names_table,
+	    ARRAY_LENGTH(চাবি_names_table),
+	    পরিমাণ(চাবি_names_table[0]),
+	    cmp_চাবি_name_entry);
+	যদি (entry != রিক্ত && entry->enabled)
 	{
-	    int key = entry->key;
+	    পূর্ণাঙ্ক চাবি = entry->চাবি;
 	    // Both TAB and K_TAB have name "Tab", and it's unspecified which
 	    // one bsearch() will return.  TAB is the expected one.
-	    return key == K_TAB ? TAB : key;
+	    ঘূৰাই চাবি == K_TAB ? TAB : চাবি;
 	}
     }
 
-    return 0;
+    ঘূৰাই 0;
 }
 
     char_u *
-get_key_name(int i)
+get_চাবি_name(পূর্ণাঙ্ক i)
 {
-    if (i < 0 || i >= (int)ARRAY_LENGTH(key_names_table))
-	return NULL;
+    যদি (i < 0 || i >= (পূর্ণাঙ্ক)ARRAY_LENGTH(চাবি_names_table))
+	ঘূৰাই রিক্ত;
 
-    return key_names_table[i].name.string;
+    ঘূৰাই চাবি_names_table[i].name.string;
 }
 
 /*
  * Return the current end-of-line type: EOL_DOS, EOL_UNIX or EOL_MAC.
  */
-    int
+    পূর্ণাঙ্ক
 get_fileformat(buf_T *buf)
 {
-    int		c = *buf->b_p_ff;
+    পূর্ণাঙ্ক		c = *buf->b_p_ff;
 
-    if (buf->b_p_bin || c == 'u')
-	return EOL_UNIX;
-    if (c == 'm')
-	return EOL_MAC;
-    return EOL_DOS;
+    যদি (buf->b_p_bin || c == 'u')
+	ঘূৰাই EOL_UNIX;
+    যদি (c == 'm')
+	ঘূৰাই EOL_MAC;
+    ঘূৰাই EOL_DOS;
 }
 
 /*
  * Like get_fileformat(), but override 'fileformat' with "p" for "++opt=val"
  * argument.
  */
-    int
+    পূর্ণাঙ্ক
 get_fileformat_force(
     buf_T	*buf,
     exarg_T	*eap)	    // can be NULL!
 {
-    int		c;
+    পূর্ণাঙ্ক		c;
 
-    if (eap != NULL && eap->force_ff != 0)
+    যদি (eap != রিক্ত && eap->force_ff != 0)
 	c = eap->force_ff;
-    else
+    অন্যথা
     {
-	if ((eap != NULL && eap->force_bin != 0)
+	যদি ((eap != রিক্ত && eap->force_bin != 0)
 			       ? (eap->force_bin == FORCE_BIN) : buf->b_p_bin)
-	    return EOL_UNIX;
+	    ঘূৰাই EOL_UNIX;
 	c = *buf->b_p_ff;
     }
-    if (c == 'u')
-	return EOL_UNIX;
-    if (c == 'm')
-	return EOL_MAC;
-    return EOL_DOS;
+    যদি (c == 'u')
+	ঘূৰাই EOL_UNIX;
+    যদি (c == 'm')
+	ঘূৰাই EOL_MAC;
+    ঘূৰাই EOL_DOS;
 }
 
 /*
@@ -1841,36 +1841,36 @@ get_fileformat_force(
  * Sets both 'textmode' and 'fileformat'.
  * Note: Does _not_ set global value of 'textmode'!
  */
-    void
+    শূন্য
 set_fileformat(
-    int		t,
-    int		opt_flags)	// OPT_LOCAL and/or OPT_GLOBAL
+    পূর্ণাঙ্ক		t,
+    পূর্ণাঙ্ক		opt_flags)	// OPT_LOCAL and/or OPT_GLOBAL
 {
-    char	*p = NULL;
+    ৱর্ণ	*p = রিক্ত;
 
-    switch (t)
+    ৱিকল্প (t)
     {
-    case EOL_DOS:
+    পক্ষ EOL_DOS:
 	p = FF_DOS;
 	curbuf->b_p_tx = TRUE;
-	break;
-    case EOL_UNIX:
+	ভঙ্গ;
+    পক্ষ EOL_UNIX:
 	p = FF_UNIX;
 	curbuf->b_p_tx = FALSE;
-	break;
-    case EOL_MAC:
+	ভঙ্গ;
+    পক্ষ EOL_MAC:
 	p = FF_MAC;
 	curbuf->b_p_tx = FALSE;
-	break;
+	ভঙ্গ;
     }
-    if (p != NULL)
+    যদি (p != রিক্ত)
 	set_string_option_direct((char_u *)"ff", -1, (char_u *)p,
 						     OPT_FREE | opt_flags, 0);
 
     // This may cause the buffer to become (un)modified.
     check_status(curbuf);
     redraw_tabline = TRUE;
-#if defined(FEAT_TABPANEL)
+#যদি defined(FEAT_TABPANEL)
     redraw_tabpanel = TRUE;
 #endif
     need_maketitle = TRUE;	    // set window title later
@@ -1879,48 +1879,48 @@ set_fileformat(
 /*
  * Return the default fileformat from 'fileformats'.
  */
-    int
-default_fileformat(void)
+    পূর্ণাঙ্ক
+default_fileformat(শূন্য)
 {
-    switch (*p_ffs)
+    ৱিকল্প (*p_ffs)
     {
-	case 'm':   return EOL_MAC;
-	case 'd':   return EOL_DOS;
+	পক্ষ 'm':   ঘূৰাই EOL_MAC;
+	পক্ষ 'd':   ঘূৰাই EOL_DOS;
     }
-    return EOL_UNIX;
+    ঘূৰাই EOL_UNIX;
 }
 
 /*
  * Call shell.	Calls mch_call_shell, with 'shellxquote' added.
  */
-    int
-call_shell(char_u *cmd, int opt)
+    পূর্ণাঙ্ক
+call_shell(char_u *cmd, পূর্ণাঙ্ক opt)
 {
-    int		retval;
+    পূর্ণাঙ্ক		retval;
 #ifdef FEAT_PROFILE
     proftime_T	wait_time;
 #endif
 
-    if (p_verbose > 3)
+    যদি (p_verbose > 3)
     {
 	verbose_enter();
-	smsg(_("Calling shell to execute: \"%s\""), cmd == NULL ? p_sh : cmd);
-	msg_putchar_attr('\n', 0);
+	smsg(_("Calling shell to execute: \"%s\""), cmd == রিক্ত ? p_sh : cmd);
+	বাৰ্তা_putchar_attr('\n', 0);
 	cursor_on();
 	verbose_leave();
     }
 
 #ifdef FEAT_PROFILE
-    if (do_profiling == PROF_YES)
+    যদি (do_profiling == PROF_YES)
 	prof_child_enter(&wait_time);
 #endif
 
-    if (*p_sh == NUL)
+    যদি (*p_sh == NUL)
     {
 	emsg(_(e_shell_option_is_empty));
 	retval = -1;
     }
-    else
+    অন্যথা
     {
 #ifdef FEAT_GUI_MSWIN
 	// Don't hide the pointer while executing a shell command.
@@ -1932,35 +1932,35 @@ call_shell(char_u *cmd, int opt)
 	// The external command may update a tags file, clear cached tags.
 	tag_freematch();
 
-	if (cmd == NULL || *p_sxq == NUL)
+	যদি (cmd == রিক্ত || *p_sxq == NUL)
 	    retval = mch_call_shell(cmd, opt);
-	else
+	অন্যথা
 	{
 	    char_u  *ncmd;
 	    size_t  ncmdsize;
 	    char_u  *ecmd = cmd;
 
-	    if (*p_sxe != NUL && *p_sxq == '(')
+	    যদি (*p_sxe != NUL && *p_sxq == '(')
 	    {
 		ecmd = vim_strsave_escaped_ext(cmd, p_sxe, '^', FALSE);
-		if (ecmd == NULL)
+		যদি (ecmd == রিক্ত)
 		    ecmd = cmd;
 	    }
 	    ncmdsize = STRLEN(ecmd) + STRLEN(p_sxq) * 2 + 1;
 	    ncmd = alloc(ncmdsize);
-	    if (ncmd != NULL)
+	    যদি (ncmd != রিক্ত)
 	    {
 		// When 'shellxquote' is ( append ).
 		// When 'shellxquote' is "( append )".
-		vim_snprintf((char *)ncmd, ncmdsize, "%s%s%s", p_sxq, ecmd, *p_sxq == '(' ? (char_u *)")"
+		vim_snprintf((ৱর্ণ *)ncmd, ncmdsize, "%s%s%s", p_sxq, ecmd, *p_sxq == '(' ? (char_u *)")"
 		    : *p_sxq == '"' && *(p_sxq+1) == '(' ? (char_u *)")\""
 		    : p_sxq);
 		retval = mch_call_shell(ncmd, opt);
 		vim_free(ncmd);
 	    }
-	    else
+	    অন্যথা
 		retval = -1;
-	    if (ecmd != cmd)
+	    যদি (ecmd != cmd)
 		vim_free(ecmd);
 	}
 #ifdef FEAT_GUI
@@ -1976,12 +1976,12 @@ call_shell(char_u *cmd, int opt)
 #ifdef FEAT_EVAL
     set_vim_var_nr(VV_SHELL_ERROR, (long)retval);
 # ifdef FEAT_PROFILE
-    if (do_profiling == PROF_YES)
+    যদি (do_profiling == PROF_YES)
 	prof_child_exit(&wait_time);
 # endif
 #endif
 
-    return retval;
+    ঘূৰাই retval;
 }
 
 /*
@@ -1989,21 +1989,21 @@ call_shell(char_u *cmd, int opt)
  * equal to MODE_NORMAL State with a condition.  This function returns the real
  * State.
  */
-    int
-get_real_state(void)
+    পূর্ণাঙ্ক
+get_real_state(শূন্য)
 {
-    if (State & MODE_NORMAL)
+    যদি (State & MODE_NORMAL)
     {
-	if (VIsual_active)
+	যদি (VIsual_active)
 	{
-	    if (VIsual_select)
-		return MODE_SELECT;
-	    return MODE_VISUAL;
+	    যদি (VIsual_select)
+		ঘূৰাই MODE_SELECT;
+	    ঘূৰাই MODE_VISUAL;
 	}
-	else if (finish_op)
-	    return MODE_OP_PENDING;
+	অন্যথা যদি (finish_op)
+	    ঘূৰাই MODE_OP_PENDING;
     }
-    return State;
+    ঘূৰাই State;
 }
 
 /*
@@ -2011,10 +2011,10 @@ get_real_state(void)
  * Takes care of multi-byte characters.
  * "b" must point to the start of the file name
  */
-    int
+    পূর্ণাঙ্ক
 after_pathsep(char_u *b, char_u *p)
 {
-    return p > b && vim_ispathsep(p[-1])
+    ঘূৰাই p > b && vim_ispathsep(p[-1])
 			     && (!has_mbyte || (*mb_head_off)(b, p - 1) == 0);
 }
 
@@ -2022,7 +2022,7 @@ after_pathsep(char_u *b, char_u *p)
  * Return TRUE if file names "f1" and "f2" are in the same directory.
  * "f1" may be a short name, "f2" must be a full path.
  */
-    int
+    পূর্ণাঙ্ক
 same_directory(char_u *f1, char_u *f2)
 {
     char_u	ffname[MAXPATHL];
@@ -2030,17 +2030,17 @@ same_directory(char_u *f1, char_u *f2)
     char_u	*t2;
 
     // safety check
-    if (f1 == NULL || f2 == NULL)
-	return FALSE;
+    যদি (f1 == রিক্ত || f2 == রিক্ত)
+	ঘূৰাই FALSE;
 
-    (void)vim_FullName(f1, ffname, MAXPATHL, FALSE);
+    (শূন্য)vim_FullName(f1, ffname, MAXPATHL, FALSE);
     t1 = gettail_sep(ffname);
     t2 = gettail_sep(f2);
-    return (t1 - ffname == t2 - f2
-	     && pathcmp((char *)ffname, (char *)f2, (int)(t1 - ffname)) == 0);
+    ঘূৰাই (t1 - ffname == t2 - f2
+	     && pathcmp((ৱর্ণ *)ffname, (ৱর্ণ *)f2, (পূর্ণাঙ্ক)(t1 - ffname)) == 0);
 }
 
-#if defined(FEAT_SESSION) || defined(FEAT_AUTOCHDIR) \
+#যদি defined(FEAT_SESSION) || defined(FEAT_AUTOCHDIR) \
 	|| defined(MSWIN) || defined(FEAT_GUI_GTK) \
 	|| defined(FEAT_NETBEANS_INTG)
 /*
@@ -2048,72 +2048,72 @@ same_directory(char_u *f1, char_u *f2)
  * Caller must call shorten_fnames()!
  * Return OK or FAIL.
  */
-    int
-vim_chdirfile(char_u *fname, char *trigger_autocmd)
+    পূর্ণাঙ্ক
+vim_chdirfile(char_u *fname, ৱর্ণ *trigger_autocmd)
 {
     char_u	old_dir[MAXPATHL];
     char_u	new_dir[MAXPATHL];
 
-    if (mch_dirname(old_dir, MAXPATHL) != OK)
+    যদি (mch_dirname(old_dir, MAXPATHL) != OK)
 	*old_dir = NUL;
 
     vim_strncpy(new_dir, fname, MAXPATHL - 1);
     *gettail_sep(new_dir) = NUL;
 
-    if (pathcmp((char *)old_dir, (char *)new_dir, -1) == 0)
+    যদি (pathcmp((ৱর্ণ *)old_dir, (ৱর্ণ *)new_dir, -1) == 0)
 	// nothing to do
-	return OK;
+	ঘূৰাই OK;
 
-    if (trigger_autocmd != NULL)
+    যদি (trigger_autocmd != রিক্ত)
 	trigger_DirChangedPre((char_u *)trigger_autocmd, new_dir);
 
-    if (mch_chdir((char *)new_dir) != 0)
-	return FAIL;
+    যদি (mch_chdir((ৱর্ণ *)new_dir) != 0)
+	ঘূৰাই FAIL;
 
-    if (trigger_autocmd != NULL)
+    যদি (trigger_autocmd != রিক্ত)
 	apply_autocmds(EVENT_DIRCHANGED, (char_u *)trigger_autocmd,
 						       new_dir, FALSE, curbuf);
-    return OK;
+    ঘূৰাই OK;
 }
 #endif
 
-#if defined(STAT_IGNORES_SLASH)
+#যদি defined(STAT_IGNORES_SLASH)
 /*
  * Check if "name" ends in a slash and is not a directory.
  * Used for systems where stat() ignores a trailing slash on a file name.
  * The Vim code assumes a trailing slash is only ignored for a directory.
  */
-    static int
-illegal_slash(const char *name)
+    স্থির পূর্ণাঙ্ক
+illegal_slash(ধ্রুৱ ৱর্ণ *name)
 {
-    if (name[0] == NUL)
-	return FALSE;	    // no file name is not illegal
-    if (name[strlen(name) - 1] != '/')
-	return FALSE;	    // no trailing slash
-    if (mch_isdir((char_u *)name))
-	return FALSE;	    // trailing slash for a directory
-    return TRUE;
+    যদি (name[0] == NUL)
+	ঘূৰাই FALSE;	    // no file name is not illegal
+    যদি (name[strlen(name) - 1] != '/')
+	ঘূৰাই FALSE;	    // no trailing slash
+    যদি (mch_isdir((char_u *)name))
+	ঘূৰাই FALSE;	    // trailing slash for a directory
+    ঘূৰাই TRUE;
 }
 
 /*
  * Special implementation of mch_stat() for Solaris.
  */
-    int
-vim_stat(const char *name, stat_T *stp)
+    পূর্ণাঙ্ক
+vim_stat(ধ্রুৱ ৱর্ণ *name, stat_T *stp)
 {
     // On Solaris stat() accepts "file/" as if it was "file".  Return -1 if
     // the name ends in "/" and it's not a directory.
-    return illegal_slash(name) ? -1 : stat(name, stp);
+    ঘূৰাই illegal_slash(name) ? -1 : stat(name, stp);
 }
 #endif
 
-#if defined(CURSOR_SHAPE)
+#যদি defined(CURSOR_SHAPE)
 
 /*
  * Handling of cursor and mouse pointer shapes in various modes.
  */
 
-cursorentry_T shape_table[SHAPE_IDX_COUNT] =
+cursorentry_T shape_table[SHAPE_IDX_গুনতি] =
 {
     // The values will be filled in from the 'guicursor' and 'mouseshape'
     // defaults when Vim starts.
@@ -2142,7 +2142,7 @@ cursorentry_T shape_table[SHAPE_IDX_COUNT] =
  * Table with names for mouse shapes.  Keep in sync with all the tables for
  * mch_set_mouse_shape()!.
  */
-static string_T mshape_names[] =
+স্থির string_T mshape_names[] =
 {
     STR_LITERAL_INIT("arrow"),	// default, must be the first one
     STR_LITERAL_INIT("blank"),	// hidden
@@ -2160,10 +2160,10 @@ static string_T mshape_names[] =
     STR_LITERAL_INIT("question"),
     STR_LITERAL_INIT("rightup-arrow"),
     STR_LITERAL_INIT("up-arrow"),
-    {NULL, 0}
+    {রিক্ত, 0}
 };
 
-#  define MSHAPE_NAMES_COUNT  (ARRAY_LENGTH(mshape_names) - 1)
+#  define MSHAPE_NAMES_গুনতি  (ARRAY_LENGTH(mshape_names) - 1)
 # endif
 
 /*
@@ -2171,88 +2171,88 @@ static string_T mshape_names[] =
  * ("what" is SHAPE_MOUSE).
  * Returns error message for an illegal option, NULL otherwise.
  */
-    char *
-parse_shape_opt(int what)
+    ৱর্ণ *
+parse_shape_opt(পূর্ণাঙ্ক what)
 {
     char_u	*modep;
     char_u	*colonp;
     char_u	*commap;
     char_u	*slashp;
     char_u	*p, *endp;
-    int		idx = 0;		// init for GCC
-    int		all_idx;
-    int		len;
-    int		i;
+    পূর্ণাঙ্ক		idx = 0;		// init for GCC
+    পূর্ণাঙ্ক		all_idx;
+    পূর্ণাঙ্ক		len;
+    পূর্ণাঙ্ক		i;
     long	n;
-    int		found_ve = FALSE;	// found "ve" flag
-    int		round;
+    পূর্ণাঙ্ক		found_ve = FALSE;	// found "ve" flag
+    পূর্ণাঙ্ক		round;
 
     /*
      * First round: check for errors; second round: do it for real.
      */
-    for (round = 1; round <= 2; ++round)
+    বাবে (round = 1; round <= 2; ++round)
     {
 	/*
 	 * Repeat for all comma separated parts.
 	 */
 # ifdef FEAT_MOUSESHAPE
-	if (what == SHAPE_MOUSE)
+	যদি (what == SHAPE_MOUSE)
 	    modep = p_mouseshape;
-	else
+	অন্যথা
 # endif
 	    modep = p_guicursor;
-	while (*modep != NUL)
+	যেতিয়ালৈ (*modep != NUL)
 	{
 	    colonp = vim_strchr(modep, ':');
 	    commap = vim_strchr(modep, ',');
 
-	    if (colonp == NULL || (commap != NULL && commap < colonp))
-		return e_missing_colon_2;
-	    if (colonp == modep)
-		return e_illegal_mode;
+	    যদি (colonp == রিক্ত || (commap != রিক্ত && commap < colonp))
+		ঘূৰাই e_missing_colon_2;
+	    যদি (colonp == modep)
+		ঘূৰাই e_illegal_mode;
 
 	    /*
 	     * Repeat for all mode's before the colon.
 	     * For the 'a' mode, we loop to handle all the modes.
 	     */
 	    all_idx = -1;
-	    while (modep < colonp || all_idx >= 0)
+	    যেতিয়ালৈ (modep < colonp || all_idx >= 0)
 	    {
-		if (all_idx < 0)
+		যদি (all_idx < 0)
 		{
 		    // Find the mode.
-		    if (modep[1] == '-' || modep[1] == ':')
+		    যদি (modep[1] == '-' || modep[1] == ':')
 			len = 1;
-		    else
+		    অন্যথা
 			len = 2;
-		    if (len == 1 && TOLOWER_ASC(modep[0]) == 'a')
-			all_idx = SHAPE_IDX_COUNT - 1;
-		    else
+		    যদি (len == 1 && TOLOWER_ASC(modep[0]) == 'a')
+			all_idx = SHAPE_IDX_গুনতি - 1;
+		    অন্যথা
 		    {
-			for (idx = 0; idx < SHAPE_IDX_COUNT; ++idx)
-			    if (STRNICMP(modep, shape_table[idx].name, len)
+			বাবে (idx = 0; idx < SHAPE_IDX_গুনতি; ++idx)
+			    যদি (STRNICMP(modep, shape_table[idx].name, len)
 									 == 0)
-				break;
-			if (idx == SHAPE_IDX_COUNT
+				ভঙ্গ;
+			যদি (idx == SHAPE_IDX_গুনতি
 				   || (shape_table[idx].used_for & what) == 0)
-			    return e_illegal_mode;
-			if (len == 2 && modep[0] == 'v' && modep[1] == 'e')
+			    ঘূৰাই e_illegal_mode;
+			যদি (len == 2 && modep[0] == 'v' && modep[1] == 'e')
 			    found_ve = TRUE;
 		    }
 		    modep += len + 1;
 		}
 
-		if (all_idx >= 0)
+		যদি (all_idx >= 0)
 		    idx = all_idx--;
-		else if (round == 2)
+		অন্যথা যদি (round == 2)
 		{
 # ifdef FEAT_MOUSESHAPE
-		    if (what == SHAPE_MOUSE)
+		    যদি (what == SHAPE_MOUSE)
 		    {
 			// Set the default, for the missing parts
 			shape_table[idx].mshape = 0;
 		    }
-		    else
+		    অন্যথা
 # endif
 		    {
 			// Set the defaults, for the missing parts
@@ -2264,34 +2264,34 @@ parse_shape_opt(int what)
 		}
 
 		// Parse the part after the colon
-		for (p = colonp + 1; *p && *p != ','; )
+		বাবে (p = colonp + 1; *p && *p != ','; )
 		{
 # ifdef FEAT_MOUSESHAPE
-		    if (what == SHAPE_MOUSE)
+		    যদি (what == SHAPE_MOUSE)
 		    {
-			for (i = 0; ; ++i)
+			বাবে (i = 0; ; ++i)
 			{
-			    if (mshape_names[i].string == NULL)
+			    যদি (mshape_names[i].string == রিক্ত)
 			    {
-				if (!VIM_ISDIGIT(*p))
-				    return e_illegal_mouseshape;
-				if (round == 2)
+				যদি (!VIM_ISDIGIT(*p))
+				    ঘূৰাই e_illegal_mouseshape;
+				যদি (round == 2)
 				    shape_table[idx].mshape =
 					      getdigits(&p) + MSHAPE_NUMBERED;
-				else
-				    (void)getdigits(&p);
-				break;
+				অন্যথা
+				    (শূন্য)getdigits(&p);
+				ভঙ্গ;
 			    }
-			    if (STRNICMP(p, mshape_names[i].string, mshape_names[i].length) == 0)
+			    যদি (STRNICMP(p, mshape_names[i].string, mshape_names[i].length) == 0)
 			    {
-				if (round == 2)
+				যদি (round == 2)
 				    shape_table[idx].mshape = i;
 				p += mshape_names[i].length;
-				break;
+				ভঙ্গ;
 			    }
 			}
 		    }
-		    else // if (what == SHAPE_MOUSE)
+		    অন্যথা // if (what == SHAPE_MOUSE)
 # endif
 		    {
 			/*
@@ -2299,99 +2299,99 @@ parse_shape_opt(int what)
 			 */
 			i = *p;
 			len = 0;
-			if (STRNICMP(p, "ver", 3) == 0)
+			যদি (STRNICMP(p, "ver", 3) == 0)
 			    len = 3;
-			else if (STRNICMP(p, "hor", 3) == 0)
+			অন্যথা যদি (STRNICMP(p, "hor", 3) == 0)
 			    len = 3;
-			else if (STRNICMP(p, "blinkwait", 9) == 0)
+			অন্যথা যদি (STRNICMP(p, "blinkwait", 9) == 0)
 			    len = 9;
-			else if (STRNICMP(p, "blinkon", 7) == 0)
+			অন্যথা যদি (STRNICMP(p, "blinkon", 7) == 0)
 			    len = 7;
-			else if (STRNICMP(p, "blinkoff", 8) == 0)
+			অন্যথা যদি (STRNICMP(p, "blinkoff", 8) == 0)
 			    len = 8;
-			if (len != 0)
+			যদি (len != 0)
 			{
 			    p += len;
-			    if (!VIM_ISDIGIT(*p))
-				return e_digit_expected;
+			    যদি (!VIM_ISDIGIT(*p))
+				ঘূৰাই e_digit_expected;
 			    n = getdigits(&p);
-			    if (len == 3)   // "ver" or "hor"
+			    যদি (len == 3)   // "ver" or "hor"
 			    {
-				if (n == 0)
-				    return e_illegal_percentage;
-				if (round == 2)
+				যদি (n == 0)
+				    ঘূৰাই e_illegal_percentage;
+				যদি (round == 2)
 				{
-				    if (TOLOWER_ASC(i) == 'v')
+				    যদি (TOLOWER_ASC(i) == 'v')
 					shape_table[idx].shape = SHAPE_VER;
-				    else
+				    অন্যথা
 					shape_table[idx].shape = SHAPE_HOR;
 				    shape_table[idx].percentage = n;
 				}
 			    }
-			    else if (round == 2)
+			    অন্যথা যদি (round == 2)
 			    {
-				if (len == 9)
+				যদি (len == 9)
 				    shape_table[idx].blinkwait = n;
-				else if (len == 7)
+				অন্যথা যদি (len == 7)
 				    shape_table[idx].blinkon = n;
-				else
+				অন্যথা
 				    shape_table[idx].blinkoff = n;
 			    }
 			}
-			else if (STRNICMP(p, "block", 5) == 0)
+			অন্যথা যদি (STRNICMP(p, "block", 5) == 0)
 			{
-			    if (round == 2)
+			    যদি (round == 2)
 				shape_table[idx].shape = SHAPE_BLOCK;
 			    p += 5;
 			}
-			else	// must be a highlight group name then
+			অন্যথা	// must be a highlight group name then
 			{
 			    endp = vim_strchr(p, '-');
-			    if (commap == NULL)		    // last part
+			    যদি (commap == রিক্ত)		    // last part
 			    {
-				if (endp == NULL)
+				যদি (endp == রিক্ত)
 				    endp = p + STRLEN(p);   // find end of part
 			    }
-			    else if (endp > commap || endp == NULL)
+			    অন্যথা যদি (endp > commap || endp == রিক্ত)
 				endp = commap;
 			    slashp = vim_strchr(p, '/');
-			    if (slashp != NULL && slashp < endp)
+			    যদি (slashp != রিক্ত && slashp < endp)
 			    {
 				// "group/langmap_group"
-				i = syn_check_group(p, (int)(slashp - p));
+				i = syn_check_group(p, (পূর্ণাঙ্ক)(slashp - p));
 				p = slashp + 1;
 			    }
-			    if (round == 2)
+			    যদি (round == 2)
 			    {
 				shape_table[idx].id = syn_check_group(p,
-							     (int)(endp - p));
+							     (পূর্ণাঙ্ক)(endp - p));
 				shape_table[idx].id_lm = shape_table[idx].id;
-				if (slashp != NULL && slashp < endp)
+				যদি (slashp != রিক্ত && slashp < endp)
 				    shape_table[idx].id = i;
 			    }
 			    p = endp;
 			}
 		    } // if (what != SHAPE_MOUSE)
 
-		    if (*p == '-')
+		    যদি (*p == '-')
 			++p;
 		}
 	    }
 	    modep = p;
-	    if (*modep == ',')
+	    যদি (*modep == ',')
 		++modep;
 	}
     }
 
     // If the 's' flag is not given, use the 'v' cursor for 's'
-    if (!found_ve)
+    যদি (!found_ve)
     {
 # ifdef FEAT_MOUSESHAPE
-	if (what == SHAPE_MOUSE)
+	যদি (what == SHAPE_MOUSE)
 	{
 	    shape_table[SHAPE_IDX_VE].mshape = shape_table[SHAPE_IDX_V].mshape;
 	}
-	else
+	অন্যথা
 # endif
 	{
 	    shape_table[SHAPE_IDX_VE].shape = shape_table[SHAPE_IDX_V].shape;
@@ -2408,65 +2408,65 @@ parse_shape_opt(int what)
 	}
     }
 
-    return NULL;
+    ঘূৰাই রিক্ত;
 }
 
-# if defined(MCH_CURSOR_SHAPE) || defined(FEAT_GUI) \
+# যদি defined(MCH_CURSOR_SHAPE) || defined(FEAT_GUI) \
 	|| defined(FEAT_MOUSESHAPE)
 /*
  * Return the index into shape_table[] for the current mode.
  * When "mouse" is TRUE, consider indexes valid for the mouse pointer.
  */
-    int
-get_shape_idx(int mouse)
+    পূর্ণাঙ্ক
+get_shape_idx(পূর্ণাঙ্ক mouse)
 {
 #  ifdef FEAT_MOUSESHAPE
-    if (mouse && (State == MODE_HITRETURN || State == MODE_ASKMORE))
+    যদি (mouse && (State == MODE_HITRETURN || State == MODE_ASKMORE))
     {
 #   ifdef FEAT_GUI
-	int x, y;
+	পূর্ণাঙ্ক x, y;
 	gui_mch_getmouse(&x, &y);
-	if (Y_2_ROW(y) == Rows - 1)
-	    return SHAPE_IDX_MOREL;
+	যদি (Y_2_ROW(y) == Rows - 1)
+	    ঘূৰাই SHAPE_IDX_MOREL;
 #   endif
-	return SHAPE_IDX_MORE;
+	ঘূৰাই SHAPE_IDX_MORE;
     }
-    if (mouse && drag_status_line)
-	return SHAPE_IDX_SDRAG;
-    if (mouse && drag_sep_line)
-	return SHAPE_IDX_VDRAG;
+    যদি (mouse && drag_status_সাৰি)
+	ঘূৰাই SHAPE_IDX_SDRAG;
+    যদি (mouse && drag_sep_সাৰি)
+	ঘূৰাই SHAPE_IDX_VDRAG;
 #  endif
-    if (!mouse && State == MODE_SHOWMATCH)
-	return SHAPE_IDX_SM;
-    if (State & VREPLACE_FLAG)
-	return SHAPE_IDX_R;
-    if (State & REPLACE_FLAG)
-	return SHAPE_IDX_R;
-    if (State & MODE_INSERT)
-	return SHAPE_IDX_I;
-    if (State & MODE_CMDLINE)
+    যদি (!mouse && State == MODE_SHOWMATCH)
+	ঘূৰাই SHAPE_IDX_SM;
+    যদি (State & VREPLACE_FLAG)
+	ঘূৰাই SHAPE_IDX_R;
+    যদি (State & REPLACE_FLAG)
+	ঘূৰাই SHAPE_IDX_R;
+    যদি (State & MODE_ঢোকাও)
+	ঘূৰাই SHAPE_IDX_I;
+    যদি (State & MODE_CMDLINE)
     {
-	if (cmdline_at_end())
-	    return SHAPE_IDX_C;
-	if (cmdline_overstrike())
-	    return SHAPE_IDX_CR;
-	return SHAPE_IDX_CI;
+	যদি (cmdline_at_end())
+	    ঘূৰাই SHAPE_IDX_C;
+	যদি (cmdline_overstrike())
+	    ঘূৰাই SHAPE_IDX_CR;
+	ঘূৰাই SHAPE_IDX_CI;
     }
-    if (finish_op)
-	return SHAPE_IDX_O;
-    if (VIsual_active)
+    যদি (finish_op)
+	ঘূৰাই SHAPE_IDX_O;
+    যদি (VIsual_active)
     {
-	if (*p_sel == 'e')
-	    return SHAPE_IDX_VE;
-	else
-	    return SHAPE_IDX_V;
+	যদি (*p_sel == 'e')
+	    ঘূৰাই SHAPE_IDX_VE;
+	অন্যথা
+	    ঘূৰাই SHAPE_IDX_V;
     }
-    return SHAPE_IDX_N;
+    ঘূৰাই SHAPE_IDX_N;
 }
 # endif
 
-# if defined(FEAT_MOUSESHAPE)
-static int current_mouse_shape = 0;
+# যদি defined(FEAT_MOUSESHAPE)
+স্থির পূর্ণাঙ্ক current_mouse_shape = 0;
 
 /*
  * Set the mouse shape:
@@ -2475,40 +2475,40 @@ static int current_mouse_shape = 0;
  * If "shape" is -2, only update the shape when it's CLINE or STATUS (used
  * when the mouse moves off the status or command line).
  */
-    void
-update_mouseshape(int shape_idx)
+    শূন্য
+update_mouseshape(পূর্ণাঙ্ক shape_idx)
 {
-    int new_mouse_shape;
+    পূর্ণাঙ্ক new_mouse_shape;
 
     // Only works in GUI mode.
-    if (!gui.in_use || gui.starting)
-	return;
+    যদি (!gui.in_use || gui.starting)
+	ঘূৰাই;
 
     // Postpone the updating when more is to come.  Speeds up executing of
     // mappings.
-    if (shape_idx == -1 && char_avail())
+    যদি (shape_idx == -1 && char_avail())
     {
 	postponed_mouseshape = TRUE;
-	return;
+	ঘূৰাই;
     }
 
     // When ignoring the mouse don't change shape on the statusline.
-    if (*p_mouse == NUL
+    যদি (*p_mouse == NUL
 	    && (shape_idx == SHAPE_IDX_CLINE
 		|| shape_idx == SHAPE_IDX_STATUS
 		|| shape_idx == SHAPE_IDX_VSEP))
 	shape_idx = -2;
 
-    if (shape_idx == -2
+    যদি (shape_idx == -2
 	    && current_mouse_shape != shape_table[SHAPE_IDX_CLINE].mshape
 	    && current_mouse_shape != shape_table[SHAPE_IDX_STATUS].mshape
 	    && current_mouse_shape != shape_table[SHAPE_IDX_VSEP].mshape)
-	return;
-    if (shape_idx < 0)
+	ঘূৰাই;
+    যদি (shape_idx < 0)
 	new_mouse_shape = shape_table[get_shape_idx(TRUE)].mshape;
-    else
+    অন্যথা
 	new_mouse_shape = shape_table[shape_idx].mshape;
-    if (new_mouse_shape != current_mouse_shape)
+    যদি (new_mouse_shape != current_mouse_shape)
     {
 	mch_set_mouse_shape(new_mouse_shape);
 	current_mouse_shape = new_mouse_shape;
@@ -2519,18 +2519,18 @@ update_mouseshape(int shape_idx)
 
 #endif // CURSOR_SHAPE
 
-#if defined(FEAT_EVAL)
+#যদি defined(FEAT_EVAL)
 /*
  * Mainly for tests: get the name of the current mouse shape.
  */
-    void
+    শূন্য
 f_getmouseshape(typval_T *argvars UNUSED, typval_T *rettv)
 {
     rettv->v_type = VAR_STRING;
-    rettv->vval.v_string = NULL;
-# if defined(FEAT_MOUSESHAPE)
-    if (current_mouse_shape >= 0
-			      && current_mouse_shape < (int)MSHAPE_NAMES_COUNT)
+    rettv->vval.v_string = রিক্ত;
+# যদি defined(FEAT_MOUSESHAPE)
+    যদি (current_mouse_shape >= 0
+			      && current_mouse_shape < (পূর্ণাঙ্ক)MSHAPE_NAMES_গুনতি)
 	rettv->vval.v_string = vim_strnsave(
 				  mshape_names[current_mouse_shape].string,
 				  mshape_names[current_mouse_shape].length);
@@ -2544,23 +2544,23 @@ f_getmouseshape(typval_T *argvars UNUSED, typval_T *rettv)
  * Change directory to "new_dir".  Search 'cdpath' for relative directory
  * names.
  */
-    int
+    পূর্ণাঙ্ক
 vim_chdir(char_u *new_dir)
 {
     char_u	*dir_name;
-    int		r;
-    char_u	*file_to_find = NULL;
-    char	*search_ctx = NULL;
+    পূর্ণাঙ্ক		r;
+    char_u	*file_to_find = রিক্ত;
+    ৱর্ণ	*অনুসন্ধান_ctx = রিক্ত;
 
-    dir_name = find_directory_in_path(new_dir, (int)STRLEN(new_dir),
-		     FNAME_MESS, curbuf->b_ffname, &file_to_find, &search_ctx);
+    dir_name = find_directory_in_path(new_dir, (পূর্ণাঙ্ক)STRLEN(new_dir),
+		     FNAME_MESS, curbuf->b_ffname, &file_to_find, &অনুসন্ধান_ctx);
     vim_free(file_to_find);
-    vim_findfile_cleanup(search_ctx);
-    if (dir_name == NULL)
-	return -1;
-    r = mch_chdir((char *)dir_name);
+    vim_findfile_cleanup(অনুসন্ধান_ctx);
+    যদি (dir_name == রিক্ত)
+	ঘূৰাই -1;
+    r = mch_chdir((ৱর্ণ *)dir_name);
     vim_free(dir_name);
-    return r;
+    ঘূৰাই r;
 }
 
 /*
@@ -2570,62 +2570,62 @@ vim_chdir(char_u *new_dir)
  * cache the result.
  * Returns OK or FAIL.
  */
-    int
-get_user_name(char_u *buf, int len)
+    পূর্ণাঙ্ক
+get_user_name(char_u *buf, পূর্ণাঙ্ক len)
 {
-    if (username == NULL)
+    যদি (username == রিক্ত)
     {
-	if (mch_get_user_name(buf, len) == FAIL)
-	    return FAIL;
+	যদি (mch_get_user_name(buf, len) == FAIL)
+	    ঘূৰাই FAIL;
 	username = vim_strsave(buf);
     }
-    else
+    অন্যথা
 	vim_strncpy(buf, username, len - 1);
-    return OK;
+    ঘূৰাই OK;
 }
 
-#if defined(EXITFREE)
+#যদি defined(EXITFREE)
 /*
  * Free the memory allocated by get_user_name()
  */
-    void
-free_username(void)
+    শূন্য
+free_username(শূন্য)
 {
     vim_free(username);
 }
 #endif
 
-#if !defined(HAVE_QSORT) && !defined(PROTO)
+#যদি !defined(HAVE_QSORT) && !defined(PROTO)
 /*
  * Our own qsort(), for systems that don't have it.
  * It's simple and slow.  From the K&R C book.
  */
-    void
+    শূন্য
 qsort(
-    void	*base,
-    size_t	elm_count,
+    শূন্য	*base,
+    size_t	elm_গুনতি,
     size_t	elm_size,
-    int (*cmp)(const void *, const void *))
+    পূর্ণাঙ্ক (*cmp)(ধ্রুৱ শূন্য *, ধ্রুৱ শূন্য *))
 {
     char_u	*buf;
     char_u	*p1;
     char_u	*p2;
-    int		i, j;
-    int		gap;
+    পূর্ণাঙ্ক		i, j;
+    পূর্ণাঙ্ক		gap;
 
     buf = alloc(elm_size);
-    if (buf == NULL)
-	return;
+    যদি (buf == রিক্ত)
+	ঘূৰাই;
 
-    for (gap = elm_count / 2; gap > 0; gap /= 2)
-	for (i = gap; i < elm_count; ++i)
-	    for (j = i - gap; j >= 0; j -= gap)
+    বাবে (gap = elm_গুনতি / 2; gap > 0; gap /= 2)
+	বাবে (i = gap; i < elm_গুনতি; ++i)
+	    বাবে (j = i - gap; j >= 0; j -= gap)
 	    {
 		// Compare the elements.
 		p1 = (char_u *)base + j * elm_size;
 		p2 = (char_u *)base + (j + gap) * elm_size;
-		if ((*cmp)((void *)p1, (void *)p2) <= 0)
-		    break;
+		যদি ((*cmp)((শূন্য *)p1, (শূন্য *)p2) <= 0)
+		    ভঙ্গ;
 		// Exchange the elements.
 		mch_memmove(buf, p1, elm_size);
 		mch_memmove(p1, p2, elm_size);
@@ -2662,96 +2662,96 @@ qsort(
  *  (history removed, not very interesting.  See the "screen" sources.)
  */
 
-#if !defined(HAVE_SETENV) && !defined(HAVE_PUTENV) && !defined(PROTO)
+#যদি !defined(HAVE_SETENV) && !defined(HAVE_PUTENV) && !defined(PROTO)
 
 # define EXTRASIZE 5		// increment to add to env. size
 
-static int  envsize = -1;	// current size of environment
-extern char **environ;		// the global which is your env.
+স্থির পূর্ণাঙ্ক  envsize = -1;	// current size of environment
+বাহ্য ৱর্ণ **environ;		// the global which is your env.
 
-static int  findenv(char *name); // look for a name in the env.
-static int  newenv(void);	// copy env. from stack to heap
-static int  moreenv(void);	// incr. size of env.
+স্থির পূর্ণাঙ্ক  findenv(ৱর্ণ *name); // look for a name in the env.
+স্থির পূর্ণাঙ্ক  newenv(শূন্য);	// copy env. from stack to heap
+স্থির পূর্ণাঙ্ক  moreenv(শূন্য);	// incr. size of env.
 
-    int
-putenv(const char *string)
+    পূর্ণাঙ্ক
+putenv(ধ্রুৱ ৱর্ণ *string)
 {
-    int	    i;
-    char    *p;
+    পূর্ণাঙ্ক	    i;
+    ৱর্ণ    *p;
 
-    if (envsize < 0)
+    যদি (envsize < 0)
     {				// first time putenv called
-	if (newenv() < 0)	// copy env. to heap
-	    return -1;
+	যদি (newenv() < 0)	// copy env. to heap
+	    ঘূৰাই -1;
     }
 
-    i = findenv((char *)string); // look for name in environment
+    i = findenv((ৱর্ণ *)string); // look for name in environment
 
-    if (i < 0)
+    যদি (i < 0)
     {				// name must be added
-	for (i = 0; environ[i]; i++);
-	if (i >= (envsize - 1))
+	বাবে (i = 0; environ[i]; i++);
+	যদি (i >= (envsize - 1))
 	{			// need new slot
-	    if (moreenv() < 0)
-		return -1;
+	    যদি (moreenv() < 0)
+		ঘূৰাই -1;
 	}
 	p = alloc(strlen(string) + 1);
-	if (p == NULL)		// not enough core
-	    return -1;
+	যদি (p == রিক্ত)		// not enough core
+	    ঘূৰাই -1;
 	environ[i + 1] = 0;	// new end of env.
     }
-    else
+    অন্যথা
     {				// name already in env.
 	p = vim_realloc(environ[i], strlen(string) + 1);
-	if (p == NULL)
-	    return -1;
+	যদি (p == রিক্ত)
+	    ঘূৰাই -1;
     }
     sprintf(p, "%s", string);	// copy into env.
     environ[i] = p;
 
-    return 0;
+    ঘূৰাই 0;
 }
 
-    static int
-findenv(char *name)
+    স্থির পূর্ণাঙ্ক
+findenv(ৱর্ণ *name)
 {
-    char    *namechar, *envchar;
-    int	    i, found;
+    ৱর্ণ    *namechar, *envchar;
+    পূর্ণাঙ্ক	    i, found;
 
     found = 0;
-    for (i = 0; environ[i] && !found; i++)
+    বাবে (i = 0; environ[i] && !found; i++)
     {
 	envchar = environ[i];
 	namechar = name;
-	while (*namechar && *namechar != '=' && (*namechar == *envchar))
+	যেতিয়ালৈ (*namechar && *namechar != '=' && (*namechar == *envchar))
 	{
 	    namechar++;
 	    envchar++;
 	}
 	found = ((*namechar == '\0' || *namechar == '=') && *envchar == '=');
     }
-    return found ? i - 1 : -1;
+    ঘূৰাই found ? i - 1 : -1;
 }
 
-    static int
-newenv(void)
+    স্থির পূর্ণাঙ্ক
+newenv(শূন্য)
 {
-    char    **env, *elem;
-    int	    i, esize;
+    ৱর্ণ    **env, *elem;
+    পূর্ণাঙ্ক	    i, esize;
 
-    for (i = 0; environ[i]; i++)
+    বাবে (i = 0; environ[i]; i++)
 	;
 
     esize = i + EXTRASIZE + 1;
-    env = ALLOC_MULT(char *, esize);
-    if (env == NULL)
-	return -1;
+    env = ALLOC_MULT(ৱর্ণ *, esize);
+    যদি (env == রিক্ত)
+	ঘূৰাই -1;
 
-    for (i = 0; environ[i]; i++)
+    বাবে (i = 0; environ[i]; i++)
     {
 	elem = alloc(strlen(environ[i]) + 1);
-	if (elem == NULL)
-	    return -1;
+	যদি (elem == রিক্ত)
+	    ঘূৰাই -1;
 	env[i] = elem;
 	strcpy(elem, environ[i]);
     }
@@ -2759,22 +2759,22 @@ newenv(void)
     env[i] = 0;
     environ = env;
     envsize = esize;
-    return 0;
+    ঘূৰাই 0;
 }
 
-    static int
-moreenv(void)
+    স্থির পূর্ণাঙ্ক
+moreenv(শূন্য)
 {
-    int	    esize;
-    char    **env;
+    পূর্ণাঙ্ক	    esize;
+    ৱর্ণ    **env;
 
     esize = envsize + EXTRASIZE;
-    env = vim_realloc((char *)environ, esize * sizeof (*env));
-    if (env == 0)
-	return -1;
+    env = vim_realloc((ৱর্ণ *)environ, esize * পরিমাণ (*env));
+    যদি (env == 0)
+	ঘূৰাই -1;
     environ = env;
     envsize = esize;
-    return 0;
+    ঘূৰাই 0;
 }
 
 # ifdef USE_VIMPTY_GETENV
@@ -2782,122 +2782,122 @@ moreenv(void)
  * Used for mch_getenv() for Mac.
  */
     char_u *
-vimpty_getenv(const char_u *string)
+vimpty_getenv(ধ্রুৱ char_u *string)
 {
-    int i;
+    পূর্ণাঙ্ক i;
     char_u *p;
 
-    if (envsize < 0)
-	return NULL;
+    যদি (envsize < 0)
+	ঘূৰাই রিক্ত;
 
-    i = findenv((char *)string);
+    i = findenv((ৱর্ণ *)string);
 
-    if (i < 0)
-	return NULL;
+    যদি (i < 0)
+	ঘূৰাই রিক্ত;
 
     p = vim_strchr((char_u *)environ[i], '=');
-    return (p + 1);
+    ঘূৰাই (p + 1);
 }
 # endif
 
 #endif // !defined(HAVE_SETENV) && !defined(HAVE_PUTENV)
 
-#if defined(FEAT_EVAL) || defined(FEAT_SPELL)
+#যদি defined(FEAT_EVAL) || defined(FEAT_SPELL)
 /*
  * Return 0 for not writable, 1 for writable file, 2 for a dir which we have
  * rights to write into.
  */
-    int
+    পূর্ণাঙ্ক
 filewritable(char_u *fname)
 {
-    int		retval = 0;
-# if defined(UNIX) || defined(VMS)
-    int		perm = 0;
+    পূর্ণাঙ্ক		retval = 0;
+# যদি defined(UNIX) || defined(VMS)
+    পূর্ণাঙ্ক		perm = 0;
 # endif
 
-# if defined(UNIX) || defined(VMS)
+# যদি defined(UNIX) || defined(VMS)
     perm = mch_getperm(fname);
 # endif
-    if (
+    যদি (
 # ifdef MSWIN
 	    mch_writable(fname) &&
-# else
-#  if defined(UNIX) || defined(VMS)
+# অন্যথা
+#  যদি defined(UNIX) || defined(VMS)
 	    (perm & 0222) &&
 #  endif
 # endif
-	    mch_access((char *)fname, W_OK) == 0
+	    mch_access((ৱর্ণ *)fname, W_OK) == 0
        )
     {
 	++retval;
-	if (mch_isdir(fname))
+	যদি (mch_isdir(fname))
 	    ++retval;
     }
-    return retval;
+    ঘূৰাই retval;
 }
 #endif
 
-#if defined(FEAT_SPELL) || defined(FEAT_PERSISTENT_UNDO)
+#যদি defined(FEAT_SPELL) || defined(FEAT_PERSISTENT_UNDO)
 /*
  * Read 2 bytes from "fd" and turn them into an int, MSB first.
  * Returns -1 when encountering EOF.
  */
-    int
+    পূর্ণাঙ্ক
 get2c(FILE *fd)
 {
-    int		c, n;
+    পূর্ণাঙ্ক		c, n;
 
     n = getc(fd);
-    if (n == EOF) return -1;
+    যদি (n == EOF) ঘূৰাই -1;
     c = getc(fd);
-    if (c == EOF) return -1;
-    return (n << 8) + c;
+    যদি (c == EOF) ঘূৰাই -1;
+    ঘূৰাই (n << 8) + c;
 }
 
 /*
  * Read 3 bytes from "fd" and turn them into an int, MSB first.
  * Returns -1 when encountering EOF.
  */
-    int
+    পূর্ণাঙ্ক
 get3c(FILE *fd)
 {
-    int		c, n;
+    পূর্ণাঙ্ক		c, n;
 
     n = getc(fd);
-    if (n == EOF) return -1;
+    যদি (n == EOF) ঘূৰাই -1;
     c = getc(fd);
-    if (c == EOF) return -1;
+    যদি (c == EOF) ঘূৰাই -1;
     n = (n << 8) + c;
     c = getc(fd);
-    if (c == EOF) return -1;
-    return (n << 8) + c;
+    যদি (c == EOF) ঘূৰাই -1;
+    ঘূৰাই (n << 8) + c;
 }
 
 /*
  * Read 4 bytes from "fd" and turn them into an int, MSB first.
  * Returns -1 when encountering EOF.
  */
-    int
+    পূর্ণাঙ্ক
 get4c(FILE *fd)
 {
-    int		c;
+    পূর্ণাঙ্ক		c;
     // Use unsigned rather than int otherwise result is undefined
     // when left-shift sets the MSB.
     unsigned	n;
 
     c = getc(fd);
-    if (c == EOF) return -1;
+    যদি (c == EOF) ঘূৰাই -1;
     n = (unsigned)c;
     c = getc(fd);
-    if (c == EOF) return -1;
+    যদি (c == EOF) ঘূৰাই -1;
     n = (n << 8) + (unsigned)c;
     c = getc(fd);
-    if (c == EOF) return -1;
+    যদি (c == EOF) ঘূৰাই -1;
     n = (n << 8) + (unsigned)c;
     c = getc(fd);
-    if (c == EOF) return -1;
+    যদি (c == EOF) ঘূৰাই -1;
     n = (n << 8) + (unsigned)c;
-    return (int)n;
+    ঘূৰাই (পূর্ণাঙ্ক)n;
 }
 
 /*
@@ -2905,44 +2905,44 @@ get4c(FILE *fd)
  * Returns NULL when out of memory or unable to read that many bytes.
  */
     char_u *
-read_string(FILE *fd, int cnt)
+read_string(FILE *fd, পূর্ণাঙ্ক cnt)
 {
     char_u	*str;
-    int		i;
-    int		c;
+    পূর্ণাঙ্ক		i;
+    পূর্ণাঙ্ক		c;
 
     // allocate memory
     str = alloc(cnt + 1);
-    if (str == NULL)
-	return NULL;
+    যদি (str == রিক্ত)
+	ঘূৰাই রিক্ত;
 
     // Read the string.  Quit when running into the EOF.
-    for (i = 0; i < cnt; ++i)
+    বাবে (i = 0; i < cnt; ++i)
     {
 	c = getc(fd);
-	if (c == EOF)
+	যদি (c == EOF)
 	{
 	    vim_free(str);
-	    return NULL;
+	    ঘূৰাই রিক্ত;
 	}
 	str[i] = c;
     }
     str[i] = NUL;
-    return str;
+    ঘূৰাই str;
 }
 
 /*
  * Write a number to file "fd", MSB first, in "len" bytes.
  */
-    int
-put_bytes(FILE *fd, long_u nr, int len)
+    পূর্ণাঙ্ক
+put_bytes(FILE *fd, long_u nr, পূর্ণাঙ্ক len)
 {
-    int	    i;
+    পূর্ণাঙ্ক	    i;
 
-    for (i = len - 1; i >= 0; --i)
-	if (putc((int)(nr >> (i * 8)), fd) == EOF)
-	    return FAIL;
-    return OK;
+    বাবে (i = len - 1; i >= 0; --i)
+	যদি (putc((পূর্ণাঙ্ক)(nr >> (i * 8)), fd) == EOF)
+	    ঘূৰাই FAIL;
+    ঘূৰাই OK;
 }
 
 #endif
@@ -2953,12 +2953,12 @@ put_bytes(FILE *fd, long_u nr, int len)
  * Return time in msec since "start_tv".
  */
     long
-elapsed(struct timeval *start_tv)
+elapsed(সংরচনা timeval *start_tv)
 {
-    struct timeval  now_tv;
+    সংরচনা timeval  now_tv;
 
-    gettimeofday(&now_tv, NULL);
-    return (now_tv.tv_sec - start_tv->tv_sec) * 1000L
+    gettimeofday(&now_tv, রিক্ত);
+    ঘূৰাই (now_tv.tv_sec - start_tv->tv_sec) * 1000L
 	 + (now_tv.tv_usec - start_tv->tv_usec) / 1000L;
 }
 # endif
@@ -2970,14 +2970,14 @@ elapsed(struct timeval *start_tv)
     long
 elapsed(DWORD start_tick)
 {
-    DWORD	now = GetTickCount();
+    DWORD	now = Get_Tick_গুনতি();
 
-    return (long)now - (long)start_tick;
+    ঘূৰাই (long)now - (long)start_tick;
 }
 # endif
 #endif
 
-#if defined(FEAT_JOB_CHANNEL) \
+#যদি defined(FEAT_JOB_CHANNEL) \
 	|| (defined(UNIX) && (!defined(USE_SYSTEM) \
 	|| (defined(FEAT_GUI) && defined(FEAT_TERMINAL))))
 /*
@@ -2985,79 +2985,79 @@ elapsed(DWORD start_tick)
  * "argv" is an allocated array with "argc" entries and room for 4 more.
  * Returns FAIL when out of memory.
  */
-    int
-mch_parse_cmd(char_u *cmd, int use_shcf, char ***argv, int *argc)
+    পূর্ণাঙ্ক
+mch_parse_cmd(char_u *cmd, পূর্ণাঙ্ক use_shcf, ৱর্ণ ***argv, পূর্ণাঙ্ক *argc)
 {
-    int		i;
+    পূর্ণাঙ্ক		i;
     char_u	*p, *d;
-    int		inquote;
+    পূর্ণাঙ্ক		inquote;
 
     /*
      * Do this loop twice:
      * 1: find number of arguments
      * 2: separate them and build argv[]
      */
-    for (i = 1; i <= 2; ++i)
+    বাবে (i = 1; i <= 2; ++i)
     {
 	p = skipwhite(cmd);
 	inquote = FALSE;
 	*argc = 0;
-	while (*p != NUL)
+	যেতিয়ালৈ (*p != NUL)
 	{
-	    if (i == 2)
-		(*argv)[*argc] = (char *)p;
+	    যদি (i == 2)
+		(*argv)[*argc] = (ৱর্ণ *)p;
 	    ++*argc;
 	    d = p;
-	    while (*p != NUL && (inquote || (*p != ' ' && *p != TAB)))
+	    যেতিয়ালৈ (*p != NUL && (inquote || (*p != ' ' && *p != TAB)))
 	    {
-		if (p[0] == '"')
+		যদি (p[0] == '"')
 		    // quotes surrounding an argument and are dropped
 		    inquote = !inquote;
-		else
+		অন্যথা
 		{
-		    if (rem_backslash(p))
+		    যদি (rem_backslash(p))
 		    {
 			// First pass: skip over "\ " and "\"".
 			// Second pass: Remove the backslash.
 			++p;
 		    }
-		    if (i == 2)
+		    যদি (i == 2)
 			*d++ = *p;
 		}
 		++p;
 	    }
-	    if (*p == NUL)
+	    যদি (*p == NUL)
 	    {
-		if (i == 2)
+		যদি (i == 2)
 		    *d++ = NUL;
-		break;
+		ভঙ্গ;
 	    }
-	    if (i == 2)
+	    যদি (i == 2)
 		*d++ = NUL;
 	    p = skipwhite(p + 1);
 	}
-	if (*argv == NULL)
+	যদি (*argv == রিক্ত)
 	{
-	    if (use_shcf)
+	    যদি (use_shcf)
 	    {
 		// Account for possible multiple args in p_shcf.
 		p = p_shcf;
-		for (;;)
+		বাবে (;;)
 		{
 		    p = skiptowhite(p);
-		    if (*p == NUL)
-			break;
+		    যদি (*p == NUL)
+			ভঙ্গ;
 		    ++*argc;
 		    p = skipwhite(p);
 		}
 	    }
 
-	    *argv = ALLOC_MULT(char *, *argc + 4);
-	    if (*argv == NULL)	    // out of memory
-		return FAIL;
+	    *argv = ALLOC_MULT(ৱর্ণ *, *argc + 4);
+	    যদি (*argv == রিক্ত)	    // out of memory
+		ঘূৰাই FAIL;
 	}
     }
-    return OK;
+    ঘূৰাই OK;
 }
 
 /*
@@ -3065,63 +3065,63 @@ mch_parse_cmd(char_u *cmd, int use_shcf, char ***argv, int *argc)
  * "argv[argc]" is set to NULL;
  * Return FAIL when out of memory.
  */
-    int
-build_argv_from_string(char_u *cmd, char ***argv, int *argc)
+    পূর্ণাঙ্ক
+build_argv_from_string(char_u *cmd, ৱর্ণ ***argv, পূর্ণাঙ্ক *argc)
 {
     char_u	*cmd_copy;
-    int		i;
+    পূর্ণাঙ্ক		i;
 
     // Make a copy, parsing will modify "cmd".
     cmd_copy = vim_strsave(cmd);
-    if (cmd_copy == NULL
+    যদি (cmd_copy == রিক্ত
 	    || mch_parse_cmd(cmd_copy, FALSE, argv, argc) == FAIL)
     {
 	vim_free(cmd_copy);
-	return FAIL;
+	ঘূৰাই FAIL;
     }
-    for (i = 0; i < *argc; i++)
-	(*argv)[i] = (char *)vim_strsave((char_u *)(*argv)[i]);
-    (*argv)[*argc] = NULL;
+    বাবে (i = 0; i < *argc; i++)
+	(*argv)[i] = (ৱর্ণ *)vim_strsave((char_u *)(*argv)[i]);
+    (*argv)[*argc] = রিক্ত;
     vim_free(cmd_copy);
-    return OK;
+    ঘূৰাই OK;
 }
 
 #endif
 
-#if defined(FEAT_EVAL)
+#যদি defined(FEAT_EVAL)
 /*
  * Build "argv[argc]" from the list "l".
  * "argv[argc]" is set to NULL;
  * Return FAIL when out of memory.
  */
-    int
-build_argv_from_list(list_T *l, char ***argv, int *argc)
+    পূর্ণাঙ্ক
+build_argv_from_list(list_T *l, ৱর্ণ ***argv, পূর্ণাঙ্ক *argc)
 {
     listitem_T  *li;
     char_u	*s;
 
     // Pass argv[] to mch_call_shell().
-    *argv = ALLOC_MULT(char *, l->lv_len + 1);
-    if (*argv == NULL)
-	return FAIL;
+    *argv = ALLOC_MULT(ৱর্ণ *, l->lv_len + 1);
+    যদি (*argv == রিক্ত)
+	ঘূৰাই FAIL;
     *argc = 0;
-    FOR_ALL_LIST_ITEMS(l, li)
+    FOR_ALL_LIST_বস্তুসমূহ(l, li)
     {
 	s = tv_get_string_chk(&li->li_tv);
-	if (s == NULL)
+	যদি (s == রিক্ত)
 	{
-	    int i;
+	    পূর্ণাঙ্ক i;
 
-	    for (i = 0; i < *argc; ++i)
+	    বাবে (i = 0; i < *argc; ++i)
 		VIM_CLEAR((*argv)[i]);
-	    (*argv)[0] = NULL;
-	    return FAIL;
+	    (*argv)[0] = রিক্ত;
+	    ঘূৰাই FAIL;
 	}
-	(*argv)[*argc] = (char *)vim_strsave(s);
+	(*argv)[*argc] = (ৱর্ণ *)vim_strsave(s);
 	*argc += 1;
     }
-    (*argv)[*argc] = NULL;
-    return OK;
+    (*argv)[*argc] = রিক্ত;
+    ঘূৰাই OK;
 }
 #endif
 
@@ -3134,58 +3134,58 @@ build_argv_from_list(list_T *l, char ***argv, int *argc)
  *      Use the wrong result because each result is different.
  * 3: Windows 10 insider preview (current latest logic)
  */
-    int
-get_special_pty_type(void)
+    পূর্ণাঙ্ক
+get_special_pty_type(শূন্য)
 {
 #ifdef MSWIN
-    return get_conpty_type();
-#else
-    return 0;
+    ঘূৰাই get_conpty_type();
+#অন্যথা
+    ঘূৰাই 0;
 #endif
 }
 
 // compare two keyvalue_T structs by case sensitive value
-    int
-cmp_keyvalue_value(const void *a, const void *b)
+    পূর্ণাঙ্ক
+cmp_keyvalue_মান(ধ্রুৱ শূন্য *a, ধ্রুৱ শূন্য *b)
 {
     keyvalue_T *kv1 = (keyvalue_T *)a;
     keyvalue_T *kv2 = (keyvalue_T *)b;
 
-    return STRCMP(kv1->value.string, kv2->value.string);
+    ঘূৰাই STRCMP(kv1->মান.string, kv2->মান.string);
 }
 
 // compare two keyvalue_T structs by value with length
-    int
-cmp_keyvalue_value_n(const void *a, const void *b)
+    পূর্ণাঙ্ক
+cmp_keyvalue_মান_n(ধ্রুৱ শূন্য *a, ধ্রুৱ শূন্য *b)
 {
     keyvalue_T *kv1 = (keyvalue_T *)a;
     keyvalue_T *kv2 = (keyvalue_T *)b;
 
-    return STRNCMP(kv1->value.string, kv2->value.string, MAX(kv1->value.length,
-		kv2->value.length));
+    ঘূৰাই STRNCMP(kv1->মান.string, kv2->মান.string, MAX(kv1->মান.length,
+		kv2->মান.length));
 }
 
 // compare two keyvalue_T structs by case insensitive value
-    int
-cmp_keyvalue_value_i(const void *a, const void *b)
+    পূর্ণাঙ্ক
+cmp_keyvalue_মান_i(ধ্রুৱ শূন্য *a, ধ্রুৱ শূন্য *b)
 {
     keyvalue_T *kv1 = (keyvalue_T *)a;
     keyvalue_T *kv2 = (keyvalue_T *)b;
 
-    return STRICMP(kv1->value.string, kv2->value.string);
+    ঘূৰাই STRICMP(kv1->মান.string, kv2->মান.string);
 }
 
 // compare two keyvalue_T structs by case insensitive ASCII value
 // with value.length
-    int
-cmp_keyvalue_value_ni(const void *a, const void *b)
+    পূর্ণাঙ্ক
+cmp_keyvalue_মান_ni(ধ্রুৱ শূন্য *a, ধ্রুৱ শূন্য *b)
 {
     keyvalue_T *kv1 = (keyvalue_T *)a;
     keyvalue_T *kv2 = (keyvalue_T *)b;
 
-    return vim_strnicmp_asc((char *)kv1->value.string,
-	    (char *)kv2->value.string, MAX(kv1->value.length,
-		    kv2->value.length));
+    ঘূৰাই vim_strnicmp_asc((ৱর্ণ *)kv1->মান.string,
+	    (ৱর্ণ *)kv2->মান.string, MAX(kv1->মান.length,
+		    kv2->মান.length));
 }
 
 /*
@@ -3195,112 +3195,112 @@ cmp_keyvalue_value_ni(const void *a, const void *b)
  *  - Each pair of blocks is merged in sorted order.
  *  - Merged blocks are reconnected to build the sorted list.
  */
-    void *
+    শূন্য *
 mergesort_list(
-    void	*head,
-    void	*(*get_next)(void *),
-    void	(*set_next)(void *, void *),
-    void	*(*get_prev)(void *),
-    void	(*set_prev)(void *, void *),
-    int		(*compare)(const void *, const void *))
+    শূন্য	*head,
+    শূন্য	*(*get_next)(শূন্য *),
+    শূন্য	(*set_next)(শূন্য *, শূন্য *),
+    শূন্য	*(*get_prev)(শূন্য *),
+    শূন্য	(*set_prev)(শূন্য *, শূন্য *),
+    পূর্ণাঙ্ক		(*compare)(ধ্রুৱ শূন্য *, ধ্রুৱ শূন্য *))
 {
-    if (!head || !get_next(head))
-	return head;
+    যদি (!head || !get_next(head))
+	ঘূৰাই head;
 
     // Count length
-    int	    n = 0;
-    void*   curr = head;
-    while (curr)
+    পূর্ণাঙ্ক	    n = 0;
+    শূন্য*   curr = head;
+    যেতিয়ালৈ (curr)
     {
 	n++;
 	curr = get_next(curr);
     }
 
-    int	size;
-    for (size = 1; size < n; size *= 2)
+    পূর্ণাঙ্ক	size;
+    বাবে (size = 1; size < n; size *= 2)
     {
-	void*	new_head = NULL;
-	void*	tail = NULL;
+	শূন্য*	new_head = রিক্ত;
+	শূন্য*	tail = রিক্ত;
 	curr = head;
 
-	while (curr)
+	যেতিয়ালৈ (curr)
 	{
 	    // Split two runs
-	    void    *left = curr;
-	    void    *right = left;
-	    int	    i;
-	    for (i = 0; i < size && right; ++i)
-		right = get_next(right);
+	    শূন্য    *বাম = curr;
+	    শূন্য    *ডান = বাম;
+	    পূর্ণাঙ্ক	    i;
+	    বাবে (i = 0; i < size && ডান; ++i)
+		ডান = get_next(ডান);
 
-	    void    *next = right;
-	    for (i = 0; i < size && next; ++i)
+	    শূন্য    *next = ডান;
+	    বাবে (i = 0; i < size && next; ++i)
 		next = get_next(next);
 
 	    // Break links
-	    void    *l_end = right ? get_prev(right) : NULL;
-	    if (l_end)
-		set_next(l_end, NULL);
-	    if (right)
-		set_prev(right, NULL);
+	    শূন্য    *l_end = ডান ? get_prev(ডান) : রিক্ত;
+	    যদি (l_end)
+		set_next(l_end, রিক্ত);
+	    যদি (ডান)
+		set_prev(ডান, রিক্ত);
 
-	    void    *r_end = next ? get_prev(next) : NULL;
-	    if (r_end)
-		set_next(r_end, NULL);
-	    if (next)
-		set_prev(next, NULL);
+	    শূন্য    *r_end = next ? get_prev(next) : রিক্ত;
+	    যদি (r_end)
+		set_next(r_end, রিক্ত);
+	    যদি (next)
+		set_prev(next, রিক্ত);
 
 	    // Merge
-	    void    *merged = NULL;
-	    void    *merged_tail = NULL;
+	    শূন্য    *merged = রিক্ত;
+	    শূন্য    *merged_tail = রিক্ত;
 
-	    while (left || right)
+	    যেতিয়ালৈ (বাম || ডান)
 	    {
-		void	*chosen = NULL;
-		if (!left)
+		শূন্য	*chosen = রিক্ত;
+		যদি (!বাম)
 		{
-		    chosen = right;
-		    right = get_next(right);
+		    chosen = ডান;
+		    ডান = get_next(ডান);
 		}
-		else if (!right)
+		অন্যথা যদি (!ডান)
 		{
-		    chosen = left;
-		    left = get_next(left);
+		    chosen = বাম;
+		    বাম = get_next(বাম);
 		}
-		else if (compare(left, right) <= 0)
+		অন্যথা যদি (compare(বাম, ডান) <= 0)
 		{
-		    chosen = left;
-		    left = get_next(left);
+		    chosen = বাম;
+		    বাম = get_next(বাম);
 		}
-		else
+		অন্যথা
 		{
-		    chosen = right;
-		    right = get_next(right);
+		    chosen = ডান;
+		    ডান = get_next(ডান);
 		}
 
-		if (merged_tail)
+		যদি (merged_tail)
 		{
 		    set_next(merged_tail, chosen);
 		    set_prev(chosen, merged_tail);
 		    merged_tail = chosen;
 		}
-		else
+		অন্যথা
 		{
 		    merged = merged_tail = chosen;
-		    set_prev(chosen, NULL);
+		    set_prev(chosen, রিক্ত);
 		}
 	    }
 
 	    // Connect to full list
-	    if (!new_head)
+	    যদি (!new_head)
 		new_head = merged;
-	    else
+	    অন্যথা
 	    {
 		set_next(tail, merged);
 		set_prev(merged, tail);
 	    }
 
 	    // Move tail to end
-	    while (get_next(merged_tail))
+	    যেতিয়ালৈ (get_next(merged_tail))
 		merged_tail = get_next(merged_tail);
 	    tail = merged_tail;
 
@@ -3310,29 +3310,29 @@ mergesort_list(
 	head = new_head;
     }
 
-    return head;
+    ঘূৰাই head;
 }
 
-static const char_u base64_table[] =
+স্থির ধ্রুৱ char_u base64_table[] =
     "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
-static char_u base64_dec_table[256];
+স্থির char_u base64_dec_table[256];
 
 #define BASE64_ENCODED_LEN(len) ((((len) + 2) / 3) * 4 + 1)
 
 /*
  * Initialize the base64 decoding table
  */
-    static void
-init_base64_dec_table(void)
+    স্থির শূন্য
+init_base64_dec_table(শূন্য)
 {
-    static int base64_dec_tbl_initialized = FALSE;
+    স্থির পূর্ণাঙ্ক base64_dec_tbl_initialized = FALSE;
 
-    if (base64_dec_tbl_initialized)
-	return;
+    যদি (base64_dec_tbl_initialized)
+	ঘূৰাই;
 
-    vim_memset(base64_dec_table, 0xFF, sizeof(base64_dec_table));
-    for (size_t i = 0; i < sizeof(base64_table) - 1; i++)
+    vim_memset(base64_dec_table, 0xFF, পরিমাণ(base64_dec_table));
+    বাবে (size_t i = 0; i < পরিমাণ(base64_table) - 1; i++)
 	base64_dec_table[(char_u)base64_table[i]] = (char_u)i;
     base64_dec_table['='] = 0;
 
@@ -3345,11 +3345,11 @@ init_base64_dec_table(void)
  * of bytes written, excluding the NUL.
  */
     long
-base64_encode_buf(char_u *dst, const char_u *src, size_t len)
+base64_encode_buf(char_u *dst, ধ্রুৱ char_u *src, size_t len)
 {
     size_t i, j;
 
-    for (i = 0, j = 0; i < len;)
+    বাবে (i = 0, j = 0; i < len;)
     {
 	size_t remaining = len - i;
 
@@ -3370,7 +3370,7 @@ base64_encode_buf(char_u *dst, const char_u *src, size_t len)
     }
 
     dst[j] = NUL;
-    return (long)j;
+    ঘূৰাই (long)j;
 }
 
 /*
@@ -3378,14 +3378,14 @@ base64_encode_buf(char_u *dst, const char_u *src, size_t len)
  * NULL on OOM.  Caller frees with vim_free().
  */
     char_u *
-base64_encode(const char_u *data, size_t len)
+base64_encode(ধ্রুৱ char_u *data, size_t len)
 {
     char_u *encoded = alloc(BASE64_ENCODED_LEN(len));
 
-    if (encoded == NULL)
-	return NULL;
+    যদি (encoded == রিক্ত)
+	ঘূৰাই রিক্ত;
     base64_encode_buf(encoded, data, len);
-    return encoded;
+    ঘূৰাই encoded;
 }
 
 /*
@@ -3393,71 +3393,71 @@ base64_encode(const char_u *data, size_t len)
  * "out" (appended byte-by-byte, e.g. a blob's bv_ga). Returns OK on success and
  * FAIL on failure.
  */
-    int
-base64_decode(const char_u *data, size_t len, garray_T *out)
+    পূর্ণাঙ্ক
+base64_decode(ধ্রুৱ char_u *data, size_t len, garray_T *out)
 {
-    if (len == 0)
-	return OK;
+    যদি (len == 0)
+	ঘূৰাই OK;
 
-    if (len % 4 != 0)
+    যদি (len % 4 != 0)
     {
 	semsg(_(e_invalid_argument_str), data);
-	return FAIL;
+	ঘূৰাই FAIL;
     }
 
     init_base64_dec_table();
 
     size_t decoded_len = (len / 4) * 3;
-    if (data[len - 1] == '=')
+    যদি (data[len - 1] == '=')
 	decoded_len--;
-    if (data[len - 2] == '=')
+    যদি (data[len - 2] == '=')
 	decoded_len--;
 
     size_t i, j;
-    for (i = 0, j = 0; i < len;)
+    বাবে (i = 0, j = 0; i < len;)
     {
 	int_u sextet_a = base64_dec_table[(char_u)data[i++]];
 	int_u sextet_b = base64_dec_table[(char_u)data[i++]];
 	int_u sextet_c = base64_dec_table[(char_u)data[i++]];
 	int_u sextet_d = base64_dec_table[(char_u)data[i++]];
 
-	if (sextet_a == 0xFF || sextet_b == 0xFF || sextet_c == 0xFF
+	যদি (sextet_a == 0xFF || sextet_b == 0xFF || sextet_c == 0xFF
 							|| sextet_d == 0xFF)
 	{
 	    semsg(_(e_invalid_argument_str), data);
 	    ga_clear(out);
-	    return FAIL;
+	    ঘূৰাই FAIL;
 	}
 
 	int_u triple = (sextet_a << 18) | (sextet_b << 12)
 						| (sextet_c << 6) | sextet_d;
 
-	if (j < decoded_len)
+	যদি (j < decoded_len)
 	{
 	    ga_append(out, (triple >> 16) & 0xFF);
 	    j++;
 	}
-	if (j < decoded_len)
+	যদি (j < decoded_len)
 	{
 	    ga_append(out, (triple >> 8) & 0xFF);
 	    j++;
 	}
-	if (j < decoded_len)
+	যদি (j < decoded_len)
 	{
 	    ga_append(out, triple & 0xFF);
 	    j++;
 	}
 
-	if (j == decoded_len)
+	যদি (j == decoded_len)
 	{
-	    if ((data[len - 2] == '=' && ((sextet_b & 0xF) != 0))
+	    যদি ((data[len - 2] == '=' && ((sextet_b & 0xF) != 0))
 		|| ((data[len - 1] == '=') && ((sextet_c & 0x3) != 0)))
 	    {
 		semsg(_(e_invalid_argument_str), data);
 		ga_clear(out);
-		return FAIL;
+		ঘূৰাই FAIL;
 	    }
 	}
     }
-    return OK;
+    ঘূৰাই OK;
 }

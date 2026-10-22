@@ -30,24 +30,24 @@
 #ifndef _MSC_VER
 # include <unistd.h>
 #endif
-#include <malloc.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <fcntl.h>
+#অন্তর্ভাৱ <malloc.h>
+#অন্তর্ভাৱ <stdio.h>
+#অন্তর্ভাৱ <stdlib.h>
+#অন্তর্ভাৱ <string.h>
+#অন্তর্ভাৱ <fcntl.h>
 
 #ifdef _WIN32
 # define sysconf(x) -1
 #endif
 
-void usage(void)
+শূন্য usage(শূন্য)
 {
 	fprintf(stderr,
 "tee usage:\n\
 \ttee [-a] file ... file_n\n\
 \n\
 \t-a\tappend to files instead of truncating\n\
-\nTee reads its input, and writes to each of the specified files,\n\
+\nTee reads its প্ৰবেশ, and writes to each of the specified files,\n\
 as well as to the standard output.\n\
 \n\
 This version supplied with Vim 4.2 to make ':make' possible.\n\
@@ -61,49 +61,49 @@ For a more complete and stable version, consider getting\n\
  * We could use fgets, but I want to be able to handle binary blubber.
  */
 
-int
-myfread(char *buf, int elsize /*ignored*/, int max, FILE *fp)
+পূর্ণাঙ্ক
+myfread(ৱর্ণ *buf, পূর্ণাঙ্ক elsize /*ignored*/, পূর্ণাঙ্ক max, FILE *fp)
 {
-	int	c;
-	int	n = 0;
+	পূর্ণাঙ্ক	c;
+	পূর্ণাঙ্ক	n = 0;
 
-	while ((n < max) && ((c = getchar()) != EOF))
+	যেতিয়ালৈ ((n < max) && ((c = getchar()) != EOF))
 	{
 		*(buf++) = c;
 		n++;
-		if (c == '\n' || c == '\r')
-			break;
+		যদি (c == '\n' || c == '\r')
+			ভঙ্গ;
 	}
-	return n;
+	ঘূৰাই n;
 }
 
 
-int
-main(int argc, char *argv[])
+পূর্ণাঙ্ক
+main(পূর্ণাঙ্ক argc, ৱর্ণ *argv[])
 {
-	int	append = 0;
+	পূর্ণাঙ্ক	append = 0;
 	size_t	numfiles;
-	int	maxfiles;
+	পূর্ণাঙ্ক	maxfiles;
 	FILE	**filepointers;
-	int	i;
-	char	buf[BUFSIZ];
-	int	n;
-	int	optind = 1;
+	পূর্ণাঙ্ক	i;
+	ৱর্ণ	buf[BUFSIZ];
+	পূর্ণাঙ্ক	n;
+	পূর্ণাঙ্ক	optind = 1;
 
-	for (i = 1; i < argc; i++)
+	বাবে (i = 1; i < argc; i++)
 	{
-		if (argv[i][0] != '-')
-			break;
-		if (!strcmp(argv[i], "-a"))
+		যদি (argv[i][0] != '-')
+			ভঙ্গ;
+		যদি (!strcmp(argv[i], "-a"))
 			append++;
-		else
+		অন্যথা
 			usage();
 		optind++;
 	}
 
 	numfiles = argc - optind;
 
-	if (numfiles == 0)
+	যদি (numfiles == 0)
 	{
 		fprintf(stderr, "doesn't make much sense using tee without any file name arguments...\n");
 		usage();
@@ -111,53 +111,53 @@ main(int argc, char *argv[])
 	}
 
 	maxfiles = sysconf(_SC_OPEN_MAX);	/* or fill in 10 or so */
-	if (maxfiles < 0)
+	যদি (maxfiles < 0)
 		maxfiles = 10;
-	if (numfiles + 3 > maxfiles)	/* +3 accounts for stdin, out, err */
+	যদি (numfiles + 3 > maxfiles)	/* +3 accounts for stdin, out, err */
 	{
 		fprintf(stderr, "Sorry, there is a limit of max %d files.\n", maxfiles - 3);
 		exit(1);
 	}
-	filepointers = calloc(numfiles, sizeof(FILE *));
-	if (filepointers == NULL)
+	filepointers = calloc(numfiles, পরিমাণ(FILE *));
+	যদি (filepointers == রিক্ত)
 	{
 		fprintf(stderr, "Error allocating memory for %ld files\n",
 															   (long)numfiles);
 		exit(1);
 	}
-	for (i = 0; i < numfiles; i++)
+	বাবে (i = 0; i < numfiles; i++)
 	{
 		filepointers[i] = fopen(argv[i+optind], append ? "ab" : "wb");
-		if (filepointers[i] == NULL)
+		যদি (filepointers[i] == রিক্ত)
 		{
 			fprintf(stderr, "Can't open \"%s\"\n", argv[i+optind]);
 			exit(1);
 		}
 	}
 #ifdef _WIN32
-	setmode(fileno(stdin),  O_BINARY);
+	setmode(fileno(stdin),  O_দ্বিমিক);
 	fflush(stdout);	/* needed for _fsetmode(stdout) */
-	setmode(fileno(stdout),  O_BINARY);
+	setmode(fileno(stdout),  O_দ্বিমিক);
 #endif
 
-	while ((n = myfread(buf, sizeof(char), sizeof(buf), stdin)) > 0)
+	যেতিয়ালৈ ((n = myfread(buf, পরিমাণ(ৱর্ণ), পরিমাণ(buf), stdin)) > 0)
 	{
-		fwrite(buf, sizeof(char), n, stdout);
+		fwrite(buf, পরিমাণ(ৱর্ণ), n, stdout);
 		fflush(stdout);
-		for (i = 0; i < numfiles; i++)
+		বাবে (i = 0; i < numfiles; i++)
 		{
-			if (filepointers[i] &&
-			     fwrite(buf, sizeof(char), n, filepointers[i]) != n)
+			যদি (filepointers[i] &&
+			     fwrite(buf, পরিমাণ(ৱর্ণ), n, filepointers[i]) != n)
 			{
 				fprintf(stderr, "Error writing to file \"%s\"\n", argv[i+optind]);
 				fclose(filepointers[i]);
-				filepointers[i] = NULL;
+				filepointers[i] = রিক্ত;
 			}
 		}
 	}
-	for (i = 0; i < numfiles; i++)
+	বাবে (i = 0; i < numfiles; i++)
 	{
-		if (filepointers[i])
+		যদি (filepointers[i])
 			fclose(filepointers[i]);
 	}
 

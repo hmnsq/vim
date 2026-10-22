@@ -11,18 +11,18 @@
  * time.c: functions related to time and timers
  */
 
-#include "vim.h"
+#অন্তর্ভাৱ "vim.h"
 
 /*
  * Cache of the current timezone name as retrieved from TZ, or an empty string
  * where unset, up to 64 octets long including trailing null byte.
  */
-#if defined(HAVE_LOCALTIME_R) && defined(HAVE_TZSET)
-static char	tz_cache[64];
+#যদি defined(HAVE_LOCALTIME_R) && defined(HAVE_TZSET)
+স্থির ৱর্ণ	tz_cache[64];
 #endif
 
 #define FOR_ALL_TIMERS(t) \
-    for ((t) = first_timer; (t) != NULL; (t) = (t)->tr_next)
+    বাবে ((t) = first_timer; (t) != রিক্ত; (t) = (t)->tr_next)
 
 /*
  * Call either localtime(3) or localtime_r(3) from POSIX libc time.h, with the
@@ -34,27 +34,27 @@ static char	tz_cache[64];
  * standard doesn't require localtime_r(3) implementations to do that as it
  * does with localtime(3), and we don't want to call tzset(3) every time.
  */
-    static struct tm *
+    স্থির সংরচনা tm *
 vim_localtime(
-    const time_t	*timep,		// timestamp for local representation
-    struct tm		*result UNUSED)	// pointer to caller return buffer
+    ধ্রুৱ time_t	*timep,		// timestamp for local representation
+    সংরচনা tm		*result UNUSED)	// pointer to caller return buffer
 {
 #ifdef HAVE_LOCALTIME_R
 # ifdef HAVE_TZSET
-    char		*tz;		// pointer for TZ environment var
+    ৱর্ণ		*tz;		// pointer for TZ environment var
 
-    tz = (char *)mch_getenv((char_u *)"TZ");
-    if (tz == NULL)
+    tz = (ৱর্ণ *)mch_getenv((char_u *)"TZ");
+    যদি (tz == রিক্ত)
 	tz = "";
-    if (STRNCMP(tz_cache, tz, sizeof(tz_cache) - 1) != 0)
+    যদি (STRNCMP(tz_cache, tz, পরিমাণ(tz_cache) - 1) != 0)
     {
 	tzset();
-	vim_strncpy((char_u *)tz_cache, (char_u *)tz, sizeof(tz_cache) - 1);
+	vim_strncpy((char_u *)tz_cache, (char_u *)tz, পরিমাণ(tz_cache) - 1);
     }
 # endif	// HAVE_TZSET
-    return localtime_r(timep, result);
-#else
-    return localtime(timep);
+    ঘূৰাই localtime_r(timep, result);
+#অন্যথা
+    ঘূৰাই localtime(timep);
 #endif	// HAVE_LOCALTIME_R
 }
 
@@ -63,12 +63,12 @@ vim_localtime(
  * was used.
  */
     time_T
-vim_time(void)
+vim_time(শূন্য)
 {
 #ifdef FEAT_EVAL
-    return time_for_testing == 0 ? time(NULL) : time_for_testing;
-#else
-    return time(NULL);
+    ঘূৰাই time_for_testing == 0 ? time(রিক্ত) : time_for_testing;
+#অন্যথা
+    ঘূৰাই time(রিক্ত);
 #endif
 }
 
@@ -79,22 +79,22 @@ vim_time(void)
  * When "add_newline" is TRUE add a newline like ctime() does.
  * Uses a static buffer.
  */
-    char *
-get_ctime(time_t thetime, int add_newline)
+    ৱর্ণ *
+get_ctime(time_t thetime, পূর্ণাঙ্ক add_newline)
 {
-    static char buf[100];  // hopefully enough for every language
+    স্থির ৱর্ণ buf[100];  // hopefully enough for every language
 #ifdef HAVE_STRFTIME
-    struct tm	tmval;
-    struct tm	*curtime;
+    সংরচনা tm	tmval;
+    সংরচনা tm	*curtime;
 
     curtime = vim_localtime(&thetime, &tmval);
     // MSVC returns NULL for an invalid value of seconds.
-    if (curtime == NULL)
-	vim_strncpy((char_u *)buf, (char_u *)_("(Invalid)"), sizeof(buf) - 2);
-    else
+    যদি (curtime == রিক্ত)
+	vim_strncpy((char_u *)buf, (char_u *)_("(Invalid)"), পরিমাণ(buf) - 2);
+    অন্যথা
     {
 	// xgettext:no-c-format
-	if (strftime(buf, sizeof(buf) - 2, _("%a %b %d %H:%M:%S %Y"), curtime)
+	যদি (strftime(buf, পরিমাণ(buf) - 2, _("%a %b %d %H:%M:%S %Y"), curtime)
 									  == 0)
 	{
 	    // Quoting "man strftime":
@@ -102,77 +102,77 @@ get_ctime(time_t thetime, int add_newline)
 	    // > null byte) would exceed max bytes, then strftime() returns 0,
 	    // > and the contents of the array are undefined.
 	    vim_strncpy((char_u *)buf, (char_u *)_("(Invalid)"),
-							      sizeof(buf) - 2);
+							      পরিমাণ(buf) - 2);
 	}
 # ifdef MSWIN
-	if (enc_codepage >= 0 && (int)GetACP() != enc_codepage)
+	যদি (enc_codepage >= 0 && (পূর্ণাঙ্ক)GetACP() != enc_codepage)
 	{
-	    char_u	*to_free = NULL;
-	    int		len;
+	    char_u	*to_free = রিক্ত;
+	    পূর্ণাঙ্ক		len;
 
-	    acp_to_enc((char_u *)buf, (int)strlen(buf), &to_free, &len);
-	    if (to_free != NULL)
+	    acp_to_enc((char_u *)buf, (পূর্ণাঙ্ক)strlen(buf), &to_free, &len);
+	    যদি (to_free != রিক্ত)
 	    {
-		STRNCPY(buf, to_free, sizeof(buf) - 2);
+		STRNCPY(buf, to_free, পরিমাণ(buf) - 2);
 		vim_free(to_free);
 	    }
 	}
 # endif
     }
-#else
+#অন্যথা
     STRCPY(buf, "(unknown)");
 #endif
-    if (add_newline)
+    যদি (add_newline)
 	STRCAT(buf, "\n");
-    return buf;
+    ঘূৰাই buf;
 }
 
-#if defined(FEAT_EVAL)
+#যদি defined(FEAT_EVAL)
 
-# if defined(MACOS_X)
+# যদি defined(MACOS_X)
 #  include <time.h>	// for time_t
 # endif
 
 /*
  * "localtime()" function
  */
-    void
+    শূন্য
 f_localtime(typval_T *argvars UNUSED, typval_T *rettv)
 {
-    rettv->vval.v_number = (varnumber_T)time(NULL);
+    rettv->vval.v_সংখ্যা = (varnumber_T)time(রিক্ত);
 }
 
-# if defined(FEAT_RELTIME)
+# যদি defined(FEAT_RELTIME)
 /*
  * Convert a List to proftime_T.
  * Return FAIL when there is something wrong.
  */
-    static int
+    স্থির পূর্ণাঙ্ক
 list2proftime(typval_T *arg, proftime_T *tm)
 {
     long	n1, n2;
-    int	error = FALSE;
+    পূর্ণাঙ্ক	error = FALSE;
 
-    if (arg->v_type != VAR_LIST || arg->vval.v_list == NULL
+    যদি (arg->v_type != VAR_LIST || arg->vval.v_list == রিক্ত
 					     || arg->vval.v_list->lv_len != 2)
-	return FAIL;
+	ঘূৰাই FAIL;
     n1 = list_find_nr(arg->vval.v_list, 0L, &error);
     n2 = list_find_nr(arg->vval.v_list, 1L, &error);
 #  ifdef MSWIN
-    tm->HighPart = n1;
-    tm->LowPart = n2;
-#  else
+    tm->উপৰেৰ_Part = n1;
+    tm->নিচেৰ_Part = n2;
+#  অন্যথা
     tm->tv_sec = n1;
     tm->tv_fsec = n2;
 #  endif
-    return error ? FAIL : OK;
+    ঘূৰাই error ? FAIL : OK;
 }
 # endif // FEAT_RELTIME
 
 /*
  * "reltime()" function
  */
-    void
+    শূন্য
 f_reltime(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
 {
 # ifdef FEAT_RELTIME
@@ -180,59 +180,59 @@ f_reltime(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
     proftime_T	start;
     long	n1, n2;
 
-    if (rettv_list_alloc(rettv) == FAIL)
-	return;
+    যদি (rettv_list_alloc(rettv) == FAIL)
+	ঘূৰাই;
 
-    if (in_vim9script()
+    যদি (in_vim9script()
 	    && (check_for_opt_list_arg(argvars, 0) == FAIL
 		|| (argvars[0].v_type != VAR_UNKNOWN
 		    && check_for_opt_list_arg(argvars, 1) == FAIL)))
-	return;
+	ঘূৰাই;
 
-    if (argvars[0].v_type == VAR_UNKNOWN)
+    যদি (argvars[0].v_type == VAR_UNKNOWN)
     {
 	// No arguments: get current time.
 	profile_start(&res);
     }
-    else if (argvars[1].v_type == VAR_UNKNOWN)
+    অন্যথা যদি (argvars[1].v_type == VAR_UNKNOWN)
     {
-	if (list2proftime(&argvars[0], &res) == FAIL)
+	যদি (list2proftime(&argvars[0], &res) == FAIL)
 	{
-	    if (in_vim9script())
+	    যদি (in_vim9script())
 		emsg(_(e_invalid_argument));
-	    return;
+	    ঘূৰাই;
 	}
 	profile_end(&res);
     }
-    else
+    অন্যথা
     {
 	// Two arguments: compute the difference.
-	if (list2proftime(&argvars[0], &start) == FAIL
+	যদি (list2proftime(&argvars[0], &start) == FAIL
 		|| list2proftime(&argvars[1], &res) == FAIL)
 	{
-	    if (in_vim9script())
+	    যদি (in_vim9script())
 		emsg(_(e_invalid_argument));
-	    return;
+	    ঘূৰাই;
 	}
 	profile_sub(&res, &start);
     }
 
 #  ifdef MSWIN
-    n1 = res.HighPart;
-    n2 = res.LowPart;
-#  else
+    n1 = res.উপৰেৰ_Part;
+    n2 = res.নিচেৰ_Part;
+#  অন্যথা
     n1 = res.tv_sec;
     n2 = res.tv_fsec;
 #  endif
-    list_append_number(rettv->vval.v_list, (varnumber_T)n1);
-    list_append_number(rettv->vval.v_list, (varnumber_T)n2);
+    list_append_সংখ্যা(rettv->vval.v_list, (varnumber_T)n1);
+    list_append_সংখ্যা(rettv->vval.v_list, (varnumber_T)n2);
 # endif
 }
 
 /*
  * "reltimefloat()" function
  */
-    void
+    শূন্য
 f_reltimefloat(typval_T *argvars UNUSED, typval_T *rettv)
 {
 # ifdef FEAT_RELTIME
@@ -242,12 +242,12 @@ f_reltimefloat(typval_T *argvars UNUSED, typval_T *rettv)
     rettv->v_type = VAR_FLOAT;
     rettv->vval.v_float = 0;
 # ifdef FEAT_RELTIME
-    if (in_vim9script() && check_for_list_arg(argvars, 0) == FAIL)
-	return;
+    যদি (in_vim9script() && check_for_list_arg(argvars, 0) == FAIL)
+	ঘূৰাই;
 
-    if (list2proftime(&argvars[0], &tm) == OK)
+    যদি (list2proftime(&argvars[0], &tm) == OK)
 	rettv->vval.v_float = profile_float(&tm);
-    else if (in_vim9script())
+    অন্যথা যদি (in_vim9script())
 	emsg(_(e_invalid_argument));
 # endif
 }
@@ -255,76 +255,76 @@ f_reltimefloat(typval_T *argvars UNUSED, typval_T *rettv)
 /*
  * "reltimestr()" function
  */
-    void
+    শূন্য
 f_reltimestr(typval_T *argvars UNUSED, typval_T *rettv)
 {
     rettv->v_type = VAR_STRING;
-    rettv->vval.v_string = NULL;
+    rettv->vval.v_string = রিক্ত;
 # ifdef FEAT_RELTIME
-    if (in_vim9script() && check_for_list_arg(argvars, 0) == FAIL)
-	return;
+    যদি (in_vim9script() && check_for_list_arg(argvars, 0) == FAIL)
+	ঘূৰাই;
 
     proftime_T	tm;
-    if (list2proftime(&argvars[0], &tm) == OK)
+    যদি (list2proftime(&argvars[0], &tm) == OK)
     {
 #  ifdef MSWIN
-	rettv->vval.v_string = vim_strsave((char_u *)profile_msg(&tm));
-#  else
-	static char buf[50];
+	rettv->vval.v_string = vim_strsave((char_u *)profile_বাৰ্তা(&tm));
+#  অন্যথা
+	স্থির ৱর্ণ buf[50];
 	long usec = tm.tv_fsec / (TV_FSEC_SEC / 1000000);
-	vim_snprintf(buf, sizeof(buf), "%3ld.%06ld", (long)tm.tv_sec, usec);
+	vim_snprintf(buf, পরিমাণ(buf), "%3ld.%06ld", (long)tm.tv_sec, usec);
 	rettv->vval.v_string = vim_strsave((char_u *)buf);
 #  endif
     }
-    else if (in_vim9script())
+    অন্যথা যদি (in_vim9script())
 	emsg(_(e_invalid_argument));
 # endif
 }
 
-# if defined(HAVE_STRFTIME)
+# যদি defined(HAVE_STRFTIME)
 /*
  * "strftime({format}[, {time}])" function
  */
-    void
+    শূন্য
 f_strftime(typval_T *argvars, typval_T *rettv)
 {
-    struct tm	tmval;
-    struct tm	*curtime;
+    সংরচনা tm	tmval;
+    সংরচনা tm	*curtime;
     time_t	seconds;
     char_u	*p;
 
-    if (in_vim9script()
+    যদি (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
-		|| check_for_opt_number_arg(argvars, 1) == FAIL))
-	return;
+		|| check_for_opt_সংখ্যা_arg(argvars, 1) == FAIL))
+	ঘূৰাই;
 
     rettv->v_type = VAR_STRING;
 
     p = tv_get_string(&argvars[0]);
-    if (argvars[1].v_type == VAR_UNKNOWN)
-	seconds = time(NULL);
-    else
-	seconds = (time_t)tv_get_number(&argvars[1]);
+    যদি (argvars[1].v_type == VAR_UNKNOWN)
+	seconds = time(রিক্ত);
+    অন্যথা
+	seconds = (time_t)tv_get_সংখ্যা(&argvars[1]);
     curtime = vim_localtime(&seconds, &tmval);
     // MSVC returns NULL for an invalid value of seconds.
-    if (curtime == NULL)
+    যদি (curtime == রিক্ত)
     {
 	rettv->vval.v_string = vim_strsave((char_u *)_("(Invalid)"));
-	return;
+	ঘূৰাই;
     }
 
 #  ifdef MSWIN
     WCHAR	    result_buf[256];
     WCHAR	    *wp;
 
-    wp = enc_to_utf16(p, NULL);
-    if (wp != NULL)
-	(void)wcsftime(result_buf, ARRAY_LENGTH(result_buf), wp, curtime);
-    else
+    wp = enc_to_utf16(p, রিক্ত);
+    যদি (wp != রিক্ত)
+	(শূন্য)wcsftime(result_buf, ARRAY_LENGTH(result_buf), wp, curtime);
+    অন্যথা
 	result_buf[0] = NUL;
-    rettv->vval.v_string = utf16_to_enc(result_buf, NULL);
+    rettv->vval.v_string = utf16_to_enc(result_buf, রিক্ত);
     vim_free(wp);
-#  else
+#  অন্যথা
     char_u	    result_buf[256];
     vimconv_T   conv;
     char_u	    *enc;
@@ -332,44 +332,44 @@ f_strftime(typval_T *argvars, typval_T *rettv)
     conv.vc_type = CONV_NONE;
     enc = enc_locale();
     convert_setup(&conv, p_enc, enc);
-    if (conv.vc_type != CONV_NONE)
-	p = string_convert(&conv, p, NULL);
-    if (p == NULL || strftime((char *)result_buf, sizeof(result_buf),
-		(char *)p, curtime) == 0)
+    যদি (conv.vc_type != CONV_NONE)
+	p = string_convert(&conv, p, রিক্ত);
+    যদি (p == রিক্ত || strftime((ৱর্ণ *)result_buf, পরিমাণ(result_buf),
+		(ৱর্ণ *)p, curtime) == 0)
 	result_buf[0] = NUL;
 
-    if (conv.vc_type != CONV_NONE)
+    যদি (conv.vc_type != CONV_NONE)
 	vim_free(p);
     convert_setup(&conv, enc, p_enc);
-    if (conv.vc_type != CONV_NONE)
-	rettv->vval.v_string = string_convert(&conv, result_buf, NULL);
-    else
+    যদি (conv.vc_type != CONV_NONE)
+	rettv->vval.v_string = string_convert(&conv, result_buf, রিক্ত);
+    অন্যথা
 	rettv->vval.v_string = vim_strsave(result_buf);
 
     // Release conversion descriptors
-    convert_setup(&conv, NULL, NULL);
+    convert_setup(&conv, রিক্ত, রিক্ত);
     vim_free(enc);
 #  endif
 }
 # endif
 
-# if defined(HAVE_STRPTIME)
+# যদি defined(HAVE_STRPTIME)
 /*
  * "strptime({format}, {timestring})" function
  */
-    void
+    শূন্য
 f_strptime(typval_T *argvars, typval_T *rettv)
 {
-    struct tm	tmval;
+    সংরচনা tm	tmval;
     char_u	*fmt;
     char_u	*str;
     vimconv_T   conv;
     char_u	*enc;
 
-    if (in_vim9script()
+    যদি (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_string_arg(argvars, 1) == FAIL))
-	return;
+	ঘূৰাই;
 
     CLEAR_FIELD(tmval);
     tmval.tm_isdst = -1;
@@ -379,46 +379,46 @@ f_strptime(typval_T *argvars, typval_T *rettv)
     conv.vc_type = CONV_NONE;
     enc = enc_locale();
     convert_setup(&conv, p_enc, enc);
-    if (conv.vc_type != CONV_NONE)
-	fmt = string_convert(&conv, fmt, NULL);
+    যদি (conv.vc_type != CONV_NONE)
+	fmt = string_convert(&conv, fmt, রিক্ত);
 #  ifdef HAVE_TZSET
     // Pick up any change to $TZ so mktime() uses the requested timezone.
     tzset();
 #  endif
-    if (fmt == NULL
-	    || strptime((char *)str, (char *)fmt, &tmval) == NULL
-	    || (rettv->vval.v_number = mktime(&tmval)) == -1)
-	rettv->vval.v_number = 0;
+    যদি (fmt == রিক্ত
+	    || strptime((ৱর্ণ *)str, (ৱর্ণ *)fmt, &tmval) == রিক্ত
+	    || (rettv->vval.v_সংখ্যা = mktime(&tmval)) == -1)
+	rettv->vval.v_সংখ্যা = 0;
 
-    if (conv.vc_type != CONV_NONE)
+    যদি (conv.vc_type != CONV_NONE)
 	vim_free(fmt);
-    convert_setup(&conv, NULL, NULL);
+    convert_setup(&conv, রিক্ত, রিক্ত);
     vim_free(enc);
 }
 # endif
 
-# if defined(FEAT_TIMERS)
-static timer_T	*first_timer = NULL;
-static long	last_timer_id = 0;
+# যদি defined(FEAT_TIMERS)
+স্থির timer_T	*first_timer = রিক্ত;
+স্থির long	last_timer_id = 0;
 
 /*
  * Return time left, in "msec", until "due".  Negative if past "due".
  */
     long
-proftime_time_left(proftime_T *due, proftime_T *now)
+proftime_time_বাম(proftime_T *due, proftime_T *now)
 {
 #  ifdef MSWIN
     LARGE_INTEGER fr;
 
-    if (now->QuadPart > due->QuadPart)
-	return 0;
+    যদি (now->QuadPart > due->QuadPart)
+	ঘূৰাই 0;
     QueryPerformanceFrequency(&fr);
-    return (long)(((double)(due->QuadPart - now->QuadPart)
-		   / (double)fr.QuadPart) * 1000);
-#  else
-    if (now->tv_sec > due->tv_sec)
-	return 0;
-    return (due->tv_sec - now->tv_sec) * 1000
+    ঘূৰাই (long)(((দ্ৱিগুণ)(due->QuadPart - now->QuadPart)
+		   / (দ্ৱিগুণ)fr.QuadPart) * 1000);
+#  অন্যথা
+    যদি (now->tv_sec > due->tv_sec)
+	ঘূৰাই 0;
+    ঘূৰাই (due->tv_sec - now->tv_sec) * 1000
 	+ (due->tv_fsec - now->tv_fsec) / (TV_FSEC_SEC / 1000);
 #  endif
 }
@@ -426,12 +426,12 @@ proftime_time_left(proftime_T *due, proftime_T *now)
 /*
  * Insert a timer in the list of timers.
  */
-    static void
-insert_timer(timer_T *timer)
+    স্থির শূন্য
+ঢোকাও_timer(timer_T *timer)
 {
     timer->tr_next = first_timer;
-    timer->tr_prev = NULL;
-    if (first_timer != NULL)
+    timer->tr_prev = রিক্ত;
+    যদি (first_timer != রিক্ত)
 	first_timer->tr_prev = timer;
     first_timer = timer;
     did_add_timer = TRUE;
@@ -440,18 +440,18 @@ insert_timer(timer_T *timer)
 /*
  * Take a timer out of the list of timers.
  */
-    static void
+    স্থির শূন্য
 remove_timer(timer_T *timer)
 {
-    if (timer->tr_prev == NULL)
+    যদি (timer->tr_prev == রিক্ত)
 	first_timer = timer->tr_next;
-    else
+    অন্যথা
 	timer->tr_prev->tr_next = timer->tr_next;
-    if (timer->tr_next != NULL)
+    যদি (timer->tr_next != রিক্ত)
 	timer->tr_next->tr_prev = timer->tr_prev;
 }
 
-    static void
+    স্থির শূন্য
 free_timer(timer_T *timer)
 {
     free_callback(&timer->tr_callback);
@@ -463,30 +463,30 @@ free_timer(timer_T *timer)
  * Caller should set the callback.
  */
     timer_T *
-create_timer(long msec, int repeat)
+create_timer(long msec, পূর্ণাঙ্ক repeat)
 {
     timer_T	*timer = ALLOC_CLEAR_ONE(timer_T);
     long	prev_id = last_timer_id;
 
-    if (timer == NULL)
-	return NULL;
-    if (++last_timer_id <= prev_id)
+    যদি (timer == রিক্ত)
+	ঘূৰাই রিক্ত;
+    যদি (++last_timer_id <= prev_id)
 	// Overflow!  Might cause duplicates...
 	last_timer_id = 0;
     timer->tr_id = last_timer_id;
-    insert_timer(timer);
-    if (repeat != 0)
+    ঢোকাও_timer(timer);
+    যদি (repeat != 0)
 	timer->tr_repeat = repeat - 1;
     timer->tr_interval = msec;
 
     timer_start(timer);
-    return timer;
+    ঘূৰাই timer;
 }
 
 /*
  * (Re)start a timer.
  */
-    void
+    শূন্য
 timer_start(timer_T *timer)
 {
     profile_setlimit(timer->tr_interval, &timer->tr_due);
@@ -496,24 +496,24 @@ timer_start(timer_T *timer)
 /*
  * Invoke the callback of "timer".
  */
-    static void
+    স্থির শূন্য
 timer_callback(timer_T *timer)
 {
     typval_T	rettv;
     typval_T	argv[2];
 
 #  ifdef FEAT_EVAL
-    if (ch_log_active())
+    যদি (ch_log_active())
     {
 	callback_T *cb = &timer->tr_callback;
 
-	ch_log(NULL, "invoking timer callback %s",
-	       cb->cb_partial != NULL ? cb->cb_partial->pt_name : cb->cb_name);
+	ch_log(রিক্ত, "invoking timer callback %s",
+	       cb->cb_partial != রিক্ত ? cb->cb_partial->pt_name : cb->cb_name);
     }
 #  endif
 
-    argv[0].v_type = VAR_NUMBER;
-    argv[0].vval.v_number = (varnumber_T)timer->tr_id;
+    argv[0].v_type = VAR_সংখ্যা;
+    argv[0].vval.v_সংখ্যা = (varnumber_T)timer->tr_id;
     argv[1].v_type = VAR_UNKNOWN;
 
     rettv.v_type = VAR_UNKNOWN;
@@ -521,7 +521,7 @@ timer_callback(timer_T *timer)
     clear_tv(&rettv);
 
 #  ifdef FEAT_EVAL
-    ch_log(NULL, "timer callback finished");
+    ch_log(রিক্ত, "timer callback finished");
 #  endif
 }
 
@@ -531,42 +531,42 @@ timer_callback(timer_T *timer)
  * Returns -1 if there are no pending timers.
  */
     long
-check_due_timer(void)
+check_due_timer(শূন্য)
 {
     timer_T	*timer;
     timer_T	*timer_next;
     long	this_due;
     long	next_due = -1;
     proftime_T	now;
-    int		did_one = FALSE;
-    int		need_update_screen = FALSE;
+    পূর্ণাঙ্ক		did_one = FALSE;
+    পূর্ণাঙ্ক		need_update_screen = FALSE;
     long	current_id = last_timer_id;
 
     // Don't run any timers while exiting, dealing with an error or at the
     // debug prompt.
-    if (exiting || aborting() || debug_mode)
-	return next_due;
+    যদি (exiting || aborting() || debug_mode)
+	ঘূৰাই next_due;
 
     profile_start(&now);
-    for (timer = first_timer; timer != NULL && !got_int; timer = timer_next)
+    বাবে (timer = first_timer; timer != রিক্ত && !got_int; timer = timer_next)
     {
 	timer_next = timer->tr_next;
 
-	if (timer->tr_id == -1 || timer->tr_firing || timer->tr_paused)
-	    continue;
-	this_due = proftime_time_left(&timer->tr_due, &now);
-	if (this_due <= 1)
+	যদি (timer->tr_id == -1 || timer->tr_firing || timer->tr_paused)
+	    অনুৱর্ত;
+	this_due = proftime_time_বাম(&timer->tr_due, &now);
+	যদি (this_due <= 1)
 	{
 	    // Save and restore a lot of flags, because the timer fires while
 	    // waiting for a character, which might be halfway a command.
-	    int save_timer_busy = timer_busy;
-	    int save_vgetc_busy = vgetc_busy;
-	    int save_did_emsg = did_emsg;
-	    int prev_uncaught_emsg = uncaught_emsg;
-	    int save_called_emsg = called_emsg;
-	    int save_must_redraw = must_redraw;
-	    int save_ex_pressedreturn = get_pressedreturn();
-	    int save_may_garbage_collect = may_garbage_collect;
+	    পূর্ণাঙ্ক save_timer_busy = timer_busy;
+	    পূর্ণাঙ্ক save_vgetc_busy = vgetc_busy;
+	    পূর্ণাঙ্ক save_did_emsg = did_emsg;
+	    পূর্ণাঙ্ক prev_uncaught_emsg = uncaught_emsg;
+	    পূর্ণাঙ্ক save_called_emsg = called_emsg;
+	    পূর্ণাঙ্ক save_must_redraw = must_redraw;
+	    পূর্ণাঙ্ক save_ex_pressedreturn = get_pressedreturn();
+	    পূর্ণাঙ্ক save_may_garbage_collect = may_garbage_collect;
 	    vimvars_save_T	vvsave;
 	    exception_state_T	estate;
 
@@ -593,15 +593,15 @@ check_due_timer(void)
 	    did_one = TRUE;
 	    timer_busy = save_timer_busy;
 	    vgetc_busy = save_vgetc_busy;
-	    if (uncaught_emsg > prev_uncaught_emsg)
-		++timer->tr_emsg_count;
-	    else
-		timer->tr_emsg_count = 0;
+	    যদি (uncaught_emsg > prev_uncaught_emsg)
+		++timer->tr_emsg_গুনতি;
+	    অন্যথা
+		timer->tr_emsg_গুনতি = 0;
 	    did_emsg = save_did_emsg;
 	    called_emsg = save_called_emsg;
 	    exception_state_restore(&estate);
 	    restore_vimvars(&vvsave);
-	    if (must_redraw != 0)
+	    যদি (must_redraw != 0)
 		need_update_screen = TRUE;
 	    must_redraw = must_redraw > save_must_redraw
 					      ? must_redraw : save_must_redraw;
@@ -610,22 +610,22 @@ check_due_timer(void)
 
 	    // Only fire the timer again if it repeats and stop_timer() wasn't
 	    // called while inside the callback (tr_id == -1).
-	    if (timer->tr_repeat != 0 && timer->tr_id != -1
-		    && timer->tr_emsg_count < 3)
+	    যদি (timer->tr_repeat != 0 && timer->tr_id != -1
+		    && timer->tr_emsg_গুনতি < 3)
 	    {
 		profile_setlimit(timer->tr_interval, &timer->tr_due);
-		this_due = proftime_time_left(&timer->tr_due, &now);
-		if (this_due < 1)
+		this_due = proftime_time_বাম(&timer->tr_due, &now);
+		যদি (this_due < 1)
 		    this_due = 1;
-		if (timer->tr_repeat > 0)
+		যদি (timer->tr_repeat > 0)
 		    --timer->tr_repeat;
 	    }
-	    else
+	    অন্যথা
 	    {
 		this_due = -1;
-		if (timer->tr_keep)
+		যদি (timer->tr_keep)
 		    timer->tr_paused = TRUE;
-		else
+		অন্যথা
 		{
 		    remove_timer(timer);
 		    free_timer(timer);
@@ -639,33 +639,33 @@ check_due_timer(void)
 	    draw_image_placements();
 #  endif
 	}
-	if (this_due > 0 && (next_due == -1 || next_due > this_due))
+	যদি (this_due > 0 && (next_due == -1 || next_due > this_due))
 	    next_due = this_due;
     }
 
-    if (did_one)
+    যদি (did_one)
 	redraw_after_callback(need_update_screen, FALSE);
 
 #  ifdef FEAT_BEVAL_TERM
-    if (bevalexpr_due_set)
+    যদি (bevalexpr_due_set)
     {
-	this_due = proftime_time_left(&bevalexpr_due, &now);
-	if (this_due <= 1)
+	this_due = proftime_time_বাম(&bevalexpr_due, &now);
+	যদি (this_due <= 1)
 	{
 	    bevalexpr_due_set = FALSE;
-	    if (balloonEval == NULL)
+	    যদি (balloonEval == রিক্ত)
 	    {
 		balloonEval = ALLOC_CLEAR_ONE(BalloonEval);
 		balloonEvalForTerm = TRUE;
 	    }
-	    if (balloonEval != NULL)
+	    যদি (balloonEval != রিক্ত)
 	    {
 		general_beval_cb(balloonEval, 0);
 		setcursor();
 		out_flush();
 	    }
 	}
-	else if (next_due == -1 || next_due > this_due)
+	অন্যথা যদি (next_due == -1 || next_due > this_due)
 	    next_due = this_due;
     }
 #  endif
@@ -674,57 +674,57 @@ check_due_timer(void)
     next_due = term_check_timers(next_due, &now);
 #  endif
 
-    return current_id != last_timer_id ? 1 : next_due;
+    ঘূৰাই current_id != last_timer_id ? 1 : next_due;
 }
 
 /*
  * Find a timer by ID.  Returns NULL if not found;
  */
-    static timer_T *
+    স্থির timer_T *
 find_timer(long id)
 {
     timer_T *timer;
 
-    if (id < 0)
-	return NULL;
+    যদি (id < 0)
+	ঘূৰাই রিক্ত;
 
     FOR_ALL_TIMERS(timer)
-	if (timer->tr_id == id)
-	    return timer;
-    return NULL;
+	যদি (timer->tr_id == id)
+	    ঘূৰাই timer;
+    ঘূৰাই রিক্ত;
 }
 
 
 /*
  * Stop a timer and delete it.
  */
-    void
+    শূন্য
 stop_timer(timer_T *timer)
 {
-    if (timer->tr_firing)
+    যদি (timer->tr_firing)
 	// Free the timer after the callback returns.
 	timer->tr_id = -1;
-    else
+    অন্যথা
     {
 	remove_timer(timer);
 	free_timer(timer);
     }
 }
 
-    static void
-stop_all_timers(void)
+    স্থির শূন্য
+stop_all_timers(শূন্য)
 {
     timer_T *timer;
     timer_T *timer_next;
 
-    for (timer = first_timer; timer != NULL; timer = timer_next)
+    বাবে (timer = first_timer; timer != রিক্ত; timer = timer_next)
     {
 	timer_next = timer->tr_next;
 	stop_timer(timer);
     }
 }
 
-    static void
+    স্থির শূন্য
 add_timer_info(typval_T *rettv, timer_T *timer)
 {
     list_T	*list = rettv->vval.v_list;
@@ -733,90 +733,90 @@ add_timer_info(typval_T *rettv, timer_T *timer)
     long	remaining;
     proftime_T	now;
 
-    if (dict == NULL)
-	return;
+    যদি (dict == রিক্ত)
+	ঘূৰাই;
     list_append_dict(list, dict);
 
-    dict_add_number(dict, "id", timer->tr_id);
-    dict_add_number(dict, "time", (long)timer->tr_interval);
+    dict_add_সংখ্যা(dict, "id", timer->tr_id);
+    dict_add_সংখ্যা(dict, "time", (long)timer->tr_interval);
 
     profile_start(&now);
-    remaining = proftime_time_left(&timer->tr_due, &now);
-    dict_add_number(dict, "remaining", (long)remaining);
+    remaining = proftime_time_বাম(&timer->tr_due, &now);
+    dict_add_সংখ্যা(dict, "remaining", (long)remaining);
 
-    dict_add_number(dict, "repeat",
+    dict_add_সংখ্যা(dict, "repeat",
 	    (long)(timer->tr_repeat < 0 ? -1
 			     : timer->tr_repeat + (timer->tr_firing ? 0 : 1)));
-    dict_add_number(dict, "paused", (long)(timer->tr_paused));
+    dict_add_সংখ্যা(dict, "paused", (long)(timer->tr_paused));
 
     di = dictitem_alloc((char_u *)"callback");
-    if (di != NULL)
+    যদি (di != রিক্ত)
     {
-	if (dict_add(dict, di) == FAIL)
+	যদি (dict_add(dict, di) == FAIL)
 	    vim_free(di);
-	else
+	অন্যথা
 	    put_callback(&timer->tr_callback, &di->di_tv);
     }
 }
 
-    static void
+    স্থির শূন্য
 add_timer_info_all(typval_T *rettv)
 {
     timer_T *timer;
 
     FOR_ALL_TIMERS(timer)
-	if (timer->tr_id != -1)
+	যদি (timer->tr_id != -1)
 	    add_timer_info(rettv, timer);
 }
 
 /*
  * Mark references in partials of timers.
  */
-    int
-set_ref_in_timer(int copyID)
+    পূর্ণাঙ্ক
+set_ref_in_timer(পূর্ণাঙ্ক copyID)
 {
-    int		abort = FALSE;
+    পূর্ণাঙ্ক		abort = FALSE;
     timer_T	*timer;
     typval_T	tv;
 
-    for (timer = first_timer; !abort && timer != NULL; timer = timer->tr_next)
+    বাবে (timer = first_timer; !abort && timer != রিক্ত; timer = timer->tr_next)
     {
-	if (timer->tr_callback.cb_partial != NULL)
+	যদি (timer->tr_callback.cb_partial != রিক্ত)
 	{
 	    tv.v_type = VAR_PARTIAL;
 	    tv.vval.v_partial = timer->tr_callback.cb_partial;
 	}
-	else
+	অন্যথা
 	{
 	    tv.v_type = VAR_FUNC;
 	    tv.vval.v_string = timer->tr_callback.cb_name;
 	}
-	abort = abort || set_ref_in_item(&tv, copyID, NULL, NULL, NULL);
+	abort = abort || set_ref_in_item(&tv, copyID, রিক্ত, রিক্ত, রিক্ত);
     }
-    return abort;
+    ঘূৰাই abort;
 }
 
 /*
  * Return TRUE if "timer" exists in the list of timers.
  */
-    int
+    পূর্ণাঙ্ক
 timer_valid(timer_T *timer)
 {
-    if (timer == NULL)
-	return FALSE;
+    যদি (timer == রিক্ত)
+	ঘূৰাই FALSE;
 
     timer_T *t;
     FOR_ALL_TIMERS(t)
-	if (t == timer)
-	    return TRUE;
-    return FALSE;
+	যদি (t == timer)
+	    ঘূৰাই TRUE;
+    ঘূৰাই FALSE;
 }
 
-#  if defined(EXITFREE)
-    void
-timer_free_all(void)
+#  যদি defined(EXITFREE)
+    শূন্য
+timer_free_all(শূন্য)
 {
-    while (first_timer != NULL)
+    যেতিয়ালৈ (first_timer != রিক্ত)
     {
 	timer_T *timer = first_timer;
 	remove_timer(timer);
@@ -828,126 +828,126 @@ timer_free_all(void)
 /*
  * "timer_info([timer])" function
  */
-    void
+    শূন্য
 f_timer_info(typval_T *argvars, typval_T *rettv)
 {
-    timer_T *timer = NULL;
+    timer_T *timer = রিক্ত;
 
-    if (rettv_list_alloc(rettv) == FAIL)
-	return;
+    যদি (rettv_list_alloc(rettv) == FAIL)
+	ঘূৰাই;
 
-    if (check_for_opt_number_arg(argvars, 0) == FAIL)
-	return;
+    যদি (check_for_opt_সংখ্যা_arg(argvars, 0) == FAIL)
+	ঘূৰাই;
 
-    if (argvars[0].v_type != VAR_UNKNOWN)
+    যদি (argvars[0].v_type != VAR_UNKNOWN)
     {
-	timer = find_timer((int)tv_get_number(&argvars[0]));
-	if (timer != NULL)
+	timer = find_timer((পূর্ণাঙ্ক)tv_get_সংখ্যা(&argvars[0]));
+	যদি (timer != রিক্ত)
 	    add_timer_info(rettv, timer);
     }
-    else
+    অন্যথা
 	add_timer_info_all(rettv);
 }
 
 /*
  * "timer_pause(timer, paused)" function
  */
-    void
+    শূন্য
 f_timer_pause(typval_T *argvars, typval_T *rettv UNUSED)
 {
-    timer_T	*timer = NULL;
+    timer_T	*timer = রিক্ত;
 
-    if (in_vim9script()
-	    && (check_for_number_arg(argvars, 0) == FAIL
+    যদি (in_vim9script()
+	    && (check_for_সংখ্যা_arg(argvars, 0) == FAIL
 		|| check_for_bool_arg(argvars, 1) == FAIL))
-	return;
+	ঘূৰাই;
 
-    if (argvars[0].v_type != VAR_NUMBER)
+    যদি (argvars[0].v_type != VAR_সংখ্যা)
     {
-	emsg(_(e_number_expected));
-	return;
+	emsg(_(e_সংখ্যা_expected));
+	ঘূৰাই;
     }
 
-    int	paused = (int)tv_get_bool(&argvars[1]);
+    পূর্ণাঙ্ক	paused = (পূর্ণাঙ্ক)tv_get_bool(&argvars[1]);
 
-    timer = find_timer((int)tv_get_number(&argvars[0]));
-    if (timer != NULL)
+    timer = find_timer((পূর্ণাঙ্ক)tv_get_সংখ্যা(&argvars[0]));
+    যদি (timer != রিক্ত)
 	timer->tr_paused = paused;
 }
 
 /*
  * "timer_start(time, callback [, options])" function
  */
-    void
+    শূন্য
 f_timer_start(typval_T *argvars, typval_T *rettv)
 {
     long	msec;
     timer_T	*timer;
-    int		repeat = 0;
+    পূর্ণাঙ্ক		repeat = 0;
     callback_T	callback;
     dict_T	*dict;
 
-    rettv->vval.v_number = -1;
-    if (check_secure())
-	return;
+    rettv->vval.v_সংখ্যা = -1;
+    যদি (check_secure())
+	ঘূৰাই;
 
-    if (in_vim9script()
-	    && (check_for_number_arg(argvars, 0) == FAIL
+    যদি (in_vim9script()
+	    && (check_for_সংখ্যা_arg(argvars, 0) == FAIL
 		|| check_for_opt_dict_arg(argvars, 2) == FAIL))
-	return;
+	ঘূৰাই;
 
-    msec = (long)tv_get_number(&argvars[0]);
-    if (argvars[2].v_type != VAR_UNKNOWN)
+    msec = (long)tv_get_সংখ্যা(&argvars[0]);
+    যদি (argvars[2].v_type != VAR_UNKNOWN)
     {
-	if (check_for_nonnull_dict_arg(argvars, 2) == FAIL)
-	    return;
+	যদি (check_for_nonnull_dict_arg(argvars, 2) == FAIL)
+	    ঘূৰাই;
 
 	dict = argvars[2].vval.v_dict;
-	if (dict_has_key(dict, "repeat"))
-	    repeat = dict_get_number(dict, "repeat");
+	যদি (dict_has_চাবি(dict, "repeat"))
+	    repeat = dict_get_সংখ্যা(dict, "repeat");
     }
 
     callback = get_callback(&argvars[1]);
-    if (callback.cb_name == NULL)
-	return;
-    if (in_vim9script() && *callback.cb_name == NUL)
+    যদি (callback.cb_name == রিক্ত)
+	ঘূৰাই;
+    যদি (in_vim9script() && *callback.cb_name == NUL)
     {
 	// empty callback is not useful for a timer
 	emsg(_(e_invalid_callback_argument));
 	free_callback(&callback);
-	return;
+	ঘূৰাই;
     }
 
     timer = create_timer(msec, repeat);
-    if (timer == NULL)
+    যদি (timer == রিক্ত)
     {
 	free_callback(&callback);
-	return;
+	ঘূৰাই;
     }
     set_callback(&timer->tr_callback, &callback);
-    rettv->vval.v_number = (varnumber_T)timer->tr_id;
+    rettv->vval.v_সংখ্যা = (varnumber_T)timer->tr_id;
 }
 
 /*
  * "timer_stop(timer)" function
  */
-    void
+    শূন্য
 f_timer_stop(typval_T *argvars, typval_T *rettv UNUSED)
 {
     timer_T *timer;
 
-    if (check_for_number_arg(argvars, 0) == FAIL)
-	return;
+    যদি (check_for_সংখ্যা_arg(argvars, 0) == FAIL)
+	ঘূৰাই;
 
-    timer = find_timer((int)tv_get_number(&argvars[0]));
-    if (timer != NULL)
+    timer = find_timer((পূর্ণাঙ্ক)tv_get_সংখ্যা(&argvars[0]));
+    যদি (timer != রিক্ত)
 	stop_timer(timer);
 }
 
 /*
  * "timer_stopall()" function
  */
-    void
+    শূন্য
 f_timer_stopall(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
 {
     stop_all_timers();
@@ -955,20 +955,20 @@ f_timer_stopall(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
 
 # endif // FEAT_TIMERS
 
-# if defined(STARTUPTIME)
-static struct timeval	prev_timeval;
+# যদি defined(STARTUPTIME)
+স্থির সংরচনা timeval	prev_timeval;
 
 #  ifdef MSWIN
 /*
  * Windows doesn't have gettimeofday(), although it does have struct timeval.
  */
-    static int
-gettimeofday(struct timeval *tv, char *dummy UNUSED)
+    স্থির পূর্ণাঙ্ক
+gettimeofday(সংরচনা timeval *tv, ৱর্ণ *dummy UNUSED)
 {
     long t = clock();
     tv->tv_sec = t / CLOCKS_PER_SEC;
     tv->tv_usec = (t - tv->tv_sec * CLOCKS_PER_SEC) * 1000000 / CLOCKS_PER_SEC;
-    return 0;
+    ঘূৰাই 0;
 }
 #  endif
 
@@ -976,21 +976,21 @@ gettimeofday(struct timeval *tv, char *dummy UNUSED)
  * Save the previous time before doing something that could nest.
  * set "*tv_rel" to the time elapsed so far.
  */
-    void
-time_push(void *tv_rel, void *tv_start)
+    শূন্য
+time_ঠেলো(শূন্য *tv_rel, শূন্য *tv_start)
 {
-    *((struct timeval *)tv_rel) = prev_timeval;
-    gettimeofday(&prev_timeval, NULL);
-    ((struct timeval *)tv_rel)->tv_usec = prev_timeval.tv_usec
-					- ((struct timeval *)tv_rel)->tv_usec;
-    ((struct timeval *)tv_rel)->tv_sec = prev_timeval.tv_sec
-					 - ((struct timeval *)tv_rel)->tv_sec;
-    if (((struct timeval *)tv_rel)->tv_usec < 0)
+    *((সংরচনা timeval *)tv_rel) = prev_timeval;
+    gettimeofday(&prev_timeval, রিক্ত);
+    ((সংরচনা timeval *)tv_rel)->tv_usec = prev_timeval.tv_usec
+					- ((সংরচনা timeval *)tv_rel)->tv_usec;
+    ((সংরচনা timeval *)tv_rel)->tv_sec = prev_timeval.tv_sec
+					 - ((সংরচনা timeval *)tv_rel)->tv_sec;
+    যদি (((সংরচনা timeval *)tv_rel)->tv_usec < 0)
     {
-	((struct timeval *)tv_rel)->tv_usec += 1000000;
-	--((struct timeval *)tv_rel)->tv_sec;
+	((সংরচনা timeval *)tv_rel)->tv_usec += 1000000;
+	--((সংরচনা timeval *)tv_rel)->tv_sec;
     }
-    *(struct timeval *)tv_start = prev_timeval;
+    *(সংরচনা timeval *)tv_start = prev_timeval;
 }
 
 /*
@@ -999,21 +999,21 @@ time_push(void *tv_rel, void *tv_start)
  * Note: The arguments are (void *) to avoid trouble with systems that don't
  * have struct timeval.
  */
-    void
-time_pop(
-    void	*tp)	// actually (struct timeval *)
+    শূন্য
+time_বেৰ_কৰো(
+    শূন্য	*tp)	// actually (struct timeval *)
 {
-    prev_timeval.tv_usec -= ((struct timeval *)tp)->tv_usec;
-    prev_timeval.tv_sec -= ((struct timeval *)tp)->tv_sec;
-    if (prev_timeval.tv_usec < 0)
+    prev_timeval.tv_usec -= ((সংরচনা timeval *)tp)->tv_usec;
+    prev_timeval.tv_sec -= ((সংরচনা timeval *)tp)->tv_sec;
+    যদি (prev_timeval.tv_usec < 0)
     {
 	prev_timeval.tv_usec += 1000000;
 	--prev_timeval.tv_sec;
     }
 }
 
-    static void
-time_diff(struct timeval *then, struct timeval *now)
+    স্থির শূন্য
+time_diff(সংরচনা timeval *then, সংরচনা timeval *now)
 {
     long	usec;
     long	msec;
@@ -1024,32 +1024,32 @@ time_diff(struct timeval *then, struct timeval *now)
     fprintf(time_fd, "%03ld.%03ld", msec, usec >= 0 ? usec : usec + 1000L);
 }
 
-    void
-time_msg(
-    char	*mesg,
-    void	*tv_start)  // only for do_source: start time; actually
+    শূন্য
+time_বাৰ্তা(
+    ৱর্ণ	*mesg,
+    শূন্য	*tv_start)  // only for do_source: start time; actually
 			    // (struct timeval *)
 {
-    static struct timeval	start;
-    struct timeval		now;
+    স্থির সংরচনা timeval	start;
+    সংরচনা timeval		now;
 
-    if (time_fd == NULL)
-	return;
+    যদি (time_fd == রিক্ত)
+	ঘূৰাই;
 
-    if (strstr(mesg, "STARTING") != NULL)
+    যদি (strstr(mesg, "STARTING") != রিক্ত)
     {
-	gettimeofday(&start, NULL);
+	gettimeofday(&start, রিক্ত);
 	prev_timeval = start;
 	fprintf(time_fd, "\n\ntimes in msec\n");
 	fprintf(time_fd, " clock   self+sourced   self:  sourced script\n");
 	fprintf(time_fd, " clock   elapsed:              other lines\n\n");
     }
-    gettimeofday(&now, NULL);
+    gettimeofday(&now, রিক্ত);
     time_diff(&start, &now);
-    if (((struct timeval *)tv_start) != NULL)
+    যদি (((সংরচনা timeval *)tv_start) != রিক্ত)
     {
 	fprintf(time_fd, "  ");
-	time_diff(((struct timeval *)tv_start), &now);
+	time_diff(((সংরচনা timeval *)tv_start), &now);
     }
     fprintf(time_fd, "  ");
     time_diff(&prev_timeval, &now);
@@ -1059,7 +1059,7 @@ time_msg(
 # endif	// STARTUPTIME
 #endif // FEAT_EVAL
 
-#if defined(FEAT_SPELL) || defined(FEAT_PERSISTENT_UNDO)
+#যদি defined(FEAT_SPELL) || defined(FEAT_PERSISTENT_UNDO)
 /*
  * Read 8 bytes from "fd" and turn them into a time_T, MSB first.
  * Returns -1 when encountering EOF.
@@ -1067,41 +1067,41 @@ time_msg(
     time_T
 get8ctime(FILE *fd)
 {
-    int		c;
+    পূর্ণাঙ্ক		c;
     time_T	n = 0;
-    int		i;
+    পূর্ণাঙ্ক		i;
 
-    for (i = 0; i < 8; ++i)
+    বাবে (i = 0; i < 8; ++i)
     {
 	c = getc(fd);
-	if (c == EOF) return -1;
+	যদি (c == EOF) ঘূৰাই -1;
 	n = (n << 8) + c;
     }
-    return n;
+    ঘূৰাই n;
 }
 
 /*
  * Write time_T to file "fd" in 8 bytes.
  * Returns FAIL when the write failed.
  */
-    int
+    পূর্ণাঙ্ক
 put_time(FILE *fd, time_T the_time)
 {
     char_u	buf[8];
 
     time_to_bytes(the_time, buf);
-    return fwrite(buf, (size_t)8, (size_t)1, fd) == 1 ? OK : FAIL;
+    ঘূৰাই fwrite(buf, (size_t)8, (size_t)1, fd) == 1 ? OK : FAIL;
 }
 
 /*
  * Write time_T to "buf[8]".
  */
-    void
+    শূন্য
 time_to_bytes(time_T the_time, char_u *buf)
 {
-    int		c;
-    int		i;
-    int		bi = 0;
+    পূর্ণাঙ্ক		c;
+    পূর্ণাঙ্ক		i;
+    পূর্ণাঙ্ক		bi = 0;
     time_T	wtime = the_time;
 
     // time_T can be up to 8 bytes in size, more than long_u, thus we
@@ -1111,17 +1111,17 @@ time_to_bytes(time_T the_time, char_u *buf)
     // truncate if time_T is 8 bytes.  So only use a cast when it is 4 bytes,
     // it's safe to assume that long_u is 4 bytes or more and when using 8
     // bytes the top bit won't be set.
-    for (i = 7; i >= 0; --i)
+    বাবে (i = 7; i >= 0; --i)
     {
-	if (i + 1 > (int)sizeof(time_T))
+	যদি (i + 1 > (পূর্ণাঙ্ক)পরিমাণ(time_T))
 	    // ">>" doesn't work well when shifting more bits than avail
 	    buf[bi++] = 0;
-	else
+	অন্যথা
 	{
-# if defined(SIZEOF_TIME_T) && SIZEOF_TIME_T > 4
-	    c = (int)(wtime >> (i * 8));
-# else
-	    c = (int)((long_u)wtime >> (i * 8));
+# যদি defined(SIZEOF_TIME_T) && SIZEOF_TIME_T > 4
+	    c = (পূর্ণাঙ্ক)(wtime >> (i * 8));
+# অন্যথা
+	    c = (পূর্ণাঙ্ক)((long_u)wtime >> (i * 8));
 # endif
 	    buf[bi++] = c;
 	}
@@ -1133,32 +1133,32 @@ time_to_bytes(time_T the_time, char_u *buf)
 /*
  * Put timestamp "tt" in "buf[buflen]" in a nice format.
  */
-    void
+    শূন্য
 add_time(char_u *buf, size_t buflen, time_t tt)
 {
 #ifdef HAVE_STRFTIME
-    struct tm	tmval;
-    struct tm	*curtime;
+    সংরচনা tm	tmval;
+    সংরচনা tm	*curtime;
     size_t	n;
 
-    if (vim_time() - tt >= 100)
+    যদি (vim_time() - tt >= 100)
     {
 	curtime = vim_localtime(&tt, &tmval);
-	if (vim_time() - tt < (60L * 60L * 12L))
+	যদি (vim_time() - tt < (60L * 60L * 12L))
 	    // within 12 hours
-	    n = strftime((char *)buf, buflen, "%H:%M:%S", curtime);
-	else
+	    n = strftime((ৱর্ণ *)buf, buflen, "%H:%M:%S", curtime);
+	অন্যথা
 	    // longer ago
-	    n = strftime((char *)buf, buflen, "%Y/%m/%d %H:%M:%S", curtime);
-	if (n == 0)
+	    n = strftime((ৱর্ণ *)buf, buflen, "%Y/%m/%d %H:%M:%S", curtime);
+	যদি (n == 0)
 	    buf[0] = NUL;
     }
-    else
+    অন্যথা
 #endif
     {
 	long seconds = (long)(vim_time() - tt);
 
-	vim_snprintf((char *)buf, buflen,
+	vim_snprintf((ৱর্ণ *)buf, buflen,
 		NGETTEXT("%ld second ago", "%ld seconds ago", seconds),
 		seconds);
     }

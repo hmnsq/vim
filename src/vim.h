@@ -9,15 +9,15 @@
 #ifndef VIM__H
 #define VIM__H
 
-#include "protodef.h"
+#অন্তর্ভাৱ "protodef.h"
 
 // _WIN32 is defined as 1 when the compilation target is 32-bit or 64-bit.
 // Note: If you want to check for 64-bit use the _WIN64 macro.
-#if defined(WIN32) || defined(_WIN32)
+#যদি defined(WIN32) || defined(_WIN32)
 # define MSWIN
 #endif
 
-#if defined(MSWIN)
+#যদি defined(MSWIN)
 # include <io.h>
 #endif
 
@@ -26,7 +26,7 @@
 #ifdef HAVE_CONFIG_H	// GNU autoconf (or something else) was here
 # ifdef VMS
 #  include "config.h"   /* Rely on /INCLUDE to find it. */
-# else
+# অন্যথা
 #  include "auto/config.h"
 # endif /* def VMS [else] */
 # define HAVE_PATHDEF
@@ -36,11 +36,11 @@
  * it becomes zero.  This is likely a problem of not being able to run the
  * test program.  Other items from configure may also be wrong then!
  */
-# if (VIM_SIZEOF_INT == 0)
+# যদি (VIM_SIZEOF_INT == 0)
 #  error configure did not run properly.  Check auto/config.log.
 # endif
 
-# if (defined(__linux__) && !defined(__ANDROID__)) || defined(__CYGWIN__) || defined(__GNU__)
+# যদি (defined(__linux__) && !defined(__ANDROID__)) || defined(__CYGWIN__) || defined(__GNU__)
 // Needed for strptime().  Needs to be done early, since header files can
 // include other header files and end up including time.h, where these symbols
 // matter for Vim.
@@ -69,7 +69,7 @@
  * Cygwin may have fchdir() in a newer release, but in most versions it
  * doesn't work well and avoiding it keeps the binary backward compatible.
  */
-# if defined(__CYGWIN32__) && defined(HAVE_FCHDIR)
+# যদি defined(__CYGWIN32__) && defined(HAVE_FCHDIR)
 #  undef HAVE_FCHDIR
 # endif
 
@@ -79,20 +79,20 @@
 #endif
 
 // for INT_MAX, LONG_MAX et al.
-#include <limits.h>
+#অন্তর্ভাৱ <limits.h>
 
-#if !defined(UINT32_TYPEDEF)
-# if defined(uint32_t)  // this doesn't catch typedefs, unfortunately
+#যদি !defined(UINT32_TYPEDEF)
+# যদি defined(uint32_t)  // this doesn't catch typedefs, unfortunately
 #  define UINT32_TYPEDEF uint32_t
-# else
+# অন্যথা
   // Fall back to assuming unsigned int is 32 bit.  If this is wrong then the
   // test in blowfish.c will fail.
-#  define UINT32_TYPEDEF unsigned int
+#  define UINT32_TYPEDEF unsigned পূর্ণাঙ্ক
 # endif
 #endif
 
 // C89 does not define SIZE_MAX
-#if defined(__hpux) || defined(VMS)
+#যদি defined(__hpux) || defined(VMS)
 # ifndef SIZE_MAX
 #  define SIZE_MAX ((size_t)(-1))
 # endif
@@ -104,13 +104,13 @@
 #  define _TANDEM_SOURCE
 # endif
 # include <floss.h>
-# define ROOT_UID 65535
+# define মূল_UID 65535
 # define OLDXAW
-# if (_TANDEM_ARCH_ == 2 && __H_Series_RVU >= 621)
+# যদি (_TANDEM_ARCH_ == 2 && __H_Series_RVU >= 621)
 #  define SA_ONSTACK_COMPATIBILITY
 # endif
-#else
-# define ROOT_UID 0
+#অন্যথা
+# define মূল_UID 0
 #endif
 
 /* Include MAC_OS_X_VERSION_* macros */
@@ -122,27 +122,27 @@
  * MACOS_X	    compiling for Mac OS X
  * MACOS_X_DARWIN   integrating the darwin feature into MACOS_X
  */
-#if defined(MACOS_X_DARWIN) && !defined(MACOS_X)
+#যদি defined(MACOS_X_DARWIN) && !defined(MACOS_X)
 # define MACOS_X
 #endif
 // Unless made through the Makefile enforce GUI on Mac
-#if defined(MACOS_X) && !defined(HAVE_CONFIG_H)
+#যদি defined(MACOS_X) && !defined(HAVE_CONFIG_H)
 # define UNIX
 #endif
 
-#if defined(FEAT_GUI_MOTIF) \
+#যদি defined(FEAT_GUI_MOTIF) \
     || defined(FEAT_GUI_GTK) \
     || defined(FEAT_GUI_HAIKU) \
     || defined(FEAT_GUI_MSWIN) \
     || defined(FEAT_GUI_PHOTON)
-# if !defined(FEAT_GUI) && !defined(NO_X11_INCLUDES)
+# যদি !defined(FEAT_GUI) && !defined(NO_X11_INCLUDES)
 #  define FEAT_GUI
 # endif
 #endif
 
 // Check support for rendering options
 #ifdef FEAT_GUI
-# if defined(FEAT_DIRECTX)
+# যদি defined(FEAT_DIRECTX)
 #  define FEAT_RENDER_OPTIONS
 # endif
 #endif
@@ -160,45 +160,45 @@
 # ifndef FEAT_GUI_GTK	// avoid problems when generating prototypes
 #  ifdef __GNUC__
 #   define VIM_SIZEOF_INT	4
-#  else
+#  অন্যথা
 #   define VIM_SIZEOF_INT	2
 #  endif
 # endif
 #endif
-#if defined(MACOS_X) && !defined(HAVE_CONFIG_H)
+#যদি defined(MACOS_X) && !defined(HAVE_CONFIG_H)
 # define VIM_SIZEOF_INT __SIZEOF_INT__
 #endif
 
-#if VIM_SIZEOF_INT < 4 && !defined(PROTO)
-# error Vim only works with 32 bit int or larger
+#যদি VIM_SIZEOF_INT < 4 && !defined(PROTO)
+# error Vim only works with 32 bit পূর্ণাঙ্ক or larger
 #endif
 
 /*
  * #defines for optionals and features
  * Also defines FEAT_TINY, FEAT_NORMAL, etc. when FEAT_HUGE is defined.
  */
-#include "feature.h"
+#অন্তর্ভাৱ "feature.h"
 
-#if defined(MACOS_X_DARWIN)
-# if defined(FEAT_NORMAL) && !defined(FEAT_CLIPBOARD)
+#যদি defined(MACOS_X_DARWIN)
+# যদি defined(FEAT_NORMAL) && !defined(FEAT_CLIPBOARD)
 #  define FEAT_CLIPBOARD
 # endif
-# if defined(FEAT_HUGE) && !defined(FEAT_SOUND) && \
+# যদি defined(FEAT_HUGE) && !defined(FEAT_SOUND) && \
 	defined(__clang_major__) && __clang_major__ >= 7 && \
 	defined(MAC_OS_X_VERSION_MIN_REQUIRED) && MAC_OS_X_VERSION_MIN_REQUIRED >= 1060
 #  define FEAT_SOUND
 # endif
-# if defined(FEAT_SOUND)
+# যদি defined(FEAT_SOUND)
 #  define FEAT_SOUND_MACOSX
 # endif
 #endif
 
 // +x11 is only enabled when it's both available and wanted.
-#if defined(HAVE_X11) && defined(WANT_X11)
+#যদি defined(HAVE_X11) && defined(WANT_X11)
 # define FEAT_X11
 #endif
 
-#if defined(HAVE_WAYLAND) && defined(WANT_WAYLAND)
+#যদি defined(HAVE_WAYLAND) && defined(WANT_WAYLAND)
 # define FEAT_WAYLAND
 #endif
 
@@ -232,7 +232,7 @@
 #endif
 
 // The Mac conversion stuff doesn't work under X11.
-#if defined(MACOS_X_DARWIN)
+#যদি defined(MACOS_X_DARWIN)
 # define MACOS_CONVERT
 #endif
 
@@ -263,22 +263,22 @@
 # endif
 #endif
 
-#if (defined(UNIX) || defined(VMS)) \
+#যদি (defined(UNIX) || defined(VMS)) \
 	&& (!defined(MACOS_X) || defined(HAVE_CONFIG_H))
 # include "os_unix.h"	    // bring lots of system header files
-#elif !defined(PROTO)
+#নোচেদ্যদি !defined(PROTO)
   // For all non-Unix systems: use old-fashioned signal().
-# define mch_signal(signum, sighandler) signal(signum, sighandler)
+# define mch_signal(signum, sighandler) সঙ্কেত(signum, sighandler)
 #endif
 
 // Mark unused function arguments with UNUSED, so that gcc -Wunused-parameter
 // can be used to check for mistakes.
 #ifndef UNUSED
-# if defined(HAVE_ATTRIBUTE_UNUSED) || defined(__MINGW32__)
+# যদি defined(HAVE_ATTRIBUTE_UNUSED) || defined(__MINGW32__)
 #  define UNUSED __attribute__((unused))
-# else
-#  if defined __has_attribute
-#   if __has_attribute(unused)
+# অন্যথা
+#  যদি defined __has_attribute
+#   যদি __has_attribute(unused)
 #    define UNUSED __attribute__((unused))
 #   endif
 #  endif
@@ -289,7 +289,7 @@
 #endif
 
 // Used to check for "sun", "__sun" is used by newer compilers.
-#if defined(__sun)
+#যদি defined(__sun)
 # define SUN_SYSTEM
 #endif
 
@@ -299,7 +299,7 @@
 // cause compilation failures even though the headers are correct.  For
 // a concrete example, gcc-3.2 enforces exception specifications, and
 // glibc-2.2.5 has them in their system headers.
-#if !defined(__cplusplus) && defined(UNIX) \
+#যদি !defined(__cplusplus) && defined(UNIX) \
        && !defined(MACOS_X) // MACOS_X doesn't yet support osdef.h
 # include "auto/osdef.h"	// bring missing declarations in
 #endif
@@ -313,7 +313,7 @@
 #  include "os_win32.h"
 # endif
 
-# if defined(MACOS_X)
+# যদি defined(MACOS_X)
 #  include "os_mac.h"
 # endif
 
@@ -324,7 +324,7 @@
 
 #ifdef X_LOCALE
 # include <X11/Xlocale.h>
-#else
+#অন্যথা
 # ifdef HAVE_LOCALE_H
 #  include <locale.h>
 # endif
@@ -337,7 +337,7 @@
 #ifndef MAXPATHL
 # ifdef MAXPATHLEN
 #  define MAXPATHL  MAXPATHLEN
-# else
+# অন্যথা
 #  define MAXPATHL  256
 # endif
 #endif
@@ -347,12 +347,12 @@
 // not expanded, and escaping them as "\%"/"\#" breaks buffer name matching
 // when '%'/'#' is in 'isfname' (backslash treated as a path separator).
 # define BUFFER_ESC_CHARS ((char_u *)" \t\n*?[`'\"|!<")
-#else
+#অন্যথা
 # ifdef VMS
     // VMS allows a lot of characters in the file name
 #  define PATH_ESC_CHARS ((char_u *)" \t\n*?{`\\%#'\"|!")
 #  define SHELL_ESC_CHARS ((char_u *)" \t\n*?{`\\%#'|!()&")
-# else
+# অন্যথা
 #  define PATH_ESC_CHARS ((char_u *)" \t\n*?[{`$\\%#'\"|!<")
 #  define SHELL_ESC_CHARS ((char_u *)" \t\n*?[{`$\\%#'\"|!<>();&")
 # endif
@@ -378,22 +378,22 @@
  * Shorthand for unsigned variables. Many systems, but not all, have u_char
  * already defined, so we use char_u to avoid trouble.
  */
-typedef unsigned char	char_u;
-typedef unsigned short	short_u;
-typedef unsigned int	int_u;
+প্রকারনির্দেশ unsigned ৱর্ণ	char_u;
+প্রকারনির্দেশ unsigned short	short_u;
+প্রকারনির্দেশ unsigned পূর্ণাঙ্ক	int_u;
 
 // Make sure long_u is big enough to hold a pointer.
 // On Win64, longs are 32 bits and pointers are 64 bits.
 // For printf() and scanf(), we need to take care of long_u specifically.
 #ifdef _WIN64
-typedef unsigned __int64	long_u;
-typedef		 __int64	long_i;
+প্রকারনির্দেশ unsigned __int64	long_u;
+প্রকারনির্দেশ		 __int64	long_i;
 # define SCANF_HEX_LONG_U       "%llx"
 # define SCANF_DECIMAL_LONG_U   "%llu"
 # define PRINTF_HEX_LONG_U      "0x%llx"
-#else
-typedef unsigned long		long_u;
-typedef		 long		long_i;
+#অন্যথা
+প্রকারনির্দেশ unsigned long		long_u;
+প্রকারনির্দেশ		 long		long_i;
 # define SCANF_HEX_LONG_U       "%lx"
 # define SCANF_DECIMAL_LONG_U   "%lu"
 # define PRINTF_HEX_LONG_U      "0x%lx"
@@ -406,7 +406,7 @@ typedef		 long		long_i;
  * varying sizes for off_t.  The other systems will continue to use "%ld" to
  * print off_t since off_t is simply a typedef to long for them.
  */
-#if defined(SIZEOF_OFF_T) && (SIZEOF_OFF_T > VIM_SIZEOF_LONG)
+#যদি defined(SIZEOF_OFF_T) && (SIZEOF_OFF_T > VIM_SIZEOF_LONG)
 # define LONG_LONG_OFF_T
 #endif
 
@@ -416,24 +416,24 @@ typedef		 long		long_i;
  * We assume that when fseeko() is available then ftello() is too.
  * Note that Windows has different function names.
  */
-#if defined(MSWIN) && !defined(PROTO)
-typedef __int64 off_T;
+#যদি defined(MSWIN) && !defined(PROTO)
+প্রকারনির্দেশ __int64 off_T;
 # ifdef __MINGW32__
 #  define vim_lseek lseek64
 #  define vim_fseek fseeko64
 #  define vim_ftell ftello64
-# else
+# অন্যথা
 #  define vim_lseek _lseeki64
 #  define vim_fseek _fseeki64
 #  define vim_ftell _ftelli64
 # endif
-#else
-typedef off_t off_T;
+#অন্যথা
+প্রকারনির্দেশ off_t off_T;
 # ifdef HAVE_FSEEKO
 #  define vim_lseek lseek
 #  define vim_ftell ftello
 #  define vim_fseek fseeko
-# else
+# অন্যথা
 #  define vim_lseek lseek
 #  define vim_ftell ftell
 #  define vim_fseek(a, b, c)	fseek(a, (long)b, c)
@@ -443,25 +443,25 @@ typedef off_t off_T;
 /*
  * The characters and attributes cached for the screen.
  */
-typedef char_u schar_T;
-typedef unsigned short sattr_T;
+প্রকারনির্দেশ char_u schar_T;
+প্রকারনির্দেশ unsigned short sattr_T;
 #define MAX_TYPENR 65535
 
 /*
  * The u8char_T can hold one decoded UTF-8 character.
  * We use 32 bits, since some Asian characters don't fit in 16 bits.
  */
-typedef unsigned int u8char_T;	// int is 32 bits or more
+প্রকারনির্দেশ unsigned পূর্ণাঙ্ক u8char_T;	// int is 32 bits or more
 
 /*
  * The vimlong_T has sizeof(vimlong_T) >= 2 * sizeof(int).
  * One use is simple handling of overflow in int calculations.
  */
-#if defined(VMS) && defined(VAX)
+#যদি defined(VMS) && defined(VAX)
 // unsupported compiler
-typedef long      vimlong_T;
-#else
-typedef long long vimlong_T;
+প্রকারনির্দেশ long      vimlong_T;
+#অন্যথা
+প্রকারনির্দেশ long long vimlong_T;
 #endif
 
 #ifndef UNIX		    // For Unix this is included in os_unix.h
@@ -469,10 +469,10 @@ typedef long long vimlong_T;
 # include <ctype.h>
 #endif
 
-#include "ascii.h"
-#include "keymap.h"
-#include "termdefs.h"
-#include "macros.h"
+#অন্তর্ভাৱ "ascii.h"
+#অন্তর্ভাৱ "keymap.h"
+#অন্তর্ভাৱ "termdefs.h"
+#অন্তর্ভাৱ "macros.h"
 
 #ifdef LATTICE
 # include <sys/types.h>
@@ -481,11 +481,11 @@ typedef long long vimlong_T;
 #ifdef _DCC
 # include <sys/stat.h>
 #endif
-#if defined(MSWIN)
+#যদি defined(MSWIN)
 # include <sys/stat.h>
 #endif
 
-#if defined(HAVE_ERRNO_H) || defined(MSWIN)
+#যদি defined(HAVE_ERRNO_H) || defined(MSWIN)
 # include <errno.h>
 #endif
 
@@ -499,7 +499,7 @@ typedef long long vimlong_T;
 # ifdef HAVE_STRING_H
 #  include <string.h>
 # endif
-# if defined(HAVE_STRINGS_H) && !defined(NO_STRINGS_WITH_STRING_H)
+# যদি defined(HAVE_STRINGS_H) && !defined(NO_STRINGS_WITH_STRING_H)
 #  include <strings.h>
 # endif
 # ifdef HAVE_STAT_H
@@ -510,7 +510,7 @@ typedef long long vimlong_T;
 # endif
 #endif // NON-UNIX
 
-#include <assert.h>
+#অন্তর্ভাৱ <assert.h>
 
 #ifdef HAVE_STDINT_H
 # include <stdint.h>
@@ -521,17 +521,17 @@ typedef long long vimlong_T;
 #ifdef HAVE_WCTYPE_H
 # include <wctype.h>
 #endif
-#include <stdarg.h>
+#অন্তর্ভাৱ <stdarg.h>
 // older compilers do not define va_copy
 #ifndef va_copy
 # define va_copy(dst, src)	((dst) = (src))
 #endif
 
 // for offsetof()
-#include <stddef.h>
-#include <stdbool.h>
+#অন্তর্ভাৱ <stddef.h>
+#অন্তর্ভাৱ <stdbool.h>
 
-#if defined(HAVE_SYS_SELECT_H) && \
+#যদি defined(HAVE_SYS_SELECT_H) && \
 	(!defined(HAVE_SYS_TIME_H) || defined(SYS_SELECT_WITH_SYS_TIME))
 # include <sys/select.h>
 #endif
@@ -541,7 +541,7 @@ typedef long long vimlong_T;
 #  include <sys/poll.h>
 # elif defined(MSWIN)
 #  define HAVE_SELECT
-# else
+# অন্যথা
 #  ifdef HAVE_POLL_H
 #   include <poll.h>
 #  endif
@@ -571,13 +571,13 @@ typedef long long vimlong_T;
 #  define FEAT_GETTEXT
 # endif
 // These are in os_win32.c
-extern char *(*dyn_libintl_gettext)(const char *msgid);
-extern char *(*dyn_libintl_ngettext)(const char *msgid, const char *msgid_plural, unsigned long n);
-extern char *(*dyn_libintl_bindtextdomain)(const char *domainname, const char *dirname);
-extern char *(*dyn_libintl_bind_textdomain_codeset)(const char *domainname, const char *codeset);
-extern char *(*dyn_libintl_textdomain)(const char *domainname);
-extern int (*dyn_libintl_wputenv)(const wchar_t *envstring);
-extern int *dyn_libintl_nl_msg_cat_cntr;
+বাহ্য ৱর্ণ *(*dyn_libintl_gettext)(ধ্রুৱ ৱর্ণ *msgid);
+বাহ্য ৱর্ণ *(*dyn_libintl_ngettext)(ধ্রুৱ ৱর্ণ *msgid, ধ্রুৱ ৱর্ণ *msgid_plural, unsigned long n);
+বাহ্য ৱর্ণ *(*dyn_libintl_bindtextdomain)(ধ্রুৱ ৱর্ণ *domainname, ধ্রুৱ ৱর্ণ *dirname);
+বাহ্য ৱর্ণ *(*dyn_libintl_bind_textdomain_codeset)(ধ্রুৱ ৱর্ণ *domainname, ধ্রুৱ ৱর্ণ *codeset);
+বাহ্য ৱর্ণ *(*dyn_libintl_textdomain)(ধ্রুৱ ৱর্ণ *domainname);
+বাহ্য পূর্ণাঙ্ক (*dyn_libintl_wputenv)(ধ্রুৱ wchar_t *envstring);
+বাহ্য পূর্ণাঙ্ক *dyn_libintl_nl_বাৰ্তা_cat_cntr;
 #endif
 
 
@@ -591,29 +591,29 @@ extern int *dyn_libintl_nl_msg_cat_cntr;
  */
 #ifdef FEAT_GETTEXT
 # ifdef DYNAMIC_GETTEXT
-#  define _(x) (*dyn_libintl_gettext)((char *)(x))
-#  define NGETTEXT(x, xs, n) (*dyn_libintl_ngettext)((char *)(x), (char *)(xs), (n))
+#  define _(x) (*dyn_libintl_gettext)((ৱর্ণ *)(x))
+#  define NGETTEXT(x, xs, n) (*dyn_libintl_ngettext)((ৱর্ণ *)(x), (ৱর্ণ *)(xs), (n))
 #  define N_(x) x
 #  define bindtextdomain(domain, dir) (*dyn_libintl_bindtextdomain)((domain), (dir))
 #  define bind_textdomain_codeset(domain, codeset) (*dyn_libintl_bind_textdomain_codeset)((domain), (codeset))
-#  if !defined(HAVE_BIND_TEXTDOMAIN_CODESET)
+#  যদি !defined(HAVE_BIND_TEXTDOMAIN_CODESET)
 #   define HAVE_BIND_TEXTDOMAIN_CODESET 1
 #  endif
 #  define textdomain(domain) (*dyn_libintl_textdomain)(domain)
 #  define libintl_wputenv(envstring) (*dyn_libintl_wputenv)(envstring)
-# else
+# অন্যথা
 #  include <libintl.h>
-#  define _(x) gettext((char *)(x))
+#  define _(x) gettext((ৱর্ণ *)(x))
 #  define NGETTEXT(x, xs, n) ngettext((x), (xs), (n))
 #  ifdef gettext_noop
 #   define N_(x) gettext_noop(x)
-#  else
+#  অন্যথা
 #   define N_(x) x
 #  endif
 # endif
-#else
-# define _(x) ((char *)(x))
-# define NGETTEXT(x, xs, n) (((n) == 1) ? (char *)(x) : (char *)(xs))
+#অন্যথা
+# define _(x) ((ৱর্ণ *)(x))
+# define NGETTEXT(x, xs, n) (((n) == 1) ? (ৱর্ণ *)(x) : (ৱর্ণ *)(xs))
 # define N_(x) x
 # ifdef bindtextdomain
 #  undef bindtextdomain
@@ -639,7 +639,7 @@ extern int *dyn_libintl_nl_msg_cat_cntr;
 				    // with b_mod_*
 #define UPD_INVERTED		20  // redisplay inverted part that changed
 #define UPD_INVERTED_ALL	25  // redisplay whole inverted part
-#define UPD_REDRAW_TOP		30  // display first w_upd_rows screen lines
+#define UPD_REDRAW_শীৰ্ষ		30  // display first w_upd_rows screen lines
 #define UPD_SOME_VALID		35  // like UPD_NOT_VALID but may scroll
 #define UPD_NOT_VALID		40  // buffer needs complete redraw
 #define UPD_CLEAR		50  // screen messed up, clear it
@@ -724,7 +724,7 @@ extern int *dyn_libintl_nl_msg_cat_cntr;
 #define HL_ALL			0x7ff
 
 // special attribute addition: Put message in history
-#define MSG_HIST		0x1000
+#define বাৰ্তা_HIST		0x1000
 
 /*
  * Values for State.
@@ -740,7 +740,7 @@ extern int *dyn_libintl_nl_msg_cat_cntr;
 #define MODE_OP_PENDING	0x04	// Normal mode, operator is pending - use
 				// get_real_state()
 #define MODE_CMDLINE	0x08	// Editing the command line
-#define MODE_INSERT	0x10	// Insert mode, also for Replace mode
+#define MODE_ঢোকাও	0x10	// Insert mode, also for Replace mode
 #define MODE_LANGMAP	0x20	// Language mapping, can be combined with
 				// MODE_INSERT and MODE_CMDLINE
 #define MODE_SELECT	0x40	// Select mode, use get_real_state()
@@ -749,9 +749,9 @@ extern int *dyn_libintl_nl_msg_cat_cntr;
 #define MAP_ALL_MODES	0xff    // all mode bits used for mapping
 
 #define REPLACE_FLAG	0x100	// Replace mode flag
-#define MODE_REPLACE	(REPLACE_FLAG | MODE_INSERT)
+#define MODE_REPLACE	(REPLACE_FLAG | MODE_ঢোকাও)
 #define VREPLACE_FLAG	0x200	// Virtual-replace mode flag
-#define MODE_VREPLACE	(REPLACE_FLAG | VREPLACE_FLAG | MODE_INSERT)
+#define MODE_VREPLACE	(REPLACE_FLAG | VREPLACE_FLAG | MODE_ঢোকাও)
 #define MODE_LREPLACE	(REPLACE_FLAG | MODE_LANGMAP)
 
 #define MODE_NORMAL_BUSY (0x1000 | MODE_NORMAL)
@@ -761,7 +761,7 @@ extern int *dyn_libintl_nl_msg_cat_cntr;
 #define MODE_ASKMORE	0x3000	// Asking if you want --more--
 #define MODE_SETWSIZE	0x4000	// window size has changed
 #define MODE_EXTERNCMD	0x5000	// executing an external command
-#define MODE_SHOWMATCH	(0x6000 | MODE_INSERT) // show matching paren
+#define MODE_SHOWMATCH	(0x6000 | MODE_ঢোকাও) // show matching paren
 #define MODE_CONFIRM	0x7000	// ":confirm" prompt
 #define MODE_ALL	0xffff
 
@@ -775,7 +775,7 @@ extern int *dyn_libintl_nl_msg_cat_cntr;
 #define BACKWARD_FILE		(-3)
 
 // return values for functions
-#if !(defined(OK) && (OK == 1))
+#যদি !(defined(OK) && (OK == 1))
 // OK already defined to 1 in MacOS X curses, skip this
 # define OK			1
 #endif
@@ -942,10 +942,10 @@ extern int *dyn_libintl_nl_msg_cat_cntr;
 #define FINDFILE_DIR	1	// only directories
 #define FINDFILE_BOTH	2	// files and directories
 
-#if defined(FEAT_TABPANEL)
+#যদি defined(FEAT_TABPANEL)
 # define COLUMNS_WITHOUT_TPL()		(Columns - tabpanel_width())
 # define TPL_LCOL()			tabpanel_leftcol()
-#else
+#অন্যথা
 # define COLUMNS_WITHOUT_TPL()		Columns
 # define TPL_LCOL()			0
 #endif
@@ -953,7 +953,7 @@ extern int *dyn_libintl_nl_msg_cat_cntr;
 #define W_ENDCOL(wp)	((wp)->w_wincol + (wp)->w_width)
 #ifdef FEAT_MENU
 # define W_WINROW(wp)	((wp)->w_winrow + (wp)->w_winbar_height)
-#else
+#অন্যথা
 # define W_WINROW(wp)	(wp->w_winrow)
 #endif
 
@@ -998,19 +998,19 @@ extern int *dyn_libintl_nl_msg_cat_cntr;
 #endif
 
 // Values for 'options' argument in do_search() and searchit()
-#define SEARCH_REV    0x01  // go in reverse of previous dir.
-#define SEARCH_ECHO   0x02  // echo the search command and handle options
-#define SEARCH_MSG    0x0c  // give messages (yes, it's not 0x04)
-#define SEARCH_NFMSG  0x08  // give all messages except not found
-#define SEARCH_OPT    0x10  // interpret optional flags
-#define SEARCH_HIS    0x20  // put search pattern in history
-#define SEARCH_END    0x40  // put cursor at end of match
-#define SEARCH_NOOF   0x80  // don't add offset to position
-#define SEARCH_START 0x100  // start search without col offset
-#define SEARCH_MARK  0x200  // set previous context mark
-#define SEARCH_KEEP  0x400  // keep previous search pattern
-#define SEARCH_PEEK  0x800  // peek for typed char, cancel search
-#define SEARCH_COL  0x1000  // start at specified column instead of zero
+#define অনুসন্ধান_REV    0x01  // go in reverse of previous dir.
+#define অনুসন্ধান_ECHO   0x02  // echo the search command and handle options
+#define অনুসন্ধান_বাৰ্তা    0x0c  // give messages (yes, it's not 0x04)
+#define অনুসন্ধান_NFMSG  0x08  // give all messages except not found
+#define অনুসন্ধান_OPT    0x10  // interpret optional flags
+#define অনুসন্ধান_HIS    0x20  // put search pattern in history
+#define অনুসন্ধান_END    0x40  // put cursor at end of match
+#define অনুসন্ধান_NOOF   0x80  // don't add offset to position
+#define অনুসন্ধান_START 0x100  // start search without col offset
+#define অনুসন্ধান_MARK  0x200  // set previous context mark
+#define অনুসন্ধান_KEEP  0x400  // keep previous search pattern
+#define অনুসন্ধান_PEEK  0x800  // peek for typed char, cancel search
+#define অনুসন্ধান_COL  0x1000  // start at specified column instead of zero
 
 // Values for find_ident_under_cursor()
 #define FIND_IDENT	1	// find identifier (word)
@@ -1051,9 +1051,9 @@ extern int *dyn_libintl_nl_msg_cat_cntr;
 #define BLN_NOCURWIN	128	// buffer is not associated with curwin
 
 // Values for in_cinkeys()
-#define KEY_OPEN_FORW	0x101
-#define KEY_OPEN_BACK	0x102
-#define KEY_COMPLETE	0x103	// end of completion
+#define চাবি_OPEN_FORW	0x101
+#define চাবি_OPEN_BACK	0x102
+#define চাবি_COMPLETE	0x103	// end of completion
 
 // Used for the first argument of do_map()
 #define MAPTYPE_MAP		0
@@ -1078,10 +1078,10 @@ extern int *dyn_libintl_nl_msg_cat_cntr;
 #define SHELL_WRITE	64	// write lines from buffer
 
 // Values returned by mch_nodetype()
-#define NODE_NORMAL	0	// file or directory, check with mch_isdir()
-#define NODE_WRITABLE	1	// something we can write to (character
+#define গ্ৰন্থি_NORMAL	0	// file or directory, check with mch_isdir()
+#define গ্ৰন্থি_WRITABLE	1	// something we can write to (character
 				// device, fifo, socket, ..)
-#define NODE_OTHER	2	// non-writable thing (e.g., block device)
+#define গ্ৰন্থি_OTHER	2	// non-writable thing (e.g., block device)
 
 // Values for readfile() flags
 #define READ_NEW	0x01	// read a file into a new buffer
@@ -1127,7 +1127,7 @@ extern int *dyn_libintl_nl_msg_cat_cntr;
 
 // Values for sub_cmd and which_pat argument for search_regcomp()
 // Also used for which_pat argument for searchit()
-#define RE_SEARCH	0	// save/use pat in/from search_pattern
+#define RE_অনুসন্ধান	0	// save/use pat in/from search_pattern
 #define RE_SUBST	1	// save/use pat in/from subst_pattern
 #define RE_BOTH		2	// save pat in both patterns
 #define RE_LAST		2	// use last used pattern if "pat" is NULL
@@ -1197,14 +1197,14 @@ extern int *dyn_libintl_nl_msg_cat_cntr;
 #define PUT_FIXINDENT	1	// make indent look nice
 #define PUT_CURSEND	2	// leave cursor after end of new text
 #define PUT_CURSLINE	4	// leave cursor on last line of new text
-#define PUT_LINE	8	// put register as lines
-#define PUT_LINE_SPLIT	16	// split line for linewise register
-#define PUT_LINE_FORWARD 32	// put linewise register below Visual sel.
+#define PUT_সাৰি	8	// put register as lines
+#define PUT_সাৰি_SPLIT	16	// split line for linewise register
+#define PUT_সাৰি_FORWARD 32	// put linewise register below Visual sel.
 #define PUT_BLOCK_INNER 64      // in block mode, do not add trailing spaces
 
 // flags for set_indent()
 #define SIN_CHANGED	1	// call changed_bytes() when line changed
-#define SIN_INSERT	2	// insert indent before existing text
+#define SIN_ঢোকাও	2	// insert indent before existing text
 #define SIN_UNDO	4	// save line for undo before changing it
 
 // flags for insertchar()
@@ -1225,11 +1225,11 @@ extern int *dyn_libintl_nl_msg_cat_cntr;
 
 // There are five history tables:
 #define HIST_CMD	0	// colon commands
-#define HIST_SEARCH	1	// search commands
-#define HIST_EXPR	2	// expressions (from entering = register)
-#define HIST_INPUT	3	// input() lines
+#define HIST_অনুসন্ধান	1	// search commands
+#define HIST_ৰাশিমালা	2	// expressions (from entering = register)
+#define HIST_প্ৰবেশ	3	// input() lines
 #define HIST_DEBUG	4	// debug commands
-#define HIST_COUNT	5	// number of history tables
+#define HIST_গুনতি	5	// number of history tables
 
 // The type numbers are fixed for backwards compatibility.
 #define BARTYPE_VERSION 1
@@ -1246,7 +1246,7 @@ extern int *dyn_libintl_nl_msg_cat_cntr;
  * Values for do_tag().
  */
 #define DT_TAG		1	// jump to newer position or same tag again
-#define DT_POP		2	// jump to older position
+#define DT_বেৰ_কৰো		2	// jump to older position
 #define DT_NEXT		3	// jump to next match of same tag
 #define DT_PREV		4	// jump to previous match of same tag
 #define DT_FIRST	5	// jump to first match of same tag
@@ -1301,7 +1301,7 @@ extern int *dyn_libintl_nl_msg_cat_cntr;
 #define WSP_ROOM	0x01	// require enough room
 #define WSP_VERT	0x02	// split/equalize vertically
 #define WSP_HOR		0x04	// equalize horizontally
-#define WSP_TOP		0x08	// window at top-left of shell
+#define WSP_শীৰ্ষ		0x08	// window at top-left of shell
 #define WSP_BOT		0x10	// window at bottom-right of shell
 #define WSP_HELP	0x20	// creating the help window
 #define WSP_BELOW	0x40	// put new window below/right
@@ -1378,7 +1378,7 @@ extern int *dyn_libintl_nl_msg_cat_cntr;
 /*
  * Events for autocommands. Must be kept in sync with "event_tab".
  */
-enum auto_event
+গণনা auto_event
 {
     EVENT_BUFADD = 0,		// after adding a buffer to the buffer list
     EVENT_BUFCREATE,		// UNUSED: BufCreate == BufAdd
@@ -1509,17 +1509,17 @@ enum auto_event
     EVENT_WINRESIZED,		// after a window was resized
     EVENT_WINSCROLLED,		// after a window was scrolled or resized
 
-    NUM_EVENTS,			// MUST be the last one
+    অঙ্ক_EVENTS,			// MUST be the last one
 };
 
-typedef enum auto_event event_T;
+প্রকারনির্দেশ গণনা auto_event event_T;
 
 /*
  * Values for index in highlight_attr[].
  * When making changes, also update HL_FLAGS below!
  * And update the default value of 'highlight': HIGHLIGHT_INIT in optiondefs.h
  */
-typedef enum
+প্রকারনির্দেশ গণনা
 {
     HLF_8 = 0	    // Meta & special keys listed with ":map", text that is
 		    // displayed different from what it is
@@ -1575,7 +1575,7 @@ typedef enum
     , HLF_PST	    // popup menu scrollbar thumb
     , HLF_PMB	    // popup menu border
     , HLF_PMS	    // popup menu shadow
-    , HLF_POP	    // popup window body
+    , HLF_বেৰ_কৰো	    // popup window body
     , HLF_POPB	    // popup window border
     , HLF_POPT	    // popup window title
     , HLF_TP	    // tabpage line
@@ -1587,13 +1587,13 @@ typedef enum
     , HLF_QFL	    // quickfix window line currently selected
     , HLF_ST	    // status lines of terminal windows
     , HLF_STNC	    // status lines of not-current terminal windows
-    , HLF_MSG	    // message area
+    , HLF_বাৰ্তা	    // message area
     , HLF_TPL	    // tabpanel
     , HLF_TPLS	    // tabpanel selected
     , HLF_TPLF	    // tabpanel filler
     , HLF_PRI	    // "preinsert" in 'completeopt'
     , HLF_WIN	    // window colour
-    , HLF_COUNT	    // MUST be the last one
+    , HLF_গুনতি	    // MUST be the last one
 } hlf_T;
 
 // The HL_FLAGS must be in the same order as the HLF_ enums!
@@ -1611,7 +1611,7 @@ typedef enum
 /*
  * Values for behaviour in spell_move_to
  */
-typedef enum
+প্রকারনির্দেশ গণনা
 {
     SMT_ALL = 0		    // Move to "all" words
     , SMT_BAD		    // Move to "bad" words only
@@ -1632,14 +1632,14 @@ typedef enum
 #ifdef FEAT_JOB_CHANNEL
 // If "--log logfile" was used or ch_logfile() was called then log some or all
 // terminal output.
-# define MAY_WANT_TO_LOG_THIS if (ch_log_output == FALSE) ch_log_output = TRUE;
-#else
+# define MAY_WANT_TO_LOG_THIS যদি (ch_log_output == FALSE) ch_log_output = TRUE;
+#অন্যথা
 // no logging support
 # define MAY_WANT_TO_LOG_THIS
 #endif
 
 #ifndef UINT32_T
-typedef UINT32_TYPEDEF UINT32_T;
+প্রকারনির্দেশ UINT32_TYPEDEF UINT32_T;
 #endif
 
 /*
@@ -1662,7 +1662,7 @@ typedef UINT32_TYPEDEF UINT32_T;
 #define OP_JOIN_NS	14	// "gJ"  join operator, only for Visual mode
 #define OP_ROT13	15	// "g?" rot-13 encoding
 #define OP_REPLACE	16	// "r"  replace chars, only for Visual mode
-#define OP_INSERT	17	// "I"  Insert column, only for Visual mode
+#define OP_ঢোকাও	17	// "I"  Insert column, only for Visual mode
 #define OP_APPEND	18	// "A"  Append column, only for Visual mode
 #define OP_FOLD		19	// "zf" define a fold
 #define OP_FOLDOPEN	20	// "zo" open folds
@@ -1691,14 +1691,14 @@ typedef UINT32_TYPEDEF UINT32_T;
  * Minimum screen size
  */
 #define MIN_COLUMNS	12	// minimal columns for screen
-#define MIN_LINES	2	// minimal lines for screen
+#define MIN_সাৰিগুলি	2	// minimal lines for screen
 #define MIN_CMDHEIGHT	1	// minimal height for command line
 #define STATUS_HEIGHT	1	// default height of a status line under a
 				// window
 #ifdef FEAT_MENU		// height of a status line under a window
 # define WINBAR_HEIGHT(wp)	(wp)->w_winbar_height
 # define VISIBLE_HEIGHT(wp)	((wp)->w_height + (wp)->w_winbar_height)
-#else
+#অন্যথা
 # define WINBAR_HEIGHT(wp)	0
 # define VISIBLE_HEIGHT(wp)	(wp)->w_height
 #endif
@@ -1715,10 +1715,10 @@ typedef UINT32_TYPEDEF UINT32_T;
 
 #define IOSIZE	   (1024+1)	// file i/o and sprintf buffer size
 
-#define DIALOG_MSG_SIZE 1000	// buffer size for dialog_msg()
+#define DIALOG_বাৰ্তা_SIZE 1000	// buffer size for dialog_msg()
 
-#define MSG_BUF_LEN 480	// length of buffer for small messages
-#define MSG_BUF_CLEN  (MSG_BUF_LEN / 6)    // cell length (worst case: utf-8
+#define বাৰ্তা_BUF_LEN 480	// length of buffer for small messages
+#define বাৰ্তা_BUF_CLEN  (বাৰ্তা_BUF_LEN / 6)    // cell length (worst case: utf-8
 					   // takes 6 bytes for one cell)
 
 #define FOLD_TEXT_LEN  51	// buffer size for get_foldtext()
@@ -1745,11 +1745,11 @@ typedef UINT32_TYPEDEF UINT32_T;
 # include <fcntl.h>
 #endif
 
-#ifdef BINARY_FILE_IO
+#ifdef দ্বিমিক_FILE_IO
 # define WRITEBIN   "wb"	// no CR-LF translation
 # define READBIN    "rb"
 # define APPENDBIN  "ab"
-#else
+#অন্যথা
 # define WRITEBIN   "w"
 # define READBIN    "r"
 # define APPENDBIN  "a"
@@ -1760,8 +1760,8 @@ typedef UINT32_TYPEDEF UINT32_T;
  * Use O_BINARY for all open() calls.
  */
 #ifdef __CYGWIN__
-# define O_EXTRA    O_BINARY
-#else
+# define O_EXTRA    O_দ্বিমিক
+#অন্যথা
 # define O_EXTRA    0
 #endif
 
@@ -1778,58 +1778,58 @@ typedef UINT32_TYPEDEF UINT32_T;
 
 // Allocate memory for one type and cast the returned pointer to have the
 // compiler check the types.
-#define ALLOC_ONE(type)  (type *)alloc(sizeof(type))
-#define ALLOC_ONE_ID(type, id)  (type *)alloc_id(sizeof(type), id)
-#define ALLOC_MULT(type, count)  (type *)alloc(sizeof(type) * (count))
-#define ALLOC_CLEAR_ONE(type)  (type *)alloc_clear(sizeof(type))
-#define ALLOC_CLEAR_ONE_ID(type, id)  (type *)alloc_clear_id(sizeof(type), id)
-#define ALLOC_CLEAR_MULT(type, count)  (type *)alloc_clear(sizeof(type) * (count))
-#define LALLOC_CLEAR_ONE(type)  (type *)lalloc_clear(sizeof(type), FALSE)
-#define LALLOC_CLEAR_MULT(type, count)  (type *)lalloc_clear(sizeof(type) * (count), FALSE)
-#define LALLOC_MULT(type, count)  (type *)lalloc(sizeof(type) * (count), FALSE)
+#define ALLOC_ONE(type)  (type *)alloc(পরিমাণ(type))
+#define ALLOC_ONE_ID(type, id)  (type *)alloc_id(পরিমাণ(type), id)
+#define ALLOC_MULT(type, গুনতি)  (type *)alloc(পরিমাণ(type) * (গুনতি))
+#define ALLOC_CLEAR_ONE(type)  (type *)alloc_clear(পরিমাণ(type))
+#define ALLOC_CLEAR_ONE_ID(type, id)  (type *)alloc_clear_id(পরিমাণ(type), id)
+#define ALLOC_CLEAR_MULT(type, গুনতি)  (type *)alloc_clear(পরিমাণ(type) * (গুনতি))
+#define LALLOC_CLEAR_ONE(type)  (type *)lalloc_clear(পরিমাণ(type), FALSE)
+#define LALLOC_CLEAR_MULT(type, গুনতি)  (type *)lalloc_clear(পরিমাণ(type) * (গুনতি), FALSE)
+#define LALLOC_MULT(type, গুনতি)  (type *)lalloc(পরিমাণ(type) * (গুনতি), FALSE)
 
 #ifdef HAVE_MEMSET
 # define vim_memset(ptr, c, size)   memset((ptr), (c), (size))
-#else
-void *vim_memset(void *, int, size_t);
+#অন্যথা
+শূন্য *vim_memset(শূন্য *, পূর্ণাঙ্ক, size_t);
 #endif
-#define CLEAR_FIELD(field)  vim_memset(&(field), 0, sizeof(field))
-#define CLEAR_POINTER(ptr)  vim_memset((ptr), 0, sizeof(*(ptr)))
+#define CLEAR_FIELD(field)  vim_memset(&(field), 0, পরিমাণ(field))
+#define CLEAR_POINTER(ptr)  vim_memset((ptr), 0, পরিমাণ(*(ptr)))
 
 /*
  * defines to avoid typecasts from (char_u *) to (char *) and back
  * (vim_strchr() and vim_strrchr() are now in strings.c)
  */
-#define STRLEN(s)	    strlen((char *)(s))
-#define STRCPY(d, s)	    strcpy((char *)(d), (char *)(s))
-#define STRNCPY(d, s, n)    strncpy((char *)(d), (char *)(s), (n))
-#define STRCMP(d, s)	    strcmp((char *)(d), (char *)(s))
-#define STRNCMP(d, s, n)    strncmp((char *)(d), (char *)(s), (n))
+#define STRLEN(s)	    strlen((ৱর্ণ *)(s))
+#define STRCPY(d, s)	    strcpy((ৱর্ণ *)(d), (ৱর্ণ *)(s))
+#define STRNCPY(d, s, n)    strncpy((ৱর্ণ *)(d), (ৱর্ণ *)(s), (n))
+#define STRCMP(d, s)	    strcmp((ৱর্ণ *)(d), (ৱর্ণ *)(s))
+#define STRNCMP(d, s, n)    strncmp((ৱর্ণ *)(d), (ৱর্ণ *)(s), (n))
 #ifdef HAVE_STRCASECMP
-# define STRICMP(d, s)	    strcasecmp((char *)(d), (char *)(s))
-#else
+# define STRICMP(d, s)	    strcasecmp((ৱর্ণ *)(d), (ৱর্ণ *)(s))
+#অন্যথা
 # ifdef HAVE_STRICMP
-#  define STRICMP(d, s)	    stricmp((char *)(d), (char *)(s))
-# else
-#  define STRICMP(d, s)	    vim_stricmp((char *)(d), (char *)(s))
+#  define STRICMP(d, s)	    stricmp((ৱর্ণ *)(d), (ৱর্ণ *)(s))
+# অন্যথা
+#  define STRICMP(d, s)	    vim_stricmp((ৱর্ণ *)(d), (ৱর্ণ *)(s))
 # endif
 #endif
 #ifdef HAVE_STRCOLL
-# define STRCOLL(d, s)     strcoll((char *)(d), (char *)(s))
-#else
-# define STRCOLL(d, s)     strcmp((char *)(d), (char *)(s))
+# define STRCOLL(d, s)     strcoll((ৱর্ণ *)(d), (ৱর্ণ *)(s))
+#অন্যথা
+# define STRCOLL(d, s)     strcmp((ৱর্ণ *)(d), (ৱর্ণ *)(s))
 #endif
 
 // Like strcpy() but allows overlapped source and destination.
 #define STRMOVE(d, s)	    mch_memmove((d), (s), STRLEN(s) + 1)
 
 #ifdef HAVE_STRNCASECMP
-# define STRNICMP(d, s, n)  strncasecmp((char *)(d), (char *)(s), (n))
-#else
+# define STRNICMP(d, s, n)  strncasecmp((ৱর্ণ *)(d), (ৱর্ণ *)(s), (n))
+#অন্যথা
 # ifdef HAVE_STRNICMP
-#  define STRNICMP(d, s, n) strnicmp((char *)(d), (char *)(s), (n))
-# else
-#  define STRNICMP(d, s, n) vim_strnicmp((char *)(d), (char *)(s), (n))
+#  define STRNICMP(d, s, n) strnicmp((ৱর্ণ *)(d), (ৱর্ণ *)(s), (n))
+# অন্যথা
+#  define STRNICMP(d, s, n) vim_strnicmp((ৱর্ণ *)(d), (ৱর্ণ *)(s), (n))
 # endif
 #endif
 
@@ -1839,15 +1839,15 @@ void *vim_memset(void *, int, size_t);
 // STRICMP() only handles the system locale version, which often does not
 // handle non-ascii properly.
 
-#define MB_STRICMP(d, s)	mb_strnicmp((char_u *)(d), (char_u *)(s), (int)MAXCOL)
-#define MB_STRNICMP(d, s, n)	mb_strnicmp((char_u *)(d), (char_u *)(s), (int)(n))
+#define MB_STRICMP(d, s)	mb_strnicmp((char_u *)(d), (char_u *)(s), (পূর্ণাঙ্ক)MAXCOL)
+#define MB_STRNICMP(d, s, n)	mb_strnicmp((char_u *)(d), (char_u *)(s), (পূর্ণাঙ্ক)(n))
 #define MB_STRNICMP2(d, s, n1, n2)	mb_strnicmp2((char_u *)(d), (char_u *)(s), (n1), (n2))
 
-#define STRCAT(d, s)	    strcat((char *)(d), (char *)(s))
-#define STRNCAT(d, s, n)    strncat((char *)(d), (char *)(s), (n))
+#define STRCAT(d, s)	    strcat((ৱর্ণ *)(d), (ৱর্ণ *)(s))
+#define STRNCAT(d, s, n)    strncat((ৱর্ণ *)(d), (ৱর্ণ *)(s), (n))
 
 #ifdef HAVE_STRPBRK
-# define vim_strpbrk(s, cs) (char_u *)strpbrk((char *)(s), (char *)(cs))
+# define vim_strpbrk(s, cs) (char_u *)strpbrk((ৱর্ণ *)(s), (ৱর্ণ *)(cs))
 #endif
 
 #define OUT_STR(s)		    out_str((char_u *)(s))
@@ -1862,14 +1862,14 @@ void *vim_memset(void *, int, size_t);
 					: INVALCOLOR) \
 				    : termgui_##f((pixel)))
 #  define USE_24BIT		    (gui.in_use || p_tgc)
-# else
+# অন্যথা
 #  define GUI_FUNCTION(f)	    gui_##f
 #  define GUI_FUNCTION2(f,pixel)    ((pixel) != INVALCOLOR \
 				     ? gui_##f((pixel)) \
 				     : INVALCOLOR)
 #  define USE_24BIT		    gui.in_use
 # endif
-#else
+#অন্যথা
 # ifdef FEAT_TERMGUICOLORS
 #  define GUI_FUNCTION(f)	    termgui_##f
 #  define GUI_FUNCTION2(f, pixel)   termgui_##f((pixel))
@@ -1878,7 +1878,7 @@ void *vim_memset(void *, int, size_t);
 #endif
 #ifdef FEAT_TERMGUICOLORS
 # define IS_CTERM		    (t_colors > 1 || p_tgc)
-#else
+#অন্যথা
 # define IS_CTERM		    (t_colors > 1)
 #endif
 #ifdef GUI_FUNCTION
@@ -1891,14 +1891,14 @@ void *vim_memset(void *, int, size_t);
 // Prefer using emsgf(), because perror() may send the output to the wrong
 // destination and mess up the screen.
 #ifdef HAVE_STRERROR
-# define PERROR(msg)		    (void)semsg("%s: %s", (char *)(msg), strerror(errno))
-#else
-# define PERROR(msg)		    do_perror(msg)
+# define PERROR(বাৰ্তা)		    (শূন্য)semsg("%s: %s", (ৱর্ণ *)(বাৰ্তা), strerror(errno))
+#অন্যথা
+# define PERROR(বাৰ্তা)		    do_perror(বাৰ্তা)
 #endif
 
-typedef long	linenr_T;		// line number type
-typedef int	colnr_T;		// column number type
-typedef unsigned short disptick_T;	// display tick type
+প্রকারনির্দেশ long	linenr_T;		// line number type
+প্রকারনির্দেশ পূর্ণাঙ্ক	colnr_T;		// column number type
+প্রকারনির্দেশ unsigned short disptick_T;	// display tick type
 
 /*
  * Well, you won't believe it, but some S/390 machines ("host", now also known
@@ -1912,7 +1912,7 @@ typedef unsigned short disptick_T;	// display tick type
 #ifdef __MVS__
 # define MAXCOL (0x3fffffffL)		// maximum column number, 30 bits
 # define MAXLNUM (0x3fffffffL)		// maximum (invalid) line number
-#else
+#অন্যথা
   // MAXCOL used to be INT_MAX, but with 64 bit ints that results in running
   // out of memory when trying to allocate a very long line.
 # define MAXCOL  0x7fffffffL		// maximum column number
@@ -1921,10 +1921,10 @@ typedef unsigned short disptick_T;	// display tick type
 
 #define SHOWCMD_COLS 10			// columns needed by shown command
 
-typedef void	    *vim_acl_T;		// dummy to pass an ACL to a function
+প্রকারনির্দেশ শূন্য	    *vim_acl_T;		// dummy to pass an ACL to a function
 
 #ifndef mch_memmove
-# define mch_memmove(to, from, len) memmove((char*)(to), (char*)(from), (len))
+# define mch_memmove(to, from, len) memmove((ৱর্ণ*)(to), (ৱর্ণ*)(from), (len))
 #endif
 
 /*
@@ -1936,45 +1936,45 @@ typedef void	    *vim_acl_T;		// dummy to pass an ACL to a function
 #define fnamecmp(x, y) vim_fnamecmp((char_u *)(x), (char_u *)(y))
 #define fnamencmp(x, y, n) vim_fnamencmp((char_u *)(x), (char_u *)(y), (n))
 
-#if defined(UNIX) || defined(FEAT_GUI) || defined(VMS) \
+#যদি defined(UNIX) || defined(FEAT_GUI) || defined(VMS) \
 	|| defined(FEAT_CLIENTSERVER)
-# define USE_INPUT_BUF
+# define USE_প্ৰবেশ_BUF
 #endif
 
-#if !defined(EINTR) && !defined(PROTO)
-# define read_eintr(fd, buf, count) vim_read((fd), (buf), (count))
-# define write_eintr(fd, buf, count) vim_write((fd), (buf), (count))
+#যদি !defined(EINTR) && !defined(PROTO)
+# define read_eintr(fd, buf, গুনতি) vim_read((fd), (buf), (গুনতি))
+# define write_eintr(fd, buf, গুনতি) vim_write((fd), (buf), (গুনতি))
 #endif
 
 #ifdef MSWIN
 // On MS-Windows the third argument isn't size_t.  This matters for Win64,
 // where sizeof(size_t)==8, not 4
-# define vim_read(fd, buf, count)   read((fd), (char *)(buf), (unsigned int)(count))
-# define vim_write(fd, buf, count)  write((fd), (char *)(buf), (unsigned int)(count))
-#else
-# define vim_read(fd, buf, count)   read((fd), (char *)(buf), (count))
-# define vim_write(fd, buf, count)  write((fd), (char *)(buf), (count))
+# define vim_read(fd, buf, গুনতি)   পঠ((fd), (ৱর্ণ *)(buf), (unsigned পূর্ণাঙ্ক)(গুনতি))
+# define vim_write(fd, buf, গুনতি)  লিখ((fd), (ৱর্ণ *)(buf), (unsigned পূর্ণাঙ্ক)(গুনতি))
+#অন্যথা
+# define vim_read(fd, buf, গুনতি)   পঠ((fd), (ৱর্ণ *)(buf), (গুনতি))
+# define vim_write(fd, buf, গুনতি)  লিখ((fd), (ৱর্ণ *)(buf), (গুনতি))
 #endif
 
 /*
  * Enums need a typecast to be used as array index (for Ultrix).
  */
-#define HL_ATTR(n)	highlight_attr[(int)(n)]
-#define TERM_STR(n)	term_strings[(int)(n)]
+#define HL_ATTR(n)	highlight_attr[(পূর্ণাঙ্ক)(n)]
+#define TERM_STR(n)	term_strings[(পূর্ণাঙ্ক)(n)]
 
 /*
  * EXTERN is only defined in main.c.  That's where global variables are
  * actually defined and initialized.
  */
 #ifndef EXTERN
-# define EXTERN extern
+# define EXTERN বাহ্য
 # define INIT(x)
 # define INIT2(a, b)
 # define INIT3(a, b, c)
 # define INIT4(a, b, c, d)
 # define INIT5(a, b, c, d, e)
 # define INIT6(a, b, c, d, e, f)
-#else
+#অন্যথা
 # ifndef INIT
 #  define INIT(x) x
 #  define INIT2(a, b) = {a, b}
@@ -1993,25 +1993,25 @@ typedef void	    *vim_acl_T;		// dummy to pass an ACL to a function
 // characters of up to four bytes each.
 #define MB_MAXBYTES	30
 
-#if (defined(FEAT_PROFILE) || defined(FEAT_RELTIME)) && !defined(PROTO)
+#যদি (defined(FEAT_PROFILE) || defined(FEAT_RELTIME)) && !defined(PROTO)
 # ifdef MSWIN
-typedef LARGE_INTEGER proftime_T;
+প্রকারনির্দেশ LARGE_INTEGER proftime_T;
 #  define PROF_TIME_BLANK "           "
 #  define PROF_TOTALS_HEADER "count  total (s)   self (s)"
-# else
+# অন্যথা
    // Use tv_fsec for fraction of second (micro or nano) of proftime_T
-#  if defined(HAVE_TIMER_CREATE) && defined(HAVE_CLOCK_GETTIME)
+#  যদি defined(HAVE_TIMER_CREATE) && defined(HAVE_CLOCK_GETTIME)
 #   define PROF_NSEC 1
-typedef struct timespec proftime_T;
+প্রকারনির্দেশ সংরচনা timespec proftime_T;
 #   define PROF_GET_TIME(tm) clock_gettime(CLOCK_MONOTONIC, tm)
 #   define tv_fsec tv_nsec
 #   define TV_FSEC_SEC 1000000000L
 #   define PROF_TIME_FORMAT "%3ld.%09ld"
 #   define PROF_TIME_BLANK "              "
 #   define PROF_TOTALS_HEADER "count     total (s)      self (s)"
-#  else
-typedef struct timeval proftime_T;
-#   define PROF_GET_TIME(tm) gettimeofday(tm, NULL)
+#  অন্যথা
+প্রকারনির্দেশ সংরচনা timeval proftime_T;
+#   define PROF_GET_TIME(tm) gettimeofday(tm, রিক্ত)
 #   define tv_fsec tv_usec
 #   define TV_FSEC_SEC 1000000
 #   define PROF_TIME_FORMAT "%3ld.%06ld"
@@ -2019,12 +2019,12 @@ typedef struct timeval proftime_T;
 #   define PROF_TOTALS_HEADER "count  total (s)   self (s)"
 #  endif
 # endif
-#else
-typedef int proftime_T;	    // dummy for function prototypes
+#অন্যথা
+প্রকারনির্দেশ পূর্ণাঙ্ক proftime_T;	    // dummy for function prototypes
 #endif
 
 // Type of compilation passed to compile_def_function()
-typedef enum {
+প্রকারনির্দেশ গণনা {
     CT_NONE,	    // use df_instr
     CT_PROFILE,	    // use df_instr_prof
     CT_DEBUG	    // use df_instr_debug, overrules CT_PROFILE
@@ -2036,39 +2036,39 @@ typedef enum {
  * for global variables to avoid that.
  */
 #ifdef MSWIN
-typedef __time64_t  time_T;
-#else
-typedef time_t	    time_T;
+প্রকারনির্দেশ __time64_t  time_T;
+#অন্যথা
+প্রকারনির্দেশ time_t	    time_T;
 #endif
 
 #ifdef _WIN64
-typedef __int64 sock_T;
-#else
-typedef int sock_T;
+প্রকারনির্দেশ __int64 sock_T;
+#অন্যথা
+প্রকারনির্দেশ পূর্ণাঙ্ক sock_T;
 #endif
 
 // The clipboard provider feature uses clipmethod as well but should be separate
 // from the clipboard code.
-#if defined(FEAT_CLIPBOARD) || defined(FEAT_EVAL)
+#যদি defined(FEAT_CLIPBOARD) || defined(FEAT_EVAL)
 # define HAVE_CLIPMETHOD
 #endif
 
-#if defined(HAVE_CLIPMETHOD) && defined(FEAT_EVAL)
+#যদি defined(HAVE_CLIPMETHOD) && defined(FEAT_EVAL)
 # define FEAT_CLIPBOARD_PROVIDER
 #endif
 
 // Include option.h before structs.h, because the number of window-local and
 // buffer-local options is used there.
-#include "option.h"	// options and default values
+#অন্তর্ভাৱ "option.h"	// options and default values
 
-#include "beval.h"	// BalloonEval
+#অন্তর্ভাৱ "beval.h"	// BalloonEval
 
 // Note that gui.h is included by structs.h
 
-#include "structs.h"	// defines many structures
-#include "xdiff/xdiff.h"	// TODO: maybe remove this, but this brings in mmfile_t so it can compile
+#অন্তর্ভাৱ "structs.h"	// defines many structures
+#অন্তর্ভাৱ "xdiff/xdiff.h"	// TODO: maybe remove this, but this brings in mmfile_t so it can compile
 
-#include "alloc.h"
+#অন্তর্ভাৱ "alloc.h"
 
 // Values for "do_profiling".
 #define PROF_NONE	0	// profiling not started
@@ -2077,9 +2077,9 @@ typedef int sock_T;
 
 
 // Codes for mouse button events in lower three bits:
-#define MOUSE_LEFT	0x00
-#define MOUSE_MIDDLE	0x01
-#define MOUSE_RIGHT	0x02
+#define MOUSE_বাম	0x00
+#define MOUSE_মধ্য	0x01
+#define MOUSE_ডান	0x02
 #define MOUSE_RELEASE	0x03
 
 // bit masks for modifiers:
@@ -2108,18 +2108,18 @@ typedef int sock_T;
 #define MOUSE_DRAG	(0x40 | MOUSE_RELEASE)
 
 // Lowest button code for using the mouse wheel (xterm only)
-#define MOUSEWHEEL_LOW		0x60
+#define MOUSEWHEEL_নিচেৰ		0x60
 
 // Lowest button code for extra mouse buttons 8-11
-#define MOUSESIDEBUTTONS_LOW		0xa0
+#define MOUSESIDEBUTTONS_নিচেৰ		0xa0
 
 #define MOUSE_CLICK_MASK	0x03
 
-#define NUM_MOUSE_CLICKS(code) \
+#define অঙ্ক_MOUSE_CLICKS(code) \
     (((unsigned)((code) & 0xC0) >> 6) + 1)
 
-#define SET_NUM_MOUSE_CLICKS(code, num) \
-    ((code) = ((code) & 0x3f) | ((((num) - 1) & 3) << 6))
+#define SET_অঙ্ক_MOUSE_CLICKS(code, অঙ্ক) \
+    ((code) = ((code) & 0x3f) | ((((অঙ্ক) - 1) & 3) << 6))
 
 // Added to mouse column for GUI when 'mousefocus' wants to give focus to a
 // window by simulating a click on its status line.  We could use up to 128 *
@@ -2132,8 +2132,8 @@ typedef int sock_T;
  */
 #define IN_UNKNOWN		0
 #define IN_BUFFER		1
-#define IN_STATUS_LINE		2	// on status or command line
-#define IN_SEP_LINE		4	// on vertical separator line
+#define IN_STATUS_সাৰি		2	// on status or command line
+#define IN_SEP_সাৰি		4	// on vertical separator line
 #define IN_OTHER_WIN		8	// in other window but can't go there
 #define CURSOR_MOVED		0x100
 #define MOUSE_FOLD_CLOSE	0x200	// clicked on '-' in fold column
@@ -2148,7 +2148,7 @@ typedef int sock_T;
 #define MOUSE_MAY_STOP_VIS	0x10	// may stop Visual mode
 #define MOUSE_RELEASED		0x20	// button was released
 
-#if defined(UNIX) && defined(HAVE_GETTIMEOFDAY) && defined(HAVE_SYS_TIME_H)
+#যদি defined(UNIX) && defined(HAVE_GETTIMEOFDAY) && defined(HAVE_SYS_TIME_H)
 # define CHECK_DOUBLE_CLICK 1	// Checking for double clicks ourselves.
 #endif
 
@@ -2158,7 +2158,7 @@ typedef int sock_T;
 #define VALID_HEAD		2
 
 // Defines for Vim variables.  These must match vimvars[] in evalvars.c!
-#define VV_COUNT	0
+#define VV_গুনতি	0
 #define VV_COUNT1	1
 #define VV_PREVCOUNT	2
 #define VV_ERRMSG	3
@@ -2193,7 +2193,7 @@ typedef int sock_T;
 #define VV_CMDBANG	32
 #define VV_INSERTMODE	33
 #define VV_VAL		34
-#define VV_KEY		35
+#define VV_চাবি		35
 #define VV_PROFILING	36
 #define VV_FCS_REASON	37
 #define VV_FCS_CHOICE	38
@@ -2235,7 +2235,7 @@ typedef int sock_T;
 #define VV_NUMBERSIZE	74
 #define VV_VIM_DID_ENTER 75
 #define VV_TESTING	76
-#define VV_TYPE_NUMBER	77
+#define VV_TYPE_সংখ্যা	77
 #define VV_TYPE_STRING	78
 #define VV_TYPE_FUNC	79
 #define VV_TYPE_LIST	80
@@ -2286,7 +2286,7 @@ typedef int sock_T;
 #define VVAL_NULL	3L	// VAR_SPECIAL
 
 // Type values for type().
-#define VAR_TYPE_NUMBER	    0
+#define VAR_TYPE_সংখ্যা	    0
 #define VAR_TYPE_STRING	    1
 #define VAR_TYPE_FUNC	    2
 #define VAR_TYPE_LIST	    3
@@ -2310,7 +2310,7 @@ typedef int sock_T;
 #define TABSTOP_MAX 9999
 
 #ifdef HAVE_CLIPMETHOD
-typedef enum {
+প্রকারনির্দেশ গণনা {
     CLIPMETHOD_FAIL,
     CLIPMETHOD_NONE,
     CLIPMETHOD_WAYLAND,
@@ -2339,7 +2339,7 @@ typedef enum {
 
 # define SELECT_MODE_CHAR	0
 # define SELECT_MODE_WORD	1
-# define SELECT_MODE_LINE	2
+# define SELECT_MODE_সাৰি	2
 
 # ifdef FEAT_GUI_MSWIN
 #  ifdef FEAT_OLE
@@ -2348,13 +2348,13 @@ typedef enum {
 # endif
 
 // Info about selected text
-typedef struct
+প্রকারনির্দেশ সংরচনা
 {
-    int		available;	// Is clipboard available?
-    int		owned;		// Flag: do we own the selection?
+    পূর্ণাঙ্ক		available;	// Is clipboard available?
+    পূর্ণাঙ্ক		owned;		// Flag: do we own the selection?
     pos_T	start;		// Start of selected area
     pos_T	end;		// End of selected area
-    int		vmode;		// Visual mode character
+    পূর্ণাঙ্ক		vmode;		// Visual mode character
 
     // Fields for selection that doesn't use Visual mode
     short_u	origin_row;
@@ -2374,15 +2374,15 @@ typedef struct
     short_u	state;		// Current selection state
     short_u	mode;		// Select by char, word, or line.
 
-# if defined(FEAT_GUI_X11) || defined(FEAT_XCLIPBOARD)
+# যদি defined(FEAT_GUI_X11) || defined(FEAT_XCLIPBOARD)
     Atom	sel_atom;	// PRIMARY/CLIPBOARD selection ID
 # endif
 
-# if defined(FEAT_GUI_GTK) && !defined(USE_GTK4)
+# যদি defined(FEAT_GUI_GTK) && !defined(USE_GTK4)
     GdkAtom     gtk_sel_atom;	// PRIMARY/CLIPBOARD selection ID
 # endif
 
-# if defined(MSWIN) || defined(FEAT_CYGWIN_WIN32_CLIPBOARD)
+# যদি defined(MSWIN) || defined(FEAT_CYGWIN_WIN32_CLIPBOARD)
     int_u	format;		// Vim's own special clipboard format
     int_u	format_raw;	// Vim's raw text clipboard format
 # endif
@@ -2390,37 +2390,37 @@ typedef struct
     // No clipboard at the moment. TODO?
 # endif
 } Clipboard_T;
-#else
-typedef int Clipboard_T;	// This is required for the prototypes.
+#অন্যথা
+প্রকারনির্দেশ পূর্ণাঙ্ক Clipboard_T;	// This is required for the prototypes.
 #endif
 
 // Use 64-bit stat structure on MS-Windows.
 #ifdef MSWIN
-typedef struct _stat64 stat_T;
-#else
-typedef struct stat stat_T;
+প্রকারনির্দেশ সংরচনা _stat64 stat_T;
+#অন্যথা
+প্রকারনির্দেশ সংরচনা stat stat_T;
 #endif
 
-typedef struct soundcb_S soundcb_T;
+প্রকারনির্দেশ সংরচনা soundcb_S soundcb_T;
 
-#if (defined(__GNUC__) || defined(__clang__)) && !defined(__MINGW32__)
+#যদি (defined(__GNUC__) || defined(__clang__)) && !defined(__MINGW32__)
 # define ATTRIBUTE_FORMAT_PRINTF(fmt_idx, arg_idx) \
     __attribute__((format(printf, fmt_idx, arg_idx)))
-#else
+#অন্যথা
 # define ATTRIBUTE_FORMAT_PRINTF(fmt_idx, arg_idx)
 #endif
 
-#if defined(__GNUC__) || defined(__clang__)
+#যদি defined(__GNUC__) || defined(__clang__)
 # define likely(x)	__builtin_expect((x), 1)
 # define unlikely(x)	__builtin_expect((x), 0)
 # define ATTRIBUTE_COLD	__attribute__((cold))
-#else
+#অন্যথা
 # define unlikely(x)	(x)
 # define likely(x)	(x)
 # define ATTRIBUTE_COLD
 #endif
 
-typedef enum {
+প্রকারনির্দেশ গণনা {
     ASSERT_EQUAL,
     ASSERT_NOTEQUAL,
     ASSERT_MATCH,
@@ -2430,32 +2430,32 @@ typedef enum {
 } assert_type_T;
 
 // Mode for bracketed_paste().
-typedef enum {
-    PASTE_INSERT,	// insert mode
+প্রকারনির্দেশ গণনা {
+    PASTE_ঢোকাও,	// insert mode
     PASTE_CMDLINE,	// command line
     PASTE_EX,		// ex mode line
     PASTE_ONE_CHAR	// return first character
 } paste_mode_T;
 
 // Argument for flush_buffers().
-typedef enum {
+প্রকারনির্দেশ গণনা {
     FLUSH_MINIMAL,
     FLUSH_TYPEAHEAD,	// flush current typebuf contents
-    FLUSH_INPUT		// flush typebuf and inchar() input
+    FLUSH_প্ৰবেশ		// flush typebuf and inchar() input
 } flush_buffers_T;
 
 // Argument for prepare_tagpreview()
-typedef enum {
+প্রকারনির্দেশ গণনা {
     USEPOPUP_NONE,
     USEPOPUP_NORMAL,	// use info popup
     USEPOPUP_HIDDEN	// use info popup initially hidden
 } use_popup_T;
 
 // Argument for estack_sfile().
-typedef enum {
+প্রকারনির্দেশ গণনা {
     ESTACK_NONE,
     ESTACK_SFILE,
-    ESTACK_STACK,
+    ESTACK_স্তূপ,
     ESTACK_SCRIPT,
 } estack_arg_T;
 
@@ -2463,7 +2463,7 @@ typedef enum {
 #define ENABLE_STL_MODE_MULTI_NL
 
 // Argument for build_stl_str_hl_local().
-typedef enum {
+প্রকারনির্দেশ গণনা {
     STL_MODE_SINGLE,	    // Does not accept line breaks "%@"
     STL_MODE_MULTI,	    // Accept line breaks "%@"
     STL_MODE_GET_RENDERED_HEIGHT,   // Just get stl rendered height
@@ -2473,7 +2473,7 @@ typedef enum {
 } stl_mode_T;
 
 // Return value of match_keyprotocol()
-typedef enum {
+প্রকারনির্দেশ গণনা {
     KEYPROTOCOL_NONE,
     KEYPROTOCOL_MOK2,
     KEYPROTOCOL_KITTY,
@@ -2481,7 +2481,7 @@ typedef enum {
 } keyprot_T;
 
 // errors for when calling a function
-typedef enum {
+প্রকারনির্দেশ গণনা {
     FCERR_NONE,		// no error
     FCERR_UNKNOWN,	// unknown function
     FCERR_TOOMANY,	// too many arguments
@@ -2497,12 +2497,12 @@ typedef enum {
 /*
  * Array indexes used for cp_text[].
  */
-typedef enum {
+প্রকারনির্দেশ গণনা {
     CPT_ABBR,		// "abbr"
     CPT_KIND,		// "kind"
     CPT_MENU,		// "menu"
     CPT_INFO,		// "info"
-    CPT_COUNT,		// Number of entries
+    CPT_গুনতি,		// Number of entries
 } cpitem_T;
 
 /*
@@ -2512,7 +2512,7 @@ typedef enum {
  * Returns NULL if the option value is valid is successfully applied.
  * Otherwise returns an error message.
  */
-typedef char *(*opt_did_set_cb_T)(optset_T *args);
+প্রকারনির্দেশ ৱর্ণ *(*opt_did_set_cb_T)(optset_T *args);
 
 /*
  * Type for the callback function that is invoked when expanding possible
@@ -2526,7 +2526,7 @@ typedef char *(*opt_did_set_cb_T)(optset_T *args);
  * Note: If returned FAIL or *numMatches is 0, *matches will NOT be freed by
  * caller.
  */
-typedef int (*opt_expand_cb_T)(optexpand_T *args, int *numMatches, char_u ***matches);
+প্রকারনির্দেশ পূর্ণাঙ্ক (*opt_expand_cb_T)(optexpand_T *args, পূর্ণাঙ্ক *অঙ্ক_Matches, char_u ***matches);
 
 // Flags for assignment functions.
 #define ASSIGN_VAR	0     // ":var" (nothing special)
@@ -2541,52 +2541,52 @@ typedef int (*opt_expand_cb_T)(optexpand_T *args, int *numMatches, char_u ***mat
 #define ASSIGN_UPDATE_BLOCK_ID 0x100  // update sav_block_id
 #define ASSIGN_COMPOUND_OP 0x200  // compound operator e.g. "+="
 
-#include "ex_cmds.h"	    // Ex command defines
-#include "spell.h"	    // spell checking stuff
+#অন্তর্ভাৱ "ex_cmds.h"	    // Ex command defines
+#অন্তর্ভাৱ "spell.h"	    // spell checking stuff
 
-#include "proto.h"	    // function prototypes
+#অন্তর্ভাৱ "proto.h"	    // function prototypes
 
 // This has to go after the include of proto.h, as proto/gui.pro declares
 // functions of these names. The declarations would break if the defines had
 // been seen at that stage.  But it must be before globals.h, where error_ga
 // is declared.
-#if !defined(MSWIN) && !defined(FEAT_GUI_X11) && !defined(FEAT_GUI_HAIKU) \
+#যদি !defined(MSWIN) && !defined(FEAT_GUI_X11) && !defined(FEAT_GUI_HAIKU) \
 	&& !defined(FEAT_GUI_GTK) && !defined(PROTO)
 # define mch_errmsg(str)	fprintf(stderr, "%s", (str))
 # define display_errors()	fflush(stderr)
-# define mch_msg(str)		printf("%s", (str))
-#else
+# define mch_বাৰ্তা(str)		printf("%s", (str))
+#অন্যথা
 # define USE_MCH_ERRMSG
 #endif
 
-#if defined(FEAT_EVAL) \
+#যদি defined(FEAT_EVAL) \
 	&& (!defined(FEAT_GUI_MSWIN) || !defined(FEAT_MBYTE_IME))
 // Whether IME is supported by im_get_status() defined in mbyte.c.
 // For Win32 GUI it's in gui_w32.c when FEAT_MBYTE_IME is defined.
 # define IME_WITHOUT_XIM
 #endif
 
-#if defined(FEAT_XIM) \
+#যদি defined(FEAT_XIM) \
 	|| defined(IME_WITHOUT_XIM) \
 	|| (defined(FEAT_GUI_MSWIN) && defined(FEAT_MBYTE_IME))
 // im_set_active() is available
-# define HAVE_INPUT_METHOD
+# define HAVE_প্ৰবেশ_METHOD
 #endif
 
 #ifndef FEAT_LINEBREAK
 // Without the 'numberwidth' option line numbers are always 7 chars.
-# define number_width(x) 7
+# define সংখ্যা_width(x) 7
 #endif
 
 // This must come after including proto.h.
 // For VMS this is defined in macros.h.
-#if !defined(MSWIN) && !defined(VMS) && !defined(PROTO)
+#যদি !defined(MSWIN) && !defined(VMS) && !defined(PROTO)
 # define mch_open(n, m, p)	open((n), (m), (p))
 # define mch_fopen(n, p)	fopen((n), (p))
 #endif
 
-#include "globals.h"	    // global variables and messages
-#include "errors.h"	    // error messages
+#অন্তর্ভাৱ "globals.h"	    // global variables and messages
+#অন্তর্ভাৱ "errors.h"	    // error messages
 
 #ifndef PROTO
 /*
@@ -2596,12 +2596,12 @@ typedef int (*opt_expand_cb_T)(optexpand_T *args, int *numMatches, char_u ***mat
  * Defined here as "static inline" because it is called very frequently from
  * the eval hot path; inlining avoids the cross-file call overhead.
  */
-    static inline int
-in_vim9script(void)
+    স্থির অন্তঃস্থ পূর্ণাঙ্ক
+in_vim9script(শূন্য)
 {
     // "sc_version" is also set when compiling a ":def" function in legacy
     // script.
-    return (current_sctx.sc_version == SCRIPT_VERSION_VIM9
+    ঘূৰাই (current_sctx.sc_version == SCRIPT_VERSION_VIM9
 					 || (cmdmod.cmod_flags & CMOD_VIM9CMD))
 		&& !(cmdmod.cmod_flags & CMOD_LEGACY);
 }
@@ -2610,7 +2610,7 @@ in_vim9script(void)
 /*
  * If console dialog not supported, but GUI dialog is, use the GUI one.
  */
-#if defined(FEAT_GUI_DIALOG) && !defined(FEAT_CON_DIALOG)
+#যদি defined(FEAT_GUI_DIALOG) && !defined(FEAT_CON_DIALOG)
 # define do_dialog gui_mch_dialog
 #endif
 
@@ -2628,7 +2628,7 @@ in_vim9script(void)
 #  define BROWSE_FILTER_ALL_FILES (char_u *)N_("All Files (*.*)\t*.*\n")
 #  define BROWSE_FILTER_DEFAULT \
 	(char_u *)N_("All Files (*.*)\t*.*\nC source (*.c, *.h)\t*.c;*.h\nC++ source (*.cpp, *.hpp)\t*.cpp;*.hpp\nVB code (*.bas, *.frm)\t*.bas;*.frm\nVim files (*.vim, _vimrc, _gvimrc)\t*.vim;_vimrc;_gvimrc\n")
-# else
+# অন্যথা
 #  define BROWSE_FILTER_MACROS \
 	(char_u *)N_("Vim macro files (*.vim)\t*.vim\nAll Files (*)\t*\n")
 #  define BROWSE_FILTER_ALL_FILES (char_u *)N_("All Files (*)\t*\n")
@@ -2659,9 +2659,9 @@ in_vim9script(void)
 #endif
 
 // Note: a NULL argument for vim_realloc() is not portable, don't use it.
-#if defined(MEM_PROFILE)
+#যদি defined(MEM_PROFILE)
 # define vim_realloc(ptr, size)  mem_realloc((ptr), (size))
-#else
+#অন্যথা
 # define vim_realloc(ptr, size)  realloc((ptr), (size))
 #endif
 
@@ -2700,7 +2700,7 @@ in_vim9script(void)
 #  define ICONV_E2BIG  7
 #  define ICONV_EINVAL 22
 #  define ICONV_EILSEQ 42
-# else
+# অন্যথা
 #  define ICONV_ERRNO errno
 #  define ICONV_E2BIG  E2BIG
 #  define ICONV_EINVAL EINVAL
@@ -2716,103 +2716,103 @@ in_vim9script(void)
 			    // multiple signs exist on the line
 #endif
 
-#if defined(FEAT_GUI_GTK) && defined(FEAT_IMAGE)
+#যদি defined(FEAT_GUI_GTK) && defined(FEAT_IMAGE)
 // Logical pixels to physical pixels
-# define LOG2PHY(l) (gui.in_use ? (double)(l) * gui.scale : (l))
+# define LOG2PHY(l) (gui.in_use ? (দ্ৱিগুণ)(l) * gui.scale : (l))
  // Physical pixels to logical pixels
-# define PHY2LOG(p) (gui.in_use ? (double)(p) / gui.scale : (p))
-#else
+# define PHY2LOG(p) (gui.in_use ? (দ্ৱিগুণ)(p) / gui.scale : (p))
+#অন্যথা
 # define LOG2PHY(l) (l)
 # define PHY2LOG(p) (p)
 #endif
 
-#if defined(FEAT_GUI) && defined(FEAT_XCLIPBOARD)
+#যদি defined(FEAT_GUI) && defined(FEAT_XCLIPBOARD)
 # ifdef FEAT_GUI_GTK
    // Avoid using a global variable for the X display.  It's ugly
    // and is likely to cause trouble in multihead environments.
 #  define X_DISPLAY	((gui.in_use) ? gui_mch_get_display() : xterm_dpy)
-# else
+# অন্যথা
 #  define X_DISPLAY	(gui.in_use ? gui.dpy : xterm_dpy)
 # endif
-#elif defined(FEAT_GUI)
+#নোচেদ্যদি defined(FEAT_GUI)
 # ifdef FEAT_GUI_GTK
-#  define X_DISPLAY	((gui.in_use) ? gui_mch_get_display() : (Display *)NULL)
-# else
+#  define X_DISPLAY	((gui.in_use) ? gui_mch_get_display() : (Display *)রিক্ত)
+# অন্যথা
 #  define X_DISPLAY	gui.dpy
 # endif
-#elif defined(FEAT_XCLIPBOARD)
+#নোচেদ্যদি defined(FEAT_XCLIPBOARD)
 # define X_DISPLAY	xterm_dpy
-#else
-# define X_DISPLAY	(Display *)NULL
+#অন্যথা
+# define X_DISPLAY	(Display *)রিক্ত
 #endif
 
 #ifdef FEAT_GUI_GTK
-# if !GTK_CHECK_VERSION(2,14,0)
+# যদি !GTK_CHECK_VERSION(2,14,0)
 #  define gtk_widget_get_window(wid)	((wid)->window)
 #  define gtk_plug_get_socket_window(wid)	((wid)->socket_window)
 #  define gtk_selection_data_get_data(sel)	((sel)->data)
 #  define gtk_selection_data_get_data_type(sel)	((sel)->type)
 #  define gtk_selection_data_get_format(sel)	((sel)->format)
 #  define gtk_selection_data_get_length(sel)	((sel)->length)
-#  define gtk_adjustment_set_lower(adj, low) \
-    do { (adj)->lower = low; } while (0)
+#  define gtk_adjustment_set_lower(adj, নিচেৰ) \
+    কৰা { (adj)->lower = নিচেৰ; } যেতিয়ালৈ (0)
 #  define gtk_adjustment_set_upper(adj, up) \
-    do { (adj)->upper = up; } while (0)
+    কৰা { (adj)->upper = up; } যেতিয়ালৈ (0)
 #  define gtk_adjustment_set_page_size(adj, size) \
-    do { (adj)->page_size = size; } while (0)
+    কৰা { (adj)->page_size = size; } যেতিয়ালৈ (0)
 #  define gtk_adjustment_set_page_increment(adj, inc) \
-    do { (adj)->page_increment = inc; } while (0)
+    কৰা { (adj)->page_increment = inc; } যেতিয়ালৈ (0)
 #  define gtk_adjustment_set_step_increment(adj, inc) \
-    do { (adj)->step_increment = inc; } while (0)
+    কৰা { (adj)->step_increment = inc; } যেতিয়ালৈ (0)
 # endif
-# if !GTK_CHECK_VERSION(2,16,0)
+# যদি !GTK_CHECK_VERSION(2,16,0)
 #  define gtk_selection_data_get_selection(sel)	((sel)->selection)
 # endif
-# if !GTK_CHECK_VERSION(2,18,0)
+# যদি !GTK_CHECK_VERSION(2,18,0)
 #  define gtk_widget_get_allocation(wid, alloc) \
-    do { *(alloc) = (wid)->allocation; } while (0)
+    কৰা { *(alloc) = (wid)->allocation; } যেতিয়ালৈ (0)
 #  define gtk_widget_set_allocation(wid, alloc) \
-    do { (wid)->allocation = *(alloc); } while (0)
+    কৰা { (wid)->allocation = *(alloc); } যেতিয়ালৈ (0)
 #  define gtk_widget_get_has_window(wid)	!GTK_WIDGET_NO_WINDOW(wid)
 #  define gtk_widget_get_sensitive(wid)	GTK_WIDGET_SENSITIVE(wid)
 #  define gtk_widget_get_visible(wid)	GTK_WIDGET_VISIBLE(wid)
 #  define gtk_widget_has_focus(wid)	GTK_WIDGET_HAS_FOCUS(wid)
 #  define gtk_widget_set_window(wid, win) \
-    do { (wid)->window = (win); } while (0)
+    কৰা { (wid)->window = (win); } যেতিয়ালৈ (0)
 #  define gtk_widget_set_can_default(wid, can) \
-    do { if (can) \
+    কৰা { যদি (can) \
 	    { GTK_WIDGET_SET_FLAGS(wid, GTK_CAN_DEFAULT); } \
-	else \
-	    { GTK_WIDGET_UNSET_FLAGS(wid, GTK_CAN_DEFAULT); } } while (0)
+	অন্যথা \
+	    { GTK_WIDGET_UNSET_FLAGS(wid, GTK_CAN_DEFAULT); } } যেতিয়ালৈ (0)
 #  define gtk_widget_set_can_focus(wid, can) \
-    do { if (can) \
+    কৰা { যদি (can) \
 	    { GTK_WIDGET_SET_FLAGS(wid, GTK_CAN_FOCUS); } \
-	else \
-	    { GTK_WIDGET_UNSET_FLAGS(wid, GTK_CAN_FOCUS); } } while (0)
+	অন্যথা \
+	    { GTK_WIDGET_UNSET_FLAGS(wid, GTK_CAN_FOCUS); } } যেতিয়ালৈ (0)
 #  define gtk_widget_set_visible(wid, vis) \
-    do { if (vis) \
+    কৰা { যদি (vis) \
 	    { gtk_widget_show(wid); } \
-	else \
-	    { gtk_widget_hide(wid); } } while (0)
+	অন্যথা \
+	    { gtk_widget_hide(wid); } } যেতিয়ালৈ (0)
 # endif
-# if !GTK_CHECK_VERSION(2,20,0)
+# যদি !GTK_CHECK_VERSION(2,20,0)
 #  define gtk_widget_get_mapped(wid)	GTK_WIDGET_MAPPED(wid)
 #  define gtk_widget_get_realized(wid)	GTK_WIDGET_REALIZED(wid)
 #  define gtk_widget_set_mapped(wid, map) \
-    do { if (map) \
+    কৰা { যদি (map) \
 	    { GTK_WIDGET_SET_FLAGS(wid, GTK_MAPPED); } \
-	else \
-	    { GTK_WIDGET_UNSET_FLAGS(wid, GTK_MAPPED); } } while (0)
+	অন্যথা \
+	    { GTK_WIDGET_UNSET_FLAGS(wid, GTK_MAPPED); } } যেতিয়ালৈ (0)
 #  define gtk_widget_set_realized(wid, rea) \
-    do { if (rea) \
+    কৰা { যদি (rea) \
 	    { GTK_WIDGET_SET_FLAGS(wid, GTK_REALIZED); } \
-	else \
-	    { GTK_WIDGET_UNSET_FLAGS(wid, GTK_REALIZED); } } while (0)
+	অন্যথা \
+	    { GTK_WIDGET_UNSET_FLAGS(wid, GTK_REALIZED); } } যেতিয়ালৈ (0)
 # endif
 #endif
 
-#if defined(FEAT_PRINT_PANGO) && defined(FEAT_GUI_GTK) && defined(USE_GTK4)
-# if GTK_CHECK_VERSION(4, 14, 0)
+#যদি defined(FEAT_PRINT_PANGO) && defined(FEAT_GUI_GTK) && defined(USE_GTK4)
+# যদি GTK_CHECK_VERSION(4, 14, 0)
 #  define USE_GTK4_PRINT_DIALOG
 # endif
 #endif
@@ -2822,7 +2822,7 @@ in_vim9script(void)
 #endif
 #ifdef NBDEBUG // Netbeans debugging.
 # include "nbdebug.h"
-#else
+#অন্যথা
 # define nbdebug(a)
 #endif
 
@@ -2856,7 +2856,7 @@ in_vim9script(void)
 # endif
   // bool may cause trouble on some old versions of Mac OS X but is required
   // on a few other systems and for Perl
-# if (defined(MACOS_X) && !defined(MAC_OS_X_VERSION_10_6)) \
+# যদি (defined(MACOS_X) && !defined(MAC_OS_X_VERSION_10_6)) \
 				       && defined(bool) && !defined(FEAT_PERL)
 #  undef bool
 # endif
@@ -2866,7 +2866,7 @@ in_vim9script(void)
 // values for vim_handle_signal() that are not a signal
 #define SIGNAL_BLOCK	(-1)
 #define SIGNAL_UNBLOCK  (-2)
-#if !defined(UNIX) && !defined(VMS) && !defined(PROTO)
+#যদি !defined(UNIX) && !defined(VMS) && !defined(PROTO)
 # define vim_handle_signal(x) 0
 #endif
 
@@ -2901,10 +2901,10 @@ in_vim9script(void)
 // direction for nv_mousescroll() and ins_mousescroll()
 #define MSCR_DOWN	0	// DOWN must be FALSE
 #define MSCR_UP		1
-#define MSCR_LEFT	(-1)
-#define MSCR_RIGHT	(-2)
+#define MSCR_বাম	(-1)
+#define MSCR_ডান	(-2)
 
-#define KEYLEN_PART_KEY (-1)	// keylen value for incomplete key-code
+#define KEYLEN_PART_চাবি (-1)	// keylen value for incomplete key-code
 #define KEYLEN_PART_MAP (-2)	// keylen value for incomplete mapping
 #define KEYLEN_REMOVED  9999	// keylen value for removed sequence
 
@@ -2916,7 +2916,7 @@ in_vim9script(void)
 
 // Return value from get_option_value_strict
 #define SOPT_BOOL	0x01	// Boolean option
-#define SOPT_NUM	0x02	// Number option
+#define SOPT_অঙ্ক	0x02	// Number option
 #define SOPT_STRING	0x04	// String option
 #define SOPT_GLOBAL	0x08	// Option has global value
 #define SOPT_WIN	0x10	// Option has window-local value
@@ -2929,8 +2929,8 @@ in_vim9script(void)
 #define SREQ_BUF	2	// Request buffer-local option
 
 // Flags for get_reg_contents
-#define GREG_NO_EXPR	1	// Do not allow expression register
-#define GREG_EXPR_SRC	2	// Return expression itself for "=" register
+#define GREG_NO_ৰাশিমালা	1	// Do not allow expression register
+#define GREG_ৰাশিমালা_SRC	2	// Return expression itself for "=" register
 #define GREG_LIST	4	// Return list
 
 // Character used as separated in autoload function/variable names.
@@ -2938,7 +2938,7 @@ in_vim9script(void)
 
 #ifdef FEAT_JOB_CHANNEL
 # define MAX_OPEN_CHANNELS 10
-#else
+#অন্যথা
 # define MAX_OPEN_CHANNELS 0
 #endif
 
@@ -2947,11 +2947,11 @@ in_vim9script(void)
 // sets so a connection flood cannot overflow the fd_set / pollfd arrays.
 #ifdef FEAT_SOCKETSERVER
 # define MAX_CLIENT_CHANNELS 100
-#else
+#অন্যথা
 # define MAX_CLIENT_CHANNELS 0
 #endif
 
-#if defined(MSWIN)
+#যদি defined(MSWIN)
 # define MAX_NAMED_PIPE_SIZE 65535
 #endif
 
@@ -3010,7 +3010,7 @@ in_vim9script(void)
 #define FNE_CHECK_START	2	// check name starts with valid character
 
 // BSD is supposed to cover FreeBSD and similar systems.
-#if (defined(SUN_SYSTEM) || defined(BSD) || defined(__FreeBSD_kernel__)) \
+#যদি (defined(SUN_SYSTEM) || defined(BSD) || defined(__FreeBSD_kernel__)) \
 	&& (defined(S_ISCHR) || defined(S_IFCHR))
 # define OPEN_CHR_FILES
 #endif
@@ -3019,64 +3019,64 @@ in_vim9script(void)
 #ifndef S_ISDIR
 # ifdef S_IFDIR
 #  define S_ISDIR(m)	(((m) & S_IFMT) == S_IFDIR)
-# else
+# অন্যথা
 #  define S_ISDIR(m)	0
 # endif
 #endif
 #ifndef S_ISREG
 # ifdef S_IFREG
 #  define S_ISREG(m)	(((m) & S_IFMT) == S_IFREG)
-# else
+# অন্যথা
 #  define S_ISREG(m)	0
 # endif
 #endif
 #ifndef S_ISBLK
 # ifdef S_IFBLK
 #  define S_ISBLK(m)	(((m) & S_IFMT) == S_IFBLK)
-# else
+# অন্যথা
 #  define S_ISBLK(m)	0
 # endif
 #endif
 #ifndef S_ISSOCK
 # ifdef S_IFSOCK
 #  define S_ISSOCK(m)	(((m) & S_IFMT) == S_IFSOCK)
-# else
+# অন্যথা
 #  define S_ISSOCK(m)	0
 # endif
 #endif
 #ifndef S_ISFIFO
 # ifdef S_IFIFO
 #  define S_ISFIFO(m)	(((m) & S_IFMT) == S_IFIFO)
-# else
+# অন্যথা
 #  define S_ISFIFO(m)	0
 # endif
 #endif
 #ifndef S_ISCHR
 # ifdef S_IFCHR
 #  define S_ISCHR(m)	(((m) & S_IFMT) == S_IFCHR)
-# else
+# অন্যথা
 #  define S_ISCHR(m)	0
 # endif
 #endif
 #ifndef S_ISLNK
 # ifdef S_IFLNK
 #  define S_ISLNK(m)	(((m) & S_IFMT) == S_IFLNK)
-# else
+# অন্যথা
 #  define S_ISLNK(m)	0
 # endif
 #endif
 
-#if defined(HAVE_GETTIMEOFDAY) && defined(HAVE_SYS_TIME_H)
+#যদি defined(HAVE_GETTIMEOFDAY) && defined(HAVE_SYS_TIME_H)
 # define ELAPSED_TIMEVAL
-# define ELAPSED_INIT(v) gettimeofday(&(v), NULL)
+# define ELAPSED_INIT(v) gettimeofday(&(v), রিক্ত)
 # define ELAPSED_FUNC(v) elapsed(&(v))
-typedef struct timeval elapsed_T;
-long elapsed(struct timeval *start_tv);
-#elif defined(MSWIN)
+প্রকারনির্দেশ সংরচনা timeval elapsed_T;
+long elapsed(সংরচনা timeval *start_tv);
+#নোচেদ্যদি defined(MSWIN)
 # define ELAPSED_TICKCOUNT
-# define ELAPSED_INIT(v) v = GetTickCount()
+# define ELAPSED_INIT(v) v = Get_Tick_গুনতি()
 # define ELAPSED_FUNC(v) elapsed(v)
-typedef DWORD elapsed_T;
+প্রকারনির্দেশ DWORD elapsed_T;
 # ifndef PROTO
 long elapsed(DWORD start_tick);
 # endif
@@ -3111,7 +3111,7 @@ long elapsed(DWORD start_tick);
 
 // Flags for find_special_key()
 #define FSK_KEYCODE	0x01	// prefer key code, e.g. K_DEL instead of DEL
-#define FSK_KEEP_X_KEY	0x02	// don't translate xHome to Home key
+#define FSK_KEEP_X_চাবি	0x02	// don't translate xHome to Home key
 #define FSK_IN_STRING	0x04	// TRUE in string, double quote is escaped
 #define FSK_SIMPLIFY	0x08	// simplify <C-H> and <A-x>
 #define FSK_FROM_PART	0x10	// left-hand-side of mapping
@@ -3156,7 +3156,7 @@ long elapsed(DWORD start_tick);
 #define FFED_IS_GLOBAL	1	// "g:" was used
 #define FFED_NO_GLOBAL	2	// only check for script-local functions
 
-#define MAX_LSHIFT_BITS (varnumber_T)((sizeof(uvarnumber_T) * 8) - 1)
+#define MAX_LSHIFT_BITS (varnumber_T)((পরিমাণ(uvarnumber_T) * 8) - 1)
 
 // Flags used by "class_flags" of define_function()
 #define CF_CLASS	1	// inside a class
@@ -3173,10 +3173,10 @@ long elapsed(DWORD start_tick);
 // environment variable values are treated as literal.
 #ifdef VMS
 # define PATH_ESC_WILDCARDS	"*?%"
-#else
+#অন্যথা
 # ifdef MSWIN
 #  define PATH_ESC_WILDCARDS	"*?["
-# else
+# অন্যথা
 #  define PATH_ESC_WILDCARDS	"*?[{"
 # endif
 #endif

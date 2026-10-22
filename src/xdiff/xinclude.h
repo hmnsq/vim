@@ -26,49 +26,49 @@
 #ifdef HAVE_CONFIG_H
 # ifdef VMS
 #  include "config.h"
-# else
+# অন্যথা
 #  include "../auto/config.h"
 # endif
 #endif
 
 // Mark unused function arguments with UNUSED, so that gcc -Wunused-parameter
 // can be used to check for mistakes.
-#if defined(HAVE_ATTRIBUTE_UNUSED) || defined(__MINGW32__)
+#যদি defined(HAVE_ATTRIBUTE_UNUSED) || defined(__MINGW32__)
 # define UNUSED __attribute__((unused))
-#else
+#অন্যথা
 # define UNUSED
 #endif
 
-#if defined(_MSC_VER)
-# define inline __inline
+#যদি defined(_MSC_VER)
+# define অন্তঃস্থ __inline
 #endif
 
 // Vim replacement for BUG()
-void xdl_bug(const char *msg);
+শূন্য xdl_bug(ধ্রুৱ ৱর্ণ *বাৰ্তা);
 
-#if !defined(XINCLUDE_H)
+#যদি !defined(XINCLUDE_H)
 #define XINCLUDE_H
 
 // This effectively re-verts b46054b3746271d23feab0 from git
-#include <ctype.h>
-#include <stdio.h>
-#include <stdlib.h>
-#if !defined(_WIN32)
-#include <unistd.h>
+#অন্তর্ভাৱ <ctype.h>
+#অন্তর্ভাৱ <stdio.h>
+#অন্তর্ভাৱ <stdlib.h>
+#যদি !defined(_WIN32)
+#অন্তর্ভাৱ <unistd.h>
 #endif
-#include <string.h>
-#include <limits.h>
+#অন্তর্ভাৱ <string.h>
+#অন্তর্ভাৱ <limits.h>
 // This include comes from git, so uncomment it
-#if 0
-#include "git-compat-util.h"
+#যদি 0
+#অন্তর্ভাৱ "git-compat-util.h"
 #endif
-#include "xmacros.h"
-#include "xdiff.h"
-#include "xtypes.h"
-#include "xutils.h"
-#include "xprepare.h"
-#include "xdiffi.h"
-#include "xemit.h"
+#অন্তর্ভাৱ "xmacros.h"
+#অন্তর্ভাৱ "xdiff.h"
+#অন্তর্ভাৱ "xtypes.h"
+#অন্তর্ভাৱ "xutils.h"
+#অন্তর্ভাৱ "xprepare.h"
+#অন্তর্ভাৱ "xdiffi.h"
+#অন্তর্ভাৱ "xemit.h"
 
 
 #endif /* #if !defined(XINCLUDE_H) */

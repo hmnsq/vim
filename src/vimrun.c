@@ -15,73 +15,73 @@
  *	      console kills Vim.  Now it only kills vimrun.
  */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <conio.h>
+#অন্তর্ভাৱ <stdio.h>
+#অন্তর্ভাৱ <stdlib.h>
+#অন্তর্ভাৱ <conio.h>
 #ifndef WIN32_LEAN_AND_MEAN
 # define WIN32_LEAN_AND_MEAN
 #endif
-#include <windows.h>
+#অন্তর্ভাৱ <windows.h>
 
-    int
-main(void)
+    পূর্ণাঙ্ক
+main(শূন্য)
 {
-    const wchar_t   *p;
+    ধ্রুৱ wchar_t   *p;
     wchar_t	    *cmd;
     size_t	    cmdlen;
-    int		    retval;
-    int		    inquote = 0;
-    int		    silent = 0;
+    পূর্ণাঙ্ক		    retval;
+    পূর্ণাঙ্ক		    inquote = 0;
+    পূর্ণাঙ্ক		    silent = 0;
     HANDLE	    hstdout;
     DWORD	    written;
 
-    p = (const wchar_t *)GetCommandLineW();
+    p = (ধ্রুৱ wchar_t *)Get_Command_সাৰি_W();
 
     /*
      * Skip the executable name, which might be in "".
      */
-    while (*p)
+    যেতিয়ালৈ (*p)
     {
-	if (*p == L'"')
+	যদি (*p == L'"')
 	    inquote = !inquote;
-	else if (!inquote && *p == L' ')
+	অন্যথা যদি (!inquote && *p == L' ')
 	{
 	    ++p;
-	    break;
+	    ভঙ্গ;
 	}
 	++p;
     }
-    while (*p == L' ')
+    যেতিয়ালৈ (*p == L' ')
 	++p;
 
     /*
      * "-s" argument: don't wait for a key hit.
      */
-    if (p[0] == L'-' && p[1] == L's' && p[2] == L' ')
+    যদি (p[0] == L'-' && p[1] == L's' && p[2] == L' ')
     {
 	silent = 1;
 	p += 3;
-	while (*p == L' ')
+	যেতিয়ালৈ (*p == L' ')
 	    ++p;
     }
 
     // Print the command, including quotes and redirection.
     hstdout = GetStdHandle(STD_OUTPUT_HANDLE);
-    WriteConsoleW(hstdout, p, wcslen(p), &written, NULL);
-    WriteConsoleW(hstdout, L"\r\n", 2, &written, NULL);
+    WriteConsoleW(hstdout, p, wcslen(p), &written, রিক্ত);
+    WriteConsoleW(hstdout, L"\r\n", 2, &written, রিক্ত);
 
     // If the command starts and ends with double quotes,
     // Enclose the command in parentheses.
-    cmd = NULL;
+    cmd = রিক্ত;
     cmdlen = wcslen(p);
-    if (cmdlen >= 2 && p[0] == L'"' && p[cmdlen - 1] == L'"')
+    যদি (cmdlen >= 2 && p[0] == L'"' && p[cmdlen - 1] == L'"')
     {
 	cmdlen += 3;
-	cmd = malloc(cmdlen * sizeof(wchar_t));
-	if (cmd == NULL)
+	cmd = malloc(cmdlen * পরিমাণ(wchar_t));
+	যদি (cmd == রিক্ত)
 	{
 	    perror("vimrun malloc(): ");
-	    return -1;
+	    ঘূৰাই -1;
 	}
 	_snwprintf(cmd, cmdlen, L"(%s)", p);
 	p = cmd;
@@ -92,22 +92,22 @@ main(void)
      */
     retval = _wsystem(p);
 
-    if (cmd)
-	free(cmd);
+    যদি (cmd)
+	মুক্ত(cmd);
 
-    if (retval == -1)
+    যদি (retval == -1)
 	perror("vimrun system(): ");
-    else if (retval != 0)
+    অন্যথা যদি (retval != 0)
 	printf("shell returned %d\n", retval);
 
-    if (!silent)
+    যদি (!silent)
     {
 	puts("Hit any key to close this window...");
 
-	while (_kbhit())
-	    (void)_getch();
-	(void)_getch();
+	যেতিয়ালৈ (_kbhit())
+	    (শূন্য)_getch();
+	(শূন্য)_getch();
     }
 
-    return retval;
+    ঘূৰাই retval;
 }

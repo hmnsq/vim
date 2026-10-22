@@ -13,46 +13,46 @@
 
 #define MESSAGE_FILE		// don't include prototype for smsg()
 
-#include "vim.h"
+#অন্তর্ভাৱ "vim.h"
 
-static void add_msg_hist(char_u *s, int len, int attr);
-static void check_msg_hist(void);
-static void hit_return_msg(void);
-static void msg_home_replace_attr(char_u *fname, int attr);
-static void msg_puts_attr_len(char *str, int maxlen, int attr);
-static void msg_puts_display(char_u *str, int maxlen, int attr, int recurse);
-static void msg_scroll_up(void);
-static void inc_msg_scrolled(void);
-static void store_sb_text(char_u **sb_str, char_u *s, int attr, int *sb_col, int finish);
-static void t_puts(int *t_col, char_u *t_s, char_u *s, int attr);
-static void msg_puts_printf(char_u *str, int maxlen);
-static int do_more_prompt(int typed_char);
-static void msg_screen_putchar(int c, int attr);
-static void msg_moremsg(int full);
-static int  msg_check_screen(void);
-static void redir_write(char_u *s, int maxlen);
+স্থির শূন্য add_বাৰ্তা_hist(char_u *s, পূর্ণাঙ্ক len, পূর্ণাঙ্ক attr);
+স্থির শূন্য check_বাৰ্তা_hist(শূন্য);
+স্থির শূন্য hit_return_বাৰ্তা(শূন্য);
+স্থির শূন্য বাৰ্তা_home_replace_attr(char_u *fname, পূর্ণাঙ্ক attr);
+স্থির শূন্য বাৰ্তা_puts_attr_len(ৱর্ণ *str, পূর্ণাঙ্ক maxlen, পূর্ণাঙ্ক attr);
+স্থির শূন্য বাৰ্তা_puts_display(char_u *str, পূর্ণাঙ্ক maxlen, পূর্ণাঙ্ক attr, পূর্ণাঙ্ক recurse);
+স্থির শূন্য বাৰ্তা_scroll_up(শূন্য);
+স্থির শূন্য inc_বাৰ্তা_scrolled(শূন্য);
+স্থির শূন্য store_sb_text(char_u **sb_str, char_u *s, পূর্ণাঙ্ক attr, পূর্ণাঙ্ক *sb_col, পূর্ণাঙ্ক finish);
+স্থির শূন্য t_puts(পূর্ণাঙ্ক *t_col, char_u *t_s, char_u *s, পূর্ণাঙ্ক attr);
+স্থির শূন্য বাৰ্তা_puts_printf(char_u *str, পূর্ণাঙ্ক maxlen);
+স্থির পূর্ণাঙ্ক do_more_prompt(পূর্ণাঙ্ক typed_char);
+স্থির শূন্য বাৰ্তা_screen_putchar(পূর্ণাঙ্ক c, পূর্ণাঙ্ক attr);
+স্থির শূন্য বাৰ্তা_moremsg(পূর্ণাঙ্ক full);
+স্থির পূর্ণাঙ্ক  বাৰ্তা_check_screen(শূন্য);
+স্থির শূন্য redir_write(char_u *s, পূর্ণাঙ্ক maxlen);
 #ifdef FEAT_CON_DIALOG
-static char_u *msg_show_console_dialog(char_u *message, char_u *buttons, int dfltbutton);
-static int	confirm_msg_used = FALSE;	// displaying confirm_msg
-static char_u	*confirm_msg = NULL;		// ":confirm" message
-static char_u	*confirm_msg_tail;		// tail of confirm_msg
-static void display_confirm_msg(void);
+স্থির char_u *বাৰ্তা_show_console_dialog(char_u *message, char_u *buttons, পূর্ণাঙ্ক dfltbutton);
+স্থির পূর্ণাঙ্ক	confirm_বাৰ্তা_used = FALSE;	// displaying confirm_msg
+স্থির char_u	*confirm_বাৰ্তা = রিক্ত;		// ":confirm" message
+স্থির char_u	*confirm_বাৰ্তা_tail;		// tail of confirm_msg
+স্থির শূন্য display_confirm_বাৰ্তা(শূন্য);
 #endif
 #ifdef FEAT_EVAL
-static int emsg_to_channel_log = FALSE;
+স্থির পূর্ণাঙ্ক emsg_to_channel_log = FALSE;
 #endif
 
-struct msg_hist
+সংরচনা বাৰ্তা_hist
 {
-    struct msg_hist	*next;
-    char_u		*msg;
-    int			attr;
+    সংরচনা বাৰ্তা_hist	*next;
+    char_u		*বাৰ্তা;
+    পূর্ণাঙ্ক			attr;
 };
 
-static struct msg_hist *first_msg_hist = NULL;
-static struct msg_hist *last_msg_hist = NULL;
-static int msg_hist_len = 0;
-static int msg_hist_max = 500;		// The default max value is 500
+স্থির সংরচনা বাৰ্তা_hist *first_বাৰ্তা_hist = রিক্ত;
+স্থির সংরচনা বাৰ্তা_hist *last_বাৰ্তা_hist = রিক্ত;
+স্থির পূর্ণাঙ্ক বাৰ্তা_hist_len = 0;
+স্থির পূর্ণাঙ্ক বাৰ্তা_hist_max = 500;		// The default max value is 500
 
 // flags obtained from the 'messagesopt' option
 #define MESSAGES_HIT_ENTER	0x001
@@ -65,11 +65,11 @@ static int msg_hist_max = 500;		// The default max value is 500
 #define MESSAGES_OPT_HISTORY "history:"
 
 // The default is "hit-enter,history:500"
-static int msg_flags = MESSAGES_HIT_ENTER | MESSAGES_HISTORY;
-static int msg_wait = 0;
+স্থির পূর্ণাঙ্ক বাৰ্তা_flags = MESSAGES_HIT_ENTER | MESSAGES_HISTORY;
+স্থির পূর্ণাঙ্ক বাৰ্তা_wait = 0;
 
-static FILE *verbose_fd = NULL;
-static int  verbose_did_open = FALSE;
+স্থির FILE *verbose_fd = রিক্ত;
+স্থির পূর্ণাঙ্ক  verbose_did_open = FALSE;
 
 /*
  * When writing messages to the screen, there are many different situations.
@@ -112,50 +112,50 @@ static int  verbose_did_open = FALSE;
  * When terminal not initialized (yet) mch_errmsg(..) is used.
  * return TRUE if wait_return() not called
  */
-    int
-msg(char *s)
+    পূর্ণাঙ্ক
+বাৰ্তা(ৱর্ণ *s)
 {
-    return msg_attr_keep(s, 0, FALSE);
+    ঘূৰাই বাৰ্তা_attr_keep(s, 0, FALSE);
 }
 
 /*
  * Like msg() but keep it silent when 'verbosefile' is set.
  */
-    int
-verb_msg(char *s)
+    পূর্ণাঙ্ক
+verb_বাৰ্তা(ৱর্ণ *s)
 {
-    int		n;
+    পূর্ণাঙ্ক		n;
 
     verbose_enter();
-    n = msg_attr_keep(s, 0, FALSE);
+    n = বাৰ্তা_attr_keep(s, 0, FALSE);
     verbose_leave();
 
-    return n;
+    ঘূৰাই n;
 }
 
-    int
-msg_attr(char *s, int attr)
+    পূর্ণাঙ্ক
+বাৰ্তা_attr(ৱর্ণ *s, পূর্ণাঙ্ক attr)
 {
-    return msg_attr_keep(s, attr, FALSE);
+    ঘূৰাই বাৰ্তা_attr_keep(s, attr, FALSE);
 }
 
-    int
-msg_attr_keep(
-    char	*s,
-    int		attr,
-    int		keep)	    // TRUE: set keep_msg if it doesn't scroll
+    পূর্ণাঙ্ক
+বাৰ্তা_attr_keep(
+    ৱর্ণ	*s,
+    পূর্ণাঙ্ক		attr,
+    পূর্ণাঙ্ক		keep)	    // TRUE: set keep_msg if it doesn't scroll
 {
-    static int	entered = 0;
-    int		retval;
-    char_u	*buf = NULL;
+    স্থির পূর্ণাঙ্ক	entered = 0;
+    পূর্ণাঙ্ক		retval;
+    char_u	*buf = রিক্ত;
 
     // Skip messages not matching ":filter pattern".
     // Don't filter when there is an error.
-    if (!emsg_on_display && message_filtered((char_u *)s))
-	return TRUE;
+    যদি (!emsg_on_display && message_filtered((char_u *)s))
+	ঘূৰাই TRUE;
 
 #ifdef FEAT_EVAL
-    if (attr == 0)
+    যদি (attr == 0)
 	set_vim_var_string(VV_STATUSMSG, (char_u *)s, -1);
 #endif
 
@@ -164,44 +164,44 @@ msg_attr_keep(
      * when redrawing the window), which causes another message, etc..	To
      * break this loop, limit the recursiveness to 3 levels.
      */
-    if (entered >= 3)
-	return TRUE;
+    যদি (entered >= 3)
+	ঘূৰাই TRUE;
     ++entered;
 
     // Add message to history (unless it's a repeated kept message or a
     // truncated message)
-    if ((char_u *)s != keep_msg
+    যদি ((char_u *)s != keep_বাৰ্তা
 	    || (*s != '<'
-		&& last_msg_hist != NULL
-		&& last_msg_hist->msg != NULL
-		&& STRCMP(s, last_msg_hist->msg) != 0))
-	add_msg_hist((char_u *)s, -1, attr);
+		&& last_বাৰ্তা_hist != রিক্ত
+		&& last_বাৰ্তা_hist->বাৰ্তা != রিক্ত
+		&& STRCMP(s, last_বাৰ্তা_hist->বাৰ্তা) != 0))
+	add_বাৰ্তা_hist((char_u *)s, -1, attr);
 
 #ifdef FEAT_EVAL
-    if (emsg_to_channel_log)
+    যদি (emsg_to_channel_log)
 	// Write message in the channel log.
-	ch_log(NULL, "ERROR: %s", s);
+	ch_log(রিক্ত, "ERROR: %s", s);
 #endif
 
     // Truncate the message if needed.
-    msg_start();
-    buf = msg_strtrunc((char_u *)s, FALSE);
-    if (buf != NULL)
-	s = (char *)buf;
+    বাৰ্তা_start();
+    buf = বাৰ্তা_strtrunc((char_u *)s, FALSE);
+    যদি (buf != রিক্ত)
+	s = (ৱর্ণ *)buf;
 
-    msg_outtrans_attr((char_u *)s, attr);
-    msg_clr_eos();
-    retval = msg_end();
+    বাৰ্তা_outtrans_attr((char_u *)s, attr);
+    বাৰ্তা_clr_eos();
+    retval = বাৰ্তা_end();
 
-    if (keep && retval && vim_strsize((char_u *)s)
-		    < (int)(Rows - cmdline_row - 1) * cmdline_width + sc_col)
-	set_keep_msg((char_u *)s, 0);
+    যদি (keep && retval && vim_strsize((char_u *)s)
+		    < (পূর্ণাঙ্ক)(Rows - cmdline_row - 1) * cmdline_width + sc_col)
+	set_keep_বাৰ্তা((char_u *)s, 0);
 
     need_fileinfo = FALSE;
 
     vim_free(buf);
     --entered;
-    return retval;
+    ঘূৰাই retval;
 }
 
 /*
@@ -209,164 +209,164 @@ msg_attr_keep(
  * Returns an allocated string or NULL when no truncating is done.
  */
     char_u *
-msg_strtrunc(
+বাৰ্তা_strtrunc(
     char_u	*s,
-    int		force)	    // always truncate
+    পূর্ণাঙ্ক		force)	    // always truncate
 {
-    char_u	*buf = NULL;
-    int		len;
-    int		room;
+    char_u	*buf = রিক্ত;
+    পূর্ণাঙ্ক		len;
+    পূর্ণাঙ্ক		room;
 
     // May truncate message to avoid a hit-return prompt
-    if ((!msg_scroll && !need_wait_return && shortmess(SHM_TRUNCALL)
-			       && !exmode_active && msg_silent == 0) || force)
+    যদি ((!বাৰ্তা_scroll && !need_wait_return && shortmess(SHM_TRUNCALL)
+			       && !exmode_active && বাৰ্তা_silent == 0) || force)
     {
 	len = vim_strsize(s);
-	if (msg_scrolled != 0
+	যদি (বাৰ্তা_scrolled != 0
 #ifdef HAS_MESSAGE_WINDOW
 		|| in_echowindow
 #endif
 		)
 	    // Use all the columns.
-	    room = (int)(Rows - msg_row) * cmdline_width - 1;
-	else
+	    room = (পূর্ণাঙ্ক)(Rows - বাৰ্তা_row) * cmdline_width - 1;
+	অন্যথা
 	    // Use up to 'showcmd' column.
-	    room = (int)(Rows - msg_row - 1) * cmdline_width + sc_col - 1;
-	if (len > room && room > 0)
+	    room = (পূর্ণাঙ্ক)(Rows - বাৰ্তা_row - 1) * cmdline_width + sc_col - 1;
+	যদি (len > room && room > 0)
 	{
-	    if (enc_utf8)
+	    যদি (enc_utf8)
 		// may have up to 18 bytes per cell (6 per char, up to two
 		// composing chars)
 		len = (room + 2) * 18;
-	    else if (enc_dbcs == DBCS_JPNU)
+	    অন্যথা যদি (enc_dbcs == DBCS_JPNU)
 		// may have up to 2 bytes per cell for euc-jp
 		len = (room + 2) * 2;
-	    else
+	    অন্যথা
 		len = room + 2;
 	    buf = alloc(len);
-	    if (buf != NULL)
+	    যদি (buf != রিক্ত)
 		trunc_string(s, buf, room, len);
 	}
     }
-    return buf;
+    ঘূৰাই buf;
 }
 
 /*
  * Truncate a string "s" to "buf" with cell width "room".
  * "s" and "buf" may be equal.
  */
-    void
+    শূন্য
 trunc_string(
     char_u	*s,
     char_u	*buf,
-    int		room_in,
-    int		buflen)
+    পূর্ণাঙ্ক		room_in,
+    পূর্ণাঙ্ক		buflen)
 {
     size_t	room = room_in - 3; // "..." takes 3 chars
     size_t	half;
     size_t	len = 0;
-    int		e;
-    int		i;
-    int		n;
+    পূর্ণাঙ্ক		e;
+    পূর্ণাঙ্ক		i;
+    পূর্ণাঙ্ক		n;
 
-    if (*s == NUL)
+    যদি (*s == NUL)
     {
-	if (buflen > 0)
+	যদি (buflen > 0)
 	    *buf = NUL;
-	return;
+	ঘূৰাই;
     }
 
-    if (room_in < 3)
+    যদি (room_in < 3)
 	room = 0;
     half = room / 2;
 
     // First part: Start of the string.
-    for (e = 0; len < half && e < buflen; ++e)
+    বাবে (e = 0; len < half && e < buflen; ++e)
     {
-	if (s[e] == NUL)
+	যদি (s[e] == NUL)
 	{
 	    // text fits without truncating!
 	    buf[e] = NUL;
-	    return;
+	    ঘূৰাই;
 	}
 	n = ptr2cells(s + e);
-	if (len + n > half)
-	    break;
+	যদি (len + n > half)
+	    ভঙ্গ;
 	len += n;
 	buf[e] = s[e];
-	if (has_mbyte)
-	    for (n = (*mb_ptr2len)(s + e); --n > 0; )
+	যদি (has_mbyte)
+	    বাবে (n = (*mb_ptr2len)(s + e); --n > 0; )
 	    {
-		if (++e == buflen)
-		    break;
+		যদি (++e == buflen)
+		    ভঙ্গ;
 		buf[e] = s[e];
 	    }
     }
 
     // Last part: End of the string.
     i = e;
-    if (enc_dbcs != 0)
+    যদি (enc_dbcs != 0)
     {
 	// For DBCS going backwards in a string is slow, but
 	// computing the cell width isn't too slow: go forward
 	// until the rest fits.
 	n = vim_strsize(s + i);
-	while (len + n > room)
+	যেতিয়ালৈ (len + n > room)
 	{
 	    n -= ptr2cells(s + i);
 	    i += (*mb_ptr2len)(s + i);
 	}
     }
-    else if (enc_utf8)
+    অন্যথা যদি (enc_utf8)
     {
 	// For UTF-8 we can go backwards easily.
-	half = i = (int)STRLEN(s);
-	for (;;)
+	half = i = (পূর্ণাঙ্ক)STRLEN(s);
+	বাবে (;;)
 	{
-	    do
+	    কৰা
 		half = half - utf_head_off(s, s + half - 1) - 1;
-	    while (half > 0 && utf_iscomposing(utf_ptr2char(s + half)));
+	    যেতিয়ালৈ (half > 0 && utf_iscomposing(utf_ptr2char(s + half)));
 	    n = ptr2cells(s + half);
-	    if (len + n > room || half == 0)
-		break;
+	    যদি (len + n > room || half == 0)
+		ভঙ্গ;
 	    len += n;
-	    i = (int)half;
+	    i = (পূর্ণাঙ্ক)half;
 	}
     }
-    else
+    অন্যথা
     {
-	for (i = (int)STRLEN(s);
+	বাবে (i = (পূর্ণাঙ্ক)STRLEN(s);
 		   i - 1 >= 0 && len + (n = ptr2cells(s + i - 1)) <= room; --i)
 	    len += n;
     }
 
 
-    if (i <= e + 3)
+    যদি (i <= e + 3)
     {
 	// text fits without truncating
-	if (s != buf)
+	যদি (s != buf)
 	{
 	    len = STRLEN(s);
-	    if (len >= (size_t)buflen)
+	    যদি (len >= (size_t)buflen)
 		len = buflen - 1;
 	    len = len - e + 1;
-	    if (len < 1)
+	    যদি (len < 1)
 		buf[e - 1] = NUL;
-	    else
+	    অন্যথা
 		mch_memmove(buf + e, s + e, len);
 	}
     }
-    else if (e + 3 < buflen)
+    অন্যথা যদি (e + 3 < buflen)
     {
 	// set the middle and copy the last part
 	mch_memmove(buf + e, "...", (size_t)3);
 	len = STRLEN(s + i) + 1;
-	if (len >= (size_t)buflen - e - 3)
+	যদি (len >= (size_t)buflen - e - 3)
 	    len = buflen - e - 3 - 1;
 	mch_memmove(buf + e + 3, s + i, len);
 	buf[e + 3 + len - 1] = NUL;
     }
-    else
+    অন্যথা
     {
 	// can't fit in the "...", just truncate it
 	buf[buflen - 1] = NUL;
@@ -380,60 +380,60 @@ trunc_string(
  */
 #ifndef PROTO
 
-int vim_snprintf(char *str, size_t str_m, const char *fmt, ...);
+পূর্ণাঙ্ক vim_snprintf(ৱর্ণ *str, size_t str_m, ধ্রুৱ ৱর্ণ *fmt, ...);
 
-    int
-smsg(const char *s, ...)
+    পূর্ণাঙ্ক
+smsg(ধ্রুৱ ৱর্ণ *s, ...)
 {
-    if (IObuff == NULL)
+    যদি (IObuff == রিক্ত)
     {
 	// Very early in initialisation and already something wrong, just
 	// give the raw message so the user at least gets a hint.
-	return msg((char *)s);
+	ঘূৰাই বাৰ্তা((ৱর্ণ *)s);
     }
 
     va_list arglist;
 
     va_start(arglist, s);
-    vim_vsnprintf((char *)IObuff, IOSIZE, s, arglist);
+    vim_vsnprintf((ৱর্ণ *)IObuff, IOSIZE, s, arglist);
     va_end(arglist);
-    return msg((char *)IObuff);
+    ঘূৰাই বাৰ্তা((ৱর্ণ *)IObuff);
 }
 
-    int
-smsg_attr(int attr, const char *s, ...)
+    পূর্ণাঙ্ক
+smsg_attr(পূর্ণাঙ্ক attr, ধ্রুৱ ৱর্ণ *s, ...)
 {
-    if (IObuff == NULL)
+    যদি (IObuff == রিক্ত)
     {
 	// Very early in initialisation and already something wrong, just
 	// give the raw message so the user at least gets a hint.
-	return msg_attr((char *)s, attr);
+	ঘূৰাই বাৰ্তা_attr((ৱর্ণ *)s, attr);
     }
 
     va_list arglist;
 
     va_start(arglist, s);
-    vim_vsnprintf((char *)IObuff, IOSIZE, s, arglist);
+    vim_vsnprintf((ৱর্ণ *)IObuff, IOSIZE, s, arglist);
     va_end(arglist);
-    return msg_attr((char *)IObuff, attr);
+    ঘূৰাই বাৰ্তা_attr((ৱর্ণ *)IObuff, attr);
 }
 
-    int
-smsg_attr_keep(int attr, const char *s, ...)
+    পূর্ণাঙ্ক
+smsg_attr_keep(পূর্ণাঙ্ক attr, ধ্রুৱ ৱর্ণ *s, ...)
 {
-    if (IObuff == NULL)
+    যদি (IObuff == রিক্ত)
     {
 	// Very early in initialisation and already something wrong, just
 	// give the raw message so the user at least gets a hint.
-	return msg_attr_keep((char *)s, attr, TRUE);
+	ঘূৰাই বাৰ্তা_attr_keep((ৱর্ণ *)s, attr, TRUE);
     }
 
     va_list arglist;
 
     va_start(arglist, s);
-    vim_vsnprintf((char *)IObuff, IOSIZE, s, arglist);
+    vim_vsnprintf((ৱর্ণ *)IObuff, IOSIZE, s, arglist);
     va_end(arglist);
-    return msg_attr_keep((char *)IObuff, attr, TRUE);
+    ঘূৰাই বাৰ্তা_attr_keep((ৱর্ণ *)IObuff, attr, TRUE);
 }
 
 #endif
@@ -442,15 +442,15 @@ smsg_attr_keep(int attr, const char *s, ...)
  * Remember the last sourcing name/lnum used in an error message, so that it
  * isn't printed each time when it didn't change.
  */
-static int	last_sourcing_lnum = 0;
-static char_u   *last_sourcing_name = NULL;
+স্থির পূর্ণাঙ্ক	last_sourcing_lnum = 0;
+স্থির char_u   *last_sourcing_name = রিক্ত;
 
 /*
  * Reset the last used sourcing name/lnum.  Makes sure it is displayed again
  * for the next error message;
  */
-    void
-reset_last_sourcing(void)
+    শূন্য
+reset_last_sourcing(শূন্য)
 {
     VIM_CLEAR(last_sourcing_name);
     last_sourcing_lnum = 0;
@@ -459,16 +459,16 @@ reset_last_sourcing(void)
 /*
  * Return TRUE if "SOURCING_NAME" differs from "last_sourcing_name".
  */
-    static int
-other_sourcing_name(void)
+    স্থির পূর্ণাঙ্ক
+other_sourcing_name(শূন্য)
 {
-    if (HAVE_SOURCING_INFO && SOURCING_NAME != NULL)
+    যদি (HAVE_SOURCING_INFO && SOURCING_NAME != রিক্ত)
     {
-	if (last_sourcing_name != NULL)
-	    return STRCMP(SOURCING_NAME, last_sourcing_name) != 0;
-	return TRUE;
+	যদি (last_sourcing_name != রিক্ত)
+	    ঘূৰাই STRCMP(SOURCING_NAME, last_sourcing_name) != 0;
+	ঘূৰাই TRUE;
     }
-    return FALSE;
+    ঘূৰাই FALSE;
 }
 
 /*
@@ -476,32 +476,32 @@ other_sourcing_name(void)
  * Returns an allocated string with room for one more character.
  * Returns NULL when no message is to be given.
  */
-    static char_u *
-get_emsg_source(void)
+    স্থির char_u *
+get_emsg_source(শূন্য)
 {
     char_u	*Buf, *p;
 
-    if (HAVE_SOURCING_INFO && SOURCING_NAME != NULL && other_sourcing_name())
+    যদি (HAVE_SOURCING_INFO && SOURCING_NAME != রিক্ত && other_sourcing_name())
     {
 	char_u	    *sname = estack_sfile(ESTACK_NONE);
 	char_u	    *tofree = sname;
 
-	if (sname == NULL)
+	যদি (sname == রিক্ত)
 	    sname = SOURCING_NAME;
 
 #ifdef FEAT_EVAL
-	if (estack_compiling)
+	যদি (estack_compiling)
 	    p = (char_u *)_("Error detected while compiling %s:");
-	else
+	অন্যথা
 #endif
 	    p = (char_u *)_("Error detected while processing %s:");
 	Buf = alloc(STRLEN(sname) + STRLEN(p));
-	if (Buf != NULL)
-	    sprintf((char *)Buf, (char *)p, sname);
+	যদি (Buf != রিক্ত)
+	    sprintf((ৱর্ণ *)Buf, (ৱর্ণ *)p, sname);
 	vim_free(tofree);
-	return Buf;
+	ঘূৰাই Buf;
     }
-    return NULL;
+    ঘূৰাই রিক্ত;
 }
 
 /*
@@ -509,24 +509,24 @@ get_emsg_source(void)
  * Returns an allocated string with room for one more character.
  * Returns NULL when no message is to be given.
  */
-    static char_u *
-get_emsg_lnum(void)
+    স্থির char_u *
+get_emsg_lnum(শূন্য)
 {
     char_u	*Buf, *p;
 
     // lnum is 0 when executing a command from the command line
     // argument, we don't want a line number then
-    if (SOURCING_NAME != NULL
+    যদি (SOURCING_NAME != রিক্ত
 	    && (other_sourcing_name() || SOURCING_LNUM != last_sourcing_lnum)
 	    && SOURCING_LNUM != 0)
     {
 	p = (char_u *)_("line %4ld:");
 	Buf = alloc(STRLEN(p) + 20);
-	if (Buf != NULL)
-	    sprintf((char *)Buf, (char *)p, (long)SOURCING_LNUM);
-	return Buf;
+	যদি (Buf != রিক্ত)
+	    sprintf((ৱর্ণ *)Buf, (ৱর্ণ *)p, (long)SOURCING_LNUM);
+	ঘূৰাই Buf;
     }
-    return NULL;
+    ঘূৰাই রিক্ত;
 }
 
 /*
@@ -534,38 +534,38 @@ get_emsg_lnum(void)
  * Remember the file name and line number, so that for the next error the info
  * is only displayed if it changed.
  */
-    void
-msg_source(int attr)
+    শূন্য
+বাৰ্তা_source(পূর্ণাঙ্ক attr)
 {
     char_u	*p;
-    static int	recursive = FALSE;
+    স্থির পূর্ণাঙ্ক	recursive = FALSE;
 
     // Bail out if something called here causes an error.
-    if (recursive)
-	return;
+    যদি (recursive)
+	ঘূৰাই;
     recursive = TRUE;
 
     ++no_wait_return;
     p = get_emsg_source();
-    if (p != NULL)
+    যদি (p != রিক্ত)
     {
-	msg_scroll = TRUE;  // this will take more than one line
-	msg_attr((char *)p, attr);
+	বাৰ্তা_scroll = TRUE;  // this will take more than one line
+	বাৰ্তা_attr((ৱর্ণ *)p, attr);
 	vim_free(p);
     }
     p = get_emsg_lnum();
-    if (p != NULL)
+    যদি (p != রিক্ত)
     {
-	msg_attr((char *)p, HL_ATTR(HLF_N));
+	বাৰ্তা_attr((ৱর্ণ *)p, HL_ATTR(HLF_N));
 	vim_free(p);
 	last_sourcing_lnum = SOURCING_LNUM;  // only once for each line
     }
 
     // remember the last sourcing name printed, also when it's empty
-    if (SOURCING_NAME == NULL || other_sourcing_name())
+    যদি (SOURCING_NAME == রিক্ত || other_sourcing_name())
     {
 	VIM_CLEAR(last_sourcing_name);
-	if (SOURCING_NAME != NULL)
+	যদি (SOURCING_NAME != রিক্ত)
 	    last_sourcing_name = vim_strsave(SOURCING_NAME);
     }
     --no_wait_return;
@@ -579,58 +579,58 @@ msg_source(int attr)
  * If "msg" is in 'debug': do error message but without side effects.
  * If "emsg_skip" is set: never do error messages.
  */
-    static int
-emsg_not_now(void)
+    স্থির পূর্ণাঙ্ক
+emsg_not_now(শূন্য)
 {
-    if ((emsg_off > 0 && vim_strchr(p_debug, 'm') == NULL
-					  && vim_strchr(p_debug, 't') == NULL)
+    যদি ((emsg_off > 0 && vim_strchr(p_debug, 'm') == রিক্ত
+					  && vim_strchr(p_debug, 't') == রিক্ত)
 #ifdef FEAT_EVAL
 	    || emsg_skip > 0
 #endif
 	    )
-	return TRUE;
-    return FALSE;
+	ঘূৰাই TRUE;
+    ঘূৰাই FALSE;
 }
 
-#if defined(FEAT_EVAL)
-static garray_T ignore_error_list = GA_EMPTY;
+#যদি defined(FEAT_EVAL)
+স্থির garray_T ignore_error_list = GA_EMPTY;
 
-    void
+    শূন্য
 ignore_error_for_testing(char_u *error)
 {
-    if (ignore_error_list.ga_itemsize == 0)
-	ga_init2(&ignore_error_list, sizeof(char_u *), 1);
+    যদি (ignore_error_list.ga_itemsize == 0)
+	ga_init2(&ignore_error_list, পরিমাণ(char_u *), 1);
 
-    if (STRCMP("RESET", error) == 0)
+    যদি (STRCMP("RESET", error) == 0)
 	ga_clear_strings(&ignore_error_list);
-    else
+    অন্যথা
 	ga_copy_string(&ignore_error_list, error);
 }
 
-    static int
-ignore_error(const char *msg)
+    স্থির পূর্ণাঙ্ক
+ignore_error(ধ্রুৱ ৱর্ণ *বাৰ্তা)
 {
-    int i;
+    পূর্ণাঙ্ক i;
 
-    for (i = 0; i < ignore_error_list.ga_len; ++i)
-	if (strstr(msg,
-		  (char *)((char_u **)(ignore_error_list.ga_data))[i]) != NULL)
-	    return TRUE;
-    return FALSE;
+    বাবে (i = 0; i < ignore_error_list.ga_len; ++i)
+	যদি (strstr(বাৰ্তা,
+		  (ৱর্ণ *)((char_u **)(ignore_error_list.ga_data))[i]) != রিক্ত)
+	    ঘূৰাই TRUE;
+    ঘূৰাই FALSE;
 }
 #endif
 
-#if !defined(HAVE_STRERROR)
+#যদি !defined(HAVE_STRERROR)
 /*
  * Replacement for perror() that behaves more or less like emsg() was called.
  * v:errmsg will be set and called_emsg will be incremented.
  */
-    void
-do_perror(char *msg)
+    শূন্য
+do_perror(ৱর্ণ *বাৰ্তা)
 {
-    perror(msg);
+    perror(বাৰ্তা);
     ++emsg_silent;
-    emsg(msg);
+    emsg(বাৰ্তা);
     --emsg_silent;
 }
 #endif
@@ -644,22 +644,22 @@ do_perror(char *msg)
  * Return TRUE if wait_return() not called.
  * Note: caller must check 'emsg_not_now()' before calling this.
  */
-    static int
-emsg_core(const char *s)
+    স্থির পূর্ণাঙ্ক
+emsg_core(ধ্রুৱ ৱর্ণ *s)
 {
-    int		attr;
+    পূর্ণাঙ্ক		attr;
     char_u	*p;
-    int		r;
+    পূর্ণাঙ্ক		r;
 #ifdef FEAT_EVAL
-    int		ignore = FALSE;
-    int		severe;
+    পূর্ণাঙ্ক		ignore = FALSE;
+    পূর্ণাঙ্ক		severe;
 #endif
 
 #ifdef FEAT_EVAL
     // When testing some errors are turned into a normal message.
-    if (ignore_error(s))
+    যদি (ignore_error(s))
 	// don't call msg() if it results in a dialog
-	return msg_use_printf() ? FALSE : msg((char *)s);
+	ঘূৰাই বাৰ্তা_use_printf() ? FALSE : বাৰ্তা((ৱর্ণ *)s);
 #endif
 
     ++called_emsg;
@@ -671,7 +671,7 @@ emsg_core(const char *s)
     emsg_severe = FALSE;
 #endif
 
-    if (!emsg_off || vim_strchr(p_debug, 't') != NULL)
+    যদি (!emsg_off || vim_strchr(p_debug, 't') != রিক্ত)
     {
 #ifdef FEAT_EVAL
 	/*
@@ -681,20 +681,20 @@ emsg_core(const char *s)
 	 * when the message should be ignored completely (used for the
 	 * interrupt message).
 	 */
-	if (cause_errthrow((char_u *)s, severe, &ignore) == TRUE)
+	যদি (cause_errthrow((char_u *)s, severe, &ignore) == TRUE)
 	{
-	    if (!ignore)
+	    যদি (!ignore)
 		++did_emsg;
-	    return TRUE;
+	    ঘূৰাই TRUE;
 	}
 
-	if (in_assert_fails && emsg_assert_fails_msg == NULL)
+	যদি (in_assert_fails && emsg_assert_fails_বাৰ্তা == রিক্ত)
 	{
-	    emsg_assert_fails_msg = vim_strsave((char_u *)s);
+	    emsg_assert_fails_বাৰ্তা = vim_strsave((char_u *)s);
 	    emsg_assert_fails_lnum = SOURCING_LNUM;
 	    vim_free(emsg_assert_fails_context);
 	    emsg_assert_fails_context = vim_strsave(
-			 SOURCING_NAME == NULL ? (char_u *)"" : SOURCING_NAME);
+			 SOURCING_NAME == রিক্ত ? (char_u *)"" : SOURCING_NAME);
 	}
 
 	// set "v:errmsg", also when using ":silent! cmd"
@@ -705,23 +705,23 @@ emsg_core(const char *s)
 	 * When using ":silent! cmd" ignore error messages.
 	 * But do write it to the redirection file.
 	 */
-	if (emsg_silent != 0)
+	যদি (emsg_silent != 0)
 	{
 #ifdef FEAT_EVAL
 	    ++did_emsg_silent;
 #endif
-	    if (emsg_noredir == 0)
+	    যদি (emsg_noredir == 0)
 	    {
-		msg_start();
+		বাৰ্তা_start();
 		p = get_emsg_source();
-		if (p != NULL)
+		যদি (p != রিক্ত)
 		{
 		    STRCAT(p, "\n");
 		    redir_write(p, -1);
 		    vim_free(p);
 		}
 		p = get_emsg_lnum();
-		if (p != NULL)
+		যদি (p != রিক্ত)
 		{
 		    STRCAT(p, "\n");
 		    redir_write(p, -1);
@@ -732,27 +732,27 @@ emsg_core(const char *s)
 #ifdef FEAT_EVAL
 	    // Only increment did_emsg_def when :silent! wasn't used inside the
 	    // :def function.
-	    if (emsg_silent == emsg_silent_def)
+	    যদি (emsg_silent == emsg_silent_def)
 		++did_emsg_def;
 #endif
 #ifdef FEAT_EVAL
-	    ch_log(NULL, "ERROR silent: %s", s);
+	    ch_log(রিক্ত, "ERROR silent: %s", s);
 #endif
-	    return TRUE;
+	    ঘূৰাই TRUE;
 	}
 
 	ex_exitval = 1;
 
 	// Reset msg_silent, an error causes messages to be switched back on.
-	msg_silent = 0;
+	বাৰ্তা_silent = 0;
 	cmd_silent = FALSE;
 
-	if (global_busy)		// break :global command
+	যদি (global_busy)		// break :global command
 	    ++global_busy;
 
-	if (p_eb)
+	যদি (p_eb)
 	    beep_flush();		// also includes flush_buffers()
-	else
+	অন্যথা
 	    flush_buffers(FLUSH_MINIMAL);  // flush internal buffers
 	++did_emsg;			   // flag for DoOneCmd()
 #ifdef FEAT_EVAL
@@ -761,12 +761,12 @@ emsg_core(const char *s)
     }
 
 #ifdef HAS_MESSAGE_WINDOW
-    if (!in_echowindow)
+    যদি (!in_echowindow)
 #endif
 	emsg_on_display = TRUE;	    // remember there is an error message
 
     attr = HL_ATTR(HLF_E);	    // set highlight mode for error messages
-    if (msg_scrolled != 0)
+    যদি (বাৰ্তা_scrolled != 0)
 	need_wait_return = TRUE;    // needed in case emsg() is called after
 				    // wait_return() has reset need_wait_return
 				    // and a redraw is expected because
@@ -778,33 +778,33 @@ emsg_core(const char *s)
     /*
      * Display name and line number for the source of the error.
      */
-    msg_scroll = TRUE;
-    msg_source(attr);
+    বাৰ্তা_scroll = TRUE;
+    বাৰ্তা_source(attr);
 
     /*
      * Display the error message itself.
      */
-    msg_nowait = FALSE;			// wait for this msg
-    r = msg_attr((char *)s, attr);
+    বাৰ্তা_nowait = FALSE;			// wait for this msg
+    r = বাৰ্তা_attr((ৱর্ণ *)s, attr);
 
 #ifdef FEAT_JOB_CHANNEL
     emsg_to_channel_log = FALSE;
 #endif
-    return r;
+    ঘূৰাই r;
 }
 
 /*
  * Print error message "s".  Should already be translated.
  * Return TRUE if wait_return() not called.
  */
-    int
-emsg(char *s)
+    পূর্ণাঙ্ক
+emsg(ৱর্ণ *s)
 {
     // Skip this if not giving error messages at the moment.
-    if (emsg_not_now())
-	return TRUE;
+    যদি (emsg_not_now())
+	ঘূৰাই TRUE;
 
-    return emsg_core(s);
+    ঘূৰাই emsg_core(s);
 }
 
 #ifndef PROTO  // manual proto with __attribute__
@@ -814,24 +814,24 @@ emsg(char *s)
  * Note: caller must not use "IObuff" for "s"!
  * Return TRUE if wait_return() not called.
  */
-    int
-semsg(const char *s, ...)
+    পূর্ণাঙ্ক
+semsg(ধ্রুৱ ৱর্ণ *s, ...)
 {
     // Skip this if not giving error messages at the moment.
-    if (emsg_not_now())
-	return TRUE;
+    যদি (emsg_not_now())
+	ঘূৰাই TRUE;
 
-    if (IObuff == NULL)
+    যদি (IObuff == রিক্ত)
 	// Very early in initialisation and already something wrong, just
 	// give the raw message so the user at least gets a hint.
-	return emsg_core(s);
+	ঘূৰাই emsg_core(s);
 
     va_list ap;
 
     va_start(ap, s);
-    vim_vsnprintf((char *)IObuff, IOSIZE, s, ap);
+    vim_vsnprintf((ৱর্ণ *)IObuff, IOSIZE, s, ap);
     va_end(ap);
-    return emsg_core((char *)IObuff);
+    ঘূৰাই emsg_core((ৱর্ণ *)IObuff);
 }
 #endif
 
@@ -840,20 +840,20 @@ semsg(const char *s, ...)
  * defined. It is used for internal errors only, so that they can be
  * detected when fuzzing vim.
  */
-    void
-iemsg(char *s)
+    শূন্য
+iemsg(ৱর্ণ *s)
 {
-    if (emsg_not_now())
-	return;
+    যদি (emsg_not_now())
+	ঘূৰাই;
 
     // Give a generic error which is translated.  The error itself may not be
     // translated, it almost never shows.
     emsg_core(_(e_internal_error_please_report_a_bug));
 
     emsg_core(s);
-#if defined(ABORT_ON_INTERNAL_ERROR) && defined(FEAT_EVAL)
+#যদি defined(ABORT_ON_INTERNAL_ERROR) && defined(FEAT_EVAL)
     set_vim_var_string(VV_ERRMSG, (char_u *)s, -1);
-    msg_putchar('\n');  // avoid overwriting the error message
+    বাৰ্তা_putchar('\n');  // avoid overwriting the error message
     out_flush();
     abort();
 #endif
@@ -866,33 +866,33 @@ iemsg(char *s)
  * detected when fuzzing vim.
  * Note: caller must not pass 'IObuff' as 1st argument.
  */
-    void
-siemsg(const char *s, ...)
+    শূন্য
+siemsg(ধ্রুৱ ৱর্ণ *s, ...)
 {
-    if (emsg_not_now())
-	return;
+    যদি (emsg_not_now())
+	ঘূৰাই;
 
     // Give a generic error which is translated.  The error itself may not be
     // translated, it almost never shows.
     emsg_core(_(e_internal_error_please_report_a_bug));
 
-    if (IObuff == NULL)
+    যদি (IObuff == রিক্ত)
     {
 	// Very early in initialisation and already something wrong, just
 	// give the raw message so the user at least gets a hint.
 	emsg_core(s);
     }
-    else
+    অন্যথা
     {
 	va_list ap;
 
 	va_start(ap, s);
-	vim_vsnprintf((char *)IObuff, IOSIZE, s, ap);
+	vim_vsnprintf((ৱর্ণ *)IObuff, IOSIZE, s, ap);
 	va_end(ap);
-	emsg_core((char *)IObuff);
+	emsg_core((ৱর্ণ *)IObuff);
     }
 # ifdef ABORT_ON_INTERNAL_ERROR
-    msg_putchar('\n');  // avoid overwriting the error message
+    বাৰ্তা_putchar('\n');  // avoid overwriting the error message
     out_flush();
     abort();
 # endif
@@ -902,8 +902,8 @@ siemsg(const char *s, ...)
 /*
  * Give an "Internal error" message.
  */
-    void
-internal_error(char *where)
+    শূন্য
+internal_error(ৱর্ণ *where)
 {
     // Give a generic error which is translated.  The error itself may not be
     // translated, it almost never shows.
@@ -912,13 +912,13 @@ internal_error(char *where)
     siemsg(_(e_internal_error_str), where);
 }
 
-#if defined(FEAT_EVAL)
+#যদি defined(FEAT_EVAL)
 /*
  * Like internal_error() but do not call abort(), to avoid tests using
  * test_unknown() and test_void() causing Vim to exit.
  */
-    void
-internal_error_no_abort(char *where)
+    শূন্য
+internal_error_no_abort(ৱর্ণ *where)
 {
     // Give a generic error which is translated.  The error itself may not be
     // translated, it almost never shows.
@@ -930,22 +930,22 @@ internal_error_no_abort(char *where)
 
 // emsg3() and emsgn() are in misc2.c to avoid warnings for the prototypes.
 
-    void
-emsg_invreg(int name)
+    শূন্য
+emsg_invreg(পূর্ণাঙ্ক name)
 {
-    semsg(_(e_invalid_register_name_str), transchar_buf(NULL, name));
+    semsg(_(e_invalid_register_name_str), transchar_buf(রিক্ত, name));
 }
 
-#if defined(FEAT_EVAL)
+#যদি defined(FEAT_EVAL)
 /*
  * Give an error message which contains %s for "name[len]".
  */
-    void
-emsg_namelen(char *msg, char_u *name, int len)
+    শূন্য
+emsg_namelen(ৱর্ণ *বাৰ্তা, char_u *name, পূর্ণাঙ্ক len)
 {
     char_u *copy = vim_strnsave(name, len);
 
-    semsg(msg, copy == NULL ? "NULL" : (char *)copy);
+    semsg(বাৰ্তা, copy == রিক্ত ? "NULL" : (ৱর্ণ *)copy);
     vim_free(copy);
 }
 #endif
@@ -956,24 +956,24 @@ emsg_namelen(char *msg, char_u *name, int len)
  * Careful: The string may be changed by msg_may_trunc()!
  * Returns a pointer to the printed message, if wait_return() not called.
  */
-    char *
-msg_trunc_attr(char *s, int force, int attr)
+    ৱর্ণ *
+বাৰ্তা_trunc_attr(ৱর্ণ *s, পূর্ণাঙ্ক force, পূর্ণাঙ্ক attr)
 {
-    int		n;
-    char	*ts;
+    পূর্ণাঙ্ক		n;
+    ৱর্ণ	*ts;
 
     // Add message to history before truncating
-    add_msg_hist((char_u *)s, -1, attr);
+    add_বাৰ্তা_hist((char_u *)s, -1, attr);
 
-    ts = (char *)msg_may_trunc(force, (char_u *)s);
+    ts = (ৱর্ণ *)বাৰ্তা_may_trunc(force, (char_u *)s);
 
-    msg_hist_off = TRUE;
-    n = msg_attr(ts, attr);
-    msg_hist_off = FALSE;
+    বাৰ্তা_hist_off = TRUE;
+    n = বাৰ্তা_attr(ts, attr);
+    বাৰ্তা_hist_off = FALSE;
 
-    if (n)
-	return ts;
-    return NULL;
+    যদি (n)
+	ঘূৰাই ts;
+    ঘূৰাই রিক্ত;
 }
 
 /*
@@ -982,26 +982,26 @@ msg_trunc_attr(char *s, int force, int attr)
  * Note: May change the message by replacing a character with '<'.
  */
     char_u *
-msg_may_trunc(int force, char_u *s)
+বাৰ্তা_may_trunc(পূর্ণাঙ্ক force, char_u *s)
 {
-    int		n;
-    int		room;
+    পূর্ণাঙ্ক		n;
+    পূর্ণাঙ্ক		room;
 
     // If 'cmdheight' is zero or something unexpected happened "room" may be
     // negative.
-    room = (int)(Rows - cmdline_row - 1) * cmdline_width + sc_col - 1;
-    if (room > 0 && (force || (shortmess(SHM_TRUNC) && !exmode_active))
-	    && (n = (int)STRLEN(s) - room) > 0)
+    room = (পূর্ণাঙ্ক)(Rows - cmdline_row - 1) * cmdline_width + sc_col - 1;
+    যদি (room > 0 && (force || (shortmess(SHM_TRUNC) && !exmode_active))
+	    && (n = (পূর্ণাঙ্ক)STRLEN(s) - room) > 0)
     {
-	if (has_mbyte)
+	যদি (has_mbyte)
 	{
-	    int	size = vim_strsize(s);
+	    পূর্ণাঙ্ক	size = vim_strsize(s);
 
 	    // There may be room anyway when there are multibyte chars.
-	    if (size <= room)
-		return s;
+	    যদি (size <= room)
+		ঘূৰাই s;
 
-	    for (n = 0; size >= room; )
+	    বাবে (n = 0; size >= room; )
 	    {
 		size -= (*mb_ptr2cells)(s + n);
 		n += (*mb_ptr2len)(s + n);
@@ -1011,96 +1011,96 @@ msg_may_trunc(int force, char_u *s)
 	s += n;
 	*s = '<';
     }
-    return s;
+    ঘূৰাই s;
 }
 
-    static void
-add_msg_hist(
+    স্থির শূন্য
+add_বাৰ্তা_hist(
     char_u	*s,
-    int		len,		// -1 for undetermined length
-    int		attr)
+    পূর্ণাঙ্ক		len,		// -1 for undetermined length
+    পূর্ণাঙ্ক		attr)
 {
-    struct msg_hist *p;
+    সংরচনা বাৰ্তা_hist *p;
 
-    if (msg_hist_off || msg_silent != 0)
-	return;
+    যদি (বাৰ্তা_hist_off || বাৰ্তা_silent != 0)
+	ঘূৰাই;
 
     // allocate an entry and add the message at the end of the history
-    p = ALLOC_ONE(struct msg_hist);
-    if (p == NULL)
-	return;
+    p = ALLOC_ONE(সংরচনা বাৰ্তা_hist);
+    যদি (p == রিক্ত)
+	ঘূৰাই;
 
-    if (len < 0)
-	len = (int)STRLEN(s);
+    যদি (len < 0)
+	len = (পূর্ণাঙ্ক)STRLEN(s);
     // remove leading and trailing newlines
-    while (len > 0 && *s == '\n')
+    যেতিয়ালৈ (len > 0 && *s == '\n')
     {
 	++s;
 	--len;
     }
-    while (len > 0 && s[len - 1] == '\n')
+    যেতিয়ালৈ (len > 0 && s[len - 1] == '\n')
 	--len;
-    p->msg = vim_strnsave(s, len);
-    p->next = NULL;
+    p->বাৰ্তা = vim_strnsave(s, len);
+    p->next = রিক্ত;
     p->attr = attr;
-    if (last_msg_hist != NULL)
-	last_msg_hist->next = p;
-    last_msg_hist = p;
-    if (first_msg_hist == NULL)
-	first_msg_hist = last_msg_hist;
-    ++msg_hist_len;
+    যদি (last_বাৰ্তা_hist != রিক্ত)
+	last_বাৰ্তা_hist->next = p;
+    last_বাৰ্তা_hist = p;
+    যদি (first_বাৰ্তা_hist == রিক্ত)
+	first_বাৰ্তা_hist = last_বাৰ্তা_hist;
+    ++বাৰ্তা_hist_len;
 
-    check_msg_hist();
+    check_বাৰ্তা_hist();
 }
 
 /*
  * Delete the first (oldest) message from the history.
  * Returns FAIL if there are no messages.
  */
-    int
-delete_first_msg(void)
+    পূর্ণাঙ্ক
+delete_first_বাৰ্তা(শূন্য)
 {
-    struct msg_hist *p;
+    সংরচনা বাৰ্তা_hist *p;
 
-    if (msg_hist_len <= 0)
-	return FAIL;
-    p = first_msg_hist;
-    first_msg_hist = p->next;
-    if (first_msg_hist == NULL)
-	last_msg_hist = NULL;  // history is empty
-    vim_free(p->msg);
+    যদি (বাৰ্তা_hist_len <= 0)
+	ঘূৰাই FAIL;
+    p = first_বাৰ্তা_hist;
+    first_বাৰ্তা_hist = p->next;
+    যদি (first_বাৰ্তা_hist == রিক্ত)
+	last_বাৰ্তা_hist = রিক্ত;  // history is empty
+    vim_free(p->বাৰ্তা);
     vim_free(p);
-    --msg_hist_len;
-    return OK;
+    --বাৰ্তা_hist_len;
+    ঘূৰাই OK;
 }
 
-    static void
-check_msg_hist(void)
+    স্থির শূন্য
+check_বাৰ্তা_hist(শূন্য)
 {
     // Don't let the message history get too big
-    while (msg_hist_len > 0 && msg_hist_len > msg_hist_max)
-	(void)delete_first_msg();
+    যেতিয়ালৈ (বাৰ্তা_hist_len > 0 && বাৰ্তা_hist_len > বাৰ্তা_hist_max)
+	(শূন্য)delete_first_বাৰ্তা();
 }
 
 
-    int
-messagesopt_changed(void)
+    পূর্ণাঙ্ক
+messagesopt_changed(শূন্য)
 {
     char_u	*p;
-    int		messages_flags_new = 0;
-    int		messages_wait_new = 0;
-    int		messages_history_new = 0;
+    পূর্ণাঙ্ক		messages_flags_new = 0;
+    পূর্ণাঙ্ক		messages_wait_new = 0;
+    পূর্ণাঙ্ক		messages_history_new = 0;
 
     p = p_mopt;
-    while (*p != NUL)
+    যেতিয়ালৈ (*p != NUL)
     {
-	if (STRNCMP(p, MESSAGES_OPT_HIT_ENTER,
+	যদি (STRNCMP(p, MESSAGES_OPT_HIT_ENTER,
 	     STRLEN_LITERAL(MESSAGES_OPT_HIT_ENTER)) == 0)
 	{
 	    p += STRLEN_LITERAL(MESSAGES_OPT_HIT_ENTER);
 	    messages_flags_new |= MESSAGES_HIT_ENTER;
 	}
-	else if (STRNCMP(p, MESSAGES_OPT_WAIT,
+	অন্যথা যদি (STRNCMP(p, MESSAGES_OPT_WAIT,
 		  STRLEN_LITERAL(MESSAGES_OPT_WAIT)) == 0
 	    && VIM_ISDIGIT(p[STRLEN_LITERAL(MESSAGES_OPT_WAIT)]))
 	{
@@ -1108,7 +1108,7 @@ messagesopt_changed(void)
 	    messages_wait_new = getdigits(&p);
 	    messages_flags_new |= MESSAGES_WAIT;
 	}
-	else if (STRNCMP(p, MESSAGES_OPT_HISTORY,
+	অন্যথা যদি (STRNCMP(p, MESSAGES_OPT_HISTORY,
 		  STRLEN_LITERAL(MESSAGES_OPT_HISTORY)) == 0
 	    && VIM_ISDIGIT(p[STRLEN_LITERAL(MESSAGES_OPT_HISTORY)]))
 	{
@@ -1117,87 +1117,87 @@ messagesopt_changed(void)
 	    messages_flags_new |= MESSAGES_HISTORY;
 	}
 
-	if (*p != ',' && *p != NUL)
-	    return FAIL;
-	if (*p == ',')
+	যদি (*p != ',' && *p != NUL)
+	    ঘূৰাই FAIL;
+	যদি (*p == ',')
 	    ++p;
     }
 
     // Either "wait" or "hit-enter" is required
-    if (!(messages_flags_new & (MESSAGES_HIT_ENTER | MESSAGES_WAIT)))
-	return FAIL;
+    যদি (!(messages_flags_new & (MESSAGES_HIT_ENTER | MESSAGES_WAIT)))
+	ঘূৰাই FAIL;
 
     // "history" must be set
-    if (!(messages_flags_new & MESSAGES_HISTORY))
-	return FAIL;
+    যদি (!(messages_flags_new & MESSAGES_HISTORY))
+	ঘূৰাই FAIL;
 
-    if (messages_history_new < 0 || messages_history_new > 10000)
-	return FAIL;
+    যদি (messages_history_new < 0 || messages_history_new > 10000)
+	ঘূৰাই FAIL;
 
-    if (messages_wait_new < 0 || messages_wait_new > 10000)
-	return FAIL;
+    যদি (messages_wait_new < 0 || messages_wait_new > 10000)
+	ঘূৰাই FAIL;
 
-    msg_flags = messages_flags_new;
-    msg_wait = messages_wait_new;
+    বাৰ্তা_flags = messages_flags_new;
+    বাৰ্তা_wait = messages_wait_new;
 
-    msg_hist_max = messages_history_new;
-    check_msg_hist();
+    বাৰ্তা_hist_max = messages_history_new;
+    check_বাৰ্তা_hist();
 
-    return OK;
+    ঘূৰাই OK;
 }
 
 /*
  * ":messages" command.
  */
-    void
+    শূন্য
 ex_messages(exarg_T *eap)
 {
-    struct msg_hist *p;
+    সংরচনা বাৰ্তা_hist *p;
     char_u	    *s;
-    int		    c = 0;
+    পূর্ণাঙ্ক		    c = 0;
 
-    if (STRCMP(eap->arg, "clear") == 0)
+    যদি (STRCMP(eap->arg, "clear") == 0)
     {
-	int keep = eap->addr_count == 0 ? 0 : eap->line2;
+	পূর্ণাঙ্ক keep = eap->addr_গুনতি == 0 ? 0 : eap->line2;
 
-	while (msg_hist_len > keep)
-	    (void)delete_first_msg();
-	return;
+	যেতিয়ালৈ (বাৰ্তা_hist_len > keep)
+	    (শূন্য)delete_first_বাৰ্তা();
+	ঘূৰাই;
     }
 
-    if (*eap->arg != NUL)
+    যদি (*eap->arg != NUL)
     {
 	emsg(_(e_invalid_argument));
-	return;
+	ঘূৰাই;
     }
 
-    msg_hist_off = TRUE;
+    বাৰ্তা_hist_off = TRUE;
 
-    p = first_msg_hist;
-    if (eap->addr_count != 0)
+    p = first_বাৰ্তা_hist;
+    যদি (eap->addr_গুনতি != 0)
     {
 	// Count total messages
-	for (; p != NULL && !got_int; p = p->next)
+	বাবে (; p != রিক্ত && !got_int; p = p->next)
 	    c++;
 
 	c -= eap->line2;
 
 	// Skip without number of messages specified
-	for (p = first_msg_hist; p != NULL && !got_int && c > 0;
+	বাবে (p = first_বাৰ্তা_hist; p != রিক্ত && !got_int && c > 0;
 						    p = p->next, c--);
     }
 
-    if (p == first_msg_hist)
+    যদি (p == first_বাৰ্তা_hist)
     {
 #ifdef FEAT_MULTI_LANG
 	s = get_mess_lang();
-#else
+#অন্যথা
 	s = mch_getenv((char_u *)"LANG");
 #endif
-	if (s != NULL && *s != NUL)
+	যদি (s != রিক্ত && *s != NUL)
 	    // The next comment is extracted by xgettext and put in po file for
 	    // translators to read.
-	    msg_attr(
+	    বাৰ্তা_attr(
 		    // Translator: Please replace the name and email address
 		    // with the appropriate text for your translation.
 		    _("Messages maintainer: The Vim Project"),
@@ -1205,27 +1205,27 @@ ex_messages(exarg_T *eap)
     }
 
     // Display what was not skipped.
-    for (; p != NULL && !got_int; p = p->next)
-	if (p->msg != NULL)
-	    msg_attr((char *)p->msg, p->attr);
+    বাবে (; p != রিক্ত && !got_int; p = p->next)
+	যদি (p->বাৰ্তা != রিক্ত)
+	    বাৰ্তা_attr((ৱর্ণ *)p->বাৰ্তা, p->attr);
 
-    msg_hist_off = FALSE;
+    বাৰ্তা_hist_off = FALSE;
 }
 
-#if defined(FEAT_CON_DIALOG) || defined(FIND_REPLACE_DIALOG)
+#যদি defined(FEAT_CON_DIALOG) || defined(FIND_REPLACE_DIALOG)
 /*
  * Call this after prompting the user.  This will avoid a hit-return message
  * and a delay.
  */
-    void
-msg_end_prompt(void)
+    শূন্য
+বাৰ্তা_end_prompt(শূন্য)
 {
     need_wait_return = FALSE;
     emsg_on_display = FALSE;
-    cmdline_row = msg_row;
-    msg_col = 0;
-    msg_clr_eos();
-    lines_left = -1;
+    cmdline_row = বাৰ্তা_row;
+    বাৰ্তা_col = 0;
+    বাৰ্তা_clr_eos();
+    সাৰিগুলি_বাম = -1;
 }
 #endif
 
@@ -1235,26 +1235,26 @@ msg_end_prompt(void)
  * If "redraw" is FALSE, just redraw the screen.
  * If "redraw" is -1, don't redraw at all.
  */
-    void
-wait_return(int redraw)
+    শূন্য
+wait_return(পূর্ণাঙ্ক redraw)
 {
-    int		c;
-    int		oldState;
-    int		tmpState;
-    int		had_got_int;
-    int		save_reg_recording;
+    পূর্ণাঙ্ক		c;
+    পূর্ণাঙ্ক		oldState;
+    পূর্ণাঙ্ক		tmpState;
+    পূর্ণাঙ্ক		had_got_int;
+    পূর্ণাঙ্ক		save_reg_recording;
     FILE	*save_scriptout;
 
-    if (redraw == TRUE)
+    যদি (redraw == TRUE)
 	set_must_redraw(UPD_CLEAR);
 
     // If using ":silent cmd", don't wait for a return.  Also don't set
     // need_wait_return to do it later.
-    if (msg_silent != 0)
-	return;
+    যদি (বাৰ্তা_silent != 0)
+	ঘূৰাই;
 #ifdef HAS_MESSAGE_WINDOW
-    if (in_echowindow)
-	return;
+    যদি (in_echowindow)
+	ঘূৰাই;
 #endif
 
     /*
@@ -1263,36 +1263,36 @@ wait_return(int redraw)
      * the end. Adjust cmdline_row to avoid the next message overwriting the
      * last one.
      */
-    if (vgetc_busy > 0)
-	return;
+    যদি (vgetc_busy > 0)
+	ঘূৰাই;
     need_wait_return = TRUE;
-    if (no_wait_return)
+    যদি (no_wait_return)
     {
-	if (!exmode_active)
-	    cmdline_row = msg_row;
-	return;
+	যদি (!exmode_active)
+	    cmdline_row = বাৰ্তা_row;
+	ঘূৰাই;
     }
 
     redir_off = TRUE;		// don't redirect this message
     oldState = State;
-    if (quit_more)
+    যদি (quit_more)
     {
 	c = CAR;		// just pretend CR was hit
 	quit_more = FALSE;
 	got_int = FALSE;
     }
-    else if (exmode_active)
+    অন্যথা যদি (exmode_active)
     {
-	msg_puts(" ");		// make sure the cursor is on the right line
+	বাৰ্তা_puts(" ");		// make sure the cursor is on the right line
 	c = CAR;		// no need for a return in ex mode
 	got_int = FALSE;
     }
-    else if (!stuff_empty())
+    অন্যথা যদি (!stuff_empty())
 	// When there are stuffed characters, the next stuffed character will
 	// dismiss the hit-enter prompt immediately and have to be put back, so
 	// instead just don't show the hit-enter prompt at all.
 	c = CAR;
-    else
+    অন্যথা
     {
 	// Make sure the hit-return prompt is on screen when 'guioptions' was
 	// just changed.
@@ -1303,19 +1303,19 @@ wait_return(int redraw)
 #ifdef USE_ON_FLY_SCROLL
 	dont_scroll = TRUE;		// disallow scrolling here
 #endif
-	cmdline_row = msg_row;
+	cmdline_row = বাৰ্তা_row;
 
 	// Avoid the sequence that the user types ":" at the hit-return prompt
 	// to start an Ex command, but the file-changed dialog gets in the
 	// way.
-	if (need_check_timestamps)
+	যদি (need_check_timestamps)
 	    check_timestamps(FALSE);
 
-	if (msg_flags & MESSAGES_HIT_ENTER)
+	যদি (বাৰ্তা_flags & MESSAGES_HIT_ENTER)
 	{
-	    hit_return_msg();
+	    hit_return_বাৰ্তা();
 
-	    do
+	    কৰা
 	    {
 #ifdef FEAT_IMAGE
 		// Make sure to update image placements (since their row offset
@@ -1329,7 +1329,7 @@ wait_return(int redraw)
 		// Don't do mappings here, we put the character back in the
 		// typeahead buffer.
 		++no_mapping;
-		++allow_keys;
+		++allow_চাবিগুলি;
 
 		// Temporarily disable Recording. If Recording is active, the
 		// character will be recorded later, since it will be added to
@@ -1337,12 +1337,12 @@ wait_return(int redraw)
 		save_reg_recording = reg_recording;
 		save_scriptout = scriptout;
 		reg_recording = 0;
-		scriptout = NULL;
+		scriptout = রিক্ত;
 		c = safe_vgetc();
-		if (had_got_int && !global_busy)
+		যদি (had_got_int && !global_busy)
 		    got_int = FALSE;
 		--no_mapping;
-		--allow_keys;
+		--allow_চাবিগুলি;
 		reg_recording = save_reg_recording;
 		scriptout = save_scriptout;
 
@@ -1351,7 +1351,7 @@ wait_return(int redraw)
 		// at the hit-enter prompt.  Use CTRL-Y, because the same is
 		// used in Cmdline-mode and it's harmless when there is no
 		// selection.
-		if (KeyTyped && c == Ctrl_Y && clip_star.state == SELECT_DONE)
+		যদি (চাবি_Typed && c == Ctrl_Y && clip_star.state == SELECT_DONE)
 		{
 		    clip_copy_modeless_selection(TRUE);
 		    c = K_IGNORE;
@@ -1364,42 +1364,42 @@ wait_return(int redraw)
 		* screen, to avoid that typing one 'j' too many makes the
 		* messages disappear.
 		*/
-		if (KeyTyped && p_more && !p_cp)
+		যদি (চাবি_Typed && p_more && !p_cp)
 		{
-		    if (c == 'b' || c == Ctrl_B || c == 'k' || c == 'u' || c == 'g'
+		    যদি (c == 'b' || c == Ctrl_B || c == 'k' || c == 'u' || c == 'g'
 						|| c == K_UP || c == K_PAGEUP)
 		    {
-			if (msg_scrolled > Rows)
+			যদি (বাৰ্তা_scrolled > Rows)
 			    // scroll back to show older messages
 			    do_more_prompt(c);
-			else
+			অন্যথা
 			{
-			    msg_didout = FALSE;
+			    বাৰ্তা_didout = FALSE;
 			    c = K_IGNORE;
-			    msg_col =
+			    বাৰ্তা_col =
 #ifdef FEAT_RIGHTLEFT
 				cmdmsg_rl ? cmdline_width - 1 :
 #endif
 				0;
 			}
-			if (quit_more)
+			যদি (quit_more)
 			{
 			    c = CAR;		// just pretend CR was hit
 			    quit_more = FALSE;
 			    got_int = FALSE;
 			}
-			else if (c != K_IGNORE)
+			অন্যথা যদি (c != K_IGNORE)
 			{
 			    c = K_IGNORE;
-			    hit_return_msg();
+			    hit_return_বাৰ্তা();
 			}
 		    }
-		    else if (msg_scrolled > Rows - 2
+		    অন্যথা যদি (বাৰ্তা_scrolled > Rows - 2
 			    && (c == 'j' || c == 'd' || c == 'f' || c == Ctrl_F
 					    || c == K_DOWN || c == K_PAGEDOWN))
 			c = K_IGNORE;
 		}
-	    } while ((had_got_int && c == Ctrl_C)
+	    } যেতিয়ালৈ ((had_got_int && c == Ctrl_C)
 				|| c == K_IGNORE
 #ifdef FEAT_GUI
 				|| c == K_VER_SCROLLBAR || c == K_HOR_SCROLLBAR
@@ -1411,7 +1411,7 @@ wait_return(int redraw)
 				|| c == K_MOUSEDOWN  || c == K_MOUSEUP
 				|| c == K_MOUSEMOVE
 				|| (!mouse_has(MOUSE_RETURN)
-				    && mouse_row < msg_row
+				    && mouse_row < বাৰ্তা_row
 				    && (c == K_LEFTMOUSE
 					|| c == K_MIDDLEMOUSE
 					|| c == K_RIGHTMOUSE
@@ -1421,10 +1421,10 @@ wait_return(int redraw)
 	    ui_breakcheck();
 
 	    // Avoid that the mouse-up event causes Visual mode to start.
-	    if (c == K_LEFTMOUSE || c == K_MIDDLEMOUSE || c == K_RIGHTMOUSE
+	    যদি (c == K_LEFTMOUSE || c == K_MIDDLEMOUSE || c == K_RIGHTMOUSE
 					|| c == K_X1MOUSE || c == K_X2MOUSE)
-		(void)jump_to_mouse(MOUSE_SETPOS, NULL, 0);
-	    else if (!KeyTyped || (vim_strchr((char_u *)"\r\n ", c) == NULL
+		(শূন্য)jump_to_mouse(MOUSE_SETPOS, রিক্ত, 0);
+	    অন্যথা যদি (!চাবি_Typed || (vim_strchr((char_u *)"\r\n ", c) == রিক্ত
 						   && c != Ctrl_C && c != 'q'))
 	    {
 		// Put the character back in the typeahead buffer.  Don't use
@@ -1434,11 +1434,11 @@ wait_return(int redraw)
 					// typeahead
 	    }
 	}
-	else
+	অন্যথা
 	{
 	    c = CAR;
 	    // Wait to allow the user to verify the output.
-	    do_sleep(msg_wait, TRUE);
+	    do_sleep(বাৰ্তা_wait, TRUE);
 	}
     }
     redir_off = FALSE;
@@ -1447,10 +1447,10 @@ wait_return(int redraw)
      * If the user hits ':', '?' or '/' we get a command line from the next
      * line.
      */
-    if (c == ':' || c == '?' || c == '/')
+    যদি (c == ':' || c == '?' || c == '/')
     {
-	if (!exmode_active)
-	    cmdline_row = msg_row;
+	যদি (!exmode_active)
+	    cmdline_row = বাৰ্তা_row;
 	skip_redraw = TRUE;	    // skip redraw once
 	do_redraw = FALSE;
 #ifdef FEAT_TERMINAL
@@ -1466,33 +1466,33 @@ wait_return(int redraw)
     tmpState = State;
     State = oldState;		    // restore State before set_shellsize
     setmouse();
-    msg_check();
+    বাৰ্তা_check();
 
 #ifndef MSWIN
     /*
      * On TTY-style terminals (all but Windows), an extra newline is
      * needed when switching screens on exit.
      */
-    if (swapping_screen() && !termcap_active)
+    যদি (swapping_screen() && !termcap_active)
 	newline_on_exit = TRUE;
 #endif
 
     need_wait_return = FALSE;
     did_wait_return = TRUE;
     emsg_on_display = FALSE;	// can delete error message now
-    lines_left = -1;		// reset lines_left at next msg_start()
+    সাৰিগুলি_বাম = -1;		// reset lines_left at next msg_start()
     reset_last_sourcing();
-    if (keep_msg != NULL && vim_strsize(keep_msg) >=
+    যদি (keep_বাৰ্তা != রিক্ত && vim_strsize(keep_বাৰ্তা) >=
 			    (Rows - cmdline_row - 1) * cmdline_width + sc_col)
-	VIM_CLEAR(keep_msg);	    // don't redisplay message, it's too long
+	VIM_CLEAR(keep_বাৰ্তা);	    // don't redisplay message, it's too long
 
-    if (tmpState == MODE_SETWSIZE)  // got resize event while in vgetc()
+    যদি (tmpState == MODE_SETWSIZE)  // got resize event while in vgetc()
     {
 	starttermcap();		    // start termcap before redrawing
 	shell_resized();
     }
-    else if (!skip_redraw
-	    && (redraw == TRUE || (msg_scrolled != 0 && redraw != -1)))
+    অন্যথা যদি (!skip_redraw
+	    && (redraw == TRUE || (বাৰ্তা_scrolled != 0 && redraw != -1)))
     {
 	starttermcap();		    // start termcap before redrawing
 	redraw_later(UPD_VALID);
@@ -1502,190 +1502,190 @@ wait_return(int redraw)
 /*
  * Write the hit-return prompt.
  */
-    static void
-hit_return_msg(void)
+    স্থির শূন্য
+hit_return_বাৰ্তা(শূন্য)
 {
-    int		save_p_more = p_more;
+    পূর্ণাঙ্ক		save_p_more = p_more;
 
     p_more = FALSE;	// don't want to see this message when scrolling back
-    if (msg_didout)	// start on a new line
-	msg_putchar('\n');
-    if (got_int)
-	msg_puts(_("Interrupt: "));
+    যদি (বাৰ্তা_didout)	// start on a new line
+	বাৰ্তা_putchar('\n');
+    যদি (got_int)
+	বাৰ্তা_puts(_("Interrupt: "));
 
-    msg_puts_attr(_("Press ENTER or type command to continue"), HL_ATTR(HLF_R));
-    if (!msg_use_printf())
-	msg_clr_eos();
+    বাৰ্তা_puts_attr(_("Press ENTER or type command to continue"), HL_ATTR(HLF_R));
+    যদি (!বাৰ্তা_use_printf())
+	বাৰ্তা_clr_eos();
     p_more = save_p_more;
 }
 
 /*
  * Set "keep_msg" to "s".  Free the old value and check for NULL pointer.
  */
-    void
-set_keep_msg(char_u *s, int attr)
+    শূন্য
+set_keep_বাৰ্তা(char_u *s, পূর্ণাঙ্ক attr)
 {
-    vim_free(keep_msg);
-    if (s != NULL && msg_silent == 0)
-	keep_msg = vim_strsave(s);
-    else
-	keep_msg = NULL;
-    keep_msg_more = FALSE;
-    keep_msg_attr = attr;
+    vim_free(keep_বাৰ্তা);
+    যদি (s != রিক্ত && বাৰ্তা_silent == 0)
+	keep_বাৰ্তা = vim_strsave(s);
+    অন্যথা
+	keep_বাৰ্তা = রিক্ত;
+    keep_বাৰ্তা_more = FALSE;
+    keep_বাৰ্তা_attr = attr;
 }
 
 /*
  * If there currently is a message being displayed, set "keep_msg" to it, so
  * that it will be displayed again after redraw.
  */
-    void
-set_keep_msg_from_hist(void)
+    শূন্য
+set_keep_বাৰ্তা_from_hist(শূন্য)
 {
-    if (keep_msg == NULL && last_msg_hist != NULL && msg_scrolled == 0
+    যদি (keep_বাৰ্তা == রিক্ত && last_বাৰ্তা_hist != রিক্ত && বাৰ্তা_scrolled == 0
 						      && (State & MODE_NORMAL))
-	set_keep_msg(last_msg_hist->msg, last_msg_hist->attr);
+	set_keep_বাৰ্তা(last_বাৰ্তা_hist->বাৰ্তা, last_বাৰ্তা_hist->attr);
 }
 
 /*
  * Prepare for outputting characters in the command line.
  */
-    void
-msg_start(void)
+    শূন্য
+বাৰ্তা_start(শূন্য)
 {
-    int		did_return = FALSE;
+    পূর্ণাঙ্ক		did_return = FALSE;
 
-    if (msg_row < cmdline_row)
-	msg_row = cmdline_row;
+    যদি (বাৰ্তা_row < cmdline_row)
+	বাৰ্তা_row = cmdline_row;
 
-    if (!msg_silent)
+    যদি (!বাৰ্তা_silent)
     {
-	VIM_CLEAR(keep_msg);
+	VIM_CLEAR(keep_বাৰ্তা);
 	need_fileinfo = FALSE;
     }
 
 #ifdef FEAT_EVAL
-    if (need_clr_eos)
+    যদি (need_clr_eos)
     {
 	// Halfway an ":echo" command and getting an (error) message: clear
 	// any text from the command.
 	need_clr_eos = FALSE;
-	msg_clr_eos();
+	বাৰ্তা_clr_eos();
     }
 #endif
 
 #ifdef HAS_MESSAGE_WINDOW
-    if (in_echowindow)
+    যদি (in_echowindow)
     {
-	if (popup_message_win_visible()
-		    && ((msg_col > 0 && (msg_scroll || !full_screen))
+	যদি (popup_message_win_visible()
+		    && ((বাৰ্তা_col > 0 && (বাৰ্তা_scroll || !full_screen))
 			|| in_echowindow))
 	{
 	    win_T *wp = popup_get_message_win();
 
 	    // start a new line
 	    curbuf = wp->w_buffer;
-	    ml_append(wp->w_buffer->b_ml.ml_line_count,
+	    ml_append(wp->w_buffer->b_ml.ml_সাৰি_গুনতি,
 					      (char_u *)"", (colnr_T)0, FALSE);
 	    curbuf = curwin->w_buffer;
 	}
-	msg_col = 0;
+	বাৰ্তা_col = 0;
     }
-    else
+    অন্যথা
 #endif
-	if (!msg_scroll && full_screen)	// overwrite last message
+	যদি (!বাৰ্তা_scroll && full_screen)	// overwrite last message
     {
-	msg_row = cmdline_row;
-	msg_col =
+	বাৰ্তা_row = cmdline_row;
+	বাৰ্তা_col =
 #ifdef FEAT_RIGHTLEFT
 	    cmdmsg_rl ? cmdline_width - 1 :
 #endif
 	    0;
     }
-    else if (msg_didout || in_echowindow)
+    অন্যথা যদি (বাৰ্তা_didout || in_echowindow)
     {
 	// start message on next line
-	msg_putchar('\n');
+	বাৰ্তা_putchar('\n');
 	did_return = TRUE;
-	if (exmode_active != EXMODE_NORMAL)
-	    cmdline_row = msg_row;
+	যদি (exmode_active != EXMODE_NORMAL)
+	    cmdline_row = বাৰ্তা_row;
     }
-    if (!msg_didany || lines_left < 0)
-	msg_starthere();
-    if (msg_silent == 0)
+    যদি (!বাৰ্তা_didany || সাৰিগুলি_বাম < 0)
+	বাৰ্তা_starthere();
+    যদি (বাৰ্তা_silent == 0)
     {
-	msg_didout = FALSE;		    // no output on current line yet
+	বাৰ্তা_didout = FALSE;		    // no output on current line yet
 	cursor_off();
     }
 
     // when redirecting, may need to start a new line.
-    if (!did_return)
+    যদি (!did_return)
 	redir_write((char_u *)"\n", -1);
 }
 
 /*
  * Note that the current msg position is where messages start.
  */
-    void
-msg_starthere(void)
+    শূন্য
+বাৰ্তা_starthere(শূন্য)
 {
-    lines_left = cmdline_row;
-    msg_didany = FALSE;
+    সাৰিগুলি_বাম = cmdline_row;
+    বাৰ্তা_didany = FALSE;
 }
 
-    void
-msg_putchar(int c)
+    শূন্য
+বাৰ্তা_putchar(পূর্ণাঙ্ক c)
 {
-    msg_putchar_attr(c, 0);
+    বাৰ্তা_putchar_attr(c, 0);
 }
 
-    void
-msg_putchar_attr(int c, int attr)
+    শূন্য
+বাৰ্তা_putchar_attr(পূর্ণাঙ্ক c, পূর্ণাঙ্ক attr)
 {
     char_u	buf[MB_MAXBYTES + 1];
 
-    if (IS_SPECIAL(c))
+    যদি (IS_SPECIAL(c))
     {
 	buf[0] = K_SPECIAL;
 	buf[1] = K_SECOND(c);
 	buf[2] = K_THIRD(c);
 	buf[3] = NUL;
     }
-    else
+    অন্যথা
 	buf[(*mb_char2bytes)(c, buf)] = NUL;
-    msg_puts_attr((char *)buf, attr);
+    বাৰ্তা_puts_attr((ৱর্ণ *)buf, attr);
 }
 
-    void
-msg_outnum(long n)
+    শূন্য
+বাৰ্তা_outnum(long n)
 {
-    char	buf[20];
+    ৱর্ণ	buf[20];
 
     sprintf(buf, "%ld", n);
-    msg_puts(buf);
+    বাৰ্তা_puts(buf);
 }
 
-    void
-msg_home_replace(char_u *fname)
+    শূন্য
+বাৰ্তা_home_replace(char_u *fname)
 {
-    msg_home_replace_attr(fname, 0);
+    বাৰ্তা_home_replace_attr(fname, 0);
 }
 
-#if defined(FEAT_FIND_ID)
-    void
-msg_home_replace_hl(char_u *fname)
+#যদি defined(FEAT_FIND_ID)
+    শূন্য
+বাৰ্তা_home_replace_hl(char_u *fname)
 {
-    msg_home_replace_attr(fname, HL_ATTR(HLF_D));
+    বাৰ্তা_home_replace_attr(fname, HL_ATTR(HLF_D));
 }
 #endif
 
-    static void
-msg_home_replace_attr(char_u *fname, int attr)
+    স্থির শূন্য
+বাৰ্তা_home_replace_attr(char_u *fname, পূর্ণাঙ্ক attr)
 {
     char_u	*name;
 
-    name = home_replace_save(NULL, fname);
-    if (name != NULL)
-	msg_outtrans_attr(name, attr);
+    name = home_replace_save(রিক্ত, fname);
+    যদি (name != রিক্ত)
+	বাৰ্তা_outtrans_attr(name, attr);
     vim_free(name);
 }
 
@@ -1695,22 +1695,22 @@ msg_home_replace_attr(char_u *fname, int attr)
  * Use attributes 'attr'.
  * Return the number of characters it takes on the screen.
  */
-    int
-msg_outtrans(char_u *str)
+    পূর্ণাঙ্ক
+বাৰ্তা_outtrans(char_u *str)
 {
-    return msg_outtrans_attr(str, 0);
+    ঘূৰাই বাৰ্তা_outtrans_attr(str, 0);
 }
 
-    int
-msg_outtrans_attr(char_u *str, int attr)
+    পূর্ণাঙ্ক
+বাৰ্তা_outtrans_attr(char_u *str, পূর্ণাঙ্ক attr)
 {
-    return msg_outtrans_len_attr(str, (int)STRLEN(str), attr);
+    ঘূৰাই বাৰ্তা_outtrans_len_attr(str, (পূর্ণাঙ্ক)STRLEN(str), attr);
 }
 
-    int
-msg_outtrans_len(char_u *str, int len)
+    পূর্ণাঙ্ক
+বাৰ্তা_outtrans_len(char_u *str, পূর্ণাঙ্ক len)
 {
-    return msg_outtrans_len_attr(str, len, 0);
+    ঘূৰাই বাৰ্তা_outtrans_len_attr(str, len, 0);
 }
 
 /*
@@ -1718,46 +1718,46 @@ msg_outtrans_len(char_u *str, int len)
  * Handles multi-byte characters.
  */
     char_u *
-msg_outtrans_one(char_u *p, int attr)
+বাৰ্তা_outtrans_one(char_u *p, পূর্ণাঙ্ক attr)
 {
-    int		l;
+    পূর্ণাঙ্ক		l;
 
-    if (has_mbyte && (l = (*mb_ptr2len)(p)) > 1)
+    যদি (has_mbyte && (l = (*mb_ptr2len)(p)) > 1)
     {
-	msg_outtrans_len_attr(p, l, attr);
-	return p + l;
+	বাৰ্তা_outtrans_len_attr(p, l, attr);
+	ঘূৰাই p + l;
     }
-    msg_puts_attr((char *)transchar_byte_buf(NULL, *p), attr);
-    return p + 1;
+    বাৰ্তা_puts_attr((ৱর্ণ *)transchar_byte_buf(রিক্ত, *p), attr);
+    ঘূৰাই p + 1;
 }
 
-    int
-msg_outtrans_len_attr(char_u *msgstr, int len, int attr)
+    পূর্ণাঙ্ক
+বাৰ্তা_outtrans_len_attr(char_u *msgstr, পূর্ণাঙ্ক len, পূর্ণাঙ্ক attr)
 {
-    int		retval = 0;
+    পূর্ণাঙ্ক		retval = 0;
     char_u	*str = msgstr;
     char_u	*plain_start = msgstr;
     char_u	*s;
-    int		mb_l;
-    int		c;
-    int		save_got_int = got_int;
+    পূর্ণাঙ্ক		mb_l;
+    পূর্ণাঙ্ক		c;
+    পূর্ণাঙ্ক		save_got_int = got_int;
 
     // Only quit when got_int was set in here.
     got_int = FALSE;
 
-    if (attr == 0)
-	attr = HL_ATTR(HLF_MSG);
+    যদি (attr == 0)
+	attr = HL_ATTR(HLF_বাৰ্তা);
 
     // if MSG_HIST flag set, add message to history
-    if (attr & MSG_HIST)
+    যদি (attr & বাৰ্তা_HIST)
     {
-	add_msg_hist(str, len, attr);
-	attr &= ~MSG_HIST;
+	add_বাৰ্তা_hist(str, len, attr);
+	attr &= ~বাৰ্তা_HIST;
     }
 
     // When drawing over the command line no need to clear it later or remove
     // the mode message.
-    if (msg_silent == 0 && len > 0 && msg_row >= cmdline_row && msg_col == 0)
+    যদি (বাৰ্তা_silent == 0 && len > 0 && বাৰ্তা_row >= cmdline_row && বাৰ্তা_col == 0)
     {
 	clear_cmdline = FALSE;
 	mode_displayed = FALSE;
@@ -1765,88 +1765,88 @@ msg_outtrans_len_attr(char_u *msgstr, int len, int attr)
 
     // If the string starts with a composing character first draw a space on
     // which the composing char can be drawn.
-    if (enc_utf8 && utf_iscomposing(utf_ptr2char(msgstr)))
-	msg_puts_attr(" ", attr);
+    যদি (enc_utf8 && utf_iscomposing(utf_ptr2char(msgstr)))
+	বাৰ্তা_puts_attr(" ", attr);
 
     /*
      * Go over the string.  Special characters are translated and printed.
      * Normal characters are printed several at a time.
      */
-    while (--len >= 0 && !got_int)
+    যেতিয়ালৈ (--len >= 0 && !got_int)
     {
-	if (enc_utf8)
+	যদি (enc_utf8)
 	    // Don't include composing chars after the end.
 	    mb_l = utfc_ptr2len_len(str, len + 1);
-	else if (has_mbyte)
+	অন্যথা যদি (has_mbyte)
 	    mb_l = (*mb_ptr2len)(str);
-	else
+	অন্যথা
 	    mb_l = 1;
-	if (has_mbyte && mb_l > 1)
+	যদি (has_mbyte && mb_l > 1)
 	{
 	    c = (*mb_ptr2char)(str);
-	    if (vim_isprintc(c))
+	    যদি (vim_isprintc(c))
 		// printable multi-byte char: count the cells.
 		retval += (*mb_ptr2cells)(str);
-	    else
+	    অন্যথা
 	    {
 		// unprintable multi-byte char: print the printable chars so
 		// far and the translation of the unprintable char.
-		if (str > plain_start)
-		    msg_puts_attr_len((char *)plain_start,
-					       (int)(str - plain_start), attr);
+		যদি (str > plain_start)
+		    বাৰ্তা_puts_attr_len((ৱর্ণ *)plain_start,
+					       (পূর্ণাঙ্ক)(str - plain_start), attr);
 		plain_start = str + mb_l;
-		msg_puts_attr((char *)transchar_buf(NULL, c),
+		বাৰ্তা_puts_attr((ৱর্ণ *)transchar_buf(রিক্ত, c),
 					    attr == 0 ? HL_ATTR(HLF_8) : attr);
 		retval += char2cells(c);
 	    }
 	    len -= mb_l - 1;
 	    str += mb_l;
 	}
-	else
+	অন্যথা
 	{
-	    s = transchar_byte_buf(NULL, *str);
-	    if (s[1] != NUL)
+	    s = transchar_byte_buf(রিক্ত, *str);
+	    যদি (s[1] != NUL)
 	    {
 		// unprintable char: print the printable chars so far and the
 		// translation of the unprintable char.
-		if (str > plain_start)
-		    msg_puts_attr_len((char *)plain_start,
-					       (int)(str - plain_start), attr);
+		যদি (str > plain_start)
+		    বাৰ্তা_puts_attr_len((ৱর্ণ *)plain_start,
+					       (পূর্ণাঙ্ক)(str - plain_start), attr);
 		plain_start = str + 1;
-		msg_puts_attr((char *)s, attr == 0 ? HL_ATTR(HLF_8) : attr);
-		retval += (int)STRLEN(s);
+		বাৰ্তা_puts_attr((ৱর্ণ *)s, attr == 0 ? HL_ATTR(HLF_8) : attr);
+		retval += (পূর্ণাঙ্ক)STRLEN(s);
 	    }
-	    else
+	    অন্যথা
 		++retval;
 	    ++str;
 	}
     }
 
-    if (str > plain_start && !got_int)
+    যদি (str > plain_start && !got_int)
 	// print the printable chars at the end
-	msg_puts_attr_len((char *)plain_start, (int)(str - plain_start), attr);
+	বাৰ্তা_puts_attr_len((ৱর্ণ *)plain_start, (পূর্ণাঙ্ক)(str - plain_start), attr);
 
     got_int |= save_got_int;
 
-    return retval;
+    ঘূৰাই retval;
 }
 
-#if defined(FEAT_QUICKFIX)
-    void
-msg_make(char_u *arg)
+#যদি defined(FEAT_QUICKFIX)
+    শূন্য
+বাৰ্তা_make(char_u *arg)
 {
-    int	    i;
-    static char_u *str = (char_u *)"eeffoc", *rs = (char_u *)"Plon#dqg#vxjduB";
+    পূর্ণাঙ্ক	    i;
+    স্থির char_u *str = (char_u *)"eeffoc", *rs = (char_u *)"Plon#dqg#vxjduB";
 
     arg = skipwhite(arg);
-    for (i = 5; *arg && i >= 0; --i)
-	if (*arg++ != str[i])
-	    break;
-    if (i < 0)
+    বাবে (i = 5; *arg && i >= 0; --i)
+	যদি (*arg++ != str[i])
+	    ভঙ্গ;
+    যদি (i < 0)
     {
-	msg_putchar('\n');
-	for (i = 0; rs[i]; ++i)
-	    msg_putchar(rs[i] - 3);
+	বাৰ্তা_putchar('\n');
+	বাবে (i = 0; rs[i]; ++i)
+	    বাৰ্তা_putchar(rs[i] - 3);
     }
 }
 #endif
@@ -1865,44 +1865,44 @@ msg_make(char_u *arg)
  * This function is used to show mappings, where we want to see how to type
  * the character/string -- webb
  */
-    int
-msg_outtrans_special(
+    পূর্ণাঙ্ক
+বাৰ্তা_outtrans_special(
     char_u	*strstart,
-    int		from,	// TRUE for lhs of a mapping
-    int		maxlen) // screen columns, 0 for unlimited
+    পূর্ণাঙ্ক		from,	// TRUE for lhs of a mapping
+    পূর্ণাঙ্ক		maxlen) // screen columns, 0 for unlimited
 {
     char_u	*str = strstart;
-    int		retval = 0;
-    char	*text;
-    int		attr;
-    int		len;
+    পূর্ণাঙ্ক		retval = 0;
+    ৱর্ণ	*text;
+    পূর্ণাঙ্ক		attr;
+    পূর্ণাঙ্ক		len;
 
     attr = HL_ATTR(HLF_8);
-    while (*str != NUL)
+    যেতিয়ালৈ (*str != NUL)
     {
 	// Leading and trailing spaces need to be displayed in <> form.
-	if ((str == strstart || str[1] == NUL) && *str == ' ')
+	যদি ((str == strstart || str[1] == NUL) && *str == ' ')
 	{
 	    text = "<Space>";
 	    ++str;
 	}
-	else
-	    text = (char *)str2special(&str, from, FALSE);
-	if (text[0] != NUL && text[1] == NUL)
+	অন্যথা
+	    text = (ৱর্ণ *)str2special(&str, from, FALSE);
+	যদি (text[0] != NUL && text[1] == NUL)
 	    // single-byte character or illegal byte
-	    text = (char *)transchar_byte_buf(NULL, (char_u)text[0]);
+	    text = (ৱর্ণ *)transchar_byte_buf(রিক্ত, (char_u)text[0]);
 	len = vim_strsize((char_u *)text);
-	if (maxlen > 0 && retval + len >= maxlen)
-	    break;
+	যদি (maxlen > 0 && retval + len >= maxlen)
+	    ভঙ্গ;
 	// Highlight special keys
-	msg_puts_attr(text, len > 1
+	বাৰ্তা_puts_attr(text, len > 1
 		&& (*mb_ptr2len)((char_u *)text) <= 1 ? attr : 0);
 	retval += len;
     }
-    return retval;
+    ঘূৰাই retval;
 }
 
-#if defined(FEAT_EVAL) || defined(FEAT_SPELL)
+#যদি defined(FEAT_EVAL) || defined(FEAT_SPELL)
 /*
  * Return the lhs or rhs of a mapping, with the key codes turned into printable
  * strings, in an allocated string.
@@ -1910,19 +1910,19 @@ msg_outtrans_special(
     char_u *
 str2special_save(
     char_u  *str,
-    int	    replace_spaces,	// TRUE to replace " " with "<Space>".
+    পূর্ণাঙ্ক	    replace_spaces,	// TRUE to replace " " with "<Space>".
 				// used for the lhs of mapping and keytrans().
-    int	    replace_others)	// TRUE to replace "<" with "<lt>",
+    পূর্ণাঙ্ক	    replace_others)	// TRUE to replace "<" with "<lt>",
 				// "|" with "<Bar>", "\" with "<Bslash>".
 {
     garray_T	ga;
     char_u	*p = str;
 
     ga_init2(&ga, 1, 40);
-    while (*p != NUL)
+    যেতিয়ালৈ (*p != NUL)
 	ga_concat(&ga, str2special(&p, replace_spaces, replace_others));
     ga_append(&ga, NUL);
-    return (char_u *)ga.ga_data;
+    ঘূৰাই (char_u *)ga.ga_data;
 }
 #endif
 
@@ -1935,42 +1935,42 @@ str2special_save(
     char_u *
 str2special(
     char_u	**sp,
-    int		replace_spaces,	// TRUE to replace " " with "<Space>".
+    পূর্ণাঙ্ক		replace_spaces,	// TRUE to replace " " with "<Space>".
 				// used for the lhs of mapping and keytrans().
-    int		replace_others)	// TRUE to replace "<" with "<lt>",
+    পূর্ণাঙ্ক		replace_others)	// TRUE to replace "<" with "<lt>",
 				// "|" with "<Bar>", "\" with "<Bslash>".
 {
-    int			c;
-    static char_u	buf[7];
+    পূর্ণাঙ্ক			c;
+    স্থির char_u	buf[7];
     char_u		*str = *sp;
-    int			modifiers = 0;
-    int			special = FALSE;
+    পূর্ণাঙ্ক			modifiers = 0;
+    পূর্ণাঙ্ক			special = FALSE;
 
-    if (has_mbyte)
+    যদি (has_mbyte)
     {
 	char_u	*p;
 
 	// Try to un-escape a multi-byte character.  Return the un-escaped
 	// string if it is a multi-byte character.
 	p = mb_unescape(sp);
-	if (p != NULL)
-	    return p;
+	যদি (p != রিক্ত)
+	    ঘূৰাই p;
     }
 
     c = *str;
-    if ((c == K_SPECIAL
+    যদি ((c == K_SPECIAL
 #ifdef FEAT_GUI
 		|| c == CSI
 #endif
 	) && str[1] != NUL && str[2] != NUL)
     {
-	if (str[1] == KS_MODIFIER)
+	যদি (str[1] == KS_MODIFIER)
 	{
 	    modifiers = str[2];
 	    str += 3;
 	    c = *str;
 	}
-	if ((c == K_SPECIAL
+	যদি ((c == K_SPECIAL
 #ifdef FEAT_GUI
 		    || c == CSI
 #endif
@@ -1979,187 +1979,187 @@ str2special(
 	    c = TO_SPECIAL(str[1], str[2]);
 	    str += 2;
 	}
-	if (IS_SPECIAL(c) || modifiers)	// special key
+	যদি (IS_SPECIAL(c) || modifiers)	// special key
 	    special = TRUE;
     }
 
-    if (has_mbyte && !IS_SPECIAL(c) && MB_BYTE2LEN(c) > 1)
+    যদি (has_mbyte && !IS_SPECIAL(c) && MB_BYTE2LEN(c) > 1)
     {
 	char_u	*p;
 
 	*sp = str;
 	// Try to un-escape a multi-byte character after modifiers.
 	p = mb_unescape(sp);
-	if (p != NULL)
+	যদি (p != রিক্ত)
 	    // Since 'special' is TRUE the multi-byte character 'c' will be
 	    // processed by get_special_key_name()
 	    c = (*mb_ptr2char)(p);
-	else
+	অন্যথা
 	    // illegal byte
 	    *sp = str + 1;
     }
-    else
+    অন্যথা
 	// single-byte character, NUL or illegal byte
 	*sp = str + (*str == NUL ? 0 : 1);
 
     // Make special keys and C0 control characters in <> form, also <M-Space>.
-    if (special
+    যদি (special
 	|| c < ' '
 	|| (replace_spaces && c == ' ')
 	|| (replace_others && (c == '<' || c == '|' || c == '\\')))
-	return get_special_key_name(c, modifiers);
+	ঘূৰাই get_special_চাবি_name(c, modifiers);
     buf[0] = c;
     buf[1] = NUL;
-    return buf;
+    ঘূৰাই buf;
 }
 
 /*
  * Translate a key sequence into special key names.
  */
-    void
-str2specialbuf(char_u *sp, char_u *buf, int len)
+    শূন্য
+str2specialbuf(char_u *sp, char_u *buf, পূর্ণাঙ্ক len)
 {
     char_u     *s;
     size_t     buf_len = 0;
     size_t     s_len;
 
     *buf = NUL;
-    while (*sp)
+    যেতিয়ালৈ (*sp)
     {
 	s = str2special(&sp, FALSE, FALSE);
 	s_len = STRLEN(s);
-	if (buf_len + s_len < (size_t)len)
+	যদি (buf_len + s_len < (size_t)len)
 	{
 	    STRCPY(buf + buf_len, s);
 	    buf_len += s_len;
 	}
-	else
-	    break;
+	অন্যথা
+	    ভঙ্গ;
     }
 }
 
 /*
  * print line for :print or :list command
  */
-    void
-msg_prt_line(char_u *s, int list)
+    শূন্য
+বাৰ্তা_prt_সাৰি(char_u *s, পূর্ণাঙ্ক list)
 {
-    int		c;
-    int		col = 0;
-    int		n_extra = 0;
-    int		c_extra = 0;
-    int		c_final = 0;
-    char_u	*p_extra = NULL;	    // init to make SASC shut up
-    int		n;
-    int		attr = 0;
-    char_u	*trail = NULL;
-    char_u	*lead = NULL;
-    int		in_multispace = FALSE;
-    int		multispace_pos = 0;
-    int		l;
+    পূর্ণাঙ্ক		c;
+    পূর্ণাঙ্ক		col = 0;
+    পূর্ণাঙ্ক		n_extra = 0;
+    পূর্ণাঙ্ক		c_extra = 0;
+    পূর্ণাঙ্ক		c_final = 0;
+    char_u	*p_extra = রিক্ত;	    // init to make SASC shut up
+    পূর্ণাঙ্ক		n;
+    পূর্ণাঙ্ক		attr = 0;
+    char_u	*trail = রিক্ত;
+    char_u	*lead = রিক্ত;
+    পূর্ণাঙ্ক		in_multispace = FALSE;
+    পূর্ণাঙ্ক		multispace_pos = 0;
+    পূর্ণাঙ্ক		l;
     char_u	buf[MB_MAXBYTES + 1];
 
-    if (curwin->w_p_list)
+    যদি (curwin->w_p_list)
 	list = TRUE;
 
-    if (list)
+    যদি (list)
     {
 	// find start of trailing whitespace
-	if (curwin->w_lcs_chars.trail)
+	যদি (curwin->w_lcs_chars.trail)
 	{
 	    trail = s + STRLEN(s);
-	    while (trail > s && VIM_ISWHITE(trail[-1]))
+	    যেতিয়ালৈ (trail > s && VIM_ISWHITE(trail[-1]))
 		--trail;
 	}
 	// find end of leading whitespace
-	if (curwin->w_lcs_chars.lead
-				 || curwin->w_lcs_chars.leadmultispace != NULL
+	যদি (curwin->w_lcs_chars.lead
+				 || curwin->w_lcs_chars.leadmultispace != রিক্ত
 				 || curwin->w_lcs_chars.leadtab1 != NUL)
 	{
 	    lead = s;
-	    while (VIM_ISWHITE(lead[0]))
+	    যেতিয়ালৈ (VIM_ISWHITE(lead[0]))
 		lead++;
 	    // in a line full of spaces all of them are treated as trailing
-	    if (*lead == NUL)
-		lead = NULL;
+	    যদি (*lead == NUL)
+		lead = রিক্ত;
 	}
     }
 
     // output a space for an empty line, otherwise the line will be
     // overwritten
-    if (*s == NUL && !(list && curwin->w_lcs_chars.eol != NUL))
-	msg_putchar(' ');
+    যদি (*s == NUL && !(list && curwin->w_lcs_chars.eol != NUL))
+	বাৰ্তা_putchar(' ');
 
-    while (!got_int)
+    যেতিয়ালৈ (!got_int)
     {
-	if (n_extra > 0)
+	যদি (n_extra > 0)
 	{
 	    --n_extra;
-	    if (n_extra == 0 && c_final)
+	    যদি (n_extra == 0 && c_final)
 		c = c_final;
-	    else if (c_extra)
+	    অন্যথা যদি (c_extra)
 		c = c_extra;
-	    else
+	    অন্যথা
 		c = *p_extra++;
 	}
-	else if (has_mbyte && (l = (*mb_ptr2len)(s)) > 1)
+	অন্যথা যদি (has_mbyte && (l = (*mb_ptr2len)(s)) > 1)
 	{
 	    col += (*mb_ptr2cells)(s);
-	    if (l >= MB_MAXBYTES)
+	    যদি (l >= MB_MAXBYTES)
 	    {
 		STRCPY(buf, "?");
 	    }
-	    else if (curwin->w_lcs_chars.nbsp != NUL && list
+	    অন্যথা যদি (curwin->w_lcs_chars.nbsp != NUL && list
 		    && (mb_ptr2char(s) == 160
 			|| mb_ptr2char(s) == 0x202f))
 	    {
-		int len = mb_char2bytes(curwin->w_lcs_chars.nbsp, buf);
+		পূর্ণাঙ্ক len = mb_char2bytes(curwin->w_lcs_chars.nbsp, buf);
 
 		buf[len] = NUL;
 	    }
-	    else
+	    অন্যথা
 	    {
 		mch_memmove(buf, s, (size_t)l);
 		buf[l] = NUL;
 	    }
-	    msg_puts((char *)buf);
+	    বাৰ্তা_puts((ৱর্ণ *)buf);
 	    s += l;
-	    continue;
+	    অনুৱর্ত;
 	}
-	else
+	অন্যথা
 	{
 	    attr = 0;
 	    c = *s++;
-	    if (list)
+	    যদি (list)
 	    {
 		in_multispace = c == ' ' && (*s == ' '
 						 || (col > 0 && s[-2] == ' '));
-		if (!in_multispace)
+		যদি (!in_multispace)
 		    multispace_pos = 0;
 	    }
-	    if (c == TAB && (!list || curwin->w_lcs_chars.tab1))
+	    যদি (c == TAB && (!list || curwin->w_lcs_chars.tab1))
 	    {
 		// tab amount depends on current column
 #ifdef FEAT_VARTABS
 		n_extra = tabstop_padding(col, curbuf->b_p_ts,
 						    curbuf->b_p_vts_array) - 1;
-#else
+#অন্যথা
 		n_extra = curbuf->b_p_ts - col % curbuf->b_p_ts - 1;
 #endif
-		if (!list)
+		যদি (!list)
 		{
 		    c = ' ';
 		    c_extra = ' ';
 		    c_final = NUL;
 		}
-		else
+		অন্যথা
 		{
-		    int lcs_tab1 = curwin->w_lcs_chars.tab1;
-		    int lcs_tab2 = curwin->w_lcs_chars.tab2;
-		    int lcs_tab3 = curwin->w_lcs_chars.tab3;
+		    পূর্ণাঙ্ক lcs_tab1 = curwin->w_lcs_chars.tab1;
+		    পূর্ণাঙ্ক lcs_tab2 = curwin->w_lcs_chars.tab2;
+		    পূর্ণাঙ্ক lcs_tab3 = curwin->w_lcs_chars.tab3;
 
 		    // check if leadtab is set in 'listchars'
-		    if (lead != NULL && s <= lead
+		    যদি (lead != রিক্ত && s <= lead
 					&& curwin->w_lcs_chars.leadtab1 != NUL)
 		    {
 			lcs_tab1 = curwin->w_lcs_chars.leadtab1;
@@ -2173,12 +2173,12 @@ msg_prt_line(char_u *s, int list)
 		    attr = HL_ATTR(HLF_8);
 		}
 	    }
-	    else if (c == 160 && list && curwin->w_lcs_chars.nbsp != NUL)
+	    অন্যথা যদি (c == 160 && list && curwin->w_lcs_chars.nbsp != NUL)
 	    {
 		c = curwin->w_lcs_chars.nbsp;
 		attr = HL_ATTR(HLF_8);
 	    }
-	    else if (c == NUL && list && curwin->w_lcs_chars.eol != NUL)
+	    অন্যথা যদি (c == NUL && list && curwin->w_lcs_chars.eol != NUL)
 	    {
 		p_extra = (char_u *)"";
 		c_extra = NUL;
@@ -2188,10 +2188,10 @@ msg_prt_line(char_u *s, int list)
 		attr = HL_ATTR(HLF_AT);
 		--s;
 	    }
-	    else if (c != NUL && (n = byte2cells(c)) > 1)
+	    অন্যথা যদি (c != NUL && (n = byte2cells(c)) > 1)
 	    {
 		n_extra = n - 1;
-		p_extra = transchar_byte_buf(NULL, c);
+		p_extra = transchar_byte_buf(রিক্ত, c);
 		c_extra = NUL;
 		c_final = NUL;
 		c = *p_extra++;
@@ -2199,37 +2199,37 @@ msg_prt_line(char_u *s, int list)
 		// the same in plain text.
 		attr = HL_ATTR(HLF_8);
 	    }
-	    else if (c == ' ')
+	    অন্যথা যদি (c == ' ')
 	    {
-		if (lead != NULL && s <= lead && in_multispace
-			&& curwin->w_lcs_chars.leadmultispace != NULL)
+		যদি (lead != রিক্ত && s <= lead && in_multispace
+			&& curwin->w_lcs_chars.leadmultispace != রিক্ত)
 		{
 		    c = curwin->w_lcs_chars.leadmultispace[multispace_pos++];
-		    if (curwin->w_lcs_chars.leadmultispace[multispace_pos]
+		    যদি (curwin->w_lcs_chars.leadmultispace[multispace_pos]
 									== NUL)
 			multispace_pos = 0;
 		    attr = HL_ATTR(HLF_8);
 		}
-		else if (lead != NULL && s <= lead
+		অন্যথা যদি (lead != রিক্ত && s <= lead
 					    && curwin->w_lcs_chars.lead != NUL)
 		{
 		    c = curwin->w_lcs_chars.lead;
 		    attr = HL_ATTR(HLF_8);
 		}
-		else if (trail != NULL && s > trail)
+		অন্যথা যদি (trail != রিক্ত && s > trail)
 		{
 		    c = curwin->w_lcs_chars.trail;
 		    attr = HL_ATTR(HLF_8);
 		}
-		else if (in_multispace
-			&& curwin->w_lcs_chars.multispace != NULL)
+		অন্যথা যদি (in_multispace
+			&& curwin->w_lcs_chars.multispace != রিক্ত)
 		{
 		    c = curwin->w_lcs_chars.multispace[multispace_pos++];
-		    if (curwin->w_lcs_chars.multispace[multispace_pos] == NUL)
+		    যদি (curwin->w_lcs_chars.multispace[multispace_pos] == NUL)
 			multispace_pos = 0;
 		    attr = HL_ATTR(HLF_8);
 		}
-		else if (list && curwin->w_lcs_chars.space != NUL)
+		অন্যথা যদি (list && curwin->w_lcs_chars.space != NUL)
 		{
 		    c = curwin->w_lcs_chars.space;
 		    attr = HL_ATTR(HLF_8);
@@ -2237,75 +2237,75 @@ msg_prt_line(char_u *s, int list)
 	    }
 	}
 
-	if (c == NUL)
-	    break;
+	যদি (c == NUL)
+	    ভঙ্গ;
 
-	msg_putchar_attr(c, attr);
+	বাৰ্তা_putchar_attr(c, attr);
 	col++;
     }
-    msg_clr_eos();
+    বাৰ্তা_clr_eos();
 }
 
 /*
  * Use screen_puts() to output one multi-byte character.
  * Return the pointer "s" advanced to the next character.
  */
-    static char_u *
-screen_puts_mbyte(char_u *s, int l, int attr)
+    স্থির char_u *
+screen_puts_mbyte(char_u *s, পূর্ণাঙ্ক l, পূর্ণাঙ্ক attr)
 {
-    int		cw;
+    পূর্ণাঙ্ক		cw;
 
-    msg_didout = TRUE;		// remember that line is not empty
+    বাৰ্তা_didout = TRUE;		// remember that line is not empty
     cw = (*mb_ptr2cells)(s);
-    if (cw > 1 && (
+    যদি (cw > 1 && (
 #ifdef FEAT_RIGHTLEFT
-		cmdmsg_rl ? msg_col <= 1 :
+		cmdmsg_rl ? বাৰ্তা_col <= 1 :
 #endif
-		msg_col == cmdline_width - 1))
+		বাৰ্তা_col == cmdline_width - 1))
     {
 	// Doesn't fit, print a highlighted '>' to fill it up.
-	msg_screen_putchar('>', HL_ATTR(HLF_AT));
-	return s;
+	বাৰ্তা_screen_putchar('>', HL_ATTR(HLF_AT));
+	ঘূৰাই s;
     }
 
-    screen_puts_len(s, l, msg_row, cmdline_col_off + msg_col, attr);
+    screen_puts_len(s, l, বাৰ্তা_row, cmdline_col_off + বাৰ্তা_col, attr);
 #ifdef FEAT_RIGHTLEFT
-    if (cmdmsg_rl)
+    যদি (cmdmsg_rl)
     {
-	msg_col -= cw;
-	if (msg_col == 0)
+	বাৰ্তা_col -= cw;
+	যদি (বাৰ্তা_col == 0)
 	{
-	    msg_col = cmdline_width;
-	    ++msg_row;
+	    বাৰ্তা_col = cmdline_width;
+	    ++বাৰ্তা_row;
 	}
     }
-    else
+    অন্যথা
 #endif
     {
-	msg_col += cw;
-	if (msg_col >= cmdline_width)
+	বাৰ্তা_col += cw;
+	যদি (বাৰ্তা_col >= cmdline_width)
 	{
-	    msg_col = 0;
-	    ++msg_row;
+	    বাৰ্তা_col = 0;
+	    ++বাৰ্তা_row;
 	}
     }
-    return s + l;
+    ঘূৰাই s + l;
 }
 
 /*
  * Output a string to the screen at position msg_row, msg_col.
  * Update msg_row and msg_col for the next message.
  */
-    void
-msg_puts(char *s)
+    শূন্য
+বাৰ্তা_puts(ৱর্ণ *s)
 {
-    msg_puts_attr(s, 0);
+    বাৰ্তা_puts_attr(s, 0);
 }
 
-    void
-msg_puts_title(char *s)
+    শূন্য
+বাৰ্তা_puts_title(ৱর্ণ *s)
 {
-    msg_puts_attr(s, HL_ATTR(HLF_T));
+    বাৰ্তা_puts_attr(s, HL_ATTR(HLF_T));
 }
 
 /*
@@ -2313,35 +2313,35 @@ msg_puts_title(char *s)
  * part in the middle and replace it with "..." when necessary.
  * Does not handle multi-byte characters!
  */
-    static void
-msg_outtrans_long_len_attr(char_u *longstr, int len, int attr)
+    স্থির শূন্য
+বাৰ্তা_outtrans_long_len_attr(char_u *longstr, পূর্ণাঙ্ক len, পূর্ণাঙ্ক attr)
 {
-    int		slen = len;
-    int		room;
+    পূর্ণাঙ্ক		slen = len;
+    পূর্ণাঙ্ক		room;
 
-    room = cmdline_width - msg_col;
-    if (len > room && room >= 20)
+    room = cmdline_width - বাৰ্তা_col;
+    যদি (len > room && room >= 20)
     {
 	slen = (room - 3) / 2;
-	msg_outtrans_len_attr(longstr, slen, attr);
-	msg_puts_attr("...", HL_ATTR(HLF_8));
+	বাৰ্তা_outtrans_len_attr(longstr, slen, attr);
+	বাৰ্তা_puts_attr("...", HL_ATTR(HLF_8));
     }
-    msg_outtrans_len_attr(longstr + len - slen, slen, attr);
+    বাৰ্তা_outtrans_len_attr(longstr + len - slen, slen, attr);
 }
 
-    void
-msg_outtrans_long_attr(char_u *longstr, int attr)
+    শূন্য
+বাৰ্তা_outtrans_long_attr(char_u *longstr, পূর্ণাঙ্ক attr)
 {
-    msg_outtrans_long_len_attr(longstr, (int)STRLEN(longstr), attr);
+    বাৰ্তা_outtrans_long_len_attr(longstr, (পূর্ণাঙ্ক)STRLEN(longstr), attr);
 }
 
 /*
  * Basic function for writing a message with highlight attributes.
  */
-    void
-msg_puts_attr(char *s, int attr)
+    শূন্য
+বাৰ্তা_puts_attr(ৱর্ণ *s, পূর্ণাঙ্ক attr)
 {
-    msg_puts_attr_len(s, -1, attr);
+    বাৰ্তা_puts_attr_len(s, -1, attr);
 }
 
 /*
@@ -2349,8 +2349,8 @@ msg_puts_attr(char *s, int attr)
  * When "maxlen" is -1 there is no maximum length.
  * When "maxlen" is >= 0 the message is not put in the history.
  */
-    static void
-msg_puts_attr_len(char *str, int maxlen, int attr)
+    স্থির শূন্য
+বাৰ্তা_puts_attr_len(ৱর্ণ *str, পূর্ণাঙ্ক maxlen, পূর্ণাঙ্ক attr)
 {
     /*
      * If redirection is on, also write to the redirection file.
@@ -2360,17 +2360,17 @@ msg_puts_attr_len(char *str, int maxlen, int attr)
     /*
      * Don't print anything when using ":silent cmd".
      */
-    if (msg_silent != 0)
-	return;
+    যদি (বাৰ্তা_silent != 0)
+	ঘূৰাই;
 
-    if (attr == 0)
-	attr = HL_ATTR(HLF_MSG);
+    যদি (attr == 0)
+	attr = HL_ATTR(HLF_বাৰ্তা);
 
     // if MSG_HIST flag set, add message to history
-    if ((attr & MSG_HIST) && maxlen < 0)
+    যদি ((attr & বাৰ্তা_HIST) && maxlen < 0)
     {
-	add_msg_hist((char_u *)str, -1, attr);
-	attr &= ~MSG_HIST;
+	add_বাৰ্তা_hist((char_u *)str, -1, attr);
+	attr &= ~বাৰ্তা_HIST;
     }
 
     // When writing something to the screen after it has scrolled, requires a
@@ -2378,9 +2378,9 @@ msg_puts_attr_len(char *str, int maxlen, int attr)
     // need_wait_return after some prompt, and then outputting something
     // without scrolling
     // Not needed when only using CR to move the cursor.
-    if (msg_scrolled != 0 && !msg_scrolled_ign && STRCMP(str, "\r") != 0)
+    যদি (বাৰ্তা_scrolled != 0 && !বাৰ্তা_scrolled_ign && STRCMP(str, "\r") != 0)
 	need_wait_return = TRUE;
-    msg_didany = TRUE;		// remember that something was outputted
+    বাৰ্তা_didany = TRUE;		// remember that something was outputted
 
     /*
      * If there is no valid screen, use fprintf so we can see error messages.
@@ -2389,10 +2389,10 @@ msg_puts_attr_len(char *str, int maxlen, int attr)
      * different, e.g. for Win32 console) or we just don't know where the
      * cursor is.
      */
-    if (msg_use_printf())
-	msg_puts_printf((char_u *)str, maxlen);
-    else
-	msg_puts_display((char_u *)str, maxlen, attr, FALSE);
+    যদি (বাৰ্তা_use_printf())
+	বাৰ্তা_puts_printf((char_u *)str, maxlen);
+    অন্যথা
+	বাৰ্তা_puts_display((char_u *)str, maxlen, attr, FALSE);
 
     need_fileinfo = FALSE;
 }
@@ -2407,43 +2407,43 @@ msg_puts_attr_len(char *str, int maxlen, int attr)
  * Put text "t_s" until "end" in the message window.
  * "where" specifies where to put the text.
  */
-    static void
-put_msg_win(win_T *wp, int where, char_u *t_s, char_u *end, linenr_T lnum)
+    স্থির শূন্য
+put_বাৰ্তা_win(win_T *wp, পূর্ণাঙ্ক where, char_u *t_s, char_u *end, linenr_T lnum)
 {
     char_u  *p;
 
-    if (where == PUT_BELOW)
+    যদি (where == PUT_BELOW)
     {
-	if (*end != NUL)
+	যদি (*end != NUL)
 	{
 	    p = vim_strnsave(t_s, end - t_s);
-	    if (p == NULL)
-		return;
+	    যদি (p == রিক্ত)
+		ঘূৰাই;
 	}
-	else
+	অন্যথা
 	    p = t_s;
 	ml_append_buf(wp->w_buffer, lnum, p, (colnr_T)0, FALSE);
-	if (p != t_s)
+	যদি (p != t_s)
 	    vim_free(p);
     }
-    else
+    অন্যথা
     {
 	char_u *newp;
 
 	curbuf = wp->w_buffer;
-	if (where == PUT_APPEND)
+	যদি (where == PUT_APPEND)
 	{
 	    newp = concat_str(ml_get(lnum), t_s);
-	    if (newp == NULL)
-		return;
-	    if (*end != NUL)
+	    যদি (newp == রিক্ত)
+		ঘূৰাই;
+	    যদি (*end != NUL)
 		newp[STRLEN(ml_get(lnum)) + (end - t_s)] = NUL;
 	}
-	else
+	অন্যথা
 	{
 	    newp = vim_strnsave(t_s, end - t_s);
-	    if (newp == NULL)
-		return;
+	    যদি (newp == রিক্ত)
+		ঘূৰাই;
 	}
 	ml_replace(lnum, newp, FALSE);
 	curbuf = curwin->w_buffer;
@@ -2451,7 +2451,7 @@ put_msg_win(win_T *wp, int where, char_u *t_s, char_u *end, linenr_T lnum)
     redraw_win_later(wp, UPD_NOT_VALID);
 
     // set msg_col so that a newline is written if needed
-    msg_col += (int)(end - t_s);
+    বাৰ্তা_col += (পূর্ণাঙ্ক)(end - t_s);
 }
 #endif
 
@@ -2459,54 +2459,54 @@ put_msg_win(win_T *wp, int where, char_u *t_s, char_u *end, linenr_T lnum)
  * The display part of msg_puts_attr_len().
  * May be called recursively to display scroll-back text.
  */
-    static void
-msg_puts_display(
+    স্থির শূন্য
+বাৰ্তা_puts_display(
     char_u	*str,
-    int		maxlen,
-    int		attr,
-    int		recurse)
+    পূর্ণাঙ্ক		maxlen,
+    পূর্ণাঙ্ক		attr,
+    পূর্ণাঙ্ক		recurse)
 {
     char_u	*s = str;
     char_u	*t_s = str;	// string from "t_s" to "s" is still todo
-    int		t_col = 0;	// screen cells todo, 0 when "t_s" not used
-    int		l;
-    int		cw;
+    পূর্ণাঙ্ক		t_col = 0;	// screen cells todo, 0 when "t_s" not used
+    পূর্ণাঙ্ক		l;
+    পূর্ণাঙ্ক		cw;
     char_u	*sb_str = str;
-    int		sb_col = msg_col;
-    int		wrap;
-    int		did_last_char;
+    পূর্ণাঙ্ক		sb_col = বাৰ্তা_col;
+    পূর্ণাঙ্ক		wrap;
+    পূর্ণাঙ্ক		did_last_char;
 #ifdef HAS_MESSAGE_WINDOW
-    int		where = PUT_APPEND;
-    win_T	*msg_win = NULL;
+    পূর্ণাঙ্ক		where = PUT_APPEND;
+    win_T	*বাৰ্তা_win = রিক্ত;
     linenr_T    lnum = 1;
 
-    if (in_echowindow)
+    যদি (in_echowindow)
     {
-	msg_win = popup_get_message_win();
+	বাৰ্তা_win = popup_get_message_win();
 
-	if (msg_win != NULL)
+	যদি (বাৰ্তা_win != রিক্ত)
 	{
-	    if (!popup_message_win_visible())
+	    যদি (!popup_message_win_visible())
 	    {
-		if (*str == NL)
+		যদি (*str == NL)
 		{
 		    // When not showing the message window and the output
 		    // starts with a NL show the message normally.
-		    msg_win = NULL;
+		    বাৰ্তা_win = রিক্ত;
 		}
-		else
+		অন্যথা
 		{
 		    // currently hidden, make it empty
-		    curbuf = msg_win->w_buffer;
-		    while ((curbuf->b_ml.ml_flags & ML_EMPTY) == 0)
+		    curbuf = বাৰ্তা_win->w_buffer;
+		    যেতিয়ালৈ ((curbuf->b_ml.ml_flags & ML_EMPTY) == 0)
 			ml_delete(1);
 		    curbuf = curwin->w_buffer;
 		}
 	    }
-	    else
+	    অন্যথা
 	    {
-		lnum = msg_win->w_buffer->b_ml.ml_line_count;
-		if (msg_col == 0)
+		lnum = বাৰ্তা_win->w_buffer->b_ml.ml_সাৰি_গুনতি;
+		যদি (বাৰ্তা_col == 0)
 		    where = PUT_TRUNC;
 	    }
 	}
@@ -2514,13 +2514,13 @@ msg_puts_display(
 #endif
 
     did_wait_return = FALSE;
-    while ((maxlen < 0 || (int)(s - str) < maxlen) && *s != NUL)
+    যেতিয়ালৈ ((maxlen < 0 || (পূর্ণাঙ্ক)(s - str) < maxlen) && *s != NUL)
     {
 #ifdef HAS_MESSAGE_WINDOW
 	// For echowindow, use full width; for regular messages, leave last column
-	int wrap_col = msg_win != NULL ? cmdline_width : cmdline_width - 1;
-#else
-	int wrap_col = cmdline_width - 1;
+	পূর্ণাঙ্ক wrap_col = বাৰ্তা_win != রিক্ত ? cmdline_width : cmdline_width - 1;
+#অন্যথা
+	পূর্ণাঙ্ক wrap_col = cmdline_width - 1;
 #endif
 
 	/*
@@ -2528,221 +2528,221 @@ msg_puts_display(
 	 * - When outputting a newline.
 	 * - When outputting a character in the last column.
 	 */
-	if (!recurse && msg_row >= Rows - 1 && (*s == '\n' || (
+	যদি (!recurse && বাৰ্তা_row >= Rows - 1 && (*s == '\n' || (
 #ifdef FEAT_RIGHTLEFT
 		    cmdmsg_rl
 		    ? (
-			msg_col <= 1
-		      || (*s == TAB && msg_col <= 7)
-		      || (has_mbyte && (*mb_ptr2cells)(s) > 1 && msg_col <= 2))
+			বাৰ্তা_col <= 1
+		      || (*s == TAB && বাৰ্তা_col <= 7)
+		      || (has_mbyte && (*mb_ptr2cells)(s) > 1 && বাৰ্তা_col <= 2))
 		    :
 #endif
-		      ((*s != '\r' && msg_col + t_col >= wrap_col)
-		       || (*s == TAB && msg_col + t_col
+		      ((*s != '\r' && বাৰ্তা_col + t_col >= wrap_col)
+		       || (*s == TAB && বাৰ্তা_col + t_col
 			   >= (wrap_col & ~7))
 		       || (has_mbyte && (*mb_ptr2cells)(s) > 1
-			   && msg_col + t_col >= wrap_col - 1)))))
+			   && বাৰ্তা_col + t_col >= wrap_col - 1)))))
 	{
 	    /*
 	     * The screen is scrolled up when at the last row (some terminals
 	     * scroll automatically, some don't.  To avoid problems we scroll
 	     * ourselves).
 	     */
-	    if (t_col > 0)
+	    যদি (t_col > 0)
 	    {
 		// output postponed text
 #ifdef HAS_MESSAGE_WINDOW
-		if (msg_win != NULL)
+		যদি (বাৰ্তা_win != রিক্ত)
 		{
-		    put_msg_win(msg_win, where, t_s, s, lnum);
-		    if (where == PUT_BELOW)
+		    put_বাৰ্তা_win(বাৰ্তা_win, where, t_s, s, lnum);
+		    যদি (where == PUT_BELOW)
 			++lnum;
 		    t_col = 0;
 		    where = PUT_BELOW;
 		}
-		else
+		অন্যথা
 #endif
 		    t_puts(&t_col, t_s, s, attr);
 	    }
 
 	    // When no more prompt and no more room, truncate here
-	    if (msg_no_more && lines_left == 0)
-		break;
+	    যদি (বাৰ্তা_no_more && সাৰিগুলি_বাম == 0)
+		ভঙ্গ;
 
 #ifdef HAS_MESSAGE_WINDOW
-	    if (msg_win == NULL)
+	    যদি (বাৰ্তা_win == রিক্ত)
 #endif
 		// Scroll the screen up one line.
-		msg_scroll_up();
+		বাৰ্তা_scroll_up();
 
 #ifdef HAS_MESSAGE_WINDOW
-	    if (msg_win == NULL)
+	    যদি (বাৰ্তা_win == রিক্ত)
 	    {
 #endif
-		msg_row = Rows - 2;
-		if (msg_col >= cmdline_width)  // can happen after screen resize
-		    msg_col = cmdline_width - 1;
+		বাৰ্তা_row = Rows - 2;
+		যদি (বাৰ্তা_col >= cmdline_width)  // can happen after screen resize
+		    বাৰ্তা_col = cmdline_width - 1;
 #ifdef HAS_MESSAGE_WINDOW
 	    }
 #endif
 
 	    // Display char in last column before showing more-prompt.
-	    if (*s >= ' '
+	    যদি (*s >= ' '
 #ifdef FEAT_RIGHTLEFT
 		    && !cmdmsg_rl
 #endif
 	       )
 	    {
-		if (has_mbyte)
+		যদি (has_mbyte)
 		{
-		    if (enc_utf8 && maxlen >= 0)
+		    যদি (enc_utf8 && maxlen >= 0)
 			// avoid including composing chars after the end
-			l = utfc_ptr2len_len(s, (int)((str + maxlen) - s));
-		    else
+			l = utfc_ptr2len_len(s, (পূর্ণাঙ্ক)((str + maxlen) - s));
+		    অন্যথা
 			l = (*mb_ptr2len)(s);
 		    s = screen_puts_mbyte(s, l, attr);
 		}
-		else
-		    msg_screen_putchar(*s++, attr);
+		অন্যথা
+		    বাৰ্তা_screen_putchar(*s++, attr);
 		did_last_char = TRUE;
 	    }
-	    else
+	    অন্যথা
 		did_last_char = FALSE;
 
-	    if (p_more)
+	    যদি (p_more)
 		// store text for scrolling back
 		store_sb_text(&sb_str, s, attr, &sb_col, TRUE);
 
 #ifdef HAS_MESSAGE_WINDOW
-	    if (msg_win == NULL)
+	    যদি (বাৰ্তা_win == রিক্ত)
 	    {
 #endif
-		inc_msg_scrolled();
+		inc_বাৰ্তা_scrolled();
 		need_wait_return = TRUE; // may need wait_return() in main()
 		redraw_cmdline = TRUE;
-		if (cmdline_row > 0 && !exmode_active)
+		যদি (cmdline_row > 0 && !exmode_active)
 		    --cmdline_row;
 
 		/*
 		 * If screen is completely filled and 'more' is set then wait
 		 * for a character.
 		 */
-		if (lines_left > 0)
-		    --lines_left;
+		যদি (সাৰিগুলি_বাম > 0)
+		    --সাৰিগুলি_বাম;
 #ifdef HAS_MESSAGE_WINDOW
 	    }
 #endif
-	    if (p_more && lines_left == 0 && State != MODE_HITRETURN
-					    && !msg_no_more && !exmode_active)
+	    যদি (p_more && সাৰিগুলি_বাম == 0 && State != MODE_HITRETURN
+					    && !বাৰ্তা_no_more && !exmode_active)
 	    {
 #ifdef FEAT_CON_DIALOG
-		if (do_more_prompt(NUL))
-		    s = confirm_msg_tail;
-#else
-		(void)do_more_prompt(NUL);
+		যদি (do_more_prompt(NUL))
+		    s = confirm_বাৰ্তা_tail;
+#অন্যথা
+		(শূন্য)do_more_prompt(NUL);
 #endif
-		if (quit_more)
-		    return;
+		যদি (quit_more)
+		    ঘূৰাই;
 	    }
 
 	    // When we displayed a char in last column need to check if there
 	    // is still more.
-	    if (did_last_char)
-		continue;
+	    যদি (did_last_char)
+		অনুৱর্ত;
 	}
 
 	wrap = *s == '\n'
-		    || msg_col + t_col >= wrap_col
+		    || বাৰ্তা_col + t_col >= wrap_col
 		    || (has_mbyte && (*mb_ptr2cells)(s) > 1
-			    && msg_col + t_col >= wrap_col - 1);
-	if (t_col > 0 && (wrap || *s == '\r' || *s == '\b'
+			    && বাৰ্তা_col + t_col >= wrap_col - 1);
+	যদি (t_col > 0 && (wrap || *s == '\r' || *s == '\b'
 						 || *s == '\t' || *s == BELL))
 	{
 	    // output any postponed text
 #ifdef HAS_MESSAGE_WINDOW
-	    if (msg_win != NULL)
+	    যদি (বাৰ্তা_win != রিক্ত)
 	    {
-		put_msg_win(msg_win, where, t_s, s, lnum);
-		if (where == PUT_BELOW)
+		put_বাৰ্তা_win(বাৰ্তা_win, where, t_s, s, lnum);
+		যদি (where == PUT_BELOW)
 		    ++lnum;
 		t_col = 0;
 		where = PUT_BELOW;
 		// Reset msg_col after outputting to new line in echowindow
-		if (wrap)
-		    msg_col = 0;
+		যদি (wrap)
+		    বাৰ্তা_col = 0;
 	    }
-	    else
+	    অন্যথা
 #endif
 		t_puts(&t_col, t_s, s, attr);
 	}
 
-	if (wrap && p_more && !recurse)
+	যদি (wrap && p_more && !recurse)
 	    // store text for scrolling back
 	    store_sb_text(&sb_str, s, attr, &sb_col, TRUE);
 
-	if (*s == '\n')		    // go to next line
+	যদি (*s == '\n')		    // go to next line
 	{
 #ifdef HAS_MESSAGE_WINDOW
-	    if (msg_win != NULL)
+	    যদি (বাৰ্তা_win != রিক্ত)
 	    {
 		// Ignore a NL when the buffer is empty, it is used to scroll
 		// up the text.
-		if ((msg_win->w_buffer->b_ml.ml_flags & ML_EMPTY) == 0)
+		যদি ((বাৰ্তা_win->w_buffer->b_ml.ml_flags & ML_EMPTY) == 0)
 		{
-		    put_msg_win(msg_win, PUT_BELOW, t_s, t_s, lnum);
+		    put_বাৰ্তা_win(বাৰ্তা_win, PUT_BELOW, t_s, t_s, lnum);
 		    ++lnum;
 		}
-		msg_col = 0;  // Reset column for new line
+		বাৰ্তা_col = 0;  // Reset column for new line
 	    }
-	    else
+	    অন্যথা
 #endif
-		msg_didout = FALSE;	    // remember that line is empty
+		বাৰ্তা_didout = FALSE;	    // remember that line is empty
 #ifdef FEAT_RIGHTLEFT
-	    if (cmdmsg_rl)
-		msg_col = cmdline_width - 1;
-	    else
+	    যদি (cmdmsg_rl)
+		বাৰ্তা_col = cmdline_width - 1;
+	    অন্যথা
 #endif
-		msg_col = 0;
-	    if (++msg_row >= Rows)  // safety check
-		msg_row = Rows - 1;
+		বাৰ্তা_col = 0;
+	    যদি (++বাৰ্তা_row >= Rows)  // safety check
+		বাৰ্তা_row = Rows - 1;
 	}
-	else if (*s == '\r')	    // go to column 0
+	অন্যথা যদি (*s == '\r')	    // go to column 0
 	{
-	    msg_col = 0;
+	    বাৰ্তা_col = 0;
 #ifdef HAS_MESSAGE_WINDOW
 	    where = PUT_TRUNC;
 #endif
 	}
-	else if (*s == '\b')	    // go to previous char
+	অন্যথা যদি (*s == '\b')	    // go to previous char
 	{
-	    if (msg_col)
-		--msg_col;
+	    যদি (বাৰ্তা_col)
+		--বাৰ্তা_col;
 	}
-	else if (*s == TAB)	    // translate Tab into spaces
+	অন্যথা যদি (*s == TAB)	    // translate Tab into spaces
 	{
 #ifdef HAS_MESSAGE_WINDOW
-	    if (msg_win != NULL)
-		msg_col = (msg_col + 7) % 8;
-	    else
+	    যদি (বাৰ্তা_win != রিক্ত)
+		বাৰ্তা_col = (বাৰ্তা_col + 7) % 8;
+	    অন্যথা
 #endif
-		do
-		    msg_screen_putchar(' ', attr);
-		while (msg_col & 7);
+		কৰা
+		    বাৰ্তা_screen_putchar(' ', attr);
+		যেতিয়ালৈ (বাৰ্তা_col & 7);
 	}
-	else if (*s == BELL)		// beep (from ":sh")
+	অন্যথা যদি (*s == BELL)		// beep (from ":sh")
 	    vim_beep(BO_SH);
-	else
+	অন্যথা
 	{
-	    if (has_mbyte)
+	    যদি (has_mbyte)
 	    {
 		cw = (*mb_ptr2cells)(s);
-		if (enc_utf8 && maxlen >= 0)
+		যদি (enc_utf8 && maxlen >= 0)
 		    // avoid including composing chars after the end
-		    l = utfc_ptr2len_len(s, (int)((str + maxlen) - s));
-		else
+		    l = utfc_ptr2len_len(s, (পূর্ণাঙ্ক)((str + maxlen) - s));
+		অন্যথা
 		    l = (*mb_ptr2len)(s);
 	    }
-	    else
+	    অন্যথা
 	    {
 		cw = 1;
 		l = 1;
@@ -2751,21 +2751,21 @@ msg_puts_display(
 	    // When drawing from right to left or when a double-wide character
 	    // doesn't fit, draw a single character here.  Otherwise collect
 	    // characters and draw them all at once later.
-	    if (
+	    যদি (
 #ifdef FEAT_RIGHTLEFT
 		    cmdmsg_rl ||
 #endif
-		    (cw > 1 && msg_col + t_col >= wrap_col))
+		    (cw > 1 && বাৰ্তা_col + t_col >= wrap_col))
 	    {
-		if (l > 1)
+		যদি (l > 1)
 		    s = screen_puts_mbyte(s, l, attr) - 1;
-		else
-		    msg_screen_putchar(*s, attr);
+		অন্যথা
+		    বাৰ্তা_screen_putchar(*s, attr);
 	    }
-	    else
+	    অন্যথা
 	    {
 		// postpone this character until later
-		if (t_col == 0)
+		যদি (t_col == 0)
 		    t_s = s;
 		t_col += cw;
 		s += l - 1;
@@ -2775,117 +2775,117 @@ msg_puts_display(
     }
 
     // output any postponed text
-    if (t_col > 0)
+    যদি (t_col > 0)
     {
 #ifdef HAS_MESSAGE_WINDOW
-	if (msg_win != NULL)
-	    put_msg_win(msg_win, where, t_s, s, lnum);
-	else
+	যদি (বাৰ্তা_win != রিক্ত)
+	    put_বাৰ্তা_win(বাৰ্তা_win, where, t_s, s, lnum);
+	অন্যথা
 #endif
 	    t_puts(&t_col, t_s, s, attr);
     }
 
 #ifdef HAS_MESSAGE_WINDOW
-    if (msg_win != NULL)
+    যদি (বাৰ্তা_win != রিক্ত)
 	popup_show_message_win();
 #endif
     // Store the text for scroll back.
-    if (p_more && !recurse)
+    যদি (p_more && !recurse)
 	store_sb_text(&sb_str, s, attr, &sb_col, FALSE);
 
-    msg_check();
+    বাৰ্তা_check();
 }
 
 /*
  * Return TRUE when ":filter pattern" was used and "msg" does not match
  * "pattern".
  */
-    int
-message_filtered(char_u *msg)
+    পূর্ণাঙ্ক
+message_filtered(char_u *বাৰ্তা)
 {
-    int match;
+    পূর্ণাঙ্ক match;
 
-    if (cmdmod.cmod_filter_regmatch.regprog == NULL)
-	return FALSE;
-    match = vim_regexec(&cmdmod.cmod_filter_regmatch, msg, (colnr_T)0);
-    return cmdmod.cmod_filter_force ? match : !match;
+    যদি (cmdmod.cmod_filter_regmatch.regprog == রিক্ত)
+	ঘূৰাই FALSE;
+    match = vim_regexec(&cmdmod.cmod_filter_regmatch, বাৰ্তা, (colnr_T)0);
+    ঘূৰাই cmdmod.cmod_filter_force ? match : !match;
 }
 
 /*
  * Scroll the screen up one line for displaying the next message line.
  */
-    static void
-msg_scroll_up(void)
+    স্থির শূন্য
+বাৰ্তা_scroll_up(শূন্য)
 {
 #ifdef HAS_MESSAGE_WINDOW
-    if (in_echowindow)
-	return;
+    যদি (in_echowindow)
+	ঘূৰাই;
 #endif
 #ifdef FEAT_GUI
     // Remove the cursor before scrolling, ScreenLines[] is going
     // to become invalid.
-    if (gui.in_use)
+    যদি (gui.in_use)
 	gui_undraw_cursor();
 #endif
     // scrolling up always works
     mch_disable_flush();
-    screen_del_lines(0, 0, 1, (int)Rows, TRUE, 0, NULL);
+    screen_del_সাৰিগুলি(0, 0, 1, (পূর্ণাঙ্ক)Rows, TRUE, 0, রিক্ত);
     mch_enable_flush();
 
-    if (!can_clear((char_u *)" "))
+    যদি (!can_clear((char_u *)" "))
     {
 	// Scrolling up doesn't result in the right background.  Set the
 	// background here.  It's not efficient, but avoids that we have to do
 	// it all over the code.
-	screen_fill((int)Rows - 1, (int)Rows, cmdline_col_off,
-		cmdline_col_off + cmdline_width, ' ', ' ', HL_ATTR(HLF_MSG));
+	screen_fill((পূর্ণাঙ্ক)Rows - 1, (পূর্ণাঙ্ক)Rows, cmdline_col_off,
+		cmdline_col_off + cmdline_width, ' ', ' ', HL_ATTR(HLF_বাৰ্তা));
 
 	// Also clear the last char of the last but one line if it was not
 	// cleared before to avoid a scroll-up.
-	if (ScreenAttrs[LineOffset[Rows - 2] + Columns - 1] == (sattr_T)-1)
-	    screen_fill((int)Rows - 2, (int)Rows - 1,
-				 (int)Columns - 1, (int)Columns,
-				 ' ', ' ', HL_ATTR(HLF_MSG));
+	যদি (ScreenAttrs[সাৰি_Offset[Rows - 2] + Columns - 1] == (sattr_T)-1)
+	    screen_fill((পূর্ণাঙ্ক)Rows - 2, (পূর্ণাঙ্ক)Rows - 1,
+				 (পূর্ণাঙ্ক)Columns - 1, (পূর্ণাঙ্ক)Columns,
+				 ' ', ' ', HL_ATTR(HLF_বাৰ্তা));
     }
 }
 
 /*
  * Increment "msg_scrolled".
  */
-    static void
-inc_msg_scrolled(void)
+    স্থির শূন্য
+inc_বাৰ্তা_scrolled(শূন্য)
 {
 #ifdef FEAT_EVAL
-    if (*get_vim_var_str(VV_SCROLLSTART) == NUL)
+    যদি (*get_vim_var_str(VV_SCROLLSTART) == NUL)
     {
 	string_T    p = {SOURCING_NAME, 0};
-	char_u	    *tofree = NULL;
+	char_u	    *tofree = রিক্ত;
 
 	// v:scrollstart is empty, set it to the script/function name and line
-	// number
-	if (p.string == NULL)
+	//সংখ্যা
+	যদি (p.string == রিক্ত)
 	{
 	    p.string = (char_u *)_("Unknown");
 	    p.length = STRLEN(p.string);
 	}
-	else
+	অন্যথা
 	{
 	    size_t  tofreesize;
 
-	    tofreesize = (int)STRLEN(p.string) + 40;
+	    tofreesize = (পূর্ণাঙ্ক)STRLEN(p.string) + 40;
 	    tofree = alloc(tofreesize);
-	    if (tofree != NULL)
+	    যদি (tofree != রিক্ত)
 	    {
-		p.length = vim_snprintf_safelen((char *)tofree, tofreesize,
+		p.length = vim_snprintf_safelen((ৱর্ণ *)tofree, tofreesize,
 		    _("%s line %ld"), p.string, (long)SOURCING_LNUM);
 		p.string = tofree;
 	    }
 	}
-	set_vim_var_string(VV_SCROLLSTART, p.string, (int)p.length);
+	set_vim_var_string(VV_SCROLLSTART, p.string, (পূর্ণাঙ্ক)p.length);
 	vim_free(tofree);
     }
 #endif
-    ++msg_scrolled;
+    ++বাৰ্তা_scrolled;
     set_must_redraw(UPD_VALID);
 }
 
@@ -2893,22 +2893,22 @@ inc_msg_scrolled(void)
  * To be able to scroll back at the "more" and "hit-enter" prompts we need to
  * store the displayed text and remember where screen lines start.
  */
-typedef struct msgchunk_S msgchunk_T;
-struct msgchunk_S
+প্রকারনির্দেশ সংরচনা msgchunk_S msgchunk_T;
+সংরচনা msgchunk_S
 {
     msgchunk_T	*sb_next;
     msgchunk_T	*sb_prev;
-    char	sb_eol;		// TRUE when line ends after this text
-    int		sb_msg_col;	// column in which text starts
-    int		sb_attr;	// text attributes
+    ৱর্ণ	sb_eol;		// TRUE when line ends after this text
+    পূর্ণাঙ্ক		sb_বাৰ্তা_col;	// column in which text starts
+    পূর্ণাঙ্ক		sb_attr;	// text attributes
     char_u	sb_text[1];	// text to be displayed, actually longer
 };
 
-static msgchunk_T *last_msgchunk = NULL; // last displayed text
+স্থির msgchunk_T *last_msgchunk = রিক্ত; // last displayed text
 
-static msgchunk_T *msg_sb_start(msgchunk_T *mps);
+স্থির msgchunk_T *বাৰ্তা_sb_start(msgchunk_T *mps);
 
-typedef enum {
+প্রকারনির্দেশ গণনা {
     SB_CLEAR_NONE = 0,
     SB_CLEAR_ALL,
     SB_CLEAR_CMDLINE_BUSY,
@@ -2916,54 +2916,54 @@ typedef enum {
 } sb_clear_T;
 
 // When to clear text on next msg.
-static sb_clear_T do_clear_sb_text = SB_CLEAR_NONE;
+স্থির sb_clear_T do_clear_sb_text = SB_CLEAR_NONE;
 
 /*
  * Store part of a printed message for displaying when scrolling back.
  */
-    static void
+    স্থির শূন্য
 store_sb_text(
     char_u	**sb_str,	// start of string
     char_u	*s,		// just after string
-    int		attr,
-    int		*sb_col,
-    int		finish)		// line ends
+    পূর্ণাঙ্ক		attr,
+    পূর্ণাঙ্ক		*sb_col,
+    পূর্ণাঙ্ক		finish)		// line ends
 {
     msgchunk_T	*mp;
 
-    if (do_clear_sb_text == SB_CLEAR_ALL
+    যদি (do_clear_sb_text == SB_CLEAR_ALL
 	    || do_clear_sb_text == SB_CLEAR_CMDLINE_DONE)
     {
 	clear_sb_text(do_clear_sb_text == SB_CLEAR_ALL);
-	msg_sb_eol();  // prevent messages from overlapping
+	বাৰ্তা_sb_eol();  // prevent messages from overlapping
 	do_clear_sb_text = SB_CLEAR_NONE;
     }
 
-    if (s > *sb_str)
+    যদি (s > *sb_str)
     {
 	mp = alloc(offsetof(msgchunk_T, sb_text) + (s - *sb_str) + 1);
-	if (mp != NULL)
+	যদি (mp != রিক্ত)
 	{
 	    mp->sb_eol = finish;
-	    mp->sb_msg_col = *sb_col;
+	    mp->sb_বাৰ্তা_col = *sb_col;
 	    mp->sb_attr = attr;
 	    vim_strncpy(mp->sb_text, *sb_str, s - *sb_str);
 
-	    if (last_msgchunk == NULL)
+	    যদি (last_msgchunk == রিক্ত)
 	    {
 		last_msgchunk = mp;
-		mp->sb_prev = NULL;
+		mp->sb_prev = রিক্ত;
 	    }
-	    else
+	    অন্যথা
 	    {
 		mp->sb_prev = last_msgchunk;
 		last_msgchunk->sb_next = mp;
 		last_msgchunk = mp;
 	    }
-	    mp->sb_next = NULL;
+	    mp->sb_next = রিক্ত;
 	}
     }
-    else if (finish && last_msgchunk != NULL)
+    অন্যথা যদি (finish && last_msgchunk != রিক্ত)
 	last_msgchunk->sb_eol = TRUE;
 
     *sb_str = s;
@@ -2973,8 +2973,8 @@ store_sb_text(
 /*
  * Finished showing messages, clear the scroll-back text on the next message.
  */
-    void
-may_clear_sb_text(void)
+    শূন্য
+may_clear_sb_text(শূন্য)
 {
     do_clear_sb_text = SB_CLEAR_ALL;
 }
@@ -2982,17 +2982,17 @@ may_clear_sb_text(void)
 /*
  * Starting to edit the command line: do not clear messages now.
  */
-    void
-sb_text_start_cmdline(void)
+    শূন্য
+sb_text_start_cmdline(শূন্য)
 {
-    if (do_clear_sb_text == SB_CLEAR_CMDLINE_BUSY)
+    যদি (do_clear_sb_text == SB_CLEAR_CMDLINE_BUSY)
 	// Invoking command line recursively: the previous-level command line
 	// doesn't need to be remembered as it will be redrawn when returning
 	// to that level.
 	sb_text_restart_cmdline();
-    else
+    অন্যথা
     {
-	msg_sb_eol();
+	বাৰ্তা_sb_eol();
 	do_clear_sb_text = SB_CLEAR_CMDLINE_BUSY;
     }
 }
@@ -3000,23 +3000,23 @@ sb_text_start_cmdline(void)
 /*
  * Redrawing the command line: clear the last unfinished line.
  */
-    void
-sb_text_restart_cmdline(void)
+    শূন্য
+sb_text_restart_cmdline(শূন্য)
 {
     msgchunk_T *tofree;
 
     // Needed when returning from nested command line.
     do_clear_sb_text = SB_CLEAR_CMDLINE_BUSY;
 
-    if (last_msgchunk == NULL || last_msgchunk->sb_eol)
+    যদি (last_msgchunk == রিক্ত || last_msgchunk->sb_eol)
 	// No unfinished line: don't clear anything.
-	return;
+	ঘূৰাই;
 
-    tofree = msg_sb_start(last_msgchunk);
+    tofree = বাৰ্তা_sb_start(last_msgchunk);
     last_msgchunk = tofree->sb_prev;
-    if (last_msgchunk != NULL)
-	last_msgchunk->sb_next = NULL;
-    while (tofree != NULL)
+    যদি (last_msgchunk != রিক্ত)
+	last_msgchunk->sb_next = রিক্ত;
+    যেতিয়ালৈ (tofree != রিক্ত)
     {
 	msgchunk_T *tofree_next = tofree->sb_next;
 
@@ -3028,8 +3028,8 @@ sb_text_restart_cmdline(void)
 /*
  * Ending to edit the command line: clear old lines but the last one later.
  */
-    void
-sb_text_end_cmdline(void)
+    শূন্য
+sb_text_end_cmdline(শূন্য)
 {
     do_clear_sb_text = SB_CLEAR_CMDLINE_DONE;
 }
@@ -3039,22 +3039,22 @@ sb_text_end_cmdline(void)
  * When "all" is FALSE keep the last line.
  * Called when redrawing the screen.
  */
-    void
-clear_sb_text(int all)
+    শূন্য
+clear_sb_text(পূর্ণাঙ্ক all)
 {
     msgchunk_T	*mp;
     msgchunk_T	**lastp;
 
-    if (all)
+    যদি (all)
 	lastp = &last_msgchunk;
-    else
+    অন্যথা
     {
-	if (last_msgchunk == NULL)
-	    return;
-	lastp = &msg_sb_start(last_msgchunk)->sb_prev;
+	যদি (last_msgchunk == রিক্ত)
+	    ঘূৰাই;
+	lastp = &বাৰ্তা_sb_start(last_msgchunk)->sb_prev;
     }
 
-    while (*lastp != NULL)
+    যেতিয়ালৈ (*lastp != রিক্ত)
     {
 	mp = (*lastp)->sb_prev;
 	vim_free(*lastp);
@@ -3065,17 +3065,17 @@ clear_sb_text(int all)
 /*
  * "g<" command.
  */
-    void
-show_sb_text(void)
+    শূন্য
+show_sb_text(শূন্য)
 {
     msgchunk_T	*mp;
 
     // Only show something if there is more than one line, otherwise it looks
     // weird, typing a command without output results in one line.
-    mp = msg_sb_start(last_msgchunk);
-    if (mp == NULL || mp->sb_prev == NULL)
+    mp = বাৰ্তা_sb_start(last_msgchunk);
+    যদি (mp == রিক্ত || mp->sb_prev == রিক্ত)
 	vim_beep(BO_MESS);
-    else
+    অন্যথা
     {
 	do_more_prompt('G');
 	wait_return(FALSE);
@@ -3085,25 +3085,25 @@ show_sb_text(void)
 /*
  * Move to the start of screen line in already displayed text.
  */
-    static msgchunk_T *
-msg_sb_start(msgchunk_T *mps)
+    স্থির msgchunk_T *
+বাৰ্তা_sb_start(msgchunk_T *mps)
 {
     msgchunk_T *mp = mps;
 
-    while (mp != NULL && mp->sb_prev != NULL && !mp->sb_prev->sb_eol)
+    যেতিয়ালৈ (mp != রিক্ত && mp->sb_prev != রিক্ত && !mp->sb_prev->sb_eol)
 	mp = mp->sb_prev;
-    return mp;
+    ঘূৰাই mp;
 }
 
 /*
  * Mark the last message chunk as finishing the line.
  */
-    void
-msg_sb_eol(void)
+    শূন্য
+বাৰ্তা_sb_eol(শূন্য)
 {
     // A trailing newline starts an empty line that has not been filled yet.
     // Marking it as finished would introduce an extra empty line.
-    if (last_msgchunk != NULL
+    যদি (last_msgchunk != রিক্ত
 	    && !(last_msgchunk->sb_text[0] == '\n'
 		&& last_msgchunk->sb_text[1] == NUL))
 	last_msgchunk->sb_eol = TRUE;
@@ -3114,59 +3114,59 @@ msg_sb_eol(void)
  * When "clear_to_eol" is set clear the rest of the screen line.
  * Returns a pointer to the text for the next line (can be NULL).
  */
-    static msgchunk_T *
-disp_sb_line(int row, msgchunk_T *smp, int clear_to_eol)
+    স্থির msgchunk_T *
+disp_sb_সাৰি(পূর্ণাঙ্ক row, msgchunk_T *smp, পূর্ণাঙ্ক clear_to_eol)
 {
     msgchunk_T	*mp = smp;
     char_u	*p;
 
-    for (;;)
+    বাবে (;;)
     {
-	msg_row = row;
-	msg_col = mp->sb_msg_col;
+	বাৰ্তা_row = row;
+	বাৰ্তা_col = mp->sb_বাৰ্তা_col;
 	p = mp->sb_text;
-	if (*p == '\n')	    // don't display the line break
+	যদি (*p == '\n')	    // don't display the line break
 	    ++p;
-	msg_puts_display(p, -1, mp->sb_attr, TRUE);
+	বাৰ্তা_puts_display(p, -1, mp->sb_attr, TRUE);
 
 	// If clearing the screen did not work (e.g. because of a background
 	// color and t_ut isn't set) clear until the last column here.
-	if (clear_to_eol)
+	যদি (clear_to_eol)
 	    screen_fill(row, row + 1,
-		    cmdline_col_off + msg_col, cmdline_col_off + cmdline_width,
-		    ' ', ' ', HL_ATTR(HLF_MSG));
+		    cmdline_col_off + বাৰ্তা_col, cmdline_col_off + cmdline_width,
+		    ' ', ' ', HL_ATTR(HLF_বাৰ্তা));
 
-	if (mp->sb_eol || mp->sb_next == NULL)
-	    break;
+	যদি (mp->sb_eol || mp->sb_next == রিক্ত)
+	    ভঙ্গ;
 	mp = mp->sb_next;
     }
-    return mp->sb_next;
+    ঘূৰাই mp->sb_next;
 }
 
 /*
  * Output any postponed text for msg_puts_attr_len().
  */
-    static void
+    স্থির শূন্য
 t_puts(
-    int		*t_col,
+    পূর্ণাঙ্ক		*t_col,
     char_u	*t_s,
     char_u	*s,
-    int		attr)
+    পূর্ণাঙ্ক		attr)
 {
     // output postponed text
-    msg_didout = TRUE;		// remember that line is not empty
-    screen_puts_len(t_s, (int)(s - t_s), msg_row, cmdline_col_off + msg_col,
+    বাৰ্তা_didout = TRUE;		// remember that line is not empty
+    screen_puts_len(t_s, (পূর্ণাঙ্ক)(s - t_s), বাৰ্তা_row, cmdline_col_off + বাৰ্তা_col,
 	    attr);
-    msg_col += *t_col;
+    বাৰ্তা_col += *t_col;
     *t_col = 0;
     // If the string starts with a composing character don't increment the
     // column position for it.
-    if (enc_utf8 && utf_iscomposing(utf_ptr2char(t_s)))
-	--msg_col;
-    if (msg_col >= cmdline_width)
+    যদি (enc_utf8 && utf_iscomposing(utf_ptr2char(t_s)))
+	--বাৰ্তা_col;
+    যদি (বাৰ্তা_col >= cmdline_width)
     {
-	msg_col = 0;
-	++msg_row;
+	বাৰ্তা_col = 0;
+	++বাৰ্তা_row;
     }
 }
 
@@ -3178,14 +3178,14 @@ t_puts(
  * different, e.g. for Win32 console) or we just don't know where the
  * cursor is.
  */
-    int
-msg_use_printf(void)
+    পূর্ণাঙ্ক
+বাৰ্তা_use_printf(শূন্য)
 {
-    return (!msg_check_screen()
-#if defined(MSWIN) && (!defined(FEAT_GUI_MSWIN) || defined(VIMDLL))
+    ঘূৰাই (!বাৰ্তা_check_screen()
+#যদি defined(MSWIN) && (!defined(FEAT_GUI_MSWIN) || defined(VIMDLL))
 # ifdef VIMDLL
 	    || (!gui.in_use && !termcap_active)
-# else
+# অন্যথা
 	    || !termcap_active
 # endif
 #endif
@@ -3196,38 +3196,38 @@ msg_use_printf(void)
 /*
  * Print a message when there is no valid screen.
  */
-    static void
-msg_puts_printf(char_u *str, int maxlen)
+    স্থির শূন্য
+বাৰ্তা_puts_printf(char_u *str, পূর্ণাঙ্ক maxlen)
 {
     char_u	*s = str;
-    char_u	*buf = NULL;
+    char_u	*buf = রিক্ত;
     char_u	*p = s;
 
 #ifdef MSWIN
-    if (!(silent_mode && p_verbose == 0))
+    যদি (!(silent_mode && p_verbose == 0))
 	mch_settmode(TMODE_COOK);	// handle CR and NL correctly
 #endif
-    while ((maxlen < 0 || (int)(s - str) < maxlen) && *s != NUL)
+    যেতিয়ালৈ ((maxlen < 0 || (পূর্ণাঙ্ক)(s - str) < maxlen) && *s != NUL)
     {
-	if (!(silent_mode && p_verbose == 0))
+	যদি (!(silent_mode && p_verbose == 0))
 	{
 	    // NL --> CR NL translation (for Unix, not for "--version")
-	    if (*s == NL)
+	    যদি (*s == NL)
 	    {
-		int n = (int)(s - p);
+		পূর্ণাঙ্ক n = (পূর্ণাঙ্ক)(s - p);
 
 		buf = alloc(n + 3);
-		if (buf != NULL)
+		যদি (buf != রিক্ত)
 		{
 		    memcpy(buf, p, n);
-		    if (!info_message)
+		    যদি (!info_message)
 			buf[n++] = CAR;
 		    buf[n++] = NL;
 		    buf[n++] = NUL;
-		    if (info_message)   // informative message, not an error
-			mch_msg((char *)buf);
-		    else
-			mch_errmsg((char *)buf);
+		    যদি (info_message)   // informative message, not an error
+			mch_বাৰ্তা((ৱর্ণ *)buf);
+		    অন্যথা
+			mch_errmsg((ৱর্ণ *)buf);
 		    vim_free(buf);
 		}
 		p = s + 1;
@@ -3236,48 +3236,48 @@ msg_puts_printf(char_u *str, int maxlen)
 
 	// primitive way to compute the current column
 #ifdef FEAT_RIGHTLEFT
-	if (cmdmsg_rl)
+	যদি (cmdmsg_rl)
 	{
-	    if (*s == CAR || *s == NL)
-		msg_col = cmdline_width - 1;
-	    else
-		--msg_col;
+	    যদি (*s == CAR || *s == NL)
+		বাৰ্তা_col = cmdline_width - 1;
+	    অন্যথা
+		--বাৰ্তা_col;
 	}
-	else
+	অন্যথা
 #endif
 	{
-	    if (*s == CAR || *s == NL)
-		msg_col = 0;
-	    else
-		++msg_col;
+	    যদি (*s == CAR || *s == NL)
+		বাৰ্তা_col = 0;
+	    অন্যথা
+		++বাৰ্তা_col;
 	}
 	++s;
     }
 
-    if (*p != NUL && !(silent_mode && p_verbose == 0))
+    যদি (*p != NUL && !(silent_mode && p_verbose == 0))
     {
-	char_u *tofree = NULL;
+	char_u *tofree = রিক্ত;
 
-	if (maxlen > 0 && vim_strlen_maxlen((char *)p, (size_t)maxlen)
+	যদি (maxlen > 0 && vim_strlen_maxlen((ৱর্ণ *)p, (size_t)maxlen)
 							     >= (size_t)maxlen)
 	{
 	    tofree = vim_strnsave(p, (size_t)maxlen);
 	    p = tofree;
 	}
-	if (p != NULL)
+	যদি (p != রিক্ত)
 	{
-	    if (info_message)
-		mch_msg((char *)p);
-	    else
-		mch_errmsg((char *)p);
+	    যদি (info_message)
+		mch_বাৰ্তা((ৱর্ণ *)p);
+	    অন্যথা
+		mch_errmsg((ৱর্ণ *)p);
 	    vim_free(tofree);
 	}
     }
 
-    msg_didout = TRUE;	    // assume that line is not empty
+    বাৰ্তা_didout = TRUE;	    // assume that line is not empty
 
 #ifdef MSWIN
-    if (!(silent_mode && p_verbose == 0))
+    যদি (!(silent_mode && p_verbose == 0))
 	mch_settmode(TMODE_RAW);
 #endif
 }
@@ -3289,69 +3289,69 @@ msg_puts_printf(char_u *str, int maxlen)
  * otherwise it's NUL.
  * Returns TRUE when jumping ahead to "confirm_msg_tail".
  */
-    static int
-do_more_prompt(int typed_char)
+    স্থির পূর্ণাঙ্ক
+do_more_prompt(পূর্ণাঙ্ক typed_char)
 {
-    static int	entered = FALSE;
-    int		used_typed_char = typed_char;
-    int		oldState = State;
-    int		c;
+    স্থির পূর্ণাঙ্ক	entered = FALSE;
+    পূর্ণাঙ্ক		used_typed_char = typed_char;
+    পূর্ণাঙ্ক		oldState = State;
+    পূর্ণাঙ্ক		c;
 #ifdef FEAT_CON_DIALOG
-    int		retval = FALSE;
+    পূর্ণাঙ্ক		retval = FALSE;
 #endif
-    int		toscroll;
-    msgchunk_T	*mp_last = NULL;
+    পূর্ণাঙ্ক		toscroll;
+    msgchunk_T	*mp_last = রিক্ত;
     msgchunk_T	*mp;
-    int		i;
-    int		msg_attr;
+    পূর্ণাঙ্ক		i;
+    পূর্ণাঙ্ক		বাৰ্তা_attr;
 
-    msg_attr = HL_ATTR(HLF_MSG);
+    বাৰ্তা_attr = HL_ATTR(HLF_বাৰ্তা);
 
     // We get called recursively when a timer callback outputs a message. In
     // that case don't show another prompt. Also when at the hit-Enter prompt
     // and nothing was typed.
-    if (entered || (State == MODE_HITRETURN && typed_char == 0))
-	return FALSE;
+    যদি (entered || (State == MODE_HITRETURN && typed_char == 0))
+	ঘূৰাই FALSE;
     entered = TRUE;
 
-    if (typed_char == 'G')
+    যদি (typed_char == 'G')
     {
 	// "g<": Find first line on the last page.
-	mp_last = msg_sb_start(last_msgchunk);
-	for (i = 0; i < Rows - 2 && mp_last != NULL
-					     && mp_last->sb_prev != NULL; ++i)
-	    mp_last = msg_sb_start(mp_last->sb_prev);
+	mp_last = বাৰ্তা_sb_start(last_msgchunk);
+	বাবে (i = 0; i < Rows - 2 && mp_last != রিক্ত
+					     && mp_last->sb_prev != রিক্ত; ++i)
+	    mp_last = বাৰ্তা_sb_start(mp_last->sb_prev);
     }
 
     State = MODE_ASKMORE;
     setmouse();
-    if (typed_char == NUL)
-	msg_moremsg(FALSE);
-    for (;;)
+    যদি (typed_char == NUL)
+	বাৰ্তা_moremsg(FALSE);
+    বাবে (;;)
     {
 	/*
 	 * Get a typed character directly from the user.
 	 */
-	if (used_typed_char != NUL)
+	যদি (used_typed_char != NUL)
 	{
 	    c = used_typed_char;	// was typed at hit-enter prompt
 	    used_typed_char = NUL;
 	}
-	else
+	অন্যথা
 	    c = get_keystroke();
 
-#if defined(FEAT_MENU) && defined(FEAT_GUI)
-	if (c == K_MENU)
+#যদি defined(FEAT_MENU) && defined(FEAT_GUI)
+	যদি (c == K_MENU)
 	{
-	    int idx = get_menu_index(current_menu, MODE_ASKMORE);
+	    পূর্ণাঙ্ক idx = get_menu_index(current_menu, MODE_ASKMORE);
 
 	    // Used a menu.  If it starts with CTRL-Y, it must
 	    // be a "Copy" for the clipboard.  Otherwise
 	    // assume that we end
-	    if (idx == MENU_INDEX_INVALID)
-		continue;
+	    যদি (idx == MENU_INDEX_INVALID)
+		অনুৱর্ত;
 	    c = *current_menu->strings[idx];
-	    if (c != NUL && current_menu->strings[idx][1] != NUL)
+	    যদি (c != NUL && current_menu->strings[idx][1] != NUL)
 		ins_typebuf(current_menu->strings[idx] + 1,
 				current_menu->noremap[idx], 0, TRUE,
 						   current_menu->silent[idx]);
@@ -3359,56 +3359,56 @@ do_more_prompt(int typed_char)
 #endif
 
 	toscroll = 0;
-	switch (c)
+	ৱিকল্প (c)
 	{
-	case BS:		// scroll one line back
-	case K_BS:
-	case 'k':
-	case K_UP:
+	পক্ষ BS:		// scroll one line back
+	পক্ষ K_BS:
+	পক্ষ 'k':
+	পক্ষ K_UP:
 	    toscroll = -1;
-	    break;
+	    ভঙ্গ;
 
-	case CAR:		// one extra line
-	case NL:
-	case 'j':
-	case K_DOWN:
+	পক্ষ CAR:		// one extra line
+	পক্ষ NL:
+	পক্ষ 'j':
+	পক্ষ K_DOWN:
 	    toscroll = 1;
-	    break;
+	    ভঙ্গ;
 
-	case 'u':		// Up half a page
+	পক্ষ 'u':		// Up half a page
 	    toscroll = -(Rows / 2);
-	    break;
+	    ভঙ্গ;
 
-	case 'd':		// Down half a page
+	পক্ষ 'd':		// Down half a page
 	    toscroll = Rows / 2;
-	    break;
+	    ভঙ্গ;
 
-	case 'b':		// one page back
-	case Ctrl_B:
-	case K_PAGEUP:
+	পক্ষ 'b':		// one page back
+	পক্ষ Ctrl_B:
+	পক্ষ K_PAGEUP:
 	    toscroll = -(Rows - 1);
-	    break;
+	    ভঙ্গ;
 
-	case ' ':		// one extra page
-	case 'f':
-	case Ctrl_F:
-	case K_PAGEDOWN:
-	case K_LEFTMOUSE:
+	পক্ষ ' ':		// one extra page
+	পক্ষ 'f':
+	পক্ষ Ctrl_F:
+	পক্ষ K_PAGEDOWN:
+	পক্ষ K_LEFTMOUSE:
 	    toscroll = Rows - 1;
-	    break;
+	    ভঙ্গ;
 
-	case 'g':		// all the way back to the start
+	পক্ষ 'g':		// all the way back to the start
 	    toscroll = -999999;
-	    break;
+	    ভঙ্গ;
 
-	case 'G':		// all the way to the end
+	পক্ষ 'G':		// all the way to the end
 	    toscroll = 999999;
-	    lines_left = 999999;
-	    break;
+	    সাৰিগুলি_বাম = 999999;
+	    ভঙ্গ;
 
-	case ':':		// start new command line
+	পক্ষ ':':		// start new command line
 #ifdef FEAT_CON_DIALOG
-	    if (!confirm_msg_used)
+	    যদি (!confirm_বাৰ্তা_used)
 #endif
 	    {
 		// Since got_int is set all typeahead will be flushed, but we
@@ -3422,16 +3422,16 @@ do_more_prompt(int typed_char)
 		need_wait_return = FALSE;	// don't wait in main()
 	    }
 	    // FALLTHROUGH
-	case 'q':		// quit
-	case Ctrl_C:
-	case ESC:
+	পক্ষ 'q':		// quit
+	পক্ষ Ctrl_C:
+	পক্ষ ESC:
 #ifdef FEAT_CON_DIALOG
-	    if (confirm_msg_used)
+	    যদি (confirm_বাৰ্তা_used)
 	    {
 		// Jump to the choices of the dialog.
 		retval = TRUE;
 	    }
-	    else
+	    অন্যথা
 #endif
 	    {
 		got_int = TRUE;
@@ -3439,161 +3439,161 @@ do_more_prompt(int typed_char)
 	    }
 	    // When there is some more output (wrapping line) display that
 	    // without another prompt.
-	    lines_left = Rows - 1;
-	    break;
+	    সাৰিগুলি_বাম = Rows - 1;
+	    ভঙ্গ;
 
 #ifdef FEAT_CLIPBOARD
-	case Ctrl_Y:
+	পক্ষ Ctrl_Y:
 	    // Strange way to allow copying (yanking) a modeless
 	    // selection at the more prompt.  Use CTRL-Y,
 	    // because the same is used in Cmdline-mode and at the
 	    // hit-enter prompt.  However, scrolling one line up
 	    // might be expected...
-	    if (clip_star.state == SELECT_DONE)
+	    যদি (clip_star.state == SELECT_DONE)
 		clip_copy_modeless_selection(TRUE);
-	    continue;
+	    অনুৱর্ত;
 #endif
-	default:		// no valid response
-	    msg_moremsg(TRUE);
-	    continue;
+	স্ৱভাৱ:		// no valid response
+	    বাৰ্তা_moremsg(TRUE);
+	    অনুৱর্ত;
 	}
 
-	if (toscroll != 0)
+	যদি (toscroll != 0)
 	{
-	    if (toscroll < 0)
+	    যদি (toscroll < 0)
 	    {
 		// go to start of last line
-		if (mp_last == NULL)
-		    mp = msg_sb_start(last_msgchunk);
-		else if (mp_last->sb_prev != NULL)
-		    mp = msg_sb_start(mp_last->sb_prev);
-		else
-		    mp = NULL;
+		যদি (mp_last == রিক্ত)
+		    mp = বাৰ্তা_sb_start(last_msgchunk);
+		অন্যথা যদি (mp_last->sb_prev != রিক্ত)
+		    mp = বাৰ্তা_sb_start(mp_last->sb_prev);
+		অন্যথা
+		    mp = রিক্ত;
 
 		// go to start of line at top of the screen
-		for (i = 0; i < Rows - 2 && mp != NULL && mp->sb_prev != NULL;
+		বাবে (i = 0; i < Rows - 2 && mp != রিক্ত && mp->sb_prev != রিক্ত;
 									  ++i)
-		    mp = msg_sb_start(mp->sb_prev);
+		    mp = বাৰ্তা_sb_start(mp->sb_prev);
 
-		if (mp != NULL && mp->sb_prev != NULL)
+		যদি (mp != রিক্ত && mp->sb_prev != রিক্ত)
 		{
 		    // Find line to be displayed at top.
-		    for (i = 0; i > toscroll; --i)
+		    বাবে (i = 0; i > toscroll; --i)
 		    {
-			if (mp == NULL || mp->sb_prev == NULL)
-			    break;
-			mp = msg_sb_start(mp->sb_prev);
-			if (mp_last == NULL)
-			    mp_last = msg_sb_start(last_msgchunk);
-			else
-			    mp_last = msg_sb_start(mp_last->sb_prev);
+			যদি (mp == রিক্ত || mp->sb_prev == রিক্ত)
+			    ভঙ্গ;
+			mp = বাৰ্তা_sb_start(mp->sb_prev);
+			যদি (mp_last == রিক্ত)
+			    mp_last = বাৰ্তা_sb_start(last_msgchunk);
+			অন্যথা
+			    mp_last = বাৰ্তা_sb_start(mp_last->sb_prev);
 		    }
 
-		    if (toscroll == -1 && screen_ins_lines(0, 0, 1,
-						     (int)Rows, 0, NULL) == OK)
+		    যদি (toscroll == -1 && screen_ins_সাৰিগুলি(0, 0, 1,
+						     (পূর্ণাঙ্ক)Rows, 0, রিক্ত) == OK)
 		    {
 			// display line at top
-			(void)disp_sb_line(0, mp, FALSE);
+			(শূন্য)disp_sb_সাৰি(0, mp, FALSE);
 		    }
-		    else
+		    অন্যথা
 		    {
-			int did_clear = screenclear();
+			পূর্ণাঙ্ক did_clear = screenclear();
 
 			// redisplay all lines
-			for (i = 0; mp != NULL && i < Rows - 1; ++i)
+			বাবে (i = 0; mp != রিক্ত && i < Rows - 1; ++i)
 			{
-			    mp = disp_sb_line(i, mp, !did_clear);
-			    ++msg_scrolled;
+			    mp = disp_sb_সাৰি(i, mp, !did_clear);
+			    ++বাৰ্তা_scrolled;
 			}
 		    }
 		    toscroll = 0;
 		}
 	    }
-	    else
+	    অন্যথা
 	    {
 		// First display any text that we scrolled back.
-		while (toscroll > 0 && mp_last != NULL)
+		যেতিয়ালৈ (toscroll > 0 && mp_last != রিক্ত)
 		{
 		    // scroll up, display line at bottom
-		    msg_scroll_up();
-		    inc_msg_scrolled();
-		    screen_fill((int)Rows - 2, (int)Rows - 1,
+		    বাৰ্তা_scroll_up();
+		    inc_বাৰ্তা_scrolled();
+		    screen_fill((পূর্ণাঙ্ক)Rows - 2, (পূর্ণাঙ্ক)Rows - 1,
 			    cmdline_col_off, cmdline_col_off + cmdline_width,
-			    ' ', ' ', msg_attr);
-		    mp_last = disp_sb_line((int)Rows - 2, mp_last, FALSE);
+			    ' ', ' ', বাৰ্তা_attr);
+		    mp_last = disp_sb_সাৰি((পূর্ণাঙ্ক)Rows - 2, mp_last, FALSE);
 		    --toscroll;
 		}
 	    }
 
-	    if (toscroll <= 0)
+	    যদি (toscroll <= 0)
 	    {
 		// displayed the requested text, more prompt again
-		screen_fill((int)Rows - 1, (int)Rows, cmdline_col_off,
-			cmdline_col_off + cmdline_width, ' ', ' ', msg_attr);
-		msg_moremsg(FALSE);
-		continue;
+		screen_fill((পূর্ণাঙ্ক)Rows - 1, (পূর্ণাঙ্ক)Rows, cmdline_col_off,
+			cmdline_col_off + cmdline_width, ' ', ' ', বাৰ্তা_attr);
+		বাৰ্তা_moremsg(FALSE);
+		অনুৱর্ত;
 	    }
 
 	    // display more text, return to caller
-	    lines_left = toscroll;
+	    সাৰিগুলি_বাম = toscroll;
 	}
 
-	break;
+	ভঙ্গ;
     }
 
     // clear the --more-- message
-    screen_fill((int)Rows - 1, (int)Rows, cmdline_col_off,
-	    cmdline_col_off + cmdline_width, ' ', ' ', msg_attr);
+    screen_fill((পূর্ণাঙ্ক)Rows - 1, (পূর্ণাঙ্ক)Rows, cmdline_col_off,
+	    cmdline_col_off + cmdline_width, ' ', ' ', বাৰ্তা_attr);
     State = oldState;
     setmouse();
-    if (quit_more)
+    যদি (quit_more)
     {
-	msg_row = Rows - 1;
-	msg_col = 0;
+	বাৰ্তা_row = Rows - 1;
+	বাৰ্তা_col = 0;
     }
 #ifdef FEAT_RIGHTLEFT
-    else if (cmdmsg_rl)
-	msg_col = cmdline_width - 1;
+    অন্যথা যদি (cmdmsg_rl)
+	বাৰ্তা_col = cmdline_width - 1;
 #endif
 
     entered = FALSE;
 #ifdef FEAT_CON_DIALOG
-    return retval;
-#else
-    return FALSE;
+    ঘূৰাই retval;
+#অন্যথা
+    ঘূৰাই FALSE;
 #endif
 }
 
-#if defined(USE_MCH_ERRMSG)
+#যদি defined(USE_MCH_ERRMSG)
 
 # ifdef mch_errmsg
 #  undef mch_errmsg
 # endif
-# ifdef mch_msg
-#  undef mch_msg
+# ifdef mch_বাৰ্তা
+#  undef mch_বাৰ্তা
 # endif
 
-# if defined(MSWIN) && (!defined(FEAT_GUI_MSWIN) || defined(VIMDLL))
-    static void
-mch_errmsg_c(char *str)
+# যদি defined(MSWIN) && (!defined(FEAT_GUI_MSWIN) || defined(VIMDLL))
+    স্থির শূন্য
+mch_errmsg_c(ৱর্ণ *str)
 {
     DWORD   nwrite = 0;
     DWORD   mode = 0;
     HANDLE  h = GetStdHandle(STD_ERROR_HANDLE);
 
-    if (GetConsoleMode(h, &mode) && enc_codepage >= 0
-	    && (int)GetConsoleCP() != enc_codepage)
+    যদি (GetConsoleMode(h, &mode) && enc_codepage >= 0
+	    && (পূর্ণাঙ্ক)GetConsoleCP() != enc_codepage)
     {
-	int	len = (int)STRLEN(str);
+	পূর্ণাঙ্ক	len = (পূর্ণাঙ্ক)STRLEN(str);
 	WCHAR	*w = enc_to_utf16((char_u *)str, &len);
 
-	if (w != NULL)
+	যদি (w != রিক্ত)
 	{
-	    WriteConsoleW(h, w, len, &nwrite, NULL);
+	    WriteConsoleW(h, w, len, &nwrite, রিক্ত);
 	    vim_free(w);
 	}
     }
-    else
+    অন্যথা
     {
 	fprintf(stderr, "%s", str);
     }
@@ -3605,22 +3605,22 @@ mch_errmsg_c(char *str)
  * yet.  When stderr can't be used, collect error messages until the GUI has
  * started and they can be displayed in a message box.
  */
-    void
-mch_errmsg(char *str)
+    শূন্য
+mch_errmsg(ৱর্ণ *str)
 {
-# if !defined(MSWIN) || defined(FEAT_GUI_MSWIN)
-    int		len;
+# যদি !defined(MSWIN) || defined(FEAT_GUI_MSWIN)
+    পূর্ণাঙ্ক		len;
 # endif
 
-# if (defined(UNIX) || defined(FEAT_GUI)) && !defined(ALWAYS_USE_GUI) && !defined(VIMDLL)
+# যদি (defined(UNIX) || defined(FEAT_GUI)) && !defined(ALWAYS_USE_GUI) && !defined(VIMDLL)
     // On Unix use stderr if it's a tty.
     // When not going to start the GUI also use stderr.
     // On Mac, when started from Finder, stderr is the console.
-    if (
+    যদি (
 #  ifdef UNIX
 #   ifdef MACOS_X
 	    (isatty(2) && strcmp("/dev/console", ttyname(2)) != 0)
-#   else
+#   অন্যথা
 	    isatty(2)
 #   endif
 #   ifdef FEAT_GUI
@@ -3633,31 +3633,31 @@ mch_errmsg(char *str)
 	    )
     {
 	fprintf(stderr, "%s", str);
-	return;
+	ঘূৰাই;
     }
 # endif
 
-# if defined(MSWIN) && (!defined(FEAT_GUI_MSWIN) || defined(VIMDLL))
+# যদি defined(MSWIN) && (!defined(FEAT_GUI_MSWIN) || defined(VIMDLL))
 #  ifdef VIMDLL
-    if (!(gui.in_use || gui.starting))
+    যদি (!(gui.in_use || gui.starting))
 #  endif
     {
 	mch_errmsg_c(str);
-	return;
+	ঘূৰাই;
     }
 # endif
 
-# if !defined(MSWIN) || defined(FEAT_GUI_MSWIN)
+# যদি !defined(MSWIN) || defined(FEAT_GUI_MSWIN)
     // avoid a delay for a message that isn't there
     emsg_on_display = FALSE;
 
-    len = (int)STRLEN(str) + 1;
-    if (error_ga.ga_growsize == 0)
+    len = (পূর্ণাঙ্ক)STRLEN(str) + 1;
+    যদি (error_ga.ga_growsize == 0)
     {
 	error_ga.ga_growsize = 80;
 	error_ga.ga_itemsize = 1;
     }
-    if (ga_grow(&error_ga, len) == OK)
+    যদি (ga_grow(&error_ga, len) == OK)
     {
 	mch_memmove((char_u *)error_ga.ga_data + error_ga.ga_len,
 							  (char_u *)str, len);
@@ -3667,11 +3667,11 @@ mch_errmsg(char *str)
 	    char_u	*p;
 
 	    p = (char_u *)error_ga.ga_data + error_ga.ga_len;
-	    for (;;)
+	    বাবে (;;)
 	    {
 		p = vim_strchr(p, '\r');
-		if (p == NULL)
-		    break;
+		যদি (p == রিক্ত)
+		    ভঙ্গ;
 		*p = ' ';
 	    }
 	}
@@ -3682,27 +3682,27 @@ mch_errmsg(char *str)
 # endif
 }
 
-# if defined(MSWIN) && (!defined(FEAT_GUI_MSWIN) || defined(VIMDLL))
-    static void
-mch_msg_c(char *str)
+# যদি defined(MSWIN) && (!defined(FEAT_GUI_MSWIN) || defined(VIMDLL))
+    স্থির শূন্য
+mch_বাৰ্তা_c(ৱর্ণ *str)
 {
     DWORD   nwrite = 0;
     DWORD   mode;
     HANDLE  h = GetStdHandle(STD_OUTPUT_HANDLE);
 
-    if (GetConsoleMode(h, &mode) && enc_codepage >= 0
-	    && (int)GetConsoleCP() != enc_codepage)
+    যদি (GetConsoleMode(h, &mode) && enc_codepage >= 0
+	    && (পূর্ণাঙ্ক)GetConsoleCP() != enc_codepage)
     {
-	int	len = (int)STRLEN(str);
+	পূর্ণাঙ্ক	len = (পূর্ণাঙ্ক)STRLEN(str);
 	WCHAR	*w = enc_to_utf16((char_u *)str, &len);
 
-	if (w != NULL)
+	যদি (w != রিক্ত)
 	{
-	    WriteConsoleW(h, w, len, &nwrite, NULL);
+	    WriteConsoleW(h, w, len, &nwrite, রিক্ত);
 	    vim_free(w);
 	}
     }
-    else
+    অন্যথা
     {
 	printf("%s", str);
     }
@@ -3714,19 +3714,19 @@ mch_msg_c(char *str)
  * When there is no tty, collect messages until the GUI has started and they
  * can be displayed in a message box.
  */
-    void
-mch_msg(char *str)
+    শূন্য
+mch_বাৰ্তা(ৱর্ণ *str)
 {
-# if (defined(UNIX) || defined(FEAT_GUI)) && !defined(ALWAYS_USE_GUI) && !defined(VIMDLL)
+# যদি (defined(UNIX) || defined(FEAT_GUI)) && !defined(ALWAYS_USE_GUI) && !defined(VIMDLL)
     // On Unix use stdout if we have a tty.  This allows "vim -h | more" and
     // uses mch_errmsg() when started from the desktop.
     // When not going to start the GUI also use stdout.
     // On Mac, when started from Finder, stderr is the console.
-    if (
+    যদি (
 #  ifdef UNIX
 #   ifdef MACOS_X
 	    (isatty(2) && strcmp("/dev/console", ttyname(2)) != 0)
-#   else
+#   অন্যথা
 	    isatty(2)
 #   endif
 #   ifdef FEAT_GUI
@@ -3739,20 +3739,20 @@ mch_msg(char *str)
 	    )
     {
 	printf("%s", str);
-	return;
+	ঘূৰাই;
     }
 # endif
 
-# if defined(MSWIN) && (!defined(FEAT_GUI_MSWIN) || defined(VIMDLL))
+# যদি defined(MSWIN) && (!defined(FEAT_GUI_MSWIN) || defined(VIMDLL))
 #  ifdef VIMDLL
-    if (!(gui.in_use || gui.starting))
+    যদি (!(gui.in_use || gui.starting))
 #  endif
     {
-	mch_msg_c(str);
-	return;
+	mch_বাৰ্তা_c(str);
+	ঘূৰাই;
     }
 # endif
-# if !defined(MSWIN) || defined(FEAT_GUI_MSWIN)
+# যদি !defined(MSWIN) || defined(FEAT_GUI_MSWIN)
     mch_errmsg(str);
 # endif
 }
@@ -3762,81 +3762,81 @@ mch_msg(char *str)
  * Put a character on the screen at the current message position and advance
  * to the next position.  Only for printable ASCII!
  */
-    static void
-msg_screen_putchar(int c, int attr)
+    স্থির শূন্য
+বাৰ্তা_screen_putchar(পূর্ণাঙ্ক c, পূর্ণাঙ্ক attr)
 {
-    msg_didout = TRUE;		// remember that line is not empty
-    screen_putchar(c, msg_row, cmdline_col_off + msg_col, attr);
+    বাৰ্তা_didout = TRUE;		// remember that line is not empty
+    screen_putchar(c, বাৰ্তা_row, cmdline_col_off + বাৰ্তা_col, attr);
 #ifdef FEAT_RIGHTLEFT
-    if (cmdmsg_rl)
+    যদি (cmdmsg_rl)
     {
-	if (--msg_col == 0)
+	যদি (--বাৰ্তা_col == 0)
 	{
-	    msg_col = cmdline_width;
-	    ++msg_row;
+	    বাৰ্তা_col = cmdline_width;
+	    ++বাৰ্তা_row;
 	}
     }
-    else
+    অন্যথা
 #endif
     {
-	if (++msg_col >= cmdline_width)
+	যদি (++বাৰ্তা_col >= cmdline_width)
 	{
-	    msg_col = 0;
-	    ++msg_row;
+	    বাৰ্তা_col = 0;
+	    ++বাৰ্তা_row;
 	}
     }
 }
 
-    static void
-msg_moremsg(int full)
+    স্থির শূন্য
+বাৰ্তা_moremsg(পূর্ণাঙ্ক full)
 {
-    int		attr;
+    পূর্ণাঙ্ক		attr;
     char_u	*s = (char_u *)_("-- More --");
 
     attr = HL_ATTR(HLF_M);
-    screen_puts(s, (int)Rows - 1, cmdline_col_off, attr);
-    if (full)
+    screen_puts(s, (পূর্ণাঙ্ক)Rows - 1, cmdline_col_off, attr);
+    যদি (full)
 	screen_puts((char_u *)
 		_(" SPACE/d/j: screen/page/line down, b/u/k: up, q: quit "),
-		(int)Rows - 1, cmdline_col_off + vim_strsize(s), attr);
+		(পূর্ণাঙ্ক)Rows - 1, cmdline_col_off + vim_strsize(s), attr);
 }
 
 /*
  * Repeat the message for the current mode: MODE_ASKMORE, MODE_EXTERNCMD,
  * MODE_CONFIRM or exmode_active.
  */
-    void
-repeat_message(void)
+    শূন্য
+repeat_message(শূন্য)
 {
-    if (State == MODE_ASKMORE)
+    যদি (State == MODE_ASKMORE)
     {
-	msg_moremsg(TRUE);	// display --more-- message again
-	msg_row = Rows - 1;
+	বাৰ্তা_moremsg(TRUE);	// display --more-- message again
+	বাৰ্তা_row = Rows - 1;
     }
 #ifdef FEAT_CON_DIALOG
-    else if (State == MODE_CONFIRM)
+    অন্যথা যদি (State == MODE_CONFIRM)
     {
-	display_confirm_msg();	// display ":confirm" message again
-	msg_row = Rows - 1;
+	display_confirm_বাৰ্তা();	// display ":confirm" message again
+	বাৰ্তা_row = Rows - 1;
     }
 #endif
-    else if (State == MODE_EXTERNCMD)
+    অন্যথা যদি (State == MODE_EXTERNCMD)
     {
-	windgoto(msg_row, cmdline_col_off + msg_col); // put cursor back
+	windgoto(বাৰ্তা_row, cmdline_col_off + বাৰ্তা_col); // put cursor back
     }
-    else if (State == MODE_HITRETURN || State == MODE_SETWSIZE)
+    অন্যথা যদি (State == MODE_HITRETURN || State == MODE_SETWSIZE)
     {
-	if (msg_row == Rows - 1)
+	যদি (বাৰ্তা_row == Rows - 1)
 	{
 	    // Avoid drawing the "hit-enter" prompt below the previous one,
 	    // overwrite it.  Esp. useful when regaining focus and a
 	    // FocusGained autocmd exists but didn't draw anything.
-	    msg_didout = FALSE;
-	    msg_col = 0;
-	    msg_clr_eos();
+	    বাৰ্তা_didout = FALSE;
+	    বাৰ্তা_col = 0;
+	    বাৰ্তা_clr_eos();
 	}
-	hit_return_msg();
-	msg_row = Rows - 1;
+	hit_return_বাৰ্তা();
+	বাৰ্তা_row = Rows - 1;
     }
 }
 
@@ -3846,28 +3846,28 @@ repeat_message(void)
  * While starting the GUI the terminal codes will be set for the GUI, but the
  * output goes to the terminal.  Don't use the terminal codes then.
  */
-    static int
-msg_check_screen(void)
+    স্থির পূর্ণাঙ্ক
+বাৰ্তা_check_screen(শূন্য)
 {
-    if (!full_screen || !screen_valid(FALSE))
-	return FALSE;
+    যদি (!full_screen || !screen_valid(FALSE))
+	ঘূৰাই FALSE;
 
-    if (msg_row >= Rows)
-	msg_row = Rows - 1;
-    if (msg_col >= cmdline_width)
-	msg_col = cmdline_width - 1;
-    return TRUE;
+    যদি (বাৰ্তা_row >= Rows)
+	বাৰ্তা_row = Rows - 1;
+    যদি (বাৰ্তা_col >= cmdline_width)
+	বাৰ্তা_col = cmdline_width - 1;
+    ঘূৰাই TRUE;
 }
 
 /*
  * Clear from current message position to end of screen.
  * Skip this when ":silent" was used, no need to clear for redirection.
  */
-    void
-msg_clr_eos(void)
+    শূন্য
+বাৰ্তা_clr_eos(শূন্য)
 {
-    if (msg_silent == 0)
-	msg_clr_eos_force();
+    যদি (বাৰ্তা_silent == 0)
+	বাৰ্তা_clr_eos_force();
 }
 
 /*
@@ -3875,48 +3875,48 @@ msg_clr_eos(void)
  * Note: msg_col is not updated, so we remember the end of the message
  * for msg_check().
  */
-    void
-msg_clr_eos_force(void)
+    শূন্য
+বাৰ্তা_clr_eos_force(শূন্য)
 {
 #ifdef HAS_MESSAGE_WINDOW
-    if (in_echowindow)
-	return;  // messages go into a popup
+    যদি (in_echowindow)
+	ঘূৰাই;  // messages go into a popup
 #endif
-    if (msg_use_printf())
+    যদি (বাৰ্তা_use_printf())
     {
-	if (full_screen)	// only when termcap codes are valid
+	যদি (full_screen)	// only when termcap codes are valid
 	{
-	    if (*T_CD)
+	    যদি (*T_CD)
 		out_str(T_CD);	// clear to end of display
-	    else if (*T_CE)
+	    অন্যথা যদি (*T_CE)
 		out_str(T_CE);	// clear to end of line
 	}
     }
-    else
+    অন্যথা
     {
-	int msg_attr;
+	পূর্ণাঙ্ক বাৰ্তা_attr;
 
-	msg_attr = HL_ATTR(HLF_MSG);
+	বাৰ্তা_attr = HL_ATTR(HLF_বাৰ্তা);
 
 #ifdef FEAT_RIGHTLEFT
-	if (cmdmsg_rl)
+	যদি (cmdmsg_rl)
 	{
-	    screen_fill(msg_row, msg_row + 1,
-		    cmdline_col_off, cmdline_col_off + msg_col + 1,
-		    ' ', ' ', msg_attr);
-	    screen_fill(msg_row + 1, (int)Rows,
+	    screen_fill(বাৰ্তা_row, বাৰ্তা_row + 1,
+		    cmdline_col_off, cmdline_col_off + বাৰ্তা_col + 1,
+		    ' ', ' ', বাৰ্তা_attr);
+	    screen_fill(বাৰ্তা_row + 1, (পূর্ণাঙ্ক)Rows,
 		    cmdline_col_off, cmdline_col_off + cmdline_width,
-		    ' ', ' ', msg_attr);
+		    ' ', ' ', বাৰ্তা_attr);
 	}
-	else
+	অন্যথা
 #endif
 	{
-	    screen_fill(msg_row, msg_row + 1,
-		    cmdline_col_off + msg_col, cmdline_col_off + cmdline_width,
-		    ' ', ' ', msg_attr);
-	    screen_fill(msg_row + 1, (int)Rows,
+	    screen_fill(বাৰ্তা_row, বাৰ্তা_row + 1,
+		    cmdline_col_off + বাৰ্তা_col, cmdline_col_off + cmdline_width,
+		    ' ', ' ', বাৰ্তা_attr);
+	    screen_fill(বাৰ্তা_row + 1, (পূর্ণাঙ্ক)Rows,
 		    cmdline_col_off, cmdline_col_off + cmdline_width,
-		    ' ', ' ', msg_attr);
+		    ' ', ' ', বাৰ্তা_attr);
 	}
     }
 }
@@ -3924,12 +3924,12 @@ msg_clr_eos_force(void)
 /*
  * Clear the command line.
  */
-    void
-msg_clr_cmdline(void)
+    শূন্য
+বাৰ্তা_clr_cmdline(শূন্য)
 {
-    msg_row = cmdline_row;
-    msg_col = 0;
-    msg_clr_eos_force();
+    বাৰ্তা_row = cmdline_row;
+    বাৰ্তা_col = 0;
+    বাৰ্তা_clr_eos_force();
 }
 
 /*
@@ -3937,8 +3937,8 @@ msg_clr_cmdline(void)
  * call wait_return() if the message does not fit in the available space
  * return TRUE if wait_return() not called.
  */
-    int
-msg_end(void)
+    পূর্ণাঙ্ক
+বাৰ্তা_end(শূন্য)
 {
     /*
      * If the string is larger than the window,
@@ -3946,23 +3946,23 @@ msg_end(void)
      * we have to redraw the window.
      * Do not do this if we are abandoning the file or editing the command line.
      */
-    if (!exiting && need_wait_return && !(State & MODE_CMDLINE))
+    যদি (!exiting && need_wait_return && !(State & MODE_CMDLINE))
     {
 	wait_return(FALSE);
-	return FALSE;
+	ঘূৰাই FALSE;
     }
     out_flush();
-    return TRUE;
+    ঘূৰাই TRUE;
 }
 
 /*
  * If the written message runs into the shown command or ruler, we have to
  * wait for hit-return and redraw the window later.
  */
-    void
-msg_check(void)
+    শূন্য
+বাৰ্তা_check(শূন্য)
 {
-    if (msg_row == Rows - 1 && msg_col >= sc_col
+    যদি (বাৰ্তা_row == Rows - 1 && বাৰ্তা_col >= sc_col
 #ifdef HAS_MESSAGE_WINDOW
 		&& !in_echowindow
 #endif
@@ -3977,81 +3977,81 @@ msg_check(void)
  * May write a string to the redirection file.
  * When "maxlen" is -1 write the whole string, otherwise up to "maxlen" bytes.
  */
-    static void
-redir_write(char_u *str, int maxlen)
+    স্থির শূন্য
+redir_write(char_u *str, পূর্ণাঙ্ক maxlen)
 {
     char_u	*s = str;
-    static int	cur_col = 0;
+    স্থির পূর্ণাঙ্ক	cur_col = 0;
 
     // Don't do anything for displaying prompts and the like.
-    if (redir_off)
-	return;
+    যদি (redir_off)
+	ঘূৰাই;
 
     // If 'verbosefile' is set prepare for writing in that file.
-    if (*p_vfile != NUL && verbose_fd == NULL)
+    যদি (*p_vfile != NUL && verbose_fd == রিক্ত)
 	verbose_open();
 
-    if (redirecting())
+    যদি (redirecting())
     {
 	// If the string doesn't start with CR or NL, go to msg_col
-	if (*s != '\n' && *s != '\r')
+	যদি (*s != '\n' && *s != '\r')
 	{
-	    while (cur_col < msg_col)
+	    যেতিয়ালৈ (cur_col < বাৰ্তা_col)
 	    {
 #ifdef FEAT_EVAL
-		if (redir_execute)
+		যদি (redir_execute)
 		    execute_redir_str((char_u *)" ", -1);
-		else if (redir_reg)
+		অন্যথা যদি (redir_reg)
 		    write_reg_contents(redir_reg, (char_u *)" ", -1, TRUE);
-		else if (redir_vname)
+		অন্যথা যদি (redir_vname)
 		    var_redir_str((char_u *)" ", -1);
-		else
+		অন্যথা
 #endif
-		    if (redir_fd != NULL)
+		    যদি (redir_fd != রিক্ত)
 		    fputs(" ", redir_fd);
-		if (verbose_fd != NULL)
+		যদি (verbose_fd != রিক্ত)
 		    fputs(" ", verbose_fd);
 		++cur_col;
 	    }
 	}
 
 #ifdef FEAT_EVAL
-	if (redir_execute)
+	যদি (redir_execute)
 	    execute_redir_str(s, maxlen);
-	else if (redir_reg)
+	অন্যথা যদি (redir_reg)
 	    write_reg_contents(redir_reg, s, maxlen, TRUE);
-	else if (redir_vname)
+	অন্যথা যদি (redir_vname)
 	    var_redir_str(s, maxlen);
 #endif
 
 	// Write and adjust the current column.
-	while (*s != NUL && (maxlen < 0 || (int)(s - str) < maxlen))
+	যেতিয়ালৈ (*s != NUL && (maxlen < 0 || (পূর্ণাঙ্ক)(s - str) < maxlen))
 	{
 #ifdef FEAT_EVAL
-	    if (!redir_reg && !redir_vname && !redir_execute)
+	    যদি (!redir_reg && !redir_vname && !redir_execute)
 #endif
-		if (redir_fd != NULL)
+		যদি (redir_fd != রিক্ত)
 		    putc(*s, redir_fd);
-	    if (verbose_fd != NULL)
+	    যদি (verbose_fd != রিক্ত)
 		putc(*s, verbose_fd);
-	    if (*s == '\r' || *s == '\n')
+	    যদি (*s == '\r' || *s == '\n')
 		cur_col = 0;
-	    else if (*s == '\t')
+	    অন্যথা যদি (*s == '\t')
 		cur_col += (8 - cur_col % 8);
-	    else
+	    অন্যথা
 		++cur_col;
 	    ++s;
 	}
 
-	if (msg_silent != 0)	// should update msg_col
-	    msg_col = cur_col;
+	যদি (বাৰ্তা_silent != 0)	// should update msg_col
+	    বাৰ্তা_col = cur_col;
     }
 }
 
-    int
-redirecting(void)
+    পূর্ণাঙ্ক
+redirecting(শূন্য)
 {
-    return redir_fd != NULL || *p_vfile != NUL
+    ঘূৰাই redir_fd != রিক্ত || *p_vfile != NUL
 #ifdef FEAT_EVAL
 			  || redir_reg || redir_vname || redir_execute
 #endif
@@ -4062,63 +4062,63 @@ redirecting(void)
  * Before giving verbose message.
  * Must always be called paired with verbose_leave()!
  */
-    void
-verbose_enter(void)
+    শূন্য
+verbose_enter(শূন্য)
 {
-    if (*p_vfile != NUL)
-	++msg_silent;
+    যদি (*p_vfile != NUL)
+	++বাৰ্তা_silent;
 }
 
 /*
  * After giving verbose message.
  * Must always be called paired with verbose_enter()!
  */
-    void
-verbose_leave(void)
+    শূন্য
+verbose_leave(শূন্য)
 {
-    if (*p_vfile != NUL)
-	if (--msg_silent < 0)
-	    msg_silent = 0;
+    যদি (*p_vfile != NUL)
+	যদি (--বাৰ্তা_silent < 0)
+	    বাৰ্তা_silent = 0;
 }
 
 /*
  * Like verbose_enter() and set msg_scroll when displaying the message.
  */
-    void
-verbose_enter_scroll(void)
+    শূন্য
+verbose_enter_scroll(শূন্য)
 {
-    if (*p_vfile != NUL)
-	++msg_silent;
-    else
+    যদি (*p_vfile != NUL)
+	++বাৰ্তা_silent;
+    অন্যথা
 	// always scroll up, don't overwrite
-	msg_scroll = TRUE;
+	বাৰ্তা_scroll = TRUE;
 }
 
 /*
  * Like verbose_leave() and set cmdline_row when displaying the message.
  */
-    void
-verbose_leave_scroll(void)
+    শূন্য
+verbose_leave_scroll(শূন্য)
 {
-    if (*p_vfile != NUL)
+    যদি (*p_vfile != NUL)
     {
-	if (--msg_silent < 0)
-	    msg_silent = 0;
+	যদি (--বাৰ্তা_silent < 0)
+	    বাৰ্তা_silent = 0;
     }
-    else
-	cmdline_row = msg_row;
+    অন্যথা
+	cmdline_row = বাৰ্তা_row;
 }
 
 /*
  * Called when 'verbosefile' is set: stop writing to the file.
  */
-    void
-verbose_stop(void)
+    শূন্য
+verbose_stop(শূন্য)
 {
-    if (verbose_fd != NULL)
+    যদি (verbose_fd != রিক্ত)
     {
 	fclose(verbose_fd);
-	verbose_fd = NULL;
+	verbose_fd = রিক্ত;
     }
     verbose_did_open = FALSE;
 }
@@ -4127,40 +4127,40 @@ verbose_stop(void)
  * Open the file 'verbosefile'.
  * Return FAIL or OK.
  */
-    int
-verbose_open(void)
+    পূর্ণাঙ্ক
+verbose_open(শূন্য)
 {
-    if (verbose_fd == NULL && !verbose_did_open)
+    যদি (verbose_fd == রিক্ত && !verbose_did_open)
     {
 	// Only give the error message once.
 	verbose_did_open = TRUE;
 
-	verbose_fd = mch_fopen((char *)p_vfile, "a");
-	if (verbose_fd == NULL)
+	verbose_fd = mch_fopen((ৱর্ণ *)p_vfile, "a");
+	যদি (verbose_fd == রিক্ত)
 	{
 	    semsg(_(e_cant_open_file_str), p_vfile);
-	    return FAIL;
+	    ঘূৰাই FAIL;
 	}
     }
-    return OK;
+    ঘূৰাই OK;
 }
 
 /*
  * Give a warning message (for searching).
  * Use 'w' highlighting and may repeat the message after redrawing
  */
-    void
-give_warning(char_u *message, int hl)
+    শূন্য
+give_warning(char_u *message, পূর্ণাঙ্ক hl)
 {
     give_warning_with_source(message, hl, FALSE);
 }
 
-    void
-give_warning_with_source(char_u *message, int hl, int with_source)
+    শূন্য
+give_warning_with_source(char_u *message, পূর্ণাঙ্ক hl, পূর্ণাঙ্ক with_source)
 {
     // Don't do this for ":silent".
-    if (msg_silent != 0)
-	return;
+    যদি (বাৰ্তা_silent != 0)
+	ঘূৰাই;
 
     // Don't want a hit-enter prompt here.
     ++no_wait_return;
@@ -4168,46 +4168,46 @@ give_warning_with_source(char_u *message, int hl, int with_source)
 #ifdef FEAT_EVAL
     set_vim_var_string(VV_WARNINGMSG, message, -1);
 #endif
-    VIM_CLEAR(keep_msg);
-    if (hl)
-	keep_msg_attr = HL_ATTR(HLF_W);
-    else
-	keep_msg_attr = 0;
+    VIM_CLEAR(keep_বাৰ্তা);
+    যদি (hl)
+	keep_বাৰ্তা_attr = HL_ATTR(HLF_W);
+    অন্যথা
+	keep_বাৰ্তা_attr = 0;
 
-    if (with_source)
+    যদি (with_source)
     {
 	// Do what msg() does, but with a column offset if the warning should
 	// be after the mode message.
-	msg_start();
-	msg_source(HL_ATTR(HLF_W));
-	msg_puts(" ");
-	msg_puts_attr((char *)message, HL_ATTR(HLF_W) | MSG_HIST);
-	msg_clr_eos();
-	(void)msg_end();
+	বাৰ্তা_start();
+	বাৰ্তা_source(HL_ATTR(HLF_W));
+	বাৰ্তা_puts(" ");
+	বাৰ্তা_puts_attr((ৱর্ণ *)message, HL_ATTR(HLF_W) | বাৰ্তা_HIST);
+	বাৰ্তা_clr_eos();
+	(শূন্য)বাৰ্তা_end();
     }
-    else if (msg_attr((char *)message, keep_msg_attr) && msg_scrolled == 0)
-	set_keep_msg(message, keep_msg_attr);
+    অন্যথা যদি (বাৰ্তা_attr((ৱর্ণ *)message, keep_বাৰ্তা_attr) && বাৰ্তা_scrolled == 0)
+	set_keep_বাৰ্তা(message, keep_বাৰ্তা_attr);
 
-    msg_didout = FALSE;	    // overwrite this message
-    msg_nowait = TRUE;	    // don't wait for this message
-    msg_col = 0;
+    বাৰ্তা_didout = FALSE;	    // overwrite this message
+    বাৰ্তা_nowait = TRUE;	    // don't wait for this message
+    বাৰ্তা_col = 0;
 
     --no_wait_return;
 }
 
-#if defined(FEAT_EVAL)
-    void
-give_warning2(char_u *message, char_u *a1, int hl)
+#যদি defined(FEAT_EVAL)
+    শূন্য
+give_warning2(char_u *message, char_u *a1, পূর্ণাঙ্ক hl)
 {
-    if (IObuff == NULL)
+    যদি (IObuff == রিক্ত)
     {
 	// Very early in initialisation and already something wrong, just give
 	// the raw message so the user at least gets a hint.
 	give_warning(message, hl);
     }
-    else
+    অন্যথা
     {
-	vim_snprintf((char *)IObuff, IOSIZE, (char *)message, a1);
+	vim_snprintf((ৱর্ণ *)IObuff, IOSIZE, (ৱর্ণ *)message, a1);
 	give_warning(IObuff, hl);
     }
 }
@@ -4216,44 +4216,44 @@ give_warning2(char_u *message, char_u *a1, int hl)
 /*
  * Advance msg cursor to column "col".
  */
-    void
-msg_advance(int col)
+    শূন্য
+বাৰ্তা_advance(পূর্ণাঙ্ক col)
 {
-    if (msg_silent != 0)	// nothing to advance to
+    যদি (বাৰ্তা_silent != 0)	// nothing to advance to
     {
-	msg_col = col;		// for redirection, may fill it up later
-	return;
+	বাৰ্তা_col = col;		// for redirection, may fill it up later
+	ঘূৰাই;
     }
-    if (col >= cmdline_width)	// not enough room
+    যদি (col >= cmdline_width)	// not enough room
 	col = cmdline_width - 1;
 #ifdef FEAT_RIGHTLEFT
-    if (cmdmsg_rl)
-	while (msg_col > cmdline_width - col)
-	    msg_putchar(' ');
-    else
+    যদি (cmdmsg_rl)
+	যেতিয়ালৈ (বাৰ্তা_col > cmdline_width - col)
+	    বাৰ্তা_putchar(' ');
+    অন্যথা
 #endif
-	while (msg_col < col)
-	    msg_putchar(' ');
+	যেতিয়ালৈ (বাৰ্তা_col < col)
+	    বাৰ্তা_putchar(' ');
 }
 
 /*
  * Warn about missing Clipboard Support
  */
-    void
-msg_warn_missing_clipboard(void)
+    শূন্য
+বাৰ্তা_warn_missing_clipboard(শূন্য)
 {
-    if (!global_busy && !did_warn_clipboard && silence_w23_w24_msg == 0)
+    যদি (!global_busy && !did_warn_clipboard && silence_w23_w24_বাৰ্তা == 0)
     {
 #ifdef FEAT_CLIPBOARD
-	msg(_("W23: Clipboard register not available, using register 0"));
-#else
-	msg(_("W24: Clipboard register not available. See :h W24"));
+	বাৰ্তা(_("W23: Clipboard register not available, using register 0"));
+#অন্যথা
+	বাৰ্তা(_("W24: Clipboard register not available. See :h W24"));
 #endif
 	did_warn_clipboard = TRUE;
     }
 }
 
-#if defined(FEAT_CON_DIALOG)
+#যদি defined(FEAT_CON_DIALOG)
 /*
  * Used for "confirm()" function, and the :confirm command prefix.
  * Versions which haven't got flexible dialogs yet, and console
@@ -4274,52 +4274,52 @@ msg_warn_missing_clipboard(void)
  *
  * Returns 0 if cancelled, otherwise the nth button (1-indexed).
  */
-    int
+    পূর্ণাঙ্ক
 do_dialog(
-    int		type UNUSED,
+    পূর্ণাঙ্ক		type UNUSED,
     char_u	*title UNUSED,
     char_u	*message,
     char_u	*buttons,
-    int		dfltbutton,
+    পূর্ণাঙ্ক		dfltbutton,
     char_u	*textfield UNUSED,	// IObuff for inputdialog(), NULL
 					// otherwise
-    int		ex_cmd)	    // when TRUE pressing : accepts default and starts
+    পূর্ণাঙ্ক		ex_cmd)	    // when TRUE pressing : accepts default and starts
 			    // Ex command
 {
-    int		oldState;
-    int		retval = 0;
+    পূর্ণাঙ্ক		oldState;
+    পূর্ণাঙ্ক		retval = 0;
     char_u	*hotkeys;
-    int		c;
-    int		i;
+    পূর্ণাঙ্ক		c;
+    পূর্ণাঙ্ক		i;
     tmode_T	save_tmode;
 
 # ifndef NO_CONSOLE
     // Don't output anything in silent mode ("ex -s")
-    if (silent_mode)
-	return dfltbutton;   // return default option
+    যদি (silent_mode)
+	ঘূৰাই dfltbutton;   // return default option
 # endif
 
 # ifdef FEAT_GUI_DIALOG
     // When GUI is running and 'c' not in 'guioptions', use the GUI dialog
-    if (gui.in_use && vim_strchr(p_go, GO_CONDIALOG) == NULL)
+    যদি (gui.in_use && vim_strchr(p_go, GO_CONDIALOG) == রিক্ত)
     {
 	// --gui-dialog-file: write text to a file
-	if (gui_dialog_log(title, message))
+	যদি (gui_dialog_log(title, message))
 	    c = dfltbutton;
-	else
+	অন্যথা
 	    c = gui_mch_dialog(type, title, message, buttons, dfltbutton,
 							   textfield, ex_cmd);
 	// avoid a hit-enter prompt without clearing the cmdline
 	need_wait_return = FALSE;
 	emsg_on_display = FALSE;
-	cmdline_row = msg_row;
+	cmdline_row = বাৰ্তা_row;
 
 	// Flush output to avoid that further messages and redrawing is done
 	// in the wrong order.
 	out_flush();
 	gui_mch_update();
 
-	return c;
+	ঘূৰাই c;
     }
 # endif
 
@@ -4336,56 +4336,56 @@ do_dialog(
      * user press RETURN as well afterwards.
      */
     ++no_wait_return;
-    hotkeys = msg_show_console_dialog(message, buttons, dfltbutton);
+    hotkeys = বাৰ্তা_show_console_dialog(message, buttons, dfltbutton);
 
-    if (hotkeys != NULL)
+    যদি (hotkeys != রিক্ত)
     {
-	for (;;)
+	বাবে (;;)
 	{
 	    // Get a typed character directly from the user.
 	    c = get_keystroke();
-	    switch (c)
+	    ৱিকল্প (c)
 	    {
-	    case CAR:		// User accepts default option
-	    case NL:
+	    পক্ষ CAR:		// User accepts default option
+	    পক্ষ NL:
 		retval = dfltbutton;
-		break;
-	    case Ctrl_C:	// User aborts/cancels
-	    case ESC:
+		ভঙ্গ;
+	    পক্ষ Ctrl_C:	// User aborts/cancels
+	    পক্ষ ESC:
 		retval = 0;
-		break;
-	    default:		// Could be a hotkey?
-		if (c < 0)	// special keys are ignored here
-		    continue;
-		if (c == ':' && ex_cmd)
+		ভঙ্গ;
+	    স্ৱভাৱ:		// Could be a hotkey?
+		যদি (c < 0)	// special keys are ignored here
+		    অনুৱর্ত;
+		যদি (c == ':' && ex_cmd)
 		{
 		    retval = dfltbutton;
 		    ins_char_typebuf(':', 0);
-		    break;
+		    ভঙ্গ;
 		}
 
 		// Make the character lowercase, as chars in "hotkeys" are.
 		c = MB_TOLOWER(c);
 		retval = 1;
-		for (i = 0; hotkeys[i]; ++i)
+		বাবে (i = 0; hotkeys[i]; ++i)
 		{
-		    if (has_mbyte)
+		    যদি (has_mbyte)
 		    {
-			if ((*mb_ptr2char)(hotkeys + i) == c)
-			    break;
+			যদি ((*mb_ptr2char)(hotkeys + i) == c)
+			    ভঙ্গ;
 			i += (*mb_ptr2len)(hotkeys + i) - 1;
 		    }
-		    else
-			if (hotkeys[i] == c)
-			    break;
+		    অন্যথা
+			যদি (hotkeys[i] == c)
+			    ভঙ্গ;
 		    ++retval;
 		}
-		if (hotkeys[i])
-		    break;
+		যদি (hotkeys[i])
+		    ভঙ্গ;
 		// No hotkey match, so keep waiting
-		continue;
+		অনুৱর্ত;
 	    }
-	    break;
+	    ভঙ্গ;
 	}
 
 	vim_free(hotkeys);
@@ -4395,45 +4395,45 @@ do_dialog(
     State = oldState;
     setmouse();
     --no_wait_return;
-    msg_end_prompt();
+    বাৰ্তা_end_prompt();
 
-    return retval;
+    ঘূৰাই retval;
 }
 
 /*
  * Copy one character from "*from" to "*to", taking care of multi-byte
  * characters.  Return the length of the character in bytes.
  */
-    static int
+    স্থির পূর্ণাঙ্ক
 copy_char(
     char_u	*from,
     char_u	*to,
-    int		lowercase)	// make character lower case
+    পূর্ণাঙ্ক		lowercase)	// make character lower case
 {
-    int		len;
-    int		c;
+    পূর্ণাঙ্ক		len;
+    পূর্ণাঙ্ক		c;
 
-    if (has_mbyte)
+    যদি (has_mbyte)
     {
-	if (lowercase)
+	যদি (lowercase)
 	{
 	    c = MB_TOLOWER((*mb_ptr2char)(from));
-	    return (*mb_char2bytes)(c, to);
+	    ঘূৰাই (*mb_char2bytes)(c, to);
 	}
-	else
+	অন্যথা
 	{
 	    len = (*mb_ptr2len)(from);
 	    mch_memmove(to, from, (size_t)len);
-	    return len;
+	    ঘূৰাই len;
 	}
     }
-    else
+    অন্যথা
     {
-	if (lowercase)
+	যদি (lowercase)
 	    *to = (char_u)TOLOWER_LOC(*from);
-	else
+	অন্যথা
 	    *to = *from;
-	return 1;
+	ঘূৰাই 1;
     }
 }
 
@@ -4446,24 +4446,24 @@ copy_char(
  *
  * Returns an allocated string with hotkeys, or NULL for error.
  */
-    static char_u *
-msg_show_console_dialog(
+    স্থির char_u *
+বাৰ্তা_show_console_dialog(
     char_u	*message,
     char_u	*buttons,
-    int		dfltbutton)
+    পূর্ণাঙ্ক		dfltbutton)
 {
-    int		len = 0;
+    পূর্ণাঙ্ক		len = 0;
 # define HOTK_LEN (has_mbyte ? MB_MAXBYTES : 1)
-    int		lenhotkey = HOTK_LEN;	// count first button
-    char_u	*hotk = NULL;
-    char_u	*msgp = NULL;
-    char_u	*hotkp = NULL;
+    পূর্ণাঙ্ক		lenhotkey = HOTK_LEN;	// count first button
+    char_u	*hotk = রিক্ত;
+    char_u	*msgp = রিক্ত;
+    char_u	*hotkp = রিক্ত;
     char_u	*r;
-    int		copy;
+    পূর্ণাঙ্ক		copy;
 # define HAS_HOTKEY_LEN 30
     char_u	has_hotkey[HAS_HOTKEY_LEN];
-    int		first_hotkey = FALSE;	// first char of button is hotkey
-    int		idx;
+    পূর্ণাঙ্ক		first_hotkey = FALSE;	// first char of button is hotkey
+    পূর্ণাঙ্ক		idx;
 
     has_hotkey[0] = FALSE;
 
@@ -4471,50 +4471,50 @@ msg_show_console_dialog(
      * First loop: compute the size of memory to allocate.
      * Second loop: copy to the allocated memory.
      */
-    for (copy = 0; copy <= 1; ++copy)
+    বাবে (copy = 0; copy <= 1; ++copy)
     {
 	r = buttons;
 	idx = 0;
-	while (*r)
+	যেতিয়ালৈ (*r)
 	{
-	    if (*r == DLG_BUTTON_SEP)
+	    যদি (*r == DLG_BUTTON_SEP)
 	    {
-		if (copy)
+		যদি (copy)
 		{
 		    *msgp++ = ',';
 		    *msgp++ = ' ';	    // '\n' -> ', '
 
 		    // advance to next hotkey and set default hotkey
-		    if (has_mbyte)
+		    যদি (has_mbyte)
 			hotkp += STRLEN(hotkp);
-		    else
+		    অন্যথা
 			++hotkp;
 		    hotkp[copy_char(r + 1, hotkp, TRUE)] = NUL;
-		    if (dfltbutton)
+		    যদি (dfltbutton)
 			--dfltbutton;
 
 		    // If no hotkey is specified first char is used.
-		    if (idx < HAS_HOTKEY_LEN - 1 && !has_hotkey[++idx])
+		    যদি (idx < HAS_HOTKEY_LEN - 1 && !has_hotkey[++idx])
 			first_hotkey = TRUE;
 		}
-		else
+		অন্যথা
 		{
 		    len += 3;		    // '\n' -> ', '; 'x' -> '(x)'
 		    lenhotkey += HOTK_LEN;  // each button needs a hotkey
-		    if (idx < HAS_HOTKEY_LEN - 1)
+		    যদি (idx < HAS_HOTKEY_LEN - 1)
 			has_hotkey[++idx] = FALSE;
 		}
 	    }
-	    else if (*r == DLG_HOTKEY_CHAR || first_hotkey)
+	    অন্যথা যদি (*r == DLG_HOTKEY_CHAR || first_hotkey)
 	    {
-		if (*r == DLG_HOTKEY_CHAR)
+		যদি (*r == DLG_HOTKEY_CHAR)
 		    ++r;
 		first_hotkey = FALSE;
-		if (copy)
+		যদি (copy)
 		{
-		    if (*r == DLG_HOTKEY_CHAR)		// '&&a' -> '&a'
+		    যদি (*r == DLG_HOTKEY_CHAR)		// '&&a' -> '&a'
 			*msgp++ = *r;
-		    else
+		    অন্যথা
 		    {
 			// '&a' -> '[a]'
 			*msgp++ = (dfltbutton == 1) ? '[' : '(';
@@ -4525,17 +4525,17 @@ msg_show_console_dialog(
 			hotkp[copy_char(r, hotkp, TRUE)] = NUL;
 		    }
 		}
-		else
+		অন্যথা
 		{
 		    ++len;	    // '&a' -> '[a]'
-		    if (idx < HAS_HOTKEY_LEN - 1)
+		    যদি (idx < HAS_HOTKEY_LEN - 1)
 			has_hotkey[idx] = TRUE;
 		}
 	    }
-	    else
+	    অন্যথা
 	    {
 		// everything else copy literally
-		if (copy)
+		যদি (copy)
 		    msgp += copy_char(r, msgp, FALSE);
 	    }
 
@@ -4543,22 +4543,22 @@ msg_show_console_dialog(
 	    MB_PTR_ADV(r);
 	}
 
-	if (copy)
+	যদি (copy)
 	{
 	    *msgp++ = ':';
 	    *msgp++ = ' ';
 	    *msgp = NUL;
 	}
-	else
+	অন্যথা
 	{
-	    len += (int)(STRLEN(message)
+	    len += (পূর্ণাঙ্ক)(STRLEN(message)
 			+ 2			// for the NL's
 			+ STRLEN(buttons)
 			+ 3);			// for the ": " and NUL
 	    lenhotkey++;			// for the NUL
 
 	    // If no hotkey is specified first char is used.
-	    if (!has_hotkey[0])
+	    যদি (!has_hotkey[0])
 	    {
 		first_hotkey = TRUE;
 		len += 2;		// "x" -> "[x]"
@@ -4567,19 +4567,19 @@ msg_show_console_dialog(
 	    /*
 	     * Now allocate and load the strings
 	     */
-	    vim_free(confirm_msg);
-	    confirm_msg = alloc(len);
-	    if (confirm_msg == NULL)
-		return NULL;
-	    *confirm_msg = NUL;
+	    vim_free(confirm_বাৰ্তা);
+	    confirm_বাৰ্তা = alloc(len);
+	    যদি (confirm_বাৰ্তা == রিক্ত)
+		ঘূৰাই রিক্ত;
+	    *confirm_বাৰ্তা = NUL;
 	    hotk = alloc(lenhotkey);
-	    if (hotk == NULL)
-		return NULL;
+	    যদি (hotk == রিক্ত)
+		ঘূৰাই রিক্ত;
 
-	    *confirm_msg = '\n';
-	    STRCPY(confirm_msg + 1, message);
+	    *confirm_বাৰ্তা = '\n';
+	    STRCPY(confirm_বাৰ্তা + 1, message);
 
-	    msgp = confirm_msg + 1 + STRLEN(message);
+	    msgp = confirm_বাৰ্তা + 1 + STRLEN(message);
 	    hotkp = hotk;
 
 	    // Define first default hotkey.  Keep the hotkey string NUL
@@ -4588,84 +4588,84 @@ msg_show_console_dialog(
 
 	    // Remember where the choices start, displaying starts here when
 	    // "hotkp" typed at the more prompt.
-	    confirm_msg_tail = msgp;
+	    confirm_বাৰ্তা_tail = msgp;
 	    *msgp++ = '\n';
 	}
     }
 
-    display_confirm_msg();
-    return hotk;
+    display_confirm_বাৰ্তা();
+    ঘূৰাই hotk;
 }
 
 /*
  * Display the ":confirm" message.  Also called when screen resized.
  */
-    static void
-display_confirm_msg(void)
+    স্থির শূন্য
+display_confirm_বাৰ্তা(শূন্য)
 {
     // avoid that 'q' at the more prompt truncates the message here
-    ++confirm_msg_used;
-    if (confirm_msg != NULL)
-	msg_puts_attr((char *)confirm_msg, HL_ATTR(HLF_M));
-    --confirm_msg_used;
+    ++confirm_বাৰ্তা_used;
+    যদি (confirm_বাৰ্তা != রিক্ত)
+	বাৰ্তা_puts_attr((ৱর্ণ *)confirm_বাৰ্তা, HL_ATTR(HLF_M));
+    --confirm_বাৰ্তা_used;
 }
 
 #endif // FEAT_CON_DIALOG
 
-#if defined(FEAT_CON_DIALOG) || defined(FEAT_GUI_DIALOG)
+#যদি defined(FEAT_CON_DIALOG) || defined(FEAT_GUI_DIALOG)
 
-    int
+    পূর্ণাঙ্ক
 vim_dialog_yesno(
-    int		type,
+    পূর্ণাঙ্ক		type,
     char_u	*title,
     char_u	*message,
-    int		dflt)
+    পূর্ণাঙ্ক		dflt)
 {
-    if (do_dialog(type,
-		title == NULL ? (char_u *)_("Question") : title,
+    যদি (do_dialog(type,
+		title == রিক্ত ? (char_u *)_("Question") : title,
 		message,
-		(char_u *)_("&Yes\n&No"), dflt, NULL, FALSE) == 1)
-	return VIM_YES;
-    return VIM_NO;
+		(char_u *)_("&Yes\n&No"), dflt, রিক্ত, FALSE) == 1)
+	ঘূৰাই VIM_YES;
+    ঘূৰাই VIM_NO;
 }
 
-    int
+    পূর্ণাঙ্ক
 vim_dialog_yesnocancel(
-    int		type,
+    পূর্ণাঙ্ক		type,
     char_u	*title,
     char_u	*message,
-    int		dflt)
+    পূর্ণাঙ্ক		dflt)
 {
-    switch (do_dialog(type,
-		title == NULL ? (char_u *)_("Question") : title,
+    ৱিকল্প (do_dialog(type,
+		title == রিক্ত ? (char_u *)_("Question") : title,
 		message,
-		(char_u *)_("&Yes\n&No\n&Cancel"), dflt, NULL, FALSE))
+		(char_u *)_("&Yes\n&No\n&Cancel"), dflt, রিক্ত, FALSE))
     {
-	case 1: return VIM_YES;
-	case 2: return VIM_NO;
+	পক্ষ 1: ঘূৰাই VIM_YES;
+	পক্ষ 2: ঘূৰাই VIM_NO;
     }
-    return VIM_CANCEL;
+    ঘূৰাই VIM_CANCEL;
 }
 
-    int
+    পূর্ণাঙ্ক
 vim_dialog_yesnoallcancel(
-    int		type,
+    পূর্ণাঙ্ক		type,
     char_u	*title,
     char_u	*message,
-    int		dflt)
+    পূর্ণাঙ্ক		dflt)
 {
-    switch (do_dialog(type,
-		title == NULL ? (char_u *)"Question" : title,
+    ৱিকল্প (do_dialog(type,
+		title == রিক্ত ? (char_u *)"Question" : title,
 		message,
 		(char_u *)_("&Yes\n&No\nSave &All\n&Discard All\n&Cancel"),
-							   dflt, NULL, FALSE))
+							   dflt, রিক্ত, FALSE))
     {
-	case 1: return VIM_YES;
-	case 2: return VIM_NO;
-	case 3: return VIM_ALL;
-	case 4: return VIM_DISCARDALL;
+	পক্ষ 1: ঘূৰাই VIM_YES;
+	পক্ষ 2: ঘূৰাই VIM_NO;
+	পক্ষ 3: ঘূৰাই VIM_ALL;
+	পক্ষ 4: ঘূৰাই VIM_DISCARDALL;
     }
-    return VIM_CANCEL;
+    ঘূৰাই VIM_CANCEL;
 }
 
 #endif // FEAT_GUI_DIALOG || FEAT_CON_DIALOG

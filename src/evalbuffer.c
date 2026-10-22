@@ -11,55 +11,55 @@
  * evalbuffer.c: Buffer related builtin functions
  */
 
-#include "vim.h"
+#অন্তর্ভাৱ "vim.h"
 
-#if defined(FEAT_EVAL)
+#যদি defined(FEAT_EVAL)
 /*
  * Mark references in functions of buffers.
  */
-    int
-set_ref_in_buffers(int copyID)
+    পূর্ণাঙ্ক
+set_ref_in_buffers(পূর্ণাঙ্ক copyID)
 {
-    int		abort = FALSE;
+    পূর্ণাঙ্ক		abort = FALSE;
     buf_T	*bp;
 
     FOR_ALL_BUFFERS(bp)
     {
 	listener_T *lnr;
 
-	for (lnr = bp->b_listener; !abort && lnr != NULL; lnr = lnr->lr_next)
+	বাবে (lnr = bp->b_listener; !abort && lnr != রিক্ত; lnr = lnr->lr_next)
 	    abort = abort || set_ref_in_callback(&lnr->lr_callback, copyID);
 # ifdef FEAT_JOB_CHANNEL
-	if (!abort)
+	যদি (!abort)
 	    abort = abort || set_ref_in_callback(&bp->b_prompt_callback, copyID);
-	if (!abort)
+	যদি (!abort)
 	    abort = abort || set_ref_in_callback(&bp->b_prompt_interrupt, copyID);
 # endif
 # ifdef FEAT_COMPL_FUNC
-	if (!abort)
+	যদি (!abort)
 	    abort = abort || set_ref_in_callback(&bp->b_cfu_cb, copyID);
-	if (!abort)
+	যদি (!abort)
 	    abort = abort || set_ref_in_callback(&bp->b_ofu_cb, copyID);
-	if (!abort)
+	যদি (!abort)
 	    abort = abort || set_ref_in_callback(&bp->b_tsrfu_cb, copyID);
-	if (!abort && bp->b_p_cpt_cb != NULL)
+	যদি (!abort && bp->b_p_cpt_cb != রিক্ত)
 	    abort = abort || set_ref_in_cpt_callbacks(bp->b_p_cpt_cb,
-		    bp->b_p_cpt_count, copyID);
+		    bp->b_p_cpt_গুনতি, copyID);
 # endif
-	if (!abort)
+	যদি (!abort)
 	    abort = abort || set_ref_in_callback(&bp->b_tfu_cb, copyID);
-	if (!abort)
+	যদি (!abort)
 	    abort = abort || set_ref_in_callback(&bp->b_ffu_cb, copyID);
-	if (abort)
-	    break;
+	যদি (abort)
+	    ভঙ্গ;
     }
-    return abort;
+    ঘূৰাই abort;
 }
 
     buf_T *
-buflist_find_by_name(char_u *name, int curtab_only)
+buflist_find_by_name(char_u *name, পূর্ণাঙ্ক curtab_only)
 {
-    int		save_magic;
+    পূর্ণাঙ্ক		save_magic;
     char_u	*save_cpo;
     buf_T	*buf;
 
@@ -74,7 +74,7 @@ buflist_find_by_name(char_u *name, int curtab_only)
 
     p_magic = save_magic;
     p_cpo = save_cpo;
-    return buf;
+    ঘূৰাই buf;
 }
 
 /*
@@ -83,34 +83,34 @@ buflist_find_by_name(char_u *name, int curtab_only)
     buf_T *
 find_buffer(typval_T *avar)
 {
-    buf_T	*buf = NULL;
+    buf_T	*buf = রিক্ত;
 
-    if (avar->v_type == VAR_NUMBER)
-	buf = buflist_findnr((int)avar->vval.v_number);
-    else if (in_vim9script() && check_for_string_arg(avar, 0) == FAIL)
-	return NULL;
-    else if (avar->v_type == VAR_STRING && avar->vval.v_string != NULL)
+    যদি (avar->v_type == VAR_সংখ্যা)
+	buf = buflist_findnr((পূর্ণাঙ্ক)avar->vval.v_সংখ্যা);
+    অন্যথা যদি (in_vim9script() && check_for_string_arg(avar, 0) == FAIL)
+	ঘূৰাই রিক্ত;
+    অন্যথা যদি (avar->v_type == VAR_STRING && avar->vval.v_string != রিক্ত)
     {
 	buf = buflist_findname_exp(avar->vval.v_string);
-	if (buf == NULL)
+	যদি (buf == রিক্ত)
 	{
 	    // No full path name match, try a match with a URL or a "nofile"
 	    // buffer, these don't use the full path.
 	    FOR_ALL_BUFFERS(buf)
-		if (buf->b_fname != NULL
+		যদি (buf->b_fname != রিক্ত
 			&& (path_with_url(buf->b_fname) || bt_nofilename(buf))
 			&& STRCMP(buf->b_fname, avar->vval.v_string) == 0)
-		    break;
+		    ভঙ্গ;
 	}
     }
-    return buf;
+    ঘূৰাই buf;
 }
 
 /*
  * If there is a window for "curbuf", make it the current window.
  */
-    static void
-find_win_for_curbuf(void)
+    স্থির শূন্য
+find_win_for_curbuf(শূন্য)
 {
     wininfo_T *wip;
 
@@ -119,19 +119,19 @@ find_win_for_curbuf(void)
     // Do check the buffer is still there.
     FOR_ALL_BUF_WININFO(curbuf, wip)
     {
-	if (wip->wi_win != NULL && wip->wi_win->w_buffer == curbuf)
+	যদি (wip->wi_win != রিক্ত && wip->wi_win->w_buffer == curbuf)
 	{
 	    curwin = wip->wi_win;
-	    break;
+	    ভঙ্গ;
 	}
     }
 }
 
-typedef struct {
+প্রকারনির্দেশ সংরচনা {
     win_T	*cob_curwin_save;
     aco_save_T	cob_aco;
-    int		cob_using_aco;
-    int		cob_save_VIsual_active;
+    পূর্ণাঙ্ক		cob_using_aco;
+    পূর্ণাঙ্ক		cob_save_VIsual_active;
 } cob_T;
 
 /*
@@ -144,7 +144,7 @@ typedef struct {
  *
  * If this fails then "curbuf" will not be equal to "buf".
  */
-    static void
+    স্থির শূন্য
 change_other_buffer_prepare(cob_T *cob, buf_T *buf)
 {
     CLEAR_POINTER(cob);
@@ -157,25 +157,25 @@ change_other_buffer_prepare(cob_T *cob, buf_T *buf)
     curbuf = buf;
     find_win_for_curbuf();  // simplest: find existing window for "buf"
 
-    if (curwin->w_buffer != buf)
+    যদি (curwin->w_buffer != buf)
     {
 	// No existing window for this buffer.  It is dangerous to have
 	// curwin->w_buffer differ from "curbuf", use the autocmd window.
 	curbuf = curwin->w_buffer;
 	aucmd_prepbuf(&cob->cob_aco, buf);
-	if (curbuf == buf)
+	যদি (curbuf == buf)
 	    cob->cob_using_aco = TRUE;
     }
 }
 
-    static void
+    স্থির শূন্য
 change_other_buffer_restore(cob_T *cob)
 {
-    if (cob->cob_using_aco)
+    যদি (cob->cob_using_aco)
     {
 	aucmd_restbuf(&cob->cob_aco);
     }
-    else
+    অন্যথা
     {
 	curwin = cob->cob_curwin_save;
 	curbuf = curwin->w_buffer;
@@ -187,125 +187,125 @@ change_other_buffer_restore(cob_T *cob)
  * Set line or list of lines in buffer "buf" to "lines".
  * Any type is allowed and converted to a string.
  */
-    static void
-set_buffer_lines(
+    স্থির শূন্য
+set_buffer_সাৰিগুলি(
 	buf_T	    *buf,
 	linenr_T    lnum_arg,
-	int	    append,
-	typval_T    *lines,
+	পূর্ণাঙ্ক	    append,
+	typval_T    *সাৰিগুলি,
 	typval_T    *rettv)
 {
     linenr_T    lnum = lnum_arg + (append ? 1 : 0);
-    char_u	*line = NULL;
-    list_T	*l = NULL;
-    listitem_T	*li = NULL;
+    char_u	*সাৰি = রিক্ত;
+    list_T	*l = রিক্ত;
+    listitem_T	*li = রিক্ত;
     long	added = 0;
     linenr_T	append_lnum;
 
     // When using the current buffer ml_mfp will be set if needed.  Useful when
     // setline() is used on startup.  For other buffers the buffer must be
     // loaded.
-    int is_curbuf = buf == curbuf;
-    if (buf == NULL || (!is_curbuf && buf->b_ml.ml_mfp == NULL) || lnum < 1)
+    পূর্ণাঙ্ক is_curbuf = buf == curbuf;
+    যদি (buf == রিক্ত || (!is_curbuf && buf->b_ml.ml_mfp == রিক্ত) || lnum < 1)
     {
-	rettv->vval.v_number = 1;	// FAIL
-	if (in_vim9script() && lnum < 1)
-	    semsg(_(e_invalid_line_number_nr), lnum_arg);
-	return;
+	rettv->vval.v_সংখ্যা = 1;	// FAIL
+	যদি (in_vim9script() && lnum < 1)
+	    semsg(_(e_invalid_সাৰি_সংখ্যা_nr), lnum_arg);
+	ঘূৰাই;
     }
 
     // After this don't use "return", goto "cleanup"!
     cob_T cob;
-    if (!is_curbuf)
+    যদি (!is_curbuf)
 	// set "curbuf" to "buf" and find a window for this buffer
 	change_other_buffer_prepare(&cob, buf);
 
-    if (append)
+    যদি (append)
 	// appendbufline() uses the line number below which we insert
 	append_lnum = lnum - 1;
-    else
+    অন্যথা
 	// setbufline() uses the line number above which we insert, we only
 	// append if it's below the last line
-	append_lnum = curbuf->b_ml.ml_line_count;
+	append_lnum = curbuf->b_ml.ml_সাৰি_গুনতি;
 
-    if (lines->v_type == VAR_LIST)
+    যদি (সাৰিগুলি->v_type == VAR_LIST)
     {
-	l = lines->vval.v_list;
-	if (l == NULL || list_len(l) == 0)
+	l = সাৰিগুলি->vval.v_list;
+	যদি (l == রিক্ত || list_len(l) == 0)
 	{
 	    // not appending anything always succeeds
-	    goto done;
+	    গচ্ছ done;
 	}
 	CHECK_LIST_MATERIALIZE(l);
 	li = l->lv_first;
     }
-    else
-	line = typval_tostring(lines, FALSE);
+    অন্যথা
+	সাৰি = typval_tostring(সাৰিগুলি, FALSE);
 
     // default result is zero == OK
-    for (;;)
+    বাবে (;;)
     {
-	if (l != NULL)
+	যদি (l != রিক্ত)
 	{
 	    // list argument, get next string
-	    if (li == NULL)
-		break;
-	    vim_free(line);
-	    line = typval_tostring(&li->li_tv, FALSE);
+	    যদি (li == রিক্ত)
+		ভঙ্গ;
+	    vim_free(সাৰি);
+	    সাৰি = typval_tostring(&li->li_tv, FALSE);
 	    li = li->li_next;
 	}
 
-	rettv->vval.v_number = 1;	// FAIL
-	if (line == NULL || lnum > curbuf->b_ml.ml_line_count + 1)
-	    break;
+	rettv->vval.v_সংখ্যা = 1;	// FAIL
+	যদি (সাৰি == রিক্ত || lnum > curbuf->b_ml.ml_সাৰি_গুনতি + 1)
+	    ভঙ্গ;
 
 	// When coming here from Insert mode, sync undo, so that this can be
 	// undone separately from what was previously inserted.
-	if (u_sync_once == 2)
+	যদি (u_sync_once == 2)
 	{
 	    u_sync_once = 1; // notify that u_sync() was called
 	    u_sync(TRUE);
 	}
 
-	if (!append && lnum <= curbuf->b_ml.ml_line_count)
+	যদি (!append && lnum <= curbuf->b_ml.ml_সাৰি_গুনতি)
 	{
 	    // Existing line, replace it.
 	    // Removes any existing text properties.
-	    if (u_savesub(lnum) == OK && ml_replace_len(
-		      lnum, line, (colnr_T)STRLEN(line) + 1, TRUE, TRUE) == OK)
+	    যদি (u_savesub(lnum) == OK && ml_replace_len(
+		      lnum, সাৰি, (colnr_T)STRLEN(সাৰি) + 1, TRUE, TRUE) == OK)
 	    {
 		changed_bytes(lnum, 0);
-		if (is_curbuf && lnum == curwin->w_cursor.lnum)
+		যদি (is_curbuf && lnum == curwin->w_cursor.lnum)
 		    check_cursor_col();
-		rettv->vval.v_number = 0;	// OK
+		rettv->vval.v_সংখ্যা = 0;	// OK
 	    }
 	}
-	else if (added > 0 || u_save(lnum - 1, lnum) == OK)
+	অন্যথা যদি (added > 0 || u_save(lnum - 1, lnum) == OK)
 	{
 	    // append the line
 	    ++added;
-	    if (ml_append(lnum - 1, line, (colnr_T)0, FALSE) == OK)
-		rettv->vval.v_number = 0;	// OK
+	    যদি (ml_append(lnum - 1, সাৰি, (colnr_T)0, FALSE) == OK)
+		rettv->vval.v_সংখ্যা = 0;	// OK
 	}
 
-	if (l == NULL)			// only one string argument
-	    break;
+	যদি (l == রিক্ত)			// only one string argument
+	    ভঙ্গ;
 	++lnum;
     }
-    vim_free(line);
+    vim_free(সাৰি);
 
-    if (added > 0)
+    যদি (added > 0)
     {
 	win_T	    *wp;
 	tabpage_T   *tp;
 
-	appended_lines_mark(append_lnum, added);
+	appended_সাৰিগুলি_mark(append_lnum, added);
 
 	// Only adjust the cursor for buffers other than the current, unless it
 	// is the current window.  For curbuf and other windows it has been
 	// done in mark_adjust_internal().
 	FOR_ALL_TAB_WINDOWS(tp, wp)
-	    if (wp->w_buffer == buf
+	    যদি (wp->w_buffer == buf
 		    && (wp->w_buffer != curbuf || wp == curwin)
 		    && wp->w_cursor.lnum > append_lnum)
 		wp->w_cursor.lnum += added;
@@ -313,225 +313,225 @@ set_buffer_lines(
 
 	// Only update the window view if w_buffer matches curbuf, otherwise
 	// the computations will be wrong.
-	if (curwin->w_buffer == curbuf)
+	যদি (curwin->w_buffer == curbuf)
 	    update_topline();
     }
 
 done:
-    if (!is_curbuf)
+    যদি (!is_curbuf)
 	change_other_buffer_restore(&cob);
 }
 
 /*
  * "append(lnum, string/list)" function
  */
-    void
+    শূন্য
 f_append(typval_T *argvars, typval_T *rettv)
 {
     linenr_T	lnum;
-    int		did_emsg_before = did_emsg;
+    পূর্ণাঙ্ক		did_emsg_before = did_emsg;
 
-    if (in_vim9script() && check_for_lnum_arg(argvars, 0) == FAIL)
-	return;
+    যদি (in_vim9script() && check_for_lnum_arg(argvars, 0) == FAIL)
+	ঘূৰাই;
 
     lnum = tv_get_lnum(&argvars[0]);
-    if (did_emsg == did_emsg_before)
-	set_buffer_lines(curbuf, lnum, TRUE, &argvars[1], rettv);
+    যদি (did_emsg == did_emsg_before)
+	set_buffer_সাৰিগুলি(curbuf, lnum, TRUE, &argvars[1], rettv);
 }
 
 /*
  * Set or append lines to a buffer.
  */
-    static void
-buf_set_append_line(typval_T *argvars, typval_T *rettv, int append)
+    স্থির শূন্য
+buf_set_append_সাৰি(typval_T *argvars, typval_T *rettv, পূর্ণাঙ্ক append)
 {
     linenr_T	lnum;
     buf_T	*buf;
-    int		did_emsg_before = did_emsg;
+    পূর্ণাঙ্ক		did_emsg_before = did_emsg;
 
-    if (in_vim9script()
+    যদি (in_vim9script()
 	    && (check_for_buffer_arg(argvars, 0) == FAIL
 		|| check_for_lnum_arg(argvars, 1) == FAIL
-		|| check_for_string_or_number_or_list_arg(argvars, 2) == FAIL))
-	return;
+		|| check_for_string_or_সংখ্যা_or_list_arg(argvars, 2) == FAIL))
+	ঘূৰাই;
 
     buf = tv_get_buf(&argvars[0], FALSE);
-    if (buf == NULL)
-	rettv->vval.v_number = 1; // FAIL
-    else
+    যদি (buf == রিক্ত)
+	rettv->vval.v_সংখ্যা = 1; // FAIL
+    অন্যথা
     {
 	lnum = tv_get_lnum_buf(&argvars[1], buf);
-	if (did_emsg == did_emsg_before)
-	    set_buffer_lines(buf, lnum, append, &argvars[2], rettv);
+	যদি (did_emsg == did_emsg_before)
+	    set_buffer_সাৰিগুলি(buf, lnum, append, &argvars[2], rettv);
     }
 }
 
 /*
  * "appendbufline(buf, lnum, string/list)" function
  */
-    void
+    শূন্য
 f_appendbufline(typval_T *argvars, typval_T *rettv)
 {
-    buf_set_append_line(argvars, rettv, TRUE);
+    buf_set_append_সাৰি(argvars, rettv, TRUE);
 }
 
 /*
  * "bufadd(expr)" function
  */
-    void
+    শূন্য
 f_bufadd(typval_T *argvars, typval_T *rettv)
 {
     char_u *name;
 
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    যদি (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+	ঘূৰাই;
 
     name = tv_get_string(&argvars[0]);
-    rettv->vval.v_number = buflist_add(*name == NUL ? NULL : name, 0);
+    rettv->vval.v_সংখ্যা = buflist_add(*name == NUL ? রিক্ত : name, 0);
 }
 
 /*
  * "bufexists(expr)" function
  */
-    void
+    শূন্য
 f_bufexists(typval_T *argvars, typval_T *rettv)
 {
-    if (in_vim9script() && check_for_buffer_arg(argvars, 0) == FAIL)
-	return;
+    যদি (in_vim9script() && check_for_buffer_arg(argvars, 0) == FAIL)
+	ঘূৰাই;
 
-    rettv->vval.v_number = (find_buffer(&argvars[0]) != NULL);
+    rettv->vval.v_সংখ্যা = (find_buffer(&argvars[0]) != রিক্ত);
 }
 
 /*
  * "buflisted(expr)" function
  */
-    void
+    শূন্য
 f_buflisted(typval_T *argvars, typval_T *rettv)
 {
     buf_T	*buf;
 
-    if (in_vim9script() && check_for_buffer_arg(argvars, 0) == FAIL)
-	return;
+    যদি (in_vim9script() && check_for_buffer_arg(argvars, 0) == FAIL)
+	ঘূৰাই;
 
     buf = find_buffer(&argvars[0]);
-    rettv->vval.v_number = (buf != NULL && buf->b_p_bl);
+    rettv->vval.v_সংখ্যা = (buf != রিক্ত && buf->b_p_bl);
 }
 
 /*
  * "bufload(expr)" function
  */
-    void
+    শূন্য
 f_bufload(typval_T *argvars, typval_T *rettv UNUSED)
 {
     buf_T	*buf;
 
-    if (in_vim9script() && check_for_buffer_arg(argvars, 0) == FAIL)
-	return;
+    যদি (in_vim9script() && check_for_buffer_arg(argvars, 0) == FAIL)
+	ঘূৰাই;
 
     buf = get_buf_arg(&argvars[0]);
-    if (buf != NULL)
+    যদি (buf != রিক্ত)
 	buffer_ensure_loaded(buf);
 }
 
 /*
  * "bufloaded(expr)" function
  */
-    void
+    শূন্য
 f_bufloaded(typval_T *argvars, typval_T *rettv)
 {
     buf_T	*buf;
 
-    if (in_vim9script() && check_for_buffer_arg(argvars, 0) == FAIL)
-	return;
+    যদি (in_vim9script() && check_for_buffer_arg(argvars, 0) == FAIL)
+	ঘূৰাই;
 
     buf = find_buffer(&argvars[0]);
-    rettv->vval.v_number = (buf != NULL && buf->b_ml.ml_mfp != NULL);
+    rettv->vval.v_সংখ্যা = (buf != রিক্ত && buf->b_ml.ml_mfp != রিক্ত);
 }
 
 /*
  * "bufname(expr)" function
  */
-    void
+    শূন্য
 f_bufname(typval_T *argvars, typval_T *rettv)
 {
     buf_T	*buf;
     typval_T	*tv = &argvars[0];
 
-    if (in_vim9script() && check_for_opt_buffer_arg(argvars, 0) == FAIL)
-	return;
+    যদি (in_vim9script() && check_for_opt_buffer_arg(argvars, 0) == FAIL)
+	ঘূৰাই;
 
-    if (tv->v_type == VAR_UNKNOWN)
+    যদি (tv->v_type == VAR_UNKNOWN)
 	buf = curbuf;
-    else
+    অন্যথা
 	buf = tv_get_buf_from_arg(tv);
     rettv->v_type = VAR_STRING;
-    if (buf != NULL && buf->b_fname != NULL)
+    যদি (buf != রিক্ত && buf->b_fname != রিক্ত)
 	rettv->vval.v_string = vim_strsave(buf->b_fname);
-    else
-	rettv->vval.v_string = NULL;
+    অন্যথা
+	rettv->vval.v_string = রিক্ত;
 }
 
 /*
  * "bufnr(expr)" function
  */
-    void
+    শূন্য
 f_bufnr(typval_T *argvars, typval_T *rettv)
 {
     buf_T	*buf;
-    int		error = FALSE;
+    পূর্ণাঙ্ক		error = FALSE;
     char_u	*name;
 
-    if (in_vim9script()
+    যদি (in_vim9script()
 	    && (check_for_opt_buffer_arg(argvars, 0) == FAIL
 		|| (argvars[0].v_type != VAR_UNKNOWN
 		    && check_for_opt_bool_arg(argvars, 1) == FAIL)))
-	return;
+	ঘূৰাই;
 
-    if (argvars[0].v_type == VAR_UNKNOWN)
+    যদি (argvars[0].v_type == VAR_UNKNOWN)
 	buf = curbuf;
-    else
+    অন্যথা
 	buf = tv_get_buf_from_arg(&argvars[0]);
 
     // If the buffer isn't found and the second argument is not zero create a
     // new buffer.
-    if (buf == NULL
+    যদি (buf == রিক্ত
 	    && argvars[1].v_type != VAR_UNKNOWN
 	    && tv_get_bool_chk(&argvars[1], &error) != 0
 	    && !error
-	    && (name = tv_get_string_chk(&argvars[0])) != NULL
+	    && (name = tv_get_string_chk(&argvars[0])) != রিক্ত
 	    && !error)
-	buf = buflist_new(name, NULL, (linenr_T)1, 0);
+	buf = buflist_new(name, রিক্ত, (linenr_T)1, 0);
 
-    if (buf != NULL)
-	rettv->vval.v_number = buf->b_fnum;
-    else
-	rettv->vval.v_number = -1;
+    যদি (buf != রিক্ত)
+	rettv->vval.v_সংখ্যা = buf->b_fnum;
+    অন্যথা
+	rettv->vval.v_সংখ্যা = -1;
 }
 
-    static void
-buf_win_common(typval_T *argvars, typval_T *rettv, int get_nr)
+    স্থির শূন্য
+buf_win_common(typval_T *argvars, typval_T *rettv, পূর্ণাঙ্ক get_nr)
 {
     win_T	*wp;
-    int		winnr = 0;
+    পূর্ণাঙ্ক		winnr = 0;
     buf_T	*buf;
 
-    if (in_vim9script() && check_for_buffer_arg(argvars, 0) == FAIL)
-	return;
+    যদি (in_vim9script() && check_for_buffer_arg(argvars, 0) == FAIL)
+	ঘূৰাই;
 
     buf = tv_get_buf_from_arg(&argvars[0]);
     FOR_ALL_WINDOWS(wp)
     {
 	++winnr;
-	if (wp->w_buffer == buf)
-	    break;
+	যদি (wp->w_buffer == buf)
+	    ভঙ্গ;
     }
-    rettv->vval.v_number = (wp != NULL ? (get_nr ? winnr : wp->w_id) : -1);
+    rettv->vval.v_সংখ্যা = (wp != রিক্ত ? (get_nr ? winnr : wp->w_id) : -1);
 }
 
 /*
  * "bufwinid(nr)" function
  */
-    void
+    শূন্য
 f_bufwinid(typval_T *argvars, typval_T *rettv)
 {
     buf_win_common(argvars, rettv, FALSE);
@@ -540,7 +540,7 @@ f_bufwinid(typval_T *argvars, typval_T *rettv)
 /*
  * "bufwinnr(nr)" function
  */
-    void
+    শূন্য
 f_bufwinnr(typval_T *argvars, typval_T *rettv)
 {
     buf_win_common(argvars, rettv, TRUE);
@@ -549,93 +549,93 @@ f_bufwinnr(typval_T *argvars, typval_T *rettv)
 /*
  * "deletebufline()" function
  */
-    void
+    শূন্য
 f_deletebufline(typval_T *argvars, typval_T *rettv)
 {
     buf_T	*buf;
     linenr_T	first, last;
     linenr_T	lnum;
-    long	count;
-    int		is_curbuf;
+    long	গুনতি;
+    পূর্ণাঙ্ক		is_curbuf;
     tabpage_T	*tp;
     win_T	*wp;
-    int		did_emsg_before = did_emsg;
+    পূর্ণাঙ্ক		did_emsg_before = did_emsg;
 
-    rettv->vval.v_number = 1;	// FAIL by default
+    rettv->vval.v_সংখ্যা = 1;	// FAIL by default
 
-    if (in_vim9script()
+    যদি (in_vim9script()
 	    && (check_for_buffer_arg(argvars, 0) == FAIL
 		|| check_for_lnum_arg(argvars, 1) == FAIL
 		|| check_for_opt_lnum_arg(argvars, 2) == FAIL))
-	return;
+	ঘূৰাই;
 
     buf = tv_get_buf(&argvars[0], FALSE);
-    if (buf == NULL)
-	return;
+    যদি (buf == রিক্ত)
+	ঘূৰাই;
 
     first = tv_get_lnum_buf(&argvars[1], buf);
-    if (did_emsg > did_emsg_before)
-	return;
-    if (argvars[2].v_type != VAR_UNKNOWN)
+    যদি (did_emsg > did_emsg_before)
+	ঘূৰাই;
+    যদি (argvars[2].v_type != VAR_UNKNOWN)
 	last = tv_get_lnum_buf(&argvars[2], buf);
-    else
+    অন্যথা
 	last = first;
 
-    if (buf->b_ml.ml_mfp == NULL || first < 1
-			   || first > buf->b_ml.ml_line_count || last < first)
-	return;
+    যদি (buf->b_ml.ml_mfp == রিক্ত || first < 1
+			   || first > buf->b_ml.ml_সাৰি_গুনতি || last < first)
+	ঘূৰাই;
 
     // After this don't use "return", goto "cleanup"!
     is_curbuf = buf == curbuf;
     cob_T cob;
-    if (!is_curbuf)
+    যদি (!is_curbuf)
 	// set "curbuf" to "buf" and find a window for this buffer
 	change_other_buffer_prepare(&cob, buf);
 
-    if (last > curbuf->b_ml.ml_line_count)
-	last = curbuf->b_ml.ml_line_count;
-    count = last - first + 1;
+    যদি (last > curbuf->b_ml.ml_সাৰি_গুনতি)
+	last = curbuf->b_ml.ml_সাৰি_গুনতি;
+    গুনতি = last - first + 1;
 
     // When coming here from Insert mode, sync undo, so that this can be
     // undone separately from what was previously inserted.
-    if (u_sync_once == 2)
+    যদি (u_sync_once == 2)
     {
 	u_sync_once = 1; // notify that u_sync() was called
 	u_sync(TRUE);
     }
 
-    if (u_save(first - 1, last + 1) == FAIL)
-	goto cleanup;
+    যদি (u_save(first - 1, last + 1) == FAIL)
+	গচ্ছ cleanup;
 
-    for (lnum = first; lnum <= last; ++lnum)
+    বাবে (lnum = first; lnum <= last; ++lnum)
 	ml_delete_flags(first, ML_DEL_MESSAGE);
 
     FOR_ALL_TAB_WINDOWS(tp, wp)
-	if (wp->w_buffer == buf)
+	যদি (wp->w_buffer == buf)
 	{
-	    if (wp->w_cursor.lnum > last)
-		wp->w_cursor.lnum -= count;
-	    else if (wp->w_cursor.lnum > first)
+	    যদি (wp->w_cursor.lnum > last)
+		wp->w_cursor.lnum -= গুনতি;
+	    অন্যথা যদি (wp->w_cursor.lnum > first)
 		wp->w_cursor.lnum = first;
-	    if (wp->w_cursor.lnum > wp->w_buffer->b_ml.ml_line_count)
-		wp->w_cursor.lnum = wp->w_buffer->b_ml.ml_line_count;
+	    যদি (wp->w_cursor.lnum > wp->w_buffer->b_ml.ml_সাৰি_গুনতি)
+		wp->w_cursor.lnum = wp->w_buffer->b_ml.ml_সাৰি_গুনতি;
 	    wp->w_valid = 0;
-	    if (wp->w_cursor.lnum <= wp->w_topline)
+	    যদি (wp->w_cursor.lnum <= wp->w_topline)
 		wp->w_topline = 1;
 	}
     check_cursor_col();
-    deleted_lines_mark(first, count);
-    rettv->vval.v_number = 0; // OK
+    deleted_সাৰিগুলি_mark(first, গুনতি);
+    rettv->vval.v_সংখ্যা = 0; // OK
 
 cleanup:
-    if (!is_curbuf)
+    যদি (!is_curbuf)
 	change_other_buffer_restore(&cob);
 }
 
 /*
  * Returns buffer options, variables and other attributes in a dictionary.
  */
-    static dict_T *
+    স্থির dict_T *
 get_buffer_info(buf_T *buf)
 {
     dict_T	*dict;
@@ -644,58 +644,58 @@ get_buffer_info(buf_T *buf)
     list_T	*windows;
 
     dict = dict_alloc();
-    if (dict == NULL)
-	return NULL;
+    যদি (dict == রিক্ত)
+	ঘূৰাই রিক্ত;
 
-    dict_add_number(dict, "bufnr", buf->b_fnum);
+    dict_add_সংখ্যা(dict, "bufnr", buf->b_fnum);
     dict_add_string(dict, "name", buf->b_ffname);
-    dict_add_number(dict, "lnum", buf == curbuf ? curwin->w_cursor.lnum
+    dict_add_সংখ্যা(dict, "lnum", buf == curbuf ? curwin->w_cursor.lnum
 						     : buflist_findlnum(buf));
-    dict_add_number(dict, "linecount", buf->b_ml.ml_line_count);
-    dict_add_number(dict, "loaded", buf->b_ml.ml_mfp != NULL);
-    dict_add_number(dict, "listed", buf->b_p_bl);
-    dict_add_number(dict, "changed", bufIsChanged(buf));
-    dict_add_number(dict, "changedtick", CHANGEDTICK(buf));
-    dict_add_number(dict, "hidden",
-			    buf->b_ml.ml_mfp != NULL && buf->b_nwindows == 0);
-    dict_add_number(dict, "command", buf == cmdwin_buf);
+    dict_add_সংখ্যা(dict, "linecount", buf->b_ml.ml_সাৰি_গুনতি);
+    dict_add_সংখ্যা(dict, "loaded", buf->b_ml.ml_mfp != রিক্ত);
+    dict_add_সংখ্যা(dict, "listed", buf->b_p_bl);
+    dict_add_সংখ্যা(dict, "changed", bufIsChanged(buf));
+    dict_add_সংখ্যা(dict, "changedtick", CHANGEDTICK(buf));
+    dict_add_সংখ্যা(dict, "hidden",
+			    buf->b_ml.ml_mfp != রিক্ত && buf->b_nwindows == 0);
+    dict_add_সংখ্যা(dict, "command", buf == cmdwin_buf);
 
     // Get a reference to buffer variables
     dict_add_dict(dict, "variables", buf->b_vars);
 
     // List of windows displaying this buffer
     windows = list_alloc();
-    if (windows != NULL)
+    যদি (windows != রিক্ত)
     {
 	FOR_ALL_TAB_WINDOWS(tp, wp)
-	    if (wp->w_buffer == buf)
-		list_append_number(windows, (varnumber_T)wp->w_id);
+	    যদি (wp->w_buffer == buf)
+		list_append_সংখ্যা(windows, (varnumber_T)wp->w_id);
 	dict_add_list(dict, "windows", windows);
     }
 
 # ifdef FEAT_PROP_POPUP
     // List of popup windows displaying this buffer
     windows = list_alloc();
-    if (windows != NULL)
+    যদি (windows != রিক্ত)
     {
 	FOR_ALL_POPUPWINS(wp)
-	    if (wp->w_buffer == buf)
-		list_append_number(windows, (varnumber_T)wp->w_id);
+	    যদি (wp->w_buffer == buf)
+		list_append_সংখ্যা(windows, (varnumber_T)wp->w_id);
 	FOR_ALL_TABPAGES(tp)
 	    FOR_ALL_POPUPWINS_IN_TAB(tp, wp)
-		if (wp->w_buffer == buf)
-		    list_append_number(windows, (varnumber_T)wp->w_id);
+		যদি (wp->w_buffer == buf)
+		    list_append_সংখ্যা(windows, (varnumber_T)wp->w_id);
 
 	dict_add_list(dict, "popups", windows);
     }
 # endif
 
 # ifdef FEAT_SIGNS
-    if (buf->b_signlist != NULL)
+    যদি (buf->b_signlist != রিক্ত)
     {
 	// List of signs placed in this buffer
 	list_T	*signs = list_alloc();
-	if (signs != NULL)
+	যদি (signs != রিক্ত)
 	{
 	    get_buffer_signs(buf, signs);
 	    dict_add_list(dict, "signs", signs);
@@ -704,39 +704,39 @@ get_buffer_info(buf_T *buf)
 # endif
 
 # ifdef FEAT_VIMINFO
-    dict_add_number(dict, "lastused", buf->b_last_used);
+    dict_add_সংখ্যা(dict, "lastused", buf->b_last_used);
 # endif
 
-    return dict;
+    ঘূৰাই dict;
 }
 
 /*
  * "getbufinfo()" function
  */
-    void
+    শূন্য
 f_getbufinfo(typval_T *argvars, typval_T *rettv)
 {
-    buf_T	*buf = NULL;
-    buf_T	*argbuf = NULL;
+    buf_T	*buf = রিক্ত;
+    buf_T	*argbuf = রিক্ত;
     dict_T	*d;
-    int		filtered = FALSE;
-    int		sel_buflisted = FALSE;
-    int		sel_bufloaded = FALSE;
-    int		sel_bufmodified = FALSE;
+    পূর্ণাঙ্ক		filtered = FALSE;
+    পূর্ণাঙ্ক		sel_buflisted = FALSE;
+    পূর্ণাঙ্ক		sel_bufloaded = FALSE;
+    পূর্ণাঙ্ক		sel_bufmodified = FALSE;
 
-    if (rettv_list_alloc(rettv) == FAIL)
-	return;
+    যদি (rettv_list_alloc(rettv) == FAIL)
+	ঘূৰাই;
 
-    if (in_vim9script()
+    যদি (in_vim9script()
 	    && check_for_opt_buffer_or_dict_arg(argvars, 0) == FAIL)
-	return;
+	ঘূৰাই;
 
     // List of all the buffers or selected buffers
-    if (argvars[0].v_type == VAR_DICT)
+    যদি (argvars[0].v_type == VAR_DICT)
     {
 	dict_T	*sel_d = argvars[0].vval.v_dict;
 
-	if (sel_d != NULL)
+	যদি (sel_d != রিক্ত)
 	{
 	    filtered = TRUE;
 	    sel_buflisted = dict_get_bool(sel_d, "buflisted", FALSE);
@@ -745,29 +745,29 @@ f_getbufinfo(typval_T *argvars, typval_T *rettv)
 									FALSE);
 	}
     }
-    else if (argvars[0].v_type != VAR_UNKNOWN)
+    অন্যথা যদি (argvars[0].v_type != VAR_UNKNOWN)
     {
 	// Information about one buffer.  Argument specifies the buffer
 	argbuf = tv_get_buf_from_arg(&argvars[0]);
-	if (argbuf == NULL)
-	    return;
+	যদি (argbuf == রিক্ত)
+	    ঘূৰাই;
     }
 
     // Return information about all the buffers or a specified buffer
     FOR_ALL_BUFFERS(buf)
     {
-	if (argbuf != NULL && argbuf != buf)
-	    continue;
-	if (filtered && ((sel_bufloaded && buf->b_ml.ml_mfp == NULL)
+	যদি (argbuf != রিক্ত && argbuf != buf)
+	    অনুৱর্ত;
+	যদি (filtered && ((sel_bufloaded && buf->b_ml.ml_mfp == রিক্ত)
 			|| (sel_buflisted && !buf->b_p_bl)
 			|| (sel_bufmodified && !buf->b_changed)))
-	    continue;
+	    অনুৱর্ত;
 
 	d = get_buffer_info(buf);
-	if (d != NULL)
+	যদি (d != রিক্ত)
 	    list_append_dict(rettv->vval.v_list, d);
-	if (argbuf != NULL)
-	    return;
+	যদি (argbuf != রিক্ত)
+	    ঘূৰাই;
     }
 }
 
@@ -777,105 +777,105 @@ f_getbufinfo(typval_T *argvars, typval_T *rettv)
  * buffer.
  * If 'retlist' is TRUE, then the lines are returned as a Vim List.
  */
-    static void
-get_buffer_lines(
+    স্থির শূন্য
+get_buffer_সাৰিগুলি(
     buf_T	*buf,
     linenr_T	start,
     linenr_T	end,
-    int		retlist,
+    পূর্ণাঙ্ক		retlist,
     typval_T	*rettv)
 {
-    if (!retlist)
+    যদি (!retlist)
     {
 	rettv->v_type = VAR_STRING;
-	rettv->vval.v_string = NULL;
+	rettv->vval.v_string = রিক্ত;
     }
 
-    if (buf == NULL || buf->b_ml.ml_mfp == NULL || start < 0)
+    যদি (buf == রিক্ত || buf->b_ml.ml_mfp == রিক্ত || start < 0)
     {
-	if (retlist)
-	    (void)rettv_list_alloc(rettv);
-	return;
+	যদি (retlist)
+	    (শূন্য)rettv_list_alloc(rettv);
+	ঘূৰাই;
     }
 
-    if (!retlist)
+    যদি (!retlist)
     {
-	if (start >= 1 && start <= buf->b_ml.ml_line_count)
+	যদি (start >= 1 && start <= buf->b_ml.ml_সাৰি_গুনতি)
 	    rettv->vval.v_string =
 		vim_strnsave(ml_get_buf(buf, start, FALSE),
 		    ml_get_buf_len(buf, start));
-	else
+	অন্যথা
 	    rettv->vval.v_string = vim_strnsave((char_u *)"", 0);
     }
-    else
+    অন্যথা
     {
 	list_T		*l;
 	listitem_T	*li;
 
 	start = MAX(start, 1);
-	end = MIN(end, buf->b_ml.ml_line_count);
-	if (end < start)
-	    goto nolist;
+	end = MIN(end, buf->b_ml.ml_সাৰি_গুনতি);
+	যদি (end < start)
+	    গচ্ছ nolist;
 
 	// The number of lines is known, so allocate the list and its items
 	// in one allocation.
-	l = list_alloc_with_items((int)(end - start + 1));
-	if (l == NULL)
-	    goto nolist;
+	l = list_alloc_with_বস্তুসমূহ((পূর্ণাঙ্ক)(end - start + 1));
+	যদি (l == রিক্ত)
+	    গচ্ছ nolist;
 	rettv_list_set(rettv, l);
 
 	// The items are already linked and zeroed, so only the string needs
 	// to be filled in.
-	for (li = l->lv_first; start <= end; ++start, li = li->li_next)
+	বাবে (li = l->lv_first; start <= end; ++start, li = li->li_next)
 	{
 	    li->li_tv.v_type = VAR_STRING;
 	    li->li_tv.vval.v_string = vim_strnsave(ml_get_buf(buf, start, FALSE),
 						   ml_get_buf_len(buf, start));
 	}
     }
-    return;
+    ঘূৰাই;
 
 nolist:
-    (void)rettv_list_alloc(rettv);
+    (শূন্য)rettv_list_alloc(rettv);
 }
 
 /*
  * "retlist" TRUE: "getbufline()" function
  * "retlist" FALSE: "getbufoneline()" function
  */
-    static void
-getbufline(typval_T *argvars, typval_T *rettv, int retlist)
+    স্থির শূন্য
+getbufline(typval_T *argvars, typval_T *rettv, পূর্ণাঙ্ক retlist)
 {
     linenr_T	lnum = 1;
     linenr_T	end = 1;
     buf_T	*buf;
-    int		did_emsg_before = did_emsg;
+    পূর্ণাঙ্ক		did_emsg_before = did_emsg;
 
-    if (in_vim9script()
+    যদি (in_vim9script()
 	    && (check_for_buffer_arg(argvars, 0) == FAIL
 		|| check_for_lnum_arg(argvars, 1) == FAIL
 		|| check_for_opt_lnum_arg(argvars, 2) == FAIL))
-	return;
+	ঘূৰাই;
 
     buf = tv_get_buf_from_arg(&argvars[0]);
-    if (buf != NULL)
+    যদি (buf != রিক্ত)
     {
 	lnum = tv_get_lnum_buf(&argvars[1], buf);
-	if (did_emsg > did_emsg_before)
-	    return;
-	if (argvars[2].v_type == VAR_UNKNOWN)
+	যদি (did_emsg > did_emsg_before)
+	    ঘূৰাই;
+	যদি (argvars[2].v_type == VAR_UNKNOWN)
 	    end = lnum;
-	else
+	অন্যথা
 	    end = tv_get_lnum_buf(&argvars[2], buf);
     }
 
-    get_buffer_lines(buf, lnum, end, retlist, rettv);
+    get_buffer_সাৰিগুলি(buf, lnum, end, retlist, rettv);
 }
 
 /*
  * "getbufline()" function
  */
-    void
+    শূন্য
 f_getbufline(typval_T *argvars, typval_T *rettv)
 {
     getbufline(argvars, rettv, TRUE);
@@ -884,7 +884,7 @@ f_getbufline(typval_T *argvars, typval_T *rettv)
 /*
  * "getbufoneline()" function
  */
-    void
+    শূন্য
 f_getbufoneline(typval_T *argvars, typval_T *rettv)
 {
     getbufline(argvars, rettv, FALSE);
@@ -893,66 +893,66 @@ f_getbufoneline(typval_T *argvars, typval_T *rettv)
 /*
  * "getline(lnum, [end])" function
  */
-    void
+    শূন্য
 f_getline(typval_T *argvars, typval_T *rettv)
 {
     linenr_T	lnum;
     linenr_T	end;
-    int		retlist;
+    পূর্ণাঙ্ক		retlist;
 
-    if (in_vim9script()
+    যদি (in_vim9script()
 	    && (check_for_lnum_arg(argvars, 0) == FAIL
 		|| check_for_opt_lnum_arg(argvars, 1) == FAIL))
-	return;
+	ঘূৰাই;
 
     lnum = tv_get_lnum(argvars);
-    if (argvars[1].v_type == VAR_UNKNOWN)
+    যদি (argvars[1].v_type == VAR_UNKNOWN)
     {
 	end = 0;
 	retlist = FALSE;
     }
-    else
+    অন্যথা
     {
 	end = tv_get_lnum(&argvars[1]);
 	retlist = TRUE;
     }
 
-    get_buffer_lines(curbuf, lnum, end, retlist, rettv);
+    get_buffer_সাৰিগুলি(curbuf, lnum, end, retlist, rettv);
 }
 
 /*
  * "setbufline()" function
  */
-    void
+    শূন্য
 f_setbufline(typval_T *argvars, typval_T *rettv)
 {
-    buf_set_append_line(argvars, rettv, FALSE);
+    buf_set_append_সাৰি(argvars, rettv, FALSE);
 }
 
 /*
  * "setline()" function
  */
-    void
+    শূন্য
 f_setline(typval_T *argvars, typval_T *rettv)
 {
     linenr_T	lnum;
-    int		did_emsg_before = did_emsg;
+    পূর্ণাঙ্ক		did_emsg_before = did_emsg;
 
-    if (in_vim9script() && check_for_lnum_arg(argvars, 0) == FAIL)
-	return;
+    যদি (in_vim9script() && check_for_lnum_arg(argvars, 0) == FAIL)
+	ঘূৰাই;
 
     lnum = tv_get_lnum(&argvars[0]);
-    if (did_emsg == did_emsg_before)
-	set_buffer_lines(curbuf, lnum, FALSE, &argvars[1], rettv);
+    যদি (did_emsg == did_emsg_before)
+	set_buffer_সাৰিগুলি(curbuf, lnum, FALSE, &argvars[1], rettv);
 }
 #endif  // FEAT_EVAL
 
-#if defined(FEAT_PYTHON) || defined(FEAT_PYTHON3)
+#যদি defined(FEAT_PYTHON) || defined(FEAT_PYTHON3)
 /*
  * Make "buf" the current buffer.  restore_buffer() MUST be called to undo.
  * No autocommands will be executed.  Use aucmd_prepbuf() if there are any.
  */
-    void
+    শূন্য
 switch_buffer(bufref_T *save_curbuf, buf_T *buf)
 {
     block_autocmds();
@@ -969,7 +969,7 @@ switch_buffer(bufref_T *save_curbuf, buf_T *buf)
 /*
  * Restore the current buffer after using switch_buffer().
  */
-    void
+    শূন্য
 restore_buffer(bufref_T *save_curbuf)
 {
     unblock_autocmds();
@@ -977,7 +977,7 @@ restore_buffer(bufref_T *save_curbuf)
     --disable_fold_update;
 # endif
     // Check for valid buffer, just in case.
-    if (bufref_valid(save_curbuf))
+    যদি (bufref_valid(save_curbuf))
     {
 	--curbuf->b_nwindows;
 	curwin->w_buffer = save_curbuf->br_buf;
@@ -991,16 +991,16 @@ restore_buffer(bufref_T *save_curbuf)
  * If found OK is returned and "wp" and "tp" are set to the window and tabpage.
  * If not found FAIL is returned.
  */
-    static int
+    স্থির পূর্ণাঙ্ক
 find_win_for_buf(
     buf_T     *buf,
     win_T     **wp,
     tabpage_T **tp)
 {
     FOR_ALL_TAB_WINDOWS(*tp, *wp)
-	if ((*wp)->w_buffer == buf)
-	    return OK;
-    return FAIL;
+	যদি ((*wp)->w_buffer == buf)
+	    ঘূৰাই OK;
+    ঘূৰাই FAIL;
 }
 
 /*
@@ -1009,7 +1009,7 @@ find_win_for_buf(
  * Caller must initialize save_curbuf to NULL.
  * restore_win_for_buf() MUST be called later!
  */
-    void
+    শূন্য
 switch_to_win_for_buf(
 	buf_T	    *buf,
 	switchwin_T *switchwin,
@@ -1018,23 +1018,23 @@ switch_to_win_for_buf(
     win_T	*wp;
     tabpage_T	*tp;
 
-    if (find_win_for_buf(buf, &wp, &tp) == FAIL)
+    যদি (find_win_for_buf(buf, &wp, &tp) == FAIL)
 	switch_buffer(save_curbuf, buf);
-    else if (switch_win(switchwin, wp, tp, TRUE) == FAIL)
+    অন্যথা যদি (switch_win(switchwin, wp, tp, TRUE) == FAIL)
     {
 	restore_win(switchwin, TRUE);
 	switch_buffer(save_curbuf, buf);
     }
 }
 
-    void
+    শূন্য
 restore_win_for_buf(
 	switchwin_T *switchwin,
 	bufref_T    *save_curbuf)
 {
-    if (save_curbuf->br_buf == NULL)
+    যদি (save_curbuf->br_buf == রিক্ত)
 	restore_win(switchwin, TRUE);
-    else
+    অন্যথা
 	restore_buffer(save_curbuf);
 }
 #endif

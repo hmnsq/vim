@@ -20,16 +20,16 @@
  *
  */
 
-#if !defined(XEMIT_H)
+#যদি !defined(XEMIT_H)
 #define XEMIT_H
 
 
-typedef int (*emit_func_t)(xdfenv_t *xe, xdchange_t *xscr, xdemitcb_t *ecb,
-			   xdemitconf_t const *xecfg);
+প্রকারনির্দেশ পূর্ণাঙ্ক (*emit_func_t)(xdfenv_t *xe, xdchange_t *xscr, xdemitcb_t *ecb,
+			   xdemitconf_t ধ্রুৱ *xecfg);
 
-xdchange_t *xdl_get_hunk(xdchange_t **xscr, xdemitconf_t const *xecfg);
-int xdl_emit_diff(xdfenv_t *xe, xdchange_t *xscr, xdemitcb_t *ecb,
-		  xdemitconf_t const *xecfg);
+xdchange_t *xdl_get_hunk(xdchange_t **xscr, xdemitconf_t ধ্রুৱ *xecfg);
+পূর্ণাঙ্ক xdl_emit_diff(xdfenv_t *xe, xdchange_t *xscr, xdemitcb_t *ecb,
+		  xdemitconf_t ধ্রুৱ *xecfg);
 
 
 

@@ -3,7 +3,7 @@
  * Table giving the index of the first command in cmdnames[] to lookup
  * based on the first letter of a command.
  */
-static const unsigned short cmdidxs1[26] =
+স্থির ধ্রুৱ unsigned short cmdidxs1[26] =
 {
   /* a */ 0,
   /* b */ 21,
@@ -39,7 +39,7 @@ static const unsigned short cmdidxs1[26] =
  * Values in cmdidxs2[c1][c2] are relative to cmdidxs1[c1] so that they
  * fit in a byte.
  */
-static const unsigned char cmdidxs2[26][26] =
+স্থির ধ্রুৱ unsigned ৱর্ণ cmdidxs2[26][26] =
 { /*         a   b   c   d   e   f   g   h   i   j   k   l   m   n   o   p   q   r   s   t   u   v   w   x   y   z */
   /* a */ {  0,  1,  0,  0,  0,  0,  0,  0,  0,  0,  0,  5,  6,  7,  0,  0,  0,  8, 17,  0, 18,  0,  0,  0,  0,  0 },
   /* b */ {  2,  0,  0,  5,  6,  8,  0,  0,  0,  0,  0,  9, 10, 11, 12, 13,  0, 14,  0,  0,  0,  0, 23,  0,  0,  0 },
@@ -69,4 +69,4 @@ static const unsigned char cmdidxs2[26][26] =
   /* z */ {  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0 }
 };
 
-static const int command_count = 600;
+স্থির ধ্রুৱ পূর্ণাঙ্ক command_গুনতি = 600;

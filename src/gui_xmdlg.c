@@ -16,40 +16,40 @@
  * when using a dynamic scrollbar policy.
  */
 
-#include "vim.h"
+#অন্তর্ভাৱ "vim.h"
 
-#include <Xm/Form.h>
-#include <Xm/PushBG.h>
-#include <Xm/Text.h>
-#include <Xm/TextF.h>
-#include <Xm/Label.h>
-#include <Xm/Frame.h>
-#include <Xm/LabelG.h>
-#include <Xm/ToggleBG.h>
-#include <Xm/SeparatoG.h>
-#include <Xm/DialogS.h>
-#include <Xm/List.h>
-#include <Xm/RowColumn.h>
-#include <Xm/AtomMgr.h>
-#include <Xm/Protocols.h>
+#অন্তর্ভাৱ <Xm/Form.h>
+#অন্তর্ভাৱ <Xm/PushBG.h>
+#অন্তর্ভাৱ <Xm/Text.h>
+#অন্তর্ভাৱ <Xm/TextF.h>
+#অন্তর্ভাৱ <Xm/Label.h>
+#অন্তর্ভাৱ <Xm/Frame.h>
+#অন্তর্ভাৱ <Xm/LabelG.h>
+#অন্তর্ভাৱ <Xm/ToggleBG.h>
+#অন্তর্ভাৱ <Xm/SeparatoG.h>
+#অন্তর্ভাৱ <Xm/DialogS.h>
+#অন্তর্ভাৱ <Xm/List.h>
+#অন্তর্ভাৱ <Xm/RowColumn.h>
+#অন্তর্ভাৱ <Xm/AtomMgr.h>
+#অন্তর্ভাৱ <Xm/Protocols.h>
 
-#include <X11/keysym.h>
-#include <X11/Xatom.h>
-#include <X11/StringDefs.h>
-#include <X11/Intrinsic.h>
+#অন্তর্ভাৱ <X11/keysym.h>
+#অন্তর্ভাৱ <X11/Xatom.h>
+#অন্তর্ভাৱ <X11/StringDefs.h>
+#অন্তর্ভাৱ <X11/Intrinsic.h>
 
-extern Widget vimShell;
+বাহ্য Widget vimShell;
 
 #ifdef FEAT_MENU
 # define apply_fontlist(w) gui_motif_menu_fontlist(w)
-#else
+#অন্যথা
 # define apply_fontlist(w)
 #endif
 
 /////////////////////////////////////////////////////////////////////////////
 // Font selection dialogue implementation.
 
-static char wild[3] = "*";
+স্থির ৱর্ণ wild[3] = "*";
 
 /*
  * FIXME: This is a generic function, which should be used throughout the whole
@@ -60,18 +60,18 @@ static char wild[3] = "*";
  * WM_DELETE_WINDOW protocol request for the window.
  */
 
-    static void
-add_cancel_action(Widget shell, XtCallbackProc close_callback, void *arg)
+    স্থির শূন্য
+add_cancel_action(Widget shell, XtCallbackProc close_callback, শূন্য *arg)
 {
-    static Atom wmp_atom = 0;
-    static Atom dw_atom = 0;
+    স্থির Atom wmp_atom = 0;
+    স্থির Atom dw_atom = 0;
     Display *display = XtDisplay(shell);
 
     // deactivate the built-in delete response of killing the application
-    XtVaSetValues(shell, XmNdeleteResponse, XmDO_NOTHING, NULL);
+    Xt_Va_Set_মানসমূহ(shell, XmNdeleteResponse, XmDO_NOTHING, রিক্ত);
 
     // add a delete window protocol callback instead
-    if (!dw_atom)
+    যদি (!dw_atom)
     {
 	wmp_atom = XmInternAtom(display, "WM_PROTOCOLS", True);
 	dw_atom = XmInternAtom(display, "WM_DELETE_WINDOW", True);
@@ -85,7 +85,7 @@ add_cancel_action(Widget shell, XtCallbackProc close_callback, void *arg)
 #define MAX_DISPLAY_SIZE		150
 #define TEMP_BUF_SIZE			256
 
-enum ListSpecifier
+গণনা ListSpecifier
 {
     ENCODING,
     NAME,
@@ -94,7 +94,7 @@ enum ListSpecifier
     NONE
 };
 
-typedef struct _SharedFontSelData
+প্রকারনির্দেশ সংরচনা _SharedFontSelData
 {
     Widget	dialog;
     Widget	ok;
@@ -104,11 +104,11 @@ typedef struct _SharedFontSelData
     Widget	list[NONE];
     Widget	name;
     Widget	sample;
-    char	**names;	// font name array of arrays
-    int		num;		// number of font names
+    ৱর্ণ	**names;	// font name array of arrays
+    পূর্ণাঙ্ক		অঙ্ক;		// number of font names
     String	sel[NONE];	// selection category
     Boolean	in_pixels;	// toggle state - size in pixels
-    char	*font_name;	// current font name
+    ৱর্ণ	*font_name;	// current font name
     XFontStruct	*old;		// font data structure for sample display
     XmFontList	old_list;	// font data structure for sample display
     Boolean	exit;		// used for program exit control
@@ -117,39 +117,39 @@ typedef struct _SharedFontSelData
 /*
  * Checking access to the font name array for validity.
  */
-    static char *
-fn(SharedFontSelData *data, int i)
+    স্থির ৱর্ণ *
+fn(SharedFontSelData *data, পূর্ণাঙ্ক i)
 {
     // Assertion checks:
-    if (data->num < 0)
+    যদি (data->অঙ্ক < 0)
 	abort();
-    if (i >= data->num)
-	i = data->num - 1;
-    if (i < 0)
+    যদি (i >= data->অঙ্ক)
+	i = data->অঙ্ক - 1;
+    যদি (i < 0)
 	i = 0;
 
-    return data->names[i];
+    ঘূৰাই data->names[i];
 }
 
 /*
  * Get a specific substring from a font name.
  */
-    static void
-get_part(char *in, int pos, char *out)
+    স্থির শূন্য
+get_part(ৱর্ণ *in, পূর্ণাঙ্ক pos, ৱর্ণ *out)
 {
-    int	i;
-    int j;
+    পূর্ণাঙ্ক	i;
+    পূর্ণাঙ্ক j;
 
     *out = '\0';
 
-    for (i = 0; (pos > 0) && (in[i] != '\0'); ++i)
-	if (in[i] == '-')
+    বাবে (i = 0; (pos > 0) && (in[i] != '\0'); ++i)
+	যদি (in[i] == '-')
 	    pos--;
 
-    if (in[i] == '\0')
-	return;
+    যদি (in[i] == '\0')
+	ঘূৰাই;
 
-    for (j = 0; (in[i] != '-') && (in[i] != '\0'); ++i, ++j)
+    বাবে (j = 0; (in[i] != '-') && (in[i] != '\0'); ++i, ++j)
 	out[j] = in[i];
     out[j] = '\0';
 }
@@ -158,54 +158,54 @@ get_part(char *in, int pos, char *out)
  * Given a font name this function returns the part used in the first
  * scroll list.
  */
-    static void
-name_part(char *font, char *buf)
+    স্থির শূন্য
+name_part(ৱর্ণ *font, ৱর্ণ *buf)
 {
-    char    buf2[TEMP_BUF_SIZE];
-    char    buf3[TEMP_BUF_SIZE];
+    ৱর্ণ    buf2[TEMP_BUF_SIZE];
+    ৱর্ণ    buf3[TEMP_BUF_SIZE];
 
     get_part(font, 2, buf2);
     get_part(font, 1, buf3);
 
-    if (*buf3 != NUL)
+    যদি (*buf3 != NUL)
 	vim_snprintf(buf, TEMP_BUF_SIZE, "%s (%s)", buf2, buf3);
-    else
+    অন্যথা
 	vim_snprintf(buf, TEMP_BUF_SIZE, "%s", buf2);
 }
 
 /*
  * Given a font name this function returns the part used in the second scroll list.
  */
-    static void
-style_part(char *font, char *buf)
+    স্থির শূন্য
+style_part(ৱর্ণ *font, ৱর্ণ *buf)
 {
-    char    buf2[TEMP_BUF_SIZE];
-    char    buf3[TEMP_BUF_SIZE];
+    ৱর্ণ    buf2[TEMP_BUF_SIZE];
+    ৱর্ণ    buf3[TEMP_BUF_SIZE];
 
     get_part(font, 3, buf3);
     get_part(font, 5, buf2);
 
-    if (!strcmp(buf2, "normal") && !strcmp(buf2, "Normal")
+    যদি (!strcmp(buf2, "normal") && !strcmp(buf2, "Normal")
 						   && !strcmp(buf2, "NORMAL"))
 	vim_snprintf(buf, TEMP_BUF_SIZE, "%s %s", buf3, buf2);
-    else
+    অন্যথা
 	strcpy(buf, buf3);
 
     get_part(font, 6, buf2);
 
-    if (buf2[0] != '\0')
+    যদি (buf2[0] != '\0')
 	vim_snprintf(buf3, TEMP_BUF_SIZE, "%s %s", buf, buf2);
-    else
+    অন্যথা
 	strcpy(buf3, buf);
 
     get_part(font, 4, buf2);
 
-    if (!strcmp(buf2, "o") || !strcmp(buf2, "O"))
+    যদি (!strcmp(buf2, "o") || !strcmp(buf2, "O"))
 	vim_snprintf(buf, TEMP_BUF_SIZE, "%s oblique", buf3);
-    else if (!strcmp(buf2, "i") || !strcmp(buf2, "I"))
+    অন্যথা যদি (!strcmp(buf2, "i") || !strcmp(buf2, "I"))
 	vim_snprintf(buf, TEMP_BUF_SIZE, "%s italic", buf3);
 
-    if (!strcmp(buf, " "))
+    যদি (!strcmp(buf, " "))
 	strcpy(buf, "-");
 }
 
@@ -213,34 +213,34 @@ style_part(char *font, char *buf)
  * Given a font name this function returns the part used in the third
  * scroll list.
  */
-    static void
-size_part(char *font, char *buf, int inPixels)
+    স্থির শূন্য
+size_part(ৱর্ণ *font, ৱর্ণ *buf, পূর্ণাঙ্ক inPixels)
 {
-    int	    size;
-    float   temp;
+    পূর্ণাঙ্ক	    size;
+    ভিন্ন   temp;
 
     *buf = '\0';
 
-    if (inPixels)
+    যদি (inPixels)
     {
 	get_part(font, 7, buf);
-	if (*buf != NUL)
+	যদি (*buf != NUL)
 	{
 	    size = atoi(buf);
 	    sprintf(buf, "%3d", size);
 	}
     }
-    else
+    অন্যথা
     {
 	get_part(font, 8, buf);
-	if (*buf != NUL)
+	যদি (*buf != NUL)
 	{
 	    size = atoi(buf);
-	    temp = (float)size / 10.0;
+	    temp = (ভিন্ন)size / 10.0;
 	    size = temp;
-	    if (buf[strlen(buf) - 1] == '0')
+	    যদি (buf[strlen(buf) - 1] == '0')
 		sprintf(buf, "%3d", size);
-	    else
+	    অন্যথা
 		sprintf(buf, "%4.1f", temp);
 	}
     }
@@ -249,109 +249,109 @@ size_part(char *font, char *buf, int inPixels)
 /*
  * Given a font name this function returns the part used in the choice menu.
  */
-    static void
-encoding_part(char *font, char *buf)
+    স্থির শূন্য
+encoding_part(ৱর্ণ *font, ৱর্ণ *buf)
 {
-    char    buf1[TEMP_BUF_SIZE];
-    char    buf2[TEMP_BUF_SIZE];
+    ৱর্ণ    buf1[TEMP_BUF_SIZE];
+    ৱর্ণ    buf2[TEMP_BUF_SIZE];
 
     *buf = '\0';
 
     get_part(font, 13, buf1);
     get_part(font, 14, buf2);
 
-    if (*buf1 != NUL && *buf2 != NUL)
+    যদি (*buf1 != NUL && *buf2 != NUL)
 	vim_snprintf(buf, TEMP_BUF_SIZE, "%s-%s", buf1, buf2);
-    if (!strcmp(buf, " "))
+    যদি (!strcmp(buf, " "))
 	strcpy(buf, "-");
 }
 
 /*
  * Inserts a string into correct sorted position in a list.
  */
-    static void
-add_to_list(char **buf, char *item, int *count)
+    স্থির শূন্য
+add_to_list(ৱর্ণ **buf, ৱর্ণ *item, পূর্ণাঙ্ক *গুনতি)
 {
-    int	i;
-    int j;
+    পূর্ণাঙ্ক	i;
+    পূর্ণাঙ্ক j;
 
-    if (*count == MAX_ENTRIES_IN_LIST)
-	return;
+    যদি (*গুনতি == MAX_ENTRIES_IN_LIST)
+	ঘূৰাই;
 
     // avoid duplication
-    for (i = 0; i < *count; ++i)
+    বাবে (i = 0; i < *গুনতি; ++i)
     {
-	if (!strcmp(buf[i], item))
-	    return;
+	যদি (!strcmp(buf[i], item))
+	    ঘূৰাই;
     }
 
     // find order place, but make sure that wild card comes first
-    if (!strcmp(item, wild))
+    যদি (!strcmp(item, wild))
 	i = 0;
-    else
-	for (i = 0; i < *count; ++i)
-	    if (strcmp(buf[i], item) > 0 && strcmp(buf[i], wild))
-		break;
+    অন্যথা
+	বাবে (i = 0; i < *গুনতি; ++i)
+	    যদি (strcmp(buf[i], item) > 0 && strcmp(buf[i], wild))
+		ভঙ্গ;
 
     // now insert the item
-    for (j = *count; j > i; --j)
+    বাবে (j = *গুনতি; j > i; --j)
 	buf[j] = buf[j-1];
     buf[i] = XtNewString(item);
 
-    ++(*count);
+    ++(*গুনতি);
 }
 
 /*
  * True if the font matches some field.
  */
-    static Boolean
-match(SharedFontSelData *data, enum ListSpecifier l, int i)
+    স্থির Boolean
+match(SharedFontSelData *data, গণনা ListSpecifier l, পূর্ণাঙ্ক i)
 {
-    char buf[TEMP_BUF_SIZE];
+    ৱর্ণ buf[TEMP_BUF_SIZE];
 
     // An empty selection or a wild card matches anything.
-    if (!data->sel[l] || !strcmp(data->sel[l], wild))
-	return True;
+    যদি (!data->sel[l] || !strcmp(data->sel[l], wild))
+	ঘূৰাই True;
 
     // chunk out the desired part...
-    switch (l)
+    ৱিকল্প (l)
     {
-	case ENCODING:
+	পক্ষ ENCODING:
 	    encoding_part(fn(data, i), buf);
-	    break;
+	    ভঙ্গ;
 
-	case NAME:
+	পক্ষ NAME:
 	    name_part(fn(data, i), buf);
-	    break;
+	    ভঙ্গ;
 
-	case STYLE:
+	পক্ষ STYLE:
 	    style_part(fn(data, i), buf);
-	    break;
+	    ভঙ্গ;
 
-	case SIZE:
+	পক্ষ SIZE:
 	    size_part(fn(data, i), buf, data->in_pixels);
-	    break;
-	default:
+	    ভঙ্গ;
+	স্ৱভাৱ:
 	    ;
     }
 
     // ...and chew it now
 
-    return !strcmp(buf, data->sel[l]);
+    ঘূৰাই !strcmp(buf, data->sel[l]);
 }
 
-    static Boolean
-proportional(char *font)
+    স্থির Boolean
+proportional(ৱর্ণ *font)
 {
-    char buf[TEMP_BUF_SIZE];
+    ৱর্ণ buf[TEMP_BUF_SIZE];
 
     get_part(font, 11, buf);
 
-    return !strcmp(buf, "p") || !strcmp(buf, "P");
+    ঘূৰাই !strcmp(buf, "p") || !strcmp(buf, "P");
 }
 
 
-static void encoding_callback(Widget w, SharedFontSelData *data,
+স্থির শূন্য encoding_callback(Widget w, SharedFontSelData *data,
 							     XtPointer dummy);
 
 /*
@@ -359,68 +359,68 @@ static void encoding_callback(Widget w, SharedFontSelData *data,
  * parameter can be used to exclude a list from any changes.  This is used for
  * updates after selections caused by the users actions.
  */
-    static void
-fill_lists(enum ListSpecifier fix, SharedFontSelData *data)
+    স্থির শূন্য
+fill_lists(গণনা ListSpecifier fix, SharedFontSelData *data)
 {
-    char	*list[NONE][MAX_ENTRIES_IN_LIST];
-    int		count[NONE];
-    char	buf[TEMP_BUF_SIZE];
-    XmString	items[MAX_ENTRIES_IN_LIST];
-    int		i;
-    int		idx;
+    ৱর্ণ	*list[NONE][MAX_ENTRIES_IN_LIST];
+    পূর্ণাঙ্ক		গুনতি[NONE];
+    ৱর্ণ	buf[TEMP_BUF_SIZE];
+    XmString	বস্তুসমূহ[MAX_ENTRIES_IN_LIST];
+    পূর্ণাঙ্ক		i;
+    পূর্ণাঙ্ক		idx;
 
-    for (idx = (int)ENCODING; idx < (int)NONE; ++idx)
-	count[idx] = 0;
+    বাবে (idx = (পূর্ণাঙ্ক)ENCODING; idx < (পূর্ণাঙ্ক)NONE; ++idx)
+	গুনতি[idx] = 0;
 
     // First we insert the wild char into every single list.
-    if (fix != ENCODING)
-	add_to_list(list[ENCODING], wild, &count[ENCODING]);
-    if (fix != NAME)
-	add_to_list(list[NAME], wild, &count[NAME]);
-    if (fix != STYLE)
-	add_to_list(list[STYLE], wild, &count[STYLE]);
-    if (fix != SIZE)
-	add_to_list(list[SIZE], wild, &count[SIZE]);
+    যদি (fix != ENCODING)
+	add_to_list(list[ENCODING], wild, &গুনতি[ENCODING]);
+    যদি (fix != NAME)
+	add_to_list(list[NAME], wild, &গুনতি[NAME]);
+    যদি (fix != STYLE)
+	add_to_list(list[STYLE], wild, &গুনতি[STYLE]);
+    যদি (fix != SIZE)
+	add_to_list(list[SIZE], wild, &গুনতি[SIZE]);
 
-    for (i = 0; i < data->num && i < MAX_ENTRIES_IN_LIST; i++)
+    বাবে (i = 0; i < data->অঙ্ক && i < MAX_ENTRIES_IN_LIST; i++)
     {
-	if (proportional(fn(data, i)))
-	    continue;
+	যদি (proportional(fn(data, i)))
+	    অনুৱর্ত;
 
-	if (fix != ENCODING
+	যদি (fix != ENCODING
 		&& match(data, NAME, i)
 		&& match(data, STYLE, i)
 		&& match(data, SIZE, i))
 	{
 	    encoding_part(fn(data, i), buf);
-	    add_to_list(list[ENCODING], buf, &count[ENCODING]);
+	    add_to_list(list[ENCODING], buf, &গুনতি[ENCODING]);
 	}
 
-	if (fix != NAME
+	যদি (fix != NAME
 		&& match(data, ENCODING, i)
 		&& match(data, STYLE, i)
 		&& match(data, SIZE, i))
 	{
 	    name_part(fn(data, i), buf);
-	    add_to_list(list[NAME], buf, &count[NAME]);
+	    add_to_list(list[NAME], buf, &গুনতি[NAME]);
 	}
 
-	if (fix != STYLE
+	যদি (fix != STYLE
 		&& match(data, ENCODING, i)
 		&& match(data, NAME, i)
 		&& match(data, SIZE, i))
 	{
 	    style_part(fn(data, i), buf);
-	    add_to_list(list[STYLE], buf, &count[STYLE]);
+	    add_to_list(list[STYLE], buf, &গুনতি[STYLE]);
 	}
 
-	if (fix != SIZE
+	যদি (fix != SIZE
 		&& match(data, ENCODING, i)
 		&& match(data, NAME, i)
 		&& match(data, STYLE, i))
 	{
 	    size_part(fn(data, i), buf, data->in_pixels);
-	    add_to_list(list[SIZE], buf, &count[SIZE]);
+	    add_to_list(list[SIZE], buf, &গুনতি[SIZE]);
 	}
     }
 
@@ -428,150 +428,150 @@ fill_lists(enum ListSpecifier fix, SharedFontSelData *data)
      * And now do the preselection in all lists where there was one:
      */
 
-    if (fix != ENCODING)
+    যদি (fix != ENCODING)
     {
-	Cardinal n_items;
+	Cardinal n_বস্তুসমূহ;
 	WidgetList children;
 	Widget selected_button = 0;
 
 	// Get and update the current button list.
-	XtVaGetValues(data->encoding_pulldown,
+	Xt_Va_Get_মানসমূহ(data->encoding_pulldown,
 		XmNchildren, &children,
-		XmNnumChildren, &n_items,
-		NULL);
+		XmNnumChildren, &n_বস্তুসমূহ,
+		রিক্ত);
 
-	for (i = 0; i < count[ENCODING]; ++i)
+	বাবে (i = 0; i < গুনতি[ENCODING]; ++i)
 	{
 	    Widget button;
 
-	    items[i] = XmStringCreateLocalized(list[ENCODING][i]);
+	    বস্তুসমূহ[i] = XmStringCreateLocalized(list[ENCODING][i]);
 
-	    if (i < (int)n_items)
+	    যদি (i < (পূর্ণাঙ্ক)n_বস্তুসমূহ)
 	    {
 		// recycle old button
-		XtVaSetValues(children[i],
-			XmNlabelString, items[i],
+		Xt_Va_Set_মানসমূহ(children[i],
+			XmNlabelString, বস্তুসমূহ[i],
 			XmNuserData, i,
-			NULL);
+			রিক্ত);
 		button = children[i];
 	    }
-	    else
+	    অন্যথা
 	    {
 		// create a new button
 		button = XtVaCreateManagedWidget("button",
-			xmPushButtonGadgetClass,
+			xm_ঠেলো_Button_Gadget_Class,
 			data->encoding_pulldown,
-			XmNlabelString, items[i],
+			XmNlabelString, বস্তুসমূহ[i],
 			XmNuserData, i,
-			NULL);
+			রিক্ত);
 		XtAddCallback(button, XmNactivateCallback,
 			(XtCallbackProc) encoding_callback, (XtPointer) data);
 		XtManageChild(button);
 	    }
 
-	    if (data->sel[ENCODING])
+	    যদি (data->sel[ENCODING])
 	    {
-		if (!strcmp(data->sel[ENCODING], list[ENCODING][i]))
+		যদি (!strcmp(data->sel[ENCODING], list[ENCODING][i]))
 		    selected_button = button;
 	    }
 	    XtFree(list[ENCODING][i]);
 	}
 
 	// Destroy all the outstanding menu items.
-	for (i = count[ENCODING]; i < (int)n_items; ++i)
+	বাবে (i = গুনতি[ENCODING]; i < (পূর্ণাঙ্ক)n_বস্তুসমূহ; ++i)
 	{
 	    XtUnmanageChild(children[i]);
 	    XtDestroyWidget(children[i]);
 	}
 
 	// Preserve the current selection visually.
-	if (selected_button)
+	যদি (selected_button)
 	{
-	    XtVaSetValues(data->encoding_menu,
+	    Xt_Va_Set_মানসমূহ(data->encoding_menu,
 		    XmNmenuHistory, selected_button,
-		    NULL);
+		    রিক্ত);
 	}
 
-	for (i = 0; i < count[ENCODING]; ++i)
-	    XmStringFree(items[i]);
+	বাবে (i = 0; i < গুনতি[ENCODING]; ++i)
+	    XmStringFree(বস্তুসমূহ[i]);
     }
 
     /*
      * Now loop through the remaining lists and set them up.
      */
-    for (idx = (int)NAME; idx < (int)NONE; ++idx)
+    বাবে (idx = (পূর্ণাঙ্ক)NAME; idx < (পূর্ণাঙ্ক)NONE; ++idx)
     {
 	Widget w;
 
-	if (fix == (enum ListSpecifier)idx)
-	    continue;
+	যদি (fix == (গণনা ListSpecifier)idx)
+	    অনুৱর্ত;
 
-	switch ((enum ListSpecifier)idx)
+	ৱিকল্প ((গণনা ListSpecifier)idx)
 	{
-	    case NAME:
+	    পক্ষ NAME:
 		w = data->list[NAME];
-		break;
-	    case STYLE:
+		ভঙ্গ;
+	    পক্ষ STYLE:
 		w = data->list[STYLE];
-		break;
-	    case SIZE:
+		ভঙ্গ;
+	    পক্ষ SIZE:
 		w = data->list[SIZE];
-		break;
-	    default:
+		ভঙ্গ;
+	    স্ৱভাৱ:
 		w = (Widget)0;	// for lint
 	}
 
-	for (i = 0; i < count[idx]; ++i)
+	বাবে (i = 0; i < গুনতি[idx]; ++i)
 	{
-	    items[i] = XmStringCreateLocalized(list[idx][i]);
+	    বস্তুসমূহ[i] = XmStringCreateLocalized(list[idx][i]);
 	    XtFree(list[idx][i]);
 	}
-	XmListDeleteAllItems(w);
-	XmListAddItems(w, items, count[idx], 1);
-	if (data->sel[idx])
+	Xm_List_Delete_All_বস্তুসমূহ(w);
+	Xm_List_Add_বস্তুসমূহ(w, বস্তুসমূহ, গুনতি[idx], 1);
+	যদি (data->sel[idx])
 	{
-	    XmStringFree(items[0]);
-	    items[0] = XmStringCreateLocalized(data->sel[idx]);
-	    XmListSelectItem(w, items[0], False);
-	    XmListSetBottomItem(w, items[0]);
+	    XmStringFree(বস্তুসমূহ[0]);
+	    বস্তুসমূহ[0] = XmStringCreateLocalized(data->sel[idx]);
+	    XmListSelectItem(w, বস্তুসমূহ[0], False);
+	    XmListSetBottomItem(w, বস্তুসমূহ[0]);
 	}
-	for (i = 0; i < count[idx]; ++i)
-	    XmStringFree(items[i]);
+	বাবে (i = 0; i < গুনতি[idx]; ++i)
+	    XmStringFree(বস্তুসমূহ[i]);
     }
 }
 
-    static void
+    স্থির শূন্য
 stoggle_callback(Widget w UNUSED,
 	SharedFontSelData *data,
 	XmToggleButtonCallbackStruct *call_data)
 {
-    int		i, do_sel;
-    char	newSize[TEMP_BUF_SIZE];
+    পূর্ণাঙ্ক		i, do_sel;
+    ৱর্ণ	newSize[TEMP_BUF_SIZE];
     XmString	str;
 
-    if (call_data->reason != (int)XmCR_VALUE_CHANGED)
-	return;
+    যদি (call_data->reason != (পূর্ণাঙ্ক)Xm_CR_মান_CHANGED)
+	ঘূৰাই;
 
-    do_sel = (data->sel[SIZE] != NULL) && strcmp(data->sel[SIZE], wild);
+    do_sel = (data->sel[SIZE] != রিক্ত) && strcmp(data->sel[SIZE], wild);
 
-    for (i = 0; do_sel && (i < data->num); i++)
-	if (match(data, ENCODING, i)
+    বাবে (i = 0; do_sel && (i < data->অঙ্ক); i++)
+	যদি (match(data, ENCODING, i)
 		&& match(data, NAME, i)
 		&& match(data, STYLE, i)
 		&& match(data, SIZE, i))
 	{
 	    size_part(fn(data, i), newSize, !data->in_pixels);
-	    break;
+	    ভঙ্গ;
 	}
 
     data->in_pixels = !data->in_pixels;
 
-    if (data->sel[SIZE])
+    যদি (data->sel[SIZE])
 	XtFree(data->sel[SIZE]);
-    data->sel[SIZE] = NULL;
+    data->sel[SIZE] = রিক্ত;
     fill_lists(NONE, data);
 
-    if (do_sel)
+    যদি (do_sel)
     {
 	str = XmStringCreateLocalized(newSize);
 	XmListSelectItem(data->list[SIZE], str, True);
@@ -583,11 +583,11 @@ stoggle_callback(Widget w UNUSED,
 /*
  * Show the currently selected font in the sample text label.
  */
-    static void
+    স্থির শূন্য
 display_sample(SharedFontSelData *data)
 {
     Arg		    args[2];
-    int		    n;
+    পূর্ণাঙ্ক		    n;
     XFontStruct	*   font;
     XmFontList	    font_list;
     Display *	    display;
@@ -602,10 +602,10 @@ display_sample(SharedFontSelData *data)
     XtSetArg(args[n], XmNlabelString, str); n++;
     XtSetArg(args[n], XmNfontList, font_list); n++;
 
-    XtSetValues(data->sample, args, n);
+    Xt_Set_মানসমূহ(data->sample, args, n);
     XmStringFree(str);
 
-    if (data->old)
+    যদি (data->old)
     {
 	XFreeFont(display, data->old);
 	XmFontListFree(data->old_list);
@@ -615,29 +615,29 @@ display_sample(SharedFontSelData *data)
 }
 
 
-    static Boolean
+    স্থির Boolean
 do_choice(Widget w,
 	SharedFontSelData *data,
 	XmListCallbackStruct *call_data,
-	enum ListSpecifier which)
+	গণনা ListSpecifier which)
 {
-    char *sel;
+    ৱর্ণ *sel;
 
     XmStringGetLtoR(call_data->item, XmSTRING_DEFAULT_CHARSET, &sel);
 
-    if (!data->sel[which])
+    যদি (!data->sel[which])
 	data->sel[which] = XtNewString(sel);
-    else
+    অন্যথা
     {
-	if (!strcmp(data->sel[which], sel))
+	যদি (!strcmp(data->sel[which], sel))
 	{
 	    // unselecting current selection
 	    XtFree(data->sel[which]);
-	    data->sel[which] = NULL;
-	    if (w)
+	    data->sel[which] = রিক্ত;
+	    যদি (w)
 		XmListDeselectItem(w, call_data->item);
 	}
-	else
+	অন্যথা
 	{
 	    XtFree(data->sel[which]);
 	    data->sel[which] = XtNewString(sel);
@@ -648,7 +648,7 @@ do_choice(Widget w,
     fill_lists(which, data);
 
     // If there is a font selection, we display it.
-    if (data->sel[ENCODING]
+    যদি (data->sel[ENCODING]
 	    && data->sel[NAME]
 	    && data->sel[STYLE]
 	    && data->sel[SIZE]
@@ -657,57 +657,57 @@ do_choice(Widget w,
 	    && strcmp(data->sel[STYLE], wild)
 	    && strcmp(data->sel[SIZE], wild))
     {
-	int i;
+	পূর্ণাঙ্ক i;
 
-	if (data->font_name)
+	যদি (data->font_name)
 	    XtFree(data->font_name);
-	data->font_name = NULL;
+	data->font_name = রিক্ত;
 
-	for (i = 0; i < data->num; i++)
+	বাবে (i = 0; i < data->অঙ্ক; i++)
 	{
-	    if (match(data, ENCODING, i)
+	    যদি (match(data, ENCODING, i)
 		    && match(data, NAME, i)
 		    && match(data, STYLE, i)
 		    && match(data, SIZE, i))
 	    {
 		data->font_name = XtNewString(fn(data, i));
-		break;
+		ভঙ্গ;
 	    }
 	}
 
-	if (data->font_name)
+	যদি (data->font_name)
 	{
 	    XmTextSetString(data->name, data->font_name);
 	    display_sample(data);
 	}
-	else
+	অন্যথা
 	    do_dialog(VIM_ERROR,
 		    (char_u *)_("Error"),
 		    (char_u *)_("Invalid font specification"),
-		    (char_u *)_("&Dismiss"), 1, NULL, FALSE);
+		    (char_u *)_("&Dismiss"), 1, রিক্ত, FALSE);
 
-	return True;
+	ঘূৰাই True;
     }
-    else
+    অন্যথা
     {
-	int	    n;
+	পূর্ণাঙ্ক	    n;
 	XmString    str;
 	Arg	    args[4];
-	char	    *nomatch_msg = _("no specific match");
+	ৱর্ণ	    *nomatch_বাৰ্তা = _("no specific match");
 
 	n = 0;
-	str = XmStringCreateLocalized(nomatch_msg);
+	str = XmStringCreateLocalized(nomatch_বাৰ্তা);
 	XtSetArg(args[n], XmNlabelString, str); ++n;
-	XtSetValues(data->sample, args, n);
+	Xt_Set_মানসমূহ(data->sample, args, n);
 	apply_fontlist(data->sample);
-	XmTextSetString(data->name, nomatch_msg);
+	XmTextSetString(data->name, nomatch_বাৰ্তা);
 	XmStringFree(str);
 
-	return False;
+	ঘূৰাই False;
     }
 }
 
-    static void
+    স্থির শূন্য
 encoding_callback(Widget w,
 	SharedFontSelData *data,
 	XtPointer dummy UNUSED)
@@ -715,17 +715,17 @@ encoding_callback(Widget w,
     XmString str;
     XmListCallbackStruct fake_data;
 
-    XtVaGetValues(w, XmNlabelString, &str, NULL);
+    Xt_Va_Get_মানসমূহ(w, XmNlabelString, &str, রিক্ত);
 
-    if (!str)
-	return;
+    যদি (!str)
+	ঘূৰাই;
 
     fake_data.item = str;
 
     do_choice(0, data, &fake_data, ENCODING);
 }
 
-    static void
+    স্থির শূন্য
 name_callback(Widget w,
 	SharedFontSelData *data,
 	XmListCallbackStruct *call_data)
@@ -733,7 +733,7 @@ name_callback(Widget w,
     do_choice(w, data, call_data, NAME);
 }
 
-    static void
+    স্থির শূন্য
 style_callback(Widget w,
 	SharedFontSelData *data,
 	XmListCallbackStruct *call_data)
@@ -741,7 +741,7 @@ style_callback(Widget w,
     do_choice(w, data, call_data, STYLE);
 }
 
-    static void
+    স্থির শূন্য
 size_callback(Widget w,
 	SharedFontSelData *data,
 	XmListCallbackStruct *call_data)
@@ -749,95 +749,95 @@ size_callback(Widget w,
     do_choice(w, data, call_data, SIZE);
 }
 
-    static void
+    স্থির শূন্য
 cancel_callback(Widget w UNUSED,
 	SharedFontSelData *data,
 	XmListCallbackStruct *call_data UNUSED)
 {
-    if (data->sel[ENCODING])
+    যদি (data->sel[ENCODING])
     {
 	XtFree(data->sel[ENCODING]);
-	data->sel[ENCODING] = NULL;
+	data->sel[ENCODING] = রিক্ত;
     }
-    if (data->sel[NAME])
+    যদি (data->sel[NAME])
     {
 	XtFree(data->sel[NAME]);
-	data->sel[NAME] = NULL;
+	data->sel[NAME] = রিক্ত;
     }
-    if (data->sel[STYLE])
+    যদি (data->sel[STYLE])
     {
 	XtFree(data->sel[STYLE]);
-	data->sel[STYLE] = NULL;
+	data->sel[STYLE] = রিক্ত;
     }
-    if (data->sel[SIZE])
+    যদি (data->sel[SIZE])
     {
 	XtFree(data->sel[SIZE]);
-	data->sel[SIZE] = NULL;
+	data->sel[SIZE] = রিক্ত;
     }
 
-    if (data->font_name)
+    যদি (data->font_name)
 	XtFree(data->font_name);
-    data->font_name = NULL;
+    data->font_name = রিক্ত;
 
-    data->num = 0;
+    data->অঙ্ক = 0;
     XFreeFontNames(data->names);
-    data->names = NULL;
+    data->names = রিক্ত;
     data->exit = True;
 }
 
-    static void
+    স্থির শূন্য
 ok_callback(Widget w UNUSED,
 	SharedFontSelData *data,
-	XmPushButtonCallbackStruct *call_data UNUSED)
+	Xm_ঠেলো_Button_Callback_Struct *call_data UNUSED)
 {
-    char    *pattern;
-    char    **name;
-    int	    i;
+    ৱর্ণ    *pattern;
+    ৱর্ণ    **name;
+    পূর্ণাঙ্ক	    i;
 
     pattern = XmTextGetString(data->name);
     name    = XListFonts(XtDisplay(data->dialog), pattern, 1, &i);
     XtFree(pattern);
 
-    if (i != 1)
+    যদি (i != 1)
     {
 	do_dialog(VIM_ERROR,
 		(char_u *)_("Error"),
 		(char_u *)_("Invalid font specification"),
-		(char_u *)_("&Dismiss"), 1, NULL, FALSE);
+		(char_u *)_("&Dismiss"), 1, রিক্ত, FALSE);
 	XFreeFontNames(name);
     }
-    else
+    অন্যথা
     {
-	if (data->font_name)
+	যদি (data->font_name)
 	    XtFree(data->font_name);
 	data->font_name = XtNewString(name[0]);
 
-	if (data->sel[ENCODING])
+	যদি (data->sel[ENCODING])
 	{
 	    XtFree(data->sel[ENCODING]);
-	    data->sel[ENCODING] = NULL;
+	    data->sel[ENCODING] = রিক্ত;
 	}
-	if (data->sel[NAME])
+	যদি (data->sel[NAME])
 	{
 	    XtFree(data->sel[NAME]);
-	    data->sel[NAME] = NULL;
+	    data->sel[NAME] = রিক্ত;
 	}
-	if (data->sel[STYLE])
+	যদি (data->sel[STYLE])
 	{
 	    XtFree(data->sel[STYLE]);
-	    data->sel[STYLE] = NULL;
+	    data->sel[STYLE] = রিক্ত;
 	}
-	if (data->sel[SIZE])
+	যদি (data->sel[SIZE])
 	{
 	    XtFree(data->sel[SIZE]);
-	    data->sel[SIZE] = NULL;
+	    data->sel[SIZE] = রিক্ত;
 	}
 
 	XFreeFontNames(name);
 
-	data->num = 0;
+	data->অঙ্ক = 0;
 	XFreeFontNames(data->names);
-	data->names = NULL;
+	data->names = রিক্ত;
 	data->exit = True;
     }
 }
@@ -850,7 +850,7 @@ ok_callback(Widget w UNUSED,
     char_u *
 gui_xm_select_font(char_u *current)
 {
-    static SharedFontSelData	_data;
+    স্থির SharedFontSelData	_data;
 
     Widget		parent;
     Widget		form;
@@ -861,16 +861,16 @@ gui_xm_select_font(char_u *current)
     Widget		disp_frame;
     Widget		frame;
     Arg			args[64];
-    int			n;
+    পূর্ণাঙ্ক			n;
     XmString		str;
-    char		big_font[MAX_FONT_NAME_LEN];
+    ৱর্ণ		big_font[MAX_FONT_NAME_LEN];
     SharedFontSelData	*data;
 
     data = &_data;
 
     parent = vimShell;
     data->names = XListFonts(XtDisplay(parent), "-*-*-*-*-*-*-*-*-*-*-*-*-*-*",
-						       MAX_FONTS, &data->num);
+						       MAX_FONTS, &data->অঙ্ক);
 
     /*
      * Find the name of the biggest font less than the given limit
@@ -879,17 +879,17 @@ gui_xm_select_font(char_u *current)
      */
 
     {
-	int	i;
-	int	max;
-	int	idx = 0;
-	int	size;
-	char	buf[128];
+	পূর্ণাঙ্ক	i;
+	পূর্ণাঙ্ক	max;
+	পূর্ণাঙ্ক	idx = 0;
+	পূর্ণাঙ্ক	size;
+	ৱর্ণ	buf[128];
 
-	for (i = 0, max = 0; i < data->num; i++)
+	বাবে (i = 0, max = 0; i < data->অঙ্ক; i++)
 	{
 	    get_part(fn(data, i), 7, buf);
 	    size = atoi(buf);
-	    if ((size > max) && (size < MAX_DISPLAY_SIZE))
+	    যদি ((size > max) && (size < MAX_DISPLAY_SIZE))
 	    {
 		idx = i;
 		max = size;
@@ -901,7 +901,7 @@ gui_xm_select_font(char_u *current)
     data->old_list = gui_motif_create_fontlist(data->old);
 
     // Set the title of the Dialog window.
-    data->dialog = XmCreateDialogShell(parent, "fontSelector", NULL, 0);
+    data->dialog = XmCreateDialogShell(parent, "fontSelector", রিক্ত, 0);
     str = XmStringCreateLocalized(_("Vim - Font Selector"));
 
     // Create form popup dialog widget.
@@ -910,7 +910,7 @@ gui_xm_select_font(char_u *current)
 	    XmNdialogTitle, str,
 	    XmNautoUnmanage, False,
 	    XmNdialogStyle, XmDIALOG_FULL_APPLICATION_MODAL,
-	    NULL);
+	    রিক্ত);
     XmStringFree(str);
 
     sub_form = XtVaCreateManagedWidget("subForm",
@@ -922,26 +922,26 @@ gui_xm_select_font(char_u *current)
 	    XmNtopAttachment, XmATTACH_FORM,
 	    XmNtopOffset, 4,
 	    XmNorientation, XmVERTICAL,
-	    NULL);
+	    রিক্ত);
 
     data->ok = XtVaCreateManagedWidget(_("OK"),
-	    xmPushButtonGadgetClass, sub_form,
+	    xm_ঠেলো_Button_Gadget_Class, sub_form,
 	    XmNleftAttachment, XmATTACH_FORM,
 	    XmNrightAttachment, XmATTACH_FORM,
 	    XmNtopAttachment, XmATTACH_FORM,
 	    XmNtopOffset, 4,
-	    NULL);
+	    রিক্ত);
     apply_fontlist(data->ok);
 
     data->cancel = XtVaCreateManagedWidget(_("Cancel"),
-	    xmPushButtonGadgetClass, sub_form,
+	    xm_ঠেলো_Button_Gadget_Class, sub_form,
 	    XmNrightAttachment, XmATTACH_FORM,
 	    XmNleftAttachment, XmATTACH_FORM,
 	    XmNtopAttachment, XmATTACH_WIDGET,
 	    XmNtopWidget, data->ok,
 	    XmNtopOffset, 4,
 	    XmNshowAsDefault, True,
-	    NULL);
+	    রিক্ত);
     apply_fontlist(data->cancel);
 
     // Create the separator for beauty.
@@ -966,10 +966,10 @@ gui_xm_select_font(char_u *current)
 	    XmNrightWidget, separator,
 	    XmNrightOffset, 4,
 	    XmNeditable, False,
-	    XmNeditMode, XmSINGLE_LINE_EDIT,
+	    XmNeditMode, Xm_SINGLE_সাৰি_EDIT,
 	    XmNmaxLength, MAX_FONT_NAME_LEN,
 	    XmNcolumns, 60,
-	    NULL);
+	    রিক্ত);
 
     str = XmStringCreateLocalized(_("Name:"));
     name = XtVaCreateManagedWidget("fontNameLabel",
@@ -981,7 +981,7 @@ gui_xm_select_font(char_u *current)
 	    XmNbottomAttachment, XmATTACH_WIDGET,
 	    XmNbottomWidget, data->name,
 	    XmNtopOffset, 1,
-	    NULL);
+	    রিক্ত);
     XmStringFree(str);
     apply_fontlist(name);
 
@@ -997,7 +997,7 @@ gui_xm_select_font(char_u *current)
 	    XmNrightWidget, separator,
 	    XmNrightOffset, 4,
 	    XmNalignment, XmALIGNMENT_BEGINNING,
-	    NULL);
+	    রিক্ত);
 
     data->sample = XtVaCreateManagedWidget("sampleLabel",
 	    xmLabelWidgetClass, disp_frame,
@@ -1008,7 +1008,7 @@ gui_xm_select_font(char_u *current)
 	    XmNalignment, XmALIGNMENT_BEGINNING,
 	    XmNrecomputeSize, False,
 	    XmNfontList, data->old_list,
-	    NULL);
+	    রিক্ত);
 
     // create toggle button
     str = XmStringCreateLocalized(_("Show size in Points"));
@@ -1020,7 +1020,7 @@ gui_xm_select_font(char_u *current)
 	    XmNbottomAttachment, XmATTACH_WIDGET,
 	    XmNbottomWidget, disp_frame,
 	    XmNbottomOffset, 4,
-	    NULL);
+	    রিক্ত);
     XmStringFree(str);
     apply_fontlist(size_toggle);
     XtManageChild(size_toggle);
@@ -1028,7 +1028,7 @@ gui_xm_select_font(char_u *current)
     // Encoding pulldown menu.
 
     data->encoding_pulldown = XmCreatePulldownMenu(form,
-						 "encodingPulldown", NULL, 0);
+						 "encodingPulldown", রিক্ত, 0);
     str = XmStringCreateLocalized(_("Encoding:"));
     n = 0;
     XtSetArg(args[n], XmNsubMenuId, data->encoding_pulldown); ++n;
@@ -1063,7 +1063,7 @@ gui_xm_select_font(char_u *current)
 	    XmNtopAttachment, XmATTACH_FORM,
 	    XmNtopOffset, 2,
 	    XmNorientation, XmVERTICAL,
-	    NULL);
+	    রিক্ত);
 
     // font list
     frame = XtVaCreateManagedWidget("frame", xmFrameWidgetClass, sub_form,
@@ -1073,7 +1073,7 @@ gui_xm_select_font(char_u *current)
 	    XmNleftAttachment, XmATTACH_FORM,
 	    XmNrightAttachment, XmATTACH_POSITION,
 	    XmNrightPosition, 50,
-	    NULL);
+	    রিক্ত);
 
     str = XmStringCreateLocalized(_("Font:"));
     name = XtVaCreateManagedWidget("nameListLabel", xmLabelGadgetClass, frame,
@@ -1081,12 +1081,12 @@ gui_xm_select_font(char_u *current)
 	    XmNchildVerticalAlignment, XmALIGNMENT_CENTER,
 	    XmNchildHorizontalAlignment, XmALIGNMENT_BEGINNING,
 	    XmNlabelString, str,
-	    NULL);
+	    রিক্ত);
     XmStringFree(str);
     apply_fontlist(name);
 
     n = 0;
-    XtSetArg(args[n], XmNvisibleItemCount, 8); ++n;
+    XtSetArg(args[n], Xm_Nvisible_Item_গুনতি, 8); ++n;
     XtSetArg(args[n], XmNresizable, True); ++n;
     XtSetArg(args[n], XmNlistSizePolicy, XmCONSTANT); ++n;
     XtSetArg(args[n], XmNvisualPolicy, XmVARIABLE); ++n;
@@ -1094,7 +1094,7 @@ gui_xm_select_font(char_u *current)
     XtSetArg(args[n], XmNscrollBarDisplayPolicy, XmSTATIC); ++n;
 #endif
     data->list[NAME] = XmCreateScrolledList(frame, "fontList", args, n);
-    XtVaSetValues(name, XmNuserData, data->list[NAME], NULL);
+    Xt_Va_Set_মানসমূহ(name, XmNuserData, data->list[NAME], রিক্ত);
 
     // style list
     frame = XtVaCreateManagedWidget("frame", xmFrameWidgetClass, sub_form,
@@ -1106,7 +1106,7 @@ gui_xm_select_font(char_u *current)
 	    XmNleftOffset, 4,
 	    XmNrightAttachment, XmATTACH_POSITION,
 	    XmNrightPosition, 80,
-	    NULL);
+	    রিক্ত);
 
     str = XmStringCreateLocalized(_("Style:"));
     name = XtVaCreateManagedWidget("styleListLabel", xmLabelWidgetClass, frame,
@@ -1114,12 +1114,12 @@ gui_xm_select_font(char_u *current)
 	    XmNchildVerticalAlignment, XmALIGNMENT_CENTER,
 	    XmNchildHorizontalAlignment, XmALIGNMENT_BEGINNING,
 	    XmNlabelString, str,
-	    NULL);
+	    রিক্ত);
     XmStringFree(str);
     apply_fontlist(name);
 
     n = 0;
-    XtSetArg(args[n], XmNvisibleItemCount, 8); ++n;
+    XtSetArg(args[n], Xm_Nvisible_Item_গুনতি, 8); ++n;
     XtSetArg(args[n], XmNresizable, True); ++n;
     XtSetArg(args[n], XmNlistSizePolicy, XmCONSTANT); ++n;
     XtSetArg(args[n], XmNvisualPolicy, XmVARIABLE); ++n;
@@ -1127,7 +1127,7 @@ gui_xm_select_font(char_u *current)
     XtSetArg(args[n], XmNscrollBarDisplayPolicy, XmSTATIC); ++n;
 #endif
     data->list[STYLE] = XmCreateScrolledList(frame, "styleList", args, n);
-    XtVaSetValues(name, XmNuserData, data->list[STYLE], NULL);
+    Xt_Va_Set_মানসমূহ(name, XmNuserData, data->list[STYLE], রিক্ত);
 
     // size list
     frame = XtVaCreateManagedWidget("frame", xmFrameWidgetClass, sub_form,
@@ -1138,7 +1138,7 @@ gui_xm_select_font(char_u *current)
 	    XmNleftPosition, 80,
 	    XmNleftOffset, 4,
 	    XmNrightAttachment, XmATTACH_FORM,
-	    NULL);
+	    রিক্ত);
 
     str = XmStringCreateLocalized(_("Size:"));
     name = XtVaCreateManagedWidget("sizeListLabel", xmLabelGadgetClass, frame,
@@ -1146,12 +1146,12 @@ gui_xm_select_font(char_u *current)
 	    XmNchildVerticalAlignment, XmALIGNMENT_CENTER,
 	    XmNchildHorizontalAlignment, XmALIGNMENT_BEGINNING,
 	    XmNlabelString, str,
-	    NULL);
+	    রিক্ত);
     XmStringFree(str);
     apply_fontlist(name);
 
     n = 0;
-    XtSetArg(args[n], XmNvisibleItemCount, 8); ++n;
+    XtSetArg(args[n], Xm_Nvisible_Item_গুনতি, 8); ++n;
     XtSetArg(args[n], XmNresizable, True); ++n;
     XtSetArg(args[n], XmNlistSizePolicy, XmCONSTANT); ++n;
     XtSetArg(args[n], XmNvisualPolicy, XmVARIABLE); ++n;
@@ -1159,10 +1159,10 @@ gui_xm_select_font(char_u *current)
     XtSetArg(args[n], XmNscrollBarDisplayPolicy, XmSTATIC); ++n;
 #endif
     data->list[SIZE] = XmCreateScrolledList(frame, "sizeList", args, n);
-    XtVaSetValues(name, XmNuserData, data->list[SIZE], NULL);
+    Xt_Va_Set_মানসমূহ(name, XmNuserData, data->list[SIZE], রিক্ত);
 
     // update form widgets cancel button
-    XtVaSetValues(form, XmNcancelButton, data->cancel, NULL);
+    Xt_Va_Set_মানসমূহ(form, XmNcancelButton, data->cancel, রিক্ত);
 
     XtAddCallback(size_toggle, XmNvalueChangedCallback,
 	    (XtCallbackProc)stoggle_callback, (XtPointer)data);
@@ -1195,27 +1195,27 @@ gui_xm_select_font(char_u *current)
 
     data->exit = False;
     data->in_pixels= True;
-    data->sel[ENCODING] = NULL;
-    data->sel[NAME] = NULL;
-    data->sel[STYLE] = NULL;
-    data->sel[SIZE] = NULL;
-    data->font_name = NULL;
+    data->sel[ENCODING] = রিক্ত;
+    data->sel[NAME] = রিক্ত;
+    data->sel[STYLE] = রিক্ত;
+    data->sel[SIZE] = রিক্ত;
+    data->font_name = রিক্ত;
 
     // set up current font parameters
-    if (current && current[0] != '\0')
+    যদি (current && current[0] != '\0')
     {
-	int	    i;
-	char	    **names;
+	পূর্ণাঙ্ক	    i;
+	ৱর্ণ	    **names;
 
-	names = XListFonts(XtDisplay(form), (char *) current, 1, &i);
+	names = XListFonts(XtDisplay(form), (ৱর্ণ *) current, 1, &i);
 
-	if (i != 0)
+	যদি (i != 0)
 	{
-	    char namebuf[TEMP_BUF_SIZE];
-	    char stylebuf[TEMP_BUF_SIZE];
-	    char sizebuf[TEMP_BUF_SIZE];
-	    char encodingbuf[TEMP_BUF_SIZE];
-	    char *found;
+	    ৱর্ণ namebuf[TEMP_BUF_SIZE];
+	    ৱর্ণ stylebuf[TEMP_BUF_SIZE];
+	    ৱর্ণ sizebuf[TEMP_BUF_SIZE];
+	    ৱর্ণ encodingbuf[TEMP_BUF_SIZE];
+	    ৱর্ণ *found;
 
 	    found = names[0];
 
@@ -1224,7 +1224,7 @@ gui_xm_select_font(char_u *current)
 	    size_part(found, sizebuf, data->in_pixels);
 	    encoding_part(found, encodingbuf);
 
-	    if (*namebuf != NUL
+	    যদি (*namebuf != NUL
 		    && *stylebuf != NUL
 		    && *sizebuf != NUL
 		    && *encodingbuf != NUL)
@@ -1237,7 +1237,7 @@ gui_xm_select_font(char_u *current)
 		display_sample(data);
 		XmTextSetString(data->name, data->font_name);
 	    }
-	    else
+	    অন্যথা
 	    {
 		// We can't preset a symbolic name, which isn't a full font
 		// description. Therefore we just behave the same way as if the
@@ -1245,7 +1245,7 @@ gui_xm_select_font(char_u *current)
 		//
 		// Unfortunately there is no known way to expand an abbreviated
 		// font name.
-		data->font_name = NULL;
+		data->font_name = রিক্ত;
 	    }
 	}
 	XFreeFontNames(names);
@@ -1262,11 +1262,11 @@ gui_xm_select_font(char_u *current)
     manage_centered(form);
 
     // modal event loop
-    while (!data->exit)
+    যেতিয়ালৈ (!data->exit)
 	XtAppProcessEvent(XtWidgetToApplicationContext(data->dialog),
-							(XtInputMask)XtIMAll);
+							(Xt_প্ৰবেশ_Mask)XtIMAll);
 
-    if (data->old)
+    যদি (data->old)
     {
 	XFreeFont(XtDisplay(data->dialog),  data->old);
 	XmFontListFree(data->old_list);
@@ -1275,5 +1275,5 @@ gui_xm_select_font(char_u *current)
 
     gui_motif_synch_fonts();
 
-    return (char_u *) data->font_name;
+    ঘূৰাই (char_u *) data->font_name;
 }
