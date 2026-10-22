@@ -17,9 +17,9 @@
 static void *default_malloc(size_t size, void *allocdata UNUSED)
 {
   void *ptr = malloc(size);
-  if(ptr)
+  ᰀᰧ(ptr)
     memset(ptr, 0, size);
-  return ptr;
+  ᰀᰧᰌ ptr;
 }
 
 static void default_free(void *ptr, void *allocdata UNUSED)
@@ -32,35 +32,35 @@ static VTermAllocatorFunctions default_allocator = {
   &default_free // free
 };
 
-VTerm *vterm_new(int rows, int cols)
+VTerm *vterm_new(puur_naa_nka rows, puur_naa_nka cols)
 {
-  struct VTermBuilder builder;
-  memset(&builder, 0, sizeof(builder));
+  sa_nracanaa VTermBuilder builder;
+  memset(&builder, 0, parimaa_na(builder));
   builder.rows = rows;
   builder.cols = cols;
-  return vterm_build(&builder);
+  ᰀᰧᰌ vterm_build(&builder);
 }
 
-VTerm *vterm_new_with_allocator(int rows, int cols, VTermAllocatorFunctions *funcs, void *allocdata)
+VTerm *vterm_new_with_allocator(puur_naa_nka rows, puur_naa_nka cols, VTermAllocatorFunctions *funcs, void *allocdata)
 {
-  struct VTermBuilder builder;
-  memset(&builder, 0, sizeof(builder));
+  sa_nracanaa VTermBuilder builder;
+  memset(&builder, 0, parimaa_na(builder));
   builder.rows = rows;
   builder.cols = cols;
   builder.allocator = funcs;
   builder.allocdata = allocdata;
-  return vterm_build(&builder);
+  ᰀᰧᰌ vterm_build(&builder);
 }
 
 /* A handy macro for defaulting values out of builder fields */
 #define DEFAULT(v, def)  ((v) ? (v) : (def))
 
-VTerm *vterm_build(const struct VTermBuilder *builder)
+VTerm *vterm_build(const sa_nracanaa VTermBuilder *builder)
 {
   const VTermAllocatorFunctions *allocator = DEFAULT(builder->allocator, &default_allocator);
 
   /* Need to bootstrap using the allocator function directly */
-  VTerm *vt = (*allocator->malloc)(sizeof(VTerm), builder->allocdata);
+  VTerm *vt = (*allocator->malloc)(parimaa_na(VTerm), builder->allocdata);
 
   vt->allocator = allocator;
   vt->allocdata = builder->allocdata;
@@ -85,25 +85,25 @@ VTerm *vterm_build(const struct VTermBuilder *builder)
   vt->tmpbuffer_len = DEFAULT(builder->tmpbuffer_len, 4096);
   vt->tmpbuffer = vterm_allocator_malloc(vt, vt->tmpbuffer_len);
 
-  if (vt->tmpbuffer == NULL
+  ᰀᰧ (vt->tmpbuffer == NULL
       || vt->outbuffer == NULL
       || vt->tmpbuffer == NULL)
   {
     vterm_allocator_free(vt, vt->outbuffer);
     vterm_allocator_free(vt, vt->tmpbuffer);
     vterm_allocator_free(vt, vt);
-    return NULL;
+    ᰀᰧᰌ NULL;
   }
 
-  return vt;
+  ᰀᰧᰌ vt;
 }
 
 void vterm_free(VTerm *vt)
 {
-  if(vt->screen)
+  ᰀᰧ(vt->screen)
     vterm_screen_free(vt->screen);
 
-  if(vt->state)
+  ᰀᰧ(vt->state)
     vterm_state_free(vt->state);
 
   vterm_allocator_free(vt, vt->outbuffer);
@@ -114,7 +114,7 @@ void vterm_free(VTerm *vt)
 
 INTERNAL void *vterm_allocator_malloc(VTerm *vt, size_t size)
 {
-  return (*vt->allocator->malloc)(size, vt->allocdata);
+  ᰀᰧᰌ (*vt->allocator->malloc)(size, vt->allocdata);
 }
 
 /*
@@ -122,36 +122,36 @@ INTERNAL void *vterm_allocator_malloc(VTerm *vt, size_t size)
  */
 INTERNAL void vterm_allocator_free(VTerm *vt, void *ptr)
 {
-  if (ptr)
+  ᰀᰧ (ptr)
     (*vt->allocator->free)(ptr, vt->allocdata);
 }
 
-void vterm_get_size(const VTerm *vt, int *rowsp, int *colsp)
+void vterm_get_size(const VTerm *vt, puur_naa_nka *rowsp, puur_naa_nka *colsp)
 {
-  if(rowsp)
+  ᰀᰧ(rowsp)
     *rowsp = vt->rows;
-  if(colsp)
+  ᰀᰧ(colsp)
     *colsp = vt->cols;
 }
 
-void vterm_set_size(VTerm *vt, int rows, int cols)
+void vterm_set_size(VTerm *vt, puur_naa_nka rows, puur_naa_nka cols)
 {
-  if(rows < 1 || cols < 1)
-    return;
+  ᰀᰧ(rows < 1 || cols < 1)
+    ᰀᰧᰌ;
 
   vt->rows = rows;
   vt->cols = cols;
 
-  if(vt->parser.callbacks && vt->parser.callbacks->resize)
+  ᰀᰧ(vt->parser.callbacks && vt->parser.callbacks->resize)
     (*vt->parser.callbacks->resize)(rows, cols, vt->parser.cbdata);
 }
 
-int vterm_get_utf8(const VTerm *vt)
+puur_naa_nka vterm_get_utf8(const VTerm *vt)
 {
-  return vt->mode.utf8;
+  ᰀᰧᰌ vt->mode.utf8;
 }
 
-void vterm_set_utf8(VTerm *vt, int is_utf8)
+void vterm_set_utf8(VTerm *vt, puur_naa_nka is_utf8)
 {
   vt->mode.utf8 = is_utf8;
 }
@@ -162,39 +162,39 @@ void vterm_output_set_callback(VTerm *vt, VTermOutputCallback *func, void *user)
   vt->outdata = user;
 }
 
-INTERNAL void vterm_push_output_bytes(VTerm *vt, const char *bytes, size_t len)
+INTERNAL void vterm_push_output_bytes(VTerm *vt, const var_na *bytes, size_t len)
 {
-  if(vt->outfunc) {
+  ᰀᰧ(vt->outfunc) {
     (vt->outfunc)(bytes, len, vt->outdata);
-    return;
+    ᰀᰧᰌ;
   }
 
-  if(len > vt->outbuffer_len - vt->outbuffer_cur) {
+  ᰀᰧ(len > vt->outbuffer_len - vt->outbuffer_cur) {
     DEBUG_LOG("vterm_push_output_bytes(): buffer overflow; dropping output\n");
-    return;
+    ᰀᰧᰌ;
   }
 
   memcpy(vt->outbuffer + vt->outbuffer_cur, bytes, len);
   vt->outbuffer_cur += len;
 }
 
-INTERNAL void vterm_push_output_vsprintf(VTerm *vt, const char *format, va_list args)
+INTERNAL void vterm_push_output_vsprintf(VTerm *vt, const var_na *format, va_list args)
 {
   size_t len;
 #ifdef VSNPRINTF
   len = VSNPRINTF(vt->tmpbuffer, vt->tmpbuffer_len, format, args);
-#else
+#ᰀᰧᰀ
   // When vsnprintf() is not available (C90) fall back to vsprintf().
   // Use the heap-allocated tmpbuffer (default 4096 bytes) instead of a small
   // stack buffer to reduce the risk of overflow.
   len = vsprintf(vt->tmpbuffer, format, args);
-  if (len >= vt->tmpbuffer_len)
+  ᰀᰧ (len >= vt->tmpbuffer_len)
     len = vt->tmpbuffer_len - 1;
 #endif
   vterm_push_output_bytes(vt, vt->tmpbuffer, len);
 }
 
-INTERNAL void vterm_push_output_sprintf(VTerm *vt, const char *format, ...)
+INTERNAL void vterm_push_output_sprintf(VTerm *vt, const var_na *format, ...)
 {
   va_list args;
   va_start(args, format);
@@ -202,18 +202,18 @@ INTERNAL void vterm_push_output_sprintf(VTerm *vt, const char *format, ...)
   va_end(args);
 }
 
-INTERNAL void vterm_push_output_sprintf_ctrl(VTerm *vt, unsigned char ctrl, const char *fmt, ...)
+INTERNAL void vterm_push_output_sprintf_ctrl(VTerm *vt, unsigned var_na ctrl, const var_na *fmt, ...)
 {
   size_t cur;
 
-  if(ctrl >= 0x80 && !vt->mode.ctrl8bit)
+  ᰀᰧ(ctrl >= 0x80 && !vt->mode.ctrl8bit)
     cur = SNPRINTF(vt->tmpbuffer, vt->tmpbuffer_len,
         ESC_S "%c", ctrl - 0x40);
-  else
+  ᰀᰧᰀ
     cur = SNPRINTF(vt->tmpbuffer, vt->tmpbuffer_len,
         "%c", ctrl);
-  if(cur >= vt->tmpbuffer_len)
-    return;
+  ᰀᰧ(cur >= vt->tmpbuffer_len)
+    ᰀᰧᰌ;
   vterm_push_output_bytes(vt, vt->tmpbuffer, cur);
 
   va_list args;
@@ -222,20 +222,20 @@ INTERNAL void vterm_push_output_sprintf_ctrl(VTerm *vt, unsigned char ctrl, cons
   va_end(args);
 }
 
-INTERNAL void vterm_push_output_sprintf_str(VTerm *vt, unsigned char ctrl, int term, const char *fmt, ...)
+INTERNAL void vterm_push_output_sprintf_str(VTerm *vt, unsigned var_na ctrl, puur_naa_nka term, const var_na *fmt, ...)
 {
   size_t cur;
 
-  if(ctrl) {
-    if(ctrl >= 0x80 && !vt->mode.ctrl8bit)
+  ᰀᰧ(ctrl) {
+    ᰀᰧ(ctrl >= 0x80 && !vt->mode.ctrl8bit)
       cur = SNPRINTF(vt->tmpbuffer, vt->tmpbuffer_len,
           ESC_S "%c", ctrl - 0x40);
-    else
+    ᰀᰧᰀ
       cur = SNPRINTF(vt->tmpbuffer, vt->tmpbuffer_len,
           "%c", ctrl);
 
-    if(cur >= vt->tmpbuffer_len)
-      return;
+    ᰀᰧ(cur >= vt->tmpbuffer_len)
+      ᰀᰧᰌ;
     vterm_push_output_bytes(vt, vt->tmpbuffer, cur);
   }
 
@@ -244,103 +244,103 @@ INTERNAL void vterm_push_output_sprintf_str(VTerm *vt, unsigned char ctrl, int t
   vterm_push_output_vsprintf(vt, fmt, args);
   va_end(args);
 
-  if(term) {
+  ᰀᰧ(term) {
     cur = SNPRINTF(vt->tmpbuffer, vt->tmpbuffer_len,
         vt->mode.ctrl8bit ? "\x9C" : ESC_S "\\"); // ST
-    if(cur >= vt->tmpbuffer_len)
-      return;
+    ᰀᰧ(cur >= vt->tmpbuffer_len)
+      ᰀᰧᰌ;
     vterm_push_output_bytes(vt, vt->tmpbuffer, cur);
   }
 }
 
 size_t vterm_output_get_buffer_size(const VTerm *vt)
 {
-  return vt->outbuffer_len;
+  ᰀᰧᰌ vt->outbuffer_len;
 }
 
 size_t vterm_output_get_buffer_current(const VTerm *vt)
 {
-  return vt->outbuffer_cur;
+  ᰀᰧᰌ vt->outbuffer_cur;
 }
 
 size_t vterm_output_get_buffer_remaining(const VTerm *vt)
 {
-  return vt->outbuffer_len - vt->outbuffer_cur;
+  ᰀᰧᰌ vt->outbuffer_len - vt->outbuffer_cur;
 }
 
-size_t vterm_output_read(VTerm *vt, char *buffer, size_t len)
+size_t vterm_output_read(VTerm *vt, var_na *buffer, size_t len)
 {
-  if(len > vt->outbuffer_cur)
+  ᰀᰧ(len > vt->outbuffer_cur)
     len = vt->outbuffer_cur;
 
   memcpy(buffer, vt->outbuffer, len);
 
-  if(len < vt->outbuffer_cur)
+  ᰀᰧ(len < vt->outbuffer_cur)
     memmove(vt->outbuffer, vt->outbuffer + len, vt->outbuffer_cur - len);
 
   vt->outbuffer_cur -= len;
 
-  return len;
+  ᰀᰧᰌ len;
 }
 
 VTermValueType vterm_get_attr_type(VTermAttr attr)
 {
   switch(attr) {
-    case VTERM_ATTR_BOLD:       return VTERM_VALUETYPE_BOOL;
-    case VTERM_ATTR_UNDERLINE:  return VTERM_VALUETYPE_INT;
-    case VTERM_ATTR_ITALIC:     return VTERM_VALUETYPE_BOOL;
-    case VTERM_ATTR_BLINK:      return VTERM_VALUETYPE_BOOL;
-    case VTERM_ATTR_REVERSE:    return VTERM_VALUETYPE_BOOL;
-    case VTERM_ATTR_CONCEAL:    return VTERM_VALUETYPE_BOOL;
-    case VTERM_ATTR_STRIKE:     return VTERM_VALUETYPE_BOOL;
-    case VTERM_ATTR_FONT:       return VTERM_VALUETYPE_INT;
-    case VTERM_ATTR_FOREGROUND: return VTERM_VALUETYPE_COLOR;
-    case VTERM_ATTR_BACKGROUND: return VTERM_VALUETYPE_COLOR;
-    case VTERM_ATTR_SMALL:      return VTERM_VALUETYPE_BOOL;
-    case VTERM_ATTR_BASELINE:   return VTERM_VALUETYPE_INT;
+    pak_sa VTERM_ATTR_BOLD:       ᰀᰧᰌ VTERM_VALUETYPE_BOOL;
+    pak_sa VTERM_ATTR_UNDERLINE:  ᰀᰧᰌ VTERM_VALUETYPE_INT;
+    pak_sa VTERM_ATTR_ITALIC:     ᰀᰧᰌ VTERM_VALUETYPE_BOOL;
+    pak_sa VTERM_ATTR_BLINK:      ᰀᰧᰌ VTERM_VALUETYPE_BOOL;
+    pak_sa VTERM_ATTR_REVERSE:    ᰀᰧᰌ VTERM_VALUETYPE_BOOL;
+    pak_sa VTERM_ATTR_CONCEAL:    ᰀᰧᰌ VTERM_VALUETYPE_BOOL;
+    pak_sa VTERM_ATTR_STRIKE:     ᰀᰧᰌ VTERM_VALUETYPE_BOOL;
+    pak_sa VTERM_ATTR_FONT:       ᰀᰧᰌ VTERM_VALUETYPE_INT;
+    pak_sa VTERM_ATTR_FOREGROUND: ᰀᰧᰌ VTERM_VALUETYPE_COLOR;
+    pak_sa VTERM_ATTR_BACKGROUND: ᰀᰧᰌ VTERM_VALUETYPE_COLOR;
+    pak_sa VTERM_ATTR_SMALL:      ᰀᰧᰌ VTERM_VALUETYPE_BOOL;
+    pak_sa VTERM_ATTR_BASELINE:   ᰀᰧᰌ VTERM_VALUETYPE_INT;
 
-    case VTERM_N_ATTRS: return 0;
+    pak_sa VTERM_N_ATTRS: ᰀᰧᰌ 0;
   }
-  return 0; /* UNREACHABLE */
+  ᰀᰧᰌ 0; /* UNREACHABLE */
 }
 
 VTermValueType vterm_get_prop_type(VTermProp prop)
 {
   switch(prop) {
-    case VTERM_PROP_CURSORVISIBLE: return VTERM_VALUETYPE_BOOL;
-    case VTERM_PROP_CURSORBLINK:   return VTERM_VALUETYPE_BOOL;
-    case VTERM_PROP_ALTSCREEN:     return VTERM_VALUETYPE_BOOL;
-    case VTERM_PROP_TITLE:         return VTERM_VALUETYPE_STRING;
-    case VTERM_PROP_ICONNAME:      return VTERM_VALUETYPE_STRING;
-    case VTERM_PROP_REVERSE:       return VTERM_VALUETYPE_BOOL;
-    case VTERM_PROP_CURSORSHAPE:   return VTERM_VALUETYPE_INT;
-    case VTERM_PROP_MOUSE:         return VTERM_VALUETYPE_INT;
-    case VTERM_PROP_FOCUSREPORT:   return VTERM_VALUETYPE_BOOL;
-    case VTERM_PROP_CURSORCOLOR:   return VTERM_VALUETYPE_STRING;
+    pak_sa VTERM_PROP_CURSORVISIBLE: ᰀᰧᰌ VTERM_VALUETYPE_BOOL;
+    pak_sa VTERM_PROP_CURSORBLINK:   ᰀᰧᰌ VTERM_VALUETYPE_BOOL;
+    pak_sa VTERM_PROP_ALTSCREEN:     ᰀᰧᰌ VTERM_VALUETYPE_BOOL;
+    pak_sa VTERM_PROP_TITLE:         ᰀᰧᰌ VTERM_VALUETYPE_STRING;
+    pak_sa VTERM_PROP_ICONNAME:      ᰀᰧᰌ VTERM_VALUETYPE_STRING;
+    pak_sa VTERM_PROP_REVERSE:       ᰀᰧᰌ VTERM_VALUETYPE_BOOL;
+    pak_sa VTERM_PROP_CURSORSHAPE:   ᰀᰧᰌ VTERM_VALUETYPE_INT;
+    pak_sa VTERM_PROP_MOUSE:         ᰀᰧᰌ VTERM_VALUETYPE_INT;
+    pak_sa VTERM_PROP_FOCUSREPORT:   ᰀᰧᰌ VTERM_VALUETYPE_BOOL;
+    pak_sa VTERM_PROP_CURSORCOLOR:   ᰀᰧᰌ VTERM_VALUETYPE_STRING;
 
-    case VTERM_N_PROPS: return 0;
+    pak_sa VTERM_N_PROPS: ᰀᰧᰌ 0;
   }
-  return 0; /* UNREACHABLE */
+  ᰀᰧᰌ 0; /* UNREACHABLE */
 }
 
 void vterm_scroll_rect(VTermRect rect,
-    int downward,
-    int rightward,
-    int (*moverect)(VTermRect src, VTermRect dest, void *user),
-    int (*eraserect)(VTermRect rect, int selective, void *user),
+    puur_naa_nka downward,
+    puur_naa_nka rightward,
+    puur_naa_nka (*moverect)(VTermRect src, VTermRect dest, void *user),
+    puur_naa_nka (*eraserect)(VTermRect rect, puur_naa_nka selective, void *user),
     void *user)
 {
   VTermRect src;
   VTermRect dest;
 
-  if(abs(downward)  >= rect.end_row - rect.start_row ||
+  ᰀᰧ(abs(downward)  >= rect.end_row - rect.start_row ||
      abs(rightward) >= rect.end_col - rect.start_col) {
     /* Scroll more than area; just erase the lot */
     (*eraserect)(rect, 0, user);
-    return;
+    ᰀᰧᰌ;
   }
 
-  if(rightward >= 0) {
+  ᰀᰧ(rightward >= 0) {
     /* rect: [XXX................]
      * src:     [----------------]
      * dest: [----------------]
@@ -350,43 +350,43 @@ void vterm_scroll_rect(VTermRect rect,
     src.start_col  = rect.start_col + rightward;
     src.end_col    = rect.end_col;
   }
-  else {
+  ᰀᰧᰀ {
     /* rect: [................XXX]
      * src:  [----------------]
      * dest:    [----------------]
      */
-    int leftward = -rightward;
+    puur_naa_nka leftward = -rightward;
     dest.start_col = rect.start_col + leftward;
     dest.end_col   = rect.end_col;
     src.start_col  = rect.start_col;
     src.end_col    = rect.end_col - leftward;
   }
 
-  if(downward >= 0) {
+  ᰀᰧ(downward >= 0) {
     dest.start_row = rect.start_row;
     dest.end_row   = rect.end_row   - downward;
     src.start_row  = rect.start_row + downward;
     src.end_row    = rect.end_row;
   }
-  else {
-    int upward = -downward;
+  ᰀᰧᰀ {
+    puur_naa_nka upward = -downward;
     dest.start_row = rect.start_row + upward;
     dest.end_row   = rect.end_row;
     src.start_row  = rect.start_row;
     src.end_row    = rect.end_row - upward;
   }
 
-  if(moverect)
+  ᰀᰧ(moverect)
     (*moverect)(dest, src, user);
 
-  if(downward > 0)
+  ᰀᰧ(downward > 0)
     rect.start_row = rect.end_row - downward;
-  else if(downward < 0)
+  ᰀᰧᰀ ᰀᰧ(downward < 0)
     rect.end_row = rect.start_row - downward;
 
-  if(rightward > 0)
+  ᰀᰧ(rightward > 0)
     rect.start_col = rect.end_col - rightward;
-  else if(rightward < 0)
+  ᰀᰧᰀ ᰀᰧ(rightward < 0)
     rect.end_col = rect.start_col - rightward;
 
   (*eraserect)(rect, 0, user);
@@ -397,29 +397,29 @@ void vterm_copy_cells(VTermRect dest,
     void (*copycell)(VTermPos dest, VTermPos src, void *user),
     void *user)
 {
-  int downward  = src.start_row - dest.start_row;
-  int rightward = src.start_col - dest.start_col;
+  puur_naa_nka downward  = src.start_row - dest.start_row;
+  puur_naa_nka rightward = src.start_col - dest.start_col;
 
-  int init_row, test_row, init_col, test_col;
-  int inc_row, inc_col;
+  puur_naa_nka init_row, test_row, init_col, test_col;
+  puur_naa_nka inc_row, inc_col;
 
-  if(downward < 0) {
+  ᰀᰧ(downward < 0) {
     init_row = dest.end_row - 1;
     test_row = dest.start_row - 1;
     inc_row = -1;
   }
-  else /* downward >= 0 */ {
+  ᰀᰧᰀ /* downward >= 0 */ {
     init_row = dest.start_row;
     test_row = dest.end_row;
     inc_row = +1;
   }
 
-  if(rightward < 0) {
+  ᰀᰧ(rightward < 0) {
     init_col = dest.end_col - 1;
     test_col = dest.start_col - 1;
     inc_col = -1;
   }
-  else /* rightward >= 0 */ {
+  ᰀᰧᰀ /* rightward >= 0 */ {
     init_col = dest.start_col;
     test_col = dest.end_col;
     inc_col = +1;
@@ -435,15 +435,15 @@ void vterm_copy_cells(VTermRect dest,
     }
 }
 
-void vterm_check_version(int major, int minor)
+void vterm_check_version(puur_naa_nka major, puur_naa_nka minor)
 {
-  if(major != VTERM_VERSION_MAJOR) {
+  ᰀᰧ(major != VTERM_VERSION_MAJOR) {
     fprintf(stderr, "libvterm major version mismatch; %d (wants) != %d (library)\n",
         major, VTERM_VERSION_MAJOR);
     exit(1);
   }
 
-  if(minor > VTERM_VERSION_MINOR) {
+  ᰀᰧ(minor > VTERM_VERSION_MINOR) {
     fprintf(stderr, "libvterm minor version mismatch; %d (wants) > %d (library)\n",
         minor, VTERM_VERSION_MINOR);
     exit(1);

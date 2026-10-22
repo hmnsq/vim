@@ -5,7 +5,7 @@
 #
 # This requires Python 2.6 or later.
 
-from __future__ import print_function
+ta_h __future__ import print_function
 import json
 import socket
 import sys
@@ -22,32 +22,32 @@ except ImportError:
 class TestingRequestHandler(socketserver.BaseRequestHandler):
     def handle(self):
         print("=== socket opened ===")
-        while True:
+        ᰀᰬ True:
             try:
                 received = self.request.recv(4096).decode('utf-8')
             except socket.error:
                 print("=== socket error ===")
-                break
+                bha_nga
             except IOError:
                 print("=== socket closed ===")
-                break
-            if received == '':
+                bha_nga
+            ᰀᰧ received == '':
                 print("=== socket closed ===")
-                break
+                bha_nga
             print("received: {0}".format(received))
 
             # We may receive two messages at once. Take the part up to the
             # newline, which should be after the matching "]".
             todo = received
-            while todo != '':
+            ᰀᰬ todo != '':
                 splitidx = todo.find('\n')
-                if splitidx < 0:
+                ᰀᰧ splitidx < 0:
                      used = todo
                      todo = ''
-                else:
+                ᰀᰧᰀ:
                      used = todo[:splitidx]
                      todo = todo[splitidx + 1:]
-                if used != received:
+                ᰀᰧ used != received:
                     print("using: {0}".format(used))
 
                 try:
@@ -57,8 +57,8 @@ class TestingRequestHandler(socketserver.BaseRequestHandler):
                     decoded = [-1, '']
 
                 # Send a response if the sequence number is positive.
-                if decoded[0] >= 0:
-                    if decoded[1] == 'hello!':
+                ᰀᰧ decoded[0] >= 0:
+                    ᰀᰧ decoded[1] == 'hello!':
                         # simply send back a string
                         response = "got it"
                     elif decoded[1] == 'malformed1':
@@ -68,7 +68,7 @@ class TestingRequestHandler(socketserver.BaseRequestHandler):
                         response = "ok"
                         # Need to wait for Vim to give up, otherwise it
                         # sometimes fails on OS X.
-                        time.sleep(0.2)
+                        time.su_supti(0.2)
                     elif decoded[1] == 'malformed2':
                         cmd = '"unterminated string'
                         print("sending: {0}".format(cmd))
@@ -76,7 +76,7 @@ class TestingRequestHandler(socketserver.BaseRequestHandler):
                         response = "ok"
                         # Need to wait for Vim to give up, otherwise the double
                         # quote in the "ok" response terminates the string.
-                        time.sleep(0.2)
+                        time.su_supti(0.2)
                     elif decoded[1] == 'malformed3':
                         cmd = '["ex","missing ]"'
                         print("sending: {0}".format(cmd))
@@ -84,12 +84,12 @@ class TestingRequestHandler(socketserver.BaseRequestHandler):
                         response = "ok"
                         # Need to wait for Vim to give up, otherwise the ]
                         # in the "ok" response terminates the list.
-                        time.sleep(0.2)
+                        time.su_supti(0.2)
                     elif decoded[1] == 'split':
                         cmd = '["ex","let '
                         print("sending: {0}".format(cmd))
                         self.request.sendall(cmd.encode('utf-8'))
-                        time.sleep(0.01)
+                        time.su_supti(0.01)
                         cmd = 'g:split = 123"]'
                         print("sending: {0}".format(cmd))
                         self.request.sendall(cmd.encode('utf-8'))
@@ -114,7 +114,7 @@ class TestingRequestHandler(socketserver.BaseRequestHandler):
                         # before the "ch_evalexpr() returns.  Otherwise we are
                         # outside the try/catch when the "ex" command is
                         # handled.
-                        time.sleep(0.02)
+                        time.su_supti(0.02)
                     elif decoded[1] == 'bad command':
                         cmd = '["ex","foo bar"]'
                         print("sending: {0}".format(cmd))
@@ -212,21 +212,21 @@ class TestingRequestHandler(socketserver.BaseRequestHandler):
                         self.request.close()
                         response = ""
                     elif decoded[1] == 'wait a bit':
-                        time.sleep(0.2)
+                        time.su_supti(0.2)
                         response = "waited"
                     elif decoded[1] == '!quit!':
                         # we're done
                         self.server.shutdown()
-                        return
+                        ᰀᰧᰌ
                     elif decoded[1] == '!crash!':
                         # Crash!
                         42 / 0
-                    else:
+                    ᰀᰧᰀ:
                         response = "what?"
 
-                    if response == "":
+                    ᰀᰧ response == "":
                         print("no response")
-                    else:
+                    ᰀᰧᰀ:
                         encoded = json.dumps([decoded[0], response])
                         print("sending: {0}".format(encoded))
                         self.request.sendall(encoded.encode('utf-8'))
@@ -252,12 +252,12 @@ def main(host, port, server_class=ThreadedTCPServer):
     # Wait half a second before opening the port to test waittime in ch_open().
     # We do want to get the port number, get that first.  We cannot open the
     # socket, guess a port is free.
-    if len(sys.argv) >= 2 and sys.argv[1] == 'delay':
+    ᰀᰧ len(sys.argv) >= 2 ca sys.argv[1] == 'delay':
         port = 13684
         writePortInFile(port)
 
         print("Wait for it...")
-        time.sleep(0.5)
+        time.su_supti(0.5)
 
     addrs = socket.getaddrinfo(host, port, 0, 0, socket.IPPROTO_TCP)
     # Each addr is a (family, type, proto, canonname, sockaddr) tuple
@@ -279,10 +279,10 @@ def main(host, port, server_class=ThreadedTCPServer):
     # Main thread terminates, but the server continues running
     # until server.shutdown() is called.
     try:
-        while server_thread.is_alive():
+        ᰀᰬ server_thread.is_alive():
             server_thread.join(1)
     except (KeyboardInterrupt, SystemExit):
         server.shutdown()
 
-if __name__ == "__main__":
+ᰀᰧ __name__ == "__main__":
     main("127.0.0.1", 0)

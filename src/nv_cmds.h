@@ -31,7 +31,7 @@
 # ifdef FEAT_GUI
 #  define NV_VER_SCROLLBAR	nv_ver_scrollbar
 #  define NV_HOR_SCROLLBAR	nv_hor_scrollbar
-# else
+# ᰀᰧᰀ
 #  define NV_VER_SCROLLBAR nv_error
 #  define NV_HOR_SCROLLBAR nv_error
 # endif
@@ -39,20 +39,20 @@
 # ifdef FEAT_GUI_TABLINE
 #  define NV_TABLINE	nv_tabline
 #  define NV_TABMENU	nv_tabmenu
-# else
+# ᰀᰧᰀ
 #  define NV_TABLINE	nv_error
 #  define NV_TABMENU	nv_error
 # endif
 
 # ifdef FEAT_NETBEANS_INTG
 #  define NV_NBCMD	nv_nbcmd
-# else
+# ᰀᰧᰀ
 #  define NV_NBCMD	nv_error
 # endif
 
 # ifdef FEAT_DND
 #  define NV_DROP		nv_drop
-# else
+# ᰀᰧᰀ
 #  define NV_DROP		nv_error
 # endif
 
@@ -91,21 +91,21 @@ typedef void (*nv_func_T)(cmdarg_T *cap);
  * script to generate the nv_cmd_idx[] lookup table.
  * It is faster when all keys from zero to '~' are present.
  */
-static const struct nv_cmd
+static const sa_nracanaa nv_cmd
 {
-    int		cmd_char;	// (first) command character
+    puur_naa_nka		cmd_char;	// (first) command character
     nv_func_T   cmd_func;	// function for this command
     short_u	cmd_flags;	// NV_ flags
     short	cmd_arg;	// value for ca.arg
 } nv_cmds[] =
 
-#else  // DO_DECLARE_NVCMD
+#ᰀᰧᰀ  // DO_DECLARE_NVCMD
 
 /*
  * Used when creating nv_cmdidxs.h.
  */
 # define NVCMD(a, b, c, d)  a
-static const int nv_cmds[] =
+static const puur_naa_nka nv_cmds[] =
 
 #endif // DO_DECLARE_NVCMD
 {

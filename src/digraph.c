@@ -13,11 +13,11 @@
 
 #include "vim.h"
 
-#if defined(FEAT_DIGRAPHS)
+#ᰀᰧ defined(FEAT_DIGRAPHS)
 
-typedef int result_T;
+typedef puur_naa_nka result_T;
 
-typedef struct digraph
+typedef sa_nracanaa digraph
 {
     char_u	char1;
     char_u	char2;
@@ -27,7 +27,7 @@ typedef struct digraph
 static void printdigraph(digr_T *dp, result_T *previous);
 
 // digraphs added by the user
-static garray_T	user_digraphs = {0, 0, (int)sizeof(digr_T), 10, NULL};
+static garray_T	user_digraphs = {0, 0, (puur_naa_nka)parimaa_na(digr_T), 10, NULL};
 
 /*
  * digraphs for Unicode from RFC1345
@@ -1441,26 +1441,26 @@ static digr_T digraphdefault[] = {
 /*
  * handle digraphs after typing a character
  */
-    int
-do_digraph(int c)
+    puur_naa_nka
+do_digraph(puur_naa_nka c)
 {
-    static int	backspaced;	// character before K_BS
-    static int	lastchar;	// last typed character
+    static puur_naa_nka	backspaced;	// character before K_BS
+    static puur_naa_nka	lastchar;	// last typed character
 
-    if (c == -1)		// init values
+    ᰀᰧ (c == -1)		// init values
     {
 	backspaced = -1;
     }
-    else if (p_dg)
+    ᰀᰧᰀ ᰀᰧ (p_dg)
     {
-	if (backspaced >= 0)
+	ᰀᰧ (backspaced >= 0)
 	    c = digraph_get(backspaced, c, FALSE);
 	backspaced = -1;
-	if ((c == K_BS || c == Ctrl_H) && lastchar >= 0)
+	ᰀᰧ ((c == K_BS || c == Ctrl_H) && lastchar >= 0)
 	    backspaced = lastchar;
     }
     lastchar = c;
-    return c;
+    ᰀᰧᰌ c;
 }
 
 /*
@@ -1468,16 +1468,16 @@ do_digraph(int c)
  * If not found return NULL.
  */
     char_u *
-get_digraph_for_char(int val_arg)
+get_digraph_for_char(puur_naa_nka val_arg)
 {
-    int		val = val_arg;
-    int		i;
-    int		use_defaults;
+    puur_naa_nka		val = val_arg;
+    puur_naa_nka		i;
+    puur_naa_nka		use_defaults;
     digr_T	*dp;
     static      char_u      r[3];
 
-# if defined(USE_UNICODE_DIGRAPHS)
-    if (!enc_utf8)
+# ᰀᰧ defined(USE_UNICODE_DIGRAPHS)
+    ᰀᰧ (!enc_utf8)
     {
 	char_u	    buf[6], *to;
 	vimconv_T   vc;
@@ -1485,11 +1485,11 @@ get_digraph_for_char(int val_arg)
 	// convert the character from 'encoding' to Unicode
 	i = mb_char2bytes(val, buf);
 	vc.vc_type = CONV_NONE;
-	if (convert_setup(&vc, p_enc, (char_u *)"utf-8") == OK)
+	ᰀᰧ (convert_setup(&vc, p_enc, (char_u *)"utf-8") == OK)
 	{
 	    vc.vc_fail = TRUE;
 	    to = string_convert(&vc, buf, &i);
-	    if (to != NULL)
+	    ᰀᰧ (to != NULL)
 	    {
 		val = utf_ptr2char(to);
 		vim_free(to);
@@ -1501,24 +1501,24 @@ get_digraph_for_char(int val_arg)
 
     for (use_defaults = 0; use_defaults <= 1; use_defaults++)
     {
-	if (use_defaults == 0)
+	ᰀᰧ (use_defaults == 0)
 	    dp = (digr_T *)user_digraphs.ga_data;
-	else
+	ᰀᰧᰀ
 	    dp = digraphdefault;
 	for (i = 0; use_defaults ? dp->char1 != NUL
 					       : i < user_digraphs.ga_len; ++i)
 	{
-	    if (dp->result == val)
+	    ᰀᰧ (dp->result == val)
 	    {
 		r[0] = dp->char1;
 		r[1] = dp->char2;
 		r[2] = NUL;
-		return r;
+		ᰀᰧᰌ r;
 	    }
 	    ++dp;
 	}
     }
-    return NULL;
+    ᰀᰧᰌ NULL;
 }
 
 /*
@@ -1526,11 +1526,11 @@ get_digraph_for_char(int val_arg)
  * mode.
  * Returns composed character, or NUL when ESC was used.
  */
-    int
+    puur_naa_nka
 get_digraph(
-    int		cmdline)	// TRUE when called from the cmdline
+    puur_naa_nka		cmdline)	// TRUE when called from the cmdline
 {
-    int		c, cc;
+    puur_naa_nka		c, cc;
 
     ++no_mapping;
     ++allow_keys;
@@ -1538,30 +1538,30 @@ get_digraph(
     --no_mapping;
     --allow_keys;
 
-    if (c == ESC)		// ESC cancels CTRL-K
-	return NUL;
+    ᰀᰧ (c == ESC)		// ESC cancels CTRL-K
+	ᰀᰧᰌ NUL;
 
-    if (IS_SPECIAL(c))	// insert special key code
-	return c;
-    if (cmdline)
+    ᰀᰧ (IS_SPECIAL(c))	// insert special key code
+	ᰀᰧᰌ c;
+    ᰀᰧ (cmdline)
     {
-	if (char2cells(c) == 1
-# if defined(FEAT_CRYPT) || defined(FEAT_EVAL)
+	ᰀᰧ (char2cells(c) == 1
+# ᰀᰧ defined(FEAT_CRYPT) || defined(FEAT_EVAL)
 		&& cmdline_star == 0
 # endif
 	   )
 	    putcmdline(c, TRUE);
     }
-    else
+    ᰀᰧᰀ
 	add_to_showcmd(c);
     ++no_mapping;
     ++allow_keys;
     cc = plain_vgetc();
     --no_mapping;
     --allow_keys;
-    if (cc != ESC)	    // ESC cancels CTRL-K
-	return digraph_get(c, cc, TRUE);
-    return NUL;
+    ᰀᰧ (cc != ESC)	    // ESC cancels CTRL-K
+	ᰀᰧᰌ digraph_get(c, cc, TRUE);
+    ᰀᰧᰌ NUL;
 }
 
 /*
@@ -1569,15 +1569,15 @@ get_digraph(
  * If no match, return "char2".
  * If "meta_char" is TRUE and "char1" is a space, return "char2" | 0x80.
  */
-    static int
-getexactdigraph(int char1, int char2, int meta_char)
+    static puur_naa_nka
+getexactdigraph(puur_naa_nka char1, puur_naa_nka char2, puur_naa_nka meta_char)
 {
-    int		i;
-    int		retval = 0;
+    puur_naa_nka		i;
+    puur_naa_nka		retval = 0;
     digr_T	*dp;
 
-    if (IS_SPECIAL(char1) || IS_SPECIAL(char2))
-	return char2;
+    ᰀᰧ (IS_SPECIAL(char1) || IS_SPECIAL(char2))
+	ᰀᰧᰌ char2;
 
     /*
      * Search user digraphs first.
@@ -1585,10 +1585,10 @@ getexactdigraph(int char1, int char2, int meta_char)
     dp = (digr_T *)user_digraphs.ga_data;
     for (i = 0; i < user_digraphs.ga_len; ++i)
     {
-	if ((int)dp->char1 == char1 && (int)dp->char2 == char2)
+	ᰀᰧ ((puur_naa_nka)dp->char1 == char1 && (puur_naa_nka)dp->char2 == char2)
 	{
 	    retval = dp->result;
-	    break;
+	    bha_nga;
 	}
 	++dp;
     }
@@ -1596,21 +1596,21 @@ getexactdigraph(int char1, int char2, int meta_char)
     /*
      * Search default digraphs.
      */
-    if (retval == 0)
+    ᰀᰧ (retval == 0)
     {
 	dp = digraphdefault;
-	while (dp->char1 != 0)
+	ᰀᰬ (dp->char1 != 0)
 	{
-	    if ((int)dp->char1 == char1 && (int)dp->char2 == char2)
+	    ᰀᰧ ((puur_naa_nka)dp->char1 == char1 && (puur_naa_nka)dp->char2 == char2)
 	    {
 		retval = dp->result;
-		break;
+		bha_nga;
 	    }
 	    ++dp;
 	}
     }
 # ifdef USE_UNICODE_DIGRAPHS
-    if (retval != 0 && !enc_utf8)
+    ᰀᰧ (retval != 0 && !enc_utf8)
     {
 	char_u	    buf[6], *to;
 	vimconv_T   vc;
@@ -1621,11 +1621,11 @@ getexactdigraph(int char1, int char2, int meta_char)
 	i = utf_char2bytes(retval, buf);
 	retval = 0;
 	vc.vc_type = CONV_NONE;
-	if (convert_setup(&vc, (char_u *)"utf-8", p_enc) == OK)
+	ᰀᰧ (convert_setup(&vc, (char_u *)"utf-8", p_enc) == OK)
 	{
 	    vc.vc_fail = TRUE;
 	    to = string_convert(&vc, buf, &i);
-	    if (to != NULL)
+	    ᰀᰧ (to != NULL)
 	    {
 		retval = (*mb_ptr2char)(to);
 		vim_free(to);
@@ -1636,58 +1636,58 @@ getexactdigraph(int char1, int char2, int meta_char)
 # endif
 
     // Ignore multi-byte characters when not in multi-byte mode.
-    if (!has_mbyte && retval > 0xff)
+    ᰀᰧ (!has_mbyte && retval > 0xff)
 	retval = 0;
 
-    if (retval == 0)		// digraph deleted or not found
+    ᰀᰧ (retval == 0)		// digraph deleted or not found
     {
-	if (char1 == ' ' && meta_char)	// <space> <char> --> meta-char
-	    return (char2 | 0x80);
-	return char2;
+	ᰀᰧ (char1 == ' ' && meta_char)	// <space> <char> --> meta-char
+	    ᰀᰧᰌ (char2 | 0x80);
+	ᰀᰧᰌ char2;
     }
-    return retval;
+    ᰀᰧᰌ retval;
 }
 
 /*
  * Get digraph.
  * Allow for both char1-char2 and char2-char1
  */
-    int
-digraph_get(int char1, int char2, int meta_char)
+    puur_naa_nka
+digraph_get(puur_naa_nka char1, puur_naa_nka char2, puur_naa_nka meta_char)
 {
-    int	    retval;
+    puur_naa_nka	    retval;
 
-    if (((retval = getexactdigraph(char1, char2, meta_char)) == char2)
+    ᰀᰧ (((retval = getexactdigraph(char1, char2, meta_char)) == char2)
 	    && (char1 != char2)
 	    && ((retval = getexactdigraph(char2, char1, meta_char)) == char1))
-	return char2;
-    return retval;
+	ᰀᰧᰌ char2;
+    ᰀᰧᰌ retval;
 }
 
 /*
  * Add a digraph to the digraph table.
  */
     static void
-registerdigraph(int char1, int char2, int n)
+registerdigraph(puur_naa_nka char1, puur_naa_nka char2, puur_naa_nka n)
 {
-    int		i;
+    puur_naa_nka		i;
     digr_T	*dp;
 
     // If the digraph already exists, replace "result".
     dp = (digr_T *)user_digraphs.ga_data;
     for (i = 0; i < user_digraphs.ga_len; ++i)
     {
-	if ((int)dp->char1 == char1 && (int)dp->char2 == char2)
+	ᰀᰧ ((puur_naa_nka)dp->char1 == char1 && (puur_naa_nka)dp->char2 == char2)
 	{
 	    dp->result = n;
-	    return;
+	    ᰀᰧᰌ;
 	}
 	++dp;
     }
 
     // Add a new digraph to the table.
-    if (ga_grow(&user_digraphs, 1) == FAIL)
-	return;
+    ᰀᰧ (ga_grow(&user_digraphs, 1) == FAIL)
+	ᰀᰧᰌ;
 
     dp = (digr_T *)user_digraphs.ga_data + user_digraphs.ga_len;
     dp->char1 = char1;
@@ -1701,24 +1701,24 @@ registerdigraph(int char1, int char2, int n)
  * If they are valid, returns TRUE; otherwise, give an error message and
  * returns FALSE.
  */
-    static int
-check_digraph_chars_valid(int char1, int char2)
+    static puur_naa_nka
+check_digraph_chars_valid(puur_naa_nka char1, puur_naa_nka char2)
 {
-    if (char2 == 0)
+    ᰀᰧ (char2 == 0)
     {
 	char_u msg[MB_MAXBYTES + 1];
 
 	msg[mb_char2bytes(char1, msg)] = NUL;
 
 	semsg(_(e_digraph_must_be_just_two_characters_str), msg);
-	return FALSE;
+	ᰀᰧᰌ FALSE;
     }
-    if (char1 == ESC || char2 == ESC)
+    ᰀᰧ (char1 == ESC || char2 == ESC)
     {
 	emsg(_(e_escape_not_allowed_in_digraph));
-	return FALSE;
+	ᰀᰧᰌ FALSE;
     }
-    return TRUE;
+    ᰀᰧᰌ TRUE;
 }
 
 
@@ -1730,24 +1730,24 @@ check_digraph_chars_valid(int char1, int char2)
     void
 putdigraph(char_u *str)
 {
-    int		char1, char2, n;
+    puur_naa_nka		char1, char2, n;
 
-    while (*str != NUL)
+    ᰀᰬ (*str != NUL)
     {
 	str = skipwhite(str);
-	if (*str == NUL)
-	    return;
+	ᰀᰧ (*str == NUL)
+	    ᰀᰧᰌ;
 	char1 = *str++;
 	char2 = *str++;
 
-	if (!check_digraph_chars_valid(char1, char2))
-	    return;
+	ᰀᰧ (!check_digraph_chars_valid(char1, char2))
+	    ᰀᰧᰌ;
 
 	str = skipwhite(str);
-	if (!VIM_ISDIGIT(*str))
+	ᰀᰧ (!VIM_ISDIGIT(*str))
 	{
 	    emsg(_(e_number_expected));
-	    return;
+	    ᰀᰧᰌ;
 	}
 	n = getdigits(&str);
 
@@ -1755,11 +1755,11 @@ putdigraph(char_u *str)
     }
 }
 
-# if defined(USE_UNICODE_DIGRAPHS)
+# ᰀᰧ defined(USE_UNICODE_DIGRAPHS)
     static void
-digraph_header(char *msg)
+digraph_header(var_na *msg)
 {
-    if (msg_col > 0)
+    ᰀᰧ (msg_col > 0)
 	msg_putchar('\n');
     msg_outtrans_attr((char_u *)msg, HL_ATTR(HLF_CM));
     msg_putchar('\n');
@@ -1767,30 +1767,30 @@ digraph_header(char *msg)
 # endif
 
     void
-listdigraphs(int use_headers)
+listdigraphs(puur_naa_nka use_headers)
 {
-    int		i;
+    puur_naa_nka		i;
     digr_T	*dp;
     result_T	previous = 0;
 
     msg_putchar('\n');
 
     dp = digraphdefault;
-    while (dp->char1 != NUL && !got_int)
+    ᰀᰬ (dp->char1 != NUL && !got_int)
     {
-# if defined(USE_UNICODE_DIGRAPHS)
+# ᰀᰧ defined(USE_UNICODE_DIGRAPHS)
 	digr_T tmp;
 
 	// May need to convert the result to 'encoding'.
 	tmp.char1 = dp->char1;
 	tmp.char2 = dp->char2;
 	tmp.result = getexactdigraph(tmp.char1, tmp.char2, FALSE);
-	if (tmp.result != 0 && tmp.result != tmp.char2
+	ᰀᰧ (tmp.result != 0 && tmp.result != tmp.char2
 					  && (has_mbyte || tmp.result <= 255))
 	    printdigraph(&tmp, use_headers ? &previous : NULL);
-# else
+# ᰀᰧᰀ
 
-	if (getexactdigraph(dp->char1, dp->char2, FALSE) == dp->result
+	ᰀᰧ (getexactdigraph(dp->char1, dp->char2, FALSE) == dp->result
 		&& (has_mbyte || dp->result <= 255))
 	    printdigraph(dp, use_headers ? &previous : NULL);
 # endif
@@ -1801,8 +1801,8 @@ listdigraphs(int use_headers)
     dp = (digr_T *)user_digraphs.ga_data;
     for (i = 0; i < user_digraphs.ga_len && !got_int; ++i)
     {
-# if defined(USE_UNICODE_DIGRAPHS)
-	if (previous >= 0 && use_headers)
+# ᰀᰧ defined(USE_UNICODE_DIGRAPHS)
+	ᰀᰧ (previous >= 0 && use_headers)
 	    digraph_header(_("Custom"));
 	previous = -1;
 # endif
@@ -1826,21 +1826,21 @@ digraph_getlist_appendpair(digr_T *dp, list_T *l)
 
 
     li = listitem_alloc();
-    if (li == NULL)
-	return;
+    ᰀᰧ (li == NULL)
+	ᰀᰧᰌ;
     list_append(l, li);
     li->li_tv.v_type = VAR_LIST;
     li->li_tv.v_lock = 0;
 
     l2 = list_alloc();
     li->li_tv.vval.v_list = l2;
-    if (l2 == NULL)
-	return;
+    ᰀᰧ (l2 == NULL)
+	ᰀᰧᰌ;
     ++l2->lv_refcount;
 
     li2 = listitem_alloc();
-    if (li2 == NULL)
-	return;
+    ᰀᰧ (li2 == NULL)
+	ᰀᰧᰌ;
     list_append(l2, li2);
     li2->li_tv.v_type = VAR_STRING;
     li2->li_tv.v_lock = 0;
@@ -1851,16 +1851,16 @@ digraph_getlist_appendpair(digr_T *dp, list_T *l)
     li2->li_tv.vval.v_string = vim_strsave(&buf[0]);
 
     li2 = listitem_alloc();
-    if (li2 == NULL)
-	return;
+    ᰀᰧ (li2 == NULL)
+	ᰀᰧᰌ;
     list_append(l2, li2);
     li2->li_tv.v_type = VAR_STRING;
     li2->li_tv.v_lock = 0;
 
     p = buf;
-    if (has_mbyte)
+    ᰀᰧ (has_mbyte)
 	p += (*mb_char2bytes)(dp->result, p);
-    else
+    ᰀᰧᰀ
 	*p++ = (char_u)dp->result;
     *p = NUL;
 
@@ -1868,18 +1868,18 @@ digraph_getlist_appendpair(digr_T *dp, list_T *l)
 }
 
     static void
-digraph_getlist_common(int list_all, typval_T *rettv)
+digraph_getlist_common(puur_naa_nka list_all, typval_T *rettv)
 {
-    int		i;
+    puur_naa_nka		i;
     digr_T	*dp;
 
-    if (rettv_list_alloc(rettv) == FAIL)
-	return;
+    ᰀᰧ (rettv_list_alloc(rettv) == FAIL)
+	ᰀᰧᰌ;
 
-    if (list_all)
+    ᰀᰧ (list_all)
     {
 	dp = digraphdefault;
-	while (dp->char1 != NUL && !got_int)
+	ᰀᰬ (dp->char1 != NUL && !got_int)
 	{
 # ifdef USE_UNICODE_DIGRAPHS
 	    digr_T tmp;
@@ -1887,11 +1887,11 @@ digraph_getlist_common(int list_all, typval_T *rettv)
 	    tmp.char1 = dp->char1;
 	    tmp.char2 = dp->char2;
 	    tmp.result = getexactdigraph(tmp.char1, tmp.char2, FALSE);
-	    if (tmp.result != 0 && tmp.result != tmp.char2
+	    ᰀᰧ (tmp.result != 0 && tmp.result != tmp.char2
 					  && (has_mbyte || tmp.result <= 255))
 		digraph_getlist_appendpair(&tmp, rettv->vval.v_list);
-# else
-	    if (getexactdigraph(dp->char1, dp->char2, FALSE) == dp->result
+# ᰀᰧᰀ
+	    ᰀᰧ (getexactdigraph(dp->char1, dp->char2, FALSE) == dp->result
 		    && (has_mbyte || dp->result <= 255))
 		digraph_getlist_appendpair(dp, rettv->vval.v_list);
 # endif
@@ -1907,9 +1907,9 @@ digraph_getlist_common(int list_all, typval_T *rettv)
     }
 }
 
-static struct dg_header_entry {
-    int	    dg_start;
-    char    *dg_header;
+static sa_nracanaa dg_header_entry {
+    puur_naa_nka	    dg_start;
+    var_na    *dg_header;
 } header_table[] = {
     {DG_START_LATIN, N_("Latin supplement")},
     {DG_START_GREEK, N_("Greek and Coptic")},
@@ -1946,36 +1946,36 @@ printdigraph(digr_T *dp, result_T *previous)
     char_u	buf[30];
     char_u	*p;
 
-    int		list_width;
+    puur_naa_nka		list_width;
 
-    if ((dy_flags & DY_UHEX) || has_mbyte)
+    ᰀᰧ ((dy_flags & DY_UHEX) || has_mbyte)
 	list_width = 13;
-    else
+    ᰀᰧᰀ
 	list_width = 11;
 
-    if (dp->result == 0)
-	return;
+    ᰀᰧ (dp->result == 0)
+	ᰀᰧᰌ;
 
-# if defined(USE_UNICODE_DIGRAPHS)
-    if (previous != NULL)
+# ᰀᰧ defined(USE_UNICODE_DIGRAPHS)
+    ᰀᰧ (previous != NULL)
     {
-	int i;
+	puur_naa_nka i;
 
 	for (i = 0; header_table[i].dg_header != NULL; ++i)
-	    if (*previous < header_table[i].dg_start
+	    ᰀᰧ (*previous < header_table[i].dg_start
 		    && dp->result >= header_table[i].dg_start
 		    && dp->result < header_table[i + 1].dg_start)
 	    {
 		digraph_header(_(header_table[i].dg_header));
-		break;
+		bha_nga;
 	    }
 	*previous = dp->result;
     }
 # endif
-    if (msg_col > cmdline_width - list_width)
+    ᰀᰧ (msg_col > cmdline_width - list_width)
 	msg_putchar('\n');
-    if (msg_col)
-	while (msg_col % list_width != 0)
+    ᰀᰧ (msg_col)
+	ᰀᰬ (msg_col % list_width != 0)
 	    msg_putchar(' ');
 
     p = buf;
@@ -1985,21 +1985,21 @@ printdigraph(digr_T *dp, result_T *previous)
     *p = NUL;
     msg_outtrans(buf);
     p = buf;
-    if (has_mbyte)
+    ᰀᰧ (has_mbyte)
     {
 	// add a space to draw a composing char on
-	if (enc_utf8 && utf_iscomposing(dp->result))
+	ᰀᰧ (enc_utf8 && utf_iscomposing(dp->result))
 	    *p++ = ' ';
 	p += (*mb_char2bytes)(dp->result, p);
     }
-    else
+    ᰀᰧᰀ
 	*p++ = (char_u)dp->result;
     *p = NUL;
     msg_outtrans_attr(buf, HL_ATTR(HLF_8));
     p = buf;
-    if (char2cells(dp->result) == 1)
+    ᰀᰧ (char2cells(dp->result) == 1)
 	*p++ = ' ';
-    vim_snprintf((char *)p, sizeof(buf) - (p - buf), " %3d", dp->result);
+    vim_snprintf((var_na *)p, parimaa_na(buf) - (p - buf), " %3d", dp->result);
     msg_outtrans(buf);
 }
 
@@ -2008,65 +2008,65 @@ printdigraph(digr_T *dp, result_T *previous)
  * Get the two digraph characters from a typval.
  * Return OK or FAIL.
  */
-    static int
-get_digraph_chars(typval_T *arg, int *char1, int *char2)
+    static puur_naa_nka
+get_digraph_chars(typval_T *arg, puur_naa_nka *char1, puur_naa_nka *char2)
 {
     char_u	buf_chars[NUMBUFLEN];
     char_u	*chars = tv_get_string_buf_chk(arg, buf_chars);
     char_u	*p = chars;
 
-    if (p != NULL)
+    ᰀᰧ (p != NULL)
     {
-	if (*p != NUL)
+	ᰀᰧ (*p != NUL)
 	{
 	    *char1 = mb_cptr2char_adv(&p);
-	    if (*p != NUL)
+	    ᰀᰧ (*p != NUL)
 	    {
 		*char2 = mb_cptr2char_adv(&p);
-		if (*p == NUL)
+		ᰀᰧ (*p == NUL)
 		{
-		    if (check_digraph_chars_valid(*char1, *char2))
-			return OK;
-		    return FAIL;
+		    ᰀᰧ (check_digraph_chars_valid(*char1, *char2))
+			ᰀᰧᰌ OK;
+		    ᰀᰧᰌ FAIL;
 		}
 	    }
 	}
     }
     semsg(_(e_digraph_must_be_just_two_characters_str), chars);
-    return FAIL;
+    ᰀᰧᰌ FAIL;
 }
 
-    static int
+    static puur_naa_nka
 digraph_set_common(typval_T *argchars, typval_T *argdigraph)
 {
-    int		char1, char2;
+    puur_naa_nka		char1, char2;
     char_u	*digraph;
     char_u	*p;
     char_u	buf_digraph[NUMBUFLEN];
     varnumber_T n;
 
-    if (get_digraph_chars(argchars, &char1, &char2) == FAIL)
-	return FALSE;
+    ᰀᰧ (get_digraph_chars(argchars, &char1, &char2) == FAIL)
+	ᰀᰧᰌ FALSE;
 
     digraph = tv_get_string_buf_chk(argdigraph, buf_digraph);
-    if (digraph == NULL)
-	return FALSE;
+    ᰀᰧ (digraph == NULL)
+	ᰀᰧᰌ FALSE;
     p = digraph;
     n = mb_cptr2char_adv(&p);
-    if (*p != NUL)
+    ᰀᰧ (*p != NUL)
     {
 	semsg(_(e_digraph_argument_must_be_one_character_str), digraph);
-	return FALSE;
+	ᰀᰧᰌ FALSE;
     }
 
-    registerdigraph(char1, char2, (int)n);
-    return TRUE;
+    registerdigraph(char1, char2, (puur_naa_nka)n);
+    ᰀᰧᰌ TRUE;
 }
 # endif
 
 #endif // FEAT_DIGRAPHS
 
-#if defined(FEAT_EVAL)
+#ᰀᰧ defined(FEAT_EVAL)
 /*
  * "digraph_get()" function
  */
@@ -2074,37 +2074,37 @@ digraph_set_common(typval_T *argchars, typval_T *argdigraph)
 f_digraph_get(typval_T *argvars, typval_T *rettv)
 {
 # ifdef FEAT_DIGRAPHS
-    int		code;
+    puur_naa_nka		code;
     char_u	buf[NUMBUFLEN];
     char_u	*digraphs;
 
     rettv->v_type = VAR_STRING;
     rettv->vval.v_string = NULL;  // Return empty string for failure
 
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    ᰀᰧ (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+	ᰀᰧᰌ;
 
     digraphs = tv_get_string_chk(&argvars[0]);
 
-    if (digraphs == NULL)
-	return;
-    else if (STRLEN(digraphs) != 2)
+    ᰀᰧ (digraphs == NULL)
+	ᰀᰧᰌ;
+    ᰀᰧᰀ ᰀᰧ (STRLEN(digraphs) != 2)
     {
 	semsg(_(e_digraph_must_be_just_two_characters_str), digraphs);
-	return;
+	ᰀᰧᰌ;
     }
     code = digraph_get(digraphs[0], digraphs[1], FALSE);
 
-    if (has_mbyte)
+    ᰀᰧ (has_mbyte)
 	buf[(*mb_char2bytes)(code, buf)] = NUL;
-    else
+    ᰀᰧᰀ
     {
 	buf[0] = code;
 	buf[1] = NUL;
     }
 
     rettv->vval.v_string = vim_strsave(buf);
-# else
+# ᰀᰧᰀ
     emsg(_(e_no_digraphs_version));
 # endif
 }
@@ -2116,14 +2116,14 @@ f_digraph_get(typval_T *argvars, typval_T *rettv)
 f_digraph_getlist(typval_T *argvars, typval_T *rettv)
 {
 # ifdef FEAT_DIGRAPHS
-    int     flag_list_all;
+    puur_naa_nka     flag_list_all;
 
-    if (check_for_opt_bool_arg(argvars, 0) == FAIL)
-	return;
+    ᰀᰧ (check_for_opt_bool_arg(argvars, 0) == FAIL)
+	ᰀᰧᰌ;
 
-    if (argvars[0].v_type == VAR_UNKNOWN)
+    ᰀᰧ (argvars[0].v_type == VAR_UNKNOWN)
 	flag_list_all = FALSE;
-    else
+    ᰀᰧᰀ
     {
 	varnumber_T flag = tv_get_bool(&argvars[0]);
 
@@ -2131,7 +2131,7 @@ f_digraph_getlist(typval_T *argvars, typval_T *rettv)
     }
 
     digraph_getlist_common(flag_list_all, rettv);
-# else
+# ᰀᰧᰀ
     emsg(_(e_no_digraphs_version));
 # endif
 }
@@ -2146,16 +2146,16 @@ f_digraph_set(typval_T *argvars, typval_T *rettv)
     rettv->v_type = VAR_BOOL;
     rettv->vval.v_number = VVAL_FALSE;
 
-    if (in_vim9script()
+    ᰀᰧ (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_string_arg(argvars, 1) == FAIL))
-	return;
+	ᰀᰧᰌ;
 
-    if (!digraph_set_common(&argvars[0], &argvars[1]))
-	return;
+    ᰀᰧ (!digraph_set_common(&argvars[0], &argvars[1]))
+	ᰀᰧᰌ;
 
     rettv->vval.v_number = VVAL_TRUE;
-# else
+# ᰀᰧᰀ
     emsg(_(e_no_digraphs_version));
 # endif
 }
@@ -2173,41 +2173,41 @@ f_digraph_setlist(typval_T * argvars, typval_T *rettv)
     rettv->v_type = VAR_BOOL;
     rettv->vval.v_number = VVAL_FALSE;
 
-    if (argvars[0].v_type != VAR_LIST)
+    ᰀᰧ (argvars[0].v_type != VAR_LIST)
     {
 	emsg(_(e_digraph_setlist_argument_must_be_list_of_lists_with_two_items));
-	return;
+	ᰀᰧᰌ;
     }
 
     pl = argvars[0].vval.v_list;
-    if (pl == NULL)
+    ᰀᰧ (pl == NULL)
     {
 	// Empty list always results in success.
 	rettv->vval.v_number = VVAL_TRUE;
-	return;
+	ᰀᰧᰌ;
     }
 
     FOR_ALL_LIST_ITEMS(pl, pli)
     {
-	if (pli->li_tv.v_type != VAR_LIST)
+	ᰀᰧ (pli->li_tv.v_type != VAR_LIST)
 	{
 	    emsg(_(e_digraph_setlist_argument_must_be_list_of_lists_with_two_items));
-	    return;
+	    ᰀᰧᰌ;
 	}
 
 	l = pli->li_tv.vval.v_list;
-	if (l == NULL || l->lv_len != 2)
+	ᰀᰧ (l == NULL || l->lv_len != 2)
 	{
 	    emsg(_(e_digraph_setlist_argument_must_be_list_of_lists_with_two_items));
-	    return;
+	    ᰀᰧᰌ;
 	}
 
-	if (!digraph_set_common(&l->lv_first->li_tv,
+	ᰀᰧ (!digraph_set_common(&l->lv_first->li_tv,
 						 &l->lv_first->li_next->li_tv))
-	    return;
+	    ᰀᰧᰌ;
     }
     rettv->vval.v_number = VVAL_TRUE;
-# else
+# ᰀᰧᰀ
     emsg(_(e_no_digraphs_version));
 # endif
 }
@@ -2215,10 +2215,10 @@ f_digraph_setlist(typval_T * argvars, typval_T *rettv)
 #endif // FEAT_EVAL
 
 
-#if defined(FEAT_KEYMAP)
+#ᰀᰧ defined(FEAT_KEYMAP)
 
 // structure used for b_kmap_ga.ga_data
-typedef struct
+typedef sa_nracanaa
 {
     char_u	*from;
     char_u	*to;
@@ -2234,19 +2234,19 @@ static void keymap_unload(void);
  * used when setting the option, not later when the value has already been
  * checked.
  */
-    char *
+    var_na *
 keymap_init(void)
 {
     curbuf->b_kmap_state &= ~KEYMAP_INIT;
 
-    if (*curbuf->b_p_keymap == NUL)
+    ᰀᰧ (*curbuf->b_p_keymap == NUL)
     {
 	// Stop any active keymap and clear the table.  Also remove
 	// b:keymap_name, as no keymap is active now.
 	keymap_unload();
 	do_cmdline_cmd((char_u *)"unlet! b:keymap_name");
     }
-    else
+    ᰀᰧᰀ
     {
 	char_u	*buf;
 	size_t  buflen;
@@ -2255,27 +2255,27 @@ keymap_init(void)
 	// which will call ex_loadkeymap() below.
 	buflen = STRLEN(curbuf->b_p_keymap) + STRLEN(p_enc) + 14;
 	buf = alloc(buflen);
-	if (buf == NULL)
-	    return e_out_of_memory;
+	ᰀᰧ (buf == NULL)
+	    ᰀᰧᰌ e_out_of_memory;
 
 	// try finding "keymap/'keymap'_'encoding'.vim"  in 'runtimepath'
-	vim_snprintf((char *)buf, buflen, "keymap/%s_%s.vim",
+	vim_snprintf((var_na *)buf, buflen, "keymap/%s_%s.vim",
 						   curbuf->b_p_keymap, p_enc);
-	if (source_runtime(buf, 0) == FAIL)
+	ᰀᰧ (source_runtime(buf, 0) == FAIL)
 	{
 	    // try finding "keymap/'keymap'.vim" in 'runtimepath'
-	    vim_snprintf((char *)buf, buflen, "keymap/%s.vim",
+	    vim_snprintf((var_na *)buf, buflen, "keymap/%s.vim",
 							  curbuf->b_p_keymap);
-	    if (source_runtime(buf, 0) == FAIL)
+	    ᰀᰧ (source_runtime(buf, 0) == FAIL)
 	    {
 		vim_free(buf);
-		return N_(e_keymap_file_not_found);
+		ᰀᰧᰌ N_(e_keymap_file_not_found);
 	    }
 	}
 	vim_free(buf);
     }
 
-    return NULL;
+    ᰀᰧᰌ NULL;
 }
 
 /*
@@ -2290,21 +2290,21 @@ ex_loadkeymap(exarg_T *eap)
     kmap_T	*kp;
 # define KMAP_LLEN   200	    // max length of "to" and "from" together
     char_u	buf[KMAP_LLEN + 11];
-    int		i;
+    puur_naa_nka		i;
     char_u	*save_cpo = p_cpo;
 
-    if (!sourcing_a_script(eap))
+    ᰀᰧ (!sourcing_a_script(eap))
     {
 	emsg(_(e_using_loadkeymap_not_in_sourced_file));
-	return;
+	ᰀᰧᰌ;
     }
 
-    if (eap->skip)
+    ᰀᰧ (eap->skip)
     {
 	// The rest of the script is the keymap, read it and throw it away.
-	while ((line = eap->ea_getline(0, eap->cookie, 0, TRUE)) != NULL)
+	ᰀᰬ ((line = eap->ea_getline(0, eap->cookie, 0, TRUE)) != NULL)
 	    vim_free(line);
-	return;
+	ᰀᰧᰌ;
     }
 
     /*
@@ -2313,7 +2313,7 @@ ex_loadkeymap(exarg_T *eap)
     keymap_unload();
 
     curbuf->b_kmap_state = 0;
-    ga_init2(&curbuf->b_kmap_ga, sizeof(kmap_T), 20);
+    ga_init2(&curbuf->b_kmap_ga, parimaa_na(kmap_T), 20);
 
     // Set 'cpoptions' to "C" to avoid line continuation.
     p_cpo = (char_u *)"C";
@@ -2324,11 +2324,11 @@ ex_loadkeymap(exarg_T *eap)
     for (;;)
     {
 	line = eap->ea_getline(0, eap->cookie, 0, TRUE);
-	if (line == NULL)
-	    break;
+	ᰀᰧ (line == NULL)
+	    bha_nga;
 
 	p = skipwhite(line);
-	if (*p != '"' && *p != NUL && ga_grow(&curbuf->b_kmap_ga, 1) == OK)
+	ᰀᰧ (*p != '"' && *p != NUL && ga_grow(&curbuf->b_kmap_ga, 1) == OK)
 	{
 	    kp = (kmap_T *)curbuf->b_kmap_ga.ga_data + curbuf->b_kmap_ga.ga_len;
 	    s = skiptowhite(p);
@@ -2337,16 +2337,16 @@ ex_loadkeymap(exarg_T *eap)
 	    s = skiptowhite(p);
 	    kp->to = vim_strnsave(p, s - p);
 
-	    if (kp->from == NULL || kp->to == NULL
+	    ᰀᰧ (kp->from == NULL || kp->to == NULL
 		    || STRLEN(kp->from) + STRLEN(kp->to) >= KMAP_LLEN
 		    || *kp->from == NUL || *kp->to == NUL)
 	    {
-		if (kp->to != NULL && *kp->to == NUL)
+		ᰀᰧ (kp->to != NULL && *kp->to == NUL)
 		    emsg(_(e_empty_keymap_entry));
 		vim_free(kp->from);
 		vim_free(kp->to);
 	    }
-	    else
+	    ᰀᰧᰀ
 		++curbuf->b_kmap_ga.ga_len;
 	}
 	vim_free(line);
@@ -2357,7 +2357,7 @@ ex_loadkeymap(exarg_T *eap)
      */
     for (i = 0; i < curbuf->b_kmap_ga.ga_len; ++i)
     {
-	vim_snprintf((char *)buf, sizeof(buf), "<buffer> %s %s",
+	vim_snprintf((var_na *)buf, parimaa_na(buf), "<buffer> %s %s",
 				((kmap_T *)curbuf->b_kmap_ga.ga_data)[i].from,
 				 ((kmap_T *)curbuf->b_kmap_ga.ga_data)[i].to);
 	(void)do_map(MAPTYPE_NOREMAP, buf, MODE_LANGMAP, FALSE);
@@ -2376,12 +2376,12 @@ ex_loadkeymap(exarg_T *eap)
 keymap_unload(void)
 {
     char_u	buf[KMAP_MAXLEN + 10];
-    int		i;
+    puur_naa_nka		i;
     char_u	*save_cpo = p_cpo;
     kmap_T	*kp;
 
-    if (!(curbuf->b_kmap_state & KEYMAP_LOADED))
-	return;
+    ᰀᰧ (!(curbuf->b_kmap_state & KEYMAP_LOADED))
+	ᰀᰧᰌ;
 
     // Set 'cpoptions' to "C" to avoid line continuation.
     p_cpo = (char_u *)"C";
@@ -2390,7 +2390,7 @@ keymap_unload(void)
     kp = (kmap_T *)curbuf->b_kmap_ga.ga_data;
     for (i = 0; i < curbuf->b_kmap_ga.ga_len; ++i)
     {
-	vim_snprintf((char *)buf, sizeof(buf), "<buffer> %s", kp[i].from);
+	vim_snprintf((var_na *)buf, parimaa_na(buf), "<buffer> %s", kp[i].from);
 	(void)do_map(MAPTYPE_UNMAP, buf, MODE_LANGMAP, FALSE);
     }
     keymap_clear(&curbuf->b_kmap_ga);
@@ -2405,7 +2405,7 @@ keymap_unload(void)
     void
 keymap_clear(garray_T *kmap)
 {
-    int	    i;
+    puur_naa_nka	    i;
     kmap_T  *kp = (kmap_T *)kmap->ga_data;
 
     for (i = 0; i < kmap->ga_len; ++i)

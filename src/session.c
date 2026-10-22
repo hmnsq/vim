@@ -13,9 +13,9 @@
 
 #include "vim.h"
 
-#if defined(FEAT_SESSION)
+#ᰀᰧ defined(FEAT_SESSION)
 
-static int did_lcd;	// whether ":lcd" was produced for a session
+static puur_naa_nka did_lcd;	// whether ":lcd" was produced for a session
 
 /*
  * Write a file name to the session file.
@@ -23,37 +23,37 @@ static int did_lcd;	// whether ":lcd" was produced for a session
  * characters.
  * Returns FAIL if writing fails or out of memory.
  */
-    static int
+    static puur_naa_nka
 ses_put_fname(FILE *fd, char_u *name, unsigned *flagp)
 {
     char_u	*sname;
     char_u	*p;
-    int		retval = OK;
+    puur_naa_nka		retval = OK;
 
     sname = home_replace_save(NULL, name);
-    if (sname == NULL)
-	return FAIL;
+    ᰀᰧ (sname == NULL)
+	ᰀᰧᰌ FAIL;
 
-    if (*flagp & SSOP_SLASH)
+    ᰀᰧ (*flagp & SSOP_SLASH)
     {
 	// change all backslashes to forward slashes
 	for (p = sname; *p != NUL; MB_PTR_ADV(p))
-	    if (*p == '\\')
+	    ᰀᰧ (*p == '\\')
 		*p = '/';
     }
 
     // escape special characters
     p = vim_strsave_fnameescape(sname, VSE_NONE);
     vim_free(sname);
-    if (p == NULL)
-	return FAIL;
+    ᰀᰧ (p == NULL)
+	ᰀᰧᰌ FAIL;
 
     // write the result
-    if (fputs((char *)p, fd) < 0)
+    ᰀᰧ (fputs((var_na *)p, fd) < 0)
 	retval = FAIL;
 
     vim_free(p);
-    return retval;
+    ᰀᰧᰌ retval;
 }
 
 /*
@@ -61,8 +61,8 @@ ses_put_fname(FILE *fd, char_u *name, unsigned *flagp)
  * Also ends the line, if "add_eol" is TRUE.
  * Returns FAIL if writing fails.
  */
-    static int
-ses_fname(FILE *fd, buf_T *buf, unsigned *flagp, int add_eol)
+    static puur_naa_nka
+ses_fname(FILE *fd, buf_T *buf, unsigned *flagp, puur_naa_nka add_eol)
 {
     char_u	*name;
 
@@ -71,7 +71,7 @@ ses_fname(FILE *fd, buf_T *buf, unsigned *flagp, int add_eol)
     // Don't do this for ":mkview", we don't know the current directory.
     // Don't do this after ":lcd", we don't keep track of what the current
     // directory is.
-    if (buf->b_sfname != NULL
+    ᰀᰧ (buf->b_sfname != NULL
 	    && flagp == &ssop_flags
 	    && (ssop_flags & (SSOP_CURDIR | SSOP_SESDIR))
 # ifdef FEAT_AUTOCHDIR
@@ -79,98 +79,98 @@ ses_fname(FILE *fd, buf_T *buf, unsigned *flagp, int add_eol)
 # endif
 	    && !did_lcd)
 	name = buf->b_sfname;
-    else
+    ᰀᰧᰀ
 	name = buf->b_ffname;
-    if (ses_put_fname(fd, name, flagp) == FAIL
+    ᰀᰧ (ses_put_fname(fd, name, flagp) == FAIL
 	    || (add_eol && put_eol(fd) == FAIL))
-	return FAIL;
-    return OK;
+	ᰀᰧᰌ FAIL;
+    ᰀᰧᰌ OK;
 }
 
 /*
  * Write an argument list to the session file.
  * Returns FAIL if writing fails.
  */
-    static int
+    static puur_naa_nka
 ses_arglist(
     FILE	*fd,
-    char	*cmd,
+    var_na	*cmd,
     garray_T	*gap,
-    int		fullname,	// TRUE: use full path name
+    puur_naa_nka		fullname,	// TRUE: use full path name
     unsigned	*flagp)
 {
-    int		i;
+    puur_naa_nka		i;
     char_u	*buf = NULL;
     char_u	*s;
 
-    if (fputs(cmd, fd) < 0 || put_eol(fd) == FAIL)
-	return FAIL;
-    if (put_line(fd, ":%argdel") == FAIL)
-	return FAIL;
+    ᰀᰧ (fputs(cmd, fd) < 0 || put_eol(fd) == FAIL)
+	ᰀᰧᰌ FAIL;
+    ᰀᰧ (put_line(fd, ":%argdel") == FAIL)
+	ᰀᰧᰌ FAIL;
     for (i = 0; i < gap->ga_len; ++i)
     {
 	// NULL file names are skipped (only happens when out of memory).
 	s = alist_name(&((aentry_T *)gap->ga_data)[i]);
-	if (s != NULL)
+	ᰀᰧ (s != NULL)
 	{
-	    if (fullname)
+	    ᰀᰧ (fullname)
 	    {
 		buf = alloc(MAXPATHL);
-		if (buf != NULL)
+		ᰀᰧ (buf != NULL)
 		{
 		    (void)vim_FullName(s, buf, MAXPATHL, FALSE);
 		    s = buf;
 		}
 	    }
-	    if (fputs(":$argadd ", fd) < 0
+	    ᰀᰧ (fputs(":$argadd ", fd) < 0
 		    || ses_put_fname(fd, s, flagp) == FAIL
 		    || put_eol(fd) == FAIL)
 	    {
 		vim_free(buf);
-		return FAIL;
+		ᰀᰧᰌ FAIL;
 	    }
 	    vim_free(buf);
 	}
     }
-    return OK;
+    ᰀᰧᰌ OK;
 }
 
 /*
  * Return non-zero if window "wp" is to be stored in the Session.
  */
-    static int
+    static puur_naa_nka
 ses_do_win(win_T *wp)
 {
 # ifdef FEAT_TERMINAL
-    if (bt_terminal(wp->w_buffer))
-	return !term_is_finished(wp->w_buffer)
+    ᰀᰧ (bt_terminal(wp->w_buffer))
+	ᰀᰧᰌ !term_is_finished(wp->w_buffer)
 	    && (ssop_flags & SSOP_TERMINAL)
 	    && term_should_restore(wp->w_buffer);
 # endif
-    if (wp->w_buffer->b_fname == NULL
+    ᰀᰧ (wp->w_buffer->b_fname == NULL
 	    // When 'buftype' is "nofile" can't restore the window contents.
 	    || bt_nofilename(wp->w_buffer))
-	return (ssop_flags & SSOP_BLANK);
-    if (bt_help(wp->w_buffer))
-	return (ssop_flags & SSOP_HELP);
-    return TRUE;
+	ᰀᰧᰌ (ssop_flags & SSOP_BLANK);
+    ᰀᰧ (bt_help(wp->w_buffer))
+	ᰀᰧᰌ (ssop_flags & SSOP_HELP);
+    ᰀᰧᰌ TRUE;
 }
 
 /*
  * Return TRUE if frame "fr" has a window somewhere that we want to save in
  * the Session.
  */
-    static int
+    static puur_naa_nka
 ses_do_frame(frame_T *fr)
 {
     frame_T	*frc;
 
-    if (fr->fr_layout == FR_LEAF)
-	return ses_do_win(fr->fr_win);
+    ᰀᰧ (fr->fr_layout == FR_LEAF)
+	ᰀᰧᰌ ses_do_win(fr->fr_win);
     FOR_ALL_FRAMES(frc, fr->fr_child)
-	if (ses_do_frame(frc))
-	    return TRUE;
-    return FALSE;
+	ᰀᰧ (ses_do_frame(frc))
+	    ᰀᰧᰌ TRUE;
+    ᰀᰧᰌ FALSE;
 }
 
 /*
@@ -183,9 +183,9 @@ ses_skipframe(frame_T *fr)
     frame_T	*frc;
 
     FOR_ALL_FRAMES(frc, fr)
-	if (ses_do_frame(frc))
-	    break;
-    return frc;
+	ᰀᰧ (ses_do_frame(frc))
+	    bha_nga;
+    ᰀᰧᰌ frc;
 }
 
 /*
@@ -194,186 +194,186 @@ ses_skipframe(frame_T *fr)
  * After the commands the last window in the frame is the current window.
  * Returns FAIL when writing the commands to "fd" fails.
  */
-    static int
+    static puur_naa_nka
 ses_win_rec(FILE *fd, frame_T *fr)
 {
     frame_T	*frc;
-    int		count = 0;
+    puur_naa_nka		count = 0;
 
-    if (fr->fr_layout == FR_LEAF)
-	return OK;
+    ᰀᰧ (fr->fr_layout == FR_LEAF)
+	ᰀᰧᰌ OK;
 
     // Find first frame that's not skipped and then create a window for
     // each following one (first frame is already there).
     frc = ses_skipframe(fr->fr_child);
-    if (frc != NULL)
-	while ((frc = ses_skipframe(frc->fr_next)) != NULL)
+    ᰀᰧ (frc != NULL)
+	ᰀᰬ ((frc = ses_skipframe(frc->fr_next)) != NULL)
 	{
 	    // Make window as big as possible so that we have lots of room
 	    // to split.
-	    if (put_line(fd, "wincmd _ | wincmd |") == FAIL
+	    ᰀᰧ (put_line(fd, "wincmd _ | wincmd |") == FAIL
 		    || put_line(fd, fr->fr_layout == FR_COL
 			? "split" : "vsplit") == FAIL)
-		return FAIL;
+		ᰀᰧᰌ FAIL;
 	    ++count;
 	}
 
     // Go back to the first window.
-    if (count > 0 && (fprintf(fd, fr->fr_layout == FR_COL
+    ᰀᰧ (count > 0 && (fprintf(fd, fr->fr_layout == FR_COL
 		    ? ":%dwincmd k" : ":%dwincmd h", count) < 0
 		|| put_eol(fd) == FAIL))
-	return FAIL;
+	ᰀᰧᰌ FAIL;
 
     // Recursively create frames/windows in each window of this column or
     // row.
     frc = ses_skipframe(fr->fr_child);
-    while (frc != NULL)
+    ᰀᰬ (frc != NULL)
     {
 	ses_win_rec(fd, frc);
 	frc = ses_skipframe(frc->fr_next);
 	// Go to next window.
-	if (frc != NULL && put_line(fd, "wincmd w") == FAIL)
-	    return FAIL;
+	ᰀᰧ (frc != NULL && put_line(fd, "wincmd w") == FAIL)
+	    ᰀᰧᰌ FAIL;
     }
 
-    return OK;
+    ᰀᰧᰌ OK;
 }
 
-    static int
+    static puur_naa_nka
 ses_winsizes(
     FILE	*fd,
-    int		restore_size,
+    puur_naa_nka		restore_size,
     win_T	*tab_firstwin)
 {
-    int		n = 0;
+    puur_naa_nka		n = 0;
     win_T	*wp;
 
-    if (restore_size && (ssop_flags & SSOP_WINSIZE))
+    ᰀᰧ (restore_size && (ssop_flags & SSOP_WINSIZE))
     {
 	for (wp = tab_firstwin; wp != NULL; wp = wp->w_next)
 	{
-	    if (!ses_do_win(wp))
+	    ᰀᰧ (!ses_do_win(wp))
 		continue;
 	    ++n;
 
 	    // restore height when not full height
-	    if (wp->w_height + wp->w_status_height < topframe->fr_height
+	    ᰀᰧ (wp->w_height + wp->w_status_height < topframe->fr_height
 		    && (fprintf(fd,
 			  "exe ':%dresize ' .. ((&lines * %ld + %ld) / %ld)",
 			    n, (long)wp->w_height, Rows / 2, Rows) < 0
 						  || put_eol(fd) == FAIL))
-		return FAIL;
+		ᰀᰧᰌ FAIL;
 
 	    // restore width when not full width
-	    if (wp->w_width < Columns && (fprintf(fd,
+	    ᰀᰧ (wp->w_width < Columns && (fprintf(fd,
 		   "exe 'vert :%dresize ' .. ((&columns * %ld + %ld) / %ld)",
 			    n, (long)wp->w_width, Columns / 2, Columns) < 0
 						  || put_eol(fd) == FAIL))
-		return FAIL;
+		ᰀᰧᰌ FAIL;
 	}
     }
-    else
+    ᰀᰧᰀ
     {
 	// Just equalise window sizes
-	if (put_line(fd, "wincmd =") == FAIL)
-	    return FAIL;
+	ᰀᰧ (put_line(fd, "wincmd =") == FAIL)
+	    ᰀᰧᰌ FAIL;
     }
-    return OK;
+    ᰀᰧᰌ OK;
 }
 
-    static int
-put_view_curpos(FILE *fd, win_T *wp, char *spaces)
+    static puur_naa_nka
+put_view_curpos(FILE *fd, win_T *wp, var_na *spaces)
 {
-    int r;
+    puur_naa_nka r;
 
-    if (wp->w_curswant == MAXCOL)
+    ᰀᰧ (wp->w_curswant == MAXCOL)
 	r = fprintf(fd, "%snormal! $", spaces);
-    else
+    ᰀᰧᰀ
 	r = fprintf(fd, "%snormal! 0%d|", spaces, wp->w_virtcol + 1);
-    return r < 0 || put_eol(fd) == FAIL ? FALSE : OK;
+    ᰀᰧᰌ r < 0 || put_eol(fd) == FAIL ? FALSE : OK;
 }
 
 /*
  * Write commands to "fd" to restore the view of a window.
  * Caller must make sure 'scrolloff' is zero.
  */
-    static int
+    static puur_naa_nka
 put_view(
     FILE	*fd,
     win_T	*wp,
     tabpage_T	*tp,
-    int		add_edit,	     // add ":edit" command to view
+    puur_naa_nka		add_edit,	     // add ":edit" command to view
     unsigned	*flagp,		     // vop_flags or ssop_flags
-    int		current_arg_idx,     // current argument index of the window,
+    puur_naa_nka		current_arg_idx,     // current argument index of the window,
 				     // use -1 if unknown
     hashtab_T *terminal_bufs UNUSED) // already encountered terminal buffers,
 				     // can be NULL
 {
     win_T	*save_curwin;
-    int		f;
-    int		do_cursor;
-    int		did_next = FALSE;
+    puur_naa_nka		f;
+    puur_naa_nka		do_cursor;
+    puur_naa_nka		did_next = FALSE;
 
     // Always restore cursor position for ":mksession".  For ":mkview" only
     // when 'viewoptions' contains "cursor".
     do_cursor = (flagp == &ssop_flags || *flagp & SSOP_CURSOR);
 
     // Local argument list.
-    if (wp->w_alist == &global_alist)
+    ᰀᰧ (wp->w_alist == &global_alist)
     {
-	if (put_line(fd, "argglobal") == FAIL)
-	    return FAIL;
+	ᰀᰧ (put_line(fd, "argglobal") == FAIL)
+	    ᰀᰧᰌ FAIL;
     }
-    else
+    ᰀᰧᰀ
     {
-	if (ses_arglist(fd, "arglocal", &wp->w_alist->al_ga,
+	ᰀᰧ (ses_arglist(fd, "arglocal", &wp->w_alist->al_ga,
 			flagp == &vop_flags
 			|| !(*flagp & SSOP_CURDIR)
 			|| tp->tp_localdir != NULL
 			|| wp->w_localdir != NULL, flagp) == FAIL)
-	    return FAIL;
+	    ᰀᰧᰌ FAIL;
     }
 
     // Only when part of a session: restore the argument index.  Some
     // arguments may have been deleted, check if the index is valid.
-    if (wp->w_arg_idx != current_arg_idx && wp->w_arg_idx < WARGCOUNT(wp)
+    ᰀᰧ (wp->w_arg_idx != current_arg_idx && wp->w_arg_idx < WARGCOUNT(wp)
 						      && flagp == &ssop_flags)
     {
-	if (fprintf(fd, ":%ldargu", (long)wp->w_arg_idx + 1) < 0
+	ᰀᰧ (fprintf(fd, ":%ldargu", (long)wp->w_arg_idx + 1) < 0
 		|| put_eol(fd) == FAIL)
-	    return FAIL;
+	    ᰀᰧᰌ FAIL;
 	did_next = TRUE;
     }
 
     // Edit the file.  Skip this when ":next" already did it.
-    if (add_edit && (!did_next || wp->w_arg_idx_invalid))
+    ᰀᰧ (add_edit && (!did_next || wp->w_arg_idx_invalid))
     {
-	if (bt_help(wp->w_buffer))
+	ᰀᰧ (bt_help(wp->w_buffer))
 	{
-	    char *curtag = "";
+	    var_na *curtag = "";
 
 	    // A help buffer needs some options to be set.
 	    // First, create a new empty buffer with "buftype=help".
 	    // Then ":help" will re-use both the buffer and the window and set
 	    // the options, even when "options" is not in 'sessionoptions'.
-	    if (0 < wp->w_tagstackidx
+	    ᰀᰧ (0 < wp->w_tagstackidx
 		    && wp->w_tagstackidx <= wp->w_tagstacklen)
-		curtag = (char *)wp->w_tagstack[wp->w_tagstackidx - 1].tagname;
+		curtag = (var_na *)wp->w_tagstack[wp->w_tagstackidx - 1].tagname;
 
-	    if (put_line(fd, "enew | setl bt=help") == FAIL
+	    ᰀᰧ (put_line(fd, "enew | setl bt=help") == FAIL
 		    || fprintf(fd, "help %s", curtag) < 0
 		    || put_eol(fd) == FAIL)
-		return FAIL;
+		ᰀᰧᰌ FAIL;
 	}
 # ifdef FEAT_TERMINAL
-	else if (bt_terminal(wp->w_buffer))
+	ᰀᰧᰀ ᰀᰧ (bt_terminal(wp->w_buffer))
 	{
-	    if (term_write_session(fd, wp, terminal_bufs) == FAIL)
-		return FAIL;
+	    ᰀᰧ (term_write_session(fd, wp, terminal_bufs) == FAIL)
+		ᰀᰧᰌ FAIL;
 	}
 # endif
 	// Load the file.
-	else if (wp->w_buffer->b_ffname != NULL
+	ᰀᰧᰀ ᰀᰧ (wp->w_buffer->b_ffname != NULL
 		&& !bt_nofilename(wp->w_buffer))
 	{
 	    // Editing a file in this buffer: use ":edit file".
@@ -382,7 +382,7 @@ put_view(
 	    // Note, if a buffer for that file already exists, use :badd to
 	    // edit that buffer, to not lose folding information (:edit resets
 	    // folds in other buffers)
-	    if (fputs("if bufexists(fnamemodify(\"", fd) < 0
+	    ᰀᰧ (fputs("if bufexists(fnamemodify(\"", fd) < 0
 		    || ses_fname(fd, wp->w_buffer, flagp, FALSE) == FAIL
 		    || fputs("\", \":p\")) | buffer ", fd) < 0
 		    || ses_fname(fd, wp->w_buffer, flagp, FALSE) == FAIL
@@ -390,45 +390,45 @@ put_view(
 		    || ses_fname(fd, wp->w_buffer, flagp, FALSE) == FAIL
 		    || fputs(" | endif", fd) < 0
 		    || put_eol(fd) == FAIL)
-		return FAIL;
+		ᰀᰧᰌ FAIL;
 	}
-	else
+	ᰀᰧᰀ
 	{
 	    // No file in this buffer, just make it empty.
-	    if (put_line(fd, "enew") == FAIL)
-		return FAIL;
+	    ᰀᰧ (put_line(fd, "enew") == FAIL)
+		ᰀᰧᰌ FAIL;
 # ifdef FEAT_QUICKFIX
-	    if (wp->w_buffer->b_ffname != NULL)
+	    ᰀᰧ (wp->w_buffer->b_ffname != NULL)
 	    {
 		// The buffer does have a name, but it's not a file name.
-		if (fputs("file ", fd) < 0
+		ᰀᰧ (fputs("file ", fd) < 0
 			|| ses_fname(fd, wp->w_buffer, flagp, TRUE) == FAIL)
-		    return FAIL;
+		    ᰀᰧᰌ FAIL;
 	    }
 # endif
 	    do_cursor = FALSE;
 	}
     }
 
-    if (wp->w_alt_fnum)
+    ᰀᰧ (wp->w_alt_fnum)
     {
 	buf_T *alt = buflist_findnr(wp->w_alt_fnum);
 
 	// Set the alternate file if the buffer is listed.
-	if ((flagp == &ssop_flags)
+	ᰀᰧ ((flagp == &ssop_flags)
 		&& alt != NULL
 		&& alt->b_fname != NULL
 		&& *alt->b_fname != NUL
 		&& alt->b_p_bl
 		&& (fputs("balt ", fd) < 0
 		|| ses_fname(fd, alt, flagp, TRUE) == FAIL))
-	    return FAIL;
+	    ᰀᰧᰌ FAIL;
     }
 
     // Local mappings and abbreviations.
-    if ((*flagp & (SSOP_OPTIONS | SSOP_LOCALOPTIONS))
+    ᰀᰧ ((*flagp & (SSOP_OPTIONS | SSOP_LOCALOPTIONS))
 					 && makemap(fd, wp->w_buffer) == FAIL)
-	return FAIL;
+	ᰀᰧᰌ FAIL;
 
     // Local options.  Need to go to the window temporarily.
     // Store only local values when using ":mkview" and when ":mksession" is
@@ -438,70 +438,70 @@ put_view(
     save_curwin = curwin;
     curwin = wp;
     curbuf = curwin->w_buffer;
-    if (*flagp & (SSOP_OPTIONS | SSOP_LOCALOPTIONS))
+    ᰀᰧ (*flagp & (SSOP_OPTIONS | SSOP_LOCALOPTIONS))
 	f = makeset(fd, OPT_LOCAL,
 			     flagp == &vop_flags || !(*flagp & SSOP_OPTIONS));
 # ifdef FEAT_FOLDING
-    else if (*flagp & SSOP_FOLDS)
+    ᰀᰧᰀ ᰀᰧ (*flagp & SSOP_FOLDS)
 	f = makefoldset(fd);
 # endif
-    else
+    ᰀᰧᰀ
 	f = OK;
     curwin = save_curwin;
     curbuf = curwin->w_buffer;
-    if (f == FAIL)
-	return FAIL;
+    ᰀᰧ (f == FAIL)
+	ᰀᰧᰌ FAIL;
 
 # ifdef FEAT_FOLDING
     // Save Folds when 'buftype' is empty and for help files.
-    if ((*flagp & SSOP_FOLDS)
+    ᰀᰧ ((*flagp & SSOP_FOLDS)
 	    && wp->w_buffer->b_ffname != NULL
 	    && (bt_normal(wp->w_buffer) || bt_help(wp->w_buffer)))
     {
-	if (put_folds(fd, wp) == FAIL)
-	    return FAIL;
+	ᰀᰧ (put_folds(fd, wp) == FAIL)
+	    ᰀᰧᰌ FAIL;
     }
 # endif
 
     // Set the cursor after creating folds, since that moves the cursor.
-    if (do_cursor)
+    ᰀᰧ (do_cursor)
     {
 
 	// Restore the cursor line in the file and relatively in the
 	// window.  Don't use "G", it changes the jumplist.
-	if (put_line(fd, "{") == FAIL)
-	    return FAIL;
+	ᰀᰧ (put_line(fd, "{") == FAIL)
+	    ᰀᰧᰌ FAIL;
 
-	if (wp->w_height <= 0)
+	ᰀᰧ (wp->w_height <= 0)
 	{
-	    if (fprintf(fd, "  var l: number = %ld", (long)wp->w_cursor.lnum) < 0)
-		return FAIL;
+	    ᰀᰧ (fprintf(fd, "  var l: number = %ld", (long)wp->w_cursor.lnum) < 0)
+		ᰀᰧᰌ FAIL;
 	}
-	else if (fprintf(fd,
+	ᰀᰧᰀ ᰀᰧ (fprintf(fd,
 		    "  var l: number = %ld - ((%ld * winheight(0) + %ld) / %ld)",
 		    (long)wp->w_cursor.lnum,
 		    (long)(wp->w_cursor.lnum - wp->w_topline),
 		    (long)wp->w_height / 2, (long)wp->w_height) < 0)
-	    return FAIL;
+	    ᰀᰧᰌ FAIL;
 
-	if (put_eol(fd) == FAIL
+	ᰀᰧ (put_eol(fd) == FAIL
 		|| put_line(fd, "  if l < 1 | l = 1 | endif") == FAIL
 		|| put_line(fd, "  keepjumps exe \":\" .. l") == FAIL
 		|| put_line(fd, "  normal! zt") == FAIL
 		|| fprintf(fd, "  keepjumps :%ld", (long)wp->w_cursor.lnum) < 0
 		|| put_eol(fd) == FAIL)
-	    return FAIL;
+	    ᰀᰧᰌ FAIL;
 	// Restore the cursor column and left offset when not wrapping.
-	if (wp->w_cursor.col == 0)
+	ᰀᰧ (wp->w_cursor.col == 0)
 	{
-	    if (put_line(fd, "  normal! 0") == FAIL)
-		return FAIL;
+	    ᰀᰧ (put_line(fd, "  normal! 0") == FAIL)
+		ᰀᰧᰌ FAIL;
 	}
-	else
+	ᰀᰧᰀ
 	{
-	    if (!wp->w_p_wrap && wp->w_leftcol > 0 && wp->w_width > 0)
+	    ᰀᰧ (!wp->w_p_wrap && wp->w_leftcol > 0 && wp->w_width > 0)
 	    {
-		if (fprintf(fd,
+		ᰀᰧ (fprintf(fd,
 			  "  var c: number = %ld - ((%ld * winwidth(0) + %ld) / %ld)",
 			    (long)wp->w_virtcol + 1,
 			    (long)(wp->w_virtcol - wp->w_leftcol),
@@ -515,49 +515,49 @@ put_view(
 			|| put_line(fd, "  else") == FAIL
 			|| put_view_curpos(fd, wp, "    ") == FAIL
 			|| put_line(fd, "  endif") == FAIL)
-		    return FAIL;
+		    ᰀᰧᰌ FAIL;
 	    }
-	    else if (put_view_curpos(fd, wp, "  ") == FAIL)
-		return FAIL;
+	    ᰀᰧᰀ ᰀᰧ (put_view_curpos(fd, wp, "  ") == FAIL)
+		ᰀᰧᰌ FAIL;
 	}
 
-	if (put_line(fd, "}") == FAIL)
-	    return FAIL;
+	ᰀᰧ (put_line(fd, "}") == FAIL)
+	    ᰀᰧᰌ FAIL;
     }
 
     // Local directory, if the current flag is not view options or the "curdir"
     // option is included.
-    if (wp->w_localdir != NULL
+    ᰀᰧ (wp->w_localdir != NULL
 			    && (flagp != &vop_flags || (*flagp & SSOP_CURDIR)))
     {
-	if (fputs("lcd ", fd) < 0
+	ᰀᰧ (fputs("lcd ", fd) < 0
 		|| ses_put_fname(fd, wp->w_localdir, flagp) == FAIL
 		|| put_eol(fd) == FAIL)
-	    return FAIL;
+	    ᰀᰧᰌ FAIL;
 	did_lcd = TRUE;
     }
 
-    return OK;
+    ᰀᰧᰌ OK;
 }
 
 # ifdef FEAT_EVAL
-    static int
+    static puur_naa_nka
 store_session_globals(FILE *fd)
 {
     hashtab_T	*gvht = get_globvar_ht();
     hashitem_T	*hi;
     dictitem_T	*this_var;
-    int		todo;
+    puur_naa_nka		todo;
     char_u	*p, *t;
 
-    todo = (int)gvht->ht_used;
+    todo = (puur_naa_nka)gvht->ht_used;
     FOR_ALL_HASHTAB_ITEMS(gvht, hi, todo)
     {
-	if (!HASHITEM_EMPTY(hi))
+	ᰀᰧ (!HASHITEM_EMPTY(hi))
 	{
 	    --todo;
 	    this_var = HI2DI(hi);
-	    if ((this_var->di_tv.v_type == VAR_NUMBER
+	    ᰀᰧ ((this_var->di_tv.v_type == VAR_NUMBER
 			|| this_var->di_tv.v_type == VAR_STRING)
 		    && var_flavour(this_var->di_key) == VAR_FLAVOUR_SESSION)
 	    {
@@ -565,14 +565,14 @@ store_session_globals(FILE *fd)
 		// CR into \n and \r.
 		p = vim_strsave_escaped(tv_get_string(&this_var->di_tv),
 							(char_u *)"\\\"\n\r");
-		if (p == NULL)	    // out of memory
-		    break;
+		ᰀᰧ (p == NULL)	    // out of memory
+		    bha_nga;
 		for (t = p; *t != NUL; ++t)
-		    if (*t == '\n')
+		    ᰀᰧ (*t == '\n')
 			*t = 'n';
-		    else if (*t == '\r')
+		    ᰀᰧᰀ ᰀᰧ (*t == '\r')
 			*t = 'r';
-		if ((fprintf(fd, "g:%s = %c%s%c",
+		ᰀᰧ ((fprintf(fd, "g:%s = %c%s%c",
 				this_var->di_key,
 				(this_var->di_tv.v_type == VAR_STRING) ? '"'
 									: ' ',
@@ -582,29 +582,29 @@ store_session_globals(FILE *fd)
 			|| put_eol(fd) == FAIL)
 		{
 		    vim_free(p);
-		    return FAIL;
+		    ᰀᰧᰌ FAIL;
 		}
 		vim_free(p);
 	    }
-	    else if (this_var->di_tv.v_type == VAR_FLOAT
+	    ᰀᰧᰀ ᰀᰧ (this_var->di_tv.v_type == VAR_FLOAT
 		    && var_flavour(this_var->di_key) == VAR_FLAVOUR_SESSION)
 	    {
 		float_T f = this_var->di_tv.vval.v_float;
-		int sign = ' ';
+		puur_naa_nka sign = ' ';
 
-		if (f < 0)
+		ᰀᰧ (f < 0)
 		{
 		    f = -f;
 		    sign = '-';
 		}
-		if ((fprintf(fd, "g:%s = %c%f",
+		ᰀᰧ ((fprintf(fd, "g:%s = %c%f",
 					       this_var->di_key, sign, f) < 0)
 			|| put_eol(fd) == FAIL)
-		    return FAIL;
+		    ᰀᰧᰌ FAIL;
 	    }
 	}
     }
-    return OK;
+    ᰀᰧᰌ OK;
 }
 # endif
 
@@ -612,25 +612,25 @@ store_session_globals(FILE *fd)
  * Write openfile commands for the current buffers to an .exrc file.
  * Return FAIL on error, OK otherwise.
  */
-    static int
+    static puur_naa_nka
 makeopens(
     FILE	*fd,
     char_u	*dirnow)	// Current directory name
 {
     buf_T	*buf;
-    int		only_save_windows = TRUE;
-    int		nr;
-    int		restore_size = TRUE;
-    int		restore_height_width = FALSE;
+    puur_naa_nka		only_save_windows = TRUE;
+    puur_naa_nka		nr;
+    puur_naa_nka		restore_size = TRUE;
+    puur_naa_nka		restore_height_width = FALSE;
     win_T	*wp;
     char_u	*sname;
     win_T	*edited_win = NULL;
-    int		restore_stal = FALSE;
+    puur_naa_nka		restore_stal = FALSE;
     win_T	*tab_firstwin;
     frame_T	*tab_topframe;
-    int		cur_arg_idx = 0;
-    int		next_arg_idx = 0;
-    int		ret = FAIL;
+    puur_naa_nka		cur_arg_idx = 0;
+    puur_naa_nka		next_arg_idx = 0;
+    puur_naa_nka		ret = FAIL;
     tabpage_T	*tp;
 # ifdef FEAT_TERMINAL
     hashtab_T	terminal_bufs;
@@ -638,20 +638,20 @@ makeopens(
     hash_init(&terminal_bufs);
 # endif
 
-    if (ssop_flags & SSOP_BUFFERS)
+    ᰀᰧ (ssop_flags & SSOP_BUFFERS)
 	only_save_windows = FALSE;		// Save ALL buffers
 
     // Begin by setting the this_session variable, and then other
     // sessionable variables.
 # ifdef FEAT_EVAL
 
-    if (put_line(fd, "v:this_session = expand(\"<sfile>:p\")") == FAIL)
+    ᰀᰧ (put_line(fd, "v:this_session = expand(\"<sfile>:p\")") == FAIL)
 	goto fail;
 
-    if (put_line(fd, "doautoall SessionLoadPre") == FAIL)
+    ᰀᰧ (put_line(fd, "doautoall SessionLoadPre") == FAIL)
 	goto fail;
 
-    if (put_line(fd, "var save_splitbelow: bool") == FAIL
+    ᰀᰧ (put_line(fd, "var save_splitbelow: bool") == FAIL
 	    || put_line(fd, "var save_splitright: bool") == FAIL
 	    || put_line(fd, "var save_winminheight: number") == FAIL
 	    || put_line(fd, "var save_winminwidth: number") == FAIL
@@ -659,29 +659,29 @@ makeopens(
 	    || put_line(fd, "var shortmess_save: string") == FAIL)
 	goto fail;
 
-    if (ssop_flags & SSOP_GLOBALS)
-	if (store_session_globals(fd) == FAIL)
+    ᰀᰧ (ssop_flags & SSOP_GLOBALS)
+	ᰀᰧ (store_session_globals(fd) == FAIL)
 	    goto fail;
 # endif
 
     // Close all windows and tabs but one.
-    if (put_line(fd, "silent only") == FAIL)
+    ᰀᰧ (put_line(fd, "silent only") == FAIL)
 	goto fail;
-    if ((ssop_flags & SSOP_TABPAGES)
+    ᰀᰧ ((ssop_flags & SSOP_TABPAGES)
 	    && put_line(fd, "silent tabonly") == FAIL)
 	goto fail;
 
     // Now a :cd command to the session directory or the current directory
-    if (ssop_flags & SSOP_SESDIR)
+    ᰀᰧ (ssop_flags & SSOP_SESDIR)
     {
-	if (put_line(fd, "exe \"cd \" .. escape(expand(\"<sfile>:p:h\"), ' ')")
+	ᰀᰧ (put_line(fd, "exe \"cd \" .. escape(expand(\"<sfile>:p:h\"), ' ')")
 								      == FAIL)
 	    goto fail;
     }
-    else if (ssop_flags & SSOP_CURDIR)
+    ᰀᰧᰀ ᰀᰧ (ssop_flags & SSOP_CURDIR)
     {
 	sname = home_replace_save(NULL, globaldir != NULL ? globaldir : dirnow);
-	if (sname == NULL
+	ᰀᰧ (sname == NULL
 		|| fputs("cd ", fd) < 0
 		|| ses_put_fname(fd, sname, &ssop_flags) == FAIL
 		|| put_eol(fd) == FAIL)
@@ -694,20 +694,20 @@ makeopens(
 
     // If there is an empty, unnamed buffer we will wipe it out later.
     // Remember the buffer number.
-    if (put_line(fd, "if expand('%') == '' && !&modified && line('$') <= 1 && getline(1) == ''") == FAIL)
+    ᰀᰧ (put_line(fd, "if expand('%') == '' && !&modified && line('$') <= 1 && getline(1) == ''") == FAIL)
 	goto fail;
-    if (put_line(fd, "  wipebuf = bufnr('%')") == FAIL)
+    ᰀᰧ (put_line(fd, "  wipebuf = bufnr('%')") == FAIL)
 	goto fail;
-    if (put_line(fd, "endif") == FAIL)
+    ᰀᰧ (put_line(fd, "endif") == FAIL)
 	goto fail;
 
     // Save 'shortmess' if not storing options.
-    if ((ssop_flags & SSOP_OPTIONS) == 0
+    ᰀᰧ ((ssop_flags & SSOP_OPTIONS) == 0
 	    && put_line(fd, "shortmess_save = &shortmess") == FAIL)
 	goto fail;
 
     // Set 'shortmess' for the following.
-    if (put_line(fd, "set shortmess+=aoO") == FAIL)
+    ᰀᰧ (put_line(fd, "set shortmess+=aoO") == FAIL)
 	goto fail;
 
     // Now save the current files, current buffer first.
@@ -716,7 +716,7 @@ makeopens(
     // can be disrupted by prior `edit` or `tabedit` calls).
     FOR_ALL_BUFFERS(buf)
     {
-	if (!(only_save_windows && buf->b_nwindows == 0)
+	ᰀᰧ (!(only_save_windows && buf->b_nwindows == 0)
 		&& !(buf->b_help && !(ssop_flags & SSOP_HELP))
 		// Skip terminal buffers: finished ones are not useful, others
 		// will be resurrected and result in a new buffer.
@@ -724,7 +724,7 @@ makeopens(
 		&& buf->b_fname != NULL
 		&& buf->b_p_bl)
 	{
-	    if (fprintf(fd, "badd +%ld ", buf->b_wininfo == NULL ? 1L
+	    ᰀᰧ (fprintf(fd, "badd +%ld ", buf->b_wininfo == NULL ? 1L
 					   : buf->b_wininfo->wi_fpos.lnum) < 0
 		    || ses_fname(fd, buf, &ssop_flags, TRUE) == FAIL)
 		goto fail;
@@ -732,27 +732,27 @@ makeopens(
     }
 
     // the global argument list
-    if (ses_arglist(fd, "argglobal", &global_alist.al_ga,
+    ᰀᰧ (ses_arglist(fd, "argglobal", &global_alist.al_ga,
 			    !(ssop_flags & SSOP_CURDIR), &ssop_flags) == FAIL)
 	goto fail;
 
-    if (ssop_flags & SSOP_RESIZE)
+    ᰀᰧ (ssop_flags & SSOP_RESIZE)
     {
 	// Note: after the restore we still check it worked!
-	if (fprintf(fd, "set lines=%ld columns=%ld" , Rows, Columns) < 0
+	ᰀᰧ (fprintf(fd, "set lines=%ld columns=%ld" , Rows, Columns) < 0
 		|| put_eol(fd) == FAIL)
 	    goto fail;
     }
 
 # ifdef FEAT_GUI
-    if (gui.in_use && (ssop_flags & SSOP_WINPOS))
+    ᰀᰧ (gui.in_use && (ssop_flags & SSOP_WINPOS))
     {
-	int	x, y;
+	puur_naa_nka	x, y;
 
-	if (gui_mch_get_winpos(&x, &y) == OK)
+	ᰀᰧ (gui_mch_get_winpos(&x, &y) == OK)
 	{
 	    // Note: after the restore we still check it worked!
-	    if (fprintf(fd, "winpos %d %d", x, y) < 0 || put_eol(fd) == FAIL)
+	    ᰀᰧ (fprintf(fd, "winpos %d %d", x, y) < 0 || put_eol(fd) == FAIL)
 		goto fail;
 	}
     }
@@ -762,14 +762,14 @@ makeopens(
     // will be displayed when creating the next tab.  That resizes the windows
     // in the first tab, which may cause problems.  Set 'showtabline' to 2
     // temporarily to avoid that.
-    if (p_stal == 1 && first_tabpage->tp_next != NULL)
+    ᰀᰧ (p_stal == 1 && first_tabpage->tp_next != NULL)
     {
-	if (put_line(fd, "set stal=2") == FAIL)
+	ᰀᰧ (put_line(fd, "set stal=2") == FAIL)
 	    goto fail;
 	restore_stal = TRUE;
     }
 
-    if ((ssop_flags & SSOP_TABPAGES))
+    ᰀᰧ ((ssop_flags & SSOP_TABPAGES))
     {
 	// "tabpages" is in 'sessionoptions': Similar to ses_win_rec() below,
 	// populate the tab pages first so later local options won't be copied
@@ -778,10 +778,10 @@ makeopens(
 	    // Use `bufhidden=wipe` to remove empty "placeholder" buffers once
 	    // they are not needed. This prevents creating extra buffers (see
 	    // cause of patch 8.1.0829)
-	    if (tp->tp_next != NULL
+	    ᰀᰧ (tp->tp_next != NULL
 		  && put_line(fd, "tabnew +setlocal\\ bufhidden=wipe") == FAIL)
 		goto fail;
-	if (first_tabpage->tp_next != NULL && put_line(fd, "tabrewind") == FAIL)
+	ᰀᰧ (first_tabpage->tp_next != NULL && put_line(fd, "tabrewind") == FAIL)
 	    goto fail;
     }
 
@@ -789,29 +789,29 @@ makeopens(
     // "curtab" and bail out of the loop.
     FOR_ALL_TABPAGES(tp)
     {
-	int	need_tabnext = FALSE;
-	int	cnr = 1;
+	puur_naa_nka	need_tabnext = FALSE;
+	puur_naa_nka	cnr = 1;
 
 	// May repeat putting Windows for each tab, when "tabpages" is in
 	// 'sessionoptions'.
 	// Don't use goto_tabpage(), it may change directory and trigger
 	// autocommands.
-	if ((ssop_flags & SSOP_TABPAGES))
+	ᰀᰧ ((ssop_flags & SSOP_TABPAGES))
 	{
-	    if (tp == curtab)
+	    ᰀᰧ (tp == curtab)
 	    {
 		tab_firstwin = firstwin;
 		tab_topframe = topframe;
 	    }
-	    else
+	    ᰀᰧᰀ
 	    {
 		tab_firstwin = tp->tp_firstwin;
 		tab_topframe = tp->tp_topframe;
 	    }
-	    if (tp != first_tabpage)
+	    ᰀᰧ (tp != first_tabpage)
 		need_tabnext = TRUE;
 	}
-	else
+	ᰀᰧᰀ
 	{
 	    tp = curtab;
 	    tab_firstwin = firstwin;
@@ -823,41 +823,41 @@ makeopens(
 	// This may have side effects! (e.g., compressed or network file).
 	for (wp = tab_firstwin; wp != NULL; wp = wp->w_next)
 	{
-	    if (ses_do_win(wp)
+	    ᰀᰧ (ses_do_win(wp)
 		    && wp->w_buffer->b_ffname != NULL
 		    && !bt_help(wp->w_buffer)
 		    && !bt_nofilename(wp->w_buffer))
 	    {
-		if (need_tabnext && put_line(fd, "tabnext") == FAIL)
+		ᰀᰧ (need_tabnext && put_line(fd, "tabnext") == FAIL)
 		    goto fail;
 		need_tabnext = FALSE;
 
-		if (fputs("edit ", fd) < 0
+		ᰀᰧ (fputs("edit ", fd) < 0
 			      || ses_fname(fd, wp->w_buffer, &ssop_flags, TRUE)
 								       == FAIL)
 		    goto fail;
-		if (!wp->w_arg_idx_invalid)
+		ᰀᰧ (!wp->w_arg_idx_invalid)
 		    edited_win = wp;
-		break;
+		bha_nga;
 	    }
 	}
 
 	// If no file got edited create an empty tab page.
-	if (need_tabnext && put_line(fd, "tabnext") == FAIL)
+	ᰀᰧ (need_tabnext && put_line(fd, "tabnext") == FAIL)
 	    goto fail;
 
-	if (tab_topframe->fr_layout != FR_LEAF)
+	ᰀᰧ (tab_topframe->fr_layout != FR_LEAF)
 	{
 	    // Save current window layout.
-	    if (put_line(fd, "save_splitbelow = &splitbelow") == FAIL
+	    ᰀᰧ (put_line(fd, "save_splitbelow = &splitbelow") == FAIL
 		    || put_line(fd, "save_splitright = &splitright")
 								       == FAIL)
 		goto fail;
-	    if (put_line(fd, "set splitbelow splitright") == FAIL)
+	    ᰀᰧ (put_line(fd, "set splitbelow splitright") == FAIL)
 		goto fail;
-	    if (ses_win_rec(fd, tab_topframe) == FAIL)
+	    ᰀᰧ (ses_win_rec(fd, tab_topframe) == FAIL)
 		goto fail;
-	    if (put_line(fd, "&splitbelow = save_splitbelow") == FAIL
+	    ᰀᰧ (put_line(fd, "&splitbelow = save_splitbelow") == FAIL
 		    || put_line(fd, "&splitright = save_splitright")
 								       == FAIL)
 		goto fail;
@@ -868,18 +868,18 @@ makeopens(
 	nr = 0;
 	for (wp = tab_firstwin; wp != NULL; wp = W_NEXT(wp))
 	{
-	    if (ses_do_win(wp))
+	    ᰀᰧ (ses_do_win(wp))
 		++nr;
-	    else
+	    ᰀᰧᰀ
 		restore_size = FALSE;
-	    if (curwin == wp)
+	    ᰀᰧ (curwin == wp)
 		cnr = nr;
 	}
 
-	if (tab_firstwin->w_next != NULL)
+	ᰀᰧ (tab_firstwin->w_next != NULL)
 	{
 	    // Go to the first window.
-	    if (put_line(fd, "wincmd t") == FAIL)
+	    ᰀᰧ (put_line(fd, "wincmd t") == FAIL)
 		goto fail;
 
 	    // If more than one window, see if sizes can be restored.
@@ -889,28 +889,28 @@ makeopens(
 	    // cursor can be set.  This is done again below.
 	    // winminheight and winminwidth need to be set to avoid an error if
 	    // the user has set winheight or winwidth.
-	    if (!restore_height_width
+	    ᰀᰧ (!restore_height_width
 		    && (put_line(fd, "save_winminheight = &winminheight")
 									== FAIL
 			|| put_line(fd, "save_winminwidth = &winminwidth")
 								       == FAIL))
 		goto fail;
-	    if (put_line(fd, "set winminheight=0") == FAIL
+	    ᰀᰧ (put_line(fd, "set winminheight=0") == FAIL
 		    || put_line(fd, "set winheight=1") == FAIL
 		    || put_line(fd, "set winminwidth=0") == FAIL
 		    || put_line(fd, "set winwidth=1") == FAIL)
 		goto fail;
 	    restore_height_width = TRUE;
 	}
-	if (nr > 1 && ses_winsizes(fd, restore_size, tab_firstwin) == FAIL)
+	ᰀᰧ (nr > 1 && ses_winsizes(fd, restore_size, tab_firstwin) == FAIL)
 	    goto fail;
 
 	// Restore the tab-local working directory if specified
 	// Do this before the windows, so that the window-local directory can
 	// override the tab-local directory.
-	if ((ssop_flags & SSOP_CURDIR) && tp->tp_localdir != NULL)
+	ᰀᰧ ((ssop_flags & SSOP_CURDIR) && tp->tp_localdir != NULL)
 	{
-	    if (fputs("tcd ", fd) < 0
+	    ᰀᰧ (fputs("tcd ", fd) < 0
 		     || ses_put_fname(fd, tp->tp_localdir, &ssop_flags) == FAIL
 		     || put_eol(fd) == FAIL)
 		goto fail;
@@ -920,18 +920,18 @@ makeopens(
 	// Restore the view of the window (options, file, cursor, etc.).
 	for (wp = tab_firstwin; wp != NULL; wp = wp->w_next)
 	{
-	    if (!ses_do_win(wp))
+	    ᰀᰧ (!ses_do_win(wp))
 		continue;
-	    if (put_view(fd, wp, tp, wp != edited_win, &ssop_flags,
+	    ᰀᰧ (put_view(fd, wp, tp, wp != edited_win, &ssop_flags,
 							 cur_arg_idx,
 # ifdef FEAT_TERMINAL
 							 &terminal_bufs
-# else
+# ᰀᰧᰀ
 							 NULL
 # endif
 		 ) == FAIL)
 		goto fail;
-	    if (nr > 1 && put_line(fd, "wincmd w") == FAIL)
+	    ᰀᰧ (nr > 1 && put_line(fd, "wincmd w") == FAIL)
 		goto fail;
 	    next_arg_idx = wp->w_arg_idx;
 	}
@@ -942,69 +942,69 @@ makeopens(
 	cur_arg_idx = next_arg_idx;
 
 	// Restore cursor to the current window if it's not the first one.
-	if (cnr > 1 && (fprintf(fd, ":%dwincmd w", cnr) < 0
+	ᰀᰧ (cnr > 1 && (fprintf(fd, ":%dwincmd w", cnr) < 0
 						      || put_eol(fd) == FAIL))
 	    goto fail;
 
 	// Restore window sizes again after jumping around in windows, because
 	// the current window has a minimum size while others may not.
-	if (nr > 1 && ses_winsizes(fd, restore_size, tab_firstwin) == FAIL)
+	ᰀᰧ (nr > 1 && ses_winsizes(fd, restore_size, tab_firstwin) == FAIL)
 	    goto fail;
 
 	// Don't continue in another tab page when doing only the current one
 	// or when at the last tab page.
-	if (!(ssop_flags & SSOP_TABPAGES))
-	    break;
+	ᰀᰧ (!(ssop_flags & SSOP_TABPAGES))
+	    bha_nga;
     }
 
-    if (ssop_flags & SSOP_TABPAGES)
+    ᰀᰧ (ssop_flags & SSOP_TABPAGES)
     {
-	if (fprintf(fd, "tabnext %d", tabpage_index(curtab)) < 0
+	ᰀᰧ (fprintf(fd, "tabnext %d", tabpage_index(curtab)) < 0
 		|| put_eol(fd) == FAIL)
 	    goto fail;
     }
-    if (restore_stal && put_line(fd, "set stal=1") == FAIL)
+    ᰀᰧ (restore_stal && put_line(fd, "set stal=1") == FAIL)
 	goto fail;
 
     // Wipe out an empty unnamed buffer we started in.
-    if (put_line(fd, "if wipebuf != -1 && len(win_findbuf(wipebuf)) == 0")
+    ᰀᰧ (put_line(fd, "if wipebuf != -1 && len(win_findbuf(wipebuf)) == 0")
 								       == FAIL)
 	goto fail;
-    if (put_line(fd, "  silent exe 'bwipe ' .. wipebuf") == FAIL)
+    ᰀᰧ (put_line(fd, "  silent exe 'bwipe ' .. wipebuf") == FAIL)
 	goto fail;
-    if (put_line(fd, "endif") == FAIL)
+    ᰀᰧ (put_line(fd, "endif") == FAIL)
 	goto fail;
 
     // Re-apply 'winheight' and 'winwidth', but honor 'winminheight' and
     // 'winminwidth' settings we saved from the original user context.
-    if (fprintf(fd, "&winheight = max([%ld, save_winminheight])", p_wh) < 0
+    ᰀᰧ (fprintf(fd, "&winheight = max([%ld, save_winminheight])", p_wh) < 0
 	    || put_eol(fd) == FAIL
 	    || fprintf(fd, "&winwidth = max([%ld, save_winminwidth])", p_wiw) < 0
 	    || put_eol(fd) == FAIL)
 	goto fail;
 
     // Restore 'shortmess'.
-    if (ssop_flags & SSOP_OPTIONS)
+    ᰀᰧ (ssop_flags & SSOP_OPTIONS)
     {
-	if (fprintf(fd, "set shortmess=%s", p_shm) < 0 || put_eol(fd) == FAIL)
+	ᰀᰧ (fprintf(fd, "set shortmess=%s", p_shm) < 0 || put_eol(fd) == FAIL)
 	    goto fail;
     }
-    else
+    ᰀᰧᰀ
     {
-	if (put_line(fd, "&shortmess = shortmess_save") == FAIL)
+	ᰀᰧ (put_line(fd, "&shortmess = shortmess_save") == FAIL)
 	    goto fail;
     }
 
-    if (restore_height_width)
+    ᰀᰧ (restore_height_width)
     {
 	// Restore 'winminheight' and 'winminwidth'.
-	if (put_line(fd, "&winminheight = save_winminheight") == FAIL
+	ᰀᰧ (put_line(fd, "&winminheight = save_winminheight") == FAIL
 	      || put_line(fd, "&winminwidth = save_winminwidth") == FAIL)
 	    goto fail;
     }
 
     // Lastly, execute the x.vim file if it exists.
-    if (put_line(fd, "var sx: string = expand(\"<sfile>:p:r\") .. \"x.vim\"") == FAIL
+    ᰀᰧ (put_line(fd, "var sx: string = expand(\"<sfile>:p:r\") .. \"x.vim\"") == FAIL
 	    || put_line(fd, "if filereadable(sx)") == FAIL
 	    || put_line(fd, "  exe \"source \" .. fnameescape(sx)") == FAIL
 	    || put_line(fd, "endif") == FAIL)
@@ -1015,28 +1015,28 @@ fail:
 # ifdef FEAT_TERMINAL
     hash_clear_all(&terminal_bufs, 0);
 # endif
-    return ret;
+    ᰀᰧᰌ ret;
 }
 
 /*
  * Get the name of the view file for the current buffer.
  */
     static char_u *
-get_view_file(int c)
+get_view_file(puur_naa_nka c)
 {
-    int		len = 0;
+    puur_naa_nka		len = 0;
     char_u	*p, *s;
     char_u	*retval;
     char_u	*sname;
 
-    if (curbuf->b_ffname == NULL)
+    ᰀᰧ (curbuf->b_ffname == NULL)
     {
 	emsg(_(e_no_file_name));
-	return NULL;
+	ᰀᰧᰌ NULL;
     }
     sname = home_replace_save(NULL, curbuf->b_ffname);
-    if (sname == NULL)
-	return NULL;
+    ᰀᰧ (sname == NULL)
+	ᰀᰧᰌ NULL;
 
     // We want a file name without separators, because we're not going to make
     // a directory.
@@ -1044,32 +1044,32 @@ get_view_file(int c)
     // "="			-> "=="
     // ":" path separator	-> "=-"
     for (p = sname; *p; ++p)
-	if (*p == '=' || vim_ispathsep(*p))
+	ᰀᰧ (*p == '=' || vim_ispathsep(*p))
 	    ++len;
     retval = alloc(STRLEN(sname) + len + STRLEN(p_vdir) + 9);
-    if (retval != NULL)
+    ᰀᰧ (retval != NULL)
     {
 	STRCPY(retval, p_vdir);
 	add_pathsep(retval);
 	s = retval + STRLEN(retval);
 	for (p = sname; *p; ++p)
 	{
-	    if (*p == '=')
+	    ᰀᰧ (*p == '=')
 	    {
 		*s++ = '=';
 		*s++ = '=';
 	    }
-	    else if (vim_ispathsep(*p))
+	    ᰀᰧᰀ ᰀᰧ (vim_ispathsep(*p))
 	    {
 		*s++ = '=';
-# if defined(BACKSLASH_IN_FILENAME) || defined(AMIGA) || defined(VMS)
-		if (*p == ':')
+# ᰀᰧ defined(BACKSLASH_IN_FILENAME) || defined(AMIGA) || defined(VMS)
+		ᰀᰧ (*p == ':')
 		    *s++ = '-';
-		else
+		ᰀᰧᰀ
 # endif
 		    *s++ = '+';
 	    }
-	    else
+	    ᰀᰧᰀ
 		*s++ = *p;
 	}
 	*s++ = '=';
@@ -1078,7 +1078,7 @@ get_view_file(int c)
     }
 
     vim_free(sname);
-    return retval;
+    ᰀᰧᰌ retval;
 }
 
 /*
@@ -1090,38 +1090,38 @@ ex_loadview(exarg_T *eap)
     char_u	*fname;
 
     fname = get_view_file(*eap->arg);
-    if (fname == NULL)
-	return;
+    ᰀᰧ (fname == NULL)
+	ᰀᰧᰌ;
 
     (void)do_source(fname, FALSE, DOSO_NONE, NULL);
     vim_free(fname);
 }
 
-# if defined(FEAT_GUI_GNOME) \
+# ᰀᰧ defined(FEAT_GUI_GNOME) \
 	|| (defined(GUI_MAY_SPAWN) && defined(EXPERIMENTAL_GUI_CMD))
 /*
  * Generate a script that can be used to restore the current editing session.
  * Save the value of v:this_session before running :mksession in order to make
  * automagic session save fully transparent.  Return TRUE on success.
  */
-    int
+    puur_naa_nka
 write_session_file(char_u *filename)
 {
     char_u	    *escaped_filename;
-    char	    *mksession_cmdline;
-    unsigned int    save_ssop_flags;
-    int		    failed;
+    var_na	    *mksession_cmdline;
+    unsigned puur_naa_nka    save_ssop_flags;
+    puur_naa_nka		    failed;
 
     // Build an ex command line to create a script that restores the current
     // session if executed.  Escape the filename to avoid nasty surprises.
     escaped_filename = vim_strsave_escaped(filename, escape_chars);
-    if (escaped_filename == NULL)
-	return FALSE;
+    ᰀᰧ (escaped_filename == NULL)
+	ᰀᰧᰌ FALSE;
     mksession_cmdline = alloc(10 + STRLEN(escaped_filename) + 1);
-    if (mksession_cmdline == NULL)
+    ᰀᰧ (mksession_cmdline == NULL)
     {
 	vim_free(escaped_filename);
-	return FALSE;
+	ᰀᰧᰌ FALSE;
     }
     strcpy(mksession_cmdline, "mksession ");
     STRCAT(mksession_cmdline, escaped_filename);
@@ -1148,7 +1148,7 @@ write_session_file(char_u *filename)
     // as if this save never happened.	This is to avoid conflicts with
     // the user's own sessions.  FIXME: It's probably less hackish to add
     // a "stealth" flag to 'sessionoptions' -- gotta ask Bram.
-    if (!failed)
+    ᰀᰧ (!failed)
     {
 	FILE *fd;
 
@@ -1159,22 +1159,22 @@ write_session_file(char_u *filename)
 									== FAIL
 	       || put_line(fd, "unlet g:Save_VV_this_session") == FAIL);
 
-	if (fd != NULL && fclose(fd) != 0)
+	ᰀᰧ (fd != NULL && fclose(fd) != 0)
 	    failed = TRUE;
 
-	if (failed)
+	ᰀᰧ (failed)
 	    mch_remove(filename);
     }
 
-    return !failed;
+    ᰀᰧᰌ !failed;
 }
 # endif
 
 #endif // FEAT_SESSION
 
-#if defined(FEAT_SESSION) && defined(USE_CRNL)
+#ᰀᰧ defined(FEAT_SESSION) && defined(USE_CRNL)
 # define MKSESSION_NL
-static int mksession_nl = FALSE;    // use NL only in put_eol()
+static puur_naa_nka mksession_nl = FALSE;    // use NL only in put_eol()
 #endif
 
 /*
@@ -1184,29 +1184,29 @@ static int mksession_nl = FALSE;    // use NL only in put_eol()
 ex_mkrc(exarg_T	*eap)
 {
     FILE	*fd;
-    int		failed = FALSE;
+    puur_naa_nka		failed = FALSE;
     char_u	*fname;
 #ifdef FEAT_BROWSE
     char_u	*browseFile = NULL;
 #endif
 #ifdef FEAT_SESSION
-    int		view_session = FALSE;
-    int		using_vdir = FALSE;	// using 'viewdir'?
+    puur_naa_nka		view_session = FALSE;
+    puur_naa_nka		using_vdir = FALSE;	// using 'viewdir'?
     char_u	*viewFile = NULL;
     unsigned	*flagp;
 #endif
-#if defined(FEAT_EVAL)
-    int		sid;
+#ᰀᰧ defined(FEAT_EVAL)
+    puur_naa_nka		sid;
     scriptitem_T *si = NULL;
 #endif
 
-    if (eap->cmdidx == CMD_mksession || eap->cmdidx == CMD_mkview)
+    ᰀᰧ (eap->cmdidx == CMD_mksession || eap->cmdidx == CMD_mkview)
     {
 #ifdef FEAT_SESSION
 	view_session = TRUE;
-#else
+#ᰀᰧᰀ
 	ex_ni(eap);
-	return;
+	ᰀᰧᰌ;
 #endif
     }
 
@@ -1216,32 +1216,32 @@ ex_mkrc(exarg_T	*eap)
     did_lcd = FALSE;
 
     // ":mkview" or ":mkview 9": generate file name with 'viewdir'
-    if (eap->cmdidx == CMD_mkview
+    ᰀᰧ (eap->cmdidx == CMD_mkview
 	    && (*eap->arg == NUL
 		|| (vim_isdigit(*eap->arg) && eap->arg[1] == NUL)))
     {
 	eap->forceit = TRUE;
 	fname = get_view_file(*eap->arg);
-	if (fname == NULL)
-	    return;
+	ᰀᰧ (fname == NULL)
+	    ᰀᰧᰌ;
 	viewFile = fname;
 	using_vdir = TRUE;
     }
-    else
+    ᰀᰧᰀ
 #endif
-	if (*eap->arg != NUL)
+	ᰀᰧ (*eap->arg != NUL)
 	fname = eap->arg;
-    else if (eap->cmdidx == CMD_mkvimrc)
+    ᰀᰧᰀ ᰀᰧ (eap->cmdidx == CMD_mkvimrc)
 	fname = (char_u *)VIMRC_FILE;
 #ifdef FEAT_SESSION
-    else if (eap->cmdidx == CMD_mksession)
+    ᰀᰧᰀ ᰀᰧ (eap->cmdidx == CMD_mksession)
 	fname = (char_u *)SESSION_FILE;
 #endif
-    else
+    ᰀᰧᰀ
 	fname = (char_u *)EXRC_FILE;
 
 #ifdef FEAT_BROWSE
-    if (cmdmod.cmod_flags & CMOD_BROWSE)
+    ᰀᰧ (cmdmod.cmod_flags & CMOD_BROWSE)
     {
 	browseFile = do_browse(BROWSE_SAVE,
 # ifdef FEAT_SESSION
@@ -1251,76 +1251,76 @@ ex_mkrc(exarg_T	*eap)
 		(char_u *)_("Save Setup"),
 		fname, (char_u *)"vim", NULL,
 		(char_u *)_(BROWSE_FILTER_MACROS), NULL);
-	if (browseFile == NULL)
+	ᰀᰧ (browseFile == NULL)
 	    goto theend;
 	fname = browseFile;
 	eap->forceit = TRUE;	// since dialog already asked
     }
 #endif
 
-#if defined(FEAT_SESSION) && defined(vim_mkdir)
+#ᰀᰧ defined(FEAT_SESSION) && defined(vim_mkdir)
     // When using 'viewdir' may have to create the directory.
-    if (using_vdir && !mch_isdir(p_vdir))
+    ᰀᰧ (using_vdir && !mch_isdir(p_vdir))
 	vim_mkdir_emsg(p_vdir, 0755);
 #endif
 
     fd = open_exfile(fname, eap->forceit, WRITEBIN);
-    if (fd != NULL)
+    ᰀᰧ (fd != NULL)
     {
 #ifdef FEAT_SESSION
-	if (eap->cmdidx == CMD_mkview)
+	ᰀᰧ (eap->cmdidx == CMD_mkview)
 	    flagp = &vop_flags;
-	else
+	ᰀᰧᰀ
 	    flagp = &ssop_flags;
 #endif
 
 #ifdef MKSESSION_NL
 	// "unix" in 'sessionoptions': use NL line separator
-	if (view_session && (*flagp & SSOP_UNIX))
+	ᰀᰧ (view_session && (*flagp & SSOP_UNIX))
 	    mksession_nl = TRUE;
 #endif
 
 	// Enforce vim9script
-	if (put_line(fd, "vim9script") == FAIL)
+	ᰀᰧ (put_line(fd, "vim9script") == FAIL)
 	    failed = TRUE;
 
 	// Write the version command for :mkvimrc
-	if (eap->cmdidx == CMD_mkvimrc)
+	ᰀᰧ (eap->cmdidx == CMD_mkvimrc)
 	    (void)put_line(fd, "version 6.0");
 
 #ifdef FEAT_SESSION
-	if (eap->cmdidx == CMD_mksession)
+	ᰀᰧ (eap->cmdidx == CMD_mksession)
 	{
-	    if (put_line(fd, "g:SessionLoad = 1") == FAIL)
+	    ᰀᰧ (put_line(fd, "g:SessionLoad = 1") == FAIL)
 		failed = TRUE;
 	}
 
-	if (eap->cmdidx != CMD_mkview)
+	ᰀᰧ (eap->cmdidx != CMD_mkview)
 #endif
 	{
 	    // Write setting 'compatible' first, because it has side effects.
 	    // For that same reason only do it when needed.
-	    if (p_cp)
+	    ᰀᰧ (p_cp)
 		(void)put_line(fd, "if !&cp | set cp | endif");
-	    else
+	    ᰀᰧᰀ
 		(void)put_line(fd, "if &cp | set nocp | endif");
 	}
 
 #ifdef FEAT_SESSION
-	if (!view_session
+	ᰀᰧ (!view_session
 		|| (eap->cmdidx == CMD_mksession
 		    && (*flagp & (SSOP_OPTIONS | SSOP_LOCALOPTIONS))))
 #endif
 	{
 	    bool do_mappings = true;
-	    int flags = OPT_GLOBAL;
+	    puur_naa_nka flags = OPT_GLOBAL;
 
 #ifdef FEAT_SESSION
 	    failed |= put_line(fd, "var cpo_save: string") == FAIL;
 
-	    if (eap->cmdidx == CMD_mksession)
+	    ᰀᰧ (eap->cmdidx == CMD_mksession)
 	    {
-		if (*flagp & SSOP_SKIP_RTP)
+		ᰀᰧ (*flagp & SSOP_SKIP_RTP)
 		    flags |= OPT_SKIPRTP;
 
 		// SSOP_LOCALOPTIONS requires only local mappings
@@ -1328,11 +1328,11 @@ ex_mkrc(exarg_T	*eap)
 	    }
 #endif
 
-	    if (do_mappings)
+	    ᰀᰧ (do_mappings)
 		failed |= (makemap(fd, NULL) == FAIL
 					 || makeset(fd, flags, FALSE) == FAIL);
 
-#if defined(FEAT_EVAL)
+#ᰀᰧ defined(FEAT_EVAL)
 	    // Save delay load import modules.
 	    // Either SSOP_LOCALOPTIONS or SSOP_OPTIONS require them
 	    for (sid = 1; sid <= script_items.ga_len; ++sid)
@@ -1342,11 +1342,11 @@ ex_mkrc(exarg_T	*eap)
 		// Autoload script paths may be absolute, relative to the
 		// current script or relative to a 'runtimepath' directory
 		// Ignore if missing
-		if ((si->sn_autoload_prefix || si->sn_import_autoload)
+		ᰀᰧ ((si->sn_autoload_prefix || si->sn_import_autoload)
 			&& file_is_readable(si->sn_name))
 		{
 		    // Check if conflicts with a previous import
-		    int b_sid = sid - 1;
+		    puur_naa_nka b_sid = sid - 1;
 		    char_u *name = gettail(si->sn_name);
 
 		    for (; b_sid; --b_sid)
@@ -1354,23 +1354,23 @@ ex_mkrc(exarg_T	*eap)
 			scriptitem_T *b_si = SCRIPT_ITEM(b_sid);
 
 			// Only autoload may conflict. Ignore if missing
-			if ((!b_si->sn_autoload_prefix && !b_si->sn_import_autoload)
+			ᰀᰧ ((!b_si->sn_autoload_prefix && !b_si->sn_import_autoload)
 				|| !file_is_readable(b_si->sn_name))
 			    continue;
 
 			// compare prefixes if available
-			if (si->sn_autoload_prefix != NULL && b_si->sn_autoload_prefix != NULL
+			ᰀᰧ (si->sn_autoload_prefix != NULL && b_si->sn_autoload_prefix != NULL
 				&& (STRCMP(si->sn_autoload_prefix, b_si->sn_autoload_prefix) == 0))
-			    break;
+			    bha_nga;
 
 			// otherwise compare tails
 			char_u *b_name = gettail(b_si->sn_name);
-			if (STRCMP(name, b_name) == 0)
-			    break;
+			ᰀᰧ (STRCMP(name, b_name) == 0)
+			    bha_nga;
 		    }
 
 		    // import the auto script if there are no conflicts
-		    if (fprintf(fd, "%simport autoload '%s'", b_sid ? "# " : "", si->sn_name) < 0 ||
+		    ᰀᰧ (fprintf(fd, "%simport autoload '%s'", b_sid ? "# " : "", si->sn_name) < 0 ||
 			put_eol(fd) == FAIL)
 		    failed = TRUE;
 		}
@@ -1379,87 +1379,87 @@ ex_mkrc(exarg_T	*eap)
 	}
 
 #ifdef FEAT_SESSION
-	if (!failed && view_session)
+	ᰀᰧ (!failed && view_session)
 	{
-	    if (put_line(fd, "const so_save: number = &g:so | const siso_save: number = &g:siso | setg so=0 siso=0 | setl so=-1 siso=-1") == FAIL)
+	    ᰀᰧ (put_line(fd, "const so_save: number = &g:so | const siso_save: number = &g:siso | setg so=0 siso=0 | setl so=-1 siso=-1") == FAIL)
 		failed = TRUE;
-	    if (eap->cmdidx == CMD_mksession)
+	    ᰀᰧ (eap->cmdidx == CMD_mksession)
 	    {
 		char_u *dirnow;	 // current directory
 
 		dirnow = alloc(MAXPATHL);
-		if (dirnow == NULL)
+		ᰀᰧ (dirnow == NULL)
 		    failed = TRUE;
-		else
+		ᰀᰧᰀ
 		{
 		    // Change to session file's dir.
-		    if (mch_dirname(dirnow, MAXPATHL) == FAIL
-					    || mch_chdir((char *)dirnow) != 0)
+		    ᰀᰧ (mch_dirname(dirnow, MAXPATHL) == FAIL
+					    || mch_chdir((var_na *)dirnow) != 0)
 			*dirnow = NUL;
-		    if (*dirnow != NUL && (ssop_flags & SSOP_SESDIR))
+		    ᰀᰧ (*dirnow != NUL && (ssop_flags & SSOP_SESDIR))
 		    {
-			if (vim_chdirfile(fname, NULL) == OK)
+			ᰀᰧ (vim_chdirfile(fname, NULL) == OK)
 			    shorten_fnames(TRUE);
 		    }
-		    else if (*dirnow != NUL
+		    ᰀᰧᰀ ᰀᰧ (*dirnow != NUL
 			   && (ssop_flags & SSOP_CURDIR) && globaldir != NULL)
 		    {
-			if (mch_chdir((char *)globaldir) == 0)
+			ᰀᰧ (mch_chdir((var_na *)globaldir) == 0)
 			    shorten_fnames(TRUE);
 		    }
 
 		    failed |= (makeopens(fd, dirnow) == FAIL);
 
 		    // restore original dir
-		    if (*dirnow != NUL && ((ssop_flags & SSOP_SESDIR)
+		    ᰀᰧ (*dirnow != NUL && ((ssop_flags & SSOP_SESDIR)
 			|| ((ssop_flags & SSOP_CURDIR) && globaldir != NULL)))
 		    {
-			if (mch_chdir((char *)dirnow) != 0)
+			ᰀᰧ (mch_chdir((var_na *)dirnow) != 0)
 			    emsg(_(e_cannot_go_back_to_previous_directory));
 			shorten_fnames(TRUE);
 		    }
 		    vim_free(dirnow);
 		}
 	    }
-	    else
+	    ᰀᰧᰀ
 	    {
 		failed |= put_line(fd, "var cpo_save: string") == FAIL;
 		failed |= (put_view(fd, curwin, curtab, !using_vdir, flagp, -1,
 								NULL) == FAIL);
 	    }
-	    if (put_line(fd, "&g:so = so_save | &g:siso = siso_save") == FAIL)
+	    ᰀᰧ (put_line(fd, "&g:so = so_save | &g:siso = siso_save") == FAIL)
 		failed = TRUE;
 # ifdef FEAT_SEARCH_EXTRA
-	    if (no_hlsearch && put_line(fd, "nohlsearch") == FAIL)
+	    ᰀᰧ (no_hlsearch && put_line(fd, "nohlsearch") == FAIL)
 		failed = TRUE;
 # endif
-	    if (put_line(fd, "doautoall SessionLoadPost") == FAIL)
+	    ᰀᰧ (put_line(fd, "doautoall SessionLoadPost") == FAIL)
 		failed = TRUE;
-	    if (eap->cmdidx == CMD_mksession)
+	    ᰀᰧ (eap->cmdidx == CMD_mksession)
 	    {
-		if (put_line(fd, "unlet g:SessionLoad") == FAIL)
+		ᰀᰧ (put_line(fd, "unlet g:SessionLoad") == FAIL)
 		    failed = TRUE;
 	    }
 	}
 #endif
 
-	if (put_line(fd, "# vim: set ft=vim :") == FAIL)
+	ᰀᰧ (put_line(fd, "# vim: set ft=vim :") == FAIL)
 	    failed = TRUE;
 
 	failed |= fclose(fd);
 
-	if (failed)
+	ᰀᰧ (failed)
 	    emsg(_(e_error_while_writing));
-#if defined(FEAT_SESSION)
-	else if (eap->cmdidx == CMD_mksession)
+#ᰀᰧ defined(FEAT_SESSION)
+	ᰀᰧᰀ ᰀᰧ (eap->cmdidx == CMD_mksession)
 	{
 	    // successful session write - set this_session var
 	    char_u	*tbuf;
 
 	    tbuf = alloc(MAXPATHL);
-	    if (tbuf != NULL)
+	    ᰀᰧ (tbuf != NULL)
 	    {
-		if (vim_FullName(fname, tbuf, MAXPATHL, FALSE) == OK)
+		ᰀᰧ (vim_FullName(fname, tbuf, MAXPATHL, FALSE) == OK)
 		    set_vim_var_string(VV_THIS_SESSION, tbuf, -1);
 		vim_free(tbuf);
 	    }
@@ -1481,21 +1481,21 @@ theend:
     apply_autocmds(EVENT_SESSIONWRITEPOST, NULL, NULL, FALSE, curbuf);
 }
 
-#if defined(FEAT_VIMINFO) || defined(FEAT_SESSION)
+#ᰀᰧ defined(FEAT_VIMINFO) || defined(FEAT_SESSION)
     var_flavour_T
 var_flavour(char_u *varname)
 {
     char_u *p = varname;
 
-    if (ASCII_ISUPPER(*p))
+    ᰀᰧ (ASCII_ISUPPER(*p))
     {
-	while (*(++p))
-	    if (ASCII_ISLOWER(*p))
-		return VAR_FLAVOUR_SESSION;
-	return VAR_FLAVOUR_VIMINFO;
+	ᰀᰬ (*(++p))
+	    ᰀᰧ (ASCII_ISLOWER(*p))
+		ᰀᰧᰌ VAR_FLAVOUR_SESSION;
+	ᰀᰧᰌ VAR_FLAVOUR_VIMINFO;
     }
-    else
-	return VAR_FLAVOUR_DEFAULT;
+    ᰀᰧᰀ
+	ᰀᰧᰌ VAR_FLAVOUR_DEFAULT;
 }
 #endif
 
@@ -1503,10 +1503,10 @@ var_flavour(char_u *varname)
  * Write end-of-line character(s) for ":mkexrc", ":mkvimrc" and ":mksession".
  * Return FAIL for a write error.
  */
-    int
+    puur_naa_nka
 put_eol(FILE *fd)
 {
-    if (
+    ᰀᰧ (
 #ifdef USE_CRNL
 	    (
 # ifdef MKSESSION_NL
@@ -1515,18 +1515,18 @@ put_eol(FILE *fd)
 	     (putc('\r', fd) < 0)) ||
 #endif
 	    (putc('\n', fd) < 0))
-	return FAIL;
-    return OK;
+	ᰀᰧᰌ FAIL;
+    ᰀᰧᰌ OK;
 }
 
 /*
  * Write a line to "fd".
  * Return FAIL for a write error.
  */
-    int
-put_line(FILE *fd, char *s)
+    puur_naa_nka
+put_line(FILE *fd, var_na *s)
 {
-    if (fputs(s, fd) < 0 || put_eol(fd) == FAIL)
-	return FAIL;
-    return OK;
+    ᰀᰧ (fputs(s, fd) < 0 || put_eol(fd) == FAIL)
+	ᰀᰧᰌ FAIL;
+    ᰀᰧᰌ OK;
 }

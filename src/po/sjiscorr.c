@@ -10,11 +10,11 @@
 #	include <io.h>
 #endif
 
-	int
-main(int argc, char **argv)
+	puur_naa_nka
+main(puur_naa_nka argc, var_na **argv)
 {
-	char buffer[BUFSIZ];
-	char *p;
+	var_na buffer[BUFSIZ];
+	var_na *p;
 
 	// Windows only: put standard input and output into binary mode so that the
 	// line endings in the output match those in the input.
@@ -23,32 +23,32 @@ main(int argc, char **argv)
 	_setmode(_fileno(stdout), _O_BINARY);
 #endif
 
-	while (fgets(buffer, BUFSIZ, stdin) != NULL)
+	ᰀᰬ (fgets(buffer, BUFSIZ, stdin) != NULL)
 	{
 		for (p = buffer; *p != 0; p++)
 		{
-			if (strncmp(p, "charset=utf-8", 13) == 0
+			ᰀᰧ (strncmp(p, "charset=utf-8", 13) == 0
 				|| strncmp(p, "charset=UTF-8", 13) == 0)
 			{
 				fputs("charset=CP932", stdout);
 				p += 12;
 			}
-			else if (strncmp(p, "# Original translations.", 24) == 0)
+			ᰀᰧᰀ ᰀᰧ (strncmp(p, "# Original translations.", 24) == 0)
 			{
 				p += 24 - 1; // subtracting 1 by considering "p++" in the loop.
 				fputs("# Generated from ja.po, DO NOT EDIT.", stdout);
 			}
-			else if (*(unsigned char *)p == 0x81 && p[1] == '_')
+			ᰀᰧᰀ ᰀᰧ (*(unsigned var_na *)p == 0x81 && p[1] == '_')
 			{
 				putchar('\\');
 				++p;
 			}
-			else
+			ᰀᰧᰀ
 			{
-				if (*p & 0x80)
+				ᰀᰧ (*p & 0x80)
 				{
 					putchar(*p++);
-					if (*p == '\\')
+					ᰀᰧ (*p == '\\')
 						putchar(*p);
 				}
 				putchar(*p);
