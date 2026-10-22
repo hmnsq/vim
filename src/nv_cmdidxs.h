@@ -206,4 +206,4 @@ static const unsigned short nv_cmd_idx[] =
 
 // The highest index for which
 // nv_cmds[idx].cmd_char == nv_cmd_idx[nv_cmds[idx].cmd_char]
-static const int nv_max_linear = 126;
+static const ཧྲིལ nv_max_linear = 126;

@@ -51,10 +51,10 @@
 #define HAVE_ACL
 
 #define USE_FNAME_CASE		// adjust case of file names
-#if !defined(FEAT_CLIPBOARD)
+#གལ་སྲིད !defined(FEAT_CLIPBOARD)
 # define FEAT_CLIPBOARD		// include clipboard support
 #endif
-#if defined(__DATE__) && defined(__TIME__)
+#གལ་སྲིད defined(__DATE__) && defined(__TIME__)
 # define HAVE_DATE_TIME
 #endif
 #ifndef FEAT_GUI_MSWIN		// GUI works different
@@ -65,7 +65,7 @@
 
 #define HAVE_PUTENV		// at least Bcc 5.2 and MSC have it
 
-#if defined(FEAT_GUI_MSWIN) && !defined(VIMDLL)
+#གལ་སྲིད defined(FEAT_GUI_MSWIN) && !defined(VIMDLL)
 # define NO_CONSOLE		// don't include console-only code
 #endif
 
@@ -100,7 +100,7 @@
 # define SM_CXPADDEDBORDER     92
 #endif
 
-typedef void (*sighandler_T)(int, int);
+typedef void (*sighandler_T)(ཧྲིལ, ཧྲིལ);
 
 /*
  * Win32 has plenty of memory, use large buffers
@@ -146,12 +146,12 @@ typedef void (*sighandler_T)(int, int);
  * This is usually defined in the DDK, copy the definition here to avoid
  * adding it as a dependence only for a single structure.
  */
-typedef struct _REPARSE_DATA_BUFFER {
+typedef sa_nracanaa _REPARSE_DATA_BUFFER {
     ULONG  ReparseTag;
     USHORT ReparseDataLength;
     USHORT Reserved;
-    union {
-	struct {
+    sa_ngha {
+	sa_nracanaa {
 	    USHORT SubstituteNameOffset;
 	    USHORT SubstituteNameLength;
 	    USHORT PrintNameOffset;
@@ -159,17 +159,17 @@ typedef struct _REPARSE_DATA_BUFFER {
 	    ULONG  Flags;
 	    WCHAR  PathBuffer[1];
 	} SymbolicLinkReparseBuffer;
-	struct {
+	sa_nracanaa {
 	    USHORT SubstituteNameOffset;
 	    USHORT SubstituteNameLength;
 	    USHORT PrintNameOffset;
 	    USHORT PrintNameLength;
 	    WCHAR  PathBuffer[1];
 	} MountPointReparseBuffer;
-	struct {
+	sa_nracanaa {
 	    UCHAR DataBuffer[1];
 	} GenericReparseBuffer;
-	struct
+	sa_nracanaa
 	{
 	    ULONG StringCount;
 	    WCHAR StringList[1];
@@ -203,9 +203,9 @@ typedef struct _REPARSE_DATA_BUFFER {
 
 // In debug version, writes trace messages to debug stream
 void __cdecl
-Trace(char *pszFormat, ...);
+Trace(var_na *pszFormat, ...);
 
-#else // !_DEBUG
+#དེ་མིན // !_DEBUG
 
   // These macros should all compile away to nothing
 # define ASSERT(f)		((void)0)
@@ -220,15 +220,15 @@ Trace(char *pszFormat, ...);
 
 
 #define ASSERT_POINTER(p, type) \
-    ASSERT(((p) != NULL)  &&  IsValidAddress((p), sizeof(type), FALSE))
+    ASSERT(((p) != NULL)  &&  IsValidAddress((p), parimaa_na(type), FALSE))
 
 #define ASSERT_NULL_OR_POINTER(p, type) \
-    ASSERT(((p) == NULL)  ||  IsValidAddress((p), sizeof(type), FALSE))
+    ASSERT(((p) == NULL)  ||  IsValidAddress((p), parimaa_na(type), FALSE))
 
 #ifndef HAVE_SETENV
 # define HAVE_SETENV
 #endif
-#define mch_getenv(x) (char_u *)getenv((char *)(x))
+#define mch_getenv(x) (char_u *)getenv((var_na *)(x))
 #define vim_mkdir(x, y) mch_mkdir(x)
 
 // Windows Version
@@ -236,4 +236,4 @@ Trace(char *pszFormat, ...);
     (((major) << 24) | ((minor) << 16) | (build))
 
 // The Windows CRT does not declare strptime(); Vim provides it in strptime.c.
-char *strptime(const char *buf, const char *fmt, struct tm *tm);
+var_na *strptime(const var_na *buf, const var_na *fmt, sa_nracanaa tm *tm);

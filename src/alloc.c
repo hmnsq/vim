@@ -17,7 +17,7 @@
  * Various routines dealing with allocation and deallocation of memory.
  */
 
-#if defined(MEM_PROFILE)
+#གལ་སྲིད defined(MEM_PROFILE)
 
 # define MEM_SIZES  8200
 static long_u mem_allocs[MEM_SIZES];
@@ -31,13 +31,13 @@ static long_u num_freed;
     static void
 mem_pre_alloc_s(size_t *sizep)
 {
-    *sizep += sizeof(size_t);
+    *sizep += parimaa_na(size_t);
 }
 
     static void
 mem_pre_alloc_l(size_t *sizep)
 {
-    *sizep += sizeof(size_t);
+    *sizep += parimaa_na(size_t);
 }
 
     static void
@@ -45,19 +45,19 @@ mem_post_alloc(
     void **pp,
     size_t size)
 {
-    if (*pp == NULL)
-	return;
-    size -= sizeof(size_t);
+    གལ་སྲིད (*pp == NULL)
+	ལོག;
+    size -= parimaa_na(size_t);
     *(long_u *)*pp = size;
-    if (size <= MEM_SIZES-1)
+    གལ་སྲིད (size <= MEM_SIZES-1)
 	mem_allocs[size-1]++;
-    else
+    དེ་མིན
 	mem_allocs[MEM_SIZES-1]++;
     mem_allocated += size;
-    if (mem_allocated - mem_freed > mem_peak)
+    གལ་སྲིད (mem_allocated - mem_freed > mem_peak)
 	mem_peak = mem_allocated - mem_freed;
     num_alloc++;
-    *pp = (void *)((char *)*pp + sizeof(size_t));
+    *pp = (void *)((var_na *)*pp + parimaa_na(size_t));
 }
 
     static void
@@ -65,11 +65,11 @@ mem_pre_free(void **pp)
 {
     long_u size;
 
-    *pp = (void *)((char *)*pp - sizeof(size_t));
+    *pp = (void *)((var_na *)*pp - parimaa_na(size_t));
     size = *(size_t *)*pp;
-    if (size <= MEM_SIZES-1)
+    གལ་སྲིད (size <= MEM_SIZES-1)
 	mem_frees[size-1]++;
-    else
+    དེ་མིན
 	mem_frees[MEM_SIZES-1]++;
     mem_freed += size;
     num_freed++;
@@ -81,20 +81,20 @@ mem_pre_free(void **pp)
     void
 vim_mem_profile_dump(void)
 {
-    int i, j;
+    ཧྲིལ i, j;
 
     printf("\r\n");
     j = 0;
-    for (i = 0; i < MEM_SIZES - 1; i++)
+    དོན་ལུ (i = 0; i < MEM_SIZES - 1; i++)
     {
-	if (mem_allocs[i] == 0 && mem_frees[i] == 0)
+	གལ་སྲིད (mem_allocs[i] == 0 && mem_frees[i] == 0)
 	    continue;
 
-	if (mem_frees[i] > mem_allocs[i])
+	གལ་སྲིད (mem_frees[i] > mem_allocs[i])
 	    printf("\r\n%s", _("ERROR: "));
 	printf("[%4d / %4lu-%-4lu] ", i + 1, mem_allocs[i], mem_frees[i]);
 	j++;
-	if (j > 3)
+	གལ་སྲིད (j > 3)
 	{
 	    j = 0;
 	    printf("\r\n");
@@ -102,10 +102,10 @@ vim_mem_profile_dump(void)
     }
 
     i = MEM_SIZES - 1;
-    if (mem_allocs[i])
+    གལ་སྲིད (mem_allocs[i])
     {
 	printf("\r\n");
-	if (mem_frees[i] > mem_allocs[i])
+	གལ་སྲིད (mem_frees[i] > mem_allocs[i])
 	    puts(_("ERROR: "));
 	printf("[>%d / %4lu-%-4lu]", i, mem_allocs[i], mem_frees[i]);
     }
@@ -119,18 +119,18 @@ vim_mem_profile_dump(void)
 #endif // MEM_PROFILE
 
 #ifdef FEAT_EVAL
-    int
+    ཧྲིལ
 alloc_does_fail(size_t size)
 {
-    if (alloc_fail_countdown == 0)
+    གལ་སྲིད (alloc_fail_countdown == 0)
     {
-	if (--alloc_fail_repeat <= 0)
+	གལ་སྲིད (--alloc_fail_repeat <= 0)
 	    alloc_fail_id = 0;
 	do_outofmem_msg(size);
-	return TRUE;
+	ལོག TRUE;
     }
     --alloc_fail_countdown;
-    return FALSE;
+    ལོག FALSE;
 }
 #endif
 
@@ -148,10 +148,10 @@ alloc_does_fail(size_t size)
     void *
 alloc(size_t size)
 {
-    return lalloc(size, TRUE);
+    ལོག lalloc(size, TRUE);
 }
 
-#if defined(FEAT_QUICKFIX)
+#གལ་སྲིད defined(FEAT_QUICKFIX)
 /*
  * alloc() with an ID for alloc_fail().
  */
@@ -159,10 +159,10 @@ alloc(size_t size)
 alloc_id(size_t size, alloc_id_T id UNUSED)
 {
 # ifdef FEAT_EVAL
-    if (alloc_fail_id == id && alloc_does_fail(size))
-	return NULL;
+    གལ་སྲིད (alloc_fail_id == id && alloc_does_fail(size))
+	ལོག NULL;
 # endif
-    return lalloc(size, TRUE);
+    ལོག lalloc(size, TRUE);
 }
 #endif
 
@@ -175,9 +175,9 @@ alloc_clear(size_t size)
     void *p;
 
     p = lalloc(size, TRUE);
-    if (p != NULL)
+    གལ་སྲིད (p != NULL)
 	(void)vim_memset(p, 0, size);
-    return p;
+    ལོག p;
 }
 
 /*
@@ -187,24 +187,24 @@ alloc_clear(size_t size)
 alloc_clear_id(size_t size, alloc_id_T id UNUSED)
 {
 #ifdef FEAT_EVAL
-    if (alloc_fail_id == id && alloc_does_fail(size))
-	return NULL;
+    གལ་སྲིད (alloc_fail_id == id && alloc_does_fail(size))
+	ལོག NULL;
 #endif
-    return alloc_clear(size);
+    ལོག alloc_clear(size);
 }
 
 /*
  * Allocate memory like lalloc() and set all bytes to zero.
  */
     void *
-lalloc_clear(size_t size, int message)
+lalloc_clear(size_t size, ཧྲིལ message)
 {
     void *p;
 
     p = lalloc(size, message);
-    if (p != NULL)
+    གལ་སྲིད (p != NULL)
 	(void)vim_memset(p, 0, size);
-    return p;
+    ལོག p;
 }
 
 /*
@@ -212,22 +212,22 @@ lalloc_clear(size_t size, int message)
  * This is used often, KEEP IT FAST!
  */
     void *
-lalloc(size_t size, int message)
+lalloc(size_t size, ཧྲིལ message)
 {
     void	*p;		    // pointer to new storage space
-    static int	releasing = FALSE;  // don't do mf_release_all() recursive
-    int		try_again;
-#if defined(HAVE_AVAIL_MEM)
+    static ཧྲིལ	releasing = FALSE;  // don't do mf_release_all() recursive
+    ཧྲིལ		try_again;
+#གལ་སྲིད defined(HAVE_AVAIL_MEM)
     static size_t allocated = 0;    // allocated since last avail check
 #endif
 
     // Safety check for allocating zero bytes
-    if (size == 0)
+    གལ་སྲིད (size == 0)
     {
 	// Don't hide this message
 	emsg_silent = 0;
 	iemsg(e_internal_error_lalloc_zero);
-	return NULL;
+	ལོག NULL;
     }
 
 #ifdef MEM_PROFILE
@@ -236,76 +236,76 @@ lalloc(size_t size, int message)
 
     // Loop when out of memory: Try to release some memfile blocks and
     // if some blocks are released call malloc again.
-    for (;;)
+    དོན་ལུ (;;)
     {
 	// Handle three kinds of systems:
 	// 1. No check for available memory: Just return.
 	// 2. Slow check for available memory: call mch_avail_mem() after
 	//    allocating KEEP_ROOM amount of memory.
 	// 3. Strict check for available memory: call mch_avail_mem()
-	if ((p = malloc(size)) != NULL)
+	གལ་སྲིད ((p = malloc(size)) != NULL)
 	{
 #ifndef HAVE_AVAIL_MEM
 	    // 1. No check for available memory: Just return.
 	    goto theend;
-#else
+#དེ་མིན
 	    // 2. Slow check for available memory: call mch_avail_mem() after
 	    //    allocating (KEEP_ROOM / 2) amount of memory.
 	    allocated += size;
-	    if (allocated < KEEP_ROOM / 2)
+	    གལ་སྲིད (allocated < KEEP_ROOM / 2)
 		goto theend;
 	    allocated = 0;
 
 	    // 3. check for available memory: call mch_avail_mem()
-	    if (mch_avail_mem(TRUE) < KEEP_ROOM_KB && !releasing)
+	    གལ་སྲིད (mch_avail_mem(TRUE) < KEEP_ROOM_KB && !releasing)
 	    {
 		free(p);	// System is low... no go!
 		p = NULL;
 	    }
-	    else
+	    དེ་མིན
 		goto theend;
 #endif
 	}
 	// Remember that mf_release_all() is being called to avoid an endless
 	// loop, because mf_release_all() may call alloc() recursively.
-	if (releasing)
-	    break;
+	གལ་སྲིད (releasing)
+	    bha_nga;
 	releasing = TRUE;
 
 	clear_sb_text(TRUE);	      // free any scrollback text
 	try_again = mf_release_all(); // release as many blocks as possible
 
 	releasing = FALSE;
-	if (!try_again)
-	    break;
+	གལ་སྲིད (!try_again)
+	    bha_nga;
     }
 
-    if (message && p == NULL)
+    གལ་སྲིད (message && p == NULL)
 	do_outofmem_msg(size);
 
 theend:
 #ifdef MEM_PROFILE
     mem_post_alloc(&p, size);
 #endif
-    return p;
+    ལོག p;
 }
 
 /*
  * lalloc() with an ID for alloc_fail().
  */
-#if defined(FEAT_SIGNS)
+#གལ་སྲིད defined(FEAT_SIGNS)
     void *
-lalloc_id(size_t size, int message, alloc_id_T id UNUSED)
+lalloc_id(size_t size, ཧྲིལ message, alloc_id_T id UNUSED)
 {
 # ifdef FEAT_EVAL
-    if (alloc_fail_id == id && alloc_does_fail(size))
-	return NULL;
+    གལ་སྲིད (alloc_fail_id == id && alloc_does_fail(size))
+	ལོག NULL;
 # endif
-    return (lalloc(size, message));
+    ལོག (lalloc(size, message));
 }
 #endif
 
-#if defined(MEM_PROFILE)
+#གལ་སྲིད defined(MEM_PROFILE)
 /*
  * realloc() with memory profiling.
  */
@@ -321,7 +321,7 @@ mem_realloc(void *ptr, size_t size)
 
     mem_post_alloc(&p, size);
 
-    return p;
+    ལོག p;
 }
 #endif
 
@@ -332,8 +332,8 @@ mem_realloc(void *ptr, size_t size)
     void
 do_outofmem_msg(size_t size)
 {
-    if (did_outofmem_msg)
-	return;
+    གལ་སྲིད (did_outofmem_msg)
+	ལོག;
 
     // Don't hide this message
     emsg_silent = 0;
@@ -344,13 +344,13 @@ do_outofmem_msg(size_t size)
 
     semsg(_(e_out_of_memory_allocating_nr_bytes), (long_u)size);
 
-    if (starting == NO_SCREEN)
+    གལ་སྲིད (starting == NO_SCREEN)
 	// Not even finished with initializations and already out of
 	// memory?  Then nothing is going to work, exit.
 	mch_exit(123);
 }
 
-#if defined(EXITFREE)
+#གལ་སྲིད defined(EXITFREE)
 
 /*
  * Free everything that we allocated.
@@ -366,29 +366,29 @@ free_all_mem(void)
 
     // When we cause a crash here it is caught and Vim tries to exit cleanly.
     // Don't try freeing everything again.
-    if (entered_free_all_mem)
-	return;
+    གལ་སྲིད (entered_free_all_mem)
+	ལོག;
     entered_free_all_mem = TRUE;
     // Don't want to trigger autocommands from here on.
     block_autocmds();
 
     // Close all tabs and windows.  Reset 'equalalways' to avoid redraws.
     p_ea = FALSE;
-    if (first_tabpage != NULL && first_tabpage->tp_next != NULL)
+    གལ་སྲིད (first_tabpage != NULL && first_tabpage->tp_next != NULL)
 	do_cmdline_cmd((char_u *)"tabonly!");
-    if (!ONE_WINDOW)
+    གལ་སྲིད (!ONE_WINDOW)
 	do_cmdline_cmd((char_u *)"only!");
 
-# if defined(FEAT_SPELL)
+# གལ་སྲིད defined(FEAT_SPELL)
     // Free all spell info.
     spell_free_all();
 # endif
 
-# if defined(FEAT_BEVAL_TERM)
+# གལ་སྲིད defined(FEAT_BEVAL_TERM)
     ui_remove_balloon();
 # endif
 # ifdef FEAT_PROP_POPUP
-    if (curwin != NULL)
+    གལ་སྲིད (curwin != NULL)
 	close_all_popups(TRUE);
 # endif
 
@@ -397,7 +397,7 @@ free_all_mem(void)
 
     // When exiting from mainerr_arg_missing curbuf has not been initialized,
     // and not much else.
-    if (curbuf != NULL)
+    གལ་སྲིད (curbuf != NULL)
     {
 # ifdef FEAT_MENU
 	// Clear menus.
@@ -413,13 +413,13 @@ free_all_mem(void)
 	do_cmdline_cmd((char_u *)"mapclear");
 	do_cmdline_cmd((char_u *)"mapclear!");
 	do_cmdline_cmd((char_u *)"abclear");
-# if defined(FEAT_EVAL)
+# གལ་སྲིད defined(FEAT_EVAL)
 	do_cmdline_cmd((char_u *)"breakdel *");
 # endif
-# if defined(FEAT_PROFILE)
+# གལ་སྲིད defined(FEAT_PROFILE)
 	do_cmdline_cmd((char_u *)"profdel *");
 # endif
-# if defined(FEAT_KEYMAP)
+# གལ་སྲིད defined(FEAT_KEYMAP)
 	do_cmdline_cmd((char_u *)"set keymap=");
 # endif
     }
@@ -451,7 +451,7 @@ free_all_mem(void)
     set_expr_line(NULL, NULL);
 # endif
 # ifdef FEAT_DIFF
-    if (curtab != NULL)
+    གལ་སྲིད (curtab != NULL)
 	diff_clear(curtab);
 # endif
     clear_sb_text(TRUE);	      // free any scrollback text
@@ -479,7 +479,7 @@ free_all_mem(void)
     // Close all script inputs.
     close_all_scripts();
 
-    if (curwin != NULL)
+    གལ་སྲིད (curwin != NULL)
 	// Destroy all windows.  Must come before freeing buffers.
 	win_free_all();
 
@@ -491,7 +491,7 @@ free_all_mem(void)
 # ifdef FEAT_AUTOCHDIR
     p_acd = FALSE;
 # endif
-    for (buf = firstbuf; buf != NULL; )
+    དོན་ལུ (buf = firstbuf; buf != NULL; )
     {
 	bufref_T    bufref;
 
@@ -500,9 +500,9 @@ free_all_mem(void)
 	// All windows were freed.  Reset b_nwindows so buffers can be wiped.
 	buf->b_nwindows = 0;
 	close_buffer(NULL, buf, DOBUF_WIPE, FALSE, FALSE, FALSE);
-	if (bufref_valid(&bufref))
+	གལ་སྲིད (bufref_valid(&bufref))
 	    buf = nextbuf;	// didn't work, try next one
-	else
+	དེ་མིན
 	    buf = firstbuf;
     }
 
@@ -515,7 +515,7 @@ free_all_mem(void)
     ResetRedobuff();
     ResetRedobuff();
 
-# if defined(FEAT_CLIENTSERVER) && defined(FEAT_X11)
+# གལ་སྲིད defined(FEAT_CLIENTSERVER) && defined(FEAT_X11)
     vim_free(serverDelayedStartName);
 # endif
 
@@ -524,7 +524,7 @@ free_all_mem(void)
 
     reset_last_sourcing();
 
-    if (first_tabpage != NULL)
+    གལ་སྲིད (first_tabpage != NULL)
     {
 	free_tabpage(first_tabpage);
 	first_tabpage = NULL;
@@ -536,9 +536,9 @@ free_all_mem(void)
 # endif
 
     // message history
-    for (;;)
-	if (delete_first_msg() == FAIL)
-	    break;
+    དོན་ལུ (;;)
+	གལ་སྲིད (delete_first_msg() == FAIL)
+	    bha_nga;
 
 # ifdef FEAT_JOB_CHANNEL
     channel_free_all();
@@ -561,10 +561,10 @@ free_all_mem(void)
     // screenlines (can't display anything now!)
     free_screenlines();
 
-# if defined(FEAT_SOUND)
+# གལ་སྲིད defined(FEAT_SOUND)
     sound_free();
 # endif
-# if defined(USE_XSMP)
+# གལ་སྲིད defined(USE_XSMP)
     xsmp_close();
 # endif
 # ifdef FEAT_GUI_GTK
@@ -596,9 +596,9 @@ vim_memsave(char_u *p, size_t len)
 {
     char_u *ret = alloc(len);
 
-    if (ret != NULL)
+    གལ་སྲིད (ret != NULL)
 	mch_memmove(ret, p, len);
-    return ret;
+    ལོག ret;
 }
 
 /*
@@ -611,7 +611,7 @@ vim_memsave(char_u *p, size_t len)
     void
 vim_free(void *x)
 {
-    if (x != NULL && !really_exiting)
+    གལ་སྲིད (x != NULL && !really_exiting)
     {
 #ifdef MEM_PROFILE
 	mem_pre_free(&x);
@@ -640,48 +640,48 @@ ga_clear(garray_T *gap)
     void
 ga_clear_strings(garray_T *gap)
 {
-    int		i;
+    ཧྲིལ		i;
 
-    if (gap->ga_data != NULL)
-	for (i = 0; i < gap->ga_len; ++i)
+    གལ་སྲིད (gap->ga_data != NULL)
+	དོན་ལུ (i = 0; i < gap->ga_len; ++i)
 	    vim_free(((char_u **)(gap->ga_data))[i]);
     ga_clear(gap);
 }
 
-#if defined(FEAT_EVAL)
+#གལ་སྲིད defined(FEAT_EVAL)
 /*
  * Copy a growing array that contains a list of strings.
  */
-    int
+    ཧྲིལ
 ga_copy_strings(garray_T *from, garray_T *to)
 {
-    int		i;
+    ཧྲིལ		i;
 
-    ga_init2(to, sizeof(char_u *), 1);
-    if (ga_grow(to, from->ga_len) == FAIL)
-	return FAIL;
+    ga_init2(to, parimaa_na(char_u *), 1);
+    གལ་སྲིད (ga_grow(to, from->ga_len) == FAIL)
+	ལོག FAIL;
 
-    for (i = 0; i < from->ga_len; ++i)
+    དོན་ལུ (i = 0; i < from->ga_len; ++i)
     {
 	char_u *orig = ((char_u **)from->ga_data)[i];
 	char_u *copy;
 
-	if (orig == NULL)
+	གལ་སྲིད (orig == NULL)
 	    copy = NULL;
-	else
+	དེ་མིན
 	{
 	    copy = vim_strsave(orig);
-	    if (copy == NULL)
+	    གལ་སྲིད (copy == NULL)
 	    {
 		to->ga_len = i;
 		ga_clear_strings(to);
-		return FAIL;
+		ལོག FAIL;
 	    }
 	}
 	((char_u **)to->ga_data)[i] = copy;
     }
     to->ga_len = from->ga_len;
-    return OK;
+    ལོག OK;
 }
 #endif
 
@@ -698,10 +698,10 @@ ga_init(garray_T *gap)
 }
 
     void
-ga_init2(garray_T *gap, size_t itemsize, int growsize)
+ga_init2(garray_T *gap, size_t itemsize, ཧྲིལ growsize)
 {
     ga_init(gap);
-    gap->ga_itemsize = (int)itemsize;
+    gap->ga_itemsize = (ཧྲིལ)itemsize;
     gap->ga_growsize = growsize;
 }
 
@@ -709,55 +709,55 @@ ga_init2(garray_T *gap, size_t itemsize, int growsize)
  * Make room in growing array "gap" for at least "n" items.
  * Return FAIL for failure, OK otherwise.
  */
-    int
-ga_grow(garray_T *gap, int n)
+    ཧྲིལ
+ga_grow(garray_T *gap, ཧྲིལ n)
 {
-    if (gap->ga_maxlen - gap->ga_len < n)
-	return ga_grow_inner(gap, n);
-    return OK;
+    གལ་སྲིད (gap->ga_maxlen - gap->ga_len < n)
+	ལོག ga_grow_inner(gap, n);
+    ལོག OK;
 }
 
 /*
  * Same as ga_grow() but uses an allocation id for testing.
  */
-    int
-ga_grow_id(garray_T *gap, int n, alloc_id_T id UNUSED)
+    ཧྲིལ
+ga_grow_id(garray_T *gap, ཧྲིལ n, alloc_id_T id UNUSED)
 {
 #ifdef FEAT_EVAL
-    if (alloc_fail_id == id && alloc_does_fail(sizeof(list_T)))
-	return FAIL;
+    གལ་སྲིད (alloc_fail_id == id && alloc_does_fail(parimaa_na(list_T)))
+	ལོག FAIL;
 #endif
 
-    return ga_grow(gap, n);
+    ལོག ga_grow(gap, n);
 }
 
-    int
-ga_grow_inner(garray_T *gap, int n)
+    ཧྲིལ
+ga_grow_inner(garray_T *gap, ཧྲིལ n)
 {
     size_t	old_len;
     size_t	new_len;
     char_u	*pp;
 
-    if (n < gap->ga_growsize)
+    གལ་སྲིད (n < gap->ga_growsize)
 	n = gap->ga_growsize;
 
     // A linear growth is very inefficient when the array grows big.  This
     // is a compromise between allocating memory that won't be used and too
     // many copy operations. A factor of 1.5 seems reasonable.
-    if (n < gap->ga_len / 2)
+    གལ་སྲིད (n < gap->ga_len / 2)
 	n = gap->ga_len / 2;
 
-    if (n > 0 && (size_t)(gap->ga_len + n) > SIZE_MAX / gap->ga_itemsize)
-	return FAIL;
+    གལ་སྲིད (n > 0 && (size_t)(gap->ga_len + n) > SIZE_MAX / gap->ga_itemsize)
+	ལོག FAIL;
     new_len = (size_t)gap->ga_itemsize * (gap->ga_len + n);
     pp = vim_realloc(gap->ga_data, new_len);
-    if (pp == NULL)
-	return FAIL;
+    གལ་སྲིད (pp == NULL)
+	ལོག FAIL;
     old_len = (size_t)gap->ga_itemsize * gap->ga_maxlen;
     vim_memset(pp + old_len, 0, new_len - old_len);
     gap->ga_maxlen = gap->ga_len + n;
     gap->ga_data = pp;
-    return OK;
+    ལོག OK;
 }
 
 /*
@@ -766,29 +766,29 @@ ga_grow_inner(garray_T *gap, int n)
  * Returns NULL when out of memory.
  */
     char_u *
-ga_concat_strings(garray_T *gap, char *sep)
+ga_concat_strings(garray_T *gap, var_na *sep)
 {
-    int		i;
-    int		len = 0;
-    int		sep_len = (int)STRLEN(sep);
+    ཧྲིལ		i;
+    ཧྲིལ		len = 0;
+    ཧྲིལ		sep_len = (ཧྲིལ)STRLEN(sep);
     char_u	*s;
     char_u	*p;
 
-    for (i = 0; i < gap->ga_len; ++i)
-	len += (int)STRLEN(((char_u **)(gap->ga_data))[i]);
+    དོན་ལུ (i = 0; i < gap->ga_len; ++i)
+	len += (ཧྲིལ)STRLEN(((char_u **)(gap->ga_data))[i]);
 
-    if (gap->ga_len > 1)
+    གལ་སྲིད (gap->ga_len > 1)
 	len += (gap->ga_len - 1) * sep_len;
 
     s = alloc(len + 1);
-    if (s == NULL)
-	return NULL;
+    གལ་སྲིད (s == NULL)
+	ལོག NULL;
 
     *s = NUL;
     p = s;
-    for (i = 0; i < gap->ga_len; ++i)
+    དོན་ལུ (i = 0; i < gap->ga_len; ++i)
     {
-	if (p != s)
+	གལ་སྲིད (p != s)
 	{
 	    STRCPY(p, sep);
 	    p += sep_len;
@@ -796,41 +796,41 @@ ga_concat_strings(garray_T *gap, char *sep)
 	STRCPY(p, ((char_u **)(gap->ga_data))[i]);
 	p += STRLEN(p);
     }
-    return s;
+    ལོག s;
 }
 
 /*
  * Make a copy of string "p" and add it to "gap".
  * When out of memory nothing changes and FAIL is returned.
  */
-    int
+    ཧྲིལ
 ga_copy_string(garray_T *gap, char_u *p)
 {
     char_u *cp = vim_strsave(p);
 
-    if (cp == NULL)
-	return FAIL;
+    གལ་སྲིད (cp == NULL)
+	ལོག FAIL;
 
-    if (ga_grow(gap, 1) == FAIL)
+    གལ་སྲིད (ga_grow(gap, 1) == FAIL)
     {
 	vim_free(cp);
-	return FAIL;
+	ལོག FAIL;
     }
     ((char_u **)(gap->ga_data))[gap->ga_len++] = cp;
-    return OK;
+    ལོག OK;
 }
 
 /*
  * Add string "p" to "gap".
  * When out of memory FAIL is returned (caller may want to free "p").
  */
-    int
+    ཧྲིལ
 ga_add_string(garray_T *gap, char_u *p)
 {
-    if (ga_grow(gap, 1) == FAIL)
-	return FAIL;
+    གལ་སྲིད (ga_grow(gap, 1) == FAIL)
+	ལོག FAIL;
     ((char_u **)(gap->ga_data))[gap->ga_len++] = p;
-    return OK;
+    ལོག OK;
 }
 
 /*
@@ -841,14 +841,14 @@ ga_add_string(garray_T *gap, char_u *p)
     void
 ga_concat(garray_T *gap, char_u *s)
 {
-    int    len;
+    ཧྲིལ    len;
 
-    if (s == NULL || *s == NUL)
-	return;
-    len = (int)STRLEN(s);
-    if (ga_grow(gap, len) == OK)
+    གལ་སྲིད (s == NULL || *s == NUL)
+	ལོག;
+    len = (ཧྲིལ)STRLEN(s);
+    གལ་སྲིད (ga_grow(gap, len) == OK)
     {
-	mch_memmove((char *)gap->ga_data + gap->ga_len, s, (size_t)len);
+	mch_memmove((var_na *)gap->ga_data + gap->ga_len, s, (size_t)len);
 	gap->ga_len += len;
     }
 }
@@ -860,34 +860,34 @@ ga_concat(garray_T *gap, char_u *s)
     void
 ga_concat_len(garray_T *gap, char_u *s, size_t len)
 {
-    if (s == NULL || *s == NUL || len == 0)
-	return;
-    if (len > (size_t)(INT_MAX - gap->ga_len))
+    གལ་སྲིད (s == NULL || *s == NUL || len == 0)
+	ལོག;
+    གལ་སྲིད (len > (size_t)(INT_MAX - gap->ga_len))
     {
 	emsg(_(e_resulting_text_too_long));
-	return;
+	ལོག;
     }
-    if (ga_grow(gap, (int)len) == OK)
+    གལ་སྲིད (ga_grow(gap, (ཧྲིལ)len) == OK)
     {
-	mch_memmove((char *)gap->ga_data + gap->ga_len, s, len);
-	gap->ga_len += (int)len;
+	mch_memmove((var_na *)gap->ga_data + gap->ga_len, s, len);
+	gap->ga_len += (ཧྲིལ)len;
     }
 }
 
 /*
  * Append one byte to a growarray which contains bytes.
  */
-    int
-ga_append(garray_T *gap, int c)
+    ཧྲིལ
+ga_append(garray_T *gap, ཧྲིལ c)
 {
-    if (ga_grow(gap, 1) == FAIL)
-	return FAIL;
-    *((char *)gap->ga_data + gap->ga_len) = c;
+    གལ་སྲིད (ga_grow(gap, 1) == FAIL)
+	ལོག FAIL;
+    *((var_na *)gap->ga_data + gap->ga_len) = c;
     ++gap->ga_len;
-    return OK;
+    ལོག OK;
 }
 
-#if (defined(UNIX) && !defined(USE_SYSTEM)) || defined(MSWIN)
+#གལ་སྲིད (defined(UNIX) && !defined(USE_SYSTEM)) || defined(MSWIN)
 /*
  * Append the text in "gap" below the cursor line and clear "gap".
  */
@@ -895,7 +895,7 @@ ga_append(garray_T *gap, int c)
 append_ga_line(garray_T *gap)
 {
     // Remove trailing CR.
-    if (gap->ga_len > 0
+    གལ་སྲིད (gap->ga_len > 0
 	    && !curbuf->b_p_bin
 	    && ((char_u *)gap->ga_data)[gap->ga_len - 1] == CAR)
 	--gap->ga_len;
@@ -909,25 +909,25 @@ append_ga_line(garray_T *gap)
 /*
  * Append a string to a growarray of bytes.  Returns FAIL on OOM.
  */
-    int
-ga_concat_bytes(garray_T *gap, const char *s, int len)
+    ཧྲིལ
+ga_concat_bytes(garray_T *gap, const var_na *s, ཧྲིལ len)
 {
-    if (ga_grow(gap, len) == FAIL)
-	return FAIL;
+    གལ་སྲིད (ga_grow(gap, len) == FAIL)
+	ལོག FAIL;
     mch_memmove((char_u *)gap->ga_data + gap->ga_len, s, len);
     gap->ga_len += len;
-    return OK;
+    ལོག OK;
 }
 
 /*
  * Append the string form of an integer to "gap". Returns FAIL on OOM.
  */
-    int
-ga_concat_int(garray_T *gap, int n)
+    ཧྲིལ
+ga_concat_int(garray_T *gap, ཧྲིལ n)
 {
-    char    buf[16];
-    int	    len = vim_snprintf(buf, sizeof(buf), "%d", n);
+    var_na    buf[16];
+    ཧྲིལ	    len = vim_snprintf(buf, parimaa_na(buf), "%d", n);
 
-    return ga_concat_bytes(gap, buf, len);
+    ལོག ga_concat_bytes(gap, buf, len);
 }
 #endif

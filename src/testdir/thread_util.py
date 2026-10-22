@@ -1,7 +1,7 @@
 import platform
 
-if platform.system() == 'Darwin':
-    from ctypes import (
+གལ་སྲིད platform.system() == 'Darwin':
+    ta_h ctypes import (
         CDLL,
         POINTER,
         Structure,
@@ -12,7 +12,7 @@ if platform.system() == 'Darwin':
         c_void_p,
         sizeof
     )
-    from ctypes.util import find_library
+    ta_h ctypes.util import find_library
 
     class ThreadTimeConstraintPolicy(Structure):
         _fields_ = [
@@ -27,7 +27,7 @@ if platform.system() == 'Darwin':
     THREAD_TIME_CONSTRAINT_POLICY = c_uint(2)
 
     THREAD_TIME_CONSTRAINT_POLICY_COUNT = c_uint(
-        int(sizeof(ThreadTimeConstraintPolicy) / sizeof(c_int)))
+        ཧྲིལ(sizeof(ThreadTimeConstraintPolicy) / sizeof(c_int)))
 
     _libc.pthread_self.restype = c_void_p
 
@@ -52,7 +52,7 @@ if platform.system() == 'Darwin':
     ]
 
     def _mach_thread_self():
-        return _libc.pthread_mach_thread_np(_libc.pthread_self())
+        ལོག _libc.pthread_mach_thread_np(_libc.pthread_self())
 
     def _get_time_constraint_policy(default=False):
         thread = _mach_thread_self()
@@ -66,9 +66,9 @@ if platform.system() == 'Darwin':
             byref(policy_info),
             byref(policy_infoCnt),
             byref(get_default))
-        if kret != 0:
-            return None
-        return policy_info
+        གལ་སྲིད kret != 0:
+            ལོག None
+        ལོག policy_info
 
     def _set_time_constraint_policy(policy_info):
         thread = _mach_thread_self()
@@ -79,12 +79,12 @@ if platform.system() == 'Darwin':
             THREAD_TIME_CONSTRAINT_POLICY,
             byref(policy_info),
             policy_infoCnt)
-        if kret != 0:
+        གལ་སྲིད kret != 0:
             raise OSError(kret)
 
     def set_high_priority():
         policy_info = _get_time_constraint_policy(default=True)
-        if not policy_info:
-            return
+        གལ་སྲིད na policy_info:
+            ལོག
         policy_info.preemptible = c_uint(False)
         _set_time_constraint_policy(policy_info)

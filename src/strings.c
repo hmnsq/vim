@@ -25,9 +25,9 @@ vim_strsave(char_u *string)
 
     len = STRLEN(string) + 1;
     p = alloc(len);
-    if (p != NULL)
+    གལ་སྲིད (p != NULL)
 	mch_memmove(p, string, len);
-    return p;
+    ལོག p;
 }
 
 /*
@@ -42,12 +42,12 @@ vim_strnsave(char_u *string, size_t len)
     char_u	*p;
 
     p = alloc(len + 1);
-    if (p == NULL)
-	return NULL;
+    གལ་སྲིད (p == NULL)
+	ལོག NULL;
 
     STRNCPY(p, string, len);
     p[len] = NUL;
-    return p;
+    ལོག p;
 }
 
 /*
@@ -57,7 +57,7 @@ vim_strnsave(char_u *string, size_t len)
     char_u *
 vim_strsave_escaped(char_u *string, char_u *esc_chars)
 {
-    return vim_strsave_escaped_ext(string, esc_chars, '\\', FALSE);
+    ལོག vim_strsave_escaped_ext(string, esc_chars, '\\', FALSE);
 }
 
 /*
@@ -69,67 +69,67 @@ vim_strsave_escaped(char_u *string, char_u *esc_chars)
 vim_strsave_escaped_ext(
     char_u	*string,
     char_u	*esc_chars,
-    int		cc,
-    int		bsl)
+    ཧྲིལ		cc,
+    ཧྲིལ		bsl)
 {
     char_u	*p;
     char_u	*p2;
     char_u	*escaped_string;
     unsigned	length;
-    int		l;
+    ཧྲིལ		l;
 
     // First count the number of backslashes required.
     // Then allocate the memory and insert them.
     length = 1;				// count the trailing NUL
-    for (p = string; *p; p++)
+    དོན་ལུ (p = string; *p; p++)
     {
-	if (has_mbyte && (l = (*mb_ptr2len)(p)) > 1)
+	གལ་སྲིད (has_mbyte && (l = (*mb_ptr2len)(p)) > 1)
 	{
 	    length += l;		// count a multibyte char
 	    p += l - 1;
 	    continue;
 	}
-	if (vim_strchr(esc_chars, *p) != NULL || (bsl && rem_backslash(p)))
+	གལ་སྲིད (vim_strchr(esc_chars, *p) != NULL || (bsl && rem_backslash(p)))
 	    ++length;			// count a backslash
 	++length;			// count an ordinary char
     }
     escaped_string = alloc(length);
-    if (escaped_string == NULL)
-	return NULL;
+    གལ་སྲིད (escaped_string == NULL)
+	ལོག NULL;
     p2 = escaped_string;
-    for (p = string; *p; p++)
+    དོན་ལུ (p = string; *p; p++)
     {
-	if (has_mbyte && (l = (*mb_ptr2len)(p)) > 1)
+	གལ་སྲིད (has_mbyte && (l = (*mb_ptr2len)(p)) > 1)
 	{
 	    mch_memmove(p2, p, (size_t)l);
 	    p2 += l;
 	    p += l - 1;		// skip multibyte char
 	    continue;
 	}
-	if (vim_strchr(esc_chars, *p) != NULL || (bsl && rem_backslash(p)))
+	གལ་སྲིད (vim_strchr(esc_chars, *p) != NULL || (bsl && rem_backslash(p)))
 	    *p2++ = cc;
 	*p2++ = *p;
     }
     *p2 = NUL;
-    return escaped_string;
+    ལོག escaped_string;
 }
 
 /*
  * Return TRUE when 'shell' has "csh" in the tail.
  */
-    int
+    ཧྲིལ
 csh_like_shell(void)
 {
-    return (strstr((char *)gettail(p_sh), "csh") != NULL);
+    ལོག (strstr((var_na *)gettail(p_sh), "csh") != NULL);
 }
 
 /*
  * Return TRUE when 'shell' has "fish" in the tail.
  */
-    static int
+    static ཧྲིལ
 fish_like_shell(void)
 {
-    return (strstr((char *)gettail(p_sh), "fish") != NULL);
+    ལོག (strstr((var_na *)gettail(p_sh), "fish") != NULL);
 }
 
 /*
@@ -145,19 +145,19 @@ fish_like_shell(void)
  * Returns the result in allocated memory, NULL if we have run out.
  */
     char_u *
-vim_strsave_shellescape(char_u *string, int do_special, int do_newline)
+vim_strsave_shellescape(char_u *string, ཧྲིལ do_special, ཧྲིལ do_newline)
 {
     unsigned	length;
     char_u	*p;
     char_u	*d;
     char_u	*escaped_string;
     size_t	l;
-    int		csh_like;
-    int		fish_like;
+    ཧྲིལ		csh_like;
+    ཧྲིལ		fish_like;
     char_u	*shname;
-    int		powershell;
+    ཧྲིལ		powershell;
 #ifdef MSWIN
-    int		double_quotes;
+    ཧྲིལ		double_quotes;
 #endif
 
     // Only csh and similar shells expand '!' within single quotes.  For sh and
@@ -172,68 +172,68 @@ vim_strsave_shellescape(char_u *string, int do_special, int do_newline)
 
     // PowerShell uses its own version for quoting single quotes
     shname = gettail(p_sh);
-    powershell = strstr((char *)shname, "pwsh") != NULL;
+    powershell = strstr((var_na *)shname, "pwsh") != NULL;
 #ifdef MSWIN
-    powershell = powershell || strstr((char *)shname, "powershell") != NULL;
+    powershell = powershell || strstr((var_na *)shname, "powershell") != NULL;
     // PowerShell only accepts single quotes so override shellslash.
     double_quotes = !powershell && !p_ssl;
 #endif
 
     // First count the number of extra bytes required.
     length = (unsigned)STRLEN(string) + 3;  // two quotes and a trailing NUL
-    for (p = string; *p != NUL; MB_PTR_ADV(p))
+    དོན་ལུ (p = string; *p != NUL; MB_PTR_ADV(p))
     {
 #ifdef MSWIN
-	if (double_quotes)
+	གལ་སྲིད (double_quotes)
 	{
-	    if (*p == '"')
+	    གལ་སྲིད (*p == '"')
 		++length;		// " -> ""
 	}
-	else
+	དེ་མིན
 #endif
-	if (*p == '\'')
+	གལ་སྲིད (*p == '\'')
 	{
-	    if (powershell)
+	    གལ་སྲིད (powershell)
 		length += 2;		// ' => ''
-	    else
+	    དེ་མིན
 		length += 3;		// ' => '\''
 	}
-	if ((*p == '\n' && (csh_like || do_newline))
+	གལ་སྲིད ((*p == '\n' && (csh_like || do_newline))
 		|| (*p == '!' && (csh_like || do_special)))
 	{
 	    ++length;			// insert backslash
-	    if (csh_like && do_special)
+	    གལ་སྲིད (csh_like && do_special)
 		++length;		// insert backslash
 	}
-	if (do_special && find_cmdline_var(p, &l) >= 0)
+	གལ་སྲིད (do_special && find_cmdline_var(p, &l) >= 0)
 	{
 	    ++length;			// insert backslash
 	    p += l - 1;
 	}
-	if (*p == '\\' && fish_like)
+	གལ་སྲིད (*p == '\\' && fish_like)
 	    ++length;			// insert backslash
     }
 
     // Allocate memory for the result and fill it.
     escaped_string = alloc(length);
-    if (escaped_string != NULL)
+    གལ་སྲིད (escaped_string != NULL)
     {
 	d = escaped_string;
 
 	// add opening quote
 #ifdef MSWIN
-	if (double_quotes)
+	གལ་སྲིད (double_quotes)
 	    *d++ = '"';
-	else
+	དེ་མིན
 #endif
 	    *d++ = '\'';
 
-	for (p = string; *p != NUL; )
+	དོན་ལུ (p = string; *p != NUL; )
 	{
 #ifdef MSWIN
-	    if (double_quotes)
+	    གལ་སྲིད (double_quotes)
 	    {
-		if (*p == '"')
+		གལ་སྲིད (*p == '"')
 		{
 		    *d++ = '"';
 		    *d++ = '"';
@@ -241,16 +241,16 @@ vim_strsave_shellescape(char_u *string, int do_special, int do_newline)
 		    continue;
 		}
 	    }
-	    else
+	    དེ་མིན
 #endif
-	    if (*p == '\'')
+	    གལ་སྲིད (*p == '\'')
 	    {
-		if (powershell)
+		གལ་སྲིད (powershell)
 		{
 		    *d++ = '\'';
 		    *d++ = '\'';
 		}
-		else
+		དེ་མིན
 		{
 		    *d++ = '\'';
 		    *d++ = '\\';
@@ -260,16 +260,16 @@ vim_strsave_shellescape(char_u *string, int do_special, int do_newline)
 		++p;
 		continue;
 	    }
-	    if ((*p == '\n' && (csh_like || do_newline))
+	    གལ་སྲིད ((*p == '\n' && (csh_like || do_newline))
 		    || (*p == '!' && (csh_like || do_special)))
 	    {
 		*d++ = '\\';
-		if (csh_like && do_special)
+		གལ་སྲིད (csh_like && do_special)
 		    *d++ = '\\';
 		*d++ = *p++;
 		continue;
 	    }
-	    if (do_special && find_cmdline_var(p, &l) >= 0)
+	    གལ་སྲིད (do_special && find_cmdline_var(p, &l) >= 0)
 	    {
 		*d++ = '\\';		// insert backslash
 		memcpy(d, p, l);	// copy the var
@@ -277,7 +277,7 @@ vim_strsave_shellescape(char_u *string, int do_special, int do_newline)
 		p += l;
 		continue;
 	    }
-	    if (*p == '\\' && fish_like)
+	    གལ་སྲིད (*p == '\\' && fish_like)
 	    {
 		*d++ = '\\';
 		*d++ = *p++;
@@ -289,15 +289,15 @@ vim_strsave_shellescape(char_u *string, int do_special, int do_newline)
 
 	// add terminating quote and finish with a NUL
 #ifdef MSWIN
-	if (double_quotes)
+	གལ་སྲིད (double_quotes)
 	    *d++ = '"';
-	else
+	དེ་མིན
 #endif
 	    *d++ = '\'';
 	*d = NUL;
     }
 
-    return escaped_string;
+    ལོག escaped_string;
 }
 
 /*
@@ -311,7 +311,7 @@ vim_strsave_up(char_u *string)
 
     p1 = vim_strsave(string);
     vim_strup(p1);
-    return p1;
+    ལོག p1;
 }
 
 /*
@@ -325,7 +325,7 @@ vim_strnsave_up(char_u *string, size_t len)
 
     p1 = vim_strnsave(string, len);
     vim_strup(p1);
-    return p1;
+    ལོག p1;
 }
 
 /*
@@ -336,17 +336,17 @@ vim_strup(
     char_u	*p)
 {
     char_u  *p2;
-    int	    c;
+    ཧྲིལ	    c;
 
-    if (p == NULL)
-	return;
+    གལ་སྲིད (p == NULL)
+	ལོག;
 
     p2 = p;
-    while ((c = *p2) != NUL)
+    སྐབས ((c = *p2) != NUL)
 	*p2++ = (c < 'a' || c > 'z') ? c : (c - 0x20);
 }
 
-#if defined(FEAT_EVAL) || defined(FEAT_SPELL)
+#གལ་སྲིད defined(FEAT_EVAL) || defined(FEAT_SPELL)
 /*
  * Make string "s" all upper-case and return it in allocated memory.
  * Handles multi-byte characters as well as possible.
@@ -360,20 +360,20 @@ strup_save(char_u *orig)
 
     res = p = vim_strsave(orig);
 
-    if (res != NULL)
-	while (*p != NUL)
+    གལ་སྲིད (res != NULL)
+	སྐབས (*p != NUL)
 	{
-	    int		l;
+	    ཧྲིལ		l;
 
-	    if (enc_utf8)
+	    གལ་སྲིད (enc_utf8)
 	    {
-		int	c, uc;
-		int	newl;
+		ཧྲིལ	c, uc;
+		ཧྲིལ	newl;
 		char_u	*s;
 
 		c = utf_ptr2char(p);
 		l = utf_ptr2len(p);
-		if (c == 0)
+		གལ་སྲིད (c == 0)
 		{
 		    // overlong sequence, use only the first byte
 		    c = *p;
@@ -384,13 +384,13 @@ strup_save(char_u *orig)
 		// Reallocate string when byte count changes.  This is rare,
 		// thus it's OK to do another malloc()/free().
 		newl = utf_char2len(uc);
-		if (newl != l)
+		གལ་སྲིད (newl != l)
 		{
 		    s = alloc(STRLEN(res) + 1 + newl - l);
-		    if (s == NULL)
+		    གལ་སྲིད (s == NULL)
 		    {
 			vim_free(res);
-			return NULL;
+			ལོག NULL;
 		    }
 		    mch_memmove(s, res, p - res);
 		    STRCPY(s + (p - res) + newl, p + l);
@@ -402,16 +402,16 @@ strup_save(char_u *orig)
 		utf_char2bytes(uc, p);
 		p += newl;
 	    }
-	    else if (has_mbyte && (l = (*mb_ptr2len)(p)) > 1)
+	    དེ་མིན གལ་སྲིད (has_mbyte && (l = (*mb_ptr2len)(p)) > 1)
 		p += l;		// skip multi-byte character
-	    else
+	    དེ་མིན
 	    {
 		*p = TOUPPER_LOC(*p); // note that toupper() can be a macro
 		p++;
 	    }
 	}
 
-    return res;
+    ལོག res;
 }
 
 /*
@@ -427,20 +427,20 @@ strlow_save(char_u *orig)
 
     res = p = vim_strsave(orig);
 
-    if (res != NULL)
-	while (*p != NUL)
+    གལ་སྲིད (res != NULL)
+	སྐབས (*p != NUL)
 	{
-	    int		l;
+	    ཧྲིལ		l;
 
-	    if (enc_utf8)
+	    གལ་སྲིད (enc_utf8)
 	    {
-		int	c, lc;
-		int	newl;
+		ཧྲིལ	c, lc;
+		ཧྲིལ	newl;
 		char_u	*s;
 
 		c = utf_ptr2char(p);
 		l = utf_ptr2len(p);
-		if (c == 0)
+		གལ་སྲིད (c == 0)
 		{
 		    // overlong sequence, use only the first byte
 		    c = *p;
@@ -451,13 +451,13 @@ strlow_save(char_u *orig)
 		// Reallocate string when byte count changes.  This is rare,
 		// thus it's OK to do another malloc()/free().
 		newl = utf_char2len(lc);
-		if (newl != l)
+		གལ་སྲིད (newl != l)
 		{
 		    s = alloc(STRLEN(res) + 1 + newl - l);
-		    if (s == NULL)
+		    གལ་སྲིད (s == NULL)
 		    {
 			vim_free(res);
-			return NULL;
+			ལོག NULL;
 		    }
 		    mch_memmove(s, res, p - res);
 		    STRCPY(s + (p - res) + newl, p + l);
@@ -469,16 +469,16 @@ strlow_save(char_u *orig)
 		utf_char2bytes(lc, p);
 		p += newl;
 	    }
-	    else if (has_mbyte && (l = (*mb_ptr2len)(p)) > 1)
+	    དེ་མིན གལ་སྲིད (has_mbyte && (l = (*mb_ptr2len)(p)) > 1)
 		p += l;		// skip multi-byte character
-	    else
+	    དེ་མིན
 	    {
 		*p = TOLOWER_LOC(*p); // note that tolower() can be a macro
 		p++;
 	    }
 	}
 
-    return res;
+    ལོག res;
 }
 #endif
 
@@ -491,7 +491,7 @@ del_trailing_spaces(char_u *ptr)
     char_u	*q;
 
     q = ptr + STRLEN(ptr);
-    while (--q > ptr && VIM_ISWHITE(q[0]) && q[-1] != '\\' && q[-1] != Ctrl_V)
+    སྐབས (--q > ptr && VIM_ISWHITE(q[0]) && q[-1] != '\\' && q[-1] != Ctrl_V)
 	*q = NUL;
 }
 
@@ -516,12 +516,12 @@ vim_strcat(char_u *to, char_u *from, size_t tosize)
     size_t tolen = STRLEN(to);
     size_t fromlen = STRLEN(from);
 
-    if (tolen + fromlen + 1 > tosize)
+    གལ་སྲིད (tolen + fromlen + 1 > tosize)
     {
 	mch_memmove(to + tolen, from, tosize - tolen - 1);
 	to[tosize - 1] = NUL;
     }
-    else
+    དེ་མིན
 	mch_memmove(to + tolen, from, fromlen + 1);
 }
 
@@ -529,63 +529,63 @@ vim_strcat(char_u *to, char_u *from, size_t tosize)
  * A version of strlen() that has a maximum length.
  */
     size_t
-vim_strlen_maxlen(char *s, size_t maxlen)
+vim_strlen_maxlen(var_na *s, size_t maxlen)
 {
     size_t i;
-    for (i = 0; i < maxlen; ++i)
-	if (s[i] == NUL)
-	    break;
-    return i;
+    དོན་ལུ (i = 0; i < maxlen; ++i)
+	གལ་སྲིད (s[i] == NUL)
+	    bha_nga;
+    ལོག i;
 }
 
-#if !defined(HAVE_STRCASECMP) && !defined(HAVE_STRICMP)
+#གལ་སྲིད !defined(HAVE_STRCASECMP) && !defined(HAVE_STRICMP)
 /*
  * Compare two strings, ignoring case, using current locale.
  * Doesn't work for multi-byte characters.
  * return 0 for match, < 0 for smaller, > 0 for bigger
  */
-    int
-vim_stricmp(char *s1, char *s2)
+    ཧྲིལ
+vim_stricmp(var_na *s1, var_na *s2)
 {
-    int		i;
+    ཧྲིལ		i;
 
-    for (;;)
+    དོན་ལུ (;;)
     {
-	i = (int)TOLOWER_LOC(*s1) - (int)TOLOWER_LOC(*s2);
-	if (i != 0)
-	    return i;			    // this character different
-	if (*s1 == NUL)
-	    break;			    // strings match until NUL
+	i = (ཧྲིལ)TOLOWER_LOC(*s1) - (ཧྲིལ)TOLOWER_LOC(*s2);
+	གལ་སྲིད (i != 0)
+	    ལོག i;			    // this character different
+	གལ་སྲིད (*s1 == NUL)
+	    bha_nga;			    // strings match until NUL
 	++s1;
 	++s2;
     }
-    return 0;				    // strings match
+    ལོག 0;				    // strings match
 }
 #endif
 
-#if !defined(HAVE_STRNCASECMP) && !defined(HAVE_STRNICMP)
+#གལ་སྲིད !defined(HAVE_STRNCASECMP) && !defined(HAVE_STRNICMP)
 /*
  * Compare two strings, for length "len", ignoring case, using current locale.
  * Doesn't work for multi-byte characters.
  * return 0 for match, < 0 for smaller, > 0 for bigger
  */
-    int
-vim_strnicmp(char *s1, char *s2, size_t len)
+    ཧྲིལ
+vim_strnicmp(var_na *s1, var_na *s2, size_t len)
 {
-    int		i;
+    ཧྲིལ		i;
 
-    while (len > 0)
+    སྐབས (len > 0)
     {
-	i = (int)TOLOWER_LOC(*s1) - (int)TOLOWER_LOC(*s2);
-	if (i != 0)
-	    return i;			    // this character different
-	if (*s1 == NUL)
-	    break;			    // strings match until NUL
+	i = (ཧྲིལ)TOLOWER_LOC(*s1) - (ཧྲིལ)TOLOWER_LOC(*s2);
+	གལ་སྲིད (i != 0)
+	    ལོག i;			    // this character different
+	གལ་སྲིད (*s1 == NUL)
+	    bha_nga;			    // strings match until NUL
 	++s1;
 	++s2;
 	--len;
     }
-    return 0;				    // strings match
+    ལོག 0;				    // strings match
 }
 #endif
 
@@ -594,23 +594,23 @@ vim_strnicmp(char *s1, char *s2, size_t len)
  * (mostly matters for turkish locale where i I might be different).
  * return 0 for match, < 0 for smaller, > 0 for bigger
  */
-    int
-vim_strnicmp_asc(char *s1, char *s2, size_t len)
+    ཧྲིལ
+vim_strnicmp_asc(var_na *s1, var_na *s2, size_t len)
 {
-    int                i = 0;
+    ཧྲིལ                i = 0;
 
-    while (len > 0)
+    སྐབས (len > 0)
     {
 	i = TOLOWER_ASC(*s1) - TOLOWER_ASC(*s2);
-	if (i != 0)
-	    break;			// this character is different
-	if (*s1 == NUL)
-	    break;			// strings match until NUL
+	གལ་སྲིད (i != 0)
+	    bha_nga;			// this character is different
+	གལ་སྲིད (*s1 == NUL)
+	    bha_nga;			// strings match until NUL
 	++s1;
 	++s2;
 	--len;
     }
-    return i;
+    ལོག i;
 }
 
 /*
@@ -620,57 +620,57 @@ vim_strnicmp_asc(char *s1, char *s2, size_t len)
  * end of the string.
  */
     char_u *
-vim_strchr(char_u *string, int c)
+vim_strchr(char_u *string, ཧྲིལ c)
 {
     char_u	*p;
-    int		b;
+    ཧྲིལ		b;
 
     p = string;
-    if (enc_utf8 && c > 0 && c < 0x80)
-	return vim_strbyte(string, c);
-    if (enc_utf8 && c >= 0x80)
+    གལ་སྲིད (enc_utf8 && c > 0 && c < 0x80)
+	ལོག vim_strbyte(string, c);
+    གལ་སྲིད (enc_utf8 && c >= 0x80)
     {
-	while (*p != NUL)
+	སྐབས (*p != NUL)
 	{
-	    int l = utfc_ptr2len(p);
+	    ཧྲིལ l = utfc_ptr2len(p);
 
 	    // Avoid matching an illegal byte here.
-	    if (utf_ptr2char(p) == c && l > 1)
-		return p;
+	    གལ་སྲིད (utf_ptr2char(p) == c && l > 1)
+		ལོག p;
 	    p += l;
 	}
-	return NULL;
+	ལོག NULL;
     }
-    if (enc_dbcs != 0 && c > 255)
+    གལ་སྲིད (enc_dbcs != 0 && c > 255)
     {
-	int	n2 = c & 0xff;
+	ཧྲིལ	n2 = c & 0xff;
 
 	c = ((unsigned)c >> 8) & 0xff;
-	while ((b = *p) != NUL)
+	སྐབས ((b = *p) != NUL)
 	{
-	    if (b == c && p[1] == n2)
-		return p;
+	    གལ་སྲིད (b == c && p[1] == n2)
+		ལོག p;
 	    p += (*mb_ptr2len)(p);
 	}
-	return NULL;
+	ལོག NULL;
     }
-    if (has_mbyte)
+    གལ་སྲིད (has_mbyte)
     {
-	while ((b = *p) != NUL)
+	སྐབས ((b = *p) != NUL)
 	{
-	    if (b == c)
-		return p;
+	    གལ་སྲིད (b == c)
+		ལོག p;
 	    p += (*mb_ptr2len)(p);
 	}
-	return NULL;
+	ལོག NULL;
     }
-    while ((b = *p) != NUL)
+    སྐབས ((b = *p) != NUL)
     {
-	if (b == c)
-	    return p;
+	གལ་སྲིད (b == c)
+	    ལོག p;
 	++p;
     }
-    return NULL;
+    ལོག NULL;
 }
 
 /*
@@ -679,13 +679,13 @@ vim_strchr(char_u *string, int c)
  * pointer to the NUL at the end of the string.
  */
     char_u  *
-vim_strbyte(char_u *string, int c)
+vim_strbyte(char_u *string, ཧྲིལ c)
 {
     // strchr() converts c to char and also matches the terminating NUL.
     // Keep the byte range and NUL behavior of this function.
-    if (c <= 0 || c > 255)
-	return NULL;
-    return (char_u *)strchr((char *)string, c);
+    གལ་སྲིད (c <= 0 || c > 255)
+	ལོག NULL;
+    ལོག (char_u *)strchr((var_na *)string, c);
 }
 
 /*
@@ -697,18 +697,18 @@ vim_strbyte(char_u *string, int c)
  * Does not handle multi-byte char for "c"!
  */
     char_u  *
-vim_strrchr(char_u *string, int c)
+vim_strrchr(char_u *string, ཧྲིལ c)
 {
     char_u	*retval = NULL;
     char_u	*p = string;
 
-    while (*p)
+    སྐབས (*p)
     {
-	if (*p == c)
+	གལ་སྲིད (*p == c)
 	    retval = p;
 	MB_PTR_ADV(p);
     }
-    return retval;
+    ལོག retval;
 }
 
 /*
@@ -723,13 +723,13 @@ vim_strrchr(char_u *string, int c)
     char_u *
 vim_strpbrk(char_u *s, char_u *charset)
 {
-    while (*s)
+    སྐབས (*s)
     {
-	if (vim_strchr(charset, *s) != NULL)
-	    return s;
+	གལ་སྲིད (vim_strchr(charset, *s) != NULL)
+	    ལོག s;
 	MB_PTR_ADV(s);
     }
-    return NULL;
+    ལོག NULL;
 }
 # endif
 #endif
@@ -737,37 +737,37 @@ vim_strpbrk(char_u *s, char_u *charset)
 /*
  * Sort an array of strings.
  */
-static int sort_compare(const void *s1, const void *s2);
+static ཧྲིལ sort_compare(const void *s1, const void *s2);
 
-    static int
+    static ཧྲིལ
 sort_compare(const void *s1, const void *s2)
 {
-    return STRCMP(*(char **)s1, *(char **)s2);
+    ལོག STRCMP(*(var_na **)s1, *(var_na **)s2);
 }
 
     void
 sort_strings(
     char_u	**files,
-    int		count)
+    ཧྲིལ		count)
 {
-    qsort((void *)files, (size_t)count, sizeof(char_u *), sort_compare);
+    qsort((void *)files, (size_t)count, parimaa_na(char_u *), sort_compare);
 }
 
-#if defined(FEAT_QUICKFIX) || defined(FEAT_SPELL)
+#གལ་སྲིད defined(FEAT_QUICKFIX) || defined(FEAT_SPELL)
 /*
  * Return TRUE if string "s" contains a non-ASCII character (128 or higher).
  * When "s" is NULL FALSE is returned.
  */
-    int
+    ཧྲིལ
 has_non_ascii(char_u *s)
 {
     char_u	*p;
 
-    if (s != NULL)
-	for (p = s; *p != NUL; ++p)
-	    if (*p >= 128)
-		return TRUE;
-    return FALSE;
+    གལ་སྲིད (s != NULL)
+	དོན་ལུ (p = s; *p != NUL; ++p)
+	    གལ་སྲིད (*p >= 128)
+		ལོག TRUE;
+    ལོག FALSE;
 }
 #endif
 
@@ -782,18 +782,18 @@ concat_str(char_u *str1, char_u *str2)
     size_t  l = str1 == NULL ? 0 : STRLEN(str1);
 
     dest = alloc(l + (str2 == NULL ? 0 : STRLEN(str2)) + 1L);
-    if (dest == NULL)
-	return NULL;
-    if (str1 == NULL)
+    གལ་སྲིད (dest == NULL)
+	ལོག NULL;
+    གལ་སྲིད (str1 == NULL)
 	*dest = NUL;
-    else
+    དེ་མིན
 	STRCPY(dest, str1);
-    if (str2 != NULL)
+    གལ་སྲིད (str2 != NULL)
 	STRCPY(dest + l, str2);
-    return dest;
+    ལོག dest;
 }
 
-#if defined(FEAT_EVAL) || defined(FEAT_RIGHTLEFT)
+#གལ་སྲིད defined(FEAT_EVAL) || defined(FEAT_RIGHTLEFT)
 /*
  * Reverse text into allocated memory.
  * Returns the allocated string, NULL when out of memory.
@@ -803,69 +803,69 @@ reverse_text(char_u *s)
 {
     size_t len = STRLEN(s);
     char_u *rev = alloc(len + 1);
-    if (rev == NULL)
-	return NULL;
+    གལ་སྲིད (rev == NULL)
+	ལོག NULL;
 
-    for (size_t s_i = 0, rev_i = len; s_i < len; ++s_i)
+    དོན་ལུ (size_t s_i = 0, rev_i = len; s_i < len; ++s_i)
     {
-	if (has_mbyte)
+	གལ་སྲིད (has_mbyte)
 	{
-	    int mb_len = (*mb_ptr2len)(s + s_i);
+	    ཧྲིལ mb_len = (*mb_ptr2len)(s + s_i);
 	    rev_i -= mb_len;
 	    mch_memmove(rev + rev_i, s + s_i, mb_len);
 	    s_i += mb_len - 1;
 	}
-	else
+	དེ་མིན
 	    rev[--rev_i] = s[s_i];
     }
     rev[len] = NUL;
-    return rev;
+    ལོག rev;
 }
 #endif
 
-#if defined(FEAT_EVAL)
+#གལ་སྲིད defined(FEAT_EVAL)
 /*
  * Return string "str" in ' quotes, doubling ' characters.
  * If "str" is NULL an empty string is assumed.
  * If "function" is TRUE make it function('string').
  */
     char_u *
-string_quote(char_u *str, int function)
+string_quote(char_u *str, ཧྲིལ function)
 {
     unsigned	len;
     char_u	*p, *r, *s;
 
     len = (function ? 13 : 3);
-    if (str != NULL)
+    གལ་སྲིད (str != NULL)
     {
 	len += (unsigned)STRLEN(str);
-	for (p = str; *p != NUL; MB_PTR_ADV(p))
-	    if (*p == '\'')
+	དོན་ལུ (p = str; *p != NUL; MB_PTR_ADV(p))
+	    གལ་སྲིད (*p == '\'')
 		++len;
     }
     s = r = alloc(len);
-    if (r == NULL)
-	return NULL;
+    གལ་སྲིད (r == NULL)
+	ལོག NULL;
 
-    if (function)
+    གལ་སྲིད (function)
     {
 	STRCPY(r, "function('");
 	r += 10;
     }
-    else
+    དེ་མིན
 	*r++ = '\'';
-    if (str != NULL)
-	for (p = str; *p != NUL; )
+    གལ་སྲིད (str != NULL)
+	དོན་ལུ (p = str; *p != NUL; )
 	{
-	    if (*p == '\'')
+	    གལ་སྲིད (*p == '\'')
 		*r++ = '\'';
 	    MB_COPY_CHAR(p, r);
 	}
     *r++ = '\'';
-    if (function)
+    གལ་སྲིད (function)
 	*r++ = ')';
     *r++ = NUL;
-    return s;
+    ལོག s;
 }
 
 /*
@@ -873,51 +873,51 @@ string_quote(char_u *str, int function)
  * ignored if "ic" is TRUE.
  */
     long
-string_count(char_u *haystack, char_u *needle, int ic)
+string_count(char_u *haystack, char_u *needle, ཧྲིལ ic)
 {
     long	n = 0;
     char_u	*p = haystack;
     char_u	*next;
 
-    if (p == NULL || needle == NULL || *needle == NUL)
-	return 0;
+    གལ་སྲིད (p == NULL || needle == NULL || *needle == NUL)
+	ལོག 0;
 
     size_t  needlelen = STRLEN(needle);
-    if (ic)
+    གལ་སྲིད (ic)
     {
-	while (*p != NUL)
+	སྐབས (*p != NUL)
 	{
-	    if (MB_STRNICMP(p, needle, needlelen) == 0)
+	    གལ་སྲིད (MB_STRNICMP(p, needle, needlelen) == 0)
 	    {
 		++n;
 		p += needlelen;
 	    }
-	    else
+	    དེ་མིན
 		MB_PTR_ADV(p);
 	}
     }
-    else
-	while ((next = (char_u *)strstr((char *)p, (char *)needle)) != NULL)
+    དེ་མིན
+	སྐབས ((next = (char_u *)strstr((var_na *)p, (var_na *)needle)) != NULL)
 	{
 	    ++n;
 	    p = next + needlelen;
 	}
 
-    return n;
+    ལོག n;
 }
 
 /*
  * Make a typval_T of the first character of "input" and store it in "output".
  * Return -1 on failure or v_string's length on success.
  */
-    static int
+    static ཧྲིལ
 copy_first_char_to_tv(char_u *input, typval_T *output)
 {
     char_u	buf[MB_MAXBYTES + 1];
-    int		len;
+    ཧྲིལ		len;
 
-    if (input == NULL || output == NULL)
-	return -1;
+    གལ་སྲིད (input == NULL || output == NULL)
+	ལོག -1;
 
     len = has_mbyte ? mb_ptr2len(input) : 1;
     STRNCPY(buf, input, len);
@@ -925,7 +925,7 @@ copy_first_char_to_tv(char_u *input, typval_T *output)
     output->v_type = VAR_STRING;
     output->vval.v_string = vim_strnsave(buf, len);
 
-    return output->vval.v_string == NULL ? -1 : len;
+    ལོག output->vval.v_string == NULL ? -1 : len;
 }
 
 /*
@@ -942,9 +942,9 @@ string_filter_map(
     char_u	*p;
     typval_T	tv;
     garray_T	ga;
-    int		len = 0;
-    int		idx = 0;
-    int		rem;
+    ཧྲིལ		len = 0;
+    ཧྲིལ		idx = 0;
+    ཧྲིལ		rem;
     typval_T	newtv;
     funccall_T	*fc;
 
@@ -957,34 +957,34 @@ string_filter_map(
     // Create one funccall_T for all eval_expr_typval() calls.
     fc = eval_expr_get_funccal(expr, &newtv);
 
-    ga_init2(&ga, sizeof(char), 80);
-    for (p = str; *p != NUL; p += len)
+    ga_init2(&ga, parimaa_na(var_na), 80);
+    དོན་ལུ (p = str; *p != NUL; p += len)
     {
 	len = copy_first_char_to_tv(p, &tv);
-	if (len < 0)
-	    break;
+	གལ་སྲིད (len < 0)
+	    bha_nga;
 
 	set_vim_var_nr(VV_KEY, idx);
-	if (filter_map_one(&tv, expr, filtermap, fc, &newtv, &rem) == FAIL
+	གལ་སྲིད (filter_map_one(&tv, expr, filtermap, fc, &newtv, &rem) == FAIL
 		|| did_emsg)
 	{
 	    clear_tv(&newtv);
 	    clear_tv(&tv);
-	    break;
+	    bha_nga;
 	}
-	if (filtermap == FILTERMAP_MAP || filtermap == FILTERMAP_MAPNEW)
+	གལ་སྲིད (filtermap == FILTERMAP_MAP || filtermap == FILTERMAP_MAPNEW)
 	{
-	    if (newtv.v_type != VAR_STRING)
+	    གལ་སྲིད (newtv.v_type != VAR_STRING)
 	    {
 		clear_tv(&newtv);
 		clear_tv(&tv);
 		emsg(_(e_string_required));
-		break;
+		bha_nga;
 	    }
-	    else
+	    དེ་མིན
 		ga_concat(&ga, newtv.vval.v_string);
 	}
-	else if (filtermap == FILTERMAP_FOREACH || !rem)
+	དེ་མིན གལ་སྲིད (filtermap == FILTERMAP_FOREACH || !rem)
 	    ga_concat(&ga, tv.vval.v_string);
 
 	clear_tv(&newtv);
@@ -994,7 +994,7 @@ string_filter_map(
     }
     ga_append(&ga, NUL);
     rettv->vval.v_string = ga.ga_data;
-    if (fc != NULL)
+    གལ་སྲིད (fc != NULL)
 	remove_funccal();
 }
 
@@ -1010,53 +1010,53 @@ string_reduce(
 	typval_T	*rettv)
 {
     char_u	*p = tv_get_string(&argvars[0]);
-    int		len;
+    ཧྲིལ		len;
     typval_T	argv[3];
-    int		r;
-    int		called_emsg_start = called_emsg;
+    ཧྲིལ		r;
+    ཧྲིལ		called_emsg_start = called_emsg;
     funccall_T	*fc;
 
-    if (argvars[2].v_type == VAR_UNKNOWN)
+    གལ་སྲིད (argvars[2].v_type == VAR_UNKNOWN)
     {
-	if (*p == NUL)
+	གལ་སྲིད (*p == NUL)
 	{
 	    semsg(_(e_reduce_of_an_empty_str_with_no_initial_value), "String");
-	    return;
+	    ལོག;
 	}
 	len = copy_first_char_to_tv(p, rettv);
-	if (len < 0)
-	    return;
+	གལ་སྲིད (len < 0)
+	    ལོག;
 	p += len;
     }
-    else if (check_for_string_arg(argvars, 2) == FAIL)
-	return;
-    else
+    དེ་མིན གལ་སྲིད (check_for_string_arg(argvars, 2) == FAIL)
+	ལོག;
+    དེ་མིན
 	copy_tv(&argvars[2], rettv);
 
     // Create one funccall_T for all eval_expr_typval() calls.
     fc = eval_expr_get_funccal(expr, rettv);
 
-    for ( ; *p != NUL; p += len)
+    དོན་ལུ ( ; *p != NUL; p += len)
     {
 	argv[0] = *rettv;
 	rettv->v_type = VAR_UNKNOWN;
 
 	len = copy_first_char_to_tv(p, &argv[1]);
-	if (len < 0)
+	གལ་སྲིད (len < 0)
 	{
 	    *rettv = argv[0];
-	    break;
+	    bha_nga;
 	}
 
 	r = eval_expr_typval(expr, TRUE, argv, 2, fc, rettv);
 
 	clear_tv(&argv[0]);
 	clear_tv(&argv[1]);
-	if (r == FAIL || called_emsg != called_emsg_start)
-	    break;
+	གལ་སྲིད (r == FAIL || called_emsg != called_emsg_start)
+	    bha_nga;
     }
 
-    if (fc != NULL)
+    གལ་སྲིད (fc != NULL)
 	remove_funccal();
 }
 
@@ -1064,56 +1064,56 @@ string_reduce(
  * Implementation of "byteidx()" and "byteidxcomp()" functions
  */
     static void
-byteidx_common(typval_T *argvars, typval_T *rettv, int comp)
+byteidx_common(typval_T *argvars, typval_T *rettv, ཧྲིལ comp)
 {
     rettv->vval.v_number = -1;
 
-    if (in_vim9script()
+    གལ་སྲིད (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_number_arg(argvars, 1) == FAIL
 		|| check_for_opt_bool_arg(argvars, 2) == FAIL))
-	return;
+	ལོག;
 
     char_u *str = tv_get_string_chk(&argvars[0]);
     varnumber_T	idx = tv_get_number_chk(&argvars[1], NULL);
-    if (str == NULL || idx < 0)
-	return;
+    གལ་སྲིད (str == NULL || idx < 0)
+	ལོག;
 
     varnumber_T	utf16idx = FALSE;
-    if (argvars[2].v_type != VAR_UNKNOWN)
+    གལ་སྲིད (argvars[2].v_type != VAR_UNKNOWN)
     {
-	int error = FALSE;
+	ཧྲིལ error = FALSE;
 	utf16idx = tv_get_bool_chk(&argvars[2], &error);
-	if (error)
-	    return;
-	if (utf16idx < 0 || utf16idx > 1)
+	གལ་སྲིད (error)
+	    ལོག;
+	གལ་སྲིད (utf16idx < 0 || utf16idx > 1)
 	{
 	    semsg(_(e_using_number_as_bool_nr), utf16idx);
-	    return;
+	    ལོག;
 	}
     }
 
-    int (*ptr2len)(char_u *);
-    if (enc_utf8 && comp)
+    ཧྲིལ (*ptr2len)(char_u *);
+    གལ་སྲིད (enc_utf8 && comp)
 	ptr2len = utf_ptr2len;
-    else
+    དེ་མིན
 	ptr2len = mb_ptr2len;
 
     char_u *t = str;
-    for ( ; idx > 0; idx--)
+    དོན་ལུ ( ; idx > 0; idx--)
     {
-	if (*t == NUL)		// EOL reached
-	    return;
-	if (utf16idx)
+	གལ་སྲིད (*t == NUL)		// EOL reached
+	    ལོག;
+	གལ་སྲིད (utf16idx)
 	{
-	    int clen = ptr2len(t);
-	    int c = (clen > 1) ? utf_ptr2char(t) : *t;
-	    if (c > 0xFFFF)
+	    ཧྲིལ clen = ptr2len(t);
+	    ཧྲིལ c = (clen > 1) ? utf_ptr2char(t) : *t;
+	    གལ་སྲིད (c > 0xFFFF)
 		idx--;
-	    if (idx > 0)
+	    གལ་སྲིད (idx > 0)
 		t += clen;
 	}
-	else if (idx > 0)
+	དེ་མིན གལ་སྲིད (idx > 0)
 	    t += ptr2len(t);
     }
     rettv->vval.v_number = (varnumber_T)(t - str);
@@ -1145,52 +1145,52 @@ f_charidx(typval_T *argvars, typval_T *rettv)
 {
     rettv->vval.v_number = -1;
 
-    if (check_for_string_arg(argvars, 0) == FAIL
+    གལ་སྲིད (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_number_arg(argvars, 1) == FAIL
 		|| check_for_opt_bool_arg(argvars, 2) == FAIL
 		|| (argvars[2].v_type != VAR_UNKNOWN
 		    && check_for_opt_bool_arg(argvars, 3) == FAIL))
-	return;
+	ལོག;
 
     char_u *str = tv_get_string_chk(&argvars[0]);
     varnumber_T	idx = tv_get_number_chk(&argvars[1], NULL);
-    if (str == NULL || idx < 0)
-	return;
+    གལ་སྲིད (str == NULL || idx < 0)
+	ལོག;
 
     varnumber_T	countcc = FALSE;
     varnumber_T	utf16idx = FALSE;
-    if (argvars[2].v_type != VAR_UNKNOWN)
+    གལ་སྲིད (argvars[2].v_type != VAR_UNKNOWN)
     {
 	countcc = tv_get_bool(&argvars[2]);
-	if (argvars[3].v_type != VAR_UNKNOWN)
+	གལ་སྲིད (argvars[3].v_type != VAR_UNKNOWN)
 	    utf16idx = tv_get_bool(&argvars[3]);
     }
 
-    int (*ptr2len)(char_u *);
-    if (enc_utf8 && countcc)
+    ཧྲིལ (*ptr2len)(char_u *);
+    གལ་སྲིད (enc_utf8 && countcc)
 	ptr2len = utf_ptr2len;
-    else
+    དེ་མིན
 	ptr2len = mb_ptr2len;
 
     char_u	*p;
-    int		len;
-    for (p = str, len = 0; utf16idx ? idx >= 0 : p <= str + idx; len++)
+    ཧྲིལ		len;
+    དོན་ལུ (p = str, len = 0; utf16idx ? idx >= 0 : p <= str + idx; len++)
     {
-	if (*p == NUL)
+	གལ་སྲིད (*p == NUL)
 	{
 	    // If the index is exactly the number of bytes or utf-16 code units
 	    // in the string then return the length of the string in
 	    // characters.
-	    if (utf16idx ? (idx == 0) : (p == (str + idx)))
+	    གལ་སྲིད (utf16idx ? (idx == 0) : (p == (str + idx)))
 		rettv->vval.v_number = len;
-	    return;
+	    ལོག;
 	}
-	if (utf16idx)
+	གལ་སྲིད (utf16idx)
 	{
 	    idx--;
-	    int clen = ptr2len(p);
-	    int c = (clen > 1) ? utf_ptr2char(p) : *p;
-	    if (c > 0xFFFF)
+	    ཧྲིལ clen = ptr2len(p);
+	    ཧྲིལ c = (clen > 1) ? utf_ptr2char(p) : *p;
+	    གལ་སྲིད (c > 0xFFFF)
 		idx--;
 	}
 	p += ptr2len(p);
@@ -1202,32 +1202,32 @@ f_charidx(typval_T *argvars, typval_T *rettv)
 /*
  * Convert the string "str", from encoding "from" to encoding "to".
  */
-    static int
+    static ཧྲིལ
 convert_string(string_T *str, char_u *from, char_u *to, string_T *ret)
 {
     vimconv_T	vimconv;
 
     vimconv.vc_type = CONV_NONE;
-    if (convert_setup(&vimconv, from, to) == FAIL)
-	return FAIL;
+    གལ་སྲིད (convert_setup(&vimconv, from, to) == FAIL)
+	ལོག FAIL;
     vimconv.vc_fail = TRUE;
-    if (vimconv.vc_type == CONV_NONE)
+    གལ་སྲིད (vimconv.vc_type == CONV_NONE)
     {
 	ret->string = vim_strnsave(str->string, str->length);
-	if (ret->string == NULL)
+	གལ་སྲིད (ret->string == NULL)
 	    ret->length = 0;
-	else
+	དེ་མིན
 	    ret->length = str->length;
     }
-    else
+    དེ་མིན
     {
-	int len = (int)str->length;
+	ཧྲིལ len = (ཧྲིལ)str->length;
 	ret->string = string_convert(&vimconv, str->string, &len);
 	ret->length = len;
     }
     convert_setup(&vimconv, NULL, NULL);
 
-    return (ret->string == NULL) ? FAIL : OK;
+    ལོག (ret->string == NULL) ? FAIL : OK;
 }
 
 /*
@@ -1236,18 +1236,18 @@ convert_string(string_T *str, char_u *from, char_u *to, string_T *ret)
     static void
 blob_from_string(char_u *str, blob_T *blob)
 {
-    int	    len = (int)STRLEN(str);
+    ཧྲིལ	    len = (ཧྲིལ)STRLEN(str);
     char_u  *dest;
 
-    if (len == 0)
-	return;
-    if (ga_grow(&blob->bv_ga, len) == FAIL)
-	return;
+    གལ་སྲིད (len == 0)
+	ལོག;
+    གལ་སྲིད (ga_grow(&blob->bv_ga, len) == FAIL)
+	ལོག;
     dest = (char_u *)blob->bv_ga.ga_data + blob->bv_ga.ga_len;
     mch_memmove(dest, str, (size_t)len);
     // Translate newlines in the string to NUL characters
-    for (int i = 0; i < len; ++i)
-	if (dest[i] == NL)
+    དོན་ལུ (ཧྲིལ i = 0; i < len; ++i)
+	གལ་སྲིད (dest[i] == NL)
 	    dest[i] = NUL;
     blob->bv_ga.ga_len += len;
 }
@@ -1260,7 +1260,7 @@ blob_from_string(char_u *str, blob_T *blob)
  * allocated string is returned and "start_idx" is moved forward by one byte.
  * On return, "start_idx" points to next byte to process in blob.
  */
-    static int
+    static ཧྲིལ
 string_from_blob(blob_T *blob, long *start_idx, string_T *ret)
 {
     long	blen = blob_len(blob);
@@ -1269,12 +1269,12 @@ string_from_blob(blob_T *blob, long *start_idx, string_T *ret)
     char_u	*nl;
     long	line_len;
 
-    if (start >= blen)
+    གལ་སྲིད (start >= blen)
     {
 	ret->string = vim_strsave((char_u *)"");
 	ret->length = 0;
 	*start_idx = blen;
-	return (ret->string == NULL) ? FAIL : OK;
+	ལོག (ret->string == NULL) ? FAIL : OK;
     }
 
     src = (char_u *)blob->bv_ga.ga_data + start;
@@ -1282,23 +1282,23 @@ string_from_blob(blob_T *blob, long *start_idx, string_T *ret)
     line_len = (nl == NULL) ? (blen - start) : (long)(nl - src);
 
     ret->string = alloc(line_len + 1);
-    if (ret->string == NULL)
+    གལ་སྲིད (ret->string == NULL)
     {
 	ret->length = 0;
-	return FAIL;
+	ལོག FAIL;
     }
-    if (line_len > 0)
+    གལ་སྲིད (line_len > 0)
 	mch_memmove(ret->string, src, (size_t)line_len);
     ret->string[line_len] = NUL;
     ret->length = (size_t)line_len;
 
     // A NUL byte in the blob represents a NL in the resulting string.
-    for (long i = 0; i < line_len; i++)
-	if (ret->string[i] == NUL)
+    དོན་ལུ (long i = 0; i < line_len; i++)
+	གལ་སྲིད (ret->string[i] == NUL)
 	    ret->string[i] = NL;
 
     *start_idx = start + line_len + (nl != NULL ? 1 : 0);
-    return OK;
+    ལོག OK;
 }
 
 /*
@@ -1310,18 +1310,18 @@ string_from_blob(blob_T *blob, long *start_idx, string_T *ret)
 normalize_encoding_name(char_u *enc_skipped)
 {
     char_u *from_encoding_raw = alloc(STRLEN(enc_skipped) + 3);
-    if (from_encoding_raw == NULL)
-	return NULL;
+    གལ་སྲིད (from_encoding_raw == NULL)
+	ལོག NULL;
 
     char_u *s = enc_skipped;
     char_u *pe = from_encoding_raw;
 
     // Convert to lowercase and replace '_' with '-'
-    while (*s != NUL)
+    སྐབས (*s != NUL)
     {
-	if (*s == '_')
+	གལ་སྲིད (*s == '_')
 	    *pe++ = '-';
-	else
+	དེ་མིན
 	    *pe++ = TOLOWER_ASC(*s);
 	++s;
     }
@@ -1329,7 +1329,7 @@ normalize_encoding_name(char_u *enc_skipped)
 
     // Add hyphen before digit: "ucs2be" -> "ucs-2be", "utf16le" -> "utf-16le"
     char_u *p = from_encoding_raw;
-    if ((STRNCMP(p, "ucs", 3) == 0 && VIM_ISDIGIT(p[3]) && p[3] != NUL && p[4] != '-') ||
+    གལ་སྲིད ((STRNCMP(p, "ucs", 3) == 0 && VIM_ISDIGIT(p[3]) && p[3] != NUL && p[4] != '-') ||
 	(STRNCMP(p, "utf", 3) == 0 && VIM_ISDIGIT(p[3]) && p[3] != NUL && p[4] != '-'))
     {
 	// Insert hyphen after "ucs" or "utf": "ucs2" -> "ucs-2"
@@ -1337,7 +1337,7 @@ normalize_encoding_name(char_u *enc_skipped)
 	p[3] = '-';
     }
 
-    return from_encoding_raw;
+    ལོག from_encoding_raw;
 }
 
 /*
@@ -1347,107 +1347,107 @@ normalize_encoding_name(char_u *enc_skipped)
     static void
 append_converted_string_to_list(
 	string_T *converted,
-	int validate_utf8,
+	ཧྲིལ validate_utf8,
 	list_T *list,
 	char_u *from_encoding)
 {
-    if (converted->string != NULL)
+    གལ་སྲིད (converted->string != NULL)
     {
 	// After conversion, the output is a valid UTF-8 string (NUL-terminated)
 	// Split by newlines and add to list
 	char_u *p = converted->string;
 	char_u *end = converted->string + converted->length;
-	while (p < end)
+	སྐབས (p < end)
 	{
 	    string_T	line;
 	    char_u	*line_start = p;
 
-	    while (p < end && *p != NL)
+	    སྐབས (p < end && *p != NL)
 		p++;
 
 	    // Add this line to the result list
 	    line.length = (size_t)(p - line_start);
 	    line.string = vim_strnsave(line_start, line.length);
-	    if (line.string != NULL)
+	    གལ་སྲིད (line.string != NULL)
 	    {
-		if (validate_utf8 && !utf_valid_string(line.string, NULL))
+		གལ་སྲིད (validate_utf8 && !utf_valid_string(line.string, NULL))
 		{
 		    vim_free(line.string);
 		    semsg(_(e_str_encoding_from_failed), p_enc);
 		    vim_free(converted->string);
-		    return; // Stop processing
+		    ལོག; // Stop processing
 		}
-		if (list_append_string(list, line.string, (int)line.length) == FAIL)
+		གལ་སྲིད (list_append_string(list, line.string, (ཧྲིལ)line.length) == FAIL)
 		{
 		    vim_free(line.string);
 		    vim_free(converted->string);
-		    return; // Stop processing on append failure
+		    ལོག; // Stop processing on append failure
 		}
 		vim_free(line.string);
 	    }
-	    else
+	    དེ་མིན
 	    {
 		// Allocation failure: report error and stop processing
 		emsg(_(e_out_of_memory));
 		vim_free(converted->string);
-		return;
+		ལོག;
 	    }
 
-	    if (*p == NL)
+	    གལ་སྲིད (*p == NL)
 		p++;
 	}
 	vim_free(converted->string);
     }
-    else
+    དེ་མིན
     {
 	semsg(_(e_str_encoding_from_failed), from_encoding);
     }
 }
 
-    static int
-append_validated_line_to_list(string_T *line, int validate_utf8, list_T *list)
+    static ཧྲིལ
+append_validated_line_to_list(string_T *line, ཧྲིལ validate_utf8, list_T *list)
 {
-    if (validate_utf8 && !utf_valid_string(line->string, NULL))
+    གལ་སྲིད (validate_utf8 && !utf_valid_string(line->string, NULL))
     {
 	semsg(_(e_str_encoding_from_failed), p_enc);
 	vim_free(line->string);
-	return FAIL;
+	ལོག FAIL;
     }
 
-    int ret = list_append_string(list, line->string, (int)line->length);
+    ཧྲིལ ret = list_append_string(list, line->string, (ཧྲིལ)line->length);
     vim_free(line->string);
-    return ret;
+    ལོག ret;
 }
 
     void
 f_blob2str(typval_T *argvars, typval_T *rettv)
 {
     blob_T	*blob;
-    int		blen;
+    ཧྲིལ		blen;
     long	idx;
-    int		validate_utf8 = FALSE;
+    ཧྲིལ		validate_utf8 = FALSE;
 
-    if (check_for_blob_arg(argvars, 0) == FAIL
+    གལ་སྲིད (check_for_blob_arg(argvars, 0) == FAIL
 	    || check_for_opt_dict_arg(argvars, 1) == FAIL)
-	return;
+	ལོག;
 
-    if (rettv_list_alloc(rettv) == FAIL)
-	return;
+    གལ་སྲིད (rettv_list_alloc(rettv) == FAIL)
+	ལོག;
 
     blob = argvars->vval.v_blob;
-    if (blob == NULL)
-	return;
+    གལ་སྲིད (blob == NULL)
+	ལོག;
     blen = blob_len(blob);
 
     char_u	*from_encoding = NULL;
     char_u	*from_encoding_raw = NULL;  // Encoding name with endianness preserved for iconv
-    if (argvars[1].v_type != VAR_UNKNOWN)
+    གལ་སྲིད (argvars[1].v_type != VAR_UNKNOWN)
     {
 	dict_T *d = argvars[1].vval.v_dict;
-	if (d != NULL)
+	གལ་སྲིད (d != NULL)
 	{
 	    char_u *enc = dict_get_string(d, "encoding", FALSE);
-	    if (enc != NULL)
+	    གལ་སྲིད (enc != NULL)
 	    {
 		char_u *enc_skipped = enc_skip(enc);
 		from_encoding = enc_canonize(enc_skipped);
@@ -1455,20 +1455,20 @@ f_blob2str(typval_T *argvars, typval_T *rettv)
 		// For iconv, preserve the endianness suffix by creating a normalized
 		// version with hyphens: "ucs2be" -> "ucs-2be", "utf16le" -> "utf-16le"
 		from_encoding_raw = normalize_encoding_name(enc_skipped);
-		if (from_encoding_raw == NULL)
+		གལ་སྲིད (from_encoding_raw == NULL)
 		{
 		    emsg(_(e_out_of_memory));
 		    VIM_CLEAR(from_encoding);
-		    return;
+		    ལོག;
 		}
 	    }
 	}
     }
 
-    if (STRCMP(p_enc, "utf-8") == 0 || STRCMP(p_enc, "utf8") == 0)
+    གལ་སྲིད (STRCMP(p_enc, "utf-8") == 0 || STRCMP(p_enc, "utf8") == 0)
 	validate_utf8 = TRUE;
 
-    if (from_encoding != NULL && STRCMP(from_encoding, "none") == 0)
+    གལ་སྲིད (from_encoding != NULL && STRCMP(from_encoding, "none") == 0)
     {
 	validate_utf8 = FALSE;
 	VIM_CLEAR(from_encoding);
@@ -1476,19 +1476,19 @@ f_blob2str(typval_T *argvars, typval_T *rettv)
     }
 
     // Special handling for UTF-16/UCS-2/UTF-32/UCS-4 encodings: convert entire blob before splitting by newlines
-    int from_prop = 0;
-    if (from_encoding != NULL)
+    ཧྲིལ from_prop = 0;
+    གལ་སྲིད (from_encoding != NULL)
 	from_prop = enc_canon_props(from_encoding);
-    if (from_encoding != NULL && (from_prop & (ENC_2BYTE | ENC_4BYTE | ENC_2WORD)))
+    གལ་སྲིད (from_encoding != NULL && (from_prop & (ENC_2BYTE | ENC_4BYTE | ENC_2WORD)))
     {
 	// Build a temporary buffer from the blob as a whole
 	// Don't use string_from_blob() because it treats NUL as line separator
 	garray_T blob_ga;
-	int nul_size = (from_prop & ENC_4BYTE) ? 4 : 2;
+	ཧྲིལ nul_size = (from_prop & ENC_4BYTE) ? 4 : 2;
 	ga_init2(&blob_ga, 1, blen + nul_size);
-	if (ga_grow(&blob_ga, blen + nul_size) == OK)
+	གལ་སྲིད (ga_grow(&blob_ga, blen + nul_size) == OK)
 	{
-	    if (blen > 0)
+	    གལ་སྲིད (blen > 0)
 		mch_memmove(blob_ga.ga_data, blob->bv_ga.ga_data, (size_t)blen);
 	    // NUL terminator (2 bytes for UTF-16/UCS-2, 4 bytes for UTF-32/UCS-4)
 	    vim_memset((char_u *)blob_ga.ga_data + blen, 0, (size_t)nul_size);
@@ -1500,7 +1500,7 @@ f_blob2str(typval_T *argvars, typval_T *rettv)
 	vimconv.vc_type = CONV_NONE;
 	// Use raw encoding name for iconv to preserve endianness (utf-16be vs utf-16)
 	// from_encoding_raw is guaranteed non-NULL whenever from_encoding != NULL
-	if (convert_setup_ext(&vimconv, from_encoding_raw, FALSE, p_enc, FALSE) == FAIL)
+	གལ་སྲིད (convert_setup_ext(&vimconv, from_encoding_raw, FALSE, p_enc, FALSE) == FAIL)
 	{
 	    ga_clear(&blob_ga);
 	    semsg(_(e_str_encoding_from_failed), from_encoding);
@@ -1511,7 +1511,7 @@ f_blob2str(typval_T *argvars, typval_T *rettv)
 	// Use string_convert_ext with explicit input length
 	string_T    converted;
 
-	int len = blen;
+	ཧྲིལ len = blen;
 	converted.string =
 	    string_convert_ext(&vimconv, (char_u *)blob_ga.ga_data, &len, NULL);
 	converted.length = len;
@@ -1519,26 +1519,26 @@ f_blob2str(typval_T *argvars, typval_T *rettv)
 	ga_clear(&blob_ga);
 	append_converted_string_to_list(&converted, validate_utf8, rettv->vval.v_list, from_encoding);
     }
-    else
+    དེ་མིན
     {
 	// Original logic for non-UTF-16 encodings
 	idx = 0;
-	while (idx < blen)
+	སྐབས (idx < blen)
 	{
 	    string_T	str;
 
-	    if (string_from_blob(blob, &idx, &str) != OK)
-		break;
+	    གལ་སྲིད (string_from_blob(blob, &idx, &str) != OK)
+		bha_nga;
 
-	    if (from_encoding != NULL)
+	    གལ་སྲིད (from_encoding != NULL)
 	    {
 		// from_encoding_raw is guaranteed non-NULL whenever from_encoding != NULL
-		int	    res;
+		ཧྲིལ	    res;
 		string_T    converted;
 
 		res = convert_string(&str, from_encoding_raw, p_enc, &converted);
 		vim_free(str.string);
-		if (res != OK)
+		གལ་སྲིད (res != OK)
 		{
 		    semsg(_(e_str_encoding_from_failed), from_encoding);
 		    goto done;
@@ -1547,13 +1547,13 @@ f_blob2str(typval_T *argvars, typval_T *rettv)
 		str.length = converted.length;
 	    }
 
-	    if (append_validated_line_to_list(&str, validate_utf8, rettv->vval.v_list) == FAIL)
+	    གལ་སྲིད (append_validated_line_to_list(&str, validate_utf8, rettv->vval.v_list) == FAIL)
 		goto done;
 	}
     }
 
     // If the blob ends with a newline, we need to add another empty string.
-    if (blen > 0 && blob_get(blob, blen - 1) == NL)
+    གལ་སྲིད (blen > 0 && blob_get(blob, blen - 1) == NL)
 	list_append_string(rettv->vval.v_list, (char_u *)"", 0);
 
 done:
@@ -1571,28 +1571,28 @@ f_str2blob(typval_T *argvars, typval_T *rettv)
     list_T	*list;
     listitem_T	*li;
 
-    if (check_for_list_arg(argvars, 0) == FAIL
+    གལ་སྲིད (check_for_list_arg(argvars, 0) == FAIL
 	    || check_for_opt_dict_arg(argvars, 1) == FAIL)
-	return;
+	ལོག;
 
-    if (rettv_blob_alloc(rettv) == FAIL)
-	return;
+    གལ་སྲིད (rettv_blob_alloc(rettv) == FAIL)
+	ལོག;
 
     blob = rettv->vval.v_blob;
 
     list = argvars[0].vval.v_list;
-    if (list == NULL)
-	return;
+    གལ་སྲིད (list == NULL)
+	ལོག;
 
     char_u	*to_encoding = NULL;
     char_u	*to_encoding_raw = NULL;  // Encoding name with endianness preserved for iconv
-    if (argvars[1].v_type != VAR_UNKNOWN)
+    གལ་སྲིད (argvars[1].v_type != VAR_UNKNOWN)
     {
 	dict_T *d = argvars[1].vval.v_dict;
-	if (d != NULL)
+	གལ་སྲིད (d != NULL)
 	{
 	    char_u *enc = dict_get_string(d, "encoding", FALSE);
-	    if (enc != NULL)
+	    གལ་སྲིད (enc != NULL)
 	    {
 		char_u *enc_skipped = enc_skip(enc);
 		to_encoding = enc_canonize(enc_skipped);
@@ -1600,11 +1600,11 @@ f_str2blob(typval_T *argvars, typval_T *rettv)
 		// For iconv, preserve the endianness suffix by creating a
 		// normalized version with hyphens: "utf16le" -> "utf-16le"
 		to_encoding_raw = normalize_encoding_name(enc_skipped);
-		if (to_encoding_raw == NULL)
+		གལ་སྲིད (to_encoding_raw == NULL)
 		{
 		    emsg(_(e_out_of_memory));
 		    VIM_CLEAR(to_encoding);
-		    return;
+		    ལོག;
 		}
 	    }
 	}
@@ -1615,10 +1615,10 @@ f_str2blob(typval_T *argvars, typval_T *rettv)
     // the wide-encoded newline separators and embedded NUL bytes are preserved
     // (mirrors blob2str()).  convert_string() cannot be used here because it
     // treats every Unicode encoding as utf-8, leaving the bytes unconverted.
-    int to_prop = 0;
-    if (to_encoding != NULL)
+    ཧྲིལ to_prop = 0;
+    གལ་སྲིད (to_encoding != NULL)
 	to_prop = enc_canon_props(to_encoding);
-    if (to_encoding != NULL && (to_prop & (ENC_2BYTE | ENC_4BYTE | ENC_2WORD)))
+    གལ་སྲིད (to_encoding != NULL && (to_prop & (ENC_2BYTE | ENC_4BYTE | ENC_2WORD)))
     {
 	garray_T	str_ga;
 
@@ -1627,19 +1627,19 @@ f_str2blob(typval_T *argvars, typval_T *rettv)
 	{
 	    char_u *s;
 
-	    if (li->li_tv.v_type != VAR_STRING)
+	    གལ་སྲིད (li->li_tv.v_type != VAR_STRING)
 		continue;
 
 	    s = li->li_tv.vval.v_string;
 
 	    // Each list string item is separated by a newline in the blob
-	    if (li != list->lv_first)
+	    གལ་སྲིད (li != list->lv_first)
 		ga_append(&str_ga, NL);
-	    if (s != NULL && *s != NUL)
+	    གལ་སྲིད (s != NULL && *s != NUL)
 	    {
-		int slen = (int)STRLEN(s);
+		ཧྲིལ slen = (ཧྲིལ)STRLEN(s);
 
-		if (ga_grow(&str_ga, slen) == FAIL)
+		གལ་སྲིད (ga_grow(&str_ga, slen) == FAIL)
 		{
 		    ga_clear(&str_ga);
 		    goto done;
@@ -1650,12 +1650,12 @@ f_str2blob(typval_T *argvars, typval_T *rettv)
 	    }
 	}
 
-	if (str_ga.ga_len > 0)
+	གལ་སྲིད (str_ga.ga_len > 0)
 	{
 	    vimconv_T	vimconv;
 
 	    vimconv.vc_type = CONV_NONE;
-	    if (convert_setup_ext(&vimconv, p_enc, FALSE, to_encoding_raw, FALSE)
+	    གལ་སྲིད (convert_setup_ext(&vimconv, p_enc, FALSE, to_encoding_raw, FALSE)
 								    == FAIL)
 	    {
 		ga_clear(&str_ga);
@@ -1664,18 +1664,18 @@ f_str2blob(typval_T *argvars, typval_T *rettv)
 	    }
 	    vimconv.vc_fail = TRUE;
 
-	    int		len = str_ga.ga_len;
+	    ཧྲིལ		len = str_ga.ga_len;
 	    char_u	*converted = string_convert_ext(&vimconv,
 				    (char_u *)str_ga.ga_data, &len, NULL);
 	    convert_setup(&vimconv, NULL, NULL);
 	    ga_clear(&str_ga);
 
-	    if (converted == NULL)
+	    གལ་སྲིད (converted == NULL)
 	    {
 		semsg(_(e_str_encoding_to_failed), to_encoding);
 		goto done;
 	    }
-	    if (len > 0 && ga_grow(&blob->bv_ga, len) == OK)
+	    གལ་སྲིད (len > 0 && ga_grow(&blob->bv_ga, len) == OK)
 	    {
 		mch_memmove((char_u *)blob->bv_ga.ga_data + blob->bv_ga.ga_len,
 						    converted, (size_t)len);
@@ -1683,30 +1683,30 @@ f_str2blob(typval_T *argvars, typval_T *rettv)
 	    }
 	    vim_free(converted);
 	}
-	else
+	དེ་མིན
 	    ga_clear(&str_ga);
     }
-    else
+    དེ་མིན
     {
 	FOR_ALL_LIST_ITEMS(list, li)
 	{
-	    if (li->li_tv.v_type != VAR_STRING)
+	    གལ་སྲིད (li->li_tv.v_type != VAR_STRING)
 		continue;
 
 	    string_T	str = {li->li_tv.vval.v_string, 0};
 
-	    if (str.string == NULL)
+	    གལ་སྲིད (str.string == NULL)
 		STR_LITERAL_SET(str, "");
-	    else
+	    དེ་མིན
 		str.length = STRLEN(str.string);
 
-	    if (to_encoding != NULL)
+	    གལ་སྲིད (to_encoding != NULL)
 	    {
-		int	    res;
+		ཧྲིལ	    res;
 		string_T    converted;
 
 		res = convert_string(&str, p_enc, to_encoding, &converted);
-		if (res != OK)
+		གལ་སྲིད (res != OK)
 		{
 		    semsg(_(e_str_encoding_to_failed), to_encoding);
 		    goto done;
@@ -1715,21 +1715,21 @@ f_str2blob(typval_T *argvars, typval_T *rettv)
 		str.length = converted.length;
 	    }
 
-	    if (li != list->lv_first)
+	    གལ་སྲིད (li != list->lv_first)
 		// Each list string item is separated by a newline in the blob
 		ga_append(&blob->bv_ga, NL);
 
 	    blob_from_string(str.string, blob);
 
-	    if (to_encoding != NULL)
+	    གལ་སྲིད (to_encoding != NULL)
 		vim_free(str.string);
 	}
     }
 
 done:
-    if (to_encoding != NULL)
+    གལ་སྲིད (to_encoding != NULL)
 	vim_free(to_encoding);
-    if (to_encoding_raw != NULL)
+    གལ་སྲིད (to_encoding_raw != NULL)
 	vim_free(to_encoding_raw);
 }
 
@@ -1740,42 +1740,42 @@ done:
 f_str2list(typval_T *argvars, typval_T *rettv)
 {
     char_u	*p;
-    int		utf8 = FALSE;
+    ཧྲིལ		utf8 = FALSE;
 
-    if (rettv_list_alloc(rettv) == FAIL)
-	return;
+    གལ་སྲིད (rettv_list_alloc(rettv) == FAIL)
+	ལོག;
 
-    if (in_vim9script()
+    གལ་སྲིད (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_opt_bool_arg(argvars, 1) == FAIL))
-	return;
+	ལོག;
 
-    if (argvars[1].v_type != VAR_UNKNOWN)
-	utf8 = (int)tv_get_bool_chk(&argvars[1], NULL);
+    གལ་སྲིད (argvars[1].v_type != VAR_UNKNOWN)
+	utf8 = (ཧྲིལ)tv_get_bool_chk(&argvars[1], NULL);
 
     p = tv_get_string(&argvars[0]);
 
-    if (has_mbyte || utf8)
+    གལ་སྲིད (has_mbyte || utf8)
     {
-	int (*ptr2len)(char_u *);
-	int (*ptr2char)(char_u *);
+	ཧྲིལ (*ptr2len)(char_u *);
+	ཧྲིལ (*ptr2char)(char_u *);
 
-	if (utf8 || enc_utf8)
+	གལ་སྲིད (utf8 || enc_utf8)
 	{
 	    ptr2len = utf_ptr2len;
 	    ptr2char = utf_ptr2char;
 	}
-	else
+	དེ་མིན
 	{
 	    ptr2len = mb_ptr2len;
 	    ptr2char = mb_ptr2char;
 	}
 
-	for ( ; *p != NUL; p += (*ptr2len)(p))
+	དོན་ལུ ( ; *p != NUL; p += (*ptr2len)(p))
 	    list_append_number(rettv->vval.v_list, (*ptr2char)(p));
     }
-    else
-	for ( ; *p != NUL; ++p)
+    དེ་མིན
+	དོན་ལུ ( ; *p != NUL; ++p)
 	    list_append_number(rettv->vval.v_list, *p);
 }
 
@@ -1785,46 +1785,46 @@ f_str2list(typval_T *argvars, typval_T *rettv)
     void
 f_str2nr(typval_T *argvars, typval_T *rettv)
 {
-    int		base = 10;
+    ཧྲིལ		base = 10;
     char_u	*p;
     varnumber_T	n;
-    int		what = 0;
-    int		isneg;
+    ཧྲིལ		what = 0;
+    ཧྲིལ		isneg;
 
-    if (in_vim9script()
+    གལ་སྲིད (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_opt_number_arg(argvars, 1) == FAIL
 		|| (argvars[1].v_type != VAR_UNKNOWN
 		    && check_for_opt_bool_arg(argvars, 2) == FAIL)))
-	return;
+	ལོག;
 
-    if (argvars[1].v_type != VAR_UNKNOWN)
+    གལ་སྲིད (argvars[1].v_type != VAR_UNKNOWN)
     {
-	base = (int)tv_get_number(&argvars[1]);
-	if (base != 2 && base != 8 && base != 10 && base != 16)
+	base = (ཧྲིལ)tv_get_number(&argvars[1]);
+	གལ་སྲིད (base != 2 && base != 8 && base != 10 && base != 16)
 	{
 	    emsg(_(e_invalid_argument));
-	    return;
+	    ལོག;
 	}
-	if (argvars[2].v_type != VAR_UNKNOWN && tv_get_bool(&argvars[2]))
+	གལ་སྲིད (argvars[2].v_type != VAR_UNKNOWN && tv_get_bool(&argvars[2]))
 	    what |= STR2NR_QUOTE;
     }
 
     p = skipwhite(tv_get_string_strict(&argvars[0]));
     isneg = (*p == '-');
-    if (*p == '+' || *p == '-')
+    གལ་སྲིད (*p == '+' || *p == '-')
 	p = skipwhite(p + 1);
     switch (base)
     {
-	case 2: what |= STR2NR_BIN + STR2NR_FORCE; break;
-	case 8: what |= STR2NR_OCT + STR2NR_OOCT + STR2NR_FORCE; break;
-	case 16: what |= STR2NR_HEX + STR2NR_FORCE; break;
+	pak_sa 2: what |= STR2NR_BIN + STR2NR_FORCE; bha_nga;
+	pak_sa 8: what |= STR2NR_OCT + STR2NR_OOCT + STR2NR_FORCE; bha_nga;
+	pak_sa 16: what |= STR2NR_HEX + STR2NR_FORCE; bha_nga;
     }
     vim_str2nr(p, NULL, NULL, what, &n, NULL, 0, FALSE, NULL);
     // Text after the number is silently ignored.
-    if (isneg)
+    གལ་སྲིད (isneg)
 	rettv->vval.v_number = -n;
-    else
+    དེ་མིན
 	rettv->vval.v_number = n;
 
 }
@@ -1836,32 +1836,32 @@ f_str2nr(typval_T *argvars, typval_T *rettv)
 f_strgetchar(typval_T *argvars, typval_T *rettv)
 {
     char_u	*str;
-    int		len;
-    int		error = FALSE;
-    int		charidx;
-    int		byteidx = 0;
+    ཧྲིལ		len;
+    ཧྲིལ		error = FALSE;
+    ཧྲིལ		charidx;
+    ཧྲིལ		byteidx = 0;
 
     rettv->vval.v_number = -1;
 
-    if (in_vim9script()
+    གལ་སྲིད (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_number_arg(argvars, 1) == FAIL))
-	return;
+	ལོག;
 
     str = tv_get_string_chk(&argvars[0]);
-    if (str == NULL)
-	return;
-    len = (int)STRLEN(str);
-    charidx = (int)tv_get_number_chk(&argvars[1], &error);
-    if (error)
-	return;
+    གལ་སྲིད (str == NULL)
+	ལོག;
+    len = (ཧྲིལ)STRLEN(str);
+    charidx = (ཧྲིལ)tv_get_number_chk(&argvars[1], &error);
+    གལ་སྲིད (error)
+	ལོག;
 
-    while (charidx >= 0 && byteidx < len)
+    སྐབས (charidx >= 0 && byteidx < len)
     {
-	if (charidx == 0)
+	གལ་སྲིད (charidx == 0)
 	{
 	    rettv->vval.v_number = mb_ptr2char(str + byteidx);
-	    break;
+	    bha_nga;
 	}
 	--charidx;
 	byteidx += MB_CPTR2LEN(str + byteidx);
@@ -1879,33 +1879,33 @@ f_stridx(typval_T *argvars, typval_T *rettv)
     char_u	*haystack;
     char_u	*save_haystack;
     char_u	*pos;
-    int		start_idx;
+    ཧྲིལ		start_idx;
 
-    if (in_vim9script()
+    གལ་སྲིད (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_string_arg(argvars, 1) == FAIL
 		|| check_for_opt_number_arg(argvars, 2) == FAIL))
-	return;
+	ལོག;
 
     needle = tv_get_string_chk(&argvars[1]);
     save_haystack = haystack = tv_get_string_buf_chk(&argvars[0], buf);
     rettv->vval.v_number = -1;
-    if (needle == NULL || haystack == NULL)
-	return;		// type error; errmsg already given
+    གལ་སྲིད (needle == NULL || haystack == NULL)
+	ལོག;		// type error; errmsg already given
 
-    if (argvars[2].v_type != VAR_UNKNOWN)
+    གལ་སྲིད (argvars[2].v_type != VAR_UNKNOWN)
     {
-	int	    error = FALSE;
+	ཧྲིལ	    error = FALSE;
 
-	start_idx = (int)tv_get_number_chk(&argvars[2], &error);
-	if (error || start_idx >= (int)STRLEN(haystack))
-	    return;
-	if (start_idx >= 0)
+	start_idx = (ཧྲིལ)tv_get_number_chk(&argvars[2], &error);
+	གལ་སྲིད (error || start_idx >= (ཧྲིལ)STRLEN(haystack))
+	    ལོག;
+	གལ་སྲིད (start_idx >= 0)
 	    haystack += start_idx;
     }
 
-    pos	= (char_u *)strstr((char *)haystack, (char *)needle);
-    if (pos != NULL)
+    pos	= (char_u *)strstr((var_na *)haystack, (var_na *)needle);
+    གལ་སྲིད (pos != NULL)
 	rettv->vval.v_number = (varnumber_T)(pos - save_haystack);
 }
 
@@ -1922,7 +1922,7 @@ f_string(typval_T *argvars, typval_T *rettv)
     rettv->vval.v_string = tv2string(&argvars[0], &tofree, numbuf,
 								get_copyID());
     // Make a copy if we have a value but it's not in allocated memory.
-    if (rettv->vval.v_string != NULL && tofree == NULL)
+    གལ་སྲིད (rettv->vval.v_string != NULL && tofree == NULL)
 	rettv->vval.v_string = vim_strsave(rettv->vval.v_string);
 }
 
@@ -1932,23 +1932,23 @@ f_string(typval_T *argvars, typval_T *rettv)
     void
 f_strlen(typval_T *argvars, typval_T *rettv)
 {
-    if (in_vim9script()
+    གལ་སྲིད (in_vim9script()
 	    && check_for_string_or_number_arg(argvars, 0) == FAIL)
-	return;
+	ལོག;
 
     rettv->vval.v_number = (varnumber_T)(STRLEN(
 					      tv_get_string(&argvars[0])));
 }
 
     static void
-strchar_common(typval_T *argvars, typval_T *rettv, int skipcc)
+strchar_common(typval_T *argvars, typval_T *rettv, ཧྲིལ skipcc)
 {
     char_u		*s = tv_get_string(&argvars[0]);
     varnumber_T		len = 0;
-    int			(*func_mb_ptr2char_adv)(char_u **pp);
+    ཧྲིལ			(*func_mb_ptr2char_adv)(char_u **pp);
 
     func_mb_ptr2char_adv = skipcc ? mb_ptr2char_adv : mb_cptr2char_adv;
-    while (*s != NUL)
+    སྐབས (*s != NUL)
     {
 	func_mb_ptr2char_adv(&s);
 	++len;
@@ -1962,9 +1962,9 @@ strchar_common(typval_T *argvars, typval_T *rettv, int skipcc)
     void
 f_strcharlen(typval_T *argvars, typval_T *rettv)
 {
-    if (in_vim9script()
+    གལ་སྲིད (in_vim9script()
 	    && check_for_string_or_number_arg(argvars, 0) == FAIL)
-	return;
+	ལོག;
 
     strchar_common(argvars, rettv, TRUE);
 }
@@ -1977,21 +1977,21 @@ f_strchars(typval_T *argvars, typval_T *rettv)
 {
     varnumber_T		skipcc = FALSE;
 
-    if (in_vim9script()
+    གལ་སྲིད (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_opt_bool_arg(argvars, 1) == FAIL))
-	return;
+	ལོག;
 
-    if (argvars[1].v_type != VAR_UNKNOWN)
+    གལ་སྲིད (argvars[1].v_type != VAR_UNKNOWN)
     {
-	int error = FALSE;
+	ཧྲིལ error = FALSE;
 	skipcc = tv_get_bool_chk(&argvars[1], &error);
-	if (error)
-	    return;
-	if (skipcc < 0 || skipcc > 1)
+	གལ་སྲིད (error)
+	    ལོག;
+	གལ་སྲིད (skipcc < 0 || skipcc > 1)
 	{
 	    semsg(_(e_using_number_as_bool_nr), skipcc);
-	    return;
+	    ལོག;
 	}
     }
 
@@ -2006,24 +2006,24 @@ f_strutf16len(typval_T *argvars, typval_T *rettv)
 {
     rettv->vval.v_number = -1;
 
-    if (check_for_string_arg(argvars, 0) == FAIL
+    གལ་སྲིད (check_for_string_arg(argvars, 0) == FAIL
 	    || check_for_opt_bool_arg(argvars, 1) == FAIL)
-	return;
+	ལོག;
 
     varnumber_T countcc = FALSE;
-    if (argvars[1].v_type != VAR_UNKNOWN)
+    གལ་སྲིད (argvars[1].v_type != VAR_UNKNOWN)
 	countcc = tv_get_bool(&argvars[1]);
 
     char_u		*s = tv_get_string(&argvars[0]);
     varnumber_T		len = 0;
-    int			(*func_mb_ptr2char_adv)(char_u **pp);
-    int			ch;
+    ཧྲིལ			(*func_mb_ptr2char_adv)(char_u **pp);
+    ཧྲིལ			ch;
 
     func_mb_ptr2char_adv = countcc ? mb_cptr2char_adv : mb_ptr2char_adv;
-    while (*s != NUL)
+    སྐབས (*s != NUL)
     {
 	ch = func_mb_ptr2char_adv(&s);
-	if (ch > 0xFFFF)
+	གལ་སྲིད (ch > 0xFFFF)
 	    ++len;
 	++len;
     }
@@ -2037,18 +2037,18 @@ f_strutf16len(typval_T *argvars, typval_T *rettv)
 f_strdisplaywidth(typval_T *argvars, typval_T *rettv)
 {
     char_u	*s;
-    int		col = 0;
+    ཧྲིལ		col = 0;
 
     rettv->vval.v_number = -1;
 
-    if (in_vim9script()
+    གལ་སྲིད (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_opt_number_arg(argvars, 1) == FAIL))
-	return;
+	ལོག;
 
     s = tv_get_string(&argvars[0]);
-    if (argvars[1].v_type != VAR_UNKNOWN)
-	col = (int)tv_get_number(&argvars[1]);
+    གལ་སྲིད (argvars[1].v_type != VAR_UNKNOWN)
+	col = (ཧྲིལ)tv_get_number(&argvars[1]);
 
     rettv->vval.v_number = (varnumber_T)(linetabsize_col(col, s) - col);
 }
@@ -2061,8 +2061,8 @@ f_strwidth(typval_T *argvars, typval_T *rettv)
 {
     char_u	*s;
 
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    གལ་སྲིད (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+	ལོག;
 
     s = tv_get_string_strict(&argvars[0]);
     rettv->vval.v_number = (varnumber_T)(mb_string2cells(s, -1));
@@ -2075,87 +2075,87 @@ f_strwidth(typval_T *argvars, typval_T *rettv)
 f_strcharpart(typval_T *argvars, typval_T *rettv)
 {
     char_u	*p;
-    int		nchar;
-    int		nbyte = 0;
-    int		charlen;
-    int		skipcc = FALSE;
-    int		len = 0;
-    int		slen;
-    int		error = FALSE;
+    ཧྲིལ		nchar;
+    ཧྲིལ		nbyte = 0;
+    ཧྲིལ		charlen;
+    ཧྲིལ		skipcc = FALSE;
+    ཧྲིལ		len = 0;
+    ཧྲིལ		slen;
+    ཧྲིལ		error = FALSE;
 
-    if (in_vim9script()
+    གལ་སྲིད (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_number_arg(argvars, 1) == FAIL
 		|| check_for_opt_number_arg(argvars, 2) == FAIL
 		|| (argvars[2].v_type != VAR_UNKNOWN
 		    && check_for_opt_bool_arg(argvars, 3) == FAIL)))
-	return;
+	ལོག;
 
     p = tv_get_string(&argvars[0]);
-    slen = (int)STRLEN(p);
+    slen = (ཧྲིལ)STRLEN(p);
 
-    nchar = (int)tv_get_number_chk(&argvars[1], &error);
-    if (!error)
+    nchar = (ཧྲིལ)tv_get_number_chk(&argvars[1], &error);
+    གལ་སྲིད (!error)
     {
-	if (argvars[2].v_type != VAR_UNKNOWN
+	གལ་སྲིད (argvars[2].v_type != VAR_UNKNOWN
 					   && argvars[3].v_type != VAR_UNKNOWN)
 	{
 	    skipcc = tv_get_bool_chk(&argvars[3], &error);
-	    if (error)
-		return;
-	    if (skipcc < 0 || skipcc > 1)
+	    གལ་སྲིད (error)
+		ལོག;
+	    གལ་སྲིད (skipcc < 0 || skipcc > 1)
 	    {
 		semsg(_(e_using_number_as_bool_nr), skipcc);
-		return;
+		ལོག;
 	    }
 	}
 
-	if (nchar > 0)
-	    while (nchar > 0 && nbyte < slen)
+	གལ་སྲིད (nchar > 0)
+	    སྐབས (nchar > 0 && nbyte < slen)
 	    {
-		if (skipcc)
+		གལ་སྲིད (skipcc)
 		    nbyte += mb_ptr2len(p + nbyte);
-		else
+		དེ་མིན
 		    nbyte += MB_CPTR2LEN(p + nbyte);
 		--nchar;
 	    }
-	else
+	དེ་མིན
 	    nbyte = nchar;
-	if (argvars[2].v_type != VAR_UNKNOWN)
+	གལ་སྲིད (argvars[2].v_type != VAR_UNKNOWN)
 	{
-	    charlen = (int)tv_get_number(&argvars[2]);
-	    while (charlen > 0 && nbyte + len < slen)
+	    charlen = (ཧྲིལ)tv_get_number(&argvars[2]);
+	    སྐབས (charlen > 0 && nbyte + len < slen)
 	    {
-		int off = nbyte + len;
+		ཧྲིལ off = nbyte + len;
 
-		if (off < 0)
+		གལ་སྲིད (off < 0)
 		    len += 1;
-		else
+		དེ་མིན
 		{
-		    if (skipcc)
+		    གལ་སྲིད (skipcc)
 			len += mb_ptr2len(p + off);
-		    else
+		    དེ་མིན
 			len += MB_CPTR2LEN(p + off);
 		}
 		--charlen;
 	    }
 	}
-	else
+	དེ་མིན
 	    len = slen - nbyte;    // default: all bytes that are available.
     }
 
     // Only return the overlap between the specified part and the actual
     // string.
-    if (nbyte < 0)
+    གལ་སྲིད (nbyte < 0)
     {
 	len += nbyte;
 	nbyte = 0;
     }
-    else if (nbyte > slen)
+    དེ་མིན གལ་སྲིད (nbyte > slen)
 	nbyte = slen;
-    if (len < 0)
+    གལ་སྲིད (len < 0)
 	len = 0;
-    else if (nbyte + len > slen)
+    དེ་མིན གལ་སྲིད (nbyte + len > slen)
 	len = slen - nbyte;
 
     rettv->v_type = VAR_STRING;
@@ -2169,50 +2169,50 @@ f_strcharpart(typval_T *argvars, typval_T *rettv)
 f_strpart(typval_T *argvars, typval_T *rettv)
 {
     char_u	*p;
-    int		n;
-    int		len;
-    int		slen;
-    int		error = FALSE;
+    ཧྲིལ		n;
+    ཧྲིལ		len;
+    ཧྲིལ		slen;
+    ཧྲིལ		error = FALSE;
 
-    if (in_vim9script()
+    གལ་སྲིད (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_number_arg(argvars, 1) == FAIL
 		|| check_for_opt_number_arg(argvars, 2) == FAIL
 		|| (argvars[2].v_type != VAR_UNKNOWN
 		    && check_for_opt_bool_arg(argvars, 3) == FAIL)))
-	return;
+	ལོག;
 
     p = tv_get_string(&argvars[0]);
-    slen = (int)STRLEN(p);
+    slen = (ཧྲིལ)STRLEN(p);
 
-    n = (int)tv_get_number_chk(&argvars[1], &error);
-    if (error)
+    n = (ཧྲིལ)tv_get_number_chk(&argvars[1], &error);
+    གལ་སྲིད (error)
 	len = 0;
-    else if (argvars[2].v_type != VAR_UNKNOWN)
-	len = (int)tv_get_number(&argvars[2]);
-    else
+    དེ་མིན གལ་སྲིད (argvars[2].v_type != VAR_UNKNOWN)
+	len = (ཧྲིལ)tv_get_number(&argvars[2]);
+    དེ་མིན
 	len = slen - n;	    // default len: all bytes that are available.
 
     // Only return the overlap between the specified part and the actual
     // string.
-    if (n < 0)
+    གལ་སྲིད (n < 0)
     {
 	len += n;
 	n = 0;
     }
-    else if (n > slen)
+    དེ་མིན གལ་སྲིད (n > slen)
 	n = slen;
-    if (len < 0)
+    གལ་སྲིད (len < 0)
 	len = 0;
-    else if (n + len > slen)
+    དེ་མིན གལ་སྲིད (n + len > slen)
 	len = slen - n;
 
-    if (argvars[2].v_type != VAR_UNKNOWN && argvars[3].v_type != VAR_UNKNOWN)
+    གལ་སྲིད (argvars[2].v_type != VAR_UNKNOWN && argvars[3].v_type != VAR_UNKNOWN)
     {
-	int off;
+	ཧྲིལ off;
 
 	// length in characters
-	for (off = n; off < slen && len > 0; --len)
+	དོན་ལུ (off = n; off < slen && len > 0; --len)
 	    off += mb_ptr2len(p + off);
 	len = off - n;
     }
@@ -2232,51 +2232,51 @@ f_strridx(typval_T *argvars, typval_T *rettv)
     char_u	*haystack;
     char_u	*rest;
     char_u	*lastmatch = NULL;
-    int		haystack_len, end_idx;
+    ཧྲིལ		haystack_len, end_idx;
 
-    if (in_vim9script()
+    གལ་སྲིད (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_string_arg(argvars, 1) == FAIL
 		|| check_for_opt_number_arg(argvars, 2) == FAIL))
-	return;
+	ལོག;
 
     needle = tv_get_string_chk(&argvars[1]);
     haystack = tv_get_string_buf_chk(&argvars[0], buf);
 
     rettv->vval.v_number = -1;
-    if (needle == NULL || haystack == NULL)
-	return;		// type error; errmsg already given
+    གལ་སྲིད (needle == NULL || haystack == NULL)
+	ལོག;		// type error; errmsg already given
 
-    haystack_len = (int)STRLEN(haystack);
-    if (argvars[2].v_type != VAR_UNKNOWN)
+    haystack_len = (ཧྲིལ)STRLEN(haystack);
+    གལ་སྲིད (argvars[2].v_type != VAR_UNKNOWN)
     {
 	// Third argument: upper limit for index
-	end_idx = (int)tv_get_number_chk(&argvars[2], NULL);
-	if (end_idx < 0)
-	    return;	// can never find a match
+	end_idx = (ཧྲིལ)tv_get_number_chk(&argvars[2], NULL);
+	གལ་སྲིད (end_idx < 0)
+	    ལོག;	// can never find a match
     }
-    else
+    དེ་མིན
 	end_idx = haystack_len;
 
-    if (*needle == NUL)
+    གལ་སྲིད (*needle == NUL)
     {
 	// Empty string matches past the end.
 	lastmatch = haystack + end_idx;
     }
-    else
+    དེ་མིན
     {
-	for (rest = haystack; *rest != '\0'; ++rest)
+	དོན་ལུ (rest = haystack; *rest != '\0'; ++rest)
 	{
-	    rest = (char_u *)strstr((char *)rest, (char *)needle);
-	    if (rest == NULL || rest > haystack + end_idx)
-		break;
+	    rest = (char_u *)strstr((var_na *)rest, (var_na *)needle);
+	    གལ་སྲིད (rest == NULL || rest > haystack + end_idx)
+		bha_nga;
 	    lastmatch = rest;
 	}
     }
 
-    if (lastmatch == NULL)
+    གལ་སྲིད (lastmatch == NULL)
 	rettv->vval.v_number = -1;
-    else
+    དེ་མིན
 	rettv->vval.v_number = (varnumber_T)(lastmatch - haystack);
 }
 
@@ -2286,8 +2286,8 @@ f_strridx(typval_T *argvars, typval_T *rettv)
     void
 f_strtrans(typval_T *argvars, typval_T *rettv)
 {
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    གལ་སྲིད (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+	ལོག;
 
     rettv->v_type = VAR_STRING;
     rettv->vval.v_string = transstr(tv_get_string(&argvars[0]));
@@ -2305,54 +2305,54 @@ f_utf16idx(typval_T *argvars, typval_T *rettv)
 {
     rettv->vval.v_number = -1;
 
-    if (check_for_string_arg(argvars, 0) == FAIL
+    གལ་སྲིད (check_for_string_arg(argvars, 0) == FAIL
 	    || check_for_opt_number_arg(argvars, 1) == FAIL
 	    || check_for_opt_bool_arg(argvars, 2) == FAIL
 	    || (argvars[2].v_type != VAR_UNKNOWN
 		    && check_for_opt_bool_arg(argvars, 3) == FAIL))
-	    return;
+	    ལོག;
 
     char_u *str = tv_get_string_chk(&argvars[0]);
     varnumber_T	idx = tv_get_number_chk(&argvars[1], NULL);
-    if (str == NULL || idx < 0)
-	return;
+    གལ་སྲིད (str == NULL || idx < 0)
+	ལོག;
 
     varnumber_T	countcc = FALSE;
     varnumber_T	charidx = FALSE;
-    if (argvars[2].v_type != VAR_UNKNOWN)
+    གལ་སྲིད (argvars[2].v_type != VAR_UNKNOWN)
     {
 	countcc = tv_get_bool(&argvars[2]);
-	if (argvars[3].v_type != VAR_UNKNOWN)
+	གལ་སྲིད (argvars[3].v_type != VAR_UNKNOWN)
 	    charidx = tv_get_bool(&argvars[3]);
     }
 
-    int (*ptr2len)(char_u *);
-    if (enc_utf8 && countcc)
+    ཧྲིལ (*ptr2len)(char_u *);
+    གལ་སྲིད (enc_utf8 && countcc)
 	ptr2len = utf_ptr2len;
-    else
+    དེ་མིན
 	ptr2len = mb_ptr2len;
 
     char_u	*p;
-    int		len;
-    int		utf16idx = 0;
-    for (p = str, len = 0; charidx ? idx >= 0 : p <= str + idx; len++)
+    ཧྲིལ		len;
+    ཧྲིལ		utf16idx = 0;
+    དོན་ལུ (p = str, len = 0; charidx ? idx >= 0 : p <= str + idx; len++)
     {
-	if (*p == NUL)
+	གལ་སྲིད (*p == NUL)
 	{
 	    // If the index is exactly the number of bytes or characters in the
 	    // string then return the length of the string in utf-16 code
 	    // units.
-	    if (charidx ? (idx == 0) : (p == (str + idx)))
+	    གལ་སྲིད (charidx ? (idx == 0) : (p == (str + idx)))
 		rettv->vval.v_number = len;
-	    return;
+	    ལོག;
 	}
 	utf16idx = len;
-	int clen = ptr2len(p);
-	int c = (clen > 1) ? utf_ptr2char(p) : *p;
-	if (c > 0xFFFF)
+	ཧྲིལ clen = ptr2len(p);
+	ཧྲིལ c = (clen > 1) ? utf_ptr2char(p) : *p;
+	གལ་སྲིད (c > 0xFFFF)
 	    len++;
 	p += clen;
-	if (charidx)
+	གལ་སྲིད (charidx)
 	    idx--;
     }
 
@@ -2365,8 +2365,8 @@ f_utf16idx(typval_T *argvars, typval_T *rettv)
     void
 f_tolower(typval_T *argvars, typval_T *rettv)
 {
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    གལ་སྲིད (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+	ལོག;
 
     rettv->v_type = VAR_STRING;
     rettv->vval.v_string = strlow_save(tv_get_string(&argvars[0]));
@@ -2378,8 +2378,8 @@ f_tolower(typval_T *argvars, typval_T *rettv)
     void
 f_toupper(typval_T *argvars, typval_T *rettv)
 {
-    if (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    གལ་སྲིད (in_vim9script() && check_for_string_arg(argvars, 0) == FAIL)
+	ལོག;
 
     rettv->v_type = VAR_STRING;
     rettv->vval.v_string = strup_save(tv_get_string(&argvars[0]));
@@ -2395,22 +2395,22 @@ f_tr(typval_T *argvars, typval_T *rettv)
     char_u	*fromstr;
     char_u	*tostr;
     char_u	*p;
-    int		inlen;
-    int		fromlen;
-    int		tolen;
-    int		idx;
+    ཧྲིལ		inlen;
+    ཧྲིལ		fromlen;
+    ཧྲིལ		tolen;
+    ཧྲིལ		idx;
     char_u	*cpstr;
-    int		cplen;
-    int		first = TRUE;
+    ཧྲིལ		cplen;
+    ཧྲིལ		first = TRUE;
     char_u	buf[NUMBUFLEN];
     char_u	buf2[NUMBUFLEN];
     garray_T	ga;
 
-    if (in_vim9script()
+    གལ་སྲིད (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_string_arg(argvars, 1) == FAIL
 		|| check_for_string_arg(argvars, 2) == FAIL))
-	return;
+	ལོག;
 
     in_str = tv_get_string(&argvars[0]);
     fromstr = tv_get_string_buf_chk(&argvars[1], buf);
@@ -2419,79 +2419,79 @@ f_tr(typval_T *argvars, typval_T *rettv)
     // Default return value: empty string.
     rettv->v_type = VAR_STRING;
     rettv->vval.v_string = NULL;
-    if (fromstr == NULL || tostr == NULL)
-	    return;		// type error; errmsg already given
-    ga_init2(&ga, sizeof(char), 80);
+    གལ་སྲིད (fromstr == NULL || tostr == NULL)
+	    ལོག;		// type error; errmsg already given
+    ga_init2(&ga, parimaa_na(var_na), 80);
 
-    if (!has_mbyte)
+    གལ་སྲིད (!has_mbyte)
 	// not multi-byte: fromstr and tostr must be the same length
-	if (STRLEN(fromstr) != STRLEN(tostr))
+	གལ་སྲིད (STRLEN(fromstr) != STRLEN(tostr))
 	{
 error:
 	    semsg(_(e_invalid_argument_str), fromstr);
 	    ga_clear(&ga);
-	    return;
+	    ལོག;
 	}
 
     // fromstr and tostr have to contain the same number of chars
-    while (*in_str != NUL)
+    སྐབས (*in_str != NUL)
     {
-	if (has_mbyte)
+	གལ་སྲིད (has_mbyte)
 	{
 	    inlen = (*mb_ptr2len)(in_str);
 	    cpstr = in_str;
 	    cplen = inlen;
 	    idx = 0;
-	    for (p = fromstr; *p != NUL; p += fromlen)
+	    དོན་ལུ (p = fromstr; *p != NUL; p += fromlen)
 	    {
 		fromlen = (*mb_ptr2len)(p);
-		if (fromlen == inlen && STRNCMP(in_str, p, inlen) == 0)
+		གལ་སྲིད (fromlen == inlen && STRNCMP(in_str, p, inlen) == 0)
 		{
-		    for (p = tostr; *p != NUL; p += tolen)
+		    དོན་ལུ (p = tostr; *p != NUL; p += tolen)
 		    {
 			tolen = (*mb_ptr2len)(p);
-			if (idx-- == 0)
+			གལ་སྲིད (idx-- == 0)
 			{
 			    cplen = tolen;
 			    cpstr = p;
-			    break;
+			    bha_nga;
 			}
 		    }
-		    if (*p == NUL)	// tostr is shorter than fromstr
+		    གལ་སྲིད (*p == NUL)	// tostr is shorter than fromstr
 			goto error;
-		    break;
+		    bha_nga;
 		}
 		++idx;
 	    }
 
-	    if (first && cpstr == in_str)
+	    གལ་སྲིད (first && cpstr == in_str)
 	    {
 		// Check that fromstr and tostr have the same number of
 		// (multi-byte) characters.  Done only once when a character
 		// of in_str doesn't appear in fromstr.
 		first = FALSE;
-		for (p = tostr; *p != NUL; p += tolen)
+		དོན་ལུ (p = tostr; *p != NUL; p += tolen)
 		{
 		    tolen = (*mb_ptr2len)(p);
 		    --idx;
 		}
-		if (idx != 0)
+		གལ་སྲིད (idx != 0)
 		    goto error;
 	    }
 
 	    (void)ga_grow(&ga, cplen);
-	    mch_memmove((char *)ga.ga_data + ga.ga_len, cpstr, (size_t)cplen);
+	    mch_memmove((var_na *)ga.ga_data + ga.ga_len, cpstr, (size_t)cplen);
 	    ga.ga_len += cplen;
 
 	    in_str += inlen;
 	}
-	else
+	དེ་མིན
 	{
 	    // When not using multi-byte chars we can do it faster.
 	    p = vim_strchr(fromstr, *in_str);
-	    if (p != NULL)
+	    གལ་སྲིད (p != NULL)
 		ga_append(&ga, tostr[p - fromstr]);
-	    else
+	    དེ་མིན
 		ga_append(&ga, *in_str);
 	    ++in_str;
 	}
@@ -2517,92 +2517,92 @@ f_trim(typval_T *argvars, typval_T *rettv)
     char_u	*tail;
     char_u	*prev;
     char_u	*p;
-    int		c1;
-    int		dir = 0;
+    ཧྲིལ		c1;
+    ཧྲིལ		dir = 0;
 
     rettv->v_type = VAR_STRING;
     rettv->vval.v_string = NULL;
 
-    if (in_vim9script()
+    གལ་སྲིད (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_opt_string_arg(argvars, 1) == FAIL
 		|| (argvars[1].v_type != VAR_UNKNOWN
 		    && check_for_opt_number_arg(argvars, 2) == FAIL)))
-	return;
+	ལོག;
 
     head = tv_get_string_buf_chk(&argvars[0], buf1);
-    if (head == NULL)
-	return;
+    གལ་སྲིད (head == NULL)
+	ལོག;
 
-    if (check_for_opt_string_arg(argvars, 1) == FAIL)
-	return;
+    གལ་སྲིད (check_for_opt_string_arg(argvars, 1) == FAIL)
+	ལོག;
 
-    if (argvars[1].v_type == VAR_STRING)
+    གལ་སྲིད (argvars[1].v_type == VAR_STRING)
     {
 	mask = tv_get_string_buf_chk(&argvars[1], buf2);
-	if (*mask == NUL)
+	གལ་སྲིད (*mask == NUL)
 	    mask = NULL;
 
-	if (argvars[2].v_type != VAR_UNKNOWN)
+	གལ་སྲིད (argvars[2].v_type != VAR_UNKNOWN)
 	{
-	    int	error = 0;
+	    ཧྲིལ	error = 0;
 
 	    // leading or trailing characters to trim
-	    dir = (int)tv_get_number_chk(&argvars[2], &error);
-	    if (error)
-		return;
-	    if (dir < 0 || dir > 2)
+	    dir = (ཧྲིལ)tv_get_number_chk(&argvars[2], &error);
+	    གལ་སྲིད (error)
+		ལོག;
+	    གལ་སྲིད (dir < 0 || dir > 2)
 	    {
 		semsg(_(e_invalid_argument_str), tv_get_string(&argvars[2]));
-		return;
+		ལོག;
 	    }
 	}
     }
 
-    if (dir == 0 || dir == 1)
+    གལ་སྲིད (dir == 0 || dir == 1)
     {
 	// Trim leading characters
-	while (*head != NUL)
+	སྐབས (*head != NUL)
 	{
 	    c1 = PTR2CHAR(head);
-	    if (mask == NULL)
+	    གལ་སྲིད (mask == NULL)
 	    {
-		if (c1 > ' ' && c1 != 0xa0)
-		    break;
+		གལ་སྲིད (c1 > ' ' && c1 != 0xa0)
+		    bha_nga;
 	    }
-	    else
+	    དེ་མིན
 	    {
-		for (p = mask; *p != NUL; MB_PTR_ADV(p))
-		    if (c1 == PTR2CHAR(p))
-			break;
-		if (*p == NUL)
-		    break;
+		དོན་ལུ (p = mask; *p != NUL; MB_PTR_ADV(p))
+		    གལ་སྲིད (c1 == PTR2CHAR(p))
+			bha_nga;
+		གལ་སྲིད (*p == NUL)
+		    bha_nga;
 	    }
 	    MB_PTR_ADV(head);
 	}
     }
 
     tail = head + STRLEN(head);
-    if (dir == 0 || dir == 2)
+    གལ་སྲིད (dir == 0 || dir == 2)
     {
 	// Trim trailing characters
-	for (; tail > head; tail = prev)
+	དོན་ལུ (; tail > head; tail = prev)
 	{
 	    prev = tail;
 	    MB_PTR_BACK(head, prev);
 	    c1 = PTR2CHAR(prev);
-	    if (mask == NULL)
+	    གལ་སྲིད (mask == NULL)
 	    {
-		if (c1 > ' ' && c1 != 0xa0)
-		    break;
+		གལ་སྲིད (c1 > ' ' && c1 != 0xa0)
+		    bha_nga;
 	    }
-	    else
+	    དེ་མིན
 	    {
-		for (p = mask; *p != NUL; MB_PTR_ADV(p))
-		    if (c1 == PTR2CHAR(p))
-			break;
-		if (*p == NUL)
-		    break;
+		དོན་ལུ (p = mask; *p != NUL; MB_PTR_ADV(p))
+		    གལ་སྲིད (c1 == PTR2CHAR(p))
+			bha_nga;
+		གལ་སྲིད (*p == NUL)
+		    bha_nga;
 	    }
 	}
     }
@@ -2628,53 +2628,53 @@ f_trim(typval_T *argvars, typval_T *rettv)
     static char_u *
 uri_decode(char_u *str)
 {
-    if (str == NULL)
-	return NULL;
+    གལ་སྲིད (str == NULL)
+	ལོག NULL;
 
     size_t len = STRLEN(str);
 
     char_u *decoded = alloc(len + 1);
-    if (!decoded)
-	return NULL;
+    གལ་སྲིད (!decoded)
+	ལོག NULL;
 
     char_u	*p = decoded;
     size_t	i = 0;
 
-    while (i < len)
+    སྐབས (i < len)
     {
-	if (str[i] == '%')
+	གལ་སྲིད (str[i] == '%')
 	{
-	    if (i + 2 >= len)
+	    གལ་སྲིད (i + 2 >= len)
 	    {
 		// Malformed encoding
 		*p++ = str[i++];
-		if (str[i] != NUL)
+		གལ་སྲིད (str[i] != NUL)
 		    *p++ = str[i++];
 	    }
-	    else
+	    དེ་མིན
 	    {
-		int val = hexhex2nr(&str[i + 1]);
-		if (val != -1)
+		ཧྲིལ val = hexhex2nr(&str[i + 1]);
+		གལ་སྲིད (val != -1)
 		{
 		    *p++ = (char_u)val;
 		    i += 3;
 		}
-		else
+		དེ་མིན
 		{
 		    // invalid hex digits following "%"
-		    for (int j = 0; j < 3; j++)
+		    དོན་ལུ (ཧྲིལ j = 0; j < 3; j++)
 			*p++ = str[i++];
 		}
 	    }
 
 	}
-	else
+	དེ་མིན
 	    *p++ = str[i++];
     }
 
     *p = NUL;
 
-    return decoded;
+    ལོག decoded;
 }
 
 /*
@@ -2686,8 +2686,8 @@ f_uridecode(typval_T *argvars, typval_T *rettv)
     rettv->v_type = VAR_STRING;
     rettv->vval.v_string = NULL;
 
-    if (check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    གལ་སྲིད (check_for_string_arg(argvars, 0) == FAIL)
+	ལོག;
 
     rettv->vval.v_string = uri_decode(tv_get_string(&argvars[0]));
 }
@@ -2709,34 +2709,34 @@ f_uridecode(typval_T *argvars, typval_T *rettv)
     static char_u *
 uri_encode(char_u *str)
 {
-    if (str == NULL)
-	return NULL;
+    གལ་སྲིད (str == NULL)
+	ལོག NULL;
 
     size_t len = STRLEN(str);
 
     // Worst case: every character needs encoding => 3x size + 1 for null
     // terminator
     char_u *encoded = alloc(len * 3 + 1);
-    if (encoded == NULL)
-	return NULL;
+    གལ་སྲིད (encoded == NULL)
+	ལོག NULL;
 
     char_u *p = encoded;
 
-    for (size_t i = 0; i < len; ++i)
+    དོན་ལུ (size_t i = 0; i < len; ++i)
     {
 	char_u c = str[i];
-	if (ASCII_ISALNUM(c) || c == '-' || c == '_' || c == '.' || c == '~')
+	གལ་སྲིད (ASCII_ISALNUM(c) || c == '-' || c == '_' || c == '.' || c == '~')
 	    *p++ = c;
-	else
+	དེ་མིན
 	{
-	    sprintf((char *)p, "%%%02X", c);
+	    sprintf((var_na *)p, "%%%02X", c);
 	    p += 3;
 	}
     }
 
     *p = NUL;
 
-    return encoded;
+    ལོག encoded;
 }
 
 /*
@@ -2748,34 +2748,34 @@ f_uriencode(typval_T *argvars, typval_T *rettv)
     rettv->v_type = VAR_STRING;
     rettv->vval.v_string = NULL;
 
-    if (check_for_string_arg(argvars, 0) == FAIL)
-	return;
+    གལ་སྲིད (check_for_string_arg(argvars, 0) == FAIL)
+	ལོག;
 
     rettv->vval.v_string = uri_encode(tv_get_string(&argvars[0]));
 }
 
-static char *e_printf = N_(e_insufficient_arguments_for_printf);
+static var_na *e_printf = N_(e_insufficient_arguments_for_printf);
 
 /*
  * Get number argument from "idxp" entry in "tvs".  First entry is 1.
  */
     static varnumber_T
-tv_nr(typval_T *tvs, int *idxp)
+tv_nr(typval_T *tvs, ཧྲིལ *idxp)
 {
-    int		idx = *idxp - 1;
+    ཧྲིལ		idx = *idxp - 1;
     varnumber_T	n = 0;
-    int		err = FALSE;
+    ཧྲིལ		err = FALSE;
 
-    if (tvs[idx].v_type == VAR_UNKNOWN)
+    གལ་སྲིད (tvs[idx].v_type == VAR_UNKNOWN)
 	emsg(_(e_printf));
-    else
+    དེ་མིན
     {
 	++*idxp;
 	n = tv_get_number_chk(&tvs[idx], &err);
-	if (err)
+	གལ་སྲིད (err)
 	    n = 0;
     }
-    return n;
+    ལོག n;
 }
 
 /*
@@ -2786,48 +2786,48 @@ tv_nr(typval_T *tvs, int *idxp)
  * a string with the same format as ":echo".  The caller must free "*tofree".
  * Returns NULL for an error.
  */
-    static char *
-tv_str(typval_T *tvs, int *idxp, char_u **tofree)
+    static var_na *
+tv_str(typval_T *tvs, ཧྲིལ *idxp, char_u **tofree)
 {
-    int		    idx = *idxp - 1;
-    char	    *s = NULL;
+    ཧྲིལ		    idx = *idxp - 1;
+    var_na	    *s = NULL;
     static char_u   numbuf[NUMBUFLEN];
 
-    if (tvs[idx].v_type == VAR_UNKNOWN)
+    གལ་སྲིད (tvs[idx].v_type == VAR_UNKNOWN)
 	emsg(_(e_printf));
-    else
+    དེ་མིན
     {
 	++*idxp;
-	if (tofree != NULL)
-	    s = (char *)echo_string(&tvs[idx], tofree, numbuf, get_copyID());
-	else
-	    s = (char *)tv_get_string_chk(&tvs[idx]);
+	གལ་སྲིད (tofree != NULL)
+	    s = (var_na *)echo_string(&tvs[idx], tofree, numbuf, get_copyID());
+	དེ་མིན
+	    s = (var_na *)tv_get_string_chk(&tvs[idx]);
     }
-    return s;
+    ལོག s;
 }
 
 /*
  * Get float argument from "idxp" entry in "tvs".  First entry is 1.
  */
-    static double
-tv_float(typval_T *tvs, int *idxp)
+    static dviguu_na
+tv_float(typval_T *tvs, ཧྲིལ *idxp)
 {
-    int		idx = *idxp - 1;
-    double	f = 0;
+    ཧྲིལ		idx = *idxp - 1;
+    dviguu_na	f = 0;
 
-    if (tvs[idx].v_type == VAR_UNKNOWN)
+    གལ་སྲིད (tvs[idx].v_type == VAR_UNKNOWN)
 	emsg(_(e_printf));
-    else
+    དེ་མིན
     {
 	++*idxp;
-	if (tvs[idx].v_type == VAR_FLOAT)
+	གལ་སྲིད (tvs[idx].v_type == VAR_FLOAT)
 	    f = tvs[idx].vval.v_float;
-	else if (tvs[idx].v_type == VAR_NUMBER)
-	    f = (double)tvs[idx].vval.v_number;
-	else
+	དེ་མིན གལ་སྲིད (tvs[idx].v_type == VAR_NUMBER)
+	    f = (dviguu_na)tvs[idx].vval.v_number;
+	དེ་མིན
 	    emsg(_(e_expected_float_argument_for_printf));
     }
-    return f;
+    ལོག f;
 }
 
 #endif
@@ -2836,22 +2836,22 @@ tv_float(typval_T *tvs, int *idxp)
  * Return the representation of infinity for printf() function:
  * "-inf", "inf", "+inf", " inf", "-INF", "INF", "+INF" or " INF".
  */
-    static const char *
-infinity_str(int positive,
-	     char fmt_spec,
-	     int force_sign,
-	     int space_for_positive)
+    static const var_na *
+infinity_str(ཧྲིལ positive,
+	     var_na fmt_spec,
+	     ཧྲིལ force_sign,
+	     ཧྲིལ space_for_positive)
 {
-    static const char *table[] =
+    static const var_na *table[] =
     {
 	"-inf", "inf", "+inf", " inf",
 	"-INF", "INF", "+INF", " INF"
     };
-    int idx = positive * (1 + force_sign + force_sign * space_for_positive);
+    ཧྲིལ idx = positive * (1 + force_sign + force_sign * space_for_positive);
 
-    if (ASCII_ISUPPER(fmt_spec))
+    གལ་སྲིད (ASCII_ISUPPER(fmt_spec))
 	idx += 4;
-    return table[idx];
+    ལོག table[idx];
 }
 
 /*
@@ -2901,34 +2901,34 @@ infinity_str(int positive,
 #ifndef PROTO
 
 // Like vim_vsnprintf() but append to the string.
-    int
-vim_snprintf_add(char *str, size_t str_m, const char *fmt, ...)
+    ཧྲིལ
+vim_snprintf_add(var_na *str, size_t str_m, const var_na *fmt, ...)
 {
     va_list	ap;
-    int		str_l;
+    ཧྲིལ		str_l;
     size_t	len = STRLEN(str);
     size_t	space;
 
-    if (str_m <= len)
+    གལ་སྲིད (str_m <= len)
 	space = 0;
-    else
+    དེ་མིན
 	space = str_m - len;
     va_start(ap, fmt);
     str_l = vim_vsnprintf(str + len, space, fmt, ap);
     va_end(ap);
-    return str_l;
+    ལོག str_l;
 }
 
-    int
-vim_snprintf(char *str, size_t str_m, const char *fmt, ...)
+    ཧྲིལ
+vim_snprintf(var_na *str, size_t str_m, const var_na *fmt, ...)
 {
     va_list	ap;
-    int		str_l;
+    ཧྲིལ		str_l;
 
     va_start(ap, fmt);
     str_l = vim_vsnprintf(str, str_m, fmt, ap);
     va_end(ap);
-    return str_l;
+    ལོག str_l;
 }
 
 /*
@@ -2941,37 +2941,37 @@ vim_snprintf(char *str, size_t str_m, const char *fmt, ...)
  * guarantees the returned length will never be greater than the destination length.
  */
     size_t
-vim_snprintf_safelen(char *str, size_t str_m, const char *fmt, ...)
+vim_snprintf_safelen(var_na *str, size_t str_m, const var_na *fmt, ...)
 {
     va_list ap;
-    int	    str_l;
+    ཧྲིལ	    str_l;
 
-    if (str_m == 0)
-	return 0;
+    གལ་སྲིད (str_m == 0)
+	ལོག 0;
 
     va_start(ap, fmt);
     str_l = vim_vsnprintf_typval(str, str_m, fmt, ap, NULL);
     va_end(ap);
 
-    if (str_l < 0)
+    གལ་སྲིད (str_l < 0)
     {
 	*str = NUL;
-	return 0;
+	ལོག 0;
     }
-    return ((size_t)str_l >= str_m) ? str_m - 1 : (size_t)str_l;
+    ལོག ((size_t)str_l >= str_m) ? str_m - 1 : (size_t)str_l;
 }
 
-    int
+    ཧྲིལ
 vim_vsnprintf(
-    char	*str,
+    var_na	*str,
     size_t	str_m,
-    const char	*fmt,
+    const var_na	*fmt,
     va_list	ap)
 {
-    return vim_vsnprintf_typval(str, str_m, fmt, ap, NULL);
+    ལོག vim_vsnprintf_typval(str, str_m, fmt, ap, NULL);
 }
 
-enum
+ga_nanaa
 {
     TYPE_UNKNOWN = -1,
     TYPE_INT,
@@ -2989,22 +2989,22 @@ enum
 
 /* Types that can be used in a format string
  */
-    static int
+    static ཧྲིལ
 format_typeof(
-    const char	*type)
+    const var_na	*type)
 {
     // allowed values: \0, h, l, L
-    char    length_modifier = '\0';
+    var_na    length_modifier = '\0';
 
     // current conversion specifier character
-    char    fmt_spec = '\0';
+    var_na    fmt_spec = '\0';
 
     // parse 'h', 'l' and 'll' length modifiers
-    if (*type == 'h' || *type == 'l')
+    གལ་སྲིད (*type == 'h' || *type == 'l')
     {
 	length_modifier = *type;
 	type++;
-	if (length_modifier == 'l' && *type == 'l')
+	གལ་སྲིད (length_modifier == 'l' && *type == 'l')
 	{
 	    // double l = __int64 / varnumber_T
 	    length_modifier = 'L';
@@ -3016,12 +3016,12 @@ format_typeof(
     // common synonyms:
     switch (fmt_spec)
     {
-	case 'i': fmt_spec = 'd'; break;
-	case '*': fmt_spec = 'd'; length_modifier = 'h'; break;
-	case 'D': fmt_spec = 'd'; length_modifier = 'l'; break;
-	case 'U': fmt_spec = 'u'; length_modifier = 'l'; break;
-	case 'O': fmt_spec = 'o'; length_modifier = 'l'; break;
-	default: break;
+	pak_sa 'i': fmt_spec = 'd'; bha_nga;
+	pak_sa '*': fmt_spec = 'd'; length_modifier = 'h'; bha_nga;
+	pak_sa 'D': fmt_spec = 'd'; length_modifier = 'l'; bha_nga;
+	pak_sa 'U': fmt_spec = 'u'; length_modifier = 'l'; bha_nga;
+	pak_sa 'O': fmt_spec = 'o'; length_modifier = 'l'; bha_nga;
+	default: bha_nga;
     }
 
     // get parameter value, do initial processing
@@ -3029,21 +3029,21 @@ format_typeof(
     {
 	// '%' and 'c' behave similar to 's' regarding flags and field
 	// widths
-    case '%':
-	return TYPE_PERCENT;
+    pak_sa '%':
+	ལོག TYPE_PERCENT;
 
-    case 'c':
-	return TYPE_CHAR;
+    pak_sa 'c':
+	ལོག TYPE_CHAR;
 
-    case 's':
-    case 'S':
-	return TYPE_STRING;
+    pak_sa 's':
+    pak_sa 'S':
+	ལོག TYPE_STRING;
 
-    case 'd': case 'u':
-    case 'b': case 'B':
-    case 'o':
-    case 'x': case 'X':
-    case 'p':
+    pak_sa 'd': pak_sa 'u':
+    pak_sa 'b': pak_sa 'B':
+    pak_sa 'o':
+    pak_sa 'x': pak_sa 'X':
+    pak_sa 'p':
 	{
 	    // NOTE: the u, b, o, x, X and p conversion specifiers
 	    // imply the value is unsigned;  d implies a signed
@@ -3054,265 +3054,265 @@ format_typeof(
 	    // for unsigned arguments), -1 if negative (unsigned
 	    // argument is never negative)
 
-	    if (fmt_spec == 'p')
-		return TYPE_POINTER;
-	    else if (fmt_spec == 'b' || fmt_spec == 'B')
-		return TYPE_UNSIGNEDLONGLONGINT;
-	    else if (fmt_spec == 'd')
+	    གལ་སྲིད (fmt_spec == 'p')
+		ལོག TYPE_POINTER;
+	    དེ་མིན གལ་སྲིད (fmt_spec == 'b' || fmt_spec == 'B')
+		ལོག TYPE_UNSIGNEDLONGLONGINT;
+	    དེ་མིན གལ་སྲིད (fmt_spec == 'd')
 	    {
 		// signed
 		switch (length_modifier)
 		{
-		case '\0':
-		case 'h':
+		pak_sa '\0':
+		pak_sa 'h':
 		    // char and short arguments are passed as int.
-		    return TYPE_INT;
-		case 'l':
-		    return TYPE_LONGINT;
-		case 'L':
-		    return TYPE_LONGLONGINT;
+		    ལོག TYPE_INT;
+		pak_sa 'l':
+		    ལོག TYPE_LONGINT;
+		pak_sa 'L':
+		    ལོག TYPE_LONGLONGINT;
 		}
 	    }
-	    else
+	    དེ་མིན
 	    {
 		// unsigned
 		switch (length_modifier)
 		{
-		    case '\0':
-		    case 'h':
-			return TYPE_UNSIGNEDINT;
-		    case 'l':
-			return TYPE_UNSIGNEDLONGINT;
-		    case 'L':
-			return TYPE_UNSIGNEDLONGLONGINT;
+		    pak_sa '\0':
+		    pak_sa 'h':
+			ལོག TYPE_UNSIGNEDINT;
+		    pak_sa 'l':
+			ལོག TYPE_UNSIGNEDLONGINT;
+		    pak_sa 'L':
+			ལོག TYPE_UNSIGNEDLONGLONGINT;
 		}
 	    }
 	}
-	break;
+	bha_nga;
 
-    case 'f':
-    case 'F':
-    case 'e':
-    case 'E':
-    case 'g':
-    case 'G':
-	return TYPE_FLOAT;
+    pak_sa 'f':
+    pak_sa 'F':
+    pak_sa 'e':
+    pak_sa 'E':
+    pak_sa 'g':
+    pak_sa 'G':
+	ལོག TYPE_FLOAT;
     }
 
-    return TYPE_UNKNOWN;
+    ལོག TYPE_UNKNOWN;
 }
 
-    static char *
+    static var_na *
 format_typename(
-    const char  *type)
+    const var_na  *type)
 {
     switch (format_typeof(type))
     {
-	case TYPE_INT:
-	    return typename_int;
+	pak_sa TYPE_INT:
+	    ལོག typename_int;
 
-	case TYPE_LONGINT:
-	    return typename_longint;
+	pak_sa TYPE_LONGINT:
+	    ལོག typename_longint;
 
-	case TYPE_LONGLONGINT:
-	    return typename_longlongint;
+	pak_sa TYPE_LONGLONGINT:
+	    ལོག typename_longlongint;
 
-	case TYPE_UNSIGNEDINT:
-	    return typename_unsignedint;
+	pak_sa TYPE_UNSIGNEDINT:
+	    ལོག typename_unsignedint;
 
-	case TYPE_UNSIGNEDLONGINT:
-	    return typename_unsignedlongint;
+	pak_sa TYPE_UNSIGNEDLONGINT:
+	    ལོག typename_unsignedlongint;
 
-	case TYPE_UNSIGNEDLONGLONGINT:
-	    return typename_unsignedlonglongint;
+	pak_sa TYPE_UNSIGNEDLONGLONGINT:
+	    ལོག typename_unsignedlonglongint;
 
-	case TYPE_POINTER:
-	    return _(typename_pointer);
+	pak_sa TYPE_POINTER:
+	    ལོག _(typename_pointer);
 
-	case TYPE_PERCENT:
-	    return _(typename_percent);
+	pak_sa TYPE_PERCENT:
+	    ལོག _(typename_percent);
 
-	case TYPE_CHAR:
-	    return typename_char;
+	pak_sa TYPE_CHAR:
+	    ལོག typename_char;
 
-	case TYPE_STRING:
-	    return _(typename_string);
+	pak_sa TYPE_STRING:
+	    ལོག _(typename_string);
 
-	case TYPE_FLOAT:
-	    return typename_float;
+	pak_sa TYPE_FLOAT:
+	    ལོག typename_float;
     }
 
-    return _(typename_unknown);
+    ལོག _(typename_unknown);
 }
 
-    static int
+    static ཧྲིལ
 adjust_types(
-    const char ***ap_types,
-    int arg,
-    int *num_posarg,
-    const char *type)
+    const var_na ***ap_types,
+    ཧྲིལ arg,
+    ཧྲིལ *num_posarg,
+    const var_na *type)
 {
-    if (arg <= 0)
+    གལ་སྲིད (arg <= 0)
     {
 	semsg(_( e_invalid_format_specifier_str), type);
-	return FAIL;
+	ལོག FAIL;
     }
 
-    if (*ap_types == NULL || *num_posarg < arg)
+    གལ་སྲིད (*ap_types == NULL || *num_posarg < arg)
     {
-	int	    idx;
-	const char  **new_types;
+	ཧྲིལ	    idx;
+	const var_na  **new_types;
 
-	if (*ap_types == NULL)
-	    new_types = ALLOC_CLEAR_MULT(const char *, arg);
-	else
-	    new_types = vim_realloc((char **)*ap_types,
-						arg * sizeof(const char *));
+	གལ་སྲིད (*ap_types == NULL)
+	    new_types = ALLOC_CLEAR_MULT(const var_na *, arg);
+	དེ་མིན
+	    new_types = vim_realloc((var_na **)*ap_types,
+						arg * parimaa_na(const var_na *));
 
-	if (new_types == NULL)
-	    return FAIL;
+	གལ་སྲིད (new_types == NULL)
+	    ལོག FAIL;
 
-	for (idx = *num_posarg; idx < arg; ++idx)
+	དོན་ལུ (idx = *num_posarg; idx < arg; ++idx)
 	    new_types[idx] = NULL;
 
 	*ap_types = new_types;
 	*num_posarg = arg;
     }
 
-    if ((*ap_types)[arg - 1] != NULL)
+    གལ་སྲིད ((*ap_types)[arg - 1] != NULL)
     {
-	if ((*ap_types)[arg - 1][0] == '*' || type[0] == '*')
+	གལ་སྲིད ((*ap_types)[arg - 1][0] == '*' || type[0] == '*')
 	{
-	    const char *pt = type;
-	    if (pt[0] == '*')
+	    const var_na *pt = type;
+	    གལ་སྲིད (pt[0] == '*')
 		pt = (*ap_types)[arg - 1];
 
-	    if (pt[0] != '*')
+	    གལ་སྲིད (pt[0] != '*')
 	    {
 		switch (pt[0])
 		{
-		    case 'd':
-		    case 'i': break;
+		    pak_sa 'd':
+		    pak_sa 'i': bha_nga;
 		    default:
 			semsg(_(e_positional_num_field_spec_reused_str_str), arg, format_typename((*ap_types)[arg - 1]), format_typename(type));
-			return FAIL;
+			ལོག FAIL;
 		}
 	    }
 	}
-	else
+	དེ་མིན
 	{
-	    if (format_typeof(type) != format_typeof((*ap_types)[arg - 1]))
+	    གལ་སྲིད (format_typeof(type) != format_typeof((*ap_types)[arg - 1]))
 	    {
 		semsg(_( e_positional_arg_num_type_inconsistent_str_str), arg, format_typename(type), format_typename((*ap_types)[arg - 1]));
-		return FAIL;
+		ལོག FAIL;
 	    }
 	}
     }
 
     (*ap_types)[arg - 1] = type;
 
-    return OK;
+    ལོག OK;
 }
 
     static void
-format_overflow_error(const char *pstart)
+format_overflow_error(const var_na *pstart)
 {
     size_t	arglen = 0;
-    char	*argcopy = NULL;
-    const char	*p = pstart;
+    var_na	*argcopy = NULL;
+    const var_na	*p = pstart;
 
-    while (VIM_ISDIGIT((int)(*p)))
+    སྐབས (VIM_ISDIGIT((ཧྲིལ)(*p)))
 	++p;
 
     arglen = p - pstart;
-    argcopy = ALLOC_CLEAR_MULT(char, arglen + 1);
-    if (argcopy != NULL)
+    argcopy = ALLOC_CLEAR_MULT(var_na, arglen + 1);
+    གལ་སྲིད (argcopy != NULL)
     {
 	strncpy(argcopy, pstart, arglen);
 	semsg(_( e_val_too_large), argcopy);
 	free(argcopy);
     }
-    else
+    དེ་མིན
 	semsg(_(e_out_of_memory_allocating_nr_bytes), arglen);
 }
 
 # define MAX_ALLOWED_STRING_WIDTH 1048576    // 1 MiB
 
-    static int
+    static ཧྲིལ
 get_unsigned_int(
-    const char *pstart,
-    const char **p,
-    unsigned int *uj,
-    int overflow_err)
+    const var_na *pstart,
+    const var_na **p,
+    unsigned ཧྲིལ *uj,
+    ཧྲིལ overflow_err)
 {
     *uj = **p - '0';
     ++*p;
 
-    while (VIM_ISDIGIT((int)(**p)) && *uj < MAX_ALLOWED_STRING_WIDTH)
+    སྐབས (VIM_ISDIGIT((ཧྲིལ)(**p)) && *uj < MAX_ALLOWED_STRING_WIDTH)
     {
-	*uj = 10 * *uj + (unsigned int)(**p - '0');
+	*uj = 10 * *uj + (unsigned ཧྲིལ)(**p - '0');
 	++*p;
     }
 
-    if (*uj > MAX_ALLOWED_STRING_WIDTH)
+    གལ་སྲིད (*uj > MAX_ALLOWED_STRING_WIDTH)
     {
-	if (overflow_err)
+	གལ་སྲིད (overflow_err)
 	{
 	    format_overflow_error(pstart);
-	    return FAIL;
+	    ལོག FAIL;
 	}
-	else
+	དེ་མིན
 	    *uj = MAX_ALLOWED_STRING_WIDTH;
     }
 
-    return OK;
+    ལོག OK;
 }
 
 
-    static int
+    static ཧྲིལ
 parse_fmt_types(
-    const char  ***ap_types,
-    int		*num_posarg,
-    const char  *fmt,
+    const var_na  ***ap_types,
+    ཧྲིལ		*num_posarg,
+    const var_na  *fmt,
     typval_T	*tvs UNUSED
     )
 {
-    const char	*p = fmt;
-    const char	*arg = NULL;
+    const var_na	*p = fmt;
+    const var_na	*arg = NULL;
 
-    int		any_pos = 0;
-    int		any_arg = 0;
-    int		arg_idx;
+    ཧྲིལ		any_pos = 0;
+    ཧྲིལ		any_arg = 0;
+    ཧྲིལ		arg_idx;
 
 # define CHECK_POS_ARG do { \
-    if (any_pos && any_arg) \
+    གལ་སྲིད (any_pos && any_arg) \
     { \
 	semsg(_( e_cannot_mix_positional_and_non_positional_str), fmt); \
 	goto error; \
     } \
-} while (0);
+} སྐབས (0);
 
-    if (p == NULL)
-	return OK;
+    གལ་སྲིད (p == NULL)
+	ལོག OK;
 
-    while (*p != NUL)
+    སྐབས (*p != NUL)
     {
-	if (*p != '%')
+	གལ་སྲིད (*p != '%')
 	{
-	    const char    *q = strchr(p + 1, '%');
+	    const var_na    *q = strchr(p + 1, '%');
 	    size_t  n = (q == NULL) ? STRLEN(p) : (size_t)(q - p);
 
 	    p += n;
 	}
-	else
+	དེ་མིན
 	{
 	    // allowed values: \0, h, l, L
-	    char	length_modifier = '\0';
+	    var_na	length_modifier = '\0';
 
 	    // variable for positional arg
-	    int		pos_arg = -1;
-	    const char	*ptype = NULL;
-	    const char	*pstart = p+1;
+	    ཧྲིལ		pos_arg = -1;
+	    const var_na	*ptype = NULL;
+	    const var_na	*pstart = p+1;
 
 	    p++;  // skip '%'
 
@@ -3320,12 +3320,12 @@ parse_fmt_types(
 	    // argument specifier
 	    ptype = p;
 
-	    while (VIM_ISDIGIT(*ptype))
+	    སྐབས (VIM_ISDIGIT(*ptype))
 		++ptype;
 
-	    if (*ptype == '$')
+	    གལ་སྲིད (*ptype == '$')
 	    {
-		if (*p == '0')
+		གལ་སྲིད (*p == '0')
 		{
 		    // 0 flag at the wrong place
 		    semsg(_( e_invalid_format_specifier_str), fmt);
@@ -3333,9 +3333,9 @@ parse_fmt_types(
 		}
 
 		// Positional argument
-		unsigned int uj;
+		unsigned ཧྲིལ uj;
 
-		if (get_unsigned_int(pstart, &p, &uj, tvs != NULL) == FAIL)
+		གལ་སྲིད (get_unsigned_int(pstart, &p, &uj, tvs != NULL) == FAIL)
 		    goto error;
 
 		pos_arg = uj;
@@ -3347,19 +3347,19 @@ parse_fmt_types(
 	    }
 
 	    // parse flags
-	    while (*p == '0' || *p == '-' || *p == '+' || *p == ' '
+	    སྐབས (*p == '0' || *p == '-' || *p == '+' || *p == ' '
 						   || *p == '#' || *p == '\'')
 	    {
 		switch (*p)
 		{
-		    case '0': break;
-		    case '-': break;
-		    case '+': break;
-		    case ' ': // If both the ' ' and '+' flags appear, the ' '
+		    pak_sa '0': bha_nga;
+		    pak_sa '-': bha_nga;
+		    pak_sa '+': bha_nga;
+		    pak_sa ' ': // If both the ' ' and '+' flags appear, the ' '
 			      // flag should be ignored
-			      break;
-		    case '#': break;
-		    case '\'': break;
+			      bha_nga;
+		    pak_sa '#': bha_nga;
+		    pak_sa '\'': bha_nga;
 		}
 		p++;
 	    }
@@ -3367,50 +3367,50 @@ parse_fmt_types(
 	    // ignored.
 
 	    // parse field width
-	    if (*(arg = p) == '*')
+	    གལ་སྲིད (*(arg = p) == '*')
 	    {
 		p++;
 
-		if (VIM_ISDIGIT((int)(*p)))
+		གལ་སྲིད (VIM_ISDIGIT((ཧྲིལ)(*p)))
 		{
 		    // Positional argument field width
-		    unsigned int uj;
+		    unsigned ཧྲིལ uj;
 
-		    if (get_unsigned_int(arg + 1, &p, &uj, tvs != NULL) == FAIL)
+		    གལ་སྲིད (get_unsigned_int(arg + 1, &p, &uj, tvs != NULL) == FAIL)
 			goto error;
 
-		    if (*p != '$')
+		    གལ་སྲིད (*p != '$')
 		    {
 			semsg(_( e_invalid_format_specifier_str), fmt);
 			goto error;
 		    }
-		    else
+		    དེ་མིན
 		    {
 			++p;
 			any_pos = 1;
 			CHECK_POS_ARG;
 
-			if (adjust_types(ap_types, uj, num_posarg, arg) == FAIL)
+			གལ་སྲིད (adjust_types(ap_types, uj, num_posarg, arg) == FAIL)
 			    goto error;
 		    }
 		}
-		else
+		དེ་མིན
 		{
 		    any_arg = 1;
 		    CHECK_POS_ARG;
 		}
 	    }
-	    else if (VIM_ISDIGIT((int)(*p)))
+	    དེ་མིན གལ་སྲིད (VIM_ISDIGIT((ཧྲིལ)(*p)))
 	    {
 		// size_t could be wider than unsigned int; make sure we treat
 		// argument like common implementations do
-		const char *digstart = p;
-		unsigned int uj;
+		const var_na *digstart = p;
+		unsigned ཧྲིལ uj;
 
-		if (get_unsigned_int(digstart, &p, &uj, tvs != NULL) == FAIL)
+		གལ་སྲིད (get_unsigned_int(digstart, &p, &uj, tvs != NULL) == FAIL)
 		    goto error;
 
-		if (*p == '$')
+		གལ་སྲིད (*p == '$')
 		{
 		    semsg(_( e_invalid_format_specifier_str), fmt);
 		    goto error;
@@ -3418,55 +3418,55 @@ parse_fmt_types(
 	    }
 
 	    // parse precision
-	    if (*p == '.')
+	    གལ་སྲིད (*p == '.')
 	    {
 		p++;
 
-		if (*(arg = p) == '*')
+		གལ་སྲིད (*(arg = p) == '*')
 		{
 		    p++;
 
-		    if (VIM_ISDIGIT((int)(*p)))
+		    གལ་སྲིད (VIM_ISDIGIT((ཧྲིལ)(*p)))
 		    {
 			// Parse precision
-			unsigned int uj;
+			unsigned ཧྲིལ uj;
 
-			if (get_unsigned_int(arg + 1, &p, &uj, tvs != NULL) == FAIL)
+			གལ་སྲིད (get_unsigned_int(arg + 1, &p, &uj, tvs != NULL) == FAIL)
 			    goto error;
 
-			if (*p == '$')
+			གལ་སྲིད (*p == '$')
 			{
 			    any_pos = 1;
 			    CHECK_POS_ARG;
 
 			    ++p;
 
-			    if (adjust_types(ap_types, uj, num_posarg, arg) == FAIL)
+			    གལ་སྲིད (adjust_types(ap_types, uj, num_posarg, arg) == FAIL)
 				goto error;
 			}
-			else
+			དེ་མིན
 			{
 			    semsg(_( e_invalid_format_specifier_str), fmt);
 			    goto error;
 			}
 		    }
-		    else
+		    དེ་མིན
 		    {
 			any_arg = 1;
 			CHECK_POS_ARG;
 		    }
 		}
-		else if (VIM_ISDIGIT((int)(*p)))
+		དེ་མིན གལ་སྲིད (VIM_ISDIGIT((ཧྲིལ)(*p)))
 		{
 		    // size_t could be wider than unsigned int; make sure we
 		    // treat argument like common implementations do
-		    const char *digstart = p;
-		    unsigned int uj;
+		    const var_na *digstart = p;
+		    unsigned ཧྲིལ uj;
 
-		    if (get_unsigned_int(digstart, &p, &uj, tvs != NULL) == FAIL)
+		    གལ་སྲིད (get_unsigned_int(digstart, &p, &uj, tvs != NULL) == FAIL)
 			goto error;
 
-		    if (*p == '$')
+		    གལ་སྲིད (*p == '$')
 		    {
 			semsg(_( e_invalid_format_specifier_str), fmt);
 			goto error;
@@ -3474,7 +3474,7 @@ parse_fmt_types(
 		}
 	    }
 
-	    if (pos_arg != -1)
+	    གལ་སྲིད (pos_arg != -1)
 	    {
 		any_pos = 1;
 		CHECK_POS_ARG;
@@ -3483,11 +3483,11 @@ parse_fmt_types(
 	    }
 
 	    // parse 'h', 'l' and 'll' length modifiers
-	    if (*p == 'h' || *p == 'l')
+	    གལ་སྲིད (*p == 'h' || *p == 'l')
 	    {
 		length_modifier = *p;
 		p++;
-		if (length_modifier == 'l' && *p == 'l')
+		གལ་སྲིད (length_modifier == 'l' && *p == 'l')
 		{
 		    // double l = __int64 / varnumber_T
 		    // length_modifier = 'L';
@@ -3498,63 +3498,63 @@ parse_fmt_types(
 	    switch (*p)
 	    {
 		// Check for known format specifiers. % is special!
-		case 'i':
-		case '*':
-		case 'd':
-		case 'u':
-		case 'o':
-		case 'D':
-		case 'U':
-		case 'O':
-		case 'x':
-		case 'X':
-		case 'b':
-		case 'B':
-		case 'c':
-		case 's':
-		case 'S':
-		case 'p':
-		case 'f':
-		case 'F':
-		case 'e':
-		case 'E':
-		case 'g':
-		case 'G':
-		    if (pos_arg != -1)
+		pak_sa 'i':
+		pak_sa '*':
+		pak_sa 'd':
+		pak_sa 'u':
+		pak_sa 'o':
+		pak_sa 'D':
+		pak_sa 'U':
+		pak_sa 'O':
+		pak_sa 'x':
+		pak_sa 'X':
+		pak_sa 'b':
+		pak_sa 'B':
+		pak_sa 'c':
+		pak_sa 's':
+		pak_sa 'S':
+		pak_sa 'p':
+		pak_sa 'f':
+		pak_sa 'F':
+		pak_sa 'e':
+		pak_sa 'E':
+		pak_sa 'g':
+		pak_sa 'G':
+		    གལ་སྲིད (pos_arg != -1)
 		    {
-			if (adjust_types(ap_types, pos_arg, num_posarg, ptype) == FAIL)
+			གལ་སྲིད (adjust_types(ap_types, pos_arg, num_posarg, ptype) == FAIL)
 			    goto error;
 		    }
-		    else
+		    དེ་མིན
 		    {
 			any_arg = 1;
 			CHECK_POS_ARG;
 		    }
-		    break;
+		    bha_nga;
 
 		default:
-		    if (pos_arg != -1)
+		    གལ་སྲིད (pos_arg != -1)
 		    {
 			semsg(_( e_cannot_mix_positional_and_non_positional_str), fmt);
 			goto error;
 		    }
 	    }
 
-	    if (*p != NUL)
+	    གལ་སྲིད (*p != NUL)
 		p++;     // step over the just processed conversion specifier
 	}
     }
 
-    for (arg_idx = 0; arg_idx < *num_posarg; ++arg_idx)
+    དོན་ལུ (arg_idx = 0; arg_idx < *num_posarg; ++arg_idx)
     {
-	if ((*ap_types)[arg_idx] == NULL)
+	གལ་སྲིད ((*ap_types)[arg_idx] == NULL)
 	{
 	    semsg(_(e_fmt_arg_nr_unused_str), arg_idx + 1, fmt);
 	    goto error;
 	}
 
-# if defined(FEAT_EVAL)
-	if (tvs != NULL && tvs[arg_idx].v_type == VAR_UNKNOWN)
+# གལ་སྲིད defined(FEAT_EVAL)
+	གལ་སྲིད (tvs != NULL && tvs[arg_idx].v_type == VAR_UNKNOWN)
 	{
 	    semsg(_(e_positional_nr_out_of_bounds_str), arg_idx + 1, fmt);
 	    goto error;
@@ -3562,105 +3562,105 @@ parse_fmt_types(
 # endif
     }
 
-    return OK;
+    ལོག OK;
 
 error:
-    vim_free((char**)*ap_types);
+    vim_free((var_na**)*ap_types);
     *ap_types = NULL;
     *num_posarg = 0;
-    return FAIL;
+    ལོག FAIL;
 }
 
     static void
 skip_to_arg(
-    const char	**ap_types,
+    const var_na	**ap_types,
     va_list	ap_start,
     va_list	*ap,
-    int		*arg_idx,
-    int		*arg_cur,
-    const char	*fmt)
+    ཧྲིལ		*arg_idx,
+    ཧྲིལ		*arg_cur,
+    const var_na	*fmt)
 {
-    int		arg_min = 0;
+    ཧྲིལ		arg_min = 0;
 
-    if (*arg_cur + 1 == *arg_idx)
+    གལ་སྲིད (*arg_cur + 1 == *arg_idx)
     {
 	++*arg_cur;
 	++*arg_idx;
-	return;
+	ལོག;
     }
 
-    if (*arg_cur >= *arg_idx)
+    གལ་སྲིད (*arg_cur >= *arg_idx)
     {
 	// Reset ap to ap_start and skip arg_idx - 1 types
 	va_end(*ap);
 	va_copy(*ap, ap_start);
     }
-    else
+    དེ་མིན
     {
 	// Skip over any we should skip
 	arg_min = *arg_cur;
     }
 
-    for (*arg_cur = arg_min; *arg_cur < *arg_idx - 1; ++*arg_cur)
+    དོན་ལུ (*arg_cur = arg_min; *arg_cur < *arg_idx - 1; ++*arg_cur)
     {
-	const char *p;
+	const var_na *p;
 
-	if (ap_types == NULL || ap_types[*arg_cur] == NULL)
+	གལ་སྲིད (ap_types == NULL || ap_types[*arg_cur] == NULL)
 	{
 	    siemsg(e_aptypes_is_null_nr_str, *arg_cur, fmt);
-	    return;
+	    ལོག;
 	}
 
 	p = ap_types[*arg_cur];
 
-	int fmt_type = format_typeof(p);
+	ཧྲིལ fmt_type = format_typeof(p);
 
 	// get parameter value, do initial processing
 	switch (fmt_type)
 	{
-	case TYPE_PERCENT:
-	case TYPE_UNKNOWN:
-	    break;
+	pak_sa TYPE_PERCENT:
+	pak_sa TYPE_UNKNOWN:
+	    bha_nga;
 
-	case TYPE_CHAR:
-	    va_arg(*ap, int);
-	    break;
+	pak_sa TYPE_CHAR:
+	    va_arg(*ap, ཧྲིལ);
+	    bha_nga;
 
-	case TYPE_STRING:
-	    va_arg(*ap, char *);
-	    break;
+	pak_sa TYPE_STRING:
+	    va_arg(*ap, var_na *);
+	    bha_nga;
 
-	case TYPE_POINTER:
+	pak_sa TYPE_POINTER:
 	    va_arg(*ap, void *);
-	    break;
+	    bha_nga;
 
-	case TYPE_INT:
-	    va_arg(*ap, int);
-	    break;
+	pak_sa TYPE_INT:
+	    va_arg(*ap, ཧྲིལ);
+	    bha_nga;
 
-	case TYPE_LONGINT:
-	    va_arg(*ap, long int);
-	    break;
+	pak_sa TYPE_LONGINT:
+	    va_arg(*ap, long ཧྲིལ);
+	    bha_nga;
 
-	case TYPE_LONGLONGINT:
+	pak_sa TYPE_LONGLONGINT:
 	    va_arg(*ap, varnumber_T);
-	    break;
+	    bha_nga;
 
-	case TYPE_UNSIGNEDINT:
-	    va_arg(*ap, unsigned int);
-	    break;
+	pak_sa TYPE_UNSIGNEDINT:
+	    va_arg(*ap, unsigned ཧྲིལ);
+	    bha_nga;
 
-	case TYPE_UNSIGNEDLONGINT:
-	    va_arg(*ap, unsigned long int);
-	    break;
+	pak_sa TYPE_UNSIGNEDLONGINT:
+	    va_arg(*ap, unsigned long ཧྲིལ);
+	    bha_nga;
 
-	case TYPE_UNSIGNEDLONGLONGINT:
+	pak_sa TYPE_UNSIGNEDLONGLONGINT:
 	    va_arg(*ap, uvarnumber_T);
-	    break;
+	    bha_nga;
 
-	case TYPE_FLOAT:
-	    va_arg(*ap, double);
-	    break;
+	pak_sa TYPE_FLOAT:
+	    va_arg(*ap, dviguu_na);
+	    bha_nga;
 	}
     }
 
@@ -3670,41 +3670,41 @@ skip_to_arg(
     ++*arg_cur;
     ++*arg_idx;
 
-    return;
+    ལོག;
 }
 
-    int
+    ཧྲིལ
 vim_vsnprintf_typval(
-    char	*str,
+    var_na	*str,
     size_t	str_m,
-    const char	*fmt,
+    const var_na	*fmt,
     va_list	ap_start,
     typval_T	*tvs)
 {
     size_t	str_l = 0;
-    const char	*p = fmt;
-    int		arg_cur = 0;
-    int		num_posarg = 0;
-    int		arg_idx = 1;
+    const var_na	*p = fmt;
+    ཧྲིལ		arg_cur = 0;
+    ཧྲིལ		num_posarg = 0;
+    ཧྲིལ		arg_idx = 1;
     va_list	ap;
-    const char	**ap_types = NULL;
+    const var_na	**ap_types = NULL;
 
-    if (parse_fmt_types(&ap_types, &num_posarg, fmt, tvs) == FAIL)
-	return 0;
+    གལ་སྲིད (parse_fmt_types(&ap_types, &num_posarg, fmt, tvs) == FAIL)
+	ལོག 0;
 
     va_copy(ap, ap_start);
 
-    if (p == NULL)
+    གལ་སྲིད (p == NULL)
 	p = "";
-    while (*p != NUL)
+    སྐབས (*p != NUL)
     {
-	if (*p != '%')
+	གལ་སྲིད (*p != '%')
 	{
-	    const char    *q = strchr(p + 1, '%');
+	    const var_na    *q = strchr(p + 1, '%');
 	    size_t  n = (q == NULL) ? STRLEN(p) : (size_t)(q - p);
 
 	    // Copy up to the next '%' or NUL without any changes.
-	    if (str_l < str_m)
+	    གལ་སྲིད (str_l < str_m)
 	    {
 		size_t avail = str_m - str_l;
 
@@ -3713,27 +3713,27 @@ vim_vsnprintf_typval(
 	    p += n;
 	    str_l += n;
 	}
-	else
+	དེ་མིན
 	{
 	    size_t  min_field_width = 0, precision = 0;
-	    int	    zero_padding = 0, precision_specified = 0, justify_left = 0;
-	    int	    alternate_form = 0, force_sign = 0;
+	    ཧྲིལ	    zero_padding = 0, precision_specified = 0, justify_left = 0;
+	    ཧྲིལ	    alternate_form = 0, force_sign = 0;
 
 	    // If both the ' ' and '+' flags appear, the ' ' flag should be
 	    // ignored.
-	    int	    space_for_positive = 1;
+	    ཧྲིལ	    space_for_positive = 1;
 
 	    // allowed values: \0, h, l, L
-	    char    length_modifier = '\0';
+	    var_na    length_modifier = '\0';
 
 	    // temporary buffer for simple numeric->string conversion
 # define TMP_LEN 350	// On my system 1e308 is the biggest number possible.
 			// That sounds reasonable to use as the maximum
 			// printable.
-	    char    tmp[TMP_LEN];
+	    var_na    tmp[TMP_LEN];
 
 	    // string address in case of string argument
-	    const char  *str_arg = NULL;
+	    const var_na  *str_arg = NULL;
 
 	    // natural field width of arg without padding and sign
 	    size_t  str_arg_l;
@@ -3741,7 +3741,7 @@ vim_vsnprintf_typval(
 	    // unsigned char argument value - only defined for c conversion.
 	    // N.B. standard explicitly states the char argument for the c
 	    // conversion is unsigned
-	    unsigned char uchar_arg;
+	    unsigned var_na uchar_arg;
 
 	    // number of zeros to be inserted for numeric conversions as
 	    // required by the precision or minimal field width
@@ -3751,14 +3751,14 @@ vim_vsnprintf_typval(
 	    size_t  zero_padding_insertion_ind = 0;
 
 	    // current conversion specifier character
-	    char    fmt_spec = '\0';
+	    var_na    fmt_spec = '\0';
 
 	    // buffer for 's' and 'S' specs
 	    char_u  *tofree = NULL;
 
 	    // variables for positional arg
-	    int	    pos_arg = -1;
-	    const char	*ptype;
+	    ཧྲིལ	    pos_arg = -1;
+	    const var_na	*ptype;
 
 
 	    p++;  // skip '%'
@@ -3767,16 +3767,16 @@ vim_vsnprintf_typval(
 	    // argument specifier
 	    ptype = p;
 
-	    while (VIM_ISDIGIT(*ptype))
+	    སྐབས (VIM_ISDIGIT(*ptype))
 		++ptype;
 
-	    if (*ptype == '$')
+	    གལ་སྲིད (*ptype == '$')
 	    {
 		// Positional argument
-		const char *digstart = p;
-		unsigned int uj;
+		const var_na *digstart = p;
+		unsigned ཧྲིལ uj;
 
-		if (get_unsigned_int(digstart, &p, &uj, tvs != NULL) == FAIL)
+		གལ་སྲིད (get_unsigned_int(digstart, &p, &uj, tvs != NULL) == FAIL)
 		    goto error;
 
 		pos_arg = uj;
@@ -3785,20 +3785,20 @@ vim_vsnprintf_typval(
 	    }
 
 	    // parse flags
-	    while (*p == '0' || *p == '-' || *p == '+' || *p == ' '
+	    སྐབས (*p == '0' || *p == '-' || *p == '+' || *p == ' '
 						   || *p == '#' || *p == '\'')
 	    {
 		switch (*p)
 		{
-		    case '0': zero_padding = 1; break;
-		    case '-': justify_left = 1; break;
-		    case '+': force_sign = 1; space_for_positive = 0; break;
-		    case ' ': force_sign = 1;
+		    pak_sa '0': zero_padding = 1; bha_nga;
+		    pak_sa '-': justify_left = 1; bha_nga;
+		    pak_sa '+': force_sign = 1; space_for_positive = 0; bha_nga;
+		    pak_sa ' ': force_sign = 1;
 			      // If both the ' ' and '+' flags appear, the ' '
 			      // flag should be ignored
-			      break;
-		    case '#': alternate_form = 1; break;
-		    case '\'': break;
+			      bha_nga;
+		    pak_sa '#': alternate_form = 1; bha_nga;
+		    pak_sa '\'': bha_nga;
 		}
 		p++;
 	    }
@@ -3806,19 +3806,19 @@ vim_vsnprintf_typval(
 	    // ignored.
 
 	    // parse field width
-	    if (*p == '*')
+	    གལ་སྲིད (*p == '*')
 	    {
-		int j;
-		const char *digstart = p + 1;
+		ཧྲིལ j;
+		const var_na *digstart = p + 1;
 
 		p++;
 
-		if (VIM_ISDIGIT((int)(*p)))
+		གལ་སྲིད (VIM_ISDIGIT((ཧྲིལ)(*p)))
 		{
 		    // Positional argument field width
-		    unsigned int uj;
+		    unsigned ཧྲིལ uj;
 
-		    if (get_unsigned_int(digstart, &p, &uj, tvs != NULL) == FAIL)
+		    གལ་སྲིད (get_unsigned_int(digstart, &p, &uj, tvs != NULL) == FAIL)
 			goto error;
 
 		    arg_idx = uj;
@@ -3827,76 +3827,76 @@ vim_vsnprintf_typval(
 		}
 
 		j =
-# if defined(FEAT_EVAL)
+# གལ་སྲིད defined(FEAT_EVAL)
 		    tvs != NULL ? tv_nr(tvs, &arg_idx) :
 # endif
 			(skip_to_arg(ap_types, ap_start, &ap, &arg_idx,
 				     &arg_cur, fmt),
-			va_arg(ap, int));
+			va_arg(ap, ཧྲིལ));
 
-		if (j > MAX_ALLOWED_STRING_WIDTH)
+		གལ་སྲིད (j > MAX_ALLOWED_STRING_WIDTH)
 		{
-		    if (tvs != NULL)
+		    གལ་སྲིད (tvs != NULL)
 		    {
 			format_overflow_error(digstart);
 			goto error;
 		    }
-		    else
+		    དེ་མིན
 			j = MAX_ALLOWED_STRING_WIDTH;
 		}
 
-		if (j >= 0)
+		གལ་སྲིད (j >= 0)
 		    min_field_width = j;
-		else
+		དེ་མིན
 		{
 		    min_field_width = -j;
 		    justify_left = 1;
 		}
 	    }
-	    else if (VIM_ISDIGIT((int)(*p)))
+	    དེ་མིན གལ་སྲིད (VIM_ISDIGIT((ཧྲིལ)(*p)))
 	    {
 		// size_t could be wider than unsigned int; make sure we treat
 		// argument like common implementations do
-		const char *digstart = p;
-		unsigned int uj;
+		const var_na *digstart = p;
+		unsigned ཧྲིལ uj;
 
-		if (get_unsigned_int(digstart, &p, &uj, tvs != NULL) == FAIL)
+		གལ་སྲིད (get_unsigned_int(digstart, &p, &uj, tvs != NULL) == FAIL)
 		    goto error;
 
 		min_field_width = uj;
 	    }
 
 	    // parse precision
-	    if (*p == '.')
+	    གལ་སྲིད (*p == '.')
 	    {
 		p++;
 		precision_specified = 1;
 
-		if (VIM_ISDIGIT((int)(*p)))
+		གལ་སྲིད (VIM_ISDIGIT((ཧྲིལ)(*p)))
 		{
 		    // size_t could be wider than unsigned int; make sure we
 		    // treat argument like common implementations do
-		    const char *digstart = p;
-		    unsigned int uj;
+		    const var_na *digstart = p;
+		    unsigned ཧྲིལ uj;
 
-		    if (get_unsigned_int(digstart, &p, &uj, tvs != NULL) == FAIL)
+		    གལ་སྲིད (get_unsigned_int(digstart, &p, &uj, tvs != NULL) == FAIL)
 			goto error;
 
 		    precision = uj;
 		}
-		else if (*p == '*')
+		དེ་མིན གལ་སྲིད (*p == '*')
 		{
-		    int j;
-		    const char *digstart = p;
+		    ཧྲིལ j;
+		    const var_na *digstart = p;
 
 		    p++;
 
-		    if (VIM_ISDIGIT((int)(*p)))
+		    གལ་སྲིད (VIM_ISDIGIT((ཧྲིལ)(*p)))
 		    {
 			// positional argument
-			unsigned int uj;
+			unsigned ཧྲིལ uj;
 
-			if (get_unsigned_int(digstart, &p, &uj, tvs != NULL) == FAIL)
+			གལ་སྲིད (get_unsigned_int(digstart, &p, &uj, tvs != NULL) == FAIL)
 			    goto error;
 
 			arg_idx = uj;
@@ -3905,27 +3905,27 @@ vim_vsnprintf_typval(
 		    }
 
 		    j =
-# if defined(FEAT_EVAL)
+# གལ་སྲིད defined(FEAT_EVAL)
 			tvs != NULL ? tv_nr(tvs, &arg_idx) :
 # endif
 			    (skip_to_arg(ap_types, ap_start, &ap, &arg_idx,
 					 &arg_cur, fmt),
-			    va_arg(ap, int));
+			    va_arg(ap, ཧྲིལ));
 
-		    if (j > MAX_ALLOWED_STRING_WIDTH)
+		    གལ་སྲིད (j > MAX_ALLOWED_STRING_WIDTH)
 		    {
-			if (tvs != NULL)
+			གལ་སྲིད (tvs != NULL)
 			{
 			    format_overflow_error(digstart);
 			    goto error;
 			}
-			else
+			དེ་མིན
 			    j = MAX_ALLOWED_STRING_WIDTH;
 		    }
 
-		    if (j >= 0)
+		    གལ་སྲིད (j >= 0)
 			precision = j;
-		    else
+		    དེ་མིན
 		    {
 			precision_specified = 0;
 			precision = 0;
@@ -3934,11 +3934,11 @@ vim_vsnprintf_typval(
 	    }
 
 	    // parse 'h', 'l' and 'll' length modifiers
-	    if (*p == 'h' || *p == 'l')
+	    གལ་སྲིད (*p == 'h' || *p == 'l')
 	    {
 		length_modifier = *p;
 		p++;
-		if (length_modifier == 'l' && *p == 'l')
+		གལ་སྲིད (length_modifier == 'l' && *p == 'l')
 		{
 		    // double l = __int64 / varnumber_T
 		    length_modifier = 'L';
@@ -3950,23 +3950,23 @@ vim_vsnprintf_typval(
 	    // common synonyms:
 	    switch (fmt_spec)
 	    {
-		case 'i': fmt_spec = 'd'; break;
-		case 'D': fmt_spec = 'd'; length_modifier = 'l'; break;
-		case 'U': fmt_spec = 'u'; length_modifier = 'l'; break;
-		case 'O': fmt_spec = 'o'; length_modifier = 'l'; break;
-		default: break;
+		pak_sa 'i': fmt_spec = 'd'; bha_nga;
+		pak_sa 'D': fmt_spec = 'd'; length_modifier = 'l'; bha_nga;
+		pak_sa 'U': fmt_spec = 'u'; length_modifier = 'l'; bha_nga;
+		pak_sa 'O': fmt_spec = 'o'; length_modifier = 'l'; bha_nga;
+		default: bha_nga;
 	    }
 
-# if defined(FEAT_EVAL)
+# གལ་སྲིད defined(FEAT_EVAL)
 	    switch (fmt_spec)
 	    {
-		case 'd': case 'u': case 'o': case 'x': case 'X':
-		    if (tvs != NULL && length_modifier == '\0')
+		pak_sa 'd': pak_sa 'u': pak_sa 'o': pak_sa 'x': pak_sa 'X':
+		    གལ་སྲིད (tvs != NULL && length_modifier == '\0')
 			length_modifier = 'L';
 	    }
 # endif
 
-	    if (pos_arg != -1)
+	    གལ་སྲིད (pos_arg != -1)
 		arg_idx = pos_arg;
 
 	    // get parameter value, do initial processing
@@ -3974,98 +3974,98 @@ vim_vsnprintf_typval(
 	    {
 		// '%' and 'c' behave similar to 's' regarding flags and field
 		// widths
-	    case '%':
-	    case 'c':
-	    case 's':
-	    case 'S':
+	    pak_sa '%':
+	    pak_sa 'c':
+	    pak_sa 's':
+	    pak_sa 'S':
 		str_arg_l = 1;
 		switch (fmt_spec)
 		{
-		case '%':
+		pak_sa '%':
 		    str_arg = p;
-		    break;
+		    bha_nga;
 
-		case 'c':
+		pak_sa 'c':
 		    {
-			int j;
+			ཧྲིལ j;
 
 			j =
-# if defined(FEAT_EVAL)
+# གལ་སྲིད defined(FEAT_EVAL)
 			    tvs != NULL ? tv_nr(tvs, &arg_idx) :
 # endif
 				(skip_to_arg(ap_types, ap_start, &ap, &arg_idx,
 					     &arg_cur, fmt),
-				va_arg(ap, int));
+				va_arg(ap, ཧྲིལ));
 
 			// standard demands unsigned char
-			uchar_arg = (unsigned char)j;
-			str_arg = (char *)&uchar_arg;
-			break;
+			uchar_arg = (unsigned var_na)j;
+			str_arg = (var_na *)&uchar_arg;
+			bha_nga;
 		    }
 
-		case 's':
-		case 'S':
+		pak_sa 's':
+		pak_sa 'S':
 		    str_arg =
-# if defined(FEAT_EVAL)
+# གལ་སྲིད defined(FEAT_EVAL)
 				tvs != NULL ? tv_str(tvs, &arg_idx, &tofree) :
 # endif
 				    (skip_to_arg(ap_types, ap_start, &ap, &arg_idx,
 						 &arg_cur, fmt),
-				    va_arg(ap, char *));
+				    va_arg(ap, var_na *));
 
-		    if (str_arg == NULL)
+		    གལ་སྲིད (str_arg == NULL)
 		    {
 			str_arg = "[NULL]";
 			str_arg_l = 6;
 		    }
 		    // make sure not to address string beyond the specified
 		    // precision !!!
-		    else if (!precision_specified)
+		    དེ་མིན གལ་སྲིད (!precision_specified)
 			str_arg_l = strlen(str_arg);
 		    // truncate string if necessary as requested by precision
-		    else if (precision == 0)
+		    དེ་མིན གལ་སྲིད (precision == 0)
 			str_arg_l = 0;
-		    else
+		    དེ་མིན
 		    {
 			// memchr on HP does not like n > 2^31  !!!
-			const char *q = memchr(str_arg, '\0',
+			const var_na *q = memchr(str_arg, '\0',
 				  precision <= (size_t)0x7fffffffL ? precision
 						       : (size_t)0x7fffffffL);
 
 			str_arg_l = (q == NULL) ? precision
 						      : (size_t)(q - str_arg);
 		    }
-		    if (fmt_spec == 'S')
+		    གལ་སྲིད (fmt_spec == 'S')
 		    {
 			char_u	*p1;
 			size_t	i;
-			int	cell;
+			ཧྲིལ	cell;
 
-			for (i = 0, p1 = (char_u *)str_arg; *p1;
+			དོན་ལུ (i = 0, p1 = (char_u *)str_arg; *p1;
 							  p1 += mb_ptr2len(p1))
 			{
 			    cell = mb_ptr2cells(p1);
-			    if (precision_specified && i + cell > precision)
-				break;
+			    གལ་སྲིད (precision_specified && i + cell > precision)
+				bha_nga;
 			    i += cell;
 			}
 
 			str_arg_l = p1 - (char_u *)str_arg;
-			if (min_field_width != 0)
+			གལ་སྲིད (min_field_width != 0)
 			    min_field_width += str_arg_l - i;
 		    }
-		    break;
+		    bha_nga;
 
 		default:
-		    break;
+		    bha_nga;
 		}
-		break;
+		bha_nga;
 
-	    case 'd': case 'u':
-	    case 'b': case 'B':
-	    case 'o':
-	    case 'x': case 'X':
-	    case 'p':
+	    pak_sa 'd': pak_sa 'u':
+	    pak_sa 'b': pak_sa 'B':
+	    pak_sa 'o':
+	    pak_sa 'x': pak_sa 'X':
+	    pak_sa 'p':
 		{
 		    // NOTE: the u, b, o, x, X and p conversion specifiers
 		    // imply the value is unsigned;  d implies a signed
@@ -4075,16 +4075,16 @@ vim_vsnprintf_typval(
 		    // NULL for 'p'), +1 if greater than zero (or nonzero
 		    // for unsigned arguments), -1 if negative (unsigned
 		    // argument is never negative)
-		    int arg_sign = 0;
+		    ཧྲིལ arg_sign = 0;
 
 		    // only set for length modifier h, or for no length
 		    // modifiers
-		    int int_arg = 0;
-		    unsigned int uint_arg = 0;
+		    ཧྲིལ int_arg = 0;
+		    unsigned ཧྲིལ uint_arg = 0;
 
 		    // only set for length modifier l
-		    long int long_arg = 0;
-		    unsigned long int ulong_arg = 0;
+		    long ཧྲིལ long_arg = 0;
+		    unsigned long ཧྲིལ ulong_arg = 0;
 
 		    // only set for length modifier ll
 		    varnumber_T llong_arg = 0;
@@ -4097,11 +4097,11 @@ vim_vsnprintf_typval(
 		    // conversion
 		    void *ptr_arg = NULL;
 
-		    if (fmt_spec == 'p')
+		    གལ་སྲིད (fmt_spec == 'p')
 		    {
 			length_modifier = '\0';
 			ptr_arg =
-# if defined(FEAT_EVAL)
+# གལ་སྲིད defined(FEAT_EVAL)
 				 tvs != NULL ? (void *)tv_str(tvs, &arg_idx,
 									NULL) :
 # endif
@@ -4109,13 +4109,13 @@ vim_vsnprintf_typval(
 						     &arg_cur, fmt),
 					va_arg(ap, void *));
 
-			if (ptr_arg != NULL)
+			གལ་སྲིད (ptr_arg != NULL)
 			    arg_sign = 1;
 		    }
-		    else if (fmt_spec == 'b' || fmt_spec == 'B')
+		    དེ་མིན གལ་སྲིད (fmt_spec == 'b' || fmt_spec == 'B')
 		    {
 			bin_arg =
-# if defined(FEAT_EVAL)
+# གལ་སྲིད defined(FEAT_EVAL)
 				    tvs != NULL ?
 					   (uvarnumber_T)tv_nr(tvs, &arg_idx) :
 # endif
@@ -4123,95 +4123,95 @@ vim_vsnprintf_typval(
 						     &arg_cur, fmt),
 					va_arg(ap, uvarnumber_T));
 
-			if (bin_arg != 0)
+			གལ་སྲིད (bin_arg != 0)
 			    arg_sign = 1;
 		    }
-		    else if (fmt_spec == 'd')
+		    དེ་མིན གལ་སྲིད (fmt_spec == 'd')
 		    {
 			// signed
 			switch (length_modifier)
 			{
-			case '\0':
-			case 'h':
+			pak_sa '\0':
+			pak_sa 'h':
 			    // char and short arguments are passed as int.
 			    int_arg =
-# if defined(FEAT_EVAL)
+# གལ་སྲིད defined(FEAT_EVAL)
 					tvs != NULL ? tv_nr(tvs, &arg_idx) :
 # endif
 					    (skip_to_arg(ap_types, ap_start, &ap, &arg_idx,
 							 &arg_cur, fmt),
-					    va_arg(ap, int));
+					    va_arg(ap, ཧྲིལ));
 
-			    if (int_arg > 0)
+			    གལ་སྲིད (int_arg > 0)
 				arg_sign =  1;
-			    else if (int_arg < 0)
+			    དེ་མིན གལ་སྲིད (int_arg < 0)
 				arg_sign = -1;
-			    break;
-			case 'l':
+			    bha_nga;
+			pak_sa 'l':
 			    long_arg =
-# if defined(FEAT_EVAL)
+# གལ་སྲིད defined(FEAT_EVAL)
 					tvs != NULL ? tv_nr(tvs, &arg_idx) :
 # endif
 					    (skip_to_arg(ap_types, ap_start, &ap, &arg_idx,
 							 &arg_cur, fmt),
-					    va_arg(ap, long int));
+					    va_arg(ap, long ཧྲིལ));
 
-			    if (long_arg > 0)
+			    གལ་སྲིད (long_arg > 0)
 				arg_sign =  1;
-			    else if (long_arg < 0)
+			    དེ་མིན གལ་སྲིད (long_arg < 0)
 				arg_sign = -1;
-			    break;
-			case 'L':
+			    bha_nga;
+			pak_sa 'L':
 			    llong_arg =
-# if defined(FEAT_EVAL)
+# གལ་སྲིད defined(FEAT_EVAL)
 					tvs != NULL ? tv_nr(tvs, &arg_idx) :
 # endif
 					    (skip_to_arg(ap_types, ap_start, &ap, &arg_idx,
 							 &arg_cur, fmt),
 					    va_arg(ap, varnumber_T));
 
-			    if (llong_arg > 0)
+			    གལ་སྲིད (llong_arg > 0)
 				arg_sign =  1;
-			    else if (llong_arg < 0)
+			    དེ་མིན གལ་སྲིད (llong_arg < 0)
 				arg_sign = -1;
-			    break;
+			    bha_nga;
 			}
 		    }
-		    else
+		    དེ་མིན
 		    {
 			// unsigned
 			switch (length_modifier)
 			{
-			    case '\0':
-			    case 'h':
+			    pak_sa '\0':
+			    pak_sa 'h':
 				uint_arg =
-# if defined(FEAT_EVAL)
+# གལ་སྲིད defined(FEAT_EVAL)
 					    tvs != NULL ? (unsigned)
 							tv_nr(tvs, &arg_idx) :
 # endif
 						(skip_to_arg(ap_types, ap_start, &ap, &arg_idx,
 							     &arg_cur, fmt),
-						va_arg(ap, unsigned int));
+						va_arg(ap, unsigned ཧྲིལ));
 
-				if (uint_arg != 0)
+				གལ་སྲིད (uint_arg != 0)
 				    arg_sign = 1;
-				break;
-			    case 'l':
+				bha_nga;
+			    pak_sa 'l':
 				ulong_arg =
-# if defined(FEAT_EVAL)
+# གལ་སྲིད defined(FEAT_EVAL)
 					    tvs != NULL ? (unsigned long)
 							tv_nr(tvs, &arg_idx) :
 # endif
 						(skip_to_arg(ap_types, ap_start, &ap, &arg_idx,
 							     &arg_cur, fmt),
-						va_arg(ap, unsigned long int));
+						va_arg(ap, unsigned long ཧྲིལ));
 
-				if (ulong_arg != 0)
+				གལ་སྲིད (ulong_arg != 0)
 				    arg_sign = 1;
-				break;
-			    case 'L':
+				bha_nga;
+			    pak_sa 'L':
 				ullong_arg =
-# if defined(FEAT_EVAL)
+# གལ་སྲིད defined(FEAT_EVAL)
 					    tvs != NULL ? (uvarnumber_T)
 							tv_nr(tvs, &arg_idx) :
 # endif
@@ -4219,9 +4219,9 @@ vim_vsnprintf_typval(
 							     &arg_cur, fmt),
 						va_arg(ap, uvarnumber_T));
 
-				if (ullong_arg != 0)
+				གལ་སྲིད (ullong_arg != 0)
 				    arg_sign = 1;
-				break;
+				bha_nga;
 			}
 		    }
 
@@ -4233,18 +4233,18 @@ vim_vsnprintf_typval(
 		    //   specified, the '0' flag should be ignored. This is so
 		    //   with Solaris 2.6, Digital UNIX 4.0, HPUX 10, Linux,
 		    //   FreeBSD, NetBSD; but not with Perl.
-		    if (precision_specified)
+		    གལ་སྲིད (precision_specified)
 			zero_padding = 0;
-		    if (fmt_spec == 'd')
+		    གལ་སྲིད (fmt_spec == 'd')
 		    {
-			if (force_sign && arg_sign >= 0)
+			གལ་སྲིད (force_sign && arg_sign >= 0)
 			    tmp[str_arg_l++] = space_for_positive ? ' ' : '+';
 			// leave negative numbers for sprintf to handle, to
 			// avoid handling tricky cases like (short int)-32768
 		    }
-		    else if (alternate_form)
+		    དེ་མིན གལ་སྲིད (alternate_form)
 		    {
-			if (arg_sign != 0
+			གལ་སྲིད (arg_sign != 0
 				     && (fmt_spec == 'b' || fmt_spec == 'B'
 				      || fmt_spec == 'x' || fmt_spec == 'X') )
 			{
@@ -4256,107 +4256,107 @@ vim_vsnprintf_typval(
 		    }
 
 		    zero_padding_insertion_ind = str_arg_l;
-		    if (!precision_specified)
+		    གལ་སྲིད (!precision_specified)
 			precision = 1;   // default precision is 1
-		    if (precision == 0 && arg_sign == 0)
+		    གལ་སྲིད (precision == 0 && arg_sign == 0)
 		    {
 			// When zero value is formatted with an explicit
 			// precision 0, the resulting formatted string is
 			// empty (d, i, u, b, B, o, x, X, p).
 		    }
-		    else
+		    དེ་མིན
 		    {
-			char	f[6];
-			int	f_l = 0;
+			var_na	f[6];
+			ཧྲིལ	f_l = 0;
 
 			// construct a simple format string for sprintf
 			f[f_l++] = '%';
-			if (!length_modifier)
+			གལ་སྲིད (!length_modifier)
 			    ;
-			else if (length_modifier == 'L')
+			དེ་མིན གལ་སྲིད (length_modifier == 'L')
 			{
 # ifdef MSWIN
 			    f[f_l++] = 'I';
 			    f[f_l++] = '6';
 			    f[f_l++] = '4';
-# else
+# དེ་མིན
 			    f[f_l++] = 'l';
 			    f[f_l++] = 'l';
 # endif
 			}
-			else
+			དེ་མིན
 			    f[f_l++] = length_modifier;
 			f[f_l++] = fmt_spec;
 			f[f_l++] = '\0';
 
-			if (fmt_spec == 'p')
+			གལ་སྲིད (fmt_spec == 'p')
 			    str_arg_l += sprintf(tmp + str_arg_l, f, ptr_arg);
-			else if (fmt_spec == 'b' || fmt_spec == 'B')
+			དེ་མིན གལ་སྲིད (fmt_spec == 'b' || fmt_spec == 'B')
 			{
-			    char	    b[8 * sizeof(uvarnumber_T)];
+			    var_na	    b[8 * parimaa_na(uvarnumber_T)];
 			    size_t	    b_l = 0;
 			    uvarnumber_T    bn = bin_arg;
 
 			    do
 			    {
-				b[sizeof(b) - ++b_l] = '0' + (bn & 0x1);
+				b[parimaa_na(b) - ++b_l] = '0' + (bn & 0x1);
 				bn >>= 1;
 			    }
-			    while (bn != 0);
+			    སྐབས (bn != 0);
 
-			    memcpy(tmp + str_arg_l, b + sizeof(b) - b_l, b_l);
+			    memcpy(tmp + str_arg_l, b + parimaa_na(b) - b_l, b_l);
 			    str_arg_l += b_l;
 			}
-			else if (fmt_spec == 'd')
+			དེ་མིན གལ་སྲིད (fmt_spec == 'd')
 			{
 			    // signed
 			    switch (length_modifier)
 			    {
-			    case '\0': str_arg_l += sprintf(
+			    pak_sa '\0': str_arg_l += sprintf(
 						 tmp + str_arg_l, f,
 						 int_arg);
-				       break;
-			    case 'h': str_arg_l += sprintf(
+				       bha_nga;
+			    pak_sa 'h': str_arg_l += sprintf(
 						 tmp + str_arg_l, f,
 						 (short)int_arg);
-				      break;
-			    case 'l': str_arg_l += sprintf(
+				      bha_nga;
+			    pak_sa 'l': str_arg_l += sprintf(
 						tmp + str_arg_l, f, long_arg);
-				      break;
-			    case 'L': str_arg_l += sprintf(
+				      bha_nga;
+			    pak_sa 'L': str_arg_l += sprintf(
 					       tmp + str_arg_l, f, llong_arg);
-				      break;
+				      bha_nga;
 			    }
 			}
-			else
+			དེ་མིན
 			{
 			    // unsigned
 			    switch (length_modifier)
 			    {
-			    case '\0': str_arg_l += sprintf(
+			    pak_sa '\0': str_arg_l += sprintf(
 						tmp + str_arg_l, f,
 						uint_arg);
-				       break;
-			    case 'h': str_arg_l += sprintf(
+				       bha_nga;
+			    pak_sa 'h': str_arg_l += sprintf(
 						tmp + str_arg_l, f,
 						(unsigned short)uint_arg);
-				      break;
-			    case 'l': str_arg_l += sprintf(
+				      bha_nga;
+			    pak_sa 'l': str_arg_l += sprintf(
 					       tmp + str_arg_l, f, ulong_arg);
-				      break;
-			    case 'L': str_arg_l += sprintf(
+				      bha_nga;
+			    pak_sa 'L': str_arg_l += sprintf(
 					      tmp + str_arg_l, f, ullong_arg);
-				      break;
+				      bha_nga;
 			    }
 			}
 
 			// include the optional minus sign and possible
 			// "0x" in the region before the zero padding
 			// insertion point
-			if (zero_padding_insertion_ind < str_arg_l
+			གལ་སྲིད (zero_padding_insertion_ind < str_arg_l
 				&& tmp[zero_padding_insertion_ind] == '-')
 			    zero_padding_insertion_ind++;
-			if (zero_padding_insertion_ind + 1 < str_arg_l
+			གལ་སྲིད (zero_padding_insertion_ind + 1 < str_arg_l
 				&& tmp[zero_padding_insertion_ind]   == '0'
 				&& (tmp[zero_padding_insertion_ind + 1] == 'x'
 				 || tmp[zero_padding_insertion_ind + 1] == 'X'))
@@ -4367,7 +4367,7 @@ vim_vsnprintf_typval(
 			size_t num_of_digits = str_arg_l
 						 - zero_padding_insertion_ind;
 
-			if (alternate_form && fmt_spec == 'o'
+			གལ་སྲིད (alternate_form && fmt_spec == 'o'
 				// unless zero is already the first
 				// character
 				&& !(zero_padding_insertion_ind < str_arg_l
@@ -4375,7 +4375,7 @@ vim_vsnprintf_typval(
 			{
 			    // assure leading zero for alternate-form
 			    // octal numbers
-			    if (!precision_specified
+			    གལ་སྲིད (!precision_specified
 					     || precision < num_of_digits + 1)
 			    {
 				// precision is increased to force the
@@ -4386,60 +4386,60 @@ vim_vsnprintf_typval(
 			    }
 			}
 			// zero padding to specified precision?
-			if (num_of_digits < precision)
+			གལ་སྲིད (num_of_digits < precision)
 			    number_of_zeros_to_pad = precision - num_of_digits;
 		    }
 		    // zero padding to specified minimal field width?
-		    if (!justify_left && zero_padding)
+		    གལ་སྲིད (!justify_left && zero_padding)
 		    {
-			int n = (int)(min_field_width - (str_arg_l
+			ཧྲིལ n = (ཧྲིལ)(min_field_width - (str_arg_l
 						    + number_of_zeros_to_pad));
-			if (n > 0)
+			གལ་སྲིད (n > 0)
 			    number_of_zeros_to_pad += n;
 		    }
-		    break;
+		    bha_nga;
 		}
 
-	    case 'f':
-	    case 'F':
-	    case 'e':
-	    case 'E':
-	    case 'g':
-	    case 'G':
+	    pak_sa 'f':
+	    pak_sa 'F':
+	    pak_sa 'e':
+	    pak_sa 'E':
+	    pak_sa 'g':
+	    pak_sa 'G':
 		{
 		    // Floating point.
-		    double	f;
-		    double	abs_f;
-		    char	format[40];
-		    int		l;
-		    int		remove_trailing_zeroes = FALSE;
+		    dviguu_na	f;
+		    dviguu_na	abs_f;
+		    var_na	format[40];
+		    ཧྲིལ		l;
+		    ཧྲིལ		remove_trailing_zeroes = FALSE;
 
 		    f =
-# if defined(FEAT_EVAL)
+# གལ་སྲིད defined(FEAT_EVAL)
 			tvs != NULL ? tv_float(tvs, &arg_idx) :
 # endif
 			    (skip_to_arg(ap_types, ap_start, &ap, &arg_idx,
 					 &arg_cur, fmt),
-			    va_arg(ap, double));
+			    va_arg(ap, dviguu_na));
 
 		    abs_f = f < 0 ? -f : f;
 
-		    if (fmt_spec == 'g' || fmt_spec == 'G')
+		    གལ་སྲིད (fmt_spec == 'g' || fmt_spec == 'G')
 		    {
 			// Would be nice to use %g directly, but it prints
 			// "1.0" as "1", we don't want that.
-			if ((abs_f >= 0.001 && abs_f < 10000000.0)
+			གལ་སྲིད ((abs_f >= 0.001 && abs_f < 10000000.0)
 							      || abs_f == 0.0)
 			    fmt_spec = ASCII_ISUPPER(fmt_spec) ? 'F' : 'f';
-			else
+			དེ་མིན
 			    fmt_spec = fmt_spec == 'g' ? 'e' : 'E';
 			remove_trailing_zeroes = TRUE;
 		    }
 
-		    if ((fmt_spec == 'f' || fmt_spec == 'F') &&
+		    གལ་སྲིད ((fmt_spec == 'f' || fmt_spec == 'F') &&
 # ifdef VAX
 			    abs_f > 1.0e38
-# else
+# དེ་མིན
 			    abs_f > 1.0e307
 # endif
 			    )
@@ -4450,9 +4450,9 @@ vim_vsnprintf_typval(
 			str_arg_l = STRLEN(tmp);
 			zero_padding = 0;
 		    }
-		    else
+		    དེ་མིན
 		    {
-			if (isnan(f))
+			གལ་སྲིད (isnan(f))
 			{
 			    // Not a number: nan or NAN
 			    STRCPY(tmp, ASCII_ISUPPER(fmt_spec) ? "NAN"
@@ -4460,32 +4460,32 @@ vim_vsnprintf_typval(
 			    str_arg_l = 3;
 			    zero_padding = 0;
 			}
-			else if (isinf(f))
+			དེ་མིན གལ་སྲིད (isinf(f))
 			{
 			    STRCPY(tmp, infinity_str(f > 0.0, fmt_spec,
 					      force_sign, space_for_positive));
 			    str_arg_l = STRLEN(tmp);
 			    zero_padding = 0;
 			}
-			else
+			དེ་མིན
 			{
 			    // Regular float number
 			    format[0] = '%';
 			    l = 1;
-			    if (force_sign)
+			    གལ་སྲིད (force_sign)
 				format[l++] = space_for_positive ? ' ' : '+';
-			    if (precision_specified)
+			    གལ་སྲིད (precision_specified)
 			    {
 				size_t max_prec = TMP_LEN - 10;
 
 				// Make sure we don't get more digits than we
 				// have room for.
-				if ((fmt_spec == 'f' || fmt_spec == 'F')
+				གལ་སྲིད ((fmt_spec == 'f' || fmt_spec == 'F')
 								&& abs_f > 1.0)
 				    max_prec -= (size_t)log10(abs_f);
-				if (precision > max_prec)
+				གལ་སྲིད (precision > max_prec)
 				    precision = max_prec;
-				l += sprintf(format + l, ".%d", (int)precision);
+				l += sprintf(format + l, ".%d", (ཧྲིལ)precision);
 			    }
 			    format[l] = fmt_spec == 'F' ? 'f' : fmt_spec;
 			    format[l + 1] = NUL;
@@ -4493,30 +4493,30 @@ vim_vsnprintf_typval(
 			    str_arg_l = sprintf(tmp, format, f);
 			}
 
-			if (remove_trailing_zeroes)
+			གལ་སྲིད (remove_trailing_zeroes)
 			{
-			    int i;
-			    char *tp;
+			    ཧྲིལ i;
+			    var_na *tp;
 
 			    // Using %g or %G: remove superfluous zeroes.
-			    if (fmt_spec == 'f' || fmt_spec == 'F')
+			    གལ་སྲིད (fmt_spec == 'f' || fmt_spec == 'F')
 				tp = tmp + str_arg_l - 1;
-			    else
+			    དེ་མིན
 			    {
-				tp = (char *)vim_strchr((char_u *)tmp,
+				tp = (var_na *)vim_strchr((char_u *)tmp,
 						 fmt_spec == 'e' ? 'e' : 'E');
-				if (tp != NULL)
+				གལ་སྲིད (tp != NULL)
 				{
 				    // Remove superfluous '+' and leading
 				    // zeroes from the exponent.
-				    if (tp[1] == '+')
+				    གལ་སྲིད (tp[1] == '+')
 				    {
 					// Change "1.0e+07" to "1.0e07"
 					STRMOVE(tp + 1, tp + 2);
 					--str_arg_l;
 				    }
 				    i = (tp[1] == '-') ? 2 : 1;
-				    while (tp[i] == '0')
+				    སྐབས (tp[i] == '0')
 				    {
 					// Change "1.0e07" to "1.0e7"
 					STRMOVE(tp + i, tp + i + 1);
@@ -4526,10 +4526,10 @@ vim_vsnprintf_typval(
 				}
 			    }
 
-			    if (tp != NULL && !precision_specified)
+			    གལ་སྲིད (tp != NULL && !precision_specified)
 				// Remove trailing zeroes, but keep the one
 				// just after a dot.
-				while (tp > tmp + 2 && *tp == '0'
+				སྐབས (tp > tmp + 2 && *tp == '0'
 							     && tp[-1] != '.')
 				{
 				    STRMOVE(tp, tp + 1);
@@ -4537,16 +4537,16 @@ vim_vsnprintf_typval(
 				    --str_arg_l;
 				}
 			}
-			else
+			དེ་མིན
 			{
-			    char *tp;
+			    var_na *tp;
 
 			    // Be consistent: some printf("%e") use 1.0e+12
 			    // and some 1.0e+012.  Remove one zero in the last
 			    // case.
-			    tp = (char *)vim_strchr((char_u *)tmp,
+			    tp = (var_na *)vim_strchr((char_u *)tmp,
 						 fmt_spec == 'e' ? 'e' : 'E');
-			    if (tp != NULL && (tp[1] == '+' || tp[1] == '-')
+			    གལ་སྲིད (tp != NULL && (tp[1] == '+' || tp[1] == '-')
 					  && tp[2] == '0'
 					  && vim_isdigit(tp[3])
 					  && vim_isdigit(tp[4]))
@@ -4556,7 +4556,7 @@ vim_vsnprintf_typval(
 			    }
 			}
 		    }
-		    if (zero_padding && min_field_width > str_arg_l
+		    གལ་སྲིད (zero_padding && min_field_width > str_arg_l
 					      && (tmp[0] == '-' || force_sign))
 		    {
 			// padding 0's should be inserted after the sign
@@ -4564,7 +4564,7 @@ vim_vsnprintf_typval(
 			zero_padding_insertion_ind = 1;
 		    }
 		    str_arg = tmp;
-		    break;
+		    bha_nga;
 		}
 
 	    default:
@@ -4579,26 +4579,26 @@ vim_vsnprintf_typval(
 		// the unrecognized conversion character
 		str_arg = p;
 		str_arg_l = 0;
-		if (*p != NUL)
+		གལ་སྲིད (*p != NUL)
 		    str_arg_l++;  // include invalid conversion specifier
 				  // unchanged if not at end-of-string
-		break;
+		bha_nga;
 	    }
 
-	    if (*p != NUL)
+	    གལ་སྲིད (*p != NUL)
 		p++;     // step over the just processed conversion specifier
 
 	    // insert padding to the left as requested by min_field_width;
 	    // this does not include the zero padding in case of numerical
 	    // conversions
-	    if (!justify_left)
+	    གལ་སྲིད (!justify_left)
 	    {
 		// left padding with blank or zero
-		int pn = (int)(min_field_width - (str_arg_l + number_of_zeros_to_pad));
+		ཧྲིལ pn = (ཧྲིལ)(min_field_width - (str_arg_l + number_of_zeros_to_pad));
 
-		if (pn > 0)
+		གལ་སྲིད (pn > 0)
 		{
-		    if (str_l < str_m)
+		    གལ་སྲིད (str_l < str_m)
 		    {
 			size_t avail = str_m - str_l;
 
@@ -4612,21 +4612,21 @@ vim_vsnprintf_typval(
 
 	    // zero padding as requested by the precision or by the minimal
 	    // field width for numeric conversions required?
-	    if (number_of_zeros_to_pad == 0)
+	    གལ་སྲིད (number_of_zeros_to_pad == 0)
 	    {
 		// will not copy first part of numeric right now, *
 		// force it to be copied later in its entirety
 		zero_padding_insertion_ind = 0;
 	    }
-	    else
+	    དེ་མིན
 	    {
 		// insert first part of numerics (sign or '0x') before zero
 		// padding
-		int zn = (int)zero_padding_insertion_ind;
+		ཧྲིལ zn = (ཧྲིལ)zero_padding_insertion_ind;
 
-		if (zn > 0)
+		གལ་སྲིད (zn > 0)
 		{
-		    if (str_l < str_m)
+		    གལ་སྲིད (str_l < str_m)
 		    {
 			size_t avail = str_m - str_l;
 
@@ -4639,10 +4639,10 @@ vim_vsnprintf_typval(
 
 		// insert zero padding as requested by the precision or min
 		// field width
-		zn = (int)number_of_zeros_to_pad;
-		if (zn > 0)
+		zn = (ཧྲིལ)number_of_zeros_to_pad;
+		གལ་སྲིད (zn > 0)
 		{
-		    if (str_l < str_m)
+		    གལ་སྲིད (str_l < str_m)
 		    {
 			size_t avail = str_m - str_l;
 
@@ -4657,11 +4657,11 @@ vim_vsnprintf_typval(
 	    // insert formatted string
 	    // (or as-is conversion specifier for unknown conversions)
 	    {
-		int sn = (int)(str_arg_l - zero_padding_insertion_ind);
+		ཧྲིལ sn = (ཧྲིལ)(str_arg_l - zero_padding_insertion_ind);
 
-		if (sn > 0)
+		གལ་སྲིད (sn > 0)
 		{
-		    if (str_l < str_m)
+		    གལ་སྲིད (str_l < str_m)
 		    {
 			size_t avail = str_m - str_l;
 
@@ -4674,15 +4674,15 @@ vim_vsnprintf_typval(
 	    }
 
 	    // insert right padding
-	    if (justify_left)
+	    གལ་སྲིད (justify_left)
 	    {
 		// right blank padding to the field width
-		int pn = (int)(min_field_width
+		ཧྲིལ pn = (ཧྲིལ)(min_field_width
 				      - (str_arg_l + number_of_zeros_to_pad));
 
-		if (pn > 0)
+		གལ་སྲིད (pn > 0)
 		{
-		    if (str_l < str_m)
+		    གལ་སྲིད (str_l < str_m)
 		    {
 			size_t avail = str_m - str_l;
 
@@ -4697,7 +4697,7 @@ vim_vsnprintf_typval(
 	}
     }
 
-    if (str_m > 0)
+    གལ་སྲིད (str_m > 0)
     {
 	// make sure the string is nul-terminated even at the expense of
 	// overwriting the last character (shouldn't happen, but just in case)
@@ -4705,17 +4705,17 @@ vim_vsnprintf_typval(
 	str[str_l <= str_m - 1 ? str_l : str_m - 1] = '\0';
     }
 
-    if (tvs != NULL && tvs[num_posarg != 0 ? num_posarg : arg_idx - 1].v_type != VAR_UNKNOWN)
+    གལ་སྲིད (tvs != NULL && tvs[num_posarg != 0 ? num_posarg : arg_idx - 1].v_type != VAR_UNKNOWN)
 	emsg(_(e_too_many_arguments_to_printf));
 
 error:
-    vim_free((char*)ap_types);
+    vim_free((var_na*)ap_types);
     va_end(ap);
 
     // Return the number of characters formatted (excluding trailing nul
     // character), that is, the number of characters that would have been
     // written to the buffer if it were large enough.
-    return (int)str_l;
+    ལོག (ཧྲིལ)str_l;
 }
 
 #endif // PROTO

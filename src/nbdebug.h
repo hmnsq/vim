@@ -15,7 +15,7 @@
 
 # ifndef ASSERT
 #  define ASSERT(c) \
-    if (!(c)) \
+    གལ་སྲིད (!(c)) \
     { \
 	fprintf(stderr, "Assertion failed: line %d, file %s\n", \
 		__LINE__, __FILE__); \
@@ -36,22 +36,22 @@
 
 # define NBDEBUG_TRACE	1
 
-typedef enum {
+typedef ga_nanaa {
 		WT_ENV = 1,		// look for env var if set
 		WT_WAIT,		// look for ~/.gvimwait if set
 		WT_STOP			// look for ~/.gvimstop if set
 } WtWait;
 
 
-void		 nbdbg(char *, ...) ATTRIBUTE_FORMAT_PRINTF(1, 2);
+void		 nbdbg(var_na *, ...) ATTRIBUTE_FORMAT_PRINTF(1, 2);
 
-void nbdebug_wait(u_int wait_flags, char *wait_var, u_int wait_secs);
-void nbdebug_log_init(char *log_var, char *level_var);
+void nbdebug_wait(u_int wait_flags, var_na *wait_var, u_int wait_secs);
+void nbdebug_log_init(var_na *log_var, var_na *level_var);
 
 extern FILE	*nb_debug;
 extern u_int	 nb_dlevel;		// nb_debug verbosity level
 
-#else		// not NBDEBUG
+#དེ་མིན		// not NBDEBUG
 
 # ifndef ASSERT
 #  define ASSERT(c)
@@ -64,7 +64,7 @@ extern u_int	 nb_dlevel;		// nb_debug verbosity level
 
 void
 nbdbg(
-	char		*fmt,
+	var_na		*fmt,
 	...)
 {
 }

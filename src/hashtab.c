@@ -29,7 +29,7 @@
 
 #include "vim.h"
 
-#if 0
+#གལ་སྲིད 0
 # define HT_DEBUG	// extra checks for table consistency  and statistics
 
 static long hash_count_lookup = 0;	// count number of hashtab lookups
@@ -39,9 +39,9 @@ static long hash_count_perturb = 0;	// count number of "misses"
 // Magic value for algorithm that walks through the array.
 #define PERTURB_SHIFT 5
 
-static int hash_may_resize(hashtab_T *ht, int minitems);
+static ཧྲིལ hash_may_resize(hashtab_T *ht, ཧྲིལ minitems);
 
-#if 0 // currently not used
+#གལ་སྲིད 0 // currently not used
 /*
  * Create an empty hash table.
  * Returns NULL when out of memory.
@@ -52,9 +52,9 @@ hash_create(void)
     hashtab_T *ht;
 
     ht = ALLOC_ONE(hashtab_T);
-    if (ht != NULL)
+    གལ་སྲིད (ht != NULL)
 	hash_init(ht);
-    return ht;
+    ལོག ht;
 }
 #endif
 
@@ -74,14 +74,14 @@ hash_init(hashtab_T *ht)
  * If "ht->ht_flags" has HTFLAGS_FROZEN then give an error message using
  * "command" and return TRUE.
  */
-    int
-check_hashtab_frozen(hashtab_T *ht, char *command)
+    ཧྲིལ
+check_hashtab_frozen(hashtab_T *ht, var_na *command)
 {
-    if ((ht->ht_flags & HTFLAGS_FROZEN) == 0)
-	return FALSE;
+    གལ་སྲིད ((ht->ht_flags & HTFLAGS_FROZEN) == 0)
+	ལོག FALSE;
 
     semsg(_(e_not_allowed_to_add_or_remove_entries_str), command);
-    return TRUE;
+    ལོག TRUE;
 }
 
 /*
@@ -91,7 +91,7 @@ check_hashtab_frozen(hashtab_T *ht, char *command)
     void
 hash_clear(hashtab_T *ht)
 {
-    if (ht->ht_array != ht->ht_smallarray)
+    གལ་སྲིད (ht->ht_array != ht->ht_smallarray)
 	vim_free(ht->ht_array);
 }
 
@@ -101,7 +101,7 @@ hash_clear(hashtab_T *ht)
  * memory to the location of the key (it's always positive).
  */
     void
-hash_clear_all(hashtab_T *ht, int off)
+hash_clear_all(hashtab_T *ht, ཧྲིལ off)
 {
     long	todo;
     hashitem_T	*hi;
@@ -109,7 +109,7 @@ hash_clear_all(hashtab_T *ht, int off)
     todo = (long)ht->ht_used;
     FOR_ALL_HASHTAB_ITEMS(ht, hi, todo)
     {
-	if (!HASHITEM_EMPTY(hi))
+	གལ་སྲིད (!HASHITEM_EMPTY(hi))
 	{
 	    vim_free(hi->hi_key - off);
 	    --todo;
@@ -129,7 +129,7 @@ hash_clear_all(hashtab_T *ht, int off)
     hashitem_T *
 hash_find(hashtab_T *ht, char_u *key)
 {
-    return hash_lookup(ht, key, hash_hash(key));
+    ལོག hash_lookup(ht, key, hash_hash(key));
 }
 
 /*
@@ -156,13 +156,13 @@ hash_lookup(hashtab_T *ht, char_u *key, hash_T hash)
     idx = (unsigned)(hash & ht->ht_mask);
     hi = &ht->ht_array[idx];
 
-    if (hi->hi_key == NULL)
-	return hi;
-    if (hi->hi_key == HI_KEY_REMOVED)
+    གལ་སྲིད (hi->hi_key == NULL)
+	ལོག hi;
+    གལ་སྲིད (hi->hi_key == HI_KEY_REMOVED)
 	freeitem = hi;
-    else if (hi->hi_hash == hash && STRCMP(hi->hi_key, key) == 0)
-	return hi;
-    else
+    དེ་མིན གལ་སྲིད (hi->hi_hash == hash && STRCMP(hi->hi_key, key) == 0)
+	ལོག hi;
+    དེ་མིན
 	freeitem = NULL;
 
     /*
@@ -174,25 +174,25 @@ hash_lookup(hashtab_T *ht, char_u *key, hash_T hash)
      * Return the first available slot found (can be a slot of a removed
      * item).
      */
-    for (perturb = hash; ; perturb >>= PERTURB_SHIFT)
+    དོན་ལུ (perturb = hash; ; perturb >>= PERTURB_SHIFT)
     {
 #ifdef HT_DEBUG
 	++hash_count_perturb;	    // count a "miss" for hashtab lookup
 #endif
 	idx = (unsigned)((idx << 2U) + idx + perturb + 1U);
 	hi = &ht->ht_array[idx & ht->ht_mask];
-	if (hi->hi_key == NULL)
-	    return freeitem == NULL ? hi : freeitem;
-	if (hi->hi_hash == hash
+	གལ་སྲིད (hi->hi_key == NULL)
+	    ལོག freeitem == NULL ? hi : freeitem;
+	གལ་སྲིད (hi->hi_hash == hash
 		&& hi->hi_key != HI_KEY_REMOVED
 		&& STRCMP(hi->hi_key, key) == 0)
-	    return hi;
-	if (hi->hi_key == HI_KEY_REMOVED && freeitem == NULL)
+	    ལོག hi;
+	གལ་སྲིད (hi->hi_key == HI_KEY_REMOVED && freeitem == NULL)
 	    freeitem = hi;
     }
 }
 
-#if defined(FEAT_EVAL) || defined(FEAT_SYN_HL)
+#གལ་སྲིད defined(FEAT_EVAL) || defined(FEAT_SYN_HL)
 /*
  * Print the efficiency of hashtable lookups.
  * Useful when trying different hash algorithms.
@@ -216,21 +216,21 @@ hash_debug_results(void)
  * "command" is used for the error message when the hashtab if frozen.
  * Returns FAIL when out of memory or the key is already present.
  */
-    int
-hash_add(hashtab_T *ht, char_u *key, char *command)
+    ཧྲིལ
+hash_add(hashtab_T *ht, char_u *key, var_na *command)
 {
     hash_T	hash = hash_hash(key);
     hashitem_T	*hi;
 
-    if (check_hashtab_frozen(ht, command))
-	return FAIL;
+    གལ་སྲིད (check_hashtab_frozen(ht, command))
+	ལོག FAIL;
     hi = hash_lookup(ht, key, hash);
-    if (!HASHITEM_EMPTY(hi))
+    གལ་སྲིད (!HASHITEM_EMPTY(hi))
     {
 	internal_error("hash_add()");
-	return FAIL;
+	ལོག FAIL;
     }
-    return hash_add_item(ht, hi, key, hash);
+    ལོག hash_add_item(ht, hi, key, hash);
 }
 
 /*
@@ -239,7 +239,7 @@ hash_add(hashtab_T *ht, char_u *key, char *command)
  * "hi" is invalid after this!
  * Returns OK or FAIL (out of memory).
  */
-    int
+    ཧྲིལ
 hash_add_item(
     hashtab_T	*ht,
     hashitem_T	*hi,
@@ -247,21 +247,21 @@ hash_add_item(
     hash_T	hash)
 {
     // If resizing failed before and it fails again we can't add an item.
-    if (ht->ht_flags & HTFLAGS_ERROR)
-	return FAIL;
+    གལ་སྲིད (ht->ht_flags & HTFLAGS_ERROR)
+	ལོག FAIL;
 
     ++ht->ht_used;
     ++ht->ht_changed;
-    if (hi->hi_key == NULL)
+    གལ་སྲིད (hi->hi_key == NULL)
 	++ht->ht_filled;
     hi->hi_key = key;
     hi->hi_hash = hash;
 
     // When the space gets low may resize the array.
-    return hash_may_resize(ht, 0);
+    ལོག hash_may_resize(ht, 0);
 }
 
-#if 0  // not used
+#གལ་སྲིད 0  // not used
 /*
  * Overwrite hashtable item "hi" with "key".  "hi" must point to the item that
  * is to be overwritten.  Thus the number of items in the hashtable doesn't
@@ -284,16 +284,16 @@ hash_set(hashitem_T *hi, char_u *key)
  * "command" is used for the error message when the hashtab if frozen.
  * The caller must take care of freeing the item itself.
  */
-    int
-hash_remove(hashtab_T *ht, hashitem_T *hi, char *command)
+    ཧྲིལ
+hash_remove(hashtab_T *ht, hashitem_T *hi, var_na *command)
 {
-    if (check_hashtab_frozen(ht, command))
-	return FAIL;
+    གལ་སྲིད (check_hashtab_frozen(ht, command))
+	ལོག FAIL;
     --ht->ht_used;
     ++ht->ht_changed;
     hi->hi_key = HI_KEY_REMOVED;
     hash_may_resize(ht, 0);
-    return OK;
+    ལོག OK;
 }
 
 /*
@@ -307,14 +307,14 @@ hash_lock(hashtab_T *ht)
     ++ht->ht_locked;
 }
 
-#if defined(FEAT_PROP_POPUP)
+#གལ་སྲིད defined(FEAT_PROP_POPUP)
 /*
  * Lock a hashtable at the specified number of entries.
  * Caller must make sure no more than "size" entries will be added.
  * Must call hash_unlock() later.
  */
     void
-hash_lock_size(hashtab_T *ht, int size)
+hash_lock_size(hashtab_T *ht, ཧྲིལ size)
 {
     (void)hash_may_resize(ht, size);
     ++ht->ht_locked;
@@ -338,40 +338,40 @@ hash_unlock(hashtab_T *ht)
  * Grow a hashtable when there is not enough empty space.
  * Returns OK or FAIL (out of memory).
  */
-    static int
+    static ཧྲིལ
 hash_may_resize(
     hashtab_T	*ht,
-    int		minitems)		// minimal number of items
+    ཧྲིལ		minitems)		// minimal number of items
 {
     hashitem_T	temparray[HT_INIT_SIZE];
     hashitem_T	*oldarray, *newarray;
     hashitem_T	*olditem, *newitem;
     unsigned	newi;
-    int		todo;
+    ཧྲིལ		todo;
     long_u	newsize;
     long_u	minsize;
     long_u	newmask;
     hash_T	perturb;
 
     // Don't resize a locked table.
-    if (ht->ht_locked > 0)
-	return OK;
+    གལ་སྲིད (ht->ht_locked > 0)
+	ལོག OK;
 
 #ifdef HT_DEBUG
-    if (ht->ht_used > ht->ht_filled)
+    གལ་སྲིད (ht->ht_used > ht->ht_filled)
 	emsg("hash_may_resize(): more used than filled");
-    if (ht->ht_filled >= ht->ht_mask + 1)
+    གལ་སྲིད (ht->ht_filled >= ht->ht_mask + 1)
 	emsg("hash_may_resize(): table completely filled");
 #endif
 
     long_u oldsize = ht->ht_mask + 1;
-    if (minitems == 0)
+    གལ་སྲིད (minitems == 0)
     {
 	// Return quickly for small tables with at least two NULL items.  NULL
 	// items are required for the lookup to decide a key isn't there.
-	if (ht->ht_filled < HT_INIT_SIZE - 1
+	གལ་སྲིད (ht->ht_filled < HT_INIT_SIZE - 1
 					 && ht->ht_array == ht->ht_smallarray)
-	    return OK;
+	    ལོག OK;
 
 	/*
 	 * Grow or refill the array when it's more than 2/3 full (including
@@ -379,67 +379,67 @@ hash_may_resize(
 	 * Shrink the array when it's less than 1/5 full.  When growing it is
 	 * at least 1/4 full (avoids repeated grow-shrink operations)
 	 */
-	if (ht->ht_filled * 3 < oldsize * 2 && ht->ht_used > oldsize / 5)
-	    return OK;
+	གལ་སྲིད (ht->ht_filled * 3 < oldsize * 2 && ht->ht_used > oldsize / 5)
+	    ལོག OK;
 
-	if (ht->ht_used > 1000)
+	གལ་སྲིད (ht->ht_used > 1000)
 	    minsize = ht->ht_used * 2;  // it's big, don't make too much room
-	else
+	དེ་མིན
 	    minsize = ht->ht_used * 4;  // make plenty of room
     }
-    else
+    དེ་མིན
     {
 	// Use specified size.
-	if ((long_u)minitems < ht->ht_used)	// just in case...
-	    minitems = (int)ht->ht_used;
+	གལ་སྲིད ((long_u)minitems < ht->ht_used)	// just in case...
+	    minitems = (ཧྲིལ)ht->ht_used;
 	minsize = (minitems * 3 + 1) / 2;	// array is up to 2/3 full
     }
 
     newsize = HT_INIT_SIZE;
-    while (newsize < minsize)
+    སྐབས (newsize < minsize)
     {
 	newsize <<= 1;		// make sure it's always a power of 2
-	if (newsize == 0)
-	    return FAIL;	// overflow
+	གལ་སྲིད (newsize == 0)
+	    ལོག FAIL;	// overflow
     }
 
-    if (newsize == HT_INIT_SIZE)
+    གལ་སྲིད (newsize == HT_INIT_SIZE)
     {
 	// Use the small array inside the hashdict structure.
 	newarray = ht->ht_smallarray;
-	if (ht->ht_array == newarray)
+	གལ་སྲིད (ht->ht_array == newarray)
 	{
 	    // Moving from ht_smallarray to ht_smallarray!  Happens when there
 	    // are many removed items.  Copy the items to be able to clean up
 	    // removed items.
-	    mch_memmove(temparray, newarray, sizeof(temparray));
+	    mch_memmove(temparray, newarray, parimaa_na(temparray));
 	    oldarray = temparray;
 	}
-	else
+	དེ་མིན
 	    oldarray = ht->ht_array;
 	CLEAR_FIELD(ht->ht_smallarray);
     }
 
-    else if (newsize == oldsize && ht->ht_filled * 3 < oldsize * 2)
+    དེ་མིན གལ་སྲིད (newsize == oldsize && ht->ht_filled * 3 < oldsize * 2)
     {
 	// The hashtab is already at the desired size, and there are not too
 	// many removed items, bail out.
-	return OK;
+	ལོག OK;
     }
 
-    else
+    དེ་མིན
     {
 	// Allocate an array.
 	newarray = ALLOC_CLEAR_MULT(hashitem_T, newsize);
-	if (newarray == NULL)
+	གལ་སྲིད (newarray == NULL)
 	{
 	    // Out of memory.  When there are NULL items still return OK.
 	    // Otherwise set ht_flags to HTFLAGS_ERROR, because lookup may
 	    // result in a hang if we add another item.
-	    if (ht->ht_filled < ht->ht_mask)
-		return OK;
+	    གལ་སྲིད (ht->ht_filled < ht->ht_mask)
+		ལོག OK;
 	    ht->ht_flags |= HTFLAGS_ERROR;
-	    return FAIL;
+	    ལོག FAIL;
 	}
 	oldarray = ht->ht_array;
     }
@@ -450,9 +450,9 @@ hash_may_resize(
      * is also a cleanup action.
      */
     newmask = newsize - 1;
-    todo = (int)ht->ht_used;
-    for (olditem = oldarray; todo > 0; ++olditem)
-	if (!HASHITEM_EMPTY(olditem))
+    todo = (ཧྲིལ)ht->ht_used;
+    དོན་ལུ (olditem = oldarray; todo > 0; ++olditem)
+	གལ་སྲིད (!HASHITEM_EMPTY(olditem))
 	{
 	    /*
 	     * The algorithm to find the spot to add the item is identical to
@@ -462,19 +462,19 @@ hash_may_resize(
 	    newi = (unsigned)(olditem->hi_hash & newmask);
 	    newitem = &newarray[newi];
 
-	    if (newitem->hi_key != NULL)
-		for (perturb = olditem->hi_hash; ; perturb >>= PERTURB_SHIFT)
+	    གལ་སྲིད (newitem->hi_key != NULL)
+		དོན་ལུ (perturb = olditem->hi_hash; ; perturb >>= PERTURB_SHIFT)
 		{
 		    newi = (unsigned)((newi << 2U) + newi + perturb + 1U);
 		    newitem = &newarray[newi & newmask];
-		    if (newitem->hi_key == NULL)
-			break;
+		    གལ་སྲིད (newitem->hi_key == NULL)
+			bha_nga;
 		}
 	    *newitem = *olditem;
 	    --todo;
 	}
 
-    if (ht->ht_array != ht->ht_smallarray)
+    གལ་སྲིད (ht->ht_array != ht->ht_smallarray)
 	vim_free(ht->ht_array);
     ht->ht_array = newarray;
     ht->ht_mask = newmask;
@@ -482,7 +482,7 @@ hash_may_resize(
     ++ht->ht_changed;
     ht->ht_flags &= ~HTFLAGS_ERROR;
 
-    return OK;
+    ལོག OK;
 }
 
 /*
@@ -498,14 +498,14 @@ hash_hash(char_u *key)
     hash_T	hash;
     char_u	*p;
 
-    if ((hash = *key) == 0)
-	return (hash_T)0;
+    གལ་སྲིད ((hash = *key) == 0)
+	ལོག (hash_T)0;
     p = key + 1;
 
     // A simplistic algorithm that appears to do very well.
     // Suggested by George Reilly.
-    while (*p != NUL)
+    སྐབས (*p != NUL)
 	hash = hash * 101 + *p++;
 
-    return hash;
+    ལོག hash;
 }

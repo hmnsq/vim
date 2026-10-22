@@ -17,12 +17,12 @@
 /*
  * GTK4 removed GtkToolbar, so this is our version of it.
  */
-struct _VimToolbar
+sa_nracanaa _VimToolbar
 {
     GtkWidget parent;
 
-    int style; // TOOLBAR_* flags
-    int iconsize; // TBIS_* values
+    ཧྲིལ style; // TOOLBAR_* flags
+    ཧྲིལ iconsize; // TBIS_* values
 
     GList *items;
 
@@ -35,8 +35,8 @@ struct _VimToolbar
 
 G_DEFINE_TYPE(VimToolbar, vim_toolbar, GTK_TYPE_WIDGET)
 
-static void vim_toolbar_size_allocate(GtkWidget *widget, int width, int height, int baseline);
-static void vim_toolbar_measure(GtkWidget *widget, GtkOrientation orientation, int for_size, int *minimum, int *natural, int *minimum_baseline, int *natural_baseline);
+static void vim_toolbar_size_allocate(GtkWidget *widget, ཧྲིལ width, ཧྲིལ height, ཧྲིལ baseline);
+static void vim_toolbar_measure(GtkWidget *widget, GtkOrientation orientation, ཧྲིལ for_size, ཧྲིལ *minimum, ཧྲིལ *natural, ཧྲིལ *minimum_baseline, ཧྲིལ *natural_baseline);
 
     static void
 vim_toolbar_dispose(GObject *object)
@@ -101,7 +101,7 @@ vim_toolbar_init(VimToolbar *self)
     GtkWidget *
 vim_toolbar_new(void)
 {
-    return g_object_new(VIM_TYPE_TOOLBAR, NULL);
+    ལོག g_object_new(VIM_TYPE_TOOLBAR, NULL);
 }
 
 /*
@@ -109,12 +109,12 @@ vim_toolbar_new(void)
  * overflowing items.
  */
     static void
-vim_toolbar_insert(VimToolbar *self, GtkWidget *widget, int idx)
+vim_toolbar_insert(VimToolbar *self, GtkWidget *widget, ཧྲིལ idx)
 {
     GtkWidget	*cur_child = gtk_widget_get_first_child(self->strip);
-    int		i = 0;
+    ཧྲིལ		i = 0;
 
-    while (cur_child != NULL && i != idx - 1)
+    སྐབས (cur_child != NULL && i != idx - 1)
     {
 	cur_child = gtk_widget_get_next_sibling(cur_child);
 	i++;
@@ -129,23 +129,23 @@ vim_toolbar_insert(VimToolbar *self, GtkWidget *widget, int idx)
  * Update "btn" according to "style" and "iconsize".
  */
     static void
-set_button_style(GtkWidget *btn, int style, int iconsize, gboolean invalidate)
+set_button_style(GtkWidget *btn, ཧྲིལ style, ཧྲིལ iconsize, gboolean invalidate)
 {
     GtkWidget *box;
     GtkWidget *icon;
     GtkWidget *label;
 
-    if (GTK_IS_SEPARATOR(btn))
-	return;
+    གལ་སྲིད (GTK_IS_SEPARATOR(btn))
+	ལོག;
 
     box = gtk_button_get_child(GTK_BUTTON(btn));
-    if (style & TOOLBAR_HORIZ)
+    གལ་སྲིད (style & TOOLBAR_HORIZ)
     {
 	gtk_orientable_set_orientation(GTK_ORIENTABLE(box),
 		GTK_ORIENTATION_HORIZONTAL);
 	gtk_box_set_spacing(GTK_BOX(box), 8);
     }
-    else
+    དེ་མིན
     {
 	gtk_orientable_set_orientation(GTK_ORIENTABLE(box),
 		GTK_ORIENTATION_VERTICAL);
@@ -155,42 +155,42 @@ set_button_style(GtkWidget *btn, int style, int iconsize, gboolean invalidate)
     gtk_widget_set_has_tooltip(btn, style & TOOLBAR_TOOLTIPS);
 
     icon = g_object_get_data(G_OBJECT(btn), "icon");
-    if (icon != NULL)
+    གལ་སྲིད (icon != NULL)
     {
-	if (style & TOOLBAR_ICONS)
+	གལ་སྲིད (style & TOOLBAR_ICONS)
 	{
 	    GtkIconSize size;
 
 	    switch (iconsize)
 	    {
-		case TBIS_TINY:
-		case TBIS_SMALL:
-		case TBIS_MEDIUM:
+		pak_sa TBIS_TINY:
+		pak_sa TBIS_SMALL:
+		pak_sa TBIS_MEDIUM:
 		    size = GTK_ICON_SIZE_NORMAL;
-		    break;
-		case TBIS_LARGE:
-		case TBIS_HUGE:
-		case TBIS_GIANT:
+		    bha_nga;
+		pak_sa TBIS_LARGE:
+		pak_sa TBIS_HUGE:
+		pak_sa TBIS_GIANT:
 		    size = GTK_ICON_SIZE_LARGE;
-		    break;
+		    bha_nga;
 		default:
 		    size = GTK_ICON_SIZE_NORMAL;
-		    break;
+		    bha_nga;
 	    }
 	    gtk_image_set_icon_size(GTK_IMAGE(icon), size);
 	    gtk_widget_set_visible(icon, TRUE);
 	}
-	else
+	དེ་མིན
 	    gtk_widget_set_visible(icon, FALSE);
     }
 
     label = g_object_get_data(G_OBJECT(btn), "label");
-    if (label != NULL)
+    གལ་སྲིད (label != NULL)
 	gtk_widget_set_visible(label, style & TOOLBAR_TEXT);
 
     // Used to cache width in toolbar ("self->strip"). -1 means not calculated
     // yet.
-    if (invalidate)
+    གལ་སྲིད (invalidate)
 	g_object_set_data(G_OBJECT(btn), "toolbar-width", GINT_TO_POINTER(-1));
 }
 
@@ -215,8 +215,8 @@ button_clicked(GtkWidget *widget UNUSED, VimToolbar *self)
 vim_toolbar_insert_button(
 	VimToolbar  *self,
 	GtkWidget   *icon,
-	const char  *text,
-	int	    idx)
+	const var_na  *text,
+	ཧྲིལ	    idx)
 {
     GtkWidget *btn = gtk_button_new();
     GtkWidget *box;
@@ -226,14 +226,14 @@ vim_toolbar_insert_button(
 
     gtk_button_set_child(GTK_BUTTON(btn), box);
 
-    if (icon != NULL)
+    གལ་སྲིད (icon != NULL)
     {
 	gtk_widget_set_valign (icon, GTK_ALIGN_CENTER);
 	gtk_widget_set_vexpand (icon, TRUE);
 	gtk_box_append(GTK_BOX(box), icon);
 	g_object_set_data(G_OBJECT(btn), "icon", icon);
     }
-    if (text != NULL)
+    གལ་སྲིད (text != NULL)
     {
 	GtkWidget *label = gtk_label_new(text);
 
@@ -249,47 +249,47 @@ vim_toolbar_insert_button(
 	    G_CALLBACK(button_clicked), self, G_CONNECT_DEFAULT);
 
     vim_toolbar_insert(self, btn, idx);
-    return btn;
+    ལོག btn;
 }
 
 /*
  * Insert a toolbar separator at the given index and return the widget.
  */
     GtkWidget *
-vim_toolbar_insert_separator(VimToolbar *self, int idx)
+vim_toolbar_insert_separator(VimToolbar *self, ཧྲིལ idx)
 {
     GtkWidget *sep = gtk_separator_new(GTK_ORIENTATION_VERTICAL);
 
     g_object_set_data(G_OBJECT(sep), "toolbar-width", GINT_TO_POINTER(-1));
     vim_toolbar_insert(self, sep, idx);
-    return sep;
+    ལོག sep;
 }
 
 /*
  * Update the style and iconsize of the toolbar
  */
     void
-vim_toolbar_set_style(VimToolbar *self, int style, int iconsize)
+vim_toolbar_set_style(VimToolbar *self, ཧྲིལ style, ཧྲིལ iconsize)
 {
     GtkWidget *cur_child = gtk_widget_get_first_child(self->strip);
 
-    if (style == self->style && self->iconsize == iconsize)
-	return;
+    གལ་སྲིད (style == self->style && self->iconsize == iconsize)
+	ལོག;
 
     self->style = style;
     self->iconsize = iconsize;
 
-    while (cur_child != NULL)
+    སྐབས (cur_child != NULL)
     {
-	if (!GTK_IS_SEPARATOR(cur_child))
+	གལ་སྲིད (!GTK_IS_SEPARATOR(cur_child))
 	    set_button_style(cur_child, style, iconsize, TRUE);
 	cur_child = gtk_widget_get_next_sibling(cur_child);
     }
 
     cur_child = gtk_widget_get_first_child(self->overflow_box);
-    while (cur_child != NULL)
+    སྐབས (cur_child != NULL)
     {
-	if (!GTK_IS_SEPARATOR(cur_child))
+	གལ་སྲིད (!GTK_IS_SEPARATOR(cur_child))
 	    set_button_style(cur_child, style, iconsize, TRUE);
 	cur_child = gtk_widget_get_next_sibling(cur_child);
     }
@@ -303,9 +303,9 @@ vim_toolbar_set_style(VimToolbar *self, int style, int iconsize)
     void
 vim_toolbar_remove(VimToolbar *self, GtkWidget *item)
 {
-    if (gtk_widget_get_parent(item) == self->strip)
+    གལ་སྲིད (gtk_widget_get_parent(item) == self->strip)
 	gtk_box_remove(GTK_BOX(self->strip), item);
-    else
+    དེ་མིན
 	gtk_box_remove(GTK_BOX(self->overflow_box), item);
 
     self->items = g_list_remove(self->items, item);
@@ -326,8 +326,8 @@ vim_toolbar_move_item_to(
     GtkBox *from, *to;
 
     to = overflow ? GTK_BOX(self->overflow_box) : GTK_BOX(self->strip);
-    if (gtk_widget_get_parent(item) == GTK_WIDGET(to))
-	return;
+    གལ་སྲིད (gtk_widget_get_parent(item) == GTK_WIDGET(to))
+	ལོག;
 
     from = overflow ? GTK_BOX(self->strip) : GTK_BOX(self->overflow_box);
 
@@ -336,13 +336,13 @@ vim_toolbar_move_item_to(
     gtk_box_append(to, item);
     g_object_unref(item);
 
-    if (GTK_IS_SEPARATOR(item))
+    གལ་སྲིད (GTK_IS_SEPARATOR(item))
 	gtk_widget_set_visible(item, !overflow);
-    else
+    དེ་མིན
     {
-	if (overflow)
+	གལ་སྲིད (overflow)
 	{
-	    int style = self->style;
+	    ཧྲིལ style = self->style;
 
 	    // Force set these flags for the overflow menu, to mimic what GTK3
 	    // GtkToolbar does.
@@ -351,15 +351,15 @@ vim_toolbar_move_item_to(
 	    style |= TOOLBAR_ICONS;
 	    set_button_style(item, style, self->iconsize, FALSE);
 	}
-	else
+	དེ་མིན
 	    set_button_style(item, self->style, self->iconsize, FALSE);
     }
 }
 
-    static int
+    static ཧྲིལ
 get_item_width(GtkWidget *item)
 {
-    int toolbar_width = -1;
+    ཧྲིལ toolbar_width = -1;
 
     // Always use cached width for item, because width in overflow menu is
     // different (GtkBox is in horizontal layout). Also use it for separators,
@@ -367,7 +367,7 @@ get_item_width(GtkWidget *item)
     toolbar_width = GPOINTER_TO_INT(
 	    g_object_get_data(G_OBJECT(item), "toolbar-width"));
 
-    if (toolbar_width == -1)
+    གལ་སྲིད (toolbar_width == -1)
     {
 	GtkRequisition min_req, nat_req;
 	gtk_widget_get_preferred_size(item, &min_req, &nat_req);
@@ -377,68 +377,68 @@ get_item_width(GtkWidget *item)
 	g_object_set_data(G_OBJECT(item),
 		"toolbar-width", GINT_TO_POINTER(toolbar_width));
     }
-    return toolbar_width;
+    ལོག toolbar_width;
 }
 
     static void
 vim_toolbar_size_allocate(
 	GtkWidget   *widget,
-	int	    width,
-	int	    height,
-	int	    baseline)
+	ཧྲིལ	    width,
+	ཧྲིལ	    height,
+	ཧྲིལ	    baseline)
 {
     VimToolbar	    *self = VIM_TOOLBAR(widget);
     GtkAllocation   alloc;
-    int		    used = 0;
-    int		    avail;
+    ཧྲིལ		    used = 0;
+    ཧྲིལ		    avail;
     GList	    *overflow_ele = NULL;
     GtkWidget	    *child;
 
     avail = width - get_item_width(self->overflow_btn);
 
-    for (GList *ele = self->items; ele != NULL; ele = ele->next)
+    དོན་ལུ (GList *ele = self->items; ele != NULL; ele = ele->next)
     {
 	GtkWidget   *item = ele->data;
-	int	    toolbar_width = get_item_width(item);
+	ཧྲིལ	    toolbar_width = get_item_width(item);
 
-	if (used + toolbar_width > avail)
+	གལ་སྲིད (used + toolbar_width > avail)
 	{
 	    overflow_ele = ele;
-	    break;
+	    bha_nga;
 	}
-	else
+	དེ་མིན
 	    vim_toolbar_move_item_to(self, item, FALSE);
 	used += toolbar_width;
     }
 
-    if (overflow_ele != NULL)
+    གལ་སྲིད (overflow_ele != NULL)
     {
-	int	    remaining = width - used;
+	ཧྲིལ	    remaining = width - used;
 	gboolean    need_overflow_btn = FALSE;
 
 	// Move all items in the overflow to the toolbar, so we can add them
 	// in the correct order back again. Also check if the overflow button is
 	// still needed (can fit all toolbar items by disabling it).
-	while ((child = gtk_widget_get_first_child(self->overflow_box))
+	སྐབས ((child = gtk_widget_get_first_child(self->overflow_box))
 		!= NULL)
 	    vim_toolbar_move_item_to(self, child, FALSE);
 
-	for (GList *ele = overflow_ele; ele != NULL; ele = ele->next)
+	དོན་ལུ (GList *ele = overflow_ele; ele != NULL; ele = ele->next)
 	{
 	    remaining -= get_item_width(ele->data);
-	    if (remaining < 0)
+	    གལ་སྲིད (remaining < 0)
 	    {
 		need_overflow_btn = TRUE;
-		break;
+		bha_nga;
 	    }
 	}
 
-	if (need_overflow_btn)
-	    for (; overflow_ele != NULL; overflow_ele = overflow_ele->next)
+	གལ་སྲིད (need_overflow_btn)
+	    དོན་ལུ (; overflow_ele != NULL; overflow_ele = overflow_ele->next)
 		vim_toolbar_move_item_to(self, overflow_ele->data, TRUE);
 	gtk_widget_set_visible(self->overflow_btn, need_overflow_btn);
     }
-    else
+    དེ་མིན
 	gtk_widget_set_visible(self->overflow_btn, FALSE);
 
     alloc.x = alloc.y = 0;
@@ -452,39 +452,39 @@ vim_toolbar_size_allocate(
 vim_toolbar_measure(
 	GtkWidget	*widget,
 	GtkOrientation	orientation,
-	int		for_size,
-	int		*min,
-	int		*nat,
-	int		*min_baseline,
-	int		*nat_baseline)
+	ཧྲིལ		for_size,
+	ཧྲིལ		*min,
+	ཧྲིལ		*nat,
+	ཧྲིལ		*min_baseline,
+	ཧྲིལ		*nat_baseline)
 {
     VimToolbar	*self = VIM_TOOLBAR(widget);
-    int		strip_min = 0, strip_nat = 0;
-    int		obtn_min = 0, obtn_nat = 0;
+    ཧྲིལ		strip_min = 0, strip_nat = 0;
+    ཧྲིལ		obtn_min = 0, obtn_nat = 0;
 
     gtk_widget_measure(self->strip, orientation, for_size,
 	    &strip_min, &strip_nat, NULL, NULL);
     gtk_widget_measure(self->overflow_btn, orientation, for_size,
 	    &obtn_min, &obtn_nat, NULL, NULL);
 
-    if (orientation == GTK_ORIENTATION_HORIZONTAL)
+    གལ་སྲིད (orientation == GTK_ORIENTATION_HORIZONTAL)
     {
-	if (min != NULL)
+	གལ་སྲིད (min != NULL)
 	    *min = obtn_min;
-	if (nat != NULL)
+	གལ་སྲིད (nat != NULL)
 	    *nat = strip_nat + obtn_nat;
     }
-    else
+    དེ་མིན
     {
-	if (min != NULL)
+	གལ་སྲིད (min != NULL)
 	    *min = MAX(strip_min, obtn_min);
-	if (nat != NULL)
+	གལ་སྲིད (nat != NULL)
 	    *nat = MAX(strip_nat, obtn_nat);
     }
 
-    if (min_baseline != NULL)
+    གལ་སྲིད (min_baseline != NULL)
 	*min_baseline = -1;
-    if (nat_baseline != NULL)
+    གལ་སྲིད (nat_baseline != NULL)
 	*nat_baseline = -1;
 }
 

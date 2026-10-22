@@ -13,7 +13,7 @@
 #define WIN32_LEAN_AND_MEAN
 
 #ifndef DYNAMIC_DIRECTX
-# if WINVER < 0x0600
+# གལ་སྲིད WINVER < 0x0600
 #  error WINVER must be 0x0600 or above to use DirectWrite(DirectX)
 # endif
 #endif
@@ -26,7 +26,7 @@
 #include <d2d1helper.h>
 
 // Disable these macros to compile with old VC and newer SDK (V8.1 or later).
-#if defined(_MSC_VER) && (_MSC_VER < 1700)
+#གལ་སྲིད defined(_MSC_VER) && (_MSC_VER < 1700)
 # define _COM_Outptr_ __out
 # define _In_reads_(s)
 # define _In_reads_opt_(s)
@@ -40,7 +40,7 @@
 
 #ifdef FEAT_DIRECTX_COLOR_EMOJI
 # include <dwrite_2.h>
-#else
+#དེ་མིན
 # include <dwrite.h>
 #endif
 
@@ -54,20 +54,20 @@
 
 #ifdef __MINGW32__
 # define UNUSED __attribute__((unused))
-#else
+#དེ་མིན
 # define UNUSED
 #endif
 
-#if (defined(_MSC_VER) && (_MSC_VER >= 1700)) || (__cplusplus >= 201103L)
+#གལ་སྲིད (defined(_MSC_VER) && (_MSC_VER >= 1700)) || (__cplusplus >= 201103L)
 # define FINAL final
-#else
+#དེ་མིན
 # define FINAL
 #endif
 
 #ifdef DYNAMIC_DIRECTX
-extern "C" HINSTANCE vimLoadLib(const char *name);
+extern "C" HINSTANCE vimLoadLib(const var_na *name);
 
-typedef int (WINAPI *PGETUSERDEFAULTLOCALENAME)(LPWSTR, int);
+typedef ཧྲིལ (WINAPI *PGETUSERDEFAULTLOCALENAME)(LPWSTR, ཧྲིལ);
 typedef HRESULT (WINAPI *PD2D1CREATEFACTORY)(D2D1_FACTORY_TYPE,
 	REFIID, const D2D1_FACTORY_OPTIONS *, void **);
 typedef HRESULT (WINAPI *PDWRITECREATEFACTORY)(DWRITE_FACTORY_TYPE,
@@ -87,7 +87,7 @@ static PDWRITECREATEFACTORY pDWriteCreateFactory = NULL;
     static void
 unload(HINSTANCE &hinst)
 {
-    if (hinst != NULL)
+    གལ་སྲིད (hinst != NULL)
     {
 	FreeLibrary(hinst);
 	hinst = NULL;
@@ -95,9 +95,9 @@ unload(HINSTANCE &hinst)
 }
 #endif // DYNAMIC_DIRECTX
 
-template <class T> inline void SafeRelease(T **ppT)
+template <class T> anta_hstha void SafeRelease(T **ppT)
 {
-    if (*ppT)
+    གལ་སྲིད (*ppT)
     {
 	(*ppT)->Release();
 	*ppT = NULL;
@@ -105,103 +105,103 @@ template <class T> inline void SafeRelease(T **ppT)
 }
 
     static DWRITE_PIXEL_GEOMETRY
-ToPixelGeometry(int value)
+ToPixelGeometry(ཧྲིལ value)
 {
     switch (value)
     {
 	default:
-	case 0:
-	    return DWRITE_PIXEL_GEOMETRY_FLAT;
-	case 1:
-	    return DWRITE_PIXEL_GEOMETRY_RGB;
-	case 2:
-	    return DWRITE_PIXEL_GEOMETRY_BGR;
+	pak_sa 0:
+	    ལོག DWRITE_PIXEL_GEOMETRY_FLAT;
+	pak_sa 1:
+	    ལོག DWRITE_PIXEL_GEOMETRY_RGB;
+	pak_sa 2:
+	    ལོག DWRITE_PIXEL_GEOMETRY_BGR;
     }
 }
 
-    static int
+    static ཧྲིལ
 ToInt(DWRITE_PIXEL_GEOMETRY value)
 {
     switch (value)
     {
-	case DWRITE_PIXEL_GEOMETRY_FLAT:
-	    return 0;
-	case DWRITE_PIXEL_GEOMETRY_RGB:
-	    return 1;
-	case DWRITE_PIXEL_GEOMETRY_BGR:
-	    return 2;
+	pak_sa DWRITE_PIXEL_GEOMETRY_FLAT:
+	    ལོག 0;
+	pak_sa DWRITE_PIXEL_GEOMETRY_RGB:
+	    ལོག 1;
+	pak_sa DWRITE_PIXEL_GEOMETRY_BGR:
+	    ལོག 2;
 	default:
-	    return -1;
+	    ལོག -1;
     }
 }
 
     static DWRITE_RENDERING_MODE
-ToRenderingMode(int value)
+ToRenderingMode(ཧྲིལ value)
 {
     switch (value)
     {
 	default:
-	case 0:
-	    return DWRITE_RENDERING_MODE_DEFAULT;
-	case 1:
-	    return DWRITE_RENDERING_MODE_ALIASED;
-	case 2:
-	    return DWRITE_RENDERING_MODE_CLEARTYPE_GDI_CLASSIC;
-	case 3:
-	    return DWRITE_RENDERING_MODE_CLEARTYPE_GDI_NATURAL;
-	case 4:
-	    return DWRITE_RENDERING_MODE_CLEARTYPE_NATURAL;
-	case 5:
-	    return DWRITE_RENDERING_MODE_CLEARTYPE_NATURAL_SYMMETRIC;
-	case 6:
-	    return DWRITE_RENDERING_MODE_OUTLINE;
+	pak_sa 0:
+	    ལོག DWRITE_RENDERING_MODE_DEFAULT;
+	pak_sa 1:
+	    ལོག DWRITE_RENDERING_MODE_ALIASED;
+	pak_sa 2:
+	    ལོག DWRITE_RENDERING_MODE_CLEARTYPE_GDI_CLASSIC;
+	pak_sa 3:
+	    ལོག DWRITE_RENDERING_MODE_CLEARTYPE_GDI_NATURAL;
+	pak_sa 4:
+	    ལོག DWRITE_RENDERING_MODE_CLEARTYPE_NATURAL;
+	pak_sa 5:
+	    ལོག DWRITE_RENDERING_MODE_CLEARTYPE_NATURAL_SYMMETRIC;
+	pak_sa 6:
+	    ལོག DWRITE_RENDERING_MODE_OUTLINE;
     }
 }
 
     static D2D1_TEXT_ANTIALIAS_MODE
-ToTextAntialiasMode(int value)
+ToTextAntialiasMode(ཧྲིལ value)
 {
     switch (value)
     {
 	default:
-	case 0:
-	    return D2D1_TEXT_ANTIALIAS_MODE_DEFAULT;
-	case 1:
-	    return D2D1_TEXT_ANTIALIAS_MODE_CLEARTYPE;
-	case 2:
-	    return D2D1_TEXT_ANTIALIAS_MODE_GRAYSCALE;
-	case 3:
-	    return D2D1_TEXT_ANTIALIAS_MODE_ALIASED;
+	pak_sa 0:
+	    ལོག D2D1_TEXT_ANTIALIAS_MODE_DEFAULT;
+	pak_sa 1:
+	    ལོག D2D1_TEXT_ANTIALIAS_MODE_CLEARTYPE;
+	pak_sa 2:
+	    ལོག D2D1_TEXT_ANTIALIAS_MODE_GRAYSCALE;
+	pak_sa 3:
+	    ལོག D2D1_TEXT_ANTIALIAS_MODE_ALIASED;
     }
 }
 
-    static int
+    static ཧྲིལ
 ToInt(DWRITE_RENDERING_MODE value)
 {
     switch (value)
     {
-	case DWRITE_RENDERING_MODE_DEFAULT:
-	    return 0;
-	case DWRITE_RENDERING_MODE_ALIASED:
-	    return 1;
-	case DWRITE_RENDERING_MODE_CLEARTYPE_GDI_CLASSIC:
-	    return 2;
-	case DWRITE_RENDERING_MODE_CLEARTYPE_GDI_NATURAL:
-	    return 3;
-	case DWRITE_RENDERING_MODE_CLEARTYPE_NATURAL:
-	    return 4;
-	case DWRITE_RENDERING_MODE_CLEARTYPE_NATURAL_SYMMETRIC:
-	    return 5;
-	case DWRITE_RENDERING_MODE_OUTLINE:
-	    return 6;
+	pak_sa DWRITE_RENDERING_MODE_DEFAULT:
+	    ལོག 0;
+	pak_sa DWRITE_RENDERING_MODE_ALIASED:
+	    ལོག 1;
+	pak_sa DWRITE_RENDERING_MODE_CLEARTYPE_GDI_CLASSIC:
+	    ལོག 2;
+	pak_sa DWRITE_RENDERING_MODE_CLEARTYPE_GDI_NATURAL:
+	    ལོག 3;
+	pak_sa DWRITE_RENDERING_MODE_CLEARTYPE_NATURAL:
+	    ལོག 4;
+	pak_sa DWRITE_RENDERING_MODE_CLEARTYPE_NATURAL_SYMMETRIC:
+	    ལོག 5;
+	pak_sa DWRITE_RENDERING_MODE_OUTLINE:
+	    ལོག 6;
 	default:
-	    return -1;
+	    ལོག -1;
     }
 }
 
 class FontCache {
 public:
-    struct Item {
+    sa_nracanaa Item {
 	HFONT              hFont;
 	IDWriteTextFormat* pTextFormat;
 	DWRITE_FONT_WEIGHT fontWeight;
@@ -211,11 +211,11 @@ public:
     };
 
 private:
-    int mSize;
+    ཧྲིལ mSize;
     Item *mItems;
 
 public:
-    FontCache(int size = 2) :
+    FontCache(ཧྲིལ size = 2) :
 	mSize(size),
 	mItems(new Item[size])
     {
@@ -223,30 +223,30 @@ public:
 
     ~FontCache()
     {
-	for (int i = 0; i < mSize; ++i)
+	དོན་ལུ (ཧྲིལ i = 0; i < mSize; ++i)
 	    SafeRelease(&mItems[i].pTextFormat);
 	delete[] mItems;
     }
 
     bool get(HFONT hFont, Item &item)
     {
-	int n = find(hFont);
-	if (n < 0)
-	    return false;
+	ཧྲིལ n = find(hFont);
+	གལ་སྲིད (n < 0)
+	    ལོག false;
 	item = mItems[n];
 	slide(n);
-	return true;
+	ལོག true;
     }
 
     void put(const Item& item)
     {
-	int n = find(item.hFont);
-	if (n < 0)
+	ཧྲིལ n = find(item.hFont);
+	གལ་སྲིད (n < 0)
 	    n = mSize - 1;
-	if (mItems[n].pTextFormat != item.pTextFormat)
+	གལ་སྲིད (mItems[n].pTextFormat != item.pTextFormat)
 	{
 	    SafeRelease(&mItems[n].pTextFormat);
-	    if (item.pTextFormat != NULL)
+	    གལ་སྲིད (item.pTextFormat != NULL)
 		item.pTextFormat->AddRef();
 	}
 	mItems[n] = item;
@@ -254,34 +254,34 @@ public:
     }
 
 private:
-    int find(HFONT hFont)
+    ཧྲིལ find(HFONT hFont)
     {
-	for (int i = 0; i < mSize; ++i)
+	དོན་ལུ (ཧྲིལ i = 0; i < mSize; ++i)
 	{
-	    if (mItems[i].hFont == hFont)
-		return i;
+	    གལ་སྲིད (mItems[i].hFont == hFont)
+		ལོག i;
 	}
-	return -1;
+	ལོག -1;
     }
 
-    void slide(int nextTop)
+    void slide(ཧྲིལ nextTop)
     {
-	if (nextTop == 0)
-	    return;
+	གལ་སྲིད (nextTop == 0)
+	    ལོག;
 	Item tmp = mItems[nextTop];
-	for (int i = nextTop - 1; i >= 0; --i)
+	དོན་ལུ (ཧྲིལ i = nextTop - 1; i >= 0; --i)
 	    mItems[i + 1] = mItems[i];
 	mItems[0] = tmp;
     }
 };
 
-enum DrawingMode {
+ga_nanaa DrawingMode {
     DM_GDI = 0,
     DM_DIRECTX = 1,
     DM_INTEROP = 2,
 };
 
-struct DWriteContext {
+sa_nracanaa DWriteContext {
     HDC mHDC;
     RECT mBindRect;
     DrawingMode mDMode;
@@ -314,7 +314,7 @@ struct DWriteContext {
     D2D1_TEXT_ANTIALIAS_MODE mTextAntialiasMode;
 
     DWriteFontFeature mFontFeatures[DWRITE_MAX_FONT_FEATURES];
-    int mFontFeatureCount;
+    ཧྲིལ mFontFeatureCount;
 
     // METHODS
 
@@ -341,17 +341,17 @@ struct DWriteContext {
 
     ID2D1Brush* SolidBrush(COLORREF color);
 
-    void DrawText(const WCHAR *text, int len,
-	int x, int y, int w, int h, int cellWidth, COLORREF color,
+    void DrawText(const WCHAR *text, ཧྲིལ len,
+	ཧྲིལ x, ཧྲིལ y, ཧྲིལ w, ཧྲིལ h, ཧྲིལ cellWidth, COLORREF color,
 	UINT fuOptions, const RECT *lprc, const INT *lpDx);
 
     void FillRect(const RECT *rc, COLORREF color);
 
-    void DrawLine(int x1, int y1, int x2, int y2, COLORREF color);
+    void DrawLine(ཧྲིལ x1, ཧྲིལ y1, ཧྲིལ x2, ཧྲིལ y2, COLORREF color);
 
-    void SetPixel(int x, int y, COLORREF color);
+    void SetPixel(ཧྲིལ x, ཧྲིལ y, COLORREF color);
 
-    void Scroll(int x, int y, const RECT *rc);
+    void Scroll(ཧྲིལ x, ཧྲིལ y, const RECT *rc);
 
     void Flush();
 
@@ -361,7 +361,7 @@ struct DWriteContext {
     DWriteRenderingParams *GetRenderingParams(
 	    DWriteRenderingParams *params);
 
-    void SetFontFeatures(const DWriteFontFeature *features, int count);
+    void SetFontFeatures(const DWriteFontFeature *features, ཧྲིལ count);
 };
 
 class AdjustedGlyphRun : public DWRITE_GLYPH_RUN
@@ -377,25 +377,25 @@ public:
 	    FLOAT cellWidth,
 	    FLOAT &accum,
 	    const INT *lpDx,
-	    int *glyphIndex,
-	    int cchText) :
+	    ཧྲིལ *glyphIndex,
+	    ཧྲིལ cchText) :
 	DWRITE_GLYPH_RUN(*glyphRun),
 	mAccum(accum),
 	mDelta(0.0f),
 	mAdjustedAdvances(new FLOAT[glyphRun->glyphCount])
     {
 	assert(cellWidth != 0.0f);
-	for (UINT32 i = 0; i < glyphRun->glyphCount; ++i)
+	དོན་ལུ (UINT32 i = 0; i < glyphRun->glyphCount; ++i)
 	{
 	    FLOAT orig = glyphRun->glyphAdvances[i];
 	    FLOAT adjusted;
 
-	    if (*glyphIndex < cchText)
+	    གལ་སྲིད (*glyphIndex < cchText)
 	    {
 		adjusted = FLOAT(lpDx[*glyphIndex]);
 		(*glyphIndex)++;
 	    }
-	    else
+	    དེ་མིན
 	    {
 		adjusted = adjustToCell(orig, cellWidth);
 	    }
@@ -414,24 +414,24 @@ public:
 
     static FLOAT adjustToCell(FLOAT value, FLOAT cellWidth)
     {
-	int cellCount = int(floor(value / cellWidth + 0.5f));
-	if (cellCount < 1)
+	ཧྲིལ cellCount = ཧྲིལ(floor(value / cellWidth + 0.5f));
+	གལ་སྲིད (cellCount < 1)
 	    cellCount = 1;
-	return cellCount * cellWidth;
+	ལོག cellCount * cellWidth;
     }
 };
 
-struct TextRendererContext {
+sa_nracanaa TextRendererContext {
     // const fields.
     COLORREF color;
     FLOAT cellWidth;
     const INT *lpDx;
-    int cchText;
+    ཧྲིལ cchText;
     FLOAT baselineY;  // Fixed baseline Y coordinate
 
     // working fields.
     FLOAT offsetX;
-    int glyphIndex;
+    ཧྲིལ glyphIndex;
 };
 
 class TextRenderer FINAL : public IDWriteTextRenderer
@@ -455,7 +455,7 @@ public:
 	__out BOOL* isDisabled)
     {
 	*isDisabled = FALSE;
-	return S_OK;
+	ལོག S_OK;
     }
 
     IFACEMETHOD(GetCurrentTransform)(
@@ -465,7 +465,7 @@ public:
 	// forward the render target's transform
 	pDWC_->mRT->GetTransform(
 		reinterpret_cast<D2D1_MATRIX_3X2_F*>(transform));
-	return S_OK;
+	ལོག S_OK;
     }
 
     IFACEMETHOD(GetPixelsPerDip)(
@@ -475,7 +475,7 @@ public:
 	float dpiX, unused;
 	pDWC_->mRT->GetDpi(&dpiX, &unused);
 	*pixelsPerDip = dpiX / 96.0f;
-	return S_OK;
+	ལོག S_OK;
     }
 
     IFACEMETHOD(DrawUnderline)(
@@ -485,7 +485,7 @@ public:
 	__in DWRITE_UNDERLINE const* underline UNUSED,
 	IUnknown* clientDrawingEffect UNUSED)
     {
-	return E_NOTIMPL;
+	ལོག E_NOTIMPL;
     }
 
     IFACEMETHOD(DrawStrikethrough)(
@@ -495,7 +495,7 @@ public:
 	__in DWRITE_STRIKETHROUGH const* strikethrough UNUSED,
 	IUnknown* clientDrawingEffect UNUSED)
     {
-	return E_NOTIMPL;
+	ལོག E_NOTIMPL;
     }
 
     IFACEMETHOD(DrawInlineObject)(
@@ -507,7 +507,7 @@ public:
 	BOOL isRightToLeft UNUSED,
 	IUnknown* clientDrawingEffect UNUSED)
     {
-	return E_NOTIMPL;
+	ལོག E_NOTIMPL;
     }
 
     IFACEMETHOD(DrawGlyphRun)(
@@ -532,7 +532,7 @@ public:
 		context->cchText);
 
 #ifdef FEAT_DIRECTX_COLOR_EMOJI
-	if (pDWC_->mDWriteFactory2 != NULL)
+	གལ་སྲིད (pDWC_->mDWriteFactory2 != NULL)
 	{
 	    IDWriteColorGlyphRunEnumerator *enumerator = NULL;
 	    HRESULT hr = pDWC_->mDWriteFactory2->TranslateColorGlyphRun(
@@ -544,12 +544,12 @@ public:
 		NULL,
 		0,
 		&enumerator);
-	    if (SUCCEEDED(hr))
+	    གལ་སྲིད (SUCCEEDED(hr))
 	    {
 		// Draw by IDWriteFactory2 for color emoji
 		BOOL hasRun = TRUE;
 		enumerator->MoveNext(&hasRun);
-		while (hasRun)
+		སྐབས (hasRun)
 		{
 		    const DWRITE_COLOR_GLYPH_RUN* colorGlyphRun;
 		    enumerator->GetCurrentRun(&colorGlyphRun);
@@ -565,7 +565,7 @@ public:
 		    enumerator->MoveNext(&hasRun);
 		}
 		SafeRelease(&enumerator);
-		return S_OK;
+		ལོག S_OK;
 	    }
 	}
 #endif
@@ -578,50 +578,50 @@ public:
 		&adjustedGlyphRun,
 		pDWC_->SolidBrush(context->color),
 		DWRITE_MEASURING_MODE_NATURAL);
-	return S_OK;
+	ལོག S_OK;
     }
 
 public:
     IFACEMETHOD_(unsigned long, AddRef) ()
     {
-	return InterlockedIncrement(&cRefCount_);
+	ལོག InterlockedIncrement(&cRefCount_);
     }
 
     IFACEMETHOD_(unsigned long, Release) ()
     {
 	long newCount = InterlockedDecrement(&cRefCount_);
 
-	if (newCount == 0)
+	གལ་སྲིད (newCount == 0)
 	{
 	    delete this;
-	    return 0;
+	    ལོག 0;
 	}
-	return newCount;
+	ལོག newCount;
     }
 
     IFACEMETHOD(QueryInterface)(
 	IID const& riid,
 	void** ppvObject)
     {
-	if (__uuidof(IDWriteTextRenderer) == riid)
+	གལ་སྲིད (__uuidof(IDWriteTextRenderer) == riid)
 	{
 	    *ppvObject = this;
 	}
-	else if (__uuidof(IDWritePixelSnapping) == riid)
+	དེ་མིན གལ་སྲིད (__uuidof(IDWritePixelSnapping) == riid)
 	{
 	    *ppvObject = this;
 	}
-	else if (__uuidof(IUnknown) == riid)
+	དེ་མིན གལ་སྲིད (__uuidof(IUnknown) == riid)
 	{
 	    *ppvObject = this;
 	}
-	else
+	དེ་མིན
 	{
 	    *ppvObject = NULL;
-	    return E_FAIL;
+	    ལོག E_FAIL;
 	}
 
-	return S_OK;
+	ལོག S_OK;
     }
 
 private:
@@ -656,7 +656,7 @@ DWriteContext::DWriteContext() :
     mTextAntialiasMode(D2D1_TEXT_ANTIALIAS_MODE_DEFAULT),
     mFontFeatureCount(0)
 {
-    ZeroMemory(mFontFeatures, sizeof(mFontFeatures));
+    ZeroMemory(mFontFeatures, parimaa_na(mFontFeatures));
     HRESULT hr;
 
     hr = D2D1CreateFactory(D2D1_FACTORY_TYPE_SINGLE_THREADED,
@@ -664,7 +664,7 @@ DWriteContext::DWriteContext() :
 	    reinterpret_cast<void**>(&mD2D1Factory));
     _RPT2(_CRT_WARN, "D2D1CreateFactory: hr=%p p=%p\n", hr, mD2D1Factory);
 
-    if (SUCCEEDED(hr))
+    གལ་སྲིད (SUCCEEDED(hr))
     {
 	hr = DWriteCreateFactory(
 		DWRITE_FACTORY_TYPE_SHARED,
@@ -675,7 +675,7 @@ DWriteContext::DWriteContext() :
     }
 
 #ifdef FEAT_DIRECTX_COLOR_EMOJI
-    if (SUCCEEDED(hr))
+    གལ་སྲིད (SUCCEEDED(hr))
     {
 	DWriteCreateFactory(
 		DWRITE_FACTORY_TYPE_SHARED,
@@ -685,13 +685,13 @@ DWriteContext::DWriteContext() :
     }
 #endif
 
-    if (SUCCEEDED(hr))
+    གལ་སྲིད (SUCCEEDED(hr))
     {
 	hr = mDWriteFactory->GetGdiInterop(&mGdiInterop);
 	_RPT2(_CRT_WARN, "GetGdiInterop: hr=%p p=%p\n", hr, mGdiInterop);
     }
 
-    if (SUCCEEDED(hr))
+    གལ་སྲིད (SUCCEEDED(hr))
     {
 	hr = mDWriteFactory->CreateRenderingParams(&mRenderingParams);
 	_RPT2(_CRT_WARN, "CreateRenderingParams: hr=%p p=%p\n", hr,
@@ -720,8 +720,8 @@ DWriteContext::CreateDeviceResources()
 {
     HRESULT hr;
 
-    if (mRT != NULL)
-	return S_OK;
+    གལ་སྲིད (mRT != NULL)
+	ལོག S_OK;
 
     D2D1_RENDER_TARGET_PROPERTIES props = {
 	D2D1_RENDER_TARGET_TYPE_DEFAULT,
@@ -733,7 +733,7 @@ DWriteContext::CreateDeviceResources()
     hr = mD2D1Factory->CreateDCRenderTarget(&props, &mRT);
     _RPT2(_CRT_WARN, "CreateDCRenderTarget: hr=%p p=%p\n", hr, mRT);
 
-    if (SUCCEEDED(hr))
+    གལ་སྲིད (SUCCEEDED(hr))
     {
 	// This always succeeds.
 	mRT->QueryInterface(
@@ -742,7 +742,7 @@ DWriteContext::CreateDeviceResources()
 	_RPT1(_CRT_WARN, "GdiInteropRenderTarget: p=%p\n", mGDIRT);
     }
 
-    if (SUCCEEDED(hr))
+    གལ་སྲིད (SUCCEEDED(hr))
     {
 	hr = mRT->CreateSolidColorBrush(
 		D2D1::ColorF(D2D1::ColorF::Black),
@@ -750,10 +750,10 @@ DWriteContext::CreateDeviceResources()
 	_RPT2(_CRT_WARN, "CreateSolidColorBrush: hr=%p p=%p\n", hr, mBrush);
     }
 
-    if (SUCCEEDED(hr))
+    གལ་སྲིད (SUCCEEDED(hr))
 	Rebind();
 
-    return hr;
+    ལོག hr;
 }
 
     void
@@ -779,20 +779,20 @@ DWriteContext::CreateTextFormatFromLOGFONT(const LOGFONTW &logFont,
     float fontSize = 0;
     DWRITE_FONT_METRICS fontMetrics = {};
 
-    if (SUCCEEDED(hr))
+    གལ་སྲིད (SUCCEEDED(hr))
     {
 	hr = mGdiInterop->CreateFontFromLOGFONT(&logFont, &font);
     }
 
     // Get the font family to which this font belongs.
-    if (SUCCEEDED(hr))
+    གལ་སྲིད (SUCCEEDED(hr))
     {
 	hr = font->GetFontFamily(&fontFamily);
     }
 
     // Get the family names. This returns an object that encapsulates one or
     // more names with the same meaning but in different languages.
-    if (SUCCEEDED(hr))
+    གལ་སྲིད (SUCCEEDED(hr))
     {
 	hr = fontFamily->GetFamilyNames(&localizedFamilyNames);
     }
@@ -802,13 +802,13 @@ DWriteContext::CreateTextFormatFromLOGFONT(const LOGFONTW &logFont,
     // purposes of creating a text format object any language will do.
 
     wchar_t familyName[100];
-    if (SUCCEEDED(hr))
+    གལ་སྲིད (SUCCEEDED(hr))
     {
 	hr = localizedFamilyNames->GetString(0, familyName,
 		ARRAYSIZE(familyName));
     }
 
-    if (SUCCEEDED(hr))
+    གལ་སྲིད (SUCCEEDED(hr))
     {
 	// Use lfHeight of the LOGFONT as font size.
 	fontSize = float(logFont.lfHeight);
@@ -816,12 +816,12 @@ DWriteContext::CreateTextFormatFromLOGFONT(const LOGFONTW &logFont,
 	font->GetMetrics(&fontMetrics);
 
 	// Convert lfHeight to DirectWrite font size
-	if (fontSize < 0)
+	གལ་སྲིད (fontSize < 0)
 	{
 	    // Negative lfHeight represents the font's em height in pixels
 	    fontSize = -fontSize;
 	}
-	else if (fontSize > 0)
+	དེ་མིན གལ་སྲིད (fontSize > 0)
 	{
 	    // Positive lfHeight represents the font's cell height (ascent + descent)
 	    // Convert to em height
@@ -834,13 +834,13 @@ DWriteContext::CreateTextFormatFromLOGFONT(const LOGFONTW &logFont,
     // language of the text, which may or may not be the same as the primary
     // language of the user. However, for our purposes the user locale will do.
     wchar_t localeName[LOCALE_NAME_MAX_LENGTH];
-    if (SUCCEEDED(hr))
+    གལ་སྲིད (SUCCEEDED(hr))
     {
-	if (GetUserDefaultLocaleName(localeName, LOCALE_NAME_MAX_LENGTH) == 0)
+	གལ་སྲིད (GetUserDefaultLocaleName(localeName, LOCALE_NAME_MAX_LENGTH) == 0)
 	    hr = HRESULT_FROM_WIN32(GetLastError());
     }
 
-    if (SUCCEEDED(hr))
+    གལ་སྲིད (SUCCEEDED(hr))
     {
 	// Create the text format object.
 	hr = mDWriteFactory->CreateTextFormat(
@@ -854,37 +854,37 @@ DWriteContext::CreateTextFormatFromLOGFONT(const LOGFONTW &logFont,
 		&pTextFormat);
     }
 
-    if (SUCCEEDED(hr))
+    གལ་སྲིད (SUCCEEDED(hr))
 	hr = pTextFormat->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_LEADING);
 
-    if (SUCCEEDED(hr))
+    གལ་སྲིད (SUCCEEDED(hr))
 	hr = pTextFormat->SetParagraphAlignment(
 		DWRITE_PARAGRAPH_ALIGNMENT_FAR);
 
-    if (SUCCEEDED(hr))
+    གལ་སྲིད (SUCCEEDED(hr))
 	hr = pTextFormat->SetWordWrapping(DWRITE_WORD_WRAPPING_NO_WRAP);
 
     SafeRelease(&localizedFamilyNames);
     SafeRelease(&fontFamily);
     SafeRelease(&font);
 
-    if (SUCCEEDED(hr))
+    གལ་སྲིད (SUCCEEDED(hr))
     {
 	*ppTextFormat = pTextFormat;
-	if (pFontAscent != NULL && fontMetrics.designUnitsPerEm != 0)
+	གལ་སྲིད (pFontAscent != NULL && fontMetrics.designUnitsPerEm != 0)
 	{
 	    // Calculate ascent ratio (0.0 to 1.0) relative to total font height
 	    FLOAT totalHeight = float(fontMetrics.ascent + fontMetrics.descent);
-	    if (totalHeight != 0.0f)
+	    གལ་སྲིད (totalHeight != 0.0f)
 		*pFontAscent = float(fontMetrics.ascent) / totalHeight;
-	    else
+	    དེ་མིན
 		*pFontAscent = 0.83f; // fallback
 	}
     }
-    else
+    དེ་མིན
 	SafeRelease(&pTextFormat);
 
-    return hr;
+    ལོག hr;
 }
 
     HRESULT
@@ -896,7 +896,7 @@ DWriteContext::SetFontByLOGFONT(const LOGFONTW &logFont)
 
     hr = CreateTextFormatFromLOGFONT(logFont, &pTextFormat, &fontAscent);
 
-    if (SUCCEEDED(hr))
+    གལ་སྲིད (SUCCEEDED(hr))
     {
 	SafeRelease(&mTextFormat);
 	mTextFormat = pTextFormat;
@@ -906,16 +906,16 @@ DWriteContext::SetFontByLOGFONT(const LOGFONTW &logFont)
 	mFontAscent = fontAscent;
     }
 
-    return hr;
+    ལོག hr;
 }
 
     void
 DWriteContext::SetFont(HFONT hFont)
 {
     FontCache::Item item;
-    if (mFontCache.get(hFont, item))
+    གལ་སྲིད (mFontCache.get(hFont, item))
     {
-	if (item.pTextFormat != NULL)
+	གལ་སྲིད (item.pTextFormat != NULL)
 	{
 	    item.pTextFormat->AddRef();
 	    SafeRelease(&mTextFormat);
@@ -925,18 +925,18 @@ DWriteContext::SetFont(HFONT hFont)
 	    mFontAscent = item.fontAscent;
 	    mFallbackDC = false;
 	}
-	else
+	དེ་མིན
 	    mFallbackDC = true;
-	return;
+	ལོག;
     }
 
     HRESULT hr = E_FAIL;
     LOGFONTW lf;
-    if (GetObjectW(hFont, sizeof(lf), &lf))
+    གལ་སྲིད (GetObjectW(hFont, parimaa_na(lf), &lf))
 	hr = SetFontByLOGFONT(lf);
 
     item.hFont = hFont;
-    if (SUCCEEDED(hr))
+    གལ་སྲིད (SUCCEEDED(hr))
     {
 	item.pTextFormat = mTextFormat;
 	item.fontWeight = mFontWeight;
@@ -944,7 +944,7 @@ DWriteContext::SetFont(HFONT hFont)
 	item.fontAscent = mFontAscent;
 	mFallbackDC = false;
     }
-    else
+    དེ་མིན
 	mFallbackDC = true;
     mFontCache.put(item);
 }
@@ -973,9 +973,9 @@ DWriteContext::BindDC(HDC hdc, const RECT *rect)
     mHDC = hdc;
     mBindRect = *rect;
 
-    if (mRT == NULL)
+    གལ་སྲིད (mRT == NULL)
 	CreateDeviceResources();
-    else
+    དེ་མིན
     {
 	Flush();
 	Rebind();
@@ -992,16 +992,16 @@ DWriteContext::SetDrawingMode(DrawingMode mode)
     switch (mode)
     {
 	default:
-	case DM_GDI:
-	    if (mInteropHDC != NULL)
+	pak_sa DM_GDI:
+	    གལ་སྲིད (mInteropHDC != NULL)
 	    {
 		mGDIRT->ReleaseDC(NULL);
 		mInteropHDC = NULL;
 	    }
-	    if (mDrawing)
+	    གལ་སྲིད (mDrawing)
 	    {
 		hr = mRT->EndDraw();
-		if (hr == (HRESULT)D2DERR_RECREATE_TARGET)
+		གལ་སྲིད (hr == (HRESULT)D2DERR_RECREATE_TARGET)
 		{
 		    hr = S_OK;
 		    DiscardDeviceResources();
@@ -1010,35 +1010,35 @@ DWriteContext::SetDrawingMode(DrawingMode mode)
 		}
 		mDrawing = false;
 	    }
-	    break;
+	    bha_nga;
 
-	case DM_DIRECTX:
-	    if (mInteropHDC != NULL)
+	pak_sa DM_DIRECTX:
+	    གལ་སྲིད (mInteropHDC != NULL)
 	    {
 		mGDIRT->ReleaseDC(NULL);
 		mInteropHDC = NULL;
 	    }
-	    else if (mDrawing == false)
+	    དེ་མིན གལ་སྲིད (mDrawing == false)
 	    {
 		CreateDeviceResources();
 		mRT->BeginDraw();
 		mDrawing = true;
 	    }
-	    break;
+	    bha_nga;
 
-	case DM_INTEROP:
-	    if (mDrawing == false)
+	pak_sa DM_INTEROP:
+	    གལ་སྲིད (mDrawing == false)
 	    {
 		CreateDeviceResources();
 		mRT->BeginDraw();
 		mDrawing = true;
 	    }
-	    if (mInteropHDC == NULL)
+	    གལ་སྲིད (mInteropHDC == NULL)
 		hr = mGDIRT->GetDC(D2D1_DC_INITIALIZE_MODE_COPY, &mInteropHDC);
-	    break;
+	    bha_nga;
     }
     mDMode = mode;
-    return hr;
+    ལོག hr;
 }
 
     ID2D1Brush*
@@ -1046,19 +1046,19 @@ DWriteContext::SolidBrush(COLORREF color)
 {
     mBrush->SetColor(D2D1::ColorF(UINT32(GetRValue(color)) << 16 |
 		UINT32(GetGValue(color)) << 8 | UINT32(GetBValue(color))));
-    return mBrush;
+    ལོག mBrush;
 }
 
     void
-DWriteContext::DrawText(const WCHAR *text, int len,
-	int x, int y, int w, int h, int cellWidth, COLORREF color,
+DWriteContext::DrawText(const WCHAR *text, ཧྲིལ len,
+	ཧྲིལ x, ཧྲིལ y, ཧྲིལ w, ཧྲིལ h, ཧྲིལ cellWidth, COLORREF color,
 	UINT fuOptions, const RECT *lprc, const INT *lpDx)
 {
-    if (mFallbackDC)
+    གལ་སྲིད (mFallbackDC)
     {
 	// Fall back to GDI rendering.
 	HRESULT hr = SetDrawingMode(DM_INTEROP);
-	if (SUCCEEDED(hr))
+	གལ་སྲིད (SUCCEEDED(hr))
 	{
 	    HGDIOBJ hFont = ::GetCurrentObject(mHDC, OBJ_FONT);
 	    HGDIOBJ hOldFont = ::SelectObject(mInteropHDC, hFont);
@@ -1067,7 +1067,7 @@ DWriteContext::DrawText(const WCHAR *text, int len,
 	    ::ExtTextOutW(mInteropHDC, x, y, fuOptions, lprc, text, len, lpDx);
 	    ::SelectObject(mInteropHDC, hOldFont);
 	}
-	return;
+	ལོག;
     }
 
     HRESULT hr;
@@ -1076,7 +1076,7 @@ DWriteContext::DrawText(const WCHAR *text, int len,
     SetDrawingMode(DM_DIRECTX);
 
     // Apply clipping if ETO_CLIPPED is specified
-    if ((fuOptions & ETO_CLIPPED) && lprc != NULL)
+    གལ་སྲིད ((fuOptions & ETO_CLIPPED) && lprc != NULL)
     {
 	mRT->PushAxisAlignedClip(
 	    D2D1::RectF(FLOAT(lprc->left), FLOAT(lprc->top),
@@ -1087,13 +1087,13 @@ DWriteContext::DrawText(const WCHAR *text, int len,
     hr = mDWriteFactory->CreateTextLayout(text, len, mTextFormat,
 	    FLOAT(w), FLOAT(h), &textLayout);
 
-    if (SUCCEEDED(hr))
+    གལ་སྲིད (SUCCEEDED(hr))
     {
 	DWRITE_TEXT_RANGE textRange = { 0, UINT32(len) };
 	textLayout->SetFontWeight(mFontWeight, textRange);
 	textLayout->SetFontStyle(mFontStyle, textRange);
 
-	if (mFontFeatureCount > 0)
+	གལ་སྲིད (mFontFeatureCount > 0)
 	{
 	    // Default OpenType features that DirectWrite normally enables.
 	    // SetTypography() overrides all defaults, so we must
@@ -1105,32 +1105,32 @@ DWriteContext::DrawText(const WCHAR *text, int len,
 		{ DWRITE_FONT_FEATURE_TAG_REQUIRED_LIGATURES, 1 },
 		{ DWRITE_FONT_FEATURE_TAG_KERNING, 1 },
 	    };
-	    static const int numDefaults = sizeof(defaultFeatures)
-		/ sizeof(defaultFeatures[0]);
+	    static const ཧྲིལ numDefaults = parimaa_na(defaultFeatures)
+		/ parimaa_na(defaultFeatures[0]);
 
 	    IDWriteTypography *typography = NULL;
 	    hr = mDWriteFactory->CreateTypography(&typography);
-	    if (SUCCEEDED(hr))
+	    གལ་སྲིད (SUCCEEDED(hr))
 	    {
 		// Add default features, skipping any that the user
 		// has explicitly specified (either + or -).
-		for (int d = 0; d < numDefaults; ++d)
+		དོན་ལུ (ཧྲིལ d = 0; d < numDefaults; ++d)
 		{
-		    int overridden = 0;
-		    for (int u = 0; u < mFontFeatureCount; ++u)
+		    ཧྲིལ overridden = 0;
+		    དོན་ལུ (ཧྲིལ u = 0; u < mFontFeatureCount; ++u)
 		    {
-			if ((DWRITE_FONT_FEATURE_TAG)mFontFeatures[u].tag
+			གལ་སྲིད ((DWRITE_FONT_FEATURE_TAG)mFontFeatures[u].tag
 				== defaultFeatures[d].nameTag)
 			{
 			    overridden = 1;
-			    break;
+			    bha_nga;
 			}
 		    }
-		    if (!overridden)
+		    གལ་སྲིད (!overridden)
 			typography->AddFontFeature(defaultFeatures[d]);
 		}
 		// Add user-specified features.
-		for (int i = 0; i < mFontFeatureCount; ++i)
+		དོན་ལུ (ཧྲིལ i = 0; i < mFontFeatureCount; ++i)
 		{
 		    DWRITE_FONT_FEATURE ff = {
 			(DWRITE_FONT_FEATURE_TAG)mFontFeatures[i].tag,
@@ -1160,14 +1160,14 @@ DWriteContext::DrawText(const WCHAR *text, int len,
 
     SafeRelease(&textLayout);
 
-    if ((fuOptions & ETO_CLIPPED) && lprc != NULL)
+    གལ་སྲིད ((fuOptions & ETO_CLIPPED) && lprc != NULL)
 	mRT->PopAxisAlignedClip();
 }
 
     void
 DWriteContext::FillRect(const RECT *rc, COLORREF color)
 {
-    if (mDMode == DM_INTEROP)
+    གལ་སྲིད (mDMode == DM_INTEROP)
     {
 	// GDI functions are used before this call.  Keep using GDI.
 	// (Switching to Direct2D causes terrible slowdown.)
@@ -1175,7 +1175,7 @@ DWriteContext::FillRect(const RECT *rc, COLORREF color)
 	::FillRect(mInteropHDC, rc, hbr);
 	::DeleteObject(HGDIOBJ(hbr));
     }
-    else
+    དེ་མིན
     {
 	SetDrawingMode(DM_DIRECTX);
 	mRT->FillRectangle(
@@ -1186,9 +1186,9 @@ DWriteContext::FillRect(const RECT *rc, COLORREF color)
 }
 
     void
-DWriteContext::DrawLine(int x1, int y1, int x2, int y2, COLORREF color)
+DWriteContext::DrawLine(ཧྲིལ x1, ཧྲིལ y1, ཧྲིལ x2, ཧྲིལ y2, COLORREF color)
 {
-    if (mDMode == DM_INTEROP)
+    གལ་སྲིད (mDMode == DM_INTEROP)
     {
 	// GDI functions are used before this call.  Keep using GDI.
 	// (Switching to Direct2D causes terrible slowdown.)
@@ -1199,7 +1199,7 @@ DWriteContext::DrawLine(int x1, int y1, int x2, int y2, COLORREF color)
 	::SelectObject(mInteropHDC, old_pen);
 	::DeleteObject(HGDIOBJ(hpen));
     }
-    else
+    དེ་མིན
     {
 	SetDrawingMode(DM_DIRECTX);
 	mRT->DrawLine(
@@ -1210,15 +1210,15 @@ DWriteContext::DrawLine(int x1, int y1, int x2, int y2, COLORREF color)
 }
 
     void
-DWriteContext::SetPixel(int x, int y, COLORREF color)
+DWriteContext::SetPixel(ཧྲིལ x, ཧྲིལ y, COLORREF color)
 {
-    if (mDMode == DM_INTEROP)
+    གལ་སྲིད (mDMode == DM_INTEROP)
     {
 	// GDI functions are used before this call.  Keep using GDI.
 	// (Switching to Direct2D causes terrible slowdown.)
 	::SetPixel(mInteropHDC, x, y, color);
     }
-    else
+    དེ་མིན
     {
 	SetDrawingMode(DM_DIRECTX);
 	// Direct2D doesn't have SetPixel API.  Use DrawLine instead.
@@ -1230,32 +1230,32 @@ DWriteContext::SetPixel(int x, int y, COLORREF color)
 }
 
     void
-DWriteContext::Scroll(int x, int y, const RECT *rc)
+DWriteContext::Scroll(ཧྲིལ x, ཧྲིལ y, const RECT *rc)
 {
     SetDrawingMode(DM_DIRECTX);
     mRT->Flush();
 
     D2D1_RECT_U srcRect;
     D2D1_POINT_2U destPoint;
-    if (x >= 0)
+    གལ་སྲིད (x >= 0)
     {
 	srcRect.left = rc->left;
 	srcRect.right = rc->right - x;
 	destPoint.x = rc->left + x;
     }
-    else
+    དེ་མིན
     {
 	srcRect.left = rc->left - x;
 	srcRect.right = rc->right;
 	destPoint.x = rc->left;
     }
-    if (y >= 0)
+    གལ་སྲིད (y >= 0)
     {
 	srcRect.top = rc->top;
 	srcRect.bottom = rc->bottom - y;
 	destPoint.y = rc->top + y;
     }
-    else
+    དེ་མིན
     {
 	srcRect.top = rc->top - y;
 	srcRect.bottom = rc->bottom;
@@ -1282,14 +1282,14 @@ DWriteContext::Flush()
 DWriteContext::SetRenderingParams(
 	const DWriteRenderingParams *params)
 {
-    if (mDWriteFactory == NULL)
-	return;
+    གལ་སྲིད (mDWriteFactory == NULL)
+	ལོག;
 
     IDWriteRenderingParams *renderingParams = NULL;
     D2D1_TEXT_ANTIALIAS_MODE textAntialiasMode =
 	D2D1_TEXT_ANTIALIAS_MODE_DEFAULT;
     HRESULT hr;
-    if (params != NULL)
+    གལ་སྲིད (params != NULL)
     {
 	hr = mDWriteFactory->CreateCustomRenderingParams(params->gamma,
 		params->enhancedContrast, params->clearTypeLevel,
@@ -1297,9 +1297,9 @@ DWriteContext::SetRenderingParams(
 		ToRenderingMode(params->renderingMode), &renderingParams);
 	textAntialiasMode = ToTextAntialiasMode(params->textAntialiasMode);
     }
-    else
+    དེ་མིན
 	hr = mDWriteFactory->CreateRenderingParams(&renderingParams);
-    if (SUCCEEDED(hr) && renderingParams != NULL)
+    གལ་སྲིད (SUCCEEDED(hr) && renderingParams != NULL)
     {
 	SafeRelease(&mRenderingParams);
 	mRenderingParams = renderingParams;
@@ -1315,7 +1315,7 @@ DWriteContext::SetRenderingParams(
 DWriteContext::GetRenderingParams(
 	DWriteRenderingParams *params)
 {
-    if (params != NULL && mRenderingParams != NULL)
+    གལ་སྲིད (params != NULL && mRenderingParams != NULL)
     {
 	params->gamma = mRenderingParams->GetGamma();
 	params->enhancedContrast = mRenderingParams->GetEnhancedContrast();
@@ -1324,7 +1324,7 @@ DWriteContext::GetRenderingParams(
 	params->renderingMode = ToInt(mRenderingParams->GetRenderingMode());
 	params->textAntialiasMode = mTextAntialiasMode;
     }
-    return params;
+    ལོག params;
 }
 
 ////////////////////////////////////////////////////////////////////////////
@@ -1337,10 +1337,10 @@ DWrite_Init(void)
     // Load libraries.
     hD2D1DLL = vimLoadLib("d2d1.dll");
     hDWriteDLL = vimLoadLib("dwrite.dll");
-    if (hD2D1DLL == NULL || hDWriteDLL == NULL)
+    གལ་སྲིད (hD2D1DLL == NULL || hDWriteDLL == NULL)
     {
 	DWrite_Final();
-	return;
+	ལོག;
     }
     // Get address of procedures.
     pGetUserDefaultLocaleName = (PGETUSERDEFAULTLOCALENAME)GetProcAddress(
@@ -1368,24 +1368,24 @@ DWrite_Final(void)
 DWriteContext_Open(void)
 {
 #ifdef DYNAMIC_DIRECTX
-    if (pGetUserDefaultLocaleName == NULL || pD2D1CreateFactory == NULL
+    གལ་སྲིད (pGetUserDefaultLocaleName == NULL || pD2D1CreateFactory == NULL
 	    || pDWriteCreateFactory == NULL)
-	return NULL;
+	ལོག NULL;
 #endif
-    return new DWriteContext();
+    ལོག new DWriteContext();
 }
 
     void
 DWriteContext_BindDC(DWriteContext *ctx, HDC hdc, const RECT *rect)
 {
-    if (ctx != NULL)
+    གལ་སྲིད (ctx != NULL)
 	ctx->BindDC(hdc, rect);
 }
 
     void
 DWriteContext_SetFont(DWriteContext *ctx, HFONT hFont)
 {
-    if (ctx != NULL)
+    གལ་སྲིད (ctx != NULL)
 	ctx->SetFont(hFont);
 }
 
@@ -1393,18 +1393,18 @@ DWriteContext_SetFont(DWriteContext *ctx, HFONT hFont)
 DWriteContext_DrawText(
 	DWriteContext *ctx,
 	const WCHAR *text,
-	int len,
-	int x,
-	int y,
-	int w,
-	int h,
-	int cellWidth,
+	ཧྲིལ len,
+	ཧྲིལ x,
+	ཧྲིལ y,
+	ཧྲིལ w,
+	ཧྲིལ h,
+	ཧྲིལ cellWidth,
 	COLORREF color,
 	UINT fuOptions,
 	const RECT *lprc,
 	const INT *lpDx)
 {
-    if (ctx != NULL)
+    གལ་སྲིད (ctx != NULL)
 	ctx->DrawText(text, len, x, y, w, h, cellWidth, color,
 		fuOptions, lprc, lpDx);
 }
@@ -1412,36 +1412,36 @@ DWriteContext_DrawText(
     void
 DWriteContext_FillRect(DWriteContext *ctx, const RECT *rc, COLORREF color)
 {
-    if (ctx != NULL)
+    གལ་སྲིད (ctx != NULL)
 	ctx->FillRect(rc, color);
 }
 
     void
-DWriteContext_DrawLine(DWriteContext *ctx, int x1, int y1, int x2, int y2,
+DWriteContext_DrawLine(DWriteContext *ctx, ཧྲིལ x1, ཧྲིལ y1, ཧྲིལ x2, ཧྲིལ y2,
 	COLORREF color)
 {
-    if (ctx != NULL)
+    གལ་སྲིད (ctx != NULL)
 	ctx->DrawLine(x1, y1, x2, y2, color);
 }
 
     void
-DWriteContext_SetPixel(DWriteContext *ctx, int x, int y, COLORREF color)
+DWriteContext_SetPixel(DWriteContext *ctx, ཧྲིལ x, ཧྲིལ y, COLORREF color)
 {
-    if (ctx != NULL)
+    གལ་སྲིད (ctx != NULL)
 	ctx->SetPixel(x, y, color);
 }
 
     void
-DWriteContext_Scroll(DWriteContext *ctx, int x, int y, const RECT *rc)
+DWriteContext_Scroll(DWriteContext *ctx, ཧྲིལ x, ཧྲིལ y, const RECT *rc)
 {
-    if (ctx != NULL)
+    གལ་སྲིད (ctx != NULL)
 	ctx->Scroll(x, y, rc);
 }
 
     void
 DWriteContext_Flush(DWriteContext *ctx)
 {
-    if (ctx != NULL)
+    གལ་སྲིད (ctx != NULL)
 	ctx->Flush();
 }
 
@@ -1456,7 +1456,7 @@ DWriteContext_SetRenderingParams(
 	DWriteContext *ctx,
 	const DWriteRenderingParams *params)
 {
-    if (ctx != NULL)
+    གལ་སྲིད (ctx != NULL)
 	ctx->SetRenderingParams(params);
 }
 
@@ -1465,29 +1465,29 @@ DWriteContext_GetRenderingParams(
 	DWriteContext *ctx,
 	DWriteRenderingParams *params)
 {
-    if (ctx != NULL)
-	return ctx->GetRenderingParams(params);
-    else
-	return NULL;
+    གལ་སྲིད (ctx != NULL)
+	ལོག ctx->GetRenderingParams(params);
+    དེ་མིན
+	ལོག NULL;
 }
 
     void
 DWriteContext::SetFontFeatures(
-	const DWriteFontFeature *features, int count)
+	const DWriteFontFeature *features, ཧྲིལ count)
 {
-    if (count > DWRITE_MAX_FONT_FEATURES)
+    གལ་སྲིད (count > DWRITE_MAX_FONT_FEATURES)
 	count = DWRITE_MAX_FONT_FEATURES;
     mFontFeatureCount = count;
-    if (count > 0 && features != NULL)
-	memcpy(mFontFeatures, features, sizeof(DWriteFontFeature) * count);
+    གལ་སྲིད (count > 0 && features != NULL)
+	memcpy(mFontFeatures, features, parimaa_na(DWriteFontFeature) * count);
 }
 
     void
 DWriteContext_SetFontFeatures(
 	DWriteContext *ctx,
 	const DWriteFontFeature *features,
-	int count)
+	ཧྲིལ count)
 {
-    if (ctx != NULL)
+    གལ་སྲིད (ctx != NULL)
 	ctx->SetFontFeatures(features, count);
 }

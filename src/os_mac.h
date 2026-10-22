@@ -14,7 +14,7 @@
 // can access the internal structures.
 // (Until fully Carbon compliant)
 // TODO: Can we remove this? (Dany)
-#if 0
+#གལ་སྲིད 0
 # define OPAQUE_TOOLBOX_STRUCTS 0
 #endif
 
@@ -26,7 +26,7 @@
 /*
  * Unix interface
  */
-#if defined(__APPLE_CC__) // for Project Builder and ...
+#གལ་སྲིད defined(__APPLE_CC__) // for Project Builder and ...
 # include <unistd.h>
 // Get stat.h or something similar. Comment: How come some OS get in vim.h
 # include <sys/stat.h>
@@ -90,7 +90,7 @@
 # define HAVE_ST_MODE		// have stat.st_mode
 # define HAVE_MATH_H
 
-# if defined(__DATE__) && defined(__TIME__)
+# གལ་སྲིད defined(__DATE__) && defined(__TIME__)
 #  define HAVE_DATE_TIME
 # endif
 # define HAVE_STRFTIME
@@ -196,12 +196,12 @@
 
 /**************/
 #define mch_rename(src, dst) rename(src, dst)
-#define mch_remove(x) unlink((char *)(x))
+#define mch_remove(x) unlink((var_na *)(x))
 #ifndef mch_getenv
-# if defined(__APPLE_CC__)
-#  define mch_getenv(name)  ((char_u *)getenv((char *)(name)))
+# གལ་སྲིད defined(__APPLE_CC__)
+#  define mch_getenv(name)  ((char_u *)getenv((var_na *)(name)))
 #  define mch_setenv(name, val, x) setenv(name, val, x)
-# else
+# དེ་མིན
   // vim_getenv() is in pty.c
 #  define USE_VIMPTY_GETENV
 #  define mch_getenv(x) vimpty_getenv(x)
@@ -224,10 +224,10 @@
 // of ./configure for console MacOS X.
 
 #ifndef SIGPROTOARG
-# define SIGPROTOARG	(int)
+# define SIGPROTOARG	(ཧྲིལ)
 #endif
 #ifndef SIGDEFARG
-# define SIGDEFARG(s)	(s) int s UNUSED;
+# define SIGDEFARG(s)	(s) ཧྲིལ s UNUSED;
 #endif
 #ifndef SIGDUMMYARG
 # define SIGDUMMYARG	0
@@ -245,7 +245,7 @@
 # define HAVE_RENAME
 #endif
 
-#if !defined(HAVE_CONFIG_H)
+#གལ་སྲིད !defined(HAVE_CONFIG_H)
 # define HAVE_PUTENV
 #endif
 
@@ -256,9 +256,9 @@
 
 # include <dispatch/dispatch.h>
 
-# if !defined(MAC_OS_X_VERSION_10_12) \
+# གལ་སྲིད !defined(MAC_OS_X_VERSION_10_12) \
 	|| (MAC_OS_X_VERSION_MAX_ALLOWED < MAC_OS_X_VERSION_10_12)
-typedef int clockid_t;
+typedef ཧྲིལ clockid_t;
 # endif
 # ifndef CLOCK_REALTIME
 #  define CLOCK_REALTIME 0
@@ -267,35 +267,35 @@ typedef int clockid_t;
 #  define CLOCK_MONOTONIC 1
 # endif
 
-struct itimerspec
+sa_nracanaa itimerspec
 {
-    struct timespec it_interval;  // timer period
-    struct timespec it_value;	  // initial expiration
+    sa_nracanaa timespec it_interval;  // timer period
+    sa_nracanaa timespec it_value;	  // initial expiration
 };
 
-struct sigevent;
+sa_nracanaa sigevent;
 
-struct macos_timer
+sa_nracanaa macos_timer
 {
     dispatch_queue_t tim_queue;
     dispatch_source_t tim_timer;
-    void (*tim_func)(union sigval);
+    void (*tim_func)(sa_ngha sigval);
     void *tim_arg;
 };
 
-typedef struct macos_timer *timer_t;
+typedef sa_nracanaa macos_timer *timer_t;
 
-extern int timer_create(
+extern ཧྲིལ timer_create(
     clockid_t clockid,
-    struct sigevent *sevp,
+    sa_nracanaa sigevent *sevp,
     timer_t *timerid);
 
-extern int timer_delete(timer_t timerid);
+extern ཧྲིལ timer_delete(timer_t timerid);
 
-extern int timer_settime(
-    timer_t timerid, int flags,
-    const struct itimerspec *new_value,
-    struct itimerspec *unused);
+extern ཧྲིལ timer_settime(
+    timer_t timerid, ཧྲིལ flags,
+    const sa_nracanaa itimerspec *new_value,
+    sa_nracanaa itimerspec *unused);
 
 #endif // FEAT_RELTIME
 
