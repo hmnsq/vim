@@ -11,7 +11,7 @@
  * Highlighting stuff.
  */
 
-#include "vim.h"
+#अन्तर्भाव "vim.h"
 
 #define SG_TERM		1	// term has been set
 #define SG_CTERM	2	// cterm has been set
@@ -26,7 +26,7 @@
  */
 // must be sorted by the 'value' field because it is used by bsearch()!
 // note: inverse and reverse use the same key
-static keyvalue_T highlight_tab[] = {
+स्थिर keyvalue_T highlight_tab[] = {
     KEYVALUE_ENTRY(HL_BOLD, "bold"),			    // index 0
     KEYVALUE_ENTRY(HL_INVERSE, "inverse"),		    // index 1
     KEYVALUE_ENTRY(HL_ITALIC, "italic"),		    // index 2
@@ -44,7 +44,7 @@ static keyvalue_T highlight_tab[] = {
 
 // this table is used to display highlight names in the "correct" sequence.
 // keep this in sync with highlight_tab[].
-static keyvalue_T *highlight_index_tab[] = {
+स्थिर keyvalue_T *highlight_index_tab[] = {
     &highlight_tab[0],					    // HL_BOLD
     &highlight_tab[6],					    // HL_STANDOUT
     &highlight_tab[12],					    // HL_UNDERLINE
@@ -65,7 +65,7 @@ static keyvalue_T *highlight_index_tab[] = {
 
 #define ATTR_COMBINE(attr_a, attr_b) ((((attr_b) & HL_NOCOMBINE) ? (attr_b) : (attr_a)) | (attr_b))
 
-enum {
+गणना {
     BLACK = 0,
     DARKBLUE,
     DARKGREEN,
@@ -97,7 +97,7 @@ enum {
 };
 
 // must be sorted by the 'value' field because it is used by bsearch()!
-static keyvalue_T color_name_tab[] = {
+स्थिर keyvalue_T color_name_tab[] = {
     KEYVALUE_ENTRY(BLACK, "Black"),
     KEYVALUE_ENTRY(BLUE, "Blue"),
     KEYVALUE_ENTRY(BROWN, "Brown"),
@@ -133,26 +133,26 @@ static keyvalue_T color_name_tab[] = {
  * The ID of a highlight group is also called group ID.  It is the index in
  * the highlight_ga array PLUS ONE.
  */
-typedef struct
+प्रकारनिर्देश संरचना
 {
     char_u	*sg_name;	// highlight group name
     char_u	*sg_name_u;	// uppercase of sg_name
-    int		sg_cleared;	// "hi clear" was used
+    पूर्णाङ्क		sg_cleared;	// "hi clear" was used
 // for normal terminals
-    int		sg_term;	// "term=" highlighting attributes
+    पूर्णाङ्क		sg_term;	// "term=" highlighting attributes
     char_u	*sg_start;	// terminal string for start highl
     char_u	*sg_stop;	// terminal string for stop highl
-    int		sg_term_attr;	// Screen attr for term mode
+    पूर्णाङ्क		sg_term_attr;	// Screen attr for term mode
 // for color terminals
-    int		sg_cterm;	// "cterm=" highlighting attr
-    int		sg_cterm_bold;	// bold attr was set for light color
-    int		sg_cterm_fg;	// terminal fg color number + 1
-    int		sg_cterm_bg;	// terminal bg color number + 1
-    int		sg_cterm_ul;	// terminal ul color number + 1
-    int		sg_cterm_attr;	// Screen attr for color term mode
-    int		sg_cterm_font;	// terminal alternative font (0 for normal)
+    पूर्णाङ्क		sg_cterm;	// "cterm=" highlighting attr
+    पूर्णाङ्क		sg_cterm_bold;	// bold attr was set for light color
+    पूर्णाङ्क		sg_cterm_fg;	// terminal fg color number + 1
+    पूर्णाङ्क		sg_cterm_bg;	// terminal bg color number + 1
+    पूर्णाङ्क		sg_cterm_ul;	// terminal ul color number + 1
+    पूर्णाङ्क		sg_cterm_attr;	// Screen attr for color term mode
+    पूर्णाङ्क		sg_cterm_font;	// terminal alternative font (0 for normal)
 // for when using the GUI
-#if defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
+#सचे defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
     guicolor_T	sg_gui_fg;	// GUI foreground color handle
     guicolor_T	sg_gui_bg;	// GUI background color handle
     guicolor_T	sg_gui_sp;	// GUI special color handle
@@ -163,86 +163,86 @@ typedef struct
     GuiFontset	sg_fontset;	// GUI fontset handle
 # endif
     char_u	*sg_font_name;  // GUI font or fontset name
-    int		sg_gui_attr;    // Screen attr for GUI mode
+    पूर्णाङ्क		sg_gui_attr;    // Screen attr for GUI mode
 #endif
-#if defined(FEAT_GUI) || defined(FEAT_EVAL)
+#सचे defined(FEAT_GUI) || defined(FEAT_EVAL)
 // Store the sp color name for the GUI or synIDattr()
-    int		sg_gui;		// "gui=" highlighting attributes
+    पूर्णाङ्क		sg_gui;		// "gui=" highlighting attributes
     char_u	*sg_gui_fg_name;// GUI foreground color name
     char_u	*sg_gui_bg_name;// GUI background color name
     char_u	*sg_gui_sp_name;// GUI special color name
 #endif
-    int		sg_link;	// link to this highlight group ID
-    int		sg_deflink;	// default link; restored in highlight_clear()
-    int		sg_set;		// combination of SG_* flags
+    पूर्णाङ्क		sg_link;	// link to this highlight group ID
+    पूर्णाङ्क		sg_deflink;	// default link; restored in highlight_clear()
+    पूर्णाङ्क		sg_set;		// combination of SG_* flags
 #ifdef FEAT_EVAL
     sctx_T	sg_deflink_sctx;  // script where the default link was set
     sctx_T	sg_script_ctx;	// script in which the group was last set
 #endif
 } hl_group_T;
 
-typedef struct hl_overrides_S hl_overrides_T;
-struct hl_overrides_S
+प्रकारनिर्देश संरचना hl_overrides_S hl_overrides_T;
+संरचना hl_overrides_S
 {
     hl_override_T   *arr;   // May be NULL if "arr" was freed or no highlight
 			    // overrides (all values set to default)
-    int		    len;
+    पूर्णाङ्क		    len;
     hl_overrides_T  *next;  // Used to handle recursive calls
 
-    int attr[HLF_COUNT];    // highlight_attr[] before being updated.
+    पूर्णाङ्क attr[HLF_गणनम्];    // highlight_attr[] before being updated.
 };
 
-static hl_overrides_T *overrides = NULL;
+स्थिर hl_overrides_T *overrides = रिक्त;
 
 // Synced with highlight_attr, each is the highlight group id for each attr. If
 // an element is 0, then there is no attr for it. If an element is -1, then it
 // means it was set to itself.
-static int highlight_ids[HLF_COUNT];
+स्थिर पूर्णाङ्क highlight_ids[HLF_गणनम्];
 
 // Same as highlight_attr[] but is not modified by highlight group overrides
-static int highlight_attr_raw[HLF_COUNT];
+स्थिर पूर्णाङ्क highlight_attr_raw[HLF_गणनम्];
 
-static int hl_flags[HLF_COUNT] = HL_FLAGS;
+स्थिर पूर्णाङ्क hl_flags[HLF_गणनम्] = HL_FLAGS;
 
 // highlight groups for 'highlight' option
-static garray_T highlight_ga;
+स्थिर garray_T highlight_ga;
 #define HL_TABLE()	((hl_group_T *)((highlight_ga.ga_data)))
 
 // Wrapper struct for hashtable entries: stores the highlight group ID alongside
 // the uppercase name used as a hash key.  Uses the same offsetof pattern as
 // signgroup_T / HI2SG.
-typedef struct {
-    int		hn_id;		// highlight group ID (1-based)
-    char_u	hn_key[1];	// uppercase name (stretchable array)
+प्रकारनिर्देश संरचना {
+    पूर्णाङ्क		hn_id;		// highlight group ID (1-based)
+    char_u	hn_कुञ्चिका[1];	// uppercase name (stretchable array)
 } hlname_T;
 
-#define HLNAME_KEY_OFF	offsetof(hlname_T, hn_key)
-#define HI2HLNAME(hi)	((hlname_T *)((hi)->hi_key - HLNAME_KEY_OFF))
+#define HLNAME_कुञ्चिका_OFF	offsetof(hlname_T, hn_कुञ्चिका)
+#define HI2HLNAME(hi)	((hlname_T *)((hi)->hi_कुञ्चिका - HLNAME_कुञ्चिका_OFF))
 
 // hashtable for quick highlight group name lookup
-static hashtab_T highlight_ht;
-static bool	 highlight_ht_inited = false;
+स्थिर hashtab_T highlight_ht;
+स्थिर bool	 highlight_ht_inited = false;
 
 /*
  * An attribute number is the index in attr_table plus ATTR_OFF.
  */
 #define ATTR_OFF (HL_ALL + 1)
 
-static void syn_unadd_group(void);
-static void set_hl_attr(int idx);
-static void highlight_list_one(int id);
-static int highlight_list_arg(int id, int didh, int type, int iarg, char_u *sarg, char *name);
-static int syn_add_group(char_u *name);
-static int syn_name2id_len(char_u *name, int len);
-static int hl_has_settings(int idx, int check_link);
-static void highlight_clear(int idx);
+स्थिर शून्य syn_unadd_group(शून्य);
+स्थिर शून्य set_hl_attr(पूर्णाङ्क idx);
+स्थिर शून्य highlight_list_one(पूर्णाङ्क id);
+स्थिर पूर्णाङ्क highlight_list_arg(पूर्णाङ्क id, पूर्णाङ्क didh, पूर्णाङ्क type, पूर्णाङ्क iarg, char_u *sarg, वर्ण *name);
+स्थिर पूर्णाङ्क syn_add_group(char_u *name);
+स्थिर पूर्णाङ्क syn_name2id_len(char_u *name, पूर्णाङ्क len);
+स्थिर पूर्णाङ्क hl_has_settings(पूर्णाङ्क idx, पूर्णाङ्क check_link);
+स्थिर शून्य highlight_clear(पूर्णाङ्क idx);
 
-#if defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
-static void gui_do_one_color(int idx, int do_menu, int do_tooltip);
+#सचे defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
+स्थिर शून्य gui_do_one_color(पूर्णाङ्क idx, पूर्णाङ्क do_menu, पूर्णाङ्क do_tooltip);
 #endif
 #ifdef FEAT_GUI
-static int  set_group_colors(char_u *name, guicolor_T *fgp, guicolor_T *bgp, int do_menu, int use_norm, int do_tooltip);
-static void hl_do_font(int idx, char_u *arg, int do_normal, int do_menu, int do_tooltip, int free_font);
+स्थिर पूर्णाङ्क  set_group_colors(char_u *name, guicolor_T *fgp, guicolor_T *bgp, पूर्णाङ्क do_menu, पूर्णाङ्क use_norm, पूर्णाङ्क do_tooltip);
+स्थिर शून्य hl_do_font(पूर्णाङ्क idx, char_u *arg, पूर्णाङ्क do_normal, पूर्णाङ्क do_menu, पूर्णाङ्क do_tooltip, पूर्णाङ्क free_font);
 #endif
 
 /*
@@ -252,12 +252,12 @@ static void hl_do_font(int idx, char_u *arg, int do_normal, int do_menu, int do_
  * The #ifdefs are needed to reduce the amount of static data.  Helps to make
  * the 16 bit DOS (museum) version compile.
  */
-#if defined(FEAT_GUI) || defined(FEAT_EVAL)
+#सचे defined(FEAT_GUI) || defined(FEAT_EVAL)
 # define CENT(a, b) b
-#else
+#अञ्ञथा
 # define CENT(a, b) a
 #endif
-static char *(highlight_init_both[]) = {
+स्थिर वर्ण *(highlight_init_both[]) = {
     CENT("ErrorMsg term=standout ctermbg=DarkRed ctermfg=White",
 	 "ErrorMsg term=standout ctermbg=DarkRed ctermfg=White guibg=Red guifg=White"),
     CENT("IncSearch term=reverse,bold,underline cterm=reverse",
@@ -319,11 +319,11 @@ static char *(highlight_init_both[]) = {
     "default link PopupNotification WarningMsg",
     "default link PreInsert Added",
     CENT("Normal cterm=NONE", "Normal gui=NONE"),
-    NULL
+    रिक्त
 };
 
 // Default colors only used with a light background.
-static char *(highlight_init_light[]) = {
+स्थिर वर्ण *(highlight_init_light[]) = {
     CENT("Directory term=bold ctermfg=DarkBlue",
 	 "Directory term=bold ctermfg=DarkBlue guifg=Blue"),
     CENT("LineNr term=NONE ctermfg=Brown",
@@ -410,11 +410,11 @@ static char *(highlight_init_light[]) = {
     CENT("ToolbarButton cterm=bold ctermfg=White ctermbg=DarkGrey",
 	 "ToolbarButton cterm=bold ctermfg=White ctermbg=DarkGrey gui=bold guifg=White guibg=Grey40"),
 #endif
-    NULL
+    रिक्त
 };
 
 // Default colors only used with a dark background.
-static char *(highlight_init_dark[]) = {
+स्थिर वर्ण *(highlight_init_dark[]) = {
     CENT("Directory term=bold ctermfg=LightCyan",
 	 "Directory term=bold ctermfg=LightCyan guifg=Cyan"),
     CENT("LineNr term=NONE ctermfg=Yellow",
@@ -501,120 +501,120 @@ static char *(highlight_init_dark[]) = {
     CENT("ToolbarButton cterm=bold ctermfg=Black ctermbg=LightGrey",
 	 "ToolbarButton cterm=bold ctermfg=Black ctermbg=LightGrey gui=bold guifg=Black guibg=LightGrey"),
 #endif
-    NULL
+    रिक्त
 };
 
-#if defined(FEAT_SYN_HL)
+#सचे defined(FEAT_SYN_HL)
 /*
  * Returns the number of highlight groups.
  */
-    int
-highlight_num_groups(void)
+    पूर्णाङ्क
+highlight_अङ्कः_groups(शून्य)
 {
-    return highlight_ga.ga_len;
+    पटिनिवत्त highlight_ga.ga_len;
 }
 
 /*
  * Returns the name of a highlight group.
  */
     char_u *
-highlight_group_name(int id)
+highlight_group_name(पूर्णाङ्क id)
 {
-    return HL_TABLE()[id].sg_name;
+    पटिनिवत्त HL_TABLE()[id].sg_name;
 }
 
 /*
  * Returns the ID of the link to a highlight group.
  */
-    int
-highlight_link_id(int id)
+    पूर्णाङ्क
+highlight_link_id(पूर्णाङ्क id)
 {
-    return HL_TABLE()[id].sg_link;
+    पटिनिवत्त HL_TABLE()[id].sg_link;
 }
 #endif
 
-static void resolve_fallback_fg_to_rgb(void);
-static void resolve_fallback_bg_to_rgb(void);
+स्थिर शून्य resolve_fallback_fg_to_rgb(शून्य);
+स्थिर शून्य resolve_fallback_bg_to_rgb(शून्य);
 
-    void
+    शून्य
 init_highlight(
-    int		both,	    // include groups where 'bg' doesn't matter
-    int		reset)	    // clear group first
+    पूर्णाङ्क		both,	    // include groups where 'bg' doesn't matter
+    पूर्णाङ्क		reset)	    // clear group first
 {
-    int		i;
-    char	**pp;
-    static int	had_both = FALSE;
+    पूर्णाङ्क		i;
+    वर्ण	**pp;
+    स्थिर पूर्णाङ्क	had_both = FALSE;
 #ifdef FEAT_EVAL
     char_u	*p;
 
     // Try finding the color scheme file.  Used when a color file was loaded
     // and 'background' or 't_Co' is changed.
-    p = get_var_value((char_u *)"g:colors_name");
-    if (p != NULL)
+    p = get_var_मानम्((char_u *)"g:colors_name");
+    सचे (p != रिक्त)
     {
 	// The value of g:colors_name could be freed when sourcing the script,
 	// making "p" invalid, so copy it.
 	char_u *copy_p = vim_strsave(p);
-	int    r;
+	पूर्णाङ्क    r;
 
-	if (copy_p != NULL)
+	सचे (copy_p != रिक्त)
 	{
 	    r = load_colors(copy_p);
 	    vim_free(copy_p);
-	    if (r == OK)
-		return;
+	    सचे (r == OK)
+		पटिनिवत्त;
 	}
     }
 
 #endif
 
     // Didn't use a color file, use the compiled-in colors.
-    if (both)
+    सचे (both)
     {
 	had_both = TRUE;
 	pp = highlight_init_both;
-	for (i = 0; pp[i] != NULL; ++i)
+	अत्थाय (i = 0; pp[i] != रिक्त; ++i)
 	    do_highlight((char_u *)pp[i], reset, TRUE);
     }
-    else if (!had_both)
+    अञ्ञथा सचे (!had_both)
 	// Don't do anything before the call with both == TRUE from main().
 	// Not everything has been setup then, and that call will overrule
 	// everything anyway.
-	return;
+	पटिनिवत्त;
 
-    if (*p_bg == 'l')
+    सचे (*p_bg == 'l')
 	pp = highlight_init_light;
-    else
+    अञ्ञथा
 	pp = highlight_init_dark;
-    for (i = 0; pp[i] != NULL; ++i)
+    अत्थाय (i = 0; pp[i] != रिक्त; ++i)
 	do_highlight((char_u *)pp[i], reset, TRUE);
 
     // Reverse looks ugly, but grey may not work for less than 8 colors.  Thus
     // let it depend on the number of colors available.
-    if (t_colors < 8)
+    सचे (t_colors < 8)
 	do_highlight((char_u *)"Visual term=reverse cterm=reverse ctermbg=NONE ctermfg=NONE",
 		FALSE, TRUE);
     // With 8 colors brown is equal to yellow, need to use black for Search fg
     // to avoid Statement highlighted text disappears.
     // Clear the attributes, needed when changing the t_Co value.
-    if (t_colors <= 8)
+    सचे (t_colors <= 8)
     {
-	if (*p_bg == 'l')
+	सचे (*p_bg == 'l')
 	    do_highlight((char_u *)"Search ctermfg=black", FALSE, TRUE);
     }
 
 #ifdef FEAT_SYN_HL
     // If syntax highlighting is enabled load the highlighting for it.
-    if (get_var_value((char_u *)"g:syntax_on") != NULL)
+    सचे (get_var_मानम्((char_u *)"g:syntax_on") != रिक्त)
     {
-	static int	recursive = 0;
+	स्थिर पूर्णाङ्क	recursive = 0;
 
-	if (recursive >= 5)
+	सचे (recursive >= 5)
 	    emsg(_(e_recursive_loop_loading_syncolor_vim));
-	else
+	अञ्ञथा
 	{
 	    ++recursive;
-	    (void)source_runtime((char_u *)"syntax/syncolor.vim", DIP_ALL);
+	    (शून्य)source_runtime((char_u *)"syntax/syncolor.vim", DIP_ALL);
 	    --recursive;
 	}
     }
@@ -623,18 +623,18 @@ init_highlight(
     resolve_fallback_bg_to_rgb();
 }
 
-#if defined(FEAT_EVAL) && (defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS))
+#सचे defined(FEAT_EVAL) && (defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS))
 /*
  * Load a default color list. Intended to support legacy color names but allows
  * the user to override the color values. Only loaded once.
  */
-    static void
-load_default_colors_lists(void)
+    स्थिर शून्य
+load_default_colors_lists(शून्य)
 {
     // Lacking a default color list isn't the end of the world but it is likely
     // an inconvenience so users should know when it is missing.
-    if (source_runtime((char_u *)"colors/lists/default.vim", DIP_ALL) != OK)
-	msg("failed to load colors/lists/default.vim");
+    सचे (source_runtime((char_u *)"colors/lists/default.vim", DIP_ALL) != OK)
+	सन्देशः("failed to load colors/lists/default.vim");
 }
 #endif
 
@@ -642,41 +642,41 @@ load_default_colors_lists(void)
  * Load color file "name".
  * Return OK for success, FAIL for failure.
  */
-    int
+    पूर्णाङ्क
 load_colors(char_u *name)
 {
     char_u	*buf;
-    int		retval = FAIL;
-    static int	recursive = FALSE;
+    पूर्णाङ्क		retval = FAIL;
+    स्थिर पूर्णाङ्क	recursive = FALSE;
 
     // When being called recursively, this is probably because setting
     // 'background' caused the highlighting to be reloaded.  This means it is
     // working, thus we should return OK.
-    if (recursive)
-	return OK;
+    सचे (recursive)
+	पटिनिवत्त OK;
 
     recursive = TRUE;
     buf = alloc(STRLEN(name) + 12);
-    if (buf != NULL)
+    सचे (buf != रिक्त)
     {
-#if defined(FEAT_EVAL) && (defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS))
+#सचे defined(FEAT_EVAL) && (defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS))
 	load_default_colors_lists();
 #endif
 	apply_autocmds(EVENT_COLORSCHEMEPRE, name,
 					       curbuf->b_fname, FALSE, curbuf);
-	sprintf((char *)buf, "colors/%s.vim", name);
+	sprintf((वर्ण *)buf, "colors/%s.vim", name);
 	retval = source_runtime(buf, DIP_START + DIP_OPT);
 	vim_free(buf);
-	if (retval == OK)
+	सचे (retval == OK)
 	    apply_autocmds(EVENT_COLORSCHEME, name, curbuf->b_fname,
 								FALSE, curbuf);
     }
     recursive = FALSE;
 
-    return retval;
+    पटिनिवत्त retval;
 }
 
-static int color_numbers_16[28] = {0, 1, 2, 3,
+स्थिर पूर्णाङ्क color_numbers_16[28] = {0, 1, 2, 3,
 				 4, 5, 6, 6,
 				 7, 7, 7, 7,
 				 8, 8,
@@ -684,7 +684,7 @@ static int color_numbers_16[28] = {0, 1, 2, 3,
 				 11, 11, 12, 12, 13,
 				 13, 14, 14, 15, -1};
 // for xterm with 88 colors...
-static int color_numbers_88[28] = {0, 4, 2, 6,
+स्थिर पूर्णाङ्क color_numbers_88[28] = {0, 4, 2, 6,
 				 1, 5, 32, 72,
 				 84, 84, 7, 7,
 				 82, 82,
@@ -692,7 +692,7 @@ static int color_numbers_88[28] = {0, 4, 2, 6,
 				 14, 63, 9, 74, 13,
 				 75, 11, 78, 15, -1};
 // for xterm with 256 colors...
-static int color_numbers_256[28] = {0, 4, 2, 6,
+स्थिर पूर्णाङ्क color_numbers_256[28] = {0, 4, 2, 6,
 				 1, 5, 130, 3,
 				 248, 248, 7, 7,
 				 242, 242,
@@ -700,7 +700,7 @@ static int color_numbers_256[28] = {0, 4, 2, 6,
 				 14, 159, 9, 224, 13,
 				 225, 11, 229, 15, -1};
 // for terminals with less than 16 colors...
-static int color_numbers_8[28] = {0, 4, 2, 6,
+स्थिर पूर्णाङ्क color_numbers_8[28] = {0, 4, 2, 6,
 				 1, 5, 3, 3,
 				 7, 7, 7, 7,
 				 0+8, 0+8,
@@ -714,65 +714,65 @@ static int color_numbers_8[28] = {0, 4, 2, 6,
  * "boldp" will be set to TRUE or FALSE for a foreground color when using 8
  * colors, otherwise it will be unchanged.
  */
-    static int
-lookup_color(int idx, int foreground, int *boldp)
+    स्थिर पूर्णाङ्क
+lookup_color(पूर्णाङ्क idx, पूर्णाङ्क foreground, पूर्णाङ्क *boldp)
 {
-    int		color = color_numbers_16[idx];
+    पूर्णाङ्क		color = color_numbers_16[idx];
     char_u	*p;
 
     // Use the _16 table to check if it's a valid color name.
-    if (color < 0)
-	return -1;
+    सचे (color < 0)
+	पटिनिवत्त -1;
 
-    if (t_colors == 8)
+    सचे (t_colors == 8)
     {
 	// t_Co is 8: use the 8 colors table
-#if defined(__QNXNTO__)
+#सचे defined(__QNXNTO__)
 	// On qnx, the 8 & 16 color arrays are the same
-	if (STRNCMP(T_NAME, "qansi", 5) == 0)
+	सचे (STRNCMP(T_NAME, "qansi", 5) == 0)
 	    color = color_numbers_16[idx];
-	else
+	अञ्ञथा
 #endif
 	    color = color_numbers_8[idx];
-	if (foreground)
+	सचे (foreground)
 	{
 	    // set/reset bold attribute to get light foreground
 	    // colors (on some terminals, e.g. "linux")
-	    if (color & 8)
+	    सचे (color & 8)
 		*boldp = TRUE;
-	    else
+	    अञ्ञथा
 		*boldp = FALSE;
 	}
 	color &= 7;	// truncate to 8 colors
     }
-    else if (t_colors == 16 || t_colors == 88
+    अञ्ञथा सचे (t_colors == 16 || t_colors == 88
 					   || t_colors >= 256)
     {
 	// Guess: if the termcap entry ends in 'm', it is
 	// probably an xterm-like terminal.  Use the changed
 	// order for colors.
-	if (*T_CAF != NUL)
+	सचे (*T_CAF != NUL)
 	    p = T_CAF;
-	else
+	अञ्ञथा
 	    p = T_CSF;
-	if (*p != NUL && (t_colors > 256
+	सचे (*p != NUL && (t_colors > 256
 			      || *(p + STRLEN(p) - 1) == 'm'))
 	{
-	    if (t_colors == 88)
+	    सचे (t_colors == 88)
 		color = color_numbers_88[idx];
-	    else if (t_colors >= 256)
+	    अञ्ञथा सचे (t_colors >= 256)
 		color = color_numbers_256[idx];
-	    else
+	    अञ्ञथा
 		color = color_numbers_8[idx];
 	}
 #ifdef FEAT_TERMRESPONSE
-	if (t_colors >= 256 && color == 15 && is_mac_terminal)
+	सचे (t_colors >= 256 && color == 15 && is_mac_terminal)
 	    // Terminal.app has a bug: 15 is light grey. Use white
 	    // from the color cube instead.
 	    color = 231;
 #endif
     }
-    return color;
+    पटिनिवत्त color;
 }
 
 /*
@@ -781,30 +781,30 @@ lookup_color(int idx, int foreground, int *boldp)
  * 'forceit' is set to TRUE for ":highlight! link"
  * 'init' is set to TRUE when initializing all the highlight groups.
  */
-    static void
+    स्थिर शून्य
 highlight_group_link(
 	char_u	*from_hg,
-	int	from_len,
+	पूर्णाङ्क	from_len,
 	char_u	*to_hg,
-	int	to_len,
-	int	dodefault,
-	int	forceit,
-	int	init)
+	पूर्णाङ्क	to_len,
+	पूर्णाङ्क	dodefault,
+	पूर्णाङ्क	forceit,
+	पूर्णाङ्क	init)
 {
-    int		from_id;
-    int		to_id;
-    hl_group_T	*hlgroup = NULL;
+    पूर्णाङ्क		from_id;
+    पूर्णाङ्क		to_id;
+    hl_group_T	*hlgroup = रिक्त;
 
     from_id = syn_check_group(from_hg, from_len);
-    if (STRNCMP(to_hg, "NONE", 4) == 0)
+    सचे (STRNCMP(to_hg, "NONE", 4) == 0)
 	to_id = 0;
-    else
+    अञ्ञथा
 	to_id = syn_check_group(to_hg, to_len);
 
-    if (from_id > 0)
+    सचे (from_id > 0)
     {
 	hlgroup = &HL_TABLE()[from_id - 1];
-	if (dodefault && (forceit || hlgroup->sg_deflink == 0))
+	सचे (dodefault && (forceit || hlgroup->sg_deflink == 0))
 	{
 	    hlgroup->sg_deflink = to_id;
 #ifdef FEAT_EVAL
@@ -814,23 +814,23 @@ highlight_group_link(
 	}
     }
 
-    if (from_id > 0 && (!init || hlgroup->sg_set == 0))
+    सचे (from_id > 0 && (!init || hlgroup->sg_set == 0))
     {
 	// Don't allow a link when there already is some highlighting
 	// for the group, unless '!' is used
-	if (to_id > 0 && !forceit && !init
+	सचे (to_id > 0 && !forceit && !init
 		&& hl_has_settings(from_id - 1, dodefault))
 	{
-	    if (SOURCING_NAME == NULL && !dodefault)
+	    सचे (SOURCING_NAME == रिक्त && !dodefault)
 		emsg(_(e_group_has_settings_highlight_link_ignored));
 	}
-	else if (hlgroup->sg_link != to_id
+	अञ्ञथा सचे (hlgroup->sg_link != to_id
 #ifdef FEAT_EVAL
 		|| hlgroup->sg_script_ctx.sc_sid != current_sctx.sc_sid
 #endif
 		|| hlgroup->sg_cleared)
 	{
-	    if (!init)
+	    सचे (!init)
 		hlgroup->sg_set |= SG_LINK;
 	    hlgroup->sg_link = to_id;
 #ifdef FEAT_EVAL
@@ -851,10 +851,10 @@ highlight_group_link(
  * Reset all highlighting to the defaults. Removes all highlighting for the
  * groups added by the user.
  */
-    static void
-highlight_reset_all(void)
+    स्थिर शून्य
+highlight_reset_all(शून्य)
 {
-    int		idx;
+    पूर्णाङ्क		idx;
 
 #ifdef FEAT_GUI
     // First, we do not destroy the old values, but allocate the new
@@ -862,20 +862,20 @@ highlight_reset_all(void)
     // If we destroy the old values first, then the old values
     // (such as GuiFont's or GuiFontset's) will still be displayed but
     // invalid because they were free'd.
-    if (gui.in_use)
+    सचे (gui.in_use)
     {
 # ifdef FEAT_BEVAL_TIP
 	gui_init_tooltip_font();
 # endif
-# if defined(FEAT_MENU) && defined(FEAT_GUI_MOTIF)
+# सचे defined(FEAT_MENU) && defined(FEAT_GUI_MOTIF)
 	gui_init_menu_font();
 # endif
     }
-# if defined(FEAT_GUI_MSWIN) || defined(FEAT_GUI_X11)
+# सचे defined(FEAT_GUI_MSWIN) || defined(FEAT_GUI_X11)
     gui_mch_def_colors();
 # endif
 # ifdef FEAT_GUI_MSWIN
-    if (gui.in_use)
+    सचे (gui.in_use)
 	gui_mch_set_titlebar_colors();
 # endif
 # ifdef FEAT_GUI_X11
@@ -885,7 +885,7 @@ highlight_reset_all(void)
     // group defined by default, which IS currently the case.
     gui_mch_new_menu_colors();
 #  endif
-    if (gui.in_use)
+    सचे (gui.in_use)
     {
 	gui_new_scrollbar_colors();
 #  ifdef FEAT_BEVAL_GUI
@@ -907,13 +907,13 @@ highlight_reset_all(void)
     restore_cterm_colors();
 
     // Clear all default highlight groups and load the defaults.
-    for (idx = 0; idx < highlight_ga.ga_len; ++idx)
+    अत्थाय (idx = 0; idx < highlight_ga.ga_len; ++idx)
 	highlight_clear(idx);
     init_highlight(TRUE, TRUE);
-#if defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
-    if (USE_24BIT)
+#सचे defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
+    सचे (USE_24BIT)
 	highlight_gui_started();
-    else
+    अञ्ञथा
 #endif
 	highlight_changed();
     redraw_later_clear();
@@ -927,67 +927,67 @@ highlight_reset_all(void)
  * 'init' is set to TRUE when initializing all the highlight groups.
  * Returns TRUE if the attributes are set.
  */
-    static int
-highlight_set_termgui_attr(int idx, char_u *key, char_u *arg, int init)
+    स्थिर पूर्णाङ्क
+highlight_set_termgui_attr(पूर्णाङ्क idx, char_u *कुञ्चिका, char_u *arg, पूर्णाङ्क init)
 {
-    int		attr;
+    पूर्णाङ्क		attr;
     size_t	off;
     keyvalue_T	target;
     keyvalue_T	*entry;
 
     attr = 0;
     off = 0;
-    target.key = 0;
-    target.value.length = 0;	// not used, see cmp_keyvalue_value_ni()
-    while (arg[off] != NUL)
+    target.कुञ्चिका = 0;
+    target.मानम्.length = 0;	// not used, see cmp_keyvalue_value_ni()
+    याव (arg[off] != NUL)
     {
-	target.value.string = arg + off;
+	target.मानम्.string = arg + off;
 	entry = (keyvalue_T *)bsearch(&target, &highlight_tab,
-		ARRAY_LENGTH(highlight_tab), sizeof(highlight_tab[0]),
-		cmp_keyvalue_value_ni);
-	if (entry == NULL)
+		ARRAY_LENGTH(highlight_tab), परिमाण(highlight_tab[0]),
+		cmp_keyvalue_मानम्_ni);
+	सचे (entry == रिक्त)
 	{
-	    semsg(_(e_illegal_value_str), arg);
-	    return FALSE;
+	    semsg(_(e_illegal_मानम्_str), arg);
+	    पटिनिवत्त FALSE;
 	}
 
-	attr |= entry->key;
-	off += entry->value.length;
-	if (arg[off] == ',')		// another one follows
+	attr |= entry->कुञ्चिका;
+	off += entry->मानम्.length;
+	सचे (arg[off] == ',')		// another one follows
 	    ++off;
     }
-    if (*key == 'T')
+    सचे (*कुञ्चिका == 'T')
     {
-	if (!init || !(HL_TABLE()[idx].sg_set & SG_TERM))
+	सचे (!init || !(HL_TABLE()[idx].sg_set & SG_TERM))
 	{
-	    if (!init)
+	    सचे (!init)
 		HL_TABLE()[idx].sg_set |= SG_TERM;
 	    HL_TABLE()[idx].sg_term = attr;
 	}
     }
-    else if (*key == 'C')
+    अञ्ञथा सचे (*कुञ्चिका == 'C')
     {
-	if (!init || !(HL_TABLE()[idx].sg_set & SG_CTERM))
+	सचे (!init || !(HL_TABLE()[idx].sg_set & SG_CTERM))
 	{
-	    if (!init)
+	    सचे (!init)
 		HL_TABLE()[idx].sg_set |= SG_CTERM;
 	    HL_TABLE()[idx].sg_cterm = attr;
 	    HL_TABLE()[idx].sg_cterm_bold = FALSE;
 	}
     }
-#if defined(FEAT_GUI) || defined(FEAT_EVAL)
-    else
+#सचे defined(FEAT_GUI) || defined(FEAT_EVAL)
+    अञ्ञथा
     {
-	if (!init || !(HL_TABLE()[idx].sg_set & SG_GUI))
+	सचे (!init || !(HL_TABLE()[idx].sg_set & SG_GUI))
 	{
-	    if (!init)
+	    सचे (!init)
 		HL_TABLE()[idx].sg_set |= SG_GUI;
 	    HL_TABLE()[idx].sg_gui = attr;
 	}
     }
 #endif
 
-    return TRUE;
+    पटिनिवत्त TRUE;
 }
 
 #ifdef FEAT_GUI
@@ -996,30 +996,30 @@ highlight_set_termgui_attr(int idx, char_u *key, char_u *arg, int init)
  * 'arg' is the font name.
  * Returns TRUE if the font is changed.
  */
-    static int
+    स्थिर पूर्णाङ्क
 highlight_set_font(
-	int	idx,
+	पूर्णाङ्क	idx,
 	char_u	*arg,
-	int	is_normal_group,
-	int	is_menu_group,
-	int	is_tooltip_group)
+	पूर्णाङ्क	is_normal_group,
+	पूर्णाङ्क	is_menu_group,
+	पूर्णाङ्क	is_tooltip_group)
 {
-    int		did_change = FALSE;
+    पूर्णाङ्क		did_change = FALSE;
 
     // in non-GUI fonts are simply ignored
-    if (HL_TABLE()[idx].sg_font_name != NULL
+    सचे (HL_TABLE()[idx].sg_font_name != रिक्त
 	    && STRCMP(HL_TABLE()[idx].sg_font_name, arg) == 0)
     {
 	// Font name didn't change, ignore.
     }
-    else if (!gui.shell_created)
+    अञ्ञथा सचे (!gui.shell_created)
     {
 	// GUI not started yet, always accept the name.
 	vim_free(HL_TABLE()[idx].sg_font_name);
 	HL_TABLE()[idx].sg_font_name = vim_strsave(arg);
 	did_change = TRUE;
     }
-    else
+    अञ्ञथा
     {
 	GuiFont temp_sg_font = HL_TABLE()[idx].sg_font;
 # ifdef FEAT_XFONTSET
@@ -1038,35 +1038,35 @@ highlight_set_font(
 		is_tooltip_group, FALSE);
 
 # ifdef FEAT_XFONTSET
-	if (HL_TABLE()[idx].sg_fontset != NOFONTSET)
+	सचे (HL_TABLE()[idx].sg_fontset != NOFONTSET)
 	{
 	    // New fontset was accepted. Free the old one, if there
 	    // was one.
 	    gui_mch_free_fontset(temp_sg_fontset);
 	    did_change = TRUE;
 	}
-	else
+	अञ्ञथा
 	    HL_TABLE()[idx].sg_fontset = temp_sg_fontset;
 # endif
-	if (HL_TABLE()[idx].sg_font != NOFONT)
+	सचे (HL_TABLE()[idx].sg_font != NOFONT)
 	{
 	    // New font was accepted. Free the old one, if there was
 	    // one.
 	    gui_mch_free_font(temp_sg_font);
 	    did_change = TRUE;
 	}
-	else
+	अञ्ञथा
 	    HL_TABLE()[idx].sg_font = temp_sg_font;
 	// Update sg_font_name once here, after both font and fontset results
 	// are known.
-	if (did_change)
+	सचे (did_change)
 	{
 	    vim_free(HL_TABLE()[idx].sg_font_name);
 	    HL_TABLE()[idx].sg_font_name = vim_strsave(arg);
 	}
     }
 
-    return did_change;
+    पटिनिवत्त did_change;
 }
 #endif
 
@@ -1074,18 +1074,18 @@ highlight_set_font(
  * Set the cterm foreground color for the Normal highlight group to "color" and
  * the bold attribute to "bold".
  */
-    static void
-hl_set_ctermfg_normal_group(int color, int bold)
+    स्थिर शून्य
+hl_set_ctermfg_normal_group(पूर्णाङ्क color, पूर्णाङ्क bold)
 {
     cterm_normal_fg_color = color + 1;
     cterm_normal_fg_bold = bold;
 #ifdef FEAT_GUI
     // Don't do this if the GUI is used.
-    if (!gui.in_use && !gui.starting)
+    सचे (!gui.in_use && !gui.starting)
 #endif
     {
 	set_must_redraw(UPD_CLEAR);
-	if (termcap_active && color >= 0)
+	सचे (termcap_active && color >= 0)
 	    term_fg_color(color);
     }
 }
@@ -1093,11 +1093,11 @@ hl_set_ctermfg_normal_group(int color, int bold)
 /*
  * Set the cterm foreground color for the highlight group at 'idx' to 'color'.
  */
-    static void
-highlight_set_ctermfg(int idx, int color, int is_normal_group)
+    स्थिर शून्य
+highlight_set_ctermfg(पूर्णाङ्क idx, पूर्णाङ्क color, पूर्णाङ्क is_normal_group)
 {
     HL_TABLE()[idx].sg_cterm_fg = color + 1;
-    if (is_normal_group)
+    सचे (is_normal_group)
 	hl_set_ctermfg_normal_group(color,
 					(HL_TABLE()[idx].sg_cterm & HL_BOLD));
 }
@@ -1105,34 +1105,34 @@ highlight_set_ctermfg(int idx, int color, int is_normal_group)
 /*
  * Set the cterm background color for the Normal highlight group to "color".
  */
-    static void
-hl_set_ctermbg_normal_group(int color)
+    स्थिर शून्य
+hl_set_ctermbg_normal_group(पूर्णाङ्क color)
 {
     cterm_normal_bg_color = color + 1;
 #ifdef FEAT_GUI
     // Don't mess with 'background' if the GUI is used.
-    if (!gui.in_use && !gui.starting)
+    सचे (!gui.in_use && !gui.starting)
 #endif
     {
 	set_must_redraw(UPD_CLEAR);
-	if (color >= 0)
+	सचे (color >= 0)
 	{
-	    int dark = -1;
+	    पूर्णाङ्क dark = -1;
 
-	    if (termcap_active)
+	    सचे (termcap_active)
 		term_bg_color(color);
-	    if (t_colors < 16)
+	    सचे (t_colors < 16)
 		dark = (color == 0 || color == 4);
 	    // Limit the heuristic to the standard 16 colors
-	    else if (color < 16)
+	    अञ्ञथा सचे (color < 16)
 		dark = (color < 7 || color == 8);
 	    // Set the 'background' option if the value is
 	    // wrong.
-	    if (dark != -1
+	    सचे (dark != -1
 		    && dark != (*p_bg == 'd')
 		    && !option_was_set((char_u *)"bg"))
 	    {
-		set_option_value_give_err((char_u *)"bg",
+		set_option_मानम्_give_err((char_u *)"bg",
 			0L, (char_u *)(dark ? "dark" : "light"), 0);
 		reset_option_was_set((char_u *)"bg");
 	    }
@@ -1143,28 +1143,28 @@ hl_set_ctermbg_normal_group(int color)
 /*
  * Set the cterm background color for the highlight group at 'idx' to 'color'.
  */
-    static void
-highlight_set_ctermbg(int idx, int color, int is_normal_group)
+    स्थिर शून्य
+highlight_set_ctermbg(पूर्णाङ्क idx, पूर्णाङ्क color, पूर्णाङ्क is_normal_group)
 {
     HL_TABLE()[idx].sg_cterm_bg = color + 1;
-    if (is_normal_group)
+    सचे (is_normal_group)
 	hl_set_ctermbg_normal_group(color);
 }
 
 /*
  * Set the cterm underline color for the Normal highlight group to "color".
  */
-    static void
-hl_set_ctermul_normal_group(int color)
+    स्थिर शून्य
+hl_set_ctermul_normal_group(पूर्णाङ्क color)
 {
     cterm_normal_ul_color = color + 1;
 #ifdef FEAT_GUI
     // Don't do this if the GUI is used.
-    if (!gui.in_use && !gui.starting)
+    सचे (!gui.in_use && !gui.starting)
 #endif
     {
 	set_must_redraw(UPD_CLEAR);
-	if (termcap_active && color >= 0)
+	सचे (termcap_active && color >= 0)
 	    term_ul_color(color);
     }
 }
@@ -1172,11 +1172,11 @@ hl_set_ctermul_normal_group(int color)
 /*
  * Set the cterm underline color for the highlight group at 'idx' to 'color'.
  */
-    static void
-highlight_set_ctermul(int idx, int color, int is_normal_group)
+    स्थिर शून्य
+highlight_set_ctermul(पूर्णाङ्क idx, पूर्णाङ्क color, पूर्णाङ्क is_normal_group)
 {
     HL_TABLE()[idx].sg_cterm_ul = color + 1;
-    if (is_normal_group)
+    सचे (is_normal_group)
 	hl_set_ctermul_normal_group(color);
 }
 
@@ -1188,29 +1188,29 @@ highlight_set_ctermul(int idx, int color, int is_normal_group)
  *
  * Returns TRUE if the font is set.
  */
-    static int
+    स्थिर पूर्णाङ्क
 highlight_set_cterm_font(
-	int	idx,
+	पूर्णाङ्क	idx,
 	char_u	*arg,
-	int	init)
+	पूर्णाङ्क	init)
 {
-    int		font;
+    पूर्णाङ्क		font;
 
-    if (init && (HL_TABLE()[idx].sg_set & SG_CTERM))
-	return FALSE;
+    सचे (init && (HL_TABLE()[idx].sg_set & SG_CTERM))
+	पटिनिवत्त FALSE;
 
-    if (!init)
+    सचे (!init)
 	HL_TABLE()[idx].sg_set |= SG_CTERM;
 
-    if (VIM_ISDIGIT(*arg))
-	font = atoi((char *)arg);
-    else if (STRICMP(arg, "NONE") == 0)
+    सचे (VIM_ISDIGIT(*arg))
+	font = atoi((वर्ण *)arg);
+    अञ्ञथा सचे (STRICMP(arg, "NONE") == 0)
 	font = -1;
-    else
-	return FALSE;
+    अञ्ञथा
+	पटिनिवत्त FALSE;
 
     HL_TABLE()[idx].sg_cterm_font = font + 1;
-    return TRUE;
+    पटिनिवत्त TRUE;
 }
 
 /*
@@ -1224,178 +1224,178 @@ highlight_set_cterm_font(
  *
  * Returns TRUE if the color is set.
  */
-    static int
+    स्थिर पूर्णाङ्क
 highlight_set_cterm_color(
-	int	idx,
-	char_u	*key,
-	char_u	*key_start,
+	पूर्णाङ्क	idx,
+	char_u	*कुञ्चिका,
+	char_u	*कुञ्चिका_start,
 	char_u	*arg,
-	int	is_normal_group,
-	int	init)
+	पूर्णाङ्क	is_normal_group,
+	पूर्णाङ्क	init)
 {
-    int		color;
+    पूर्णाङ्क		color;
 
-    if (init && (HL_TABLE()[idx].sg_set & SG_CTERM))
-	return FALSE;
+    सचे (init && (HL_TABLE()[idx].sg_set & SG_CTERM))
+	पटिनिवत्त FALSE;
 
-    if (!init)
+    सचे (!init)
 	HL_TABLE()[idx].sg_set |= SG_CTERM;
 
     // When setting the foreground color, and previously the "bold"
     // flag was set for a light color, reset it now
-    if (key[5] == 'F' && HL_TABLE()[idx].sg_cterm_bold)
+    सचे (कुञ्चिका[5] == 'F' && HL_TABLE()[idx].sg_cterm_bold)
     {
 	HL_TABLE()[idx].sg_cterm &= ~HL_BOLD;
 	HL_TABLE()[idx].sg_cterm_bold = FALSE;
     }
 
-    if (VIM_ISDIGIT(*arg))
-	color = atoi((char *)arg);
-    else if (STRICMP(arg, "fg") == 0)
+    सचे (VIM_ISDIGIT(*arg))
+	color = atoi((वर्ण *)arg);
+    अञ्ञथा सचे (STRICMP(arg, "fg") == 0)
     {
-	if (cterm_normal_fg_color)
+	सचे (cterm_normal_fg_color)
 	    color = cterm_normal_fg_color - 1;
-	else
+	अञ्ञथा
 	{
 	    emsg(_(e_fg_color_unknown));
-	    return FALSE;
+	    पटिनिवत्त FALSE;
 	}
     }
-    else if (STRICMP(arg, "bg") == 0)
+    अञ्ञथा सचे (STRICMP(arg, "bg") == 0)
     {
-	if (cterm_normal_bg_color > 0)
+	सचे (cterm_normal_bg_color > 0)
 	    color = cterm_normal_bg_color - 1;
-	else
+	अञ्ञथा
 	{
 	    emsg(_(e_bg_color_unknown));
-	    return FALSE;
+	    पटिनिवत्त FALSE;
 	}
     }
-    else if (STRICMP(arg, "ul") == 0)
+    अञ्ञथा सचे (STRICMP(arg, "ul") == 0)
     {
-	if (cterm_normal_ul_color > 0)
+	सचे (cterm_normal_ul_color > 0)
 	    color = cterm_normal_ul_color - 1;
-	else
+	अञ्ञथा
 	{
 	    emsg(_(e_ul_color_unknown));
-	    return FALSE;
+	    पटिनिवत्त FALSE;
 	}
     }
-    else
+    अञ्ञथा
     {
-	int bold = MAYBE;
+	पूर्णाङ्क bold = MAYBE;
 	keyvalue_T target;
 	keyvalue_T *entry;
 
-	target.key = 0;
-	target.value.string = arg;
-	target.value.length = 0;	// not used, see cmp_keyvalue_value_i()
+	target.कुञ्चिका = 0;
+	target.मानम्.string = arg;
+	target.मानम्.length = 0;	// not used, see cmp_keyvalue_value_i()
 	entry = (keyvalue_T *)bsearch(&target, &color_name_tab,
-		ARRAY_LENGTH(color_name_tab), sizeof(color_name_tab[0]),
-		cmp_keyvalue_value_i);
-	if (entry == NULL)
+		ARRAY_LENGTH(color_name_tab), परिमाण(color_name_tab[0]),
+		cmp_keyvalue_मानम्_i);
+	सचे (entry == रिक्त)
 	{
-	    semsg(_(e_color_name_or_number_not_recognized_str), key_start);
-	    return FALSE;
+	    semsg(_(e_color_name_or_सङ्ख्या_not_recognized_str), कुञ्चिका_start);
+	    पटिनिवत्त FALSE;
 	}
 
-	color = lookup_color(entry->key, key[5] == 'F', &bold);
+	color = lookup_color(entry->कुञ्चिका, कुञ्चिका[5] == 'F', &bold);
 
 	// set/reset bold attribute to get light foreground
 	// colors (on some terminals, e.g. "linux")
-	if (bold == TRUE)
+	सचे (bold == TRUE)
 	{
 	    HL_TABLE()[idx].sg_cterm |= HL_BOLD;
 	    HL_TABLE()[idx].sg_cterm_bold = TRUE;
 	}
-	else if (bold == FALSE)
+	अञ्ञथा सचे (bold == FALSE)
 	    HL_TABLE()[idx].sg_cterm &= ~HL_BOLD;
     }
 
     // Add one to the argument, to avoid zero.  Zero is used for
     // "NONE", then "color" is -1.
-    if (key[5] == 'F')
+    सचे (कुञ्चिका[5] == 'F')
 	highlight_set_ctermfg(idx, color, is_normal_group);
-    else if (key[5] == 'B')
+    अञ्ञथा सचे (कुञ्चिका[5] == 'B')
 	highlight_set_ctermbg(idx, color, is_normal_group);
-    else // ctermul
+    अञ्ञथा // ctermul
 	highlight_set_ctermul(idx, color, is_normal_group);
 
-    return TRUE;
+    पटिनिवत्त TRUE;
 }
 
-#if defined(FEAT_GUI) || defined(FEAT_EVAL)
+#सचे defined(FEAT_GUI) || defined(FEAT_EVAL)
 /*
  * Set the GUI foreground color for the highlight group at 'idx'.
  * Returns TRUE if the color is set.
  */
-    static int
+    स्थिर पूर्णाङ्क
 highlight_set_guifg(
-	int	idx,
+	पूर्णाङ्क	idx,
 	char_u	*arg,
-	int	is_menu_group UNUSED,
-	int	is_scrollbar_group UNUSED,
-	int	is_tooltip_group UNUSED,
-	int	is_titlebar_group UNUSED,
-	int	is_titlebarnc_group UNUSED,
-	int	*do_colors UNUSED,
-	int	init)
+	पूर्णाङ्क	is_menu_group UNUSED,
+	पूर्णाङ्क	is_scrollbar_group UNUSED,
+	पूर्णाङ्क	is_tooltip_group UNUSED,
+	पूर्णाङ्क	is_titlebar_group UNUSED,
+	पूर्णाङ्क	is_titlebarnc_group UNUSED,
+	पूर्णाङ्क	*do_colors UNUSED,
+	पूर्णाङ्क	init)
 {
-# if defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
+# सचे defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
     long	i;
 # endif
     char_u	**namep;
-    int		did_change = FALSE;
+    पूर्णाङ्क		did_change = FALSE;
 
-    if (init && (HL_TABLE()[idx].sg_set & SG_GUI))
-	return FALSE;
+    सचे (init && (HL_TABLE()[idx].sg_set & SG_GUI))
+	पटिनिवत्त FALSE;
 
     namep = &HL_TABLE()[idx].sg_gui_fg_name;
-    if (!init)
+    सचे (!init)
 	HL_TABLE()[idx].sg_set |= SG_GUI;
 
-# if defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
+# सचे defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
     // In GUI guifg colors are only used when recognized
     i = color_name2handle(arg);
-    if (i != INVALCOLOR || STRCMP(arg, "NONE") == 0 || !USE_24BIT)
+    सचे (i != INVALCOLOR || STRCMP(arg, "NONE") == 0 || !USE_24BIT)
     {
 	HL_TABLE()[idx].sg_gui_fg = i;
 # endif
-	if (*namep == NULL || STRCMP(*namep, arg) != 0)
+	सचे (*namep == रिक्त || STRCMP(*namep, arg) != 0)
 	{
 	    vim_free(*namep);
-	    if (STRCMP(arg, "NONE") != 0)
+	    सचे (STRCMP(arg, "NONE") != 0)
 		*namep = vim_strsave(arg);
-	    else
-		*namep = NULL;
+	    अञ्ञथा
+		*namep = रिक्त;
 	    did_change = TRUE;
 	}
-# if defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
+# सचे defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
 #  ifdef FEAT_GUI_MSWIN
-	if (is_titlebar_group && gui.title_fg_pixel != i)
+	सचे (is_titlebar_group && gui.title_fg_pixel != i)
 	{
 	    gui.title_fg_pixel = i;
 	    *do_colors = TRUE;
 	}
-	if (is_titlebarnc_group && gui.titlenc_fg_pixel != i)
+	सचे (is_titlebarnc_group && gui.titlenc_fg_pixel != i)
 	{
 	    gui.titlenc_fg_pixel = i;
 	    *do_colors = TRUE;
 	}
 #  endif
 #  ifdef FEAT_GUI_X11
-	if (is_menu_group && gui.menu_fg_pixel != i)
+	सचे (is_menu_group && gui.menu_fg_pixel != i)
 	{
 	    gui.menu_fg_pixel = i;
 	    *do_colors = TRUE;
 	}
-	if (is_scrollbar_group && gui.scroll_fg_pixel != i)
+	सचे (is_scrollbar_group && gui.scroll_fg_pixel != i)
 	{
 	    gui.scroll_fg_pixel = i;
 	    *do_colors = TRUE;
 	}
 #   ifdef FEAT_BEVAL_GUI
-	if (is_tooltip_group && gui.tooltip_fg_pixel != i)
+	सचे (is_tooltip_group && gui.tooltip_fg_pixel != i)
 	{
 	    gui.tooltip_fg_pixel = i;
 	    *do_colors = TRUE;
@@ -1405,80 +1405,80 @@ highlight_set_guifg(
     }
 # endif
 
-    return did_change;
+    पटिनिवत्त did_change;
 }
 
 /*
  * Set the GUI background color for the highlight group at 'idx'.
  * Returns TRUE if the color is set.
  */
-    static int
+    स्थिर पूर्णाङ्क
 highlight_set_guibg(
-	int	idx,
+	पूर्णाङ्क	idx,
 	char_u	*arg,
-	int	is_menu_group UNUSED,
-	int	is_scrollbar_group UNUSED,
-	int	is_tooltip_group UNUSED,
-	int	is_titlebar_group UNUSED,
-	int	is_titlebarnc_group UNUSED,
-	int	*do_colors UNUSED,
-	int	init)
+	पूर्णाङ्क	is_menu_group UNUSED,
+	पूर्णाङ्क	is_scrollbar_group UNUSED,
+	पूर्णाङ्क	is_tooltip_group UNUSED,
+	पूर्णाङ्क	is_titlebar_group UNUSED,
+	पूर्णाङ्क	is_titlebarnc_group UNUSED,
+	पूर्णाङ्क	*do_colors UNUSED,
+	पूर्णाङ्क	init)
 {
-# if defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
-    int		i;
+# सचे defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
+    पूर्णाङ्क		i;
 # endif
     char_u	**namep;
-    int		did_change = FALSE;
+    पूर्णाङ्क		did_change = FALSE;
 
-    if (init && (HL_TABLE()[idx].sg_set & SG_GUI))
-	return FALSE;
+    सचे (init && (HL_TABLE()[idx].sg_set & SG_GUI))
+	पटिनिवत्त FALSE;
 
     namep = &HL_TABLE()[idx].sg_gui_bg_name;
-    if (!init)
+    सचे (!init)
 	HL_TABLE()[idx].sg_set |= SG_GUI;
 
-# if defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
+# सचे defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
     // In GUI guibg colors are only used when recognized
     i = color_name2handle(arg);
-    if (i != INVALCOLOR || STRCMP(arg, "NONE") == 0 || !USE_24BIT)
+    सचे (i != INVALCOLOR || STRCMP(arg, "NONE") == 0 || !USE_24BIT)
     {
 	HL_TABLE()[idx].sg_gui_bg = i;
 # endif
-	if (*namep == NULL || STRCMP(*namep, arg) != 0)
+	सचे (*namep == रिक्त || STRCMP(*namep, arg) != 0)
 	{
 	    vim_free(*namep);
-	    if (STRCMP(arg, "NONE") != 0)
+	    सचे (STRCMP(arg, "NONE") != 0)
 		*namep = vim_strsave(arg);
-	    else
-		*namep = NULL;
+	    अञ्ञथा
+		*namep = रिक्त;
 	    did_change = TRUE;
 	}
-# if defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
+# सचे defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
 #  ifdef FEAT_GUI_MSWIN
-	if (is_titlebar_group && gui.title_bg_pixel != i)
+	सचे (is_titlebar_group && gui.title_bg_pixel != i)
 	{
 	    gui.title_bg_pixel = i;
 	    *do_colors = TRUE;
 	}
-	if (is_titlebarnc_group && gui.titlenc_bg_pixel != i)
+	सचे (is_titlebarnc_group && gui.titlenc_bg_pixel != i)
 	{
 	    gui.titlenc_bg_pixel = i;
 	    *do_colors = TRUE;
 	}
 #  endif
 #  ifdef FEAT_GUI_X11
-	if (is_menu_group && gui.menu_bg_pixel != i)
+	सचे (is_menu_group && gui.menu_bg_pixel != i)
 	{
 	    gui.menu_bg_pixel = i;
 	    *do_colors = TRUE;
 	}
-	if (is_scrollbar_group && gui.scroll_bg_pixel != i)
+	सचे (is_scrollbar_group && gui.scroll_bg_pixel != i)
 	{
 	    gui.scroll_bg_pixel = i;
 	    *do_colors = TRUE;
 	}
 #   ifdef FEAT_BEVAL_GUI
-	if (is_tooltip_group && gui.tooltip_bg_pixel != i)
+	सचे (is_tooltip_group && gui.tooltip_bg_pixel != i)
 	{
 	    gui.tooltip_bg_pixel = i;
 	    *do_colors = TRUE;
@@ -1488,50 +1488,50 @@ highlight_set_guibg(
     }
 # endif
 
-    return did_change;
+    पटिनिवत्त did_change;
 }
 
 /*
  * Set the GUI undercurl/strikethrough color for the highlight group at 'idx'.
  * Returns TRUE if the color is set.
  */
-    static int
-highlight_set_guisp(int idx, char_u *arg, int init)
+    स्थिर पूर्णाङ्क
+highlight_set_guisp(पूर्णाङ्क idx, char_u *arg, पूर्णाङ्क init)
 {
-# if defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
-    int		i;
+# सचे defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
+    पूर्णाङ्क		i;
 # endif
-    int		did_change = FALSE;
+    पूर्णाङ्क		did_change = FALSE;
     char_u	**namep;
 
-    if (init && (HL_TABLE()[idx].sg_set & SG_GUI))
-	return FALSE;
+    सचे (init && (HL_TABLE()[idx].sg_set & SG_GUI))
+	पटिनिवत्त FALSE;
 
     namep = &HL_TABLE()[idx].sg_gui_sp_name;
-    if (!init)
+    सचे (!init)
 	HL_TABLE()[idx].sg_set |= SG_GUI;
 
-# if defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
+# सचे defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
     // In GUI guisp colors are only used when recognized
     i = color_name2handle(arg);
-    if (i != INVALCOLOR || STRCMP(arg, "NONE") == 0 || !USE_24BIT)
+    सचे (i != INVALCOLOR || STRCMP(arg, "NONE") == 0 || !USE_24BIT)
     {
 	HL_TABLE()[idx].sg_gui_sp = i;
 # endif
-	if (*namep == NULL || STRCMP(*namep, arg) != 0)
+	सचे (*namep == रिक्त || STRCMP(*namep, arg) != 0)
 	{
 	    vim_free(*namep);
-	    if (STRCMP(arg, "NONE") != 0)
+	    सचे (STRCMP(arg, "NONE") != 0)
 		*namep = vim_strsave(arg);
-	    else
-		*namep = NULL;
+	    अञ्ञथा
+		*namep = रिक्त;
 	    did_change = TRUE;
 	}
-# if defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
+# सचे defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
     }
 # endif
 
-    return did_change;
+    पटिनिवत्त did_change;
 }
 #endif
 
@@ -1539,82 +1539,82 @@ highlight_set_guisp(int idx, char_u *arg, int init)
  * Set the start/stop terminal codes for a highlight group.
  * Returns TRUE if the terminal code is set.
  */
-    static int
-highlight_set_startstop_termcode(int idx, char_u *key, char_u *arg, int init)
+    स्थिर पूर्णाङ्क
+highlight_set_startstop_termcode(पूर्णाङ्क idx, char_u *कुञ्चिका, char_u *arg, पूर्णाङ्क init)
 {
-    int		off;
+    पूर्णाङ्क		off;
     char_u	buf[100];
-    int		len;
+    पूर्णाङ्क		len;
     char_u	*tname;
     char_u	*p;
 
-    if (!init)
+    सचे (!init)
 	HL_TABLE()[idx].sg_set |= SG_TERM;
 
     // The "start" and "stop"  arguments can be a literal escape
     // sequence, or a comma separated list of terminal codes.
-    if (STRNCMP(arg, "t_", 2) == 0)
+    सचे (STRNCMP(arg, "t_", 2) == 0)
     {
 	off = 0;
 	buf[0] = 0;
-	while (arg[off] != NUL)
+	याव (arg[off] != NUL)
 	{
 	    // Isolate one termcap name
-	    for (len = 0; arg[off + len] &&
+	    अत्थाय (len = 0; arg[off + len] &&
 		    arg[off + len] != ','; ++len)
 		;
 	    tname = vim_strnsave(arg + off, len);
-	    if (tname == NULL)		// out of memory
-		return FALSE;
+	    सचे (tname == रिक्त)		// out of memory
+		पटिनिवत्त FALSE;
 	    // lookup the escape sequence for the item
 	    p = get_term_code(tname);
 	    vim_free(tname);
-	    if (p == NULL)	    // ignore non-existing things
+	    सचे (p == रिक्त)	    // ignore non-existing things
 		p = (char_u *)"";
 
 	    // Append it to the already found stuff
-	    if ((int)(STRLEN(buf) + STRLEN(p)) >= 99)
+	    सचे ((पूर्णाङ्क)(STRLEN(buf) + STRLEN(p)) >= 99)
 	    {
 		semsg(_(e_terminal_code_too_long_str), arg);
-		return FALSE;
+		पटिनिवत्त FALSE;
 	    }
 	    STRCAT(buf, p);
 
 	    // Advance to the next item
 	    off += len;
-	    if (arg[off] == ',')	    // another one follows
+	    सचे (arg[off] == ',')	    // another one follows
 		++off;
 	}
     }
-    else
+    अञ्ञथा
     {
 	// Copy characters from arg[] to buf[], translating <> codes.
-	for (p = arg, off = 0; off < 100 - 6 && *p; )
+	अत्थाय (p = arg, off = 0; off < 100 - 6 && *p; )
 	{
-	    len = trans_special(&p, buf + off, FSK_SIMPLIFY, FALSE, NULL);
-	    if (len > 0)	    // recognized special char
+	    len = trans_special(&p, buf + off, FSK_SIMPLIFY, FALSE, रिक्त);
+	    सचे (len > 0)	    // recognized special char
 		off += len;
-	    else		    // copy as normal char
+	    अञ्ञथा		    // copy as normal char
 		buf[off++] = *p++;
 	}
 	buf[off] = NUL;
     }
 
-    if (STRCMP(buf, "NONE") == 0)	// resetting the value
-	p = NULL;
-    else
+    सचे (STRCMP(buf, "NONE") == 0)	// resetting the value
+	p = रिक्त;
+    अञ्ञथा
 	p = vim_strsave(buf);
-    if (key[2] == 'A')
+    सचे (कुञ्चिका[2] == 'A')
     {
 	vim_free(HL_TABLE()[idx].sg_start);
 	HL_TABLE()[idx].sg_start = p;
     }
-    else
+    अञ्ञथा
     {
 	vim_free(HL_TABLE()[idx].sg_stop);
 	HL_TABLE()[idx].sg_stop = p;
     }
-    return TRUE;
+    पटिनिवत्त TRUE;
 }
 
 /*
@@ -1622,338 +1622,338 @@ highlight_set_startstop_termcode(int idx, char_u *key, char_u *arg, int init)
  * When using ":hi clear" this is called recursively for each group with
  * "forceit" and "init" both TRUE.
  */
-    void
+    शून्य
 do_highlight(
-    char_u	*line,
-    int		forceit,
-    int		init)	    // TRUE when called for initializing
+    char_u	*पङ्क्तिः,
+    पूर्णाङ्क		forceit,
+    पूर्णाङ्क		init)	    // TRUE when called for initializing
 {
     char_u	*name_end;
     char_u	*linep;
-    char_u	*key_start;
+    char_u	*कुञ्चिका_start;
     char_u	*arg_start;
-    char_u	*key = NULL, *arg = NULL;
+    char_u	*कुञ्चिका = रिक्त, *arg = रिक्त;
     long	i;
-    int		id;
-    int		idx;
+    पूर्णाङ्क		id;
+    पूर्णाङ्क		idx;
     hl_group_T	item_before;
-    int		did_change = FALSE;
-    int		dodefault = FALSE;
-    int		doclear = FALSE;
-    int		dolink = FALSE;
-    int		error = FALSE;
-    int		is_normal_group = FALSE;	// "Normal" group
+    पूर्णाङ्क		did_change = FALSE;
+    पूर्णाङ्क		dodefault = FALSE;
+    पूर्णाङ्क		doclear = FALSE;
+    पूर्णाङ्क		dolink = FALSE;
+    पूर्णाङ्क		error = FALSE;
+    पूर्णाङ्क		is_normal_group = FALSE;	// "Normal" group
 #ifdef FEAT_GUI_MSWIN
-    int		is_titlebar_group = FALSE;	// "TitleBar" group
-    int		is_titlebarnc_group = FALSE;	// "TitleBarNC" group
-#else
+    पूर्णाङ्क		is_titlebar_group = FALSE;	// "TitleBar" group
+    पूर्णाङ्क		is_titlebarnc_group = FALSE;	// "TitleBarNC" group
+#अञ्ञथा
 # define is_titlebar_group 0
 # define is_titlebarnc_group 0
 #endif
 #ifdef FEAT_GUI_X11
-    int		is_menu_group = FALSE;		// "Menu" group
-    int		is_scrollbar_group = FALSE;	// "Scrollbar" group
-    int		is_tooltip_group = FALSE;	// "Tooltip" group
-#else
+    पूर्णाङ्क		is_menu_group = FALSE;		// "Menu" group
+    पूर्णाङ्क		is_scrollbar_group = FALSE;	// "Scrollbar" group
+    पूर्णाङ्क		is_tooltip_group = FALSE;	// "Tooltip" group
+#अञ्ञथा
 # define is_menu_group 0
 # define is_tooltip_group 0
 # define is_scrollbar_group 0
 #endif
-#if defined(FEAT_GUI) || defined(FEAT_EVAL)
-    int		do_colors = FALSE;		// need to update colors?
+#सचे defined(FEAT_GUI) || defined(FEAT_EVAL)
+    पूर्णाङ्क		do_colors = FALSE;		// need to update colors?
 #endif
-#if defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
-    int		did_highlight_changed = FALSE;
+#सचे defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
+    पूर्णाङ्क		did_highlight_changed = FALSE;
 #endif
 
     // If no argument, list current highlighting.
-    if (!init && ends_excmd2(line - 1, line))
+    सचे (!init && ends_excmd2(पङ्क्तिः - 1, पङ्क्तिः))
     {
-	for (i = 1; i <= highlight_ga.ga_len && !got_int; ++i)
+	अत्थाय (i = 1; i <= highlight_ga.ga_len && !got_int; ++i)
 	    // TODO: only call when the group has attributes set
-	    highlight_list_one((int)i);
-	return;
+	    highlight_list_one((पूर्णाङ्क)i);
+	पटिनिवत्त;
     }
 
     // Isolate the name.
-    name_end = skiptowhite(line);
+    name_end = skiptowhite(पङ्क्तिः);
     linep = skipwhite(name_end);
 
     // Check for "default" argument.
-    if (STRNCMP(line, "default", name_end - line) == 0)
+    सचे (STRNCMP(पङ्क्तिः, "default", name_end - पङ्क्तिः) == 0)
     {
 	dodefault = TRUE;
-	line = linep;
-	name_end = skiptowhite(line);
+	पङ्क्तिः = linep;
+	name_end = skiptowhite(पङ्क्तिः);
 	linep = skipwhite(name_end);
     }
 
     // Check for "clear" or "link" argument.
-    if (STRNCMP(line, "clear", name_end - line) == 0)
+    सचे (STRNCMP(पङ्क्तिः, "clear", name_end - पङ्क्तिः) == 0)
 	doclear = TRUE;
-    if (STRNCMP(line, "link", name_end - line) == 0)
+    सचे (STRNCMP(पङ्क्तिः, "link", name_end - पङ्क्तिः) == 0)
 	dolink = TRUE;
 
     // ":highlight {group-name}": list highlighting for one group.
-    if (!doclear && !dolink && ends_excmd2(line, linep))
+    सचे (!doclear && !dolink && ends_excmd2(पङ्क्तिः, linep))
     {
-	id = syn_namen2id(line, (int)(name_end - line));
-	if (id == 0)
-	    semsg(_(e_highlight_group_name_not_found_str), line);
-	else
+	id = syn_namen2id(पङ्क्तिः, (पूर्णाङ्क)(name_end - पङ्क्तिः));
+	सचे (id == 0)
+	    semsg(_(e_highlight_group_name_not_found_str), पङ्क्तिः);
+	अञ्ञथा
 	    highlight_list_one(id);
-	return;
+	पटिनिवत्त;
     }
 
     // Handle ":highlight link {from} {to}" command.
-    if (dolink)
+    सचे (dolink)
     {
 	char_u	    *from_start = linep;
 	char_u	    *from_end;
-	int	    from_len;
+	पूर्णाङ्क	    from_len;
 	char_u	    *to_start;
 	char_u	    *to_end;
-	int	    to_len;
+	पूर्णाङ्क	    to_len;
 
 	from_end = skiptowhite(from_start);
 	to_start = skipwhite(from_end);
 	to_end	 = skiptowhite(to_start);
 
-	if (ends_excmd2(line, from_start) || ends_excmd2(line, to_start))
+	सचे (ends_excmd2(पङ्क्तिः, from_start) || ends_excmd2(पङ्क्तिः, to_start))
 	{
 	    semsg(_(e_not_enough_arguments_highlight_link_str), from_start);
-	    return;
+	    पटिनिवत्त;
 	}
 
-	if (!ends_excmd2(line, skipwhite(to_end)))
+	सचे (!ends_excmd2(पङ्क्तिः, skipwhite(to_end)))
 	{
 	    semsg(_(e_too_many_arguments_highlight_link_str), from_start);
-	    return;
+	    पटिनिवत्त;
 	}
 
-	from_len = (int)(from_end - from_start);
-	to_len = (int)(to_end - to_start);
+	from_len = (पूर्णाङ्क)(from_end - from_start);
+	to_len = (पूर्णाङ्क)(to_end - to_start);
 	highlight_group_link(from_start, from_len, to_start, to_len,
 						dodefault, forceit, init);
-	return;
+	पटिनिवत्त;
     }
 
-    if (doclear)
+    सचे (doclear)
     {
 	// ":highlight clear [group]" command.
-	if (ends_excmd2(line, linep))
+	सचे (ends_excmd2(पङ्क्तिः, linep))
 	{
 	    // ":highlight clear" without group name
 	    highlight_reset_all();
-	    return;
+	    पटिनिवत्त;
 	}
-	line = linep;
-	name_end = skiptowhite(line);
+	पङ्क्तिः = linep;
+	name_end = skiptowhite(पङ्क्तिः);
 	linep = skipwhite(name_end);
     }
 
     // Find the group name in the table.  If it does not exist yet, add it.
-    id = syn_check_group(line, (int)(name_end - line));
-    if (id == 0)	// failed (out of memory)
-	return;
+    id = syn_check_group(पङ्क्तिः, (पूर्णाङ्क)(name_end - पङ्क्तिः));
+    सचे (id == 0)	// failed (out of memory)
+	पटिनिवत्त;
     idx = id - 1;	// index is ID minus one
 
     // Return if "default" was used and the group already has settings.
-    if (dodefault && hl_has_settings(idx, TRUE))
-	return;
+    सचे (dodefault && hl_has_settings(idx, TRUE))
+	पटिनिवत्त;
 
     // Make a copy so we can check if any attribute actually changed.
     item_before = HL_TABLE()[idx];
 
-    if (STRCMP(HL_TABLE()[idx].sg_name_u, "NORMAL") == 0)
+    सचे (STRCMP(HL_TABLE()[idx].sg_name_u, "NORMAL") == 0)
 	is_normal_group = TRUE;
 #ifdef FEAT_GUI_MSWIN
-    else if (STRCMP(HL_TABLE()[idx].sg_name_u, "TITLEBAR") == 0)
+    अञ्ञथा सचे (STRCMP(HL_TABLE()[idx].sg_name_u, "TITLEBAR") == 0)
 	is_titlebar_group = TRUE;
-    else if (STRCMP(HL_TABLE()[idx].sg_name_u, "TITLEBARNC") == 0)
+    अञ्ञथा सचे (STRCMP(HL_TABLE()[idx].sg_name_u, "TITLEBARNC") == 0)
 	is_titlebarnc_group = TRUE;
 #endif
 #ifdef FEAT_GUI_X11
-    else if (STRCMP(HL_TABLE()[idx].sg_name_u, "MENU") == 0)
+    अञ्ञथा सचे (STRCMP(HL_TABLE()[idx].sg_name_u, "MENU") == 0)
 	is_menu_group = TRUE;
-    else if (STRCMP(HL_TABLE()[idx].sg_name_u, "SCROLLBAR") == 0)
+    अञ्ञथा सचे (STRCMP(HL_TABLE()[idx].sg_name_u, "SCROLLBAR") == 0)
 	is_scrollbar_group = TRUE;
-    else if (STRCMP(HL_TABLE()[idx].sg_name_u, "TOOLTIP") == 0)
+    अञ्ञथा सचे (STRCMP(HL_TABLE()[idx].sg_name_u, "TOOLTIP") == 0)
 	is_tooltip_group = TRUE;
 #endif
 
     // Clear the highlighting for ":hi clear {group}" and ":hi clear".
-    if (doclear || (forceit && init))
+    सचे (doclear || (forceit && init))
     {
 	highlight_clear(idx);
-	if (!doclear)
+	सचे (!doclear)
 	    HL_TABLE()[idx].sg_set = 0;
     }
 
-    if (!doclear)
-	while (!ends_excmd2(line, linep))
+    सचे (!doclear)
+	याव (!ends_excmd2(पङ्क्तिः, linep))
 	{
-	    key_start = linep;
-	    if (*linep == '=')
+	    कुञ्चिका_start = linep;
+	    सचे (*linep == '=')
 	    {
-		semsg(_(e_unexpected_equal_sign_str), key_start);
+		semsg(_(e_unexpected_equal_sign_str), कुञ्चिका_start);
 		error = TRUE;
-		break;
+		भङ्ग;
 	    }
 
 	    // Note: Keep this in sync with get_highlight_group_key.
 
 	    // Isolate the key ("term", "ctermfg", "ctermbg", "font", "guifg"
 	    // or "guibg").
-	    while (*linep && !VIM_ISWHITE(*linep) && *linep != '=')
+	    याव (*linep && !VIM_ISWHITE(*linep) && *linep != '=')
 		++linep;
-	    vim_free(key);
-	    key = vim_strnsave_up(key_start, linep - key_start);
-	    if (key == NULL)
+	    vim_free(कुञ्चिका);
+	    कुञ्चिका = vim_strnsave_up(कुञ्चिका_start, linep - कुञ्चिका_start);
+	    सचे (कुञ्चिका == रिक्त)
 	    {
 		error = TRUE;
-		break;
+		भङ्ग;
 	    }
 	    linep = skipwhite(linep);
 
-	    if (STRCMP(key, "NONE") == 0)
+	    सचे (STRCMP(कुञ्चिका, "NONE") == 0)
 	    {
-		if (!init || HL_TABLE()[idx].sg_set == 0)
+		सचे (!init || HL_TABLE()[idx].sg_set == 0)
 		{
-		    if (!init)
+		    सचे (!init)
 			HL_TABLE()[idx].sg_set |= SG_TERM+SG_CTERM+SG_GUI;
 		    highlight_clear(idx);
 		}
-		continue;
+		अनुवर्त;
 	    }
 
 	    // Check for the equal sign.
-	    if (*linep != '=')
+	    सचे (*linep != '=')
 	    {
-		semsg(_(e_missing_equal_sign_str_2), key_start);
+		semsg(_(e_missing_equal_sign_str_2), कुञ्चिका_start);
 		error = TRUE;
-		break;
+		भङ्ग;
 	    }
 	    ++linep;
 
 	    // Isolate the argument.
 	    linep = skipwhite(linep);
-	    if (*linep == '\'')		// guifg='color name'
+	    सचे (*linep == '\'')		// guifg='color name'
 	    {
 		arg_start = ++linep;
 		linep = vim_strchr(linep, '\'');
-		if (linep == NULL)
+		सचे (linep == रिक्त)
 		{
-		    semsg(_(e_invalid_argument_str), key_start);
+		    semsg(_(e_invalid_argument_str), कुञ्चिका_start);
 		    error = TRUE;
-		    break;
+		    भङ्ग;
 		}
 	    }
-	    else
+	    अञ्ञथा
 	    {
 		arg_start = linep;
 		linep = skiptowhite(linep);
 	    }
-	    if (linep == arg_start)
+	    सचे (linep == arg_start)
 	    {
-		semsg(_(e_missing_argument_str), key_start);
+		semsg(_(e_missing_argument_str), कुञ्चिका_start);
 		error = TRUE;
-		break;
+		भङ्ग;
 	    }
 	    vim_free(arg);
 	    arg = vim_strnsave(arg_start, linep - arg_start);
-	    if (arg == NULL)
+	    सचे (arg == रिक्त)
 	    {
 		error = TRUE;
-		break;
+		भङ्ग;
 	    }
-	    if (*linep == '\'')
+	    सचे (*linep == '\'')
 		++linep;
 
 	    // Store the argument.
-	    if (STRCMP(key, "TERM") == 0
-		    || STRCMP(key, "CTERM") == 0
-		    || STRCMP(key, "GUI") == 0)
+	    सचे (STRCMP(कुञ्चिका, "TERM") == 0
+		    || STRCMP(कुञ्चिका, "CTERM") == 0
+		    || STRCMP(कुञ्चिका, "GUI") == 0)
 	    {
-		if (!highlight_set_termgui_attr(idx, key, arg, init))
+		सचे (!highlight_set_termgui_attr(idx, कुञ्चिका, arg, init))
 		{
 		    error = TRUE;
-		    break;
+		    भङ्ग;
 		}
 	    }
-	    else if (STRCMP(key, "FONT") == 0)
+	    अञ्ञथा सचे (STRCMP(कुञ्चिका, "FONT") == 0)
 	    {
 		// in non-GUI fonts are simply ignored
 #ifdef FEAT_GUI
-		if (highlight_set_font(idx, arg, is_normal_group,
+		सचे (highlight_set_font(idx, arg, is_normal_group,
 					      is_menu_group, is_tooltip_group))
 		    did_change = TRUE;
 #endif
 	    }
-	    else if (STRCMP(key, "CTERMFG") == 0
-		    || STRCMP(key, "CTERMBG") == 0
-		    || STRCMP(key, "CTERMUL") == 0)
+	    अञ्ञथा सचे (STRCMP(कुञ्चिका, "CTERMFG") == 0
+		    || STRCMP(कुञ्चिका, "CTERMBG") == 0
+		    || STRCMP(कुञ्चिका, "CTERMUL") == 0)
 	    {
-		if (!highlight_set_cterm_color(idx, key, key_start, arg,
+		सचे (!highlight_set_cterm_color(idx, कुञ्चिका, कुञ्चिका_start, arg,
 							is_normal_group, init))
 		{
 		    error = TRUE;
-		    break;
+		    भङ्ग;
 		}
 	    }
-	    else if (STRCMP(key, "CTERMFONT") == 0)
+	    अञ्ञथा सचे (STRCMP(कुञ्चिका, "CTERMFONT") == 0)
 	    {
-		if (!highlight_set_cterm_font(idx, arg, init))
+		सचे (!highlight_set_cterm_font(idx, arg, init))
 		{
 		    error = TRUE;
-		    break;
+		    भङ्ग;
 		}
 	    }
-	    else if (STRCMP(key, "GUIFG") == 0)
+	    अञ्ञथा सचे (STRCMP(कुञ्चिका, "GUIFG") == 0)
 	    {
-#if defined(FEAT_GUI) || defined(FEAT_EVAL)
-		if (highlight_set_guifg(idx, arg, is_menu_group,
+#सचे defined(FEAT_GUI) || defined(FEAT_EVAL)
+		सचे (highlight_set_guifg(idx, arg, is_menu_group,
 			    is_scrollbar_group, is_tooltip_group,
 			    is_titlebar_group, is_titlebarnc_group,
 			    &do_colors, init))
 		    did_change = TRUE;
 #endif
 	    }
-	    else if (STRCMP(key, "GUIBG") == 0)
+	    अञ्ञथा सचे (STRCMP(कुञ्चिका, "GUIBG") == 0)
 	    {
-#if defined(FEAT_GUI) || defined(FEAT_EVAL)
-		if (highlight_set_guibg(idx, arg, is_menu_group,
+#सचे defined(FEAT_GUI) || defined(FEAT_EVAL)
+		सचे (highlight_set_guibg(idx, arg, is_menu_group,
 			    is_scrollbar_group, is_tooltip_group,
 			    is_titlebar_group, is_titlebarnc_group,
 			    &do_colors, init))
 		    did_change = TRUE;
 #endif
 	    }
-	    else if (STRCMP(key, "GUISP") == 0)
+	    अञ्ञथा सचे (STRCMP(कुञ्चिका, "GUISP") == 0)
 	    {
-#if defined(FEAT_GUI) || defined(FEAT_EVAL)
-		if (highlight_set_guisp(idx, arg, init))
+#सचे defined(FEAT_GUI) || defined(FEAT_EVAL)
+		सचे (highlight_set_guisp(idx, arg, init))
 		    did_change = TRUE;
 #endif
 	    }
-	    else if (STRCMP(key, "START") == 0 || STRCMP(key, "STOP") == 0)
+	    अञ्ञथा सचे (STRCMP(कुञ्चिका, "START") == 0 || STRCMP(कुञ्चिका, "STOP") == 0)
 	    {
-		if (!highlight_set_startstop_termcode(idx, key, arg, init))
+		सचे (!highlight_set_startstop_termcode(idx, कुञ्चिका, arg, init))
 		{
 		    error = TRUE;
-		    break;
+		    भङ्ग;
 		}
 	    }
-	    else
+	    अञ्ञथा
 	    {
-		semsg(_(e_illegal_argument_str_3), key_start);
+		semsg(_(e_illegal_argument_str_3), कुञ्चिका_start);
 		error = TRUE;
-		break;
+		भङ्ग;
 	    }
 	    HL_TABLE()[idx].sg_cleared = FALSE;
 
 	    // When highlighting has been given for a group, don't link it.
-	    if (!init || !(HL_TABLE()[idx].sg_set & SG_LINK))
+	    सचे (!init || !(HL_TABLE()[idx].sg_set & SG_LINK))
 		HL_TABLE()[idx].sg_link = 0;
 
 	    // Continue with next argument.
@@ -1961,11 +1961,11 @@ do_highlight(
 	}
 
     // If there is an error, and it's a new entry, remove it from the table.
-    if (error && idx == highlight_ga.ga_len)
+    सचे (error && idx == highlight_ga.ga_len)
 	syn_unadd_group();
-    else
+    अञ्ञथा
     {
-	if (is_normal_group)
+	सचे (is_normal_group)
 	{
 	    HL_TABLE()[idx].sg_term_attr = 0;
 	    HL_TABLE()[idx].sg_cterm_attr = 0;
@@ -1974,8 +1974,8 @@ do_highlight(
 	    // Need to update all groups, because they might be using "bg"
 	    // and/or "fg", which have been changed now.
 #endif
-#if defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
-	    if (USE_24BIT)
+#सचे defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
+	    सचे (USE_24BIT)
 	    {
 		highlight_gui_started();
 		did_highlight_changed = TRUE;
@@ -1989,41 +1989,41 @@ do_highlight(
 #endif
 	}
 #ifdef FEAT_GUI_MSWIN
-	else if (is_titlebar_group)
+	अञ्ञथा सचे (is_titlebar_group)
 	{
-	    if (gui.in_use && do_colors)
+	    सचे (gui.in_use && do_colors)
 		gui_mch_set_titlebar_colors();
 	}
-	else if (is_titlebarnc_group)
+	अञ्ञथा सचे (is_titlebarnc_group)
 	{
-	    if (gui.in_use && do_colors)
+	    सचे (gui.in_use && do_colors)
 		gui_mch_set_titlebar_colors();
 	}
 #endif
 #ifdef FEAT_GUI_X11
 # ifdef FEAT_MENU
-	else if (is_menu_group)
+	अञ्ञथा सचे (is_menu_group)
 	{
-	    if (gui.in_use && do_colors)
+	    सचे (gui.in_use && do_colors)
 		gui_mch_new_menu_colors();
 	}
 # endif
-	else if (is_scrollbar_group)
+	अञ्ञथा सचे (is_scrollbar_group)
 	{
-	    if (gui.in_use && do_colors)
+	    सचे (gui.in_use && do_colors)
 		gui_new_scrollbar_colors();
-	    else
+	    अञ्ञथा
 		set_hl_attr(idx);
 	}
 # ifdef FEAT_BEVAL_GUI
-	else if (is_tooltip_group)
+	अञ्ञथा सचे (is_tooltip_group)
 	{
-	    if (gui.in_use && do_colors)
+	    सचे (gui.in_use && do_colors)
 		gui_mch_new_tooltip_colors();
 	}
 # endif
 #endif
-	else
+	अञ्ञथा
 	    set_hl_attr(idx);
 #ifdef FEAT_EVAL
 	HL_TABLE()[idx].sg_script_ctx = current_sctx;
@@ -2031,14 +2031,14 @@ do_highlight(
 #endif
     }
 
-    vim_free(key);
+    vim_free(कुञ्चिका);
     vim_free(arg);
 
     // Only call highlight_changed() once, after a sequence of highlight
     // commands, and only if an attribute actually changed.
-    if ((did_change
-	   || memcmp(&HL_TABLE()[idx], &item_before, sizeof(item_before)) != 0)
-#if defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
+    सचे ((did_change
+	   || memcmp(&HL_TABLE()[idx], &item_before, परिमाण(item_before)) != 0)
+#सचे defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
 	    && !did_highlight_changed
 #endif
        )
@@ -2046,23 +2046,23 @@ do_highlight(
 	// Do not trigger a redraw when highlighting is changed while
 	// redrawing.  This may happen when evaluating 'statusline' changes the
 	// StatusLine group.
-	if (!updating_screen)
+	सचे (!updating_screen)
 	    redraw_all_later(UPD_NOT_VALID);
 	need_highlight_changed = TRUE;
     }
 }
 
-#if defined(EXITFREE)
-    void
-free_highlight(void)
+#सचे defined(EXITFREE)
+    शून्य
+free_highlight(शून्य)
 {
-    int	    i;
+    पूर्णाङ्क	    i;
 
-    for (i = 0; i < highlight_ga.ga_len; ++i)
+    अत्थाय (i = 0; i < highlight_ga.ga_len; ++i)
     {
 	highlight_clear(i);
 	vim_free(HL_TABLE()[i].sg_name);
-	vim_free(HL_TABLE()[i].sg_name_u - HLNAME_KEY_OFF);
+	vim_free(HL_TABLE()[i].sg_name_u - HLNAME_कुञ्चिका_OFF);
     }
     ga_clear(&highlight_ga);
     hash_clear(&highlight_ht);
@@ -2074,20 +2074,20 @@ free_highlight(void)
  * Reset the cterm colors to what they were before Vim was started, if
  * possible.  Otherwise reset them to zero.
  */
-    void
-restore_cterm_colors(void)
+    शून्य
+restore_cterm_colors(शून्य)
 {
-#if defined(MSWIN) && !defined(FEAT_GUI_MSWIN)
+#सचे defined(MSWIN) && !defined(FEAT_GUI_MSWIN)
     // Since t_me has been set, this probably means that the user
     // wants to use this as default colors.  Need to reset default
     // background/foreground colors.
     mch_set_normal_colors();
-#else
+#अञ्ञथा
 # ifdef VIMDLL
-    if (!gui.in_use)
+    सचे (!gui.in_use)
     {
 	mch_set_normal_colors();
-	return;
+	पटिनिवत्त;
     }
 # endif
     cterm_normal_fg_color = 0;
@@ -2107,10 +2107,10 @@ restore_cterm_colors(void)
  * Return TRUE if highlight group "idx" has any settings.
  * When "check_link" is TRUE also check for an existing link.
  */
-    static int
-hl_has_settings(int idx, int check_link)
+    स्थिर पूर्णाङ्क
+hl_has_settings(पूर्णाङ्क idx, पूर्णाङ्क check_link)
 {
-    return HL_TABLE()[idx].sg_cleared == 0
+    पटिनिवत्त HL_TABLE()[idx].sg_cleared == 0
 	 && (  HL_TABLE()[idx].sg_term_attr != 0
 	    || HL_TABLE()[idx].sg_cterm_attr != 0
 	    || HL_TABLE()[idx].sg_cterm_fg != 0
@@ -2118,10 +2118,10 @@ hl_has_settings(int idx, int check_link)
 	    || HL_TABLE()[idx].sg_cterm_font != 0
 #ifdef FEAT_GUI
 	    || HL_TABLE()[idx].sg_gui_attr != 0
-	    || HL_TABLE()[idx].sg_gui_fg_name != NULL
-	    || HL_TABLE()[idx].sg_gui_bg_name != NULL
-	    || HL_TABLE()[idx].sg_gui_sp_name != NULL
-	    || HL_TABLE()[idx].sg_font_name != NULL
+	    || HL_TABLE()[idx].sg_gui_fg_name != रिक्त
+	    || HL_TABLE()[idx].sg_gui_bg_name != रिक्त
+	    || HL_TABLE()[idx].sg_gui_sp_name != रिक्त
+	    || HL_TABLE()[idx].sg_font_name != रिक्त
 #endif
 	    || (check_link && (HL_TABLE()[idx].sg_set & SG_LINK)));
 }
@@ -2129,8 +2129,8 @@ hl_has_settings(int idx, int check_link)
 /*
  * Clear highlighting for one group.
  */
-    static void
-highlight_clear(int idx)
+    स्थिर शून्य
+highlight_clear(पूर्णाङ्क idx)
 {
     HL_TABLE()[idx].sg_cleared = TRUE;
 
@@ -2144,13 +2144,13 @@ highlight_clear(int idx)
     HL_TABLE()[idx].sg_cterm_bg = 0;
     HL_TABLE()[idx].sg_cterm_attr = 0;
     HL_TABLE()[idx].sg_cterm_font = 0;
-#if defined(FEAT_GUI) || defined(FEAT_EVAL)
+#सचे defined(FEAT_GUI) || defined(FEAT_EVAL)
     HL_TABLE()[idx].sg_gui = 0;
     VIM_CLEAR(HL_TABLE()[idx].sg_gui_fg_name);
     VIM_CLEAR(HL_TABLE()[idx].sg_gui_bg_name);
     VIM_CLEAR(HL_TABLE()[idx].sg_gui_sp_name);
 #endif
-#if defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
+#सचे defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
     HL_TABLE()[idx].sg_gui_fg = INVALCOLOR;
     HL_TABLE()[idx].sg_gui_bg = INVALCOLOR;
     HL_TABLE()[idx].sg_gui_sp = INVALCOLOR;
@@ -2174,21 +2174,21 @@ highlight_clear(int idx)
 #endif
 }
 
-#if defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
+#सचे defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
 /*
  * Set the normal foreground and background colors according to the "Normal"
  * highlighting group.  For X11 also set "Menu", "Scrollbar" and "Tooltip"
  * colors.  For MS-Windows also set "TitleBar" and "TitleBarNC" colors.
  */
-    void
-set_normal_colors(void)
+    शून्य
+set_normal_colors(शून्य)
 {
 # ifdef FEAT_GUI
 #  ifdef FEAT_TERMGUICOLORS
-    if (gui.in_use)
+    सचे (gui.in_use)
 #  endif
     {
-	if (set_group_colors((char_u *)"Normal",
+	सचे (set_group_colors((char_u *)"Normal",
 				 &gui.norm_pixel, &gui.back_pixel,
 				 FALSE, TRUE, FALSE))
 	{
@@ -2196,14 +2196,14 @@ set_normal_colors(void)
 	    set_must_redraw(UPD_CLEAR);
 	}
 #  ifdef FEAT_GUI_MSWIN
-	if (set_group_colors((char_u *)"TitleBar",
+	सचे (set_group_colors((char_u *)"TitleBar",
 				 &gui.title_fg_pixel, &gui.title_bg_pixel,
 				 FALSE, FALSE, FALSE))
 	{
 	    gui_mch_set_titlebar_colors();
 	    set_must_redraw(UPD_CLEAR);
 	}
-	if (set_group_colors((char_u *)"TitleBarNC",
+	सचे (set_group_colors((char_u *)"TitleBarNC",
 				 &gui.titlenc_fg_pixel, &gui.titlenc_bg_pixel,
 				 FALSE, FALSE, FALSE))
 	{
@@ -2212,7 +2212,7 @@ set_normal_colors(void)
 	}
 #  endif
 #  ifdef FEAT_GUI_X11
-	if (set_group_colors((char_u *)"Menu",
+	सचे (set_group_colors((char_u *)"Menu",
 			     &gui.menu_fg_pixel, &gui.menu_bg_pixel,
 			     TRUE, FALSE, FALSE))
 	{
@@ -2222,7 +2222,7 @@ set_normal_colors(void)
 	    set_must_redraw(UPD_CLEAR);
 	}
 #   ifdef FEAT_BEVAL_GUI
-	if (set_group_colors((char_u *)"Tooltip",
+	सचे (set_group_colors((char_u *)"Tooltip",
 			     &gui.tooltip_fg_pixel, &gui.tooltip_bg_pixel,
 			     FALSE, FALSE, TRUE))
 	{
@@ -2232,7 +2232,7 @@ set_normal_colors(void)
 	    set_must_redraw(UPD_CLEAR);
 	}
 #   endif
-	if (set_group_colors((char_u *)"Scrollbar",
+	सचे (set_group_colors((char_u *)"Scrollbar",
 			&gui.scroll_fg_pixel, &gui.scroll_bg_pixel,
 			FALSE, FALSE, FALSE))
 	{
@@ -2244,19 +2244,19 @@ set_normal_colors(void)
 # endif
 # ifdef FEAT_TERMGUICOLORS
 #  ifdef FEAT_GUI
-    else
+    अञ्ञथा
 #  endif
     {
-	int		idx;
+	पूर्णाङ्क		idx;
 
 	idx = syn_name2id((char_u *)"Normal") - 1;
-	if (idx >= 0)
+	सचे (idx >= 0)
 	{
 	    gui_do_one_color(idx, FALSE, FALSE);
 
 	    // If the normal fg or bg color changed a complete redraw is
 	    // required.
-	    if (cterm_normal_fg_gui_color != HL_TABLE()[idx].sg_gui_fg
+	    सचे (cterm_normal_fg_gui_color != HL_TABLE()[idx].sg_gui_fg
 		    || cterm_normal_bg_gui_color != HL_TABLE()[idx].sg_gui_bg)
 	    {
 		// if the GUI color is INVALCOLOR then we use the default cterm
@@ -2271,37 +2271,37 @@ set_normal_colors(void)
 }
 #endif
 
-#if defined(FEAT_GUI)
+#सचे defined(FEAT_GUI)
 /*
  * Set the colors for "Normal", "Menu", "TitleBar", "TitleBarNC", "Tooltip" or
  * "Scrollbar".
  */
-    static int
+    स्थिर पूर्णाङ्क
 set_group_colors(
     char_u	*name,
     guicolor_T	*fgp,
     guicolor_T	*bgp,
-    int		do_menu,
-    int		use_norm,
-    int		do_tooltip)
+    पूर्णाङ्क		do_menu,
+    पूर्णाङ्क		use_norm,
+    पूर्णाङ्क		do_tooltip)
 {
-    int		idx;
+    पूर्णाङ्क		idx;
 
     idx = syn_name2id(name) - 1;
-    if (idx < 0)
-	return FALSE;
+    सचे (idx < 0)
+	पटिनिवत्त FALSE;
 
     gui_do_one_color(idx, do_menu, do_tooltip);
 
-    if (HL_TABLE()[idx].sg_gui_fg != INVALCOLOR)
+    सचे (HL_TABLE()[idx].sg_gui_fg != INVALCOLOR)
 	*fgp = HL_TABLE()[idx].sg_gui_fg;
-    else if (use_norm)
+    अञ्ञथा सचे (use_norm)
 	*fgp = gui.def_norm_pixel;
-    if (HL_TABLE()[idx].sg_gui_bg != INVALCOLOR)
+    सचे (HL_TABLE()[idx].sg_gui_bg != INVALCOLOR)
 	*bgp = HL_TABLE()[idx].sg_gui_bg;
-    else if (use_norm)
+    अञ्ञथा सचे (use_norm)
 	*bgp = gui.def_back_pixel;
-    return TRUE;
+    पटिनिवत्त TRUE;
 }
 
 /*
@@ -2309,33 +2309,33 @@ set_group_colors(
  * Returns "" when it's not found or not set.
  */
     char_u *
-hl_get_font_name(void)
+hl_get_font_name(शून्य)
 {
-    int		id;
+    पूर्णाङ्क		id;
     char_u	*s;
 
     id = syn_name2id((char_u *)"Normal");
-    if (id > 0)
+    सचे (id > 0)
     {
 	s = HL_TABLE()[id - 1].sg_font_name;
-	if (s != NULL)
-	    return s;
+	सचे (s != रिक्त)
+	    पटिनिवत्त s;
     }
-    return (char_u *)"";
+    पटिनिवत्त (char_u *)"";
 }
 
 /*
  * Set font for "Normal" group.  Called by gui_mch_init_font() when a font has
  * actually chosen to be used.
  */
-    void
+    शून्य
 hl_set_font_name(char_u *font_name)
 {
-    int	    id;
+    पूर्णाङ्क	    id;
 
     id = syn_name2id((char_u *)"Normal");
-    if (id <= 0)
-	return;
+    सचे (id <= 0)
+	पटिनिवत्त;
 
     vim_free(HL_TABLE()[id - 1].sg_font_name);
     HL_TABLE()[id - 1].sg_font_name = vim_strsave(font_name);
@@ -2345,18 +2345,18 @@ hl_set_font_name(char_u *font_name)
  * Set background color for "Normal" group.  Called by gui_set_bg_color()
  * when the color is known.
  */
-    void
+    शून्य
 hl_set_bg_color_name(
     char_u  *name)	    // must have been allocated
 {
-    int	    id;
+    पूर्णाङ्क	    id;
 
-    if (name == NULL)
-	return;
+    सचे (name == रिक्त)
+	पटिनिवत्त;
 
     id = syn_name2id((char_u *)"Normal");
-    if (id <= 0)
-	return;
+    सचे (id <= 0)
+	पटिनिवत्त;
 
     vim_free(HL_TABLE()[id - 1].sg_gui_bg_name);
     HL_TABLE()[id - 1].sg_gui_bg_name = name;
@@ -2366,18 +2366,18 @@ hl_set_bg_color_name(
  * Set foreground color for "Normal" group.  Called by gui_set_fg_color()
  * when the color is known.
  */
-    void
+    शून्य
 hl_set_fg_color_name(
     char_u  *name)	    // must have been allocated
 {
-    int	    id;
+    पूर्णाङ्क	    id;
 
-    if (name == NULL)
-	return;
+    सचे (name == रिक्त)
+	पटिनिवत्त;
 
     id = syn_name2id((char_u *)"Normal");
-    if (id <= 0)
-	return;
+    सचे (id <= 0)
+	पटिनिवत्त;
 
     vim_free(HL_TABLE()[id - 1].sg_gui_fg_name);
     HL_TABLE()[id - 1].sg_gui_fg_name = name;
@@ -2387,13 +2387,13 @@ hl_set_fg_color_name(
  * Return the handle for a font name.
  * Returns NOFONT when failed.
  */
-    static GuiFont
+    स्थिर GuiFont
 font_name2handle(char_u *name)
 {
-    if (STRCMP(name, "NONE") == 0)
-	return NOFONT;
+    सचे (STRCMP(name, "NONE") == 0)
+	पटिनिवत्त NOFONT;
 
-    return gui_mch_get_font(name, TRUE);
+    पटिनिवत्त gui_mch_get_font(name, TRUE);
 }
 
 # ifdef FEAT_XFONTSET
@@ -2401,32 +2401,32 @@ font_name2handle(char_u *name)
  * Return the handle for a fontset name.
  * Returns NOFONTSET when failed.
  */
-    static GuiFontset
-fontset_name2handle(char_u *name, int fixed_width)
+    स्थिर GuiFontset
+fontset_name2handle(char_u *name, पूर्णाङ्क fixed_width)
 {
-    if (STRCMP(name, "NONE") == 0)
-	return NOFONTSET;
+    सचे (STRCMP(name, "NONE") == 0)
+	पटिनिवत्त NOFONTSET;
 
-    return gui_mch_get_fontset(name, TRUE, fixed_width);
+    पटिनिवत्त gui_mch_get_fontset(name, TRUE, fixed_width);
 }
 # endif
 
 /*
  * Get the font or fontset for one highlight group.
  */
-    static void
+    स्थिर शून्य
 hl_do_font(
-    int		idx,
+    पूर्णाङ्क		idx,
     char_u	*arg,
-    int		do_normal,		// set normal font
-    int		do_menu UNUSED,		// set menu font
-    int		do_tooltip UNUSED,	// set tooltip font
-    int		free_font)		// free current font/fontset
+    पूर्णाङ्क		do_normal,		// set normal font
+    पूर्णाङ्क		do_menu UNUSED,		// set menu font
+    पूर्णाङ्क		do_tooltip UNUSED,	// set tooltip font
+    पूर्णाङ्क		free_font)		// free current font/fontset
 {
 # ifdef FEAT_XFONTSET
     // If 'guifontset' is not empty, first try using the name as a
     // fontset.  If that doesn't work, use it as a font name.
-    if (*p_guifontset != NUL
+    सचे (*p_guifontset != NUL
 #  ifdef FONTSET_ALWAYS
 	|| do_menu
 #  endif
@@ -2436,7 +2436,7 @@ hl_do_font(
 #  endif
 	    )
     {
-	if (free_font)
+	सचे (free_font)
 	    gui_mch_free_fontset(HL_TABLE()[idx].sg_fontset);
 	HL_TABLE()[idx].sg_fontset = fontset_name2handle(arg, 0
 #  ifdef FONTSET_ALWAYS
@@ -2447,25 +2447,25 @@ hl_do_font(
 #  endif
 		);
     }
-    if (HL_TABLE()[idx].sg_fontset != NOFONTSET)
+    सचे (HL_TABLE()[idx].sg_fontset != NOFONTSET)
     {
 	// If it worked and it's the Normal group, use it as the normal
 	// fontset.  Same for the Menu group.
-	if (do_normal)
+	सचे (do_normal)
 	    gui_init_font(arg, TRUE);
-#  if defined(FEAT_GUI_MOTIF) && defined(FEAT_MENU)
-	if (do_menu)
+#  सचे defined(FEAT_GUI_MOTIF) && defined(FEAT_MENU)
+	सचे (do_menu)
 	{
 #   ifdef FONTSET_ALWAYS
 	    gui.menu_fontset = HL_TABLE()[idx].sg_fontset;
-#   else
+#   अञ्ञथा
 	    // YIKES!  This is a bug waiting to crash the program
 	    gui.menu_font = HL_TABLE()[idx].sg_fontset;
 #   endif
 	    gui_mch_new_menu_font();
 	}
 #   ifdef FEAT_BEVAL_GUI
-	if (do_tooltip)
+	सचे (do_tooltip)
 	{
 	    // The Athena widget set could not handle switching between
 	    // displaying a single font and a fontset.
@@ -2478,21 +2478,21 @@ hl_do_font(
 #   endif
 #  endif
     }
-    else
+    अञ्ञथा
 # endif
     {
-	if (free_font)
+	सचे (free_font)
 	    gui_mch_free_font(HL_TABLE()[idx].sg_font);
 	HL_TABLE()[idx].sg_font = font_name2handle(arg);
 	// If it worked and it's the Normal group, use it as the
 	// normal font.  Same for the Menu group.
-	if (HL_TABLE()[idx].sg_font != NOFONT)
+	सचे (HL_TABLE()[idx].sg_font != NOFONT)
 	{
-	    if (do_normal)
+	    सचे (do_normal)
 		gui_init_font(arg, FALSE);
 # ifndef FONTSET_ALWAYS
-#  if defined(FEAT_GUI_MOTIF) && defined(FEAT_MENU)
-	    if (do_menu)
+#  सचे defined(FEAT_GUI_MOTIF) && defined(FEAT_MENU)
+	    सचे (do_menu)
 	    {
 		gui.menu_font = HL_TABLE()[idx].sg_font;
 		gui_mch_new_menu_font();
@@ -2505,7 +2505,7 @@ hl_do_font(
 
 #endif // FEAT_GUI
 
-#if defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
+#सचे defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
 /*
  * Return the handle for a color name.
  * Returns INVALCOLOR when failed.
@@ -2513,47 +2513,47 @@ hl_do_font(
     guicolor_T
 color_name2handle(char_u *name)
 {
-    if (STRCMP(name, "NONE") == 0)
-	return INVALCOLOR;
+    सचे (STRCMP(name, "NONE") == 0)
+	पटिनिवत्त INVALCOLOR;
 
-    if (STRICMP(name, "fg") == 0 || STRICMP(name, "foreground") == 0)
+    सचे (STRICMP(name, "fg") == 0 || STRICMP(name, "foreground") == 0)
     {
-# if defined(FEAT_TERMGUICOLORS) && defined(FEAT_GUI)
-	if (gui.in_use)
+# सचे defined(FEAT_TERMGUICOLORS) && defined(FEAT_GUI)
+	सचे (gui.in_use)
 # endif
 # ifdef FEAT_GUI
-	    return gui.norm_pixel;
+	    पटिनिवत्त gui.norm_pixel;
 # endif
 # ifdef FEAT_TERMGUICOLORS
-	if (cterm_normal_fg_gui_color != INVALCOLOR)
-	    return cterm_normal_fg_gui_color;
+	सचे (cterm_normal_fg_gui_color != INVALCOLOR)
+	    पटिनिवत्त cterm_normal_fg_gui_color;
 	// Guess that the foreground is black or white.
-	return GUI_GET_COLOR((char_u *)(*p_bg == 'l' ? "black" : "white"));
+	पटिनिवत्त GUI_GET_COLOR((char_u *)(*p_bg == 'l' ? "black" : "white"));
 # endif
     }
-    if (STRICMP(name, "bg") == 0 || STRICMP(name, "background") == 0)
+    सचे (STRICMP(name, "bg") == 0 || STRICMP(name, "background") == 0)
     {
-# if defined(FEAT_TERMGUICOLORS) && defined(FEAT_GUI)
-	if (gui.in_use)
+# सचे defined(FEAT_TERMGUICOLORS) && defined(FEAT_GUI)
+	सचे (gui.in_use)
 # endif
 # ifdef FEAT_GUI
-	    return gui.back_pixel;
+	    पटिनिवत्त gui.back_pixel;
 # endif
 # ifdef FEAT_TERMGUICOLORS
-	if (cterm_normal_bg_gui_color != INVALCOLOR)
-	    return cterm_normal_bg_gui_color;
+	सचे (cterm_normal_bg_gui_color != INVALCOLOR)
+	    पटिनिवत्त cterm_normal_bg_gui_color;
 	// Guess that the background is white or black.
-	return GUI_GET_COLOR((char_u *)(*p_bg == 'l' ? "white" : "black"));
+	पटिनिवत्त GUI_GET_COLOR((char_u *)(*p_bg == 'l' ? "white" : "black"));
 # endif
     }
 
-    return GUI_GET_COLOR(name);
+    पटिनिवत्त GUI_GET_COLOR(name);
 }
 
 // On MS-Windows an RGB macro is available and it produces 0x00bbggrr color
 // values as used by the MS-Windows GDI api.  It should be used only for
 // MS-Windows GDI builds.
-# if defined(RGB) && defined(MSWIN) && !defined(FEAT_GUI)
+# सचे defined(RGB) && defined(MSWIN) && !defined(FEAT_GUI)
 #  undef RGB
 # endif
 # ifndef RGB
@@ -2561,44 +2561,44 @@ color_name2handle(char_u *name)
 # endif
 
 # ifdef VIMDLL
-    static guicolor_T
+    स्थिर guicolor_T
 gui_adjust_rgb(guicolor_T c)
 {
-    if (gui.in_use)
-	return c;
-    else
-	return ((c & 0xff) << 16) | (c & 0x00ff00) | ((c >> 16) & 0xff);
+    सचे (gui.in_use)
+	पटिनिवत्त c;
+    अञ्ञथा
+	पटिनिवत्त ((c & 0xff) << 16) | (c & 0x00ff00) | ((c >> 16) & 0xff);
 }
-# else
+# अञ्ञथा
 #  define gui_adjust_rgb(c) (c)
 # endif
 
-    static int
-hex_digit(int c)
+    स्थिर पूर्णाङ्क
+hex_digit(पूर्णाङ्क c)
 {
-    if (SAFE_isdigit(c))
-	return c - '0';
+    सचे (SAFE_isdigit(c))
+	पटिनिवत्त c - '0';
     c = TOLOWER_ASC(c);
-    if (c >= 'a' && c <= 'f')
-	return c - 'a' + 10;
-    return 0x1ffffff;
+    सचे (c >= 'a' && c <= 'f')
+	पटिनिवत्त c - 'a' + 10;
+    पटिनिवत्त 0x1ffffff;
 }
 
-    static guicolor_T
+    स्थिर guicolor_T
 decode_hex_color(char_u *hex)
 {
     guicolor_T color;
 
-    if (hex[0] != '#' || STRLEN(hex) != 7)
-	return INVALCOLOR;
+    सचे (hex[0] != '#' || STRLEN(hex) != 7)
+	पटिनिवत्त INVALCOLOR;
 
     // Name is in "#rrggbb" format
     color = RGB(((hex_digit(hex[1]) << 4) + hex_digit(hex[2])),
 		((hex_digit(hex[3]) << 4) + hex_digit(hex[4])),
 		((hex_digit(hex[5]) << 4) + hex_digit(hex[6])));
-    if (color > 0xffffff)
-	return INVALCOLOR;
-    return gui_adjust_rgb(color);
+    सचे (color > 0xffffff)
+	पटिनिवत्त INVALCOLOR;
+    पटिनिवत्त gui_adjust_rgb(color);
 }
 
 # ifdef FEAT_EVAL
@@ -2606,7 +2606,7 @@ decode_hex_color(char_u *hex)
 // such name exists in the color table. The convention is to use lowercase for
 // all keys in the v:colornames dictionary. The value can be either a string in
 // the form #rrggbb or a number, either of which is converted to a guicolor_T.
-    static guicolor_T
+    स्थिर guicolor_T
 colorname2rgb(char_u *name)
 {
     dict_T      *colornames_table = get_vim_var_dict(VV_COLORNAMES);
@@ -2616,35 +2616,35 @@ colorname2rgb(char_u *name)
     varnumber_T colnum;
 
     lc_name = strlow_save(name);
-    if (lc_name == NULL)
-	return INVALCOLOR;
+    सचे (lc_name == रिक्त)
+	पटिनिवत्त INVALCOLOR;
 
     colentry = dict_find(colornames_table, lc_name, -1);
     vim_free(lc_name);
-    if (colentry == NULL)
-	return INVALCOLOR;
+    सचे (colentry == रिक्त)
+	पटिनिवत्त INVALCOLOR;
 
-    if (colentry->di_tv.v_type == VAR_STRING)
+    सचे (colentry->di_tv.v_type == VAR_STRING)
     {
 	colstr = tv_get_string_strict(&colentry->di_tv);
-	if ((STRLEN(colstr) == 7) && (*colstr == '#'))
+	सचे ((STRLEN(colstr) == 7) && (*colstr == '#'))
 	{
-	    return decode_hex_color(colstr);
+	    पटिनिवत्त decode_hex_color(colstr);
 	}
-	else
+	अञ्ञथा
 	{
 	    semsg(_(e_bad_color_string_str), colstr);
-	    return INVALCOLOR;
+	    पटिनिवत्त INVALCOLOR;
 	}
     }
 
-    if (colentry->di_tv.v_type == VAR_NUMBER)
+    सचे (colentry->di_tv.v_type == VAR_सङ्ख्या)
     {
-	colnum = tv_get_number(&colentry->di_tv);
-	return (guicolor_T)colnum;
+	colnum = tv_get_सङ्ख्या(&colentry->di_tv);
+	पटिनिवत्त (guicolor_T)colnum;
     }
 
-    return INVALCOLOR;
+    पटिनिवत्त INVALCOLOR;
 }
 
 # endif
@@ -2656,7 +2656,7 @@ gui_get_color_cmn(char_u *name)
     // Only non X11 colors (not present in rgb.txt) and colors in
     // color_name_tab[], useful when $VIMRUNTIME is not found,.
     // must be sorted by the 'value' field because it is used by bsearch()!
-    static keyvalue_T rgb_tab[] = {
+    स्थिर keyvalue_T rgb_tab[] = {
 	KEYVALUE_ENTRY(RGB(0x00, 0x00, 0x00), "black"),
 	KEYVALUE_ENTRY(RGB(0x00, 0x00, 0xFF), "blue"),
 	KEYVALUE_ENTRY(RGB(0xA5, 0x2A, 0x2A), "brown"),
@@ -2693,43 +2693,43 @@ gui_get_color_cmn(char_u *name)
     keyvalue_T *entry;
 
     color = decode_hex_color(name);
-    if (color != INVALCOLOR)
-	return color;
+    सचे (color != INVALCOLOR)
+	पटिनिवत्त color;
 
-    target.key = 0;
-    target.value.string = name;
-    target.value.length = 0;	// not used, see cmp_keyvalue_value_i()
+    target.कुञ्चिका = 0;
+    target.मानम्.string = name;
+    target.मानम्.length = 0;	// not used, see cmp_keyvalue_value_i()
     entry = (keyvalue_T *)bsearch(&target, &rgb_tab, ARRAY_LENGTH(rgb_tab),
-	    sizeof(rgb_tab[0]), cmp_keyvalue_value_i);
-    if (entry != NULL)
-	return gui_adjust_rgb((guicolor_T)entry->key);
+	    परिमाण(rgb_tab[0]), cmp_keyvalue_मानम्_i);
+    सचे (entry != रिक्त)
+	पटिनिवत्त gui_adjust_rgb((guicolor_T)entry->कुञ्चिका);
 
-# if defined(FEAT_EVAL)
+# सचे defined(FEAT_EVAL)
     /*
      * Not a traditional color. Load additional color aliases and then consult the alias table.
      */
 
     color = colorname2rgb(name);
-    if (color == INVALCOLOR)
+    सचे (color == INVALCOLOR)
     {
 	load_default_colors_lists();
 	color = colorname2rgb(name);
     }
 
-    return color;
-# else
-    return INVALCOLOR;
+    पटिनिवत्त color;
+# अञ्ञथा
+    पटिनिवत्त INVALCOLOR;
 # endif
 }
 
     guicolor_T
-gui_get_rgb_color_cmn(int r, int g, int b)
+gui_get_rgb_color_cmn(पूर्णाङ्क r, पूर्णाङ्क g, पूर्णाङ्क b)
 {
     guicolor_T  color = RGB(r, g, b);
 
-    if (color > 0xffffff)
-	return INVALCOLOR;
-    return gui_adjust_rgb(color);
+    सचे (color > 0xffffff)
+	पटिनिवत्त INVALCOLOR;
+    पटिनिवत्त gui_adjust_rgb(color);
 }
 #endif
 
@@ -2738,16 +2738,16 @@ gui_get_rgb_color_cmn(int r, int g, int b)
  * Note that this table is used by ALL buffers.  This is required because the
  * GUI can redraw at any time for any buffer.
  */
-static garray_T	term_attr_table = {0, 0, 0, 0, NULL};
+स्थिर garray_T	term_attr_table = {0, 0, 0, 0, रिक्त};
 
 #define TERM_ATTR_ENTRY(idx) ((attrentry_T *)term_attr_table.ga_data)[idx]
 
-static garray_T	cterm_attr_table = {0, 0, 0, 0, NULL};
+स्थिर garray_T	cterm_attr_table = {0, 0, 0, 0, रिक्त};
 
 #define CTERM_ATTR_ENTRY(idx) ((attrentry_T *)cterm_attr_table.ga_data)[idx]
 
 #ifdef FEAT_GUI
-static garray_T	gui_attr_table = {0, 0, 0, 0, NULL};
+स्थिर garray_T	gui_attr_table = {0, 0, 0, 0, रिक्त};
 
 # define GUI_ATTR_ENTRY(idx) ((attrentry_T *)gui_attr_table.ga_data)[idx]
 #endif
@@ -2758,22 +2758,22 @@ static garray_T	gui_attr_table = {0, 0, 0, 0, NULL};
  * if the combination is new.
  * Return 0 for error (no more room).
  */
-    static int
+    स्थिर पूर्णाङ्क
 get_attr_entry(garray_T *table, attrentry_T *aep)
 {
-    int		i;
+    पूर्णाङ्क		i;
     attrentry_T	*taep;
-    static int	recursive = FALSE;
+    स्थिर पूर्णाङ्क	recursive = FALSE;
 
     // Init the table, in case it wasn't done yet.
-    table->ga_itemsize = sizeof(attrentry_T);
+    table->ga_itemsize = परिमाण(attrentry_T);
     table->ga_growsize = 7;
 
     // Try to find an entry with the same specifications.
-    for (i = 0; i < table->ga_len; ++i)
+    अत्थाय (i = 0; i < table->ga_len; ++i)
     {
 	taep = &(((attrentry_T *)table->ga_data)[i]);
-	if (	   aep->ae_attr == taep->ae_attr
+	सचे (	   aep->ae_attr == taep->ae_attr
 		&& (
 #ifdef FEAT_GUI
 		       (table == &gui_attr_table
@@ -2790,14 +2790,14 @@ get_attr_entry(garray_T *table, attrentry_T *aep)
 		    ||
 #endif
 		       (table == &term_attr_table
-			&& (aep->ae_u.term.start == NULL)
-					    == (taep->ae_u.term.start == NULL)
-			&& (aep->ae_u.term.start == NULL
+			&& (aep->ae_u.term.start == रिक्त)
+					    == (taep->ae_u.term.start == रिक्त)
+			&& (aep->ae_u.term.start == रिक्त
 			    || STRCMP(aep->ae_u.term.start,
 						  taep->ae_u.term.start) == 0)
-			&& (aep->ae_u.term.stop == NULL)
-					     == (taep->ae_u.term.stop == NULL)
-			&& (aep->ae_u.term.stop == NULL
+			&& (aep->ae_u.term.stop == रिक्त)
+					     == (taep->ae_u.term.stop == रिक्त)
+			&& (aep->ae_u.term.stop == रिक्त
 			    || STRCMP(aep->ae_u.term.stop,
 						  taep->ae_u.term.stop) == 0))
 		    || (table == &cterm_attr_table
@@ -2819,18 +2819,18 @@ get_attr_entry(garray_T *table, attrentry_T *aep)
 #endif
 		       )))
 
-	return i + ATTR_OFF;
+	पटिनिवत्त i + ATTR_OFF;
     }
 
-    if (table->ga_len + ATTR_OFF > MAX_TYPENR)
+    सचे (table->ga_len + ATTR_OFF > MAX_TYPENR)
     {
 	// Running out of attribute entries!  remove all attributes, and
 	// compute new ones for all groups.
 	// When called recursively, we are really out of numbers.
-	if (recursive)
+	सचे (recursive)
 	{
 	    emsg(_(e_too_many_different_highlighting_attributes_in_use));
-	    return 0;
+	    पटिनिवत्त 0;
 	}
 	recursive = TRUE;
 
@@ -2838,21 +2838,21 @@ get_attr_entry(garray_T *table, attrentry_T *aep)
 
 	set_must_redraw(UPD_CLEAR);
 
-	for (i = 0; i < highlight_ga.ga_len; ++i)
+	अत्थाय (i = 0; i < highlight_ga.ga_len; ++i)
 	    set_hl_attr(i);
 
 	recursive = FALSE;
     }
 
     // This is a new combination of colors and font, add an entry.
-    if (ga_grow(table, 1) == FAIL)
-	return 0;
+    सचे (ga_grow(table, 1) == FAIL)
+	पटिनिवत्त 0;
 
     taep = &(((attrentry_T *)table->ga_data)[table->ga_len]);
     CLEAR_POINTER(taep);
     taep->ae_attr = aep->ae_attr;
 #ifdef FEAT_GUI
-    if (table == &gui_attr_table)
+    सचे (table == &gui_attr_table)
     {
 	taep->ae_u.gui.fg_color = aep->ae_u.gui.fg_color;
 	taep->ae_u.gui.bg_color = aep->ae_u.gui.bg_color;
@@ -2863,18 +2863,18 @@ get_attr_entry(garray_T *table, attrentry_T *aep)
 # endif
     }
 #endif
-    if (table == &term_attr_table)
+    सचे (table == &term_attr_table)
     {
-	if (aep->ae_u.term.start == NULL)
-	    taep->ae_u.term.start = NULL;
-	else
+	सचे (aep->ae_u.term.start == रिक्त)
+	    taep->ae_u.term.start = रिक्त;
+	अञ्ञथा
 	    taep->ae_u.term.start = vim_strsave(aep->ae_u.term.start);
-	if (aep->ae_u.term.stop == NULL)
-	    taep->ae_u.term.stop = NULL;
-	else
+	सचे (aep->ae_u.term.stop == रिक्त)
+	    taep->ae_u.term.stop = रिक्त;
+	अञ्ञथा
 	    taep->ae_u.term.stop = vim_strsave(aep->ae_u.term.stop);
     }
-    else if (table == &cterm_attr_table)
+    अञ्ञथा सचे (table == &cterm_attr_table)
     {
 	taep->ae_u.cterm.fg_color = aep->ae_u.cterm.fg_color;
 	taep->ae_u.cterm.bg_color = aep->ae_u.cterm.bg_color;
@@ -2887,16 +2887,16 @@ get_attr_entry(garray_T *table, attrentry_T *aep)
 #endif
     }
     ++table->ga_len;
-    return (table->ga_len - 1 + ATTR_OFF);
+    पटिनिवत्त (table->ga_len - 1 + ATTR_OFF);
 }
 
-#if defined(FEAT_TERMINAL)
+#सचे defined(FEAT_TERMINAL)
 /*
  * Get an attribute index for a cterm entry.
  * Uses an existing entry when possible or adds one when needed.
  */
-    int
-get_cterm_attr_idx(int attr, int fg, int bg)
+    पूर्णाङ्क
+get_cterm_attr_idx(पूर्णाङ्क attr, पूर्णाङ्क fg, पूर्णाङ्क bg)
 {
     attrentry_T		at_en;
 
@@ -2911,46 +2911,46 @@ get_cterm_attr_idx(int attr, int fg, int bg)
     at_en.ae_u.cterm.bg_color = bg;
     at_en.ae_u.cterm.ul_color = 0;
     at_en.ae_u.cterm.font = 0;
-    return get_attr_entry(&cterm_attr_table, &at_en);
+    पटिनिवत्त get_attr_entry(&cterm_attr_table, &at_en);
 }
 #endif
 
-#if defined(FEAT_TERMINAL) && defined(FEAT_TERMGUICOLORS)
+#सचे defined(FEAT_TERMINAL) && defined(FEAT_TERMGUICOLORS)
 /*
  * Get an attribute index for a 'termguicolors' entry.
  * Uses an existing entry when possible or adds one when needed.
  */
-    int
-get_tgc_attr_idx(int attr, guicolor_T fg, guicolor_T bg)
+    पूर्णाङ्क
+get_tgc_attr_idx(पूर्णाङ्क attr, guicolor_T fg, guicolor_T bg)
 {
     attrentry_T		at_en;
 
     CLEAR_FIELD(at_en);
     at_en.ae_attr = attr;
-    if (fg == INVALCOLOR && bg == INVALCOLOR)
+    सचे (fg == INVALCOLOR && bg == INVALCOLOR)
     {
 	// If both GUI colors are not set fall back to the cterm colors.  Helps
 	// if the GUI only has an attribute, such as undercurl.
 	at_en.ae_u.cterm.fg_rgb = CTERMCOLOR;
 	at_en.ae_u.cterm.bg_rgb = CTERMCOLOR;
     }
-    else
+    अञ्ञथा
     {
 	at_en.ae_u.cterm.fg_rgb = fg;
 	at_en.ae_u.cterm.bg_rgb = bg;
     }
     at_en.ae_u.cterm.ul_rgb = INVALCOLOR;
-    return get_attr_entry(&cterm_attr_table, &at_en);
+    पटिनिवत्त get_attr_entry(&cterm_attr_table, &at_en);
 }
 #endif
 
-#if defined(FEAT_TERMINAL) && defined(FEAT_GUI)
+#सचे defined(FEAT_TERMINAL) && defined(FEAT_GUI)
 /*
  * Get an attribute index for a cterm entry.
  * Uses an existing entry when possible or adds one when needed.
  */
-    int
-get_gui_attr_idx(int attr, guicolor_T fg, guicolor_T bg)
+    पूर्णाङ्क
+get_gui_attr_idx(पूर्णाङ्क attr, guicolor_T fg, guicolor_T bg)
 {
     attrentry_T		at_en;
 
@@ -2958,23 +2958,23 @@ get_gui_attr_idx(int attr, guicolor_T fg, guicolor_T bg)
     at_en.ae_attr = attr;
     at_en.ae_u.gui.fg_color = fg;
     at_en.ae_u.gui.bg_color = bg;
-    return get_attr_entry(&gui_attr_table, &at_en);
+    पटिनिवत्त get_attr_entry(&gui_attr_table, &at_en);
 }
 #endif
 
 /*
  * Clear all highlight tables.
  */
-    void
-clear_hl_tables(void)
+    शून्य
+clear_hl_tables(शून्य)
 {
-    int		i;
+    पूर्णाङ्क		i;
     attrentry_T	*taep;
 
 #ifdef FEAT_GUI
     ga_clear(&gui_attr_table);
 #endif
-    for (i = 0; i < term_attr_table.ga_len; ++i)
+    अत्थाय (i = 0; i < term_attr_table.ga_len; ++i)
     {
 	taep = &(((attrentry_T *)term_attr_table.ga_data)[i]);
 	vim_free(taep->ae_u.term.start);
@@ -2993,68 +2993,68 @@ clear_hl_tables(void)
  * result.
  * Return the resulting attributes.
  */
-    int
-hl_combine_attr(int char_attr, int prim_attr)
+    पूर्णाङ्क
+hl_combine_attr(पूर्णाङ्क char_attr, पूर्णाङ्क prim_attr)
 {
-    attrentry_T *char_aep = NULL;
+    attrentry_T *char_aep = रिक्त;
     attrentry_T *prim_aep;
     attrentry_T new_en;
 
-    if (char_attr == 0)
-	return prim_attr;
-    if (char_attr <= HL_ALL && prim_attr <= HL_ALL)
-	return ATTR_COMBINE(char_attr, prim_attr);
+    सचे (char_attr == 0)
+	पटिनिवत्त prim_attr;
+    सचे (char_attr <= HL_ALL && prim_attr <= HL_ALL)
+	पटिनिवत्त ATTR_COMBINE(char_attr, prim_attr);
 #ifdef FEAT_GUI
-    if (gui.in_use)
+    सचे (gui.in_use)
     {
-	if (char_attr > HL_ALL)
+	सचे (char_attr > HL_ALL)
 	    char_aep = syn_gui_attr2entry(char_attr);
-	if (char_aep != NULL)
+	सचे (char_aep != रिक्त)
 	    new_en = *char_aep;
-	else
+	अञ्ञथा
 	{
 	    CLEAR_FIELD(new_en);
 	    new_en.ae_u.gui.fg_color = INVALCOLOR;
 	    new_en.ae_u.gui.bg_color = INVALCOLOR;
 	    new_en.ae_u.gui.sp_color = INVALCOLOR;
-	    if (char_attr <= HL_ALL)
+	    सचे (char_attr <= HL_ALL)
 		new_en.ae_attr = char_attr;
 	}
 
-	if (prim_attr <= HL_ALL)
+	सचे (prim_attr <= HL_ALL)
 	    new_en.ae_attr = ATTR_COMBINE(new_en.ae_attr, prim_attr);
-	else
+	अञ्ञथा
 	{
 	    prim_aep = syn_gui_attr2entry(prim_attr);
-	    if (prim_aep != NULL)
+	    सचे (prim_aep != रिक्त)
 	    {
 		new_en.ae_attr = ATTR_COMBINE(new_en.ae_attr,
 							   prim_aep->ae_attr);
-		if (prim_aep->ae_u.gui.fg_color != INVALCOLOR)
+		सचे (prim_aep->ae_u.gui.fg_color != INVALCOLOR)
 		    new_en.ae_u.gui.fg_color = prim_aep->ae_u.gui.fg_color;
-		if (prim_aep->ae_u.gui.bg_color != INVALCOLOR)
+		सचे (prim_aep->ae_u.gui.bg_color != INVALCOLOR)
 		    new_en.ae_u.gui.bg_color = prim_aep->ae_u.gui.bg_color;
-		if (prim_aep->ae_u.gui.sp_color != INVALCOLOR)
+		सचे (prim_aep->ae_u.gui.sp_color != INVALCOLOR)
 		    new_en.ae_u.gui.sp_color = prim_aep->ae_u.gui.sp_color;
-		if (prim_aep->ae_u.gui.font != NOFONT)
+		सचे (prim_aep->ae_u.gui.font != NOFONT)
 		    new_en.ae_u.gui.font = prim_aep->ae_u.gui.font;
 # ifdef FEAT_XFONTSET
-		if (prim_aep->ae_u.gui.fontset != NOFONTSET)
+		सचे (prim_aep->ae_u.gui.fontset != NOFONTSET)
 		    new_en.ae_u.gui.fontset = prim_aep->ae_u.gui.fontset;
 # endif
 	    }
 	}
-	return get_attr_entry(&gui_attr_table, &new_en);
+	पटिनिवत्त get_attr_entry(&gui_attr_table, &new_en);
     }
 #endif
 
-    if (IS_CTERM)
+    सचे (IS_CTERM)
     {
-	if (char_attr > HL_ALL)
+	सचे (char_attr > HL_ALL)
 	    char_aep = syn_cterm_attr2entry(char_attr);
-	if (char_aep != NULL)
+	सचे (char_aep != रिक्त)
 	    new_en = *char_aep;
-	else
+	अञ्ञथा
 	{
 	    CLEAR_FIELD(new_en);
 #ifdef FEAT_TERMGUICOLORS
@@ -3062,80 +3062,80 @@ hl_combine_attr(int char_attr, int prim_attr)
 	    new_en.ae_u.cterm.fg_rgb = INVALCOLOR;
 	    new_en.ae_u.cterm.ul_rgb = INVALCOLOR;
 #endif
-	    if (char_attr <= HL_ALL)
+	    सचे (char_attr <= HL_ALL)
 		new_en.ae_attr = char_attr;
 	}
 
-	if (prim_attr <= HL_ALL)
+	सचे (prim_attr <= HL_ALL)
 		new_en.ae_attr = ATTR_COMBINE(new_en.ae_attr, prim_attr);
-	else
+	अञ्ञथा
 	{
 	    prim_aep = syn_cterm_attr2entry(prim_attr);
-	    if (prim_aep != NULL)
+	    सचे (prim_aep != रिक्त)
 	    {
 		new_en.ae_attr = ATTR_COMBINE(new_en.ae_attr,
 							   prim_aep->ae_attr);
-		if (prim_aep->ae_u.cterm.fg_color > 0)
+		सचे (prim_aep->ae_u.cterm.fg_color > 0)
 		    new_en.ae_u.cterm.fg_color = prim_aep->ae_u.cterm.fg_color;
-		if (prim_aep->ae_u.cterm.bg_color > 0)
+		सचे (prim_aep->ae_u.cterm.bg_color > 0)
 		    new_en.ae_u.cterm.bg_color = prim_aep->ae_u.cterm.bg_color;
-		if (prim_aep->ae_u.cterm.ul_color > 0)
+		सचे (prim_aep->ae_u.cterm.ul_color > 0)
 		    new_en.ae_u.cterm.ul_color = prim_aep->ae_u.cterm.ul_color;
-		if (prim_aep->ae_u.cterm.font > 0)
+		सचे (prim_aep->ae_u.cterm.font > 0)
 		    new_en.ae_u.cterm.font = prim_aep->ae_u.cterm.font;
 #ifdef FEAT_TERMGUICOLORS
 		// If both fg and bg are not set fall back to cterm colors.
 		// Helps for SpellBad which uses undercurl in the GUI.
-		if (COLOR_INVALID(prim_aep->ae_u.cterm.fg_rgb)
+		सचे (COLOR_INVALID(prim_aep->ae_u.cterm.fg_rgb)
 			&& COLOR_INVALID(prim_aep->ae_u.cterm.bg_rgb))
 		{
-		    if (prim_aep->ae_u.cterm.fg_color > 0)
+		    सचे (prim_aep->ae_u.cterm.fg_color > 0)
 			new_en.ae_u.cterm.fg_rgb = CTERMCOLOR;
-		    if (prim_aep->ae_u.cterm.bg_color > 0)
+		    सचे (prim_aep->ae_u.cterm.bg_color > 0)
 			new_en.ae_u.cterm.bg_rgb = CTERMCOLOR;
 		}
-		else
+		अञ्ञथा
 		{
-		    if (prim_aep->ae_u.cterm.fg_rgb != INVALCOLOR)
+		    सचे (prim_aep->ae_u.cterm.fg_rgb != INVALCOLOR)
 			new_en.ae_u.cterm.fg_rgb = prim_aep->ae_u.cterm.fg_rgb;
-		    if (prim_aep->ae_u.cterm.bg_rgb != INVALCOLOR)
+		    सचे (prim_aep->ae_u.cterm.bg_rgb != INVALCOLOR)
 			new_en.ae_u.cterm.bg_rgb = prim_aep->ae_u.cterm.bg_rgb;
 		}
-		if (prim_aep->ae_u.cterm.ul_rgb != INVALCOLOR)
+		सचे (prim_aep->ae_u.cterm.ul_rgb != INVALCOLOR)
 		    new_en.ae_u.cterm.ul_rgb = prim_aep->ae_u.cterm.ul_rgb;
 #endif
 	    }
 	}
-	return get_attr_entry(&cterm_attr_table, &new_en);
+	पटिनिवत्त get_attr_entry(&cterm_attr_table, &new_en);
     }
 
-    if (char_attr > HL_ALL)
+    सचे (char_attr > HL_ALL)
 	char_aep = syn_term_attr2entry(char_attr);
-    if (char_aep != NULL)
+    सचे (char_aep != रिक्त)
 	new_en = *char_aep;
-    else
+    अञ्ञथा
     {
 	CLEAR_FIELD(new_en);
-	if (char_attr <= HL_ALL)
+	सचे (char_attr <= HL_ALL)
 	    new_en.ae_attr = char_attr;
     }
 
-    if (prim_attr <= HL_ALL)
+    सचे (prim_attr <= HL_ALL)
 	new_en.ae_attr = ATTR_COMBINE(new_en.ae_attr, prim_attr);
-    else
+    अञ्ञथा
     {
 	prim_aep = syn_term_attr2entry(prim_attr);
-	if (prim_aep != NULL)
+	सचे (prim_aep != रिक्त)
 	{
 	    new_en.ae_attr = ATTR_COMBINE(new_en.ae_attr, prim_aep->ae_attr);
-	    if (prim_aep->ae_u.term.start != NULL)
+	    सचे (prim_aep->ae_u.term.start != रिक्त)
 	    {
 		new_en.ae_u.term.start = prim_aep->ae_u.term.start;
 		new_en.ae_u.term.stop = prim_aep->ae_u.term.stop;
 	    }
 	}
     }
-    return get_attr_entry(&term_attr_table, &new_en);
+    पटिनिवत्त get_attr_entry(&term_attr_table, &new_en);
 }
 
 // ANSI color order: Black, Red, Green, Yellow, Blue, Magenta,
@@ -3143,7 +3143,7 @@ hl_combine_attr(int char_attr, int prim_attr)
 // only a cterm color number is known (no guifg/guibg).  Real terminal
 // palettes may differ if the user reconfigured their emulator, but
 // these are reasonable xterm-ish defaults.
-static const long_u cterm_color_16[16] = {
+स्थिर ध्रुव long_u cterm_color_16[16] = {
     0x000000, 0xc00000, 0x008000, 0x808000,
     0x0000c0, 0xc000c0, 0x004080, 0xc0c0c0,
     0x808080, 0xff8080, 0x00ff00, 0xffff00,
@@ -3157,12 +3157,12 @@ static const long_u cterm_color_16[16] = {
  * specified (no guifg/guibg).
  * Returns INVALCOLOR if the color number is out of range.
  */
-    static guicolor_T
-cterm_color_to_rgb(int color_nr)
+    स्थिर guicolor_T
+cterm_color_to_rgb(पूर्णाङ्क color_nr)
 {
-    if (color_nr < 1 || color_nr > 16)
-	return INVALCOLOR;
-    return (guicolor_T)cterm_color_16[color_nr - 1];
+    सचे (color_nr < 1 || color_nr > 16)
+	पटिनिवत्त INVALCOLOR;
+    पटिनिवत्त (guicolor_T)cterm_color_16[color_nr - 1];
 }
 #endif
 
@@ -3171,33 +3171,33 @@ cterm_color_to_rgb(int color_nr)
  * Uses the standard xterm palette: 0-15 ANSI (cterm_color_16), 16-231
  * 6x6x6 cube, 232-255 grayscale ramp.
  */
-    static void
-cterm_idx_to_rgb(int idx, int *r, int *g, int *b)
+    स्थिर शून्य
+cterm_idx_to_rgb(पूर्णाङ्क idx, पूर्णाङ्क *r, पूर्णाङ्क *g, पूर्णाङ्क *b)
 {
-    static const int cube[] = { 0x00, 0x5F, 0x87, 0xAF, 0xD7, 0xFF };
+    स्थिर ध्रुव पूर्णाङ्क cube[] = { 0x00, 0x5F, 0x87, 0xAF, 0xD7, 0xFF };
 
-    if (idx < 0 || idx > 255)
+    सचे (idx < 0 || idx > 255)
     {
 	*r = *g = *b = 0;
-	return;
+	पटिनिवत्त;
     }
-    if (idx < 16)
+    सचे (idx < 16)
     {
 	long_u rgb = cterm_color_16[idx];
 	*r = (rgb >> 16) & 0xFF;
 	*g = (rgb >> 8) & 0xFF;
 	*b = rgb & 0xFF;
     }
-    else if (idx < 232)
+    अञ्ञथा सचे (idx < 232)
     {
-	int n = idx - 16;
+	पूर्णाङ्क n = idx - 16;
 	*r = cube[n / 36 % 6];
 	*g = cube[n / 6  % 6];
 	*b = cube[n      % 6];
     }
-    else
+    अञ्ञथा
     {
-	int v = 8 + (idx - 232) * 10;
+	पूर्णाङ्क v = 8 + (idx - 232) * 10;
 	*r = *g = *b = v;
     }
 }
@@ -3206,40 +3206,40 @@ cterm_idx_to_rgb(int idx, int *r, int *g, int *b)
  * Approximate an RGB triple to the nearest xterm 256-color index.
  * Searches the 6x6x6 cube and the grayscale ramp; returns 0-255.
  */
-    static int
-rgb_to_cterm_idx(int r, int g, int b)
+    स्थिर पूर्णाङ्क
+rgb_to_cterm_idx(पूर्णाङ्क r, पूर्णाङ्क g, पूर्णाङ्क b)
 {
-    static const int cube[] = { 0x00, 0x5F, 0x87, 0xAF, 0xD7, 0xFF };
-    int best = 0;
+    स्थिर ध्रुव पूर्णाङ्क cube[] = { 0x00, 0x5F, 0x87, 0xAF, 0xD7, 0xFF };
+    पूर्णाङ्क best = 0;
     long best_d = -1;
-    int i;
+    पूर्णाङ्क i;
 
     // Search the 6x6x6 cube.
-    for (i = 16; i < 232; ++i)
+    अत्थाय (i = 16; i < 232; ++i)
     {
-	int n = i - 16;
-	int cr = cube[n / 36 % 6];
-	int cg = cube[n / 6  % 6];
-	int cb = cube[n      % 6];
+	पूर्णाङ्क n = i - 16;
+	पूर्णाङ्क cr = cube[n / 36 % 6];
+	पूर्णाङ्क cg = cube[n / 6  % 6];
+	पूर्णाङ्क cb = cube[n      % 6];
 	long d = (cr - r) * (cr - r) + (cg - g) * (cg - g) + (cb - b) * (cb - b);
-	if (best_d < 0 || d < best_d)
+	सचे (best_d < 0 || d < best_d)
 	{
 	    best_d = d;
 	    best = i;
 	}
     }
     // Search the grayscale ramp.
-    for (i = 232; i < 256; ++i)
+    अत्थाय (i = 232; i < 256; ++i)
     {
-	int v = 8 + (i - 232) * 10;
+	पूर्णाङ्क v = 8 + (i - 232) * 10;
 	long d = (v - r) * (v - r) + (v - g) * (v - g) + (v - b) * (v - b);
-	if (d < best_d)
+	सचे (d < best_d)
 	{
 	    best_d = d;
 	    best = i;
 	}
     }
-    return best;
+    पटिनिवत्त best;
 }
 
 /*
@@ -3248,51 +3248,51 @@ rgb_to_cterm_idx(int r, int g, int b)
  * Returns true on success; false when no color is defined.
  * cterm_c is 1-based (0 means "no color").
  */
-    static bool
-resolve_color_to_rgb(int cterm_c, guicolor_T rgb UNUSED, int *r, int *g, int *b)
+    स्थिर bool
+resolve_color_to_rgb(पूर्णाङ्क cterm_c, guicolor_T rgb UNUSED, पूर्णाङ्क *r, पूर्णाङ्क *g, पूर्णाङ्क *b)
 {
 #ifdef FEAT_TERMGUICOLORS
-    if (!COLOR_INVALID(rgb))
+    सचे (!COLOR_INVALID(rgb))
     {
 	*r = (rgb >> 16) & 0xFF;
 	*g = (rgb >> 8) & 0xFF;
 	*b = rgb & 0xFF;
-	return true;
+	पटिनिवत्त true;
     }
 #endif
-    if (cterm_c > 0)
+    सचे (cterm_c > 0)
     {
 	cterm_idx_to_rgb(cterm_c - 1, r, g, b);
-	return true;
+	पटिनिवत्त true;
     }
-    return false;
+    पटिनिवत्त false;
 }
 
 /*
  * get a RGB fallback color from gui, cterm or default color
  */
-    static guicolor_T
-resolve_fallback_color(int cterm_c, guicolor_T rgb, guicolor_T default_rgb)
+    स्थिर guicolor_T
+resolve_fallback_color(पूर्णाङ्क cterm_c, guicolor_T rgb, guicolor_T default_rgb)
 {
-    int red, green, blue;
-    if (!resolve_color_to_rgb(cterm_c, rgb, &red, &green, &blue))
-	return default_rgb;
-    else
-	return (red << 16) | (green << 8) | blue;
+    पूर्णाङ्क red, green, blue;
+    सचे (!resolve_color_to_rgb(cterm_c, rgb, &red, &green, &blue))
+	पटिनिवत्त default_rgb;
+    अञ्ञथा
+	पटिनिवत्त (red << 16) | (green << 8) | blue;
 }
 
 /*
  * get a RGB fallback foreground color from guifg, ctermfg or deduced from background
  */
-    static void
-resolve_fallback_fg_to_rgb(void)
+    स्थिर शून्य
+resolve_fallback_fg_to_rgb(शून्य)
 {
     guicolor_T fgcolor_or_gui_fgcolor = INVALCOLOR;
 #ifdef FEAT_TERMGUICOLORS
     fgcolor_or_gui_fgcolor = cterm_normal_fg_gui_color;
 #endif
 #ifdef FEAT_GUI
-    if (gui.in_use)
+    सचे (gui.in_use)
 	fgcolor_or_gui_fgcolor = gui.norm_pixel;
 #endif
     fallback_fg_rgb = resolve_fallback_color(cterm_normal_fg_color, fgcolor_or_gui_fgcolor, (*p_bg == 'l') ? 0x000000 : 0xFFFFFF);
@@ -3301,15 +3301,15 @@ resolve_fallback_fg_to_rgb(void)
 /*
  * get a RGB fallback background color from guifg, ctermbg or deduced from background
  */
-    static void
-resolve_fallback_bg_to_rgb(void)
+    स्थिर शून्य
+resolve_fallback_bg_to_rgb(शून्य)
 {
     guicolor_T bgcolor_or_gui_bgcolor = INVALCOLOR;
 #ifdef FEAT_TERMGUICOLORS
     bgcolor_or_gui_bgcolor = cterm_normal_bg_gui_color;
 #endif
 #ifdef FEAT_GUI
-    if (gui.in_use)
+    सचे (gui.in_use)
 	bgcolor_or_gui_bgcolor = gui.back_pixel;
 #endif
     fallback_bg_rgb = resolve_fallback_color(cterm_normal_bg_color, bgcolor_or_gui_bgcolor, (*p_bg == 'l') ? 0xFFFFFF : 0x000000);
@@ -3328,59 +3328,59 @@ resolve_fallback_bg_to_rgb(void)
  *
  * Requires t_colors >= 256; otherwise returns popup_c unchanged.
  */
-    static int
-blend_cterm_colors(int popup_c, guicolor_T popup_rgb,
-		   int under_c, guicolor_T under_rgb,
-		   int default_rgb,
-		   int blend_val)
+    स्थिर पूर्णाङ्क
+blend_cterm_colors(पूर्णाङ्क popup_c, guicolor_T popup_rgb,
+		   पूर्णाङ्क under_c, guicolor_T under_rgb,
+		   पूर्णाङ्क default_rgb,
+		   पूर्णाङ्क blend_val)
 {
-    int pr, pg, pb, ur, ug, ub, r, g, b;
+    पूर्णाङ्क pr, pg, pb, ur, ug, ub, r, g, b;
 
-    if (t_colors < 256)
-	return popup_c;
-    if (!resolve_color_to_rgb(popup_c, popup_rgb, &pr, &pg, &pb))
-	return under_c;
-    if (blend_val <= 0)
-	return rgb_to_cterm_idx(pr, pg, pb) + 1;
-    if (!resolve_color_to_rgb(under_c, under_rgb, &ur, &ug, &ub))
+    सचे (t_colors < 256)
+	पटिनिवत्त popup_c;
+    सचे (!resolve_color_to_rgb(popup_c, popup_rgb, &pr, &pg, &pb))
+	पटिनिवत्त under_c;
+    सचे (blend_val <= 0)
+	पटिनिवत्त rgb_to_cterm_idx(pr, pg, pb) + 1;
+    सचे (!resolve_color_to_rgb(under_c, under_rgb, &ur, &ug, &ub))
     {
 	ur = (default_rgb >> 16) & 0xFF;
 	ug = (default_rgb >> 8) & 0xFF;
 	ub = default_rgb & 0xFF;
     }
-    if (blend_val >= 100)
-	return rgb_to_cterm_idx(ur, ug, ub) + 1;
+    सचे (blend_val >= 100)
+	पटिनिवत्त rgb_to_cterm_idx(ur, ug, ub) + 1;
     r = pr + (ur - pr) * blend_val / 100;
     g = pg + (ug - pg) * blend_val / 100;
     b = pb + (ub - pb) * blend_val / 100;
-    return rgb_to_cterm_idx(r, g, b) + 1;
+    पटिनिवत्त rgb_to_cterm_idx(r, g, b) + 1;
 }
 
-#if defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
+#सचे defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
 /*
  * Blend two RGB colors based on blend value (0-100).
  * blend: 0=return first argument color, 100=return second argument color
  * If bg_color is INVALCOLOR, high blend means more visible (return INVALCOLOR).
  */
-    static guicolor_T
-blend_colors(guicolor_T popup_color, guicolor_T bg_color, int blend_val)
+    स्थिर guicolor_T
+blend_colors(guicolor_T popup_color, guicolor_T bg_color, पूर्णाङ्क blend_val)
 {
-    int r1, g1, b1, r2, g2, b2, r, g, b;
+    पूर्णाङ्क r1, g1, b1, r2, g2, b2, r, g, b;
 
     // CTERMCOLOR is a sentinel meaning "use the cterm color"; for blending
     // it has no real RGB so treat it like INVALCOLOR.
-    if (COLOR_INVALID(popup_color))
-	return INVALCOLOR;
+    सचे (COLOR_INVALID(popup_color))
+	पटिनिवत्त INVALCOLOR;
 
     // Fully transparent: use underlying color as-is.
-    if (blend_val >= 100)
-	return bg_color;
+    सचे (blend_val >= 100)
+	पटिनिवत्त bg_color;
 
     r1 = (popup_color >> 16) & 0xFF;
     g1 = (popup_color >> 8) & 0xFF;
     b1 = popup_color & 0xFF;
 
-    if (COLOR_INVALID(bg_color))
+    सचे (COLOR_INVALID(bg_color))
 	bg_color = fallback_bg_rgb;
 
     r2 = (bg_color >> 16) & 0xFF;
@@ -3391,7 +3391,7 @@ blend_colors(guicolor_T popup_color, guicolor_T bg_color, int blend_val)
     g = g1 + (g2 - g1) * blend_val / 100;
     b = b1 + (b2 - b1) * blend_val / 100;
 
-    return (r << 16) | (g << 8) | b;
+    पटिनिवत्त (r << 16) | (g << 8) | b;
 }
 #endif
 
@@ -3401,37 +3401,37 @@ blend_colors(guicolor_T popup_color, guicolor_T bg_color, int blend_val)
  * blend: 0 = opaque (use popup colors), 100 = transparent (use background colors)
  * blend_fg: TRUE to blend foreground color, FALSE to keep popup foreground
  */
-    static int
+    स्थिर पूर्णाङ्क
 hl_blend_attr_common(
-    int		char_attr,
-    int		popup_attr,
-    int		blend,
-    int		blend_fg)
+    पूर्णाङ्क		char_attr,
+    पूर्णाङ्क		popup_attr,
+    पूर्णाङ्क		blend,
+    पूर्णाङ्क		blend_fg)
 {
-    attrentry_T *char_aep = NULL;
+    attrentry_T *char_aep = रिक्त;
     attrentry_T *popup_aep;
     attrentry_T new_en;
     attrentry_T tmp_en;
 
 #ifdef FEAT_GUI
-    if (gui.in_use)
+    सचे (gui.in_use)
     {
-	if (char_attr > HL_ALL)
+	सचे (char_attr > HL_ALL)
 	    char_aep = syn_gui_attr2entry(char_attr);
-	if (char_aep != NULL)
+	सचे (char_aep != रिक्त)
 	    new_en = *char_aep;
-	else
+	अञ्ञथा
 	{
 	    CLEAR_FIELD(new_en);
 	    new_en.ae_u.gui.fg_color = INVALCOLOR;
 	    new_en.ae_u.gui.bg_color = INVALCOLOR;
 	    new_en.ae_u.gui.sp_color = INVALCOLOR;
-	    if (char_attr <= HL_ALL)
+	    सचे (char_attr <= HL_ALL)
 		new_en.ae_attr = char_attr;
 	}
 
 	// initialize an empty entry if no highlight set for popup
-	if (popup_attr <= HL_ALL)
+	सचे (popup_attr <= HL_ALL)
 	{
 	    CLEAR_FIELD(tmp_en);
 	    tmp_en.ae_u.gui.fg_color = INVALCOLOR;
@@ -3443,28 +3443,28 @@ hl_blend_attr_common(
 
 	    popup_aep->ae_u.gui.bg_color = fallback_bg_rgb;
 	}
-	else
+	अञ्ञथा
 	    popup_aep = syn_gui_attr2entry(popup_attr);
 
-	if (popup_aep != NULL)
+	सचे (popup_aep != रिक्त)
 	{
 	    guicolor_T popup_bg_rgb = popup_aep->ae_u.gui.bg_color;
-	    if (COLOR_INVALID(popup_bg_rgb))
+	    सचे (COLOR_INVALID(popup_bg_rgb))
 		popup_bg_rgb = fallback_bg_rgb;
 
-	    if (blend_fg)
+	    सचे (blend_fg)
 	    {
 		// blend_fg=TRUE: fade underlying text toward popup bg.
 		{
-		    int base_fg = fallback_fg_rgb;
-		    if (char_aep != NULL
+		    पूर्णाङ्क base_fg = fallback_fg_rgb;
+		    सचे (char_aep != रिक्त
 			    && char_aep->ae_u.gui.fg_color != INVALCOLOR)
 			base_fg = char_aep->ae_u.gui.fg_color;
 		    new_en.ae_u.gui.fg_color = blend_colors(
 			    popup_bg_rgb, base_fg, blend);
 		}
 	    }
-	    else
+	    अञ्ञथा
 	    {
 		// blend_fg=FALSE: popup text is opaque.  Replace the
 		// underlying cell's attribute flags, fg, special color
@@ -3483,7 +3483,7 @@ hl_blend_attr_common(
 	    // Blend background color: blend popup bg toward underlying bg
 	    {
 		guicolor_T underlying_bg = fallback_bg_rgb;
-		if (char_aep != NULL
+		सचे (char_aep != रिक्त
 			&& !COLOR_INVALID(char_aep->ae_u.gui.bg_color))
 		    underlying_bg = char_aep->ae_u.gui.bg_color;
 		new_en.ae_u.gui.bg_color = blend_colors(
@@ -3491,17 +3491,17 @@ hl_blend_attr_common(
 			underlying_bg, blend);
 	    }
 	}
-	return get_attr_entry(&gui_attr_table, &new_en);
+	पटिनिवत्त get_attr_entry(&gui_attr_table, &new_en);
     }
 #endif
 
-    if (IS_CTERM)
+    सचे (IS_CTERM)
     {
-	if (char_attr > HL_ALL)
+	सचे (char_attr > HL_ALL)
 	    char_aep = syn_cterm_attr2entry(char_attr);
-	if (char_aep != NULL)
+	सचे (char_aep != रिक्त)
 	    new_en = *char_aep;
-	else
+	अञ्ञथा
 	{
 	    CLEAR_FIELD(new_en);
 #ifdef FEAT_TERMGUICOLORS
@@ -3509,12 +3509,12 @@ hl_blend_attr_common(
 	    new_en.ae_u.cterm.fg_rgb = INVALCOLOR;
 	    new_en.ae_u.cterm.ul_rgb = INVALCOLOR;
 #endif
-	    if (char_attr <= HL_ALL)
+	    सचे (char_attr <= HL_ALL)
 		new_en.ae_attr = char_attr;
 	}
 
 	// initialize an empty entry if no highlight set for popup
-	if (popup_attr <= HL_ALL)
+	सचे (popup_attr <= HL_ALL)
 	{
 	    CLEAR_FIELD(tmp_en);
 #ifdef FEAT_TERMGUICOLORS
@@ -3530,26 +3530,26 @@ hl_blend_attr_common(
 	    // allow blending with notermguicolors
 	    popup_aep->ae_u.cterm.bg_color = cterm_normal_bg_color;
 	}
-	else
+	अञ्ञथा
 	    popup_aep = syn_cterm_attr2entry(popup_attr);
 
-	if (popup_aep != NULL)
+	सचे (popup_aep != रिक्त)
 	{
 	    guicolor_T popup_bg_rgb = INVALCOLOR;
 #ifdef FEAT_TERMGUICOLORS
 	    // Fall back to cterm color converted to RGB when gui color is not set.
 	    popup_bg_rgb = popup_aep->ae_u.cterm.bg_rgb;
-	    if (COLOR_INVALID(popup_bg_rgb)
+	    सचे (COLOR_INVALID(popup_bg_rgb)
 		    && popup_aep->ae_u.cterm.bg_color > 0)
 		popup_bg_rgb = cterm_color_to_rgb(
 			popup_aep->ae_u.cterm.bg_color);
 #endif
 	    // assign default color if guibg and ctermbg are not set for popup
-	    if (COLOR_INVALID(popup_bg_rgb)
+	    सचे (COLOR_INVALID(popup_bg_rgb)
 		    && popup_aep->ae_u.cterm.bg_color == 0)
 		popup_bg_rgb = fallback_bg_rgb;
 
-	    if (!blend_fg)
+	    सचे (!blend_fg)
 	    {
 		// blend_fg=FALSE: popup text is opaque.  Replace the
 		// underlying cell's attribute flags, fg, underline color
@@ -3560,12 +3560,12 @@ hl_blend_attr_common(
 		// text is still readable instead of taking on whatever
 		// the underlying cell happened to have.
 		new_en.ae_attr = popup_aep->ae_attr;
-		if (popup_aep->ae_u.cterm.fg_color > 0)
+		सचे (popup_aep->ae_u.cterm.fg_color > 0)
 		    new_en.ae_u.cterm.fg_color =
 			popup_aep->ae_u.cterm.fg_color;
-		else if (cterm_normal_fg_color > 0)
+		अञ्ञथा सचे (cterm_normal_fg_color > 0)
 		    new_en.ae_u.cterm.fg_color = cterm_normal_fg_color;
-		else
+		अञ्ञथा
 		    // black-ish or white-ish
 		    new_en.ae_u.cterm.fg_color = (*p_bg == 'l') ? 1 : 16;
 		new_en.ae_u.cterm.ul_color = popup_aep->ae_u.cterm.ul_color;
@@ -3574,16 +3574,16 @@ hl_blend_attr_common(
 		new_en.ae_u.cterm.ul_rgb = popup_aep->ae_u.cterm.ul_rgb;
 #endif
 	    }
-	    else
+	    अञ्ञथा
 	    {
 		// blend_fg=TRUE: fade underlying fg toward popup bg in
 		// the 256-color palette.  Used when the popup is over a
 		// cell rendered with cterm colors (no termguicolors RGB).
-		int under_fg = (char_aep != NULL)
+		पूर्णाङ्क under_fg = (char_aep != रिक्त)
 		    ? char_aep->ae_u.cterm.fg_color : 0;
 		guicolor_T under_fg_rgb = INVALCOLOR;
 #ifdef FEAT_TERMGUICOLORS
-		if (char_aep != NULL)
+		सचे (char_aep != रिक्त)
 		    under_fg_rgb = char_aep->ae_u.cterm.fg_rgb;
 #endif
 		new_en.ae_u.cterm.fg_color = blend_cterm_colors(
@@ -3593,11 +3593,11 @@ hl_blend_attr_common(
 	    // Approximate cterm bg by blending with the underlying bg
 	    // in the 256-color palette and mapping to the nearest entry.
 	    {
-		int under_bg = (char_aep != NULL)
+		पूर्णाङ्क under_bg = (char_aep != रिक्त)
 		    ? char_aep->ae_u.cterm.bg_color : 0;
 		guicolor_T under_bg_rgb = INVALCOLOR;
 #ifdef FEAT_TERMGUICOLORS
-		if (char_aep != NULL)
+		सचे (char_aep != रिक्त)
 		    under_bg_rgb = char_aep->ae_u.cterm.bg_rgb;
 #endif
 		new_en.ae_u.cterm.bg_color = blend_cterm_colors(
@@ -3607,23 +3607,23 @@ hl_blend_attr_common(
 #ifdef FEAT_TERMGUICOLORS
 	    // Blend RGB colors for termguicolors mode.
 	    {
-		if (blend_fg)
+		सचे (blend_fg)
 		{
 		    // blend_fg=TRUE: fade underlying text toward popup bg.
-		    if (popup_bg_rgb != INVALCOLOR)
+		    सचे (popup_bg_rgb != INVALCOLOR)
 		    {
-			int base_fg = fallback_fg_rgb;
+			पूर्णाङ्क base_fg = fallback_fg_rgb;
 			// CTERMCOLOR is a sentinel meaning "use the cterm
 			// color"; treat it as no underlying color so it is
 			// not blended in as a real near-white pixel.
-			if (char_aep != NULL
+			सचे (char_aep != रिक्त
 				&& !COLOR_INVALID(char_aep->ae_u.cterm.fg_rgb))
 			    base_fg = char_aep->ae_u.cterm.fg_rgb;
 			new_en.ae_u.cterm.fg_rgb = blend_colors(
 				popup_bg_rgb, base_fg, blend);
 		    }
 		}
-		else
+		अञ्ञथा
 		{
 		    // blend_fg=FALSE: popup text is opaque.  Replace fg with
 		    // popup's so the underlying syntax highlighting fg does
@@ -3635,23 +3635,23 @@ hl_blend_attr_common(
 		    // color is not set.
 		    guicolor_T popup_fg = popup_aep->ae_u.cterm.fg_rgb;
 
-		    if (COLOR_INVALID(popup_fg)
+		    सचे (COLOR_INVALID(popup_fg)
 			    && popup_aep->ae_u.cterm.fg_color > 0)
 			popup_fg = cterm_color_to_rgb(
 				popup_aep->ae_u.cterm.fg_color);
 
-		    if (!COLOR_INVALID(popup_fg))
+		    सचे (!COLOR_INVALID(popup_fg))
 			new_en.ae_u.cterm.fg_rgb = popup_fg;
-		    else if (!COLOR_INVALID(cterm_normal_fg_gui_color))
+		    अञ्ञथा सचे (!COLOR_INVALID(cterm_normal_fg_gui_color))
 			new_en.ae_u.cterm.fg_rgb = cterm_normal_fg_gui_color;
-		    else
+		    अञ्ञथा
 			new_en.ae_u.cterm.fg_rgb = fallback_fg_rgb;
 		}
-		if (popup_bg_rgb != INVALCOLOR)
+		सचे (popup_bg_rgb != INVALCOLOR)
 		{
 		    // Blend popup bg toward underlying bg
 		    guicolor_T underlying_bg = fallback_bg_rgb;
-		    if (char_aep != NULL
+		    सचे (char_aep != रिक्त
 			    && !COLOR_INVALID(char_aep->ae_u.cterm.bg_rgb))
 			underlying_bg = char_aep->ae_u.cterm.bg_rgb;
 		    new_en.ae_u.cterm.bg_rgb = blend_colors(
@@ -3660,53 +3660,53 @@ hl_blend_attr_common(
 	    }
 #endif
 	}
-	return get_attr_entry(&cterm_attr_table, &new_en);
+	पटिनिवत्त get_attr_entry(&cterm_attr_table, &new_en);
     }
 
-    if (char_attr > HL_ALL)
+    सचे (char_attr > HL_ALL)
 	char_aep = syn_term_attr2entry(char_attr);
-    if (char_aep != NULL)
+    सचे (char_aep != रिक्त)
 	new_en = *char_aep;
-    else
+    अञ्ञथा
     {
 	CLEAR_FIELD(new_en);
-	if (char_attr <= HL_ALL)
+	सचे (char_attr <= HL_ALL)
 	    new_en.ae_attr = char_attr;
     }
 
     // For term mode, no separate background color handling.
-    return get_attr_entry(&term_attr_table, &new_en);
+    पटिनिवत्त get_attr_entry(&term_attr_table, &new_en);
 }
 
 /*
  * Blend attributes for popup windows with opacity.
  */
-    int
-hl_blend_attr(int char_attr, int popup_attr, int blend, int blend_fg)
+    पूर्णाङ्क
+hl_blend_attr(पूर्णाङ्क char_attr, पूर्णाङ्क popup_attr, पूर्णाङ्क blend, पूर्णाङ्क blend_fg)
 {
-    if (blend >= 100 && blend_fg)
-	return char_attr;
+    सचे (blend >= 100 && blend_fg)
+	पटिनिवत्त char_attr;
 
-    return hl_blend_attr_common(char_attr, popup_attr, blend, blend_fg);
+    पटिनिवत्त hl_blend_attr_common(char_attr, popup_attr, blend, blend_fg);
 }
 
 /*
  * Blend underlying foreground and background colors for pum space cells.
  */
-    int
-hl_pum_blend_attr(int char_attr, int popup_attr, int blend)
+    पूर्णाङ्क
+hl_pum_blend_attr(पूर्णाङ्क char_attr, पूर्णाङ्क popup_attr, पूर्णाङ्क blend)
 {
-    return hl_blend_attr_common(char_attr, popup_attr, blend, TRUE);
+    पटिनिवत्त hl_blend_attr_common(char_attr, popup_attr, blend, TRUE);
 }
 
 #ifdef FEAT_GUI
     attrentry_T *
-syn_gui_attr2entry(int attr)
+syn_gui_attr2entry(पूर्णाङ्क attr)
 {
     attr -= ATTR_OFF;
-    if (attr >= gui_attr_table.ga_len)	    // did ":syntax clear"
-	return NULL;
-    return &(GUI_ATTR_ENTRY(attr));
+    सचे (attr >= gui_attr_table.ga_len)	    // did ":syntax clear"
+	पटिनिवत्त रिक्त;
+    पटिनिवत्त &(GUI_ATTR_ENTRY(attr));
 }
 #endif
 
@@ -3714,82 +3714,82 @@ syn_gui_attr2entry(int attr)
  * Get the highlight attributes (HL_BOLD etc.) from an attribute nr.
  * Only to be used when "attr" > HL_ALL.
  */
-    int
-syn_attr2attr(int attr)
+    पूर्णाङ्क
+syn_attr2attr(पूर्णाङ्क attr)
 {
     attrentry_T	*aep;
 
 #ifdef FEAT_GUI
-    if (gui.in_use)
+    सचे (gui.in_use)
 	aep = syn_gui_attr2entry(attr);
-    else
+    अञ्ञथा
 #endif
-	if (IS_CTERM)
+	सचे (IS_CTERM)
 	    aep = syn_cterm_attr2entry(attr);
-	else
+	अञ्ञथा
 	    aep = syn_term_attr2entry(attr);
 
-    if (aep == NULL)	    // highlighting not set
-	return 0;
-    return aep->ae_attr;
+    सचे (aep == रिक्त)	    // highlighting not set
+	पटिनिवत्त 0;
+    पटिनिवत्त aep->ae_attr;
 }
 
 
     attrentry_T *
-syn_term_attr2entry(int attr)
+syn_term_attr2entry(पूर्णाङ्क attr)
 {
     attr -= ATTR_OFF;
-    if (attr >= term_attr_table.ga_len)	    // did ":syntax clear"
-	return NULL;
-    return &(TERM_ATTR_ENTRY(attr));
+    सचे (attr >= term_attr_table.ga_len)	    // did ":syntax clear"
+	पटिनिवत्त रिक्त;
+    पटिनिवत्त &(TERM_ATTR_ENTRY(attr));
 }
 
     attrentry_T *
-syn_cterm_attr2entry(int attr)
+syn_cterm_attr2entry(पूर्णाङ्क attr)
 {
     attr -= ATTR_OFF;
-    if (attr >= cterm_attr_table.ga_len)	// did ":syntax clear"
-	return NULL;
-    return &(CTERM_ATTR_ENTRY(attr));
+    सचे (attr >= cterm_attr_table.ga_len)	// did ":syntax clear"
+	पटिनिवत्त रिक्त;
+    पटिनिवत्त &(CTERM_ATTR_ENTRY(attr));
 }
 
 #define LIST_ATTR   1
 #define LIST_STRING 2
 #define LIST_INT    3
 
-    static void
-highlight_list_one(int id)
+    स्थिर शून्य
+highlight_list_one(पूर्णाङ्क id)
 {
     hl_group_T	    *sgp;
-    int		    didh = FALSE;
+    पूर्णाङ्क		    didh = FALSE;
 
     sgp = &HL_TABLE()[id - 1];	    // index is ID minus one
 
-    if (message_filtered(sgp->sg_name))
-	return;
+    सचे (message_filtered(sgp->sg_name))
+	पटिनिवत्त;
 
     // Note: Keep this in sync with expand_highlight_group().
     didh = highlight_list_arg(id, didh, LIST_ATTR,
-				    sgp->sg_term, NULL, "term");
+				    sgp->sg_term, रिक्त, "term");
     didh = highlight_list_arg(id, didh, LIST_STRING,
 				    0, sgp->sg_start, "start");
     didh = highlight_list_arg(id, didh, LIST_STRING,
 				    0, sgp->sg_stop, "stop");
 
     didh = highlight_list_arg(id, didh, LIST_ATTR,
-				    sgp->sg_cterm, NULL, "cterm");
+				    sgp->sg_cterm, रिक्त, "cterm");
     didh = highlight_list_arg(id, didh, LIST_INT,
-				    sgp->sg_cterm_fg, NULL, "ctermfg");
+				    sgp->sg_cterm_fg, रिक्त, "ctermfg");
     didh = highlight_list_arg(id, didh, LIST_INT,
-				    sgp->sg_cterm_bg, NULL, "ctermbg");
+				    sgp->sg_cterm_bg, रिक्त, "ctermbg");
     didh = highlight_list_arg(id, didh, LIST_INT,
-				    sgp->sg_cterm_ul, NULL, "ctermul");
+				    sgp->sg_cterm_ul, रिक्त, "ctermul");
     didh = highlight_list_arg(id, didh, LIST_INT,
-				    sgp->sg_cterm_font, NULL, "ctermfont");
+				    sgp->sg_cterm_font, रिक्त, "ctermfont");
 
-#if defined(FEAT_GUI) || defined(FEAT_EVAL)
+#सचे defined(FEAT_GUI) || defined(FEAT_EVAL)
     didh = highlight_list_arg(id, didh, LIST_ATTR,
-				    sgp->sg_gui, NULL, "gui");
+				    sgp->sg_gui, रिक्त, "gui");
     didh = highlight_list_arg(id, didh, LIST_STRING,
 				    0, sgp->sg_gui_fg_name, "guifg");
     didh = highlight_list_arg(id, didh, LIST_STRING,
@@ -3802,219 +3802,219 @@ highlight_list_one(int id)
 				    0, sgp->sg_font_name, "font");
 #endif
 
-    if (sgp->sg_link && !got_int)
+    सचे (sgp->sg_link && !got_int)
     {
-	(void)syn_list_header(didh, 9999, id);
+	(शून्य)syn_list_header(didh, 9999, id);
 	didh = TRUE;
-	msg_puts_attr("links to", HL_ATTR(HLF_D));
-	msg_putchar(' ');
-	msg_outtrans(HL_TABLE()[HL_TABLE()[id - 1].sg_link - 1].sg_name);
+	सन्देशः_puts_attr("links to", HL_ATTR(HLF_D));
+	सन्देशः_putchar(' ');
+	सन्देशः_outtrans(HL_TABLE()[HL_TABLE()[id - 1].sg_link - 1].sg_name);
     }
 
-    if (!didh)
+    सचे (!didh)
 	highlight_list_arg(id, didh, LIST_STRING, 0, (char_u *)"cleared", "");
 #ifdef FEAT_EVAL
-    if (p_verbose > 0)
-	last_set_msg(sgp->sg_script_ctx);
+    सचे (p_verbose > 0)
+	last_set_सन्देशः(sgp->sg_script_ctx);
 #endif
 }
 
-    static char_u*
+    स्थिर char_u*
 highlight_arg_to_string(
-    int		type,
-    int		iarg,
+    पूर्णाङ्क		type,
+    पूर्णाङ्क		iarg,
     char_u	*sarg,
     char_u	*buf)
 {
-    if (type == LIST_INT)
-	sprintf((char *)buf, "%d", iarg - 1);
-    else if (type == LIST_STRING)
-	return sarg;
-    else // type == LIST_ATTR
+    सचे (type == LIST_INT)
+	sprintf((वर्ण *)buf, "%d", iarg - 1);
+    अञ्ञथा सचे (type == LIST_STRING)
+	पटिनिवत्त sarg;
+    अञ्ञथा // type == LIST_ATTR
     {
 	size_t buflen;
 
 	buf[0] = NUL;
 	buflen = 0;
-	for (int i = 0; i < (int)ARRAY_LENGTH(highlight_index_tab); ++i)
+	अत्थाय (पूर्णाङ्क i = 0; i < (पूर्णाङ्क)ARRAY_LENGTH(highlight_index_tab); ++i)
 	{
-	    if (iarg & highlight_index_tab[i]->key)
+	    सचे (iarg & highlight_index_tab[i]->कुञ्चिका)
 	    {
-		if (buflen > 0)
+		सचे (buflen > 0)
 		{
 		    STRCPY(buf + buflen, (char_u *)",");
 		    ++buflen;
 		}
-		STRCPY(buf + buflen, highlight_index_tab[i]->value.string);
-		buflen += highlight_index_tab[i]->value.length;
-		iarg &= ~highlight_index_tab[i]->key;	    // don't want "inverse"/"reverse"
+		STRCPY(buf + buflen, highlight_index_tab[i]->मानम्.string);
+		buflen += highlight_index_tab[i]->मानम्.length;
+		iarg &= ~highlight_index_tab[i]->कुञ्चिका;	    // don't want "inverse"/"reverse"
 	    }
 	}
     }
-    return buf;
+    पटिनिवत्त buf;
 }
 
-    static int
+    स्थिर पूर्णाङ्क
 highlight_list_arg(
-    int		id,
-    int		didh,
-    int		type,
-    int		iarg,
+    पूर्णाङ्क		id,
+    पूर्णाङ्क		didh,
+    पूर्णाङ्क		type,
+    पूर्णाङ्क		iarg,
     char_u	*sarg,
-    char	*name)
+    वर्ण	*name)
 {
     char_u	buf[MAX_ATTR_LEN];
     char_u	*ts;
 
-    if (got_int)
-	return FALSE;
+    सचे (got_int)
+	पटिनिवत्त FALSE;
 
-    if (type == LIST_STRING ? (sarg == NULL) : (iarg == 0))
-	return didh;
+    सचे (type == LIST_STRING ? (sarg == रिक्त) : (iarg == 0))
+	पटिनिवत्त didh;
 
     ts = highlight_arg_to_string(type, iarg, sarg, buf);
 
-    (void)syn_list_header(didh,
-	    (int)(vim_strsize(ts) + STRLEN(name) + 1), id);
+    (शून्य)syn_list_header(didh,
+	    (पूर्णाङ्क)(vim_strsize(ts) + STRLEN(name) + 1), id);
     didh = TRUE;
-    if (!got_int)
+    सचे (!got_int)
     {
-	if (*name != NUL)
+	सचे (*name != NUL)
 	{
-	    msg_puts_attr(name, HL_ATTR(HLF_D));
-	    msg_puts_attr("=", HL_ATTR(HLF_D));
+	    सन्देशः_puts_attr(name, HL_ATTR(HLF_D));
+	    सन्देशः_puts_attr("=", HL_ATTR(HLF_D));
 	}
-	msg_outtrans(ts);
+	सन्देशः_outtrans(ts);
     }
-    return didh;
+    पटिनिवत्त didh;
 }
 
-#if ((defined(FEAT_EVAL) || defined(FEAT_PRINTER))) && defined(FEAT_SYN_HL)
+#सचे ((defined(FEAT_EVAL) || defined(FEAT_PRINTER))) && defined(FEAT_SYN_HL)
 /*
  * Return "1" if highlight group "id" has attribute "flag".
  * Return NULL otherwise.
  */
     char_u *
 highlight_has_attr(
-    int		id,
-    int		flag,
-    int		modec)	// 'g' for GUI, 'c' for cterm, 't' for term
+    पूर्णाङ्क		id,
+    पूर्णाङ्क		flag,
+    पूर्णाङ्क		modec)	// 'g' for GUI, 'c' for cterm, 't' for term
 {
-    int		attr;
+    पूर्णाङ्क		attr;
 
-    if (id <= 0 || id > highlight_ga.ga_len)
-	return NULL;
+    सचे (id <= 0 || id > highlight_ga.ga_len)
+	पटिनिवत्त रिक्त;
 
-# if defined(FEAT_GUI) || defined(FEAT_EVAL)
-    if (modec == 'g')
+# सचे defined(FEAT_GUI) || defined(FEAT_EVAL)
+    सचे (modec == 'g')
 	attr = HL_TABLE()[id - 1].sg_gui;
-    else
+    अञ्ञथा
 # endif
     {
-	if (modec == 'c')
+	सचे (modec == 'c')
 	    attr = HL_TABLE()[id - 1].sg_cterm;
-	else
+	अञ्ञथा
 	    attr = HL_TABLE()[id - 1].sg_term;
     }
 
-    if (attr & flag)
-	return (char_u *)"1";
-    return NULL;
+    सचे (attr & flag)
+	पटिनिवत्त (char_u *)"1";
+    पटिनिवत्त रिक्त;
 }
 #endif
 
-#if defined(FEAT_SYN_HL) && defined(FEAT_EVAL)
+#सचे defined(FEAT_SYN_HL) && defined(FEAT_EVAL)
 /*
  * Return color name of highlight group "id".
  */
     char_u *
 highlight_color(
-    int		id,
+    पूर्णाङ्क		id,
     char_u	*what,	// "font", "fg", "bg", "sp", "ul", "fg#", "bg#" or "sp#"
-    int		modec)	// 'g' for GUI, 'c' for cterm, 't' for term
+    पूर्णाङ्क		modec)	// 'g' for GUI, 'c' for cterm, 't' for term
 {
-    static char_u	name[20];
-    int			n;
-    int			fg = FALSE;
-    int			sp = FALSE;
-    int			ul = FALSE;
-    int			font = FALSE;
+    स्थिर char_u	name[20];
+    पूर्णाङ्क			n;
+    पूर्णाङ्क			fg = FALSE;
+    पूर्णाङ्क			sp = FALSE;
+    पूर्णाङ्क			ul = FALSE;
+    पूर्णाङ्क			font = FALSE;
 
-    if (id <= 0 || id > highlight_ga.ga_len)
-	return NULL;
+    सचे (id <= 0 || id > highlight_ga.ga_len)
+	पटिनिवत्त रिक्त;
 
-    if (TOLOWER_ASC(what[0]) == 'f' && TOLOWER_ASC(what[1]) == 'g')
+    सचे (TOLOWER_ASC(what[0]) == 'f' && TOLOWER_ASC(what[1]) == 'g')
 	fg = TRUE;
-    else if (TOLOWER_ASC(what[0]) == 'f' && TOLOWER_ASC(what[1]) == 'o'
+    अञ्ञथा सचे (TOLOWER_ASC(what[0]) == 'f' && TOLOWER_ASC(what[1]) == 'o'
 	     && TOLOWER_ASC(what[2]) == 'n' && TOLOWER_ASC(what[3]) == 't')
 	font = TRUE;
-    else if (TOLOWER_ASC(what[0]) == 's' && TOLOWER_ASC(what[1]) == 'p')
+    अञ्ञथा सचे (TOLOWER_ASC(what[0]) == 's' && TOLOWER_ASC(what[1]) == 'p')
 	sp = TRUE;
-    else if (TOLOWER_ASC(what[0]) == 'u' && TOLOWER_ASC(what[1]) == 'l')
+    अञ्ञथा सचे (TOLOWER_ASC(what[0]) == 'u' && TOLOWER_ASC(what[1]) == 'l')
 	ul = TRUE;
-    else if (!(TOLOWER_ASC(what[0]) == 'b' && TOLOWER_ASC(what[1]) == 'g'))
-	return NULL;
-    if (modec == 'g')
+    अञ्ञथा सचे (!(TOLOWER_ASC(what[0]) == 'b' && TOLOWER_ASC(what[1]) == 'g'))
+	पटिनिवत्त रिक्त;
+    सचे (modec == 'g')
     {
-# if defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
+# सचे defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
 #  ifdef FEAT_GUI
 	// return font name
-	if (font)
-	    return HL_TABLE()[id - 1].sg_font_name;
+	सचे (font)
+	    पटिनिवत्त HL_TABLE()[id - 1].sg_font_name;
 #  endif
 
 	// return #RRGGBB form (only possible when GUI is running)
-	if ((USE_24BIT) && what[2] == '#')
+	सचे ((USE_24BIT) && what[2] == '#')
 	{
 	    guicolor_T		color;
 	    long_u		rgb;
-	    static char_u	buf[10];
+	    स्थिर char_u	buf[10];
 
-	    if (fg)
+	    सचे (fg)
 		color = HL_TABLE()[id - 1].sg_gui_fg;
-	    else if (sp)
+	    अञ्ञथा सचे (sp)
 		color = HL_TABLE()[id - 1].sg_gui_sp;
-	    else
+	    अञ्ञथा
 		color = HL_TABLE()[id - 1].sg_gui_bg;
-	    if (color == INVALCOLOR)
-		return NULL;
+	    सचे (color == INVALCOLOR)
+		पटिनिवत्त रिक्त;
 	    rgb = (long_u)GUI_MCH_GET_RGB(color);
-	    sprintf((char *)buf, "#%02x%02x%02x",
+	    sprintf((वर्ण *)buf, "#%02x%02x%02x",
 				      (unsigned)(rgb >> 16),
 				      (unsigned)(rgb >> 8) & 255,
 				      (unsigned)rgb & 255);
-	    return buf;
+	    पटिनिवत्त buf;
 	}
 # endif
-	if (fg)
-	    return (HL_TABLE()[id - 1].sg_gui_fg_name);
-	if (sp)
-	    return (HL_TABLE()[id - 1].sg_gui_sp_name);
-	return (HL_TABLE()[id - 1].sg_gui_bg_name);
+	सचे (fg)
+	    पटिनिवत्त (HL_TABLE()[id - 1].sg_gui_fg_name);
+	सचे (sp)
+	    पटिनिवत्त (HL_TABLE()[id - 1].sg_gui_sp_name);
+	पटिनिवत्त (HL_TABLE()[id - 1].sg_gui_bg_name);
     }
-    if (sp)
-	return NULL;
-    if (modec == 'c')
+    सचे (sp)
+	पटिनिवत्त रिक्त;
+    सचे (modec == 'c')
     {
-	if (fg)
+	सचे (fg)
 	    n = HL_TABLE()[id - 1].sg_cterm_fg - 1;
-	else if (ul)
+	अञ्ञथा सचे (ul)
 	    n = HL_TABLE()[id - 1].sg_cterm_ul - 1;
-	else if (font)
+	अञ्ञथा सचे (font)
 	    n = HL_TABLE()[id - 1].sg_cterm_font - 1;
-	else
+	अञ्ञथा
 	    n = HL_TABLE()[id - 1].sg_cterm_bg - 1;
-	if (n < 0)
-	    return NULL;
-	sprintf((char *)name, "%d", n);
-	return name;
+	सचे (n < 0)
+	    पटिनिवत्त रिक्त;
+	sprintf((वर्ण *)name, "%d", n);
+	पटिनिवत्त name;
     }
     // term doesn't have color
-    return NULL;
+    पटिनिवत्त रिक्त;
 }
 #endif
 
-#if defined(FEAT_SYN_HL) \
+#सचे defined(FEAT_SYN_HL) \
 	    && (defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)) \
 	&& defined(FEAT_PRINTER)
 /*
@@ -4022,23 +4022,23 @@ highlight_color(
  */
     long_u
 highlight_gui_color_rgb(
-    int		id,
-    int		fg)	// TRUE = fg, FALSE = bg
+    पूर्णाङ्क		id,
+    पूर्णाङ्क		fg)	// TRUE = fg, FALSE = bg
 {
     guicolor_T	color;
 
-    if (id <= 0 || id > highlight_ga.ga_len)
-	return 0L;
+    सचे (id <= 0 || id > highlight_ga.ga_len)
+	पटिनिवत्त 0L;
 
-    if (fg)
+    सचे (fg)
 	color = HL_TABLE()[id - 1].sg_gui_fg;
-    else
+    अञ्ञथा
 	color = HL_TABLE()[id - 1].sg_gui_bg;
 
-    if (color == INVALCOLOR)
-	return 0L;
+    सचे (color == INVALCOLOR)
+	पटिनिवत्त 0L;
 
-    return GUI_MCH_GET_RGB(color);
+    पटिनिवत्त GUI_MCH_GET_RGB(color);
 }
 #endif
 
@@ -4046,75 +4046,75 @@ highlight_gui_color_rgb(
  * Output the syntax list header.
  * Return TRUE when started a new line.
  */
-    int
+    पूर्णाङ्क
 syn_list_header(
-    int	    did_header,		// did header already
-    int	    outlen,		// length of string that comes
-    int	    id)			// highlight group id
+    पूर्णाङ्क	    did_header,		// did header already
+    पूर्णाङ्क	    outlen,		// length of string that comes
+    पूर्णाङ्क	    id)			// highlight group id
 {
-    int	    endcol = 19;
-    int	    newline = TRUE;
-    int	    name_col = 0;
+    पूर्णाङ्क	    endcol = 19;
+    पूर्णाङ्क	    newline = TRUE;
+    पूर्णाङ्क	    name_col = 0;
 
-    if (!did_header)
+    सचे (!did_header)
     {
-	msg_putchar('\n');
-	if (got_int)
-	    return TRUE;
-	msg_outtrans(HL_TABLE()[id - 1].sg_name);
-	name_col = msg_col;
+	सन्देशः_putchar('\n');
+	सचे (got_int)
+	    पटिनिवत्त TRUE;
+	सन्देशः_outtrans(HL_TABLE()[id - 1].sg_name);
+	name_col = सन्देशः_col;
 	endcol = 15;
     }
-    else if (msg_col + outlen + 1 >= cmdline_width)
+    अञ्ञथा सचे (सन्देशः_col + outlen + 1 >= cmdline_width)
     {
-	msg_putchar('\n');
-	if (got_int)
-	    return TRUE;
+	सन्देशः_putchar('\n');
+	सचे (got_int)
+	    पटिनिवत्त TRUE;
     }
-    else
+    अञ्ञथा
     {
-	if (msg_col >= endcol)	// wrap around is like starting a new line
+	सचे (सन्देशः_col >= endcol)	// wrap around is like starting a new line
 	    newline = FALSE;
     }
 
-    if (msg_col >= endcol)	// output at least one space
-	endcol = msg_col + 1;
-    if (cmdline_width <= endcol)	// avoid hang for tiny window
+    सचे (सन्देशः_col >= endcol)	// output at least one space
+	endcol = सन्देशः_col + 1;
+    सचे (cmdline_width <= endcol)	// avoid hang for tiny window
 	endcol = cmdline_width - 1;
 
-    msg_advance(endcol);
+    सन्देशः_advance(endcol);
 
     // Show "xxx" with the attributes.
-    if (!did_header)
+    सचे (!did_header)
     {
-	if (endcol == cmdline_width - 1 && endcol <= name_col)
-	    msg_putchar(' ');
-	msg_puts_attr("xxx", syn_id2attr(id));
-	msg_putchar(' ');
+	सचे (endcol == cmdline_width - 1 && endcol <= name_col)
+	    सन्देशः_putchar(' ');
+	सन्देशः_puts_attr("xxx", syn_id2attr(id));
+	सन्देशः_putchar(' ');
     }
 
-    return newline;
+    पटिनिवत्त newline;
 }
 
 /*
  * Set the attribute numbers for a highlight group.
  * Called after one of the attributes has changed.
  */
-    static void
+    स्थिर शून्य
 set_hl_attr(
-    int		idx)	    // index in array
+    पूर्णाङ्क		idx)	    // index in array
 {
     attrentry_T	    at_en;
     hl_group_T	    *sgp = HL_TABLE() + idx;
 
     // The "Normal" group doesn't need an attribute number
-    if (sgp->sg_name_u != NULL && STRCMP(sgp->sg_name_u, "NORMAL") == 0)
-	return;
+    सचे (sgp->sg_name_u != रिक्त && STRCMP(sgp->sg_name_u, "NORMAL") == 0)
+	पटिनिवत्त;
 
 #ifdef FEAT_GUI
     // For the GUI mode: If there are other than "normal" highlighting
     // attributes, need to allocate an attr number.
-    if (sgp->sg_gui_fg == INVALCOLOR
+    सचे (sgp->sg_gui_fg == INVALCOLOR
 	    && sgp->sg_gui_bg == INVALCOLOR
 	    && sgp->sg_gui_sp == INVALCOLOR
 	    && sgp->sg_font == NOFONT
@@ -4125,7 +4125,7 @@ set_hl_attr(
     {
 	sgp->sg_gui_attr = sgp->sg_gui;
     }
-    else
+    अञ्ञथा
     {
 	at_en.ae_attr = sgp->sg_gui;
 	at_en.ae_u.gui.fg_color = sgp->sg_gui_fg;
@@ -4140,9 +4140,9 @@ set_hl_attr(
 #endif
     // For the term mode: If there are other than "normal" highlighting
     // attributes, need to allocate an attr number.
-    if (sgp->sg_start == NULL && sgp->sg_stop == NULL)
+    सचे (sgp->sg_start == रिक्त && sgp->sg_stop == रिक्त)
 	sgp->sg_term_attr = sgp->sg_term;
-    else
+    अञ्ञथा
     {
 	at_en.ae_attr = sgp->sg_term;
 	at_en.ae_u.term.start = sgp->sg_start;
@@ -4152,7 +4152,7 @@ set_hl_attr(
 
     // For the color term mode: If there are other than "normal"
     // highlighting attributes, need to allocate an attr number.
-    if (sgp->sg_cterm_fg == 0 && sgp->sg_cterm_bg == 0 &&
+    सचे (sgp->sg_cterm_fg == 0 && sgp->sg_cterm_bg == 0 &&
 	sgp->sg_cterm_ul == 0 && sgp->sg_cterm_font == 0
 #ifdef FEAT_TERMGUICOLORS
 	    && sgp->sg_gui_fg == INVALCOLOR
@@ -4161,7 +4161,7 @@ set_hl_attr(
 #endif
 	    )
 	sgp->sg_cterm_attr = sgp->sg_cterm;
-    else
+    अञ्ञथा
     {
 	at_en.ae_attr = sgp->sg_cterm;
 	at_en.ae_u.cterm.fg_color = sgp->sg_cterm_fg;
@@ -4173,12 +4173,12 @@ set_hl_attr(
 	at_en.ae_u.cterm.bg_rgb = GUI_MCH_GET_RGB2(sgp->sg_gui_bg);
 	// Only use the underline/undercurl color when used, it may clear the
 	// background color if not supported.
-	if (sgp->sg_cterm & (HL_UNDERLINE | HL_UNDERCURL
+	सचे (sgp->sg_cterm & (HL_UNDERLINE | HL_UNDERCURL
 			   | HL_UNDERDOUBLE | HL_UNDERDOTTED | HL_UNDERDASHED))
 	    at_en.ae_u.cterm.ul_rgb = GUI_MCH_GET_RGB2(sgp->sg_gui_sp);
-	else
+	अञ्ञथा
 	    at_en.ae_u.cterm.ul_rgb = INVALCOLOR;
-	if (at_en.ae_u.cterm.fg_rgb == INVALCOLOR
+	सचे (at_en.ae_u.cterm.fg_rgb == INVALCOLOR
 		&& at_en.ae_u.cterm.bg_rgb == INVALCOLOR)
 	{
 	    // If both fg and bg are invalid fall back to the cterm colors.
@@ -4195,85 +4195,85 @@ set_hl_attr(
  * Check if highlight id is overridden, and return the overriding highlight id.
  * Otherwise return the original id if no override.
  */
-    static int
-syn_override(int id)
+    स्थिर पूर्णाङ्क
+syn_override(पूर्णाङ्क id)
 {
-    if (overrides != NULL && overrides->arr != NULL)
-	for (int k = 0; k < overrides->len; k++)
-	    if (overrides->arr[k].from == id)
-		return overrides->arr[k].to;
-    return id;
+    सचे (overrides != रिक्त && overrides->arr != रिक्त)
+	अत्थाय (पूर्णाङ्क k = 0; k < overrides->len; k++)
+	    सचे (overrides->arr[k].from == id)
+		पटिनिवत्त overrides->arr[k].to;
+    पटिनिवत्त id;
 }
 
 /*
  * Lookup a highlight group name by pointer and length.
  * If it is not found, 0 is returned.
  */
-    static int
-syn_name2id_len(char_u *name, int len)
+    स्थिर पूर्णाङ्क
+syn_name2id_len(char_u *name, पूर्णाङ्क len)
 {
     char_u	name_u[MAX_SYN_NAME + 1];
     hashitem_T	*hi;
 
-    if (len > MAX_SYN_NAME)
+    सचे (len > MAX_SYN_NAME)
 	len = MAX_SYN_NAME;
     mch_memmove(name_u, name, len);
     name_u[len] = NUL;
     vim_strup(name_u);
-    if (!highlight_ht_inited)
-	return 0;
+    सचे (!highlight_ht_inited)
+	पटिनिवत्त 0;
     hi = hash_find(&highlight_ht, name_u);
-    if (HASHITEM_EMPTY(hi))
-	return 0;
-    return HI2HLNAME(hi)->hn_id;
+    सचे (HASHITEM_EMPTY(hi))
+	पटिनिवत्त 0;
+    पटिनिवत्त HI2HLNAME(hi)->hn_id;
 }
 
 /*
  * Lookup a highlight group name and return its ID.
  * If it is not found, 0 is returned.
  */
-    int
+    पूर्णाङ्क
 syn_name2id(char_u *name)
 {
     // Avoid using stricmp() too much, it's slow on some systems.
-    return syn_name2id_len(name, (int)STRLEN(name));
+    पटिनिवत्त syn_name2id_len(name, (पूर्णाङ्क)STRLEN(name));
 }
 
 /*
  * Lookup a highlight group name and return its attributes.
  * Return zero if not found.
  */
-    int
+    पूर्णाङ्क
 syn_name2attr(char_u *name)
 {
-    int id = syn_name2id(name);
+    पूर्णाङ्क id = syn_name2id(name);
 
-    if (id != 0)
-	return syn_id2attr(id);
-    return 0;
+    सचे (id != 0)
+	पटिनिवत्त syn_id2attr(id);
+    पटिनिवत्त 0;
 }
 
-#if defined(FEAT_EVAL)
+#सचे defined(FEAT_EVAL)
 /*
  * Return TRUE if highlight group "name" exists.
  */
-    int
+    पूर्णाङ्क
 highlight_exists(char_u *name)
 {
-    return (syn_name2id(name) > 0);
+    पटिनिवत्त (syn_name2id(name) > 0);
 }
 
-# if defined(FEAT_SEARCH_EXTRA)
+# सचे defined(FEAT_अन्वेषणम्_EXTRA)
 /*
  * Return the name of highlight group "id".
  * When not a valid ID return an empty string.
  */
     char_u *
-syn_id2name(int id)
+syn_id2name(पूर्णाङ्क id)
 {
-    if (id <= 0 || id > highlight_ga.ga_len)
-	return (char_u *)"";
-    return HL_TABLE()[id - 1].sg_name;
+    सचे (id <= 0 || id > highlight_ga.ga_len)
+	पटिनिवत्त (char_u *)"";
+    पटिनिवत्त HL_TABLE()[id - 1].sg_name;
 }
 # endif
 #endif
@@ -4281,10 +4281,10 @@ syn_id2name(int id)
 /*
  * Like syn_name2id(), but take a pointer + length argument.
  */
-    int
-syn_namen2id(char_u *linep, int len)
+    पूर्णाङ्क
+syn_namen2id(char_u *linep, पूर्णाङ्क len)
 {
-    return syn_name2id_len(linep, len);
+    पटिनिवत्त syn_name2id_len(linep, len);
 }
 
 /*
@@ -4293,26 +4293,26 @@ syn_namen2id(char_u *linep, int len)
  * If it doesn't exist yet, a new entry is created.
  * Return 0 for failure.
  */
-    int
-syn_check_group(char_u *pp, int len)
+    पूर्णाङ्क
+syn_check_group(char_u *pp, पूर्णाङ्क len)
 {
-    int	    id;
+    पूर्णाङ्क	    id;
     char_u  *name;
 
-    if (len > MAX_SYN_NAME)
+    सचे (len > MAX_SYN_NAME)
     {
 	emsg(_(e_highlight_group_name_too_long));
-	return 0;
+	पटिनिवत्त 0;
     }
     id = syn_name2id_len(pp, len);
-    if (id == 0)			// doesn't exist yet
+    सचे (id == 0)			// doesn't exist yet
     {
 	name = vim_strnsave(pp, len);
-	if (name == NULL)
-	    return 0;
+	सचे (name == रिक्त)
+	    पटिनिवत्त 0;
 	id = syn_add_group(name);
     }
-    return id;
+    पटिनिवत्त id;
 }
 
 /*
@@ -4320,74 +4320,74 @@ syn_check_group(char_u *pp, int len)
  * "name" must be an allocated string, it will be consumed.
  * Return 0 for failure.
  */
-    static int
+    स्थिर पूर्णाङ्क
 syn_add_group(char_u *name)
 {
     char_u	*p;
     char_u	*name_up;
 
     // Check that the name is valid (ASCII letters, digits, underscores, dots, or hyphens).
-    for (p = name; *p != NUL; ++p)
+    अत्थाय (p = name; *p != NUL; ++p)
     {
-	if (!vim_isprintc(*p))
+	सचे (!vim_isprintc(*p))
 	{
 	    emsg(_(e_unprintable_character_in_group_name));
 	    vim_free(name);
-	    return 0;
+	    पटिनिवत्त 0;
 	}
-	else if (!ASCII_ISALNUM(*p) && *p != '_' && *p != '.' && *p != '-')
+	अञ्ञथा सचे (!ASCII_ISALNUM(*p) && *p != '_' && *p != '.' && *p != '-')
 	{
 	    // This is an error, but since there previously was no check only
 	    // give a warning.
-	    msg_source(HL_ATTR(HLF_W));
-	    msg(_("W18: Invalid character in group name"));
-	    break;
+	    सन्देशः_source(HL_ATTR(HLF_W));
+	    सन्देशः(_("W18: Invalid character in group name"));
+	    भङ्ग;
 	}
     }
 
     // First call for this growarray: init growing array.
-    if (highlight_ga.ga_data == NULL)
+    सचे (highlight_ga.ga_data == रिक्त)
     {
-	highlight_ga.ga_itemsize = sizeof(hl_group_T);
+	highlight_ga.ga_itemsize = परिमाण(hl_group_T);
 	highlight_ga.ga_growsize = 10;
 	hash_init(&highlight_ht);
 	highlight_ht_inited = true;
     }
 
-    if (highlight_ga.ga_len >= MAX_HL_ID)
+    सचे (highlight_ga.ga_len >= MAX_HL_ID)
     {
 	emsg(_(e_too_many_highlight_and_syntax_groups));
 	vim_free(name);
-	return 0;
+	पटिनिवत्त 0;
     }
 
     // Make room for at least one other syntax_highlight entry.
-    if (ga_grow(&highlight_ga, 1) == FAIL)
+    सचे (ga_grow(&highlight_ga, 1) == FAIL)
     {
 	vim_free(name);
-	return 0;
+	पटिनिवत्त 0;
     }
 
     {
 	hlname_T    *hn;
-	int	    len = (int)STRLEN(name);
+	पूर्णाङ्क	    len = (पूर्णाङ्क)STRLEN(name);
 
-	hn = alloc(offsetof(hlname_T, hn_key) + len + 1);
-	if (hn == NULL)
+	hn = alloc(offsetof(hlname_T, hn_कुञ्चिका) + len + 1);
+	सचे (hn == रिक्त)
 	{
 	    vim_free(name);
-	    return 0;
+	    पटिनिवत्त 0;
 	}
-	vim_strncpy(hn->hn_key, name, len);
-	vim_strup(hn->hn_key);
+	vim_strncpy(hn->hn_कुञ्चिका, name, len);
+	vim_strup(hn->hn_कुञ्चिका);
 	hn->hn_id = highlight_ga.ga_len + 1;	// ID is index plus one
-	name_up = hn->hn_key;
+	name_up = hn->hn_कुञ्चिका;
     }
 
     CLEAR_POINTER(&(HL_TABLE()[highlight_ga.ga_len]));
     HL_TABLE()[highlight_ga.ga_len].sg_name = name;
     HL_TABLE()[highlight_ga.ga_len].sg_name_u = name_up;
-#if defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
+#सचे defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
     HL_TABLE()[highlight_ga.ga_len].sg_gui_bg = INVALCOLOR;
     HL_TABLE()[highlight_ga.ga_len].sg_gui_fg = INVALCOLOR;
     HL_TABLE()[highlight_ga.ga_len].sg_gui_sp = INVALCOLOR;
@@ -4395,88 +4395,88 @@ syn_add_group(char_u *name)
     hash_add(&highlight_ht, name_up, "highlight");
     ++highlight_ga.ga_len;
 
-    return highlight_ga.ga_len;		    // ID is index plus one
+    पटिनिवत्त highlight_ga.ga_len;		    // ID is index plus one
 }
 
 /*
  * When, just after calling syn_add_group(), an error is discovered, this
  * function deletes the new name.
  */
-    static void
-syn_unadd_group(void)
+    स्थिर शून्य
+syn_unadd_group(शून्य)
 {
     hashitem_T *hi;
 
     --highlight_ga.ga_len;
     hi = hash_find(&highlight_ht, HL_TABLE()[highlight_ga.ga_len].sg_name_u);
-    if (!HASHITEM_EMPTY(hi))
+    सचे (!HASHITEM_EMPTY(hi))
 	hash_remove(&highlight_ht, hi, "highlight");
     vim_free(HL_TABLE()[highlight_ga.ga_len].sg_name);
-    vim_free(HL_TABLE()[highlight_ga.ga_len].sg_name_u - HLNAME_KEY_OFF);
+    vim_free(HL_TABLE()[highlight_ga.ga_len].sg_name_u - HLNAME_कुञ्चिका_OFF);
 }
 
 /*
  * Translate a group ID to highlight attributes.
  * "hl_id" must be valid: > 0, caller must check.
  */
-    int
-syn_id2attr(int hl_id)
+    पूर्णाङ्क
+syn_id2attr(पूर्णाङ्क hl_id)
 {
-    int		attr;
+    पूर्णाङ्क		attr;
     hl_group_T	*sgp;
 
     hl_id = syn_get_final_id(hl_id);
     // shouldn't happen
-    assert(hl_id > 0);
+    प्रतिज्ञा(hl_id > 0);
     sgp = &HL_TABLE()[hl_id - 1];	    // index is ID minus one
 
 #ifdef FEAT_GUI
     // Only use GUI attr when the GUI is being used.
-    if (gui.in_use)
+    सचे (gui.in_use)
 	attr = sgp->sg_gui_attr;
-    else
+    अञ्ञथा
 #endif
-	if (IS_CTERM)
+	सचे (IS_CTERM)
 	    attr = sgp->sg_cterm_attr;
-	else
+	अञ्ञथा
 	    attr = sgp->sg_term_attr;
 
-    return attr;
+    पटिनिवत्त attr;
 }
 
-#if defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
+#सचे defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
 /*
  * Get the GUI colors and attributes for a group ID.
  * NOTE: the colors will be INVALCOLOR when not set, the color otherwise.
  */
-    int
-syn_id2colors(int hl_id, guicolor_T *fgp, guicolor_T *bgp)
+    पूर्णाङ्क
+syn_id2colors(पूर्णाङ्क hl_id, guicolor_T *fgp, guicolor_T *bgp)
 {
     hl_group_T	*sgp;
 
     hl_id = syn_get_final_id(hl_id);
     // shouldn't happen
-    assert(hl_id > 0);
+    प्रतिज्ञा(hl_id > 0);
     sgp = &HL_TABLE()[hl_id - 1];	    // index is ID minus one
 
     *fgp = sgp->sg_gui_fg;
     *bgp = sgp->sg_gui_bg;
-    return sgp->sg_gui;
+    पटिनिवत्त sgp->sg_gui;
 }
 #endif
 
-#if (defined(MSWIN) \
+#सचे (defined(MSWIN) \
 	    && (!defined(FEAT_GUI_MSWIN) || defined(VIMDLL)) \
 	    && defined(FEAT_TERMGUICOLORS)) \
 	|| defined(FEAT_TERMINAL)
-    void
-syn_id2cterm_bg(int hl_id, int *fgp, int *bgp)
+    शून्य
+syn_id2cterm_bg(पूर्णाङ्क hl_id, पूर्णाङ्क *fgp, पूर्णाङ्क *bgp)
 {
     hl_group_T	*sgp;
 
     hl_id = syn_get_final_id(hl_id);
     // shouldn't happen
-    assert(hl_id > 0);
+    प्रतिज्ञा(hl_id > 0);
     sgp = &HL_TABLE()[hl_id - 1];	    // index is ID minus one
     *fgp = sgp->sg_cterm_fg - 1;
     *bgp = sgp->sg_cterm_bg - 1;
@@ -4486,158 +4486,158 @@ syn_id2cterm_bg(int hl_id, int *fgp, int *bgp)
 /*
  * Translate a group ID to the final group ID (following links).
  */
-    int
-syn_get_final_id(int hl_id)
+    पूर्णाङ्क
+syn_get_final_id(पूर्णाङ्क hl_id)
 {
-    int		count;
+    पूर्णाङ्क		गणनम्;
     hl_group_T	*sgp;
 
-    if (hl_id > highlight_ga.ga_len || hl_id < 1)
-	return 0;			// Can be called from eval!!
+    सचे (hl_id > highlight_ga.ga_len || hl_id < 1)
+	पटिनिवत्त 0;			// Can be called from eval!!
 
     // Follow links until there is no more.
     // Look out for loops!  Break after 100 links.
-    for (count = 100; --count >= 0; )
+    अत्थाय (गणनम् = 100; --गणनम् >= 0; )
     {
-	int tmp = hl_id;
+	पूर्णाङ्क tmp = hl_id;
 
 	sgp = &HL_TABLE()[hl_id - 1];	    // index is ID minus one
-	if (sgp->sg_link == 0 || sgp->sg_link > highlight_ga.ga_len)
-	    break;
+	सचे (sgp->sg_link == 0 || sgp->sg_link > highlight_ga.ga_len)
+	    भङ्ग;
 
 	// This is to handle highlight groups that are overridden but are in the
 	// middle of a link chain.
 	hl_id = syn_override(hl_id);
-	if (tmp != hl_id)
-	    continue;
+	सचे (tmp != hl_id)
+	    अनुवर्त;
 	hl_id = sgp->sg_link;
     }
-    return syn_override(hl_id);
+    पटिनिवत्त syn_override(hl_id);
 }
 
-#if defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
+#सचे defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
 /*
  * Call this function just after the GUI has started.
  * Also called when 'termguicolors' was set, gui.in_use will be FALSE then.
  * It finds the font and color handles for the highlighting groups.
  */
-    void
-highlight_gui_started(void)
+    शून्य
+highlight_gui_started(शून्य)
 {
-    int	    idx;
+    पूर्णाङ्क	    idx;
 
     // First get the colors from the "Normal" and "Menu" group, if set
-    if (USE_24BIT)
+    सचे (USE_24BIT)
 	set_normal_colors();
 
-    for (idx = 0; idx < highlight_ga.ga_len; ++idx)
+    अत्थाय (idx = 0; idx < highlight_ga.ga_len; ++idx)
 	gui_do_one_color(idx, FALSE, FALSE);
 
     highlight_changed();
 }
 
-    static void
+    स्थिर शून्य
 gui_do_one_color(
-    int		idx,
-    int		do_menu UNUSED,	   // TRUE: might set the menu font
-    int		do_tooltip UNUSED) // TRUE: might set the tooltip font
+    पूर्णाङ्क		idx,
+    पूर्णाङ्क		do_menu UNUSED,	   // TRUE: might set the menu font
+    पूर्णाङ्क		do_tooltip UNUSED) // TRUE: might set the tooltip font
 {
-    int		didit = FALSE;
+    पूर्णाङ्क		didit = FALSE;
 
 # ifdef FEAT_GUI
 #  ifdef FEAT_TERMGUICOLORS
-    if (gui.in_use)
+    सचे (gui.in_use)
 #  endif
-	if (HL_TABLE()[idx].sg_font_name != NULL)
+	सचे (HL_TABLE()[idx].sg_font_name != रिक्त)
 	{
 	    hl_do_font(idx, HL_TABLE()[idx].sg_font_name, FALSE, do_menu,
 							    do_tooltip, TRUE);
 	    didit = TRUE;
 	}
 # endif
-    if (HL_TABLE()[idx].sg_gui_fg_name != NULL)
+    सचे (HL_TABLE()[idx].sg_gui_fg_name != रिक्त)
     {
 	HL_TABLE()[idx].sg_gui_fg =
 			    color_name2handle(HL_TABLE()[idx].sg_gui_fg_name);
 	didit = TRUE;
     }
-    if (HL_TABLE()[idx].sg_gui_bg_name != NULL)
+    सचे (HL_TABLE()[idx].sg_gui_bg_name != रिक्त)
     {
 	HL_TABLE()[idx].sg_gui_bg =
 			    color_name2handle(HL_TABLE()[idx].sg_gui_bg_name);
 	didit = TRUE;
     }
-    if (HL_TABLE()[idx].sg_gui_sp_name != NULL)
+    सचे (HL_TABLE()[idx].sg_gui_sp_name != रिक्त)
     {
 	HL_TABLE()[idx].sg_gui_sp =
 			    color_name2handle(HL_TABLE()[idx].sg_gui_sp_name);
 	didit = TRUE;
     }
-    if (didit)	// need to get a new attr number
+    सचे (didit)	// need to get a new attr number
 	set_hl_attr(idx);
 }
 #endif
 
-#if defined(USER_HIGHLIGHT) && defined(FEAT_STL_OPT)
+#सचे defined(USER_HIGHLIGHT) && defined(FEAT_STL_OPT)
 /*
  * Apply difference between User[1-9] and HLF_S to HLF_SNC, HLF_ST or HLF_STNC.
  */
-    static void
+    स्थिर शून्य
 combine_stl_hlt(
-	int id,
-	int id_S,
-	int id_alt,
-	int hlcnt,
-	int i,
-	int hlf,
-	int *table)
+	पूर्णाङ्क id,
+	पूर्णाङ्क id_S,
+	पूर्णाङ्क id_alt,
+	पूर्णाङ्क hlcnt,
+	पूर्णाङ्क i,
+	पूर्णाङ्क hlf,
+	पूर्णाङ्क *table)
 {
     hl_group_T *hlt = HL_TABLE();
 
-    if (id_alt == 0)
+    सचे (id_alt == 0)
     {
 	CLEAR_POINTER(&hlt[hlcnt + i]);
 	hlt[hlcnt + i].sg_term = highlight_attr[hlf];
 	hlt[hlcnt + i].sg_cterm = highlight_attr[hlf];
-# if defined(FEAT_GUI) || defined(FEAT_EVAL)
+# सचे defined(FEAT_GUI) || defined(FEAT_EVAL)
 	hlt[hlcnt + i].sg_gui = highlight_attr[hlf];
 # endif
     }
-    else
+    अञ्ञथा
 	mch_memmove(&hlt[hlcnt + i],
 		    &hlt[id_alt - 1],
-		    sizeof(hl_group_T));
+		    परिमाण(hl_group_T));
     hlt[hlcnt + i].sg_link = 0;
 
     hlt[hlcnt + i].sg_term ^=
 	hlt[id - 1].sg_term ^ hlt[id_S - 1].sg_term;
-    if (hlt[id - 1].sg_start != hlt[id_S - 1].sg_start)
+    सचे (hlt[id - 1].sg_start != hlt[id_S - 1].sg_start)
 	hlt[hlcnt + i].sg_start = hlt[id - 1].sg_start;
-    if (hlt[id - 1].sg_stop != hlt[id_S - 1].sg_stop)
+    सचे (hlt[id - 1].sg_stop != hlt[id_S - 1].sg_stop)
 	hlt[hlcnt + i].sg_stop = hlt[id - 1].sg_stop;
     hlt[hlcnt + i].sg_cterm ^=
 	hlt[id - 1].sg_cterm ^ hlt[id_S - 1].sg_cterm;
-    if (hlt[id - 1].sg_cterm_fg != hlt[id_S - 1].sg_cterm_fg)
+    सचे (hlt[id - 1].sg_cterm_fg != hlt[id_S - 1].sg_cterm_fg)
 	hlt[hlcnt + i].sg_cterm_fg = hlt[id - 1].sg_cterm_fg;
-    if (hlt[id - 1].sg_cterm_bg != hlt[id_S - 1].sg_cterm_bg)
+    सचे (hlt[id - 1].sg_cterm_bg != hlt[id_S - 1].sg_cterm_bg)
 	hlt[hlcnt + i].sg_cterm_bg = hlt[id - 1].sg_cterm_bg;
-    if (hlt[id - 1].sg_cterm_font != hlt[id_S - 1].sg_cterm_font)
+    सचे (hlt[id - 1].sg_cterm_font != hlt[id_S - 1].sg_cterm_font)
 	hlt[hlcnt + i].sg_cterm_font = hlt[id - 1].sg_cterm_font;
-# if defined(FEAT_GUI) || defined(FEAT_EVAL)
+# सचे defined(FEAT_GUI) || defined(FEAT_EVAL)
     hlt[hlcnt + i].sg_gui ^=
 	hlt[id - 1].sg_gui ^ hlt[id_S - 1].sg_gui;
 # endif
 # ifdef FEAT_GUI
-    if (hlt[id - 1].sg_gui_fg != hlt[id_S - 1].sg_gui_fg)
+    सचे (hlt[id - 1].sg_gui_fg != hlt[id_S - 1].sg_gui_fg)
 	hlt[hlcnt + i].sg_gui_fg = hlt[id - 1].sg_gui_fg;
-    if (hlt[id - 1].sg_gui_bg != hlt[id_S - 1].sg_gui_bg)
+    सचे (hlt[id - 1].sg_gui_bg != hlt[id_S - 1].sg_gui_bg)
 	hlt[hlcnt + i].sg_gui_bg = hlt[id - 1].sg_gui_bg;
-    if (hlt[id - 1].sg_gui_sp != hlt[id_S - 1].sg_gui_sp)
+    सचे (hlt[id - 1].sg_gui_sp != hlt[id_S - 1].sg_gui_sp)
 	hlt[hlcnt + i].sg_gui_sp = hlt[id - 1].sg_gui_sp;
-    if (hlt[id - 1].sg_font != hlt[id_S - 1].sg_font)
+    सचे (hlt[id - 1].sg_font != hlt[id_S - 1].sg_font)
 	hlt[hlcnt + i].sg_font = hlt[id - 1].sg_font;
 #  ifdef FEAT_XFONTSET
-    if (hlt[id - 1].sg_fontset != hlt[id_S - 1].sg_fontset)
+    सचे (hlt[id - 1].sg_fontset != hlt[id_S - 1].sg_fontset)
 	hlt[hlcnt + i].sg_fontset = hlt[id - 1].sg_fontset;
 #  endif
 # endif
@@ -4655,26 +4655,26 @@ combine_stl_hlt(
  * screen redraw after any :highlight command.
  * Return FAIL when an invalid flag is found in 'highlight'.  OK otherwise.
  */
-    int
-highlight_changed(void)
+    पूर्णाङ्क
+highlight_changed(शून्य)
 {
-    int		hlf;
-    int		i;
+    पूर्णाङ्क		hlf;
+    पूर्णाङ्क		i;
     char_u	*p;
     char_u	*default_hl;
-    int		attr;
+    पूर्णाङ्क		attr;
     char_u	*end;
-    int		id;
+    पूर्णाङ्क		id;
 #ifdef USER_HIGHLIGHT
     char_u      userhl[30];  // use 30 to avoid compiler warning
 # ifdef FEAT_STL_OPT
-    int		id_S = -1;
-    int		id_SNC = 0;
+    पूर्णाङ्क		id_S = -1;
+    पूर्णाङ्क		id_SNC = 0;
 #  ifdef FEAT_TERMINAL
-    int		id_ST = 0;
-    int		id_STNC = 0;
+    पूर्णाङ्क		id_ST = 0;
+    पूर्णाङ्क		id_STNC = 0;
 #  endif
-    int		hlcnt;
+    पूर्णाङ्क		hlcnt;
 # endif
 #endif
     win_T	*wp;
@@ -4687,7 +4687,7 @@ highlight_changed(void)
 #endif
 
     // Clear all attributes.
-    for (hlf = 0; hlf < (int)HLF_COUNT; ++hlf)
+    अत्थाय (hlf = 0; hlf < (पूर्णाङ्क)HLF_गणनम्; ++hlf)
     {
 	highlight_attr[hlf] = 0;
 	highlight_attr_raw[hlf] = 0;
@@ -4699,92 +4699,92 @@ highlight_changed(void)
     // First set all attributes to their default value.
     // Then use the attributes from the 'highlight' option, unless it already
     // matches the default and would repeat the same work.
-    for (i = 0; i < 2; ++i)
+    अत्थाय (i = 0; i < 2; ++i)
     {
-	if (i)
+	सचे (i)
 	{
-	    if (default_hl != NULL && p_hl != NULL
+	    सचे (default_hl != रिक्त && p_hl != रिक्त
 				      && STRCMP(default_hl, p_hl) == 0)
-		continue;
+		अनुवर्त;
 	    p = p_hl;
 	}
-	else
+	अञ्ञथा
 	    p = default_hl;
-	if (p == NULL)	    // just in case
-	    continue;
+	सचे (p == रिक्त)	    // just in case
+	    अनुवर्त;
 
-	while (*p)
+	याव (*p)
 	{
-	    for (hlf = 0; hlf < (int)HLF_COUNT; ++hlf)
-		if (hl_flags[hlf] == *p)
-		    break;
+	    अत्थाय (hlf = 0; hlf < (पूर्णाङ्क)HLF_गणनम्; ++hlf)
+		सचे (hl_flags[hlf] == *p)
+		    भङ्ग;
 	    ++p;
-	    if (hlf == (int)HLF_COUNT || *p == NUL)
-		return FAIL;
+	    सचे (hlf == (पूर्णाङ्क)HLF_गणनम् || *p == NUL)
+		पटिनिवत्त FAIL;
 
 	    // Allow several hl_flags to be combined, like "bu" for
 	    // bold-underlined.
 	    attr = 0;
 	    id = 0;
-	    for ( ; *p && *p != ','; ++p)	    // parse up to comma
+	    अत्थाय ( ; *p && *p != ','; ++p)	    // parse up to comma
 	    {
-		if (VIM_ISWHITE(*p))		    // ignore white space
-		    continue;
+		सचे (VIM_ISWHITE(*p))		    // ignore white space
+		    अनुवर्त;
 
-		if (attr > HL_ALL)  // Combination with ':' is not allowed.
-		    return FAIL;
+		सचे (attr > HL_ALL)  // Combination with ':' is not allowed.
+		    पटिनिवत्त FAIL;
 
 		// Note: Keep this in sync with expand_set_highlight().
-		switch (*p)
+		विकल्प (*p)
 		{
-		    case 'b':	attr |= HL_BOLD;
-				break;
-		    case 'i':	attr |= HL_ITALIC;
-				break;
-		    case '-':
-		    case 'n':			    // no highlighting
-				break;
-		    case 'r':	attr |= HL_INVERSE;
-				break;
-		    case 's':	attr |= HL_STANDOUT;
-				break;
-		    case 'u':	attr |= HL_UNDERLINE;
-				break;
-		    case 'c':	attr |= HL_UNDERCURL;
-				break;
-		    case '2':	attr |= HL_UNDERDOUBLE;
-				break;
-		    case 'd':	attr |= HL_UNDERDOTTED;
-				break;
-		    case '=':	attr |= HL_UNDERDASHED;
-				break;
-		    case 't':	attr |= HL_STRIKETHROUGH;
-				break;
-		    case ':':	++p;		    // highlight group name
-				if (attr || *p == NUL)	 // no combinations
-				    return FAIL;
+		    पक्ष 'b':	attr |= HL_BOLD;
+				भङ्ग;
+		    पक्ष 'i':	attr |= HL_ITALIC;
+				भङ्ग;
+		    पक्ष '-':
+		    पक्ष 'n':			    // no highlighting
+				भङ्ग;
+		    पक्ष 'r':	attr |= HL_INVERSE;
+				भङ्ग;
+		    पक्ष 's':	attr |= HL_STANDOUT;
+				भङ्ग;
+		    पक्ष 'u':	attr |= HL_UNDERLINE;
+				भङ्ग;
+		    पक्ष 'c':	attr |= HL_UNDERCURL;
+				भङ्ग;
+		    पक्ष '2':	attr |= HL_UNDERDOUBLE;
+				भङ्ग;
+		    पक्ष 'd':	attr |= HL_UNDERDOTTED;
+				भङ्ग;
+		    पक्ष '=':	attr |= HL_UNDERDASHED;
+				भङ्ग;
+		    पक्ष 't':	attr |= HL_STRIKETHROUGH;
+				भङ्ग;
+		    पक्ष ':':	++p;		    // highlight group name
+				सचे (attr || *p == NUL)	 // no combinations
+				    पटिनिवत्त FAIL;
 				end = vim_strchr(p, ',');
-				if (end == NULL)
+				सचे (end == रिक्त)
 				    end = p + STRLEN(p);
-				id = syn_check_group(p, (int)(end - p));
-				if (id == 0)
-				    return FAIL;
+				id = syn_check_group(p, (पूर्णाङ्क)(end - p));
+				सचे (id == 0)
+				    पटिनिवत्त FAIL;
 				attr = syn_id2attr(id);
 				p = end - 1;
-#if defined(FEAT_STL_OPT) && defined(USER_HIGHLIGHT)
-				if (hlf == (int)HLF_SNC)
+#सचे defined(FEAT_STL_OPT) && defined(USER_HIGHLIGHT)
+				सचे (hlf == (पूर्णाङ्क)HLF_SNC)
 				    id_SNC = syn_get_final_id(id);
 # ifdef FEAT_TERMINAL
-				else if (hlf == (int)HLF_ST)
+				अञ्ञथा सचे (hlf == (पूर्णाङ्क)HLF_ST)
 				    id_ST = syn_get_final_id(id);
-				else if (hlf == (int)HLF_STNC)
+				अञ्ञथा सचे (hlf == (पूर्णाङ्क)HLF_STNC)
 				    id_STNC = syn_get_final_id(id);
 # endif
-				else if (hlf == (int)HLF_S)
+				अञ्ञथा सचे (hlf == (पूर्णाङ्क)HLF_S)
 				    id_S = syn_get_final_id(id);
 #endif
-				break;
-		    default:	return FAIL;
+				भङ्ग;
+		    स्वभाव:	पटिनिवत्त FAIL;
 		}
 	    }
 	    highlight_attr[hlf] = attr;
@@ -4798,9 +4798,9 @@ highlight_changed(void)
     // Highlight ids may have been changed, so keep windows up to date
     FOR_ALL_WINDOWS(wp)
     {
-	char *errmsg = update_winhighlight(wp, wp->w_p_whl);
+	वर्ण *errmsg = update_winhighlight(wp, wp->w_p_whl);
 
-	if (errmsg != NULL)
+	सचे (errmsg != रिक्त)
 	    emsg(_(errmsg));
     }
 
@@ -4819,10 +4819,10 @@ highlight_changed(void)
     // Have to be in there simultaneously in case of table overflows in
     // get_attr_entry()
 # ifdef FEAT_STL_OPT
-    if (ga_grow(&highlight_ga, 28) == FAIL)
-	return FAIL;
+    सचे (ga_grow(&highlight_ga, 28) == FAIL)
+	पटिनिवत्त FAIL;
     hlcnt = highlight_ga.ga_len;
-    if (id_S == -1)
+    सचे (id_S == -1)
     {
 	// Make sure id_S is always valid to simplify code below. Use the last
 	// entry.
@@ -4831,11 +4831,11 @@ highlight_changed(void)
 	id_S = hlcnt + 19;
     }
 # endif
-    for (i = 0; i < 9; i++)
+    अत्थाय (i = 0; i < 9; i++)
     {
-	sprintf((char *)userhl, "User%d", i + 1);
+	sprintf((वर्ण *)userhl, "User%d", i + 1);
 	id = syn_name2id(userhl);
-	if (id == 0)
+	सचे (id == 0)
 	{
 	    highlight_user[i] = 0;
 # ifdef FEAT_STL_OPT
@@ -4846,7 +4846,7 @@ highlight_changed(void)
 #  endif
 # endif
 	}
-	else
+	अञ्ञथा
 	{
 	    highlight_user[i] = syn_id2attr(id);
 # ifdef FEAT_STL_OPT
@@ -4867,29 +4867,29 @@ highlight_changed(void)
 
 #endif // USER_HIGHLIGHT
 
-    return OK;
+    पटिनिवत्त OK;
 }
 
-static void highlight_list(void);
-static void highlight_list_two(int cnt, int attr);
+स्थिर शून्य highlight_list(शून्य);
+स्थिर शून्य highlight_list_two(पूर्णाङ्क cnt, पूर्णाङ्क attr);
 
 // context for :highlight <group> <arg> expansion
-static int expand_hi_synid = 0;	    // ID for highlight group being completed
-static int expand_hi_equal_col = 0; // column where the '=' is
-static int expand_hi_include_orig = 0;	    // whether to fill the existing current value or not
-static char_u *expand_hi_curvalue = NULL;   // the existing current value
-#if defined(FEAT_EVAL) && (defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS))
-static dict_iterator_T expand_colornames_iter;	// iterator for looping through v:colornames
+स्थिर पूर्णाङ्क expand_hi_synid = 0;	    // ID for highlight group being completed
+स्थिर पूर्णाङ्क expand_hi_equal_col = 0; // column where the '=' is
+स्थिर पूर्णाङ्क expand_hi_include_orig = 0;	    // whether to fill the existing current value or not
+स्थिर char_u *expand_hi_curvalue = रिक्त;   // the existing current value
+#सचे defined(FEAT_EVAL) && (defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS))
+स्थिर dict_iterator_T expand_colornames_iter;	// iterator for looping through v:colornames
 #endif
 
 /*
  * Handle command line completion for :highlight command.
  */
-    void
+    शून्य
 set_context_in_highlight_cmd(expand_T *xp, char_u *arg)
 {
     char_u	*p;
-    int		expand_group = TRUE;
+    पूर्णाङ्क		expand_group = TRUE;
 
     // Default: expand group names
     xp->xp_context = EXPAND_HIGHLIGHT;
@@ -4898,37 +4898,37 @@ set_context_in_highlight_cmd(expand_T *xp, char_u *arg)
     include_link = 2;
     include_default = 1;
 
-    if (*arg == NUL)
-	return;
+    सचे (*arg == NUL)
+	पटिनिवत्त;
 
     // (part of) subcommand already typed
     p = skiptowhite(arg);
-    if (*p == NUL)
-	return;
+    सचे (*p == NUL)
+	पटिनिवत्त;
 
     // past "default" or group name
     include_default = 0;
-    if (STRNCMP("default", arg, p - arg) == 0)
+    सचे (STRNCMP("default", arg, p - arg) == 0)
     {
 	arg = skipwhite(p);
 	xp->xp_pattern = arg;
 	p = skiptowhite(arg);
     }
-    if (*p == NUL)
-	return;
+    सचे (*p == NUL)
+	पटिनिवत्त;
 
     // past group name
     include_link = 0;
-    if (arg[1] == 'i' && arg[0] == 'N')
+    सचे (arg[1] == 'i' && arg[0] == 'N')
     {
 	highlight_list();
 	expand_group = FALSE;
     }
-    if (STRNCMP("link", arg, p - arg) == 0)
+    सचे (STRNCMP("link", arg, p - arg) == 0)
     {
 	xp->xp_pattern = skipwhite(p);
 	p = skiptowhite(xp->xp_pattern);
-	if (*p != NUL)		// past first group name
+	सचे (*p != NUL)		// past first group name
 	{
 	    xp->xp_pattern = skipwhite(p);
 	    p = skiptowhite(xp->xp_pattern);
@@ -4936,59 +4936,59 @@ set_context_in_highlight_cmd(expand_T *xp, char_u *arg)
 	}
 	expand_group = FALSE;
     }
-    else if (STRNCMP("clear", arg, p - arg) == 0)
+    अञ्ञथा सचे (STRNCMP("clear", arg, p - arg) == 0)
     {
 	xp->xp_pattern = skipwhite(p);
 	p = skiptowhite(xp->xp_pattern);
 	expand_group = FALSE;
     }
-    if (*p != NUL)			// past group name(s)
+    सचे (*p != NUL)			// past group name(s)
     {
-	if (expand_group)
+	सचे (expand_group)
 	{
 	    // expansion will be done in expand_highlight_group()
 	    xp->xp_context = EXPAND_HIGHLIGHT_GROUP;
 
-	    expand_hi_synid = syn_namen2id(arg, (int)(p - arg));
+	    expand_hi_synid = syn_namen2id(arg, (पूर्णाङ्क)(p - arg));
 
-	    while (*p != NUL)
+	    याव (*p != NUL)
 	    {
 		arg = skipwhite(p);
 		p = skiptowhite(arg);
 	    }
 
 	    p = vim_strchr(arg, '=');
-	    if (p == NULL)
+	    सचे (p == रिक्त)
 	    {
 		// Didn't find a key=<value> pattern
 		xp->xp_pattern = arg;
 		expand_hi_equal_col = -1;
 		expand_hi_include_orig = FALSE;
 	    }
-	    else
+	    अञ्ञथा
 	    {
 		// Found key=<value> pattern, record the exact location
-		expand_hi_equal_col = (int)(p - xp->xp_line);
+		expand_hi_equal_col = (पूर्णाङ्क)(p - xp->xp_पङ्क्तिः);
 
 		// Only include the original value if the pattern is empty
-		if (*(p + 1) == NUL)
+		सचे (*(p + 1) == NUL)
 		    expand_hi_include_orig = TRUE;
-		else
+		अञ्ञथा
 		    expand_hi_include_orig = FALSE;
 
 		// Account for comma-separated values
-		if (STRNCMP(arg, "term=", 5) == 0 ||
+		सचे (STRNCMP(arg, "term=", 5) == 0 ||
 			STRNCMP(arg, "cterm=", 6) == 0 ||
 			STRNCMP(arg, "gui=", 4) == 0)
 		{
 		    char_u *comma = vim_strrchr(p + 1, ',');
-		    if (comma != NULL)
+		    सचे (comma != रिक्त)
 			p = comma;
 		}
 		xp->xp_pattern = p + 1;
 	    }
 	}
-	else
+	अञ्ञथा
 	{
 	    xp->xp_context = EXPAND_NOTHING;
 	}
@@ -4998,22 +4998,22 @@ set_context_in_highlight_cmd(expand_T *xp, char_u *arg)
 /*
  * List highlighting matches in a nice way.
  */
-    static void
-highlight_list(void)
+    स्थिर शून्य
+highlight_list(शून्य)
 {
-    int		i;
+    पूर्णाङ्क		i;
 
-    for (i = 10; --i >= 0; )
+    अत्थाय (i = 10; --i >= 0; )
 	highlight_list_two(i, HL_ATTR(HLF_D));
-    for (i = 40; --i >= 0; )
+    अत्थाय (i = 40; --i >= 0; )
 	highlight_list_two(99, 0);
 }
 
-    static void
-highlight_list_two(int cnt, int attr)
+    स्थिर शून्य
+highlight_list_two(पूर्णाङ्क cnt, पूर्णाङ्क attr)
 {
-    msg_puts_attr(&("N \bI \b!  \b"[cnt / 11]), attr);
-    msg_clr_eos();
+    सन्देशः_puts_attr(&("N \bI \b!  \b"[cnt / 11]), attr);
+    सन्देशः_clr_eos();
     out_flush();
     ui_delay(cnt == 99 ? 40L : (long)cnt * 50L, FALSE);
 }
@@ -5022,9 +5022,9 @@ highlight_list_two(int cnt, int attr)
  * Function given to ExpandGeneric() to obtain the list of group names.
  */
     char_u *
-get_highlight_name(expand_T *xp UNUSED, int idx)
+get_highlight_name(expand_T *xp UNUSED, पूर्णाङ्क idx)
 {
-    return get_highlight_name_ext(xp, idx, TRUE);
+    पटिनिवत्त get_highlight_name_ext(xp, idx, TRUE);
 }
 
 /*
@@ -5032,123 +5032,123 @@ get_highlight_name(expand_T *xp UNUSED, int idx)
  * When "skip_cleared" is TRUE don't return a cleared entry.
  */
     char_u *
-get_highlight_name_ext(expand_T *xp UNUSED, int idx, int skip_cleared)
+get_highlight_name_ext(expand_T *xp UNUSED, पूर्णाङ्क idx, पूर्णाङ्क skip_cleared)
 {
-    if (idx < 0)
-	return NULL;
+    सचे (idx < 0)
+	पटिनिवत्त रिक्त;
 
     // Items are never removed from the table, skip the ones that were
     // cleared.
-    if (skip_cleared && idx < highlight_ga.ga_len && HL_TABLE()[idx].sg_cleared)
-	return (char_u *)"";
+    सचे (skip_cleared && idx < highlight_ga.ga_len && HL_TABLE()[idx].sg_cleared)
+	पटिनिवत्त (char_u *)"";
 
-    if (idx == highlight_ga.ga_len && include_none != 0)
-	return (char_u *)"NONE";
-    if (idx == highlight_ga.ga_len + include_none && include_default != 0)
-	return (char_u *)"default";
-    if (idx == highlight_ga.ga_len + include_none + include_default
+    सचे (idx == highlight_ga.ga_len && include_none != 0)
+	पटिनिवत्त (char_u *)"NONE";
+    सचे (idx == highlight_ga.ga_len + include_none && include_default != 0)
+	पटिनिवत्त (char_u *)"default";
+    सचे (idx == highlight_ga.ga_len + include_none + include_default
 							 && include_link != 0)
-	return (char_u *)"link";
-    if (idx == highlight_ga.ga_len + include_none + include_default + 1
+	पटिनिवत्त (char_u *)"link";
+    सचे (idx == highlight_ga.ga_len + include_none + include_default + 1
 							 && include_link != 0)
-	return (char_u *)"clear";
-    if (idx >= highlight_ga.ga_len)
-	return NULL;
-    return HL_TABLE()[idx].sg_name;
+	पटिनिवत्त (char_u *)"clear";
+    सचे (idx >= highlight_ga.ga_len)
+	पटिनिवत्त रिक्त;
+    पटिनिवत्त HL_TABLE()[idx].sg_name;
 }
 
-    static char_u *
-get_highlight_attr_name(expand_T *xp UNUSED, int idx)
+    स्थिर char_u *
+get_highlight_attr_name(expand_T *xp UNUSED, पूर्णाङ्क idx)
 {
-    if (idx == 0)
+    सचे (idx == 0)
     {
 	// Fill with current value first
-	if (expand_hi_curvalue != NULL)
-	    return expand_hi_curvalue;
-	else
-	    return (char_u*)"";
+	सचे (expand_hi_curvalue != रिक्त)
+	    पटिनिवत्त expand_hi_curvalue;
+	अञ्ञथा
+	    पटिनिवत्त (char_u*)"";
     }
-    if (idx < (int)ARRAY_LENGTH(highlight_index_tab) + 1)
+    सचे (idx < (पूर्णाङ्क)ARRAY_LENGTH(highlight_index_tab) + 1)
     {
-	char_u *value = highlight_index_tab[idx-1]->value.string;
-	if (expand_hi_curvalue != NULL && STRCMP(expand_hi_curvalue, value) == 0)
+	char_u *मानम् = highlight_index_tab[idx-1]->मानम्.string;
+	सचे (expand_hi_curvalue != रिक्त && STRCMP(expand_hi_curvalue, मानम्) == 0)
 	{
 	    // Already returned the current value above, just skip.
-	    return (char_u*)"";
+	    पटिनिवत्त (char_u*)"";
 	}
-	return value;
+	पटिनिवत्त मानम्;
     }
-    return NULL;
+    पटिनिवत्त रिक्त;
 }
 
-    static char_u *
-get_highlight_cterm_color(expand_T *xp UNUSED, int idx)
+    स्थिर char_u *
+get_highlight_cterm_color(expand_T *xp UNUSED, पूर्णाङ्क idx)
 {
-    if (idx == 0)
+    सचे (idx == 0)
     {
 	// Fill with current value first
-	if (expand_hi_curvalue != NULL)
-	    return expand_hi_curvalue;
-	else
-	    return (char_u*)"";
+	सचे (expand_hi_curvalue != रिक्त)
+	    पटिनिवत्त expand_hi_curvalue;
+	अञ्ञथा
+	    पटिनिवत्त (char_u*)"";
     }
     // See highlight_set_cterm_color()
-    else if (idx == 1)
-	return (char_u*)"fg";
-    else if (idx == 2)
-	return (char_u*)"bg";
-    if (idx < (int)ARRAY_LENGTH(color_name_tab) + 3)
+    अञ्ञथा सचे (idx == 1)
+	पटिनिवत्त (char_u*)"fg";
+    अञ्ञथा सचे (idx == 2)
+	पटिनिवत्त (char_u*)"bg";
+    सचे (idx < (पूर्णाङ्क)ARRAY_LENGTH(color_name_tab) + 3)
     {
-	char_u *value = color_name_tab[idx-3].value.string;
-	return value;
+	char_u *मानम् = color_name_tab[idx-3].मानम्.string;
+	पटिनिवत्त मानम्;
     }
-    return NULL;
+    पटिनिवत्त रिक्त;
 }
 
-#if defined(FEAT_EVAL) && (defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS))
-    static char_u *
-get_highlight_gui_color(expand_T *xp UNUSED, int idx)
+#सचे defined(FEAT_EVAL) && (defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS))
+    स्थिर char_u *
+get_highlight_gui_color(expand_T *xp UNUSED, पूर्णाङ्क idx)
 {
-    if (idx == 0)
+    सचे (idx == 0)
     {
 	// Fill with current value first
-	if (expand_hi_curvalue != NULL)
-	    return expand_hi_curvalue;
-	else
-	    return (char_u*)"";
+	सचे (expand_hi_curvalue != रिक्त)
+	    पटिनिवत्त expand_hi_curvalue;
+	अञ्ञथा
+	    पटिनिवत्त (char_u*)"";
     }
     // See color_name2handle()
-    else if (idx == 1)
-	return (char_u*)"fg";
-    else if (idx == 2)
-	return (char_u*)"bg";
-    else if (idx == 3)
-	return (char_u*)"NONE";
+    अञ्ञथा सचे (idx == 1)
+	पटिनिवत्त (char_u*)"fg";
+    अञ्ञथा सचे (idx == 2)
+	पटिनिवत्त (char_u*)"bg";
+    अञ्ञथा सचे (idx == 3)
+	पटिनिवत्त (char_u*)"NONE";
 
     // Complete from v:colornames. Don't do platform specific names for now.
     typval_T *tv_result;
     char_u *colorname = dict_iterate_next(&expand_colornames_iter, &tv_result);
-    if (colorname != NULL)
+    सचे (colorname != रिक्त)
     {
 	// :hi command doesn't allow space, so don't suggest any malformed items
-	if (vim_strchr(colorname, ' ') != NULL)
-	    return (char_u*)"";
+	सचे (vim_strchr(colorname, ' ') != रिक्त)
+	    पटिनिवत्त (char_u*)"";
 
-	if (expand_hi_curvalue != NULL && STRICMP(expand_hi_curvalue, colorname) == 0)
+	सचे (expand_hi_curvalue != रिक्त && STRICMP(expand_hi_curvalue, colorname) == 0)
 	{
 	    // Already returned the current value above, just skip.
-	    return (char_u*)"";
+	    पटिनिवत्त (char_u*)"";
 	}
     }
-    return colorname;
+    पटिनिवत्त colorname;
 }
 #endif
 
-    static char_u *
-get_highlight_group_key(expand_T *xp UNUSED, int idx)
+    स्थिर char_u *
+get_highlight_group_कुञ्चिका(expand_T *xp UNUSED, पूर्णाङ्क idx)
 {
     // Note: Keep this in sync with do_highlight.
-    static char *(p_hi_group_key_values[]) =
+    स्थिर वर्ण *(p_hi_group_कुञ्चिका_मानानि[]) =
     {
 	"term=",
 	"start=",
@@ -5158,7 +5158,7 @@ get_highlight_group_key(expand_T *xp UNUSED, int idx)
 	"ctermbg=",
 	"ctermul=",
 	"ctermfont=",
-#if defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
+#सचे defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
 	"gui=",
 	"guifg=",
 	"guibg=",
@@ -5170,127 +5170,127 @@ get_highlight_group_key(expand_T *xp UNUSED, int idx)
 	"NONE",
     };
 
-    if (idx < (int)ARRAY_LENGTH(p_hi_group_key_values))
-	return (char_u*)p_hi_group_key_values[idx];
-    return NULL;
+    सचे (idx < (पूर्णाङ्क)ARRAY_LENGTH(p_hi_group_कुञ्चिका_मानानि))
+	पटिनिवत्त (char_u*)p_hi_group_कुञ्चिका_मानानि[idx];
+    पटिनिवत्त रिक्त;
 }
 
 /*
  * Command-line expansion for :hi {group-name} <args>...
  */
-    int
+    पूर्णाङ्क
 expand_highlight_group(
 	char_u	    *pat,
 	expand_T    *xp,
 	regmatch_T  *rmp,
 	char_u	    ***matches,
-	int	    *numMatches)
+	पूर्णाङ्क	    *अङ्कः_Matches)
 {
-    if (expand_hi_equal_col != -1)
+    सचे (expand_hi_equal_col != -1)
     {
 	// List the values. First fill in the current value, then if possible colors
 	// or attribute names.
-	char_u	    *(*expandfunc)(expand_T *, int) = NULL;
-	int	    type = 0;
-	hl_group_T  *sgp = NULL;
-	int	    iarg = 0;
-	char_u	    *sarg = NULL;
+	char_u	    *(*expandfunc)(expand_T *, पूर्णाङ्क) = रिक्त;
+	पूर्णाङ्क	    type = 0;
+	hl_group_T  *sgp = रिक्त;
+	पूर्णाङ्क	    iarg = 0;
+	char_u	    *sarg = रिक्त;
 
-	int	    unsortedItems = -1; // don't sort by default
+	पूर्णाङ्क	    unsorted_वस्तूनि = -1; // don't sort by default
 
-	if (expand_hi_synid != 0)
+	सचे (expand_hi_synid != 0)
 	    sgp = &HL_TABLE()[expand_hi_synid - 1]; // index is ID minus one
 
 	// Note: Keep this in sync with highlight_list_one().
-	char_u	    *name_end = xp->xp_line + expand_hi_equal_col;
-	if (name_end - xp->xp_line >= 5
+	char_u	    *name_end = xp->xp_पङ्क्तिः + expand_hi_equal_col;
+	सचे (name_end - xp->xp_पङ्क्तिः >= 5
 		&& STRNCMP(name_end - 5, " term", 5) == 0)
 	{
 	    expandfunc = get_highlight_attr_name;
-	    if (sgp)
+	    सचे (sgp)
 	    {
 		type = LIST_ATTR;
 		iarg = sgp->sg_term;
 	    }
 	}
-	else if (name_end - xp->xp_line >= 6
+	अञ्ञथा सचे (name_end - xp->xp_पङ्क्तिः >= 6
 		&& STRNCMP(name_end - 6, " cterm", 6) == 0)
 	{
 	    expandfunc = get_highlight_attr_name;
-	    if (sgp)
+	    सचे (sgp)
 	    {
 		type = LIST_ATTR;
 		iarg = sgp->sg_cterm;
 	    }
 	}
-#if defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
-	else if (name_end - xp->xp_line >= 4
+#सचे defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS)
+	अञ्ञथा सचे (name_end - xp->xp_पङ्क्तिः >= 4
 		&& STRNCMP(name_end - 4, " gui", 4) == 0)
 	{
 	    expandfunc = get_highlight_attr_name;
-	    if (sgp)
+	    सचे (sgp)
 	    {
 		type = LIST_ATTR;
 		iarg = sgp->sg_gui;
 	    }
 	}
 #endif
-	else if (name_end - xp->xp_line >= 8
+	अञ्ञथा सचे (name_end - xp->xp_पङ्क्तिः >= 8
 		&& STRNCMP(name_end - 8, " ctermfg", 8) == 0)
 	{
 	    expandfunc = get_highlight_cterm_color;
-	    if (sgp)
+	    सचे (sgp)
 	    {
 		type = LIST_INT;
 		iarg = sgp->sg_cterm_fg;
 	    }
 	}
-	else if (name_end - xp->xp_line >= 8
+	अञ्ञथा सचे (name_end - xp->xp_पङ्क्तिः >= 8
 		&& STRNCMP(name_end - 8, " ctermbg", 8) == 0)
 	{
 	    expandfunc = get_highlight_cterm_color;
-	    if (sgp)
+	    सचे (sgp)
 	    {
 		type = LIST_INT;
 		iarg = sgp->sg_cterm_bg;
 	    }
 	}
-	else if (name_end - xp->xp_line >= 8
+	अञ्ञथा सचे (name_end - xp->xp_पङ्क्तिः >= 8
 		&& STRNCMP(name_end - 8, " ctermul", 8) == 0)
 	{
 	    expandfunc = get_highlight_cterm_color;
-	    if (sgp)
+	    सचे (sgp)
 	    {
 		type = LIST_INT;
 		iarg = sgp->sg_cterm_ul;
 	    }
 	}
-#if defined(FEAT_EVAL) && (defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS))
-	else if (name_end - xp->xp_line >= 6
+#सचे defined(FEAT_EVAL) && (defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS))
+	अञ्ञथा सचे (name_end - xp->xp_पङ्क्तिः >= 6
 		&& STRNCMP(name_end - 6, " guifg", 6) == 0)
 	{
 	    expandfunc = get_highlight_gui_color;
-	    if (sgp)
+	    सचे (sgp)
 	    {
 		type = LIST_STRING;
 		sarg = sgp->sg_gui_fg_name;
 	    }
 	}
-	else if (name_end - xp->xp_line >= 6
+	अञ्ञथा सचे (name_end - xp->xp_पङ्क्तिः >= 6
 		&& STRNCMP(name_end - 6, " guibg", 6) == 0)
 	{
 	    expandfunc = get_highlight_gui_color;
-	    if (sgp)
+	    सचे (sgp)
 	    {
 		type = LIST_STRING;
 		sarg = sgp->sg_gui_bg_name;
 	    }
 	}
-	else if (name_end - xp->xp_line >= 6
+	अञ्ञथा सचे (name_end - xp->xp_पङ्क्तिः >= 6
 		&& STRNCMP(name_end - 6, " guisp", 6) == 0)
 	{
 	    expandfunc = get_highlight_gui_color;
-	    if (sgp)
+	    सचे (sgp)
 	    {
 		type = LIST_STRING;
 		sarg = sgp->sg_gui_sp_name;
@@ -5298,11 +5298,11 @@ expand_highlight_group(
 	}
 #endif
 
-#if defined(FEAT_EVAL) && (defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS))
-	if (expandfunc == get_highlight_gui_color)
+#सचे defined(FEAT_EVAL) && (defined(FEAT_GUI) || defined(FEAT_TERMGUICOLORS))
+	सचे (expandfunc == get_highlight_gui_color)
 	{
 	    // Top 4 items are special, after that sort all the color names
-	    unsortedItems = 4;
+	    unsorted_वस्तूनि = 4;
 
 	    dict_T *colornames_table = get_vim_var_dict(VV_COLORNAMES);
 	    typval_T colornames_val;
@@ -5314,11 +5314,11 @@ expand_highlight_group(
 
 	char_u	    buf[MAX_ATTR_LEN];
 
-	expand_hi_curvalue = NULL;
-	if (expand_hi_include_orig)
+	expand_hi_curvalue = रिक्त;
+	सचे (expand_hi_include_orig)
 	{
-	    if (((type == LIST_ATTR || type == LIST_INT) && iarg != 0) ||
-		(type == LIST_STRING && sarg != NULL))
+	    सचे (((type == LIST_ATTR || type == LIST_INT) && iarg != 0) ||
+		(type == LIST_STRING && sarg != रिक्त))
 	    {
 		// Retrieve the current value to go first in completion
 		expand_hi_curvalue = highlight_arg_to_string(
@@ -5326,45 +5326,45 @@ expand_highlight_group(
 	    }
 	}
 
-	if (expandfunc != NULL)
+	सचे (expandfunc != रिक्त)
 	{
-	    return ExpandGenericExt(
+	    पटिनिवत्त ExpandGenericExt(
 		    pat,
 		    xp,
 		    rmp,
 		    matches,
-		    numMatches,
+		    अङ्कः_Matches,
 		    expandfunc,
 		    FALSE,
-		    unsortedItems);
+		    unsorted_वस्तूनि);
 	}
 
-	return FAIL;
+	पटिनिवत्त FAIL;
     }
 
     // List all the key names
-    return ExpandGenericExt(
+    पटिनिवत्त ExpandGenericExt(
 	    pat,
 	    xp,
 	    rmp,
 	    matches,
-	    numMatches,
-	    get_highlight_group_key,
+	    अङ्कः_Matches,
+	    get_highlight_group_कुञ्चिका,
 	    FALSE,
 	    -1);
 }
 
-#if defined(FEAT_GUI)
+#सचे defined(FEAT_GUI)
 /*
  * Free all the highlight group fonts.
  * Used when quitting for systems which need it.
  */
-    void
-free_highlight_fonts(void)
+    शून्य
+free_highlight_fonts(शून्य)
 {
-    int	    idx;
+    पूर्णाङ्क	    idx;
 
-    for (idx = 0; idx < highlight_ga.ga_len; ++idx)
+    अत्थाय (idx = 0; idx < highlight_ga.ga_len; ++idx)
     {
 	gui_mch_free_font(HL_TABLE()[idx].sg_font);
 	HL_TABLE()[idx].sg_font = NOFONT;
@@ -5386,34 +5386,34 @@ free_highlight_fonts(void)
 }
 #endif
 
-#if defined(FEAT_EVAL)
+#सचे defined(FEAT_EVAL)
 /*
  * Convert each of the highlight attribute bits (bold, standout, underline,
  * etc.) set in 'hlattr' into a separate boolean item in a Dictionary with
  * the attribute name as the key.
  */
-    static dict_T *
-highlight_get_attr_dict(int hlattr)
+    स्थिर dict_T *
+highlight_get_attr_dict(पूर्णाङ्क hlattr)
 {
     dict_T	*dict;
-    int		i;
+    पूर्णाङ्क		i;
 
     dict = dict_alloc();
-    if (dict == NULL)
-	return NULL;
+    सचे (dict == रिक्त)
+	पटिनिवत्त रिक्त;
 
-    for (i = 0; i < (int)ARRAY_LENGTH(highlight_index_tab); ++i)
+    अत्थाय (i = 0; i < (पूर्णाङ्क)ARRAY_LENGTH(highlight_index_tab); ++i)
     {
-	if (hlattr & highlight_index_tab[i]->key)
+	सचे (hlattr & highlight_index_tab[i]->कुञ्चिका)
 	{
-	    dict_add_bool(dict, (char *)highlight_index_tab[i]->value.string,
+	    dict_add_bool(dict, (वर्ण *)highlight_index_tab[i]->मानम्.string,
 		    VVAL_TRUE);
 	    // don't want "inverse"/"reverse"
-	    hlattr &= ~highlight_index_tab[i]->key;
+	    hlattr &= ~highlight_index_tab[i]->कुञ्चिका;
 	}
     }
 
-    return dict;
+    पटिनिवत्त dict;
 }
 
 /*
@@ -5421,127 +5421,127 @@ highlight_get_attr_dict(int hlattr)
  * Dictionary. If 'resolve_link' is TRUE, then resolves the highlight group
  * links recursively.
  */
-    static dict_T *
-highlight_get_info(int hl_idx, int resolve_link)
+    स्थिर dict_T *
+highlight_get_info(पूर्णाङ्क hl_idx, पूर्णाङ्क resolve_link)
 {
     dict_T	*dict;
     hl_group_T	*sgp;
-    dict_T	*attr_dict = NULL;
-    int		hlgid;
+    dict_T	*attr_dict = रिक्त;
+    पूर्णाङ्क		hlgid;
 
     dict = dict_alloc();
-    if (dict == NULL)
-	return dict;
+    सचे (dict == रिक्त)
+	पटिनिवत्त dict;
 
     sgp = &HL_TABLE()[hl_idx];
     // highlight group id is 1-based
     hlgid = hl_idx + 1;
 
-    if (dict_add_string(dict, "name", sgp->sg_name) == FAIL)
-	goto error;
-    if (dict_add_number(dict, "id", hlgid) == FAIL)
-	goto error;
+    सचे (dict_add_string(dict, "name", sgp->sg_name) == FAIL)
+	गच्छ error;
+    सचे (dict_add_सङ्ख्या(dict, "id", hlgid) == FAIL)
+	गच्छ error;
 
-    if (resolve_link)
+    सचे (resolve_link)
     {
 	// resolve the highlight group link recursively
-	while (sgp->sg_link)
+	याव (sgp->sg_link)
 	{
 	    hlgid = sgp->sg_link;
 	    sgp = &HL_TABLE()[sgp->sg_link - 1];
 	}
     }
 
-    if (sgp->sg_term != 0)
+    सचे (sgp->sg_term != 0)
     {
 	attr_dict = highlight_get_attr_dict(sgp->sg_term);
-	if (attr_dict != NULL)
+	सचे (attr_dict != रिक्त)
 	{
-	    if (dict_add_dict(dict, "term", attr_dict) == FAIL)
-		goto error;
-	    attr_dict = NULL;
+	    सचे (dict_add_dict(dict, "term", attr_dict) == FAIL)
+		गच्छ error;
+	    attr_dict = रिक्त;
 	}
     }
-    if (sgp->sg_start != NULL)
-	if (dict_add_string(dict, "start", sgp->sg_start) == FAIL)
-	    goto error;
-    if (sgp->sg_stop != NULL)
-	if (dict_add_string(dict, "stop", sgp->sg_stop) == FAIL)
-	    goto error;
-    if (sgp->sg_cterm != 0)
+    सचे (sgp->sg_start != रिक्त)
+	सचे (dict_add_string(dict, "start", sgp->sg_start) == FAIL)
+	    गच्छ error;
+    सचे (sgp->sg_stop != रिक्त)
+	सचे (dict_add_string(dict, "stop", sgp->sg_stop) == FAIL)
+	    गच्छ error;
+    सचे (sgp->sg_cterm != 0)
     {
 	attr_dict = highlight_get_attr_dict(sgp->sg_cterm);
-	if (attr_dict != NULL)
+	सचे (attr_dict != रिक्त)
 	{
-	    if (dict_add_dict(dict, "cterm", attr_dict) == FAIL)
-		goto error;
-	    attr_dict = NULL;
+	    सचे (dict_add_dict(dict, "cterm", attr_dict) == FAIL)
+		गच्छ error;
+	    attr_dict = रिक्त;
 	}
     }
-    if (sgp->sg_cterm_fg != 0)
-	if (dict_add_string(dict, "ctermfg",
+    सचे (sgp->sg_cterm_fg != 0)
+	सचे (dict_add_string(dict, "ctermfg",
 		    highlight_color(hlgid, (char_u *)"fg", 'c')) == FAIL)
-	    goto error;
-    if (sgp->sg_cterm_bg != 0)
-	if (dict_add_string(dict, "ctermbg",
+	    गच्छ error;
+    सचे (sgp->sg_cterm_bg != 0)
+	सचे (dict_add_string(dict, "ctermbg",
 			highlight_color(hlgid, (char_u *)"bg", 'c')) == FAIL)
-	    goto error;
-    if (sgp->sg_cterm_ul != 0)
-	if (dict_add_string(dict, "ctermul",
+	    गच्छ error;
+    सचे (sgp->sg_cterm_ul != 0)
+	सचे (dict_add_string(dict, "ctermul",
 			highlight_color(hlgid, (char_u *)"ul", 'c')) == FAIL)
-	    goto error;
-    if (sgp->sg_cterm_font != 0)
-	if (dict_add_string(dict, "ctermfont",
+	    गच्छ error;
+    सचे (sgp->sg_cterm_font != 0)
+	सचे (dict_add_string(dict, "ctermfont",
 			highlight_color(hlgid, (char_u *)"font", 'c')) == FAIL)
-	    goto error;
-    if (sgp->sg_gui != 0)
+	    गच्छ error;
+    सचे (sgp->sg_gui != 0)
     {
 	attr_dict = highlight_get_attr_dict(sgp->sg_gui);
-	if (attr_dict != NULL)
+	सचे (attr_dict != रिक्त)
 	{
-	    if (dict_add_dict(dict, "gui", attr_dict) == FAIL)
-		goto error;
-	    attr_dict = NULL;
+	    सचे (dict_add_dict(dict, "gui", attr_dict) == FAIL)
+		गच्छ error;
+	    attr_dict = रिक्त;
 	}
     }
-    if (sgp->sg_gui_fg_name != NULL)
-	if (dict_add_string(dict, "guifg",
+    सचे (sgp->sg_gui_fg_name != रिक्त)
+	सचे (dict_add_string(dict, "guifg",
 			highlight_color(hlgid, (char_u *)"fg", 'g')) == FAIL)
-	    goto error;
-    if (sgp->sg_gui_bg_name != NULL)
-	if (dict_add_string(dict, "guibg",
+	    गच्छ error;
+    सचे (sgp->sg_gui_bg_name != रिक्त)
+	सचे (dict_add_string(dict, "guibg",
 			highlight_color(hlgid, (char_u *)"bg", 'g')) == FAIL)
-	    goto error;
-    if (sgp->sg_gui_sp_name != NULL)
-	if (dict_add_string(dict, "guisp",
+	    गच्छ error;
+    सचे (sgp->sg_gui_sp_name != रिक्त)
+	सचे (dict_add_string(dict, "guisp",
 			highlight_color(hlgid, (char_u *)"sp", 'g')) == FAIL)
-	    goto error;
+	    गच्छ error;
 # ifdef FEAT_GUI
-    if (sgp->sg_font_name != NULL)
-	if (dict_add_string(dict, "font", sgp->sg_font_name) == FAIL)
-	    goto error;
+    सचे (sgp->sg_font_name != रिक्त)
+	सचे (dict_add_string(dict, "font", sgp->sg_font_name) == FAIL)
+	    गच्छ error;
 # endif
-    if (sgp->sg_link)
+    सचे (sgp->sg_link)
     {
 	char_u	*link;
 
 	link = HL_TABLE()[sgp->sg_link - 1].sg_name;
-	if (link != NULL && dict_add_string(dict, "linksto", link) == FAIL)
-	    goto error;
+	सचे (link != रिक्त && dict_add_string(dict, "linksto", link) == FAIL)
+	    गच्छ error;
 
-	if (sgp->sg_deflink)
+	सचे (sgp->sg_deflink)
 	    dict_add_bool(dict, "default", VVAL_TRUE);
     }
-    if (dict_len(dict) == 2)
+    सचे (dict_len(dict) == 2)
 	// If only 'name' is present, then the highlight group is cleared.
 	dict_add_bool(dict, "cleared", VVAL_TRUE);
 
-    return dict;
+    पटिनिवत्त dict;
 
 error:
     dict_unref(attr_dict);
     dict_unref(dict);
-    return NULL;
+    पटिनिवत्त रिक्त;
 }
 
 /*
@@ -5549,47 +5549,47 @@ error:
  * Return the attributes of a specific highlight group (if specified) or all
  * the highlight groups.
  */
-    void
+    शून्य
 f_hlget(typval_T *argvars, typval_T *rettv)
 {
     list_T	*list;
     dict_T	*dict;
-    int		i;
-    char_u	*hlarg = NULL;
-    int		resolve_link = FALSE;
+    पूर्णाङ्क		i;
+    char_u	*hlarg = रिक्त;
+    पूर्णाङ्क		resolve_link = FALSE;
 
-    if (rettv_list_alloc(rettv) == FAIL)
-	return;
+    सचे (rettv_list_alloc(rettv) == FAIL)
+	पटिनिवत्त;
 
-    if (check_for_opt_string_arg(argvars, 0) == FAIL
+    सचे (check_for_opt_string_arg(argvars, 0) == FAIL
 	    || (argvars[0].v_type != VAR_UNKNOWN
 		&& check_for_opt_bool_arg(argvars, 1) == FAIL))
-	return;
+	पटिनिवत्त;
 
-    if (argvars[0].v_type != VAR_UNKNOWN)
+    सचे (argvars[0].v_type != VAR_UNKNOWN)
     {
 	// highlight group name supplied
 	hlarg = tv_get_string_chk(&argvars[0]);
-	if (hlarg == NULL)
-	    return;
+	सचे (hlarg == रिक्त)
+	    पटिनिवत्त;
 
-	if (argvars[1].v_type != VAR_UNKNOWN)
+	सचे (argvars[1].v_type != VAR_UNKNOWN)
 	{
-	    int error = FALSE;
+	    पूर्णाङ्क error = FALSE;
 
 	    resolve_link = tv_get_bool_chk(&argvars[1], &error);
-	    if (error)
-		return;
+	    सचे (error)
+		पटिनिवत्त;
 	}
     }
 
     list = rettv->vval.v_list;
-    for (i = 0; i < highlight_ga.ga_len && !got_int; ++i)
+    अत्थाय (i = 0; i < highlight_ga.ga_len && !got_int; ++i)
     {
-	if (hlarg == NULL || STRICMP(hlarg, HL_TABLE()[i].sg_name) == 0)
+	सचे (hlarg == रिक्त || STRICMP(hlarg, HL_TABLE()[i].sg_name) == 0)
 	{
 	    dict = highlight_get_info(i, resolve_link);
-	    if (dict != NULL && list_append_dict(list, dict) == FAIL)
+	    सचे (dict != रिक्त && list_append_dict(list, dict) == FAIL)
 		dict_unref(dict);
 	}
     }
@@ -5600,24 +5600,24 @@ f_hlget(typval_T *argvars, typval_T *rettv)
  * 'dict' or the value is not a string type. If the value is not a string type
  * or is NULL, then 'error' is set to TRUE.
  */
-    static char_u *
-hldict_get_string(dict_T *dict, char_u *key, int *error)
+    स्थिर char_u *
+hldict_get_string(dict_T *dict, char_u *कुञ्चिका, पूर्णाङ्क *error)
 {
     dictitem_T	*di;
 
     *error = FALSE;
-    di = dict_find(dict, key, -1);
-    if (di == NULL)
-	return NULL;
+    di = dict_find(dict, कुञ्चिका, -1);
+    सचे (di == रिक्त)
+	पटिनिवत्त रिक्त;
 
-    if (di->di_tv.v_type != VAR_STRING || di->di_tv.vval.v_string == NULL)
+    सचे (di->di_tv.v_type != VAR_STRING || di->di_tv.vval.v_string == रिक्त)
     {
 	emsg(_(e_string_required));
 	*error = TRUE;
-	return NULL;
+	पटिनिवत्त रिक्त;
     }
 
-    return di->di_tv.vval.v_string;
+    पटिनिवत्त di->di_tv.vval.v_string;
 }
 
 /*
@@ -5625,114 +5625,114 @@ hldict_get_string(dict_T *dict, char_u *key, int *error)
  * value in 'attr_str' of length 'len'. Returns FALSE if 'dict[key]' is not a
  * Dictionary or is NULL.
  */
-    static int
+    स्थिर पूर्णाङ्क
 hldict_attr_to_str(
 	dict_T	*dict,
-	char_u	*key,
+	char_u	*कुञ्चिका,
 	char_u	*attr_str,
 	size_t	len)
 {
     dictitem_T	*di;
     dict_T	*attrdict;
-    int		i;
+    पूर्णाङ्क		i;
     char_u	*p;
 
     attr_str[0] = NUL;
-    di = dict_find(dict, key, -1);
-    if (di == NULL)
-	return TRUE;
+    di = dict_find(dict, कुञ्चिका, -1);
+    सचे (di == रिक्त)
+	पटिनिवत्त TRUE;
 
-    if (di->di_tv.v_type != VAR_DICT || di->di_tv.vval.v_dict == NULL)
+    सचे (di->di_tv.v_type != VAR_DICT || di->di_tv.vval.v_dict == रिक्त)
     {
 	emsg(_(e_dictionary_required));
-	return FALSE;
+	पटिनिवत्त FALSE;
     }
 
     attrdict = di->di_tv.vval.v_dict;
 
     // If the attribute dict is empty, then return NONE to clear the attributes
-    if (dict_len(attrdict) == 0)
+    सचे (dict_len(attrdict) == 0)
     {
 	vim_strcat(attr_str, (char_u *)"NONE", len);
-	return TRUE;
+	पटिनिवत्त TRUE;
     }
 
     p = attr_str;
-    for (i = 0; i < (int)ARRAY_LENGTH(highlight_tab); ++i)
+    अत्थाय (i = 0; i < (पूर्णाङ्क)ARRAY_LENGTH(highlight_tab); ++i)
     {
-	if (dict_get_bool(attrdict, (char *)highlight_tab[i].value.string,
+	सचे (dict_get_bool(attrdict, (वर्ण *)highlight_tab[i].मानम्.string,
 		    VVAL_FALSE) == VVAL_TRUE)
 	{
-	    if (p != attr_str && (size_t)(p - attr_str + 2) < len)
+	    सचे (p != attr_str && (size_t)(p - attr_str + 2) < len)
 		STRCPY(p, (char_u *)",");
-	    if (p - attr_str + highlight_tab[i].value.length + 1 < len)
+	    सचे (p - attr_str + highlight_tab[i].मानम्.length + 1 < len)
 	    {
-		STRCPY(p, highlight_tab[i].value.string);
-		p += highlight_tab[i].value.length;
+		STRCPY(p, highlight_tab[i].मानम्.string);
+		p += highlight_tab[i].मानम्.length;
 	    }
 	}
     }
 
-    return TRUE;
+    पटिनिवत्त TRUE;
 }
 
 // Temporary buffer used to store the command string produced by hlset().
 // IObuff cannot be used for this as the error messages produced by hlset()
 // internally use IObuff.
 # define	HLSETBUFSZ  512
-static char_u hlsetBuf[HLSETBUFSZ + 1];
+स्थिर char_u hlsetBuf[HLSETBUFSZ + 1];
 
 /*
  * Add the highlight attribute "attr" of length "attrlen" and "value" at
  * "dptr", which points into "hlsetBuf".
  * Returns the updated pointer.
  */
-    static char_u *
-add_attr_and_value(char_u *dptr, char_u *attr, int attrlen, char_u *value)
+    स्थिर char_u *
+add_attr_and_मानम्(char_u *dptr, char_u *attr, पूर्णाङ्क attrlen, char_u *मानम्)
 {
     size_t	vallen;
 
     // Do nothing if the value is not specified or is empty
-    if (value == NULL || *value == NUL)
-	return dptr;
+    सचे (मानम् == रिक्त || *मानम् == NUL)
+	पटिनिवत्त dptr;
 
-    vallen = STRLEN(value);
+    vallen = STRLEN(मानम्);
     // When the value contains a space and the attribute has an "=" (i.e. it
     // is a key=value pair), surround the value with single quotes so that
     // do_highlight() can parse it correctly.
-    if (vim_strchr(value, ' ') != NULL && vim_strchr(attr, '=') != NULL)
+    सचे (vim_strchr(मानम्, ' ') != रिक्त && vim_strchr(attr, '=') != रिक्त)
     {
-	if (dptr + attrlen + vallen + 3 < hlsetBuf + HLSETBUFSZ)
+	सचे (dptr + attrlen + vallen + 3 < hlsetBuf + HLSETBUFSZ)
 	{
 	    STRCPY(dptr, attr);
 	    dptr += attrlen;
 	    *dptr++ = '\'';
-	    STRCPY(dptr, value);
+	    STRCPY(dptr, मानम्);
 	    dptr += vallen;
 	    *dptr++ = '\'';
 	    *dptr = NUL;
 	}
     }
-    else if (dptr + attrlen + vallen + 1 < hlsetBuf + HLSETBUFSZ)
+    अञ्ञथा सचे (dptr + attrlen + vallen + 1 < hlsetBuf + HLSETBUFSZ)
     {
 	STRCPY(dptr, attr);
 	dptr += attrlen;
-	STRCPY(dptr, value);
+	STRCPY(dptr, मानम्);
 	dptr += vallen;
     }
 
-    return dptr;
+    पटिनिवत्त dptr;
 }
 
 /*
  * Add or update a highlight group using 'dict' items. Returns TRUE if
  * successfully updated the highlight group.
  */
-    static int
+    स्थिर पूर्णाङ्क
 hlg_add_or_update(dict_T *dict)
 {
     char_u	*name;
-    int		error;
+    पूर्णाङ्क		error;
     char_u	term_attr[MAX_ATTR_LEN];
     char_u	cterm_attr[MAX_ATTR_LEN];
     char_u	gui_attr[MAX_ATTR_LEN];
@@ -5748,45 +5748,45 @@ hlg_add_or_update(dict_T *dict)
 # ifdef FEAT_GUI
     char_u	*font;
 # endif
-    int		forceit = FALSE;
-    int		dodefault = FALSE;
-    int		done = FALSE;
+    पूर्णाङ्क		forceit = FALSE;
+    पूर्णाङ्क		dodefault = FALSE;
+    पूर्णाङ्क		done = FALSE;
     char_u	*p;
 
     name = hldict_get_string(dict, (char_u *)"name", &error);
-    if (name == NULL || *name == NUL || error)
-	return FALSE;
+    सचे (name == रिक्त || *name == NUL || error)
+	पटिनिवत्त FALSE;
 
-    if (dict_get_bool(dict, "force", VVAL_FALSE) == VVAL_TRUE)
+    सचे (dict_get_bool(dict, "force", VVAL_FALSE) == VVAL_TRUE)
 	forceit = TRUE;
 
-    if (dict_get_bool(dict, "default", VVAL_FALSE) == VVAL_TRUE)
+    सचे (dict_get_bool(dict, "default", VVAL_FALSE) == VVAL_TRUE)
 	dodefault = TRUE;
 
-    if (dict_has_key(dict, "cleared"))
+    सचे (dict_has_कुञ्चिका(dict, "cleared"))
     {
 	varnumber_T	cleared;
 
 	// clear a highlight group
 	cleared = dict_get_bool(dict, "cleared", FALSE);
-	if (cleared == TRUE)
+	सचे (cleared == TRUE)
 	{
-	    vim_snprintf((char *)hlsetBuf, HLSETBUFSZ, "clear %s", name);
+	    vim_snprintf((वर्ण *)hlsetBuf, HLSETBUFSZ, "clear %s", name);
 	    do_highlight(hlsetBuf, forceit, FALSE);
 	    done = TRUE;
 	}
     }
 
-    if (dict_has_key(dict, "linksto"))
+    सचे (dict_has_कुञ्चिका(dict, "linksto"))
     {
 	char_u	*linksto;
 
 	// link highlight groups
 	linksto = hldict_get_string(dict, (char_u *)"linksto", &error);
-	if (linksto == NULL || *linksto == NUL || error)
-	    return FALSE;
+	सचे (linksto == रिक्त || *linksto == NUL || error)
+	    पटिनिवत्त FALSE;
 
-	vim_snprintf((char *)hlsetBuf, HLSETBUFSZ, "%slink %s %s",
+	vim_snprintf((वर्ण *)hlsetBuf, HLSETBUFSZ, "%slink %s %s",
 				dodefault ? "default " : "", name, linksto);
 	do_highlight(hlsetBuf, forceit, FALSE);
 
@@ -5795,128 +5795,128 @@ hlg_add_or_update(dict_T *dict)
 
     // If 'cleared' or 'linksto' are specified, then don't process the other
     // attributes.
-    if (done)
-	return TRUE;
+    सचे (done)
+	पटिनिवत्त TRUE;
 
     start = hldict_get_string(dict, (char_u *)"start", &error);
-    if (error)
-	return FALSE;
+    सचे (error)
+	पटिनिवत्त FALSE;
 
     stop = hldict_get_string(dict, (char_u *)"stop", &error);
-    if (error)
-	return FALSE;
+    सचे (error)
+	पटिनिवत्त FALSE;
 
-    if (!hldict_attr_to_str(dict, (char_u *)"term", term_attr,
-							    sizeof(term_attr)))
-	return FALSE;
+    सचे (!hldict_attr_to_str(dict, (char_u *)"term", term_attr,
+							    परिमाण(term_attr)))
+	पटिनिवत्त FALSE;
 
-    if (!hldict_attr_to_str(dict, (char_u *)"cterm", cterm_attr,
-							   sizeof(cterm_attr)))
-	return FALSE;
+    सचे (!hldict_attr_to_str(dict, (char_u *)"cterm", cterm_attr,
+							   परिमाण(cterm_attr)))
+	पटिनिवत्त FALSE;
 
     ctermfg = hldict_get_string(dict, (char_u *)"ctermfg", &error);
-    if (error)
-	return FALSE;
+    सचे (error)
+	पटिनिवत्त FALSE;
 
     ctermbg = hldict_get_string(dict, (char_u *)"ctermbg", &error);
-    if (error)
-	return FALSE;
+    सचे (error)
+	पटिनिवत्त FALSE;
 
     ctermul = hldict_get_string(dict, (char_u *)"ctermul", &error);
-    if (error)
-	return FALSE;
+    सचे (error)
+	पटिनिवत्त FALSE;
 
     ctermfont = hldict_get_string(dict, (char_u *)"ctermfont", &error);
-    if (error)
-	return FALSE;
+    सचे (error)
+	पटिनिवत्त FALSE;
 
-    if (!hldict_attr_to_str(dict, (char_u *)"gui", gui_attr, sizeof(gui_attr)))
-	return FALSE;
+    सचे (!hldict_attr_to_str(dict, (char_u *)"gui", gui_attr, परिमाण(gui_attr)))
+	पटिनिवत्त FALSE;
 
     guifg = hldict_get_string(dict, (char_u *)"guifg", &error);
-    if (error)
-	return FALSE;
+    सचे (error)
+	पटिनिवत्त FALSE;
 
     guibg = hldict_get_string(dict, (char_u *)"guibg", &error);
-    if (error)
-	return FALSE;
+    सचे (error)
+	पटिनिवत्त FALSE;
 
     guisp = hldict_get_string(dict, (char_u *)"guisp", &error);
-    if (error)
-	return FALSE;
+    सचे (error)
+	पटिनिवत्त FALSE;
 
 # ifdef FEAT_GUI
     font = hldict_get_string(dict, (char_u *)"font", &error);
-    if (error)
-	return FALSE;
+    सचे (error)
+	पटिनिवत्त FALSE;
 # endif
 
     // If none of the attributes are specified, then do nothing.
-    if (term_attr[0] == NUL && start == NULL && stop == NULL
-	    && cterm_attr[0] == NUL && ctermfg == NULL && ctermbg == NULL
-	    && ctermul == NULL && ctermfont == NULL && gui_attr[0] == NUL
+    सचे (term_attr[0] == NUL && start == रिक्त && stop == रिक्त
+	    && cterm_attr[0] == NUL && ctermfg == रिक्त && ctermbg == रिक्त
+	    && ctermul == रिक्त && ctermfont == रिक्त && gui_attr[0] == NUL
 # ifdef FEAT_GUI
-	    && font == NULL
+	    && font == रिक्त
 # endif
-	    && guifg == NULL && guibg == NULL && guisp == NULL
+	    && guifg == रिक्त && guibg == रिक्त && guisp == रिक्त
 	    )
-	return TRUE;
+	पटिनिवत्त TRUE;
 
     hlsetBuf[0] = NUL;
     p = hlsetBuf;
-    if (dodefault)
-	p = add_attr_and_value(p, (char_u *)"default", 7, (char_u *)" ");
-    p = add_attr_and_value(p, (char_u *)"", 0, name);
-    p = add_attr_and_value(p, (char_u *)" term=", 6, term_attr);
-    p = add_attr_and_value(p, (char_u *)" start=", 7, start);
-    p = add_attr_and_value(p, (char_u *)" stop=", 6, stop);
-    p = add_attr_and_value(p, (char_u *)" cterm=", 7, cterm_attr);
-    p = add_attr_and_value(p, (char_u *)" ctermfg=", 9, ctermfg);
-    p = add_attr_and_value(p, (char_u *)" ctermbg=", 9, ctermbg);
-    p = add_attr_and_value(p, (char_u *)" ctermul=", 9, ctermul);
-    p = add_attr_and_value(p, (char_u *)" ctermfont=", 11, ctermfont);
-    p = add_attr_and_value(p, (char_u *)" gui=", 5, gui_attr);
+    सचे (dodefault)
+	p = add_attr_and_मानम्(p, (char_u *)"default", 7, (char_u *)" ");
+    p = add_attr_and_मानम्(p, (char_u *)"", 0, name);
+    p = add_attr_and_मानम्(p, (char_u *)" term=", 6, term_attr);
+    p = add_attr_and_मानम्(p, (char_u *)" start=", 7, start);
+    p = add_attr_and_मानम्(p, (char_u *)" stop=", 6, stop);
+    p = add_attr_and_मानम्(p, (char_u *)" cterm=", 7, cterm_attr);
+    p = add_attr_and_मानम्(p, (char_u *)" ctermfg=", 9, ctermfg);
+    p = add_attr_and_मानम्(p, (char_u *)" ctermbg=", 9, ctermbg);
+    p = add_attr_and_मानम्(p, (char_u *)" ctermul=", 9, ctermul);
+    p = add_attr_and_मानम्(p, (char_u *)" ctermfont=", 11, ctermfont);
+    p = add_attr_and_मानम्(p, (char_u *)" gui=", 5, gui_attr);
 # ifdef FEAT_GUI
-    p = add_attr_and_value(p, (char_u *)" font=", 6, font);
+    p = add_attr_and_मानम्(p, (char_u *)" font=", 6, font);
 # endif
-    p = add_attr_and_value(p, (char_u *)" guifg=", 7, guifg);
-    p = add_attr_and_value(p, (char_u *)" guibg=", 7, guibg);
-    (void)add_attr_and_value(p, (char_u *)" guisp=", 7, guisp);
+    p = add_attr_and_मानम्(p, (char_u *)" guifg=", 7, guifg);
+    p = add_attr_and_मानम्(p, (char_u *)" guibg=", 7, guibg);
+    (शून्य)add_attr_and_मानम्(p, (char_u *)" guisp=", 7, guisp);
 
     do_highlight(hlsetBuf, forceit, FALSE);
 
-    return TRUE;
+    पटिनिवत्त TRUE;
 }
 
 /*
  * "hlset([{highlight_attr}])" function
  * Add or modify highlight groups
  */
-    void
+    शून्य
 f_hlset(typval_T *argvars, typval_T *rettv)
 {
     listitem_T	*li;
     dict_T	*dict;
 
-    rettv->vval.v_number = -1;
+    rettv->vval.v_सङ्ख्या = -1;
 
-    if (check_for_list_arg(argvars, 0) == FAIL)
-	return;
+    सचे (check_for_list_arg(argvars, 0) == FAIL)
+	पटिनिवत्त;
 
-    FOR_ALL_LIST_ITEMS(argvars->vval.v_list, li)
+    FOR_ALL_LIST_वस्तूनि(argvars->vval.v_list, li)
     {
-	if (li->li_tv.v_type != VAR_DICT)
+	सचे (li->li_tv.v_type != VAR_DICT)
 	{
 	    emsg(_(e_dictionary_required));
-	    return;
+	    पटिनिवत्त;
 	}
 
 	dict = li->li_tv.vval.v_dict;
-	if (!hlg_add_or_update(dict))
-	    return;
+	सचे (!hlg_add_or_update(dict))
+	    पटिनिवत्त;
     }
 
-    rettv->vval.v_number = 0;
+    rettv->vval.v_सङ्ख्या = 0;
 }
 #endif
 
@@ -5924,15 +5924,15 @@ f_hlset(typval_T *argvars, typval_T *rettv)
  * If "old" is in the override stack, then update it to "hl_new". Does not free
  * "old".
  */
-    void
-update_highlight_overrides(hl_override_T *old, hl_override_T *hl_new, int newlen)
+    शून्य
+update_highlight_overrides(hl_override_T *old, hl_override_T *hl_new, पूर्णाङ्क newlen)
 {
-    if (old == NULL)
-	return;
+    सचे (old == रिक्त)
+	पटिनिवत्त;
 
-    for (hl_overrides_T *set = overrides; set != NULL; set = set->next)
+    अत्थाय (hl_overrides_T *set = overrides; set != रिक्त; set = set->next)
     {
-	if (set->arr == old)
+	सचे (set->arr == old)
 	{
 	    set->arr = hl_new;
 	    set->len = newlen;
@@ -5943,18 +5943,18 @@ update_highlight_overrides(hl_override_T *old, hl_override_T *hl_new, int newlen
 /*
  * If "arr" is in the highlight overrides list, then mark it as invalid.
  */
-    void
+    शून्य
 remove_highlight_overrides(hl_override_T *arr)
 {
-    if (arr == NULL || overrides == NULL)
-	return;
+    सचे (arr == रिक्त || overrides == रिक्त)
+	पटिनिवत्त;
 
-    for (hl_overrides_T *set = overrides; set != NULL; set = set->next)
+    अत्थाय (hl_overrides_T *set = overrides; set != रिक्त; set = set->next)
     {
-	if (set->arr == arr)
+	सचे (set->arr == arr)
 	{
-	    set->arr = NULL;
-	    break;
+	    set->arr = रिक्त;
+	    भङ्ग;
 	}
     }
 }
@@ -5963,48 +5963,48 @@ remove_highlight_overrides(hl_override_T *arr)
  * Update highlight_attr[] array. If "update_ids" is true, then update
  * highlight_ids[] array instead.
  */
-    static void
-set_highlight_attr(hl_override_T *arr, int len, bool update_ids)
+    स्थिर शून्य
+set_highlight_attr(hl_override_T *arr, पूर्णाङ्क len, bool update_ids)
 {
-    for (int i = 0; i < len; i++)
+    अत्थाय (पूर्णाङ्क i = 0; i < len; i++)
     {
 	hl_override_T	*override = arr + i;
-	int		hlf = -1, attr;
+	पूर्णाङ्क		hlf = -1, attr;
 
-	if (override->from <= 0)
+	सचे (override->from <= 0)
 	    // Directly map to highlight_attr
 	    hlf = -override->from;
-	else
+	अञ्ञथा
 	{
-	    for (int k = 0; k < HLF_COUNT; k++)
-		if (override->from == highlight_ids[k])
+	    अत्थाय (पूर्णाङ्क k = 0; k < HLF_गणनम्; k++)
+		सचे (override->from == highlight_ids[k])
 		{
 		    hlf = k;
-		    break;
+		    भङ्ग;
 		}
 
-	    if (hlf == -1)
-		continue;
+	    सचे (hlf == -1)
+		अनुवर्त;
 	}
 
-	if (update_ids)
+	सचे (update_ids)
 	{
-	    if (override->to <= 0)
+	    सचे (override->to <= 0)
 	    {
-		if (hlf == -override->to)
+		सचे (hlf == -override->to)
 		    highlight_ids[hlf] = -1;
-		else
+		अञ्ञथा
 		    highlight_ids[hlf] = highlight_ids[-override->to];
 	    }
-	    else
+	    अञ्ञथा
 		highlight_ids[hlf] = override->to;
 	}
-	else
+	अञ्ञथा
 	{
-	    if (override->to <= 0)
+	    सचे (override->to <= 0)
 		// Directly use highlight_attr[]
 		attr = highlight_attr[-override->to];
-	    else
+	    अञ्ञथा
 		attr = syn_id2attr(override->to);
 
 	    highlight_attr[hlf] = attr;
@@ -6016,19 +6016,19 @@ set_highlight_attr(hl_override_T *arr, int len, bool update_ids)
  * Set the current highlight override to "arr". Returns true if successful
  */
     bool
-push_highlight_overrides(hl_override_T *arr, int len)
+प्रक्षिप_highlight_overrides(hl_override_T *arr, पूर्णाङ्क len)
 {
     // Don't want to do anything if "arr" is already the current override. If
     // "arr" is NULL (but overrides->arr is not), then still push an override,
     // but "->arr" will just be NULL so any previous overrides are cleared.
-    if (overrides != NULL && overrides->arr == arr)
-	return false;
+    सचे (overrides != रिक्त && overrides->arr == arr)
+	पटिनिवत्त false;
 
     hl_overrides_T *set;
 
     set = ALLOC_ONE(hl_overrides_T);
-    if (set == NULL)
-	return false;
+    सचे (set == रिक्त)
+	पटिनिवत्त false;
 
     set->arr = arr;
     set->len = len;
@@ -6039,35 +6039,35 @@ push_highlight_overrides(hl_override_T *arr, int len)
 
     // Save current highlight_attr[], so it can be restored later after this
     // override is popped.
-    memcpy(set->attr, highlight_attr, sizeof(highlight_attr));
+    memcpy(set->attr, highlight_attr, परिमाण(highlight_attr));
 
     // Reset highlight_attr[] to default values, as we don't want changes from
     // other overrides.
-    memcpy(highlight_attr, highlight_attr_raw, sizeof(highlight_attr));
+    memcpy(highlight_attr, highlight_attr_raw, परिमाण(highlight_attr));
 
     // Update highlight_attr[] array
-    if (arr != NULL)
+    सचे (arr != रिक्त)
 	set_highlight_attr(arr, len, false);
 
-    return true;
+    पटिनिवत्त true;
 }
 
 /*
  * Pop the current highlight override (if any) from the stack. This should
  * always be paired with a *successful* push.
  */
-    void
-pop_highlight_overrides(void)
+    शून्य
+निष्कासय_highlight_overrides(शून्य)
 {
     hl_overrides_T *set = overrides;
 
-    if (overrides == NULL)
-	return;
+    सचे (overrides == रिक्त)
+	पटिनिवत्त;
 
     overrides = set->next;
 
     // Set highlight_attr[] to state before override was pushed.
-    memcpy(highlight_attr, set->attr, sizeof(highlight_attr));
+    memcpy(highlight_attr, set->attr, परिमाण(highlight_attr));
     vim_free(set);
 }
 
@@ -6075,120 +6075,120 @@ pop_highlight_overrides(void)
  * Parse the 'winhighlight' option and return array. Returns NULL on failure or
  * if empty option. If failure, then errmsg is set.
  */
-    static hl_override_T *
-parse_winhighlight(char_u *opt, int *len, char **errmsg)
+    स्थिर hl_override_T *
+parse_winhighlight(char_u *opt, पूर्णाङ्क *len, वर्ण **errmsg)
 {
     char_u	    *p = opt;
     hl_override_T   *arr;
-    int		    i = 0;
-    int		    num = 1;
-    int		    n_colons = 0;
+    पूर्णाङ्क		    i = 0;
+    पूर्णाङ्क		    अङ्कः = 1;
+    पूर्णाङ्क		    n_colons = 0;
 
-    if (*p == NUL)
-	return NULL;
+    सचे (*p == NUL)
+	पटिनिवत्त रिक्त;
 
     // Get number of overrides first so we can allocate array
-    while ((p = vim_strchr(p, ',')) != NULL)
+    याव ((p = vim_strchr(p, ',')) != रिक्त)
     {
 	p++;
-	num++;
+	अङ्कः++;
     }
     p = opt;
     // Check if number of ':' matches number of ','
-    while ((p = vim_strchr(p, ':')) != NULL)
+    याव ((p = vim_strchr(p, ':')) != रिक्त)
     {
 	p++;
 	n_colons++;
     }
 
-    if (num != n_colons)
+    सचे (अङ्कः != n_colons)
     {
 	*errmsg = e_invalid_argument;
-	return NULL;
+	पटिनिवत्त रिक्त;
     }
 
-    arr = ALLOC_MULT(hl_override_T, num);
-    if (arr == NULL)
+    arr = ALLOC_MULT(hl_override_T, अङ्कः);
+    सचे (arr == रिक्त)
     {
 	*errmsg = e_out_of_memory;
-	return NULL;
+	पटिनिवत्त रिक्त;
     }
 
     p = opt;
 
-    while (true)
+    याव (true)
     {
 	hl_override_T *override = arr + i++;
 	char_u	*fromname = p, *toname;
 	char_u	*tmp;
 	char_u	**names[2] = {&fromname, &toname};
-	int	fromlen, tolen;
-	int	*lens[2] = {&fromlen, &tolen};
-	int	fromid, toid;
-	int	*ids[2] = {&fromid, &toid};
+	पूर्णाङ्क	fromlen, tolen;
+	पूर्णाङ्क	*lens[2] = {&fromlen, &tolen};
+	पूर्णाङ्क	fromid, toid;
+	पूर्णाङ्क	*ids[2] = {&fromid, &toid};
 
 	p = vim_strchr(p, ':');
 
-	if (p == NULL)
-	    goto fail;
+	सचे (p == रिक्त)
+	    गच्छ fail;
 
 	fromlen = p - fromname; // Get hl for "from"
-	if (fromlen == 0)
-	    goto fail;
+	सचे (fromlen == 0)
+	    गच्छ fail;
 	p++; // Skip colon ':'
-	if (*p == NUL)
-	    goto fail;
+	सचे (*p == NUL)
+	    गच्छ fail;
 
 	toname = p;
 	tmp = vim_strchr(p, ',');
 
 	// Get hl for "to", must check for no trailing comma in case last
 	// element.
-	if (tmp == NULL)
-	    tolen = (int)STRLEN(p);
-	else
+	सचे (tmp == रिक्त)
+	    tolen = (पूर्णाङ्क)STRLEN(p);
+	अञ्ञथा
 	{
 	    tolen = tmp - toname;
 	    p = ++tmp;
 	}
-	if (tolen == 0)
-	    goto fail;
+	सचे (tolen == 0)
+	    गच्छ fail;
 
-	for (int k = 0; k < 2; k++)
+	अत्थाय (पूर्णाङ्क k = 0; k < 2; k++)
 	{
 	    char_u  *name = *names[k];
-	    int	    nlen = *lens[k];
+	    पूर्णाङ्क	    nlen = *lens[k];
 
-	    if (*name == '!')
+	    सचे (*name == '!')
 	    {
 		// If starts with "!", then it maps directly to a 'highlight'
 		// occasion.
-		int hlf;
+		पूर्णाङ्क hlf;
 
-		if (nlen != 2)
-		    goto fail;
+		सचे (nlen != 2)
+		    गच्छ fail;
 
-		for (hlf = 0; hlf < (int)HLF_COUNT; ++hlf)
-		    if (hl_flags[hlf] == name[1])
-			break;
+		अत्थाय (hlf = 0; hlf < (पूर्णाङ्क)HLF_गणनम्; ++hlf)
+		    सचे (hl_flags[hlf] == name[1])
+			भङ्ग;
 
-		if (hlf >= HLF_COUNT)
-		    goto fail;
+		सचे (hlf >= HLF_गणनम्)
+		    गच्छ fail;
 
 		*ids[k] = -hlf;
 	    }
-	    else
+	    अञ्ञथा
 	    {
 		// Otherwise get the highlight group id.
-		if (syn_check_group(name, nlen) == 0)
-		    goto fail;
+		सचे (syn_check_group(name, nlen) == 0)
+		    गच्छ fail;
 
 		*ids[k] = syn_namen2id(name, nlen);
-		if (*ids[k] == 0)
-		    goto fail;
+		सचे (*ids[k] == 0)
+		    गच्छ fail;
 
 		// Always map "Normal" group to HLF_WIN
-		if (ids[k] == &fromid &&
+		सचे (ids[k] == &fromid &&
 			STRCMP(HL_TABLE()[*ids[k] - 1].sg_name_u, "NORMAL") == 0)
 		    *ids[k] = -HLF_WIN;
 	    }
@@ -6200,42 +6200,42 @@ parse_winhighlight(char_u *opt, int *len, char **errmsg)
 	override->from = fromid;
 	override->to = toid;
 
-	if (tmp == NULL)
-	    break;
+	सचे (tmp == रिक्त)
+	    भङ्ग;
     }
 
-    *len = num;
-    return arr;
+    *len = अङ्कः;
+    पटिनिवत्त arr;
 fail:
     vim_free(arr);
     *errmsg = e_invalid_argument;
-    return NULL;
+    पटिनिवत्त रिक्त;
 }
 
 /*
  * Update w_hl for "wp" using given option value. Returns error
  * message on failure, otherwise NULL.
  */
-    char *
+    वर्ण *
 update_winhighlight(win_T *wp, char_u *opt)
 {
-    char	    *err = NULL;
+    वर्ण	    *err = रिक्त;
     hl_override_T   *arr;
-    int		    num = 1;
+    पूर्णाङ्क		    अङ्कः = 1;
 
-    arr = parse_winhighlight(opt, &num, &err);
+    arr = parse_winhighlight(opt, &अङ्कः, &err);
 
-    if (arr == NULL && err != NULL)
-	return err;
+    सचे (arr == रिक्त && err != रिक्त)
+	पटिनिवत्त err;
 
-    if (arr == NULL && wp->w_hl == NULL)
-	return NULL;
+    सचे (arr == रिक्त && wp->w_hl == रिक्त)
+	पटिनिवत्त रिक्त;
 
-    update_highlight_overrides(wp->w_hl, arr, num);
+    update_highlight_overrides(wp->w_hl, arr, अङ्कः);
 
     vim_free(wp->w_hl);
     wp->w_hl = arr;
-    wp->w_hl_len = num;
+    wp->w_hl_len = अङ्कः;
 
     wp->w_hlfwin_id = hlf_get_id(wp, HLF_WIN);
 
@@ -6245,40 +6245,40 @@ update_winhighlight(win_T *wp, char_u *opt)
 
 #ifdef FEAT_TERMINAL
     // May be NULL (such as in after_copy_winopt())
-    if (wp->w_buffer != NULL)
+    सचे (wp->w_buffer != रिक्त)
     {
 	// Make sure terminal highlighting is updated
-	bool ret = push_highlight_overrides(wp->w_hl, wp->w_hl_len);
+	bool ret = प्रक्षिप_highlight_overrides(wp->w_hl, wp->w_hl_len);
 
-	if (wp->w_buffer->b_term != NULL)
+	सचे (wp->w_buffer->b_term != रिक्त)
 	    term_init_default_colors(wp->w_buffer->b_term);
-	if (ret)
-	    pop_highlight_overrides();
+	सचे (ret)
+	    निष्कासय_highlight_overrides();
     }
 #endif
 
-    return NULL;
+    पटिनिवत्त रिक्त;
 }
 
 /*
  * Get id that the hlf attr is using in window "wp", otherwise zero. Note that
  * -1 may be returned if the hlf was set to itself.
  */
-    int
-hlf_get_id(win_T *wp, int hlf)
+    पूर्णाङ्क
+hlf_get_id(win_T *wp, पूर्णाङ्क hlf)
 {
-    int id;
-    static int prev[HLF_COUNT];
+    पूर्णाङ्क id;
+    स्थिर पूर्णाङ्क prev[HLF_गणनम्];
 
-    if (wp->w_hl == NULL)
-	return highlight_ids[hlf];
+    सचे (wp->w_hl == रिक्त)
+	पटिनिवत्त highlight_ids[hlf];
 
-    memcpy(prev, highlight_ids, sizeof(highlight_ids));
+    memcpy(prev, highlight_ids, परिमाण(highlight_ids));
     set_highlight_attr(wp->w_hl, wp->w_hl_len, true);
     id = highlight_ids[hlf];
-    memcpy(highlight_ids, prev, sizeof(highlight_ids));
+    memcpy(highlight_ids, prev, परिमाण(highlight_ids));
 
-    return id;
+    पटिनिवत्त id;
 }
 
 /*
@@ -6286,25 +6286,25 @@ hlf_get_id(win_T *wp, int hlf)
  * message on failure otherwise NULL. Does not update the actual 'wincolor'
  * value, but does update the 'winhighlight' value.
  */
-    char *
+    वर्ण *
 update_wincolor(win_T *wp, char_u *opt)
 {
-    char_u  *str = *opt == NUL ? "" : alloc(sizeof("!(:") + STRLEN(opt));
-    char    *errmsg;
+    char_u  *str = *opt == NUL ? "" : alloc(परिमाण("!(:") + STRLEN(opt));
+    वर्ण    *errmsg;
 
-    if (str == NULL)
-	return e_out_of_memory;
+    सचे (str == रिक्त)
+	पटिनिवत्त e_out_of_memory;
 
-    if (*opt != NUL)
-	sprintf((char *)str, "!(:%s", opt);
+    सचे (*opt != NUL)
+	sprintf((वर्ण *)str, "!(:%s", opt);
 
     errmsg = update_winhighlight(wp, str);
 
-    if (errmsg == NULL)
+    सचे (errmsg == रिक्त)
 	set_string_option_direct_in_win(wp, (char_u *)"winhighlight", -1,
 		str, OPT_FREE|OPT_LOCAL, 0);
 
-    if (*opt != NUL)
-	free(str);
-    return errmsg;
+    सचे (*opt != NUL)
+	मुक्त(str);
+    पटिनिवत्त errmsg;
 }

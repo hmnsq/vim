@@ -13,20 +13,20 @@
 #define WIN32_LEAN_AND_MEAN
 
 #ifndef DYNAMIC_DIRECTX
-# if WINVER < 0x0600
+# सचे WINVER < 0x0600
 #  error WINVER must be 0x0600 or above to use DirectWrite(DirectX)
 # endif
 #endif
 
-#include <windows.h>
-#include <crtdbg.h>
-#include <assert.h>
-#include <math.h>
-#include <d2d1.h>
-#include <d2d1helper.h>
+#अन्तर्भाव <windows.h>
+#अन्तर्भाव <crtdbg.h>
+#अन्तर्भाव <assert.h>
+#अन्तर्भाव <math.h>
+#अन्तर्भाव <d2d1.h>
+#अन्तर्भाव <d2d1helper.h>
 
 // Disable these macros to compile with old VC and newer SDK (V8.1 or later).
-#if defined(_MSC_VER) && (_MSC_VER < 1700)
+#सचे defined(_MSC_VER) && (_MSC_VER < 1700)
 # define _COM_Outptr_ __out
 # define _In_reads_(s)
 # define _In_reads_opt_(s)
@@ -40,11 +40,11 @@
 
 #ifdef FEAT_DIRECTX_COLOR_EMOJI
 # include <dwrite_2.h>
-#else
+#अञ्ञथा
 # include <dwrite.h>
 #endif
 
-#include "gui_dwrite.h"
+#अन्तर्भाव "gui_dwrite.h"
 
 #ifdef __MINGW32__
 # define __maybenull	SAL__maybenull
@@ -54,240 +54,240 @@
 
 #ifdef __MINGW32__
 # define UNUSED __attribute__((unused))
-#else
+#अञ्ञथा
 # define UNUSED
 #endif
 
-#if (defined(_MSC_VER) && (_MSC_VER >= 1700)) || (__cplusplus >= 201103L)
+#सचे (defined(_MSC_VER) && (_MSC_VER >= 1700)) || (__cplusplus >= 201103L)
 # define FINAL final
-#else
+#अञ्ञथा
 # define FINAL
 #endif
 
 #ifdef DYNAMIC_DIRECTX
-extern "C" HINSTANCE vimLoadLib(const char *name);
+बाह्य "C" HINSTANCE vimLoadLib(ध्रुव वर्ण *name);
 
-typedef int (WINAPI *PGETUSERDEFAULTLOCALENAME)(LPWSTR, int);
-typedef HRESULT (WINAPI *PD2D1CREATEFACTORY)(D2D1_FACTORY_TYPE,
-	REFIID, const D2D1_FACTORY_OPTIONS *, void **);
-typedef HRESULT (WINAPI *PDWRITECREATEFACTORY)(DWRITE_FACTORY_TYPE,
+प्रकारनिर्देश पूर्णाङ्क (WINAPI *PGETUSERDEFAULTLOCALENAME)(LPWSTR, पूर्णाङ्क);
+प्रकारनिर्देश HRESULT (WINAPI *PD2D1CREATEFACTORY)(D2D1_FACTORY_TYPE,
+	REFIID, ध्रुव D2D1_FACTORY_OPTIONS *, शून्य **);
+प्रकारनिर्देश HRESULT (WINAPI *PDWRITECREATEFACTORY)(DWRITE_FACTORY_TYPE,
 	REFIID, IUnknown **);
 
-static HINSTANCE hD2D1DLL = NULL;
-static HINSTANCE hDWriteDLL = NULL;
+स्थिर HINSTANCE hD2D1DLL = रिक्त;
+स्थिर HINSTANCE hDWriteDLL = रिक्त;
 
-static PGETUSERDEFAULTLOCALENAME pGetUserDefaultLocaleName = NULL;
-static PD2D1CREATEFACTORY pD2D1CreateFactory = NULL;
-static PDWRITECREATEFACTORY pDWriteCreateFactory = NULL;
+स्थिर PGETUSERDEFAULTLOCALENAME pGetUserDefaultLocaleName = रिक्त;
+स्थिर PD2D1CREATEFACTORY pD2D1CreateFactory = रिक्त;
+स्थिर PDWRITECREATEFACTORY pDWriteCreateFactory = रिक्त;
 
 #define GetUserDefaultLocaleName	(*pGetUserDefaultLocaleName)
 #define D2D1CreateFactory		(*pD2D1CreateFactory)
 #define DWriteCreateFactory		(*pDWriteCreateFactory)
 
-    static void
+    स्थिर शून्य
 unload(HINSTANCE &hinst)
 {
-    if (hinst != NULL)
+    सचे (hinst != रिक्त)
     {
 	FreeLibrary(hinst);
-	hinst = NULL;
+	hinst = रिक्त;
     }
 }
 #endif // DYNAMIC_DIRECTX
 
-template <class T> inline void SafeRelease(T **ppT)
+template <वग्ग T> अन्तःस्थ शून्य SafeRelease(T **ppT)
 {
-    if (*ppT)
+    सचे (*ppT)
     {
 	(*ppT)->Release();
-	*ppT = NULL;
+	*ppT = रिक्त;
     }
 }
 
-    static DWRITE_PIXEL_GEOMETRY
-ToPixelGeometry(int value)
+    स्थिर DWRITE_PIXEL_GEOMETRY
+ToPixelGeometry(पूर्णाङ्क मानम्)
 {
-    switch (value)
+    विकल्प (मानम्)
     {
-	default:
-	case 0:
-	    return DWRITE_PIXEL_GEOMETRY_FLAT;
-	case 1:
-	    return DWRITE_PIXEL_GEOMETRY_RGB;
-	case 2:
-	    return DWRITE_PIXEL_GEOMETRY_BGR;
+	स्वभाव:
+	पक्ष 0:
+	    पटिनिवत्त DWRITE_PIXEL_GEOMETRY_FLAT;
+	पक्ष 1:
+	    पटिनिवत्त DWRITE_PIXEL_GEOMETRY_RGB;
+	पक्ष 2:
+	    पटिनिवत्त DWRITE_PIXEL_GEOMETRY_BGR;
     }
 }
 
-    static int
-ToInt(DWRITE_PIXEL_GEOMETRY value)
+    स्थिर पूर्णाङ्क
+ToInt(DWRITE_PIXEL_GEOMETRY मानम्)
 {
-    switch (value)
+    विकल्प (मानम्)
     {
-	case DWRITE_PIXEL_GEOMETRY_FLAT:
-	    return 0;
-	case DWRITE_PIXEL_GEOMETRY_RGB:
-	    return 1;
-	case DWRITE_PIXEL_GEOMETRY_BGR:
-	    return 2;
-	default:
-	    return -1;
+	पक्ष DWRITE_PIXEL_GEOMETRY_FLAT:
+	    पटिनिवत्त 0;
+	पक्ष DWRITE_PIXEL_GEOMETRY_RGB:
+	    पटिनिवत्त 1;
+	पक्ष DWRITE_PIXEL_GEOMETRY_BGR:
+	    पटिनिवत्त 2;
+	स्वभाव:
+	    पटिनिवत्त -1;
     }
 }
 
-    static DWRITE_RENDERING_MODE
-ToRenderingMode(int value)
+    स्थिर DWRITE_RENDERING_MODE
+ToRenderingMode(पूर्णाङ्क मानम्)
 {
-    switch (value)
+    विकल्प (मानम्)
     {
-	default:
-	case 0:
-	    return DWRITE_RENDERING_MODE_DEFAULT;
-	case 1:
-	    return DWRITE_RENDERING_MODE_ALIASED;
-	case 2:
-	    return DWRITE_RENDERING_MODE_CLEARTYPE_GDI_CLASSIC;
-	case 3:
-	    return DWRITE_RENDERING_MODE_CLEARTYPE_GDI_NATURAL;
-	case 4:
-	    return DWRITE_RENDERING_MODE_CLEARTYPE_NATURAL;
-	case 5:
-	    return DWRITE_RENDERING_MODE_CLEARTYPE_NATURAL_SYMMETRIC;
-	case 6:
-	    return DWRITE_RENDERING_MODE_OUTLINE;
+	स्वभाव:
+	पक्ष 0:
+	    पटिनिवत्त DWRITE_RENDERING_MODE_DEFAULT;
+	पक्ष 1:
+	    पटिनिवत्त DWRITE_RENDERING_MODE_ALIASED;
+	पक्ष 2:
+	    पटिनिवत्त DWRITE_RENDERING_MODE_CLEARTYPE_GDI_CLASSIC;
+	पक्ष 3:
+	    पटिनिवत्त DWRITE_RENDERING_MODE_CLEARTYPE_GDI_NATURAL;
+	पक्ष 4:
+	    पटिनिवत्त DWRITE_RENDERING_MODE_CLEARTYPE_NATURAL;
+	पक्ष 5:
+	    पटिनिवत्त DWRITE_RENDERING_MODE_CLEARTYPE_NATURAL_SYMMETRIC;
+	पक्ष 6:
+	    पटिनिवत्त DWRITE_RENDERING_MODE_OUTLINE;
     }
 }
 
-    static D2D1_TEXT_ANTIALIAS_MODE
-ToTextAntialiasMode(int value)
+    स्थिर D2D1_TEXT_ANTIALIAS_MODE
+ToTextAntialiasMode(पूर्णाङ्क मानम्)
 {
-    switch (value)
+    विकल्प (मानम्)
     {
-	default:
-	case 0:
-	    return D2D1_TEXT_ANTIALIAS_MODE_DEFAULT;
-	case 1:
-	    return D2D1_TEXT_ANTIALIAS_MODE_CLEARTYPE;
-	case 2:
-	    return D2D1_TEXT_ANTIALIAS_MODE_GRAYSCALE;
-	case 3:
-	    return D2D1_TEXT_ANTIALIAS_MODE_ALIASED;
+	स्वभाव:
+	पक्ष 0:
+	    पटिनिवत्त D2D1_TEXT_ANTIALIAS_MODE_DEFAULT;
+	पक्ष 1:
+	    पटिनिवत्त D2D1_TEXT_ANTIALIAS_MODE_CLEARTYPE;
+	पक्ष 2:
+	    पटिनिवत्त D2D1_TEXT_ANTIALIAS_MODE_GRAYSCALE;
+	पक्ष 3:
+	    पटिनिवत्त D2D1_TEXT_ANTIALIAS_MODE_ALIASED;
     }
 }
 
-    static int
-ToInt(DWRITE_RENDERING_MODE value)
+    स्थिर पूर्णाङ्क
+ToInt(DWRITE_RENDERING_MODE मानम्)
 {
-    switch (value)
+    विकल्प (मानम्)
     {
-	case DWRITE_RENDERING_MODE_DEFAULT:
-	    return 0;
-	case DWRITE_RENDERING_MODE_ALIASED:
-	    return 1;
-	case DWRITE_RENDERING_MODE_CLEARTYPE_GDI_CLASSIC:
-	    return 2;
-	case DWRITE_RENDERING_MODE_CLEARTYPE_GDI_NATURAL:
-	    return 3;
-	case DWRITE_RENDERING_MODE_CLEARTYPE_NATURAL:
-	    return 4;
-	case DWRITE_RENDERING_MODE_CLEARTYPE_NATURAL_SYMMETRIC:
-	    return 5;
-	case DWRITE_RENDERING_MODE_OUTLINE:
-	    return 6;
-	default:
-	    return -1;
+	पक्ष DWRITE_RENDERING_MODE_DEFAULT:
+	    पटिनिवत्त 0;
+	पक्ष DWRITE_RENDERING_MODE_ALIASED:
+	    पटिनिवत्त 1;
+	पक्ष DWRITE_RENDERING_MODE_CLEARTYPE_GDI_CLASSIC:
+	    पटिनिवत्त 2;
+	पक्ष DWRITE_RENDERING_MODE_CLEARTYPE_GDI_NATURAL:
+	    पटिनिवत्त 3;
+	पक्ष DWRITE_RENDERING_MODE_CLEARTYPE_NATURAL:
+	    पटिनिवत्त 4;
+	पक्ष DWRITE_RENDERING_MODE_CLEARTYPE_NATURAL_SYMMETRIC:
+	    पटिनिवत्त 5;
+	पक्ष DWRITE_RENDERING_MODE_OUTLINE:
+	    पटिनिवत्त 6;
+	स्वभाव:
+	    पटिनिवत्त -1;
     }
 }
 
-class FontCache {
-public:
-    struct Item {
+वग्ग FontCache {
+सार्वजनिक:
+    संरचना Item {
 	HFONT              hFont;
 	IDWriteTextFormat* pTextFormat;
 	DWRITE_FONT_WEIGHT fontWeight;
 	DWRITE_FONT_STYLE  fontStyle;
 	FLOAT              fontAscent;
-	Item() : hFont(NULL), pTextFormat(NULL), fontAscent(0.0f) {}
+	Item() : hFont(रिक्त), pTextFormat(रिक्त), fontAscent(0.0f) {}
     };
 
-private:
-    int mSize;
-    Item *mItems;
+गुप्त:
+    पूर्णाङ्क mSize;
+    Item *m_वस्तूनि;
 
-public:
-    FontCache(int size = 2) :
+सार्वजनिक:
+    FontCache(पूर्णाङ्क size = 2) :
 	mSize(size),
-	mItems(new Item[size])
+	m_वस्तूनि(नूतन Item[size])
     {
     }
 
     ~FontCache()
     {
-	for (int i = 0; i < mSize; ++i)
-	    SafeRelease(&mItems[i].pTextFormat);
-	delete[] mItems;
+	अत्थाय (पूर्णाङ्क i = 0; i < mSize; ++i)
+	    SafeRelease(&m_वस्तूनि[i].pTextFormat);
+	delete[] m_वस्तूनि;
     }
 
-    bool get(HFONT hFont, Item &item)
+    तार्किक get(HFONT hFont, Item &item)
     {
-	int n = find(hFont);
-	if (n < 0)
-	    return false;
-	item = mItems[n];
+	पूर्णाङ्क n = find(hFont);
+	सचे (n < 0)
+	    पटिनिवत्त मिच्छा;
+	item = m_वस्तूनि[n];
 	slide(n);
-	return true;
+	पटिनिवत्त सच्च;
     }
 
-    void put(const Item& item)
+    शून्य put(ध्रुव Item& item)
     {
-	int n = find(item.hFont);
-	if (n < 0)
+	पूर्णाङ्क n = find(item.hFont);
+	सचे (n < 0)
 	    n = mSize - 1;
-	if (mItems[n].pTextFormat != item.pTextFormat)
+	सचे (m_वस्तूनि[n].pTextFormat != item.pTextFormat)
 	{
-	    SafeRelease(&mItems[n].pTextFormat);
-	    if (item.pTextFormat != NULL)
+	    SafeRelease(&m_वस्तूनि[n].pTextFormat);
+	    सचे (item.pTextFormat != रिक्त)
 		item.pTextFormat->AddRef();
 	}
-	mItems[n] = item;
+	m_वस्तूनि[n] = item;
 	slide(n);
     }
 
-private:
-    int find(HFONT hFont)
+गुप्त:
+    पूर्णाङ्क find(HFONT hFont)
     {
-	for (int i = 0; i < mSize; ++i)
+	अत्थाय (पूर्णाङ्क i = 0; i < mSize; ++i)
 	{
-	    if (mItems[i].hFont == hFont)
-		return i;
+	    सचे (m_वस्तूनि[i].hFont == hFont)
+		पटिनिवत्त i;
 	}
-	return -1;
+	पटिनिवत्त -1;
     }
 
-    void slide(int nextTop)
+    शून्य slide(पूर्णाङ्क next_शिखरम्)
     {
-	if (nextTop == 0)
-	    return;
-	Item tmp = mItems[nextTop];
-	for (int i = nextTop - 1; i >= 0; --i)
-	    mItems[i + 1] = mItems[i];
-	mItems[0] = tmp;
+	सचे (next_शिखरम् == 0)
+	    पटिनिवत्त;
+	Item tmp = m_वस्तूनि[next_शिखरम्];
+	अत्थाय (पूर्णाङ्क i = next_शिखरम् - 1; i >= 0; --i)
+	    m_वस्तूनि[i + 1] = m_वस्तूनि[i];
+	m_वस्तूनि[0] = tmp;
     }
 };
 
-enum DrawingMode {
+गणना DrawingMode {
     DM_GDI = 0,
     DM_DIRECTX = 1,
     DM_INTEROP = 2,
 };
 
-struct DWriteContext {
+संरचना DWriteContext {
     HDC mHDC;
     RECT mBindRect;
     DrawingMode mDMode;
     HDC mInteropHDC;
-    bool mDrawing;
-    bool mFallbackDC;
+    तार्किक mDrawing;
+    तार्किक mFallbackDC;
 
     ID2D1Factory *mD2D1Factory;
 
@@ -314,88 +314,88 @@ struct DWriteContext {
     D2D1_TEXT_ANTIALIAS_MODE mTextAntialiasMode;
 
     DWriteFontFeature mFontFeatures[DWRITE_MAX_FONT_FEATURES];
-    int mFontFeatureCount;
+    पूर्णाङ्क m_Font_Feature_गणनम्;
 
     // METHODS
 
     DWriteContext();
 
-    virtual ~DWriteContext();
+    आभास ~DWriteContext();
 
     HRESULT CreateDeviceResources();
 
-    void DiscardDeviceResources();
+    शून्य DiscardDeviceResources();
 
-    HRESULT CreateTextFormatFromLOGFONT(const LOGFONTW &logFont,
+    HRESULT CreateTextFormatFromLOGFONT(ध्रुव LOGFONTW &logFont,
 	    IDWriteTextFormat **ppTextFormat, FLOAT *pFontAscent);
 
-    HRESULT SetFontByLOGFONT(const LOGFONTW &logFont);
+    HRESULT SetFontByLOGFONT(ध्रुव LOGFONTW &logFont);
 
-    void SetFont(HFONT hFont);
+    शून्य SetFont(HFONT hFont);
 
-    void Rebind();
+    शून्य Rebind();
 
-    void BindDC(HDC hdc, const RECT *rect);
+    शून्य BindDC(HDC hdc, ध्रुव RECT *rect);
 
     HRESULT SetDrawingMode(DrawingMode mode);
 
     ID2D1Brush* SolidBrush(COLORREF color);
 
-    void DrawText(const WCHAR *text, int len,
-	int x, int y, int w, int h, int cellWidth, COLORREF color,
-	UINT fuOptions, const RECT *lprc, const INT *lpDx);
+    शून्य DrawText(ध्रुव WCHAR *text, पूर्णाङ्क len,
+	पूर्णाङ्क x, पूर्णाङ्क y, पूर्णाङ्क w, पूर्णाङ्क h, पूर्णाङ्क cellWidth, COLORREF color,
+	UINT fuOptions, ध्रुव RECT *lprc, ध्रुव INT *lpDx);
 
-    void FillRect(const RECT *rc, COLORREF color);
+    शून्य FillRect(ध्रुव RECT *rc, COLORREF color);
 
-    void DrawLine(int x1, int y1, int x2, int y2, COLORREF color);
+    शून्य Draw_पङ्क्तिः(पूर्णाङ्क x1, पूर्णाङ्क y1, पूर्णाङ्क x2, पूर्णाङ्क y2, COLORREF color);
 
-    void SetPixel(int x, int y, COLORREF color);
+    शून्य SetPixel(पूर्णाङ्क x, पूर्णाङ्क y, COLORREF color);
 
-    void Scroll(int x, int y, const RECT *rc);
+    शून्य Scroll(पूर्णाङ्क x, पूर्णाङ्क y, ध्रुव RECT *rc);
 
-    void Flush();
+    शून्य Flush();
 
-    void SetRenderingParams(
-	    const DWriteRenderingParams *params);
+    शून्य SetRenderingParams(
+	    ध्रुव DWriteRenderingParams *params);
 
     DWriteRenderingParams *GetRenderingParams(
 	    DWriteRenderingParams *params);
 
-    void SetFontFeatures(const DWriteFontFeature *features, int count);
+    शून्य SetFontFeatures(ध्रुव DWriteFontFeature *features, पूर्णाङ्क गणनम्);
 };
 
-class AdjustedGlyphRun : public DWRITE_GLYPH_RUN
+वग्ग AdjustedGlyphRun : सार्वजनिक DWRITE_GLYPH_RUN
 {
-private:
+गुप्त:
     FLOAT &mAccum;
     FLOAT mDelta;
     FLOAT *mAdjustedAdvances;
 
-public:
+सार्वजनिक:
     AdjustedGlyphRun(
-	    const DWRITE_GLYPH_RUN *glyphRun,
+	    ध्रुव DWRITE_GLYPH_RUN *glyphRun,
 	    FLOAT cellWidth,
 	    FLOAT &accum,
-	    const INT *lpDx,
-	    int *glyphIndex,
-	    int cchText) :
+	    ध्रुव INT *lpDx,
+	    पूर्णाङ्क *glyphIndex,
+	    पूर्णाङ्क cchText) :
 	DWRITE_GLYPH_RUN(*glyphRun),
 	mAccum(accum),
 	mDelta(0.0f),
-	mAdjustedAdvances(new FLOAT[glyphRun->glyphCount])
+	mAdjustedAdvances(नूतन FLOAT[glyphRun->glyph_गणनम्])
     {
-	assert(cellWidth != 0.0f);
-	for (UINT32 i = 0; i < glyphRun->glyphCount; ++i)
+	प्रतिज्ञा(cellWidth != 0.0f);
+	अत्थाय (UINT32 i = 0; i < glyphRun->glyph_गणनम्; ++i)
 	{
 	    FLOAT orig = glyphRun->glyphAdvances[i];
 	    FLOAT adjusted;
 
-	    if (*glyphIndex < cchText)
+	    सचे (*glyphIndex < cchText)
 	    {
 		adjusted = FLOAT(lpDx[*glyphIndex]);
 		(*glyphIndex)++;
 	    }
-	    else
+	    अञ्ञथा
 	    {
 		adjusted = adjustToCell(orig, cellWidth);
 	    }
@@ -412,111 +412,111 @@ public:
 	delete[] mAdjustedAdvances;
     }
 
-    static FLOAT adjustToCell(FLOAT value, FLOAT cellWidth)
+    स्थिर FLOAT adjustToCell(FLOAT मानम्, FLOAT cellWidth)
     {
-	int cellCount = int(floor(value / cellWidth + 0.5f));
-	if (cellCount < 1)
-	    cellCount = 1;
-	return cellCount * cellWidth;
+	पूर्णाङ्क cell_गणनम् = पूर्णाङ्क(floor(मानम् / cellWidth + 0.5f));
+	सचे (cell_गणनम् < 1)
+	    cell_गणनम् = 1;
+	पटिनिवत्त cell_गणनम् * cellWidth;
     }
 };
 
-struct TextRendererContext {
+संरचना TextRendererContext {
     // const fields.
     COLORREF color;
     FLOAT cellWidth;
-    const INT *lpDx;
-    int cchText;
+    ध्रुव INT *lpDx;
+    पूर्णाङ्क cchText;
     FLOAT baselineY;  // Fixed baseline Y coordinate
 
     // working fields.
     FLOAT offsetX;
-    int glyphIndex;
+    पूर्णाङ्क glyphIndex;
 };
 
-class TextRenderer FINAL : public IDWriteTextRenderer
+वग्ग TextRenderer FINAL : सार्वजनिक IDWriteTextRenderer
 {
-public:
+सार्वजनिक:
     TextRenderer(
 	    DWriteContext* pDWC) :
-	cRefCount_(0),
+	c_Ref_गणनम्(0),
 	pDWC_(pDWC)
     {
 	AddRef();
     }
 
     // add "virtual" to avoid a compiler warning
-    virtual ~TextRenderer()
+    आभास ~TextRenderer()
     {
     }
 
     IFACEMETHOD(IsPixelSnappingDisabled)(
-	__maybenull void* clientDrawingContext UNUSED,
+	__maybenull शून्य* clientDrawingContext UNUSED,
 	__out BOOL* isDisabled)
     {
 	*isDisabled = FALSE;
-	return S_OK;
+	पटिनिवत्त S_OK;
     }
 
     IFACEMETHOD(GetCurrentTransform)(
-	__maybenull void* clientDrawingContext UNUSED,
+	__maybenull शून्य* clientDrawingContext UNUSED,
 	__out DWRITE_MATRIX* transform)
     {
 	// forward the render target's transform
 	pDWC_->mRT->GetTransform(
 		reinterpret_cast<D2D1_MATRIX_3X2_F*>(transform));
-	return S_OK;
+	पटिनिवत्त S_OK;
     }
 
     IFACEMETHOD(GetPixelsPerDip)(
-	__maybenull void* clientDrawingContext UNUSED,
+	__maybenull शून्य* clientDrawingContext UNUSED,
 	__out FLOAT* pixelsPerDip)
     {
-	float dpiX, unused;
+	भिन्न dpiX, unused;
 	pDWC_->mRT->GetDpi(&dpiX, &unused);
 	*pixelsPerDip = dpiX / 96.0f;
-	return S_OK;
+	पटिनिवत्त S_OK;
     }
 
     IFACEMETHOD(DrawUnderline)(
-	__maybenull void* clientDrawingContext UNUSED,
+	__maybenull शून्य* clientDrawingContext UNUSED,
 	FLOAT baselineOriginX UNUSED,
 	FLOAT baselineOriginY UNUSED,
-	__in DWRITE_UNDERLINE const* underline UNUSED,
+	__in DWRITE_UNDERLINE ध्रुव* underline UNUSED,
 	IUnknown* clientDrawingEffect UNUSED)
     {
-	return E_NOTIMPL;
+	पटिनिवत्त E_NOTIMPL;
     }
 
     IFACEMETHOD(DrawStrikethrough)(
-	__maybenull void* clientDrawingContext UNUSED,
+	__maybenull शून्य* clientDrawingContext UNUSED,
 	FLOAT baselineOriginX UNUSED,
 	FLOAT baselineOriginY UNUSED,
-	__in DWRITE_STRIKETHROUGH const* strikethrough UNUSED,
+	__in DWRITE_STRIKETHROUGH ध्रुव* strikethrough UNUSED,
 	IUnknown* clientDrawingEffect UNUSED)
     {
-	return E_NOTIMPL;
+	पटिनिवत्त E_NOTIMPL;
     }
 
     IFACEMETHOD(DrawInlineObject)(
-	__maybenull void* clientDrawingContext UNUSED,
+	__maybenull शून्य* clientDrawingContext UNUSED,
 	FLOAT originX UNUSED,
 	FLOAT originY UNUSED,
 	IDWriteInlineObject* inlineObject UNUSED,
 	BOOL isSideways UNUSED,
-	BOOL isRightToLeft UNUSED,
+	BOOL is_दक्षिणः_To_वामः UNUSED,
 	IUnknown* clientDrawingEffect UNUSED)
     {
-	return E_NOTIMPL;
+	पटिनिवत्त E_NOTIMPL;
     }
 
     IFACEMETHOD(DrawGlyphRun)(
-	__maybenull void* clientDrawingContext,
+	__maybenull शून्य* clientDrawingContext,
 	FLOAT baselineOriginX,
 	FLOAT baselineOriginY,
 	DWRITE_MEASURING_MODE measuringMode UNUSED,
-	__in DWRITE_GLYPH_RUN const* glyphRun,
-	__in DWRITE_GLYPH_RUN_DESCRIPTION const* glyphRunDescription UNUSED,
+	__in DWRITE_GLYPH_RUN ध्रुव* glyphRun,
+	__in DWRITE_GLYPH_RUN_DESCRIPTION ध्रुव* glyphRunDescription UNUSED,
 	IUnknown* clientDrawingEffect UNUSED)
     {
 	TextRendererContext *context =
@@ -532,26 +532,26 @@ public:
 		context->cchText);
 
 #ifdef FEAT_DIRECTX_COLOR_EMOJI
-	if (pDWC_->mDWriteFactory2 != NULL)
+	सचे (pDWC_->mDWriteFactory2 != रिक्त)
 	{
-	    IDWriteColorGlyphRunEnumerator *enumerator = NULL;
+	    IDWriteColorGlyphRunEnumerator *enumerator = रिक्त;
 	    HRESULT hr = pDWC_->mDWriteFactory2->TranslateColorGlyphRun(
 		baselineOriginX + context->offsetX,
 		baselineOriginY,
 		&adjustedGlyphRun,
-		NULL,
+		रिक्त,
 		DWRITE_MEASURING_MODE_GDI_NATURAL,
-		NULL,
+		रिक्त,
 		0,
 		&enumerator);
-	    if (SUCCEEDED(hr))
+	    सचे (SUCCEEDED(hr))
 	    {
 		// Draw by IDWriteFactory2 for color emoji
 		BOOL hasRun = TRUE;
 		enumerator->MoveNext(&hasRun);
-		while (hasRun)
+		याव (hasRun)
 		{
-		    const DWRITE_COLOR_GLYPH_RUN* colorGlyphRun;
+		    ध्रुव DWRITE_COLOR_GLYPH_RUN* colorGlyphRun;
 		    enumerator->GetCurrentRun(&colorGlyphRun);
 
 		    pDWC_->mBrush->SetColor(colorGlyphRun->runColor);
@@ -565,7 +565,7 @@ public:
 		    enumerator->MoveNext(&hasRun);
 		}
 		SafeRelease(&enumerator);
-		return S_OK;
+		पटिनिवत्त S_OK;
 	    }
 	}
 #endif
@@ -578,93 +578,93 @@ public:
 		&adjustedGlyphRun,
 		pDWC_->SolidBrush(context->color),
 		DWRITE_MEASURING_MODE_NATURAL);
-	return S_OK;
+	पटिनिवत्त S_OK;
     }
 
-public:
+सार्वजनिक:
     IFACEMETHOD_(unsigned long, AddRef) ()
     {
-	return InterlockedIncrement(&cRefCount_);
+	पटिनिवत्त InterlockedIncrement(&c_Ref_गणनम्);
     }
 
     IFACEMETHOD_(unsigned long, Release) ()
     {
-	long newCount = InterlockedDecrement(&cRefCount_);
+	long new_गणनम्_2 = InterlockedDecrement(&c_Ref_गणनम्);
 
-	if (newCount == 0)
+	सचे (new_गणनम्_2 == 0)
 	{
-	    delete this;
-	    return 0;
+	    delete एतत्;
+	    पटिनिवत्त 0;
 	}
-	return newCount;
+	पटिनिवत्त new_गणनम्_2;
     }
 
     IFACEMETHOD(QueryInterface)(
-	IID const& riid,
-	void** ppvObject)
+	IID ध्रुव& riid,
+	शून्य** ppvObject)
     {
-	if (__uuidof(IDWriteTextRenderer) == riid)
+	सचे (__uuidof(IDWriteTextRenderer) == riid)
 	{
-	    *ppvObject = this;
+	    *ppvObject = एतत्;
 	}
-	else if (__uuidof(IDWritePixelSnapping) == riid)
+	अञ्ञथा सचे (__uuidof(IDWritePixelSnapping) == riid)
 	{
-	    *ppvObject = this;
+	    *ppvObject = एतत्;
 	}
-	else if (__uuidof(IUnknown) == riid)
+	अञ्ञथा सचे (__uuidof(IUnknown) == riid)
 	{
-	    *ppvObject = this;
+	    *ppvObject = एतत्;
 	}
-	else
+	अञ्ञथा
 	{
-	    *ppvObject = NULL;
-	    return E_FAIL;
+	    *ppvObject = रिक्त;
+	    पटिनिवत्त E_FAIL;
 	}
 
-	return S_OK;
+	पटिनिवत्त S_OK;
     }
 
-private:
-    long cRefCount_;
+गुप्त:
+    long c_Ref_गणनम्;
     DWriteContext* pDWC_;
 };
 
 DWriteContext::DWriteContext() :
-    mHDC(NULL),
+    mHDC(रिक्त),
     mBindRect(),
     mDMode(DM_GDI),
-    mInteropHDC(NULL),
-    mDrawing(false),
-    mFallbackDC(false),
-    mD2D1Factory(NULL),
-    mRT(NULL),
-    mGDIRT(NULL),
-    mBrush(NULL),
-    mBitmap(NULL),
-    mDWriteFactory(NULL),
+    mInteropHDC(रिक्त),
+    mDrawing(मिच्छा),
+    mFallbackDC(मिच्छा),
+    mD2D1Factory(रिक्त),
+    mRT(रिक्त),
+    mGDIRT(रिक्त),
+    mBrush(रिक्त),
+    mBitmap(रिक्त),
+    mDWriteFactory(रिक्त),
 #ifdef FEAT_DIRECTX_COLOR_EMOJI
-    mDWriteFactory2(NULL),
+    mDWriteFactory2(रिक्त),
 #endif
-    mGdiInterop(NULL),
-    mRenderingParams(NULL),
+    mGdiInterop(रिक्त),
+    mRenderingParams(रिक्त),
     mFontCache(8),
-    mTextFormat(NULL),
+    mTextFormat(रिक्त),
     mFontWeight(DWRITE_FONT_WEIGHT_NORMAL),
     mFontStyle(DWRITE_FONT_STYLE_NORMAL),
     mFontSize(0.0f),
     mFontAscent(0.0f),
     mTextAntialiasMode(D2D1_TEXT_ANTIALIAS_MODE_DEFAULT),
-    mFontFeatureCount(0)
+    m_Font_Feature_गणनम्(0)
 {
-    ZeroMemory(mFontFeatures, sizeof(mFontFeatures));
+    ZeroMemory(mFontFeatures, परिमाण(mFontFeatures));
     HRESULT hr;
 
     hr = D2D1CreateFactory(D2D1_FACTORY_TYPE_SINGLE_THREADED,
-	    __uuidof(ID2D1Factory), NULL,
-	    reinterpret_cast<void**>(&mD2D1Factory));
+	    __uuidof(ID2D1Factory), रिक्त,
+	    reinterpret_cast<शून्य**>(&mD2D1Factory));
     _RPT2(_CRT_WARN, "D2D1CreateFactory: hr=%p p=%p\n", hr, mD2D1Factory);
 
-    if (SUCCEEDED(hr))
+    सचे (SUCCEEDED(hr))
     {
 	hr = DWriteCreateFactory(
 		DWRITE_FACTORY_TYPE_SHARED,
@@ -675,7 +675,7 @@ DWriteContext::DWriteContext() :
     }
 
 #ifdef FEAT_DIRECTX_COLOR_EMOJI
-    if (SUCCEEDED(hr))
+    सचे (SUCCEEDED(hr))
     {
 	DWriteCreateFactory(
 		DWRITE_FACTORY_TYPE_SHARED,
@@ -685,13 +685,13 @@ DWriteContext::DWriteContext() :
     }
 #endif
 
-    if (SUCCEEDED(hr))
+    सचे (SUCCEEDED(hr))
     {
 	hr = mDWriteFactory->GetGdiInterop(&mGdiInterop);
 	_RPT2(_CRT_WARN, "GetGdiInterop: hr=%p p=%p\n", hr, mGdiInterop);
     }
 
-    if (SUCCEEDED(hr))
+    सचे (SUCCEEDED(hr))
     {
 	hr = mDWriteFactory->CreateRenderingParams(&mRenderingParams);
 	_RPT2(_CRT_WARN, "CreateRenderingParams: hr=%p p=%p\n", hr,
@@ -720,8 +720,8 @@ DWriteContext::CreateDeviceResources()
 {
     HRESULT hr;
 
-    if (mRT != NULL)
-	return S_OK;
+    सचे (mRT != रिक्त)
+	पटिनिवत्त S_OK;
 
     D2D1_RENDER_TARGET_PROPERTIES props = {
 	D2D1_RENDER_TARGET_TYPE_DEFAULT,
@@ -733,16 +733,16 @@ DWriteContext::CreateDeviceResources()
     hr = mD2D1Factory->CreateDCRenderTarget(&props, &mRT);
     _RPT2(_CRT_WARN, "CreateDCRenderTarget: hr=%p p=%p\n", hr, mRT);
 
-    if (SUCCEEDED(hr))
+    सचे (SUCCEEDED(hr))
     {
 	// This always succeeds.
 	mRT->QueryInterface(
 		__uuidof(ID2D1GdiInteropRenderTarget),
-		reinterpret_cast<void**>(&mGDIRT));
+		reinterpret_cast<शून्य**>(&mGDIRT));
 	_RPT1(_CRT_WARN, "GdiInteropRenderTarget: p=%p\n", mGDIRT);
     }
 
-    if (SUCCEEDED(hr))
+    सचे (SUCCEEDED(hr))
     {
 	hr = mRT->CreateSolidColorBrush(
 		D2D1::ColorF(D2D1::ColorF::Black),
@@ -750,13 +750,13 @@ DWriteContext::CreateDeviceResources()
 	_RPT2(_CRT_WARN, "CreateSolidColorBrush: hr=%p p=%p\n", hr, mBrush);
     }
 
-    if (SUCCEEDED(hr))
+    सचे (SUCCEEDED(hr))
 	Rebind();
 
-    return hr;
+    पटिनिवत्त hr;
 }
 
-    void
+    शून्य
 DWriteContext::DiscardDeviceResources()
 {
     SafeRelease(&mBitmap);
@@ -766,33 +766,33 @@ DWriteContext::DiscardDeviceResources()
 }
 
     HRESULT
-DWriteContext::CreateTextFormatFromLOGFONT(const LOGFONTW &logFont,
+DWriteContext::CreateTextFormatFromLOGFONT(ध्रुव LOGFONTW &logFont,
 	IDWriteTextFormat **ppTextFormat, FLOAT *pFontAscent)
 {
     // Most of this function is copied from: https://github.com/Microsoft/Windows-classic-samples/blob/master/Samples/Win7Samples/multimedia/DirectWrite/RenderTest/TextHelpers.cpp
     HRESULT hr = S_OK;
-    IDWriteTextFormat *pTextFormat = NULL;
+    IDWriteTextFormat *pTextFormat = रिक्त;
 
-    IDWriteFont *font = NULL;
-    IDWriteFontFamily *fontFamily = NULL;
-    IDWriteLocalizedStrings *localizedFamilyNames = NULL;
-    float fontSize = 0;
+    IDWriteFont *font = रिक्त;
+    IDWriteFontFamily *fontFamily = रिक्त;
+    IDWriteLocalizedStrings *localizedFamilyNames = रिक्त;
+    भिन्न fontSize = 0;
     DWRITE_FONT_METRICS fontMetrics = {};
 
-    if (SUCCEEDED(hr))
+    सचे (SUCCEEDED(hr))
     {
 	hr = mGdiInterop->CreateFontFromLOGFONT(&logFont, &font);
     }
 
     // Get the font family to which this font belongs.
-    if (SUCCEEDED(hr))
+    सचे (SUCCEEDED(hr))
     {
 	hr = font->GetFontFamily(&fontFamily);
     }
 
     // Get the family names. This returns an object that encapsulates one or
     // more names with the same meaning but in different languages.
-    if (SUCCEEDED(hr))
+    सचे (SUCCEEDED(hr))
     {
 	hr = fontFamily->GetFamilyNames(&localizedFamilyNames);
     }
@@ -802,31 +802,31 @@ DWriteContext::CreateTextFormatFromLOGFONT(const LOGFONTW &logFont,
     // purposes of creating a text format object any language will do.
 
     wchar_t familyName[100];
-    if (SUCCEEDED(hr))
+    सचे (SUCCEEDED(hr))
     {
 	hr = localizedFamilyNames->GetString(0, familyName,
 		ARRAYSIZE(familyName));
     }
 
-    if (SUCCEEDED(hr))
+    सचे (SUCCEEDED(hr))
     {
 	// Use lfHeight of the LOGFONT as font size.
-	fontSize = float(logFont.lfHeight);
+	fontSize = भिन्न(logFont.lfHeight);
 
 	font->GetMetrics(&fontMetrics);
 
 	// Convert lfHeight to DirectWrite font size
-	if (fontSize < 0)
+	सचे (fontSize < 0)
 	{
 	    // Negative lfHeight represents the font's em height in pixels
 	    fontSize = -fontSize;
 	}
-	else if (fontSize > 0)
+	अञ्ञथा सचे (fontSize > 0)
 	{
 	    // Positive lfHeight represents the font's cell height (ascent + descent)
 	    // Convert to em height
-	    fontSize = fontSize * float(fontMetrics.designUnitsPerEm)
-		/ float(fontMetrics.ascent + fontMetrics.descent + fontMetrics.lineGap);
+	    fontSize = fontSize * भिन्न(fontMetrics.designUnitsPerEm)
+		/ भिन्न(fontMetrics.ascent + fontMetrics.descent + fontMetrics.पङ्क्तिः_Gap);
 	}
     }
 
@@ -834,18 +834,18 @@ DWriteContext::CreateTextFormatFromLOGFONT(const LOGFONTW &logFont,
     // language of the text, which may or may not be the same as the primary
     // language of the user. However, for our purposes the user locale will do.
     wchar_t localeName[LOCALE_NAME_MAX_LENGTH];
-    if (SUCCEEDED(hr))
+    सचे (SUCCEEDED(hr))
     {
-	if (GetUserDefaultLocaleName(localeName, LOCALE_NAME_MAX_LENGTH) == 0)
+	सचे (GetUserDefaultLocaleName(localeName, LOCALE_NAME_MAX_LENGTH) == 0)
 	    hr = HRESULT_FROM_WIN32(GetLastError());
     }
 
-    if (SUCCEEDED(hr))
+    सचे (SUCCEEDED(hr))
     {
 	// Create the text format object.
 	hr = mDWriteFactory->CreateTextFormat(
 		familyName,
-		NULL, // no custom font collection
+		रिक्त, // no custom font collection
 		font->GetWeight(),
 		font->GetStyle(),
 		font->GetStretch(),
@@ -854,49 +854,49 @@ DWriteContext::CreateTextFormatFromLOGFONT(const LOGFONTW &logFont,
 		&pTextFormat);
     }
 
-    if (SUCCEEDED(hr))
+    सचे (SUCCEEDED(hr))
 	hr = pTextFormat->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_LEADING);
 
-    if (SUCCEEDED(hr))
+    सचे (SUCCEEDED(hr))
 	hr = pTextFormat->SetParagraphAlignment(
 		DWRITE_PARAGRAPH_ALIGNMENT_FAR);
 
-    if (SUCCEEDED(hr))
+    सचे (SUCCEEDED(hr))
 	hr = pTextFormat->SetWordWrapping(DWRITE_WORD_WRAPPING_NO_WRAP);
 
     SafeRelease(&localizedFamilyNames);
     SafeRelease(&fontFamily);
     SafeRelease(&font);
 
-    if (SUCCEEDED(hr))
+    सचे (SUCCEEDED(hr))
     {
 	*ppTextFormat = pTextFormat;
-	if (pFontAscent != NULL && fontMetrics.designUnitsPerEm != 0)
+	सचे (pFontAscent != रिक्त && fontMetrics.designUnitsPerEm != 0)
 	{
 	    // Calculate ascent ratio (0.0 to 1.0) relative to total font height
-	    FLOAT totalHeight = float(fontMetrics.ascent + fontMetrics.descent);
-	    if (totalHeight != 0.0f)
-		*pFontAscent = float(fontMetrics.ascent) / totalHeight;
-	    else
+	    FLOAT totalHeight = भिन्न(fontMetrics.ascent + fontMetrics.descent);
+	    सचे (totalHeight != 0.0f)
+		*pFontAscent = भिन्न(fontMetrics.ascent) / totalHeight;
+	    अञ्ञथा
 		*pFontAscent = 0.83f; // fallback
 	}
     }
-    else
+    अञ्ञथा
 	SafeRelease(&pTextFormat);
 
-    return hr;
+    पटिनिवत्त hr;
 }
 
     HRESULT
-DWriteContext::SetFontByLOGFONT(const LOGFONTW &logFont)
+DWriteContext::SetFontByLOGFONT(ध्रुव LOGFONTW &logFont)
 {
     HRESULT hr = S_OK;
-    IDWriteTextFormat *pTextFormat = NULL;
+    IDWriteTextFormat *pTextFormat = रिक्त;
     FLOAT fontAscent = 0.0f;
 
     hr = CreateTextFormatFromLOGFONT(logFont, &pTextFormat, &fontAscent);
 
-    if (SUCCEEDED(hr))
+    सचे (SUCCEEDED(hr))
     {
 	SafeRelease(&mTextFormat);
 	mTextFormat = pTextFormat;
@@ -906,16 +906,16 @@ DWriteContext::SetFontByLOGFONT(const LOGFONTW &logFont)
 	mFontAscent = fontAscent;
     }
 
-    return hr;
+    पटिनिवत्त hr;
 }
 
-    void
+    शून्य
 DWriteContext::SetFont(HFONT hFont)
 {
     FontCache::Item item;
-    if (mFontCache.get(hFont, item))
+    सचे (mFontCache.get(hFont, item))
     {
-	if (item.pTextFormat != NULL)
+	सचे (item.pTextFormat != रिक्त)
 	{
 	    item.pTextFormat->AddRef();
 	    SafeRelease(&mTextFormat);
@@ -923,33 +923,33 @@ DWriteContext::SetFont(HFONT hFont)
 	    mFontWeight = item.fontWeight;
 	    mFontStyle = item.fontStyle;
 	    mFontAscent = item.fontAscent;
-	    mFallbackDC = false;
+	    mFallbackDC = मिच्छा;
 	}
-	else
-	    mFallbackDC = true;
-	return;
+	अञ्ञथा
+	    mFallbackDC = सच्च;
+	पटिनिवत्त;
     }
 
     HRESULT hr = E_FAIL;
     LOGFONTW lf;
-    if (GetObjectW(hFont, sizeof(lf), &lf))
+    सचे (GetObjectW(hFont, परिमाण(lf), &lf))
 	hr = SetFontByLOGFONT(lf);
 
     item.hFont = hFont;
-    if (SUCCEEDED(hr))
+    सचे (SUCCEEDED(hr))
     {
 	item.pTextFormat = mTextFormat;
 	item.fontWeight = mFontWeight;
 	item.fontStyle = mFontStyle;
 	item.fontAscent = mFontAscent;
-	mFallbackDC = false;
+	mFallbackDC = मिच्छा;
     }
-    else
-	mFallbackDC = true;
+    अञ्ञथा
+	mFallbackDC = सच्च;
     mFontCache.put(item);
 }
 
-    void
+    शून्य
 DWriteContext::Rebind()
 {
     SafeRelease(&mBitmap);
@@ -962,83 +962,83 @@ DWriteContext::Rebind()
 	96.0f, 96.0f
     };
     mRT->CreateBitmap(
-	    D2D1::SizeU(mBindRect.right - mBindRect.left,
-		mBindRect.bottom - mBindRect.top),
+	    D2D1::SizeU(mBindRect.दक्षिणः - mBindRect.वामः,
+		mBindRect.bottom - mBindRect.शिखरम्),
 	    props, &mBitmap);
 }
 
-    void
-DWriteContext::BindDC(HDC hdc, const RECT *rect)
+    शून्य
+DWriteContext::BindDC(HDC hdc, ध्रुव RECT *rect)
 {
     mHDC = hdc;
     mBindRect = *rect;
 
-    if (mRT == NULL)
+    सचे (mRT == रिक्त)
 	CreateDeviceResources();
-    else
+    अञ्ञथा
     {
 	Flush();
 	Rebind();
     }
 }
 
-extern "C" void redraw_later_clear(void);
+बाह्य "C" शून्य redraw_later_clear(शून्य);
 
     HRESULT
 DWriteContext::SetDrawingMode(DrawingMode mode)
 {
     HRESULT hr = S_OK;
 
-    switch (mode)
+    विकल्प (mode)
     {
-	default:
-	case DM_GDI:
-	    if (mInteropHDC != NULL)
+	स्वभाव:
+	पक्ष DM_GDI:
+	    सचे (mInteropHDC != रिक्त)
 	    {
-		mGDIRT->ReleaseDC(NULL);
-		mInteropHDC = NULL;
+		mGDIRT->ReleaseDC(रिक्त);
+		mInteropHDC = रिक्त;
 	    }
-	    if (mDrawing)
+	    सचे (mDrawing)
 	    {
 		hr = mRT->EndDraw();
-		if (hr == (HRESULT)D2DERR_RECREATE_TARGET)
+		सचे (hr == (HRESULT)D2DERR_RECREATE_TARGET)
 		{
 		    hr = S_OK;
 		    DiscardDeviceResources();
 		    CreateDeviceResources();
 		    redraw_later_clear();
 		}
-		mDrawing = false;
+		mDrawing = मिच्छा;
 	    }
-	    break;
+	    भङ्ग;
 
-	case DM_DIRECTX:
-	    if (mInteropHDC != NULL)
+	पक्ष DM_DIRECTX:
+	    सचे (mInteropHDC != रिक्त)
 	    {
-		mGDIRT->ReleaseDC(NULL);
-		mInteropHDC = NULL;
+		mGDIRT->ReleaseDC(रिक्त);
+		mInteropHDC = रिक्त;
 	    }
-	    else if (mDrawing == false)
+	    अञ्ञथा सचे (mDrawing == मिच्छा)
 	    {
 		CreateDeviceResources();
 		mRT->BeginDraw();
-		mDrawing = true;
+		mDrawing = सच्च;
 	    }
-	    break;
+	    भङ्ग;
 
-	case DM_INTEROP:
-	    if (mDrawing == false)
+	पक्ष DM_INTEROP:
+	    सचे (mDrawing == मिच्छा)
 	    {
 		CreateDeviceResources();
 		mRT->BeginDraw();
-		mDrawing = true;
+		mDrawing = सच्च;
 	    }
-	    if (mInteropHDC == NULL)
+	    सचे (mInteropHDC == रिक्त)
 		hr = mGDIRT->GetDC(D2D1_DC_INITIALIZE_MODE_COPY, &mInteropHDC);
-	    break;
+	    भङ्ग;
     }
     mDMode = mode;
-    return hr;
+    पटिनिवत्त hr;
 }
 
     ID2D1Brush*
@@ -1046,19 +1046,19 @@ DWriteContext::SolidBrush(COLORREF color)
 {
     mBrush->SetColor(D2D1::ColorF(UINT32(GetRValue(color)) << 16 |
 		UINT32(GetGValue(color)) << 8 | UINT32(GetBValue(color))));
-    return mBrush;
+    पटिनिवत्त mBrush;
 }
 
-    void
-DWriteContext::DrawText(const WCHAR *text, int len,
-	int x, int y, int w, int h, int cellWidth, COLORREF color,
-	UINT fuOptions, const RECT *lprc, const INT *lpDx)
+    शून्य
+DWriteContext::DrawText(ध्रुव WCHAR *text, पूर्णाङ्क len,
+	पूर्णाङ्क x, पूर्णाङ्क y, पूर्णाङ्क w, पूर्णाङ्क h, पूर्णाङ्क cellWidth, COLORREF color,
+	UINT fuOptions, ध्रुव RECT *lprc, ध्रुव INT *lpDx)
 {
-    if (mFallbackDC)
+    सचे (mFallbackDC)
     {
 	// Fall back to GDI rendering.
 	HRESULT hr = SetDrawingMode(DM_INTEROP);
-	if (SUCCEEDED(hr))
+	सचे (SUCCEEDED(hr))
 	{
 	    HGDIOBJ hFont = ::GetCurrentObject(mHDC, OBJ_FONT);
 	    HGDIOBJ hOldFont = ::SelectObject(mInteropHDC, hFont);
@@ -1067,70 +1067,70 @@ DWriteContext::DrawText(const WCHAR *text, int len,
 	    ::ExtTextOutW(mInteropHDC, x, y, fuOptions, lprc, text, len, lpDx);
 	    ::SelectObject(mInteropHDC, hOldFont);
 	}
-	return;
+	पटिनिवत्त;
     }
 
     HRESULT hr;
-    IDWriteTextLayout *textLayout = NULL;
+    IDWriteTextLayout *textLayout = रिक्त;
 
     SetDrawingMode(DM_DIRECTX);
 
     // Apply clipping if ETO_CLIPPED is specified
-    if ((fuOptions & ETO_CLIPPED) && lprc != NULL)
+    सचे ((fuOptions & ETO_CLIPPED) && lprc != रिक्त)
     {
-	mRT->PushAxisAlignedClip(
-	    D2D1::RectF(FLOAT(lprc->left), FLOAT(lprc->top),
-			FLOAT(lprc->right), FLOAT(lprc->bottom)),
+	mRT->प्रक्षिप_Axis_Aligned_Clip(
+	    D2D1::RectF(FLOAT(lprc->वामः), FLOAT(lprc->शिखरम्),
+			FLOAT(lprc->दक्षिणः), FLOAT(lprc->bottom)),
 	    D2D1_ANTIALIAS_MODE_ALIASED);
     }
 
     hr = mDWriteFactory->CreateTextLayout(text, len, mTextFormat,
 	    FLOAT(w), FLOAT(h), &textLayout);
 
-    if (SUCCEEDED(hr))
+    सचे (SUCCEEDED(hr))
     {
 	DWRITE_TEXT_RANGE textRange = { 0, UINT32(len) };
 	textLayout->SetFontWeight(mFontWeight, textRange);
 	textLayout->SetFontStyle(mFontStyle, textRange);
 
-	if (mFontFeatureCount > 0)
+	सचे (m_Font_Feature_गणनम् > 0)
 	{
 	    // Default OpenType features that DirectWrite normally enables.
 	    // SetTypography() overrides all defaults, so we must
 	    // re-add them here explicitly.
-	    static const DWRITE_FONT_FEATURE defaultFeatures[] = {
+	    स्थिर ध्रुव DWRITE_FONT_FEATURE defaultFeatures[] = {
 		{ DWRITE_FONT_FEATURE_TAG_CONTEXTUAL_ALTERNATES, 1 },
 		{ DWRITE_FONT_FEATURE_TAG_STANDARD_LIGATURES, 1 },
 		{ DWRITE_FONT_FEATURE_TAG_CONTEXTUAL_LIGATURES, 1 },
 		{ DWRITE_FONT_FEATURE_TAG_REQUIRED_LIGATURES, 1 },
 		{ DWRITE_FONT_FEATURE_TAG_KERNING, 1 },
 	    };
-	    static const int numDefaults = sizeof(defaultFeatures)
-		/ sizeof(defaultFeatures[0]);
+	    स्थिर ध्रुव पूर्णाङ्क अङ्कः_Defaults = परिमाण(defaultFeatures)
+		/ परिमाण(defaultFeatures[0]);
 
-	    IDWriteTypography *typography = NULL;
+	    IDWriteTypography *typography = रिक्त;
 	    hr = mDWriteFactory->CreateTypography(&typography);
-	    if (SUCCEEDED(hr))
+	    सचे (SUCCEEDED(hr))
 	    {
 		// Add default features, skipping any that the user
 		// has explicitly specified (either + or -).
-		for (int d = 0; d < numDefaults; ++d)
+		अत्थाय (पूर्णाङ्क d = 0; d < अङ्कः_Defaults; ++d)
 		{
-		    int overridden = 0;
-		    for (int u = 0; u < mFontFeatureCount; ++u)
+		    पूर्णाङ्क overridden = 0;
+		    अत्थाय (पूर्णाङ्क u = 0; u < m_Font_Feature_गणनम्; ++u)
 		    {
-			if ((DWRITE_FONT_FEATURE_TAG)mFontFeatures[u].tag
+			सचे ((DWRITE_FONT_FEATURE_TAG)mFontFeatures[u].tag
 				== defaultFeatures[d].nameTag)
 			{
 			    overridden = 1;
-			    break;
+			    भङ्ग;
 			}
 		    }
-		    if (!overridden)
+		    सचे (!overridden)
 			typography->AddFontFeature(defaultFeatures[d]);
 		}
 		// Add user-specified features.
-		for (int i = 0; i < mFontFeatureCount; ++i)
+		अत्थाय (पूर्णाङ्क i = 0; i < m_Font_Feature_गणनम्; ++i)
 		{
 		    DWRITE_FONT_FEATURE ff = {
 			(DWRITE_FONT_FEATURE_TAG)mFontFeatures[i].tag,
@@ -1151,7 +1151,7 @@ DWriteContext::DrawText(const WCHAR *text, int len,
 	// vertical shifts during redraw.
 	FLOAT baselineY = roundf(FLOAT(y) + FLOAT(h) * mFontAscent + 0.5);
 
-	TextRenderer renderer(this);
+	TextRenderer renderer(एतत्);
 	TextRendererContext context = { color, FLOAT(cellWidth), lpDx, len,
 		baselineY, 0.0f, 0 };
 
@@ -1160,14 +1160,14 @@ DWriteContext::DrawText(const WCHAR *text, int len,
 
     SafeRelease(&textLayout);
 
-    if ((fuOptions & ETO_CLIPPED) && lprc != NULL)
-	mRT->PopAxisAlignedClip();
+    सचे ((fuOptions & ETO_CLIPPED) && lprc != रिक्त)
+	mRT->निष्कासय_Axis_Aligned_Clip();
 }
 
-    void
-DWriteContext::FillRect(const RECT *rc, COLORREF color)
+    शून्य
+DWriteContext::FillRect(ध्रुव RECT *rc, COLORREF color)
 {
-    if (mDMode == DM_INTEROP)
+    सचे (mDMode == DM_INTEROP)
     {
 	// GDI functions are used before this call.  Keep using GDI.
 	// (Switching to Direct2D causes terrible slowdown.)
@@ -1175,121 +1175,121 @@ DWriteContext::FillRect(const RECT *rc, COLORREF color)
 	::FillRect(mInteropHDC, rc, hbr);
 	::DeleteObject(HGDIOBJ(hbr));
     }
-    else
+    अञ्ञथा
     {
 	SetDrawingMode(DM_DIRECTX);
 	mRT->FillRectangle(
-		D2D1::RectF(FLOAT(rc->left), FLOAT(rc->top),
-		    FLOAT(rc->right), FLOAT(rc->bottom)),
+		D2D1::RectF(FLOAT(rc->वामः), FLOAT(rc->शिखरम्),
+		    FLOAT(rc->दक्षिणः), FLOAT(rc->bottom)),
 		SolidBrush(color));
     }
 }
 
-    void
-DWriteContext::DrawLine(int x1, int y1, int x2, int y2, COLORREF color)
+    शून्य
+DWriteContext::Draw_पङ्क्तिः(पूर्णाङ्क x1, पूर्णाङ्क y1, पूर्णाङ्क x2, पूर्णाङ्क y2, COLORREF color)
 {
-    if (mDMode == DM_INTEROP)
+    सचे (mDMode == DM_INTEROP)
     {
 	// GDI functions are used before this call.  Keep using GDI.
 	// (Switching to Direct2D causes terrible slowdown.)
 	HPEN hpen = ::CreatePen(PS_SOLID, 1, color);
 	HGDIOBJ old_pen = ::SelectObject(mInteropHDC, HGDIOBJ(hpen));
-	::MoveToEx(mInteropHDC, x1, y1, NULL);
-	::LineTo(mInteropHDC, x2, y2);
+	::MoveToEx(mInteropHDC, x1, y1, रिक्त);
+	::पङ्क्तिः_To(mInteropHDC, x2, y2);
 	::SelectObject(mInteropHDC, old_pen);
 	::DeleteObject(HGDIOBJ(hpen));
     }
-    else
+    अञ्ञथा
     {
 	SetDrawingMode(DM_DIRECTX);
-	mRT->DrawLine(
+	mRT->Draw_पङ्क्तिः(
 		D2D1::Point2F(FLOAT(x1), FLOAT(y1) + 0.5f),
 		D2D1::Point2F(FLOAT(x2), FLOAT(y2) + 0.5f),
 		SolidBrush(color));
     }
 }
 
-    void
-DWriteContext::SetPixel(int x, int y, COLORREF color)
+    शून्य
+DWriteContext::SetPixel(पूर्णाङ्क x, पूर्णाङ्क y, COLORREF color)
 {
-    if (mDMode == DM_INTEROP)
+    सचे (mDMode == DM_INTEROP)
     {
 	// GDI functions are used before this call.  Keep using GDI.
 	// (Switching to Direct2D causes terrible slowdown.)
 	::SetPixel(mInteropHDC, x, y, color);
     }
-    else
+    अञ्ञथा
     {
 	SetDrawingMode(DM_DIRECTX);
 	// Direct2D doesn't have SetPixel API.  Use DrawLine instead.
-	mRT->DrawLine(
+	mRT->Draw_पङ्क्तिः(
 		D2D1::Point2F(FLOAT(x), FLOAT(y) + 0.5f),
 		D2D1::Point2F(FLOAT(x+1), FLOAT(y) + 0.5f),
 		SolidBrush(color));
     }
 }
 
-    void
-DWriteContext::Scroll(int x, int y, const RECT *rc)
+    शून्य
+DWriteContext::Scroll(पूर्णाङ्क x, पूर्णाङ्क y, ध्रुव RECT *rc)
 {
     SetDrawingMode(DM_DIRECTX);
     mRT->Flush();
 
     D2D1_RECT_U srcRect;
     D2D1_POINT_2U destPoint;
-    if (x >= 0)
+    सचे (x >= 0)
     {
-	srcRect.left = rc->left;
-	srcRect.right = rc->right - x;
-	destPoint.x = rc->left + x;
+	srcRect.वामः = rc->वामः;
+	srcRect.दक्षिणः = rc->दक्षिणः - x;
+	destPoint.x = rc->वामः + x;
     }
-    else
+    अञ्ञथा
     {
-	srcRect.left = rc->left - x;
-	srcRect.right = rc->right;
-	destPoint.x = rc->left;
+	srcRect.वामः = rc->वामः - x;
+	srcRect.दक्षिणः = rc->दक्षिणः;
+	destPoint.x = rc->वामः;
     }
-    if (y >= 0)
+    सचे (y >= 0)
     {
-	srcRect.top = rc->top;
+	srcRect.शिखरम् = rc->शिखरम्;
 	srcRect.bottom = rc->bottom - y;
-	destPoint.y = rc->top + y;
+	destPoint.y = rc->शिखरम् + y;
     }
-    else
+    अञ्ञथा
     {
-	srcRect.top = rc->top - y;
+	srcRect.शिखरम् = rc->शिखरम् - y;
 	srcRect.bottom = rc->bottom;
-	destPoint.y = rc->top;
+	destPoint.y = rc->शिखरम्;
     }
     mBitmap->CopyFromRenderTarget(&destPoint, mRT, &srcRect);
 
     D2D1_RECT_F destRect = {
 	    FLOAT(destPoint.x), FLOAT(destPoint.y),
-	    FLOAT(destPoint.x + srcRect.right - srcRect.left),
-	    FLOAT(destPoint.y + srcRect.bottom - srcRect.top)
+	    FLOAT(destPoint.x + srcRect.दक्षिणः - srcRect.वामः),
+	    FLOAT(destPoint.y + srcRect.bottom - srcRect.शिखरम्)
     };
     mRT->DrawBitmap(mBitmap, destRect, 1.0F,
 	    D2D1_BITMAP_INTERPOLATION_MODE_NEAREST_NEIGHBOR, destRect);
 }
 
-    void
+    शून्य
 DWriteContext::Flush()
 {
     SetDrawingMode(DM_GDI);
 }
 
-    void
+    शून्य
 DWriteContext::SetRenderingParams(
-	const DWriteRenderingParams *params)
+	ध्रुव DWriteRenderingParams *params)
 {
-    if (mDWriteFactory == NULL)
-	return;
+    सचे (mDWriteFactory == रिक्त)
+	पटिनिवत्त;
 
-    IDWriteRenderingParams *renderingParams = NULL;
+    IDWriteRenderingParams *renderingParams = रिक्त;
     D2D1_TEXT_ANTIALIAS_MODE textAntialiasMode =
 	D2D1_TEXT_ANTIALIAS_MODE_DEFAULT;
     HRESULT hr;
-    if (params != NULL)
+    सचे (params != रिक्त)
     {
 	hr = mDWriteFactory->CreateCustomRenderingParams(params->gamma,
 		params->enhancedContrast, params->clearTypeLevel,
@@ -1297,9 +1297,9 @@ DWriteContext::SetRenderingParams(
 		ToRenderingMode(params->renderingMode), &renderingParams);
 	textAntialiasMode = ToTextAntialiasMode(params->textAntialiasMode);
     }
-    else
+    अञ्ञथा
 	hr = mDWriteFactory->CreateRenderingParams(&renderingParams);
-    if (SUCCEEDED(hr) && renderingParams != NULL)
+    सचे (SUCCEEDED(hr) && renderingParams != रिक्त)
     {
 	SafeRelease(&mRenderingParams);
 	mRenderingParams = renderingParams;
@@ -1315,7 +1315,7 @@ DWriteContext::SetRenderingParams(
 DWriteContext::GetRenderingParams(
 	DWriteRenderingParams *params)
 {
-    if (params != NULL && mRenderingParams != NULL)
+    सचे (params != रिक्त && mRenderingParams != रिक्त)
     {
 	params->gamma = mRenderingParams->GetGamma();
 	params->enhancedContrast = mRenderingParams->GetEnhancedContrast();
@@ -1324,23 +1324,23 @@ DWriteContext::GetRenderingParams(
 	params->renderingMode = ToInt(mRenderingParams->GetRenderingMode());
 	params->textAntialiasMode = mTextAntialiasMode;
     }
-    return params;
+    पटिनिवत्त params;
 }
 
 ////////////////////////////////////////////////////////////////////////////
 // PUBLIC C INTERFACES
 
-    void
-DWrite_Init(void)
+    शून्य
+DWrite_Init(शून्य)
 {
 #ifdef DYNAMIC_DIRECTX
     // Load libraries.
     hD2D1DLL = vimLoadLib("d2d1.dll");
     hDWriteDLL = vimLoadLib("dwrite.dll");
-    if (hD2D1DLL == NULL || hDWriteDLL == NULL)
+    सचे (hD2D1DLL == रिक्त || hDWriteDLL == रिक्त)
     {
 	DWrite_Final();
-	return;
+	पटिनिवत्त;
     }
     // Get address of procedures.
     pGetUserDefaultLocaleName = (PGETUSERDEFAULTLOCALENAME)GetProcAddress(
@@ -1352,111 +1352,111 @@ DWrite_Init(void)
 #endif
 }
 
-    void
-DWrite_Final(void)
+    शून्य
+DWrite_Final(शून्य)
 {
 #ifdef DYNAMIC_DIRECTX
-    pGetUserDefaultLocaleName = NULL;
-    pD2D1CreateFactory = NULL;
-    pDWriteCreateFactory = NULL;
+    pGetUserDefaultLocaleName = रिक्त;
+    pD2D1CreateFactory = रिक्त;
+    pDWriteCreateFactory = रिक्त;
     unload(hDWriteDLL);
     unload(hD2D1DLL);
 #endif
 }
 
     DWriteContext *
-DWriteContext_Open(void)
+DWriteContext_Open(शून्य)
 {
 #ifdef DYNAMIC_DIRECTX
-    if (pGetUserDefaultLocaleName == NULL || pD2D1CreateFactory == NULL
-	    || pDWriteCreateFactory == NULL)
-	return NULL;
+    सचे (pGetUserDefaultLocaleName == रिक्त || pD2D1CreateFactory == रिक्त
+	    || pDWriteCreateFactory == रिक्त)
+	पटिनिवत्त रिक्त;
 #endif
-    return new DWriteContext();
+    पटिनिवत्त नूतन DWriteContext();
 }
 
-    void
-DWriteContext_BindDC(DWriteContext *ctx, HDC hdc, const RECT *rect)
+    शून्य
+DWriteContext_BindDC(DWriteContext *ctx, HDC hdc, ध्रुव RECT *rect)
 {
-    if (ctx != NULL)
+    सचे (ctx != रिक्त)
 	ctx->BindDC(hdc, rect);
 }
 
-    void
+    शून्य
 DWriteContext_SetFont(DWriteContext *ctx, HFONT hFont)
 {
-    if (ctx != NULL)
+    सचे (ctx != रिक्त)
 	ctx->SetFont(hFont);
 }
 
-    void
+    शून्य
 DWriteContext_DrawText(
 	DWriteContext *ctx,
-	const WCHAR *text,
-	int len,
-	int x,
-	int y,
-	int w,
-	int h,
-	int cellWidth,
+	ध्रुव WCHAR *text,
+	पूर्णाङ्क len,
+	पूर्णाङ्क x,
+	पूर्णाङ्क y,
+	पूर्णाङ्क w,
+	पूर्णाङ्क h,
+	पूर्णाङ्क cellWidth,
 	COLORREF color,
 	UINT fuOptions,
-	const RECT *lprc,
-	const INT *lpDx)
+	ध्रुव RECT *lprc,
+	ध्रुव INT *lpDx)
 {
-    if (ctx != NULL)
+    सचे (ctx != रिक्त)
 	ctx->DrawText(text, len, x, y, w, h, cellWidth, color,
 		fuOptions, lprc, lpDx);
 }
 
-    void
-DWriteContext_FillRect(DWriteContext *ctx, const RECT *rc, COLORREF color)
+    शून्य
+DWriteContext_FillRect(DWriteContext *ctx, ध्रुव RECT *rc, COLORREF color)
 {
-    if (ctx != NULL)
+    सचे (ctx != रिक्त)
 	ctx->FillRect(rc, color);
 }
 
-    void
-DWriteContext_DrawLine(DWriteContext *ctx, int x1, int y1, int x2, int y2,
+    शून्य
+DWrite_Context_Draw_पङ्क्तिः(DWriteContext *ctx, पूर्णाङ्क x1, पूर्णाङ्क y1, पूर्णाङ्क x2, पूर्णाङ्क y2,
 	COLORREF color)
 {
-    if (ctx != NULL)
-	ctx->DrawLine(x1, y1, x2, y2, color);
+    सचे (ctx != रिक्त)
+	ctx->Draw_पङ्क्तिः(x1, y1, x2, y2, color);
 }
 
-    void
-DWriteContext_SetPixel(DWriteContext *ctx, int x, int y, COLORREF color)
+    शून्य
+DWriteContext_SetPixel(DWriteContext *ctx, पूर्णाङ्क x, पूर्णाङ्क y, COLORREF color)
 {
-    if (ctx != NULL)
+    सचे (ctx != रिक्त)
 	ctx->SetPixel(x, y, color);
 }
 
-    void
-DWriteContext_Scroll(DWriteContext *ctx, int x, int y, const RECT *rc)
+    शून्य
+DWriteContext_Scroll(DWriteContext *ctx, पूर्णाङ्क x, पूर्णाङ्क y, ध्रुव RECT *rc)
 {
-    if (ctx != NULL)
+    सचे (ctx != रिक्त)
 	ctx->Scroll(x, y, rc);
 }
 
-    void
+    शून्य
 DWriteContext_Flush(DWriteContext *ctx)
 {
-    if (ctx != NULL)
+    सचे (ctx != रिक्त)
 	ctx->Flush();
 }
 
-    void
+    शून्य
 DWriteContext_Close(DWriteContext *ctx)
 {
     delete ctx;
 }
 
-    void
+    शून्य
 DWriteContext_SetRenderingParams(
 	DWriteContext *ctx,
-	const DWriteRenderingParams *params)
+	ध्रुव DWriteRenderingParams *params)
 {
-    if (ctx != NULL)
+    सचे (ctx != रिक्त)
 	ctx->SetRenderingParams(params);
 }
 
@@ -1465,29 +1465,29 @@ DWriteContext_GetRenderingParams(
 	DWriteContext *ctx,
 	DWriteRenderingParams *params)
 {
-    if (ctx != NULL)
-	return ctx->GetRenderingParams(params);
-    else
-	return NULL;
+    सचे (ctx != रिक्त)
+	पटिनिवत्त ctx->GetRenderingParams(params);
+    अञ्ञथा
+	पटिनिवत्त रिक्त;
 }
 
-    void
+    शून्य
 DWriteContext::SetFontFeatures(
-	const DWriteFontFeature *features, int count)
+	ध्रुव DWriteFontFeature *features, पूर्णाङ्क गणनम्)
 {
-    if (count > DWRITE_MAX_FONT_FEATURES)
-	count = DWRITE_MAX_FONT_FEATURES;
-    mFontFeatureCount = count;
-    if (count > 0 && features != NULL)
-	memcpy(mFontFeatures, features, sizeof(DWriteFontFeature) * count);
+    सचे (गणनम् > DWRITE_MAX_FONT_FEATURES)
+	गणनम् = DWRITE_MAX_FONT_FEATURES;
+    m_Font_Feature_गणनम् = गणनम्;
+    सचे (गणनम् > 0 && features != रिक्त)
+	memcpy(mFontFeatures, features, परिमाण(DWriteFontFeature) * गणनम्);
 }
 
-    void
+    शून्य
 DWriteContext_SetFontFeatures(
 	DWriteContext *ctx,
-	const DWriteFontFeature *features,
-	int count)
+	ध्रुव DWriteFontFeature *features,
+	पूर्णाङ्क गणनम्)
 {
-    if (ctx != NULL)
-	ctx->SetFontFeatures(features, count);
+    सचे (ctx != रिक्त)
+	ctx->SetFontFeatures(features, गणनम्);
 }

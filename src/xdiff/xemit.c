@@ -20,25 +20,25 @@
  *
  */
 
-#include "xinclude.h"
+#अन्तर्भाव "xinclude.h"
 
 
-static int xdl_emit_record(xdfile_t *xdf, long ri, char const *pre, xdemitcb_t *ecb)
+स्थिर पूर्णाङ्क xdl_emit_record(xdfile_t *xdf, long ri, वर्ण ध्रुव *pre, xdemitcb_t *ecb)
 {
 	xrecord_t *rec = &xdf->recs[ri];
 
-	if (xdl_emit_diffrec(rec->ptr, rec->size, pre, (long)strlen(pre), ecb) < 0)
-		return -1;
+	सचे (xdl_emit_diffrec(rec->ptr, rec->size, pre, (long)strlen(pre), ecb) < 0)
+		पटिनिवत्त -1;
 
-	return 0;
+	पटिनिवत्त 0;
 }
 
 #define signed_add_overflows(a, b) \
     ((b) > LONG_MAX - (a))
 
-static long saturating_add(long a, long b)
+स्थिर long saturating_add(long a, long b)
 {
-	return signed_add_overflows(a, b) ? LONG_MAX : a + b;
+	पटिनिवत्त signed_add_overflows(a, b) ? LONG_MAX : a + b;
 }
 
 #undef signed_add_overflows
@@ -48,7 +48,7 @@ static long saturating_add(long a, long b)
  * inside the differential hunk according to the specified configuration.
  * Also advance xscr if the first changes must be discarded.
  */
-xdchange_t *xdl_get_hunk(xdchange_t **xscr, xdemitconf_t const *xecfg)
+xdchange_t *xdl_get_hunk(xdchange_t **xscr, xdemitconf_t ध्रुव *xecfg)
 {
 	xdchange_t *xch, *xchp, *lxch;
 	long max_common = saturating_add(saturating_add(xecfg->ctxlen,
@@ -58,155 +58,155 @@ xdchange_t *xdl_get_hunk(xdchange_t **xscr, xdemitconf_t const *xecfg)
 	long ignored = 0; /* number of ignored blank lines */
 
 	/* remove ignorable changes that are too far before other changes */
-	for (xchp = *xscr; xchp && xchp->ignore; xchp = xchp->next) {
+	अत्थाय (xchp = *xscr; xchp && xchp->ignore; xchp = xchp->next) {
 		xch = xchp->next;
 
-		if (xch == NULL ||
+		सचे (xch == रिक्त ||
 		    xch->i1 - (xchp->i1 + xchp->chg1) >= max_ignorable)
 			*xscr = xch;
 	}
 
-	if (!*xscr)
-		return NULL;
+	सचे (!*xscr)
+		पटिनिवत्त रिक्त;
 
 	lxch = *xscr;
 
-	for (xchp = *xscr, xch = xchp->next; xch; xchp = xch, xch = xch->next) {
+	अत्थाय (xchp = *xscr, xch = xchp->next; xch; xchp = xch, xch = xch->next) {
 		long distance = xch->i1 - (xchp->i1 + xchp->chg1);
-		if (distance > max_common)
-			break;
+		सचे (distance > max_common)
+			भङ्ग;
 
-		if (distance < max_ignorable && (!xch->ignore || lxch == xchp)) {
+		सचे (distance < max_ignorable && (!xch->ignore || lxch == xchp)) {
 			lxch = xch;
 			ignored = 0;
-		} else if (distance < max_ignorable && xch->ignore) {
+		} अञ्ञथा सचे (distance < max_ignorable && xch->ignore) {
 			ignored += xch->chg2;
-		} else if (lxch != xchp &&
+		} अञ्ञथा सचे (lxch != xchp &&
 			   xch->i1 + ignored - (lxch->i1 + lxch->chg1) > max_common) {
-			break;
-		} else if (!xch->ignore) {
+			भङ्ग;
+		} अञ्ञथा सचे (!xch->ignore) {
 			lxch = xch;
 			ignored = 0;
-		} else {
+		} अञ्ञथा {
 			ignored += xch->chg2;
 		}
 	}
 
-	return lxch;
+	पटिनिवत्त lxch;
 }
 
 
-#if 0
-static long def_ff(const char *rec, long len, char *buf, long sz)
+#सचे 0
+स्थिर long def_ff(ध्रुव वर्ण *rec, long len, वर्ण *buf, long sz)
 {
-	if (len > 0 &&
-			(isalpha((unsigned char)*rec) || /* identifier? */
+	सचे (len > 0 &&
+			(isalpha((unsigned वर्ण)*rec) || /* identifier? */
 			 *rec == '_' || /* also identifier? */
 			 *rec == '$')) { /* identifiers from VMS and other esoterico */
-		if (len > sz)
+		सचे (len > sz)
 			len = sz;
-		while (0 < len && isspace((unsigned char)rec[len - 1]))
+		याव (0 < len && isspace((unsigned वर्ण)rec[len - 1]))
 			len--;
 		memcpy(buf, rec, len);
-		return len;
+		पटिनिवत्त len;
 	}
-	return -1;
+	पटिनिवत्त -1;
 }
 #endif
 
-#if 0
-static long match_func_rec(xdfile_t *xdf, xdemitconf_t const *xecfg, long ri,
-			   char *buf, long sz)
+#सचे 0
+स्थिर long match_func_rec(xdfile_t *xdf, xdemitconf_t ध्रुव *xecfg, long ri,
+			   वर्ण *buf, long sz)
 {
 	xrecord_t *rec = &xdf->recs[ri];
 
-	if (!xecfg->find_func)
-		return def_ff(rec->ptr, rec->size, buf, sz);
-	return xecfg->find_func(rec->ptr, rec->size, buf, sz, xecfg->find_func_priv);
+	सचे (!xecfg->find_func)
+		पटिनिवत्त def_ff(rec->ptr, rec->size, buf, sz);
+	पटिनिवत्त xecfg->find_func(rec->ptr, rec->size, buf, sz, xecfg->find_func_priv);
 }
 #endif
 
-#if 0
-static int is_func_rec(xdfile_t *xdf, xdemitconf_t const *xecfg, long ri)
+#सचे 0
+स्थिर पूर्णाङ्क is_func_rec(xdfile_t *xdf, xdemitconf_t ध्रुव *xecfg, long ri)
 {
-	char dummy[1];
-	return match_func_rec(xdf, xecfg, ri, dummy, sizeof(dummy)) >= 0;
+	वर्ण dummy[1];
+	पटिनिवत्त match_func_rec(xdf, xecfg, ri, dummy, परिमाण(dummy)) >= 0;
 }
 #endif
 
-struct func_line {
+संरचना func_पङ्क्तिः {
 	long len;
-	char buf[80];
+	वर्ण buf[80];
 };
 
-#if 0
-static long get_func_line(xdfenv_t *xe, xdemitconf_t const *xecfg,
-			  struct func_line *func_line, long start, long limit)
+#सचे 0
+स्थिर long get_func_पङ्क्तिः(xdfenv_t *xe, xdemitconf_t ध्रुव *xecfg,
+			  संरचना func_पङ्क्तिः *func_पङ्क्तिः, long start, long limit)
 {
 	long l, size, step = (start > limit) ? -1 : 1;
-	char *buf, dummy[1];
+	वर्ण *buf, dummy[1];
 
-	buf = func_line ? func_line->buf : dummy;
-	size = func_line ? sizeof(func_line->buf) : sizeof(dummy);
+	buf = func_पङ्क्तिः ? func_पङ्क्तिः->buf : dummy;
+	size = func_पङ्क्तिः ? परिमाण(func_पङ्क्तिः->buf) : परिमाण(dummy);
 
-	for (l = start; l != limit && 0 <= l && l < xe->xdf1.nrec; l += step) {
+	अत्थाय (l = start; l != limit && 0 <= l && l < xe->xdf1.nrec; l += step) {
 		long len = match_func_rec(&xe->xdf1, xecfg, l, buf, size);
-		if (len >= 0) {
-			if (func_line)
-				func_line->len = len;
-			return l;
+		सचे (len >= 0) {
+			सचे (func_पङ्क्तिः)
+				func_पङ्क्तिः->len = len;
+			पटिनिवत्त l;
 		}
 	}
-	return -1;
+	पटिनिवत्त -1;
 }
 #endif
 
-#if 0
-static int is_empty_rec(xdfile_t *xdf, long ri)
+#सचे 0
+स्थिर पूर्णाङ्क is_empty_rec(xdfile_t *xdf, long ri)
 {
 	xrecord_t *rec = &xdf->recs[ri];
 	long i = 0;
 
-	for (; i < rec->size && XDL_ISSPACE(rec->ptr[i]); i++);
+	अत्थाय (; i < rec->size && XDL_ISSPACE(rec->ptr[i]); i++);
 
-	return i == rec->size;
+	पटिनिवत्त i == rec->size;
 }
 #endif
 
-int xdl_emit_diff(xdfenv_t *xe, xdchange_t *xscr, xdemitcb_t *ecb,
-		  xdemitconf_t const *xecfg) {
+पूर्णाङ्क xdl_emit_diff(xdfenv_t *xe, xdchange_t *xscr, xdemitcb_t *ecb,
+		  xdemitconf_t ध्रुव *xecfg) {
 	long s1, s2, e1, e2, lctx;
 	xdchange_t *xch, *xche;
-#if 0
+#सचे 0
 	long funclineprev = -1;
 #endif
-	struct func_line func_line;
+	संरचना func_पङ्क्तिः func_पङ्क्तिः;
 
-	func_line.len = 0;
+	func_पङ्क्तिः.len = 0;
 
-	for (xch = xscr; xch; xch = xche->next) {
+	अत्थाय (xch = xscr; xch; xch = xche->next) {
 		xche = xdl_get_hunk(&xch, xecfg);
-		if (!xch)
-			break;
+		सचे (!xch)
+			भङ्ग;
 
 		s1 = XDL_MAX(xch->i1 - xecfg->ctxlen, 0);
 		s2 = XDL_MAX(xch->i2 - xecfg->ctxlen, 0);
 
-#if 0
-		if (xecfg->flags & XDL_EMIT_FUNCCONTEXT) {
+#सचे 0
+		सचे (xecfg->flags & XDL_EMIT_FUNCCONTEXT) {
 			long fs1, i1 = xch->i1;
 
 			/* Appended chunk? */
-			if (i1 >= xe->xdf1.nrec) {
+			सचे (i1 >= xe->xdf1.nrec) {
 				long i2 = xch->i2;
 
 				/*
 				 * We don't need additional context if
 				 * a whole function was added.
 				 */
-				while (i2 < xe->xdf2.nrec) {
-					if (is_func_rec(&xe->xdf2, xecfg, i2))
-						goto post_context_calculation;
+				याव (i2 < xe->xdf2.nrec) {
+					सचे (is_func_rec(&xe->xdf2, xecfg, i2))
+						गच्छ post_context_calculation;
 					i2++;
 				}
 
@@ -217,13 +217,13 @@ int xdl_emit_diff(xdfenv_t *xe, xdchange_t *xscr, xdemitcb_t *ecb,
 				i1 = xe->xdf1.nrec - 1;
 			}
 
-			fs1 = get_func_line(xe, xecfg, NULL, i1, -1);
-			while (fs1 > 0 && !is_empty_rec(&xe->xdf1, fs1 - 1) &&
+			fs1 = get_func_पङ्क्तिः(xe, xecfg, रिक्त, i1, -1);
+			याव (fs1 > 0 && !is_empty_rec(&xe->xdf1, fs1 - 1) &&
 			       !is_func_rec(&xe->xdf1, xecfg, fs1 - 1))
 				fs1--;
-			if (fs1 < 0)
+			सचे (fs1 < 0)
 				fs1 = 0;
-			if (fs1 < s1) {
+			सचे (fs1 < s1) {
 				s2 = XDL_MAX(s2 - (s1 - fs1), 0);
 				s1 = fs1;
 
@@ -231,15 +231,15 @@ int xdl_emit_diff(xdfenv_t *xe, xdchange_t *xscr, xdemitcb_t *ecb,
 				 * Did we extend context upwards into an
 				 * ignored change?
 				 */
-				while (xchp != xch &&
+				याव (xchp != xch &&
 				       xchp->i1 + xchp->chg1 <= s1 &&
 				       xchp->i2 + xchp->chg2 <= s2)
 					xchp = xchp->next;
 
 				/* If so, show it after all. */
-				if (xchp != xch) {
+				सचे (xchp != xch) {
 					xch = xchp;
-					goto pre_context_calculation;
+					गच्छ pre_context_calculation;
 				}
 			}
 		}
@@ -253,16 +253,16 @@ int xdl_emit_diff(xdfenv_t *xe, xdchange_t *xscr, xdemitcb_t *ecb,
 		e1 = xche->i1 + xche->chg1 + lctx;
 		e2 = xche->i2 + xche->chg2 + lctx;
 
-#if 0
-		if (xecfg->flags & XDL_EMIT_FUNCCONTEXT) {
-			long fe1 = get_func_line(xe, xecfg, NULL,
+#सचे 0
+		सचे (xecfg->flags & XDL_EMIT_FUNCCONTEXT) {
+			long fe1 = get_func_पङ्क्तिः(xe, xecfg, रिक्त,
 						 xche->i1 + xche->chg1,
 						 xe->xdf1.nrec);
-			while (fe1 > 0 && is_empty_rec(&xe->xdf1, fe1 - 1))
+			याव (fe1 > 0 && is_empty_rec(&xe->xdf1, fe1 - 1))
 				fe1--;
-			if (fe1 < 0)
+			सचे (fe1 < 0)
 				fe1 = xe->xdf1.nrec;
-			if (fe1 > e1) {
+			सचे (fe1 > e1) {
 				e2 = XDL_MIN(e2 + (fe1 - e1), xe->xdf2.nrec);
 				e1 = fe1;
 			}
@@ -272,13 +272,13 @@ int xdl_emit_diff(xdfenv_t *xe, xdchange_t *xscr, xdemitcb_t *ecb,
 			 * in the current hunk and start over to find
 			 * its new end.
 			 */
-			if (xche->next) {
+			सचे (xche->next) {
 				long l = XDL_MIN(xche->next->i1,
 						 xe->xdf1.nrec - 1);
-				if (l - xecfg->ctxlen <= e1 ||
-				    get_func_line(xe, xecfg, NULL, l, e1) < 0) {
+				सचे (l - xecfg->ctxlen <= e1 ||
+				    get_func_पङ्क्तिः(xe, xecfg, रिक्त, l, e1) < 0) {
 					xche = xche->next;
-					goto post_context_calculation;
+					गच्छ post_context_calculation;
 				}
 			}
 		}
@@ -288,49 +288,49 @@ int xdl_emit_diff(xdfenv_t *xe, xdchange_t *xscr, xdemitcb_t *ecb,
 		 * Emit current hunk header.
 		 */
 
-#if 0
-		if (xecfg->flags & XDL_EMIT_FUNCNAMES) {
-			get_func_line(xe, xecfg, &func_line,
+#सचे 0
+		सचे (xecfg->flags & XDL_EMIT_FUNCNAMES) {
+			get_func_पङ्क्तिः(xe, xecfg, &func_पङ्क्तिः,
 				      s1 - 1, funclineprev);
 			funclineprev = s1 - 1;
 		}
 #endif
-		if (!(xecfg->flags & XDL_EMIT_NO_HUNK_HDR) &&
+		सचे (!(xecfg->flags & XDL_EMIT_NO_HUNK_HDR) &&
 		    xdl_emit_hunk_hdr(s1 + 1, e1 - s1, s2 + 1, e2 - s2,
-				      func_line.buf, func_line.len, ecb) < 0)
-			return -1;
+				      func_पङ्क्तिः.buf, func_पङ्क्तिः.len, ecb) < 0)
+			पटिनिवत्त -1;
 
 		/*
 		 * Emit pre-context.
 		 */
-		for (; s2 < xch->i2; s2++)
-			if (xdl_emit_record(&xe->xdf2, s2, " ", ecb) < 0)
-				return -1;
+		अत्थाय (; s2 < xch->i2; s2++)
+			सचे (xdl_emit_record(&xe->xdf2, s2, " ", ecb) < 0)
+				पटिनिवत्त -1;
 
-		for (s1 = xch->i1, s2 = xch->i2;; xch = xch->next) {
+		अत्थाय (s1 = xch->i1, s2 = xch->i2;; xch = xch->next) {
 			/*
 			 * Merge previous with current change atom.
 			 */
-			for (; s1 < xch->i1 && s2 < xch->i2; s1++, s2++)
-				if (xdl_emit_record(&xe->xdf2, s2, " ", ecb) < 0)
-					return -1;
+			अत्थाय (; s1 < xch->i1 && s2 < xch->i2; s1++, s2++)
+				सचे (xdl_emit_record(&xe->xdf2, s2, " ", ecb) < 0)
+					पटिनिवत्त -1;
 
 			/*
 			 * Removes lines from the first file.
 			 */
-			for (s1 = xch->i1; s1 < xch->i1 + xch->chg1; s1++)
-				if (xdl_emit_record(&xe->xdf1, s1, "-", ecb) < 0)
-					return -1;
+			अत्थाय (s1 = xch->i1; s1 < xch->i1 + xch->chg1; s1++)
+				सचे (xdl_emit_record(&xe->xdf1, s1, "-", ecb) < 0)
+					पटिनिवत्त -1;
 
 			/*
 			 * Adds lines from the second file.
 			 */
-			for (s2 = xch->i2; s2 < xch->i2 + xch->chg2; s2++)
-				if (xdl_emit_record(&xe->xdf2, s2, "+", ecb) < 0)
-					return -1;
+			अत्थाय (s2 = xch->i2; s2 < xch->i2 + xch->chg2; s2++)
+				सचे (xdl_emit_record(&xe->xdf2, s2, "+", ecb) < 0)
+					पटिनिवत्त -1;
 
-			if (xch == xche)
-				break;
+			सचे (xch == xche)
+				भङ्ग;
 			s1 = xch->i1 + xch->chg1;
 			s2 = xch->i2 + xch->chg2;
 		}
@@ -338,10 +338,10 @@ int xdl_emit_diff(xdfenv_t *xe, xdchange_t *xscr, xdemitcb_t *ecb,
 		/*
 		 * Emit post-context.
 		 */
-		for (s2 = xche->i2 + xche->chg2; s2 < e2; s2++)
-			if (xdl_emit_record(&xe->xdf2, s2, " ", ecb) < 0)
-				return -1;
+		अत्थाय (s2 = xche->i2 + xche->chg2; s2 < e2; s2++)
+			सचे (xdl_emit_record(&xe->xdf2, s2, " ", ecb) < 0)
+				पटिनिवत्त -1;
 	}
 
-	return 0;
+	पटिनिवत्त 0;
 }

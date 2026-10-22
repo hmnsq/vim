@@ -11,37 +11,37 @@
  * Text properties implementation.  See ":help text-properties".
  */
 
-#include "vim.h"
+#अन्तर्भाव "vim.h"
 
-#if defined(FEAT_PROP_POPUP)
+#सचे defined(FEAT_PROP_POPUP)
 
-static void um_store_changes(unpacked_memline_T *um);
+स्थिर शून्य um_store_changes(unpacked_memline_T *um);
 
 /*
  * Free virtual text strings in a detached unpacked memline's props.
  */
-    static void
-um_free_vtext(textprop_T *props, int count)
+    स्थिर शून्य
+um_free_vtext(textprop_T *props, पूर्णाङ्क गणनम्)
 {
-    for (int i = 0; i < count; ++i)
-	if (props[i].tp_flags & TP_FLAG_VTEXT_PTR)
+    अत्थाय (पूर्णाङ्क i = 0; i < गणनम्; ++i)
+	सचे (props[i].tp_flags & TP_FLAG_VTEXT_PTR)
 	    VIM_CLEAR(props[i].u.tp_text);
 }
 
 /*
  * Free memory used by an unpacked memline.
  */
-    static void
+    स्थिर शून्य
 um_free(unpacked_memline_T *um)
 {
-    if (um->detached)
+    सचे (um->detached)
     {
 	VIM_CLEAR(um->text);
-	um_free_vtext(um->props, um->prop_count);
+	um_free_vtext(um->props, um->prop_गणनम्);
     }
     VIM_CLEAR(um->props);
     um->prop_size = 0;
-    um->prop_count = 0;
+    um->prop_गणनम् = 0;
     um->lnum = 0;
     um->detached = false;
 }
@@ -57,7 +57,7 @@ um_open(buf_T *buf)
 
     CLEAR_FIELD(um);
     um.buf = buf;
-    return um;
+    पटिनिवत्त um;
 }
 
 /*
@@ -67,88 +67,88 @@ um_open(buf_T *buf)
  * Returns true on success, false on error (um becomes closed).
  */
     bool
-um_goto_line(unpacked_memline_T *um, linenr_T lnum, int extra_props)
+um_goto_पङ्क्तिः(unpacked_memline_T *um, linenr_T lnum, पूर्णाङ्क extra_props)
 {
-    char_u	*line;
+    char_u	*पङ्क्तिः;
     size_t	textlen;
     size_t	propdata_len;
-    int		proplen;
+    पूर्णाङ्क		proplen;
 
-    if (um->buf == NULL)
-	return false;
+    सचे (um->buf == रिक्त)
+	पटिनिवत्त false;
 
     // Store changes to the current line if any.
-    if (um->lnum > 0 && um->detached)
+    सचे (um->lnum > 0 && um->detached)
 	um_store_changes(um);
     um_free(um);
 
-    if (lnum == 0)
-	return true;	// just unload
+    सचे (lnum == 0)
+	पटिनिवत्त true;	// just unload
 
-    line = ml_get_buf(um->buf, lnum, FALSE);
+    पङ्क्तिः = ml_get_buf(um->buf, lnum, FALSE);
     textlen = ml_get_buf_len(um->buf, lnum) + 1;
-    propdata_len = um->buf->b_ml.ml_line_len - textlen;
+    propdata_len = um->buf->b_ml.ml_पङ्क्तिः_len - textlen;
 
     um->lnum = lnum;
     um->text_size = (colnr_T)textlen;
-    um->text = line;
+    um->text = पङ्क्तिः;
 
-    if (propdata_len == 0)
-	return true;
+    सचे (propdata_len == 0)
+	पटिनिवत्त true;
 
     // New format: [prop_count (uint16)][textprop_T...][vtext...]
-    if (propdata_len < PROP_COUNT_SIZE + sizeof(textprop_T))
+    सचे (propdata_len < PROP_गणनम्_SIZE + परिमाण(textprop_T))
     {
 	emsg(e_text_property_info_corrupted);
-	um->buf = NULL;
-	return false;
+	um->buf = रिक्त;
+	पटिनिवत्त false;
     }
 
-    uint16_t    prop_count;
-    char_u	    *count_ptr = line + textlen;
+    uint16_t    prop_गणनम्;
+    char_u	    *गणनम्_ptr = पङ्क्तिः + textlen;
     char_u	    *props_start;
 
-    mch_memmove(&prop_count, count_ptr, PROP_COUNT_SIZE);
-    if (!text_prop_count_valid(prop_count, propdata_len))
+    mch_memmove(&prop_गणनम्, गणनम्_ptr, PROP_गणनम्_SIZE);
+    सचे (!text_prop_गणनम्_valid(prop_गणनम्, propdata_len))
     {
 	emsg(e_text_property_info_corrupted);
-	um->buf = NULL;
-	return false;
+	um->buf = रिक्त;
+	पटिनिवत्त false;
     }
-    proplen = (int)prop_count;
-    props_start = count_ptr + PROP_COUNT_SIZE;
+    proplen = (पूर्णाङ्क)prop_गणनम्;
+    props_start = गणनम्_ptr + PROP_गणनम्_SIZE;
 
-    if (!text_prop_vtext_valid(props_start, proplen, propdata_len))
+    सचे (!text_prop_vtext_valid(props_start, proplen, propdata_len))
     {
 	emsg(e_text_property_info_corrupted);
-	um->buf = NULL;
-	return false;
+	um->buf = रिक्त;
+	पटिनिवत्त false;
     }
 
     um->props = ALLOC_MULT(textprop_T, proplen + extra_props);
-    if (um->props == NULL)
+    सचे (um->props == रिक्त)
     {
-	um->buf = NULL;
-	return false;
+	um->buf = रिक्त;
+	पटिनिवत्त false;
     }
     um->prop_size = proplen + extra_props;
-    um->prop_count = proplen;
-    mch_memmove(um->props, props_start, proplen * sizeof(textprop_T));
+    um->prop_गणनम् = proplen;
+    mch_memmove(um->props, props_start, proplen * परिमाण(textprop_T));
 
     // Convert tp_text_offset to tp_text pointer for virtual text
     // props.
-    for (int i = 0; i < proplen; ++i)
+    अत्थाय (पूर्णाङ्क i = 0; i < proplen; ++i)
     {
-	if (um->props[i].tp_id < 0 && um->props[i].u.tp_text_offset > 0)
+	सचे (um->props[i].tp_id < 0 && um->props[i].u.tp_text_offset > 0)
 	{
-	    um->props[i].u.tp_text = count_ptr + um->props[i].u.tp_text_offset;
+	    um->props[i].u.tp_text = गणनम्_ptr + um->props[i].u.tp_text_offset;
 	    um->props[i].tp_flags |= TP_FLAG_VTEXT_PTR;
 	}
-	else
-	    um->props[i].u.tp_text = NULL;
+	अञ्ञथा
+	    um->props[i].u.tp_text = रिक्त;
     }
 
-    return true;
+    पटिनिवत्त true;
 }
 
 /*
@@ -156,13 +156,13 @@ um_goto_line(unpacked_memline_T *um, linenr_T lnum, int extra_props)
  * Check um.buf != NULL for success.
  */
     unpacked_memline_T
-um_open_at(buf_T *buf, linenr_T lnum, int extra_props)
+um_open_at(buf_T *buf, linenr_T lnum, पूर्णाङ्क extra_props)
 {
     unpacked_memline_T um = um_open(buf);
 
-    if (!um_goto_line(&um, lnum, extra_props))
-	um.buf = NULL;
-    return um;
+    सचे (!um_goto_पङ्क्तिः(&um, lnum, extra_props))
+	um.buf = रिक्त;
+    पटिनिवत्त um;
 }
 
 /*
@@ -170,43 +170,43 @@ um_open_at(buf_T *buf, linenr_T lnum, int extra_props)
  * strings to allocated memory (LOADED -> DETACHED).
  * Returns true on success.
  */
-    static bool
+    स्थिर bool
 um_detach(unpacked_memline_T *um)
 {
     char_u  *newtext;
 
-    if (um->detached || um->buf == NULL)
-	return um->detached;
+    सचे (um->detached || um->buf == रिक्त)
+	पटिनिवत्त um->detached;
 
     newtext = vim_strnsave(um->text, um->text_size - 1);
-    if (newtext == NULL)
+    सचे (newtext == रिक्त)
     {
-	um->buf = NULL;
-	return false;
+	um->buf = रिक्त;
+	पटिनिवत्त false;
     }
     um->text = newtext;
 
-    for (int i = 0; i < um->prop_count; ++i)
+    अत्थाय (पूर्णाङ्क i = 0; i < um->prop_गणनम्; ++i)
     {
-	if (um->props[i].tp_flags & TP_FLAG_VTEXT_PTR)
+	सचे (um->props[i].tp_flags & TP_FLAG_VTEXT_PTR)
 	{
 	    char_u *copy = vim_strsave(um->props[i].u.tp_text);
 
-	    if (copy == NULL)
+	    सचे (copy == रिक्त)
 	    {
-		for (int j = 0; j < i; ++j)
-		    if (um->props[j].tp_id < 0)
+		अत्थाय (पूर्णाङ्क j = 0; j < i; ++j)
+		    सचे (um->props[j].tp_id < 0)
 			VIM_CLEAR(um->props[j].u.tp_text);
 		VIM_CLEAR(um->text);
-		um->buf = NULL;
-		return false;
+		um->buf = रिक्त;
+		पटिनिवत्त false;
 	    }
 	    um->props[i].u.tp_text = copy;
 	}
     }
 
     um->detached = true;
-    return true;
+    पटिनिवत्त true;
 }
 
 /*
@@ -216,64 +216,64 @@ um_detach(unpacked_memline_T *um)
     bool
 um_set_text(unpacked_memline_T *um, char_u *text)
 {
-    if (um->buf == NULL)
-	return false;
-    if (um->detached)
+    सचे (um->buf == रिक्त)
+	पटिनिवत्त false;
+    सचे (um->detached)
 	vim_free(um->text);
     um->text = text;
     um->text_size = (colnr_T)STRLEN(text) + 1;
     um->text_changed = true;
     um->detached = true;
-    return true;
+    पटिनिवत्त true;
 }
 
 /*
  * Ensure there is space for at least "needed" more properties.
  * Returns true on success.
  */
-    static bool
-um_grow_props(unpacked_memline_T *um, int needed)
+    स्थिर bool
+um_grow_props(unpacked_memline_T *um, पूर्णाङ्क needed)
 {
-    if (um->prop_count + needed <= um->prop_size)
-	return true;
+    सचे (um->prop_गणनम् + needed <= um->prop_size)
+	पटिनिवत्त true;
 
-    int	    new_size = um->prop_count + needed;
+    पूर्णाङ्क	    new_size = um->prop_गणनम् + needed;
     textprop_T  *newprops = vim_realloc(um->props,
-					    new_size * sizeof(textprop_T));
-    if (newprops == NULL)
-	return false;
+					    new_size * परिमाण(textprop_T));
+    सचे (newprops == रिक्त)
+	पटिनिवत्त false;
     um->props = newprops;
     um->prop_size = new_size;
 
-    return true;
+    पटिनिवत्त true;
 }
 
 /*
  * Add a property to the end of the props array without sorting.
  * For virtual text props, u.tp_text ownership is transferred.
  */
-    static void
+    स्थिर शून्य
 um_add_prop(unpacked_memline_T *um, textprop_T *prop)
 {
-    if (um->buf == NULL)
-	return;
-    if (!um->detached && !um_detach(um))
-	return;
-    if (!um_grow_props(um, 1))
+    सचे (um->buf == रिक्त)
+	पटिनिवत्त;
+    सचे (!um->detached && !um_detach(um))
+	पटिनिवत्त;
+    सचे (!um_grow_props(um, 1))
     {
-	um->buf = NULL;
-	return;
+	um->buf = रिक्त;
+	पटिनिवत्त;
     }
-    um->props[um->prop_count++] = *prop;
+    um->props[um->prop_गणनम्++] = *prop;
 }
 
 /*
  * Reverse the order of all properties.
  */
-    void
+    शून्य
 um_reverse_props(unpacked_memline_T *um)
 {
-    for (int i = 0, j = um->prop_count - 1; i < j; ++i, --j)
+    अत्थाय (पूर्णाङ्क i = 0, j = um->prop_गणनम् - 1; i < j; ++i, --j)
     {
 	textprop_T tmp = um->props[i];
 	um->props[i] = um->props[j];
@@ -287,45 +287,45 @@ um_reverse_props(unpacked_memline_T *um)
  * immediately in the DETACHED state.
  */
     unpacked_memline_T
-um_open_at_no_props(buf_T *buf, linenr_T lnum, int prop_count)
+um_open_at_no_props(buf_T *buf, linenr_T lnum, पूर्णाङ्क prop_गणनम्)
 {
     unpacked_memline_T um;
 
     CLEAR_FIELD(um);
     um.buf = buf;
 
-    if (lnum < 1 || lnum > buf->b_ml.ml_line_count)
+    सचे (lnum < 1 || lnum > buf->b_ml.ml_पङ्क्तिः_गणनम्)
     {
-	um.buf = NULL;
-	return um;
+	um.buf = रिक्त;
+	पटिनिवत्त um;
     }
 
-    char_u *line = ml_get_buf(buf, lnum, FALSE);
-    char_u *text_copy = vim_strsave(line);
+    char_u *पङ्क्तिः = ml_get_buf(buf, lnum, FALSE);
+    char_u *text_copy = vim_strsave(पङ्क्तिः);
 
-    if (text_copy == NULL)
+    सचे (text_copy == रिक्त)
     {
-	um.buf = NULL;
-	return um;
+	um.buf = रिक्त;
+	पटिनिवत्त um;
     }
     um.lnum = lnum;
     um.text = text_copy;
     um.text_size = (colnr_T)STRLEN(text_copy) + 1;
     um.detached = true;
 
-    if (prop_count > 0)
+    सचे (prop_गणनम् > 0)
     {
-	um.props = ALLOC_MULT(textprop_T, prop_count);
-	if (um.props == NULL)
+	um.props = ALLOC_MULT(textprop_T, prop_गणनम्);
+	सचे (um.props == रिक्त)
 	{
 	    vim_free(um.text);
-	    um.buf = NULL;
-	    return um;
+	    um.buf = रिक्त;
+	    पटिनिवत्त um;
 	}
-	um.prop_size = prop_count;
+	um.prop_size = prop_गणनम्;
     }
 
-    return um;
+    पटिनिवत्त um;
 }
 
 /*
@@ -333,31 +333,31 @@ um_open_at_no_props(buf_T *buf, linenr_T lnum, int prop_count)
  * Find a property on "lnum" in "buf" that matches "tp_id" and "tp_type",
  * and clear "flag_to_clear" (TP_FLAG_CONT_NEXT or TP_FLAG_CONT_PREV).
  */
-    static void
+    स्थिर शून्य
 clear_cont_flag_on_neighbor(buf_T *buf, linenr_T lnum,
-					int tp_id, int tp_type, int flag)
+					पूर्णाङ्क tp_id, पूर्णाङ्क tp_type, पूर्णाङ्क flag)
 {
     unpacked_memline_T	neighbor;
 
-    if (lnum < 1 || lnum > buf->b_ml.ml_line_count)
-	return;
+    सचे (lnum < 1 || lnum > buf->b_ml.ml_पङ्क्तिः_गणनम्)
+	पटिनिवत्त;
 
     neighbor = um_open_at(buf, lnum, 0);
-    if (neighbor.buf == NULL)
-	return;
+    सचे (neighbor.buf == रिक्त)
+	पटिनिवत्त;
 
-    for (int i = 0; i < neighbor.prop_count; ++i)
+    अत्थाय (पूर्णाङ्क i = 0; i < neighbor.prop_गणनम्; ++i)
     {
 	textprop_T *p = &neighbor.props[i];
 
-	if (p->tp_id == tp_id && p->tp_type == tp_type && (p->tp_flags & flag))
+	सचे (p->tp_id == tp_id && p->tp_type == tp_type && (p->tp_flags & flag))
 	{
-	    if (!neighbor.detached && !um_detach(&neighbor))
-		break;
+	    सचे (!neighbor.detached && !um_detach(&neighbor))
+		भङ्ग;
 	    // Re-get pointer after detach.
 	    p = &neighbor.props[i];
 	    p->tp_flags &= ~flag;
-	    break;
+	    भङ्ग;
 	}
     }
     um_close(&neighbor);
@@ -368,27 +368,27 @@ clear_cont_flag_on_neighbor(buf_T *buf, linenr_T lnum,
  * Automatically detaches if needed.
  * Also adjusts continuation flags on neighboring lines.
  */
-    void
-um_delete_prop(unpacked_memline_T *um, int index)
+    शून्य
+um_delete_prop(unpacked_memline_T *um, पूर्णाङ्क index)
 {
     textprop_T *prop;
 
-    if (um->buf == NULL || index < 0 || index >= um->prop_count)
-	return;
-    if (!um->detached && !um_detach(um))
-	return;
+    सचे (um->buf == रिक्त || index < 0 || index >= um->prop_गणनम्)
+	पटिनिवत्त;
+    सचे (!um->detached && !um_detach(um))
+	पटिनिवत्त;
 
     prop = &um->props[index];
 
     // Adjust continuation flags on neighboring lines before deleting.
-    if (prop->tp_flags & TP_FLAG_CONT_PREV)
+    सचे (prop->tp_flags & TP_FLAG_CONT_PREV)
 	clear_cont_flag_on_neighbor(um->buf, um->lnum - 1,
 			       prop->tp_id, prop->tp_type, TP_FLAG_CONT_NEXT);
-    if (prop->tp_flags & TP_FLAG_CONT_NEXT)
+    सचे (prop->tp_flags & TP_FLAG_CONT_NEXT)
 	clear_cont_flag_on_neighbor(um->buf, um->lnum + 1,
 			       prop->tp_id, prop->tp_type, TP_FLAG_CONT_PREV);
 
-    if (prop->tp_flags & TP_FLAG_VTEXT_PTR)
+    सचे (prop->tp_flags & TP_FLAG_VTEXT_PTR)
 	VIM_CLEAR(prop->u.tp_text);
     prop->tp_flags |= TP_FLAG_DELETED;
 }
@@ -402,147 +402,147 @@ um_delete_prop(unpacked_memline_T *um, int index)
  * NOTE: Currently packs in the OLD format (no inline vtext) because
  * the read side has not been converted yet.
  */
-    static char_u *
-um_pack(unpacked_memline_T *um, int *packed_len)
+    स्थिर char_u *
+um_pack(unpacked_memline_T *um, पूर्णाङ्क *packed_len)
 {
-    uint16_t	live_count = 0;
-    int		vtext_size = 0;
-    int		total_len;
+    uint16_t	live_गणनम् = 0;
+    पूर्णाङ्क		vtext_size = 0;
+    पूर्णाङ्क		total_len;
     char_u	*buf;
-    char_u	*count_dest;
+    char_u	*गणनम्_dest;
     char_u	*prop_dest;
     char_u	*vtext_dest;
 
-    for (int i = 0; i < um->prop_count; ++i)
+    अत्थाय (पूर्णाङ्क i = 0; i < um->prop_गणनम्; ++i)
     {
 	textprop_T *prop = &um->props[i];
 
-	if (prop->tp_flags & TP_FLAG_DELETED)
-	    continue;
-	++live_count;
-	if (prop->tp_flags & TP_FLAG_VTEXT_PTR)
+	सचे (prop->tp_flags & TP_FLAG_DELETED)
+	    अनुवर्त;
+	++live_गणनम्;
+	सचे (prop->tp_flags & TP_FLAG_VTEXT_PTR)
 	    vtext_size += prop->tp_len + 1;
     }
 
-    if (live_count == 0)
+    सचे (live_गणनम् == 0)
     {
 	// No properties: just text, no prop_count header.
 	total_len = um->text_size;
 	buf = alloc(total_len);
-	if (buf == NULL)
-	    return NULL;
+	सचे (buf == रिक्त)
+	    पटिनिवत्त रिक्त;
 	*packed_len = total_len;
 	mch_memmove(buf, um->text, um->text_size);
-	return buf;
+	पटिनिवत्त buf;
     }
 
     // Format: [text][NUL][prop_count][textprop_T...][vtext...]
-    total_len = um->text_size + (int)PROP_COUNT_SIZE
-		+ live_count * (int)sizeof(textprop_T) + vtext_size;
+    total_len = um->text_size + (पूर्णाङ्क)PROP_गणनम्_SIZE
+		+ live_गणनम् * (पूर्णाङ्क)परिमाण(textprop_T) + vtext_size;
     buf = alloc(total_len);
-    if (buf == NULL)
-	return NULL;
+    सचे (buf == रिक्त)
+	पटिनिवत्त रिक्त;
     *packed_len = total_len;
 
     mch_memmove(buf, um->text, um->text_size);
 
-    count_dest = buf + um->text_size;
-    mch_memmove(count_dest, &live_count, PROP_COUNT_SIZE);
+    गणनम्_dest = buf + um->text_size;
+    mch_memmove(गणनम्_dest, &live_गणनम्, PROP_गणनम्_SIZE);
 
-    prop_dest = count_dest + PROP_COUNT_SIZE;
-    vtext_dest = prop_dest + live_count * sizeof(textprop_T);
+    prop_dest = गणनम्_dest + PROP_गणनम्_SIZE;
+    vtext_dest = prop_dest + live_गणनम् * परिमाण(textprop_T);
 
-    for (int i = 0; i < um->prop_count; ++i)
+    अत्थाय (पूर्णाङ्क i = 0; i < um->prop_गणनम्; ++i)
     {
 	textprop_T prop = um->props[i];
 
-	if (prop.tp_flags & TP_FLAG_DELETED)
-	    continue;
+	सचे (prop.tp_flags & TP_FLAG_DELETED)
+	    अनुवर्त;
 
-	if (prop.tp_id < 0 && (prop.tp_flags & TP_FLAG_VTEXT_PTR))
+	सचे (prop.tp_id < 0 && (prop.tp_flags & TP_FLAG_VTEXT_PTR))
 	{
-	    int copysize = prop.tp_len + 1;
+	    पूर्णाङ्क copysize = prop.tp_len + 1;
 
 	    mch_memmove(vtext_dest, prop.u.tp_text, copysize);
-	    prop.u.tp_text_offset = (colnr_T)(vtext_dest - count_dest);
+	    prop.u.tp_text_offset = (colnr_T)(vtext_dest - गणनम्_dest);
 	    vtext_dest += copysize;
 	}
-	else
+	अञ्ञथा
 	    prop.u.tp_text_offset = 0;
 	prop.tp_flags &= ~(TP_FLAG_DELETED | TP_FLAG_VTEXT_PTR);
 
-	mch_memmove(prop_dest, &prop, sizeof(textprop_T));
-	prop_dest += sizeof(textprop_T);
+	mch_memmove(prop_dest, &prop, परिमाण(textprop_T));
+	prop_dest += परिमाण(textprop_T);
     }
 
-    return buf;
+    पटिनिवत्त buf;
 }
 
 /*
  * Store changes to the current line back into the buffer's memline.
  */
-    static void
+    स्थिर शून्य
 um_store_changes(unpacked_memline_T *um)
 {
     char_u  *packed;
-    int	    packed_len;
+    पूर्णाङ्क	    packed_len;
 
-    if (!um->detached || um->buf == NULL || um->lnum == 0)
-	return;
+    सचे (!um->detached || um->buf == रिक्त || um->lnum == 0)
+	पटिनिवत्त;
 
     packed = um_pack(um, &packed_len);
-    if (packed == NULL)
+    सचे (packed == रिक्त)
     {
-	um->buf = NULL;
-	return;
+	um->buf = रिक्त;
+	पटिनिवत्त;
     }
 
     // Flush any other dirty line before setting ours.  ml_get_buf()
     // with will_change=TRUE will flush the current dirty line and set
     // up for our line.
-    if (um->buf->b_ml.ml_line_lnum != um->lnum)
+    सचे (um->buf->b_ml.ml_पङ्क्तिः_lnum != um->lnum)
 	ml_get_buf(um->buf, um->lnum, TRUE);
-    else if (!(um->buf->b_ml.ml_flags & ML_LINE_DIRTY))
-	(void)ml_get_buf(um->buf, um->lnum, TRUE);
+    अञ्ञथा सचे (!(um->buf->b_ml.ml_flags & ML_पङ्क्तिः_DIRTY))
+	(शून्य)ml_get_buf(um->buf, um->lnum, TRUE);
 
     // Free the detached text and vtext before switching to packed.
     vim_free(um->text);
-    um_free_vtext(um->props, um->prop_count);
+    um_free_vtext(um->props, um->prop_गणनम्);
 
-    if (um->buf->b_ml.ml_flags & (ML_LINE_DIRTY | ML_ALLOCATED))
-	vim_free(um->buf->b_ml.ml_line_ptr);
-    um->buf->b_ml.ml_line_ptr = packed;
-    um->buf->b_ml.ml_line_len = packed_len;
-    um->buf->b_ml.ml_flags |= ML_LINE_DIRTY;
+    सचे (um->buf->b_ml.ml_flags & (ML_पङ्क्तिः_DIRTY | ML_ALLOCATED))
+	vim_free(um->buf->b_ml.ml_पङ्क्तिः_ptr);
+    um->buf->b_ml.ml_पङ्क्तिः_ptr = packed;
+    um->buf->b_ml.ml_पङ्क्तिः_len = packed_len;
+    um->buf->b_ml.ml_flags |= ML_पङ्क्तिः_DIRTY;
 
     um->detached = false;
     um->text = packed;
     um->text_size = (colnr_T)STRLEN(packed) + 1;
-    um->buf->b_ml.ml_line_textlen = um->text_size;
+    um->buf->b_ml.ml_पङ्क्तिः_textlen = um->text_size;
 }
 
 /*
  * Close an unpacked memline, storing any changes.
  */
-    void
+    शून्य
 um_close(unpacked_memline_T *um)
 {
-    if (um->buf == NULL)
-	return;
-    if (um->detached && um->lnum > 0)
+    सचे (um->buf == रिक्त)
+	पटिनिवत्त;
+    सचे (um->detached && um->lnum > 0)
 	um_store_changes(um);
     um_free(um);
-    um->buf = NULL;
+    um->buf = रिक्त;
 }
 
 /*
  * Abort an unpacked memline, discarding any changes.
  */
-    void
+    शून्य
 um_abort(unpacked_memline_T *um)
 {
     um_free(um);
-    um->buf = NULL;
+    um->buf = रिक्त;
 }
 
 /*
@@ -554,65 +554,65 @@ um_abort(unpacked_memline_T *um)
  */
 #define PT2HIKEY(p)  ((p)->pt_name)
 #define HIKEY2PT(p)   ((proptype_T *)((p) - offsetof(proptype_T, pt_name)))
-#define HI2PT(hi)      HIKEY2PT((hi)->hi_key)
+#define HI2PT(hi)      HIKEY2PT((hi)->hi_कुञ्चिका)
 
 // The global text property types.
-static hashtab_T *global_proptypes = NULL;
-static proptype_T **global_proparray = NULL;
+स्थिर hashtab_T *global_proptypes = रिक्त;
+स्थिर proptype_T **global_proparray = रिक्त;
 
 // The last used text property type ID.
-static int proptype_id = 0;
+स्थिर पूर्णाङ्क proptype_id = 0;
 
 /*
  * Find a property type by name, return the hashitem.
  * Returns NULL if the item can't be found.
  */
-    static hashitem_T *
+    स्थिर hashitem_T *
 find_prop_type_hi(char_u *name, buf_T *buf)
 {
     hashtab_T	*ht;
     hashitem_T	*hi;
 
-    if (*name == NUL)
-	return NULL;
-    if (buf == NULL)
+    सचे (*name == NUL)
+	पटिनिवत्त रिक्त;
+    सचे (buf == रिक्त)
 	ht = global_proptypes;
-    else
+    अञ्ञथा
 	ht = buf->b_proptypes;
 
-    if (ht == NULL)
-	return NULL;
+    सचे (ht == रिक्त)
+	पटिनिवत्त रिक्त;
     hi = hash_find(ht, name);
-    if (HASHITEM_EMPTY(hi))
-	return NULL;
-    return hi;
+    सचे (HASHITEM_EMPTY(hi))
+	पटिनिवत्त रिक्त;
+    पटिनिवत्त hi;
 }
 
 /*
  * Like find_prop_type_hi() but return the property type.
  */
-    static proptype_T *
+    स्थिर proptype_T *
 find_prop_type(char_u *name, buf_T *buf)
 {
     hashitem_T	*hi = find_prop_type_hi(name, buf);
 
-    if (hi == NULL)
-	return NULL;
-    return HI2PT(hi);
+    सचे (hi == रिक्त)
+	पटिनिवत्त रिक्त;
+    पटिनिवत्त HI2PT(hi);
 }
 
 /*
  * Get the prop type ID of "name".
  * When not found return zero.
  */
-    int
+    पूर्णाङ्क
 find_prop_type_id(char_u *name, buf_T *buf)
 {
     proptype_T *pt = find_prop_type(name, buf);
 
-    if (pt == NULL)
-	return 0;
-    return pt->pt_id;
+    सचे (pt == रिक्त)
+	पटिनिवत्त 0;
+    पटिनिवत्त pt->pt_id;
 }
 
 /*
@@ -620,16 +620,16 @@ find_prop_type_id(char_u *name, buf_T *buf)
  * global types.
  * When not found gives an error message and returns NULL.
  */
-    static proptype_T *
+    स्थिर proptype_T *
 lookup_prop_type(char_u *name, buf_T *buf)
 {
     proptype_T *type = find_prop_type(name, buf);
 
-    if (type == NULL)
-	type = find_prop_type(name, NULL);
-    if (type == NULL)
+    सचे (type == रिक्त)
+	type = find_prop_type(name, रिक्त);
+    सचे (type == रिक्त)
 	semsg(_(e_property_type_str_does_not_exist), name);
-    return type;
+    पटिनिवत्त type;
 }
 
 /*
@@ -639,50 +639,50 @@ lookup_prop_type(char_u *name, buf_T *buf)
  * If "bufnr" is valid or not present return OK.
  * When "arg" is not a dict or "bufnr" is invalid return FAIL.
  */
-    static int
+    स्थिर पूर्णाङ्क
 get_bufnr_from_arg(typval_T *arg, buf_T **buf)
 {
     dictitem_T	*di;
 
-    if (arg->v_type != VAR_DICT)
+    सचे (arg->v_type != VAR_DICT)
     {
 	emsg(_(e_dictionary_required));
-	return FAIL;
+	पटिनिवत्त FAIL;
     }
-    if (arg->vval.v_dict == NULL)
-	return OK;  // NULL dict is like an empty dict
+    सचे (arg->vval.v_dict == रिक्त)
+	पटिनिवत्त OK;  // NULL dict is like an empty dict
     di = dict_find(arg->vval.v_dict, (char_u *)"bufnr", -1);
-    if (di != NULL && (di->di_tv.v_type != VAR_NUMBER
-					      || di->di_tv.vval.v_number != 0))
+    सचे (di != रिक्त && (di->di_tv.v_type != VAR_सङ्ख्या
+					      || di->di_tv.vval.v_सङ्ख्या != 0))
     {
 	*buf = get_buf_arg(&di->di_tv);
-	if (*buf == NULL)
-	    return FAIL;
+	सचे (*buf == रिक्त)
+	    पटिनिवत्त FAIL;
     }
-    return OK;
+    पटिनिवत्त OK;
 }
 
 /*
  * prop_add({lnum}, {col}, {props})
  */
-    void
+    शून्य
 f_prop_add(typval_T *argvars, typval_T *rettv)
 {
     linenr_T	start_lnum;
     colnr_T	start_col;
 
-    if (in_vim9script()
-	    && (check_for_number_arg(argvars, 0) == FAIL
-		|| check_for_number_arg(argvars, 1) == FAIL
+    सचे (in_vim9script()
+	    && (check_for_सङ्ख्या_arg(argvars, 0) == FAIL
+		|| check_for_सङ्ख्या_arg(argvars, 1) == FAIL
 		|| check_for_dict_arg(argvars, 2) == FAIL))
-	return;
+	पटिनिवत्त;
 
-    start_lnum = tv_get_number(&argvars[0]);
-    start_col = tv_get_number(&argvars[1]);
-    if (check_for_dict_arg(argvars, 2) == FAIL)
-	return;
+    start_lnum = tv_get_सङ्ख्या(&argvars[0]);
+    start_col = tv_get_सङ्ख्या(&argvars[1]);
+    सचे (check_for_dict_arg(argvars, 2) == FAIL)
+	पटिनिवत्त;
 
-    rettv->vval.v_number = prop_add_common(start_lnum, start_col,
+    rettv->vval.v_सङ्ख्या = prop_add_common(start_lnum, start_col,
 				 argvars[2].vval.v_dict, curbuf, &argvars[2]);
 }
 
@@ -692,14 +692,14 @@ f_prop_add(typval_T *argvars, typval_T *rettv)
  * the buffer "buf" and assign identifier "id".
  * When "text" is not NULL store it as virtual text in the memline.
  */
-    static int
+    स्थिर पूर्णाङ्क
 prop_add_one(
 	buf_T		*buf,
 	char_u		*type_name,
-	int		id,
+	पूर्णाङ्क		id,
 	char_u		*text_arg,
-	int		text_padding_left,
-	int		text_flags,
+	पूर्णाङ्क		text_padding_वामः,
+	पूर्णाङ्क		text_flags,
 	linenr_T	start_lnum,
 	linenr_T	end_lnum,
 	colnr_T		start_col,
@@ -707,49 +707,49 @@ prop_add_one(
 {
     proptype_T	*type;
     linenr_T	lnum;
-    int		proplen;
-    char_u	*props = NULL;
+    पूर्णाङ्क		proplen;
+    char_u	*props = रिक्त;
     char_u	*newprops;
     size_t	textlen;
     char_u	*newtext;
-    int		i;
+    पूर्णाङ्क		i;
     textprop_T	tmp_prop;
     char_u	*text = text_arg;
-    int		res = FAIL;
+    पूर्णाङ्क		res = FAIL;
 
     type = lookup_prop_type(type_name, buf);
-    if (type == NULL)
-	goto theend;
+    सचे (type == रिक्त)
+	गच्छ theend;
 
-    if (start_lnum < 1 || start_lnum > buf->b_ml.ml_line_count)
+    सचे (start_lnum < 1 || start_lnum > buf->b_ml.ml_पङ्क्तिः_गणनम्)
     {
-	semsg(_(e_invalid_line_number_nr), (long)start_lnum);
-	goto theend;
+	semsg(_(e_invalid_पङ्क्तिः_सङ्ख्या_nr), (long)start_lnum);
+	गच्छ theend;
     }
-    if (end_lnum < start_lnum || end_lnum > buf->b_ml.ml_line_count)
+    सचे (end_lnum < start_lnum || end_lnum > buf->b_ml.ml_पङ्क्तिः_गणनम्)
     {
-	semsg(_(e_invalid_line_number_nr), (long)end_lnum);
-	goto theend;
+	semsg(_(e_invalid_पङ्क्तिः_सङ्ख्या_nr), (long)end_lnum);
+	गच्छ theend;
     }
 
-    if (buf->b_ml.ml_mfp == NULL)
+    सचे (buf->b_ml.ml_mfp == रिक्त)
     {
 	emsg(_(e_cannot_add_text_property_to_unloaded_buffer));
-	goto theend;
+	गच्छ theend;
     }
 
-    if (text != NULL)
+    सचे (text != रिक्त)
     {
 	char_u	    *p;
 
 	// change any control character (Tab, Newline, etc.) to a Space to make
 	// it simpler to compute the size
-	for (p = text; *p != NUL; MB_PTR_ADV(p))
-	    if (*p < ' ')
+	अत्थाय (p = text; *p != NUL; MB_PTR_ADV(p))
+	    सचे (*p < ' ')
 		*p = ' ';
     }
 
-    for (lnum = start_lnum; lnum <= end_lnum; ++lnum)
+    अत्थाय (lnum = start_lnum; lnum <= end_lnum; ++lnum)
     {
 	colnr_T col;	    // start column use in tp_col
 	colnr_T sort_col;   // column where it appears
@@ -760,39 +760,39 @@ prop_add_one(
 	textlen = ml_get_buf_len(buf, lnum) + 1;
 
 	// prop_count is a uint16_t; stop before proplen + 1 wraps to zero.
-	if (proplen >= 0xffff)
+	सचे (proplen >= 0xffff)
 	{
-	    emsg(_(e_too_many_text_properties_on_a_single_line));
-	    goto theend;
+	    emsg(_(e_too_many_text_properties_on_a_single_पङ्क्तिः));
+	    गच्छ theend;
 	}
 
-	if (lnum == start_lnum)
+	सचे (lnum == start_lnum)
 	    col = start_col;
-	else
+	अञ्ञथा
 	    col = 1;
-	if (col - 1 > (colnr_T)textlen && !(col == 0 && text_arg != NULL))
+	सचे (col - 1 > (colnr_T)textlen && !(col == 0 && text_arg != रिक्त))
 	{
-	    semsg(_(e_invalid_column_number_nr), (long)start_col);
-	    goto theend;
+	    semsg(_(e_invalid_column_सङ्ख्या_nr), (long)start_col);
+	    गच्छ theend;
 	}
 	sort_col = col;
 
-	if (lnum == end_lnum)
+	सचे (lnum == end_lnum)
 	    length = end_col - col;
-	else
-	    length = (int)textlen - col + 1;
-	if (length > (long)textlen)
-	    length = (int)textlen;	// can include the end-of-line
-	if (length < 0)
+	अञ्ञथा
+	    length = (पूर्णाङ्क)textlen - col + 1;
+	सचे (length > (long)textlen)
+	    length = (पूर्णाङ्क)textlen;	// can include the end-of-line
+	सचे (length < 0)
 	    length = 0;		// zero-width property
 
-	if (text_arg != NULL)
+	सचे (text_arg != रिक्त)
 	{
 	    length = (long)STRLEN(text_arg);
-	    if (col == 0)
+	    सचे (col == 0)
 	    {
 		col = MAXCOL;	// before or after the line
-		if ((text_flags & TP_FLAG_ALIGN_ABOVE) == 0)
+		सचे ((text_flags & TP_FLAG_ALIGN_ABOVE) == 0)
 		    sort_col = MAXCOL;
 	    }
 	}
@@ -808,126 +808,126 @@ prop_add_one(
 			    | (lnum < end_lnum ? TP_FLAG_CONT_NEXT : 0)
 			    | ((type->pt_flags & PT_FLAG_INS_START_INCL)
 						     ? TP_FLAG_START_INCL : 0);
-	tmp_prop.tp_padleft = text_padding_left;
-	if (text_arg != NULL)
+	tmp_prop.tp_padleft = text_padding_वामः;
+	सचे (text_arg != रिक्त)
 	    tmp_prop.u.tp_text = text_arg;
 
 	// Find the index where to insert the new property.
-	for (i = 0; i < proplen; ++i)
+	अत्थाय (i = 0; i < proplen; ++i)
 	{
 	    textprop_T	existing;
 	    colnr_T	prop_col;
 
-	    mch_memmove(&existing, props + i * sizeof(textprop_T),
-							   sizeof(textprop_T));
+	    mch_memmove(&existing, props + i * परिमाण(textprop_T),
+							   परिमाण(textprop_T));
 	    prop_col = (existing.tp_flags & TP_FLAG_ALIGN_ABOVE)
 				? 0 : existing.tp_col;
-	    if (prop_col >= sort_col)
-		break;
+	    सचे (prop_col >= sort_col)
+		भङ्ग;
 	}
 
 	// Compute the sizes for the new memline format:
 	//   [text][NUL][prop_count][textprop_T...][vtext...]
 	uint16_t	new_propcount = (uint16_t)(proplen + 1);
-	int		vtext_total = 0;
-	int		new_line_len;
-	char_u	*count_dest;
+	पूर्णाङ्क		vtext_total = 0;
+	पूर्णाङ्क		new_पङ्क्तिः_len;
+	char_u	*गणनम्_dest;
 	char_u	*vtext_dest;
-	int		j;
+	पूर्णाङ्क		j;
 
 	// Compute total vtext size from existing props.
-	for (j = 0; j < proplen; ++j)
+	अत्थाय (j = 0; j < proplen; ++j)
 	{
 	    textprop_T ep;
 
-	    mch_memmove(&ep, props + j * sizeof(textprop_T),
-							sizeof(textprop_T));
-	    if (ep.tp_id < 0 && ep.tp_len > 0)
+	    mch_memmove(&ep, props + j * परिमाण(textprop_T),
+							परिमाण(textprop_T));
+	    सचे (ep.tp_id < 0 && ep.tp_len > 0)
 		vtext_total += ep.tp_len + 1;
 	}
 	// Add new vtext if this is a virtual text prop.
-	if (text_arg != NULL)
+	सचे (text_arg != रिक्त)
 	    vtext_total += length + 1;
 
-	new_line_len = (int)textlen + (int)PROP_COUNT_SIZE
-			+ new_propcount * (int)sizeof(textprop_T)
+	new_पङ्क्तिः_len = (पूर्णाङ्क)textlen + (पूर्णाङ्क)PROP_गणनम्_SIZE
+			+ new_propcount * (पूर्णाङ्क)परिमाण(textprop_T)
 			+ vtext_total;
-	newtext = alloc(new_line_len);
-	if (newtext == NULL)
-	    goto theend;
+	newtext = alloc(new_पङ्क्तिः_len);
+	सचे (newtext == रिक्त)
+	    गच्छ theend;
 
 	// Copy line text.
-	mch_memmove(newtext, buf->b_ml.ml_line_ptr, textlen);
+	mch_memmove(newtext, buf->b_ml.ml_पङ्क्तिः_ptr, textlen);
 
 	// Write prop_count.
-	count_dest = newtext + textlen;
-	mch_memmove(count_dest, &new_propcount, PROP_COUNT_SIZE);
+	गणनम्_dest = newtext + textlen;
+	mch_memmove(गणनम्_dest, &new_propcount, PROP_गणनम्_SIZE);
 
 	// Write properties: [0..i-1] existing, [i] new, [i..proplen-1]
 	// existing.
-	newprops = count_dest + PROP_COUNT_SIZE;
-	if (i > 0)
-	    mch_memmove(newprops, props, sizeof(textprop_T) * i);
+	newprops = गणनम्_dest + PROP_गणनम्_SIZE;
+	सचे (i > 0)
+	    mch_memmove(newprops, props, परिमाण(textprop_T) * i);
 	// new prop is written after vtext offsets are computed
-	if (i < proplen)
-	    mch_memmove(newprops + (i + 1) * sizeof(textprop_T),
-					props + i * sizeof(textprop_T),
-					sizeof(textprop_T) * (proplen - i));
+	सचे (i < proplen)
+	    mch_memmove(newprops + (i + 1) * परिमाण(textprop_T),
+					props + i * परिमाण(textprop_T),
+					परिमाण(textprop_T) * (proplen - i));
 
 	// Write vtext strings and set offsets.
-	vtext_dest = newprops + new_propcount * sizeof(textprop_T);
-	for (j = 0; j < new_propcount; ++j)
+	vtext_dest = newprops + new_propcount * परिमाण(textprop_T);
+	अत्थाय (j = 0; j < new_propcount; ++j)
 	{
 	    textprop_T ep;
 
-	    if (j == i)
-		continue;  // handle new prop separately below
-	    mch_memmove(&ep, newprops + j * sizeof(textprop_T),
-		    sizeof(textprop_T));
-	    if (ep.tp_id < 0 && ep.tp_len > 0)
+	    सचे (j == i)
+		अनुवर्त;  // handle new prop separately below
+	    mch_memmove(&ep, newprops + j * परिमाण(textprop_T),
+		    परिमाण(textprop_T));
+	    सचे (ep.tp_id < 0 && ep.tp_len > 0)
 	    {
 		// Copy existing vtext from old memline data.
-		char_u *old_count = (char_u *)props - PROP_COUNT_SIZE;
-		char_u *old_vtext = old_count + ep.u.tp_text_offset;
+		char_u *old_गणनम्_2 = (char_u *)props - PROP_गणनम्_SIZE;
+		char_u *old_vtext = old_गणनम्_2 + ep.u.tp_text_offset;
 
 		mch_memmove(vtext_dest, old_vtext, ep.tp_len + 1);
-		ep.u.tp_text_offset = (colnr_T)(vtext_dest - count_dest);
-		mch_memmove(newprops + j * sizeof(textprop_T), &ep,
-			sizeof(textprop_T));
+		ep.u.tp_text_offset = (colnr_T)(vtext_dest - गणनम्_dest);
+		mch_memmove(newprops + j * परिमाण(textprop_T), &ep,
+			परिमाण(textprop_T));
 		vtext_dest += ep.tp_len + 1;
 	    }
 	}
 
 	// Write new prop with vtext.
-	if (text_arg != NULL)
+	सचे (text_arg != रिक्त)
 	{
-	    int copysize = tmp_prop.tp_len + 1;
+	    पूर्णाङ्क copysize = tmp_prop.tp_len + 1;
 
 	    mch_memmove(vtext_dest, text_arg, copysize);
 	    tmp_prop.u.tp_text_offset =
-				    (colnr_T)(vtext_dest - count_dest);
+				    (colnr_T)(vtext_dest - गणनम्_dest);
 	    vtext_dest += copysize;
 	}
-	else
+	अञ्ञथा
 	    tmp_prop.u.tp_text_offset = 0;
 
-	mch_memmove(newprops + i * sizeof(textprop_T), &tmp_prop,
-							sizeof(textprop_T));
+	mch_memmove(newprops + i * परिमाण(textprop_T), &tmp_prop,
+							परिमाण(textprop_T));
 
-	if (buf->b_ml.ml_flags & (ML_LINE_DIRTY | ML_ALLOCATED))
-	    vim_free(buf->b_ml.ml_line_ptr);
-	buf->b_ml.ml_line_ptr = newtext;
-	buf->b_ml.ml_line_len = new_line_len;
-	buf->b_ml.ml_flags |= ML_LINE_DIRTY;
+	सचे (buf->b_ml.ml_flags & (ML_पङ्क्तिः_DIRTY | ML_ALLOCATED))
+	    vim_free(buf->b_ml.ml_पङ्क्तिः_ptr);
+	buf->b_ml.ml_पङ्क्तिः_ptr = newtext;
+	buf->b_ml.ml_पङ्क्तिः_len = new_पङ्क्तिः_len;
+	buf->b_ml.ml_flags |= ML_पङ्क्तिः_DIRTY;
     }
 
-    changed_line_display_buf(buf);
-    changed_lines_buf(buf, start_lnum, end_lnum + 1, 0);
+    changed_पङ्क्तिः_display_buf(buf);
+    changed_पङ्क्तयः_buf(buf, start_lnum, end_lnum + 1, 0);
     res = OK;
 
 theend:
     vim_free(text);
-    return res;
+    पटिनिवत्त res;
 }
 
 /*
@@ -937,102 +937,102 @@ theend:
  * Second argument is a List where each item is a List with the following
  * entries: [lnum, start_col, end_col]
  */
-    void
+    शून्य
 f_prop_add_list(typval_T *argvars, typval_T *rettv UNUSED)
 {
     dict_T	*dict;
     char_u	*type_name;
     buf_T	*buf = curbuf;
-    int		id = 0;
+    पूर्णाङ्क		id = 0;
     listitem_T	*li;
     list_T	*pos_list;
     linenr_T	start_lnum;
     colnr_T	start_col;
     linenr_T	end_lnum;
     colnr_T	end_col;
-    int		error = FALSE;
-    int		prev_did_emsg = did_emsg;
+    पूर्णाङ्क		error = FALSE;
+    पूर्णाङ्क		prev_did_emsg = did_emsg;
 
-    if (check_for_dict_arg(argvars, 0) == FAIL
+    सचे (check_for_dict_arg(argvars, 0) == FAIL
 	    || check_for_list_arg(argvars, 1) == FAIL)
-	return;
+	पटिनिवत्त;
 
-    if (check_for_nonnull_list_arg(argvars, 1) == FAIL)
-	return;
+    सचे (check_for_nonnull_list_arg(argvars, 1) == FAIL)
+	पटिनिवत्त;
 
     dict = argvars[0].vval.v_dict;
-    if (dict == NULL || !dict_has_key(dict, "type"))
+    सचे (dict == रिक्त || !dict_has_कुञ्चिका(dict, "type"))
     {
 	emsg(_(e_missing_property_type_name));
-	return;
+	पटिनिवत्त;
     }
     type_name = dict_get_string(dict, "type", FALSE);
 
-    if (dict_has_key(dict, "id"))
+    सचे (dict_has_कुञ्चिका(dict, "id"))
     {
 	vimlong_T x;
-	x = dict_get_number(dict, "id");
-	if (x > INT_MAX || x  <= INT_MIN)
+	x = dict_get_सङ्ख्या(dict, "id");
+	सचे (x > INT_MAX || x  <= INT_MIN)
 	{
 	    semsg(_(e_val_too_large), dict_get_string(dict, "id", FALSE));
-	    return;
+	    पटिनिवत्त;
 	}
-	id = (int)x;
+	id = (पूर्णाङ्क)x;
     }
 
-    if (get_bufnr_from_arg(&argvars[0], &buf) == FAIL)
-	return;
+    सचे (get_bufnr_from_arg(&argvars[0], &buf) == FAIL)
+	पटिनिवत्त;
 
     // This must be done _before_ we start adding properties because property
     // changes trigger buffer (memline) reorganisation, which needs this flag
     // to be correctly set.
     buf->b_has_textprop = true;  // this is never reset
-    FOR_ALL_LIST_ITEMS(argvars[1].vval.v_list, li)
+    FOR_ALL_LIST_वस्तूनि(argvars[1].vval.v_list, li)
     {
-	if (li->li_tv.v_type != VAR_LIST || li->li_tv.vval.v_list == NULL)
+	सचे (li->li_tv.v_type != VAR_LIST || li->li_tv.vval.v_list == रिक्त)
 	{
 	    emsg(_(e_list_required));
-	    return;
+	    पटिनिवत्त;
 	}
 
 	pos_list = li->li_tv.vval.v_list;
 	start_lnum = list_find_nr(pos_list, 0L, &error);
-	if (!error)
+	सचे (!error)
 	    start_col = list_find_nr(pos_list, 1L, &error);
-	if (!error)
+	सचे (!error)
 	    end_lnum = list_find_nr(pos_list, 2L, &error);
-	if (!error)
+	सचे (!error)
 	    end_col = list_find_nr(pos_list, 3L, &error);
-	int this_id = id;
-	if (!error && pos_list->lv_len > 4)
+	पूर्णाङ्क this_id = id;
+	सचे (!error && pos_list->lv_len > 4)
 	    this_id = list_find_nr(pos_list, 4L, &error);
-	if (error || start_lnum <= 0 || start_col <= 0
+	सचे (error || start_lnum <= 0 || start_col <= 0
 		  || end_lnum <= 0 || end_col <= 0)
 	{
-	    if (prev_did_emsg == did_emsg)
+	    सचे (prev_did_emsg == did_emsg)
 		emsg(_(e_invalid_argument));
-	    return;
+	    पटिनिवत्त;
 	}
-	if (prop_add_one(buf, type_name, this_id, NULL, 0, 0,
+	सचे (prop_add_one(buf, type_name, this_id, रिक्त, 0, 0,
 			     start_lnum, end_lnum, start_col, end_col) == FAIL)
-	    return;
+	    पटिनिवत्त;
     }
 
     redraw_buf_later(buf, UPD_VALID);
 }
 
 // Counter for virtual text property IDs (decremented for each new one).
-static int vt_id_counter = 0;
+स्थिर पूर्णाङ्क vt_id_counter = 0;
 
 /*
  * Get the next ID to use for a textprop.
  */
-    static int
-get_textprop_id(void)
+    स्थिर पूर्णाङ्क
+get_textprop_id(शून्य)
 {
-    if (vt_id_counter > 0)
+    सचे (vt_id_counter > 0)
 	vt_id_counter = 0;
-    return --vt_id_counter;
+    पटिनिवत्त --vt_id_counter;
 }
 
 /*
@@ -1041,7 +1041,7 @@ get_textprop_id(void)
  * it is NULL for popup_create().
  * Returns the "id" used for "text" or zero.
  */
-    int
+    पूर्णाङ्क
 prop_add_common(
 	linenr_T    start_lnum,
 	colnr_T	    start_col,
@@ -1053,156 +1053,156 @@ prop_add_common(
     colnr_T	end_col;
     char_u	*type_name;
     buf_T	*buf = default_buf;
-    int		id = 0;
-    char_u	*text = NULL;
-    int		text_padding_left = 0;
-    int		flags = 0;
+    पूर्णाङ्क		id = 0;
+    char_u	*text = रिक्त;
+    पूर्णाङ्क		text_padding_वामः = 0;
+    पूर्णाङ्क		flags = 0;
 
-    if (dict == NULL || !dict_has_key(dict, "type"))
+    सचे (dict == रिक्त || !dict_has_कुञ्चिका(dict, "type"))
     {
 	emsg(_(e_missing_property_type_name));
-	goto theend;
+	गच्छ theend;
     }
     type_name = dict_get_string(dict, "type", FALSE);
 
-    if (dict_has_key(dict, "end_lnum"))
+    सचे (dict_has_कुञ्चिका(dict, "end_lnum"))
     {
-	end_lnum = dict_get_number(dict, "end_lnum");
-	if (end_lnum < start_lnum)
+	end_lnum = dict_get_सङ्ख्या(dict, "end_lnum");
+	सचे (end_lnum < start_lnum)
 	{
-	    semsg(_(e_invalid_value_for_argument_str), "end_lnum");
-	    goto theend;
+	    semsg(_(e_invalid_मानम्_for_argument_str), "end_lnum");
+	    गच्छ theend;
 	}
     }
-    else
+    अञ्ञथा
 	end_lnum = start_lnum;
 
-    if (dict_has_key(dict, "length"))
+    सचे (dict_has_कुञ्चिका(dict, "length"))
     {
-	long length = dict_get_number(dict, "length");
+	long length = dict_get_सङ्ख्या(dict, "length");
 
-	if (length < 0 || end_lnum > start_lnum)
+	सचे (length < 0 || end_lnum > start_lnum)
 	{
-	    semsg(_(e_invalid_value_for_argument_str), "length");
-	    goto theend;
+	    semsg(_(e_invalid_मानम्_for_argument_str), "length");
+	    गच्छ theend;
 	}
 	end_col = start_col + length;
     }
-    else if (dict_has_key(dict, "end_col"))
+    अञ्ञथा सचे (dict_has_कुञ्चिका(dict, "end_col"))
     {
-	end_col = dict_get_number(dict, "end_col");
-	if (end_col <= 0)
+	end_col = dict_get_सङ्ख्या(dict, "end_col");
+	सचे (end_col <= 0)
 	{
-	    semsg(_(e_invalid_value_for_argument_str), "end_col");
-	    goto theend;
+	    semsg(_(e_invalid_मानम्_for_argument_str), "end_col");
+	    गच्छ theend;
 	}
     }
-    else if (start_lnum == end_lnum)
+    अञ्ञथा सचे (start_lnum == end_lnum)
 	end_col = start_col;
-    else
+    अञ्ञथा
 	end_col = 1;
 
-    if (dict_has_key(dict, "id"))
+    सचे (dict_has_कुञ्चिका(dict, "id"))
     {
 	vimlong_T x;
-	x = dict_get_number(dict, "id");
-	if (x > INT_MAX || x  <= INT_MIN)
+	x = dict_get_सङ्ख्या(dict, "id");
+	सचे (x > INT_MAX || x  <= INT_MIN)
 	{
 	    semsg(_(e_val_too_large), dict_get_string(dict, "id", FALSE));
-	    goto theend;
+	    गच्छ theend;
 	}
-	id = (int)x;
+	id = (पूर्णाङ्क)x;
     }
 
-    if (dict_has_key(dict, "text"))
+    सचे (dict_has_कुञ्चिका(dict, "text"))
     {
-	if (dict_has_key(dict, "length")
-		|| dict_has_key(dict, "end_col")
-		|| dict_has_key(dict, "end_lnum"))
+	सचे (dict_has_कुञ्चिका(dict, "length")
+		|| dict_has_कुञ्चिका(dict, "end_col")
+		|| dict_has_कुञ्चिका(dict, "end_lnum"))
 	{
 	    emsg(_(e_cannot_use_length_endcol_and_endlnum_with_text));
-	    goto theend;
+	    गच्छ theend;
 	}
 
 	text = dict_get_string(dict, "text", TRUE);
-	if (text == NULL)
-	    goto theend;
+	सचे (text == रिक्त)
+	    गच्छ theend;
 	// use a default length of 1 to make multiple props show up
 	end_col = start_col + 1;
 
-	if (dict_has_key(dict, "text_align"))
+	सचे (dict_has_कुञ्चिका(dict, "text_align"))
 	{
 	    char_u *p = dict_get_string(dict, "text_align", FALSE);
 
-	    if (p == NULL)
-		goto theend;
-	    if (start_col != 0)
+	    सचे (p == रिक्त)
+		गच्छ theend;
+	    सचे (start_col != 0)
 	    {
 		emsg(_(e_can_only_use_text_align_when_column_is_zero));
-		goto theend;
+		गच्छ theend;
 	    }
-	    if (STRCMP(p, "right") == 0)
-		flags |= TP_FLAG_ALIGN_RIGHT;
-	    else if (STRCMP(p, "above") == 0)
+	    सचे (STRCMP(p, "right") == 0)
+		flags |= TP_FLAG_ALIGN_दक्षिणः;
+	    अञ्ञथा सचे (STRCMP(p, "above") == 0)
 		flags |= TP_FLAG_ALIGN_ABOVE;
-	    else if (STRCMP(p, "below") == 0)
+	    अञ्ञथा सचे (STRCMP(p, "below") == 0)
 		flags |= TP_FLAG_ALIGN_BELOW;
-	    else if (STRCMP(p, "after") != 0)
+	    अञ्ञथा सचे (STRCMP(p, "after") != 0)
 	    {
-		semsg(_(e_invalid_value_for_argument_str_str), "text_align", p);
-		goto theend;
+		semsg(_(e_invalid_मानम्_for_argument_str_str), "text_align", p);
+		गच्छ theend;
 	    }
 	}
 
-	if (dict_has_key(dict, "text_padding_left"))
+	सचे (dict_has_कुञ्चिका(dict, "text_padding_left"))
 	{
-	    text_padding_left = dict_get_number(dict, "text_padding_left");
-	    if (text_padding_left < 0)
+	    text_padding_वामः = dict_get_सङ्ख्या(dict, "text_padding_left");
+	    सचे (text_padding_वामः < 0)
 	    {
 		semsg(_(e_argument_must_be_positive_str), "text_padding_left");
-		goto theend;
+		गच्छ theend;
 	    }
 	}
 
-	if (dict_has_key(dict, "text_wrap"))
+	सचे (dict_has_कुञ्चिका(dict, "text_wrap"))
 	{
 	    char_u *p = dict_get_string(dict, "text_wrap", FALSE);
 
-	    if (p == NULL)
-		goto theend;
-	    if (STRCMP(p, "wrap") == 0)
+	    सचे (p == रिक्त)
+		गच्छ theend;
+	    सचे (STRCMP(p, "wrap") == 0)
 		flags |= TP_FLAG_WRAP;
-	    else if (STRCMP(p, "truncate") != 0)
+	    अञ्ञथा सचे (STRCMP(p, "truncate") != 0)
 	    {
-		semsg(_(e_invalid_value_for_argument_str_str), "text_wrap", p);
-		goto theend;
+		semsg(_(e_invalid_मानम्_for_argument_str_str), "text_wrap", p);
+		गच्छ theend;
 	    }
 	}
     }
 
     // Column must be 1 or more for a normal text property; when "text" is
     // present zero means it goes after the line.
-    if (start_col < (text == NULL ? 1 : 0))
+    सचे (start_col < (text == रिक्त ? 1 : 0))
     {
-	semsg(_(e_invalid_column_number_nr), (long)start_col);
-	goto theend;
+	semsg(_(e_invalid_column_सङ्ख्या_nr), (long)start_col);
+	गच्छ theend;
     }
-    if (start_col > 0 && text_padding_left > 0)
+    सचे (start_col > 0 && text_padding_वामः > 0)
     {
-	emsg(_(e_can_only_use_left_padding_when_column_is_zero));
-	goto theend;
+	emsg(_(e_can_only_use_वामः_padding_when_column_is_zero));
+	गच्छ theend;
     }
 
-    if (dict_arg != NULL && get_bufnr_from_arg(dict_arg, &buf) == FAIL)
-	goto theend;
+    सचे (dict_arg != रिक्त && get_bufnr_from_arg(dict_arg, &buf) == FAIL)
+	गच्छ theend;
 
-    if (text != NULL)
+    सचे (text != रिक्त)
 	// Always assign an internal negative id; ignore any user-provided id.
 	id = get_textprop_id();
-    else if (id < 0)
+    अञ्ञथा सचे (id < 0)
     {
 	emsg(_(e_cannot_use_negative_id));
-	goto theend;
+	गच्छ theend;
     }
 
     // This must be done _before_ we add the property because property changes
@@ -1210,15 +1210,15 @@ prop_add_common(
     // correctly set.
     buf->b_has_textprop = true;  // this is never reset
 
-    prop_add_one(buf, type_name, id, text, text_padding_left, flags,
+    prop_add_one(buf, type_name, id, text, text_padding_वामः, flags,
 				    start_lnum, end_lnum, start_col, end_col);
-    text = NULL;
+    text = रिक्त;
 
     redraw_buf_later(buf, UPD_VALID);
 
 theend:
     vim_free(text);
-    return id;
+    पटिनिवत्त id;
 }
 
 /*
@@ -1227,48 +1227,48 @@ theend:
  * first one in "props" (note that it is not aligned, therefore the char_u
  * pointer).
  */
-    int
-get_text_props(buf_T *buf, linenr_T lnum, char_u **props, int will_change)
+    पूर्णाङ्क
+get_text_props(buf_T *buf, linenr_T lnum, char_u **props, पूर्णाङ्क will_change)
 {
     char_u	*text;
     size_t	textlen;
     size_t	propdata_len;
-    uint16_t	prop_count;
+    uint16_t	prop_गणनम्;
 
     // Be quick when no text property types have been defined for the buffer,
     // unless we are adding one.
-    if ((!buf->b_has_textprop && !will_change) || buf->b_ml.ml_mfp == NULL)
-	return 0;
+    सचे ((!buf->b_has_textprop && !will_change) || buf->b_ml.ml_mfp == रिक्त)
+	पटिनिवत्त 0;
 
     // Fetch the line to get the ml_line_len field updated.
     text = ml_get_buf(buf, lnum, will_change);
     textlen = ml_get_buf_len(buf, lnum) + 1;
-    propdata_len = buf->b_ml.ml_line_len - textlen;
-    if (propdata_len == 0)
-	return 0;
+    propdata_len = buf->b_ml.ml_पङ्क्तिः_len - textlen;
+    सचे (propdata_len == 0)
+	पटिनिवत्त 0;
 
     // Format: [prop_count (uint16)][textprop_T...][vtext...]
     // Lines without properties have no prop data at all.
     // prop_count is never zero.
-    if (propdata_len < PROP_COUNT_SIZE + sizeof(textprop_T))
+    सचे (propdata_len < PROP_गणनम्_SIZE + परिमाण(textprop_T))
     {
 	emsg(e_text_property_info_corrupted);
-	return 0;
+	पटिनिवत्त 0;
     }
-    mch_memmove(&prop_count, text + textlen, PROP_COUNT_SIZE);
-    if (!text_prop_count_valid(prop_count, propdata_len))
+    mch_memmove(&prop_गणनम्, text + textlen, PROP_गणनम्_SIZE);
+    सचे (!text_prop_गणनम्_valid(prop_गणनम्, propdata_len))
     {
 	emsg(e_text_property_info_corrupted);
-	return 0;
+	पटिनिवत्त 0;
     }
-    if (!text_prop_vtext_valid(text + textlen + PROP_COUNT_SIZE,
-					   (int)prop_count, propdata_len))
+    सचे (!text_prop_vtext_valid(text + textlen + PROP_गणनम्_SIZE,
+					   (पूर्णाङ्क)prop_गणनम्, propdata_len))
     {
 	emsg(e_text_property_info_corrupted);
-	return 0;
+	पटिनिवत्त 0;
     }
-    *props = text + textlen + PROP_COUNT_SIZE;
-    return (int)prop_count;
+    *props = text + textlen + PROP_गणनम्_SIZE;
+    पटिनिवत्त (पूर्णाङ्क)prop_गणनम्;
 }
 
 /*
@@ -1276,34 +1276,34 @@ get_text_props(buf_T *buf, linenr_T lnum, char_u **props, int will_change)
  * line "lnum".  A "right" aligned property also goes below after a "below" or
  * other "right" aligned property.
  */
-    int
-prop_count_above_below(buf_T *buf, linenr_T lnum)
+    पूर्णाङ्क
+prop_गणनम्_above_below(buf_T *buf, linenr_T lnum)
 {
     char_u	*props;
-    int		count = get_text_props(buf, lnum, &props, FALSE);
-    int		result = 0;
+    पूर्णाङ्क		गणनम् = get_text_props(buf, lnum, &props, FALSE);
+    पूर्णाङ्क		result = 0;
     textprop_T	prop;
-    int		i;
-    int		next_right_goes_below = FALSE;
+    पूर्णाङ्क		i;
+    पूर्णाङ्क		next_दक्षिणः_goes_below = FALSE;
 
-    if (count == 0)
-	return 0;
-    for (i = 0; i < count; ++i)
+    सचे (गणनम् == 0)
+	पटिनिवत्त 0;
+    अत्थाय (i = 0; i < गणनम्; ++i)
     {
-	mch_memmove(&prop, props + i * sizeof(prop), sizeof(prop));
-	if (prop.tp_col == MAXCOL && text_prop_type_valid(buf, &prop))
+	mch_memmove(&prop, props + i * परिमाण(prop), परिमाण(prop));
+	सचे (prop.tp_col == MAXCOL && text_prop_type_valid(buf, &prop))
 	{
-	    if ((prop.tp_flags & (TP_FLAG_ALIGN_ABOVE | TP_FLAG_ALIGN_BELOW))
-		    || (next_right_goes_below
-				     && (prop.tp_flags & TP_FLAG_ALIGN_RIGHT)))
+	    सचे ((prop.tp_flags & (TP_FLAG_ALIGN_ABOVE | TP_FLAG_ALIGN_BELOW))
+		    || (next_दक्षिणः_goes_below
+				     && (prop.tp_flags & TP_FLAG_ALIGN_दक्षिणः)))
 	    {
 		++result;
 	    }
-	    else if (prop.tp_flags & TP_FLAG_ALIGN_RIGHT)
-		next_right_goes_below = TRUE;
+	    अञ्ञथा सचे (prop.tp_flags & TP_FLAG_ALIGN_दक्षिणः)
+		next_दक्षिणः_goes_below = TRUE;
 	}
     }
-    return result;
+    पटिनिवत्त result;
 }
 
 /**
@@ -1313,44 +1313,44 @@ prop_count_above_below(buf_T *buf, linenr_T lnum)
  * When "last_line" is FALSE then text properties after the line are not
  * counted.
  */
-    int
-count_props(linenr_T lnum, int only_starting, int last_line)
+    पूर्णाङ्क
+गणनम्_props(linenr_T lnum, पूर्णाङ्क only_starting, पूर्णाङ्क last_पङ्क्तिः)
 {
     char_u	*props;
-    int		proplen = get_text_props(curbuf, lnum, &props, 0);
-    int		result = proplen;
+    पूर्णाङ्क		proplen = get_text_props(curbuf, lnum, &props, 0);
+    पूर्णाङ्क		result = proplen;
     textprop_T	prop;
 
-    for (int i = 0; i < proplen; ++i)
+    अत्थाय (पूर्णाङ्क i = 0; i < proplen; ++i)
     {
-	mch_memmove(&prop, props + i * sizeof(prop), sizeof(prop));
+	mch_memmove(&prop, props + i * परिमाण(prop), परिमाण(prop));
 	// A prop is dropped when in the first line and it continues from the
 	// previous line, or when not in the last line and it is virtual text
 	// after the line.
-	if ((only_starting && (prop.tp_flags & TP_FLAG_CONT_PREV))
-		|| (!last_line && prop.tp_col == MAXCOL))
+	सचे ((only_starting && (prop.tp_flags & TP_FLAG_CONT_PREV))
+		|| (!last_पङ्क्तिः && prop.tp_col == MAXCOL))
 	    --result;
     }
-    return result;
+    पटिनिवत्त result;
 }
 
-static textprop_T	*text_prop_compare_props;
-static buf_T		*text_prop_compare_buf;
+स्थिर textprop_T	*text_prop_compare_props;
+स्थिर buf_T		*text_prop_compare_buf;
 
 /*
  * Score for sorting on position of the text property: 0: above,
  * 1: after (default), 2: right, 3: below (comes last)
  */
-    static int
-text_prop_order(int flags)
+    स्थिर पूर्णाङ्क
+text_prop_order(पूर्णाङ्क flags)
 {
-    if (flags & TP_FLAG_ALIGN_ABOVE)
-	return 0;
-    if (flags & TP_FLAG_ALIGN_RIGHT)
-	return 2;
-    if (flags & TP_FLAG_ALIGN_BELOW)
-	return 3;
-    return 1;
+    सचे (flags & TP_FLAG_ALIGN_ABOVE)
+	पटिनिवत्त 0;
+    सचे (flags & TP_FLAG_ALIGN_दक्षिणः)
+	पटिनिवत्त 2;
+    सचे (flags & TP_FLAG_ALIGN_BELOW)
+	पटिनिवत्त 3;
+    पटिनिवत्त 1;
 }
 
 /*
@@ -1358,73 +1358,73 @@ text_prop_order(int flags)
  * Return 1 if "s1" has priority over "s2", -1 if the other way around, zero if
  * both have the same priority.
  */
-    static int
-text_prop_compare(const void *s1, const void *s2)
+    स्थिर पूर्णाङ्क
+text_prop_compare(ध्रुव शून्य *s1, ध्रुव शून्य *s2)
 {
-    int  idx1, idx2;
+    पूर्णाङ्क  idx1, idx2;
     textprop_T	*tp1, *tp2;
     proptype_T  *pt1, *pt2;
     colnr_T col1, col2;
 
-    idx1 = *(int *)s1;
-    idx2 = *(int *)s2;
+    idx1 = *(पूर्णाङ्क *)s1;
+    idx2 = *(पूर्णाङ्क *)s2;
     tp1 = &text_prop_compare_props[idx1];
     tp2 = &text_prop_compare_props[idx2];
     col1 = tp1->tp_col;
     col2 = tp2->tp_col;
 
     // property that inserts text has priority over one that doesn't
-    if ((tp1->tp_id < 0) != (tp2->tp_id < 0))
-	return tp1->tp_id < 0 ? 1 : -1;
+    सचे ((tp1->tp_id < 0) != (tp2->tp_id < 0))
+	पटिनिवत्त tp1->tp_id < 0 ? 1 : -1;
 
-    if (col1 == MAXCOL || col2 == MAXCOL)
+    सचे (col1 == MAXCOL || col2 == MAXCOL)
     {
-	int order1 = text_prop_order(tp1->tp_flags);
-	int order2 = text_prop_order(tp2->tp_flags);
+	पूर्णाङ्क order1 = text_prop_order(tp1->tp_flags);
+	पूर्णाङ्क order2 = text_prop_order(tp2->tp_flags);
 
 	// sort on order where it is added
-	if (order1 != order2)
-	    return order1 < order2 ? 1 : -1;
+	सचे (order1 != order2)
+	    पटिनिवत्त order1 < order2 ? 1 : -1;
     }
 
     // check highest priority, defined by the type
     pt1 = text_prop_type_by_id(text_prop_compare_buf, tp1->tp_type);
     pt2 = text_prop_type_by_id(text_prop_compare_buf, tp2->tp_type);
-    if (pt1 != pt2)
+    सचे (pt1 != pt2)
     {
-	if (pt1 == NULL)
-	    return -1;
-	if (pt2 == NULL)
-	    return 1;
-	if (pt1->pt_priority != pt2->pt_priority)
-	    return pt1->pt_priority > pt2->pt_priority ? 1 : -1;
+	सचे (pt1 == रिक्त)
+	    पटिनिवत्त -1;
+	सचे (pt2 == रिक्त)
+	    पटिनिवत्त 1;
+	सचे (pt1->pt_priority != pt2->pt_priority)
+	    पटिनिवत्त pt1->pt_priority > pt2->pt_priority ? 1 : -1;
     }
 
     // same priority, one that starts first wins
-    if (col1 != col2)
-	return col1 < col2 ? 1 : -1;
+    सचे (col1 != col2)
+	पटिनिवत्त col1 < col2 ? 1 : -1;
 
     // for a property with text the id can be used as tie breaker
-    if (tp1->tp_id < 0)
-	return tp1->tp_id > tp2->tp_id ? 1 : -1;
+    सचे (tp1->tp_id < 0)
+	पटिनिवत्त tp1->tp_id > tp2->tp_id ? 1 : -1;
 
-    return 0;
+    पटिनिवत्त 0;
 }
 
 /*
  * Sort "count" text properties using an array if indexes "idxs" into the list
  * of text props "props" for buffer "buf".
  */
-    void
+    शून्य
 sort_text_props(
 	buf_T	    *buf,
 	textprop_T  *props,
-	int	    *idxs,
-	int	    count)
+	पूर्णाङ्क	    *idxs,
+	पूर्णाङ्क	    गणनम्)
 {
     text_prop_compare_buf = buf;
     text_prop_compare_props = props;
-    qsort((void *)idxs, (size_t)count, sizeof(int), text_prop_compare);
+    qsort((शून्य *)idxs, (size_t)गणनम्, परिमाण(पूर्णाङ्क), text_prop_compare);
 }
 
 /*
@@ -1432,39 +1432,39 @@ sort_text_props(
  * "wp"'s buffer.  Match "id" when it is > 0.  Returns false when not found.
  */
     bool
-find_prop_in_lines(
+find_prop_in_पङ्क्तयः(
 	win_T	    *wp,
-	int	    type_id,
-	int	    id,
+	पूर्णाङ्क	    type_id,
+	पूर्णाङ्क	    id,
 	textprop_T  *prop,
 	linenr_T    *found_lnum,
 	linenr_T    first_lnum,
 	linenr_T    last_lnum)
 {
-    if (text_prop_type_by_id(wp->w_buffer, type_id) == NULL)
-	return false;
+    सचे (text_prop_type_by_id(wp->w_buffer, type_id) == रिक्त)
+	पटिनिवत्त false;
 
-    if (first_lnum < 1)
+    सचे (first_lnum < 1)
 	first_lnum = 1;
-    if (last_lnum > wp->w_buffer->b_ml.ml_line_count)
-	last_lnum = wp->w_buffer->b_ml.ml_line_count;
+    सचे (last_lnum > wp->w_buffer->b_ml.ml_पङ्क्तिः_गणनम्)
+	last_lnum = wp->w_buffer->b_ml.ml_पङ्क्तिः_गणनम्;
 
-    for (linenr_T lnum = first_lnum; lnum <= last_lnum; ++lnum)
+    अत्थाय (linenr_T lnum = first_lnum; lnum <= last_lnum; ++lnum)
     {
 	char_u	*props;
-	int	count = get_text_props(wp->w_buffer, lnum, &props, FALSE);
-	for (int i = 0; i < count; ++i)
+	पूर्णाङ्क	गणनम् = get_text_props(wp->w_buffer, lnum, &props, FALSE);
+	अत्थाय (पूर्णाङ्क i = 0; i < गणनम्; ++i)
 	{
-	    mch_memmove(prop, props + i * sizeof(textprop_T),
-							   sizeof(textprop_T));
-	    if (prop->tp_type == type_id && (id <= 0 || prop->tp_id == id))
+	    mch_memmove(prop, props + i * परिमाण(textprop_T),
+							   परिमाण(textprop_T));
+	    सचे (prop->tp_type == type_id && (id <= 0 || prop->tp_id == id))
 	    {
 		*found_lnum = lnum;
-		return true;
+		पटिनिवत्त true;
 	    }
 	}
     }
-    return false;
+    पटिनिवत्त false;
 }
 
 /*
@@ -1475,14 +1475,14 @@ find_prop_in_lines(
     bool
 find_visible_prop(
 	win_T	    *wp,
-	int	    type_id,
-	int	    id,
+	पूर्णाङ्क	    type_id,
+	पूर्णाङ्क	    id,
 	textprop_T  *prop,
 	linenr_T    *found_lnum)
 {
     // w_botline may not have been updated yet.
     validate_botline_win(wp);
-    return find_prop_in_lines(wp, type_id, id, prop, found_lnum,
+    पटिनिवत्त find_prop_in_पङ्क्तयः(wp, type_id, id, prop, found_lnum,
 					  wp->w_topline, wp->w_botline - 1);
 }
 
@@ -1493,82 +1493,82 @@ find_visible_prop(
  * For virtual text props, u.tp_text must point to the vtext string.
  * Only works for the current buffer.
  */
-    static void
-set_text_props(linenr_T lnum, textprop_T *tps, int count)
+    स्थिर शून्य
+set_text_props(linenr_T lnum, textprop_T *tps, पूर्णाङ्क गणनम्)
 {
     char_u  *text;
     char_u  *newtext;
-    int	    textlen;
+    पूर्णाङ्क	    textlen;
 
     text = ml_get(lnum);
     textlen = ml_get_len(lnum) + 1;
 
-    if (count == 0)
+    सचे (गणनम् == 0)
     {
 	// No properties: just text.
 	newtext = alloc(textlen);
-	if (newtext == NULL)
-	    return;
+	सचे (newtext == रिक्त)
+	    पटिनिवत्त;
 	mch_memmove(newtext, text, textlen);
-	if (curbuf->b_ml.ml_flags & (ML_LINE_DIRTY | ML_ALLOCATED))
-	    vim_free(curbuf->b_ml.ml_line_ptr);
-	curbuf->b_ml.ml_line_ptr = newtext;
-	curbuf->b_ml.ml_line_len = textlen;
-	curbuf->b_ml.ml_flags |= ML_LINE_DIRTY;
+	सचे (curbuf->b_ml.ml_flags & (ML_पङ्क्तिः_DIRTY | ML_ALLOCATED))
+	    vim_free(curbuf->b_ml.ml_पङ्क्तिः_ptr);
+	curbuf->b_ml.ml_पङ्क्तिः_ptr = newtext;
+	curbuf->b_ml.ml_पङ्क्तिः_len = textlen;
+	curbuf->b_ml.ml_flags |= ML_पङ्क्तिः_DIRTY;
     }
-    else
+    अञ्ञथा
     {
 	// Build new format: [text][NUL][prop_count][props...][vtext...]
-	uint16_t    prop_count = (uint16_t)count;
-	int	    vtext_size = 0;
-	int	    total_len;
-	char_u	    *count_dest;
+	uint16_t    prop_गणनम् = (uint16_t)गणनम्;
+	पूर्णाङ्क	    vtext_size = 0;
+	पूर्णाङ्क	    total_len;
+	char_u	    *गणनम्_dest;
 	char_u	    *prop_dest;
 	char_u	    *vtext_dest;
-	int	    i;
+	पूर्णाङ्क	    i;
 
-	for (i = 0; i < count; ++i)
-	    if (tps[i].tp_flags & TP_FLAG_VTEXT_PTR)
+	अत्थाय (i = 0; i < गणनम्; ++i)
+	    सचे (tps[i].tp_flags & TP_FLAG_VTEXT_PTR)
 		vtext_size += tps[i].tp_len + 1;
 
-	total_len = textlen + (int)PROP_COUNT_SIZE
-		    + count * (int)sizeof(textprop_T) + vtext_size;
+	total_len = textlen + (पूर्णाङ्क)PROP_गणनम्_SIZE
+		    + गणनम् * (पूर्णाङ्क)परिमाण(textprop_T) + vtext_size;
 	newtext = alloc(total_len);
-	if (newtext == NULL)
-	    return;
+	सचे (newtext == रिक्त)
+	    पटिनिवत्त;
 	mch_memmove(newtext, text, textlen);
 
-	count_dest = newtext + textlen;
-	mch_memmove(count_dest, &prop_count, PROP_COUNT_SIZE);
+	गणनम्_dest = newtext + textlen;
+	mch_memmove(गणनम्_dest, &prop_गणनम्, PROP_गणनम्_SIZE);
 
-	prop_dest = count_dest + PROP_COUNT_SIZE;
-	vtext_dest = prop_dest + count * sizeof(textprop_T);
+	prop_dest = गणनम्_dest + PROP_गणनम्_SIZE;
+	vtext_dest = prop_dest + गणनम् * परिमाण(textprop_T);
 
-	for (i = 0; i < count; ++i)
+	अत्थाय (i = 0; i < गणनम्; ++i)
 	{
 	    textprop_T prop = tps[i];
 
-	    if (prop.tp_flags & TP_FLAG_VTEXT_PTR)
+	    सचे (prop.tp_flags & TP_FLAG_VTEXT_PTR)
 	    {
-		int copysize = prop.tp_len + 1;
+		पूर्णाङ्क copysize = prop.tp_len + 1;
 
 		mch_memmove(vtext_dest, prop.u.tp_text, copysize);
 		vim_free(tps[i].u.tp_text);
-		tps[i].u.tp_text = NULL;
-		prop.u.tp_text_offset = (colnr_T)(vtext_dest - count_dest);
+		tps[i].u.tp_text = रिक्त;
+		prop.u.tp_text_offset = (colnr_T)(vtext_dest - गणनम्_dest);
 		vtext_dest += copysize;
 	    }
-	    else
+	    अञ्ञथा
 		prop.u.tp_text_offset = 0;
-	    mch_memmove(prop_dest, &prop, sizeof(textprop_T));
-	    prop_dest += sizeof(textprop_T);
+	    mch_memmove(prop_dest, &prop, परिमाण(textprop_T));
+	    prop_dest += परिमाण(textprop_T);
 	}
 
-	if (curbuf->b_ml.ml_flags & (ML_LINE_DIRTY | ML_ALLOCATED))
-	    vim_free(curbuf->b_ml.ml_line_ptr);
-	curbuf->b_ml.ml_line_ptr = newtext;
-	curbuf->b_ml.ml_line_len = total_len;
-	curbuf->b_ml.ml_flags |= ML_LINE_DIRTY;
+	सचे (curbuf->b_ml.ml_flags & (ML_पङ्क्तिः_DIRTY | ML_ALLOCATED))
+	    vim_free(curbuf->b_ml.ml_पङ्क्तिः_ptr);
+	curbuf->b_ml.ml_पङ्क्तिः_ptr = newtext;
+	curbuf->b_ml.ml_पङ्क्तिः_len = total_len;
+	curbuf->b_ml.ml_flags |= ML_पङ्क्तिः_DIRTY;
     }
 }
 
@@ -1583,105 +1583,105 @@ set_text_props(linenr_T lnum, textprop_T *tps, int count)
  * of the text including NUL.  "*new_len" is set to the new total length.
  */
     char_u *
-props_add_count_header(char_u *line, int line_len, int textlen, int *new_len)
+props_add_गणनम्_header(char_u *पङ्क्तिः, पूर्णाङ्क पङ्क्तिः_len, पूर्णाङ्क textlen, पूर्णाङ्क *new_len)
 {
-    int		prop_bytes = line_len - textlen;
-    uint16_t	prop_count;
-    int		vtext_size = 0;
-    int		total;
+    पूर्णाङ्क		prop_bytes = पङ्क्तिः_len - textlen;
+    uint16_t	prop_गणनम्;
+    पूर्णाङ्क		vtext_size = 0;
+    पूर्णाङ्क		total;
     char_u	*newline;
-    char_u	*count_dest;
+    char_u	*गणनम्_dest;
     char_u	*prop_dest;
     char_u	*vtext_dest;
-    int		i;
+    पूर्णाङ्क		i;
 
-    if (prop_bytes <= 0 || prop_bytes % sizeof(textprop_T) != 0)
+    सचे (prop_bytes <= 0 || prop_bytes % परिमाण(textprop_T) != 0)
     {
-	*new_len = line_len;
-	return NULL;
+	*new_len = पङ्क्तिः_len;
+	पटिनिवत्त रिक्त;
     }
-    prop_count = (uint16_t)(prop_bytes / sizeof(textprop_T));
+    prop_गणनम् = (uint16_t)(prop_bytes / परिमाण(textprop_T));
 
     // Calculate total vtext size.
-    for (i = 0; i < (int)prop_count; ++i)
+    अत्थाय (i = 0; i < (पूर्णाङ्क)prop_गणनम्; ++i)
     {
 	textprop_T prop;
 
-	mch_memmove(&prop, line + textlen + i * sizeof(textprop_T),
-							sizeof(textprop_T));
-	if (prop.tp_flags & TP_FLAG_VTEXT_PTR)
+	mch_memmove(&prop, पङ्क्तिः + textlen + i * परिमाण(textprop_T),
+							परिमाण(textprop_T));
+	सचे (prop.tp_flags & TP_FLAG_VTEXT_PTR)
 	    vtext_size += prop.tp_len + 1;
     }
 
-    total = textlen + (int)PROP_COUNT_SIZE + prop_bytes + vtext_size;
+    total = textlen + (पूर्णाङ्क)PROP_गणनम्_SIZE + prop_bytes + vtext_size;
     newline = alloc(total);
-    if (newline == NULL)
-	return NULL;
+    सचे (newline == रिक्त)
+	पटिनिवत्त रिक्त;
     *new_len = total;
 
-    mch_memmove(newline, line, textlen);
-    count_dest = newline + textlen;
-    mch_memmove(count_dest, &prop_count, PROP_COUNT_SIZE);
-    prop_dest = count_dest + PROP_COUNT_SIZE;
+    mch_memmove(newline, पङ्क्तिः, textlen);
+    गणनम्_dest = newline + textlen;
+    mch_memmove(गणनम्_dest, &prop_गणनम्, PROP_गणनम्_SIZE);
+    prop_dest = गणनम्_dest + PROP_गणनम्_SIZE;
     vtext_dest = prop_dest + prop_bytes;
 
-    for (i = 0; i < (int)prop_count; ++i)
+    अत्थाय (i = 0; i < (पूर्णाङ्क)prop_गणनम्; ++i)
     {
 	textprop_T prop;
 
-	mch_memmove(&prop, line + textlen + i * sizeof(textprop_T),
-							sizeof(textprop_T));
-	if (prop.tp_flags & TP_FLAG_VTEXT_PTR)
+	mch_memmove(&prop, पङ्क्तिः + textlen + i * परिमाण(textprop_T),
+							परिमाण(textprop_T));
+	सचे (prop.tp_flags & TP_FLAG_VTEXT_PTR)
 	{
-	    int copysize = prop.tp_len + 1;
+	    पूर्णाङ्क copysize = prop.tp_len + 1;
 
 	    mch_memmove(vtext_dest, prop.u.tp_text, copysize);
 	    vim_free(prop.u.tp_text);
-	    prop.u.tp_text_offset = (colnr_T)(vtext_dest - count_dest);
+	    prop.u.tp_text_offset = (colnr_T)(vtext_dest - गणनम्_dest);
 	    vtext_dest += copysize;
 	}
-	else
+	अञ्ञथा
 	    prop.u.tp_text_offset = 0;
-	mch_memmove(prop_dest + i * sizeof(textprop_T), &prop,
-							sizeof(textprop_T));
+	mch_memmove(prop_dest + i * परिमाण(textprop_T), &prop,
+							परिमाण(textprop_T));
     }
-    return newline;
+    पटिनिवत्त newline;
 }
 
 /*
  * Add "text_props" with "text_prop_count" text properties to line "lnum".
  */
-    void
-add_text_props(linenr_T lnum, textprop_T *text_props, int text_prop_count)
+    शून्य
+add_text_props(linenr_T lnum, textprop_T *text_props, पूर्णाङ्क text_prop_गणनम्)
 {
     unpacked_memline_T	um;
-    int			i;
+    पूर्णाङ्क			i;
 
-    um = um_open_at(curbuf, lnum, text_prop_count);
-    if (um.buf == NULL)
-	return;
-    if (!um_detach(&um))
+    um = um_open_at(curbuf, lnum, text_prop_गणनम्);
+    सचे (um.buf == रिक्त)
+	पटिनिवत्त;
+    सचे (!um_detach(&um))
     {
 	um_abort(&um);
-	return;
+	पटिनिवत्त;
     }
 
     // Grow props array if needed.
-    if (um.prop_count + text_prop_count > um.prop_size)
+    सचे (um.prop_गणनम् + text_prop_गणनम् > um.prop_size)
     {
 	textprop_T *newprops = vim_realloc(um.props,
-		(um.prop_count + text_prop_count) * sizeof(textprop_T));
-	if (newprops == NULL)
+		(um.prop_गणनम् + text_prop_गणनम्) * परिमाण(textprop_T));
+	सचे (newprops == रिक्त)
 	{
 	    um_abort(&um);
-	    return;
+	    पटिनिवत्त;
 	}
 	um.props = newprops;
-	um.prop_size = um.prop_count + text_prop_count;
+	um.prop_size = um.prop_गणनम् + text_prop_गणनम्;
     }
 
-    for (i = 0; i < text_prop_count; ++i)
-	um.props[um.prop_count++] = text_props[i];
+    अत्थाय (i = 0; i < text_prop_गणनम्; ++i)
+	um.props[um.prop_गणनम्++] = text_props[i];
 
     um_close(&um);
 }
@@ -1689,120 +1689,120 @@ add_text_props(linenr_T lnum, textprop_T *text_props, int text_prop_count)
 /*
  * Function passed to qsort() for sorting proptype_T on pt_id.
  */
-    static int
-compare_pt(const void *s1, const void *s2)
+    स्थिर पूर्णाङ्क
+compare_pt(ध्रुव शून्य *s1, ध्रुव शून्य *s2)
 {
     proptype_T	*tp1 = *(proptype_T **)s1;
     proptype_T	*tp2 = *(proptype_T **)s2;
 
-    return tp1->pt_id == tp2->pt_id ? 0 : tp1->pt_id < tp2->pt_id ? -1 : 1;
+    पटिनिवत्त tp1->pt_id == tp2->pt_id ? 0 : tp1->pt_id < tp2->pt_id ? -1 : 1;
 }
 
-    static proptype_T *
-find_type_by_id(hashtab_T *ht, proptype_T ***array, int id)
+    स्थिर proptype_T *
+find_type_by_id(hashtab_T *ht, proptype_T ***array, पूर्णाङ्क id)
 {
-    int low = 0;
-    int high;
+    पूर्णाङ्क नीचः = 0;
+    पूर्णाङ्क उच्चः;
 
-    if (ht == NULL || ht->ht_used == 0)
-	return NULL;
+    सचे (ht == रिक्त || ht->ht_used == 0)
+	पटिनिवत्त रिक्त;
 
     // Make the lookup faster by creating an array with pointers to
     // hashtable entries, sorted on pt_id.
-    if (*array == NULL)
+    सचे (*array == रिक्त)
     {
 	long	    todo;
 	hashitem_T  *hi;
-	int	    i = 0;
+	पूर्णाङ्क	    i = 0;
 
 	*array = ALLOC_MULT(proptype_T *, ht->ht_used);
-	if (*array == NULL)
-	    return NULL;
+	सचे (*array == रिक्त)
+	    पटिनिवत्त रिक्त;
 	todo = (long)ht->ht_used;
-	FOR_ALL_HASHTAB_ITEMS(ht, hi, todo)
+	FOR_ALL_HASHTAB_वस्तूनि(ht, hi, todo)
 	{
-	    if (!HASHITEM_EMPTY(hi))
+	    सचे (!HASHITEM_EMPTY(hi))
 	    {
 		(*array)[i++] = HI2PT(hi);
 		--todo;
 	    }
 	}
-	qsort((void *)*array, ht->ht_used, sizeof(proptype_T *), compare_pt);
+	qsort((शून्य *)*array, ht->ht_used, परिमाण(proptype_T *), compare_pt);
     }
 
     // binary search in the sorted array
-    high = ht->ht_used;
-    while (high > low)
+    उच्चः = ht->ht_used;
+    याव (उच्चः > नीचः)
     {
-	int m = (high + low) / 2;
+	पूर्णाङ्क m = (उच्चः + नीचः) / 2;
 
-	if ((*array)[m]->pt_id == id)
-	    return (*array)[m];
-	if ((*array)[m]->pt_id > id)
-	    high = m;
-	else
-	    low = m + 1;
+	सचे ((*array)[m]->pt_id == id)
+	    पटिनिवत्त (*array)[m];
+	सचे ((*array)[m]->pt_id > id)
+	    उच्चः = m;
+	अञ्ञथा
+	    नीचः = m + 1;
     }
-    return NULL;
+    पटिनिवत्त रिक्त;
 }
 
 /*
  * Fill 'dict' with text properties in 'prop'.
  */
-    static void
+    स्थिर शून्य
 prop_fill_dict(dict_T *dict, textprop_T *prop, buf_T *buf)
 {
     proptype_T *pt;
-    int buflocal = TRUE;
-    int virtualtext_prop = prop->tp_id < 0;
+    पूर्णाङ्क buflocal = TRUE;
+    पूर्णाङ्क virtualtext_prop = prop->tp_id < 0;
 
-    dict_add_number(dict, "col", (prop->tp_col == MAXCOL) ? 0 : prop->tp_col);
-    if (!virtualtext_prop)
+    dict_add_सङ्ख्या(dict, "col", (prop->tp_col == MAXCOL) ? 0 : prop->tp_col);
+    सचे (!virtualtext_prop)
     {
-	dict_add_number(dict, "length", prop->tp_len);
-	dict_add_number(dict, "id", prop->tp_id);
+	dict_add_सङ्ख्या(dict, "length", prop->tp_len);
+	dict_add_सङ्ख्या(dict, "id", prop->tp_id);
     }
-    dict_add_number(dict, "start", !(prop->tp_flags & TP_FLAG_CONT_PREV));
-    dict_add_number(dict, "end", !(prop->tp_flags & TP_FLAG_CONT_NEXT));
+    dict_add_सङ्ख्या(dict, "start", !(prop->tp_flags & TP_FLAG_CONT_PREV));
+    dict_add_सङ्ख्या(dict, "end", !(prop->tp_flags & TP_FLAG_CONT_NEXT));
 
     pt = find_type_by_id(buf->b_proptypes, &buf->b_proparray, prop->tp_type);
-    if (pt == NULL)
+    सचे (pt == रिक्त)
     {
 	pt = find_type_by_id(global_proptypes, &global_proparray,
 								prop->tp_type);
 	buflocal = FALSE;
     }
-    if (pt != NULL)
+    सचे (pt != रिक्त)
 	dict_add_string(dict, "type", pt->pt_name);
 
-    if (buflocal)
-	dict_add_number(dict, "type_bufnr", buf->b_fnum);
-    else
-	dict_add_number(dict, "type_bufnr", 0);
-    if (virtualtext_prop)
+    सचे (buflocal)
+	dict_add_सङ्ख्या(dict, "type_bufnr", buf->b_fnum);
+    अञ्ञथा
+	dict_add_सङ्ख्या(dict, "type_bufnr", 0);
+    सचे (virtualtext_prop)
     {
-	string_T    text_align = {NULL, 0};
+	string_T    text_align = {रिक्त, 0};
 
 	// virtual text property - u.tp_text must be set by caller
 	dict_add_string(dict, "text", prop->u.tp_text);
 
 	// text_align
-	if (prop->tp_flags & TP_FLAG_ALIGN_RIGHT)
+	सचे (prop->tp_flags & TP_FLAG_ALIGN_दक्षिणः)
 	    STR_LITERAL_SET(text_align, "right");
-	else if (prop->tp_flags & TP_FLAG_ALIGN_ABOVE)
+	अञ्ञथा सचे (prop->tp_flags & TP_FLAG_ALIGN_ABOVE)
 	    STR_LITERAL_SET(text_align, "above");
-	else if (prop->tp_flags & TP_FLAG_ALIGN_BELOW)
+	अञ्ञथा सचे (prop->tp_flags & TP_FLAG_ALIGN_BELOW)
 	    STR_LITERAL_SET(text_align, "below");
-	if (text_align.string != NULL)
+	सचे (text_align.string != रिक्त)
 	    dict_add_string_len(dict, "text_align",
-		text_align.string, (int)text_align.length);
+		text_align.string, (पूर्णाङ्क)text_align.length);
 
 	// text_wrap
-	if (prop->tp_flags & TP_FLAG_WRAP)
+	सचे (prop->tp_flags & TP_FLAG_WRAP)
 	    dict_add_string_len(dict, "text_wrap",
 		(char_u *)"wrap", STRLEN_LITERAL("wrap"));
-	if (prop->tp_padleft != 0)
-	    dict_add_number(dict, "text_padding_left", prop->tp_padleft);
+	सचे (prop->tp_padleft != 0)
+	    dict_add_सङ्ख्या(dict, "text_padding_left", prop->tp_padleft);
     }
 }
 
@@ -1811,14 +1811,14 @@ prop_fill_dict(dict_T *dict, textprop_T *prop, buf_T *buf)
  * Returns NULL if not found.
  */
     proptype_T *
-text_prop_type_by_id(buf_T *buf, int id)
+text_prop_type_by_id(buf_T *buf, पूर्णाङ्क id)
 {
     proptype_T *type;
 
     type = find_type_by_id(buf->b_proptypes, &buf->b_proparray, id);
-    if (type == NULL)
+    सचे (type == रिक्त)
 	type = find_type_by_id(global_proptypes, &global_proparray, id);
-    return type;
+    पटिनिवत्त type;
 }
 
 /*
@@ -1827,218 +1827,218 @@ text_prop_type_by_id(buf_T *buf, int id)
     bool
 text_prop_type_valid(buf_T *buf, textprop_T *prop)
 {
-    return text_prop_type_by_id(buf, prop->tp_type) != NULL;
+    पटिनिवत्त text_prop_type_by_id(buf, prop->tp_type) != रिक्त;
 }
 
 /*
  * prop_clear({lnum} [, {lnum_end} [, {bufnr}]])
  */
-    void
+    शून्य
 f_prop_clear(typval_T *argvars, typval_T *rettv UNUSED)
 {
     linenr_T start;
     linenr_T end;
     linenr_T lnum;
     buf_T    *buf = curbuf;
-    int	    did_clear = FALSE;
+    पूर्णाङ्क	    did_clear = FALSE;
 
-    if (in_vim9script()
-	    && (check_for_number_arg(argvars, 0) == FAIL
-		|| check_for_opt_number_arg(argvars, 1) == FAIL
+    सचे (in_vim9script()
+	    && (check_for_सङ्ख्या_arg(argvars, 0) == FAIL
+		|| check_for_opt_सङ्ख्या_arg(argvars, 1) == FAIL
 		|| (argvars[1].v_type != VAR_UNKNOWN
 		    && check_for_opt_dict_arg(argvars, 2) == FAIL)))
-	return;
+	पटिनिवत्त;
 
-    start = tv_get_number(&argvars[0]);
+    start = tv_get_सङ्ख्या(&argvars[0]);
     end = start;
-    if (argvars[1].v_type != VAR_UNKNOWN)
+    सचे (argvars[1].v_type != VAR_UNKNOWN)
     {
-	end = tv_get_number(&argvars[1]);
-	if (argvars[2].v_type != VAR_UNKNOWN)
+	end = tv_get_सङ्ख्या(&argvars[1]);
+	सचे (argvars[2].v_type != VAR_UNKNOWN)
 	{
-	    if (get_bufnr_from_arg(&argvars[2], &buf) == FAIL)
-		return;
+	    सचे (get_bufnr_from_arg(&argvars[2], &buf) == FAIL)
+		पटिनिवत्त;
 	}
     }
-    if (start < 1 || end < 1)
+    सचे (start < 1 || end < 1)
     {
 	emsg(_(e_invalid_range));
-	return;
+	पटिनिवत्त;
     }
 
     {
 	unpacked_memline_T um = um_open(buf);
 
-	for (lnum = start; lnum <= end; ++lnum)
+	अत्थाय (lnum = start; lnum <= end; ++lnum)
 	{
-	    int idx;
+	    पूर्णाङ्क idx;
 
-	    if (lnum > buf->b_ml.ml_line_count)
-		break;
-	    if (!um_goto_line(&um, lnum, 0))
-		break;
-	    if (um.prop_count > 0)
+	    सचे (lnum > buf->b_ml.ml_पङ्क्तिः_गणनम्)
+		भङ्ग;
+	    सचे (!um_goto_पङ्क्तिः(&um, lnum, 0))
+		भङ्ग;
+	    सचे (um.prop_गणनम् > 0)
 	    {
 		did_clear = TRUE;
-		for (idx = um.prop_count - 1; idx >= 0; --idx)
+		अत्थाय (idx = um.prop_गणनम् - 1; idx >= 0; --idx)
 		    um_delete_prop(&um, idx);
 	    }
 	}
 	um_close(&um);
     }
-    if (did_clear)
+    सचे (did_clear)
 	redraw_buf_later(buf, UPD_NOT_VALID);
 }
 
 /*
  * prop_find({props} [, {direction}])
  */
-    void
+    शून्य
 f_prop_find(typval_T *argvars, typval_T *rettv)
 {
     pos_T       *cursor = &curwin->w_cursor;
     dict_T      *dict;
     buf_T       *buf = curbuf;
     dictitem_T  *di;
-    int		lnum_start;
-    int		start_pos_has_prop = 0;
-    int		seen_end = FALSE;
-    int		id = 0;
-    int		id_found = FALSE;
-    int		type_id = -1;
-    int		skipstart = FALSE;
-    int		lnum = -1;
-    int		col = -1;
-    int		dir = FORWARD;    // FORWARD == 1, BACKWARD == -1
-    int		both;
+    पूर्णाङ्क		lnum_start;
+    पूर्णाङ्क		start_pos_has_prop = 0;
+    पूर्णाङ्क		seen_end = FALSE;
+    पूर्णाङ्क		id = 0;
+    पूर्णाङ्क		id_found = FALSE;
+    पूर्णाङ्क		type_id = -1;
+    पूर्णाङ्क		skipstart = FALSE;
+    पूर्णाङ्क		lnum = -1;
+    पूर्णाङ्क		col = -1;
+    पूर्णाङ्क		dir = FORWARD;    // FORWARD == 1, BACKWARD == -1
+    पूर्णाङ्क		both;
 
-    if (in_vim9script()
+    सचे (in_vim9script()
 	    && (check_for_dict_arg(argvars, 0) == FAIL
 		|| check_for_opt_string_arg(argvars, 1) == FAIL))
-	return;
+	पटिनिवत्त;
 
-    if (check_for_nonnull_dict_arg(argvars, 0) == FAIL)
-	return;
+    सचे (check_for_nonnull_dict_arg(argvars, 0) == FAIL)
+	पटिनिवत्त;
     dict = argvars[0].vval.v_dict;
 
-    if (get_bufnr_from_arg(&argvars[0], &buf) == FAIL)
-	return;
-    if (buf->b_ml.ml_mfp == NULL)
-	return;
+    सचे (get_bufnr_from_arg(&argvars[0], &buf) == FAIL)
+	पटिनिवत्त;
+    सचे (buf->b_ml.ml_mfp == रिक्त)
+	पटिनिवत्त;
 
-    if (argvars[1].v_type != VAR_UNKNOWN)
+    सचे (argvars[1].v_type != VAR_UNKNOWN)
     {
 	char_u      *dir_s = tv_get_string(&argvars[1]);
 
-	if (*dir_s == 'b')
+	सचे (*dir_s == 'b')
 	    dir = BACKWARD;
-	else if (*dir_s != 'f')
+	अञ्ञथा सचे (*dir_s != 'f')
 	{
 	    emsg(_(e_invalid_argument));
-	    return;
+	    पटिनिवत्त;
 	}
     }
 
     di = dict_find(dict, (char_u *)"lnum", -1);
-    if (di != NULL)
-	lnum = tv_get_number(&di->di_tv);
+    सचे (di != रिक्त)
+	lnum = tv_get_सङ्ख्या(&di->di_tv);
 
     di = dict_find(dict, (char_u *)"col", -1);
-    if (di != NULL)
-	col = tv_get_number(&di->di_tv);
+    सचे (di != रिक्त)
+	col = tv_get_सङ्ख्या(&di->di_tv);
 
-    if (lnum == -1)
+    सचे (lnum == -1)
     {
 	lnum = cursor->lnum;
 	col = cursor->col + 1;
     }
-    else if (col == -1)
+    अञ्ञथा सचे (col == -1)
 	col = 1;
 
-    if (lnum < 1 || lnum > buf->b_ml.ml_line_count)
+    सचे (lnum < 1 || lnum > buf->b_ml.ml_पङ्क्तिः_गणनम्)
     {
 	emsg(_(e_invalid_range));
-	return;
+	पटिनिवत्त;
     }
 
     skipstart = dict_get_bool(dict, "skipstart", 0);
 
-    if (dict_has_key(dict, "id"))
+    सचे (dict_has_कुञ्चिका(dict, "id"))
     {
-	id = dict_get_number(dict, "id");
+	id = dict_get_सङ्ख्या(dict, "id");
 	id_found = TRUE;
     }
-    if (dict_has_key(dict, "type"))
+    सचे (dict_has_कुञ्चिका(dict, "type"))
     {
 	char_u	    *name = dict_get_string(dict, "type", FALSE);
 	proptype_T  *type = lookup_prop_type(name, buf);
 
-	if (type == NULL)
-	    return;
+	सचे (type == रिक्त)
+	    पटिनिवत्त;
 	type_id = type->pt_id;
     }
     both = dict_get_bool(dict, "both", FALSE);
-    if (!id_found && type_id == -1)
+    सचे (!id_found && type_id == -1)
     {
 	emsg(_(e_need_at_least_one_of_id_or_type));
-	return;
+	पटिनिवत्त;
     }
-    if (both && (!id_found || type_id == -1))
+    सचे (both && (!id_found || type_id == -1))
     {
 	emsg(_(e_need_id_and_type_or_types_with_both));
-	return;
+	पटिनिवत्त;
     }
 
     lnum_start = lnum;
 
-    if (rettv_dict_alloc(rettv) == FAIL)
-	return;
+    सचे (rettv_dict_alloc(rettv) == FAIL)
+	पटिनिवत्त;
 
-    while (1)
+    याव (1)
     {
 	char_u	*prop_start_ptr;
-	int	count = get_text_props(buf, lnum, &prop_start_ptr, FALSE);
-	int	    i;
+	पूर्णाङ्क	गणनम् = get_text_props(buf, lnum, &prop_start_ptr, FALSE);
+	पूर्णाङ्क	    i;
 	textprop_T  prop;
-	int	    prop_start;
-	int	    prop_end;
+	पूर्णाङ्क	    prop_start;
+	पूर्णाङ्क	    prop_end;
 
-	for (i = dir == BACKWARD ? count - 1 : 0; i >= 0 && i < count; i += dir)
+	अत्थाय (i = dir == BACKWARD ? गणनम् - 1 : 0; i >= 0 && i < गणनम्; i += dir)
 	{
-	    mch_memmove(&prop, prop_start_ptr + i * sizeof(textprop_T),
-							   sizeof(textprop_T));
+	    mch_memmove(&prop, prop_start_ptr + i * परिमाण(textprop_T),
+							   परिमाण(textprop_T));
 	    // Convert offset to pointer for virtual text props.
-	    if (prop.tp_id < 0 && prop.u.tp_text_offset > 0)
+	    सचे (prop.tp_id < 0 && prop.u.tp_text_offset > 0)
 	    {
-		prop.u.tp_text = (prop_start_ptr - PROP_COUNT_SIZE)
+		prop.u.tp_text = (prop_start_ptr - PROP_गणनम्_SIZE)
 						    + prop.u.tp_text_offset;
 		prop.tp_flags |= TP_FLAG_VTEXT_PTR;
 	    }
-	    else
-		prop.u.tp_text = NULL;
+	    अञ्ञथा
+		prop.u.tp_text = रिक्त;
 
 	    // For the very first line try to find the first property before or
 	    // after `col`, depending on the search direction.
-	    if (lnum == lnum_start)
+	    सचे (lnum == lnum_start)
 	    {
 		bool is_floating_vtext = prop.tp_id < 0
 		    && prop.tp_col == MAXCOL;
-		if (dir == BACKWARD)
+		सचे (dir == BACKWARD)
 		{
 		    // Virtual text with MAXCOL always matches any column
-		    if (!is_floating_vtext && prop.tp_col > col)
-			continue;
+		    सचे (!is_floating_vtext && prop.tp_col > col)
+			अनुवर्त;
 		}
-		else if (!is_floating_vtext
+		अञ्ञथा सचे (!is_floating_vtext
 		    && prop.tp_col + prop.tp_len - (prop.tp_len != 0) < col)
-		    continue;
+		    अनुवर्त;
 	    }
-	    if (both ? prop.tp_id == id && prop.tp_type == type_id
+	    सचे (both ? prop.tp_id == id && prop.tp_type == type_id
 		     : (id_found && prop.tp_id == id)
 						    || prop.tp_type == type_id)
 	    {
 		// Check if the starting position has text props.
-		if (lnum_start == lnum
+		सचे (lnum_start == lnum
 			&& col >= prop.tp_col
 			&& (col <= prop.tp_col + prop.tp_len
 							 - (prop.tp_len != 0)))
@@ -2050,44 +2050,44 @@ f_prop_find(typval_T *argvars, typval_T *rettv)
 		// The property does not continue on the next line, it ends on
 		// this line.
 		prop_end = !(prop.tp_flags & TP_FLAG_CONT_NEXT);
-		if (!prop_start && prop_end && dir == FORWARD)
+		सचे (!prop_start && prop_end && dir == FORWARD)
 		    seen_end = 1;
 
 		// Skip lines without the start flag.
-		if (!prop_start)
+		सचे (!prop_start)
 		{
 		    // Always search backwards for start when search started
 		    // on a prop and we're not skipping.
-		    if (start_pos_has_prop && !skipstart)
+		    सचे (start_pos_has_prop && !skipstart)
 			dir = BACKWARD;
-		    continue;
+		    अनुवर्त;
 		}
 
 		// If skipstart is true, skip the prop at start pos (even if
 		// continued from another line).
-		if (start_pos_has_prop && skipstart && !seen_end)
+		सचे (start_pos_has_prop && skipstart && !seen_end)
 		{
 		    start_pos_has_prop = 0;
-		    continue;
+		    अनुवर्त;
 		}
 
 		prop_fill_dict(rettv->vval.v_dict, &prop, buf);
-		dict_add_number(rettv->vval.v_dict, "lnum", lnum);
+		dict_add_सङ्ख्या(rettv->vval.v_dict, "lnum", lnum);
 
-		return;
+		पटिनिवत्त;
 	    }
 	}
 
-	if (dir > 0)
+	सचे (dir > 0)
 	{
-	    if (lnum >= buf->b_ml.ml_line_count)
-		break;
+	    सचे (lnum >= buf->b_ml.ml_पङ्क्तिः_गणनम्)
+		भङ्ग;
 	    lnum++;
 	}
-	else
+	अञ्ञथा
 	{
-	    if (lnum <= 1)
-		break;
+	    सचे (lnum <= 1)
+		भङ्ग;
 	    lnum--;
 	}
     }
@@ -2096,16 +2096,16 @@ f_prop_find(typval_T *argvars, typval_T *rettv)
 /*
  * Returns TRUE if 'type_or_id' is in the 'types_or_ids' list.
  */
-    static int
-prop_type_or_id_in_list(int *types_or_ids, int len, int type_or_id)
+    स्थिर पूर्णाङ्क
+prop_type_or_id_in_list(पूर्णाङ्क *types_or_ids, पूर्णाङ्क len, पूर्णाङ्क type_or_id)
 {
-    int i;
+    पूर्णाङ्क i;
 
-    for (i = 0; i < len; i++)
-	if (types_or_ids[i] == type_or_id)
-	    return TRUE;
+    अत्थाय (i = 0; i < len; i++)
+	सचे (types_or_ids[i] == type_or_id)
+	    पटिनिवत्त TRUE;
 
-    return FALSE;
+    पटिनिवत्त FALSE;
 }
 
 /*
@@ -2117,51 +2117,51 @@ prop_type_or_id_in_list(int *types_or_ids, int len, int type_or_id)
  * If 'add_lnum' is TRUE, then add the line number also to the text property
  * dictionary.
  */
-    static void
-get_props_in_line(
+    स्थिर शून्य
+get_props_in_पङ्क्तिः(
 	buf_T		*buf,
 	linenr_T	lnum,
-	int		*prop_types,
-	int		prop_types_len,
-	int		*prop_ids,
-	int		prop_ids_len,
+	पूर्णाङ्क		*prop_types,
+	पूर्णाङ्क		prop_types_len,
+	पूर्णाङ्क		*prop_ids,
+	पूर्णाङ्क		prop_ids_len,
 	list_T		*retlist,
-	int		add_lnum)
+	पूर्णाङ्क		add_lnum)
 {
     char_u	*props;
-    int		count;
-    int		i;
+    पूर्णाङ्क		गणनम्;
+    पूर्णाङ्क		i;
     textprop_T	prop;
 
-    count = get_text_props(buf, lnum, &props, FALSE);
-    for (i = 0; i < count; ++i)
+    गणनम् = get_text_props(buf, lnum, &props, FALSE);
+    अत्थाय (i = 0; i < गणनम्; ++i)
     {
-	mch_memmove(&prop, props + i * sizeof(textprop_T),
-		sizeof(textprop_T));
+	mch_memmove(&prop, props + i * परिमाण(textprop_T),
+		परिमाण(textprop_T));
 	// Convert offset to pointer for virtual text props.
-	if (prop.tp_id < 0 && prop.u.tp_text_offset > 0)
+	सचे (prop.tp_id < 0 && prop.u.tp_text_offset > 0)
 	{
-	    prop.u.tp_text = (props - PROP_COUNT_SIZE)
+	    prop.u.tp_text = (props - PROP_गणनम्_SIZE)
 						+ prop.u.tp_text_offset;
 	    prop.tp_flags |= TP_FLAG_VTEXT_PTR;
 	}
-	else
-	    prop.u.tp_text = NULL;
-	if ((prop_types == NULL
+	अञ्ञथा
+	    prop.u.tp_text = रिक्त;
+	सचे ((prop_types == रिक्त
 		    || prop_type_or_id_in_list(prop_types, prop_types_len,
 			prop.tp_type))
-		&& (prop_ids == NULL
+		&& (prop_ids == रिक्त
 		    || prop_type_or_id_in_list(prop_ids, prop_ids_len,
 								 prop.tp_id)))
 	{
 	    dict_T *d = dict_alloc();
 
-	    if (d == NULL)
-		break;
+	    सचे (d == रिक्त)
+		भङ्ग;
 	    prop_fill_dict(d, &prop, buf);
-	    if (add_lnum)
-		dict_add_number(d, "lnum", lnum);
-	    if (list_append_dict(retlist, d) == FAIL)
+	    सचे (add_lnum)
+		dict_add_सङ्ख्या(d, "lnum", lnum);
+	    सचे (list_append_dict(retlist, d) == FAIL)
 		dict_unref(d);
 	}
     }
@@ -2172,45 +2172,45 @@ get_props_in_line(
  * identifiers. Returns a pointer to the allocated array. Returns NULL on
  * error. 'num_types' is set to the number of returned property types.
  */
-    static int *
-get_prop_types_from_names(list_T *l, buf_T *buf, int *num_types)
+    स्थिर पूर्णाङ्क *
+get_prop_types_from_names(list_T *l, buf_T *buf, पूर्णाङ्क *अङ्कः_types)
 {
-    int		*prop_types;
+    पूर्णाङ्क		*prop_types;
     listitem_T	*li;
-    int		i;
+    पूर्णाङ्क		i;
     char_u	*name;
     proptype_T	*type;
 
-    *num_types = 0;
+    *अङ्कः_types = 0;
 
-    prop_types = ALLOC_MULT(int, list_len(l));
-    if (prop_types == NULL)
-	return NULL;
+    prop_types = ALLOC_MULT(पूर्णाङ्क, list_len(l));
+    सचे (prop_types == रिक्त)
+	पटिनिवत्त रिक्त;
 
     i = 0;
-    FOR_ALL_LIST_ITEMS(l, li)
+    FOR_ALL_LIST_वस्तूनि(l, li)
     {
-	if (li->li_tv.v_type != VAR_STRING)
+	सचे (li->li_tv.v_type != VAR_STRING)
 	{
 	    emsg(_(e_string_required));
-	    goto errret;
+	    गच्छ errret;
 	}
 	name = li->li_tv.vval.v_string;
-	if (name == NULL)
-	    goto errret;
+	सचे (name == रिक्त)
+	    गच्छ errret;
 
 	type = lookup_prop_type(name, buf);
-	if (type == NULL)
-	    goto errret;
+	सचे (type == रिक्त)
+	    गच्छ errret;
 	prop_types[i++] = type->pt_id;
     }
 
-    *num_types = i;
-    return prop_types;
+    *अङ्कः_types = i;
+    पटिनिवत्त prop_types;
 
 errret:
     VIM_CLEAR(prop_types);
-    return NULL;
+    पटिनिवत्त रिक्त;
 }
 
 /*
@@ -2218,135 +2218,135 @@ errret:
  * identifiers.  Returns a pointer to the allocated array. Returns NULL on
  * error. 'num_ids' is set to the number of returned property identifiers.
  */
-    static int *
-get_prop_ids_from_list(list_T *l, int *num_ids)
+    स्थिर पूर्णाङ्क *
+get_prop_ids_from_list(list_T *l, पूर्णाङ्क *अङ्कः_ids)
 {
-    int		*prop_ids;
+    पूर्णाङ्क		*prop_ids;
     listitem_T	*li;
-    int		i = 0;
-    int		id;
-    int		error;
+    पूर्णाङ्क		i = 0;
+    पूर्णाङ्क		id;
+    पूर्णाङ्क		error;
 
-    *num_ids = 0;
+    *अङ्कः_ids = 0;
 
-    prop_ids = ALLOC_MULT(int, list_len(l));
-    if (prop_ids == NULL)
-	return NULL;
+    prop_ids = ALLOC_MULT(पूर्णाङ्क, list_len(l));
+    सचे (prop_ids == रिक्त)
+	पटिनिवत्त रिक्त;
 
     CHECK_LIST_MATERIALIZE(l);
-    FOR_ALL_LIST_ITEMS(l, li)
+    FOR_ALL_LIST_वस्तूनि(l, li)
     {
 	error = FALSE;
-	id = tv_get_number_chk(&li->li_tv, &error);
-	if (error)
-	    goto errret;
+	id = tv_get_सङ्ख्या_chk(&li->li_tv, &error);
+	सचे (error)
+	    गच्छ errret;
 
 	prop_ids[i++] = id;
     }
 
-    *num_ids = i;
-    return prop_ids;
+    *अङ्कः_ids = i;
+    पटिनिवत्त prop_ids;
 
 errret:
     VIM_CLEAR(prop_ids);
-    return NULL;
+    पटिनिवत्त रिक्त;
 }
 
 /*
  * prop_list({lnum} [, {bufnr}])
  */
-    void
+    शून्य
 f_prop_list(typval_T *argvars, typval_T *rettv)
 {
     linenr_T	lnum;
     linenr_T	start_lnum;
     linenr_T	end_lnum;
     buf_T	*buf = curbuf;
-    int		add_lnum = FALSE;
-    int		*prop_types = NULL;
-    int		prop_types_len = 0;
-    int		*prop_ids = NULL;
-    int		prop_ids_len = 0;
+    पूर्णाङ्क		add_lnum = FALSE;
+    पूर्णाङ्क		*prop_types = रिक्त;
+    पूर्णाङ्क		prop_types_len = 0;
+    पूर्णाङ्क		*prop_ids = रिक्त;
+    पूर्णाङ्क		prop_ids_len = 0;
     list_T	*l;
     dictitem_T	*di;
 
-    if (in_vim9script()
-	    && (check_for_number_arg(argvars, 0) == FAIL
+    सचे (in_vim9script()
+	    && (check_for_सङ्ख्या_arg(argvars, 0) == FAIL
 		|| check_for_opt_dict_arg(argvars, 1) == FAIL))
-	return;
+	पटिनिवत्त;
 
-    if (rettv_list_alloc(rettv) == FAIL)
-	return;
+    सचे (rettv_list_alloc(rettv) == FAIL)
+	पटिनिवत्त;
 
     // default: get text properties on current line
-    start_lnum = tv_get_number(&argvars[0]);
+    start_lnum = tv_get_सङ्ख्या(&argvars[0]);
     end_lnum = start_lnum;
-    if (argvars[1].v_type != VAR_UNKNOWN)
+    सचे (argvars[1].v_type != VAR_UNKNOWN)
     {
 	dict_T *d;
 
-	if (check_for_dict_arg(argvars, 1) == FAIL)
-	    return;
+	सचे (check_for_dict_arg(argvars, 1) == FAIL)
+	    पटिनिवत्त;
 	d = argvars[1].vval.v_dict;
 
-	if (get_bufnr_from_arg(&argvars[1], &buf) == FAIL)
-	    return;
+	सचे (get_bufnr_from_arg(&argvars[1], &buf) == FAIL)
+	    पटिनिवत्त;
 
-	if (d != NULL && (di = dict_find(d, (char_u *)"end_lnum", -1)) != NULL)
+	सचे (d != रिक्त && (di = dict_find(d, (char_u *)"end_lnum", -1)) != रिक्त)
 	{
-	    if (di->di_tv.v_type != VAR_NUMBER)
+	    सचे (di->di_tv.v_type != VAR_सङ्ख्या)
 	    {
-		emsg(_(e_number_required));
-		return;
+		emsg(_(e_सङ्ख्या_required));
+		पटिनिवत्त;
 	    }
-	    end_lnum = tv_get_number(&di->di_tv);
-	    if (end_lnum < 0)
+	    end_lnum = tv_get_सङ्ख्या(&di->di_tv);
+	    सचे (end_lnum < 0)
 		// negative end_lnum is used as an offset from the last buffer
-		// line
-		end_lnum = buf->b_ml.ml_line_count + end_lnum + 1;
-	    else if (end_lnum > buf->b_ml.ml_line_count)
-		end_lnum = buf->b_ml.ml_line_count;
+		//पङ्क्तिः
+		end_lnum = buf->b_ml.ml_पङ्क्तिः_गणनम् + end_lnum + 1;
+	    अञ्ञथा सचे (end_lnum > buf->b_ml.ml_पङ्क्तिः_गणनम्)
+		end_lnum = buf->b_ml.ml_पङ्क्तिः_गणनम्;
 	    add_lnum = TRUE;
 	}
-	if (d != NULL && (di = dict_find(d, (char_u *)"types", -1)) != NULL)
+	सचे (d != रिक्त && (di = dict_find(d, (char_u *)"types", -1)) != रिक्त)
 	{
-	    if (di->di_tv.v_type != VAR_LIST)
+	    सचे (di->di_tv.v_type != VAR_LIST)
 	    {
 		emsg(_(e_list_required));
-		return;
+		पटिनिवत्त;
 	    }
 
 	    l = di->di_tv.vval.v_list;
-	    if (l != NULL && list_len(l) > 0)
+	    सचे (l != रिक्त && list_len(l) > 0)
 	    {
 		prop_types = get_prop_types_from_names(l, buf, &prop_types_len);
-		if (prop_types == NULL)
-		    return;
+		सचे (prop_types == रिक्त)
+		    पटिनिवत्त;
 	    }
 	}
-	if (d != NULL && (di = dict_find(d, (char_u *)"ids", -1)) != NULL)
+	सचे (d != रिक्त && (di = dict_find(d, (char_u *)"ids", -1)) != रिक्त)
 	{
-	    if (di->di_tv.v_type != VAR_LIST)
+	    सचे (di->di_tv.v_type != VAR_LIST)
 	    {
 		emsg(_(e_list_required));
-		goto errret;
+		गच्छ errret;
 	    }
 
 	    l = di->di_tv.vval.v_list;
-	    if (l != NULL && list_len(l) > 0)
+	    सचे (l != रिक्त && list_len(l) > 0)
 	    {
 		prop_ids = get_prop_ids_from_list(l, &prop_ids_len);
-		if (prop_ids == NULL)
-		    goto errret;
+		सचे (prop_ids == रिक्त)
+		    गच्छ errret;
 	    }
 	}
     }
-    if (start_lnum < 1 || start_lnum > buf->b_ml.ml_line_count
+    सचे (start_lnum < 1 || start_lnum > buf->b_ml.ml_पङ्क्तिः_गणनम्
 		|| end_lnum < 1 || end_lnum < start_lnum)
 	emsg(_(e_invalid_range));
-    else
-	for (lnum = start_lnum; lnum <= end_lnum; lnum++)
-	    get_props_in_line(buf, lnum, prop_types, prop_types_len,
+    अञ्ञथा
+	अत्थाय (lnum = start_lnum; lnum <= end_lnum; lnum++)
+	    get_props_in_पङ्क्तिः(buf, lnum, prop_types, prop_types_len,
 		    prop_ids, prop_ids_len,
 		    rettv->vval.v_list, add_lnum);
 
@@ -2358,7 +2358,7 @@ errret:
 /*
  * prop_remove({props} [, {lnum} [, {lnum_end}]])
  */
-    void
+    शून्य
 f_prop_remove(typval_T *argvars, typval_T *rettv)
 {
     linenr_T	start = 1;
@@ -2368,161 +2368,161 @@ f_prop_remove(typval_T *argvars, typval_T *rettv)
     linenr_T	last_changed = 0;
     dict_T	*dict;
     buf_T	*buf = curbuf;
-    int		do_all;
-    int		id = -MAXCOL;
-    int		type_id = -1;	    // for a single "type"
-    int		*type_ids = NULL;   // array, for a list of "types", allocated
-    int		num_type_ids = 0;   // number of elements in "type_ids"
-    int		both;
+    पूर्णाङ्क		do_all;
+    पूर्णाङ्क		id = -MAXCOL;
+    पूर्णाङ्क		type_id = -1;	    // for a single "type"
+    पूर्णाङ्क		*type_ids = रिक्त;   // array, for a list of "types", allocated
+    पूर्णाङ्क		अङ्कः_type_ids = 0;   // number of elements in "type_ids"
+    पूर्णाङ्क		both;
 
-    rettv->vval.v_number = 0;
+    rettv->vval.v_सङ्ख्या = 0;
 
-    if (in_vim9script()
+    सचे (in_vim9script()
 	    && (check_for_dict_arg(argvars, 0) == FAIL
-		|| check_for_opt_number_arg(argvars, 1) == FAIL
+		|| check_for_opt_सङ्ख्या_arg(argvars, 1) == FAIL
 		|| (argvars[1].v_type != VAR_UNKNOWN
-		    && check_for_opt_number_arg(argvars, 2) == FAIL)))
-	return;
+		    && check_for_opt_सङ्ख्या_arg(argvars, 2) == FAIL)))
+	पटिनिवत्त;
 
-    if (check_for_nonnull_dict_arg(argvars, 0) == FAIL)
-	return;
+    सचे (check_for_nonnull_dict_arg(argvars, 0) == FAIL)
+	पटिनिवत्त;
 
-    if (argvars[1].v_type != VAR_UNKNOWN)
+    सचे (argvars[1].v_type != VAR_UNKNOWN)
     {
-	start = tv_get_number(&argvars[1]);
+	start = tv_get_सङ्ख्या(&argvars[1]);
 	end = start;
-	if (argvars[2].v_type != VAR_UNKNOWN)
-	    end = tv_get_number(&argvars[2]);
-	if (start < 1 || end < 1)
+	सचे (argvars[2].v_type != VAR_UNKNOWN)
+	    end = tv_get_सङ्ख्या(&argvars[2]);
+	सचे (start < 1 || end < 1)
 	{
 	    emsg(_(e_invalid_range));
-	    return;
+	    पटिनिवत्त;
 	}
     }
 
     dict = argvars[0].vval.v_dict;
-    if (get_bufnr_from_arg(&argvars[0], &buf) == FAIL)
-	return;
-    if (buf->b_ml.ml_mfp == NULL)
-	return;
+    सचे (get_bufnr_from_arg(&argvars[0], &buf) == FAIL)
+	पटिनिवत्त;
+    सचे (buf->b_ml.ml_mfp == रिक्त)
+	पटिनिवत्त;
 
     do_all = dict_get_bool(dict, "all", FALSE);
 
-    if (dict_has_key(dict, "id"))
-	id = dict_get_number(dict, "id");
+    सचे (dict_has_कुञ्चिका(dict, "id"))
+	id = dict_get_सङ्ख्या(dict, "id");
 
     // if a specific type was supplied "type": check that (and ignore "types".
     // Otherwise check against the list of "types".
-    if (dict_has_key(dict, "type"))
+    सचे (dict_has_कुञ्चिका(dict, "type"))
     {
 	char_u	    *name = dict_get_string(dict, "type", FALSE);
 	proptype_T  *type = lookup_prop_type(name, buf);
 
-	if (type == NULL)
-	    return;
+	सचे (type == रिक्त)
+	    पटिनिवत्त;
 	type_id = type->pt_id;
     }
-    if (dict_has_key(dict, "types"))
+    सचे (dict_has_कुञ्चिका(dict, "types"))
     {
 	typval_T types;
-	listitem_T *li = NULL;
+	listitem_T *li = रिक्त;
 
 	dict_get_tv(dict, "types", &types);
-	if (types.v_type == VAR_LIST && types.vval.v_list->lv_len > 0)
+	सचे (types.v_type == VAR_LIST && types.vval.v_list->lv_len > 0)
 	{
-	    type_ids = alloc( sizeof(int) * types.vval.v_list->lv_len );
+	    type_ids = alloc( परिमाण(पूर्णाङ्क) * types.vval.v_list->lv_len );
 
-	    FOR_ALL_LIST_ITEMS(types.vval.v_list, li)
+	    FOR_ALL_LIST_वस्तूनि(types.vval.v_list, li)
 	    {
 		proptype_T *prop_type;
 
-		if (li->li_tv.v_type != VAR_STRING)
-		    continue;
+		सचे (li->li_tv.v_type != VAR_STRING)
+		    अनुवर्त;
 
 		prop_type = lookup_prop_type(li->li_tv.vval.v_string, buf);
 
-		if (!prop_type)
-		    goto cleanup_prop_remove;
+		सचे (!prop_type)
+		    गच्छ cleanup_prop_remove;
 
-		type_ids[num_type_ids++] = prop_type->pt_id;
+		type_ids[अङ्कः_type_ids++] = prop_type->pt_id;
 	    }
 	}
     }
     both = dict_get_bool(dict, "both", FALSE);
 
-    if (id == -MAXCOL && (type_id == -1 && num_type_ids == 0))
+    सचे (id == -MAXCOL && (type_id == -1 && अङ्कः_type_ids == 0))
     {
 	emsg(_(e_need_at_least_one_of_id_or_type));
-	goto cleanup_prop_remove;
+	गच्छ cleanup_prop_remove;
     }
-    if (both && (id == -MAXCOL || (type_id == -1 && num_type_ids == 0)))
+    सचे (both && (id == -MAXCOL || (type_id == -1 && अङ्कः_type_ids == 0)))
     {
 	emsg(_(e_need_id_and_type_or_types_with_both));
-	goto cleanup_prop_remove;
+	गच्छ cleanup_prop_remove;
     }
-    if (type_id != -1 && num_type_ids > 0)
+    सचे (type_id != -1 && अङ्कः_type_ids > 0)
     {
 	emsg(_(e_cannot_specify_both_type_and_types));
-	goto cleanup_prop_remove;
+	गच्छ cleanup_prop_remove;
     }
 
-    if (end == 0)
-	end = buf->b_ml.ml_line_count;
+    सचे (end == 0)
+	end = buf->b_ml.ml_पङ्क्तिः_गणनम्;
 
     {
 	unpacked_memline_T um = um_open(buf);
 
-	for (lnum = start; lnum <= end; ++lnum)
+	अत्थाय (lnum = start; lnum <= end; ++lnum)
 	{
-	    int idx;
+	    पूर्णाङ्क idx;
 
-	    if (lnum > buf->b_ml.ml_line_count)
-		break;
-	    if (!um_goto_line(&um, lnum, 0))
-		break;
+	    सचे (lnum > buf->b_ml.ml_पङ्क्तिः_गणनम्)
+		भङ्ग;
+	    सचे (!um_goto_पङ्क्तिः(&um, lnum, 0))
+		भङ्ग;
 
-	    for (idx = 0; idx < um.prop_count; ++idx)
+	    अत्थाय (idx = 0; idx < um.prop_गणनम्; ++idx)
 	    {
 		textprop_T  *prop = &um.props[idx];
-		int	    matches_id = 0;
-		int	    matches_type = 0;
+		पूर्णाङ्क	    matches_id = 0;
+		पूर्णाङ्क	    matches_type = 0;
 
-		if (prop->tp_flags & TP_FLAG_DELETED)
-		    continue;
+		सचे (prop->tp_flags & TP_FLAG_DELETED)
+		    अनुवर्त;
 
 		matches_id = prop->tp_id == id;
-		if (num_type_ids > 0)
+		सचे (अङ्कः_type_ids > 0)
 		{
-		    int idx2;
+		    पूर्णाङ्क idx2;
 
-		    for (idx2 = 0; !matches_type && idx2 < num_type_ids;
+		    अत्थाय (idx2 = 0; !matches_type && idx2 < अङ्कः_type_ids;
 								      ++idx2)
 			matches_type = prop->tp_type == type_ids[idx2];
 		}
-		else
+		अञ्ञथा
 		    matches_type = prop->tp_type == type_id;
 
-		if (both ? matches_id && matches_type
+		सचे (both ? matches_id && matches_type
 			 : matches_id || matches_type)
 		{
 		    um_delete_prop(&um, idx);
 
-		    if (first_changed == 0)
+		    सचे (first_changed == 0)
 			first_changed = lnum;
 		    last_changed = lnum;
-		    ++rettv->vval.v_number;
-		    if (!do_all)
-			break;
+		    ++rettv->vval.v_सङ्ख्या;
+		    सचे (!do_all)
+			भङ्ग;
 		}
 	    }
 	}
 	um_close(&um);
     }
 
-    if (first_changed > 0)
+    सचे (first_changed > 0)
     {
-	changed_line_display_buf(buf);
-	changed_lines_buf(buf, first_changed, last_changed + 1, 0);
+	changed_पङ्क्तिः_display_buf(buf);
+	changed_पङ्क्तयः_buf(buf, first_changed, last_changed + 1, 0);
 	redraw_buf_later(buf, UPD_VALID);
     }
 
@@ -2533,135 +2533,135 @@ cleanup_prop_remove:
 /*
  * Common for f_prop_type_add() and f_prop_type_change().
  */
-    static void
-prop_type_set(typval_T *argvars, int add)
+    स्थिर शून्य
+prop_type_set(typval_T *argvars, पूर्णाङ्क add)
 {
     char_u	*name;
-    buf_T	*buf = NULL;
+    buf_T	*buf = रिक्त;
     dict_T	*dict;
     dictitem_T  *di;
     proptype_T	*prop;
 
-    if (in_vim9script()
+    सचे (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_dict_arg(argvars, 1) == FAIL))
-	return;
+	पटिनिवत्त;
 
     name = tv_get_string(&argvars[0]);
-    if (*name == NUL)
+    सचे (*name == NUL)
     {
 	semsg(_(e_invalid_argument_str), "\"\"");
-	return;
+	पटिनिवत्त;
     }
 
-    if (get_bufnr_from_arg(&argvars[1], &buf) == FAIL)
-	return;
+    सचे (get_bufnr_from_arg(&argvars[1], &buf) == FAIL)
+	पटिनिवत्त;
     dict = argvars[1].vval.v_dict;
 
     prop = find_prop_type(name, buf);
-    if (add)
+    सचे (add)
     {
 	hashtab_T **htp;
 
-	if (prop != NULL)
+	सचे (prop != रिक्त)
 	{
 	    semsg(_(e_property_type_str_already_defined), name);
-	    return;
+	    पटिनिवत्त;
 	}
 	prop = alloc_clear(offsetof(proptype_T, pt_name) + STRLEN(name) + 1);
-	if (prop == NULL)
-	    return;
+	सचे (prop == रिक्त)
+	    पटिनिवत्त;
 	STRCPY(prop->pt_name, name);
 	prop->pt_id = ++proptype_id;
 	prop->pt_flags = PT_FLAG_COMBINE;
-	if (buf == NULL)
+	सचे (buf == रिक्त)
 	{
 	    htp = &global_proptypes;
 	    VIM_CLEAR(global_proparray);
 	}
-	else
+	अञ्ञथा
 	{
 	    htp = &buf->b_proptypes;
 	    VIM_CLEAR(buf->b_proparray);
 	}
-	if (*htp == NULL)
+	सचे (*htp == रिक्त)
 	{
 	    *htp = ALLOC_ONE(hashtab_T);
-	    if (*htp == NULL)
+	    सचे (*htp == रिक्त)
 	    {
 		vim_free(prop);
-		return;
+		पटिनिवत्त;
 	    }
 	    hash_init(*htp);
 	}
 	hash_add(*htp, PT2HIKEY(prop), "prop type");
     }
-    else
+    अञ्ञथा
     {
-	if (prop == NULL)
+	सचे (prop == रिक्त)
 	{
 	    semsg(_(e_property_type_str_does_not_exist), name);
-	    return;
+	    पटिनिवत्त;
 	}
     }
 
-    if (dict != NULL)
+    सचे (dict != रिक्त)
     {
 	di = dict_find(dict, (char_u *)"highlight", -1);
-	if (di != NULL)
+	सचे (di != रिक्त)
 	{
 	    char_u	*highlight;
-	    int		hl_id = 0;
+	    पूर्णाङ्क		hl_id = 0;
 
 	    highlight = dict_get_string(dict, "highlight", FALSE);
-	    if (highlight != NULL && *highlight != NUL)
+	    सचे (highlight != रिक्त && *highlight != NUL)
 		hl_id = syn_name2id(highlight);
-	    if (hl_id <= 0)
+	    सचे (hl_id <= 0)
 	    {
 		semsg(_(e_unknown_highlight_group_name_str),
-			highlight == NULL ? (char_u *)"" : highlight);
-		return;
+			highlight == रिक्त ? (char_u *)"" : highlight);
+		पटिनिवत्त;
 	    }
 	    prop->pt_hl_id = hl_id;
 	}
 
 	di = dict_find(dict, (char_u *)"combine", -1);
-	if (di != NULL)
+	सचे (di != रिक्त)
 	{
-	    if (tv_get_bool(&di->di_tv))
+	    सचे (tv_get_bool(&di->di_tv))
 		prop->pt_flags |= PT_FLAG_COMBINE;
-	    else
+	    अञ्ञथा
 		prop->pt_flags &= ~PT_FLAG_COMBINE;
 	}
 
 	di = dict_find(dict, (char_u *)"override", -1);
-	if (di != NULL)
+	सचे (di != रिक्त)
 	{
-	    if (tv_get_bool(&di->di_tv))
+	    सचे (tv_get_bool(&di->di_tv))
 		prop->pt_flags |= PT_FLAG_OVERRIDE;
-	    else
+	    अञ्ञथा
 		prop->pt_flags &= ~PT_FLAG_OVERRIDE;
 	}
 
 	di = dict_find(dict, (char_u *)"priority", -1);
-	if (di != NULL)
-	    prop->pt_priority = tv_get_number(&di->di_tv);
+	सचे (di != रिक्त)
+	    prop->pt_priority = tv_get_सङ्ख्या(&di->di_tv);
 
 	di = dict_find(dict, (char_u *)"start_incl", -1);
-	if (di != NULL)
+	सचे (di != रिक्त)
 	{
-	    if (tv_get_bool(&di->di_tv))
+	    सचे (tv_get_bool(&di->di_tv))
 		prop->pt_flags |= PT_FLAG_INS_START_INCL;
-	    else
+	    अञ्ञथा
 		prop->pt_flags &= ~PT_FLAG_INS_START_INCL;
 	}
 
 	di = dict_find(dict, (char_u *)"end_incl", -1);
-	if (di != NULL)
+	सचे (di != रिक्त)
 	{
-	    if (tv_get_bool(&di->di_tv))
+	    सचे (tv_get_bool(&di->di_tv))
 		prop->pt_flags |= PT_FLAG_INS_END_INCL;
-	    else
+	    अञ्ञथा
 		prop->pt_flags &= ~PT_FLAG_INS_END_INCL;
 	}
     }
@@ -2670,7 +2670,7 @@ prop_type_set(typval_T *argvars, int add)
 /*
  * prop_type_add({name}, {props})
  */
-    void
+    शून्य
 f_prop_type_add(typval_T *argvars, typval_T *rettv UNUSED)
 {
     prop_type_set(argvars, TRUE);
@@ -2679,7 +2679,7 @@ f_prop_type_add(typval_T *argvars, typval_T *rettv UNUSED)
 /*
  * prop_type_change({name}, {props})
  */
-    void
+    शून्य
 f_prop_type_change(typval_T *argvars, typval_T *rettv UNUSED)
 {
     prop_type_set(argvars, FALSE);
@@ -2688,44 +2688,44 @@ f_prop_type_change(typval_T *argvars, typval_T *rettv UNUSED)
 /*
  * prop_type_delete({name} [, {bufnr}])
  */
-    void
+    शून्य
 f_prop_type_delete(typval_T *argvars, typval_T *rettv UNUSED)
 {
     char_u	*name;
-    buf_T	*buf = NULL;
+    buf_T	*buf = रिक्त;
     hashitem_T	*hi;
 
-    if (in_vim9script()
+    सचे (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_opt_dict_arg(argvars, 1) == FAIL))
-	return;
+	पटिनिवत्त;
 
     name = tv_get_string(&argvars[0]);
-    if (*name == NUL)
+    सचे (*name == NUL)
     {
 	semsg(_(e_invalid_argument_str), "\"\"");
-	return;
+	पटिनिवत्त;
     }
 
-    if (argvars[1].v_type != VAR_UNKNOWN)
+    सचे (argvars[1].v_type != VAR_UNKNOWN)
     {
-	if (get_bufnr_from_arg(&argvars[1], &buf) == FAIL)
-	    return;
+	सचे (get_bufnr_from_arg(&argvars[1], &buf) == FAIL)
+	    पटिनिवत्त;
     }
 
     hi = find_prop_type_hi(name, buf);
-    if (hi == NULL)
-	return;
+    सचे (hi == रिक्त)
+	पटिनिवत्त;
 
     hashtab_T	*ht;
     proptype_T	*prop = HI2PT(hi);
 
-    if (buf == NULL)
+    सचे (buf == रिक्त)
     {
 	ht = global_proptypes;
 	VIM_CLEAR(global_proparray);
     }
-    else
+    अञ्ञथा
     {
 	ht = buf->b_proptypes;
 	VIM_CLEAR(buf->b_proparray);
@@ -2735,72 +2735,72 @@ f_prop_type_delete(typval_T *argvars, typval_T *rettv UNUSED)
 
     // currently visible text properties will disappear
     redraw_all_later(UPD_CLEAR);
-    changed_window_setting_buf(buf == NULL ? curbuf : buf);
+    changed_window_setting_buf(buf == रिक्त ? curbuf : buf);
 }
 
 /*
  * prop_type_get({name} [, {props}])
  */
-    void
+    शून्य
 f_prop_type_get(typval_T *argvars, typval_T *rettv)
 {
     char_u *name;
 
-    if (in_vim9script()
+    सचे (in_vim9script()
 	    && (check_for_string_arg(argvars, 0) == FAIL
 		|| check_for_opt_dict_arg(argvars, 1) == FAIL))
-	return;
+	पटिनिवत्त;
 
     name = tv_get_string(&argvars[0]);
-    if (*name == NUL)
+    सचे (*name == NUL)
     {
 	semsg(_(e_invalid_argument_str), "\"\"");
-	return;
+	पटिनिवत्त;
     }
 
-    if (rettv_dict_alloc(rettv) == FAIL)
-	return;
+    सचे (rettv_dict_alloc(rettv) == FAIL)
+	पटिनिवत्त;
 
-    proptype_T  *prop = NULL;
-    buf_T	    *buf = NULL;
+    proptype_T  *prop = रिक्त;
+    buf_T	    *buf = रिक्त;
 
-    if (argvars[1].v_type != VAR_UNKNOWN)
+    सचे (argvars[1].v_type != VAR_UNKNOWN)
     {
-	if (get_bufnr_from_arg(&argvars[1], &buf) == FAIL)
-	    return;
+	सचे (get_bufnr_from_arg(&argvars[1], &buf) == FAIL)
+	    पटिनिवत्त;
     }
 
     prop = find_prop_type(name, buf);
-    if (prop == NULL)
-	return;
+    सचे (prop == रिक्त)
+	पटिनिवत्त;
 
     dict_T *d = rettv->vval.v_dict;
 
-    if (prop->pt_hl_id > 0)
+    सचे (prop->pt_hl_id > 0)
 	dict_add_string(d, "highlight", syn_id2name(prop->pt_hl_id));
-    dict_add_number(d, "priority", prop->pt_priority);
-    dict_add_number(d, "combine",
+    dict_add_सङ्ख्या(d, "priority", prop->pt_priority);
+    dict_add_सङ्ख्या(d, "combine",
 	    (prop->pt_flags & PT_FLAG_COMBINE) ? 1 : 0);
-    dict_add_number(d, "override",
+    dict_add_सङ्ख्या(d, "override",
 	    (prop->pt_flags & PT_FLAG_OVERRIDE) ? 1 : 0);
-    dict_add_number(d, "start_incl",
+    dict_add_सङ्ख्या(d, "start_incl",
 	    (prop->pt_flags & PT_FLAG_INS_START_INCL) ? 1 : 0);
-    dict_add_number(d, "end_incl",
+    dict_add_सङ्ख्या(d, "end_incl",
 	    (prop->pt_flags & PT_FLAG_INS_END_INCL) ? 1 : 0);
-    if (buf != NULL)
-	dict_add_number(d, "bufnr", buf->b_fnum);
+    सचे (buf != रिक्त)
+	dict_add_सङ्ख्या(d, "bufnr", buf->b_fnum);
 }
 
-    static void
+    स्थिर शून्य
 list_types(hashtab_T *ht, list_T *l)
 {
     long	todo;
     hashitem_T	*hi;
 
     todo = (long)ht->ht_used;
-    FOR_ALL_HASHTAB_ITEMS(ht, hi, todo)
+    FOR_ALL_HASHTAB_वस्तूनि(ht, hi, todo)
     {
-	if (!HASHITEM_EMPTY(hi))
+	सचे (!HASHITEM_EMPTY(hi))
 	{
 	    proptype_T *prop = HI2PT(hi);
 
@@ -2813,47 +2813,47 @@ list_types(hashtab_T *ht, list_T *l)
 /*
  * prop_type_list([{bufnr}])
  */
-    void
+    शून्य
 f_prop_type_list(typval_T *argvars, typval_T *rettv)
 {
-    buf_T *buf = NULL;
+    buf_T *buf = रिक्त;
 
-    if (rettv_list_alloc(rettv) == FAIL)
-	return;
+    सचे (rettv_list_alloc(rettv) == FAIL)
+	पटिनिवत्त;
 
-    if (in_vim9script() && check_for_opt_dict_arg(argvars, 0) == FAIL)
-	return;
+    सचे (in_vim9script() && check_for_opt_dict_arg(argvars, 0) == FAIL)
+	पटिनिवत्त;
 
-    if (argvars[0].v_type != VAR_UNKNOWN)
+    सचे (argvars[0].v_type != VAR_UNKNOWN)
     {
-	if (get_bufnr_from_arg(&argvars[0], &buf) == FAIL)
-	    return;
+	सचे (get_bufnr_from_arg(&argvars[0], &buf) == FAIL)
+	    पटिनिवत्त;
     }
-    if (buf == NULL)
+    सचे (buf == रिक्त)
     {
-	if (global_proptypes != NULL)
+	सचे (global_proptypes != रिक्त)
 	    list_types(global_proptypes, rettv->vval.v_list);
     }
-    else if (buf->b_proptypes != NULL)
+    अञ्ञथा सचे (buf->b_proptypes != रिक्त)
 	list_types(buf->b_proptypes, rettv->vval.v_list);
 }
 
 /*
  * Free all property types in "ht".
  */
-    static void
+    स्थिर शून्य
 clear_ht_prop_types(hashtab_T *ht)
 {
     long	todo;
     hashitem_T	*hi;
 
-    if (ht == NULL)
-	return;
+    सचे (ht == रिक्त)
+	पटिनिवत्त;
 
     todo = (long)ht->ht_used;
-    FOR_ALL_HASHTAB_ITEMS(ht, hi, todo)
+    FOR_ALL_HASHTAB_वस्तूनि(ht, hi, todo)
     {
-	if (!HASHITEM_EMPTY(hi))
+	सचे (!HASHITEM_EMPTY(hi))
 	{
 	    proptype_T *prop = HI2PT(hi);
 
@@ -2866,15 +2866,15 @@ clear_ht_prop_types(hashtab_T *ht)
     vim_free(ht);
 }
 
-#if defined(EXITFREE)
+#सचे defined(EXITFREE)
 /*
  * Free all global property types.
  */
-    void
-clear_global_prop_types(void)
+    शून्य
+clear_global_prop_types(शून्य)
 {
     clear_ht_prop_types(global_proptypes);
-    global_proptypes = NULL;
+    global_proptypes = रिक्त;
     VIM_CLEAR(global_proparray);
 }
 #endif
@@ -2882,19 +2882,19 @@ clear_global_prop_types(void)
 /*
  * Free all property types for "buf".
  */
-    void
+    शून्य
 clear_buf_prop_types(buf_T *buf)
 {
     clear_ht_prop_types(buf->b_proptypes);
-    buf->b_proptypes = NULL;
+    buf->b_proptypes = रिक्त;
     VIM_CLEAR(buf->b_proparray);
 }
 
 // Struct used to return two values from adjust_prop().
-typedef struct
+प्रकारनिर्देश संरचना
 {
-    int dirty;	    // if the property was changed
-    int can_drop;   // whether after this change, the prop may be removed
+    पूर्णाङ्क dirty;	    // if the property was changed
+    पूर्णाङ्क can_drop;   // whether after this change, the prop may be removed
 } adjustres_T;
 
 /*
@@ -2906,64 +2906,64 @@ typedef struct
  * APC_SUBSTITUTE:	Text is replaced, not inserted.
  * APC_INDENT:		Text is inserted before virtual text prop
  */
-    static adjustres_T
+    स्थिर adjustres_T
 adjust_prop(
 	textprop_T  *prop,
 	colnr_T	    col,
-	int	    added,
-	int	    flags)
+	पूर्णाङ्क	    added,
+	पूर्णाङ्क	    flags)
 {
     proptype_T	*pt;
-    int		start_incl;
-    int		end_incl;
-    int		droppable;
+    पूर्णाङ्क		start_incl;
+    पूर्णाङ्क		end_incl;
+    पूर्णाङ्क		droppable;
     adjustres_T res = {TRUE, FALSE};
 
     // prop after end of the line doesn't move
-    if (prop->tp_col == MAXCOL)
+    सचे (prop->tp_col == MAXCOL)
     {
 	res.dirty = FALSE;
-	return res;
+	पटिनिवत्त res;
     }
 
     pt = text_prop_type_by_id(curbuf, prop->tp_type);
-    start_incl = (pt != NULL && (pt->pt_flags & PT_FLAG_INS_START_INCL))
+    start_incl = (pt != रिक्त && (pt->pt_flags & PT_FLAG_INS_START_INCL))
 				|| (flags & APC_SUBSTITUTE)
 				|| (prop->tp_flags & TP_FLAG_CONT_PREV);
-    if (prop->tp_id < 0 && (flags & APC_INDENT))
+    सचे (prop->tp_id < 0 && (flags & APC_INDENT))
 	// when inserting indent just before a character with virtual text
 	// shift the text property
 	start_incl = FALSE;
-    end_incl = (pt != NULL && (pt->pt_flags & PT_FLAG_INS_END_INCL))
+    end_incl = (pt != रिक्त && (pt->pt_flags & PT_FLAG_INS_END_INCL))
 				|| (prop->tp_flags & TP_FLAG_CONT_NEXT);
     // do not drop zero-width props if they later can increase in size
     droppable = !(start_incl || end_incl);
 
-    if (added > 0)
+    सचे (added > 0)
     {
-	if (col + 1 <= prop->tp_col
+	सचे (col + 1 <= prop->tp_col
 		- (start_incl || (prop->tp_len == 0 && end_incl)))
 	    // Change is entirely before the text property: Only shift
 	    prop->tp_col += added;
-	else if (col + 1 < prop->tp_col + prop->tp_len + end_incl
+	अञ्ञथा सचे (col + 1 < prop->tp_col + prop->tp_len + end_incl
 		&& prop->tp_id >= 0)  // don't change length for virtual text
 	    // Insertion was inside text property
 	    prop->tp_len += added;
     }
-    else if (prop->tp_col > col + 1)
+    अञ्ञथा सचे (prop->tp_col > col + 1)
     {
-	if (prop->tp_col + added < col + 1)
+	सचे (prop->tp_col + added < col + 1)
 	{
-	    if (prop->tp_id < 0)
+	    सचे (prop->tp_id < 0)
 	    {
 		// Inline virtual text swallowed by the deletion.
 		res.can_drop = TRUE;
 	    }
-	    else
+	    अञ्ञथा
 	    {
 		prop->tp_len += (prop->tp_col - 1 - col) + added;
 		prop->tp_col = col + 1;
-		if (prop->tp_len <= 0)
+		सचे (prop->tp_len <= 0)
 		{
 		    prop->tp_len = 0;
 		    // Multiline properties with no text left should
@@ -2974,33 +2974,33 @@ adjust_prop(
 		}
 	    }
 	}
-	else
+	अञ्ञथा
 	    prop->tp_col += added;
     }
-    else if (prop->tp_len > 0 && prop->tp_col + prop->tp_len > col
+    अञ्ञथा सचे (prop->tp_len > 0 && prop->tp_col + prop->tp_len > col
 	    && prop->tp_id >= 0)  // don't change length for virtual text
     {
-	if (added <= -MAXCOL)
+	सचे (added <= -MAXCOL)
 	    // Delete everything from col to end of line.
 	    prop->tp_len = col - (prop->tp_col - 1);
-	else
+	अञ्ञथा
 	{
-	    int after = col - added - (prop->tp_col - 1 + prop->tp_len);
+	    पूर्णाङ्क after = col - added - (prop->tp_col - 1 + prop->tp_len);
 
 	    prop->tp_len += after > 0 ? added + after : added;
 	}
 	// A multiline property with no text left on this line
 	// should also be dropped.  When TP_FLAG_CONT_NEXT is set,
 	// tp_len == 1 means only the newline remains.
-	if (prop->tp_len <= 0 || ((prop->tp_flags & TP_FLAG_CONT_NEXT)
+	सचे (prop->tp_len <= 0 || ((prop->tp_flags & TP_FLAG_CONT_NEXT)
 		    && prop->tp_len <= 1))
 	    res.can_drop = droppable || (prop->tp_flags
 			& (TP_FLAG_CONT_PREV | TP_FLAG_CONT_NEXT));
     }
-    else
+    अञ्ञथा
 	res.dirty = FALSE;
 
-    return res;
+    पटिनिवत्त res;
 }
 
 /*
@@ -3015,68 +3015,68 @@ adjust_prop(
  * Caller is expected to check b_has_textprop and "bytes_added" being non-zero.
  * Returns TRUE when props were changed.
  */
-    int
+    पूर्णाङ्क
 adjust_prop_columns(
 	linenr_T    lnum,
 	colnr_T	    col,
-	int	    bytes_added,
-	int	    flags)
+	पूर्णाङ्क	    bytes_added,
+	पूर्णाङ्क	    flags)
 {
     unpacked_memline_T um;
-    int		dirty = FALSE;
-    int		ri;
+    पूर्णाङ्क		dirty = FALSE;
+    पूर्णाङ्क		ri;
 
-    if (text_prop_frozen > 0)
-	return FALSE;
+    सचे (text_prop_frozen > 0)
+	पटिनिवत्त FALSE;
 
     um = um_open_at(curbuf, lnum, 0);
-    if (um.buf == NULL || um.prop_count == 0)
+    सचे (um.buf == रिक्त || um.prop_गणनम् == 0)
     {
 	um_abort(&um);
-	return FALSE;
+	पटिनिवत्त FALSE;
     }
 
-    for (ri = 0; ri < um.prop_count; ++ri)
+    अत्थाय (ri = 0; ri < um.prop_गणनम्; ++ri)
     {
 	textprop_T	*prop = &um.props[ri];
 	adjustres_T	res;
 
 	res = adjust_prop(prop, col, bytes_added, flags);
-	if (res.dirty)
+	सचे (res.dirty)
 	{
-	    if (!dirty)
+	    सचे (!dirty)
 	    {
 		// Detach before u_savesub() so that all text and vtext
 		// pointers are allocated copies, immune to memline
 		// changes caused by u_savesub().
-		if (!um.detached && !um_detach(&um))
+		सचे (!um.detached && !um_detach(&um))
 		{
 		    um_abort(&um);
-		    return FALSE;
+		    पटिनिवत्त FALSE;
 		}
 		// Re-get prop pointer after detach (array may move).
 		prop = &um.props[ri];
 
-		if ((flags & APC_SAVE_FOR_UNDO)
+		सचे ((flags & APC_SAVE_FOR_UNDO)
 					       && u_savesub(lnum) == FAIL)
 		{
 		    um_abort(&um);
-		    return FALSE;
+		    पटिनिवत्त FALSE;
 		}
 	    }
 	    dirty = TRUE;
 	}
-	if (res.can_drop)
+	सचे (res.can_drop)
 	{
 	    um_delete_prop(&um, ri);
-	    continue;
+	    अनुवर्त;
 	}
     }
-    if (dirty)
+    सचे (dirty)
 	um_close(&um);
-    else
+    अञ्ञथा
 	um_abort(&um);
-    return dirty;
+    पटिनिवत्त dirty;
 }
 
 /*
@@ -3087,127 +3087,127 @@ adjust_prop_columns(
  * "deleted" is the number of bytes deleted.
  * "at_eol" is true if the split is after the end of the line.
  */
-    void
+    शून्य
 adjust_props_for_split(
 	linenr_T    lnum_props,
-	linenr_T    lnum_top,
-	int	    kept,
-	int	    deleted,
-	int	    at_eol)
+	linenr_T    lnum_शिखरम्,
+	पूर्णाङ्क	    kept,
+	पूर्णाङ्क	    deleted,
+	पूर्णाङ्क	    at_eol)
 {
     char_u	*props;
-    int		count;
+    पूर्णाङ्क		गणनम्;
     garray_T    prevprop;
     garray_T    nextprop;
-    int		skipped = kept + deleted;
+    पूर्णाङ्क		skipped = kept + deleted;
 
-    if (!curbuf->b_has_textprop)
-	return;
+    सचे (!curbuf->b_has_textprop)
+	पटिनिवत्त;
 
     // Get the text properties from "lnum_props".
-    count = get_text_props(curbuf, lnum_props, &props, FALSE);
-    ga_init2(&prevprop, sizeof(textprop_T), 10);
-    ga_init2(&nextprop, sizeof(textprop_T), 10);
+    गणनम् = get_text_props(curbuf, lnum_props, &props, FALSE);
+    ga_init2(&prevprop, परिमाण(textprop_T), 10);
+    ga_init2(&nextprop, परिमाण(textprop_T), 10);
 
     // count_ptr points to the prop_count field in the memline.
-    char_u *count_ptr = props - PROP_COUNT_SIZE;
+    char_u *गणनम्_ptr = props - PROP_गणनम्_SIZE;
 
     // Keep the relevant ones in the first line, reducing the length if needed.
     // Copy the ones that include the split to the second line.
     // Move the ones after the split to the second line.
-    for (int i = 0; i < count; ++i)
+    अत्थाय (पूर्णाङ्क i = 0; i < गणनम्; ++i)
     {
 	textprop_T  prop;
 	proptype_T *pt;
-	int	    start_incl, end_incl;
-	int	    cont_prev, cont_next;
-	int	    prop_col;
+	पूर्णाङ्क	    start_incl, end_incl;
+	पूर्णाङ्क	    cont_prev, cont_next;
+	पूर्णाङ्क	    prop_col;
 
 	// copy the prop to an aligned structure
-	mch_memmove(&prop, props + i * sizeof(textprop_T), sizeof(textprop_T));
+	mch_memmove(&prop, props + i * परिमाण(textprop_T), परिमाण(textprop_T));
 
 	// Convert offset to pointer and copy for virtual text props.
 	// Must copy because set_text_props() may invalidate memline data.
-	if (prop.tp_id < 0 && prop.u.tp_text_offset > 0)
+	सचे (prop.tp_id < 0 && prop.u.tp_text_offset > 0)
 	{
-	    prop.u.tp_text = vim_strsave(count_ptr + prop.u.tp_text_offset);
+	    prop.u.tp_text = vim_strsave(गणनम्_ptr + prop.u.tp_text_offset);
 	    prop.tp_flags |= TP_FLAG_VTEXT_PTR;
 	}
-	else
-	    prop.u.tp_text = NULL;
+	अञ्ञथा
+	    prop.u.tp_text = रिक्त;
 
 	pt = text_prop_type_by_id(curbuf, prop.tp_type);
-	start_incl = (pt != NULL && (pt->pt_flags & PT_FLAG_INS_START_INCL));
-	end_incl = (pt != NULL && (pt->pt_flags & PT_FLAG_INS_END_INCL));
+	start_incl = (pt != रिक्त && (pt->pt_flags & PT_FLAG_INS_START_INCL));
+	end_incl = (pt != रिक्त && (pt->pt_flags & PT_FLAG_INS_END_INCL));
 
 	// a text prop "above" behaves like it is on the first text column
 	prop_col = (prop.tp_flags & TP_FLAG_ALIGN_ABOVE) ? 1 : prop.tp_col;
 
-	if (prop_col == MAXCOL)
+	सचे (prop_col == MAXCOL)
 	{
 	    cont_prev = at_eol;
 	    cont_next = !at_eol;
 	}
-	else
+	अञ्ञथा
 	{
 	    // Floating virtual text (tp_col == MAXCOL) should not use
 	    // tp_len for continuation since tp_len holds the vtext
 	    // string length.
-	    int is_floating_vtext = (prop.tp_id < 0
+	    पूर्णाङ्क is_floating_vtext = (prop.tp_id < 0
 						&& prop.tp_col == MAXCOL);
 
 	    cont_prev = prop_col + !start_incl <= kept;
-	    if (is_floating_vtext)
+	    सचे (is_floating_vtext)
 		cont_next = FALSE;
-	    else
+	    अञ्ञथा
 		cont_next = skipped <= prop_col + prop.tp_len - !end_incl;
 	}
 	// when a prop has text it is never copied
-	if (prop.tp_id < 0 && cont_next)
+	सचे (prop.tp_id < 0 && cont_next)
 	    cont_prev = FALSE;
 
-	if (cont_prev && ga_grow(&prevprop, 1) == OK)
+	सचे (cont_prev && ga_grow(&prevprop, 1) == OK)
 	{
 	    textprop_T *p = ((textprop_T *)prevprop.ga_data) + prevprop.ga_len;
-	    int is_vtext = (prop.tp_id < 0);
+	    पूर्णाङ्क is_vtext = (prop.tp_id < 0);
 
 	    *p = prop;
 	    ++prevprop.ga_len;
-	    if (!is_vtext && p->tp_col + p->tp_len >= kept)
+	    सचे (!is_vtext && p->tp_col + p->tp_len >= kept)
 		p->tp_len = kept - p->tp_col;
-	    if (cont_next)
+	    सचे (cont_next)
 		p->tp_flags |= TP_FLAG_CONT_NEXT;
 	}
 
 	// Only add the property to the next line if the length is bigger than
 	// zero.
-	if (cont_next && ga_grow(&nextprop, 1) == OK)
+	सचे (cont_next && ga_grow(&nextprop, 1) == OK)
 	{
 	    textprop_T *p = ((textprop_T *)nextprop.ga_data) + nextprop.ga_len;
-	    int is_vtext = (prop.tp_id < 0);
+	    पूर्णाङ्क is_vtext = (prop.tp_id < 0);
 
 	    *p = prop;
 	    ++nextprop.ga_len;
-	    if (p->tp_col != MAXCOL)
+	    सचे (p->tp_col != MAXCOL)
 	    {
-		if (p->tp_col > skipped)
+		सचे (p->tp_col > skipped)
 		    p->tp_col -= skipped - 1;
-		else
+		अञ्ञथा
 		{
-		    if (!is_vtext)
+		    सचे (!is_vtext)
 			p->tp_len -= skipped - p->tp_col;
 		    p->tp_col = 1;
 		}
 	    }
-	    if (cont_prev)
+	    सचे (cont_prev)
 		p->tp_flags |= TP_FLAG_CONT_PREV;
 	}
     }
 
-    set_text_props(lnum_top, (textprop_T *)prevprop.ga_data,
+    set_text_props(lnum_शिखरम्, (textprop_T *)prevprop.ga_data,
 							    prevprop.ga_len);
     ga_clear(&prevprop);
-    set_text_props(lnum_top + 1, (textprop_T *)nextprop.ga_data,
+    set_text_props(lnum_शिखरम् + 1, (textprop_T *)nextprop.ga_data,
 							    nextprop.ga_len);
     ga_clear(&nextprop);
 }
@@ -3217,55 +3217,55 @@ adjust_props_for_split(
  * Properties are added in reverse order; caller should call
  * um_reverse_props() after all lines are processed.
  */
-    void
+    शून्य
 prepend_joined_props(
 	unpacked_memline_T  *um,
 	linenr_T	    lnum,
-	int		    last_line,
+	पूर्णाङ्क		    last_पङ्क्तिः,
 	long		    col,
-	int		    removed)
+	पूर्णाङ्क		    removed)
 {
     unpacked_memline_T	r_um;
 
-    if (um->buf == NULL)
-	return;
+    सचे (um->buf == रिक्त)
+	पटिनिवत्त;
 
     r_um = um_open_at(um->buf, lnum, 0);
-    if (r_um.buf == NULL)
-	return;
-    if (!um_detach(&r_um))
+    सचे (r_um.buf == रिक्त)
+	पटिनिवत्त;
+    सचे (!um_detach(&r_um))
     {
 	um_abort(&r_um);
-	return;
+	पटिनिवत्त;
     }
 
-    for (int i = r_um.prop_count - 1; i >= 0; --i)
+    अत्थाय (पूर्णाङ्क i = r_um.prop_गणनम् - 1; i >= 0; --i)
     {
 	textprop_T  *prop = &r_um.props[i];
-	int	    end;
+	पूर्णाङ्क	    end;
 
-	if (prop->tp_col == MAXCOL && !last_line)
-	    continue;  // drop floating text for non-last lines
+	सचे (prop->tp_col == MAXCOL && !last_पङ्क्तिः)
+	    अनुवर्त;  // drop floating text for non-last lines
 	end = !(prop->tp_flags & TP_FLAG_CONT_NEXT);
 
 	adjust_prop(prop, 0, -removed, 0);
 	adjust_prop(prop, -1, col, 0);
 
-	if (last_line || end)
+	सचे (last_पङ्क्तिः || end)
 	{
 	    um_add_prop(um, prop);
-	    prop->u.tp_text = NULL;  // ownership transferred
+	    prop->u.tp_text = रिक्त;  // ownership transferred
 	}
-	else
+	अञ्ञथा
 	{
 	    // Search for continuing prop in um.
 	    bool    found = false;
 
-	    for (int j = 0; j < um->prop_count; ++j)
+	    अत्थाय (पूर्णाङ्क j = 0; j < um->prop_गणनम्; ++j)
 	    {
 		textprop_T *op = &um->props[j];
 
-		if ((op->tp_flags & TP_FLAG_CONT_PREV)
+		सचे ((op->tp_flags & TP_FLAG_CONT_PREV)
 			&& op->tp_id == prop->tp_id
 			&& op->tp_type == prop->tp_type)
 		{
@@ -3273,10 +3273,10 @@ prepend_joined_props(
 		    op->tp_len += op->tp_col - prop->tp_col;
 		    op->tp_col = prop->tp_col;
 		    op->tp_flags = prop->tp_flags;
-		    break;
+		    भङ्ग;
 		}
 	    }
-	    if (!found)
+	    सचे (!found)
 		internal_error("text property above joined line not found");
 	}
     }
@@ -3286,17 +3286,17 @@ prepend_joined_props(
 /*
  * Remember in "gap" that "flag" was cleared on "prop", on the line "which".
  */
-    static void
-remember_cleared_prop(garray_T *gap, int which, textprop_T *prop, int flag)
+    स्थिर शून्य
+remember_cleared_prop(garray_T *gap, पूर्णाङ्क which, textprop_T *prop, पूर्णाङ्क flag)
 {
     undoprop_T	*up;
 
-    if (which == UNDOPROP_NONE)
-	return;
-    if (gap->ga_itemsize == 0)
-	ga_init2(gap, sizeof(undoprop_T), 4);
-    if (ga_grow(gap, 1) == FAIL)
-	return;
+    सचे (which == UNDOPROP_NONE)
+	पटिनिवत्त;
+    सचे (gap->ga_itemsize == 0)
+	ga_init2(gap, परिमाण(undoprop_T), 4);
+    सचे (ga_grow(gap, 1) == FAIL)
+	पटिनिवत्त;
     up = (undoprop_T *)gap->ga_data + gap->ga_len++;
     up->up_which = which;
     up->up_type = prop->tp_type;
@@ -3311,72 +3311,72 @@ remember_cleared_prop(garray_T *gap, int which, textprop_T *prop, int flag)
  * is cleared on the line above is remembered in "gap" as "above_which", on
  * the line below as "below_which".
  */
-    void
+    शून्य
 adjust_props_for_undo(
 	buf_T	    *buf,
 	linenr_T    lnum,
 	garray_T    *gap,
-	int	    above_which,
-	int	    below_which)
+	पूर्णाङ्क	    above_which,
+	पूर्णाङ्क	    below_which)
 {
     unpacked_memline_T	above;
     unpacked_memline_T	below;
-    bool		*paired = NULL;
+    bool		*paired = रिक्त;
     bool		above_changed = false;
     bool		below_changed = false;
     bool		cont_next = false;
 
-    if (!buf->b_has_textprop || lnum < 1 || lnum >= buf->b_ml.ml_line_count)
-	return;
+    सचे (!buf->b_has_textprop || lnum < 1 || lnum >= buf->b_ml.ml_पङ्क्तिः_गणनम्)
+	पटिनिवत्त;
 
     above = um_open_at(buf, lnum, 0);
-    if (above.buf == NULL)
-	return;
-    for (int i = 0; i < above.prop_count; ++i)
-	if (above.props[i].tp_flags & TP_FLAG_CONT_NEXT)
+    सचे (above.buf == रिक्त)
+	पटिनिवत्त;
+    अत्थाय (पूर्णाङ्क i = 0; i < above.prop_गणनम्; ++i)
+	सचे (above.props[i].tp_flags & TP_FLAG_CONT_NEXT)
 	    cont_next = true;
     // Loading the line below may invalidate the text of "above", copy it when
     // it may have to be stored.
-    if (cont_next && !um_detach(&above))
+    सचे (cont_next && !um_detach(&above))
     {
 	um_abort(&above);
-	return;
+	पटिनिवत्त;
     }
 
     below = um_open_at(buf, lnum + 1, 0);
-    if (below.buf == NULL)
+    सचे (below.buf == रिक्त)
     {
 	um_abort(&above);
-	return;
+	पटिनिवत्त;
     }
-    if (below.prop_count > 0)
+    सचे (below.prop_गणनम् > 0)
     {
-	paired = ALLOC_CLEAR_MULT(bool, below.prop_count);
-	if (paired == NULL)
-	    goto theend;
+	paired = ALLOC_CLEAR_MULT(bool, below.prop_गणनम्);
+	सचे (paired == रिक्त)
+	    गच्छ theend;
     }
 
-    for (int i = 0; i < above.prop_count; ++i)
+    अत्थाय (पूर्णाङ्क i = 0; i < above.prop_गणनम्; ++i)
     {
 	textprop_T  *prop = &above.props[i];
 	bool	    found = false;
 
-	if (!(prop->tp_flags & TP_FLAG_CONT_NEXT))
-	    continue;
-	for (int j = 0; j < below.prop_count; ++j)
+	सचे (!(prop->tp_flags & TP_FLAG_CONT_NEXT))
+	    अनुवर्त;
+	अत्थाय (पूर्णाङ्क j = 0; j < below.prop_गणनम्; ++j)
 	{
 	    textprop_T *next = &below.props[j];
 
-	    if (!paired[j] && (next->tp_flags & TP_FLAG_CONT_PREV)
+	    सचे (!paired[j] && (next->tp_flags & TP_FLAG_CONT_PREV)
 		    && next->tp_id == prop->tp_id
 		    && next->tp_type == prop->tp_type)
 	    {
 		paired[j] = true;
 		found = true;
-		break;
+		भङ्ग;
 	    }
 	}
-	if (!found)
+	सचे (!found)
 	{
 	    prop->tp_flags &= ~TP_FLAG_CONT_NEXT;
 	    above_changed = true;
@@ -3384,12 +3384,12 @@ adjust_props_for_undo(
 	}
     }
 
-    for (int j = 0; j < below.prop_count; ++j)
+    अत्थाय (पूर्णाङ्क j = 0; j < below.prop_गणनम्; ++j)
     {
-	if (!(below.props[j].tp_flags & TP_FLAG_CONT_PREV) || paired[j])
-	    continue;
-	if (!below.detached && !um_detach(&below))
-	    break;
+	सचे (!(below.props[j].tp_flags & TP_FLAG_CONT_PREV) || paired[j])
+	    अनुवर्त;
+	सचे (!below.detached && !um_detach(&below))
+	    भङ्ग;
 	below.props[j].tp_flags &= ~TP_FLAG_CONT_PREV;
 	below_changed = true;
 	remember_cleared_prop(gap, below_which, &below.props[j],
@@ -3397,13 +3397,13 @@ adjust_props_for_undo(
     }
 
 theend:
-    if (below_changed)
+    सचे (below_changed)
 	um_close(&below);
-    else
+    अञ्ञथा
 	um_abort(&below);
-    if (above_changed)
+    सचे (above_changed)
 	um_close(&above);
-    else
+    अञ्ञथा
 	um_abort(&above);
     vim_free(paired);
 }
@@ -3413,58 +3413,58 @@ theend:
  * those cleared when the undo block was applied the other way.  A property
  * that is no longer there is skipped.
  */
-    void
+    शून्य
 restore_props_for_undo(
 	buf_T	    *buf,
 	linenr_T    lnum,
 	garray_T    *gap,
-	int	    which)
+	पूर्णाङ्क	    which)
 {
     unpacked_memline_T	um;
     bool		changed = false;
 
-    if (!buf->b_has_textprop || gap->ga_len == 0 || lnum < 1
-					  || lnum > buf->b_ml.ml_line_count)
-	return;
+    सचे (!buf->b_has_textprop || gap->ga_len == 0 || lnum < 1
+					  || lnum > buf->b_ml.ml_पङ्क्तिः_गणनम्)
+	पटिनिवत्त;
     um = um_open_at(buf, lnum, 0);
-    if (um.buf == NULL)
-	return;
-    for (int r = 0; r < gap->ga_len; ++r)
+    सचे (um.buf == रिक्त)
+	पटिनिवत्त;
+    अत्थाय (पूर्णाङ्क r = 0; r < gap->ga_len; ++r)
     {
 	undoprop_T  *up = (undoprop_T *)gap->ga_data + r;
 
-	if (up->up_which != which)
-	    continue;
-	for (int i = 0; i < um.prop_count; ++i)
+	सचे (up->up_which != which)
+	    अनुवर्त;
+	अत्थाय (पूर्णाङ्क i = 0; i < um.prop_गणनम्; ++i)
 	{
 	    textprop_T *prop = &um.props[i];
 
-	    if (prop->tp_type != up->up_type || prop->tp_id != up->up_id
+	    सचे (prop->tp_type != up->up_type || prop->tp_id != up->up_id
 		    || prop->tp_col != up->up_col
 		    || (prop->tp_flags & up->up_flag))
-		continue;
-	    if (!um.detached && !um_detach(&um))
-		goto theend;
+		अनुवर्त;
+	    सचे (!um.detached && !um_detach(&um))
+		गच्छ theend;
 	    um.props[i].tp_flags |= up->up_flag;
 	    changed = true;
-	    break;
+	    भङ्ग;
 	}
     }
 
 theend:
-    if (changed)
+    सचे (changed)
 	um_close(&um);
-    else
+    अञ्ञथा
 	um_abort(&um);
 }
 
     bool
-text_prop_count_valid(int prop_count, size_t propdata_len)
+text_prop_गणनम्_valid(पूर्णाङ्क prop_गणनम्, size_t propdata_len)
 {
-    if (propdata_len < PROP_COUNT_SIZE)
-	return false;
-    return (size_t)prop_count * sizeof(textprop_T)
-		    <= propdata_len - PROP_COUNT_SIZE;
+    सचे (propdata_len < PROP_गणनम्_SIZE)
+	पटिनिवत्त false;
+    पटिनिवत्त (size_t)prop_गणनम् * परिमाण(textprop_T)
+		    <= propdata_len - PROP_गणनम्_SIZE;
 }
 
 /*
@@ -3473,21 +3473,21 @@ text_prop_count_valid(int prop_count, size_t propdata_len)
  * "props" may be unaligned.
  */
     bool
-text_prop_vtext_valid(char_u *props, int prop_count, size_t propdata_len)
+text_prop_vtext_valid(char_u *props, पूर्णाङ्क prop_गणनम्, size_t propdata_len)
 {
-    for (int i = 0; i < prop_count; ++i)
+    अत्थाय (पूर्णाङ्क i = 0; i < prop_गणनम्; ++i)
     {
 	textprop_T  prop;
 
-	mch_memmove(&prop, props + (size_t)i * sizeof(textprop_T),
-							  sizeof(textprop_T));
-	if (prop.tp_id >= 0 || prop.u.tp_text_offset <= 0)
-	    continue;
-	if (prop.tp_len < 0 || (size_t)prop.u.tp_text_offset
+	mch_memmove(&prop, props + (size_t)i * परिमाण(textprop_T),
+							  परिमाण(textprop_T));
+	सचे (prop.tp_id >= 0 || prop.u.tp_text_offset <= 0)
+	    अनुवर्त;
+	सचे (prop.tp_len < 0 || (size_t)prop.u.tp_text_offset
 				+ (size_t)prop.tp_len + 1 > propdata_len)
-	    return false;
+	    पटिनिवत्त false;
     }
-    return true;
+    पटिनिवत्त true;
 }
 
 #endif // FEAT_PROP_POPUP

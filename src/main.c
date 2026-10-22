@@ -8,7 +8,7 @@
  */
 
 #define EXTERN
-#include "vim.h"
+#अन्तर्भाव "vim.h"
 
 #ifdef __CYGWIN__
 # include <cygwin/version.h>
@@ -17,7 +17,7 @@
 # include <limits.h>
 #endif
 
-#if defined(MSWIN) && (!defined(FEAT_GUI_MSWIN) || defined(VIMDLL))
+#सचे defined(MSWIN) && (!defined(FEAT_GUI_MSWIN) || defined(VIMDLL))
 # include "iscygpty.h"
 #endif
 
@@ -28,26 +28,26 @@
 #define EDIT_TAG    3	    // tag name argument given, use tagname
 #define EDIT_QF	    4	    // start in quickfix mode
 
-#if (defined(UNIX) || defined(VMS)) && !defined(NO_VIM_MAIN)
-static int file_owned(char *fname);
+#सचे (defined(UNIX) || defined(VMS)) && !defined(NO_VIM_MAIN)
+स्थिर पूर्णाङ्क file_owned(वर्ण *fname);
 #endif
-static void mainerr(int, char_u *);
-static void early_arg_scan(mparm_T *parmp);
+स्थिर शून्य mainerr(पूर्णाङ्क, char_u *);
+स्थिर शून्य early_arg_scan(mparm_T *parmp);
 #ifndef NO_VIM_MAIN
-static void usage(void);
-static void parse_command_name(mparm_T *parmp);
-static void command_line_scan(mparm_T *parmp);
-static void check_tty(mparm_T *parmp);
-static void read_stdin(void);
-static void create_windows(mparm_T *parmp);
-static void edit_buffers(mparm_T *parmp, char_u *cwd);
-static void exe_pre_commands(mparm_T *parmp);
-static void exe_commands(mparm_T *parmp);
-static void source_startup_scripts(mparm_T *parmp);
-static void main_start_gui(void);
-static void check_swap_exists_action(void);
+स्थिर शून्य usage(शून्य);
+स्थिर शून्य parse_command_name(mparm_T *parmp);
+स्थिर शून्य command_पङ्क्तिः_scan(mparm_T *parmp);
+स्थिर शून्य check_tty(mparm_T *parmp);
+स्थिर शून्य read_stdin(शून्य);
+स्थिर शून्य create_windows(mparm_T *parmp);
+स्थिर शून्य edit_buffers(mparm_T *parmp, char_u *cwd);
+स्थिर शून्य exe_pre_commands(mparm_T *parmp);
+स्थिर शून्य exe_commands(mparm_T *parmp);
+स्थिर शून्य source_startup_scripts(mparm_T *parmp);
+स्थिर शून्य main_start_gui(शून्य);
+स्थिर शून्य check_swap_exists_action(शून्य);
 # ifdef FEAT_EVAL
-static void set_progpath(char_u *argv0);
+स्थिर शून्य set_progpath(char_u *argv0);
 # endif
 #endif
 
@@ -55,7 +55,7 @@ static void set_progpath(char_u *argv0);
 /*
  * Different types of error messages.
  */
-static char *(main_errors[]) =
+स्थिर वर्ण *(main_errors[]) =
 {
     N_("Unknown option argument"),
 #define ME_UNKNOWN_OPTION	0
@@ -74,31 +74,31 @@ static char *(main_errors[]) =
 #ifndef PROTO		// don't want a prototype for main()
 
 // Various parameters passed between main() and other functions.
-static mparm_T	params;
+स्थिर mparm_T	params;
 
 # ifdef _IOLBF
-static void *s_vbuf = NULL;		// buffer for setvbuf()
+स्थिर शून्य *s_vbuf = रिक्त;		// buffer for setvbuf()
 # endif
 
 # ifndef NO_VIM_MAIN	// skip this for unittests
 
-static char_u *start_dir = NULL;	// current working dir on startup
+स्थिर char_u *start_dir = रिक्त;	// current working dir on startup
 
-static int has_dash_c_arg = FALSE;
+स्थिर पूर्णाङ्क has_dash_c_arg = FALSE;
 
 #  ifdef VIMDLL
 __declspec(dllexport)
 #  endif
-    int
+    पूर्णाङ्क
 #  ifdef MSWIN
 VimMain
-#  else
+#  अञ्ञथा
 main
 #  endif
-(int argc, char **argv)
+(पूर्णाङ्क argc, वर्ण **argv)
 {
-#  if defined(STARTUPTIME) || defined(CLEAN_RUNTIMEPATH)
-    int		i;
+#  सचे defined(STARTUPTIME) || defined(CLEAN_RUNTIMEPATH)
+    पूर्णाङ्क		i;
 #  endif
 
     /*
@@ -125,14 +125,14 @@ main
 #  ifdef FEAT_EVAL
     params.use_debug_break_level = -1;
 #  endif
-    params.window_count = -1;
+    params.window_गणनम् = -1;
 
     autocmd_init();
 
 #  ifdef FEAT_RUBY
     {
-	int ruby_stack_start;
-	vim_ruby_init((void *)&ruby_stack_start);
+	पूर्णाङ्क ruby_राशिः_start;
+	vim_ruby_init((शून्य *)&ruby_राशिः_start);
     }
 #  endif
 
@@ -149,20 +149,20 @@ main
      */
     common_init_1();
 
-#  if defined(STARTUPTIME) || defined(FEAT_JOB_CHANNEL)
+#  सचे defined(STARTUPTIME) || defined(FEAT_JOB_CHANNEL)
     // Need to find "--startuptime" and "--log" before actually parsing
     // arguments.
-    for (i = 1; i < argc - 1; ++i)
+    अत्थाय (i = 1; i < argc - 1; ++i)
     {
 #   ifdef STARTUPTIME
-	if (STRICMP(argv[i], "--startuptime") == 0 && time_fd == NULL)
+	सचे (STRICMP(argv[i], "--startuptime") == 0 && time_fd == रिक्त)
 	{
 	    time_fd = mch_fopen(argv[i + 1], "a");
-	    TIME_MSG("--- VIM STARTING ---");
+	    TIME_सन्देशः("--- VIM STARTING ---");
 	}
 #   endif
 #   ifdef FEAT_EVAL
-	if (STRICMP(argv[i], "--log") == 0)
+	सचे (STRICMP(argv[i], "--log") == 0)
 	    ch_logfile((char_u *)(argv[i + 1]), (char_u *)"ao");
 #   endif
     }
@@ -170,22 +170,22 @@ main
 
 #  ifdef CLEAN_RUNTIMEPATH
     // Need to find "--clean" before actually parsing arguments.
-    for (i = 1; i < argc; ++i)
-	if (STRICMP(argv[i], "--clean") == 0)
+    अत्थाय (i = 1; i < argc; ++i)
+	सचे (STRICMP(argv[i], "--clean") == 0)
 	{
 	    params.clean = TRUE;
-	    break;
+	    भङ्ग;
 	}
 #  endif
 #  ifdef MSWIN
     // Need to find "-register" and "-unregister" before loading any libraries.
-    for (i = 1; i < argc; ++i)
-	if ((STRICMP(argv[i] + 1, "register") == 0
+    अत्थाय (i = 1; i < argc; ++i)
+	सचे ((STRICMP(argv[i] + 1, "register") == 0
 				    || STRICMP(argv[i] + 1, "unregister") == 0)
 		&& (argv[i][0] == '-' || argv[i][0] == '/'))
 	{
 	    found_register_arg = TRUE;
-	    break;
+	    भङ्ग;
 	}
 #  endif
 
@@ -219,8 +219,8 @@ main
      * Process the command line arguments.  File names are put in the global
      * argument list "global_alist".
      */
-    command_line_scan(&params);
-    TIME_MSG("parsing arguments");
+    command_पङ्क्तिः_scan(&params);
+    TIME_सन्देशः("parsing arguments");
 
     /*
      * On some systems, when we compile with the GUI, we always use it.  On Mac
@@ -229,46 +229,46 @@ main
      */
 #  ifdef ALWAYS_USE_GUI
     gui.starting = true;
-#  else
-#   if defined(FEAT_GUI_X11) || defined(FEAT_GUI_GTK)
+#  अञ्ञथा
+#   सचे defined(FEAT_GUI_X11) || defined(FEAT_GUI_GTK)
     /*
      * Check if the GUI can be started.  Reset gui.starting if not.
      * Don't know about other systems, stay on the safe side and don't check.
      */
-    if (gui.starting)
+    सचे (gui.starting)
     {
-	if (gui_init_check() == FAIL)
+	सचे (gui_init_check() == FAIL)
 	{
 	    gui.starting = false;
 
 	    // When running "evim" or "gvim -y" we need the menus, exit if we
 	    // don't have them.
-	    if (params.evim_mode)
+	    सचे (params.evim_mode)
 		mch_exit(1);
 	}
     }
 #   endif
 #  endif
 
-    if (GARGCOUNT > 0)
+    सचे (GARGCOUNT > 0)
     {
 #  ifdef EXPAND_FILENAMES
 	/*
 	 * Expand wildcards in file names.
 	 */
-	if (!params.literal)
+	सचे (!params.literal)
 	{
 	    start_dir = alloc(MAXPATHL);
-	    if (start_dir != NULL)
+	    सचे (start_dir != रिक्त)
 		mch_dirname(start_dir, MAXPATHL);
 	    // Temporarily add '(' and ')' to 'isfname'.  These are valid
 	    // filename characters but are excluded from 'isfname' to make
 	    // "gf" work on a file name in parentheses (e.g.: see vim.h).
 	    do_cmdline_cmd((char_u *)":set isf+=(,)");
-	    alist_expand(NULL, 0);
+	    alist_expand(रिक्त, 0);
 	    do_cmdline_cmd((char_u *)":set isf&");
-	    if (start_dir != NULL)
-		mch_chdir((char *)start_dir);
+	    सचे (start_dir != रिक्त)
+		mch_chdir((वर्ण *)start_dir);
 	}
 #  endif
 	params.fname = alist_name(&GARGLIST[0]);
@@ -278,12 +278,12 @@ main
     {
 	// Remember the number of entries in the argument list.  If it changes
 	// we don't react on setting 'encoding'.
-	set_alist_count();
+	set_alist_गणनम्();
     }
 #  endif
 
 #  ifdef MSWIN
-    if (GARGCOUNT == 1 && params.full_path)
+    सचे (GARGCOUNT == 1 && params.full_path)
     {
 	/*
 	 * If there is one filename, fully qualified, we have very probably
@@ -291,17 +291,17 @@ main
 	 * Hint: to avoid this when typing a command use a forward slash.
 	 * If the cd fails, it doesn't matter.
 	 */
-	if (vim_chdirfile(params.fname, "drop") == OK)
+	सचे (vim_chdirfile(params.fname, "drop") == OK)
 	    last_chdir_reason = "drop";
-	if (start_dir != NULL)
+	सचे (start_dir != रिक्त)
 	    mch_dirname(start_dir, MAXPATHL);
     }
 #  endif
-    TIME_MSG("expanding arguments");
+    TIME_सन्देशः("expanding arguments");
 
 #  ifdef FEAT_DIFF
-    if (params.diff_mode && params.window_count == -1)
-	params.window_count = 0;	// open up to 3 windows
+    सचे (params.diff_mode && params.window_गणनम् == -1)
+	params.window_गणनम् = 0;	// open up to 3 windows
 #  endif
 
     // Don't redraw until much later.
@@ -310,7 +310,7 @@ main
     /*
      * When listing swap file names, don't do cursor positioning et. al.
      */
-    if (recoverymode && params.fname == NULL)
+    सचे (recoverymode && params.fname == रिक्त)
 	params.want_full_screen = FALSE;
 
     /*
@@ -318,9 +318,9 @@ main
      * For GTK we can't be sure, but when started from the desktop it doesn't
      * make sense to try using a terminal.
      */
-#  if defined(ALWAYS_USE_GUI) || defined(FEAT_GUI_X11) || defined(FEAT_GUI_GTK) \
+#  सचे defined(ALWAYS_USE_GUI) || defined(FEAT_GUI_X11) || defined(FEAT_GUI_GTK) \
 	|| defined(VIMDLL)
-    if (gui.starting
+    सचे (gui.starting
 #   ifdef FEAT_GUI_GTK
 	    && !isatty(2)
 #   endif
@@ -334,7 +334,7 @@ main
      * Note that we may use mch_exit() before mch_init()!
      */
     mch_init();
-    TIME_MSG("shell init");
+    TIME_सन्देशः("shell init");
 
 #  ifdef USE_XSMP
     /*
@@ -344,14 +344,14 @@ main
      * has a similar delay upon failure.
      * Only try if SESSION_MANAGER is set to something non-null.
      */
-    if (!x_no_connect)
+    सचे (!x_no_connect)
     {
-	char *p = getenv("SESSION_MANAGER");
+	वर्ण *p = getenv("SESSION_MANAGER");
 
-	if (p != NULL && *p != NUL)
+	सचे (p != रिक्त && *p != NUL)
 	{
 	    xsmp_init();
-	    TIME_MSG("xsmp init");
+	    TIME_सन्देशः("xsmp init");
 	}
     }
 #  endif
@@ -362,27 +362,27 @@ main
     check_tty(&params);
 
 #  ifdef _IOLBF
-    if (silent_mode)
+    सचे (silent_mode)
     {
 	// Ensure output works usefully without a tty: buffer lines instead of
 	// fully buffered.
 	s_vbuf = malloc(BUFSIZ);
-	if (s_vbuf != NULL)
+	सचे (s_vbuf != रिक्त)
 	    setvbuf(stdout, s_vbuf, _IOLBF, BUFSIZ);
     }
 #  endif
 
     // This message comes before term inits, but after setting "silent_mode"
     // when the input is not a tty. Omit the message with --not-a-term.
-    if (GARGCOUNT > 1 && !silent_mode && !is_not_a_term())
+    सचे (GARGCOUNT > 1 && !silent_mode && !is_not_a_term())
 	printf(_("%d files to edit\n"), GARGCOUNT);
 
-    if (params.want_full_screen && !silent_mode)
+    सचे (params.want_full_screen && !silent_mode)
     {
 	termcapinit(params.term);	// set terminal name and get terminal
 				   // capabilities (will set full_screen)
 	screen_start();		// don't know where cursor is now
-	TIME_MSG("Termcap init");
+	TIME_सन्देशः("Termcap init");
     }
 
     /*
@@ -393,28 +393,28 @@ main
 #  ifdef FEAT_DIFF
     // Set the 'diff' option now, so that it can be checked for in a .vimrc
     // file.  There is no buffer yet though.
-    if (params.diff_mode)
+    सचे (params.diff_mode)
 	diff_win_options(firstwin, FALSE);
 #  endif
 
     cmdline_row = Rows - p_ch;
     cmdline_col_off = 0;
-    cmdline_width = (int)Columns;
-    msg_row = cmdline_row;
-    msg_col = 0;
+    cmdline_width = (पूर्णाङ्क)Columns;
+    सन्देशः_row = cmdline_row;
+    सन्देशः_col = 0;
     screenalloc(FALSE);		// allocate screen buffers
     set_init_2();
-    TIME_MSG("inits 2");
+    TIME_सन्देशः("inits 2");
 
-    msg_scroll = TRUE;
+    सन्देशः_scroll = TRUE;
     no_wait_return = TRUE;
 
     init_mappings();		// set up initial mappings
 
     init_highlight(TRUE, FALSE); // set the default highlight groups
-    TIME_MSG("init highlight");
+    TIME_सन्देशः("init highlight");
 
-#  if defined(FEAT_TERMRESPONSE)
+#  सचे defined(FEAT_TERMRESPONSE)
     init_term_props(TRUE);
 #  endif
 
@@ -425,7 +425,7 @@ main
 
     // Reset 'loadplugins' for "-u NONE" before "--cmd" arguments.
     // Allows for setting 'loadplugins' there.
-    if (params.use_vimrc != NULL
+    सचे (params.use_vimrc != रिक्त
 	    && (STRCMP(params.use_vimrc, "NONE") == 0
 		|| STRCMP(params.use_vimrc, "DEFAULTS") == 0))
 	p_lpl = FALSE;
@@ -448,20 +448,20 @@ main
      * and splitting off remaining Vim main into vim_main2().
      * Do source startup scripts, so that 'mzschemedll' can be set.
      */
-    return mzscheme_main();
-#  else
-    return vim_main2();
+    पटिनिवत्त mzscheme_main();
+#  अञ्ञथा
+    पटिनिवत्त vim_main2();
 #  endif
 }
 # endif // NO_VIM_MAIN
 #endif // PROTO
 
-#if defined(FEAT_X11) && defined(FEAT_XCLIPBOARD) && defined(FEAT_CLIPBOARD)
+#सचे defined(FEAT_X11) && defined(FEAT_XCLIPBOARD) && defined(FEAT_CLIPBOARD)
 /*
  * Restore the state after a fatal X error.
  */
-    static void
-x_restore_state(void)
+    स्थिर शून्य
+x_restore_state(शून्य)
 {
     State = MODE_NORMAL;
     VIsual_active = FALSE;
@@ -491,8 +491,8 @@ x_restore_state(void)
  * things simple.
  * It is also defined when NO_VIM_MAIN is defined, but then it's empty.
  */
-    int
-vim_main2(void)
+    पूर्णाङ्क
+vim_main2(शून्य)
 {
 #ifndef NO_VIM_MAIN
 # ifdef FEAT_EVAL
@@ -500,13 +500,13 @@ vim_main2(void)
      * Read all the plugin files.
      * Only when compiled with +eval, since most plugins need it.
      */
-    if (p_lpl)
+    सचे (p_lpl)
     {
-	char_u *rtp_copy = NULL;
+	char_u *rtp_copy = रिक्त;
 	char_u *plugin_pattern = (char_u *)
-#  if defined(VMS) || defined(AMIGA) // VMS and Amiga don't handle the "**".
+#  सचे defined(VMS) || defined(AMIGA) // VMS and Amiga don't handle the "**".
 		"plugin/*.vim"
-#  else
+#  अञ्ञथा
 		"plugin/**/*.vim"
 #  endif
 		;
@@ -516,35 +516,35 @@ vim_main2(void)
 	// :packloadall command.
 	// Make a copy of 'runtimepath', so that source_runtime does not use
 	// the pack directories.
-	if (!did_source_packages)
+	सचे (!did_source_packages)
 	{
 	    rtp_copy = vim_strsave(p_rtp);
 	    add_pack_start_dirs();
 	}
 
-	source_in_path(rtp_copy == NULL ? p_rtp : rtp_copy, plugin_pattern,
-		DIP_ALL | DIP_NOAFTER, NULL);
-	TIME_MSG("loading plugins");
+	source_in_path(rtp_copy == रिक्त ? p_rtp : rtp_copy, plugin_pattern,
+		DIP_ALL | DIP_NOAFTER, रिक्त);
+	TIME_सन्देशः("loading plugins");
 	vim_free(rtp_copy);
 
 	// Only source "start" packages if not done already with a :packloadall
 	// command.
-	if (!did_source_packages)
+	सचे (!did_source_packages)
 	    load_start_packages();
-	TIME_MSG("loading packages");
+	TIME_सन्देशः("loading packages");
 
 	source_runtime(plugin_pattern, DIP_ALL | DIP_AFTER);
-	TIME_MSG("loading after plugins");
+	TIME_सन्देशः("loading after plugins");
     }
 # endif
 
 # ifdef FEAT_DIFF
     // Decide about window layout for diff mode after reading vimrc.
-    if (params.diff_mode && params.window_layout == 0)
+    सचे (params.diff_mode && params.window_layout == 0)
     {
-	if (diffopt_horizontal())
+	सचे (diffopt_horizontal())
 	    params.window_layout = WIN_HOR;	// use horizontal split
-	else
+	अञ्ञथा
 	    params.window_layout = WIN_VER;	// use vertical split
     }
 # endif
@@ -554,9 +554,9 @@ vim_main2(void)
      * This uses the 'dir' option, therefore it must be after the
      * initializations.
      */
-    if (recoverymode && params.fname == NULL)
+    सचे (recoverymode && params.fname == रिक्त)
     {
-	recover_names(NULL, TRUE, NULL, 0, NULL);
+	recover_names(रिक्त, TRUE, रिक्त, 0, रिक्त);
 	mch_exit(0);
     }
 
@@ -565,31 +565,31 @@ vim_main2(void)
      * 'title' and 'icon', Unix: 'shellpipe' and 'shellredir'.
      */
     set_init_3();
-    TIME_MSG("inits 3");
+    TIME_सन्देशः("inits 3");
 
     /*
      * "-n" argument: Disable swap file by setting 'updatecount' to 0.
      * Note that this overrides anything from a vimrc file.
      */
-    if (params.no_swap_file)
+    सचे (params.no_swap_file)
 	p_uc = 0;
 
 # ifdef FEAT_GUI
-    if (gui.starting)
+    सचे (gui.starting)
     {
-#  if defined(UNIX) || defined(VMS)
+#  सचे defined(UNIX) || defined(VMS)
 	// When something caused a message from a vimrc script, need to output
 	// an extra newline before the shell prompt.
-	if (did_emsg || msg_didout)
+	सचे (did_emsg || सन्देशः_didout)
 	    putchar('\n');
 #  endif
 
-	gui_start(NULL);		// will set full_screen to TRUE
-	TIME_MSG("starting GUI");
+	gui_start(रिक्त);		// will set full_screen to TRUE
+	TIME_सन्देशः("starting GUI");
 
 	// When running "evim" or "gvim -y" we need the menus, exit if we
 	// don't have them.
-	if (!gui.in_use && params.evim_mode)
+	सचे (!gui.in_use && params.evim_mode)
 	    mch_exit(1);
 	firstwin->w_prev_height = firstwin->w_height; // may have changed
     }
@@ -600,15 +600,15 @@ vim_main2(void)
      * Read in registers, history etc, but not marks, from the viminfo file.
      * This is where v:oldfiles gets filled.
      */
-    if (*p_viminfo != NUL)
+    सचे (*p_viminfo != NUL)
     {
-	read_viminfo(NULL, VIF_WANT_INFO | VIF_GET_OLDFILES);
-	TIME_MSG("reading viminfo");
+	read_viminfo(रिक्त, VIF_WANT_INFO | VIF_GET_OLDFILES);
+	TIME_सन्देशः("reading viminfo");
     }
 # endif
 # ifdef FEAT_EVAL
     // It's better to make v:oldfiles an empty list than NULL.
-    if (get_vim_var_list(VV_OLDFILES) == NULL)
+    सचे (get_vim_var_list(VV_OLDFILES) == रिक्त)
 	set_vim_var_list(VV_OLDFILES, list_alloc());
 # endif
 
@@ -617,21 +617,21 @@ vim_main2(void)
      * "-q errorfile": Load the error file now.
      * If the error file can't be read, exit before doing anything else.
      */
-    if (params.edit_type == EDIT_QF)
+    सचे (params.edit_type == EDIT_QF)
     {
-	char_u	*enc = NULL;
+	char_u	*enc = रिक्त;
 
 	enc = p_menc;
-	if (params.use_ef != NULL)
+	सचे (params.use_ef != रिक्त)
 	    set_string_option_direct((char_u *)"ef", -1,
 					   params.use_ef, OPT_FREE, SID_CARG);
-	vim_snprintf((char *)IObuff, IOSIZE, "cfile %s", p_ef);
-	if (qf_init(NULL, p_ef, p_efm, TRUE, IObuff, enc) < 0)
+	vim_snprintf((वर्ण *)IObuff, IOSIZE, "cfile %s", p_ef);
+	सचे (qf_init(रिक्त, p_ef, p_efm, TRUE, IObuff, enc) < 0)
 	{
 	    out_char('\n');
 	    mch_exit(3);
 	}
-	TIME_MSG("reading errorfile");
+	TIME_सन्देशः("reading errorfile");
     }
 # endif
 
@@ -642,8 +642,8 @@ vim_main2(void)
      */
     starting = NO_BUFFERS;
     no_wait_return = FALSE;
-    if (!exmode_active)
-	msg_scroll = FALSE;
+    सचे (!exmode_active)
+	सन्देशः_scroll = FALSE;
 
 # ifdef FEAT_GUI
     /*
@@ -653,29 +653,29 @@ vim_main2(void)
      * For the Mac this handles putting files dropped on the Vim icon to
      * global_alist.
      */
-    if (gui.in_use)
+    सचे (gui.in_use)
     {
 	gui_wait_for_chars(50L, typebuf.tb_change_cnt);
-	TIME_MSG("GUI delay");
+	TIME_सन्देशः("GUI delay");
     }
 # endif
 
-# if defined(FEAT_GUI_PHOTON) && defined(FEAT_CLIPBOARD)
+# सचे defined(FEAT_GUI_PHOTON) && defined(FEAT_CLIPBOARD)
     qnx_clip_init();
 # endif
 
-# if defined(MACOS_X) && defined(FEAT_CLIPBOARD)
+# सचे defined(MACOS_X) && defined(FEAT_CLIPBOARD)
     clip_init(TRUE);
 # endif
 
 # ifdef FEAT_XCLIPBOARD
     // Start using the X clipboard, unless the GUI was started.
 #  ifdef FEAT_GUI
-    if (!gui.in_use)
+    सचे (!gui.in_use)
 #  endif
     {
 	setup_term_clip();
-	TIME_MSG("setup x11 clipboard");
+	TIME_सन्देशः("setup x11 clipboard");
     }
 # endif
 
@@ -686,16 +686,16 @@ vim_main2(void)
 
 # ifdef FEAT_WAYLAND
 #  ifdef FEAT_GUI
-    if (!gui.in_use)
+    सचे (!gui.in_use)
 #  endif
     {
-	if (wayland_init_connection(wayland_display_name) == OK)
+	सचे (wayland_init_connection(wayland_display_name) == OK)
 	{
-	    TIME_MSG("connected to Wayland display");
+	    TIME_सन्देशः("connected to Wayland display");
 
 #  ifdef FEAT_WAYLAND_CLIPBOARD
-	    if (clip_init_wayland() == OK)
-		TIME_MSG("setup Wayland clipboard");
+	    सचे (clip_init_wayland() == OK)
+		TIME_सन्देशः("setup Wayland clipboard");
 #  endif
 	}
     }
@@ -712,13 +712,13 @@ vim_main2(void)
      * are the same terminal: "cat | vim -".
      * Using autocommands here may cause trouble...
      */
-    if (params.edit_type == EDIT_STDIN && !recoverymode)
+    सचे (params.edit_type == EDIT_STDIN && !recoverymode)
 	read_stdin();
 
-# if defined(UNIX) || defined(VMS)
+# सचे defined(UNIX) || defined(VMS)
     // When switching screens and something caused a message from a vimrc
     // script, need to output an extra newline on exit.
-    if ((did_emsg || msg_didout) && *T_TI != NUL && params.edit_type != EDIT_STDIN)
+    सचे ((did_emsg || सन्देशः_didout) && *T_TI != NUL && params.edit_type != EDIT_STDIN)
 	newline_on_exit = TRUE;
 # endif
 
@@ -731,47 +731,47 @@ vim_main2(void)
      * defined by termcapinit and redefined in .exrc.
      */
     settmode(TMODE_RAW);
-    TIME_MSG("setting raw mode");
+    TIME_सन्देशः("setting raw mode");
 
-    if (need_wait_return || msg_didany)
+    सचे (need_wait_return || सन्देशः_didany)
     {
 	wait_return(TRUE);
-	TIME_MSG("waiting for return");
+	TIME_सन्देशः("waiting for return");
     }
 
     starttermcap();	    // start termcap if not done by wait_return()
-    TIME_MSG("start termcap");
+    TIME_सन्देशः("start termcap");
 
     setmouse();				// may start using the mouse
-    if (scroll_region)
+    सचे (scroll_region)
 	scroll_region_reset();		// In case Rows changed
     scroll_start();	// may scroll the screen to the right position
 
-# if defined(UNIX) || defined(VMS) || defined(MACOS_X)
-    term_push_title(SAVE_RESTORE_BOTH);
+# सचे defined(UNIX) || defined(VMS) || defined(MACOS_X)
+    term_प्रक्षिप_title(SAVE_RESTORE_BOTH);
 # endif
 
     /*
      * Don't clear the screen when starting in Ex mode, unless using the GUI.
      */
-    if (exmode_active
+    सचे (exmode_active
 # ifdef FEAT_GUI
 			&& !gui.in_use
 # endif
 					)
 	set_must_redraw(UPD_CLEAR);
-    else
+    अञ्ञथा
     {
 	screenclear();			// clear screen
-	TIME_MSG("clearing screen");
+	TIME_सन्देशः("clearing screen");
     }
 
 # ifdef FEAT_CRYPT
-    if (params.ask_for_key)
+    सचे (params.ask_for_कुञ्चिका)
     {
 	crypt_check_current_method();
-	(void)crypt_get_key(TRUE, TRUE);
-	TIME_MSG("getting crypt key");
+	(शून्य)crypt_get_कुञ्चिका(TRUE, TRUE);
+	TIME_सन्देशः("getting crypt key");
     }
 # endif
 
@@ -782,29 +782,29 @@ vim_main2(void)
      * Also does recovery if "recoverymode" set.
      */
     create_windows(&params);
-    TIME_MSG("opening buffers");
+    TIME_सन्देशः("opening buffers");
 
 # ifdef FEAT_EVAL
     // clear v:swapcommand
-    set_vim_var_string(VV_SWAPCOMMAND, NULL, -1);
+    set_vim_var_string(VV_SWAPCOMMAND, रिक्त, -1);
 # endif
 
     // Ex starts at last line of the file
-    if (exmode_active)
-	curwin->w_cursor.lnum = curbuf->b_ml.ml_line_count;
+    सचे (exmode_active)
+	curwin->w_cursor.lnum = curbuf->b_ml.ml_पङ्क्तिः_गणनम्;
 
-    apply_autocmds(EVENT_BUFENTER, NULL, NULL, FALSE, curbuf);
-    TIME_MSG("BufEnter autocommands");
+    apply_autocmds(EVENT_BUFENTER, रिक्त, रिक्त, FALSE, curbuf);
+    TIME_सन्देशः("BufEnter autocommands");
     setpcmark();
 
 # ifdef FEAT_QUICKFIX
     /*
      * When started with "-q errorfile" jump to first error now.
      */
-    if (params.edit_type == EDIT_QF)
+    सचे (params.edit_type == EDIT_QF)
     {
-	qf_jump(NULL, 0, 0, FALSE);
-	TIME_MSG("jump to first error");
+	qf_jump(रिक्त, 0, 0, FALSE);
+	TIME_सन्देशः("jump to first error");
     }
 # endif
 
@@ -816,7 +816,7 @@ vim_main2(void)
     vim_free(start_dir);
 
 # ifdef FEAT_DIFF
-    if (params.diff_mode)
+    सचे (params.diff_mode)
     {
 	win_T	*wp;
 
@@ -835,20 +835,20 @@ vim_main2(void)
      * Need to jump to the tag before executing the '-c command'.
      * Makes "vim -c '/return' -t main" work.
      */
-    if (params.tagname != NULL)
+    सचे (params.tagname != रिक्त)
     {
 	swap_exists_did_quit = FALSE;
 
-	vim_snprintf((char *)IObuff, IOSIZE, "ta %s", params.tagname);
+	vim_snprintf((वर्ण *)IObuff, IOSIZE, "ta %s", params.tagname);
 	do_cmdline_cmd(IObuff);
-	TIME_MSG("jumping to tag");
+	TIME_सन्देशः("jumping to tag");
 
 	// If the user doesn't want to edit the file then we quit here.
-	if (swap_exists_did_quit)
+	सचे (swap_exists_did_quit)
 	    getout(1);
     }
 
-# if defined(FEAT_X11) && defined(FEAT_XCLIPBOARD)
+# सचे defined(FEAT_X11) && defined(FEAT_XCLIPBOARD)
     // Temporarily set x_jump_env to here in case there is an X11 IO error,
     // because x_jump_env is only actually set in main_loop(), before
     // exe_commands(). May not be the best solution since commands passed via
@@ -856,17 +856,17 @@ vim_main2(void)
     // an X IO error results in the command being partially done. In theory we
     // could use SETJMP in RealWaitForChar(), but the stack frame for that may
     // possibly exit and then LONGJMP is called on it.
-    int jump_result = SETJMP(x_jump_env);
+    पूर्णाङ्क jump_result = SETJMP(x_jump_env);
 
-    if (jump_result == 0)
+    सचे (jump_result == 0)
     {
 # endif
 	// Execute any "+", "-c" and "-S" arguments.
-	if (params.n_commands > 0)
+	सचे (params.n_commands > 0)
 	    exe_commands(&params);
-# if defined(FEAT_X11) && defined(FEAT_XCLIPBOARD)
+# सचे defined(FEAT_X11) && defined(FEAT_XCLIPBOARD)
     }
-    else
+    अञ्ञथा
 	// Restore state and continue just like what main_loop() does.
 	x_restore_state();
 # endif
@@ -874,7 +874,7 @@ vim_main2(void)
     // Must come before the may_req_ calls.
     starting = 0;
 
-# if defined(FEAT_TERMRESPONSE)
+# सचे defined(FEAT_TERMRESPONSE)
     // Must be done before redrawing, puts a few characters on the screen.
     check_terminal_behavior();
 # endif
@@ -893,21 +893,21 @@ vim_main2(void)
 
     may_req_bg_color();
 # endif
-# if defined(FEAT_IMAGE) || defined(FEAT_EVAL)
+# सचे defined(FEAT_IMAGE) || defined(FEAT_EVAL)
     update_cell_size();
 # endif
 
     // start in insert mode
-    if (p_im)
+    सचे (p_im)
 	need_start_insertmode = TRUE;
 
 # ifdef FEAT_EVAL
     set_vim_var_nr(VV_VIM_DID_ENTER, 1L);
 # endif
-    apply_autocmds(EVENT_VIMENTER, NULL, NULL, FALSE, curbuf);
-    TIME_MSG("VimEnter autocommands");
+    apply_autocmds(EVENT_VIMENTER, रिक्त, रिक्त, FALSE, curbuf);
+    TIME_सन्देशः("VimEnter autocommands");
 
-# if defined(FEAT_EVAL) && defined(FEAT_CLIPBOARD)
+# सचे defined(FEAT_EVAL) && defined(FEAT_CLIPBOARD)
     // Adjust default register name for "unnamed" in 'clipboard'. Can only be
     // done after the clipboard is available and all initial commands that may
     // modify the 'clipboard' setting have run; i.e. just before entering the
@@ -915,31 +915,31 @@ vim_main2(void)
     reset_reg_var();
 # endif
 
-# if defined(FEAT_DIFF)
+# सचे defined(FEAT_DIFF)
     // When a startup script or session file setup for diff'ing and
     // scrollbind, sync the scrollbind now.
-    if (curwin->w_p_diff && curwin->w_p_scb)
+    सचे (curwin->w_p_diff && curwin->w_p_scb)
     {
 	update_topline();
 	check_scrollbind((linenr_T)0, 0L);
-	TIME_MSG("diff scrollbinding");
+	TIME_सन्देशः("diff scrollbinding");
     }
 # endif
 
-# if defined(MSWIN) && (!defined(FEAT_GUI_MSWIN) || defined(VIMDLL))
+# सचे defined(MSWIN) && (!defined(FEAT_GUI_MSWIN) || defined(VIMDLL))
 #  ifdef VIMDLL
-    if (!gui.in_use)
+    सचे (!gui.in_use)
 #  endif
 	mch_set_winsize_now();	    // Allow winsize changes from now on
 # endif
 
-# if defined(FEAT_GUI)
+# सचे defined(FEAT_GUI)
     // When tab pages were created, may need to update the tab pages line and
     // scrollbars.  This is skipped while creating them.
-    if (gui.in_use && first_tabpage->tp_next != NULL)
+    सचे (gui.in_use && first_tabpage->tp_next != रिक्त)
     {
 	out_flush();
-	gui_init_which_components(NULL);
+	gui_init_which_components(रिक्त);
 	gui_update_scrollbars(TRUE);
     }
     need_mouse_correct = TRUE;
@@ -947,16 +947,16 @@ vim_main2(void)
 
     // If ":startinsert" command used, stuff a dummy command to be able to
     // call normal_cmd(), which will then start Insert mode.
-    if (restart_edit != 0)
+    सचे (restart_edit != 0)
 	stuffcharReadbuff(K_NOP);
 
 # ifdef FEAT_NETBEANS_INTG
-    if (netbeansArg != NULL && strncmp("-nb", netbeansArg, 3) == 0)
+    सचे (netbeansArg != रिक्त && strncmp("-nb", netbeansArg, 3) == 0)
     {
 #  ifdef FEAT_GUI
-#   if !defined(FEAT_GUI_X11) && !defined(FEAT_GUI_GTK)  \
+#   सचे !defined(FEAT_GUI_X11) && !defined(FEAT_GUI_GTK)  \
 		&& !defined(FEAT_GUI_MSWIN)
-	if (gui.in_use)
+	सचे (gui.in_use)
 	{
 	    mch_errmsg(_("netbeans is not supported with this GUI\n"));
 	    mch_exit(2);
@@ -976,10 +976,10 @@ vim_main2(void)
     // window title gets updated.
     do_redraw = TRUE;
 
-    TIME_MSG("before starting main loop");
+    TIME_सन्देशः("before starting main loop");
 
 # ifdef FEAT_JOB_CHANNEL
-    if (use_stdio_channel)
+    सचे (use_stdio_channel)
     {
 	// Serve the stdio channel instead of reading Ex commands, exit when
 	// it is closed.
@@ -995,19 +995,19 @@ vim_main2(void)
 
 #endif // NO_VIM_MAIN
 
-    return 0;
+    पटिनिवत्त 0;
 }
 
 /*
  * Initialisation #1 shared by main() and some tests.
  */
-    void
-common_init_1(void)
+    शून्य
+common_init_1(शून्य)
 {
     estack_init();
     cmdline_init();
 
-    (void)mb_init();	// init mb_bytelen_tab[] to ones
+    (शून्य)mb_init();	// init mb_bytelen_tab[] to ones
 #ifdef FEAT_EVAL
     eval_init();	// init global variables
 #endif
@@ -1020,17 +1020,17 @@ common_init_1(void)
      * Allocate space for the generic buffers (needed for set_init_1() and
      * emsg()).
      */
-    if ((IObuff = alloc(IOSIZE)) == NULL
-	    || (NameBuff = alloc(MAXPATHL)) == NULL)
+    सचे ((IObuff = alloc(IOSIZE)) == रिक्त
+	    || (NameBuff = alloc(MAXPATHL)) == रिक्त)
 	mch_exit(0);
-    TIME_MSG("Allocated generic buffers");
+    TIME_सन्देशः("Allocated generic buffers");
 }
 
 
 /*
  * Initialisation #2 shared by main() and some tests.
  */
-    void
+    शून्य
 common_init_2(mparm_T *paramp)
 {
 #ifdef NBDEBUG
@@ -1038,17 +1038,17 @@ common_init_2(mparm_T *paramp)
     // NameBuff.
     nbdebug_log_init("SPRO_GVIM_DEBUG", "SPRO_GVIM_DLEVEL");
     nbdebug_wait(WT_ENV | WT_WAIT | WT_STOP, "SPRO_GVIM_WAIT", 20);
-    TIME_MSG("NetBeans debug wait");
+    TIME_सन्देशः("NetBeans debug wait");
 #endif
 
-#if defined(HAVE_LOCALE_H) || defined(X_LOCALE)
+#सचे defined(HAVE_LOCALE_H) || defined(X_LOCALE)
     /*
      * Setup to use the current locale (for ctype() and many other things).
      * NOTE: Translated messages with encodings other than latin1 will not
      * work until set_init_1() has been called!
      */
     init_locale();
-    TIME_MSG("locale set");
+    TIME_सन्देशः("locale set");
 #endif
 
 #ifdef FEAT_GUI
@@ -1071,15 +1071,15 @@ common_init_2(mparm_T *paramp)
      */
     early_arg_scan(paramp);
 
-#if defined(FEAT_GUI)
+#सचे defined(FEAT_GUI)
     // Prepare for possibly starting GUI sometime
     gui_prepare(&paramp->argc, paramp->argv);
-    TIME_MSG("GUI prepared");
+    TIME_सन्देशः("GUI prepared");
 #endif
 
 #ifdef FEAT_CLIPBOARD
     clip_init(FALSE);		// Initialise clipboard stuff
-    TIME_MSG("clipboard setup");
+    TIME_सन्देशः("clipboard setup");
 #endif
 
     /*
@@ -1089,13 +1089,13 @@ common_init_2(mparm_T *paramp)
      * -dev argument.
      */
     stdout_isatty = (mch_check_win(paramp->argc, paramp->argv) != FAIL);
-    TIME_MSG("window checked");
+    TIME_सन्देशः("window checked");
 
     /*
      * Allocate the first window and buffer.
      * Can't do anything without it, exit when it fails.
      */
-    if (win_alloc_first() == FAIL)
+    सचे (win_alloc_first() == FAIL)
 	mch_exit(0);
 
     init_yank();		// init yank buffers
@@ -1112,7 +1112,7 @@ common_init_2(mparm_T *paramp)
      */
     init_homedir();		// find real value of $HOME
     set_init_1(paramp->clean);
-    TIME_MSG("inits 1");
+    TIME_सन्देशः("inits 1");
 
 #ifdef FEAT_EVAL
     // set v:lang and v:ctype
@@ -1130,71 +1130,71 @@ common_init_2(mparm_T *paramp)
     // initialize quickfix list
     // don't send an error message when memory allocation fails
     // do it when the user tries to access the quickfix list
-    qf_init_stack();
+    qf_init_राशिः();
 #endif
 }
 
 /*
  * Return TRUE when the --not-a-term argument was found.
  */
-    int
-is_not_a_term(void)
+    पूर्णाङ्क
+is_not_a_term(शून्य)
 {
-    return params.not_a_term;
+    पटिनिवत्त params.not_a_term;
 }
 
 /*
  * Return TRUE when the --not-a-term argument was found or the GUI is in use.
  */
-    int
-is_not_a_term_or_gui(void)
+    पूर्णाङ्क
+is_not_a_term_or_gui(शून्य)
 {
-    return params.not_a_term
+    पटिनिवत्त params.not_a_term
 #ifdef FEAT_GUI
 			    || gui.in_use
 #endif
 	;
 }
 
-#if defined(EXITFREE)
-    void
-free_vbuf(void)
+#सचे defined(EXITFREE)
+    शून्य
+free_vbuf(शून्य)
 {
 # ifdef _IOLBF
-    if (s_vbuf != NULL)
+    सचे (s_vbuf != रिक्त)
     {
-	setvbuf(stdout, NULL, _IONBF, 0);
-	free(s_vbuf);
-	s_vbuf = NULL;
+	setvbuf(stdout, रिक्त, _IONBF, 0);
+	मुक्त(s_vbuf);
+	s_vbuf = रिक्त;
     }
 # endif
 }
 #endif
 
-#if defined(FEAT_GUI)
+#सचे defined(FEAT_GUI)
 /*
  * If a --gui-dialog-file argument was given return the file name.
  * Otherwise return NULL.
  */
     char_u *
-get_gui_dialog_file(void)
+get_gui_dialog_file(शून्य)
 {
-    return params.gui_dialog_file;
+    पटिनिवत्त params.gui_dialog_file;
 }
 #endif
 
 // When TRUE in a safe state when starting to wait for a character.
-static int	was_safe = FALSE;
-static oparg_T	*current_oap = NULL;
+स्थिर पूर्णाङ्क	was_safe = FALSE;
+स्थिर oparg_T	*current_oap = रिक्त;
 
 /*
  * Return TRUE if an operator was started but not finished yet.
  * Includes typing a count or a register name.
  */
-    int
-op_pending(void)
+    पूर्णाङ्क
+op_pending(शून्य)
 {
-    return !(current_oap != NULL
+    पटिनिवत्त !(current_oap != रिक्त
 	    && !finish_op
 	    && current_oap->prev_opcount == 0
 	    && current_oap->prev_count0 == 0
@@ -1206,12 +1206,12 @@ op_pending(void)
  * Return whether currently it is safe, assuming it was safe before (high level
  * state didn't change).
  */
-    static int
-is_safe_now(void)
+    स्थिर पूर्णाङ्क
+is_safe_now(शून्य)
 {
-    return stuff_empty()
+    पटिनिवत्त stuff_empty()
 	&& typebuf.tb_len == 0
-	&& scriptin[curscript] == NULL
+	&& scriptin[curscript] == रिक्त
 #ifdef FEAT_EVAL
 	&& !debug_mode
 #endif
@@ -1222,20 +1222,20 @@ is_safe_now(void)
  * Trigger SafeState if currently in a safe state, that is "safe" is TRUE and
  * there is no typeahead.
  */
-    void
-may_trigger_safestate(int safe)
+    शून्य
+may_trigger_safestate(पूर्णाङ्क safe)
 {
-    int is_safe = safe && is_safe_now();
+    पूर्णाङ्क is_safe = safe && is_safe_now();
 
 #ifdef FEAT_EVAL
-    if (was_safe != is_safe)
+    सचे (was_safe != is_safe)
 	// Only log when the state changes, otherwise it happens at nearly
 	// every key stroke.
-	ch_log(NULL, is_safe ? "SafeState: Start triggering"
+	ch_log(रिक्त, is_safe ? "SafeState: Start triggering"
 					       : "SafeState: Stop triggering");
 #endif
-    if (is_safe)
-	apply_autocmds(EVENT_SAFESTATE, NULL, NULL, FALSE, curbuf);
+    सचे (is_safe)
+	apply_autocmds(EVENT_SAFESTATE, रिक्त, रिक्त, FALSE, curbuf);
     was_safe = is_safe;
 }
 
@@ -1244,62 +1244,62 @@ may_trigger_safestate(int safe)
  * character was typed.  It will remain unsafe until the next call to
  * may_trigger_safestate().
  */
-    void
-state_no_longer_safe(char *reason UNUSED)
+    शून्य
+state_no_longer_safe(वर्ण *reason UNUSED)
 {
 #ifdef FEAT_EVAL
-    if (was_safe)
-	ch_log(NULL, "SafeState: reset: %s", reason);
+    सचे (was_safe)
+	ch_log(रिक्त, "SafeState: reset: %s", reason);
 #endif
     was_safe = FALSE;
 }
 
-#if defined(FEAT_EVAL) || defined(MESSAGE_QUEUE)
-    int
-get_was_safe_state(void)
+#सचे defined(FEAT_EVAL) || defined(MESSAGE_QUEUE)
+    पूर्णाङ्क
+get_was_safe_state(शून्य)
 {
-    return was_safe;
+    पटिनिवत्त was_safe;
 }
 #endif
 
-#if defined(MESSAGE_QUEUE)
+#सचे defined(MESSAGE_QUEUE)
 /*
  * Invoked when leaving code that invokes callbacks.  Then trigger
  * SafeStateAgain, if it was safe when starting to wait for a character.
  */
-    void
-may_trigger_safestateagain(void)
+    शून्य
+may_trigger_safestateagain(शून्य)
 {
-    if (!was_safe)
+    सचे (!was_safe)
     {
 	// If the safe state was reset in state_no_longer_safe(), e.g. because
 	// of calling feedkeys(), we check if it's now safe again (all keys
 	// were consumed).
 	was_safe = is_safe_now();
 # ifdef FEAT_EVAL
-	if (was_safe)
-	    ch_log(NULL, "SafeState: undo reset");
+	सचे (was_safe)
+	    ch_log(रिक्त, "SafeState: undo reset");
 # endif
     }
-    if (was_safe)
+    सचे (was_safe)
     {
 # ifdef FEAT_EVAL
 	// Only do this message when another message was given, otherwise we
 	// get lots of them.
-	if ((did_repeated_msg & REPEATED_MSG_SAFESTATE) == 0)
+	सचे ((did_repeated_सन्देशः & REPEATED_सन्देशः_SAFESTATE) == 0)
 	{
-	    int did = did_repeated_msg;
+	    पूर्णाङ्क did = did_repeated_सन्देशः;
 
-	    ch_log(NULL,
+	    ch_log(रिक्त,
 		      "SafeState: back to waiting, triggering SafeStateAgain");
-	    did_repeated_msg = did | REPEATED_MSG_SAFESTATE;
+	    did_repeated_सन्देशः = did | REPEATED_सन्देशः_SAFESTATE;
 	}
 # endif
-	apply_autocmds(EVENT_SAFESTATEAGAIN, NULL, NULL, FALSE, curbuf);
+	apply_autocmds(EVENT_SAFESTATEAGAIN, रिक्त, रिक्त, FALSE, curbuf);
     }
 # ifdef FEAT_EVAL
-    else
-	ch_log(NULL,
+    अञ्ञथा
+	ch_log(रिक्त,
 		  "SafeState: back to waiting, not triggering SafeStateAgain");
 # endif
 }
@@ -1308,16 +1308,16 @@ may_trigger_safestateagain(void)
 /*
  * Return TRUE if there is any typeahead, pending operator or command.
  */
-    int
-work_pending(void)
+    पूर्णाङ्क
+work_pending(शून्य)
 {
-    return op_pending() || !is_safe_now();
+    पटिनिवत्त op_pending() || !is_safe_now();
 }
 
 #ifdef FEAT_CONCEAL
-static linenr_T	conceal_old_cursor_line = 0;
-static linenr_T	conceal_new_cursor_line = 0;
-static int	conceal_update_lines = FALSE;
+स्थिर linenr_T	conceal_old_cursor_पङ्क्तिः = 0;
+स्थिर linenr_T	conceal_new_cursor_पङ्क्तिः = 0;
+स्थिर पूर्णाङ्क	conceal_update_पङ्क्तयः = FALSE;
 #endif
 
 /*
@@ -1329,22 +1329,22 @@ static int	conceal_update_lines = FALSE;
  * happened with an event ignored is not reported once it is not ignored
  * anymore.
  */
-    void
-may_trigger_deferred_events(void)
+    शून्य
+may_trigger_deferred_events(शून्य)
 {
-    static bool	recursive = false;
+    स्थिर bool	recursive = false;
 
-    if (recursive)
-	return;
+    सचे (recursive)
+	पटिनिवत्त;
     recursive = true;
 
 #ifdef FEAT_CONCEAL
-    if (curwin->w_p_cole == 0)
-	conceal_update_lines = FALSE;
+    सचे (curwin->w_p_cole == 0)
+	conceal_update_पङ्क्तयः = FALSE;
 #endif
 
     // Trigger CursorMoved if the cursor moved.
-    if (!finish_op && (has_cursormoved()
+    सचे (!finish_op && (has_cursormoved()
 #ifdef FEAT_PROP_POPUP
 		|| popup_visible
 #endif
@@ -1353,44 +1353,44 @@ may_trigger_deferred_events(void)
 #endif
 		) && !EQUAL_POS(last_cursormoved, curwin->w_cursor))
     {
-	if (has_cursormoved())
-	    apply_autocmds(EVENT_CURSORMOVED, NULL, NULL, FALSE, curbuf);
+	सचे (has_cursormoved())
+	    apply_autocmds(EVENT_CURSORMOVED, रिक्त, रिक्त, FALSE, curbuf);
 #ifdef FEAT_PROP_POPUP
-	if (popup_visible)
+	सचे (popup_visible)
 	    popup_check_cursor_pos();
 #endif
 #ifdef FEAT_CONCEAL
-	if (curwin->w_p_cole > 0)
+	सचे (curwin->w_p_cole > 0)
 	{
-	    conceal_old_cursor_line = last_cursormoved.lnum;
-	    conceal_new_cursor_line = curwin->w_cursor.lnum;
-	    conceal_update_lines = TRUE;
+	    conceal_old_cursor_पङ्क्तिः = last_cursormoved.lnum;
+	    conceal_new_cursor_पङ्क्तिः = curwin->w_cursor.lnum;
+	    conceal_update_पङ्क्तयः = TRUE;
 	}
 #endif
 	last_cursormoved = curwin->w_cursor;
     }
 
 #ifdef FEAT_CONCEAL
-    if (conceal_update_lines
-	    && (conceal_old_cursor_line != conceal_new_cursor_line
-		|| conceal_cursor_line(curwin)
-		|| need_cursor_line_redraw))
+    सचे (conceal_update_पङ्क्तयः
+	    && (conceal_old_cursor_पङ्क्तिः != conceal_new_cursor_पङ्क्तिः
+		|| conceal_cursor_पङ्क्तिः(curwin)
+		|| need_cursor_पङ्क्तिः_redraw))
     {
-	if (conceal_old_cursor_line != conceal_new_cursor_line
-		&& conceal_old_cursor_line != 0
-		&& conceal_old_cursor_line <= curbuf->b_ml.ml_line_count)
-	    redrawWinline(curwin, conceal_old_cursor_line);
-	redrawWinline(curwin, conceal_new_cursor_line);
+	सचे (conceal_old_cursor_पङ्क्तिः != conceal_new_cursor_पङ्क्तिः
+		&& conceal_old_cursor_पङ्क्तिः != 0
+		&& conceal_old_cursor_पङ्क्तिः <= curbuf->b_ml.ml_पङ्क्तिः_गणनम्)
+	    redrawWinline(curwin, conceal_old_cursor_पङ्क्तिः);
+	redrawWinline(curwin, conceal_new_cursor_पङ्क्तिः);
 	curwin->w_valid &= ~VALID_CROW;
-	need_cursor_line_redraw = FALSE;
+	need_cursor_पङ्क्तिः_redraw = FALSE;
     }
 #endif
 
     // Trigger TextChanged if b:changedtick differs.
-    if (!finish_op && has_textchanged()
+    सचे (!finish_op && has_textchanged()
 	    && curbuf->b_last_changedtick != CHANGEDTICK(curbuf))
     {
-	apply_autocmds(EVENT_TEXTCHANGED, NULL, NULL, FALSE, curbuf);
+	apply_autocmds(EVENT_TEXTCHANGED, रिक्त, रिक्त, FALSE, curbuf);
 	curbuf->b_last_changedtick = CHANGEDTICK(curbuf);
     }
 
@@ -1399,7 +1399,7 @@ may_trigger_deferred_events(void)
     update_topline();
     validate_cursor();
 
-    if (!finish_op)
+    सचे (!finish_op)
 	may_trigger_win_scrolled_resized();
 
     recursive = false;
@@ -1413,38 +1413,38 @@ may_trigger_deferred_events(void)
  * Also used to handle ":visual" command after ":global": execute Normal mode
  * commands, return when entering Ex mode.  "noexmode" is TRUE then.
  */
-    void
+    शून्य
 main_loop(
-    int		cmdwin,	    // TRUE when working in the command-line window
-    int		noexmode)   // TRUE when return on entering Ex mode
+    पूर्णाङ्क		cmdwin,	    // TRUE when working in the command-line window
+    पूर्णाङ्क		noexmode)   // TRUE when return on entering Ex mode
 {
     oparg_T	oa;		// operator arguments
     oparg_T	*prev_oap;	// operator arguments
-    volatile int previous_got_int = FALSE;	// "got_int" was TRUE
+    चञ्चल पूर्णाङ्क previous_got_int = FALSE;	// "got_int" was TRUE
 
     prev_oap = current_oap;
     current_oap = &oa;
 
-#if defined(FEAT_X11) && defined(FEAT_XCLIPBOARD)
+#सचे defined(FEAT_X11) && defined(FEAT_XCLIPBOARD)
     // Setup to catch a terminating error from the X server.  Just ignore
     // it, restore the state and continue.  This might not always work
     // properly, but at least we hopefully don't exit unexpectedly when the X
     // server exits while Vim is running in a console.
-    if (!cmdwin && !noexmode && SETJMP(x_jump_env))
+    सचे (!cmdwin && !noexmode && SETJMP(x_jump_env))
 	x_restore_state();
 #endif
 
     clear_oparg(&oa);
-    while (!cmdwin || cmdwin_result == 0)
+    याव (!cmdwin || cmdwin_result == 0)
     {
-	if (stuff_empty())
+	सचे (stuff_empty())
 	{
 	    did_check_timestamps = FALSE;
-	    if (need_check_timestamps)
+	    सचे (need_check_timestamps)
 		check_timestamps(FALSE);
-	    if (need_wait_return)	// if wait_return() still needed ...
+	    सचे (need_wait_return)	// if wait_return() still needed ...
 		wait_return(FALSE);	// ... call it now
-	    if (need_start_insertmode && goto_im() && !VIsual_active)
+	    सचे (need_start_insertmode && goto_im() && !VIsual_active)
 	    {
 		need_start_insertmode = FALSE;
 		stuffReadbuff((char_u *)"i");	// start insert mode next
@@ -1459,35 +1459,35 @@ main_loop(
 	// the ":g" command.
 	// For ":g/pat/vi" we reset "got_int" when used once.  When used
 	// a second time we go back to Ex mode and abort the ":g" command.
-	if (got_int)
+	सचे (got_int)
 	{
-	    if (noexmode && global_busy && !exmode_active && previous_got_int)
+	    सचे (noexmode && global_busy && !exmode_active && previous_got_int)
 	    {
 		// Typed two CTRL-C in a row: go back to ex mode as if "Q" was
 		// used and keep "got_int" set, so that it aborts ":g".
 		exmode_active = EXMODE_NORMAL;
 		State = MODE_NORMAL;
 	    }
-	    else if (!global_busy || !exmode_active)
+	    अञ्ञथा सचे (!global_busy || !exmode_active)
 	    {
-		if (!quit_more)
-		    (void)vgetc();		// flush all buffers
+		सचे (!quit_more)
+		    (शून्य)vgetc();		// flush all buffers
 		got_int = FALSE;
 	    }
 	    previous_got_int = TRUE;
 	}
-	else
+	अञ्ञथा
 	    previous_got_int = FALSE;
 
 #ifdef FEAT_EVAL
 	// At the toplevel there is no exception handling.  Discard any that
 	// may be hanging around (e.g. from "interrupt" at the debug prompt).
-	if (did_throw && !ex_normal_busy)
+	सचे (did_throw && !ex_normal_busy)
 	    discard_current_exception();
 #endif
 
-	if (!exmode_active)
-	    msg_scroll = FALSE;
+	सचे (!exmode_active)
+	    सन्देशः_scroll = FALSE;
 	quit_more = FALSE;
 
 	// it's not safe unless may_trigger_safestate_main() is called
@@ -1498,13 +1498,13 @@ main_loop(
 	 * If there is nothing in the stuff_buffer or do_redraw is TRUE,
 	 * update cursor and redraw.
 	 */
-	if (skip_redraw || exmode_active)
+	सचे (skip_redraw || exmode_active)
 	{
 	    skip_redraw = FALSE;
 	    setcursor();
 	    cursor_on();
 	}
-	else if (do_redraw || stuff_empty())
+	अञ्ञथा सचे (do_redraw || stuff_empty())
 	{
 #ifdef FEAT_GUI
 	    // If ui_breakcheck() was used a resize may have been postponed.
@@ -1521,25 +1521,25 @@ main_loop(
 	    // type a character, trigger SafeState.
 	    may_trigger_safestate(!op_pending() && restart_edit == 0);
 
-#if defined(FEAT_DIFF)
+#सचे defined(FEAT_DIFF)
 	    // Updating diffs from changed() does not always work properly,
 	    // esp. updating folds.  Do an update just before redrawing if
 	    // needed.
-	    if (curtab->tp_diff_update || curtab->tp_diff_invalid)
+	    सचे (curtab->tp_diff_update || curtab->tp_diff_invalid)
 	    {
-		ex_diffupdate(NULL);
+		ex_diffupdate(रिक्त);
 		curtab->tp_diff_update = FALSE;
 	    }
 
 	    // Scroll-binding for diff mode may have been postponed until
 	    // here.  Avoids doing it for every change.
-	    if (diff_need_scrollbind)
+	    सचे (diff_need_scrollbind)
 	    {
 		check_scrollbind((linenr_T)0, 0L);
 		diff_need_scrollbind = FALSE;
 	    }
 #endif
-#if defined(FEAT_FOLDING)
+#सचे defined(FEAT_FOLDING)
 	    // Include a closed fold completely in the Visual area.
 	    foldAdjustVisual();
 #endif
@@ -1550,10 +1550,10 @@ main_loop(
 	     * When 'foldopen' is "all", open the fold(s) under the cursor.
 	     * This may mark the window for redrawing.
 	     */
-	    if (hasAnyFolding(curwin) && !char_avail())
+	    सचे (hasAnyFolding(curwin) && !char_avail())
 	    {
 		foldCheckClose();
-		if (fdo_flags & FDO_ALL)
+		सचे (fdo_flags & FDO_ALL)
 		    foldOpenCursor();
 	    }
 #endif
@@ -1563,40 +1563,40 @@ main_loop(
 	    update_topline();
 	    validate_cursor();
 
-	    if (VIsual_active)
+	    सचे (VIsual_active)
 		update_curbuf(UPD_INVERTED); // update inverted part
-	    else if (must_redraw)
+	    अञ्ञथा सचे (must_redraw)
 	    {
 		mch_disable_flush();	// Stop issuing gui_mch_flush().
 		update_screen(0);
 		mch_enable_flush();
 	    }
-	    else if (redraw_cmdline || clear_cmdline || redraw_mode)
+	    अञ्ञथा सचे (redraw_cmdline || clear_cmdline || redraw_mode)
 		showmode();
 	    redraw_statuslines();
-	    if (need_maketitle)
+	    सचे (need_maketitle)
 		maketitle();
 #ifdef FEAT_VIMINFO
 	    curbuf->b_last_used = vim_time();
 #endif
 	    // display message after redraw
-	    if (keep_msg != NULL)
+	    सचे (keep_सन्देशः != रिक्त)
 	    {
-		char_u *p = vim_strsave(keep_msg);
+		char_u *p = vim_strsave(keep_सन्देशः);
 
-		if (p != NULL)
+		सचे (p != रिक्त)
 		{
 		    // msg_start() will set keep_msg to NULL, make a copy
 		    // first.  Don't reset keep_msg, msg_attr_keep() uses it to
 		    // check for duplicates.  Never put this message in
 		    // history.
-		    msg_hist_off = TRUE;
-		    msg_attr((char *)p, keep_msg_attr);
-		    msg_hist_off = FALSE;
+		    सन्देशः_hist_off = TRUE;
+		    सन्देशः_attr((वर्ण *)p, keep_सन्देशः_attr);
+		    सन्देशः_hist_off = FALSE;
 		    vim_free(p);
 		}
 	    }
-	    if (need_fileinfo)		// show file info after redraw
+	    सचे (need_fileinfo)		// show file info after redraw
 	    {
 		fileinfo(FALSE, TRUE, FALSE);
 		need_fileinfo = FALSE;
@@ -1604,7 +1604,7 @@ main_loop(
 
 	    emsg_on_display = FALSE;	// can delete error message now
 	    did_emsg = FALSE;
-	    msg_didany = FALSE;		// reset lines_left in msg_start()
+	    सन्देशः_didany = FALSE;		// reset lines_left in msg_start()
 	    may_clear_sb_text();	// clear scroll-back text on next msg
 	    showruler(FALSE);
 
@@ -1616,12 +1616,12 @@ main_loop(
 #ifdef STARTUPTIME
 	    // Now that we have drawn the first screen all the startup stuff
 	    // has been done, close any file for startup messages.
-	    if (time_fd != NULL)
+	    सचे (time_fd != रिक्त)
 	    {
-		TIME_MSG("first screen update");
-		TIME_MSG("--- VIM STARTED ---");
+		TIME_सन्देशः("first screen update");
+		TIME_सन्देशः("--- VIM STARTED ---");
 		fclose(time_fd);
-		time_fd = NULL;
+		time_fd = रिक्त;
 	    }
 #endif
 	    // After the first screen update may start triggering WinScrolled
@@ -1629,7 +1629,7 @@ main_loop(
 	    may_make_initial_scroll_size_snapshot();
 	}
 #ifdef FEAT_GUI
-	if (need_mouse_correct)
+	सचे (need_mouse_correct)
 	    gui_mouse_correct();
 #endif
 
@@ -1654,16 +1654,16 @@ main_loop(
 	 * If we're invoked as ex, do a round of ex commands.
 	 * Otherwise, get and execute a normal mode command.
 	 */
-	if (exmode_active)
+	सचे (exmode_active)
 	{
-	    if (noexmode)   // End of ":global/path/visual" commands
-		goto theend;
+	    सचे (noexmode)   // End of ":global/path/visual" commands
+		गच्छ theend;
 	    do_exmode(exmode_active == EXMODE_VIM);
 	}
-	else
+	अञ्ञथा
 	{
 #ifdef FEAT_TERMINAL
-	    if (term_use_loop()
+	    सचे (term_use_loop()
 		    && oa.op_type == OP_NOP && oa.regname == NUL
 		    && !VIsual_active
 		    && !skip_term_loop)
@@ -1671,10 +1671,10 @@ main_loop(
 		// If terminal_loop() returns OK we got a key that is handled
 		// in Normal mode.  With FAIL we first need to position the
 		// cursor and the screen needs to be redrawn.
-		if (terminal_loop(TRUE) == OK)
+		सचे (terminal_loop(TRUE) == OK)
 		    normal_cmd(&oa, TRUE);
 	    }
-	    else
+	    अञ्ञथा
 #endif
 	    {
 #ifdef FEAT_TERMINAL
@@ -1690,14 +1690,14 @@ theend:
 }
 
 
-#if defined(USE_XSMP) || defined(FEAT_GUI)
+#सचे defined(USE_XSMP) || defined(FEAT_GUI)
 /*
  * Exit, but leave behind swap files for modified buffers.
  */
-    void
-getout_preserve_modified(int exitval)
+    शून्य
+getout_preserve_modified(पूर्णाङ्क exitval)
 {
-# if defined(SIGHUP) && defined(SIG_IGN)
+# सचे defined(SIGHUP) && defined(SIG_IGN)
     // Ignore SIGHUP, because a dropped connection causes a read error, which
     // makes Vim exit and then handling SIGHUP causes various reentrance
     // problems.
@@ -1716,126 +1716,126 @@ getout_preserve_modified(int exitval)
  * Exit properly.  This is the only way to exit Vim after startup has
  * succeeded.  We are certain to exit here, no way to abort it.
  */
-    void
-getout(int exitval)
+    शून्य
+getout(पूर्णाङ्क exitval)
 {
     exiting = TRUE;
-#if defined(FEAT_EVAL)
-    ch_log(NULL, "Exiting...");
+#सचे defined(FEAT_EVAL)
+    ch_log(रिक्त, "Exiting...");
 #endif
 
     // When running in Ex mode an error causes us to exit with a non-zero exit
     // code.  POSIX requires this, although it's not 100% clear from the
     // standard.
-    if (exmode_active)
+    सचे (exmode_active)
 	exitval += ex_exitval;
 
 #ifdef FEAT_EVAL
-    set_vim_var_type(VV_EXITING, VAR_NUMBER);
+    set_vim_var_type(VV_EXITING, VAR_सङ्ख्या);
     set_vim_var_nr(VV_EXITING, exitval);
 #endif
 
     // Position the cursor on the last screen line, below all the text
-    if (!is_not_a_term_or_gui())
-	windgoto((int)Rows - 1, 0);
+    सचे (!is_not_a_term_or_gui())
+	windgoto((पूर्णाङ्क)Rows - 1, 0);
 
 #ifdef FEAT_EVAL
     // Invoked all deferred functions in the function stack.
     invoke_all_defer();
 #endif
 
-#if defined(FEAT_EVAL) || defined(FEAT_SYN_HL)
+#सचे defined(FEAT_EVAL) || defined(FEAT_SYN_HL)
     // Optionally print hashtable efficiency.
     hash_debug_results();
 #endif
 
 #ifdef FEAT_GUI
-    msg_didany = FALSE;
+    सन्देशः_didany = FALSE;
 #endif
 
-    if (v_dying <= 1)
+    सचे (v_dying <= 1)
     {
 	tabpage_T	*tp;
 	tabpage_T	*next_tp;
 	buf_T		*buf;
 	win_T		*wp;
-	int		unblock = 0;
+	पूर्णाङ्क		unblock = 0;
 
 	// Trigger BufWinLeave for all windows, but only once per buffer.
-	for (tp = first_tabpage; tp != NULL; tp = next_tp)
+	अत्थाय (tp = first_tabpage; tp != रिक्त; tp = next_tp)
 	{
 	    next_tp = tp->tp_next;
 	    FOR_ALL_WINDOWS_IN_TAB(tp, wp)
 	    {
-		if (wp->w_buffer == NULL || !buf_valid(wp->w_buffer))
+		सचे (wp->w_buffer == रिक्त || !buf_valid(wp->w_buffer))
 		    // Autocmd must have close the buffer already, skip.
-		    continue;
+		    अनुवर्त;
 		buf = wp->w_buffer;
-		if (CHANGEDTICK(buf) != -1)
+		सचे (CHANGEDTICK(buf) != -1)
 		{
 		    bufref_T bufref;
 
 		    set_bufref(&bufref, buf);
 		    apply_autocmds(EVENT_BUFWINLEAVE, buf->b_fname,
 						    buf->b_fname, FALSE, buf);
-		    if (bufref_valid(&bufref))
+		    सचे (bufref_valid(&bufref))
 			CHANGEDTICK(buf) = -1;  // note we did it already
 
 		    // start all over, autocommands may mess up the lists
 		    next_tp = first_tabpage;
-		    break;
+		    भङ्ग;
 		}
 	    }
 	}
 
 	// Trigger BufUnload for buffers that are loaded
 	FOR_ALL_BUFFERS(buf)
-	    if (buf->b_ml.ml_mfp != NULL)
+	    सचे (buf->b_ml.ml_mfp != रिक्त)
 	    {
 		bufref_T bufref;
 
 		set_bufref(&bufref, buf);
 		apply_autocmds(EVENT_BUFUNLOAD, buf->b_fname, buf->b_fname,
 								  FALSE, buf);
-		if (!bufref_valid(&bufref))
+		सचे (!bufref_valid(&bufref))
 		    // autocmd deleted the buffer
-		    break;
+		    भङ्ग;
 	    }
 
 	// deathtrap() blocks autocommands, but we do want to trigger
 	// VimLeavePre.
-	if (is_autocmd_blocked())
+	सचे (is_autocmd_blocked())
 	{
 	    unblock_autocmds();
 	    ++unblock;
 	}
-	apply_autocmds(EVENT_VIMLEAVEPRE, NULL, NULL, FALSE, curbuf);
-	if (unblock)
+	apply_autocmds(EVENT_VIMLEAVEPRE, रिक्त, रिक्त, FALSE, curbuf);
+	सचे (unblock)
 	    block_autocmds();
     }
 
 #ifdef FEAT_VIMINFO
-    if (
+    सचे (
 # ifdef EXITFREE
 	    entered_free_all_mem == FALSE &&
 # endif
 	    *p_viminfo != NUL)
 	// Write out the registers, history, marks etc, to the viminfo file
-	write_viminfo(NULL, FALSE);
+	write_viminfo(रिक्त, FALSE);
 #endif
 
-    if (v_dying <= 1)
+    सचे (v_dying <= 1)
     {
-	int	unblock = 0;
+	पूर्णाङ्क	unblock = 0;
 
 	// deathtrap() blocks autocommands, but we do want to trigger VimLeave.
-	if (is_autocmd_blocked())
+	सचे (is_autocmd_blocked())
 	{
 	    unblock_autocmds();
 	    ++unblock;
 	}
-	apply_autocmds(EVENT_VIMLEAVE, NULL, NULL, FALSE, curbuf);
-	if (unblock)
+	apply_autocmds(EVENT_VIMLEAVE, रिक्त, रिक्त, FALSE, curbuf);
+	सचे (unblock)
 	    block_autocmds();
     }
 
@@ -1843,9 +1843,9 @@ getout(int exitval)
     profile_dump();
 #endif
 
-    if (did_emsg
+    सचे (did_emsg
 #ifdef FEAT_GUI
-	    || (gui.in_use && msg_didany && p_verbose > 0)
+	    || (gui.in_use && सन्देशः_didany && p_verbose > 0)
 #endif
 	    )
     {
@@ -1855,8 +1855,8 @@ getout(int exitval)
     }
 
     // Position the cursor again, the autocommands may have moved it
-    if (!is_not_a_term_or_gui())
-	windgoto((int)Rows - 1, 0);
+    सचे (!is_not_a_term_or_gui())
+	windgoto((पूर्णाङ्क)Rows - 1, 0);
 
 #ifdef FEAT_JOB_CHANNEL
     job_stop_on_exit();
@@ -1882,7 +1882,7 @@ getout(int exitval)
 #ifdef FEAT_PERL
     perl_end();
 #endif
-#if defined(USE_ICONV) && defined(DYNAMIC_ICONV)
+#सचे defined(USE_ICONV) && defined(DYNAMIC_ICONV)
     iconv_end();
 #endif
 #ifdef FEAT_NETBEANS_INTG
@@ -1898,7 +1898,7 @@ getout(int exitval)
     uninit_image_state();
 #endif
 #ifdef FEAT_EVAL
-    if (garbage_collect_at_exit)
+    सचे (garbage_collect_at_exit)
 	garbage_collect(FALSE);
 #endif
 #ifdef MSWIN
@@ -1917,92 +1917,92 @@ getout(int exitval)
  * Also find the --server, --clientserver... arguments and --socketid and
  * --windowid
  */
-    static void
+    स्थिर शून्य
 early_arg_scan(mparm_T *parmp UNUSED)
 {
-#if defined(FEAT_XCLIPBOARD) || defined(FEAT_CLIENTSERVER) \
+#सचे defined(FEAT_XCLIPBOARD) || defined(FEAT_CLIENTSERVER) \
 	|| !defined(FEAT_NETBEANS_INTG)
-    int		argc = parmp->argc;
-    char	**argv = parmp->argv;
-    int		i;
+    पूर्णाङ्क		argc = parmp->argc;
+    वर्ण	**argv = parmp->argv;
+    पूर्णाङ्क		i;
 
-    for (i = 1; i < argc; i++)
+    अत्थाय (i = 1; i < argc; i++)
     {
-	if (STRCMP(argv[i], "--") == 0)
-	    break;
+	सचे (STRCMP(argv[i], "--") == 0)
+	    भङ्ग;
 # ifdef FEAT_XCLIPBOARD
-	else if (STRICMP(argv[i], "-display") == 0
-#  if defined(FEAT_GUI_GTK)
+	अञ्ञथा सचे (STRICMP(argv[i], "-display") == 0
+#  सचे defined(FEAT_GUI_GTK)
 		|| STRICMP(argv[i], "--display") == 0
 #  endif
 		)
 	{
-	    if (i == argc - 1)
+	    सचे (i == argc - 1)
 		mainerr_arg_missing((char_u *)argv[i]);
 	    xterm_display = argv[++i];
 	}
 # endif
 # ifdef FEAT_CLIENTSERVER
-	else if (STRICMP(argv[i], "--servername") == 0)
+	अञ्ञथा सचे (STRICMP(argv[i], "--servername") == 0)
 	{
-	    if (i == argc - 1)
+	    सचे (i == argc - 1)
 		mainerr_arg_missing((char_u *)argv[i]);
 	    parmp->serverName_arg = (char_u *)argv[++i];
 	}
-	else if (STRICMP(argv[i], "--serverlist") == 0)
+	अञ्ञथा सचे (STRICMP(argv[i], "--serverlist") == 0)
 	    parmp->serverArg = TRUE;
-	else if (STRNICMP(argv[i], "--remote", 8) == 0)
+	अञ्ञथा सचे (STRNICMP(argv[i], "--remote", 8) == 0)
 	{
 	    parmp->serverArg = TRUE;
 #  ifdef FEAT_GUI
-	    if (strstr(argv[i], "-wait") != 0)
+	    सचे (strstr(argv[i], "-wait") != 0)
 		// don't fork() when starting the GUI to edit files ourself
 		gui.dofork = false;
 #  endif
 	}
 #  ifdef FEAT_CLIENTSERVER_BACKENDS
-	else if (STRICMP(argv[i], "--clientserver") == 0)
+	अञ्ञथा सचे (STRICMP(argv[i], "--clientserver") == 0)
 	{
 	    char_u *arg;
-	    if (i == argc - 1)
+	    सचे (i == argc - 1)
 		mainerr_arg_missing((char_u *)argv[i]);
 	    arg = (char_u *)argv[++i];
 
-	    if (STRICMP(arg, "socket") == 0)
+	    सचे (STRICMP(arg, "socket") == 0)
 		clientserver_method = CLIENTSERVER_METHOD_SOCKET;
 #   ifdef FEAT_X11
-	    else if (STRICMP(arg, "x11") == 0)
+	    अञ्ञथा सचे (STRICMP(arg, "x11") == 0)
 		clientserver_method = CLIENTSERVER_METHOD_X11;
 #   endif
 #   ifdef MSWIN
-	    else if (STRICMP(arg, "mswin") == 0)
+	    अञ्ञथा सचे (STRICMP(arg, "mswin") == 0)
 		clientserver_method = CLIENTSERVER_METHOD_MSWIN;
 #   endif
-	    else
+	    अञ्ञथा
 		mainerr(ME_UNKNOWN_OPTION, arg);
 	}
 #  endif
 # endif
 
-# if defined(FEAT_GUI_GTK) || defined(FEAT_GUI_MSWIN)
+# सचे defined(FEAT_GUI_GTK) || defined(FEAT_GUI_MSWIN)
 #  ifdef FEAT_GUI_MSWIN
-	else if (STRICMP(argv[i], "--windowid") == 0)
-#  else
-	else if (STRICMP(argv[i], "--socketid") == 0)
+	अञ्ञथा सचे (STRICMP(argv[i], "--windowid") == 0)
+#  अञ्ञथा
+	अञ्ञथा सचे (STRICMP(argv[i], "--socketid") == 0)
 #  endif
 	{
 	    long_u	id;
-	    int		count;
+	    पूर्णाङ्क		गणनम्;
 
-	    if (i == argc - 1)
+	    सचे (i == argc - 1)
 		mainerr_arg_missing((char_u *)argv[i]);
-	    if (STRNICMP(argv[i+1], "0x", 2) == 0)
-		count = sscanf(&(argv[i + 1][2]), SCANF_HEX_LONG_U, &id);
-	    else
-		count = sscanf(argv[i + 1], SCANF_DECIMAL_LONG_U, &id);
-	    if (count != 1)
+	    सचे (STRNICMP(argv[i+1], "0x", 2) == 0)
+		गणनम् = sscanf(&(argv[i + 1][2]), SCANF_HEX_LONG_U, &id);
+	    अञ्ञथा
+		गणनम् = sscanf(argv[i + 1], SCANF_DECIMAL_LONG_U, &id);
+	    सचे (गणनम् != 1)
 		mainerr(ME_INVALID_ARG, (char_u *)argv[i]);
-	    else
+	    अञ्ञथा
 #  ifdef FEAT_GUI_MSWIN
 		win_socket_id = id;
 #  elif !defined(USE_GTK4)
@@ -2011,12 +2011,12 @@ early_arg_scan(mparm_T *parmp UNUSED)
 	    i++;
 	}
 # endif
-# if defined(FEAT_GUI_GTK) && !defined(USE_GTK4)
-	else if (STRICMP(argv[i], "--echo-wid") == 0)
+# सचे defined(FEAT_GUI_GTK) && !defined(USE_GTK4)
+	अञ्ञथा सचे (STRICMP(argv[i], "--echo-wid") == 0)
 	    echo_wid_arg = TRUE;
 # endif
 # ifndef FEAT_NETBEANS_INTG
-	else if (strncmp(argv[i], "-nb", (size_t)3) == 0)
+	अञ्ञथा सचे (strncmp(argv[i], "-nb", (size_t)3) == 0)
 	{
 	    mch_errmsg(_("'-nb' cannot be used: not enabled at compile time\n"));
 	    mch_exit(2);
@@ -2031,19 +2031,19 @@ early_arg_scan(mparm_T *parmp UNUSED)
 /*
  * Get a (optional) count for a Vim argument.
  */
-    static int
-get_number_arg(
+    स्थिर पूर्णाङ्क
+get_सङ्ख्या_arg(
     char_u	*p,	    // pointer to argument
-    int		*idx,	    // index in argument, is incremented
-    int		def)	    // default value
+    पूर्णाङ्क		*idx,	    // index in argument, is incremented
+    पूर्णाङ्क		def)	    // default value
 {
-    if (vim_isdigit(p[*idx]))
+    सचे (vim_isdigit(p[*idx]))
     {
-	def = atoi((char *)&(p[*idx]));
-	while (vim_isdigit(p[*idx]))
+	def = atoi((वर्ण *)&(p[*idx]));
+	याव (vim_isdigit(p[*idx]))
 	    *idx = *idx + 1;
     }
-    return def;
+    पटिनिवत्त def;
 }
 
 /*
@@ -2056,7 +2056,7 @@ get_number_arg(
  * If the next characters are "ex" we start in Ex mode.  If it's followed
  * by "im" use improved Ex mode.
  */
-    static void
+    स्थिर शून्य
 parse_command_name(mparm_T *parmp)
 {
     char_u	*initstr;
@@ -2068,14 +2068,14 @@ parse_command_name(mparm_T *parmp)
     set_progpath((char_u *)parmp->argv[0]);
 # endif
 
-    if (TOLOWER_ASC(initstr[0]) == 'r')
+    सचे (TOLOWER_ASC(initstr[0]) == 'r')
     {
 	restricted = TRUE;
 	++initstr;
     }
 
     // Use evim mode for "evim" and "egvim", not for "editor".
-    if (TOLOWER_ASC(initstr[0]) == 'e'
+    सचे (TOLOWER_ASC(initstr[0]) == 'e'
 	    && (TOLOWER_ASC(initstr[1]) == 'v'
 		|| TOLOWER_ASC(initstr[1]) == 'g'))
     {
@@ -2087,7 +2087,7 @@ parse_command_name(mparm_T *parmp)
     }
 
     // "gvim" starts the GUI.  Also accept "Gvim" for MS-Windows.
-    if (TOLOWER_ASC(initstr[0]) == 'g'
+    सचे (TOLOWER_ASC(initstr[0]) == 'g'
 # ifdef VIMDLL
 	    || mch_is_gui_executable()
 # endif
@@ -2102,27 +2102,27 @@ parse_command_name(mparm_T *parmp)
 # endif
     }
 # ifdef GUI_MAY_SPAWN
-    else
+    अञ्ञथा
 	gui.dospawn = true;	// Not "gvim". Need to spawn gvim.exe.
 # endif
 
 
-    if (STRNICMP(initstr, "view", 4) == 0)
+    सचे (STRNICMP(initstr, "view", 4) == 0)
     {
 	readonlymode = TRUE;
 	curbuf->b_p_ro = TRUE;
 	p_uc = 10000;			// don't update very often
 	initstr += 4;
     }
-    else if (STRNICMP(initstr, "vim", 3) == 0)
+    अञ्ञथा सचे (STRNICMP(initstr, "vim", 3) == 0)
 	initstr += 3;
 
     // Catch "[r][g]vimdiff" and "[r][g]viewdiff".
-    if (STRICMP(initstr, "diff") == 0)
+    सचे (STRICMP(initstr, "diff") == 0)
     {
 # ifdef FEAT_DIFF
 	parmp->diff_mode = TRUE;
-# else
+# अञ्ञथा
 	mch_errmsg(_("This Vim was not compiled with the diff feature."));
 	mch_errmsg("\n");
 	mch_exit(2);
@@ -2131,11 +2131,11 @@ parse_command_name(mparm_T *parmp)
 
     // Checking for "ex" here may catch some weird names, such as "vimex" or
     // "viewex", we assume the user knows that.
-    if (STRNICMP(initstr, "ex", 2) == 0)
+    सचे (STRNICMP(initstr, "ex", 2) == 0)
     {
-	if (STRNICMP(initstr + 2, "im", 2) == 0)
+	सचे (STRNICMP(initstr + 2, "im", 2) == 0)
 	    exmode_active = EXMODE_VIM;
-	else
+	अञ्ञथा
 	    exmode_active = EXMODE_NORMAL;
 	change_compatible(TRUE);	// set 'compatible'
     }
@@ -2144,45 +2144,45 @@ parse_command_name(mparm_T *parmp)
 /*
  * Scan the command line arguments.
  */
-    static void
-command_line_scan(mparm_T *parmp)
+    स्थिर शून्य
+command_पङ्क्तिः_scan(mparm_T *parmp)
 {
-    int		argc = parmp->argc;
-    char	**argv = parmp->argv;
-    int		argv_idx;		// index in argv[n][]
-    int		had_minmin = FALSE;	// found "--" argument
-    int		want_argument;		// option argument with argument
-    int		c;
-    char_u	*p = NULL;
+    पूर्णाङ्क		argc = parmp->argc;
+    वर्ण	**argv = parmp->argv;
+    पूर्णाङ्क		argv_idx;		// index in argv[n][]
+    पूर्णाङ्क		had_minmin = FALSE;	// found "--" argument
+    पूर्णाङ्क		want_argument;		// option argument with argument
+    पूर्णाङ्क		c;
+    char_u	*p = रिक्त;
     long	n;
 
     --argc;
     ++argv;
     argv_idx = 1;	    // active option letter is argv[0][argv_idx]
-    while (argc > 0)
+    याव (argc > 0)
     {
 	/*
 	 * "+" or "+{number}" or "+/{pat}" or "+{command}" argument.
 	 */
-	if (argv[0][0] == '+' && !had_minmin)
+	सचे (argv[0][0] == '+' && !had_minmin)
 	{
-	    if (parmp->n_commands >= MAX_ARG_CMDS)
-		mainerr(ME_EXTRA_CMD, NULL);
+	    सचे (parmp->n_commands >= MAX_ARG_CMDS)
+		mainerr(ME_EXTRA_CMD, रिक्त);
 	    argv_idx = -1;	    // skip to next argument
-	    if (argv[0][1] == NUL)
+	    सचे (argv[0][1] == NUL)
 		parmp->commands[parmp->n_commands++] = (char_u *)"$";
-	    else
+	    अञ्ञथा
 		parmp->commands[parmp->n_commands++] = (char_u *)&(argv[0][1]);
 	}
 
 	/*
 	 * Optional argument.
 	 */
-	else if (argv[0][0] == '-' && !had_minmin)
+	अञ्ञथा सचे (argv[0][0] == '-' && !had_minmin)
 	{
 	    want_argument = FALSE;
 	    c = argv[0][argv_idx++];
-# if defined( VMS)
+# सचे defined( VMS)
 	    /* 2025-05-13  SMS
 	     * On sufficiently recent non-VAX systems, case preservation
 	     * of the command line is possible/routine.  And quotation
@@ -2199,7 +2199,7 @@ command_line_scan(mparm_T *parmp)
 	     * VMS only uses upper case command lines.  Interpret "-X" as "-x"
 	     * and "-/X" as "-X".
 	     */
-	    if (c == '/')
+	    सचे (c == '/')
 	    {
 		c = argv[0][argv_idx++];
 		c = TOUPPER_ASC(c);
@@ -2210,23 +2210,23 @@ command_line_scan(mparm_T *parmp)
 	     * preserve-case results):
 	     */
 # endif /* defined( VMS) */
-	    switch (c)
+	    विकल्प (c)
 	    {
-	    case NUL:		// "vim -"  read from stdin
+	    पक्ष NUL:		// "vim -"  read from stdin
 				// "ex -" silent mode
-		if (exmode_active)
+		सचे (exmode_active)
 		    silent_mode = TRUE;
-		else
+		अञ्ञथा
 		{
-		    if (parmp->edit_type != EDIT_NONE)
+		    सचे (parmp->edit_type != EDIT_NONE)
 			mainerr(ME_TOO_MANY_ARGS, (char_u *)argv[0]);
 		    parmp->edit_type = EDIT_STDIN;
 		    read_cmd_fd = 2;	// read from stderr instead of stdin
 		}
 		argv_idx = -1;		// skip to next argument
-		break;
+		भङ्ग;
 
-	    case '-':		// "--" don't take any more option arguments
+	    पक्ष '-':		// "--" don't take any more option arguments
 				// "--help" give help message
 				// "--version" give version message
 				// "--clean" clean context
@@ -2240,86 +2240,86 @@ command_line_scan(mparm_T *parmp)
 				// "--stdio-channel" use stdin/stdout as channel
 				// "--noplugin[s]" skip plugins
 				// "--cmd <cmd>" execute cmd before vimrc
-		if (STRICMP(argv[0] + argv_idx, "help") == 0)
+		सचे (STRICMP(argv[0] + argv_idx, "help") == 0)
 		    usage();
-		else if (STRICMP(argv[0] + argv_idx, "version") == 0)
+		अञ्ञथा सचे (STRICMP(argv[0] + argv_idx, "version") == 0)
 		{
 		    cmdline_width = Columns = 80;   // need to init Columns
 		    info_message = TRUE; // use mch_msg(), not mch_errmsg()
-# if defined(FEAT_GUI) && !defined(ALWAYS_USE_GUI) && !defined(VIMDLL)
+# सचे defined(FEAT_GUI) && !defined(ALWAYS_USE_GUI) && !defined(VIMDLL)
 		    gui.starting = false; // not starting GUI, will exit
 # endif
 		    list_version();
-		    msg_putchar('\n');
-		    msg_didout = FALSE;
+		    सन्देशः_putchar('\n');
+		    सन्देशः_didout = FALSE;
 		    mch_exit(0);
 		}
-		else if (STRNICMP(argv[0] + argv_idx, "clean", 5) == 0)
+		अञ्ञथा सचे (STRNICMP(argv[0] + argv_idx, "clean", 5) == 0)
 		{
 		    parmp->use_vimrc = (char_u *)"DEFAULTS";
 # ifdef FEAT_GUI
 		    use_gvimrc = (char_u *)"NONE";
 # endif
 		    parmp->clean = TRUE;
-		    set_option_value_give_err((char_u *)"vif",
+		    set_option_मानम्_give_err((char_u *)"vif",
 						      0L, (char_u *)"NONE", 0);
 		}
-		else if (STRNICMP(argv[0] + argv_idx, "literal", 7) == 0)
+		अञ्ञथा सचे (STRNICMP(argv[0] + argv_idx, "literal", 7) == 0)
 		{
 # ifdef EXPAND_FILENAMES
 		    parmp->literal = TRUE;
 # endif
 		}
-		else if (STRNICMP(argv[0] + argv_idx, "nofork", 6) == 0)
+		अञ्ञथा सचे (STRNICMP(argv[0] + argv_idx, "nofork", 6) == 0)
 		{
 # ifdef FEAT_GUI
 		    gui.dofork = false;	// don't fork() when starting GUI
 # endif
 		}
-		else if (STRNICMP(argv[0] + argv_idx, "noplugin", 8) == 0)
+		अञ्ञथा सचे (STRNICMP(argv[0] + argv_idx, "noplugin", 8) == 0)
 		    p_lpl = FALSE;
-		else if (STRNICMP(argv[0] + argv_idx, "not-a-term", 10) == 0)
+		अञ्ञथा सचे (STRNICMP(argv[0] + argv_idx, "not-a-term", 10) == 0)
 		    parmp->not_a_term = TRUE;
-		else if (STRNICMP(argv[0] + argv_idx, "gui-dialog-file", 15)
+		अञ्ञथा सचे (STRNICMP(argv[0] + argv_idx, "gui-dialog-file", 15)
 									 == 0)
 		{
 		    want_argument = TRUE;
 		    argv_idx += 15;
 		}
-		else if (STRNICMP(argv[0] + argv_idx, "ttyfail", 7) == 0)
+		अञ्ञथा सचे (STRNICMP(argv[0] + argv_idx, "ttyfail", 7) == 0)
 		    parmp->tty_fail = TRUE;
 # ifdef FEAT_JOB_CHANNEL
-		else if (STRNICMP(argv[0] + argv_idx, "stdio-channel", 13) == 0)
+		अञ्ञथा सचे (STRNICMP(argv[0] + argv_idx, "stdio-channel", 13) == 0)
 		{
 		    // Like "-es": no terminal, but the channel is served
 		    // instead of reading Ex commands.
 		    use_stdio_channel = TRUE;
 		    exmode_active = EXMODE_NORMAL;
 		    silent_mode = TRUE;
-#  if defined(FEAT_GUI) && !defined(VIMDLL)
+#  सचे defined(FEAT_GUI) && !defined(VIMDLL)
 		    gui.starting = false;	// don't start GUI
 #  endif
 		}
 # endif
-		else if (STRNICMP(argv[0] + argv_idx, "cmd", 3) == 0)
+		अञ्ञथा सचे (STRNICMP(argv[0] + argv_idx, "cmd", 3) == 0)
 		{
 		    want_argument = TRUE;
 		    argv_idx += 3;
 		}
-		else if (STRNICMP(argv[0] + argv_idx, "startuptime", 11) == 0)
+		अञ्ञथा सचे (STRNICMP(argv[0] + argv_idx, "startuptime", 11) == 0)
 		{
 		    want_argument = TRUE;
 		    argv_idx += 11;
 		}
-		else if (STRNICMP(argv[0] + argv_idx, "log", 3) == 0)
+		अञ्ञथा सचे (STRNICMP(argv[0] + argv_idx, "log", 3) == 0)
 		{
 		    want_argument = TRUE;
 		    argv_idx += 3;
 		}
 # ifdef FEAT_CLIENTSERVER
-		else if (STRICMP(argv[0] + argv_idx, "serverlist") == 0)
+		अञ्ञथा सचे (STRICMP(argv[0] + argv_idx, "serverlist") == 0)
 		    ; // already processed -- no arg
-		else if (STRICMP(argv[0] + argv_idx, "servername") == 0
+		अञ्ञथा सचे (STRICMP(argv[0] + argv_idx, "servername") == 0
 		       || STRICMP(argv[0] + argv_idx, "serversend") == 0
 		       // Don't put this under FEAT_CLIENTSERVER_BACKENDS, just
 		       // let it be ignored. Makes tests less complicated
@@ -2327,22 +2327,22 @@ command_line_scan(mparm_T *parmp)
 		       )
 		{
 		    // already processed -- snatch the following arg
-		    if (argc > 1)
+		    सचे (argc > 1)
 		    {
 			--argc;
 			++argv;
 		    }
 		}
 # endif
-# if defined(FEAT_GUI_GTK) || defined(FEAT_GUI_MSWIN)
+# सचे defined(FEAT_GUI_GTK) || defined(FEAT_GUI_MSWIN)
 #  ifdef FEAT_GUI_GTK
-		else if (STRNICMP(argv[0] + argv_idx, "socketid", 8) == 0)
-#  else
-		else if (STRNICMP(argv[0] + argv_idx, "windowid", 8) == 0)
+		अञ्ञथा सचे (STRNICMP(argv[0] + argv_idx, "socketid", 8) == 0)
+#  अञ्ञथा
+		अञ्ञथा सचे (STRNICMP(argv[0] + argv_idx, "windowid", 8) == 0)
 #  endif
 		{
 		    // already processed -- snatch the following arg
-		    if (argc > 1)
+		    सचे (argc > 1)
 		    {
 			--argc;
 			++argv;
@@ -2350,330 +2350,330 @@ command_line_scan(mparm_T *parmp)
 		}
 # endif
 # ifdef FEAT_GUI_GTK
-		else if (STRNICMP(argv[0] + argv_idx, "echo-wid", 8) == 0)
+		अञ्ञथा सचे (STRNICMP(argv[0] + argv_idx, "echo-wid", 8) == 0)
 		{
 		    // already processed, skip
 		}
 # endif
-		else
+		अञ्ञथा
 		{
-		    if (argv[0][argv_idx])
+		    सचे (argv[0][argv_idx])
 			mainerr(ME_UNKNOWN_OPTION, (char_u *)argv[0]);
 		    had_minmin = TRUE;
 		}
-		if (!want_argument)
+		सचे (!want_argument)
 		    argv_idx = -1;	// skip to next argument
-		break;
+		भङ्ग;
 
-	    case 'A':		// "-A" start in Arabic mode
+	    पक्ष 'A':		// "-A" start in Arabic mode
 # ifdef FEAT_ARABIC
-		set_option_value_give_err((char_u *)"arabic", 1L, NULL, 0);
-# else
+		set_option_मानम्_give_err((char_u *)"arabic", 1L, रिक्त, 0);
+# अञ्ञथा
 		mch_errmsg(_(e_arabic_cannot_be_used_not_enabled_at_compile_time));
 		mch_exit(2);
 # endif
-		break;
+		भङ्ग;
 
-	    case 'b':		// "-b" binary mode
+	    पक्ष 'b':		// "-b" binary mode
 		// Needs to be effective before expanding file names, because
 		// for Win32 this makes us edit a shortcut file itself,
 		// instead of the file it links to.
 		set_options_bin(curbuf->b_p_bin, 1, 0);
 		curbuf->b_p_bin = 1;	    // binary file I/O
-		break;
+		भङ्ग;
 
-	    case 'C':		// "-C"  Compatible
+	    पक्ष 'C':		// "-C"  Compatible
 		change_compatible(TRUE);
 		has_dash_c_arg = TRUE;
-		break;
+		भङ्ग;
 
-	    case 'e':		// "-e" Ex mode
+	    पक्ष 'e':		// "-e" Ex mode
 		exmode_active = EXMODE_NORMAL;
-		break;
+		भङ्ग;
 
-	    case 'E':		// "-E" Improved Ex mode
+	    पक्ष 'E':		// "-E" Improved Ex mode
 		exmode_active = EXMODE_VIM;
-		break;
+		भङ्ग;
 
-	    case 'f':		// "-f"  GUI: run in foreground.  Amiga: open
+	    पक्ष 'f':		// "-f"  GUI: run in foreground.  Amiga: open
 				// window directly, not with newcli
 # ifdef FEAT_GUI
 		gui.dofork = false;	// don't fork() when starting GUI
 # endif
-		break;
+		भङ्ग;
 
-	    case 'g':		// "-g" start GUI
+	    पक्ष 'g':		// "-g" start GUI
 		main_start_gui();
-		break;
+		भङ्ग;
 
-	    case 'F':		// "-F" was for Farsi mode
+	    पक्ष 'F':		// "-F" was for Farsi mode
 		mch_errmsg(_(e_farsi_support_has_been_removed));
 		mch_exit(2);
-		break;
+		भङ्ग;
 
-	    case '?':		// "-?" give help message (for MS-Windows)
-	    case 'h':		// "-h" give help message
+	    पक्ष '?':		// "-?" give help message (for MS-Windows)
+	    पक्ष 'h':		// "-h" give help message
 # ifdef FEAT_GUI_GNOME
 		// Tell usage() to exit for "gvim".
 		gui.starting = false;
 # endif
 		usage();
-		break;
+		भङ्ग;
 
-	    case 'H':		// "-H" start in Hebrew mode: rl + hkmap set
+	    पक्ष 'H':		// "-H" start in Hebrew mode: rl + hkmap set
 # ifdef FEAT_RIGHTLEFT
 		p_hkmap = TRUE;
-		set_option_value_give_err((char_u *)"rl", 1L, NULL, 0);
-# else
+		set_option_मानम्_give_err((char_u *)"rl", 1L, रिक्त, 0);
+# अञ्ञथा
 		mch_errmsg(_(e_hebrew_cannot_be_used_not_enabled_at_compile_time));
 		mch_exit(2);
 # endif
-		break;
+		भङ्ग;
 
-	    case 'l':		// "-l" lisp mode, 'lisp' and 'showmatch' on
-		set_option_value_give_err((char_u *)"lisp", 1L, NULL, 0);
+	    पक्ष 'l':		// "-l" lisp mode, 'lisp' and 'showmatch' on
+		set_option_मानम्_give_err((char_u *)"lisp", 1L, रिक्त, 0);
 		p_sm = TRUE;
-		break;
+		भङ्ग;
 
-	    case 'M':		// "-M"  no changes or writing of files
+	    पक्ष 'M':		// "-M"  no changes or writing of files
 		reset_modifiable();
 		// FALLTHROUGH
 
-	    case 'm':		// "-m"  no writing of files
+	    पक्ष 'm':		// "-m"  no writing of files
 		p_write = FALSE;
-		break;
+		भङ्ग;
 
-	    case 'y':		// "-y"  easy mode
+	    पक्ष 'y':		// "-y"  easy mode
 # ifdef FEAT_GUI
 		gui.starting = true;	// start GUI a bit later
 # endif
 		parmp->evim_mode = TRUE;
-		break;
+		भङ्ग;
 
-	    case 'N':		// "-N"  Nocompatible
+	    पक्ष 'N':		// "-N"  Nocompatible
 		change_compatible(FALSE);
-		break;
+		भङ्ग;
 
-	    case 'n':		// "-n" no swap file
+	    पक्ष 'n':		// "-n" no swap file
 # ifdef FEAT_NETBEANS_INTG
 		// checking for "-nb", netbeans parameters
-		if (argv[0][argv_idx] == 'b')
+		सचे (argv[0][argv_idx] == 'b')
 		{
 		    netbeansArg = argv[0];
 		    argv_idx = -1;	    // skip to next argument
 		}
-		else
+		अञ्ञथा
 # endif
 		parmp->no_swap_file = TRUE;
-		break;
+		भङ्ग;
 
-	    case 'p':		// "-p[N]" open N tab pages
+	    पक्ष 'p':		// "-p[N]" open N tab pages
 # ifdef TARGET_API_MAC_OSX
 		// For some reason on MacOS X, an argument like:
 		// -psn_0_10223617 is passed in when invoke from Finder
 		// or with the 'open' command
-		if (argv[0][argv_idx] == 's')
+		सचे (argv[0][argv_idx] == 's')
 		{
 		    argv_idx = -1; // bypass full -psn
 		    main_start_gui();
-		    break;
+		    भङ्ग;
 		}
 # endif
 		// default is 0: open window for each file
-		parmp->window_count = get_number_arg((char_u *)argv[0],
+		parmp->window_गणनम् = get_सङ्ख्या_arg((char_u *)argv[0],
 								&argv_idx, 0);
 		parmp->window_layout = WIN_TABS;
-		break;
+		भङ्ग;
 
-	    case 'o':		// "-o[N]" open N horizontal split windows
+	    पक्ष 'o':		// "-o[N]" open N horizontal split windows
 		// default is 0: open window for each file
-		parmp->window_count = get_number_arg((char_u *)argv[0],
+		parmp->window_गणनम् = get_सङ्ख्या_arg((char_u *)argv[0],
 								&argv_idx, 0);
 		parmp->window_layout = WIN_HOR;
-		break;
+		भङ्ग;
 
-		case 'O':	// "-O[N]" open N vertical split windows
+		पक्ष 'O':	// "-O[N]" open N vertical split windows
 		// default is 0: open window for each file
-		parmp->window_count = get_number_arg((char_u *)argv[0],
+		parmp->window_गणनम् = get_सङ्ख्या_arg((char_u *)argv[0],
 								&argv_idx, 0);
 		parmp->window_layout = WIN_VER;
-		break;
+		भङ्ग;
 
 # ifdef FEAT_QUICKFIX
-	    case 'q':		// "-q" QuickFix mode
-		if (parmp->edit_type != EDIT_NONE)
+	    पक्ष 'q':		// "-q" QuickFix mode
+		सचे (parmp->edit_type != EDIT_NONE)
 		    mainerr(ME_TOO_MANY_ARGS, (char_u *)argv[0]);
 		parmp->edit_type = EDIT_QF;
-		if (argv[0][argv_idx])		// "-q{errorfile}"
+		सचे (argv[0][argv_idx])		// "-q{errorfile}"
 		{
 		    parmp->use_ef = (char_u *)argv[0] + argv_idx;
 		    argv_idx = -1;
 		}
-		else if (argc > 1)		// "-q {errorfile}"
+		अञ्ञथा सचे (argc > 1)		// "-q {errorfile}"
 		    want_argument = TRUE;
-		break;
+		भङ्ग;
 # endif
 
-	    case 'R':		// "-R" readonly mode
+	    पक्ष 'R':		// "-R" readonly mode
 		readonlymode = TRUE;
 		curbuf->b_p_ro = TRUE;
 		p_uc = 10000;			// don't update very often
-		break;
+		भङ्ग;
 
-	    case 'r':		// "-r" recovery mode
-	    case 'L':		// "-L" recovery mode
+	    पक्ष 'r':		// "-r" recovery mode
+	    पक्ष 'L':		// "-L" recovery mode
 		recoverymode = 1;
-		break;
+		भङ्ग;
 
-	    case 's':
-		if (exmode_active)	// "-s" silent (batch) mode
+	    पक्ष 's':
+		सचे (exmode_active)	// "-s" silent (batch) mode
 		    silent_mode = TRUE;
-		else		// "-s {scriptin}" read from script file
+		अञ्ञथा		// "-s {scriptin}" read from script file
 		    want_argument = TRUE;
-		break;
+		भङ्ग;
 
-	    case 't':		// "-t {tag}" or "-t{tag}" jump to tag
-		if (parmp->edit_type != EDIT_NONE)
+	    पक्ष 't':		// "-t {tag}" or "-t{tag}" jump to tag
+		सचे (parmp->edit_type != EDIT_NONE)
 		    mainerr(ME_TOO_MANY_ARGS, (char_u *)argv[0]);
 		parmp->edit_type = EDIT_TAG;
-		if (argv[0][argv_idx])		// "-t{tag}"
+		सचे (argv[0][argv_idx])		// "-t{tag}"
 		{
 		    parmp->tagname = (char_u *)argv[0] + argv_idx;
 		    argv_idx = -1;
 		}
-		else				// "-t {tag}"
+		अञ्ञथा				// "-t {tag}"
 		    want_argument = TRUE;
-		break;
+		भङ्ग;
 
 # ifdef FEAT_EVAL
-	    case 'D':		// "-D"		Debugging
+	    पक्ष 'D':		// "-D"		Debugging
 		parmp->use_debug_break_level = 9999;
-		break;
+		भङ्ग;
 # endif
 # ifdef FEAT_DIFF
-	    case 'd':		// "-d"		'diff'
+	    पक्ष 'd':		// "-d"		'diff'
 #  ifdef AMIGA
 		// check for "-dev {device}"
-		if (argv[0][argv_idx] == 'e' && argv[0][argv_idx + 1] == 'v')
+		सचे (argv[0][argv_idx] == 'e' && argv[0][argv_idx + 1] == 'v')
 		    want_argument = TRUE;
-		else
+		अञ्ञथा
 #  endif
 		    parmp->diff_mode = TRUE;
-		break;
+		भङ्ग;
 # endif
-	    case 'V':		// "-V{N}"	Verbose level
+	    पक्ष 'V':		// "-V{N}"	Verbose level
 		// default is 10: a little bit verbose
-		p_verbose = get_number_arg((char_u *)argv[0], &argv_idx, 10);
-		if (argv[0][argv_idx] != NUL)
+		p_verbose = get_सङ्ख्या_arg((char_u *)argv[0], &argv_idx, 10);
+		सचे (argv[0][argv_idx] != NUL)
 		{
-		    set_option_value_give_err((char_u *)"verbosefile",
+		    set_option_मानम्_give_err((char_u *)"verbosefile",
 					  0L, (char_u *)argv[0] + argv_idx, 0);
-		    argv_idx = (int)STRLEN(argv[0]);
+		    argv_idx = (पूर्णाङ्क)STRLEN(argv[0]);
 		}
-		break;
+		भङ्ग;
 
-	    case 'v':		// "-v"  Vi-mode (as if called "vi")
+	    पक्ष 'v':		// "-v"  Vi-mode (as if called "vi")
 		exmode_active = 0;
-# if defined(FEAT_GUI) && !defined(VIMDLL)
+# सचे defined(FEAT_GUI) && !defined(VIMDLL)
 		gui.starting = false;	// don't start GUI
 # endif
-		break;
+		भङ्ग;
 
-	    case 'w':		// "-w{number}"	set window height
+	    पक्ष 'w':		// "-w{number}"	set window height
 				// "-w {scriptout}"	write to script
-		if (vim_isdigit(((char_u *)argv[0])[argv_idx]))
+		सचे (vim_isdigit(((char_u *)argv[0])[argv_idx]))
 		{
-		    n = get_number_arg((char_u *)argv[0], &argv_idx, 10);
-		    set_option_value_give_err((char_u *)"window", n, NULL, 0);
-		    break;
+		    n = get_सङ्ख्या_arg((char_u *)argv[0], &argv_idx, 10);
+		    set_option_मानम्_give_err((char_u *)"window", n, रिक्त, 0);
+		    भङ्ग;
 		}
 		want_argument = TRUE;
-		break;
+		भङ्ग;
 
 # ifdef FEAT_CRYPT
-	    case 'x':		// "-x"  encrypted reading/writing of files
-		parmp->ask_for_key = TRUE;
-		break;
+	    पक्ष 'x':		// "-x"  encrypted reading/writing of files
+		parmp->ask_for_कुञ्चिका = TRUE;
+		भङ्ग;
 # endif
 
-	    case 'X':		// "-X"  don't connect to X server
-# if (defined(UNIX) || defined(VMS)) && defined(FEAT_X11)
+	    पक्ष 'X':		// "-X"  don't connect to X server
+# सचे (defined(UNIX) || defined(VMS)) && defined(FEAT_X11)
 		x_no_connect = TRUE;
 # endif
-		break;
-	    case 'Y':		// "-Y" don't connect to Wayland compositor
-# if defined(FEAT_WAYLAND)
+		भङ्ग;
+	    पक्ष 'Y':		// "-Y" don't connect to Wayland compositor
+# सचे defined(FEAT_WAYLAND)
 		wayland_no_connect = TRUE;
 # endif
-		break;
+		भङ्ग;
 
-	    case 'Z':		// "-Z"  restricted mode
+	    पक्ष 'Z':		// "-Z"  restricted mode
 		restricted = TRUE;
-		break;
+		भङ्ग;
 
-	    case 'c':		// "-c{command}" or "-c {command}" execute
+	    पक्ष 'c':		// "-c{command}" or "-c {command}" execute
 				// command
-		if (argv[0][argv_idx] != NUL)
+		सचे (argv[0][argv_idx] != NUL)
 		{
-		    if (parmp->n_commands >= MAX_ARG_CMDS)
-			mainerr(ME_EXTRA_CMD, NULL);
+		    सचे (parmp->n_commands >= MAX_ARG_CMDS)
+			mainerr(ME_EXTRA_CMD, रिक्त);
 		    parmp->commands[parmp->n_commands++] = (char_u *)argv[0]
 								   + argv_idx;
 		    argv_idx = -1;
-		    break;
+		    भङ्ग;
 		}
 		// FALLTHROUGH
-	    case 'S':		// "-S {file}" execute Vim script
-	    case 'i':		// "-i {viminfo}" use for viminfo
+	    पक्ष 'S':		// "-S {file}" execute Vim script
+	    पक्ष 'i':		// "-i {viminfo}" use for viminfo
 # ifndef FEAT_DIFF
-	    case 'd':		// "-d {device}" device (for Amiga)
+	    पक्ष 'd':		// "-d {device}" device (for Amiga)
 # endif
-	    case 'T':		// "-T {terminal}" terminal name
-	    case 'u':		// "-u {vimrc}" vim inits file
-	    case 'U':		// "-U {gvimrc}" gvim inits file
-	    case 'W':		// "-W {scriptout}" overwrite
+	    पक्ष 'T':		// "-T {terminal}" terminal name
+	    पक्ष 'u':		// "-u {vimrc}" vim inits file
+	    पक्ष 'U':		// "-U {gvimrc}" gvim inits file
+	    पक्ष 'W':		// "-W {scriptout}" overwrite
 # ifdef FEAT_GUI_MSWIN
-	    case 'P':		// "-P {parent title}" MDI parent
+	    पक्ष 'P':		// "-P {parent title}" MDI parent
 # endif
 		want_argument = TRUE;
-		break;
+		भङ्ग;
 
-	    default:
+	    स्वभाव:
 		mainerr(ME_UNKNOWN_OPTION, (char_u *)argv[0]);
 	    }
 
 	    /*
 	     * Handle option arguments with argument.
 	     */
-	    if (want_argument)
+	    सचे (want_argument)
 	    {
 		/*
 		 * Check for garbage immediately after the option letter.
 		 */
-		if (argv[0][argv_idx] != NUL)
+		सचे (argv[0][argv_idx] != NUL)
 		    mainerr(ME_GARBAGE, (char_u *)argv[0]);
 
 		--argc;
-		if (argc < 1 && c != 'S')  // -S has an optional argument
+		सचे (argc < 1 && c != 'S')  // -S has an optional argument
 		    mainerr_arg_missing((char_u *)argv[0]);
 		++argv;
 		argv_idx = -1;
 
-		switch (c)
+		विकल्प (c)
 		{
-		case 'c':	// "-c {command}" execute command
-		case 'S':	// "-S {file}" execute Vim script
-		    if (parmp->n_commands >= MAX_ARG_CMDS)
-			mainerr(ME_EXTRA_CMD, NULL);
-		    if (c == 'S')
+		पक्ष 'c':	// "-c {command}" execute command
+		पक्ष 'S':	// "-S {file}" execute Vim script
+		    सचे (parmp->n_commands >= MAX_ARG_CMDS)
+			mainerr(ME_EXTRA_CMD, रिक्त);
+		    सचे (c == 'S')
 		    {
-			char	*a;
+			वर्ण	*a;
 
-			if (argc < 1)
+			सचे (argc < 1)
 			    // "-S" without argument: use default session file
 			    // name.
 			    a = SESSION_FILE;
-			else if (argv[0][0] == '-')
+			अञ्ञथा सचे (argv[0][0] == '-')
 			{
 			    // "-S" followed by another option: use default
 			    // session file name.
@@ -2681,31 +2681,31 @@ command_line_scan(mparm_T *parmp)
 			    ++argc;
 			    --argv;
 			}
-			else
+			अञ्ञथा
 			    a = argv[0];
 			p = alloc(STRLEN(a) + 4);
-			if (p == NULL)
+			सचे (p == रिक्त)
 			    mch_exit(2);
-			sprintf((char *)p, "so %s", a);
+			sprintf((वर्ण *)p, "so %s", a);
 			parmp->cmds_tofree[parmp->n_commands] = TRUE;
 			parmp->commands[parmp->n_commands++] = p;
 		    }
-		    else
+		    अञ्ञथा
 			parmp->commands[parmp->n_commands++] =
 							    (char_u *)argv[0];
-		    break;
+		    भङ्ग;
 
-		case '-':
-		    if (argv[-1][2] == 'c')
+		पक्ष '-':
+		    सचे (argv[-1][2] == 'c')
 		    {
 			// "--cmd {command}" execute command
-			if (parmp->n_pre_commands >= MAX_ARG_CMDS)
-			    mainerr(ME_EXTRA_CMD, NULL);
+			सचे (parmp->n_pre_commands >= MAX_ARG_CMDS)
+			    mainerr(ME_EXTRA_CMD, रिक्त);
 			parmp->pre_commands[parmp->n_pre_commands++] =
 							    (char_u *)argv[0];
 		    }
 		    // --gui-dialog-file fname
-		    if (argv[-1][2] == 'g')
+		    सचे (argv[-1][2] == 'g')
 		    {
 			// without GUI ignore the argument
 # ifdef FEAT_GUI
@@ -2715,24 +2715,24 @@ command_line_scan(mparm_T *parmp)
 
 		    // "--startuptime <file>" already handled
 		    // "--log <file>" already handled
-		    break;
+		    भङ्ग;
 
 	    //	case 'd':   -d {device} is handled in mch_check_win() for the
 	    //		    Amiga
 
 # ifdef FEAT_QUICKFIX
-		case 'q':	// "-q {errorfile}" QuickFix mode
+		पक्ष 'q':	// "-q {errorfile}" QuickFix mode
 		    parmp->use_ef = (char_u *)argv[0];
-		    break;
+		    भङ्ग;
 # endif
 
-		case 'i':	// "-i {viminfo}" use for viminfo
-		    set_option_value_give_err((char_u *)"vif",
+		पक्ष 'i':	// "-i {viminfo}" use for viminfo
+		    set_option_मानम्_give_err((char_u *)"vif",
 						     0L, (char_u *)argv[0], 0);
-		    break;
+		    भङ्ग;
 
-		case 's':	// "-s {scriptin}" read from script file
-		    if (scriptin[0] != NULL)
+		पक्ष 's':	// "-s {scriptin}" read from script file
+		    सचे (scriptin[0] != रिक्त)
 		    {
 scripterror:
 			mch_errmsg(_("Attempt to open script file again: \""));
@@ -2742,74 +2742,74 @@ scripterror:
 			mch_errmsg("\"\n");
 			mch_exit(2);
 		    }
-		    if ((scriptin[0] = mch_fopen(argv[0], READBIN)) == NULL)
+		    सचे ((scriptin[0] = mch_fopen(argv[0], READBIN)) == रिक्त)
 		    {
 			mch_errmsg(_("Cannot open for reading: \""));
 			mch_errmsg(argv[0]);
 			mch_errmsg("\"\n");
 			mch_exit(2);
 		    }
-		    if (save_typebuf() == FAIL)
+		    सचे (save_typebuf() == FAIL)
 			mch_exit(2);	// out of memory
-		    break;
+		    भङ्ग;
 
-		case 't':	// "-t {tag}"
+		पक्ष 't':	// "-t {tag}"
 		    parmp->tagname = (char_u *)argv[0];
-		    break;
+		    भङ्ग;
 
-		case 'T':	// "-T {terminal}" terminal name
+		पक्ष 'T':	// "-T {terminal}" terminal name
 		    /*
 		     * The -T term argument is always available and when
 		     * HAVE_TERMLIB is supported it overrides the environment
 		     * variable TERM.
 		     */
 # ifdef FEAT_GUI
-		    if (term_is_gui((char_u *)argv[0]))
+		    सचे (term_is_gui((char_u *)argv[0]))
 			gui.starting = true;	// start GUI a bit later
-		    else
+		    अञ्ञथा
 # endif
 			parmp->term = (char_u *)argv[0];
-		    break;
+		    भङ्ग;
 
-		case 'u':	// "-u {vimrc}" vim inits file
+		पक्ष 'u':	// "-u {vimrc}" vim inits file
 		    parmp->use_vimrc = (char_u *)argv[0];
-		    break;
+		    भङ्ग;
 
-		case 'U':	// "-U {gvimrc}" gvim inits file
+		पक्ष 'U':	// "-U {gvimrc}" gvim inits file
 # ifdef FEAT_GUI
 		    use_gvimrc = (char_u *)argv[0];
 # endif
-		    break;
+		    भङ्ग;
 
-		case 'w':	// "-w {nr}" 'window' value
+		पक्ष 'w':	// "-w {nr}" 'window' value
 				// "-w {scriptout}" append to script file
-		    if (vim_isdigit(*((char_u *)argv[0])))
+		    सचे (vim_isdigit(*((char_u *)argv[0])))
 		    {
 			argv_idx = 0;
-			n = get_number_arg((char_u *)argv[0], &argv_idx, 10);
-			set_option_value_give_err((char_u *)"window",
-								   n, NULL, 0);
+			n = get_सङ्ख्या_arg((char_u *)argv[0], &argv_idx, 10);
+			set_option_मानम्_give_err((char_u *)"window",
+								   n, रिक्त, 0);
 			argv_idx = -1;
-			break;
+			भङ्ग;
 		    }
 		    // FALLTHROUGH
-		case 'W':	// "-W {scriptout}" overwrite script file
-		    if (scriptout != NULL)
-			goto scripterror;
-		    if ((scriptout = mch_fopen(argv[0],
-				    c == 'w' ? APPENDBIN : WRITEBIN)) == NULL)
+		पक्ष 'W':	// "-W {scriptout}" overwrite script file
+		    सचे (scriptout != रिक्त)
+			गच्छ scripterror;
+		    सचे ((scriptout = mch_fopen(argv[0],
+				    c == 'w' ? APPENDBIN : WRITEBIN)) == रिक्त)
 		    {
 			mch_errmsg(_("Cannot open for script output: \""));
 			mch_errmsg(argv[0]);
 			mch_errmsg("\"\n");
 			mch_exit(2);
 		    }
-		    break;
+		    भङ्ग;
 
 # ifdef FEAT_GUI_MSWIN
-		case 'P':		// "-P {parent title}" MDI parent
+		पक्ष 'P':		// "-P {parent title}" MDI parent
 		    gui_mch_set_parent(argv[0]);
-		    break;
+		    भङ्ग;
 # endif
 		}
 	    }
@@ -2818,28 +2818,28 @@ scripterror:
 	/*
 	 * File name argument.
 	 */
-	else
+	अञ्ञथा
 	{
 	    argv_idx = -1;	    // skip to next argument
 
 	    // Check for only one type of editing.
-	    if (parmp->edit_type != EDIT_NONE && parmp->edit_type != EDIT_FILE)
+	    सचे (parmp->edit_type != EDIT_NONE && parmp->edit_type != EDIT_FILE)
 		mainerr(ME_TOO_MANY_ARGS, (char_u *)argv[0]);
 	    parmp->edit_type = EDIT_FILE;
 
 # ifdef MSWIN
 	    // Remember if the argument was a full path before changing
 	    // slashes to backslashes.
-	    if (argv[0][0] != NUL && argv[0][1] == ':' && argv[0][2] == '\\')
+	    सचे (argv[0][0] != NUL && argv[0][1] == ':' && argv[0][2] == '\\')
 		parmp->full_path = TRUE;
 # endif
 
 	    // Add the file to the global argument list.
-	    if (ga_grow(&global_alist.al_ga, 1) == FAIL
-		    || (p = vim_strsave((char_u *)argv[0])) == NULL)
+	    सचे (ga_grow(&global_alist.al_ga, 1) == FAIL
+		    || (p = vim_strsave((char_u *)argv[0])) == रिक्त)
 		mch_exit(2);
 # ifdef FEAT_DIFF
-	    if (parmp->diff_mode && mch_isdir(p) && GARGCOUNT > 0
+	    सचे (parmp->diff_mode && mch_isdir(p) && GARGCOUNT > 0
 				      && !mch_isdir(alist_name(&GARGLIST[0])))
 	    {
 		char_u	    *tail;
@@ -2847,7 +2847,7 @@ scripterror:
 
 		tail = gettail(alist_name(&GARGLIST[0]));
 		concat_fnames(p, STRLEN(p), tail, STRLEN(tail), TRUE, &ret);
-		if (ret.string != NULL)
+		सचे (ret.string != रिक्त)
 		{
 		    vim_free(p);
 		    p = ret.string;
@@ -2861,18 +2861,18 @@ scripterror:
 	     * Look for evidence of non-Cygwin paths before we bother.
 	     * This is only for when using the Unix files.
 	     */
-	    if (vim_strpbrk(p, "\\:") != NULL && !path_with_url(p))
+	    सचे (vim_strpbrk(p, "\\:") != रिक्त && !path_with_url(p))
 	    {
-		char posix_path[MAXPATHL];
+		वर्ण posix_path[MAXPATHL];
 
-#  if CYGWIN_VERSION_DLL_MAJOR >= 1007
+#  सचे CYGWIN_VERSION_DLL_MAJOR >= 1007
 		cygwin_conv_path(CCP_WIN_A_TO_POSIX, p, posix_path, MAXPATHL);
-#  else
+#  अञ्ञथा
 		cygwin_conv_to_posix_path(p, posix_path);
 #  endif
 		vim_free(p);
 		p = vim_strsave((char_u *)posix_path);
-		if (p == NULL)
+		सचे (p == रिक्त)
 		    mch_exit(2);
 	    }
 # endif
@@ -2885,7 +2885,7 @@ scripterror:
 	    alist_add(&global_alist, p,
 # ifdef EXPAND_FILENAMES
 		    parmp->literal ? 2 : 0	// add buffer nr after exp.
-# else
+# अञ्ञथा
 		    2		// add buffer number now and use curbuf
 # endif
 		    );
@@ -2897,7 +2897,7 @@ scripterror:
 		used_file_arg(argv[0], parmp->literal, parmp->full_path,
 #  ifdef FEAT_DIFF
 							    parmp->diff_mode
-#  else
+#  अञ्ञथा
 							    FALSE
 #  endif
 							    );
@@ -2910,7 +2910,7 @@ scripterror:
 	 * argument.  argv_idx is set to -1 when the current argument is to be
 	 * skipped.
 	 */
-	if (argv_idx <= 0 || argv[0][argv_idx] == NUL)
+	सचे (argv_idx <= 0 || argv[0][argv_idx] == NUL)
 	{
 	    --argc;
 	    ++argv;
@@ -2921,16 +2921,16 @@ scripterror:
 # ifdef FEAT_EVAL
     // If there is a "+123" or "-c" command, set v:swapcommand to the first
     // one.
-    if (parmp->n_commands > 0)
+    सचे (parmp->n_commands > 0)
     {
 	size_t  plen;
 
 	plen = STRLEN(parmp->commands[0]) + 2;
 	p = alloc(plen + 1);
-	if (p != NULL)
+	सचे (p != रिक्त)
 	{
-	    sprintf((char *)p, ":%s\r", parmp->commands[0]);
-	    set_vim_var_string(VV_SWAPCOMMAND, p, (int)plen);
+	    sprintf((वर्ण *)p, ":%s\r", parmp->commands[0]);
+	    set_vim_var_string(VV_SWAPCOMMAND, p, (पूर्णाङ्क)plen);
 	    vim_free(p);
 	}
     }
@@ -2941,18 +2941,18 @@ scripterror:
  * Print a warning if stdout is not a terminal.
  * When starting in Ex mode and commands come from a file, set silent_mode.
  */
-    static void
+    स्थिर शून्य
 check_tty(mparm_T *parmp)
 {
-    int		input_isatty;		// is active input a terminal?
+    पूर्णाङ्क		निवेशः_isatty;		// is active input a terminal?
 
-    input_isatty = mch_input_isatty();
-    if (exmode_active)
+    निवेशः_isatty = mch_निवेशः_isatty();
+    सचे (exmode_active)
     {
-	if (!input_isatty)
+	सचे (!निवेशः_isatty)
 	    silent_mode = TRUE;
     }
-    else if (parmp->want_full_screen && (!stdout_isatty || !input_isatty)
+    अञ्ञथा सचे (parmp->want_full_screen && (!stdout_isatty || !निवेशः_isatty)
 # ifdef FEAT_GUI
 	    // don't want the delay when started from the desktop
 	    && !gui.starting
@@ -2967,76 +2967,76 @@ check_tty(mparm_T *parmp)
 	 * input buffer so fast I can't even kill the process in under 2
 	 * minutes (and it beeps continuously the whole time :-)
 	 */
-	if (netbeans_active() && (!stdout_isatty || !input_isatty))
+	सचे (netbeans_active() && (!stdout_isatty || !निवेशः_isatty))
 	{
 	    mch_errmsg(_("Vim: Error: Failure to start gvim from NetBeans\n"));
 	    exit(1);
 	}
 # endif
-# if defined(MSWIN) && (!defined(FEAT_GUI_MSWIN) || defined(VIMDLL))
-	if (
+# सचे defined(MSWIN) && (!defined(FEAT_GUI_MSWIN) || defined(VIMDLL))
+	सचे (
 #  ifdef VIMDLL
 	    !gui.starting &&
 #  endif
 	    is_cygpty_used())
 	{
-#  if defined(HAVE_BIND_TEXTDOMAIN_CODESET) \
+#  सचे defined(HAVE_BIND_TEXTDOMAIN_CODESET) \
 	&& defined(FEAT_GETTEXT)
-	    char    *s, *tofree = NULL;
+	    वर्ण    *s, *tofree = रिक्त;
 
 	    // Set the encoding of the error message based on $LC_ALL or
 	    // other environment variables instead of 'encoding'.
 	    // Note that the message is shown on a Cygwin terminal (e.g.
 	    // mintty) which encoding is based on $LC_ALL or etc., not the
 	    // current codepage used by normal Win32 console programs.
-	    tofree = s = (char *)enc_locale_env(NULL);
-	    if (s == NULL)
+	    tofree = s = (वर्ण *)enc_locale_env(रिक्त);
+	    सचे (s == रिक्त)
 		s = "utf-8";	// Use "utf-8" by default.
-	    (void)bind_textdomain_codeset(VIMPACKAGE, s);
+	    (शून्य)bind_textdomain_codeset(VIMPACKAGE, s);
 	    vim_free(tofree);
 #  endif
 	    mch_errmsg(_("Vim: Error: This version of Vim does not run in a Cygwin terminal\n"));
 	    exit(1);
 	}
 # endif
-	if (!stdout_isatty)
+	सचे (!stdout_isatty)
 	    mch_errmsg(_("Vim: Warning: Output is not to a terminal\n"));
-	if (!input_isatty)
+	सचे (!निवेशः_isatty)
 	    mch_errmsg(_("Vim: Warning: Input is not from a terminal\n"));
 	out_flush();
-	if (parmp->tty_fail && (!stdout_isatty || !input_isatty))
+	सचे (parmp->tty_fail && (!stdout_isatty || !निवेशः_isatty))
 	    exit(1);
-	if (scriptin[0] == NULL)
+	सचे (scriptin[0] == रिक्त)
 	    ui_delay(2005L, TRUE);
-	TIME_MSG("Warning delay");
+	TIME_सन्देशः("Warning delay");
     }
 }
 
 /*
  * Read text from stdin.
  */
-    static void
-read_stdin(void)
+    स्थिर शून्य
+read_stdin(शून्य)
 {
-    int	    i;
+    पूर्णाङ्क	    i;
 
     // When getting the ATTENTION prompt here, use a dialog
     swap_exists_action = SEA_DIALOG;
 
     no_wait_return = TRUE;
-    i = msg_didany;
+    i = सन्देशः_didany;
     set_buflisted(TRUE);
 
     // Create memfile and read from stdin.
-    (void)open_buffer(TRUE, NULL, 0);
+    (शून्य)open_buffer(TRUE, रिक्त, 0);
 
     no_wait_return = FALSE;
-    msg_didany = i;
-    TIME_MSG("reading stdin");
+    सन्देशः_didany = i;
+    TIME_सन्देशः("reading stdin");
 
     check_swap_exists_action();
 
-# if !(defined(AMIGA) || defined(MACOS_X))
+# सचे !(defined(AMIGA) || defined(MACOS_X))
     // Dup stdin from stderr to read commands from, so that shell commands
     // work.
     // TODO: why is this needed, even though readfile() has done this?
@@ -3049,51 +3049,51 @@ read_stdin(void)
  * Create the requested number of windows and edit buffers in them.
  * Also does recovery if "recoverymode" set.
  */
-    static void
+    स्थिर शून्य
 create_windows(mparm_T *parmp UNUSED)
 {
-    int		dorewind;
-    int		done = 0;
+    पूर्णाङ्क		dorewind;
+    पूर्णाङ्क		done = 0;
 
     /*
      * Create the number of windows that was requested.
      */
-    if (parmp->window_count == -1)	// was not set
-	parmp->window_count = 1;
-    if (parmp->window_count == 0)
-	parmp->window_count = GARGCOUNT;
-    if (parmp->window_count > 1)
+    सचे (parmp->window_गणनम् == -1)	// was not set
+	parmp->window_गणनम् = 1;
+    सचे (parmp->window_गणनम् == 0)
+	parmp->window_गणनम् = GARGCOUNT;
+    सचे (parmp->window_गणनम् > 1)
     {
 	// Don't change the windows if there was a command in .vimrc that
 	// already split some windows
-	if (parmp->window_layout == 0)
+	सचे (parmp->window_layout == 0)
 	    parmp->window_layout = WIN_HOR;
-	if (parmp->window_layout == WIN_TABS)
+	सचे (parmp->window_layout == WIN_TABS)
 	{
-	    parmp->window_count = make_tabpages(parmp->window_count);
-	    TIME_MSG("making tab pages");
+	    parmp->window_गणनम् = make_tabpages(parmp->window_गणनम्);
+	    TIME_सन्देशः("making tab pages");
 	}
-	else if (firstwin->w_next == NULL)
+	अञ्ञथा सचे (firstwin->w_next == रिक्त)
 	{
-	    parmp->window_count = make_windows(parmp->window_count,
+	    parmp->window_गणनम् = make_windows(parmp->window_गणनम्,
 					     parmp->window_layout == WIN_VER);
-	    TIME_MSG("making windows");
+	    TIME_सन्देशः("making windows");
 	}
-	else
-	    parmp->window_count = win_count();
+	अञ्ञथा
+	    parmp->window_गणनम् = win_गणनम्();
     }
-    else
-	parmp->window_count = 1;
+    अञ्ञथा
+	parmp->window_गणनम् = 1;
 
-    if (recoverymode)			// do recover
+    सचे (recoverymode)			// do recover
     {
-	msg_scroll = TRUE;		// scroll message up
+	सन्देशः_scroll = TRUE;		// scroll message up
 	ml_recover(TRUE);
-	if (curbuf->b_ml.ml_mfp == NULL) // failed
+	सचे (curbuf->b_ml.ml_mfp == रिक्त) // failed
 	    getout(1);
 	do_modelines(0);		// do modelines
     }
-    else
+    अञ्ञथा
     {
 	/*
 	 * Open a buffer for windows that don't have one yet.
@@ -3106,34 +3106,34 @@ create_windows(mparm_T *parmp UNUSED)
 	++autocmd_no_enter;
 	++autocmd_no_leave;
 	dorewind = TRUE;
-	while (done++ < 1000)
+	याव (done++ < 1000)
 	{
-	    if (dorewind)
+	    सचे (dorewind)
 	    {
-		if (parmp->window_layout == WIN_TABS)
+		सचे (parmp->window_layout == WIN_TABS)
 		    goto_tabpage(1);
-		else
+		अञ्ञथा
 		    curwin = firstwin;
 	    }
-	    else if (parmp->window_layout == WIN_TABS)
+	    अञ्ञथा सचे (parmp->window_layout == WIN_TABS)
 	    {
-		if (curtab->tp_next == NULL)
-		    break;
+		सचे (curtab->tp_next == रिक्त)
+		    भङ्ग;
 		goto_tabpage(0);
 	    }
-	    else
+	    अञ्ञथा
 	    {
-		if (curwin->w_next == NULL)
-		    break;
+		सचे (curwin->w_next == रिक्त)
+		    भङ्ग;
 		curwin = curwin->w_next;
 	    }
 	    dorewind = FALSE;
 	    curbuf = curwin->w_buffer;
-	    if (curbuf->b_ml.ml_mfp == NULL)
+	    सचे (curbuf->b_ml.ml_mfp == रिक्त)
 	    {
 # ifdef FEAT_FOLDING
 		// Set 'foldlevel' to 'foldlevelstart' if it's not negative.
-		if (p_fdls >= 0)
+		सचे (p_fdls >= 0)
 		    curwin->w_p_fdl = p_fdls;
 # endif
 		// When getting the ATTENTION prompt here, use a dialog
@@ -3142,11 +3142,11 @@ create_windows(mparm_T *parmp UNUSED)
 		set_buflisted(TRUE);
 
 		// create memfile, read file
-		(void)open_buffer(FALSE, NULL, 0);
+		(शून्य)open_buffer(FALSE, रिक्त, 0);
 
-		if (swap_exists_action == SEA_QUIT)
+		सचे (swap_exists_action == SEA_QUIT)
 		{
-		    if (got_int || only_one_window())
+		    सचे (got_int || only_one_window())
 		    {
 			// abort selected or quit and only one window
 			did_emsg = FALSE;   // avoid hit-enter prompt
@@ -3155,24 +3155,24 @@ create_windows(mparm_T *parmp UNUSED)
 		    // We can't close the window, it would disturb what
 		    // happens next.  Clear the file name and set the arg
 		    // index to -1 to delete it later.
-		    setfname(curbuf, NULL, NULL, FALSE);
+		    setfname(curbuf, रिक्त, रिक्त, FALSE);
 		    curwin->w_arg_idx = -1;
 		    swap_exists_action = SEA_NONE;
 		}
-		else
-		    handle_swap_exists(NULL);
+		अञ्ञथा
+		    handle_swap_exists(रिक्त);
 		dorewind = TRUE;		// start again
 	    }
 	    ui_breakcheck();
-	    if (got_int)
+	    सचे (got_int)
 	    {
-		(void)vgetc();	// only break the file loading, not the rest
-		break;
+		(शून्य)vgetc();	// only break the file loading, not the rest
+		भङ्ग;
 	    }
 	}
-	if (parmp->window_layout == WIN_TABS)
+	सचे (parmp->window_layout == WIN_TABS)
 	    goto_tabpage(1);
-	else
+	अञ्ञथा
 	    curwin = firstwin;
 	curbuf = curwin->w_buffer;
 	--autocmd_no_enter;
@@ -3184,16 +3184,16 @@ create_windows(mparm_T *parmp UNUSED)
  * If opened more than one window, start editing files in the other
  * windows.  make_windows() has already opened the windows.
  */
-    static void
+    स्थिर शून्य
 edit_buffers(
     mparm_T	*parmp,
     char_u	*cwd)			// current working dir
 {
-    int		arg_idx;		// index in argument list
-    int		i;
-    int		advance = TRUE;
+    पूर्णाङ्क		arg_idx;		// index in argument list
+    पूर्णाङ्क		i;
+    पूर्णाङ्क		advance = TRUE;
     win_T	*win;
-    char_u	*p_shm_save = NULL;
+    char_u	*p_shm_save = रिक्त;
 
     /*
      * Don't execute Win/Buf Enter/Leave autocommands here
@@ -3202,50 +3202,50 @@ edit_buffers(
     ++autocmd_no_leave;
 
     // When w_arg_idx is -1 remove the window (see create_windows()).
-    if (curwin->w_arg_idx == -1)
+    सचे (curwin->w_arg_idx == -1)
     {
 	win_close(curwin, TRUE);
 	advance = FALSE;
     }
 
     arg_idx = 1;
-    for (i = 1; i < parmp->window_count; ++i)
+    अत्थाय (i = 1; i < parmp->window_गणनम्; ++i)
     {
-	if (cwd != NULL)
-	    mch_chdir((char *)cwd);
+	सचे (cwd != रिक्त)
+	    mch_chdir((वर्ण *)cwd);
 	// When w_arg_idx is -1 remove the window (see create_windows()).
-	if (curwin->w_arg_idx == -1)
+	सचे (curwin->w_arg_idx == -1)
 	{
 	    ++arg_idx;
 	    win_close(curwin, TRUE);
 	    advance = FALSE;
-	    continue;
+	    अनुवर्त;
 	}
 
-	if (advance)
+	सचे (advance)
 	{
-	    if (parmp->window_layout == WIN_TABS)
+	    सचे (parmp->window_layout == WIN_TABS)
 	    {
-		if (curtab->tp_next == NULL)	// just checking
-		    break;
+		सचे (curtab->tp_next == रिक्त)	// just checking
+		    भङ्ग;
 		goto_tabpage(0);
 		// Temporarily reset 'shm' option to not print fileinfo when
 		// loading the other buffers. This would overwrite the already
 		// existing fileinfo for the first tab.
-		if (i == 1)
+		सचे (i == 1)
 		{
-		    char buf[100];
+		    वर्ण buf[100];
 
 		    p_shm_save = vim_strsave(p_shm);
 		    vim_snprintf(buf, 100, "F%s", p_shm);
-		    set_option_value_give_err((char_u *)"shm",
+		    set_option_मानम्_give_err((char_u *)"shm",
 							 0L, (char_u *)buf, 0);
 		}
 	    }
-	    else
+	    अञ्ञथा
 	    {
-		if (curwin->w_next == NULL)	// just checking
-		    break;
+		सचे (curwin->w_next == रिक्त)	// just checking
+		    भङ्ग;
 		win_enter(curwin->w_next, FALSE);
 	    }
 	}
@@ -3253,19 +3253,19 @@ edit_buffers(
 
 	// Only open the file if there is no file in this window yet (that can
 	// happen when .vimrc contains ":sall").
-	if (curbuf == firstwin->w_buffer || curbuf->b_ffname == NULL)
+	सचे (curbuf == firstwin->w_buffer || curbuf->b_ffname == रिक्त)
 	{
 	    curwin->w_arg_idx = arg_idx;
 	    // Edit file from arg list, if there is one.  When "Quit" selected
 	    // at the ATTENTION prompt close the window.
 	    swap_exists_did_quit = FALSE;
-	    (void)do_ecmd(0, arg_idx < GARGCOUNT
-			  ? alist_name(&GARGLIST[arg_idx]) : NULL,
-			  NULL, NULL, ECMD_LASTL, ECMD_HIDE, curwin);
-	    if (swap_exists_did_quit)
+	    (शून्य)do_ecmd(0, arg_idx < GARGCOUNT
+			  ? alist_name(&GARGLIST[arg_idx]) : रिक्त,
+			  रिक्त, रिक्त, ECMD_LASTL, ECMD_HIDE, curwin);
+	    सचे (swap_exists_did_quit)
 	    {
 		// abort or quit selected
-		if (got_int || only_one_window())
+		सचे (got_int || only_one_window())
 		{
 		    // abort selected and only one window
 		    did_emsg = FALSE;   // avoid hit-enter prompt
@@ -3274,87 +3274,87 @@ edit_buffers(
 		win_close(curwin, TRUE);
 		advance = FALSE;
 	    }
-	    if (arg_idx == GARGCOUNT - 1)
+	    सचे (arg_idx == GARGCOUNT - 1)
 		arg_had_last = TRUE;
 	    ++arg_idx;
 	}
 	ui_breakcheck();
-	if (got_int)
+	सचे (got_int)
 	{
-	    (void)vgetc();	// only break the file loading, not the rest
-	    break;
+	    (शून्य)vgetc();	// only break the file loading, not the rest
+	    भङ्ग;
 	}
     }
 
-    if (p_shm_save != NULL)
+    सचे (p_shm_save != रिक्त)
     {
-	set_option_value_give_err((char_u *)"shm", 0L, p_shm_save, 0);
+	set_option_मानम्_give_err((char_u *)"shm", 0L, p_shm_save, 0);
 	vim_free(p_shm_save);
     }
 
-    if (parmp->window_layout == WIN_TABS)
+    सचे (parmp->window_layout == WIN_TABS)
 	goto_tabpage(1);
     --autocmd_no_enter;
 
     // make the first window the current window
     win = firstwin;
-# if defined(FEAT_QUICKFIX)
+# सचे defined(FEAT_QUICKFIX)
     // Avoid making a preview window the current window.
-    while (win->w_p_pvw)
+    याव (win->w_p_pvw)
     {
 	win = win->w_next;
-	if (win == NULL)
+	सचे (win == रिक्त)
 	{
 	    win = firstwin;
-	    break;
+	    भङ्ग;
 	}
     }
 # endif
     win_enter(win, FALSE);
 
     --autocmd_no_leave;
-    TIME_MSG("editing files in windows");
-    if (parmp->window_count > 1 && parmp->window_layout != WIN_TABS)
+    TIME_सन्देशः("editing files in windows");
+    सचे (parmp->window_गणनम् > 1 && parmp->window_layout != WIN_TABS)
 	win_equal(curwin, FALSE, 'b');	// adjust heights
 }
 
 /*
  * Execute the commands from --cmd arguments "cmds[cnt]".
  */
-    static void
+    स्थिर शून्य
 exe_pre_commands(mparm_T *parmp)
 {
     char_u	**cmds = parmp->pre_commands;
-    int		cnt = parmp->n_pre_commands;
-    int		i;
+    पूर्णाङ्क		cnt = parmp->n_pre_commands;
+    पूर्णाङ्क		i;
     ESTACK_CHECK_DECLARATION;
 
-    if (cnt <= 0)
-	return;
+    सचे (cnt <= 0)
+	पटिनिवत्त;
 
     curwin->w_cursor.lnum = 0; // just in case..
-    estack_push(ETYPE_ARGS, (char_u *)_("pre-vimrc command line"), 0);
+    estack_प्रक्षिप(ETYPE_ARGS, (char_u *)_("pre-vimrc command line"), 0);
     ESTACK_CHECK_SETUP;
 # ifdef FEAT_EVAL
     current_sctx.sc_sid = SID_CMDARG;
 # endif
-    for (i = 0; i < cnt; ++i)
+    अत्थाय (i = 0; i < cnt; ++i)
 	do_cmdline_cmd(cmds[i]);
     ESTACK_CHECK_NOW;
-    estack_pop();
+    estack_निष्कासय();
 # ifdef FEAT_EVAL
     current_sctx.sc_sid = 0;
 # endif
-    TIME_MSG("--cmd commands");
+    TIME_सन्देशः("--cmd commands");
 }
 
 /*
  * Execute "+", "-c" and "-S" arguments.
  */
-    static void
+    स्थिर शून्य
 exe_commands(mparm_T *parmp)
 {
-    int		i;
+    पूर्णाङ्क		i;
     ESTACK_CHECK_DECLARATION;
 
     /*
@@ -3362,88 +3362,88 @@ exe_commands(mparm_T *parmp)
      * pattern on line 1.  But don't move the cursor when an autocommand
      * with g`" was used.
      */
-    msg_scroll = TRUE;
-    if (parmp->tagname == NULL && curwin->w_cursor.lnum <= 1)
+    सन्देशः_scroll = TRUE;
+    सचे (parmp->tagname == रिक्त && curwin->w_cursor.lnum <= 1)
 	curwin->w_cursor.lnum = 0;
-    estack_push(ETYPE_ARGS, (char_u *)"command line", 0);
+    estack_प्रक्षिप(ETYPE_ARGS, (char_u *)"command line", 0);
     ESTACK_CHECK_SETUP;
 # ifdef FEAT_EVAL
     current_sctx.sc_sid = SID_CARG;
     current_sctx.sc_seq = 0;
 # endif
-    for (i = 0; i < parmp->n_commands; ++i)
+    अत्थाय (i = 0; i < parmp->n_commands; ++i)
     {
 	do_cmdline_cmd(parmp->commands[i]);
-	if (parmp->cmds_tofree[i])
+	सचे (parmp->cmds_tofree[i])
 	    vim_free(parmp->commands[i]);
     }
     ESTACK_CHECK_NOW;
-    estack_pop();
+    estack_निष्कासय();
 # ifdef FEAT_EVAL
     current_sctx.sc_sid = 0;
 # endif
-    if (curwin->w_cursor.lnum == 0)
+    सचे (curwin->w_cursor.lnum == 0)
 	curwin->w_cursor.lnum = 1;
 
-    if (!exmode_active)
-	msg_scroll = FALSE;
+    सचे (!exmode_active)
+	सन्देशः_scroll = FALSE;
 
 # ifdef FEAT_QUICKFIX
     // When started with "-q errorfile" jump to first error again.
-    if (parmp->edit_type == EDIT_QF)
-	qf_jump(NULL, 0, 0, FALSE);
+    सचे (parmp->edit_type == EDIT_QF)
+	qf_jump(रिक्त, 0, 0, FALSE);
 # endif
-    TIME_MSG("executing command arguments");
+    TIME_सन्देशः("executing command arguments");
 }
 
 /*
  * Source startup scripts.
  */
-    static void
+    स्थिर शून्य
 source_startup_scripts(mparm_T *parmp)
 {
-    int		i;
+    पूर्णाङ्क		i;
 
     /*
      * For "evim" source evim.vim first of all, so that the user can overrule
      * any things he doesn't like.
      */
-    if (parmp->evim_mode)
+    सचे (parmp->evim_mode)
     {
-	(void)do_source((char_u *)EVIM_FILE, FALSE, DOSO_NONE, NULL);
-	TIME_MSG("source evim file");
+	(शून्य)do_source((char_u *)EVIM_FILE, FALSE, DOSO_NONE, रिक्त);
+	TIME_सन्देशः("source evim file");
     }
 
     /*
      * If -u argument given, use only the initializations from that file and
      * nothing else.
      */
-    if (parmp->use_vimrc != NULL)
+    सचे (parmp->use_vimrc != रिक्त)
     {
-	if (STRCMP(parmp->use_vimrc, "DEFAULTS") == 0)
+	सचे (STRCMP(parmp->use_vimrc, "DEFAULTS") == 0)
 	{
-	    if (do_source((char_u *)VIM_DEFAULTS_FILE, FALSE, DOSO_NONE, NULL)
+	    सचे (do_source((char_u *)VIM_DEFAULTS_FILE, FALSE, DOSO_NONE, रिक्त)
 									 != OK)
 		emsg(_(e_failed_to_source_defaults));
 	}
-	else if (STRCMP(parmp->use_vimrc, "NONE") == 0
+	अञ्ञथा सचे (STRCMP(parmp->use_vimrc, "NONE") == 0
 				     || STRCMP(parmp->use_vimrc, "NORC") == 0)
 	{
 # ifdef FEAT_GUI
-	    if (use_gvimrc == NULL)	    // don't load gvimrc either
+	    सचे (use_gvimrc == रिक्त)	    // don't load gvimrc either
 		use_gvimrc = parmp->use_vimrc;
 # endif
 	}
-	else
+	अञ्ञथा
 	{
-	    if (do_source(parmp->use_vimrc, FALSE, DOSO_NONE, NULL) != OK)
+	    सचे (do_source(parmp->use_vimrc, FALSE, DOSO_NONE, रिक्त) != OK)
 		semsg(_(e_cannot_read_from_str_2), parmp->use_vimrc);
 	}
     }
-    else if (!silent_mode)
+    अञ्ञथा सचे (!silent_mode)
     {
 # ifdef AMIGA
-	struct Process	*proc = (struct Process *)FindTask(0L);
+	संरचना Process	*proc = (संरचना Process *)FindTask(0L);
 	APTR		save_winptr = proc->pr_WindowPtr;
 
 	// Avoid a requester here for a volume that doesn't exist.
@@ -3454,11 +3454,11 @@ source_startup_scripts(mparm_T *parmp)
 	 * Get system wide defaults, if the file name is defined.
 	 */
 # ifdef SYS_VIMRC_FILE
-	(void)do_source((char_u *)SYS_VIMRC_FILE, FALSE, DOSO_NONE, NULL);
+	(शून्य)do_source((char_u *)SYS_VIMRC_FILE, FALSE, DOSO_NONE, रिक्त);
 # endif
 # ifdef MACOS_X
-	(void)do_source((char_u *)"$VIMRUNTIME/macmap.vim", FALSE,
-							      DOSO_NONE, NULL);
+	(शून्य)do_source((char_u *)"$VIMRUNTIME/macmap.vim", FALSE,
+							      DOSO_NONE, रिक्त);
 # endif
 
 	/*
@@ -3471,38 +3471,38 @@ source_startup_scripts(mparm_T *parmp)
 	 * - second user exrc file ($VIM/.exrc for Dos)
 	 * The first that exists is used, the rest is ignored.
 	 */
-	if (process_env((char_u *)"VIMINIT", TRUE) != OK)
+	सचे (process_env((char_u *)"VIMINIT", TRUE) != OK)
 	{
-	    if (do_source((char_u *)USR_VIMRC_FILE, TRUE,
-						      DOSO_VIMRC, NULL) == FAIL
+	    सचे (do_source((char_u *)USR_VIMRC_FILE, TRUE,
+						      DOSO_VIMRC, रिक्त) == FAIL
 # ifdef USR_VIMRC_FILE2
 		&& do_source((char_u *)USR_VIMRC_FILE2, TRUE,
-						      DOSO_VIMRC, NULL) == FAIL
+						      DOSO_VIMRC, रिक्त) == FAIL
 # endif
 # ifdef XDG_VIMRC_FILE
 		&& do_source((char_u *)XDG_VIMRC_FILE, TRUE,
-						      DOSO_VIMRC, NULL) == FAIL
+						      DOSO_VIMRC, रिक्त) == FAIL
 # endif
 # ifdef USR_VIMRC_FILE3
 		&& do_source((char_u *)USR_VIMRC_FILE3, TRUE,
-						      DOSO_VIMRC, NULL) == FAIL
+						      DOSO_VIMRC, रिक्त) == FAIL
 # endif
 # ifdef USR_VIMRC_FILE4
 		&& do_source((char_u *)USR_VIMRC_FILE4, TRUE,
-						      DOSO_VIMRC, NULL) == FAIL
+						      DOSO_VIMRC, रिक्त) == FAIL
 # endif
 		&& process_env((char_u *)"EXINIT", FALSE) == FAIL
 		&& do_source((char_u *)USR_EXRC_FILE, FALSE,
-						       DOSO_NONE, NULL) == FAIL
+						       DOSO_NONE, रिक्त) == FAIL
 # ifdef USR_EXRC_FILE2
 		&& do_source((char_u *)USR_EXRC_FILE2, FALSE,
-						       DOSO_NONE, NULL) == FAIL
+						       DOSO_NONE, रिक्त) == FAIL
 # endif
 		&& !has_dash_c_arg)
 	    {
 		// When no .vimrc file was found: source defaults.vim.
-		if (do_source((char_u *)VIM_DEFAULTS_FILE, FALSE, DOSO_NONE,
-								 NULL) == FAIL)
+		सचे (do_source((char_u *)VIM_DEFAULTS_FILE, FALSE, DOSO_NONE,
+								 रिक्त) == FAIL)
 		    emsg(_(e_failed_to_source_defaults));
 	    }
 	}
@@ -3516,16 +3516,16 @@ source_startup_scripts(mparm_T *parmp)
 	 * Only do this if VIMRC_FILE is not the same as USR_VIMRC_FILE or
 	 * SYS_VIMRC_FILE.
 	 */
-	if (p_exrc)
+	सचे (p_exrc)
 	{
-# if defined(UNIX) || defined(VMS)
+# सचे defined(UNIX) || defined(VMS)
 	    // If ".vimrc" file is not owned by user, set 'secure' mode.
-	    if (!file_owned(VIMRC_FILE))
+	    सचे (!file_owned(VIMRC_FILE))
 # endif
 		secure = p_secure;
 
 	    i = FAIL;
-	    if (fullpathcmp((char_u *)USR_VIMRC_FILE,
+	    सचे (fullpathcmp((char_u *)USR_VIMRC_FILE,
 				(char_u *)VIMRC_FILE, FALSE, TRUE) != FPC_SAME
 # ifdef USR_VIMRC_FILE2
 		    && fullpathcmp((char_u *)USR_VIMRC_FILE2,
@@ -3540,47 +3540,47 @@ source_startup_scripts(mparm_T *parmp)
 				(char_u *)VIMRC_FILE, FALSE, TRUE) != FPC_SAME
 # endif
 				)
-		i = do_source((char_u *)VIMRC_FILE, TRUE, DOSO_VIMRC, NULL);
+		i = do_source((char_u *)VIMRC_FILE, TRUE, DOSO_VIMRC, रिक्त);
 
-	    if (i == FAIL)
+	    सचे (i == FAIL)
 	    {
-# if defined(UNIX) || defined(VMS)
+# सचे defined(UNIX) || defined(VMS)
 		// if ".exrc" is not owned by user set 'secure' mode
-		if (!file_owned(EXRC_FILE))
+		सचे (!file_owned(EXRC_FILE))
 		    secure = p_secure;
-		else
+		अञ्ञथा
 		    secure = 0;
 # endif
-		if (	   fullpathcmp((char_u *)USR_EXRC_FILE,
+		सचे (	   fullpathcmp((char_u *)USR_EXRC_FILE,
 				(char_u *)EXRC_FILE, FALSE, TRUE) != FPC_SAME
 # ifdef USR_EXRC_FILE2
 			&& fullpathcmp((char_u *)USR_EXRC_FILE2,
 				(char_u *)EXRC_FILE, FALSE, TRUE) != FPC_SAME
 # endif
 				)
-		    (void)do_source((char_u *)EXRC_FILE, FALSE,
-							      DOSO_NONE, NULL);
+		    (शून्य)do_source((char_u *)EXRC_FILE, FALSE,
+							      DOSO_NONE, रिक्त);
 	    }
 	}
-	if (secure == 2)
+	सचे (secure == 2)
 	    need_wait_return = TRUE;
 	secure = 0;
 # ifdef AMIGA
 	proc->pr_WindowPtr = save_winptr;
 # endif
     }
-    TIME_MSG("sourcing vimrc file(s)");
+    TIME_सन्देशः("sourcing vimrc file(s)");
 }
 
 /*
  * Setup to start using the GUI.  Exit with an error when not available.
  */
-    static void
-main_start_gui(void)
+    स्थिर शून्य
+main_start_gui(शून्य)
 {
 # ifdef FEAT_GUI
     gui.starting = true;	// start GUI a bit later
-# else
+# अञ्ञथा
     mch_errmsg(_(e_gui_cannot_be_used_not_enabled_at_compile_time));
     mch_errmsg("\n");
     mch_exit(2);
@@ -3593,21 +3593,21 @@ main_start_gui(void)
  * Get an environment variable and execute it as Ex commands.
  * Returns FAIL if the environment variable was not executed, OK otherwise.
  */
-    int
+    पूर्णाङ्क
 process_env(
     char_u	*env,
-    int		is_viminit) // when TRUE, called for VIMINIT
+    पूर्णाङ्क		is_viminit) // when TRUE, called for VIMINIT
 {
     char_u	*initstr;
     sctx_T	save_current_sctx;
     ESTACK_CHECK_DECLARATION;
 
-    if ((initstr = mch_getenv(env)) == NULL || *initstr == NUL)
-	return FAIL;
+    सचे ((initstr = mch_getenv(env)) == रिक्त || *initstr == NUL)
+	पटिनिवत्त FAIL;
 
-    if (is_viminit)
-	vimrc_found(NULL, NULL);
-    estack_push(ETYPE_ENV, env, 0);
+    सचे (is_viminit)
+	vimrc_found(रिक्त, रिक्त);
+    estack_प्रक्षिप(ETYPE_ENV, env, 0);
     ESTACK_CHECK_SETUP;
     save_current_sctx = current_sctx;
     current_sctx.sc_version = 1;
@@ -3620,28 +3620,28 @@ process_env(
     do_cmdline_cmd(initstr);
 
     ESTACK_CHECK_NOW;
-    estack_pop();
+    estack_निष्कासय();
     current_sctx = save_current_sctx;
-    return OK;
+    पटिनिवत्त OK;
 }
 
-#if (defined(UNIX) || defined(VMS)) && !defined(NO_VIM_MAIN)
+#सचे (defined(UNIX) || defined(VMS)) && !defined(NO_VIM_MAIN)
 /*
  * Return TRUE if we are certain the user owns the file "fname".
  * Used for ".vimrc" and ".exrc".
  * Use both stat() and lstat() for extra security.
  */
-    static int
-file_owned(char *fname)
+    स्थिर पूर्णाङ्क
+file_owned(वर्ण *fname)
 {
     stat_T	s;
 # ifdef UNIX
     uid_t	uid = getuid();
-# else	 // VMS
+# अञ्ञथा	 // VMS
     uid_t	uid = ((getgid() << 16) | getuid());
 # endif
 
-    return !(mch_stat(fname, &s) != 0 || s.st_uid != uid
+    पटिनिवत्त !(mch_stat(fname, &s) != 0 || s.st_uid != uid
 # ifdef HAVE_LSTAT
 	    || mch_lstat(fname, &s) != 0 || s.st_uid != uid
 # endif
@@ -3652,12 +3652,12 @@ file_owned(char *fname)
 /*
  * Give an error message main_errors["n"] and exit.
  */
-    static void
+    स्थिर शून्य
 mainerr(
-    int		n,	// one of the ME_ defines
+    पूर्णाङ्क		n,	// one of the ME_ defines
     char_u	*str)	// extra argument or NULL
 {
-#if defined(UNIX) || defined(VMS)
+#सचे defined(UNIX) || defined(VMS)
     reset_signals();		// kill us with CTRL-C here, if you like
 #endif
 
@@ -3673,10 +3673,10 @@ mainerr(
     mch_errmsg(longVersion);
     mch_errmsg("\n");
     mch_errmsg(_(main_errors[n]));
-    if (str != NULL)
+    सचे (str != रिक्त)
     {
 	mch_errmsg(": \"");
-	mch_errmsg((char *)str);
+	mch_errmsg((वर्ण *)str);
 	mch_errmsg("\"");
     }
     mch_errmsg(_("\nMore info with: \"vim -h\"\n"));
@@ -3684,7 +3684,7 @@ mainerr(
     mch_exit(1);
 }
 
-    void
+    शून्य
 mainerr_arg_missing(char_u *str)
 {
     mainerr(ME_ARG_MISSING, str);
@@ -3694,22 +3694,22 @@ mainerr_arg_missing(char_u *str)
 /*
  * print a message with three spaces prepended and '\n' appended.
  */
-    static void
-main_msg(char *s)
+    स्थिर शून्य
+main_सन्देशः(वर्ण *s)
 {
-    mch_msg("   ");
-    mch_msg(s);
-    mch_msg("\n");
+    mch_सन्देशः("   ");
+    mch_सन्देशः(s);
+    mch_सन्देशः("\n");
 }
 
 /*
  * Print messages for "vim -h" or "vim --help" and exit.
  */
-    static void
-usage(void)
+    स्थिर शून्य
+usage(शून्य)
 {
-    int		i;
-    static char	*(use[]) =
+    पूर्णाङ्क		i;
+    स्थिर वर्ण	*(use[]) =
     {
 	N_("[file ..]       edit specified file(s)"),
 	N_("-               read text from stdin"),
@@ -3719,194 +3719,194 @@ usage(void)
 # endif
     };
 
-# if defined(UNIX) || defined(VMS)
+# सचे defined(UNIX) || defined(VMS)
     reset_signals();		// kill us with CTRL-C here, if you like
 # endif
 
     init_longVersion();
-    mch_msg(longVersion);
-    mch_msg(_("\n\nUsage:"));
-    for (i = 0; ; ++i)
+    mch_सन्देशः(longVersion);
+    mch_सन्देशः(_("\n\nUsage:"));
+    अत्थाय (i = 0; ; ++i)
     {
-	mch_msg(_(" vim [arguments] "));
-	mch_msg(_(use[i]));
-	if (i == ARRAY_LENGTH(use) - 1)
-	    break;
-	mch_msg(_("\n   or:"));
+	mch_सन्देशः(_(" vim [arguments] "));
+	mch_सन्देशः(_(use[i]));
+	सचे (i == ARRAY_LENGTH(use) - 1)
+	    भङ्ग;
+	mch_सन्देशः(_("\n   or:"));
     }
-# if defined( VMS)
-    mch_msg(_("\nWhere command is down-cased, prepend / (like: -/R) to treat flag as upper-case."));
-    mch_msg(_("\nOr, where supported, SET PROC/PARSE=EXT, or else quote upper-case material."));
+# सचे defined( VMS)
+    mch_सन्देशः(_("\nWhere command is down-cased, prepend / (like: -/R) to treat flag as upper-case."));
+    mch_सन्देशः(_("\nOr, where supported, SET PROC/PARSE=EXT, or else quote upper-case material."));
 # endif /* defined( VMS) */
 
-    mch_msg(_("\n\nArguments:\n"));
-    main_msg(_("--\t\t\tOnly file names after this"));
+    mch_सन्देशः(_("\n\nArguments:\n"));
+    main_सन्देशः(_("--\t\t\tOnly file names after this"));
 # ifdef EXPAND_FILENAMES
-    main_msg(_("--literal\t\tDon't expand wildcards"));
+    main_सन्देशः(_("--literal\t\tDon't expand wildcards"));
 # endif
 # ifdef FEAT_OLE
-    main_msg(_("-register\t\tRegister this gvim for OLE"));
-    main_msg(_("-unregister\t\tUnregister gvim for OLE"));
+    main_सन्देशः(_("-register\t\tRegister this gvim for OLE"));
+    main_सन्देशः(_("-unregister\t\tUnregister gvim for OLE"));
 # endif
 # ifdef FEAT_GUI
-    main_msg(_("-g\t\t\tRun using GUI (like \"gvim\")"));
-    main_msg(_("-f  or  --nofork\tForeground: Don't fork when starting GUI"));
+    main_सन्देशः(_("-g\t\t\tRun using GUI (like \"gvim\")"));
+    main_सन्देशः(_("-f  or  --nofork\tForeground: Don't fork when starting GUI"));
 # endif
-    main_msg(_("-v\t\t\tVi mode (like \"vi\")"));
-    main_msg(_("-e\t\t\tEx mode (like \"ex\")"));
-    main_msg(_("-E\t\t\tImproved Ex mode"));
-    main_msg(_("-s\t\t\tSilent (batch) mode (only for \"ex\")"));
+    main_सन्देशः(_("-v\t\t\tVi mode (like \"vi\")"));
+    main_सन्देशः(_("-e\t\t\tEx mode (like \"ex\")"));
+    main_सन्देशः(_("-E\t\t\tImproved Ex mode"));
+    main_सन्देशः(_("-s\t\t\tSilent (batch) mode (only for \"ex\")"));
 # ifdef FEAT_DIFF
-    main_msg(_("-d\t\t\tDiff mode (like \"vimdiff\")"));
+    main_सन्देशः(_("-d\t\t\tDiff mode (like \"vimdiff\")"));
 # endif
-    main_msg(_("-y\t\t\tEasy mode (like \"evim\", modeless)"));
-    main_msg(_("-R\t\t\tReadonly mode (like \"view\")"));
-    main_msg(_("-Z\t\t\tRestricted mode (like \"rvim\")"));
-    main_msg(_("-m\t\t\tModifications (writing files) not allowed"));
-    main_msg(_("-M\t\t\tModifications in text not allowed"));
-    main_msg(_("-b\t\t\tBinary mode"));
-    main_msg(_("-l\t\t\tLisp mode"));
-    main_msg(_("-C\t\t\tCompatible with Vi: 'compatible'"));
-    main_msg(_("-N\t\t\tNot fully Vi compatible: 'nocompatible'"));
-    main_msg(_("-V[N][fname]\t\tBe verbose [level N] [log messages to fname]"));
+    main_सन्देशः(_("-y\t\t\tEasy mode (like \"evim\", modeless)"));
+    main_सन्देशः(_("-R\t\t\tReadonly mode (like \"view\")"));
+    main_सन्देशः(_("-Z\t\t\tRestricted mode (like \"rvim\")"));
+    main_सन्देशः(_("-m\t\t\tModifications (writing files) not allowed"));
+    main_सन्देशः(_("-M\t\t\tModifications in text not allowed"));
+    main_सन्देशः(_("-b\t\t\tBinary mode"));
+    main_सन्देशः(_("-l\t\t\tLisp mode"));
+    main_सन्देशः(_("-C\t\t\tCompatible with Vi: 'compatible'"));
+    main_सन्देशः(_("-N\t\t\tNot fully Vi compatible: 'nocompatible'"));
+    main_सन्देशः(_("-V[N][fname]\t\tBe verbose [level N] [log messages to fname]"));
 # ifdef FEAT_EVAL
-    main_msg(_("-D\t\t\tDebugging mode"));
+    main_सन्देशः(_("-D\t\t\tDebugging mode"));
 # endif
-    main_msg(_("-n\t\t\tNo swap file, use memory only"));
-    main_msg(_("-r\t\t\tList swap files and exit"));
-    main_msg(_("-r (with file name)\tRecover crashed session"));
-    main_msg(_("-L\t\t\tSame as -r"));
+    main_सन्देशः(_("-n\t\t\tNo swap file, use memory only"));
+    main_सन्देशः(_("-r\t\t\tList swap files and exit"));
+    main_सन्देशः(_("-r (with file name)\tRecover crashed session"));
+    main_सन्देशः(_("-L\t\t\tSame as -r"));
 # ifdef AMIGA
-    main_msg(_("-f\t\t\tDon't use newcli to open window"));
-    main_msg(_("-dev <device>\t\tUse <device> for I/O"));
+    main_सन्देशः(_("-f\t\t\tDon't use newcli to open window"));
+    main_सन्देशः(_("-dev <device>\t\tUse <device> for I/O"));
 # endif
 # ifdef FEAT_ARABIC
-    main_msg(_("-A\t\t\tStart in Arabic mode"));
+    main_सन्देशः(_("-A\t\t\tStart in Arabic mode"));
 # endif
 # ifdef FEAT_RIGHTLEFT
-    main_msg(_("-H\t\t\tStart in Hebrew mode"));
+    main_सन्देशः(_("-H\t\t\tStart in Hebrew mode"));
 # endif
-    main_msg(_("-T <terminal>\tSet terminal type to <terminal>"));
-    main_msg(_("--not-a-term\t\tSkip warning for input/output not being a terminal"));
+    main_सन्देशः(_("-T <terminal>\tSet terminal type to <terminal>"));
+    main_सन्देशः(_("--not-a-term\t\tSkip warning for input/output not being a terminal"));
 # ifdef FEAT_GUI
-    main_msg(_("--gui-dialog-file {fname}  For testing: write dialog text"));
+    main_सन्देशः(_("--gui-dialog-file {fname}  For testing: write dialog text"));
 # endif
-    main_msg(_("--ttyfail\t\tExit if input or output is not a terminal"));
+    main_सन्देशः(_("--ttyfail\t\tExit if input or output is not a terminal"));
 # ifdef FEAT_JOB_CHANNEL
-    main_msg(_("--stdio-channel\tUse stdin and stdout as a channel"));
+    main_सन्देशः(_("--stdio-channel\tUse stdin and stdout as a channel"));
 # endif
-    main_msg(_("-u <vimrc>\t\tUse <vimrc> instead of any .vimrc"));
+    main_सन्देशः(_("-u <vimrc>\t\tUse <vimrc> instead of any .vimrc"));
 # ifdef FEAT_GUI
-    main_msg(_("-U <gvimrc>\t\tUse <gvimrc> instead of any .gvimrc"));
+    main_सन्देशः(_("-U <gvimrc>\t\tUse <gvimrc> instead of any .gvimrc"));
 # endif
-    main_msg(_("--noplugin\t\tDon't load plugin scripts"));
-    main_msg(_("-p[N]\t\tOpen N tab pages (default: one for each file)"));
-    main_msg(_("-o[N]\t\tOpen N windows (default: one for each file)"));
-    main_msg(_("-O[N]\t\tLike -o but split vertically"));
-    main_msg(_("+\t\t\tStart at end of file"));
-    main_msg(_("+<lnum>\t\tStart at line <lnum>"));
-    main_msg(_("--cmd <command>\tExecute <command> before loading any vimrc file"));
-    main_msg(_("-c <command>\t\tExecute <command> after loading the first file"));
-    main_msg(_("-S <session>\t\tSource file <session> after loading the first file"));
-    main_msg(_("-s <scriptin>\tRead Normal mode commands from file <scriptin>"));
-    main_msg(_("-w <scriptout>\tAppend all typed commands to file <scriptout>"));
-    main_msg(_("-W <scriptout>\tWrite all typed commands to file <scriptout>"));
+    main_सन्देशः(_("--noplugin\t\tDon't load plugin scripts"));
+    main_सन्देशः(_("-p[N]\t\tOpen N tab pages (default: one for each file)"));
+    main_सन्देशः(_("-o[N]\t\tOpen N windows (default: one for each file)"));
+    main_सन्देशः(_("-O[N]\t\tLike -o but split vertically"));
+    main_सन्देशः(_("+\t\t\tStart at end of file"));
+    main_सन्देशः(_("+<lnum>\t\tStart at line <lnum>"));
+    main_सन्देशः(_("--cmd <command>\tExecute <command> before loading any vimrc file"));
+    main_सन्देशः(_("-c <command>\t\tExecute <command> after loading the first file"));
+    main_सन्देशः(_("-S <session>\t\tSource file <session> after loading the first file"));
+    main_सन्देशः(_("-s <scriptin>\tRead Normal mode commands from file <scriptin>"));
+    main_सन्देशः(_("-w <scriptout>\tAppend all typed commands to file <scriptout>"));
+    main_सन्देशः(_("-W <scriptout>\tWrite all typed commands to file <scriptout>"));
 # ifdef FEAT_CRYPT
-    main_msg(_("-x\t\t\tEdit encrypted files"));
+    main_सन्देशः(_("-x\t\t\tEdit encrypted files"));
 # endif
-# if (defined(UNIX) || defined(VMS)) && defined(FEAT_X11)
-#  if defined(FEAT_GUI_X11) && !defined(FEAT_GUI_GTK)
-    main_msg(_("-display <display>\tConnect Vim to this particular X-server"));
+# सचे (defined(UNIX) || defined(VMS)) && defined(FEAT_X11)
+#  सचे defined(FEAT_GUI_X11) && !defined(FEAT_GUI_GTK)
+    main_सन्देशः(_("-display <display>\tConnect Vim to this particular X-server"));
 #  endif
-    main_msg(_("-X\t\t\tDo not connect to X server"));
+    main_सन्देशः(_("-X\t\t\tDo not connect to X server"));
 # endif
-# if defined(FEAT_WAYLAND)
-    main_msg(_("-Y\t\t\tDo not connect to Wayland compositor"));
+# सचे defined(FEAT_WAYLAND)
+    main_सन्देशः(_("-Y\t\t\tDo not connect to Wayland compositor"));
 # endif
 # ifdef FEAT_CLIENTSERVER
 #  ifdef FEAT_CLIENTSERVER_BACKENDS
-    main_msg(_("--clientserver <socket|x11|mswin> Backend for clientserver communication"));
+    main_सन्देशः(_("--clientserver <socket|x11|mswin> Backend for clientserver communication"));
 #  endif
-    main_msg(_("--remote <files>\tEdit <files> in a Vim server if possible"));
-    main_msg(_("--remote-silent <files>  Same, don't complain if there is no server"));
-    main_msg(_("--remote-wait <files>  As --remote but wait for files to have been edited"));
-    main_msg(_("--remote-wait-silent <files>  Same, don't complain if there is no server"));
-    main_msg(_("--remote-tab[-wait][-silent] <files>  As --remote but use tab page per file"));
-    main_msg(_("--remote-send <keys>\tSend <keys> to a Vim server and exit"));
-    main_msg(_("--remote-expr <expr>\tEvaluate <expr> in a Vim server and print result"));
-    main_msg(_("--serverlist\t\tList available Vim server names and exit"));
-    main_msg(_("--servername <name>\tSend to/become the Vim server <name>"));
+    main_सन्देशः(_("--remote <files>\tEdit <files> in a Vim server if possible"));
+    main_सन्देशः(_("--remote-silent <files>  Same, don't complain if there is no server"));
+    main_सन्देशः(_("--remote-wait <files>  As --remote but wait for files to have been edited"));
+    main_सन्देशः(_("--remote-wait-silent <files>  Same, don't complain if there is no server"));
+    main_सन्देशः(_("--remote-tab[-wait][-silent] <files>  As --remote but use tab page per file"));
+    main_सन्देशः(_("--remote-send <keys>\tSend <keys> to a Vim server and exit"));
+    main_सन्देशः(_("--remote-expr <expr>\tEvaluate <expr> in a Vim server and print result"));
+    main_सन्देशः(_("--serverlist\t\tList available Vim server names and exit"));
+    main_सन्देशः(_("--servername <name>\tSend to/become the Vim server <name>"));
 # endif
 # ifdef STARTUPTIME
-    main_msg(_("--startuptime <file>\tWrite startup timing messages to <file>"));
+    main_सन्देशः(_("--startuptime <file>\tWrite startup timing messages to <file>"));
 # endif
 # ifdef FEAT_JOB_CHANNEL
-    main_msg(_("--log <file>\t\tStart logging to <file> early"));
+    main_सन्देशः(_("--log <file>\t\tStart logging to <file> early"));
 # endif
 # ifdef FEAT_VIMINFO
-    main_msg(_("-i <viminfo>\t\tUse <viminfo> instead of .viminfo"));
+    main_सन्देशः(_("-i <viminfo>\t\tUse <viminfo> instead of .viminfo"));
 # endif
-    main_msg(_("--clean\t\t'nocompatible', Vim defaults, no plugins, no viminfo"));
-    main_msg(_("-h  or  --help\tPrint Help (this message) and exit"));
-    main_msg(_("--version\t\tPrint version information and exit"));
+    main_सन्देशः(_("--clean\t\t'nocompatible', Vim defaults, no plugins, no viminfo"));
+    main_सन्देशः(_("-h  or  --help\tPrint Help (this message) and exit"));
+    main_सन्देशः(_("--version\t\tPrint version information and exit"));
 
 # ifdef FEAT_GUI_X11
 #  ifdef FEAT_GUI_MOTIF
-    mch_msg(_("\nArguments recognised by gvim (Motif version):\n"));
+    mch_सन्देशः(_("\nArguments recognised by gvim (Motif version):\n"));
 #  endif
-    main_msg(_("-display <display>\tRun Vim on <display>"));
-    main_msg(_("-iconic\t\tStart Vim iconified"));
-    main_msg(_("-background <color>\tUse <color> for the background (also: -bg)"));
-    main_msg(_("-foreground <color>\tUse <color> for normal text (also: -fg)"));
-    main_msg(_("-font <font>\t\tUse <font> for normal text (also: -fn)"));
-    main_msg(_("-boldfont <font>\tUse <font> for bold text"));
-    main_msg(_("-italicfont <font>\tUse <font> for italic text"));
-    main_msg(_("-geometry <geom>\tUse <geom> for initial geometry (also: -geom)"));
-    main_msg(_("-borderwidth <width>\tUse a border width of <width> (also: -bw)"));
-    main_msg(_("-scrollbarwidth <width>  Use a scrollbar width of <width> (also: -sw)"));
-    main_msg(_("-reverse\t\tUse reverse video (also: -rv)"));
-    main_msg(_("+reverse\t\tDon't use reverse video (also: +rv)"));
-    main_msg(_("-xrm <resource>\tSet the specified resource"));
+    main_सन्देशः(_("-display <display>\tRun Vim on <display>"));
+    main_सन्देशः(_("-iconic\t\tStart Vim iconified"));
+    main_सन्देशः(_("-background <color>\tUse <color> for the background (also: -bg)"));
+    main_सन्देशः(_("-foreground <color>\tUse <color> for normal text (also: -fg)"));
+    main_सन्देशः(_("-font <font>\t\tUse <font> for normal text (also: -fn)"));
+    main_सन्देशः(_("-boldfont <font>\tUse <font> for bold text"));
+    main_सन्देशः(_("-italicfont <font>\tUse <font> for italic text"));
+    main_सन्देशः(_("-geometry <geom>\tUse <geom> for initial geometry (also: -geom)"));
+    main_सन्देशः(_("-borderwidth <width>\tUse a border width of <width> (also: -bw)"));
+    main_सन्देशः(_("-scrollbarwidth <width>  Use a scrollbar width of <width> (also: -sw)"));
+    main_सन्देशः(_("-reverse\t\tUse reverse video (also: -rv)"));
+    main_सन्देशः(_("+reverse\t\tDon't use reverse video (also: +rv)"));
+    main_सन्देशः(_("-xrm <resource>\tSet the specified resource"));
 # endif // FEAT_GUI_X11
 # ifdef FEAT_GUI_GTK
 #  ifdef USE_GTK4
-    mch_msg(_("\nArguments recognised by gvim (GTK4 version):\n"));
-#  else
-    mch_msg(_("\nArguments recognised by gvim (GTK+ version):\n"));
+    mch_सन्देशः(_("\nArguments recognised by gvim (GTK4 version):\n"));
+#  अञ्ञथा
+    mch_सन्देशः(_("\nArguments recognised by gvim (GTK+ version):\n"));
 #  endif
-    main_msg(_("-background <color>\tUse <color> for the background (also: -bg)"));
-    main_msg(_("-foreground <color>\tUse <color> for normal text (also: -fg)"));
-    main_msg(_("-font <font>\t\tUse <font> for normal text (also: -fn)"));
-    main_msg(_("-geometry <geom>\tUse <geom> for initial geometry (also: -geom)"));
+    main_सन्देशः(_("-background <color>\tUse <color> for the background (also: -bg)"));
+    main_सन्देशः(_("-foreground <color>\tUse <color> for normal text (also: -fg)"));
+    main_सन्देशः(_("-font <font>\t\tUse <font> for normal text (also: -fn)"));
+    main_सन्देशः(_("-geometry <geom>\tUse <geom> for initial geometry (also: -geom)"));
 #  ifdef USE_GTK4
-    main_msg("--prg-name <name>\tSet GTK program name");
-#  else
-    main_msg(_("-iconic\t\tStart Vim iconified"));
-    main_msg(_("-reverse\t\tUse reverse video (also: -rv)"));
-    main_msg(_("-display <display>\tRun Vim on <display> (also: --display)"));
-    main_msg(_("--role <role>\tSet a unique role to identify the main window"));
-    main_msg(_("--socketid <xid>\tOpen Vim inside another GTK widget"));
-    main_msg(_("--echo-wid\t\tMake gvim echo the Window ID on stdout"));
+    main_सन्देशः("--prg-name <name>\tSet GTK program name");
+#  अञ्ञथा
+    main_सन्देशः(_("-iconic\t\tStart Vim iconified"));
+    main_सन्देशः(_("-reverse\t\tUse reverse video (also: -rv)"));
+    main_सन्देशः(_("-display <display>\tRun Vim on <display> (also: --display)"));
+    main_सन्देशः(_("--role <role>\tSet a unique role to identify the main window"));
+    main_सन्देशः(_("--socketid <xid>\tOpen Vim inside another GTK widget"));
+    main_सन्देशः(_("--echo-wid\t\tMake gvim echo the Window ID on stdout"));
 #  endif
 # endif
 # ifdef FEAT_GUI_MSWIN
 #  ifdef VIMDLL
-    if (gui.starting)
+    सचे (gui.starting)
 #  endif
     {
-	main_msg(_("-P <parent title>\tOpen Vim inside parent application"));
-	main_msg(_("--windowid <HWND>\tOpen Vim inside another win32 widget"));
+	main_सन्देशः(_("-P <parent title>\tOpen Vim inside parent application"));
+	main_सन्देशः(_("--windowid <HWND>\tOpen Vim inside another win32 widget"));
     }
 # endif
 
 # ifdef FEAT_GUI_GNOME
     // Gnome gives extra messages for --help if we continue, but not for -h.
-    if (gui.starting)
+    सचे (gui.starting)
     {
-	mch_msg("\n");
+	mch_सन्देशः("\n");
 	gui.dofork = false;
     }
-    else
+    अञ्ञथा
 # endif
 	mch_exit(0);
 }
@@ -3916,18 +3916,18 @@ usage(void)
  * When "Quit" selected, exit Vim.
  * When "Recover" selected, recover the file.
  */
-    static void
-check_swap_exists_action(void)
+    स्थिर शून्य
+check_swap_exists_action(शून्य)
 {
-    if (swap_exists_action == SEA_QUIT)
+    सचे (swap_exists_action == SEA_QUIT)
 	getout(1);
-    handle_swap_exists(NULL);
+    handle_swap_exists(रिक्त);
 }
 
 #endif // NO_VIM_MAIN
 
-#if !defined(NO_VIM_MAIN) && defined(FEAT_EVAL)
-    static void
+#सचे !defined(NO_VIM_MAIN) && defined(FEAT_EVAL)
+    स्थिर शून्य
 set_progpath(char_u *argv0)
 {
     char_u *val = argv0;
@@ -3937,27 +3937,27 @@ set_progpath(char_u *argv0)
     // turn it into a full path.
     // On MS-Windows "vim" should be expanded to "vim.exe", thus always do
     // this.
-    char_u *path = NULL;
+    char_u *path = रिक्त;
 
-    if (mch_can_exe(argv0, &path, FALSE) && path != NULL)
+    सचे (mch_can_exe(argv0, &path, FALSE) && path != रिक्त)
 	val = path;
-# else
+# अञ्ञथा
     char_u	buf[MAXPATHL + 1];
 #  ifdef PROC_EXE_LINK
-    char	linkbuf[MAXPATHL + 1];
+    वर्ण	linkbuf[MAXPATHL + 1];
     ssize_t	len;
 
     len = readlink(PROC_EXE_LINK, linkbuf, MAXPATHL);
-    if (len > 0)
+    सचे (len > 0)
     {
 	linkbuf[len] = NUL;
 	val = (char_u *)linkbuf;
     }
 #  endif
 
-    if (!mch_isFullName(val))
+    सचे (!mch_isFullName(val))
     {
-	if (gettail(val) != val
+	सचे (gettail(val) != val
 			   && vim_FullName(val, buf, MAXPATHL, TRUE) != FAIL)
 	    val = buf;
     }

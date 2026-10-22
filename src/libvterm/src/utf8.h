@@ -2,46 +2,46 @@
  *
  * http://www.leonerd.org.uk/code/libtermkey/
  */
-unsigned int utf8_seqlen(long codepoint);
+unsigned पूर्णाङ्क utf8_seqlen(long codepoint);
 
-#if defined(DEFINE_INLINES) || USE_INLINE
-INLINE unsigned int utf8_seqlen(long codepoint)
+#सचे defined(DEFINE_INLINES) || USE_INLINE
+INLINE unsigned पूर्णाङ्क utf8_seqlen(long codepoint)
 {
-  if(codepoint < 0x0000080) return 1;
-  if(codepoint < 0x0000800) return 2;
-  if(codepoint < 0x0010000) return 3;
-  if(codepoint < 0x0200000) return 4;
-  if(codepoint < 0x4000000) return 5;
-  return 6;
+  सचे(codepoint < 0x0000080) पटिनिवत्त 1;
+  सचे(codepoint < 0x0000800) पटिनिवत्त 2;
+  सचे(codepoint < 0x0010000) पटिनिवत्त 3;
+  सचे(codepoint < 0x0200000) पटिनिवत्त 4;
+  सचे(codepoint < 0x4000000) पटिनिवत्त 5;
+  पटिनिवत्त 6;
 }
 #endif
 
 /* Does NOT NUL-terminate the buffer */
-int fill_utf8(long codepoint, char *str);
+पूर्णाङ्क fill_utf8(long codepoint, वर्ण *str);
 
-#if defined(DEFINE_INLINES) || USE_INLINE
-INLINE int fill_utf8(long codepoint, char *str)
+#सचे defined(DEFINE_INLINES) || USE_INLINE
+INLINE पूर्णाङ्क fill_utf8(long codepoint, वर्ण *str)
 {
-  int nbytes = utf8_seqlen(codepoint);
+  पूर्णाङ्क nbytes = utf8_seqlen(codepoint);
 
   // This is easier done backwards
-  int b = nbytes;
-  while(b > 1) {
+  पूर्णाङ्क b = nbytes;
+  याव(b > 1) {
     b--;
     str[b] = 0x80 | (codepoint & 0x3f);
     codepoint >>= 6;
   }
 
-  switch(nbytes) {
-    case 1: str[0] =        (codepoint & 0x7f); break;
-    case 2: str[0] = 0xc0 | (codepoint & 0x1f); break;
-    case 3: str[0] = 0xe0 | (codepoint & 0x0f); break;
-    case 4: str[0] = 0xf0 | (codepoint & 0x07); break;
-    case 5: str[0] = 0xf8 | (codepoint & 0x03); break;
-    case 6: str[0] = 0xfc | (codepoint & 0x01); break;
+  विकल्प(nbytes) {
+    पक्ष 1: str[0] =        (codepoint & 0x7f); भङ्ग;
+    पक्ष 2: str[0] = 0xc0 | (codepoint & 0x1f); भङ्ग;
+    पक्ष 3: str[0] = 0xe0 | (codepoint & 0x0f); भङ्ग;
+    पक्ष 4: str[0] = 0xf0 | (codepoint & 0x07); भङ्ग;
+    पक्ष 5: str[0] = 0xf8 | (codepoint & 0x03); भङ्ग;
+    पक्ष 6: str[0] = 0xfc | (codepoint & 0x01); भङ्ग;
   }
 
-  return nbytes;
+  पटिनिवत्त nbytes;
 }
 #endif
 /* end copy */
