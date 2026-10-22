@@ -13,121 +13,121 @@
  */
 
 #undef NDEBUG
-#include <assert.h>
+#ضمن <assert.h>
 
 // Must include main.c because it contains much more than just main()
 #define NO_VIM_MAIN
-#include "main.c"
+#ضمن "main.c"
 
 // This file has to be included because the tested functions are static
-#include "memfile.c"
+#ضمن "memfile.c"
 
-#define index_to_key(i) ((i) ^ 15167)
-#define TEST_COUNT 50000
+#define index_to_کونچي(i) ((i) ^ 15167)
+#define TEST_کيراءن 50000
 
 /*
  * Test mf_hash_*() functions.
  */
-    static void
-test_mf_hash(void)
+    ساكن فراغ
+test_mf_hash(فراغ)
 {
     mf_hashtab_T   ht;
     mf_hashitem_T  *item;
-    blocknr_T      key;
+    blocknr_T      کونچي;
     long_u	   i;
-    long_u	   num_buckets;
+    long_u	   اڠک_buckets;
 
     mf_hash_init(&ht);
 
     // insert some items and check invariants
-    for (i = 0; i < TEST_COUNT; i++)
+    لكل (i = 0; i < TEST_کيراءن; i++)
     {
-	assert(ht.mht_count == i);
+	أكد(ht.mht_کيراءن == i);
 
 	// check that number of buckets is a power of 2
-	num_buckets = ht.mht_mask + 1;
-	assert(num_buckets > 0 && (num_buckets & (num_buckets - 1)) == 0);
+	اڠک_buckets = ht.mht_mask + 1;
+	أكد(اڠک_buckets > 0 && (اڠک_buckets & (اڠک_buckets - 1)) == 0);
 
 	// check load factor
-	assert(ht.mht_count <= (num_buckets << MHT_LOG_LOAD_FACTOR));
+	أكد(ht.mht_کيراءن <= (اڠک_buckets << MHT_LOG_LOAD_FACTOR));
 
-	if (i < (MHT_INIT_SIZE << MHT_LOG_LOAD_FACTOR))
+	إذا (i < (MHT_INIT_SIZE << MHT_LOG_LOAD_FACTOR))
 	{
 	    // first expansion shouldn't have occurred yet
-	    assert(num_buckets == MHT_INIT_SIZE);
-	    assert(ht.mht_buckets == ht.mht_small_buckets);
+	    أكد(اڠک_buckets == MHT_INIT_SIZE);
+	    أكد(ht.mht_buckets == ht.mht_small_buckets);
 	}
-	else
+	وإلا
 	{
-	    assert(num_buckets > MHT_INIT_SIZE);
-	    assert(ht.mht_buckets != ht.mht_small_buckets);
+	    أكد(اڠک_buckets > MHT_INIT_SIZE);
+	    أكد(ht.mht_buckets != ht.mht_small_buckets);
 	}
 
-	key = index_to_key(i);
-	assert(mf_hash_find(&ht, key) == NULL);
+	کونچي = index_to_کونچي(i);
+	أكد(mf_hash_find(&ht, کونچي) == عدم);
 
 	// allocate and add new item
 	item = LALLOC_CLEAR_ONE(mf_hashitem_T);
-	assert(item != NULL);
-	item->mhi_key = key;
+	أكد(item != عدم);
+	item->mhi_کونچي = کونچي;
 	mf_hash_add_item(&ht, item);
 
-	assert(mf_hash_find(&ht, key) == item);
+	أكد(mf_hash_find(&ht, کونچي) == item);
 
-	if (ht.mht_mask + 1 != num_buckets)
+	إذا (ht.mht_mask + 1 != اڠک_buckets)
 	{
 	    // hash table was expanded
-	    assert(ht.mht_mask + 1 == num_buckets * MHT_GROWTH_FACTOR);
-	    assert(i + 1 == (num_buckets << MHT_LOG_LOAD_FACTOR));
+	    أكد(ht.mht_mask + 1 == اڠک_buckets * MHT_GROWTH_FACTOR);
+	    أكد(i + 1 == (اڠک_buckets << MHT_LOG_LOAD_FACTOR));
 	}
     }
 
     // check presence of inserted items
-    for (i = 0; i < TEST_COUNT; i++)
+    لكل (i = 0; i < TEST_کيراءن; i++)
     {
-	key = index_to_key(i);
-	item = mf_hash_find(&ht, key);
-	assert(item != NULL);
-	assert(item->mhi_key == key);
+	کونچي = index_to_کونچي(i);
+	item = mf_hash_find(&ht, کونچي);
+	أكد(item != عدم);
+	أكد(item->mhi_کونچي == کونچي);
     }
 
     // delete some items
-    for (i = 0; i < TEST_COUNT; i++)
+    لكل (i = 0; i < TEST_کيراءن; i++)
     {
-	if (i % 100 < 70)
+	إذا (i % 100 < 70)
 	{
-	    key = index_to_key(i);
-	    item = mf_hash_find(&ht, key);
-	    assert(item != NULL);
-	    assert(item->mhi_key == key);
+	    کونچي = index_to_کونچي(i);
+	    item = mf_hash_find(&ht, کونچي);
+	    أكد(item != عدم);
+	    أكد(item->mhi_کونچي == کونچي);
 
 	    mf_hash_rem_item(&ht, item);
-	    assert(mf_hash_find(&ht, key) == NULL);
+	    أكد(mf_hash_find(&ht, کونچي) == عدم);
 
 	    mf_hash_add_item(&ht, item);
-	    assert(mf_hash_find(&ht, key) == item);
+	    أكد(mf_hash_find(&ht, کونچي) == item);
 
 	    mf_hash_rem_item(&ht, item);
-	    assert(mf_hash_find(&ht, key) == NULL);
+	    أكد(mf_hash_find(&ht, کونچي) == عدم);
 
 	    vim_free(item);
 	}
     }
 
     // check again
-    for (i = 0; i < TEST_COUNT; i++)
+    لكل (i = 0; i < TEST_کيراءن; i++)
     {
-	key = index_to_key(i);
-	item = mf_hash_find(&ht, key);
+	کونچي = index_to_کونچي(i);
+	item = mf_hash_find(&ht, کونچي);
 
-	if (i % 100 < 70)
+	إذا (i % 100 < 70)
 	{
-	    assert(item == NULL);
+	    أكد(item == عدم);
 	}
-	else
+	وإلا
 	{
-	    assert(item != NULL);
-	    assert(item->mhi_key == key);
+	    أكد(item != عدم);
+	    أكد(item->mhi_کونچي == کونچي);
 	}
     }
 
@@ -135,9 +135,9 @@ test_mf_hash(void)
     mf_hash_free_all(&ht);
 }
 
-    int
-main(void)
+    صحيح
+main(فراغ)
 {
     test_mf_hash();
-    return 0;
+    أرجع 0;
 }

@@ -9,17 +9,17 @@
  * See README.txt for an overview of the Vim source code.
  */
 
-#include "vim.h"
+#ضمن "vim.h"
 
-#if defined(FEAT_CSCOPE)
+#إذا defined(FEAT_CSCOPE)
 
 # include <sys/types.h>
 # include <sys/stat.h>
-# if defined(UNIX)
+# إذا defined(UNIX)
 #  include <sys/wait.h>
 # endif
 
-# if defined (MSWIN)
+# إذا defined (MSWIN)
 #  ifndef WIN32_LEAN_AND_MEAN
 #   define WIN32_LEAN_AND_MEAN
 #  endif
@@ -36,29 +36,29 @@
  * See ":help cscope-find" for the possible queries.
  */
 
-typedef struct {
-    char *  name;
-    int     (*func)(exarg_T *eap);
-    char *  help;
-    char *  usage;
-    int	    cansplit;		// if supports splitting window
+تعريفنوع بنية {
+    حرف *  name;
+    صحيح     (*func)(exarg_T *eap);
+    حرف *  help;
+    حرف *  usage;
+    صحيح	    cansplit;		// if supports splitting window
 } cscmd_T;
 
-typedef struct csi {
-    char *	    fname;	// cscope db name
-    char *	    ppath;	// path to prepend (the -P option)
-    char *	    flags;	// additional cscope flags/options (e.g, -p2)
-# if defined(UNIX)
+تعريفنوع بنية csi {
+    حرف *	    fname;	// cscope db name
+    حرف *	    ppath;	// path to prepend (the -P option)
+    حرف *	    flags;	// additional cscope flags/options (e.g, -p2)
+# إذا defined(UNIX)
     pid_t	    pid;	// PID of the connected cscope process.
     dev_t	    st_dev;	// ID of dev containing cscope db
     ino_t	    st_ino;	// inode number of cscope db
-# else
-#  if defined(MSWIN)
+# وإلا
+#  إذا defined(MSWIN)
     DWORD	    pid;	// PID of the connected cscope process.
     HANDLE	    hProc;	// cscope process handle
     DWORD	    nVolume;	// Volume serial number, instead of st_dev
-    DWORD	    nIndexHigh;	// st_ino has no meaning in the Windows
-    DWORD	    nIndexLow;
+    DWORD	    n_Index_تيڠݢي;	// st_ino has no meaning in the Windows
+    DWORD	    n_Index_رنده;
 #  endif
 # endif
 
@@ -66,52 +66,52 @@ typedef struct csi {
     FILE *	    to_fp;	// to cscope: FILE.
 } csinfo_T;
 
-typedef enum { Add, Find, Help, Kill, Reset, Show } csid_e;
+تعريفنوع تعداد { Add, Find, Help, Kill, Reset, Show } csid_e;
 
-typedef enum {
+تعريفنوع تعداد {
     Store,
     Get,
     Free,
     Print
 } mcmd_e;
 
-static int	    cs_add(exarg_T *eap);
-static int	    cs_add_common(char *, char *, char *);
-static int	    cs_check_for_connections(void);
-static int	    cs_check_for_tags(void);
-static int	    cs_cnt_connections(void);
-static int	    cs_create_connection(int i);
+ساكن صحيح	    cs_add(exarg_T *eap);
+ساكن صحيح	    cs_add_common(حرف *, حرف *, حرف *);
+ساكن صحيح	    cs_check_for_connections(فراغ);
+ساكن صحيح	    cs_check_for_tags(فراغ);
+ساكن صحيح	    cs_cnt_connections(فراغ);
+ساكن صحيح	    cs_create_connection(صحيح i);
 # ifdef FEAT_QUICKFIX
-static void	    cs_file_results(FILE *, int *);
+ساكن فراغ	    cs_file_results(FILE *, صحيح *);
 # endif
-static void	    cs_fill_results(char *, int , int *, char ***,
-			char ***, int *);
-static int	    cs_find(exarg_T *eap);
-static int	    cs_find_common(char *opt, char *pat, int, int, int, char_u *cmdline);
-static int	    cs_help(exarg_T *eap);
-static int	    cs_insert_filelist(char *, char *, char *,
+ساكن فراغ	    cs_fill_results(حرف *, صحيح , صحيح *, حرف ***,
+			حرف ***, صحيح *);
+ساكن صحيح	    cs_find(exarg_T *eap);
+ساكن صحيح	    cs_find_common(حرف *opt, حرف *pat, صحيح, صحيح, صحيح, char_u *cmdline);
+ساكن صحيح	    cs_help(exarg_T *eap);
+ساكن صحيح	    cs_سيسيڤ_filelist(حرف *, حرف *, حرف *,
 			stat_T *);
-static int	    cs_kill(exarg_T *eap);
-static void	    cs_kill_execute(int, char *);
-static cscmd_T *    cs_lookup_cmd(exarg_T *eap);
-static char *	    cs_make_vim_style_matches(char *, char *,
-			char *, char *);
-static char *	    cs_manage_matches(char **, char **, int, mcmd_e);
-static void	    cs_print_tags_priv(char **, char **, int);
-static int	    cs_read_prompt(int);
-static void	    cs_release_csp(int, int freefnpp);
-static int	    cs_reset(exarg_T *eap);
-static char *	    cs_resolve_file(int, char *);
-static int	    cs_show(exarg_T *eap);
+ساكن صحيح	    cs_kill(exarg_T *eap);
+ساكن فراغ	    cs_kill_execute(صحيح, حرف *);
+ساكن cscmd_T *    cs_lookup_cmd(exarg_T *eap);
+ساكن حرف *	    cs_make_vim_style_matches(حرف *, حرف *,
+			حرف *, حرف *);
+ساكن حرف *	    cs_manage_matches(حرف **, حرف **, صحيح, mcmd_e);
+ساكن فراغ	    cs_print_tags_priv(حرف **, حرف **, صحيح);
+ساكن صحيح	    cs_read_prompt(صحيح);
+ساكن فراغ	    cs_release_csp(صحيح, صحيح freefnpp);
+ساكن صحيح	    cs_reset(exarg_T *eap);
+ساكن حرف *	    cs_resolve_file(صحيح, حرف *);
+ساكن صحيح	    cs_show(exarg_T *eap);
 
 
-static csinfo_T *   csinfo = NULL;
-static int	    csinfo_size = 0;	// number of items allocated in
+ساكن csinfo_T *   csinfo = عدم;
+ساكن صحيح	    csinfo_size = 0;	// number of items allocated in
 					// csinfo[]
 
-static int	    eap_arg_len;    // length of eap->arg, set in
+ساكن صحيح	    eap_arg_len;    // length of eap->arg, set in
 				    // cs_lookup_cmd()
-static cscmd_T	    cs_cmds[] =
+ساكن cscmd_T	    cs_cmds[] =
 {
     { "add",	cs_add,
 		N_("Add a new database"),     "add file|dir [pre-path] [flags]", 0 },
@@ -125,16 +125,16 @@ static cscmd_T	    cs_cmds[] =
 		N_("Reinit all connections"), "reset", 0 },
     { "show",	cs_show,
 		N_("Show connections"),       "show", 0 },
-    { NULL, NULL, NULL, NULL, 0 }
+    { عدم, عدم, عدم, عدم, 0 }
 };
 
-    static void
-cs_usage_msg(csid_e x)
+    ساكن فراغ
+cs_usage_ڤسنن(csid_e x)
 {
-    (void)semsg(_(e_usage_cscope_str), cs_cmds[(int)x].usage);
+    (فراغ)semsg(_(e_usage_cscope_str), cs_cmds[(صحيح)x].usage);
 }
 
-static enum
+ساكن تعداد
 {
     EXP_CSCOPE_SUBCMD,	// expand ":cscope" sub-commands
     EXP_SCSCOPE_SUBCMD,	// expand ":scscope" sub-commands
@@ -147,67 +147,67 @@ static enum
  * expansion.
  */
     char_u *
-get_cscope_name(expand_T *xp UNUSED, int idx)
+get_cscope_name(expand_T *xp UNUSED, صحيح idx)
 {
-    int		current_idx;
-    int		i;
+    صحيح		current_idx;
+    صحيح		i;
 
-    switch (expand_what)
+    بدل (expand_what)
     {
-    case EXP_CSCOPE_SUBCMD:
+    حالة EXP_CSCOPE_SUBCMD:
 	// Complete with sub-commands of ":cscope":
 	// add, find, help, kill, reset, show
-	return (char_u *)cs_cmds[idx].name;
-    case EXP_SCSCOPE_SUBCMD:
+	أرجع (char_u *)cs_cmds[idx].name;
+    حالة EXP_SCSCOPE_SUBCMD:
 	// Complete with sub-commands of ":scscope": same sub-commands as
 	// ":cscope" but skip commands which don't support split windows
-	for (i = 0, current_idx = 0; cs_cmds[i].name != NULL; i++)
-	    if (cs_cmds[i].cansplit)
-		if (current_idx++ == idx)
-		    break;
-	return (char_u *)cs_cmds[i].name;
-    case EXP_CSCOPE_FIND:
+	لكل (i = 0, current_idx = 0; cs_cmds[i].name != عدم; i++)
+	    إذا (cs_cmds[i].cansplit)
+		إذا (current_idx++ == idx)
+		    اكسر;
+	أرجع (char_u *)cs_cmds[i].name;
+    حالة EXP_CSCOPE_FIND:
 	{
-	    const char *query_type[] =
+	    ثابت حرف *query_type[] =
 	    {
-		"a", "c", "d", "e", "f", "g", "i", "s", "t", NULL
+		"a", "c", "d", "e", "f", "g", "i", "s", "t", عدم
 	    };
 
 	    // Complete with query type of ":cscope find {query_type}".
 	    // {query_type} can be letters (c, d, ... a) or numbers (0, 1,
 	    // ..., 9) but only complete with letters, since numbers are
 	    // redundant.
-	    return (char_u *)query_type[idx];
+	    أرجع (char_u *)query_type[idx];
 	}
-    case EXP_CSCOPE_KILL:
+    حالة EXP_CSCOPE_KILL:
 	{
-	    static char	connection[5];
+	    ساكن حرف	connection[5];
 
 	    // ":cscope kill" accepts connection numbers or partial names of
 	    // the pathname of the cscope database as argument.  Only complete
 	    // with connection numbers. -1 can also be used to kill all
 	    // connections.
-	    for (i = 0, current_idx = 0; i < csinfo_size; i++)
+	    لكل (i = 0, current_idx = 0; i < csinfo_size; i++)
 	    {
-		if (csinfo[i].fname == NULL)
-		    continue;
-		if (current_idx++ == idx)
+		إذا (csinfo[i].fname == عدم)
+		    استمر;
+		إذا (current_idx++ == idx)
 		{
-		    vim_snprintf(connection, sizeof(connection), "%d", i);
-		    return (char_u *)connection;
+		    vim_snprintf(connection, حجم(connection), "%d", i);
+		    أرجع (char_u *)connection;
 		}
 	    }
-	    return (current_idx == idx && idx > 0) ? (char_u *)"-1" : NULL;
+	    أرجع (current_idx == idx && idx > 0) ? (char_u *)"-1" : عدم;
 	}
-    default:
-	return NULL;
+    افتراضي:
+	أرجع عدم;
     }
 }
 
 /*
  * Handle command line completion for :cscope command.
  */
-    void
+    فراغ
 set_context_in_cscope_cmd(
     expand_T	*xp,
     char_u	*arg,
@@ -221,25 +221,25 @@ set_context_in_cscope_cmd(
     expand_what = (cmdidx == CMD_scscope)
 			? EXP_SCSCOPE_SUBCMD : EXP_CSCOPE_SUBCMD;
 
-    if (*arg == NUL)
-	return;
+    إذا (*arg == NUL)
+	أرجع;
 
     // (part of) subcommand already typed
     p = skiptowhite(arg);
-    if (*p == NUL)
-	return;
+    إذا (*p == NUL)
+	أرجع;
 
     // past first word
     xp->xp_pattern = skipwhite(p);
-    if (*skiptowhite(xp->xp_pattern) != NUL)
+    إذا (*skiptowhite(xp->xp_pattern) != NUL)
 	xp->xp_context = EXPAND_NOTHING;
-    else if (STRNICMP(arg, "add", p - arg) == 0)
+    وإلا إذا (STRNICMP(arg, "add", p - arg) == 0)
 	xp->xp_context = EXPAND_FILES;
-    else if (STRNICMP(arg, "kill", p - arg) == 0)
+    وإلا إذا (STRNICMP(arg, "kill", p - arg) == 0)
 	expand_what = EXP_CSCOPE_KILL;
-    else if (STRNICMP(arg, "find", p - arg) == 0)
+    وإلا إذا (STRNICMP(arg, "find", p - arg) == 0)
 	expand_what = EXP_CSCOPE_FIND;
-    else
+    وإلا
 	xp->xp_context = EXPAND_NOTHING;
 }
 
@@ -247,28 +247,28 @@ set_context_in_cscope_cmd(
  * Find the command, print help if invalid, and then call the corresponding
  * command function.
  */
-    static void
+    ساكن فراغ
 do_cscope_general(
     exarg_T	*eap,
-    int		make_split UNUSED) // whether to split window
+    صحيح		make_split UNUSED) // whether to split window
 {
     cscmd_T *cmdp;
 
-    if (check_restricted())
-	return;
+    إذا (check_restricted())
+	أرجع;
 
-    if ((cmdp = cs_lookup_cmd(eap)) == NULL)
+    إذا ((cmdp = cs_lookup_cmd(eap)) == عدم)
     {
 	cs_help(eap);
-	return;
+	أرجع;
     }
 
-    if (make_split)
+    إذا (make_split)
     {
-	if (!cmdp->cansplit)
+	إذا (!cmdp->cansplit)
 	{
-	    (void)msg_puts(_("This cscope command does not support splitting the window.\n"));
-	    return;
+	    (فراغ)ڤسنن_puts(_("This cscope command does not support splitting the window.\n"));
+	    أرجع;
 	}
 	postponed_split = -1;
 	postponed_split_flags = cmdmod.cmod_split;
@@ -284,7 +284,7 @@ do_cscope_general(
 /*
  * Implementation of ":cscope" and ":lcscope"
  */
-    void
+    فراغ
 ex_cscope(exarg_T *eap)
 {
     do_cscope_general(eap, FALSE);
@@ -293,7 +293,7 @@ ex_cscope(exarg_T *eap)
 /*
  * Implementation of ":scscope". Same as ex_cscope(), but splits window, too.
  */
-    void
+    فراغ
 ex_scscope(exarg_T *eap)
 {
     do_cscope_general(eap, TRUE);
@@ -302,73 +302,73 @@ ex_scscope(exarg_T *eap)
 /*
  * Implementation of ":cstag"
  */
-    void
+    فراغ
 ex_cstag(exarg_T *eap)
 {
-    int ret = FALSE;
+    صحيح ret = FALSE;
 
-    if (*eap->arg == NUL)
+    إذا (*eap->arg == NUL)
     {
-	(void)emsg(_(e_usage_cstag_ident));
-	return;
+	(فراغ)emsg(_(e_usage_cstag_ident));
+	أرجع;
     }
 
-    switch (p_csto)
+    بدل (p_csto)
     {
-    case 0 :
-	if (cs_check_for_connections())
+    حالة 0 :
+	إذا (cs_check_for_connections())
 	{
-	    ret = cs_find_common("g", (char *)(eap->arg), eap->forceit, FALSE,
+	    ret = cs_find_common("g", (حرف *)(eap->arg), eap->forceit, FALSE,
 						       FALSE, *eap->cmdlinep);
-	    if (ret == FALSE)
+	    إذا (ret == FALSE)
 	    {
 		cs_free_tags();
-		if (msg_col)
-		    msg_putchar('\n');
+		إذا (ڤسنن_col)
+		    ڤسنن_putchar('\n');
 
-		if (cs_check_for_tags())
+		إذا (cs_check_for_tags())
 		    ret = do_tag(eap->arg, DT_JUMP, 0, eap->forceit, FALSE);
 	    }
 	}
-	else if (cs_check_for_tags())
+	وإلا إذا (cs_check_for_tags())
 	{
 	    ret = do_tag(eap->arg, DT_JUMP, 0, eap->forceit, FALSE);
 	}
-	break;
-    case 1 :
-	if (cs_check_for_tags())
+	اكسر;
+    حالة 1 :
+	إذا (cs_check_for_tags())
 	{
 	    ret = do_tag(eap->arg, DT_JUMP, 0, eap->forceit, FALSE);
-	    if (ret == FALSE)
+	    إذا (ret == FALSE)
 	    {
-		if (msg_col)
-		    msg_putchar('\n');
+		إذا (ڤسنن_col)
+		    ڤسنن_putchar('\n');
 
-		if (cs_check_for_connections())
+		إذا (cs_check_for_connections())
 		{
-		    ret = cs_find_common("g", (char *)(eap->arg), eap->forceit,
+		    ret = cs_find_common("g", (حرف *)(eap->arg), eap->forceit,
 						FALSE, FALSE, *eap->cmdlinep);
-		    if (ret == FALSE)
+		    إذا (ret == FALSE)
 			cs_free_tags();
 		}
 	    }
 	}
-	else if (cs_check_for_connections())
+	وإلا إذا (cs_check_for_connections())
 	{
-	    ret = cs_find_common("g", (char *)(eap->arg), eap->forceit, FALSE,
+	    ret = cs_find_common("g", (حرف *)(eap->arg), eap->forceit, FALSE,
 						       FALSE, *eap->cmdlinep);
-	    if (ret == FALSE)
+	    إذا (ret == FALSE)
 		cs_free_tags();
 	}
-	break;
-    default :
-	break;
+	اكسر;
+    افتراضي :
+	اكسر;
     }
 
-    if (!ret)
+    إذا (!ret)
     {
-	(void)emsg(_(e_cstag_tag_not_founc));
-# if defined(FEAT_QUICKFIX)
+	(فراغ)emsg(_(e_cstag_tag_not_founc));
+# إذا defined(FEAT_QUICKFIX)
 	g_do_tagpreview = 0;
 # endif
     }
@@ -382,36 +382,36 @@ ex_cstag(exarg_T *eap)
  *
  * returns TRUE if eof, FALSE otherwise
  */
-    int
-cs_fgets(char_u *buf, int size)
+    صحيح
+cs_fgets(char_u *buf, صحيح size)
 {
-    char *p;
+    حرف *p;
 
-    if ((p = cs_manage_matches(NULL, NULL, -1, Get)) == NULL)
-	return TRUE;
+    إذا ((p = cs_manage_matches(عدم, عدم, -1, Get)) == عدم)
+	أرجع TRUE;
     vim_strncpy(buf, (char_u *)p, size - 1);
 
-    return FALSE;
+    أرجع FALSE;
 }
 
 
 /*
  * Called only from do_tag(), when popping the tag stack.
  */
-    void
-cs_free_tags(void)
+    فراغ
+cs_free_tags(فراغ)
 {
-    cs_manage_matches(NULL, NULL, -1, Free);
+    cs_manage_matches(عدم, عدم, -1, Free);
 }
 
 
 /*
  * Called from do_tag().
  */
-    void
-cs_print_tags(void)
+    فراغ
+cs_print_tags(فراغ)
 {
-    cs_manage_matches(NULL, NULL, -1, Print);
+    cs_manage_matches(عدم, عدم, -1, Print);
 }
 
 
@@ -442,53 +442,53 @@ cs_print_tags(void)
  *
  *		Note: All string comparisons are case sensitive!
  */
-# if defined(FEAT_EVAL)
-    static int
-cs_connection(int num, char_u *dbpath, char_u *ppath)
+# إذا defined(FEAT_EVAL)
+    ساكن صحيح
+cs_connection(صحيح اڠک, char_u *dbpath, char_u *ppath)
 {
-    int i;
+    صحيح i;
 
-    if (num < 0 || num > 4 || (num > 0 && !dbpath))
-	return FALSE;
+    إذا (اڠک < 0 || اڠک > 4 || (اڠک > 0 && !dbpath))
+	أرجع FALSE;
 
-    for (i = 0; i < csinfo_size; i++)
+    لكل (i = 0; i < csinfo_size; i++)
     {
-	if (!csinfo[i].fname)
-	    continue;
+	إذا (!csinfo[i].fname)
+	    استمر;
 
-	if (num == 0)
-	    return TRUE;
+	إذا (اڠک == 0)
+	    أرجع TRUE;
 
-	switch (num)
+	بدل (اڠک)
 	{
-	case 1:
-	    if (strstr(csinfo[i].fname, (char *)dbpath))
-		return TRUE;
-	    break;
-	case 2:
-	    if (strcmp(csinfo[i].fname, (char *)dbpath) == 0)
-		return TRUE;
-	    break;
-	case 3:
-	    if (strstr(csinfo[i].fname, (char *)dbpath)
+	حالة 1:
+	    إذا (strstr(csinfo[i].fname, (حرف *)dbpath))
+		أرجع TRUE;
+	    اكسر;
+	حالة 2:
+	    إذا (strcmp(csinfo[i].fname, (حرف *)dbpath) == 0)
+		أرجع TRUE;
+	    اكسر;
+	حالة 3:
+	    إذا (strstr(csinfo[i].fname, (حرف *)dbpath)
 		    && ((!ppath && !csinfo[i].ppath)
 			|| (ppath
 			    && csinfo[i].ppath
-			    && strstr(csinfo[i].ppath, (char *)ppath))))
-		return TRUE;
-	    break;
-	case 4:
-	    if ((strcmp(csinfo[i].fname, (char *)dbpath) == 0)
+			    && strstr(csinfo[i].ppath, (حرف *)ppath))))
+		أرجع TRUE;
+	    اكسر;
+	حالة 4:
+	    إذا ((strcmp(csinfo[i].fname, (حرف *)dbpath) == 0)
 		    && ((!ppath && !csinfo[i].ppath)
 			|| (ppath
 			    && csinfo[i].ppath
-			    && (strcmp(csinfo[i].ppath, (char *)ppath) == 0))))
-		return TRUE;
-	    break;
+			    && (strcmp(csinfo[i].ppath, (حرف *)ppath) == 0))))
+		أرجع TRUE;
+	    اكسر;
 	}
     }
 
-    return FALSE;
+    أرجع FALSE;
 }
 
 # endif
@@ -502,27 +502,27 @@ cs_connection(int num, char_u *dbpath, char_u *ppath)
  * Add cscope database or a directory name (to look for cscope.out)
  * to the cscope connection list.
  */
-    static int
+    ساكن صحيح
 cs_add(exarg_T *eap UNUSED)
 {
-    char *fname, *ppath, *flags = NULL;
+    حرف *fname, *ppath, *flags = عدم;
 
-    if ((fname = strtok((char *)NULL, (const char *)" ")) == NULL)
+    إذا ((fname = strtok((حرف *)عدم, (ثابت حرف *)" ")) == عدم)
     {
-	cs_usage_msg(Add);
-	return CSCOPE_FAILURE;
+	cs_usage_ڤسنن(Add);
+	أرجع CSCOPE_FAILURE;
     }
-    if ((ppath = strtok((char *)NULL, (const char *)" ")) != NULL)
-	flags = strtok((char *)NULL, (const char *)" ");
+    إذا ((ppath = strtok((حرف *)عدم, (ثابت حرف *)" ")) != عدم)
+	flags = strtok((حرف *)عدم, (ثابت حرف *)" ");
 
-    return cs_add_common(fname, ppath, flags);
+    أرجع cs_add_common(fname, ppath, flags);
 }
 
-    static void
-cs_stat_emsg(char *fname)
+    ساكن فراغ
+cs_stat_emsg(حرف *fname)
 {
-    int err = errno;
-    (void)semsg(_(e_stat_str_error_nr), fname, err);
+    صحيح err = errno;
+    (فراغ)semsg(_(e_stat_str_error_nr), fname, err);
 }
 
 
@@ -531,115 +531,115 @@ cs_stat_emsg(char *fname)
  * cs_add() and cs_reset().  I really don't like to do this, but this
  * routine uses a number of goto statements.
  */
-    static int
+    ساكن صحيح
 cs_add_common(
-    char *arg1,	    // filename - may contain environment variables
-    char *arg2,	    // prepend path - may contain environment variables
-    char *flags)
+    حرف *arg1,	    // filename - may contain environment variables
+    حرف *arg2,	    // prepend path - may contain environment variables
+    حرف *flags)
 {
     stat_T	statbuf;
-    int		ret;
-    char	*fname = NULL;
-    char	*fname2 = NULL;
-    char	*ppath = NULL;
-    int		i;
+    صحيح		ret;
+    حرف	*fname = عدم;
+    حرف	*fname2 = عدم;
+    حرف	*ppath = عدم;
+    صحيح		i;
     size_t	len;
     size_t	usedlen = 0;
-    char_u	*fbuf = NULL;
+    char_u	*fbuf = عدم;
 
     // get the filename (arg1), expand it, and try to stat it
-    if ((fname = alloc(MAXPATHL + 1)) == NULL)
-	goto add_err;
+    إذا ((fname = alloc(MAXPATHL + 1)) == عدم)
+	اذهب add_err;
 
     len = expand_env((char_u *)arg1, (char_u *)fname, MAXPATHL);
     fbuf = (char_u *)fname;
-    (void)modify_fname((char_u *)":p", FALSE, &usedlen,
+    (فراغ)modify_fname((char_u *)":p", FALSE, &usedlen,
 					      (char_u **)&fname, &fbuf, &len);
-    if (fname == NULL)
-	goto add_err;
-    fname = (char *)vim_strnsave((char_u *)fname, len);
+    إذا (fname == عدم)
+	اذهب add_err;
+    fname = (حرف *)vim_strnsave((char_u *)fname, len);
     vim_free(fbuf);
 
     ret = mch_stat(fname, &statbuf);
-    if (ret < 0)
+    إذا (ret < 0)
     {
 staterr:
-	if (p_csverbose)
+	إذا (p_csverbose)
 	    cs_stat_emsg(fname);
-	goto add_err;
+	اذهب add_err;
     }
 
     // get the prepend path (arg2), expand it, and try to stat it
-    if (arg2 != NULL)
+    إذا (arg2 != عدم)
     {
 	stat_T	    statbuf2;
 
-	if ((ppath = alloc(MAXPATHL + 1)) == NULL)
-	    goto add_err;
+	إذا ((ppath = alloc(MAXPATHL + 1)) == عدم)
+	    اذهب add_err;
 
 	expand_env((char_u *)arg2, (char_u *)ppath, MAXPATHL);
 	ret = mch_stat(ppath, &statbuf2);
-	if (ret < 0)
-	    goto staterr;
+	إذا (ret < 0)
+	    اذهب staterr;
     }
 
     // if filename is a directory, append the cscope database name to it
-    if (S_ISDIR(statbuf.st_mode))
+    إذا (S_ISDIR(statbuf.st_mode))
     {
 	fname2 = alloc(STRLEN_LITERAL(CSCOPE_DBFILE) + strlen(fname) + 2);
-	if (fname2 == NULL)
-	    goto add_err;
+	إذا (fname2 == عدم)
+	    اذهب add_err;
 
-	while (fname[strlen(fname)-1] == '/'
+	طالما (fname[strlen(fname)-1] == '/'
 # ifdef MSWIN
 		|| fname[strlen(fname)-1] == '\\'
 # endif
 		)
 	{
 	    fname[strlen(fname)-1] = '\0';
-	    if (fname[0] == '\0')
-		break;
+	    إذا (fname[0] == '\0')
+		اكسر;
 	}
-	if (fname[0] == '\0')
-	    (void)sprintf(fname2, "/%s", CSCOPE_DBFILE);
-	else
-	    (void)sprintf(fname2, "%s/%s", fname, CSCOPE_DBFILE);
+	إذا (fname[0] == '\0')
+	    (فراغ)sprintf(fname2, "/%s", CSCOPE_DBFILE);
+	وإلا
+	    (فراغ)sprintf(fname2, "%s/%s", fname, CSCOPE_DBFILE);
 
 	ret = mch_stat(fname2, &statbuf);
-	if (ret < 0)
+	إذا (ret < 0)
 	{
-	    if (p_csverbose)
+	    إذا (p_csverbose)
 		cs_stat_emsg(fname2);
-	    goto add_err;
+	    اذهب add_err;
 	}
 
-	i = cs_insert_filelist(fname2, ppath, flags, &statbuf);
+	i = cs_سيسيڤ_filelist(fname2, ppath, flags, &statbuf);
     }
-    else if (S_ISREG(statbuf.st_mode) || S_ISLNK(statbuf.st_mode))
+    وإلا إذا (S_ISREG(statbuf.st_mode) || S_ISLNK(statbuf.st_mode))
     {
-	i = cs_insert_filelist(fname, ppath, flags, &statbuf);
+	i = cs_سيسيڤ_filelist(fname, ppath, flags, &statbuf);
     }
-    else
+    وإلا
     {
-	if (p_csverbose)
-	    (void)semsg(_(e_str_is_not_directory_or_valid_cscope_database),
+	إذا (p_csverbose)
+	    (فراغ)semsg(_(e_str_is_not_directory_or_valid_cscope_database),
 									fname);
-	goto add_err;
+	اذهب add_err;
     }
 
-    if (i != -1)
+    إذا (i != -1)
     {
-	if (cs_create_connection(i) == CSCOPE_FAILURE
+	إذا (cs_create_connection(i) == CSCOPE_FAILURE
 		|| cs_read_prompt(i) == CSCOPE_FAILURE)
 	{
 	    cs_release_csp(i, TRUE);
-	    goto add_err;
+	    اذهب add_err;
 	}
 
-	if (p_csverbose)
+	إذا (p_csverbose)
 	{
-	    msg_clr_eos();
-	    (void)smsg_attr(HL_ATTR(HLF_R),
+	    ڤسنن_clr_eos();
+	    (فراغ)smsg_attr(HL_ATTR(HLF_R),
 			    _("Added cscope database %s"),
 			    csinfo[i].fname);
 	}
@@ -648,48 +648,48 @@ staterr:
     vim_free(fname);
     vim_free(fname2);
     vim_free(ppath);
-    return CSCOPE_SUCCESS;
+    أرجع CSCOPE_SUCCESS;
 
 add_err:
     vim_free(fname2);
     vim_free(fname);
     vim_free(ppath);
-    return CSCOPE_FAILURE;
+    أرجع CSCOPE_FAILURE;
 }
 
 
-    static int
-cs_check_for_connections(void)
+    ساكن صحيح
+cs_check_for_connections(فراغ)
 {
-    return (cs_cnt_connections() > 0);
+    أرجع (cs_cnt_connections() > 0);
 }
 
 
-    static int
-cs_check_for_tags(void)
+    ساكن صحيح
+cs_check_for_tags(فراغ)
 {
-    return (p_tags[0] != NUL && curbuf->b_p_tags != NULL);
+    أرجع (p_tags[0] != NUL && curbuf->b_p_tags != عدم);
 }
 
 
 /*
  * Count the number of cscope connections.
  */
-    static int
-cs_cnt_connections(void)
+    ساكن صحيح
+cs_cnt_connections(فراغ)
 {
-    int i;
-    int cnt = 0;
+    صحيح i;
+    صحيح cnt = 0;
 
-    for (i = 0; i < csinfo_size; i++)
-	if (csinfo[i].fname != NULL)
+    لكل (i = 0; i < csinfo_size; i++)
+	إذا (csinfo[i].fname != عدم)
 	    cnt++;
-    return cnt;
+    أرجع cnt;
 }
 
-    static void
+    ساكن فراغ
 cs_reading_emsg(
-    int idx)	// connection index
+    صحيح idx)	// connection index
 {
     semsg(_(e_error_reading_cscope_connection_nr), idx);
 }
@@ -698,27 +698,27 @@ cs_reading_emsg(
 /*
  * Count the number of matches for a given cscope connection.
  */
-    static int
-cs_cnt_matches(int idx)
+    ساكن صحيح
+cs_cnt_matches(صحيح idx)
 {
-    char *stok;
-    char *buf;
-    int nlines = 0;
+    حرف *stok;
+    حرف *buf;
+    صحيح nlines = 0;
 
     buf = alloc(CSREAD_BUFSIZE);
-    if (buf == NULL)
-	return 0;
-    for (;;)
+    إذا (buf == عدم)
+	أرجع 0;
+    لكل (;;)
     {
-	if (!fgets(buf, CSREAD_BUFSIZE, csinfo[idx].fr_fp))
+	إذا (!fgets(buf, CSREAD_BUFSIZE, csinfo[idx].fr_fp))
 	{
-	    if (feof(csinfo[idx].fr_fp))
+	    إذا (feof(csinfo[idx].fr_fp))
 		errno = EIO;
 
 	    cs_reading_emsg(idx);
 
 	    vim_free(buf);
-	    return -1;
+	    أرجع -1;
 	}
 
 	/*
@@ -728,93 +728,93 @@ cs_cnt_matches(int idx)
 	 * Accept "\S*cscope: X lines", also matches "mlcscope".
 	 * Bail out for the "Unable to search" error.
 	 */
-	if (strstr((const char *)buf, "Unable to search database") != NULL)
-	    break;
-	if ((stok = strtok(buf, (const char *)" ")) == NULL)
-	    continue;
-	if (strstr((const char *)stok, "cscope:") == NULL)
-	    continue;
+	إذا (strstr((ثابت حرف *)buf, "Unable to search database") != عدم)
+	    اكسر;
+	إذا ((stok = strtok(buf, (ثابت حرف *)" ")) == عدم)
+	    استمر;
+	إذا (strstr((ثابت حرف *)stok, "cscope:") == عدم)
+	    استمر;
 
-	if ((stok = strtok(NULL, (const char *)" ")) == NULL)
-	    continue;
+	إذا ((stok = strtok(عدم, (ثابت حرف *)" ")) == عدم)
+	    استمر;
 	nlines = atoi(stok);
-	if (nlines < 0)
+	إذا (nlines < 0)
 	{
 	    nlines = 0;
-	    break;
+	    اكسر;
 	}
 
-	if ((stok = strtok(NULL, (const char *)" ")) == NULL)
-	    continue;
-	if (strncmp((const char *)stok, "lines", 5))
-	    continue;
+	إذا ((stok = strtok(عدم, (ثابت حرف *)" ")) == عدم)
+	    استمر;
+	إذا (strncmp((ثابت حرف *)stok, "lines", 5))
+	    استمر;
 
-	break;
+	اكسر;
     }
 
     vim_free(buf);
-    return nlines;
+    أرجع nlines;
 }
 
 
 /*
  * Creates the actual cscope command query from what the user entered.
  */
-    static char *
-cs_create_cmd(char *csoption, char *pattern)
+    ساكن حرف *
+cs_create_cmd(حرف *csoption, حرف *pattern)
 {
-    char *cmd;
-    short search;
-    char *pat;
+    حرف *cmd;
+    short چارين;
+    حرف *pat;
 
-    switch (csoption[0])
+    بدل (csoption[0])
     {
-    case '0' : case 's' :
-	search = 0;
-	break;
-    case '1' : case 'g' :
-	search = 1;
-	break;
-    case '2' : case 'd' :
-	search = 2;
-	break;
-    case '3' : case 'c' :
-	search = 3;
-	break;
-    case '4' : case 't' :
-	search = 4;
-	break;
-    case '6' : case 'e' :
-	search = 6;
-	break;
-    case '7' : case 'f' :
-	search = 7;
-	break;
-    case '8' : case 'i' :
-	search = 8;
-	break;
-    case '9' : case 'a' :
-	search = 9;
-	break;
-    default :
-	(void)emsg(_(e_unknown_cscope_search_type));
-	cs_usage_msg(Find);
-	return NULL;
+    حالة '0' : حالة 's' :
+	چارين = 0;
+	اكسر;
+    حالة '1' : حالة 'g' :
+	چارين = 1;
+	اكسر;
+    حالة '2' : حالة 'd' :
+	چارين = 2;
+	اكسر;
+    حالة '3' : حالة 'c' :
+	چارين = 3;
+	اكسر;
+    حالة '4' : حالة 't' :
+	چارين = 4;
+	اكسر;
+    حالة '6' : حالة 'e' :
+	چارين = 6;
+	اكسر;
+    حالة '7' : حالة 'f' :
+	چارين = 7;
+	اكسر;
+    حالة '8' : حالة 'i' :
+	چارين = 8;
+	اكسر;
+    حالة '9' : حالة 'a' :
+	چارين = 9;
+	اكسر;
+    افتراضي :
+	(فراغ)emsg(_(e_unknown_cscope_چارين_type));
+	cs_usage_ڤسنن(Find);
+	أرجع عدم;
     }
 
     // Skip white space before the pattern, except for text and pattern search,
     // they may want to use the leading white space.
     pat = pattern;
-    if (search != 4 && search != 6)
-	while VIM_ISWHITE(*pat)
+    إذا (چارين != 4 && چارين != 6)
+	طالما VIM_ISWHITE(*pat)
 	    ++pat;
 
-    if ((cmd = alloc(strlen(pat) + 2)) == NULL)
-	return NULL;
+    إذا ((cmd = alloc(strlen(pat) + 2)) == عدم)
+	أرجع عدم;
 
-    (void)sprintf(cmd, "%d%s", search, pat);
+    (فراغ)sprintf(cmd, "%d%s", چارين, pat);
 
-    return cmd;
+    أرجع cmd;
 }
 
 
@@ -822,18 +822,18 @@ cs_create_cmd(char *csoption, char *pattern)
  * This piece of code was taken/adapted from nvi.  do we need to add
  * the BSD license notice?
  */
-    static int
-cs_create_connection(int i)
+    ساكن صحيح
+cs_create_connection(صحيح i)
 {
 # ifdef UNIX
-    int		to_cs[2], from_cs[2];
+    صحيح		to_cs[2], from_cs[2];
 # endif
-    int		cmdlen;
-    char	*prog, *cmd, *ppath = NULL;
+    صحيح		cmdlen;
+    حرف	*prog, *cmd, *ppath = عدم;
     size_t	proglen;
 # ifdef MSWIN
-    int		fd;
-    int		len;
+    صحيح		fd;
+    صحيح		len;
     SECURITY_ATTRIBUTES sa;
     PROCESS_INFORMATION pi;
     STARTUPINFO si;
@@ -843,113 +843,113 @@ cs_create_connection(int i)
     BOOL	created;
 # endif
 
-# if defined(UNIX)
+# إذا defined(UNIX)
     /*
      * Cscope reads from to_cs[0] and writes to from_cs[1]; vi reads from
      * from_cs[0] and writes to to_cs[1].
      */
     to_cs[0] = to_cs[1] = from_cs[0] = from_cs[1] = -1;
-    if (pipe(to_cs) < 0 || pipe(from_cs) < 0)
+    إذا (pipe(to_cs) < 0 || pipe(from_cs) < 0)
     {
-	(void)emsg(_(e_could_not_create_cscope_pipes));
+	(فراغ)emsg(_(e_could_not_create_cscope_pipes));
 err_closing:
-	if (to_cs[0] != -1)
-	    (void)close(to_cs[0]);
-	if (to_cs[1] != -1)
-	    (void)close(to_cs[1]);
-	if (from_cs[0] != -1)
-	    (void)close(from_cs[0]);
-	if (from_cs[1] != -1)
-	    (void)close(from_cs[1]);
-	return CSCOPE_FAILURE;
+	إذا (to_cs[0] != -1)
+	    (فراغ)close(to_cs[0]);
+	إذا (to_cs[1] != -1)
+	    (فراغ)close(to_cs[1]);
+	إذا (from_cs[0] != -1)
+	    (فراغ)close(from_cs[0]);
+	إذا (from_cs[1] != -1)
+	    (فراغ)close(from_cs[1]);
+	أرجع CSCOPE_FAILURE;
     }
 
-    if ((csinfo[i].pid = fork()) == -1)
+    إذا ((csinfo[i].pid = fork()) == -1)
     {
-	(void)emsg(_(e_could_not_fork_for_cscope));
-	goto err_closing;
+	(فراغ)emsg(_(e_could_not_fork_for_cscope));
+	اذهب err_closing;
     }
-    else if (csinfo[i].pid == 0)	// child: run cscope.
+    وإلا إذا (csinfo[i].pid == 0)	// child: run cscope.
     {
-	char **argv = NULL;
+	حرف **argv = عدم;
 
-	if (dup2(to_cs[0], STDIN_FILENO) == -1)
+	إذا (dup2(to_cs[0], STDIN_FILENO) == -1)
 	    PERROR("cs_create_connection 1");
-	if (dup2(from_cs[1], STDOUT_FILENO) == -1)
+	إذا (dup2(from_cs[1], STDOUT_FILENO) == -1)
 	    PERROR("cs_create_connection 2");
-	if (dup2(from_cs[1], STDERR_FILENO) == -1)
+	إذا (dup2(from_cs[1], STDERR_FILENO) == -1)
 	    PERROR("cs_create_connection 3");
 
 	// close unused
-	(void)close(to_cs[1]);
-	(void)close(from_cs[0]);
-# else
+	(فراغ)close(to_cs[1]);
+	(فراغ)close(from_cs[0]);
+# وإلا
 	// MSWIN
 	// Create pipes to communicate with cscope
-	sa.nLength = sizeof(SECURITY_ATTRIBUTES);
+	sa.nLength = حجم(SECURITY_ATTRIBUTES);
 	sa.bInheritHandle = TRUE;
-	sa.lpSecurityDescriptor = NULL;
+	sa.lpSecurityDescriptor = عدم;
 
-	if (!(pipe_stdin = CreatePipe(&stdin_rd, &stdin_wr, &sa, 0))
+	إذا (!(pipe_stdin = CreatePipe(&stdin_rd, &stdin_wr, &sa, 0))
 		|| !(pipe_stdout = CreatePipe(&stdout_rd, &stdout_wr, &sa, 0)))
 	{
-	    (void)emsg(_(e_could_not_create_cscope_pipes));
+	    (فراغ)emsg(_(e_could_not_create_cscope_pipes));
 err_closing:
-	    if (pipe_stdin)
+	    إذا (pipe_stdin)
 	    {
 		CloseHandle(stdin_rd);
 		CloseHandle(stdin_wr);
 	    }
-	    if (pipe_stdout)
+	    إذا (pipe_stdout)
 	    {
 		CloseHandle(stdout_rd);
 		CloseHandle(stdout_wr);
 	    }
-	    return CSCOPE_FAILURE;
+	    أرجع CSCOPE_FAILURE;
 	}
 # endif
 	// expand the cscope exec for env var's
-	if ((prog = alloc(MAXPATHL + 1)) == NULL)
+	إذا ((prog = alloc(MAXPATHL + 1)) == عدم)
 	{
 # ifdef UNIX
 	    exit(EXIT_FAILURE);
-# else
+# وإلا
 	    // MSWIN
-	    goto err_closing;
+	    اذهب err_closing;
 # endif
 	}
 	proglen = expand_env(p_csprg, (char_u *)prog, MAXPATHL);
 
 	// alloc space to hold the cscope command
-	cmdlen = (int)(proglen + strlen(csinfo[i].fname) + 32);
-	if (csinfo[i].ppath)
+	cmdlen = (صحيح)(proglen + strlen(csinfo[i].fname) + 32);
+	إذا (csinfo[i].ppath)
 	{
 	    // expand the prepend path for env var's
-	    if ((ppath = alloc(MAXPATHL + 1)) == NULL)
+	    إذا ((ppath = alloc(MAXPATHL + 1)) == عدم)
 	    {
 		vim_free(prog);
 # ifdef UNIX
 		exit(EXIT_FAILURE);
-# else
+# وإلا
 		// MSWIN
-		goto err_closing;
+		اذهب err_closing;
 # endif
 	    }
-	    cmdlen += (int)expand_env((char_u *)csinfo[i].ppath, (char_u *)ppath, MAXPATHL);
+	    cmdlen += (صحيح)expand_env((char_u *)csinfo[i].ppath, (char_u *)ppath, MAXPATHL);
 	}
 
-	if (csinfo[i].flags)
-	    cmdlen += (int)strlen(csinfo[i].flags);
+	إذا (csinfo[i].flags)
+	    cmdlen += (صحيح)strlen(csinfo[i].flags);
 
-	if ((cmd = alloc(cmdlen)) == NULL)
+	إذا ((cmd = alloc(cmdlen)) == عدم)
 	{
 	    vim_free(prog);
 	    vim_free(ppath);
 # ifdef UNIX
 	    exit(EXIT_FAILURE);
-# else
+# وإلا
 	    // MSWIN
-	    goto err_closing;
+	    اذهب err_closing;
 # endif
 	}
 
@@ -957,82 +957,82 @@ err_closing:
 # ifdef UNIX
 	{
 	    garray_T	ga_argv;
-	    char	**tok = NULL;
-	    int		tokc = 0;
+	    حرف	**tok = عدم;
+	    صحيح		tokc = 0;
 
-	    ga_init2(&ga_argv, sizeof(char *), 8);
+	    ga_init2(&ga_argv, حجم(حرف *), 8);
 
 	    // 'cscopeprg' may be multi-word (e.g. "cscope --foo");
 	    // split it into separate argv entries.
-	    if (build_argv_from_string((char_u *)prog, &tok, &tokc) == FAIL)
+	    إذا (build_argv_from_string((char_u *)prog, &tok, &tokc) == FAIL)
 		exit(EXIT_FAILURE);
-	    for (int k = 0; k < tokc; ++k)
+	    لكل (صحيح k = 0; k < tokc; ++k)
 	    {
-		if (ga_grow(&ga_argv, 1) == FAIL)
+		إذا (ga_grow(&ga_argv, 1) == FAIL)
 		    exit(EXIT_FAILURE);
-		((char **)ga_argv.ga_data)[ga_argv.ga_len++] = tok[k];
+		((حرف **)ga_argv.ga_data)[ga_argv.ga_len++] = tok[k];
 	    }
 	    VIM_CLEAR(tok);
 
 	    // Literal arguments: "-dl", "-f", fname.
-	    if (ga_grow(&ga_argv, 3) == FAIL)
+	    إذا (ga_grow(&ga_argv, 3) == FAIL)
 		exit(EXIT_FAILURE);
-	    ((char **)ga_argv.ga_data)[ga_argv.ga_len++] =
-				    (char *)vim_strsave((char_u *)"-dl");
-	    ((char **)ga_argv.ga_data)[ga_argv.ga_len++] =
-				    (char *)vim_strsave((char_u *)"-f");
-	    ((char **)ga_argv.ga_data)[ga_argv.ga_len++] =
-				(char *)vim_strsave((char_u *)csinfo[i].fname);
+	    ((حرف **)ga_argv.ga_data)[ga_argv.ga_len++] =
+				    (حرف *)vim_strsave((char_u *)"-dl");
+	    ((حرف **)ga_argv.ga_data)[ga_argv.ga_len++] =
+				    (حرف *)vim_strsave((char_u *)"-f");
+	    ((حرف **)ga_argv.ga_data)[ga_argv.ga_len++] =
+				(حرف *)vim_strsave((char_u *)csinfo[i].fname);
 
 	    // "-P<ppath>" as a single argv entry, if set.
-	    if (ppath != NULL)
+	    إذا (ppath != عدم)
 	    {
 		size_t	plen = STRLEN(ppath) + 3;
-		char	*parg = alloc(plen);
+		حرف	*parg = alloc(plen);
 
-		if (parg == NULL || ga_grow(&ga_argv, 1) == FAIL)
+		إذا (parg == عدم || ga_grow(&ga_argv, 1) == FAIL)
 		    exit(EXIT_FAILURE);
 		vim_snprintf(parg, plen, "-P%s", ppath);
-		((char **)ga_argv.ga_data)[ga_argv.ga_len++] = parg;
+		((حرف **)ga_argv.ga_data)[ga_argv.ga_len++] = parg;
 	    }
 
 	    // 'flags' is intended to be a sequence of cscope tokens
 	    // like "-q -i somefile"; split it the same way as prog.
-	    if (csinfo[i].flags != NULL)
+	    إذا (csinfo[i].flags != عدم)
 	    {
-		if (build_argv_from_string((char_u *)csinfo[i].flags,
+		إذا (build_argv_from_string((char_u *)csinfo[i].flags,
 							&tok, &tokc) == FAIL)
 		    exit(EXIT_FAILURE);
-		for (int k = 0; k < tokc; ++k)
+		لكل (صحيح k = 0; k < tokc; ++k)
 		{
-		    if (ga_grow(&ga_argv, 1) == FAIL)
+		    إذا (ga_grow(&ga_argv, 1) == FAIL)
 			exit(EXIT_FAILURE);
-		    ((char **)ga_argv.ga_data)[ga_argv.ga_len++] = tok[k];
+		    ((حرف **)ga_argv.ga_data)[ga_argv.ga_len++] = tok[k];
 		}
 		vim_free(tok);
 	    }
 
 	    // NULL-terminate argv.
-	    if (ga_grow(&ga_argv, 1) == FAIL)
+	    إذا (ga_grow(&ga_argv, 1) == FAIL)
 		exit(EXIT_FAILURE);
-	    ((char **)ga_argv.ga_data)[ga_argv.ga_len] = NULL;
+	    ((حرف **)ga_argv.ga_data)[ga_argv.ga_len] = عدم;
 
 	    vim_free(prog);
 	    vim_free(ppath);
 	    vim_free(cmd);
 
-#  if defined(HAVE_SETSID) || defined(HAVE_SETPGID)
+#  إذا defined(HAVE_SETSID) || defined(HAVE_SETPGID)
 	    // Change our process group to avoid cscope receiving SIGWINCH.
-#   if defined(HAVE_SETSID)
-	    (void)setsid();
-#   else
-	    if (setpgid(0, 0) == -1)
+#   إذا defined(HAVE_SETSID)
+	    (فراغ)setsid();
+#   وإلا
+	    إذا (setpgid(0, 0) == -1)
 		PERROR(_("cs_create_connection setpgid failed"));
 #   endif
 #  endif
 
-	    argv = (char **)ga_argv.ga_data;
-	    if (argv[0] == NULL || execvp(argv[0], argv) == -1)
+	    argv = (حرف **)ga_argv.ga_data;
+	    إذا (argv[0] == عدم || execvp(argv[0], argv) == -1)
 	    {
 		fprintf(stderr, "%s\n",
 		    _("cs_create_connection exec failed"));
@@ -1043,32 +1043,32 @@ err_closing:
 	    // NOTREACHED
 	}
     }
-    else	// parent.
+    وإلا	// parent.
     {
 	/*
 	 * Save the file descriptors for later duplication, and
 	 * reopen as streams.
 	 */
-	if ((csinfo[i].to_fp = fdopen(to_cs[1], "w")) == NULL)
+	إذا ((csinfo[i].to_fp = fdopen(to_cs[1], "w")) == عدم)
 	    PERROR(_("cs_create_connection: fdopen for to_fp failed"));
-	if ((csinfo[i].fr_fp = fdopen(from_cs[0], "r")) == NULL)
+	إذا ((csinfo[i].fr_fp = fdopen(from_cs[0], "r")) == عدم)
 	    PERROR(_("cs_create_connection: fdopen for fr_fp failed"));
 
 	// close unused
-	(void)close(to_cs[0]);
-	(void)close(from_cs[1]);
+	(فراغ)close(to_cs[0]);
+	(فراغ)close(from_cs[1]);
     }
-# else
+# وإلا
     // MSWIN
     vim_snprintf(cmd, cmdlen, "%s -dl -f %s", prog, csinfo[i].fname);
-    if (csinfo[i].ppath != NULL)
+    إذا (csinfo[i].ppath != عدم)
     {
-	len = (int)STRLEN(cmd);
+	len = (صحيح)STRLEN(cmd);
 	vim_snprintf(cmd + len, cmdlen - len, " -P%s", csinfo[i].ppath);
     }
-    if (csinfo[i].flags != NULL)
+    إذا (csinfo[i].flags != عدم)
     {
-	len = (int)STRLEN(cmd);
+	len = (صحيح)STRLEN(cmd);
 	vim_snprintf(cmd + len, cmdlen - len, " %s", csinfo[i].flags);
     }
     vim_free(ppath);
@@ -1079,17 +1079,17 @@ err_closing:
     si.wShowWindow = SW_HIDE;  // Hide child application window
     si.hStdOutput = stdout_wr;
     si.hStdError  = stdout_wr;
-    si.hStdInput  = stdin_rd;
-    created = CreateProcess(NULL, cmd, NULL, NULL, TRUE, CREATE_NEW_CONSOLE,
-							NULL, NULL, &si, &pi);
+    si.h_Std_ماسوقن  = stdin_rd;
+    created = CreateProcess(عدم, cmd, عدم, عدم, TRUE, CREATE_NEW_CONSOLE,
+							عدم, عدم, &si, &pi);
     vim_free(prog);
     vim_free(cmd);
 
-    if (!created)
+    إذا (!created)
     {
 	PERROR(_("cs_create_connection exec failed"));
-	(void)emsg(_(e_could_not_spawn_cscope_process));
-	goto err_closing;
+	(فراغ)emsg(_(e_could_not_spawn_cscope_process));
+	اذهب err_closing;
     }
     // else
     csinfo[i].pid = pi.dwProcessId;
@@ -1097,13 +1097,13 @@ err_closing:
     CloseHandle(pi.hThread);
 
     // TODO - tidy up after failure to create files on pipe handles.
-    if (((fd = _open_osfhandle((intptr_t)stdin_wr,
+    إذا (((fd = _open_osfhandle((intptr_t)stdin_wr,
 						      _O_TEXT|_O_APPEND)) < 0)
-	    || ((csinfo[i].to_fp = _fdopen(fd, "w")) == NULL))
+	    || ((csinfo[i].to_fp = _fdopen(fd, "w")) == عدم))
 	PERROR(_("cs_create_connection: fdopen for to_fp failed"));
-    if (((fd = _open_osfhandle((intptr_t)stdout_rd,
+    إذا (((fd = _open_osfhandle((intptr_t)stdout_rd,
 						      _O_TEXT|_O_RDONLY)) < 0)
-	    || ((csinfo[i].fr_fp = _fdopen(fd, "r")) == NULL))
+	    || ((csinfo[i].fr_fp = _fdopen(fd, "r")) == عدم))
 	PERROR(_("cs_create_connection: fdopen for fr_fp failed"));
 
     // Close handles for file descriptors inherited by the cscope process
@@ -1112,7 +1112,7 @@ err_closing:
 
 # endif // !UNIX
 
-    return CSCOPE_SUCCESS;
+    أرجع CSCOPE_SUCCESS;
 }
 
 
@@ -1122,40 +1122,40 @@ err_closing:
  *
  * returns TRUE if we jump to a tag or abort, FALSE if not.
  */
-    static int
+    ساكن صحيح
 cs_find(exarg_T *eap)
 {
-    char *opt, *pat;
-    int i;
+    حرف *opt, *pat;
+    صحيح i;
 
-    if (cs_check_for_connections() == FALSE)
+    إذا (cs_check_for_connections() == FALSE)
     {
-	(void)emsg(_(e_no_cscope_connections));
-	return FALSE;
+	(فراغ)emsg(_(e_no_cscope_connections));
+	أرجع FALSE;
     }
 
-    if ((opt = strtok((char *)NULL, (const char *)" ")) == NULL)
+    إذا ((opt = strtok((حرف *)عدم, (ثابت حرف *)" ")) == عدم)
     {
-	cs_usage_msg(Find);
-	return FALSE;
+	cs_usage_ڤسنن(Find);
+	أرجع FALSE;
     }
 
     pat = opt + strlen(opt) + 1;
-    if (pat >= (char *)eap->arg + eap_arg_len)
+    إذا (pat >= (حرف *)eap->arg + eap_arg_len)
     {
-	cs_usage_msg(Find);
-	return FALSE;
+	cs_usage_ڤسنن(Find);
+	أرجع FALSE;
     }
 
     /*
      * Let's replace the NULs written by strtok() with spaces - we need the
      * spaces to correctly display the quickfix/location list window's title.
      */
-    for (i = 0; i < eap_arg_len; ++i)
-	if (NUL == eap->arg[i])
+    لكل (i = 0; i < eap_arg_len; ++i)
+	إذا (NUL == eap->arg[i])
 	    eap->arg[i] = ' ';
 
-    return cs_find_common(opt, pat, eap->forceit, TRUE,
+    أرجع cs_find_common(opt, pat, eap->forceit, TRUE,
 				  eap->cmdidx == CMD_lcscope, *eap->cmdlinep);
 }
 
@@ -1163,76 +1163,76 @@ cs_find(exarg_T *eap)
 /*
  * Common code for cscope find, shared by cs_find() and ex_cstag().
  */
-    static int
+    ساكن صحيح
 cs_find_common(
-    char *opt,
-    char *pat,
-    int forceit,
-    int verbose,
-    int	use_ll UNUSED,
+    حرف *opt,
+    حرف *pat,
+    صحيح forceit,
+    صحيح verbose,
+    صحيح	use_ll UNUSED,
     char_u *cmdline UNUSED)
 {
-    int i;
-    char *cmd;
-    int *nummatches;
-    int totmatches;
+    صحيح i;
+    حرف *cmd;
+    صحيح *nummatches;
+    صحيح totmatches;
 # ifdef FEAT_QUICKFIX
-    char cmdletter;
-    char *qfpos;
+    حرف cmdletter;
+    حرف *qfpos;
 
     // get cmd letter
-    switch (opt[0])
+    بدل (opt[0])
     {
-    case '0' :
+    حالة '0' :
 	cmdletter = 's';
-	break;
-    case '1' :
+	اكسر;
+    حالة '1' :
 	cmdletter = 'g';
-	break;
-    case '2' :
+	اكسر;
+    حالة '2' :
 	cmdletter = 'd';
-	break;
-    case '3' :
+	اكسر;
+    حالة '3' :
 	cmdletter = 'c';
-	break;
-    case '4' :
+	اكسر;
+    حالة '4' :
 	cmdletter = 't';
-	break;
-    case '6' :
+	اكسر;
+    حالة '6' :
 	cmdletter = 'e';
-	break;
-    case '7' :
+	اكسر;
+    حالة '7' :
 	cmdletter = 'f';
-	break;
-    case '8' :
+	اكسر;
+    حالة '8' :
 	cmdletter = 'i';
-	break;
-    case '9' :
+	اكسر;
+    حالة '9' :
 	cmdletter = 'a';
-	break;
-    default :
+	اكسر;
+    افتراضي :
 	cmdletter = opt[0];
     }
 
-    qfpos = (char *)vim_strchr(p_csqf, cmdletter);
-    if (qfpos != NULL)
+    qfpos = (حرف *)vim_strchr(p_csqf, cmdletter);
+    إذا (qfpos != عدم)
     {
 	qfpos++;
 	// next symbol must be + or -
-	if (strchr(CSQF_FLAGS, *qfpos) == NULL)
+	إذا (strchr(CSQF_FLAGS, *qfpos) == عدم)
 	{
-	    (void)semsg(_(e_invalid_cscopequickfix_flag_chr_for_chr),
+	    (فراغ)semsg(_(e_invalid_cscopequickfix_flag_chr_for_chr),
 							 *qfpos, *(qfpos - 1));
-	    return FALSE;
+	    أرجع FALSE;
 	}
 
-	if (*qfpos != '0'
+	إذا (*qfpos != '0'
 		&& apply_autocmds(EVENT_QUICKFIXCMDPRE, (char_u *)"cscope",
 					       curbuf->b_fname, TRUE, curbuf))
 	{
 #  ifdef FEAT_EVAL
-	    if (aborting())
-		return FALSE;
+	    إذا (aborting())
+		أرجع FALSE;
 #  endif
 	}
     }
@@ -1240,80 +1240,80 @@ cs_find_common(
 
     // create the actual command to send to cscope
     cmd = cs_create_cmd(opt, pat);
-    if (cmd == NULL)
-	return FALSE;
+    إذا (cmd == عدم)
+	أرجع FALSE;
 
-    nummatches = ALLOC_MULT(int, csinfo_size);
-    if (nummatches == NULL)
+    nummatches = ALLOC_MULT(صحيح, csinfo_size);
+    إذا (nummatches == عدم)
     {
 	vim_free(cmd);
-	return FALSE;
+	أرجع FALSE;
     }
 
     // Send query to all open connections, then count the total number
     // of matches so we can alloc all in one swell foop.
-    for (i = 0; i < csinfo_size; i++)
+    لكل (i = 0; i < csinfo_size; i++)
 	nummatches[i] = 0;
     totmatches = 0;
-    for (i = 0; i < csinfo_size; i++)
+    لكل (i = 0; i < csinfo_size; i++)
     {
-	if (csinfo[i].fname == NULL || csinfo[i].to_fp == NULL)
-	    continue;
+	إذا (csinfo[i].fname == عدم || csinfo[i].to_fp == عدم)
+	    استمر;
 
 	// send cmd to cscope
-	(void)fprintf(csinfo[i].to_fp, "%s\n", cmd);
-	(void)fflush(csinfo[i].to_fp);
+	(فراغ)fprintf(csinfo[i].to_fp, "%s\n", cmd);
+	(فراغ)fflush(csinfo[i].to_fp);
 
 	nummatches[i] = cs_cnt_matches(i);
 
-	if (nummatches[i] > -1)
+	إذا (nummatches[i] > -1)
 	    totmatches += nummatches[i];
 
-	if (nummatches[i] == 0)
-	    (void)cs_read_prompt(i);
+	إذا (nummatches[i] == 0)
+	    (فراغ)cs_read_prompt(i);
     }
     vim_free(cmd);
 
-    if (totmatches == 0)
+    إذا (totmatches == 0)
     {
-	if (verbose)
-	    (void)semsg(_(e_no_matches_found_for_cscope_query_str_of_str),
+	إذا (verbose)
+	    (فراغ)semsg(_(e_no_matches_found_for_cscope_query_str_of_str),
 								     opt, pat);
 	vim_free(nummatches);
-	return FALSE;
+	أرجع FALSE;
     }
 
 # ifdef FEAT_QUICKFIX
-    if (qfpos != NULL && *qfpos != '0' && totmatches > 0)
+    إذا (qfpos != عدم && *qfpos != '0' && totmatches > 0)
     {
 	// fill error list
 	FILE	    *f;
 	char_u	    *tmp = vim_tempname('c', TRUE);
-	qf_info_T   *qi = NULL;
-	win_T	    *wp = NULL;
+	qf_info_T   *qi = عدم;
+	win_T	    *wp = عدم;
 
-	if (tmp == NULL)
+	إذا (tmp == عدم)
 	{
 	    vim_free(nummatches);
-	    return FALSE;
+	    أرجع FALSE;
 	}
 
-	f = mch_fopen((char *)tmp, "w");
-	if (f == NULL)
+	f = mch_fopen((حرف *)tmp, "w");
+	إذا (f == عدم)
 	    semsg(_(e_cant_open_file_str), tmp);
-	else
+	وإلا
 	{
 	    cs_file_results(f, nummatches);
 	    fclose(f);
-	    if (use_ll)	    // Use location list
+	    إذا (use_ll)	    // Use location list
 		wp = curwin;
 	    // '-' starts a new error list
-	    if (qf_init(wp, tmp, (char_u *)"%f%*\\t%l%*\\t%m",
-					  *qfpos == '-', cmdline, NULL) > 0)
+	    إذا (qf_init(wp, tmp, (char_u *)"%f%*\\t%l%*\\t%m",
+					  *qfpos == '-', cmdline, عدم) > 0)
 	    {
-		if (postponed_split != 0)
+		إذا (postponed_split != 0)
 		{
-		    (void)win_split(postponed_split > 0 ? postponed_split : 0,
+		    (فراغ)win_split(postponed_split > 0 ? postponed_split : 0,
 						       postponed_split_flags);
 		    RESET_BINDING(curwin);
 		    postponed_split = 0;
@@ -1321,12 +1321,12 @@ cs_find_common(
 
 		apply_autocmds(EVENT_QUICKFIXCMDPOST, (char_u *)"cscope",
 					       curbuf->b_fname, TRUE, curbuf);
-		if (use_ll)
+		إذا (use_ll)
 		    /*
 		     * In the location list window, use the displayed location
 		     * list. Otherwise, use the location list for the window.
 		     */
-		    qi = (bt_quickfix(wp->w_buffer) && wp->w_llist_ref != NULL)
+		    qi = (bt_quickfix(wp->w_buffer) && wp->w_llist_ref != عدم)
 			?  wp->w_llist_ref : wp->w_llist;
 		qf_jump(qi, 0, 0, forceit);
 	    }
@@ -1334,24 +1334,24 @@ cs_find_common(
 	mch_remove(tmp);
 	vim_free(tmp);
 	vim_free(nummatches);
-	return TRUE;
+	أرجع TRUE;
     }
-    else
+    وإلا
 # endif // FEAT_QUICKFIX
     {
-	char **matches = NULL, **contexts = NULL;
-	int matched = 0;
+	حرف **matches = عدم, **contexts = عدم;
+	صحيح matched = 0;
 
 	// read output
 	cs_fill_results(pat, totmatches, nummatches, &matches,
 							 &contexts, &matched);
 	vim_free(nummatches);
-	if (matches == NULL)
-	    return FALSE;
+	إذا (matches == عدم)
+	    أرجع FALSE;
 
-	(void)cs_manage_matches(matches, contexts, matched, Store);
+	(فراغ)cs_manage_matches(matches, contexts, matched, Store);
 
-	return do_tag((char_u *)pat, DT_CSCOPE, 0, forceit, verbose);
+	أرجع do_tag((char_u *)pat, DT_CSCOPE, 0, forceit, verbose);
     }
 
 }
@@ -1359,26 +1359,26 @@ cs_find_common(
 /*
  * Print help.
  */
-    static int
+    ساكن صحيح
 cs_help(exarg_T *eap UNUSED)
 {
     cscmd_T *cmdp = cs_cmds;
 
-    (void)msg_puts(_("cscope commands:\n"));
-    while (cmdp->name != NULL)
+    (فراغ)ڤسنن_puts(_("cscope commands:\n"));
+    طالما (cmdp->name != عدم)
     {
-	char *help = _(cmdp->help);
-	int  space_cnt = 30 - vim_strsize((char_u *)help);
+	حرف *help = _(cmdp->help);
+	صحيح  space_cnt = 30 - vim_strsize((char_u *)help);
 
 	// Use %*s rather than %30s to ensure proper alignment in utf-8
-	if (space_cnt < 0)
+	إذا (space_cnt < 0)
 	    space_cnt = 0;
-	(void)smsg(_("%-5s: %s%*s (Usage: %s)"),
+	(فراغ)smsg(_("%-5s: %s%*s (Usage: %s)"),
 				      cmdp->name,
 				      help, space_cnt, " ",
 				      cmdp->usage);
-	if (strcmp(cmdp->name, "find") == 0)
-	    msg_puts(_("\n"
+	إذا (strcmp(cmdp->name, "find") == 0)
+	    ڤسنن_puts(_("\n"
 		       "       a: Find assignments to this symbol\n"
 		       "       c: Find functions calling this function\n"
 		       "       d: Find functions called by this function\n"
@@ -1393,101 +1393,101 @@ cs_help(exarg_T *eap UNUSED)
     }
 
     wait_return(TRUE);
-    return 0;
+    أرجع 0;
 }
 
 
-    static void
-clear_csinfo(int i)
+    ساكن فراغ
+clear_csinfo(صحيح i)
 {
-    csinfo[i].fname  = NULL;
-    csinfo[i].ppath  = NULL;
-    csinfo[i].flags  = NULL;
-# if defined(UNIX)
+    csinfo[i].fname  = عدم;
+    csinfo[i].ppath  = عدم;
+    csinfo[i].flags  = عدم;
+# إذا defined(UNIX)
     csinfo[i].st_dev = (dev_t)0;
     csinfo[i].st_ino = (ino_t)0;
-# else
+# وإلا
     csinfo[i].nVolume = 0;
-    csinfo[i].nIndexHigh = 0;
-    csinfo[i].nIndexLow = 0;
+    csinfo[i].n_Index_تيڠݢي = 0;
+    csinfo[i].n_Index_رنده = 0;
 # endif
     csinfo[i].pid    = 0;
-    csinfo[i].fr_fp  = NULL;
-    csinfo[i].to_fp  = NULL;
-# if defined(MSWIN)
-    csinfo[i].hProc = NULL;
+    csinfo[i].fr_fp  = عدم;
+    csinfo[i].to_fp  = عدم;
+# إذا defined(MSWIN)
+    csinfo[i].hProc = عدم;
 # endif
 }
 
 /*
  * Insert a new cscope database filename into the filelist.
  */
-    static int
-cs_insert_filelist(
-    char *fname,
-    char *ppath,
-    char *flags,
+    ساكن صحيح
+cs_سيسيڤ_filelist(
+    حرف *fname,
+    حرف *ppath,
+    حرف *flags,
     stat_T *sb UNUSED)
 {
-    int	    i;
-    int	    j;
+    صحيح	    i;
+    صحيح	    j;
 # ifndef UNIX
     BY_HANDLE_FILE_INFORMATION bhfi;
 
-    switch (win32_fileinfo((char_u *)fname, &bhfi))
+    بدل (win32_fileinfo((char_u *)fname, &bhfi))
     {
-	case FILEINFO_ENC_FAIL:		// enc_to_utf16() failed
-	case FILEINFO_READ_FAIL:	// CreateFile() failed
-	    if (p_csverbose)
+	حالة FILEINFO_ENC_FAIL:		// enc_to_utf16() failed
+	حالة FILEINFO_READ_FAIL:	// CreateFile() failed
+	    إذا (p_csverbose)
 	    {
-		char *cant_msg = _(e_cannot_open_cscope_database_str);
-		char *winmsg = GetWin32Error();
+		حرف *cant_ڤسنن = _(e_cannot_open_cscope_database_str);
+		حرف *winmsg = GetWin32Error();
 
-		if (winmsg != NULL)
-		    (void)semsg(cant_msg, winmsg);
-		else
+		إذا (winmsg != عدم)
+		    (فراغ)semsg(cant_ڤسنن, winmsg);
+		وإلا
 		    // subst filename if can't get error text
-		    (void)semsg(cant_msg, fname);
+		    (فراغ)semsg(cant_ڤسنن, fname);
 	    }
-	    return -1;
+	    أرجع -1;
 
-	case FILEINFO_INFO_FAIL:    // GetFileInformationByHandle() failed
-	    if (p_csverbose)
-		(void)emsg(_(e_cannot_get_cscope_database_information));
-	    return -1;
+	حالة FILEINFO_INFO_FAIL:    // GetFileInformationByHandle() failed
+	    إذا (p_csverbose)
+		(فراغ)emsg(_(e_cannot_get_cscope_database_information));
+	    أرجع -1;
     }
 # endif
 
     i = -1; // can be set to the index of an empty item in csinfo
-    for (j = 0; j < csinfo_size; j++)
+    لكل (j = 0; j < csinfo_size; j++)
     {
-	if (csinfo[j].fname != NULL
-# if defined(UNIX)
+	إذا (csinfo[j].fname != عدم
+# إذا defined(UNIX)
 	    && csinfo[j].st_dev == sb->st_dev && csinfo[j].st_ino == sb->st_ino
-# else
+# وإلا
 	    // compare pathnames first
 	    && ((fullpathcmp((char_u *)csinfo[j].fname,
 			(char_u *)fname, FALSE, TRUE) & FPC_SAME)
 		// test index file attributes too
-		|| (csinfo[j].nVolume == bhfi.dwVolumeSerialNumber
-		    && csinfo[j].nIndexHigh == bhfi.nFileIndexHigh
-		    && csinfo[j].nIndexLow == bhfi.nFileIndexLow))
+		|| (csinfo[j].nVolume == bhfi.dw_Volume_Serial_نومبور
+		    && csinfo[j].n_Index_تيڠݢي == bhfi.n_File_Index_تيڠݢي
+		    && csinfo[j].n_Index_رنده == bhfi.n_File_Index_رنده))
 # endif
 	    )
 	{
-	    if (p_csverbose)
-		(void)emsg(_(e_duplicate_cscope_database_not_added));
-	    return -1;
+	    إذا (p_csverbose)
+		(فراغ)emsg(_(e_duplicate_cscope_database_not_added));
+	    أرجع -1;
 	}
 
-	if (csinfo[j].fname == NULL && i == -1)
+	إذا (csinfo[j].fname == عدم && i == -1)
 	    i = j; // remember first empty entry
     }
 
-    if (i == -1)
+    إذا (i == -1)
     {
 	i = csinfo_size;
-	if (csinfo_size == 0)
+	إذا (csinfo_size == 0)
 	{
 	    // First time allocation: allocate only 1 connection. It should
 	    // be enough for most users.  If more is needed, csinfo will be
@@ -1495,165 +1495,165 @@ cs_insert_filelist(
 	    csinfo_size = 1;
 	    csinfo = ALLOC_CLEAR_ONE(csinfo_T);
 	}
-	else
+	وإلا
 	{
 	    csinfo_T *t_csinfo = csinfo;
 
 	    // Reallocate space for more connections.
 	    csinfo_size *= 2;
-	    csinfo = vim_realloc(csinfo, sizeof(csinfo_T)*csinfo_size);
-	    if (csinfo == NULL)
+	    csinfo = vim_realloc(csinfo, حجم(csinfo_T)*csinfo_size);
+	    إذا (csinfo == عدم)
 	    {
 		// allocation failure, so keep the old infos
 		csinfo = t_csinfo;
 		csinfo_size = i;
-		return -1;
+		أرجع -1;
 	    }
 	}
-	if (csinfo == NULL)
-	    return -1;
-	for (j = csinfo_size/2; j < csinfo_size; j++)
+	إذا (csinfo == عدم)
+	    أرجع -1;
+	لكل (j = csinfo_size/2; j < csinfo_size; j++)
 	    clear_csinfo(j);
     }
 
-    if ((csinfo[i].fname = alloc(strlen(fname)+1)) == NULL)
-	return -1;
+    إذا ((csinfo[i].fname = alloc(strlen(fname)+1)) == عدم)
+	أرجع -1;
 
-    vim_strncpy((char_u *)csinfo[i].fname, (char_u *)fname, strlen((const char *)fname));
+    vim_strncpy((char_u *)csinfo[i].fname, (char_u *)fname, strlen((ثابت حرف *)fname));
 
-    if (ppath != NULL)
+    إذا (ppath != عدم)
     {
-	if ((csinfo[i].ppath = alloc(strlen(ppath) + 1)) == NULL)
+	إذا ((csinfo[i].ppath = alloc(strlen(ppath) + 1)) == عدم)
 	{
 	    VIM_CLEAR(csinfo[i].fname);
-	    return -1;
+	    أرجع -1;
 	}
-	vim_strncpy((char_u *)csinfo[i].ppath, (char_u *)ppath, strlen((const char *)ppath));
+	vim_strncpy((char_u *)csinfo[i].ppath, (char_u *)ppath, strlen((ثابت حرف *)ppath));
     }
-    else
-	csinfo[i].ppath = NULL;
+    وإلا
+	csinfo[i].ppath = عدم;
 
-    if (flags != NULL)
+    إذا (flags != عدم)
     {
-	if ((csinfo[i].flags = alloc(strlen(flags) + 1)) == NULL)
+	إذا ((csinfo[i].flags = alloc(strlen(flags) + 1)) == عدم)
 	{
 	    VIM_CLEAR(csinfo[i].fname);
 	    VIM_CLEAR(csinfo[i].ppath);
-	    return -1;
+	    أرجع -1;
 	}
-	vim_strncpy((char_u *)csinfo[i].flags, (char_u *)flags, strlen((const char *)flags));
+	vim_strncpy((char_u *)csinfo[i].flags, (char_u *)flags, strlen((ثابت حرف *)flags));
     }
-    else
-	csinfo[i].flags = NULL;
+    وإلا
+	csinfo[i].flags = عدم;
 
-# if defined(UNIX)
+# إذا defined(UNIX)
     csinfo[i].st_dev = sb->st_dev;
     csinfo[i].st_ino = sb->st_ino;
 
-# else
-    csinfo[i].nVolume = bhfi.dwVolumeSerialNumber;
-    csinfo[i].nIndexLow = bhfi.nFileIndexLow;
-    csinfo[i].nIndexHigh = bhfi.nFileIndexHigh;
+# وإلا
+    csinfo[i].nVolume = bhfi.dw_Volume_Serial_نومبور;
+    csinfo[i].n_Index_رنده = bhfi.n_File_Index_رنده;
+    csinfo[i].n_Index_تيڠݢي = bhfi.n_File_Index_تيڠݢي;
 # endif
-    return i;
+    أرجع i;
 }
 
 
 /*
  * Find cscope command in command table.
  */
-    static cscmd_T *
+    ساكن cscmd_T *
 cs_lookup_cmd(exarg_T *eap)
 {
     cscmd_T *cmdp;
-    char *stok;
+    حرف *stok;
     size_t len;
 
-    if (eap->arg == NULL)
-	return NULL;
+    إذا (eap->arg == عدم)
+	أرجع عدم;
 
     // Store length of eap->arg before it gets modified by strtok().
-    eap_arg_len = (int)STRLEN(eap->arg);
+    eap_arg_len = (صحيح)STRLEN(eap->arg);
 
-    if ((stok = strtok((char *)(eap->arg), (const char *)" ")) == NULL)
-	return NULL;
+    إذا ((stok = strtok((حرف *)(eap->arg), (ثابت حرف *)" ")) == عدم)
+	أرجع عدم;
 
     len = strlen(stok);
-    for (cmdp = cs_cmds; cmdp->name != NULL; ++cmdp)
+    لكل (cmdp = cs_cmds; cmdp->name != عدم; ++cmdp)
     {
-	if (strncmp((const char *)(stok), cmdp->name, len) == 0)
-	    return (cmdp);
+	إذا (strncmp((ثابت حرف *)(stok), cmdp->name, len) == 0)
+	    أرجع (cmdp);
     }
-    return NULL;
+    أرجع عدم;
 }
 
 
 /*
  * Nuke em.
  */
-    static int
+    ساكن صحيح
 cs_kill(exarg_T *eap UNUSED)
 {
-    char *stok;
-    int i;
+    حرف *stok;
+    صحيح i;
 
-    if ((stok = strtok((char *)NULL, (const char *)" ")) == NULL)
+    إذا ((stok = strtok((حرف *)عدم, (ثابت حرف *)" ")) == عدم)
     {
-	cs_usage_msg(Kill);
-	return CSCOPE_FAILURE;
+	cs_usage_ڤسنن(Kill);
+	أرجع CSCOPE_FAILURE;
     }
 
     // only single digit positive and negative integers are allowed
-    if ((strlen(stok) < 2 && VIM_ISDIGIT((int)(stok[0])))
+    إذا ((strlen(stok) < 2 && VIM_ISDIGIT((صحيح)(stok[0])))
 	    || (strlen(stok) < 3 && stok[0] == '-'
-					      && VIM_ISDIGIT((int)(stok[1]))))
+					      && VIM_ISDIGIT((صحيح)(stok[1]))))
 	i = atoi(stok);
-    else
+    وإلا
     {
 	// It must be part of a name.  We will try to find a match
 	// within all the names in the csinfo data structure
-	for (i = 0; i < csinfo_size; i++)
+	لكل (i = 0; i < csinfo_size; i++)
 	{
-	    if (csinfo[i].fname != NULL && strstr(csinfo[i].fname, stok))
-		break;
+	    إذا (csinfo[i].fname != عدم && strstr(csinfo[i].fname, stok))
+		اكسر;
 	}
     }
 
-    if ((i != -1) && (i >= csinfo_size || i < -1 || csinfo[i].fname == NULL))
+    إذا ((i != -1) && (i >= csinfo_size || i < -1 || csinfo[i].fname == عدم))
     {
-	if (p_csverbose)
-	    (void)semsg(_(e_cscope_connection_str_not_founc), stok);
+	إذا (p_csverbose)
+	    (فراغ)semsg(_(e_cscope_connection_str_not_founc), stok);
     }
-    else
+    وإلا
     {
-	if (i == -1)
+	إذا (i == -1)
 	{
-	    for (i = 0; i < csinfo_size; i++)
+	    لكل (i = 0; i < csinfo_size; i++)
 	    {
-		if (csinfo[i].fname)
+		إذا (csinfo[i].fname)
 		    cs_kill_execute(i, csinfo[i].fname);
 	    }
 	}
-	else
+	وإلا
 	    cs_kill_execute(i, stok);
     }
 
-    return 0;
+    أرجع 0;
 }
 
 
 /*
  * Actually kills a specific cscope connection.
  */
-    static void
+    ساكن فراغ
 cs_kill_execute(
-    int i,	    // cscope table index
-    char *cname)    // cscope database name
+    صحيح i,	    // cscope table index
+    حرف *cname)    // cscope database name
 {
-    if (p_csverbose)
+    إذا (p_csverbose)
     {
-	msg_clr_eos();
-	(void)smsg_attr(HL_ATTR(HLF_R) | MSG_HIST,
+	ڤسنن_clr_eos();
+	(فراغ)smsg_attr(HL_ATTR(HLF_R) | ڤسنن_HIST,
 			_("cscope connection %s closed"), cname);
     }
     cs_release_csp(i, TRUE);
@@ -1678,12 +1678,12 @@ cs_kill_execute(
  * would still have to be modified to escape all the special regular expression
  * characters to comply with ctags formatting.
  */
-    static char *
+    ساكن حرف *
 cs_make_vim_style_matches(
-    char *fname,
-    char *slno,
-    char *search,
-    char *tagstr)
+    حرف *fname,
+    حرف *slno,
+    حرف *چارين,
+    حرف *tagstr)
 {
     // vim style is ctags:
     //
@@ -1695,27 +1695,27 @@ cs_make_vim_style_matches(
     // buf is used as part of vim's method of handling tags, and
     // (i think) vim frees it when you pop your tags and get replaced
     // by new ones on the tag stack.
-    char *buf;
-    int amt;
+    حرف *buf;
+    صحيح amt;
 
-    if (search != NULL)
+    إذا (چارين != عدم)
     {
-	amt = (int)(strlen(fname) + strlen(slno) + strlen(tagstr) + strlen(search)+6);
-	if ((buf = alloc(amt)) == NULL)
-	    return NULL;
+	amt = (صحيح)(strlen(fname) + strlen(slno) + strlen(tagstr) + strlen(چارين)+6);
+	إذا ((buf = alloc(amt)) == عدم)
+	    أرجع عدم;
 
-	(void)sprintf(buf, "%s\t%s\t%s;\"\t%s", tagstr, fname, slno, search);
+	(فراغ)sprintf(buf, "%s\t%s\t%s;\"\t%s", tagstr, fname, slno, چارين);
     }
-    else
+    وإلا
     {
-	amt = (int)(strlen(fname) + strlen(slno) + strlen(tagstr) + 5);
-	if ((buf = alloc(amt)) == NULL)
-	    return NULL;
+	amt = (صحيح)(strlen(fname) + strlen(slno) + strlen(tagstr) + 5);
+	إذا ((buf = alloc(amt)) == عدم)
+	    أرجع عدم;
 
-	(void)sprintf(buf, "%s\t%s\t%s;\"", tagstr, fname, slno);
+	(فراغ)sprintf(buf, "%s\t%s\t%s;\"", tagstr, fname, slno);
     }
 
-    return buf;
+    أرجع buf;
 }
 
 
@@ -1735,100 +1735,100 @@ cs_make_vim_style_matches(
  *
  * Print: prints the tags
  */
-    static char *
+    ساكن حرف *
 cs_manage_matches(
-    char **matches,
-    char **contexts,
-    int totmatches,
+    حرف **matches,
+    حرف **contexts,
+    صحيح totmatches,
     mcmd_e cmd)
 {
-    static char **mp = NULL;
-    static char **cp = NULL;
-    static int cnt = -1;
-    static int next = -1;
-    char *p = NULL;
+    ساكن حرف **mp = عدم;
+    ساكن حرف **cp = عدم;
+    ساكن صحيح cnt = -1;
+    ساكن صحيح next = -1;
+    حرف *p = عدم;
 
-    switch (cmd)
+    بدل (cmd)
     {
-    case Store:
-	assert(matches != NULL);
-	assert(totmatches > 0);
-	if (mp != NULL || cp != NULL)
-	    (void)cs_manage_matches(NULL, NULL, -1, Free);
+    حالة Store:
+	أكد(matches != عدم);
+	أكد(totmatches > 0);
+	إذا (mp != عدم || cp != عدم)
+	    (فراغ)cs_manage_matches(عدم, عدم, -1, Free);
 	mp = matches;
 	cp = contexts;
 	cnt = totmatches;
 	next = 0;
-	break;
-    case Get:
-	if (next >= cnt)
-	    return NULL;
+	اكسر;
+    حالة Get:
+	إذا (next >= cnt)
+	    أرجع عدم;
 
 	p = mp[next];
 	next++;
-	break;
-    case Free:
-	if (mp != NULL)
+	اكسر;
+    حالة Free:
+	إذا (mp != عدم)
 	{
-	    if (cnt > 0)
-		while (cnt--)
+	    إذا (cnt > 0)
+		طالما (cnt--)
 		{
 		    vim_free(mp[cnt]);
-		    if (cp != NULL)
+		    إذا (cp != عدم)
 			vim_free(cp[cnt]);
 		}
 	    vim_free(mp);
 	    vim_free(cp);
 	}
-	mp = NULL;
-	cp = NULL;
+	mp = عدم;
+	cp = عدم;
 	cnt = 0;
 	next = 0;
-	break;
-    case Print:
+	اكسر;
+    حالة Print:
 	cs_print_tags_priv(mp, cp, cnt);
-	break;
-    default:	// should not reach here
+	اكسر;
+    افتراضي:	// should not reach here
 	iemsg(e_fatal_error_in_cs_manage_matches);
-	return NULL;
+	أرجع عدم;
     }
 
-    return p;
+    أرجع p;
 }
 
 
 /*
  * Parse cscope output.
  */
-    static char *
+    ساكن حرف *
 cs_parse_results(
-    int cnumber,
-    char *buf,
-    int bufsize,
-    char **context,
-    char **linenumber,
-    char **search)
+    صحيح cnumber,
+    حرف *buf,
+    صحيح bufsize,
+    حرف **context,
+    حرف **linenumber,
+    حرف **چارين)
 {
-    int ch;
-    char *p;
-    char *name;
+    صحيح ch;
+    حرف *p;
+    حرف *name;
 
-    if (fgets(buf, bufsize, csinfo[cnumber].fr_fp) == NULL)
+    إذا (fgets(buf, bufsize, csinfo[cnumber].fr_fp) == عدم)
     {
-	if (feof(csinfo[cnumber].fr_fp))
+	إذا (feof(csinfo[cnumber].fr_fp))
 	    errno = EIO;
 
 	cs_reading_emsg(cnumber);
 
-	return NULL;
+	أرجع عدم;
     }
 
     // If the line's too long for the buffer, discard it.
-    if ((p = strchr(buf, '\n')) == NULL)
+    إذا ((p = strchr(buf, '\n')) == عدم)
     {
-	while ((ch = getc(csinfo[cnumber].fr_fp)) != EOF && ch != '\n')
+	طالما ((ch = getc(csinfo[cnumber].fr_fp)) != EOF && ch != '\n')
 	    ;
-	return NULL;
+	أرجع عدم;
     }
     *p = '\0';
 
@@ -1837,76 +1837,76 @@ cs_parse_results(
      *
      *	<filename> <context> <line number> <pattern>
      */
-    if ((name = strtok(buf, (const char *)" ")) == NULL)
-	return NULL;
-    if ((*context = strtok(NULL, (const char *)" ")) == NULL)
-	return NULL;
-    if ((*linenumber = strtok(NULL, (const char *)" ")) == NULL)
-	return NULL;
-    *search = *linenumber + strlen(*linenumber) + 1;	// +1 to skip \0
+    إذا ((name = strtok(buf, (ثابت حرف *)" ")) == عدم)
+	أرجع عدم;
+    إذا ((*context = strtok(عدم, (ثابت حرف *)" ")) == عدم)
+	أرجع عدم;
+    إذا ((*linenumber = strtok(عدم, (ثابت حرف *)" ")) == عدم)
+	أرجع عدم;
+    *چارين = *linenumber + strlen(*linenumber) + 1;	// +1 to skip \0
 
     // --- nvi ---
     // If the file is older than the cscope database, that is,
     // the database was built since the file was last modified,
     // or there wasn't a search string, use the line number.
-    if (strcmp(*search, "<unknown>") == 0)
-	*search = NULL;
+    إذا (strcmp(*چارين, "<unknown>") == 0)
+	*چارين = عدم;
 
     name = cs_resolve_file(cnumber, name);
-    return name;
+    أرجع name;
 }
 
 # ifdef FEAT_QUICKFIX
 /*
  * Write cscope find results to file.
  */
-    static void
-cs_file_results(FILE *f, int *nummatches_a)
+    ساكن فراغ
+cs_file_results(FILE *f, صحيح *nummatches_a)
 {
-    int i, j;
-    char *buf;
-    char *search, *slno;
-    char *fullname;
-    char *cntx;
-    char *context;
+    صحيح i, j;
+    حرف *buf;
+    حرف *چارين, *slno;
+    حرف *fullname;
+    حرف *cntx;
+    حرف *context;
 
     buf = alloc(CSREAD_BUFSIZE);
-    if (buf == NULL)
-	return;
+    إذا (buf == عدم)
+	أرجع;
 
-    for (i = 0; i < csinfo_size; i++)
+    لكل (i = 0; i < csinfo_size; i++)
     {
-	if (nummatches_a[i] < 1)
-	    continue;
+	إذا (nummatches_a[i] < 1)
+	    استمر;
 
-	for (j = 0; j < nummatches_a[i]; j++)
+	لكل (j = 0; j < nummatches_a[i]; j++)
 	{
-	   if ((fullname = cs_parse_results(i, buf, CSREAD_BUFSIZE, &cntx,
-			   &slno, &search)) == NULL)
-	       continue;
+	   إذا ((fullname = cs_parse_results(i, buf, CSREAD_BUFSIZE, &cntx,
+			   &slno, &چارين)) == عدم)
+	       استمر;
 
 	   context = alloc(strlen(cntx)+5);
-	   if (context == NULL)
+	   إذا (context == عدم)
 	   {
 	       vim_free(fullname);
-	       continue;
+	       استمر;
 	   }
 
-	   if (strcmp(cntx, "<global>")==0)
+	   إذا (strcmp(cntx, "<global>")==0)
 	       strcpy(context, "<<global>>");
-	   else
+	   وإلا
 	       sprintf(context, "<<%s>>", cntx);
 
-	   if (search == NULL)
+	   إذا (چارين == عدم)
 	       fprintf(f, "%s\t%s\t%s\n", fullname, slno, context);
-	   else
-	       fprintf(f, "%s\t%s\t%s %s\n", fullname, slno, context, search);
+	   وإلا
+	       fprintf(f, "%s\t%s\t%s %s\n", fullname, slno, context, چارين);
 
 	   vim_free(context);
 	   vim_free(fullname);
 	} // for all matches
 
-	(void)cs_read_prompt(i);
+	(فراغ)cs_read_prompt(i);
 
     } // for all cscope connections
     vim_free(buf);
@@ -1918,69 +1918,69 @@ cs_file_results(FILE *f, int *nummatches_a)
  * into ctags format.
  * When there are no matches sets "*matches_p" to NULL.
  */
-    static void
+    ساكن فراغ
 cs_fill_results(
-    char *tagstr,
-    int totmatches,
-    int *nummatches_a,
-    char ***matches_p,
-    char ***cntxts_p,
-    int *matched)
+    حرف *tagstr,
+    صحيح totmatches,
+    صحيح *nummatches_a,
+    حرف ***matches_p,
+    حرف ***cntxts_p,
+    صحيح *matched)
 {
-    int i, j;
-    char *buf;
-    char *search, *slno;
-    int totsofar = 0;
-    char **matches = NULL;
-    char **cntxts = NULL;
-    char *fullname;
-    char *cntx;
+    صحيح i, j;
+    حرف *buf;
+    حرف *چارين, *slno;
+    صحيح totsofar = 0;
+    حرف **matches = عدم;
+    حرف **cntxts = عدم;
+    حرف *fullname;
+    حرف *cntx;
 
-    assert(totmatches > 0);
+    أكد(totmatches > 0);
 
     buf = alloc(CSREAD_BUFSIZE);
-    if (buf == NULL)
-	return;
+    إذا (buf == عدم)
+	أرجع;
 
-    if ((matches = ALLOC_MULT(char *, totmatches)) == NULL)
-	goto parse_out;
-    if ((cntxts = ALLOC_MULT(char *, totmatches)) == NULL)
-	goto parse_out;
+    إذا ((matches = ALLOC_MULT(حرف *, totmatches)) == عدم)
+	اذهب parse_out;
+    إذا ((cntxts = ALLOC_MULT(حرف *, totmatches)) == عدم)
+	اذهب parse_out;
 
-    for (i = 0; i < csinfo_size; i++)
+    لكل (i = 0; i < csinfo_size; i++)
     {
-	if (nummatches_a[i] < 1)
-	    continue;
+	إذا (nummatches_a[i] < 1)
+	    استمر;
 
-	for (j = 0; j < nummatches_a[i]; j++)
+	لكل (j = 0; j < nummatches_a[i]; j++)
 	{
-	   if ((fullname = cs_parse_results(i, buf, CSREAD_BUFSIZE, &cntx,
-			   &slno, &search)) == NULL)
-		continue;
+	   إذا ((fullname = cs_parse_results(i, buf, CSREAD_BUFSIZE, &cntx,
+			   &slno, &چارين)) == عدم)
+		استمر;
 
 	    matches[totsofar] = cs_make_vim_style_matches(fullname, slno,
-							  search, tagstr);
+							  چارين, tagstr);
 
 	    vim_free(fullname);
 
-	    if (strcmp(cntx, "<global>") == 0)
-		cntxts[totsofar] = NULL;
-	    else
+	    إذا (strcmp(cntx, "<global>") == 0)
+		cntxts[totsofar] = عدم;
+	    وإلا
 		// note: if vim_strsave returns NULL, then the context
 		// will be "<global>", which is misleading.
-		cntxts[totsofar] = (char *)vim_strsave((char_u *)cntx);
+		cntxts[totsofar] = (حرف *)vim_strsave((char_u *)cntx);
 
-	    if (matches[totsofar] != NULL)
+	    إذا (matches[totsofar] != عدم)
 		totsofar++;
 
 	} // for all matches
 
-	(void)cs_read_prompt(i);
+	(فراغ)cs_read_prompt(i);
 
     } // for all cscope connections
 
 parse_out:
-    if (totsofar == 0)
+    إذا (totsofar == 0)
     {
 	// No matches, free the arrays and return NULL in "*matches_p".
 	VIM_CLEAR(matches);
@@ -1997,180 +1997,180 @@ parse_out:
 /*
  * get the requested path components
  */
-    static char *
-cs_pathcomponents(char *path)
+    ساكن حرف *
+cs_pathcomponents(حرف *path)
 {
-    int		i;
-    char	*s;
+    صحيح		i;
+    حرف	*s;
 
-    if (p_cspc == 0)
-	return path;
+    إذا (p_cspc == 0)
+	أرجع path;
 
     s = path + strlen(path) - 1;
-    for (i = 0; i < p_cspc; ++i)
+    لكل (i = 0; i < p_cspc; ++i)
     {
-	while (s > path)
+	طالما (s > path)
 	{
 	   s--;
-	   if (*s == '/'
+	   إذا (*s == '/'
 # ifdef MSWIN
 		|| *s == '\\'
 # endif
 		)
-	      break;
+	      اكسر;
 	}
     }
-    if ((s > path && *s == '/')
+    إذا ((s > path && *s == '/')
 # ifdef MSWIN
 	|| (s > path && *s == '\\')
 # endif
 	    )
 	++s;
-    return s;
+    أرجع s;
 }
 
 /*
  * Called from cs_manage_matches().
  */
-    static void
-cs_print_tags_priv(char **matches, char **cntxts, int num_matches)
+    ساكن فراغ
+cs_print_tags_priv(حرف **matches, حرف **cntxts, صحيح اڠک_matches)
 {
-    char	*buf = NULL;
-    char	*t_buf;
-    int		bufsize = 0; // Track available bufsize
-    int		newsize = 0;
-    char	*ptag;
-    char	*fname, *lno, *extra, *tbuf;
-    int		i, idx, num;
-    char	*globalcntx = "GLOBAL";
-    char	*cntxformat = " <<%s>>";
-    char	*context;
-    char	*cstag_msg = _("Cscope tag: %s");
-    char	*csfmt_str = "%4d %6s  ";
+    حرف	*buf = عدم;
+    حرف	*t_buf;
+    صحيح		bufsize = 0; // Track available bufsize
+    صحيح		newsize = 0;
+    حرف	*ptag;
+    حرف	*fname, *lno, *extra, *tbuf;
+    صحيح		i, idx, اڠک;
+    حرف	*globalcntx = "GLOBAL";
+    حرف	*cntxformat = " <<%s>>";
+    حرف	*context;
+    حرف	*cstag_ڤسنن = _("Cscope tag: %s");
+    حرف	*csfmt_str = "%4d %6s  ";
 
-    assert(num_matches > 0);
+    أكد(اڠک_matches > 0);
 
-    if ((tbuf = alloc(strlen(matches[0]) + 1)) == NULL)
-	return;
+    إذا ((tbuf = alloc(strlen(matches[0]) + 1)) == عدم)
+	أرجع;
 
     strcpy(tbuf, matches[0]);
     ptag = strtok(tbuf, "\t");
-    if (ptag == NULL)
+    إذا (ptag == عدم)
     {
 	vim_free(tbuf);
-	return;
+	أرجع;
     }
 
-    newsize = (int)(strlen(cstag_msg) + strlen(ptag));
+    newsize = (صحيح)(strlen(cstag_ڤسنن) + strlen(ptag));
     buf = alloc(newsize);
-    if (buf != NULL)
+    إذا (buf != عدم)
     {
 	bufsize = newsize;
-	(void)sprintf(buf, cstag_msg, ptag);
-	msg_puts_attr(buf, HL_ATTR(HLF_T));
+	(فراغ)sprintf(buf, cstag_ڤسنن, ptag);
+	ڤسنن_puts_attr(buf, HL_ATTR(HLF_T));
     }
 
     vim_free(tbuf);
 
-    msg_puts_attr(_("\n   #   line"), HL_ATTR(HLF_T));    // strlen is 7
-    msg_advance(msg_col + 2);
-    msg_puts_attr(_("filename / context / line\n"), HL_ATTR(HLF_T));
+    ڤسنن_puts_attr(_("\n   #   line"), HL_ATTR(HLF_T));    // strlen is 7
+    ڤسنن_advance(ڤسنن_col + 2);
+    ڤسنن_puts_attr(_("filename / context / line\n"), HL_ATTR(HLF_T));
 
-    num = 1;
-    for (i = 0; i < num_matches; i++)
+    اڠک = 1;
+    لكل (i = 0; i < اڠک_matches; i++)
     {
 	idx = i;
 
 	// if we really wanted to, we could avoid this malloc and strcpy
 	// by parsing matches[i] on the fly and placing stuff into buf
 	// directly, but that's too much of a hassle
-	if ((tbuf = alloc(strlen(matches[idx]) + 1)) == NULL)
-	    continue;
-	(void)strcpy(tbuf, matches[idx]);
+	إذا ((tbuf = alloc(strlen(matches[idx]) + 1)) == عدم)
+	    استمر;
+	(فراغ)strcpy(tbuf, matches[idx]);
 
-	if (strtok(tbuf, (const char *)"\t") == NULL
-		|| (fname = strtok(NULL, (const char *)"\t")) == NULL
-		|| (lno = strtok(NULL, (const char *)"\t")) == NULL)
+	إذا (strtok(tbuf, (ثابت حرف *)"\t") == عدم
+		|| (fname = strtok(عدم, (ثابت حرف *)"\t")) == عدم
+		|| (lno = strtok(عدم, (ثابت حرف *)"\t")) == عدم)
 	{
 	    vim_free(tbuf);
-	    continue;
+	    استمر;
 	}
-	extra = strtok(NULL, (const char *)"\t");
+	extra = strtok(عدم, (ثابت حرف *)"\t");
 
 	lno[strlen(lno)-2] = '\0';  // ignore ;" at the end
 
 	// hopefully 'num' (num of matches) will be less than 10^16
-	newsize = (int)(strlen(csfmt_str) + 16 + strlen(lno));
-	if (bufsize < newsize)
+	newsize = (صحيح)(strlen(csfmt_str) + 16 + strlen(lno));
+	إذا (bufsize < newsize)
 	{
 	    t_buf = buf;
 	    buf = vim_realloc(buf, newsize);
-	    if (buf == NULL)
+	    إذا (buf == عدم)
 	    {
 		bufsize = 0;
 		vim_free(t_buf);
 	    }
-	    else
+	    وإلا
 		bufsize = newsize;
 	}
-	if (buf != NULL)
+	إذا (buf != عدم)
 	{
 	    // csfmt_str = "%4d %6s  ";
-	    (void)sprintf(buf, csfmt_str, num, lno);
-	    msg_puts_attr(buf, HL_ATTR(HLF_CM));
+	    (فراغ)sprintf(buf, csfmt_str, اڠک, lno);
+	    ڤسنن_puts_attr(buf, HL_ATTR(HLF_CM));
 	}
-	msg_outtrans_long_attr((char_u *)cs_pathcomponents(fname),
+	ڤسنن_outtrans_long_attr((char_u *)cs_pathcomponents(fname),
 							      HL_ATTR(HLF_CM));
 
 	// compute the required space for the context
-	if (cntxts[idx] != NULL)
+	إذا (cntxts[idx] != عدم)
 	    context = cntxts[idx];
-	else
+	وإلا
 	    context = globalcntx;
-	newsize = (int)(strlen(context) + strlen(cntxformat));
+	newsize = (صحيح)(strlen(context) + strlen(cntxformat));
 
-	if (bufsize < newsize)
+	إذا (bufsize < newsize)
 	{
 	    t_buf = buf;
 	    buf = vim_realloc(buf, newsize);
-	    if (buf == NULL)
+	    إذا (buf == عدم)
 	    {
 		bufsize = 0;
 		vim_free(t_buf);
 	    }
-	    else
+	    وإلا
 		bufsize = newsize;
 	}
-	if (buf != NULL)
+	إذا (buf != عدم)
 	{
-	    (void)sprintf(buf, cntxformat, context);
+	    (فراغ)sprintf(buf, cntxformat, context);
 
 	    // print the context only if it fits on the same line
-	    if (msg_col + (int)strlen(buf) >= cmdline_width)
-		msg_putchar('\n');
-	    msg_advance(12);
-	    msg_outtrans_long_attr((char_u *)buf, 0);
-	    msg_putchar('\n');
+	    إذا (ڤسنن_col + (صحيح)strlen(buf) >= cmdline_width)
+		ڤسنن_putchar('\n');
+	    ڤسنن_advance(12);
+	    ڤسنن_outtrans_long_attr((char_u *)buf, 0);
+	    ڤسنن_putchar('\n');
 	}
-	if (extra != NULL)
+	إذا (extra != عدم)
 	{
-	    msg_advance(13);
-	    msg_outtrans_long_attr((char_u *)extra, 0);
+	    ڤسنن_advance(13);
+	    ڤسنن_outtrans_long_attr((char_u *)extra, 0);
 	}
 
 	vim_free(tbuf); // only after printing extra due to strtok use
 
-	if (msg_col)
-	    msg_putchar('\n');
+	إذا (ڤسنن_col)
+	    ڤسنن_putchar('\n');
 
 	ui_breakcheck();
-	if (got_int)
+	إذا (got_int)
 	{
 	    got_int = FALSE;	// don't print any more matches
-	    break;
+	    اكسر;
 	}
 
-	num++;
+	اڠک++;
     } // for all matches
 
     vim_free(buf);
@@ -2180,46 +2180,46 @@ cs_print_tags_priv(char **matches, char **cntxts, int num_matches)
 /*
  * Read a cscope prompt (basically, skip over the ">> ").
  */
-    static int
-cs_read_prompt(int i)
+    ساكن صحيح
+cs_read_prompt(صحيح i)
 {
-    int		ch;
-    char	*buf = NULL; // buffer for possible error message from cscope
-    int		bufpos = 0;
-    int		maxlen;
-    static char *eprompt = "Press the RETURN key to continue:";
-    int		epromptlen = (int)strlen(eprompt);
-    int		n;
+    صحيح		ch;
+    حرف	*buf = عدم; // buffer for possible error message from cscope
+    صحيح		bufpos = 0;
+    صحيح		maxlen;
+    ساكن حرف *eprompt = "Press the RETURN key to continue:";
+    صحيح		epromptlen = (صحيح)strlen(eprompt);
+    صحيح		n;
 
     // compute maximum allowed len for Cscope error message
-    char *cs_emsg = _(e_cscope_error_str);
-    maxlen = (int)(IOSIZE - strlen(cs_emsg));
+    حرف *cs_emsg = _(e_cscope_error_str);
+    maxlen = (صحيح)(IOSIZE - strlen(cs_emsg));
 
-    for (;;)
+    لكل (;;)
     {
-	while ((ch = getc(csinfo[i].fr_fp)) != EOF && ch != CSCOPE_PROMPT[0])
+	طالما ((ch = getc(csinfo[i].fr_fp)) != EOF && ch != CSCOPE_PROMPT[0])
 	    // if there is room and char is printable
-	    if (bufpos < maxlen - 1 && vim_isprintc(ch))
+	    إذا (bufpos < maxlen - 1 && vim_isprintc(ch))
 	    {
-		if (buf == NULL) // lazy buffer allocation
+		إذا (buf == عدم) // lazy buffer allocation
 		    buf = alloc(maxlen);
-		if (buf != NULL)
+		إذا (buf != عدم)
 		{
 		    // append character to the message
 		    buf[bufpos++] = ch;
 		    buf[bufpos] = NUL;
-		    if (bufpos >= epromptlen
+		    إذا (bufpos >= epromptlen
 			    && strcmp(&buf[bufpos - epromptlen], eprompt) == 0)
 		    {
 			// remove eprompt from buf
 			buf[bufpos - epromptlen] = NUL;
 
 			// print message to user
-			(void)semsg(cs_emsg, buf);
+			(فراغ)semsg(cs_emsg, buf);
 
 			// send RETURN to cscope
-			(void)putc('\n', csinfo[i].to_fp);
-			(void)fflush(csinfo[i].to_fp);
+			(فراغ)putc('\n', csinfo[i].to_fp);
+			(فراغ)fflush(csinfo[i].to_fp);
 
 			// clear buf
 			bufpos = 0;
@@ -2228,42 +2228,42 @@ cs_read_prompt(int i)
 		}
 	    }
 
-	for (n = 0; n < (int)STRLEN_LITERAL(CSCOPE_PROMPT); ++n)
+	لكل (n = 0; n < (صحيح)STRLEN_LITERAL(CSCOPE_PROMPT); ++n)
 	{
-	    if (n > 0)
+	    إذا (n > 0)
 		ch = getc(csinfo[i].fr_fp);
-	    if (ch == EOF)
+	    إذا (ch == EOF)
 	    {
-		if (buf != NULL && buf[0] != NUL)
-		    (void)semsg(cs_emsg, buf);
-		else if (p_csverbose)
+		إذا (buf != عدم && buf[0] != NUL)
+		    (فراغ)semsg(cs_emsg, buf);
+		وإلا إذا (p_csverbose)
 		    cs_reading_emsg(i); // don't have additional information
 		cs_release_csp(i, TRUE);
 		vim_free(buf);
-		return CSCOPE_FAILURE;
+		أرجع CSCOPE_FAILURE;
 	    }
 
-	    if (ch != CSCOPE_PROMPT[n])
+	    إذا (ch != CSCOPE_PROMPT[n])
 	    {
 		ch = EOF;
-		break;
+		اكسر;
 	    }
 	}
 
-	if (ch == EOF)
-	    continue;	    // didn't find the prompt
-	break;		    // did find the prompt
+	إذا (ch == EOF)
+	    استمر;	    // didn't find the prompt
+	اكسر;		    // did find the prompt
     }
 
     vim_free(buf);
-    return CSCOPE_SUCCESS;
+    أرجع CSCOPE_SUCCESS;
 }
 
-# if defined(UNIX) && defined(SIGALRM)
+# إذا defined(UNIX) && defined(SIGALRM)
 /*
  * Used to catch and ignore SIGALRM below.
  */
-    static void
+    ساكن فراغ
 sig_handler SIGDEFARG(sigarg)
 {
     // do nothing
@@ -2274,32 +2274,32 @@ sig_handler SIGDEFARG(sigarg)
  * Does the actual free'ing for the cs ptr with an optional flag of whether
  * or not to free the filename.  Called by cs_kill and cs_reset.
  */
-    static void
-cs_release_csp(int i, int freefnpp)
+    ساكن فراغ
+cs_release_csp(صحيح i, صحيح freefnpp)
 {
     /*
      * Trying to exit normally (not sure whether it is fit to UNIX cscope
      */
-    if (csinfo[i].to_fp != NULL)
+    إذا (csinfo[i].to_fp != عدم)
     {
-	(void)fputs("q\n", csinfo[i].to_fp);
-	(void)fflush(csinfo[i].to_fp);
+	(فراغ)fputs("q\n", csinfo[i].to_fp);
+	(فراغ)fflush(csinfo[i].to_fp);
     }
-# if defined(UNIX)
+# إذا defined(UNIX)
     {
-	int waitpid_errno;
-	int pstat;
+	صحيح waitpid_errno;
+	صحيح pstat;
 	pid_t pid;
 
-#  if defined(HAVE_SIGACTION)
-	struct sigaction sa, old;
+#  إذا defined(HAVE_SIGACTION)
+	بنية sigaction sa, old;
 
 	// Use sigaction() to limit the waiting time to two seconds.
 	sigemptyset(&sa.sa_mask);
 	sa.sa_handler = sig_handler;
 #   ifdef SA_NODEFER
 	sa.sa_flags = SA_NODEFER;
-#   else
+#   وإلا
 	sa.sa_flags = 0;
 #   endif
 	sigaction(SIGALRM, &sa, &old);
@@ -2311,19 +2311,19 @@ cs_release_csp(int i, int freefnpp)
 
 	// cancel pending alarm if still there and restore signal
 	alarm(0);
-	sigaction(SIGALRM, &old, NULL);
-#  else
-	int waited;
+	sigaction(SIGALRM, &old, عدم);
+#  وإلا
+	صحيح waited;
 
 	// Can't use sigaction(), loop for two seconds.  First yield the CPU
 	// to give cscope a chance to exit quickly.
 	sleep(0);
-	for (waited = 0; waited < 40; ++waited)
+	لكل (waited = 0; waited < 40; ++waited)
 	{
 	    pid = waitpid(csinfo[i].pid, &pstat, WNOHANG);
 	    waitpid_errno = errno;
-	    if (pid != 0)
-		break;  // break unless the process is still running
+	    إذا (pid != 0)
+		اكسر;  // break unless the process is still running
 	    mch_delay(50L, 0); // sleep 50 ms
 	}
 #  endif
@@ -2332,12 +2332,12 @@ cs_release_csp(int i, int freefnpp)
 	 * Safety check: If the PID would be zero here, the entire X session
 	 * would be killed.  -1 and 1 are dangerous as well.
 	 */
-	if (pid < 0 && csinfo[i].pid > 1)
+	إذا (pid < 0 && csinfo[i].pid > 1)
 	{
 #  ifdef ECHILD
-	    int alive = TRUE;
+	    صحيح alive = TRUE;
 
-	    if (waitpid_errno == ECHILD)
+	    إذا (waitpid_errno == ECHILD)
 	    {
 		/*
 		 * When using 'vim -g', vim is forked and cscope process is
@@ -2348,44 +2348,44 @@ cs_release_csp(int i, int freefnpp)
 		 * the "q" command, hence giving it a chance to clean up
 		 * its temporary files.
 		 */
-		int waited;
+		صحيح waited;
 
 		sleep(0);
-		for (waited = 0; waited < 40; ++waited)
+		لكل (waited = 0; waited < 40; ++waited)
 		{
 		    // Check whether cscope process is still alive
-		    if (kill(csinfo[i].pid, 0) != 0)
+		    إذا (kill(csinfo[i].pid, 0) != 0)
 		    {
 			alive = FALSE; // cscope process no longer exists
-			break;
+			اكسر;
 		    }
 		    mch_delay(50L, 0); // sleep 50 ms
 		}
 	    }
-	    if (alive)
+	    إذا (alive)
 #  endif
 	    {
 		kill(csinfo[i].pid, SIGKILL);
-		(void)waitpid(csinfo[i].pid, &pstat, 0);
+		(فراغ)waitpid(csinfo[i].pid, &pstat, 0);
 	    }
 	}
     }
-# else  // !UNIX
-    if (csinfo[i].hProc != NULL)
+# وإلا  // !UNIX
+    إذا (csinfo[i].hProc != عدم)
     {
 	// Give cscope a chance to exit normally
-	if (WaitForSingleObject(csinfo[i].hProc, 1000) == WAIT_TIMEOUT)
+	إذا (WaitForSingleObject(csinfo[i].hProc, 1000) == WAIT_TIMEOUT)
 	    TerminateProcess(csinfo[i].hProc, 0);
 	CloseHandle(csinfo[i].hProc);
     }
 # endif
 
-    if (csinfo[i].fr_fp != NULL)
-	(void)fclose(csinfo[i].fr_fp);
-    if (csinfo[i].to_fp != NULL)
-	(void)fclose(csinfo[i].to_fp);
+    إذا (csinfo[i].fr_fp != عدم)
+	(فراغ)fclose(csinfo[i].fr_fp);
+    إذا (csinfo[i].to_fp != عدم)
+	(فراغ)fclose(csinfo[i].to_fp);
 
-    if (freefnpp)
+    إذا (freefnpp)
     {
 	vim_free(csinfo[i].fname);
 	vim_free(csinfo[i].ppath);
@@ -2399,50 +2399,50 @@ cs_release_csp(int i, int freefnpp)
 /*
  * Calls cs_kill on all cscope connections then reinits.
  */
-    static int
+    ساكن صحيح
 cs_reset(exarg_T *eap UNUSED)
 {
-    char	**dblist = NULL, **pplist = NULL, **fllist = NULL;
-    int	i;
-    char buf[20]; // for sprintf " (#%d)"
+    حرف	**dblist = عدم, **pplist = عدم, **fllist = عدم;
+    صحيح	i;
+    حرف buf[20]; // for sprintf " (#%d)"
 
-    if (csinfo_size == 0)
-	return CSCOPE_SUCCESS;
+    إذا (csinfo_size == 0)
+	أرجع CSCOPE_SUCCESS;
 
     // malloc our db and ppath list
-    dblist = ALLOC_MULT(char *, csinfo_size);
-    pplist = ALLOC_MULT(char *, csinfo_size);
-    fllist = ALLOC_MULT(char *, csinfo_size);
-    if (dblist == NULL || pplist == NULL || fllist == NULL)
+    dblist = ALLOC_MULT(حرف *, csinfo_size);
+    pplist = ALLOC_MULT(حرف *, csinfo_size);
+    fllist = ALLOC_MULT(حرف *, csinfo_size);
+    إذا (dblist == عدم || pplist == عدم || fllist == عدم)
     {
 	vim_free(dblist);
 	vim_free(pplist);
 	vim_free(fllist);
-	return CSCOPE_FAILURE;
+	أرجع CSCOPE_FAILURE;
     }
 
-    for (i = 0; i < csinfo_size; i++)
+    لكل (i = 0; i < csinfo_size; i++)
     {
 	dblist[i] = csinfo[i].fname;
 	pplist[i] = csinfo[i].ppath;
 	fllist[i] = csinfo[i].flags;
-	if (csinfo[i].fname != NULL)
+	إذا (csinfo[i].fname != عدم)
 	    cs_release_csp(i, FALSE);
     }
 
     // rebuild the cscope connection list
-    for (i = 0; i < csinfo_size; i++)
+    لكل (i = 0; i < csinfo_size; i++)
     {
-	if (dblist[i] != NULL)
+	إذا (dblist[i] != عدم)
 	{
 	    cs_add_common(dblist[i], pplist[i], fllist[i]);
-	    if (p_csverbose)
+	    إذا (p_csverbose)
 	    {
 		// don't use smsg_attr() because we want to display the
 		// connection number in the same line as
 		// "Added cscope database..."
 		sprintf(buf, " (#%d)", i);
-		msg_puts_attr(buf, HL_ATTR(HLF_R));
+		ڤسنن_puts_attr(buf, HL_ATTR(HLF_R));
 	    }
 	}
 	vim_free(dblist[i]);
@@ -2453,9 +2453,9 @@ cs_reset(exarg_T *eap UNUSED)
     vim_free(pplist);
     vim_free(fllist);
 
-    if (p_csverbose)
-	msg_attr(_("All cscope databases reset"), HL_ATTR(HLF_R) | MSG_HIST);
-    return CSCOPE_SUCCESS;
+    إذا (p_csverbose)
+	ڤسنن_attr(_("All cscope databases reset"), HL_ATTR(HLF_R) | ڤسنن_HIST);
+    أرجع CSCOPE_SUCCESS;
 }
 
 
@@ -2468,14 +2468,14 @@ cs_reset(exarg_T *eap UNUSED)
  * ships with Solaris 2.6), the output never has the prefix prepended.
  * Contrast this with my development system (Digital Unix), which does.
  */
-    static char *
-cs_resolve_file(int i, char *name)
+    ساكن حرف *
+cs_resolve_file(صحيح i, حرف *name)
 {
-    char	*fullname;
-    string_T	csdir = {NULL, 0};
+    حرف	*fullname;
+    string_T	csdir = {عدم, 0};
     size_t	namelen;
     size_t	ppathlen = 0;
-    int		len;
+    صحيح		len;
 
     /*
      * Ppath is freed when we destroy the cscope connection.
@@ -2483,31 +2483,31 @@ cs_resolve_file(int i, char *name)
      * copied into the tag buffer used by Vim.
      */
     namelen = STRLEN(name);
-    len = (int)namelen + 2;
-    if (csinfo[i].ppath != NULL)
+    len = (صحيح)namelen + 2;
+    إذا (csinfo[i].ppath != عدم)
     {
 	ppathlen = STRLEN(csinfo[i].ppath);
-	len += (int)ppathlen;
+	len += (صحيح)ppathlen;
     }
-    else if (p_csre && csinfo[i].fname != NULL)
+    وإلا إذا (p_csre && csinfo[i].fname != عدم)
     {
 	// If 'cscoperelative' is set and ppath is not set, use cscope.out
 	// path in path resolution.
 	csdir.string = alloc(MAXPATHL);
-	if (csdir.string != NULL)
+	إذا (csdir.string != عدم)
 	{
 	    vim_strncpy(csdir.string, (char_u *)csinfo[i].fname,
 					  gettail((char_u *)csinfo[i].fname)
 						 - (char_u *)csinfo[i].fname);
 	    csdir.length = STRLEN(csdir.string);
-	    len += (int)csdir.length;
+	    len += (صحيح)csdir.length;
 	}
     }
 
     // Note/example: this won't work if the cscope output already starts
     // "../.." and the prefix path is also "../..".  if something like this
     // happens, you are screwed up and need to fix how you're using cscope.
-    if (csinfo[i].ppath != NULL
+    إذا (csinfo[i].ppath != عدم
 	    && (strncmp(name, csinfo[i].ppath, ppathlen) != 0)
 	    && (name[0] != '/')
 # ifdef MSWIN
@@ -2515,70 +2515,70 @@ cs_resolve_file(int i, char *name)
 # endif
        )
     {
-	if ((fullname = alloc(len)) != NULL)
-	    (void)sprintf(fullname, "%s/%s", csinfo[i].ppath, name);
+	إذا ((fullname = alloc(len)) != عدم)
+	    (فراغ)sprintf(fullname, "%s/%s", csinfo[i].ppath, name);
     }
-    else if (csdir.string != NULL && csinfo[i].fname != NULL && *csdir.string != NUL)
+    وإلا إذا (csdir.string != عدم && csinfo[i].fname != عدم && *csdir.string != NUL)
     {
 	string_T    ret;
 
 	// Check for csdir to be non empty to avoid empty path concatenated to
 	// cscope output.
-	fullname = (char *)concat_fnames(csdir.string, csdir.length, (char_u *)name, namelen, TRUE, &ret);
+	fullname = (حرف *)concat_fnames(csdir.string, csdir.length, (char_u *)name, namelen, TRUE, &ret);
     }
-    else
+    وإلا
     {
-	fullname = (char *)vim_strnsave((char_u *)name, namelen);
+	fullname = (حرف *)vim_strnsave((char_u *)name, namelen);
     }
 
     vim_free(csdir.string);
-    return fullname;
+    أرجع fullname;
 }
 
 
 /*
  * Show all cscope connections.
  */
-    static int
+    ساكن صحيح
 cs_show(exarg_T *eap UNUSED)
 {
-    int i;
+    صحيح i;
 
-    if (cs_cnt_connections() == 0)
-	msg_puts(_("no cscope connections\n"));
-    else
+    إذا (cs_cnt_connections() == 0)
+	ڤسنن_puts(_("no cscope connections\n"));
+    وإلا
     {
-	msg_puts_attr(
+	ڤسنن_puts_attr(
 	    _(" # pid    database name                       prepend path\n"),
 	    HL_ATTR(HLF_T));
-	for (i = 0; i < csinfo_size; i++)
+	لكل (i = 0; i < csinfo_size; i++)
 	{
-	    if (csinfo[i].fname == NULL)
-		continue;
+	    إذا (csinfo[i].fname == عدم)
+		استمر;
 
-	    if (csinfo[i].ppath != NULL)
-		(void)smsg("%2d %-5ld  %-34s  %-32s",
+	    إذا (csinfo[i].ppath != عدم)
+		(فراغ)smsg("%2d %-5ld  %-34s  %-32s",
 		    i, (long)csinfo[i].pid, csinfo[i].fname, csinfo[i].ppath);
-	    else
-		(void)smsg("%2d %-5ld  %-34s  <none>",
+	    وإلا
+		(فراغ)smsg("%2d %-5ld  %-34s  <none>",
 			   i, (long)csinfo[i].pid, csinfo[i].fname);
 	}
     }
 
     wait_return(FALSE);
-    return CSCOPE_SUCCESS;
+    أرجع CSCOPE_SUCCESS;
 }
 
 
 /*
  * Only called when VIM exits to quit any cscope sessions.
  */
-    void
-cs_end(void)
+    فراغ
+cs_end(فراغ)
 {
-    int i;
+    صحيح i;
 
-    for (i = 0; i < csinfo_size; i++)
+    لكل (i = 0; i < csinfo_size; i++)
 	cs_release_csp(i, TRUE);
     vim_free(csinfo);
     csinfo_size = 0;
@@ -2586,40 +2586,40 @@ cs_end(void)
 
 #endif	// FEAT_CSCOPE
 
-#if defined(FEAT_EVAL)
+#إذا defined(FEAT_EVAL)
 
 /*
  * "cscope_connection([{num} , {dbpath} [, {prepend}]])" function
  *
  * Checks the existence of a cscope connection.
  */
-    void
+    فراغ
 f_cscope_connection(typval_T *argvars UNUSED, typval_T *rettv UNUSED)
 {
 # ifdef FEAT_CSCOPE
-    int		num = 0;
-    char_u	*dbpath = NULL;
-    char_u	*prepend = NULL;
+    صحيح		اڠک = 0;
+    char_u	*dbpath = عدم;
+    char_u	*prepend = عدم;
     char_u	buf[NUMBUFLEN];
 
-    if (in_vim9script()
-	    && (check_for_opt_number_arg(argvars, 0) == FAIL
+    إذا (in_vim9script()
+	    && (check_for_opt_نومبور_arg(argvars, 0) == FAIL
 		|| (argvars[0].v_type != VAR_UNKNOWN
 		    && (check_for_opt_string_arg(argvars, 1) == FAIL
 			|| (argvars[1].v_type != VAR_UNKNOWN
 			    && check_for_opt_string_arg(argvars, 2) == FAIL)))))
-	return;
+	أرجع;
 
-    if (argvars[0].v_type != VAR_UNKNOWN
+    إذا (argvars[0].v_type != VAR_UNKNOWN
 	    && argvars[1].v_type != VAR_UNKNOWN)
     {
-	num = (int)tv_get_number(&argvars[0]);
+	اڠک = (صحيح)tv_get_نومبور(&argvars[0]);
 	dbpath = tv_get_string(&argvars[1]);
-	if (argvars[2].v_type != VAR_UNKNOWN)
+	إذا (argvars[2].v_type != VAR_UNKNOWN)
 	    prepend = tv_get_string_buf(&argvars[2], buf);
     }
 
-    rettv->vval.v_number = cs_connection(num, dbpath, prepend);
+    rettv->vval.v_نومبور = cs_connection(اڠک, dbpath, prepend);
 # endif
 }
 

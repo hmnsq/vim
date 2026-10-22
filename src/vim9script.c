@@ -11,17 +11,17 @@
  * vim9script.c: :vim9script, :import, :export and friends
  */
 
-#include "vim.h"
+#ضمن "vim.h"
 
-#if defined(FEAT_EVAL)
+#إذا defined(FEAT_EVAL)
 /*
  * Return TRUE when currently in a script with script version smaller than
  * "max_version" or command modifiers forced it.
  */
-    int
-in_old_script(int max_version)
+    صحيح
+in_old_script(صحيح max_version)
 {
-    return (current_sctx.sc_version < max_version
+    أرجع (current_sctx.sc_version < max_version
 					&& !(cmdmod.cmod_flags & CMOD_VIM9CMD))
 		|| (cmdmod.cmod_flags & CMOD_LEGACY);
 }
@@ -30,10 +30,10 @@ in_old_script(int max_version)
  * Return TRUE if the current script is Vim9 script.
  * This also returns TRUE in a legacy function in a Vim9 script.
  */
-    int
-current_script_is_vim9(void)
+    صحيح
+current_script_is_vim9(فراغ)
 {
-    return SCRIPT_ID_VALID(current_sctx.sc_sid)
+    أرجع SCRIPT_ID_VALID(current_sctx.sc_sid)
 	    && SCRIPT_ITEM(current_sctx.sc_sid)->sn_version
 						       == SCRIPT_VERSION_VIM9;
 }
@@ -43,8 +43,8 @@ current_script_is_vim9(void)
 /*
  * Clear Vim9 script-local variables and functions.
  */
-    void
-clear_vim9_scriptlocal_vars(int sid)
+    فراغ
+clear_vim9_scriptlocal_vars(صحيح sid)
 {
     hashtab_T	*ht = &SCRIPT_VARS(sid);
 
@@ -63,102 +63,102 @@ clear_vim9_scriptlocal_vars(int sid)
 /*
  * ":vim9script".
  */
-    void
+    فراغ
 ex_vim9script(exarg_T *eap UNUSED)
 {
 #ifdef FEAT_EVAL
-    int		    sid = current_sctx.sc_sid;
+    صحيح		    sid = current_sctx.sc_sid;
     scriptitem_T    *si;
-    int		    found_noclear = FALSE;
+    صحيح		    found_noclear = FALSE;
     char_u	    *p;
 
-    if (!sourcing_a_script(eap))
+    إذا (!sourcing_a_script(eap))
     {
 	emsg(_(e_vim9script_can_only_be_used_in_script));
-	return;
+	أرجع;
     }
 
     si = SCRIPT_ITEM(sid);
-    if (si->sn_state == SN_STATE_HAD_COMMAND)
+    إذا (si->sn_state == SN_STATE_HAD_COMMAND)
     {
 	emsg(_(e_vim9script_must_be_first_command_in_script));
-	return;
+	أرجع;
     }
 
-    for (p = eap->arg; !IS_WHITE_OR_NUL(*p); p = skipwhite(skiptowhite(p)))
+    لكل (p = eap->arg; !IS_WHITE_OR_NUL(*p); p = skipwhite(skiptowhite(p)))
     {
-	if (STRNCMP(p, "noclear", 7) == 0 && IS_WHITE_OR_NUL(p[7]))
+	إذا (STRNCMP(p, "noclear", 7) == 0 && IS_WHITE_OR_NUL(p[7]))
 	{
-	    if (found_noclear)
+	    إذا (found_noclear)
 	    {
 		semsg(_(e_duplicate_argument_str), p);
-		return;
+		أرجع;
 	    }
 	    found_noclear = TRUE;
 	}
-	else
+	وإلا
 	{
 	    semsg(_(e_invalid_argument_str), eap->arg);
-	    return;
+	    أرجع;
 	}
     }
 
-    if (si->sn_state == SN_STATE_RELOAD && !found_noclear)
+    إذا (si->sn_state == SN_STATE_RELOAD && !found_noclear)
 	// Reloading a script without the "noclear" argument: clear
 	// script-local variables and functions.
 	clear_vim9_scriptlocal_vars(sid);
     si->sn_state = SN_STATE_HAD_COMMAND;
 
     // Store the prefix with the script, it is used to find exported functions.
-    if (si->sn_autoload_prefix == NULL)
+    إذا (si->sn_autoload_prefix == عدم)
 	si->sn_autoload_prefix = get_autoload_prefix(si);
 
     current_sctx.sc_version = SCRIPT_VERSION_VIM9;
     si->sn_version = SCRIPT_VERSION_VIM9;
 
-    if (STRCMP(p_cpo, CPO_VIM) != 0)
+    إذا (STRCMP(p_cpo, CPO_VIM) != 0)
     {
 	si->sn_save_cpo = vim_strsave(p_cpo);
-	set_option_value_give_err((char_u *)"cpo",
+	set_option_نيلاي_give_err((char_u *)"cpo",
 					 0L, (char_u *)CPO_VIM, OPT_NO_REDRAW);
     }
-#else
+#وإلا
     // No check for this being the first command, the information is not
     // available.
     current_sctx.sc_version = SCRIPT_VERSION_VIM9;
 #endif
 }
 
-#if defined(FEAT_EVAL)
+#إذا defined(FEAT_EVAL)
 /*
  * When in Vim9 script give an error (unless "silent" is true) and return FAIL.
  */
-    int
+    صحيح
 not_in_vim9(exarg_T *eap, bool silent)
 {
-    if (in_vim9script())
-	switch (eap->cmdidx)
+    إذا (in_vim9script())
+	بدل (eap->cmdidx)
 	{
-	    case CMD_k:
-		if (eap->addr_count > 0)
+	    حالة CMD_k:
+		إذا (eap->addr_کيراءن > 0)
 		{
-		    if (!silent)
+		    إذا (!silent)
 			emsg(_(e_no_range_allowed));
-		    return FAIL;
+		    أرجع FAIL;
 		}
 		// FALLTHROUGH
-	    case CMD_append:
-	    case CMD_change:
-	    case CMD_insert:
-	    case CMD_open:
-	    case CMD_t:
-	    case CMD_xit:
-		if (!silent)
+	    حالة CMD_append:
+	    حالة CMD_change:
+	    حالة CMD_سيسيڤ:
+	    حالة CMD_open:
+	    حالة CMD_t:
+	    حالة CMD_xit:
+		إذا (!silent)
 		    semsg(_(e_command_not_supported_in_vim9_script_missing_var_str), eap->cmd);
-		return FAIL;
-	    default: break;
+		أرجع FAIL;
+	    افتراضي: اكسر;
 	}
-    return OK;
+    أرجع OK;
 }
 
 /*
@@ -167,16 +167,16 @@ not_in_vim9(exarg_T *eap, bool silent)
  * This avoids that using a legacy style #{} dictionary leads to difficult to
  * understand errors.
  */
-    int
+    صحيح
 vim9_bad_comment(char_u *p)
 {
-    if (p[0] == '#' && p[1] == '{' && p[2] != '{')
+    إذا (p[0] == '#' && p[1] == '{' && p[2] != '{')
     {
-	if (!did_emsg)
+	إذا (!did_emsg)
 	    emsg(_(e_cannot_use_hash_curly_to_start_comment));
-	return TRUE;
+	أرجع TRUE;
     }
-    return FALSE;
+    أرجع FALSE;
 }
 #endif
 
@@ -185,45 +185,45 @@ vim9_bad_comment(char_u *p)
  * Gives an error for using "#{", not for "#{{".
  * Does not check for white space.
  */
-    int
+    صحيح
 vim9_comment_start(char_u *p)
 {
 #ifdef FEAT_EVAL
-    return p[0] == '#' && !vim9_bad_comment(p);
-#else
-    return p[0] == '#' && (p[1] != '{' || p[2] == '{');
+    أرجع p[0] == '#' && !vim9_bad_comment(p);
+#وإلا
+    أرجع p[0] == '#' && (p[1] != '{' || p[2] == '{');
 #endif
 }
 
-#if defined(FEAT_EVAL)
+#إذا defined(FEAT_EVAL)
 
 /*
  * "++nr" and "--nr" commands.
  */
-    void
+    فراغ
 ex_incdec(exarg_T *eap)
 {
     char_u	*cmd = eap->cmd;
     char_u	*nextcmd = eap->nextcmd;
     size_t	len = STRLEN(eap->cmd) + 8;
 
-    if (VIM_ISWHITE(cmd[2]))
+    إذا (VIM_ISWHITE(cmd[2]))
     {
 	semsg(_(e_no_white_space_allowed_after_str_str),
 			 eap->cmdidx == CMD_increment ? "++" : "--", eap->cmd);
-	return;
+	أرجع;
     }
 
     // This works like "nr += 1" or "nr -= 1".
     // Add a '|' to avoid looking in the next line.
     eap->cmd = alloc(len);
-    if (eap->cmd == NULL)
-	return;
-    vim_snprintf((char *)eap->cmd, len, "%s %c= 1 |", cmd + 2,
+    إذا (eap->cmd == عدم)
+	أرجع;
+    vim_snprintf((حرف *)eap->cmd, len, "%s %c= 1 |", cmd + 2,
 				     eap->cmdidx == CMD_increment ? '+' : '-');
     eap->arg = eap->cmd;
     eap->cmdidx = CMD_var;
-    eap->nextcmd = NULL;
+    eap->nextcmd = عدم;
     ex_let(eap);
     vim_free(eap->cmd);
     eap->cmd = cmd;
@@ -233,7 +233,7 @@ ex_incdec(exarg_T *eap)
 /*
  * ":export cmd"
  */
-    void
+    فراغ
 ex_export(exarg_T *eap UNUSED)
 {
     // can only get here when "export" wasn't caught in do_cmdline()
@@ -243,42 +243,42 @@ ex_export(exarg_T *eap UNUSED)
 /*
  * Add a new imported item entry to the current script.
  */
-    static imported_T *
+    ساكن imported_T *
 new_imported(garray_T *gap)
 {
-    if (ga_grow(gap, 1) == OK)
-	return ((imported_T *)gap->ga_data + gap->ga_len++);
-    return NULL;
+    إذا (ga_grow(gap, 1) == OK)
+	أرجع ((imported_T *)gap->ga_data + gap->ga_len++);
+    أرجع عدم;
 }
 
 /*
  * Free the script variables from "sn_all_vars".
  */
-    static void
+    ساكن فراغ
 free_all_script_vars(scriptitem_T *si)
 {
-    int		todo;
+    صحيح		todo;
     hashtab_T	*ht = &si->sn_all_vars.dv_hashtab;
     hashitem_T	*hi;
     sallvar_T	*sav;
     sallvar_T	*sav_next;
-    int		idx;
+    صحيح		idx;
 
     hash_lock(ht);
-    todo = (int)ht->ht_used;
-    FOR_ALL_HASHTAB_ITEMS(ht, hi, todo)
+    todo = (صحيح)ht->ht_used;
+    FOR_ALL_HASHTAB_بارڠن(ht, hi, todo)
     {
-	if (!HASHITEM_EMPTY(hi))
+	إذا (!HASHITEM_EMPTY(hi))
 	{
 	    --todo;
 
 	    // Free the variable.  Don't remove it from the hashtab, ht_array
 	    // might change then.  hash_clear() takes care of it later.
 	    sav = HI2SAV(hi);
-	    while (sav != NULL)
+	    طالما (sav != عدم)
 	    {
 		sav_next = sav->sav_next;
-		if (sav->sav_di == NULL)
+		إذا (sav->sav_di == عدم)
 		    clear_tv(&sav->sav_tv);
 		vim_free(sav);
 		sav = sav_next;
@@ -288,11 +288,11 @@ free_all_script_vars(scriptitem_T *si)
     hash_clear(ht);
     hash_init(ht);
 
-    for (idx = 0; idx < si->sn_var_vals.ga_len; ++idx)
+    لكل (idx = 0; idx < si->sn_var_vals.ga_len; ++idx)
     {
 	svar_T    *sv = ((svar_T *)si->sn_var_vals.ga_data) + idx;
 
-	if (sv->sv_flags & SVFLAG_TYPE_ALLOCATED)
+	إذا (sv->sv_flags & SVFLAG_TYPE_ALLOCATED)
 	    free_type(sv->sv_type);
     }
     ga_clear(&si->sn_var_vals);
@@ -304,13 +304,13 @@ free_all_script_vars(scriptitem_T *si)
 /*
  * Free all imported items in script "sid".
  */
-    void
-free_imports_and_script_vars(int sid)
+    فراغ
+free_imports_and_script_vars(صحيح sid)
 {
     scriptitem_T    *si = SCRIPT_ITEM(sid);
-    int		    idx;
+    صحيح		    idx;
 
-    for (idx = 0; idx < si->sn_imports.ga_len; ++idx)
+    لكل (idx = 0; idx < si->sn_imports.ga_len; ++idx)
     {
 	imported_T *imp = ((imported_T *)si->sn_imports.ga_data) + idx;
 
@@ -327,13 +327,13 @@ free_imports_and_script_vars(int sid)
  * Mark all imports as possible to redefine.  Used when a script is loaded
  * again but not cleared.
  */
-    void
-mark_imports_for_reload(int sid)
+    فراغ
+mark_imports_for_reload(صحيح sid)
 {
     scriptitem_T    *si = SCRIPT_ITEM(sid);
-    int		    idx;
+    صحيح		    idx;
 
-    for (idx = 0; idx < si->sn_imports.ga_len; ++idx)
+    لكل (idx = 0; idx < si->sn_imports.ga_len; ++idx)
     {
 	imported_T *imp = ((imported_T *)si->sn_imports.ga_data) + idx;
 
@@ -345,42 +345,42 @@ mark_imports_for_reload(int sid)
  * Part of "import" that handles a relative or absolute file name/
  * Returns OK or FAIL.
  */
-    static int
-handle_import_fname(char_u *fname, int is_autoload, int *sid)
+    ساكن صحيح
+handle_import_fname(char_u *fname, صحيح is_autoload, صحيح *sid)
 {
-    if (is_autoload)
+    إذا (is_autoload)
     {
 	scriptitem_T	*si;
 
 	*sid = find_script_by_name(fname);
-	if (*sid < 0)
+	إذا (*sid < 0)
 	{
-	    int error = OK;
+	    صحيح error = OK;
 
 	    // Script does not exist yet, check name and create a new
 	    // scriptitem.
-	    if (!file_is_readable(fname))
+	    إذا (!file_is_readable(fname))
 	    {
 		semsg(_(mch_isdir(fname) ? e_str_is_directory
 					  : e_cannot_read_from_str_2), fname);
-		return FAIL;
+		أرجع FAIL;
 	    }
 	    *sid = get_new_scriptitem_for_fname(&error, fname);
-	    if (error == FAIL)
-		return FAIL;
+	    إذا (error == FAIL)
+		أرجع FAIL;
 	}
 
 	si = SCRIPT_ITEM(*sid);
 	si->sn_import_autoload = TRUE;
 
-	if (si->sn_autoload_prefix == NULL)
+	إذا (si->sn_autoload_prefix == عدم)
 	    si->sn_autoload_prefix = get_autoload_prefix(si);
 
 	// with testing override: load autoload script right away
-	if (!override_autoload || si->sn_state != SN_STATE_NOT_LOADED)
-	    return OK;
+	إذا (!override_autoload || si->sn_state != SN_STATE_NOT_LOADED)
+	    أرجع OK;
     }
-    return do_source(fname, FALSE, DOSO_NONE, sid);
+    أرجع do_source(fname, FALSE, DOSO_NONE, sid);
 }
 
 /*
@@ -389,29 +389,29 @@ handle_import_fname(char_u *fname, int is_autoload, int *sid)
  * "cctx" is NULL at the script level.
  * Returns a pointer to after the command or NULL in case of failure
  */
-    static char_u *
+    ساكن char_u *
 handle_import(
 	char_u	    *arg_start,
 	garray_T    *gap,
-	int	    import_sid,
+	صحيح	    import_sid,
 	evalarg_T   *evalarg,
-	void	    *cctx)
+	فراغ	    *cctx)
 {
     char_u	*arg = arg_start;
     char_u	*nextarg;
-    int		is_autoload = FALSE;
-    int		getnext;
-    char_u	*expr_end;
-    int		ret = FAIL;
-    char_u	*as_name = NULL;
+    صحيح		is_autoload = FALSE;
+    صحيح		getnext;
+    char_u	*اوڠکاڤن_end;
+    صحيح		ret = FAIL;
+    char_u	*as_name = عدم;
     typval_T	tv;
-    int		sid = -2;
-    int		res;
+    صحيح		sid = -2;
+    صحيح		res;
     long	start_lnum = SOURCING_LNUM;
     garray_T	*import_gap;
-    int		i;
+    صحيح		i;
 
-    if (STRNCMP(arg, "autoload", 8) == 0 && VIM_ISWHITE(arg[8]))
+    إذا (STRNCMP(arg, "autoload", 8) == 0 && VIM_ISWHITE(arg[8]))
     {
 	is_autoload = TRUE;
 	arg = skipwhite(arg + 8);
@@ -419,14 +419,14 @@ handle_import(
 
     // The name of the file can be an expression, which must evaluate to a
     // string.
-    ret = eval0_retarg(arg, &tv, NULL, evalarg, &expr_end);
-    if (ret == FAIL)
-	goto erret;
-    if (tv.v_type != VAR_STRING
-		       || tv.vval.v_string == NULL || *tv.vval.v_string == NUL)
+    ret = eval0_retarg(arg, &tv, عدم, evalarg, &اوڠکاڤن_end);
+    إذا (ret == FAIL)
+	اذهب erret;
+    إذا (tv.v_type != VAR_STRING
+		       || tv.vval.v_string == عدم || *tv.vval.v_string == NUL)
     {
 	semsg(_(e_invalid_string_for_import_str), arg);
-	goto erret;
+	اذهب erret;
     }
 
     // Give error messages for the start of the line.
@@ -435,186 +435,186 @@ handle_import(
     /*
      * find script file
      */
-    if (*tv.vval.v_string == '.')
+    إذا (*tv.vval.v_string == '.')
     {
 	size_t		len;
 	scriptitem_T	*si = SCRIPT_ITEM(current_sctx.sc_sid);
 	char_u		*tail = gettail(si->sn_name);
 	char_u		*from_name;
-	int		sourced_from_nofile_buf = FALSE;
+	صحيح		sourced_from_nofile_buf = FALSE;
 
-	if (STRNCMP(si->sn_name, ":source buffer=", 15) == 0)
+	إذا (STRNCMP(si->sn_name, ":source buffer=", 15) == 0)
 	    sourced_from_nofile_buf = TRUE;
 
-	if (!sourced_from_nofile_buf)
+	إذا (!sourced_from_nofile_buf)
 	{
 	    // Relative to current script: "./name.vim", "../../name.vim".
 	    len = STRLEN(si->sn_name) - STRLEN(tail) + STRLEN(tv.vval.v_string) + 2;
 	    from_name = alloc(len);
-	    if (from_name == NULL)
-		goto erret;
+	    إذا (from_name == عدم)
+		اذهب erret;
 	    vim_strncpy(from_name, si->sn_name, tail - si->sn_name);
 	    add_pathsep(from_name);
 	    STRCAT(from_name, tv.vval.v_string);
 	}
-	else
+	وإلا
 	    from_name = vim_strsave(tv.vval.v_string);
 	simplify_filename(from_name);
 
 	res = handle_import_fname(from_name, is_autoload, &sid);
 	vim_free(from_name);
     }
-    else if (mch_isFullName(tv.vval.v_string))
+    وإلا إذا (mch_isFullName(tv.vval.v_string))
     {
 	// Absolute path: "/tmp/name.vim"
 	res = handle_import_fname(tv.vval.v_string, is_autoload, &sid);
     }
-    else if (is_autoload)
+    وإلا إذا (is_autoload)
     {
 	size_t	    len = 9 + STRLEN(tv.vval.v_string) + 1;
 	char_u	    *from_name;
 
 	// Find file in "autoload" subdirs in 'runtimepath'.
 	from_name = alloc(len);
-	if (from_name == NULL)
-	    goto erret;
-	vim_snprintf((char *)from_name, len, "autoload/%s", tv.vval.v_string);
+	إذا (from_name == عدم)
+	    اذهب erret;
+	vim_snprintf((حرف *)from_name, len, "autoload/%s", tv.vval.v_string);
 	// we need a scriptitem without loading the script
 	sid = find_script_in_rtp(from_name);
 	vim_free(from_name);
-	if (SCRIPT_ID_VALID(sid))
+	إذا (SCRIPT_ID_VALID(sid))
 	{
 	    scriptitem_T    *si = SCRIPT_ITEM(sid);
 
-	    if (si->sn_autoload_prefix == NULL)
+	    إذا (si->sn_autoload_prefix == عدم)
 		si->sn_autoload_prefix = get_autoload_prefix(si);
 	    res = OK;
-	    if (override_autoload && si->sn_state == SN_STATE_NOT_LOADED)
+	    إذا (override_autoload && si->sn_state == SN_STATE_NOT_LOADED)
 		// testing override: load autoload script right away
-		(void)do_source(si->sn_name, FALSE, DOSO_NONE, NULL);
+		(فراغ)do_source(si->sn_name, FALSE, DOSO_NONE, عدم);
 	}
-	else
+	وإلا
 	    res = FAIL;
     }
-    else
+    وإلا
     {
 	size_t	    len = 7 + STRLEN(tv.vval.v_string) + 1;
 	char_u	    *from_name;
 
 	// Find file in "import" subdirs in 'runtimepath'.
 	from_name = alloc(len);
-	if (from_name == NULL)
-	    goto erret;
-	vim_snprintf((char *)from_name, len, "import/%s", tv.vval.v_string);
+	إذا (from_name == عدم)
+	    اذهب erret;
+	vim_snprintf((حرف *)from_name, len, "import/%s", tv.vval.v_string);
 	res = source_in_path(p_rtp, from_name, DIP_NOAFTER, &sid);
 	vim_free(from_name);
     }
 
-    if (res == FAIL || sid <= 0)
+    إذا (res == FAIL || sid <= 0)
     {
 	semsg(_(is_autoload && sid == -2
 		    ? e_autoload_import_cannot_use_absolute_or_relative_path
 		    : e_could_not_import_str), tv.vval.v_string);
-	goto erret;
+	اذهب erret;
     }
 
-    if (sid == current_sctx.sc_sid)
+    إذا (sid == current_sctx.sc_sid)
     {
 	emsg(_(e_script_cannot_import_itself));
-	goto erret;
+	اذهب erret;
     }
 
-    import_gap = gap != NULL ? gap : &SCRIPT_ITEM(import_sid)->sn_imports;
-    for (i = 0; i < import_gap->ga_len; ++i)
+    import_gap = gap != عدم ? gap : &SCRIPT_ITEM(import_sid)->sn_imports;
+    لكل (i = 0; i < import_gap->ga_len; ++i)
     {
 	imported_T *import = (imported_T *)import_gap->ga_data + i;
 
-	if (import->imp_sid == sid)
+	إذا (import->imp_sid == sid)
 	{
-	    if (import->imp_flags & IMP_FLAGS_RELOAD)
+	    إذا (import->imp_flags & IMP_FLAGS_RELOAD)
 	    {
 		// encountering same script first time on a reload is OK
 		import->imp_flags &= ~IMP_FLAGS_RELOAD;
-		break;
+		اكسر;
 	    }
 	    semsg(_(e_cannot_import_same_script_twice_str), tv.vval.v_string);
-	    goto erret;
+	    اذهب erret;
 	}
     }
 
     // Allow for the "as Name" to be in the next line.
-    nextarg = eval_next_non_blank(expr_end, evalarg, &getnext);
-    if (STRNCMP("as", nextarg, 2) == 0 && IS_WHITE_OR_NUL(nextarg[2]))
+    nextarg = eval_next_non_blank(اوڠکاڤن_end, evalarg, &getnext);
+    إذا (STRNCMP("as", nextarg, 2) == 0 && IS_WHITE_OR_NUL(nextarg[2]))
     {
 	char_u *p;
 
-	if (getnext)
-	    arg = eval_next_line(expr_end, evalarg);
-	else
+	إذا (getnext)
+	    arg = eval_next_باريس(اوڠکاڤن_end, evalarg);
+	وإلا
 	    arg = nextarg;
 
 	// Skip over "as Name "; no line break allowed after "as".
 	// Do not allow for ':' and '#'.
 	arg = skipwhite(arg + 2);
 	p = arg;
-	if (eval_isnamec1(*arg))
-	    while (ASCII_ISALNUM(*arg) || *arg == '_')
+	إذا (eval_isnamec1(*arg))
+	    طالما (ASCII_ISALNUM(*arg) || *arg == '_')
 		++arg;
-	if (p == arg || !IS_WHITE_OR_NUL(*arg))
+	إذا (p == arg || !IS_WHITE_OR_NUL(*arg))
 	{
 	    semsg(_(e_syntax_error_in_import_str), p);
-	    goto erret;
+	    اذهب erret;
 	}
 	as_name = vim_strnsave(p, arg - p);
 	arg = skipwhite(arg);
     }
-    else
+    وإلا
     {
 	char_u *p = gettail(tv.vval.v_string);
-	char_u *end = (char_u *)strstr((char *)p, ".vim");
+	char_u *end = (char_u *)strstr((حرف *)p, ".vim");
 
-	if (!ends_excmd2(arg_start, expr_end))
+	إذا (!ends_excmd2(arg_start, اوڠکاڤن_end))
 	{
-	    semsg(_(e_trailing_characters_str), expr_end);
-	    goto erret;
+	    semsg(_(e_trailing_characters_str), اوڠکاڤن_end);
+	    اذهب erret;
 	}
-	if (end == NULL || end[4] != NUL)
+	إذا (end == عدم || end[4] != NUL)
 	{
 	    semsg(_(e_imported_script_must_use_as_or_end_in_dot_vim_str), p);
-	    goto erret;
+	    اذهب erret;
 	}
-	if (end == p)
+	إذا (end == p)
 	{
 	    semsg(_(e_cannot_import_dot_vim_without_using_as), p);
-	    goto erret;
+	    اذهب erret;
 	}
 	as_name = vim_strnsave(p, end - p);
     }
 
-    if (as_name != NULL)
+    إذا (as_name != عدم)
     {
 	imported_T  *imported;
 
 	imported = find_imported(as_name, STRLEN(as_name), FALSE);
-	if (imported != NULL && imported->imp_sid != sid)
+	إذا (imported != عدم && imported->imp_sid != sid)
 	{
 	    semsg(_(e_name_already_defined_str), as_name);
-	    goto erret;
+	    اذهب erret;
 	}
-	else if (imported == NULL
-		&& check_defined(as_name, STRLEN(as_name), cctx, NULL,
+	وإلا إذا (imported == عدم
+		&& check_defined(as_name, STRLEN(as_name), cctx, عدم,
 								FALSE) == FAIL)
-	    goto erret;
+	    اذهب erret;
 
-	if (imported == NULL)
+	إذا (imported == عدم)
 	{
 	    imported = new_imported(import_gap);
-	    if (imported == NULL)
-		goto erret;
+	    إذا (imported == عدم)
+		اذهب erret;
 	    imported->imp_name = as_name;
-	    as_name = NULL;
+	    as_name = عدم;
 	    imported->imp_sid = sid;
-	    if (is_autoload)
+	    إذا (is_autoload)
 		imported->imp_flags = IMP_FLAGS_AUTOLOAD;
 	}
     }
@@ -622,29 +622,29 @@ handle_import(
 erret:
     clear_tv(&tv);
     vim_free(as_name);
-    return arg;
+    أرجع arg;
 }
 
 /*
  * ":import 'filename'"
  * ":import 'filename' as Name"
  */
-    void
+    فراغ
 ex_import(exarg_T *eap)
 {
     char_u	*cmd_end;
     evalarg_T	evalarg;
 
-    if (!sourcing_a_script(eap))
+    إذا (!sourcing_a_script(eap))
     {
 	emsg(_(e_import_can_only_be_used_in_script));
-	return;
+	أرجع;
     }
     fill_evalarg_from_eap(&evalarg, eap, eap->skip);
 
-    cmd_end = handle_import(eap->arg, NULL, current_sctx.sc_sid,
-							       &evalarg, NULL);
-    if (cmd_end != NULL)
+    cmd_end = handle_import(eap->arg, عدم, current_sctx.sc_sid,
+							       &evalarg, عدم);
+    إذا (cmd_end != عدم)
 	set_nextcmd(eap, cmd_end);
     clear_evalarg(&evalarg, eap);
 }
@@ -654,12 +654,12 @@ ex_import(exarg_T *eap)
  * under another name.  Adjust the import script ID if needed.
  * "*sid" must be a valid script ID.
  */
-    void
-import_check_sourced_sid(int *sid)
+    فراغ
+import_check_sourced_sid(صحيح *sid)
 {
     scriptitem_T *script = SCRIPT_ITEM(*sid);
 
-    if (script->sn_sourced_sid > 0)
+    إذا (script->sn_sourced_sid > 0)
 	*sid = script->sn_sourced_sid;
 }
 
@@ -670,45 +670,45 @@ import_check_sourced_sid(int *sid)
  * When it is a user function return "*ufunc".
  * When not found returns -1 and "*ufunc" is NULL.
  */
-    int
+    صحيح
 find_exported(
-	int	    sid,
+	صحيح	    sid,
 	char_u	    *name,
 	ufunc_T	    **ufunc,
 	type_T	    **type,
 	cctx_T	    *cctx,
 	cstack_T    *cstack,
-	int	    verbose)
+	صحيح	    verbose)
 {
-    int		idx = -1;
+    صحيح		idx = -1;
     svar_T	*sv;
     scriptitem_T *script = SCRIPT_ITEM(sid);
 
-    *ufunc = NULL;
+    *ufunc = عدم;
 
-    if (script->sn_import_autoload && script->sn_state == SN_STATE_NOT_LOADED)
+    إذا (script->sn_import_autoload && script->sn_state == SN_STATE_NOT_LOADED)
     {
-	if (do_source(script->sn_name, FALSE, DOSO_NONE, NULL) == FAIL)
+	إذا (do_source(script->sn_name, FALSE, DOSO_NONE, عدم) == FAIL)
 	{
 	    semsg(_(e_cant_open_file_str), script->sn_name);
-	    return -1;
+	    أرجع -1;
 	}
     }
 
     // Find name in "script".
     idx = get_script_item_idx(sid, name, 0, cctx, cstack);
-    if (idx >= 0)
+    إذا (idx >= 0)
     {
 	sv = ((svar_T *)script->sn_var_vals.ga_data) + idx;
-	if ((sv->sv_flags & SVFLAG_EXPORTED) == 0)
+	إذا ((sv->sv_flags & SVFLAG_EXPORTED) == 0)
 	{
-	    if (verbose)
+	    إذا (verbose)
 		semsg(_(e_item_not_exported_in_script_str), name);
-	    return -1;
+	    أرجع -1;
 	}
 	*type = sv->sv_type;
     }
-    else
+    وإلا
     {
 	size_t	len = STRLEN(name);
 	char_u	buffer[200];
@@ -717,64 +717,64 @@ find_exported(
 	// It could be a user function.  Normally this is stored as
 	// "<SNR>99_name".  For an autoload script a function is stored with
 	// the autoload prefix: "dir#script#name".
-	if (script->sn_autoload_prefix != NULL)
+	إذا (script->sn_autoload_prefix != عدم)
 	    len += STRLEN(script->sn_autoload_prefix) + 2;
-	else
+	وإلا
 	    len += 15;
 
-	if (len < sizeof(buffer))
+	إذا (len < حجم(buffer))
 	    funcname = buffer;
-	else
+	وإلا
 	{
 	    funcname = alloc(len);
-	    if (funcname == NULL)
-		return -1;
+	    إذا (funcname == عدم)
+		أرجع -1;
 	}
-	if (script->sn_autoload_prefix != NULL)
+	إذا (script->sn_autoload_prefix != عدم)
 	{
-	    sprintf((char *)funcname, "%s%s", script->sn_autoload_prefix, name);
+	    sprintf((حرف *)funcname, "%s%s", script->sn_autoload_prefix, name);
 	}
-	else
+	وإلا
 	{
 	    funcname[0] = K_SPECIAL;
 	    funcname[1] = KS_EXTRA;
-	    funcname[2] = (int)KE_SNR;
-	    sprintf((char *)funcname + 3, "%ld_%s", (long)sid, name);
+	    funcname[2] = (صحيح)KE_SNR;
+	    sprintf((حرف *)funcname + 3, "%ld_%s", (long)sid, name);
 	}
 	*ufunc = find_func(funcname, FALSE);
 
-	if (*ufunc == NULL)
+	إذا (*ufunc == عدم)
 	{
-	    if (verbose)
+	    إذا (verbose)
 	    {
-		ufunc_T *alt_ufunc = NULL;
+		ufunc_T *alt_ufunc = عدم;
 
-		if (script->sn_autoload_prefix != NULL)
+		إذا (script->sn_autoload_prefix != عدم)
 		{
 		    // try find the function by the script-local name
 		    funcname[0] = K_SPECIAL;
 		    funcname[1] = KS_EXTRA;
-		    funcname[2] = (int)KE_SNR;
-		    sprintf((char *)funcname + 3, "%ld_%s", (long)sid, name);
+		    funcname[2] = (صحيح)KE_SNR;
+		    sprintf((حرف *)funcname + 3, "%ld_%s", (long)sid, name);
 		    alt_ufunc = find_func(funcname, FALSE);
 		}
-		if (alt_ufunc != NULL)
+		إذا (alt_ufunc != عدم)
 		    semsg(_(e_item_not_exported_in_script_str), name);
-		else
+		وإلا
 		    semsg(_(e_item_not_found_in_script_str), name);
 	    }
 	}
-	else if (((*ufunc)->uf_flags & FC_EXPORT) == 0)
+	وإلا إذا (((*ufunc)->uf_flags & FC_EXPORT) == 0)
 	{
-	    if (verbose)
+	    إذا (verbose)
 		semsg(_(e_item_not_exported_in_script_str), name);
-	    *ufunc = NULL;
+	    *ufunc = عدم;
 	}
-	if (funcname != buffer)
+	إذا (funcname != buffer)
 	    vim_free(funcname);
     }
 
-    return idx;
+    أرجع idx;
 }
 
 /*
@@ -791,60 +791,60 @@ vim9_declare_scriptvar(exarg_T *eap, char_u *arg)
     type_T	    *type;
     typval_T	    init_tv;
 
-    if (eap->cmdidx == CMD_final || eap->cmdidx == CMD_const)
+    إذا (eap->cmdidx == CMD_final || eap->cmdidx == CMD_const)
     {
-	if (eap->cmdidx == CMD_final)
-	    emsg(_(e_final_requires_a_value));
-	else
-	    emsg(_(e_const_requires_a_value));
-	return arg + STRLEN(arg);
+	إذا (eap->cmdidx == CMD_final)
+	    emsg(_(e_final_requires_a_نيلاي));
+	وإلا
+	    emsg(_(e_const_requires_a_نيلاي));
+	أرجع arg + STRLEN(arg);
     }
 
     // Check for valid starting character.
-    if (!eval_isnamec1(*arg))
+    إذا (!eval_isnamec1(*arg))
     {
 	semsg(_(e_invalid_argument_str), arg);
-	return arg + STRLEN(arg);
+	أرجع arg + STRLEN(arg);
     }
 
-    for (p = arg + 1; *p != NUL && eval_isnamec(*p); MB_PTR_ADV(p))
-	if (*p == ':' && (VIM_ISWHITE(p[1]) || p != arg + 1))
-	    break;
+    لكل (p = arg + 1; *p != NUL && eval_isnamec(*p); MB_PTR_ADV(p))
+	إذا (*p == ':' && (VIM_ISWHITE(p[1]) || p != arg + 1))
+	    اكسر;
 
-    if (*p != ':')
+    إذا (*p != ':')
     {
 	emsg(_(e_type_or_initialization_required));
-	return arg + STRLEN(arg);
+	أرجع arg + STRLEN(arg);
     }
-    if (!VIM_ISWHITE(p[1]))
+    إذا (!VIM_ISWHITE(p[1]))
     {
 	semsg(_(e_white_space_required_after_str_str), ":", p);
-	return arg + STRLEN(arg);
+	أرجع arg + STRLEN(arg);
     }
     name = vim_strnsave(arg, p - arg);
 
     // parse type, check for reserved name
     p = skipwhite(p + 1);
-    type = parse_type(&p, &si->sn_type_list, NULL, NULL, TRUE);
-    if (type == NULL
+    type = parse_type(&p, &si->sn_type_list, عدم, عدم, TRUE);
+    إذا (type == عدم
 	    || check_reserved_name(name, FALSE) == FAIL
 	    || !valid_declaration_type(type))
     {
 	vim_free(name);
-	return p;
+	أرجع p;
     }
 
     // Create the variable with 0/NULL value.
     CLEAR_FIELD(init_tv);
-    if (type->tt_type == VAR_ANY)
+    إذا (type->tt_type == VAR_ANY)
 	// A variable of type "any" is not possible, just use zero instead
-	init_tv.v_type = VAR_NUMBER;
-    else
+	init_tv.v_type = VAR_نومبور;
+    وإلا
 	init_tv.v_type = type->tt_type;
     set_var_const(name, 0, type, &init_tv, FALSE, ASSIGN_INIT, 0);
 
     vim_free(name);
-    return p;
+    أرجع p;
 }
 
 /*
@@ -856,108 +856,108 @@ vim9_declare_scriptvar(exarg_T *eap, char_u *arg)
  * When "*type" is NULL use "tv" for the type and update "*type".  If
  * "do_member" is TRUE also use the member type, otherwise use "any".
  */
-    void
+    فراغ
 update_vim9_script_var(
-	int	    create,
+	صحيح	    create,
 	dictitem_T  *di,
 	char_u	    *name,
-	int	    flags,
+	صحيح	    flags,
 	typval_T    *tv,
 	type_T	    **type,
-	int	    do_member)
+	صحيح	    do_member)
 {
     scriptitem_T    *si = SCRIPT_ITEM(current_sctx.sc_sid);
     hashitem_T	    *hi;
-    svar_T	    *sv = NULL;
+    svar_T	    *sv = عدم;
 
-    if (create)
+    إذا (create)
     {
 	sallvar_T   *newsav;
-	sallvar_T   *sav = NULL;
+	sallvar_T   *sav = عدم;
 
 	// Store a pointer to the typval_T, so that it can be found by index
 	// instead of using a hastab lookup.
-	if (ga_grow(&si->sn_var_vals, 1) == FAIL)
-	    return;
+	إذا (ga_grow(&si->sn_var_vals, 1) == FAIL)
+	    أرجع;
 
 	hi = hash_find(&si->sn_all_vars.dv_hashtab, name);
-	if (!HASHITEM_EMPTY(hi))
+	إذا (!HASHITEM_EMPTY(hi))
 	{
 	    // Variable with this name exists, either in this block or in
 	    // another block.
-	    for (sav = HI2SAV(hi); ; sav = sav->sav_next)
+	    لكل (sav = HI2SAV(hi); ; sav = sav->sav_next)
 	    {
-		if (sav->sav_block_id == si->sn_current_block_id)
+		إذا (sav->sav_block_id == si->sn_current_block_id)
 		{
 		    // variable defined in a loop, re-use the entry
 		    sv = ((svar_T *)si->sn_var_vals.ga_data)
 						       + sav->sav_var_vals_idx;
 		    // unhide the variable
-		    if (sv->sv_tv == &sav->sav_tv)
+		    إذا (sv->sv_tv == &sav->sav_tv)
 		    {
 			clear_tv(&sav->sav_tv);
 			sv->sv_tv = &di->di_tv;
 			sav->sav_di = di;
 		    }
-		    break;
+		    اكسر;
 		}
-		if (sav->sav_next == NULL)
-		    break;
+		إذا (sav->sav_next == عدم)
+		    اكسر;
 	    }
 	}
 
-	if (sv == NULL)
+	إذا (sv == عدم)
 	{
 	    // Variable not defined or not defined in current block: Add a
 	    // svar_T and create a new sallvar_T.
 	    sv = ((svar_T *)si->sn_var_vals.ga_data) + si->sn_var_vals.ga_len;
 	    newsav = (sallvar_T *)alloc_clear(
-			      offsetof(sallvar_T, sav_key) + STRLEN(name) + 1);
-	    if (newsav == NULL)
-		return;
+			      offsetof(sallvar_T, sav_کونچي) + STRLEN(name) + 1);
+	    إذا (newsav == عدم)
+		أرجع;
 
 	    sv->sv_tv = &di->di_tv;
 	    sv->sv_const = (flags & ASSIGN_FINAL) ? ASSIGN_FINAL
 				   : (flags & ASSIGN_CONST) ? ASSIGN_CONST : 0;
 	    sv->sv_flags = is_export ? SVFLAG_EXPORTED : 0;
-	    if ((flags & ASSIGN_INIT) == 0)
+	    إذا ((flags & ASSIGN_INIT) == 0)
 		sv->sv_flags |= SVFLAG_ASSIGNED;
 	    newsav->sav_var_vals_idx = si->sn_var_vals.ga_len;
 	    ++si->sn_var_vals.ga_len;
 	    // a pointer to the first char avoids a FORTIFY_SOURCE problem
-	    STRCPY(&newsav->sav_key[0], name);
-	    sv->sv_name = newsav->sav_key;
+	    STRCPY(&newsav->sav_کونچي[0], name);
+	    sv->sv_name = newsav->sav_کونچي;
 	    newsav->sav_di = di;
 	    newsav->sav_block_id = si->sn_current_block_id;
 
-	    if (HASHITEM_EMPTY(hi))
+	    إذا (HASHITEM_EMPTY(hi))
 		// new variable name
-		hash_add(&si->sn_all_vars.dv_hashtab, newsav->sav_key,
+		hash_add(&si->sn_all_vars.dv_hashtab, newsav->sav_کونچي,
 							       "add variable");
-	    else if (sav != NULL)
+	    وإلا إذا (sav != عدم)
 		// existing name in a new block, append to the list
 		sav->sav_next = newsav;
 	}
     }
-    else
+    وإلا
     {
 	sv = find_typval_in_script(&di->di_tv, 0, TRUE);
     }
-    if (sv != NULL)
+    إذا (sv != عدم)
     {
-	if (*type == NULL)
+	إذا (*type == عدم)
 	    *type = typval2type(tv, get_copyID(), &si->sn_type_list,
 					       do_member ? TVTT_DO_MEMBER : 0);
-	else if ((flags & ASSIGN_INIT) == 0
+	وإلا إذا ((flags & ASSIGN_INIT) == 0
 		&& (*type)->tt_type == VAR_BLOB && tv->v_type == VAR_BLOB
-						    && tv->vval.v_blob == NULL)
+						    && tv->vval.v_blob == عدم)
 	{
 	    // "var b: blob = null_blob" has a different type.
 	    *type = &t_blob_null;
 	}
-	if (sv->sv_flags & SVFLAG_TYPE_ALLOCATED)
+	إذا (sv->sv_flags & SVFLAG_TYPE_ALLOCATED)
 	    free_type(sv->sv_type);
-	if (*type != NULL && ((*type)->tt_type == VAR_FUNC
+	إذا (*type != عدم && ((*type)->tt_type == VAR_FUNC
 					   || (*type)->tt_type == VAR_PARTIAL))
 	{
 	    // The type probably uses uf_type_list, which is cleared when the
@@ -966,7 +966,7 @@ update_vim9_script_var(
 	    sv->sv_type = alloc_type(*type);
 	    sv->sv_flags |= SVFLAG_TYPE_ALLOCATED;
 	}
-	else
+	وإلا
 	{
 	    sv->sv_type = *type;
 	    sv->sv_flags &= ~SVFLAG_TYPE_ALLOCATED;
@@ -983,8 +983,8 @@ update_vim9_script_var(
  * When "func_defined" is non-zero then a function was defined in this block,
  * the variable may be accessed by it.  Otherwise the variable can be cleared.
  */
-    void
-hide_script_var(scriptitem_T *si, int idx, int func_defined)
+    فراغ
+hide_script_var(scriptitem_T *si, صحيح idx, صحيح func_defined)
 {
     svar_T	*sv = ((svar_T *)si->sn_var_vals.ga_data) + idx;
     hashtab_T	*script_ht = get_script_local_ht();
@@ -998,39 +998,39 @@ hide_script_var(scriptitem_T *si, int idx, int func_defined)
     script_hi = hash_find(script_ht, sv->sv_name);
     all_hi = hash_find(all_ht, sv->sv_name);
 
-    if (HASHITEM_EMPTY(script_hi) || HASHITEM_EMPTY(all_hi))
-	return;
+    إذا (HASHITEM_EMPTY(script_hi) || HASHITEM_EMPTY(all_hi))
+	أرجع;
 
     dictitem_T	*di = HI2DI(script_hi);
     sallvar_T	*sav = HI2SAV(all_hi);
-    sallvar_T	*sav_prev = NULL;
+    sallvar_T	*sav_prev = عدم;
 
     // There can be multiple entries with the same name in different
     // blocks, find the right one.
-    while (sav != NULL && sav->sav_var_vals_idx != idx)
+    طالما (sav != عدم && sav->sav_var_vals_idx != idx)
     {
 	sav_prev = sav;
 	sav = sav->sav_next;
     }
-    if (sav == NULL)
-	return;
+    إذا (sav == عدم)
+	أرجع;
 
-    if (func_defined)
+    إذا (func_defined)
     {
 	// move the typval from the dictitem to the sallvar
 	sav->sav_tv = di->di_tv;
 	di->di_tv.v_type = VAR_UNKNOWN;
 	sav->sav_flags = di->di_flags;
-	sav->sav_di = NULL;
+	sav->sav_di = عدم;
 	sv->sv_tv = &sav->sav_tv;
     }
-    else
+    وإلا
     {
-	if (sav_prev == NULL)
+	إذا (sav_prev == عدم)
 	    hash_remove(all_ht, all_hi, "hide variable");
-	else
+	وإلا
 	    sav_prev->sav_next = sav->sav_next;
-	sv->sv_name = NULL;
+	sv->sv_name = عدم;
 	vim_free(sav);
     }
     delete_var(script_ht, script_hi);
@@ -1043,65 +1043,65 @@ hide_script_var(scriptitem_T *si, int idx, int func_defined)
  * Returns NULL if not found and give an internal error.
  */
     svar_T *
-find_typval_in_script(typval_T *dest, scid_T sid, int must_find)
+find_typval_in_script(typval_T *dest, scid_T sid, صحيح must_find)
 {
     scriptitem_T    *si = SCRIPT_ITEM(sid == 0 ? current_sctx.sc_sid : sid);
-    int		    idx;
+    صحيح		    idx;
 
-    if (si->sn_version != SCRIPT_VERSION_VIM9)
+    إذا (si->sn_version != SCRIPT_VERSION_VIM9)
 	// legacy script doesn't store variable types
-	return NULL;
+	أرجع عدم;
 
     // Find the svar_T in sn_var_vals.  Start at the end, in a for loop the
     // variable was added at the end.
-    for (idx = si->sn_var_vals.ga_len - 1; idx >= 0; --idx)
+    لكل (idx = si->sn_var_vals.ga_len - 1; idx >= 0; --idx)
     {
 	svar_T    *sv = ((svar_T *)si->sn_var_vals.ga_data) + idx;
 
 	// If "sv_name" is NULL the variable was hidden when leaving a block,
 	// don't check "sv_tv" then, it might be used for another variable now.
-	if (sv->sv_name != NULL && sv->sv_tv == dest)
-	    return sv;
+	إذا (sv->sv_name != عدم && sv->sv_tv == dest)
+	    أرجع sv;
     }
-    if (must_find)
+    إذا (must_find)
 	iemsg("find_typval_in_script(): not found");
-    return NULL;
+    أرجع عدم;
 }
 
 /*
  * Check if the type of script variable "dest" allows assigning "value".
  * If needed convert "value" to a bool.
  */
-    int
+    صحيح
 check_script_var_type(
 	svar_T	    *sv,
-	typval_T    *value,
+	typval_T    *نيلاي,
 	char_u	    *name,
 	where_T	    where)
 {
-    int	    ret;
+    صحيح	    ret;
 
-    if (sv->sv_const != 0)
+    إذا (sv->sv_const != 0)
     {
 	semsg(_(e_cannot_change_readonly_variable_str), name);
-	return FAIL;
+	أرجع FAIL;
     }
-    ret = check_typval_type(sv->sv_type, value, where);
-    if (ret == OK && need_convert_to_bool(sv->sv_type, value))
+    ret = check_typval_type(sv->sv_type, نيلاي, where);
+    إذا (ret == OK && need_convert_to_bool(sv->sv_type, نيلاي))
     {
-	int	val = tv2bool(value);
+	صحيح	val = tv2bool(نيلاي);
 
-	clear_tv(value);
-	value->v_type = VAR_BOOL;
-	value->v_lock = 0;
-	value->vval.v_number = val ? VVAL_TRUE : VVAL_FALSE;
+	clear_tv(نيلاي);
+	نيلاي->v_type = VAR_BOOL;
+	نيلاي->v_lock = 0;
+	نيلاي->vval.v_نومبور = val ? VVAL_TRUE : VVAL_FALSE;
     }
-    return ret;
+    أرجع ret;
 }
 
 // words that cannot be used as a variable
 // Keep this array sorted, as bsearch() is used to search this array.
-static char *reserved[] = {
+ساكن حرف *reserved[] = {
     "false",
     "null",
     "null_blob",
@@ -1123,30 +1123,30 @@ static char *reserved[] = {
 /*
  * String compare function used for bsearch()
  */
-    static int
-comp_names(const void *s1, const void *s2)
+    ساكن صحيح
+comp_names(ثابت فراغ *s1, ثابت فراغ *s2)
 {
-    return STRCMP(*(char **)s1, *(char **)s2);
+    أرجع STRCMP(*(حرف **)s1, *(حرف **)s2);
 }
 
 /*
  * Returns OK if "name" is not a reserved keyword.  Otherwise returns FAIL.
  */
-    int
-check_reserved_name(char_u *name, int is_objm_access)
+    صحيح
+check_reserved_name(char_u *name, صحيح is_objm_access)
 {
     // "this" can be used in an object method
-    if (is_objm_access && STRCMP("this", name) == 0)
-	return OK;
+    إذا (is_objm_access && STRCMP("this", name) == 0)
+	أرجع OK;
 
-    if (bsearch(&name, reserved, ARRAY_LENGTH(reserved),
-				sizeof(reserved[0]), comp_names) != NULL)
+    إذا (bsearch(&name, reserved, ARRAY_LENGTH(reserved),
+				حجم(reserved[0]), comp_names) != عدم)
     {
 	semsg(_(e_cannot_use_reserved_name_str), name);
-	return FAIL;
+	أرجع FAIL;
     }
 
-    return OK;
+    أرجع OK;
 }
 
 #endif // FEAT_EVAL
