@@ -13,20 +13,20 @@
 #define WIN32_LEAN_AND_MEAN
 
 #ifndef DYNAMIC_DIRECTX
-# if WINVER < 0x0600
+# إذا WINVER < 0x0600
 #  error WINVER must be 0x0600 or above to use DirectWrite(DirectX)
 # endif
 #endif
 
-#include <windows.h>
-#include <crtdbg.h>
-#include <assert.h>
-#include <math.h>
-#include <d2d1.h>
-#include <d2d1helper.h>
+#ضمن <windows.h>
+#ضمن <crtdbg.h>
+#ضمن <assert.h>
+#ضمن <math.h>
+#ضمن <d2d1.h>
+#ضمن <d2d1helper.h>
 
 // Disable these macros to compile with old VC and newer SDK (V8.1 or later).
-#if defined(_MSC_VER) && (_MSC_VER < 1700)
+#إذا defined(_MSC_VER) && (_MSC_VER < 1700)
 # define _COM_Outptr_ __out
 # define _In_reads_(s)
 # define _In_reads_opt_(s)
@@ -40,11 +40,11 @@
 
 #ifdef FEAT_DIRECTX_COLOR_EMOJI
 # include <dwrite_2.h>
-#else
+#وإلا
 # include <dwrite.h>
 #endif
 
-#include "gui_dwrite.h"
+#ضمن "gui_dwrite.h"
 
 #ifdef __MINGW32__
 # define __maybenull	SAL__maybenull
@@ -54,240 +54,240 @@
 
 #ifdef __MINGW32__
 # define UNUSED __attribute__((unused))
-#else
+#وإلا
 # define UNUSED
 #endif
 
-#if (defined(_MSC_VER) && (_MSC_VER >= 1700)) || (__cplusplus >= 201103L)
+#إذا (defined(_MSC_VER) && (_MSC_VER >= 1700)) || (__cplusplus >= 201103L)
 # define FINAL final
-#else
+#وإلا
 # define FINAL
 #endif
 
 #ifdef DYNAMIC_DIRECTX
-extern "C" HINSTANCE vimLoadLib(const char *name);
+خارجي "C" HINSTANCE vimLoadLib(ثابت حرف *name);
 
-typedef int (WINAPI *PGETUSERDEFAULTLOCALENAME)(LPWSTR, int);
-typedef HRESULT (WINAPI *PD2D1CREATEFACTORY)(D2D1_FACTORY_TYPE,
-	REFIID, const D2D1_FACTORY_OPTIONS *, void **);
-typedef HRESULT (WINAPI *PDWRITECREATEFACTORY)(DWRITE_FACTORY_TYPE,
+تعريفنوع صحيح (WINAPI *PGETUSERDEFAULTLOCALENAME)(LPWSTR, صحيح);
+تعريفنوع HRESULT (WINAPI *PD2D1CREATEFACTORY)(D2D1_FACTORY_TYPE,
+	REFIID, ثابت D2D1_FACTORY_OPTIONS *, فراغ **);
+تعريفنوع HRESULT (WINAPI *PDWRITECREATEFACTORY)(DWRITE_FACTORY_TYPE,
 	REFIID, IUnknown **);
 
-static HINSTANCE hD2D1DLL = NULL;
-static HINSTANCE hDWriteDLL = NULL;
+ساكن HINSTANCE hD2D1DLL = عدم;
+ساكن HINSTANCE hDWriteDLL = عدم;
 
-static PGETUSERDEFAULTLOCALENAME pGetUserDefaultLocaleName = NULL;
-static PD2D1CREATEFACTORY pD2D1CreateFactory = NULL;
-static PDWRITECREATEFACTORY pDWriteCreateFactory = NULL;
+ساكن PGETUSERDEFAULTLOCALENAME pGetUserDefaultLocaleName = عدم;
+ساكن PD2D1CREATEFACTORY pD2D1CreateFactory = عدم;
+ساكن PDWRITECREATEFACTORY pDWriteCreateFactory = عدم;
 
 #define GetUserDefaultLocaleName	(*pGetUserDefaultLocaleName)
 #define D2D1CreateFactory		(*pD2D1CreateFactory)
 #define DWriteCreateFactory		(*pDWriteCreateFactory)
 
-    static void
+    ساكن فراغ
 unload(HINSTANCE &hinst)
 {
-    if (hinst != NULL)
+    إذا (hinst != عدم)
     {
 	FreeLibrary(hinst);
-	hinst = NULL;
+	hinst = عدم;
     }
 }
 #endif // DYNAMIC_DIRECTX
 
-template <class T> inline void SafeRelease(T **ppT)
+template <صنف T> مضمن فراغ SafeRelease(T **ppT)
 {
-    if (*ppT)
+    إذا (*ppT)
     {
 	(*ppT)->Release();
-	*ppT = NULL;
+	*ppT = عدم;
     }
 }
 
-    static DWRITE_PIXEL_GEOMETRY
-ToPixelGeometry(int value)
+    ساكن DWRITE_PIXEL_GEOMETRY
+ToPixelGeometry(صحيح قدر)
 {
-    switch (value)
+    بدل (قدر)
     {
-	default:
-	case 0:
-	    return DWRITE_PIXEL_GEOMETRY_FLAT;
-	case 1:
-	    return DWRITE_PIXEL_GEOMETRY_RGB;
-	case 2:
-	    return DWRITE_PIXEL_GEOMETRY_BGR;
+	افتراضي:
+	حالة 0:
+	    أرجع DWRITE_PIXEL_GEOMETRY_FLAT;
+	حالة 1:
+	    أرجع DWRITE_PIXEL_GEOMETRY_RGB;
+	حالة 2:
+	    أرجع DWRITE_PIXEL_GEOMETRY_BGR;
     }
 }
 
-    static int
-ToInt(DWRITE_PIXEL_GEOMETRY value)
+    ساكن صحيح
+ToInt(DWRITE_PIXEL_GEOMETRY قدر)
 {
-    switch (value)
+    بدل (قدر)
     {
-	case DWRITE_PIXEL_GEOMETRY_FLAT:
-	    return 0;
-	case DWRITE_PIXEL_GEOMETRY_RGB:
-	    return 1;
-	case DWRITE_PIXEL_GEOMETRY_BGR:
-	    return 2;
-	default:
-	    return -1;
+	حالة DWRITE_PIXEL_GEOMETRY_FLAT:
+	    أرجع 0;
+	حالة DWRITE_PIXEL_GEOMETRY_RGB:
+	    أرجع 1;
+	حالة DWRITE_PIXEL_GEOMETRY_BGR:
+	    أرجع 2;
+	افتراضي:
+	    أرجع -1;
     }
 }
 
-    static DWRITE_RENDERING_MODE
-ToRenderingMode(int value)
+    ساكن DWRITE_RENDERING_MODE
+ToRenderingMode(صحيح قدر)
 {
-    switch (value)
+    بدل (قدر)
     {
-	default:
-	case 0:
-	    return DWRITE_RENDERING_MODE_DEFAULT;
-	case 1:
-	    return DWRITE_RENDERING_MODE_ALIASED;
-	case 2:
-	    return DWRITE_RENDERING_MODE_CLEARTYPE_GDI_CLASSIC;
-	case 3:
-	    return DWRITE_RENDERING_MODE_CLEARTYPE_GDI_NATURAL;
-	case 4:
-	    return DWRITE_RENDERING_MODE_CLEARTYPE_NATURAL;
-	case 5:
-	    return DWRITE_RENDERING_MODE_CLEARTYPE_NATURAL_SYMMETRIC;
-	case 6:
-	    return DWRITE_RENDERING_MODE_OUTLINE;
+	افتراضي:
+	حالة 0:
+	    أرجع DWRITE_RENDERING_MODE_DEFAULT;
+	حالة 1:
+	    أرجع DWRITE_RENDERING_MODE_ALIASED;
+	حالة 2:
+	    أرجع DWRITE_RENDERING_MODE_CLEARTYPE_GDI_CLASSIC;
+	حالة 3:
+	    أرجع DWRITE_RENDERING_MODE_CLEARTYPE_GDI_NATURAL;
+	حالة 4:
+	    أرجع DWRITE_RENDERING_MODE_CLEARTYPE_NATURAL;
+	حالة 5:
+	    أرجع DWRITE_RENDERING_MODE_CLEARTYPE_NATURAL_SYMMETRIC;
+	حالة 6:
+	    أرجع DWRITE_RENDERING_MODE_OUTLINE;
     }
 }
 
-    static D2D1_TEXT_ANTIALIAS_MODE
-ToTextAntialiasMode(int value)
+    ساكن D2D1_TEXT_ANTIALIAS_MODE
+ToTextAntialiasMode(صحيح قدر)
 {
-    switch (value)
+    بدل (قدر)
     {
-	default:
-	case 0:
-	    return D2D1_TEXT_ANTIALIAS_MODE_DEFAULT;
-	case 1:
-	    return D2D1_TEXT_ANTIALIAS_MODE_CLEARTYPE;
-	case 2:
-	    return D2D1_TEXT_ANTIALIAS_MODE_GRAYSCALE;
-	case 3:
-	    return D2D1_TEXT_ANTIALIAS_MODE_ALIASED;
+	افتراضي:
+	حالة 0:
+	    أرجع D2D1_TEXT_ANTIALIAS_MODE_DEFAULT;
+	حالة 1:
+	    أرجع D2D1_TEXT_ANTIALIAS_MODE_CLEARTYPE;
+	حالة 2:
+	    أرجع D2D1_TEXT_ANTIALIAS_MODE_GRAYSCALE;
+	حالة 3:
+	    أرجع D2D1_TEXT_ANTIALIAS_MODE_ALIASED;
     }
 }
 
-    static int
-ToInt(DWRITE_RENDERING_MODE value)
+    ساكن صحيح
+ToInt(DWRITE_RENDERING_MODE قدر)
 {
-    switch (value)
+    بدل (قدر)
     {
-	case DWRITE_RENDERING_MODE_DEFAULT:
-	    return 0;
-	case DWRITE_RENDERING_MODE_ALIASED:
-	    return 1;
-	case DWRITE_RENDERING_MODE_CLEARTYPE_GDI_CLASSIC:
-	    return 2;
-	case DWRITE_RENDERING_MODE_CLEARTYPE_GDI_NATURAL:
-	    return 3;
-	case DWRITE_RENDERING_MODE_CLEARTYPE_NATURAL:
-	    return 4;
-	case DWRITE_RENDERING_MODE_CLEARTYPE_NATURAL_SYMMETRIC:
-	    return 5;
-	case DWRITE_RENDERING_MODE_OUTLINE:
-	    return 6;
-	default:
-	    return -1;
+	حالة DWRITE_RENDERING_MODE_DEFAULT:
+	    أرجع 0;
+	حالة DWRITE_RENDERING_MODE_ALIASED:
+	    أرجع 1;
+	حالة DWRITE_RENDERING_MODE_CLEARTYPE_GDI_CLASSIC:
+	    أرجع 2;
+	حالة DWRITE_RENDERING_MODE_CLEARTYPE_GDI_NATURAL:
+	    أرجع 3;
+	حالة DWRITE_RENDERING_MODE_CLEARTYPE_NATURAL:
+	    أرجع 4;
+	حالة DWRITE_RENDERING_MODE_CLEARTYPE_NATURAL_SYMMETRIC:
+	    أرجع 5;
+	حالة DWRITE_RENDERING_MODE_OUTLINE:
+	    أرجع 6;
+	افتراضي:
+	    أرجع -1;
     }
 }
 
-class FontCache {
-public:
-    struct Item {
+صنف FontCache {
+عام:
+    بنية Item {
 	HFONT              hFont;
 	IDWriteTextFormat* pTextFormat;
 	DWRITE_FONT_WEIGHT fontWeight;
 	DWRITE_FONT_STYLE  fontStyle;
 	FLOAT              fontAscent;
-	Item() : hFont(NULL), pTextFormat(NULL), fontAscent(0.0f) {}
+	Item() : hFont(عدم), pTextFormat(عدم), fontAscent(0.0f) {}
     };
 
-private:
-    int mSize;
-    Item *mItems;
+خاص:
+    صحيح mSize;
+    Item *m_اشیاء;
 
-public:
-    FontCache(int size = 2) :
+عام:
+    FontCache(صحيح size = 2) :
 	mSize(size),
-	mItems(new Item[size])
+	m_اشیاء(جديد Item[size])
     {
     }
 
     ~FontCache()
     {
-	for (int i = 0; i < mSize; ++i)
-	    SafeRelease(&mItems[i].pTextFormat);
-	delete[] mItems;
+	لكل (صحيح i = 0; i < mSize; ++i)
+	    SafeRelease(&m_اشیاء[i].pTextFormat);
+	delete[] m_اشیاء;
     }
 
-    bool get(HFONT hFont, Item &item)
+    منطقي get(HFONT hFont, Item &item)
     {
-	int n = find(hFont);
-	if (n < 0)
-	    return false;
-	item = mItems[n];
+	صحيح n = find(hFont);
+	إذا (n < 0)
+	    أرجع خطأ;
+	item = m_اشیاء[n];
 	slide(n);
-	return true;
+	أرجع true;
     }
 
-    void put(const Item& item)
+    فراغ put(ثابت Item& item)
     {
-	int n = find(item.hFont);
-	if (n < 0)
+	صحيح n = find(item.hFont);
+	إذا (n < 0)
 	    n = mSize - 1;
-	if (mItems[n].pTextFormat != item.pTextFormat)
+	إذا (m_اشیاء[n].pTextFormat != item.pTextFormat)
 	{
-	    SafeRelease(&mItems[n].pTextFormat);
-	    if (item.pTextFormat != NULL)
+	    SafeRelease(&m_اشیاء[n].pTextFormat);
+	    إذا (item.pTextFormat != عدم)
 		item.pTextFormat->AddRef();
 	}
-	mItems[n] = item;
+	m_اشیاء[n] = item;
 	slide(n);
     }
 
-private:
-    int find(HFONT hFont)
+خاص:
+    صحيح find(HFONT hFont)
     {
-	for (int i = 0; i < mSize; ++i)
+	لكل (صحيح i = 0; i < mSize; ++i)
 	{
-	    if (mItems[i].hFont == hFont)
-		return i;
+	    إذا (m_اشیاء[i].hFont == hFont)
+		أرجع i;
 	}
-	return -1;
+	أرجع -1;
     }
 
-    void slide(int nextTop)
+    فراغ slide(صحيح next_چوٹی)
     {
-	if (nextTop == 0)
-	    return;
-	Item tmp = mItems[nextTop];
-	for (int i = nextTop - 1; i >= 0; --i)
-	    mItems[i + 1] = mItems[i];
-	mItems[0] = tmp;
+	إذا (next_چوٹی == 0)
+	    أرجع;
+	Item tmp = m_اشیاء[next_چوٹی];
+	لكل (صحيح i = next_چوٹی - 1; i >= 0; --i)
+	    m_اشیاء[i + 1] = m_اشیاء[i];
+	m_اشیاء[0] = tmp;
     }
 };
 
-enum DrawingMode {
+تعداد DrawingMode {
     DM_GDI = 0,
     DM_DIRECTX = 1,
     DM_INTEROP = 2,
 };
 
-struct DWriteContext {
+بنية DWriteContext {
     HDC mHDC;
     RECT mBindRect;
     DrawingMode mDMode;
     HDC mInteropHDC;
-    bool mDrawing;
-    bool mFallbackDC;
+    منطقي mDrawing;
+    منطقي mFallbackDC;
 
     ID2D1Factory *mD2D1Factory;
 
@@ -314,7 +314,7 @@ struct DWriteContext {
     D2D1_TEXT_ANTIALIAS_MODE mTextAntialiasMode;
 
     DWriteFontFeature mFontFeatures[DWRITE_MAX_FONT_FEATURES];
-    int mFontFeatureCount;
+    صحيح m_Font_Feature_گنتی;
 
     // METHODS
 
@@ -324,78 +324,78 @@ struct DWriteContext {
 
     HRESULT CreateDeviceResources();
 
-    void DiscardDeviceResources();
+    فراغ DiscardDeviceResources();
 
-    HRESULT CreateTextFormatFromLOGFONT(const LOGFONTW &logFont,
+    HRESULT CreateTextFormatFromLOGFONT(ثابت LOGFONTW &logFont,
 	    IDWriteTextFormat **ppTextFormat, FLOAT *pFontAscent);
 
-    HRESULT SetFontByLOGFONT(const LOGFONTW &logFont);
+    HRESULT SetFontByLOGFONT(ثابت LOGFONTW &logFont);
 
-    void SetFont(HFONT hFont);
+    فراغ SetFont(HFONT hFont);
 
-    void Rebind();
+    فراغ Rebind();
 
-    void BindDC(HDC hdc, const RECT *rect);
+    فراغ BindDC(HDC hdc, ثابت RECT *rect);
 
     HRESULT SetDrawingMode(DrawingMode mode);
 
     ID2D1Brush* SolidBrush(COLORREF color);
 
-    void DrawText(const WCHAR *text, int len,
-	int x, int y, int w, int h, int cellWidth, COLORREF color,
-	UINT fuOptions, const RECT *lprc, const INT *lpDx);
+    فراغ DrawText(ثابت WCHAR *text, صحيح len,
+	صحيح x, صحيح y, صحيح w, صحيح h, صحيح cellWidth, COLORREF color,
+	UINT fuOptions, ثابت RECT *lprc, ثابت INT *lpDx);
 
-    void FillRect(const RECT *rc, COLORREF color);
+    فراغ FillRect(ثابت RECT *rc, COLORREF color);
 
-    void DrawLine(int x1, int y1, int x2, int y2, COLORREF color);
+    فراغ Draw_سطر(صحيح x1, صحيح y1, صحيح x2, صحيح y2, COLORREF color);
 
-    void SetPixel(int x, int y, COLORREF color);
+    فراغ SetPixel(صحيح x, صحيح y, COLORREF color);
 
-    void Scroll(int x, int y, const RECT *rc);
+    فراغ Scroll(صحيح x, صحيح y, ثابت RECT *rc);
 
-    void Flush();
+    فراغ Flush();
 
-    void SetRenderingParams(
-	    const DWriteRenderingParams *params);
+    فراغ SetRenderingParams(
+	    ثابت DWriteRenderingParams *params);
 
     DWriteRenderingParams *GetRenderingParams(
 	    DWriteRenderingParams *params);
 
-    void SetFontFeatures(const DWriteFontFeature *features, int count);
+    فراغ SetFontFeatures(ثابت DWriteFontFeature *features, صحيح گنتی);
 };
 
-class AdjustedGlyphRun : public DWRITE_GLYPH_RUN
+صنف AdjustedGlyphRun : عام DWRITE_GLYPH_RUN
 {
-private:
+خاص:
     FLOAT &mAccum;
     FLOAT mDelta;
     FLOAT *mAdjustedAdvances;
 
-public:
+عام:
     AdjustedGlyphRun(
-	    const DWRITE_GLYPH_RUN *glyphRun,
+	    ثابت DWRITE_GLYPH_RUN *glyphRun,
 	    FLOAT cellWidth,
 	    FLOAT &accum,
-	    const INT *lpDx,
-	    int *glyphIndex,
-	    int cchText) :
+	    ثابت INT *lpDx,
+	    صحيح *glyphIndex,
+	    صحيح cchText) :
 	DWRITE_GLYPH_RUN(*glyphRun),
 	mAccum(accum),
 	mDelta(0.0f),
-	mAdjustedAdvances(new FLOAT[glyphRun->glyphCount])
+	mAdjustedAdvances(جديد FLOAT[glyphRun->glyph_گنتی])
     {
-	assert(cellWidth != 0.0f);
-	for (UINT32 i = 0; i < glyphRun->glyphCount; ++i)
+	أكد(cellWidth != 0.0f);
+	لكل (UINT32 i = 0; i < glyphRun->glyph_گنتی; ++i)
 	{
 	    FLOAT orig = glyphRun->glyphAdvances[i];
 	    FLOAT adjusted;
 
-	    if (*glyphIndex < cchText)
+	    إذا (*glyphIndex < cchText)
 	    {
 		adjusted = FLOAT(lpDx[*glyphIndex]);
 		(*glyphIndex)++;
 	    }
-	    else
+	    وإلا
 	    {
 		adjusted = adjustToCell(orig, cellWidth);
 	    }
@@ -412,34 +412,34 @@ public:
 	delete[] mAdjustedAdvances;
     }
 
-    static FLOAT adjustToCell(FLOAT value, FLOAT cellWidth)
+    ساكن FLOAT adjustToCell(FLOAT قدر, FLOAT cellWidth)
     {
-	int cellCount = int(floor(value / cellWidth + 0.5f));
-	if (cellCount < 1)
-	    cellCount = 1;
-	return cellCount * cellWidth;
+	صحيح cell_گنتی = صحيح(floor(قدر / cellWidth + 0.5f));
+	إذا (cell_گنتی < 1)
+	    cell_گنتی = 1;
+	أرجع cell_گنتی * cellWidth;
     }
 };
 
-struct TextRendererContext {
+بنية TextRendererContext {
     // const fields.
     COLORREF color;
     FLOAT cellWidth;
-    const INT *lpDx;
-    int cchText;
+    ثابت INT *lpDx;
+    صحيح cchText;
     FLOAT baselineY;  // Fixed baseline Y coordinate
 
     // working fields.
     FLOAT offsetX;
-    int glyphIndex;
+    صحيح glyphIndex;
 };
 
-class TextRenderer FINAL : public IDWriteTextRenderer
+صنف TextRenderer FINAL : عام IDWriteTextRenderer
 {
-public:
+عام:
     TextRenderer(
 	    DWriteContext* pDWC) :
-	cRefCount_(0),
+	c_Ref_گنتی(0),
 	pDWC_(pDWC)
     {
 	AddRef();
@@ -451,72 +451,72 @@ public:
     }
 
     IFACEMETHOD(IsPixelSnappingDisabled)(
-	__maybenull void* clientDrawingContext UNUSED,
+	__maybenull فراغ* clientDrawingContext UNUSED,
 	__out BOOL* isDisabled)
     {
 	*isDisabled = FALSE;
-	return S_OK;
+	أرجع S_OK;
     }
 
     IFACEMETHOD(GetCurrentTransform)(
-	__maybenull void* clientDrawingContext UNUSED,
+	__maybenull فراغ* clientDrawingContext UNUSED,
 	__out DWRITE_MATRIX* transform)
     {
 	// forward the render target's transform
 	pDWC_->mRT->GetTransform(
 		reinterpret_cast<D2D1_MATRIX_3X2_F*>(transform));
-	return S_OK;
+	أرجع S_OK;
     }
 
     IFACEMETHOD(GetPixelsPerDip)(
-	__maybenull void* clientDrawingContext UNUSED,
+	__maybenull فراغ* clientDrawingContext UNUSED,
 	__out FLOAT* pixelsPerDip)
     {
-	float dpiX, unused;
+	عائم dpiX, unused;
 	pDWC_->mRT->GetDpi(&dpiX, &unused);
 	*pixelsPerDip = dpiX / 96.0f;
-	return S_OK;
+	أرجع S_OK;
     }
 
     IFACEMETHOD(DrawUnderline)(
-	__maybenull void* clientDrawingContext UNUSED,
+	__maybenull فراغ* clientDrawingContext UNUSED,
 	FLOAT baselineOriginX UNUSED,
 	FLOAT baselineOriginY UNUSED,
-	__in DWRITE_UNDERLINE const* underline UNUSED,
+	__in DWRITE_UNDERLINE ثابت* underline UNUSED,
 	IUnknown* clientDrawingEffect UNUSED)
     {
-	return E_NOTIMPL;
+	أرجع E_NOTIMPL;
     }
 
     IFACEMETHOD(DrawStrikethrough)(
-	__maybenull void* clientDrawingContext UNUSED,
+	__maybenull فراغ* clientDrawingContext UNUSED,
 	FLOAT baselineOriginX UNUSED,
 	FLOAT baselineOriginY UNUSED,
-	__in DWRITE_STRIKETHROUGH const* strikethrough UNUSED,
+	__in DWRITE_STRIKETHROUGH ثابت* strikethrough UNUSED,
 	IUnknown* clientDrawingEffect UNUSED)
     {
-	return E_NOTIMPL;
+	أرجع E_NOTIMPL;
     }
 
     IFACEMETHOD(DrawInlineObject)(
-	__maybenull void* clientDrawingContext UNUSED,
+	__maybenull فراغ* clientDrawingContext UNUSED,
 	FLOAT originX UNUSED,
 	FLOAT originY UNUSED,
 	IDWriteInlineObject* inlineObject UNUSED,
 	BOOL isSideways UNUSED,
-	BOOL isRightToLeft UNUSED,
+	BOOL is_دایاں_To_بایاں UNUSED,
 	IUnknown* clientDrawingEffect UNUSED)
     {
-	return E_NOTIMPL;
+	أرجع E_NOTIMPL;
     }
 
     IFACEMETHOD(DrawGlyphRun)(
-	__maybenull void* clientDrawingContext,
+	__maybenull فراغ* clientDrawingContext,
 	FLOAT baselineOriginX,
 	FLOAT baselineOriginY,
 	DWRITE_MEASURING_MODE measuringMode UNUSED,
-	__in DWRITE_GLYPH_RUN const* glyphRun,
-	__in DWRITE_GLYPH_RUN_DESCRIPTION const* glyphRunDescription UNUSED,
+	__in DWRITE_GLYPH_RUN ثابت* glyphRun,
+	__in DWRITE_GLYPH_RUN_DESCRIPTION ثابت* glyphRunDescription UNUSED,
 	IUnknown* clientDrawingEffect UNUSED)
     {
 	TextRendererContext *context =
@@ -532,26 +532,26 @@ public:
 		context->cchText);
 
 #ifdef FEAT_DIRECTX_COLOR_EMOJI
-	if (pDWC_->mDWriteFactory2 != NULL)
+	إذا (pDWC_->mDWriteFactory2 != عدم)
 	{
-	    IDWriteColorGlyphRunEnumerator *enumerator = NULL;
+	    IDWriteColorGlyphRunEnumerator *enumerator = عدم;
 	    HRESULT hr = pDWC_->mDWriteFactory2->TranslateColorGlyphRun(
 		baselineOriginX + context->offsetX,
 		baselineOriginY,
 		&adjustedGlyphRun,
-		NULL,
+		عدم,
 		DWRITE_MEASURING_MODE_GDI_NATURAL,
-		NULL,
+		عدم,
 		0,
 		&enumerator);
-	    if (SUCCEEDED(hr))
+	    إذا (SUCCEEDED(hr))
 	    {
 		// Draw by IDWriteFactory2 for color emoji
 		BOOL hasRun = TRUE;
 		enumerator->MoveNext(&hasRun);
-		while (hasRun)
+		طالما (hasRun)
 		{
-		    const DWRITE_COLOR_GLYPH_RUN* colorGlyphRun;
+		    ثابت DWRITE_COLOR_GLYPH_RUN* colorGlyphRun;
 		    enumerator->GetCurrentRun(&colorGlyphRun);
 
 		    pDWC_->mBrush->SetColor(colorGlyphRun->runColor);
@@ -565,7 +565,7 @@ public:
 		    enumerator->MoveNext(&hasRun);
 		}
 		SafeRelease(&enumerator);
-		return S_OK;
+		أرجع S_OK;
 	    }
 	}
 #endif
@@ -578,93 +578,93 @@ public:
 		&adjustedGlyphRun,
 		pDWC_->SolidBrush(context->color),
 		DWRITE_MEASURING_MODE_NATURAL);
-	return S_OK;
+	أرجع S_OK;
     }
 
-public:
+عام:
     IFACEMETHOD_(unsigned long, AddRef) ()
     {
-	return InterlockedIncrement(&cRefCount_);
+	أرجع InterlockedIncrement(&c_Ref_گنتی);
     }
 
     IFACEMETHOD_(unsigned long, Release) ()
     {
-	long newCount = InterlockedDecrement(&cRefCount_);
+	long new_گنتی_2 = InterlockedDecrement(&c_Ref_گنتی);
 
-	if (newCount == 0)
+	إذا (new_گنتی_2 == 0)
 	{
-	    delete this;
-	    return 0;
+	    delete هذا;
+	    أرجع 0;
 	}
-	return newCount;
+	أرجع new_گنتی_2;
     }
 
     IFACEMETHOD(QueryInterface)(
-	IID const& riid,
-	void** ppvObject)
+	IID ثابت& riid,
+	فراغ** ppvObject)
     {
-	if (__uuidof(IDWriteTextRenderer) == riid)
+	إذا (__uuidof(IDWriteTextRenderer) == riid)
 	{
-	    *ppvObject = this;
+	    *ppvObject = هذا;
 	}
-	else if (__uuidof(IDWritePixelSnapping) == riid)
+	وإلا إذا (__uuidof(IDWritePixelSnapping) == riid)
 	{
-	    *ppvObject = this;
+	    *ppvObject = هذا;
 	}
-	else if (__uuidof(IUnknown) == riid)
+	وإلا إذا (__uuidof(IUnknown) == riid)
 	{
-	    *ppvObject = this;
+	    *ppvObject = هذا;
 	}
-	else
+	وإلا
 	{
-	    *ppvObject = NULL;
-	    return E_FAIL;
+	    *ppvObject = عدم;
+	    أرجع E_FAIL;
 	}
 
-	return S_OK;
+	أرجع S_OK;
     }
 
-private:
-    long cRefCount_;
+خاص:
+    long c_Ref_گنتی;
     DWriteContext* pDWC_;
 };
 
 DWriteContext::DWriteContext() :
-    mHDC(NULL),
+    mHDC(عدم),
     mBindRect(),
     mDMode(DM_GDI),
-    mInteropHDC(NULL),
-    mDrawing(false),
-    mFallbackDC(false),
-    mD2D1Factory(NULL),
-    mRT(NULL),
-    mGDIRT(NULL),
-    mBrush(NULL),
-    mBitmap(NULL),
-    mDWriteFactory(NULL),
+    mInteropHDC(عدم),
+    mDrawing(خطأ),
+    mFallbackDC(خطأ),
+    mD2D1Factory(عدم),
+    mRT(عدم),
+    mGDIRT(عدم),
+    mBrush(عدم),
+    mBitmap(عدم),
+    mDWriteFactory(عدم),
 #ifdef FEAT_DIRECTX_COLOR_EMOJI
-    mDWriteFactory2(NULL),
+    mDWriteFactory2(عدم),
 #endif
-    mGdiInterop(NULL),
-    mRenderingParams(NULL),
+    mGdiInterop(عدم),
+    mRenderingParams(عدم),
     mFontCache(8),
-    mTextFormat(NULL),
+    mTextFormat(عدم),
     mFontWeight(DWRITE_FONT_WEIGHT_NORMAL),
     mFontStyle(DWRITE_FONT_STYLE_NORMAL),
     mFontSize(0.0f),
     mFontAscent(0.0f),
     mTextAntialiasMode(D2D1_TEXT_ANTIALIAS_MODE_DEFAULT),
-    mFontFeatureCount(0)
+    m_Font_Feature_گنتی(0)
 {
-    ZeroMemory(mFontFeatures, sizeof(mFontFeatures));
+    ZeroMemory(mFontFeatures, حجم(mFontFeatures));
     HRESULT hr;
 
     hr = D2D1CreateFactory(D2D1_FACTORY_TYPE_SINGLE_THREADED,
-	    __uuidof(ID2D1Factory), NULL,
-	    reinterpret_cast<void**>(&mD2D1Factory));
+	    __uuidof(ID2D1Factory), عدم,
+	    reinterpret_cast<فراغ**>(&mD2D1Factory));
     _RPT2(_CRT_WARN, "D2D1CreateFactory: hr=%p p=%p\n", hr, mD2D1Factory);
 
-    if (SUCCEEDED(hr))
+    إذا (SUCCEEDED(hr))
     {
 	hr = DWriteCreateFactory(
 		DWRITE_FACTORY_TYPE_SHARED,
@@ -675,7 +675,7 @@ DWriteContext::DWriteContext() :
     }
 
 #ifdef FEAT_DIRECTX_COLOR_EMOJI
-    if (SUCCEEDED(hr))
+    إذا (SUCCEEDED(hr))
     {
 	DWriteCreateFactory(
 		DWRITE_FACTORY_TYPE_SHARED,
@@ -685,13 +685,13 @@ DWriteContext::DWriteContext() :
     }
 #endif
 
-    if (SUCCEEDED(hr))
+    إذا (SUCCEEDED(hr))
     {
 	hr = mDWriteFactory->GetGdiInterop(&mGdiInterop);
 	_RPT2(_CRT_WARN, "GetGdiInterop: hr=%p p=%p\n", hr, mGdiInterop);
     }
 
-    if (SUCCEEDED(hr))
+    إذا (SUCCEEDED(hr))
     {
 	hr = mDWriteFactory->CreateRenderingParams(&mRenderingParams);
 	_RPT2(_CRT_WARN, "CreateRenderingParams: hr=%p p=%p\n", hr,
@@ -720,8 +720,8 @@ DWriteContext::CreateDeviceResources()
 {
     HRESULT hr;
 
-    if (mRT != NULL)
-	return S_OK;
+    إذا (mRT != عدم)
+	أرجع S_OK;
 
     D2D1_RENDER_TARGET_PROPERTIES props = {
 	D2D1_RENDER_TARGET_TYPE_DEFAULT,
@@ -733,16 +733,16 @@ DWriteContext::CreateDeviceResources()
     hr = mD2D1Factory->CreateDCRenderTarget(&props, &mRT);
     _RPT2(_CRT_WARN, "CreateDCRenderTarget: hr=%p p=%p\n", hr, mRT);
 
-    if (SUCCEEDED(hr))
+    إذا (SUCCEEDED(hr))
     {
 	// This always succeeds.
 	mRT->QueryInterface(
 		__uuidof(ID2D1GdiInteropRenderTarget),
-		reinterpret_cast<void**>(&mGDIRT));
+		reinterpret_cast<فراغ**>(&mGDIRT));
 	_RPT1(_CRT_WARN, "GdiInteropRenderTarget: p=%p\n", mGDIRT);
     }
 
-    if (SUCCEEDED(hr))
+    إذا (SUCCEEDED(hr))
     {
 	hr = mRT->CreateSolidColorBrush(
 		D2D1::ColorF(D2D1::ColorF::Black),
@@ -750,13 +750,13 @@ DWriteContext::CreateDeviceResources()
 	_RPT2(_CRT_WARN, "CreateSolidColorBrush: hr=%p p=%p\n", hr, mBrush);
     }
 
-    if (SUCCEEDED(hr))
+    إذا (SUCCEEDED(hr))
 	Rebind();
 
-    return hr;
+    أرجع hr;
 }
 
-    void
+    فراغ
 DWriteContext::DiscardDeviceResources()
 {
     SafeRelease(&mBitmap);
@@ -766,33 +766,33 @@ DWriteContext::DiscardDeviceResources()
 }
 
     HRESULT
-DWriteContext::CreateTextFormatFromLOGFONT(const LOGFONTW &logFont,
+DWriteContext::CreateTextFormatFromLOGFONT(ثابت LOGFONTW &logFont,
 	IDWriteTextFormat **ppTextFormat, FLOAT *pFontAscent)
 {
     // Most of this function is copied from: https://github.com/Microsoft/Windows-classic-samples/blob/master/Samples/Win7Samples/multimedia/DirectWrite/RenderTest/TextHelpers.cpp
     HRESULT hr = S_OK;
-    IDWriteTextFormat *pTextFormat = NULL;
+    IDWriteTextFormat *pTextFormat = عدم;
 
-    IDWriteFont *font = NULL;
-    IDWriteFontFamily *fontFamily = NULL;
-    IDWriteLocalizedStrings *localizedFamilyNames = NULL;
-    float fontSize = 0;
+    IDWriteFont *font = عدم;
+    IDWriteFontFamily *fontFamily = عدم;
+    IDWriteLocalizedStrings *localizedFamilyNames = عدم;
+    عائم fontSize = 0;
     DWRITE_FONT_METRICS fontMetrics = {};
 
-    if (SUCCEEDED(hr))
+    إذا (SUCCEEDED(hr))
     {
 	hr = mGdiInterop->CreateFontFromLOGFONT(&logFont, &font);
     }
 
     // Get the font family to which this font belongs.
-    if (SUCCEEDED(hr))
+    إذا (SUCCEEDED(hr))
     {
 	hr = font->GetFontFamily(&fontFamily);
     }
 
     // Get the family names. This returns an object that encapsulates one or
     // more names with the same meaning but in different languages.
-    if (SUCCEEDED(hr))
+    إذا (SUCCEEDED(hr))
     {
 	hr = fontFamily->GetFamilyNames(&localizedFamilyNames);
     }
@@ -802,31 +802,31 @@ DWriteContext::CreateTextFormatFromLOGFONT(const LOGFONTW &logFont,
     // purposes of creating a text format object any language will do.
 
     wchar_t familyName[100];
-    if (SUCCEEDED(hr))
+    إذا (SUCCEEDED(hr))
     {
 	hr = localizedFamilyNames->GetString(0, familyName,
 		ARRAYSIZE(familyName));
     }
 
-    if (SUCCEEDED(hr))
+    إذا (SUCCEEDED(hr))
     {
 	// Use lfHeight of the LOGFONT as font size.
-	fontSize = float(logFont.lfHeight);
+	fontSize = عائم(logFont.lfHeight);
 
 	font->GetMetrics(&fontMetrics);
 
 	// Convert lfHeight to DirectWrite font size
-	if (fontSize < 0)
+	إذا (fontSize < 0)
 	{
 	    // Negative lfHeight represents the font's em height in pixels
 	    fontSize = -fontSize;
 	}
-	else if (fontSize > 0)
+	وإلا إذا (fontSize > 0)
 	{
 	    // Positive lfHeight represents the font's cell height (ascent + descent)
 	    // Convert to em height
-	    fontSize = fontSize * float(fontMetrics.designUnitsPerEm)
-		/ float(fontMetrics.ascent + fontMetrics.descent + fontMetrics.lineGap);
+	    fontSize = fontSize * عائم(fontMetrics.designUnitsPerEm)
+		/ عائم(fontMetrics.ascent + fontMetrics.descent + fontMetrics.سطر_Gap);
 	}
     }
 
@@ -834,18 +834,18 @@ DWriteContext::CreateTextFormatFromLOGFONT(const LOGFONTW &logFont,
     // language of the text, which may or may not be the same as the primary
     // language of the user. However, for our purposes the user locale will do.
     wchar_t localeName[LOCALE_NAME_MAX_LENGTH];
-    if (SUCCEEDED(hr))
+    إذا (SUCCEEDED(hr))
     {
-	if (GetUserDefaultLocaleName(localeName, LOCALE_NAME_MAX_LENGTH) == 0)
+	إذا (GetUserDefaultLocaleName(localeName, LOCALE_NAME_MAX_LENGTH) == 0)
 	    hr = HRESULT_FROM_WIN32(GetLastError());
     }
 
-    if (SUCCEEDED(hr))
+    إذا (SUCCEEDED(hr))
     {
 	// Create the text format object.
 	hr = mDWriteFactory->CreateTextFormat(
 		familyName,
-		NULL, // no custom font collection
+		عدم, // no custom font collection
 		font->GetWeight(),
 		font->GetStyle(),
 		font->GetStretch(),
@@ -854,49 +854,49 @@ DWriteContext::CreateTextFormatFromLOGFONT(const LOGFONTW &logFont,
 		&pTextFormat);
     }
 
-    if (SUCCEEDED(hr))
+    إذا (SUCCEEDED(hr))
 	hr = pTextFormat->SetTextAlignment(DWRITE_TEXT_ALIGNMENT_LEADING);
 
-    if (SUCCEEDED(hr))
+    إذا (SUCCEEDED(hr))
 	hr = pTextFormat->SetParagraphAlignment(
 		DWRITE_PARAGRAPH_ALIGNMENT_FAR);
 
-    if (SUCCEEDED(hr))
+    إذا (SUCCEEDED(hr))
 	hr = pTextFormat->SetWordWrapping(DWRITE_WORD_WRAPPING_NO_WRAP);
 
     SafeRelease(&localizedFamilyNames);
     SafeRelease(&fontFamily);
     SafeRelease(&font);
 
-    if (SUCCEEDED(hr))
+    إذا (SUCCEEDED(hr))
     {
 	*ppTextFormat = pTextFormat;
-	if (pFontAscent != NULL && fontMetrics.designUnitsPerEm != 0)
+	إذا (pFontAscent != عدم && fontMetrics.designUnitsPerEm != 0)
 	{
 	    // Calculate ascent ratio (0.0 to 1.0) relative to total font height
-	    FLOAT totalHeight = float(fontMetrics.ascent + fontMetrics.descent);
-	    if (totalHeight != 0.0f)
-		*pFontAscent = float(fontMetrics.ascent) / totalHeight;
-	    else
+	    FLOAT totalHeight = عائم(fontMetrics.ascent + fontMetrics.descent);
+	    إذا (totalHeight != 0.0f)
+		*pFontAscent = عائم(fontMetrics.ascent) / totalHeight;
+	    وإلا
 		*pFontAscent = 0.83f; // fallback
 	}
     }
-    else
+    وإلا
 	SafeRelease(&pTextFormat);
 
-    return hr;
+    أرجع hr;
 }
 
     HRESULT
-DWriteContext::SetFontByLOGFONT(const LOGFONTW &logFont)
+DWriteContext::SetFontByLOGFONT(ثابت LOGFONTW &logFont)
 {
     HRESULT hr = S_OK;
-    IDWriteTextFormat *pTextFormat = NULL;
+    IDWriteTextFormat *pTextFormat = عدم;
     FLOAT fontAscent = 0.0f;
 
     hr = CreateTextFormatFromLOGFONT(logFont, &pTextFormat, &fontAscent);
 
-    if (SUCCEEDED(hr))
+    إذا (SUCCEEDED(hr))
     {
 	SafeRelease(&mTextFormat);
 	mTextFormat = pTextFormat;
@@ -906,16 +906,16 @@ DWriteContext::SetFontByLOGFONT(const LOGFONTW &logFont)
 	mFontAscent = fontAscent;
     }
 
-    return hr;
+    أرجع hr;
 }
 
-    void
+    فراغ
 DWriteContext::SetFont(HFONT hFont)
 {
     FontCache::Item item;
-    if (mFontCache.get(hFont, item))
+    إذا (mFontCache.get(hFont, item))
     {
-	if (item.pTextFormat != NULL)
+	إذا (item.pTextFormat != عدم)
 	{
 	    item.pTextFormat->AddRef();
 	    SafeRelease(&mTextFormat);
@@ -923,33 +923,33 @@ DWriteContext::SetFont(HFONT hFont)
 	    mFontWeight = item.fontWeight;
 	    mFontStyle = item.fontStyle;
 	    mFontAscent = item.fontAscent;
-	    mFallbackDC = false;
+	    mFallbackDC = خطأ;
 	}
-	else
+	وإلا
 	    mFallbackDC = true;
-	return;
+	أرجع;
     }
 
     HRESULT hr = E_FAIL;
     LOGFONTW lf;
-    if (GetObjectW(hFont, sizeof(lf), &lf))
+    إذا (GetObjectW(hFont, حجم(lf), &lf))
 	hr = SetFontByLOGFONT(lf);
 
     item.hFont = hFont;
-    if (SUCCEEDED(hr))
+    إذا (SUCCEEDED(hr))
     {
 	item.pTextFormat = mTextFormat;
 	item.fontWeight = mFontWeight;
 	item.fontStyle = mFontStyle;
 	item.fontAscent = mFontAscent;
-	mFallbackDC = false;
+	mFallbackDC = خطأ;
     }
-    else
+    وإلا
 	mFallbackDC = true;
     mFontCache.put(item);
 }
 
-    void
+    فراغ
 DWriteContext::Rebind()
 {
     SafeRelease(&mBitmap);
@@ -962,83 +962,83 @@ DWriteContext::Rebind()
 	96.0f, 96.0f
     };
     mRT->CreateBitmap(
-	    D2D1::SizeU(mBindRect.right - mBindRect.left,
-		mBindRect.bottom - mBindRect.top),
+	    D2D1::SizeU(mBindRect.دایاں - mBindRect.بایاں,
+		mBindRect.bottom - mBindRect.چوٹی),
 	    props, &mBitmap);
 }
 
-    void
-DWriteContext::BindDC(HDC hdc, const RECT *rect)
+    فراغ
+DWriteContext::BindDC(HDC hdc, ثابت RECT *rect)
 {
     mHDC = hdc;
     mBindRect = *rect;
 
-    if (mRT == NULL)
+    إذا (mRT == عدم)
 	CreateDeviceResources();
-    else
+    وإلا
     {
 	Flush();
 	Rebind();
     }
 }
 
-extern "C" void redraw_later_clear(void);
+خارجي "C" فراغ redraw_later_clear(فراغ);
 
     HRESULT
 DWriteContext::SetDrawingMode(DrawingMode mode)
 {
     HRESULT hr = S_OK;
 
-    switch (mode)
+    بدل (mode)
     {
-	default:
-	case DM_GDI:
-	    if (mInteropHDC != NULL)
+	افتراضي:
+	حالة DM_GDI:
+	    إذا (mInteropHDC != عدم)
 	    {
-		mGDIRT->ReleaseDC(NULL);
-		mInteropHDC = NULL;
+		mGDIRT->ReleaseDC(عدم);
+		mInteropHDC = عدم;
 	    }
-	    if (mDrawing)
+	    إذا (mDrawing)
 	    {
 		hr = mRT->EndDraw();
-		if (hr == (HRESULT)D2DERR_RECREATE_TARGET)
+		إذا (hr == (HRESULT)D2DERR_RECREATE_TARGET)
 		{
 		    hr = S_OK;
 		    DiscardDeviceResources();
 		    CreateDeviceResources();
 		    redraw_later_clear();
 		}
-		mDrawing = false;
+		mDrawing = خطأ;
 	    }
-	    break;
+	    اكسر;
 
-	case DM_DIRECTX:
-	    if (mInteropHDC != NULL)
+	حالة DM_DIRECTX:
+	    إذا (mInteropHDC != عدم)
 	    {
-		mGDIRT->ReleaseDC(NULL);
-		mInteropHDC = NULL;
+		mGDIRT->ReleaseDC(عدم);
+		mInteropHDC = عدم;
 	    }
-	    else if (mDrawing == false)
+	    وإلا إذا (mDrawing == خطأ)
 	    {
 		CreateDeviceResources();
 		mRT->BeginDraw();
 		mDrawing = true;
 	    }
-	    break;
+	    اكسر;
 
-	case DM_INTEROP:
-	    if (mDrawing == false)
+	حالة DM_INTEROP:
+	    إذا (mDrawing == خطأ)
 	    {
 		CreateDeviceResources();
 		mRT->BeginDraw();
 		mDrawing = true;
 	    }
-	    if (mInteropHDC == NULL)
+	    إذا (mInteropHDC == عدم)
 		hr = mGDIRT->GetDC(D2D1_DC_INITIALIZE_MODE_COPY, &mInteropHDC);
-	    break;
+	    اكسر;
     }
     mDMode = mode;
-    return hr;
+    أرجع hr;
 }
 
     ID2D1Brush*
@@ -1046,19 +1046,19 @@ DWriteContext::SolidBrush(COLORREF color)
 {
     mBrush->SetColor(D2D1::ColorF(UINT32(GetRValue(color)) << 16 |
 		UINT32(GetGValue(color)) << 8 | UINT32(GetBValue(color))));
-    return mBrush;
+    أرجع mBrush;
 }
 
-    void
-DWriteContext::DrawText(const WCHAR *text, int len,
-	int x, int y, int w, int h, int cellWidth, COLORREF color,
-	UINT fuOptions, const RECT *lprc, const INT *lpDx)
+    فراغ
+DWriteContext::DrawText(ثابت WCHAR *text, صحيح len,
+	صحيح x, صحيح y, صحيح w, صحيح h, صحيح cellWidth, COLORREF color,
+	UINT fuOptions, ثابت RECT *lprc, ثابت INT *lpDx)
 {
-    if (mFallbackDC)
+    إذا (mFallbackDC)
     {
 	// Fall back to GDI rendering.
 	HRESULT hr = SetDrawingMode(DM_INTEROP);
-	if (SUCCEEDED(hr))
+	إذا (SUCCEEDED(hr))
 	{
 	    HGDIOBJ hFont = ::GetCurrentObject(mHDC, OBJ_FONT);
 	    HGDIOBJ hOldFont = ::SelectObject(mInteropHDC, hFont);
@@ -1067,70 +1067,70 @@ DWriteContext::DrawText(const WCHAR *text, int len,
 	    ::ExtTextOutW(mInteropHDC, x, y, fuOptions, lprc, text, len, lpDx);
 	    ::SelectObject(mInteropHDC, hOldFont);
 	}
-	return;
+	أرجع;
     }
 
     HRESULT hr;
-    IDWriteTextLayout *textLayout = NULL;
+    IDWriteTextLayout *textLayout = عدم;
 
     SetDrawingMode(DM_DIRECTX);
 
     // Apply clipping if ETO_CLIPPED is specified
-    if ((fuOptions & ETO_CLIPPED) && lprc != NULL)
+    إذا ((fuOptions & ETO_CLIPPED) && lprc != عدم)
     {
-	mRT->PushAxisAlignedClip(
-	    D2D1::RectF(FLOAT(lprc->left), FLOAT(lprc->top),
-			FLOAT(lprc->right), FLOAT(lprc->bottom)),
+	mRT->ڈالو_Axis_Aligned_Clip(
+	    D2D1::RectF(FLOAT(lprc->بایاں), FLOAT(lprc->چوٹی),
+			FLOAT(lprc->دایاں), FLOAT(lprc->bottom)),
 	    D2D1_ANTIALIAS_MODE_ALIASED);
     }
 
     hr = mDWriteFactory->CreateTextLayout(text, len, mTextFormat,
 	    FLOAT(w), FLOAT(h), &textLayout);
 
-    if (SUCCEEDED(hr))
+    إذا (SUCCEEDED(hr))
     {
 	DWRITE_TEXT_RANGE textRange = { 0, UINT32(len) };
 	textLayout->SetFontWeight(mFontWeight, textRange);
 	textLayout->SetFontStyle(mFontStyle, textRange);
 
-	if (mFontFeatureCount > 0)
+	إذا (m_Font_Feature_گنتی > 0)
 	{
 	    // Default OpenType features that DirectWrite normally enables.
 	    // SetTypography() overrides all defaults, so we must
 	    // re-add them here explicitly.
-	    static const DWRITE_FONT_FEATURE defaultFeatures[] = {
+	    ساكن ثابت DWRITE_FONT_FEATURE defaultFeatures[] = {
 		{ DWRITE_FONT_FEATURE_TAG_CONTEXTUAL_ALTERNATES, 1 },
 		{ DWRITE_FONT_FEATURE_TAG_STANDARD_LIGATURES, 1 },
 		{ DWRITE_FONT_FEATURE_TAG_CONTEXTUAL_LIGATURES, 1 },
 		{ DWRITE_FONT_FEATURE_TAG_REQUIRED_LIGATURES, 1 },
 		{ DWRITE_FONT_FEATURE_TAG_KERNING, 1 },
 	    };
-	    static const int numDefaults = sizeof(defaultFeatures)
-		/ sizeof(defaultFeatures[0]);
+	    ساكن ثابت صحيح عدد_Defaults = حجم(defaultFeatures)
+		/ حجم(defaultFeatures[0]);
 
-	    IDWriteTypography *typography = NULL;
+	    IDWriteTypography *typography = عدم;
 	    hr = mDWriteFactory->CreateTypography(&typography);
-	    if (SUCCEEDED(hr))
+	    إذا (SUCCEEDED(hr))
 	    {
 		// Add default features, skipping any that the user
 		// has explicitly specified (either + or -).
-		for (int d = 0; d < numDefaults; ++d)
+		لكل (صحيح d = 0; d < عدد_Defaults; ++d)
 		{
-		    int overridden = 0;
-		    for (int u = 0; u < mFontFeatureCount; ++u)
+		    صحيح overridden = 0;
+		    لكل (صحيح u = 0; u < m_Font_Feature_گنتی; ++u)
 		    {
-			if ((DWRITE_FONT_FEATURE_TAG)mFontFeatures[u].tag
+			إذا ((DWRITE_FONT_FEATURE_TAG)mFontFeatures[u].tag
 				== defaultFeatures[d].nameTag)
 			{
 			    overridden = 1;
-			    break;
+			    اكسر;
 			}
 		    }
-		    if (!overridden)
+		    إذا (!overridden)
 			typography->AddFontFeature(defaultFeatures[d]);
 		}
 		// Add user-specified features.
-		for (int i = 0; i < mFontFeatureCount; ++i)
+		لكل (صحيح i = 0; i < m_Font_Feature_گنتی; ++i)
 		{
 		    DWRITE_FONT_FEATURE ff = {
 			(DWRITE_FONT_FEATURE_TAG)mFontFeatures[i].tag,
@@ -1151,7 +1151,7 @@ DWriteContext::DrawText(const WCHAR *text, int len,
 	// vertical shifts during redraw.
 	FLOAT baselineY = roundf(FLOAT(y) + FLOAT(h) * mFontAscent + 0.5);
 
-	TextRenderer renderer(this);
+	TextRenderer renderer(هذا);
 	TextRendererContext context = { color, FLOAT(cellWidth), lpDx, len,
 		baselineY, 0.0f, 0 };
 
@@ -1160,14 +1160,14 @@ DWriteContext::DrawText(const WCHAR *text, int len,
 
     SafeRelease(&textLayout);
 
-    if ((fuOptions & ETO_CLIPPED) && lprc != NULL)
-	mRT->PopAxisAlignedClip();
+    إذا ((fuOptions & ETO_CLIPPED) && lprc != عدم)
+	mRT->نکالو_Axis_Aligned_Clip();
 }
 
-    void
-DWriteContext::FillRect(const RECT *rc, COLORREF color)
+    فراغ
+DWriteContext::FillRect(ثابت RECT *rc, COLORREF color)
 {
-    if (mDMode == DM_INTEROP)
+    إذا (mDMode == DM_INTEROP)
     {
 	// GDI functions are used before this call.  Keep using GDI.
 	// (Switching to Direct2D causes terrible slowdown.)
@@ -1175,121 +1175,121 @@ DWriteContext::FillRect(const RECT *rc, COLORREF color)
 	::FillRect(mInteropHDC, rc, hbr);
 	::DeleteObject(HGDIOBJ(hbr));
     }
-    else
+    وإلا
     {
 	SetDrawingMode(DM_DIRECTX);
 	mRT->FillRectangle(
-		D2D1::RectF(FLOAT(rc->left), FLOAT(rc->top),
-		    FLOAT(rc->right), FLOAT(rc->bottom)),
+		D2D1::RectF(FLOAT(rc->بایاں), FLOAT(rc->چوٹی),
+		    FLOAT(rc->دایاں), FLOAT(rc->bottom)),
 		SolidBrush(color));
     }
 }
 
-    void
-DWriteContext::DrawLine(int x1, int y1, int x2, int y2, COLORREF color)
+    فراغ
+DWriteContext::Draw_سطر(صحيح x1, صحيح y1, صحيح x2, صحيح y2, COLORREF color)
 {
-    if (mDMode == DM_INTEROP)
+    إذا (mDMode == DM_INTEROP)
     {
 	// GDI functions are used before this call.  Keep using GDI.
 	// (Switching to Direct2D causes terrible slowdown.)
 	HPEN hpen = ::CreatePen(PS_SOLID, 1, color);
 	HGDIOBJ old_pen = ::SelectObject(mInteropHDC, HGDIOBJ(hpen));
-	::MoveToEx(mInteropHDC, x1, y1, NULL);
-	::LineTo(mInteropHDC, x2, y2);
+	::MoveToEx(mInteropHDC, x1, y1, عدم);
+	::سطر_To(mInteropHDC, x2, y2);
 	::SelectObject(mInteropHDC, old_pen);
 	::DeleteObject(HGDIOBJ(hpen));
     }
-    else
+    وإلا
     {
 	SetDrawingMode(DM_DIRECTX);
-	mRT->DrawLine(
+	mRT->Draw_سطر(
 		D2D1::Point2F(FLOAT(x1), FLOAT(y1) + 0.5f),
 		D2D1::Point2F(FLOAT(x2), FLOAT(y2) + 0.5f),
 		SolidBrush(color));
     }
 }
 
-    void
-DWriteContext::SetPixel(int x, int y, COLORREF color)
+    فراغ
+DWriteContext::SetPixel(صحيح x, صحيح y, COLORREF color)
 {
-    if (mDMode == DM_INTEROP)
+    إذا (mDMode == DM_INTEROP)
     {
 	// GDI functions are used before this call.  Keep using GDI.
 	// (Switching to Direct2D causes terrible slowdown.)
 	::SetPixel(mInteropHDC, x, y, color);
     }
-    else
+    وإلا
     {
 	SetDrawingMode(DM_DIRECTX);
 	// Direct2D doesn't have SetPixel API.  Use DrawLine instead.
-	mRT->DrawLine(
+	mRT->Draw_سطر(
 		D2D1::Point2F(FLOAT(x), FLOAT(y) + 0.5f),
 		D2D1::Point2F(FLOAT(x+1), FLOAT(y) + 0.5f),
 		SolidBrush(color));
     }
 }
 
-    void
-DWriteContext::Scroll(int x, int y, const RECT *rc)
+    فراغ
+DWriteContext::Scroll(صحيح x, صحيح y, ثابت RECT *rc)
 {
     SetDrawingMode(DM_DIRECTX);
     mRT->Flush();
 
     D2D1_RECT_U srcRect;
     D2D1_POINT_2U destPoint;
-    if (x >= 0)
+    إذا (x >= 0)
     {
-	srcRect.left = rc->left;
-	srcRect.right = rc->right - x;
-	destPoint.x = rc->left + x;
+	srcRect.بایاں = rc->بایاں;
+	srcRect.دایاں = rc->دایاں - x;
+	destPoint.x = rc->بایاں + x;
     }
-    else
+    وإلا
     {
-	srcRect.left = rc->left - x;
-	srcRect.right = rc->right;
-	destPoint.x = rc->left;
+	srcRect.بایاں = rc->بایاں - x;
+	srcRect.دایاں = rc->دایاں;
+	destPoint.x = rc->بایاں;
     }
-    if (y >= 0)
+    إذا (y >= 0)
     {
-	srcRect.top = rc->top;
+	srcRect.چوٹی = rc->چوٹی;
 	srcRect.bottom = rc->bottom - y;
-	destPoint.y = rc->top + y;
+	destPoint.y = rc->چوٹی + y;
     }
-    else
+    وإلا
     {
-	srcRect.top = rc->top - y;
+	srcRect.چوٹی = rc->چوٹی - y;
 	srcRect.bottom = rc->bottom;
-	destPoint.y = rc->top;
+	destPoint.y = rc->چوٹی;
     }
     mBitmap->CopyFromRenderTarget(&destPoint, mRT, &srcRect);
 
     D2D1_RECT_F destRect = {
 	    FLOAT(destPoint.x), FLOAT(destPoint.y),
-	    FLOAT(destPoint.x + srcRect.right - srcRect.left),
-	    FLOAT(destPoint.y + srcRect.bottom - srcRect.top)
+	    FLOAT(destPoint.x + srcRect.دایاں - srcRect.بایاں),
+	    FLOAT(destPoint.y + srcRect.bottom - srcRect.چوٹی)
     };
     mRT->DrawBitmap(mBitmap, destRect, 1.0F,
 	    D2D1_BITMAP_INTERPOLATION_MODE_NEAREST_NEIGHBOR, destRect);
 }
 
-    void
+    فراغ
 DWriteContext::Flush()
 {
     SetDrawingMode(DM_GDI);
 }
 
-    void
+    فراغ
 DWriteContext::SetRenderingParams(
-	const DWriteRenderingParams *params)
+	ثابت DWriteRenderingParams *params)
 {
-    if (mDWriteFactory == NULL)
-	return;
+    إذا (mDWriteFactory == عدم)
+	أرجع;
 
-    IDWriteRenderingParams *renderingParams = NULL;
+    IDWriteRenderingParams *renderingParams = عدم;
     D2D1_TEXT_ANTIALIAS_MODE textAntialiasMode =
 	D2D1_TEXT_ANTIALIAS_MODE_DEFAULT;
     HRESULT hr;
-    if (params != NULL)
+    إذا (params != عدم)
     {
 	hr = mDWriteFactory->CreateCustomRenderingParams(params->gamma,
 		params->enhancedContrast, params->clearTypeLevel,
@@ -1297,9 +1297,9 @@ DWriteContext::SetRenderingParams(
 		ToRenderingMode(params->renderingMode), &renderingParams);
 	textAntialiasMode = ToTextAntialiasMode(params->textAntialiasMode);
     }
-    else
+    وإلا
 	hr = mDWriteFactory->CreateRenderingParams(&renderingParams);
-    if (SUCCEEDED(hr) && renderingParams != NULL)
+    إذا (SUCCEEDED(hr) && renderingParams != عدم)
     {
 	SafeRelease(&mRenderingParams);
 	mRenderingParams = renderingParams;
@@ -1315,7 +1315,7 @@ DWriteContext::SetRenderingParams(
 DWriteContext::GetRenderingParams(
 	DWriteRenderingParams *params)
 {
-    if (params != NULL && mRenderingParams != NULL)
+    إذا (params != عدم && mRenderingParams != عدم)
     {
 	params->gamma = mRenderingParams->GetGamma();
 	params->enhancedContrast = mRenderingParams->GetEnhancedContrast();
@@ -1324,23 +1324,23 @@ DWriteContext::GetRenderingParams(
 	params->renderingMode = ToInt(mRenderingParams->GetRenderingMode());
 	params->textAntialiasMode = mTextAntialiasMode;
     }
-    return params;
+    أرجع params;
 }
 
 ////////////////////////////////////////////////////////////////////////////
 // PUBLIC C INTERFACES
 
-    void
-DWrite_Init(void)
+    فراغ
+DWrite_Init(فراغ)
 {
 #ifdef DYNAMIC_DIRECTX
     // Load libraries.
     hD2D1DLL = vimLoadLib("d2d1.dll");
     hDWriteDLL = vimLoadLib("dwrite.dll");
-    if (hD2D1DLL == NULL || hDWriteDLL == NULL)
+    إذا (hD2D1DLL == عدم || hDWriteDLL == عدم)
     {
 	DWrite_Final();
-	return;
+	أرجع;
     }
     // Get address of procedures.
     pGetUserDefaultLocaleName = (PGETUSERDEFAULTLOCALENAME)GetProcAddress(
@@ -1352,111 +1352,111 @@ DWrite_Init(void)
 #endif
 }
 
-    void
-DWrite_Final(void)
+    فراغ
+DWrite_Final(فراغ)
 {
 #ifdef DYNAMIC_DIRECTX
-    pGetUserDefaultLocaleName = NULL;
-    pD2D1CreateFactory = NULL;
-    pDWriteCreateFactory = NULL;
+    pGetUserDefaultLocaleName = عدم;
+    pD2D1CreateFactory = عدم;
+    pDWriteCreateFactory = عدم;
     unload(hDWriteDLL);
     unload(hD2D1DLL);
 #endif
 }
 
     DWriteContext *
-DWriteContext_Open(void)
+DWriteContext_Open(فراغ)
 {
 #ifdef DYNAMIC_DIRECTX
-    if (pGetUserDefaultLocaleName == NULL || pD2D1CreateFactory == NULL
-	    || pDWriteCreateFactory == NULL)
-	return NULL;
+    إذا (pGetUserDefaultLocaleName == عدم || pD2D1CreateFactory == عدم
+	    || pDWriteCreateFactory == عدم)
+	أرجع عدم;
 #endif
-    return new DWriteContext();
+    أرجع جديد DWriteContext();
 }
 
-    void
-DWriteContext_BindDC(DWriteContext *ctx, HDC hdc, const RECT *rect)
+    فراغ
+DWriteContext_BindDC(DWriteContext *ctx, HDC hdc, ثابت RECT *rect)
 {
-    if (ctx != NULL)
+    إذا (ctx != عدم)
 	ctx->BindDC(hdc, rect);
 }
 
-    void
+    فراغ
 DWriteContext_SetFont(DWriteContext *ctx, HFONT hFont)
 {
-    if (ctx != NULL)
+    إذا (ctx != عدم)
 	ctx->SetFont(hFont);
 }
 
-    void
+    فراغ
 DWriteContext_DrawText(
 	DWriteContext *ctx,
-	const WCHAR *text,
-	int len,
-	int x,
-	int y,
-	int w,
-	int h,
-	int cellWidth,
+	ثابت WCHAR *text,
+	صحيح len,
+	صحيح x,
+	صحيح y,
+	صحيح w,
+	صحيح h,
+	صحيح cellWidth,
 	COLORREF color,
 	UINT fuOptions,
-	const RECT *lprc,
-	const INT *lpDx)
+	ثابت RECT *lprc,
+	ثابت INT *lpDx)
 {
-    if (ctx != NULL)
+    إذا (ctx != عدم)
 	ctx->DrawText(text, len, x, y, w, h, cellWidth, color,
 		fuOptions, lprc, lpDx);
 }
 
-    void
-DWriteContext_FillRect(DWriteContext *ctx, const RECT *rc, COLORREF color)
+    فراغ
+DWriteContext_FillRect(DWriteContext *ctx, ثابت RECT *rc, COLORREF color)
 {
-    if (ctx != NULL)
+    إذا (ctx != عدم)
 	ctx->FillRect(rc, color);
 }
 
-    void
-DWriteContext_DrawLine(DWriteContext *ctx, int x1, int y1, int x2, int y2,
+    فراغ
+DWrite_Context_Draw_سطر(DWriteContext *ctx, صحيح x1, صحيح y1, صحيح x2, صحيح y2,
 	COLORREF color)
 {
-    if (ctx != NULL)
-	ctx->DrawLine(x1, y1, x2, y2, color);
+    إذا (ctx != عدم)
+	ctx->Draw_سطر(x1, y1, x2, y2, color);
 }
 
-    void
-DWriteContext_SetPixel(DWriteContext *ctx, int x, int y, COLORREF color)
+    فراغ
+DWriteContext_SetPixel(DWriteContext *ctx, صحيح x, صحيح y, COLORREF color)
 {
-    if (ctx != NULL)
+    إذا (ctx != عدم)
 	ctx->SetPixel(x, y, color);
 }
 
-    void
-DWriteContext_Scroll(DWriteContext *ctx, int x, int y, const RECT *rc)
+    فراغ
+DWriteContext_Scroll(DWriteContext *ctx, صحيح x, صحيح y, ثابت RECT *rc)
 {
-    if (ctx != NULL)
+    إذا (ctx != عدم)
 	ctx->Scroll(x, y, rc);
 }
 
-    void
+    فراغ
 DWriteContext_Flush(DWriteContext *ctx)
 {
-    if (ctx != NULL)
+    إذا (ctx != عدم)
 	ctx->Flush();
 }
 
-    void
+    فراغ
 DWriteContext_Close(DWriteContext *ctx)
 {
     delete ctx;
 }
 
-    void
+    فراغ
 DWriteContext_SetRenderingParams(
 	DWriteContext *ctx,
-	const DWriteRenderingParams *params)
+	ثابت DWriteRenderingParams *params)
 {
-    if (ctx != NULL)
+    إذا (ctx != عدم)
 	ctx->SetRenderingParams(params);
 }
 
@@ -1465,29 +1465,29 @@ DWriteContext_GetRenderingParams(
 	DWriteContext *ctx,
 	DWriteRenderingParams *params)
 {
-    if (ctx != NULL)
-	return ctx->GetRenderingParams(params);
-    else
-	return NULL;
+    إذا (ctx != عدم)
+	أرجع ctx->GetRenderingParams(params);
+    وإلا
+	أرجع عدم;
 }
 
-    void
+    فراغ
 DWriteContext::SetFontFeatures(
-	const DWriteFontFeature *features, int count)
+	ثابت DWriteFontFeature *features, صحيح گنتی)
 {
-    if (count > DWRITE_MAX_FONT_FEATURES)
-	count = DWRITE_MAX_FONT_FEATURES;
-    mFontFeatureCount = count;
-    if (count > 0 && features != NULL)
-	memcpy(mFontFeatures, features, sizeof(DWriteFontFeature) * count);
+    إذا (گنتی > DWRITE_MAX_FONT_FEATURES)
+	گنتی = DWRITE_MAX_FONT_FEATURES;
+    m_Font_Feature_گنتی = گنتی;
+    إذا (گنتی > 0 && features != عدم)
+	memcpy(mFontFeatures, features, حجم(DWriteFontFeature) * گنتی);
 }
 
-    void
+    فراغ
 DWriteContext_SetFontFeatures(
 	DWriteContext *ctx,
-	const DWriteFontFeature *features,
-	int count)
+	ثابت DWriteFontFeature *features,
+	صحيح گنتی)
 {
-    if (ctx != NULL)
-	ctx->SetFontFeatures(features, count);
+    إذا (ctx != عدم)
+	ctx->SetFontFeatures(features, گنتی);
 }
